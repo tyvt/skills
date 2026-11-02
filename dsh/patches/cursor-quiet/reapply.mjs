@@ -7,6 +7,7 @@
 // writes only when it had to change something.
 import { apply, status, log } from './install.mjs';
 import { applyQuiet, statusQuiet } from './patch-quiet.mjs';
+import { apply as applyBatchSealed } from '../cursor-batch-sealed/patch-batch-sealed.mjs';
 
 try {
   const before = status();
@@ -23,6 +24,16 @@ try {
     if (q.changed) log(`reapplied quiet raise on native-session.mjs (${q.from} -> ${q.to})`);
   } catch (e) {
     log(`quiet raise skipped: ${e.message}`);
+  }
+
+  // Keep the sealed-batch retransmission fix on native-session.mjs: without it a
+  // retransmitted exec after a single-call step seals its batch ends the whole
+  // turn with "native call arrived after its batch was sealed" (502).
+  try {
+    const b = applyBatchSealed();
+    if (b.changed) log('reapplied sealed-batch retransmission fix on native-session.mjs');
+  } catch (e) {
+    log(`sealed-batch fix skipped: ${e.message}`);
   }
 } catch (error) {
   log(`reapply failed: ${error.message}`);
