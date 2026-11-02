@@ -1,0 +1,183 @@
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+#
+# Token 优化（2026-10-27，见 token-audit/portal-2d1bdfb2.md）：
+# headless 没有 preset，主 agent 直接用 base bundle 的顶层行，
+# 所以模型表、spill、pruner、tool-fs 都能直接按 id 命中。
+- id: spill-policy
+  name: '@deepseek-ai/dsh-spill-policy'
+  config:
+    maxInlineTokens: 3000
+- id: compaction-basic
+  name: '@deepseek-ai/dsh-compaction-basic'
+  config:
+    thresholdRatio: 0.4
+    # Independent of Magpie model-table sync: 1M * 0.1024 = 102400.
+    modelPolicies:
+      - provider: magpie
+        model: workbuddy/deepseek-v4.1-flash
+        thresholdRatio: 0.1024
+        retainTokens: 20000
+      - provider: magpie
+        model: workbuddy/glm-5.3-flash
+        thresholdRatio: 0.1024
+        retainTokens: 20000
+      - provider: magpie
+        model: workbuddy-ai/deepseek-v4.1-flash
+        thresholdRatio: 0.1024
+        retainTokens: 20000
+      - provider: magpie
+        model: workbuddy-ai/deepseek-v4.1-flash-sg
+        thresholdRatio: 0.1024
+        retainTokens: 20000
+- id: tool-result-pruner
+  name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+  config:
+    thresholdChars: 4096
+    headChars: 2048
+    tailChars: 768
+- id: tool-fs
+  name: '@deepseek-ai/dsh-tool-fs'
+  config:
+    readLimit: 400
+    readMaxBytes: 24576
+- id: tool-skill
+  name: '@deepseek-ai/dsh-tool-skill'
+  config:
+    catalogDescriptionMaxLength: 120
+
+# MCP 改由 dsh-mcp-gateway bundle 按需代理（见 profiles/headless/package.json）。
+# headless 的 base bundle 里没有 mcp-client 行，不需要 disabled 覆盖。
+- id: llm-pi-ai # magpie
+  name: "@deepseek-ai/dsh-llm-pi-ai"
+  config:
+    providers:
+      magpie:
+        displayName: Magpie
+        apiKeyEnv: MAGPIE_GATEWAY_KEY
+        api: openai-completions
+        baseURL: http://127.0.0.1:3425/v1
+        models:
+          - id: auto/hy3
+            name: Hy3 · routing group
+            contextWindow: 192000
+            maxTokens: 48000
+            input: [text, image]
+            reasoningEfforts:
+              low: low
+              high: high
+          - id: auto/deepseek-v4.1-flash
+            name: DeepSeek V4.1 Flash · routing group
+            contextWindow: 1000000
+            maxTokens: 128000
+            input: [text, image]
+            reasoningEfforts:
+              low: low
+              high: high
+          - id: cursor/grok-4.7@256k
+            name: Grok 4.7 @ 256k · Cursor
+            contextWindow: 256000
+            input: [text, image]
+            reasoningEfforts:
+              low: low
+              medium: medium
+              high: high
+              xhigh: xhigh
+          - id: cursor/deepseek-v41-flash-1017
+            name: DeepSeek V4.1 Flash 1017 · Cursor
+            contextWindow: 1048576
+            input: [text, image]
+            reasoningEfforts:
+              "off": none
+              low: low
+              medium: medium
+              high: high
+              max: max
+          - id: cursor/composer-2.5
+            name: Composer 2.5 · Cursor
+            contextWindow: 200000
+            input: [text, image]
+          - id: workbuddy/hy3
+            name: Hy3 · WorkBuddy
+            contextWindow: 192000
+            maxTokens: 48000
+            input: [text, image]
+            reasoningEfforts:
+              low: low
+              high: high
+          - id: workbuddy/deepseek-v4.1-flash
+            name: DeepSeek-V4.1-Flash · WorkBuddy
+            contextWindow: 1000000
+            maxTokens: 128000
+            input: [text, image]
+            reasoningEfforts:
+              "off": none
+              low: low
+              high: high
+              max: max
+          - id: workbuddy-ai/hy3
+            name: Hy3 · WorkBuddy AI
+            contextWindow: 192000
+            maxTokens: 48000
+            input: [text, image]
+            reasoningEfforts:
+              low: low
+              high: high
+          - id: workbuddy-ai/deepseek-v4.1-flash-sg
+            name: Deepseek-V4.1-Flash · WorkBuddy AI
+            contextWindow: 1000000
+            maxTokens: 128000
+            input: [text, image]
+            reasoningEfforts:
+              "off": none
+              low: low
+              high: high
+              max: max
+          - id: autoclaw-cn/zai_glm-5.3-flash
+            name: GLM-5.3-Flash · AutoClaw 国内 (Zhipu)
+            contextWindow: 1048576
+            maxTokens: 131072
+            input: [text, image]
+            reasoningEfforts:
+              low: low
+              high: high
+              max: max
+          - id: trae-cn/deepseek-v4.1-flash
+            name: DeepSeek-V4.1-Flash · Trae CN
+            contextWindow: 116000
+            maxTokens: 16000
+            input: [text, image]
+            reasoningEfforts:
+              low: low
+              high: high
+              xhigh: xhigh
+        streamIdleTimeoutMs: 600000
+      magpie-anthropic:
+        displayName: Magpie · Anthropic
+        apiKeyEnv: MAGPIE_GATEWAY_KEY
+        api: anthropic-messages
+        baseURL: http://127.0.0.1:3425
+        models:
+          - id: minimax-code/MiniMax-M3.1-Flash
+            name: M3.1-Flash · MiniMax Code
+            contextWindow: 1048576
+            maxTokens: 458752
+            input: [text, image]
+            reasoningEfforts:
+              low: low
+              medium: medium
+              high: high
+              xhigh: xhigh
+              max: max
+        streamIdleTimeoutMs: 600000
+- id: agent-default-model # magpie
+  config:
+    provider: magpie
+    model: "workbuddy/deepseek-v4.1-flash"
+- id: web-search-deepseek # magpie
+  name: "@deepseek-ai/dsh-web-search-deepseek"
+  config:
+    apiKeyEnv: MAGPIE_GATEWAY_KEY
+    baseURL: "http://127.0.0.1:3425/v1"
+    model: "workbuddy/deepseek-v4.1-flash"

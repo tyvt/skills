@@ -1,0 +1,28 @@
+# dsh-agent-guard bundle 自己的行。
+#
+# cordis 的 patch 规则：非 insert 的 patch 必须命中已存在的条目，条目不存在会
+# 被跳过并报 `entry not found`。所以新增插件必须用 `insert` 往树里插入。
+# profile 级覆盖（~/.dsh/profiles/web/cordis.patch.yml）在本文件之后应用。
+- insert:
+    - id: agent-guard
+      name: dsh-agent-guard
+      config:
+        enabled: true
+        repair:
+          toolName: true
+          schema: true
+          escalation: true
+          semantics: true
+        recovery:
+          enabled: true
+          # 内建 llm-retry 是「每会话每 provider 5 次」，用完就整轮报废。
+          # 这里在预算之外再给 3 次带退避的机会。
+          maxExtraRetries: 3
+          # 额度型 429 重试意义有限，最多再给 1 次。
+          rateLimitMaxExtraRetries: 1
+          initialDelayMs: 1500
+          maxDelayMs: 20000
+          jitterRatio: 0.2
+          # provider 要求等待超过 2 分钟就不重试，避免把会话挂住几小时。
+          maxWaitMs: 120000
+        ledgerPath: reports/agent-guard-ledger.jsonl

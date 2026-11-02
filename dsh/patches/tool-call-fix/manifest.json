@@ -1,0 +1,76 @@
+{
+  "format": 1,
+  "id": "dsh-tool-call-fix-20261027",
+  "patches": [
+    {
+      "name": "dsh-llm-pi-ai",
+      "edits": [
+        {
+          "before": "arguments: JSON.stringify(event.toolCall.arguments)",
+          "after": "// Preserve parser failures as a non-object so even zero-argument tools reject them.\n                    arguments: JSON.stringify(event.toolCall.argumentsError\n                        ? \"Invalid tool arguments: \" + event.toolCall.argumentsError\n                        : event.toolCall.arguments)"
+        }
+      ]
+    },
+    {
+      "name": "dsh-tools",
+      "edits": [
+        {
+          "before": "if (violations.length > 0) throw new ToolArgsError(violations);",
+          "after": "if (violations.length > 0) {\n                const error = new ToolArgsError(violations);\n                const required = (parameters.required ?? []).map(key => key + \" (\" + (parameters.properties?.[key]?.type ?? \"see schema\") + \")\").join(\", \");\n                error.message += '\\nTool \"' + options.name + '\" was not executed. Send a JSON object using the declared parameter names. Required parameters: ' + (required || \"none\") + '.';\n                if (typeof args === \"string\") error.message += \"\\nArgument parsing diagnostic: \" + args.slice(0, 1600);\n                throw error;\n            }"
+        },
+        {
+          "before": "if (!tool) throw new ToolNotFoundError(exec.name);",
+          "after": "if (!tool) {\n                const names = this.schemas(exec.agent).filter(schema => !this.collapses(schema.name, exec.agent, exec.parent !== void 0)).map(schema => schema.name);\n                throw new ToolNotFoundError(exec.name, \"currently callable tools: \" + (names.join(\", \") || \"none\") + \". Use a name from this list and its declared parameters.\");\n            }"
+        }
+      ]
+    },
+    {
+      "name": "dsh-sandbox",
+      "edits": [
+        {
+          "before": "\tif (justification !== void 0 && sandboxPermissions === void 0) throw new Error(\"invalid escalation: justification is only valid together with sandbox_permissions\");",
+          "after": "\tif (justification !== void 0 && sandboxPermissions === void 0) return; // lenient: drop a stray justification; the caller ignores it unless actually escalating"
+        }
+      ]
+    },
+    {
+      "name": "dsh-tool-fs",
+      "edits": [
+        {
+          "before": "//#region lib/types/mutation-result.js",
+          "after": "async function observeIfPresent(ctx, target, exec) {\n\tconst info = await ctx.fs.stat(target, exec.signal);\n\tif (info !== void 0) ctx.emit(\"fs/observed\", target, { kind: \"present\", version: info.version }, exec);\n}\n\n//#region lib/types/mutation-result.js"
+        },
+        {
+          "before": "\t\t\tconst target = await ctx.fs.resolve(input.filePath, await sessionResolveOptions(ctx, exec));\n\t\t\tconst intent = await ctx.waterfall(\"fs/write-intent\", target, exec, () => void 0);",
+          "after": "\t\t\tconst target = await ctx.fs.resolve(input.filePath, await sessionResolveOptions(ctx, exec));\n\t\t\tawait observeIfPresent(ctx, target, exec);\n\t\t\tconst intent = await ctx.waterfall(\"fs/write-intent\", target, exec, () => void 0);"
+        },
+        {
+          "before": "\t\t\tconst target = await ctx.fs.resolve(input.filePath, await sessionResolveOptions(ctx, exec));\n\t\t\tlet outcome;",
+          "after": "\t\t\tconst target = await ctx.fs.resolve(input.filePath, await sessionResolveOptions(ctx, exec));\n\t\t\tawait observeIfPresent(ctx, target, exec);\n\t\t\tlet outcome;"
+        }
+      ]
+    },
+    {
+      "name": "dsh-tool-fs-search",
+      "edits": [
+        {
+          "before": "const SEARCH_TIMEOUT_MS = 3e4;",
+          "after": "const SEARCH_TIMEOUT_MS = 12e4;"
+        }
+      ]
+    },
+    {
+      "name": "dsh-tool-session-query",
+      "edits": [
+        {
+          "before": "const DEFAULT_SEARCH_TIMEOUT_MS = 3e4;",
+          "after": "const DEFAULT_SEARCH_TIMEOUT_MS = 12e4;"
+        },
+        {
+          "before": "const searchTimeoutMs = config.searchTimeoutMs ?? 3e4;",
+          "after": "const searchTimeoutMs = config.searchTimeoutMs ?? 12e4;"
+        }
+      ]
+    }
+  ]
+}
