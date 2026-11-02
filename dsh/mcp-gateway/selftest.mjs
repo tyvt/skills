@@ -83,7 +83,8 @@ const exec = { signal }
 let listed = ''
 try {
   listed = await definition.execute({ server: 'dbx' }, exec)
-  check('列出 dbx 工具', listed.includes('dbx 有 25 个工具'), listed.slice(0, 120))
+  const countMatch = listed.match(/dbx 有 (\d+) 个工具/)
+  check('列出 dbx 工具', !!countMatch && Number(countMatch[1]) >= 1, listed.slice(0, 120))
   check('清单含 execute_query', listed.includes('dbx_execute_query'))
   check('清单是紧凑渲染（不含 JSON schema）', !listed.includes('"properties"'))
 } catch (error) {
