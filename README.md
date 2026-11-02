@@ -5,9 +5,7 @@
 ## 包含技能
 
 - `decision-options`
-- `find-skills`
 - `grill-me`
-- `handoff`
 - `i-have-adhd`
 - `long-term-memory`
 - `tdd`
