@@ -6,7 +6,8 @@
     python zentao_resolve.py <bugID> --resolution fixed --build trunk \
         --assign-to lichandan --comment-file note.html [--account tiany] [--password xxx]
 
-密码来源优先级：--password > 环境变量 ZENTAO_PASSWORD。
+凭据来源：默认读取同目录 credentials.py，无需每次询问；
+优先级：--account/--password > 环境变量 > credentials.py 默认值。
 """
 import argparse
 import json
@@ -17,8 +18,13 @@ import urllib.parse
 import urllib.request
 import http.cookiejar
 
-BASE = os.environ.get("ZENTAO_BASE", "http://zentao-biz.zhi.com")
-DEFAULT_ACCOUNT = os.environ.get("ZENTAO_ACCOUNT", "tiany")
+try:
+    import credentials as _cred
+except Exception:  # 独立运行时兜底
+    _cred = None
+
+BASE = (_cred.base() if _cred else os.environ.get("ZENTAO_BASE", "http://zentao-biz.zhi.com"))
+DEFAULT_ACCOUNT = (_cred.DEFAULT_ACCOUNT if _cred else os.environ.get("ZENTAO_ACCOUNT", "tiany"))
 
 
 def make_opener():
@@ -105,12 +111,21 @@ def main():
     ap.add_argument("--build", default="trunk")
     ap.add_argument("--assign-to", default="")
     ap.add_argument("--comment-file", default="")
-    ap.add_argument("--account", default=DEFAULT_ACCOUNT)
-    ap.add_argument("--password", default=os.environ.get("ZENTAO_PASSWORD", ""))
+    ap.add_argument("--account", default=None)
+    ap.add_argument("--password", default=None)
     args = ap.parse_args()
 
+    # 省略则从 credentials.py / 环境变量取，不再每次询问
+    if _cred:
+        acc0, pwd0 = _cred.resolve(args.account, args.password)
+        if not args.account:
+            args.account = acc0
+        if not args.password:
+            args.password = pwd0
+    if not args.account:
+        args.account = DEFAULT_ACCOUNT
     if not args.password:
-        print("缺少密码：请设 ZENTAO_PASSWORD 环境变量或传 --password")
+        print("缺少密码：请在 credentials.py 配置 DEFAULT_PASSWORD，或设 ZENTAO_PASSWORD 环境变量")
         sys.exit(2)
 
     op = make_opener()

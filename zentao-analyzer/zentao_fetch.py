@@ -16,8 +16,13 @@ import urllib.request
 import urllib.parse
 import http.cookiejar
 
-BASE = os.environ.get("ZENTAO_BASE", "http://zentao-biz.zhi.com")
-DEFAULT_ACCOUNT = os.environ.get("ZENTAO_ACCOUNT", "tiany")
+try:
+    import credentials as _cred
+except Exception:
+    _cred = None
+
+BASE = (_cred.base() if _cred else os.environ.get("ZENTAO_BASE", "http://zentao-biz.zhi.com"))
+DEFAULT_ACCOUNT = (_cred.DEFAULT_ACCOUNT if _cred else os.environ.get("ZENTAO_ACCOUNT", "tiany"))
 
 
 def make_opener():
@@ -78,12 +83,20 @@ def main():
     ap.add_argument("id", type=int)
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--type", default="bug", choices=["bug", "task", "story"])
-    ap.add_argument("--account", default=DEFAULT_ACCOUNT)
-    ap.add_argument("--password", default=os.environ.get("ZENTAO_PASSWORD", ""))
+    ap.add_argument("--account", default=None)
+    ap.add_argument("--password", default=None)
     args = ap.parse_args()
 
+    if _cred:
+        acc0, pwd0 = _cred.resolve(args.account, args.password)
+        if not args.account:
+            args.account = acc0
+        if not args.password:
+            args.password = pwd0
+    if not args.account:
+        args.account = DEFAULT_ACCOUNT
     if not args.password:
-        print("缺少密码：请设 ZENTAO_PASSWORD 环境变量或传 --password")
+        print("缺少密码：请在 credentials.py 配置 DEFAULT_PASSWORD，或设 ZENTAO_PASSWORD 环境变量")
         sys.exit(2)
 
     op = make_opener()
