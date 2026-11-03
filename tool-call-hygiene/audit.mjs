@@ -19,12 +19,18 @@ import path from 'path';
 import os from 'os';
 
 const TZ = 8 * 3600 * 1000;
+// 按 Asia/Shanghai(+08:00) 取 YYYY-MM-DD，避免用 UTC toISOString 把 +08:00 午夜回拨成前一天
+function shanghaiYMD(ts) {
+  const d = new Date(ts + TZ);
+  const p = n => String(n).padStart(2, '0');
+  return d.getUTCFullYear() + '-' + p(d.getUTCMonth() + 1) + '-' + p(d.getUTCDate());
+}
 const arg = process.argv[2];
 const dayStart = arg
   ? new Date(arg + 'T00:00:00+08:00').getTime()
   : (() => { const n = new Date(Date.now() + TZ); return new Date(n.toISOString().slice(0, 10) + 'T00:00:00+08:00').getTime(); })();
 const dayEnd = dayStart + 864e5;
-const dayLabel = arg || new Date(dayStart).toISOString().slice(0, 10);
+const dayLabel = arg || shanghaiYMD(dayStart);
 
 const base = path.join(os.homedir(), '.dsh', 'sessions');
 if (!fs.existsSync(base)) { console.error('未找到 sessions 目录: ' + base); process.exit(1); }
