@@ -21,6 +21,13 @@
 
 总计约 2.7 MB。
 
+## 同步方式
+
+- **运行时唯一源**：`~/.openviking/.../memories/`（OpenViking 服务写入）
+- **本目录**：复制快照，由 [`../scripts/snapshot-openviking-memory.mjs`](../scripts/snapshot-openviking-memory.mjs) 更新
+- **全量导入结束**：`memory-migration/import-all.mjs` 自动 `--commit --push`
+- **定时**：见 [`../scripts/README-openviking-snapshot.md`](../scripts/README-openviking-snapshot.md)
+
 ## 目录说明
 
 - `entities/`：实体知识卡（技术模式、组件、业务实体、项目等）
