@@ -23,7 +23,7 @@ node .\scripts\snapshot-openviking-memory.mjs --commit --push --reason manual
 
 ## 定时快照（Windows 计划任务）
 
-默认：**每天 03:00** 仅 `--commit`（本地提交，不推送）。
+默认：**每天 03:00** 执行 `--commit --push`（同步并推送到 `origin/main`）。
 
 ```powershell
 # 注册（管理员 PowerShell 可选；当前用户任务一般不需要）
