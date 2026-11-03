@@ -1,0 +1,30 @@
+# hy3
+OpenViking 使用的视觉语言模型（VLM），负责从会话中抽取记忆。
+
+## 基本信息
+- 在 OpenViking 中引用为 openai/auto/hy3
+- 复用 magpie 配置，作为记忆抽取器
+- 于 2026-11-02 在 doctor 检查中确认 VLM 探活成功
+
+## 状态备注
+- 2026-11-02 验证 VLM 抽取链路完全打通：实测会话抽取成功（单次 11578 tokens 抽 4 条、8973 tokens 抽 3 条、8712 tokens 抽 2 条记忆），中文结构化抽取准确
+- 抽取速度较慢：实测 2 条消息 commit 耗时 126 秒、12K tokens 仅产 1 条记忆约 100 秒
+- 单次 commit 约消耗 22K tokens，其中 VLM 抽取约 8K 推理 tokens
+- add-memory 直灌路径单条约 40 秒、约 4K tokens，自动分类写入（entities/preferences 等）
+- 2026-11-02 当前会话单次 commit 实测：约 370 秒、52K tokens，产出 3 条新增 + 3 条更新记忆（全量抽取含较长上下文）
+
+## 预提炼记忆导入表现
+- 2026-11-02 实测：将带 type/files/evidence/sessionIds/baseline 的预提炼记忆原样导入 OpenViking 时，VLM 仅保留语义分类（如 preference）与关键落地文件（例：VerificationReceiptDetailTable.vue），丢失 sessionIds（溯源 UUID）、baseline（代码基线如 c97957703）、evidence 原文及部分文件完整路径
+- 2026-11-02 园区物管2.0 试跑导入：hy3 每批抽4条，溯源内嵌正文保留率73%(偏好类本不带会话ID)；分类将bug归entities而非events，实体卡增大致合并增强、write降edit增
+- 同试跑单批耗时151→174s/批，累计1199万tokens@42批，证实用VLM导入成本高但可控
+- 2026-11-02 园区物管2.0 全量导入暴露语言漂移严重缺陷：hy3 将23条记忆整体葡萄牙语翻译(技术术语与中文项目名受损)，并生成葡语目录名 padrão técnico(技术模式)/causa raiz de layout(布局根因)；修复未重跑VLM(会再漂移)，改用内容指纹(变量名/组件名/接口名等ASCII标识符)从源数据精确反查中文原文逐条重写，23条全部恢复、残留0
+
+<!-- MEMORY_FIELDS
+{
+  "category": "视觉语言模型",
+  "name": "hy3",
+  "source_extraction_id": "66f5a71d91d04757bbadc1945a9aeacc",
+  "version": 7,
+  "memory_type": "entities"
+}
+-->

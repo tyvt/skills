@@ -1,0 +1,14 @@
+- Root cause of change button jump failure: `getRouterPathByFilePath` threw error breaking fallback, and `getLastByLogin` returned inconsistent formats.
+- `companyRecord.js` added `resolveChangeId()` to accept scalar or object ID.
+- `CompanyBasicInfoDetail.vue` switched to `findRouterByFilePath` for silent route lookup, navigating with `query: { formMode: 'edit', id }`.
+- Verification: src=苏州市房地产监测V3-rest/005.md; source session ac2a541a-e0f6-41f2-bba0-8b283388ff32.
+
+<!-- MEMORY_FIELDS
+{
+  "user": "user",
+  "topic": "change_button_routing",
+  "source_extraction_id": "23e8a3d6cd95441bbfbb4be068db545e",
+  "version": 1,
+  "memory_type": "preferences"
+}
+-->
