@@ -1,110 +1,21 @@
-<!-- BEGIN long-term-memory-index -->
-# 长期开发记忆库
+<!-- BEGIN openviking-memory-index -->
+# 长期记忆（OpenViking）
 
-从 Cursor、WorkBuddy、pi、zcode、Codex 的本地开发会话（含个人仓库来源）提炼的 **5537** 条技术经验。
+本机长期记忆已切换为 **OpenViking**（默认 `127.0.0.1:1933`）：会话由 `@openviking/dsh-memory-plugin` 实时镜像并后台抽取；检索与读写走 OpenViking MCP 工具（或 skill **`openviking-memory`**）。
 
-## 关键约束：按需读取，一次只读一个文件
+## 使用约束
 
-记忆库很大（约 3MB+），**绝不能通读**。正确用法：
+1. **先看注入**：若对话里已有 `<openviking-context>` 且能回答问题，优先用它，不必重复检索。
+2. **按需检索**：需要更多时用 `search`（`mode="context"`）或 `find`，对命中的 `viking://…` URI 用 `read` 展开后再引用；**禁止**把 `viking://` 当磁盘路径用 `read`/`grep`/`glob` 直接读。
+3. **文件级备份**：本仓库 `openviking-memory/` 是 OpenViking 记忆目录的 git 快照（见该目录 `README.md`），用于版本备份与 diff；**日常 agent 仍以 OpenViking 服务为准**，不要通读整个快照目录。
+4. **写入**： durable 事实优先靠会话结束后的自动抽取；仅用户明确要求「记住」或必须在抽取前落盘时用 `remember`。
+5. **跨会话全文检索**：大日志或历史会话仍可用 **`mcp_gateway`** 的 `context-mode`（见下文 Token 规则第 5 条）。
 
-1. 判断技术栈：小程序读 `--mp`，Web 后台读 `--web`；
-2. 按主题找到对应文件，**一个文件 ≤40KB**，读一两个就够；
-3. 主题分多个分片时（`-1`/`-2`），先读第 1 部分，不够再读下一片；
-4. 只有问题明确指向某项目自己的组件/业务时，才读 `project/`；
-5. 时效：🔵 约定类长期有效 ｜ 🟢 ≤7天 ｜ 🟡 ≤60天 ｜ 🔴 绑定旧实现，**引用前核对代码**。
+## 已废弃
 
-## 主题索引
+原 `long-term-memory/`（patterns/project 分片 md）已从本仓库移除；内容曾大面积零填充损坏，且已由 OpenViking 导入与实时记忆替代。
 
-### 图表渲染（87 条）
-
-小程序：`patterns/chart--mp.md`
-Web后台：`patterns/chart--web-1.md` … 共 3 片
-
-### 弹层层级与渲染（528 条）
-
-小程序：`patterns/popup-layer--mp-1.md` … 共 2 片
-Web后台：`patterns/popup-layer--web-1.md` … 共 16 片
-
-### 样式作用域与主题（248 条）
-
-小程序：`patterns/style-scope--mp-1.md` … 共 3 片
-Web后台：`patterns/style-scope--web-1.md` … 共 6 片
-
-### 接口与数据归一化 · 请求协议与加解密（176 条）
-
-小程序：`patterns/data-api-protocol--mp.md`
-Web后台：`patterns/data-api-protocol--web-1.md` … 共 6 片
-
-### 图片与静态资源（271 条）
-
-小程序：`patterns/image-static--mp-1.md` … 共 3 片
-Web后台：`patterns/image-static--web-1.md` … 共 7 片
-
-### 构建与调试（110 条）
-
-小程序：`patterns/build-debug--mp.md`
-Web后台：`patterns/build-debug--web-1.md` … 共 4 片
-
-### 工程结构与约定（200 条）
-
-小程序：`patterns/structure--mp.md`
-Web后台：`patterns/structure--web-1.md` … 共 6 片
-
-### 接口与数据归一化 · 字段容错与 0 值（455 条）
-
-小程序：`patterns/data-api-fields--mp.md`
-Web后台：`patterns/data-api-fields--web-1.md` … 共 16 片
-
-### 表单与选择器（290 条）
-
-小程序：`patterns/form-picker--mp-1.md` … 共 2 片
-Web后台：`patterns/form-picker--web-1.md` … 共 8 片
-
-### 接口与数据归一化 · 列表分页与 store（193 条）
-
-小程序：`patterns/data-api-paging--mp.md`
-Web后台：`patterns/data-api-paging--web-1.md` … 共 7 片
-
-### 路由与跳转（240 条）
-
-小程序：`patterns/navigation--mp-1.md` … 共 3 片
-Web后台：`patterns/navigation--web-1.md` … 共 6 片
-
-### 其他（941 条）
-
-小程序：`patterns/misc--mp-1.md` … 共 3 片
-Web后台：`patterns/misc--web-1.md` … 共 20 片
-
-### 接口与数据归一化 · 其他（84 条）
-
-小程序：`patterns/data-api-other--mp.md`
-Web后台：`patterns/data-api-other--web-1.md` … 共 2 片
-
-### 表格与布局（381 条）
-
-小程序：`patterns/web-table--mp.md`
-Web后台：`patterns/web-table--web-1.md` … 共 13 片
-
-### 业务字典与编码（196 条）
-
-小程序：`patterns/web-dict--mp.md`
-Web后台：`patterns/web-dict--web-1.md` … 共 7 片
-
-### E2E 与测试（145 条）
-
-小程序：`patterns/web-e2e--mp.md`
-Web后台：`patterns/web-e2e--web-1.md` … 共 6 片
-
-### 接口与数据归一化 · 字典与状态映射（161 条）
-
-小程序：`patterns/data-api-dict--mp.md`
-Web后台：`patterns/data-api-dict--web-1.md` … 共 6 片
-
-### 项目专属记忆
-
-入口：`project/generated/index.md`（831 条，50 片；以此入口为准）。
-
-<!-- END long-term-memory-index -->
+<!-- END openviking-memory-index -->
 
 ## Token 与上下文（全局，所有 agent 默认遵守）
 
@@ -277,7 +188,7 @@ Web后台：`patterns/data-api-dict--web-1.md` … 共 6 片
 
 `D:\repository\skills` 是技能库真实存储（`~/.dsh/skills`、`~/.cursor/skills`、`~/.claude/skills` 都只是指向它的符号链接），远程为 `tyvt/skills`。曾发生过整个 `SKILL.md` 与 `*.mjs` 被写成**长度正确但内容全是 0x00（NUL）**，且被 `git add -A && commit && push` 推到远程，导致远程备份与本地一起报废、所有历史版本均无真内容可恢复。
 
-因此对本目录（及任何记忆库 `long-term-memory/`）提交前必须做到：
+因此对本目录（及 `openviking-memory/` 等记忆快照目录）提交前必须做到：
 
 1. **提交前校验非零**：暂存后逐个检查被暂存文件，凡 `size>0` 但含 NUL 或可打印字符占比过低（疑似零填充/截断）一律拦截，不得提交。可用：
    ```powershell

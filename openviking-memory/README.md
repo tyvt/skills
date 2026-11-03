@@ -28,12 +28,9 @@
 - `preferences/`：偏好记忆
 - `identity.md` / `soul.md`：身份与人格基线
 
-## 关于旧目录 long-term-memory/
+## 关于旧方案
 
-本仓库根目录原有的 `long-term-memory/` 目录曾发生零填充（NUL）损坏事故，
-222 个 md 文件中 202 个内容全为 0x00，历史提交与远程均无可用版本。
-本目录 `openviking-memory/` 是全新抓取、经零填充与完整性校验（0 个零填充、0 个截断）的干净数据，
-与旧目录互不干扰。
+本仓库曾用 `long-term-memory/`（patterns/project 分片 md）作 AGENTS 索引；该目录已删除（曾大面积零填充损坏）。长期记忆现以 OpenViking 服务 + 本目录快照为准。
 
 ## 校验
 

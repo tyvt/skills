@@ -7,7 +7,7 @@
 - `decision-options`
 - `grill-me`
 - `i-have-adhd`
-- `long-term-memory`
+- `openviking-memory`（OpenViking 记忆 git 快照，非 skill 目录）
 - `tdd`
 - `token-frugal`
 - `tool-call-hygiene`
