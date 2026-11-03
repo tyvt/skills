@@ -36,6 +36,48 @@ FROM zt_bug WHERE id=<id>;
 SELECT SUBSTRING(steps,1,200) s1, SUBSTRING(steps,201,200) s2 FROM zt_bug WHERE id=<id>;
 ```
 
+### ⚠ 必读：先读「备注 / 评论」再分析根因（2026-11-02 事故后新增）
+
+**`zt_bug` 只存提单人的原始步骤，后端、测试、产品后续补充的接口变更全在 `zt_action` 的 `comment` 里。只看 `zt_bug.steps` 就开始翻代码，会对着已经作废的接口死磕。**
+
+开工第一步就跑这条，**先于任何代码检索**：
+
+```text
+-- 全部操作 + 评论（含谁在什么时候说了什么）
+SELECT id, actor, action, date, LEFT(comment,1000) cmt
+FROM zt_action WHERE objectType='bug' AND objectID=<id> ORDER BY id;
+-- 命中后端接口变更/入参说明/方案调整时，分段读全（comment 会被按 200 字截断）
+SELECT SUBSTRING(comment,1,300) c1, SUBSTRING(comment,301,300) c2, CHAR_LENGTH(comment) len
+FROM zt_action WHERE id=<actionId>;
+```
+
+要点：
+
+1. **`action='commented'` 的记录就是需求变更/后端说明**，必须全部读完再动手；`assigned` 记录告诉你当前该谁处理。
+2. **评论时间晚于 opening 的，优先级高于 steps**：后端说「接口换为 XXX」就以 XXX 为准，旧接口的报错不用再分析。
+3. 评论里的接口路径、入参、字段名要**原文抄下来**再对代码，不要凭记忆转写。
+4. 评论带图片（`{filEID}.png`）时，用上方 REST API 取下来看，图片里常有接口文档或报错细节。
+
+> 事故（2026-11-02，bug 6023）：用户给了链接直接开干，只查了 `zt_bug`（标题+steps），就去追「前端传参对不对 / 数据库字段为什么为空」，写了长篇根因分析。实际上后端 **15 分钟前**已在备注里写明「同步接口换为 `/building/building/extractBuildingBySurveying`，入参 buildingId、projectId」——正确做法只是换一个 URL。**没读备注 = 整轮分析全部作废。**
+
+### ⚠ 必读：按截图定位页面，不要按方法名猜（2026-11-03 二次返工后新增）
+
+**同一个业务动作在本项目常有多处入口，`grep 同步`/`grep sync` 会命中一堆方法名相近的文件。取第一个语义相近的就改，必然改错页面。**
+
+正确做法——**用截图里的界面元素反查页面**：
+
+1. **看左侧菜单名 + 顶部页签**：菜单「楼幢维护 / 项目备案申请 / 单元管理 / 户室查询」→ `projectManagement` 模块；菜单「楼幢管理 / 项目管理」→ `building` 模块。
+2. **看按钮文案与图标**：文案「同步」+ `el-icon-refresh` 与「同步房屋信息」是两个不同页面，精确匹配文案比匹配方法名可靠。
+3. **反查路由映射**：`grep -n '<菜单名>' src/router/` 或菜单配置文件，把菜单名落到具体 `.vue` 路径，再核对 `grep` 命中的文件是否就是这个路径。
+4. **`grep` 多处命中时逐处核对所属页面**，在最终回复里写明「改的是哪个文件、对应截图哪个元素」。
+5. **改完一处，全仓 `grep` 旧接口路径**，确认没有遗漏的调用方（后端换接口通常所有入口都要换）：
+
+```powershell
+git -C <repo> grep -n '<旧接口路径>' -- src/
+```
+
+> 事故（2026-11-03，bug 6023 返工）：备注要求换 `extractBuildingBySurveying`，agent 改了 `building/building/detail.vue` 的 `synchronizeHouse()`，但 bug 截图对应的是 `projectManagement/buildinginfo/detail.vue` 的 `handleSync()`（菜单「楼幢维护」、按钮「同步」+刷新图标），后者仍在调旧接口 `extractBuilding`。用户直接追问「备注让改成 extractBuildingBySurveying，为什么代码用的是 extractBuilding」。**按方法名猜页面 = 改错文件，必须返工。**
+
 ## 取截图/附件（REST API，绕开强制改密）
 
 Web 登录会被强制跳「修改密码」，`index.php?m=file&read&fileID=<id>` 拿不到；用 **禅道 REST v1 Token** 直接下二进制即可。已实测可用（bug 6012 的截图就是这样拿到的）。
@@ -107,11 +149,31 @@ VALUES ('bug',<id>,'<product>',<project>,<execution>,'tiany','resolved',NOW(),'<
 
 ## 标准流程（修 bug 闭环）
 
+0. **先定落地位置，再碰代码**（见下方「开工前置：落地位置与并行任务」）。用户说了「在主分支做 / 不要碰某个 worktree」，就只在主工作区对应分支改，不要进任何 `*-wt-*` 目录。
 1. **取详情**：DBX 查 `zt_bug`（或 `zentao_fetch.py <id>`）确认标题、复现步骤、负责人、状态。
 2. **定位根因**：先判断代码归属项目（多仓库共存：监测V3 = `zhi3-web-admin-...`，门户 = `zhi2-web-admin-...`，两者共用 `zhi2-web-admin` 子模块；用 `.env`/`VITE_APP_PROXY_ADDRESS`、`sys.portal.index.url` 等确认对应哪个）。再按业务域查组件；结合 `dbx` 看真实数据形态。
 3. **修复 + 验证**：改源码 → `npm run lint`/`npm run build` → 本地 nginx 站点（监测V3 8098 / 门户 8099）部署 → 核对 dist 已加载新构建。
 4. **提交推送**：子模块提交推送 → 父仓库 gitlink 提交推送（自底向上）。只暂存本次改动，勿夹带他人未提交文件。
 5. **回写禅道**：DBX 事务化回写为 `fixed`、`resolvedBuild=trunk`、指派回原提交人，附根因与修复说明（见上节）。
+
+## 开工前置：落地位置与并行任务（强制，2026-11-02 事故后新增）
+
+禅道任务经常和**别的未验收任务**并行在同一台机器上。踩过一次代价很大的坑：bug 6023 那轮，用户明确说「在主分支做，不用碰预售资金 worktree」，agent 却把全部写入落到了 `szfc-v3-wt-prefund-new`（另一个任务的预售资金 worktree），与那里刚建的 `src/views/supervision/account/**` 撞车，6 个文件未提交即中断，两轮工作一起作废。
+
+开工前必做：
+
+1. **枚举所有工作区与它们的进行中工作**：
+   ```powershell
+   git worktree list
+   git status --short; git -C zhi2-web-admin status --short
+   git -C <每个 wt> status --short; git -C <每个 wt> log --oneline -3
+   ```
+2. **把用户指定的落地位置当硬约束**：明确豁免 worktree 时，直接在主工作区改，**不**进入/修改/合并/删除那个 worktree，也不拿它的未提交文件当基线。
+3. **目录存在性先 `Test-Path`**：别的任务新建的目录（如 `src/views/supervision/account/`）往往**只存在于那个 worktree**，主工作区里没有。不存在就按本任务新建自己的路径，不要跳进 worktree 借目录。
+4. **新需求用新路径、新菜单**：需求要求「老页面也要能正常用、新建菜单」时，新建独立目录（如 `supervision/account2/...`），不要复用他人正在改的同名目录。
+5. **收尾对账**：`git worktree list` 与开工前一致；改动归属能在最终回复里逐条说清（哪个 worktree / 哪个分支 / 哪个提交）。
+
+> 补充：本轮还有一类纯工具层浪费——`grep` 漏 `pattern`、`write`/`edit` 漏 `file_path`/`content`、`mcp_gateway` 把 `dbx` 当 tool 名调，重复 5 次以上。调 `mcp_gateway` 时 `server: "dbx"` 只用来**列工具**，真正执行要再带 `tool` 与 `arguments`；执行 SQL 的参数名是 `sql`。
 
 
 
