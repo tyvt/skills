@@ -18,15 +18,15 @@
 - zhi2-web-admin/src/components/AnnexUpload/index.vue 与 AppendixRequirementGrid.vue
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/156.md
+- 验证证据：src=苏州市房地产监测V3-rest/156.md、src=苏州市房地产监测V3/197.md
 - 来源会话：435d70c1-1e98-4e05-b285-4c74fff0815e；代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "appendix_package_sort_consistency",
-  "source_extraction_id": "5226bb432f51444c806d951babd78102",
-  "version": 1,
+  "source_extraction_id": "84a47ab3c126474bb760ae62e5ed52d2",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

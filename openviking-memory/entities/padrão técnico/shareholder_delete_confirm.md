@@ -10,7 +10,7 @@ No Suzhou Real Estate Monitoring V3, exclusões de acionistas (linha única e em
 - `deleteShareholderByName` e `batchDeleteShareholders` confirmam antes de executar
 
 ## Verificação e arquivos
-- Evidência: src=苏州市房地产监测V3-rest/125.md
+- Evidência: src=苏州市房地产监测V3-rest/125.md e src=苏州市房地产监测V3/169.md
 - Arquivos: Step4Shareholders.vue, register-helpers.js, detailMixins.js, shareholderTable.vue, permit/detail.vue, company-register-branch.spec.js, shareholder/index.vue, listMixins.js
 - Sessão: be083398-3966-4e2a-b4e7-52daef8b2c73; baseline: none
 
@@ -18,8 +18,8 @@ No Suzhou Real Estate Monitoring V3, exclusões de acionistas (linha única e em
 {
   "category": "Padrão técnico",
   "name": "shareholder_delete_confirm",
-  "source_extraction_id": "dde3fbc9f6c8407fb1b50b1438772b93",
-  "version": 1,
+  "source_extraction_id": "77174234a0a04fd3bf6b0d9c3b1c7f88",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

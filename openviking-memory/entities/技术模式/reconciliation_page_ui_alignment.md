@@ -16,15 +16,15 @@
 - zhi2-web-admin/src/api/capital/verifyRecord.js 与 maintenance/maintenanceRec/index.vue
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/157.md
+- 验证证据：src=苏州市房地产监测V3-rest/157.md、src=苏州市房地产监测V3/197.md
 - 来源会话：62ae63d9-de46-4756-a36e-4e7c34c9a158；代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "reconciliation_page_ui_alignment",
-  "source_extraction_id": "5226bb432f51444c806d951babd78102",
-  "version": 1,
+  "source_extraction_id": "84a47ab3c126474bb760ae62e5ed52d2",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

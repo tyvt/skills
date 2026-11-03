@@ -6,10 +6,10 @@
 - 法人全非必填要件时误报；多步流程 `Step3Appendix.vue` 本无此限制
 
 ## 解决方案
-- 删除冗余附件守卫，仅依赖 `missingRequiredNames` 与 `InstitutionUploadItem` 必填星标一致
+- 移除该冗余附件校验，提交仅依赖 `missingRequiredNames` 过滤后的必填项检查（同 `Step3Appendix.vue` 逻辑）
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-leftover/113.md
+- 验证证据：src=苏州市房地产监测V3/313.md（早前记录见苏州市房地产监测V3-leftover/113.md）
 - 涉及文件：InstitutionRegisterSingleForm.vue、registerAppendixAdminType.js、CompanyRegisterSingleForm.vue、appendix.js、Step3Appendix.vue
 - 所属项目：苏州市房地产监测V3；来源会话：4b85e9a6-d8c8-452a-86e2-545a995afd8f；代码基线：none
 
@@ -17,8 +17,8 @@
 {
   "category": "技术模式",
   "name": "register_attachment_guard",
-  "source_extraction_id": "c7a7f46ab8b2402891ec68878f84c6aa",
-  "version": 1,
+  "source_extraction_id": "8298b83dd6b24dbbbfaf79725dcec981",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

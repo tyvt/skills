@@ -11,7 +11,7 @@
 - 详情 detail.vue 读 administrativeArea 用 ECONOMIC_INSTITUTIONS_REGION，update 未封装调用
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/055.md
+- 验证证据：src=苏州市房地产监测V3/108.md; src=苏州市房地产监测V3-rest/055.md
 - 涉及文件：src/api/company/companyApply.js、companyApplyAudit/detail.vue、companyApplyAudit/index.vue、companyApply/detail.vue、institution/record/components/AgencyApplyDialog.vue、institution/record/mixin.js、src/api/company/companyRecord.js、路由信息.json
 - 来源会话：1ac6ad00-db16-4fd7-aafc-8152e4a58b8c
 
@@ -19,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "zhi2_frontend_only",
-  "source_extraction_id": "44b97381139d40c9b4eb87bf138f6ca4",
-  "version": 1,
+  "source_extraction_id": "ffbc88f6ff83419787a66226a5f2572d",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

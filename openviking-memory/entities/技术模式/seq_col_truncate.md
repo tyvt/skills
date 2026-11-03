@@ -8,10 +8,10 @@
 ## 修复方案
 - zs-table-column.vue 改为取 width 与 80px 较大值
 - 新增 table-header--fixed 类关闭 ellipsis 避免表头截断
-- BuildingDialog.vue 等 4 处原生列宽改为 80
+- BuildingDialog.vue、SelectRoomDialog.vue、RegulatoryAccountDialog.vue、VotingItemsDialog.vue 原生列宽改为 80
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/090.md
+- 验证证据：src=苏州市房地产监测V3/136.md
 - 涉及文件：zs-table-column.vue、styles/index.scss、zs-table.vue、dataEntryDetail/index.vue、ListTemplate.js、RelatedBuildingsTable.vue、bankTable.vue、JymxTable.vue
 - 来源会话：361222fd-00ea-45a7-a172-1112a1552ff8；代码基线：none
 
@@ -19,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "seq_col_truncate",
-  "source_extraction_id": "87e9d6bf8c1143a7a889c7f5c4fbaedd",
-  "version": 1,
+  "source_extraction_id": "622bc94388724ad38c296348aac87c4e",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

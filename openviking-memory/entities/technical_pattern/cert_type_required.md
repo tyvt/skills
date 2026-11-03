@@ -1,24 +1,26 @@
-# 证书弹窗certificateType缺必填致无星号
-苏州市房地产监测V3 中证书弹窗表单 rules 未包含 certificateType 必填校验，导致无必填星号与提交拦截。
 
-## 问题根因
-- 证书弹窗 `certificatesDialog.vue` 的 `rules` 未包含 `certificateType` 必填校验
-- 导致表单无必填星号显示且提交时未拦截空值
+# Diálogos de certificado sem validação obrigatória de tipo
+No projeto 苏州市房地产监测V3, as regras de formulário dos diálogos de certificado não incluíam validação obrigatória de `certificateType`, causando ausência de asterisco e não bloqueio de envio.
 
-## 解决方案
-- 在 `zhi2-web-admin/src/views/company/staffManagement/components/certificatesDialog.vue` 与 `personnelRecord/certificatesDialog.vue` 的 `rules` 中增补 `certificateType: [{ required: true, message: '证书类型不能为空', trigger: ['change'] }]`
+## Causa raiz
+- As regras (`rules`) do `certificatesDialog.vue` não incluíam validação obrigatória de `certificateType`
+- O formulário não exibia asterisco de obrigatório e não bloqueava valores vazios ao enviar
 
-## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-leftover/046.md
-- 涉及文件：zhi2-web-admin/src/views/company/staffManagement/components/certificatesDialog.vue、personnelRecord/certificatesDialog.vue、components/certificatesTable.vue、toB/personnelRecord/components/certificatesDialog.vue、institution/personnel/components/certificatesDialog.vue、company/staffManagement/components/detail.vue 等
-- 所属项目：苏州市房地产监测V3；来源会话：7c358850-cada-4f48-ae63-ef09a5db0ee9；代码基线：none
+## Solução
+- Adicionar `certificateType: [{ required: true, message: '证书类型不能为空', trigger: ['change'] }]` aos `rules` de `zhi2-web-admin/src/views/company/staffManagement/components/certificatesDialog.vue` e `personnelRecord/certificatesDialog.vue`
+
+## Verificação e origem
+- Evidência: src=苏州市房地产监测V3/246.md
+- Arquivos: zhi2-web-admin/src/views/company/staffManagement/components/certificatesDialog.vue, personnelRecord/certificatesDialog.vue, components/certificatesTable.vue, toB/personnelRecord/components/certificatesDialog.vue, institution/personnel/components/certificatesDialog.vue, company/staffManagement/components/detail.vue
+- Projeto: 苏州市房地产监测V3; Sessão: 7c358850-cada-4f48-ae63-ef09a5db0ee9; Base de código: none
+
 
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",
   "name": "cert_type_required",
-  "source_extraction_id": "708b39ed40c847009c995dd6200f64ae",
-  "version": 2,
+  "source_extraction_id": "3440ed0abfed42a4aa0c1bc2d6540321",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

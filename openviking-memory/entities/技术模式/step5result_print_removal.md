@@ -9,7 +9,7 @@
 - 保留「确认」按钮触发 `@confirm` 返回登录页
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-leftover/048.md
+- 验证证据：src=苏州市房地产监测V3/248.md
 - 涉及文件：zhi2-web-admin/src/views/register/companyRegister.vue、zhi2-web-admin/src/views/register/components/Step5Result.vue、zhi2-web-admin/src/views/register/propertyCompanyRegister.vue
 - 所属项目：苏州市房地产监测V3；来源会话：8f0970a9-714c-44b4-a15e-2d3dda1ae8d2；代码基线：none
 
@@ -17,8 +17,8 @@
 {
   "category": "技术模式",
   "name": "step5result_print_removal",
-  "source_extraction_id": "546275cea60345d0accb2c916598cd00",
-  "version": 1,
+  "source_extraction_id": "010b16fd09244983972d9f0e9cb07a8e",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

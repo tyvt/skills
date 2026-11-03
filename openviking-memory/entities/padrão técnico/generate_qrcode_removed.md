@@ -19,7 +19,7 @@ O `AnnexUpload/index.vue` removeu o popup de upload por scan e métodos `showQrC
 - `qrCode.vue`
 
 ## Verificação
-- Evidência: src=苏州市房地产监测V3-leftover/036.md
+- Evidência: src=苏州市房地产监测V3/236.md
 - Sessão: bee3c0ee-1c52-49fd-aba5-14405edf6707
 - Projeto: 苏州市房地产监测V3; base de código: none
 
@@ -27,8 +27,8 @@ O `AnnexUpload/index.vue` removeu o popup de upload por scan e métodos `showQrC
 {
   "category": "Padrão técnico",
   "name": "generate_qrcode_removed",
-  "source_extraction_id": "f749948ee9fa4da4a491c83192dd1efb",
-  "version": 1,
+  "source_extraction_id": "5a368dde30334afa99f7154d2f5147cf",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -4,7 +4,8 @@
 ## 改动内容
 - 原列计算未处理 rowSpan+span>24 及 span=24 时的换行与槽位归零
 - 在 detail-grid.js 新增 getDetailSpanSlotUnits、assignDetailGridColumn 计算槽位
-- detail-template.vue 共用该逻辑处理布局
+- detail-template.vue 共用该逻辑处理布局，columnLabelCharCounts 等改用该计算实现布局
+- 当 rowSpan+span>24 或 span=24 时换行并将 gridSlot 归零
 
 ## 涉及文件
 - zhi2-web-admin/src/views/company/companyApplyAudit/detail.vue
@@ -16,7 +17,7 @@
 - zhi2-web-admin/package.json
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/141.md
+- 验证证据：src=苏州市房地产监测V3-rest/141.md；src=苏州市房地产监测V3/183.md
 - 来源会话ID：63e9efd7-32f6-48eb-a977-6f79ef7ad989
 - 所属项目：苏州市房地产监测V3；代码基线：none
 
@@ -24,8 +25,8 @@
 {
   "category": "技术模式",
   "name": "detail_grid_slot",
-  "source_extraction_id": "0925c1b461604fd789523e8d04997112",
-  "version": 1,
+  "source_extraction_id": "dbef7d368b1740119fb77620e86c1a0f",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

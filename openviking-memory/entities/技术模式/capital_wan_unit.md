@@ -1,30 +1,31 @@
-# 注册资本统一以金额组件万元单位展示
-苏州市房地产监测V3 中注册资本展示规范统一为金额组件配置万元单位。
+# Registro de Capital Unificado com Componente de Valor em Unidade Wan
 
-## 描述
-- 注册资本展示规范统一为金额组件配置万元单位
-- `agencyBasicInfoContent.js` 配置 `type: 'amount'`、`unit: '万元'`、`dot: 2` 覆盖查看态
-- `AgencyBranchDetail.vue` 的 `basicInfoView` 接入 `DetailTemplate` 金额展示
-- 移除 `formatFixedDecimal` 逻辑及引用，同步 `institutionRegister/detail.vue` 等页面
+No projeto 苏州市房地产监测V3, o padrão de exibição do registro de capital foi unificado para usar o componente de valor com unidade em wan (万元).
 
-## 涉及文件
-- src/views/company/institutionRegister/detail.vue
-- src/views/institution/agencyBranch/components/AgencyBranchDetail.vue
-- src/components/detail-template/detail-template.vue
-- src/views/company/companyManagement/components/subCompanyRecordTable.vue、detail.vue、developerBasicInfoContent.js、agencyBasicInfoContent.js
-- src/views/company/companyApplyAudit/detail.vue
+## Descrição
+- O registro de capital era originalmente concatenado manualmente via `formatFixedDecimal` no `displayValue` de `AgencyBranchDetail.vue`, sem usar a configuração de unidade de valor.
+- `agencyBasicInfoContent.js` configura `type: 'amount'`, `unit: '万元'`, `dot: 2` para a visualização de consulta.
+- O `basicInfoView` de `AgencyBranchDetail.vue` passa a usar a exibição de valor do `DetailTemplate`, removendo a referência a `formatFixedDecimal`.
+- `institutionRegister/detail.vue` e outras páginas foram sincronizadas com o mesmo padrão.
 
-## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/145.md
-- 来源会话：933f8c6e-62d9-4070-9cc4-09de061894a6
-- 所属项目：苏州市房地产监测V3；代码基线：none
+## Arquivos Envolvidos
+- `src/views/company/institutionRegister/detail.vue`
+- `src/views/institution/agencyBranch/components/AgencyBranchDetail.vue`
+- `src/components/detail-template/detail-template.vue`
+- `src/views/company/companyManagement/components/subCompanyRecordTable.vue`, `detail.vue`, `developerBasicInfoContent.js`, `agencyBasicInfoContent.js`
+- `src/views/company/companyApplyAudit/detail.vue`
+
+## Verificação e Origem
+- Evidência: src=苏州市房地产监测V3/186.md
+- Sessão de origem: 933f8c6e-62d9-4070-9cc4-09de061894a6
+- Projeto: 苏州市房地产监测V3; baseline de código: none
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "capital_wan_unit",
-  "source_extraction_id": "f03252ab12034d9281cc6024c18c407b",
-  "version": 1,
+  "source_extraction_id": "b850c6100f3340dc963c83ea536ffc93",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

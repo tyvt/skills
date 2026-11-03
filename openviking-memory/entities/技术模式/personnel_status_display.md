@@ -10,15 +10,15 @@
 - 同步调整 InfoCardDialog.vue、StatusAdjustDialog.vue、zs-table-column.vue、listMixins.js、dict-tag.vue 及 property/workOrder/order/index.vue
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-leftover/010.md
+- 验证证据：src=苏州市房地产监测V3/210.md
 - 所属项目：苏州市房地产监测V3；来源会话：7dd6eb02-0c67-4ffd-81c7-628d978d0085；代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "personnel_status_display",
-  "source_extraction_id": "a8c29ad78aa04768882548eb829f2e94",
-  "version": 1,
+  "source_extraction_id": "8d76582b52e848ada33f841ccd2a4531",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

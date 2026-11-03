@@ -11,7 +11,7 @@
 - 关闭所有标签后回跳 `/todo`
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/131.md
+- 验证证据：src=苏州市房地产监测V3-rest/131.md；src=苏州市房地产监测V3/158.md
 - 涉及文件：router/index.js、login.vue、TagsView/index.vue、路由信息.json、companyLogin.vue、permission.js、index.vue、settings.js
 - 所属项目：苏州市房地产监测V3；来源会话：4c436c5b-d2ad-4894-8c78-5a8d855852f6；代码基线：none
 
@@ -19,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "default_landing_todo",
-  "source_extraction_id": "09055bdcd2ed47b8927899ce1b85cc24",
-  "version": 1,
+  "source_extraction_id": "fcc5ba53c4b941589a4680bf29e3e0cd",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

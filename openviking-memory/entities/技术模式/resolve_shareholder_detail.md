@@ -12,15 +12,15 @@ O zhi2-web-admin do projeto 苏州市房地产监测V3 adiciona função em comp
 - api/company/companyRecord.js, utils/registerQualification.js, toB/companyRecord/detail.vue
 
 ## Verificação
-- Evidência: src=苏州市房地产监测V3-rest/093.md
+- Evidência: src=苏州市房地产监测V3/140.md
 - Projeto: 苏州市房地产监测V3; sessão: 4d9d7fb3-9c0c-440d-b3de-166a2d7335a9; baseline: none
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "resolve_shareholder_detail",
-  "source_extraction_id": "49cdd093c09f43ab9dcf740eb82cca87",
-  "version": 1,
+  "source_extraction_id": "2f6669c1d0ad4e90a1d5ad451cb4d376",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

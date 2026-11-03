@@ -10,7 +10,7 @@ No projeto Suzhou Real Estate Monitoring V3, detail.vue de supervision/unblock/n
 - Valores alinhados com o caminho de API do módulo
 
 ## Verificação
-- Evidência: src=苏州市房地产监测V3-leftover/038.md
+- Evidência: src=苏州市房地产监测V3/238.md
 - Arquivos: detail.vue, detailMixins.js, deposit/notice/detail.vue, form.js, api/capital/notice.js, unblock/noticeChange/detail.vue, unblock/guarantee/changedetail.vue, formComponents.js
 - Projeto: Suzhou Real Estate Monitoring V3; sessão: f35d14e1-f0a5-4fa4-b44d-947275ba1b5c; base de código: none
 
@@ -18,8 +18,8 @@ No projeto Suzhou Real Estate Monitoring V3, detail.vue de supervision/unblock/n
 {
   "category": "padrao_tecnico",
   "name": "notice_detail_missing_fields",
-  "source_extraction_id": "0b4492fb95804bc7a75d78f6242e5c1b",
-  "version": 3,
+  "source_extraction_id": "7f4f7c73a9974a71af95ef834460ef0b",
+  "version": 4,
   "memory_type": "entities"
 }
 -->

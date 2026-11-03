@@ -16,15 +16,15 @@
 - agencyBasicInfoContent.js、companyBasicInfoShared.js
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/009.md
+- 验证证据：src=苏州市房地产监测V3/066.md
 - 所属项目：苏州市房地产监测V3；来源会话：8c3c7790-3198-42c7-8854-d0b971635778；代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "headline_stack_spacing",
-  "source_extraction_id": "eb40dec2781a45a9a11c09c062168035",
-  "version": 1,
+  "source_extraction_id": "ea7b06cf68f14ed5a1ce3310fa59cb66",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

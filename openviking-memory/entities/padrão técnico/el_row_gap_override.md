@@ -14,7 +14,7 @@ O contêiner de detalhes `.detail-from-container.el-row` com `gap: 0` tinha espe
 - Após ajuste, o espaçamento entre blocos é fornecido corretamente.
 
 ## Verificação
-- Evidência: src=苏州市房地产监测V3-rest/011.md
+- Evidência: src=苏州市房地产监测V3/060.md
 - Arquivos: Headline/index.vue; styles/detail-form.scss; styles/index.scss; companyManagement/components/AgencyBasicInfoForm.vue; AgencyBasicInfoDetail.vue; vite.config.js; e2e/fixtures/company-menu-config.js; e2e/company/institution-register-real-api-flow.spec.js
 - Sessão: 5180d428-0584-4329-9241-d8565c0dbc3e; base de código: none
 
@@ -22,8 +22,8 @@ O contêiner de detalhes `.detail-from-container.el-row` com `gap: 0` tinha espe
 {
   "category": "Padrão técnico",
   "name": "el_row_gap_override",
-  "source_extraction_id": "187c2553208941ddaccffd0b0decd66f",
-  "version": 1,
+  "source_extraction_id": "4874608f104944719aa2f486c341f696",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

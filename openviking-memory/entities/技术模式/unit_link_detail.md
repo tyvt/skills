@@ -13,7 +13,7 @@
 - `zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue`
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/126.md
+- 验证证据：src=苏州市房地产监测V3-rest/126.md；src=苏州市房地产监测V3/153.md
 - 来源会话ID：146ee20b-f6d8-4780-be83-1077344f1c17
 - 所属项目：苏州市房地产监测V3；代码基线：none
 
@@ -21,8 +21,8 @@
 {
   "category": "技术模式",
   "name": "unit_link_detail",
-  "source_extraction_id": "d5003cc58ed741acbc25c5ea5b23b3df",
-  "version": 1,
+  "source_extraction_id": "44e59d3d914d48ed86daf5e20ef46d69",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

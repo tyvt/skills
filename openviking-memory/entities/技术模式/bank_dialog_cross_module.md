@@ -6,6 +6,7 @@
 - `cbyh` 模块的 `WdmcDialog.vue` 为联行选择旧方案弹窗
 - `jgwd` 模块 `detail.vue` 复用 `cbyh` 的 `WdmcDialog`
 - `superviseBank` 模块 `detail.vue` 为左树右表管理页
+- 监管银行模块视图位于 src/views/supervision/bank/，按 cbyh、jgwd、superviseBank 子目录划分
 
 ## 涉及文件
 - src/api/jgyh/yhwdgl.js、cbyh.js
@@ -15,7 +16,7 @@
 - src/views/supervision/bank/cbyh/components/YhwdDialog.vue
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/143.md
+- 验证证据：src=苏州市房地产监测V3-rest/143.md；src=苏州市房地产监测V3/193.md
 - 来源会话：cfe56384-8c0c-4afc-a527-e02f0ce80e0d
 - 所属项目：苏州市房地产监测V3；代码基线：none
 
@@ -23,8 +24,8 @@
 {
   "category": "技术模式",
   "name": "bank_dialog_cross_module",
-  "source_extraction_id": "f03252ab12034d9281cc6024c18c407b",
-  "version": 1,
+  "source_extraction_id": "390d9fa5dbc94517a9908e44e267a934",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

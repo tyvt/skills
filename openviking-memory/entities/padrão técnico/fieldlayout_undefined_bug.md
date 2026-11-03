@@ -17,7 +17,7 @@ O módulo constante `fieldLayout` não foi definido em `contentInfo`, causando R
 - `zhi2-web-admin/src/utils/detailLayout.js`
 
 ## Verificação
-- Evidência: src=苏州市房地产监测V3-leftover/034.md
+- Evidência: src=苏州市房地产监测V3/234.md
 - Sessão de origem: c9e3f7f1-e112-4668-b0d4-4bad6d731b08
 - Projeto: 苏州市房地产监测V3; base de código: none
 
@@ -25,8 +25,8 @@ O módulo constante `fieldLayout` não foi definido em `contentInfo`, causando R
 {
   "category": "Padrão técnico",
   "name": "fieldlayout_undefined_bug",
-  "source_extraction_id": "f749948ee9fa4da4a491c83192dd1efb",
-  "version": 1,
+  "source_extraction_id": "5a368dde30334afa99f7154d2f5147cf",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

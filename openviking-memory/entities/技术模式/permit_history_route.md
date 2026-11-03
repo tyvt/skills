@@ -17,9 +17,11 @@
 - zhi2-web-admin/src/views/presale/permit/components/index.vue
 - zhi2-web-admin/src/router/index.js
 - zhi2-web-admin/src/mixins/listMixins.js
+- .workbuddy/memory/MEMORY.md
+- .workbuddy/memory/2026-09-11.md
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/029.md
+- 验证证据：src=苏州市房地产监测V3/084.md
 - 来源会话：2cbd9c2f-a7a8-42bc-973a-d8fe877023a9
 - 所属项目：苏州市房地产监测V3；代码基线：none
 
@@ -27,8 +29,8 @@
 {
   "category": "技术模式",
   "name": "permit_history_route",
-  "source_extraction_id": "1eff560d266446f4988cb669dab21459",
-  "version": 1,
+  "source_extraction_id": "9a7a6e30e88942b69bcab76fafb42454",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

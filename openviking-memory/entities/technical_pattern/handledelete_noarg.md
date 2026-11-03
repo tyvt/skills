@@ -10,7 +10,7 @@
 - Change `brand/index.vue` to `@click="handleDelete"` without parentheses
 
 ## Files and Attribution
-- Verification: src=苏州市房地产监测V3-leftover/124.md
+- Verification: src=苏州市房地产监测V3-leftover/124.md; src=苏州市房地产监测V3/324.md
 - Involved files: company/brand/index.vue, mixins/listMixins.js, mixins/table.js
 - Project: 苏州市房地产监测V3; source session: 5bbc22cc-cdf5-42d9-8521-6ed4291d2efc; code baseline: none
 
@@ -18,8 +18,8 @@
 {
   "category": "technical_pattern",
   "name": "handledelete_noarg",
-  "source_extraction_id": "708b39ed40c847009c995dd6200f64ae",
-  "version": 1,
+  "source_extraction_id": "bcd04e9a91754eea9e43e07c2c83f87f",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

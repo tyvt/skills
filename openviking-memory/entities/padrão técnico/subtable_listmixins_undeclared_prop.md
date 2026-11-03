@@ -11,7 +11,7 @@ No projeto Suzhou Real Estate Monitoring V3 (zhi2-web-admin), `PresaleBuildingTa
 - `PresaleHouseTable.vue` deve ter remoção semelhante se houver mesmo uso incorreto
 
 ## Verificação e arquivos
-- Evidência: src=苏州市房地产监测V3-leftover/086.md
+- Evidência: src=苏州市房地产监测V3/286.md
 - Arquivos: PresaleSelectBuildingDialog.vue, listMixins.js, table.js, PresaleBuildingTable.vue, main.js, PresaleHouseTable.vue
 - Projeto: Suzhou Real Estate Monitoring V3; sessão: 69921419-8a4f-4e43-b9d8-780e617536da; baseline: none
 
@@ -19,8 +19,8 @@ No projeto Suzhou Real Estate Monitoring V3 (zhi2-web-admin), `PresaleBuildingTa
 {
   "category": "Padrão técnico",
   "name": "subtable_listmixins_undeclared_prop",
-  "source_extraction_id": "0ec9de86592745d2954137491ac6674b",
-  "version": 1,
+  "source_extraction_id": "ea52cb840c62465ab3fb0dba5f6a6e78",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

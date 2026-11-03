@@ -15,15 +15,15 @@
 - entrust-sale-detail-layout.spec.js、cashsale-apply-helpers.js
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/082.md
+- 验证证据：src=苏州市房地产监测V3/129.md
 - 所属项目：苏州市房地产监测V3；来源会话：88abd213-0e65-43a2-9a47-f93417d5524d；代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "cashsale_record_first",
-  "source_extraction_id": "c9ec89c294bb40ec83fcfcf2a273efec",
-  "version": 1,
+  "source_extraction_id": "d59ddbfaa7294cb29f8936825d8b0a16",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

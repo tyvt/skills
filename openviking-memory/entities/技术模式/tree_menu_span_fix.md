@@ -20,7 +20,7 @@
 - zhi2-web-admin/package.json
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-rest/029.md
+- 验证证据：src=苏州市房地产监测V3/079.md
 - 来源会话：0b933a14-fbd5-4c86-8301-29f6b89bb1c4
 - 所属项目：苏州市房地产监测V3；代码基线：none
 
@@ -28,8 +28,8 @@
 {
   "category": "技术模式",
   "name": "tree_menu_span_fix",
-  "source_extraction_id": "bf6db419de6c4a29b691d3709e9aa418",
-  "version": 1,
+  "source_extraction_id": "c33d55e7dad949b891f6f2cb7eef445c",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

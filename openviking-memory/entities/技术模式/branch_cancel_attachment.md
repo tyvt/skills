@@ -10,7 +10,7 @@
 - AnnexUpload 加 v-if="visible && agencyBranchId" 与 :key 按需重挂载
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-leftover/073.md
+- 验证证据：src=苏州市房地产监测V3/273.md
 - 涉及文件：CancelDialog.vue、AnnexUpload/index.vue、appendix.js、AgencyBranchList.vue、routeMeta.js、StatusAdjustDialog.vue、institution-menu-config.js、AgencyBranchDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：4f553a87-b022-4362-834b-2964f2ec1897；代码基线：none
 
@@ -18,8 +18,8 @@
 {
   "category": "技术模式",
   "name": "branch_cancel_attachment",
-  "source_extraction_id": "3d4e9b6847ad45a4ac86a62e72186090",
-  "version": 1,
+  "source_extraction_id": "5d98e1c12360479781ab28931522b2f2",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

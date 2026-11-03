@@ -11,7 +11,7 @@
 - 接入 `toB/companyRecord/detail.vue` 与 `companyRecordAgency/change/detail.vue`
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-leftover/016.md
+- 验证证据：src=苏州市房地产监测V3-leftover/016.md；src=苏州市房地产监测V3/216.md
 - 涉及文件：companyRecordAgency/change/detail.vue、toB/companyRecord/detail.vue、companyManagement/components/AgencyBasicInfoForm.vue、companyBasicInfoShared.js、companyManagement/components/detail.vue、companyManagement/changeApply/detail.vue、api/company/companyRecord.js、zljg/agencyRecordChangeApply/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：edb3ac8c-9101-4ea8-871a-f3e115e70ff8；代码基线：none
 
@@ -19,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "company_change_admin_area",
-  "source_extraction_id": "0bcf481cb340407cb990dac81fe58681",
-  "version": 1,
+  "source_extraction_id": "5b55fde1cd1b4f419a674259657b5c37",
+  "version": 2,
   "memory_type": "entities"
 }
 -->
