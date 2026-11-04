@@ -2,8 +2,8 @@
 苏州市房地产监测V3 中 leaseContract/detail.vue 表单 label 改为「租金支付方式」且 PartyDialog 部分字段前端非必填。
 
 ## 实现要点
-- `detail.vue` 表单 label 改为「租金支付方式」（`paymentMethodPay` 字段名不变），校验提示同步更新
-- `components/PartyDialog.vue` 的 `graduatedInstitutions` 与 `maritalStatus` 前端无 required 校验（仅学历必填）
+- `detail.vue` 表单 label 改为「租金支付方式」（`paymentMethodPay` 字段名不变），校验提示同步改为「请选择租金支付方式-付 / -押」，样式注释同步更新
+- `components/PartyDialog.vue` 的 `graduatedInstitutions` 与 `maritalStatus` 前端无 required 校验（仅学历必填）；全库检索确认仅出现在该弹窗与 e2e 测试，前端无其他强制校验
 - 若后端拦截需调整对应后端 DTO，本仓库无后端代码
 
 ## 验证与归属
@@ -15,8 +15,8 @@
 {
   "category": "技术模式",
   "name": "rent_pay_method_non_required",
-  "source_extraction_id": "3a29ac9907f94022a22fb0ef67802f2f",
-  "version": 1,
+  "source_extraction_id": "eb974d84ed2446a982b5539521f0ce63",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

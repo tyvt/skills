@@ -3,6 +3,7 @@
 
 ## 问题背景
 - 江阴侧无法统计物业企业录入情况，原 dataEntryDetail 表格列及合计逻辑失去意义
+- 该页面此前已有 bug 4637 临时修复（注释隐藏列），本次改为正式删除并清理相关代码
 
 ## 修改内容
 - 修改 zhi2-web-admin/src/views/property/dataEntryDetail/index.vue，删除该列及子列
@@ -18,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "remove_dataentry_column",
-  "source_extraction_id": "72e6d9f6bfc04519b4929a1ff2767368",
-  "version": 1,
+  "source_extraction_id": "093c8be28c6a4c9988e8db5806ecd9bf",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

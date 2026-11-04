@@ -15,14 +15,14 @@ wygl小程序「业主决策」菜单从点击到进入表决H5的完整交互�
 ## 验证与归属
 - 验证证据：008.md 会话69631682/f16e6ba9、009.md 会话24b99026
 - 涉及文件：pages/webview/externalWebview.vue、pages/webview/home.vue、utils/portal-h5-webview.js
-- 来源会话ID：69631682-9401-4bb4-bd61-d、f16e6ba9-0ef7-4d9a-8278-5ef26eb7c22f、24b99026-d930-474c-94f5-946b2e5b7235；代码基线：none
+- 来源会话ID：69631682-9401-4bb4-bd61-d、f16e6ba9-0ef7-4d9a-8278-5ef26eb7c22f、24b99026-d930-474c-94f5-946b2e5b7235、6ee1f9e2-e92a-4b85-a26a-c8d8507a5363；代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "小程序技术",
   "name": "owner_decision_entry",
-  "source_extraction_id": "d8600bf3c81e4e25b78224a443f65995",
-  "version": 1,
+  "source_extraction_id": "e639637956e641fd92e4d5fcac5e1554",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

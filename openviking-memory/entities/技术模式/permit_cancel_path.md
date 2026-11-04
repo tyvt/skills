@@ -6,8 +6,9 @@
 
 ## 解决方案
 - 改为通用 `handleView(row)` 利用路由 `meta.filePath` 推导 `presale/permitCancel/detail` 及主键 `presalePermitCancelId`
-- 要件 busCode 由 `resolveCancelAppendixBusCode` 解析
+- 要件 busCode 由 `resolveCancelAppendixBusCode` 从注销菜单解析，不再串到预售许可申请
 - 移除无效引入 `buildNavigationByFilePath` 与 `PERMIT_APPENDIX_BUS_CODE`
+- 结果：点许可证号 / 项目名称 / 「查看」按钮均进入本模块注销详情
 
 ## 验证与归属
 - 验证证据：src=苏州市房地产监测V3/309.md
@@ -18,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "permit_cancel_path",
-  "source_extraction_id": "2080a0baaff942c089970729ab9937c9",
-  "version": 2,
+  "source_extraction_id": "c5d95a38a9c04a809be2e123d4710d6d",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

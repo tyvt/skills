@@ -11,15 +11,15 @@
 
 ## 验证与归属
 - 验证证据：会话 82f1e5be 用户报 sys_yes_no 与 FILE_TYPE 重复调用，结论删无用 sys_yes_no 请求并为 FILE_TYPE 加模块缓存
-- 涉及文件：zhi1-web-admin/src/views/repairFunds/usage/fundUsageKs/components/AnnexContainer/components/TableBody.vue、FileListDialog.vue
+- 涉及文件：zhi1-web-admin/src/views/repairFunds/usage/fundUsageKs/components/AnnexContainer/components/TableBody.vue、FileListDialog.vue、AnnexContainer/index.vue、api/system/dict/data.js
 - 所属项目：太仓G；来源会话：82f1e5be-80bb-4d16-827c-0a7d2778a100；代码基线：df87537
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "recursive_tablebody_dicts_dedup",
-  "source_extraction_id": "9f1553d11e6748dbbd5b1e168b4a4daf",
-  "version": 1,
+  "source_extraction_id": "e10f5b85e1b24318b239ba222491d390",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

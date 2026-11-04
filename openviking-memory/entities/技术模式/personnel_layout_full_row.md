@@ -2,7 +2,7 @@
 在项目 苏州市房地产监测V3 中，人员信息布局组件强制两列未豁免，导致整行字段出现半宽。
 
 ## 问题根因
-- 编辑模式下的居住地址为 `FORM_COL_FULL`
+- 编辑态 `户籍地址` 本身已是 `FORM_COL_FULL`（span 24，整行），但 `PersonnelBasicInfoLayout.vue` 兜底样式把块内所有 `.el-row > .el-col` 强制收敛为两列宽（本意把三列栅格压成「证件照 + 两列」布局，只豁免 textarea），导致整行字段被压成半宽、后面「联系电话」挤到同一行。
 - `PersonnelBasicInfoLayout.vue` 的回退样式强制 `.el-row > .el-col` 为两列未豁免
 
 ## 解决方案
@@ -18,8 +18,8 @@
 {
   "category": "技术模式",
   "name": "personnel_layout_full_row",
-  "source_extraction_id": "3440ed0abfed42a4aa0c1bc2d6540321",
-  "version": 1,
+  "source_extraction_id": "393ff4b197654fe9a049ff3d076ab662",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

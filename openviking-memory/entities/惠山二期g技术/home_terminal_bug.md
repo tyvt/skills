@@ -13,13 +13,14 @@
 - 验证证据：src=惠山二期G/013.md
 - 涉及文件：zhi2-web-admin/src/views/home/index-wrapper.vue
 - 所属项目：惠山二期G；来源会话：cc2fdb8f-a6a1-46f0-b90b-f048bcbf9bd2；代码基线：none
+- 建议验证：物业账号(B端)登录应见旧版首页；G端账号登录仍为新版首页
 
 <!-- MEMORY_FIELDS
 {
   "category": "惠山二期G技术",
   "name": "home_terminal_bug",
-  "source_extraction_id": "199894fef6144ee28cf97b4077472d75",
-  "version": 1,
+  "source_extraction_id": "ae053fea123242788f33036f4ed333c3",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

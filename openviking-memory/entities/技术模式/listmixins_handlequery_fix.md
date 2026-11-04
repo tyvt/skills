@@ -7,7 +7,7 @@
 
 ## 解决方案
 - 在 `pubBankDetailDay/index.vue` 注册 listMixins（来自 table.js）
-- 混入 `handleQuery` 与 `multiple`、`loading` 等状态，对齐 `bankDetailDay/index.vue`
+- 混入 `handleQuery`（实现为 `this.queryParams.pageNum = 1; this.getList()`）与 `multiple`、`loading` 等状态，对齐 `bankDetailDay/index.vue`
 
 ## 验证与归属
 - 验证证据：src=宜兴公共收益/003.md
@@ -18,8 +18,8 @@
 {
   "category": "技术模式",
   "name": "listmixins_handlequery_fix",
-  "source_extraction_id": "1af5f05a76db443a9f62de599737d5e9",
-  "version": 1,
+  "source_extraction_id": "033c4384d3a244c9b904b7072ccc1be0",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

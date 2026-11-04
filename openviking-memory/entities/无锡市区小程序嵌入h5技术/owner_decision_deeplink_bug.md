@@ -17,16 +17,17 @@
 
 ## 验证与归属
 - 来源会话：02076a8a-747c-4891-a785-497ddd2c8a97
+- 语法校验：esbuild 校验通过
 - 代码基线：38bd192
-- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js、src/utils/portal.js
+- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js、src/utils/portal.js、src/pages/webview/home.vue
 - 所属项目：无锡市区小程序嵌入H5
 
 <!-- MEMORY_FIELDS
 {
   "category": "无锡市区小程序嵌入H5技术",
   "name": "owner_decision_deeplink_bug",
-  "source_extraction_id": "259ccd137522413f8a275a710d09c982",
-  "version": 1,
+  "source_extraction_id": "4326f61db27d461c9d5f126bae9c9e87",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

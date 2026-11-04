@@ -11,15 +11,15 @@
 
 ## 验证与归属
 - 验证：extracted source=workbuddy session=ecf5b419-1deb-41ae-99d8-e72824553d97
-- 涉及文件：src/store/vote.js、src/pages_owner/decision/index.vue、src/pages_owner/elect/index.vue、src/pages-suggest/list.vue 等
+- 涉及文件：src/store/app.js、src/store/vote.js、decision/detail.vue、src/pages_owner/decision/index.vue、src/pages_owner/elect/index.vue、src/pages-suggest/list.vue 等；移除未使用的 appStore import，eslint 校验通过
 - 所属项目：惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）；来源会话：ecf5b419-1deb-41ae-99d8-e72824553d97；代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "huishan_phase2_tech",
   "name": "vote_type_filter_bug",
-  "source_extraction_id": "81ea005e02284cf9a207c22dfc8a128a",
-  "version": 1,
+  "source_extraction_id": "0a2d84477c6e4d33ab1ebb4f3244c34d",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

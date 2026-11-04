@@ -6,6 +6,14 @@
 - 前端已登录态据 userStore.userId 等字段判定，无独立 isLogin 函数
 - 登录态判定依赖 src/http/interceptor.ts 的 HTTP 响应（result==='fail' 且 info==='请先登录'）、Pinia userStore 的 userId/userCode 及 URL token 换票
 
+## Storage 一览
+- 前端相关存储键：urlToken、isphone、user、beforeLoginPath
+- beforeLoginPath 记录登录前路径，但当前未被消费
+
+## 已知缺口
+- beforeLoginPath 未被消费（记录后无后续跳转使用）
+- handleLoginSuccess 为无条件跳转，未做条件分支
+
 ## 关键文件
 - 登录页：src/pages/login.vue
 - 请求拦截：src/http/http.ts
@@ -25,8 +33,8 @@
 {
   "category": "技术模式",
   "name": "three_layer_login",
-  "source_extraction_id": "f0381b4466ce46f19fa0940c92d3febd",
-  "version": 2,
+  "source_extraction_id": "988f0e26b2544c369974d107c496b197",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

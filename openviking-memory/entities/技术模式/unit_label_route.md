@@ -13,14 +13,14 @@
 ## 验证与归属
 - 涉及文件：d:/repository/相城G/src/views/repairFunds/deposit/depositnotice/detail.vue、d:/repository/相城G/src/views/repairFunds/deposit/depositnotice/index.vue
 - 所属项目：相城G；代码基线：none
-- 来源会话：77e0fe3d-4dd5-49c3-90b2-105aa977bf93；验证证据：相城G/001.md
+- 来源会话：77e0fe3d-4dd5-49c3-90b2-105aa977bf93；验证证据：extracted source=cursor project=相城G
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "unit_label_route",
-  "source_extraction_id": "a5bc3548d9d34129ac45381b9bce370c",
-  "version": 1,
+  "source_extraction_id": "e69b5c4392454ad0aaa761388c263c0b",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

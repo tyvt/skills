@@ -8,6 +8,7 @@
 ## 解决方案
 - 移除 `tabDisabled` 拦截，前置 `getList` 定义。
 - 于 `onLoad` 调 `refresh()`，并在 `getList` 记录请求 `tab` 防数据覆盖。
+- 清空搜索框后自动重新搜索。
 
 ## 验证与归属
 - 涉及文件：d:/repository/昆山市民/src/pages_examine/examineList.vue、src/hooks/useLoadMore.js、src/pages_contract/list.vue、src/pages_benefit/benefit/index.vue、src/pages_activity_vote/my-activities.vue、src/api/modules/examine.js、src/pages.json、src/pages_examine/components/operationBtn.vue
@@ -18,8 +19,8 @@
 {
   "category": "昆山市民技术",
   "name": "tab_disabled_bug",
-  "source_extraction_id": "9f5ed67ac35144b098b3ed9d8f44d21c",
-  "version": 1,
+  "source_extraction_id": "c3b6be7beffe427a8a4251db85b7ca61",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

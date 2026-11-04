@@ -7,6 +7,7 @@
 
 ## 解决方案
 - 移除 `:inline="true"` 后的多余孤立冒号即可消除错误
+- 该孤立冒号已被删除，ScopeSelectDialog.vue 的解析错误已消除
 
 ## 验证与归属
 - 验证证据：extracted source=cursor session=97483054-f372-458c-b11a-afe35cc4d287
@@ -17,8 +18,8 @@
 {
   "category": "技术模式",
   "name": "vue_inline_colon",
-  "source_extraction_id": "708689435f864318965b557f3ab6ccf6",
-  "version": 1,
+  "source_extraction_id": "94b3163b683a4c1583f1ec12b25eac22",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

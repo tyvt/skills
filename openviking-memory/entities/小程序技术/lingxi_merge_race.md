@@ -5,6 +5,8 @@ mergeLingXiHouseIntoPortalUser 合并房屋后触发 PORTAL_HOUSE_SELECTION_CHAN
 - mergeLingXiHouseIntoPortalUser 合并房屋后同步触发 PORTAL_HOUSE_SELECTION_CHANGED_EVENT
 - onPortalHouseSelectionChanged 立即 restorePortalSnapshotFromPageStorage() 读到旧快照（houseBoundViaAuth 仍为 false）
 - 正式环境下旧快照触发 clearPortalHouseFields 清掉刚合并的房屋
+- externalWebview.vue（「我的」页）未监听该事件，因此不会出现此问题
+- persistPortalUserSnapshot 把清空状态写回本地，弹窗仍显示成功（isLingXiSuccess 独立维护），但 hasHouse() 为 false
 
 ## 解决方案
 - onPortalHouseSelectionChanged 用 $nextTick 等 writePortalSnapshot 完成后再恢复快照
@@ -20,8 +22,8 @@ mergeLingXiHouseIntoPortalUser 合并房屋后触发 PORTAL_HOUSE_SELECTION_CHAN
 {
   "category": "小程序技术",
   "name": "lingxi_merge_race",
-  "source_extraction_id": "a05ef5444c4c40b7b614ae24c0ceaaad",
-  "version": 1,
+  "source_extraction_id": "acfa3d29203d49719c288b371914a6bf",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

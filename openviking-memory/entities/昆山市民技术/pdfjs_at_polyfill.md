@@ -12,15 +12,15 @@
 
 ## 验证与归属
 - 验证：会话 d22bb0e1 最终结论，含报错与修复要点。
-- 涉及文件：`src/utils/pdfPolyfill.js`、`src/pages/common/filePreview.vue`、`src/pages_contract/detail.vue`。
+- 涉及文件：`src/utils/pdfPolyfill.js`、`src/pages/common/filePreview.vue`、`src/pages_contract/detail.vue`、`src/utils/index.js`、`package.json`、`vite.config.js`。
 - 所属项目：昆山市民；代码基线：75db5a8；来源会话ID：d22bb0e1-fc61-42cb-bfc2-13d1d148fd21。
 
 <!-- MEMORY_FIELDS
 {
   "category": "昆山市民技术",
   "name": "pdfjs_at_polyfill",
-  "source_extraction_id": "227214d675d14725964edfb851677a3e",
-  "version": 1,
+  "source_extraction_id": "e7ff9dee35c247329e04ae4c0c42cda8",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

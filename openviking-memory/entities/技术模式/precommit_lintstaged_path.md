@@ -10,12 +10,12 @@
 
 ## 解决方案
 - 应在 hook 里先 `cd zhi2-web-admin`，再用 `node "$REPO_ROOT/node_modules/lint-staged/bin/lint-staged.js"` 直接执行根目录已安装的 lint-staged，完全绕开 npx 的 monorepo 路径解析。
-- 旧场景可改为优先查找子目录 `node_modules/lint-staged`，再回退根目录查找。
+- 旧场景已实现修复：更新 `zhi2-web-admin/.husky/pre-commit`，先尝试 `zhi2-web-admin/node_modules/lint-staged`，若无再尝试根目录 `node_modules`，两处皆无则明确提示并退出；当前在 `zhi2-web-admin` 下执行该 hook 已通过。
 
 ## 关联信息
 - 验证证据（npm workspaces）：会话 855a5094 三次 commit 失败栈均指向 `D:\repository\产品2.0\node_modules\node_modules\lint-staged\bin\lint-staged.js`；改为 REPO_ROOT + node 直跑后通过（src=2-0/008.md）。
-- 验证证据（旧场景）：src=G/003.md
-- 涉及文件：.husky/pre-commit、zhi2-web-admin/package.json
+- 验证证据（旧场景）：extracted source=cursor project=G
+- 涉及文件：zhi2-web-admin/.husky/pre-commit、`D:\repository\泰兴G\node_modules\lint-staged\bin\lint-staged.js`
 - 来源会话：855a5094-af56-4cd9-aa09-0a5ab6a8ea78、e8dad49f-1052-4158-899c-8a546531700d
 - 代码基线：产品2.0 父仓 + zhi2-web-admin workspace
 
@@ -23,8 +23,8 @@
 {
   "category": "技术模式",
   "name": "precommit_lintstaged_path",
-  "source_extraction_id": "6fe784494645457794d83b09b9193f65",
-  "version": 3,
+  "source_extraction_id": "c236da9a3df445bb9d98b7def057c10b",
+  "version": 4,
   "memory_type": "entities"
 }
 -->

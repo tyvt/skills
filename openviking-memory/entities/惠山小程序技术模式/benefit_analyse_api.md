@@ -4,7 +4,10 @@
 ## 接口与参数
 - 请求接口：GET /v2.0/benefit/app/accountStatistics/analyse
 - 参数 regulatoryAccount 来自 store 的 benefitInfo
-- 参数 year 指定统计年份
+- 参数 year 指定统计年份，默认当前年（截图里是 2026）
+
+## 返回字段
+- `annualBalance` → 年度结余
 
 ## 涉及文件
 - d:/repository/惠山小程序/src/pages_benefit/benefit/benefitAnalysis.vue
@@ -22,8 +25,8 @@
 {
   "category": "惠山小程序技术模式",
   "name": "benefit_analyse_api",
-  "source_extraction_id": "506c6443b4d24c358b82c5a05e60bdc8",
-  "version": 1,
+  "source_extraction_id": "461613e2a2f54b25a2e9ab1b1429116a",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

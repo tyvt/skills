@@ -3,6 +3,7 @@
 
 ## 流程说明
 - 登录和绑房是两个独立步骤
+- 前端方法 bindHouseByLingXi 定义于 src/api/security.js（POST /security/ctAuth/lingXi/bindHouse），于 src/utils/lingxi.js 登录成功后调用（传 authCode）
 - security.js 的 bindHouseByLingXi 通过 POST /security/ctAuth/lingXi/bindHouse 提交授权页回跳URL中的 authCode
 - lingxi.js 在登录成功后调用绑房接口
 - 仅登录成功不能证明绑房成功
@@ -16,8 +17,8 @@
 {
   "category": "huishan_phase2_tech",
   "name": "lingxi_login_bind_separate",
-  "source_extraction_id": "81ea005e02284cf9a207c22dfc8a128a",
-  "version": 1,
+  "source_extraction_id": "1807f7f40b37437882a8c1d8884b1b34",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

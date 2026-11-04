@@ -2,6 +2,7 @@
 在宿迁苏服办项目中，App.vue 的 initUser() 通过 lightAppJssdk.user.getTicket() 获取票据，无需显式传 appid。
 
 ## 调用流程
+- 应用启动（非开发环境）时调用 initUser()
 - Ticket 由 src/App.vue 的 initUser() 调用 lightAppJssdk.user.getTicket() 获取
 - 调用 JSSDK 获取票据无需显式传 appid
 - 未登录时触发 loginapp() 拉起登录
@@ -18,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "app_jssdk_ticket",
-  "source_extraction_id": "d82dd7e7fe344bf68c816f8510fcdc29",
-  "version": 1,
+  "source_extraction_id": "57adfb7930cd48c3a63051bac4c8af14",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

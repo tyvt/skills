@@ -9,7 +9,7 @@
 - 插件需配置 all_frames 注入（含 about:blank 子页）
 
 ## 验证与归属
-- 验证证据：src=H5/001.md
+- 验证证据：extracted source=cursor project=H5
 - 涉及文件：@混淆图片.html
 - 来源会话：6ecaed5d-de7a-48b4-9f19-36f8045db884；代码基线：none
 
@@ -17,8 +17,8 @@
 {
   "category": "技术模式",
   "name": "iframe_plugin_inject",
-  "source_extraction_id": "ec014e6704ab4b4c97a1f8eea1e7cab1",
-  "version": 1,
+  "source_extraction_id": "a406d3eb4867402c8b60531599883674",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

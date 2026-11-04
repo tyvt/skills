@@ -12,6 +12,7 @@
 - 打开弹窗并行拉台账详情与合同详情：台账失败仍可尝试合同；合同未成功时不要整页切租赁字段导致基础信息全为 -
 - 图片侧与经营用房一致：逗号拆 attachments + resolveServerAssetUrl，无附件回退 picUrl 等
 - revenueContractResourcesId 同时从列表行与明细 form 取值
+- 组件 name 改为 AdvertiseAssetDialog；无合同或合同详情未加载成功时展示基础字段（名称、类别、类型、共享/独有、数量、位置、备注），合同详情加载成功时展示租赁字段（租赁编号、金额、期限等）
 - 若接口有数据仍无图，核对列表 resourcesId 是否等于后端 advertiseSpaceDetailId（映射问题需接口补字段）
 
 ## 验证与归属
@@ -23,8 +24,8 @@
 {
   "category": "技术模式",
   "name": "adspace_popup_detail",
-  "source_extraction_id": "3b024a03f1f641b08ea6be6c3dd919ff",
-  "version": 2,
+  "source_extraction_id": "8280b5a305984951910eb7df99f705d7",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

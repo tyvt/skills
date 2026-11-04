@@ -5,6 +5,8 @@
 - main.ts 设置 uni.$uv.config.unit = 'rpx'
 - uv-picker 据此输出内联 height/line-height
 - 内联样式优先级高于 picker-view 的 --picker-view-column-indicator-height 变量
+- 症状：滚动按指示器高度算、选项按 rpx 渲染，最后一项往往滚不到中间选中框，只能点选
+- 与 DCloud 社区「不要给 picker 项单独设 height/line-height」结论一致
 
 ## 解决方案
 - 在 src/style/index.scss 增加仅 H5 生效的全局样式强制行高对齐指示器
@@ -25,8 +27,8 @@
 {
   "category": "技术模式",
   "name": "uv_picker_misalign",
-  "source_extraction_id": "f0381b4466ce46f19fa0940c92d3febd",
-  "version": 1,
+  "source_extraction_id": "db3398da656b41a4955e049848ba9a61",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

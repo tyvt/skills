@@ -12,15 +12,15 @@
 - 该修复覆盖所有带小计+固定操作列的列表
 
 ## 验证与归属
-- 涉及文件：src/components/zs-table/zs-table.vue、src/views/maintenance/query/index.vue
+- 修复改动约+31/-4行；涉及文件：src/components/zs-table/zs-table.vue、src/views/maintenance/query/index.vue、projectNameExampleDialog.vue
 - 所属项目：园区公共收益；来源会话：8cf85830-9fc8-4151-9f52-885208388c12、797b8ce9-32a7-41fc-8031-23d0a604bf9a；代码基线：0abcb96
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zhi2_subtotal_bug",
-  "source_extraction_id": "c36c34f056dd48c9be8f216646e9ea81",
-  "version": 1,
+  "source_extraction_id": "03289f07c5334576ab4bc228a9de1fd1",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

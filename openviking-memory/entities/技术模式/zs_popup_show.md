@@ -7,10 +7,11 @@ zs-popup 组件未实现 show 参数，仅支持默认 v-model，导致 decision
 
 ## 解决方案
 - 在 src/components/zs-popup/zs-popup.vue 新增 show prop
-- 兼容 v-model 与 v-model:show 两种用法
+- 兼容 v-model（modelValue / update:modelValue）与 v-model:show（show / update:show）两种用法
+- 修复后 src/pages_owner/decision/form.vue 中 decisionResponse(...).then(... => { showSzfPopup.value = true }) 将正确触发弹窗打开
 
 ## 验证与归属
-- 验证证据：extracted source=cursor session=d82bff24-0e41-424c-9a97-545984d9ac69
+- 验证证据：extracted source=cursor project=H5 session=d82bff24-0e41-424c-9a97-545984d9ac69
 - 涉及文件：src/pages_owner/decision/form.vue、src/components/zs-popup/zs-popup.vue
 - 来源会话：d82bff24-0e41-424c-9a97-545984d9ac69；代码基线：none
 
@@ -18,8 +19,8 @@ zs-popup 组件未实现 show 参数，仅支持默认 v-model，导致 decision
 {
   "category": "技术模式",
   "name": "zs_popup_show",
-  "source_extraction_id": "cbe7f99334114351b9d7d6c20eaddbd5",
-  "version": 1,
+  "source_extraction_id": "7146bf7d99e4433bb774d137ebb2fa4f",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

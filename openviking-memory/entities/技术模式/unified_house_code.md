@@ -6,7 +6,7 @@
 
 ## 解决方案
 - `houseLimitConstants.js` 新增 `resolveUnifiedHouseCode()` 用于 `normalizeHouseLimitLineRow`。
-- `limitFormMixin.js` 回显与保存映射同步优先 `unifiedHouseCode`/`unifiedBuildingCode`。
+- `limitFormMixin.js` 的 `normalizeCancelHouseRow` 回显与 `mapHouseToLimitLine`/`mapHouseToRemovalLine` 保存映射同步优先 `unifiedHouseCode`/`unifiedBuildingCode`。
 - 查看弹窗 UI 混乱一并修正，存量误存数据需后端刷数。
 
 ## 验证与归属
@@ -18,8 +18,8 @@
 {
   "category": "技术模式",
   "name": "unified_house_code",
-  "source_extraction_id": "24ce2097e17b4d698afe338a8b2912e2",
-  "version": 1,
+  "source_extraction_id": "393ff4b197654fe9a049ff3d076ab662",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

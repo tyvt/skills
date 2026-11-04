@@ -2,7 +2,7 @@
 iHomePC 个人中心我的账单页通过 personalCenter.js 新增 Mock 接口完成补充缴费与退费申请。
 
 ## 接口变更
-- `src/api/modules/personalCenter.js` 新增 `submitRentPayment`、`submitRefundApply` 与 `getRefundContractOptions` 的 Mock 接口，均返回 `code: 200`。
+- `src/api/modules/personalCenter.js` 新增 `submitRentPayment`（入参 `{ billId, payMethod }`，`payMethod` 可选 `ALIPAY`|`WECHAT`|`BANK_CARD`，将账单置为已缴费、写入缴费时间并返回 `code: 200`）、`submitRefundApply`（入参 `{ contractId, refundType, amount, reason }`，`refundType` 为 `RENT`|`DEPOSIT`，返回 `code: 200`、`msg: "退费申请已提交"`）与 `getRefundContractOptions`（返回当前 mock 合同列表）的 Mock 接口。
 
 ## 页面接入
 - `src/views/personalCenter/myBill/index.vue` 接入上述接口，完成补充缴费与退费申请功能。
@@ -15,8 +15,8 @@ iHomePC 个人中心我的账单页通过 personalCenter.js 新增 Mock 接口�
 {
   "category": "技术模式",
   "name": "bill_mock_api",
-  "source_extraction_id": "f1329ecf668e4fb1a4d941a19f455f18",
-  "version": 1,
+  "source_extraction_id": "12def0402d4647a38511dddb624f592c",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

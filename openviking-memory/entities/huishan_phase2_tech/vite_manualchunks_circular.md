@@ -7,9 +7,10 @@
 - node_modules 路径分割笔误（原 node_modules\/\//）
 
 ## 解决方案
-- H5 不启用该强制拆包
+- H5 不启用该强制拆包（该拆包原本只用于小程序减小主包体积）
 - 小程序侧 includes('vue') 改精确匹配 vue/@vue
 - 修正 node_modules 路径分割笔误
+- H5 修复后需重新构建：npm run build:h5；本地开发重启 npm run dev:h5
 
 ## 验证与归属
 - 验证：src=惠山二期H5/007.md
@@ -20,8 +21,8 @@
 {
   "category": "huishan_phase2_tech",
   "name": "vite_manualchunks_circular",
-  "source_extraction_id": "8c4a40e76b8e480d92d361435c8d6a78",
-  "version": 1,
+  "source_extraction_id": "0dfd4f13547047ad84a80b4f19903007",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

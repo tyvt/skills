@@ -4,9 +4,10 @@
 ## 问题根因
 - `examineDetail.vue` 的 `getDetail` 未合并 URL 参数 `dataId`，刷新后 `init` 传参不全
 - `onMounted` 与 `watch` 竞态致 `keyNode` 未就绪
+- 全局响应拦截器在权限校验类接口失败时仍 `showError` 弹出报错提示，用户看到「节点key不能为空」
 
 ## 修复方案
-- `examineDetail.vue` 合并 `dataId`/`busCode`
+- `examineDetail.vue` 合并 `dataId`/`busCode`，操作按钮区域增加 `dataId` 判断，数据就绪后再渲染
 - `operationBtn.vue` 改用 `immediate:true` 单一 watch 避免重复初始化
 
 ## 验证与归属
@@ -18,8 +19,8 @@
 {
   "category": "昆山市民技术",
   "name": "examine_detail_dataid_bug",
-  "source_extraction_id": "caaa6f50daa5490bae09d3487c3ef499",
-  "version": 1,
+  "source_extraction_id": "f93ad767e88948b5b1deeea32b5a0798",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

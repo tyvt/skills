@@ -7,7 +7,7 @@
 
 ## 解决方案
 - `login.html` 在 Vue 初始化前引入 `static/js/crypto-js.js` 与 `static/js/secure-login.js`
-- 对上述两个接口的 `username`、`password` 字段实施 AES-128-CBC 加密
+- 对上述两个接口的 `username`、`password` 字段实施 AES-128-CBC 加密；其中 `/loginName/login` 的 `telephone`、`checkCode`、`code`、`codeId` 仍按明文传输
 - 移除表单 `action`/`method`，登录按钮设 `native-type="button"` 防止默认提交
 - 增设加密组件加载失败提示与登录 `loading` 状态
 
@@ -25,8 +25,8 @@
 {
   "category": "前端技术笔记",
   "name": "login_aes_encrypt",
-  "source_extraction_id": "6e39ea42c1d04631b8da064f5a1f0c98",
-  "version": 1,
+  "source_extraction_id": "25be547a82f34c29b716d307134ecf34",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -6,8 +6,8 @@
 - E 证通核身接口返回 code 200 但被拦截器误判失败
 
 ## 修复方案
-- 修改 src/request/index.js 兼容 res.status/res.statusCode 及 2xx
-- 调整 src/pages/common/useEidVerify.js 以 code/message 判断成功并增加兜底 resolve
+- 修改 src/request/index.js：兼容 res.status/res.statusCode，接受 2xx 状态码（不再只认 200）；自动解析字符串类型的 res.data；用 Number() 统一处理业务 code
+- 调整 src/pages/common/useEidVerify.js：以 code === 200 或 msg === '操作成功' 判断成功，不再依赖 faceRecognition == 1；从 E 证通返回后延迟 300ms 再调 wx.login；增加兜底：即使进入 catch，若响应体表示成功也会 resolve
 
 ## 涉及文件
 - src/api/modules/estate.js
@@ -27,8 +27,8 @@
 {
   "category": "昆山市民技术",
   "name": "eid_verify_bug",
-  "source_extraction_id": "ab8c60a92ea7445d845556d78d295742",
-  "version": 1,
+  "source_extraction_id": "105ecfd0ad3a4016988d83e0d771cf2c",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

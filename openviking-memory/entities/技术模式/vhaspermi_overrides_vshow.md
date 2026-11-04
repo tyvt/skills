@@ -8,7 +8,9 @@
 
 ## 修复约定
 - 改用 `v-if` 合并权限判断 `checkPermission([...])`，不混用 `v-show` + `v-hasPermi`
-- 涉及按钮：撤销（revoke）、「提前开始」等
+- 涉及按钮：撤销（revoke）、「提前开始」、「重新发起表决」等
+- ownerDecision/detail.vue、sortDecison/detail.vue 中「重新发起表决」按钮条件：`v-if="isFormDisabled && form.bizState == '2' && showRevote && checkPermission(['estate:ownerDecision:revoke'])"`
+- 该按钮仅在维修资金表决且表决已结束（`decisionState === '3'`）并有结果时显示，未开始状态不显示
 
 ## 验证与归属
 - 验证证据：会话 149638fc 与 627ed433 用户报按钮误显/仍显示
@@ -19,8 +21,8 @@
 {
   "category": "技术模式",
   "name": "vhaspermi_overrides_vshow",
-  "source_extraction_id": "b3c0a8593584475eb37a8ad50767e7d1",
-  "version": 1,
+  "source_extraction_id": "dd32723f05a14b2bb4948bdacf39d9ea",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

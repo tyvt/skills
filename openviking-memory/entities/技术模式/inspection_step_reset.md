@@ -5,7 +5,8 @@
 - 巡检记录添加并删除步骤后再次新增存在状态残留
 
 ## 解决方案
-- 在 `src/pages_facility/record/add.vue` 修正步骤状态重置逻辑
+- `src/pages_facility/record/add.vue` 给 `ZsUploader` 加 `v-if="showStepFormPopup"`：弹窗关闭时销毁上传组件，再次打开时重新挂载，避免 `uni-file-picker` 内部 `files` 残留
+- 统一取消逻辑：新增 `onCancelStepForm`，关闭弹窗并调用 `resetStepForm()`
 
 ## 验证与归属
 - 验证证据：src=物业手持B端/004.md
@@ -16,8 +17,8 @@
 {
   "category": "技术模式",
   "name": "inspection_step_reset",
-  "source_extraction_id": "8d4147cd914e4ebdb70a5e2257f219ff",
-  "version": 1,
+  "source_extraction_id": "859dfcfb9ffe4d1d902c1e904f6715fb",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

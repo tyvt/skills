@@ -2,7 +2,7 @@
 个人中心 personalInfo.vue 的删除按钮只重置表单不调用后端删除接口，属逻辑缺陷。
 
 ## 问题根因
-- `head-edit` 内新增删除按钮绑定 `deletePersonalInfo`，该方法仅重置 `form`、`userforms` 为空且 `pictureUrl` 为 `undefined` 并提示成功。
+- `head-edit` 内头像右侧按钮区，紧挨着“保存 / 修改 / 取消”按钮，新增红色删除按钮，文案 `{{ $t('message.delete') }}`（即“删除”），点击 `@click="deletePersonalInfo"`；该方法仅重置 `form`、`userforms` 为空且 `pictureUrl` 为 `undefined` 并提示成功。
 - 未调用任何后端删除接口，数据实际未删除。
 
 ## 涉及文件
@@ -16,8 +16,8 @@
 {
   "category": "技术模式",
   "name": "personal_info_delete",
-  "source_extraction_id": "f1329ecf668e4fb1a4d941a19f455f18",
-  "version": 1,
+  "source_extraction_id": "1167e1792b9b40dfbcb6256ab4a97c5a",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -5,7 +5,7 @@
 - 根因：src/pages_vote/vote/vote.vue 直接访问 optionGroupList?.[0]?.tMfOptionApplyList
 - 根因：接口返回空数组时越界崩溃
 - 修复：vote.vue 新增 optionApplyList computed 安全读取 `?? []`，模板 v-for 改用该变量
-- 修复：onLoad 校验 OPTION 无选项时提示返回
+- 修复：onLoad 校验 OPTION 无选项时提示「暂无表决选项，请联系管理员」并返回上一页
 - 修复：src/stores/vote.js 的 selectOption 对相关字段加 `?? []` 兜底
 
 ## 涉及文件（表决页）
@@ -29,8 +29,8 @@
 {
   "category": "惠山小程序技术模式",
   "name": "vote_option_crash",
-  "source_extraction_id": "cb1b208ed4a04a328bf963f720200934",
-  "version": 1,
+  "source_extraction_id": "591eeb9000e74a4fae1a3990c5386c2d",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

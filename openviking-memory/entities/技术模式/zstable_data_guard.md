@@ -15,13 +15,14 @@
 - 验证证据：extracted source=cursor session=5ef01991-e3ff-4f8a-b74e-945baa6f1ef6
 - 涉及文件：src/components/zsTable/index.vue
 - 所属项目：靖江物管G；来源会话：5ef01991-e3ff-4f8a-b74e-945baa6f1ef6
+- 已执行 lint 检查，当前无新增告警
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zstable_data_guard",
-  "source_extraction_id": "07fb09c462ea44bd8382c5fb50834270",
-  "version": 1,
+  "source_extraction_id": "97e341df09df4a1faf00c8a28424c2a1",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

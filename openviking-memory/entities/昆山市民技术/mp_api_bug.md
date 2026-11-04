@@ -11,16 +11,17 @@
 - 改 env 后需 `npm run build:mp` 重新上传。
 
 ## 验证与归属
-- 验证：会话 76e058f1 用户反馈小程序打包接口不对，修复恢复 envVersion 分支表。
-- 涉及文件：src/env/mp.js、src/request/index.js。
+- 验证：会话 76e058f1 用户反馈小程序打包接口不对，修复恢复 envVersion 分支表；验证证据 src=昆山市民/006.md。
+- 涉及文件：src/env/mp.js、src/request/index.js、package.json、vite.config.js、src/manifest.json、src/api/index.js。
 - 所属项目：昆山市民；代码基线：1e46691；来源会话ID：76e058f1-ba17-479b-89f8-7c7af2202d46。
+
 
 <!-- MEMORY_FIELDS
 {
   "category": "昆山市民技术",
   "name": "mp_api_bug",
-  "source_extraction_id": "a9d0b2ccfd0f4c0fac517d664707e5c5",
-  "version": 1,
+  "source_extraction_id": "c534b7c594854b9089e2fda834ef7f9b",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

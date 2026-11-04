@@ -4,7 +4,7 @@
 ## 工作机制
 - 响应拦截器检测响应头`x-encrypt`是否为`"true"`
 - 若为true：RSA解密`res.data.key`获得AES密钥，再用AES-CBC零IV解密`res.data.data`，将解密结果写回`res.data`
-- 依赖经`public/assets/js/jsencrypt.min.js`与`vite.config.js`全局映射`JSEncrypt`引入
+- 依赖经`public/assets/js/jsencrypt.min.js`与`vite.config.js`全局映射`JSEncrypt`引入；因当前环境`npm install`异常，采用与`crypto-js`相同的外部脚本方式（参考根目录`index.js`实现）
 
 ## 涉及文件
 - 核心文件：zhi2-web-admin/src/utils/request.js、zhi2-web-admin/src/api/index.js、zhi2-web-admin/vite.config.js、zhi2-web-admin/index.html、zhi2-web-admin/package.json
@@ -18,8 +18,8 @@
 {
   "category": "前端技术笔记",
   "name": "response_auto_decrypt",
-  "source_extraction_id": "4c41132cc4414e02ab9756bee071929d",
-  "version": 1,
+  "source_extraction_id": "033c4384d3a244c9b904b7072ccc1be0",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

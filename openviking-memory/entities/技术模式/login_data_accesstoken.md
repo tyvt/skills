@@ -9,7 +9,7 @@
 - `LoginByUidResponse` 的 `data` 字段定义为 `string` 类型的 `accessToken`
 
 ## 验证与归属
-- 验证证据：src=江阴C端/001.md
+- 验证证据：extracted source=cursor project=江阴C端
 - 涉及文件：d:/repository/江阴C端/src/pages/login.vue、src/api/security.ts、src/store/user.ts、src/main.ts、src/pages/login/index.vue、src/utils/url.ts、src/http/http.ts
 - 所属项目：江阴C端；来源会话：dc371ef3-e637-4ca8-826a-fc2421c1ed0b；代码基线：none
 
@@ -17,8 +17,8 @@
 {
   "category": "技术模式",
   "name": "login_data_accesstoken",
-  "source_extraction_id": "3839cf190fa045a0b66d6e97a3ff2a09",
-  "version": 1,
+  "source_extraction_id": "717ffab9ae174b55a4f11f43ec650732",
+  "version": 2,
   "memory_type": "entities"
 }
 -->
