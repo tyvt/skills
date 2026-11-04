@@ -8,8 +8,8 @@ Nos diálogos de informações básicas do portal, os rótulos de campo têm lar
 - Os demais diálogos da home já estavam alinhados à esquerda, sem necessidade de repetir
 
 ## Arquivos e origem
-- Arquivos: PortalDialogHost.vue, PropertyDetailDialog.vue, RentalDetailDialog.vue (em zhi2-web-admin/src/views/home/publicPortal)
-- Evidência: src=门户/052.md
+- 涉及文件: PortalDialogHost.vue, PropertyDetailDialog.vue, RentalDetailDialog.vue (em zhi2-web-admin/src/views/home/publicPortal)
+- 验证证据: src=门户/052.md
 - Sessão de origem: 4bae8daf-b9b1-4788-9e4b-f12564292ebb; base de código: e1f8e0b
 
 <!-- MEMORY_FIELDS

@@ -10,10 +10,10 @@
 - Antes do merge, modificar `v-money:2` em `el-option` e condição `disabled` de `el-select` em `BuildingChangeDialog.vue`
 - ESLint não cobre esses dois pontos
 
-## Verificação e origem
-- Evidência: src=苏州市房地产监测V3-leftover/064.md; src=苏州市房地产监测V3/264.md
-- Arquivos: BuildingChangeDialog.vue, NodeDetailsDialog.vue, PaymentBuildingDialog.vue, zs-dialog.vue, RealEstateDialog.vue
-- Projeto: 苏州市房地产监测V3; sessão: 7123fc41-c4b5-4ca1-afc5-aec23b0dd06d; base de código: none
+## 验证与归属
+- 验证证据: src=苏州市房地产监测V3-leftover/064.md; src=苏州市房地产监测V3/264.md
+- 涉及文件: BuildingChangeDialog.vue, NodeDetailsDialog.vue, PaymentBuildingDialog.vue, zs-dialog.vue, RealEstateDialog.vue
+- 所属项目: 苏州市房地产监测V3; sessão: 7123fc41-c4b5-4ca1-afc5-aec23b0dd06d; base de código: none
 
 
 <!-- MEMORY_FIELDS

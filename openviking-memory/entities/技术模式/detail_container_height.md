@@ -1,7 +1,7 @@
 # Ajuste de altura do detail-container
 O zhi2-web-admin do projeto 苏州市房地产监测V3 tinha .detail-container com height: calc(100vh - 120px) causando excesso de espaço inferior e truncamento de título.
 
-## Problema
+## 问题
 - `.detail-container` em src/styles/index.scss fixava height: calc(100vh - 120px)
 - Valor real do cabeçalho era 104px, então deduzia 16px a mais
 - Causava 40px de espaço em branco inferior e truncamento do título
@@ -11,8 +11,8 @@ O zhi2-web-admin do projeto 苏州市房地产监测V3 tinha .detail-container c
 - Isolar 468 referências dentro de el-dialog
 
 ## Verificação
-- Evidência: src=苏州市房地产监测V3/141.md
-- Projeto: 苏州市房地产监测V3; sessão: 21609fbb-aecf-47c4-8d70-955eeb1e9b2b; baseline: none
+- 验证证据: src=苏州市房地产监测V3/141.md
+- 所属项目: 苏州市房地产监测V3; sessão: 21609fbb-aecf-47c4-8d70-955eeb1e9b2b; baseline: none
 
 <!-- MEMORY_FIELDS
 {

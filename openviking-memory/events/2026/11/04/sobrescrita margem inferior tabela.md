@@ -1,5 +1,5 @@
 # Summary
-No arquivo index-new.vue, na classe .todo-body, a margem inferior de zs-table-container--bottom-spacing foi sobrescrita de 24px para 0 para eliminar espaço em branco em tabelas sem paginação, e o padding de .todo-body foi alterado para 10px 10px 4px para colar a barra de rolagem no fundo. O estilo de borda :deep foi mesclado no bloco deep de .todo-body, mantendo o espaçamento global em index.scss inalterado. Evidência: portal/021.md.
+No arquivo index-new.vue, na classe .todo-body, a margem inferior de zs-table-container--bottom-spacing foi sobrescrita de 24px para 0 para eliminar espaço em branco em tabelas sem paginação, e o padding de .todo-body foi alterado para 10px 10px 4px para colar a barra de rolagem no fundo. O estilo de borda :deep foi mesclado no bloco deep de .todo-body, mantendo o espaçamento global em index.scss inalterado. 验证证据: portal/021.md.
 # 2026-11-04 (Wednesday) ChatLog:
 **user**: 【记忆类型】fact
 【标题】待办表格覆写 zs-table 底部间距去留白
@@ -13,7 +13,7 @@ No arquivo index-new.vue, na classe .todo-body, a margem inferior de zs-table-co
 {
   "event_name": "sobrescrita margem inferior tabela",
   "goal": "Corrigir espaçamento tabela tarefas",
-  "summary": "No arquivo index-new.vue, na classe .todo-body, a margem inferior de zs-table-container--bottom-spacing foi sobrescrita de 24px para 0 para eliminar espaço em branco em tabelas sem paginação, e o padding de .todo-body foi alterado para 10px 10px 4px para colar a barra de rolagem no fundo. O estilo de borda :deep foi mesclado no bloco deep de .todo-body, mantendo o espaçamento global em index.scss inalterado. Evidência: portal/021.md.",
+  "summary": "No arquivo index-new.vue, na classe .todo-body, a margem inferior de zs-table-container--bottom-spacing foi sobrescrita de 24px para 0 para eliminar espaço em branco em tabelas sem paginação, e o padding de .todo-body foi alterado para 10px 10px 4px para colar a barra de rolagem no fundo. O estilo de borda :deep foi mesclado no bloco deep de .todo-body, mantendo o espaçamento global em index.scss inalterado. 验证证据: portal/021.md.",
   "ranges": "0-5",
   "source_extraction_id": "6d81a1d895e74cd1bc8d8f74ecec9578",
   "version": 1,

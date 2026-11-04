@@ -2,7 +2,7 @@
 - Em áreas de colapso Headline e diálogos, el-col deve ter largura forçada de 100%.
 - Em @media (min-width: 768px), redeclarar no final para evitar sobrescrita.
 - Em detail-template.vue, getItemSpan retorna valor fixo 24 para type === 'textarea' quando keepSpan não é true.
-- Arquivos: detail-form.scss, element-ui.scss, companyBasicInfoShared.js, Step1BasicInfo.vue, detail.vue, index.scss, package.json, detailLayout.js. Evidência: 苏州市房地产监测V3-rest/002.md.
+- 涉及文件: detail-form.scss, element-ui.scss, companyBasicInfoShared.js, Step1BasicInfo.vue, detail.vue, index.scss, package.json, detailLayout.js. 验证证据: 苏州市房地产监测V3-rest/002.md.
 
 <!-- MEMORY_FIELDS
 {

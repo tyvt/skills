@@ -7,9 +7,9 @@
 - 3 componentes de sub-tabela tiveram botões de permissão reformados
 
 ## Arquivos e proveniência
-- Arquivos: src/views/maintenance/depositNotice/components/detail.vue, src/views/commercialHousingSales/priceFiling/priceParameters/detail.vue, src/views/supervision/agreement/xy/detail.vue, src/views/supervision/agreement/account/detail.vue, src/views/supervision/agreement/jgxm/detail.vue, src/views/supervision/agreement/allocation/detail.vue, src/views/supervision/agreement/version/detail.vue, src/views/supervision/agreement/xy_version/detail.vue
+- 涉及文件: src/views/maintenance/depositNotice/components/detail.vue, src/views/commercialHousingSales/priceFiling/priceParameters/detail.vue, src/views/supervision/agreement/xy/detail.vue, src/views/supervision/agreement/account/detail.vue, src/views/supervision/agreement/jgxm/detail.vue, src/views/supervision/agreement/allocation/detail.vue, src/views/supervision/agreement/version/detail.vue, src/views/supervision/agreement/xy_version/detail.vue
 - Total: 10 arquivos alterados
-- Projeto: 产品2.0; sessão: 0296e49b-14ac-4732-906b-0ef4ab03bede; base: none; evidência: 产品2.0/032.md
+- 所属项目: 产品2.0; sessão: 0296e49b-14ac-4732-906b-0ef4ab03bede; base: none; 验证证据: 产品2.0/032.md
 
 
 <!-- MEMORY_FIELDS

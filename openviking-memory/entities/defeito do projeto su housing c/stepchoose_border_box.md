@@ -1,7 +1,7 @@
 # Opção StepChoose sem border-box causa overflow de largura
 No projeto Su Housing C, opções de StepChoose sem box-sizing border-box causavam overflow de largura e fundo de destaque colado à borda.
 
-## Causa raiz
+## 问题根因
 - optional/StepChoose.vue não definia box-sizing: border-box causando overflow de largura
 - overflow: hidden e alinhamento padrão impediam layout desejado
 
@@ -19,12 +19,12 @@ No projeto Su Housing C, opções de StepChoose sem box-sizing border-box causav
 - src/components/ZsCheckbox/ZsCheckbox.vue
 
 ## Verificação
-- Evidência: extracted source=cursor session=7596f0ef-5187-468b-8b37-d30dd7fc905d
-- Projeto: Su Housing C (zhi2-mobile-shimin); base de código: none
+- 验证证据: extracted source=cursor session=7596f0ef-5187-468b-8b37-d30dd7fc905d
+- 所属项目: Su Housing C (zhi2-mobile-shimin); base de código: none
 
 <!-- MEMORY_FIELDS
 {
-  "category": "Defeito do projeto Su Housing C",
+  "category": "技术模式",
   "name": "stepchoose_border_box",
   "source_extraction_id": "98ca1eb1092046e4bdfecb4a8ca58d2b",
   "version": 1,

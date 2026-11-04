@@ -16,10 +16,10 @@ Ajuste do botão de visualização de fluxo e unificação de exibição de regi
 - d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permitExtend/detail.vue
 - d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permitCancel/detail.vue
 
-## Verificação e Origem
-- Evidência: src=苏州市房地产监测V3-rest/025.md
+## 验证与归属
+- 验证证据: src=苏州市房地产监测V3-rest/025.md
 - Sessão: 3042833a-7ef3-4a0c-a806-d3d5885f5ff1
-- Projeto: 苏州市房地产监测V3; baseline: none
+- 所属项目: 苏州市房地产监测V3; baseline: none
 
 <!-- MEMORY_FIELDS
 {

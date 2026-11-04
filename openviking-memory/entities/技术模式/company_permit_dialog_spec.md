@@ -9,8 +9,8 @@ Os diálogos de detalhe de empresa e licença do portal seguem zs-dialog + .form
 - Cabeçalho sem borda inferior, com sublinhado claro
 
 ## Arquivos e origem
-- Arquivos: PropertyDetailDialog.vue, PortalDialogHost.vue, zs-dialog.vue, CompanyDialog/index.vue, ProjectDialog/index.vue, detail-template.vue, public-portal-designs.md, detail-form.scss (em zhi2-web-admin/src/views/home/publicPortal)
-- Evidência: sessão workbuddy 47720336-5f4d-49c6-8fa8-1a7fc52beb93
+- 涉及文件: PropertyDetailDialog.vue, PortalDialogHost.vue, zs-dialog.vue, CompanyDialog/index.vue, ProjectDialog/index.vue, detail-template.vue, public-portal-designs.md, detail-form.scss (em zhi2-web-admin/src/views/home/publicPortal)
+- 验证证据: sessão workbuddy 47720336-5f4d-49c6-8fa8-1a7fc52beb93
 
 <!-- MEMORY_FIELDS
 {

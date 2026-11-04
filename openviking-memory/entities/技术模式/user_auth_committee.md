@@ -11,7 +11,7 @@ Causa raiz: o campo de nome de organização `committeeName` do backend não est
 - autonomy/userAuth/index.vue
 
 ## Afiliação
-- Projeto: 园区物管2.0
+- 所属项目: 园区物管2.0
 - Sessão de origem: a64c833f-c485-4bfe-899a-5d177a83f9f3
 - Baseline de código: none
 

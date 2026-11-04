@@ -12,8 +12,8 @@ No zhi2-web-admin do projeto 苏州市房地产监测V3 o corpo da interface de 
 - institution/record/components/RecordCertificateDialog.vue, institution/record/index.vue
 
 ## Verificação
-- Evidência: src=苏州市房地产监测V3-rest/094.md
-- Projeto: 苏州市房地产监测V3; sessão: b13e0131-0391-4d9f-9e4c-9a23fc4f3322; baseline: none
+- 验证证据: src=苏州市房地产监测V3-rest/094.md
+- 所属项目: 苏州市房地产监测V3; sessão: b13e0131-0391-4d9f-9e4c-9a23fc4f3322; baseline: none
 
 <!-- MEMORY_FIELDS
 {

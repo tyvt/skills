@@ -1,6 +1,6 @@
 - Sub-tabelas: substituir `el-row.action-container` + `el-col` aninhados (causavam layout quebrado) por `div.operation-button-container`; 27 arquivos alterados.
 - `index.scss` adiciona estilo de espaçamento e fallback para `.action-container` legado; manter lógica `v-if`.
-- Evidência: src=苏州市房地产监测V3/050.md
+- 验证证据: src=苏州市房地产监测V3/050.md
 
 <!-- MEMORY_FIELDS
 {

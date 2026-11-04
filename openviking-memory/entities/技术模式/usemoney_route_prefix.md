@@ -2,7 +2,7 @@
 
 No projeto 苏州市房地产监测V3, a navegação de detalhe de uso de fundos pulava para página não supervisionada por falta de prefixo de tipo.
 
-## Causa Raiz
+## 问题根因
 - `resolveListRoutePathHint` captura apenas o último segmento `usemoney`, fazendo `pickDetailRouteForList` casar errado com a rota não supervisionada `general/usemoney/:tableid`.
 - `buildTableIdNavigation` prioriza esse caminho incorreto de correspondência.
 
@@ -15,10 +15,10 @@ No projeto 苏州市房地产监测V3, a navegação de detalhe de uso de fundos
 - `src/utils/ruoyi.js`
 - `路由信息.json`
 
-## Verificação e Origem
-- Evidência: src=苏州市房地产监测V3/187.md
+## 验证与归属
+- 验证证据: src=苏州市房地产监测V3/187.md
 - Sessão de origem: 41805f07-b6a7-46c0-90b9-f28d770d61ab
-- Projeto: 苏州市房地产监测V3; baseline de código: none
+- 所属项目: 苏州市房地产监测V3; baseline de código: none
 
 <!-- MEMORY_FIELDS
 {

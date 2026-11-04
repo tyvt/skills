@@ -5,10 +5,10 @@
 ## Correção
 - Corrigir caminhos de import e registrar `AppendixEmpty` em `AppendixPackageSection/index.vue`
 
-## Verificação e origem
-- Evidência: src=苏州市房地产监测V3/267.md
-- Arquivos: conLandLic/detail.vue, conLandLic/changeDetail.vue, AppendixPackageSection/index.vue, AppendixEmpty/index.vue, presale/surveyChange/detail.vue, presale/permitCancel/detail.vue, company/companyAdmin/detail.vue
-- Projeto: 苏州市房地产监测V3; sessão: 3e018025-42b0-4579-8189-908990fe5d69; base: none
+## 验证与归属
+- 验证证据: src=苏州市房地产监测V3/267.md
+- 涉及文件: conLandLic/detail.vue, conLandLic/changeDetail.vue, AppendixPackageSection/index.vue, AppendixEmpty/index.vue, presale/surveyChange/detail.vue, presale/permitCancel/detail.vue, company/companyAdmin/detail.vue
+- 所属项目: 苏州市房地产监测V3; sessão: 3e018025-42b0-4579-8189-908990fe5d69; base: none
 
 
 <!-- MEMORY_FIELDS

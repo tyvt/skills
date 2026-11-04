@@ -1,7 +1,7 @@
 # Ícone de ajuda em addHouse falha ao pular pacotes e placeholder inconsistente
 No projeto Su Housing C, ícone '?' em addHouse.vue com navegação entre subpacotes falhava e campo de certificado tinha placeholder inconsistente.
 
-## Causa raiz
+## 问题根因
 - Ícone '?' em addHouse.vue usava pulo entre subpacotes propenso a falha
 - Input de número de certificado não usava classe de placeholder uniforme
 
@@ -20,12 +20,12 @@ No projeto Su Housing C, ícone '?' em addHouse.vue com navegação entre subpac
 - src/pages_owner/house/verify.vue
 
 ## Verificação
-- Evidência: extracted source=cursor session=7bc1d9ba-8faa-4839-9f70-f4939f0e1403
-- Projeto: Su Housing C (zhi2-mobile-shimin); base de código: none
+- 验证证据: extracted source=cursor session=7bc1d9ba-8faa-4839-9f70-f4939f0e1403
+- 所属项目: Su Housing C (zhi2-mobile-shimin); base de código: none
 
 <!-- MEMORY_FIELDS
 {
-  "category": "Defeito do projeto Su Housing C",
+  "category": "技术模式",
   "name": "addhouse_icon_jump",
   "source_extraction_id": "98ca1eb1092046e4bdfecb4a8ca58d2b",
   "version": 1,

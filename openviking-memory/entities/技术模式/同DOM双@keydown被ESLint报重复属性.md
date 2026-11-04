@@ -11,7 +11,7 @@
 **代码基线**：none
 <!-- MEMORY_FIELDS
 {
-  "category": "Padrão técnico",
+  "category": "技术模式",
   "name": "vue_keydown_dup_attr",
   "source_extraction_id": "f5d831b184074ef7877fa2026e807b62",
   "version": 1,

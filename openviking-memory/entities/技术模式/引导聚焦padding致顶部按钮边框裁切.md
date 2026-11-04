@@ -11,7 +11,7 @@
 **代码基线**：none
 <!-- MEMORY_FIELDS
 {
-  "category": "Padrão técnico",
+  "category": "技术模式",
   "name": "driver_top_clip",
   "source_extraction_id": "2e723bb38f8049e6a07ff416b0c2139b",
   "version": 1,

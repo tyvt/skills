@@ -1,7 +1,7 @@
 - Slots customizados do tipo link não devem ser julgados como coluna de largura fixa; usar `min-width` e contar como coluna flexível.
 - Em `zs-table-column.vue` adicionar `isFixedWidthCustomSlot` para restringir escopo de coluna fixa; nó de texto puro considerado largura mensurável.
 - Em `element-ui.scss`, `td.zs-table-column--auto-width` mantém ellipsis e tooltip.
-- Evidência: src=苏州市房地产监测V3-leftover/020.md; sessão 7c64a6c0-a818-489b-a545-1c33f9163bfe.
+- 验证证据: src=苏州市房地产监测V3-leftover/020.md; sessão 7c64a6c0-a818-489b-a545-1c33f9163bfe.
 
 <!-- MEMORY_FIELDS
 {

@@ -7,10 +7,10 @@ No `detail.vue` de venda consignada, `:disabled="isFormDisabled"` do `zs-form` d
 - `FileList.vue` adiciona restrição `$attrs.operable` nos botões de observação/salvar fora de rascunho
 - `entrust-sale-real-api-flow.spec.js` adiciona helper `assertEntrustSaleAppendixButtons` para validar
 
-## Verificação e origem
-- Evidência: src=苏州市房地产监测V3/108.md
-- Arquivos: presale/entrustSale/detail.vue, mixins/detailMixins.js, mixins/form.js, AnnexUpload/index.vue, AnnexUpload/components/FileList.vue, e2e/presale/entrust-sale-real-api-flow.spec.js, e2e/fixtures/entrust-sale-helpers.js, supervision/agreement/version/detail.vue
-- Projeto: 苏州市房地产监测V3; sessão: 80d2603f-f2d9-4f58-9273-3841d86f0ce0; baseline: none
+## 验证与归属
+- 验证证据: src=苏州市房地产监测V3/108.md
+- 涉及文件: presale/entrustSale/detail.vue, mixins/detailMixins.js, mixins/form.js, AnnexUpload/index.vue, AnnexUpload/components/FileList.vue, e2e/presale/entrust-sale-real-api-flow.spec.js, e2e/fixtures/entrust-sale-helpers.js, supervision/agreement/version/detail.vue
+- 所属项目: 苏州市房地产监测V3; sessão: 80d2603f-f2d9-4f58-9273-3841d86f0ce0; baseline: none
 
 <!-- MEMORY_FIELDS
 {

@@ -11,10 +11,10 @@ Correção em página de novo branch usando `getOwnCompany` em vez de `init` par
 - D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchList.vue
 - D:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/institution/agency-branch-real-api-flow.spec.js
 
-## Verificação e Origem
-- Evidência: src=苏州市房地产监测V3-rest/026.md
+## 验证与归属
+- 验证证据: src=苏州市房地产监测V3-rest/026.md
 - Sessão: 01a162aa-5047-70c5-a400-7594cbb8728b
-- Projeto: 苏州市房地产监测V3; baseline: none
+- 所属项目: 苏州市房地产监测V3; baseline: none
 
 <!-- MEMORY_FIELDS
 {

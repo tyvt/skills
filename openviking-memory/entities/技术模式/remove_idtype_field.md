@@ -6,10 +6,10 @@ Removido item de edição «证件类型», exibição `basicInfoView` e valida�
 - Payload de salvamento ainda envia `idType:'01'` para compatibilidade com backend
 - Afeta também testes e2e: agency-personnel-real-api-flow.spec.js
 
-## Verificação e origem
-- Evidência: src=苏州市房地产监测V3/266.md
-- Arquivos: AgencyPersonnelDetail.vue, LeasePersonnelDetail.vue, e2e/institution/agency-personnel-real-api-flow.spec.js
-- Projeto: 苏州市房地产监测V3; sessão: 5d103f6d-b346-4d26-8144-3e36ee398668; base: none
+## 验证与归属
+- 验证证据: src=苏州市房地产监测V3/266.md
+- 涉及文件: AgencyPersonnelDetail.vue, LeasePersonnelDetail.vue, e2e/institution/agency-personnel-real-api-flow.spec.js
+- 所属项目: 苏州市房地产监测V3; sessão: 5d103f6d-b346-4d26-8144-3e36ee398668; base: none
 
 
 <!-- MEMORY_FIELDS

@@ -10,8 +10,8 @@ Ajuste de UI da página inicial do Su Zhu Fang C: caixa de busca com gradiente v
 - pages.json, pages/index/home.vue, Home_Suzhufang.vue (vários caminhos), OnlineServiceGrid.vue, HotAppsHome.vue, MidModuleGrid.vue, AppTabBar.vue
 
 ## Verificação
-- Evidência: sessão cursor f12bdce7-635e-42f0-b034-e806a17e8c7e
-- Projeto: Su Zhu Fang C (zhi2-mobile-shimin); baseline: none
+- 验证证据: sessão cursor f12bdce7-635e-42f0-b034-e806a17e8c7e
+- 所属项目: Su Zhu Fang C (zhi2-mobile-shimin); baseline: none
 
 <!-- MEMORY_FIELDS
 {

@@ -7,10 +7,10 @@ A seleção total ou cancelamento de edifícios para escolha de casas usa mixin 
 - collectSelectedHousesFromTree agrega e exclui exist==1.
 - buildingSelectRevision atualiza o texto das ações.
 
-## Verificação e origem
-- Evidência: cursor session ce7dea61-1961-4abb-adbd-9512add57f6a
+## 验证与归属
+- 验证证据: cursor session ce7dea61-1961-4abb-adbd-9512add57f6a
 - Ficheiros: zhi2-web-admin/package.json, zhi2-web-admin/src/views/autonomy/multiply/detail.vue, zhi2-web-admin/src/views/autonomy/multiply/components/DecisionRangeTable.vue, zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue, zhi2-web-admin/src/components/zs-select-dialog/SKILL.md, zhi2-web-admin/src/views/autonomy/preparatoryApply/components/preparatoryRangeTable.vue, zhi2-web-admin/src/views/components/BuildingTable.vue, zhi2-web-admin/src/views/building/unit/components/BuildingTableDialog.vue
-- Projeto: 惠山二期G
+- 所属项目: 惠山二期G
 
 <!-- MEMORY_FIELDS
 {
