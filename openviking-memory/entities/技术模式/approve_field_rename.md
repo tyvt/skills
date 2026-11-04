@@ -1,0 +1,28 @@
+# Renomeação do campo de aprovação comment para approveMessage
+No projeto 苏州市房地产监测V3, o campo de "意见说明" da interface de aprovação foi unificado de `comment` para `approveMessage` para alinhar com o fluxo principal de pré-venda.
+
+## 描述
+- Ajuste de nomenclatura de campo em diálogos de aprovação e helpers e2e
+- 所属项目: 苏州市房地产监测V3
+
+## 问题根因
+- O campo `comment` não estava alinhado com o fluxo principal de pré-venda (`approveMessage`)
+
+## 解决方案
+- Modificados `src/views/presale/permitCancel/components/ApprovalDialog.vue`, `src/views/presale/permitExtend/components/ApprovalDialog.vue`, `src/views/presale/permit/components/PermitApprovalDialog.vue`
+- Atualizadas asserções em `e2e/fixtures/presale-cancel-helpers.js` e `e2e/fixtures/presale-extend-helpers.js`
+
+## 验证与归属
+- 验证证据: src=苏州市房地产监测V3/232.md
+- 涉及文件: d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permitCancel/components/ApprovalDialog.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permitExtend/components/ApprovalDialog.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permit/components/PermitApprovalDialog.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/fixtures/presale-cancel-helpers.js; d:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/fixtures/presale-extend-helpers.js
+- Sessão de origem: cf534ef4-25d6-4a32-b82b-358de4a68ed6; linha de base: none
+
+<!-- MEMORY_FIELDS
+{
+  "category": "技术模式",
+  "name": "approve_field_rename",
+  "source_extraction_id": "ed4340c4032043b1baf185a8b9851f9f",
+  "version": 2,
+  "memory_type": "entities"
+}
+-->
