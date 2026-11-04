@@ -1,7 +1,7 @@
 # Resolução de nome de categoria de instalação aninhado ou em array
 Correção de lista em branco quando o nome da categoria vem em subobjeto ou array.
 
-## Descrição
+## 描述
 - Interface retorna nome de categoria em subobjeto `facilityDefinition` ou array de strings.
 - Bind original `prop: 'facilityDefinitionName'` no topo causava campo em branco.
 - Em `scrappedRecord/index.vue` coluna ganha `formatter` que chama `resolveFacilityDefinitionName`.
@@ -12,7 +12,7 @@ Correção de lista em branco quando o nome da categoria vem em subobjeto ou arr
 - `recordProcess/components/index.vue`, `procedure/components/procedureProcessTable.vue`, `visitor/entry/index.vue`
 
 ## Verificação
-- Fonte: cursor session=f8b4bd31-2a17-4162-a6aa-7b14123bf0f6
+- 来源: cursor session=f8b4bd31-2a17-4162-a6aa-7b14123bf0f6
 
 <!-- MEMORY_FIELDS
 {

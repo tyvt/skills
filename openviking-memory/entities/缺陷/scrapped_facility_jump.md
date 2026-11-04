@@ -1,7 +1,7 @@
 # Salto para detalhe de instalação a partir da lista de registros de baixa
 Correção em `scrappedRecord/index.vue` para tornar o nome da instalação clicável e abrir o detalhe do equipamento.
 
-## Descrição
+## 描述
 - O arquivo `scrappedRecord/index.vue` importa `getRouterPathByFilePath`.
 - Coluna "设施设备名称" (nome da instalação) recebe `function: this.handleViewFacility`.
 - A função usa `row.facilityId` para navegar até `maintenance/facility/detail` com `formMode: 'view'`.
@@ -13,7 +13,7 @@ Correção em `scrappedRecord/index.vue` para tornar o nome da instalação clic
 - `d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/repair/index.vue`
 
 ## Verificação
-- Fonte: cursor session=71a2b0ad-3e39-4680-9567-9bb5c7e84b89
+- 来源: cursor session=71a2b0ad-3e39-4680-9567-9bb5c7e84b89
 - Linha de base de código: none
 
 <!-- MEMORY_FIELDS
