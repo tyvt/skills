@@ -12,15 +12,16 @@
 
 ## 验证与归属
 - 验证：index.scss 原用 .el-table__body-wrapper:hover 仅轨道附近显示，改为 .el-table:hover > .el-table__body-wrapper 与 .zs-table-container:hover
-- 涉及文件：src/styles/index.scss、src/components/zs-table/zs-table.vue、src/views/home/components/HomeTodoTable.vue
+- 验证证据：src=门户/033.md
+- 涉及文件：src/styles/index.scss、src/components/zs-table/zs-table.vue、src/views/home/components/HomeTodoTable.vue、package.json
 - 所属项目：门户；来源会话：908fa819-e4da-4511-b737-948d86388270；代码基线：b84b4e7
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "el_table_hscroll",
-  "source_extraction_id": "be485c2942c740ec95fed36871b1ab0f",
-  "version": 1,
+  "source_extraction_id": "b5902f830b8c4e0b9062f0b54455ece5",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

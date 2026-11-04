@@ -11,13 +11,14 @@
 ## 验证与归属
 - 验证：会话 4e63d96f 给出完整配置（nameLocation middle、grid.top 38、legend top 6、tooltip confine true）
 - 涉及文件：benefit/dataSandbox/fundPanorama/index.vue；所属项目：园区物管2.0；代码基线：f00310232
+- 复用：zhi2-web-admin 房产监测页 CumulativePanel.vue 的 buildUsageOption 与 unsoldOption 采用相同方案（双轴单位 nameLocation:'middle' + nameRotate:±90 + nameGap:34，legend 改 left:8/top:4 单行不换行，grid.top 34、bottom 30-36），解决单位与 legend 遮挡、X 轴 label 裁切；来源会话：2026-11-04
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "echarts_axis_mid",
-  "source_extraction_id": "080e089d30224d56846c26374eea4472",
-  "version": 1,
+  "source_extraction_id": "c0ad0a9d312d40b6a54ce9d51b9c054a",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

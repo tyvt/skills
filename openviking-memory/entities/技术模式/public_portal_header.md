@@ -14,6 +14,7 @@ publicPortal 的详情头组件 PortalDetailHeader 自身无 `<style>`，样式�
 ## 注意事项
 - MEDIUM 级技术债：组件与全局 SCSS 强耦合
 - 来源会话 a8453950、8088d086；代码基线 e1f8e0b；所属项目 门户
+- 验证证据：会话 a8453950 审查确认 DOM 与选择器一致、可访问性保持
 
 ## 涉及文件
 - zhi2-web-admin/src/views/home/publicPortal/components/PortalDetailHeader.vue
@@ -24,8 +25,8 @@ publicPortal 的详情头组件 PortalDetailHeader 自身无 `<style>`，样式�
 {
   "category": "技术模式",
   "name": "public_portal_header",
-  "source_extraction_id": "b517f13e5b474bc8acf59afc78f5febc",
-  "version": 1,
+  "source_extraction_id": "b8492c87cabc41c1b1a1dc8590e752b1",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

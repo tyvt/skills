@@ -10,15 +10,14 @@ Padrão de refatoração onde validações de negócio no front-end são removid
 - Validação de negócio passou a ser tratada uniformemente pelo backend.
 
 ## Relações
-- Arquivos afetados pertencem ao projeto zhi2-web-admin.
-
+- Arquivos afetados: `guaranteeDepositAgreement/detail.vue`, `guaranteeDepositAgreementEnd/detail.vue`, `guaranteeDepositAccount/detail.vue`, `guaranteeDepositAccount/index.vue`, `guaranteeDeposit/components/index.vue`, `guaranteeDeposit/components/AddDialog.vue` (projeto zhi2-web-admin).
 
 <!-- MEMORY_FIELDS
 {
   "category": "padrão de código",
   "name": "validacao_frontend_backend",
-  "source_extraction_id": "f43c7056662240278d1b1ff7669d9a4f",
-  "version": 1,
+  "source_extraction_id": "e24be3328bc94fe9a65179d03859c6a6",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

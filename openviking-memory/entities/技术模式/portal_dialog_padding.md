@@ -1,20 +1,17 @@
-# Regra unificada de padding do corpo de diálogos do portal
-O `portal.scss` do portal unifica o padding do corpo de `.portal-detail-dialog` e define exceções e regras de deduplicação.
+# 门户详情弹窗正文内边距统一规则与例外
+portal.scss 对 .portal-detail-dialog 正文区统一内边距规则，并规定例外与去重约束。
 
-## Regra unificada
-- Corpo de `.portal-detail-dialog` unifica padding vertical 24px, horizontal 40px (igual ao form-box)
-- Em tela estreita `max-width: 650px` o padding horizontal reduz para 16px
-- Diálogos de empresa de locação/crédito já mudaram de 32px para a regra global 40px
+## 统一规则与去重
+- .portal-detail-dialog 正文区统一：上下 padding 24px、左右 40px（与 form-box 一致）
+- 窄屏 max-width 650px 时左右 padding 降为 16px
+- 租赁企业/信用弹窗已由 32px 改为走全局 40px
+- PropertyDetailDialog / RentalDetailDialog 应去掉正文重复的 margin 与垂直 padding，避免与全局规则叠加形成两层 padding
 
-## Exceções
-- `portal-house-body` (detalhe de imóvel) mantém layout próprio
-- `rental-person-body` (foto à direita) mantém layout próprio
+## 例外布局
+- 房屋详情 portal-house-body 保持各自布局
+- 租赁人员 rental-person-body（右侧照片留白）保持各自布局
 
-## Restrições de deduplicação
-- PropertyDetailDialog / RentalDetailDialog devem remover margin e padding vertical duplicados no corpo
-- Evitar sobreposição com regra global criando duas camadas de padding
-
-## Arquivos envolvidos
+## 涉及文件
 - zhi2-web-admin/src/views/home/publicPortal/portal.scss
 - zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue
 - zhi2-web-admin/src/views/home/publicPortal/components/RentalDetailDialog.vue
@@ -24,17 +21,19 @@ O `portal.scss` do portal unifica o padding do corpo de `.portal-detail-dialog` 
 - zhi2-web-admin/package.json
 - zhi2-web-admin/tests/e2e/public-portal-visual.spec.ts
 
-## Verificação
-- Padding que estava espalhado pelos componentes foi convergido para portal.scss (PropertyDetailDialog, RentalDetailDialog, UnifiedLoginMenuMoreDialog)
-- Montagem conferida via PortalDialogHost e assertivas de layout E2E; ESLint sem erros para os arquivos Vue citados
-- Evidência: portal/038.md, portal/039.md; Sessões: a4628c5f-d778-4c31-8176-5b38c95b7139
+## 验证与归属
+- 会话 8088d086 按「首页所有弹窗」统一内边距；租赁企业/信用弹窗由 32px 改为走全局 40px
+- 会话 a4628c5f 将分散在各组件的 padding 收敛至 portal.scss（PropertyDetailDialog、RentalDetailDialog、UnifiedLoginMenuMoreDialog）
+- 验证证据：portal/038.md、portal/039.md；E2E 布局断言与 ESLint 通过
+- 所属项目：门户；来源会话ID：8088d086-ac9e-4292-b17b-9ffd0590a85f、a4628c5f-d778-4c31-8176-5b38c95b7139；代码基线：e1f8e0b
+
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "portal_dialog_padding",
-  "source_extraction_id": "dd37fc1ce95e4bc7ac6e21d7160d2ee6",
-  "version": 2,
+  "source_extraction_id": "6f81cd5ab899430da326b422449948bc",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

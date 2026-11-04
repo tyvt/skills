@@ -1,29 +1,31 @@
-# 公共收益编辑页行政区划为空报错
-无锡市区G（公共收益/专户管理）中管理主体、开户申请/监管账户、开户变更三个编辑页保存时后端报"行政区划不能为空"，根因为前端编辑未回填 regionName。
+
+# 公共收益专户页行政区划为空修复
+无锡市区G（公共收益/专户管理）下管理主体、开户申请、开户变更三个编辑页保存报"行政区划不能为空"，前端未补全 regionCode 与 regionName 所致。
 
 ## 根因
-- 后端 PubManagementOrgSaveDto、PubRegulatoryAccountChangeSaveDto、PubRegulatoryAccountSaveDto 对 regionName 均有 @NotBlank(message="行政区划不能为空")
-- 三个编辑页表单未渲染行政区划字段，getDetail 加载详情后从不回填 regionName
-- 当记录本身 region_name 为空（如"同步数据"导入记录）时，提交体 regionName 缺省导致后端校验拒绝
+- 后端 PubManagementOrgSaveDto、PubRegulatoryAccountChangeSaveDto、PubRegulatoryAccountSaveDto 对 regionCode、regionName 均有必填校验
+- 三页表单未渲染行政区划字段，加载详情后未补全；原始记录 regionCode 为空时提交体缺编码
+- 开户变更新增态（formMode=add 带入 accountId）走 getOldDetail() 而非 getDetail()，原未调用补齐函数
 
 ## 修复方案
-- 三个页面 getDetail 加载详情后统一调用 fillRegionName()
-- 已有 regionName 则保留；否则用记录 regionCode 经 getFullRegionNameByRegionCode(allAreas, code) 拼全名（同步，覆盖绝大多数记录）
-- 仍为空且存在 projectId 时拉 /property/complex/{projectId} 用其 region 补齐
-- allAreas 来自 store state.common.allAreas，由 /system/region/list 初始化填充
+- 三页 getDetail（编辑态）与 getOldDetail（新增态）均调用 fillProjectInfo()
+- isMissing() 增加 !this.form.regionCode 判断，缺编码也触发查小区详情
+- 用 projectId 查 /property/complex/{projectId} 取返回 region 字段赋给 form.regionCode（缺才补）
+- regionName 用全局 allAreas 经 getFullRegionNameByRegionCode 反查补齐
+- 管理主体、开户申请两页表单 data 补声明 regionCode 字段（开户变更原本已有）
 
-## 涉及文件与归属
-- pubManagementOrg/detail.vue（管理主体）、pubRegulatoryAccount/detail.vue（监管账户/开户申请）、pubRegAccountChange/detail.vue（开户变更）
-- 修复分支 bugfix/region-name-edit，合入 develop/v2.6.1 提交 e4e4d0bd0
-- 构建产物位于 D:epository\无锡市区G\dist，nginx 自测站点端口 8105，代理无锡网关 unlimited.g.h5.admin.web.v2.benefit.shiqu.wuxi.test.zhi.com
-- 所属项目：无锡市区G（公共收益）；来源会话：2026-11-04
+## 涉及文件与提交
+- pubManagementOrg/detail.vue（管理主体）、pubRegulatoryAccount/detail.vue（开户申请/监管账户）、pubRegAccountChange/detail.vue（开户变更）
+- 提交：e4e4d0bd0（初版 regionName 补齐）、f950bb0c7（开户变更新增态补 fillProjectInfo）、7f214174b（补 regionCode 赋值+isMissing 含 regionCode，含回滚误改 complexChange）
+- 构建产物 D:\repository\无锡市区G\dist，nginx 自测端口 8105；所属项目无锡市区G（公共收益）
+
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "benefit_regionname_edit",
-  "source_extraction_id": "24db1d3e1c48437f9b2c4b7a38eb93ad",
-  "version": 1,
+  "source_extraction_id": "d436605849024a1fac58829ad825af9d",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

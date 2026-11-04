@@ -13,6 +13,7 @@ publicPortal 模块用 mock/properties.js 驱动可售列表与 PropertyDetailDi
 
 ## 验证与归属
 - 验证证据：会话 b0e6ea97 数据一致性审查：HIGH 可售列表坐落与项目名不一致、列表进详情缺楼层；MEDIUM 幢号 mock 未关联、PropertyPages 硬编码 '14' 兜底
+- 楼盘表路径内部面积/总价计算自洽（会话 b0e6ea97 审查）
 - 涉及文件：mock/properties.js、PropertyDetailDialog.vue、PropertyPages.vue、mock/notices.js（均在 zhi2-web-admin/src/views/home/publicPortal 下）
 - 来源会话ID：b0e6ea97-1dd9-4c28-84b9-b7c31ee86ee8；代码基线：dfee5a6
 
@@ -20,8 +21,8 @@ publicPortal 模块用 mock/properties.js 驱动可售列表与 PropertyDetailDi
 {
   "category": "技术模式",
   "name": "portal_properties_mock",
-  "source_extraction_id": "868ead1e9ba04a2fa723ab626edb2ae2",
-  "version": 1,
+  "source_extraction_id": "d6fc5a08c1a44421b65f7e1e6fe22d0d",
+  "version": 2,
   "memory_type": "entities"
 }
 -->
