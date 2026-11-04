@@ -12,7 +12,7 @@ No projeto Suzhou Housing G, o template referenciava computed `tableWidth` não 
 - src/utils/monthlyReport.js
 
 ## Verificação
-- Evidência: 苏住房G/089.md (documento interno).
+- 验证证据: 苏住房G/089.md (documento interno).
 - Sessão de origem: e2b799d6-2c74-4d75-98c4-123b9c9d51db.
 - Linha de base de código: none.
 

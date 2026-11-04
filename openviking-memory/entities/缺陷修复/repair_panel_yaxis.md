@@ -13,7 +13,7 @@ No projeto Suzhou Housing G, o gráfico de tendência de reparos tinha marcaçã
 - package.json, tests/e2e/home-v2.spec.mjs, tests/e2e/home-v2-mocks.js
 
 ## Verificação
-- Evidência: 苏住房G/088.md (documento interno).
+- 验证证据: 苏住房G/088.md (documento interno).
 - Sessão de origem: 0f8fb539-1a29-4d91-bc69-d033c6762e16.
 - Linha de base de código: none.
 

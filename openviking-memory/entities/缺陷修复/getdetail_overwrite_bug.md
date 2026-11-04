@@ -1,7 +1,7 @@
 # getDetail sobrescreve form e perde tipo de conta
 Bug no Suzhou Monitoramento Imobiliário V3 onde getDetail() em modo view sobrescrevia o formulário e perdia o tipo de conta de abertura.
 
-## Causa raiz
+## 问题根因
 - `getDetail()` em modo view cobria todo o `form`; quando a interface não retornava `opensalesType`, o tipo de conta era perdido.
 - `syncOpensalesTypeFromRoute()` originalmente só funcionava no modo add.
 
@@ -10,9 +10,9 @@ Bug no Suzhou Monitoramento Imobiliário V3 onde getDetail() em modo view sobres
 - Estender a função sync para escrever quando o form não tem valor, completando após getDetail.
 - Template usa o computed para controlar campos e Tab.
 
-## Verificação e origem
-- Evidência: src=苏州市房地产监测V3/106.md
-- Projeto: Suzhou Monitoramento Imobiliário V3; sessão: 5c1b8a24-76c6-4187-b758-d05c9e6ba67e; baseline: none
+## 验证与归属
+- 验证证据: src=苏州市房地产监测V3/106.md
+- 所属项目: Suzhou Monitoramento Imobiliário V3; sessão: 5c1b8a24-76c6-4187-b758-d05c9e6ba67e; baseline: none
 
 <!-- MEMORY_FIELDS
 {

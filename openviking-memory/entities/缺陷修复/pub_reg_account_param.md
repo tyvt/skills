@@ -14,7 +14,7 @@ No projeto Suzhou Housing G, o parâmetro isPubRegulatoryAccount é enviado apen
 - src/views/benefit/pubRegulatoryAccount/index.vue
 
 ## Verificação
-- Evidência: 苏住房G/088.md (documento interno).
+- 验证证据: 苏住房G/088.md (documento interno).
 - Sessão de origem: d88a1f97-8d9a-4d6d-a7cd-02ddf13b5a0d.
 - Linha de base de código: none.
 
