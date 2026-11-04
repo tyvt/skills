@@ -8,6 +8,7 @@
 - 修改点收在`filePreview`一处，所有调用方（FileList/Type2/contracts附件、收入信息等）自动生效
 ## 验证与归属
 - 验证：会话114830fb，contracts.vue附件点击报invalid url；修复为改用resolveMediaUrl
+- 验证证据：src=苏住房C/065.md
 - 涉及文件：src/utils/index.js、contracts.vue、FileList.vue、Type2.vue、api/common.js
 - 所属项目：苏住房C；来源会话ID：114830fb-d6f5-4964-849d-72fac1151285；代码基线：b7bf813
 
@@ -15,8 +16,8 @@
 {
   "category": "苏住房C技术",
   "name": "downloadfile_invalid_url",
-  "source_extraction_id": "b9d8b7ebce554cb182f77784992bd5df",
-  "version": 1,
+  "source_extraction_id": "b1017c16efbe49578723df1f2aed4396",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

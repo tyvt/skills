@@ -12,15 +12,15 @@
 
 ## 验证与归属
 - 验证：会话 4cc1a55a，基线 4630e8e；houseLoanGuide/index.vue 去 link/to，goToDetail 内先 eventDataAdd 再 goto
-- 涉及文件：src/pages_transaction/houseLoanGuide/index.vue、src/pages_transaction/buyHousePolicy/index.vue、src/api/appAnalytics.js、src/pages_transaction/taxGuide/index.vue、src/pages_transaction/transactionFlowGuide/index.vue、src/pages_owner/ownerCard/index.vue
+- 涉及文件：src/pages_transaction/houseLoanGuide/index.vue、src/pages_transaction/buyHousePolicy/index.vue、src/api/appAnalytics.js、src/pages_transaction/taxGuide/index.vue、src/pages_transaction/transactionFlowGuide/index.vue、src/pages_owner/ownerCard/index.vue、src/api/index.js、src/api/httpInstance.js、src/pages_owner/family/index.vue
 - 所属项目：苏住房C；来源会话ID：4cc1a55a-ca40-4bc8-a6d2-4081c8a09783；代码基线：4630e8e
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "list_jump_analytics",
-  "source_extraction_id": "f684d63a5e0143f29d14a1b71d05f06a",
-  "version": 1,
+  "source_extraction_id": "e6e8e38071404e3ba2e177022db337ec",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

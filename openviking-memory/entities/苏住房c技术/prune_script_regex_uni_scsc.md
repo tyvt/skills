@@ -12,17 +12,16 @@ zhi2-mobile-shimin 构建后 prune-component-wxss-leak.mjs 的 LEAK_END 正则�
 - 日常可单独跑 npm run size:main 快速验体积（validate-dist 末尾自动跑）。
 
 ## 验证与归属
-- 验证：会话 ec247072（基线 6aca310）构建报 OVER LIMIT；更新正则兼容 .container/.success-page 与 min-height:inherit 后 components 431.6KB→164.6KB、MAIN 磁盘 1804.1KB→1537.1KB、上传预估→1798.4KB ok。
-- 涉及文件：scripts/prune-component-wxss-leak.mjs、src/uni.scss、scripts/size-main-package.mjs、src/pages.json
-- 所属项目：苏住房C；来源会话ID：ec247072-d32c-44f5-838a-cfbdfe935169；代码基线：6aca310。
-
+- 验证：会话 ec247072（基线 none）构建报 OVER LIMIT；更新正则兼容 .container/.success-page 与 min-height:inherit 后 components 431.6KB→164.6KB、MAIN 磁盘 1804.1KB→1537.1KB、上传预估→1798.4KB ok。
+- 涉及文件：scripts/prune-component-wxss-leak.mjs、src/uni.scss、scripts/size-main-package.mjs、src/pages.json、scripts/validate-dist.mjs、package.json、src/components/shared/SuccessCard.vue、dist/components/shared/SuccessCard.wxss
+- 所属项目：苏住房C；来源会话ID：ec247072-d32c-44f5-838a-cfbdfe935169；代码基线：none。
 
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房C技术",
   "name": "prune_script_regex_uni_scsc",
-  "source_extraction_id": "c0fd305100de4799a4169c34e9bea617",
-  "version": 1,
+  "source_extraction_id": "bf93ed7583b04cdc899775f3a7eb2b15",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

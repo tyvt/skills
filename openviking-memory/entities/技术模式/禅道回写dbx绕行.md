@@ -16,13 +16,14 @@
 - 验证会话：bc59e190-d142-47a0-97da-97a0e446689a（基线 d0305fdb6）
 - 结论：状态 wait→done、finishedBy=tiany、消耗8h、动态 id 82385/82386
 - bug#6084（2026-11-03）复用同法：DBX 事务化 UPDATE zt_bug 置 status=resolved/resolution=fixed/resolvedBy=tiany/resolvedBuild=trunk/assignedTo=lichandan，并 INSERT zt_action 一条 resolved 动作（含根因+修复+验证说明）；事务内与提交后双校验确认持久化
+- bug#6094（2026-11-03）复用同法：DBX 事务化 UPDATE zt_bug 置 status=resolved/resolution=fixed/resolvedBy=tiany/resolvedDate=2026-11-03 15:07:59/resolvedBuild=trunk/assignedTo=lichandan，并 INSERT zt_action 一条 resolved 动作（id 86125，含根因+修复+验证说明）；事务内与提交后双校验确认持久化
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "禅道回写DBX绕行",
-  "source_extraction_id": "c54e170c74df471d813661c83605c151",
-  "version": 2,
+  "source_extraction_id": "16eb6d67fa8848c4bca5d6843683279b",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

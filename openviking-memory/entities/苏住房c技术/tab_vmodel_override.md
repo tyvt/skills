@@ -13,16 +13,17 @@
 - 修完按tab核对请求：推荐listRecommend、新房pageByKeyWord、二手房houseInfoDisplayList
 
 ## 验证与归属
-- 验证：会话6e707628用户报苏找房切换tag没调接口；定位Project_Suzhufang.vue第67行原含v-model；修复为去v-model、$nextTick后reload、删手动清空
-- 涉及文件：src/pages/index/components/Project_Suzhufang.vue、menu/ProjectTabBar.vue、src/pages/index/project.vue、src/components/ZsPaging/ZsPaging.vue
+- Verification: session 6e707628 user reported SuZhaoFang tab switch no interface call; located Project_Suzhufang.vue line 67 had v-model; fixed by removing v-model, reload after $nextTick, remove manual clear
+- Verification evidence: src=苏住房C/063.md
+- Involved files: src/pages/index/components/Project_Suzhufang.vue, menu/ProjectTabBar.vue, src/pages/index/project.vue, src/components/ZsPaging/ZsPaging.vue, src/components/commonNew/tabLine.vue, src/hooks/usePaging.js, src/pages.json
 - 所属项目：苏住房C；来源会话ID：6e707628-a295-466a-98ef-4fff34cf5423；代码基线：9832ba3
 
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房C技术",
   "name": "tab_vmodel_override",
-  "source_extraction_id": "3ba05a2df0ba496eb9f6fc33290d5132",
-  "version": 1,
+  "source_extraction_id": "0424bc6fcd5a49b3a343fdf938f08ef6",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

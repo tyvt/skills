@@ -1,0 +1,22 @@
+# Summary
+O compilador vite:vue2 não permite :key em <template v-for>, conflitando com regra ESLint Vue 3. Foi usado um wrapper .flow-step-group com :key e display:contents, mantendo .flow-step e .flow-arrow como filhos flex diretos de .flow-steps. Arquivos: index-new.vue, package.json, portal-home-visual.spec.ts. Evidência: portal/021.md.
+# 2026-11-04 (Wednesday) ChatLog:
+**user**: 【记忆类型】fact
+【标题】Vue2 编译器禁 v-for 模板写 key 需包层
+【内容】`vite:vue2` 编译器不允许在 `<template v-for>` 上写 `:key`，与 Vue 3 ESLint 规则冲突。使用带 `:key` 的 `.flow-step-group` 包裹步骤并设置 `display: contents`，使 `.flow-step` 与 `.flow-arrow` 仍作为 `.flow-steps` 的直接 flex 子项排版。
+【验证证据】src=门户/021.md
+【涉及文件】d:/repository/门户/zhi2-web-admin/src/views/home/index-new.vue ; d:/repository/门户/zhi2-web-admin/package.json ; d:/repository/门户/zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts
+【来源会话ID】90beac8b-1085-4755-9837-9d8a62c90937
+【代码基线】none
+
+<!-- MEMORY_FIELDS
+{
+  "event_name": "encapsulamento para chave v for",
+  "goal": "Contornar limite compilador Vue2",
+  "summary": "O compilador vite:vue2 não permite :key em <template v-for>, conflitando com regra ESLint Vue 3. Foi usado um wrapper .flow-step-group com :key e display:contents, mantendo .flow-step e .flow-arrow como filhos flex diretos de .flow-steps. Arquivos: index-new.vue, package.json, portal-home-visual.spec.ts. Evidência: portal/021.md.",
+  "ranges": "6-9",
+  "source_extraction_id": "6d81a1d895e74cd1bc8d8f74ecec9578",
+  "version": 1,
+  "memory_type": "events"
+}
+-->

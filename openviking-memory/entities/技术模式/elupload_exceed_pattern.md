@@ -13,7 +13,7 @@
 
 ## 验证与归属
 - 验证：会话 3b0f6cd2 结论明确「设 :limit=1 后再次选择走 on-exceed，不进入 on-change」，给出 handleExceed{ clearFiles + handleStart } 代码
-- 涉及文件：zhi2-web-admin/src/components/FileUpload/index.vue、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue
+- 涉及文件：zhi2-web-admin/src/components/FileUpload/index.vue、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue、src/components/ImageUpload/index.vue、src/components/zs-import/zs-import.vue、src/components/AnnexUpload/index.vue、src/views/benefit/components/AnnexUploadDialog/index.vue、src/views/property/allotNotice/detail.vue
 - 所属项目：产品2.0
 - 来源会话ID：3b0f6cd2-34d8-446f-830d-2c1d4d5eda2f
 - 代码基线：94b86fa
@@ -22,8 +22,8 @@
 {
   "category": "技术模式",
   "name": "elupload_exceed_pattern",
-  "source_extraction_id": "e3897fa6cf07484a96b884627556c453",
-  "version": 1,
+  "source_extraction_id": "2618dad3089247029330eb677f274518",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

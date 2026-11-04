@@ -14,15 +14,16 @@
 
 ## 验证与归属
 - 验证：会话db56ec08用户反馈登录后点菜单仍提示认证，根因明确为getUserInfo未await listStatus且登录后未刷新。
-- 涉及文件：zhi2-mobile-shimin/src/store/user.js、pages_main/login/index.vue、utils/tabBar.js、App.vue、My_Suzhufang.vue。
+- 涉及文件：zhi2-mobile-shimin/src/store/user.js、pages_main/login/index.vue、utils/tabBar.js、App.vue、My_Suzhufang.vue、utils/index.js、api/property.js、pages/login/index.vue、pages_main/login/success.vue、pages_main/login/password.vue。
+- 验证证据：src=苏住房C/033.md
 - 所属项目：苏住房C；代码基线：5f0f4dc；来源会话ID：db56ec08-2aeb-407a-bde0-498f081066b6。
 
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房C技术",
   "name": "login_auth_bug",
-  "source_extraction_id": "2a3c186a43ce41b1b1060f5995a31a14",
-  "version": 1,
+  "source_extraction_id": "683afd88640c49c496defff46d02b40e",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

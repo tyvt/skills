@@ -12,15 +12,16 @@
 
 ## 关键事实
 - 修复只改 element-ui.scss 一处，弹窗组件零改动
-- 涉及文件：zhi2-web-admin/src/styles/element-ui.scss、zhi2-web-admin/src/views/dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue
+- Verification: src=产品2.0/054.md
+- 涉及文件：zhi2-web-admin/src/styles/element-ui.scss、zhi2-web-admin/src/views/dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue、zhi2-web-admin/src/views/dataProperty/procedure/detail.vue、zhi2-web-admin/src/views/dataProperty/procedure/index.vue、zhi2-web-admin/src/components/zs-select-column/zs-select-column.vue、zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/OwnerAddDialog.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue、zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue
 - 所属项目：产品2.0；来源会话：6b9584dd-8399-40b2-8b79-9baf367ed910；代码基线：64fa9e2
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "tree_single_dialog",
-  "source_extraction_id": "065add8eab774fc2a55b7e59c38e0390",
-  "version": 1,
+  "source_extraction_id": "e7c605a5c99a41d8ac71682f2e3b63a6",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -10,7 +10,7 @@ ProjectStateLandLicPanel.vue 等三页面查看态与表单字段顺序未按图
 - 变更详情页附图、附件名称及变更原因保留末尾
 
 ## 验证与归属
-- 验证证据：src=苏州市房地产监测V3-leftover/100.md
+- 验证证据：src=苏州市房地产监测V3-leftover/100.md；另见 src=苏州市房地产监测V3/301.md
 - 涉及文件：certificate/stateLandLic/detail.vue、customerProject/components/certificate/ProjectStateLandLicPanel.vue、certificate/stateLandLic/changeDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：7128e0f4-00dc-4df9-8734-952fe4c706d3；代码基线：none
 
@@ -18,8 +18,8 @@ ProjectStateLandLicPanel.vue 等三页面查看态与表单字段顺序未按图
 {
   "category": "技术模式",
   "name": "land_lic_field_order",
-  "source_extraction_id": "2136db77eeb545a3bfb5c7faab73e6ab",
-  "version": 1,
+  "source_extraction_id": "0bb48399527b42a8b82c414ecfd73497",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -12,16 +12,17 @@
 - 同类排查：任何onShow/onActivated调用带默认值推导的加载函数都要检查是否覆盖已填内容，从选择类子页返回是最高发触发路径
 
 ## 验证与归属
-- 验证：会话f5c3361f用户报切换房屋A→B返回变回A；定位submit.vue的onShow→getHouseList按默认重置；修复为data.house有值时按选中项回填5个字段并return
-- 涉及文件：src/pages_owner_extra/repair/submit.vue、chooseFacility.vue、src/pages_owner/repair/submit.vue、chooseFacility.vue
+- Verification: session f5c3361f user reported house A->B reset to A on return; located submit.vue onShow->getHouseList default reset; fixed by returning 5 fields when data.house has value
+- Verification evidence: src=苏住房C/062.md
+- Involved files: src/pages_owner_extra/repair/submit.vue, chooseFacility.vue, src/pages_owner/repair/submit.vue, chooseFacility.vue, src/pages_owner/repair/add.vue, src/pages_owner_extra/repair/index.vue, src/pages.json
 - 所属项目：苏住房C；来源会话ID：f5c3361f-ac2a-43fa-8586-7a2d7934e203；代码基线：b7bf813
 
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房C技术",
   "name": "repair_onshow_reset",
-  "source_extraction_id": "3ba05a2df0ba496eb9f6fc33290d5132",
-  "version": 1,
+  "source_extraction_id": "0424bc6fcd5a49b3a343fdf938f08ef6",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

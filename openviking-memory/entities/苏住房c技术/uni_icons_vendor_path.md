@@ -13,7 +13,7 @@
 - 改完必须停 dev server 重新 npm run dev，微信开发者工具点编译/重新载入，热更新看不到效果
 
 ## 验证与归属
-- 验证：会话 829a9465 用户贴出 uni-icons module not defined 报错；已修复三处分包
+- 验证：会话 829a9465 用户贴出 uni-icons module not defined 报错；已修复三处分包；验证证据：src=苏住房C/058.md
 - 涉及文件：scripts/relocate-uni-icons.mjs、vite.config.ts、scripts/relocate-datetime-picker.mjs、scripts/relocate-z-paging.mjs
 - 所属项目：苏住房C；来源会话ID：829a9465-5450-4144-a178-49e21c221320；代码基线：b7bf813
 
@@ -21,8 +21,8 @@
 {
   "category": "苏住房C技术",
   "name": "uni_icons_vendor_path",
-  "source_extraction_id": "26d7a6fd99de463182bdf8dc2795cc18",
-  "version": 1,
+  "source_extraction_id": "6d2d014529be465fbbb01ab3f8d573a9",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

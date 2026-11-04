@@ -8,22 +8,24 @@
 
 ## 解决方案
 - 禁用判定改「仅当原始数据已有值才禁用」：编辑模式按 this.originForm.accountType 是否为空决定禁用，add 模式永不禁用
-- 下拉选项分档：add 或「编辑且原始值为空」用可选项字典 sys_account_type，有值时切只读展示全集字典 sys_account_type_all
+- 下拉选项分档：add 或「编辑且原始值为空」用可选项字典 sys_account_type（产品2.0 对应 accountTypeSelectOptions），有值时切只读展示全集字典 sys_account_type_all（产品2.0 对应 accountTypeAllOptions）
 - 抽 isAccountTypeEmpty 同时判 null/undefined/空串/纯空格，避免「一个空格」绕过
+- 登录名等始终不可改字段在编辑态直接禁用，不参看 originForm 判空
+- 禁用计算属性三分支：新增模式可编辑／编辑态 originForm.accountType 为空可编辑／有值禁用
 - 关键顺序：detailCallback 里把 originForm 赋值移到所有表单字段处理完成之后，否则禁用门控先读到空 originForm
 
 ## 与已知差异及验证
 - 比已知「accountType='4' 禁止编辑」更深一层：那条只讲取值，本条讲空值历史数据下的可编辑性门控
 - 验证：用户报历史数据账号类型空致无法编辑保存；改为按 originForm 判空、选项按空切换字典、originForm 赋值后移
 - 涉及文件：views/system/user/detail.vue、mixins/detailMixins.js
-- 所属项目：苏住房G；来源会话：08df6a66-6dbe-4a03-8d68-a6fa9506abe6；代码基线：44d6576
+- 所属项目：苏住房G、产品2.0；来源会话：08df6a66-6dbe-4a03-8d68-a6fa9506abe6、536f025f-ffaf-4424-bbcf-b53ebfb5d0d4；代码基线：44d6576、ee952eb
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "autogen_field_deadlock",
-  "source_extraction_id": "379120973bb24c27ab7081046431e71c",
-  "version": 1,
+  "source_extraction_id": "1dfa118ed8184c1497a5c2ba66117fa9",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

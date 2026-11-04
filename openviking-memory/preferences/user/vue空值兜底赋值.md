@@ -10,13 +10,14 @@
 - Evidência: cursor sessão=009b156c-7e38-4831-9716-5483987c41c5; arquivo: src/views/benefit/statisticsMap/operatingAssets.vue
 - Em `zhi2-web-admin/src/views/projectManagement/customerProject/detail.vue`, `projectId` passa a usar cadeia de fallback (`this.id`/`$route.params.tableId`/`$route.query.id`) para evitar saída silenciosa quando `/building/project/detail` retorna null.
 - Evidência: src=苏州市房地产监测V3-rest/025.md; sessão: 01a16159-63a8-7295-ba46-c2ad374e49ae
+- Em `zhi2-web-admin/src/views/property/spFeeBill/components/collectionDialog.vue`, `getBillReceivable` usa `??` que só retrocede em `null/undefined`; quando `unpaidAmount` é número `0` pega `0` em vez de `receivableAmount` (0.01). Corrigido: priorizar cálculo `应收金额-实收金额`, com `unpaidAmount` como fallback; `index.vue` sincroniza linha da tabela antes de abrir popup. Evidência: cursor sessão=a3cfd7af-98f1-41cd-a0ce-0592087251ad
 
 <!-- MEMORY_FIELDS
 {
   "user": "user",
   "topic": "Vue空值兜底赋值",
-  "source_extraction_id": "2541e120aaed44a78ac4d8041d820fd0",
-  "version": 5,
+  "source_extraction_id": "5ba2dade06d048a48e78322216a00bde",
+  "version": 6,
   "memory_type": "preferences"
 }
 -->

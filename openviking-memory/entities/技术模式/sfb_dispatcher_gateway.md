@@ -1,4 +1,3 @@
-
 # 苏服办网关统一转发模式
 苏住房C 按江苏省「苏服办」接入规范改造接口层，后端只上架 2 个统一转发接口，前端统一请求、后端内部转发到真实业务接口。
 ## 背景与目的
@@ -10,16 +9,15 @@
 - httpInstance.js 网关模式直连网关地址并解析响应；sign.js 跳过对 gateway.do 重复签名；.env.* 新增 VITE_APP_SFB_GATEWAY_URL 与两个 INTERFACE_ID；vite.config.ts 加 /sfb-gateway 代理绕 CORS
 - api/dispatcher.js 集中管理苏服办配置与 zs- 请求头组装，index.js/v1Instance.js 只保留 base、token、tag 等差异；请求日志打印请求头/地址/参数/响应体便于定位
 ## 验证与归属
-- 涉及文件：src/api/dispatcher.js、src/api/httpInstance.js、src/api/index.js、src/api/v1Instance.js、src/utils/sign.js、src/static/js/sign.js、src/utils/sfb.js、.env.*、vite.config.ts
+- 涉及文件：src/api/dispatcher.js、src/api/httpInstance.js、src/api/index.js、src/api/v1Instance.js、src/utils/sign.js、src/static/js/sign.js、src/utils/sfb.js、.env.*、vite.config.ts、宿迁苏服办/src/api/gateway.js、宿迁苏服办/src/request/index.js、宿迁苏服办/src/api/config.js
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 b5d791be 与 87362be2；代码基线 83c4136 与 8b5f883
-
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "sfb_dispatcher_gateway",
-  "source_extraction_id": "5e371535e51540189614394318a97e79",
-  "version": 2,
+  "source_extraction_id": "eda857c276dd4b41a6be633cb004b45e",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

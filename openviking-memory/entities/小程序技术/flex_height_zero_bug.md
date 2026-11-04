@@ -16,15 +16,15 @@
 
 ## 验证与归属
 - 验证：会话 59b4aa3c 用户先反馈平铺无法滚动，改 height:0 后贴图反馈切换布局不展示菜单图标，恢复 height:100% 并补 flex-direction/align-items 后修复。
-- 涉及文件：src/pages/index/community.vue、src/pages/index/components/Community_Suzhufang.vue
+- 涉及文件：src/pages/index/community.vue、src/pages/index/components/Community_Suzhufang.vue、src/pages_tab/components/Community_Suzhufang.vue、src/pages.json、src/pages/index/home.vue、src/pages_tab/components/Home_Suzhufang.vue、src/components/AppTabBar/AppTabBar.vue、src/pages/index/property.vue
 - 所属项目：苏住房C；来源会话ID：59b4aa3c-d6de-4704-af8a-49711c8611b5；代码基线：4630e8e
 
 <!-- MEMORY_FIELDS
 {
   "category": "小程序技术",
   "name": "flex_height_zero_bug",
-  "source_extraction_id": "fb3a64033c064976b834d788539c9914",
-  "version": 1,
+  "source_extraction_id": "395f446932c540848feb870a30c2925f",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

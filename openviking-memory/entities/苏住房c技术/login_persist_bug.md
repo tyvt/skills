@@ -12,15 +12,16 @@
 
 ## 验证与归属
 - 验证会话：81967bea，用户报关闭小程序重开退出登录
-- 涉及文件：zhi2-mobile-shimin/src/store/user.js、src/pages/login/index.vue、src/App.vue、src/api/index.js
+- 验证证据：苏住房C/044.md
+- 涉及文件：zhi2-mobile-shimin/src/store/user.js、src/store/vote.js、src/pages/login/index.vue、src/App.vue、src/store/owner.js、src/pages/redirect/index.vue、src/api/index.js、src/pages.json
 - 代码基线：5f0f4dc
 
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房C技术",
   "name": "login_persist_bug",
-  "source_extraction_id": "2b4445ef78724ef68f75a93c4eeae34d",
-  "version": 1,
+  "source_extraction_id": "cf25625703d14c518174696c3e7c1a4c",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -17,15 +17,15 @@
 
 ## 验证与归属
 - 验证证据：会话 a54442c4 结论含 onShow else 清零、messageBadge computed 兜底、loadUnread 前后校验 token；验收四条通过
-- 涉及文件：pages_tab/components/My_Suzhufang.vue、store/user.js、pages_tab/components/menu/MenuSection.vue、HaveBgItem.vue、pages_my/setting/cancellationReason.vue
+- 涉及文件：pages_tab/components/My_Suzhufang.vue、store/user.js、pages_tab/components/menu/MenuSection.vue、HaveBgItem.vue、pages_my/setting/cancellationReason.vue、pages_my/setting/userInfo.vue、pages/index/my.vue、pages_my/setting/index.vue
 - 所属项目：苏住房C；来源会话ID：a54442c4-8431-4207-b588-fa848d7bf178；代码基线：9cdf7b8
 
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房C技术",
   "name": "logout_unread_badge",
-  "source_extraction_id": "cb687cdf13e34fa6a1124eadb650c4e7",
-  "version": 1,
+  "source_extraction_id": "e6e8e38071404e3ba2e177022db337ec",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

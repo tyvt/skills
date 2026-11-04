@@ -17,14 +17,15 @@
 ## 验证与归属
 - 验证：会话34bbb144用户明确嵌入APP的H5会后退回H5 tab，agent新建appNavigation.js并在tabBar.js/utils/index.js/main.ts三处接线
 - 涉及文件：src/utils/appNavigation.js、src/utils/tabBar.js、src/utils/index.js、src/main.ts、src/pages/redirect/index.vue
+- 验证证据：src=苏住房C/042.md
 - 所属项目：苏住房C；来源会话ID：34bbb144-2648-4883-b2f5-4039faa3aa6e；代码基线：b7bf813
 
 <!-- MEMORY_FIELDS
 {
   "category": "小程序技术",
   "name": "h5_tab_backinfo",
-  "source_extraction_id": "1783407079064bbfa35c5b8e02609550",
-  "version": 1,
+  "source_extraction_id": "2c47098b9b9847d2b91828f0ccce3081",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -15,6 +15,11 @@
 - My_Suzhufang混合：文案与promptSfbLogin取HEAD，getMsgNum()无参与mySections写法取main
 - MenuSection取main的defineEmits(['switch-project'])
 
+## 关联缺陷（tabBar.js 缺 onTabPageShow）
+- 根因：依赖文件 src/utils/tabBar.js 未支持 onTabPageShow 生命周期，导致标签页显示异常
+- 修复：在解决 git 合并冲突（会话 6df0f95a）时为该文件补全 onTabPageShow 逻辑，保留 setTabBarIndex+menuStore.loadMenu()+token 校验
+- 受影响页面含五个 tab 页（home/my/community/project/property）及其组件 Home_Suzhufang.vue、My_Suzhufang.vue、MenuSection.vue
+
 ## 收尾与验证
 - 冲突解决后必须连带检查src/utils/tabBar.js（onTabPageShow保留setTabBarIndex+menuStore.loadMenu()+token校验），否则tab切换菜单与绑定小区不刷新
 - 以git status显示All conflicts fixed为准再commit，并核对App.vue、sfb.js等未列入清单文件
@@ -24,8 +29,8 @@
 {
   "category": "苏住房C技术",
   "name": "sfb_main_merge",
-  "source_extraction_id": "0e31f6bb15d24732a33d1e0cad0d9ed7",
-  "version": 1,
+  "source_extraction_id": "d6a463af3a394dfc9c190fb365e5731a",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

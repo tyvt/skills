@@ -21,14 +21,14 @@
 - 所属项目：苏住房C(zhi2-mobile-shimin)
 - 来源会话：8cccd282-23de-4677-8488-fd1b2de11ef6
 - 代码基线：d43894b
-- 涉及文件：src/utils/sfb.js、src/hooks/useFaceVerify.js、src/pages/common/face.vue及参考项目对应文件
+- 涉及文件：src/utils/sfb.js、src/hooks/useFaceVerify.js、src/pages/common/face.vue、zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js、zhi2-mobile-admin-h5-c-unlimited/src/pages/face/face.vue、zhi2-mobile-admin-h5-c-unlimited/src/pages/face/verify.vue、zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js、zhi2-mobile-admin-h5-c-unlimited/index.html及参考项目对应文件
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "sfb_arg0_bug",
-  "source_extraction_id": "3ab43fc3ff7e4751aab7746f0359aac7",
-  "version": 1,
+  "source_extraction_id": "0303e6fbd99640a4aad5dc2a1e3e3234",
+  "version": 2,
   "memory_type": "entities"
 }
 -->
