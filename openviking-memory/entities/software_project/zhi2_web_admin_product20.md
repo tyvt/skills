@@ -1,4 +1,4 @@
-# zhi2-web-admin
+﻿# zhi2-web-admin
 Vue.js web administration frontend for the "产品2.0" real-estate management system.
 
 ## Description
@@ -18,7 +18,7 @@ Vue.js web administration frontend for the "产品2.0" real-estate management sy
 <!-- MEMORY_FIELDS
 {
   "category": "software_project",
-  "name": "zhi2_web_admin",
+  "name": "zhi2_web_admin_product20",
   "source_extraction_id": "5a097ed472984afcbfab163f215a0e4a",
   "version": 1,
   "memory_type": "entities"

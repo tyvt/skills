@@ -5,21 +5,21 @@
 ## 来源
 
 - 源目录：`~/.openviking/data/viking/default/user/default/memories/`
-- 抓取时间：2026-11-03（全量导入进行到 81/84 项目时的中途快照，非最终态）
+- 抓取时间：**2026-11-04**（DSH 三项目 align-final + 质量清理后；见 commit `align-final` / `quality-cleanup`）
 - 格式：OpenViking 0.5.3 记忆文件，每个 `.md` 正文末尾带 `<!-- MEMORY_FIELDS {...} -->` 元数据块
 
 ## 内容规模
 
-| 分类 | 文件数 |
+| 分类 | 文件数（约） |
 | --- | --- |
-| entities | 1957 |
-| events | 53 |
-| preferences | 279 |
+| entities | 3490+ |
+| events | 100 |
+| preferences | 480+ |
 | identity.md | 1 |
 | soul.md | 1 |
-| **合计** | **2291** |
+| **合计（用户可见 `.md`，不含 `.*` 索引）** | **~3954** |
 
-总计约 2.7 MB。
+总计约 **4.8 MB**（以 [`snapshot-openviking-memory.mjs`](../scripts/snapshot-openviking-memory.mjs) 扫描为准）。
 
 ## 同步方式
 
