@@ -1,15 +1,15 @@
-# Diálogo com gap substitui margens sobrepostas
-Ajuste de espaçamento em diálogo onde margens esquerda/direita causavam folga excessiva.
+# 对话框使用 gap 替代重叠边距
+调整对话框中的间距，其中左右边距造成了过多空白。
 
 ## 描述
-- `.dialog-box` usava `margin-right:24px` à esquerda e `padding-left:20px` à direita, somando ~44px de vazio.
-- Alterado para `gap:16px` removendo espaçamentos laterais, podendo ajustar para `12px`.
+- `.dialog-box` 在左侧使用了 `margin-right:24px`，在右侧使用了 `padding-left:20px`，合计约 44px 的空白。
+- 改为 `gap:16px`，移除横向间距，可调整为 `12px`。
 
-## Arquivos afetados
-- `zs-dialog.vue`, `chooseHouseDialog.vue`, `HouseSelectDialog.vue`, `contractMainInfo/index.vue` entre outros.
+## 受影响的文件
+- `zs-dialog.vue`, `chooseHouseDialog.vue`, `HouseSelectDialog.vue`, `contractMainInfo/index.vue` 等。
 
-## Verificação
-- 来源: 苏州市房地产监测V3/073.md; sessão aa2afcf7-1398-4cdf-93b4-30183eff923a.
+## 验证
+- 来源: 苏州市房地产监测V3/073.md; 会话 aa2afcf7-1398-4cdf-93b4-30183eff923a.
 
 <!-- MEMORY_FIELDS
 {

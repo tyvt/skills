@@ -1,15 +1,15 @@
-# Opção StepChoose sem border-box causa overflow de largura
-No projeto Su Housing C, opções de StepChoose sem box-sizing border-box causavam overflow de largura e fundo de destaque colado à borda.
+# 缺少 border-box 的 StepChoose 选项导致宽度溢出
+在 Su Housing C 项目中，缺少 box-sizing border-box 的 StepChoose 选项导致宽度溢出以及高亮背景紧贴边框。
 
 ## 问题根因
-- optional/StepChoose.vue não definia box-sizing: border-box causando overflow de largura
-- overflow: hidden e alinhamento padrão impediam layout desejado
+- optional/StepChoose.vue 未定义 box-sizing: border-box 导致宽度溢出
+- overflow: hidden 和默认对齐方式阻碍了期望的布局
 
-## Correção
-- Definir box-sizing: border-box e padding: 24rpx 28rpx
-- Remover overflow: hidden e ajustar alinhamento à esquerda para layout da figura 2
+## 修正
+- 设置 box-sizing: border-box 和 padding: 24rpx 28rpx
+- 移除 overflow: hidden 并调整左对齐以符合图2的布局
 
-## Arquivos envolvidos
+## 涉及的文件
 - src/pages_vote/decision/form.vue
 - src/pages_vote/decision/optional/StepChoose.vue
 - src/pages_vote/decision/common/StepChoose.vue
@@ -18,9 +18,9 @@ No projeto Su Housing C, opções de StepChoose sem box-sizing border-box causav
 - src/pages_vote/decision/styles/card.scss
 - src/components/ZsCheckbox/ZsCheckbox.vue
 
-## Verificação
+## 验证
 - 验证证据: extracted source=cursor session=7596f0ef-5187-468b-8b37-d30dd7fc905d
-- 所属项目: Su Housing C (zhi2-mobile-shimin); base de código: none
+- 所属项目: Su Housing C (zhi2-mobile-shimin); 代码库: none
 
 <!-- MEMORY_FIELDS
 {

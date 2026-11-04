@@ -1,21 +1,21 @@
-# Correção de tags de fechamento Vue com prefixo zs
-No projeto 苏州市房地产监测V3, tags de fechamento `</el-input>` e `</el-button-group>` foram erroneamente escritas como `</zs-input>` e `</zs-button-group>` causando erro de compilação Vite.
+# 修复带有 zs 前缀的 Vue 闭合标签
+在 苏州市房地产监测V3 项目中，闭合标签 `</el-input>` 和 `</el-button-group>` 被错误地写成了 `</zs-input>` 和 `</zs-button-group>`，导致 Vite 编译错误。
 
 ## 描述
-- Erro de correspondência de tags em templates Vue de diretórios commercialHousingSales e contract
+- Vue 模板中 commercialHousingSales 和 contract 目录下的标签不匹配错误
 - 所属项目: 苏州市房地产监测V3
 
 ## 问题根因
-- Em `contractRevoke/detail.vue` linha 207 e `saleAgencyDialog.vue` linha 38, tags de fechamento usaram prefixo `zs-` em vez de `el-`
+- 在 `contractRevoke/detail.vue` 第 207 行和 `saleAgencyDialog.vue` 第 38 行，闭合标签使用了 `zs-` 前缀而不是 `el-`
 
 ## 解决方案
-- Corrigidas para tags corretas com prefixo `el-`
-- Após correção, varredura de templates dos diretórios `commercialHousingSales` e `contract` passou
+- 已修正为带有 `el-` 前缀的正确标签
+- 修正后，对 `commercialHousingSales` 和 `contract` 目录下的模板扫描通过
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-leftover/032.md
 - 涉及文件: d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/commercialHousingSales/presale/contractRevoke/detail.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/components/tables/MortgageEntitiesTable.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/components/tables/CommercialHousingTable.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/chapters/cash/chapter1.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/components/tables/PricingModeTable.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/dialogs/saleAgencyDialog.vue
-- Sessão de origem: c7884ca9-0f78-4e4e-9359-8fa478960362; linha de base: none
+- 源会话: c7884ca9-0f78-4e4e-9359-8fa478960362; 基线: none
 
 <!-- MEMORY_FIELDS
 {

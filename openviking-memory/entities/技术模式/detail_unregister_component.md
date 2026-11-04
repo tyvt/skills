@@ -1,18 +1,18 @@
-# Defeito de Componente Registrado mas Não Utilizado no Detail.vue
-No projeto Suzhou Real Estate Monitoring V3, companyAdmin/detail.vue registrou RegisterUploadItem em components sem importá-lo, e o template não o usava, causando erro de referência.
+# Detail.vue 中注册但未使用的组件缺陷
+在项目 Suzhou Real Estate Monitoring V3 中，companyAdmin/detail.vue 在 components 中注册了 RegisterUploadItem 但未导入它，且模板未使用它，导致引用错误。
 
 ## 问题根因
-- companyAdmin/detail.vue registrou RegisterUploadItem em components sem import
-- Template não usava o componente, registro redundante causava erro de referência
+- companyAdmin/detail.vue 在 components 中注册了 RegisterUploadItem 但未导入
+- 模板未使用该组件，冗余注册导致引用错误
 
-## Correção
-- Removeu-se o registro redundante de RegisterUploadItem
-- Upload necessário passou a ser tratado por AppendixPackageSection para restaurar rota
+## 修复
+- 移除了 RegisterUploadItem 的冗余注册
+- 必要的上传改为由 AppendixPackageSection 处理以恢复路由
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3-rest/023.md
 - 涉及文件: companyAdmin/detail.vue, agency/detail.vue, certLic/consLic/detail.vue, register-form.scss, zs-select-dialog.vue, DeveloperBasicInfoDetail.vue, index.scss, companyAdmin/index.vue
-- 所属项目: Suzhou Real Estate Monitoring V3; sessão: 0cdbc4de-abdb-4fc7-8b12-467375ea1019; base de código: none
+- 所属项目: Suzhou Real Estate Monitoring V3; session: 0cdbc4de-abdb-4fc7-8b12-467375ea1019; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

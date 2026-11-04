@@ -1,18 +1,18 @@
-# ZsImage com altura total causa ícone com altura zero sem pai definido
-No projeto 苏住房C (zhi2-mobile-shimin), `ZsImage` renderizava ícone com altura 0 quando o pai não tinha altura explícita.
+# ZsImage 使用全高导致父级无显式高度时图标高度为零
+在项目 苏住房C (zhi2-mobile-shimin) 中，`ZsImage` 在父级没有显式高度时渲染出高度为 0 的图标。
 
 ## 问题根因
-- `ZsImage` usa `width: 100%` e `height: 100%` por padrão
-- Em `.footer-btn-left` sem altura explícita, o ícone renderizava com altura 0
+- `ZsImage` 默认使用 `width: 100%` 和 `height: 100%`
+- 在 `.footer-btn-left` 没有显式高度时，图标渲染高度为 0
 
-## Correção
-- Em `conditionScreening.vue`, definir ícone fixo `16×16px` e `margin-bottom: 4px`
+## 修复
+- 在 `conditionScreening.vue` 中，定义固定图标 `16×16px` 和 `margin-bottom: 4px`
 
 ## 验证与归属
 - 所属项目: 苏住房C (zhi2-mobile-shimin)
-- Sessão de origem: dcb389f5-4d39-4923-958e-bf04219059c1
+- 来源会话: dcb389f5-4d39-4923-958e-bf04219059c1
 - 涉及文件: src/components/commonNew/conditionScreening.vue, src/components/ZsImage/ZsImage.vue, src/utils/index.js, src/pages_transaction/newHouse/index.vue, src/pages_transaction/stockHouse/components/moreForm.vue, src/utils/mainStaticPaths.js, src/components/commonNew/gridNav.vue
-- Linha de base de código: none
+- 代码基线: none
 
 <!-- MEMORY_FIELDS
 {

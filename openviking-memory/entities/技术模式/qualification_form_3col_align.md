@@ -1,15 +1,15 @@
-# Formulário de qualificação em grade de 3 colunas
-No Suzhou Real Estate Monitoring V3, o formulário de certificado de qualificação foi ajustado para grade de 3 colunas conforme o design.
+# 3列网格资格表单
+在 Suzhou Real Estate Monitoring V3 中，资格证书表单已根据设计调整为 3 列网格。
 
-## Alterações
-- `personnelCertificate/detail.vue` ajustado para 14 campos em grade de 3 colunas
-- Novo campo de sexo vinculado ao dicionário `sys_user_sex`
-- Alinhamento célula a célula com a página de lista `index.vue` conforme design
+## 变更
+- `personnelCertificate/detail.vue` 调整为 3 列网格中的 14 个字段
+- 新增性别字段，关联到字典 `sys_user_sex`
+- 根据设计，与列表页 `index.vue` 逐单元格对齐
 
-## Arquivos e Atribuição
+## 文件与归属
 - 验证证据: src=苏州市房地产监测V3/169.md
 - 涉及文件: institution/qualifications/index.vue, institution/qualifications/detail.vue, zljg/components/PersonnelCertificatePlaceholder.vue, company/personnelCertificate/index.vue, company/personnelCertificate/detail.vue, api/company/personnelCertificate.js, utils/registerQualification.js, institution/personnel/components/certificatesDialog.vue
-- Sessão: 3faee039-2b79-4d3e-be53-0d46273c923b; baseline: none
+- 会话: 3faee039-2b79-4d3e-be53-0d46273c923b; baseline: none
 
 <!-- MEMORY_FIELDS
 {

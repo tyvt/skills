@@ -1,18 +1,17 @@
-# Correção de Rótulo de Região com Formatter Provincial
-No Suzhou Real Estate Monitoring V3, o campo region em projectDelivery armazena código e a view de detalhe deve converter para nome.
+# 使用省级格式化器修正区域标签
+在 Suzhou Real Estate Monitoring V3 中，projectDelivery 中的 region 字段存储代码，详情视图应转换为名称。
 
 ## 问题根因
-- Em `supervision/projectDelivery`, `region` armazena código de divisão administrativa; a view de detalhe exibia o código diretamente sem converter para nome.
+- 在 `supervision/projectDelivery` 中，`region` 存储行政区划代码；详情视图直接显示代码而未转换为名称。
 
 ## 解决方案
-- `ProjectDeliveryInfoPanel.vue` adicionou propriedade computada `regionLabel` que chama `formatters.provinceFormatter` para conversão.
-- `regionLabel` usado uniformemente em detalhe e formulário de edição.
+- `ProjectDeliveryInfoPanel.vue` 添加了计算属性 `regionLabel`，该属性调用 `formatters.provinceFormatter` 进行转换。
+- `regionLabel` 统一用于详情和编辑表单中。
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3/092.md
 - 涉及文件: ProjectDeliveryInfoPanel.vue, projectDeliveryConstants.js, ProjectDeliveryDetail.vue, index.vue, detail-template.vue, listMixins.js, detailMixins.js, ruoyi.js
-- Sessão de origem: 189a9e5a-b1d3-44f4-a6ab-16d07c1529ef; baseline: none
-
+- 原始会话: 189a9e5a-b1d3-44f4-a6ab-16d07c1529ef; baseline: none
 
 <!-- MEMORY_FIELDS
 {

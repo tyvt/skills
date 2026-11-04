@@ -1,15 +1,15 @@
-# Pop-up de seleção de conta não reutilizava zs-select-dialog
-accountNameDialog.vue usava zs-dialog+zs-table customizados, divergente do padrão zs-select-dialog.
+# 账户选择弹窗未复用 zs-select-dialog
+accountNameDialog.vue 使用了自定义的 zs-dialog+zs-table，与 zs-select-dialog 标准不一致。
 
 ## 描述
-- accountNameDialog.vue implementava estilo antigo próprio com zs-dialog e zs-table.
-- Inconsistência de aparência e interação com zs-select-dialog.
+- accountNameDialog.vue 使用 zs-dialog 和 zs-table 实现了自有旧样式。
+- 与 zs-select-dialog 在外观和交互上不一致。
 
 ## 解决方案
-- Reutilizado internamente zs-select-dialog para unificar estilo.
-- Padronizadas altura de linha, ausência de borda, formulário de busca, paginação e seleção única/múltipla.
+- 内部复用了 zs-select-dialog 以统一样式。
+- 规范了行高、无边框、搜索表单、分页以及单选/多选。
 
-## Arquivos
+## 文件
 - zhi2-web-admin/src/views/maintenance/accountSplit/detail.vue
 - zhi2-web-admin/src/views/maintenance/accountSplit/components/accountNameDialog.vue
 - zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue
@@ -19,9 +19,9 @@ accountNameDialog.vue usava zs-dialog+zs-table customizados, divergente do padr�
 - zhi2-web-admin/src/views/maintenance/accountCancel/components/ChangeApplyDialog.vue
 - zhi2-web-admin/src/views/maintenance/depositNotice/components/AccountDetailDialog.vue
 
-## Relações
-- Sessão 来源: c7c58078-a865-450f-bba0-bff68effa3c3 (cursor)
-- 所属项目: produto 2.0
+## 关系
+- 会话来源: c7c58078-a865-450f-bba0-bff68effa3c3 (cursor)
+- 所属项目: 产品 2.0
 
 <!-- MEMORY_FIELDS
 {

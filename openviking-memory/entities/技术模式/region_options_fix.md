@@ -1,18 +1,18 @@
-# Conflito de computed regionOptions em componente e mixin
-O componente `AgencyEntryNetworkDetail.vue` mistura `area.js` via `detailMixins` que já possui o computed `regionOptions`, e a `data` do componente definia o mesmo nome, disparando aviso do Vue2.
+# 组件与 mixin 中 computed regionOptions 的冲突
+组件 `AgencyEntryNetworkDetail.vue` 通过 `detailMixins` 混入了 `area.js`，后者已拥有 computed `regionOptions`，且组件的 `data` 定义了同名属性，触发了 Vue2 警告。
 
 ## 问题根因
-- `detailMixins` inclui `area.js` com computed `regionOptions`
-- `AgencyEntryNetworkDetail.vue` definia `regionOptions` na `data`, causando conflito e aviso Vue2
+- `detailMixins` 引入了含 computed `regionOptions` 的 `area.js`
+- `AgencyEntryNetworkDetail.vue` 在 `data` 中定义了 `regionOptions`，导致冲突和 Vue2 警告
 
 ## 解决方案
-- Renomeado para `administrativeRegionOptions`, referenciando `AgencyBasicInfoDetail.vue`
-- Sincronizados `AgencyEntryNetworkDetail.vue` e `AgencyEntryNetworkAdminDetail.vue` em `data`, `initDict` e template `:region-options`
+- 重命名为 `administrativeRegionOptions`，参考了 `AgencyBasicInfoDetail.vue`
+- 在 `data`、`initDict` 和模板 `:region-options` 中同步了 `AgencyEntryNetworkDetail.vue` 和 `AgencyEntryNetworkAdminDetail.vue`
 
-## Verificação e arquivos
+## 验证与文件
 - 验证证据: src=苏州市房地产监测V3-leftover/113.md
 - 涉及文件: AgencyEntryNetworkDetail.vue, detailMixins.js (area.js), AgencyEntryNetworkAdminDetail.vue, AgencyBasicInfoDetail.vue
-- 所属项目: Suzhou Real Estate Monitoring V3; sessão: 5bc132a2-9d67-4e01-bb16-34e9f3a56c64; baseline: none
+- 所属项目: Suzhou Real Estate Monitoring V3; 会话: 5bc132a2-9d67-4e01-bb16-34e9f3a56c64; baseline: none
 
 <!-- MEMORY_FIELDS
 {

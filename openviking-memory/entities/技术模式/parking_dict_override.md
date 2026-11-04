@@ -1,14 +1,14 @@
-# Filtro de propriedade sobrescrevia dicionário e exibia número na coluna de tipo de vaga
-No projeto Park Public Benefit (zhi2-web-admin), a função onParkingSpaceTypeChange em parkingSpace/index.vue substituía parkingSpaceTypeOptions por um subconjunto de dicionário, fazendo o dictFormatter falhar e exibir o número 1.
+# 属性筛选器覆盖字典并在车位类型列显示数字
+在项目 Park Public Benefit (zhi2-web-admin) 中，parkingSpace/index.vue 中的函数 onParkingSpaceTypeChange 将 parkingSpaceTypeOptions 替换为字典的子集，导致 dictFormatter 失败并显示数字 1。
 
 ## 问题根因
-- onParkingSpaceTypeChange substituía parkingSpaceTypeOptions pelo subconjunto de filtro
-- dictFormatter não encontrava correspondência e exibia o número original 1 na coluna de tipo de vaga
+- onParkingSpaceTypeChange 将 parkingSpaceTypeOptions 替换为筛选器子集
+- dictFormatter 找不到匹配项，并在车位类型列显示原始数字 1
 
 ## 解决方案
-- Separadas as opções: parkingSpaceTypeFilterOptions para filtro e parkingSpaceTypeOptions completo (benefit_parking_type) para formatação
+- 分离选项：parkingSpaceTypeFilterOptions 用于筛选，完整的 parkingSpaceTypeOptions (benefit_parking_type) 用于格式化
 
-## Arquivos envolvidos
+## 涉及的文件
 - src/views/benefit/parkingSpace/index.vue
 - src/views/benefit/pubParkingSpace/components/parkingTable.vue
 - src/mixins/listMixins.js
@@ -18,8 +18,8 @@ No projeto Park Public Benefit (zhi2-web-admin), a função onParkingSpaceTypeCh
 - src/views/benefit/parkingManage/index.vue
 - src/views/benefit/pubParkingSpaceDetailChange/index.vue
 
-## Verificação e atribuição
-- 所属项目: Park Public Benefit; sessão: 8f234827-4934-41b5-9ea5-1d36dd635cc0; base: none
+## 验证与归属
+- 所属项目: Park Public Benefit; 会话: 8f234827-4934-41b5-9ea5-1d36dd635cc0; base: none
 
 <!-- MEMORY_FIELDS
 {

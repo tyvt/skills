@@ -1,17 +1,17 @@
-# Card de resumo de vagas de estacionamento
-O componente operatingAssets.vue tinha espaçamento inconsistente no card de vagas por falta de padding.
+# 停车位概要卡片
+operatingAssets.vue 组件在停车位卡片中因缺少 padding 导致间距不一致。
 
 ## Description
-- .parking-total-card em operatingAssets.vue não tinha padding:10px 0 14px
-- Outros Tabs usam operating-assets__stats com esse mesmo padding
-- Correção aplicada: adicionar padding:10px 0 14px ao .parking-total-card
+- operatingAssets.vue 中的 .parking-total-card 没有 padding:10px 0 14px
+- 其他 Tabs 使用 operating-assets__stats 并带有相同的 padding
+- 已应用修正：为 .parking-total-card 添加 padding:10px 0 14px
 
 ## Purpose
-- Manter consistência de espaçamento entre as abas da página de ativos operacionais
+- 保持运营资产页面各选项卡之间的间距一致性
 
 ## Relations
 - 涉及文件: benefit/statisticsMapDetail/index.vue, benefit/statisticsMap/operatingAssets.vue, components/Headline/index.vue, benefit/statisticsMap/overviewContent.vue, benefit/statisticsMap/assetLease.vue
-- Sessão cursor: 870b5b21-223f-480d-b1ef-f92c770baf5b
+- cursor 会话: 870b5b21-223f-480d-b1ef-f92c770baf5b
 
 <!-- MEMORY_FIELDS
 {

@@ -1,16 +1,16 @@
-# Resposta de array da API sem proteção causa erro em tabela
-No projeto 苏州市房地产监测V3, a interface `selectCompany` retornando `data` como array fazia `res.data.records` ser undefined, levando `getList` a atribuir valor não array a `tableData` e gerar erro de renderização.
+# API 返回未受保护的数组导致表格错误
+在项目 苏州市房地产监测V3 中，接口 `selectCompany` 返回 `data` 为数组，导致 `res.data.records` 为 undefined，使得 `getList` 将非数组值赋给 `tableData` 并引发渲染错误。
 
 ## 问题根因
-- `selectCompany` retorna `data` como array, tornando `res.data.records` undefined
-- `getList` atribuía `tableData` com valor não array causando erro de renderização
+- `selectCompany` 返回 `data` 作为数组，导致 `res.data.records` 为 undefined
+- `getList` 将非数组值赋给 `tableData`，导致渲染错误
 
 ## 解决方案
-- `zs-select-dialog-func.vue` adicionou `extractListData`/`extractTotal` para analisar caminho de ponto e fallback para `data`/`records`/`list`/`rows`
-- Sempre garante que `tableData` seja array
-- `resolvedTableTrCount` recebeu tratamento defensivo
+- `zs-select-dialog-func.vue` 添加了 `extractListData`/`extractTotal` 用于解析点路径并回退到 `data`/`records`/`list`/`rows`
+- 始终确保 `tableData` 为数组
+- `resolvedTableTrCount` 进行了防御性处理
 
-## Arquivos envolvidos
+## 涉及的文件
 - zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue
 - zhi2-web-admin/src/views/company/companyCancel/index.vue
 - zhi2-web-admin/src/components/README.md
@@ -18,8 +18,8 @@ No projeto 苏州市房地产监测V3, a interface `selectCompany` retornando `d
 - zhi2-web-admin/src/mixins/table.js
 - zhi2-web-admin/src/views/company/companyCancel/detail.vue
 
-## Verificação
-- Sessão: 4367cc38-7b0c-49de-b6aa-65bb248d7532
+## 验证
+- 会话: 4367cc38-7b0c-49de-b6aa-65bb248d7532
 - 所属项目: 苏州市房地产监测V3
 
 <!-- MEMORY_FIELDS

@@ -1,18 +1,18 @@
-# Uso incorreto do popup unificado na votação de fundo de manutenção
-A reconstrução da votação de fundo de manutenção usou o popup unificado de Kunshan, divergindo do ambiente do cliente.
+# 维修基金投票中错误使用了统一弹窗
+维修基金投票的重构使用了昆山统一弹窗，与客户环境不一致。
 
 ## 问题根因
-- A reconstrução usou decisionCommon/MaintainResultDialog.vue na versão unificada de Kunshan
-- Isso causou inconsistência com o ambiente do cliente
+- 重构使用了昆山统一版本中的 decisionCommon/MaintainResultDialog.vue
+- 这导致了与客户环境不一致
 
-## Correção
-- Adicionar verificação isMaintainFund (rota maintain)
-- Restaurar interface calculationChart, quatro campos de casas/área, tabela de candidatos sempre visível e botão "确认"
+## 修正
+- 添加 isMaintainFund 校验（maintain 路由）
+- 恢复 calculationChart 界面、房屋/面积四个字段、候选人表格始终可见以及"确认"按钮
 
 ## 验证与归属
 - 验证证据: extracted source=cursor session=f57cbb90-c8af-4874-9961-54eca50f5cb8
 - 涉及文件: maintainDecision/detail.vue, decisionCommon/components/MaintainResultDialog.vue, ownerDecision/components/MaintainResultDialog.vue, decisionCommon/components/MaintainResultTable.vue, ownerDecision/components/MaintainResultTable.vue, decisionCommon/config.js
-- 所属项目: 太仓G; sessão: f57cbb90-c8af-4874-9961-54eca50f5cb8; baseline: none
+- 所属项目: 太仓G; session: f57cbb90-c8af-4874-9961-54eca50f5cb8; baseline: none
 
 <!-- MEMORY_FIELDS
 {

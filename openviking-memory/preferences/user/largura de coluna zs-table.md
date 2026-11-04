@@ -1,7 +1,7 @@
-- Evitar flicker de largura de coluna em `zs-table`: não sobrepor lógica assíncrona de `scheduleDistributeRemainingWidth` (rAF + setTimeout 16ms) com `scheduleDomWidthMeasure` (rAF).
-- Adicionar `queueDistributeAfterColumnsUpdated` em `zs-table.vue` executado após mudança de `tableData` com `$nextTick`.
-- Mudar `scheduleDistributeRemainingWidth` para `rAF + $nextTick` removendo atraso 16ms.
-- 验证证据: src=苏州市房地产监测V3-leftover/021.md; sessão 533e9595-631f-446e-8081-9e0ce442a190.
+- 避免在 `zs-table` 中出现列宽度闪烁：不要将 `scheduleDistributeRemainingWidth` (rAF + setTimeout 16ms) 的异步逻辑与 `scheduleDomWidthMeasure` (rAF) 重叠。
+- 在 `zs-table.vue` 中添加 `queueDistributeAfterColumnsUpdated`，在 `tableData` 变化后通过 `$nextTick` 执行。
+- 将 `scheduleDistributeRemainingWidth` 改为 `rAF + $nextTick`，移除 16ms 延迟。
+- 验证证据: src=苏州市房地产监测V3-leftover/021.md; 会话 533e9595-631f-446e-8081-9e0ce442a190.
 
 <!-- MEMORY_FIELDS
 {

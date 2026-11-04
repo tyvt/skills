@@ -1,21 +1,22 @@
-# ListTemplate + listMixins em páginas de depósito
-Páginas de lista do módulo de supervisão de depósito foram refatoradas para usar ListTemplate + listMixins, padronizando a estrutura.
+# ListTemplate + listMixins 在存款页面中
 
-## Contexto
-- 4 páginas convertidas: other_record, notice, refund, additional e adjustmentofAccounts
-- 所属项目: zhi2-web-admin (produto 2.0)
+存款监管模块的列表页面已重构以使用 ListTemplate + listMixins，统一了结构。
 
-## Pontos-chave
-- Configurado moduleName: prefund e businessName: paymentNotice nas páginas
-- Preservado o roteamento por paymentType e o getList customizado
-- Mantido o botão de exportação
+## 背景
+- 已转换 4 个页面：other_record, notice, refund, additional 和 adjustmentofAccounts
+- 所属项目: zhi2-web-admin (产品 2.0)
 
-## Arquivos
-- Views: supervision/deposit/{other_record,notice,refund,additional,adjustmentofAccounts}/index.vue
-- APIs: api/finance/{notice,refund,additional}.js
+## 关键点
+- 在页面中配置了 moduleName: prefund 和 businessName: paymentNotice
+- 保留了基于 paymentType 的路由和自定义的 getList
+- 保留了导出按钮
 
-## Verificação
-- Sessão cursor: 5db9c51e-2b5e-440b-9222-d5a6f6452a33
+## 文件
+- 视图: supervision/deposit/{other_record,notice,refund,additional,adjustmentofAccounts}/index.vue
+- API: api/finance/{notice,refund,additional}.js
+
+## 验证
+- cursor 会话: 5db9c51e-2b5e-440b-9222-d5a6f6452a33
 
 <!-- MEMORY_FIELDS
 {

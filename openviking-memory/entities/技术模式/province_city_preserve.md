@@ -1,15 +1,15 @@
-# Alteração de instituição deve manter provinceCityArea original
-O `companyBasicInfoContent.js` funde valor de exibição de `administrativeArea` preservando `provinceCityArea` original no projeto 苏州市房地产监测V3.
+# 机构变更应保持原始 provinceCityArea
+`companyBasicInfoContent.js` 在苏州市房地产监测V3项目中合并 `administrativeArea` 的显示值并保留原始 `provinceCityArea`。
 
-## Problema
-- `normalizeCompanyBasicForm` em `companyBasicInfoContent.js` ao fundir `administrativeArea` não preservava `provinceCityArea` original
-- `getDetail` em `companyRecordAgency/change/detail.vue` não preenchia dados originais de registro quando faltava mudança
+## 问题
+- `companyBasicInfoContent.js` 中的 `normalizeCompanyBasicForm` 在合并 `administrativeArea` 时未保留原始 `provinceCityArea`
+- `companyRecordAgency/change/detail.vue` 中的 `getDetail` 在缺少变更时未填充原始登记数据
 
 ## 解决方案
-- `normalizeCompanyBasicForm` preserva `provinceCityArea` original ao fundir valor de exibição `administrativeArea`
-- `getDetail` em `companyRecordAgency/change/detail.vue` preenche dados do registro original quando mudança está ausente
+- `normalizeCompanyBasicForm` 在合并 `administrativeArea` 显示值时保留原始 `provinceCityArea`
+- `companyRecordAgency/change/detail.vue` 中的 `getDetail` 在变更缺失时填充原始登记数据
 
-## Arquivos
+## 文件
 - `zhi2-web-admin/src/views/company/companyRecordAgency/change/detail.vue`
 - `zhi2-web-admin/src/views/company/companyManagement/components/companyBasicInfoContent.js`
 - `zhi2-web-admin/src/views/company/companyManagement/components/CompanyBasicInfoForm.vue`
@@ -19,10 +19,10 @@ O `companyBasicInfoContent.js` funde valor de exibição de `administrativeArea`
 - `zhi2-web-admin/src/views/institutionRegister/components/Step1BasicInfo.vue`
 - `zhi2-web-admin/src/views/company/companyCancel/detail.vue`
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3-leftover/036.md
-- Sessão: b9e75113-bcab-4880-a9ad-aff2106e5082
-- 所属项目: 苏州市房地产监测V3; base de código: none
+- 会话: b9e75113-bcab-4880-a9ad-aff2106e5082
+- 所属项目: 苏州市房地产监测V3; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

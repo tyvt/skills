@@ -1,18 +1,9 @@
-# Fusão do ramo Yulin perdeu camada list-card em 4 páginas
-O ramo base `develop/v2.6.2` já tinha `syncObligee/index.vue` sem `list-card`; a fusão do ramo personalizado Yulin perdeu adicionalmente a camada `list-card` de 4 páginas.
+# Yulin 分支合并在 4 个页面中丢失了 list-card 层
+基础分支 `develop/v2.6.2` 已经存在不带 `list-card` 的 `syncObligee/index.vue`；Yulin 自定义分支的合并额外丢失了 4 个页面的 `list-card` 层。
 
 ## 问题根因
-- O ramo base `develop/v2.6.2` já tinha `syncObligee/index.vue` sem `list-card`
-- A fusão do ramo `develop/v2.6.2-yulin` com alterações de `getQueryParams` do lado B perdeu adicionalmente a camada `list-card` de 4 páginas (registro/alteração de área de propriedade, autorização de edifício e sincronização de titular)
-
-## 解决方案
-- Readicionar `list-card` nas páginas correspondentes para restaurar a borda da lista
-
-## 验证与归属
-- Tipo de memória: bug
-- 验证证据: src=产品2.0/033.md
-- 涉及文件: d:/repository/产品2.0/zhi2-web-admin/src/views/property/complex/index.vue, src/views/property/complex/components/RegionTreeLayout.vue, src/components/zs-table/zs-table.vue, src/styles/index.scss, src/mixins/listMixins.js, src/views/property/subdistrict/index.vue, src/views/property/wasteAccount/index.vue, src/views/property/complexBuildingAuth/index.vue
-- 所属项目: 产品2.0; sessão: 7ae7d4b9-281a-4316-bf51-824355179604; base de código: none
+- 基础分支 `develop/v2.6.2` 已经存在不带 `list-card` 的 `syncObligee/index.vue`
+- 分支 `develop/v
 
 <!-- MEMORY_FIELDS
 {

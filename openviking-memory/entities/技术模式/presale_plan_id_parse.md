@@ -1,18 +1,18 @@
-# Presale Plan ID Parse Bug
-A visualização do plano de pré-venda ficava sem valores porque o ID não era parseado do retorno `presalePlanId`.
+# 预售计划 ID 解析 Bug
+预售计划的视图因为没有从返回值 `presalePlanId` 中解析出 ID 而显示为空。
 
 ## 描述
-- Backend `PresalePlanSaveVo` retorna `presalePlanId` em vez de `planId`.
-- `plan/detail.vue` usava `resolveResponseId(res, 'planId')` e não lia o ID.
+- 后端 `PresalePlanSaveVo` 返回 `presalePlanId` 而不是 `planId`。
+- `plan/detail.vue` 使用了 `resolveResponseId(res, 'planId')` 并且没有读取到 ID。
 
 ## 解决方案
-- Modificado para `extractPlanId(res.data)` para resolver o ID do plano.
-- Helpers E2E ganharam `extractPlanIdFromSaveResponse`.
+- 修改为 `extractPlanId(res.data)` 以解析计划 ID。
+- E2E 辅助函数新增了 `extractPlanIdFromSaveResponse`。
 
-## Verificação e Atribuição
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-rest/069.md
 - 涉及文件: presale/permit/components/detail.vue, permitConstants.js, permit/plan/detail.vue, PermitPlanPanel.vue, e2e/fixtures/presale-permit-helpers.js, e2e/presale/presale-permit-real-api-flow.spec.js, presale/cashsale/plan/detail.vue, package.json
-- 所属项目: 苏州市房地产监测V3; Sessão: 77643a80-744f-419d-abfc-21a4685e8d9f; Base: none
+- 所属项目: 苏州市房地产监测V3; 会话: 77643a80-744f-419d-abfc-21a4685e8d9f; Base: none
 
 <!-- MEMORY_FIELDS
 {

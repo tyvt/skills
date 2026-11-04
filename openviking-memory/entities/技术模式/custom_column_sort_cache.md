@@ -1,17 +1,17 @@
-# Falha em ordenação custom de colunas por cache e config não persistida
-No projeto 淮安物管 (zhi2-web-admin), el-table não reordena ao trocar apenas ordem de v-for; displayColumns não restaurado de localStorage e dados antigos sem campo order causam NaN.
+# 由于缓存和未持久化配置导致的自定义列排序失败
+在淮安物管 (zhi2-web-admin) 项目中，el-table 在仅更换 v-for 顺序时不重新排序；displayColumns 未从 localStorage 恢复，且缺少 order 字段的旧数据导致 NaN。
 
-## Problema
-- Element UI el-table mantém cache de colunas ao só trocar ordem em v-for, não re-renderiza
-- displayColumns após refresh não recupera de localStorage; dados antigos sem order geram NaN na ordenação
+## 问题
+- Element UI el-table 在仅通过 v-for 更换顺序时保留列缓存，不重新渲染
+- 刷新后 displayColumns 未从 localStorage 恢复；缺少 order 的旧数据在排序时产生 NaN
 
 ## 解决方案
-- Em mixins/table.js adicionar tableColumnsKey e restaurar de localStorage quando Vuex vazio
-- Ordenar com (a.order ?? 0) - (b.order ?? 0)
-- Em mixins/ListTemplate.js bind :key para reconstruir tabela
+- 在 mixins/table.js 中添加 tableColumnsKey，并在 Vuex 为空时从 localStorage 恢复
+- 使用 (a.order ?? 0) - (b.order ?? 0) 进行排序
+- 在 mixins/ListTemplate.js 中绑定 :key 以重建表格
 
-## Verificação
-- Sessão cursor 23259f03-6ebe-4aaa-8a85-fd3a770bfa1b
+## 验证
+- cursor 会话 23259f03-6ebe-4aaa-8a85-fd3a770bfa1b
 - 涉及文件: src/views/autonomy/regulation/components/index.vue, src/components/global-table-config/global-table-config.vue, src/mixins/table.js, src/mixins/listMixins.js, src/mixins/ListTemplate.js, src/store/modules/table.js, src/components/zs-table-column/zs-table-column.vue, src/components/zs-table/zs-table.vue
 
 <!-- MEMORY_FIELDS

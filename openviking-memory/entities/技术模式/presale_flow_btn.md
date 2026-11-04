@@ -1,12 +1,12 @@
 # Presale Flow Btn
-Ajuste do botão de visualização de fluxo e unificação de exibição de registro de aprovação em páginas de detalhe de pré-venda no projeto 苏州市房地产监测V3.
+在苏州市房地产监测V3项目中，调整流程查看按钮并统一预售详情页面中的审批记录展示。
 
-## Pontos de Implementação
-- Em `zhi2-web-admin/src/components/OperationBtnGroup/index.vue`, mover "流程查看" após "返回" e adicionar `data-testid="flow-view-btn"`.
-- Cinco páginas de detalhe (`presale/permit/components/detail.vue`, `presale/cashsale/components/CashsaleDetail.vue`, `permitExtend/detail.vue`, `permitCancel/detail.vue`, `surveyChange/detail.vue`) removam bloco inferior "审批记录" e usem `:show-audit="showFlowViewButton"` (estado de visualização + salvo + `bizState!=='0'`).
-- Aplicação de permissão de pré-venda remove adicionalmente conforme indicado.
+## 实现要点
+- 在 `zhi2-web-admin/src/components/OperationBtnGroup/index.vue` 中，将 "流程查看" 移动到 "返回" 之后，并添加 `data-testid="flow-view-btn"`。
+- 五个详情页面（`presale/permit/components/detail.vue`, `presale/cashsale/components/CashsaleDetail.vue`, `permitExtend/detail.vue`, `permitCancel/detail.vue`, `surveyChange/detail.vue`）移除底部的 "审批记录" 块，并使用 `:show-audit="showFlowViewButton"`（查看状态 + 已保存 + `bizState!=='0'`）。
+- 预售许可申请另根据指示移除。
 
-## Arquivos Envolvidos
+## 涉及文件
 - d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permit/components/detail.vue
 - d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/OperationContainer/index.vue
 - d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/stock/contract/detail.vue
@@ -18,7 +18,7 @@ Ajuste do botão de visualização de fluxo e unificação de exibição de regi
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-rest/025.md
-- Sessão: 3042833a-7ef3-4a0c-a806-d3d5885f5ff1
+- 会话: 3042833a-7ef3-4a0c-a806-d3d5885f5ff1
 - 所属项目: 苏州市房地产监测V3; baseline: none
 
 <!-- MEMORY_FIELDS

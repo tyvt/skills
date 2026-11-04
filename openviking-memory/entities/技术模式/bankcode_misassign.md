@@ -1,20 +1,21 @@
-# Código de banco regulatório atribuído errado via branchCode
-No projeto 淮安物管, o código do banco regulatório era atribuído com `bankBranchCode` em vez de `bankCode`, divergindo do esperado pelo backend.
+# 通过 branchCode 错误分配的监管银行代码
+
+在 淮安物管 项目中，监管银行代码被错误地使用 `bankBranchCode` 而非 `bankCode` 进行赋值，与后端的预期不符。
 
 ## 问题根因
-- `pubRegulatoryAccount/detail.vue` e `propertyAccount/detail.vue` tinham callback `showBankDialog` que atribuía `regulatoryBankCode` com `row.bankBranchCode`.
+- `pubRegulatoryAccount/detail.vue` 和 `propertyAccount/detail.vue` 中的回调 `showBankDialog` 使用 `row.bankBranchCode` 为 `regulatoryBankCode` 赋值。
 
-## Correção
-- O callback passou a usar `row.bankCode` para casar com o armazenamento de código bancário do backend.
+## 修正
+- 回调改为使用 `row.bankCode` 以匹配后端的银行代码存储。
 
-## Arquivos envolvidos
+## 涉及的文件
 - `benefit/pubRegulatoryAccount/detail.vue`, `benefit/pubWorkBank/detail.vue`
 - `benefit/pubRegAccountChange/detail.vue`, `benefit/pubRegAccPropMgmt/detail.vue`
 - `maintenance/bank/detail.vue`, `property/propertyAccount/detail.vue`
 - `components/zs-select-dialog/zs-select-dialog-func.vue`, `benefit/pubRegulatoryAgreement/detail.vue`
 
-## Verificação
-- Sessão cursor: e057ae2f-2107-42b9-9657-ffd0a073d835
+## 验证
+- cursor 会话: e057ae2f-2107-42b9-9657-ffd0a073d835
 - 所属项目: 淮安物管 zhi2-web-admin; baseline: none
 
 <!-- MEMORY_FIELDS

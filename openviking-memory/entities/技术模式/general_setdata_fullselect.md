@@ -1,12 +1,12 @@
-# Perda de seleção total de edifícios por defeito no setData
-O componente `general` DecisionRangeTable.setData submete apenas o edifício atual após seleção, causando perda da seleção total; é necessário corrigir prioritariamente.
+# setData 中因缺陷导致建筑物全选丢失
+`general` 组件中的 DecisionRangeTable.setData 在选中后仅提交当前建筑物，导致全选丢失；需要优先修复。
 
 ## 问题根因
-- `DecisionRangeTable.setData` (em `general`) submete apenas o edifício atual após clique, ignorando seleção total.
-- Lado de submissão deve filtrar `initHouseChecked` com `exist==1` para evitar duplicação de inserção.
-- Tipo de `checked` na lista de preparação deve ser unificado.
+- `DecisionRangeTable.setData`（位于 `general` 中）在点击后仅提交当前建筑物，忽略了全选。
+- 提交端应使用 `exist==1` 过滤 `initHouseChecked` 以避免重复插入。
+- 准备列表中的 `checked` 类型应统一。
 
-## Ficheiros envolvidos
+## 涉及的文件
 - `src/views/autonomy/mixins/decisionRangeBuildingSelectMixins.js`
 - `src/components/zs-select-dialog/zs-select-dialog.vue`
 - `src/views/autonomy/election/components/apply/RangeTable.vue`
@@ -19,8 +19,8 @@ O componente `general` DecisionRangeTable.setData submete apenas o edifício atu
 ## 验证与归属
 - 所属项目: 惠山二期G
 - 验证证据: `src=惠山二期G/009.md`
-- Sessão de origem: `da4d5f02-fc36-4e8c-8717-0c4503f50d5e`
-- Linha de base de código: none
+- 来源会话: `da4d5f02-fc36-4e8c-8717-0c4503f50d5e`
+- 代码基线: none
 
 <!-- MEMORY_FIELDS
 {

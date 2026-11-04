@@ -1,17 +1,17 @@
-# Pop-up de seleção de cancelamento de instituição deve usar SelectDialog
-Na lista de cancelamento de empresa, o uso de `SelectCompanyDialog` causava pop-up em branco; substituiu-se por `SelectDialog.open`.
+# 机构注销选择弹窗应使用 SelectDialog
+在企业注销列表中，使用 `SelectCompanyDialog` 会导致空白弹窗；已替换为 `SelectDialog.open`。
 
-## Problema
-- A página lista «新增» usava `SelectCompanyDialog` resultando em pop-up vazio
-- O componente `SelectCompanyDialog` original foi removido
+## 问题
+- 列表页的“新增”使用了 `SelectCompanyDialog` 导致空白弹窗
+- 原有的 `SelectCompanyDialog` 组件已被移除
 
 ## 解决方案
-- Passou a chamar o `SelectDialog.open` genérico, abrindo pop-up de seleção com altura adaptável ao número de linhas de dados
+- 改为调用通用的 `SelectDialog.open`，打开高度随数据行数自适应的选择弹窗
 
-## Arquivos e Verificação
+## 文件与验证
 - 涉及文件: `company/companyCancel/index.vue`, `company/companyCancel/components/SelectCompanyDialog.vue`, `components/README.md`, `institution/record/components/RecordCertificateDialog.vue`, `package.json`, `vite.config.js`, `index.html`
 - 验证证据: src=苏州市房地产监测V3/082.md
-- Sessão: dbc2df17-64c5-4d5a-b8ed-a9c2aaee2dce; base de código: none
+- 会话: dbc2df17-64c5-4d5a-b8ed-a9c2aaee2dce; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

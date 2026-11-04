@@ -1,22 +1,22 @@
-# Topo sem menu superior preserva operação à direita
-Correção: ocultar o menu superior horizontal causava deslocamento da área de operações para a esquerda no portal.
+# 无顶部菜单时顶部保留右侧操作区
+修正：隐藏顶部水平菜单会导致门户中操作区域向左偏移。
 
-## Problema
-- Ao ocultar top-nav-container (flex:1), restava apenas a área de operações à direita sob space-between, colando à esquerda
-- Nome de usuário e ícone de mensagem ficavam deslocados
+## 问题
+- 隐藏 top-nav-container (flex:1) 后，在 space-between 下仅剩右侧操作区，紧贴左侧
+- 用户名和消息图标发生偏移
 
 ## 解决方案
-- Adicionar classe navbar--no-top-nav quando não há menu superior
-- Aplicar justify-content: flex-end para a área de operações à direita
-- Logo/título à esquerda mantêm posicionamento absoluto
+- 当没有顶部菜单时，添加 navbar--no-top-nav 类
+- 对右侧操作区应用 justify-content: flex-end
+- 左侧的 Logo/标题保持绝对定位
 
-## Arquivos
-- src/views/home/config/homeLayout.js e src/layout/index.vue (lógica de layout)
-- src/views/home/index-new.vue, HomeLayoutSidebar.vue, UnifiedLogin.vue (páginas)
-- src/layout/components/Navbar.vue, homeDataMixin.js, src/settings.js (apoio)
+## 文件
+- src/views/home/config/homeLayout.js 和 src/layout/index.vue （布局逻辑）
+- src/views/home/index-new.vue, HomeLayoutSidebar.vue, UnifiedLogin.vue （页面）
+- src/layout/components/Navbar.vue, homeDataMixin.js, src/settings.js （辅助）
 
-## Verificação
-- 验证证据: src=门户/021.md; sessão: f0d5550d-7371-4ca0-ba93-0e9506808d82
+## 验证
+- 验证证据: src=门户/021.md; 会话: f0d5550d-7371-4ca0-ba93-0e9506808d82
 
 <!-- MEMORY_FIELDS
 {

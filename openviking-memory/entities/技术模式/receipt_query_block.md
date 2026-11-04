@@ -1,20 +1,20 @@
-# Validação do modo de recibo bancário bloqueia consulta conciliada
-No projeto Park Public Benefit (zhi2-web-admin), as funções validateBankReceiptQueryParams e shouldUseBankReceiptMode em pubBankDetailDay/index.vue restringiam incorretamente o status de conciliação a "não conciliado", impedindo a consulta de recibos já conciliados.
+# 银行回单模式验证阻止了已对账查询
+在 Park Public Benefit (zhi2-web-admin) 项目中，pubBankDetailDay/index.vue 中的 validateBankReceiptQueryParams 和 shouldUseBankReceiptMode 函数错误地将对账状态限制为“未对账”，阻止了已对账回单的查询。
 
 ## 问题根因
-- validateBankReceiptQueryParams e shouldUseBankReceiptMode forçavam o status como não conciliado
-- Dados conciliados eram bloqueados por não atenderem à condição, impossibilitando a consulta
+- validateBankReceiptQueryParams 和 shouldUseBankReceiptMode 强制状态为未对账
+- 已对账数据因不满足该条件被阻止，导致无法查询
 
 ## 解决方案
-- Removida a validação de não conciliado, mantida apenas a condição de baixa manual
-- Suporte para exibir recibos bancários conciliados e não conciliados
+- 移除了未对账的验证，仅保留手动核销条件
+- 支持显示已对账和未对账的银行回单
 
-## Arquivos envolvidos
+## 涉及文件
 - src/views/benefit/pubBankDetailDay/index.vue
 - src/views/benefit/components/BankReconciliation.vue
 
-## Verificação e atribuição
-- 所属项目: Park Public Benefit; sessão: 859f5de6-bf9f-4503-94b7-53f26a6002a5; base: none
+## 验证与归属
+- 所属项目: Park Public Benefit; 会话: 859f5de6-bf9f-4503-94b7-53f26a6002a5; base: none
 
 <!-- MEMORY_FIELDS
 {

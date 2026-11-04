@@ -1,6 +1,7 @@
 # Summary
-Em 2026-11-03, foi corrigido um bug em que tabelas com menos de 10 linhas de dados apresentavam espaço em branco abaixo no layout list-card. Causa raiz: shouldSparseAutoHeight em zs-table.vue era restrito ao layout de árvore de região, e algumas páginas definiam min-height em .list-card forçando expansão. Correção: adicionada a propriedade inListCard em zs-table.vue para basear shouldSparseAutoHeight em inListCard; removido min-height de .list-card nas páginas company/companyApplyAudit/index.vue para a tabela encolher conforme o conteúdo. Arquivos envolvidos: ListTemplate.js, table.js, main.js, 路由信息.json, zs-table.vue, index.scss, AppMain.vue, layout/index.vue. 验证证据: 苏州市房地产监测V3-rest/002.md. ID de sessão de origem: deee3f49-3c02-4d81-a251-d57518e4e866.
-# 2026-11-03 (Tuesday) ChatLog:
+在 2026-11-03，修复了一个 bug，其中数据行数少于 10 行的表格在 list-card 布局下方出现空白。根本原因：zs-table.vue 中的 shouldSparseAutoHeight 仅限于区域树布局，并且某些页面在 .list-card 中定义了 min-height 强制展开。修复：在 zs-table.vue 中添加了 inListCard 属性，使 shouldSparseAutoHeight 基于 inListCard；移除了 company/companyApplyAudit/index.vue 页面中 .list-card 的 min-height，使表格根据内容收缩。涉及文件：ListTemplate.js, table.js, main.js, 路由信息.json, zs-table.vue, index.scss, AppMain.vue, layout/index.vue. 验证证据: 苏州市房地产监测V3-rest/002.md. 来源会话 ID: deee3f49-3c02-4d81-a251-d57518e4e866.
+
+# 2026-11-03 (星期二) ChatLog:
 **user**: 【记忆类型】bug
 【标题】list-card内表格少数据未收缩致空白
 【内容】zs-table.vue中shouldSparseAutoHeight仅限区域树布局，且部分页面.list-card设min-height强制撑开，致表格数据少于10行时下方空白。修复：zs-table.vue新增inListCard属性使shouldSparseAutoHeight基于inListCard，并移除company/companyApplyAudit/index.vue等页面.list-card的min-height，表格按内容收缩。

@@ -1,18 +1,18 @@
-# DetailTemplate com ordem e campos divergentes
-O DetailTemplate(contentInfo) de building/project/detail.vue e projectChange/detail.vue divergia da captura de tela em ordem e campos.
+# DetailTemplate 顺序和字段不一致
+building/project/detail.vue 和 projectChange/detail.vue 中的 DetailTemplate(contentInfo) 在顺序和字段上与截图不一致。
 
-## Problema
-- A ordem dos campos no DetailTemplate(contentInfo) não correspondia à captura de tela.
-- Faltavam campos como landPlotName, nome do responsável pelo uso do terreno e observações.
+## 问题
+- DetailTemplate(contentInfo) 中的字段顺序与截图不对应。
+- 缺少诸如 landPlotName、土地使用责任人名称和备注等字段。
 
 ## 解决方案
-- Reordenado contentInfo conforme a página de visualização.
-- Adicionados ao final: nome do lote, pessoa com direito de uso do terreno e observações.
-- Endpoints e estado de edição não foram alterados.
+- 根据查看页面重新排序了 contentInfo。
+- 在末尾添加了：地块名称、拥有土地使用权的人员和备注。
+- Endpoints 和编辑状态未被更改。
 
-## Arquivos e origem
+## 文件和来源
 - 涉及文件: building/project/detail.vue; building/projectChange/detail.vue.
-- 验证证据: sessão cursor ff097cf6-67f8-45c1-8b04-753136cfda5d.
+- 验证证据: cursor会话 ff097cf6-67f8-45c1-8b04-753136cfda5d.
 
 <!-- MEMORY_FIELDS
 {

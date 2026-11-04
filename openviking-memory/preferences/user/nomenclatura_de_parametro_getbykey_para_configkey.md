@@ -1,5 +1,5 @@
-- Em registro de empresa (autonomy/regulation), parâmetro de interface getByKey é nomeado como configKey; integração real de API aprovada, editAndSubmit e Step5 funcionam normalmente.
-- Evidência de sessão Cursor 0acfabb2-4547-45e3-9ab0-7ad98438a646.
+- 在企业注册（autonomy/regulation）中，接口参数 getByKey 被命名为 configKey；实际 API 集成已批准，editAndSubmit 和 Step5 正常工作。
+- Cursor 会话证据 0acfabb2-4547-45e3-9ab0-7ad98438a646.
 
 <!-- MEMORY_FIELDS
 {

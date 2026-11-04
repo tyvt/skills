@@ -1,20 +1,20 @@
-# Correção de Resposta das Tabelas de Preço Médio
-Componentes de tabela de preço médio foram ajustados para compatibilidade de retorno da API.
+# 平均价格表响应修复
+平均价格表组件已调整以兼容 API 返回格式。
 
-## Causa
-- APIs `averagePrice` retornam array em `data`, mas três componentes usavam `response.rows` falhando
+## 原因
+- API `averagePrice` 在 `data` 中返回数组，但三个组件使用了 `response.rows` 导致失败
 
 ## 解决方案
-- Padronizado para `response.rows || response.data || []` para compatibilidade
+- 标准化为 `response.rows || response.data || []` 以兼容
 
-## Arquivos Envolvidos
+## 涉及文件
 - `src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/components/AveragePriceTable.vue`
-- Mesma pasta: `BuildRecordTable.vue`, `historicalPrice.vue`, `detail.vue`
+- 同一文件夹: `BuildRecordTable.vue`, `historicalPrice.vue`, `detail.vue`
 - `src/api/pricemng/recordPriceMng.js`, `src/api/presale/recordPriceMng.js`, `src/api/index.js`, `src/utils/request.js`
 
 ## 验证与归属
-- 验证证据: extraído do cursor session=a9f5fddf-6da7-4aa2-811e-c9b3d7941b5e
-- Linha de base: none; 所属项目: Produto 2.0
+- 验证证据: 提取自 cursor session=a9f5fddf-6da7-4aa2-811e-c9b3d7941b5e
+- 基线: none; 所属项目: Produto 2.0
 
 <!-- MEMORY_FIELDS
 {

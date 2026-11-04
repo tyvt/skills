@@ -1,13 +1,13 @@
-# Flag de string '0' aciona falsamente aviso de liquidação
-Em maintenance/final/index.vue, o v-if="settleWarnFlag" trata string '0' como verdadeiro em JS, causando exibição indevida.
+# 字符串 '0' 标志错误触发结算警告
+在 maintenance/final/index.vue 中，v-if="settleWarnFlag" 在 JS 中将字符串 '0' 视为真值，导致不当显示。
 
 ## 问题根因
-- UI de aviso de liquidação usava v-if="settleWarnFlag" avaliando truthy; string '0' é truthy em JS.
+- 结算警告 UI 使用 v-if="settleWarnFlag" 评估为真值；字符串 '0' 在 JS 中是真值。
 
 ## 解决方案
-- Seguir convenção do repositório usando comparação explícita == '1' para flags.
+- 遵循仓库约定，对标志使用显式比较 == '1'。
 
-## Arquivos envolvidos
+## 涉及的文件
 - maintenance/final/index.vue
 - maintenance/completion/detail.vue
 - maintenance/final/detail.vue
@@ -16,8 +16,8 @@ Em maintenance/final/index.vue, o v-if="settleWarnFlag" trata string '0' como ve
 - maintenance/maintenanceApply/detail.vue
 
 ## 验证与归属
-- 验证证据: sessão cursor 7fd96eae-ff4a-4cde-8f71-536de88bfa82
-- Base de código: none
+- 验证证据: cursor 会话 7fd96eae-ff4a-4cde-8f71-536de88bfa82
+- 代码库: none
 
 <!-- MEMORY_FIELDS
 {

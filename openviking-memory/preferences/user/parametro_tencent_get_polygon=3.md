@@ -1,7 +1,5 @@
-
-- Uso do `get_polygon=3` para contorno de ruas: não é interface independente, é parâmetro da API de divisão administrativa WebService do Tencent.
-- Em telão de nível distrito, chamar `ws/district/v1/getchildren` com `id` e `get_polygon=3` para obter contorno de ruas.
-
+- 使用 `get_polygon=3` 获取街道轮廓：不是独立接口，是腾讯 WebService 行政区划 API 的参数。
+- 在区级大屏上，调用 `ws/district/v1/getchildren` 并传入 `id` 和 `get_polygon=3` 以获取街道轮廓。
 
 <!-- MEMORY_FIELDS
 {

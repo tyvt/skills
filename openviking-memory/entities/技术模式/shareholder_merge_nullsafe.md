@@ -1,19 +1,19 @@
-# Formatação segura para fusão de tabela de acionistas
-`ShareholderPlainTable.vue` adiciona prop `beforeRows` para modo de fusão; valores `undefined` de um lado devem usar formatter seguro em vez de `percentFormatter`.
+# 股东表合并的安全格式化
+`ShareholderPlainTable.vue` 为合并模式添加 prop `beforeRows`；一侧的 `undefined` 值应使用安全的 formatter 而不是 `percentFormatter`。
 
 ## 问题根因
-- `rimraf` bloqueado por guarda de deleção segura deixou resíduo `.tmp-verify-dist` exigindo limpeza manual
-- Fusão de linhas com `undefined` de um lado causava `undefined%` ao usar `percentFormatter`
+- `rimraf` 被安全删除保护阻止，留下了 `.tmp-verify-dist` 残留，需要手动清理
+- 合并行时，一侧为 `undefined` 在使用 `percentFormatter` 时会导致 `undefined%`
 
 ## 解决方案
-- `ShareholderPlainTable.vue` recebe prop `beforeRows` para ativar modo de fusão
-- `mergedRows` faz correspondência por `shareholderId`→`idNumber`→nome do acionista (fallback)
-- Usar formatter com segurança de nulo para lado `undefined`, não `percentFormatter`
+- `ShareholderPlainTable.vue` 接收 prop `beforeRows` 以启用合并模式
+- `mergedRows` 通过 `shareholderId`→`idNumber`→股东名称 (fallback) 进行匹配
+- 对 `undefined` 一侧使用空值安全的 formatter，而非 `percentFormatter`
 
-## Arquivos e Atribuição
-- 验证证据: src=苏州市房地产监测V3-rest/122.md e src=苏州市房地产监测V3/143.md
-- 涉及文件: ShareholderChangeSection.vue, ShareholderPlainTable.vue, SurveyChangeHouseTable.vue (toB/companyRecord e presale/surveyChange), DeveloperBasicInfoForm.vue, formatters/index.js, main.js, element.js
-- 所属项目: 苏州市房地产监测V3; sessão: f1fe42af-7198-4586-90dc-5a34ed97f963; baseline: none
+## 文件与归属
+- 验证证据: src=苏州市房地产监测V3-rest/122.md 和 src=苏州市房地产监测V3/143.md
+- 涉及文件: ShareholderChangeSection.vue, ShareholderPlainTable.vue, SurveyChangeHouseTable.vue (toB/companyRecord 和 presale/surveyChange), DeveloperBasicInfoForm.vue, formatters/index.js, main.js, element.js
+- 所属项目: 苏州市房地产监测V3; session: f1fe42af-7198-4586-90dc-5a34ed97f963; baseline: none
 
 <!-- MEMORY_FIELDS
 {

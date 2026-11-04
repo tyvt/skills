@@ -1,15 +1,15 @@
-# House Bound Via Auth Marker
-utils/portal-user.js introduces houseBoundViaAuth flag, set true only when LingXi authCode house selection succeeds via mergeLingXiHouseIntoPortalUser, used as the formal-version house-binding criterion.
-## Behavior
-- houseBoundViaAuth defined in utils/portal-user.js, set true only on successful mergeLingXiHouseIntoPortalUser
-- externalWebview.vue hasHouse now checks this flag to determine house presence
-- refreshPortalProfile no longer fills house fields from ctUserIdentity
-## Scope
-- Formal version requires LingXi authCode selection success to count as house binding
-- Trial version ignores this flag; houseList/houseId presence counts as bound
-## Attribution
-- Source session: 05b9061d-bcb6-412b-9bf6-24c69eb80182; code baseline: none
-- Files: utils/portal-user.js, pages/webview/externalWebview.vue
+# 通过鉴权标记绑定房屋
+utils/portal-user.js 引入了 houseBoundViaAuth 标志，仅当 LingXi authCode 房屋选择通过 mergeLingXiHouseIntoPortalUser 成功时设为 true，用作正式版本的房屋绑定判定标准。
+## 行为
+- houseBoundViaAuth 定义于 utils/portal-user.js 中，仅在 mergeLingXiHouseIntoPortalUser 成功时设为 true
+- externalWebview.vue 中的 hasHouse 现在检查此标志以确定房屋存在
+- refreshPortalProfile 不再从 ctUserIdentity 填充房屋字段
+## 范围
+- 正式版本要求 LingXi authCode 选择成功才计为房屋绑定
+- 试用版本忽略此标志；houseList/houseId 存在即计为已绑定
+## 归属
+- 来源会话：05b9061d-bcb6-412b-9bf6-24c69eb80182；代码基线：none
+- 文件：utils/portal-user.js, pages/webview/externalWebview.vue
 
 <!-- MEMORY_FIELDS
 {

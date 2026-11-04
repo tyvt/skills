@@ -1,18 +1,18 @@
-# Validação de taxa proporcional omite 0-100 e duas casas decimais
-O esquema de serviço não validava a taxa de cobrança de forma diferenciada por tipo; no modo proporcional não limitava 0-100 nem duas casas decimais.
+# 比例费率验证遗漏了0-100和两位小数
+服务方案未根据类型差异化验证收费费率；在比例模式下未限制0-100和两位小数。
 
 ## 解决方案
-- Adicionar verificação `isChargeTypeProportion` em `companyScheme/detail.vue`
-- Alterar `rules` para `computed` implementando validação proporcional
-- Observar `form.chargeType` para revalidar
+- 在 `companyScheme/detail.vue` 中添加 `isChargeTypeProportion` 校验
+- 将 `rules` 改为 `computed`，实现比例验证
+- 监听 `form.chargeType` 以重新验证
 
-## Arquivos envolvidos
+## 涉及的文件
 - company/companyScheme/detail.vue, api/company/companyScheme.js
 - institution/agencyPersonnel/components/AgencyPersonnelDetail.vue
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-rest/141.md
-- Sessão de origem: 6b993f54-a54c-46d4-bd1e-32b8da6cc3ba; base de código: none
+- 来源会话: 6b993f54-a54c-46d4-bd1e-32b8da6cc3ba; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

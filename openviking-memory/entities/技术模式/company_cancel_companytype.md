@@ -1,23 +1,23 @@
-# Lista de cancelamento de instituição deve usar companyType
-A condição de busca «tipo de instituição» na lista de cancelamento usava organType erroneamente; o backend exige companyType para filtro do usuário.
+# 机构注销列表应使用 companyType
+注销列表中的“机构类型”搜索条件错误地使用了 organType；后端要求使用 companyType 作为用户筛选条件。
 
 ## 问题根因
-- Lista de cancelamento de instituição usava organType no filtro de tipo de instituição
-- organType é contexto fixo (agency/lease); filtro do usuário deve passar companyType
+- 机构注销列表在机构类型筛选中使用了 organType
+- organType 是固定上下文（agency/lease）；用户筛选应传递 companyType
 
 ## 解决方案
-- companyCancel/index.vue: parâmetros de consulta e formulário de busca alterados para companyType
-- Requisição de lista fixa organType como this.resolvedOrganType (via CompanyOrganProvider ou meta de rota)
-- Comportamento alinhado a companyRecordAgency/index.vue
+- companyCancel/index.vue: 查询参数和搜索表单已改为 companyType
+- 列表请求将 organType 固定为 this.resolvedOrganType（通过 CompanyOrganProvider 或路由 meta）
+- 行为与 companyRecordAgency/index.vue 保持一致
 
-## Arquivos envolvidos
-- src/views/company/companyCancel/index.vue e detail.vue
-- src/api/company/companyCancel.js e src/mixins/companyOrganContext.js
-- src/views/zljg/companyCancel/index.vue e src/views/company/companyRecordAgency/index.vue
-- src/constants/companyOrgan.js e e2e/list/list-card-spacing.spec.js
+## 涉及的文件
+- src/views/company/companyCancel/index.vue 和 detail.vue
+- src/api/company/companyCancel.js 和 src/mixins/companyOrganContext.js
+- src/views/zljg/companyCancel/index.vue 和 src/views/company/companyRecordAgency/index.vue
+- src/constants/companyOrgan.js 和 e2e/list/list-card-spacing.spec.js
 
-## Verificação
-- 验证证据: src=苏州市房地产监测V3-leftover/058.md; Sessão: 50257d35-25d2-4753-bbb1-55a3c981474e
+## 验证
+- 验证证据: src=苏州市房地产监测V3-leftover/058.md; 会话: 50257d35-25d2-4753-bbb1-55a3c981474e
 
 <!-- MEMORY_FIELDS
 {

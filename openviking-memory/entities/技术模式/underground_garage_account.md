@@ -1,13 +1,13 @@
-# Garagem subterrânea não verifica campo account em estado não aberto
-Em empj_EstateDetail.js, a lógica de garagem subterrânea não conferia account, divergindo da lógica superficial.
+# 地下车库在未开户状态不检查 account 字段
+在 empj_EstateDetail.js 中，地下车库的逻辑未检查 account，与地上逻辑不一致。
 
-## Problema
-- changeBuild agrupa floor<0 em mapUnit['地下车库']; página "未开户" usa image/no.png com classe gray.
-- Garagem subterrânea julgada apenas por purpose e isInitpayment, sem checar account, inconsistente com parte superior.
+## 问题
+- changeBuild 将 floor<0 归类到 mapUnit['地下车库']；页面 "未开户" 使用 image/no.png 且类为 gray。
+- 地下车库仅依据 purpose 和 isInitpayment 判断，未检查 account，与上层不一致。
 
-## Arquivos e Origem
+## 文件与来源
 - 涉及文件: empj_EstateDetail.js, empj_EstateDetail.shtml, empj_EstateDetail.css, BuildingMapper.xml.
-- Sessão de origem: 47a15a5b-96fc-44bf-a48d-4d88ec7e305c.
+- 源会话: 47a15a5b-96fc-44bf-a48d-4d88ec7e305c.
 
 <!-- MEMORY_FIELDS
 {

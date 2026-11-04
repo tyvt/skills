@@ -1,18 +1,18 @@
-# Subtabela Não Atualiza após Salvar Limite
-Em detail de edição de limite, falta de sincronização de paginação da subtabela fazia com que ela não atualizasse após salvar.
+# 保存限额后子表不更新
+在限额编辑详情中，子表分页同步的缺失导致其在保存后不更新。
 
 ## 问题根因
-- Detail em modo edição não retornava houseList e não chamava `/building/houseLimit/page` para preenchimento
-- Callback de salvar não sincronizava explicitamente, causando não atualização da subtabela
+- 编辑模式下的详情未返回 houseList 且未调用 `/building/houseLimit/page` 进行填充
+- 保存回调未显式同步，导致子表未更新
 
-## Correção
-- `limitFormMixin.js` ganhou `syncSelectedHousesFromSubTablePage()` chamado em `$nextTick`
-- `detailCallback` sobrescreve `selectedHouses` apenas quando `houseList.length > 0`
+## 修复
+- `limitFormMixin.js` 新增了 `syncSelectedHousesFromSubTablePage()`，在 `$nextTick` 中调用
+- `detailCallback` 仅当 `houseList.length > 0` 时覆盖 `selectedHouses`
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3-rest/088.md
 - 涉及文件: stock/limit/detail.vue, building/houseLimit/limitFormMixin.js, limitAdd.vue, limitCancel.vue, houseLimitAudit/index.vue, mixins/detailMixins.js, mixins/form.js
-- Sessão: f7ff995f-0339-4200-9550-e6b17381deaf; base de código: none
+- 会话: f7ff995f-0339-4200-9550-e6b17381deaf; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

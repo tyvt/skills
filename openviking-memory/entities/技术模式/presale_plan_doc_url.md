@@ -1,19 +1,18 @@
-# Resolução de URL de PDF do Plano de Pré-venda
-No Suzhou Real Estate Monitoring V3, o PDF do plano de pré-venda deve ler `planDocSite` para evitar navegação de fallback para a página do plano.
+# 预售计划PDF的URL解析
+在 Suzhou Real Estate Monitoring V3 中，预售计划的 PDF 需读取 `planDocSite` 以避免回退导航到计划页面。
 
 ## 问题根因
-- O caminho do PDF da interface está em `data.plan.planDocSite`; o código antigo lia `planUrl` inexistente, causando fallback para a página do plano.
+- 接口返回的 PDF 路径位于 `data.plan.planDocSite`；旧代码读取了不存在的 `planUrl`，导致回退到计划页面。
 
 ## 解决方案
-- Adicionado `resolvePlanDocUrl()` em `permitConstants.js` para ler `planDocSite`/`planUrl` sequencialmente.
-- Chamado por `handleQueryPlan()` e `canQueryPlan`.
-- `vite.config.js` precisa proxy `/zhi2-dev` para recursos estáticos.
+- 在 `permitConstants.js` 中添加了 `resolvePlanDocUrl()` 以依次读取 `planDocSite`/`planUrl`。
+- 由 `handleQueryPlan()` 和 `canQueryPlan` 调用。
+- `vite.config.js` 需要将 `/zhi2-dev` 代理至静态资源。
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3/092.md
 - 涉及文件: presale/permit/components/detail.vue, PermitPlanPanel.vue, resolveServerAssetUrl.js, companyApplyAudit/detail.vue, detailMixins.js, form.js, .workbuddy/memory/MEMORY.md, .workbuddy/memory/2026-09-11.md
-- Sessão de origem: 6976122d-456e-461d-a9a7-8ac465dc9b76; baseline de código: none
-
+- 源会话: 6976122d-456e-461d-a9a7-8ac465dc9b76; 代码基线: none
 
 <!-- MEMORY_FIELDS
 {

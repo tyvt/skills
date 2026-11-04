@@ -1,12 +1,12 @@
-- `showHomeNavMenu` originalmente só verificava `isSuperAdmin` e não `layoutVariant`, causando exibição indevida da barra de menu no layout de empresa em desenvolvimento.
-- Em `homeDataMixin.js`, exibir o menu apenas quando super_admin E `layoutVariant === 'admin'`; restaurar a chamada `resolveHomeLayoutVariant(...)`.
+- `showHomeNavMenu` 原本只检查了 `isSuperAdmin` 而未检查 `layoutVariant`，导致在开发中的企业布局中菜单栏显示不当。
+- 在 `homeDataMixin.js` 中，仅当 super_admin 且 `layoutVariant === 'admin'` 时显示菜单；恢复对 `resolveHomeLayoutVariant(...)` 的调用。
 - 涉及文件: homeDataMixin.js, HomeNavMenu.vue, layout/index.vue, index-new.vue, config/homeLayout.js, store/getters.js, utils/portalLayout.js, store/modules/permission.js
-- Sessão de origem: 26455e70-8674-4b7e-8d89-82798ecab4f1
+- 源会话: 26455e70-8674-4b7e-8d89-82798ecab4f1
 
 <!-- MEMORY_FIELDS
 {
   "user": "user",
-  "topic": "Menu de navegação e variante de layout",
+  "topic": "主题标题: 导航菜单和布局变体",
   "source_extraction_id": "b6999fcd9db6402c903ccb96bee9d95d",
   "version": 1,
   "memory_type": "preferences"

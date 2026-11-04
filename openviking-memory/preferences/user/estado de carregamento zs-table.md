@@ -1,5 +1,5 @@
-- `zs-table` deve usar `:loading` cobrindo apenas `.el-table__body-wrapper`, mantendo o cabeçalho sempre visível.
-- O antigo `v-loading` usava `MutationObserver` para sincronizar largura/altura com o corpo e realinhar em mudanças de layout; proibido misturar ambas as escritas na mesma tabela para evitar duplo spinner.
+- `zs-table` 应使用 `:loading` 仅覆盖 `.el-table__body-wrapper`，保持表头始终可见。
+- 旧的 `v-loading` 使用 `MutationObserver` 来同步宽度/高度与主体，并在布局变化时重新对齐；禁止在同一表格中混合使用这两种写法，以避免出现双 spinner。
 - 验证证据: src=苏州市房地产监测V3/050.md
 
 <!-- MEMORY_FIELDS

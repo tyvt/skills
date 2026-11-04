@@ -1,13 +1,13 @@
-# Exibição de anexos por papel com prioridade de pacote de autorização
-No projeto Suzhou Real Estate Monitoring V3, anexos exigidos são mostrados conforme papel do operador, priorizando pacote de autorização em duplicação.
+# 按角色展示附件并优先采用授权包
+在 Suzhou Real Estate Monitoring V3 项目中，所需的附件根据操作员角色展示，在出现重复时优先采用授权包。
 
-## Regras de Exibição
-- Operador não contrato vê apenas carteira de identidade
-- Operador de contrato vê carteira de identidade e procuração
-- Pacote de registro (`备案包`) mantém só identidade; pacote `zljghtsq` oferece identidade e autorização
-- Em duplicação com registro, priorizar pacote de autorização e mesclar removendo duplicados
+## 展示规则
+- 非合同操作员仅见身份证
+- 合同操作员见身份证和授权书
+- 登记包（`备案包`）仅保留身份；包 `zljghtsq` 提供身份和授权
+- 与登记包重复时，优先采用授权包并合并去除重复项
 
-## Arquivos Envolvidos
+## 涉及的文件
 - `views/institution/leasePersonnel/components/LeasePersonnelDetail.vue`
 - `api/company/leasePersonnel.js`
 - `views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue`
@@ -19,8 +19,8 @@ No projeto Suzhou Real Estate Monitoring V3, anexos exigidos são mostrados conf
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/027.md
-- ID de sessão: 77fa1a75-24f0-43b1-bb5c-38c9efb094bb
-- 所属项目: Suzhou Real Estate Monitoring V3; linha de base: none
+- 会话 ID: 77fa1a75-24f0-43b1-bb5c-38c9efb094bb
+- 所属项目: Suzhou Real Estate Monitoring V3; 基线: none
 
 <!-- MEMORY_FIELDS
 {

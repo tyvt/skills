@@ -1,18 +1,18 @@
-# Falta de Campos CRUD em Detail de Aviso Causa Aviso Vue e Erro de API
-No projeto Suzhou Real Estate Monitoring V3, detail.vue de supervision/unblock/notice não declarou campos em data(), causando aviso de binding e erro de concatenação de API no mixin form.js.
+# 通知详情中缺少CRUD字段导致Vue警告和API错误
+在 Suzhou Real Estate Monitoring V3 项目中，supervision/unblock/notice 的 detail.vue 未在 data() 中声明字段，导致在 mixin form.js 中出现绑定警告和 API 拼接错误。
 
 ## 问题根因
-- `src/views/supervision/unblock/notice/detail.vue` não declarou `primaryKey`, `moduleName`, `businessName` em `data()`
-- Causou aviso de binding em `operation-btn-group` e erro de concatenação de API no mixin `form.js`
+- `src/views/supervision/unblock/notice/detail.vue` 未在 `data()` 中声明 `primaryKey`、`moduleName`、`businessName`
+- 导致在 `operation-btn-group` 中出现绑定警告，以及在 mixin `form.js` 中出现 API 拼接错误
 
 ## 解决方案
-- Adicionou-se em `data()` `primaryKey: 'allotNoticeId'`, `moduleName: 'prefund'`, `businessName: 'notice'`
-- Valores alinhados com o caminho de API do módulo
+- 在 `data()` 中添加了 `primaryKey: 'allotNoticeId'`、`moduleName: 'prefund'`、`businessName: 'notice'`
+- 值与模块的 API 路径保持一致
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3/238.md
 - 涉及文件: detail.vue, detailMixins.js, deposit/notice/detail.vue, form.js, api/capital/notice.js, unblock/noticeChange/detail.vue, unblock/guarantee/changedetail.vue, formComponents.js
-- 所属项目: Suzhou Real Estate Monitoring V3; sessão: f35d14e1-f0a5-4fa4-b44d-947275ba1b5c; base de código: none
+- 所属项目: Suzhou Real Estate Monitoring V3; 会话: f35d14e1-f0a5-4fa4-b44d-947275ba1b5c; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

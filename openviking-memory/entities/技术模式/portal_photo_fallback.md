@@ -1,18 +1,18 @@
-# Portal Photo Fallback
-Fallback para foto de pessoa ausente usando empty.svg no portal de aluguel.
+# 门户照片回退
+在租赁门户中使用 empty.svg 作为缺失人员照片的回退方案。
 
 ## 描述
-- Página de divulgação de funcionários de imobiliárias não mostrava imagem quando faltava foto.
-- Adicionado `resolvePersonPhotoSrc` em `portalPersonPhoto.js` para retornar `/assets/images/empty.svg` quando não há photo/photoUrl/avatar/headPortrait ou falha de carregamento.
-- Detalhe do corretor à esquerda passou a usar `img` com borda.
-- Placeholder do logo da instituição não foi alterado.
+- 房地产公司员工展示页面在缺少照片时不显示图片。
+- 在 `portalPersonPhoto.js` 中添加了 `resolvePersonPhotoSrc`，以便在没有 photo/photoUrl/avatar/headPortrait 或加载失败时返回 `/assets/images/empty.svg`。
+- 左侧的经纪人详情开始使用带边框的 `img`。
+- 机构 logo 的占位符未更改。
 
-## Arquivos
+## 文件
 - `RentalDetailDialog.vue`, `BrokerPages.vue`, `PortalDialogHost.vue`, `RentalPages.vue`
 - `tests/e2e/public-portal-interactions.spec.ts`, `mock/brokers.js`, `UnifiedLogin.vue`, `tests/e2e/fixtures/public-portal-designs.ts`
 
-## Verificação
-- Sessão de origem: `5942ae9c-e4bd-4732-877f-0bca30cb992b`
+## 验证
+- 原始会话: `5942ae9c-e4bd-4732-877f-0bca30cb992b`
 
 <!-- MEMORY_FIELDS
 {

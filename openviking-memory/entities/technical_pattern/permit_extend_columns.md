@@ -1,14 +1,14 @@
-# permitExtend Column Config
-permitExtend/index.vue columns() sets project name as text and extension number as link to detail.
+# permitExtend 列配置
+permitExtend/index.vue columns() 将项目名称设置为文本，将延期申请编号设置为详情链接。
 
-## Configuration
-- `项目名称` configured as `type: 'text'` with `showOverflowTooltip`, placed in first column
-- `延期申请编号` configured as `type: 'link'` with `function: this.handleView` passing `presalePermitExtendId` to detail
+## 配置
+- `项目名称` 配置为 `type: 'text'` 并带有 `showOverflowTooltip`，放置在第一列
+- `延期申请编号` 配置为 `type: 'link'` 并使用 `function: this.handleView` 将 `presalePermitExtendId` 传递到详情
 
-## Attribution
-- Source session: c0158687-53dd-4468-a19c-21916c1b2d50
-- Project: 苏州市房地产监测V3
-- Files: permitExtend/index.vue, listMixins.js, zs-table-column.vue, ListTemplate.js
+## 归属信息
+- 源会话：c0158687-53dd-4468-a19c-21916c1b2d50
+- 项目：苏州市房地产监测V3
+- 文件：permitExtend/index.vue, listMixins.js, zs-table-column.vue, ListTemplate.js
 
 <!-- MEMORY_FIELDS
 {

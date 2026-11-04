@@ -1,15 +1,15 @@
-# Company Founding Asset Validation
-Padrão técnico para validação de campos obrigatórios em páginas de empresas no projeto 苏住房G.
+# 公司成立资产验证
+苏住房G项目中公司页面必填字段验证的技术规范。
 
-## Description
-- `companyManagement/components/detail.vue` originalmente não tinha regras obrigatórias para `foundingDate` e `registeredAssets`.
-- Após adicionar regras em `rules`, passou a exibir asterisco vermelho no modo de edição e validar.
-- Módulos de registro, auditoria e histórico de alteração de instituição já possuíam validação.
+## 描述
+- `companyManagement/components/detail.vue` 原本没有针对 `foundingDate` 和 `registeredAssets` 的必填规则。
+- 在 `rules` 中添加规则后，在编辑模式下开始显示红色星号并进行验证。
+- 登记、审计和机构变更历史模块已经具备验证。
 
-## Verification and Attribution
+## 验证与归属
 - 验证证据: src=苏住房G/037.md
 - 涉及文件: company/companyRegister/dialog.vue, table.vue, companyRegister/components/companyInfo.vue, companyRegister/detail.vue, toB/companyRecord/detail.vue, companyManagement/components/detail.vue, publicQuery/propertyCompany/detail.vue, register/components/accountInfo.vue
-- 所属项目: 苏住房G; Sessão: b9d18492-03d8-4a9e-b3b7-9057c3686e1c; Base de código: none
+- 所属项目: 苏住房G; 会话: b9d18492-03d8-4a9e-b3b7-9057c3686e1c; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

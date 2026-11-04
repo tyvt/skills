@@ -1,20 +1,20 @@
-# Componente separado para manutenção de plano de venda à vista distingue edição e leitura
-No projeto Suzhou Real Estate Monitoring V3, `CashsaleDetail.vue` usa `openPlanPage(false)` para edição e `openPlanPage(true)` para somente leitura, com componente dedicado `CashsalePlanFillForm.vue`.
+# 用于现售计划维护的分离组件区分编辑与只读
+在 Suzhou Real Estate Monitoring V3 项目中，`CashsaleDetail.vue` 使用 `openPlanPage(false)` 进行编辑，使用 `openPlanPage(true)` 进行只读，并采用专用组件 `CashsalePlanFillForm.vue`。
 
-## Distinção de modos
-- Manutenção chama `openPlanPage(false)` habilitando edição
-- Visualização chama `openPlanPage(true)` em modo somente leitura
-- `CashsalePlanFillForm.vue` é componente dedicado à venda à vista
+## 模式区分
+- 维护调用 `openPlanPage(false)` 启用编辑
+- 查看调用 `openPlanPage(true)` 为只读模式
+- `CashsalePlanFillForm.vue` 是专用于现售的组件
 
-## Diferenças de componente
-- Contém 5 abas
-- Remove abas específicas de pré-venda (ex.: monitoramento de fundos)
-- Separado de `PresalePlanFillForm.vue`
+## 组件差异
+- 包含 5 个选项卡
+- 移除预售特定的选项卡（例如：资金监测）
+- 与 `PresalePlanFillForm.vue` 分离
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/070.md
 - 涉及文件: cashsale-apply-menu-config.js, presale/cashsale/plan/detail.vue, presale/permit/plan/detail.vue, CashsaleDetail.vue, PresalePlanFillForm.vue, Headline/index.vue, AnnexUpload/index.vue, cashsale-apply-helpers.js
-- Sessão: c9033c2c-3a69-4b73-b22e-394f818a3b2b; baseline: none
+- 会话: c9033c2c-3a69-4b73-b22e-394f818a3b2b; baseline: none
 
 <!-- MEMORY_FIELDS
 {

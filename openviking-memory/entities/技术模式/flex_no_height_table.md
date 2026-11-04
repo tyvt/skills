@@ -1,17 +1,17 @@
-# Área de tabela em pop-up encolhida por falta de altura flex
-Pai flex sem altura definida fez a área de tabela flex:1 encolher para ~120px, mostrando só 2-3 linhas.
+# 弹窗中表格区域因缺少弹性高度而收缩
+未定义高度的弹性父容器导致 flex:1 的表格区域收缩至约 120px，仅显示 2-3 行。
 
 ## 描述
-- Contêiner pai flex não tinha altura explícita.
-- Região de tabela com flex:1 encolhia para altura mínima de cerca de 120px.
-- Apenas 2-3 linhas eram visíveis no pop-up.
+- 弹性父容器没有显式高度。
+- 具有 flex:1 的表格区域收缩至约 120px 的最小高度。
+- 弹窗中仅可见 2-3 行。
 
 ## 解决方案
-- Altura de dialog-box definida como var(--zs-dialog-content-max-height) (~88vh).
-- Cadeia de altura flex conectada de el-dialog até a tabela.
-- ResizeObserver sincroniza altura da tabela evitando sobreposição de altura fixa de zs-table.
+- 将 dialog-box 的高度定义为 var(--zs-dialog-content-max-height) (~88vh)。
+- 从 el-dialog 到表格的弹性高度链已连接。
+- ResizeObserver 同步表格高度，避免 zs-table 固定高度的重叠。
 
-## Arquivos
+## 文件
 - zhi2-web-admin/src/views/maintenance/components/OpeningBuildingDialog.vue
 - zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue
 - zhi2-web-admin/src/views/maintenance/components/ScopeSelectDialog.vue
@@ -20,8 +20,8 @@ Pai flex sem altura definida fez a área de tabela flex:1 encolher para ~120px, 
 - zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/OpenDetailTable.vue
 - zhi2-web-admin/src/views/maintenance/depositNotice/components/ScopeSelectDialog.vue
 
-## Relações
-- Sessão 来源: 082a4d1c-6379-4946-a74a-7dab35a3ffd7 (cursor)
+## 关系
+- 会话来源: 082a4d1c-6379-4946-a74a-7dab35a3ffd7 (cursor)
 - 所属项目: produto 2.0
 
 <!-- MEMORY_FIELDS

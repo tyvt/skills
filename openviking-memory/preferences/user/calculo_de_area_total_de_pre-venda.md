@@ -1,11 +1,11 @@
-- A «área total de pré-venda» do edifício é somada no frontend a partir dos dados de imóveis, não usando mais os campos `totalArea`/`houseArea` da API.
-- `permitConstants.js` usa `sumPresaleHouseAreas` e encapsula `resolvePresaleHouseFloorArea` etc.; acumula com `add` de `@/utils/calculation` mantendo 2 casas decimais para evitar erro de ponto flutuante.
-- `PresaleBuildingTable.vue` chama `computePresaleBuildingHouseArea(row, houses)` passando `houses` recebidos para renderizar a coluna «área total de pré-venda».
+- 楼栋的“预售总面积”在前端根据房屋数据求和，不再使用 API 的 `totalArea`/`houseArea` 字段。
+- `permitConstants.js` 使用 `sumPresaleHouseAreas` 并封装 `resolvePresaleHouseFloorArea` 等；通过 `@/utils/calculation` 中的 `add` 进行累加，保留 2 位小数以避免浮点错误。
+- `PresaleBuildingTable.vue` 调用 `computePresaleBuildingHouseArea(row, houses)`，传入接收到的 `houses` 以渲染“预售总面积”列。
 
 <!-- MEMORY_FIELDS
 {
   "user": "user",
-  "topic": "Cálculo de área total de pré-venda",
+  "topic": "主题标题: 预售总面积计算",
   "source_extraction_id": "bc24b503fbae49f6a34aceca79c91074",
   "version": 2,
   "memory_type": "preferences"

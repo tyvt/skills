@@ -1,16 +1,16 @@
-# Estilo de diálogo de autorização de pavilhão não sincronizado com branch yuanqu
-O layout e interação de BuildingDialogAuth.vue no branch atual divergem do padrão do branch yuanqu.
+# 楼宇授权对话框样式未与 branch yuanqu 同步
+当前分支上的 BuildingDialogAuth.vue 的布局和交互与 branch yuanqu 的标准不一致。
 
 ## 问题根因
-- BuildingDialogAuth.vue no branch atual tem layout e interação inconsistentes com o padrão do branch yuanqu.
+- 当前分支上的 BuildingDialogAuth.vue 的布局和交互与 branch yuanqu 的标准不一致。
 
 ## 解决方案
-- Sincronizar com commit cd9696539.
-- Alterar botão de confirmação inferior, botão de transferência de texto, paginação de selecionados, largura 96vw, tabela com 8 linhas fixas etc.
+- 与 commit cd9696539 同步。
+- 修改底部确认按钮、文本传输按钮、已选分页、宽度 96vw、固定 8 行表格等。
 
-## Verificação e proveniência
-- 涉及文件: src/views/property/complexBuildingAuth/detail.vue; src/views/components/BuildingDialogAuth.vue; BuildingDialogAuth.vue do branch atual.
-- Sessão: dc881812-1513-477b-8342-59b5f3fc62ac; código base: none.
+## 验证与溯源
+- 涉及文件: src/views/property/complexBuildingAuth/detail.vue; src/views/components/BuildingDialogAuth.vue; 当前分支的 BuildingDialogAuth.vue。
+- 会话: dc881812-1513-477b-8342-59b5f3fc62ac; 基础代码: none.
 
 <!-- MEMORY_FIELDS
 {

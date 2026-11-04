@@ -1,14 +1,14 @@
-# Formulário busca: bizState múltiplo corrigido
-Correção de item de formulário `bizState` que selecionava múltiplo erroneamente por falta de atributo `multiple`.
+# 搜索表单：bizState 多选已修正
+修正了表单项 `bizState` 因缺少 `multiple` 属性而错误地进行多选的问题。
 
 ## 描述
-- Arquivo: `zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue`
-- Quando `type==='select'` e `model==='bizState'`, `isMultiple` passa a ser `false` sem atributo `multiple` explícito (seleção única)
-- Para múltipla seleção, exigir `multiple: true` em `attrs` de `formItems`
+- 文件: `zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue`
+- 当 `type==='select'` 且 `model==='bizState'` 时，`isMultiple` 在没有显式 `multiple` 属性的情况下变为 `false`（单选）
+- 对于多选，需要在 `formItems` 的 `attrs` 中指定 `multiple: true`
 
-## Validação
+## 验证
 - 来源: cursor session `0bc574c1-233a-406d-9cc5-678ea3dabed5`
-- Base de código: none
+- 代码库: none
 
 <!-- MEMORY_FIELDS
 {

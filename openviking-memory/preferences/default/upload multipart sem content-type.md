@@ -1,6 +1,6 @@
-- Não definir manualmente o cabeçalho `Content-Type: multipart/form-data` pois isso omite o boundary gerado automaticamente pelo navegador, causando falha no upload.
-- Em gateway.js: remover `blobToBase64` e usar `formData.append` para envio binário direto; `biz_content` deve conter apenas parâmetros de negócio; adicionar `buildUploadGatewayHeader` mantendo cabeçalhos necessários (ex.: `zs-authorization`) e removendo cabeçalhos redundantes.
-- Em httpInstance.js: parar de repassar cabeçalhos extras e priorizar autenticação via `formData.token`.
+- 不要手动设置 `Content-Type: multipart/form-data` 请求头，因为这会省略浏览器自动生成的 boundary，导致上传失败。
+- 在 gateway.js 中：移除 `blobToBase64` 并使用 `formData.append` 进行直接二进制发送；`biz_content` 应仅包含业务参数；添加 `buildUploadGatewayHeader` 以保留必要的请求头（例如：`zs-authorization`）并移除冗余的请求头。
+- 在 httpInstance.js 中：停止传递额外的请求头，并优先通过 `formData.token` 进行身份验证。
 
 <!-- MEMORY_FIELDS
 {

@@ -1,15 +1,15 @@
-# type amount com align left
-Globalmente, type: 'amount' com align: 'right' deve ser alterado para align: 'left'.
+# type amount 使用 align left
+全局范围内，type: 'amount' 使用 align: 'right' 应改为 align: 'left'。
 
-## Regra
-- Substituir align: 'right' por align: 'left' em todos os type: 'amount'
-- Cobrir módulos de receita, propriedade etc.
+## 规则
+- 在所有 type: 'amount' 中将 align: 'right' 替换为 align: 'left'
+- 覆盖收入、财产等模块。
 
-## Verificação
-- Checagem secundária por regex type: 'amount' ... align: 'right' retornou 0 ocorrências
+## 验证
+- 通过 regex type: 'amount' ... align: 'right' 的二次检查返回 0 处匹配
 - 验证证据: src=bugfix/001.md
-- Arquivo envolvido: localPropertyWin/detail.vue
-- Sessão: 9d21af84-c650-421a-bfb6-02ee07eee6e0
+- 涉及文件: localPropertyWin/detail.vue
+- 会话: 9d21af84-c650-421a-bfb6-02ee07eee6e0
 
 <!-- MEMORY_FIELDS
 {

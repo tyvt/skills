@@ -1,12 +1,12 @@
-- `.el-input__inner` mantém `border-radius:4px` nos quatro cantos; botão stepper usa `top/bottom/right:1px` com altura `calc(50% - 1px)`, raio `3px`, fixado internamente
-- `.list-card` adiciona `overflow:hidden` e `box-sizing:border-box` para evitar overflow e oclusão de borda
+- `.el-input__inner` 保持四个角 `border-radius:4px`；stepper 按钮使用 `top/bottom/right:1px`，高度 `calc(50% - 1px)`，圆角 `3px`，内部固定
+- `.list-card` 添加 `overflow:hidden` 和 `box-sizing:border-box` 以避免溢出和边框遮挡
 - 涉及文件: RegionTreeLayout.vue, pubParkingRate/index.vue, pubParkingRate/detail.vue, pubParkingSpace/index.vue, parkingDialog.vue, pubParkingSpace/detail.vue, styles/index.scss, AmountInput/index.vue
-- 来源: sessão cursor 5bb61819-6c43-4252-b895-b382e5a2b5f4
+- 来源: cursor 会话 5bb61819-6c43-4252-b895-b382e5a2b5f4
 
 <!-- MEMORY_FIELDS
 {
   "user": "user",
-  "topic": "Estilo de botão stepper em input numérico",
+  "topic": "主题标题: 数字输入框中步进按钮的样式",
   "source_extraction_id": "efa109da20f6432b865c449dbd04a2ff",
   "version": 1,
   "memory_type": "preferences"

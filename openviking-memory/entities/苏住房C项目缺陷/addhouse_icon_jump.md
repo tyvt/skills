@@ -1,15 +1,15 @@
-# Ícone de ajuda em addHouse falha ao pular pacotes e placeholder inconsistente
-No projeto Su Housing C, ícone '?' em addHouse.vue com navegação entre subpacotes falhava e campo de certificado tinha placeholder inconsistente.
+# addHouse 中的帮助图标在跳包时失败且占位符不一致
+在项目 Su Housing C 中，addHouse.vue 中的 '?' 图标在子包间导航时失败，且证书字段存在不一致的占位符。
 
 ## 问题根因
-- Ícone '?' em addHouse.vue usava pulo entre subpacotes propenso a falha
-- Input de número de certificado não usava classe de placeholder uniforme
+- addHouse.vue 中的 '?' 图标使用了易失败的子包间跳转
+- 证书编号输入框未使用统一的 placeholder 类
 
-## Correção
-- Usar popup interno uni-popup com openInstructions() e adicionar @tap.stop
-- Aplicar placeholder-class='uni-easyinput__placeholder-class' no input de certificado
+## 修复
+- 使用内部 popup uni-popup 配合 openInstructions() 并添加 @tap.stop
+- 在证书输入框上应用 placeholder-class='uni-easyinput__placeholder-class'
 
-## Arquivos envolvidos
+## 涉及文件
 - src/pages_owner/house/owner/addHouse.vue
 - src/pages_transaction/publishHouse/verification.vue
 - src/components/ZsPicker/ZsPicker.vue
@@ -19,9 +19,9 @@ No projeto Su Housing C, ícone '?' em addHouse.vue com navegação entre subpac
 - src/pages_owner/house/owner/register.vue
 - src/pages_owner/house/verify.vue
 
-## Verificação
+## 验证
 - 验证证据: extracted source=cursor session=7bc1d9ba-8faa-4839-9f70-f4939f0e1403
-- 所属项目: Su Housing C (zhi2-mobile-shimin); base de código: none
+- 所属项目: Su Housing C (zhi2-mobile-shimin); 代码库: none
 
 <!-- MEMORY_FIELDS
 {

@@ -1,19 +1,19 @@
-# Pop-up de edifício não mostra tipo/local por erro de coluna
-O campo retornado pela interface é `position` mas `buildingTable.vue` usou `address`; no render do `SelectDialog`, `zs-table-column.vue` usou `scope.column.type` inconsistente com `$attrs.type`, falhando a coluna de dicionário.
+# 建筑弹窗因列错误不显示类型/位置
+接口返回的字段是 `position` 但 `buildingTable.vue` 使用了 `address`；在 `SelectDialog` 的渲染中，`zs-table-column.vue` 使用了 `scope.column.type`，与 `$attrs.type` 不一致，导致字典列失效。
 
 ## 问题根因
-- O campo retornado pela interface é `position` mas `buildingTable.vue` usou `address`
-- No render do `SelectDialog`, `zs-table-column.vue` usou `scope.column.type` inconsistente com `$attrs.type`, falhando a coluna de dicionário
+- 接口返回的字段是 `position` 但 `buildingTable.vue` 使用了 `address`
+- 在 `SelectDialog` 的渲染中，`zs-table-column.vue` 使用了 `scope.column.type`，与 `$attrs.type` 不一致，导致字典列失效
 
 ## 解决方案
-- Modificar `prop` e `dictUrl` em `buildingTable.vue`
-- `zs-table-column.vue` passa a usar `$attrs.type` para julgar o tipo de coluna
+- 修改 `buildingTable.vue` 中的 `prop` 和 `dictUrl`
+- `zs-table-column.vue` 改为使用 `$attrs.type` 来判断列类型
 
 ## 验证与归属
-- Tipo de memória: bug
+- 记忆类型: bug
 - 验证证据: src=产品2.0/035.md
 - 涉及文件: d:/repository/产品2.0/zhi2-web-admin/src/views/publicQuery/complex/components/buildingTable.vue, src/views/publicQuery/complex/detail.vue, src/components/zs-select-dialog/zs-select-dialog-func.vue, src/views/property/complex/components/rangeTable.vue, src/views/property/complex/components/houseTable.vue, src/components/zs-table-column/zs-table-column.vue, src/views/building/complexSearch/components/houseTable.vue, src/mixins/table.js
-- 所属项目: 产品2.0; sessão: dbc7cb9d-a0a8-4e87-8a32-7d0db2961532; base de código: none
+- 所属项目: 产品2.0; 会话: dbc7cb9d-a0a8-4e87-8a32-7d0db2961532; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

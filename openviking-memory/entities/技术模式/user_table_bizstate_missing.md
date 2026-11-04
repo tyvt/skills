@@ -1,24 +1,17 @@
-# Caixa de seleção de userTable não renderizada por falta de bizState
-Coluna de checkbox em userTable.vue tinha v-if="bizState=='0'", mas selectUserDialog não passava bizState.
+# userTable 的复选框因缺少 bizState 未渲染
+userTable.vue 中的复选框列有 v-if="bizState=='0'"，但 selectUserDialog 未传递 bizState。
 
 ## 描述
-- userTable.vue condicionava coluna de seleção a bizState === '0'.
-- selectUserDialog não transmitia bizState, deixando-o undefined e ocultando coluna.
+- userTable.vue 将选择列限制为 bizState === '0'。
+- selectUserDialog 未传递 bizState，导致其未定义并隐藏了列。
 
 ## 解决方案
-- Removido v-if para exibir coluna de checkbox permanentemente.
-- Usuários já selecionados continuam desabilitados via isSelectable.
+- 移除了 v-if 以永久显示复选框列。
+- 已选用户仍通过 isSelectable 保持禁用。
 
-## Arquivos
+## 文件
 - zhi2-web-admin/src/views/benefit/pubUseMoneyApply/detail.vue
 - zhi2-web-admin/src/views/msg/notice/components/selectUserDialog.vue
-- zhi2-web-admin/src/views/msg/notice/components/userTable.vue
-- zhi2-web-admin/src/mixins/subTableMixins.js
-- zhi2-web-admin/src/views/msg/notice/components/userNoticeTable.vue
-
-## Relações
-- Sessão 来源: 5687225e-f8a8-4719-a9e7-c4013411f266 (cursor)
-- 所属项目: produto 2.0
 
 <!-- MEMORY_FIELDS
 {

@@ -1,16 +1,16 @@
 # Portal Page Math Max
-Geração de números de página usava Math.max incorretamente, criando página extra.
+页码生成误用了 Math.max，产生了多余的页面。
 
 ## 描述
-- `displayedPages` foi escrito como `Math.max(2, this.pages)`, causando duas páginas no v-for quando total era 1.
-- Corrigido para `return this.pages`, exibindo apenas página 1 em caso de página única.
-- Afeta paginação de `PortalTable`.
+- `displayedPages` 被写为 `Math.max(2, this.pages)`，导致在总数为 1 时 v-for 中生成了两页。
+- 修正为 `return this.pages`，在单页情况下仅显示第 1 页。
+- 影响 `PortalTable` 的分页。
 
-## Arquivos
+## 文件
 - `PortalTable.vue`
 
-## Verificação
-- Sessão de origem: `176808fe-ac0e-40e4-872f-fa68fc7638ab`
+## 验证
+- 源会话: `176808fe-ac0e-40e4-872f-fa68fc7638ab`
 
 <!-- MEMORY_FIELDS
 {

@@ -1,19 +1,17 @@
-
-# Diálogos de certificado sem validação obrigatória de tipo
-No projeto 苏州市房地产监测V3, as regras de formulário dos diálogos de certificado não incluíam validação obrigatória de `certificateType`, causando ausência de asterisco e não bloqueio de envio.
+# 证书对话框缺少类型必填验证
+在项目苏州市房地产监测V3中，证书对话框的表单规则未包含`certificateType`的必填验证，导致缺少必填星号且未阻止提交。
 
 ## 问题根因
-- As regras (`rules`) do `certificatesDialog.vue` não incluíam validação obrigatória de `certificateType`
-- O formulário não exibia asterisco de obrigatório e não bloqueava valores vazios ao enviar
+- `certificatesDialog.vue`的`rules`未包含`certificateType`的必填验证
+- 表单未显示必填星号，且在提交时未阻止空值
 
 ## 解决方案
-- Adicionar `certificateType: [{ required: true, message: '证书类型不能为空', trigger: ['change'] }]` aos `rules` de `zhi2-web-admin/src/views/company/staffManagement/components/certificatesDialog.vue` e `personnelRecord/certificatesDialog.vue`
+- 在`zhi2-web-admin/src/views/company/staffManagement/components/certificatesDialog.vue`和`personnelRecord/certificatesDialog.vue`的`rules`中添加`certificateType: [{ required: true, message: '证书类型不能为空', trigger: ['change'] }]`
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/246.md
 - 涉及文件: zhi2-web-admin/src/views/company/staffManagement/components/certificatesDialog.vue, personnelRecord/certificatesDialog.vue, components/certificatesTable.vue, toB/personnelRecord/components/certificatesDialog.vue, institution/personnel/components/certificatesDialog.vue, company/staffManagement/components/detail.vue
-- 所属项目: 苏州市房地产监测V3; Sessão: 7c358850-cada-4f48-ae63-ef09a5db0ee9; Base de código: none
-
+- 所属项目: 苏州市房地产监测V3; Session: 7c358850-cada-4f48-ae63-ef09a5db0ee9; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

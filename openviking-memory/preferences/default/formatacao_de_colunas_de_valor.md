@@ -1,11 +1,11 @@
-- Prefere que colunas de valor desativem slots de exibição e usem `:formatter` com `amountFormatter` para alinhamento à direita; colunas numéricas puras alinham à direita por título com separador de milhar.
-- O script `zhi2-web-admin/scripts/scan-format-slots.py` verifica `zs-table-column` para garantir ausência de slots `amountFormatter`.
-- `amountFormatter` é usado apenas em `:formatter`, linha de total ou corpo de método.
+- 建议值列禁用显示插槽，并使用 `:formatter` 配合 `amountFormatter` 实现右对齐；纯数字列通过列标题右对齐，并使用千位分隔符。
+- 脚本 `zhi2-web-admin/scripts/scan-format-slots.py` 检查 `zs-table-column` 以确保不存在 `amountFormatter` 插槽。
+- `amountFormatter` 仅用于 `:formatter`、总计行或方法体中。
 
 <!-- MEMORY_FIELDS
 {
   "user": "default",
-  "topic": "Formatação de colunas de valor",
+  "topic": "",
   "source_extraction_id": "c7ea67c41536451ea2f1166b9de5c647",
   "version": 1,
   "memory_type": "preferences"

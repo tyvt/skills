@@ -1,15 +1,15 @@
 # Portal Broker Branch
-Coluna de arquivo de instituição ficava em branco em lista de filiais no BrokerPages.
+机构档案列在 BrokerPages 的分支列表中显示为空白。
 
 ## 描述
-- Slot da coluna de arquivo só renderizava quando `state==='list' && kind==='agencies'`; em `view=stores` a condição falhava.
-- Após correção, mostra informações básicas também em lista de filiais e `isBrokerList`, chamando `openRecord`.
+- 档案列的 Slot 仅在 `state==='list' && kind==='agencies'` 时渲染；在 `view=stores` 时条件不满足。
+- 修复后，在分支列表和 `isBrokerList` 中也显示基本信息，并调用 `openRecord`。
 
-## Arquivos
+## 文件
 - `BrokerPages.vue`, `RentalPages.vue`, `UnifiedLogin.vue`, `mock/brokers.js`, `tests/e2e/public-portal-interactions.spec.ts`
 
-## Verificação
-- Sessão de origem: `01c99a3c-2693-474a-bcc9-5c73f2538cbe`
+## 验证
+- 源会话: `01c99a3c-2693-474a-bcc9-5c73f2538cbe`
 
 <!-- MEMORY_FIELDS
 {

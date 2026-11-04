@@ -1,15 +1,15 @@
-# Espaçamento vertical de formulário de detalhe unificado em 24px
-O `padding-bottom` original de `.el-form-item` somado ao `row-gap` de `section-form` causava espaçamento anômalo; unificou `--detail-block-gap` para 24px e zerou o padding do item.
+# 详情表单垂直间距统一为 24px
+原始的 `.el-form-item` 的 `padding-bottom` 加上 `section-form` 的 `row-gap` 导致了异常的间距；将 `--detail-block-gap` 统一为 24px 并清零该项的 padding。
 
-## Pontos de contrato
-- `padding-bottom` de `.el-form-item` somado ao `row-gap` de `section-form` causava espaçamento anômalo
-- `--detail-block-gap` em `variables.css` alterado para `24px`
-- Em `detail-form.scss`, `padding-bottom:0` do item de formulário, exceto quando `.el-dialog__body` não tem `el-row` e empilha `el-col` direto, onde usa a variável para evitar sobreposição
+## 约定点
+- `.el-form-item` 的 `padding-bottom` 加上 `section-form` 的 `row-gap` 导致了异常的间距
+- `variables.css` 中的 `--detail-block-gap` 改为 `24px`
+- 在 `detail-form.scss` 中，表单项的 `padding-bottom:0`，除非 `.el-dialog__body` 没有 `el-row` 且直接堆叠 `el-col` 时，此时使用该变量以避免重叠
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/109.md
 - 涉及文件: styles/detail-form.scss, vite.config.js, styles/index.scss, styles/variables.css, styles/element-ui.scss, presale/entrustSale/detail.vue, zs-dialog/zs-dialog.vue
-- 所属项目: 苏州市房地产监测V3; sessão: 14ac23b1-f562-46c6-80d9-d8e3b7a96870; baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 14ac23b1-f562-46c6-80d9-d8e3b7a96870; baseline: none
 
 <!-- MEMORY_FIELDS
 {

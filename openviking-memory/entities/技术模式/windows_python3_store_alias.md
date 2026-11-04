@@ -1,13 +1,13 @@
-# Windows python3 abre loja
-No Windows, os stubs python.exe/python3.exe em WindowsApps redirecionam chamadas de python3 para a Microsoft Store.
-## Problema
-- Stubs em WindowsApps causam redirecionamento para loja ao invocar python3.
-- Ambiente: Windows com Python em C:\Program Files\Python310.
+# Windows python3 打开商店
+在 Windows 中，WindowsApps 里的 python.exe/python3.exe 存根会将 python3 的调用重定向到 Microsoft Store。
+## 问题
+- WindowsApps 中的存根在调用 python3 时导致重定向到商店。
+- 环境：Windows，Python 位于 C:\Program Files\Python310。
 ## 解决方案
-- Remover stub e criar hard link de C:\Program Files\Python310\python3.exe para python.exe.
-- Configurar ~/.bashrc e python.defaultInterpreterPath no Cursor para contornar.
-## Verificação
-- 来源: 苏州市房地产监测V3-leftover/005.md; sessão 7907a58f-b73f-49f7-ad3d-d1a5d8cfa3eb.
+- 删除存根并创建从 C:\Program Files\Python310\python3.exe 到 python.exe 的硬链接。
+- 配置 ~/.bashrc 和 Cursor 中的 python.defaultInterpreterPath 以规避。
+## 验证
+- 来源: 苏州市房地产监测V3-leftover/005.md; session 7907a58f-b73f-49f7-ad3d-d1a5d8cfa3eb.
 - 涉及文件: zhi2-web-admin/.vscode/settings.json; Cursor User settings.json.
 
 <!-- MEMORY_FIELDS

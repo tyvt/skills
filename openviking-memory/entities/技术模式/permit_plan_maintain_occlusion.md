@@ -1,19 +1,19 @@
-# PermitPlanPanel oculta botão de manutenção com imagem vazia
-No 苏州市房地产监测V3, `PermitPlanPanel` renderiza imagem vazia quando não mantido e não operável, cobrindo a entrada de manutenção.
+# PermitPlanPanel 用空图像隐藏维护按钮
+在 苏州市房地产监测V3 中，`PermitPlanPanel` 在未维护且不可操作时渲染空图像，覆盖了维护入口。
 
 ## 问题根因
-- `PermitPlanPanel` renderiza `AppendixEmpty` quando não mantido e `operable===false`
-- Botão «manutenção» só aparece quando `operable===true`; imagem cobre a entrada
+- `PermitPlanPanel` 在未维护且 `operable===false` 时渲染 `AppendixEmpty`
+- “维护”按钮仅在 `operable===true` 时出现；图像覆盖入口
 
-## Correção
-- `PermitPlanPanel.vue` remove imagem vazia quando não mantido
-- Adiciona `showMaintainButton` (mostra quando não somente-leitura e editável ou não mantido)
-- `detail.vue` passa `planPanelReadonly` e `canOperatePlan` para alinhar botões e navegação
+## 修复
+- `PermitPlanPanel.vue` 在未维护时移除空图像
+- 添加 `showMaintainButton` （当非只读且可编辑或未维护时显示）
+- `detail.vue` 传递 `planPanelReadonly` 和 `canOperatePlan` 以对齐按钮和导航
 
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-rest/073.md
 - 涉及文件: AppendixRequirementCard.vue, PermitInfoPanel.vue, PermitPlanPanel.vue, detail.vue, Headline/index.vue, AppendixEmpty/index.vue, index.vue, CashsaleDetail.vue
-- 所属项目: 苏州市房地产监测V3; Sessão: 5c95c517-e8ad-4225-b0de-55c6271384c8; Baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 5c95c517-e8ad-4225-b0de-55c6271384c8; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

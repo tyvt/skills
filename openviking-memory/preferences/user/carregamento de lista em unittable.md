@@ -1,6 +1,6 @@
-- Remover `immediate:true` do `watch` de `buildingId` em `unitTable`; o primeiro carregamento deve usar apenas `init()` de `subTableMixins`.
-- Evitar chamadas duplicadas de `getList()` causadas por `init()` e `watch(immediate:true)` ambos invocando a função.
-- Mudanças de `buildingId` continuam a disparar atualização via `watch` após o carregamento inicial.
+- 从 `unitTable` 中的 `buildingId` 的 `watch` 移除 `immediate:true`；首次加载应仅使用 `subTableMixins` 的 `init()`。
+- 避免由 `init()` 和 `watch(immediate:true)` 均调用该函数而引起的 `getList()` 重复调用。
+- `buildingId` 的更改在初始加载后继续通过 `watch` 触发更新。
 
 <!-- MEMORY_FIELDS
 {

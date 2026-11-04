@@ -1,26 +1,24 @@
+# 清理 storage 前的 E2E 会话清理协议
+Playwright 跨端 clearBrowserSession 在 about:blank 访问 storage 时抛出 SecurityError；需要先进入真实 origin。
 
-# Protocolo de limpeza de sessão E2E antes de limpar storage
-Playwright cross-end clearBrowserSession em about:blank lança SecurityError ao acessar storage; precisa entrar em origin real primeiro.
-
-## Sintomas
-- Casos cross-end (03 troca empresa para admin) chamam clearBrowserSession e falham com SecurityError
-- clearCookies funciona mas limpar storage quebra, fácil de confundir com problema de login ou permissão
+## 症状
+- 跨端用例（03 将企业切换为 admin）调用 clearBrowserSession 并因 SecurityError 失败
+- clearCookies 正常工作但清理 storage 出错，容易与登录或权限问题混淆
 
 ## 问题根因
-- No início do caso, page está em about:blank sem origin; page.evaluate acessa localStorage/sessionStorage e é bloqueado pela política de mesma origem
-- clearCookies usa camada context, não depende de origin, por isso o comportamento é inconsistente
+- 在用例开始时，page 处于没有 origin 的 about:blank；page.evaluate 访问 localStorage/sessionStorage 被同源策略阻止
+- clearCookies 使用 context 层，不依赖 origin，因此行为不一致
 
 ## 解决方案
-- clearBrowserSession em 3 etapas: primeiro context().clearCookies(); depois page.evaluate detecta protocolo http/https (try/catch); se não atender, goto('/#/') para entrar na app; então limpar localStorage/sessionStorage
-- A própria detecção deve ter catch para não quebrar antes
-- Em e2e/fixtures/auth-helpers.js verifica protocolo; se não for http/https faz page.goto antes de limpar storage
-- Textos de status do fluxo seguem o critério do usuário, não inferir
+- clearBrowserSession 分 3 步：首先 context().clearCookies()；然后 page.evaluate 检测 http/https 协议（try/catch）；如果不满足，goto('/#/') 进入 app；然后清理 localStorage/sessionStorage
+- 检测本身应有 catch 以免提前中断
+- 在 e2e/fixtures/auth-helpers.js 中检查协议；如果不是 http/https 则在清理 storage 前执行 page.goto
+- 流程状态文本遵循用户标准，不要推断
 
-## Verificação e proveniência
-- 验证证据: clearBrowserSession em about:blank limpando storage direto dispara SecurityError; solução com detecção canClearOnCurrentPage + goto antes de limpar
+## 验证与来源
+- 验证证据: 在 about:blank 直接清理 storage 的 clearBrowserSession 会触发 SecurityError；解决方案为使用 canClearOnCurrentPage 检测 + 清理前 goto
 - 涉及文件: e2e/fixtures/auth-helpers.js, e2e/fixtures/company-helpers.js, e2e/fixtures/register-helpers.js, e2e/company/company-record-change.spec.js, src/views/company/companyManagement/components/CompanyBasicInfoDetail.vue, src/views/company/companyManagement/change/detail.vue, src/views/toB/change/detail.vue, src/views/toB/companyRecord/detail.vue, package.json
-- 所属项目: 产品2.0; sessão: c24a0b77-252c-498f-8424-de964da60242; base de código: 62d5fb9
-
+- 所属项目: 产品2.0; session: c24a0b77-252c-498f-8424-de964da60242; 代码库: 62d5fb9
 
 <!-- MEMORY_FIELDS
 {

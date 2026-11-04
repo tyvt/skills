@@ -1,20 +1,20 @@
-# Tipo de cobrança sem opções por dicionário errado
-O campo de tipo de cobrança do esquema de serviço não possui opções porque os componentes usaram a chave de dicionário `charge_type` em vez de `FEE_TYPE`.
+# 由于字典错误导致收费类型无选项
+服务方案中的收费类型字段没有选项，因为组件使用了字典键 `charge_type` 而不是 `FEE_TYPE`。
 
 ## 问题根因
-- `ServiceSchemePanel.vue` e `AgencyBranchDetail.vue` usam a chave de dicionário incorreta `charge_type`
-- O sistema atual utiliza `FEE_TYPE`, causando dropdown de tipo de cobrança sem opções
+- `ServiceSchemePanel.vue` 和 `AgencyBranchDetail.vue` 使用了错误的字典键 `charge_type`
+- 当前系统使用 `FEE_TYPE`，导致收费类型下拉框没有选项
 
 ## 解决方案
-- Alterar a chave de dicionário para `FEE_TYPE` em `ServiceSchemePanel.vue`, `AgencyBranchDetail.vue` e no mock `agency-branch-flow.spec.js`
-- Sincronizar os testes e2e correspondentes
+- 将字典键改为 `FEE_TYPE`，涉及 `ServiceSchemePanel.vue`、`AgencyBranchDetail.vue` 以及 mock 文件 `agency-branch-flow.spec.js`
+- 同步相应的 e2e 测试
 
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-leftover/118.md
 - 涉及文件: `ServiceSchemePanel.vue`, `Step4ServiceScheme.vue`, `AgencyBranchDetail.vue`, `agency-branch-flow.spec.js`
 - 所属项目: 苏州市房地产监测V3
-- Sessão de origem: 35fd1584-6f54-4128-979b-a920dbba023c
-- Baseline de código: none
+- 源会话: 35fd1584-6f54-4128-979b-a920dbba023c
+- 代码基线: none
 
 <!-- MEMORY_FIELDS
 {

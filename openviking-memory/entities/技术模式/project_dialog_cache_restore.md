@@ -1,20 +1,20 @@
-# Restauração de cache de diálogo de seleção de projeto global
-Na camada de layout/home, o diálogo de seleção de projeto imobiliário usa localStorage + validação de permissão para restauração estável sem reabrir após refresh.
+# 全局项目选择对话框的缓存恢复
+在 layout/home 层，项目选择对话框使用 localStorage + 权限验证来实现稳定恢复，刷新后无需重新打开。
 
-## Fenômeno
-- Implementação original abria diálogo de seleção de projeto (comunidade) a cada refresh, má experiência
-- Visibilidade não ligada a cache local, perdia estado «já selecionado» após refresh
+## 现象
+- 原始实现每次刷新都会打开项目选择对话框（社区），体验差
+- 可见性未与本地缓存关联，刷新后丢失“已选中”状态
 
 ## 解决方案
-- bProjectDialog.vue novo tryRestoreFromCache(): lê currentProjectId do localStorage, se na lista de áreas operáveis (permissão) restaura seleção, sincroniza Vuex, fecha diálogo
-- Usar cacheRestored para evitar que restauração automática seja vista como troca manual e feche errado
-- layout/index.vue não abre por padrão; syncProjectDialogVisibility: cache válido não abre, inválido limpa e abre
+- bProjectDialog.vue 新增 tryRestoreFromCache(): 从 localStorage 读取 currentProjectId，如果在可操作区域列表（权限）中则恢复选择，同步 Vuex，关闭对话框
+- 使用 cacheRestored 以避免自动恢复被视为手动切换而导致错误关闭
+- layout/index.vue 默认不打开；syncProjectDialogVisibility: 缓存有效则不打开，无效则清除并打开
 
-## Restrições
-- Cache deve validar com lista de permissão; inválido limpar e reabrir, não só checar existência de key
+## 限制
+- 缓存必须与权限列表验证；无效则清除并重新打开，不能仅检查 key 是否存在
 
-## Relacionados
-- 涉及文件: zhi2-web-admin/src/views/home/bProjectDialog.vue, index-wrapper.vue, layout/index.vue; 所属项目: 园区物管2.0; sessão: d3445a30-e077-4745-9bfa-b18a1203606d; baseline: 036.md
+## 相关
+- 涉及文件: zhi2-web-admin/src/views/home/bProjectDialog.vue, index-wrapper.vue, layout/index.vue; 所属项目: 园区物管2.0; 会话: d3445a30-e077-4745-9bfa-b18a1203606d; baseline: 036.md
 
 <!-- MEMORY_FIELDS
 {

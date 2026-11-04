@@ -1,19 +1,19 @@
-# Ramos de ambiente Suzhou remanescentes causam lógica não unificada
-No projeto 苏州市房地产监测V3, arquivos como `exchangeContract/index.vue` mantêm ramos `isSuzhouzhizai` e `currentEnvironment`, acoplando a lógica.
+# 残留的苏州环境分支导致逻辑不统一
+在苏州市房地产监测V3项目中，诸如 `exchangeContract/index.vue` 的文件保留了 `isSuzhouzhizai` 和 `currentEnvironment` 分支，耦合了逻辑。
 
 ## 问题根因
-- `exchangeContract/index.vue` e outros mantêm ramos `isSuzhouzhizai` e `currentEnvironment`
-- Os ramos de ambiente acoplam a lógica e impedem unificação entre arquivos
+- `exchangeContract/index.vue` 和其他文件保留 `isSuzhouzhizai` 和 `currentEnvironment` 分支
+- 环境分支耦合逻辑并阻碍文件间统一
 
 ## 解决方案
-- Remover os ramos e unificar a estrutura genérica
-- Fixar colunas exibidas e a API `/building/buildinginfo/xyBuilding` de `BuildSelectDialog.vue`
-- Em `rec/index.vue`, unificar a interface `listRec` e os textos
+- 移除分支并统一通用结构
+- 固定 `BuildSelectDialog.vue` 中显示的列和 API `/building/buildinginfo/xyBuilding`
+- 在 `rec/index.vue` 中，统一接口 `listRec` 和文本
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/277.md
-- 涉及文件: exchangeContract/index.vue, contractView/index.vue, BranchOneDialog.vue, BuildSelectDialog.vue (duas pastas benefit), rec/index.vue
-- 所属项目: 苏州市房地产监测V3; Sessão: bf97360e-6cc0-4224-aef3-edf155a68b8e; Baseline: none
+- 涉及文件: exchangeContract/index.vue, contractView/index.vue, BranchOneDialog.vue, BuildSelectDialog.vue (两个 benefit 文件夹), rec/index.vue
+- 所属项目: 苏州市房地产监测V3; 会话: bf97360e-6cc0-4224-aef3-edf155a68b8e; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

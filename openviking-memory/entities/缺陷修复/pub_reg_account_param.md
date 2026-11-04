@@ -1,26 +1,26 @@
-# Filtro de conta regulatória pública em diálogo bancário
-No projeto Suzhou Housing G, o parâmetro isPubRegulatoryAccount é enviado apenas quando o modo não é 'openedAdd'.
+# 银行对话框中的公共监管账户筛选
+在 Suzhou Housing G 项目中，参数 isPubRegulatoryAccount 仅当模式不为 'openedAdd' 时发送。
 
-## Causa e solução
-- Em detail.vue, a função showBankDialog verifica formMode.
-- Se formMode != 'openedAdd', envia isPubRegulatoryAccount:'1' para filtrar bancos operadores.
-- Caso contrário, não envia o parâmetro.
+## 原因与解决
+- 在 detail.vue 中，函数 showBankDialog 检查 formMode。
+- 如果 formMode != 'openedAdd'，则发送 isPubRegulatoryAccount:'1' 以筛选运营银行。
+- 否则，不发送该参数。
 
-## Arquivos envolvidos
+## 涉及的文件
 - src/views/benefit/pubRegulatoryAccount/detail.vue
 - src/views/system/regionBankAuth/detail.vue
 - src/utils/workBank.js
 - src/views/property/propertyAccount/detail.vue
 - src/views/benefit/pubRegulatoryAccount/index.vue
 
-## Verificação
-- 验证证据: 苏住房G/088.md (documento interno).
-- Sessão de origem: d88a1f97-8d9a-4d6d-a7cd-02ddf13b5a0d.
-- Linha de base de código: none.
+## 验证
+- 验证证据: 苏住房G/088.md (内部文档).
+- 源会话: d88a1f97-8d9a-4d6d-a7cd-02ddf13b5a0d.
+- 代码基线: none.
 
 <!-- MEMORY_FIELDS
 {
-  "category": "Correção de bug",
+  "category": "缺陷修复",
   "name": "pub_reg_account_param",
   "source_extraction_id": "d932d4a67f654d5dbfff00e631306d33",
   "version": 1,

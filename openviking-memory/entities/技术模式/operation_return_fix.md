@@ -1,11 +1,11 @@
-# Correção de 404 por lógica de retorno que remove segmento de rota
-A lógica de retorno padrão do `OperationBtnGroup` removia o último segmento do caminho (ex.: `/import/add` → `/import`), causando 404 quando o caminho intermediário não tinha rota.
+# 修复因移除路由段的返回逻辑导致的404问题
+`OperationBtnGroup` 的默认返回逻辑会移除路径的最后一段（例如：`/import/add` → `/import`），当中间路径没有路由时会导致404。
 
 ## 解决方案
-- `import.vue` desativou o retorno embutido e passou a usar `navigateBack()` priorizando `backUrl`
-- `index.vue` passa `backUrl: this.$route.path` ao navegar
+- `import.vue` 禁用了内置返回，并改用 `navigateBack()`，优先使用 `backUrl`
+- `index.vue` 在导航时传递 `backUrl: this.$route.path`
 
-## Arquivos envolvidos
+## 涉及的文件
 - zhi2-web-admin/src/views/property/spFeeBill/components/index.vue
 - zhi2-web-admin/src/views/property/spFeeBill/components/import.vue
 - zhi2-web-admin/src/mixins/detailMixins.js
@@ -15,9 +15,9 @@ A lógica de retorno padrão do `OperationBtnGroup` removia o último segmento d
 - zhi2-web-admin/src/utils/ruoyi.js
 - zhi2-web-admin/src/router/index.js
 
-## Verificação
-- Sessão de origem: 7e35018a-3038-4ded-afb4-236a2607fad5 (extracted source=cursor)
-- Linha de base de código: none
+## 验证
+- 源会话：7e35018a-3038-4ded-afb4-236a2607fad5 (extracted source=cursor)
+- 代码基线：none
 
 <!-- MEMORY_FIELDS
 {

@@ -1,16 +1,16 @@
-# Portal Label No Fullwidth Colon
-Padrão do portal para remover dois pontos de largura total após rótulos de campos em pop-ups de segundo nível.
+# 门户标签无全角冒号
+门户规范，用于在二级弹窗中的字段标签后移除全角冒号。
 
-## Escopo
-- Aplica-se a PropertyPages.vue, InformationPages.vue, BrokerPages.vue, RentalPages.vue, PropertyDetailDialog.vue, RentalDetailDialog.vue, UnifiedLogin.vue, PortalSearch.vue.
-- Remove os dois pontos de largura total (全角冒号) após rótulos de campos nesses componentes.
+## 范围
+- 适用于 PropertyPages.vue, InformationPages.vue, BrokerPages.vue, RentalPages.vue, PropertyDetailDialog.vue, RentalDetailDialog.vue, UnifiedLogin.vue, PortalSearch.vue。
+- 移除这些组件中字段标签后的全角冒号（全角冒号）。
 
-## Exceções
-- Mantém dois pontos em formato de documento oficial e textos de consulta; formulário de consulta originalmente não possui dois pontos.
+## 例外
+- 保留官方文档格式和查询文本中的冒号；查询表单原本没有冒号。
 
-## Verificação
-- 验证证据: src=门户/019.md; sessão: 2fd56787-bd18-4625-bb06-d6a35e3562b5
-- Arquivos envolvidos: UnifiedLogin.vue, InformationPages.vue, PropertyPages.vue, RentalPages.vue, PortalSearch.vue, RentalDetailDialog.vue, BrokerPages.vue, PropertyDetailDialog.vue.
+## 验证
+- 验证证据: src=门户/019.md; 会话: 2fd56787-bd18-4625-bb06-d6a35e3562b5
+- 涉及的文件: UnifiedLogin.vue, InformationPages.vue, PropertyPages.vue, RentalPages.vue, PortalSearch.vue, RentalDetailDialog.vue, BrokerPages.vue, PropertyDetailDialog.vue.
 
 <!-- MEMORY_FIELDS
 {

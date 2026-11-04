@@ -1,18 +1,18 @@
-# Linha narrativa da página de pré-venda com justify e input largura total
-No projeto Suzhou Real Estate Monitoring V3, a linha narrativa usava text-align: justify e inputs ocupavam largura total, causando desalinhamento.
+# 预售页面中带 justify 且输入框占满宽度的叙述行
+在 Suzhou Real Estate Monitoring V3 项目中，叙述行使用了 text-align: justify，且输入框占满整行宽度，导致错位。
 
 ## 问题根因
-- text-align: justify espalhava o texto da linha narrativa.
-- Inputs numéricos ocupavam a linha inteira por padrão.
+- text-align: justify 使叙述行文本分散排列。
+- 数字输入框默认占据整行。
 
 ## 解决方案
-- Removido text-align: justify; a linha narrativa usa flex com flex-wrap.
-- Texto envolveu-se em <span class="narrative-text">.
-- Inputs com largura fixa: número 88px, área 108px, nome de lugar 280px.
+- 移除了 text-align: justify；叙述行使用 flex 与 flex-wrap。
+- 文本包裹在 <span class="narrative-text"> 中。
+- 输入框固定宽度：数字 88px，面积 108px，地名 280px。
 
-## Arquivos e verificação
+## 文件与验证
 - 涉及文件: PermitPlanPanel.vue, PresalePlanFillForm.vue, plan/detail.vue, detail.vue, Headline/index.vue, presale-permit-helpers.js, PermitAppendixPanel.vue.
-- 验证证据: src=苏州市房地产监测V3-rest/057.md; sessão 3b1ff38c-e27a-4867-a215-6627c1d4380c.
+- 验证证据: src=苏州市房地产监测V3-rest/057.md; session 3b1ff38c-e27a-4867-a215-6627c1d4380c.
 
 <!-- MEMORY_FIELDS
 {

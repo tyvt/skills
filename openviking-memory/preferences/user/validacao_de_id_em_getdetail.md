@@ -1,11 +1,11 @@
-- O mixin `form.js` `getDetail()` usa `validateDetailRequiredParams()` que exige `id` por padrão, fazendo com que interfaces sem id (ex.: `platformConfig/detail.vue` reescreveu `detailApiFull`) falhem e pulsem requisição.
-- Para adaptar interfaces sem id, reescrever `getDetailRequiredParams()` em `detail.vue` removendo a obrigatoriedade de `id`.
-- Verificação: evidência 产品2.0/064.md; sessão aac565c5.
+- 混入 `form.js` 的 `getDetail()` 使用 `validateDetailRequiredParams()`，该函数默认要求 `id`，导致无 `id` 的接口（例如：`platformConfig/detail.vue` 重写了 `detailApiFull`）失败并触发请求。
+- 为了适配无 `id` 的接口，在 `detail.vue` 中重写 `getDetailRequiredParams()`，移除对 `id` 的必填约束。
+- 验证：证据 产品2.0/064.md; 会话 aac565c5。
 
 <!-- MEMORY_FIELDS
 {
   "user": "user",
-  "topic": "Validação de id em getDetail",
+  "topic": "主题标题: 在 getDetail 中验证 id",
   "source_extraction_id": "3767eb61220a4803b7b3738f9ee63044",
   "version": 1,
   "memory_type": "preferences"

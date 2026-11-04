@@ -1,18 +1,18 @@
-# Ajuste de altura do detail-container
-O zhi2-web-admin do projeto 苏州市房地产监测V3 tinha .detail-container com height: calc(100vh - 120px) causando excesso de espaço inferior e truncamento de título.
+# detail-container 高度调整
+项目 苏州市房地产监测V3 的 zhi2-web-admin 中的 `.detail-container` 使用了 `height: calc(100vh - 120px)`，导致底部空间过剩和标题截断。
 
 ## 问题
-- `.detail-container` em src/styles/index.scss fixava height: calc(100vh - 120px)
-- Valor real do cabeçalho era 104px, então deduzia 16px a mais
-- Causava 40px de espaço em branco inferior e truncamento do título
+- `src/styles/index.scss` 中的 `.detail-container` 固定了 `height: calc(100vh - 120px)`
+- 头部的实际高度为 104px，因此多扣除了 16px
+- 导致底部出现 40px 空白并截断标题
 
-## Correção
-- Restringir escopo via `#app-main.app-main:has(> .detail-container)`
-- Isolar 468 referências dentro de el-dialog
+## 修正
+- 通过 `#app-main.app-main:has(> .detail-container)` 限制作用域
+- 隔离 `el-dialog` 内的 468 处引用
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3/141.md
-- 所属项目: 苏州市房地产监测V3; sessão: 21609fbb-aecf-47c4-8d70-955eeb1e9b2b; baseline: none
+- 所属项目: 苏州市房地产监测V3; session: 21609fbb-aecf-47c4-8d70-955eeb1e9b2b; baseline: none
 
 <!-- MEMORY_FIELDS
 {

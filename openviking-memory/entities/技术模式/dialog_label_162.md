@@ -1,16 +1,16 @@
-# Rótulos de campos de diálogos básicos com largura fixa 162px e valor alinhado à esquerda
-Nos diálogos de informações básicas do portal, os rótulos de campo têm largura fixa de 162px e os valores ficam alinhados à esquerda, mantendo o padrão dos diálogos da home.
+# 基础对话框字段标签宽度固定为162px且值左对齐
+在门户的基础信息对话框中，字段标签宽度固定为162px，值左对齐，保持首页对话框的规范。
 
-## Pontos de norma
-- Rótulo de campo com largura fixa de 162px
-- Valor de campo alinhado à esquerda, cobrindo diálogos da home de informações de pessoas, crédito e detalhes de imóveis
-- Ao mudar UI em lote, percorrer os DetailDialogs sob PortalDialogHost (pessoas, crédito, imóveis etc.), evitando consertar só um; diálogos de detalhe de empresa/licença usam spec própria (rótulo alinhado à direita 168px/150px via zs-dialog), não este padrão
-- Os demais diálogos da home já estavam alinhados à esquerda, sem necessidade de repetir
+## 规范要点
+- 字段标签宽度固定为162px
+- 字段值左对齐，覆盖首页中人员信息、信用和房产详情的对话框
+- 批量修改UI时，遍历 PortalDialogHost 下的 DetailDialogs（人员、信用、房产等），避免只修复其中一个；公司/许可证详情对话框使用自有规范（通过 zs-dialog 实现标签右对齐 168px/150px），不适用此标准
+- 首页的其他对话框已经左对齐，无需重复修改
 
-## Arquivos e origem
-- 涉及文件: PortalDialogHost.vue, PropertyDetailDialog.vue, RentalDetailDialog.vue (em zhi2-web-admin/src/views/home/publicPortal)
+## 文件与来源
+- 涉及文件: PortalDialogHost.vue, PropertyDetailDialog.vue, RentalDetailDialog.vue (位于 zhi2-web-admin/src/views/home/publicPortal)
 - 验证证据: src=门户/052.md
-- Sessão de origem: 4bae8daf-b9b1-4788-9e4b-f12564292ebb; base de código: e1f8e0b
+- 来源会话: 4bae8daf-b9b1-4788-9e4b-f12564292ebb; 代码库: e1f8e0b
 
 <!-- MEMORY_FIELDS
 {

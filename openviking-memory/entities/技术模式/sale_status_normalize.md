@@ -1,17 +1,16 @@
-# Normalização do status de venda do imóvel
-No módulo house-limit do Suzhou Real Estate Monitoring V3, os dados do imóvel possuem os campos duplos `saleStatus` e `sale_status`; `resolveHouseSaleStatus` em `houseLimitConstants.js` unifica a origem para que a exibição `dict-tag` e a lógica de desativação `isHouseSelectable` fiquem consistentes.
+# 房屋销售状态的规范化
+在苏州市房地产监测V3的house-limit模块中，房产数据存在重复的字段`saleStatus`和`sale_status`；`houseLimitConstants.js`中的`resolveHouseSaleStatus`统一了来源，以使`dict-tag`显示和`isHouseSelectable`禁用逻辑保持一致。
 
-## Pontos de alteração
-- `houseLimitConstants.js` adiciona `resolveHouseSaleStatus` com lógica `saleStatus ?? sale_status`
-- `isHouseSold` e `normalizeHouseLimitLineRow` chamam `resolveHouseSaleStatus`
-- `HouseSelectDialog.normalizeHouse` grava o `saleStatus` normalizado
-- Mantido o aviso `el-form-item` existente sem alterar a estrutura de negócio
+## 变更点
+- `houseLimitConstants.js`添加`resolveHouseSaleStatus`，逻辑为`saleStatus ?? sale_status`
+- `isHouseSold`和`normalizeHouseLimitLineRow`调用`resolveHouseSaleStatus`
+- `HouseSelectDialog.normalizeHouse`记录规范化后的`saleStatus`
+- 保留现有的`el-form-item`提示，不改变业务结构
 
-## Verificação e atribuição
-- Verificação: src=苏州市房地产监测V3/172.md; src=苏州市房地产监测V3-rest/149.md
+## 验证与归属
+- 验证: src=苏州市房地产监测V3/172.md; src=苏州市房地产监测V3-rest/149.md
 - 涉及文件: HouseSelectDialog.vue, houseLimitConstants.js, detail.vue, limitFormMixin.js, limitAdd.vue, HouseLimitFloorSelectGrid.vue, limitCancel.vue
-- Sessão de origem: f742546b-5fa1-4c38-be7c-f50d9d083f69; baseline de código: none
-
+- 源会话: f742546b-5fa1-4c38-be7c-f50d9d083f69; 代码基线: none
 
 <!-- MEMORY_FIELDS
 {

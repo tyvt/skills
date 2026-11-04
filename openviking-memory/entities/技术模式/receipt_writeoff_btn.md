@@ -1,15 +1,15 @@
-# Linha de recibo conciliado exibia botão de baixa incorretamente
-No projeto Park Public Benefit (zhi2-web-admin), a função bankReceiptOperateButtons em pubBankDetailDay/index.vue não verificava o status de conciliação e sempre exibia o botão de baixa.
+# 已对账收据行错误地显示了核销按钮
+在 Park Public Benefit (zhi2-web-admin) 项目中，pubBankDetailDay/index.vue 中的 bankReceiptOperateButtons 函数未检查对账状态，且总是显示核销按钮。
 
 ## 问题根因
-- bankReceiptOperateButtons não distinguia por status de conciliação, exibindo baixa também em linhas conciliadas
-- Faltava proteção para o status conciliado
+- bankReceiptOperateButtons 未根据对账状态进行区分，在对账行中也显示了核销按钮
+- 缺少针对已对账状态的保护
 
 ## 解决方案
-- Nova função isBankReceiptReconciled(row) exibe botões de visualizar/baixa/nenhum conforme condição
-- handleReceiptWriteOff recebeu proteção para status conciliado
+- 新函数 isBankReceiptReconciled(row) 根据条件显示查看/核销/无按钮
+- handleReceiptWriteOff 增加了对已对账状态的保护
 
-## Arquivos envolvidos
+## 涉及的文件
 - src/views/benefit/pubBankDetailDay/index.vue
 - src/views/benefit/components/BankReconciliation.vue
 - src/views/maintenance/maintenanceRec/index.vue
@@ -19,8 +19,8 @@ No projeto Park Public Benefit (zhi2-web-admin), a função bankReceiptOperateBu
 - src/views/benefit/components/BankReceiptForm.vue
 - src/views/benefit/pubCheckoutManage/index.vue
 
-## Verificação e atribuição
-- 所属项目: Park Public Benefit; sessão: 6a315793-11fc-4e4d-9c27-2ea581a2e486; base: none
+## 验证与归属
+- 所属项目: Park Public Benefit; 会话: 6a315793-11fc-4e4d-9c27-2ea581a2e486; base: none
 
 <!-- MEMORY_FIELDS
 {

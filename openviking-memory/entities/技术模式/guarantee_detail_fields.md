@@ -1,17 +1,17 @@
-# Falta de Campos em Detalhe de Garantia Causa Erro de Requisição
-No projeto Suzhou Real Estate Monitoring V3, o `data()` de `guarantee/detail.vue` não tem `primaryKey`, `moduleName`, `businessName`, causando aviso Vue e impedindo `getDetail()` de montar `/prefund/useMoneyApply/detail`.
+# 担保详情缺少字段导致请求错误
+在项目 Suzhou Real Estate Monitoring V3 中，`guarantee/detail.vue` 的 `data()` 缺少 `primaryKey`、`moduleName`、`businessName`，导致 Vue 警告并阻止 `getDetail()` 挂载 `/prefund/useMoneyApply/detail`。
 
 ## 问题根因
-- `data()` de `guarantee/detail.vue` ausência dos campos `primaryKey`, `moduleName`, `businessName`
-- Causa aviso Vue e `getDetail()` falha ao concatenar `/prefund/useMoneyApply/detail`
+- `guarantee/detail.vue` 的 `data()` 缺少字段 `primaryKey`、`moduleName`、`businessName`
+- 导致 Vue 警告并且 `getDetail()` 拼接 `/prefund/useMoneyApply/detail` 失败
 
 ## 解决方案
-- Completar os três campos em `data()` de `guarantee/detail.vue` alinhados com `guarantee/index.vue`
+- 在 `guarantee/detail.vue` 的 `data()` 中补全这三个字段，与 `guarantee/index.vue` 对齐
 
-## Verificação e Atribuição
+## 验证与归因
 - 验证证据: src=苏州市房地产监测V3/202.md
 - 涉及文件: supervision/unblock/guarantee/detail.vue, mixins/detailMixins.js, supervision/unblock/guarantee/index.vue, supervision/unblock/usemoney/detail.vue, supervision/unblock/guarantee/changedetail.vue, supervision/unblock/usemoneyRevoke/detail.vue, mixins/form.js, supervision/unblock/notice/detail.vue
-- 所属项目: Suzhou Real Estate Monitoring V3; Sessão: e533c035-bd03-4c12-aa72-72937c898843; Base: none
+- 所属项目: Suzhou Real Estate Monitoring V3; 会话: e533c035-bd03-4c12-aa72-72937c898843; Base: none
 
 <!-- MEMORY_FIELDS
 {

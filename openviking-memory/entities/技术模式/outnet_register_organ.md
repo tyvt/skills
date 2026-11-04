@@ -1,16 +1,16 @@
-# Registro externo de empresa dev exige organType 01
-No registro externo de empresas de desenvolvimento, o `organType` deve ser uniformemente `01` (empresa de desenvolvimento), correspondendo ao título da página «Registro de conta empresarial (empresa de desenvolvimento)».
+# 外部开发企业注册要求 organType 01
+在外部开发企业注册中，`organType` 必须统一为 `01`（开发企业），与页面标题«企业账户注册（开发企业）»相符。
 
-## Pontos de modificação
-- Valor inicial do formulário em `src/utils/registerValidate.js`
-- `getQueryParams()` em `src/views/company/companyRegister/index.vue`
-- Rascunho de teste em `e2e/fixtures/register-helpers.js`
+## 修改点
+- 表单初始值在 `src/utils/registerValidate.js`
+- `getQueryParams()` 在 `src/views/company/companyRegister/index.vue`
+- 测试草稿在 `e2e/fixtures/register-helpers.js`
 
 ## 验证与归属
-- Tipo de memória: pattern
+- 记忆类型: pattern
 - 验证证据: src=产品2.0/033.md
 - 涉及文件: d:/repository/产品2.0/zhi2-web-admin/src/views/company/companyRegister/index.vue, src/views/register/companyRegister.vue, src/api/company/companyRegister.js, src/views/register/components/companyInfo.vue, e2e/fixtures/company-helpers.js, src/views/company/companyRegister/detail.vue, src/views/login.vue, src/utils/registerValidate.js
-- 所属项目: 产品2.0; sessão: bc67591b-a7e5-4c59-bfbf-ecc997f7c3f3; base de código: none
+- 所属项目: 产品2.0; 会话: bc67591b-a7e5-4c59-bfbf-ecc997f7c3f3; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

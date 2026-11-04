@@ -1,18 +1,18 @@
-# ReferenceError por shorthand ES6 não importado em componente
-O `noticeChange/detail.vue` usava a propriedade shorthand ES6 `TransactionDetailTable` em `components` sem importar a variável, causando ReferenceError ao carregar o módulo.
+# 组件中未导入 ES6 简写属性导致的 ReferenceError
+`noticeChange/detail.vue` 在 `components` 中使用了 ES6 简写属性 `TransactionDetailTable`，但未导入该变量，导致模块加载时抛出 ReferenceError。
 
 ## 问题根因
-- `components` de `noticeChange/detail.vue` usava `TransactionDetailTable` em shorthand ES6 sem import da variável
-- O carregamento do módulo lançava ReferenceError
+- `noticeChange/detail.vue` 的 `components` 使用了 ES6 简写属性 `TransactionDetailTable`，但未导入该变量
+- 模块加载时抛出 ReferenceError
 
 ## 解决方案
-- Linha 250 de `noticeChange/detail.vue` alterada para registro assíncrono lazy: `TransactionDetailTable: () => import('@/views/supervision/deposit/notice/components/TransactionDetailTable.vue')`
-- Alinhado com `notice/detail.vue`, sem necessidade de import no topo
+- 将 `noticeChange/detail.vue` 的第 250 行改为懒加载异步注册：`TransactionDetailTable: () => import('@/views/supervision/deposit/notice/components/TransactionDetailTable.vue')`
+- 与 `notice/detail.vue` 保持一致，无需在顶部 import
 
-## Verificação e arquivos
+## 验证与文件
 - 验证证据: src=苏州市房地产监测V3-leftover/115.md
 - 涉及文件: noticeChange/detail.vue, notice/detail.vue, TransactionDetailTable.vue
-- 所属项目: Suzhou Real Estate Monitoring V3; sessão: 97f8fc4b-8d6e-4425-965a-75edd085590c; baseline: none
+- 所属项目: Suzhou Real Estate Monitoring V3; 会话: 97f8fc4b-8d6e-4425-965a-75edd085590c; baseline: none
 
 <!-- MEMORY_FIELDS
 {

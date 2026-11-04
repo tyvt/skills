@@ -1,17 +1,17 @@
-# composition-row quebra número de certificado em duas linhas
-`addHouse.vue` usa layout vertical `composition-row` (`flex-direction: column`) para o número de certificado de propriedade, dividindo o texto em duas linhas.
+# composition-row 将证书编号断成两行
+`addHouse.vue` 对产权证书编号使用垂直布局 `composition-row` (`flex-direction: column`)，将文本分成两行。
 
 ## 问题根因
-- `addHouse.vue` aplica `composition-row` (column) ao número de certificado de imóvel
-- O texto é quebrado em duas linhas indevidamente
+- `addHouse.vue` 将 `composition-row` (column) 应用于房产证书编号
+- 文本被不当地断成两行
 
-## Correção
-- Trocar para layout de linha única `flex items-center`
-- Manter consistência com `stockHouseSign/apply.vue`
+## 修正
+- 改为单行布局 `flex items-center`
+- 与 `stockHouseSign/apply.vue` 保持一致
 
-## Arquivos e verificação
+## 文件与验证
 - `src/pages_owner/house/owner/addHouse.vue`, `src/pages_transaction/publishHouse/verification.vue`, `src/pages_transaction/stockHouseSign/apply.vue`
-- 所属项目: 苏住房C (zhi2-mobile-shimin); sessão: 54f4fa88-f084-46ed-a03b-0f245a7026be
+- 所属项目: 苏住房C (zhi2-mobile-shimin); 会话: 54f4fa88-f084-46ed-a03b-0f245a7026be
 
 <!-- MEMORY_FIELDS
 {

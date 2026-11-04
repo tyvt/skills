@@ -1,18 +1,18 @@
-# Componente reutilizado deve ser importado e registrado
-Em templates Vue2/Options API, usar tag customizada PascalCase/camelCase sem importar e registrar em `components` faz o Vue falhar ao resolver o componente (erro "Failed to resolve component" ou elemento customizado desconhecido).
+# 可复用组件必须被导入并注册
+在 Vue2/Options API 模板中，使用 PascalCase/camelCase 的自定义标签而不在 `components` 中导入并注册，会导致 Vue 无法解析该组件（报错 "Failed to resolve component" 或未知的自定义元素）。
 
 ## 问题根因
-- Reutilizar componente de outro diretório (ex.: propertyContractTable.vue em company) exige import explícito e registro no SFC atual.
-- Sem registro o Vue não resolve o componente, independente de ser custom element nativo.
-- Usar componente existente (ex.: DetailTemplate) no modo de visualização sem registrar também gera elemento customizado desconhecido.
+- 复用其他目录中的组件（例如：company 中的 propertyContractTable.vue）需要在当前 SFC 中显式导入并注册。
+- 如果不注册，Vue 无法解析该组件，无论其是否为原生自定义元素。
+- 在预览模式下使用已存在的组件（例如：DetailTemplate）而不注册，也会产生未知的自定义元素。
 
 ## 解决方案
-- Importar explicitamente o caminho do componente no SFC atual e registrá-lo na opção `components` antes de usá-lo.
-- Não dependa de registro global nem assuma ser custom element nativo.
+- 在当前 SFC 中显式导入组件路径，并在使用前将其注册到 `components` 选项中。
+- 不要依赖全局注册，也不要假定其为原生自定义元素。
 
-## Verificação e proveniência
-- Caso 1: sessão 1dad72c5 — /toB/companyInfo em companyRecord/detail.vue usava propertyContractTable sem registro, falhando resolução. 涉及文件: zhi2-web-admin/src/views/toB/companyRecord/detail.vue; zhi2-web-admin/src/views/company/companyManagement/components/propertyContractTable.vue. 所属项目: 2-0; sessão: 1dad72c5-73f0-43c2-8c13-cda8490370ba.
-- Caso 2: sessão cdb8c8d2 — bankTable.vue (modo visualização) usava DetailTemplate sem registro; apenas o mixin subTableMixins não contém o componente. Correção: import e registro explícitos de DetailTemplate, também em companyManagement/components/bankTable.vue. 涉及文件: src/views/company/companyRegister/components/bankTable.vue; src/views/company/companyManagement/components/bankTable.vue; src/mixins/subTableMixins.js; src/views/company/companyManagement/components/qualificationDialog.vue; src/main.js; src/views/maintenance/components/AllocationDialog.vue; src/views/company/companyRegister/dialog.vue; src/mixins/dialogMixins.js. Sessão: cdb8c8d2-612f-4ad7-a826-8e4470159f9f.
+## 验证与来源
+- 案例 1：会话 1dad72c5 — /toB/companyInfo 在 companyRecord/detail.vue 中使用了未注册的 propertyContractTable，解析失败。 涉及文件: zhi2-web-admin/src/views/toB/companyRecord/detail.vue; zhi2-web-admin/src/views/company/companyManagement/components/propertyContractTable.vue. 所属项目: 2-0; 会话: 1dad72c5-73f0-43c2-8c13-cda8490370ba.
+- 案例 2：会话 cdb8c8d2 — bankTable.vue（预览模式）使用了未注册的 DetailTemplate；仅 mixin subTableMixins 不包含该组件。修正：显式导入并注册 DetailTemplate，同样在 companyManagement/components/bankTable.vue 中。 涉及文件: src/views/company/companyRegister/components/bankTable.vue; src/views/company/companyManagement/components/bankTable.vue; src/mixins/subTableMixins.js; src/views/company/companyManagement/components/qualificationDialog.vue; src/main.js; src/views/maintenance/components/AllocationDialog.vue; src/views/company/companyRegister/dialog.vue; src/mixins/dialogMixins.js. 会话: cdb8c8d2-612f-4ad7-a826-8e4470159f9f.
 
 <!-- MEMORY_FIELDS
 {

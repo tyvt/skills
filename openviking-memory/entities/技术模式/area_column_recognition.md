@@ -1,17 +1,17 @@
-# Reconhecimento Uniforme de Coluna Area
-Props de tabela com "Area" devem ser identificados por `isMeasureColumnProp` para evitar dano acidental e sobreposição de alinhamento.
+# Area列的统一识别
+带有 "Area" 的表格 Props 必须通过 `isMeasureColumnProp` 来标识，以避免意外损坏和对齐覆盖。
 
-## Regra
-- Props de tabela com Area em `src/views` devem ser identificados por `isMeasureColumnProp`
-- Substituição de texto de divisão administrativa deve corresponder às regras de exclusão de `tableColumnMeasure`
+## 规则
+- 在 `src/views` 中包含 Area 的表格 Props 必须通过 `isMeasureColumnProp` 标识
+- 行政区划文本的替换必须对应于 `tableColumnMeasure` 的排除规则
 
-## Motivo
-- Evita que expressão regular nua `Area$` ferira colunas e sobrescreva `align`
+## 原因
+- 避免裸正则表达式 `Area$` 破坏列并覆盖 `align`
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3-rest/089.md
 - 涉及文件: 路由信息.json, company/companyRegister/index.vue, mixins/ListTemplate.js, zs-table-column.vue, utils/tableColumnMeasure.js, formatters/index.js, package.json
-- Sessão: 211494e9-a81b-4b9a-af2c-3ec7d67b86e9; base de código: none
+- 会话: 211494e9-a81b-4b9a-af2c-3ec7d67b86e9; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

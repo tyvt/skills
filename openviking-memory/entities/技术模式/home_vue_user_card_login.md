@@ -1,13 +1,13 @@
-# Clique no cartão de usuário em home.vue dispara login complementar
-Em `home.vue`, o bloco `user-card` chama `handleUserEntry`; `goLogin()` aciona `detectMiniProgramEnv()` e `initMiniProgramMessageListener()`, reenviando `requestLogin` após `WeixinJSBridgeReady` quando ponte não está pronta.
+# 在 home.vue 中点击用户卡片触发补充登录
+在 `home.vue` 中，`user-card` 块调用 `handleUserEntry`；`goLogin()` 触发 `detectMiniProgramEnv()` 和 `initMiniProgramMessageListener()`，当桥接未就绪时，在 `WeixinJSBridgeReady` 之后重新发送 `requestLogin`。
 
-## Comportamento
-- `user-card` inteiro vinculado a `handleUserEntry`
-- `goLogin()` chama `detectMiniProgramEnv()` e `initMiniProgramMessageListener()`
-- Se ambiente `miniprogram` e ponte não pronta, `requestLogin` reenviado após `WeixinJSBridgeReady`
-- Cada clique retorna toast claro
+## 行为
+- 整个 `user-card` 绑定到 `handleUserEntry`
+- `goLogin()` 调用 `detectMiniProgramEnv()` 和 `initMiniProgramMessageListener()`
+- 如果环境为 `miniprogram` 且桥接未就绪，则在 `WeixinJSBridgeReady` 之后重新发送 `requestLogin`
+- 每次点击均返回清晰的 toast
 
-## Arquivos e Verificação
+## 文件与验证
 - 验证证据: src=i淮安公版/001.md
 - 涉及文件: src/pages/index/home.vue, vite.config.ts, src/store/user.js, src/store/house.js, src/pages/index/property.vue, src/api/security.js, src/pages/login/index.vue, index.html
 - 所属项目: i淮安公版/zhi2-mobile-admin-h5-c-unlimited

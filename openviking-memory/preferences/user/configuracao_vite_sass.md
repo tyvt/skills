@@ -3,7 +3,7 @@
 <!-- MEMORY_FIELDS
 {
   "user": "user",
-  "topic": "Configuração Vite Sass",
+  "topic": "主题标题: Vite Sass 配置",
   "source_extraction_id": "abc711535aaf4dbeace7d2af079c5c75",
   "version": 1,
   "memory_type": "preferences"

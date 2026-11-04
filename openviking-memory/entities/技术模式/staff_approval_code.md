@@ -1,17 +1,17 @@
-# Vincular código de aprovação no arquivamento de funcionários
-O `detail.vue` do lado empresarial alinha com a implementação toB, vinculando os códigos de negócio de aprovação `cyryba`/`cyrybg` ao `:bus-code` do `operation-btn-group`, controlando botões por `formMode` e `businessStatus`, e integrando gaveta `ApprovalProcess` e carregamento de ordem de alteração.
+# 在员工备案中关联审批代码
+企业端的 `detail.vue` 与 toB 实现保持一致，将审批业务代码 `cyryba`/`cyrybg` 绑定到 `operation-btn-group` 的 `:bus-code`，通过 `formMode` 和 `businessStatus` 控制按钮，并集成 `ApprovalProcess` 抽屉和变更单加载。
 
-## Contexto
-- O arquivamento de profissionais (从业人员备案) precisa alinhar com a implementação toB
+## 上下文
+- 从业人员备案（从业人员备案）需要与 toB 实现保持一致
 
 ## 解决方案
-- Vincular `cyryba`/`cyrybg` ao `:bus-code` de `operation-btn-group`
-- Controlar botões por `formMode` e `businessStatus`
-- Integrar gaveta `ApprovalProcess` e carregamento de ordem de alteração
+- 将 `cyryba`/`cyrybg` 绑定到 `operation-btn-group` 的 `:bus-code`
+- 通过 `formMode` 和 `businessStatus` 控制按钮
+- 集成 `ApprovalProcess` 抽屉和变更单加载
 
 ## 验证与归属
 - 涉及文件: company/staffManagement/components/detail.vue, components/OperationBtnGroup/index.vue, mixins/detailMixins.js, company/staffManagement/personnelRecord/detail.vue, mixins/form.js, toB/personnelRecord/components/detail.vue, mixins/formComponents.js, main.js
-- 所属项目: 产品2.0; 来源: 035.md; Sessão: 2f709dc5-4ae2-4b08-9df3-6698a076d982
+- 所属项目: 产品2.0; 来源: 035.md; 会话: 2f709dc5-4ae2-4b08-9df3-6698a076d982
 
 <!-- MEMORY_FIELDS
 {

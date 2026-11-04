@@ -1,18 +1,18 @@
-# Tabela do diálogo de seleção comprimida e linhas insuficientes
-No projeto 园区公共收益 (zhi2-web-admin), o `tableTrCount` fixo do `zs-select-dialog` faz a barra de rolagem horizontal ocupar altura e cortar a última linha; a tabela em `.dialog-right` com `flex:1; min-height:0` é comprimida.
+# 选择对话框表格被压缩且行数不足
+在项目 园区公共收益 (zhi2-web-admin) 中，`zs-select-dialog` 的固定 `tableTrCount` 导致水平滚动条占据高度并截断最后一行；`.dialog-right` 中带有 `flex:1; min-height:0` 的表格被压缩。
 
 ## 问题根因
-- `tableTrCount` fixo faz a barra de rolagem horizontal ocupar altura e cortar a última linha
-- Tabela em `.dialog-right` com `flex:1; min-height:0` é comprimida/recortada
+- 固定的 `tableTrCount` 导致水平滚动条占据高度并截断最后一行
+- `.dialog-right` 中带有 `flex:1; min-height:0` 的表格被压缩/裁剪
 
 ## 解决方案
-- Calcular linhas dinamicamente com reserva de buffer
-- Usar `flex-shrink:0` para evitar compressão
-- Chamar `doLayout()` após `getList()`
+- 动态计算行数并预留缓冲
+- 使用 `flex-shrink:0` 以避免压缩
+- 在 `getList()` 之后调用 `doLayout()`
 
-## Arquivos envolvidos
+## 涉及的文件
 - `zs-select-dialog` (zs-select-dialog.vue, zs-select-dialog-func.vue, SKILL.md)
-- `zs-dialog.vue` e `zs-table.vue`
+- `zs-dialog.vue` 和 `zs-table.vue`
 - `pubBankDetailDay/index.vue`
 
 ## 验证与归属

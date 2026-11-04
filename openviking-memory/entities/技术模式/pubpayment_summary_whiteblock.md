@@ -1,16 +1,19 @@
-# Bloqueio branco e falta de resumo centralizado em pagamentos
-Card de padrão técnico para anomalias de UI em pubPaymentNotice e pubManualBookkeeping no projeto zhi2-web-admin.
+# 支付中的白色块遮挡与缺少居中汇总
+zhi2-web-admin 项目中 pubPaymentNotice 和 pubManualBookkeeping 的 UI 异常技术模式卡片。
+
 ## 问题根因
-- pubPaymentNotice/index.vue não definiu showSummary:true, ocultando subtotal.
-- detail.vue com campos não centralizados e DetailTemplate sem labelAlign.
-- pubManualBookkeeping/index.vue busca por palavra-chave sem attrs.placeholder causando anomalia de cor.
-- Coluna fixa gera bloco branco el-table__fixed-right-patch.
+- pubPaymentNotice/index.vue 未定义 showSummary:true，隐藏了小计。
+- detail.vue 字段未居中且 DetailTemplate 缺少 labelAlign。
+- pubManualBookkeeping/index.vue 关键词搜索缺少 attrs.placeholder 导致颜色异常。
+- 固定列生成白色块 el-table__fixed-right-patch。
+
 ## 解决方案
-- Ativar showSummary e definir align/labelAlign centrado, adicionar suporte labelAlign.
-- Completar attrs.placeholder; index.scss oculta bloco branco.
-## Arquivos e verificação
+- 启用 showSummary 并定义 align/labelAlign 居中，添加 labelAlign 支持。
+- 补全 attrs.placeholder；index.scss 隐藏白色块。
+
+## 文件与验证
 - 涉及文件: pubPaymentNotice/index.vue, pubManualBookkeeping/index.vue, pubPaymentNotice/detail.vue, pubManualBookkeeping/detail.vue, bookDetailTable.vue, mixins/table.js, pubParkingRate/index.vue, detail-template.vue.
-- Sessão de origem: 5ec6511f-7bd3-4005-a984-83b775525513; linha de base: none.
+- 源会话: 5ec6511f-7bd3-4005-a984-83b775525513; 基线: none.
 
 <!-- MEMORY_FIELDS
 {

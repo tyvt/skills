@@ -1,15 +1,15 @@
-# Vídeos E2E redundantes no registro de empresa
-No zhi2-web-admin (produto 2.0) fluxo completo, caso UI, navegação de retorno e CRUD de sócios repetiam Step1→3, gerando 12 vídeos redundantes.
+# 公司注册中冗余的 E2E 视频
+在 zhi2-web-admin（2.0 产品）完整流程、UI 用例、返回导航以及合伙人 CRUD 中，重复了 Step1→3，产生了 12 个冗余视频。
 ## 问题根因
-- Cada caso (fluxo completo, UI, retorno, CRUD de sócios) refazia Step1→3 independentemente.
+- 每个用例（完整流程、UI、返回、合伙人 CRUD）都独立地重做了 Step1→3。
 ## 解决方案
-- Unir company-register.spec.js em 2 sessões contínuas.
-- Mover validação de campos para company-register-fields.spec.js sem gravar vídeo.
-- Gerar test-results/company-register-full.webm (~58s), mantendo cobertura de asserções.
+- 将 company-register.spec.js 合并为 2 个连续的会话。
+- 将字段验证移至 company-register-fields.spec.js，且不录制视频。
+- 生成 test-results/company-register-full.webm（~58s），保持断言覆盖率。
 ## 验证与归属
 - 验证证据: cursor session=1a0da812-3129-4757-ad86-ae58155f438e
 - 涉及文件: package.json, playwright.config.js, real-api-flow.spec.js, register-helpers.js, real-api.spec.js, flow.spec.js, ui.spec.js, input-maxlength.spec.js
-- 所属项目: 2-0; código base: none
+- 所属项目: 2-0; 代码基础: none
 
 <!-- MEMORY_FIELDS
 {

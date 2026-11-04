@@ -1,10 +1,10 @@
-- Em supervision/bank/jgwd/detail.vue, introduzir @/components/HeadTitle/index.vue acima da seção de informações básicas para exibir operador e horário de operação.
-- Remover os campos duplicados na parte inferior do contentInfo do DetailTemplate para evitar repetição.
+- 在 supervision/bank/jgwd/detail.vue 中，在基本信息部分上方引入 @/components/HeadTitle/index.vue 以显示操作人和操作时间。
+- 移除 DetailTemplate 的 contentInfo 底部的重复字段，以避免重复。
 
 <!-- MEMORY_FIELDS
 {
   "user": "default",
-  "topic": "Barra de status HeadTitle em página de detalhes de agência bancária",
+  "topic": "银行分行详情页上的 HeadTitle 状态栏",
   "source_extraction_id": "47e976c84c0c4838a3a5a3b87ec2709b",
   "version": 1,
   "memory_type": "preferences"

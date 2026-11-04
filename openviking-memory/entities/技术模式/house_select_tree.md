@@ -1,19 +1,19 @@
-# Diálogo de seleção de imóvel deve complementar atributos tree e normalizar parâmetros
-No projeto Suzhou Real Estate Monitoring V3, `HouseSelectDialog.vue` complementa `treeUrl`/`treeKey`/`treeLabel` via `buildingSelectTree` e padroniza requisição `findHouseList`.
+# 房产选择对话框应补全 tree 属性并规范化参数
+在 Suzhou Real Estate Monitoring V3 项目中，`HouseSelectDialog.vue` 通过 `buildingSelectTree` 补全 `treeUrl`/`treeKey`/`treeLabel`，并规范化 `findHouseList` 请求。
 
-## Complemento de propriedades
-- `HouseSelectDialog.vue` usa `buildingSelectTree` para preencher `treeUrl`/`treeKey`/`treeLabel`
-- Elimina avisos de prop ausente
+## 属性补全
+- `HouseSelectDialog.vue` 使用 `buildingSelectTree` 来填充 `treeUrl`/`treeKey`/`treeLabel`
+- 消除缺失 prop 的警告
 
-## Requisição e parser
-- `findHouseList` envia fixo `key:String(projectId)` e `buildCode`, com fallback `buildingId`
-- `parseApiList` parseia apenas array/`rows`/`list`/`data`
-- Excede paginação alerta truncamento
+## 请求与解析
+- `findHouseList` 固定发送 `key:String(projectId)` 和 `buildCode`，兜底使用 `buildingId`
+- `parseApiList` 仅解析 array/`rows`/`list`/`data`
+- 超出分页时告警截断
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/070.md
 - 涉及文件: houseLimitAudit/index.vue, houseLimit/limitAdd.vue, HouseSelectDialog.vue, houseMerge/detail.vue, limitFormMixin.js, zs-select-dialog-func.vue, BuildingTableViewTabs.vue, zs-select-dialog.vue
-- Sessão: b1e26906-7719-47ec-96f7-a8e3dc7a48fa; baseline: none
+- 会话: b1e26906-7719-47ec-96f7-a8e3dc7a48fa; baseline: none
 
 <!-- MEMORY_FIELDS
 {

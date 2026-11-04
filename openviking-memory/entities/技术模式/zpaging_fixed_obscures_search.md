@@ -1,12 +1,12 @@
-# z-paging com fixed padrão cobre busca
-`z-paging` usa `fixed=true` por padrão, renderizando em tela cheia e cobrindo navegação de busca externa.
-## Contexto
-- Afeta arquivos como `newHouse/index.vue`, `newHouse/indexMore.vue`, `newHouse/houseTypeList.vue`, `goodProject/index.vue`.
+# z-paging 默认 fixed 覆盖搜索
+`z-paging` 默认使用 `fixed=true`，全屏渲染并覆盖外部搜索导航。
+## 上下文
+- 影响文件如 `newHouse/index.vue`、`newHouse/indexMore.vue`、`newHouse/houseTypeList.vue`、`goodProject/index.vue`。
 - 所属项目: zhi2-mobile-shimin.
 ## 解决方案
-- Mover busca, navegação e filtros para o slot `#top` do `z-paging`, mantendo lista com scroll independente.
-## Verificação
-- Sessão cursor 671da04e-7711-4f45-b4cb-a4bcab90d503 registrou a correção.
+- 将搜索、导航和筛选移动到 `z-paging` 的 `#top` 插槽中，保持列表独立滚动。
+## 验证
+- cursor 会话 671da04e-7711-4f45-b4cb-a4bcab90d503 记录了修复。
 - 涉及文件: gridNav.vue, conditionScreening.vue, ZsPaging.vue, etc.
 
 <!-- MEMORY_FIELDS

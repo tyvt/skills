@@ -1,16 +1,16 @@
-# Presale area field switched to amount-input component
-No módulo 苏州市房地产监测V3, PermitInfoPanel.vue usa amount-input no modo de edição substituindo zs-input para entrada de valores monetários.
+# 预售面积字段切换为 amount-input 组件
+在 苏州市房地产监测V3 模块中，PermitInfoPanel.vue 在编辑模式下使用 amount-input 替代 zs-input 用于货币值输入。
 
-## Pontos de mudança
-- PermitInfoPanel.vue em modo de edição usa amount-input (unit="㎡", :dot="2", v-money) substituindo zs-input
-- Modo de visualização formatado via formatFixedDecimal
-- presaleAreaValue retorna '' quando vazio
-- presaleAreaText retorna '-' quando vazio
+## 变更点
+- PermitInfoPanel.vue 在编辑模式下使用 amount-input (unit="㎡", :dot="2", v-money) 替代 zs-input
+- 查看模式通过 formatFixedDecimal 格式化
+- presaleAreaValue 为空时返回 ''
+- presaleAreaText 为空时返回 '-'
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/145.md
 - 涉及文件: presale/permit/components/detail.vue, presale/permit/permitConstants.js, presale/permit/components/PermitInfoPanel.vue, projectManagement/buildinginfo/detail.vue, package.json, contract/dialogs/pricingModeDialog.vue, vite.config.js, main.js
-- Sessão: 52e97276-20ef-4050-8053-34217a106e19; base de código: none
+- 会话: 52e97276-20ef-4050-8053-34217a106e19; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

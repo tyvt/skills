@@ -1,5 +1,5 @@
 # Summary
-Em 2026-11-02, o usuário documentou a correção de validação de formato de telefone ausente no arquivo guaranteeDepositAgreement/detail.vue. As validações de contactPhone e propertyContactPhone tinham apenas obrigatoriedade, faltando formato. Foi adicionado regex global patterns.contactPhone para validar celular, fixo e números de 8 dígitos. Arquivos envolvidos: d:/repository/榆林G/zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue, d:/repository/榆林G/zhi2-web-admin/src/views/company/companyManagement/components/detail.vue, d:/repository/榆林G/zhi2-web-admin/src/patterns/index.js, d:/repository/榆林G/zhi2-web-admin/src/mixins/detailMixins.js. Origem: sessão cursor ea514d30-3de8-4e8a-beb7-f0690c0e8a2b.
+在 2026-11-02，用户记录了文件 guaranteeDepositAgreement/detail.vue 中缺失的电话格式校验的修复。contactPhone 和 propertyContactPhone 的校验仅包含必填性，缺少格式校验。添加了全局正则 patterns.contactPhone 用于校验手机、固定电话和8位数字号码。涉及文件: d:/repository/榆林G/zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue, d:/repository/榆林G/zhi2-web-admin/src/views/company/companyManagement/components/detail.vue, d:/repository/榆林G/zhi2-web-admin/src/patterns/index.js, d:/repository/榆林G/zhi2-web-admin/src/mixins/detailMixins.js。来源: cursor 会话 ea514d30-3de8-4e8a-beb7-f0690c0e8a2b。
 # 2026-11-02 (Monday) ChatLog:
 **user**: 【记忆类型】bug
 【标题】保证金协议物业开发电话缺格式校验

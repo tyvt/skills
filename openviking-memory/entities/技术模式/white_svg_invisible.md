@@ -1,18 +1,18 @@
-# Ícone de coleta invisível por SVG branco em fundo branco
-O `newHouse/detail.vue` usa barra inferior branca com ícone `aixin_e.svg` de filtro branco (`imgType="dark"`), tornando o ícone invisível.
+# 白色SVG在白色背景下导致收藏图标不可见
+`newHouse/detail.vue` 使用白色底栏与白色滤镜的 `aixin_e.svg` 图标（`imgType="dark"`），导致图标不可见。
 
 ## 问题根因
-- Barra inferior branca em `newHouse/detail.vue` usa `aixin_e.svg` com filtro branco (`imgType="dark"`)
-- O ícone fica invisível sobre o fundo branco
+- `newHouse/detail.vue` 中的白色底栏使用了带有白色滤镜的 `aixin_e.svg`（`imgType="dark"`）
+- 图标在白色背景下不可见
 
-## Correção
-- Trocar para `aixin_g.png` visível sobre fundo branco
-- Simplificar `imageSubpackage` em `collectBtn.vue` para retornar direto `subpackage`, evitando erro de resolução de caminho
+## 修复
+- 替换为在白色背景下可见的 `aixin_g.png`
+- 简化 `collectBtn.vue` 中的 `imageSubpackage`，使其直接返回 `subpackage`，避免路径解析错误
 
-## Arquivos e verificação
+## 文件与验证
 - `src/pages_transaction/newHouse/detail.vue`, `src/components/collectBtn/collectBtn.vue`
-- Também afeta `stockHouse/detail.vue`, `ZsImage.vue`, `utils/index.js`, `bottomBtn.vue`, `houseCard.vue`, `NewHouse.vue`
-- 所属项目: 苏住房C (zhi2-mobile-shimin); sessão: 31b6e9ca-2ea3-4981-827d-9dac98d0e40f
+- 同时影响 `stockHouse/detail.vue`, `ZsImage.vue`, `utils/index.js`, `bottomBtn.vue`, `houseCard.vue`, `NewHouse.vue`
+- 所属项目: 苏住房C (zhi2-mobile-shimin); 会话: 31b6e9ca-2ea3-4981-827d-9dac98d0e40f
 
 <!-- MEMORY_FIELDS
 {

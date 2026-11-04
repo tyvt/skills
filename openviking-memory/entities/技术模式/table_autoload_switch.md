@@ -1,16 +1,16 @@
-# Consulta automática no created causa pop-up de backend por parâmetros vazios
-O `init()` do `src/mixins/table.js` chama `getList()` incondicionalmente no `created`, enviando pedido vazio interceptado pelo backend.
+# created 中的自动查询因空参数导致后端弹窗
+`src/mixins/table.js` 的 `init()` 在 `created` 中无条件调用 `getList()`，发送了被后端拦截的空请求。
 
 ## 问题根因
-- `table.js` `init()` invoca `getList()` sem condições, gerando requisição vazia.
-- Backend bloqueia e mostra pop-up de erro.
+- `table.js` 的 `init()` 无条件调用 `getList()`，产生空请求。
+- 后端阻止并显示错误弹窗。
 
-## 解决方案 aplicada
-- Adicionar flag `autoLoadList` (default `true`).
-- `src/views/property/appOwnerAudit/index.vue` define `false` para pular consulta automática.
-- Reescrever `handleQuery()` para validar frontend: nome/número de documento/telemóvel com pelo menos dois preenchidos antes do pedido.
+## 已应用的解决方案
+- 添加标志 `autoLoadList`（默认 `true`）。
+- `src/views/property/appOwnerAudit/index.vue` 定义 `false` 以跳过自动查询。
+- 重写 `handleQuery()` 以进行前端校验：姓名/证件号/手机号在请求前至少填写两项。
 
-## Ficheiros envolvidos
+## 涉及的文件
 - `src/mixins/table.js`
 - `src/mixins/listMixins.js`
 - `src/mixins/ListTemplate.js`
@@ -21,8 +21,8 @@ O `init()` do `src/mixins/table.js` chama `getList()` incondicionalmente no `cre
 ## 验证与归属
 - 所属项目: 惠山二期G
 - 验证证据: `src=惠山二期G/011.md`
-- Sessão de origem: `333318b1-4f2d-4f92-b2b0-f97f02e88d67`
-- Linha de base: none
+- 来源会话: `333318b1-4f2d-4f92-b2b0-f97f02e88d67`
+- 基线: none
 
 <!-- MEMORY_FIELDS
 {

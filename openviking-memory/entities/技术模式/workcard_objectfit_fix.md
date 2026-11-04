@@ -1,18 +1,18 @@
-# Download de crachá com object-fit faltante
-html2canvas não suporta nativamente object-fit, causando esticamento de imagem em download de crachá.
+# 缺少 object-fit 的证件下载
+html2canvas 原生不支持 object-fit，导致证件下载时图像被拉伸。
 
-## Problema
-- `html2canvas` não suporta `object-fit`, deformando foto de crachá e logo no download.
+## 问题
+- `html2canvas` 不支持 `object-fit`，导致下载时证件照片和 logo 变形。
 
 ## 解决方案
-- Novo `html2canvasObjectFit.js` redesenha imagens conforme object-fit no canvas durante `onclone`.
-- `WorkCardDialog.vue` e `InfoCardDialog.vue` em `handleDownload` processam nós `.work-card__photo`, `.work-card__logo`.
+- 新增 `html2canvasObjectFit.js` 在 `onclone` 期间根据 object-fit 在 canvas 上重绘图像。
+- `WorkCardDialog.vue` 和 `InfoCardDialog.vue` 在 `handleDownload` 中处理 `.work-card__photo`、`.work-card__logo` 节点。
 
-## Arquivos
+## 文件
 - WorkCardDialog.vue, AgencyPersonnelList.vue, InfoCardDialog.vue, spec e2e, resolveServerAssetUrl.js, html2canvasObjectFit.js, package.json.
 
-## Verificação
-- 验证证据: src=苏州市房地产监测V3-leftover/020.md; sessão 0b2661f5-bbe8-434f-86da-96244d6397a7; projeto 苏州市房地产监测V3.
+## 验证
+- 验证证据: src=苏州市房地产监测V3-leftover/020.md; 会话 0b2661f5-bbe8-434f-86da-96244d6397a7; 项目 苏州市房地产监测V3.
 
 <!-- MEMORY_FIELDS
 {

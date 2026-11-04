@@ -1,19 +1,19 @@
-# Empate de prioridade de estilo zs-dialog causa duplo espaçamento
-No 苏州市房地产监测V3, o estilo global `.dialog-left` (`margin-right:20px;padding:20px`) do `zs-dialog` empatou em prioridade com novo estilo de componente e não surtiu efeito, gerando duplo espaçamento no painel esquerdo do diálogo.
+# zs-dialog 样式优先级平局导致双重间距
+在苏州市房地产监测V3中，`zs-dialog` 的全局样式 `.dialog-left` (`margin-right:20px;padding:20px`) 与新的组件样式优先级平局且未生效，导致对话框左侧面板出现双重间距。
 
 ## 问题根因
-- Estilo global `.dialog-left` de `zs-dialog` com `margin-right:20px;padding:20px`
-- Novo estilo de componente empatou em prioridade e não foi aplicado
-- Resultou em duplo espaçamento entre painel esquerdo e direito do diálogo
+- `zs-dialog` 的全局样式 `.dialog-left` 带有 `margin-right:20px;padding:20px`
+- 新的组件样式优先级平局且未被应用
+- 导致对话框左右面板之间出现双重间距
 
 ## 解决方案
-- `BuildingUnitLazyTree.vue` elevou seletor para `.dialog-box .dialog-left.building-unit-lazy-tree`
-- `ContractDialog.vue`, `NoticeContractDialog.vue`, `buildingTreeDialog.vue` adicionaram classe específica e sobrescreveram `gap:16px`, removeram `margin-right` e ajustaram `padding`
+- `BuildingUnitLazyTree.vue` 将选择器提升为 `.dialog-box .dialog-left.building-unit-lazy-tree`
+- `ContractDialog.vue`、`NoticeContractDialog.vue`、`buildingTreeDialog.vue` 添加了特定类并覆盖了 `gap:16px`，移除了 `margin-right` 并调整了 `padding`
 
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-leftover/054.md
 - 涉及文件: chooseHouseDialog.vue, BuildingUnitLazyTree.vue, ContractDialog.vue, buildingTreeDialog.vue, NoticeContractDialog.vue, HouseSelectDialog.vue, zs-select-dialog.vue, BuildingDialog.vue
-- 所属项目: 苏州市房地产监测V3; Sessão: 7342d846-a274-472d-aa53-0402cfe58bdb; Baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 7342d846-a274-472d-aa53-0402cfe58bdb; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

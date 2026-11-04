@@ -1,21 +1,19 @@
+# Cursor 因宽泛索引和 TS 服务消耗大量内存
+项目 苏州市房地产监测V3 在 Cursor 编辑器中因语言和索引服务配置不当导致内存消耗过高。
 
-# Cursor consome muita memória por índice amplo e serviço TS
-O projeto 苏州市房地产监测V3 teve alto consumo de memória no editor Cursor por configuração inadequada de serviço de linguagem e índice.
+## 原因与调整
+- 过度的内存消耗来自于 TS server 限制过高、索引宽泛以及冗余的 MCP
+- settings.json: maxTsServerMemory/maxOldSpaceSize 从 8192 降低到 2048
+- mcp.json: 移除了 chrome-devtools MCP 进程
+- jsconfig.json: include 限制为 src/**/* 并创建了 .cursorignore 以排除 node_modules/, dist/ 等
 
-## Causa e ajuste
-- Consumo excessivo veio de limite alto do TS server, índice amplo e MCP redundante
-- settings.json: maxTsServerMemory/maxOldSpaceSize reduzidos de 8192 para 2048
-- mcp.json: removido processo chrome-devtools MCP
-- jsconfig.json: include restrito a src/**/* e criado .cursorignore excluindo node_modules/, dist/ etc.
-
-## Arquivos envolvidos
-- vite.config.js, mcp-servers.json, extensions.json, package.json (raiz e zhi2-web-admin), jsconfig.json, settings.json, mcp.json
+## 涉及的文件
+- vite.config.js, mcp-servers.json, extensions.json, package.json (根目录和 zhi2-web-admin), jsconfig.json, settings.json, mcp.json
 
 ## 验证与归属
-- 验证证据: src=苏州市房地产监测V3/177.md e src=苏州市房地产监测V3-rest/144.md
-- Sessão de origem: 5d1c2a9f-7bac-4b86-936c-8870cfdb6c90
-- 所属项目: 苏州市房地产监测V3; baseline de código: none
-
+- 验证证据: src=苏州市房地产监测V3/177.md 和 src=苏州市房地产监测V3-rest/144.md
+- 来源会话: 5d1c2a9f-7bac-4b86-936c-8870cfdb6c90
+- 所属项目: 苏州市房地产监测V3; 代码基线: none
 
 <!-- MEMORY_FIELDS
 {

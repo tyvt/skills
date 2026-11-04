@@ -1,19 +1,19 @@
-# Swiper pré-montado com array vazio causa erro fileSite
-A página `pages_transaction/stockHouse/detail` monta `swiper-component` antes dos dados e sem `v-if`, gerando erro ao acessar `allList[currentSlide].fileSite` com array vazio.
+# Swiper 预挂载空数组导致 fileSite 错误
+页面 `pages_transaction/stockHouse/detail` 在数据加载前挂载了 `swiper-component` 且未使用 `v-if`，导致在数组为空时访问 `allList[currentSlide].fileSite` 产生错误。
 
 ## 问题根因
-- Montagem de `swiper-component` antes do carregamento de dados, sem guarda `v-if`
-- Acesso a `allList[currentSlide].fileSite` falha quando o array está vazio
-- `currentSlide` com valor hardcoded apresenta risco de estouro de índice
+- 在数据加载前挂载 `swiper-component`，且缺少 `v-if` 守卫
+- 当数组为空时，访问 `allList[currentSlide].fileSite` 失败
+- `currentSlide` 使用硬编码值，存在索引越界风险
 
-## Correção
-- Adicionar guarda `v-if` na camada de vídeo de `swiperComponent.vue`
-- Eliminar o risco de estouro por índice hardcoded em `currentSlide`
+## 修复
+- 在 `swiperComponent.vue` 的视频层添加 `v-if` 守卫
+- 消除 `currentSlide` 中因硬编码索引导致的越界风险
 
-## Arquivos e verificação
+## 文件与验证
 - `src/pages_transaction/stockHouse/detail.vue`
 - `src/pages/commonNew/swiperComponent.vue`, `src/components/commonNew/swiperComponent.vue`
-- 所属项目: 苏住房C (zhi2-mobile-shimin); sessão: db381270-844e-45c8-899a-a19894dde18f
+- 所属项目: 苏住房C (zhi2-mobile-shimin); 会话: db381270-844e-45c8-899a-a19894dde18f
 
 <!-- MEMORY_FIELDS
 {

@@ -1,18 +1,18 @@
-# Conflito v-hasPermi e v-show gera botões extras
-No arquivo optionDecision/detail.vue do projeto 太仓G, o conflito entre v-show e v-hasPermi causava botões redundantes.
+# v-hasPermi 与 v-show 冲突导致多余按钮
+在项目太仓G的 optionDecision/detail.vue 文件中，v-show 与 v-hasPermi 的冲突导致了多余按钮。
 
 ## 问题根因
-- Botões de rodapé usavam `v-show` e `v-hasPermi` simultaneamente
-- Ao passar na permissão, `v-hasPermi` executa `el.style.display = ''` sobrepondo `none` do v-show
+- 底部按钮同时使用了 `v-show` 和 `v-hasPermi`
+- 当权限通过时，`v-hasPermi` 执行 `el.style.display = ''` 覆盖 v-show 的 `none`
 
-## Correção
-- 7 botões de negócio em `optionDecision/detail.vue` trocaram `v-show` por `v-if`
-- Quando condição falsa, não renderiza evitando interferência
+## 修复
+- 在 `optionDecision/detail.vue` 中的 7 个业务按钮将 `v-show` 替换为 `v-if`
+- 当条件为假时，不渲染以避免干扰
 
-## Verificação e arquivos
-- Sessão de origem: d78da6c5-2f67-48d6-9fd2-d7742debc541
+## 验证与文件
+- 原始会话: d78da6c5-2f67-48d6-9fd2-d7742debc541
 - 涉及文件: optionDecision/detail.vue, OperationContainer/index.vue, detailMixins.js, ownerDecision/detail.vue, optionDecision/index.vue, sortDecison/detail.vue, main.js, directives/permission/hasPermi.js
-- 所属项目: 太仓G; base de código: none
+- 所属项目: 太仓G; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

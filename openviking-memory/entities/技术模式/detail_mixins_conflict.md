@@ -1,18 +1,18 @@
-# Uso indevido de detailMixins causa conflito e reescrita de form
-No projeto Suzhou Real Estate Monitoring V3, o `detailMixins` introduziu computed `regionOptions` do mixin area conflitando com data de CompanyCancelDetail e prop de CompanyBasicInfoForm; CompanyBasicInfoForm usou detailMixins em modo view reescrevendo prop de form.
+# detailMixins 使用不当导致冲突并覆写 form
+在 Suzhou Real Estate Monitoring V3 项目中，`detailMixins` 引入了来自 area mixin 的 computed `regionOptions`，与 CompanyCancelDetail 的 data 以及 CompanyBasicInfoForm 的 prop 发生冲突；CompanyBasicInfoForm 在 view 模式下使用了 detailMixins，覆写了 form 的 prop。
 
 ## 问题根因
-- `detailMixins` traz `regionOptions` que conflita com `data` de CompanyCancelDetail e prop de CompanyBasicInfoForm (mesmo nome)
-- CompanyBasicInfoForm usou `detailMixins`; no modo view executou `init()->getDetail()->detailCallback()` reescrevendo prop de form
+- `detailMixins` 带来了 `regionOptions`，与 CompanyCancelDetail 的 `data` 以及 CompanyBasicInfoForm 的 prop 冲突（同名）
+- CompanyBasicInfoForm 使用了 `detailMixins`；在 view 模式下执行了 `init()->getDetail()->detailCallback()`，覆写了 form 的 prop
 
 ## 解决方案
-- `CompanyBasicInfoForm.vue` removido `detailMixins` e importou direto `Headline`, `DetailTemplate`; modo edição usa form do pai
-- `companyCancel/detail.vue` renomeou `regionOptions` para `economicRegionOptions`
+- `CompanyBasicInfoForm.vue` 移除了 `detailMixins` 并直接引入了 `Headline`、`DetailTemplate`；编辑模式使用父级的 form
+- `companyCancel/detail.vue` 将 `regionOptions` 重命名为 `economicRegionOptions`
 
-## Verificação e arquivos
+## 验证与文件
 - 验证证据: src=苏州市房地产监测V3-leftover/039.md
 - 涉及文件: companyCancel/detail.vue, CompanyBasicInfoForm.vue, detailMixins.js, area.js, companyApply/detail.vue, companyRecordAgency/change/detail.vue, toB/companyRecord/detail.vue, form.js
-- Sessão: 9aaca310-0d97-443b-83c2-2382ce1e8d98; baseline: none
+- 会话: 9aaca310-0d97-443b-83c2-2382ce1e8d98; baseline: none
 
 <!-- MEMORY_FIELDS
 {

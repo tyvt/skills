@@ -1,24 +1,24 @@
-# Reuso de rota de detalhe em link de título de aviso
-Padrão do portal para a coluna de título de avisos públicos reusar a rota de detalhe via link realçado.
+# 在公告标题链接中复用详情路由
+门户规范：公共公告标题列通过高亮链接复用详情路由。
 
-## Propósito
-- Reutilizar a rota de detalhe "查看" via $emit('navigate', { kind: 'notice-detail', record: row })
-- Manter estilo azul realçado, negrito e ellipsis no título
+## 目的
+- 通过 $emit('navigate', { kind: 'notice-detail', record: row }) 复用“查看”详情路由
+- 在标题中保持高亮蓝色、粗体和省略号样式
 
-## Implementação
-- InformationPages.vue usa slot #cell-title para renderizar button.portal-link.portal-notice-title
-- PortalTable.vue e PortalDialogHost.vue dão suporte ao evento navigate
-- mock/notices.js fornece dados de aviso para testes
+## 实现
+- InformationPages.vue 使用插槽 #cell-title 渲染 button.portal-link.portal-notice-title
+- PortalTable.vue 和 PortalDialogHost.vue 支持 navigate 事件
+- mock/notices.js 提供用于测试的公告数据
 
-## Verificação
-- Teste E2E public-portal-interactions.spec.ts valida clique no título abrindo detalhe e retorno
-- 验证证据: src=门户/020.md; sessão: c58d5c89-4619-4408-90ad-208094cad341
+## 验证
+- E2E 测试 public-portal-interactions.spec.ts 验证点击标题打开详情并返回
+- 验证证据: src=门户/020.md; 会话: c58d5c89-4619-4408-90ad-208094cad341
 
-## Arquivos
+## 文件
 - src/views/home/publicPortal/pages/InformationPages.vue
 - src/views/home/publicPortal/components/PortalTable.vue
 - src/views/home/publicPortal/PortalDialogHost.vue
-- src/views/home/publicPortal/mock/notices.js e portal.scss
+- src/views/home/publicPortal/mock/notices.js 和 portal.scss
 - tests/e2e/public-portal-interactions.spec.ts, fixtures/public-portal-designs.ts, _tmp-debug-title.spec.ts
 
 <!-- MEMORY_FIELDS

@@ -1,18 +1,18 @@
-# Núcleo de adição de registro de inspeção está em record/add.vue
-No app móvel de gestão imobiliária B-end, o núcleo de adicionar e remover etapas de registro de inspeção está em src/pages_facility/record/add.vue, associado ao upload de imagem ZsUploader, ao diálogo ZsDialog e às APIs correspondentes.
+# 巡检记录添加核心位于 record/add.vue
+在B端物业管理移动应用中，添加和移除巡检记录步骤的核心位于 src/pages_facility/record/add.vue，与图片上传组件 ZsUploader、对话框 ZsDialog 以及相应的 API 相关联。
 
-## Localização do núcleo
-- O núcleo de adicionar e remover etapas de registro de inspeção está em src/pages_facility/record/add.vue
+## 核心位置
+- 添加和移除巡检记录步骤的核心位于 src/pages_facility/record/add.vue
 
-## Componentes e interfaces associados
-- Associado ao componente de upload de imagem ZsUploader.vue
-- Associado ao componente de diálogo ZsDialog.vue
-- Associado às APIs correspondentes como src/api/maintenance.js
+## 关联的组件和接口
+- 与图片上传组件 ZsUploader.vue 相关联
+- 与对话框组件 ZsDialog.vue 相关联
+- 与相应的 API（如 src/api/maintenance.js）相关联
 
-## Verificação e atribuição
+## 验证与归属
 - 验证证据: extracted source=cursor session=44acf323-b57a-4493-a6bb-8786b84965af
 - 涉及文件: src/pages_facility/record/add.vue, src/pages.json, src/components/ZsUploader/ZsUploader.vue, src/pages_facility/record/index.vue, src/pages/workbench/index.vue, src/pages_facility/issue/components/TransferKnowledgeDialog.vue, src/api/maintenance.js, src/pages_facility/record/detail.vue
-- Sessão de origem: 44acf323-b57a-4493-a6bb-8786b84965af; base de código: none
+- 源会话: 44acf323-b57a-4493-a6bb-8786b84965af; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

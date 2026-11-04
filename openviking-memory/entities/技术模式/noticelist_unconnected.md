@@ -1,17 +1,17 @@
-# NoticeList.vue não conectado ao fluxo de notificação da página inicial
-No app móvel de gestão imobiliária B-end, a lógica do ponto vermelho de notificação na página inicial está em home/index.vue e NoticeList.vue é um componente antigo não conectado; as interfaces de mensagem dependem de home.js e msg.js.
+# NoticeList.vue 未连接到首页通知流
+在B-end物业管理移动App中，首页通知红点的逻辑位于 home/index.vue，且 NoticeList.vue 是一个未连接的旧组件；消息接口依赖于 home.js 和 msg.js。
 
-## Componentes
-- A lógica do ponto vermelho de notificação na página inicial está em src/pages/home/index.vue
-- NoticeList.vue é um componente antigo não conectado ao fluxo atual
+## 组件
+- 首页通知红点的逻辑位于 src/pages/home/index.vue
+- NoticeList.vue 是一个未连接到当前流的旧组件
 
-## Dependências de interface
-- As interfaces de mensagem dependem de src/api/home.js e src/api/msg.js
+## 接口依赖
+- 消息接口依赖于 src/api/home.js 和 src/api/msg.js
 
-## Verificação e atribuição
+## 验证与归属
 - 验证证据: extracted source=cursor session=652779ed-8494-4c1a-86e5-496e1851f191
 - 涉及文件: src/pages/home/index.vue, src/pages/message/index.vue, src/pages/message/detail.vue, src/api/msg.js, src/api/home.js, src/components/CustomTabbar/CustomTabbar.vue, src/pages/announcement/index.vue, src/pages.json
-- Sessão de origem: 652779ed-8494-4c1a-86e5-496e1851f191; base de código: none
+- 源会话: 652779ed-8494-4c1a-86e5-496e1851f191; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

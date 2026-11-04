@@ -1,15 +1,14 @@
-# Remoção de Borda em Abas e Alinhamento de Barra de Ferramentas
-No Suzhou Real Estate Monitoring V3, estilo global remove borda de abas e alinha título com toolbar.
+# 移除选项卡边框并对齐工具栏
+在苏州市房地产监测V3中，全局样式移除选项卡边框并将标题与工具栏对齐。
 
 ## 解决方案
-- Em `index.scss`, `.tabs-content .collapse-container` usa `border: none !important` para sobrescrever borda scoped do `Headline` (exceto `border-only`, `appendix-section`).
-- `.collapse-header` com `flex` + `nowrap`; zera `margin/padding` de `.operation-button-container` para alinhar título com toolbar `#right` (compatível com DOM de `zs-tabs.vue`).
+- 在 `index.scss` 中，`.tabs-content .collapse-container` 使用 `border: none !important` 来覆盖 `Headline` 的 scoped 边框（除了 `border-only`、`appendix-section`）。
+- `.collapse-header` 使用 `flex` + `nowrap`；将 `.operation-button-container` 的 `margin/padding` 清零以将标题与工具栏 `#right` 对齐（兼容 `zs-tabs.vue` 的 DOM）。
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3/093.md
 - 涉及文件: supervision/progress/change/detail.vue, BuildingChangeTable.vue, Headline/index.vue, styles/index.scss, supervision/progress/node/detail.vue, AgreementDetailsTable.vue, ShareholderTable.vue, supervision/unblock/usemoney/detail.vue
-- Sessão de origem: 347d795c-a17e-454d-9b6d-e10334fa6635; baseline: none
-
+- 源会话: 347d795c-a17e-454d-9b6d-e10334fa6635; baseline: none
 
 <!-- MEMORY_FIELDS
 {

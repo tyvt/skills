@@ -1,20 +1,20 @@
-# Remoção do campo tipo de documento das páginas de detalhe de pessoal
-No projeto 苏州市房地产监测V3, removidos os itens «证件类型» dos formulários de edição em `AgencyPersonnelDetail.vue` e `LeasePersonnelDetail.vue`.
+# 从人员详情页移除证件类型字段
+在 苏州市房地产监测V3 项目中，从 `AgencyPersonnelDetail.vue` 和 `LeasePersonnelDetail.vue` 的编辑表单中移除了 «证件类型» 项。
 
 ## 问题根因
-- Os formulários de edição exibiam o campo «证件类型» indevido
-- `basicInfoView` mostrava o campo; regra obrigatória `idType` e carregamento do dicionário `document_type` presentes
+- 编辑表单显示了多余的 «证件类型» 字段
+- `basicInfoView` 显示了该字段；存在必填规则 `idType` 和字典 `document_type` 的加载
 
 ## 解决方案
-- Remover o item do formulário em `AgencyPersonnelDetail.vue` e `LeasePersonnelDetail.vue`
-- `basicInfoView` oculta o campo
-- Excluir regra obrigatória `idType` e carregamento do dicionário `document_type`
-- Manter valor padrão `idType: '01'` no formulário e preservar esse valor no payload de salvamento; lógica de backend permanece compatível
+- 在 `AgencyPersonnelDetail.vue` 和 `LeasePersonnelDetail.vue` 中从表单移除该项
+- `basicInfoView` 隐藏该字段
+- 删除必填规则 `idType` 和字典 `document_type` 的加载
+- 在表单中保留默认值 `idType: '01'` 并在保存 payload 中保留该值；后端逻辑保持兼容
 
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-leftover/066.md
 - 涉及文件: AgencyPersonnelDetail.vue, LeasePersonnelDetail.vue, e2e/institution/agency-personnel-real-api-flow.spec.js
-- 所属项目: 苏州市房地产监测V3; Sessão: 5d103f6d-b346-4d26-8144-3e36ee398668; Baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 5d103f6d-b346-4d26-8144-3e36ee398668; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

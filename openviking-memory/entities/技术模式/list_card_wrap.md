@@ -1,16 +1,16 @@
-# Listagem envolve tabela e paginação com list-card
-Seguindo ListTemplate.js, as páginas de lista usam `<div class="list-card">` para envolver área de operação + tabela + paginação (busca fora).
+# 列表涉及表格和分页（使用 list-card）
+遵循 ListTemplate.js，列表页面使用 `<div class="list-card">` 来包裹操作区域 + 表格 + 分页（搜索在外部）。
 
 ## 描述
-- 137 arquivos index.vue aplicam a estrutura com `<div class="list-card">` envolvendo operação + tabela + paginação.
-- A busca fica fora do list-card.
+- 137 个 index.vue 文件应用了以 `<div class="list-card">` 包裹操作区域 + 表格 + 分页的结构。
+- 搜索位于 list-card 外部。
 
-## Implementação
-- O script `zhi2-web-admin/scripts/wrap-list-card.mjs` pega o último `</template>` antes de `<script>`.
-- Fecha automaticamente `zs-pagination` pela tag de fechamento mais posterior, com negative lookahead para não confundir com `</zs-table-column>`.
+## 实现
+- 脚本 `zhi2-web-admin/scripts/wrap-list-card.mjs` 获取 `<script>` 之前的最后一个 `</template>`。
+- 通过最靠后的闭合标签自动关闭 `zs-pagination`，使用 negative lookahead 以避免与 `</zs-table-column>` 混淆。
 
-## Arquivos e origem
-- 涉及文件: ListTemplate.js; scripts/wrap-list-card.mjs; diversos index.vue (property/serviceItem, building/unit, article/components, benefit/pubManagementOrg, property/bankReceiptApply, property/complex, building/building).
+## 文件与来源
+- 涉及文件: ListTemplate.js; scripts/wrap-list-card.mjs; 多个 index.vue (property/serviceItem, building/unit, article/components, benefit/pubManagementOrg, property/bankReceiptApply, property/complex, building/building).
 - 验证证据: cursor session=2a132670-9deb-4220-9d16-a2853aa45068.
 
 <!-- MEMORY_FIELDS

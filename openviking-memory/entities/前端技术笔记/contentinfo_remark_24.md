@@ -1,16 +1,16 @@
 # ContentInfo Remark Layout 24
-Bug fix para contentInfo em detalhe de mudança de propriedade autônoma.
+修复自主属性变更详情中的 contentInfo。
 
-## Descrição
-- Em `zhi2-web-admin/src/views/autonomy/change/property/detail.vue`, ao final do array `contentInfo` adicionar item `remark` (nome de exibição "变更内容").
-- Definir `layout` do item com `xs/sm/md/lg/xl` todos iguais a `24` para ocupar linha inteira.
+## 描述
+- 在 `zhi2-web-admin/src/views/autonomy/change/property/detail.vue` 中，在 `contentInfo` 数组末尾添加 `remark` 项（显示名称为“变更内容”）。
+- 将该项的 `layout` 的 `xs/sm/md/lg/xl` 全部设置为 `24`，以占据整行。
 
-## Arquivos Envolvidos
+## 涉及的文件
 - zhi2-web-admin/src/views/autonomy/change/property/detail.vue
 
-## Verificação
-- Fonte: cursor session=667f57c4-46bf-4026-b4cf-866c7a9cab67
-- Base de código: none
+## 验证
+- 来源: cursor session=667f57c4-46bf-4026-b4cf-866c7a9cab67
+- 代码库: none
 
 <!-- MEMORY_FIELDS
 {

@@ -1,15 +1,15 @@
-# Botão de operação sem resposta por nome de evento save escrito errado
-No projeto 淮安物管 (zhi2-web-admin), detail.vue de branchInformation usava @save1234qweR="submitForm" em vez do evento padrão save.
+# 因保存事件名称写错导致操作按钮无响应
+在 淮安物管 (zhi2-web-admin) 项目中，branchInformation 的 detail.vue 使用了 @save1234qweR="submitForm" 而不是标准的 save 事件。
 
-## Problema
-- Componente operation-btn-group só emite evento save
-- Evento não padrão @save1234qweR não era capturado, botão de salvar não responde
+## 问题
+- operation-btn-group 组件只触发 save 事件
+- 非标准事件 @save1234qweR 未被捕获，保存按钮无响应
 
 ## 解决方案
-- Corrigir para @save="submitForm" para responder à operação de salvar
+- 修正为 @save="submitForm" 以响应保存操作
 
-## Verificação
-- Sessão cursor 2d7e9be2-2c2b-4dc0-bb76-1942eb9b0244
+## 验证
+- cursor 会话 2d7e9be2-2c2b-4dc0-bb76-1942eb9b0244
 - 涉及文件: D:/repository/淮安物管/zhi2-web-admin/src/views/system/branchInformation/detail.vue
 
 <!-- MEMORY_FIELDS

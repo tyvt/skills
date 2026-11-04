@@ -1,7 +1,7 @@
-- O branch correto para o ambiente é `develop/v2.6.2-suzhufang`; não utilizar `develop/v2.6.2-yulin-szr`.
-- Commit `2880a54a6` pertence a `develop/v2.6.2-suzhufang`; branch incorreto foi revertido e estados de ambos corrigidos.
-- Arquivos de referência: depositNotice/elevator/index.vue, depositNotice/components/index.vue, ListTemplate.js, styles/index.scss, zs-table.vue, listMixins.js, layout/index.vue, mapProperty/index.vue.
-- 验证证据: sessão cursor 15ef611b-2214-4e2e-a0e8-5e0cdc4659ca.
+- 该环境正确的分支是 `develop/v2.6.2-suzhufang`；不要使用 `develop/v2.6.2-yulin-szr`。
+- 提交 `2880a54a6` 属于 `develop/v2.6.2-suzhufang`；错误的分支已被回退，并且两者的状态已修正。
+- 参考文件：depositNotice/elevator/index.vue, depositNotice/components/index.vue, ListTemplate.js, styles/index.scss, zs-table.vue, listMixins.js, layout/index.vue, mapProperty/index.vue。
+- 验证证据: cursor 会话 15ef611b-2214-4e2e-a0e8-5e0cdc4659ca.
 
 <!-- MEMORY_FIELDS
 {

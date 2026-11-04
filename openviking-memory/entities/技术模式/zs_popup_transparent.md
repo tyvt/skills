@@ -1,16 +1,16 @@
-# ZsPopup Transparência Canto Azul
-Remove pseudo-elemento e torna fundo transparente para eliminar canto azul superior.
+# ZsPopup 透明蓝角
+移除伪元素并使背景透明以消除顶部蓝角。
 ## 问题根因
-- `.popup-container::after` cria canto azul; `uni-popup` tem fundo azul padrão.
+- `.popup-container::after` 创建蓝角; `uni-popup` 具有默认蓝色背景。
 ## 解决方案
-- Remover `.popup-container::after` em `ZsPopup.vue`.
-- Adicionar `overflow: hidden` para cortar vazamento de cantos arredondados.
-- Mudar `uni-popup` para `background-color="transparent"`.
-- Adicionar `:deep(.uni-popup__wrapper) { background: transparent !important; }`.
-## Arquivos
+- 移除 `ZsPopup.vue` 中的 `.popup-container::after`。
+- 添加 `overflow: hidden` 以裁剪圆角溢出。
+- 将 `uni-popup` 改为 `background-color="transparent"`。
+- 添加 `:deep(.uni-popup__wrapper) { background: transparent !important; }`。
+## 文件
 - `ZsPopup.vue`, `addHouse.vue`, `ZsButton.vue`, `zs-button.scss`, `ZsPicker.vue`, `authorization.vue`, `package.json`, `2026-09-11.md`.
-## Verificação
-- Sessão cursor 9b073154-cc39-42ea-a983-a2a4c7876b10; base: none.
+## 验证
+- cursor 会话 9b073154-cc39-42ea-a983-a2a4c7876b10; base: none.
 
 <!-- MEMORY_FIELDS
 {

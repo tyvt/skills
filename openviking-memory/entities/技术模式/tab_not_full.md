@@ -1,19 +1,19 @@
-# Tab não ocupa largura total por centralização e largura ausente
-`pages_main/my/myContract.vue` tem container pai com `align-items: center` e `tab-line` sem `width: 100%`, fazendo a tab não ocupar toda a largura.
+# Tab 因居中且缺少宽度而未占据全部宽度
+`pages_main/my/myContract.vue` 的父容器具有 `align-items: center`，且 `tab-line` 缺少 `width: 100%`，导致 tab 未占据整个宽度。
 
 ## 问题根因
-- Container pai `.my-contract-box` com `align-items: center`
-- `tab-line` sem `width: 100%`, não ocupando toda a largura
+- 父容器 `.my-contract-box` 具有 `align-items: center`
+- `tab-line` 缺少 `width: 100%`，未占据整个宽度
 
-## Correção
-- Definir `width: 100%` em `tab-line`
-- Mudar `:deep(.filter)` para `flex` com largura total
-- Definir `flex: 1` em `.button` para distribuir igualmente
+## 修正
+- 在 `tab-line` 中定义 `width: 100%`
+- 将 `:deep(.filter)` 改为具有全部宽度的 `flex`
+- 在 `.button` 中定义 `flex: 1` 以均匀分布
 
-## Arquivos e verificação
+## 文件与验证
 - `src/pages_main/my/myContract.vue`, `src/pages/my/myContract.vue`, `src/components/commonNew/tabLine.vue`
-- Também: `src/pages.json`, `info/index.vue`, `stockHouse/index.vue`, `onlineService/index.vue`
-- 所属项目: 苏住房C (zhi2-mobile-shimin); sessão: 79b57ec7-807a-4bf3-a5c0-808a9f8fbf51
+- 另包括：`src/pages.json`, `info/index.vue`, `stockHouse/index.vue`, `onlineService/index.vue`
+- 所属项目: 苏住房C (zhi2-mobile-shimin); 会话: 79b57ec7-807a-4bf3-a5c0-808a9f8fbf51
 
 <!-- MEMORY_FIELDS
 {

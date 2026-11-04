@@ -1,18 +1,18 @@
-# Correção de largura fixa da coluna de operação na lista de funcionários
-No projeto 苏州市房地产监测V3, a coluna de operação da lista de funcionários de agência teve a largura fixa removida para reduzir espaço em branco.
+# 修复机构人员列表中操作列的固定宽度
+在 苏州市房地产监测V3 项目中，机构人员列表的操作列移除了固定宽度，以减少空白。
 
-## Problema
-- zs-operate-column com :width="480" causava excesso de espaço em branco na lista AgencyPersonnelList.vue
+## 问题
+- zs-operate-column 使用 :width="480" 导致在 AgencyPersonnelList.vue 列表中出现过多空白。
 
 ## 解决方案
-- Removido :width="480" de zs-operate-column em AgencyPersonnelList.vue
-- Largura calculada automaticamente pelo componente conforme texto dos botões
-- Largura reduzida em 164px com botões dispostos sem quebra de linha
+- 在 AgencyPersonnelList.vue 中从 zs-operate-column 移除了 :width="480"
+- 组件根据按钮文本自动计算宽度
+- 宽度减少了 164px，按钮排列不换行
 
-## Verificação e arquivos
-- Verificação: src=苏州市房地产监测V3/179.md
+## 验证与文件
+- 验证: src=苏州市房地产监测V3/179.md
 - 涉及文件: AgencyPersonnelList.vue, zs-operate-column.vue, package.json, agency-personnel-real-api-flow.spec.js, vite.config.js, institution-menu-config.js, institution-helpers.js, auth-helpers.js
-- Sessão: c07f2835-00f4-4f26-8f40-499ded465259
+- 会话: c07f2835-00f4-4f26-8f40-499ded465259
 
 <!-- MEMORY_FIELDS
 {

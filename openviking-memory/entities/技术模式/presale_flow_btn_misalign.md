@@ -1,18 +1,18 @@
-# Botão de visualização de fluxo da pré-venda desalinhado e auditoria redundante
-Na pré-venda do sistema de monitoramento imobiliário de Suzhou V3, o botão «visualizar fluxo» estava desalinhado e o bloco de registro de aprovação redundante.
+# 预售流程查看按钮错位及冗余审批记录
+在苏州V3房地产监测系统的预售中，«流程查看»按钮错位且审批记录块冗余。
 
-## Problema
-- O botão «流程查看» (visualizar fluxo) em `OperationBtnGroup/index.vue` estava posicionado incorretamente
-- O bloco de registro de aprovação na parte inferior era redundante nas páginas de detalhe
+## 问题
+- 在 `OperationBtnGroup/index.vue` 中的 «流程查看» 按钮位置不正确
+- 详情页面底部的审批记录块冗余
 
 ## 解决方案
-- Moveu-se o botão para após «返回» (voltar) e adicionou-se `data-testid="flow-view-btn"`
-- Cinco páginas de detalhe usaram `:show-audit="showFlowViewButton"` para renderização condicional substituindo o bloco fixo
+- 将按钮移动到 «返回» 之后，并添加了 `data-testid="flow-view-btn"`
+- 五个详情页面使用 `:show-audit="showFlowViewButton"` 进行条件渲染，以替代固定块
 
-## Arquivos e Verificação
+## 文件与验证
 - 涉及文件: `OperationBtnGroup/index.vue`, `OperationContainer/index.vue`, `stock/contract/detail.vue`, `OperationBtnGroup/attachmentDraw.vue`, `presale/cashsale/components/CashsaleDetail.vue`, `presale/permitExtend/detail.vue`, `presale/permitCancel/detail.vue`, `presale/permit/components/detail.vue`
 - 验证证据: src=苏州市房地产监测V3/081.md
-- Sessão: 3042833a-7ef3-4a0c-a806-d3d5885f5ff1; base de código: none
+- 会话: 3042833a-7ef3-4a0c-a806-d3d5885f5ff1; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

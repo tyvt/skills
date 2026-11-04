@@ -1,17 +1,17 @@
-# Entrada de contrato renderiza componente 2016 unificado
-Unificação da renderização do componente 2016 e abstração de ações comuns em contrato.
+# 合同入口渲染统一的2016组件
+统一2016组件的渲染，并抽象合同中的常见操作。
 
 ## 描述
-- `src/views/contract/index.vue` deixou hardcoded 2016 como pré-venda, agora julga à vista via rota `/cash` e força render 2016.
-- Corrigido defeito de `reSign` pulando para `/pre`.
-- Novo `components/ContractOperationActions.vue` para botões comuns aos dois ramos.
-- `chapter1.vue` de suzhou2016 renomeia campos de tabela de partes por mapeamento da seção 5 e reusa `vendeeAgentDialog`.
+- `src/views/contract/index.vue` 之前将2016硬编码为预售，现在通过路由 `/cash` 按现售判断并强制渲染2016。
+- 修复了 `reSign` 跳转到 `/pre` 的缺陷。
+- 新增 `components/ContractOperationActions.vue` 用于两个分支的通用按钮。
+- suzhou2016 的 `chapter1.vue` 根据第5部分的映射重命名了当事人表的字段，并复用了 `vendeeAgentDialog`。
 
-## Arquivos
-- `contract/index.vue`, `ContractOperationActions.vue`, `chapters/suzhou2016/chapter1.vue`, `szForm.js` etc.
+## 文件
+- `contract/index.vue`, `ContractOperationActions.vue`, `chapters/suzhou2016/chapter1.vue`, `szForm.js` 等。
 
-## Verificação
-- 来源: 苏州市房地产监测V3/074.md; sessão 52faca44-46f3-48c0-9ba2-d452448948d2.
+## 验证
+- 来源: 苏州市房地产监测V3/074.md; session 52faca44-46f3-48c0-9ba2-d452448948d2.
 
 <!-- MEMORY_FIELDS
 {

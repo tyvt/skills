@@ -1,14 +1,14 @@
-# Borda dupla e linha horizontal por list-card repetido
-Padrão técnico para páginas de publicidade que envolvem list-card externo causando borda dupla.
+# 由重复的 list-card 引起的双边框和水平线
+涉及外部 list-card 导致双边框的广告页面的技术规范。
 ## 问题根因
-- pubownerDecision/index.vue e pubPublicity/index.vue repetem list-container+list-card fora do subcomponente que já tem ListTemplate.
-- Subtabela .sub-container sem estilo padrão causa linha horizontal inferior.
+- pubownerDecision/index.vue 和 pubPublicity/index.vue 在已经包含 ListTemplate 的子组件之外重复了 list-container+list-card。
+- 没有标准样式的子表 .sub-container 导致下方水平线。
 ## 解决方案
-- Remover invólucro externo e renderizar subcomponente diretamente.
-- index.scss adiciona estilo .sub-container consistente com .list-card.
-## Arquivos e verificação
+- 移除外部包裹层并直接渲染子组件。
+- index.scss 添加与 .list-card 一致的 .sub-container 样式。
+## 文件和验证
 - 涉及文件: pubownerDecision/index.vue, pubPublicity/index.vue, pubQuarterlyDeclaration/index.vue, detailTable.vue, autonomy/general/index.vue, autonomy/publicity/index.vue, styles/index.scss, mixins/ListTemplate.js.
-- Sessão de origem: 37a43ff8-4058-4152-bac5-a0c1e5aa7270; linha de base: none.
+- 原始会话: 37a43ff8-4058-4152-bac5-a0c1e5aa7270; 基线: none.
 
 <!-- MEMORY_FIELDS
 {

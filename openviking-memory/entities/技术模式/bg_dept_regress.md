@@ -1,17 +1,18 @@
-# Regressão de árvore de departamento B/G
-Na 2.6.1 a lógica era `terminalType != 'B'`, ocultando a árvore de departamento no B. Na 2.6.2 (task490) mudou para `isGTerminalLike`/`isBTerminalPractitioner`, causando que o admin empresarial B ainda visse árvore de departamento vazia — regressão.
+# B/G 部门树回归
 
-## Contexto
-- 2.6.1: `terminalType != 'B'` ocultava árvore no lado B
-- 2.6.2 (task490): condição alterada quebrou o comportamento do B
+在 2.6.1 中，逻辑为 `terminalType != 'B'`，在 B 端隐藏部门树。在 2.6.2 (task490) 中改为 `isGTerminalLike`/`isBTerminalPractitioner`，导致 B 端企业管理员仍然看到空的部门树 —— 回归。
 
-## Fatos
-- Admin empresarial B continuou vendo árvore de departamento vazia após task490
-- Condição `isGTerminalLike`/`isBTerminalPractitioner` introduziu regressão
+## 上下文
+- 2.6.1: `terminalType != 'B'` 在 B 端隐藏部门树
+- 2.6.2 (task490): 修改的条件破坏了 B 端的行为
+
+## 事实
+- B 端企业管理员在 task490 后继续看到空的部门树
+- 条件 `isGTerminalLike`/`isBTerminalPractitioner` 引入了回归
 
 ## 验证与归属
 - 涉及文件: property/complex/components/RegionTreeLayout.vue, benefit/housePart/index.vue, utils/terminalUser.js, mixins/table.js, mixins/listMixins.js, property/complex/components/regionTree.vue, property/serviceItem/index.vue, store/modules/user.js
-- 所属项目: 产品2.0; 来源: 036.md; Sessão: 33328664-0183-4781-807e-7e1586e6d95d
+- 所属项目: 产品2.0; 来源: 036.md; 会话: 33328664-0183-4781-807e-7e1586e6d95d
 
 <!-- MEMORY_FIELDS
 {

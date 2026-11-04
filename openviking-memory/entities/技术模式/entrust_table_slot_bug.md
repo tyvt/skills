@@ -5,7 +5,7 @@
 - zs-table-column 透传 :scope="scope"，插槽 props 为 { scope } 而非直接 row
 - EntrustBuildingTable.vue 操作列误用 slot-scope="scope" 致 scope.row 为 undefined
 - 报错被 .catch 静默吞掉，删除/批量删除按钮失效
-- O mesmo padrão de `slot-scope="scope"` não desestruturado afeta também `CommercialHousingTable.vue`, `buildingTable/index.vue` e outros ~20 arquivos (src=苏州市房地产监测V3/057.md)
+- 同样的未解构的 `slot-scope="scope"` 模式也影响了 `CommercialHousingTable.vue`, `buildingTable/index.vue` 以及其他约20个文件 (src=苏州市房地产监测V3/057.md)
 
 ## 解决方案
 - 操作列插槽改为 slot-scope="{ scope }" 以正确解构

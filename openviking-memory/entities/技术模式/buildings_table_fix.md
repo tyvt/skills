@@ -1,20 +1,20 @@
-# Correção do Botão de Exclusão BuildingsTable
-O botão de exclusão do `BuildingsTable.vue` foi corrigido para validar linhas selecionadas.
+# BuildingsTable 删除按钮修复
+`BuildingsTable.vue` 的删除按钮已修复，以验证选中的行。
 
-## Causa
-- O `disabled` do botão só verificava `form.bizState != '0'`, ignorando seleção de linhas
+## 原因
+- 按钮的 `disabled` 仅检查了 `form.bizState != '0'`，忽略了行的选择
 
 ## 解决方案
-- Alterado para `:disabled="form.bizState != '0' || multiple"`
-- `multiple` mantido em `handleSelectionChange`, sendo `true` quando nada selecionado
+- 改为 `:disabled="form.bizState != '0' || multiple"`
+- `multiple` 保留在 `handleSelectionChange` 中，当未选择任何内容时为 `true`
 
-## Arquivos Envolvidos
+## 涉及文件
 - `src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/components/BuildingsTable.vue`
-- Relacionados: `zs-button.vue`, `PriceTable.vue`, `BuildRecordTable.vue`, `HouseScopeTable.vue`, `detail.vue`
+- 相关文件: `zs-button.vue`, `PriceTable.vue`, `BuildRecordTable.vue`, `HouseScopeTable.vue`, `detail.vue`
 
 ## 验证与归属
-- 验证证据: extraído do cursor session=a93d9024-80c0-483e-b0d2-40a3f424626b
-- Linha de base: none; 所属项目: Produto 2.0
+- 验证证据: 提取自cursor session=a93d9024-80c0-483e-b0d2-40a3f424626b
+- 基线: none; 所属项目: 产品 2.0
 
 <!-- MEMORY_FIELDS
 {

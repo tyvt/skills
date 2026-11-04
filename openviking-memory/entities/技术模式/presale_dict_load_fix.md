@@ -1,20 +1,20 @@
-# Correção de carregamento dinâmico de dicionário no formulário de pré-venda
-No projeto 苏州市房地产监测V3, o formulário PresalePlanFillForm foi corrigido para carregar dicionários dinamicamente e ajustar campos de data e modo de venda.
+# 预售表单中字典动态加载的修复
+在 苏州市房地产监测V3 项目中，PresalePlanFillForm 表单已修复以动态加载字典并调整日期字段和销售模式。
 
-## Problema
-- Dicionários de dropdown no PresalePlanFillForm.vue não carregavam dinamicamente, causando erro de linkage
+## 问题
+- PresalePlanFillForm.vue 中的下拉字典未动态加载，导致联动错误
 
 ## 解决方案
-- Adicionadas constantes de dicionário como LAND_MORTGAGE_STATE em permitConstants.js
-- Dropdowns alterados para usar getDicts com carga dinâmica em PresalePlanFillForm.vue
-- Campos consentDate e facilityDelivery passaram a usar zs-date-picker
-- Condição de exibição da linha de agência corrigida para saleMode === '1'
-- normalizeSaleMode() mapeia códigos antigos de modo de venda
+- 在 permitConstants.js 中添加了如 LAND_MORTGAGE_STATE 之类的字典常量
+- 在 PresalePlanFillForm.vue 中将下拉框改为使用 getDicts 进行动态加载
+- consentDate 和 facilityDelivery 字段改用 zs-date-picker
+- 代理行行的显示条件修正为 saleMode === '1'
+- normalizeSaleMode() 映射旧的销售模式代码
 
-## Verificação e arquivos
-- Verificação: src=苏州市房地产监测V3/179.md
+## 验证与文件
+- 验证: src=苏州市房地产监测V3/179.md
 - 涉及文件: PermitPlanPanel.vue, PresalePlanFillForm.vue, permitConstants.js, plan/detail.vue, detail.vue, presale-permit-helpers.js
-- Sessão: 44a56ca5-f11d-40ff-a9f2-cd4a229a1f75
+- 会话: 44a56ca5-f11d-40ff-a9f2-cd4a229a1f75
 
 <!-- MEMORY_FIELDS
 {

@@ -1,18 +1,19 @@
-# Componente de detalhe sobrescreve init sem chamar getDetail
-No projeto 苏州市房地产监测V3, os arquivos `staffManagement/components/detail.vue` e `toB/personnelRecord/components/detail.vue` sobrescrevem `init()` do `detailMixins` tratando apenas lógica de adição, sem chamar `getDetail()` na visualização/edição, causando falta de requisição de detalhes.
+# 详情组件覆盖 init 而未调用 getDetail
+
+在项目 苏州市房地产监测V3 中，文件 `staffManagement/components/detail.vue` 和 `toB/personnelRecord/components/detail.vue` 覆盖了 `detailMixins` 的 `init()`，仅处理新增逻辑，在查看/编辑时未调用 `getDetail()`，导致缺少详情请求。
 
 ## 问题根因
-- `zhi2-web-admin/src/views/company/staffManagement/components/detail.vue` sobrescreve `detailMixins.init()` tratando apenas adição
-- `zhi2-web-admin/src/views/toB/personnelRecord/components/detail.vue` também não chama `getDetail()` ao visualizar/editar
-- Causa falta de requisição de detalhes ao abrir
+- `zhi2-web-admin/src/views/company/staffManagement/components/detail.vue` 覆盖 `detailMixins.init()`，仅处理新增
+- `zhi2-web-admin/src/views/toB/personnelRecord/components/detail.vue` 在查看/编辑时也未调用 `getDetail()`
+- 导致打开时缺少详情请求
 
-## Correção
-- Acrescentar verificação `getId()` e chamar `getDetail()` ao final do `init()`
+## 修复
+- 增加 `getId()` 检查，并在 `init()` 末尾调用 `getDetail()`
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/110.md
 - 涉及文件: 路由信息.json, src/api/company/personnelRecord.js, personnelListManageMixin.js, staffManagement/components/index.vue, staffManagement/components/detail.vue, listMixins.js, detailMixins.js, staffManagement/personnelRecordApply/index.vue
-- 所属项目: 苏州市房地产监测V3; sessão: d82ce8b3-d375-424f-ba1f-1a0ccfc69dc2; base de código: none
+- 所属项目: 苏州市房地产监测V3; session: d82ce8b3-d375-424f-ba1f-1a0ccfc69dc2; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

@@ -1,18 +1,17 @@
-# CI OOM: Sync Apenas Config Vite em Múltiplos Ramos do Submódulo
-No projeto 苏州市房地产监测V3, o build Vite em CI falha por OOM (memória de heap JS insuficiente). A correção foi sincronizada ao submódulo `zhi2-web-admin` em múltiplos ramos de destino, atualizando apenas arquivos de build.
+# CI OOM: 仅同步 Vite 配置到子模块的多个分支
 
-## Escopo de Sincronização
-- Sincronizado para 8 ramos de destino do submódulo `zhi2-web-admin` (ex.: `2.6.2-portal-v3`)
-- Cada ramo atualiza apenas `scripts/vite-build.mjs` e `vite.config.js` (pontos-chave da correção OOM)
+在项目 苏州市房地产监测V3 中，CI 中的 Vite 构建因 OOM（JS 堆内存不足）而失败。该修复已同步到子模块 `zhi2-web-admin` 的多个目标分支，仅更新了构建文件。
 
-## Itens Não Alterados
-- Não foi alterado `public/version.json`
-- Configuração do repositório raiz e documentos não afetados
+## 同步范围
+- 已同步到子模块 `zhi2-web-admin` 的 8 个目标分支（例如：`2.6.2-portal-v3`）
+- 每个分支仅更新 `scripts/vite-build.mjs` 和 `vite.config.js`（OOM 修复的关键点）
+
+## 未更改项
+- 未更改 `public/version.json`
+- 根仓库配置和文档未受影响
 
 ## 验证与归属
-- 验证证据: src=苏州市房地产监测V3/127.md e src=苏州市房地产监测V3-rest/104.md
-- 涉及文件: zhi2-web-admin/vite.config.js, zhi2-web-admin/package.json, package.json raiz, zhi2-web-admin/scripts/vite-build.mjs, zhi2-web-admin/scripts/fix-detail-chunk-load.mjs
-- 所属项目: 苏州市房地产监测V3; Sessão: c2c6e916-2a2e-4117-ac80-b5e180e3180f; Base de código: none
+- 验证证据: src=苏州市房地产监测V3/127
 
 <!-- MEMORY_FIELDS
 {

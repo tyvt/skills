@@ -1,4 +1,4 @@
-- Evitar definir 'businessName' como prop e simultaneamente como propriedade computada em OperationBtnGroup, pois dispara aviso do Vue; usar nova propriedade computada 'effectivePermissionPrefix' fornecida ao botão :permission para evitar conflito.
+- 避免在 OperationBtnGroup 中将 'businessName' 定义为 prop 同时作为计算属性，因为这会触发 Vue 的警告；使用新的计算属性 'effectivePermissionPrefix' 提供给按钮 :permission 以避免冲突。
 
 <!-- MEMORY_FIELDS
 {

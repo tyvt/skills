@@ -1,6 +1,6 @@
 # Summary
-No diretório certificate, 28 arquivos Vue existentes, dos quais 20 concluíram migração e 8 index.vue não precisaram alteração. Em detail.vue, operation-container substituído por operation-btn-group, adicionados moduleName:'presale', businessName, primaryKey, removidos zs-attachment e zs-print independentes. Sessão Cursor 5a8c8d9e-bdb0-4660-b439-a10862f22116.
-# 2026-11-04 (Wednesday) ChatLog:
+在 certificate 目录下，现有 28 个 Vue 文件，其中 20 个完成了迁移，8 个 index.vue 无需改动。在 detail.vue 中，operation-container 被替换为 operation-btn-group，添加了 moduleName:'presale'、businessName、primaryKey，移除了独立的 zs-attachment 和 zs-print。Cursor 会话 5a8c8d9e-bdb0-4660-b439-a10862f22116。
+# 2026-11-04 (星期三) ChatLog:
 **user**: 【记忆类型】fact
 【标题】certificate 下20个Vue文件改造完毕
 【内容】certificate 目录共 28 个 Vue 文件，其中 20 个完成迁移改造，8 个 index.vue 无需改动。detail.vue 将 operation-container 替换为 operation-btn-group，增加 moduleName: 'presale'、businessName、primaryKey，移除独立 zs-attachment 与 zs-print。

@@ -1,24 +1,24 @@
-# Salvamento de filial valida apenas formulário sem pré-verificação de apêndice
-No 苏州市房地产监测V3, o salvamento da filial de agência passou a validar apenas o formulário, removendo lógica de submissão, aprovação e pré-verificação de apêndice.
+# 分支机构保存仅验证表单，无附件预校验
+在苏州市房地产监测V3中，代理分支机构的保存改为仅验证表单，移除了提交、审批和附件预校验的逻辑。
 
-## Contexto e objetivo
-- Após o registro da agência principal, o backend registra automaticamente; o frontend não precisa mais tratar submissão e aprovação
-- Simplificar o fluxo de salvamento da filial; upload de apêndice deixa de ser bloqueio prévio do salvamento
+## 背景与目标
+- 主代理机构注册后，后端自动注册；前端不再需要处理提交和审批
+- 简化分支机构的保存流程；附件上传不再作为保存的前置阻塞
 
-## Alterações
-- `AgencyBranchDetail.vue` chama apenas `handleSave` para validação de formulário
-- Desativa `show-submit` e `show-approval` (entradas de submissão e aprovação)
-- `agencyBranch.js` remove `listAgencyBranchAppendix` e `validateAppendix` (pré-verificação)
-- Ajustes sincronizados em complex/detail.vue, detailMixins.js, form.js etc.
+## 变更
+- `AgencyBranchDetail.vue` 仅调用 `handleSave` 进行表单验证
+- 停用 `show-submit` 和 `show-approval`（提交和审批入口）
+- `agencyBranch.js` 移除 `listAgencyBranchAppendix` 和 `validateAppendix`（预校验）
+- 在 complex/detail.vue, detailMixins.js, form.js 等文件中进行了同步调整
 
-## Impacto em testes
-- E2E remove cenário de bloqueio por apêndice faltante
-- Salvamento não expira mais por falta de apêndice
+## 测试影响
+- E2E 移除因缺少附件而阻塞的场景
+- 保存不再因缺少附件而失效
 
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-rest/072.md
 - 涉及文件: AgencyBranchDetail.vue, complex/detail.vue, detailMixins.js, form.js, formComponents.js, vite.config.js, OperationBtnGroup/index.vue, AgencyBranchList.vue
-- 所属项目: 苏州市房地产监测V3; Sessão: 40edb9e5-354a-4c2b-8557-eea7a3245770; Baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 40edb9e5-354a-4c2b-8557-eea7a3245770; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

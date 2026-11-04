@@ -1,15 +1,15 @@
-# Correção de código de região em pubHouse
+# 修复 pubHouse 中的区域代码
 
-Ao submeter `/benefit/pubHouse` faltava `regionCode` e `subdistrict`/`community` eram convertidos em nomes, mas o backend precisa de códigos.
+在提交 `/benefit/pubHouse` 时缺少 `regionCode`，且 `subdistrict`/`community` 被转换为名称，但后端需要代码。
 
 ## 描述
-- Em `index.vue` e `detail.vue` adicionou-se `regionCode`.
-- Ao selecionar área de gerenciamento de propriedade, atribui-se diretamente o código.
-- No B-end, preenche-se `regionCode` com `project.region` por padrão.
+- 在 `index.vue` 和 `detail.vue` 中添加了 `regionCode`。
+- 选择物业管理区域时，直接赋值代码。
+- 在 B 端，默认使用 `project.region` 填充 `regionCode`。
 
-## Relações
+## 关系
 - 涉及文件: `benefit/pubHouse/index.vue`, `benefit/pubHouse/components/pubHouseDialog.vue`, `benefit/pubHouse/detail.vue`, `benefit/pubVenue/detail.vue`, `benefit/pubParkingSpace/detail.vue`.
-- 来源: sessão cursor b86fe772-d48c-4f14-83ed-0fae40ff6861.
+- 来源: cursor 会话 b86fe772-d48c-4f14-83ed-0fae40ff6861.
 
 <!-- MEMORY_FIELDS
 {

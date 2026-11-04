@@ -1,15 +1,15 @@
-# Página de vinculação LingXi baseada em lista e menu dinâmico
-A página property/userStatistics/index.vue usa lista GET e resumo, com menu dinâmico do backend.
+# 基于列表和动态菜单的 LingXi 绑定页面
+页面 property/userStatistics/index.vue 使用 GET 列表和摘要，带有后端的动态菜单。
 
-## Comportamento
-- Lista chama GET /property/userStatistics/list; resumo inferior chama /property/userStatistics/summary.
-- Menu é emitido dinamicamente pelo backend; requer configuração de caminho de componente e permissão.
+## 行为
+- 列表调用 GET /property/userStatistics/list；底部摘要调用 /property/userStatistics/summary。
+- 菜单由后端动态生成；需要配置组件路径和权限。
 
-## Configuração necessária
-- Componente: property/userStatistics/index
-- Permissão: property:userStatistics:list
+## 必要配置
+- 组件: property/userStatistics/index
+- 权限: property:userStatistics:list
 
-## Arquivos envolvidos
+## 涉及的文件
 - property/userStatistics/index.vue
 - property/ctUserIdentityApply/index.vue
 - maintenance/accountQuery/index.vue
@@ -18,8 +18,8 @@ A página property/userStatistics/index.vue usa lista GET e resumo, com menu din
 - property/complex/index.vue
 
 ## 验证与归属
-- 验证证据: sessão cursor 6db21291-c1ac-4c3b-921b-5f99e82885a2
-- Base de código: none
+- 验证证据: 会话 cursor 6db21291-c1ac-4c3b-921b-5f99e82885a2
+- 代码库: none
 
 <!-- MEMORY_FIELDS
 {

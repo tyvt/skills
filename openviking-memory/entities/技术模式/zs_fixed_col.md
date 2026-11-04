@@ -1,17 +1,17 @@
-# Coluna custom de largura fixa não participa de divisão em zs-table
-Sistema Suzhou Real Estate Monitoring V3: zs-table tratava coluna fixa como esticável, causando espaço em branco; corrigido para usar slot-width.
+# 固定宽度的自定义列不参与 zs-table 中的宽度分配
+Suzhou Real Estate Monitoring V3 系统：zs-table 曾将固定列视为可拉伸的，导致空白；已修正为使用 slot-width。
 
 ## 问题根因
-- `zs-table` via `type="custom"` e `slot-width` tratava coluna fixa como esticável em divisão de largura restante, gerando espaço à direita
+- `zs-table` 通过 `type="custom"` 和 `slot-width` 在剩余宽度分配中将固定列视为可拉伸的，导致右侧出现空白
 
-## Correção
-- `zs-table-column.vue` não inclui mais coluna fixa custom na divisão
-- `getBaseWidth` usa diretamente `slot-width` alinhando largura real
+## 修正
+- `zs-table-column.vue` 不再将自定义固定列包含在宽度分配中
+- `getBaseWidth` 直接使用 `slot-width` 以对齐实际宽度
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-rest/039.md
 - 涉及文件: zs-table-column.vue, zs-table.vue, FranchiseTable.vue, detail-template.vue, houseTable.vue, appendix.js, README.md, companyApplyAudit/detail.vue
-- 所属项目: Suzhou Real Estate Monitoring V3; Sessão: 00b4659f-08fb-4133-a80c-e461befbd2cf; Base: none
+- 所属项目: Suzhou Real Estate Monitoring V3; 会话: 00b4659f-08fb-4133-a80c-e461befbd2cf; Base: none
 
 <!-- MEMORY_FIELDS
 {

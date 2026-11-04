@@ -1,21 +1,21 @@
-# ListTemplate + listMixins em vendas imobiliárias e fundos de reparo
-Páginas de lista de commercialHousingSales e repairFunds foram refatoradas para ListTemplate + listMixins.
+# ListTemplate + listMixins 在商品房销售与维修基金中
+commercialHousingSales 和 repairFunds 的列表页面已重构为 ListTemplate + listMixins。
 
-## Contexto
-- 5 páginas convertidas: contractView, specialcontract, exchangeContract, verifyRecord e finance/rec
-- 所属项目: zhi2-web-admin (produto 2.0)
+## 上下文
+- 5 个页面已转换：contractView, specialcontract, exchangeContract, verifyRecord 和 finance/rec
+- 所属项目: zhi2-web-admin (产品 2.0)
 
-## Pontos-chave
-- Configurado módulo presale
-- Preservada a coluna condicional isSuzhouzhizai e o getList customizado
-- Injetado o componente ChooseHouseDialog
+## 关键点
+- 配置了 presale 模块
+- 保留了条件列 isSuzhouzhizai 和自定义的 getList
+- 注入了 ChooseHouseDialog 组件
 
-## Arquivos
+## 文件
 - Views: commercialHousingSales/priceFiling/recordPriceMngSuzhou/index.vue, commercialHousingSales/presale/{contractView,specialcontract,exchangeContract}/index.vue, repairFunds/{verifyRecord,finance/rec}/index.vue
-- Mixins: mixins/ListTemplate.js e mixins/listMixins.js
+- Mixins: mixins/ListTemplate.js 和 mixins/listMixins.js
 
-## Verificação
-- Sessão cursor: 43c84fe7-2b4f-4b61-b5ff-d697d2feb8ba
+## 验证
+- cursor 会话: 43c84fe7-2b4f-4b61-b5ff-d697d2feb8ba
 
 <!-- MEMORY_FIELDS
 {

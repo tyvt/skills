@@ -1,19 +1,19 @@
-# Correção do Caminho de Importação Buildland
-O `projectManagement/buildland/detail.vue` teve o caminho de importação corrigido para buildar.
+# Buildland 导入路径修正
+`projectManagement/buildland/detail.vue` 的导入路径已修正以通过构建。
 
-## Causa
-- Referência errada `../project/components/buildingTable.vue` causava falha de build
+## 原因
+- 错误的引用 `../project/components/buildingTable.vue` 导致构建失败
 
 ## 解决方案
-- Alterado para `@/views/building/project/components/buildingTable.vue` importando componente que suporta `landPlotId`
+- 更改为 `@/views/building/project/components/buildingTable.vue`，导入支持 `landPlotId` 的组件
 
-## Arquivos Envolvidos
+## 涉及文件
 - `src/views/projectManagement/buildland/detail.vue`
 - `src/views/building/project/components/buildingTable.vue`, `package.json`
 
 ## 验证与归属
-- 验证证据: extraído do cursor session=a4b83bc3-a943-4439-b513-3c52d63c3302
-- Linha de base: none; 所属项目: Produto 2.0
+- 验证证据: 提取自 cursor session=a4b83bc3-a943-4439-b513-3c52d63c3302
+- 基线: none; 所属项目: Produto 2.0
 
 <!-- MEMORY_FIELDS
 {

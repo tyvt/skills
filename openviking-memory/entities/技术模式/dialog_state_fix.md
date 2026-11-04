@@ -1,18 +1,18 @@
-# Nome de estado em data() divergente causa undefined
-No projeto 苏州市房地产监测V3, `chooseHouseDialog.vue` declarava `selection.origin/target` em `data()` mas os methods usavam `selectedOrigin/Target`, gerando erro em `forEach`.
+# data() 中状态名称不一致导致 undefined
+在项目 苏州市房地产监测V3 中，`chooseHouseDialog.vue` 在 `data()` 中声明了 `selection.origin/target`，但 methods 使用了 `selectedOrigin/Target`，导致在 `forEach` 中出错。
 
 ## 问题根因
-- `data()` de `chooseHouseDialog.vue` declara `selection.origin/target`
-- methods usam `selectedOrigin/Target` não inicializados, erro em chamada `forEach`
+- `chooseHouseDialog.vue` 的 `data()` 声明了 `selection.origin/target`
+- methods 使用了未初始化的 `selectedOrigin/Target`，在调用 `forEach` 时出错
 
 ## 解决方案
-- `data()` passou a declarar `selectedOrigin: []` e `selectedTarget: []`, removendo `selection`
-- `onClose` reseta estados; `handleDown/Up` retornam quando não há seleção
+- `data()` 改为声明 `selectedOrigin: []` 和 `selectedTarget: []`，移除了 `selection`
+- `onClose` 重置状态；`handleDown/Up` 在没有选择时返回
 
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/269.md
 - 涉及文件: chooseHouseDialog.vue, index.vue (commercialHousingSales/presale/contractMainInfo), contract-sign-helpers.js
-- 所属项目: 苏州市房地产监测V3; Sessão: 62a1ffcb-1ad7-433b-9cc8-6f6f5585bd2e; Baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 62a1ffcb-1ad7-433b-9cc8-6f6f5585bd2e; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

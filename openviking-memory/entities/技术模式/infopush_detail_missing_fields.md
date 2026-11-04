@@ -1,17 +1,17 @@
-# Campos ausentes em detail.vue causam aviso Vue
-No projeto 苏州市房地产监测V3, `detail.vue` e `changeDetail.vue` de InformationPush ausentam `primaryKey`, `moduleName`, `businessName` e têm nomes irregulares, gerando Vue warn.
+# detail.vue 中缺失字段导致 Vue 警告
+在项目 苏州市房地产监测V3 中，InformationPush 的 `detail.vue` 和 `changeDetail.vue` 缺少 `primaryKey`、`moduleName`、`businessName`，且命名不规范，导致 Vue 警告。
 
 ## 问题根因
-- `detail.vue` e `changeDetail.vue` de supervision/unblock/InformationPush ausentam `primaryKey`, `moduleName`, `businessName`
-- Nomes de componentes não padronizados geram Vue warn
+- `supervision/unblock/InformationPush` 下的 `detail.vue` 和 `changeDetail.vue` 缺少 `primaryKey`、`moduleName`、`businessName`
+- 组件名称未规范化导致 Vue 警告
 
 ## 解决方案
-- Adicionados os campos e renomeados componentes para `InformationPushDetail` e `InformationPushChangeDetail`
+- 已添加字段并将组件重命名为 `InformationPushDetail` 和 `InformationPushChangeDetail`
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3-rest/051.md
 - 涉及文件: supervision/unblock/InformationPush/detail.vue, mixins/detailMixins.js, supervision/unblock/InformationPush/changeDetail.vue, api/InformationPush.js, supervision/unblock/noticeChange/detail.vue, api/InformationPushChange.js, mixins/form.js, supervision/unblock/notice/detail.vue
-- 所属项目: 苏州市房地产监测V3; sessão: b2283e1b-5660-4ecc-9c6b-175b05319777; baseline: none
+- 所属项目: 苏州市房地产监测V3; session: b2283e1b-5660-4ecc-9c6b-175b05319777; baseline: none
 
 <!-- MEMORY_FIELDS
 {

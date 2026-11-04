@@ -1,18 +1,18 @@
-# Menu de link externo sem normalize InnerLink causa 404
-Rotas de menu externo não seguem padrão InnerLink, gerando interceptação de guarda e 404.
+# 未经 InnerLink 标准化的外部链接菜单导致 404
+外部菜单路由未遵循 InnerLink 规范，导致路由守卫拦截并报 404。
 
 ## 问题根因
-- Menu com `path` `https://` não casa com Vue Router interno.
-- `sso/bTerminalRedirect/index` não passa por normalização de rota `InnerLink` em `permission.js`, guarda intercepta `/404` como não autorizado.
+- 菜单的 `path` 为 `https://` 时与内部 Vue Router 不匹配。
+- `sso/bTerminalRedirect/index` 在 `permission.js` 中未经过 `InnerLink` 路由标准化，路由守卫将其作为未授权拦截至 `/404`。
 
 ## 解决方案
-- Em `permission.js`, incluir `bTerminalRedirect` na normalização de rota iframe.
-- Ajustar `RecursiveMenu` para usar `router-link` nesse componente, evitando nova janela.
+- 在 `permission.js` 中，将 `bTerminalRedirect` 纳入 iframe 路由标准化。
+- 调整 `RecursiveMenu` 在该组件中使用 `router-link`，避免打开新窗口。
 
-## Verificação e arquivos
-- Verificação: src=无锡市区G/002.md
+## 验证与文件
+- 验证: src=无锡市区G/002.md
 - 涉及文件: api/security/oauth2.js, sso/bTerminalRedirect/index.vue, property/culturalTourism/index.vue, store/permission.js, api/index.js, api/property/cultourPlatform.js, components/iFrame/index.vue, InnerLink/index.vue
-- Sessão: 2c02c8f7-aee0-47dd-b23d-d8d8f94a007a; baseline: none
+- 会话: 2c02c8f7-aee0-47dd-b23d-d8d8f94a007a; baseline: none
 
 <!-- MEMORY_FIELDS
 {

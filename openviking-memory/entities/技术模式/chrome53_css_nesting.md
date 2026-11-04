@@ -1,15 +1,15 @@
-# Chrome53 Não Suporta Aninhamento CSS
-Alvo de build chrome53 quebra compressão esbuild por sintaxe de aninhamento.
+# Chrome53 不支持 CSS 嵌套
+构建目标 chrome53 因嵌套语法导致 esbuild 压缩失败。
 ## 问题根因
-- Build target chrome53 não suporta CSS nesting (`&~.xxx`, aninhamento pai).
-- esbuild falha na compressão.
+- 构建目标 chrome53 不支持 CSS 嵌套（`&~.xxx`，父级嵌套）。
+- esbuild 压缩失败。
 ## 解决方案
-- Achatar seletores em 4 arquivos (ex: `&~.info-row` → `.info-row ~ .info-row`).
-- Usar `.count-block .total-count` em vez de aninhamento.
-## Arquivos
+- 在 4 个文件中展平选择器（例如：`&~.info-row` → `.info-row ~ .info-row`）。
+- 使用 `.count-block .total-count` 代替嵌套。
+## 文件
 - `company-detail.vue`, `property-detail.vue`, `PropertyCard.vue`, `data-analysis.vue`.
-## Verificação
-- Sessão cursor ce271386-7c66-451e-b5aa-3595f5dce594; base: none.
+## 验证
+- cursor 会话 ce271386-7c66-451e-b5aa-3595f5dce594; base: none.
 
 <!-- MEMORY_FIELDS
 {

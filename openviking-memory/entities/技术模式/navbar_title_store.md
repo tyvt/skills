@@ -1,14 +1,14 @@
-# Título da Navbar lido do store com fallback de env
-No zhi2-web-admin (produto 2.0) Navbar.vue tinha o título fixo em variável de ambiente, não lendo o nome da plataforma do store.
+# 从 store 读取 Navbar 标题，环境变量作为回退
+在 zhi2-web-admin（产品 2.0）中，Navbar.vue 的标题固定为环境变量，没有从 store 读取平台名称。
 ## 问题根因
-- Navbar.vue definia title em data como import.meta.env.VITE_APP_PROJECT_NAME fixo.
+- Navbar.vue 在 data 中将 title 定义为固定的 import.meta.env.VITE_APP_PROJECT_NAME。
 ## 解决方案
-- Adicionar computed title() retornando this.platformConfig.platformName || import.meta.env.VITE_APP_PROJECT_NAME.
-- Remover definição de title em data.
+- 添加 computed title() 返回 this.platformConfig.platformName || import.meta.env.VITE_APP_PROJECT_NAME。
+- 移除 data 中对 title 的定义。
 ## 验证与归属
 - 验证证据: cursor session=6a14ed22-6423-4953-948b-32e9d3050f1b
 - 涉及文件: src/layout/components/Navbar.vue, src/store/modules/app.js
-- 所属项目: 2-0; código base: none
+- 所属项目: 2-0; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

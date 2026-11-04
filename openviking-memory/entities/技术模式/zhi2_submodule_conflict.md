@@ -1,14 +1,14 @@
-# Conflito de ponteiro de submódulo zhi2-web-admin resolvido
-No zhi2-web-admin (produto 2.0), foi resolvido o conflito de ponteiro de submódulo ao mesclar develop/v2.6.2-yulin.
+# zhi2-web-admin 子模块指针冲突已解决
+在 zhi2-web-admin（产品 2.0）中，合并 develop/v2.6.2-yulin 时解决了子模块指针冲突。
 
-## Ocorrência
-- Merge remoto de develop/v2.6.2-yulin resolveu conflito do submódulo zhi2-web-admin
-- Ponteiro do submódulo mudou de 1db695f para 490fe1d (commit a93d9cc)
-- Área de trabalho limpa, aguardando push
+## 事件
+- 远程合并 develop/v2.6.2-yulin 解决了 zhi2-web-admin 子模块冲突
+- 子模块指针从 1db695f 变更为 490fe1d（提交 a93d9cc）
+- 工作区干净，等待推送
 
 ## 验证与归属
-- Arquivo: zhi2-web-admin/vite.config.js
-- 验证证据: src=产品2.0/074.md; sessão 0ebb2365-b4e4-48a3-b882-09b95f93edb2; base none
+- 文件: zhi2-web-admin/vite.config.js
+- 验证证据: src=产品2.0/074.md; 会话 0ebb2365-b4e4-48a3-b882-09b95f93edb2; base none
 
 <!-- MEMORY_FIELDS
 {

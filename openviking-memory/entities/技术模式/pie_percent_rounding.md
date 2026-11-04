@@ -1,16 +1,16 @@
-# Arredondamento independente de setores de pizza excede 100%
-Nos gráficos de pizza do projeto EstateManagement-Park, o arredondamento separado de cada setor fazia a soma passar de 100%.
+# 饼图扇区独立四舍五入超过100%
+在 EstateManagement-Park 项目的饼图中，每个扇区的分别四舍五入导致总和超过100%。
 
-## Problema
-- Setores arredondados individualmente a duas casas somavam 100.01% (ex.: 84.49%+9.07%+6.45%).
+## 问题
+- 单独四舍五入到两位小数的扇区总和为100.01%（例如：84.49%+9.07%+6.45%）。
 
 ## 解决方案
-- Novo PiePercentUtil em vote/component/piePercentUtil.js usa método do maior saldo para normalizar percentuais.
-- Integrado em pieChartCom.js, 19 arquivos JS com drawPie e 18 páginas shtml.
+- 新的 PiePercentUtil 在 vote/component/piePercentUtil.js 中使用最大余额法来规范化百分比。
+- 已集成到 pieChartCom.js、19个带有 drawPie 的 JS 文件和18个 shtml 页面中。
 
-## Arquivos e Origem
+## 文件与来源
 - 涉及文件: vote/component/pieChartCom.js, ownerVote/components/votePreview.js, vote/component/votePreview.js, ownerVote_Detail.shtml, vote_ownervoteDetail.shtml, vote_ownervoteDetail.js, commonJs/BaseJs.js, committePer/component/committePerPreview.js.
-- Sessão de origem: be9616f8-0da6-4e20-a64e-2ae5ed979631.
+- 来源会话: be9616f8-0da6-4e20-a64e-2ae5ed979631.
 
 <!-- MEMORY_FIELDS
 {

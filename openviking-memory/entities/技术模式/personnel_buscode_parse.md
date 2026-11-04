@@ -1,16 +1,16 @@
-# Parsing de busCode de Mudança de Pessoal por Rota e Tipo
-No projeto 苏州市房地产监测V3, lógica original confundia códigos de registro (cyryba/zlcyryba) com códigos de mudança.
+# 按路由和类型解析人员变更的 busCode
+在苏州市房地产监测V3项目中，原始逻辑将登记代码（cyryba/zlcyryba）与变更代码混淆。
 
-## Correção em personnelRecord.js
-- `resolvePersonnelChangeBusCode` reescrito: se meta da rota acerta busCode de mudança, confia diretamente; senão mapeia por tipo de instituição (corretora agencyPersonnel→jgcyrybg).
+## 在 personnelRecord.js 中的修正
+- `resolvePersonnelChangeBusCode` 重写：如果路由的 meta 命中变更 busCode，则直接信任；否则按机构类型映射（经纪机构 agencyPersonnel→jgcyrybg）。
 
-## Correção em companyChangeManage/index.vue
-- `CHANGE_DETAIL_TARGET_BY_BUS_CODE` adiciona jgcyrybg→institution/agencyPersonnel/detail.
+## 在 companyChangeManage/index.vue 中的修正
+- `CHANGE_DETAIL_TARGET_BY_BUS_CODE` 添加 jgcyrybg→institution/agencyPersonnel/detail。
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/129.md
 - 涉及文件: personnelRecord.js, personnelRecordMenuConstants.js, staffManagement/components/index.vue, agencyBranchChange.js, companyChangeManage/index.vue, staffManagement/components/detail.vue, AgencyPersonnelDetail.vue, LeasePersonnelDetail.vue
-- Sessão: 01a16232-5377-7628-b520-45bedf400542; Base: none
+- 会话: 01a16232-5377-7628-b520-45bedf400542; Base: none
 
 <!-- MEMORY_FIELDS
 {

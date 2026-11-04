@@ -1,20 +1,20 @@
 # Owner Vote List Image Subpackage
-Imagens estáticas de miniprograma não podem ser acessadas entre subpacotes, causando falha na exibição de house_szf.png.
+小程序的静态图片不能在子包之间访问，导致 house_szf.png 显示失败。
 
-## Problema e correção
-- Imagens estáticas de subpacote não podem ser acessadas entre pacotes, deixando house_szf.png invisível na lista de votação
-- Imagem copiada para src/pages_vote/static/images/
-- DecisionList.vue e StepChoose.vue especificam explicitamente o subpacote pages_vote
-- utils/index.js atualiza prioridade de mapeamento de subpacotes
+## 问题与修正
+- 子包的静态图片不能在包之间访问，导致 house_szf.png 在投票列表中不可见
+- 图片已复制到 src/pages_vote/static/images/
+- DecisionList.vue 和 StepChoose.vue 明确指定了子包 pages_vote
+- utils/index.js 更新了子包映射优先级
 
-## Arquivos envolvidos
+## 涉及的文件
 - src/pages.json, src/utils/index.js
 - src/pages_owner/decision/index.vue, components/DecisionList.vue
 - src/store/menu.js
 - src/pages_vote/decision/index.vue, components/DecisionList.vue, src/pages_vote/elect/index.vue
 
-## Origem
-- Sessão de origem: 5a891058-8e80-44d0-9a37-a7ff9e578ff9
+## 来源
+- 来源会话: 5a891058-8e80-44d0-9a37-a7ff9e578ff9
 - 所属项目: zhi2-mobile-shimin
 
 <!-- MEMORY_FIELDS

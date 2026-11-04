@@ -1,19 +1,19 @@
-# Auditoria de Campos Core de Agência e Trava de USCI
-A lógica de alteração de agência estava incompleta e causava erro de autorização; foi adicionada verificação de campos core e trava de código USCI.
+# 代理机构核心字段审计与 USCI 锁定
+代理机构变更逻辑不完整，导致了授权错误；已添加核心字段校验和 USCI 代码锁定。
 
 ## 描述
-- Projeto Suzhou Real Estate Monitoring V3, frontend zhi2-web-admin.
-- Falta de lógica de alteração de agência provocava erro de autorização.
+- 苏州房地产监测 V3 项目，前端 zhi2-web-admin。
+- 缺少代理机构变更逻辑导致了授权错误。
 
 ## 解决方案
-- Novo arquivo `agencyChangeCoreFields.js` com julgamento de campos core e bloqueio de USCI (código de crédito).
-- `AgencyBasicInfoForm.vue` desabilita campos em modo alteração e reescreve valores originais em `getForm()`.
-- Alterações de campos core seguem auditoria `jjjgbgxq`; não core salvam efeito imediato.
+- 新建文件 `agencyChangeCoreFields.js`，包含核心字段判断和 USCI（信用代码）锁定。
+- `AgencyBasicInfoForm.vue` 在变更模式下禁用字段，并在 `getForm()` 中重写原始值。
+- 核心字段的变更遵循审计 `jjjgbgxq`；非核心字段保存后立即生效。
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3-rest/011.md
 - 涉及文件: AgencyBasicInfoDetail.vue; companyRecordAgency/detail.vue; utils/ruoyi.js; e2e/fixtures/company-menu-config.js; companyRecordAgency/change/detail.vue; toB/agencyChange/detail.vue; toB/agencyRecord/detail.vue; toB/change/detail.vue
-- Sessão: 6c91b23f-bba3-49fb-bd85-76e4879db720; base de código: none
+- 会话: 6c91b23f-bba3-49fb-bd85-76e4879db720; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

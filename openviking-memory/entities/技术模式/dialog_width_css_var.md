@@ -1,13 +1,13 @@
-# Largura de diálogo controlada por variável CSS
-No projeto Suzhou Real Estate Monitoring V3, a largura de diálogos foi desacoplada de props e centralizada em CSS variables.
+# 由 CSS 变量控制的对话框宽度
+在 Suzhou Real Estate Monitoring V3 项目中，对话框宽度已从 props 解耦，并集中到 CSS variables 中。
 
-## Mudanças
-- `zs-select-dialog.vue` define `inheritAttrs: false` e remove `width: 1300px` fixo de `mergedDialogAttrs`
-- Estilo scoped remove `:deep(.el-dialog)` e usa estilo global `building-table` para wrapper e `.el-dialog`
-- `zs-select-dialog-func.vue` em `sanitize` remove `width`; `SelectDialog.open` elimina slots Vue 2 e não passa `width` a `zs-dialog`
-- `RegulatoryAccountDialog.vue` e `scope-select-dialog` também param de injetar `width: 1300px`
+## 变更
+- `zs-select-dialog.vue` 定义 `inheritAttrs: false` 并从 `mergedDialogAttrs` 中移除固定的 `width: 1300px`
+- scoped 样式移除 `:deep(.el-dialog)` 并使用全局样式 `building-table` 用于 wrapper 和 `.el-dialog`
+- `zs-select-dialog-func.vue` 在 `sanitize` 中移除 `width`；`SelectDialog.open` 移除 Vue 2 的 slots 且不向 `zs-dialog` 传递 `width`
+- `RegulatoryAccountDialog.vue` 和 `scope-select-dialog` 也停止注入 `width: 1300px`
 
-## Arquivos Envolvidos
+## 涉及文件
 - `views/supervision/utils/selectDialog.js`
 - `views/components/SelectDialog.vue`
 - `views/supervision/deposit/refund/detail.vue`
@@ -19,8 +19,8 @@ No projeto Suzhou Real Estate Monitoring V3, a largura de diálogos foi desacopl
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/026.md
-- ID de sessão: e2df1fba-88d3-49d5-bd1b-602953368329
-- 所属项目: Suzhou Real Estate Monitoring V3; linha de base: none
+- 会话ID: e2df1fba-88d3-49d5-bd1b-602953368329
+- 所属项目: Suzhou Real Estate Monitoring V3; 基线: none
 
 <!-- MEMORY_FIELDS
 {

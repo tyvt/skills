@@ -1,12 +1,12 @@
-- Criado componente `TopicInfoTable.vue` (referenciado em `detail.vue` que antes não o importava); sem grupo exibe achatado sem título "默认不分组", com grupo exibe nome do grupo, container `padding:0 24px 24px`
-- `TopicDialog.vue` envolve informações básicas em bloco `Headline`, estilo consistente com opções de tópico (`18px 24px`)
+- 创建了组件 `TopicInfoTable.vue` (在 `detail.vue` 中引用，之前未导入它)；无分组时扁平显示且无标题 "默认不分组"，有分组时显示分组名称，容器 `padding:0 24px 24px`
+- `TopicDialog.vue` 将基本信息包裹在 `Headline` 块中，样式与题目选项保持一致 (`18px 24px`)
 - 涉及文件: survey/template/detail.vue, TopicTable.vue, TopicDialog.vue, OptionTable.vue, GroupTable.vue, evaluation/surveyRelease/release/components/SurveyTopicInfoTable.vue, subTableMixins.js, Headline/index.vue
-- Verificação: sessão de origem 946e7e74-221e-42c1-acb7-c1bf634305ac
+- 验证：源会话 946e7e74-221e-42c1-acb7-c1bf634305ac
 
 <!-- MEMORY_FIELDS
 {
   "user": "user",
-  "topic": "Componente de tabela de tópicos de questionário sem título de grupo",
+  "topic": "主题标题: 无组标题的问卷主题表格组件",
   "source_extraction_id": "1a2b75746c8a4c628333ce0a17314818",
   "version": 1,
   "memory_type": "preferences"

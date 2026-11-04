@@ -1,18 +1,18 @@
-# Árvore de região com interface configurável e passagem de parâmetros
-O componente region-tree-layout recebe treeUrl e treeParams, repassando-os a regionTree.vue, com fallback quando vazio.
+# 具有可配置接口和参数传递的区域树
+组件 region-tree-layout 接收 treeUrl 和 treeParams，并将其传递给 regionTree.vue，为空时采用 fallback。
 
 ## Description
-- index.vue define tree-url='/system/dept/complexTree' e :tree-params='{}' para region-tree-layout
-- RegionTreeLayout.vue adiciona props treeUrl e treeParams repassadas a regionTree.vue
-- Quando treeParams está vazio, nenhum parâmetro de consulta é enviado
-- Interface retorna estrutura id/label/children compatível com componente existente
+- index.vue 为 region-tree-layout 定义 tree-url='/system/dept/complexTree' 和 :tree-params='{}'
+- RegionTreeLayout.vue 新增 props treeUrl 和 treeParams，并传递给 regionTree.vue
+- 当 treeParams 为空时，不发送任何查询参数
+- 接口返回与现有组件兼容的 id/label/children 结构
 
 ## Purpose
-- Tornar a árvore de regiões configurável por URL e parâmetros, mantendo compatibilidade
+- 使区域树可通过 URL 和参数配置，同时保持兼容性
 
 ## Relations
 - 涉及文件: property/workOrder/order/index.vue, property/complex/components/RegionTreeLayout.vue, property/complex/components/regionTree.vue, mixins/listMixins.js, mixins/table.js
-- Sessão cursor: ca01e574-0616-48a5-8f5a-4a6bbe304b4b
+- Cursor 会话: ca01e574-0616-48a5-8f5a-4a6bbe304b4b
 
 <!-- MEMORY_FIELDS
 {

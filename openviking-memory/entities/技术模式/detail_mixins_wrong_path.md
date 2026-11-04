@@ -1,18 +1,18 @@
-# detailMixins Concatena Caminho Errado Causando Requisição Incorreta
-No projeto Suzhou Real Estate Monitoring V3, `detailMixins` no `formMode:'view'` monta caminho errado `/company/institutionRegister/detail` via `moduleName+businessName`, fazendo detalhe requisitar API errada.
+# detailMixins 拼接错误路径导致错误请求
+在 Suzhou Real Estate Monitoring V3 项目中，`detailMixins` 在 `formMode:'view'` 下通过 `moduleName+businessName` 拼接了错误路径 `/company/institutionRegister/detail`，导致详情请求了错误的 API。
 
-## Sintoma
-- `detailMixins` em `formMode:'view'` `init()` monta caminho errado `/company/institutionRegister/detail`
+## 症状
+- `detailMixins` 在 `formMode:'view'` 下的 `init()` 拼接了错误路径 `/company/institutionRegister/detail`
 
 ## 解决方案
-- `detail.vue` sobrescreve `init()` para evitar requisição automática
-- Mantém `loadDetail()` em `created()` chamando `/company/companyRegister/detail`
-- Páginas wrapper como `zljg` compartilham efeito
+- `detail.vue` 重写 `init()` 以避免自动请求
+- 在 `created()` 中保持 `loadDetail()` 调用 `/company/companyRegister/detail`
+- 诸如 `zljg` 的包装页面共享该效果
 
-## Verificação e Atribuição
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/181.md
 - 涉及文件: api/company/institutionRegister.js, api/institution/institutionRegister.js, company/institutionRegister/detail.vue, institutionRegister/InstitutionRegisterPage.vue, mixins/detailMixins.js, mixins/form.js, zljg/institutionRegister/detail.vue, OperationBtnGroup/index.vue
-- 所属项目: Suzhou Real Estate Monitoring V3; Sessão: 1412adc3-5a64-46ef-9d42-ab80e4e6c02f; Base: none
+- 所属项目: Suzhou Real Estate Monitoring V3; 会话: 1412adc3-5a64-46ef-9d42-ab80e4e6c02f; Base: none
 
 <!-- MEMORY_FIELDS
 {

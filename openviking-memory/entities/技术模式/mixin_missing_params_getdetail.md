@@ -1,20 +1,20 @@
-# Chamada Indevida de getDetail por Mixin sem Parâmetros
-No projeto Suzhou Real Estate Monitoring V3, `QualificationFormSection.vue` usava `detailMixins` sem `moduleName`, fazendo `init()` chamar `getDetail()` em interface errada.
+# 无参数 Mixin 对 getDetail 的错误调用
+在 Suzhou Real Estate Monitoring V3 项目中，`QualificationFormSection.vue` 使用了不带 `moduleName` 的 `detailMixins`，导致 `init()` 在错误的接口上调用了 `getDetail()`。
 
 ## 问题根因
-- `QualificationFormSection.vue` usava incorretamente `detailMixins` sem parâmetros como `moduleName`
-- `init()` do mixin chamava `getDetail()` contra interface anômala por falta de parâmetros
+- `QualificationFormSection.vue` 错误地使用了不带 `moduleName` 参数的 `detailMixins`
+- mixin 的 `init()` 因缺少参数而对异常接口调用了 `getDetail()`
 
 ## 解决方案
-- Removido o `detailMixins` do componente, mantido apenas `registerFormConsumerMixin`
-- `detailMixins.js` faz `init()` retornar direto quando faltam parâmetros
-- `validateDetailRequiredParams` emite `warn` para parâmetros ausentes
+- 从组件中移除了 `detailMixins`，仅保留了 `registerFormConsumerMixin`
+- `detailMixins.js` 使 `init()` 在缺少参数时直接返回
+- `validateDetailRequiredParams` 对缺失的参数发出 `warn` 警告
 
-## Verificação e Atribuição
+## 验证与归因
 - 验证证据: src=苏州市房地产监测V3-rest/151.md
 - 所属项目: 苏州市房地产监测V3
 - 涉及文件: QualificationFormSection.vue, detailMixins.js, form.js, Step1CompanyInfo.vue, registerValidate.js, DeveloperBasicInfoForm.vue, registerFormContext.js, formComponents.js
-- Sessão: 5584ad88-6363-48c5-9d3d-5f769967f5f6; Base: none
+- 会话: 5584ad88-6363-48c5-9d3d-5f769967f5f6; Base: none
 
 <!-- MEMORY_FIELDS
 {

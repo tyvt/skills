@@ -1,18 +1,18 @@
-# Erro de parâmetro organType na lista de cancelamento
-A view companyCancel/index.vue usou organType para o filtro de tipo de instituição, mas organType é parâmetro de contexto fixo (agency/lease); o filtro do usuário deve passar companyType.
+# 取消列表中的 organType 参数错误
+视图 companyCancel/index.vue 使用 organType 作为机构类型的筛选条件，但 organType 是固定的上下文参数（agency/lease）；用户的筛选条件应传递 companyType。
 
 ## 问题根因
-- Uso incorreto de `organType` como tipo de instituição na busca e formulário
-- `organType` é parâmetro de contexto fixo (`agency`/`lease`), não o filtro de usuário
+- 在搜索和表单中错误地将 `organType` 用作机构类型
+- `organType` 是固定的上下文参数（`agency`/`lease`），而非用户筛选条件
 
-## Correção
-- Parâmetros de consulta e campos de formulário alterados para `companyType`
-- Requisição de lista usa `organType` fixo de `this.resolvedOrganType` (CompanyOrganProvider ou meta de rota), consistente com `companyRecordAgency/index.vue`
+## 修正
+- 查询参数和表单字段已更改为 `companyType`
+- 列表请求使用来自 `this.resolvedOrganType` 的固定 `organType`（CompanyOrganProvider 或路由 meta），与 `companyRecordAgency/index.vue` 保持一致
 
-## Verificação e arquivos
+## 验证与文件
 - 验证证据: src=苏州市房地产监测V3/258.md
 - 涉及文件: zhi2-web-admin/src/views/company/companyCancel/index.vue, src/api/company/companyCancel.js, zhi2-web-admin/src/views/zljg/companyCancel/index.vue, src/mixins/companyOrganContext.js, companyRecordAgency/index.vue, companyCancel/detail.vue, e2e/list/list-card-spacing.spec.js, src/constants/companyOrgan.js
-- 所属项目: 苏州市房地产监测V3; sessão: 50257d35-25d2-4753-bbb1-55a3c981474e
+- 所属项目: 苏州市房地产监测V3; 会话: 50257d35-25d2-4753-bbb1-55a3c981474e
 
 <!-- MEMORY_FIELDS
 {

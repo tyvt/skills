@@ -1,16 +1,16 @@
-# Exibição de undefined em campo de área por não usar tipo amount
-No projeto 淮安物管 (zhi2-web-admin), propertyContract/components/detail.vue usava template string `${this.form.landArea}㎡` causando "undefined㎡" quando null.
+# 因未使用 amount 类型导致面积字段显示 undefined
+在项目 淮安物管 (zhi2-web-admin) 中，propertyContract/components/detail.vue 使用了模板字符串 `${this.form.landArea}㎡`，当为 null 时导致 "undefined㎡"。
 
-## Problema
-- landArea null vira string "undefined" concatenada com ㎡
-- Falta tratamento de placeholder para nulos
+## 问题
+- landArea 为 null 时变为与 ㎡ 拼接的字符串 "undefined"
+- 缺少对 null 值的占位符处理
 
 ## 解决方案
-- Usar type: 'amount' passando landArea/totalFloorArea direto
-- detail-template getAmountDisplay trata placeholder "-" e concatena unidade
+- 使用 type: 'amount' 直接传入 landArea/totalFloorArea
+- detail-template getAmountDisplay 处理占位符 "-" 并拼接单位
 
-## Verificação
-- Sessão cursor 1d686e0a-d458-44a4-bb4f-d49a87fb35e2
+## 验证
+- cursor 会话 1d686e0a-d458-44a4-bb4f-d49a87fb35e2
 - 涉及文件: src/views/property/propertyContract/components/detail.vue, src/components/detail-template/detail-template.vue
 
 <!-- MEMORY_FIELDS

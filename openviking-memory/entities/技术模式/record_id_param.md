@@ -1,12 +1,12 @@
-# Correção de parâmetro companyRecordId em interface de mudança
-No projeto zhi2-web-admin, corrigiu-se falta de companyRecordId na API de mudança de registro de agência.
+# 修复变更接口中的 companyRecordId 参数
+在项目 zhi2-web-admin 中，修复了代理机构注册变更 API 中缺失 companyRecordId 的问题。
 
-## Correção
-- `companyRecord.js` `getLastChangeByLogin` recebe parâmetros opcionais `data`/`config` para compatibilidade
-- `companyRecordAgency/detail.vue` `startChange()` passa `{ companyRecordId: this.companyRecordId }`
-- Lado de locação (租赁端) passa a reusar a chamada corretamente
+## 修复
+- `companyRecord.js` 中的 `getLastChangeByLogin` 接收可选参数 `data`/`config` 以兼容
+- `companyRecordAgency/detail.vue` 中的 `startChange()` 传递 `{ companyRecordId: this.companyRecordId }`
+- 租赁端现在正确地重用该调用
 
-## Arquivos
+## 文件
 - src/api/company/companyRecord.js
 - src/views/company/companyRecordAgency/detail.vue
 - src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue
@@ -15,8 +15,8 @@ No projeto zhi2-web-admin, corrigiu-se falta de companyRecordId na API de mudan�
 - e2e/company/company-record-flow.spec.js
 - src/views/company/companyRecordAgency/index.vue
 
-## Verificação
-- Sessão: 7228345d-b39b-4e14-b319-e0de248ed26e
+## 验证
+- 会话: 7228345d-b39b-4e14-b319-e0de248ed26e
 
 <!-- MEMORY_FIELDS
 {

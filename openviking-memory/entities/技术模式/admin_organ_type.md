@@ -1,18 +1,18 @@
-# Campos de pessoal ocultos e salvamento incompleto por falta de organType
-O `companyAdmin/detail.vue` dependia de `form.organType` para exibir campos de pessoal; a interface sem `organType` os ocultava, e `getForm()` omitia `personnelType` e outros.
+# 因缺少 organType 导致人员字段隐藏和保存不完整
+`companyAdmin/detail.vue` 依赖 `form.organType` 来显示人员字段；没有 `organType` 的界面会隐藏它们，并且 `getForm()` 忽略了 `personnelType` 等字段。
 
 ## 问题根因
-- `isAgency` em `companyAdmin/detail.vue` depende de `form.organType` para mostrar campos de pessoal
-- Interface sem `organType` causava ocultação; `getForm()` não salvava `personnelType` e demais campos
+- `companyAdmin/detail.vue` 中的 `isAgency` 依赖 `form.organType` 来显示人员字段
+- 没有 `organType` 的界面导致隐藏；`getForm()` 未保存 `personnelType` 及其他字段
 
 ## 解决方案
-- Adicionado `showAgencyFields` como fallback, unificando formulário e validação
-- `getForm()` passou a preencher `personnelCode`, `personnelType`, `householdAddress`
+- 添加 `showAgencyFields` 作为回退方案，统一表单和验证
+- `getForm()` 开始填充 `personnelCode`、`personnelType`、`householdAddress`
 
-## Verificação e arquivos
+## 验证与文件
 - 验证证据: src=苏州市房地产监测V3-leftover/118.md
 - 涉及文件: companyAdmin/detail.vue, companyOrganContext.js, companyOrgan.js, operator/index.vue
-- 所属项目: Suzhou Real Estate Monitoring V3; sessão: 1aa60fcd-fb6c-40ed-85a3-935deaae7e9d; baseline: none
+- 所属项目: Suzhou Real Estate Monitoring V3; 会话: 1aa60fcd-fb6c-40ed-85a3-935deaae7e9d; baseline: none
 
 <!-- MEMORY_FIELDS
 {

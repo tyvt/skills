@@ -1,18 +1,18 @@
-# Rota recordPriceHouse sem componente Vue correspondente
-A rota declarada em 路由信息.json (linhas 2761 e 2795) aponta para componentes salePlan/pricehouse/recordPriceHouse/index e detail, mas o diretório não existe no workspace, causando falha no import dinâmico.
+# 路由 recordPriceHouse 没有对应的 Vue 组件
+在 路由信息.json（第 2761 和 2795 行）中声明的路由指向组件 salePlan/pricehouse/recordPriceHouse/index 和 detail，但 workspace 中不存在该目录，导致动态导入失败。
 
-## Causa-raiz
-- JSON de rotas declara componentes Vue inexistentes no workspace
+## 根本原因
+- 路由 JSON 声明了 workspace 中不存在的 Vue 组件
 
-## Correção necessária
-- Criar os arquivos Vue correspondentes ou corrigir o apontamento da rota
+## 需要的修正
+- 创建相应的 Vue 文件或更正路由指向
 
-## Arquivos envolvidos
-- recordPriceMngSuzhou/detail.vue, changeDetail.vue e priceParameters/detail.vue
-- Components: BuildingsTable.vue, PriceTable.vue, BuildRecordTable.vue, AveragePriceTable.vue, historicalPrice.vue
+## 涉及的文件
+- recordPriceMngSuzhou/detail.vue, changeDetail.vue 和 priceParameters/detail.vue
+- 组件: BuildingsTable.vue, PriceTable.vue, BuildRecordTable.vue, AveragePriceTable.vue, historicalPrice.vue
 
-## Verificação
-- Sessão cursor: ec4668d5-44ce-4441-ba60-8e9070976025
+## 验证
+- cursor 会话: ec4668d5-44ce-4441-ba60-8e9070976025
 
 <!-- MEMORY_FIELDS
 {

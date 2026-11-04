@@ -1,18 +1,18 @@
-# Campos ausentes em detail.vue causam aviso Vue e erro de requisição
-No projeto 苏州市房地产监测V3, `guarantee/detail.vue` tem `data()` sem campos, causando aviso Vue e concatenação errada de requisição de detalhe.
+# detail.vue 中缺失字段导致 Vue 警告和请求错误
+在项目 苏州市房地产监测V3 中，`guarantee/detail.vue` 的 `data()` 缺少字段，导致 Vue 警告和详情请求拼接错误。
 
 ## 问题根因
-- `data()` de `guarantee/detail.vue` ausenta `primaryKey`, `moduleName`, `businessName`
-- Causa aviso Vue e erro de concatenação em `getDetail()`
+- `guarantee/detail.vue` 的 `data()` 缺少 `primaryKey`, `moduleName`, `businessName`
+- 导致 Vue 警告和 `getDetail()` 中的拼接错误
 
 ## 解决方案
-- Completar `data()` com `primaryKey: 'useMoneyApplyId'`, `moduleName: 'prefund'`, `businessName: 'useMoneyApply'` iguais a `guarantee/index.vue`
-- Elimina aviso e permite requisição normal `/prefund/useMoneyApply/detail`
+- 补充 `data()` 中的 `primaryKey: 'useMoneyApplyId'`, `moduleName: 'prefund'`, `businessName: 'useMoneyApply'`，与 `guarantee/index.vue` 保持一致
+- 消除警告并允许正常请求 `/prefund/useMoneyApply/detail`
 
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-leftover/004.md
 - 涉及文件: guarantee/detail.vue, mixins/detailMixins.js, guarantee/index.vue, usemoney/detail.vue, guarantee/changedetail.vue, usemoneyRevoke/detail.vue, mixins/form.js, notice/detail.vue
-- 所属项目: 苏州市房地产监测V3; Sessão: e533c035-bd03-4c12-aa72-72937c898843; Baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: e533c035-bd03-4c12-aa72-72937c898843; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

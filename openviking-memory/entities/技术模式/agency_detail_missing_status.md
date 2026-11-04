@@ -1,18 +1,19 @@
-# Página de detalhe de agência omite status e condições de registro
-No projeto 苏州市房地产监测V3, `AgencyBasicInfoDetail.vue` não exibe status de registro da agência e condições atendidas, não alinhado às regras da lista.
+# 机构详情页遗漏注册状态和条件
+
+在苏州市房地产监测V3项目中，`AgencyBasicInfoDetail.vue` 未展示机构注册状态及已满足的条件，与列表规则不一致。
 
 ## 问题根因
-- `AgencyBasicInfoDetail.vue` não mostra status de registro e condições atendidas
-- Não alinhado com regras da página de lista
+- `AgencyBasicInfoDetail.vue` 未展示注册状态及已满足的条件
+- 与列表页面规则不一致
 
 ## 解决方案
-- Adicionar exibição na barra de status superior e bloco de informações básicas de `AgencyBasicInfoDetail.vue`, dados de `getCompanyApplyOverview`
-- Em `agencyApplyOverview.js` adicionar lógica compartilhada `shouldShowApplyConditionMet`, restrita a `detailScope === 'own'` e exibição de agência
+- 在 `AgencyBasicInfoDetail.vue` 的顶部状态栏和基本信息区块中添加展示，数据来自 `getCompanyApplyOverview`
+- 在 `agencyApplyOverview.js` 中添加共享逻辑 `shouldShowApplyConditionMet`，限定于 `detailScope === 'own'` 及机构展示
 
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-leftover/016.md
 - 涉及文件: institution/record/index.vue, router/index.js, institution/company/admin.vue, AgencyBasicInfoDetail.vue, agencyBasicInfoContent.js, toB/agencyRecord/detail.vue, utils/agencyApplyOverview.js, components/HeadTitle/index.vue
-- 所属项目: 苏州市房地产监测V3; Sessão: 31f62931-8476-44d0-9fee-9330529a9b8b; Baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 31f62931-8476-44d0-9fee-9330529a9b8b; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

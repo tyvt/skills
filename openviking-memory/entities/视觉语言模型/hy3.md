@@ -17,7 +17,7 @@ OpenViking 使用的视觉语言模型（VLM），负责从会话中抽取记忆
 - 2026-11-02 实测：将带 type/files/evidence/sessionIds/baseline 的预提炼记忆原样导入 OpenViking 时，VLM 仅保留语义分类（如 preference）与关键落地文件（例：VerificationReceiptDetailTable.vue），丢失 sessionIds（溯源 UUID）、baseline（代码基线如 c97957703）、evidence 原文及部分文件完整路径
 - 2026-11-02 园区物管2.0 试跑导入：hy3 每批抽4条，溯源内嵌正文保留率73%(偏好类本不带会话ID)；分类将bug归entities而非events，实体卡增大致合并增强、write降edit增
 - 同试跑单批耗时151→174s/批，累计1199万tokens@42批，证实用VLM导入成本高但可控
-- 2026-11-02 园区物管2.0 全量导入暴露语言漂移严重缺陷：hy3 将23条记忆整体葡萄牙语翻译(技术术语与中文项目名受损)，并生成葡语目录名 padrão técnico(技术模式)/causa raiz de layout(布局根因)；修复未重跑VLM(会再漂移)，改用内容指纹(变量名/组件名/接口名等ASCII标识符)从源数据精确反查中文原文逐条重写，23条全部恢复、残留0
+- 2026-11-02 园区物管2.0 全量导入暴露语言漂移严重缺陷：hy3 将23条记忆整体葡萄牙语翻译(技术术语与中文项目名受损)，并生成葡语目录名（技术模式/布局根因）；修复未重跑VLM(会再漂移)，改用内容指纹(变量名/组件名/接口名等ASCII标识符)从源数据精确反查中文原文逐条重写，23条全部恢复、残留0
 
 <!-- MEMORY_FIELDS
 {

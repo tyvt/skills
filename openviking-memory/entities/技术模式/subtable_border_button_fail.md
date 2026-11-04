@@ -1,17 +1,17 @@
-# Falha de botão por borda de subtabela e formulário desabilitado
-Subtabela com atributo border exibia linhas verticais e, ao ser colocada em zs-form desabilitado, os botões falharam em pop-ups de benefício.
+# 因子表边框和禁用表单导致的按钮失效
+具有 border 属性的子表显示垂直线条，并且当放置在禁用的 zs-form 中时，福利弹窗中的按钮失效。
 
 ## 描述
-- Componente de subtabela com border gerava separadores verticais visuais.
-- Pop-up não alinhado com subVenueDialog causava espaço em branco excessivo.
-- Subtabela dentro de zs-form desabilitado acionava fieldset disabled, invalidando botões.
+- 带有 border 的子表组件产生了可视的垂直分隔线。
+- 未与 subVenueDialog 对齐的弹窗导致过多的空白空间。
+- 位于禁用的 zs-form 中的子表触发了 fieldset disabled，使按钮失效。
 
 ## 解决方案
-- Removido border de subOtherTable e similares.
-- subOtherDialog etc. usam tamanhos mini/medium com fullRowLayout e el-row.
-- Subtabela movida para fora de zs-form, trocando para el-button.
+- 从 subOtherTable 及类似组件中移除了 border。
+- subOtherDialog 等使用 mini/medium 尺寸配合 fullRowLayout 和 el-row。
+- 将子表移到 zs-form 外部，并替换为 el-button。
 
-## Arquivos
+## 文件
 - zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subOtherDialog.vue
 - zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subOtherTable.vue
 - zhi2-web-admin/src/mixins/dialogMixins.js
@@ -21,9 +21,9 @@ Subtabela com atributo border exibia linhas verticais e, ao ser colocada em zs-f
 - zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/detail.vue
 - zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subVenueTable.vue
 
-## Relações
-- Sessão 来源: 92e30909-1160-4e65-bfae-414e923ee760 (cursor)
-- 所属项目: produto 2.0 (zhi2-web-admin)
+## 关系
+- 会话来源: 92e30909-1160-4e65-bfae-414e923ee760 (cursor)
+- 所属项目: 产品 2.0 (zhi2-web-admin)
 
 <!-- MEMORY_FIELDS
 {

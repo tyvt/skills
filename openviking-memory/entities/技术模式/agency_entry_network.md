@@ -1,15 +1,15 @@
-# Campos obrigatórios de alias e associação na certificação de agência
-A certificação de entrada de rede de agência imobiliária deve submeter os campos não obrigatórios `companyAlias` e `industryAssociation`.
+# 代理认证中别名和关联的必填字段
+房地产代理网络接入认证必须提交非必填字段 `companyAlias` 和 `industryAssociation`。
 
-## Contexto
-- `AgencyEntryNetworkDetail.vue` em `buildEntryNetworkSavePayload()` para agências não locatárias envia `companyAlias` sem espaços e `industryAssociation` com valor
-- `AgencyEntryNetworkSections.vue` suporta edição (maxlength=150, dicionário `INDUSTRY_ASSOCIATION`) e visualização via `agencyBasicInfoContent.js` `DetailTemplate`
+## 上下文
+- `AgencyEntryNetworkDetail.vue` 中的 `buildEntryNetworkSavePayload()` 针对非租户代理发送不带空格的 `companyAlias` 和有值的 `industryAssociation`
+- `AgencyEntryNetworkSections.vue` 支持编辑（maxlength=150，字典 `INDUSTRY_ASSOCIATION`）和通过 `agencyBasicInfoContent.js` 的 `DetailTemplate` 查看
 
-## Arquivos e nota
-- `companyRecord.js` `saveAgencyEntryNetwork` recebeu comentário complementar
+## 文件与备注
+- `companyRecord.js` 的 `saveAgencyEntryNetwork` 收到了补充注释
 - 验证证据: src=苏州市房地产监测V3/259.md
 - 涉及文件: companyRecord.js, AgencyEntryNetworkDetail.vue, AgencyEntryNetworkSections.vue, agencyBasicInfoContent.js, companyBasicInfoShared.js, companyRecordAgency/change/detail.vue, AgencyBasicInfoForm.vue
-- 所属项目: 苏州市房地产监测V3; sessão: 55b4a7f2-9aca-4e4f-906e-0245c0774837
+- 所属项目: 苏州市房地产监测V3; 会话: 55b4a7f2-9aca-4e4f-906e-0245c0774837
 
 <!-- MEMORY_FIELDS
 {

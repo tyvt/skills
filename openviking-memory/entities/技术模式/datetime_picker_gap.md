@@ -1,17 +1,17 @@
-# uni-datetime-picker causa espaço em branco abaixo da data
-No app móvel de gestão imobiliária B-end, o uni-datetime-picker causava espaço em branco abaixo do seletor de data em record/add.vue; corrigido estendendo ZsDatePicker e removendo estilos de correção.
+# uni-datetime-picker 导致日期下方出现空白
+在 B-end 物业管理移动端应用中，uni-datetime-picker 曾在 record/add.vue 的日期选择器下方导致空白；通过扩展 ZsDatePicker 并移除修正样式修复。
 
 ## 问题根因
-- O uni-datetime-picker em src/pages_facility/record/add.vue causa espaço em branco abaixo do seletor de data de inspeção
+- 在 src/pages_facility/record/add.vue 中的 uni-datetime-picker 导致巡检日期选择器下方出现空白
 
 ## 解决方案
-- Estendido ZsDatePicker para suportar type="date" substituindo o componente original
-- Removidos onDateChange e o estilo de correção :deep(.uni-calendar__content-mobile)
+- 扩展 ZsDatePicker 以支持 type="date"，替换原组件
+- 移除了 onDateChange 和修正样式 :deep(.uni-calendar__content-mobile)
 
-## Verificação e atribuição
+## 验证与归属
 - 验证证据: extracted source=cursor session=348a159a-0e6d-49a3-a318-5c1a3d19e32b
 - 涉及文件: src/pages_facility/record/add.vue, src/pages_facility/record/addScrap.vue, src/components/ZsDatePicker/ZsDatePicker.vue, src/pages_facility/components/FilterPopup.vue, src/components/ZsPicker/ZsPicker.vue, src/pages_facility/record/index.vue, src/styles/filter.scss
-- Sessão de origem: 348a159a-0e6d-49a3-a318-5c1a3d19e32b; base de código: none
+- 源会话: 348a159a-0e6d-49a3-a318-5c1a3d19e32b; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

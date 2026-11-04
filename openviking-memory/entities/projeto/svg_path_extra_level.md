@@ -1,15 +1,15 @@
-# Caminho SVG com Nível Extra e Arquivo Vazio
-Erro de referência SVG com caminho extra e arquivo 0 bytes em páginas de decisão.
+# 带有额外层级和空文件的 SVG 路径
+决策页面中出现路径多余且文件为 0 字节的 SVG 引用错误。
 ## 问题根因
-- `ResultStatistics.vue` e `StepConfirm.vue` usam `../.././static` (um nível a mais).
-- `flag-szf.svg` tem 0 bytes.
+- `ResultStatistics.vue` 和 `StepConfirm.vue` 使用了 `../.././static` (多了一个层级).
+- `flag-szf.svg` 为 0 字节.
 ## 解决方案
-- Corrigir para `../../static/images/svg/flag-szf.svg`.
-- Adicionar ícone de bandeira com cor tema `#1354BE`.
-## Arquivos
+- 更正为 `../../static/images/svg/flag-szf.svg`.
+- 添加带有主题色 `#1354BE` 的旗帜图标.
+## 文件
 - `ResultStatistics.vue`, `StepConfirm.vue`, `sort.scss`, `StepChoose.vue`, `package.json`.
-## Verificação
-- Sessão cursor 860e18b1-7843-41e3-a393-6d3279b805da; base: none.
+## 验证
+- cursor 会话 860e18b1-7843-41e3-a393-6d3279b805da; base: none.
 
 <!-- MEMORY_FIELDS
 {

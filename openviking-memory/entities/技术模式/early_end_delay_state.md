@@ -1,18 +1,18 @@
-# Botão de término antecipado oculto sem estado de adiamento
-Na página de detalhe de decisão geral (generalDecision/detail.vue), o botão de término antecipado não aparecia no estado de adiamento.
+# 无延期状态下隐藏的提前结束按钮
+在常规决策详情页 (generalDecision/detail.vue) 中，提前结束按钮在延期状态下不显示。
 
 ## 问题根因
-- Botão "término antecipado" exibia apenas quando `decisionState == '2'`
-- Estado de adiamento (`'5'`) não atendia à condição
+- “提前结束”按钮仅在 `decisionState == '2'` 时显示
+- 延期状态 (`'5'`) 不满足该条件
 
-## Correção
-- Em `detail.vue` o `v-if` do botão incluiu `decisionState == '5'`
-- Mantida a verificação de permissão, alinhado a outras páginas de decisão
+## 修正
+- 在 `detail.vue` 中，按钮的 `v-if` 加入了 `decisionState == '5'`
+- 保留了权限验证，与其他决策页面保持一致
 
-## Verificação e arquivos
-- Sessão de origem: 5498a264-de28-46af-8525-e64606a2220e
+## 验证与文件
+- 源会话: 5498a264-de28-46af-8525-e64606a2220e
 - 涉及文件: generalDecision/detail.vue, ownerDecision/detail.vue, optionDecision/detail.vue, sortDecison/detail.vue, maintainDecision/detail.vue
-- 所属项目: 太仓G; base de código: none
+- 所属项目: 太仓G; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

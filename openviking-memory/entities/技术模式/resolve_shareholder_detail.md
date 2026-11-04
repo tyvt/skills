@@ -1,19 +1,19 @@
-# Resolução de lista de acionistas do detail
-O zhi2-web-admin do projeto 苏州市房地产监测V3 adiciona função em companyBasicInfoShared.js para extrair shareholderList da resposta de companyRecord/detail com fallback via getOwnCompany.
+# 解析 detail 的股东列表
+项目苏州市房地产监测V3的 zhi2-web-admin 在 companyBasicInfoShared.js 中添加了函数，用于从 companyRecord/detail 的响应中提取 shareholderList，并通过 getOwnCompany 进行回退。
 
-## Implementação
-- Em `zhi2-web-admin/src/views/company/companyManagement/components/companyBasicInfoShared.js` nova função `resolveShareholderListFromDetailPayload` parseia `shareholderList` da resposta `/company/companyRecord/detail`
-- `DeveloperBasicInfoDetail.vue` `loadShareholderList()` chama interface detail quando existe `companyRecordId`
-- `detailCallback` usa `getOwnCompany` como fallback e depois sobrescreve; falha mantém fallback
+## 实现
+- 在 `zhi2-web-admin/src/views/company/companyManagement/components/companyBasicInfoShared.js` 中，新函数 `resolveShareholderListFromDetailPayload` 解析来自 `/company/companyRecord/detail` 响应的 `shareholderList`
+- `DeveloperBasicInfoDetail.vue` 中的 `loadShareholderList()` 在存在 `companyRecordId` 时调用 detail 接口
+- `detailCallback` 使用 `getOwnCompany` 作为回退，然后覆盖；失败则保留回退
 
-## Arquivos
+## 文件
 - companyBasicInfoShared.js, DeveloperBasicInfoDetail.vue, ShareholderPlainTable.vue
 - companyManagement/companyBasicInfo/detail.vue, companyRegister/detail.vue
 - api/company/companyRecord.js, utils/registerQualification.js, toB/companyRecord/detail.vue
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3/140.md
-- 所属项目: 苏州市房地产监测V3; sessão: 4d9d7fb3-9c0c-440d-b3de-166a2d7335a9; baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 4d9d7fb3-9c0c-440d-b3de-166a2d7335a9; baseline: none
 
 <!-- MEMORY_FIELDS
 {

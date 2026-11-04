@@ -1,16 +1,16 @@
-# Diálogos de detalhe de empresa/licença com zs-dialog
-Os diálogos de detalhe de empresa e licença do portal seguem zs-dialog + .form-box, com rótulos alinhados à direita em coluna de largura fixa.
+# 使用 zs-dialog 的企业/许可证详情对话框
+门户中的企业和许可证详情对话框遵循 zs-dialog + .form-box，标签在固定宽度列中右对齐。
 
-## Especificação
-- Coluna de rótulo com largura fixa e alinhamento à direita: empresa 168px, licença 150px
-- Espaçamento entre rótulo e valor: 12px
-- Padding do corpo: 20px 40px
-- Line-height 40px com entrelinha 16px
-- Cabeçalho sem borda inferior, com sublinhado claro
+## 规格
+- 标签列固定宽度且右对齐：企业 168px，许可证 150px
+- 标签与值之间的间距：12px
+- 主体内边距：20px 40px
+- Line-height 40px，行间距 16px
+- 头部无下边框，带有浅色下划线
 
-## Arquivos e origem
-- 涉及文件: PropertyDetailDialog.vue, PortalDialogHost.vue, zs-dialog.vue, CompanyDialog/index.vue, ProjectDialog/index.vue, detail-template.vue, public-portal-designs.md, detail-form.scss (em zhi2-web-admin/src/views/home/publicPortal)
-- 验证证据: sessão workbuddy 47720336-5f4d-49c6-8fa8-1a7fc52beb93
+## 文件与来源
+- 涉及文件: PropertyDetailDialog.vue, PortalDialogHost.vue, zs-dialog.vue, CompanyDialog/index.vue, ProjectDialog/index.vue, detail-template.vue, public-portal-designs.md, detail-form.scss (位于 zhi2-web-admin/src/views/home/publicPortal)
+- 验证证据: workbuddy 会话 47720336-5f4d-49c6-8fa8-1a7fc52beb93
 
 <!-- MEMORY_FIELDS
 {

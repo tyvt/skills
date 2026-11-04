@@ -1,22 +1,22 @@
-# Slot de coluna customizado não pode desestruturar row
-No projeto 苏州市房地产监测V3, o `zs-table-column` passa `{ scope }` e não `{ row }`; componentes como `PresaleHouseTable.vue` e `PresaleBuildingTable.vue` usavam `slot-scope='{ row }'` causando `row` undefined.
+# 自定义列插槽无法解构 row
+在 苏州市房地产监测V3 项目中，`zs-table-column` 传递的是 `{ scope }` 而不是 `{ row }`；诸如 `PresaleHouseTable.vue` 和 `PresaleBuildingTable.vue` 等组件使用了 `slot-scope='{ row }'`，导致 `row` 为 undefined。
 
 ## 问题根因
-- `zs-table-column` passa `{ scope }` em vez de `{ row }` no slot customizado
-- `PresaleHouseTable.vue` usava `slot-scope='{ row }'` em 4 colunas customizadas, fazendo `row` ser `undefined`
-- `PresaleBuildingTable.vue` desestruturava `{ row }` e obtinha `undefined`, gerando erro de acesso a propriedade
-- `PermitHistoryPanel.vue`, `PermitEntrustPanel.vue` e `PermitPlanPanel.vue` tinham uso incorreto similar
+- `zs-table-column` 在自定义插槽中传递的是 `{ scope }` 而非 `{ row }`
+- `PresaleHouseTable.vue` 在 4 个自定义列中使用了 `slot-scope='{ row }'`，导致 `row` 为 `undefined`
+- `PresaleBuildingTable.vue` 解构了 `{ row }` 并得到 `undefined`，从而引发属性访问错误
+- `PermitHistoryPanel.vue`、`PermitEntrustPanel.vue` 和 `PermitPlanPanel.vue` 存在类似的不正确用法
 
 ## 解决方案
-- 4 slots de coluna em `PresaleHouseTable.vue` mudaram para `{ scope }` e acessam via `scope.row`
-- `PresaleBuildingTable.vue` teve o slot alterado para `{ scope }` com acesso por `scope.row`
-- `PermitHistoryPanel.vue` e `PermitEntrustPanel.vue` ajustados da mesma forma
-- `PresaleSelectBuildingDialog.vue` usou `<template slot-scope="{ scope }">{{ scope.row.superviseStandard || '-' }}</template>`
-- `companyChangeManage/index.vue` e `toB/companyRecord/detail.vue` passaram a usar o `formatter` da coluna para renderizar o tipo de mudança e proteger `row` vazio no método (sessão 239bd34d-1fce-4cc6-aba4-e5be4ee5ce9f)
+- `PresaleHouseTable.vue` 中的 4 个列插槽改为 `{ scope }` 并通过 `scope.row` 访问
+- `PresaleBuildingTable.vue` 的插槽改为 `{ scope }` 并通过 `scope.row` 访问
+- `PermitHistoryPanel.vue` 和 `PermitEntrustPanel.vue` 做了同样的调整
+- `PresaleSelectBuildingDialog.vue` 使用了 `<template slot-scope="{ scope }">{{ scope.row.superviseStandard || '-' }}</template>`
+- `companyChangeManage/index.vue` 和 `toB/companyRecord/detail.vue` 开始使用该列的 `formatter` 来渲染变更类型，并在方法中保护空的 `row`（会话 239bd34d-1fce-4cc6-aba4-e5be4ee5ce9f）
 
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/269.md; src=苏州市房地产监测V3-leftover/069.md; src=苏州市房地产监测V3-rest/009.md; src=苏州市房地产监测V3/058.md
-- Sessões: 050cc8e9-9258-449c-ade4-f02145919718; 71d310c7-e8fd-4626-846a-719d1e85dcb3; 848529ca-dbef-4317-ac0a-f071aba151fb; 239bd34d-1fce-4cc6-aba4-e5be4ee5ce9f
+- 会话: 050cc8e9-9258-449c-ade4-f02145919718; 71d310c7-e8fd-4626-846a-719d1e85dcb3; 848529ca-dbef-4317-ac0a-f071aba151fb; 239bd34d-1fce-4cc6-aba4-e5be4ee5ce9f
 - 涉及文件: PresaleHouseTable.vue, PresaleBuildingTable.vue, permitConstants.js, zs-table-column.vue, PresaleBuildingSection.vue, zs-table.vue, zs-table-column/zs-table-column.vue, PresaleSelectBuildingDialog.vue, PermitHistoryPanel.vue, PermitEntrustPanel.vue, PermitPlanPanel.vue, package.json, ruoyi.js, presale-permit-helpers.js, detail.vue, companyChangeManage/index.vue, toB/companyRecord/detail.vue
 - 所属项目: 苏州市房地产监测V3; Baseline: none
 

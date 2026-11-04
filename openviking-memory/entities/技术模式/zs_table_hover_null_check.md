@@ -1,16 +1,16 @@
-# Verificação de nulo no hover do zs-table
-No zs-table.vue, os manipuladores de hover acessavam cell.parentElement sem verificação, causando erro quando cell era undefined.
+# zs-table 悬停时的空值检查
+在 zs-table.vue 中，悬停处理程序在没有检查的情况下访问了 cell.parentElement，当 cell 为 undefined 时导致错误。
 
-## Problema
-- Em zs-table.vue, handleCellMouseEnter/handleCellMouseLeave acessavam diretamente cell.parentElement.
-- Em linhas de total ou colunas fixas não sincronizadas, cell podia ser undefined, gerando "Cannot read properties of undefined".
+## 问题
+- 在 zs-table.vue 中，handleCellMouseEnter/handleCellMouseLeave 直接访问了 cell.parentElement。
+- 在合计行或未同步的固定列中，cell 可能为 undefined，产生 "Cannot read properties of undefined"。
 
 ## 解决方案
-- Adicionado `if (!cell?.parentElement) return` para bloquear acesso a undefined.
+- 添加了 `if (!cell?.parentElement) return` 以阻止对 undefined 的访问。
 
-## Arquivos e origem
+## 文件和来源
 - 涉及文件: zs-table.vue; src/views/benefit/assetLeaseApply/index.vue; src/views/property/complex/components/RegionTreeLayout.vue.
-- 验证证据: src=产品2.0/085.md; sessão: 2e92212a-8c81-44e4-9cc6-e2feecfe6e5e.
+- 验证证据: src=产品2.0/085.md; 会话: 2e92212a-8c81-44e4-9cc6-e2feecfe6e5e.
 
 <!-- MEMORY_FIELDS
 {

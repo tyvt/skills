@@ -1,20 +1,21 @@
-# Botão de Visualização Cinza por Falta de planId em Solicitação Salva
-No projeto Suzhou Real Estate Monitoring V3, o botão "查看" de solicitações de permissão salvas ficava desabilitado porque o detalhe nem sempre retornava `planId`.
+# 保存的申请因缺少 planId 导致查看按钮变灰
+
+在 Suzhou Real Estate Monitoring V3 项目中，已保存的许可申请的“查看”按钮处于禁用状态，因为详情并不总是返回 `planId`。
 
 ## 问题根因
-- A interface de detalhe de solicitação salva pode não retornar `planId`
-- O botão "查看" dependia apenas do `planId` local, causando estado cinza
+- 保存的申请详情接口可能不返回 `planId`
+- “查看”按钮仅依赖本地的 `planId`，导致灰色状态
 
 ## 解决方案
-- `PermitPlanPanel.vue` aceita `planId` ou `presalePermitId` para habilitar o botão
-- `permitConstants.js` ganhou `extractPlanId()` para resolver o campo uniformemente
-- `detail.vue` e `plan/detail.vue` integraram a função com fallback de carregamento
+- `PermitPlanPanel.vue` 接受 `planId` 或 `presalePermitId` 来启用按钮
+- `permitConstants.js` 新增 `extractPlanId()` 以统一解析该字段
+- `detail.vue` 和 `plan/detail.vue` 集成了该函数并具备加载回退
 
-## Verificação e Atribuição
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/198.md
 - 所属项目: 苏州市房地产监测V3
 - 涉及文件: PermitPlanPanel.vue, detail.vue, plan/detail.vue, detailMixins.js, form.js, ruoyi.js, permitConstants.js, e2e/fixtures/presale-permit-helpers.js
-- Sessão: 954f078a-f048-4ccb-a30d-b2fce225de05; Base: none
+- 会话: 954f078a-f048-4ccb-a30d-b2fce225de05; Base: none
 
 <!-- MEMORY_FIELDS
 {

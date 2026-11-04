@@ -1,6 +1,6 @@
-# Summary
-A página `statistics/index.vue` foi refatorada para alinhar com o padrão de lista de `release/index.vue`, adotando `ListTemplate.js` e `listMixins`. Foram removidos dados redundantes como `getList` escrito manualmente; `operationButtons` retorna vazio; `buttons` mantém apenas `viewButton`; preservados `initDict` e `handleView`. Alteração descrita na sessão de extração 79d8b01e-dd31-4523-9359-f9809fc997bf.
-# 2026-11-04 (Wednesday) ChatLog:
+# 摘要
+页面 `statistics/index.vue` 已被重构以对齐 `release/index.vue` 的列表模式，采用 `ListTemplate.js` 和 `listMixins`。已移除冗余数据，例如手写的 `getList`；`operationButtons` 返回空；`buttons` 仅保留 `viewButton`；保留了 `initDict` 和 `handleView`。更改描述在提取会话 79d8b01e-dd31-4523-9359-f9809fc997bf 中。
+# 2026-11-04 (星期三) 聊天日志:
 **user**: 【记忆类型】bug
 【标题】statistics页未对齐标准列表写法致冗余
 【内容】`statistics/index.vue`对齐`release/index.vue`标准列表，采用`ListTemplate.js`+`listMixins`删除手写`getList`等冗余data，`operationButtons`返空，`buttons`仅留`viewButton`，保留`initDict`与`handleView`。

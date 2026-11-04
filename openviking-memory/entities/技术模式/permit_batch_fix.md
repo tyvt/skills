@@ -1,18 +1,19 @@
-# detail.vue não envia campo batchNo ao salvar
-No projeto 苏州市房地产监测V3, `src/views/presale/permit/components/detail.vue` montava parâmetros em `getForm()` sem `batchNo`, que só era calculado em `handleProjectChange` para exibição.
+# detail.vue 保存时未发送 batchNo 字段
+
+在项目 苏州市房地产监测V3 中，`src/views/presale/permit/components/detail.vue` 在 `getForm()` 中组装参数时缺少 `batchNo`，该字段仅在 `handleProjectChange` 中计算用于显示。
 
 ## 问题根因
-- `getForm()` de `detail.vue` não incluía `batchNo` ao montar parâmetros de salvamento
-- Número do lote era calculado apenas em `handleProjectChange` para exibição
+- `detail.vue` 的 `getForm()` 在组装保存参数时未包含 `batchNo`
+- 批次号仅在 `handleProjectChange` 中计算用于显示
 
 ## 解决方案
-- `getForm()` passou a retornar `batchNo: this.form.batchNo`
-- Garante que requisições de salvamento em modo inclusão e edição carregam o campo de lote
+- `getForm()` 改为返回 `batchNo: this.form.batchNo`
+- 确保在新增和编辑模式下的保存请求都携带批次字段
 
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/273.md
 - 涉及文件: src/views/presale/permit/components/detail.vue
-- 所属项目: 苏州市房地产监测V3; Sessão: 01a16316-12bd-70c5-a400-765e5489bc0b; Baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 01a16316-12bd-70c5-a400-765e5489bc0b; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

@@ -1,5 +1,5 @@
-- Ajusta seleção de datas de prazo (célula do mês), `textarea` e botão de exclusão em lote em helpers E2E de venda consignada.
-- Falha '天印发起签署失败' é por conta de ambiente não configurada, não por layout.
+- 调整寄售 E2E helpers 中的期限日期选择（月份单元格）、`textarea` 和批量删除按钮。
+- 失败 '天印发起签署失败' 是由于环境未配置，而非布局。
 
 <!-- MEMORY_FIELDS
 {

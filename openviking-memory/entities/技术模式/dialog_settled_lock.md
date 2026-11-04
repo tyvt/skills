@@ -1,14 +1,14 @@
-# SelectDialog confirm inválido por reject sobrepor resolve
-Bug em `zs-select-dialog-func.vue`: ao clicar em confirmar, `setData` era seguido de `resolve`, mas o fechamento acionava `reject('cancel')` que sobrescrevia, fazendo catch de `handleAdd` silenciar erro e lista não atualizar.
+# SelectDialog 确认无效因 reject 覆盖 resolve
+Bug 在 `zs-select-dialog-func.vue` 中：点击确认时，`setData` 之后跟着 `resolve`，但关闭触发了 `reject('cancel')` 将其覆盖，导致 `handleAdd` 的 catch 静默错误且列表未更新。
 
-## Problema
-- `SelectDialog.open` confirm inválido porque `reject` cobria `resolve` sem trava
+## 问题
+- `SelectDialog.open` 确认无效，因为 `reject` 在无锁的情况下覆盖了 `resolve`
 
 ## 解决方案
-- Adicionado bloqueio `settled` em `zs-select-dialog-func.vue` para garantir apenas uma liquidação
-- Novo `openUnionBankWdmcSelect` em `unionBankWdmc.js` unifica seleção de banco conforme `/system/unionBank/page`
+- 在 `zs-select-dialog-func.vue` 中添加了 `settled` 锁，以确保仅进行一次结算
+- 在 `unionBankWdmc.js` 中新增 `openUnionBankWdmcSelect`，根据 `/system/unionBank/page` 统一银行选择
 
-## Arquivos
+## 文件
 - supervision/bank/superviseBank/index.vue
 - supervision/bank/jgwd/index.vue
 - supervision/utils/selectDialog/prefund.js
@@ -17,9 +17,9 @@ Bug em `zs-select-dialog-func.vue`: ao clicar em confirmar, `setData` era seguid
 - supervision/bank/jgwd/detail.vue
 - supervision/bank/superviseBank/detail.vue
 
-## Validação
+## 验证
 - 验证证据: src=苏州市房地产监测V3/028.md
-- Sessão: b1936cf8-2758-4591-92a8-a76aef6e1db5
+- 会话: b1936cf8-2758-4591-92a8-a76aef6e1db5
 
 <!-- MEMORY_FIELDS
 {

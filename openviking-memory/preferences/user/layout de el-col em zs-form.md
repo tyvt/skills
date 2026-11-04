@@ -1,7 +1,6 @@
-- Em `NodeDetailsDialog.vue`, manter `el-row`/`el-col` dentro de `zs-form` para evitar que estilo `.form-box .zs-form > .el-col { width: 100% }` transforme duas colunas em uma.
-- Configurar `zs-dialog` com `zs-size="mini"`, `label-position="left"` e `label-width="120px"`.
-- Remover campos redundantes em `data` ao aplicar esse padrão.
-
+- 在 `NodeDetailsDialog.vue` 中，保持 `el-row`/`el-col` 在 `zs-form` 内，以避免样式 `.form-box .zs-form > .el-col { width: 100% }` 将两列变为一列。
+- 将 `zs-dialog` 配置为 `zs-size="mini"`、`label-position="left"` 和 `label-width="120px"`。
+- 应用此模式时，移除 `data` 中的冗余字段。
 
 <!-- MEMORY_FIELDS
 {

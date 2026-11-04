@@ -1,18 +1,18 @@
-# Correção de min-width de menu fixo que ocupava a tela
-No menu de usuário com `position: fixed`, `min-width: max(100%, 132px)` calculava `100%` pela largura da viewport, esticando o dropdown e cobrindo a barra lateral.
+# 修复固定菜单占用屏幕的 min-width 问题
+在带有 `position: fixed` 的用户菜单中，`min-width: max(100%, 132px)` 根据 viewport 宽度计算 `100%`，拉伸了下拉菜单并覆盖了侧边栏。
 
-## Problema
-- Menu de usuário usa `position: fixed`
-- `min-width: max(100%, 132px)` faz `100%` igual à largura da viewport
-- Dropdown estica e cobre a barra lateral
+## 问题
+- 用户菜单使用 `position: fixed`
+- `min-width: max(100%, 132px)` 使 `100%` 等于 viewport 的宽度
+- 下拉菜单拉伸并覆盖侧边栏
 
 ## 解决方案
-- Remove `max(100%, …)` do `min-width`
-- Em `updateDesktopDropdownPosition`, calcula `minWidth` pela largura real da área do avatar (mínimo 132px)
+- 从 `min-width` 中移除 `max(100%, …)`
+- 在 `updateDesktopDropdownPosition` 中，根据头像区域的真实宽度计算 `minWidth`（最小 132px）
 
-## Arquivos e origem
+## 文件和来源
 - 涉及文件: Navbar.vue, variables.css, index.vue, AppMain.vue, TagsView/index.vue, index.scss, ruoyi.scss, facility/index.vue
-- Sessão: eaeb4d6a-1209-47e7-a761-4c6b265f74bc
+- 会话: eaeb4d6a-1209-47e7-a761-4c6b265f74bc
 
 <!-- MEMORY_FIELDS
 {

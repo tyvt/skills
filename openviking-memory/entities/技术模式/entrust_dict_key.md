@@ -1,17 +1,17 @@
-# Chave de Dicionário Errada em Detalhe de Venda Consignada
-A página de detalhe de venda consignada falhava ao exibir dicionário de estado de negócio devido a chave incompatível.
+# 委托销售详情中的字典键错误
+由于键不兼容，委托销售详情页面在显示业务状态字典时失败。
 
 ## 描述
-- Projeto Suzhou Real Estate Monitoring V3, frontend zhi2-web-admin.
-- Detalhe de entrustSale tinha retorno de dicionário de estado de negócio incorreto.
+- 项目苏州房地产监测V3，前端 zhi2-web-admin。
+- entrustSale 详情返回了错误的业务状态字典。
 
 ## 解决方案
-- Modificar chave do dicionário de estado de negócio em `presale/entrustSale/detail.vue` para valor começando com `BI` para correta exibição.
+- 修改 `presale/entrustSale/detail.vue` 中业务状态字典的键为以 `BI` 开头的值，以正确显示。
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3-rest/012.md
 - 涉及文件: presale/entrustSale/detail.vue; presale/entrustSale/index.vue; supervision/bank/jgwd/detail.vue; main.js; components/detail-template/detail-template.vue; autonomy/repair/detail.vue; mixins/detailMixins.js; utils/dict.js
-- Sessão: 98dea9b7-0496-43cc-8f46-c865905aa071; base de código: none
+- 会话: 98dea9b7-0496-43cc-8f46-c865905aa071; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

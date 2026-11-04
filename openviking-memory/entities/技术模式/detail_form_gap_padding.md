@@ -1,17 +1,17 @@
-# Sobreposição de gap e padding no formulário de detalhe
-No projeto Suzhou Real Estate Monitoring V3, o espaçamento vertical do formulário de detalhe era irregular pela sobreposição de padding-bottom e row-gap.
+# 详情表单中 gap 与 padding 的重叠
+在 Suzhou Real Estate Monitoring V3 项目中，详情表单的垂直间距因 padding-bottom 与 row-gap 的重叠而不均匀。
 
 ## 问题根因
-- O espaçamento vertical original vinha de padding-bottom em .el-form-item somado a row-gap, gerando inconsistência.
+- 原始的垂直间距来自于 .el-form-item 中的 padding-bottom 加上 row-gap，导致不一致。
 
 ## 解决方案
-- Em variables.css, --detail-block-gap passou a ser 24px.
-- Em detail-form.scss, padding-bottom dos itens de formulário foi 0, cabendo ao gap o espaçamento.
-- Apenas .el-dialog__body sem el-row empilhado usa padding-bottom para evitar sobreposição com row-gap de zs-form.
+- 在 variables.css 中，--detail-block-gap 改为 24px。
+- 在 detail-form.scss 中，表单项的 padding-bottom 设为 0，间距由 gap 负责。
+- 仅在没有堆叠 el-row 的 .el-dialog__body 上使用 padding-bottom，以避免与 zs-form 的 row-gap 重叠。
 
-## Arquivos e verificação
+## 文件与验证
 - 涉及文件: variables.css, detail-form.scss, vite.config.js, index.scss, element-ui.scss, detail.vue, zs-dialog.vue.
-- 验证证据: src=苏州市房地产监测V3-rest/056.md; sessão 14ac23b1-f562-46c6-80d9-d8e3b7a96870.
+- 验证证据: src=苏州市房地产监测V3-rest/056.md; session 14ac23b1-f562-46c6-80d9-d8e3b7a96870.
 
 <!-- MEMORY_FIELDS
 {

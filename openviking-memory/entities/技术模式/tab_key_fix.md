@@ -1,15 +1,15 @@
 # tab_key_fix
-Colisão de chave de aba causa falha de exclusão mútua e dados vazios de sub-tabela no projeto 苏州市房地产监测V3.
+标签页键冲突导致苏州市房地产监测V3项目中的互斥失效及子表数据为空。
 ## 问题根因
-- Abrigo/decoração refinada compartilham `versionId` e `deliverType`, chave `versionId_deliverType` colide ativando ambos
-- Sub-tabela solicita dados antes de `currentTab` estar pronta, retornando vazio
+- 遮盖/精装修共享 `versionId` 和 `deliverType`，键 `versionId_deliverType` 冲突导致两者同时激活
+- 子表在 `currentTab` 就绪之前请求数据，返回空
 ## 解决方案
-- Nome de aba alterado para índice de linha `0,1,2...` garantindo exclusão mútua
-- `cardValue` padrão `0` com validação; sub-tabela usa `watch currentTab` (`immediate`) e após pronta chama `getColumn`/`getList` com parâmetros de paginação
-## Arquivos
+- 标签页名称改为行索引 `0,1,2...`，保证互斥
+- `cardValue` 默认 `0` 并校验；子表使用 `watch currentTab` (`immediate`)，并在就绪后调用 `getColumn`/`getList` 并传入分页参数
+## 文件
 - unblock/usemoney/detail.vue, plan/detail.vue, AppropriateTable.vue, PlanDetailsTable.vue, planChange/detail.vue, BuildingTable.vue, RelatedBuildingsTable.vue
-## Verificação
-- 来源: 苏州市房地产监测V3/053.md; Sessão: 66577926-e9f6-4492-b968-4c342f004cbe
+## 验证
+- 来源: 苏州市房地产监测V3/053.md; 会话: 66577926-e9f6-4492-b968-4c342f004cbe
 
 <!-- MEMORY_FIELDS
 {

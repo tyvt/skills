@@ -1,17 +1,17 @@
-# Campo novo lv=2 causa recuo incorreto de subitens de saldo de fundos
-Em mapTipRows, 3 campos (ex.: 本年新增账户数) com lv=2 e padding-left:20px para imitar recuo de subitens de receita/despesa causa desalinhamento.
+# 新字段 lv=2 导致资金余额子项缩进不正确
+在 mapTipRows 中，3 个字段（例如：本年新增账户数）使用 lv=2 和 padding-left:20px 来模仿收入/支出子项的缩进，导致错位。
 
 ## 问题根因
-- 3 campos em mapTipRows tinham lv definido como 2 com padding-left:20px imitando recuo de receita/despesa de fundos.
-- Isso causa recuo incorreto dos subitens de saldo de fundos.
+- mapTipRows 中的 3 个字段的 lv 被定义为 2，并使用 padding-left:20px 模仿资金收支的缩进。
+- 这导致资金余额子项缩进不正确。
 
 ## 解决方案
-- Mudar lv para 1, ficando no mesmo nível de "资金余额" (saldo de fundos).
-- Ajustar ordem para: saldo de fundos → 3 campos → receita/despesa (lv:2).
+- 将 lv 改为 1，使其与“资金余额”处于同一级别。
+- 调整顺序为：资金余额 → 3 个字段 → 收入/支出 (lv:2)。
 
-## Verificação e proveniência
-- Arquivo: src/views/benefit/mapOverview/index.vue.
-- Sessão: 0c9c218b-0876-4484-af0e-4452a8f8c076; código base: none.
+## 验证与来源
+- 文件: src/views/benefit/mapOverview/index.vue
+- 会话: 0c9c218b-0876-4484-af0e-4452a8f8c076; 基础代码: none
 
 <!-- MEMORY_FIELDS
 {

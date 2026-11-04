@@ -1,19 +1,19 @@
-# Campo de nome de organização integrado à consulta de lista de autorização de usuário
-Causa raiz: o campo de nome de organização `committeeName` do backend não estava conectado ao frontend. Correção chave: `autonomy/userAuth/index.vue` teve `queryParams` e `formItems` com suporte a `committeeName` para busca fuzzy, e `columns` ganhou coluna «Nome da organização» mapeando esse campo.
+# 组织名称字段集成到用户授权列表查询
+根本原因：后端的组织名称字段 `committeeName` 未连接到前端。关键修复：`autonomy/userAuth/index.vue` 的 `queryParams` 和 `formItems` 增加了对 `committeeName` 的支持以进行模糊搜索，且 `columns` 新增了映射该字段的“组织名称”列。
 
-## Evidência de verificação
-- Fonte extraída de sessão cursor a64c833f-c485-4bfe-899a-5d177a83f9f3
+## 验证证据
+- 来源提取自 cursor 会话 a64c833f-c485-4bfe-899a-5d177a83f9f3
 
-## Arquivos envolvidos
+## 涉及文件
 - d:/repository/园区物管2.0/zhi2-web-admin/src/views/autonomy/userAuth/index.vue
 - d:/repository/园区物管2.0/zhi2-web-admin/src/views/autonomy/userAuth/detail.vue
 - d:/repository/园区物管2.0/zhi2-web-admin/src/views/autonomy/change/industry/index.vue
 - autonomy/userAuth/index.vue
 
-## Afiliação
+## 归属
 - 所属项目: 园区物管2.0
-- Sessão de origem: a64c833f-c485-4bfe-899a-5d177a83f9f3
-- Baseline de código: none
+- 来源会话: a64c833f-c485-4bfe-899a-5d177a83f9f3
+- 代码基线: none
 
 <!-- MEMORY_FIELDS
 {

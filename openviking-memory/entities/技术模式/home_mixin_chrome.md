@@ -1,18 +1,18 @@
-# Reset de flag no homeDataMixin faz menu superior reaparecer
-O homeDataMixin define hideLayoutChrome=true em created e volta para false em beforeDestroy, fazendo o menu horizontal superior reaparecer ao sair da home.
+# 在 homeDataMixin 中重置标志导致顶部菜单重新出现
+homeDataMixin 在 created 中设置 hideLayoutChrome=true，并在 beforeDestroy 中将其恢复为 false，导致离开 home 时顶部水平菜单重新出现。
 
 ## 问题根因
-- homeDataMixin define hideLayoutChrome=true em created
-- Volta para false em beforeDestroy
-- Menu horizontal superior reaparece ao sair da home
+- homeDataMixin 在 created 中定义 hideLayoutChrome=true
+- 在 beforeDestroy 中恢复为 false
+- 离开 home 时顶部水平菜单重新出现
 
-## Correção
-- portalLayout.js sem menu horizontal no lado administrativo
-- syncHideLayoutChrome após login
-- homeDataMixin restaura apenas ao sair em não administrativo
-- TagsView/GenerateRoutes usam árvore completa da barra lateral
+## 修复
+- portalLayout.js 在管理端没有水平菜单
+- 登录后 syncHideLayoutChrome
+- homeDataMixin 仅在非管理端退出时恢复
+- TagsView/GenerateRoutes 使用侧边栏的完整树
 
-## Arquivos envolvidos
+## 涉及的文件
 - zhi2-web-admin/src/views/home/mixins/homeDataMixin.js
 - zhi2-web-admin/src/layout/index.vue
 - zhi2-web-admin/src/layout/components/Navbar.vue
@@ -23,8 +23,8 @@ O homeDataMixin define hideLayoutChrome=true em created e volta para false em be
 - zhi2-web-admin/src/layout/components/Sidebar/index.vue
 
 ## 验证与归属
-- 验证证据: extração de sessão cursor
-- 所属项目: portal; sessão: 40f4d280-b5c1-4c8e-8477-9f099246ba53
+- 验证证据: cursor 会话提取
+- 所属项目: portal; session: 40f4d280-b5c1-4c8e-8477-9f099246ba53
 
 <!-- MEMORY_FIELDS
 {

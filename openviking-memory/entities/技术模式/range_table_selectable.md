@@ -1,18 +1,18 @@
-# selectable mal vinculado inibe votação offline
-No componente DecisionRangeTable.vue do projeto 太仓G, linhas submetidas não podiam ser selecionadas para votação offline.
+# selectable 错误绑定导致无法离线投票
+在项目太仓G的组件 DecisionRangeTable.vue 中，已提交的行无法被选中用于离线投票。
 
 ## 问题根因
-- `selectable` vinculado erroneamente a `canEditRange` (só rascunho `bizState==='0'` selecionável)
-- Quando `bizState='2'` (submetido), linha não selecionável e botão "entrada de voto offline" desabilitado
+- `selectable` 错误绑定到 `canEditRange` (仅草稿 `bizState==='0'` 可选中)
+- 当 `bizState='2'` (已提交) 时，行不可选，且“离线投票入口”按钮被禁用
 
-## Correção
-- Nova propriedade computada `isRowSelectable` suporta rascunho ou submetido com votação em curso (`showSuccess && !voteDisabled`)
-- Corrigido também módulo `optionDecision`
+## 修复
+- 新的计算属性 `isRowSelectable` 支持草稿或已提交且投票进行中 (`showSuccess && !voteDisabled`)
+- 同时修复了模块 `optionDecision`
 
-## Verificação e arquivos
-- Sessão de origem: 1e824235-0e5e-44dd-9dc4-238cd6a1389a
+## 验证与文件
+- 源会话: 1e824235-0e5e-44dd-9dc4-238cd6a1389a
 - 涉及文件: optionDecision/detail.vue, DecisionRangeTable.vue, VoteRangeDialog.vue, ownerDecision/DecisionRangeTable.vue, ownerDecision/detail.vue, generalDecision/detail.vue, decisionCommon/DecisionRangeTable.vue, zsSelectColumn/index.vue
-- 所属项目: 太仓G; base de código: none
+- 所属项目: 太仓G; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

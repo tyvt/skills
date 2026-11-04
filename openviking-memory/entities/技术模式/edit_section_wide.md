@@ -1,19 +1,19 @@
-# Campo de endereço em duas colunas evita desalinhamento de grade
-No estado de edição, o campo "项目坐落" ocupava 16 colunas dentro de `el-row`, deixando 8 para o resto e empurrando "统一社会信用代码" para uma terceira coluna desalinhada.
+# 两列地址字段避免网格错位
+在编辑状态下，字段"项目坐落"在 `el-row` 内占据了16列，留下8列给其余部分，并将"统一社会信用代码"推到了不对齐的第三列。
 
 ## 解决方案
-- Mudar o estado de edição para grade de três colunas com `section-form`
-- Campos comuns usam `section-field`
-- "项目坐落" usa `section-field--wide` ocupando duas colunas
-- "预售描述" usa `section-field--full` ocupando a linha inteira
+- 将编辑状态改为采用 `section-form` 的三列网格
+- 普通字段使用 `section-field`
+- "项目坐落" 使用 `section-field--wide` 占据两列
+- "预售描述" 使用 `section-field--full` 占据整行
 
-## Arquivos envolvidos
+## 涉及的文件
 - detail.vue, PermitInfoPanel.vue, permitConstants.js
 - detail-template.vue, permitExtendConstants.js, permitSelectConstants.js, surveyChangeConstants.js
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-rest/140.md
-- Sessão de origem: f7e32c84-3538-433f-bf02-d17f353e9e06; base de código: none
+- 来源会话: f7e32c84-3538-433f-bf02-d17f353e9e06; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

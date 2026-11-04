@@ -1,17 +1,15 @@
+# 步骤组件不应重复块标题
+在苏州市房地产监测V3项目中，`institutionRegister/index.vue` 移除了步骤2中冗余的 `<h2>管理员信息</h2>`，并直接渲染 `Step2AdminInfo`，避免与步骤条上的标题重复。
 
-# Componente de etapa não deve repetir título de bloco
-No projeto 苏州市房地产监测V3, `institutionRegister/index.vue` removeu o `<h2>管理员信息</h2>` redundante na etapa 2 e renderiza direto o `Step2AdminInfo`, evitando duplicação com o título da barra de etapas.
+## 实现
+- `institutionRegister/index.vue` 步骤2移除了冗余的 `<h2>管理员信息</h2>`
+- 直接渲染 `Step2AdminInfo` 组件
+- 避免重复步骤条上已有的标题
 
-## Implementação
-- `institutionRegister/index.vue` etapa 2 removeu o `<h2>管理员信息</h2>` redundante
-- Renderiza diretamente o componente `Step2AdminInfo`
-- Evita repetir o título já presente na barra de etapas
-
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: extracted source=cursor session=e6a70106-1904-4b9e-9ff5-cc44b3452aa4
 - 涉及文件: institutionRegister/index.vue, institutionRegister/components/Step2AdminInfo.vue, register/companyRegister.vue
-- 所属项目: 苏州市房地产监测V3; Sessão: e6a70106-1904-4b9e-9ff5-cc44b3452aa4; Baseline: none
-
+- 所属项目: 苏州市房地产监测V3; 会话: e6a70106-1904-4b9e-9ff5-cc44b3452aa4; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

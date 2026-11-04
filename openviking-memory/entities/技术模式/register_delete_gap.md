@@ -1,15 +1,15 @@
-# APIs de exclusão inconsistentes nos fluxos de registro
-No projeto 苏州市房地产监测V3, os três fluxos de registro têm implementação inconsistente de exclusão de anexos no Step3.
+# 注册流程中不一致的删除 API
+在项目 苏州市房地产监测V3 中，三个注册流程在 Step3 的附件删除实现上不一致。
 
-## Problema
-- As APIs de exclusão de upload de anexos no Step3 dos três fluxos de registro são inconsistentes.
-- O repositório só possui `uploadAnonymous` e não tem `deleteAnonymous`.
+## 问题
+- 三个注册流程在 Step3 的附件上传删除 API 不一致。
+- 仓库仅包含 `uploadAnonymous`，而没有 `deleteAnonymous`。
 
-## Padrão de componentes
-- Instituições de corretagem e de locação compartilham componentes de página.
-- Diferem apenas em `busCode` e na rota de entrada.
+## 组件模式
+- 经纪机构和租赁机构共享页面组件。
+- 仅区别于 `busCode` 和入口路由。
 
-## Arquivos
+## 文件
 - `companyRegister.js`, `institutionRegister.js`, `Step3Appendix.vue`, `RegisterUploadItem.vue`, `InstitutionUploadItem.vue`, `前端技术信息.md`, `路由信息.json`.
 
 <!-- MEMORY_FIELDS

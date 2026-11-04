@@ -1,16 +1,16 @@
-# Salvamento de entrada de agência inclui alias e campo de associação
-No projeto 苏州市房地产监测V3, o salvamento de entrada de agência não locadora em `AgencyEntryNetworkDetail.vue` submete campos opcionais `companyAlias` e `industryAssociation`.
+# 机构录入保存包含别名和协会字段
+在 苏州市房地产监测V3 项目中，在 `AgencyEntryNetworkDetail.vue` 中非租赁机构录入的保存提交了可选字段 `companyAlias` 和 `industryAssociation`。
 
-## Pontos de implementação
-- Salvamento de entrada de agência não locadora em `AgencyEntryNetworkDetail.vue` via `buildEntryNetworkSavePayload()` submete `companyAlias` e `industryAssociation` opcionais
-- `AgencyEntryNetworkSections.vue` integra os dois campos em modo edição (dicionário `INDUSTRY_ASSOCIATION`)
-- Modo visualização reutiliza `DetailTemplate` de `agencyBasicInfoContent.js`
-- `companyRecord.js` recebe comentários de interface
+## 实现要点
+- 通过 `buildEntryNetworkSavePayload()` 在 `AgencyEntryNetworkDetail.vue` 中保存非租赁机构录入时提交可选的 `companyAlias` 和 `industryAssociation`
+- `AgencyEntryNetworkSections.vue` 在编辑模式下集成这两个字段（字典 `INDUSTRY_ASSOCIATION`）
+- 查看模式复用 `agencyBasicInfoContent.js` 中的 `DetailTemplate`
+- `companyRecord.js` 接收接口注释
 
-## Verificação e afiliação
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-leftover/059.md
 - 涉及文件: companyRecord.js, AgencyEntryNetworkDetail.vue, AgencyEntryNetworkSections.vue, agencyBasicInfoContent.js, companyBasicInfoShared.js, companyRecordAgency/change/detail.vue, AgencyBasicInfoForm.vue
-- 所属项目: 苏州市房地产监测V3; Sessão: 55b4a7f2-9aca-4e4f-906e-0245c0774837; Baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 55b4a7f2-9aca-4e4f-906e-0245c0774837; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

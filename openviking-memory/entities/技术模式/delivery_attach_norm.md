@@ -1,18 +1,18 @@
-# Anexos de aprovação de entrega de projeto devem ter caminho relativo normalizado
-No projeto Suzhou Real Estate Monitoring V3, interfaces `detail`/`approval` de entrega de projeto ganharam lógica de anexo; `projectDeliveryConstants.js` normaliza `approvalAttachment`.
+# 项目交付审批附件应具有规范化的相对路径
+在 Suzhou Real Estate Monitoring V3 项目中，项目交付的 `detail`/`approval` 接口增加了附件逻辑；`projectDeliveryConstants.js` 对 `approvalAttachment` 进行规范化。
 
-## Normalização
-- `projectDeliveryConstants.js` adiciona `normalizeApprovalAttachmentList` etc. para normalizar `approvalAttachment`
-- Submissão carrega array de strings `fileSite` de caminhos relativos
+## 规范化
+- `projectDeliveryConstants.js` 添加 `normalizeApprovalAttachmentList` 等以规范化 `approvalAttachment`
+- 提交加载由相对路径字符串组成的 `fileSite` 数组
 
-## Mudanças no diálogo
-- `ProjectDeliveryApprovalDialog.vue` adiciona `FileUpload` obrigatório (máx 10)
-- `ProjectDeliveryDetail.vue` e `ProjectDeliveryInfoPanel.vue` ajustados
+## 对话框变更
+- `ProjectDeliveryApprovalDialog.vue` 添加必填的 `FileUpload`（最多 10 个）
+- `ProjectDeliveryDetail.vue` 和 `ProjectDeliveryInfoPanel.vue` 进行了调整
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/071.md
 - 涉及文件: doc frontend, 路由信息.json, 前端技术信息.md, xmjf.js, ProjectDeliveryApprovalDialog.vue, ProjectDeliveryDetail.vue, projectDeliveryConstants.js, ProjectDeliveryInfoPanel.vue
-- Sessão: f25b074f-2774-4b55-bbb6-fe05b1d2cad4; baseline: none
+- 会话: f25b074f-2774-4b55-bbb6-fe05b1d2cad4; baseline: none
 
 <!-- MEMORY_FIELDS
 {

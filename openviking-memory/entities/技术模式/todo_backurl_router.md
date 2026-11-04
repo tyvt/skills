@@ -1,25 +1,23 @@
+# 将 backUrl 传入 Vue Router 3 的待办返回
+在 zhi2-web-admin 项目（Huishan Fase 2G）中，在“flowable 待办 → 业务详情 → 返回”场景下，定义如何将 backUrl 字符串有效且安全地传递给 Vue Router 3。
 
-# Retorno de pendências com backUrl alimentado à Vue Router 3
-No projeto zhi2-web-admin (Huishan Fase 2G), no cenário "pendência flowable → detalhe de negócio → retorno", definição de como a string backUrl é passada de forma válida e segura à Vue Router 3.
+## 上下文
+- `utils/ruoyi.js` 中的 `navigateToTodoTask` 记录 `query.backUrl`；`main.js`/`OperationBtnGroup` 中的 `goBack` 使用 `resolveBackNavigationPath` + `router.push({ path, query: { type: 'back' } })`。
+- `utils/ruoyi.js` 中的 `resolveBackNavigationTarget` 已修正，以正确返回列表、补充 `backUrl`、识别 `directDetail` 路由并统一详情路径。
 
-## Contexto
-- `utils/ruoyi.js` `navigateToTodoTask` grava `query.backUrl`; `goBack` em `main.js`/`OperationBtnGroup` usa `resolveBackNavigationPath` + `router.push({ path, query: { type: 'back' } })`.
-- `resolveBackNavigationTarget` em `utils/ruoyi.js` foi corrigido para retornar corretamente à lista, complementar `backUrl`, reconhecer rota `directDetail` e unificar o caminho de detalhe.
+## 问题与修正
+- 问题 1（Vue Router 3 解析）：带有 `?pageNum=2` 的地址原始插入 `path` 会导致失败或 404；在 push 之前按 `?`/`#` 分割或使用 `new URL(backUrl, origin)`，或者禁止 backUrl 中包含 query 并在入口处校验。
+- 问题 2（安全性）：未校验的 `query.backUrl`/`options.backUrl` 允许恶意重定向（`//evil.com`、scheme）；仅接受以单个 `/` 开头的内部路径（拒绝 `//`、`:`、`http`），否则忽略并通过路径返回。
+- 问题 3（状态丢失 MEDIUM）：`navigateToTodoTask` 仅记录 `current.path` 而不含 query，返回带有筛选/分页的列表时会丢失状态；应使用 `fullPath` 或序列化 query 以完整恢复。
+- 特定 Bug（session 1f86f5fa）：首页待办通过 `navigateToTodoTask` 进入详情时未带 `backUrl`；旧的 `lastIndexOf('/')` 裁剪了 `detail/{id}` 导致进入无 ID 的空壳页面引发参数错误；未识别 `directDetail` 路由。已在 `utils/ruoyi.js` 的 `resolveBackNavigationTarget` 中修正，以返回列表、添加 `backUrl`、识别 `directDetail` 并统一详情路径。
 
-## Problemas e correções
-- Problema 1 (parse Vue Router 3): endereço com `?pageNum=2` inserido cru em `path` falha ou 404; dividir por `?`/`#` ou usar `new URL(backUrl, origin)` antes de push, ou proibir query em backUrl e validar na entrada.
-- Problema 2 (segurança): `query.backUrl`/`options.backUrl` sem validação permite redirecionamento malicioso (`//evil.com`, scheme); aceitar apenas path interno começando por único `/` (rejeitar `//`, `:`, `http`), senão ignorar e voltar por caminho.
-- Problema 3 (perda de estado MEDIUM): `navigateToTodoTask` registra apenas `current.path` sem query, retorno de lista com filtro/paginação perde estado; usar `fullPath` ou query serializada para restauração completa.
-- Bug específico (session 1f86f5fa): pendência na home entrando em detalhe via `navigateToTodoTask` sem `backUrl`; antigo `lastIndexOf('/')` cortava `detail/{id}` caindo em página casca sem ID causando erro de parâmetro; rota `directDetail` não reconhecida. Corrigido em `utils/ruoyi.js` `resolveBackNavigationTarget` para retornar lista, adicionar `backUrl`, reconhecer `directDetail` e uniformizar caminho de detalhe.
-
-## Arquivos envolvidos
+## 涉及文件
 - utils/ruoyi.js, main.js, components/OperationBtnGroup/index.vue
 - views/autonomy/record/components/detail.vue, components/detail-template/detail-template.vue, views/autonomy/record/components/directDetail.vue, mixins/detailMixins.js, mixins/form.js
 
 ## 验证与归属
-- Sessões: 26959102 (HIGH incompatibilidade router.push com query; HIGH backUrl sem validação; MEDIUM perda de query), 1f86f5fa-6621-449b-b902-a3be952fcbd5 (bug backUrl pendências)
-- 所属项目: Huishan Fase 2G; base de código: adccd7e (e none para o novo)
-
+- 会话：26959102（router.push 与 query 不兼容 HIGH；backUrl 未校验 HIGH；query 丢失 MEDIUM），1f86f5fa-6621-449b-b902-a3be952fcbd5（backUrl 待办 bug）
+- 所属项目: Huishan Fase 2G; 代码基线: adccd7e（新的为 none）
 
 <!-- MEMORY_FIELDS
 {

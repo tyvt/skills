@@ -1,12 +1,12 @@
-# Falha de imagem de fundo em pages_poll por uso de ../../
-Os arquivos `src/pages_poll/result.vue` e `form.vue` usaram incorretamente `../../static/images/bg_szf.png`, resolvendo para um diretório static inexistente; corrigido com caminho de alias.
+# pages_poll 中因使用 ../.. 导致的背景图片故障
+文件 `src/pages_poll/result.vue` 和 `form.vue` 错误地使用了 `../../static/images/bg_szf.png`，解析到了不存在的 static 目录；已使用别名路径修正。
 
 ## 问题根因
-- `src/pages_poll/result.vue` e `form.vue` usaram caminho relativo `../../static/images/bg_szf.png`
-- O caminho resolveu para o diretório raiz static inexistente, causando falha de carregamento
+- `src/pages_poll/result.vue` 和 `form.vue` 使用了相对路径 `../../static/images/bg_szf.png`
+- 该路径解析到了不存在的 static 根目录，导致加载失败
 
 ## 解决方案
-- Substituído por caminho de alias `url("@/static/images/bg_szf.png")` para corrigir a referência
+- 替换为别名路径 `url("@/static/images/bg_szf.png")` 以修正引用
 
 ## 验证与归属
 - 验证证据: extracted source=cursor session=1b86fe06-0678-4ce4-b9df-fbd51273d5c6

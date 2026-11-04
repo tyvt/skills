@@ -1,24 +1,24 @@
-# vue-qr com margin padrão causa espaço excessivo
-O zhi2-web-admin do projeto 苏州市房地产监测V3 tinha vue-qr com margin=20 padrão causando espaço em branco em código de 50px.
+# vue-qr 默认 margin 导致过多空白
+项目 苏州市房地产监测V3 的 zhi2-web-admin 中的 vue-qr 使用默认 margin=20，导致 50px 的二维码出现空白。
 
 ## 问题
-- `vue-qr` usa margin=20 padrão em :size="50" deixando espaço em branco grande
-- Container com padding:4px agrava o deslocamento visual
-- Afeta WorkCardDialog.vue e InfoCardDialog.vue
+- `vue-qr` 在 :size="50" 时使用默认 margin=20，留下很大的空白
+- 带有 padding:4px 的容器加剧了视觉偏移
+- 影响 WorkCardDialog.vue 和 InfoCardDialog.vue
 
-## Correção
-- Definir :margin="0" e :white-margin="false" no vue-qr
-- Remover padding de .work-card__qr-wrap/.info-card__qr-wrap fixando 50×50px com overflow:hidden
-- Em falha de scan, margin pode ser 1 para zona quieta
+## 修正
+- 在 vue-qr 中设置 :margin="0" 和 :white-margin="false"
+- 移除 .work-card__qr-wrap/.info-card__qr-wrap 的 padding，固定为 50×50px 并设置 overflow:hidden
+- 如果扫描失败，margin 可以设为 1 作为静区
 
-## Arquivos
+## 文件
 - presale/cashsale/components/CashsaleDetail.vue, CashsaleInfoPanel.vue
 - institution/agencyPersonnel/components/InfoCardDialog.vue, AgencyPersonnelDetail.vue, WorkCardDialog.vue
 - institution/record/components/RecordCertificateDialog.vue
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3/142.md
-- 所属项目: 苏州市房地产监测V3; sessão: 271fe773-92e0-4ead-a113-8889fcea1743; baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 271fe773-92e0-4ead-a113-8889fcea1743; baseline: none
 
 <!-- MEMORY_FIELDS
 {

@@ -1,19 +1,19 @@
-# Componente de subpacote não pode ser referenciado entre subpacotes
-No mini-programa SuzhouFangC (zhi2-mobile-shimin), componentes de subpacotes não podem ser referenciados entre diferentes subpacotes; Home_Jiayuanqu (subpacote pages_tab) referenciava NoticeList do subpacote pages_main causando erro, sendo necessário mover o componente para o pacote principal e unificar o caminho de importação.
+# 子包组件无法在子包之间引用
+在小程序 SuzhouFangC (zhi2-mobile-shimin) 中，子包组件不能在不同的子包之间被引用；Home_Jiayuanqu（子包 pages_tab）引用了子包 pages_main 中的 NoticeList 导致错误，需要将组件移动到主包并统一导入路径。
 
 ## 问题根因
-- O mini-programa WeChat não permite referência de componentes entre subpacotes
-- Home_Jiayuanqu (subpacote pages_tab) referenciava NoticeList do subpacote pages_main, causando falha de carregamento
+- WeChat 小程序不允许在子包之间引用组件
+- Home_Jiayuanqu（子包 pages_tab）引用了子包 pages_main 中的 NoticeList，导致加载失败
 
 ## 解决方案
-- Mover NoticeList para o pacote principal em src/components/NoticeList/NoticeList.vue
-- Unificar caminhos de importação em pages_tab/components/Home_Jiayuanqu.vue etc. para @/components/NoticeList/NoticeList.vue
-- Remover o caminho original do subpacote
+- 将 NoticeList 移动到主包中的 src/components/NoticeList/NoticeList.vue
+- 将 pages_tab/components/Home_Jiayuanqu.vue 等文件中的导入路径统一为 @/components/NoticeList/NoticeList.vue
+- 移除子包中的原始路径
 
 ## 验证与归属
-- Verificação: sessão 454c97fd usuário reportou erro de referência entre subpacotes; NoticeList movido para pacote principal e caminhos unificados
+- 验证：会话 454c97fd 用户报告了子包之间的引用错误；NoticeList 已移动到主包且路径已统一
 - 涉及文件: src/pages/index/components/Home_Jiayuanqu.vue, src/pages.json, src/components/PageBg/PageBg.vue, src/components/NoticeList/NoticeList.vue, pages_tab/components/Home_Jiayuanqu.vue
-- 验证证据: src=苏住房C/052.md; ID da sessão: 454c97fd-ca5c-4c7f-a2dd-54da7553d258; base de código: none
+- 验证证据: src=苏住房C/052.md; 会话 ID: 454c97fd-ca5c-4c7f-a2dd-54da7553d258; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

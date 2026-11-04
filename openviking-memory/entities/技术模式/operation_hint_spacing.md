@@ -1,12 +1,12 @@
-# Espaçamento desigual por padding-top inline
-Padrão técnico para texto de dica com padding-top inline sem margem inferior causando desalinhamento.
+# padding-top inline 导致的不均匀间距
+关于使用 padding-top inline 且无下边距导致未对齐的提示文本的技术规范。
 ## 问题根因
-- Texto de descrição usa apenas padding-top:10px inline sem margem inferior, espaçamento vertical desigual.
+- 描述文本仅使用 padding-top:10px inline 且无下边距，垂直间距不均匀。
 ## 解决方案
-- Usar estilo global operation-hint com display:flex, align-items:center, padding:0 12px 12px, line-height:22px para centralizar.
-## Arquivos e verificação
+- 使用全局样式 operation-hint，设置 display:flex, align-items:center, padding:0 12px 12px, line-height:22px 以居中。
+## 文件与验证
 - 涉及文件: pubRevenueContract/index.vue, assetsLeaseContractFiling/index.vue, styles/index.scss.
-- Sessão de origem: 95de17f2-76c3-4cab-884c-27a0549a0793; linha de base: none.
+- 源会话: 95de17f2-76c3-4cab-884c-27a0549a0793; 基线: none.
 
 <!-- MEMORY_FIELDS
 {

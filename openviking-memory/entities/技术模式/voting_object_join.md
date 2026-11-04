@@ -1,21 +1,21 @@
-# Erro de join em array de objetos em VotingItemsDialog
-No modo de visualização de VotingItemsDialog.vue, o contentInfo aplicava join(',') em ownerFileList (array de objetos) gerando [object Object] e anexos anómalos.
+# VotingItemsDialog 中对象数组的 join 错误
+在 VotingItemsDialog.vue 的查看模式下，contentInfo 对 ownerFileList（对象数组）应用了 join(',')，生成了 [object Object] 和异常的附件。
 
 ## 问题根因
-- O contentInfo em VotingItemsDialog.vue usava join(',') sobre ownerFileList, um array de objetos, produzindo a string "[object Object]".
+- VotingItemsDialog.vue 中的 contentInfo 对 ownerFileList（一个对象数组）使用了 join(',')，产生了字符串 "[object Object]"。
 
 ## 解决方案
-- Alterado para passar o array de objetos diretamente, deixando o getAttachmentFiles do DetailTemplate analisar e exibir.
+- 改为直接传递对象数组，让 DetailTemplate 的 getAttachmentFiles 解析并展示。
 
-## Arquivos envolvidos
+## 涉及的文件
 - autonomy/option/components/VotingItemsDialog.vue
 - autonomy/candidateCollect/components/CandidateDialog.vue
 - components/detail-template/detail-template.vue
 - company/staffManagement/components/certificatesDialog.vue
 
 ## 验证与归属
-- 验证证据: sessão cursor 462b8a83-d68c-46cb-bae9-7553f60772a3
-- Base de código: none
+- 验证证据: cursor 会话 462b8a83-d68c-46cb-bae9-7553f60772a3
+- 代码库: none
 
 <!-- MEMORY_FIELDS
 {

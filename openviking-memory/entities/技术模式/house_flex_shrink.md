@@ -1,19 +1,20 @@
-# display:flex centralizado faz subcomponente encolher em miniprograma
-No projeto 苏住房C (zhi2-mobile-shimin), `.house-page` com flex centralizado fazia subcomponentes encolherem em vez de preencher.
+# display:flex 居中导致小程序中子组件收缩
+
+在项目 苏住房C (zhi2-mobile-shimin) 中，使用居中 flex 的 `.house-page` 使子组件收缩而非填充。
 
 ## 问题根因
-- `.house-page` em `pages_owner/house/detail.vue` usa `display: flex` + `align-items: center`
-- Subcomponentes de miniprograma encolhem ao conteúdo em vez de preencher
+- `pages_owner/house/detail.vue` 中的 `.house-page` 使用 `display: flex` + `align-items: center`
+- 小程序子组件根据内容收缩而不是填充
 
-## Correção
-- Mudar para layout de bloco em fluxo com padding `20rpx`
-- Definir `width: 100%` para o botão inferior
+## 修正
+- 改为带有 `20rpx` 内边距的流式块布局
+- 为底部按钮设置 `width: 100%`
 
 ## 验证与归属
 - 所属项目: 苏住房C (zhi2-mobile-shimin)
-- Sessão de origem: a0fa70c1-04b5-4e88-bb03-c924fab3eae3
+- 来源会话: a0fa70c1-04b5-4e88-bb03-c924fab3eae3
 - 涉及文件: src/pages_owner/house/detail.vue, src/components/commonNew/baseCard.vue, src/pages_owner/house/components/CellCard.vue, src/pages_owner/house/owner/detail.vue, src/pages_owner/house/index.vue, src/components/ZsButton/ZsButton.vue, src/pages_owner/house/components/registerInfo.vue, src/pages.json
-- Linha de base de código: none
+- 代码基线: none
 
 <!-- MEMORY_FIELDS
 {

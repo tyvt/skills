@@ -1,15 +1,14 @@
-# dayjs como variável global externa no Vite
+# dayjs 作为 Vite 中的外部全局变量
 
-Fato de configuração onde dayjs é global externo via CDN, não dependência npm.
+一种配置情况，其中 dayjs 是通过 CDN 引入的外部全局变量，而不是 npm 依赖。
 
 ## 描述
-- `vite.config.js` configura `dayjs` como variável global externa (injetada via CDN), não como dependência npm.
-- `import dayjs from 'dayjs'` dispara ESLint `import/no-unresolved`.
-- Deve-se remover o import e usar `dayjs` global diretamente.
+- `vite.config.js` 将 `dayjs` 配置为外部全局变量（通过 CDN 注入），而不是 npm 依赖。
+- `import dayjs from 'dayjs'` 会触发 ESLint 的 `import/no-unresolved` 错误。
+- 应移除该 import，并直接使用全局 `dayjs`。
 
-## Impacto
-- Afeta projetos como zhi2-web-admin e 综合查询.
-
+## 影响
+- 影响诸如 zhi2-web-admin 和 综合查询 等项目。
 
 <!-- MEMORY_FIELDS
 {

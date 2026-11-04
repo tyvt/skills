@@ -1,16 +1,16 @@
-# Alinhamento esquerdo de rótulos no detail-template
-No Suzhou Real Estate Monitoring V3, o `detail-template.vue` teve o alinhamento padrão de rótulos alterado para esquerda.
+# detail-template 中标签的左对齐
+在 Suzhou Real Estate Monitoring V3 中，`detail-template.vue` 的标签默认对齐方式已更改为左对齐。
 
-## Alterações no componente
-- `getLabelAlignClass` muda `labelAlign` padrão de `right` para `left`
-- `getLabelContentStyle` muda padrão e fallback para `flex-start`
-- CSS `.detail-label` e `.detail-label-main` com `justify-content: flex-start` e `text-align: left`
-- Itens individuais ainda podem sobrescrever via `labelAlign`
+## 组件变更
+- `getLabelAlignClass` 将 `labelAlign` 默认值从 `right` 改为 `left`
+- `getLabelContentStyle` 将默认值和回退改为 `flex-start`
+- CSS `.detail-label` 和 `.detail-label-main` 使用 `justify-content: flex-start` 和 `text-align: left`
+- 单个项仍可通过 `labelAlign` 覆盖
 
-## Arquivos e Atribuição
+## 文件与归属
 - 验证证据: src=苏州市房地产监测V3/168.md
 - 涉及文件: CashsaleInfoPanel.vue, detail-template.vue, detail-template-long-labels.md, README.md, detail-template-CrrkOgnH.css, migrate-detail-framework.mjs
-- Sessão: 0e6522ee-5877-4b0d-9156-b0f67a688a71; baseline: none
+- 会话: 0e6522ee-5877-4b0d-9156-b0f67a688a71; baseline: none
 
 <!-- MEMORY_FIELDS
 {

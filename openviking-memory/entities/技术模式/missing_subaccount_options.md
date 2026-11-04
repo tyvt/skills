@@ -1,14 +1,14 @@
 # missing_subaccount_options
-O dictFormatter global procura {prop}Options por coluna; páginas de detalhe ausentes causam coluna vazia.
+全局 dictFormatter 按列查找 {prop}Options；缺失的详情页导致列空白。
 
 ## 问题根因
-- depositNotice/components/detail.vue e company/components/detail.vue carregavam apenas yesOrNoOptions, sem hasSubAccountOptions
-- dictFormatter global busca {prop}Options pela prop da coluna; ausência deixa coluna vazia
+- depositNotice/components/detail.vue 和 company/components/detail.vue 仅加载了 yesOrNoOptions，缺少 hasSubAccountOptions
+- 全局 dictFormatter 根据列的 prop 查找 {prop}Options；缺失会使列空白
 
 ## 解决方案
-- Adicionar hasSubAccountOptions em data e atribuir sys_yes_no via initDict
+- 在 data 中添加 hasSubAccountOptions 并通过 initDict 赋值为 sys_yes_no
 
-## Arquivos envolvidos
+## 涉及的文件
 - d:/repository/园区公共收益/zhi2-web-admin/src/views/maintenance/depositNotice/components/detail.vue
 - d:/repository/园区公共收益/zhi2-web-admin/src/views/maintenance/depositNotice/company/components/detail.vue
 - d:/repository/园区公共收益/zhi2-web-admin/src/views/maintenance/settlementAccount/detail.vue
@@ -18,9 +18,9 @@ O dictFormatter global procura {prop}Options por coluna; páginas de detalhe aus
 - d:/repository/园区公共收益/zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue
 - d:/repository/园区公共收益/zhi2-web-admin/src/mixins/detailMixins.js
 
-## Verificação
+## 验证
 - 验证证据: src=园区公共收益/020.md
-- Sessão de origem: 7e4c18c0-5ce0-41ce-b4dd-d28988df5d00; base de código: none
+- 源会话: 7e4c18c0-5ce0-41ce-b4dd-d28988df5d00; 代码库: none
 - 所属项目: 园区公共收益
 
 <!-- MEMORY_FIELDS

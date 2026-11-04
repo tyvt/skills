@@ -1,17 +1,17 @@
-# Reutilização de anexos de pré-venda na transferência para venda à vista
-Padrão do Suzhou Monitoramento Imobiliário V3 que reaproveita anexos somente-leitura de pré-venda na transferência para venda à vista.
+# 预售附件在转现售中的复用
+苏州房地产监测V3的标准，在转现售时复用预售的只读附件。
 
-## Definição de rota
-- `cashsaleConstants.js` define o código de negócio `yszxs` reconhecido por `resolveAppendixBusCode`.
+## 路由定义
+- `cashsaleConstants.js` 定义被 `resolveAppendixBusCode` 识别的业务代码 `yszxs`。
 
-## Componente e montagem
-- Criar `CashsaleTransferAppendixPanel.vue` que busca anexos de pré-venda (`ysxksq` + `presalePermitId`) marcados como somente-leitura.
-- Concatenar anexos do próprio formulário via `AnnexUpload` e `handleConfig`.
-- `mapAppendixPackageList` realiza o mapeamento dos anexos.
+## 组件与装配
+- 创建 `CashsaleTransferAppendixPanel.vue`，用于获取标记为只读的预售附件（`ysxksq` + `presalePermitId`）。
+- 通过 `AnnexUpload` 和 `handleConfig` 拼接表单自身的附件。
+- `mapAppendixPackageList` 执行附件的映射。
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/104.md
-- 所属项目: Suzhou Monitoramento Imobiliário V3; sessão: b682e5d0-7ff0-4125-961e-04c9a7ebb147; baseline: none
+- 所属项目: 苏州房地产监测V3; 会话: b682e5d0-7ff0-4125-961e-04c9a7ebb147; baseline: none
 
 <!-- MEMORY_FIELDS
 {

@@ -1,17 +1,15 @@
+# 在10个文件中移除环境分支
+在项目 苏州市房地产监测V3 中，为了统一通用逻辑，从多个文件中移除了环境分支。
 
-# Remoção de ramos de ambiente em 10 arquivos
-No projeto 苏州市房地产监测V3, ramos de ambiente foram removidos de múltiplos arquivos para unificar lógica comum.
-
-## Alteração
-- Em notice/detail.vue, usemoney/detail.vue e outros 10 arquivos, removidos ramos isSuzhouzhizai/currentEnvironment
-- Conta bancária unificada para campos genéricos ${frontLabel}/${frontBank}
-- defaultTabList fixado em três abas: 用款明细, 关联楼幢, 股东信息
+## 变更
+- 在 notice/detail.vue、usemoney/detail.vue 和其他10个文件中，移除了 isSuzhouzhizai/currentEnvironment 分支
+- 银行账户统一为通用字段 ${frontLabel}/${frontBank}
+- defaultTabList 固定为三个标签页：用款明细, 关联楼幢, 股东信息
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/179.md
 - 涉及文件: notice/detail.vue, AppropriationBuildingsTable.vue, usemoney/detail.vue, RelatedBuildingsTable.vue, usemoneyRevoke/detail.vue, BuildingTable.vue, AppropriateTable.vue
-- Sessão: f81fe328-0c4a-411a-b2a9-b762808390a4; baseline: none
-
+- 会话: f81fe328-0c4a-411a-b2a9-b762808390a4; baseline: none
 
 <!-- MEMORY_FIELDS
 {

@@ -1,12 +1,12 @@
-# preview.vue referencia ZsPageLoading ausente
-O `preview.vue` referencia `@/components/ZsPageLoading/ZsPageLoading.vue`, inexistente no projeto atual; resolvido copiando o componente do projeto Wuxi urbano.
+# preview.vue 引用了不存在的 ZsPageLoading
+`preview.vue` 引用了 `@/components/ZsPageLoading/ZsPageLoading.vue`，该文件在当前项目中不存在；通过从无锡市区项目复制组件解决。
 
 ## 问题根因
-- `preview.vue` referencia `@/components/ZsPageLoading/ZsPageLoading.vue`
-- O projeto atual `zhi2-mobile-admin-h5-c-unlimited` não possui esse componente
+- `preview.vue` 引用了 `@/components/ZsPageLoading/ZsPageLoading.vue`
+- 当前项目 `zhi2-mobile-admin-h5-c-unlimited` 没有该组件
 
 ## 解决方案
-- Copiado `ZsPageLoading.vue` de `无锡市区/zhi2-mobile-admin-h5-c-unlimited/src/components/ZsPageLoading/` para o diretório correspondente do projeto atual
+- 将 `ZsPageLoading.vue` 从 `无锡市区/zhi2-mobile-admin-h5-c-unlimited/src/components/ZsPageLoading/` 复制到当前项目的对应目录
 
 ## 验证与归属
 - 验证证据: extracted source=cursor session=50bd54d9-da06-4e47-b5a7-b5123d1eb366

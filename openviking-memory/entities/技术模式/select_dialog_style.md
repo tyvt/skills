@@ -1,16 +1,16 @@
-# Estilo de diálogo funcional de seleção divergente
-No projeto Suzhou Real Estate Monitoring V3, `SelectDialog.open` tinha bordas extras e layout divergindo do componente padrão.
+# 偏离的功能选择对话框样式
+在 Suzhou Real Estate Monitoring V3 项目中，`SelectDialog.open` 有多余的边框且布局偏离标准组件。
 
-## Problema
-- `SelectDialog.open` possuía `list-card` com borda extra e classe de alinhamento à direita no rodapé compact
-- Paginação posicionada dentro da tabela causando desalinhamento
+## 问题
+- `SelectDialog.open` 带有多余边框的 `list-card` 以及紧凑页脚中右对齐的类
+- 分页放置在表格内部导致错位
 
-## Correção
-- Remover `list-card` e classe de rodapé compact; mover paginação para fora da tabela com `margin-top:12px; padding:12px 0 0` em estilo scoped
-- Alinhar com estrutura `select-dialog-table-wrap` e `dialog-footer` centralizado de `zs-select-dialog.vue`
-- Manter lógica de paginação frontend `clientPagination` sem afetar layout
+## 修复
+- 移除 `list-card` 和紧凑页脚类；将分页移到表格外部，在 scoped 样式中使用 `margin-top:12px; padding:12px 0 0`
+- 与 `zs-select-dialog.vue` 中的 `select-dialog-table-wrap` 结构和居中的 `dialog-footer` 对齐
+- 保持前端分页逻辑 `clientPagination` 不影响布局
 
-## Arquivos Envolvidos
+## 涉及文件
 - `views/company/companyCancel/index.vue`
 - `components/zs-select-dialog/zs-select-dialog-func.vue`
 - `views/company/companyApplyAudit/index.vue`
@@ -22,8 +22,8 @@ No projeto Suzhou Real Estate Monitoring V3, `SelectDialog.open` tinha bordas ex
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/025.md
-- ID de sessão: 81825ca3-8f1a-442f-a106-ef98a5c8c238
-- 所属项目: Suzhou Real Estate Monitoring V3; linha de base: none
+- 会话 ID: 81825ca3-8f1a-442f-a106-ef98a5c8c238
+- 所属项目: Suzhou Real Estate Monitoring V3; 基线: none
 
 <!-- MEMORY_FIELDS
 {

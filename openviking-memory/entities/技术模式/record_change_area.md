@@ -1,18 +1,18 @@
-# Lista de alterações de registro usa administrativeArea
-No Suzhou Real Estate Monitoring V3, a lista de alterações de credenciamento de instituições teve o parâmetro de consulta alterado de `regionCode` para `administrativeArea` para adaptar à nova interface.
+# 登记变更列表使用 administrativeArea
+在苏州房地产监测V3中，机构认证变更列表的查询参数已从 `regionCode` 更改为 `administrativeArea`，以适应新接口。
 
-## Problema
-- Parâmetro `regionCode` não adaptado à nova interface `administrativeArea`, causando anomalia de filtro
+## 问题
+- 参数 `regionCode` 未适配新接口 `administrativeArea`，导致筛选异常
 
 ## 解决方案
-- Em `change/index.vue`, parâmetro de consulta alterado para `administrativeArea`
-- Coluna de tabela usa `type='dict'` e `dict-url='ECONOMIC_INSTITUTIONS_REGION'`, removendo `formatRegion`
-- `companyRecord.js` adiciona JSDoc para `pageCompanyRecordChanges` e nova interface `addCompanyRecordChange`
+- 在 `change/index.vue` 中，查询参数更改为 `administrativeArea`
+- 表格列使用 `type='dict'` 和 `dict-url='ECONOMIC_INSTITUTIONS_REGION'`，移除了 `formatRegion`
+- `companyRecord.js` 为 `pageCompanyRecordChanges` 添加 JSDoc 以及新接口 `addCompanyRecordChange`
 
-## Verificação e arquivos
+## 验证与文件
 - 验证证据: src=苏州市房地产监测V3-rest/124.md
 - 涉及文件: change/index.vue, change/detail.vue, companyRecord.js, companyBasicInfoContent.js, companyRecordAgency/index.vue, CompanyBasicInfoForm.vue, detail.vue, company-record-change.spec.js
-- Sessão: 81bf5be6-c0ce-46ce-b29f-c26f9c1c7127; baseline: none
+- 会话: 81bf5be6-c0ce-46ce-b29f-c26f9c1c7127; baseline: none
 
 <!-- MEMORY_FIELDS
 {

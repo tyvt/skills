@@ -1,19 +1,19 @@
-# Interface de venda consignada muda parâmetro areaCode para region
-No projeto Suzhou Real Estate Monitoring V3, o backend alterou campo de entrada e resposta de detalhe de areaCode para region na interface de venda consignada; frontend não estava alinhado.
+# 委托销售接口将参数 areaCode 改为 region
+在 Suzhou Real Estate Monitoring V3 项目中，后端在委托销售接口中将输入字段和详情返回字段从 areaCode 改为 region；前端未对齐。
 
 ## 问题根因
-- Backend mudou parâmetro de add/edit e campo de resposta de detalhe de `areaCode` para `region`
-- Frontend não alinhado causando descompasso
+- 后端将新增/编辑参数和详情返回字段从 `areaCode` 改为 `region`
+- 前端未对齐导致不一致
 
 ## 解决方案
-- `detail.vue` `normalizeDetail` passou a ler apenas `data.region`; `buildSavePayload` envia `region: form.region`
-- `entrust-sale-helpers.js` assertiva E2E mudou de `'areaCode'` para `'region'`
-- Formulário internamente ainda usa `form.region`; lógica de exibição inalterada
+- `detail.vue` 的 `normalizeDetail` 改为仅读取 `data.region`；`buildSavePayload` 发送 `region: form.region`
+- `entrust-sale-helpers.js` 的 E2E 断言从 `'areaCode'` 改为 `'region'`
+- 表单内部仍使用 `form.region`；展示逻辑不变
 
-## Verificação e arquivos
+## 验证与文件
 - 验证证据: src=苏州市房地产监测V3-leftover/039.md
 - 涉及文件: presale/entrustSale/detail.vue, index.vue, e2e/fixtures/entrust-sale-helpers.js, detailMixins.js, e2e/presale/entrust-sale-real-api-flow.spec.js, form.js
-- Sessão: 74428e0b-126e-4f90-9fc3-2fbe6b27a399; baseline: none
+- 会话: 74428e0b-126e-4f90-9fc3-2fbe6b27a399; baseline: none
 
 <!-- MEMORY_FIELDS
 {

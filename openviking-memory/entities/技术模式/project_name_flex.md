@@ -1,15 +1,15 @@
-# Layout flex do nome de projeto de supervisão
-No projeto 苏州市房地产监测V3, `detail.vue` de supervisão jgxm usa flex para alinhar nome principal e número de prédio, e estado de visualização concatena parênteses de largura total.
+# 监管项目名称的 flex 布局
+在项目 苏州市房地产监测V3 中，监管 jgxm 的 `detail.vue` 使用 flex 来对齐主名称和楼栋号，并且查看状态拼接全角括号。
 
 ## 描述
-- Ajuste de apresentação do nome do projeto de supervisão (jgxm)
+- 调整监管项目名称的展示（jgxm）
 - 所属项目: 苏州市房地产监测V3
 
-## Implementação
-- Em edição: container `regulator-project-name-fields` com flex; nome principal `flex:1`, segmento de número de prédio `margin-left:auto` à direita
-- Em visualização: `regulatorProjectNameDisplay` concatena `${name}（${short}）` com parênteses de largura total
+## 实现
+- 编辑时：容器 `regulator-project-name-fields` 使用 flex；主名称 `flex:1`，楼栋号片段 `margin-left:auto` 靠右
+- 查看时：`regulatorProjectNameDisplay` 拼接 `${name}（${short}）` 使用全角括号
 
-## Arquivos Relacionados
+## 相关文件
 - `src/views/supervision/agreement/jgxm/detail.vue`
 - `src/views/supervision/unblock/InformationPush/detail.vue`
 - `src/utils/detailLayout.js`
@@ -17,7 +17,7 @@ No projeto 苏州市房地产监测V3, `detail.vue` de supervisão jgxm usa flex
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-leftover/032.md
-- Sessão de origem: 8ed69fd8-6062-4732-bc26-b18e22054b54; linha de base: none
+- 来源会话: 8ed69fd8-6062-4732-bc26-b18e22054b54; linha de base: none
 
 <!-- MEMORY_FIELDS
 {

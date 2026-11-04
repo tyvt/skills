@@ -1,18 +1,18 @@
-# Mudança de Campo areaCode para region em Venda Consignada
-No projeto Suzhou Real Estate Monitoring V3, campo da API backend `areaCode` mudou para `region`; frontend sincronizado.
+# 委托销售中将字段 areaCode 变更为 region
+在 Suzhou Real Estate Monitoring V3 项目中，后端 API 字段 `areaCode` 变更为 `region`；前端已同步。
 
-## Causa
-- Interface backend alterou `areaCode` para `region`
+## 原因
+- 后端接口将 `areaCode` 改为 `region`
 
 ## 解决方案
-- `detail.vue` `normalizeDetail` lê apenas `data.region`; `buildSavePayload` envia `region`
-- `entrust-sale-helpers.js` assertiva E2E muda campo para `region`
-- Sem referências `areaCode` globais
+- `detail.vue` 中的 `normalizeDetail` 仅读取 `data.region`；`buildSavePayload` 发送 `region`
+- `entrust-sale-helpers.js` 中的 E2E 断言将字段改为 `region`
+- 没有全局的 `areaCode` 引用
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3/239.md
 - 涉及文件: presale/entrustSale/detail.vue, presale/entrustSale/index.vue, e2e/fixtures/entrust-sale-helpers.js, mixins/detailMixins.js, e2e/presale/entrust-sale-real-api-flow.spec.js, mixins/form.js
-- 所属项目: Suzhou Real Estate Monitoring V3; Sessão: 74428e0b-126e-4f90-9fc3-2fbe6b27a399; Base: none
+- 所属项目: Suzhou Real Estate Monitoring V3; 会话: 74428e0b-126e-4f90-9fc3-2fbe6b27a399; Base: none
 
 <!-- MEMORY_FIELDS
 {

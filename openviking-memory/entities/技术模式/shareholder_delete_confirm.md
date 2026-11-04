@@ -1,18 +1,18 @@
-# Exclusão de acionista exige confirmação
-No Suzhou Real Estate Monitoring V3, exclusões de acionistas (linha única e em lote) passaram a exigir popup de confirmação para evitar exclusão acidental.
+# 删除股东需确认
+在 Suzhou Real Estate Monitoring V3 中，股东删除（单行和批量）现在需要确认弹窗，以避免意外删除。
 
-## Alterações no componente
-- `Step4Shareholders.vue` adiciona `confirmDelete(message)` chamando `$confirm` do Element UI
-- Exclusões única e em lote confirmam antes de executar
+## 组件变更
+- `Step4Shareholders.vue` 添加 `confirmDelete(message)`，调用 Element UI 的 `$confirm`
+- 单行和批量删除在执行前确认
 
-## Alterações no helper
-- `register-helpers.js` adiciona `confirmDeleteDialog(page)`
-- `deleteShareholderByName` e `batchDeleteShareholders` confirmam antes de executar
+## helper 变更
+- `register-helpers.js` 添加 `confirmDeleteDialog(page)`
+- `deleteShareholderByName` 和 `batchDeleteShareholders` 在执行前确认
 
-## Verificação e arquivos
-- 验证证据: src=苏州市房地产监测V3-rest/125.md e src=苏州市房地产监测V3/169.md
+## 验证与文件
+- 验证证据: src=苏州市房地产监测V3-rest/125.md 和 src=苏州市房地产监测V3/169.md
 - 涉及文件: Step4Shareholders.vue, register-helpers.js, detailMixins.js, shareholderTable.vue, permit/detail.vue, company-register-branch.spec.js, shareholder/index.vue, listMixins.js
-- Sessão: be083398-3966-4e2a-b4e7-52daef8b2c73; baseline: none
+- 会话: be083398-3966-4e2a-b4e7-52daef8b2c73; baseline: none
 
 <!-- MEMORY_FIELDS
 {

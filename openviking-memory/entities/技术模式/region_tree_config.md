@@ -1,18 +1,18 @@
-# Árvore de região configurável para ordens de serviço
-O componente region-tree-layout aceita URL e parâmetros de árvore configuráveis, repassados até regionTree.vue.
+# 用于工单的可配置区域树
+region-tree-layout 组件接受可配置的树 URL 和参数，并传递给 regionTree.vue。
 
 ## Description
-- index.vue define tree-url='/system/dept/complexTree' e :tree-params='{}' no region-tree-layout
-- RegionTreeLayout.vue expõe propriedades treeUrl e treeParams, repassando para regionTree.vue
-- Quando treeParams está vazio, nenhum parâmetro de consulta é enviado à interface
+- index.vue 在 region-tree-layout 中定义 tree-url='/system/dept/complexTree' 和 :tree-params='{}'
+- RegionTreeLayout.vue 暴露 treeUrl 和 treeParams 属性，传递给 regionTree.vue
+- 当 treeParams 为空时，不向接口发送任何查询参数
 
 ## Purpose
-- Tornar a árvore de regiões configurável por página de lista de ordens de serviço
+- 使区域树可由工单列表页面配置
 
 ## Relations
-- Resposta compatível com estrutura id/label/children do componente existente
+- 响应兼容现有组件的 id/label/children 结构
 - 涉及文件: property/workOrder/order/index.vue, complex/components/RegionTreeLayout.vue, complex/components/regionTree.vue, mixins/listMixins.js, mixins/table.js
-- Sessão cursor: ca01e574-0616-48a5-8f5a-4a6bbe304b4b
+- 光标会话: ca01e574-0616-48a5-8f5a-4a6bbe304b4b
 
 <!-- MEMORY_FIELDS
 {

@@ -1,13 +1,13 @@
-# Exibição de "não selecionado" em votação não obrigatória
-Quando a votação não é obrigatória e não foi votada, as áreas de opção em `ViewOptionsList.vue` e `DescribePopup.vue` exibem "暂未选择"; adicionado prop `readOnly`.
+# 非必填投票中“未选择”的显示
+当投票非必填且未投票时，`ViewOptionsList.vue` 和 `DescribePopup.vue` 中的选项区域显示“暂未选择”；新增了 prop `readOnly`。
 
 ## 问题根因
-- Áreas de opção de voto não exibiam estado unificado quando não obrigatório e não votado
-- Lógica original dependia de `decisionRequired == '1'`
+- 投票选项区域在非必填且未投票时未显示统一状态
+- 原有逻辑依赖于 `decisionRequired == '1'`
 
 ## 解决方案
-- `ViewOptionsList.vue` e `DescribePopup.vue` exibem "暂未选择" unificadamente
-- `DescribePopup.vue` recebe nova prop `readOnly` do componente pai para cenários somente leitura
+- `ViewOptionsList.vue` 和 `DescribePopup.vue` 统一显示“暂未选择”
+- `DescribePopup.vue` 从父组件接收新的 prop `readOnly` 用于只读场景
 
 ## 验证与归属
 - 验证证据: extracted source=cursor session=ea6407fc-4a97-464f-86b5-f338dfb9dbb6

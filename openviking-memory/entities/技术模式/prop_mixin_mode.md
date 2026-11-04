@@ -1,15 +1,15 @@
-# Conflito de nome entre prop e propriedade computada de mixin
-`AgencyBasicInfoDetail` mistura `detailMixins` cuja propriedade computada `mode` conflita com prop `mode` do componente, causando sobrescrita.
+# prop 与 mixin 的计算属性之间的命名冲突
+`AgencyBasicInfoDetail` 混入 `detailMixins`，其计算属性 `mode` 与组件的 prop `mode` 冲突，导致覆盖。
 
-## Correção
-- Prop renomeado para `detailScope`
-- `loadDetail` usa `this.detailScope === 'admin'` para decisão
-- Componente referenciado `toB/agencyRecord/detail.vue` não precisa de mudança
+## 修正
+- prop 重命名为 `detailScope`
+- `loadDetail` 使用 `this.detailScope === 'admin'` 进行判断
+- 引用的组件 `toB/agencyRecord/detail.vue` 无需更改
 
-## Verificação e arquivos
+## 验证与文件
 - 验证证据: src=苏州市房地产监测V3/262.md
 - 涉及文件: AgencyBasicInfoDetail.vue, mixins/detailMixins.js, toB/agencyRecord/detail.vue, DeveloperBasicInfoDetail.vue, mixins/form.js, mixins/formComponents.js
-- 所属项目: 苏州市房地产监测V3; sessão: d7c5546b-aa33-4b71-aad6-e797b69bb1eb
+- 所属项目: 苏州市房地产监测V3; session: d7c5546b-aa33-4b71-aad6-e797b69bb1eb
 
 <!-- MEMORY_FIELDS
 {

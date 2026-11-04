@@ -1,17 +1,17 @@
-# Exclusão de comprovante não atualiza página pai e mantém valor antigo
-No projeto 园区公共收益 (zhi2-web-admin), o `handleDelete` do `table.js` só atualiza a tabela filha e não notifica o pai; a página de detalhe mantém o valor antigo em «valor desta verificação».
+# 删除凭证不更新父页面并保留旧值
+在 园区公共收益 (zhi2-web-admin) 项目中，`table.js` 的 `handleDelete` 仅更新子表且不通知父级；详情页在 «本次验证的值» 中保留旧值。
 
 ## 问题根因
-- O `handleDelete` do `table.js` só atualiza a tabela filha, sem notificar o pai
-- A página de detalhe mantém o valor antigo em «valor desta verificação»
+- `table.js` 的 `handleDelete` 仅更新子表，未通知父级
+- 详情页在 «本次验证的值» 中保留旧值
 
 ## 解决方案
-- Adicionar `deleteSuccessCallback` em `VerificationReceiptDetailTable.vue`
-- Chamar `this.$emit('refresh')` para disparar `getDetail` e recarregar detalhes
+- 在 `VerificationReceiptDetailTable.vue` 中添加 `deleteSuccessCallback`
+- 调用 `this.$emit('refresh')` 以触发 `getDetail` 并重新加载详情
 
-## Arquivos envolvidos
-- `detail.vue` e `VerificationReceiptDetailTable.vue` (página de detalhe e tabela)
-- `VerificationReceiptDetailDialog.vue` e `ReconciliationBusinessTable.vue`
+## 涉及文件
+- `detail.vue` 和 `VerificationReceiptDetailTable.vue` (详情页和表格)
+- `VerificationReceiptDetailDialog.vue` 和 `ReconciliationBusinessTable.vue`
 - Mixins: `subTableMixins.js`, `table.js`, `detailMixins.js`
 
 ## 验证与归属

@@ -1,19 +1,17 @@
+# zs-operate 列需要布尔权限
+列 `zs-operate-column` 使用 `permission` 作为布尔开关，并使用 `permissionType` 作为权限后缀。
 
-# Coluna zs-operate requer permissão booleana
-A coluna `zs-operate-column` usa `permission` como interruptor booleano e `permissionType` como sufixo de permissão.
+## 问题
+- 使用数组代替布尔值会导致 `permissionType` 变为未定义，并且权限验证失败。
 
-## Problema
-- Usar array em vez de booleano faz `permissionType` ficar indefinido e falha a verificação de permissão.
+## 修正
+- 在 `institutionRegister/index.vue` 中，`buttons()` 定义 `permission: true` 和 `permissionType: 'query'` 以进行修正。
 
-## Correção
-- Em `institutionRegister/index.vue`, `buttons()` define `permission: true` e `permissionType: 'query'` para corrigir.
-
-## Arquivos relacionados
+## 相关文件
 - `components/zs-operate-column/zs-operate-column.vue`
 - `components/OperationBtnGroup/index.vue`
 - `store/modules/permission.js`
 - `utils/permission.js`
-
 
 <!-- MEMORY_FIELDS
 {

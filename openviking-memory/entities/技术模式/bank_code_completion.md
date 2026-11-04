@@ -1,20 +1,19 @@
-# Completar código bancário na pré-autenticação
-A ausência de `regulatoryBankCode`/`bankCode` no retorno de `pageIsAgreement` causava falso aviso de área não selecionada antes da autenticação; a solução encadeia buscas com fallback.
+# 在预认证时补全银行代码
+在 `pageIsAgreement` 的返回中缺失 `regulatoryBankCode`/`bankCode` 会在认证前导致虚假的未选择区域警告；解决方案通过带回退的链式查询来补全。
 
-## Problema
-- `pageIsAgreement` normalmente retorna sem `regulatoryBankCode`/`bankCode`
-- Verificação de nulo antes da autenticação exibia erro falso "请先选择物业管理区域" (selecione a área de gestão imobiliária)
-- Arquivos afetados incluem benefit/pubExpenditureContract, property/expenditureContract, benefit/pubUseMoneyApply, benefit/pubBankReceiptApply, benefit/pubRevenueContract, benefit/pubRegulatoryAccount
+## 问题
+- `pageIsAgreement` 通常返回时不带 `regulatoryBankCode`/`bankCode`
+- 认证前的空值检查会显示虚假错误“请先选择物业管理区域”
+- 受影响的文件包括 benefit/pubExpenditureContract, property/expenditureContract, benefit/pubUseMoneyApply, benefit/pubBankReceiptApply, benefit/pubRevenueContract, benefit/pubRegulatoryAccount
 
 ## 解决方案
-- Após selecionar área, completar código em cadeia: `pageIsAgreement`→lista de abertura de conta→detalhe de abertura→lista de bancos gestores
-- Quando o código está ausente, usar fallback `payeeAccountBankCode`
-- Mudar aviso para "未能获取银行编码…" (não foi possível obter o código bancário)
+- 选择区域后，链式补全代码：`pageIsAgreement`→开户列表→开户详情→监管银行列表
+- 当代码缺失时，使用回退值 `payeeAccountBankCode`
+- 将提示信息改为“未能获取银行编码…”
 
 ## 验证与归属
-- Evidência extraída da sessão cursor e95efacc-3c6a-4c04-84ea-35202f15a58e
-- 所属项目: 无锡锡山V2 (Wuxi Xishan V2); baseline de código: none
-- 涉及文件: src/views/benefit/pubExpenditureContract/detail.vue, src/views/property/expenditureContract/detail.vue, src/views/benefit/pubUseMoneyApply/detail.vue, src/views/benefit/pubBankReceiptApply/detail.vue, src/views/benefit/pubRevenueContract/detail.vue, src/api/benefit/pubUseMoneyApply.js, src/views/benefit/pubRegulatoryAccount/index.vue, src/api/benefit/pubRegulatoryAccount.js
+- 证据提取自 cursor 会话 e95efacc-3c6a-4c04-84ea-35202f15a58e
+- 所属项目: 无锡锡山V2 (Wuxi Xishan V2); 代码基线: none
 
 <!-- MEMORY_FIELDS
 {

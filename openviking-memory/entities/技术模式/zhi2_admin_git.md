@@ -11,13 +11,16 @@ zhi2-web-admin 是父仓库的子模块，拥有独立 git 仓库，改动须走
 ## 验证注意
 - worktree 不随检出的 node_modules，整包 npm run build 难跑；可借主工作区 node_modules 做 SFC 编译校验
 - 纯 Vue2 Options API + 标准资源导入页面，与既有同类页一致即可认为编译安全
+- 禁止用 PowerShell 的 Get-Content/Set-Content 读写含中文的 Vue 文件，会破坏 UTF-8 编码并加 BOM 导致乱码；字符串替换请用 read/edit 工具
+- worktree 自 HEAD 切出，不含主工作区未提交改动；若用户看到的文件含未提交改动，需先把主工作区版本作为基线带入 worktree，或直接在主工作区修改
+- 构建验证可放回主工作区进行（worktree 路径下 vite 因 node_modules 解析/版本检查更严格可能构建失败）
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zhi2_admin_git",
-  "source_extraction_id": "31ab600c7e9c4295b07e25f5a3e0cbf9",
-  "version": 2,
+  "source_extraction_id": "16fcaf1869de4f7cb3030b624169e993",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

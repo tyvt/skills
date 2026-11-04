@@ -1,19 +1,19 @@
-# zs-textarea com tipo richtext incorreto
-Mesmo arquivo com zs-textarea e label '备注' configurado como type 'richtext' deve usar textarea, mantendo zs-editor para richtext real.
+# zs-textarea 的 richtext 类型不正确
+即使文件中的 zs-textarea 且 label 为 '备注' 被配置为 type 'richtext'，也应使用 textarea，同时为真正的 richtext 保留 zs-editor。
 
 ## Problema
-- zs-textarea com label '备注' recebeu type 'richtext' por engano
-- Correspondência incorreta afeta componentes de formulário Vue
+- zs-textarea 且 label 为 '备注' 被错误地赋予了 type 'richtext'
+- 不正确的匹配影响了 Vue 表单组件
 
 ## 解决方案
-- Alterar type para 'textarea' quando zs-textarea tiver label '备注' e type 'richtext'
-- Manter zs-editor para richtext genuíno
-- Correção em lote de 75 arquivos limpou o erro de correspondência
+- 当 zs-textarea 具有 label '备注' 且 type 'richtext' 时，将 type 改为 'textarea'
+- 为真正的 richtext 保留 zs-editor
+- 批量修正 75 个文件清除了匹配错误
 
 ## 验证与归属
-- Arquivo maintenance/accountQuery/detail.vue não pertence à classe por não ter zs-textarea
+- 文件 maintenance/accountQuery/detail.vue 因不包含 zs-textarea 而不属于该类
 - 验证证据: src=bugfix/001.md
-- Sessão: c26b5af2-98bb-45f3-8246-0a1d95b9d310
+- 会话: c26b5af2-98bb-45f3-8246-0a1d95b9d310
 - 所属项目: zhi2-web-admin; baseline none
 
 <!-- MEMORY_FIELDS

@@ -1,5 +1,5 @@
-- Quando `registerUrl` não está configurado, `goRegisterPage` deve remover lógica de fallback e apenas exibir a mensagem «未配置注册链接域名，请联系管理员在基本配置中设置» sem redirecionar.
-- Quando `registerUrl` está configurado, redireciona para `<registerUrl>/#<path>?<query>` com salto de página inteira.
+- 当 `registerUrl` 未配置时，`goRegisterPage` 应移除 fallback 逻辑，仅显示消息 «未配置注册链接域名，请联系管理员在基本配置中设置» 而不重定向。
+- 当 `registerUrl` 已配置时，重定向到 `<registerUrl>/#<path>?<query>`，采用整页跳转。
 
 <!-- MEMORY_FIELDS
 {

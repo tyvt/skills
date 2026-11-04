@@ -1,15 +1,15 @@
-# Modo de manutenção de pessoal G-end somente campo de função editável
-No projeto 苏州市房地产监测V3, quando `isGTerminalPersonnelMaintainEdit` é true, apenas o campo `人员角色` (função do pessoal) fica editável; demais campos são bloqueados via `maintainOtherFieldsDisabled`.
+# G-end人员维护模式仅职能字段可编辑
+在项目 苏州市房地产监测V3 中，当 `isGTerminalPersonnelMaintainEdit` 为 true 时，仅 `人员角色` 字段（人员职能）可编辑；其他字段通过 `maintainOtherFieldsDisabled` 锁定。
 
-## Comportamento
-- `isGTerminalPersonnelMaintainEdit` true -> só `人员角色` sem `:disabled` editável
-- Outros campos bloqueados por `maintainOtherFieldsDisabled`
-- `handleSave` ignora validação de exigências (要件校验)
+## 行为
+- `isGTerminalPersonnelMaintainEdit` 为 true -> 仅 `人员角色` 不带 `:disabled` 可编辑
+- 其他字段通过 `maintainOtherFieldsDisabled` 锁定
+- `handleSave` 忽略要件校验
 
-## Condições de ramificação G-end
-- Lista e detalhe alinham ramos G-end com `isGTerminal`, `bizState==='2'`, `!isPersonnelCancelled`
+## G-end 分支条件
+- 列表和详情将 G-end 分支与 `isGTerminal`, `bizState==='2'`, `!isPersonnelCancelled` 对齐
 
-## Arquivos envolvidos
+## 涉及文件
 - AgencyPersonnelDetail.vue
 - AgencyPersonnelList.vue
 - LeasePersonnelDetail.vue
@@ -18,8 +18,8 @@ No projeto 苏州市房地产监测V3, quando `isGTerminalPersonnelMaintainEdit`
 - e2e spec
 - personnelRecord/components/detail.vue
 
-## Verificação
-- Sessão: c622c348-e873-4a4f-9936-9bbb4eab54d2
+## 验证
+- 会话: c622c348-e873-4a4f-9936-9bbb4eab54d2
 - 所属项目: 苏州市房地产监测V3
 
 <!-- MEMORY_FIELDS

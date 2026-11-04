@@ -1,6 +1,6 @@
-- Em `src/views/benefit/alert/index.vue`, os quatro botões de consulta chamam primeiro `switchWarningType` e depois o `getList()` sem parâmetros do mixin.
-- Remove a implementação customizada de `getList` sobrescrita na página.
-- Configura `moduleName: 'benefit'` e `businessName: 'warningAnalys'`.
+- 在 `src/views/benefit/alert/index.vue` 中，四个查询按钮先调用 `switchWarningType`，然后调用 mixin 中无参数的 `getList()`。
+- 移除页面中重写的自定义 `getList` 实现。
+- 配置 `moduleName: 'benefit'` 和 `businessName: 'warningAnalys'`。
 
 <!-- MEMORY_FIELDS
 {

@@ -1,22 +1,22 @@
-# Supervision Detail Zone API Mismatch
-O dropdown de área de supervisão ficava sem valores devido a referência de API não unificada no zhi2-web-admin.
+# 监管详情区域 API 不匹配
+由于 zhi2-web-admin 中 API 引用未统一，监管区域的下拉框没有值。
 
 ## 描述
-- Arquivo `zhi2-web-admin/src/views/supervision/agreement/version/detail.vue` referenciava `@/api/zone/zone.js` incorretamente.
-- O dropdown de zona/área subordinada não carregava valores.
+- 文件 `zhi2-web-admin/src/views/supervision/agreement/version/detail.vue` 错误地引用了 `@/api/zone/zone.js`。
+- 区域/下属区域的下拉框未加载出值。
 
 ## 问题根因
-- Referência de API divergente do `index.vue` que usa `@/api/system/zone`.
-- Lógica de carregamento de lista não estava alinhada.
+- 与使用了 `@/api/system/zone` 的 `index.vue` 的 API 引用不一致。
+- 列表加载逻辑未对齐。
 
 ## 解决方案
-- Alterado para `@/api/system/zone` para alinhar com `index.vue`.
-- Corrigida a lógica de carregamento list.
+- 修改为 `@/api/system/zone` 以与 `index.vue` 对齐。
+- 修正了列表加载逻辑。
 
-## Verificação e Atribuição
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3-rest/069.md
 - 涉及文件: supervision/agreement/version/detail.vue, benefit/pubRegAccountChange/detail.vue, presale/entrustSale/detail.vue, api/zone/zone.js, api/system/zone.js, property/propertyAccount/detail.vue, api/index.js, mixins/detailMixins.js
-- 所属项目: 苏州市房地产监测V3; Sessão: ff916423-d72a-4b4e-b8d0-925acbfa29d1; Base: none
+- 所属项目: 苏州市房地产监测V3; 会话: ff916423-d72a-4b4e-b8d0-925acbfa29d1; Base: none
 
 <!-- MEMORY_FIELDS
 {

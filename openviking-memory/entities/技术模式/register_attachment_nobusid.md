@@ -1,11 +1,11 @@
-# Upload de anexos de registro sem busId
-No projeto Suzhou Real Estate Monitoring V3, o upload de anexos de registro não depende de busId e é processado pelo backend após submissão.
+# 无 busId 的注册附件上传
+在 Suzhou Real Estate Monitoring V3 项目中，注册附件的上传不依赖于 busId，而是在提交后由后端处理。
 
-## Contexto
-- Registro de empresa (`companyRegisterId`) ao puxar exigências sem modo de upload `busId` frequentemente retorna vazio
-- Upload de anexos não depende de `busId`, mas sim de `saveAndSubmit` que envia `attachmentList` para o backend tratar a montagem
+## 背景
+- 企业注册（`companyRegisterId`）在拉取附件要求时，若无 `busId` 上传模式，经常返回空
+- 附件上传不依赖于 `busId`，而是依赖于 `saveAndSubmit`，其将 `attachmentList` 发送至后端处理附件的组装
 
-## Arquivos Envolvidos
+## 涉及文件
 - `AnnexUpload/components/AppendixRequirementCard.vue`
 - `utils/appendix.js`
 - `views/register/companyRegister.vue`
@@ -16,8 +16,8 @@ No projeto Suzhou Real Estate Monitoring V3, o upload de anexos de registro não
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/025.md
-- ID de sessão: 2026e41e-c4eb-4375-afbb-6894581445bf
-- 所属项目: Suzhou Real Estate Monitoring V3; linha de base de código: none
+- 会话ID: 2026e41e-c4eb-4375-afbb-6894581445bf
+- 所属项目: Suzhou Real Estate Monitoring V3; 代码基线: none
 
 <!-- MEMORY_FIELDS
 {

@@ -1,5 +1,5 @@
-- Em `FranchiseDialog.vue`, usar `suffix-icon="el-icon-search"` no input de loja em vez de slot manual.
-- Chamar `SelectDialog.open()` para seleção de loja, removendo `zs-select-dialog` embutido e mantendo registro global.
+- 在 `FranchiseDialog.vue` 中，店铺输入框使用 `suffix-icon="el-icon-search"` 代替手动插槽。
+- 调用 `SelectDialog.open()` 选择店铺，移除内置的 `zs-select-dialog` 并保持全局注册。
 
 <!-- MEMORY_FIELDS
 {

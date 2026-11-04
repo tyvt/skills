@@ -1,13 +1,13 @@
-# Import duplicado de ref em Vue
-`ExpenseList.vue` apresentava import duplicado de `ref` de 'vue' gerando conflito ESLint.
+# Vue中ref的重复导入
+`ExpenseList.vue` 出现了从 'vue' 重复导入 `ref` 导致 ESLint 冲突。
 ## 描述
-- Ocorreu em `src/pages_owner/maintain/components/ExpenseList.vue` (projeto zhi2-mobile-shimin).
-- Linhas 28 e 34 repetiam `import { ref } from 'vue'`.
-## Correção
-- Remover a linha 34 redundante para atender ao ESLint.
-## Verificação
-- Sessão cursor 82027868-3f83-446c-a0bf-5e3fec501631 documenta a mudança.
-- Código base: none.
+- 发生在 `src/pages_owner/maintain/components/ExpenseList.vue` (项目 zhi2-mobile-shimin)。
+- 第28和34行重复了 `import { ref } from 'vue'`。
+## 修正
+- 移除冗余的第34行以符合 ESLint。
+## 验证
+- 会话 cursor 82027868-3f83-446c-a0bf-5e3fec501631 记录了此次更改。
+- 基础代码: none.
 
 <!-- MEMORY_FIELDS
 {

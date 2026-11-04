@@ -1,15 +1,15 @@
-# Correção de redundância em página statistics por alinhamento a lista padrão
-A página `statistics/index.vue` foi alinhada à escrita padrão de lista (`release/index.vue`) eliminando código redundante.
+# 通过对齐标准列表修正 statistics 页面冗余
+`statistics/index.vue` 页面已对齐列表标准写法 (`release/index.vue`)，消除了冗余代码。
 
-## Problema
-- `statistics/index.vue` não seguia o padrão de lista, causando dados redundantes e métodos manuais.
+## 问题
+- `statistics/index.vue` 未遵循列表标准，导致冗余数据和手动方法。
 
 ## 解决方案
-- Adotar `ListTemplate.js` + `listMixins`.
-- Remover `getList` manual e dados redundantes; `operationButtons` retorna vazio.
-- `buttons` mantém apenas `viewButton`; preservar `initDict` e `handleView`.
+- 采用 `ListTemplate.js` + `listMixins`。
+- 移除手动 `getList` 和冗余数据；`operationButtons` 返回空。
+- `buttons` 仅保留 `viewButton`；保留 `initDict` 和 `handleView`。
 
-## Arquivos Envolvidos
+## 涉及文件
 - d:/repository/产品2.0/zhi2-web-admin/src/views/evaluation/surveyRelease/statistics/index.vue
 - d:/repository/产品2.0/zhi2-web-admin/src/views/evaluation/surveyRelease/release/index.vue
 - d:/repository/产品2.0/zhi2-web-admin/src/mixins/ListTemplate.js
@@ -19,8 +19,8 @@ A página `statistics/index.vue` foi alinhada à escrita padrão de lista (`rele
 - d:/repository/产品2.0/zhi2-web-admin/src/views/evaluation/surveyRelease/release/detail.vue
 - d:/repository/产品2.0/zhi2-web-admin/src/views/benefit/mobilePreview/components/mobileContainer.vue
 
-## Verificação
-- Sessão cursor 79d8b01e-dd31-4523-9359-f9809fc997bf; baseline de código: none
+## 验证
+- cursor 会话 79d8b01e-dd31-4523-9359-f9809fc997bf；代码基线: none
 
 <!-- MEMORY_FIELDS
 {

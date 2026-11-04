@@ -1,19 +1,18 @@
-# Flex Incorreto em Diálogo de Novo Contrato Causa Espaço em Branco
-No projeto Suzhou Real Estate Monitoring V3, adicionar `flex: 1` a `.dialog-left` criava espaço em branco em diálogos de 80% de largura.
+# 新合同对话框中错误的 Flex 导致空白
+在苏州市房地产监测V3项目中，向 `.dialog-left` 添加 `flex: 1` 会在宽度为80%的对话框中产生空白。
 
 ## 问题根因
-- `.dialog-left` com `flex: 1` esticava a cerca de metade da largura do diálogo de 80%, gerando espaço em branco
+- `.dialog-left` 使用 `flex: 1` 会被拉伸至约80%宽度对话框的一半，从而产生空白
 
 ## 解决方案
-- Alterar `.dialog-left` para barra lateral fixa `flex: 0 0 290px` e `max-width: 290px`
-- Manter lado direito com `flex: 1` para preencher espaço restante
+- 将 `.dialog-left` 改为固定侧边栏 `flex: 0 0 290px` 和 `max-width: 290px`
+- 保持右侧使用 `flex: 1` 以填充剩余空间
 
-## Verificação e Atribuição
+## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/199.md
 - 所属项目: 苏州市房地产监测V3
 - 涉及文件: chooseHouseDialog.vue (contractMainInfo), zs-select-dialog.vue, ElevatorOpeningDialog.vue, zs-dialog.vue, chooseHouseDialog.vue (contractView), contractMainInfo/index.vue, vite.config.js
-- Sessão: f882f9ab-4b6d-42b0-8cfa-ee45d52f7c6b; Base: none
-
+- 会话: f882f9ab-4b6d-42b0-8cfa-ee45d52f7c6b; Base: none
 
 <!-- MEMORY_FIELDS
 {

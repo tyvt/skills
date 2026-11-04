@@ -1,22 +1,22 @@
-# getDetail sobrescreve form e perde tipo de conta
-Bug no Suzhou Monitoramento Imobiliário V3 onde getDetail() em modo view sobrescrevia o formulário e perdia o tipo de conta de abertura.
+# getDetail 覆盖 form 并丢失账户类型
+在苏州市房地产监测V3中的一个 bug，其中 getDetail() 在 view 模式下覆盖表单并丢失开户账户类型。
 
 ## 问题根因
-- `getDetail()` em modo view cobria todo o `form`; quando a interface não retornava `opensalesType`, o tipo de conta era perdido.
-- `syncOpensalesTypeFromRoute()` originalmente só funcionava no modo add.
+- 在 view 模式下的 `getDetail()` 覆盖了整个 `form`；当接口未返回 `opensalesType` 时，账户类型丢失。
+- `syncOpensalesTypeFromRoute()` 原本只在 add 模式下工作。
 
-## Correção
-- Adicionar computed `opensalesType` com fallback para resolução de rota.
-- Estender a função sync para escrever quando o form não tem valor, completando após getDetail.
-- Template usa o computed para controlar campos e Tab.
+## 修复
+- 添加 computed `opensalesType` 并回退至路由解析。
+- 扩展 sync 函数以便在 form 没有值时写入，在 getDetail 之后补全。
+- Template 使用该 computed 来控制字段和 Tab。
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/106.md
-- 所属项目: Suzhou Monitoramento Imobiliário V3; sessão: 5c1b8a24-76c6-4187-b758-d05c9e6ba67e; baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 5c1b8a24-76c6-4187-b758-d05c9e6ba67e; baseline: none
 
 <!-- MEMORY_FIELDS
 {
-  "category": "Correção de bug",
+  "category": "缺陷修复",
   "name": "getdetail_overwrite_bug",
   "source_extraction_id": "79cf24bafc744c04973bd842fa4e560f",
   "version": 1,

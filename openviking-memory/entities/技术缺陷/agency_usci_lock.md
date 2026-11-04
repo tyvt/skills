@@ -1,19 +1,19 @@
-# Bloqueio de USCI e Revisão de Campos Centrais em Alteração de Agência
-O sistema de monitoramento imobiliário de Suzhou V3 (苏州市房地产监测V3) não trava o USCI nem exige revisão nos campos centrais ao alterar agências.
+# 代理机构变更时的USCI锁定与核心字段审核
+苏州V3房地产监测系统（苏州市房地产监测V3）在变更代理机构时，既不锁定USCI，也不要求核心字段审核。
 
 ## 问题
-- Campos centrais (nome da agência e outros 6) devem submeter jjjgbgxq para revisão e permanecer na página de visualização
-- Campos não centrais entram em vigor ao salvar
-- agencyChangeCoreFields.js identifica campos centrais e getForm() força a regravação do USCI original para impedir adulteração
+- 核心字段（代理机构名称及其他6个）应提交 jjjgbgxq 以供审核，并保留在查看页面
+- 非核心字段在保存时生效
+- agencyChangeCoreFields.js 识别核心字段，且 getForm() 强制重写原始 USCI 以防止篡改
 
-## Verificação
+## 验证
 - 验证证据: src=苏州市房地产监测V3/060.md
 - 涉及文件: AgencyBasicInfoDetail.vue; companyRecordAgency/detail.vue; ruoyi.js; company-menu-config.js; companyRecordAgency/change/detail.vue; toB/agencyChange/detail.vue; toB/agencyRecord/detail.vue; toB/change/detail.vue
-- Sessão: 6c91b23f-bba3-49fb-bd85-76e4879db720; base de código: none
+- 会话: 6c91b23f-bba3-49fb-bd85-76e4879db720; 代码库: none
 
 <!-- MEMORY_FIELDS
 {
-  "category": "Defeito técnico",
+  "category": "技术缺陷",
   "name": "agency_usci_lock",
   "source_extraction_id": "4874608f104944719aa2f486c341f696",
   "version": 1,

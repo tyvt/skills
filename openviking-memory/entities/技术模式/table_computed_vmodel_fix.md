@@ -1,19 +1,19 @@
-# computed usado como v-model em tabela causa erro de linha indefinida
-No projeto 苏州市房地产监测V3, `EducationTable` usa computed como v-model; ao adicionar, o emit do componente pai conflita com o recálculo de altura do `zs-table`, gerando `row` undefined e erro.
+# 在表格中将 computed 用作 v-model 导致未定义行错误
+在项目 苏州市房地产监测V3 中，`EducationTable` 使用 computed 作为 v-model；在添加时，父组件的 emit 与 `zs-table` 的高度重算冲突，导致 `row` undefined 并报错。
 
 ## 问题根因
-- `EducationTable` usa computed como v-model
-- Ao adicionar, o emit do pai conflita com o recálculo de altura do `zs-table`, tornando `row` undefined
+- `EducationTable` 使用 computed 作为 v-model
+- 在添加时，父组件的 emit 与 `zs-table` 的高度重算冲突，导致 `row` undefined
 
 ## 解决方案
-- Substituir computed por `data.innerList` e sincronizar com `watch` em `value`
-- Usar `push`/`splice` para adicionar/remover e depois emit; bind `:table-tr="innerList.length || 1"`
-- Adicionar `v-if="row"` nos templates de coluna como defesa de renderização
+- 将 computed 替换为 `data.innerList` 并与 `value` 上的 `watch` 同步
+- 使用 `push`/`splice` 进行添加/删除，然后 emit；绑定 `:table-tr="innerList.length || 1"`
+- 在列模板中添加 `v-if="row"` 作为渲染防御
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/277.md
 - 涉及文件: EducationTable.vue, AgencyPersonnelDetail.vue, CertificateList.vue, zs-table.vue, zs-table-column.vue, ServiceSchemePanel.vue
-- 所属项目: 苏州市房地产监测V3; Sessão: 3893ccfd-88f3-46aa-bc62-e0f4d3d00ac6; Baseline: none
+- 所属项目: 苏州市房地产监测V3; 会话: 3893ccfd-88f3-46aa-bc62-e0f4d3d00ac6; Baseline: none
 
 <!-- MEMORY_FIELDS
 {

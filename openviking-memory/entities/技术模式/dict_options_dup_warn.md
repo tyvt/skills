@@ -1,19 +1,19 @@
-# Opção de dicionário declarada em prop e data dispara aviso Vue
-No projeto 苏州市房地产监测V3, `bizStateOptions` declarado em `props` e `data()` do `InfoCardDialog.vue` dispara aviso do Vue.
+# 在 prop 和 data 中声明的字典选项触发 Vue 警告
+在项目 苏州市房地产监测V3 中，在 `InfoCardDialog.vue` 的 `props` 和 `data()` 中声明的 `bizStateOptions` 触发了 Vue 警告。
 
 ## 问题根因
-- `bizStateOptions` declarado em `props` e `data()` de `institution/agencyPersonnel/components/InfoCardDialog.vue`
-- Dispara aviso do Vue por nome duplicado
+- 在 `institution/agencyPersonnel/components/InfoCardDialog.vue` 的 `props` 和 `data()` 中声明的 `bizStateOptions`
+- 因名称重复触发 Vue 警告
 
-## Correção
-- Remover esse prop e adicionar `personnelStatusOptions`
-- Em `loadCredential` chamar `getDicts('personnel_business_status')` para autocarregar o dicionário
-- Componente pai remove o parâmetro passado
+## 修正
+- 移除该 prop 并添加 `personnelStatusOptions`
+- 在 `loadCredential` 中调用 `getDicts('personnel_business_status')` 以自动加载字典
+- 父组件移除传入的参数
 
 ## 验证与归属
 - 验证证据: src=苏州市房地产监测V3/110.md
 - 涉及文件: InfoCardDialog.vue, AgencyPersonnelList.vue, WorkCardDialog.vue, personnelStatus.js, AgencyPersonnelDetail.vue, zs-table-column.vue, listMixins.js, table.js
-- 所属项目: 苏州市房地产监测V3; sessão: c7e8e793-52a0-4fb3-835f-ca02c35c1248; base de código: none
+- 所属项目: 苏州市房地产监测V3; session: c7e8e793-52a0-4fb3-835f-ca02c35c1248; 代码库: none
 
 <!-- MEMORY_FIELDS
 {

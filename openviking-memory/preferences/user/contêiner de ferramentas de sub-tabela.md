@@ -1,5 +1,5 @@
-- Sub-tabelas: substituir `el-row.action-container` + `el-col` aninhados (causavam layout quebrado) por `div.operation-button-container`; 27 arquivos alterados.
-- `index.scss` adiciona estilo de espaçamento e fallback para `.action-container` legado; manter lógica `v-if`.
+- 子表格：将嵌套的 `el-row.action-container` + `el-col`（导致布局破裂）替换为 `div.operation-button-container`；修改了 27 个文件。
+- `index.scss` 为遗留的 `.action-container` 添加间距样式和回退方案；保留 `v-if` 逻辑。
 - 验证证据: src=苏州市房地产监测V3/050.md
 
 <!-- MEMORY_FIELDS
