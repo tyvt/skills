@@ -11,7 +11,7 @@
 **代码基线**：3353ef164 / f00310232 / 193a9a3b6 / d48841f13
 <!-- MEMORY_FIELDS
 {
-  "category": "Causa raiz de layout",
+  "category": "layout的根本原因",
   "name": "tooltip_table_overlap",
   "source_extraction_id": "1bff9247b411402ebbcf245405c1569f",
   "version": 1,

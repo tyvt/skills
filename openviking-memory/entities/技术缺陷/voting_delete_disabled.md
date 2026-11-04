@@ -16,7 +16,7 @@ VotingItemsTable.vue 中的删除按钮具有固定的 disabled，且不对 bizS
 
 <!-- MEMORY_FIELDS
 {
-  "category": "Bug técnico",
+  "category": "技术Bug",
   "name": "voting_delete_disabled",
   "source_extraction_id": "f8326583daa3400db8d64fde3493fd36",
   "version": 1,

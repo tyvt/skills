@@ -11,9 +11,9 @@
 
 <!-- MEMORY_FIELDS
 {
-  "event_name": "Refatoração da página statistics para padrão de lista",
+  "event_name": "",
   "goal": "Padronizar escrita de lista",
-  "summary": "A página `statistics/index.vue` foi refatorada para alinhar com o padrão de lista de `release/index.vue`, adotando `ListTemplate.js` e `listMixins`. Foram removidos dados redundantes como `getList` escrito manualmente; `operationButtons` retorna vazio; `buttons` mantém apenas `viewButton`; preservados `initDict` e `handleView`. Alteração descrita na sessão de extração 79d8b01e-dd31-4523-9359-f9809fc997bf.",
+  "summary": "",
   "ranges": "13-19",
   "source_extraction_id": "efa109da20f6432b865c449dbd04a2ff",
   "version": 1,

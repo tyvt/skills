@@ -12,7 +12,7 @@
 
 <!-- MEMORY_FIELDS
 {
-  "category": "configuração de build",
+  "category": "",
   "name": "dayjs_vite_global",
   "source_extraction_id": "f43c7056662240278d1b1ff7669d9a4f",
   "version": 1,

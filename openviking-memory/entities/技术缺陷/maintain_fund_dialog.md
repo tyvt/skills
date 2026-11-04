@@ -16,7 +16,7 @@
 
 <!-- MEMORY_FIELDS
 {
-  "category": "Bug técnico",
+  "category": "技术 Bug",
   "name": "maintain_fund_dialog",
   "source_extraction_id": "f8326583daa3400db8d64fde3493fd36",
   "version": 1,

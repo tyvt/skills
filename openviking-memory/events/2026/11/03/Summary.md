@@ -12,9 +12,9 @@
 
 <!-- MEMORY_FIELDS
 {
-  "event_name": "Correção de espaço vazio em tabela list-card",
+  "event_name": "修复 list-card 表格中的空白",
   "goal": "Corrigir encolhimento de tabela",
-  "summary": "Em 2026-11-03, foi corrigido um bug em que tabelas com menos de 10 linhas de dados apresentavam espaço em branco abaixo no layout list-card. Causa raiz: shouldSparseAutoHeight em zs-table.vue era restrito ao layout de árvore de região, e algumas páginas definiam min-height em .list-card forçando expansão. Correção: adicionada a propriedade inListCard em zs-table.vue para basear shouldSparseAutoHeight em inListCard; removido min-height de .list-card nas páginas company/companyApplyAudit/index.vue para a tabela encolher conforme o conteúdo. Arquivos envolvidos: ListTemplate.js, table.js, main.js, 路由信息.json, zs-table.vue, index.scss, AppMain.vue, layout/index.vue. 验证证据: 苏州市房地产监测V3-rest/002.md. ID de sessão de origem: deee3f49-3c02-4d81-a251-d57518e4e866.",
+  "summary": "",
   "ranges": "0-6",
   "source_extraction_id": "772b51dcf2dd4e5b954bbf2076058ae6",
   "version": 1,

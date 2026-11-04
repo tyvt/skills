@@ -16,7 +16,7 @@ VoteViewLite.vue 中的计算比例属性直接返回了 float，且 v-money:2 �
 
 <!-- MEMORY_FIELDS
 {
-  "category": "Bug técnico",
+  "category": "",
   "name": "voteviewlite_tofixed",
   "source_extraction_id": "f8326583daa3400db8d64fde3493fd36",
   "version": 1,

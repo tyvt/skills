@@ -11,9 +11,9 @@ VotingItemsTable.vue中viewDecisionDetailButton与resultButton仅设permission: 
 **代码基线**：none
 <!-- MEMORY_FIELDS
 {
-  "event_name": "Ajuste de permissão em VotingItemsTable",
-  "goal": "Adicionar permissionType aos botões",
-  "summary": "Em 2026-11-02, foi identificado que em `VotingItemsTable.vue` os botões `viewDecisionDetailButton` e `resultButton` definiam apenas `permission: true` sem `permissionType`, impedindo o `zs-operate-column` de concatenar caracteres de permissão válidos; decidiu-se adicionar o `permissionType` correspondente.",
+  "event_name": "调整 VotingItemsTable 中的权限",
+  "goal": "为按钮添加 permissionType",
+  "summary": "",
   "ranges": "15-20",
   "source_extraction_id": "d844f94ca9c9437188f0c9b246ecc583",
   "version": 1,

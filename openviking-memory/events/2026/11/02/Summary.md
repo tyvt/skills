@@ -10,9 +10,9 @@
 
 <!-- MEMORY_FIELDS
 {
-  "event_name": "Correção de validação de telefone",
-  "goal": "Registrar correção de falha",
-  "summary": "Em 2026-11-02, o usuário documentou a correção de validação de formato de telefone ausente no arquivo guaranteeDepositAgreement/detail.vue. As validações de contactPhone e propertyContactPhone tinham apenas obrigatoriedade, faltando formato. Foi adicionado regex global patterns.contactPhone para validar celular, fixo e números de 8 dígitos. Arquivos envolvidos: d:/repository/榆林G/zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue, d:/repository/榆林G/zhi2-web-admin/src/views/company/companyManagement/components/detail.vue, d:/repository/榆林G/zhi2-web-admin/src/patterns/index.js, d:/repository/榆林G/zhi2-web-admin/src/mixins/detailMixins.js. Origem: sessão cursor ea514d30-3de8-4e8a-beb7-f0690c0e8a2b.",
+  "event_name": "",
+  "goal": "",
+  "summary": "",
   "ranges": "0-4",
   "source_extraction_id": "ebd72c614ecf41f9ba8d70d6d434c474",
   "version": 1,

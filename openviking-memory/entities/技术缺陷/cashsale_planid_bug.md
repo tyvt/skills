@@ -12,7 +12,7 @@
 
 <!-- MEMORY_FIELDS
 {
-  "category": "Bug técnico",
+  "category": "技术Bug",
   "name": "cashsale_planid_bug",
   "source_extraction_id": "96963c4591f34599a58a91018404b608",
   "version": 1,

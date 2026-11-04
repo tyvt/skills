@@ -11,7 +11,7 @@
 **代码基线**：none
 <!-- MEMORY_FIELDS
 {
-  "category": "Causa raiz de layout",
+  "category": "",
   "name": "dialog_body_center",
   "source_extraction_id": "1bff9247b411402ebbcf245405c1569f",
   "version": 1,
