@@ -5,7 +5,7 @@
 <!-- MEMORY_FIELDS
 {
   "user": "user",
-  "topic": "Vinculação de salvamento Vue e localização E2E",
+  "topic": "主题标题: Vue 保存绑定与 E2E 定位",
   "source_extraction_id": "5ba2dade06d048a48e78322216a00bde",
   "version": 1,
   "memory_type": "preferences"
