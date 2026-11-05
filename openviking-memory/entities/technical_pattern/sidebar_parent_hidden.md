@@ -1,16 +1,17 @@
-# Sidebar Parent Hidden Not Traced
-Sidebar child items incorrectly display when a parent Layout has hidden: true because visibility checks ignore ancestor hidden state.
+# 侧栏父级隐藏未追溯导致子菜单误显
+当父级 Layout 设置 hidden: true 时，侧栏子项仍错误显示，因为可见性判断未追溯祖先隐藏状态。
 
-## Root Cause
-- `listRouters` child routes set `hidden: false` which conflicts with menu management hidden status.
-- `buildNavbarChildrenMenus` flattens children without tracing parent Layout `hidden: true`.
-- `isRouteHidden()` only evaluates the current node, not ancestor hidden flags.
+## 根因
+- `listRouters` 子路由设置 `hidden: false`，与菜单管理中的「隐藏」状态冲突（如「应用管理详情」父 Layout 为 hidden:true，子节点 application/:tableid 为 hidden:false，且 listRouters 未在子节点体现 hidden:true 或 visible:1）。
+- `buildNavbarChildrenMenus` 将 children 扁平化，未追溯父 Layout 的 hidden: true。
+- `isRouteHidden()` 仅判断当前节点，未判断祖先 hidden 标志。
+- 门户将大量菜单拆分为多个 `path: "/"` 的 Layout，侧栏实际使用扁平化后的 children；原逻辑只看子项是否 hidden，父已隐藏、子仍为 hidden:false 时（如「应用管理详情」因排在第一个常出现在侧栏最上方）仍会被推进侧栏列表。
 
-## Fix Points
-- Add parent-level `hidden` status judgment in `buildNavbarChildrenMenus` and `isRouteHidden()`.
-- Alternatively synchronize the `hidden` field on child nodes within `listRouters`.
+## 修复要点
+- 在 `buildNavbarChildrenMenus` 与 `isRouteHidden()` 中增加父级 hidden 状态判断。
+- 或在 `listRouters` 中同步子节点的 hidden 字段。
 
-## Involved Files
+## 涉及文件
 - `zhi2-web-admin/src/layout/components/Sidebar/index.vue`
 - `zhi2-web-admin/src/utils/menuVisibility.js`
 - `zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue`
@@ -19,18 +20,18 @@ Sidebar child items incorrectly display when a parent Layout has hidden: true be
 - `zhi2-web-admin/src/api/portal/menu.js`
 - `zhi2-web-admin/src/layout/components/TagsView/index.vue`
 
-## Verification and Attribution
-- Validation evidence source: portal/027.md
-- Project: portal (门户)
-- Source session ID: 92104882-f56a-49cf-931b-814063421ad6
-- Code baseline: none
+## 验证与归属
+- 验证证据来源：cursor 提取，portal/027.md
+- 所属项目：门户
+- 来源会话ID：92104882-f56a-49cf-931b-814063421ad6
+- 代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",
   "name": "sidebar_parent_hidden",
-  "source_extraction_id": "4e272057a2544379a7ea40025b4387c7",
-  "version": 1,
+  "source_extraction_id": "04a383200b2048969f86cf9638b3ae40",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

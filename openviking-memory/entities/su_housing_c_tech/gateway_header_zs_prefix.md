@@ -5,7 +5,7 @@ In Su Zhu Fang C (zhi2-mobile-shimin), the backend requires gateway header field
 - Backend requires gateway header fields to use the zs- prefix, consistent with zs-method and others
 
 ## Solution
-- gateway.js writes the gateway header field as zs-desensitize-flag with multiple-case compatibility
+- gateway.js writes the gateway header field as zs-desensitize-flag，兼容多种大小写回退链：customHeaders['zs-desensitize-flag'] ?? customHeaders['ZS-DESENSITIZE-FLAG'] ?? customHeaders['Desensitize-Flag'] ?? customHeaders['desensitize-flag'] ?? customHeaders['DESENSITIZE-FLAG']
 - user.js / autonomy.js business request headers unified to the zs- prefix
 
 ## Involved Files
@@ -26,8 +26,8 @@ In Su Zhu Fang C (zhi2-mobile-shimin), the backend requires gateway header field
 {
   "category": "su_housing_c_tech",
   "name": "gateway_header_zs_prefix",
-  "source_extraction_id": "3cbdf3040fb54620be57d598c520b61e",
-  "version": 1,
+  "source_extraction_id": "cbccc77e23c04a3fb98fe21d70df4ad3",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

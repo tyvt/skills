@@ -6,6 +6,7 @@
 ## 解决方案
 - 改为 CDN 地址 `https://www.ylzhwy.com:8081/zhi2/static-xcx/static/staff/organization/search.png`。
 - 需确认 CDN 资源部署状态。
+- 本机访问该 CDN 地址目前返回 404，与组织架构页使用同一资源；若图标仍不显示，需确认 CDN 已部署 `static/staff/organization/search.png` 或将图片加入 `src/static/` 使用本地资源。
 ## 验证与归属
 - 验证证据：src=泰兴小程序/017.md
 - 涉及文件：src/staff/pages/complex-select/index.vue、src/staff/components/ZsSearch/ZsSearch.vue、src/pages/staff/organization/index.vue、src/pages.json、src/components/ZsImage/ZsImage.vue、src/env/mp.js、vite.config.ts
@@ -16,8 +17,8 @@
 {
   "category": "技术模式",
   "name": "search_icon_cdn",
-  "source_extraction_id": "14f9f34c6b2047cf86ef295274671d43",
-  "version": 1,
+  "source_extraction_id": "1d73c2d6945a4b4f88a81ca174efdb92",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

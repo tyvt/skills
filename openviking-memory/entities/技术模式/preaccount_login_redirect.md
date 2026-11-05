@@ -9,8 +9,8 @@
 
 ## 验证与归属
 - 验证：会话 f3561464（008.md）accountInfo 提交后重定向登录，预账号跳 step=2 续填。
-- 涉及文件：zhi2-web-admin/src/views/register/components/accountInfo.vue、zhi2-web-admin/src/views/login/index.vue
-- 所属项目：园区物管2.0（zhi2-web-admin）
+- 涉及文件：zhi2-web-admin/src/views/register/components/accountInfo.vue、zhi2-web-admin/src/views/login/LoginForm.vue、zhi2-web-admin/src/views/register/components/companyRegister.vue、zhi2-web-admin/src/views/register/components/companyInfo.vue
+- 所属项目：repository
 - 来源会话ID：f3561464-54e7-471b-929f-2579c20beca8
 - 代码基线：none
 
@@ -18,8 +18,8 @@
 {
   "category": "技术模式",
   "name": "preaccount_login_redirect",
-  "source_extraction_id": "b21f97ce3f0d42898d28fa313bf40a83",
-  "version": 1,
+  "source_extraction_id": "2b613728a85544a581e8279650d99ee9",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

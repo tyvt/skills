@@ -8,6 +8,9 @@
 ## 解决方案
 - 统一 `guaranteeDepositAgreement/detail.vue`、`index.vue` 与 `guaranteeDepositAgreementEnd/detail.vue`、`index.vue` 的字典类型为 `agreement_state`
 
+## 关联格式问题
+- 详情页「签订日期」显示为 `2026-07-21T00:00:00.000+08:00` 是因为字段用 `type: 'text'`；如需格式化为 `2026-07-21` 可改为 `type: 'datetime'`
+
 ## 涉及文件与归属
 - 涉及文件：zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue、index.vue、mixins/detailMixins.js、components/detail-template/detail-template.vue、components/dict-tag/dict-tag.vue、guaranteeDepositAgreementEnd/detail.vue、components/zs-table-column/zs-table-column.vue、mixins/ListTemplate.js
 - 所属项目：产品2.0；来源会话：654476f2-c8c2-4687-a36b-cfc42a35337b；代码基线：none
@@ -16,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "agreement_dict_misuse",
-  "source_extraction_id": "61bcf916e961454588f66fa839204bbe",
-  "version": 1,
+  "source_extraction_id": "4a4687e501644f5c9730ebec13b67ef5",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

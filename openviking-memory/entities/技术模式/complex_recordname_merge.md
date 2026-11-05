@@ -6,6 +6,8 @@
 - 移除 complexName 必填校验
 - 查看模式合并展示两名称
 - detailCallback 与 getForm 兼容同步
+- complexChange/detail.vue 变更对比保留 field: 'recordName'
+- complex/detail.vue 修复后第一行恢复三列布局
 
 ## 涉及文件
 - zhi2-web-admin/src/views/property/complex/detail.vue
@@ -24,8 +26,8 @@
 {
   "category": "技术模式",
   "name": "complex_recordname_merge",
-  "source_extraction_id": "2e5ea267d3f94da49a90e706ce832095",
-  "version": 1,
+  "source_extraction_id": "d29a058ffc4a4d00972767cc35116df4",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

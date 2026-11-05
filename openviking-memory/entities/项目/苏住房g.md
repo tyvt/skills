@@ -1,44 +1,26 @@
 # 苏住房G
-苏住房G 是用户提及的一个 frontend 管理项目，包含房地产管理、企业登记等模块。
+苏住房G（苏州住房G端/管理端H5）前端项目，使用 zhi2-web-admin 子模块，本机工作区位于 D:/repository/苏住房G。
 
-## Description
-- Frontend zhi2-web-admin 涵盖房地产合同、企业登记、月度报告、评估等模块。
-- 用户积累了多个调试和重构的工作流。
+## 项目描述
+- 涵盖房地产合同、企业登记、月度报告、评估、资产/资金全景监管等模块。
+- 用户积累了多个调试、重构与 bug 修复工作流，用于偏好和技术模式记忆的项目上下文。
 
-## Significance
-- 用于偏好和技术模式记忆的项目上下文。
-
-## 已知技术模式
-- detail_readonly_dual: 子表 readOnly 判断 formMode 和 bizState，仅编辑+草稿可操作。
-- showsave_formmode: showSave 在 operation-btn-group 中限制为 formMode=='edit'。
-- fee_declare_submit_edit_only: showSubmit 由 formMode 控制，编辑时隐藏。
-- rectification_bizstate_default: bizState 在 rectificationNotice index 中默认为 undefined。
-- company_change_bizstate_multivalue: bizState 不应是 companyChange 中的多值字符串 '1,2'。
-- pending_oper_headers: 审计仅在保存编辑和列表删除时。
-- change_double_fetch: 变更详情不应使用登记 detail 覆盖 form。
-- shell route storedPath: shell 路由在 getRouteFilePath 中返回 '' (见偏好)。
-- todo_shell_menu: single menu Layout shell mistaken as valid component.
-- jump_align_pattern: top nav + empty state link + URL preset trio change.
-- zsprint_panel_sizing: ZsPrint remove min-height to flow.
-- bizstate_search_bug: zs-search-form global multiple flip history.
-- filing_menu_config: empty state link old filePath parse fail.
-- dialog_col_width: dialog table column width minmax equal.
-- fee_declare_step_layout: step bar vertical to avoid overflow.
-- shared_api_filter_param: multi-page shared api specific param only at call site.
-- navbar_menu_width_sync: style and JS const sync 120px.
-- home_variant_ready_bug: homeVariantReady add roles second signal.
-- company_founding_asset_validation: companyManagement/detail.vue mandatory foundingDate/registeredAssets.
-- regulatory_agreement_print: frontend only adjusts field order by prototype.
-- log_feature_branch_sync: new files in both develop branches cherry-pick.
-- minus_score_dropdown_tooltip: dropdown flex with tooltip to prevent truncation.
-- bulk_import_feemode: bulkImportDialog requires feeMode else block.
+## 仓库结构与工作流
+- 主工作区分支为 develop/v2.6.2-suzhufang，位于苏住房G目录；子模块 zhi2-web-admin 同分支。
+- worktree 嵌套在苏住房G/worktrees/内部，属子模块而非父仓库直接管理；父仓库 git worktree list 不显示子模块 worktree。
+- 嵌套 worktree：bug5897（注册名 bug5874，分支 develop/v2.6.2-suzhufang-li，HEAD cfe7f9930）；task2192（分支 develop/v2.6.2-suzhufang-evaluation，HEAD 4e2cf39b3）；均基于基分支，截至2026-11-04未合并但已推origin。
+- 子模块关联：父仓库特性分支建同名父分支，固定 gitlink 指向子模块提交，.gitmodules 设 branch 后提交推送；截至2026-11-04父分支 li（44274f8）已推，evaluation（3940898）推送被拒需整合。
+- 主线直接开发：2026-11-04 禅道2295直接在 develop/v2.6.2-suzhufang 改 detail.vue 推送，子模块提交8992db265，父提交8fb06ce更新gitlink。
+- 本地 nginx 站点'苏住房G'端口8101，root 指向 D:/repository/苏住房G/dist，已 reload。
+- 2026-11-05 完成 develop/v2.6.2 到 develop/v2.6.2-suzhufang 合并：子模块提交 cc496589e 自动合并无冲突，父仓库更新指针 0fb43ab，工作区干净本地超前远程1提交。
+- 2026-11-05 将 pubBankReceiptApply 详情页获取回单明细按钮修复 cherry-pick 到 develop/v2.6.2（子模块提交 1b3c7f6c5），原分支 develop/v2.6.2-suzhufang 提交 1df2da437，两分支各领先远程 1 提交未推送（来源会话 765750a0-13d8-4789-8d78-9bb82bdf1e1f）
 
 <!-- MEMORY_FIELDS
 {
   "category": "项目",
   "name": "苏住房G",
-  "source_extraction_id": "365bab52c52f4179bd3a6d0ab0e8c6cc",
-  "version": 7,
+  "source_extraction_id": "0fa9adadc9e847248fa4eb9235709be9",
+  "version": 19,
   "memory_type": "entities"
 }
 -->

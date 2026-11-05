@@ -8,6 +8,8 @@
 ## 解决方案
 - 复制 FileList 至 pages_vote/components/FileList/
 - 修改 detail.vue 引用路径为 @/pages_vote/components/FileList/FileList.vue
+- 按项目惯例与 pages_owner/components/FileList 相同方式处理
+- 重新编译后材料区域正常渲染，空列表显示默认空态图
 
 ## 验证与归属
 - 验证证据：extracted source=cursor session=8542b614-0e61-4726-828c-c9829d260de1
@@ -18,8 +20,8 @@
 {
   "category": "su_housing_c_tech",
   "name": "subpackage_component_copy",
-  "source_extraction_id": "6e5b846ebcdc448fb91edbfc90ee8dc1",
-  "version": 1,
+  "source_extraction_id": "de6419ee06b04af68200113dcef4346b",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

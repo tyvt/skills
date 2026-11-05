@@ -2,8 +2,8 @@
 `index.html` 中 `savedTargetAllocation`、`allEtfCodes`、`etfNameMap`、`DEVIATION_THRESHOLD_MAP` 的 ETF 配置规则与变更记录。
 
 ## 分档配置与偏离阈值
-- `savedTargetAllocation` 更新为分档占比
-- `DEVIATION_THRESHOLD_MAP` 按代码分档设定偏离阈值：权益20%/债券15%/商品25%，替换统一25%逻辑并同步页面文案
+- `savedTargetAllocation` 分档占比：510300 7.62%、512890 5.07%、513500 9.51%、513100 5.07%、513030 3.17%、159920 4.44%、511260 30.00%、511010 15.00%、159980 7.50%、518880 7.50%、159985 5.00%
+- `DEVIATION_THRESHOLD_MAP` 按代码分档：A股/海外权益类(510300、512890、513500、513100、513030、159920)20%、债券类(511260、511010)15%、商品类(159980、518880、159985)25%，替换统一25%逻辑并同步页面文案为"分档阈值(15%/20%/25%)" 
 - `159985` 豆粕ETF 新增至 `allEtfCodes` 与 `etfNameMap`
 
 ## 商品ETF等权配置
@@ -21,8 +21,8 @@
 {
   "category": "ETF配置",
   "name": "index_etf_config",
-  "source_extraction_id": "0e7434ba154d436d894fccd84beaef7d",
-  "version": 2,
+  "source_extraction_id": "d44604109b454c76915803a669417212",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

@@ -7,7 +7,7 @@
 
 ## 解决方案
 - 为数据驱动的外观单独建与数据同源的层级标记 markListLayerLevel，只在 markList 真正更新时同步修改，不绑定缩放目标层级
-- 配色 computed 读它（如 areaDrillStack 有下钻一律 green，否则按 markListLayerLevel 决定 blue/green）
+- 配色 computed 读它（如 areaDrillStack 有下钻一律 green，否则按 markListLayerLevel 决定 blue/green），例如 mapBubbleTone() { if (this.areaDrillStack.length >= 1) return 'green' return this.markListLayerLevel === 'district' ? 'blue' : 'green' }
 - 接口返回前保持上一级配色，返回后再切换
 
 ## 套路
@@ -21,8 +21,8 @@
 {
   "category": "技术模式",
   "name": "map_bubble_color_data_level",
-  "source_extraction_id": "28000d8f11724e7d8c4f29352de82f49",
-  "version": 1,
+  "source_extraction_id": "2aa8b6d1567c447481ec957b1d181c1d",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

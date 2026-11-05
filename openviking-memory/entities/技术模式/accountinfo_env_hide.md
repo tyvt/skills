@@ -10,7 +10,7 @@ accountInfo.vue 根据环境变量 VITE_APP_PROJECT_ID 控制「获取机构信�
 
 ## 验证与归属
 - 验证证据：extracted source=cursor session=60504dfa-5ffc-485a-8ce6-b6e66522f3d4
-- 涉及文件：accountInfo.vue
+- 涉及文件：accountInfo.vue、detail.vue
 - 来源会话ID：60504dfa-5ffc-485a-8ce6-b6e66522f3d4
 - 代码基线：none
 
@@ -18,8 +18,8 @@ accountInfo.vue 根据环境变量 VITE_APP_PROJECT_ID 控制「获取机构信�
 {
   "category": "技术模式",
   "name": "accountinfo_env_hide",
-  "source_extraction_id": "9f93fce37f554190a2bb7cdfb8f52344",
-  "version": 1,
+  "source_extraction_id": "2b613728a85544a581e8279650d99ee9",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

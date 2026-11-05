@@ -13,13 +13,15 @@
 - 验证：extracted source=cursor session=8e746406-78d2-4b90-96da-b1cd40c82452
 - 涉及文件：benefit/pubBankReceiptApply/detail.vue、property/bankReceiptApply/detail.vue、mixins/*、components/Headline/index.vue 等
 - 来源会话：8e746406-78d2-4b90-96da-b1cd40c82452；代码基线：none
+- 补充验证：2026-11-05 完成提交并 cherry-pick 到 develop/v2.6.2（子模块提交 1b3c7f6c5），原分支 develop/v2.6.2-suzhufang 提交 1df2da437，两分支各领先远程 1 提交（来源会话 765750a0-13d8-4789-8d78-9bb82bdf1e1f，项目 苏住房G）
+- 涉及文件补充：benefit/pubBankReceiptApply/components/detailTable.vue 同次提交关联
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zsform_disabled_button",
-  "source_extraction_id": "ff6806156faa472abe330cb92a0e77f6",
-  "version": 1,
+  "source_extraction_id": "0fa9adadc9e847248fa4eb9235709be9",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

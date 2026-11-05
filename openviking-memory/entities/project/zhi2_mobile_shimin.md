@@ -18,16 +18,15 @@ uni-app Vue3 H5 project for 苏住房 (Suzhou Housing) mobile C-end (owner initi
 
 ## Project Overview
 - Mobile C-end project with second-hand housing, new housing, loan guide, policy and other pages
-- Known technical patterns tracked in tech-pattern entities (e.g. scoped_deep_fix, fddydetail_sections_missing, formmanual_load_check, vote_houseno_missing, decision_result_vote, dual_identity_flows, zspopup_pseudo_empty)
+- Known technical patterns tracked in tech-pattern entities (e.g. scoped_deep_fix, fddydetail_sections_missing, formmanual_load_check, vote_houseno_missing, decision_result_vote, dual_identity_flows, zspopup_pseudo_empty, z_paging_relocate_fix, api_dispatcher_consol, sfb_token_fix, main_pkg_optimize, list_paging_migrate, richtext_rel_url_fix, cancel_cfg_key_fix, filelist_import_fix, c_announcement_zspaging, realname_skip_idtype, menuimage_defineoptions_fix)
 - Code baseline: none; sourced from multiple cursor session extractions (bug/pattern/fact)
-
 
 <!-- MEMORY_FIELDS
 {
   "category": "project",
   "name": "zhi2_mobile_shimin",
-  "source_extraction_id": "878f34c03ebb44f88f114b0ba61bb04c",
-  "version": 5,
+  "source_extraction_id": "08c799b940474028a4a83eb8d3f409d8",
+  "version": 8,
   "memory_type": "entities"
 }
 -->

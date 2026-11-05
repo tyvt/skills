@@ -4,6 +4,12 @@ zhi2-web-admin 登录 E2E 用 Tesseract+规则纠错识别扭曲算式图常失�
 - login.spec.js 用 OCR 识别 /code 返回的 GIF 算式验证码自动登录，常 skip「OCR 未识别到有效验证码」或识别结果为 yee/CW 等无数字串。
 - 验证码为纯数字运算图，但扭曲/噪声下 Tesseract 多轮 PSM+sharp 预处理仍常看不出算式。
 - 登录页若过早识别会在图片未渲染时拿到空图。
+## 识别逻辑细节
+- `parseCaptchaText` 预处理先做通用替换：`O→0, L/I→1, S→5, Z→2, B→8, g/q→9` 等。
+- 用 `raw.replace(/[^0-9+\-*/=?A-Za-z]/g, '')` 过滤非字母数字运算符，再尝试提取「一位数字 运算符 一位数字」。
+- 像 `yee`、`CW` 去掉非数字运算符后变空串或纯字母，故返回空。
+- 针对已知模式（`ELC`, `ENS`, `ETN`, `NA` 等）做字母→数字映射（如 `E→8`、`L→*`、`C→1`，`ENS→8-5`）再试，但仍可能因无数字失败。
+
 ## 解决方案
 - 测试环境优先让 /code 增加 answer 字段或专用 /test/code，E2E 有 answer 则直填并跳过 OCR。
 - 也可让测试环境后端将 /code 返回固定值（如 1234）或弱化校验，而非前端 OCR 识别，避免实现复杂且偏离 E2E 用户流程目标。
@@ -17,8 +23,8 @@ zhi2-web-admin 登录 E2E 用 Tesseract+规则纠错识别扭曲算式图常失�
 {
   "category": "技术模式",
   "name": "login_ocr_workflow",
-  "source_extraction_id": "e2f835fecd3341d79c672dd1cc9b7a31",
-  "version": 2,
+  "source_extraction_id": "eec1849560e54b0ab2f531caec03b1b3",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

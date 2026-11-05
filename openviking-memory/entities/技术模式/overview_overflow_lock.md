@@ -13,14 +13,14 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor session=4a93808d-0737-4c3c-9c6a-8a77591adac7
 - 涉及文件：overviewContent.vue
-- 所属项目：园区物管2.0；来源会话ID：4a93808d-0737-4c3c-9c6a-8a77591adac7；代码基线：none
+- 所属项目：repository；来源会话ID：4a93808d-0737-4c3c-9c6a-8a77591adac7；代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "overview_overflow_lock",
-  "source_extraction_id": "addfb2f3b8c345c6ab59dedb2975d7b9",
-  "version": 1,
+  "source_extraction_id": "a1cac990b0394f0ebcc846f4c47cf296",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

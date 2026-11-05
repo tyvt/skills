@@ -9,6 +9,7 @@
 ## 修复方案
 - 启动顺序：await initH5Context 后再 initQqMapKeys()
 - qqMapKey.js 无 token 时直接跳过 getConfigKey（小程序端从 storage 恢复 token 时一般不受影响）
+- @/api/index.js 拦截器在 `userStore.token` 存在时自动注入 `Authorization: Bearer <token>` 请求头
 
 ## 验证与归属
 - 验证会话：ef15cdae-5895-485b-9248-03961a3b0697（基线 2e9862a）
@@ -19,8 +20,8 @@
 {
   "category": "无锡市区小程序嵌入H5技术",
   "name": "qqmapkey_init_order",
-  "source_extraction_id": "ebbf4b220692482fb080e0c398f71fe7",
-  "version": 1,
+  "source_extraction_id": "5279fead9abb4516adfbc3c5bd9fc16c",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

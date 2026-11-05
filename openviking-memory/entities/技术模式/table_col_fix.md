@@ -8,6 +8,7 @@
 
 ## Solution
 - 状态列固定 96px、操作列固定 72px，并移除操作列 fixed="right"。
+- 其余 6 列（业务类型、主题、任务名称、发起人、来源、发起时间）继续均分剩余宽度。
 - 配置 head-align="center" 与 CSS text-align: center 使内容居中。
 - 列宽更新后调用 doLayout() 防止表格重算错位。
 
@@ -18,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "table_col_fix",
-  "source_extraction_id": "5b1f7a25d9f64601b3f9fb37f485a33b",
-  "version": 1,
+  "source_extraction_id": "9a10764b0dbe4c0daf38f8e33312cb75",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

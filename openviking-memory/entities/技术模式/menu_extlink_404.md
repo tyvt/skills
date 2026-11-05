@@ -8,6 +8,7 @@
 ## 修复方案
 - 菜单外链组件路径须配置为 `InnerLink`
 - router/index.js 据此识别并放行 iframe 内嵌外链
+- 系统管理→菜单管理正确配置示例：菜单类型=菜单；是否外链=是（isFrame=0 表示 iframe 内嵌而非新窗口打开）；路由地址填完整外链（如 `https://www.kedowen.com:8666/#/share/2ee03216-f441-4a61-aa7c-11e14a33d8ec`）；组件路径=`InnerLink`
 
 ## 验证与归属
 - 验证：cursor 会话 c2035902 提取，根因与修复结论已确认
@@ -18,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "menu_extlink_404",
-  "source_extraction_id": "41277538b847487a848d23d59d202c30",
-  "version": 1,
+  "source_extraction_id": "ac80b5d8fa304846a9b0db0e9fb8bf49",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

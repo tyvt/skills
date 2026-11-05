@@ -12,6 +12,7 @@
 ## 解决方案
 - 「设计稿舞台 + 按内容缩放」类页面高度一律以真实 scrollHeight 实测值为准，不夹固定像素下限
 - 去掉 min-height，将 designMeasuredH 改为 Math.max(1, design.scrollHeight)（防御性 Math.max(1, h) 防 0/除零）
+- 去掉 min-height 后高度由 上排三块 + 间距 + 下排趋势区 + padding/gap 自然堆叠，不再强制垫高
 - 首帧测量前仍用初始值过渡，需在 initCharts/mounted 里 nextTick 后立即用真实 scrollHeight 复测一次避免闪动
 
 ## 验证与归属
@@ -23,8 +24,8 @@
 {
   "category": "技术模式",
   "name": "fund_panorama_bottom_whitespace",
-  "source_extraction_id": "681170c36c0a48678c1d9fd2cb28823e",
-  "version": 1,
+  "source_extraction_id": "793e90a635f3499bbab7253a2e8af34a",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

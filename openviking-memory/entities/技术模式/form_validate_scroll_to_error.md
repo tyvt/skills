@@ -13,15 +13,15 @@ Element UI 校验失败仅标红不滚动，需在自定义滚动容器内新增
 - 逻辑收口进公共 zs-form 的 validate 失败分支，所有消费 zs-form 的页面/弹窗一次性获得定位+聚焦能力。
 
 ## 关联信息
-- 涉及文件：src/utils/validate.js、src/components/zs-form/zs-form.vue、src/views/autonomy/candidateCollect/components/CandidateDialog.vue。
-- 所属项目：园区物管2.0；来源会话：b7798d11-726e-4733-aeb4-7435cb7b009a；代码基线：55cd8653c。
+- 涉及文件：src/utils/validate.js、src/components/zs-form/zs-form.vue、src/views/autonomy/candidateCollect/components/CandidateDialog.vue、src/mixins/dialogMixins.js、src/mixins/form.js。
+- 所属项目：园区物管2.0；来源会话：b7798d11-726e-4733-aeb4-7435cb7b009a；代码基线：none。
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "form_validate_scroll_to_error",
-  "source_extraction_id": "9f99b2420b5a45eaa510bde19c0c7eb0",
-  "version": 1,
+  "source_extraction_id": "175779f5800742d9a6b6bf5fa413e19e",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

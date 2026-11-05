@@ -3,6 +3,7 @@
 
 ## 问题背景
 - 早期 base='./' 部署时代理写死绝对路径 /map/... 致子路径 404，用 getDistrictProxyPrefix 返回 './map' 暂解。
+- 早期另在 vite.config.js 抽出 viteBase 并新增 getMapProxyContext(viteBase)：base 为 './' 时 dev 代理 key 仍为 '/map'（Vite 要求以 '/' 开头），rewrite 按 mapProxyContext 动态剥离前缀；前端请求 './map/ws/...' 解析到 dev 服务器 '/map/ws/...' 转发腾讯 API，若 base 改子路径如 '/admin/' 只需同步 viteBase。
 - 生产报 `Unexpected token '<'... is not valid JSON`：tencentDistrictBoundary.js 用 `import.meta.env.DEV` 分流，dev 走 fetch('./map/...') 依赖 Vite 代理，生产无代理落 index.html 被 res.json() 报错。
 - terser 压缩后 DEV 分支被保留、JSONP 分支当死代码删，生产包实际跑开发分支。
 - 错误写法 `if (void 0 !== import.meta && l && !0)` 运行时探测 import.meta 是否存在，压缩后恒真走 ./map 代理而非 JSONP（apis.map.qq.com）；旧构建 index-DUzdsYzz.js 验证此问题，新构建改用 import.meta.env.DEV 正确走 JSONP。
@@ -22,8 +23,8 @@
 {
   "category": "技术模式",
   "name": "Vite地图代理路径适配",
-  "source_extraction_id": "88d68922b8ca46d2b8056d0afb581a2e",
-  "version": 4,
+  "source_extraction_id": "c49381e33240423e8907d7ddfec1f2cc",
+  "version": 5,
   "memory_type": "entities"
 }
 -->

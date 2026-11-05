@@ -9,18 +9,20 @@
 ## 解决方案
 - 去掉外层包裹用的 el-col，保持与同模块详情页一致
 - zs-form 直接作为 el-row 子节点占满整行
+- 保留「上传支付凭证」下移 24px
 - 子表宽度用表单内块级 width:100% 或子表容器样式微调，不要用额外 el-col 包整表
+- 银行划拨记录仍在表单内纵向排列，并限制为 100% 宽度
 
 ## 验证与归属
-- 涉及文件：zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue、zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue、zhi2-web-admin/src/components/detail-template/detail-template.vue
+- 涉及文件：zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue、zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue、zhi2-web-admin/src/views/benefit/pubPaymentNotice/components/pubTradeDetailTable.vue、zhi2-web-admin/src/components/Headline/index.vue、zhi2-web-admin/src/components/detail-template/detail-template.vue
 - 所属项目：园区公共收益；来源会话ID：f53fddf6-9d9b-42a6-9a58-e51a3a7f7298；代码基线：7cc1625
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "detail_elcol_bug",
-  "source_extraction_id": "265d1891016b4a6484b2371a245ed467",
-  "version": 1,
+  "source_extraction_id": "d29a058ffc4a4d00972767cc35116df4",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -13,15 +13,15 @@
 
 ## 验证与归属
 - 验证：用户反馈「tag里面有两个固定的待办任务」；改完无论落地/flowable/todo或回退/index只保留一个固定待办
-- 涉及文件：src/router/index.js、src/store/modules/permission.js、src/layout/components/TagsView/index.vue、src/views/flowable/todo.vue
+- 涉及文件：src/router/index.js、src/store/modules/permission.js、src/layout/components/TagsView/index.vue、src/views/flowable/todo.vue、src/views/home/index-wrapper.vue
 - 所属项目：园区公共收益；来源会话：3bcff305-97a0-45ac-a995-1878bd7ee92b；代码基线：f783ca2
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "tagsview_dual_affix",
-  "source_extraction_id": "2c504ba9bfd644fe8073772a4088d137",
-  "version": 1,
+  "source_extraction_id": "31fe75b5c4d544939feb0480b86197a7",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

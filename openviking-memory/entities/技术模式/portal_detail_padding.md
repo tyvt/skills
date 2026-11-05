@@ -15,15 +15,15 @@ portal.scss 对 .portal-detail-dialog 正文区统一上下 24px、左右 40px�
 
 ## 验证与归属
 - 验证证据：会话 8088d086 按「首页所有弹窗」统一内边距；租赁企业/信用弹窗由 32px 改为走全局 40px
-- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/portal.scss、PropertyDetailDialog.vue、RentalDetailDialog.vue、UnifiedLoginMenuMoreDialog.vue
+- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue、portal.scss、PropertyDetailDialog.vue、RentalDetailDialog.vue、UnifiedLoginMenuMoreDialog.vue
 - 所属项目：门户；来源会话ID：8088d086-ac9e-4292-b17b-9ffd0590a85f；代码基线：e1f8e0b
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "portal_detail_padding",
-  "source_extraction_id": "4a1f5cf2a2d9479e922996bf93ffae13",
-  "version": 1,
+  "source_extraction_id": "e0e7df219ed7408bb18e5d442e1b453c",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

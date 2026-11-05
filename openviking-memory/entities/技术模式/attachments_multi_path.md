@@ -6,8 +6,8 @@
 - 前端把它整个当一个 src 传给 resolveServerAssetUrl，拼出无效 URL 必然加载失败
 
 ## 解决方案
-- 取值侧按逗号 split 成路径数组并 trim 空白，逐条走 resolveServerAssetUrl 拼域名
-- 展示侧单张用 <img>，多张用 el-carousel 轮播
+- 取值侧将 assetImageUrl 改为 assetImageUrls，按逗号 split 成路径数组并 trim 空白，逐条走 resolveServerAssetUrl 拼域名
+- 展示侧单张用 <img>，多张用 el-carousel 轮播，可按接口数据正常显示多张图片（如7张）并左右切换
 - 同模块 ParkingAssetDialog、AdvertiseAssetDialog 等弹窗有同样逻辑要一并排查
 
 ## 套路
@@ -21,8 +21,8 @@
 {
   "category": "技术模式",
   "name": "attachments_multi_path",
-  "source_extraction_id": "28000d8f11724e7d8c4f29352de82f49",
-  "version": 1,
+  "source_extraction_id": "2aa8b6d1567c447481ec957b1d181c1d",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

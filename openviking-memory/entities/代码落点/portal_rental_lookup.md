@@ -5,6 +5,7 @@
 - 页面：RentalPages.vue（kind===rental-contract 时 contractResult + portal-rental-result-grid）
 - 弹窗路由：PortalDialogHost.vue（portal=rental-contract）
 - 数据：mock/rental.js（rentalContractFixture、matchRentalContract）
+- 已知缺陷：matchRentalContract 仅匹配出租方（方兆玉等），承租方（如杨佩芳）凭正确备案编号仍查询失败，详见事件「承租方合同查询匹配缺陷确认」
 - 样式：portal.scss；主题：portalTheme.js
 - 菜单：UnifiedLogin portal:rental-contract
 - E2E：public-portal-interactions.spec.ts 断言 .portal-rental-contract-result
@@ -18,8 +19,8 @@
 {
   "category": "代码落点",
   "name": "portal_rental_lookup",
-  "source_extraction_id": "53b97c16cee14d85a13ad8202c60d342",
-  "version": 1,
+  "source_extraction_id": "d234bc9ccd6643378e099501fc46712e",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

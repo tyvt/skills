@@ -1,7 +1,7 @@
 # 侧栏目录型菜单E2E遍历规范
 navbar-sidebar-accessibility用例需遍历全部直接子叶子，同URL用main-content文本变化判定跳转成功。
 ## 解决方案
-- 递归侧栏时只处理直接子级sidebar-leaf-link，避免getByTestId捞到更深层后代
+- 递归侧栏时只处理当前目录直接子叶子；现实现为用 `.locator('.menu-collapse-wrapper .sub-menu a').nth(i)` 顺序点击，早期曾用 sidebar-leaf-link 的 testid+closest 过滤避免捞到深层后代
 - 每次点击前记录beforeUrl与[data-testid="main-content"]的innerText
 - 点击后优先waitForURL与beforeUrl不同；若URL未变用waitForFunction比较main-content文本变化超时约4s再记成功
 - 依次点击目录下每一个叶子而非只点最后一个
@@ -17,8 +17,8 @@ navbar-sidebar-accessibility用例需遍历全部直接子叶子，同URL用main
 {
   "category": "技术模式",
   "name": "sidebar_menu_e2e",
-  "source_extraction_id": "e7cf9d3a99174c338e4a5820d2038936",
-  "version": 1,
+  "source_extraction_id": "eec1849560e54b0ab2f531caec03b1b3",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

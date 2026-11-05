@@ -3,6 +3,8 @@
 ## 实现逻辑
 - `add.vue` 实现三步向导（选程序、管步骤、填信息），经 `type` 动态切换字段。
 - 步骤间数据不丢。
+- Step 1 选程序→「下一步」（未选程序时按钮禁用）；Step 2 管步骤列表→「下一步」；Step 3 填频次/日期/结果→「提交」，各步支持「上一步」。
+- `editStep.vue` 底部三按钮：删除 / 确认 / 取消。
 ## 数据传递
 - `editStep.vue` 借 `uni.setStorageSync` 传参。
 - 借 `uni.$emit('recordStepSaved')` 回传数据。
@@ -17,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "step_wizard_persist",
-  "source_extraction_id": "7d61ff9cb043451387acea9d3a28c31a",
-  "version": 1,
+  "source_extraction_id": "2762fdd53c074d90b150c24c3dcb49e4",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

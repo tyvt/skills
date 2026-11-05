@@ -6,6 +6,13 @@
 - SSO 登录登出对接 login.vue、api/portal/home.js、store/modules/user.js
 - 子系统认证接口管理端无需调用
 
+## SSO 与认证接口对照（Postman → 前端）
+- POST /portal/sso/login → 已对接 login.vue
+- POST /portal/sso/jump → 已对接 api/portal/home.js（首页应用跳转）
+- POST /portal/sso/logout → 已对接 store/modules/user.js（POST + tokenValue）
+- POST /portal/sso/ticket/verify、/portal/auth/app-token、/portal/auth/app-token/verify、/portal/sso/verify → 子系统调用，管理端无需
+- alipay/* → 按需求跳过
+
 ## 涉及文件（统一门户与系统）
 - 统一门户平台.postman_collection.json
 - zhi2-web-admin/src/views/unified/app/index.vue
@@ -26,8 +33,8 @@
 {
   "category": "technical_pattern",
   "name": "app_mod_pattern",
-  "source_extraction_id": "2fba8f8d0cda4c1c996d7f39cc34706e",
-  "version": 1,
+  "source_extraction_id": "6b8fdd3bf7ad451a97f037f40baed9eb",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

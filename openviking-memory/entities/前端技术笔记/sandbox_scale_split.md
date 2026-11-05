@@ -4,7 +4,7 @@
 ## 问题根因
 - 数据沙盒类页面（fundPanorama/assetPanorama）按 1920 设计稿用 transform: scale 适配视口
 - 侧边栏展开收起改变内容区宽度时，若整块等比缩放，图标会随侧栏一起放大缩小，不符合「侧栏只影响宽度」的预期
-- 改成 scale(sx, 1) 只缩横向后，设计稿量算高度 designMeasuredH 大于 calc(100vh - 顶栏) 可视高度时会纵向溢出
+- 改成 scale(sx, 1) 只缩横向后，设计稿量算高度 designMeasuredH 大于 calc(100vh - 84px) 可视高度时会纵向溢出
 - 单一 scale 无法同时满足「横向跟宽度、纵向跟视口高度」两个独立约束
 
 ## 解决方案
@@ -22,8 +22,8 @@
 {
   "category": "前端技术笔记",
   "name": "sandbox_scale_split",
-  "source_extraction_id": "045a65d55d4b439cb1758c87ddea6f9a",
-  "version": 1,
+  "source_extraction_id": "784cf794014b4cfc855ed72d1d2da8a2",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

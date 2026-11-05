@@ -12,14 +12,14 @@
 
 ## 涉及信息
 - 涉及文件：zhi2-web-admin/src/components/zs-select/zs-like-select.vue、zhi2-web-admin/src/views/maintenance/depositNotice/company/components/AddDialog.vue。
-- 所属项目：园区物管2.0；来源会话：3212c3b1-6f35-4233-95e1-8433cc34e122；代码基线：7814a0c2a。
+- 所属项目：园区物管2.0；来源会话：3212c3b1-6f35-4233-95e1-8433cc34e122；代码基线：7814a0c2a、041.md。
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "allow_custom_three_state",
-  "source_extraction_id": "6748b718b2a9471ca4346d124cc1977d",
-  "version": 1,
+  "source_extraction_id": "42c768a81b7349ffb7ae96dc2517af73",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -10,9 +10,11 @@
 - submenu.getByTestId('sidebar-menu-item') 会把更深层目录算进来，递归展开状态错乱。
 
 ## 解决方案
-- 叶子只点满足 `leaf.closest('[data-testid="sidebar-menu-item"]') === 当前 menuItem` 的 sidebar-leaf-link。
-- 嵌套目录只递归「其 sidebar-menu-item 祖先链上紧邻父级就是当前目录」的项。
-- 菜单顺序以 DOM 实际出现顺序为准，不做 index/href 跨上下文排序；日志带面包屑便于对照。
+- 精简重写 `clickLeafMenusUnderParent`：去掉基于 index/href 的跨上下文数据结构，DOM 侧仅统计当前目录下 `.menu-collapse-wrapper .sub-menu a` 的 `<a>` 子菜单数量。
+- Playwright 侧用 `.locator('.menu-collapse-wrapper .sub-menu a').nth(i)` 按顺序点击每个子菜单。
+- 点击后短暂等待并调用 `assertMainContentNotBlank`；断言失败仅记录到 `uiErrorRecords` 不阻塞后续菜单。
+- 每个子菜单点击用 `try/catch` 包裹，异常仅记日志，避免整个目录卡死。
+- 早期方案曾用 `sidebar-leaf-link` 的 `closest` 过滤直接子级（避免 getByTestId 捞深层后代），现简化为上述最小可靠版本。
 
 ## 涉及信息
 - 涉及文件：zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js
@@ -22,8 +24,8 @@
 {
   "category": "测试模式",
   "name": "sidebar_leaf_filter",
-  "source_extraction_id": "1001facf978947c0afeaf5611beb1e05",
-  "version": 1,
+  "source_extraction_id": "eec1849560e54b0ab2f531caec03b1b3",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

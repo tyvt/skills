@@ -6,8 +6,9 @@
 - 卡片宽度随标题长度变化，列表不齐
 
 ## 修复要点
-- 改为 flex 布局
-- `.right-text` 设 `flex: 1; min-width: 0` 限制最小宽度
+- 改为 flex 布局，卡片设 `width: 100%` 占满容器
+- `.right-text` 设 `flex: 1; min-width: 0` 限制最小宽度，文字区域自适应剩余空间
+- 有预览图时图片用 `flex-shrink: 0` 保持固定尺寸
 - `onlineService/index.vue` 的 `.content` 的 `align-items` 改为 `stretch` 统一宽度
 
 ## 涉及文件
@@ -27,8 +28,8 @@
 {
   "category": "技术模式",
   "name": "listindex_auto_width",
-  "source_extraction_id": "b593d87ec37f4a2daf53a37fe760199f",
-  "version": 1,
+  "source_extraction_id": "72b5a7991bd24f12a5931971c8afda85",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

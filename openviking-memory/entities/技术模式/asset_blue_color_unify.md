@@ -3,11 +3,11 @@
 
 ## 问题根因
 - `.is-orange` 背景色与 `asset.color` 旧蓝色值未统一至 `#1677FF`
-- 部分缴费或旧蓝值未强制映射主蓝色
+- 部分缴费或旧蓝值（如 #d0e4ff/#fde3d1/#409eff，原背景 #D0E4FF）未强制映射主蓝色
 
 ## 解决方案
 - 修改 `.is-orange` 背景为 `#1677FF` 且文字白色
-- 于 `assetCellStyle` 兜底将部分缴费或旧蓝值强制映射 `#1677FF`
+- 于 `assetCellStyle` 兜底将部分缴费或旧蓝值（如 #d0e4ff/#fde3d1/#409eff，原 #D0E4FF）强制映射 `#1677FF`
 
 ## 验证与归属
 - 涉及文件：src/views/benefit/statisticsMap/operatingAssets.vue
@@ -18,8 +18,8 @@
 {
   "category": "技术模式",
   "name": "asset_blue_color_unify",
-  "source_extraction_id": "d913d1a6135b48b89f883365240910a1",
-  "version": 1,
+  "source_extraction_id": "c8d3cef8b2f248fc83df6e71434716c5",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

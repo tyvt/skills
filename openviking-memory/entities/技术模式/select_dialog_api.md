@@ -7,7 +7,7 @@
 
 ## 解决方案
 - 带业务前置条件的选值弹窗优先向后端要/查专用可选列表接口：本项目用 /maintenance/guaranteeDepositAgreement/pageOptionalComplex，只返回已开立账户的物业管理区域。
-- 在 SelectDialog.open 里直接把 url 换成专用接口，筛选参数（bizState: '2'、当前项目 complexId）按接口约定传，表格列配置保持不变。
+- 在 SelectDialog.open 里直接把 url 换成专用接口（位于 detail.vue 的 showPropertyDialog 方法），筛选参数（bizState: '2'、当前项目 complexId）按接口约定传，表格列配置保持不变。
 - 同类模式：可选项 = 主数据 + 业务状态约束时，一律走 *Optional* / *CanUse* 类专用接口。
 
 ## 验证与归属
@@ -18,8 +18,8 @@
 {
   "category": "技术模式",
   "name": "select_dialog_api",
-  "source_extraction_id": "5ed8cff3af8a4f5db9f4d3e49a2b2037",
-  "version": 1,
+  "source_extraction_id": "2074bf66f64b451aa5c966c53659c840",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

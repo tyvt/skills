@@ -16,14 +16,15 @@
 
 ## 验证与归属
 - 所属项目：园区物管2.0；代码基线：none
+- 验证路径：权利人同步详情 → 查看 → 添加同步范围
 - 来源会话：4ac14ab7-1d24-43a8-b799-ea0b166135f7
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "sync_subcontainer_style",
-  "source_extraction_id": "fbfd30739822481d9cd63130bdfc329b",
-  "version": 1,
+  "source_extraction_id": "d49d6da15178402584b12c482ee3060a",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

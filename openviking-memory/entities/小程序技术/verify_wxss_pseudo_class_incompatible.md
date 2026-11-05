@@ -5,6 +5,10 @@ pages/face/verify.wxss 第62行附近 :deep 或伪类写法在微信编译链中
 - `pages/face/verify.wxss` 第62行附近的 `:deep` 或伪类写法在微信编译链中不兼容
 - 导致 WXSS 编译报错，排查需看源码而非 dist 产物
 
+## 排查要点
+- 编译产物 dist 文件第 62 行本身正常，应查看源码 pages/face/verify.wxss（非 dist 文件）第 62 行附近
+- 此类报错通常是 :deep / 伪类写法在微信编译链里不兼容导致
+
 ## 验证与归属
 - 验证证据：extracted source=cursor session=156fa5f3-cdaf-4b2e-a9ea-2e0cb6a93c14
 - 涉及文件：pages/face/verify.vue、unpackage/dist/dev/mp-weixin/pages/face/verify.wxss、pages/face/verify.wxss、App.vue
@@ -14,8 +18,8 @@ pages/face/verify.wxss 第62行附近 :deep 或伪类写法在微信编译链中
 {
   "category": "小程序技术",
   "name": "verify_wxss_pseudo_class_incompatible",
-  "source_extraction_id": "a915952323c7436887ace9fedf19adbf",
-  "version": 1,
+  "source_extraction_id": "8ed8cc7c612c4cff9097a608de758469",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

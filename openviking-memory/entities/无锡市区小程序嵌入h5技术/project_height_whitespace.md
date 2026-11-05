@@ -12,20 +12,20 @@
 
 ## 解决方案
 - 去掉页面根节点不必要的height:100%，让高度随内容自适应
-- 保留适度padding-bottom即可
+- 保留 padding-bottom:32rpx 等适度底部间距，使页面在「小区周边」卡片下方自然结束
 - 修改前先看是固定height还是min-height链，避免误改
 
 ## 验证与归属
-- 验证会话14093e7d：project/info/index.vue底部留白过多，去掉height:100%后随内容结束
+- 验证会话14093e7d：project/info/index.vue底部留白过多，去掉.project-page的height:100%并保留padding-bottom:32rpx后，页面在「小区周边」卡片下方自然结束
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue、src/App.vue
-- 所属项目：无锡市区小程序嵌入H5；代码基线：fb55fa9
+- 所属项目：无锡市区小程序嵌入H5；代码基线：fb55fa9（历史提取），本次会话14093e7d代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "无锡市区小程序嵌入H5技术",
   "name": "project_height_whitespace",
-  "source_extraction_id": "3527dbc6cabc42928f2894d85a85de59",
-  "version": 1,
+  "source_extraction_id": "75bbb1101ba1415cb00e5e2a501d635d",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

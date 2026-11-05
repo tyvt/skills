@@ -2,7 +2,8 @@
 园区公共收益仓库 d:\repository\园区公共收益 仅含 zhi2-web-admin 前端，contractGuard 等 2.0 接口需查独立 BE 或 V0 对照。
 
 ## 事实描述
-- 全盘搜索无 Java/MyBatis 后端，前端调用的 /maintenance/contractGuard 属于 2.0 独立后端（GitLab BE 或网关 Swagger）
+- 全盘搜索无 Java/MyBatis 后端，前端调用的 /maintenance/contractGuard 属于 2.0 独立后端（GitLab BE 或网关 Swagger），经 env 中 VITE_APP_PROXY_ADDRESS 代理访问
+- 代理当前指向 http://unlimited.g.h5.admin.web.v2.product.unlimited.unlimited.test.zhi.com/
 - 联调 usccBName 模糊查询、已付金额/付款比例等逻辑时，旧实现可参考 d:\repository\园区V0\EstateManagement-Park\...\mtpl\ 下 MtplContractGuard* 与 Mapper.xml
 - 模块与 URL 与 2.0 不是同一套，只能作字段与 SQL 思路对照，不能直接当现网契约
 
@@ -15,8 +16,8 @@
 {
   "category": "技术模式",
   "name": "repo_frontend_only",
-  "source_extraction_id": "2d8c5d9579cd49e0af90cf0231ceaa4e",
-  "version": 1,
+  "source_extraction_id": "1551a7b6b5db49d7baf731e97076f08f",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

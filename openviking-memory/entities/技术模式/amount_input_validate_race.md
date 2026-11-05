@@ -14,14 +14,14 @@ AmountInput（vue-currency-input 封装）本地开发正常、打包后字段�
 - 向上查找表单项同时认 componentName 和 name 为 ElFormItem
 
 ## 关联信息
-- 涉及文件：zhi2-web-admin/src/components/AmountInput/index.vue；所属项目：园区物管2.0；来源会话：65814715-d99f-446d-b239-bd55aaced626；代码基线：7814a0c2a
+- 涉及文件：zhi2-web-admin/src/components/AmountInput/index.vue、src/views/property/feeDeclare2/components/feeBindScopeTable.vue（使用 AmountInput）；所属项目：园区物管2.0；来源会话：65814715-d99f-446d-b239-bd55aaced626；代码基线：7814a0c2a
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "amount_input_validate_race",
-  "source_extraction_id": "02ecf26ada894602a6a08e759af6c433",
-  "version": 1,
+  "source_extraction_id": "d4c167325849479e80ae46b9e66aeb77",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

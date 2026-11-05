@@ -6,7 +6,7 @@
 
 ## 解决方案
 - FjDialog.vue 等表单及 companyRegister.js 的 normalizeAppendixConfig 统一改为输出 appendixConfigCode
-- 兼容旧字段，请求体使用 appendixConfigCode
+- 兼容旧字段，请求体使用 appendixConfigCode，示例：`{"appendixConfigCode": "company_register_license"}`
 
 ## 涉及文件
 - d:/repository/产品2.0/zhi2-web-admin/src/api/company/companyRegister.js 与 register/components/Step3Appendix.vue
@@ -23,8 +23,8 @@
 {
   "category": "技术模式",
   "name": "appendix_config_code_fix",
-  "source_extraction_id": "4ca9c539b6bc40068271fdd96394dd47",
-  "version": 1,
+  "source_extraction_id": "d70fba0bcec84f65b76e0f60a1dcc6b0",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

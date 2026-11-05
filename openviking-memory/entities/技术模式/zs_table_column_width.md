@@ -4,6 +4,7 @@ zs-table-column 按 canvas 测宽：<280px 输出固定 width，否则输出 min
 ## 实现规则
 - 测算结果 < SHORT_COLUMN_FIX_THRESHOLD（门户首页待办改造时为 280px）时输出固定 `width`，不参与 zs-table `fit` 的剩余宽度放大
 - 测算较大（主题/任务名等，上限仍 500）时输出 `min-width` 作为弹性列吸收剩余宽度
+- 测算时遍历当前页每行对应字段，用 canvas 量最长行像素宽度，加表头与内边距（COLUMN_PADDING=48），得到 min-width 并限制在 80~500 之间
 - 页面层（如 HomeTodoTable）应去掉列上的 width/min-width，操作列交给 zs-operate-column 按按钮文案测算
 
 ## 调整原则
@@ -18,8 +19,8 @@ zs-table-column 按 canvas 测宽：<280px 输出固定 width，否则输出 min
 {
   "category": "技术模式",
   "name": "zs_table_column_width",
-  "source_extraction_id": "53c603737d434329a97690f706a618f0",
-  "version": 1,
+  "source_extraction_id": "7779062f47aa4113bae1c0d272741bd0",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

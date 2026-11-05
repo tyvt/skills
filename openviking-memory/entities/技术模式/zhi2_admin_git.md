@@ -14,13 +14,15 @@ zhi2-web-admin 是父仓库的子模块，拥有独立 git 仓库，改动须走
 - 禁止用 PowerShell 的 Get-Content/Set-Content 读写含中文的 Vue 文件，会破坏 UTF-8 编码并加 BOM 导致乱码；字符串替换请用 read/edit 工具
 - worktree 自 HEAD 切出，不含主工作区未提交改动；若用户看到的文件含未提交改动，需先把主工作区版本作为基线带入 worktree，或直接在主工作区修改
 - 构建验证可放回主工作区进行（worktree 路径下 vite 因 node_modules 解析/版本检查更严格可能构建失败）
+- 另注：榆林子模块各 worktree 的 vite rootDir 同为父目录 D:/repository/榆林G，build 会写同一 dist 互相覆盖；需用 --outDir 隔离（详见园区物管2.0 部署约定）。
+- 榆林变更落 develop/v2.6.2-yulin 分支（非 develop/v3.0.0），父仓库无对应 262-yulin 分支，仅子模块推进。
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zhi2_admin_git",
-  "source_extraction_id": "16fcaf1869de4f7cb3030b624169e993",
-  "version": 3,
+  "source_extraction_id": "f79d689679644dadba4c25a84f0b231f",
+  "version": 4,
   "memory_type": "entities"
 }
 -->

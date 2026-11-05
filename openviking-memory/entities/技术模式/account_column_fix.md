@@ -19,6 +19,7 @@
 - zhi2-web-admin/src/components/zs-table/zs-table.vue
 
 ## Relations
+- 合并提交：develop/v2.6.1:87c2a03bb、develop/v2.6.2:20cf91a66、develop/v2.6.2-yulin:c58364135、develop/v2.6.2-suzhufang:88e7e284f
 - 来源会话：ccecb19b-92ad-4ceb-b6a2-3ff398f7a4aa（extracted source=cursor）
 - 代码基线：none
 
@@ -26,8 +27,8 @@
 {
   "category": "技术模式",
   "name": "account_column_fix",
-  "source_extraction_id": "487b125f28014405af5c516b05a5f94f",
-  "version": 2,
+  "source_extraction_id": "1361bd3813744042a98313dc80ef9a52",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

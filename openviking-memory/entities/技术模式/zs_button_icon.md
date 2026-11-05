@@ -5,6 +5,7 @@
 ## 解决方案
 - zs-button.vue 拦截 $attrs.icon 并自动映射为 Element Plus 图标组件。
 - 避免在每个使用 el-icon 旧写法的页面单独修改。
+- 仅剩少量直接在 el-button 或特殊场景使用 `icon="el-icon-..."` 的地方未覆盖，需按页面精修。
 ## 验证与归属
 - 验证证据：会话 4eaf5cdc（cursor session=4eaf5cdc-4638-4f11-acea-647d5111b462）。
 - 涉及文件：zs-button.vue；来源会话ID：4eaf5cdc-4638-4f11-acea-647d5111b462；代码基线：none。
@@ -13,8 +14,8 @@
 {
   "category": "技术模式",
   "name": "zs_button_icon",
-  "source_extraction_id": "9a939398a49a4f2e9c451b05bb181dcb",
-  "version": 1,
+  "source_extraction_id": "d9ab1a0ce9de4c3f9d36f986e9f6078d",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

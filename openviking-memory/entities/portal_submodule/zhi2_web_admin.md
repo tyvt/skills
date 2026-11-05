@@ -26,15 +26,15 @@ Vue 2.7 admin frontend submodule under the 门户 (Portal) repo implementing Suz
 
 ## 构建与部署
 - npm run build 产物输出至父仓库 门户/dist（非子模块内 dist），因 vite.config 中 rootDir = path.resolve(__dirname, "../") 解析到父目录；nginx 站点 root 需指向 门户/dist
-- 仓库规则禁止本地启动 dev server，须用本地 nginx（D:/nginx + nginx-ui 管理）部署 dist；task1497 新建 portal-task1497.conf 监听 8093，将 /api/v2.0|v3.0/* 去 /api 前缀反代本地网关 8080
+- 仓库规则禁止本地启动 dev server，须用本地 nginx（D:/nginx + nginx-ui 管理）部署 dist；task1497 新建 portal-task1497.conf 监听 8093，将 /api/v2.0|v3.0/* 去 /api 前缀反代本地网关 8080；该站点已于 2026-11-04 停用，配置移回 sites-available 保留备查，可按 E2E-EXTERNALINFO.md 重启
 - 门户登录走 POST /v3.0/portal/login/login（userName/password，无验证码），与旧版后台 captcha 登录不同；超管 admin(userId=1) 直接拥有全部菜单
 
 <!-- MEMORY_FIELDS
 {
   "category": "portal_submodule",
   "name": "zhi2_web_admin",
-  "source_extraction_id": "c97f0fab19dc4b2d88395d460dc20c77",
-  "version": 3,
+  "source_extraction_id": "78833d4a4a0a498e864cad5a4111eea0",
+  "version": 4,
   "memory_type": "entities"
 }
 -->

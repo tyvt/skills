@@ -11,14 +11,20 @@
 
 ## 适用场景
 - 所有被 flex 容器包裹的数值/单位组合控件出现内容不可见的场景。
-- 涉及文件：zs-input-number.vue、parkingManage/subDialog.vue、pubAdvertiseSpace/advertiseDialog.vue、zs-search-form.vue；所属项目：园区物管2.0。
+
+## 涉及文件
+- zs-input-number.vue
+- parkingManage/subDialog.vue
+- pubAdvertiseSpace/advertiseDialog.vue
+- zs-search-form.vue
+- 所属项目：园区物管2.0；来源会话：9ffa91df-ef35-47a9-9001-d53cb1cca224；代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zs_number_hide",
-  "source_extraction_id": "dcd23ce75bc845459e6f23b743f4afe2",
-  "version": 1,
+  "source_extraction_id": "cfc319a7d4474bb0b0c37ae22cfe0157",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

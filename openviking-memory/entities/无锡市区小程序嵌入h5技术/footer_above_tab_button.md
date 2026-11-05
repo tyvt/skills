@@ -5,6 +5,8 @@
 - 中间凸起按钮顶部位于 160rpx（30rpx 底边距 + 130rpx 高度）
 - 落款原 bottom:120rpx 被遮挡，调整为 188rpx 移至按钮上方
 - 页面底部内边距同步改为 340rpx 避免内容遮挡
+- 普通 tabBar 的 bottom 约 120rpx 不适用于凸起自定义 TabBar，须按真实占位计算
+- 仅加 footer 不改 bottom/内边距会导致空白多却要滚到底才见落款或被中间 tab 挡住
 
 ## 验证与归属
 - 验证证据：src=无锡市区小程序嵌入H5/010.md
@@ -15,8 +17,8 @@
 {
   "category": "无锡市区小程序嵌入H5技术",
   "name": "footer_above_tab_button",
-  "source_extraction_id": "b80256ade33b49b08266da7f93d995da",
-  "version": 1,
+  "source_extraction_id": "40cd8393981e48869460b2232fae40f9",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

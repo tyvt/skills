@@ -4,6 +4,9 @@
 - 将公司名标题字号由 `28rpx` 调整为 `40rpx`。
 - 将红色金额字号由 `46rpx` 调整为 `52rpx`。
 - 元单位保持 `34rpx`，整体拉大字体差距对齐设计稿。
+- 标题行高由 `40rpx` 调整为 `46rpx`，同步拉开。
+- 单位标签字体由 `24rpx` 调整为 `28rpx`，并加高标签尺寸。
+- 右侧费用标签统一：`right-wrap` 调整为 `34rpx`。
 ## 验证与归属
 - 验证证据：src=泰兴小程序/017.md
 - 涉及文件：src/pages_maintain_project/final-cost-detail.vue、src/pages_maintain_project/maintainProject.js、src/pages_maintain_project/apply-detail.vue、src/pages_maintain_project/project.vue、src/pages.json、src/pages_maintain_project/object-detail.vue、src/pages_maintain_project/index.vue
@@ -14,8 +17,8 @@
 {
   "category": "技术模式",
   "name": "cost_font_align",
-  "source_extraction_id": "14f9f34c6b2047cf86ef295274671d43",
-  "version": 1,
+  "source_extraction_id": "1d73c2d6945a4b4f88a81ca174efdb92",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

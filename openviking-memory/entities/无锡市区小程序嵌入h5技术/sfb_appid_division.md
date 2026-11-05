@@ -11,6 +11,14 @@
 - 支付宝经 my.postMessage 回传可能无标准 retcode，需兼容 result/msg 字段
 - 排查日志关注 tokenFromUrl（入口新 token）与 tokenStale（需重新从苏服办进入）
 
+## 当前参数对照（文档5.1.12）
+- arg0=应用appId=jisnzjk（SFB_FACE_APP_ID），与官方文档5.1.12一致
+- arg1=用户token=getSfbToken()从入口URL或缓存读取
+- arg2=令牌类型='1'（个人用户令牌）
+- success回调已绑定，解析retcode/msg；fail回调已绑定，记录日志并reject
+- isSfbFaceSuccess以retcode==='000000'为成功主判，另兼容其它返回值
+- 当前实现已对照官方文档5.1.12确认参数无误；支付宝容器内仍无法拉起扫脸非参数错误所致
+
 ## 验证与归属
 - 所属项目：无锡市区小程序嵌入H5
 - 来源会话：3fc0470b-aa98-4e6c-91de-c95f0603e8d3
@@ -21,8 +29,8 @@
 {
   "category": "无锡市区小程序嵌入H5技术",
   "name": "sfb_appid_division",
-  "source_extraction_id": "d81982be12fb49649927c1f09cdc1a12",
-  "version": 1,
+  "source_extraction_id": "801fd2bc9b8d4766aafa742c6fc75b71",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -7,6 +7,7 @@
 
 ## 解决方案
 - `maintain-detail.vue` 参照 `daily.vue` 按平台拼接 `VITE_APP_API_BASE_URL` 或 `IMAGE_BASE` 为完整 URL 后传入。
+- `ZsImage.vue` 若传入已是 `http(s)://` 完整地址则不再重复拼接 `base`，避免域名被加两次。
 
 ## 验证与归属
 - 验证证据：src=泰兴小程序/022.md
@@ -18,8 +19,8 @@
 {
   "category": "技术模式",
   "name": "process_picture_domain",
-  "source_extraction_id": "5fe64a913e8e4332b1aa5926a136ded7",
-  "version": 1,
+  "source_extraction_id": "d785119f5bb249119c9e3f841e480587",
+  "version": 2,
   "memory_type": "entities"
 }
 -->
