@@ -28,13 +28,34 @@ description: 禅道 Bug/任务分析与回写。给定一条禅道链接（如 h
 
 ### 取详情（DBX，推荐）
 
+链接形态：`m=bug&f=view&bugID=` → `zt_bug`；`m=task&f=view&id=` → `zt_task`；`m=story&f=view&storyID=` → `zt_story` + `zt_storyspec`。
+
 ```text
+-- Bug
 SELECT id,title,status,severity,openedBy,assignedTo,product,project,execution,
        openedBuild,resolution,resolvedBuild
 FROM zt_bug WHERE id=<id>;
 -- steps 字段被前端按 200 字截断时，用 SUBSTRING(steps,1,200)/SUBSTRING(steps,201,200) 分段读全
 SELECT SUBSTRING(steps,1,200) s1, SUBSTRING(steps,201,200) s2 FROM zt_bug WHERE id=<id>;
+
+-- 任务（`desc` 是保留字，须反引号）
+SELECT id,name,status,type,assignedTo,openedBy,project,execution,story,parent,`desc`
+FROM zt_task WHERE id=<id>;
+SELECT id, actor, action, date, LEFT(comment,1000) cmt
+FROM zt_action WHERE objectType='task' AND objectID=<id> ORDER BY id;
 ```
+
+### ⚠ 必读：任务/子任务信息不足时查父任务与需求（2026-11-06 新增）
+
+**子任务（`parent` > 0）或当前行的 `desc`/`story` 为空时，不要凭标题猜需求。** 按顺序补齐上下文后再写方案或改代码：
+
+1. **`parent` > 0**：查父任务 `SELECT … FROM zt_task WHERE id=<parent>`，父任务的 `desc` 往往含原型图、参照系统、需求链接。
+2. **`story` = 0 但父任务/描述 HTML 里出现 `storyID=`**：用 DBX 查 `zt_story` + `zt_storyspec`（本库需求正文在 `zt_storyspec.spec`，不在 `zt_story` 列）。
+3. **任务关联的需求**：`zt_task.story` > 0 时直接查该 story；`zt_action` 里 `objectType='story'` 的 `comment`/`edited` 可能带 UI 截图（`fileID=`）。
+4. **仍缺验收标准**：在任务/需求的 `zt_action` 里找 `commented`/`edited`；有 `fileID` 用 REST API 拉图（见「取截图/附件」）。
+5. **跨项目复用**：标题常带「参照苏住房 / 江阴已做」——在 `zhi2-web-admin` 用 `git log --grep=<关键词>`、`git grep` 或江阴/昆山分支找同名页面（例：Task 1080 → `pubRecBankFile`）。
+
+> 实例（Task 1904）：子任务 `desc` 为空，`parent=1903`；父任务描述指向 **Story 937**（「对账文件，可参照苏住房」+ 截图）；江阴分支已有 `src/views/benefit/pubRecBankFile/index.vue`（commit `c8aa79a29`），淮安只需迁移页面并配菜单/权限。
 
 ### ⚠ 必读：先读「备注 / 评论」再分析根因（2026-11-02 事故后新增）
 
