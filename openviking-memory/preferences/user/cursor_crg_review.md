@@ -1,12 +1,17 @@
-- Cursor has no native fully unattended code review capability; the user relies on global rule `~/.cursor/rules/code-review-graph-auto.mdc` and a `sessionStart` Hook in `~/.cursor/hooks.json` that checks `git diff HEAD` to inject CRG context.
-- Review thresholds are set by `FILE_THRESHOLD=3` and `LINE_THRESHOLD=80` in `crg-diff-check.py`.
+
+- Cursor 无原生完全无人值守代码审查能力（改完代码 Agent 自己弹 review 不可行）。
+- 用户依赖全局规则 `~/.cursor/rules/code-review-graph-auto.mdc`：在 ≥3 文件或 ≥80 行变更、或提到 review/影响范围时，Agent 优先走 CRG。
+- 已配置 `sessionStart` Hook `~/.cursor/hooks.json`：每次新开 Agent 会话检查 `git diff HEAD`，超阈值注入「请用 CRG」上下文。
+- 阈值在 `C:\Users\Administrator\.cursor\hooks\crg-diff-check.py` 顶部设置：`FILE_THRESHOLD = 3`、`LINE_THRESHOLD = 80`。
+- crg-daemon 已在跑：文件变更时自动更新代码图。
+
 
 <!-- MEMORY_FIELDS
 {
   "user": "user",
   "topic": "cursor_crg_review",
-  "source_extraction_id": "9c284e58ed614ab5ae1e20683f747416",
-  "version": 1,
+  "source_extraction_id": "12b45db31273463da998888caf807223",
+  "version": 2,
   "memory_type": "preferences"
 }
 -->

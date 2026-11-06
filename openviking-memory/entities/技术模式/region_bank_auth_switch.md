@@ -11,6 +11,12 @@
 - 无权限或接口失败时回滚开关状态，不再整表刷新
 - 移除冗余手写 el-switch 模板和未使用的 streetAuthStatus 插槽
 
+## 未备案单据启用修复
+- 针对未备案单据（bizState !== '2'），切换启用状态前端拦截提示「未备案的不能执行启用或禁用」并回滚开关
+- handleEnableChange 中根据目标状态反推原值 prevStatus = statusStr === '1' ? '0' : '1'，修复接口报错后回滚到错误值的问题
+- 权限校验、参数校验失败时同样正确回滚开关状态
+- 修改位置：regionBankAuth/index.vue 的 handleEnableChange 方法
+
 ## 验证与归属
 - 涉及文件：regionBankAuth/index.vue、property/utilityLinkConfig/index.vue
 - 所属项目：苏住房G；来源会话ID：2523c7eb-f1c1-4b26-8a60-77d3793a4bcf
@@ -19,8 +25,8 @@
 {
   "category": "技术模式",
   "name": "region_bank_auth_switch",
-  "source_extraction_id": "9d36e0008f33493084394e9c26960c81",
-  "version": 1,
+  "source_extraction_id": "430454bfe60c45a1a179cfb3e392ff41",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

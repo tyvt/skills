@@ -7,7 +7,7 @@
 ## 解决方案
 - `contractSelectColumns` 与 `noticeSelectColumns` 核销金额列 `prop` 改为 `hasVerifiedAmount` 并经 `amountFormatter` 格式化
 - `pickVerifiedAmount` 仅取 `row.hasVerifiedAmount`，移除旧字段兜底
-- 依赖接口返回 `hasVerifiedAmount` 字段
+- 依赖接口 `/benefit/pubRevenueContract/pageReceiptRevenueContract` 返回 `hasVerifiedAmount` 字段
 
 ## 验证与归属
 - 涉及文件：src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailDialog.vue、src/views/benefit/pubVerificationReceipts/index.vue、src/views/benefit/pubManualBookkeeping/components/bookDetailDialog.vue、src/components/zs-table-column/zs-table-column.vue
@@ -18,8 +18,8 @@
 {
   "category": "技术模式",
   "name": "verified_amount_field",
-  "source_extraction_id": "e008fb7437824de69119ff4118b6d71b",
-  "version": 1,
+  "source_extraction_id": "cc4acf3026944bc4a35a55640ad46ac4",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

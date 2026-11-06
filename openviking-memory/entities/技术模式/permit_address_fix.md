@@ -7,6 +7,7 @@
 
 ## 修复方案
 - `detailCallback` 与 `handleProjectChange` 增加 `address: data.address ?? data.projectAddress` 兼容映射
+- 该写法与委托销售模块的 `normalizeDetail` 保持一致
 
 ## 验证与归属
 - 验证证据：extracted source=cursor session=d7e90979-d433-4c59-ae3d-c5fc390cc9c4
@@ -17,8 +18,8 @@
 {
   "category": "技术模式",
   "name": "permit_address_fix",
-  "source_extraction_id": "64e817141a014c119f2d75e08fa51c85",
-  "version": 1,
+  "source_extraction_id": "66ee6a2008f240c5a4f96b7c3e61c2fa",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

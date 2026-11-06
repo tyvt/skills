@@ -16,12 +16,22 @@
 - 修复提交 4a3342506 与合并 cb854ea7b 已推送 zhi2-web-admin develop/v2.6.1
 - 涉及文件 src/views/system/user/index.vue；所属项目 无锡市区G；来源会话 2026-11-05
 
+## 客测环境Chrome 109兼容问题（2026-11-06）
+- 含高度修复的构建（合并提交 cb854ea7b，linux 构建于 2026-11-05 19:23）部署到客测环境 10.10.208.25 后，客户 Chrome 109.0.5414.120 仍显示右栏空白
+- 排查中曾因部署包 scope 哈希（data-v-7a1f00d2）与本地 Windows 构建（data-v-92c0ed0c）不同而怀疑部署非最新；后经 body 标签 build-info 确认即为 cb854ea7b，哈希差异源于 Windows(CRLF) 与 linux(LF) 换行符不同
+- 本地用 Playwright 加载同一份 dist 并 mock 接口，Chromium（134/153 内核）渲染完全正常：搜索表单、操作按钮、表格 2 行数据、分页均显示，.list-container 780px、.main-box-right 772px、子节点 2 个
+- 客户使用搜狗浏览器（Sogou）访问即正常，判定为 Chrome 109 内核渲染兼容问题，非代码缺陷
+- 可疑点：页面全局样式含 :has() 选择器，或百分比高度/flex 组合在 Chrome 109 下的表现差异；具体 CSS 未最终定位
+- 高度修复（scoped .list-container）经评估有效且无害，作为兜底保留，不回退
+- 处置建议（用户未最终选定）：① 进一步定位并改写不依赖浏览器版本的 CSS；② 保持现状并备注「客测环境需用搜狗/新版 Chrome 访问」
+- 来源会话 2026-11-06；客户 Chrome 版本 109.0.5414.120
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "user_list_blank",
-  "source_extraction_id": "d537103301824c2381174d65dd5ba3dc",
-  "version": 1,
+  "source_extraction_id": "c36f9f6ce15c45dd982367d9a7692e39",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

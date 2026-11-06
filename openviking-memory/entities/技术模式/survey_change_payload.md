@@ -3,7 +3,8 @@
 
 ## 实现要点
 - 在 `surveyChangeConstants.js` 新增 `buildSurveyChangeAddPayload` 将 form 字段映射为 API 入参
-- 强校验含 `projectName`、`region` 等，可选含 `enterpriseId` 等
+- 强校验字段：`projectName`、`region`、`projectLocation`、`enterpriseCreditCode`、`buildingNo` 等
+- 有就传：`enterpriseId`、`enterpriseName`、`oldTotalUnits`、`oldTotalArea`、`newTotalUnits`、`newTotalArea`
 - `detail.vue` 的 `getForm()` 新增时调用该函数
 - 编辑仅传 `{ id, changeReason }`
 
@@ -16,8 +17,8 @@
 {
   "category": "技术模式",
   "name": "survey_change_payload",
-  "source_extraction_id": "25da285e84a84b788cd24433bceb9002",
-  "version": 1,
+  "source_extraction_id": "b6235e8c83234c6da6eb786bbea65930",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -7,10 +7,10 @@
 
 ## 修复方案
 - 为该选择器增加 width:auto 例外修复
-- 已用 zs-button-group 包裹的弹窗不受影响
+- 已用 zs-button-group 或 `<div>` 包裹的弹窗不受影响
 
 ## 涉及文件
-- styles/index.scss 与 components/zs-dialog/zs-dialog.vue、zs-select-dialog/zs-select-dialog.vue
+- styles/element-ui.scss 与 components/zs-dialog/zs-dialog.vue、zs-select-dialog/zs-select-dialog.vue
 - supervision/bank/superviseBank/components/WdmcDialog.vue 与 supervision/bank/superviseBank/detail.vue
 - supervision/bank/cbyh/components/WdmcDialog.vue
 - maintenance/bank/components/WdmcDialog.vue
@@ -24,8 +24,8 @@
 {
   "category": "技术模式",
   "name": "dialog_button_width_auto",
-  "source_extraction_id": "557c86357e9b4baca04357cc63d73f27",
-  "version": 1,
+  "source_extraction_id": "b7b0aa0fe086415bb2597677d3dc2469",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

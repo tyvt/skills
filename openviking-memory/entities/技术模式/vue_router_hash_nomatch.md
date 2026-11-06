@@ -12,7 +12,7 @@
 - 页面最终能进多为时机问题，无需特殊处理
 
 ## 验证与归属
-- 验证证据：会话 dab975d3，用户报 /to-C/xqgl/project 无匹配，区分 hash URL 形态与动态路由首次解析时机
+- 验证证据：会话 dab975d3，用户报 /to-C/xqgl/project 无匹配，区分 hash URL 形态与动态路由首次解析时机；另见验证文档 src=2-0/017.md
 - 涉及文件：zhi2-web-admin/src/router/index.js、zhi2-web-admin/src/store/modules/permission.js
 - 所属项目：2-0；来源会话ID：dab975d3-8f02-4099-9922-936f5a02194f；代码基线：none
 
@@ -20,8 +20,8 @@
 {
   "category": "技术模式",
   "name": "vue_router_hash_nomatch",
-  "source_extraction_id": "3f3584722eb94e54a6ca13a715f1e5bf",
-  "version": 1,
+  "source_extraction_id": "464ccee4c19e426fbb67c2365f53421a",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

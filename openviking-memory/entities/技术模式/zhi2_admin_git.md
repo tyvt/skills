@@ -17,12 +17,16 @@ zhi2-web-admin 是父仓库的子模块，拥有独立 git 仓库，改动须走
 - 另注：榆林子模块各 worktree 的 vite rootDir 同为父目录 D:/repository/榆林G，build 会写同一 dist 互相覆盖；需用 --outDir 隔离（详见园区物管2.0 部署约定）。
 - 榆林变更落 develop/v2.6.2-yulin 分支（非 develop/v3.0.0），父仓库无对应 262-yulin 分支，仅子模块推进。
 
+## 远程推进与清理
+- 远程 develop/v3.0.0 被并行任务推进（不可 fast-forward）时禁止强推：先在子模块把 fix 分支合并入 develop/v3.0.0 并推送（fix 文件与远程改动零交集则无冲突），再在父仓库合并远程 develop 并解决 gitlink 冲突指向新子模块头
+- worktree 清理安全：其内若含指向主仓库 node_modules 的 junction，须先 cmd /c rmdir 摘除 junction 本体再删 worktree，否则递归删除会穿透 junction 清空主仓库依赖
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zhi2_admin_git",
-  "source_extraction_id": "f79d689679644dadba4c25a84f0b231f",
-  "version": 4,
+  "source_extraction_id": "8afb15f87ad94b18abbb9aef77a3aa4d",
+  "version": 5,
   "memory_type": "entities"
 }
 -->

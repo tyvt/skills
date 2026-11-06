@@ -1,26 +1,28 @@
-# platformConfig 功能开关默认隐藏
-跨页面按钮展示可挂在 Vuex app.platformConfig，用严格等于 true 判定避免后端未下发时误开敏感操作。
 
-## 问题背景
-- 跨页面按钮（如「发布公告」）是否展示需统一控制在 Vuex app.platformConfig
-- 接口 /system/platformConfig/getInfo 对齐，初始对象声明 isShowPublishButton: undefined
+# platformConfig 发布公告按钮获取方式改造
+产品2.0 的 zhi2-web-admin 中 candidateCollect detail.vue 的 `isShowPublishButton` 获取方式从 Vuex platformConfig 改为新接口获取。
 
-## 解决方案
-- 页面用 mapState 取出后，v-if 最前面加 isShowPublishButton === true，再叠原有 bizState/msgId/征集类型/publishState 等业务条件
-- 严格等于 true 时未配置或 undefined/false 一律不显示，避免后端未下发时误开敏感操作
-- 若产品要求「未配置则沿用旧逻辑」，改为 isShowPublishButton !== false 并文档化
+## 原方案（已移除）
+- 早期通过 Vuex `app.platformConfig` 的 `isShowPublishButton === true` 控制按钮展示，文件涉及 store/modules/app.js 与 detail.vue
+- 原所属项目记录为园区物管2.0，来源会话 f61307bd-7d75-4fff-ad85-3385c42878ea
 
-## 验证与归属
-- 验证：会话 f61307bd，app.js 增 isShowPublishButton，candidateCollect detail 发布公告按钮仅在 === true 且原条件满足时显示
-- 涉及文件：zhi2-web-admin/src/store/modules/app.js、zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue
-- 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：f61307bd-7d75-4fff-ad85-3385c42878ea
+## 现方案（当前）
+- 已移除 `computed` 里 `mapState` 映射，改为组件本地 `data` 字段
+- 组件 `created()` 调用 `/autonomy/common/getCustomConfig`，从 `res.data.preparatoryGroup.isShowPublishButton` 赋值
+- 接口异常时默认 `false`，保证按钮不误显示
+- 关键位置：`detail.vue` 约 104-199 行，组件名 `OwnerCandidateCollectDetail`
+
+## 涉及文件与归属
+- 文件：`zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue`
+- 所属项目：产品2.0；来源会话：62402fac-2ae0-4b94-a392-c3ba8b3662d4；代码基线：none
+
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "platform_config_switch",
-  "source_extraction_id": "fbe34a26be854f6a8e62e198fe539062",
-  "version": 1,
+  "source_extraction_id": "da9bca3f195c4fd8a5e10c92635c7b91",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

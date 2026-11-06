@@ -9,6 +9,12 @@ uni-app 构建后 Vite 重新注入入口脚本且不带原 onload，导致生�
 - 在 App.vue onLaunch 开头调用 window.__hidePageLoading()（仅 window 存在时）
 - 不依赖构建保留 onload；隐藏时机改为应用启动而非仅 main.js 下载完
 
+## 原始加载实现
+- index.html 默认全屏显示"页面加载中"遮罩
+- 入口脚本 `onload` 调用 `window.__hidePageLoading()` 隐藏；`onerror` 调用 `window.__showPageLoadingError()` 显示"资源加载失败，请刷新重试"
+- 入口脚本代码示例：`<script type="module" src="/src/main.js" onload="window.__hidePageLoading && window.__hidePageLoading()" onerror="window.__showPageLoadingError && window.__showPageLoadingError()"></script>`
+- 可选方案：将隐藏动作挪到 main.js 的 `createApp().mount()` 完成后（仅等 main.js 下载完而非挂载完），未实施
+
 ## 验证与归属
 - 验证：会话 0c26f1bc/128b09bc 生产一直 loading，根因 Vite 注入覆盖 onload，移到 onLaunch（证据 012.md）
 - 涉及文件：index.html、src/App.vue
@@ -18,8 +24,8 @@ uni-app 构建后 Vite 重新注入入口脚本且不带原 onload，导致生�
 {
   "category": "技术模式",
   "name": "h5_index_onload",
-  "source_extraction_id": "5275a4e5dacb42f1bcfc39133d795b60",
-  "version": 1,
+  "source_extraction_id": "e275caefd6534543abec67c4bd8c49d9",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

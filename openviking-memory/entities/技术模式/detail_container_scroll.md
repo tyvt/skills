@@ -6,6 +6,7 @@
 - `detail-from-container` 设 `flex: 1`、`min-height: 0`、`overflow-y: auto` 承载滚动
 - `#app-main:has(> .detail-container)` 设 `overflow: hidden` 防双滚动条
 - `OperationBtnGroup` 移除 `position: sticky`，操作栏通过 `flex-shrink: 0` 固定避免冲突
+- 滚动条悬停样式从 `detail-container` 改为 `detail-from-container`，仅表单区域滚动
 
 ## 涉及文件
 - src/styles/index.scss、src/styles/detail-form.scss、src/styles/variables.css
@@ -22,8 +23,8 @@
 {
   "category": "技术模式",
   "name": "detail_container_scroll",
-  "source_extraction_id": "88ea79ae85784da2bf423cd701fea8a0",
-  "version": 1,
+  "source_extraction_id": "a713c3405a0b43ccbbf1e5e1e8b62543",
+  "version": 2,
   "memory_type": "entities"
 }
 -->
