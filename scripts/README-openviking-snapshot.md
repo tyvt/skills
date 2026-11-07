@@ -1,12 +1,23 @@
-# OpenViking 记忆 → skills 仓库快照
+# OpenViking 记忆 / data → skills 仓库快照
 
-运行时记忆在 `%USERPROFILE%\.openviking\data\viking\default\user\default\memories\`；
-本目录 `openviking-memory/` 仅为 **Git 备份快照**（复制同步，非符号链接）。
+| 脚本 | 目标目录 | 范围 |
+|------|----------|------|
+| `snapshot-openviking-memory.mjs` | `openviking-memory/` | 仅 `memories/`（历史扁平快照） |
+| `snapshot-openviking-data.mjs` | `openviking-data/` | `memories/` + `peers/*/memories/` + 根摘要（**不含 sessions/vectordb**） |
 
-## 手动同步
+运行时真源：`%USERPROFILE%\.openviking\data\viking\default\user\default\`。
+
+## 手动同步（建议两者都跑）
 
 ```powershell
 cd D:\repository\skills
+node .\scripts\snapshot-openviking-data.mjs --commit --push --reason manual
+node .\scripts\snapshot-openviking-memory.mjs --commit --push --reason manual
+```
+
+仅 memories 扁平快照：
+
+```powershell
 node .\scripts\snapshot-openviking-memory.mjs
 node .\scripts\snapshot-openviking-memory.mjs --commit --push --reason manual
 ```

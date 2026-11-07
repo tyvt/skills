@@ -1,0 +1,22 @@
+# Summary
+在 certificate 目录下，现有 28 个 Vue 文件，其中 20 个完成了迁移，8 个 index.vue 无需改动。在 detail.vue 中，operation-container 被替换为 operation-btn-group，添加了 moduleName:'presale'、businessName、primaryKey，移除了独立的 zs-attachment 和 zs-print。Cursor 会话 5a8c8d9e-bdb0-4660-b439-a10862f22116。
+# 2026-11-04 (星期三) ChatLog:
+**user**: 【记忆类型】fact
+【标题】certificate 下20个Vue文件改造完毕
+【内容】certificate 目录共 28 个 Vue 文件，其中 20 个完成迁移改造，8 个 index.vue 无需改动。detail.vue 将 operation-container 替换为 operation-btn-group，增加 moduleName: 'presale'、businessName、primaryKey，移除独立 zs-attachment 与 zs-print。
+【验证证据】extracted source=cursor session=5a8c8d9e-bdb0-4660-b439-a10862f22116
+【涉及文件】D:/repository/产品2.0/zhi2-web-admin/src/views/projectManagement/buildinginfo/detail.vue ; D:/repository/产品2.0/zhi2-web-admin/src/views/projectManagement/certificate/conLandLic/detail.vue ; D:/repository/产品2.0/zhi2-web-admin/src/views/projectManagement/certificate/conLandLic/index.vue ; D:/repository/产品2.0/zhi2-web-admin/src/components/OperationBtnGroup/index.vue ; D:/repository/产品2.0/zhi2-web-admin/src/views/projectManagement/certificate/conLandLic/components/BaseLandLicForm.vue ; D:/repository/产品2.0/zhi2-web-admin/src/views/projectManagement/certificate/conLandLic/components/SearchLand.vue ; D:/repository/产品2.0/zhi2-web-admin/src/views/projectManagement/certificate/conLandLic/components/LandTable.vue ; D:/repository/产品2.0/zhi2-web-admin/src/views/projectManagement/certificate/consLic/detail.vue
+【来源会话ID】5a8c8d9e-bdb0-4660-b439-a10862f22116
+【代码基线】none
+
+<!-- MEMORY_FIELDS
+{
+  "event_name": "certificate 目录 Vue 迁移",
+  "goal": "记录迁移完成",
+  "summary": "certificate 目录共 28 个 Vue 文件，20 个完成迁移，8 个 index.vue 无需改动；detail.vue 将 operation-container 换为 operation-btn-group，增加 moduleName/businessName/primaryKey，移除独立 zs-attachment 与 zs-print。Cursor 会话 5a8c8d9e-bdb0-4660-b439-a10862f22116。",
+  "ranges": "17-25",
+  "source_extraction_id": "c18dd04fdece418e8abcb823cca38cc0",
+  "version": 1,
+  "memory_type": "events"
+}
+-->
