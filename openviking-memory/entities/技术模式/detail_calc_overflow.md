@@ -12,6 +12,7 @@
 - 未包裹页整页内滚且操作栏吸顶
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/146.md
 - 涉及文件：company/institutionRegister/detail.vue、layout/components/AppMain.vue、styles/index.scss、layout/index.vue、components/OperationBtnGroup/index.vue、components/Headline/index.vue、styles/detail-form.scss、company/companyApplyAudit/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：b69480f5-9aad-43ab-ad88-b4f7ea730209；代码基线：none

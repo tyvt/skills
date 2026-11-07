@@ -9,6 +9,8 @@
 - 未传 `:index` 的列表行为不变
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/002.md
 - 涉及文件：src/views/company/shareholder/index.vue、src/mixins/listMixins.js、src/mixins/table.js、src/views/company/companyAdmin/index.vue、src/components/zs-table-column/zs-table-column.vue、src/components/zs-table/zs-table.vue、src/views/company/personnelCertificate/index.vue
 - 来源会话ID：e387fb5f-000b-40ca-88e6-acb880980ed7

@@ -11,6 +11,9 @@
 - 移除子包中的原始路径
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：454c97fd-ca5c-4c7f-a2dd-54da7553d258
 - 验证：会话 454c97fd 用户报告了子包之间的引用错误；NoticeList 已移动到主包且路径已统一
 - 涉及文件: src/pages/index/components/Home_Jiayuanqu.vue, src/pages.json, src/components/PageBg/PageBg.vue, src/components/NoticeList/NoticeList.vue, pages_tab/components/Home_Jiayuanqu.vue
 - 验证证据: src=苏住房C/052.md; 会话 ID: 454c97fd-ca5c-4c7f-a2dd-54da7553d258; 代码库: none

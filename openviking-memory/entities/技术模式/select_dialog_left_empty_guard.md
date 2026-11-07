@@ -15,6 +15,7 @@
 - 业务页（benefit/pubRegulatoryAccount 的 showBankDialog()）无需改动即生效
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：太仓区未授权银行时左空右点搜索仍调接口未带 workBankId 查全部；修复为左空不请求显提示，点搜索提示「请先选择银行」；业务页弹窗无需改
 - 涉及文件：zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue、views/maintenance/accountOpen/components/OpenDetailDialog.vue、property/components/BranchOneDialog.vue、system/workBank/components/pubRegulatoryBranchDialog.vue
 - 所属项目：苏住房G；来源会话：e54e19e2-5d01-4169-ace4-1cfb25836888；代码基线：acf0b7c

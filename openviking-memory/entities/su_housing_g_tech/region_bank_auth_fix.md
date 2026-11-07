@@ -8,6 +8,7 @@
 - 保存接口路径改为 `/streetBankPolicy/{subdistrictCode}`，首次不传 `rowVersion`，编辑带版本号，成功后用 `GET /streetBankPolicy/page` 刷新列表
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：请重新点「授权」验证下拉是否出现高新区已备案的银行
 - 涉及文件：`zhi2-web-admin/src/views/system/regionBankAuth/index.vue`、`zhi2-web-admin/src/views/system/regionBankAuth/components/StreetAuthDialog.vue`、`zhi2-web-admin/src/views/system/regionBankAuth/utils.js`
 - 所属项目：苏住房G；来源会话：dc798ac5-5460-4582-83cb-9f9c7bf0266f

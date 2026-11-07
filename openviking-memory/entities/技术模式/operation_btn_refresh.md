@@ -10,6 +10,7 @@
 - 为避免提交时 `getDetail` 被调用两次，已从 99 个 `operation-btn-group` 标签移除重复绑定
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`OperationBtnGroup/index.vue`、`supervision/agreement/jgxm/detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：30be24cb-105f-4bdc-aa08-3b0e6ab11f36；代码基线：none
 

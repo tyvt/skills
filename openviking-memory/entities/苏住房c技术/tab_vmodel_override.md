@@ -13,6 +13,7 @@
 - 修完按tab核对请求：推荐listRecommend、新房pageByKeyWord、二手房houseInfoDisplayList
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - Verification: session 6e707628 user reported SuZhaoFang tab switch no interface call; located Project_Suzhufang.vue line 67 had v-model; fixed by removing v-model, reload after $nextTick, remove manual clear
 - Verification evidence: src=苏住房C/063.md
 - Involved files: src/pages/index/components/Project_Suzhufang.vue, menu/ProjectTabBar.vue, src/pages/index/project.vue, src/components/ZsPaging/ZsPaging.vue, src/components/commonNew/tabLine.vue, src/hooks/usePaging.js, src/pages.json

@@ -12,6 +12,7 @@
 - 暴露 slotWidth 属性供页面显式指定插槽列宽度，type:'custom' 走估算档；不合适时优先给 slotWidth。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 fb464655 role/index.vue 状态列（el-switch 插槽）大片空白；修复后约 100px。
 - 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、zhi2-web-admin/src/views/system/role/index.vue。
 - 所属项目：产品2.0；来源会话：fb464655-d812-43a9-9ccc-c27ba5ef2e85；代码基线：76646e6。

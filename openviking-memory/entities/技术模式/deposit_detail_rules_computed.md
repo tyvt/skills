@@ -13,6 +13,10 @@
 - 来源会话：43075a31-52ec-4f80-8279-94db3e9b341c
 - 代码基线：none
 
+## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
+
 
 <!-- MEMORY_FIELDS
 {

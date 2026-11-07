@@ -14,6 +14,12 @@ The 苏州市房地产监测V3 project extracted the duplicated building-unit le
 - Files: supervision/deposit/refund/detail.vue, PaymentNoticeDialog.vue, ContractDialog.vue, BuildingDialog.vue, selectDialog.js, etc.
 - Project: 苏州市房地产监测V3; Session: 85cb61cc-a222-4e94-9f77-255ce248f02c; Codebase: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：85cb61cc-a222-4e94-9f77-255ce248f02c
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

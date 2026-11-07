@@ -19,6 +19,10 @@ zhi2-web-admin 的 save-auth-state.mjs 旧脚本因登录完成判定条件不�
 - 涉及文件：zhi2-web-admin/save-auth-state.mjs、zhi2-web-admin/e2e/.auth/zsbase.json
 - 所属项目：产品2.0；来源会话：441e5287-5448-4821-9c2e-13e82e944aa5
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -10,6 +10,8 @@
 - 将 `regionLabel` 应用于详情与编辑表单
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：ProjectDeliveryInfoPanel.vue、projectDeliveryConstants.js、ProjectDeliveryDetail.vue、index.vue、detail-template.vue、listMixins.js、detailMixins.js、ruoyi.js
 - 来源会话ID：189a9e5a-b1d3-44f4-a6ab-16d07c1529ef；代码基线：none
 

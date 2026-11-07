@@ -21,6 +21,8 @@
 - `src/views/institution/leasePersonnel/components/LeasePersonnelDetail.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：75a612f1-9c9e-4b32-8b51-9ebc77e6ee9f
 - 验证证据：source=cursor session=75a612f1-9c9e-4b32-8b51-9ebc77e6ee9f
 - 所属项目：苏州市房地产监测V3；代码基线：none
 

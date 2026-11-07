@@ -12,6 +12,7 @@ Web 后台侧栏收起后顶栏标题被裁切，根因是标题区宽度误用�
 - 通用原则：同一个 CSS 变量只表达一种布局语义，收起态变量不能被不随动收缩的区域引用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：2.6.1 固定 276px 无问题；2.6.2 改 var(--sidebar-width) 致标题裁切；修复为新增 --sidebar-expanded-width: 288px
 - 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue、zhi2-web-admin/src/styles/variables.scss
 - 所属项目：产品2.0

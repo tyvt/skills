@@ -15,6 +15,10 @@
 - 详情页：`AgencyPersonnelDetail.vue`、`LeasePersonnelDetail.vue`、`staffManagement/components/detail.vue`、`toB/.../detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话ID：9640b75a-83e0-424b-a33c-daef0e9e80bf；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

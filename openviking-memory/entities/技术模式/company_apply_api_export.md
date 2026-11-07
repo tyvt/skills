@@ -10,6 +10,8 @@
 - 保持 `getCompanyApplyOverview` 的逻辑，当没有 `companyRecordId` 时传入 `{}`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：8570c278-55c3-4b1f-94fe-2e52d9744baf
 - 验证证据: src=苏州市房地产监测V3/198.md
 - 所属项目: 苏州市房地产监测V3
 - 涉及文件: companyApply.js, RecordCertificateDialog.vue, institution/record/index.vue, companyApplyAudit/detail.vue, ReplacePersonnelDialog.vue, AgencyApplyDialog.vue, companyRecord.js, dist/assets/companyApply-DRQiD2E3.js

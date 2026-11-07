@@ -11,6 +11,8 @@ detail-container 使用 height:calc(100vh - 120px) 比实际可用高度（104px
 - 未包裹容器页整页内滚且操作栏吸顶
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/091.md
 - 涉及文件：company/institutionRegister/detail.vue、layout/components/AppMain.vue、styles/index.scss、layout/index.vue、OperationBtnGroup/index.vue、Headline/index.vue、styles/detail-form.scss、company/companyApplyAudit/detail.vue
 - 来源会话：b69480f5-9aad-43ab-ad88-b4f7ea730209；代码基线：none

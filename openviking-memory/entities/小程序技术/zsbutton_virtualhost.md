@@ -15,6 +15,7 @@
 - 验证顺序：先看房屋卡片按钮恢复，再开弹窗看双钮等宽；同源项目(泰兴/G)出现mini按钮变整行宽优先grep virtualHost
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话d365c947用户连续4轮反馈弹窗双钮不等宽，最终去掉virtualHost仅底栏加样式修复
 - 涉及文件：ZsButton.vue、ZsPopup.vue、authorization.vue、TypeChoose_Suzhufang.vue
 - 所属项目：苏住房C；来源会话ID：d365c947-62dc-48ad-abbf-b9814a607332；代码基线：48bdb17

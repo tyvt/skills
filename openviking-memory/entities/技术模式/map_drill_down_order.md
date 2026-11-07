@@ -11,6 +11,7 @@
 - 街道下钻改为：等接口返回后取列表中第一条有有效经纬度的物业点，先移图（缩放 SEARCH_SINGLE=16）再更新标记；全部无经纬度则只更新标记不移视野
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：未改 WUXI_SVG_GROUP_REGIONS 导致地图高亮错位已明确；街道点击白屏改为等 selectOptionalComplexList 返回后取第一条有经纬度数据、先移图再更新标记
 - 涉及文件：src/views/benefit/mapOverview/index.vue、src/views/benefit/statisticsMap/index.vue、src/views/benefit/statisticsMap/components/map.vue
 - 所属项目：园区物管2.0；代码基线：3353ef164 / 3965548b6；来源会话：b97ec724-eb8f-408e-a609-9f918b7b1d71、b290ab4f-dc47-412c-b6bb-780421a0a4ae

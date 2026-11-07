@@ -13,6 +13,7 @@
 - `src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/components/BuildRecordTable.vue`（10-10行）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：ee495a83-a53a-4f2d-b96d-432bae5f93c9；代码基线：none
 
 <!-- MEMORY_FIELDS

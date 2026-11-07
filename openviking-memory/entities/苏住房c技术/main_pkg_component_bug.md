@@ -13,6 +13,7 @@
 - 复测同时看磁盘与上传预估(source size)两个数，本次 1741.3KB / 2037.3KB 通过。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 e2f45719（基线 f1939b0）构建失败输出 MAIN 2058.1KB 超 2048KB，迁组件+补 placeholder 后达标。
 - 涉及文件：scripts/size-main-package.mjs、prune-main-static.mjs、src/utils/mainStaticPaths.js、src/pages_transaction/components/conditionScreening/、src/pages.json。
 - 所属项目：苏住房C；来源会话ID：e2f45719-4e81-4713-9b87-20e91abcd5a1；代码基线：f1939b0。

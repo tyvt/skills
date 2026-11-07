@@ -11,6 +11,8 @@
 - 修复 getProportion 的 NaN 问题
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：cursor session=854b6afa-4257-43db-a5bb-19723cfbdf12
 - 涉及文件：views/projectManagement/customerProject/detail.vue、views/projectManagement/customerProject/changeDetail.vue、views/projectManagement/customerProject/utils/projectExtend.js、mixins/detailMixins.js、mixins/form.js、api/lpgl/projectinfo.js、views/company/companyRegister/detail.vue、utils/apiV3Normalize.js、views/building/project/detail.vue
 - 来源会话ID：854b6afa-4257-43db-a5bb-19723cfbdf12

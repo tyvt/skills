@@ -13,6 +13,7 @@
 - 通用判据：enrich/合并式取数写成「只在目标字段为空时回填」，不能无条件展开覆盖
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话84a82111与6fda2373（2026-08-27，基线f1939b0）两次收敛同一问题
 - 涉及文件：decision/common/DecisionResult.vue、elect/DecisionResult.vue、CardList.vue
 - 所属项目：苏住房C；来源会话ID：84a82111-c481-4df3-bfc7-e5397b1d1fed, 6fda2373-f0d5-4e0d-87d7-0f8c4b8cbc61；代码基线：f1939b0

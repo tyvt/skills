@@ -13,6 +13,7 @@
 - 「查看说明」`padding-left` 调整为 `48rpx` 与选项文字左对齐
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 刷新页面后选项呈现为图2：卡片内有留白，选中项圆角浅蓝背景不贴边
 - 涉及文件：`optional/StepChoose.vue`、`pages_vote/decision/common/StepChoose.vue`
 - 所属项目：苏住房C；来源会话ID：7596f0ef-5187-468b-8b37-d30dd7fc905d；代码基线：none

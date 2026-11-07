@@ -9,6 +9,7 @@
 - columns 增加 { label: '组织名称', prop: 'committeeName', minWidth: 200 }，置于「组织类型」之后
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/autonomy/userAuth/index.vue
 - 所属项目：园区物管2.0
 - 来源会话：a64c833f-c485-4bfe-899a-5d177a83f9f3

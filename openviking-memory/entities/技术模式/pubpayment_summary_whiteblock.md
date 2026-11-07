@@ -15,6 +15,12 @@ zhi2-web-admin 项目中 pubPaymentNotice 和 pubManualBookkeeping 的 UI 异常
 - 涉及文件: pubPaymentNotice/index.vue, pubManualBookkeeping/index.vue, pubPaymentNotice/detail.vue, pubManualBookkeeping/detail.vue, bookDetailTable.vue, mixins/table.js, pubParkingRate/index.vue, detail-template.vue.
 - 源会话: 5ec6511f-7bd3-4005-a984-83b775525513; 基线: none.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：5ec6511f-7bd3-4005-a984-83b775525513
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

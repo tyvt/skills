@@ -10,6 +10,7 @@
 - 根路径无需 /sys/fdc 后缀
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/005.md
 - 涉及文件：zhi2-web-admin/e2e/register/company-register.spec.js、zhi2-web-admin/playwright.config.js、zhi2-web-admin/package.json、zhi2-web-admin/e2e/fixtures/env-loader.js、zhi2-web-admin/e2e/fixtures/register-helpers.js、zhi2-web-admin/e2e/fixtures/auth-helpers.js、zhi2-web-admin/e2e/fixtures/company-register-admin-helpers.js、zhi2-web-admin/e2e/scripts/merge-company-register-video.mjs
 - 所属项目：苏州市房地产监测V3；来源会话：bbf4455e-d301-4701-a090-882f15126648；代码基线：none

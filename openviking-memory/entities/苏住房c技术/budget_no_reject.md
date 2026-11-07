@@ -14,6 +14,7 @@
 - 加载后若当前年份无数据（如2026）自动回退到接口返回最新有数据年份（如2025）
 - 排查顺序：先打日志确认拦截器返回层级，再怀疑渲染
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话ad82d807：预算页「暂无相关数据」，根因为resolveBudgetResponse期望response.data.data而接口未传noReject
 - 涉及文件：src/pages_benefit/budget/index.vue、src/api/benefit.js、src/api/index.js
 - 所属项目：苏住房C；来源会话ID：ad82d807-c9eb-4693-a967-eec366f6e641；代码基线：3ab0cff

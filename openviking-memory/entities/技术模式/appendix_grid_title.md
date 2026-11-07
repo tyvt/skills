@@ -10,6 +10,7 @@ AppendixRequirementCard.vue 同排要件标题高度不齐，固定标题行 40p
 - operable && cardOperable 时常驻 .requirement-header-actions（min-width: 72px）占位，仅未达上限显「文件上传」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/181.md
 - 涉及文件：AppendixRequirementCard.vue、AppendixRequirementGrid.vue、AppendixPackageSection/index.vue、Headline/index.vue、companyRecord/detail.vue、DeveloperBasicInfoForm.vue、QualificationFormSection.vue、index.scss
 - 所属项目：苏州市房地产监测V3；来源会话：18659b1e-74a9-4c54-8baf-badd2b1f687e；代码基线：none

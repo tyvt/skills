@@ -21,6 +21,12 @@ Bug 在 `zs-select-dialog-func.vue` 中：点击确认时，`setData` 之后跟�
 - 验证证据: src=苏州市房地产监测V3/028.md
 - 会话: b1936cf8-2758-4591-92a8-a76aef6e1db5
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b1936cf8-2758-4591-92a8-a76aef6e1db5
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

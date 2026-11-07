@@ -12,6 +12,7 @@
 - 改后下拉若为空先确认系统字典配置的是biz_state而非BIZ_STATE；运维可把BIZ_STATE文案与biz_state对齐
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：选「已备案」→请求bizStatus/bizState应为2，列表为已备案记录
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/index.vue
 - 所属项目：苏住房G；来源会话：7fa26724-2d29-4dbe-accb-87098bace420；代码基线：315702f

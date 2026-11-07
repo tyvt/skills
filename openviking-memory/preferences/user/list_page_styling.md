@@ -3,6 +3,12 @@
 - Applied across community, subdistrict, house/ProjectDetail, company/info, project/info, project/jurisdiction, subdistrict/jurisdiction pages
 - Source session: af66ed37-017b-4e3f-95ee-12512b07c08f; baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：af66ed37-017b-4e3f-95ee-12512b07c08f
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

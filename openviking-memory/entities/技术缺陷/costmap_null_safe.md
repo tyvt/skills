@@ -8,6 +8,7 @@
 - 用const sumFromApi = response.costMap?.sum；sumFromApi不为null时用{...defaultSum, ...sumFromApi}合并缺字段为0，否则用默认小计对象，与模板||0一致。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：zhi2-web-admin/src/views/maintenance/accountOpen/owner/index.vue
 - 所属项目：园区物管2.0（项目2-0）
 - 来源会话：43c3714d-1845-47df-a896-b1f6b3f03897

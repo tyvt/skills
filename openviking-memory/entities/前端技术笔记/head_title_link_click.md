@@ -17,6 +17,9 @@
 - 涉及文件：zhi2-web-admin/src/components/HeadTitle/index.vue、propertyBid/detail.vue
 - 所属项目：2-0；来源会话：ae811080-a0ec-4d52-b603-a6fb72f9ca69；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
+
 
 <!-- MEMORY_FIELDS
 {

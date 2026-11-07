@@ -9,6 +9,7 @@
 - 更新 import 至 `parking-space-total.png`、`parking-space-property.png`、`parking-space-public.png`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue、zhi2-web-admin/src/views/benefit/statisticsMap/operatingAssets.vue、zhi2-web-admin/package.json
 - 所属项目：园区物管2.0；来源会话：0599d819-a6e3-4454-9b2f-cd11e82c7dc5；代码基线：none
 

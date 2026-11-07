@@ -11,6 +11,7 @@
 - 若需与接口一致，恢复接口 `ratio` 或对为 0 项不参与 series 计算
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue
 - 所属项目：园区物管2.0；代码基线：none
 - 来源会话：e98b3c2b-020e-45a5-bbab-7177966aefbc

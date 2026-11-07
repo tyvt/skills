@@ -13,6 +13,12 @@
 - 涉及：pages_main/about/AboutUs.vue, ZsImage.vue, pages.json, pages/about/AboutUs.vue, utils/index.js。
 - 验证证据: src=苏住房C/030.md; 会话 e7e357b4-638f-4ace-8ca0-7fa9ff707a43; base none.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：e7e357b4-638f-4ace-8ca0-7fa9ff707a43
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "Tecnologia SuzhouC",

@@ -10,6 +10,7 @@
 - 自定义后缀应改用 `accept-types` 属性
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/330.md
 - 涉及文件：d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/ImageUpload/index.vue、d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：9449756e-c27f-4b6f-8d25-58ca3b632943；代码基线：none

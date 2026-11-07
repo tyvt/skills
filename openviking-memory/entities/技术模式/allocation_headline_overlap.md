@@ -10,6 +10,7 @@
 - 仅依赖表格内置标题，避免双层标题冗余
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/109.md
 - 涉及文件：allocation/detail.vue、TransactionDetailTable.vue、unblock/notice/detail.vue、deposit/notice/detail.vue、deposit/refund/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：e0321177-40d5-4630-9630-017d718101c0；代码基线：none

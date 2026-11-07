@@ -14,6 +14,7 @@
 - 楼幢批量删除按钮定位（与行内「删除」区分）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 如需 5 条用例全绿，需测试环境配好天印
 - 涉及文件：entrust-sale-helpers.js、entrust-sale-real-api-flow.spec.js、index.scss、detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：37f3b795-445f-4b9e-932e-974e07145a79

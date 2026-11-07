@@ -11,6 +11,7 @@
 - 排查字典展示为码值时：先核对「表单字段实际存什么」再选字典或接口列表，不能假设列表主键就是下拉value
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话3ef9c696中OpenDetailDialog initDict改为ACCOUNT_TYPE后查看与编辑弹窗均显示字典文案
 - 涉及文件：zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/OpenDetailDialog.vue
 - 所属项目：园区公共收益；来源会话：3ef9c696-10c0-4826-b1f5-80042dfc681b

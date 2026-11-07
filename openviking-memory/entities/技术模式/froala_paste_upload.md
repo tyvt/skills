@@ -16,6 +16,10 @@
 - 单张超 10MB 提示「图片大小不能超过 10MB」
 - 所属项目：园区V0；来源会话ID：5e09b260-67d2-4210-bc34-31daca30276b；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区V0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

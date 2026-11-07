@@ -19,6 +19,12 @@
 ## 验证
 - 验证证据: src=苏州市房地产监测V3-leftover/058.md; 会话: 50257d35-25d2-4753-bbb1-55a3c981474e
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：50257d35-25d2-4753-bbb1-55a3c981474e
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

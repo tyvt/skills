@@ -12,6 +12,7 @@
 - 改为可见字段 projectType 统一校验并通过自测表验证三条场景
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/property/complex/components/projectTypeRules.js、property/complex/detail.vue、property/complexChange/detail.vue
 - 所属项目：园区公共收益；来源会话：76645e4d-9f4d-4dff-9aa8-1c457e2f7af1；代码基线：0abcb96
 

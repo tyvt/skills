@@ -10,6 +10,8 @@
 - 自动携带部署前缀
 
 ## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：23bed992-7395-4a7a-9fa6-d6b2cbf58e24
 - 涉及文件：components/ZsPrint/index.vue、utils/resolveServerAssetUrl.js、api/system.js
 

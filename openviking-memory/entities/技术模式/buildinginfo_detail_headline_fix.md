@@ -10,6 +10,7 @@
 - 按钮改用 Vue 2 `slot="right"` 写法与 `collapse-header-actions` 类，避免套用 `operation-button-container` 样式
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新后「新增」「删除」与「楼幢信息」标题同行垂直居中，表格与标题栏间距 16px
 - 涉及文件：buildinginfo/detail.vue、Headline/index.vue、AppendixPackageSection/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：55183d55-3907-40ff-8f33-f2afa3023b7a

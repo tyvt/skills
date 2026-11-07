@@ -20,6 +20,7 @@
 - zhi2-web-admin/src/store/modules/app.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：cursor 会话提取；所属项目：门户；来源会话：b25bdc8a-c0a8-4fca-bcff-d85e7e292acd
 
 

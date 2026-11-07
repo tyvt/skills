@@ -13,6 +13,11 @@
 - 涉及文件: supervision/progress/change/detail.vue, supervision/progress/node/detail.vue, mixins/detailMixins.js, supervision/progress/change/index.vue, mixins/form.js
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: 877ff504-7267-4d24-9ee5-644aa1f9adbb; 代码库: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：877ff504-7267-4d24-9ee5-644aa1f9adbb
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "padrao_tecnico",

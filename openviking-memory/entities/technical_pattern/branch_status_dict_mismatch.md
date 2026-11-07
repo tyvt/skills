@@ -14,6 +14,12 @@ Branch_record_state dictionary conflicted with bizState interface code causing m
 - Source session: db358c02-d2dc-45a3-b641-20f260d73f4b
 - Files: AgencyPersonnelList.vue, personnelStatus.js, AgencyBranchList.vue, branchStatus.js, AgencyPersonnelDetail.vue, StatusAdjustDialog.vue, InfoCardDialog.vue, zs-table-column.vue
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：db358c02-d2dc-45a3-b641-20f260d73f4b
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

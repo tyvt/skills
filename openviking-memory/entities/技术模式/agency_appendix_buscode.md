@@ -6,6 +6,7 @@
 - `licenseAppendixBusId` 固定为 `String(companyRecordId)`，不在变更审核中切换 busId
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/158.md
 - 涉及文件：api/company/companyRecord.js、company/companyManagement/components/AgencyBasicInfoDetail.vue、e2e/company/register-basic-info-appendix.spec.js、e2e/fixtures/appendix-package-helpers.js、toB/agencyRecord/detail.vue、company/companyRecordAgency/detail.vue、zljg/companyRecord/detail.vue、company/companyManagement/components/DeveloperBasicInfoDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：ecd8f5a4-0f8d-4a9a-961f-96307805176b；代码基线：none

@@ -9,6 +9,7 @@
 - `StatCardsRow` 外包一层设 `margin-top: 12px`、`margin-bottom: 12px`；取消与相邻区块重复的 12px 外边距，避免双倍间距。属页面级组合间距，不必改公共 DetailTemplate 默认值。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证会话：040b39a1（pubHouse/detail 统计区间距未修好，改为 0/12/12 组合）
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubHouse/detail.vue、zhi2-web-admin/src/components/StatCardsRow/index.vue、zhi2-web-admin/src/components/Headline/index.vue
 - 所属项目：园区公共收益；代码基线：36a9a7e；来源会话：040b39a1-51bf-45f6-949b-bde0a5463b5a

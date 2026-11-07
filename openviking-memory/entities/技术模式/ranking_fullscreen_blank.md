@@ -11,6 +11,7 @@
 - index.vue 为排名卡片增加 ranking-card 样式，content-box 加 min-height:0 保证 grid 子项高度向下传递。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证：刷新页面并切换全屏验证效果。
 - 涉及文件：rankingList.vue、baseCard.vue、index.vue（路径 d:\repository\淮安物管\zhi2-web-admin\src\views\...）。
 - 所属项目：淮安物管；来源会话：fe8e0d01-94c7-4681-a866-26e1177ed9e4；代码基线：none。

@@ -11,6 +11,7 @@
 ## 同源适用
 - 泰兴小程序/苏住房G若接苏服办网关，上传一律按此契约，不退base64
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话ID：0b56ec32-ad5b-4d9a-918c-7580d24e744d；代码基线：e04432d
 - 涉及文件：src/api/gateway.js、httpInstance.js、file.js、src/pages_owner/repair/add.vue
 

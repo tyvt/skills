@@ -10,6 +10,7 @@
 - 更新 redirect/index.vue 保证中转页也能解析同类链接
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：点击轮播图应跳 /pages_main/news/detail?id=1989870396182228994
 - 涉及文件：menuNav.js、redirect/index.vue、utils/index.js、Home_Suzhufang.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：5e3bf5c4-bf75-4a82-9a83-96098fe31155；代码基线：none

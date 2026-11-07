@@ -15,6 +15,11 @@ TagsView/index.vue 中子组件使用 Vue2 异步写法，在 Vue3 下被当作�
 - 涉及文件：TagsView/index.vue。
 - 来源会话：78c42ac6-3d01-4efb-aa4f-c62740fb9e52；代码基线：none。
 
+## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

@@ -4,6 +4,11 @@
 - 涉及文件：`AgencyPersonnelDetail.vue`、`WorkCardDialog.vue`、`InfoCardDialog.vue`、`AgencyPersonnelList.vue`、`QrCodeDialog.vue`、`qrCode.vue`、`agency-personnel-real-api-flow.spec.js`、`CashsaleDetail.vue`、`CashsaleInfoPanel.vue`、`RecordCertificateDialog.vue`。
 - 验证证据: src=苏州市房地产监测V3-leftover/038.md; 会话: 3bb79189-7e5a-4f02-909b-f9bdf9a2ecb3; 另 src=苏州市房地产监测V3-rest/113.md; 会话: 271fe773-92e0-4ead-a113-8889fcea1743; 所属项目: 苏州市房地产监测V3.
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：3bb79189-7e5a-4f02-909b-f9bdf9a2ecb3
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

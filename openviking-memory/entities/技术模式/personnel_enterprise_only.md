@@ -20,6 +20,9 @@
 - e2e/company/personnel-record.spec.js, e2e/.env.e2e, e2e/fixtures/auth-helpers.js, e2e/company/company-record-change.spec.js, src/views/company/staffManagement/personnelRecord/detail.vue
 - 来源会话：81bf4b53-55e2-427c-8ca3-f981d35d881b；所属项目：产品2.0
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

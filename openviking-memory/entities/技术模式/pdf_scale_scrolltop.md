@@ -10,6 +10,7 @@ i淮安H5 多页 PDF 缩放因未计入 scrollTop 以文档顶部为基准导致
 - 缩放过程中锁定页面滚动，还原时滚回原位置
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安H5
 - 验证：src=i淮安H5/001.md
 - 验证步骤：滑到盖章页双指放大应稳定停在该页对应区域
 - 涉及文件：src/pages/index/propertyMenuConfig.js、src/pages_owner/company/info/contracts.vue、src/pages_owner/company/info/index.vue、src/components/FileList/Type2.vue、src/utils/index.js、src/api/common.js、src/components/FileList/FileList.vue、src/env/mp.js

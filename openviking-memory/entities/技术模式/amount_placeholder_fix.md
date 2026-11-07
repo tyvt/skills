@@ -11,6 +11,7 @@
 - 宗地 `ParcelDialog.vue` 等文件已修复
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：6b280839-f450-444e-b4d9-5cb55916b900；代码基线：none
 
 <!-- MEMORY_FIELDS

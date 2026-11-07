@@ -10,6 +10,7 @@
 - 设置 `line-height: 1.4`、`white-space: normal` 支持多行完整显示
 - `ChangePasswordDialog/index.vue` 做相同处理，避免导航栏「修改密码」入口出现同样问题
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/home/ResetPwdDialog.vue、ChangePasswordDialog/index.vue、public/assets/css/element-ui.css、components/zs-dialog/zs-dialog.vue、login.vue
 - 所属项目：园区公共收益；来源会话：1f25b0e2-be1a-4b0d-8237-80f1b1801e20；代码基线：none
 

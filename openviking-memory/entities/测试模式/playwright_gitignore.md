@@ -7,6 +7,8 @@ Playwright 测试产物不应纳入版本控制，误提交会污染仓库。
 - 于 zhi2-web-admin/.gitignore 追加上述忽略规则
 - 清理已误跟踪文件，保留磁盘文件
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/066.md
 - 涉及文件：zhi2-web-admin/package.json、zhi2-web-admin/playwright.config.js
 - 来源会话：41415a1f-2941-4133-85d2-60741ce0ac5c；代码基线：none

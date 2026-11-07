@@ -10,6 +10,7 @@
 - 若后续出现更长金额（如百万级），可将 `72px` 适当调大
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；来源会话：2aa6472f-742a-4bc7-bb9f-76eedbe8d7a9
 

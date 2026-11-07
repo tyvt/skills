@@ -12,6 +12,7 @@
 - `property/bankDetailDay/index.vue` 外层包裹及成功提示文案
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：`BankReconciliation.vue`、`property/bankDetailDay/index.vue`、`property/bankDetailDay/components/ReconciliationBusinessTable.vue`、`benefit/pubBankDetailDay/index.vue`
 - 所属项目：产品2.0；来源会话：f1a206e1-be4e-4eb5-a9b0-578ecda15418；代码基线：none
 

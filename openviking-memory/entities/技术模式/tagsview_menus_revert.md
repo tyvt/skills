@@ -8,6 +8,8 @@ Vue3 迁移中，撤回 TagsView 强算 childrenMenus 的改动并诊断 complex
 - 代码中“变更”相关跳转使用 `getRouterPathByFilePath('property/complexChange/detail')`，说明真正注册路由的 path 更可能是 `/property/complexChange/...` 而非 `/property/property/complexChange/...`。
 - 很可能是后端返回的菜单 path 与实际注册 path 不一致导致空白。
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 b3c5e61d（cursor session=b3c5e61d-0c1b-42d7-b8c6-0e42c8a88242）。
 - 涉及文件：TagsView/index.vue；来源会话ID：b3c5e61d-0c1b-42d7-b8c6-0e42c8a88242；代码基线：none。
 

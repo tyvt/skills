@@ -10,6 +10,8 @@
 - 报事待办跳转至 `/pages_facility/issue/index?orderType=1&backlog=1`，报修待办跳转至 `/pages_facility/issue/index?orderType=2&backlog=1`。
 
 ## 验证与归属
+- 所属项目：物业手持B端
+- 验证证据：extracted source=cursor project=物业手持B端
 - 验证证据：src=cursor session=d6765f9e-f18c-4d82-bd7a-2e28452fae2d
 - 涉及文件：src/pages/home/index.vue、src/api/home.js、src/pages/complex-select/index.vue、src/pages/workbench/index.vue、src/pages_facility/issue/index.vue、src/store/user.js、src/api/index.js、src/api/property.js
 - 来源会话ID：d6765f9e-f18c-4d82-bd7a-2e28452fae2d

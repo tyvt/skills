@@ -11,6 +11,7 @@
 - 样式块转为 scoped lang="scss"
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：园区物管2.0/058.md
 - 涉及文件：zhi2-web-admin/src/views/property/complex/detail.vue、complexChange/detail.vue
 - 所属项目：园区物管2.0；来源会话：0133feff-e930-40ca-a2a9-5764a587a20a

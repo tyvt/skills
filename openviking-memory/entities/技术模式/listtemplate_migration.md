@@ -8,6 +8,8 @@ Vue2 向 Vue3 迁移时，用批量脚本将 ListTemplate.js mixin 替换为内�
 - 共处理 221 个 Vue 文件。
 - 两个 .js 组件改为 .vue：`views/institution/company/admin.js`→`admin.vue`、`views/transaction/commercialProject/hot.js`→`hot.vue`，删除原 .js，路由解析到 .vue。
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 2da8b222（cursor session=2da8b222-7992-4e21-8ded-97f901ab42bc）。
 - 涉及文件：scripts/replace-list-template.mjs、admin.vue、hot.vue；来源会话ID：2da8b222-7992-4e21-8ded-97f901ab42bc；代码基线：none。
 

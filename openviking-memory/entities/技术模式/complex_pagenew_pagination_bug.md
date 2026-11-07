@@ -14,6 +14,12 @@ In 苏住房G, multiple list requests mistakenly used POST /property/complex/pag
 - Files: publicQuery/complex/detail.vue, building/complexSearch/detail.vue, publicQuery/complex/index.vue, property/complex/index.vue, mixins/listMixins.js, mixins/table.js, utils/request.js, api/index.js
 - Project: 苏住房G; Source session: 8bdf9717-be50-4471-8d56-923d2b2d1c5a; Code baseline: none
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：8bdf9717-be50-4471-8d56-923d2b2d1c5a
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

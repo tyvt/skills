@@ -12,6 +12,7 @@
 - 适用面：任何「标题栏/工具栏右侧放承载长文本的下拉」都按弹性宽度+tooltip+内层撑满写，不给死宽度。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 33479cb9（基线 a700def）切换检查表名称截断，改后 linter 无报错但构建因环境内存中断未做产物级验证，需人工多档考评切换确认。
 - 涉及文件：zhi2-web-admin/src/views/credit/assessment/components/minusScorePercentage.vue、analysisReport.vue、averageScoreAnalysis.vue。
 - 所属项目：苏住房G；来源会话ID：33479cb9-240b-4448-8a64-d699334a5f9c；代码基线：a700def

@@ -17,6 +17,7 @@
 - 测试：tests/*.spec.ts
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=家园区一网通办
 - 所属项目：家园区一网通办
 - 来源会话：e801dbc3-fe45-4c53-9f67-0eb8418cef3c
 

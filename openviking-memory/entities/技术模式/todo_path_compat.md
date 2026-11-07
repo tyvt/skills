@@ -15,6 +15,8 @@
 - src/views/home/components/TodoTable.vue、src/components/OperationBtnGroup/index.vue
 
 ## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：src=园区公共收益/015.md
 - 来源会话ID：83f986d1-0f52-47df-92db-9fd124710132；代码基线：none
 

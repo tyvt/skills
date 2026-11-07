@@ -11,6 +11,7 @@
 - 由表格外层统一画一条底边，去掉末行单元格底边避免重复
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：index.scss、maintenance/accountQuery/type.vue、components/zs-select-dialog/zs-select-dialog.vue、components/zs-table/zs-table.vue
 - 所属项目：园区物管2.0；来源会话：1eca0e2f-d760-4bdb-bbc2-11cb409dd899；代码基线：none
 

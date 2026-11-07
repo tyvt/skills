@@ -15,6 +15,7 @@
 - 抽 handleParticipate 并按 partIn 状态守卫；底部按钮容器补 z-index 避免被遮挡假象
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 9677076a（2026-08-26，基线 b7bf813）utils/index.js 保留 resolveRelativePageUrl 并给 openPage 加 fail 回调，detail.vue 改绝对路径+partIn判断+z-index:10
 - 涉及文件：src/utils/index.js、src/pages_vote/elect/detail.vue、src/pages_owner/elect/detail.vue、src/pages.json
 - 所属项目：苏住房C；来源会话ID：9677076a-944b-42fd-9eba-67e8f0aa54d4；代码基线：b7bf813

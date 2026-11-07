@@ -14,6 +14,7 @@
 - 发布按钮权限改为动态：${moduleN...（原文截断，保留动态权限意图）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：问题已修复，会话 99b102a3 给出修改内容
 - 涉及文件：pubElevMaintenanceNew/index.vue、components/expendTable.vue、pubElevMaintenance/detail.vue 等
 - 所属项目：园区物管2.0；来源会话：99b102a3-dcff-4e89-a5a6-982a16f73b88；代码基线：none

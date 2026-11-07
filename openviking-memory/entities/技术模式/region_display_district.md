@@ -11,6 +11,7 @@
 - DeveloperBasicInfoForm 默认按编码解析区级，customerProject/detail.vue 的 regionName 仅存级联末级区名
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/035.md
 - 涉及文件：company/companyAdmin/index.vue、mixins/listMixins.js、mixins/table.js、mixins/tableComponents.js、main.js、formatters/index.js、utils/listTableRowAugment.js、presale/leaseContract/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：9cf41a6c-807b-46e2-b193-053a000a8ce2；代码基线：none

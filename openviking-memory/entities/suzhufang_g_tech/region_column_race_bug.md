@@ -15,6 +15,12 @@ In regionBankAuth page, switching city/district/street levels shows wrong column
 - Files: zhi2-web-admin/src/views/system/regionBankAuth/index.vue, detail.vue, utils.js, zhi2-web-admin/src/mixins/listMixins.js, zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/index.vue
 - Project: 苏住房G; Source session: ecdea30a-99b2-441c-917e-7cbad52000ed; Code baseline: none
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：ecdea30a-99b2-441c-917e-7cbad52000ed
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "suzhufang_g_tech",

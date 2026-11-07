@@ -14,6 +14,10 @@
 - `menuRouteMap.js` 仍有若干路径用旧 `/pages/` 前缀（如 `home/search`、`message/index`、`collect/index`），可同样改为 `pages_main`
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：395868ae-5e71-4d74-afd9-9f02b478b2f1
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

@@ -11,6 +11,12 @@
 - Files: d:\repository\苏住房C\zhi2-mobile-shimin\package.json ; d:\repository\苏住房C\package.json ; d:\repository\苏住房C\zhi2-mobile-shimin\vite.config.ts ; d:\repository\苏住房C\node_modules\@dcloudio\vite-plugin-uni\dist\cli\index.js ; package.json ; vite.config.ts
 - Source session: 3541fbbe-c057-47a6-9bce-5cea5500bd20; baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：3541fbbe-c057-47a6-9bce-5cea5500bd20
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c",

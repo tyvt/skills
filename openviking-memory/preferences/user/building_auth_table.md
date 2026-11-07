@@ -3,6 +3,12 @@
 - Fixed height of 8 rows (tableTrCount) with 48px row height; only keep the transfer-layout styles.
 - Source session: 2f2222a6-6625-4a0d-b9a5-d2cce60498f7.
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：2f2222a6-6625-4a0d-b9a5-d2cce60498f7
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

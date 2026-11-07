@@ -10,6 +10,8 @@
 - 或补充路由配置 title
 
 ## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：020b4402-aa87-4f14-bc0e-617da146dbe4
 - 涉及文件：system/operlog/index.vue、utils/request.js、utils/pageRequestContext.js、utils/index.js、router/index.js、store/modules/permission.js、mixins/form.js、mixins/listMixins.js
 

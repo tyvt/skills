@@ -10,6 +10,11 @@
 【来源会话ID】deee3f49-3c02-4d81-a251-d57518e4e866
 【代码基线】none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "修复 list-card 表格中的空白",

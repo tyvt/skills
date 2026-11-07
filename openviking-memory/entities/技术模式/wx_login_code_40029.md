@@ -10,6 +10,7 @@ i淮安H5 在 verifyUser 页面预缓存 `wx.login` 的 `js_code`，用户授权
 - 在点击授权后、调用接口前实时执行 `getWechatLoginCode()` 获取新 code
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安H5
 - 验证证据：src=cursor session=00e8365d-4895-43a2-b717-a01fd5aa463d
 - 涉及文件：d:/repository/i淮安H5/src/pages/verifyUser/index.vue、d:/repository/i淮安H5/src/api/security.js、d:/repository/i淮安H5/src/api/index.js
 - 所属项目：i淮安H5；来源会话：00e8365d-4895-43a2-b717-a01fd5aa463d；代码基线：none

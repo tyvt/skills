@@ -15,6 +15,11 @@
 - 涉及文件: ownerDecision/detail.vue, mixins/detailMixins.js, optionDecision/detail.vue, optionDecision/index.vue, sortDecison/detail.vue, OperationContainer/index.vue, ownerDecision/index.vue, generalDecision/detail.vue
 - 所属项目: 太仓G; 代码库: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
+- 来源会话：3c3a27ee-5748-4f83-bd05-d3e2e69d6434
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

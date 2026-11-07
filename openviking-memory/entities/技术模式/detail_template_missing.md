@@ -19,6 +19,7 @@
 - 组件目录：src/components/detail-template/detail-template.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：src=园区物管2.0/018.md
 - 所属项目：园区物管2.0；代码基线：none；来源会话：7effa849-b94a-484d-9c96-aafece8b9d5b
 

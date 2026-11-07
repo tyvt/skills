@@ -15,6 +15,7 @@
 - 微调项：padding 3px 控边框粗细、3s 控环绕速度、渐变色值控光带颜色
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：彩色环绕边框在该页不在 index-new.vue、padding 3px→2px、animation 3s→4.5s、刷新 /UnifiedLogin 查看
 - 涉及文件：src/views/home/UnifiedLogin.vue、src/views/home/index-new.vue、src/components/zs-input/zs-input.vue
 - 所属项目：门户；来源会话：16ba347b-80c4-494d-b58c-7ecc0a738758、b952859d-fcbb-4bce-b690-b2e5ad915c03；代码基线：04586c4

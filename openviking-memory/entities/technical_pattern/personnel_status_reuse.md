@@ -11,6 +11,12 @@ In Suzhou Real Estate Monitoring V3, `personnelStatus.js` and a dictionary are r
 - Files: institution/record/index.vue, utils/personnelStatus.js, company/staffManagement/components/index.vue, toB/personnelRecord/components/index.vue, institution/agencyPersonnel/components/AgencyPersonnelList.vue, mixins/ListTemplate.js, company/staffManagement/components/detail.vue, components/zs-table-column/zs-table-column.vue
 - Project: 苏州市房地产监测V3; Source session: aee9a3ba-5a81-43af-bc39-5611731be2b1; Code base: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：aee9a3ba-5a81-43af-bc39-5611731be2b1
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

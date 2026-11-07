@@ -11,6 +11,7 @@
 - 改ownerDecision/optionDecision下VoteRangeDialog与DecisionRangeTable先确认业务类型再挂联动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证：会话5f609ab0用户反馈业委会表决选候选人非分组、决策范围显示成候选业主
 - 涉及文件：ownerDecision/components/VoteRangeDialog.vue、optionDecision/components/VoteRangeDialog.vue、decisionCommon/components/VoteRangeDialog.vue、ownerDecision/components/DecisionRangeTable.vue
 - 所属项目：太仓G；来源会话：5f609ab0-21bb-4caa-86c9-16523f5a7854；代码基线：2ded8f9

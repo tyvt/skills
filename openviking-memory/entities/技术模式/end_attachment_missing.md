@@ -13,6 +13,10 @@
 - 涉及文件：zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreementEnd/detail.vue、index.vue、benefit/pubRegulatoryStopAgreement/detail.vue、mixins/listMixins.js、property/propertyAgreementEnd/detail.vue、router/index.js、benefit/pubQuarterlyDeclaration/detail.vue
 - 所属项目：产品2.0；来源会话：cacd083e-59be-4431-9d3b-dd3a418fa3bd；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

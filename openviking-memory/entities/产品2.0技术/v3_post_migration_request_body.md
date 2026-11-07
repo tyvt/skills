@@ -16,6 +16,7 @@
 - e2e mock fixture 同步改成解析 JSON body 里的 dictType 字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 fcb686e6 / 2565718c，request.js 拦截器补 {} 修复报错；dict.js 从裸字符串改为 { dictType } 对象传参，并同步 apiV3Normalize 映射与 register-mocks.js
 - 涉及文件：zhi2-web-admin/src/utils/request.js、dict.js、apiV3Normalize.js、zhi2-web-admin/e2e/fixtures/register-mocks.js
 - 所属项目：产品2.0；来源会话：fcb686e6-73e3-4f1f-8aff-ccc07305e948、2565718c-2639-4d49-96b3-c97a40e2cfd2；代码基线：50767de~54577f2

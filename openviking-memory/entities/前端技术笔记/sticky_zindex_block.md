@@ -11,6 +11,7 @@ Web 后台详情页 OperationBtnGroup（sticky 操作栏）设 z-index:10 时盖
 - TagsView 基准是 8，若与之重叠可调到 7 但仍须 <9
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 2c210045 Navbar 下拉被挡，根因为顶栏 z-index:9 的层叠上下文与 OperationBtnGroup z-index:10 兄弟比较，改为 1 后正常
 - 涉及文件：zhi2-web-admin/src/components/OperationBtnGroup/index.vue；zhi2-web-admin/src/layout/components/Navbar.vue
 - 所属项目：园区物管2.0；代码基线：fc994977f / 3965548b6 等；来源会话：2c210045-05e2-4f43-9233-fc8c952365a9

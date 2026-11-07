@@ -8,6 +8,8 @@ Vue3 迁移中，preparatoryRangeTable.vue 通过新增同步标记修复了切�
 - `onListSelectionChange` 开头增加 `if (this.isSyncingSelection) return`，忽略同步过程里的 `selection-change` 事件。
 - 仅用户真正勾选/取消列表行时，才把选择结果反写到 `buildingTableData` 的 `house.checked`。
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 4fb591cf（cursor session=4fb591cf-2d6a-4db2-9b12-4f4070e5b694）。
 - 涉及文件：preparatoryRangeTable.vue、ScopeSelectDialog.vue、zs-table；来源会话ID：4fb591cf-2d6a-4db2-9b12-4f4070e5b694；代码基线：none。
 

@@ -11,6 +11,7 @@ zhi2-mobile-shimin的index.html脚本须按location.pathname计算资源根再�
 - 保证/szffluzm、/szffluzm/、/szffluzm/index.html均解析到/szffluzm/static/js/...
 - H5内嵌App/公众号时禁止任何相对资源路径
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话ID：43c2d24d-9340-4131-a043-2b0f220ba0b9；代码基线：77666f8
 - 涉及文件：index.html、szffluzm/index.html、src/static/js/sign.js、vite.config.ts
 

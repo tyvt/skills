@@ -5,6 +5,10 @@
 - 验证证据：contractResult 初始值由 null 改为 rentalContractFixture.result；查询、重置逻辑不变；重置仍会清空表单并隐藏结果区
 - 来源会话ID：57f7bcce-4698-4101-aaea-433c7bebf5f6
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

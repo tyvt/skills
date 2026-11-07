@@ -13,6 +13,7 @@
 - 上游 DecisionResult.vue 跳转前把 decisionPlayerName、summary 一并写进 voteStore。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 e45253dc（基线 8fc3cc5）用户贴图详情不显示内容，按三层根因修复。
 - 涉及文件：src/pages_vote/decision/optional/detail.vue、common/DecisionRecord.vue、optional/DecisionResult.vue、src/store/vote.js、src/api/autonomy.js。
 - 所属项目：苏住房C；来源会话ID：e45253dc-68ce-40ba-b3ff-5949e2df65d4；代码基线：8fc3cc5。

@@ -11,6 +11,7 @@
 - 原文件已有 lint 报错（$t、res.data 类型等）为历史问题，非本次改动引入
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=0
 - 涉及文件：src/pages-iHome/my/contractDetail.vue、pages-rent/contractEdit.vue；所属项目：0
 - 来源会话：bdd38753-38c4-41b7-993d-61f3bc588407；代码基线：none
 

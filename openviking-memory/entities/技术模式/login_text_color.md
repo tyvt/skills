@@ -7,6 +7,7 @@
 - views/system/platformConfig/detail.vue 视觉色调中增加「登录页底部文字颜色」el-color-picker 表单项，绑定 form.loginBottomTextColor。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：login.vue、store/modules/app.js、views/system/platformConfig/detail.vue、App.vue
 - 所属项目：园区物管2.0；来源会话：3a00e2ae-df89-4fd3-a9ef-788bec02c44f；代码基线：none
 

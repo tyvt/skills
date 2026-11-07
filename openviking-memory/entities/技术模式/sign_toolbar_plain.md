@@ -12,6 +12,10 @@
 - 涉及文件：contractView/index.vue、ListTemplate.js、table.js、路由信息.json、index.scss、main.js、tableComponents.js、complex/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：a816325c-00a0-41f5-b764-20f675698e98；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -12,6 +12,7 @@
 - 容器从 id=getElementById 改为 ref 引用，避免多实例时取错 DOM
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 65d1ff41 报错来自 TMap 图层构造的 instanceof TMap.Map 校验；修复为删除 data 中的 map、created 里 this.map=null 非响应式挂载 + ref="tmapRoot" 替代 #map
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue
 - 所属项目：园区物管2.0；代码基线：f00310232；来源会话：65d1ff41-2ab2-465d-a45a-6af439cdd397

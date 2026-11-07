@@ -11,6 +11,7 @@
 - 关闭所有标签后回跳 `/todo`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/131.md；src=苏州市房地产监测V3/158.md
 - 涉及文件：router/index.js、login.vue、TagsView/index.vue、路由信息.json、companyLogin.vue、permission.js、index.vue、settings.js
 - 所属项目：苏州市房地产监测V3；来源会话：4c436c5b-d2ad-4894-8c78-5a8d855852f6；代码基线：none

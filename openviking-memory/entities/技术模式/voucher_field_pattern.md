@@ -15,6 +15,7 @@
 - 后端若只存 voucherFileId 而非可访问地址，必须在接口层补全 URL，或打开详情时把可访问地址写进 voucherFileUrl，否则 DetailTemplate 图片列恒为空且不报错
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 c26c8f38 结论 simplifiedLayout && dialogFormMode==='view' 时改渲染 DetailTemplate，凭证预览 type:'image' 用 voucherFileUrl、无则回退 voucherFileId，编辑态末尾加 ImageUpload(limit=1)，弹窗底部去掉左侧缩略图
 - 涉及文件：zhi2-web-admin/src/views/benefit/components/BankReceiptDetailDialog.vue、src/components/HeadTitle/index.vue、src/views/benefit/pubBankReceiptApply/detail.vue
 - 所属项目：产品2.0；来源会话ID：c26c8f38-d604-41d2-b12e-edbdfd3c8e06；代码基线：6b9d9d7

@@ -10,6 +10,7 @@ zhi2-web-admin 布局 TagsView 中 router-link 加 custom 后未接 v-slot navig
 - 坚持 custom 时，把点击区域绑到 navigate 上
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 90372e07，用户反馈 TagsView 不能点击跳转，去掉 custom 后恢复
 - 涉及文件：zhi2-web-admin/src/layout/components/TagsView/index.vue
 - 所属项目：2-0（产品2.0）；来源会话：90372e07-25eb-4a0f-84f3-f63f39000430；代码基线：none

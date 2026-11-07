@@ -11,6 +11,7 @@ pages_owner/maintain/index.vue 页面维修资金与房屋明细报错，根因�
 - 调用位于 zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/index.vue 151-162 行
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：无锡市区小程序嵌入H5/016.md
 - 涉及文件：src/pages_owner/maintain/index.vue、src/api/repair.js、src/store/repair.js、src/api/index.js、src/utils/h5Context.js、src/api/maintenance.js、src/pages_owner/maintain/utils.js、src/pages_owner/maintain/components/TransactionTable.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话：a343d1aa-9a2b-44b9-9046-e30e130c5be6；代码基线：none

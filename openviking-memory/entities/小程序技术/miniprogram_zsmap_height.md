@@ -17,6 +17,7 @@
 - 通用结论：包装原生能力（map/canvas/video）的自定义组件，尺寸与属性都要用 prop + inheritAttrs:false 显式落到原生节点
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 f0892537（基线 4630e8e）「地图没显示」，改 height prop + inheritAttrs:false + v-if 挂载 + 经纬度转 Number 修复
 - 涉及文件：src/components/ZsMap/ZsMap.vue、pages_transaction/newHouse/detail.vue、pages_main/houseMap/houseMap.vue
 - 所属项目：苏住房C；来源会话ID：f0892537-a924-473d-9d3b-16bf6d6ea239；代码基线：4630e8e

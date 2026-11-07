@@ -11,6 +11,7 @@
 - 父级标题仍为 `基础信息` 不带单位；月报统计页 buildStatTableRows 同步显示带单位标题；无 linter 报错
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：monthlyReport.js、ReportItemsTable.vue、monthlyReportStat/detail.vue
 - 所属项目：苏住房G；来源会话ID：fc2d65aa-925d-4392-8380-99f01fdcc150
 

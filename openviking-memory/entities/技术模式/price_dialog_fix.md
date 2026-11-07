@@ -16,6 +16,10 @@
 - 文件：components/ProjectDialog.vue（detail.vue、changeDetail.vue 引用）、api/pricemng/recordPriceMng.js
 - 所属项目：产品2.0；来源会话：2968a509-de10-4547-8a3b-9515e436aa52
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

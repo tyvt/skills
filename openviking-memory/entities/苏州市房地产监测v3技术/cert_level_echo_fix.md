@@ -9,6 +9,7 @@
 - `AgencyPersonnelDetail.vue` 的 `loadDetail()` 同步调整
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 涉及文件：AgencyPersonnelCertificateTable.vue、AgencyPersonnelDetail.vue
 - 来源会话：fee19692-41de-42b8-a8ed-8e08fa99ede8

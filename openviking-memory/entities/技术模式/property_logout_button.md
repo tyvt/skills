@@ -11,6 +11,7 @@ property.vue 顶部头图右上角已加「退出登录」功能。
 - @tap.stop 避免冒泡触发背景 login
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=repository
 - 涉及文件：property.vue、src/store/user.js、src/pages/index/property.vue
 - 来源会话：2ac982b9-0050-4def-847b-622f257aa9f2
 - 所属项目：repository；代码基线 none

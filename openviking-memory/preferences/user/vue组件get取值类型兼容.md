@@ -2,6 +2,11 @@
 - 修复采用与 MultiSelect 一致的类型兼容方式改造，避免单点修复后他处复现。
 - 验证证据：src=2-0/021.md；涉及文件：src/views/property/complex/components/group-multi-select.vue；来源会话：96cc05d6-f240-484b-bd44-cb2ed62f1ebc
 
+## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

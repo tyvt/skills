@@ -12,6 +12,7 @@ ZsButton 的 permission prop 声明为 Array，通过 v-bind="attrs" 透传布�
 - 排查此类警告时先分清 permission 流向哪个组件（ZsButton 还是 zs-operate-column）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 238293ef，从 certificatesTable.vue 操作按钮 attrs 移除 permission:false，buttons 配置里的保留给 zs-operate-column
 - 涉及文件：zhi2-web-admin/src/components/zs-button/zs-button.vue；zhi2-web-admin/src/views/company/staffManagement/components/certificatesTable.vue
 - 所属项目：产品2.0；来源会话ID：238293ef-3bd5-4396-98d5-3034f011a25c；代码基线：62d5fb9

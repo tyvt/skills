@@ -18,6 +18,11 @@
 - 涉及文件: Headline/index.vue; styles/detail-form.scss; styles/index.scss; companyManagement/components/AgencyBasicInfoForm.vue; AgencyBasicInfoDetail.vue; vite.config.js; e2e/fixtures/company-menu-config.js; e2e/company/institution-register-real-api-flow.spec.js
 - 会话: 5180d428-0584-4329-9241-d8565c0dbc3e; 代码库: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：5180d428-0584-4329-9241-d8565c0dbc3e
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -12,6 +12,7 @@
 - 项目中 pubBankReceiptApply、pubExpenditureContract 等多个页面存在同样写法，可批量修复
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/views/benefit/assetLeaseApply/detail.vue、src/views/benefit/pubUseMoneyApply/detail.vue、src/utils/ruoyi.js
 - 所属项目：园区公共收益；来源会话：82837732-6269-4a38-bb56-614e39f5bbeb
 

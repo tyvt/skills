@@ -10,6 +10,7 @@
 - `save-auth-state.mjs` 默认地址由 `8096/sys/fdc` 改为 `8098`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/076.md
 - 涉及文件：company-register.spec.js、register-helpers.js、company-register-extract.spec.js、company-register-branch.spec.js、auth-helpers.js、playwright.config.js、id-helpers.js、error-context.md
 - 所属项目：苏州市房地产监测V3；来源会话：bbaca6f0-5087-4168-ba51-8a2343915f2e；代码基线：none

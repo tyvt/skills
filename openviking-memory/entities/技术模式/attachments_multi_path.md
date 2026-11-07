@@ -17,6 +17,10 @@
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/HouseAssetDialog.vue、src/utils/resolveServerAssetUrl.js
 - 所属项目：园区物管2.0；来源会话：14e20239-48ca-49b6-aa6c-ccb4e211568e；代码基线：a63180c9a
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

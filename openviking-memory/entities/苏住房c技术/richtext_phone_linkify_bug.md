@@ -11,6 +11,7 @@
 - 改完长编号回落灰文本，真实手机号/固话仍可点击
 - 排查同类高亮先定位富文本预处理层，勿用CSS覆盖蓝色；回归验证长编号不链+手机号仍链
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话971ae865（2026-07-22，基线62fd49e）截图指出记录编号蓝链，定位正则无边界，加前后边界
 - 涉及文件：src/utils/index.js、components/ZsRichText/ZsRichText.vue、pages_transaction/publishHouse/verification.vue、榆林小程序/src/utils/index.js
 - 所属项目：苏住房C；来源会话ID：971ae865-b9cb-40f4-b093-4ddfce0be730；代码基线：62fd49e

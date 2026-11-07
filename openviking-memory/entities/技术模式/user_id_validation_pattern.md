@@ -11,6 +11,7 @@
 - 输入框采用 `v-model.trim` 与 `maxlength="30"`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/153.md、src=苏州市房地产监测V3/192.md
 - 涉及文件：system/user/detail.vue、mixins/detailMixins.js、api/system/user.js、toB/adminOperator/detail.vue、toB/shareholder/detail.vue、patterns/index.js、utils/idCard.js、toB/personnelRecord/components/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：d8de2201-0386-432e-a286-0c4c77fb5d4f；代码基线：none

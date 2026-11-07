@@ -13,6 +13,10 @@
 - 涉及文件：src/views/property/largeScreen/index.vue、components/componentMap.vue、utils.js、tencentDistrictBoundary.js
 - 来源会话：97ab338d-fe13-43ec-b738-f0e3304a4393
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

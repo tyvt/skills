@@ -14,6 +14,7 @@
 - 经营资产信息区块保留 v-model="showBenefitTable"，默认仍为展开状态
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：282e21d0-00c8-49c2-89a3-940f0f8e05be；代码基线：none
 - 涉及文件：committeeTable.vue、managementOrgPanel.vue、regulatoryAccountPanel.vue、detail.vue
 

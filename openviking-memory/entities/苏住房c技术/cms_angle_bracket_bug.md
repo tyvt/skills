@@ -15,6 +15,7 @@
 - 验收：首页→在线服务→流程指南→物业服务→第二篇指南正文正常显示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话3a1c5d68用户贴截图正文与Parse Error，定位`<业主大会>`覆盖书名号，改utils/index.js后恢复
 - 涉及文件：src/utils/index.js、src/components/ZsRichText/ZsRichText.vue、src/pages_my/onlineService/PolicyDetail.vue
 - 所属项目：苏住房C；来源会话ID：3a1c5d68-e7a3-441a-a399-b1778fbaea6f；代码基线：d43894b

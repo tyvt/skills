@@ -11,6 +11,7 @@
 - 复用原则：一份能力两份实现时，先画调用链定唯一事实来源再删死代码；删除前确认零引用，删除后环境变量清单同步收敛。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 b91754cb（基线 a444c05）用户要求「用实际用的，移除冗余的」；保留 gateway.js 链路，删除 dispatcher.js。
 - 涉及文件：src/api/gateway.js、src/api/dispatcher.js、src/api/index.js、src/api/httpInstance.js、src/api/v1Instance.js
 - 所属项目：苏住房C；来源会话ID：b91754cb-4f69-4526-932a-d2e80e20327e；代码基线：a444c05。

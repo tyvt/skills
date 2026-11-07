@@ -16,6 +16,11 @@ Web后台详情页经dictFormatter转译字段偶发显示编码而非名称的�
 - zhi2-web-admin/src/mixins/detailMixins.js
 - 来源会话2bea6416-3e83-4b54-af77-1e2e56704a2a，代码基线fc994977f
 
+## 验证与归属
+- 所属项目：园区物管2.0
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端代码缺陷",

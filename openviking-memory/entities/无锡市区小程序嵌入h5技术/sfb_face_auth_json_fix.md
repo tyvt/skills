@@ -11,6 +11,7 @@
 - 识别成功后正常走goBdc()并带verifyResult=true跳转不动产授权页
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 所属项目：无锡市区小程序嵌入H5；来源会话：9641a1de-5bbe-4afe-a7ab-487324afb826
 - 涉及文件：src/utils/sfbFaceAuth.js、src/pages/face/bdc.vue、src/pages/face/face.vue
 - 代码基线：none

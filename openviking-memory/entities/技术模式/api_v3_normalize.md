@@ -16,6 +16,10 @@
 - 涉及文件：`src/utils/apiV3Normalize.js`、`request.js`、`menu/index.vue`、`role/detail.vue`
 - 所属项目：产品2.0；来源会话：88e83347-13dd-462f-a082-5dceb7d8e40e；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

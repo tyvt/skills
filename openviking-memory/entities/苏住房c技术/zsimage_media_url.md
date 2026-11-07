@@ -15,6 +15,7 @@
 - 排查顺序：打印最终 src 看是否重复拼接 → 查微信后台 downloadFile 合法域名 → 确认服务器文件真实存在
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 d56ce156（基线 9832ba3）报错 /ttp://... 500；接口返完整内网地址，ZsImage 拼出非法 URL；修复 utils/index.js 的 resolveMediaUrl 拼 IMAGE_BASE 并兼容 /http://，ZsImage 改调用
 - 涉及文件：src/utils/index.js、src/components/ZsImage/ZsImage.vue、src/env/mp.js、vite.config.ts、src/page-query/components/PropertyCard.vue、src/pages/index/components/menu/MenuImage.vue
 - 所属项目：苏住房C；来源会话ID：d56ce156-0a63-4298-b177-fd3d0430fcf2；代码基线：9832ba3

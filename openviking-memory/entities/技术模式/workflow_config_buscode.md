@@ -10,6 +10,7 @@
 - 避免在流程工具里手填 busCode，统一从菜单管理配置
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 51f3071e 用户诉求业务编码隐藏、无业务编码不弹窗并提示前往菜单管理配置
 - 涉及文件：tool/workflow/index.vue、ConfigDialog.vue、ConfigTable.vue
 - 所属项目：园区公共收益；来源会话：51f3071e-0992-4ca2-b14d-e0fa6c2d181d；代码基线：479ebe7

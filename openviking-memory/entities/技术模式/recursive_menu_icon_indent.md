@@ -12,6 +12,7 @@
 - 排查同类「缩进忽对忽不对」问题时，先对比各菜单 meta.icon 配置差异
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：工单管理子项 icon=null（文字 42px 比父级靠左 6px），知识库子项 icon="#" 正常；根因是 v-if="getMenuIcon(child)" 条件渲染图标占位；修复为保留等宽占位或按 level 算 paddingLeft
 - 涉及文件：zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue
 - 所属项目：园区物管2.0；代码基线：f101dd464；来源会话：58620e57-ed5e-40f6-8987-65c3a9dd1603

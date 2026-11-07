@@ -13,6 +13,7 @@ uni.scss 末尾 marker 规则增删属性会让 prune-component-wxss-leak.mjs �
 - 长期约定：凡改动 uni.scss 末尾marker规则（增删任意属性），必须同步检查 LEAK_END 是否仍匹配，并同时看「磁盘」与「上传预估」两指标
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：构建日志 MAIN磁盘1790.5KB ok / 上传预估2094.8KB OVER LIMIT / validate-dist失败；改可选段后构建完整通过
 - 涉及文件：src/uni.scss、scripts/prune-component-wxss-leak.mjs、scripts/validate-dist.mjs、scripts/size-main-package.mjs、package.json
 - 所属项目：苏住房C；来源会话ID：fc94b08c-d7f0-4ffe-9070-050d77fd5bb1；代码基线：9cdf7b8

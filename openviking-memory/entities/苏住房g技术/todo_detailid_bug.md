@@ -10,6 +10,7 @@
 - 缺参返回 { missingId: true } 阻止跳转
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/035.md
 - 涉及文件：zhi2-web-admin/src/utils/ruoyi.js、src/views/flowable/todo.vue、src/store/modules/permission.js、src/router/index.js、src/views/institution/record/detail.vue、src/mixins/approval.js、src/components/zs-approval/ApprovalProcessDialog.vue、src/components/ApprovalProcess/index.vue
 - 所属项目：苏住房G；来源会话ID：e352315b-e61c-4698-bab4-d2f7fd6e18b3；代码基线：none

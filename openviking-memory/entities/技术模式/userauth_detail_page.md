@@ -15,6 +15,7 @@
 - 状态：单选，字典 sys_normal_disable，默认 0（正常）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/autonomy/userAuth/detail.vue、index.vue；参考 procedure/detail.vue
 - 所属项目：园区物管2.0；来源会话：c9a03628-31e0-4f0e-bc33-82c25af46a98；代码基线：none
 

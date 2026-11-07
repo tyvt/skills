@@ -13,6 +13,10 @@
 - 涉及文件：pages/home/login/index.vue、pages/face/verify.vue、pages/face/face.vue、App.vue、pages/area-manage/area-manage.vue
 - 所属项目：小程序（wygl-wxxcx-dev-slh）；来源会话：cf9e07b8-2418-4ea4-8944-e6e30fe516eb；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "小程序技术",

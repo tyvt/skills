@@ -7,6 +7,7 @@
 - 将 ListTemplate.js 列 key 改为 (column.prop || '') + '-' + (column.label || '') 组合。
 - 同一表格一般同 prop 对应不同 label，可区分两列且不影响 v-bind="column"。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：src/mixins/ListTemplate.js、src/views/maintenance/accountCancel/index.vue。
 - 所属项目：2-0；来源会话：3c906608-3287-4fa5-8f92-5704230e2aad；代码基线：none
 

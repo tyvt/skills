@@ -10,6 +10,7 @@
 - 列表页跳转逻辑接入 `buildDetailNavigation`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 静态检查通过：price-filing-routes.spec.js
 - 涉及文件：ruoyi.js、listMixins.js、main.js、router/index.js
 - 所属项目：苏州市房地产监测V3；来源会话ID：36ca195f-8fdc-4441-adb2-4879e592fe8e

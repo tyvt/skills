@@ -8,6 +8,7 @@
 - 在 `MEASURE_LABEL_EXCLUDE_RE` 增加 `通知书号`，使编号列按普通文本左对齐
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新后应见筛选为业务状态、缴款通知书号不再显示 `0.00` 且左对齐；编号为空需核对接口 `payNoticeNo`
 - 所属项目：苏州市房地产监测V3；来源会话：6f0a6e3a-9141-46e0-84c9-7466c7b18511
 - 涉及文件：`src/views/supervision/deposit/refund/index.vue`、`tableColumnMeasure.js`、`mixins/ListTemplate.js`

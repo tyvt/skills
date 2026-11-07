@@ -16,6 +16,7 @@
 - 改完必须重新编译小程序(开发者工具点编译不生效)
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证会话 63bf69eb：定位 ListDetail.vue 用 <FileList> 未 import、easycom 找不到，改显式 import 并将 onShow 拉附件改 watch(noticeId)
 - 涉及文件：src/pages/publicNotice/detail.vue、ListDetail.vue、files.vue、src/api/notice.js、src/pages.json
 - 所属项目：苏住房C；来源会话ID：63bf69eb-375f-44da-bede-0924286c59be；代码基线：8fc3cc5

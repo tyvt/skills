@@ -13,6 +13,11 @@ AppendixRequirementCard.vue 未依据 operable 控制必填星号，致详情查
 - 涉及：AppendixRequirementCard.vue、AppendixRequirementGrid.vue、toB/companyRecord/detail.vue、AnnexUpload/index.vue、DeveloperBasicInfoDetail.vue、AppendixPackageSection/index.vue、AgencyBranchDetail.vue、e2e/utils/appendix-requirement-grid.spec.js。
 - 验证：src=苏州市房地产监测V3/245.md；来源会话：b4676408-39dd-4ce7-bd44-3126514f23d0。
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

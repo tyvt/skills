@@ -12,6 +12,7 @@
 - decision/detail.vue：底部「参与决策」改用 redirectTo() 工具函数，跳转更稳定
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证路径：个人中心→电子业主卡→投票表决→我的决策，点按钮进须知页，点卡片进详情
 - 涉及文件：decision/index.vue、DecisionList.vue、decision/detail.vue、elect/index.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：365c14a6-d64c-46e7-af26-8a237fa7b8c3；代码基线：none

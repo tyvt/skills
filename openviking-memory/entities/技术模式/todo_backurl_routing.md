@@ -12,6 +12,7 @@
 - 详情路径与列表页保持一致，使用 getRouterPathByFilePath + id
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 涉及文件：utils/ruoyi.js、OperationBtnGroup/index.vue、main.js
 - 所属项目：惠山二期G；来源会话：1f86f5fa-6621-449b-b902-a3be952fcbd5；代码基线：none
 

@@ -13,6 +13,11 @@ Su Zhu Fang C 首页的 UI 调整：搜索框采用垂直渐变，横幅图片�
 - 验证证据: cursor 会话 f12bdce7-635e-42f0-b034-e806a17e8c7e
 - 所属项目: Su Zhu Fang C (zhi2-mobile-shimin); baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：f12bdce7-635e-42f0-b034-e806a17e8c7e
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "Tecnologia Su Zhu Fang C",

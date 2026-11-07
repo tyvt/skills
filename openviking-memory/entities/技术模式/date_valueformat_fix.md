@@ -10,6 +10,7 @@
 - 在 getDetail 赋值 form 后，若有 applyTime，用项目已有 this.parseTime(..., '{y}-{m}-{d}') 转成与 value-format 一致的日期字符串，使 v-model 与 el-date-picker 内部解析一致。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山G
 - 涉及文件：d:/repository/昆山G/src/views/increment/useFund/insuranceApply/detail.vue、d:/repository/昆山G/src、d:/repository/昆山G/src/utils/ruoyi.js、d:/repository/昆山G/src/views/estate/accountApart/detail.vue
 - 所属项目：昆山G；来源会话：6de5c545-0115-4b86-8a24-5c8a01bf9d1a；代码基线：none
 - 验证证据：src=昆山G/003.md

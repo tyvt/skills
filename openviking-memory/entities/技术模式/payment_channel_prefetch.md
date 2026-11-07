@@ -12,6 +12,7 @@
 - 排查时先按URL区分接口再怀疑代码，不混改buildXxxPayload
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话ff1c31d0用户贴图问查询条件还在，结论为渠道查询非创单
 - 涉及文件：property/spFeeBill/components/collectionDialog.vue、property/bill/components/PaymentDialog.vue、utils/request.js
 - 所属项目：产品2.0；来源会话：ff1c31d0-1595-44b3-95e1-129dad1f7eae；代码基线：6accf9a

@@ -11,6 +11,7 @@
 - 为底部按钮设置 `width: 100%`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目: 苏住房C (zhi2-mobile-shimin)
 - 来源会话: a0fa70c1-04b5-4e88-bb03-c924fab3eae3
 - 涉及文件: src/pages_owner/house/detail.vue, src/components/commonNew/baseCard.vue, src/pages_owner/house/components/CellCard.vue, src/pages_owner/house/owner/detail.vue, src/pages_owner/house/index.vue, src/components/ZsButton/ZsButton.vue, src/pages_owner/house/components/registerInfo.vue, src/pages.json

@@ -11,6 +11,7 @@
 - 与明细项 amountTransform 格式化逻辑保持一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡锡山业主决策H5
 - 涉及文件：src/pages/balancePublicity/index.vue、src/utils/index.ts
 - 所属项目：无锡锡山业主决策H5；来源会话：ab129a0e-1c44-4dd6-a67d-4cd23a470f2d；代码基线：none
 

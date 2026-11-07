@@ -11,6 +11,7 @@
 - 为 `.sort-right-body` 设置 `overflow-y: auto`，内容超出时显示纵向滚动条
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 展开多个筛选条件组、组内条件增多或查询较多数据时右侧出现纵向滚动条；左侧行政区域树保持独立滚动
 - 涉及文件：publicQuery/complex/index.vue、zs-advanced-query.vue
 - 所属项目：苏住房G；来源会话ID：33637a85-f189-4220-824c-b5f9a204802c

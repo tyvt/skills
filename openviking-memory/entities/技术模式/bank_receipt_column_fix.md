@@ -14,6 +14,7 @@
 ## 正确列顺序
 - 序号 → 对方账户名称 → 通知书号 → 交易日期 → 交易金额 → 用途 → 手续费 → 记账金额 → 银行平台流水号 → 结算渠道 → 操作
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubBankDetailDay/index.vue、benefit/pubVerificationReceipts/index.vue
 - 所属项目：园区公共收益；来源会话：94e9fe38-5ccd-4e61-8fa5-8929f8b1a0cb、31028abc-b8ae-4e20-8edb-702fd8eb1e0c；代码基线：none
 

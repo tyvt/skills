@@ -11,6 +11,7 @@
 - 修正final/components/feeShareTable.vue与budget/components/feeShareTable.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：src=园区公共收益/024.md
 - 涉及文件：components/zs-table/zs-table.vue、maintenance/final/components/feeShareTable.vue、maintenance/budget/components/feeShareTable.vue、maintenance/components/ShareTable.vue、components/zs-operate-column/zs-operate-column.vue、components/zs-table-column/zs-table-column.vue
 - 所属项目：园区公共收益；来源会话：3936cf21-6925-44f4-a5c6-987975681a38；代码基线：none

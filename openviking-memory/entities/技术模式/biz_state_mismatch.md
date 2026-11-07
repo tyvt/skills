@@ -11,6 +11,7 @@
 - 排查顺序：先确认列表展示用哪个字典，再找查询区用哪份常量，不一致即根因，勿先怀疑后端
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 与 #249（业务状态统一走全局 biz_state，但只替换本地静态数组、BIZ_STATE 常量保持原样）区别：本条给直接症状，#249 讲改动边界「别误改常量」
 - 验证：rectificationNotice/index.vue 查询区 BIZ_STATE 与列表 biz_state 码值不一致；修复为统一 biz_state、参数改 bizState，两状态互不串
 - 涉及文件：zhi2-web-admin/src/views/evaluation/rectificationNotice/index.vue、src/mixins/listMixins.js、src/mixins/table.js

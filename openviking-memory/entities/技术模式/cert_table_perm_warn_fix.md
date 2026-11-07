@@ -11,6 +11,7 @@ certificatesTable.vue 中 operationButtons 的 attrs 携带 permission: false �
 - buttons 配置里保留的 `permission: false` 是给 zs-operate-column 用的，该组件用 `if (!button.permission) return true` 处理，无需改动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：刷新从业人员详情页证书区域后控制台无警告
 - 涉及文件：certificatesTable.vue、zs-button.vue
 - 所属项目：产品2.0；来源会话：238293ef-3bd5-4396-98d5-3034f011a25c；代码基线：none

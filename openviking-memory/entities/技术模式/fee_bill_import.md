@@ -16,6 +16,10 @@
 - 导入接口先做行级校验落临时批次，confirm 才真正入库，前端须按 importId 串联否则重复解析或入库失败
 - 所属项目：产品2.0；来源会话：a10aadfb-a1ed-4720-8d24-06f8099d14c1；代码基线：a10aadfb
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

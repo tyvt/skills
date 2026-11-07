@@ -14,6 +14,7 @@
 - company_qualification_level 为变更后字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0
 - 来源会话：008732db-2f2d-46d5-8491-ec57ab3fe2ea
 - 代码基线：none

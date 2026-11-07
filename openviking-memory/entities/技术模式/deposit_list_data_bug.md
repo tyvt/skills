@@ -10,6 +10,8 @@
 - `normalizeNoticeRow` 映射 `noticeNo`→`payNoticeNo` 等字段差异
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：路由信息.json、前端技术信息.md、MEMORY.md、2026-09-13.md、index.vue、notice.js、listMixins.js、table.js
 - 验证证据：src=苏州市房地产监测V3/087.md
 - 来源会话ID：39e4c6b2-6db7-42a7-8dc7-56ade38929bc；代码基线：none

@@ -11,6 +11,7 @@
 - 各 DecisionResult.vue 请求前调用解析确保 decisionRangeId 有效
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期H5
 - 验证：src=惠山二期H5/002.md
 - 涉及文件：src/api/autonomy.js、src/pages_owner/decision/common/DecisionResult.vue、src/pages_owner/decision/common/ResultStatistics.vue、src/pages_owner/decision/optional/ResultStatistics.vue、src/pages_owner/decision/multiple/ResultStatistics.vue、src/pages_owner/elect/ResultStatistics.vue、src/pages_owner/decision/index.vue、src/pages_owner/decision/sort/ResultStatistics.vue
 - 所属项目：惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）；来源会话：b9ce83c8-a16e-4596-bbae-d3dae7830525；代码基线：none

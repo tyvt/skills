@@ -11,6 +11,7 @@
 - 图例固定显示四类，数量仍为 0 也会列出
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue、chartOptions.js
 - 所属项目：园区物管2.0；来源会话：98ef0df4-45f3-4381-a79d-760eb1b00c62；代码基线：none
 

@@ -16,6 +16,7 @@
 - 若接口有数据仍无图，核对列表 resourcesId 是否等于后端 advertiseSpaceDetailId（映射问题需接口补字段）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 验证：去掉无 revenueContractId 就不请求的逻辑；用 detailId/resourcesId 调 getPubAdvertiseSpaceDetail；台账与合同分开请求；仅合同成功才切租赁字段
 - 涉及文件：benefit/statisticsMap/components/AdvertiseAssetDialog.vue、benefit/statisticsMap/operatingAssets.vue、benefit/statisticsMap/components/ParkingAssetDialog.vue、benefit/statisticsMap/components/VenueAssetDialog.vue、benefit/statisticsMap/components/HouseAssetDialog.vue、benefit/pubAdvertiseSpace/components/advertiseDialog.vue、utils/resolveServerAssetUrl.js、api/benefit/pubAdvertiseSpaceDetail.js
 - 所属项目：惠山二期G；来源会话：5a741fb2-5020-4358-a55c-ed838e2739cc；代码基线：none

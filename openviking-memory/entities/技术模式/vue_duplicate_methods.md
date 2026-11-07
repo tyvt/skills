@@ -12,6 +12,7 @@
 - 项目已有 no-duplicate-vue-options 规则兜底，提交被拦时按「后定义覆盖前定义」理解报错，合并逻辑而不是简单删一份
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 38ac27d7 两页 methods 各两次定义 getQueryParams 触发 no-duplicate-vue-options；解法为合并为一个方法并补 parentDeptId
 - 涉及文件：zhi2-web-admin/src/views/benefit/assetLeaseApply/index.vue、zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/index.vue
 - 所属项目：园区物管2.0；代码基线：49e7729ce；来源会话：38ac27d7-c45f-4497-b949-64781b2d3118

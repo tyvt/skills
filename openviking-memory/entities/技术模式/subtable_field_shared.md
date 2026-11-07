@@ -15,6 +15,7 @@
 - 验收时按「同一单据在列表子表 / 详情弹窗 / 编辑表单三处字段序列逐个比对」自检，而非只看设计稿截图
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 c26c8f38 用户诉求「子表表格字段与弹窗字段未按设计图修改，要求完全一致」；结论「借贷方向列 prop 已从 channelInstitution 改为 loanDirction」
 - 涉及文件：d:\repository\产品2.0\zhi2-web-admin\src\views\benefit\pubBankReceiptApply\components\detailTable.vue、d:\repository\产品2.0\zhi2-web-admin\src\views\benefit\components\BankReceiptDetailDialog.vue
 - 所属项目：产品2.0；来源会话：c26c8f38-d604-41d2-b12e-edbdfd3c8e06；代码基线：6b9d9d7

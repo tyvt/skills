@@ -22,6 +22,7 @@
 - 相关工具函数与组件引用需一并排查
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：src=无锡市区小程序嵌入H5/007.md
 - 涉及文件：src/utils/zhishuAsset.js、src/pages/index/commonMenu.vue、src/pages/index/propertyMenuConfig.js、src/pages/index/home.vue、src/components/custom-tabbar/custom-tabbar.vue、src/pages/index/components/GridMenu.vue、src/pages/webview/externalWebview.vue、package.json；另 wygl-wxxcx-dev-slh 子模块下 home.vue、externalWebview.vue、custom-tabbar.vue 也同步修改
 - 所属项目：无锡市区小程序嵌入H5；来源会话ID：d757069f-a917-4079-bd4e-17af4bcc117e；代码基线：none

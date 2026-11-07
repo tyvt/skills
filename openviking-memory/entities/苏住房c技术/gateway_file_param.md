@@ -12,6 +12,7 @@
 - 新写上传调用点按这四条特征自查，而非只看有无报错
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话79a544a0用户贴网关日志对比；定位gateway.js第222-232行isFileUpload=!!config.file，httpInstance.js第214-223行file:data.file||data.filePath；根因SignBoard.vue写fileUpload({files:[...]})；修复为fileUpload({file})
 - 涉及文件：src/components/SignBoard.vue、src/api/gateway.js、src/api/httpInstance.js、src/api/file.js
 - 所属项目：苏住房C；来源会话ID：79a544a0-5a29-4c3d-acb1-c80b3b9dfa2c；代码基线：77666f8

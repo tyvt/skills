@@ -8,6 +8,8 @@
 - 修正initDict内getDicts参数，使其匹配正确的字典类型
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：c376e461-5508-4c08-8192-16ac1392a65f
 - 来源：苏住房G/044.md；会话c376e461-5508-4c08-8192-16ac1392a65f
 - 涉及文件：.workbuddy/memory/2026-09-10.md、benefit/pubRegulatoryAgreement/index.vue、property/propertyAgreement/index.vue、components/zs-table-column/zs-table-column.vue、mixins/ListTemplate.js、store/modules/common.js、main.js、mixins/listMixins.js
 - 所属项目：苏住房G

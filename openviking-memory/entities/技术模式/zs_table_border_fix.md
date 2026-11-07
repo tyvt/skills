@@ -10,6 +10,7 @@
 - border:true 显示列竖线+行横线；border:false 仅行横线无列竖线
 - 行与行之间横线为列表页默认样式，非 border 控制
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：49ee8efa-ceee-4350-9446-1a98b38420eb；代码基线：none
 
 <!-- MEMORY_FIELDS

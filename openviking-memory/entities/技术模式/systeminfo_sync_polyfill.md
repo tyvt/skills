@@ -12,6 +12,7 @@
 - 残留警告多为第三方库（z-paging、@dcloudio/uni-ui）在 polyfill 前调用旧 API 或 @dcloudio/uni-app 版本偏旧，可考虑升级
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 970c1102，基线 4630e8e；警告来自 vendor.js:1438，解法如上
 - 涉及文件：src/utils/system-info.js、src/polyfills/mp-weixin-system-info.js、src/components/ZsNav/ZsNav.vue、src/utils/index.js
 - 所属项目：苏住房C；来源会话ID：970c1102-ef4a-4650-b2b0-7044abd68b9e；代码基线：4630e8e

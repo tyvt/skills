@@ -8,6 +8,8 @@
 - 在 src/pages_owner/decision/index.vue 将标签类名改为 display-inline-block 以自适应宽度
 
 ## 验证与归属
+- 所属项目：H5
+- 验证证据：extracted source=cursor project=H5
 - 验证证据：src=H5/001.md
 - 涉及文件：uno.config.ts、src/pages_owner/decision/index.vue
 - 来源会话：f8bfc1e1-de62-4572-bfc7-20b21efe668e；代码基线：none

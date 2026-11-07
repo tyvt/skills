@@ -15,6 +15,7 @@
 - system/message/components/rangeTable.vue 等
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 所属项目：园区物管2.0；代码基线：none
 - 验证路径：权利人同步详情 → 查看 → 添加同步范围
 - 来源会话：4ac14ab7-1d24-43a8-b799-ea0b166135f7

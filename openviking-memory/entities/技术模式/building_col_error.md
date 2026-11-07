@@ -10,6 +10,8 @@
 - `zs-table-column.vue` 改为使用 `$attrs.type` 来判断列类型
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：dbc7cb9d-a0a8-4e87-8a32-7d0db2961532
 - 记忆类型: bug
 - 验证证据: src=产品2.0/035.md
 - 涉及文件: d:/repository/产品2.0/zhi2-web-admin/src/views/publicQuery/complex/components/buildingTable.vue, src/views/publicQuery/complex/detail.vue, src/components/zs-select-dialog/zs-select-dialog-func.vue, src/views/property/complex/components/rangeTable.vue, src/views/property/complex/components/houseTable.vue, src/components/zs-table-column/zs-table-column.vue, src/views/building/complexSearch/components/houseTable.vue, src/mixins/table.js

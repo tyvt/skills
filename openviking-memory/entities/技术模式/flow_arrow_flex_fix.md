@@ -13,6 +13,7 @@
 - d:/repository/门户/zhi2-web-admin/src/views/home/index-new.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 所属项目：门户；来源会话：90beac8b-1085-4755-9837-9d8a62c90937；代码基线：none
 
 <!-- MEMORY_FIELDS

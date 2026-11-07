@@ -12,6 +12,7 @@
 - 新写同类页面直接照抄此链路，避免「列表只有时间」。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 aa7c3d25（2026-08-27，基线 f1939b0）根因第2条，修改含按 decisionResponseId 合并重复记录、扩展姓名解析字段。
 - 涉及文件：zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue、decision/common/DecisionRecord.vue、src/api/autonomy.js。
 - 所属项目：苏住房C；来源会话ID：aa7c3d25-bd1a-4ca4-bb8f-8c55d6730cc6；代码基线：f1939b0

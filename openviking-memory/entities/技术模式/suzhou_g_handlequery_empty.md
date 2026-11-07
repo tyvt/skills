@@ -21,6 +21,10 @@ G端后台统计页（如companyProjectStats、feeStandardStats）点搜索完�
 - 涉及文件：zhi2-web-admin/src/views/publicQuery/companyProjectStats/index.vue、feeStandardStats/index.vue
 - 所属项目：苏住房G；来源会话：5fd50fdd-c3d0-40b5-af88-9696e44c5d09；代码基线：e590ffa
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

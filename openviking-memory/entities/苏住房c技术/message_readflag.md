@@ -12,6 +12,7 @@
 - 底部批量操作栏（全选/设为已读/删除）保持固定，避免批操作丢失列表滚动位置
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话bcb98835用户诉求加readFlag:0及头部跟随滚动；代码核实index.vue:56,62带readFlag:0，My_Suzhufang.vue:114带projectType:1
 - 涉及文件：pages_main/message/index.vue、message.vue、pages_main/my.vue、pages_tab/components/My_Suzhufang.vue、hooks/usePaging.js
 - 所属项目：苏住房C；来源会话：bcb98835-f1ec-41eb-9aea-afdbf1871d66；代码基线：77666f8

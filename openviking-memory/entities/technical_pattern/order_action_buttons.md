@@ -18,6 +18,12 @@ Work order action buttons are determined by the ORDER_STATUS constant and order 
 - Source session: 346ed707-323c-469b-a3f4-390b4107d074
 - Code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：346ed707-323c-469b-a3f4-390b4107d074
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

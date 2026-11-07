@@ -13,6 +13,8 @@
 - 不要用「仅相对站点」的 ./sfb 指望在所有路由下正确。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：47414239-c758-44c5-b55e-6c30c3687109
 - 验证会话：47414239-c758-44c5-b55e-6c30c3687109（基线 6c9a164），用户反馈图片 URL 含 pages/webview 路由段，结论说明 ./sfb 相对当前页解析错误，改为 getH5PublicBase() + /sfb 前缀绝对路径。
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/zhishuAsset.js、src/hooks/usePortal.js、.env.production、src/manifest.json。
 - 所属项目：无锡市区小程序嵌入H5。

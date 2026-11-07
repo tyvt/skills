@@ -11,6 +11,8 @@
 - index.vue图表容器加chart-box--district-count类，padding-bottom:10px
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：725e800e-590a-4121-bcda-f06988a87527
 - 来源：苏住房G/044.md；会话725e800e-590a-4121-bcda-f06988a87527
 - 涉及文件：benefit/mapOverview/chartOptions.js、benefit/mapOverview/index.vue、components/Panel.vue、mock.js、package.json
 - 所属项目：苏住房G

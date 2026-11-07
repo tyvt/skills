@@ -14,6 +14,10 @@
 - 涉及文件：zhi2-web-admin/src/utils/resolveServerAssetUrl.js、bulkImportDialog.vue、detail-template.vue
 - 所属项目：苏住房G；来源会话：7c122dc2-e6a9-4323-b70f-2d6b9c7beff1；代码基线：e590ffa
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

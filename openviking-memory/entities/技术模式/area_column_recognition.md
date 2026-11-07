@@ -13,6 +13,12 @@
 - 涉及文件: 路由信息.json, company/companyRegister/index.vue, mixins/ListTemplate.js, zs-table-column.vue, utils/tableColumnMeasure.js, formatters/index.js, package.json
 - 会话: 211494e9-a81b-4b9a-af2c-3ec7d67b86e9; 代码库: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：211494e9-a81b-4b9a-af2c-3ec7d67b86e9
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "padrao_tecnico",

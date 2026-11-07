@@ -15,6 +15,10 @@
 - 验证：会话 4a686bf4 根因字符 › 16px 未 dw 缩放；已改为 dw 描边箭头并 aria-hidden，刷新公示公告区对比设计稿。
 - 来源会话ID：4a686bf4-5dee-44d8-905f-7025c81f52cd；代码基线：04586c4
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

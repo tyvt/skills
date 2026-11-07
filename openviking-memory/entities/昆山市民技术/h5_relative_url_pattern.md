@@ -12,6 +12,7 @@ H5 嵌入/子目录场景下，接口与媒体地址统一走相对路径（无�
 - 本地图标用 `:src="staticUrl('...')"` 动态绑定，避免编译期写死绝对路径；开发环境 `vite.config.js` 保留 `/statics` 代理到 `VITE_IMAGE_URL` 预览后端静态资源。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证：会话 c0160254 用户明确要求接口前缀相对路径、H5 用、不带前导 `/`、不加 `/h5`，网络图与本地图都要相对。
 - 涉及文件：src/utils/resolveAssetUrl.js、src/env/mp.js、src/request/index.js、vite.config.js、.env.development、.env.production。
 - 所属项目：昆山市民；代码基线：bf3efcf；来源会话ID：c0160254-f57e-4417-b5f5-15ff6a735c30。

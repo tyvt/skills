@@ -5,6 +5,8 @@ formatPortalHousePickerLabel 生成的 housePickerLabels 中文直接使用房�
 - externalWebview.vue 与 home.vue 都通过 getPortalHousePickerLabels 调用，两处 picker 一并生效
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：012.md 会话 fcf4ca3d：housePickerLabels 展示中文用 address
 - 涉及文件：utils/portal-user.js
 - 来源会话ID：fcf4ca3d-d26a-4766-bee4-2c1f57b061cf

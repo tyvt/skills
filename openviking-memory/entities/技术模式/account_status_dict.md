@@ -11,6 +11,7 @@
 - 排查「显示原始码」分两步：先确认前端引用字典类型正确，再确认环境字典管理配全（如补6-销户）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话011d6472用户报开户申请字典缺少销户编码，结论列两套字典对比与6个待改文件
 - 涉及文件：pubRegulatoryAccount/detail.vue、BankAccountTable.vue、pubRegAccountChange/detail.vue、pubRegAccPropMgmt/detail.vue、propertyAccount/detail.vue、account/detail.vue、pubBankAccountBalance/index.vue等
 - 所属项目：苏住房G；来源会话：011d6472-82b1-4b34-b862-5f88d5e951ce；代码基线：315702f

@@ -10,6 +10,7 @@ pages/face/user-agreement.vue 中已删除原第七条并调整后续条款编�
 - 最后一条为「七、其他条款」（协议更新相关说明）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：pages/face/user-agreement.vue
 - 所属项目：小程序（wygl-wxxcx-dev-slh）
 - 来源会话：61587d91-395e-4b29-9edf-63f0a5d87927

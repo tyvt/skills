@@ -12,6 +12,10 @@
 - @src/pages-rent/myEvaluate.vue
 - 来源会话：164f359f-6344-486a-83d4-2b56361e0db4；代码基线：none。
 
+## 验证与归属
+- 所属项目：0
+- 验证证据：extracted source=cursor project=0
+
 
 <!-- MEMORY_FIELDS
 {

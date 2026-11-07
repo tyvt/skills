@@ -14,6 +14,12 @@
 - 涉及文件: stock/limit/detail.vue, building/houseLimit/limitFormMixin.js, limitAdd.vue, limitCancel.vue, houseLimitAudit/index.vue, mixins/detailMixins.js, mixins/form.js
 - 会话: f7ff995f-0339-4200-9550-e6b17381deaf; 代码库: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：f7ff995f-0339-4200-9550-e6b17381deaf
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "padrao_tecnico",

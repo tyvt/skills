@@ -13,6 +13,7 @@
 - src/views/benefit/pubBankDetailDay/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：5ac0a40f-9d17-413b-8527-695560ab5344；代码基线：none
 
 <!-- MEMORY_FIELDS

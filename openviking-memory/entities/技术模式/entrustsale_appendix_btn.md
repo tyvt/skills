@@ -8,6 +8,7 @@
 - `AnnexUpload/components/FileList.vue`：「备注 / 保存」按钮增加 `$attrs.operable` 条件，非草稿状态不可编辑备注
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 新增 `assertEntrustSaleAppendixButtons` E2E helper，并在 `entrust-sale-real-api-flow.spec.js` 中增强验证
 - 涉及文件：`presale/entrustSale/detail.vue`、`AnnexUpload/components/FileList.vue`、`e2e/presale/entrust-sale-real-api-flow.spec.js`
 - 所属项目：苏州市房地产监测V3；来源会话：80d2603f-f2d9-4f58-9273-3841d86f0ce0

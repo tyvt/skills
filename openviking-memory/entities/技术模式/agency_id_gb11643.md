@@ -10,6 +10,8 @@ AgencyPersonnelDetail.vue 中身份证校验使用 isValidIdNumber 按国标 GB 
 - 不应作为 bug 修复，属正常国标校验
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：911f3164-2978-4d09-81ed-b2633e226cbf
 - 验证证据：src=cursor session=911f3164-2978-4d09-81ed-b2633e226cbf
 - 涉及文件：company/staffManagement/components/detail.vue、toB/personnelRecord/components/detail.vue、institution/agencyPersonnel/components/AgencyPersonnelDetail.vue、utils/idCard.js
 - 所属项目：苏州市房地产监测V3；代码基线：none

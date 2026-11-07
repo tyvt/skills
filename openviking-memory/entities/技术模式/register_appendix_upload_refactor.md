@@ -13,6 +13,7 @@
 - 管理后台详情页营业执照上传仍使用 `ImageUpload` 组件（`/file/file/upload`），属已登录管理端场景，不在本次匿名注册流程范围
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：`src/api/company/companyRegister.js`、`e2e/fixtures/register-mocks.js`、`e2e/fixtures/register-helpers.js`
 - 所属项目：产品2.0；来源会话：70beb6e7-0c07-4d5a-ae9a-5eb0f078c15d；代码基线：none
 

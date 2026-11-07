@@ -18,6 +18,7 @@
 - 回退时优先回到已验证cell-item结构局部修，不要顺手换另一组件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话f7c75f86用户报decision/detail UI有问题且差异巨大；结论分包+组件样式隔离，去CardCell+页面内DOM
 - 涉及文件：src/pages_vote/decision/detail.vue、src/pages_vote/decision/components/DetailTopCard.vue、src/styles/cell.scss
 - 所属项目：苏住房C；来源会话ID：f7c75f86-93d3-413f-b2a8-5162c9c21849；代码基线：5f0f4dc

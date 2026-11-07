@@ -16,6 +16,8 @@
 - src/components/OperationBtnGroup/index.vue
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/080.md
 - 来源会话：057dc9a5-e1bd-4c11-b65c-c659a035ce17；代码基线：none
 

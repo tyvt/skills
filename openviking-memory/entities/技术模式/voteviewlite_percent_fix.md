@@ -10,6 +10,7 @@
 - 与同目录 VoteView.vue 处理方式一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 涉及文件：`decisionCommon/components/VoteViewLite.vue`、`VoteView.vue`、`optionDecision/components/VoteView.vue`、`optionDecision/components/VotingItemsTable.vue`、`optionDecision/detail.vue`
 - 所属项目：太仓G；来源会话：b1f6d756-0df5-4c21-989e-f70ed877907d；代码基线：none
 

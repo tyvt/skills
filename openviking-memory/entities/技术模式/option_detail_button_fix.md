@@ -13,6 +13,7 @@
 - 延期（状态 5）时也会显示对应按钮
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 6bb25673 选项表决详情未显示提前结束等按钮；修复后正常
 - 涉及文件：zhi1-web-admin/src/views/estate/optionDecision/detail.vue、src/directive/permission/hasPermi.js、src/mixins/detailMixins.js、src/router
 - 所属项目：太仓G；来源会话：6bb25673-a3f0-4f17-9c69-8943d17f4cb8；代码基线：none

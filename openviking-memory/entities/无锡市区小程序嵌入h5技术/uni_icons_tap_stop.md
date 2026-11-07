@@ -11,6 +11,8 @@ uni-app 编译到 H5 时 uni-icons 触发事件非标准 DOM Event，模板写 @
 - 若必须阻止冒泡，在方法内先判断 event 再 stopPropagation，或把点击绑在外层 view 上处理
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：26ca4c09-5707-4402-a54f-9c9491ec3455
 - 验证会话：26ca4c09-5707-4402-a54f-9c9491ec3455
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/DetailsTab.vue、src/components/ZsDateRangePicker/ZsDateRangePicker.vue
 - 所属项目：无锡市区小程序嵌入H5；代码基线：a951bf3

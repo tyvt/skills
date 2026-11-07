@@ -10,6 +10,7 @@
 - 执行 generate-register-step-icons.py 重生成图标资源
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/050.md
 - 涉及文件：institutionRegister/index.vue、RegisterStepper/index.vue、companyRegister.vue、InstitutionRegisterPage.vue、e2e spec、generate-register-step-icons.py、README.md、package.json
 - 所属项目：苏州市房地产监测V3；来源会话：29f674a7-87a5-4f91-a9f2-46496ec2f4be；代码基线：none

@@ -29,6 +29,10 @@
 ## 关联信息
 - 所属项目：门户；来源会话 ID：66c9378e-4cf9-4d89-9040-e0be3ea73d99；代码基线：3e8673b；子模块 commit 374ecad，主仓 commit f10ff03
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

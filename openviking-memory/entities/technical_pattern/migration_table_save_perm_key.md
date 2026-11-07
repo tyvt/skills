@@ -15,6 +15,12 @@ Migration tables in zhi2-web-admin caused save errors and permission primary key
 - Source session: b2a4d79d-3d96-4875-bf1f-63085405dffc
 - Files: detail.vue, OperationBtnGroup/index.vue, zs-table-column.vue, AgreementDetailsTable.vue, companyRecordAgency/detail.vue, JymxTable.vue, recordTable.vue, serviceItem/index.vue
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b2a4d79d-3d96-4875-bf1f-63085405dffc
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

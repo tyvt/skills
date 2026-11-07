@@ -14,6 +14,7 @@
 - 修复：增加 `hasSelectableBuildings`，无可选时 `disabled` 或隐藏。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 验证：会话 da4d5f02 HIGH「子组件内部状态驱动父级 computed」、HIGH「exist 户室被标为已选且会进入提交集合」、MEDIUM「无可选户室时按钮语义不清」；009.md 亦提 exist 与 $refs.treeData 同类风险。
 - 涉及文件：autonomy/mixins/decisionRangeBuildingSelectMixins.js、zs-select-dialog.vue、autonomy/general/components/DecisionRangeTable.vue、autonomy/multiply/components/DecisionRangeTable.vue、autonomy/election/components/apply/RangeTable.vue、autonomy/preparatoryApply/components/preparatoryRangeTable.vue。
 - 所属项目：惠山二期G；来源会话：da4d5f02-fc36-4e8c-8717-0c4503f50d5e；代码基线：289cc30

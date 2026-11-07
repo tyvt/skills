@@ -11,6 +11,7 @@
 - 更新 `pageType`、清空表单并刷新导航栏标题
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证证据：src=昆山市民/007.md
 - 涉及文件：src/pages/verifyUser/index.vue、src/pages/common/useEidVerify.js、src/pages/verifyUser/info.vue、src/api/modules/estate.js
 - 所属项目：昆山市民；来源会话ID：bc96deeb-f24b-4f60-a14d-059e81f1caf8；代码基线：none

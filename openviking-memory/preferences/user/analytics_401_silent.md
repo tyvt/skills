@@ -5,6 +5,11 @@
 - 涉及文件：src/api/appAnalytics.js、src/api/httpInstance.js、src/api/index.js、src/utils/menuRouteMap.js、src/pages/redirect/index.vue、src/utils/app.js、src/utils/index.js
 - 适用项目：苏住房C(zhi2-mobile-shimin)；验证src=苏住房C/067.md；来源会话f8d2218a-2bef-4ce0-99ff-25ccbca24f30
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

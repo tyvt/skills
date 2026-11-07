@@ -16,6 +16,8 @@ publicPortal 表单标签左对齐改动已覆盖多页并经 portal.scss 生效
 - zhi2-web-admin/src/views/home/UnifiedLogin.vue、README.md
 
 ## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：门户/023.md
 - 来源会话ID：fa14d9fd-092e-4803-84b7-313e9d826641；代码基线：none
 

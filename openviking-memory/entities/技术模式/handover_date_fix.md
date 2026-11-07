@@ -11,6 +11,7 @@
 - 同页「前期物业服务合同期限」也存在同样问题（只显示entrustStartDate），待确认是否一并修复
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/property/handover/detail.vue
 - 来源会话ID：a6391fef-ca00-4f65-9b24-3652ab37afa9

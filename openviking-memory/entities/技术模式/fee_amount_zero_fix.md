@@ -14,6 +14,7 @@
 - 在 feeDeclare2/detail.vue 第415-423行实施
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话：d2629f80-2e2a-4b5f-927b-4c00906ffa4d
 - 涉及 feeDeclare2/detail.vue 等
 

@@ -14,6 +14,10 @@
 - 涉及 index.html、App.vue、loginWithSfbTicket
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 618cde10-d52f-49ca-a993-700278308c9e；代码基线 none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

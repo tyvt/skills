@@ -11,6 +11,10 @@
 - 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/detail.vue、zhi2-web-admin/src/views/publicQuery/complex/components/buildingTable.vue、zhi2-web-admin/src/views/publicQuery/complex/components/OverviewEmptyTip.vue
 - 所属项目：产品2.0；来源会话：b5037f07-6db9-4962-b4ff-c907c3a62fea；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

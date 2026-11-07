@@ -13,6 +13,7 @@
 - `<zs-select([^>]*):value\.sync="` → `<zs-select$1v-model:value="`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：property/complex/index.vue、@zhi2-web-admin/src/components/zs-pagination/zs-pagination.vue
 - 所属项目：2-0（产品2.0）；来源会话：73a5ecd2-f9fb-443b-b4b0-8e8521acce74；代码基线：none
 

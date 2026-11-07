@@ -12,6 +12,8 @@ bookDetailTable.vue 与 businessItemTable.vue 因模板中被多复制一段 `{{
 - bookDetailTable.vue 顺带修正删除按钮配置：`visible: this.editButton` 改为与基类 table.js 里 deleteButton 一致的正确语义
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=bugfix
+- 来源会话：531f1b9a-0bdd-40d5-b647-610d1853af02
 - bookDetailTable.vue 验证证据：src=bugfix；会话：531f1b9a-0bdd-40d5-b647-610d1853af02；涉及文件：bookDetailTable.vue、table.js
 - businessItemTable.vue 验证证据：src=bugfix；会话：2b55625d-ad3f-426b-89da-994604e35af02；涉及文件：businessItemTable.vue
 - 所属项目：bugfix；代码基线：none

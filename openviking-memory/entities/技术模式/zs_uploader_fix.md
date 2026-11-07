@@ -11,6 +11,7 @@ i淮安H5 的 ZsUploader 组件原只上传 tempFiles[0]，修复后遍历全部
 - 全部成功后一次性更新列表和 form.photo
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安H5
 - 验证：在「我要报修」一次性选多张图片应显示多张并正确计数（如 3/9）
 - 涉及文件：src/components/ZsUploader/ZsUploader.vue、src/pages_owner/repair/submit.vue、src/api/file.js、src/api/index.js、src/components/ImageUploader/ImageUploader.vue、src/pages/index/my.vue
 - 所属项目：i淮安H5；来源会话：8ea610f8-3799-4753-8f73-41ed8bb06b46；代码基线：none

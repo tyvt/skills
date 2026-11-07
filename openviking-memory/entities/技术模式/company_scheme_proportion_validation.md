@@ -15,6 +15,10 @@
 - 涉及文件：zhi2-web-admin/src/views/company/companyScheme/detail.vue、src/api/company/companyScheme.js、institution/agencyPersonnel/components/AgencyPersonnelDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：6b993f54-a54c-46d4-bd1e-32b8da6cc3ba；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

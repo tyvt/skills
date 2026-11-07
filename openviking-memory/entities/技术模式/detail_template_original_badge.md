@@ -15,6 +15,7 @@ detail-template 新增「变更显示」能力，单元格右上角红色三角�
 - detailCallback 用 loadCommunityOptionsForDetail 顺序请求并 merge 避免竞态覆盖
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：用户诉求 1-6 与最终结论（formatSelectOptionsDisplay、detail-template tag 串改、loadCommunityOptionsForDetail 顺序合并）
 - 涉及文件：detail-template.vue、property/complexChange/detail.vue、detailMixins.js、area.js、dict-tag.vue
 - 所属项目：产品2.0；来源会话：b608284d-b42b-4810-99bd-afe869af0cbd；代码基线：6da8974

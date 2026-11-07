@@ -15,6 +15,12 @@ The Vue file `pages_my/setting/userInfo` exists but was not registered in the `p
 - Files: pages.json; pages_my/setting/userInfo.vue; pages_my/setting/realInfo.vue; pages_my/setting/index.vue; My_Suzhufang.vue
 - Project: Suzhou Housing C (zhi2-mobile-shimin); code baseline: none; session: 4cc33d41-1cbc-4887-bc8a-15d1fdcc8a0e
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：4cc33d41-1cbc-4887-bc8a-15d1fdcc8a0e
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

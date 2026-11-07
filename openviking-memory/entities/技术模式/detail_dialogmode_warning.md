@@ -10,6 +10,8 @@
 - `facilityChange/detail.vue` 模板同步改为 `v-if="formMode == 'view'"`，与其他区块一致
 
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/082.md
 - 涉及文件：maintenance/facility/detail.vue、mixins/detailMixins.js、mixins/form.js、maintenance/facilityChange/detail.vue
 - 来源会话：46f27f37-13c0-41e5-8c63-7986f337f5da；代码基线：none

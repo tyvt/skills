@@ -7,6 +7,7 @@
 - 构建已通过，样式可正常编译
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新预售合同签订页，在「第一章 合同当事人」查看间距效果
 - 涉及文件：`contract-form.scss`、`chapter1.vue`
 - 所属项目：苏州市房地产监测V3

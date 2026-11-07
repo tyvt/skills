@@ -10,6 +10,7 @@
 - 各区账户余额横柱状图保持 280px 高度不变
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、fundPanorama/chartConstants.js
 - 所属项目：园区物管2.0；来源会话：03064ac9-644e-4263-ae50-f1c88bdea7a6；代码基线：none
 

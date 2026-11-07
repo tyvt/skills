@@ -24,6 +24,10 @@
 - 来源会话: f5c910bd-d8dd-4878-952a-b6286f9f507f; 代码库: none
 - 所属项目: 园区公共收益
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

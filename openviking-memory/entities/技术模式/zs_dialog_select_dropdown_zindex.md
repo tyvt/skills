@@ -15,6 +15,11 @@
 - 涉及文件：src/components/zs-dialog/zs-dialog.vue、parkingDialog.vue
 - 来源会话ID：7fa31206-b0fe-47be-9388-3aedc6b7e8ed；代码基线：none
 
+## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

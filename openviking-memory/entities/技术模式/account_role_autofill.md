@@ -13,6 +13,7 @@
 - 判定口径：「有没有物业管理区域」是角色属性而非页面属性，凡从区域树派生默认值的表单都要先判断当前账号是否归属某区域
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 8cce6e5f 用户反馈新增带了固定区域账户，当前是管理员账号应不存在物业管理区域；修复为管理员不自动带出、B 端仍带，账户改为手动弹窗选择
 - 涉及文件：zhi2-web-admin/src/views/maintenance/guaranteeDeposit/components/AddDialog.vue、components/index.vue、guaranteeDepositAccount/index.vue
 - 所属项目：产品2.0；来源会话：8cce6e5f-7212-46e4-b856-ac58b146cde8；代码基线：effe72a

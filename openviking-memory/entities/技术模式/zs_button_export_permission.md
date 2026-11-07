@@ -15,6 +15,7 @@
 - zhi2-web-admin/src/components/zs-button/zs-button.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证：会话 1e81a46d 用户要求无导出权限时不显示导出按钮；结论缺 permission 字段。
 - 所属项目：淮安物管；来源会话：1e81a46d-d7d6-4b7a-9e41-93e0635341db；代码基线：1b9f773
 

@@ -10,6 +10,7 @@
 - `路由信息.json` 及子路径 `listNofenye` 等保留未动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/118.md
 - 涉及文件：路由信息.json、CashsaleDetail.vue、2026-09-11.md、前端技术信息.md、buildinginfo.js、unitinfo.js、BuildingDialog.vue 等
 - 所属项目：苏州市房地产监测V3；来源会话：b46a5433-8dbe-4b79-a009-979887275173；代码基线：none

@@ -17,6 +17,10 @@
 - d:\repository\门户\zhi2-web-admin\tests\e2e\portal-home-visual.spec.ts
 - 所属项目：门户；来源会话ID：2a87516f-bc63-420e-9c43-3e2e10205bfd；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

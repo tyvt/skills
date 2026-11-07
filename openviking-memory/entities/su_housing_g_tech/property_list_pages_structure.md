@@ -11,6 +11,7 @@
 - 路由由后端菜单动态生成，对应 `meta.filePath` 大致为 `property/complex/index`、`property/pr...`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：`complex/index.vue`、`propertyContractTemporary/index.vue`、`propertyContract/index.vue`、`components/index.vue`
 - 所属项目：苏住房G；来源会话：eedeca97-6461-4339-b304-4e5479b278fd；代码基线：none
 

@@ -13,6 +13,12 @@ FormInput misreads $el when fitContent is not true, causing Vue warning; fix mea
 - Project: 苏州市房地产监测V3
 - Files: contract/components/formInput.vue, hashTitle.vue, chapter2.vue, formComp.js, originalTip.vue, contractContent.vue, chapter3.vue, index.vue
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b7e96737-7bf9-4f61-9517-70baf4f0966c
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "bug_fix",

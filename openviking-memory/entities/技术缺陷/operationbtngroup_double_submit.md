@@ -15,6 +15,7 @@
 - 约定：详情页提交一律走 operation-btn-group 内置 ZsSubmit，禁止在插槽里手写提交按钮
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 2c381547 最终结论：删除插槽写死的提交按钮与 audit() 方法，保留 operation-btn-group 内置提交；并指出 property/allotNotice 是 :showSubmit="false" + 手写按钮的变体
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue；zhi2-web-admin/src/components/OperationBtnGroup/index.vue；zhi2-web-admin/src/components/ZsSubmit/index.vue
 - 所属项目：产品2.0；来源会话ID：2c381547-658f-48d5-908a-a6017928c089；代码基线：产品2.0/zhi2-web-admin（苏房V3同源），基线 c98afb0

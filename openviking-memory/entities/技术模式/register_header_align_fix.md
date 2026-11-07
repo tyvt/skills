@@ -12,6 +12,7 @@
 - `src/router/index.js`、`src/views/register/companyRegister.vue`、`src/views/institutionRegister/index.vue`、`src/views/leaseInstitutionRegister/index.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：d258d735-cf1c-4ea1-b3c3-bf1f9a80262c
 

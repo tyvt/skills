@@ -10,6 +10,7 @@
 - 基本信息对齐开发企业模板，使用 `buildCompanyBasicContentInfo` + `DetailTemplate`，字段为企业名称、行政区划、营业期限、备案审核机构等（不再显示机构别名、行业协会、加盟品牌等经纪机构字段）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - E2E 用例因测试账号未授权 `toB` 未完全跑通
 - 涉及文件：`CompanyBasicInfoDetail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：2c756fb1-3104-49e3-a267-f18e9110ae47；代码基线：none

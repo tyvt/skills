@@ -11,6 +11,7 @@
 - 菜单配置：组件路径 sso/bTerminalRedirect/index、路由地址填https链接、业务编码填对应clientId；配置后需重新登录刷新动态路由
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：permission.js 新增 isBTerminalRedirectComponent + normalizeExternalLinkRoute，将 bTerminalRedirect 纳入与 InnerLink 相同外链路径规范化
 - 涉及文件：zhi2-web-admin/src/store/modules/permission.js、zhi2-web-admin/src/views/sso/bTerminalRedirect/index.vue
 - 所属项目：产品2.0；来源会话：f702fc2e-fea8-44f2-ac57-30fa5c4f7b79；代码基线：62d5fb9

@@ -12,6 +12,7 @@
 - `statsFetchSeq` 序号保护忽略过期响应；`activated` 钩子重置为「本周」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：`home/index.vue`、`home/index-wrapper.vue`、`views/index.vue`
 - 所属项目：产品2.0；来源会话：d23cbaf7-ad9b-42a8-baa6-7897239ffefe
 

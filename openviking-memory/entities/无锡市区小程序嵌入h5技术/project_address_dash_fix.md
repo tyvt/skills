@@ -11,6 +11,7 @@
 - 补全逻辑与App.vue的H5初始化一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 来源会话：c484b1ef-d8e5-4052-a213-4476498f8145；代码基线：none
 - 涉及文件：src/App.vue、src/pages_benefit/benefit/index.vue、src/store/user.js
 - 所属项目：无锡市区小程序嵌入H5

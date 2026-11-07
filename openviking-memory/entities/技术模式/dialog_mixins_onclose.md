@@ -10,6 +10,7 @@ Vue2 弹窗组件若模板写 @close="onClose" 而公共 dialogMixins 仅暴露 
 - 不要改成 @close="close" 绕过告警，也不要自己写 visible=false 绕过 mixin。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 0462a732 粘贴 Vue warn 栈指向 guaranteeDeposit/components/AddDialog.vue；结论补上 onClose() { this.close() }。
 - 涉及文件：src/views/maintenance/guaranteeDeposit/components/AddDialog.vue、components/index.vue、src/mixins/dialogMixins.js
 - 所属项目：产品2.0；来源会话：0462a732-b177-45a1-9056-c252739c0ac9；代码基线：effe72a

@@ -15,6 +15,7 @@
 - 遇「本地构建过、CI 挂在 resolve import」报错，第一嫌疑就是大小写不一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 77670b3d CI 报 Could not resolve "./components/unitTable.vue"，本地能构建；根因 Windows 大小写不敏感，修复为与实际文件名 UnitTable.vue 一致后本地 build exit 0
 - 涉及文件：zhi2-web-admin/src/views/projectManagement/buildinginfo/detail.vue
 - 所属项目：产品2.0；来源会话：77670b3d-757c-4c9b-81a1-088b6d675376；代码基线：50767de~54577f2

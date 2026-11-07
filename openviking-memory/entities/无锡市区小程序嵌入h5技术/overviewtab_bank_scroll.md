@@ -15,6 +15,7 @@ OverviewTab.vue 展开银行流水区时，index.vue 外层 scroll-view 未自�
 - 先清空再设目标值，确保重复展开可再次触发滚动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：无锡市区小程序嵌入H5/015.md
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/OverviewTab.vue、src/pages_benefit/sharedFunds/index.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话：fd9f5f4e-e4c8-42f5-a93d-27c3c6883bde；代码基线：none

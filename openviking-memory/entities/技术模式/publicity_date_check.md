@@ -11,6 +11,7 @@
 - syncPublicityDays 用 watch 监听起止日期写回 form.publicityDays，结束日期变更时主动 validateField('publicityBeginDate')
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 b11d3681 实现 validator、rules trigger 改 change、watch 同步天数并重校验 begin；边界表 08-01~08-08 通过、08-07 与 08-03~08-04 拦截
 - 涉及文件：zhi2-web-admin/src/views/autonomy/publicity/detail.vue
 - 所属项目：园区公共收益；来源会话：b11d3681-1919-4ab7-bb72-0f3cec392874；代码基线：0abcb96

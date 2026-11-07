@@ -11,6 +11,8 @@
 - `initMap`、`updateCenter`、`nameLocation` 均走安全构造以兼容脏数据
 
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/081.md
 - 涉及文件：statisticsMap/components/map.vue、src/constant/map.js、statisticsMap/index.vue
 - 来源会话：4ba54bd2-24d5-4b33-92bc-49f3cc906331；代码基线：none

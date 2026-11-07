@@ -11,6 +11,7 @@
 - 所有走 ListTemplate 的列表页都会带该属性；某页需更宽可在自身 data 覆盖
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：zhi2-web-admin/src/mixins/ListTemplate.js、table.js（表格mixin）、maintenance/query/index.vue
 - 所属项目：园区物管2.0（项目2-0）
 - 来源会话：0613463c-dedd-4264-a38a-7d944299a97c

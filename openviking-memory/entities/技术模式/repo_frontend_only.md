@@ -8,6 +8,7 @@
 - 模块与 URL 与 2.0 不是同一套，只能作字段与 SQL 思路对照，不能直接当现网契约
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 9a44f1a5 工作区 Java 搜索无结果，发现园区 V0 mtpl 合同守护实现与 2.0 接口分离
 - 涉及文件：maintenance/contractGuard/index.vue、detail.vue
 - 所属项目：园区公共收益；来源会话：9a44f1a5-9f37-49c4-994c-c50b9acce0c6；代码基线：0abcb96

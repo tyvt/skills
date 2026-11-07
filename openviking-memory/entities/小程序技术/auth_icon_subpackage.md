@@ -19,6 +19,7 @@
 - 构建后自证dist/static/images/下存在两文件，安卓真机验两入口
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话a1a45147用户报安卓手机号授权页缺默认图iOS无此现象；结论根因分包未打入+跨包加载，修复迁入主包+注册+ZsImage
 - 涉及文件：src/pages/components/PhoneForm.vue、src/pages/login/index.vue、src/static/images/phone-auth-icon.png、src/mainStaticPaths.js
 - 所属项目：苏住房C；来源会话ID：a1a45147-a211-4056-89f4-a6d870d42790；代码基线：6599714

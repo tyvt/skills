@@ -15,6 +15,7 @@
 - d:/repository/榆林G/zhi2-web-admin/src/views/maintenance/initiation/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=榆林G
 - 所属项目：榆林G；来源会话：a8ef8efd-ce98-4799-a804-7ad84b70236e；代码基线：none
 
 <!-- MEMORY_FIELDS

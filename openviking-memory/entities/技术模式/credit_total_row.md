@@ -13,6 +13,10 @@
 - 涉及文件：src/views/credit/companyEvaluation/components/index.vue、detail.vue、src/views/evaluation/companyReport/components/index.vue
 - 所属项目：园区物管2.0；来源会话：00d40a53-3f14-4723-afac-4ee9a24737e8；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

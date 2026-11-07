@@ -11,6 +11,7 @@
 - watch 监听 busId 刷新要件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/098.md
 - 涉及文件：companyManagement/components/DeveloperBasicInfoDetail.vue、api/company/companyRecord.js、companyManagement/components/AgencyBasicInfoDetail.vue、presale/permit/components/detail.vue、e2e/fixtures/company-helpers.js、companyRecordAgency/detail.vue、e2e/company/company-record-change.spec.js、toB/companyRecord/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：f9b44225-a1eb-42b2-9743-4c23122dfdce；代码基线：none

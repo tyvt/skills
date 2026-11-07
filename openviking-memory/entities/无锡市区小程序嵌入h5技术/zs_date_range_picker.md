@@ -11,6 +11,8 @@
 - 自定义模式下嵌套日期面板要抬高层级或收紧父弹层 overflow，防止子面板被父层遮挡
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：26ca4c09-5707-4402-a54f-9c9491ec3455
 - 验证会话：26ca4c09-5707-4402-a54f-9c9491ec3455（同会话多轮）
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/components/ZsDateRangePicker/ZsDateRangePicker.vue、src/pages_benefit/sharedFunds/components/DetailsTab.vue
 - 所属项目：无锡市区小程序嵌入H5；代码基线：a951bf3

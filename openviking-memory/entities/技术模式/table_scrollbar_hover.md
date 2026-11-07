@@ -11,6 +11,7 @@
 - 悬停表头、右侧固定列或数据区时底部横向滚动条均显示，与 zs-table、首页待办表一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：cursor 会话提取；所属项目：门户；来源会话ID：908fa819-e4da-4511-b737-948d86388270；代码基线：none
 - 涉及文件：zhi2-web-admin/src/styles/index.scss、zhi2-web-admin/src/views/home/components/HomeTodoTable.vue
 

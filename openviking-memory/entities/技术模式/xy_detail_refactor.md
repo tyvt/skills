@@ -12,6 +12,10 @@
 - 文件：xy/detail.vue、AgreementDetailsTable.vue、end/detail.vue、version/detail.vue
 - 所属项目：产品2.0；来源会话：0e5f49e3-e419-41e8-86f5-2009c4cfc14f；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

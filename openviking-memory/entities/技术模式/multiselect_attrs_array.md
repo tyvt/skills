@@ -10,6 +10,7 @@
 - 涉及 MultiSelect.vue、zs-select.vue、group-multi-select.vue、accountOpen/owner/index.vue 等同类型 getter 同步修改。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 96cc05d6 owner/index 搜索表单渲染报错 split is not a function；结论点名 MultiSelect 与 group-multi-select 同类 getter。
 - 涉及文件：zhi2-web-admin/src/components/zs-select/MultiSelect.vue、zs-select.vue、zhi2-web-admin/src/views/property/complex/components/group-multi-select.vue、zhi2-web-admin/src/views/maintenance/accountOpen/owner/index.vue
 - 所属项目：2-0；来源会话ID：96cc05d6-f240-484b-bd44-cb2ed62f1ebc；代码基线：none

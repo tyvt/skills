@@ -10,6 +10,7 @@
 - `detail.vue` 的 `handleProjectSelect` 改用上述函数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/281.md
 - 涉及文件：presale/surveyChange/detail.vue、surveyChangeConstants.js、permitCancel/detail.vue、zs-select-dialog-func.vue、presale-survey-change-helpers.js、permitExtend/detail.vue、entrustSale/detail.vue、apiV3Normalize.js
 - 所属项目：苏州市房地产监测V3；来源会话：754ddf0b-9295-4421-b9b9-93fc87b9b996；代码基线：none

@@ -10,6 +10,7 @@
 - 内边距设为 10px 15px 实现水平垂直居中
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue
 - 所属项目：园区物管2.0
 - 来源会话：3097391c-8f1b-4b81-9b50-2310a66b6a1c

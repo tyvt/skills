@@ -10,6 +10,7 @@
 - 在 data() 补 moduleName: 'system'、businessName: 'operLog'，取值必须与接口路径 /system/operLog/page 的段一致。
 - 验收以刷新后两条 Vue 警告消失 + 操作列权限码正确为准。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话 6b87fa8d 定位模板第24行使用未声明字段；listMixins 的 table mixin 需要它们用于 tableId 与权限前缀；修复为补 moduleName:'system'、businessName:'operLog'。
 - 涉及文件：zhi2-web-admin/src/views/system/operlog/index.vue、src/mixins/listMixins.js、src/mixins/table.js、src/components/zs-operate-column/zs-operate-column.vue
 - 所属项目：苏住房G；来源会话：6b87fa8d-f4b1-449c-ad47-3f43156f144d；代码基线：a945fa1

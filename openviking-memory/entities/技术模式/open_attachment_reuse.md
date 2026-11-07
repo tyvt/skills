@@ -16,6 +16,7 @@
 - 逻辑与接口：`src/utils/entryNetwork.js`、`e2e/fixtures/appendix-package-helpers.js`、`src/api/company/companyRecord.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/080.md、苏州市房地产监测V3/121.md
 - 所属项目：苏州市房地产监测V3；来源会话：214f8941-3e04-4144-869c-06b35138075d；代码基线：none
 

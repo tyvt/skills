@@ -11,6 +11,7 @@
 - 为「决策范围」设 `${route.path}#decisionRange`、「表决项」设 `${route.path}#votingItems` 独立缓存 key
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 涉及文件：`src/mixins/listMixins.js`、`optionDecision/components/DecisionRangeTable.vue`、`optionDecision/components/VotingItemsTable.vue`、`decisionCommon/components/DecisionRangeTable.vue`
 - 所属项目：太仓G；来源会话：e0903bbe-197e-4316-9a21-245f9310dae3；代码基线：none
 

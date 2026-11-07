@@ -2,7 +2,7 @@
 src/pages/login/index.vue 中 token 被硬编码为 1 并拼入 URL，且真实 token 读取被注释，导致请求携带假 token。
 
 ## 问题现象
-- src/pages/login/index.vue 第 100 行硬编码 token=1，第 31 行将其拼入 URL
+- src/pages/login/index.vue 第 100 行 `let token = 1`，第 31 行将其拼入 URL `v2.0/security/ctAuth/getUnifiedBusinessToken?token=${token}`，最终请求携带 `?token=1`
 - doLogin(token: string) 被传入数字类型的 token
 - uni.getStorageSync('urlToken') 被注释，导致请求携带假 token
 
@@ -20,8 +20,8 @@ src/pages/login/index.vue 中 token 被硬编码为 1 并拼入 URL，且真实 
 {
   "category": "技术模式",
   "name": "login_token_hardcoded",
-  "source_extraction_id": "8994a9560a2f44fcbd3e1449beea3404",
-  "version": 1,
+  "source_extraction_id": "f657ec189ef24d3e91aa1d267e395ce2",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

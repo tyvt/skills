@@ -10,6 +10,8 @@
 - 于 `assetCellStyle` 兜底将部分缴费或旧蓝值（如 #d0e4ff/#fde3d1/#409eff，原 #D0E4FF）强制映射 `#1677FF`
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 涉及文件：src/views/benefit/statisticsMap/operatingAssets.vue
 - 来源会话：fd027401-d927-43fc-8570-7d67081113c7
 - 代码基线：none

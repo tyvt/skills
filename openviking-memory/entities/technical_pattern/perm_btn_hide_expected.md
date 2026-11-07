@@ -15,6 +15,12 @@ Normal users lacking a permission char see no button; this is intended behavior,
 - Source cursor session: 4c6ee833-9c90-4028-9924-d76a48a30e77
 - Project: 太仓G zhi1-web-admin; code baseline: none
 
+## 验证与归属
+- 所属项目：太仓G
+- 验证证据：extracted source=cursor project=太仓G
+- 来源会话：4c6ee833-9c90-4028-9924-d76a48a30e77
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

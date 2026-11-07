@@ -12,6 +12,8 @@
 - src/styles/mixin.scss、src/styles/variables.css
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/115.md（原 079.md 同会话再确认）
 - 来源会话：8397c8af-8a67-463f-95c0-7ea80f1cd3d4；代码基线：none
 

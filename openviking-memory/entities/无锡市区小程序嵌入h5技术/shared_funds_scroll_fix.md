@@ -10,6 +10,7 @@
 - 再次点击查询明细先清空再设置scrollIntoView，保证重复触发有效
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 来源会话：fd9f5f4e-e4c8-42f5-a93d-27c3c6883bde；代码基线：none
 - 涉及文件：src/pages_benefit/sharedFunds/components/OverviewTab.vue、src/pages_benefit/sharedFunds/index.vue
 - 所属项目：无锡市区小程序嵌入H5

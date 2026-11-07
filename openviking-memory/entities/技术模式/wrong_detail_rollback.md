@@ -13,6 +13,7 @@
 - 误改清单见 `zhi2-web-admin/scripts/audit-wrong-detail-apis.json`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：`audit-wrong-detail-apis.js`、`src/api/company/companyRecord.js`、`toB/companyRecord/detail.vue` 等
 - 所属项目：产品2.0；来源会话：ab733ff8-e8ba-41af-a40c-4a367ebc6c84；代码基线：none
 - 联调建议重点验证消息发布/撤回、表决图表、大屏统计等接口路径

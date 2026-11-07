@@ -26,6 +26,7 @@
 - portalPersonPhoto.js（位于 publicPortal 相关目录）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 所属项目：门户；来源会话：5942ae9c-e4bd-4732-877f-0bca30cb992b；代码基线：none
 
 <!-- MEMORY_FIELDS

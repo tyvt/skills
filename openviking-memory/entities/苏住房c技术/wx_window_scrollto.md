@@ -13,6 +13,7 @@
 - 改完重新构建 dist 后在微信开发者工具逐个点击 tab 验证，H5 预览通过不算验证
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 41a4e64f 用户贴 weapp 报错 TypeError at Proxy.setTab；修复改用 uni.createSelectorQuery + uni.pageScrollTo，补 md0 class，md3 改 md6
 - 涉及文件：src/pages_transaction/newHouse/detail.vue
 - 所属项目：苏住房C；来源会话ID：41a4e64f-0b65-4969-b0c2-d0d6514d2d0c；代码基线：9832ba3

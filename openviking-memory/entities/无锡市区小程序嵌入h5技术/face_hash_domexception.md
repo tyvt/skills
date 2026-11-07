@@ -12,6 +12,7 @@
 - 改完需重新 build 并部署 H5 再测整段人脸→选屋流程
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话 a13995cc 用户贴 success 日志与 DOMException，非法示例 `https://wygl.wxwgzx.com:8989./#/pages/face/bdc`
 - 验证文档：无锡市区小程序嵌入H5/015.md
 - 涉及文件：src/pages/face/face.vue、src/pages/face/bdc.vue、vite.config.ts

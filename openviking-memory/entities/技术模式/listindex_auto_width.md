@@ -20,6 +20,7 @@
 - src/pages_tab/components/PolicyList.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C（zhi2-mobile-shimin）
 - 来源会话：e687f92b-2bae-4027-9337-1e29dfe49948
 - 代码基线：none

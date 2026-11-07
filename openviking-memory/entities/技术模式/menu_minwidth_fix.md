@@ -14,6 +14,12 @@
 - 涉及文件: Navbar.vue, variables.css, index.vue, AppMain.vue, TagsView/index.vue, index.scss, ruoyi.scss, facility/index.vue
 - 会话: eaeb4d6a-1209-47e7-a761-4c6b265f74bc
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：eaeb4d6a-1209-47e7-a761-4c6b265f74bc
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

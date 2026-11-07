@@ -3,6 +3,12 @@
 - 涉及文件: pubRegulatoryStopAgreement/index.vue, pubRegulatoryStopAgreement/detail.vue, guaranteeDepositAccount/index.vue, guaranteeDepositAccount/detail.vue, guaranteeDeposit/index.vue, guaranteeDeposit/detail.vue, propertyAgreementEnd/index.vue, propertyAgreementEnd/detail.vue
 - 验证：源会话 b33c9a86-2657-44fd-82c7-9dec68b27f44
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：b33c9a86-2657-44fd-82c7-9dec68b27f44
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

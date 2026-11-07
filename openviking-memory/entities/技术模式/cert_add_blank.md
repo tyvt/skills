@@ -20,6 +20,7 @@
 - d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/Headline/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/020.md
 - 来源会话ID：a685a691-d9cd-48fb-934f-e93a7a97176d
 - 所属项目：苏州市房地产监测V3；代码基线：none

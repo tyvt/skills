@@ -10,6 +10,7 @@
 - 代码：`dict.filter((item) => item.value !== "" && item.value != null)`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 来源会话：0d2c6516-1930-4d19-b020-1182a8c885bb；代码基线：none
 - 涉及文件：src/pages_benefit/sharedFunds/components/DetailsTab.vue、src/api/sharedFunds.js
 - 所属项目：无锡市区小程序嵌入H5

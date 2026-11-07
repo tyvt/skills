@@ -12,6 +12,10 @@
 - 涉及文件：zhi2-web-admin/src/views/property/complexMeter/components/complexMeterRecordDialog.vue、src/components/detail-template/detail-template.vue、complexMeterRecordTable.vue
 - 所属项目：园区物管2.0；来源会话：2b1c5e5a-7dde-40bf-813c-d73384eee27f；代码基线：042.md
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

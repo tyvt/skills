@@ -10,6 +10,7 @@
 - 内边距由 `10px 15px 10px 0` 改为对称 `10px 15px`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue
 - 修改仅样式层；lint 报 3 个既有 TypeScript 插件错误，非本次引入
 - 所属项目：园区物管2.0；代码基线：none；来源会话：3097391c-8f1b-4b81-9b50-2310a66b6a1c

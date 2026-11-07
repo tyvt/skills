@@ -11,6 +11,7 @@
 - 待提交、审核中阶段同样隐藏，备案通过后 `getDetail` 刷新 `bizState` 变为 2 报名信息自动出现
 - 业委会征集、筹备组候选人确认等场景按上述规则对齐
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue、CandidateTable.vue
 - 所属项目：园区公共收益；来源会话：4686b4cc-9df1-4168-a0c5-e5e69fe7b2df、37dbc28a-32eb-4a0c-a154-c7353dc061f8；代码基线：none
 

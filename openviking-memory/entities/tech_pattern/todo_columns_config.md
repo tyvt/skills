@@ -15,6 +15,12 @@ The flowable todo.vue table was refactored to use a columns configuration and du
 - Source cursor session: 43c31fa0-2afa-4155-861c-52d80df36f42
 - Code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：43c31fa0-2afa-4155-861c-52d80df36f42
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

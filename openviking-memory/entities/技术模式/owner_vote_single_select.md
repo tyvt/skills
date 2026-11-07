@@ -12,6 +12,11 @@
 - 涉及文件: ownerVote_Detail.shtml, components/dialog.js, MtplOwnerVoteOptionComServiceImpl.java, ownerVote_Detail.js, committePer_CommittePerCommittePerVoteDetail.js, committePer_CommittePerCommittePerVoteDetail.shtml.
 - 来源会话: ac2d34d3-11af-46a8-91d6-aec8e65207bb.
 
+## 验证与归属
+- 所属项目：园区物管V0
+- 验证证据：extracted source=cursor project=园区物管V0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

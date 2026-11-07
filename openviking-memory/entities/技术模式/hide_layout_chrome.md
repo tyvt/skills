@@ -12,6 +12,7 @@
 - `TagsView` / `GenerateRoutes`：在 `hideLayoutChrome` 下始终用完整侧栏树，避免路由切换后按 TopNav 模式裁剪菜单
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证：刷新后从首页点侧栏「应用管理」等项，顶栏应始终无横向菜单项，仅左侧菜单 + 标签页
 - 涉及文件：portalLayout.js、homeDataMixin.js、TagsView、GenerateRoutes、layout/index.vue
 - 所属项目：门户；来源会话ID：40f4d280-b5c1-4c8e-8477-9f099246ba53；代码基线：none

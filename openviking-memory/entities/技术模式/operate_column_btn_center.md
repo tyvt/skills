@@ -8,6 +8,7 @@
 - 为 `operate-column-button-container` 增加 `justify-content: center`，使按钮在操作列中居中
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue
 - 修改仅样式层；lint 报错为项目 Vue2 模板在 ts-plugin 下的既有提示，非本次引入
 - 所属项目：园区物管2.0；代码基线：none；来源会话：eb429bff-03b8-43b5-9e7a-77b8f20a182a

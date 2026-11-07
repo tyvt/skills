@@ -14,6 +14,7 @@
 - 应改为 == '1' 显式比较，与仓库其他标志位一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 所属项目：惠山二期G；代码基线：none
 - 涉及文件：completion/detail.vue、final/index.vue、final/detail.vue
 - 来源会话：f0f44bcf-e5d4-4079-aec7-a44a6efb9381、7fd96eae-ff4a-4cde-8f71-536de88bfa82

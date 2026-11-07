@@ -13,6 +13,10 @@
 - 涉及文件：TypeChoose_Suzhufang.vue、addTypeChoose.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：d365c947-62dc-48ad-abbf-b9814a607332；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

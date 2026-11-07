@@ -15,6 +15,12 @@
 ## 验证
 - cursor 会话: b2d5de3f-5090-4bd2-97e9-fac732c844c4; 代码库: none
 
+## 验证与归属
+- 所属项目：惠山二期G
+- 验证证据：extracted source=cursor project=惠山二期G
+- 来源会话：b2d5de3f-5090-4bd2-97e9-fac732c844c4
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

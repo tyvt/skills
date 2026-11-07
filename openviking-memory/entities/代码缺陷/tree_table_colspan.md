@@ -9,6 +9,7 @@
 - 每行末级可见单元格算colspan：1级=3、2级=2、3级=1；模板:colspan="cell.colspan||1"
 - 验证逐行断言各单元格colspan之和===表头列数
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话871272e2，⛵送立案线索数量colspan:2无右侧空列；信托制物业服务项目数colspan:3横跨3列
 - 涉及文件：src/utils/monthlyReport.js、src/views/publicQuery/monthlyReport/components/ReportItemsTable.vue、src/views/publicQuery/monthlyReportStat/detail.vue
 - 所属项目：苏住房G；来源会话：871272e2-4c46-4ece-af72-9c897a51118e；代码基线：8ebcdab

@@ -13,6 +13,12 @@
 - 涉及文件: publicQuery/complex/detail.vue; publicQuery/complex/components/propertyContractTable.vue; publicQuery/complex/components/buildingTable.vue; publicQuery/complex/components/committeeTable.vue; publicQuery/complex/components/advertiseTable.vue; publicQuery/complex/index.vue; mixins/subTableMixins.js; mixins/table.js.
 - 验证证据: cursor session=4f89ea4c-149b-4217-b962-c76fcfb5aaea.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：4f89ea4c-149b-4217-b962-c76fcfb5aaea
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

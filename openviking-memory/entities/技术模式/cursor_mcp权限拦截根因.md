@@ -17,6 +17,10 @@
 ## 关联
 - 与 preferences(memory_mcp_setup) 互补：需在 .cursor/cli-config.json 的 permissions.allow 加 `Mcp(tencentdb-memory, *)` 并 Reload Window 才能解除该拦截。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=d-repository-V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

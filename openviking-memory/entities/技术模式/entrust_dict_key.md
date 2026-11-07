@@ -13,6 +13,12 @@
 - 涉及文件: presale/entrustSale/detail.vue; presale/entrustSale/index.vue; supervision/bank/jgwd/detail.vue; main.js; components/detail-template/detail-template.vue; autonomy/repair/detail.vue; mixins/detailMixins.js; utils/dict.js
 - 会话: 98dea9b7-0496-43cc-8f46-c865905aa071; 代码库: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：98dea9b7-0496-43cc-8f46-c865905aa071
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

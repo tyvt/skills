@@ -15,6 +15,7 @@
 - zhi2-web-admin/src/views/home/publicPortal
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 在 http://localhost:8082/ 验证：行高 29px、日期 2022-06-06，标题可读
 - 验证证据：cursor 会话提取；所属项目：门户；来源会话：36c8f156-f9a2-4ed8-b85c-200e96ace5cc
 

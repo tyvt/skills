@@ -12,6 +12,7 @@
 - 统一地图加载入口，避免 `created`/`mounted` 重复调用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js、benefit/statisticsMap/index.vue、benefit/statisticsMap/components/map.vue
 - 所属项目：园区物管2.0；代码基线：none
 - 来源会话：b8c9482d-979a-4abb-bdf3-cd1b595616ce

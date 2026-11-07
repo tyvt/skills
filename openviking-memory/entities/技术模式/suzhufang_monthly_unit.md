@@ -7,6 +7,10 @@
 - 涉及 `monthlyReportStat/detail.vue`、`monthlyReport.js`、`ReportItemsTable.vue`、`zs-input-number.vue`
 - 所属项目：苏住房G；来源会话：c26ba994-cf69-448b-a0b6-d0646c71a5da；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

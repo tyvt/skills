@@ -11,6 +11,7 @@
 - 网络fail时对noReject请求resolve(null)，新增skipToken配置，埋点类请求不传Authorization
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 效果：埋点401静默忽略，redirect页埋点后跳转不被阻塞
 - 涉及文件：src/api/appAnalytics.js、httpInstance.js、src/api/index.js、src/utils/menuRouteMap.js
 - 所属项目：苏住房C；来源会话ID：f8d2218a-2bef-4ce0-99ff-25ccbca24f30；代码基线none

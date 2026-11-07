@@ -13,6 +13,7 @@
 - 「继续变更」按钮相关修复（原文截断）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：`CompanyBasicInfoDetail.vue`、`toB/companyRecord/detail.vue`、接口文档前端.md
 - 所属项目：产品2.0；来源会话：4e2633d3-54fb-423b-88ed-c035d9f7d33c；代码基线：none
 

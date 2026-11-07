@@ -14,6 +14,7 @@
 - 所有「同一数据源可被多入口/多条件并发刷新」的列表都套用此 seq 守卫模式，比 AbortController 更简单且不依赖 axios 版本
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：home/index.vue 增加 todoPanelFetchSeq，then/finally 中 seq === this.todoPanelFetchSeq 才写入 todos / 关 todoLoading
 - 涉及文件：zhi2-web-admin/src/views/home/index.vue
 - 所属项目：产品2.0；来源会话：17a66e94-0a17-42dc-94f3-4fbe933bf043；代码基线：6da8974

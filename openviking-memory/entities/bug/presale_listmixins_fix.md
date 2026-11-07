@@ -12,6 +12,7 @@
 - 若「房屋」Tab 仍出现同类提示，`PresaleHouseTable.vue` 可能也误用了 `listMixins`，可按同样方式去掉
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证：刷新详情页后，楼幢 Tab 下警告应消失
 - 涉及文件：`PresaleBuildingTable.vue`、`PresaleSelectBuildingDialog.vue`、`mixins/listMixins.js`
 - 所属项目：苏州市房地产监测V3；来源会话：69921419-8a4f-4e43-b9d8-780e617536da

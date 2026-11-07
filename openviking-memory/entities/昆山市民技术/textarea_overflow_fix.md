@@ -10,6 +10,7 @@
 - textarea 设固定高度 `136rpx`（176rpx 减上下各 20rpx 内边距），与容器对齐
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 所属项目：昆山市民；来源会话ID：4185ad11-fbc7-4260-b251-a68babfff42a；代码基线：none
 - 涉及文件：pages_examine/components/approveDialog.vue
 

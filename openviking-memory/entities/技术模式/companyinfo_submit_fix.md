@@ -14,6 +14,10 @@
 - 参照：zhi2-web-admin/src/views/register/components/accountInfo.vue
 - 所属项目：G（泰兴G / zhi2-web-admin）；来源会话：b2127488-181c-4650-ae00-f25d6e38cf6e；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

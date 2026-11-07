@@ -9,6 +9,7 @@
 - src/views/publicQuery/feeStandardStats/index.vue 的 handleCellClick 中将 dimensionValue 改为 rowLabel
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G
 - 涉及文件：src/views/publicQuery/feeStandardStats/index.vue、components/ComplexDetailDialog.vue
 - 来源会话：8b941e49-61cc-488f-9aec-53846bc6e898

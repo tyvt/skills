@@ -12,6 +12,8 @@
 - 如果缺少 projectId，显示无效参数警告。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
+- 来源会话：00d6a1e4-2062-4ab5-8de7-905e9b2376e6
 - 验证证据: cursor session 00d6a1e4-2062-4ab5-8de7-905e9b2376e6
 - 文件: zhi2-web-admin/package.json, zhi2-web-admin/src/views/property/userStatistics/index.vue, zhi2-web-admin/src/views/property/ctUserIdentityApply/bindTable.vue, zhi2-web-admin/src/views/property/ctUserIdentityApply/index.vue, zhi2-web-admin/src/views/property/ownerBindQuery/index.vue, zhi2-web-admin/src/views/building/project/index.vue, zhi2-web-admin/src/views/property/complex/components/rangeTable.vue, zhi2-web-admin/src/mixins/listMixins.js
 - 所属项目: 惠山二期G

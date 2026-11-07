@@ -7,6 +7,7 @@
 - 对 contentType == '1' 且内容为 [x]/【x】的项显示为空输入框，不展示占位符文本
 - 外层 content-container 增加边框与内边距；固定文本用 span 内联，可编辑项用小尺寸内联输入框
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 修复后固定文本、已填内容和待填占位项在同一区域展示
 - 涉及文件：complexServiceDetailDialog.vue、complexServiceDetailTable.vue、serviceItem/detail.vue
 - 所属项目：产品2.0；来源会话：0795a3c7-8e50-4638-8a48-817e2f850829；代码基线：none

@@ -18,6 +18,7 @@
 - scripts/migrate-pages-main.mjs
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=苏住房C/074.md
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：395868ae-5e71-4d74-afd9-9f02b478b2f1
 

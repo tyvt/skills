@@ -13,6 +13,12 @@ In pages_owner/house/index.vue, WXSS background images for .top-empty and .histo
 - Files: pages_owner/house/index.vue, ZsImage.vue, pages_owner/tenant/index.vue, TypeChoose_Suzhufang.vue
 - Source session: 5fbd3e35-025c-45df-996f-22495a68d907
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：5fbd3e35-025c-45df-996f-22495a68d907
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_tech",

@@ -13,6 +13,7 @@
 - 教训：自动计算+禁用的派生字段若接口有同义落库字段，必须在绑定 prop/可编辑/提交取值/校验字段四处保持同一字段名
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 0cbbf182 用户诉求使用 arrearsAmount；结论列三条根因及六项修改清单；src=苏住房G/086.md
 - 涉及文件：src/views/property/feeDeclare2/detail.vue、src/views/property/feeDeclare2/components/feeBindScopeTable.vue、src/views/property/declare/all/pay.vue
 - 所属项目：苏住房G；来源会话ID：0cbbf182-783b-42fb-ad93-4e0e2a8c76bc；代码基线：d109b83

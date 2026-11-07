@@ -14,6 +14,7 @@
 - 删除冗余代码：`layoutScale`（仅转发 `layoutWidthScale`）、`createMockDataState` / `applyMockData`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/assetPanorama/mock.js、src/views/benefit/dataSandbox/assetPanorama/chartOptions.js、src/views/benefit/dataSandbox/pieLegendHover.js
 - 所属项目：园区物管2.0；代码基线：none
 - 来源会话：c9fce210-f5e5-4591-b857-e112b3ac6150

@@ -15,6 +15,7 @@ zhi2-web-admin 登录 E2E 用 Tesseract+规则纠错识别扭曲算式图常失�
 - 也可让测试环境后端将 /code 返回固定值（如 1234）或弱化校验，而非前端 OCR 识别，避免实现复杂且偏离 E2E 用户流程目标。
 - 或测试环境换无扭曲简单算式图；OCR 仅作无 answer 时的兜底，且必须 wait 验证码 img/src 就绪后再截屏。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证：会话 44f9e8a5 诉求 3–6 与最终结论：三字段未填、识别内容 yee/CW、图片未出现就识别；结论建议测试环境 answer + 前端预留 res.answer。
 - 涉及文件：zhi2-web-admin/tests/e2e/login.spec.js、assets/views/login.vue；所属项目：2-0；来源会话：44f9e8a5-1336-42c2-9226-9d3dc33ccb9a
 - 另据会话 be5b577d-159c-4126-a301-a93c2e1de71f：根因 OCR 不稳定且实现复杂，测试环境后端 /code 返回固定值或弱化校验；涉及 tesseract.js、res.js；代码基线 none。

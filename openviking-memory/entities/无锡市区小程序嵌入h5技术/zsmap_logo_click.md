@@ -11,6 +11,7 @@ ZsMap.vue使用uni-app原生<map>组件（底层腾讯地图），其左下角Lo
 - 若仅为避免用户误点跳转，需采用其它非隐藏方案
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：src/components/ZsMap/ZsMap.vue、src/pages_owner/project/info/index.vue
 - 来源会话：8caf0d1f-dcbc-42e1-947f-e60d56e58eef
 - 所属项目：无锡市区小程序嵌入H5

@@ -9,6 +9,7 @@
 ## 页面用法
 - 统一写法：`<el-form-item prop="attachmentUrl" class="appendix-labeled-field-form-item" label-width="0"> <zs-file-upload v-model="form.attachmentUrl" label="建设工程规划许可证" ...>`
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`appendix-requirement-grid.scss`、`index.scss`、`CertificateFixedAppendixField.vue`、`detailAttachmentDisplay.js`
 - 所属项目：苏州市房地产监测V3；来源会话ID：f08e4450-7e4c-4f7a-8514-96638563fc99；代码基线：none
 

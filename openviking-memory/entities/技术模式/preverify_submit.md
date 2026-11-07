@@ -17,6 +17,7 @@
 - 超时阈值须大于后端5秒
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 894fc213 用户明确两步接口变更与串行loading/静默重试要求，最终落封装函数与页面去重
 - 涉及文件：src/api/property.js、PropertyAdd.vue、owner/add.vue、HouseAdd.vue、bindProject.vue、verify.vue
 - 所属项目：苏住房C；来源会话ID：894fc213-ccb6-4c5b-912d-82f922d8f7fb；代码基线：5438dc6

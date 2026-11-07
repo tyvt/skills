@@ -12,6 +12,7 @@
 - 别把地图鉴权报错与图片 500 混成一个问题处理。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 e3873d64 用户贴出两条地图鉴权失败与三张图片 500；结论指出鉴权失败是平台配置问题，与图片无关。
 - 验证：会话 b1546e14 定位为腾讯地图 Key 鉴权问题，列出 ZsMap.vue subkey="3SQBZ-QJL66-TV5SJ-ETW3L-LADIS-T6FKA" 与 manifest.json appid；给出控制台检查、公众平台接口开通、清缓存、真机验证步骤及新 Key 替换四处落点。
 - 涉及文件：src/components/ZsMap/ZsMap.vue、src/manifest.json、src/utils/index.js、src/utils/file.js

@@ -13,6 +13,7 @@
 - 状态色映射：is-red(#F7CBCB)、is-orange(#FDE3D1)、is-green(#D1EFCB)、is-gray(白底浅灰描边)
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 来源会话：feb4d674-5cbe-45b6-a39d-a9818f09eacf、dccaafe5-eb52-4dbb-ad03-5a8e2e150a84
 - 涉及文件：benefit/statisticsMap/operatingAssets.vue
 - 所属项目：园区物管2.0；代码基线 none

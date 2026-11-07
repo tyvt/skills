@@ -12,6 +12,7 @@
 - 资金缴款「选择物业管理区域」弹窗应显示「娄葑街道」等中文
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：会话「修复街道/社区显示编码的问题，全局处理」新建 areaFormatter、改 common store/router、formatters、zs-table-column、area mixin
 - 涉及文件：zhi2-web-admin/src/utils/areaFormatter.js、store/modules/common.js、router/index.js、formatters/index.js、components/zs-table-column/zs-table-column.vue、mixins/area.js
 - 所属项目：园区公共收益；来源会话：a6aae663-eacf-4a1f-bbbd-fbb2ad3323ac；代码基线：1ccdb34

@@ -7,6 +7,9 @@
 - defaultTabList 固定为三个标签页：用款明细, 关联楼幢, 股东信息
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：f81fe328-0c4a-411a-b2a9-b762808390a4
 - 验证证据: src=苏州市房地产监测V3/179.md
 - 涉及文件: notice/detail.vue, AppropriationBuildingsTable.vue, usemoney/detail.vue, RelatedBuildingsTable.vue, usemoneyRevoke/detail.vue, BuildingTable.vue, AppropriateTable.vue
 - 会话: f81fe328-0c4a-411a-b2a9-b762808390a4; baseline: none

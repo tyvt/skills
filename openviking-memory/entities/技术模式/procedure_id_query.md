@@ -18,6 +18,7 @@
 - d:/repository/产品2.0/zhi2-web-admin/src/views/dataProperty/procedure/components/procedureProcessDialog.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：4d8f8198-d7b1-458f-891e-5a0c95b1090a；代码基线：none
 
 

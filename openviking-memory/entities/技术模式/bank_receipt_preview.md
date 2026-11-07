@@ -12,6 +12,10 @@
 - 文件：`BankReceiptDetailDialog.vue`、`BankReceiptFormContent.vue`、`BankReceiptForm.vue`、`pubBankReceiptApply/detail.vue`、`index.vue`、`HeadTitle/index.vue`
 - 来源会话：c26c8f38-d604-41d2-b12e-edbdfd3c8e06；项目：产品2.0
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

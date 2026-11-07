@@ -19,6 +19,11 @@ Usage of unregistered `<pagination>` tag in pop-ups triggered `[Vue warn]: Unkno
 - Session: cf3b0379-9286-40e8-bc28-5a333098c2a0
 - Files: contractDialog.vue, projectDialog.vue, BuildingDialog.vue, presale/template/index.vue, contractMainInfo/index.vue, contractNoDialog.vue, zs-pagination.vue, package.json
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：cf3b0379-9286-40e8-bc28-5a333098c2a0
+
 
 <!-- MEMORY_FIELDS
 {

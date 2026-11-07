@@ -16,6 +16,10 @@
 - 涉及文件：zhi2-web-admin/src/views/autonomy/option/components/VotingItemsDialog.vue
 - 所属项目：惠山二期G；来源会话：462b8a83-d68c-46cb-bae9-7553f60772a3；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "惠山二期G技术",

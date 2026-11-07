@@ -10,6 +10,7 @@
 - 为首个「我的房屋」入口显式补上 title 与 content
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓一网通办H5
 - 验证证据：src=太仓一网通办H5/001.md
 - 涉及文件：d:/repository/太仓一网通办H5/src/router/index.ts、d:/repository/太仓一网通办H5/src/views/decision/DecisionIndex.vue、d:/repository/太仓一网通办H5/src/api/common.ts、d:/repository/太仓一网通办H5/src/store/vote.js、d:/repository/太仓一网通办H5/昆山市民/src/api/modules/election.js、d:/repository/太仓一网通办H5/src/views/decision/ParticipateIn.vue、d:/repository/太仓一网通办H5/src/views/components/loginBox.vue、d:/repository/太仓一网通办H5/style.css
 - 所属项目：太仓一网通办H5；来源会话：acdb01fd-de9f-4bac-91c4-db011808c9d1；代码基线：none

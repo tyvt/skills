@@ -18,6 +18,7 @@
 - 确认真正根因后，误加的状态过滤和 /page 调用必须一起回退
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 会话 1401b92d 结论：继续使用 /list 接口，去掉误加状态过滤和 /page 调用，补字段映射
 - 涉及文件：property/workOrder/report/index.vue、report/components/AddOrderDialog.vue
 - 所属项目：产品2.0；来源会话：1401b92d-0ad2-433b-83f9-aa435e2c7296；代码基线：42b6033

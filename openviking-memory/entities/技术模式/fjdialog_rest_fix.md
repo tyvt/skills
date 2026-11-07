@@ -17,6 +17,7 @@ FjDialog.vue 原使用 dialogMixins 但详情与保存仍走旧 REST 风格接�
 - 修改：POST /file/appendixConfig/update
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0
 - 来源会话ID：4d504758-e807-4d71-ab92-00820c1154ef
 - 涉及文件：FjDialog.vue、form.js、ArchiveDetailDialog.vue、index.vue

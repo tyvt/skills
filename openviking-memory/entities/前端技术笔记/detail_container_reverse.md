@@ -15,6 +15,8 @@
 - 排查「页头位置错乱」先看元素落在哪个容器，再判断该容器是否依赖 column-reverse 反转
 
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
 - creditChangeDeclaration/detail.vue 的页头被放在 detail-container 外的 list-container 中导致显示在底部，移入后恢复
 - 涉及文件：src/views/evaluation/creditChangeDeclaration/detail.vue、src/styles/index.scss；来源会话 7f4c692f-1a01-4348-afe9-003fd8ee2a08；代码基线 414029f~f59c6be
 

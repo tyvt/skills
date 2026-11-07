@@ -11,6 +11,7 @@
 - 输入框固定宽度：数字 88px、面积 108px、地名 280px
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/094.md
 - 涉及文件：PermitPlanPanel.vue、PresalePlanFillForm.vue、plan/detail.vue、detail.vue、Headline/index.vue、2026-09-11.md、presale-permit-helpers.js、PermitAppendixPanel.vue
 - 所属项目：苏州市房地产监测V3；来源会话：3b1ff38c-e27a-4867-a215-6627c1d4380c；代码基线：none

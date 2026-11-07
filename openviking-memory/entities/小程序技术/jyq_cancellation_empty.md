@@ -17,6 +17,7 @@
 - 若改完仍为空，去后台「系统参数配置」确认该键已录入内容
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证会话 de821fae：定位 cancellationWarning.vue 使用旧键 jyq.cancellation，改为 szf.user.cancellation 并兼容三种返回格式
 - 涉及文件：src/pages_my/setting/cancellationWarning.vue、src/api/system.js、src/pages/components/AgreementPage.vue、src/pages/about/agreement.vue
 - 所属项目：苏住房C；来源会话ID：de821fae-638a-46f8-93fc-2174c53953d4；代码基线：77666f8

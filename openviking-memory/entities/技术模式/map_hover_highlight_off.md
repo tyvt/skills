@@ -14,6 +14,7 @@
 - geo.emphasis 改为 itemStyle 与默认相同、label 的 formatter/rich 与普通态一致（wuxiMapLabelRich(false)），移入时视觉与常态一致，相当于去掉移入高亮；轮播 buildMapGeoCarouselRegions 仍对各块同时设置 itemStyle 与 emphasis 为高亮样式，高亮块移入不再「闪一下」。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue、chartOptions.js、constants.js
 - 所属项目：园区物管2.0；来源会话：ec2f2919-958c-46a4-9979-f0e697d4c8c7、dc3adc83-b4a0-4e74-9b28-aebb578f54f0；代码基线：none
 

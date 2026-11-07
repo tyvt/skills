@@ -13,6 +13,7 @@
 - 关键判断：改动须落到基础分支或每个定制分支，只改一条等于没修
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 7ae7d4b9 用户多次提列表没框疑合并问题；对比 develop/v2.6.2 与 -yulin 确认 4 页面 list-card 丢失，基础分支仅「权利人同步」缺，分别提交 1d2718782 与修复 4 文件
 - 涉及文件：property/complex/index.vue、RegionTreeLayout.vue、styles/index.scss、listMixins.js、zs-table.vue
 - 所属项目：产品2.0；来源会话：7ae7d4b9-281a-4316-bf51-824355179604；代码基线：50767de

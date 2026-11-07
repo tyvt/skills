@@ -8,6 +8,7 @@
 - toB/agencyRecord/detail 提交后返回当前 path 查看态
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/047.md
 - 涉及文件：LeaseEntryNetworkSections.vue、agencyBasicInfoContent.js、AgencyBasicInfoDetail.vue、register-helpers.js、leaseInstitutionRegister/index.vue、InstitutionRegisterSingleForm.vue、AgencyEntryNetworkAdminDetail.vue、AgencyBasicInfoForm.vue
 - 所属项目：苏州市房地产监测V3；来源会话：015a09b1-527e-4f9f-b78f-3ba02a284fe9；代码基线：none

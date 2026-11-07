@@ -14,6 +14,9 @@
 - company/staffManagement/components/certificatesDialog.vue
 
 ## 验证与归属
+- 所属项目：惠山二期G
+- 验证证据：extracted source=cursor project=惠山二期G
+- 来源会话：462b8a83-d68c-46cb-bae9-7553f60772a3
 - 验证证据: cursor 会话 462b8a83-d68c-46cb-bae9-7553f60772a3
 - 代码库: none
 

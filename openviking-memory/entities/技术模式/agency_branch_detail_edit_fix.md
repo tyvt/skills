@@ -10,6 +10,7 @@
 - isViewDisplay：查看模式或不可编辑时强制只读，与头部按钮状态对齐
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 查看已备案分支机构为只读展示，头部无「保存」「编辑」按钮
 - 涉及文件：AgencyBranchDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：27689708-9f9b-4386-9993-e547142b1ab3；代码基线：none

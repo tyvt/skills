@@ -10,6 +10,7 @@
 - 结构与 PaymentBuildingDialog.vue 一致以实现单行单列
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/163.md
 - 涉及文件：NodeDetailsDialog.vue、PaymentBuildingDialog.vue、NodeDetailsTable.vue、detail-form.scss、index.scss、zs-dialog.vue、BuildingChangeDialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话：dababdf0-87af-4d0b-95f2-6a4f1ceb21fd；代码基线：none

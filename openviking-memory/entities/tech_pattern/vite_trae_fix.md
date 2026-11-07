@@ -11,6 +11,7 @@
 - 全部失败返回 500（不再假成功）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=web-admin
 - 本地联调接口成功返回 200：http://localhost:8081/__open-in-editor 正常执行
 - 涉及文件：zhi2-web-admin/vite.config.js
 - 所属项目：web-admin

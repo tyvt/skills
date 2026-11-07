@@ -9,6 +9,7 @@ publicPortal 首页菜单链接打开的全屏对外门户页（可售楼盘、�
 - 换底图时须将 `portal_page_bg.jpg` 与 `portal.scss` 一起提交，否则线上只会看到灰色回退色
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：会话 49156c21 用户将苏州天际线背景应用到全屏对外门户页；会话 db938840 早期结论为二级页背景走 portal.scss 变量引用静态资源
 - 涉及文件：zhi2-web-admin/src/views/home/publicPortal/portal.scss、zhi2-web-admin/public/assets/images/homeNew/portal_page_bg.jpg、HomeQuickLinks.vue
 - 所属项目：门户；来源会话ID：49156c21-c97f-451b-8a6d-e974d3322dfe、db938840-34a6-4a51-bfdc-9bc6cd447438；代码基线：e1f8e0b

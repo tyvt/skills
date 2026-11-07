@@ -13,6 +13,7 @@
 - 排查 592–602 行基础样式后定位到子选择器与 !important 设回
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：用户改 592–602 行基础样式后反馈仍有多余上 padding，改子选择器 top 为 0 后生效；另见 src=门户/047.md
 - 涉及文件：zhi2-web-admin/src/views/home/index-new.vue
 - 所属项目：门户；来源会话ID：53c81de5-13e7-48d9-a133-ec5ba59583c5；代码基线：04586c4

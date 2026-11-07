@@ -15,6 +15,11 @@
 - 涉及文件：pages.json、ZsImage.vue、stockHouse/index.vue 等
 - 来源会话ID：dbea5b5a-3444-443d-a782-07bd1b65d66e
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

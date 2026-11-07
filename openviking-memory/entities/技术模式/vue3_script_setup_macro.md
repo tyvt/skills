@@ -18,6 +18,7 @@
 - src/page-query/components/PropertyItem.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C（zhi2-mobile-shimin）
 - 来源会话：b7ff0fc8-8e3a-4961-ab91-06155333fe7b
 - 代码基线：none

@@ -11,6 +11,7 @@
 - 左侧恢复为方形多选复选框，右侧表格选择列保持圆形单选样式
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：zhi2-web-admin/src/styles/element-ui.scss、dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue、dataProperty/procedure/detail.vue、dataProperty/procedure/index.vue
 - 所属项目：产品2.0；来源会话：6b9584dd-8399-40b2-8b79-9baf367ed910；代码基线：none
 

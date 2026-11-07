@@ -9,6 +9,8 @@
 - 改用动态绑定 :stroke-width="10" 传入数值
 
 ## 验证与归属
+- 所属项目：bugfix
+- 验证证据：extracted source=cursor project=bugfix
 - 验证证据：src=bugfix/003.md
 - 涉及文件：packages/progress/src/progress.vue；D:/repository/bugfix/zhi2-web-admin/src/views/property/largeScreen/components/componentRanking.vue
 - 来源会话ID：393829c3-3762-46f2-b7fa-330b64408e2a

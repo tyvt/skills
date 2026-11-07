@@ -12,6 +12,8 @@ operatingAssets.vue 已按缴款状态调整颜色与图例文案，并兼容后
 - statusClass() 兼容后端仍返回“缴费”文案，两套均能正确映射到颜色
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 涉及文件：src/views/benefit/statisticsMap/operatingAssets.vue
 - 来源会话：dccaafe5-eb52-4dbb-ad03-5a8e2e150a84
 - 代码基线：none

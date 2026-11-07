@@ -15,6 +15,7 @@
 - 经验外推：凡是想「受限选择」的下拉都不要顺手加 allow-create。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话 cbb5f1e2 用户澄清下拉多出手动输入原因，结论为 allow-create 自动加首项。
 - 涉及文件：zhi2-web-admin/src/components/AccountFreezeFields/AccountFreezeFields.vue、zhi2-web-admin/src/utils/accountFreeze.js、zhi2-web-admin/src/components/zs-select/SingleSelect.vue、zhi2-web-admin/src/views/system/user/detail.vue、zhi2-web-admin/src/views/company/userManagement/operator/operatorAddDialog.vue。
 - 所属项目：苏住房G；来源会话：cbb5f1e2-ec0c-4fd3-8323-b22f7cdd9fa6；代码基线：805ea8c。

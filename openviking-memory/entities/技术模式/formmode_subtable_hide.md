@@ -12,6 +12,7 @@
 - 与「用主键存在性控显隐、不用 formMode」（#1042 后置模块）互补；显隐与提交体必须成对改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：zhi2-web-admin/src/views/system/syncLog/index.vue；zhi2-web-admin/src/views/system/menu/index.vue
 - 所属项目：产品2.0
 - 来源会话ID：d9f3c68c-3ec6-4725-adf0-590b032f0388

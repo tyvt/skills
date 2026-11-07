@@ -16,6 +16,10 @@
 - 涉及文件：pages_my/verification/FormManual.vue、api/security.js、pages_my/verification/FormLocal.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：fe7db194-e3eb-4ff2-81a5-4fc5d0da76f3；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

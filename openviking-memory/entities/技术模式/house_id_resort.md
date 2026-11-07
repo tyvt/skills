@@ -10,6 +10,8 @@
 - 删除数据后须同步重排 id 保持连续
 
 ## 验证与归属
+- 所属项目：苏找房WEB
+- 验证证据：extracted source=cursor project=苏找房WEB
 - 涉及文件：public/assets/js/house_data.js
 - 来源会话：0bddbff5-d91b-45c4-99d9-ac1a45133ee6；代码基线：none
 

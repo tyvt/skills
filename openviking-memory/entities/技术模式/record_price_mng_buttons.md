@@ -12,6 +12,7 @@
 - 若仍不显示需检查账号是否有 presale:recordPriceMng:add 权限
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/index.vue、D:epository\苏州市房地产监测pps\chanpin\srciews\commercialHousingSales\priceFilingecordPriceMngSuzhou\index.vue
 - 所属项目：产品2.0；来源会话：49b771f7-5363-446e-b96b-bb0ff3c61363；代码基线：none
 

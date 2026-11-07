@@ -10,6 +10,7 @@
 - 在 `h5Context.js` 的苏服办登录逻辑中，读取密文参数后将空格还原为 `+`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 来源会话：1d789cb5-e259-4d57-ada7-dfb786d89609；代码基线：none
 - 涉及文件：src/utils/h5Context.js、src/utils/portal.js
 - 所属项目：无锡市区小程序嵌入H5

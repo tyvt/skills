@@ -11,6 +11,7 @@
 - 预填成功时组织类型/组织名称不可改，物业管理区域保持只读
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/autonomy/record/components/detail.vue、autonomy/record/components/directDetail.vue、autonomy/userAuth/detail.vue
 - 所属项目：园区公共收益；来源会话：b76adf07-3bf8-4aba-b92c-e654a01213ae；代码基线：ca05ff6
 

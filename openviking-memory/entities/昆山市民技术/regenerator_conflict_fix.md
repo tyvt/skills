@@ -13,6 +13,7 @@
 - 重新编译后 onlineIndex.js 为普通函数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证：会话 e2662fbf 用户要求全局排查类似错误并修复
 - 涉及文件：src/pages_onlineService/onlineIndex.vue、src/pages_home/home.vue、src/hooks/useLoadMore.js、src/api/modules/article.js、src/request/index.js、src/pages_contract/list.vue
 - 所属项目：昆山市民；来源会话ID：e2662fbf-7e20-4064-8bc6-9c43baa98d56

@@ -10,6 +10,7 @@
 - chartOptions.js 经营资产图表新增 computeHundredCountYAxis，Y 轴刻度间隔最小为 0.01；Y 轴 axisLabel 使用 formatHundredValue 格式化；柱顶标签、tooltip 统一使用同一格式化函数。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：刷新地图概览页后，Y 轴刻度、柱顶数值和 tooltip 均最多显示两位小数。
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/dataHelpers.js、chartOptions.js、index.vue
 - 所属项目：园区物管2.0；来源会话：cbc563ef-17dc-4a57-9a8a-a924dda959a7；代码基线：none

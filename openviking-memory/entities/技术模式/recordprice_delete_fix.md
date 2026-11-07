@@ -10,6 +10,7 @@
 - PriceTable.vue 删除按钮无需改动，继续调用 delRecordPriceHouse(ids)
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：刷新页面后删除请求体为 `{"priceRecordIds":[123]}`
 - 涉及文件：recordPriceHouse.js、PriceTable.vue
 - 所属项目：产品2.0；来源会话：be8bd962-663e-4c4a-8a14-79f95779a579；代码基线：none

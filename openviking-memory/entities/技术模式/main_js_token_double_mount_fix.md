@@ -16,6 +16,9 @@
 - 文件：`zhi2-web-admin/src/main.js`
 - 所属项目：产品2.0；来源会话：6da734ba-569d-4721-a801-3c8dd95f3fee；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

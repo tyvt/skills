@@ -18,6 +18,10 @@
 - 所属项目：榆林G
 - 来源会话：ca119077-96d7-4634-b180-497cbdf98617
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=榆林G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

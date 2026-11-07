@@ -16,6 +16,7 @@
 - `bProjectDialog` 新增 `dataLoading`，加载中显示 loading 不显示空状态；`onOpen` 不再重复调用 `initRegionList`；仅在必要时初始化
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：src=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/layout/index.vue、zhi2-web-admin/src/layout/components/Navbar.vue、zhi2-web-admin/src/views/home/bProjectDialog.vue、zhi2-web-admin/src/mixins/dialogMixins.js
 - 所属项目：园区物管2.0；代码基线 none；来源会话 99e0bdb9-a041-402c-9293-6e332ef231d4

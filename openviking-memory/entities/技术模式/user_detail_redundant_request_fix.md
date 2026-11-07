@@ -14,6 +14,11 @@
 - 文件：`system/user/detail.vue`、`tool/fjflpz/index.vue`、`mixins/listMixins.js`、`tool/fjflpz/components/FjDialog.vue`
 - 项目：产品2.0；来源会话：4f365506-e3be-4779-92c3-618489cfe3e8；代码基线：none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

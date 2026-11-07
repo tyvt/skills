@@ -14,6 +14,10 @@
 - 文件：system/message/service 下 rangeTable.vue、selectRangeDialog.vue、system/message/components/index.vue
 - 所属项目：苏住房G；来源会话：0b5e17ad-9c03-49d8-a182-38e4dddc07e6
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房G技术修复",

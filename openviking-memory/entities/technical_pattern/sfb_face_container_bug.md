@@ -17,6 +17,7 @@
 - 避免将容器状态问题误判为业务代码回归
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js、src/pages/face/face.vue、src/utils/h5Context.js
 - 所属项目：无锡市区小程序嵌入H5；来源会话：e195dccb-9f1b-45aa-92cf-65961851f833；代码基线：7993464
 

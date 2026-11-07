@@ -7,6 +7,7 @@
 - 可作为机构详情页标准实现
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/250.md
 - 涉及文件：DeveloperBasicInfoDetail.vue、detail.vue、detailMixins.js、form.js、AgencyBasicInfoDetail.vue、companyRecord.js、AgencyEntryNetworkDetail.vue、zljg/companyRecord/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：e15a1da6-99f2-4436-b12d-c0e94bfb9658；代码基线：none

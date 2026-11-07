@@ -18,6 +18,12 @@
 - 刷新后进入「可售楼盘展示 → 项目 → 楼幢列表」，左上角应显示「楼幢列表」，与面包屑一致
 - 源会话：`889b9339-9da0-4b8d-a47b-2acdb56919b7`
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：889b9339-9da0-4b8d-a47b-2acdb56919b7
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

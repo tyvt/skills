@@ -2,6 +2,12 @@
 - Files: ResetPwdDialog.vue, public/assets/css/element-ui.css, components/zs-dialog/zs-dialog.vue, views/login.vue, autonomy/multiply/components/VotingItemsDialog.vue, components/zs-form/zs-form.vue, layout/components/ChangePasswordDialog/index.vue, views/companyLogin.vue
 - Verification: source session 1f25b0e2-be1a-4b0d-8237-80f1b1801e20; code baseline none
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：1f25b0e2-be1a-4b0d-8237-80f1b1801e20
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

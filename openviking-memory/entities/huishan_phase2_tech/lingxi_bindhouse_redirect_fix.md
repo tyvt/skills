@@ -21,6 +21,8 @@
 - d:/repository/惠山二期H5/zhi2-mobile-admin-h5-c-unlimited/src/api/security.js
 
 ## 验证与归属
+- 所属项目：惠山二期H5
+- 验证证据：extracted source=cursor project=惠山二期H5
 - 验证证据：src=惠山二期H5/002.md
 - 来源会话ID：b9f46e5c-31b8-4bcb-a8ee-185ec72988e3；代码基线：none
 

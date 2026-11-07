@@ -6,6 +6,9 @@
 ## 解决方案
 - 在 src/components/zs-form/zs-form.vue 中对 size 做兜底与旧值映射：large/default/small。
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
+- 来源会话：7fcbaa3b-c65e-436a-b509-af93a4b6be04
 - 验证证据：会话 7fcbaa3b-c65e-436a-b509-af93a4b6be04 报 ZsForm 透传非法 size 致 ElForm 校验失败。
 - 涉及文件：src/components/zs-form/zs-form.vue；代码基线：none。
 

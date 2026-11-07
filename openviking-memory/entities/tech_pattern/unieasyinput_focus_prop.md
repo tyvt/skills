@@ -16,6 +16,11 @@ In zhi2-mobile-shimin, uni-easyinput has no focus() method; focus is a boolean p
 ## Verification
 - Extracted from cursor session ab7bb862-0a23-40aa-ab1b-fe4173708a80
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：ab7bb862-0a23-40aa-ab1b-fe4173708a80
+
 
 <!-- MEMORY_FIELDS
 {

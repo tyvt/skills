@@ -13,6 +13,10 @@
 - 文件：`UnifiedLogin.vue`、`StatisticsDialog.vue`
 - 项目：产品2.0；来源会话：e9d3b12e-b9f2-4d0b-97e0-bd14f38d344c；代码基线：none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

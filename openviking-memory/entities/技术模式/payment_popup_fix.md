@@ -10,6 +10,7 @@
 - 细节优化：金额文字添加 white-space: nowrap
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 涉及文件：src/staff/pages/cashier/result.vue、src/pages_property/payment/components/PaymentChannelPopup.vue、src/components/ZsPopup/ZsPopup.vue、src/staff/api/cashier.js、src/pages_property/payment/bills.vue
 - 所属项目：泰兴小程序；来源会话ID：22b6bc0a-f16b-4864-aa9f-f51528ea2774
 - 代码基线：none

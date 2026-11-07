@@ -6,6 +6,7 @@
 - CareerList.vue 与 AgencyPersonnelCertificateTable.vue 弹窗恢复默认 border 以保留外框与内部分隔线
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/150.md（原 -rest/105.md）
 - 涉及文件：components/detail-template/detail-template.vue、institution/agencyPersonnel/components/CareerList.vue、company/staffManagement/components/certificatesDialog.vue、evaluation/surveyRelease/statistics/components/TopicAnalysisTab.vue、components/README.md、institution/agencyPersonnel/components/AgencyPersonnelCertificateTable.vue、institution/agencyPersonnel/components/AgencyPersonnelDetail.vue、docs/cursor-user-rule-components.md
 - 所属项目：苏州市房地产监测V3；来源会话：8a22acb0-cef0-4f17-b365-fd7a8a3806d5；代码基线：none

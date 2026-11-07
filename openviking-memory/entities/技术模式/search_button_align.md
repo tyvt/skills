@@ -10,6 +10,7 @@
 - 新增 `multiLineButtonMarginTop`：仅在展开态置 `-40px`、其余 `0`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/325.md
 - 涉及文件：zs-search-form.vue、QueryResetButtons.vue、SearchFormItem.vue
 - 所属项目：苏州市房地产监测V3；来源会话：5d74e5ab-2eac-4349-9f53-ca8649792eab；代码基线：none

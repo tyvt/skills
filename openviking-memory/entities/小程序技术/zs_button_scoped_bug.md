@@ -15,6 +15,7 @@
 - 删掉ZsButton组件里覆盖全局的width:auto/display只保留高度、padding、颜色；在uni.scss全局以白名单统一满宽：.zs-button.long、.zs-button--block、.btn-container > .zs-button:only-child、.submit-button-wrapper > .zs-button四条选择器width:100%，避免波及弹窗双按钮等；后续个别页面不对往zs-button.scss补一条规则不再改页面
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证会话：2a76ac67（基线 5f0f4dc），用户4轮反复报按钮不生效，定位scoped样式作用不到组件内部<button>，新增全局scss并删组件覆盖规则后修复
 - 涉及文件：src/components/ZsButton/ZsButton.vue、src/uni.scss、src/styles/btn.scss、src/App.vue、src/pages_owner/decision/index.vue、DecisionList.vue、decision/styles/btn.css
 - 所属项目：苏住房C；来源会话ID：2a76ac67-47ce-4046-a986-f88a0614d57f；代码基线：5f0f4dc

@@ -10,6 +10,12 @@ pages/login moved to pages_main/login with new pages.json registration, but old 
 - Source session 73f5531d-ca8f-4227-9e76-d2fa4b5c98a1; baseline none; from 苏住房C/062.md.
 - Involved files: pages.json, migrate-pages-tab.mjs, pages/login/index.vue, pages_main/login/index.vue, utils/index.js, route-map.js, redirect/index.vue, FormLocal.vue.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：73f5531d-ca8f-4227-9e76-d2fa4b5c98a1
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "suzhou_housing_tech",

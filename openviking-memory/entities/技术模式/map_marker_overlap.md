@@ -13,6 +13,7 @@
 - 根本解决需后端为每个街道返回独立中心点坐标
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：src/views/benefit/statisticsMap/index.vue、statisticsMap/components/map.vue
 - 所属项目：园区物管2.0；来源会话：d5708d08-435c-462f-8076-056d4fde5c7a；代码基线：none
 

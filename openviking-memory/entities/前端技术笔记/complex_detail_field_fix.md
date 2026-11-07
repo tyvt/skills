@@ -10,6 +10,7 @@
 - 查看模式仍走独立只读模板 `DetailTemplate`，不受影响
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：property/complex/detail.vue、form.js
 - 所属项目：园区公共收益；来源会话：64fa742d-a958-4d22-889c-1fe54bbf88b4
 

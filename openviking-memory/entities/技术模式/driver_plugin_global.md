@@ -8,6 +8,8 @@
 - `App.vue` 调用前判断 `this.$driver` 是否存在，避免插件未挂载时抛出 `Uncaught` 异常
 
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/009.md
 - 涉及文件：driver.js、src/plugins/driver.js、main.js、App.vue
 - 来源会话：a521eb39-d368-4ec1-a02a-4131c89c94c3；代码基线：none

@@ -14,6 +14,7 @@
 - 列宽用 minWidth（信用代码180、企业名称200、行政区域160）改善首屏
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 物业服务企业/企业变更记录 enableAdvancedQuery=true 并去掉默认已备案；联调须写明「若后端未支持，前端兜底过滤但分页 total 可能不准」
 - 涉及文件：utils/companyListQuery.js、utils/dict.js、companyManagement/components/index.vue、companyRegister/index.vue、staffManagement/components/index.vue
 - 所属项目：苏住房G；来源会话：c7bcdd50-859e-48be-b953-435a57e9aa54；代码基线：d5eee56

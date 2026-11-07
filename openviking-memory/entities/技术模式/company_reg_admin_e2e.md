@@ -8,6 +8,7 @@
 - `e2e/register/company-register.spec.js`：Step1 后保存 `companyRegisterId`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 运行结果：9/9 用例通过，约 50.6s
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：0e08e573-df60-4498-a959-795ecb00ec81

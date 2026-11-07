@@ -16,6 +16,12 @@ SuZhuFang C new house carousel component lacked null protection and used index a
 - Involved files: src/components/commonNew/swiperComponent.vue, src/pages_transaction/newHouse/detail.vue, src/pages/commonNew/swiperComponent.vue, src/pages_transaction/stockHouse/detail.vue, src/pages_main/houseMap/components/NewHouse.vue, src/pages_transaction/newHouse/houseTypeDetail.vue, src/pages_transaction/buildingAlbum/index.vue, src/utils/index.js
 - Project: SuZhuFang C; source session: db12bfb7-5b5d-404f-93cd-258941957c3c; code baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：db12bfb7-5b5d-404f-93cd-258941957c3c
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "suzhufang_c_tech",

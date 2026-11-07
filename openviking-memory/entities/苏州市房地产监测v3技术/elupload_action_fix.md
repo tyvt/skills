@@ -10,6 +10,7 @@
 - `#` 仅满足校验，真实上传仍由 `handleUpload`/`uploadInstitutionAppendix` 处理
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/130.md
 - 涉及文件：InstitutionUploadItem.vue、RegisterUploadItem.vue
 - 所属项目：苏州市房地产监测V3；来源会话：7d2c6ace-ba93-4a45-988e-36327eaa2c19；代码基线：none

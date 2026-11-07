@@ -10,6 +10,7 @@
 - 修正行政区 `MultiLabel` 的 `styleId` 为 `'label'`。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue、src/components/ZsTencentMap/mapLoader.js
 - 所属项目：园区物管2.0；来源会话：f3c5b382-87a4-49cf-9a4e-27efde2b94d2；代码基线：none
 

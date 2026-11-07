@@ -15,6 +15,7 @@
 - 排查顺序：先curl复现看data是否为字符串"null"，再怀疑网络层
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话949376aa用户给完整curl，agent定位gateway.js:300-304与httpInstance.js:101-104，修复后提示变「请求异常」
 - 涉及文件：src/api/gateway.js、src/api/httpInstance.js、src/api/index.js
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：949376aa-2a8f-4366-9f75-db6d23ef2d53；代码基线：12ef89c

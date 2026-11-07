@@ -12,6 +12,7 @@ broker 侧栏欢迎卡（HomeUserCard.vue）及右侧常用功能已对齐设计
 - 已去掉 `layoutVariant` 里硬编码的调试代码
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 涉及文件：zhi2-web-admin/src/views/home/components/HomeUserCard.vue、zhi2-web-admin/src/views/home/mixins/homeDataMixin.js
 - 所属项目：门户；来源会话ID：2a30e4bd-5103-4309-bf91-2ec90aeb4857；代码基线：none
 

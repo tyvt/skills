@@ -9,6 +9,8 @@ externalWebview.vue 与 home.vue 的「切换/切换小区」按钮因 @click.st
 - externalWebview 已绑定房屋时 handleHouseAction 会直接 return，去掉 stop 不会误触整卡逻辑
 - home.vue 小区区域无父级点击，本不需要 stop
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 重新编译后点「切换/切换小区」应弹出房屋列表，选完走 onHousePickerChange 更新当前房屋
 - 仍无反应需确认 portalUser.houseList 是否多于 1 套（仅多套时显示该按钮）
 - 涉及文件：pages/webview/externalWebview.vue、pages/webview/home.vue、utils/portal-user.js

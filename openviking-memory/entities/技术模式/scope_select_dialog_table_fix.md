@@ -12,6 +12,7 @@
 - 样式优化：底部区域增加顶部分隔线和背景色，搜索区 flex-shrink:0
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：a30ff912-d925-46fa-ad4b-9657898fd082；代码基线：none
 
 

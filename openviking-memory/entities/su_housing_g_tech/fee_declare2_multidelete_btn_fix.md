@@ -12,6 +12,7 @@
 - 删除前弹确认框，确认后调用 `/property/feeDeclare2/{ids}` 接口
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：`feeDeclare2/index.vue`、`table.js`、`main.js`、`ListOperationButtonContainer/index.vue`
 - 所属项目：苏住房G；来源会话：8f5a7920-d8cf-4d5f-87f8-e65dc0975dae；代码基线：none
 

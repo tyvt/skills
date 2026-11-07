@@ -13,6 +13,7 @@
 - 改完必须停 dev server 重新 npm run dev，微信开发者工具点编译/重新载入，热更新看不到效果
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 829a9465 用户贴出 uni-icons module not defined 报错；已修复三处分包；验证证据：src=苏住房C/058.md
 - 涉及文件：scripts/relocate-uni-icons.mjs、vite.config.ts、scripts/relocate-datetime-picker.mjs、scripts/relocate-z-paging.mjs
 - 所属项目：苏住房C；来源会话ID：829a9465-5450-4144-a178-49e21c221320；代码基线：b7bf813

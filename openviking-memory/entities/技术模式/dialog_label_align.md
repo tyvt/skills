@@ -16,6 +16,8 @@
 - benefit/parkingManage/components/subDialog.vue
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/134.md
 - 来源会话：3d7db622-e5d6-4900-80d6-9428979eb12a；代码基线：none
 

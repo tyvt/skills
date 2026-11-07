@@ -15,6 +15,11 @@
 - 涉及文件: pages/index/home.vue, Home_Suzhufang.vue (多个路径), store/menu.js, menus.fallback.json, HotAppsHome.vue, MidModuleGrid.vue, api/system.js
 - 所属项目: Su Zhu Fang C (zhi2-mobile-shimin); baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：5b209d2f-cd82-4005-8b65-1e07b8e31017
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "Tecnologia Su Zhu Fang C",

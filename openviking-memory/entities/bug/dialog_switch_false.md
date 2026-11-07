@@ -18,6 +18,12 @@ The B-terminal login project selection popup was actively disabled by setting a 
 - Verification: src=榆林G/003.md
 - Source session: 1aa5a58c-4093-4786-81ac-e958b287e260
 
+## 验证与归属
+- 所属项目：榆林G
+- 验证证据：extracted source=cursor project=榆林G
+- 来源会话：1aa5a58c-4093-4786-81ac-e958b287e260
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "bug",

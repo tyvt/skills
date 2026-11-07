@@ -8,6 +8,8 @@ pages/webview/externalWebview.vue 的 requestProfile 增加 token 兜底逻辑�
 - 调用方未传 token 时自动从页面/全局/缓存获取
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 当前无 linter 报错
 - 涉及文件：pages/webview/externalWebview.vue、App.vue、utils/request.js
 - 来源会话：0d9ff23f-d0ef-43e6-a8c6-8ef81d6383a9

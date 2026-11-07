@@ -20,6 +20,7 @@
 - d:/repository/园区公共收益/zhi2-web-admin/src/views/property/decision/components/DecisionRangeTable.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：src=园区公共收益/016.md
 - 来源会话：473e272c-6e60-4e72-b905-e02eba29cfd7；代码基线：none
 - 所属项目：园区公共收益

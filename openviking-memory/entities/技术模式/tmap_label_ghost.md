@@ -12,6 +12,7 @@
 - 若产品要求保留其他 POI 名称，则反向改为去掉自定义 MultiLabel 或换个性化地图样式
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 f3c5b382 中 statisticsMap 地图苏州市文字重影，根因为底图 point 要素与 MultiLabel 叠加 + styleId 引用不存在的键
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue；zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js
 - 所属项目：园区物管2.0；代码基线：f00310232；来源会话：f3c5b382-87a4-49cf-9a4e-27efde2b94d2

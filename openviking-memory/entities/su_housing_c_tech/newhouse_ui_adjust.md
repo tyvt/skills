@@ -11,6 +11,10 @@
 - 涉及文件：newHouse/index.vue、newHouse/houseTypeList.vue、newHouse/indexMore.vue、conditionScreening.vue、pages_transaction/goodProject/index.vue。
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：efe288e0-e72c-42af-848b-9bb1cbfc98d8。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

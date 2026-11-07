@@ -10,6 +10,7 @@
 - 已在 `Navbar.vue` 和 `home/index.vue` 中增加空值判断
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`permission.js`、`Navbar.vue`、`home/index.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：d9582fdc-02eb-4965-8959-b0e49fc15b39
 

@@ -9,6 +9,7 @@
 - 在 `data()` 中补充上述三字段以匹配同模块规范
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/284.md
 - 涉及文件：supervision/unblock/usemoney/detail.vue、mixins/detailMixins.js、usemoney/index.vue、plan/detail.vue、mixins/form.js、usemoneyRevoke/detail.vue、form.js
 - 所属项目：苏州市房地产监测V3；来源会话：36f552fb-1f48-4082-96f2-5593b64d72f1；代码基线：none

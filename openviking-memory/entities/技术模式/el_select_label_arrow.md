@@ -10,6 +10,7 @@
 - 输入框 min-height:40px 随多行标签自然增高，不再依赖 $children 调内部方法
 - 验收需选最长选项截图确认箭头可见且能展开
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 25f90065，用户反馈银行名称区域太小下拉按钮被遮挡，定位 StreetAuthDialog.vue 修改
 - 涉及文件：zhi2-web-admin/src/views/system/regionBankAuth/components/StreetAuthDialog.vue
 - 所属项目：苏住房G；来源会话ID：25f90065-5711-4fcc-a0ab-c949d750a651；代码基线：315702f

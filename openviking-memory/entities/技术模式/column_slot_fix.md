@@ -15,6 +15,8 @@
 - `companyChangeManage/index.vue` 和 `toB/companyRecord/detail.vue` 开始使用该列的 `formatter` 来渲染变更类型，并在方法中保护空的 `row`（会话 239bd34d-1fce-4cc6-aba4-e5be4ee5ce9f）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：239bd34d-1fce-4cc6-aba4-e5be4ee5ce9f
 - 验证证据: src=苏州市房地产监测V3/269.md; src=苏州市房地产监测V3-leftover/069.md; src=苏州市房地产监测V3-rest/009.md; src=苏州市房地产监测V3/058.md
 - 会话: 050cc8e9-9258-449c-ade4-f02145919718; 71d310c7-e8fd-4626-846a-719d1e85dcb3; 848529ca-dbef-4317-ac0a-f071aba151fb; 239bd34d-1fce-4cc6-aba4-e5be4ee5ce9f
 - 涉及文件: PresaleHouseTable.vue, PresaleBuildingTable.vue, permitConstants.js, zs-table-column.vue, PresaleBuildingSection.vue, zs-table.vue, zs-table-column/zs-table-column.vue, PresaleSelectBuildingDialog.vue, PermitHistoryPanel.vue, PermitEntrustPanel.vue, PermitPlanPanel.vue, package.json, ruoyi.js, presale-permit-helpers.js, detail.vue, companyChangeManage/index.vue, toB/companyRecord/detail.vue

@@ -11,6 +11,7 @@
 - 编辑区换用 section-form section-form--label-top 与 9 个 section-field 并套用 detail-form.scss 栅格及 min-width: 0 实现同宽
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/114.md
 - 涉及文件：personnelCertificate/detail.vue、detail-form.scss、AgencyPersonnelCertificateTable.vue、QualificationFormSection.vue、DeveloperBasicInfoForm.vue、Headline/index.vue、index.scss、element-ui.scss
 - 所属项目：苏州市房地产监测V3；来源会话：819c3c2f-b512-4af8-bde8-ad7a2b56d9c1；代码基线：none

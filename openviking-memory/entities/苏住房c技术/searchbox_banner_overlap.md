@@ -12,6 +12,7 @@
 - 改完 pages_tab/components/Project_Suzhufang.vue 与 pages/index/components/Project_Suzhufang.vue 两处同源文件都要同步。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 f3ee482c 后经 63ca5f15（基线 8fc3cc5）把 bottom:-24px+padding-bottom:24px 抵消改为 bottom:0+translateY(50%)+margin-bottom:24px；会话 8d4ad7df（基线 8fc3cc5）再去 margin-bottom、白色块 padding-top 改 33px。
 - 涉及文件：d:\repository\苏住房C\zhi2-mobile-shimin\src\pages_tab\components\Project_Suzhufang.vue、d:\repository\苏住房C\zhi2-mobile-shimin\src\pages\index\components\Project_Suzhufang.vue
 - 所属项目：苏住房C；来源会话ID：63ca5f15-1cf5-4d52-b386-3205bad2f5ba, 8d4ad7df-77b2-4614-8dcd-322eea0ae772；代码基线：8fc3cc5

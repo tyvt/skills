@@ -13,6 +13,7 @@
 - 新增同类核验接口先问「失败要不要弹窗」，要就默认 noReject。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 0e3de74d（2026-09-28，基线 2c4e3d9）用户报「我的房屋-添加房屋，人工登记弹窗入口不显示」，根因结论如上。
 - 涉及文件：zhi2-mobile-shimin/src/api/httpInstance.js、src/api/property.js、src/pages_owner/house/owner/addHouseContract.vue、addHouse.vue、src/components/ZsPopup/ZsPopup.vue。
 - 所属项目：苏住房C；来源会话ID：0e3de74d-cc4d-4e34-8770-dd23e2757471；代码基线：2c4e3d9

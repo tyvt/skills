@@ -10,6 +10,8 @@
 - 反馈风格与取消备案保持一致
 
 ## 验证与归属
+- 所属项目：无锡锡山V2
+- 验证证据：extracted source=cursor project=无锡锡山V2
 - 验证：src=无锡锡山V2/001.md
 - 涉及文件：benefit/pubRegulatoryAccount/detail.vue、benefit/pubAccPropMgmt/detail.vue 等多文件
 - 来源会话：1260fc7c-7539-4aac-a8f7-c60a18826489；代码基线：none

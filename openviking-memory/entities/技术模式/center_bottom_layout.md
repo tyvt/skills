@@ -8,6 +8,7 @@
 - 改为 3fr 2fr，左侧数量区约 60%、右侧余额区约 40%
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；来源会话：bd7c381a-dfc6-4484-8f46-7a8bc8ff605f；代码基线：none
 

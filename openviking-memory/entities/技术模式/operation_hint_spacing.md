@@ -8,6 +8,12 @@
 - 涉及文件: pubRevenueContract/index.vue, assetsLeaseContractFiling/index.vue, styles/index.scss.
 - 源会话: 95de17f2-76c3-4cab-884c-27a0549a0793; 基线: none.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：95de17f2-76c3-4cab-884c-27a0549a0793
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

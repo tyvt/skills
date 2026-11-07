@@ -11,6 +11,7 @@
 - 凡是按条件过滤 series 数据的图表（0 值过滤、状态过滤等），都用同一份过滤后数据生成 legend，不各自维护两份列表
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 adffdf74 修复为图例仅展示 value>0 分类并无数据时隐藏图例
 - 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/assetPanorama/mock.js
 - 所属项目：园区物管2.0；代码基线 3965548b6；来源会话 adffdf74-a80c-4a6c-8841-4709866ec450

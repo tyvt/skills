@@ -17,6 +17,10 @@
 - 涉及文件：zhi2-web-admin/src/assets/images/mapOverview/apply.svg、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue。
 - 所属项目：园区物管2.0；来源会话：74cda9bf-bc09-433c-99cf-1a36768b982a；代码基线：6a4835a08。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

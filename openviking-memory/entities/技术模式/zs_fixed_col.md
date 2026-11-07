@@ -9,6 +9,8 @@ Suzhou Real Estate Monitoring V3 系统：zs-table 曾将固定列视为可拉�
 - `getBaseWidth` 直接使用 `slot-width` 以对齐实际宽度
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：00b4659f-08fb-4133-a80c-e461befbd2cf
 - 验证证据: src=苏州市房地产监测V3-rest/039.md
 - 涉及文件: zs-table-column.vue, zs-table.vue, FranchiseTable.vue, detail-template.vue, houseTable.vue, appendix.js, README.md, companyApplyAudit/detail.vue
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: 00b4659f-08fb-4133-a80c-e461befbd2cf; Base: none

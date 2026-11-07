@@ -11,6 +11,7 @@
 - 仍为空时核对系统字典是否存在与接口返回值同型的项（如值为 "1"）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 b44fb3cc 一般表决详情决策明细「投票来源」未显示；修复后业委会选举同步生效
 - 涉及文件：zhi1-web-admin/src/views/estate/decisionCommon/components/DecisionRangeTable.vue、generalDecision/detail.vue、ownerDecision/detail.vue
 - 所属项目：太仓G；来源会话：b44fb3cc-ab35-40cd-83f7-88fb4078ce58；代码基线：cf80bc8

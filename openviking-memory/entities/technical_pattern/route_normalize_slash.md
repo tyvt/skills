@@ -15,6 +15,12 @@ The "Add" button in `pages_owner/house/index.vue` used relative path `TypeChoose
 - Files: pages_owner/house/index.vue; utils/index.js; pages_owner/house/owner/success.vue; utils/route-map.js; pages_owner/house/TypeChoose.vue; pages.json; UnauthorizedPage.vue
 - Project: Suzhou Housing C (zhi2-mobile-shimin); code baseline: none; session: d7258436-2f74-40b3-a7d1-bb994d1239c1
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：d7258436-2f74-40b3-a7d1-bb994d1239c1
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

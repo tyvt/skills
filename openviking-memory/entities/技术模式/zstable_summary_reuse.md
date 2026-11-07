@@ -11,6 +11,7 @@
 - ZsSummaryText 组件同步适配 bottom-summary-items 渲染。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：src=园区物管2.0/039.md；涉及文件 zs-table.vue、ZsSummaryText/index.vue、complex/components/rangeTable.vue、budget/index.vue 等。
 - 所属项目：园区物管2.0；来源会话：4d6c0599-62a1-4620-bba9-35eec0a0c116；代码基线：none。
 

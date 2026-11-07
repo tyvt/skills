@@ -10,6 +10,7 @@
 - `showCompanyDialog()` 选择主体名称后触发名称更新
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：苏住房G/041.md
 - 涉及文件：pubRegulatoryAccount/detail.vue、pubRegulatoryAccount.js、mobilePreview/pubRegulatoryAccount/index.vue、ZsPrint/index.vue、OperationBtnGroup/index.vue、pubRegulatoryAccount/index.vue、property/account/detail.vue、pubRegAccPropMgmt/detail.vue
 - 所属项目：苏住房G；来源会话：ea26c60b-ee52-4d27-b035-5fdd8146dfa7

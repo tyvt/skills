@@ -15,6 +15,11 @@
 - 涉及文件: PresaleSelectBuildingDialog.vue, listMixins.js, table.js, PresaleBuildingTable.vue, main.js, PresaleHouseTable.vue
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: 69921419-8a4f-4e43-b9d8-780e617536da; baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：69921419-8a4f-4e43-b9d8-780e617536da
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

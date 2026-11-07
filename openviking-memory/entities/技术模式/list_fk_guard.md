@@ -12,6 +12,7 @@
 - 形成「主键校验→detail补ID→再拉依赖数据」顺序，凡列表行缺外键致按钮被拦/接口不发皆可套用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话eb97ca91修复方案为index.vue的handlePay只校验row?.id，collectionDialog.vue打开后先调GET /property/spFeeBill/payDetail/{billId}取complexId再加载支付渠道
 - 涉及文件：zhi2-web-admin/src/views/property/spFeeBill/components/index.vue、collectionDialog.vue
 - 所属项目：产品2.0；来源会话：eb97ca91-bf05-47bd-962a-06182b75ff56；代码基线：a357f32/075e6e9等（zhi2-web-admin子模块）

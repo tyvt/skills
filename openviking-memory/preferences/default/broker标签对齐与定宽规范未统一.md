@@ -4,6 +4,11 @@
 - 涉及文件：BrokerPages.vue、PropertyDetailDialog.vue、RentalDetailDialog.vue、public-portal-visual.spec.ts
 - 来源会话ID：03d20bf9-e86f-46c1-aa96-4b6f60f3e8f1
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "default",

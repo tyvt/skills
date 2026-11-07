@@ -10,6 +10,7 @@ showPersonnelRoleField 在查看与编辑模式判断差异，致经纪与专业
 - G 端 view 下将 showPersonnelRoleField 置 true，对齐编辑模式字段数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/077.md
 - 涉及文件：AgencyPersonnelDetail.vue、agencyBasicInfoContent.js、agencyPersonnelBasicInfoFields.js、detailLayout.js、AgencyPersonnelBasicInfoFormFields.vue
 - 所属项目：苏州市房地产监测V3；来源会话：78eb4f58-a263-44aa-9a8e-3ccff66ca115；代码基线：none

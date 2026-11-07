@@ -10,6 +10,7 @@
 - 每行按表头顺序用 `getUnitRooms(floor, unitId)` 取户室；列宽按单元独立计算 `getUnitColumns(unitId)`，不假定各层结构相同。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：筹备组征集新增报名选户室时楼盘表视图 1 单元无数据，根因为表头 units 仅来自 tableData[0]。
 - 涉及文件：zhi2-web-admin/src/views/components/BuildingTable.vue、zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue
 - 所属项目：园区公共收益；来源会话ID：473e272c-6e60-4e72-b905-e02eba29cfd7；代码基线：0abcb96

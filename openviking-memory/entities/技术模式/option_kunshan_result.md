@@ -11,6 +11,7 @@
 - 增加 `|| 0` 兜底避免除零显示 NaN
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证：刷新后重开「结果维护」弹窗，三项占比应与昆山一致
 - 涉及文件：`optionDecision/components/MaintainResultDialog.vue`、`ownerDecision/components/MaintainResultDialog.vue`、`decisionCommon/components/MaintainResultDialogLite.vue`
 - 所属项目：太仓G；来源会话：cde16b85-11ac-44ea-ab98-1f40f5fa5fb4；代码基线：none

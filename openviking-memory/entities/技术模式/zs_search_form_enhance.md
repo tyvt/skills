@@ -14,6 +14,7 @@
 - 重置逻辑补充清空 provinceName、cityName
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：7353ddc2-3283-4c26-b2a3-4ba0abc60fcf；代码基线：none
 

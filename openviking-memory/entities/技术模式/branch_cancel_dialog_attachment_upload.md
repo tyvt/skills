@@ -8,6 +8,7 @@
 - 「注销材料」改必填附件接入上传组件，主按钮文案「确认」，提交逻辑 `validate` 不变
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/036.md
 - 涉及文件：AnnexUpload/index.vue、AgencyPersonnelDetail.vue、AgencyBranchDetail.vue、SupervisionAddDialog.vue、branchStatus.js、agencyBranch/index.vue、agencyBranch/detail.vue、CancelDialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话：485a0b05-80d5-45aa-91a0-e2f3e44801ed；代码基线：none

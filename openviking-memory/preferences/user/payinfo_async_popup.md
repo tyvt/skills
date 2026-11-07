@@ -3,6 +3,12 @@
 - Configure the payInfo request with noMessage: true to avoid duplicate prompts with the dialog's own messages.
 - Involved files: zhi2-web-admin/src/views/property/spFeeBill/components/collectionDialog.vue, PaymentDialog.vue, spFeeBill/components/index.vue; evidence: src=产品2.0/055.md; session: ba1c8c6a-7b49-465a-aab9-2c949eb85f07.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：ba1c8c6a-7b49-465a-aab9-2c949eb85f07
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

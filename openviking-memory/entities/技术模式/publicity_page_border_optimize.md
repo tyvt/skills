@@ -8,6 +8,7 @@
 - 在 `index.scss` 为 `.sub-container` 补充与 `.list-card` 一致的标准表格样式，修复子表底部横线
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：37a43ff8-4058-4152-bac5-a0c1e5aa7270；代码基线：none
 
 <!-- MEMORY_FIELDS

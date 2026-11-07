@@ -17,6 +17,7 @@
 - 批次搬迁后做一次「分包目录下 .vue 文件 vs pages.json 注册项」对账
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 4cc33d41 报 userInfo 页 not found，文件存在但未在 pages_my 分包注册；补注册 setting/userInfo（个人信息）与 setting/realInfo（实名信息）两条路由
 - 涉及文件：src/pages.json、src/pages/index/components/My_Suzhufang.vue、src/pages_my/setting/userInfo.vue、src/pages_my/setting/realInfo.vue
 - 所属项目：苏住房C；来源会话ID：4cc33d41-1cbc-4887-bc8a-15d1fdcc8a0e；代码基线：9832ba3

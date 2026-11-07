@@ -11,6 +11,7 @@
 - ListTemplate.js 等列表模板同步去除强制撑满样式。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：src=园区物管2.0/036.md；涉及文件 zs-table.vue、pubParkingRate/index.vue、index.scss、ListTemplate.js。
 - 所属项目：园区物管2.0；来源会话：a3cdf258-43f5-4adb-9bc0-7f0801f15768；代码基线：none。
 

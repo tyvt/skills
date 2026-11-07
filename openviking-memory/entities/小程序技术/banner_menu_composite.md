@@ -15,6 +15,7 @@
 - redirect/index.vue中转页也要走同一解析，否则从中转页进入的同类链接仍提示未开放
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话5e3bf5c4后台跳转地址为复合串，navigateMenuItem整串查表触发「功能暂未开放」；修复后menuNav.js支持双格式并同步redirect页
 - 涉及文件：src/utils/menuNav.js、src/utils/menuRouteMap.js、src/pages/redirect/index.vue、src/pages/index/components/Home_Suzhufang.vue
 - 所属项目：苏住房C；来源会话ID：5e3bf5c4-bf75-4a82-9a83-96098fe31155；代码基线：f1939b0

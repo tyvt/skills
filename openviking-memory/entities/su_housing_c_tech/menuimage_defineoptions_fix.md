@@ -14,6 +14,7 @@
 - 用 `npm run dev` 开发模式需先重启 dev 服务再刷新
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：MenuImage.vue、virtualHost.js、package.json
 - 所属项目：苏住房C；来源会话ID：2f622576-daa0-4a02-9ddc-d01ed2a8da69
 

@@ -10,6 +10,8 @@
 - 需对齐后端 `landPlot` 接口校验
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/229.md
 - 涉及文件：company/institutionRegister/detail.vue、路由信息.json、projectManagement/customerProject/components/ParcelDialog.vue、projectManagement/buildland/detail.vue
 - 来源会话：a315f4c9-cedc-49db-bc6e-99df0d3ae524；代码基线：none

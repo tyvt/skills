@@ -14,6 +14,12 @@
 - 文件：benefit/alert/detailB.vue, company/userManagement/operatorAuth/operatorAuthRangeTable.vue, system/regionBankAuth/detail.vue, system/regionBankAuth/utils.js, system/regionBankAuth/index.vue, mixins/detailMixins.js, mixins/form.js, system/subdistrict/detail.vue
 - 项目：苏住房G；源会话：99982c86-0783-4c2e-a90e-818364f2c016；代码基线：无
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：99982c86-0783-4c2e-a90e-818364f2c016
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

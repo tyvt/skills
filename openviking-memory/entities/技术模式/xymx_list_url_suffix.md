@@ -9,6 +9,7 @@ zhi2-web-admin 的 xymx.js 中 listXyEnd 的 URL 多拼 /add 导致请求路径�
 - 监管协议终止详情页监管范围表格正常加载
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/210.md
 - 涉及文件：路由信息.json、supervision/agreement/end/detail.vue、AgreementDetailsTable.vue、api/zjjg/xymx.js、mixins/listMixins.js、api/benefit/xymx.js
 - 所属项目：苏州市房地产监测V3；来源会话：d33916e8-66d0-4dad-b5a9-9efd7da908c8；代码基线：none

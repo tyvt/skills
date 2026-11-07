@@ -12,6 +12,8 @@
 - `zhi2-web-admin/src/views/home/UnifiedLogin.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：58e74ae7-d504-49ac-8c05-02b1c6cadd94
 - 验证证据: `src=门户/024.md`
 - 所属项目: portal (门户)
 - 会话: `58e74ae7-d504-49ac-8c05-02b1c6cadd94`

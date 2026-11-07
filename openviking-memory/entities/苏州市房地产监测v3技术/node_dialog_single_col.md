@@ -11,6 +11,7 @@
 - 需硬刷新（Ctrl+F5）或重启 dev 后查看「新增节点明细」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 涉及文件：NodeDetailsDialog.vue、PaymentBuildingDialog.vue
 - 来源会话：dababdf0-87af-4d0b-95f2-6a4f1ceb21fd

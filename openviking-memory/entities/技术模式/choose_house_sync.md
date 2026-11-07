@@ -15,6 +15,8 @@
 - zhi2-web-admin/src/mixins/detailMixins.js
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/115.md
 - 来源会话：a735a6fd-dc76-4817-a33c-8400bcf1b742；代码基线：none
 

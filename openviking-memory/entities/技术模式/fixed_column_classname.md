@@ -15,6 +15,7 @@
 - 凡是需要命中 el-table 内部渲染的 td/th 的定制（固定列、单元格背景、hover 行配合），都走此通道，不要在页面或组件 scoped 里找选择器
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 5c0be161，用户要求操作列背景改白色；结论指出 td 由外层 el-table 画出、不在组件 DOM 里，通过 class-name/label-class-name + 非 scoped 样式实现
 - 涉及文件：zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue
 - 所属项目：产品2.0；来源会话ID：5c0be161-3528-400f-9c2b-4a3ebdeb2d79；代码基线：bd398ef

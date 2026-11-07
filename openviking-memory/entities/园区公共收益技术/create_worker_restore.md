@@ -11,6 +11,7 @@
 - 未恢复 9 月提交中删掉的自定义「返回」、「物管会类型」等字段，仅恢复工作人员入口
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/autonomy/record/components/detail.vue、directDetail.vue
 - 所属项目：园区公共收益；来源会话：16feeb76-4fb6-4182-823c-4dd71eb00369；代码基线：none
 - 关联 bug1282，建议在已备案（bizState=2）物管会/业委会登记详情页显示按钮

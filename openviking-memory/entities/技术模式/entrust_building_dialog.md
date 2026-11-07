@@ -7,6 +7,7 @@
 - `EntrustBuildingTable.vue` 改造 `openSelectDialog` 调用公共弹窗
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/148.md
 - 涉及文件：building.js、entrust-sale-real-api-flow.spec.js、EntrustBuildingTable.vue、entrust-sale-helpers.js、SelectBuildingDialog.vue、surveyChangeConstants.js、zs-select-dialog.vue、zs-select-dialog-func.vue
 - 所属项目：苏州市房地产监测V3；来源会话：a0a69d61-f390-4745-a03b-d19b25e490af；代码基线：none

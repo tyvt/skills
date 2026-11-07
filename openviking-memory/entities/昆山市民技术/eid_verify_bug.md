@@ -20,6 +20,8 @@
 - src/mp_ecard_sdk/main.js
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 来源会话ID：ea82ec90-7cc1-4d38-b7d1-2394a7ad3f09
 - 代码基线：none
 

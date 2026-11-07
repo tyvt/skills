@@ -11,6 +11,8 @@
 - E2E 删除 company-helpers 重复实现，改引 src/utils/resolveChangeId.js
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/007.md
 - 涉及文件：companyRecord.js、DeveloperBasicInfoDetail.vue、AgencyBasicInfoDetail.vue、companyRecordAgency/detail.vue、src/api/index.js、src/utils/request.js 等
 - 来源会话ID：73b844d6-16b5-409e-b3b2-20d22170917a；代码基线：none

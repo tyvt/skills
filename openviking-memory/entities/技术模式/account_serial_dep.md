@@ -13,6 +13,7 @@ B端新增资金缴存时自动填充的缴存账户来自已终止协议对应�
 - 通用套路：任何按主体自动默认关联对象逻辑须沿业务依赖链串行取数，并行独立过滤不够；后端分页不支持关联状态参数需推动后端支持
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话9f380095 fetchAccountAndAgreement并行查询、账户bizState:'2'未关联协议状态，修复改components/index.vue串行+AddDialog.vue同步过滤
 - 涉及文件：zhi2-web-admin/src/views/maintenance/guaranteeDeposit/components/index.vue、AddDialog.vue、enums.js
 - 所属项目：产品2.0；来源会话：9f380095-1ae6-4b79-936e-82358c3999ad；代码基线：产品2.0 zhi2-web-admin

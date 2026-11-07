@@ -3,6 +3,12 @@
 - httpInstance.js skips userStore.clear()/appLogin() when noReject is set, resolves(null) on network fail, and adds skipToken to omit the Authorization header.
 - Verification: src=苏住房C/067.md; source session f8d2218a-2bef-4ce0-99ff-25ccbca24f30.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：f8d2218a-2bef-4ce0-99ff-25ccbca24f30
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

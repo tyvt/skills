@@ -14,6 +14,12 @@
 - Files: src/api/security.js, pages_my/verification/FormLocal.vue, pages_my/verification/FormNonLocal.vue, utils/index.js, pages_my/verification/FormManual.vue, utils/constant.js, src/api/index.js
 - Project: 苏住房C (zhi2-mobile-shimin); Source session: 13ed1683-e44e-4216-95c3-4499d21022e8; Baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：13ed1683-e44e-4216-95c3-4499d21022e8
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "miniprogram_tech",

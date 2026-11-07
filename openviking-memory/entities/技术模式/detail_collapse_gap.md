@@ -13,6 +13,12 @@
 ## 验证
 - 证据：src=苏州市房地产监测V3/220.md 与 src=苏州市房地产监测V3-leftover/020.md；会话 479fbf59-8cc1-4660-b5b4-7e972253abe9；代码基线 none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：479fbf59-8cc1-4660-b5b4-7e972253abe9
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -6,6 +6,9 @@ Element Plus 的 ElButton 不支持 type="cancel"，ZsButton 原样透传会触�
 ## 解决方案
 - 在 src/components/zs-button/zs-button.vue 内做兼容映射，遇 type="cancel" 转 type="default"。
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
+- 来源会话：0f7a61e1-c656-416f-950e-b97496882719
 - 验证证据：会话 0f7a61e1-c656-416f-950e-b97496882719 报 ZsBtn 未映射 cancel 致 ElBtn 告警。
 - 涉及文件：src/components/zs-button/zs-button.vue；代码基线：none。
 

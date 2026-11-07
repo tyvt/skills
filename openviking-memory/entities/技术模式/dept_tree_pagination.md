@@ -11,6 +11,7 @@
 - complex/index.vue、complexChange/index.vue、housePart/index.vue 为 zs-table 增加 fill-height
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 切换到「平铺展示」后列表底部应正常看到翻页组件
 - 涉及文件：RegionTreeLayout.vue、index.scss、complex/index.vue、complexChange/index.vue、housePart/index.vue
 - 所属项目：苏住房G；来源会话ID：2f89b7ab-13d9-4f37-a91e-45c7f05466ed

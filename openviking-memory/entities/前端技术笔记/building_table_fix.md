@@ -6,6 +6,7 @@
 - `maintenance/facility/components/RangeTable.vue`：启用 `zs-select-dialog` 的 `building-table-mode`，`BuildingTable` 设 `cell-width="120"`，增加 `.building-table-wrapper` 滚动容器，调整右侧区域 padding 与 flex 布局
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：BuildingTable.vue、RangeTable.vue、RangeHouseTable.vue
 - 所属项目：园区公共收益；来源会话：f5c910bd-d8dd-4878-952a-b6286f9f507f
 

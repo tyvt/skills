@@ -19,6 +19,7 @@
 - 不需改：import图片、CSS相对url()、page-query分包CSS(Vite处理)；menus.fallback.json的/static/经MenuImage→resolveMediaUrl自动转
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话91e19c66用户报empty.png 404并要求全量排查，新增resolveStaticUrl增强resolveMediaUrl共改24文件后修复
 - 验证重点：重新部署后核查空态图、首页顶部图与图标、底部Tab图标、在线服务卡片背景、分包内PDF/图标
 - 涉及文件：src/utils/index.js、src/components/ZsImage/ZsImage.vue、src/components/ZsEmpty/ZsEmpty.vue、vite.config.ts、.env.production

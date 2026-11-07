@@ -14,6 +14,10 @@
 - 待用户确认后继续调整标签和按钮位置
 - 所属项目：门户；来源会话：1c06a96f-418e-4cc9-93c8-d8e81869540b
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

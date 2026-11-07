@@ -16,6 +16,7 @@
 - 结论：凡是用 ZsPicker 做「图标 + 文案」复合按钮，一律按上述四点实现，不要指望组件内部可点区域。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 16685517：用户报「小程序：我的-电子业主卡-切换无响应」。修复 ownerCard/index.vue 给整块切按钮绑 @tap，ZsPicker 增 defineExpose 暴露 show，按钮内 picker 设 pointer-events:none，并把 findIndex > 0 改为 >= 0 以正确恢复上次选中房屋。
 - 涉及文件：src/pages_owner_extra/ownerCard/index.vue、src/components/ZsPicker/ZsPicker.vue。
 - 所属项目：苏住房C；来源会话ID：16685517-eda4-4fc5-8357-db2568f09adb；代码基线：b7bf813。

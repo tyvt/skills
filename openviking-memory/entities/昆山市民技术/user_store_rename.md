@@ -17,6 +17,8 @@
 - pages_activity_vote/detail.vue
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 来源会话ID：437a9bbe-d421-4340-9d73-bb0fec2c1e0b
 - 代码基线：none
 

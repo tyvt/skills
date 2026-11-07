@@ -11,6 +11,7 @@
 - 列表 `justify-content: flex-start` 合理，双行过紧可加 `overflow: hidden`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/093.md
 - 涉及文件：TodoPanel.vue、StudyPanel.vue、package.json
 - 所属项目：苏住房G；来源会话ID：70c82beb-0a71-4fff-89f1-e17db817845a；代码基线：none

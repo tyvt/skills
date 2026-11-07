@@ -16,6 +16,10 @@
 - 涉及文件：zhi2-web-admin/src/views/presale/surveyChange/detail.vue、zhi2-web-admin/src/views/presale/permitCancel/detail.vue。
 - 所属项目：苏州市房地产监测V3；来源会话ID：616ab62b-abce-41e4-adb6-2fc6f69616d5。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -13,6 +13,7 @@
 - ZsPaging在本项目有4份副本（pages_main/owner/owner_extra/transaction），改组件层评估四份同步
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证会话dc3620d1三轮：用户报不加载→空白→白条挡loading，改为显式bottom+关安全区+背景统一
 - 涉及文件：pages/index/project.vue、pages_main/components/ZsPaging/ZsPaging.vue、pages_main/index/project.vue
 - 所属项目：苏住房C；代码基线：4630e8e；来源会话ID：dc3620d1-8787-4997-ad0a-327ea076910f

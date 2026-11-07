@@ -14,6 +14,10 @@
 - 所属项目：苏住房G（zhi2-web-admin）
 - 来源会话ID：54b4e1e7-1b46-41b8-a497-2f06010c1c68
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

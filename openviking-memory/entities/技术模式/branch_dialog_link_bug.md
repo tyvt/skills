@@ -10,6 +10,8 @@
 - onOpen 先设 `defalutStr` 再调用 `getList`
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：YhwdDialog.vue、BranchOneDialog.vue、YhwdTable.vue、detail.vue、package.json、pubRegulatoryBranchDialog.vue、src/styles/index.scss、SelectDialog.vue
 - 来源会话ID：a2fde687-3089-488b-83f1-704448411d98；代码基线：none
 

@@ -14,6 +14,10 @@
 - ZsImage必须放在有确定尺寸的父盒里；凡「图片没显示但网络无报错」先量父容器宽高是否为0
 - 验证：会话52f0bdb1（基线9832ba3）「empty组件UI有问题」，修复为uni.scss补全局空态样式+修正houseVideo/index.vue的#empty结构+ZsPaging.vue增scoped样式；涉及文件uni.scss、ZsPaging.vue、ZsEmpty.vue、pages_transaction/houseVideo/index.vue；所属项目苏住房C；来源会话ID 52f0bdb1-df2c-4df1-9f42-40b6d23d7382；代码基线9832ba3
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "小程序技术",

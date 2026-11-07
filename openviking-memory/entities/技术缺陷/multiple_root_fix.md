@@ -11,6 +11,7 @@
 - 顺带修正了缩进，本地 ESLint 已通过，可重新执行 git commit
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/building/mapProperty/index.vue、zhi2-web-admin/src/views/property/mapProperty/index.vue
 - 所属项目：园区物管2.0；来源会话：a1f32ab9-7041-4fcc-8f3b-7c218f1b8032
 

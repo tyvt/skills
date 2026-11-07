@@ -13,6 +13,7 @@
 - 说明：complexBuildingAuth/detail.vue 虽有同名方法，但模板无对应面积输入框，属未使用代码，未修改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话：0c58b1c2-0dda-4b30-a6fc-15ae19f0f03b
 
 <!-- MEMORY_FIELDS

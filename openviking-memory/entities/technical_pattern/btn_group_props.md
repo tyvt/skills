@@ -10,6 +10,10 @@
 **来源会话**：99b102a3-dcff-4e89-a5a6-982a16f73b88
 **代码基线**：fc994977f
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

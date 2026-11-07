@@ -16,6 +16,8 @@
 - 菜单占位与管理端：`zljg/agencyEntryNetwork/detail.vue`、`institution/leaseOpening/detail.vue`
 - 辅助：`e2e/fixtures/entry-network-helpers.js`
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：来源会话 662b0e4d-5990-4b51-9c23-9536e0b79e3a
 - 代码基线：none
 

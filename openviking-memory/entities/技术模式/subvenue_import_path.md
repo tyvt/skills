@@ -13,6 +13,12 @@
 - 涉及文件: benefit/leaseApply/detail.vue; benefit/leaseApply/components/subVenueTable.vue.
 - 验证证据: cursor 会话 e9d0317f-8909-475d-8300-5760a17efba4.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：e9d0317f-8909-475d-8300-5760a17efba4
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

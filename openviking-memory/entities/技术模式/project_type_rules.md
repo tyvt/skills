@@ -14,6 +14,8 @@
 - src/mixins/form.js、src/views/property/complexChange/detail.vue
 
 ## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：src=园区公共收益/016.md
 - 来源会话ID：76645e4d-9f4d-4dff-9aa8-1c457e2f7af1；代码基线：none
 

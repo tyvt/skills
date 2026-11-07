@@ -15,6 +15,8 @@
 - src/api/modules/vote.js
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 来源会话ID：1d9b7d53-d5cd-4b5c-87e0-c3804303cc41
 - 代码基线：none
 

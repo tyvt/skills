@@ -10,6 +10,8 @@
 - 兼容旧 `<驳回>` 前缀，避免历史数据展示异常
 
 ## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/utils/todoTask.js、src/views/home/index.vue、src/views/flowable/todo.vue、src/components/zs-table-column/zs-table-column.vue、src/mixins/ListTemplate.js、src/views/flowable/process.vue、src/components/detail-template/detail-template.vue、src/views/flowable/finished.vue
 - 来源会话ID：1661f2e6-92c4-4abf-9de9-02e95fd46214；代码基线：none
 

@@ -7,6 +7,7 @@
 - :key不稳定：StudyPanel的v-for用pickId可能undefined，需归一化稳定id或id??`${type}-${index}`；KeyDataNav嵌套v-for用bi/ri下标作key需改稳定字段。
 - PublicBenefit的watch仅深度监听data.accountStruct，图表静默更新不重绘，应把data.chart一起纳入。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话a6d1b5a7 review结论HIGH 2、MEDIUM 5，Verdict: BLOCK。
 - 涉及文件：index-v2.vue、CheckDataNav.vue、KeyDataNav.vue、PublicBenefit.vue、StudyPanel.vue、studyDataMap.js
 - 所属项目：苏住房G；来源会话：a6d1b5a7-1983-49a4-8898-bb4bc9230465；代码基线：315702f

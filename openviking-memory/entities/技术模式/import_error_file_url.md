@@ -16,6 +16,10 @@
 - 涉及文件：zhi2-web-admin/src/utils/request.js、zhi2-web-admin/src/views/property/feeDeclare2/components/bulkImportDialog.vue、zhi2-web-admin/src/views/property/feeDeclare2/index.vue。
 - 所属项目：苏住房G；来源会话ID：1f367792-daf1-4b22-a41a-28848b798cc5；代码基线：ac184e6。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -10,6 +10,7 @@
 - AgreementPage.vue 复用该属性，确保倒计时期间按钮不可点击。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：needToKnow.vue、ZsButton.vue、AgreementPage.vue。
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：c9900767-72b2-4323-9462-1cd68d147b99。
 

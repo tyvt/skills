@@ -13,6 +13,7 @@
 - mixins/detailMixins.js、utils/dict.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/067.md
 - 所属项目：苏州市房地产监测V3；来源会话：98dea9b7-0496-43cc-8f46-c865905aa071；代码基线：none
 

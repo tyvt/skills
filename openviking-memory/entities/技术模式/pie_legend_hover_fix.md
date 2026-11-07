@@ -12,6 +12,7 @@
 - 资产全景、资金全景两页面均已接入该工具方法
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：cursor 会话 fc8ed852 提取，问题已修复
 - 涉及文件：pieLegendHover.js、benefit/dataSandbox/assetPanorama/index.vue、benefit/dataSandbox/fundPanorama/index.vue
 - 所属项目：园区物管2.0；来源会话：fc8ed852-b9d6-4d0f-bba8-17f9b9edb32f；代码基线：none

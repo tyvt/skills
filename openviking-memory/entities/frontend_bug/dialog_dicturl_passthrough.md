@@ -17,6 +17,12 @@ Fix for `zs-select-dialog-func.vue` not passing `dictUrl` to child causing dicti
 ## Verification
 - Source cursor session `4487481b-f10d-43d1-9a48-5bdf07280a3d`; code baseline none.
 
+## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
+- 来源会话：4487481b-f10d-43d1-9a48-5bdf07280a3d
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "frontend_bug",

@@ -12,6 +12,7 @@
 - zhi2-web-admin/src/views/maintenance/facilityDefinition/FieldTableDialog.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 所属项目：2-0；来源会话ID：f27111ea-1764-4c3e-9978-077951c4dd1b
 - 代码基线：none
 

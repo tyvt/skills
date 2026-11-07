@@ -26,6 +26,8 @@
 - d:/repository/惠山小程序/src/pages_vote/vote/step1.vue
 
 ## 验证与归属
+- 所属项目：惠山小程序
+- 验证证据：extracted source=cursor project=惠山小程序
 - 验证证据：src=惠山小程序/001.md
 - 来源会话：e1838796-0994-4a01-8bd8-d86d41d01e81
 - 代码基线：none

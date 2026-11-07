@@ -10,6 +10,8 @@
 - 在 `src/views/contract/index.vue` 中使用 `require.context` 并按文件名和 `ctrl.name` 双重注册
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b0e0e476-6db0-4fd6-be74-9dfdfcfeb066
 - 验证证据: src=苏州市房地产监测V3/111.md
 - 涉及文件: contractContent.vue, contract/index.vue, pre/data.js, stock/contract/detail.vue, pre/cover.vue, vite.config.js, main.js, index.html
 - 所属项目: 苏州市房地产监测V3; 会话: b0e0e476-6db0-4fd6-be74-9dfdfcfeb066; 代码库: none

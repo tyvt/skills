@@ -10,6 +10,7 @@
 - 修复时在现有策略上增补（勿重复叠多条 CSP），至少包含 script-src 的 https://map.qq.com、connect-src 的 https://apis.map.qq.com，以及瓦片/图标所需 img-src 腾讯域名
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：会话 e06cd774 用户问是否 nginx 配置问题；结论为部署层 CSP 拦截外部脚本，项目内未找到 CSP 配置
 - 涉及文件：zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js
 - 所属项目：园区公共收益；来源会话：e06cd774-da4c-488e-81ae-850c6386e4e3；代码基线：4236087

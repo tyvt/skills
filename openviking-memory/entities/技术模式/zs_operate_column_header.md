@@ -14,6 +14,7 @@
 - 未用 ZsTable 的页面需自行设 `header-cell-style` 或全局表头色。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证：会话 90849550 dataStatistics 等页操作列表头背景异常，收窄选择器后表头恢复 #fafafa。
 - 涉及文件：zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue
 - 所属项目：淮安物管；来源会话：90849550-cbec-4e10-ad4a-35a4b2cf03ba；代码基线：0e429b0

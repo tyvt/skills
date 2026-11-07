@@ -15,6 +15,11 @@
 - 涉及文件：zhi2-web-admin/src/utils/monthlyReport.js、zhi2-web-admin/src/views/publicQuery/monthlyReportTemplate/components/TemplateTreeTable.vue、zhi2-web-admin/src/views/publicQuery/monthlyReportTemplate/index.vue
 - 所属项目：苏住房G
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：78a75b10-f6bb-48e1-ade4-51abaa4d72e3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房G技术",

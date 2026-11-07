@@ -13,6 +13,8 @@
 - 去除 `zhi2-web-admin/src/views/system/dict/components/DictDataTable.vue` 中把 primary 映射为 `""` 的逻辑（primary 本身是合法值）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
+- 来源会话：d39becce-af94-4451-b0d2-6ffd7cf94261
 - 验证证据：src=2-0/017.md、src=2-0/019.md；会话 d39becce-af94-4451-b0d2-6ffd7cf94261（colorMap 空串、DictDataTable primary 映射）；会话 19b58a9e-4df5-44f1-8286-0667d6776a04（maintenanceProject 页 DictTag 传 listClass=default 致 ElTag type 校验失败）
 - 涉及文件：zhi2-web-admin/src/components/dict-tag/dict-tag.vue、zhi2-web-admin/src/views/system/dict/components/DictDataTable.vue
 - 所属项目：2-0；代码基线：none

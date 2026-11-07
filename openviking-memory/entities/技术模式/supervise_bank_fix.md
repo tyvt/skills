@@ -16,6 +16,7 @@
 - 去掉 `isSupervisionBank: '1'` 覆盖，保留 `isSup` 相关参数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：superviseBank/detail.vue、WdmcDialog.vue、cbyh/components/YhwdTable.vue、cbyh/index.vue、jgyh/yhwdgl.js、jgwd/index.vue、api/system/unionBank.js、cbyh/components/WdmcDialog.vue、superviseBank/index.vue、superviseBank/components/YhwdDialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话：f9ae239b-1970-4f62-b9f6-43dcba0723b3、c3f3c00e-8252-4a2c-ac62-969e7898c321
 

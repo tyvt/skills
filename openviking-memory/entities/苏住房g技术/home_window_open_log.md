@@ -10,6 +10,7 @@
 - 补充URL校验并移除残留日志
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：苏住房G/086.md
 - 涉及文件：src/views/home/index-v2.vue、src/views/home/v2/components/KeyDataNav.vue、src/views/home/v2/components/CheckDataNav.vue、src/views/home/v2/components/PublicBenefit.vue、src/views/home/v2/components/StudyPanel.vue、src/views/home/v2/homeStatNav.js、src/views/home/v2/studyNav.js、src/views/home/v2/studyDataMap.js
 - 所属项目：苏住房G；来源会话ID：a6d1b5a7-1983-49a4-8898-bb4bc9230465；代码基线：none

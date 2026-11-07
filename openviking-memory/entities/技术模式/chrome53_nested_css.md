@@ -9,6 +9,8 @@
 - 改为平铺写法，警告消除且按钮样式正常。
 
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/014.md
 - 涉及文件：src/pages_common/verifyUser/components/AuthDialog.vue、src/utils/coordinateTransformer.js、src/App.vue、src/components/ZsButton/ZsButton.vue、vite.config.ts、src/pages-suggest/list.vue、src/pages-suggest/create.vue、src/pages-suggest/proposal-item-detail.vue
 - 来源会话ID：27f4bf24-bca2-4fd1-8aad-6b6ad61ac1e1

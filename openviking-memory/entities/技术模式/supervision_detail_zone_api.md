@@ -14,6 +14,8 @@
 - 修正了列表加载逻辑。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：ff916423-d72a-4b4e-b8d0-925acbfa29d1
 - 验证证据: src=苏州市房地产监测V3-rest/069.md
 - 涉及文件: supervision/agreement/version/detail.vue, benefit/pubRegAccountChange/detail.vue, presale/entrustSale/detail.vue, api/zone/zone.js, api/system/zone.js, property/propertyAccount/detail.vue, api/index.js, mixins/detailMixins.js
 - 所属项目: 苏州市房地产监测V3; 会话: ff916423-d72a-4b4e-b8d0-925acbfa29d1; Base: none

@@ -9,6 +9,7 @@
 - 与图形验证码组件的 onFail 复位是不同控件，短信按钮要单独保证反馈与重试。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：会话 3c5a3522 用户要求发送验证码调用接口后立刻 loading 或计时，接口异常立刻恢复；结论在 accountInfo.vue 实现。
 - 涉及文件：zhi2-web-admin/src/views/register/components/accountInfo.vue、zhi2-web-admin/src/views/register/companyRegister.vue
 - 所属项目：园区公共收益；来源会话：3c5a3522-257e-40bb-9d05-80dadfbbb3a7；代码基线：0c9b8c2

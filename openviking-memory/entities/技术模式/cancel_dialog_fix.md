@@ -10,6 +10,7 @@
 - 该组件被选项表决详情页的撤销、延期、提前结束三个弹框共用，本次修复一并生效，无需改各 detail 页面。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 文件：zhi2-web-admin/src/views/components/CancelReasonDialog.vue、zhi2-web-admin/src/views/autonomy/option/detail.vue、zhi2-web-admin/src/styles/index.scss
 - 所属项目：园区公共收益；来源会话：a5325fb9-2e64-40bc-b6ba-0a3479233656；代码基线：none
 

@@ -16,6 +16,10 @@
 - d:\repository\门户\zhi2-web-admin\src\views\home\publicPortal\mock\brokers.js
 - 所属项目：门户；来源会话：f3136e73-1172-459f-872c-cc4efe5d4b2f
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

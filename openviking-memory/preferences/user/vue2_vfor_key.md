@@ -3,6 +3,12 @@
 - Verification: src=苏州市房地产监测V3-leftover/015.md; project: 苏州市房地产监测V3 (zhi2-web-admin); source session 4f2bea14-4e58-49e2-9cdc-b2eb4273611d; code baseline none.
 - Involved files: components/AnnexUpload/components/AppendixRequirementGrid.vue, company/companyRecordAgency/detail.vue, company/companyRecordAgency/components/AccountStateDialog.vue, styles/detail-form.scss, company/companyRecordAgency/index.vue, toB/companyRecord/detail.vue.
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：4f2bea14-4e58-49e2-9cdc-b2eb4273611d
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

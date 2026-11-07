@@ -10,6 +10,8 @@ createInstance加密初始化失败时调用MessageBox.alert，但main.js未导�
 - 涉及文件：src/main.js、src/utils/element.js、src/utils/request.js
 
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/080.md
 - 来源会话ID：acc74245-8bc5-4218-9129-63dabeb7d956
 - 代码基线：none

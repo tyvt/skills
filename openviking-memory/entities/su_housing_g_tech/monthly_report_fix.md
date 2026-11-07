@@ -10,6 +10,7 @@
 - 标题和按钮组正常显示在页面顶部
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 刷新页面后确认布局恢复正常
 - 涉及文件：`src/views/publicQuery/monthlyReportStat/detail.vue`、`src/utils/monthlyReport.js`
 - 所属项目：苏住房G（zhi2-web-admin）；来源会话：c63cd57e-5fe2-4369-a1ab-b24c51627de2；代码基线：none

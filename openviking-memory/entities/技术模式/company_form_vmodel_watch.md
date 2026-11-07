@@ -12,6 +12,7 @@
 - localForm 与父组件 form 仍是同一引用，父组件校验、保存逻辑不受影响
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：zhi2-web-admin/src/views/company/companyManagement/components/CompanyBasicInfoForm.vue、toB/companyRecord/detail.vue
 - 所属项目：产品2.0；来源会话：f4820caa-7dba-4a66-83ef-64ac5b12adb3；代码基线：none
 

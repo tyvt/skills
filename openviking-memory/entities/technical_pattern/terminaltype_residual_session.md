@@ -13,6 +13,7 @@
 - 所有按 terminalType 分叉的 B/G 逻辑都要防「上一账号残留」这一前提
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：GetInfo 只在 B 端写 terminalType、登出不清除导致残留；修复覆盖五处状态重置
 - 涉及文件：src/store/modules/user.js、src/layout/index.vue、src/layout/components/Navbar.vue、src/views/home/bProjectDialog.vue、src/permission.js
 - 所属项目：园区物管2.0；代码基线 7fe15a8cb；来源会话 84a73d0e-bafd-4217-bef6-71383e10d880

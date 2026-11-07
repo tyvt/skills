@@ -13,6 +13,10 @@
 - 涉及文件：e2e/fixtures/manifest.prod.js、auth-helpers.js、playwright.config.js、package.json
 - 所属项目：产品2.0；来源会话：6e92d8f9-3213-455d-ba5c-fe96f5b76ade
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

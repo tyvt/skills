@@ -13,6 +13,10 @@
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/operatingAssets.vue、benefit/statisticsMapDetail/index.vue、components/Headline/index.vue
 - 所属项目：产品2.0；来源会话：870b5b21-223f-480d-b1ef-f92c770baf5b；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

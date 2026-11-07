@@ -12,6 +12,7 @@
 - tagDisplayList 只渲染有展示文案的项；resolveDisplayText 未命中字典时用原始码兜底，禁止空内容标签。根因在公共组件，勿在单个 propertyContract/components/detail.vue 打补丁。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证：会话 0063c43c（2026-05-13，基线 6374366）用户反馈 detail-template 空 tag 应展示 -，且 propertyContract 物业类型仍显示空 tag 颜色；结论为双口径不一致，在 dict-tag.vue 完成三处改造。
 - 验收：合同详情物业类型等 tag 字段显示中文标签；字典项为空时显示 - 或不渲染空 tag。
 - 涉及文件：dict-tag.vue、detail-template.vue、propertyContract/components/detail.vue；所属项目：淮安物管；来源会话：0063c43c-fc2e-49bb-afad-13adaef1e7f5；代码基线：6374366

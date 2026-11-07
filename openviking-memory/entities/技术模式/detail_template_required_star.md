@@ -15,6 +15,10 @@
 - 涉及文件：detail-template.vue、evaluation/assessmentPlan/detail.vue、autonomy/regulation/change/detail.vue、property/complexChange/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：df0b795f-9552-4c6b-9f39-72b1d1f13a07；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

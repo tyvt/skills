@@ -9,6 +9,7 @@
 - 移除 `require` 调用，改用项目全局 `debounce` 提供防抖能力。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证来源：苏州市房地产监测V3-leftover/044.md
 - 涉及文件：zhi2-web-admin/src/views/commercialHousingSales/presale/template/detail.vue、index.vue、package.json、vite.config.js、src/views/supervision/deposit/additional/components/buildingTreeDialog.vue、src/main.js、index.html、public/assets/js/debounce.js
 - 所属项目：苏州市房地产监测V3；来源会话：0159ba54-715b-46dc-8f41-850347ae8ed3；代码基线：none

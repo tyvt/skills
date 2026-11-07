@@ -15,6 +15,8 @@
 - permitConstants.js
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/223.md
 - 来源会话：5acc9195-8501-4cfe-9592-46ae040470a2；代码基线：none
 

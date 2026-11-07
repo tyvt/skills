@@ -12,6 +12,7 @@ zhi2-mobile-admin-h5-c-unlimited 作为苏服办/微信小程序 web-view 内嵌
 - 再回落门户配置的返回路由或首页
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 所属项目：无锡市区小程序嵌入H5
 - 来源会话：bcab9206-8b7b-478a-a355-2173f531fd74
 - 代码基线：f86ed66

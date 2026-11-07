@@ -10,6 +10,7 @@
 - 注意：已知清单已有「不要传固定 :width、交给组件自适应」，本条是自适应列宽场景下的对齐补充，不是再传 width
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：会话 eb429bff 用户截图单按钮不居中；在 operate-column-button-container 增加 justify-content:center 后单「查看」在操作列居中
 - 涉及文件：zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue
 - 所属项目：园区物管2.0

@@ -15,6 +15,10 @@
 ## 关联信息
 - 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、zhi2-web-admin/src/styles/index.scss；所属项目：园区物管2.0；来源会话：9a3daf50-8a49-4516-af4c-070c6201cf9b；代码基线：fc994977f
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

@@ -14,6 +14,7 @@
 - `onLoad` 优先读 URL 的 `pageType`，避免残留 `verifyBeforeChange`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证：会话 3178d4d9 用户要求参数改 key 取 eidToken 并修复重复跳转
 - 涉及文件：src/pages/common/useEidVerify.js、src/pages/verifyUser/info.vue、src/pages/verifyUser/index.vue、src/pages/common/useFaceVerify.js、src/pages_vote/vote/faceSuccess.vue
 - 所属项目：昆山市民；来源会话ID：3178d4d9-97a5-4520-8ff8-c7b1235a110f

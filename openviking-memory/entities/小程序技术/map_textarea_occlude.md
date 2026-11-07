@@ -16,6 +16,7 @@
 - 任意滚动也隐藏地图防原生层残留；复现时可先点上方表单区让地图消失再点输入框判定遮挡
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证会话 be5add1d：用户两轮反馈从标签换行→上下不能输入→还是不能输入，定位原生遮挡+flex压扁，改独立区块+showMap默认false+touchstart.capture
 - 涉及文件：src/pages_owner_extra/elevator/addAlone.vue、add.vue、src/styles/form2.scss、src/components/ZsTextarea/ZsTextarea.vue
 - 所属项目：苏住房C；来源会话ID：be5add1d-7616-4020-9f82-4d25046636fb；代码基线：8fc3cc5

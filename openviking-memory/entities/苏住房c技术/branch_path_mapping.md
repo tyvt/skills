@@ -13,6 +13,7 @@
 - 确认子模块与父仓库各自分支：子模块在 main-v2.1、父仓库在 -mp 时，mp 分支其它改动应 stash 而非混进本次提交
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 c6f5e6b8 社区/街道公告 z-paging 改造 + 业主卡报事报修「暂未开放」迁移到 main-v2.1
 - 涉及文件：src/hooks/useAnnouncementPaging.js、src/pages_owner/community/announcement/index.vue、src/pages_owner/subdistrict/announcement/index.vue、src/pages_owner/ownerCard/index.vue
 - 所属项目：苏住房C；来源会话ID：c6f5e6b8-04ec-4597-8607-ff8f6c062f99；代码基线：4d6dba9

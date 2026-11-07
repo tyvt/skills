@@ -14,6 +14,10 @@
 - zhi2-web-admin/src/views/system/operlog/index.vue
 - 所属项目：园区公共收益；来源会话：a2c3210a-38a4-4169-bda2-87a7f0f5a713；代码基线：635e747
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

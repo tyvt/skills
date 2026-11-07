@@ -10,6 +10,7 @@
 - 子模块提交后更新父仓指针并按规范打 tag（如 `202608131440` / `202608131440-sfb`）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话 73e008e0 用户提供接口字段说明与截图，结论完成双分支提交与 tag
 - 涉及文件：src/pages_benefit/fundPublicity/index.vue、src/pages_benefit/sharedFunds/index.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话：73e008e0-9dd9-46de-b9f7-c3c8d2356bbe；代码基线：86395e1

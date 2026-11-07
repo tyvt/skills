@@ -11,6 +11,8 @@ iHomePC 个人中心我的预约页在接口无数据或异常时填充 Mock 数
 - 有真实数据时以接口返回为准，不会用 Mock 数据覆盖。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=iHomePC
+- 来源会话：03547f0b-35e3-4acd-a109-0ebebe947cab
 - 验证：来源 cursor 会话 03547f0b-35e3-4acd-a109-0ebebe947cab。
 - 涉及文件：`src/views/personalCenter/myAppointment/index.vue`；所属项目：iHomePC；代码基线：none。
 

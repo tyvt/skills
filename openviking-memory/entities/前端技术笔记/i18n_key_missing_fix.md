@@ -10,6 +10,8 @@
 - 在涉及的所有语言包对应节点补上翻译即可修复
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证：005.md 会话删除个人基本信息功能多语言显示错误，原因是语言包没配 common.delete
 - 涉及文件：src/views/my/userInfo/index.vue
 - 来源会话ID：005-i18n

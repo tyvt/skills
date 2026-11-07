@@ -14,6 +14,12 @@ Xinghua property management (兴化物管) zhi1-web-admin zsTable/index.vue drop
 - Files: src/components/zsTable/index.vue
 - Project: 兴化物管
 
+## 验证与归属
+- 所属项目：兴化物管
+- 验证证据：extracted source=cursor project=兴化物管
+- 来源会话：e27192d0-0106-412e-86ca-44489c556107
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

@@ -11,6 +11,7 @@
 - 间距嫌小调 gap 到 24rpx/32rpx；通用约定：卡片间留缝一律用父级 flex gap，不给子组件根节点写 margin，也不 :deep 到子组件根做间距
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 80f4d555（基线 8fc3cc5），pages_owner/project/info/index 间距不生效改 .project-page flex+gap 后修复
 - 涉及文件：pages_owner/project/info/index.vue、components/commonNew/baseCard.vue、pages_owner/community/info/index.vue、pages_owner/subdistrict/info/index.vue
 - 所属项目：苏住房C；来源会话：80f4d555-4b91-4605-a249-4affc7710dfd；代码基线：8fc3cc5

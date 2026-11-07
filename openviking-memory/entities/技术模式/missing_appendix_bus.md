@@ -10,6 +10,8 @@
 - 在查看模式下，`AnnexUpload` 同步 `:bus` 绑定以消除警告
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：f9505d8d-b469-4811-976f-799ef8de543a
 - 验证证据: src=苏州市房地产监测V3-leftover/068.md
 - 涉及文件: AgencyBranchDetail.vue, AnnexUpload/index.vue, CancelDialog.vue, AgencyPersonnelDetail.vue, utils/routeMeta.js, docs/agencyBranch-menu.md, e2e/institution/agency-branch-flow.spec.js, mixins/detailMixins.js
 - 所属项目: 苏州市房地产监测V3; 会话: f9505d8d-b469-4811-976f-799ef8de543a; Baseline: none

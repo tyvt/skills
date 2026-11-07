@@ -15,6 +15,11 @@
 - 涉及文件: newHouse/index.vue, newHouse/indexMore.vue, newHouse/houseTypeList.vue, conditionScreening.vue, goodProject/index.vue, stockHouse/components/moreForm.vue, uno.config.ts, ZsImage.vue
 - 所属项目: Su Zhu Fang C (zhi2-mobile-shimin); baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：efe288e0-e72c-42af-848b-9bb1cbfc98d8
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "Tecnologia Su Zhu Fang C",

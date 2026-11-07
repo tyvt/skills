@@ -11,6 +11,7 @@
 - 现已改为滚轮街道层单独走 `dimension: 3` + 市级 `regionCode`，点击下钻仍用 `getRegionCode()` + `dimension: 2`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 b54c0d36 用户要求滚动放大街道级参数改为 regionCode 市级、dimension 3
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue
 - 所属项目：园区物管2.0；来源会话：b54c0d36-213e-49e1-97a6-50af9ae3922e；代码基线：none

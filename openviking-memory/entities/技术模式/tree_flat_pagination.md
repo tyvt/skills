@@ -12,6 +12,7 @@
 - 只改其中一层仍会复发；同构列表页是复制关系时要一并核对
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 2f89b7ab 用户反馈平铺展示时列表下缺少翻页；结论为 type-right 的 overflow:hidden 裁掉分页
 - 涉及文件：property/complex/components/RegionTreeLayout.vue、property/complex/index.vue、property/complexChange/index.vue、benefit/housePart/index.vue
 - 所属项目：苏住房G；来源会话ID：2f89b7ab-13d9-4f37-a91e-45c7f05466ed；代码基线：26069c8

@@ -9,6 +9,7 @@
 - companyManagement/components/bankTable.vue 存在同样写法，可用同样方式处理。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：cdb8c8d2-612f-4ad7-a826-8e4470159f9f；代码基线：none
 - 涉及文件：bankTable.vue、companyManagement/components/bankTable.vue、subTableMixins.js
 

@@ -10,6 +10,12 @@
 - 涉及文件: pubownerDecision/index.vue, pubPublicity/index.vue, pubQuarterlyDeclaration/index.vue, detailTable.vue, autonomy/general/index.vue, autonomy/publicity/index.vue, styles/index.scss, mixins/ListTemplate.js.
 - 原始会话: 37a43ff8-4058-4152-bac5-a0c1e5aa7270; 基线: none.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：37a43ff8-4058-4152-bac5-a0c1e5aa7270
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

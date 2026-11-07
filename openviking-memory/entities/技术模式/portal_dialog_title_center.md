@@ -8,6 +8,7 @@
 - 关闭按钮仍为右上角绝对定位，不占标题行宽度，标题在弹窗内水平居中
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：cursor 会话提取；所属项目：门户；来源会话ID：b0657f58-c3a5-4ffd-a3ba-7e97031b4770；代码基线：none
 - 涉及文件：zhi2-web-admin/src/views/home/publicPortal/portal.scss、zhi2-web-admin/src/views/home/publicPortal/pages/InformationPages.vue、PropertyDetailDialog.vue
 

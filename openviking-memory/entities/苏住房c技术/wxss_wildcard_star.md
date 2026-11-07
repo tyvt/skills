@@ -8,6 +8,7 @@
 - 在 form.scss 采用 uni-app 条件编译：`#ifdef MP` 下改 `> view` 适配 virtualHost 根节点，`#ifndef MP`（H5/App）保留原 `> *` 写法
 - 改动需同步 form.scss 与 form2.scss，确保各端编译通过
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=苏住房C/066.md；form.scss 条件编译后 MP 端 `> view`、H5/App 保留原写法
 - 涉及文件：PasswordForm.vue、form.scss、form2.scss、login/index.vue、ImgCode/index.vue、stockHouseSign/apply.vue、VerifyCode/index.vue、uni.scss
 - 所属项目：苏住房C；来源会话ID：3f6a535b-0e0d-41d1-aacb-0ee81bac9792；代码基线：none

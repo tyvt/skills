@@ -12,6 +12,7 @@
 - 组间可切换且/或关系
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/094.md
 - 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/index.vue、zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue
 - 所属项目：苏住房G；来源会话ID：20e31648-4d28-46f2-81a2-de9c591a691a；代码基线：none

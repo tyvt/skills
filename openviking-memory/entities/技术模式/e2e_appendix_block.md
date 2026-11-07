@@ -10,6 +10,7 @@
 - 于 `institution-helpers.js` 新增 `uploadRequiredAppendix` 及 `clickSaveAndWaitForSubmit` 封装上传与等待逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/004.md
 - 涉及文件：zhi2-web-admin/e2e/institution/agency-branch-real-api-flow.spec.js、zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchDetail.vue、zhi2-web-admin/src/utils/appendix.js、zhi2-web-admin/e2e/institution/agency-personnel-real-api-flow.spec.js、zhi2-web-admin/src/views/institution/agencyBranch/components/ServiceSchemePanel.vue、zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue、zhi2-web-admin/e2e/fixtures/institution-helpers.js
 - 所属项目：苏州市房地产监测V3；来源会话：78e37b39-59fb-4f08-9f79-e96bf254bdd1；代码基线：none

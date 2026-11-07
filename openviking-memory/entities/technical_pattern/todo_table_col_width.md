@@ -18,6 +18,12 @@ The zs-table-column in HomeTodoTable.vue declares no width/min-width, triggering
 - Evidence: cursor session extraction
 - Project: portal; session: 01edc950-1251-43f8-9d66-1720c46869de
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：01edc950-1251-43f8-9d66-1720c46869de
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

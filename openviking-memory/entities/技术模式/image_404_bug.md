@@ -12,6 +12,7 @@
 - 真机走「我的→我的房屋」和「添加房屋」验证
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：7faa1ba7-1ea3-4c81-8ac8-7f524dff2eb6；代码基线：f1939b0
 - 涉及文件：pages_owner/house/index.vue、addHouse.vue、utils/index.js、ZsImage.vue
 

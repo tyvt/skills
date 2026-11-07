@@ -11,6 +11,7 @@
 - 降级路径：sticky在自定义导航栏+自定义tabBar机型失效时，改「滚动事件+fixed」兼容
 - 分割线间距需求放在MenuSection的variant分支加margin-top，不在业务页覆盖
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话fb3ff994用户要求整页上滑+搜索框吸顶+图标不全修复，实现为单scroll-view+sticky+32×32容器+variant-service下.section-divider margin-top:20px
 - 涉及文件：pages_tab/components/Community_Suzhufang.vue、pages_tab/components/menu/MenuSection.vue、pages_tab/static/images/service/icon-list.svg
 - 所属项目：苏住房C；来源会话ID：fb3ff994-ae45-4f45-8468-aefcc1bc3ce7；代码基线：f1939b0

@@ -14,6 +14,7 @@
 - 以 .page-block + .page-block { margin-top: 10px }（$uni-spacing-row-base）控制间距
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 5ebe7a6f 用户反馈卡片间距失效，改用 page-block 包裹后修复
 - 涉及文件：src/pages_owner/company/info/contracts.vue、src/components/commonNew/baseCard.vue、src/pages_owner/house/components/CellCard.vue、src/pages_owner/house/components/ProjectDetail.vue、src/pages_owner/company/info/index.vue、src/pages_owner/community/info/index.vue、src/pages_owner/subdistrict/info/index.vue、src/uni.scss
 - 所属项目：苏住房C；来源会话ID：5ebe7a6f-b511-41ff-8030-0bf23da25e31；代码基线：none

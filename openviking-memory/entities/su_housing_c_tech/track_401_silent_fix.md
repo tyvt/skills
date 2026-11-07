@@ -11,6 +11,11 @@
 - 涉及文件：redirect/index.vue、appAnalytics.js、httpInstance.js、api/index.js、menuRouteMap.js
 - 项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：885fa7c0-9559-4361-80e6-9a88eb687621
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

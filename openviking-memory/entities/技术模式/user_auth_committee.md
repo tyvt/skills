@@ -15,6 +15,10 @@
 - 来源会话: a64c833f-c485-4bfe-899a-5d177a83f9f3
 - 代码基线: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

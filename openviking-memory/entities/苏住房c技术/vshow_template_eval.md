@@ -15,6 +15,7 @@
 - 排查渲染期 undefined 时定位模板中 `xxx[i].yyy` 写法，看首屏数组是否有值，勿查接口
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话 7f29f06a（基线 4630e8e）：用户贴报错栈，修复为 data 初始化+可选链
 - 涉及文件：src/pages_transaction/newHouse/detail.vue、src/utils/transaction.js、src/pages_transaction/stockHouse/detail.vue
 - 所属项目：苏住房C；来源会话ID：7f29f06a-70ca-4db2-9199-e681d3284e78

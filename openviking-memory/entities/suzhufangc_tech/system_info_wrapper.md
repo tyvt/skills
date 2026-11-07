@@ -14,6 +14,12 @@ WeChat deprecated `wx.getSystemInfoSync`; a new wrapper utility `system-info.js`
 - Involved files: `src/App.vue`, `src/utils/index.js`, `package.json`, `src/pages_credit/companyCredit/index.vue`, `src/pages_credit/dishonestyCredit/index.vue`, `src/pages_tab/components/Home_Suzhufang.vue`, `src/pages/index/components/menu/MidModuleGrid.vue`, `src/pages/index/components/Project_Suzhufang.vue`.
 - Project: SuZhuFangC; source session: 38194afa-6f69-47b8-afec-2cec1a1ae8ae; code baseline: none.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：38194afa-6f69-47b8-afec-2cec1a1ae8ae
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "suzhufangc_tech",

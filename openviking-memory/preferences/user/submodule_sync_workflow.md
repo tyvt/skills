@@ -2,6 +2,12 @@
 - Parent repo must sync-commit the updated submodule reference pointer to keep parent/child repo versions consistent
 - Source session: 03f3446f-c658-4574-9c4c-b7fce4195e30
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：03f3446f-c658-4574-9c4c-b7fce4195e30
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

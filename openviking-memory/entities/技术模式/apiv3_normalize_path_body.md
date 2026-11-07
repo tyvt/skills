@@ -8,6 +8,7 @@
 - 在 normalizeTrailingPathParams 中统一处理 4 段及以上路径：ByXxx 类动作（getByKey 等）自动推断 body 字段名不再要求数字 ID；已知单参数动作（readXml→deployId、calculationChart→decisionId、terminate→id）；多参数动作（listEffective、listReport、batchGenerateVoucher）；已规范 V3 路径（末段 /detail）跳过
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：apiV3Normalize.js、utils/tencentMapKey.js、utils/request.js、api/index.js；所属项目：产品2.0；来源会话：06f4b462-1a59-4d5f-b258-6f1f46290ddd；代码基线：none
 
 <!-- MEMORY_FIELDS

@@ -17,6 +17,7 @@ contracts.vue 通过 getLastContractDetail 获取合同详情，但模板错误�
 - src/pages_owner/poll/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C（zhi2-mobile-shimin）
 - 来源会话：d0c4c430-2836-4d0f-89fe-307fffe632fd
 - 代码基线：none

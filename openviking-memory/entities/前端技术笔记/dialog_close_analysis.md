@@ -10,6 +10,7 @@
 - 关联文件：@/utils/request.js、ScopeSelectDialog.vue、src/api/index.js 等
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：427d58f8-75b8-425c-af42-6fe424dbe22b；代码基线：none
 - 涉及文件：src/views/maintenance/components/OpeningBuildingDialog.vue、@/utils/request.js、src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue、src/api/index.js、src/utils/request.js
 

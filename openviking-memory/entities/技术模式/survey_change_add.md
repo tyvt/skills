@@ -10,6 +10,11 @@
 - 涉及文件: surveyChangeConstants.js, presale/surveyChange/detail.vue, 接口文档, e2e/fixtures/presale-survey-change-helpers.js, permitCancel/detail.vue, entrustSale/detail.vue, permitExtend/detail.vue, e2e/presale/presale-survey-change-real-api-flow.spec.js
 - 所属项目: 苏州市房地产监测V3; 会话: cd5819ca-3f99-45cb-b786-bfcca981ec48
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：cd5819ca-3f99-45cb-b786-bfcca981ec48
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

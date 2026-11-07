@@ -12,6 +12,7 @@
 - 或失败时保留原 token 并提示刷新。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证：会话 e7a59e5a 用户问接口不返回 token 会怎样，结论梳理调用链与 setToken(undefined) 隐蔽后果。
 - 涉及文件：src/pages/verifyUser/index.vue、src/stores/user.js、src/request/index.js。
 - 所属项目：昆山市民；代码基线：818bf9b；来源会话ID：e7a59e5a-613e-404d-ab23-37e8863e3fcf。

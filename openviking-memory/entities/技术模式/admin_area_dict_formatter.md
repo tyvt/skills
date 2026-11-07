@@ -13,6 +13,10 @@
 - 涉及文件：zhi2-web-admin/src/views/company/companyAdmin/index.vue、src/main.js
 - 所属项目：苏州市房地产监测V3；来源会话：fc99f7fd-5010-4501-913f-3bba06414106；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

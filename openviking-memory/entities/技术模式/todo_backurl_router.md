@@ -16,6 +16,8 @@
 - views/autonomy/record/components/detail.vue, components/detail-template/detail-template.vue, views/autonomy/record/components/directDetail.vue, mixins/detailMixins.js, mixins/form.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
+- 来源会话：1f86f5fa-6621-449b-b902-a3be952fcbd5
 - 会话：26959102（router.push 与 query 不兼容 HIGH；backUrl 未校验 HIGH；query 丢失 MEDIUM），1f86f5fa-6621-449b-b902-a3be952fcbd5（backUrl 待办 bug）
 - 所属项目: Huishan Fase 2G; 代码基线: adccd7e（新的为 none）
 

@@ -11,6 +11,7 @@
 - `handleQuery` 不再重复请求接口，表格通过计算属性自动更新
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：选择统计类型点击查询后表格只显示对应分类，清空或重置恢复全部
 - 涉及文件：`zhi2-web-admin/src/views/publicQuery/companyProjectStats/index.vue`
 - 所属项目：苏住房G；来源会话：7189b5dd-e29a-4612-b037-22a5fb3357a7；代码基线：none

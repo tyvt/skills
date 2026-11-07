@@ -15,6 +15,7 @@
 - d:/repository/门户/zhi2-web-admin/src/styles/index.scss
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 所属项目：门户；来源会话：7e03542d-2de3-4bb7-9718-e8ece18a0a0d；代码基线：none
 
 <!-- MEMORY_FIELDS

@@ -11,6 +11,7 @@
 - `operationBtn.vue` 改用 `immediate:true` 单一 watch 避免重复初始化
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证证据：src=昆山市民/005.md
 - 涉及文件：src/pages_examine/components/operationBtn.vue、src/pages_examine/examineDetail.vue、src/api/modules/examine.js、src/request/index.js、src/pages_examine/components/approveDialog.vue、src/pages_examine/examineList.vue、src/pages_examine/components/examineItem.vue、src/pages_examine/components/designateDialog.vue
 - 所属项目：昆山市民；来源会话ID：dd9f56a9-de5b-41cb-b05a-a959b8092576；代码基线：none

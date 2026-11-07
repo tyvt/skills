@@ -13,6 +13,7 @@
 - 否则执行灵犀选屋请求
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：pages/webview/externalWebview.vue、temp.vue、pages/user/index/index.vue、utils/portal-user.js
 - 所属项目：小程序（wygl-wxxcx-dev-slh）；来源会话：38603878-ea6a-4871-8ac2-8531b6c94bb4；代码基线：none
 

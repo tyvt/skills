@@ -9,6 +9,8 @@
 - 已删除按钮、StatisticsDialog 组件及引用、相关字段与 getQueryData 方法
 
 ## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：e43a5f22-6390-48a0-81a9-f2d8bc611ef1
 - 涉及文件：src/views/property/complex/detail.vue、src/views/property/complex/components/StatisticsDialog.vue
 

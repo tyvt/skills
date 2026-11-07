@@ -17,6 +17,8 @@
 - 判断标准：任何「失败也不该影响主流程」请求（埋点、日志、曝光）走此通道，不在调用点各自try/catch
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：f8d2218a-2bef-4ce0-99ff-25ccbca24f30
 - 验收：埋点401时页面照常跳转、登录态不被清，其他业务接口401不受影响
 - 会话885fa7c0用户要求eventData/add的401不影响跳转；appAnalytics.js增skipAuth:true与noReject/skipToken并列，httpInstance.js排除对应请求；来源苏住房C/045.md
 - 会话f8d2218a（2026-08-21，基线9832ba3）用户反馈「/appAnalytics/eventData/add 401异常不要影响后续逻辑」；最终appAnalytics.js统一silentPost，httpInstance.js让noReject提前返回、fail resolve(null)、新增skipToken；来源f8d2218a-2bef-4ce0-99ff-25ccbca24f30

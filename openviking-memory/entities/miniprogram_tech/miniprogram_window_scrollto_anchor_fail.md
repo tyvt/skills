@@ -14,6 +14,12 @@ Root cause: `pages_transaction/newHouse/detail.vue`'s `setTab` uses H5-only API 
 - Files: pages_transaction/newHouse/detail.vue, pages_transaction/stockHouse/detail.vue, pages_main/automaticRobot/index.vue, utils/index.js
 - Project: 苏住房C; Source session: 41a4e64f-0b65-4969-b0c2-d0d6514d2d0c; Baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：41a4e64f-0b65-4969-b0c2-d0d6514d2d0c
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "miniprogram_tech",

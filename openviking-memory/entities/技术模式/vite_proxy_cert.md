@@ -11,6 +11,7 @@
 - 优先级③：若后端支持改 http://IP 避开 TLS；secure: false 只影响 dev server proxy，不影响 build 产物
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 ee9a14e8，env/.env 使用 https://222.184.31.232:15777 触发校验失败，createProxyConfig 增加 secure: false 后本地代理恢复
 - 涉及文件：env/.env、zhi2-web-admin/vite.config.js
 - 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：ee9a14e8-3ae5-42f3-9d6a-f8fb0fad0e5c

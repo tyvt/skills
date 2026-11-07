@@ -9,6 +9,10 @@
 - 文件：benefit/dataSandbox/assetPanorama/index.vue、benefit/dataSandbox/fundPanorama/index.vue
 - 所属项目：苏住房G；来源会话：0e66deb2-651c-40b4-83b4-58b65b0015c3；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

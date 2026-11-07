@@ -11,6 +11,8 @@
 - SuccessCard.vue所有插图改为mode="widthFix" width="180px"
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 需清缓存重新编译；图片正常显示后Network里仍是/pages_my/static/images/authorized.png即可
 - 涉及ZsImage.vue、SuccessCard.vue、AuthorizedSuccess.vue；来源会话ID：a875a3cf-aa63-4197-994e-ac8f0d49cb8c
 

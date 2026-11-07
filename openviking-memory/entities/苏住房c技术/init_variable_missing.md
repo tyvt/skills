@@ -15,6 +15,7 @@
 - 新增页面照抄同目录页面时，注意把被调用API函数一并拷进 import。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 8fea7fec（基线 ce9e460）cancellationReason.vue 的 initDict 调 getDict 漏 import，补 import 后修复。
 - 涉及文件：d:\repository\苏住房C\zhi2-mobile-shimin\src\pages_my\setting\cancellationReason.vue、d:\repository\苏住房C\zhi2-mobile-shimin\src\pages_my\setting\cancellationForm.vue
 - 所属项目：苏住房C；来源会话ID：8fea7fec-d5ff-49f3-8b5d-6fe42f3a7694；代码基线：ce9e460

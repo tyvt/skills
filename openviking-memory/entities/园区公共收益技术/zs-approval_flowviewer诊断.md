@@ -13,6 +13,7 @@
 - 超级管理员可见按钮且调 `flowViewer`，说明同数据同路由下管理员前置条件满足；特定角色多半是路由 meta 或业务状态不一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：`zs-approval/index.vue`、`OperationBtnGroup/index.vue`、`system/menu/index.vue`、`company/companyRegister/detail.vue`、`mixins/approval.js`
 - 所属项目：园区公共收益
 - 来源会话：af6dbc70-f0b6-4b96-8516-bdf350b8dbe6

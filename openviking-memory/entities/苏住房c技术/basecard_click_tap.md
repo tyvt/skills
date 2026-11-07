@@ -16,6 +16,7 @@
 - 排查「点击无反应」先确认事件绑在原生节点还是自定义组件标签，再看组件是否 emit，勿先怀疑路由或权限
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 3aa806fa 最终结论「@click 绑在自定义组件 baseCard 上不会触发，事件没传到跳转逻辑」；修复为 baseCard.vue 根节点绑 @tap 并 emit，列表改 @tap
 - 涉及文件：src/components/commonNew/baseCard.vue、pages_main/publicNotice/components/ListIndex.vue、ListContractIndex.vue、publicNotice.vue、pages/publicNotice/components/ListContractIndex.vue
 - 所属项目：苏住房C；来源会话ID：3aa806fa-2f71-4575-9cb6-ed1ea81e5795；代码基线：4630e8e

@@ -9,6 +9,7 @@
 - 添 margin-right: calc(-1 * var(--detail-collapse-col-gap,32px)/3) 使其右缘与上一行搜索框对齐
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/139.md
 - 涉及文件：supervision/agreement/jgxm/detail.vue、index.scss、detailLayout.js、detail-form.scss、Headline/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：89648bd7-808a-4f32-89c3-6c9506a150c8；代码基线：none

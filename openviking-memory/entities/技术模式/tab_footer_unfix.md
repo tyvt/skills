@@ -20,6 +20,7 @@
 - src/pages/index/components/Property_Suzhufang.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C（zhi2-mobile-shimin）
 - 来源会话：196cd91b-26fc-4830-a88a-879bd91058a1
 - 代码基线：none

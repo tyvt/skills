@@ -6,6 +6,7 @@
 - complex/detail.vue 与 complexChange/detail.vue 使用 createProjectTypeRules(() => this.form.projectSubType) 替换原先分散 rules。
 - 移除隐藏的 projectSubType 表单项，数据仍由逻辑保留。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/property/complex/components/projectTypeRules.js、property/complex/detail.vue、property/complexChange/detail.vue
 - 所属项目：园区公共收益；来源会话：76645e4d-9f4d-4dff-9aa8-1c457e2f7af1；代码基线：none
 

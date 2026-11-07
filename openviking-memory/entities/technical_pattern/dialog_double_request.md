@@ -12,6 +12,12 @@ Both `onOpen` and the `maintenanceObjectId` watcher call `loadDialogData()`, and
 - Files: refundDetailDialog.vue, refundDetailTable.vue, commonTable.vue, listMixins.js, zsDialog/index.vue, SearchContainer/index.vue, ShareDetailDialog.vue, Pagination/index.vue
 - Project: 惠山G (zhi1-web-admin); Source session: 69fe4877-9065-40ce-b4bb-17b22cfdb965; Code baseline: none
 
+## 验证与归属
+- 所属项目：惠山G
+- 验证证据：extracted source=cursor project=惠山G
+- 来源会话：69fe4877-9065-40ce-b4bb-17b22cfdb965
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

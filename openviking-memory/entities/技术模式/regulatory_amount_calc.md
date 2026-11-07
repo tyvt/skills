@@ -19,6 +19,8 @@
 - zhi2-web-admin/src/views/v1/presale/stock/agreement/index.vue
 
 ## 验证与归属
+- 所属项目：淮安存量房
+- 验证证据：extracted source=cursor project=淮安存量房
 - 验证证据：src=淮安存量房/002.md；提取来源=cursor，项目=淮安存量房
 - 来源会话：c0853ff6-9071-4f61-b126-927718e7cf7e；代码基线：none
 

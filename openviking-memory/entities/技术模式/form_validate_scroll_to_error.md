@@ -16,6 +16,10 @@ Element UI 校验失败仅标红不滚动，需在自定义滚动容器内新增
 - 涉及文件：src/utils/validate.js、src/components/zs-form/zs-form.vue、src/views/autonomy/candidateCollect/components/CandidateDialog.vue、src/mixins/dialogMixins.js、src/mixins/form.js。
 - 所属项目：园区物管2.0；来源会话：b7798d11-726e-4733-aeb4-7435cb7b009a；代码基线：none。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

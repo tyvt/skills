@@ -11,6 +11,10 @@
 - 涉及文件：home.vue、utils/portal.js、src/api/portal.js
 - 所属项目：无锡市区小程序嵌入H5；来源会话：2782b86f-c8ca-4f8c-8d4e-27ba92d8c485；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "无锡市区小程序嵌入H5技术",

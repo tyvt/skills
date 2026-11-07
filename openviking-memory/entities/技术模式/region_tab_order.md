@@ -11,6 +11,7 @@
 - 动态取数改造后「前端固定排序」是新增层，勿把接口取数改回硬编码数组，也勿只改 DEFAULT_REGIONS 不排序接口结果
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话 c09eef71 用户要求 DEFAULT_REGIONS 兜底顺序为全市之后接张家港、常熟、太仓、昆山、吴江，initRegion() 按统一区划代码排序，结论两处同步排序
 - 涉及文件：zhi2-web-admin/src/views/home/index-v2.vue、zhi2-web-admin/src/views/home/v2/components/RegionTabs.vue
 - 所属项目：苏住房G；来源会话：c09eef71-ed5e-4ee0-afac-90e1a65e8696；代码基线：15e201a

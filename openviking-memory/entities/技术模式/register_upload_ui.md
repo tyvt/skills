@@ -6,6 +6,8 @@
 - 每项名称与星号（必填标记）同行显示，无逐项格式提示
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证截图：zhi2-web-admin/test-results/step3-ui-capture/register-step-3-full.png 及 register-step-3-upload-item.png
 - 验证证据：src=苏州市房地产监测V3/137.md
 - 涉及文件：register/companyRegister.vue、institutionRegister/index.vue、e2e/fixtures/register-helpers.js、register/components/Step3Appendix.vue、register/components/RegisterUploadItem.vue、institutionRegister/components/Step3Appendix.vue、institutionRegister/components/InstitutionUploadItem.vue、e2e/register/register-layout.spec.js

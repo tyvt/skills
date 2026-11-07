@@ -12,6 +12,7 @@ B端页面将`a && b`短路结果绑到布尔prop，返回字符串ID触发prop�
 - 改后刷新确认警告消失且禁用态视觉真正生效
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话6628d00f用户贴Invalid prop: type check failed for prop "disabled". Expected Boolean, got String "667570210075104"
 - 涉及文件：feeDeclare2/components/bulkImportDialog.vue、feeDeclare2/detail.vue、feeDeclare2/index.vue
 - 所属项目：苏住房G；来源会话：6628d00f-987f-45b2-80c7-d0bedcc72598；代码基线：69e9d4d

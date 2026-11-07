@@ -12,6 +12,10 @@
 - 建议创建 recordPriceHouse 对应目录与 index/detail 文件
 - 所属项目：产品2.0；来源会话：ec4668d5-44ce-4441-ba60-8e9070976025；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

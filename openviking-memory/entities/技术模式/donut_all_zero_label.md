@@ -11,6 +11,8 @@
 - 资产全景环图（资源分类/合同分类等，assetPanorama）：去掉「全为 0 时隐藏扇区 label」判断，只要接口返回 `donutData` 不为空即显示 `0 (0.0%)` 及引导线；tooltip 与底部图例逻辑不变；分类较多（如 13 子类）时标签可能仍因 ECharts `avoidLabelOverlap` 自动避让而部分重叠
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+- 来源会话：26ce6808-4e6b-41fc-88d2-b31cbed282bf
 - 验证：会话 26ce6808-4e6b-41fc-88d2-b31cbed282bf（用户要求调整数据层过多影响点击拾取等交互）
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、benefit、statisticsMap/components/map.vue、benefit/dataSandbox/assetPanorama/index.vue、benefit/dataSandbox/assetPanorama/mock.js
 - 所属项目：园区物管2.0；代码基线：none

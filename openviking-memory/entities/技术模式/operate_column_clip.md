@@ -17,6 +17,7 @@
 - 改完按「同列不同页面」横比表头是否完整、按钮是否等距
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 7a62e9a6 用户反馈「表格列出现空白」「两个都不行」
 - 涉及文件：src/components/zs-operate-column/zs-operate-column.vue、maintenance/accountOpen/owner/components/OpenDetailTable.vue
 - 所属项目：产品2.0；来源会话：7a62e9a6-5f35-46c3-b3af-b44bad9ba866；代码基线：6accf9a

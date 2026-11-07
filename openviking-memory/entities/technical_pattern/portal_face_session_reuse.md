@@ -12,6 +12,11 @@
 - 文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/decision/form.vue、src/pages_owner/elect/form.vue、src/pages.json、src/pages_owner/decision/components/multiple/ViewOptionsList.vue、src/api/autonomy.js、src/pages_owner/house/index.vue、无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js、src/hooks/usePortal.js
 - 项目：惠山二期H5 / 无锡市区小程序嵌入H5；来源会话：dfbbf465-c764-4a09-b414-4083bef5f5d2；代码基线：none
 
+## 验证与归属
+- 所属项目：惠山二期H5
+- 验证证据：extracted source=cursor project=惠山二期H5
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

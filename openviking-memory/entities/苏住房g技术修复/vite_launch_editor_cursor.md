@@ -10,6 +10,7 @@
 - vite.config.js 逻辑：仅当 env.VITE_LAUNCH_EDITOR 未设置或为 true 时启用 launch-editor 插件，editor 默认取 env.VITE_EDITOR 或 'cursor'
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G
 - 涉及文件：vite.config.js、env/.env、env/.env.test、env/.env.production
 - 来源会话：31b1bd1f-868a-41df-9b2d-8d9b9ada1333

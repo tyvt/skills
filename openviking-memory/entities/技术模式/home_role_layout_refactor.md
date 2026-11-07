@@ -23,6 +23,7 @@
 - zhi2-web-admin/src/views/home/components/HelloCard.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：cursor 会话提取；所属项目：门户；来源会话：6756ce12-ea8e-4edc-8e34-96c59e3ed137
 
 

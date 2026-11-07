@@ -12,6 +12,7 @@
 - `el-pagination`：`flex: 1` + `justify-content: flex-end`，分页控件靠右
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：HouseScopeDialog.vue、SelectRecordProcedureDialog.vue、zs-pagination.vue
 - 所属项目：园区公共收益；来源会话：c25508c5-d1e5-4bd1-bb34-e499716d2d81
 

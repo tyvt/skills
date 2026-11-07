@@ -10,6 +10,8 @@
 - 解析路由不含 pathHint 则回退列表路径 /${id}
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：cursor session=dbc55dba-6010-4384-9d71-56be65335631
 - 涉及文件：views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/index.vue、mixins/listMixins.js、views/autonomy/regulation/change/index.vue、utils/ruoyi.js、e2e/modules/price-filing-routes.spec.js、e2e/modules/price-filing-view-refresh.spec.js、路由信息.json、store/modules/permission.js
 - 来源会话ID：dbc55dba-6010-4384-9d71-56be65335631

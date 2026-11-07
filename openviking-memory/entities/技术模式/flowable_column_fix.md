@@ -11,6 +11,7 @@
 - 可在页面分别打开三个菜单确认列展示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：finished.vue、process.vue、todo.vue（zhi2-web-admin/src/views/flowable/）
 - 所属项目：园区公共收益；来源会话：3924b519-9c9c-4c23-8add-6fd9b72aa24a；代码基线：none
 

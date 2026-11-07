@@ -11,6 +11,8 @@
 - 该原生人脸核身代码未实际调用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
+- 来源会话：cbf090fd-dbf7-4699-9af7-6c33b203af19
 - 验证证据：src=cursor session=cbf090fd-dbf7-4699-9af7-6c33b203af19
 - 所属项目：昆山市民；代码基线：none
 - 涉及文件：src/pages/verifyUser/index.vue、src/pages/verifyUser/info.vue、src/pages_vote/vote/faceSuccess.vue、src/pages_vote/vote/vote_confirm.vue、src/pages_vote/vote/affirm.vue、src/pages_election/election/confirmElection.vue、README.md、src/pages_home/home.vue

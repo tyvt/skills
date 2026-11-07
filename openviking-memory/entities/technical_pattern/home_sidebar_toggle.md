@@ -13,6 +13,12 @@ The `home/index.vue` `created` hook called `toggleSideBar`, collapsing the defau
 - Files: zhi2-web-admin/src/views/home/index.vue, layout/components/Navbar.vue, layout/index.vue, Sidebar/index.vue, TagsView/Hamburger.vue, store/modules/app.js, TagsView/index.vue, router/index.js
 - Project: 产品2.0; source session: 7306b6f9-4bed-4195-ab23-cda67731b6e0; code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：7306b6f9-4bed-4195-ab23-cda67731b6e0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

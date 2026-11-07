@@ -11,6 +11,12 @@
 ## 验证
 - cursor 会话 860e18b1-7843-41e3-a393-6d3279b805da; base: none.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：860e18b1-7843-41e3-a393-6d3279b805da
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

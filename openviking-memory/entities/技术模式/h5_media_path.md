@@ -16,6 +16,7 @@ H5 端部署在子目录时，媒体相对路径会被拼进页面路径前缀�
 - 新增媒体目录前缀时要同步加进白名单，否则新目录会复发同类问题
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 288c6ff2 用户贴出实际访问地址，结论为 resolveMediaUrl 返回不带前导 / 的相对路径，修复是对媒体目录统一加前导 /
 - 涉及文件：zhi2-mobile-shimin/src/utils/index.js、zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue
 - 所属项目：苏住房C；来源会话：288c6ff2-ac59-4b55-b6ee-a561f76eeba1；代码基线：d43894b

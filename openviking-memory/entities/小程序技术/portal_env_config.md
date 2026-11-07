@@ -10,6 +10,7 @@
 - 涉及文件：utils/portal-env-config.js、utils/portal-user.js、utils/portal-h5-webview.js、utils/settings.js、pages/face/bdc.vue、pages/webview/home.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 来源会话：0a1c8f1d-c0c4-4b13-b58b-d89842dbd647
 - 所属项目：小程序（wygl-wxxcx-dev-slh）；代码基线：none
 

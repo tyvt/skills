@@ -12,6 +12,7 @@
 - 两项均在多选（`optionType === '1'`）时显示，与编辑表单一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 重新打开多议题表决项「查看」弹窗，多选议题应能看到最少、最多选择项；本地 dev 保存后热更新即可验证
 - 涉及文件：`zhi2-web-admin/src/views/autonomy/multiply/components/VotingItemsDialog.vue`
 - 所属项目：惠山二期G；来源会话：5f4bd9ba-c920-4b33-ab4f-5d2525ca5150；代码基线：none

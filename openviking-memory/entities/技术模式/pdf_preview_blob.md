@@ -13,6 +13,11 @@
 - 已在 8082 跑完 E2E，6/6 通过；断言拉取 PDF（content-type:application/pdf）、URL 无重复 assets/files、当前页仍在 /#/UnifiedLogin、未误开门户弹层。
 - 涉及文件：index.html、tests/e2e/unified-login-visual.spec.ts、UnifiedLogin.vue；来源会话 b92385ab-4138-464e-904b-5e1850ffa89d；项目门户。
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

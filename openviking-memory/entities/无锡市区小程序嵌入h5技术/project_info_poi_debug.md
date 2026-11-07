@@ -17,6 +17,7 @@ pages_owner/project/info/index.vue 的周边配套无数据时，已加 [小区�
 - JSONP 超时 / script.onerror：宿主/网络拦截 apis.map.qq.com
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话 44e9f45b 用户反馈小区周边无数据要求加日志
 - 涉及文件：src/pages_owner/project/info/index.vue、src/utils/index.js
 - 所属项目：无锡市区小程序嵌入H5；来源会话ID：44e9f45b-f8b3-4cdb-b60b-c803993c0d4a

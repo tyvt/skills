@@ -13,6 +13,7 @@
 - 若刷新后仍为空，说明后端该记录本身无权利人数据
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 所属项目：太仓G；来源会话：9b1512b5-51d7-49c5-9762-41a7264a1453；代码基线：none
 
 <!-- MEMORY_FIELDS

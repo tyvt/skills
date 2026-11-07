@@ -11,6 +11,7 @@
 - 处理方式与资产租赁合同备案、公共房屋等同类弹框一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：pubUseMoneyApply/detail.vue、ruoyi.js、pubParkingRate/detail.vue
 - 所属项目：园区公共收益；来源会话：414b600e-25ec-4a22-8966-2b35fffacd1d
 

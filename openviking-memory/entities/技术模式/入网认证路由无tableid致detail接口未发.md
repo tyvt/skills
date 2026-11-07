@@ -12,6 +12,7 @@
 - 解析 `EntryNetworkDetailVo` 优先取 `data.companyRecord` 并排除 `qualificationList`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/002.md
 - 涉及文件：前端联调文档-开发企业入网.md、institutionRegister/detail.vue、toB/companyRecord/detail.vue、developerBasicInfoContent.js、DeveloperBasicInfoDetail.vue、CompanyRegisterSingleForm.vue、companyRecord.js、DeveloperBasicInfoForm.vue
 - 来源会话ID：3ec7aa54-6427-4d87-9697-2963bbe64ad2

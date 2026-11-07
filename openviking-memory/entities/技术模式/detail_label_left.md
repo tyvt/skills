@@ -10,6 +10,7 @@
 ## 涉及文件
 - zhi2-web-admin/src/components/detail-template/detail-template.vue
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：0e6522ee-5877-4b0d-9156-b0f67a688a71；代码基线：none
 
 <!-- MEMORY_FIELDS

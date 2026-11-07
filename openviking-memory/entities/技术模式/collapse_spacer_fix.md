@@ -15,6 +15,8 @@
 - src/views/property/complex/components/RegionTreeLayout.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：10639736-d230-4e7f-93b8-169a25bf4221
 - 所属项目: Park Public Benefit; session: 10639736-d230-4e7f-93b8-169a25bf4221; base: none
 
 <!-- MEMORY_FIELDS

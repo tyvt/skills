@@ -13,6 +13,8 @@
 - 正确地址：https://wygl.wxwgzx.com:8989/sz/...（需保留 /sz）
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：utils/portal-env-config.js、pages/webview/home.vue、api/common.js、utils/portal-user.js
 - 来源会话ID：b626c0b5-4df0-46de-a16a-ec035ee4e656
 - 代码基线：none

@@ -12,6 +12,7 @@
 - 凡使用 initCurrentProject + area mixin 反查的页面（pubQuarterlyDeclaration 等）按同方式处理。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：027.md 会话 6e97f2b9 最终结论确认竞态与提前 return 问题及两处修改。
 - 涉及文件：src/views/benefit/pubParkingRate/detail.vue、src/mixins/area.js。
 - 所属项目：园区物管2.0；来源会话 6e97f2b9-b0d9-4363-889e-533667c5bbef；代码基线 3965548b6。

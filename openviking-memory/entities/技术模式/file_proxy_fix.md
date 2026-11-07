@@ -11,6 +11,7 @@
 - 前端展示加固：项目备案详情「国有土地出让合同」改为 el-image 缩略图 + 点击预览
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：ProjectCertificateTabs.vue、detail.vue、env/.env
 - 所属项目：苏州市房地产监测V3
 - 来源会话：f85f7cf0-8601-48a0-855b-e95d48138343

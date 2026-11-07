@@ -15,6 +15,7 @@
 - 后续图片迁包须同步映射表与 scripts 下迁移脚本，两者同一口径
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 9b92579b 报错「Failed to load local resource /static/images/empty.png 500」；定位 17443e68 迁包提交，加映射表并回退 pages_main
 - 涉及文件：src/utils/index.js、components/ZsImage/ZsImage.vue、utils/mainStaticPaths.js、scripts/prune-main-static.mjs
 - 所属项目：苏住房C；来源会话ID：9b92579b-9f3a-4e44-a8e1-f17d395f2790；代码基线：4630e8e

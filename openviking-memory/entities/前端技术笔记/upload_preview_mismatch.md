@@ -11,6 +11,7 @@
 - 该组件全局共用，修一处全项目受益；排查「点哪张都看错」优先怀疑预览列表与匹配键 URL 格式不一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 90aa41bd-020e-45a5-bbab-7177966aefbc 用户报 housePart/detail.vue:57 新增时多图预览匹配错乱；定位 handlePictureCardPreview 的 indexOf 格式不一致，改 findIndex + 保留 uid
 - 另据会话 90aa41bd-ec8d-452e-9246-bbbc58df8558 复现同因，涉及更多文件（见下）
 - 涉及文件：src/components/ImageUpload/index.vue、src/utils/resolveServerAssetUrl.js、src/components/AnnexUpload/components/ImageGrid.vue、src/components/detail-template/detail-template.vue、src/views/property/allotNotice/detail.vue、src/store/modules/preview.js

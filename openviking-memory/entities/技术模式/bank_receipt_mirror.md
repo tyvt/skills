@@ -11,6 +11,7 @@
 - 验收列顺序：序号 → 对方账户名称 → 通知书号 → 交易日期 → 交易金额 → … → 操作
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 31028abc 用户报银行回单字段顺序弄反；结论指 v-for 动态列与固定操作列组合导致错乱，改静态列并 doLayout
 - 涉及文件：src/views/benefit/pubBankDetailDay/index.vue、src/components/zs-table/zs-table.vue
 - 所属项目：园区公共收益；来源会话：31028abc-b8ae-4e20-8edb-702fd8eb1e0c；代码基线：36a9a7e

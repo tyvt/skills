@@ -10,6 +10,7 @@
 - 结束日期不晚于今天；打开选择器前自动校正越界历史数据
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：DetailsTab.vue、benefitRange.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话：804ea010-6379-4dfd-818f-a78d3c273994
 

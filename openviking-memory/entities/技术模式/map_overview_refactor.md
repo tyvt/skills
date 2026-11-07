@@ -15,6 +15,7 @@
 - 图表 initChart 统一初始化
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：mapOverview/index.vue、constants.js、dataHelpers.js、chartOptions.js
 - 所属项目：园区物管2.0；来源会话：c5eed802-2959-479a-9b04-332f3bcf855d；代码基线：none
 

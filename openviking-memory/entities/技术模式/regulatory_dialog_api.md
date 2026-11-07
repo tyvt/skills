@@ -6,6 +6,7 @@
 - 唯一调用方：zhi2-web-admin/src/views/supervision/agreement/jgxm/components/SupervisionAddDialog.vue
 - 父级入口：zhi2-web-admin/src/views/supervision/agreement/jgxm/components/SupervisionTable.vue
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：302ec45a-4a8a-4a2c-8b9d-89dca9c35825；代码基线：none
 
 <!-- MEMORY_FIELDS

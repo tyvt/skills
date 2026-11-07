@@ -10,6 +10,7 @@
 - 全局组件注册幂等：组件已存在则跳过，避免 Vue warn。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 1210ef9d 报 main.js:39 Vue warn；修复见 zhi2-web-admin/src/main.js 34:43 与 183:235。
 - 涉及文件：zhi2-web-admin/src/main.js
 - 所属项目：2-0；来源会话ID：1210ef9d-24f4-4452-a7cc-89267ce1e575；代码基线：none

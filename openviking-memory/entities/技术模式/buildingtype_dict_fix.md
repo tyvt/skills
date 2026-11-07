@@ -13,6 +13,7 @@
 - 刷新后 4 显示为对应中文名称（如高层、多层）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0
 - 来源会话ID：8a65f99f-f4d2-49e6-95b8-be726f98fc46
 - 涉及文件：AveragePriceTable.vue、BuildRecordTable.vue、historicalPrice.vue、PriceTable.vue

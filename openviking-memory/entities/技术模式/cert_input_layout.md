@@ -15,6 +15,7 @@
 - 改完必须重新编译真机查看
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话98b2613a用户四轮反馈（UI错乱→字号小→没生效→排版乱），结论根因flex-wrap，改固定两行布局
 - 涉及文件：pages_owner/house/verify.vue、pages_transaction/publishHouse/verification.vue、styles/form2.scss、pages_transaction/stockHouseSign/apply.vue
 - 所属项目：苏住房C；来源会话ID：98b2613a-ff87-4511-9692-3d6fb3b49725；代码基线：9832ba3

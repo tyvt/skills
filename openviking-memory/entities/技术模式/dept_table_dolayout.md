@@ -7,6 +7,7 @@
 - 设置列宽并于加载/展开后调用 doLayout() 避免操作列错位与右侧留白
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/046.md
 - 涉及文件：detailLayout.js、dept/index.vue、menu/index.vue、Headline/index.vue、table.js、subTableMixins.js、DeptDialog.vue、zs-table.vue
 - 所属项目：苏州市房地产监测V3；来源会话：c0dd69e9-f8fe-4d3f-bdb9-61cb55b5b94b；代码基线：none

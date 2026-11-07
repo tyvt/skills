@@ -9,6 +9,7 @@
 - 在 `decisionCommon/components/DecisionRangeDialog.vue`、`DecisionRangeDialogLite.vue`、`ownerDecision/components/DecisionRangeDialog.vue`、`optionDecision/components/DecisionRangeDialog.vue` 中统一将 `obligee` 改为 `obligeeName`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：光标会话 9b1512b5-51d7-49c5-9762-41a7264a1453 提取
 - 涉及文件：ownerDecision/components/DecisionRangeDialog.vue、decisionCommon/components/DecisionRangeTable.vue、decisionCommon/components/DecisionRangeDialog.vue、api/estate/decisionRange.js、decisionCommon/components/DecisionRangeDialogLite.vue、optionDecision/components/DecisionRangeDialog.vue
 - 所属项目：太仓G；来源会话：9b1512b5-51d7-49c5-9762-41a7264a1453；代码基线：none

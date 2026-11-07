@@ -12,6 +12,8 @@
 - 按钮区域与卡片下边缘保留`48rpx`间距，若偏紧可调整为`60rpx`对称
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 引用页面（`AuthorizedSuccess`、`UnauthorizedPage`等）无需修改自动生效
 - 可在小程序开发者工具打开实名认证成功/未认证页面确认
 - 项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：066bd23c-4a48-43ae-a818-2324fa5a63fb；代码基线：none

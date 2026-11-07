@@ -15,6 +15,12 @@ Enterprise login project popup is controlled by flag ENABLE_B_TERMINAL_PROJECT_D
 - Verification: src=榆林G/002.md
 - Source session: b7adac16-6317-40a9-8cb6-2631f68c204c
 
+## 验证与归属
+- 所属项目：榆林G
+- 验证证据：extracted source=cursor project=榆林G
+- 来源会话：b7adac16-6317-40a9-8cb6-2631f68c204c
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "bug",

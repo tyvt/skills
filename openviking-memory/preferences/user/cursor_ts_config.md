@@ -4,6 +4,12 @@
 - Reload via `Developer: Reload Window`; disable Vetur and old Volar, keep only `Vue - Official`.
 - Verification: src=苏住房C/078.md; files include C:\Users\Administrator\AppData\Roaming\Cursor\User\settings.json etc.; session 6911ad2f-da24-42ab-a070-15f71b1f2ffa
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：6911ad2f-da24-42ab-a070-15f71b1f2ffa
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

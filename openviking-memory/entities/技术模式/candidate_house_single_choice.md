@@ -10,6 +10,7 @@
 - 涉及 zs-select-dialog.vue、BuildingTableViewTabs.vue、RangeTable.vue 等组件协同
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：src=园区公共收益/031.md
 - 来源会话：52f8bcba-f213-44d2-86e9-611498aa1a67；代码基线：none
 - 所属项目：园区公共收益

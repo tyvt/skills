@@ -9,6 +9,7 @@
 - 刷新开发企业页面后，业务状态下拉框默认显示「已备案」，列表按该条件查询
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：`zhi2-web-admin/src/views/company/companyManagement/develop/index.vue`、`components/index.vue`
 - 所属项目：苏住房G；来源会话：9746fea2-a8bc-4394-9108-c849aad1148f；代码基线：none
 

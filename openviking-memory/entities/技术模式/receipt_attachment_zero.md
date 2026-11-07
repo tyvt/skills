@@ -12,6 +12,7 @@
 - 查看模式凭证附件仅展示 `voucherFileUrl`，不再用 `voucherFileId` 兜底
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：19c456b4-3996-489a-b606-804a1309acf5；代码基线：none
 - 涉及文件：`pubVerificationReceipts/detail.vue`
 

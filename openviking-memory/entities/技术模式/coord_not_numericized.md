@@ -11,6 +11,7 @@ zhi2-web-admin 中经纬度字段名不一致且非数值，导致坐标被过�
 - `components/map.vue` 打点前再次兼容转换并跳过非法坐标
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/076.md
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue、mock.js、mockApi.js、operatingAssets.vue、src/components/ZsTencentMap/index.vue、mapLoader.js
 - 所属项目：园区物管2.0；来源会话：4e071976-4604-4c8f-972d-87c97674c807；代码基线：none

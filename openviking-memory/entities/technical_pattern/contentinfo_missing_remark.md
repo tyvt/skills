@@ -16,6 +16,12 @@ In propertyContractFeeStandardDialog.vue, DetailTemplate renders contentInfo wit
 - Source session: 36d9b40d-3d14-49fe-953c-f9ad9284a5ee
 - Code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：36d9b40d-3d14-49fe-953c-f9ad9284a5ee
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

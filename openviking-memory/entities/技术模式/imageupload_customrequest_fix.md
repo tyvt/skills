@@ -8,6 +8,7 @@
 - append 前校验 rawFile 必须有 `size`
 - 对 Blob/File 情况重新构造 `new File([blob], safeName, {type})` 确保 multipart 为标准二进制流
 ## 验证与归属
+- 验证证据：extracted source=cursor project=repository
 - 需用失败的非中文文件名重新上传验证后端不再返回 `file: {}`
 - 涉及文件：zhi2-web-admin/src/components/ImageUpload/index.vue
 - 所属项目：repository；来源会话：7a1cac84-09ff-4e62-9499-a23a1aef9cbf；代码基线：none

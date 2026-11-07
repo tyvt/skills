@@ -13,6 +13,12 @@
 - 涉及文件: variables.css, detail-form.scss, vite.config.js, index.scss, element-ui.scss, detail.vue, zs-dialog.vue.
 - 验证证据: src=苏州市房地产监测V3-rest/056.md; session 14ac23b1-f562-46c6-80d9-d8e3b7a96870.
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：14ac23b1-f562-46c6-80d9-d8e3b7a96870
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

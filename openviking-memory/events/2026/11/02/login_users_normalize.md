@@ -9,6 +9,11 @@ In MicroCommunityWeb, the login API returned `data` as a single-user object, but
 【来源会话ID】716679d5-9d27-4090-96be-5897fd65c76f
 【代码基线】none
 
+## 验证与归属
+- 所属项目：MicroCommunityWeb
+- 验证证据：extracted source=cursor project=MicroCommunityWeb
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "login_users_normalize",

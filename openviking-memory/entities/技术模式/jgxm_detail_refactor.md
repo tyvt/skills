@@ -12,6 +12,7 @@
 - 业务逻辑：`revoke`、`multipleSignatures` 等保留
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：`jgxm/detail.vue`、`SupervisionTable.vue`
 - 所属项目：产品2.0；来源会话：d36455ff-aa49-44e4-8e20-51051f2af28f；代码基线：none
 

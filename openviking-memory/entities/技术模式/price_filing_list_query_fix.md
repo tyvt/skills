@@ -15,6 +15,7 @@
 - 价格备案参数维护（priceParameters）仍以「区域」为业务主字段，与本次去区划无关
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：60c2aa36-5b7d-4346-9e4c-362620747abd
 - 代码基线：none

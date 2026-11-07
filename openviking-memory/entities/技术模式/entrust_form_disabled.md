@@ -8,6 +8,8 @@
 - `entrust-sale-real-api-flow.spec.js` 添加 helper `assertEntrustSaleAppendixButtons` 用于验证
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：80d2603f-f2d9-4f58-9273-3841d86f0ce0
 - 验证证据: src=苏州市房地产监测V3/108.md
 - 涉及文件: presale/entrustSale/detail.vue, mixins/detailMixins.js, mixins/form.js, AnnexUpload/index.vue, AnnexUpload/components/FileList.vue, e2e/presale/entrust-sale-real-api-flow.spec.js, e2e/fixtures/entrust-sale-helpers.js, supervision/agreement/version/detail.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 80d2603f-f2d9-4f58-9273-3841d86f0ce0; baseline: none

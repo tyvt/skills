@@ -10,6 +10,7 @@
 - zhi2-web-admin/playwright.config.js
 - zhi2-web-admin/tests/e2e
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 所属项目：2-0；代码基线：none
 - 验证证据：会话d648e339要求覆盖主流PC浏览器、成功失败都录屏；结论36 passed(12×3)、video.webm落盘、配置chromium/firefox/edge与video:'on'
 - 来源会话ID：d648e339-2291-4af1-9452-f7df11d80f3b

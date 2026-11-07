@@ -11,6 +11,10 @@ i淮安公版投票/决策相关页面跳转 ResultStatistics 时携带 `rangeId
 - decision/index.vue、elect/index.vue、ViewOptionsList.vue、common/ResultStatistics.vue。
 - 所属项目：i淮安公版；来源会话：b0e15d5b-76cd-410c-ac70-649129353a28。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安公版
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "i淮安公版技术",

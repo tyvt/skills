@@ -10,6 +10,8 @@
 - H5 仍保留 `sessionStorage` 逻辑
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译运行小程序，登录后完全关闭重开，「我的」页仍显示已登录
 - 涉及文件：user.js、vote.js、login/index.vue、App.vue、owner.js
 - 项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：81967bea-0ba8-4625-a47d-4edeb016e86b

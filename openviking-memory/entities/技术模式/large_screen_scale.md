@@ -14,6 +14,7 @@
 - 新增大屏页直接复用 assetPanorama 的缩放处理，不各页自写比例逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 aedd6cfa 给出根因推导与动态设计稿宽度公式，调整设计稿宽度与统一缩放比，收紧默认高度并侧栏重算；用户提示刷新后宽度贴边铺满，若某列偏窄可指定左/中/右单独调列宽比例
 - 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/fundPanorama/index.vue、src/views/benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；代码基线 f00310232；来源会话 aedd6cfa-10c2-4204-ace0-2dc1b2eb8a12；验证证据：园区物管2.0/027.md

@@ -11,6 +11,7 @@
 - 保留 `globalThis.pdfjsWorker` 注册以免 worker 加载失败。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证：会话 d22bb0e1 最终结论，含报错与修复要点。
 - 涉及文件：`src/utils/pdfPolyfill.js`、`src/pages/common/filePreview.vue`、`src/pages_contract/detail.vue`、`src/utils/index.js`、`package.json`、`vite.config.js`。
 - 所属项目：昆山市民；代码基线：75db5a8；来源会话ID：d22bb0e1-fc61-42cb-bfc2-13d1d148fd21。

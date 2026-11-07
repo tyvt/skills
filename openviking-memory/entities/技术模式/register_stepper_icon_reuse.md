@@ -14,6 +14,8 @@
 - playwright.config.js
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/098.md
 - 来源会话ID：03f0598b-1d17-4053-8f92-746ad230caef
 

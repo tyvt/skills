@@ -12,6 +12,7 @@ getDictsIncludeDisabled 由 /system/dictData/list 分页改为 /system/dictData/
 - 切换后全库不应再有 /system/dictData/list 调用，筛选下拉仍走 getDicts，业务页面代码零改动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 58dcbdff 用户要求改用 listByType 接口查全量并用于回显，最终仅改 dict.js
 - 涉及文件：zhi2-web-admin/src/utils/dict.js、zhi2-web-admin/src/views/company/staffManagement/components/index.vue、zhi2-web-admin/src/utils/companyListQuery.js
 - 所属项目：苏住房G；来源会话ID：58dcbdff-1362-4418-9b41-bd4b7e15dd6c；代码基线：d5eee56

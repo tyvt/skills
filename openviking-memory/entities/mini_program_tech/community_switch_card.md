@@ -11,6 +11,12 @@ home.vue adds community-card between carousel and menu; shows switch entry when 
 - Source session: afb09671-9f86-4f6b-bab5-1a2b4c3931ef; code baseline: none
 - Files: home.vue, externalWebview.vue, portal-user.js
 
+## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
+- 来源会话：afb09671-9f86-4f6b-bab5-1a2b4c3931ef
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "mini_program_tech",

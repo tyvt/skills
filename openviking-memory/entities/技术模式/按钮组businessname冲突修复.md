@@ -15,6 +15,10 @@
 - 涉及：`OperationBtnGroup/index.vue`、`supervision/agreement/jgxm/detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话ID：6bc3a4e9-2565-4bd0-9acd-c67575e5b1aa
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

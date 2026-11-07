@@ -10,6 +10,7 @@
 - 数据加载后调用 doLayout() 重算表格高度
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/049.md
 - 涉及文件：PermitHistoryPanel.vue、detail.vue、permitConstants.js、2026-09-11.md、PermitEntrustPanel.vue、index.vue、request.js、package.json
 - 所属项目：苏州市房地产监测V3；来源会话：8800fd20-adfa-49a7-b6f1-4d05b99a2454；代码基线：none

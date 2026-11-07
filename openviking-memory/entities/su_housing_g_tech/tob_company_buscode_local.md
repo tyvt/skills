@@ -10,6 +10,7 @@
 - 父仓库子模块指针已在 `00dc562` 更新并推送
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：业务代码已在远端可直接联调；工作区仅剩未暂存 `env/.env`（代理地址注释）与本次修复无关
 - 涉及文件：`zhi2-web-admin/src/utils/localOrganizationFlow.js`、`zhi2-web-admin/src/mixins/localOrganizationFlowMixin.js`、`zhi2-web-admin/src/views/toB/companyRecord/detail.vue`
 - 所属项目：苏住房G；来源会话：a96b47f2-8e5d-47a4-8d57-d5fcdf160738

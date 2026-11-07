@@ -15,6 +15,7 @@
 - 三端同源项目遇「轮播图/横幅被裁」优先判定：先看 mode，再看容器高度是否写死，两者须与素材比例对齐
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证会话：6d739bef（2026-08-26，基线 b7bf813），用户截图反馈图片比例不对横向被遮挡
 - 涉及文件：pages_tab/components/Home_Suzhufang.vue、components/ZsSwiper/ZsSwiper.vue、components/ZsImage/ZsImage.vue、pages/index/components/Home_Suzhufang.vue
 - 所属项目：苏住房C；来源会话ID：6d739bef-cad1-47be-b7b4-83a3d7029671；代码基线：b7bf813

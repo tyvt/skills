@@ -13,6 +13,7 @@
 - 按鹿路通文档 §4 通过 JumpMiniProgram 跳转其他小程序
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 涉及文件：index.html、jweixin-1.6.0.js、src/main.js、src/utils/wxJssdk.js
 - 所属项目：昆山市民；来源会话ID：9727f7d9-56fd-48f1-b779-7c22335440a7；代码基线：none
 

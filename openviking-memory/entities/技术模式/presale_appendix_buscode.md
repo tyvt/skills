@@ -11,6 +11,7 @@
 - 面板需 busId 与 bus 齐备才挂载并校验 busCode 非空
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/034.md
 - 涉及文件：presale/permit/components/detail.vue、PermitPlanPanel.vue、PermitAppendixPanel.vue、utils/ruoyi.js、permit/accept/detail.vue、permit/plan/detail.vue、store/modules/permission.js、e2e/fixtures/presale-permit-menu-config.js
 - 所属项目：苏州市房地产监测V3；来源会话：e5947e2b-177c-437d-beee-e32448d7d98d；代码基线：none

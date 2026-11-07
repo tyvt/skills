@@ -16,6 +16,10 @@
 - 涉及文件：system/regionBankAuth/index.vue、property/complex/components/RegionTreeLayout.vue
 - 所属项目：苏住房G；来源会话：3afefc54-4c44-41c7-a8c6-998c856214d4；代码基线：864b409
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

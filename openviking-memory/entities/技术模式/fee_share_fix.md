@@ -14,6 +14,10 @@
 - 文件：zs-table.vue、final/components/feeShareTable.vue、budget/components/feeShareTable.vue
 - 所属项目：园区公共收益；来源会话：3936cf21-6925-44f4-a5c6-987975681a38；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

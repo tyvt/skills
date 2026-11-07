@@ -12,6 +12,8 @@
 - 将提示信息改为“未能获取银行编码…”
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡锡山V2
+- 来源会话：e95efacc-3c6a-4c04-84ea-35202f15a58e
 - 证据提取自 cursor 会话 e95efacc-3c6a-4c04-84ea-35202f15a58e
 - 所属项目: 无锡锡山V2 (Wuxi Xishan V2); 代码基线: none
 

@@ -10,6 +10,8 @@
 - zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue
 - zhi2-web-admin/src/views/property/pubLedger/index.vue
 ## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
 - 来源会话：a929e818-7ba0-4b2b-9b44-a7b2c823c54c；代码基线：none
 
 <!-- MEMORY_FIELDS

@@ -15,6 +15,7 @@
 - 若调用仅为取模板未用字段（如岗位 postOptions）直接删掉；密码初始化改由 getInitialPassword 返回后赋值，避免与 initPassword 异步竞态
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 会话 4f365506/4d504758：附件配置与用户管理新增页均报传参为空，根因 $get('/system/user/') 被规范化 POST /system/user/add；删多余请求并改 getInitialPassword 回填密码后修复
 - 涉及文件：tool/fjflpz/components/FjDialog.vue、system/user/detail.vue
 - 所属项目：产品2.0；来源会话：4f365506-e3be-4779-92c3-618489cfe3e8, 4d504758-e807-4d71-ab92-00820c1154ef；代码基线：5169909

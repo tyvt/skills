@@ -13,6 +13,8 @@ Windows 应用执行别名将 `python3` 重定向至微软商店 stub，致 Agen
 - C:/Users/Administrator/AppData/Roaming/Cursor/User/settings.json
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/202.md
 - 来源会话：7907a58f-b73f-49f7-ad3d-d1a5d8cfa3eb；代码基线：none
 

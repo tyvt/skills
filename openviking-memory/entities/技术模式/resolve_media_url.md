@@ -14,6 +14,7 @@
 - 排查此类问题直接在 vConsole 看图片实际请求URL再对表，不靠肉眼比对源码。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 2e8372a6 用户反馈图片地址还是没法显示，定位 resolveMediaUrl 旧逻辑直返http地址、H5无法访问218.4.168.198，改为识别资源前缀提取路径拼代理域名后修复。
 - 涉及文件：src/utils/index.js、src/components/ZsImage/ZsImage.vue、.env.production、.env.development
 - 所属项目：苏住房C；来源会话ID：2e8372a6-9098-488b-857d-9bb7ec7f209a；代码基线：a444c05

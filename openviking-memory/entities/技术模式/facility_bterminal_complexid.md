@@ -12,6 +12,7 @@
 - B端提示文案优化：黄色提示「请先在顶部选择物业管理区域，并在左侧选择公共设施设备分类」，校验失败提示「请先在顶部选择物业管理区域」；G端文案不变
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：需用物业公司B端账号测试
 - 涉及文件：zhi2-web-admin/src/views/maintenance/facility/index.vue、facilityChange/index.vue、src/store/modules/user.js
 - 所属项目：园区公共收益；来源会话：2e2052e0-5af7-4539-ad66-24c40bd630fb；代码基线：none

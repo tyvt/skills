@@ -18,6 +18,8 @@
 - d:/repository/惠山小程序/src/pages_home/home.js
 
 ## 验证与归属
+- 所属项目：惠山小程序
+- 验证证据：extracted source=cursor project=惠山小程序
 - 验证证据：src=惠山小程序/003.md
 - 来源会话：ab495207-a315-40db-84b5-144c8f840441
 - 代码基线：none

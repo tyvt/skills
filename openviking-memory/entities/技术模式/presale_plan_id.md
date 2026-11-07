@@ -8,6 +8,8 @@
 - E2E 辅助函数添加了 `extractPlanIdFromSaveResponse` 以确保数据流
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：77643a80-744f-419d-abfc-21a4685e8d9f
 - 验证证据: src=苏州市房地产监测V3/109.md
 - 涉及文件: presale/permit/components/detail.vue, presale/permit/permitConstants.js, presale/permit/plan/detail.vue, presale/permit/components/PermitPlanPanel.vue, e2e/fixtures/presale-permit-helpers.js, e2e/presale/presale-permit-real-api-flow.spec.js, presale/cashsale/plan/detail.vue, package.json
 - 所属项目: 苏州市房地产监测V3; 会话: 77643a80-744f-419d-abfc-21a4685e8d9f; baseline: none

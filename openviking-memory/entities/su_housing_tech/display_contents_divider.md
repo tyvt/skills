@@ -24,6 +24,12 @@ In the WeChat mini-program, the ImgCode component host with display:contents can
 - Project: SuHousingC (zhi2-mobile-shimin)
 - Source session: f888dab8-e1a9-417b-9761-339cbc03bf70
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：f888dab8-e1a9-417b-9761-339cbc03bf70
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_tech",

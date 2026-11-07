@@ -14,6 +14,10 @@ BrokerPages.vue 的「机构档案」列在分支机构列表与经纪人员列�
 - BrokerPages.vue、public-portal-interactions.spec.ts
 - 所属项目：门户；来源会话ID：01c99a3c-2693-474a-bcc9-5c73f2538cbe
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

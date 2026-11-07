@@ -10,6 +10,8 @@
 - 通过 `src/api/modules/estate.js` 的 `getEidToken` 与 `faceRecognition` 完成凭证获取及校验
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
+- 来源会话：557ceece-0aee-4751-ad10-916eb7fccb30
 - 验证证据：src=cursor session=557ceece-0aee-4751-ad10-916eb7fccb30
 - 所属项目：昆山市民；代码基线：none
 - 涉及文件：src/pages.json、src/App.vue、src/pages/common/useFaceVerify.js、src/pages/verifyUser/index.vue、src/pages/verifyUser/info.vue、src/mp_ecard_sdk/main.js、src/api/modules/estate.js、src/pages_vote/vote/faceError.vue

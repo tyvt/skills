@@ -11,6 +11,7 @@
 - 改后刷新，首页待办等宽表上移入任意区域应能看到底部横滚条
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证：index.scss 原用 .el-table__body-wrapper:hover 仅轨道附近显示，改为 .el-table:hover > .el-table__body-wrapper 与 .zs-table-container:hover
 - 验证证据：src=门户/033.md
 - 涉及文件：src/styles/index.scss、src/components/zs-table/zs-table.vue、src/views/home/components/HomeTodoTable.vue、package.json

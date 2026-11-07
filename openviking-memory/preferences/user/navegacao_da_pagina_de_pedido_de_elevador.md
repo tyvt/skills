@@ -4,6 +4,12 @@
 - 涉及文件: src/pages_owner/elevator/index.vue, src/pages.json, src/utils/system-info.js
 - 源会话: 5aa3e266-85fe-4cbd-b6e7-b65da6a0763c
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：5aa3e266-85fe-4cbd-b6e7-b65da6a0763c
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

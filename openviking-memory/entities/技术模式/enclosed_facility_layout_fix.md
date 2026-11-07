@@ -11,6 +11,7 @@
 - 封闭设施第1行：小区主入口/主入口位置/小区次入口；第2行：次入口位置/值班室/监控设备位置；第3行：其他情况（整行）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：Headline/index.vue、detail-template.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：8b5d2426-e5c8-4a9a-a656-5be3baa67278；代码基线：none
 

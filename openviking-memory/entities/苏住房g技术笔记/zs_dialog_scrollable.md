@@ -18,6 +18,7 @@ suzhufang 分支弹窗内容超出高度却无滚动条且滚不动，内容被�
 - 「为什么别的地方没事」类问题先做分支差异比对再动手
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证会话 17392583（064.md 会话 17392583）：用户报弹窗内部超出无法滚动，结论仅 develop/v2.6.2-suzhufang 含 4defa2128 与 4879d1d31，develop/v2.6.2 停在 f1b078cb9 仍是旧滚动逻辑
 - 涉及文件：components/zs-dialog/zs-dialog.vue、views/system/menu/index.vue
 - 所属项目：苏住房G；代码基线：69e9d4d；来源会话ID：17392583-56a4-49a0-82fb-430a5f1aadfe

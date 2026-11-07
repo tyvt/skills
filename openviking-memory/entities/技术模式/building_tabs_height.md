@@ -11,6 +11,7 @@
 - 弹窗内可固定 pageSize 行高 table-tr，与列表页空表紧凑空态按场景选用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 0c03606c 用户反馈「切换回列表视图高度太小」；归纳 Tab+v-show 重算高度与表格随行数变化两因
 - 涉及文件：components/BuildingTableViewTabs.vue、autonomy/candidateCollect/components/CandidateDialog.vue
 - 所属项目：园区公共收益；来源会话：0c03606c-2172-4607-9beb-eb92aee5b6d4；代码基线：7458acc

@@ -17,6 +17,8 @@
 - 集合 2：notice/detail.vue、usemoney/detail.vue、AppropriationBuildingsTable.vue、usemoneyRevoke/detail.vue、guarantee/components/RelatedBuildingsTable.vue、bond/components/BuildingTable.vue、plan/components/AppropriateTable.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：bf97360e-6cc0-4224-aef3-edf155a68b8e
 - 验证证据: src=苏州市房地产监测V3-leftover/077.md 和 src=苏州市房地产监测V3-rest/127.md
 - 所属项目: 苏州市房地产监测V3; 会话: bf97360e-6cc0-4224-aef3-edf155a68b8e, f81fe328-0c4a-411a-b2a9-b762808390a4
 - 基线: none

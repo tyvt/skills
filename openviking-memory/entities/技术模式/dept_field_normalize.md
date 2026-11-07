@@ -9,6 +9,8 @@
 - 在 `src/pages/complex-select/index.vue` 增加 `getDeptNodeId`/`getDeptNodeLabel` 归一化映射
 
 ## 验证与归属
+- 所属项目：物业手持B端
+- 验证证据：extracted source=cursor project=物业手持B端
 - 验证证据：src=物业手持B端/004.md
 - 涉及文件：complex-select/index.vue、home/index.vue、ZsPicker.vue、store/user.js、organization/index.vue、login/index.vue、useAreaDict.js、utils/index.js
 - 来源会话ID：53a1b5a9-a0bb-43b5-969a-34c78dd71d66；代码基线：none

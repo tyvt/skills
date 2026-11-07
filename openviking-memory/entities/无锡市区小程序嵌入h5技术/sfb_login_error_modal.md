@@ -9,6 +9,8 @@
 - usePortal.js 去掉重复 showToast，避免与调试弹窗叠两层
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：e904622f-d610-4edc-99c8-78a4514d766f
 - 验证会话：e904622f-d610-4edc-99c8-78a4514d766f（基线 06aa6e2）
 - 涉及文件：src/utils/h5Context.js、src/hooks/usePortal.js、src/api/index.js、src/api/security.js
 - 所有入口（initH5Context、usePortal.bootstrap、onGateConfirm）共用这一套

@@ -14,6 +14,12 @@
 - 涉及文件: CompanyRegisterSingleForm.vue, RegisterUploadItem.vue, registerValidate.js, registerFormContext.js, detailMixins.js, form.js, companyRegister.vue, Step1CompanyInfo.vue
 - 会话: 87dc18b1-c6cb-4944-ae78-7dd985b6bc0d; baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：87dc18b1-c6cb-4944-ae78-7dd985b6bc0d
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

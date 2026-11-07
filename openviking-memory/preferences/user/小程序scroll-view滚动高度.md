@@ -2,6 +2,11 @@
 - 标准修复：<scroll-view scroll-y> 外包并加 Uno 类 h-screen w-full bg-fff，内层留 flex flex-col p-40，对齐 surveyResult/index
 - 验证证据：src=家园区一网通办/001.md；涉及文件：src/pages-my/project/noticeDetail.vue、uno.config.ts、src/pages-survey/surveyResult/index.vue、pages.config.ts、src/pages-my/feedback/detail.vue、src/style/index.scss、src/pages.json；来源会话：1b979de5-b4f4-400d-bd27-f8c0ac6ae506
 
+## 验证与归属
+- 所属项目：家园区一网通办
+- 验证证据：extracted source=cursor project=家园区一网通办
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

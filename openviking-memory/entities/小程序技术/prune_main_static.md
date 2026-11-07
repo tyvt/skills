@@ -18,6 +18,7 @@
 - 全仓排查同类 @/static/... import 写法改为带分包名 resolveStaticUrl；新增静态图先确认主包/分包，分包用图必登记映射
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 bb55af39（基线 8fc3cc5）报 location-red.png 500 与「改为用默认marker」
 - 涉及文件：pages_main/houseMap/houseMap.vue、utils/index.js、pages_main/static/icon/location-red.png、scripts/prune-main-static.mjs
 - 所属项目：苏住房C；来源会话ID：bb55af39-97ad-4deb-943d-2c10c3c7ff61；代码基线：8fc3cc5

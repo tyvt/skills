@@ -18,6 +18,7 @@
 - homeInfoDisplay/index.vue：同上（原 OB4BZ-... 也改为统一配置）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：新增 tencentMapKey.js 内存缓存，多个消费文件去硬编码。
 - 涉及文件：src/utils/tencentMapKey.js、tencentDistrictBoundary.js、ZsTencentMap/mapLoader.js、ZsTencentMap/index.vue、statisticsMap/components/map.vue、mapProperty/index.vue、homeInfoDisplay/index.vue 等。
 - 所属项目：园区物管2.0；来源会话 ff82edd2-0b07-45df-bdd1-a77d7b6c0d77；代码基线 7fe15a8cb。

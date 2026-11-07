@@ -19,6 +19,7 @@
 - zhi2-web-admin/e2e/fixtures/cashsale-apply-helpers.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/026.md
 - 来源会话：c9033c2c-3a69-4b73-b22e-394f818a3b2b
 - 所属项目：苏州市房地产监测V3；代码基线：none

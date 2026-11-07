@@ -12,6 +12,7 @@
 - zhi2-web-admin/src/views/components/BuildingTable.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 所属项目：2-0；来源会话ID：c16817a9-7cdf-427a-b135-24efd6fe2d95
 - 代码基线：none
 

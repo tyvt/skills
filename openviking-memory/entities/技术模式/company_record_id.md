@@ -12,6 +12,7 @@
 - 删除 getCompanyRecordId 之类回退 companyId 的兼容方法，提交时才把值写进 companyId 字段名。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：移除 getCompanyRecordId、赋值/过滤/带出五处统一、提交字段名仍为 companyId/propertyCompanyId。
 - 涉及文件：guaranteeDepositAgreement/detail.vue、initiation/detail.vue、apply/detail.vue 等。
 - 所属项目：园区物管2.0；来源会话 0a8622de-8e91-4ab1-bda2-f07280e64814；代码基线 7814a0c2a 等。

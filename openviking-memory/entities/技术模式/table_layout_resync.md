@@ -16,6 +16,8 @@
 - zhi2-web-admin/public/assets/js/element-ui.js
 
 ## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：src=园区公共收益/015.md；涉及 .workbuddy/memory/2026-09-11.md、MEMORY.md
 - 来源会话ID：e46fb06f-9444-4980-9554-1217995da3ec；代码基线：none
 

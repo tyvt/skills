@@ -9,6 +9,7 @@
 - `dept/index.vue` 修正 `load()` 中的请求路径，统一为 `/${moduleName}/${businessName}/${apiSuffix}`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：刷新部门管理页后，展开子部门应请求 `/portal/dept/list?parentId=100`，不再请求 `/system/dept/list?parentId=100`
 - 涉及文件：src/utils/portalApiRewrite.js、src/views/system/dept/index.vue、src/utils/request.js、src/mixins/subTableMixins.js、src/mixins/table.js
 - 所属项目：产品2.0；来源会话：06d23df6-d9e0-472b-bdcb-895195ece6ab；代码基线：none

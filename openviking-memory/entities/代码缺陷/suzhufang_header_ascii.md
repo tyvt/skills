@@ -9,6 +9,7 @@
 - 修复位置：pageRequestContext.js:178-180对zs-remark使用toAsciiHeaderValue(landPlotCode)
 - 排查仅POST报错无响应时，优先grep页面上下文请求头取值来源
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话369f9db2基线d109b83，项目楼盘表保存异常，定位并修复
 - 涉及文件：src/utils/pageRequestContext.js、src/utils/request.js、src/views/building/project/detail.vue
 - 所属项目：苏住房G；来源会话：369f9db2-2fde-436c-9e46-1d22237a54a6；代码基线：d109b83

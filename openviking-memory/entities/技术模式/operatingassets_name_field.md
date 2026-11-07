@@ -8,6 +8,8 @@ operatingAssets.vue 按资产类型分别优先使用各自名称字段，并以
 - 公共场地：venueName（fallback：assetLeaseName）
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 涉及文件：src/views/benefit/statisticsMap/operatingAssets.vue
 - 来源会话：629035c8-256f-4490-890e-e576020db92e
 - 代码基线：none

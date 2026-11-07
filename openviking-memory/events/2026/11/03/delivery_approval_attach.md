@@ -9,6 +9,11 @@ On 2026-11-03, the project delivery filing interface added approval attachment a
 【来源会话ID】f25b074f-2774-4b55-bbb6-fe05b1d2cad4
 【代码基线】none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "delivery_approval_attach",

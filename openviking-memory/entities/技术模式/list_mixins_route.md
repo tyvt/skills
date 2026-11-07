@@ -14,6 +14,10 @@
 - 文件：zhi2-web-admin/src/views/property/complexChange/index.vue、mixins/listMixins.js
 - 所属项目：产品2.0；来源会话：56028024-cb08-49e4-ab44-98078061fc8a；代码基线：6da8974
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -10,6 +10,7 @@
 - E2E 用例增加断言：筛选区仅 1 个「从业人员姓名」标签，无「人员姓名」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 主管部门端 E2E 测试通过：`pageManage` 接口 1 passed
 - 涉及文件：`AgencyPersonnelList.vue`、`agency-personnel-real-api-flow.spec.js`
 - 所属项目：苏州市房地产监测V3；来源会话：c1779a4f-3141-425a-bf33-25bd2342d93d；代码基线：none

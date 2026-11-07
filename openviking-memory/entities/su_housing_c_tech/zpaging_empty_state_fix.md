@@ -11,6 +11,7 @@
 - ZsPaging.vue增加对应scoped样式，保证通过封装组件使用时也正常
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译后空态应居中显示空态图和「暂无相关数据！」文字
 - 涉及文件：uni.scss、houseVideo/index.vue、ZsPaging.vue、ZsEmpty.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：52f0bdb1-df2c-4df1-9f42-40b6d23d7382；代码基线：none

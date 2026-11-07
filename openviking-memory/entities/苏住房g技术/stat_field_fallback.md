@@ -11,6 +11,7 @@
 - 字段映射：累计应收=totalReceivableAmount、累计实收=totalActualReceivedAmount、累计欠缴=totalArrearsAmount。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话 d2629f80 三张卡片显示 ¥0.00 而详情接口已返回 5520/5328/192；补 data.x ?? this.form.x ?? 汇总 ?? 0 后恢复。
 - 涉及文件：zhi2-web-admin/src/views/property/feeDeclare2/detail.vue
 - 所属项目：苏住房G；来源会话ID：d2629f80-2e2a-4b5f-927b-4c00906ffa4d；代码基线：e590ffa

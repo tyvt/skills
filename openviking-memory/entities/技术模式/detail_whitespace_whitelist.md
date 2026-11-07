@@ -20,6 +20,7 @@
 - `src/components/detail-template/detail-template.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/172.md
 - 来源会话ID：e0841e83-95db-4936-a337-ee597853b74f
 - 所属项目：苏州市房地产监测V3；代码基线：none

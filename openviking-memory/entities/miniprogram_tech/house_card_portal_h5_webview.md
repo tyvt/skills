@@ -15,6 +15,12 @@ After login, house card display relies on a new portal-h5-webview.js wrapper and
 - Files: utils/portal-h5-webview.js, pages/webview/portalH5Webview.vue, pages/user/index/index.vue, pages/webview/externalWebview.vue, utils/portal-user.js, pages.json, components/custom-tabbar/custom-tabbar.vue
 - Project: 小程序 (wygl-wxxcx-dev-slh); Source session: 5c68c6ac-0836-4b0f-83d0-9a13e307e434; Baseline: none
 
+## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
+- 来源会话：5c68c6ac-0836-4b0f-83d0-9a13e307e434
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "miniprogram_tech",

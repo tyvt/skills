@@ -12,6 +12,7 @@
 - complex/components/rangeTable.vue、complexChange/components/rangeTable.vue与complex/detail.vue均传入clearSelectionOnTreeChange: true
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：src=园区公共收益/026.md
 - 涉及文件：property/complex/components/rangeTable.vue、components/zs-select-dialog/zs-select-dialog-func.vue、property/complexChange/components/rangeTable.vue、property/complex/detail.vue、property/complexBuildingAuth/detail.vue、building/complexSearch/components/rangeTable.vue、components/zs-table/zs-table.vue
 - 所属项目：园区公共收益；来源会话：fed5c973-84de-4f18-adfd-4d38f2f4dcd8；代码基线：none

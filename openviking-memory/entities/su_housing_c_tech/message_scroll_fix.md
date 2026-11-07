@@ -11,6 +11,7 @@
 - 底部管理操作栏（全选/设为已读/删除）保持固定底部
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：bcb98835-f1ec-41eb-9aea-afdbf1871d66
 - 涉及文件：src/pages/message/index.vue、src/pages/index/my.vue、src/pages/index/components/My_Suzhufang.vue、src/pages/message/message.vue
 - 代码基线：none

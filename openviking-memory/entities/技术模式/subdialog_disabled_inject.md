@@ -13,6 +13,10 @@
 - 涉及文件：benefit/resourcesLeaseContractFiling/detail.vue、assetLeaseApply/detail.vue、assetLeaseApply/components/subAdvertiseDialog.vue。
 - 所属项目：园区公共收益；来源会话：8b780ae8-507b-43c5-a453-8d14ffb784a3；代码基线：Vue2 + Element UI + zs-form 详情页。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -9,6 +9,7 @@
 - 改用 `resolveStaticUrl('icon/location-red.png', 'pages_main')`（与 houseMap.vue 同方式）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：addAlone.vue、houseMap.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）
 - 来源会话ID：85a3ba6b-0da3-48e5-b7f4-7ebc9f354ad6

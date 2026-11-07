@@ -10,6 +10,9 @@
 - 将 src/pages/home/index.vue 改为 readFlag==='0'
 
 ## 验证与归属
+- 所属项目：物业手持B端
+- 验证证据：extracted source=cursor project=物业手持B端
+- 来源会话：a15deb31-e978-46bc-a0d9-a8b7c5050469
 - 验证证据: src=物业手持B端/004.md
 - 涉及文件: src/pages/home/index.vue, src/pages/message/index.vue, src/pages/message/detail.vue, src/api/msg.js, src/api/home.js, package.json
 - 源会话: a15deb31-e978-46bc-a0d9-a8b7c5050469; 代码库: none

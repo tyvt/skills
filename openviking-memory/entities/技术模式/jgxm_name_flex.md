@@ -10,6 +10,9 @@
 - 涉及 `ProjectNameDialog.vue` 和 `detailLayout.js`
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：8ed69fd8-6062-4732-bc26-b18e22054b54
 - 验证证据: src=苏州市房地产监测V3/233.md
 - 涉及文件: d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/agreement/jgxm/detail.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/unblock/InformationPush/detail.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/utils/detailLayout.js; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/agreement/jgxm/components/ProjectNameDialog.vue
 - 源会话: 8ed69fd8-6062-4732-bc26-b18e22054b54; 基线: none

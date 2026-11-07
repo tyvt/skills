@@ -11,6 +11,7 @@
 - 合并脚本检测过小录屏（<10KB）并中止，避免产出空视频
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：company-record-change-concat.txt、package.json、test-results/.last-run.js 等
 - 所属项目：产品2.0；来源会话：f8ffbc1c-7b40-482d-bf84-4868214af266；代码基线：none
 

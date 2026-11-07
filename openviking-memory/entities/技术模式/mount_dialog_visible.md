@@ -12,6 +12,9 @@
 - 影响风险登记详情页面（`riskregister/detail.vue`）
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：643201ce-b344-4b8f-9d1d-ca5948636201
 - 验证证据: src=苏州市房地产监测V3/069.md
 - 涉及文件: riskregister/detail.vue, superviseDialog.vue, selectDialog/index.js, superviseProject.js, generic.js, mountDialog.js, detailMixins.js, zs-input.vue
 - 会话: 643201ce-b344-4b8f-9d1d-ca5948636201; baseline: none

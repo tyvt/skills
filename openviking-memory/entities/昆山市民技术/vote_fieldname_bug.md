@@ -10,6 +10,8 @@
 - `vote.vue` 改用该工具读取与校验最小/最大可选数
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 来源会话ID：ac3abbe6-acb9-4b9f-b696-4801dd2f5e3e
 - 代码基线：none
 - 涉及文件：src/pages_vote/vote/vote.vue、src/stores/vote.js、src/api/modules/vote.js、src/stores/election.js、src/pages_vote/vote/components/optionResult.vue、src/pages_election/election/confirmElection.vue、src/pages_vote/vote/vote_confirm.vue、src/pages_election/election/Participate.vue

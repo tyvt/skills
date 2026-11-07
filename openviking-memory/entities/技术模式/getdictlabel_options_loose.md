@@ -10,6 +10,7 @@
 - 异常时回退空数组，以兼容不一致字典结构
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡锡山业主决策H5
 - 验证：src=无锡锡山业主决策H5/001.md
 - 涉及文件：src/utils/index.ts、src/api/common.ts、src/pages_ownerV2/elect/detail.vue
 - 所属项目：无锡锡山业主决策H5；来源会话：3164adcd-5fdf-440f-a10b-0dfd4c2797b0；代码基线：none

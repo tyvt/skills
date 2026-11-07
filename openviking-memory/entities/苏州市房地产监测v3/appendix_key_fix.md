@@ -10,6 +10,7 @@
 - 卡片容器改为 v-else，与 v-if="item.isMenu" 成对，避免同一轮循环渲染两个节点。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：AppendixRequirementGrid.vue、companyRecordAgency/detail.vue、AccountStateDialog.vue。
 - 所属项目：苏州市房地产监测V3；来源会话：4f2bea14-4e58-49e2-9cdc-b2eb4273611d。
 - 验证：保存后 Vite 正常编译；若 dev server 仍报错刷新或重启。该组件出现在机构入网详情等使用 AppendixPackageSection 的页面。

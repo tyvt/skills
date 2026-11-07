@@ -11,6 +11,8 @@
 - 父组件移除传入的参数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：c7e8e793-52a0-4fb3-835f-ca02c35c1248
 - 验证证据: src=苏州市房地产监测V3/110.md
 - 涉及文件: InfoCardDialog.vue, AgencyPersonnelList.vue, WorkCardDialog.vue, personnelStatus.js, AgencyPersonnelDetail.vue, zs-table-column.vue, listMixins.js, table.js
 - 所属项目: 苏州市房地产监测V3; session: c7e8e793-52a0-4fb3-835f-ca02c35c1248; 代码库: none

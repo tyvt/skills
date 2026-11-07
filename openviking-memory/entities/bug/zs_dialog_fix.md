@@ -11,6 +11,7 @@
 - 关闭时清除拖拽留下的内联 `position/left/top/transform`，下次打开仍居中
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证：刷新页面后在 系统管理→菜单管理 打开「菜单详情」确认居中
 - 涉及文件：`drag.js`、`zs-dialog.vue`、`system/menu/index.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：13d9e93b-10ce-47af-a240-665dac7d8d84

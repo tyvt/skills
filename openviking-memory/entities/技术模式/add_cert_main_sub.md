@@ -8,6 +8,7 @@
 - `consLic/detail.vue`、`planLic/detail.vue` 菜单页同样始终走合并接口，与弹窗一致
 - 施工许可证请求体示例：`conEngConsLic` + `consLicBuildList`；规划许可证对应 `conEngPlanLic` + `planLicBuilds`
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - E2E 新增用例「新增建设工程规划许可证保存走主子表接口」，断言 POST 含 `/presale`
 - 所属项目：苏州市房地产监测V3；来源会话ID：a685a691-d9cd-48fb-934f-e93a7a97176d；代码基线：none
 

@@ -17,6 +17,8 @@
 - package.json
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/223.md
 - 来源会话：7f739b97-ea61-46d6-9fa0-e1be2e315211；代码基线：none
 

@@ -14,6 +14,7 @@
 - 各下载模板调用点统一改用该工具，未关联房屋等业务性报错能显示后端具体文案
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 3f404cf2，改 request.js 错误拦截器 + utils/index.js 新增 downloadBlobFileWithCheck + import.vue 的 getTemplate 换用该工具
 - 涉及文件：zhi2-web-admin/src/utils/request.js、zhi2-web-admin/src/utils/index.js、zhi2-web-admin/src/views/property/spFeeBill/components/import.vue
 - 所属项目：产品2.0；来源会话ID：3f404cf2-9522-42c1-aa00-9a2837b4eb10；代码基线：018ae18

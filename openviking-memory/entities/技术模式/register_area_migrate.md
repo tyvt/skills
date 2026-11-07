@@ -9,6 +9,7 @@
 - detail.vue改展示新字段并加载ECONOMIC_INSTITUTIONS_REGION字典，旧数据回退至provinceCityArea
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/062.md
 - 涉及文件：Step1BasicInfo.vue、detail.vue、AgencyApplyDialog.vue、CompanyBasicInfoForm.vue等
 - 所属项目：苏州市房地产监测V3；来源会话：b87a6819-b6e9-446b-8864-ad0ee4ca0fc1；代码基线：none

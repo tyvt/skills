@@ -12,6 +12,7 @@
 - 修改文件：zhi2-web-admin/src/components/zs-select/MultiSelect.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证状态：该文件无新增 linter 错误，本地开发服务可正常启动（端口占用自动切到 8084）
 - 所属项目：2-0；来源会话ID：533423a8-81bd-4094-9c97-d30615178fc1；代码基线：none
 

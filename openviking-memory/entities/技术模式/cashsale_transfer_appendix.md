@@ -10,6 +10,8 @@
 - `mapAppendixPackageList` 执行附件的映射。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b682e5d0-7ff0-4125-961e-04c9a7ebb147
 - 验证证据: src=苏州市房地产监测V3/104.md
 - 所属项目: 苏州房地产监测V3; 会话: b682e5d0-7ff0-4125-961e-04c9a7ebb147; baseline: none
 

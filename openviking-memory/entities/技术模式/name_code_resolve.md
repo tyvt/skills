@@ -9,6 +9,7 @@
 - 在选择及加载详情时调用 resolveRegCompanyName
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/views/benefit/pubRegulatoryAgreement/detail.vue、src/views/property/propertyAgreement/detail.vue、src/views/benefit/pubRegulatoryAccount/detail.vue、src/mixins/area.js、src/mixins/detailMixins.js、src/views/benefit/pubRegulatoryStopAgreement/detail.vue
 - 所属项目：园区公共收益；来源会话：e570fc29-51f3-4efd-8ae2-538e3c48cc3c
 

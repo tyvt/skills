@@ -10,6 +10,7 @@
 - CompanyApplyApprovalDialog.vue 置空 prop 默认值并新增 effectiveBusCode computed 回退路由 meta
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/044.md
 - 涉及文件：companyApply/detail.vue、approval.js、companyApplyAudit/detail.vue、flowApi.js、institutionRegister/detail.vue、OperationBtnGroup/index.vue、ZsSubmit/index.vue、record/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：c570d618-d3e1-4953-bd62-22a32dd7992a；代码基线：none

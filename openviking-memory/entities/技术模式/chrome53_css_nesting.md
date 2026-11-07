@@ -11,6 +11,12 @@
 ## 验证
 - cursor 会话 ce271386-7c66-451e-b5aa-3595f5dce594; base: none.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：ce271386-7c66-451e-b5aa-3595f5dce594
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -11,6 +11,7 @@
 - 验证以刷新后详情页为准，覆盖查看草稿、点编辑后、已提交三态
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：property/feeDeclare2/detail.vue、components/feeBindScopeTable.vue
 - 所属项目：苏住房G；来源会话ID：2b6910b1-af76-49c6-87c1-e6cbab4a1b46；代码基线：e590ffa
 - 与已知1077条差异：补showEdit=false杀入口根因与bizState==0才可编辑表达式

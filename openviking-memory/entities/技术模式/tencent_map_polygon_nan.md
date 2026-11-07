@@ -12,6 +12,7 @@
 - initMap、updateCenter、区域标注 nameLocation 等所有构造坐标入口都走安全构造，避免个别异常炸页面。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话结论确认根因是分隔符错误，新增 createSafeLatLng，getBuildingPaths 改 split(';')，各入口改走安全构造。
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue、zhi2-web-admin/src/constant/map.js。
 - 所属项目：产品2.0；来源会话ID：4ba54bd2-24d5-4b33-92bc-49f3cc906331；代码基线：a53a27c。

@@ -10,6 +10,7 @@
 - `getList()` 透传 `administrativeArea` 筛选
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/158.md
 - 涉及文件：institution/record/index.vue、company/institutionRegister/detail.vue、company/companyCancel/index.vue、listMixins.js、table.js、institutionRegister.js、company/companyApplyAudit/detail.vue、company/institutionRegister/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：90b0db5f-1875-41f4-8bc9-1e1a01c65775；代码基线：none

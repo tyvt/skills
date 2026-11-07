@@ -15,6 +15,10 @@
 - 所属项目：苏住房C；来源会话：a33c6375-1500-460f-81a1-56831ba1739b；代码基线：8520c36
 - 涉及文件：src/pages_owner/decision/components/DecisionList.vue、decision/index.vue、components/DetailTopCard.vue
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

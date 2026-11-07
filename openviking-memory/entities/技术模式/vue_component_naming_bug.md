@@ -11,6 +11,9 @@
 - 清理 `data()` 中多余的缩进
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b2283e1b-5660-4ecc-9c6b-175b05319777
 - 验证证据: src=苏州市房地产监测V3/103.md
 - 涉及文件: detail.vue, changeDetail.vue, detailMixins.js, InformationPush.js, InformationPushChange.js, form.js, notice/detail.vue
 - 会话: b2283e1b-5660-4ecc-9c6b-175b05319777; Base: none

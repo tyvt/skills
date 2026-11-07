@@ -11,6 +11,7 @@
 - checkedList 存稳定主键 printConfigId，用 getCheckedPrintItems() 映射回打印配置。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 c1889335（基线 3c282a5）修复多选打印只出一份，验收用例 KH26090700011 单选各 1 份、双选出 2 标签页且内容不同。
 - 涉及文件：zhi2-web-admin/src/components/ZsPrint/index.vue；zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue；zhi2-web-admin/src/components/OperationBtnGroup/index.vue；zhi2-web-admin/src/views/benefit/pubVoucherTemplate/detail.vue
 - 所属项目：苏住房G；来源会话ID：c1889335-cc50-4595-9ba6-bc2ca4d3dbe9；代码基线：3c282a5

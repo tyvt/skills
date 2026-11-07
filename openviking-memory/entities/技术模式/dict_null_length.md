@@ -10,6 +10,7 @@
 - 确保字典选项始终为数组，防御空值访问
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/049.md
 - 涉及文件：companyCancel/detail.vue、AgencyBasicInfoForm.vue、agencyBasicInfoContent.js、companyBasicInfoShared.js、detail-template.vue、detailMixins.js、dict-tag.vue、area.js
 - 所属项目：苏州市房地产监测V3；来源会话：498a2746-f027-429d-b6bd-919dab34f28b；代码基线：none

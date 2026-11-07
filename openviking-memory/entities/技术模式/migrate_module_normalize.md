@@ -7,6 +7,7 @@
 - `el-form` 转 `zs-form`（详情页/Dialog 替换，`el-form-item` 保留），`el-input/button/dialog/table/pagination/date-picker` 转 `zs-*`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：`npm run build` 通过
 - 涉及文件：big.js、specialcontract/detail.vue、planChange/detail.vue、guarantee/usemoney/detail.vue
 - 所属项目：产品2.0；来源会话：875fc450-bf31-4e92-ac86-dd4c8e25223e；代码基线：none

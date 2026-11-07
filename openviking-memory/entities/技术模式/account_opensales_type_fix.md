@@ -14,6 +14,7 @@
 - `resolveOpensalesType` 增加 busC 处理
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`supervision/agreement/account/detail.vue`、`src/mixins/detailMixins.js`
 - 所属项目：苏州市房地产监测V3
 - 来源会话：5c1b8a24-76c6-4187-b758-d05c9e6ba67e

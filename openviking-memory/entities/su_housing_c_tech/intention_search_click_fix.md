@@ -12,6 +12,7 @@
 - 在搜索页空状态模板补充「暂无数据」文案，样式与项目其他列表页一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证路径：我的→我的求购→添加求购，点击搜索框跳转；搜索小区页可输入，无结果显示「暂无数据」
 - 涉及文件：src/pages_transaction/intention/add.vue、search.vue
 - 所属项目：苏住房C；来源会话ID：1bbaff8b-e027-4764-86e9-41dd7092d234；代码基线none

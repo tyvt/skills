@@ -17,6 +17,7 @@
 - .env.production图片代理改https://szfang.szfcweb.cn
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话fa5768fc二手房图片整块空白；listRecommend返回thumbnail均为null；default.png在分包内致主包不可访问；修复后主包复制+映射改thumbnail??imageUrl+预加载+代理改https
 - 另需向上游说明：「全部」Tab缺缩略图属后端数据问题（szfHQuery已有该数据但listRecommend未返回）
 - 涉及文件：src/static/images/szf/default.png、src/utils/mainStaticPaths.js、src/components/commonNew/houseCard.vue、src/pages_tab/components/Project_Suzhufang.vue、src/pages_transaction/stockHouse/index.vue、src/pages.json、.env.production

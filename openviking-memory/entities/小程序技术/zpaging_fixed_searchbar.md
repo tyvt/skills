@@ -16,6 +16,7 @@
 - 判定顺序：z-paging 页面里出现「某块区域点不动/被盖住」，先查 fixed，再查 z-index
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 1bbaff8b（2026-07-16，基线 77666f8）用户报「搜索小区页」搜索框无法点击并缺「暂无数据」提示
 - 涉及文件：src/pages_transaction/intention/search.vue、src/components/ZsSearch/ZsSearch.vue、src/pages/common/searchPage.vue
 - 所属项目：苏住房C；来源会话ID：1bbaff8b-e027-4764-86e9-41dd7092d234；代码基线：77666f8

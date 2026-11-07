@@ -12,6 +12,7 @@
 - showVoteResult 等入口也应走同一重置逻辑。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证：会话 f7e76921 用户报选项表决详情切换 Tab 后决策明细不显示；结论定位 cardValue 滞留与 v-if 全假，给出 watch 与组件合并方案。
 - 涉及文件：zhi1-web-admin/src/views/estate/optionDecision/detail.vue、optionDecision/components/DecisionRangeTable.vue、zhi1-web-admin/src/components/zsTabs/index.vue
 - 所属项目：太仓G；来源会话：f7e76921-282e-489a-956f-276a0ef62028；代码基线：cf80bc8

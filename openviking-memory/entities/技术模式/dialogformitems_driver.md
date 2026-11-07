@@ -14,6 +14,12 @@
 - 来源: cursor session=b13808d4-8e61-472e-9b96-c5618a65f78f
 - 代码库: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：b13808d4-8e61-472e-9b96-c5618a65f78f
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -10,6 +10,7 @@
 - 查看模式下两字段已在 regulatoryInfo 的 DetailTemplate 展示，编辑区块加 v-if="formMode !== 'view'" 避免重复显示。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：benefit/pubAllotNotice/detail.vue、benefit/resourcesLeaseContractFiling/detail.vue、components/Headline/index.vue。
 - 所属项目：园区物管2.0；来源会话：fe456319-acb9-4949-980a-575125236276；代码基线：none。
 

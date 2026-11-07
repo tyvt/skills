@@ -14,6 +14,10 @@
 - 涉及文件：benefit/dataSandbox/fundPanorama/index.vue、chartRenderers.js、dataHelpers.js
 - 所属项目：园区物管2.0；来源会话：da8341d1-4c60-4e14-998d-ee6afa53037c；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术缺陷",

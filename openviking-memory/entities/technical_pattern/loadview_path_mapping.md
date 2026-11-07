@@ -7,6 +7,7 @@
 - 日志输出 `原始 => 归一化后` 便于补映射。
 - 本批示例：houseInstructionExt/index→instruction/index；propertyHandoverInspectionRange/index→handover/index；propertyManagementHouseDetail/index→propertyManagementHouseConfirm/index。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 9a9d1373 三条缺失组件经 loadView 兼容映射修复；src=2-0/017.md。
 - 涉及文件：zhi2-web-admin/src/store/modules/permission.js；所属项目：2-0；来源会话ID：9a9d1373-b7fc-470f-b1c6-c3488fb59dc9；代码基线：none。
 

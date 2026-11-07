@@ -10,6 +10,7 @@
 - 复用 clearMemberFields 清空姓名/性别/手机号等从属字段；切换业务类型也应走同一清空方法
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 04c36a87 核验失败与换组织失败均需在 catch 中清空组织及关联用户字段
 - 涉及文件：zhi2-web-admin/src/views/autonomy/userAuth/detail.vue
 - 所属项目：园区物管2.0；代码基线：5a288f142；来源会话：04c36a87-d4a7-48a6-bd8d-6bdcfbe29f08

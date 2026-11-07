@@ -10,6 +10,8 @@
 - presale-permit-helpers.js 的 fillAndSavePlan 增 1.25 输入断言防回归
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/140.md
 - 涉及文件：presale/permit/plan/detail.vue、package.json、vite.config.js、PresalePlanFillForm.vue、main.js、element.js、zs-input-number.vue
 - 来源会话：b6064b79-ffff-4208-838f-ab32633f8d33；代码基线：none

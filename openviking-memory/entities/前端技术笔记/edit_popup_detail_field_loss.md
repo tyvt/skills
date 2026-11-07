@@ -15,6 +15,7 @@
 - 同类「编辑弹窗重拉详情」的子表都应检查详情接口字段覆盖面，缺的字段用列表行兜底
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 1ee4f9a4 核销明细编辑保存 400，根因是详情接口未返回 relBusinessId；通过 handleUpdate 传行数据、弹窗预填、buildSubmitPayload 三级优先兜底修复
 - 涉及文件：src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue、VerificationReceiptDetailDialog.vue
 - 所属项目：园区物管2.0；来源会话ID：1ee4f9a4-13b3-4034-ad86-3721cc8340be

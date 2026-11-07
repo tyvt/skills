@@ -5,6 +5,7 @@ Dart Sass 旧版 JS API（legacy-js-api）触发弃用警告，须在 Vite 配�
 ## 解决方案
 - 在 `zhi2-web-admin/vite.config.js` 的 `css.preprocessorOptions.scss/sass` 中配置 `api: "modern-compiler"` 与 `silenceDeprecations: ["legacy-js-api"]` 静音警告。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/014.md
 - 涉及文件：zhi2-web-admin/vite.config.js ; css.preprocessorOptions.scss
 - 所属项目：2-0；来源会话ID：e7866ad8-8705-4e0b-9a37-e80f788b005a；代码基线：none

@@ -12,6 +12,7 @@
 - 关联组件：zs-textarea.vue、zs-input.vue 同步调整
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：detail-form.scss、detail-template.vue、zs-textarea.vue、zs-input.vue
 - 所属项目：苏州市房地产监测V3
 - 来源会话：da5fd0f5-03c2-4036-94cd-9b0a30824bc4

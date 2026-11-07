@@ -8,6 +8,7 @@
 - 登录态: e2e/.auth/zsbase.js；Playwright 版本: @playwright/test ^1.62.1
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件: playwright.config.js, e2e/register/company-register.spec.js
 - 所属项目: 苏州市房地产监测V3
 - 来源会话ID: ba79e0e6-8a0f-4051-92aa-762918bec410

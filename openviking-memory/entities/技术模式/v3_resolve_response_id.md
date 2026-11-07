@@ -15,6 +15,10 @@
 - 涉及：`ruoyi.js`、`main.js`、`supervision/agreement/account/detail.vue` 等
 - 所属项目：苏州市房地产监测V3；来源会话ID：48d8443a-2b9b-4362-94b9-0e8c065800e4
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

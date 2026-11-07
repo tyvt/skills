@@ -6,6 +6,7 @@
 - 与 editAndSubmit 提交要求对齐，未填时阻断进入下一步
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/163.md
 - 涉及文件：Step1CompanyInfo.vue、companyRegister.vue、companyInfo.vue、registerValidate.js、Step4Shareholders.vue、Step3Appendix.vue、companyRegister.js、propertyCompanyRegister.vue
 - 所属项目：苏州市房地产监测V3；来源会话：07ea18e2-6956-4c76-aee4-59cf48b781f9；代码基线：none

@@ -11,6 +11,7 @@
 - 右侧刻度宽度测量按两位小数计算，避免单位文字与标签错位
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、benefit、api/benefit/fundPanorama.js
 - 所属项目：园区物管2.0；代码基线：none
 - 来源会话：12d47513-9d93-4058-b4a5-541ebd520733

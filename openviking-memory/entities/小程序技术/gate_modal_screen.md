@@ -15,6 +15,8 @@ portal-gate-modal组件的login与house类型共用，小屏适配需调整共�
 - home.vue与externalWebview.vue引用同步生效
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：components/portal-gate-modal/portal-gate-modal.vue、home.vue、externalWebview.vue
 - 来源会话：89963d64-03a6-4bc1-8b8f-ca67ab26fc19
 - 代码基线：none

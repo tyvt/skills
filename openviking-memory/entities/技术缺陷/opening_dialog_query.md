@@ -12,6 +12,7 @@
 - 默认接口示例：/maintenance/openaccdtl/queryEnableAccHouseInfoByUnitIds
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证：打开弹窗先勾选左侧树节点，输入关键字或选筛选条件点查询，在 Network 看是否请求 listUrl
 - 涉及文件：zhi2-web-admin/src/views/maintenance/accountOpen/components/OpeningBuildingDialog.vue
 - 所属项目：园区物管2.0（项目2-0）

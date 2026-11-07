@@ -12,6 +12,7 @@
 - 打印 operation-bt（待补充）。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：0e82149c-16e9-4beb-8408-fb6a25429487；代码基线：none
 - 涉及文件：account/detail.vue、BankAccountTable.vue、detail-template.vue
 

@@ -15,6 +15,11 @@ zs-input.vue 无条件渲染 append/prepend/suffix/prefix 插槽模板，el-inpu
 - 涉及文件：zs-input.vue。
 - 来源会话：4f460db1-c912-4fc0-8cd5-057a4f3235eb；代码基线：none。
 
+## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

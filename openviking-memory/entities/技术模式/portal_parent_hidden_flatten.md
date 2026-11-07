@@ -18,6 +18,10 @@
 ## 关联信息
 - 所属项目：门户；来源会话 ID：92104882-f56a-49cf-931b-814063421ad6、f244d50e-db76-4027-b64b-fdc47bdf7a0c；代码基线：b84b4e7
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

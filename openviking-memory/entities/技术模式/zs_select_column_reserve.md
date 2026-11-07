@@ -16,6 +16,7 @@
 - 注意区分：跨页汇总类批量需求才该开 reserve-selection；逐页校验的批量操作必须关掉
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 f30c7962，根因是默认 reserve-selection:true，修复为 :reserve-selection="false" + 重写 listCallback 调 clearSelection()
 - 涉及文件：zhi2-web-admin/src/views/property/complex/index.vue、zhi2-web-admin/src/components/zs-select-column/zs-select-column.vue
 - 所属项目：产品2.0；来源会话ID：f30c7962-32af-468a-9d91-311b5e899302；代码基线：2198ce6

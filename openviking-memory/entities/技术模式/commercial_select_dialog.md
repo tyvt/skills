@@ -13,6 +13,10 @@
 - 涉及 `commercialHousingSales`、`detail-template.vue` 等
 - 所属项目：苏州市房地产监测V3；来源会话ID：ac17953e-1beb-4d4e-ac1b-41b3f305fb31
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

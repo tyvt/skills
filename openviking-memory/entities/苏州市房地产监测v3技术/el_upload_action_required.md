@@ -10,6 +10,7 @@
 - 实际请求仍走 `handleUpload`/`uploadInstitutionAppendix`，`#` 仅满足组件校验
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/331.md
 - 涉及文件：src/views/institutionRegister/components/InstitutionUploadItem.vue、src/views/register/components/RegisterUploadItem.vue
 - 所属项目：苏州市房地产监测V3；来源会话：7d2c6ace-ba93-4a45-988e-36327eaa2c19；代码基线：none

@@ -15,6 +15,7 @@
 - mousedown.prevent 套路适用于所有「输入框 @focus 打开选择弹窗 + 旁边放可点元素」的组合
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 7e50b554，showManualInput 未在 data 声明导致不响应；append 区点击先触发 @focus 打开弹窗掩盖切换，加 @mousedown.prevent 后立即生效
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubRevenueContract/detail.vue
 - 所属项目：产品2.0；来源会话ID：7e50b554-a8ad-43a6-b845-69894b24519f；代码基线：57109f9

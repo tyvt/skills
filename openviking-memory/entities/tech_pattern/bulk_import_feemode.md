@@ -6,6 +6,7 @@
 - bulkImportDialog.vue 的 excelImport params 已包含必填 feeMode 字段
 - 未选收费模式时拦截并提示用户，不发起导入请求
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/051.md
 - 涉及文件：feeDeclare2/components/bulkImportDialog.vue、reduceRecordTable.vue、feeBindScopeTable.vue、feeDeclare2/index.vue、declare/components/upload.vue
 - 所属项目：苏住房G；来源会话ID：8f44dfe2-7e91-48e0-b0d2-eb247b076f7b；代码基线：none

@@ -11,6 +11,7 @@
 - 合并双方改动（4 个）：index.scss（保留苏住房布局选择器 + 采用 v2.6.2 表格高度修复）、property/complex/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：高级查询组件、serviceItem/detail.vue、index.scss、property/complex/index.vue 等
 - 所属项目：苏住房G；来源会话：fb857748-af92-4775-bcff-a46d38cd48d4
 

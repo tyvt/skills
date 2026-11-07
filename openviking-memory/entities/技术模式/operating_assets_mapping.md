@@ -16,6 +16,7 @@
 - zhi2-web-admin/src/api/benefit/pubAssetLease.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：60c21339-ecb3-44a0-9019-c7bfbc324ce4
 - 所属项目：产品2.0
 

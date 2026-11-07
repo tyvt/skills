@@ -17,6 +17,8 @@ statisticsMap 模块中，marker 点击的 projectId 从 index.vue 一路透传�
 - 子组件：assetLease.vue、leaseContract.vue、incomeExpenseDetail.vue、operatingAssets.vue
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 来源会话：e25df0a3-f9f1-4362-8a34-4a8b0cb59fcd
 - 代码基线：none
 

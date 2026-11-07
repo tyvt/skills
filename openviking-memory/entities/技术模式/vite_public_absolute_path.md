@@ -12,6 +12,7 @@ Vite 构建中 public 目录资源必须用以 / 开头的绝对路径引用，�
 - 排查构建失败若报错指向 public/ 路径 import 解析，先查这类路径写法再怀疑依赖。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 e9d3b12e 确认 UnifiedLogin.vue 13 处 public/assets/ 全部替换为 /assets/ 后构建成功（exit 0，约 3 分 20 秒）。
 - 涉及文件：zhi2-web-admin/src/views/home/UnifiedLogin.vue。
 - 所属项目：产品2.0；来源会话ID：e9d3b12e-b9f2-4d0b-97e0-bd14f38d344c；代码基线：62d5fb9（2026-09-02）。

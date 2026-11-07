@@ -15,6 +15,8 @@
 - 注意：库内另有「fixed 全屏盖住顶栏」场景需 :fixed="false"，本页是 fixed 布局下的高度/z-index 问题，两套解法不要混用。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：35c311a0-d465-4e73-b3b7-f836ef5c6b40
 - 验证会话：35c311a0-d465-4e73-b3b7-f836ef5c6b40（基线 6c9a164），结论写明 z-paging 未 height 100%、顶部缺层级、按钮未进 #top，修改 repair/index.vue 与 pages.json 标题。
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/repair/index.vue、zhi2-mobile-admin-h5-c-unlimited/src/pages.json。
 - 所属项目：无锡市区小程序嵌入H5。

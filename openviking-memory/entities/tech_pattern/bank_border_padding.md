@@ -21,6 +21,12 @@ Bank lists had missing fixed column bottom border and left whitespace from list-
 ## Source
 - Extracted from cursor session e57a5985-4ed9-4121-a10c-c0665c930b19.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：e57a5985-4ed9-4121-a10c-c0665c930b19
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

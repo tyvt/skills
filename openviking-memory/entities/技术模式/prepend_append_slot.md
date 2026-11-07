@@ -6,6 +6,8 @@
 - 调整插槽同级，template #footer 作为 zs-dialog 直接子节点。
 - 对话框弃用 prop 上 v-model，改为 :visible + @update:visible。
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 74b0cccb（cursor session=74b0cccb-98ed-4ca2-b756-cfe54408c16b）。
 - 涉及文件：maintenance/initiation/detail.vue、StatisticsDialog.vue；来源会话ID：74b0cccb-98ed-4ca2-b756-cfe54408c16b；代码基线：none。
 

@@ -18,6 +18,7 @@
 - D:/repository/产品2.0/zhi2-web-admin/src/views/home/ForgotPassword.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：acfae044-ec7d-4f5e-bb61-36dc593a35da；代码基线：none
 
 <!-- MEMORY_FIELDS

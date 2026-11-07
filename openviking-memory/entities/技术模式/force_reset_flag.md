@@ -17,6 +17,11 @@
 - 验证证据：src=苏住房G/074.md；来源会话：526fcf75-c8f3-449c-8d6b-9706dbca2a59。
 - 涉及文件：passwordReset.js、store/modules/user.js、layout/index.vue、permission.js、ResetPwdDialog.vue、login.vue、LoginForm.vue。
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

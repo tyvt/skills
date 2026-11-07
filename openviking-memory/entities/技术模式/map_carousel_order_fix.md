@@ -9,6 +9,7 @@
 - mock 模式下源自 `mock.js` 的 `districts`（无锡市、江阴市→宜兴市→梁溪区→锡山区→惠山区→滨湖区→新吴区），对齐图表展示顺序
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：src=园区物管2.0/054.md
 - 涉及文件：mapOverview/mock.js、index.vue、constants.js、chartOptions.js、dataHelpers.js
 - 所属项目：园区物管2.0；来源会话：ce480978-d86b-4baf-97de-7a840042ee50

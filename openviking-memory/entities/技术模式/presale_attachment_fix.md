@@ -13,6 +13,7 @@
 - zhi2-web-admin/src/api/company/companyRecord.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 重新打开「工程形象进度维护」弹窗验证，查询已有附件请求应为 POST，不再报「HTTP请求方法不支持」
 - 所属项目：苏州市房地产监测V3；来源会话：fb0248ef-0ab1-4952-b167-0d4b0ecc5257；代码基线：none
 

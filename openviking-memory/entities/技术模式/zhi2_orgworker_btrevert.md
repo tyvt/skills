@@ -14,6 +14,7 @@
 - 未提交 diff 仅包含上述字典展示相关修复
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：ownerCommitteeWorker/detail.vue、record/components/detail.vue、directDetail.vue、record/components/enums.js、detail-template.vue
 - 所属项目：园区公共收益；来源会话：dd85a874-0175-478e-81cc-c4afa02d3b86
 

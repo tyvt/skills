@@ -15,6 +15,9 @@
 - 涉及文件：src/views/owner-decision/components/OptionStepChoose.vue、src/store/vote.ts、src/views/decision/components/StepChoose.vue、src/store/vote.js、src/api/modules/decision.ts、src/views/election/ElectionParticipate.vue、src/views/owner-decision/ParticipateIn.vue、src/views/owner-decision/OwnerDecisionDetail.vue
 - 所属项目：太仓一网通办H5；来源会话：31fcae87-08be-423a-9da7-ea37db71840b；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=太仓一网通办H5
+
 
 <!-- MEMORY_FIELDS
 {

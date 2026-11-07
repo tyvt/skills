@@ -12,6 +12,7 @@
 - onEditStep 先打开弹窗，再在 nextTick 后回填 stepFormImages，避免初始化时图片列表丢失
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证方式：微信小程序进入「添加巡检记录」→ 选择程序 → 点击「新增」
 - 涉及文件：src/staff/pages_facility/record/add.vue
 - 所属项目：泰兴小程序；来源会话ID：1e0282db-565c-4871-b424-f34153bcc9c5

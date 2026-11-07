@@ -12,6 +12,7 @@
 - 列表页权限标识如 `estate:ownerDecision:query/add/edit/remove/list` 任一旧串亦可命中
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 0a42918d 用户报维修资金表决很多按钮看不到但权限已配
 - 涉及文件：zhi1-web-admin/src/views/estate/maintainDecision/detail.vue、ownerDecision/detail.vue、decisionCommon/config.js、components/OperationContainer/index.vue
 - 所属项目：太仓G；来源会话：0a42918d-d7b1-492b-8365-de6556f0a811；代码基线：9638e2f

@@ -10,6 +10,10 @@
 【来源会话ID】466205e5-ee7c-4c88-9a01-a864233745f0
 【代码基线】4fad664
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "axios序列化版本兼容修复",

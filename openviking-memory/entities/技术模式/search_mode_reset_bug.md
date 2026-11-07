@@ -11,6 +11,7 @@
 - 失败或异常调用 restoreAreaLayerAfterSearchFail() 重置 false 并重载 loadAreaComplexLayer 行政区划图层
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：src=园区物管2.0/047.md
 - 涉及文件：benefit/statisticsMap/index.vue
 - 所属项目：园区物管2.0；来源会话：a3789a5a-09f2-4f9a-8236-5d37e21277d1

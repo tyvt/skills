@@ -12,6 +12,7 @@
 - driver.js 的引导标记存在 localStorage（如 driverProjectSwitch），改完引导配置后要 localStorage.removeItem(key) 清除旧标记才能重新验证。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话最终结论确认 padding:0 + 红色标识改 box-shadow: inset 内描边，并提示 localStorage.removeItem('driverProjectSwitch') 清除引导标记后重验。
 - 验证证据：src=园区物管2.0/028.md；来源会话 b97cc65a-b35d-4756-a207-7c59f24b16eb。
 - 涉及文件：zhi2-web-admin/src/utils/driver.js、zhi2-web-admin/src/views/home/bProjectDialog.vue、zhi2-web-admin/src/styles/index.scss、zhi2-web-admin/node_modules/driver.js/dist/driver.min.css、zhi2-web-admin/src/layout/components/Navbar.vue、zhi2-web-admin/package.json、zhi2-web-admin/src/App.vue、zhi2-web-admin/src/main.js。

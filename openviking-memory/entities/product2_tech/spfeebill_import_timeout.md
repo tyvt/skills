@@ -15,6 +15,12 @@ The global default 100-second timeout cannot satisfy the long-running /property/
 - Involved files: zhi2-web-admin/src/utils/request.js、src/api/index.js、vite.config.js、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue、src/views/property/spFeeBill/components/enums.js
 - Project: 产品2.0; source session: f95fd685-fb92-457c-98a8-0d5d19ac9f6f; code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：f95fd685-fb92-457c-98a8-0d5d19ac9f6f
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "product2_tech",

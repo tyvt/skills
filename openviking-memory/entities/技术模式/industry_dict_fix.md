@@ -12,6 +12,8 @@
 - 通过 `industryAssociationLabel` 或 `displayValue` 显示字典名称
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：a2724dfa-738f-4f54-bbf4-4303a1e6cf98
 - 验证证据: src=苏州市房地产监测V3-leftover/069.md; src=苏州市房地产监测V3/269.md
 - 涉及文件: CompanyBasicInfoDetail.vue, companyApply/detail.vue, companyApplyAudit/detail.vue, institutionRegister/detail.vue, institution/record/detail.vue
 - 所属项目: 苏州市房地产监测V3; 会话: a2724dfa-738f-4f54-bbf4-4303a1e6cf98; Baseline: none

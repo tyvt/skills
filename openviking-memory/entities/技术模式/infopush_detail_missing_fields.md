@@ -13,6 +13,11 @@
 - 涉及文件: supervision/unblock/InformationPush/detail.vue, mixins/detailMixins.js, supervision/unblock/InformationPush/changeDetail.vue, api/InformationPush.js, supervision/unblock/noticeChange/detail.vue, api/InformationPushChange.js, mixins/form.js, supervision/unblock/notice/detail.vue
 - 所属项目: 苏州市房地产监测V3; session: b2283e1b-5660-4ecc-9c6b-175b05319777; baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b2283e1b-5660-4ecc-9c6b-175b05319777
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

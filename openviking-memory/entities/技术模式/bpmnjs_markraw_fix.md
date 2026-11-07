@@ -12,6 +12,7 @@
 - modeler 仍可在模板与 methods 正常使用（如 v-if="modeler"、this.modeler.importXML），只是不参与响应式
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 7a277917，BpmnJS 实例报 get on proxy $pkg 错误，改用 markRaw 修复
 - 涉及文件：index.vue（含 BpmnJS 实例的组件）
 - 所属项目：2-0（产品2.0）；来源会话：7a277917-5523-45af-a656-79143ad80af9；代码基线：none

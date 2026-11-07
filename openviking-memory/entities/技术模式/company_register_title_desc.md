@@ -7,6 +7,8 @@
 - 通过 v-if="viewMode === 'form'" 于提交成功结果页隐藏说明，避免与结果页冲突
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：18b3580d-c81f-4cff-9830-320ca69ec535
 - 验证证据：cursor 会话 18b3580d-c81f-4cff-9830-320ca69ec535
 - 涉及文件：companyRegister.vue、InstitutionRegisterPage.vue、register-form.scss、CompanyRegisterSingleForm.vue、InstitutionRegisterSingleForm.vue、propertyCompanyRegister.vue、RegisterStepper/index.vue、e2e/register/register-layout.spec.js
 - 所属项目：苏州市房地产监测V3；代码基线：none

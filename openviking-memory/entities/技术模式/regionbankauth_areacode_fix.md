@@ -6,6 +6,7 @@
 - `utils.js`：区级节点 `regionCode = areaNode.region || areaNode.areaCode`；新增 `resolveDistrictRegionCode` 按 `deptId` 从 `areaCodeTree` 兜底查找。
 - `index.vue`：`setNodeContext` 选中区级节点写入 `queryParams.regionCode`；`getList` 区级请求前确认 `params.regionCode` 有值；`refreshCurrentNodeContext` 在树异步加载完成后自动补发列表请求。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：system/regionBankAuth/index.vue、system/regionBankAuth/utils.js
 - 所属项目：苏住房G；来源会话：47d60d2a-587e-4806-bba5-e7aa15aae607；代码基线：none
 

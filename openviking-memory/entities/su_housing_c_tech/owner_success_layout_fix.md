@@ -11,6 +11,7 @@
 - 统一 success 页 padding 与其他页一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：SuccessCard.vue、success.vue、authentication/owner/success.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：500973f3-9d75-48cf-8744-7385f4f59190；代码基线：none
 

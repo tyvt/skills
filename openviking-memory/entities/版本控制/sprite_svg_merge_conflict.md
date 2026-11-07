@@ -14,6 +14,7 @@
 - 涉及 article 组件多个 detail.vue 及 HeadTitle/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：园区物管2.0/031.md
 - 涉及文件：zhi2-web-admin/src/views/article/components/enums.js、article/richTextTwo/detail.vue、article/components/detail.vue、article/problem/detail.vue、article/video/detail.vue、components/HeadTitle/index.vue
 - 所属项目：园区物管2.0

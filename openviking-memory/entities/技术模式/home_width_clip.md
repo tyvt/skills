@@ -23,6 +23,7 @@
 - zhi2-web-admin/src/views/home/components/layouts/HomeLayoutSidebar.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：cursor 会话提取
 - 所属项目：门户；来源会话：ee891822-605e-45ff-93b7-d9fe4dab6497
 

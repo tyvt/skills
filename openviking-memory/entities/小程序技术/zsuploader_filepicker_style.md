@@ -16,6 +16,7 @@
 - 业务调用时标题已描述上传对象，tips 只写「点击上传」极短提示不重复
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C
 - 来源会话：8d858fb8-aeff-42fe-b53b-03cca8718495
 - 代码基线：5f0f4dc

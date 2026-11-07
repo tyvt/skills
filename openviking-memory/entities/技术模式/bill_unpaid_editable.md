@@ -17,6 +17,11 @@
 - 文件：`spFeeBill/components/enums.js`、`index.vue`、`detail.vue`
 - 项目：产品2.0；来源会话：5d376bda-346d-42a9-b39d-cc3b000dca1e；代码基线：none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

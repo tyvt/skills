@@ -16,6 +16,7 @@
 - d:/repository/园区公共收益/zhi2-web-admin/src/views/autonomy/regulation/record/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：src=园区公共收益/031.md
 - 来源会话ID：2de21899-9a42-4931-969d-24b90830bfad；代码基线：none
 - 所属项目：园区公共收益

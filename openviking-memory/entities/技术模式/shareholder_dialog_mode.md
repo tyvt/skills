@@ -11,6 +11,7 @@
 - 增 data-testid="register-shareholder-dialog-view"
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/148.md
 - 涉及文件：register/components/Step4Shareholders.vue、register/components/ShareholderDialog.vue、company/companyManagement/components/shareholderTable.vue、toB/shareholder/detail.vue、register/components/companyInfo.vue、register/companyRegister.vue、register/components/Step3Appendix.vue、mixins/detailMixins.js
 - 所属项目：苏州市房地产监测V3；来源会话：bc548255-f57a-4017-8739-5446258f1073；代码基线：none

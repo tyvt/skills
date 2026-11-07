@@ -14,6 +14,7 @@
 - 人工记账详情去除缴款信息表格底部「合计」行右侧固定操作列多出的 el-table__fixed-right-patch 白块
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0
 - 来源会话：5ec6511f-7bd3-4005-a984-83b775525513
 - 代码基线：none

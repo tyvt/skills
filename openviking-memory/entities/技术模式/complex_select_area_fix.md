@@ -8,6 +8,8 @@
 - 补充调试日志：接口失败输出 `[complex-select] 加载部门树失败`；有数据但区域列表为空时输出首层节点字段。
 
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 模拟数据验证三级级联：维阳区→政基物业→金源盛世小区。
 - 涉及文件：`src/staff/pages/complex-select/index.vue`、`useAreaDict.js`、`system.js` 等。
 - 来源会话ID：f3da0ae1-d9e7-4d38-a9b0-33c0d1b0b09f；代码基线：none。

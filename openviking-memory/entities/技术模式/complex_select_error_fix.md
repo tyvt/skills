@@ -7,6 +7,8 @@
 - `manifest.json` 微信基础库版本固定为 `3.7.12`。
 
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - `npm run build:mp-weixin` 已通过；建议在微信开发者工具将调试基础库设为 3.7.12 复验。
 - 涉及文件：`manifest.js`、`complex-select/index.vue`、`ZsPicker.vue`、`add.vue` 等。
 - 来源会话ID：00ee464f-6344-4eec-b1c8-cf79bb259d7b；代码基线：none。

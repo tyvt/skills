@@ -12,6 +12,7 @@
 - `zhi2-web-admin/src/store/getters.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：cursor 提取
 - 所属项目：门户
 - 来源会话ID：92954991-a2a3-4de6-bff0-9d78b9e27081

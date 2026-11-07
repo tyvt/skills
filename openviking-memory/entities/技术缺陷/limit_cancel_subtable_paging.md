@@ -10,6 +10,8 @@
 - 解除限制调用 `POST /building/houseLimit/pageLimitRemoval` 并规范化行数据
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：c4ca2aed-d9fc-4952-9a00-b6fc2368c3dc
 - 验证证据: src=cursor session=c4ca2aed-d9fc-4952-9a00-b6fc2368c3dc
 - 涉及文件: building/houseLimit/houseLimitConstants.js, limitFormMixin.js, limitCancel.vue, limitAdd.vue, components/LimitRecordDetailDialog.vue
 - 所属项目: 苏州市房地产监测V3; session: c4ca2aed-d9fc-4952-9a00-b6fc2368c3dc

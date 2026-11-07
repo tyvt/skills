@@ -11,6 +11,7 @@
 - 参考同目录goodProject/index.vue结构，不另写fixed容器
 - 改完重编译小程序确认搜索框在列表上方且滚动正常；此类UI消失先查是否漏#top/#bottom插槽
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话4c88e3b6（2026-07-22，基线62fd49e）截图反馈搜索框被覆盖，结论移入#top插槽修复
 - 涉及文件：pages_transaction/houseVideo/index.vue、components/ZsSearch/ZsSearch.vue、pages_transaction/stockHouse/index.vue、pages.json
 - 所属项目：苏住房C；来源会话ID：4c88e3b6-b478-4a11-8f21-8050ecd743a5；代码基线：62fd49e

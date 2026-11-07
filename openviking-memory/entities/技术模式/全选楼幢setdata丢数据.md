@@ -13,6 +13,7 @@
 - 优先修 general 的 setData，再统一 exist 过滤与 checked 类型。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 验证证据：会话 da4d5f02 审查全选楼幢改动，结论「建议先不要合并」，主因 general setData 在 buildingTableData 非空后只提交当前楼幢；另列 exist==1、isAllBuildingsSelected 刷新、checked 类型混用。
 - 涉及文件：autonomy/general/components/DecisionRangeTable.vue、autonomy/multiply/components/DecisionRangeTable.vue、autonomy/election/components/apply/RangeTable.vue、autonomy/preparatoryApply/components/preparatoryRangeTable.vue、autonomy/mixins/decisionRangeBuildingSelectMixins.js、zs-select-dialog/zs-select-dialog.vue。
 - 所属项目：惠山二期G；来源会话：da4d5f02-fc36-4e8c-8717-0c4503f50d5e；代码基线：289cc30。

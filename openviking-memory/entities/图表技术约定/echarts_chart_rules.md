@@ -33,6 +33,10 @@
 - 所属项目：园区物管2.0
 - 来源会话：5b0caae3-e374-44ea-8848-04caf6f893c4、caf5eb6c-f488-4efa-acec-cd88dff68378
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "图表技术约定",

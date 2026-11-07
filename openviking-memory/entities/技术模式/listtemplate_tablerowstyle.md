@@ -12,6 +12,7 @@ ListTemplate.js模板绑定:row-style="tableRowStyle"但table.js mixin未定义�
 - 排查类似问题：ListTemplate模板出现的绑定在页面报未定义，优先怀疑mixin缺默认实现
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话9acb00ce报错组件parkingTable.vue（经zs-tabs/Headline/detail.vue链路）；修复为table.js computed增加返回null默认tableRowStyle
 - 涉及文件：zhi2-web-admin/src/mixins/table.js、ListTemplate.js、subTableMixins.js
 - 所属项目：产品2.0；来源会话ID：9acb00ce-4277-4a60-97c9-c4001384dfcd；代码基线：76646e6

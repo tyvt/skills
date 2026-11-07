@@ -11,6 +11,7 @@
 - columnOrderKey 不应每次 render 都变，否则全表频繁重建
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 7f7497f6 用户报小计值显示在操作列；修复 zs-table updated 中 refreshColumnOrderKey，决算/预算 feeShareTable finally 中 doLayout；期望审价费 7.11 落审价费列
 - 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、maintenance/final/components/feeShareTable.vue、maintenance/budget/components/feeShareTable.vue
 - 所属项目：园区公共收益；来源会话：7f7497f6-606f-4b8e-8f81-8aeefa11369c；代码基线：0abcb96

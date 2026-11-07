@@ -20,6 +20,8 @@
 - src/views/benefit/pubCheckoutManage/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：6a315793-11fc-4e4d-9c27-2ea581a2e486
 - 所属项目: Park Public Benefit; 会话: 6a315793-11fc-4e4d-9c27-2ea581a2e486; base: none
 
 <!-- MEMORY_FIELDS

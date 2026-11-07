@@ -11,6 +11,7 @@ MP分支报修列表因使用旧接口参数导致返回空数据，已对齐 su
 - `repair/index.vue` 详情跳转增加 `source` 参数；前往报修/报事时传递 `houseId`、`facilityId`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=pages_owner_extra
 - 验证证据：src=pages_owner_extra/001.md；来源会话ID：d7c6bb90-123e-48a6-b85b-c6fd05eafa28
 - 涉及文件：src/pages.json、src/pages_owner_extra/ownerCard/index.vue、src/api/property.js、src/pages_owner/repair/index.vue、src/pages_owner/repair/components/RepairCard.vue、src/pages_owner_extra/repair/index.vue、src/pages_owner_extra/repair/submit.vue、src/pages_owner_extra/repair/components/RepairCard.vue、src/store/repair.js
 - 所属项目：苏住房C（zhi2-mobile-shimin）；代码基线：none

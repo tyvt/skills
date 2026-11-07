@@ -12,6 +12,7 @@
 - `shouldMeasureRowData`：文本类插槽（text/link/dict 等）按行数据测量；switch 等非文本插槽用固定宽度估算
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：zs-table-column.vue、system/role/index.vue、mixins/table.js
 - 所属项目：产品2.0；来源会话：fb464655-d812-43a9-9ccc-c27ba5ef2e85；代码基线：none
 

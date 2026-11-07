@@ -12,6 +12,7 @@
 - 单文件检查需用能限定路径的 eslint 调用方式（直接对单文件跑 eslint）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G
 - 涉及文件：src/views/home/v2/components/TodoPanel.vue、src/views/home/v2/components/StudyPanel.vue
 - 来源会话：70c82beb-0a71-4fff-89f1-e17db817845a

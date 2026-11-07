@@ -11,6 +11,7 @@
 - zs-table：列宽均分增加约 16ms 合并，避免多列同时触发多次布局。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：zs-table-column.vue、element-ui.scss、index.scss、zs-table.vue、personnelCertificate/index.vue、mixins/table.js。
 - 所属项目：苏州市房地产监测V3；来源会话：b1715cba-74d5-4dce-8f3b-36a679a8e083。
 - 验证：硬刷新（Ctrl+F5）后交互更顺，列不再互相压住；个别列仍偏窄可悬停看全文或加 min-width。

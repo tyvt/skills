@@ -14,6 +14,11 @@
 - 涉及文件: noticeChange/detail.vue, notice/detail.vue, TransactionDetailTable.vue
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: 97f8fc4b-8d6e-4425-965a-75edd085590c; baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：97f8fc4b-8d6e-4425-965a-75edd085590c
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

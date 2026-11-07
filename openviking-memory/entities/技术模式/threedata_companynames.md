@@ -10,6 +10,8 @@ threeData 初始为空数组，接口返回前 threeData[threeDataIndex] 为 und
 - 数据绑定安全短路 :dataList="threeData[threeDataIndex]?.companyNames || []"
 
 ## 验证与归属
+- 所属项目：bugfix
+- 验证证据：extracted source=cursor project=bugfix
 - 验证证据：src=bugfix/003.md
 - 涉及文件：index.vue；vue.js
 - 来源会话ID：57ee5fc8-b902-4632-8d17-f084cf9e6c5d

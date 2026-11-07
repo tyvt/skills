@@ -12,6 +12,7 @@
 - d:/repository/园区公共收益/zhi2-web-admin/src/components/zs-select-dialog/SKILL.md
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：src=园区公共收益/038.md
 - 来源会话ID：61675c7d-cc31-40dd-b7a9-a334676d6bb6；代码基线：none
 - 所属项目：园区公共收益

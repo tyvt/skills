@@ -23,6 +23,11 @@
 - 会话: bee3c0ee-1c52-49fd-aba5-14405edf6707
 - 所属项目: 苏州市房地产监测V3; 代码库: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：bee3c0ee-1c52-49fd-aba5-14405edf6707
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

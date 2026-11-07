@@ -11,6 +11,7 @@
 - 列表组件 `AgencyPersonnelList.vue` 等复用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/018.md
 - 涉及文件：路由信息.json、staffManagement/personnelRecord/index.vue、detail.vue、components/index.vue、shareholder-menu-routes.json、toB/personnelRecord/index.vue、components/detail.vue、institution/personnel/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：9640b75a-83e0-424b-a33c-daef0e9e80bf；代码基线：none

@@ -17,6 +17,10 @@
 - 文件：task.vue、XForm.vue、PropertyPanel.vue、parseElement.js
 - 所属项目：产品2.0；来源会话：9368bed1-6d47-4b7e-aa8e-585db398488b
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

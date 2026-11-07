@@ -16,6 +16,7 @@
 - 弹窗内图用 v-if="visible" 等打开后再渲染，小程序对隐藏容器里的 image 不加载
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 2d44d303 图标宽度算成0改固定28rpx容器+subpackage+aspectFit；会话 44137331 弹窗改 widthFix 去固定高 + v-if 延后渲染
 - 涉及文件：components/ZsImage/ZsImage.vue、pages_owner/house/index.vue、pages_owner/house/owner/addHouse.vue、utils/index.js
 - 所属项目：苏住房C；来源会话ID：2d44d303-a0e8-48dd-9747-099eab934704, 44137331-91dc-4b0c-ad74-f6c700c9aaf6；代码基线：f1939b0

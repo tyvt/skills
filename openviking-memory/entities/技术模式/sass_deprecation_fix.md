@@ -6,6 +6,7 @@
 - 样式行为不变，编译时不再出现该弃用警告
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：重启 dev server 后刷新页面即可验证
 - 涉及文件：overviewEmpty.scss、publicQuery/complex/detail.vue、propertyContractTable.vue、buildingTable.vue
 - 所属项目：产品2.0；来源会话：4f89ea4c-149b-4217-b962-c76fcfb5aaea；代码基线：none

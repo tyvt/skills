@@ -15,6 +15,10 @@
 - EstateManagement-Park/src/main/webapp/mtpl/js/mtpl_MtplMoneySharePubDetail.js（1181）
 - 所属项目：园区V0；来源会话 ID：553dcf6a-8386-4166-a8c5-2cbd36497fe6
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区V0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

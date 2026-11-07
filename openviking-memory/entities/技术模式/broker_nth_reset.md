@@ -12,6 +12,7 @@ BrokerPages 等机构信息区用固定两列 grid 配合 nth-child 设置左右
 - 需说明 DOM 顺序与桌面双栏奇偶对应关系
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：会话 03d20bf9 [HIGH] 窄屏单列仍沿用机构 nth-child 标签宽
 - 涉及文件：zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue
 - 所属项目：门户；来源会话ID：03d20bf9-e86f-46c1-aa96-4b6f60f3e8f1；代码基线：门户 zhi2-web-admin @ e1f8e0b

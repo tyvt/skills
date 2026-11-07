@@ -9,6 +9,7 @@ Playwright 断言 timeout 定义元素可见性检查的最长等待时间，非
 - 在 zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js 中对 app-layout 设 APP_LAYOUT_VISIBLE_TIMEOUT=4000ms
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js
 - 所属项目：2-0；代码基线：none
 - 验证证据：src=2-0/016.md

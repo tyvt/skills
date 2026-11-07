@@ -16,6 +16,7 @@
 - 已去掉bankReceiptDetail的兜底取值，完全依赖accountStatistics接口返回
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 所属项目：无锡市区小程序嵌入H5；来源会话：ff85538f-d398-42e4-ba21-d4efd07edadb
 - 涉及文件：src/pages_benefit/sharedFunds/components/OverviewTab.vue、src/api/sharedFunds.js、src/pages_benefit/sharedFunds/index.vue
 - 代码基线：none

@@ -14,6 +14,8 @@ mergeLingXiHouseIntoPortalUser 合并房屋后触发 PORTAL_HOUSE_SELECTION_CHAN
 - 灵犀选屋成功前先同步 ctUserIdentity 再合并，保证 complexId 与房屋列表正确
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：006.md 会话 74f04a1e 问题原因与修复：绑定房屋成功弹窗成功但首页小区卡片不显示
 - 涉及文件：pages/webview/home.vue、pages/webview/externalWebview.vue、utils/portal-user.js
 - 来源会话ID：74f04a1e-e10c-4f4b-b6f4-6377b07b2a9b；代码基线：none

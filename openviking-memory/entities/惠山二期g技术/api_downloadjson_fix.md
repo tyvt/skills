@@ -11,6 +11,7 @@
 - 用法与 `exportHouse` 接口一致，传入 `projectIds` 数组等 JSON 参数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 构建已通过验证；若 dev 仍报错可重启一次 `npm run dev`
 - 涉及文件：`buildingTable/index.vue`、`project/index.vue`、`src/api/index.js`
 - 所属项目：惠山二期G；来源会话：c97a341a-e901-4694-932b-d2c0da48f539；代码基线：none

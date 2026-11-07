@@ -12,6 +12,7 @@
 - 确需连续滚动才用scroll-view，此时页宽必须与容器严格同源（都用100%）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话1d4644c7（2026-08-21，基线9832ba3）用户报分页左右滑动UI问题；改Project_Suzhufang.vue为swiper+flex均分+指示器跟随current
 - 涉及文件：src/pages/index/components/Project_Suzhufang.vue、src/pages_tab/components/Project_Suzhufang.vue、src/pages/index/project.vue、src/pages/index/components/menu/MidModuleGrid.vue
 - 所属项目苏住房C；来源会话ID：1d4644c7-b4d9-4f0e-ae82-7cbe27b40a19

@@ -7,6 +7,7 @@
 - 右侧操作区占位：operable && cardOperable 时始终渲染 requirement-header-actions（min-width: 72px），仅在未达上传上限时显示「文件上传」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证页面: 企业入网变更备案页，同一行两列要件标题条应顶底齐平
 - 涉及文件: AppendixRequirementCard.vue, companyRecord/detail.vue, DeveloperBasicInfoForm.vue
 - 所属项目: 苏州市房地产监测V3

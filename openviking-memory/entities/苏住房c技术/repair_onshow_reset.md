@@ -12,6 +12,7 @@
 - 同类排查：任何onShow/onActivated调用带默认值推导的加载函数都要检查是否覆盖已填内容，从选择类子页返回是最高发触发路径
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - Verification: session f5c3361f user reported house A->B reset to A on return; located submit.vue onShow->getHouseList default reset; fixed by returning 5 fields when data.house has value
 - Verification evidence: src=苏住房C/062.md
 - Involved files: src/pages_owner_extra/repair/submit.vue, chooseFacility.vue, src/pages_owner/repair/submit.vue, chooseFacility.vue, src/pages_owner/repair/add.vue, src/pages_owner_extra/repair/index.vue, src/pages.json

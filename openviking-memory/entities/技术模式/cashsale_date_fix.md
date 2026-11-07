@@ -16,6 +16,10 @@
 - 来源会话：ea7bee22-7116-4196-826f-6c6b9042e05a
 - 涉及文件：`CashsaleInfoPanel.vue`、`CashsaleDetail.vue`、`cashsaleConstants.js`
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

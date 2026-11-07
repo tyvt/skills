@@ -18,6 +18,7 @@
 - 请求日志加「网关接口类型」字段对照interface_id
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话3863efc7用户报GET被识别为post、zs-params空，结论给出httpInstance层对照表并修复两处参数传递错误
 - 涉及文件：httpInstance.js、common.js、gateway.js、index.js、sign.js
 - 所属项目：苏住房C；来源会话ID：3863efc7-4edd-492d-93be-201508d84835；代码基线：77666f8

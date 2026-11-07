@@ -16,6 +16,10 @@
 - zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/detail.vue
 - 所属项目：园区公共收益；来源会话：cf131df6-f786-496a-8f96-1551776fc8f6；代码基线：4468dfa
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

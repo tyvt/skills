@@ -11,6 +11,7 @@
 - 修完须逐项在Network核对传参与label一致；同类复制页面一并替换
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 现象：按审核中查返回已备案、按已备案查返回审核中
 - 涉及文件：benefit/pubRegulatoryAgreement/index.vue、pubRegulatoryStopAgreement/index.vue
 - 所属项目：苏住房G；来源会话ID：c376e461-5508-4c08-8192-16ac1392a65f；代码基线：9e5c499

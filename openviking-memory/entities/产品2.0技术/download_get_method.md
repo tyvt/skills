@@ -13,6 +13,7 @@
 - 页面里 GET 下载一律改用 this.downloadGet；接入下载类接口先确认 HTTP 方法，POST 用 download、GET 用 downloadGet
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 会话 e7bc06b9 结论：错误报告接口 GET 但 this.download() 走 POST 致失败；新增 api/index.js downloadGet + main.js 挂载，import.vue/importUploadDialog.vue 改用 downloadGet
 - 涉及文件：src/api/index.js、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue；所属项目：产品2.0；来源会话：e7bc06b9-bcea-4473-b16e-d02f4f8e8045；代码基线：018ae18
 

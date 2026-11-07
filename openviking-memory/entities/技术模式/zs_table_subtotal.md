@@ -11,6 +11,7 @@
 - 翻页时小计会变，底部合计始终显示接口返回的全量统计
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 来源会话：4d6c0599-62a1-4620-bba9-35eec0a0c116
 - 涉及文件：property/complex/components/rangeTable.vue、maintenance/budget/index.vue、property/complexChange/components/rangeTable.vue
 - 所属项目：园区物管2.0；代码基线 none

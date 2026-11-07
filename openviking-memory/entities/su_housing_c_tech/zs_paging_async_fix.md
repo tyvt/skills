@@ -13,6 +13,7 @@
 - src/components/ZsPaging/ZsPaging.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C（zhi2-mobile-shimin）
 - 来源会话：5aa7d8b1-67f8-4176-87c9-4be5cb616b81
 - 代码基线：none

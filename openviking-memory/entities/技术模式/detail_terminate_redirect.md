@@ -11,6 +11,7 @@
 - 终止新建页在 created 中按 agreementId 主动加载源协议数据，并清掉 sessionStorage 旧缓存防止覆盖
 - 从协议带过来的区域/企业等字段以只读方式展示，不显示「点击选择协议」
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：guaranteeDepositAgreementEnd/index.vue、guaranteeDepositAgreementEnd/detail.vue、guaranteeDepositAgreement/index.vue、propertyAgreement/detail.vue
 - 所属项目：产品2.0；代码基线：414029f
 - 来源会话ID：c2c05a52-f049-49d4-a534-d9c5df814673

@@ -11,6 +11,12 @@
 ## 验证
 - 来源: 苏州市房地产监测V3/073.md; 会话 aa2afcf7-1398-4cdf-93b4-30183eff923a.
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：aa2afcf7-1398-4cdf-93b4-30183eff923a
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -14,6 +14,8 @@
 - 测试与配置：`tests/e2e/public-portal-interactions.spec.ts`、`mock/brokers.js`
 
 ## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
 - 来源会话：a64b0300-ecc7-4dc4-8634-47c21fd95aed
 
 <!-- MEMORY_FIELDS

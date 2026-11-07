@@ -21,6 +21,10 @@
 - 来源会话ID：e9d3b12e-b9f2-4d0b-97e0-bd14f38d344c
 - 代码基线：62d5fb9（2026-09-02）
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

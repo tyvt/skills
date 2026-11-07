@@ -8,6 +8,7 @@
 - 与同页第 299 行「请选择管理账户和记账日期」句式统一，采用直接可执行句式
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/views/benefit/pubBankDetailDay/index.vue
 - 所属项目：园区公共收益；来源会话：5ac0a40f-9d17-413b-8527-695560ab5344
 

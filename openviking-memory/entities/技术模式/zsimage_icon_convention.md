@@ -11,6 +11,12 @@
 ## 验证
 - Cursor 会话 4f2dff10-9967-4330-9845-304bfa354448; base: none.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：4f2dff10-9967-4330-9845-304bfa354448
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

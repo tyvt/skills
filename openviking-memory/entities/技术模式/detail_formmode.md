@@ -13,6 +13,7 @@
 - 复刻弹窗子组件代码到详情页时必须做「模式标志名对齐」检查（dialogMode→formMode），同模块兄弟详情页（如 facilityChange）有相同写法要一并修
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 46f27f37，Vue warn dialogMode not defined；结论改为 v-if="formMode == 'view'"，facilityChange 同步修改
 - 涉及文件：zhi2-web-admin/src/views/maintenance/facility/detail.vue；zhi2-web-admin/src/views/maintenance/facilityChange/detail.vue；zhi2-web-admin/src/mixins/detailMixins.js
 - 所属项目：产品2.0；来源会话ID：46f27f37-13c0-41e5-8c63-7986f337f5da；代码基线：0161609

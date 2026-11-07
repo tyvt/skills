@@ -13,6 +13,8 @@
 - 更新了 `e2e/fixtures/presale-cancel-helpers.js` 和 `e2e/fixtures/presale-extend-helpers.js` 中的断言
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：cf534ef4-25d6-4a32-b82b-358de4a68ed6
 - 验证证据: src=苏州市房地产监测V3/232.md
 - 涉及文件: d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permitCancel/components/ApprovalDialog.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permitExtend/components/ApprovalDialog.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permit/components/PermitApprovalDialog.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/fixtures/presale-cancel-helpers.js; d:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/fixtures/presale-extend-helpers.js
 - 源会话: cf534ef4-25d6-4a32-b82b-358de4a68ed6; 基线: none

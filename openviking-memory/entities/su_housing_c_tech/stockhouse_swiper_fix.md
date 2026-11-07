@@ -18,6 +18,7 @@
 - src/components/commonNew/swiperComponent.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C（zhi2-mobile-shimin）
 - 来源会话：db381270-844e-45c8-899a-a19894dde18f
 - 代码基线：none

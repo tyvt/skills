@@ -14,6 +14,12 @@
 - 涉及文件: companyCancel/detail.vue, CompanyBasicInfoForm.vue, detailMixins.js, area.js, companyApply/detail.vue, companyRecordAgency/change/detail.vue, toB/companyRecord/detail.vue, form.js
 - 会话: 9aaca310-0d97-443b-83c2-2382ce1e8d98; baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：9aaca310-0d97-443b-83c2-2382ce1e8d98
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -17,6 +17,8 @@
 - d:/repository/苏州市房地产监测V3/zhi2-web-admin/test-results/register-company-register--a0a34-全流程-Step1→Step5（含各步骤-UI-校验）-production-readonly/error-context.md
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：bbaca6f0-5087-4168-ba51-8a2343915f2e
 - 验证证据: src=苏州市房地产监测V3-rest/026.md
 - 会话: bbaca6f0-5087-4168-ba51-8a2343915f2e
 - 所属项目: 苏州市房地产监测V3; baseline: none

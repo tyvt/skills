@@ -11,6 +11,10 @@
 - 涉及文件：zhi2-web-admin/src/views/home/publicPortal、pages/BrokerPages.vue、mock/brokers.js、portal.scss
 - 所属项目：门户；来源会话ID：fbcede5c-3408-4b17-a700-fe4ca4fd9b05；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

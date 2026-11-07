@@ -6,6 +6,8 @@
 ## 解决方案
 - 路径改为 /pages/staff/...（默认、organization、statistics），并在 pages.json 的 tabBar 完成注册。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/021.md
 - 涉及文件：src/pages.json、src/staff/pages/complex-select/index.vue、src/pages/login/index.vue、src/pages/staff/organization/index.vue、src/pages/staff/statistics/index.vue、src/staff/pages/login/index.vue
 - 来源会话ID：c9cbcb08-e40e-41ce-86b6-46ac5693abdf

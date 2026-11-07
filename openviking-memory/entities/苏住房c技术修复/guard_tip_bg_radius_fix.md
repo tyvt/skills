@@ -11,6 +11,7 @@
 - 调整 tip-text-box 为 align-items: flex-end，使装饰图与横幅底部对齐。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译预览，「您共申请守护对象 X 人」右侧应出现 S 形圆角过渡，不再显示直角白块。
 - 涉及文件：pages_guard/index/index.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：092955df-f394-4c02-825f-866e02e9454a

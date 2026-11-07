@@ -7,6 +7,7 @@
 - 可选：将第一行与第二行间 `gap: 14px` 略减需改 `index-v2.vue` 的 `.home-v2` / `.home-v2__row`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：刷新首页即可观察效果
 - 涉及文件：`zhi2-web-admin/src/views/home/index-v2.vue`、`zhi2-web-admin/src/views/home/v2/components/KeyDataNav.vue`
 - 所属项目：苏住房G；来源会话：4f3ff57b-fe22-4530-b9b8-625675a308b8

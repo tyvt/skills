@@ -11,6 +11,7 @@
 - 集中在 portal.js：buildPortalHomeBackUrl、buildOwnerDecisionVoteBackUrlParam
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话 099b07e0 用户给出 ydzt.jszwfw.gov.cn 带 topicvoteid 的示例 URL；结论实现 backUrl/topicvoteid 与第三方对接示例
 - 涉及文件：src/utils/portal.js、src/hooks/usePortal.js、src/store/portal.js
 - 所属项目：无锡市区小程序嵌入H5；来源会话：099b07e0-3f22-4afe-a5e8-451cf8675f31；代码基线：ea242de

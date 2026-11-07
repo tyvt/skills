@@ -8,6 +8,7 @@
 - 单位规则对齐 `Step4ServiceScheme`（比例→`%`，平方米→`元/平方米`，其他→`元`）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/306.md
 - 涉及文件：zhi2-web-admin/src/views/company/institutionRegister/detail.vue、companyScheme/schemeDetailTemplate.js、CompanySchemeDialog.vue、institutionRegister/components/Step4ServiceScheme.vue、companyScheme/index.vue、companyRecordAgency/detail.vue、institution/agencyBranch/components/AgencyBranchDetail.vue、e2e/company/institution-register-audit-scheme.spec.js
 - 所属项目：苏州市房地产监测V3；来源会话：0266b42a-44e7-41ce-aa1d-9fcb05c9ee0a；代码基线：none

@@ -16,6 +16,7 @@
 - 体积统计用 scripts/size-main-package.mjs 看「磁盘+上传预估」两个数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 60972d80 构建日志磁盘1790.9KB/2048KB、上传预估2095.4KB/2048KB；修复后 MAIN 磁盘1744.4KB ok、上传预估2040.9KB ok、[validate-dist] ok
 - 涉及文件：zhi2-mobile-shimin/src/utils/mainStaticPaths.js、scripts/prune-main-static.mjs、scripts/size-main-package.mjs、src/utils/index.js
 - 所属项目：苏住房C；来源会话ID：60972d80-2ade-40e7-a35c-5daa665ecffd；代码基线：b7bf813

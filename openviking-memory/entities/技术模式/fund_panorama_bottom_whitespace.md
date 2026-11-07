@@ -16,6 +16,7 @@
 - 首帧测量前仍用初始值过渡，需在 initCharts/mounted 里 nextTick 后立即用真实 scrollHeight 复测一次避免闪动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 e29dc036 去掉 min-height:1080px 并将三处 Math.max(1080,…) 改为 Math.max(1, 实测高度) 后底部留白消失
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue
 - 所属项目：园区物管2.0；来源会话：e29dc036-f65f-4ad0-8174-ae9a94728599；代码基线：f00310232

@@ -9,6 +9,7 @@
 - 与项目其他列表页（如项目管理）权限控制方式一致。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 无导出权限用户不再看到该按钮。
 - 涉及文件：pubRegulatoryAccount/index.vue、mixins/listMixins.js（路径 d:\repository\淮安物管\zhi2-web-admin\src\...）。
 - 所属项目：淮安物管；来源会话：1e81a46d-d7d6-4b7a-9e41-93e0635341db；代码基线：none。

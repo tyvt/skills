@@ -11,6 +11,8 @@
 - 实现方式参照 `staffManagement/components/index.vue`
 
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/082.md
 - 涉及文件：company/userManagement/operatorAuth/index.vue、company/staffManagement/components/index.vue、company/userManagement/operator/index.vue
 - 来源会话：0819ec89-ecfa-4859-8949-e31b74cfb8f3；代码基线：none

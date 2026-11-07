@@ -15,6 +15,12 @@ SuZhuFang C SFB login logic only saved V2 token without swapping for V1 token, c
 - Involved files: src/App.vue, src/store/user.js, src/api/maintenance.js, src/api/security.js, src/pages/redirect/index.vue, src/api/index.js, src/api/v1Instance.js, src/pages/login/index.vue
 - Project: SuZhuFang C; source session: cf09ca87-b417-43c0-b05d-5168f3aa3e55; code baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：cf09ca87-b417-43c0-b05d-5168f3aa3e55
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "suzhufang_c_tech",

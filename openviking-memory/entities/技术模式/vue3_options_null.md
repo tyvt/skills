@@ -6,6 +6,7 @@ Vue 3 组合式组件或 mixin 复用场景下 `this.$options` 可能为 `undefi
 ## 解决方案
 - 在 `src/mixins/listMixins.js` 的条件判断中增加 `!this.$options` 前置判空后再访问 props。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/015.md
 - 涉及文件：src/mixins/listMixins.js
 - 所属项目：2-0；来源会话ID：9b1d4896-b6df-43ec-8825-e0a68abff6e2；代码基线：none

@@ -10,6 +10,7 @@
 - 依赖 `common.allAreas` 将 `320506` 等区域代码渲染为区县中文名，与 building/project/index.vue 逻辑对齐
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/109.md；src=苏州市房地产监测V3/152.md
 - 涉及文件：zhi2-web-admin/src/views/building/houseLimit/index.vue、building/project/index.vue、formatters/index.js、building/houseLimit/detail.vue、building/projectChange/index.vue、package.json、路由信息.json、.workbuddy/memory/2026-09-23.md
 - 所属项目：苏州市房地产监测V3；来源会话：101f7d04-3b50-49eb-8e8d-10bc2d789804；代码基线：none

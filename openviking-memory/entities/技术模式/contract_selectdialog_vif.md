@@ -13,6 +13,10 @@
 - 涉及文件：zhi2-web-admin/src/views/commercialHousingSales/presale/template/detail.vue。
 - 所属项目：苏州市房地产监测V3；来源会话ID：31e3d43d-5804-493b-b7d0-f41ce35c1bc8。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

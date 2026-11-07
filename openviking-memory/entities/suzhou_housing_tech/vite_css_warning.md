@@ -14,6 +14,12 @@ The zhi2-mobile-shimin project had build warnings from duplicate vite sourcemap 
 - Source: session 5ca7c165-a429-40a7-a5eb-a5c94b398242; baseline none; from 苏住房C/062.md.
 - Involved files: vite.config.ts, index.html, src/page-query/data-analysis.vue, PropertyCard.vue, property-detail.vue, company-detail.vue, ResultStatistics.vue, StepConfirm.vue.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：5ca7c165-a429-40a7-a5eb-a5c94b398242
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "suzhou_housing_tech",

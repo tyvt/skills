@@ -18,6 +18,10 @@
 - 来源会话：e88f9902-f489-41f1-a8b8-9ae1ba2925b4
 - 涉及文件：`SupervisionAddDialog.vue`、`SupervisionTable.vue`
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

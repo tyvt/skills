@@ -13,6 +13,7 @@
 - 回退为静态导入 import menuStore from '@/store/menu'
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 160a40f4 用户反馈小程序报错，回退静态导入后修复
 - 涉及文件：src/utils/tabBar.js、package.json、小程序报错问题汇总.md、src/utils/app.js、src/App.vue、src/store/index.ts、src/store/app.js、src/utils/index.js
 - 所属项目：苏住房C；来源会话ID：160a40f4-daed-4e76-ae44-e7c0120d9b6f；代码基线：none

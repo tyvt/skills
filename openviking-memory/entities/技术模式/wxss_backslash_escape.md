@@ -7,6 +7,8 @@
 - 增加静态规则 `leading-1-4` 映射 `line-height: 1.4`。
 - 将 `OptionCardList.vue` 类名同步修改为 `leading-1-4`。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/017.md
 - 涉及文件：src/App.vue、src/static/iconfont.css、src/uni.scss、package.json、dist/build/mp-weixin/app.wxss、tmp-check-wxss.js、uno.config.ts、src/pages_owner/decision/components/multiple/OptionCardList.vue
 - 来源会话ID：a0d0009b-0349-4d48-8002-ad825a15e96d

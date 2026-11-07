@@ -18,6 +18,12 @@ Icons not registered to the SVG sprite need a direct static file reference inste
 - Source session: b5854166-69ad-4373-b2ce-06fc224fa0a4
 - Code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：b5854166-69ad-4373-b2ce-06fc224fa0a4
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

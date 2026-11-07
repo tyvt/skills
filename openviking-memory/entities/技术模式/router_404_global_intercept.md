@@ -13,6 +13,7 @@
 - /404 路由配置保留不删，避免影响其他引用，但实际不再渲染。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 4ccb79cb 用户要求全局拦截跳 404 改为消息提醒，方案写入 router/index.js。
 - 涉及文件：zhi2-web-admin/src/router/index.js。
 - 所属项目：产品2.0；来源会话ID：4ccb79cb-b7a0-47a0-8d7a-1873a520064f；代码基线：6b9d9d7（2026-05-08）。

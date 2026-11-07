@@ -11,6 +11,11 @@
 - 现有3个lint/ts报错在原文件其他位置，非本次改动引入
 - 来源会话ID：6a14ed22-6423-4953-948b-32e9d3050f1b；项目：产品2.0；代码基线：none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -10,6 +10,7 @@
 - 在 `Navbar.vue` 中为相关样式增加 `288px` 的 fallback
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 刷新页面后标题在 288px 内省略显示，顶部菜单从标题右侧开始排列
 - 涉及文件：`Navbar.vue`、`variables.scss`、`variables.css`
 - 所属项目：产品2.0；来源会话：3c5a02bd-dab4-4af1-8656-5c6fc9ed5b9d；代码基线：none

@@ -11,6 +11,7 @@
 - router/index.ts 首页改为懒加载 () => import('../views/HomePage.vue')
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓一网通办H5
 - 验证证据：src=太仓一网通办H5/001.md
 - 涉及文件：d:/repository/太仓一网通办H5/src/views/owner-decision/components/MyDecisionTab.vue、d:/repository/太仓一网通办H5/src/views/decision/common/DecisionResult.vue、d:/repository/太仓一网通办H5/src/views/owner-decision/components/ResultStatisticsTab.vue、d:/repository/太仓一网通办H5/src/store/vote.js、d:/repository/太仓一网通办H5/src/views/owner-decision/OwnerDecisionResult.vue、d:/repository/太仓一网通办H5/src/views/decision/DecisionResult.vue、d:/repository/太仓一网通办H5/src/views/owner-decision/components/OptionStepChoose.vue、d:/repository/太仓一网通办H5/src/views/election/ElectionResult.vue
 - 所属项目：太仓一网通办H5；来源会话：e08bc29b-be15-400b-9854-8a9070c29daa；代码基线：none

@@ -19,6 +19,10 @@
 - 文件：property/expenditureContract/detail.vue、benefit/pubExpenditureContract/detail.vue
 - 所属项目：苏住房G；来源会话：4262bed0-d061-41ed-8364-ba4f6496d209；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房G技术修复",

@@ -15,6 +15,12 @@ Detail page sticky bar and table fixed columns blocked watermark; fixed by body-
 - Source session: 0f975e81-59d4-42d7-853f-761ce72bd1f7
 - Files: AppMain.vue, detail-template.vue, index.scss, HeadTitle/index.vue, Headline/index.vue, layout/index.vue, OperationBtnGroup/index.vue, element-ui.scss
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：0f975e81-59d4-42d7-853f-761ce72bd1f7
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

@@ -4,6 +4,12 @@
 - 涉及文件: detail-template.vue, property/complexChange/detail.vue, main.js, mixins/area.js, dict-tag.vue, mixins/detailMixins.js, utils/dict.js
 - 验证证据: src=产品2.0/028.md; 会话: b608284d-b42b-4810-99bd-afe869af0cbd
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：b608284d-b42b-4810-99bd-afe869af0cbd
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

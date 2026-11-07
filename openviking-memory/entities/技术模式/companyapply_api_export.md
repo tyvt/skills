@@ -16,6 +16,11 @@ zhi2-web-admin build failed with "is not exported" because companyApply.js misse
 - 来源会话：8570c278-55c3-4b1f-94fe-2e52d9744baf
 - 项目：苏州市房地产监测V3（zhi2-web-admin）
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

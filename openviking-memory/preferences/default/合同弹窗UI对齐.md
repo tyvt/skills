@@ -4,6 +4,12 @@
 - 涉及文件: chooseHouseDialog.vue, zs-select-dialog.vue, branch-one-dialog.scss, pubFinanceAccountSet/index.vue, contractMainInfo/index.vue, contractMainInfo/components/chooseHouseDialog.vue, BranchOneDialog.vue, zs-dialog.vue
 - 验证: src=苏州市房地产监测V3/046.md; 会话 a32271a9-f8e3-4970-8b59-8a7baaf0f55f
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：a32271a9-f8e3-4970-8b59-8a7baaf0f55f
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "default",

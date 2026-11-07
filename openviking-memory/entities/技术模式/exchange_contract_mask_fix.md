@@ -9,6 +9,7 @@
 - `formatters` 中实现 `listNameFormatter`，并补上项目大量引用的 `dateFormatter`、`dateTimeFormatter`、`idCardFormatter`、`listPhoneFormatter`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：exchangeContract/index.vue、formatters/index.js、maskPersonName.js
 - 所属项目：苏州市房地产监测V3；来源会话：aaf8bc2b-ca74-47e8-a834-52fa7830c0c4
 

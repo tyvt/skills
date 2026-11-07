@@ -11,6 +11,7 @@
 - 预览分流：PDF 用新窗口打开，不走 v-viewer/el-image 图片预览器；详情页查看态已区分无需改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：064.md 会话 b316e20e「项目经理：劳动合同上传PDF时为破图」
 - 涉及文件：components/ImageUpload/index.vue、company/staffManagement/components/detail.vue、institution/personnel/detail.vue
 - 所属项目：苏住房G；来源会话ID：b316e20e-0ccc-42dd-a146-455063df0ac0；代码基线：b8ae114

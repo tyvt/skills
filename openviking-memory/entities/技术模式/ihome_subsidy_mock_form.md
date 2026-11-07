@@ -7,6 +7,8 @@ iHome 补贴页在 pages-iHome/subsidy.vue 参照 pages-rent/subsidy.vue 实现�
 - 提交后本地提示成功，不跳外链
 
 ## 验证与归属
+- 所属项目：0
+- 验证证据：extracted source=cursor project=0
 - 验证：src=0/001.md
 - 涉及文件：pages-iHome/subsidy.vue、pages-rent/subsidy.vue
 - 来源会话：45e7b0ce-15f9-4788-ba08-ff2c893c36ee；代码基线：none

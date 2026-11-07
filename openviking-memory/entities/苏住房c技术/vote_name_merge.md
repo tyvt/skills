@@ -12,6 +12,8 @@
 - ResultRecord.vue 详情页补充展示
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=苏住房C/058.md
 - 涉及文件：pages_vote/elect/DecisionResult.vue、pages_vote/decision/common/DecisionResult.vue、components/CardList/CardList.vue、api/autonomy.js、pages_vote/elect/ResultRecord.vue、components/CardCell/CardCell.vue、pages.json、components/CardCell/CellFulline.vue
 - 来源会话ID：35a00989-4b03-4dae-8d47-d5841ef5d71f；代码基线：none

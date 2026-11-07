@@ -13,6 +13,11 @@
 - `src/pages_owner/house/owner/addHouse.vue`, `src/pages_transaction/publishHouse/verification.vue`, `src/pages_transaction/stockHouseSign/apply.vue`
 - 所属项目: 苏住房C (zhi2-mobile-shimin); 会话: 54f4fa88-f084-46ed-a03b-0f245a7026be
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：54f4fa88-f084-46ed-a03b-0f245a7026be
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "padrao_tecnico",

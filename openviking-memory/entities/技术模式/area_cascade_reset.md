@@ -18,6 +18,7 @@
 - 批量迁移时必须同步删掉各页与 mixin 重复的 form.region watch，否则两条清空链路互相干扰、回显又被打空。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 f1473127 最终结论在 src/mixins/area.js 集中实现上述方法，主报障页 detailCallback 改 onCascaderChange(false) + syncAreaCascadeBaseline()，并批量改造 13 个详情页、移除重复 form.region watch。
 - 差异点：已知「级联表单上游变更清空下游的清单式清空」是逐页手写清空清单、无法区分回显与交互；本条靠基线快照 + shouldReset 把两种触发源彻底分开，且清空逻辑下沉到 mixin。
 - 涉及文件：zhi2-web-admin/src/mixins/area.js、zhi2-web-admin/src/views/property/complex/detail.vue 等 13 个详情页。

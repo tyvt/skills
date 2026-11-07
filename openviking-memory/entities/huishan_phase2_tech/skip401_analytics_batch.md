@@ -9,6 +9,7 @@
 - 为批量埋点请求添加 skip401: true，使其静默失败重入队列且不跳转
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期H5
 - 验证：src=惠山二期H5/005.md
 - 涉及文件：src/api/index.js、src/api/analytics.js、src/utils/track/client.js、src/store/user.js
 - 所属项目：惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）；来源会话：73b006e7-ce1b-4f15-8ff8-b6623e838eb0；代码基线：none

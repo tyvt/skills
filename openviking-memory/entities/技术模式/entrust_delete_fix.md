@@ -15,6 +15,10 @@
 - 涉及文件：`EntrustBuildingTable.vue`、`e2e/presale/entrust-sale-real-api-flow.spec.js`、`presale/entrustSale/detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：ad31939a-64bd-4cd1-bc4c-21c4d54679cd；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

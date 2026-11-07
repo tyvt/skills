@@ -12,6 +12,7 @@
 - 与「table-tr固定行数契约+异步后doLayout」互补：行数契约值不变时也不能省略布局重算
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话acf40130中ScopeSelectDialog.vue去掉listTableTr不变即return，重置改调handleQuery；搜索后重置再滚到底检查末行完整
 - 涉及文件：zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue、zhi2-web-admin/src/components/zs-table/zs-table
 - 所属项目：园区公共收益；来源会话：acf40130-9dda-4c08-b943-34292e01cab4；代码基线：弹窗内zs-table+table-tr定高场景

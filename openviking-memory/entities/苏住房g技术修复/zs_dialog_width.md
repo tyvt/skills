@@ -11,6 +11,9 @@
 - 文件：property/complex/detail.vue、property/feeDeclare2/detail.vue、property/complex/propertyOwnerDialog.vue（参考样板）
 - 所属项目：苏住房G；来源会话：e1244325-7c27-4fc0-a9e4-4b9c9ddbb7b1；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
 
 <!-- MEMORY_FIELDS
 {

@@ -12,6 +12,7 @@
 - 登录页复用同一工具，避免两套加密逻辑不一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安存量房
 - 验证：浏览器开发者工具查看 PUT /system/profile/updatePwd 请求体应为密文
 - 涉及文件：login.vue、ChangePasswordDialog/index.vue、ResetPwdDialog.vue、resetPwd.vue、utils/crypto.js
 - 所属项目：淮安存量房；来源会话：2ae66b52-1268-4c4b-a528-017626d542ca；代码基线：none

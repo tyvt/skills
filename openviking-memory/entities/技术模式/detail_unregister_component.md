@@ -14,6 +14,11 @@
 - 涉及文件: companyAdmin/detail.vue, agency/detail.vue, certLic/consLic/detail.vue, register-form.scss, zs-select-dialog.vue, DeveloperBasicInfoDetail.vue, index.scss, companyAdmin/index.vue
 - 所属项目: Suzhou Real Estate Monitoring V3; session: 0cdbc4de-abdb-4fc7-8b12-467375ea1019; 代码库: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：0cdbc4de-abdb-4fc7-8b12-467375ea1019
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "padrao_tecnico",

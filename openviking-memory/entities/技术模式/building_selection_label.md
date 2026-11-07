@@ -15,6 +15,7 @@
 - zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/BuildingTable.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：d72ba8af-0d4f-4b21-8c49-8ed7640dbfdb
 - 所属项目：产品2.0
 

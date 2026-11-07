@@ -14,6 +14,12 @@ In 苏州市房地产监测V3, `BaseLandLicForm.vue` and `changeDetail.vue` plac
 - Involved files: projectManagement/certificate/planLic/detail.vue, projectManagement/certificate/stateLandLic/detail.vue, 路由信息.json, projectManagement/certificate/conLandLic/detail.vue, projectManagement/certificate/conLandLic/components/BaseLandLicForm.vue, projectManagement/certificate/conLandLicChange/detail.vue, projectManagement/certificate/conLandLic/changeDetail.vue
 - Project: 苏州市房地产监测V3; source session 2ad09f88-3393-44cf-96b0-eda0601788c6; code baseline none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：2ad09f88-3393-44cf-96b0-eda0601788c6
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

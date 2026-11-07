@@ -13,6 +13,7 @@
 - d:/repository/门户/zhi2-web-admin/src/views/home/UnifiedLogin.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 所属项目：门户；来源会话：4062ecea-0902-44eb-88ca-58ac62a6986b；代码基线：none
 
 <!-- MEMORY_FIELDS

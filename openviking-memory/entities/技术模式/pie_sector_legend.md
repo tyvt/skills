@@ -11,6 +11,7 @@
 - legendBottom 图例同步补充万元数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：园区物管2.0/056.md
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、assetPanorama/index.vue
 - 所属项目：园区物管2.0；来源会话：e5b3b723-e361-45f2-aa49-be6effb295d0

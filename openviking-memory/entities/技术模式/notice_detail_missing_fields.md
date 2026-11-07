@@ -14,6 +14,11 @@
 - 涉及文件: detail.vue, detailMixins.js, deposit/notice/detail.vue, form.js, api/capital/notice.js, unblock/noticeChange/detail.vue, unblock/guarantee/changedetail.vue, formComponents.js
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: f35d14e1-f0a5-4fa4-b44d-947275ba1b5c; 代码库: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：f35d14e1-f0a5-4fa4-b44d-947275ba1b5c
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "padrao_tecnico",

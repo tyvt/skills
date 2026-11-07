@@ -12,6 +12,7 @@
 - `planLic/changeDetail.vue`、`consLic/changeDetail.vue` 的 `list-name` 改为 `submit-data-key`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证：刷新规划许可证详情页后该 Vue warn 应不再出现
 - 涉及文件：`table.js`、`PlanLicRelatedBuildingTable.vue`、`ConsLicBuildTable.vue`、`planLic/changeDetail.vue`、`consLic/changeDetail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话ID：55d7d7d9-e5d7-412b-9318-c88e962e77f3

@@ -9,6 +9,8 @@
 - 在 `data()` 中添加了 `primaryKey: 'bondId'`、`moduleName: 'prefund'`、`businessName: 'paymentBond'` 以进行响应式定义
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：5f16b44a-79c3-4ac0-ae5b-ae8d696e71f0
 - 验证证据: src=苏州市房地产监测V3/219.md
 - 涉及文件: supervision/unblock/bond/detail.vue, supervision/unblock/bond/index.vue, supervision/unblock/peasantAccount/detail.vue, mixins/detailMixins.js, supervision/unblock/guarantee/detail.vue, supervision/unblock/plan/detail.vue, mixins/form.js, mixins/formComponents.js
 - 所属项目: 苏州市房地产监测V3; 会话: 5f16b44a-79c3-4ac0-ae5b-ae8d696e71f0; 代码库: none

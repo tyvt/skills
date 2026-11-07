@@ -11,6 +11,8 @@
 - 清空搜索框后自动重新搜索。
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 涉及文件：d:/repository/昆山市民/src/pages_examine/examineList.vue、src/hooks/useLoadMore.js、src/pages_contract/list.vue、src/pages_benefit/benefit/index.vue、src/pages_activity_vote/my-activities.vue、src/api/modules/examine.js、src/pages.json、src/pages_examine/components/operationBtn.vue
 - 来源会话ID：5d15f726-65f1-4f6a-b8a9-728d78cb3933
 - 代码基线：none

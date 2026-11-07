@@ -13,6 +13,10 @@
 ## 涉及与归属
 - 所属项目：苏住房G；来源会话：231da5b0-82db-4a83-819f-b9b0376ce290
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房G技术模式",

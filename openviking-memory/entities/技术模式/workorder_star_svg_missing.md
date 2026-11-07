@@ -9,6 +9,8 @@
 - 恢复 SVG 并将路径更正为 `/static/svg/`，业主端 `src/pages_owner/repair/detail.vue` 同步生效。
 
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/012.md
 - 涉及文件：src/staff/pages_facility/issue/detail.vue、src/pages_owner/repair/detail.vue、src/pages/staff/workbench/index.vue、src/pages_poll/result.vue、src/components/ZsImage/ZsImage.vue、src/env/mp.js
 - 来源会话ID：02e556af-812d-4a11-bb67-1891918531a5

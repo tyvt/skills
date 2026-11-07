@@ -9,6 +9,7 @@
 - 在 `fddydetail.vue` 中字段名全部对齐接口，联系方式使用 `contactInformation`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=cursor session=9264f45e-ecce-4dd7-99a3-b9af544b8e18
 - 涉及文件：ZsRichText.vue、PhoneCall.vue、utils/index.js、ListDetail.vue、sfb.js、formatter.js、announcement/detail.vue、publicNotice/components/ListDetail.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话：9264f45e-ecce-4dd7-99a3-b9af544b8e18；代码基线：none

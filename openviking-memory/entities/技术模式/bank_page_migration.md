@@ -7,6 +7,7 @@
 - superviseBank/detail.vue 仅 getList() 改用 page，getBranch() 保留 list
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/104.md
 - 涉及文件：supervision/bank/cbyh/components/YhwdTable.vue、supervision/bank/superviseBank/detail.vue、supervision/bank/superviseBank/components/WdmcDialog.vue、e2e/fixtures/supervision-bank-helpers.js
 - 所属项目：苏州市房地产监测V3；来源会话：300092d4-50e7-43ba-bc1b-8411e835ef15；代码基线：none

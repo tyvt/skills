@@ -9,6 +9,7 @@
 - 更稳方式：预览复用项目全局 mixin/插件而非手工列 stub。
 - 加页面时同步 review preview 入口，检查页面 created 调用的 this.xxx。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：preview-main.js:64-66 与 index-v2.vue:102-118，HomeIndexV2 created 调 getDicts，预览只 stub 部分致崩溃。
 - 涉及文件：zhi2-web-admin/src/views/home/preview-main.js、index-v2.vue
 - 所属项目：苏住房G；来源会话ID：22db11e4-4ebb-4504-8a6e-e93aa9791182；代码基线：9e5c499

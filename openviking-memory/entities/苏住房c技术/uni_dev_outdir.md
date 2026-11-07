@@ -12,6 +12,7 @@
 - 若确实要让 dev 也输出到 ../dist，只能在 vite.config.ts 里配 build.outDir，命令行传参一定不生效
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话 3541fbbe：用户贴 terminals/16.txt:16-26 的报错；结论写明「--outDir 只在 uni build 下有效，dev 不支持该参数」，从 dev 脚本移除后恢复
 - 涉及文件：zhi2-mobile-shimin/package.json、vite.config.ts、根 package.json
 - 所属项目：苏住房C；代码基线：9832ba3；来源会话ID：3541fbbe-c057-47a6-9bce-5cea5500bd20

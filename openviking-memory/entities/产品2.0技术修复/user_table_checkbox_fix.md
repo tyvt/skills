@@ -14,6 +14,10 @@
 - 涉及文件：zhi2-web-admin/src/views/msg/notice/components/userTable.vue、msg/notice/components/selectUserDialog.vue、benefit/pubUseMoneyApply/detail.vue
 - 所属项目：产品2.0；来源会话：5687225e-f8a8-4719-a9e7-c4013411f266；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "产品2.0技术修复",

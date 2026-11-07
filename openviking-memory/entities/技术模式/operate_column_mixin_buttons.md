@@ -15,6 +15,10 @@
 - 涉及文件：zhi2-web-admin/src/views/company/staffManagement/components/index.vue、zhi2-web-admin/src/mixins/table.js
 - 所属项目：产品2.0；来源会话：fdcfaacc-7f87-437f-8701-5f61b9154edb；代码基线：62d5fb9
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

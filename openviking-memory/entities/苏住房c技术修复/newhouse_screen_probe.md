@@ -23,6 +23,7 @@
 - detail.vue：将 bottom-btn 移出 house-new-detail-box；底部留白改为 calc(120px + env(safe-area-inset-bottom))；页面内容设置 position:relative; z-index:1
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：newHouse/detail.vue、pages.json、bottomBtn.vue、houseMap.vue、NewHouse.vue、houseTypeDetail.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：067afb84-7618-476c-a86e-f6d62928652f、fb9e853d-85c6-4d97-a6e2-4ca11832d84c；代码基线：none
 

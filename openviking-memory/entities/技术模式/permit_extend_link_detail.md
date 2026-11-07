@@ -12,6 +12,7 @@
 - zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/206.md
 - 来源会话ID：c0158687-53dd-4468-a19c-21916c1b2d50
 - 所属项目：苏州市房地产监测V3；代码基线：none

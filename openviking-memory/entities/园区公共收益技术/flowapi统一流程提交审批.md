@@ -15,6 +15,7 @@
 - 未配置流程节点：拦截并提示，不发起请求
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：`utils/flowApi.js`、`tool/workflow/index.vue`、`ConfigDialog.vue`、`ConfigTable.vue`
 - 所属项目：园区公共收益
 - 来源会话：51f3071e-0992-4ca2-b14d-e0fa6c2d181d

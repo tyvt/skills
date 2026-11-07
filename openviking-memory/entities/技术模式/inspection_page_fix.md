@@ -7,6 +7,7 @@
 - 样式对齐设计稿：频次/日期/年检结果行 ZsPicker 加 hideArrow 并补 uni-icons type="right"；联系电话 placeholder 改为 请输入${typeLabel}人联系电话；巡检结果保留独立白卡片 + ZsTextarea maxlength=999（含 0/999 字数统计）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 涉及文件：src/staff/pages_facility/record/add.vue
 - 所属项目：泰兴小程序；来源会话ID：57b07baa-330f-4a45-baab-c2722d1ae8db
 - 代码基线：none

@@ -11,6 +11,8 @@
 - 支持对已构建产物重新修补
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 498170bd 用户反馈 z-paging 跨分包加载异常，agent 修正脚本路径修补逻辑
 - 涉及文件：src/pages.json、package.json、scripts/relocate-z-paging.mjs、scripts/relocate-datetime-picker.mjs、scripts/validate-dist.mjs、dist/pages_transaction/node-modules/z-paging/components/z-paging/z-paging.js、dist/pages_transaction/components/ZsPaging/ZsPaging.js、scripts/merge-main-leaks.mjs
 - 验证证据：src=苏住房C/043.md；来源会话ID：498170bd-f084-43ab-8e01-034612613ebd；代码基线：none

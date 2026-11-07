@@ -7,6 +7,8 @@ iHome 合同详情页点击变更跳转合同新增页，点击续期弹日期�
 - 确定后 mock 更新租期结束日期
 
 ## 验证与归属
+- 所属项目：0
+- 验证证据：extracted source=cursor project=0
 - 验证：src=0/001.md
 - 涉及文件：@src/pages-iHome/my/contractDetail.vue
 - 来源会话：7931cd9b-e08f-4f04-aee0-34cbe2c24b5a；代码基线：none

@@ -13,6 +13,7 @@
 - 排查顺序：先查控制台请求路径与文件真实位置是否同包，再查父级有无高度。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：09b69b5c（新增 mode prop 走 widthFix 修复高度塌零）、13824f1b（子包图标显式 subpackage+定尺寸容器，定尺寸容器部分验证高度修复）。
 - 涉及文件：components/ZsImage/ZsImage.vue、pages_owner/house/owner/authentication.vue、pages_transaction/publishHouse/type.vue 等。
 - 所属项目：苏住房C；来源会话ID：13824f1b-0d06-4c7a-8d3f-79edcf5ccfe4, 09b69b5c；代码基线：8fc3cc5、b7bf813。

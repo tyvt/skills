@@ -10,6 +10,7 @@
 - menuRouteMap.js 同步更新菜单路由：3_1_10 指向 /pages_main/news/index；3_1_16 指向 /pages_main/news/detail?id=...
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译小程序后首页点击新闻资讯验证；其他菜单若报 page not found 需排查 menuRouteMap.js 中未迁移的旧 /pages/ 路径
 - 所属项目：苏住房C；来源会话：29317b48-dcb1-481b-a230-4459674df2a0
 - 涉及文件：Home_Suzhufang.vue、route-map.js、menuRouteMap.js、pages.json

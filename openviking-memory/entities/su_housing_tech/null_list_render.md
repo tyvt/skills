@@ -11,6 +11,8 @@
 - 涉及文件：ListContractIndex.vue、publicNotice.vue、ListIndex.vue、api/notice.js、hooks/useLoadMore.js
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=苏住房C/080.md
 - 来源会话ID：ddfa164f-7797-420b-afa6-c5e85e60b348
 

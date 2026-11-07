@@ -21,6 +21,12 @@ Redundant GET in user add page caused V3 empty-body POST error; removed and pass
 ## Verification
 - Source: 产品2.0/041.md; session: 4f365506-e3be-4779-92c3-618489cfe3e8
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：4f365506-e3be-4779-92c3-618489cfe3e8
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

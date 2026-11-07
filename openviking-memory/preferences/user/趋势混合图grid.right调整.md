@@ -4,6 +4,10 @@
 - 涉及文件：benefit/dataSandbox/fundPanorama、benefit/dataSandbox/fundPanorama/index.vue、package.js
 - 所属项目：园区物管2.0；来源会话：3fb2025f-5558-4b3c-b155-b057ddc32224
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

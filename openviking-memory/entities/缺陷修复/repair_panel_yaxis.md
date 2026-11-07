@@ -17,6 +17,11 @@
 - 来源会话: 0f8fb539-1a29-4d91-bc69-d033c6762e16。
 - 代码基线: none.
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "缺陷修复",

@@ -21,6 +21,10 @@
 - 涉及文件：ConfigDialog.vue、table.js、utils(normalizeV3ApiUrl)
 - 所属项目：产品2.0；来源会话：db0afc1e-0b50-40e1-afa6-15d8133f8ee0；基线：62d5fb9
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

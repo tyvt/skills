@@ -10,6 +10,8 @@
 - 新建 `src/utils/wxJssdk.js` 封装初始化与跳转，移空占位并启动初始化
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 来源会话ID：9727f7d9-56fd-48f1-b779-7c22335440a7
 - 代码基线：none
 - 涉及文件：src/pages_home/home.js、src/pages_home/home.vue、src/utils/wxLogin.js、index.html、src/main.js、src/App.vue、src/env/mp.js、src/api/modules/estate.js

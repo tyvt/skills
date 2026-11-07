@@ -13,6 +13,10 @@ ParamsDialog.vue 混入 dialogMixins.js 将 id 声明为 prop，导致 this.$att
 - 涉及文件：zhi2-web-admin/src/views/tool/print/components/ParamsDialog.vue、PrintParamsTable.vue、PrintDialog.vue、tool/print/index.vue、mixins/dialogMixins.js、subTableMixins.js、table.js、tableComponents.js
 - 所属项目：产品2.0；来源会话：6fdd2549-8d41-469b-94b8-8cd8fe8a1f20；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

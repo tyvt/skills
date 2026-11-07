@@ -13,6 +13,8 @@
 - 业委会选举申请→投票范围→选择户室弹窗中，列表视图底部正确显示「共 8 条记录」；数据超过 5 条显示分页控件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+- 来源会话：4fa38c48-5759-47ff-967b-9289cd0f35ff
 - 验证：会话 4fa38c48-5759-47ff-967b-9289cd0f35ff
 - 涉及文件：RangeTable.vue、election/components/apply/RangeTable.vue、zs-select-dialog.vue、zs-pagination.vue
 - 所属项目：园区物管2.0；代码基线：none

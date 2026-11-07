@@ -10,6 +10,7 @@
 - Step2 用例额外等待「法定代表人姓名」输入框可见确保表单挂载
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 连跑 3 轮共 9 个 register 用例均通过
 - 涉及文件：company-register-visual.spec.js、register-helpers.js、Step2LegalPerson.vue
 - 所属项目：苏州市房地产监测V3；来源会话：a2d69268-dd50-4d1d-ad28-dc9e24e9c0e9

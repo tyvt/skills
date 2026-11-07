@@ -11,6 +11,8 @@
 - `election.js` 删除无用的 `headUrl` 字段。
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 涉及文件：d:/repository/昆山市民/src/pages_election/election/index.vue、src/pages_election/election/election.js、src/pages_election/election/listStyle.scss、src/pages_vote/vote/index.vue、src/components/zs-image/zs-image.vue、src/stores/election.js
 - 来源会话ID：1ffc6a54-b6d6-4dcc-ba0b-74ef9650cccc
 - 代码基线：none

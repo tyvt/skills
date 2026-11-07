@@ -8,6 +8,7 @@
 - 改在共享SuccessCard组件层，五个success页一次修好；顺带统一padding避免漂移
 - 定位信号：按钮文字重叠且页面flex排布按钮，先怀疑按钮组件width:inherit/100%
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话500973f3，success UI紊乱；修复为.btn-group固定300rpx并统一padding/背景色
 - 涉及文件：SuccessCard.vue、ZsButton.vue、owner/success.vue、family/success.vue、uni.scss
 - 所属项目：苏住房C；来源会话ID：500973f3-9d75-48cf-8744-7385f4f59190；代码基线：5f0f4dc

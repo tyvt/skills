@@ -15,6 +15,11 @@
 - 涉及文件: AppendixRequirementCard.vue, DeveloperBasicInfoDetail.vue, AppendixRequirementGrid.vue, AppendixPackageSection/index.vue, AnnexUpload/index.vue
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: fe17d399-463d-45e5-9c19-4d7ebc506fcd; baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：fe17d399-463d-45e5-9c19-4d7ebc506fcd
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

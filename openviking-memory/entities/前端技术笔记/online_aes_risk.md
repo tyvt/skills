@@ -12,6 +12,7 @@
 - 本地dist主包为module-main-XbOf4OJl.js、构建时间2026/7/9 10:00、gitHash ec27fb6c6
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益
 - 来源会话ID：2e8f6bb0-314e-403c-9222-a11180a770ba
 - 代码基线：none

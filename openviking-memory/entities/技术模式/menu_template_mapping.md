@@ -8,6 +8,8 @@
 - 含模板路径前缀与关键 busiCode 规则说明
 
 ## 验证与归属
+- 所属项目：园区V0
+- 验证证据：extracted source=cursor project=园区V0
 - 验证来源：cursor 项目 园区V0（原记录另含 园区V0/002.md）
 - 涉及文件：IDCardUtil.java、Sm_ApprovalProcess_AlreadyHandledList.js、MtplOwnerVotePrintService.java、MtplMoneySharePubListServiceImpl.java、DepositMarginPrintService.java、ExportPdfModelByWordServiceImpl.java 及清单本体
 - 来源会话 ID：fe96c8cd-fd82-481c-bf51-9874781ab3e8

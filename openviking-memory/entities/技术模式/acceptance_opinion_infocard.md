@@ -6,6 +6,8 @@
 - 删除 opinion-card，将验收意见移入 info-card 内部紧贴竣工验收日期之下。
 - 保留原有展开/收起逻辑，附件材料保持独立卡片。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/020.md
 - 涉及文件：src/pages_maintain_project/completion-acceptance.vue、src/pages_maintain_project/final-cost-detail.vue、src/pages_maintain_project/apply-detail.vue、src/pages_maintain_project/maintainProject.js、src/pages.json、src/pages_maintain_project/object-detail.vue、src/pages_maintain_project/project-detail.vue、src/pages_maintain_project/construction-manage.vue、src/pages_maintain_project/third-party-appraisal.vue
 - 来源会话ID：1001f03a-2149-436d-91f2-135277c72900

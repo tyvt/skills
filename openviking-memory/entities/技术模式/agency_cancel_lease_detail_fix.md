@@ -16,6 +16,10 @@
 - 所属项目：苏州市房地产监测V3；来源会话：44476e9b-4f1c-4e47-83f0-e9b5128ca3cd
 - 涉及文件：AgencyBasicInfoForm.vue、companyCancel/detail.vue
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

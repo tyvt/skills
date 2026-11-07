@@ -3,6 +3,12 @@
 - 冲突项使用 `variables.css` 的有效值作为标准；入口 `index.scss` 保持不变。
 - 验证：src=苏州市房地产监测V3/172.md; 会话 b3dcdf2d-06fa-442a-b35c-5b7012fe3436.
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b3dcdf2d-06fa-442a-b35c-5b7012fe3436
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

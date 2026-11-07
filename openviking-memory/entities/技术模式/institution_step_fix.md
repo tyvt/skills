@@ -14,6 +14,11 @@
 - 文件：zhi2-web-admin/src/views/institutionRegister/index.vue、src/api/institution/institutionRegister.js、components/Step1BasicInfo.vue、components/Step2AdminInfo.vue
 - 项目：苏州市房地产监测V3；来源会话ID：9fe9ee18-7352-4a5c-bc63-a249f00380ff
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

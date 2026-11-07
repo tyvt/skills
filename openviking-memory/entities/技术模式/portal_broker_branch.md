@@ -11,6 +11,12 @@
 ## 验证
 - 源会话: `01c99a3c-2693-474a-bcc9-5c73f2538cbe`
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：01c99a3c-2693-474a-bcc9-5c73f2538cbe
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

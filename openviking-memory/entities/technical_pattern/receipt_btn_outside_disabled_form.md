@@ -11,6 +11,12 @@ In SuzhouHousingG `pubBankReceiptApply` detail page, buttons inside disabled for
 ## Verification
 - Source: 苏住房G/062.md; session 765750a0-13d8-4789-8d78-9bb82bdf1e1f.
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：765750a0-13d8-4789-8d78-9bb82bdf1e1f
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

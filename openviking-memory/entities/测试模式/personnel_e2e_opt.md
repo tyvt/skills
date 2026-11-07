@@ -15,6 +15,7 @@
 - 全程无 waitForTimeout / 固定 sleep，均为接口响应 + DOM 状态驱动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 可重新跑 npm run test:e2e:personnel-certificate-crud
 - 涉及文件：personnelRecord/index.vue、components/index.vue
 - 所属项目：产品2.0；来源会话：0dc2b982-cbda-4ef5-8a4b-504d7a26d726；代码基线：none

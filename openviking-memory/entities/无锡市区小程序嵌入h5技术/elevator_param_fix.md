@@ -13,6 +13,7 @@
 - 切换「收入/支出」tab → 正常刷新
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：pages_benefit/elevatorPubEngCons/detail.vue、index.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话：18d36ae9-021f-4f26-8bea-d76327f2b6e8
 

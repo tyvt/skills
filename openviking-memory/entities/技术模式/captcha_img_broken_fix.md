@@ -11,6 +11,7 @@
 - 直接使用 base64：验证码是 `data:image/...` 格式，不再走 `resolveServerAssetUrl`，避免多余处理。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/components/SvgIcon/index.vue；所属项目：园区物管2.0；来源会话 80ec8712-2d9a-40e3-9d5a-6f593b0483e2。
 
 

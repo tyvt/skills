@@ -10,6 +10,7 @@
 - 传真、电子邮箱及开户行信息维持选填
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：苏住房G/070.md
 - 涉及文件：register/components/companyInfo.vue、company/companyRegister/dialog.vue、patterns/index.js
 - 所属项目：苏住房G；来源会话ID：83b92882-9c0f-4f73-81af-8089218f93a0；代码基线：none

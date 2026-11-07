@@ -15,6 +15,10 @@
 - 涉及文件：bulkImportDialog.vue、feeDeclare2/index.vue、feeBindScopeTable.vue
 - 所属项目：苏住房G；来源会话：8f44dfe2-7e91-48e0-b0d2-eb247b076f7b；代码基线：3697a62
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

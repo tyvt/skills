@@ -10,6 +10,7 @@ Element Plus ElInput 的 size 仅接受 ""|default|small|large，历史传 mini/
 - 封装组件应归一化传入尺寸以避免 Vue warn。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/018.md；会话 a5963bb7 报 ElInput size 传 mini/medium 告警，经 zs-input.vue 归一化修复。
 - 涉及文件：zhi2-web-admin/src/components/zs-input/zs-input.vue；runtime.ts。
 - 所属项目：2-0；来源会话ID：a5963bb7-204d-42a4-88ac-9fc16822e761 与 76487407-667b-42b3-afef-eb2d2411a5b9；代码基线：none。

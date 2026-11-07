@@ -12,6 +12,7 @@
 - login.vue / LoginForm.vue：登录成功重置 roles 和 terminalType，确保重新拉取用户信息
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - G 端登录后不再出现该弹窗
 - 验证证据：cursor 会话 84a73d0e 提取，根因与修复已确认
 - 涉及文件：zhi2-web-admin/src/store/modules/user.js、layout/index.vue、layout/components/Navbar.vue、views/login.vue、LoginForm.vue

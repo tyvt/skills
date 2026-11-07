@@ -10,6 +10,7 @@
 - 同时实现 `beforeDestroy` 与 `beforeUnmount`，兼容 Vue2/Vue3 迁移期。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 03d38e43：/index/todo 卸载 warn；结论为卸载后仍更新触发 ElTableColumn beforeUnmount 异常。
 - 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue。
 - 所属项目：2-0；来源会话ID：03d38e43-915e-4d67-8a3b-63c1ee8a02cf；代码基线：none。

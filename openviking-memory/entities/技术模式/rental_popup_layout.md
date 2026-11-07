@@ -18,6 +18,10 @@
 - d:\repository\门户\zhi2-web-admin\src\views\home\UnifiedLogin.vue
 - 所属项目：门户；来源会话ID：89cd2e8d-f0c3-42b4-8c98-dd51867d7a1f；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

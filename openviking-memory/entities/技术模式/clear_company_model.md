@@ -7,6 +7,7 @@
 - 监听 selectedCompany（v-model 绑定值）。
 - 当清空时执行 form.companyName = undefined 与 form.companyId = undefined。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：src/views/maintenance/depositNotice/company/components/AddDialog.vue。
 - 所属项目：2-0；来源会话：76d28965-e3f4-48ff-bdb9-b55a6b87279b；代码基线：none
 

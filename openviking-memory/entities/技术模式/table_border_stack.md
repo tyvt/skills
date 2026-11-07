@@ -13,6 +13,10 @@
 - 用户怀疑「边框重合」时，先穷举同一视觉位置所有 border/伪元素来源再逐条裁剪，而非继续加样式覆盖。
 - 涉及文件：pubUseMoneyApply/index.vue、zs-table.vue、element-ui.scss、index.scss、zs-operate-column.vue、pubBankDetailDay/index.vue、resourcesLeaseContractFiling/index.vue、ZsSummaryText/index.vue；所属项目：园区物管2.0；验证：src=园区物管2.0/020.md；来源会话：2352374e-e4c1-4b7f-8295-5892e58f8155。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

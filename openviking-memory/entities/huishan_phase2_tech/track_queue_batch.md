@@ -19,6 +19,8 @@
 - d:/repository/惠山二期H5/zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/house/automaticAdd.vue
 
 ## 验证与归属
+- 所属项目：惠山二期H5
+- 验证证据：extracted source=cursor project=惠山二期H5
 - 验证证据：src=惠山二期H5/001.md
 - 来源会话ID：d17cb678-ebbf-4f71-be88-1e5cc9646c10；代码基线：none
 

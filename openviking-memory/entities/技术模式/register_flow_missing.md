@@ -16,6 +16,7 @@
 - src/api/company/companyRegister.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/070.md
 - 来源会话ID：63a99906-bb31-47e2-a926-890c925cb6ed
 - 代码基线：none

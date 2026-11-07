@@ -10,6 +10,7 @@
 - `repairFunds/usage/fundUsageKs/steps/step2-1.vue`（约250-264行）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 所属项目：太仓G；来源会话：4a311fa2-9aff-4019-80bf-ed046a95ab57；代码基线：none
 
 <!-- MEMORY_FIELDS

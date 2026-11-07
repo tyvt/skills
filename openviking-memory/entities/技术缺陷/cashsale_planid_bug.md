@@ -10,6 +10,12 @@
 - 来源: 苏州市房地产监测V3-leftover/005.md; 会话 5c4d5204-0c97-4a4d-bcb7-2b81ff546339.
 - 涉及文件: CashsaleDetail.vue, PermitPlanPanel.vue, plan/detail.vue, cashsaleConstants.js, ruoyi.js, permitConstants.js.
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：5c4d5204-0c97-4a4d-bcb7-2b81ff546339
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术Bug",

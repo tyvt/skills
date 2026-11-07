@@ -7,6 +7,10 @@
 - 已将此前误跟踪的 playwright-report/index.html 等清理
 - 所属项目：产品2.0；来源会话：41415a1f-2941-4133-85d2-60741ce0ac5c；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

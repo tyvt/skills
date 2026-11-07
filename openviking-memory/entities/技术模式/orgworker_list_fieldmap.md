@@ -12,6 +12,7 @@
 - 验证接口 `/autonomy/ownerCommitteeWorker/page`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：index.vue 等
 - 所属项目：园区公共收益；来源会话：b6d6fab6-0ca4-4685-9fa8-8c9df7a6aefd
 

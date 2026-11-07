@@ -11,6 +11,7 @@
 - 后台 JSON 可调整入口无需改前端；level 是权限等级 v0（无需登录）→v3（需身份认证），levelCode 是身份要求（owner=业主），isShow="1" 表示暂未开放、点击提示 showMsg。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 618910fc 用户问「阳光物业/公共收益如何配置 URL」，给出三层来源及路由码映射表。
 - 涉及文件：src/pages/property/index.vue、src/pages/benefit/index.vue、src/utils/menuRouteMap.js、src/static/menus.fallback.json、src/pages.json。
 - 所属项目：苏住房C；来源会话ID：618910fc-72c7-406b-887e-dd852e5e6cf5；代码基线：89637fb

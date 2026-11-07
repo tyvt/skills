@@ -11,6 +11,7 @@
 - 用户要求「插槽新语法全局搜索修复」。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：zs-table-column.vue:109 Cannot read properties of undefined (reading 'column')。
 - 验证证据补充：src=2-0/011.md（WdmcDialog.vue 等文件旧插槽语法全局改为 #header/#default/#footer 模板语法）。
 - 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue、WdmcDialog.vue。

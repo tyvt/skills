@@ -11,6 +11,7 @@
 - `utils/defaultLanding.js` 同步调整落地页逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 涉及文件：router/index.js、utils/defaultLanding.js、store/modules/permission.js、utils/permission.js
 - 来源会话：5657d5ac-3d67-4095-b7de-c93ba44cfa41

@@ -10,6 +10,7 @@ zhi2-web-admin 已全量将 el-radio / el-radio-button 的选中值写法从 lab
 - 终端 `util._extend` 的 DeprecationWarning 属 Node 提示，与 radio 警告非同一类问题
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：error.ts、index.ts（Element Plus 源码参考）
 - 所属项目：2-0；来源会话：f04aaad0-6d0c-450e-807c-fdf4dbf5a214；代码基线：none
 

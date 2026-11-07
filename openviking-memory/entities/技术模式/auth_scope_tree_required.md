@@ -10,6 +10,7 @@
 - getForm() 取勾选值时对 tree ref 做存在性判断，避免树未渲染时 getCheckedKeys 空引用报错
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 b62c693b 保存时要求授权范围非空，实现 beforeSaveHook 拦截未勾选并加固 getForm
 - 涉及文件：zhi2-web-admin/src/views/system/user/detail.vue、zhi2-web-admin/src/mixins/detailMixins.js、zhi2-web-admin/src/mixins/form.js
 - 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：b62c693b-964b-4ea2-85e8-10ced80ddbfd

@@ -14,6 +14,11 @@
 - 涉及文件: AgencyEntryNetworkDetail.vue, detailMixins.js (area.js), AgencyEntryNetworkAdminDetail.vue, AgencyBasicInfoDetail.vue
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: 5bc132a2-9d67-4e01-bb16-34e9f3a56c64; baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：5bc132a2-9d67-4e01-bb16-34e9f3a56c64
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

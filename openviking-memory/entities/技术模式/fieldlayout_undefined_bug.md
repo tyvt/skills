@@ -21,6 +21,10 @@
 - 来源会话: c9e3f7f1-e112-4668-b0d4-4bad6d731b08
 - 所属项目: 苏州市房地产监测V3; 代码库: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

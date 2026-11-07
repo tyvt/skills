@@ -8,6 +8,7 @@
 - 与depositNotice/company/components/PaymentRangeTable.vue对齐时，两个zs-select-dialog（项目维度、楼栋维度）统一用header="初交明细选择"。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：zhi2-web-admin/src/views/maintenance/depositNotice/components/PaymentRangeTable.vue、zhi2-web-admin/src/views/maintenance/depositNotice/company/components/PaymentRangeTable.vue
 - 所属项目：园区物管2.0（项目2-0）
 - 来源会话：64df7727-22c7-4f7d-ab8e-726440dc4ed9

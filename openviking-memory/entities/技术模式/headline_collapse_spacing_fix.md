@@ -10,6 +10,7 @@
 - `detail-from-container` + 唯一 `zs-form` + 多个 `Headline`：`.detail-from-container > .el-form` 的 row-gap（zs-form 根节点是 el-form）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：detail-form.scss、Headline/index.vue、styles/index.scss
 - 所属项目：苏州市房地产监测V3；来源会话ID：5180d428-0584-4329-9241-d8565c0dbc3e；代码基线：none
 

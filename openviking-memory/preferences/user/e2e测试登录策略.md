@@ -3,6 +3,11 @@
 - 增强 `auth-helpers.js` 中 `loginAsCompanyOnce` 恢复会话后的动态路由注入，供其他 spec 复用
 - 来源会话：8e08b807-7c70-4ef1-9c7b-e56fd2d3d711（产品2.0）
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

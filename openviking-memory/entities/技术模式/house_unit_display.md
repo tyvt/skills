@@ -8,6 +8,8 @@
 - 模板调用 `displayValueWithUnit(form[prop], f.unit)` 将单位拼接于值后，label 保持为面积/金额。
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 涉及文件：HouseAssetDialog.vue
 - 来源会话：c966644d-67ff-4f63-b8b6-57e06e8c7220；代码基线：none
 

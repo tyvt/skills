@@ -11,6 +11,7 @@
 - `wxLogin.js`：H5 防御性修复，URL 缺失 code 时不强制走登录
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 所属项目：昆山市民；代码基线：none
 - 来源会话ID：efd7fd9b-1f86-49c6-8815-9bbd75f57fcb
 - 涉及文件：src/pages_election/election/Participate.vue、src/pages_vote/vote/votedetail.vue、src/utils/wxLogin.js

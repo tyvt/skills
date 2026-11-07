@@ -16,6 +16,7 @@
 - H5与wygl-wxxcx小程序两侧若都有业主决策入口需同步删modal逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js、zhi2-mobile-admin-h5-c-unlimited/dist
 - 所属项目：无锡市区小程序嵌入H5；来源会话：9b0c382d-6f57-4324-ab6b-ebafaf8e1362；代码基线：3fb9434
 

@@ -14,6 +14,10 @@
 - 涉及文件：AccountDetailDialog.vue、PaymentRangeTable.vue、components/index.vue
 - 所属项目：产品2.0；来源会话：83dd90e8-3c97-4a8a-a0a8-6a32cf5c91fe；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "项目事实",

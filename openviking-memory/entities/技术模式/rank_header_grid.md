@@ -11,6 +11,7 @@
 - 数据行余额列宽度改为 `auto`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue、zhi2-web-admin/src/views/benefit/mapOverview/components/Panel.vue
 - 所属项目：园区物管2.0；来源会话：453364e3-8514-45a2-af94-951a664cdd99；代码基线：none
 

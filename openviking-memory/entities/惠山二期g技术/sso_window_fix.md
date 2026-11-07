@@ -14,6 +14,10 @@
 - 涉及文件：zhi2-web-admin/src/views/sso/bTerminalRedirect/index.vue、src/views/sso、src/layout/components/Sidebar/RecursiveMenu.vue、src/store/modules/permission.js
 - 所属项目：惠山二期G；来源会话：7ffb3be2-f8de-4608-8768-cc04a3088249；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "惠山二期G技术",

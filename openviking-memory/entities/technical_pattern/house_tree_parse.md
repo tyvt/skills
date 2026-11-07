@@ -17,6 +17,12 @@ In Suzhou Real Estate Monitoring V3, `HouseSelectDialog.vue` had an unfilled `tr
 - Files: building/houseLimitAudit/index.vue, building/houseLimit/limitAdd.vue, building/houseLimit/components/HouseSelectDialog.vue, building/houseMerge/detail.vue, building/houseLimit/limitFormMixin.js, components/zs-select-dialog/zs-select-dialog-func.vue, components/BuildingTableViewTabs.vue, components/zs-select-dialog/zs-select-dialog.vue
 - Project: 苏州市房地产监测V3; Source session: b1e26906-7719-47ec-96f7-a8e3dc7a48fa; Code base: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b1e26906-7719-47ec-96f7-a8e3dc7a48fa
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

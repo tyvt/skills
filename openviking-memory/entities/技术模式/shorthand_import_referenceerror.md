@@ -10,6 +10,7 @@
 - 写法与 `notice/detail.vue` 一致，免 top-level import
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/315.md
 - 涉及文件：noticeChange/detail.vue、notice/detail.vue、views/supervision/deposit/notice/components/TransactionDetailTable.vue
 - 所属项目：苏州市房地产监测V3；来源会话：97f8fc4b-8d6e-4425-965a-75edd085590c；代码基线：none

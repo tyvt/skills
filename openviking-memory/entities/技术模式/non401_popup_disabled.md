@@ -11,6 +11,7 @@
 - 接口仍 Promise.reject，恢复弹窗需取消对应注释
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：园区物管2.0/060.md
 - 涉及文件：zhi2-web-admin/src/utils/request.js
 - 所属项目：园区物管2.0；来源会话：e4c07993-740c-4ed4-936b-ea9e9f31c8b1；代码基线：none

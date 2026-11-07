@@ -19,6 +19,10 @@
 - zs-search-form.vue
 - 所属项目：园区物管2.0；来源会话：9ffa91df-ef35-47a9-9001-d53cb1cca224；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

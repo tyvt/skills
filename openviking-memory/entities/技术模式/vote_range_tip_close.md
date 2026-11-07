@@ -11,6 +11,7 @@
 - 修复后投票成功时确认框与主弹框均正常关闭
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 161a2f78 用户报线下投票成功后提示框还在，修复后正常
 - 涉及文件：ownerDecision/components/VoteRangeDialog.vue、DecisionRangeTable.vue
 - 所属项目：太仓G；来源会话：161a2f78-6494-4326-934c-d2a31ef3bbc2；代码基线：none

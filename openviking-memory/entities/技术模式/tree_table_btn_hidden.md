@@ -12,6 +12,7 @@
 - 顺手补busCode校验提示（请先选择左侧菜单业务编码），避免按钮修好后点下去还是空
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话d409e8fd用户报tool/print/index.vue「新增按钮不显示」，结论指develop/v2.6.2合并恢复丢失table-container，按fjflpz恢复结构并为handleAdd增busCode校验
 - 涉及文件：tool/print/index.vue、mixins/subTableMixins.js、components/zs-button/zs-button.vue
 - 所属项目：苏住房G；代码基线：9fb6c2c；来源会话：d409e8fd-ad8b-47a8-999b-763e63e18e32

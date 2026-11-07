@@ -14,6 +14,12 @@ html2canvas 原生不支持 object-fit，导致证件下载时图像被拉伸。
 ## 验证
 - 验证证据: src=苏州市房地产监测V3-leftover/020.md; 会话 0b2661f5-bbe8-434f-86da-96244d6397a7; 项目 苏州市房地产监测V3.
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：0b2661f5-bbe8-434f-86da-96244d6397a7
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

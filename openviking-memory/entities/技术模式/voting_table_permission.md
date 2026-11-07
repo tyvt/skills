@@ -12,6 +12,10 @@
 - 涉及文件：zhi2-web-admin/src/views/autonomy/multiply/components/VotingItemsTable.vue、zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue、multiply/detail.vue。
 - 所属项目：园区物管2.0；来源会话：7136a5c8-1c00-4f90-aefc-bd46f28f354f；代码基线：none。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

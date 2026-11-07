@@ -13,6 +13,8 @@ Map组件监听地图zoom_changed事件并emit clickMark/hoverMark false，导�
 - 保留 Map 组件 zoom_changed 监听逻辑，父组件不再误响应 false 而打开概览
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证：会话 0c978c4d-3266-400e-856a-6b12b6446659 中搜索导致概览异常显示
 - 涉及文件：src/components/Map/index.vue、src/views/benefit/statisticsMap/index.vue
 - 来源会话ID：0c978c4d-3266-400e-856a-6b12b6446659

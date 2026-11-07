@@ -11,6 +11,7 @@
 - SingleSelect.vue：beforeDestroy 清理 body 的 popperElm，避免详情页下拉残留遮罩
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴G
 - 验证：进入APP业主人工审核新列表，选审核状态搜索写缓存，进详情返回后确认可正常展开选择
 - 涉及文件：SearchFormItem.vue、ctUserIdentityApply/index.vue、SingleSelect.vue
 - 所属项目：泰兴G；来源会话：66934bc9-8b42-436a-a460-aad83c154ca3；代码基线：none

@@ -18,6 +18,12 @@ Commit 790f35205 (bug1594) changed the navbar width from fixed 276px to var(--si
 - Evidence: src=产品2.0/056.md
 - Project: 产品2.0; session: d115a3e1-0619-44d4-8a93-3c964fe93a54; baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：d115a3e1-0619-44d4-8a93-3c964fe93a54
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

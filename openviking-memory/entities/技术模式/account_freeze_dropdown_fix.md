@@ -11,6 +11,7 @@
 - 手动冻结选「管理员手动冻结」等不再锁死
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：system/user/detail.vue、components/AccountFreezeFields/AccountFreezeFields.vue、utils/accountFreeze.js
 - 所属项目：苏住房G；来源会话：92b6e126-dfc6-494c-a323-5344cc8169de
 

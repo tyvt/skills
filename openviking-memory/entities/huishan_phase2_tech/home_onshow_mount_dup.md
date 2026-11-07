@@ -12,6 +12,7 @@
 - lingxi.js 与 newHome.vue 添加 [灵锡绑房回跳]/[newHome] 的 authCode 日志
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期H5
 - 验证：src=惠山二期H5/006.md
 - 涉及文件：src/utils/sign.js、src/utils/lingxi.js、src/pages/index/property.vue、src/App.vue、src/pages/index/newHome.vue、src/pages/index/useProjectState.js
 - 所属项目：惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）；来源会话：a739d214-76c7-4b31-95f6-240f6706b925；代码基线：none

@@ -10,6 +10,8 @@
 - staff 子包页面：`cashier/result.vue`、`complex-select/index.vue`、`message/index.vue`，import 已适配为 `@/staff/api`、`@/staff/store` 等，路由已加 `/staff/` 前缀。
 - 首页选择性合并：`src/pages/staff/home/index.vue` 保留 `StaffCustomTabbar`、`zStatic` 图片路径等泰兴特有逻辑，合并 `@tap` 点击修复、未读判断。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 涉及文件：src/pages_owner/house/verify.vue、src/pages/index/property.vue、README.md、src/pages/staff/home/index.vue、src/staff/pages_facility/issue/index.vue、src/pages_facility/issue/index.vue（物业手持B端）、src/uni.scss 等。
 - 来源会话ID：1f8915b7-fae4-4567-901b-3b9f8404445e
 - 代码基线：none

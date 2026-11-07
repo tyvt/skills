@@ -11,6 +11,7 @@
 - 标题栏固定顶部，关闭按钮始终可见
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：cursor 会话 fe6a9c71 提取，刷新后点击综合查询验证
 - 涉及文件：zhi2-web-admin/src/views/property/complex/detail.vue、zhi2-web-admin/src/views/property/complex/components/StatisticsDialog.vue
 - 所属项目：产品2.0；来源会话：fe6a9c71-d8dc-4321-9d4d-34e4729e5e46；代码基线：none

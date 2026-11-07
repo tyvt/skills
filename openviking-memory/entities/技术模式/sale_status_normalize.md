@@ -8,6 +8,9 @@
 - 保留现有的`el-form-item`提示，不改变业务结构
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：f742546b-5fa1-4c38-be7c-f50d9d083f69
 - 验证: src=苏州市房地产监测V3/172.md; src=苏州市房地产监测V3-rest/149.md
 - 涉及文件: HouseSelectDialog.vue, houseLimitConstants.js, detail.vue, limitFormMixin.js, limitAdd.vue, HouseLimitFloorSelectGrid.vue, limitCancel.vue
 - 源会话: f742546b-5fa1-4c38-be7c-f50d9d083f69; 代码基线: none

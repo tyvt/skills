@@ -13,6 +13,7 @@
 - isChange场景按源人员organType加载
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话4d653d37用户报信托公司时角色框显物业企业角色，定位listRolePage未传企业类型
 - 涉及文件：toB/personnelRecord/components/detail.vue、institution/personnel/detail.vue、company/staffManagement/components/detail.vue、register/components/accountInfo.vue、company/userManagement/operator/detail.vue、toB/adminOperator/detail.vue
 - 所属项目：苏住房G；来源会话：4d653d37-aa8a-4614-b734-2b2e40476bec；代码基线：b8ae114

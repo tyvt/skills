@@ -10,6 +10,12 @@
 - 来源: 苏州市房地产监测V3-leftover/005.md; session 7907a58f-b73f-49f7-ad3d-d1a5d8cfa3eb.
 - 涉及文件: zhi2-web-admin/.vscode/settings.json; Cursor User settings.json.
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：7907a58f-b73f-49f7-ad3d-d1a5d8cfa3eb
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

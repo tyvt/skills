@@ -18,6 +18,7 @@
 - ⑤枚举取值若与后端不一致拿成功示例对齐，别靠猜
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话 6bf37b7b，home.js 的 getStudyList 默认 tab:'1'、index-v2.vue 维护 studyTab 传参并切换重拉、StudyPanel.vue 用 activeTab+tab-change 联动；刷新请求带 tab=1；同会话另修 /v2.0/v2.0/ 路径重复前缀
 - 涉及文件：zhi2-web-admin/src/api/portal/home.js、api/index.js、tests/e2e/home-v2.spec.mjs
 - 所属项目：苏住房G；来源会话：6bf37b7b-6069-4f69-bd6d-69fac837642a；代码基线：15e201a

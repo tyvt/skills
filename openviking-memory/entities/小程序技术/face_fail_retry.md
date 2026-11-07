@@ -15,6 +15,8 @@ face.vue 人脸识别失败改为当前页展示失败态并提供重试，而�
 - 典型页面栈：实名认证(verify) → 不动产授权(bdc) → 人脸识别(face)
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 验证：微信开发者工具进入人脸识别页，故意取消或失败一次确认失败页与重试流程
 - 涉及文件：pages/face/face.vue、pages/face/verify.vue、pages/face/bdc.vue
 - 项目路径：d:\repository\小程序\wygl-wxxcx-dev-slh

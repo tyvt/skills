@@ -14,6 +14,8 @@
 - 最终请求形如 https://wygl.wxwgzx.com:8989/szh5/sfb/zhi2/2026/...。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：47414239-c758-44c5-b55e-6c30c3687109
 - 验证会话：47414239-c758-44c5-b55e-6c30c3687109（基线 none）。
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/manifest.json、src/hooks/usePortal.js、src/api/system.js、src/pages/webview/home.vue。
 - 所属项目：无锡市区小程序嵌入H5。

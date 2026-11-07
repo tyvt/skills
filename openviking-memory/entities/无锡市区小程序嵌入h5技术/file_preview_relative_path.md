@@ -10,6 +10,7 @@ filePreview 的地址解析改为与 ZsImage 一致，新增 resolveFilePreviewU
 - DescribePopup.vue 等调用前若手动拼接 IMAGE_BASE，H5 下为空不受影响；小程序传入完整 URL 识别为绝对地址不重复拼接
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话 da88fbd0 用户要求文件预览路径改为相对路径
 - 涉及文件：DescribePopup.vue、src/utils/index.js、src/env/mp.js
 - 所属项目：无锡市区小程序嵌入H5；来源会话ID：da88fbd0-10ce-496a-a71f-84d83cffcc43

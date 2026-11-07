@@ -3,6 +3,11 @@
 - 验证证据：src=门户/006.md；来源会话 1c06a96f-418e-4cc9-93c8-d8e81869540b。
 - 涉及文件：zhi2-web-admin/src/views/home/UnifiedLogin.vue、tests/e2e/unified-login-visual.spec.ts、package.json、playwright.config.ts。
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

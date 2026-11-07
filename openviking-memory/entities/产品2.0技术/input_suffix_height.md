@@ -18,6 +18,7 @@
 - 部署后强刷缓存再验证
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 会话 6e092b88 结论：双根因确认与修复（element-ui.scss 改 center、移除 stretch、固定高度；index.html 改同步加载）
 - 涉及文件：components/AmountInput/index.vue、components/zs-input/zs-input.vue、styles/element-ui.scss、public/assets/css/element-ui.css、index.html
 - 所属项目：产品2.0；来源会话：6e092b88-7451-45d2-9591-af86334101f0；代码基线：1fa4993

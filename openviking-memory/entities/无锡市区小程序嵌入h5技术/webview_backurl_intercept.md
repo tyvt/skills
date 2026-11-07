@@ -11,6 +11,7 @@ pages/common/webView 加载带返回按钮的第三方页时，若 backUrl 命�
 - 增加 logWebViewReturn 与 inspectPortalHomeReturnUrl 辅助定位
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 所属项目：无锡市区小程序嵌入H5
 - 来源会话：3418c5a2-4fda-48cf-98cf-7a8c6d1ea069
 - 代码基线：1cce226

@@ -16,6 +16,10 @@
 - 涉及 api/sfbConfig.js、api/dispatcher.js、utils/sfbSign.js、api/requestLog.js、api/httpInstance.js、api/index.js、api/v1Instance.js、utils/sfb.js
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 b5d791be-2fb9-40ed-a41e-ead0373b6962；代码基线 none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

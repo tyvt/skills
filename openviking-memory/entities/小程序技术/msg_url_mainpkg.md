@@ -17,6 +17,7 @@
 - 覆盖所有主包迁到 pages_main 的目录前缀（news、message 等）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 01893cc7 用户贴 MiniProgramError，结论新增 route-map.js 归一化、utils/index.js 统一修正、message.vue 复用；构建验证步骤见结论
 - 涉及文件：zhi2-mobile-shimin/src/utils/route-map.js、src/utils/index.js、src/pages_main/message/message.vue、src/pages.json
 - 所属项目：苏住房C；来源会话ID：01893cc7-e8de-4690-b98f-18f412beec9e；代码基线：b7bf813

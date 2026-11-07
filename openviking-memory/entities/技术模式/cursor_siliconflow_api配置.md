@@ -12,6 +12,7 @@
 - 确认模型名保持 `THUD`（硅基流动模型标识）。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=d-repository
 - 重新验证方法：清空 Key 重新粘贴保存，或开开关后发测试消息看是否报错。
 - 涉及文件：C:\Users\Administrator\.cursor\skills-cursor\update-cursor-settings\SKILL.md、C:\Users\Administrator\AppData\Roaming\Cursor\User\settings.json
 - 所属项目：d-repository；来源会话：d053681c-4823-458c-a33f-ab528b504230

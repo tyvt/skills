@@ -9,6 +9,7 @@
 - 页面可通过重写 `getDetailRequiredParams()` 自定义校验规则
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：53746354-b471-423b-8e12-527f9a697944；代码基线：none
 - 涉及文件：`form.js`、`platformConfig/detail.vue`、`detailMixins.js`
 

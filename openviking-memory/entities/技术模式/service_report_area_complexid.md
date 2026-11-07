@@ -12,6 +12,7 @@ B端服务周报选发布范围时，若所选物业管理区域与右上角全�
 - 验证：直接看Network里是否出现complexId参数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：zhi2-web-admin/src/views/system/message/service/index.vue、components/index.vue、detail.vue
 - 所属项目：苏住房G；来源会话ID：f09d0d8f-6e96-496a-8a72-7934ff001122；代码基线：c2a604a
 

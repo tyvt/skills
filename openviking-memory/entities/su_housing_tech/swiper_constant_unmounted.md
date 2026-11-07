@@ -14,6 +14,12 @@ In the 苏住房C mobile `swiperComponent.vue` using Options API, the top-level 
 - Files: src/components/commonNew/swiperComponent.vue, src/pages/commonNew/swiperComponent.vue
 - Project: 苏住房C (zhi2-mobile-shimin); source session: eb88fc33-134b-41f2-b2d5-78dd948cbb83; code baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：eb88fc33-134b-41f2-b2d5-78dd948cbb83
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_tech",

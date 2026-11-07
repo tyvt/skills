@@ -16,6 +16,11 @@
 - 涉及文件：zhi2-web-admin/src/utils/monthlyReport.js、zhi2-web-admin/src/views/publicQuery/monthlyReportStat/detail.vue、zhi2-web-admin/src/views/publicQuery/monthlyReport/components/ReportItemsTable.vue
 - 所属项目：苏住房G
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：c17a549c-5505-45c7-a569-8186d32c2167
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房G技术",

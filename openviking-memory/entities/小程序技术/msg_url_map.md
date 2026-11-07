@@ -17,6 +17,7 @@
 - 排查直接看vConsole报错完整URL与pages.json注册路径差异
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话72fc01c4用户贴MiniProgramError，结论在normalizePageUrl增加前缀映射修复
 - 涉及文件：msg.js、message/index.vue、message.vue、pages.json
 - 所属项目：苏住房C；来源会话ID：72fc01c4-8530-4edb-8ed0-13cf0599aa37；代码基线：5f0f4dc

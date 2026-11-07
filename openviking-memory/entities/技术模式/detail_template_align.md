@@ -13,6 +13,12 @@
 - 涉及文件: CashsaleInfoPanel.vue, detail-template.vue, detail-template-long-labels.md, README.md, detail-template-CrrkOgnH.css, migrate-detail-framework.mjs
 - 会话: 0e6522ee-5877-4b0d-9156-b0f67a688a71; baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：0e6522ee-5877-4b0d-9156-b0f67a688a71
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -12,6 +12,7 @@
 - 备选方案：全局布局加 scrollbar-gutter:stable 进一步消除抖动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 来源会话：2fc8efe8-20f3-454c-8e49-fdfcaf343a87
 - 涉及文件：benefit/alert/index.vue、mixins/listMixins.js、components/zs-table/zs-table.vue
 - 所属项目：园区物管2.0；代码基线 none

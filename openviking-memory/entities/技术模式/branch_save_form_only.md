@@ -16,6 +16,8 @@
 - 保存不再因缺少附件而失效
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：40edb9e5-354a-4c2b-8557-eea7a3245770
 - 验证证据: src=苏州市房地产监测V3-rest/072.md
 - 涉及文件: AgencyBranchDetail.vue, complex/detail.vue, detailMixins.js, form.js, formComponents.js, vite.config.js, OperationBtnGroup/index.vue, AgencyBranchList.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 40edb9e5-354a-4c2b-8557-eea7a3245770; Baseline: none

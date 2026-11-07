@@ -11,6 +11,10 @@ i淮安公版首页分类切换与首次进入的 loading 展示行为约定。
 - src/App.vue、src/pages/index/home.vue、src/store/user.js。
 - 所属项目：i淮安公版；来源会话：824be91d-19a0-46ff-aeb8-1585da292e04。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安公版
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "i淮安公版技术",

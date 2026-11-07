@@ -11,6 +11,7 @@
 - 占比取 weightSocreRatio 直接 Number 转换不乘100
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓一网通办H5
 - 验证证据：src=太仓一网通办H5/003.md
 - 涉及文件：src/views/election/components/GroupResult.vue、src/views/election/ElectionResult.vue、src/views/decision/components/ProgressBar.vue、src/views/owner-decision/components/ResultStatisticsTab.vue、src/views/components/ProgressBar.vue、src/store/election.ts、src/views/decision/components/PieChart.vue、src/views/maintain/components/StatisticsCard.vue
 - 所属项目：太仓一网通办H5；来源会话：fa7fcf41-4dd6-479b-95dc-fc0517ba9715；代码基线：none

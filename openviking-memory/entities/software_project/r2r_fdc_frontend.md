@@ -25,6 +25,12 @@ Semi-Tech semiconductor R2R/FDC frontend is a Vue3.5+TS+Vite8beta web project lo
 - Session: 9cd55d53-75e0-48d1-8f31-fb34c160a130
 - Code baseline: none
 
+## 验证与归属
+- 所属项目：fdc-web
+- 验证证据：extracted source=cursor project=fdc-web
+- 来源会话：9cd55d53-75e0-48d1-8f31-fb34c160a130
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "software_project",

@@ -13,6 +13,7 @@
 - 字典到位后刷新 detailList，触发表格重新渲染
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区G
 - 验证：Ctrl+F5 强刷后打开回单详情；若仍显示数字，在 DevTools→Network 看 benefit_contract_resource_type 是否 200 并确认是否有 dictValue 为 1、2 的项；没有则需后端补字典或核对字段含义
 - 涉及文件：src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue、src/views/benefit/pubVerificationReceipts、src/mixins/subTableMixins.js
 - 来源会话：08b73ebd-1692-46da-8e18-00b4de13e612；所属项目：无锡市区G；代码基线：none

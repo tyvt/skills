@@ -13,6 +13,10 @@
 - 文件：benefit/pubParkingRate/detail.vue、ChargeStandardDialog.vue、api/benefit/pubParkingChargeStandard.js
 - 所属项目：苏住房G；来源会话：23d3fee1-5580-41c7-9e87-e84609a63989
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房G技术修复",

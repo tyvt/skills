@@ -10,6 +10,7 @@
 - 窄屏：内容宽度超容器时，.stat-table-wrap 的 overflow: auto 提供横向滚动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：zhi2-web-admin/src/views/publicQuery/monthlyReportStat/detail.vue
 - 所属项目：苏住房G；来源会话：89bf3d7d-179a-4d0a-8a4f-3157bdf4d110
 

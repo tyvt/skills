@@ -9,6 +9,7 @@
 - MenuSection.vue卡片右侧改用tabStaticUrl本地图，与头部背景图同方式，不再经MenuImage
 - menu.js电子业主卡统一引用images/my/owner-card.png，不再依赖接口远程图标
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话ID：d6842107-6287-4385-849e-b409c4545d53；代码基线：8fc3cc5
 - 涉及文件：src/pages_tab/components/menu/MenuSection.vue、MenuImage.vue、src/utils/index.js、suzhufang-android-app/app/src/main/res/layout/item_my_card.xml
 

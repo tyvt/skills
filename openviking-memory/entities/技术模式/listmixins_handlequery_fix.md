@@ -10,6 +10,7 @@
 - 混入 `handleQuery`（实现为 `this.queryParams.pageNum = 1; this.getList()`）与 `multiple`、`loading` 等状态，对齐 `bankDetailDay/index.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=宜兴公共收益
 - 验证证据：src=宜兴公共收益/003.md
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubBankDetailDay/index.vue、zhi2-web-admin/src/views/benefit/bankDetailDay/index.vue、zhi2-web-admin/src/views/benefit/pubVerificationReceipts/index.vue、zhi2-web-admin/src/mixins/table.js、zhi2-web-admin/src/mixins/listMixins.js
 - 所属项目：宜兴公共收益；代码基线 none；来源会话 6eab2f2e-27e3-4a85-8d91-5b508fe89d60

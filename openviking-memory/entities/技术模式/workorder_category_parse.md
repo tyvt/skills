@@ -16,6 +16,10 @@
 - 文件：`zhi2-web-admin/src/views/property/workOrder/report/index.vue`、`AddOrderDialog.vue` 等
 - 项目：产品2.0；来源会话：1401b92d-0ad2-433b-83f9-aa435e2c7296；代码基线：none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

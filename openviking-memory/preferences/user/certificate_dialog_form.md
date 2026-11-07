@@ -2,6 +2,12 @@
 - FileUpload sets :is-show-tip="false" and adds .upload-tip text; both files keep structure in sync and pass Lint.
 - Evidence: src=苏州市房地产监测V3/078.md; source session: ba8901ef-27cd-40ea-a120-41f51d8f7810
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：ba8901ef-27cd-40ea-a120-41f51d8f7810
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

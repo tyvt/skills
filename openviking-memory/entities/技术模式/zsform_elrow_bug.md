@@ -12,6 +12,7 @@
 - 与「el-col 必须是 .zs-form 直接子级」「弹窗内禁写 el-row/el-col」两条口径互补：本条针对确实需要栅格时 el-row 放外层
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：zhi2-web-admin/src/views/maintenance/accRefund/components/AccountRefundTable.vue
 - 所属项目：产品2.0
 - 来源会话ID：d5ae2f3e-c3d7-4c77-8ef2-048ffc7b39f4

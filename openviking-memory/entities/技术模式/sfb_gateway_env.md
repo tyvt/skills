@@ -12,6 +12,7 @@
 - 判断原则：一份 env 只说明「环境间会变」和「需人工申请」的，协议常量一律代码默认。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 0f1c6af9 用户贴网关/验签参数表后要求移除不必要参数，处理结果如上。
 - 涉及文件：zhi2-mobile-shimin/.env.development、.env.production、.env.test、src/utils/dispatcher.js。
 - 所属项目：苏住房C；来源会话ID：0f1c6af9-9dca-4fad-8282-c48ebf2f048d；代码基线：166ed47

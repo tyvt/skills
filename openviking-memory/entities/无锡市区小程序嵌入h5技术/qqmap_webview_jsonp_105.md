@@ -14,6 +14,8 @@
 - 部署后用 https://{H5域名}/qqmap/ws/place/v1/search?... 自测 status:0，再在 web-view 强刷验证日志不再出现 region(adcode) 与 JSONP 降级。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：ba685907-d68a-4e81-8abb-1388fb268339
 - 验证会话：ba685907-d68a-4e81-8abb-1388fb268339（基线 5241320），用户验证 nearby 直链 Success、web-view 内 JSONP 105，结论写明 nearby 失败→region(320513) 二次 105，修复为固定 nearby + /qqmap 代理 + uni.request JSON。
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/index.js、src/utils/qqMapKey.js、src/pages_owner/project/info/index.vue、vite.config.ts。
 - 所属项目：无锡市区小程序嵌入H5。

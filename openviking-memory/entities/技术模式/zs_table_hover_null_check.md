@@ -12,6 +12,12 @@
 - 涉及文件: zs-table.vue; src/views/benefit/assetLeaseApply/index.vue; src/views/property/complex/components/RegionTreeLayout.vue.
 - 验证证据: src=产品2.0/085.md; 会话: 2e92212a-8c81-44e4-9cc6-e2feecfe6e5e.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：2e92212a-8c81-44e4-9cc6-e2feecfe6e5e
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

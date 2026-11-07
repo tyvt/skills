@@ -18,6 +18,7 @@
 - 补完域名后仍不显示，再检查微信开发者工具 downloadFile 合法域名是否包含该图片域名
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 785096f4（基线 4d6dba9）用户贴出 Failed to load local image resource /zhi2-pro/... 500 并说明上传头像后被当本地图片；结论 My_Suzhufang.vue 原生 <image> 直接绑 userStore.avatar 是错误写法，userInfo.vue 因 ZsImage :local="false" 正确；修复为改用 resolveFullMediaUrl() 解析，失败时再查 downloadFile 合法域名
 - 涉及文件：src/pages/index/components/My_Suzhufang.vue、src/pages_my/setting/userInfo.vue、src/components/ZsImage/ZsImage.vue、src/utils/index.js、src/env/mp.js
 - 所属项目：苏住房C；来源会话ID：785096f4-4ab9-4c30-b361-cd9f73a774e6；代码基线：4d6dba9

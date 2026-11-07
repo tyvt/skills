@@ -10,6 +10,7 @@
 - 使用类 `font-(32 weight-400 color-333) leading-44` 渲染
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译小程序后效果一致
 - 涉及文件：`pages_transaction/intention/add.vue`
 - 所属项目：苏住房C；来源会话ID：452e5168-2d2e-4d7b-ad71-56eaaee8ce39；代码基线：none

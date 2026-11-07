@@ -16,6 +16,10 @@
 - 涉及文件：openNotice.js、UnifiedLogin.vue、publicAnnouncement.js、externalInfo.js
 - 所属项目：门户；来源会话ID：6b002207-e45f-4242-836c-3b25c34bb174；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

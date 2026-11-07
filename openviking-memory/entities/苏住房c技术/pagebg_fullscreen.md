@@ -16,6 +16,7 @@
 - 判断口径：任何「背景图溢出/变全屏」先看父容器是否 flex:1/100vh，再看 PageBg 绝对定位是否缺高度约束包裹层
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 1d447664 最终结论「Bg.svg 是 375×190px 横幅，PageBg 绝对定位铺满父容器，.type-container flex:1 占满整屏」；修复用 .type-bg（380rpx）包裹
 - 涉及文件：pages_owner/house/TypeChoose.vue、components/PageBg/PageBg.vue、pages_owner/house/index.vue、pages_owner/house/components/TypeChoose_Suzhufang.vue
 - 所属项目：苏住房C；来源会话ID：1d447664-822a-4688-ab03-ac7488c5ab2d；代码基线：5f0f4dc

@@ -10,6 +10,12 @@ Git technique to fix local/remote same-name tag divergence causing code inconsis
 ## Verification
 - Source session: c76d5b96-d6d4-41d2-8409-c838c89e5beb; baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：c76d5b96-d6d4-41d2-8409-c838c89e5beb
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "git_pattern",

@@ -12,6 +12,8 @@
 - 覆盖 AnnexUpload 的 height: calc(100% - 50px)
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/006.md
 - 涉及文件：zhi2-web-admin/src/views/presale/entrustSale/detail.vue、src/styles/index.scss、src/views/presale/permit/components/PermitAppendixPanel.vue、src/components/AnnexUpload/index.vue、e2e/presale/entrust-sale-detail-layout.spec.js、src/views/company/companyManagement/components/AgencyBasicInfoForm.vue、src/views/presale/entrustSale/components/EntrustSaleAddAppendix.vue、src/views/supervision/bank/superviseBank/detail.vue
 - 来源会话ID：51578e2c-0265-49db-bc23-9770861b7789；代码基线：none

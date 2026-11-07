@@ -17,6 +17,10 @@
 - 所属项目：园区V0；来源会话ID：a726fbc6-506c-419b-8b8c-b02f10958d6b；代码基线：none
 - 验证：Ctrl+F5 强制刷新后，滚动条左侧无奇怪图标，末位页签完整显示且可关闭
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区V0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

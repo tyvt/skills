@@ -11,6 +11,7 @@
 - 刷新后待办卡片显示 3409
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：home/index-v2.vue、api/portal/home.js、home/v2/components/TodoPanel.vue
 - 所属项目：苏住房G；来源会话：360057ae-d967-41ed-b07f-792998bb09db
 

@@ -14,6 +14,11 @@
 - 涉及文件: 前端技术信息.md, Step3Appendix.vue, InstitutionUploadItem.vue, company/institutionRegister.js, institution/institutionRegister.js, InstitutionRegisterPage.vue, register/components/Step3Appendix.vue, e2e/fixtures/appendix-package-helpers.js
 - 所属项目: 苏州市房地产监测V3; 会话: b5012ad6-36f9-46ad-a9b1-913b5fdf7d66; baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b5012ad6-36f9-46ad-a9b1-913b5fdf7d66
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

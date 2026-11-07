@@ -11,6 +11,7 @@
 - detail-form.scss 新增 .section-field--wide{grid-column:span 2} 并在 ≤768px 回退单列
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/040.md
 - 涉及文件：supervision/agreement/end/detail.vue、detailLayout.js、index.scss、detail-form.scss、detail-template.vue、Headline/index.vue、commercialHousingSales/priceFiling/recordPriceMngSuzhou/detail.vue、supervision/agreement/allocation/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：c6c36197-e683-4727-86cf-a23980045e4e；代码基线：none

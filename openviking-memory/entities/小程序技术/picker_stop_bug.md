@@ -10,6 +10,7 @@
 - 移除 home.vue 切换小区按钮上的 `@click.stop`，恢复弹窗正常弹出
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 来源会话：4cbe7d62-f4dd-4789-afa2-f9344da6e1d1
 - 涉及文件：pages/webview/externalWebview.vue、pages/webview/home.vue、utils/portal-user.js
 - 所属项目：小程序（wygl-wxxcx-dev-slh）；代码基线：none

@@ -11,6 +11,7 @@
 - 根因4：搜索只传 projectName 后端只认 complexName；解法：搜索参数双传兼容。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：normalizeProjectList 加字段兜底、applyCommunityLayerView 视野拟合、MultiMarker id 索引化、双参搜索。
 - 涉及文件：benefit/statisticsMap/index.vue、benefit/statisticsMap/components/map.vue。
 - 所属项目：园区物管2.0；来源会话 7936e37a-fa3a-4556-86bf-1afaf2c6a29e；代码基线 f00310232。

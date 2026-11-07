@@ -20,6 +20,10 @@
 - 来源会话：b7adac16-6317-40a9-8cb6-2631f68c204c、1aa5a58c-4093-4786-81ac-e958b287e260
 - 所属项目：榆林G
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=榆林G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "bug",

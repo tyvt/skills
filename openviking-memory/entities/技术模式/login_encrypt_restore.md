@@ -11,6 +11,10 @@
 - 涉及文件：src/utils/passwordEncrypt.js、index.html、src/views/login.vue
 - 所属项目：产品2.0；来源会话：c77f4406-8fd7-4cd0-b97f-9bc57e4e5db2；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

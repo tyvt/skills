@@ -16,6 +16,10 @@
 - 涉及文件：zhi2-web-admin/src/styles/element-ui.scss、zhi2-web-admin/src/views/dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue、zhi2-web-admin/src/views/dataProperty/procedure/detail.vue、zhi2-web-admin/src/views/dataProperty/procedure/index.vue、zhi2-web-admin/src/components/zs-select-column/zs-select-column.vue、zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/OwnerAddDialog.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue、zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue
 - 所属项目：产品2.0；来源会话：6b9584dd-8399-40b2-8b79-9baf367ed910；代码基线：64fa9e2
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

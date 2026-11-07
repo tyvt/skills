@@ -13,6 +13,7 @@
 - 页面跳失败页时对错误原因encodeURIComponent，避免URL截断
 - 排查顺序：外层code是否200→接口是否配noReject→实例是否开supportNoReject→内层错误字段message还是msg
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话df98a5b7（基线77666f8）用户报核验显示网络错误，定位v1Instance.js缺开关，补开关并encodeURIComponent
 - 涉及文件：zhi2-mobile-shimin/src/api/v1Instance.js、httpInstance.js、gateway.js、transaction.js、pages_transaction/publishHouse/verification.vue
 - 所属项目：苏住房C；来源会话ID：df98a5b7-7af2-4775-8bc5-f19612418dfd；代码基线：77666f8

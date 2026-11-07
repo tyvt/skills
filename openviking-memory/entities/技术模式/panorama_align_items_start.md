@@ -11,6 +11,7 @@
 - 与已知「详情页双来源间距」不同，本条针对看板横向多列等高布局
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：src=园区物管2.0/067.md；会话 47b47b3c 用户报资金收入/支出板块高度未占满容器；改 align-items:start 为 stretch 后中右列 panorama-block 拉满行高，饼图区 flex:1 吃掉垂直空间
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue
 - 所属项目：园区物管2.0

@@ -12,6 +12,8 @@
 - useLoadMore.js已还原，不影响其他仍使用该hook的页面
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 需在Android真机回归：慧物业→社区公告/街道公告、小区公告页
 - 涉及hooks/useAnnouncementPaging.js及三个公告页；来源会话ID：802b4a4d-97e9-4dbb-a0fe-201215024044
 

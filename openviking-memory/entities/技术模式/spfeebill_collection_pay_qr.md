@@ -15,6 +15,9 @@
 - 文件：`spFeeBill/components/collectionDialog.vue`（核心代码 397:432）、`bill/components/PaymentDialog.vue` 等
 - 所属项目：产品2.0；来源会话：af2c138b-8a07-4a0c-9b27-adf12153be13；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

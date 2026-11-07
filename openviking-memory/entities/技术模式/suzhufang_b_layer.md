@@ -9,6 +9,7 @@
 - isCompanyAdmin缺失必须当非管理员处理，否则造成相反越权展示
 - 历史7-13用ENABLE_B_TERMINAL_PROJECT_DIALOG_ON_LOGIN=false临时全关，7-15按区域数量恢复
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话cbfb89e8，用户确认B端企业管理员不应显区域；代码在utils/terminalUser.js的isBTerminalPractitioner/isGTerminalLike，弹窗BProjectDialog仅对从业人员渲染
 - 提交：bf2512af8(7-13全关)→b9412a507(7-15恢复)
 - 涉及文件：src/utils/terminalUser.js、src/layout/index.vue、src/views/home/bProjectDialog.vue；所属项目：苏住房G；来源会话：cbfb89e8-705e-429a-96b7-fa329df51e3e；代码基线：ac184e6

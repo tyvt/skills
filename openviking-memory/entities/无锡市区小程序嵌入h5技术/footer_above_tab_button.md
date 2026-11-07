@@ -9,6 +9,7 @@
 - 仅加 footer 不改 bottom/内边距会导致空白多却要滚到底才见落款或被中间 tab 挡住
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：src=无锡市区小程序嵌入H5/010.md
 - 涉及文件：src/pages/webview/home.vue、src/pages/index/my.vue、src/components/custom-tabbar/custom-tabbar.vue、src/pages.json、src/pages/webview/externalWebview.vue、src/components/sufuban-footer/sufuban-footer.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话ID：d3dd4f2b-151a-408d-b8b8-52be5b51c6dd；代码基线：none

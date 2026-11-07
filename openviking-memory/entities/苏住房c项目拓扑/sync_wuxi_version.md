@@ -10,6 +10,7 @@
 - sfb 分支带独立网关配置（httpInstance.js / gateway.js），合并冲突必须保留 sfb 侧，不能取主分支配置
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：9a5cf993-2e96-4283-bc23-24c947b70b34；代码基线：5438dc6
 - 示例：pages_benefit/assetsPublicity 从无锡版本移植，子模块 suzhou-shiqu-suzhufang-main-v2.1 → 4e9e7465，sfb → fa4a1fe2，父仓 → c25c4cf
 

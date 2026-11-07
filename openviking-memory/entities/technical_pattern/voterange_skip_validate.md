@@ -13,6 +13,12 @@ VoteRangeDialog.vue's nextStep set active=1 directly without validating required
 - Source cursor session: 81005aa4-3a6b-4f6a-9054-7ab69341ff3f
 - Project: 太仓G zhi1-web-admin; code baseline: none
 
+## 验证与归属
+- 所属项目：太仓G
+- 验证证据：extracted source=cursor project=太仓G
+- 来源会话：81005aa4-3a6b-4f6a-9054-7ab69341ff3f
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

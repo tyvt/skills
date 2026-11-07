@@ -13,6 +13,7 @@
 - 重新暂存提交；若提交时 SIGKILL 是内存不足，减少单次暂存文件数或调高 NODE_OPTIONS=--max-old-space-size
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 5fbf0b20 提交失败，15 文件命中模式，全量重扫 507 个变更 .vue 后无剩余 Parsing error
 - 涉及文件：zhi2-web-admin/src/views/maintenance/accountQuery/index.vue、budget/index.vue、report/projectSummary/components/index.vue
 - 所属项目：园区物管2.0；代码基线 8f4427ecd；来源会话 5fbf0b20-9378-4a13-8296-bd55786a876a

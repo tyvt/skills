@@ -14,6 +14,10 @@
 - 涉及文件：`src/views/dataProperty/scrappedRecord/index.vue`、`detail.vue`、`src/mixins/listMixins.js`
 - 所属项目：产品2.0；来源会话：f8b4bd31-2a17-4162-a6aa-7b14123bf0f6；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

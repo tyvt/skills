@@ -12,6 +12,12 @@
 - Source session: 3db64a36-1496-41b9-ab85-8814face82c6
 - Code baseline: none
 
+## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
+- 来源会话：3db64a36-1496-41b9-ab85-8814face82c6
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

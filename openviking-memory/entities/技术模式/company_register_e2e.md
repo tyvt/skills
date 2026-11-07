@@ -11,6 +11,7 @@
 - package.json、company-register-branch.spec.js、api/company/companyRegister.js、e2e/fixtures/auth-helpers.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/010.md
 - 所属项目：苏州市房地产监测V3；来源会话：0e08e573-df60-4498-a959-795ecb00ec81；代码基线：none
 

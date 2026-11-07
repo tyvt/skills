@@ -10,6 +10,7 @@
 - 在 `data()` 定义 `unitCheckState: {}`，通过 `watch` 监听 `tableData`（`deep: true`、`immediate: true`）调用 `syncUnitCheckState()` 同步各单元选中状态。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/011.md
 - 涉及文件：zhi2-web-admin/src/views/components/BuildingTable.vue
 - 所属项目：2-0；来源会话ID：c16817a9-7cdf-427a-b135-24efd6fe2d95；代码基线：none

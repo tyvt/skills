@@ -17,6 +17,10 @@
 - 未改动模板结构、样式和任何分支判断
 - 所属项目：小程序（wygl-wxxcx-dev-slh）；来源会话：b300def8-6c07-409d-ac21-89114d486c21；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "小程序技术",

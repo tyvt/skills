@@ -21,6 +21,11 @@
 - 来源会话：`7ffb3be2-f8de-4608-8768-cc04a3088249`
 - 代码基线：none
 
+## 验证与归属
+- 所属项目：惠山二期G
+- 验证证据：extracted source=cursor project=惠山二期G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术标准",

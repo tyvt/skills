@@ -11,6 +11,7 @@
 - 修改文件：zs-table-column.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话：1cc96294-89aa-419f-a3f0-3c4fbc943d76
 - 涉及路径：zhi2-web-admin/src/views/property/workOrder/category 等
 

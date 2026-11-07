@@ -13,6 +13,7 @@
 - 页面侧在同步originForm前完成getArea()等派生赋值，勿再手写originForm
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：地块编辑页未改任何字段直接F5，因sessionStorage假缓存跳过getDetail；结论程序化赋值与originForm时序是根因
 - 涉及文件：zhi2-web-admin/src/mixins/detailMixins.js、zhi2-web-admin/src/views/building/plot/detail.vue
 - 所属项目：园区公共收益；来源会话：0bafb3e6-385f-404a-b48a-91cebb47c939；代码基线：86a4227

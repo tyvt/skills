@@ -18,6 +18,11 @@ In Suzhou Real Estate Monitoring V3, `contractRequest.js` `getFlowViewer` and `i
 - Evidence: src=苏州市房地产监测V3/124.md
 - Project: 苏州市房地产监测V3; Session: 957b5194-9887-4b03-a4b2-f48dde8ed5fa; Baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：957b5194-9887-4b03-a4b2-f48dde8ed5fa
+
 
 <!-- MEMORY_FIELDS
 {

@@ -11,6 +11,7 @@
 - 核心改动：用 v-if="detailInfo.name" 控制有数据展示详情，无数据显示 <ZsEmpty v-else />
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：committee/info、subdistrict/info、community/info 三个 index.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：ef21dfdb-fbbc-4ce0-8b23-8c2aadf81301；代码基线：none
 

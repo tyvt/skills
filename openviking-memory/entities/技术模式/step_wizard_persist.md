@@ -10,6 +10,8 @@
 - 借 `uni.$emit('recordStepSaved')` 回传数据。
 - `pages.json` 注册 `record/editStep` 路由。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/018.md
 - 涉及文件：src/staff/pages_facility/record/add.vue、src/staff/pages_facility/record/detail.vue、src/staff/pages_facility/repair/add.vue、src/staff/components/PageButton/PageButton.vue、src/pages.json、src/staff/api/maintenance.js、src/staff/pages_facility/repair/submit.vue、src/staff/pages_facility/record/editStep.vue
 - 来源会话ID：81f4c5db-d6ab-4997-8c61-67a131a447db

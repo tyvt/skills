@@ -11,6 +11,8 @@
 - mergeRecordForm 及详情通过 `administrativeArea || provinceCityArea` 兼容旧数据，加载 ECONOMIC_INSTITUTIONS_REGION 字典展示
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/104.md；src=苏州市房地产监测V3/113.md
 - 涉及文件：institution/record/detail.vue、institution/record/index.vue、AgencyApplyDialog.vue、CompanyBasicInfoForm.vue、companyApply/detail.vue、companyRecordAgency/index.vue、companyApplyAudit/detail.vue、companyCancel/detail.vue、companyBasicInfoContent.js、detailMixins.js、companyRecord.js、路由信息.json、institution-helpers.js、institution-register-flow.spec.js
 - 来源会话ID：c41f1e6e-6285-4e62-b90d-cf6473627bf9；b87a6819-b6e9-446b-8864-ad0ee4ca0fc1；代码基线：none

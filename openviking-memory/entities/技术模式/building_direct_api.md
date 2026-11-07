@@ -7,6 +7,7 @@
 - 保留 BuildingStateTable.vue 自适应 Grid、动态列宽与 overflow 可见布局，避免同层多户被 CSS 裁切
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 验证证据：src=惠山二期G/006.md
 - 涉及文件：views/components/BuildingStateTable.vue、views/building/buildingTable/index.vue、views/building/project/detail.vue、utils/buildingFloorGroup.js
 - 所属项目：惠山二期G；来源会话：9da606ce-856f-468c-9dca-d8063172f462；代码基线：none

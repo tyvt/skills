@@ -16,6 +16,10 @@
 - 涉及文件：src/store/modules/user.js、src/layout/components/Navbar.vue、src/layout/index.vue。
 - 所属项目：园区物管2.0；来源会话：7cc4a853-05fc-4b7d-833f-c45e8ba67283；代码基线：49e7729ce。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -12,6 +12,7 @@
 - `DetailTop.vue`：修正决策类型展示逻辑，避免无数据时误显示「排序表决」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 所属项目：昆山市民；代码基线：none
 - 来源会话ID：3942ce22-16bf-4c69-b5d2-a3469d6db4fb
 - 涉及文件：src/pages_vote/vote/votedetail.vue、src/pages_vote/vote/index.vue、src/pages_vote/vote/components/DetailTop.vue、src/pages.json、src/stores/vote.js、src/api/modules/vote.js

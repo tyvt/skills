@@ -7,6 +7,7 @@
 - 避免直接用 userStore.projectName/userStore.address 拼接
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 来源会话：07179d96-198e-473a-9756-27bdde80b66b
 - 涉及文件：pages_benefit/benefit/index.vue、pages_benefit/elevatorPubEngCons/index.vue
 - 所属项目：无锡市区小程序嵌入H5

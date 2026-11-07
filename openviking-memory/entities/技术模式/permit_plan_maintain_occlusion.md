@@ -11,6 +11,8 @@
 - `detail.vue` 传递 `planPanelReadonly` 和 `canOperatePlan` 以对齐按钮和导航
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：5c95c517-e8ad-4225-b0de-55c6271384c8
 - 验证证据: src=苏州市房地产监测V3-rest/073.md
 - 涉及文件: AppendixRequirementCard.vue, PermitInfoPanel.vue, PermitPlanPanel.vue, detail.vue, Headline/index.vue, AppendixEmpty/index.vue, index.vue, CashsaleDetail.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 5c95c517-e8ad-4225-b0de-55c6271384c8; Baseline: none

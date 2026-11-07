@@ -11,6 +11,7 @@ zs-button 通过 ICON_MAP 将 el-icon-xxx 映射到 Element Plus 图标，原映
 - 引入的 Element Plus 图标组件：Plus、CirclePlus、Delete、Edit、Search、Check、View、Upload、Download、MoreFilled、Menu
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：Process/index.vue ; zhi2-web-admin/src/components/zs-button/zs-button.vue
 - 所属项目：2-0；代码基线：none
 - 验证证据：src=2-0/016.md

@@ -15,6 +15,7 @@
 - 详情页 ResultRecord.vue 自己按 ID 拉取决策人姓名，不依赖列表传参；选举与决策同构双份改一处同步另一处。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；代码基线：f1939b0；来源会话ID：35a00989-4b03-4dae-8d47-d5841ef5d71f。
 - 涉及文件：zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue、pages_vote/decision/common/DecisionResult.vue、pages_vote/elect/ResultRecord.vue、components/CardList/CardList.vue、api/autonomy.js。
 - 验证：会话贴出 detail 接口完整响应含 decisionPlayerName，结论归因分组丢字段与覆盖。

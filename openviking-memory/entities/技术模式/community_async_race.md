@@ -10,6 +10,7 @@
 - 本质是异步竞态而非字典配置缺失，需保证 communityOptions 就绪后再转译或做兜底
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/property/complex/detail.vue、main.js
 - 所属项目：园区物管2.0；来源会话：2bea6416-3e83-4b54-af77-1e2e56704a2a；代码基线：none
 

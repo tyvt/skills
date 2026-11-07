@@ -12,6 +12,8 @@
 - 在 `AppendixPackageSection/index.vue` 中添加对组件 `AppendixEmpty` 的导入和注册
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：3e018025-42b0-4579-8189-908990fe5d69
 - 验证证据: src=苏州市房地产监测V3-leftover/067.md
 - 涉及文件: conLandLic/detail.vue, conLandLic/changeDetail.vue, AppendixPackageSection/index.vue, presale/surveyChange/detail.vue, AppendixEmpty/index.vue, presale/permitCancel/detail.vue, companyAdmin/detail.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 3e018025-42b0-4579-8189-908990fe5d69; Baseline: none

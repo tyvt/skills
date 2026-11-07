@@ -16,6 +16,7 @@
 - developerBasicInfoContent.js、institution/agencyPersonnel/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/010.md
 - 所属项目：苏州市房地产监测V3；来源会话：8938ed10-af4c-44bf-8d0c-5e1178985b2e；代码基线：none
 

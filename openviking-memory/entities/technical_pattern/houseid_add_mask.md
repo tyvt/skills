@@ -11,6 +11,7 @@ i淮安H5 在存在 houseId 时调用添加业主接口并加全屏遮罩防重�
 - 方法头 if (this.submitting) return 拦截重复提交
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安H5
 - 验证：src=i淮安H5/002.md
 - 涉及文件：src/pages_owner/house/automaticAdd.vue、src/pages_owner/repair/submit.vue、src/components/ZsButton/ZsButton.vue、src/pages_owner/decision/components/StepSign.vue、ViewOptionsList.vue
 - 所属项目：i淮安H5；来源会话：0827ee09-4d39-4174-b6b1-6333e223e06e；代码基线：none

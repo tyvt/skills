@@ -18,6 +18,12 @@
 ## 验证
 - 验证证据: src=门户/021.md; 会话: f0d5550d-7371-4ca0-ba93-0e9506808d82
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：f0d5550d-7371-4ca0-ba93-0e9506808d82
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

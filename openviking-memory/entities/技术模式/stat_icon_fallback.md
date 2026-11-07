@@ -11,6 +11,8 @@
 - 映射统一维护在 STAT_ICON_MAP，statIconStyle 做兜底扩展。
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证：operatingAssets.vue 中 STAT_ICON_MAP 增加 净水机->饮水机数量.png，statIconStyle 兜底扩展。
 - 涉及文件：src/views/benefit/statisticsMap/operatingAssets.vue。
 - 来源会话：001-stat-icon、331457b6-6823-45bd-8ba1-738beb9d587c；代码基线：none。

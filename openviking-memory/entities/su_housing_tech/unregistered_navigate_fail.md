@@ -14,6 +14,12 @@ houseLoanGuide/index.vue jumped to an unregistered page pages/policy/fddydetail 
 - Files: houseLoanGuide/index.vue, pages.json, transaction.js, webViewNav.vue, bankList.vue, bankDetail.vue, taxGuide/index.vue, utils/index.js
 - Source session: 2d03bb3e-84c4-4246-ae8a-bea874fd391d
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：2d03bb3e-84c4-4246-ae8a-bea874fd391d
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_tech",

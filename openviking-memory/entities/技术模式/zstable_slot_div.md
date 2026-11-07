@@ -12,6 +12,7 @@
 - 考评周期等短文本列用 minWidth 100 而非固定 width 220，避免挤占剩余均分空间。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 6c3d92d7（基线 864b409）用户反馈表头省略、表格错位，改 <span>+minWidth≥100、先加载列再请求数据+:key+doLayout、考评周期 width220→minWidth100。
 - 涉及文件：zhi2-web-admin/src/views/credit/assessment/search.vue。
 - 所属项目：苏住房G；来源会话ID：6c3d92d7-7d4f-47a5-a873-d3825a9cd6b4；代码基线：864b409

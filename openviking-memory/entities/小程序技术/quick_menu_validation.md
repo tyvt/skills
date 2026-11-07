@@ -7,6 +7,8 @@
 - 顶部快捷菜单里的「业主决策」仍走外链 H5 投票逻辑
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：007.md 会话：共有资金表决菜单入口增加与校验绑定房屋
 - 涉及文件：pages/webview/home.vue、pages.json
 - 来源会话ID：f1c8f7f6-c39d-4e69-96a6-072e8babb312；代码基线：none

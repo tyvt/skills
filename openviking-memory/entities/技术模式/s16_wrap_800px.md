@@ -13,6 +13,7 @@
 - sz-contract.scss定义.s16-party-table-wrap的overflow-x:auto及表min-width为1080px/960px
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/062.md；src=苏州市房地产监测V3/113.md
 - 涉及文件：chapter1.vue、sz-contract.scss、BuyerTable.vue、chapter2.vue、SzContent.vue、validation.js、presale/template/detail.vue、路由信息.json、package.json等
 - 所属项目：苏州市房地产监测V3；来源会话：2e78864c-5df3-46ef-aa31-0ee09b53f9fd；代码基线：none

@@ -6,6 +6,8 @@
 ## 解决方案
 - 统一弹窗内表单元素渲染方式，避免原生 input 与组件混用。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/005.md
 - 涉及文件：src/pages.json、src/staff/pages_facility/record/add.vue、src/components/ZsTextarea/ZsTextarea.vue、src/staff/components/ZsUploader/ZsUploader.vue、src/uni.scss、src/staff/pages_facility/repair/submit.vue、src/staff/pages_facility/issue/components/CompleteDialog.vue、src/README.md
 - 来源会话ID：11a4e214-e500-42a0-9c0a-82e53325ad0f

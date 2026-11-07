@@ -12,6 +12,7 @@
 - uni.scss将.rich-text的max-width/overflow/word-break提升为全平台；ZsRichText根容器加max-width:100%+overflow:hidden
 - 同类富文本内表格/iframe/长英文字符串也应在字符串层处理
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话0f7f7bd6（2026-08-21，基线9832ba3）截图要求限宽，结论rich-text无法外部CSS控img，改formatRichTextContent注入样式
 - 涉及文件：src/utils/index.js、components/ZsRichText/ZsRichText.vue、uni.scss、pages_transaction/buyHousePolicy/detail.vue
 - 所属项目：苏住房C；来源会话ID：0f7f7bd6-7929-4524-8766-b29fbb4c9405；代码基线：9832ba3

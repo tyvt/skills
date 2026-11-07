@@ -13,6 +13,7 @@
 - ZsPrint 是全局组件，改它同时影响所有多模板打印页（开户通知书、各类申请表），改完需回归非子路径环境打印
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 a423ec75「打印的打开路径要改为相对的」→ window.open(`${window.origin}${res.data}`) 在 /test/ 部署下丢前缀，改为 resolveServerAssetUrl(...)，printWay==2 与 HTTP 模板地址两处同改
 - 涉及文件：d:\repository\苏住房G\zhi2-web-admin\src\components\ZsPrint\index.vue；benefit\pubRegulatoryAccount\detail.vue；components\OperationBtnGroup\index.vue
 - 所属项目：苏住房G；来源会话ID：a423ec75-91b1-4249-9830-1fd5d9f6e665；代码基线：864b409

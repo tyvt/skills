@@ -13,6 +13,8 @@ wygl小程序「业主决策」菜单从点击到进入表决H5的完整交互�
 - 维修资金等其它功能仍用原 ensureOwnerVerified()(有手机号直跳实名页)，与业主决策入口逻辑区分
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：008.md 会话69631682/f16e6ba9、009.md 会话24b99026
 - 涉及文件：pages/webview/externalWebview.vue、pages/webview/home.vue、utils/portal-h5-webview.js
 - 来源会话ID：69631682-9401-4bb4-bd61-d、f16e6ba9-0ef7-4d9a-8278-5ef26eb7c22f、24b99026-d930-474c-94f5-946b2e5b7235、6ee1f9e2-e92a-4b85-a26a-c8d8507a5363；代码基线：none

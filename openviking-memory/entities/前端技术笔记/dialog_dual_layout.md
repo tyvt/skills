@@ -13,6 +13,7 @@
 - 表格加 max-height（如 360）防止弹窗过高
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：根因含布局容器用错 sub-container、total=0 仍走表格、medium 尺寸偏大、加载闪烁四类
 - 涉及文件：zhi2-web-admin/src/views/building/houseImport/detail.vue、zhi2-web-admin/src/views/building/houseImport/components/HouseTable.vue
 - 所属项目：园区物管2.0；代码基线 193a9a3b6；来源会话 5b2911f5-d317-4814-93d2-d063ea72a749

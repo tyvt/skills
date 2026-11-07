@@ -14,6 +14,12 @@
 ## 验证
 - 来源: cursor session=f8b4bd31-2a17-4162-a6aa-7b14123bf0f6
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：f8b4bd31-2a17-4162-a6aa-7b14123bf0f6
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "defeito",

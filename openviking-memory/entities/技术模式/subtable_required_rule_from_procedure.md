@@ -12,6 +12,7 @@ dataProperty 巡保记录（recordProcess）步骤子表弹窗中，「说明/�
 - 重写 detailCallback：合并详情数据后再拉一次配置同步规则，保证详情异步返回后校验仍对齐；弹窗打开先拉配置再 init()
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 4d8f8198 结论 detail.vue 传 :procedure-id，recordProcessStepDialog 新增 procedureId prop、view/edit 调 procedureProcess/page 按 processSerial 匹配取 isExplain/isPicture，detailCallback 重写为详情返回后再拉一次配置，失败兜底 detailForm
 - 涉及文件：zhi2-web-admin/src/views/dataProperty/recordProcess/components/recordProcessStepDialog.vue、recordProcessStepTable.vue、zhi2-web-admin/src/mixins/subTableMixins.js
 - 所属项目：产品2.0；来源会话：4d8f8198-d7b1-458f-891e-5a0c95b1090a；代码基线：76646e6

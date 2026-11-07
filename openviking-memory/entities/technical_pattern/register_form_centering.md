@@ -16,6 +16,11 @@ In Suzhou Real Estate Monitoring V3, narrow-form containers and button bars were
 - Session: af3642fe-ee91-400a-8b23-d627c47ceb5b
 - Files: companyRegister.vue, Step2LegalPerson.vue, Step5Result.vue, Step1CompanyInfo.vue, route info.json, package.json, e2e/register/company-register-visual.spec.js, vite.config.js
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：af3642fe-ee91-400a-8b23-d627c47ceb5b
+
 
 <!-- MEMORY_FIELDS
 {

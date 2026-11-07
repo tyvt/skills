@@ -16,6 +16,7 @@
 - 排查顺序：先看容器高度与遮挡，再看 focus/v-model 逻辑，最后才怀疑组件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：d8d3c33d-5a07-488c-9663-dd7409ec4528；代码基线：8fc3cc5
 - 涉及文件：src/pages_owner_extra/elevator/addAlone.vue、add.vue、input.vue、src/styles/form2.scss、src/components/ZsTextarea/ZsTextarea.vue
 

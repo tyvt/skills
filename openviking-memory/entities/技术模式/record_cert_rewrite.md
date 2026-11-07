@@ -11,6 +11,8 @@
 - 登记机构固定为 苏州市住房和城乡建设局
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：c0e6e780-7c64-4045-ac06-51b5d3a2354a
 - 验证证据: src=苏州市房地产监测V3-leftover/004.md
 - 涉及文件: RecordCertificateDialog.vue, institution/record/index.vue, api/company/companyApply.js, companyApplyAudit/detail.vue, 前端技术信息.md
 - 所属项目: 苏州市房地产监测V3; 会话: c0e6e780-7c64-4045-ac06-51b5d3a2354a; Baseline: none

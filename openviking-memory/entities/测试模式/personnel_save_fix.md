@@ -12,6 +12,7 @@
 - personnel-certificate-crud.spec.js 优化 clickSaveButton，改用 getByRole('button', { name: /保存/ })，填写后先等待「保存」按钮可见
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 本地验证：02 增 - 创建测试从业人员 已通过
 - 已知限制：03 证书增删改查全量跑仍可能失败（服务器异常 / 没有访问权限），新建人员业务状态为待确认时后端对证书新增更新返回 500 或权限错误
 - 涉及文件：detail.vue、personnel-certificate-crud.spec.js

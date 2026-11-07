@@ -12,6 +12,7 @@
 - 修正 Pinia 持久化导致的旧 token 恢复
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 涉及文件：src/utils/wxLogin.js、src/stores/user.js、src/pages_myhouse/index.vue、src/pages_benefit/benefit/index.vue
 - 所属项目：昆山市民；来源会话ID：5879f04f-c762-41db-942c-5ca6acb2e3ce；代码基线：none
 

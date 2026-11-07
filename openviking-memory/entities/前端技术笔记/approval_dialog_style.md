@@ -7,6 +7,7 @@
 - `.batch-tip` 增加 `white-space: nowrap` 保证「批量处理 X 条数据」单行显示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：BatchApprovalDialog.vue 等
 - 所属项目：园区公共收益；来源会话：7bba50ec-878d-4ecc-aa51-2d784ce86b6d
 

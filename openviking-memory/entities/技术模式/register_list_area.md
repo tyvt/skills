@@ -12,6 +12,7 @@
 - formatRegion兼容旧数据回退provinceCityArea
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/115.md
 - 涉及文件：institution/record/index.vue、company/institutionRegister/detail.vue、company/institutionRegister/index.vue、mixins/listMixins.js、mixins/table.js、api/institution/institutionRegister.js、company/companyCancel/index.vue、company/companyApplyAudit/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：90b0db5f-1875-41f4-8bc9-1e1a01c65775；代码基线：none

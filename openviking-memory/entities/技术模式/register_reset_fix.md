@@ -11,6 +11,7 @@
 - zhi2-web-admin/e2e/register/company-register-reset.spec.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：a2982d33-2adc-4202-be1c-6587aaa98437；代码基线：none
 
 <!-- MEMORY_FIELDS

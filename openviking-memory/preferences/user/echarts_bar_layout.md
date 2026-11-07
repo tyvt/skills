@@ -3,6 +3,12 @@
 - Set `grid.top=6`, `grid.bottom=32`, and `nameTextStyle.padding` left `2` to reduce margins.
 - Verified from cursor session 22e0765c-90e6-46b3-bfc1-bac3f4a724a4; related files: fundPanorama/index.vue, assetPanorama/index.vue, package.json, fundPanorama/mock.js.
 
+## 验证与归属
+- 所属项目：园区物管2.0
+- 验证证据：extracted source=cursor project=园区物管2.0
+- 来源会话：22e0765c-90e6-46b3-bfc1-bac3f4a724a4
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

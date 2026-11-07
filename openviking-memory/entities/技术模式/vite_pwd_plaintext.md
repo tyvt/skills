@@ -16,6 +16,7 @@
 - 个人中心、顶部改密弹窗、强制改密弹窗等所有入口改调该 API，避免页面各自加密
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 验证：重启 dev 并硬刷新，Network 确认密码字段为密文（如 Base64 形态），不只看能否改成功
 - 涉及文件：zhi2-web-admin/src/api/system/profile.js、views/system/user/profile、views/login.vue、api/index.js
 - 所属项目：惠山二期G；来源会话：c458c0e2-e264-43ca-a51b-78d564dfcdd6；代码基线：bda09e5

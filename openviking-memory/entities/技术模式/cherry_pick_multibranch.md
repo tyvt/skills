@@ -18,6 +18,7 @@
 - cherry-pick 须人工确认未把只属于源分支的必填校验/参数改动带走或丢下（已知同类教训：漏恢复必填校验）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 会话 2ee3fa7e 结论：子模块 d87a19724 → v2.6.2 97cb12059 / v2.6.2-yulin f36236202 均为 cherry-pick
 - 父仓库 669d166/c2d4531/90b47f6 更新指针；env/.env 未提交，工作区恢复 develop/v2.6.1
 - 所属项目：产品2.0；来源会话：2ee3fa7e-3302-4162-9884-a54bd1cffc7f；代码基线：6accf9a

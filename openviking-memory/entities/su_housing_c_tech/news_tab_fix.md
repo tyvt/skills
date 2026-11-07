@@ -9,6 +9,7 @@
 - 去掉多余 `word-break: keep-all`
 - `ul` 重置 `margin: 0`
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译后tab应横向显示「市住建」「张家港市」等并可左右滑动
 - 涉及文件：pages_main/news/index.vue、pages/news/index.vue、ListIndex.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：9bedfd55-6428-4419-b1a7-8396206c9412；代码基线：none

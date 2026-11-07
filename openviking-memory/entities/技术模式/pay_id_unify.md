@@ -10,6 +10,8 @@
 - 替换由 `payInfo` 返回的 `orderNo`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：22489706-6592-40f4-b567-7d65ec1e013f
 - 涉及文件: spFeeBill/components/collectionDialog.vue, spFeeBill/components/index.vue, bill/components/PaymentDialog.vue, spFeeBill/components/enums.js
 - 所属项目: 产品2.0; 来源: 035.md; 会话: 22489706-6592-40f4-b567-7d65ec1e013f
 

@@ -7,6 +7,8 @@
 - 各详情页 HeadTitle 与「基本信息」间距统一降至 12px
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/093.md
 - 涉及文件：styles/index.scss、HeadTitle/index.vue、Headline/index.vue、variables.css、AgencyPersonnelDetail.vue、AgencyBranchDetail.vue、AgencyBasicInfoDetail.vue、personnelRecord/detail.vue
 - 来源会话：8a3f6885-01ea-45ad-9ee1-c73826610428；代码基线：none

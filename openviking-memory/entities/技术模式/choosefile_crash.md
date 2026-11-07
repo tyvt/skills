@@ -16,6 +16,7 @@
 - 改完要在微信开发者工具真机路径复测整条上传链路，而非只在 H5 预览
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 f62dbdc4（基线 5f0f4dc）用户贴出 TypeError 完整栈，结论为小程序端不支持该 API，改为按平台分派并抽 uploadSelectedFile
 - 涉及文件：zhi2-mobile-shimin/src/components/ImageUploader/ImageUploader.vue、zhi2-mobile-shimin/src/pages_owner/house/owner/register.vue、zhi2-mobile-shimin/src/api/file.js
 - 所属项目：苏住房C；来源会话：f62dbdc4-5a71-4b38-86cc-ade4a540eb59；代码基线：5f0f4dc

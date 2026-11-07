@@ -13,6 +13,7 @@
 - 数值细节统一在 tooltip.formatter 维护，避免 label 与 tooltip 重复改两处不一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 d0dd6cf9 fundPanorama renderDistrictPie 将 formatter 改为 p.name；会话 343f11cc 改为单行「数值 (百分比%)」；会话 a281575d assetPanorama 去掉 label 上 donutUnit「个」
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue
 - 所属项目：园区物管2.0；代码基线：f00310232；来源会话：d0dd6cf9-d65d-4e4b-b5cc-cf2bd98cd879, 343f11cc-909d-4634-8fc1-daffbd6a86a1, a281575d-c847-4a84-babf-b692fa9b404a

@@ -17,6 +17,7 @@
 - 排查时在浏览器开发者工具看图片请求 URL 是否变成 ./static/images/icon-xxx.png 即可确认
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 80e004b0 用户报「这个页面的图片在苏服办里面没法正常显示」，定位 add.vue 内联 :style 写死相对路径，改用 resolveStaticUrl(`images/icon-${prefix}-${icon}.png`) 后重新打包部署正常
 - 涉及文件：src/pages_owner/repair/add.vue、vite.config.ts、src/utils/index.js
 - 所属项目：苏住房C；来源会话ID：80e004b0-7fee-4cde-af50-62f07a822d3a；代码基线：e04432d

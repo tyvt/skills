@@ -12,6 +12,7 @@
 - 排查「xx不能为空」类报错先确认参数是表单字段还是store上下文参数，勿先查权限
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话75b9fd04用户截图报错并指出复杂小区参数即可；当前代码核实register.vue:173-176已含complexId
 - 涉及文件：pages_owner/house/owner/register.vue、addHouse.vue、bindProject.vue、store/house.js、api/property.js
 - 所属项目：苏住房C；来源会话：75b9fd04-a06e-4dd9-a25b-46eb96b4328a；代码基线：0011377

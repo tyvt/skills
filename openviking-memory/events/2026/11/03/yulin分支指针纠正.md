@@ -14,6 +14,10 @@ develop/v2.6.2-yulin 父仓库提交 d32ba38，子模块指针从误指的主干
 【来源会话ID】c7367ebb-f778-4c8b-8bf6-10398d2dbd47
 【代码基线】6accf9a
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "yulin分支指针纠正",

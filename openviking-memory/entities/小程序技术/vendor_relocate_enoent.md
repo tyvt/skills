@@ -16,6 +16,7 @@
 - 排查顺序固定为先看prod dist里vendor引用路径是否真实存在，不从业务组件图片/资源入手
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话87fe1c13控制台ENOENT指向dist/node-modules/z-paging/...与@dcloudio/uni-ui/lib/uni-datetime-picker/...；结论根因是relocate脚本删主包依赖而vendor仍引用主包路径；修复后z-paging.wxss存在于主包
 - 涉及文件：zhi2-mobile-shimin/vite.config.ts、scripts/restore-main-vendor-deps.mjs、package.json
 - 所属项目：苏住房C；来源会话ID：87fe1c13-6937-4a04-8752-5102a7dffe63；代码基线：8520c36

@@ -12,6 +12,7 @@
 - 匹配规则增强：字典未加载时用默认编码兜底（产权 1、公共 2 等），并同时支持字典编码与标签文本匹配
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：会话 c1dae8a0-fd64-44e9-b546-e8a29c03a844
 - 涉及文件：src/views/benefit/statisticsMap/operatingAssets.vue
 - 所属项目：园区物管2.0；来源会话ID：c1dae8a0-fd64-44e9-b546-e8a29c03a844；代码基线：none

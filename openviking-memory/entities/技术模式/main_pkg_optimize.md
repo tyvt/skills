@@ -15,6 +15,10 @@
 - 涉及 package.json、vite.config.ts、scripts/size-main-package.mjs、src/pages.js
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 bee1d6dc-9e69-4597-9d07-f327a5058b0c；代码基线 none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

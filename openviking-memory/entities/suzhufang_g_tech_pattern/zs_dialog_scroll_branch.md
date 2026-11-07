@@ -11,6 +11,12 @@ On branch develop/v2.6.2-suzhufang, the zs-dialog--scrollable commit causes dial
 - Files: zhi2-web-admin/src/views/system/menu/index.vue, zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue
 - Project: 苏住房G; Source session: 17392583-56a4-49a0-82fb-430a5f1aadfe; Code baseline: none
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：17392583-56a4-49a0-82fb-430a5f1aadfe
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "suzhufang_g_tech_pattern",

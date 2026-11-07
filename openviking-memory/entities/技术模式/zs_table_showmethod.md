@@ -14,6 +14,7 @@
 - 修法应落在 zs-table 组件层而非各页面自写 summary 方法；与「表底统计统一交给 zs-pagination」是两回事（行小计 vs 总条数）。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 5c7bbda7 改 rangeTable.vue 的 showMethod 列识别与字段兼容后 summary 正常渲染，涉及 zs-table 组件与多处 rangeTable 消费方。
 - 涉及文件：src/components/zs-table/zs-table.vue、src/views/property/complex/components/rangeTable.vue、src/views/property/handover/components/deliveryRangeTable.vue。
 - 所属项目：园区物管2.0；来源会话：5c7bbda7-0993-453f-a4a2-a1efa119c858；代码基线：7814a0c2a。

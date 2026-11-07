@@ -11,6 +11,8 @@
 - syncSelectionViews 批量同步视图。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
+- 来源会话：c29b0f5b-9525-4f3a-8736-42c569de1575
 - 验证证据: cursor session c29b0f5b-9525-4f3a-8736-42c569de1575
 - 文件: zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue, zhi2-web-admin/src/views/autonomy/mixins/decisionRangeBuildingSelectMixins.js, zhi2-web-admin/src/views/autonomy/multiply/components/DecisionRangeTable.vue, zhi2-web-admin/src/views/autonomy/general/components/DecisionRangeTable.vue, zhi2-web-admin/src/views/autonomy/option/components/VoteRangeDialog.vue, zhi2-web-admin/src/views/maintenance/facilityDefinition/index.vue, zhi2-web-admin/src/views/components/BuildingTable.vue, zhi2-web-admin/src/views/autonomy/repair/components/DecisionRangeTable.vue
 - 所属项目: 惠山二期G

@@ -15,6 +15,7 @@
 - 给封装表格加开关时必须确认它是真 prop 而非同名计算属性，否则 $attrs 透传会造成「传了不生效」的假 bug。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 442d7a82 确认配置 false 仍显示合计；修复落在 zs-table.vue（新增 prop + effectiveBottomSummaryVisible + 计算属性改名）与 ZsSummaryText/index.vue（写死「合计：」标题）。
 - 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、zhi2-web-admin/src/components/ZsSummaryText/index.vue、zhi2-web-admin/src/views/benefit/pubBankAccountBalance/index.vue。
 - 所属项目：园区物管2.0；来源会话 442d7a82-5af6-497e-bb37-b6b32de6979b；代码基线 b2b559778。

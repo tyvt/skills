@@ -12,6 +12,7 @@
 - 普通「价格备案(区县/市级)」「价格备案申请」等菜单逻辑不变
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`recordPriceMngSuzhou/index.vue`、`zhi2-web-admin/src/utils/ruoyi.js`
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：dbc55dba-6010-4384-9d71-56be65335631

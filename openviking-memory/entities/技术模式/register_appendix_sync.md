@@ -11,6 +11,8 @@
 - 需将注册单要件同步至备案 companyRecordId 补齐要件包
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/004.md
 - 涉及文件：路由信息.json、.workbuddy/memory/MEMORY.md、zhi2-web-admin/src/views/institutionRegister/components/Step3Appendix.vue、src/api/institution/institutionRegister.js、src/api/company/companyRegister.js、src/views/company/companyManagement/components/DeveloperBasicInfoDetail.vue、src/api/company/companyRecord.js、src/views/toB/companyRecord/detail.vue
 - 来源会话ID：6b984501-42f6-4b9b-a56e-364375c13c03；代码基线：none

@@ -10,6 +10,7 @@
 - 新增 `company-register-step3-appendix.spec.js` 覆盖预览与下载用例
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/153.md
 - 涉及文件：zhi2-web-admin/src/views/register/components/RegisterUploadItem.vue、institutionRegister/components/InstitutionUploadItem.vue、e2e/fixtures/register-helpers.js、e2e/register/company-register-branch.spec.js、register/components/Step3Appendix.vue、e2e/company/institution-register-real-api-flow.spec.js、e2e/register/company-register-visual.spec.js、package.json
 - 所属项目：苏州市房地产监测V3；来源会话：432660f8-cfe3-4a5d-b74b-1f972832c8df；代码基线：none

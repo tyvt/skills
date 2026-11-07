@@ -16,6 +16,7 @@
 - 凡「上一步写store、下一步跨小程序前后台后提交」表单均按 onLoad 快照+提交校验模式处理。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；代码基线：6599714；来源会话ID：fe7db194-e3eb-4ff2-81a5-4fc5d0da76f3。
 - 涉及文件：zhi2-mobile-shimin/src/pages_my/verification/FormManual.vue、FormLocal.vue、FormNonLocal.vue、src/store/user.js。
 - 验证：会话贴出 getRepeatByIdTypeAndIdNumber 返回 code 1101 完整请求，结论确认 onLoad 快照与兜底提示。

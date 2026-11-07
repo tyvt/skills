@@ -15,6 +15,7 @@
 - 通用教训：凡是被组件在回调前改写过的行字段，都不能当「变更前快照」用。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话 aadf551a 未备案单据启用→禁用提示后仍变禁用，根因 handleSwitchChange 先写新值。
 - 涉及文件：zhi2-web-admin/src/views/system/regionBankAuth/index.vue。
 - 所属项目：苏住房G；来源会话：aadf551a-5fa3-495e-9cfd-2fe0eba45d5b；代码基线：f9f3acf。

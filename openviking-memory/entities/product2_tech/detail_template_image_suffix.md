@@ -15,6 +15,12 @@ DetailTemplate 的 type:'image' 仅在后缀匹配 jpg/jpeg/png/gif/bmp/webp/svg
 - 涉及文件：zhi2-web-admin/src/views/dataProperty/scrappedRecord/detail.vue、src/mixins/detailMixins.js、src/views/maintenance/facility/components/FacilitySelectDialog.vue、src/mixins/form.js、src/views/dataProperty/recordProcess/components/detail.vue、src/views/property/complexDeliveryApply/components/facilityDialog.vue、src/views/maintenance/repair/detail.vue、src/views/dataProperty/recordProcess/components/recordProcessStepDialog.vue
 - 项目：产品2.0；source session: 321b7eb6-d1b4-4f6b-865c-11661215d619；code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：321b7eb6-d1b4-4f6b-865c-11661215d619
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "product2_tech",

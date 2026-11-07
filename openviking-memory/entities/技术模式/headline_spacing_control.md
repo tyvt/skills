@@ -10,6 +10,8 @@
 - 左右下内边距维持 16px（变量 `--detail-content-padding`），标题与下方间距固定12px
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/226.md
 - 涉及文件：HeadTitle/index.vue、styles/index.scss、Headline/index.vue、variables.css、detail-template.vue、mixin.scss、projectFeeApplyTable.vue、e2e/detail/headline-spacing.spec.js
 - 来源会话：167b3703-c8a7-49cb-99a1-7c5f83425618；代码基线：none

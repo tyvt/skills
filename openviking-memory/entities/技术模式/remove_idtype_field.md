@@ -6,6 +6,8 @@
 - 还影响 e2e 测试：agency-personnel-real-api-flow.spec.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：5d103f6d-b346-4d26-8144-3e36ee398668
 - 验证证据: src=苏州市房地产监测V3/266.md
 - 涉及文件: AgencyPersonnelDetail.vue, LeasePersonnelDetail.vue, e2e/institution/agency-personnel-real-api-flow.spec.js
 - 所属项目: 苏州市房地产监测V3; 会话: 5d103f6d-b346-4d26-8144-3e36ee398668; base: none

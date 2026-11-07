@@ -13,6 +13,10 @@
 - 涉及文件：zhi2-web-admin/src/views/autonomy/multiply/components/MaintainResultDialog.vue、property/partyOrganization/detail.vue、components/AmountInput/index.vue、benefit/pubElevMaintenanceIncome/detail.vue
 - 所属项目：产品2.0；来源会话：d7c7c5d4-1f13-462a-8aeb-c77645611399；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

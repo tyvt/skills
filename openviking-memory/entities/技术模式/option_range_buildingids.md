@@ -10,6 +10,7 @@
 - repairFunds/ownerApply/components/RangeHouseDialog.vue 也有相同 join(',') 写法，如报错可一并修改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证：刷新页面后多选楼栋，请求体变为 `buildingIds: ["14587", "20950"]`，接口正常返回户室列表
 - 涉及文件：estate/optionDecision/components/RangeHouseDialog.vue、repairFunds/ownerApply/components/RangeHouseDialog.vue
 - 所属项目：太仓G；来源会话：ed5871e8-b674-4437-be6c-e81ab129b3ce；代码基线：none

@@ -14,6 +14,10 @@
 - 涉及文件：zhi2-web-admin/src/components/zs-select/zs-like-select.vue、zhi2-web-admin/src/views/maintenance/depositNotice/company/components/AddDialog.vue。
 - 所属项目：园区物管2.0；来源会话：3212c3b1-6f35-4233-95e1-8433cc34e122；代码基线：7814a0c2a、041.md。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

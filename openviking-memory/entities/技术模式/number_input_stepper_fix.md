@@ -18,6 +18,10 @@
 - benefit/pubParkingRate/detail.vue
 - 所属项目：产品2.0；来源会话：5bb61819-6c43-4252-b895-b382e5a2b5f4；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -10,6 +10,7 @@
 - 需要推送到远程时再告知执行
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：0ebb2365-b4e4-48a3-b882-09b95f93edb2；代码基线：none
 - 涉及文件：d:/repository/产品2.0/zhi2-web-admin/vite.config.js
 

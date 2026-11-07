@@ -10,6 +10,8 @@
 - 执行 lint 或构建检查保障语法正确
 
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/012.md
 - 涉及文件：cardData.vue
 - 来源会话ID：7f3a94cb-db80-4ba1-862b-a2f18103f547；代码基线：none

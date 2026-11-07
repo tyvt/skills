@@ -10,6 +10,7 @@ personnelCertificate/index.vue 序号列 prop 误绑接口不存在的 billNo �
 - 新增 tableIndex 计算属性，按 (pageNum - 1) * pageSize + index + 1 计算翻页连续序号
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/120.md、src=苏州市房地产监测V3/320.md
 - 涉及文件：personnelCertificate/index.vue、companyApplyAudit/index.vue、listMixins.js、companyCancel/index.vue
 - 所属项目：苏州市房地产监测V3

@@ -8,6 +8,7 @@
 - 调用点外层包 try-catch 捕获 navigateTo 同步异常避免整页崩溃；苏服办 App 内只走官方 SDK 不加降级分支
 - 排查先问清「微信内置浏览器」还是「某小程序 webview」，两者限制不同；改完必须重新构建部署，dev 热更新看不到效果
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：src/utils/sfb.js、src/pages/policy/fddydetail.vue、src/pages.json、szffluzm/index.html、src/components/ZsRichText/ZsRichText.vue、src/utils/index.js、szffluzm/assets/index-a16cb42d.js、src/index.html
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 11c71496-2c86-4af0-8987-a08453f769f0；代码基线 77666f8
 

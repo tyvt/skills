@@ -14,6 +14,7 @@
 - 银行划拨记录仍在表单内纵向排列，并限制为 100% 宽度
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue、zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue、zhi2-web-admin/src/views/benefit/pubPaymentNotice/components/pubTradeDetailTable.vue、zhi2-web-admin/src/components/Headline/index.vue、zhi2-web-admin/src/components/detail-template/detail-template.vue
 - 所属项目：园区公共收益；来源会话ID：f53fddf6-9d9b-42a6-9a58-e51a3a7f7298；代码基线：7cc1625
 

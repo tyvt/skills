@@ -12,6 +12,7 @@ Vue2 中 Object 类型 prop 采用传入对象整体替换 default，宿主只�
 - 与「仅补 treeUrl/treeKey/treeLabel 消除 prop 校验告警」是不同故障面
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 e19f246b 中 pubExpenditureContract/detail.vue 的 showBankDialog 树配置缺 treeMethod；结论说明 Object prop 不合并默认值，并在 zs-select-dialog-func.vue 增加 DEFAULT_TREE_CONFIG 合并
 - 涉及文件：zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue、zhi2-web-admin/src/views/benefit/pubExpenditureContract/detail.vue
 - 所属项目：园区公共收益；来源会话：e19f246b-8b3f-4ed0-b2bc-12291e2e6315；代码基线：08d3255

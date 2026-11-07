@@ -9,6 +9,8 @@
 - `detail.vue` 读取改 `uni.getStorageSync` 并增 `|| '{}'` 防空值报错
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：my.vue、detail.vue、list.vue
 - 验证：src=苏住房C/081.md；来源会话：f3006cc6-3479-4cab-8a4c-e366714a4084
 - 项目：苏住房C（zhi2-mobile-shimin 市民端）

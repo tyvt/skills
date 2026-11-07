@@ -10,6 +10,8 @@
 - `pages.json` 为 `record/add` 设置 `backgroundColor:#f7f7f7`。
 
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/009.md
 - 涉及文件：src/staff/pages_facility/record/add.vue、src/pages.json、src/components/ZsPicker/ZsPicker.vue、src/components/ZsDatePicker/ZsDatePicker.vue、src/components/ZsTextarea/ZsTextarea.vue、src/components/ZsBottomPopup/ZsBottomPopup.vue、src/App.vue、src/uni.scss
 - 来源会话ID：7fb6aec0-5b23-4dcc-b12b-ba50b64b55e9

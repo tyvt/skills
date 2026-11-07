@@ -9,6 +9,7 @@
 - .card-header-text 可用 translateY(dw(-3)) 微调垂直位置。
 - .card-body 恢复四边 padding 与标题区留白。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 会话 36da1bfd 最终结论：原因 .card-header 用了 overflow:hidden，叠上 card-body 白底后标题下半截被裁掉。
 - 已改 overflow:visible、z-index:3、tab 内边距 4/14/11、translateY(dw(-3))、card-body padding dw(14)；Playwright 加 header 盒内断言 2 passed。
 - 涉及文件：zhi2-web-admin/src/views/home/index-new.vue、zhi2-web-admin/tests/e2e。

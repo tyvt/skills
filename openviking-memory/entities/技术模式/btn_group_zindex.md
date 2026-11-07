@@ -11,6 +11,7 @@
 - 涉及文件：src/components/OperationBtnGroup/index.vue、src/layout/components/Navbar.vue、src/layout/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 所属项目：园区物管2.0；来源会话：2c210045-05e2-4f43-9233-fc8c952365a9；验证证据：cursor 会话提取
 
 <!-- MEMORY_FIELDS

@@ -10,6 +10,7 @@
 - formatWanValue 最多保留两位小数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js、index.vue、dataHelpers.js
 - 所属项目：园区物管2.0；来源会话：dd77c94d-98a5-4f59-b393-fb5a4f521aff；代码基线：none
 

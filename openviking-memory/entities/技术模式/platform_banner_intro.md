@@ -8,6 +8,7 @@
 ## 涉及文件
 - zhi2-web-admin/src/views/home/UnifiedLogin.vue
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：src=门户/034.md
 - 来源会话ID：9ad67057-f5d1-4085-a148-6d6c43688cee；代码基线：none；所属项目：门户
 

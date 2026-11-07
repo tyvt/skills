@@ -10,6 +10,7 @@
 - 取消G端skip-fetch，地图弹窗统一走真实接口
 - 项目主键统一为resolvedProjectId = complexId ?? projectId ?? sourceData.projectId，无主键渲染el-empty「暂无小区数据」
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验收看Network是否发出selectOperatingAssetsCategory等standingBook请求
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/overviewContent.vue、operatingAssets.vue、index.vue
 - 所属项目：苏住房G；来源会话：59f13d6d-cf6d-464d-b961-060063675ca1；代码基线：3c282a5

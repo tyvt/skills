@@ -13,6 +13,7 @@ ZsTencentMap地图弹窗因SDK异步加载未等待导致TMap is not defined的�
 - 若仍失败需检查系统配置的腾讯地图Key（qq.map.key）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话c02c94c0报错栈在ZsTencentMap/index.vue；修复代码onOpen()串接loadMap().then
 - 涉及文件：zhi2-web-admin/src/components/ZsTencentMap/index.vue、zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js
 - 所属项目：产品2.0；来源会话ID：c02c94c0-4ea3-4558-a2c3-49dd740548de；代码基线：5169909

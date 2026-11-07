@@ -12,6 +12,7 @@
 - 确保角色菜单「企业注册」叶子路由配置 busCode，或从待办/全量菜单进入与残缺菜单进入 meta 一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 af6dbc70 用户反馈特定角色未调 flowViewer、超管正常，结论列三道拦截及菜单 busCode 按角色下发差异
 - 涉及文件：zs-approval/index.vue、OperationBtnGroup/index.vue、companyRegister/detail.vue、system/menu/index.vue
 - 所属项目：园区公共收益；来源会话：af6dbc70-f0b6-4b96-8516-bdf350b8dbe6；代码基线：b6bf87d

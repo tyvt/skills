@@ -11,6 +11,8 @@
 - 移除 .lease-contract-list 重复 gap 设定
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/065.md
 - 涉及文件：companyRecordAgency/index.vue、index.scss、zs-search-form.vue、ListTemplate.js、variables.css、benefit/alert/index.vue、companyRecordAgency/change/index.vue
 - 来源会话ID：750c5f05-27fa-429e-89fd-82d7adcd5bc9；代码基线：none

@@ -11,6 +11,7 @@
 - 字段适配以新字段为主、兼容旧字段名；该套路可复用到其他模块批量导入
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：import.vue 与 importUploadDialog.vue 实现该逻辑，接口字段映射 failCount←errorCount、bills←previewList、importId←previewBatchId
 - 涉及文件：property/spFeeBill/components/import.vue、property/spFeeBill/components/importUploadDialog.vue
 - 所属项目：产品2.0；来源会话：17074586-b181-47e4-98de-bff948d7a54e；代码基线：2f68042

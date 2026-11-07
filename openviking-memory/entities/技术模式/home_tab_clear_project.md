@@ -14,6 +14,7 @@
 - 行为：有小区保持/自动选第一个，无小区清缓存。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 30f38fb2（2026-08-04，基线 ce9e460）用户诉求「tab 页面切换时，如果小区列表为空，则清除缓存」。
 - 涉及文件：src/hooks/useBoundProjects.js、src/store/user.js、pages/index/property.vue、components/Property_Suzhufang.vue 等。
 - 所属项目：苏住房C；来源会话ID：30f38fb2-cdce-4fec-b6e7-513b5e74f474；代码基线：ce9e460。

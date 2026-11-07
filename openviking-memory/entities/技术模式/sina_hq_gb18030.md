@@ -21,6 +21,7 @@
 - d:/repository/leek-fund/src/service/eastmoney.ts 及其他：fundSuggestData.ts、fundHistory.ts、aiStockHistoryData.ts
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=leek-fund
 - 来源会话：0ab12128-c9a7-4aa0-a0fe-c5d1bd320633
 - 代码基线：none
 - 所属项目：leek-fund

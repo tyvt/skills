@@ -15,6 +15,11 @@ The listMixins table.js declares data.showListName while StateTable/PlanTable/Li
 - Files: ProjectCertificateDetailDialog.vue, ProjectCertificateTabs.vue, stateLandLic/detail.vue, projectEmbeddedCertificateDetail.js, detailMixins.js, StateTable.vue, projectEmbeddedCertificateList.js, ruoyi.js
 - Project: 苏州市房地产监测V3; source session: 82c57f89-5320-4ad9-a2ed-1c48587b738a; code baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：82c57f89-5320-4ad9-a2ed-1c48587b738a
+
 
 <!-- MEMORY_FIELDS
 {

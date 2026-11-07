@@ -18,6 +18,7 @@
 - zhi2-web-admin/src/styles/index.scss
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/084.md
 - 来源会话：bbc55614-1928-472e-9700-f59ccfc62415
 - 所属项目：苏州市房地产监测V3；代码基线：none

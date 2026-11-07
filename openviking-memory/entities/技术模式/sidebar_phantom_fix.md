@@ -19,6 +19,10 @@
 - d:\repository\门户\zhi2-web-admin\src\layout\components\Navbar.vue
 - 所属项目：门户；来源会话ID：3e984634-49ba-447f-809c-53e40d9305bb；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

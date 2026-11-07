@@ -7,6 +7,7 @@
 - 编辑接口统一调用 `/company/personnelRecord/update`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - E2E 用例断言已备案态无编辑按钮
 - 验证证据：src=苏州市房地产监测V3-rest/005.md
 - 涉及文件：zhi2-web-admin/src/api/company/personnelRecord.js、toB/personnelRecord/components/detail.vue、company/staffManagement/components/detail.vue、e2e/toB/company-personnel-flow.spec.js、e2e/company/personnel-record.spec.js、src/mixins/form.js、playwright.config.js

@@ -10,6 +10,12 @@ getActiveHouseFromPortalUser added in utils/portal-user.js unifies active-house 
 - Source session: 4b7771ad-3727-4825-9b66-d0df7f681ca0; code baseline: none
 - Files: home.vue, externalWebview.vue, portal-user.js, portal-h5-webview.js, custom-tabbar.vue, portalH5Webview.vue, bdc.vue
 
+## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
+- 来源会话：4b7771ad-3727-4825-9b66-d0df7f681ca0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "mini_program_tech",

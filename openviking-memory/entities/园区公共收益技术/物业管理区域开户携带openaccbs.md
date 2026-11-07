@@ -10,6 +10,7 @@
 - POST `/maintenance/account` 与 PUT `/maintenance/account` 请求体均含 `openAccBS: "2"`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益
 - 来源会话：ff5a7c00-ebe9-4246-8cf1-277a6aafbe76
 

@@ -15,6 +15,7 @@
 - 增加空状态展示，移除未使用的getDict相关代码，列表项key改为revEx...
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：src/pages_benefit/elevatorPubEngCons/detail.vue、src/pages_benefit/elevatorPubEngCons/index.vue、src/api/benefit.js
 - 来源会话：518350aa-c9b8-4693-b776-97fb2bd8ddb3
 - 所属项目：无锡市区小程序嵌入H5；代码基线：none

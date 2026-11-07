@@ -10,6 +10,7 @@
 - 修改后请求参数变为 `projectName=xxx`，与后端接口一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：按物业管理区域名称搜索可正常检索
 - 涉及文件：`zhi2-web-admin/src/views/company/userManagement/operatorAuth/operatorAuthRangeTable.vue`
 - 所属项目：苏住房G；来源会话：2c9ae661-5e3b-4099-bf4c-ac312e7a2647；代码基线：none

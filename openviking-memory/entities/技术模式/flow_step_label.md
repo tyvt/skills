@@ -15,6 +15,10 @@
 - 验证证据：会话 d6e2d37c 审查 flow-step 相关 CSS，结论 Warning 可合并，认可 min-width max + flex-shrink:0 方向。
 - 所属项目：门户；代码基线：04586c4；来源会话ID：d6e2d37c-78bf-4548-8cba-1179801832f4
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -17,6 +17,9 @@
 - src/views/benefit/statisticsMap/images/、src/assets/images/benefit/、src/views/benefit/statisticsMap/components/operatingAssets.vue
 - 所属项目：园区物管2.0（代码基线 f00310232，来源会话 d9094763-20ae-4fff-969b-13dc3c307504）
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
 
 <!-- MEMORY_FIELDS
 {

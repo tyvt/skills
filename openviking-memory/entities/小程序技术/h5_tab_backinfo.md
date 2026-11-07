@@ -15,6 +15,7 @@
 - 公共back()走同逻辑，main.ts注册全局拦截；浏览器独立访问与子页面间正常后退不受影响
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话34bbb144用户明确嵌入APP的H5会后退回H5 tab，agent新建appNavigation.js并在tabBar.js/utils/index.js/main.ts三处接线
 - 涉及文件：src/utils/appNavigation.js、src/utils/tabBar.js、src/utils/index.js、src/main.ts、src/pages/redirect/index.vue
 - 验证证据：src=苏住房C/042.md

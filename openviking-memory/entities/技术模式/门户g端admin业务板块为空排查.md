@@ -12,6 +12,7 @@
 - 右侧常用功能、顶部 4 项统计不依赖业务板块权限，有内容属正常
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：账号 6001164（相城区）界面为 admin 版，中间三大板块被前端全部过滤；右侧常用功能、顶部统计不依赖业务板块权限
 - 涉及文件：zhi2-web-admin/src/views/home/mixins/homeDataMixin.js、zhi2-web-admin/src/views/home/config/homeLayout.js、zhi2-web-admin/src/views/home/index-new.vue
 - 所属项目：门户；代码基线：8c17ba3；来源会话：954a92a5-1315-448d-9cd7-528b5055b21c

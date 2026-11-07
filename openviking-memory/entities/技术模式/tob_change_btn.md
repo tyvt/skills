@@ -9,6 +9,7 @@
 - `toB/agencyRecord/detail.vue`：同上返回、编辑、流程查看、`form-mode-override`；增加 `changeBizState`，在 `detailCallback` / `loadChangeDetailFromOwnCompany` 中维护，`:biz-state` 与 `showChangeEditBtn` 均依赖该状态
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`toB/companyRecord/detail.vue`、`toB/agencyRecord/detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：651e58d0-833a-407d-b950-d0210aaf6ccc
 

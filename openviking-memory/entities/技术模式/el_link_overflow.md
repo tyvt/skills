@@ -11,6 +11,7 @@
 - 适用面：凡「图标+长文本+尾部操作按钮」单行卡片（文件列表、附件项、标签行）都按此骨架写。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 614f10e0（基线 864b409）区域银行授权与 pubRegulatoryAccount 详情页样式错乱，修复后长文件名省略不遮挡删除。
 - 涉及文件：zhi2-web-admin/src/components/FileUpload/index.vue；zhi2-web-admin/src/views/system/regionBankAuth/detail.vue；zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue
 - 所属项目：苏住房G；来源会话ID：614f10e0-c3d4-4701-9abf-9cf9b6f48dc6；代码基线：864b409

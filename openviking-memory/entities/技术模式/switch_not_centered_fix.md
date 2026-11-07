@@ -10,6 +10,8 @@
 - element-ui.scss 内容区仅含开关时 flex 居中
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：36544904-a945-436e-bd9e-7077b15c8ffc
 - 验证证据：cursor 会话 36544904-a945-436e-bd9e-7077b15c8ffc
 - 涉及文件：companyAdmin/detail.vue、pubVoucherTemplate/detail.vue、register-form.scss、companyCancel/detail.vue、index.scss、DeveloperBasicInfoDetail.vue、pubBusinessItem/detail.vue、Headline/index.vue
 - 所属项目：苏州市房地产监测V3；代码基线：none

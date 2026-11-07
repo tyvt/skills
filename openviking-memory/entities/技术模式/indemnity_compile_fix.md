@@ -10,6 +10,7 @@
 - 已改为项目统一写法 `background-color: var(--primary-color)`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 构建：`zhi2-web-admin` 的 `npm run build` 退出码 0，产物在 `dist/`
 - 涉及文件：`cardData.vue`、`buildingTable/index.vue`、`src/utils/resolveServerAssetUrl.js`
 - 所属项目：产品2.0；来源会话：607e0008-39cd-4f41-ac93-f621b4844489

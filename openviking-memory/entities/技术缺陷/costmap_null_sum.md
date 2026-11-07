@@ -10,6 +10,7 @@
 - 用 {...defaultSum, ...sumFromApi} 合并，缺字段补 0。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：OpeningBuildingDialog.vue、@zhi2-web-admin/src/views/maintenance/accountOpen/owner/index.vue
 - 所属项目：园区物管2.0（项目2-0）
 - 验证证据：src=2-0/021.md

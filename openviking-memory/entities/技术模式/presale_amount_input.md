@@ -12,6 +12,7 @@
 - zhi2-web-admin/src/views/presale/permit/permitConstants.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：52e97276-20ef-4050-8053-34217a106e19；代码基线：none
 
 <!-- MEMORY_FIELDS

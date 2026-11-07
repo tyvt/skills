@@ -16,6 +16,8 @@
 - zhi2-web-admin/src/router/index.js、src/App.vue、index.html、src/permission.js、src/main.js
 
 ## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：门户/023.md；会话亦要求部署后在苏周到内重走扫码授权，确认 /suzhou-dao/auth-success 全屏、无横向滚动，若仍有问题需说明测试或生产环境
 - 来源会话ID：1df50635-29c5-45f1-8fa7-96af94e042aa；代码基线：none
 

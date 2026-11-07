@@ -15,6 +15,10 @@
 - 涉及文件：zhi2-web-admin/src/views/maintenance/facility/detail.vue、facilityChange/detail.vue、mixins/detailMixins.js
 - 所属项目：产品2.0；来源会话：46f27f37-13c0-41e5-8c63-7986f337f5da；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

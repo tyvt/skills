@@ -10,6 +10,7 @@
 - 门户分页接口目前不返回字典项列表，「字典项」列可能暂时为空
 - 如需展示可让后端附带或前端按 dictType 逐个请求
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：2caa4ea9-415d-4bd1-9439-0264ee8f6342；代码基线：none
 
 <!-- MEMORY_FIELDS

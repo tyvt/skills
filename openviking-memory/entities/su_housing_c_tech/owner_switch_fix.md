@@ -11,6 +11,7 @@
 - 切换按钮内 picker 设 `pointer-events: none`，避免事件被内部拦截
 - 逻辑将 `> 0` 改为 `>= 0`，正确恢复上次选中房屋
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译后进入「我的→电子业主卡」点右上角「切换」应弹出房屋列表
 - 涉及文件：ownerCard/index.vue、ZsPicker.vue、MenuSection.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：16685517-eda4-4fc5-8357-db2568f09adb；代码基线：none

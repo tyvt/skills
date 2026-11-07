@@ -11,6 +11,7 @@
 - 分包内 `echarts-uniapp.vue`：已有实例只 `setOption(..., { notMerge: true })`，卸载时 `dispose`，宽高 0 时短延迟重试
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 所属项目：昆山市民；代码基线：38d1482
 - 来源会话ID：fa8264ba-ca5d-4343-b44e-a4907db958f0
 - 验证证据：src=昆山市民/006.md

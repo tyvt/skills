@@ -12,6 +12,7 @@
 - 父仓库 zhi2-web-admin 子模块指针已变尚未提交
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话：5e0541e9-3a3b-4fc6-ac02-908632628340
 - 涉及文件：pubAllotNotice/detail.vue、pubAllotNotice/index.vue
 

@@ -13,6 +13,7 @@
 - 判断标准：装饰性大图走static资源，状态指示类小图标优先内置CSS/SVG字符串
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证会话7f2654d5：用户报选择样式与勾选圆圈缺失，恢复8个SVG并在TitleCard内置CSS单选圆圈
 - 涉及文件：pages_owner/house/components/TitleCard.vue、owner/authentication.vue、TypeChoose_Suzhufang.vue
 - 所属项目：苏住房C；代码基线：9832ba3；来源会话ID：7f2654d5-5bab-4165-aa36-1e84ddbdfa13

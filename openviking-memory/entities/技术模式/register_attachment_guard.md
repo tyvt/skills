@@ -9,6 +9,7 @@
 - 移除该冗余附件校验，提交仅依赖 `missingRequiredNames` 过滤后的必填项检查（同 `Step3Appendix.vue` 逻辑）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/313.md（早前记录见苏州市房地产监测V3-leftover/113.md）
 - 涉及文件：InstitutionRegisterSingleForm.vue、registerAppendixAdminType.js、CompanyRegisterSingleForm.vue、appendix.js、Step3Appendix.vue
 - 所属项目：苏州市房地产监测V3；来源会话：4b85e9a6-d8c8-452a-86e2-545a995afd8f；代码基线：none

@@ -15,6 +15,7 @@
 - guaranteeDepositAccount/detail.vue：子表在 !loading 且 resolvedAccountId（form.accountId 就绪）后才请求数据，并补全 propertyProjectId 过滤条件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：余额为 1856.53 元却出现 266.62 元记录，说明子表查到其他账户数据，修复后应仅显示当前账户
 - 所属项目：产品2.0；来源会话：a2b93bb4-760d-4bb3-93a2-a4c0506cfb2f；代码基线：none
 

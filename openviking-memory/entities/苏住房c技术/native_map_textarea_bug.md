@@ -17,6 +17,7 @@
 - 验收：滚到申请说明点击弹键盘，字数统计随输入更新(如5/120)
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话12995d5b用户二次反馈「addAlone申请说明还是无法输入」，改v-if销毁+多时机+修正绑定后恢复
 - 涉及文件：src/pages_owner_extra/elevator/addAlone.vue、src/components/ZsTextarea/ZsTextarea.vue
 - 所属项目：苏住房C；来源会话ID：12995d5b-1f0e-4084-87fa-bb16ee2b7b73；代码基线：8fc3cc5

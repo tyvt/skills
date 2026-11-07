@@ -15,6 +15,7 @@
 - 凡是新建/复刻申请页、签约页出现姓名或证件号展示，必须套这对 formatter，不自写截断
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证会话 ec2c21f5：申请页 detail.vue 直接用 userStore 原始数据；参照 stockHouseSign/apply.vue、publishHouse/verification.vue 改用 formatter
 - 涉及文件：src/pages_transaction/newHouseCertification/detail.vue、src/utils/formatter.js、src/pages_transaction/publishHouse/verification.vue、src/store/user.js
 - 所属项目：苏住房C；来源会话ID：ec2c21f5-1d1e-4abb-a5d4-f34c93d6919a；代码基线：77666f8

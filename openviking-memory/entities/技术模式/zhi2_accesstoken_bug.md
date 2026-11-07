@@ -12,6 +12,7 @@
 - 改登录页或`store/modules/user.js`时核对`auth.js`读写键名
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/utils/request.js、src/utils/auth.js、src/store/modules/user.js、src/views/login.vue
 - 所属项目：园区公共收益；来源会话：a6727568-bde2-4da6-a70a-31bf732716a4；代码基线：bd275b5
 

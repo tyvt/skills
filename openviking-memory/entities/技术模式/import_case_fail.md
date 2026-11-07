@@ -14,6 +14,7 @@ Windows不区分文件名大小写而Linux区分，`buildinginfo/detail.vue`中i
 - UnitTable.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/073.md
 - 来源会话ID：77670b3d-757c-4c9b-81a1-088b6d675376
 - 代码基线：none

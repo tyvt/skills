@@ -7,6 +7,7 @@
 - 非前端逻辑缺陷
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/048.md
 - 涉及文件：经纪机构注册-前端对接变更文档.md、institutionRegister/index.vue、InstitutionRegisterPage.vue、institutionRegister.js、companyRegister.vue、CompanyRegisterSingleForm.vue、Step1BasicInfo.vue、Step2AdminInfo.vue
 - 所属项目：苏州市房地产监测V3；来源会话：73cbbe2e-2230-4506-9d89-48940a649115；代码基线：none

@@ -8,6 +8,7 @@
 - 原 accountInfo 数据由 /company/companyRegister/{companyRegisterId} 回显。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=repository
 - 验证：会话 f3561464（008.md）accountInfo 提交后重定向登录，预账号跳 step=2 续填。
 - 涉及文件：zhi2-web-admin/src/views/register/components/accountInfo.vue、zhi2-web-admin/src/views/login/LoginForm.vue、zhi2-web-admin/src/views/register/components/companyRegister.vue、zhi2-web-admin/src/views/register/components/companyInfo.vue
 - 所属项目：repository

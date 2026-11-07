@@ -18,6 +18,10 @@
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue；所属项目：园区物管2.0；来源会话 ID：d9192f5b-c2bf-4f01-ba6a-ecefdcde18d0；代码基线：f00310232。
 - 验证：会话列出 grid.bottom=4px、stage flex:1+overflow:hidden、scale-clip overflow:hidden 三类根因及逐项修改。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

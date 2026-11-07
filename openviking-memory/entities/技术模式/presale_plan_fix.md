@@ -12,6 +12,7 @@
 - 完整数据流：POST /presale/permit/plan/save → { presalePlanId, planDocSite } → buildPlanPageResult() 写入 sessionStorage → applyPlanPageResult() 合并到 form.plan / form.p
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`presale/permit/plan/detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：77643a80-744f-419d-abfc-21a4685e8d9f
 

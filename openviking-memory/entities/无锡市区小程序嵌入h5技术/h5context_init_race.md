@@ -13,6 +13,8 @@
 - 业务页（如维修资金）在onShow里await whenH5ContextReady()后用getH5Selection()取参，勿单独信任可能过期的store
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：400a262f-e497-46ec-9234-87e452dc4641
 - 验证会话：400a262f-e497-46ec-9234-87e452dc4641（基线fb55fa9），用户反馈切换小区后URL正确但数据相反
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js、src/App.vue、src/pages_owner/maintain/index.vue、src/pages/index/useProjectState.js
 - 所属项目：无锡市区小程序嵌入H5

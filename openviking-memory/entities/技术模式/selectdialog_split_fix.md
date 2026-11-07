@@ -10,6 +10,8 @@
 - 将 SelectDialog 合并为完整组件块，置于 ProjectDialog 与 outletsTable 之间
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/229.md
 - 涉及文件：supervision/unblock/bond/detail.vue、views/components/SelectDialog.vue、supervision/unblock/InformationPush/detail.vue、supervision/unblock/usemoneyRevoke/detail.vue、supervision/deposit/notice/detail.vue、supervision/unblock/noticeChange/detail.vue、package.json
 - 来源会话：c236f45d-1867-422f-aa31-f4acbb751ce8；代码基线：none

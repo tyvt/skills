@@ -16,6 +16,10 @@
 - 小程序「同一页面所有按钮都点不动/只有列表区能滚动」优先怀疑z-paging、scroll-view等自带fixed或全屏容器的包裹问题，而非事件绑定或权限
 - 改完必须重新编译小程序再验证
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "小程序技术",

@@ -15,6 +15,7 @@
 - Console 中人脸核身失败通常有相关报错
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：13ed1683-e44e-4216-95c3-4499d21022e8
 - 涉及文件：src/api/security.js、src/pages_my/verification/FormLocal.vue、src/pages_my/verification/FormNonLocal.vue
 - 代码基线：none

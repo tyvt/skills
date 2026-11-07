@@ -19,6 +19,7 @@
 - 之后仍有 400 说明是中间带 ID 的特殊结构，需补一条专属映射
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 06f4b462（2026-08-25）用户指某接口 key 还在 URL 上，要求全局排查，最终扩展为 4 段以上四类规则
 - 涉及文件：zhi2-web-admin/src/utils/apiV3Normalize.js、src/utils/request.js、src/api/index.js
 - 所属项目：产品2.0；来源会话：06f4b462-1a59-4d5f-b258-6f1f46290ddd；代码基线：adc516a

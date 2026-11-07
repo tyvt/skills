@@ -11,6 +11,7 @@ H5 下 `scroll-view` 与 uni-app `<canvas>` 导致物业合同 PDF 预览失败�
 - 部署后仍失败时核对附件 URL 是否需带登录 token。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证：会话 a046a6f8 用户反馈物业合同预览报错，结论明确两点根因与 filePreview.vue 改造方案。
 - 涉及文件：`src/pages/common/filePreview.vue`、`src/pages_contract/detail.vue`。
 - 所属项目：昆山市民；代码基线：c8c1c24；来源会话ID：a046a6f8-9e58-45ea-a7be-81dc2f303792。

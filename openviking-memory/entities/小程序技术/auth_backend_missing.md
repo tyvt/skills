@@ -20,6 +20,7 @@
 - 小程序报错问题汇总.md
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：苏住房C/025.md
 - 来源会话ID：6d1f9a95-b615-4f9a-b58b-db5fe6a4ff8f
 - 所属项目：苏住房C

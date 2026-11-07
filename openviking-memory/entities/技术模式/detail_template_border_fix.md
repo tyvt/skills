@@ -10,6 +10,7 @@
 - 不再去除边框以恢复左侧只读网格外框
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/043.md
 - 涉及文件：permit/detail.vue、PermitInfoPanel.vue、PermitAppendixPanel.vue、detail.vue、detail-template.vue、Headline/index.vue、index.scss、AnnexUpload/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：93be20d8-831b-48da-b8df-1a5b31730ca5；代码基线：none

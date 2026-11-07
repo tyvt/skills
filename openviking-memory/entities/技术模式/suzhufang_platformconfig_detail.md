@@ -9,6 +9,10 @@
 - 涉及 `form.js`、`platformConfig/detail.vue`、`detailMixins.js`
 - 所属项目：苏住房G；来源会话：beb84a33-dfcd-4bad-a0cd-f26b74eb1d33；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -14,6 +14,7 @@
 - 出现 ENOENT 先确认用 npm run build 构建（npm run dev 不执行 relocate 脚本），并检查新增页面是否命中脚本路径白名单
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 8f42167b（2026-08-28，基线 8fc3cc5）改 patchDatetimePickerRef 同时处理 .json/.js 后重新 build 与校验通过
 - 涉及文件：zhi2-mobile-shimin/scripts/relocate-datetime-picker.mjs、scripts/validate-dist.mjs、package.json、dist/project.config.json
 - 所属项目：苏住房C；来源会话ID：8f42167b-70b4-4ea9-85ad-c66840f5a3ba；代码基线：8fc3cc5

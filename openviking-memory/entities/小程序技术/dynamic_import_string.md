@@ -15,6 +15,7 @@
 - 发现「解构出来是undefined但文件存在」时，第一时间读编译产物dist里那一行，看import是否变成字符串字面量。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 160a40f4（2026-08-24）用户贴微信开发者工具报错，定位「分包」提交把menuStore改动态import、编译成字符串，改回静态import后恢复。
 - 涉及文件：src/utils/tabBar.js、src/store/menu.js
 - 所属项目：苏住房C；来源会话ID：160a40f4-daed-4e76-ae44-e7c0120d9b6f；代码基线：4630e8e

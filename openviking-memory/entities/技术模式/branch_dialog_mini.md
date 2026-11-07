@@ -8,6 +8,8 @@
 - 删除对 el-form-item__content 的 line-height:36px 覆盖以使用默认间距
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/138.md
 - 涉及文件：system/sysBankBranch/detail.vue、supervision/bank/cbyh/components/YhwdTable.vue、YhwdDialog.vue、superviseBank/components/YhwdDialog.vue、wtjgxy/components/CompetentDialog.vue、zs-dialog/zs-dialog.vue、stock/contract/components/ExtractDialog.vue、evaluation/creditDeclarationComponents/detail.vue
 - 来源会话：3a875ff9-bacf-404f-a3fe-9efda64d3fa7；代码基线：none

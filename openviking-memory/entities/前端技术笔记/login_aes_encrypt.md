@@ -16,6 +16,7 @@
 - 镜像文件：c:/Users/Administrator/Desktop/ROOT/login.html（与仓库 ROOT/login.html 对应）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=扬州存量房
 - 验证证据：src=扬州存量房/001.md
 - 所属项目：扬州存量房
 - 来源会话ID：287ba6ec-c2c0-4ab3-8031-b2e076e84c1b

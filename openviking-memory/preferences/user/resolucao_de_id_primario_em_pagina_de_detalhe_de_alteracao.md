@@ -4,6 +4,12 @@
 - 已在 companyRecord/detail.vue, companyRecord.js, companyBasicInfoContent.js, CompanyBasicInfoDetail.vue, detailMixins.js, change/detail.vue, form.js, toB/change/detail.vue 中验证。
 - 会话来源: 24a5c5a8-dd40-426d-9696-d87bebf426bd
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：24a5c5a8-dd40-426d-9696-d87bebf426bd
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

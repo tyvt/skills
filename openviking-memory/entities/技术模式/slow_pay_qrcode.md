@@ -14,6 +14,7 @@
 - 套路适用于所有慢三方接口的前置展示场景：弹窗先给确定信息，慢数据异步补齐，失败留手动重试入口
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 立即弹扫码窗显示订单号金额 → 异步请求 payInfo → 成功展示二维码并轮询；失败区显示提示+刷新按钮，刷新先停轮询再恢复；payInfo 用 noMessage:true 防提示重复
 - 涉及文件：zhi2-web-admin/src/views/property/spFeeBill/components/collectionDialog.vue、zhi2-web-admin/src/views/property/bill/components/PaymentDialog.vue
 - 所属项目：产品2.0；代码基线：6accf9a；来源会话：ba1c8c6a-7b49-465a-aab9-2c949eb85f07

@@ -11,6 +11,7 @@
 - 旧链接打开 `TypeChoose` / `FormNonLocal` 时，`onLoad` 仍会重定向到 `FormLocal`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 建议在微信开发者工具从「个人中心 → 前往实名」走一遍，确认不再出现「居民身份证 / 非居民身份证」选择页
 - 涉及文件：src/utils/index.js、TypeChoose.vue、FormLocal.vue
 - 所属项目：苏住房C；来源会话ID：6e25ee6f-ffc6-40be-bf9d-065779c41cdc

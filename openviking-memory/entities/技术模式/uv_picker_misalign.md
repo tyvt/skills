@@ -19,6 +19,7 @@
 - 日期选择：node_modules/@climblee/uv-ui/components/uv-datetime-picker/uv-datetime-picker.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=家园区一网通办
 - 验证证据：cursor session=41177f64-7f64-43f6-ba36-e6c57614adea
 - 所属项目：家园区一网通办
 - 来源会话：41177f64-7f64-43f6-ba36-e6c57614adea

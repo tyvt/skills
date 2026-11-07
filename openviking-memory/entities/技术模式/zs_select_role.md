@@ -11,6 +11,7 @@
 - 切换组织类型时与roleIds一并清空roleName
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：修改角色为物管会保存后仍显示社区；根因只传roleIds、roleName未随选择更新
 - 涉及文件：zhi2-web-admin/src/views/autonomy/ownerCommitteeWorker/detail.vue
 - 所属项目：园区公共收益；来源会话：64889348-1c95-4eb4-8199-6ee031bb7e1e；代码基线：b6bf87d

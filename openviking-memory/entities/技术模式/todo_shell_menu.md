@@ -10,6 +10,7 @@
 - resolveTodoTaskNavigation 在 resolveRegisteredRoute 前后加 isMenuShellRoute 判定，命中且有 storedPath 则直接 { path: storedPath, query:{ formMode:'view' } }。
 - 边界：仅懒加载函数+无 meta.filePath 的真实详情页仍可走 name 解析；只有壳组件强制回退 storedPath。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 f1c7af59 用户给出 Property11/:tableid 且 component:"Layout" 真实菜单 JSON 并指出「components 是默认的 layout，这种也算匹配失败的」。
 - 涉及文件：d:\repository\苏住房G\zhi2-web-admin\src\utils\ruoyi.js、src\store\modules\permission.js、src\views\flowable\todo.vue、src\views\home\v2\components\TodoPanel.vue
 - 所属项目：苏住房G；来源会话ID：f1c7af59-850a-422f-aaa3-9169cf16f750；代码基线：db4f82c

@@ -18,6 +18,7 @@
 - 一致性参考：buildingTable.vue、propertyContractTable.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证：会话 4a4ea16a 用户要求有数据时仍显示前往备案按钮；改 committeeTable、managementOrgPanel、regulatoryAccountPanel。
 - 所属项目：淮安物管；来源会话：4a4ea16a-5909-4259-b187-a74d02887a92；代码基线：dc21427
 - 验证方式：刷新页面即可验证。

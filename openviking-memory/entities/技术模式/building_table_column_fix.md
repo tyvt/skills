@@ -9,6 +9,7 @@
 - 增加 :disableCheck="disableHouseCheck"，已报名户室（exist==1）灰色不可选。
 - 列表 :selectable="isHouseSelectable"，已报名户室不可勾选。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/components/BuildingTable.vue、autonomy/candidateCollect/components/CandidateDialog.vue
 - 所属项目：园区公共收益；来源会话：473e272c-6e60-4e72-b905-e02eba29cfd7；代码基线：none
 

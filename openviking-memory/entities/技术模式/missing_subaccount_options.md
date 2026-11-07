@@ -23,6 +23,11 @@
 - 源会话: 7e4c18c0-5ce0-41ce-b4dd-d28988df5d00; 代码库: none
 - 所属项目: 园区公共收益
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：7e4c18c0-5ce0-41ce-b4dd-d28988df5d00
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

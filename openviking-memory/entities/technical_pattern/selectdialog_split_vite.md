@@ -10,6 +10,7 @@
 - InformationPush/detail.vue 存在相同未闭合标签问题待处理
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/028.md
 - 涉及文件：views/supervision/unblock/bond/detail.vue、views/components/SelectDialog.vue、views/supervision/unblock/InformationPush/detail.vue、views/supervision/unblock/usemoneyRevoke/detail.vue、views/supervision/deposit/notice/detail.vue、views/supervision/unblock/noticeChange/detail.vue、package.json
 - 所属项目：苏州市房地产监测V3；来源会话：c236f45d-1867-422f-aa31-f4acbb751ce8；代码基线：none

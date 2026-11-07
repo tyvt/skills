@@ -10,6 +10,7 @@
 - 管理端：经纪机构管理 → 机构入网信息 → 详情 → 变更，Network 请求体应为 `{"companyRecordId":"<当前详情ID>"}` 并跳转变更编辑页
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话：7228345d-b39b-4e14-b319-e0de248ed26e
 - 涉及文件：`companyRecord.js`、`companyRecordAgency/detail.vue`、`zljg/companyRecordAgency/detail.vue`
 

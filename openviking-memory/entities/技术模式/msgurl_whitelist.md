@@ -9,6 +9,7 @@
 - 不合法时用 msgWarning 提示并 return，不执行跳转。
 - 凡接口/字典/配置读出的跳转地址（含 redirectPath）都收口到同一工具函数。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：index-v2.vue:390-402 消息打开使用未校验的 msgUrl 作为路由 path；Fix 建议仅允许以 / 开头的站内 path。
 - 涉及文件：zhi2-web-admin/src/views/home/index-v2.vue
 - 所属项目：苏住房G；来源会话ID：22db11e4-4ebb-4504-8a6e-e93aa9791182；代码基线：9e5c499

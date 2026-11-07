@@ -10,6 +10,7 @@
 - 兼容逻辑：path以detailId结尾或path以/开头则作为历史路由直接使用；否则通过getRouterPathByFilePath转换并拼接detailId
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：代码逻辑审查与历史数据兼容
 - 涉及文件：zhi2-web-admin/src/utils/todoTask.js、src/views/flowable/todo.vue、src/views/flowable/finished.vue
 - 所属项目：园区公共收益；来源会话：83f986d1-0f52-47df-92db-9fd124710132；代码基线：none

@@ -13,6 +13,7 @@
 - 通用套路：同一列表组件多模式复用时，queryParams必须在模式切换时做模式专属字段清理，不能只清模式主键
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话47d34879根因是切换展示模式时列表筛选条件没和树同步，修复为syncListParentDeptFilter切回树状清除flatOnlyFields后由handleTreeReady刷新
 - 涉及文件：zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue
 - 所属项目：产品2.0；来源会话ID：47d34879-47c4-4fc8-beb8-6a3e1375d999；代码基线：645607c

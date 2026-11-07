@@ -11,6 +11,7 @@
 - 新增态保持可正常选择企业，不套用同一个禁用开关。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话 e96ee884 用户提出编辑时企业名称应禁止编辑；修改 companyRecordAuth/detail.vue 编辑模式禁用企业名称，新增模式仍可选择。
 - 涉及文件：zhi2-web-admin/src/views/company/userManagement/companyRecordAuth/detail.vue
 - 所属项目：苏住房G；来源会话ID：e96ee884-e80d-4f80-a9e4-966848f80eb3；代码基线：26069c8

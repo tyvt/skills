@@ -8,6 +8,7 @@
 - 占位数据二选一：骨架屏/灰块不渲染真实字段，或保留行结构加统一 is-placeholder 类（灰字/虚线边）并改文案为「暂无待办」类非业务文案。
 - 多面板同页时占位样式收口到同一类名约定，新增面板直接复用。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：TodoPanel.vue:109-116 待办tab下列表不足4条用DEMO_ROW补满，文案像真实业务数据；StudyPanel有is-placeholder，TodoPanel无。
 - 涉及文件：zhi2-web-admin/src/views/home/v2/components/TodoPanel.vue、StudyPanel.vue
 - 所属项目：苏住房G；来源会话ID：22db11e4-4ebb-4504-8a6e-e93aa9791182；代码基线：9e5c499

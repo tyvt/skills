@@ -10,6 +10,7 @@
 - 覆盖 store/modules/common.js 的 saveAreaInfo、getRegions 及各处 $get('/xxx/listTree') 无参场景。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：src/utils/request.js、src/store/modules/common.js 等（路径前缀 d:/repository/产品2.0/zhi2-web-admin）。
 - 所属项目：产品2.0；来源会话：fcb686e6-73e3-4f1f-8aff-ccc07305e948；代码基线：none
 

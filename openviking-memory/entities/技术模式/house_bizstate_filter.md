@@ -10,6 +10,7 @@
 - 列表侧未备案行置不可选，确定时二次拦截防脏数据/旧缓存
 - 前端已传参仍返回未备案则转后端（forPart 查询未支持该过滤）
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 ae403e03 用户反馈弹窗带出未备案经营用房，结论补 houseBizState 及二次拦截
 - 涉及文件：benefit/housePart/index.vue、detail.vue、pubHouse/index.vue、assetLeaseApply/components/houseTable.vue
 - 所属项目：苏住房G；来源会话：ae403e03-b7dd-4d19-be74-3b70c0306a26；代码基线：9acfb2a

@@ -14,6 +14,7 @@
 - 触发父组件 getDetail 重新调用详情接口，同步更新「本次核销金额」（列表清空时变为 0 或空）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：dca7c647-3133-4108-a280-c82a7ee0abb4；代码基线：none
 
 <!-- MEMORY_FIELDS

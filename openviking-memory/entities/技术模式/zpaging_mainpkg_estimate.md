@@ -15,6 +15,10 @@
 - 涉及Project_Suzhufang.vue、scripts/relocate-z-paging.mjs、scripts/validate-dist.mjs、package.js
 - 所属项目：苏住房C(zhi2-mobile-shimin)；来源会话ID：3562f516-f5b6-4ae3-b575-1ef94fe84955
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

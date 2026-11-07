@@ -11,6 +11,8 @@
 - E2E 新增 assertEntrustSaleAppendixButtons 校验
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/055.md
 - 涉及文件：presale/entrustSale/detail.vue、mixins/detailMixins.js、mixins/form.js、components/AnnexUpload/index.vue、components/AnnexUpload/components/FileList.vue、e2e/presale/entrust-sale-real-api-flow.spec.js、e2e/fixtures/entrust-sale-helpers.js、supervision/agreement/version/detail.vue
 - 来源会话：80d2603f-f2d9-4f58-9273-3841d86f0ce0

@@ -12,6 +12,12 @@
 - 涉及文件: src/views/property/complexBuildingAuth/detail.vue; src/views/components/BuildingDialogAuth.vue; 当前分支的 BuildingDialogAuth.vue。
 - 会话: dc881812-1513-477b-8342-59b5f3fc62ac; 基础代码: none.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：dc881812-1513-477b-8342-59b5f3fc62ac
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "已知缺陷",

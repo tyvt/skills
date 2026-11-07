@@ -8,6 +8,7 @@
 - applyOrganizationSelected 中切换组织时 clearMemberFields 清空人员
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 来源会话：0b6fbcaa-8497-4ce6-9f47-939444f93d40
 - 涉及文件：autonomy/userAuth/detail.vue、autonomy/record/components/detail.vue、property/localPropertyWin/detail.vue、mixins/detailMixins.js、utils/request.js、autonomy/userAuth/index.vue、request.js
 - 所属项目：园区物管2.0；代码基线 none

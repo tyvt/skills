@@ -22,6 +22,12 @@
 ## 验证
 - cursor 会话 79d8b01e-dd31-4523-9359-f9809fc997bf；代码基线: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：79d8b01e-dd31-4523-9359-f9809fc997bf
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

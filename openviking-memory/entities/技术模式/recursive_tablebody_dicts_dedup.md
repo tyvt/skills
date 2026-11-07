@@ -10,6 +10,7 @@
 - 若需全站去重再下沉到 getDicts 封装
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 82f1e5be 用户报 sys_yes_no 与 FILE_TYPE 重复调用，结论删无用 sys_yes_no 请求并为 FILE_TYPE 加模块缓存
 - 涉及文件：zhi1-web-admin/src/views/repairFunds/usage/fundUsageKs/components/AnnexContainer/components/TableBody.vue、FileListDialog.vue、AnnexContainer/index.vue、api/system/dict/data.js
 - 所属项目：太仓G；来源会话：82f1e5be-80bb-4d16-827c-0a7d2778a100；代码基线：df87537

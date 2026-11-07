@@ -10,6 +10,8 @@
 - 更新引用路径：`pages_my/onlineService/index.vue`、`pages_my/onlineService/PolicyDetail.vue`、`pages_main/news/index.vue`、`pages_main/news/detail.vue`、`pages_owner/elevator/guideDetail.vue`、`pages_transaction/buyHousePolicy/detail.vue`
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 原`pages_main/news/components/`下两个组件废弃
 - 项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：903d152b-dae2-46f3-94af-775912aee86f；代码基线：none
 

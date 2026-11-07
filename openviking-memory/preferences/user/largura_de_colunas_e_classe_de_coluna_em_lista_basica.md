@@ -3,6 +3,12 @@
 - 涉及文件: indicatorComponents/index.vue, creditIndicator/index.vue, zs-table-column.vue, listMixins.js, indicatorBasicConfig/index.vue, styles/index.scss, assessment/search.vue, constructionTable.vue.
 - 验证证据: src=苏住房G/037.md; 会话: b3a9c220-7fdb-4c57-9aa9-ea701de8f93b.
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：b3a9c220-7fdb-4c57-9aa9-ea701de8f93b
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

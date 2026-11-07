@@ -11,6 +11,7 @@
 - TemplateTreeTable.vue 新增五列仅叶子行展示，index.vue 接入上述改造
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：苏住房G/073.md
 - 涉及文件：utils/monthlyReport.js、publicQuery/monthlyReportTemplate/components/TemplateTreeTable.vue、publicQuery/monthlyReport/components/ReportItemsTable.vue、publicQuery/monthlyReport/index.vue、monthlyReportStat/detail.vue、monthlyReport/detail.vue
 - 所属项目：苏住房G；来源会话ID：98a6eb7e-953e-490a-ae39-942396e69cb2；代码基线：none

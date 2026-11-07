@@ -10,6 +10,7 @@
 - 查询成功替换下方结果；点「重置」清空表单并隐藏结果区
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 涉及文件：zhi2-web-admin/src/views/home/publicPortal/pages/RentalPages.vue、mock/rental.js
 - 所属项目：门户；来源会话：57f7bcce-4698-4101-aaea-433c7bebf5f6
 

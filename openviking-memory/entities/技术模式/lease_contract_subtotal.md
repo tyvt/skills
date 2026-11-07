@@ -13,6 +13,7 @@
 - 刷新列表页即可看到效果
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：src/views/benefit/resourcesLeaseContractFiling/index.vue、src/views/benefit/assetsLeaseContractFiling/index.vue、src/mixins 等
 - 所属项目：园区物管2.0；来源会话：7c12e81c-34f7-48b0-b63f-8963c13aff75；代码基线：none
 

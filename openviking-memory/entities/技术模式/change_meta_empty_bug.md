@@ -12,6 +12,7 @@
 - 若制单信息也为空需后端补审计字段，前端无法凭空生成。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证：会话 95b62123 用户报「右边有大量空白，上面三个字段都没有值」；结论为 detailCallback 先合并顶层再合并嵌套，新增 resolveChangeMeta 兼容多字段名。
 - 与已知差异：#1215 是 contentInfo visible + 只取 data.summary；#1098 是 detailCallback 不 return 导致 loading/残留。
 - 涉及文件：companyManagement/change/detail.vue、change-record-dialog.vue、mixins/detailMixins.js；所属项目：淮安物管；来源会话：95b62123-9914-4e98-aca3-4d7acff520aa；代码基线：22a1d9d。

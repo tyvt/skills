@@ -11,6 +11,7 @@
 - `bill/components/import.vue`（同类问题一并修复）：`src="./../../../../public/assets/images/icon_excel.svg"` 改为 `src="/assets/images/icon_excel.svg"`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：`propertyAgreement/detail.vue`、`bill/components/import.vue`、`src/views/property/propertyAccount/index.vue`、`src/views/system/paymentChannel/index.vue`
 - 所属项目：苏住房G（zhi2-web-admin）；来源会话：7e4bfd75-cb6c-466f-aeaa-b9802e18e283；代码基线：none
 

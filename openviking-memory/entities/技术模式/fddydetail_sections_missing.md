@@ -9,6 +9,7 @@
 - 补全5区块并优先解析 `phone`、`mobile`、`businessHours` 支持拨号，回退 `contact`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=cursor session=32625b00-1426-42c0-b698-3bad3d6cb027
 - 涉及文件：ZsRichText.vue、bankDetail.vue、pages.json、fddydetail.vue、houseLoanGuide/index.vue、transaction.js、bankList.vue、sfb.js
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话：32625b00-1426-42c0-b698-3bad3d6cb027；代码基线：none

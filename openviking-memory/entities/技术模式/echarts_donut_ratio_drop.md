@@ -11,6 +11,7 @@
 - 需一致须恢复 ratio 或剔除 0 项出 series
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：src=园区物管2.0/053.md
 - 涉及文件：benefit/dataSandbox/assetPanorama/index.vue
 - 所属项目：园区物管2.0；来源会话：e98b3c2b-020e-45a5-bbab-7177966aefbc

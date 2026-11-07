@@ -13,6 +13,7 @@ operableProjectList 返回空数组时原强制弹无法关闭选择弹窗，改
 - zhi2-web-admin/src/views/home/bProjectDialog.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：园区公共收益/035.md
 - 来源会话：7c3abcbc-5c9f-492d-b81b-9b709f37b81c；代码基线：none
 - 所属项目：园区公共收益

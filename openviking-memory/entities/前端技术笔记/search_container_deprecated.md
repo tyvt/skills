@@ -13,6 +13,10 @@
 - 涉及文件：zhi2-web-admin/src/mixins/listMixins.js、zhi2-web-admin/src/views/benefit/pubElevMaintenanceNew/index.vue。
 - 所属项目：园区物管2.0；来源会话：31f93d40-0b1b-4532-9404-1e8c008776f8；代码基线：fc994977f。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

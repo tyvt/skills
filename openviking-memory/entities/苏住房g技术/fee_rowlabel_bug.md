@@ -11,6 +11,7 @@
 - 对齐汇总接口 `feeStandardStatsByPropertyType` 返回字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/092.md
 - 涉及文件：feeStandardStats/index.vue、ComplexDetailDialog.vue、utils.js、constants.js、StatsTableSection.vue
 - 所属项目：苏住房G；来源会话ID：8b941e49-61cc-488f-9aec-53846bc6e898；代码基线：none

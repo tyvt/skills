@@ -10,6 +10,7 @@
 - 原 pendingOperHeaders 机制及 enableDetailSaveHeaders、enableListDeleteHeaders 等函数保留为空实现，避免影响现有引用，后续可逐步清理
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/utils/pageRequestContext.js、src/utils/request.js
 - 所属项目：园区公共收益；来源会话：ff4a3fa0-96f2-4d49-b056-026882c79105；代码基线：none
 

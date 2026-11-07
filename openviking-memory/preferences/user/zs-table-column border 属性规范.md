@@ -4,6 +4,10 @@
 - 示例文件 `zhi2-web-admin/src/views/maintenance/budget/components/voteTable.vue` 已应用此规则。
 - 所属项目：园区物管2.0；来源会话：66524776-494d-48a6-ac48-a0938f101732；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

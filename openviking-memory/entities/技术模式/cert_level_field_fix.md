@@ -12,6 +12,7 @@
 - AgencyPersonnelDetail.vue 的 `loadDetail()` 中同步适配
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/120.md
 - 涉及文件：路由信息.json、AgencyPersonnelCertificateTable.vue、AgencyPersonnelDetail.vue、detail.vue、index.vue、agency-personnel-real-api-flow.spec.js、detail-template.vue 等
 - 所属项目：苏州市房地产监测V3；来源会话：fee19692-41de-42b8-a8ed-8e08fa99ede8；代码基线：none

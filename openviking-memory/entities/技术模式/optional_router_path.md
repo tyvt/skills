@@ -19,6 +19,12 @@ park-benefit (园区公共收益) 收益模块的选择对话框使用 getRouter
 - 文件：ruoyi.js, assetLeaseApply/detail.vue, pubUseMoneyApply/detail.vue, pubUseMoneyApply2/detail.vue, pubBankReceiptApply/detail.vue, zs-select-dialog-func.vue, regulatoryAccountPanel.vue.
 - 项目：园区公共收益；源会话：82837732-6269-4a38-bb56-614e39f5bbeb, 5922f357-1df8-46c0-8045-f0e84afd364d；代码基线：36a9a7e。
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：82837732-6269-4a38-bb56-614e39f5bbeb
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

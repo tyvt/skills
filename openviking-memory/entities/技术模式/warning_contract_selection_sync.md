@@ -15,6 +15,12 @@ In 苏住房G benefit contract filing lists, reserve-selection desynced selected
 - Files: benefit/assetsLeaseContractFiling/index.vue, benefit/parkingSpaceContractFiling/index.vue, mixins/table.js, benefit/resourcesLeaseContractFiling/index.vue, benefit/pubRevenueContract/index.vue, components/zs-select-column/zs-select-column.vue, workbuddy/memory/2026-09-10.md, workbuddy/memory/2026-09-11.md
 - Project: 苏住房G; Source session: 7960611d-0d3b-4ae8-a217-98664ba2c7a2; Code baseline: none
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：7960611d-0d3b-4ae8-a217-98664ba2c7a2
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

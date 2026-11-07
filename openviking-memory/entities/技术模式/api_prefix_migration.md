@@ -12,6 +12,7 @@
 - 收尾用旧路径残留 grep 复查归零
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 2a1a3c5d，49 个文件替换后，发现并恢复 3 处被误改的 import '@/views/maintenance/...'
 - 涉及文件：zhi2-web-admin/src/api/index.js；zhi2-web-admin/src/views/maintenance/facility/index.vue
 - 所属项目：产品2.0；来源会话ID：2a1a3c5d-9f69-436a-93ed-f2b987edfc4a；代码基线：6cf33a8

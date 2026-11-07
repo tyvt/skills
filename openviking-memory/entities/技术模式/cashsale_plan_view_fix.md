@@ -14,6 +14,11 @@
 - 涉及文件：cashsaleConstants.js、plan/detail.vue、CashsaleDetail.vue、cashsale-apply-helpers.js
 - 项目：苏州市房地产监测V3；来源会话ID：5c4d5204-0c97-4a4d-bcb7-2b81ff546339
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -10,6 +10,8 @@ refundDetailTable.vue 加 :key 使弹窗首次创建时 visible 已 true，el-di
 - 修正 ::disabled 笔误为 :disabled。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山G
+- 来源会话：1261540d-7b00-4143-aefd-bd8ea9034677
 - 验证：来源 cursor 会话 1261540d-7b00-4143-aefd-bd8ea9034677；代码基线 none。
 - 涉及文件：refundDetailTable.vue、refundDetailDialog.vue、accountTubereason/integratedQuery/components/DetailDialog.vue、commonTable.vue。
 - 所属项目：惠山G/zhi1-web-admin（维修资金退款模块）。

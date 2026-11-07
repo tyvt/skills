@@ -11,6 +11,7 @@
 - 表决意见、决策人、证件号、手机号、签字等字段保持为空
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 7f01db0d 用户反馈线下表决弹框「表决意见」未输入却显示内容
 - 涉及文件：`decisionCommon/components/VoteRangeDialog.vue`、`ownerDecision/components/VoteRangeDialog.vue`、`optionDecision/components/VoteRangeDialog.vue`
 - 所属项目：太仓G；来源会话：7f01db0d-5c85-4ac0-a81f-2cca268fc30d；代码基线：none

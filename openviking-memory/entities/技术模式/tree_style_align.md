@@ -18,6 +18,7 @@
 - 修改仅样式层，lint 报项目已有 ts-plugin `never` 相关错误，未引入新逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/index.vue、zhi2-web-admin/src/views/maintenance/facilityDefinition/index.vue
 - 所属项目：园区物管2.0；代码基线：none；来源会话：968a5e94-2c53-439a-b27e-9288474c649a
 

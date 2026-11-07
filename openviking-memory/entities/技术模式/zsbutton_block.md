@@ -14,6 +14,7 @@
 - ZsButton.vue 实现上移除 width:inherit，新增 block 属性绑 zs-button--block 类，round 属性改绑 zs-button--round 类，宽度由显式 prop 表达
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 af4e72e7，基线 b7bf813；addHouseContract「添加」按钮异常，改法为加 block、移除 long、.button 补 width:100%
 - 涉及文件：src/pages_owner/house/owner/addHouseContract.vue、src/components/ZsButton/ZsButton.vue、src/pages_owner/house/owner/addHouse.vue、src/styles/form2.scss
 - 所属项目：苏住房C；来源会话ID：af4e72e7-03c6-4e90-a546-a36ef38a5c56、064ec0fb-85a5-4024-bd90-76afedcd4945、76068bd5；代码基线：b7bf813、f1939b0、5f0f4dc

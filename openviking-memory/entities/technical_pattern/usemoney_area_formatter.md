@@ -14,6 +14,11 @@ pubUseMoneyApply/detail.vue showPropertyProjectDialog binds street/community col
 - Files: pubUseMoneyApply/detail.vue, ruoyi.js, pubParkingRate/detail.vue, detailMixins.js, assetsLeaseContractFiling/detail.vue, property/useMoneyApply/detail.vue, area.js, zs-select-dialog-func.vue.
 - Project: 园区公共收益; source session: 414b600e-25ec-4a22-8966-2b35fffacd1d; code baseline: none.
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：414b600e-25ec-4a22-8966-2b35fffacd1d
+
 
 <!-- MEMORY_FIELDS
 {

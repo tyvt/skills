@@ -13,6 +13,7 @@
 - 账号密码登录：无二级 Tab、无图形验证码
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 已暂存待提交文件：src/views/login.vue、src/views/register/components/accountInfo.vue、public/assets/images/login-icon-alipay.png、public/assets/images/login-icon-js-auth.png
 - 所属项目：产品2.0；来源会话：453c62ef-4912-4526-ae16-57cb42408710；代码基线：none
 

@@ -9,6 +9,7 @@
 - `YhwdTable.vue` 的 `handleView`/`handleUpdate` 对行数据浅拷贝 `{...row}`，`$nextTick` 后再开弹窗避免 prop 未更新触发 `@open`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 在银行网点子表分别点查看/编辑，确认网点名称、联行号、地址、联系人等字段回显
 - 所属项目：苏州市房地产监测V3；来源会话：224ebc32-0868-4266-a756-0afa83014b18
 - 涉及文件：`cbyh/components/YhwdDialog.vue`、`cbyh/components/YhwdTable.vue`、`api/jgyh/yhwdgl.js`

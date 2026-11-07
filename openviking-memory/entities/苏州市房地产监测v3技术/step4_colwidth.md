@@ -7,6 +7,7 @@
 - 表格设置 :fit=false 以紧凑布局
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/163.md
 - 涉及文件：Step4Shareholders.vue、companyRegister.vue、companyInfo.vue、registerValidate.js、Step1CompanyInfo.vue、Step3Appendix.vue、companyRegister.js、propertyCompanyRegister.vue
 - 所属项目：苏州市房地产监测V3；来源会话：07ea18e2-6956-4c76-aee4-59cf48b781f9；代码基线：none

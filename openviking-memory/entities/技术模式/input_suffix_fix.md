@@ -16,6 +16,10 @@
 - 涉及文件：input-group-fix.css、element-ui.css、element-ui.scss、index.html
 - 所属项目：产品2.0；来源会话：6e092b88-7451-45d2-9591-af86334101f0；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

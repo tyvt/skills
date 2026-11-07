@@ -11,6 +11,12 @@
 - 涉及文件: CompanyBasicInfoDetail.vue; companyRecord.js; ruoyi.js; detail.vue; index.vue; detailMixins.js; form.js; main.js
 - 会话: ac2a541a-e0f6-41f2-bba0-8b283388ff32; 代码库: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：ac2a541a-e0f6-41f2-bba0-8b283388ff32
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术缺陷",

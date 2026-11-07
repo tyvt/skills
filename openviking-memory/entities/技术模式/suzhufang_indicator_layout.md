@@ -7,6 +7,10 @@
 - 涉及 `indicatorComponents/index.vue`、`zs-table-column.vue`、`creditIndicator/index.vue`
 - 所属项目：苏住房G；来源会话：b3a9c220-7fdb-4c57-9aa9-ea701de8f93b；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

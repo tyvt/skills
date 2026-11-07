@@ -10,6 +10,7 @@
 - 同步修改 `ConsLicBuildTable.vue`、`planLic/changeDetail.vue`、`consLic/changeDetail.vue` 的相关绑定
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/284.md
 - 涉及文件：planLic/components/PlanLicRelatedBuildingTable.vue、mixins/subTableMixins.js、mixins/table.js、mixins/ListTemplate.js、consLic/components/ConsLicBuildTable.vue、planLic/detail.vue、planLic/changeDetail.vue、consLic/changeDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：55d7d7d9-e5d7-412b-9318-c88e962e77f3；代码基线：none

@@ -8,6 +8,7 @@
 - 已将 `.detail-label` 改为 `text-align: left`，标签名称靠左显示；值区域默认左对齐未改动。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/components/detail-template/detail-template.vue；所属项目：园区物管2.0；来源会话 a563fde7-487c-404f-a47e-ae62b28abbc3。
 
 

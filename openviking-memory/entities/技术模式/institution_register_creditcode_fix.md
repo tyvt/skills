@@ -15,6 +15,10 @@
 - E2E `register-layout.spec.js` 经纪机构用例 `minUsciWidth` 由 240 调整为 180，新增 `assertInstitutionUsciActionsSameRow` 断言三按钮与输入框 Y 坐标对齐，4 个用例全部通过（含「提取中 USCI 不被截断」）
 - 所属项目：苏州市房地产监测V3；来源会话：4b2f9d95-14ba-4d66-a8c1-5657389a2a88、01447af2-d905-4a03-a903-55e9e5594222
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -14,6 +14,7 @@ propertyContract 列表将「是否上传备案表」从 sys_yes_no（Y/N）改�
 - 删除 listCallback 前先确认无列依赖其字段映射
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 bbcf1fcb（2026-09-21，基线 ad5bbd9）diff 审查，结论严重度 high
 - 涉及文件：property/propertyContract/components/index.vue、components/dict-tag/dict-tag.vue、mixins/listMixins.js
 - 所属项目：苏住房G；来源会话：bbcf1fcb-341d-4924-a4e0-c14ea7c779ce；代码基线：ad5bbd9

@@ -16,6 +16,7 @@
 - 凡为返回保持筛选新增到 cachedSearchParams 的字段，若属账号/机构维度必须进登出清理清单，否则跨账号串味
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证会话 c14c5230（064.md 会话 c14c5230）：诊断 parentDeptId 退出未清理，在 LogOut 与 FedLogOut 补 dispatch('common/clearAllSearchParams', null, { root: true }) 清空缓存
 - 涉及文件：store/modules/user.js、store/modules/common.js、mixins/listMixins.js、property/complex/components/RegionTreeLayout.vue
 - 所属项目：苏住房G；代码基线：2a3ef8a；来源会话ID：c14c5230-321b-471a-a40a-e48d33f20dbb

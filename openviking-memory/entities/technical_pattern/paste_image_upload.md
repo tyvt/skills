@@ -14,6 +14,12 @@ In EstateManagement Park Froala editor, pasted images are auto-uploaded and only
 - Involved files: policy shtml, js, froala_editor.min.js, FileUploadController.java, FileUploadServiceImpl.java, index.html, SmPolicyCommunityRecordAddController.java, Application.java.
 - Source session ID: 5e09b260-67d2-4210-bc34-31daca30276b.
 
+## 验证与归属
+- 所属项目：园区V0
+- 验证证据：extracted source=cursor project=园区V0
+- 来源会话：5e09b260-67d2-4210-bc34-31daca30276b
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

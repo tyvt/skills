@@ -9,6 +9,8 @@
 - 仅 `.el-dialog__body` 内「无 `el-row`、直接 `el-col` 堆叠」用 `padding-bottom: var(--detail-block-gap)`，避免与 `detail-from-container > .zs-form` 的 `row-gap: 16px` 叠加
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：14ac23b1-f562-46c6-80d9-d8e3b7a96870
 - 验证证据: src=苏州市房地产监测V3/109.md
 - 涉及文件: styles/detail-form.scss, vite.config.js, styles/index.scss, styles/variables.css, styles/element-ui.scss, presale/entrustSale/detail.vue, zs-dialog/zs-dialog.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 14ac23b1-f562-46c6-80d9-d8e3b7a96870; baseline: none

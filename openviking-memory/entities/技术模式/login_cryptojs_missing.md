@@ -11,6 +11,7 @@
 - 在 `passwordEncrypt.js` 中增加与 `responseDecrypt.js` 一致的空值检查，便于排查
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：硬刷新页面（Ctrl+F5）后重新登录；开发服务热更新或重启 npm run dev
 - 涉及文件：`src/views/login.vue`、`index.html`、`passwordEncrypt.js`、`responseDecrypt.js`、`public/assets/js/crypto-js.min.js`
 - 所属项目：产品2.0；来源会话：1bc8fc71-bc44-4ec0-8afd-e7a6ff8608f0；代码基线：none

@@ -13,6 +13,7 @@
 - ≤1200px 断点调整时勿把机构详情误收成两列导致再次错位
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 用户反馈字段对齐出问题后改四列网格，要求刷新验证全宽行与双列左侧值纵向对齐
 - 涉及 zhi2-web-admin/src/views/home/publicPortal/portal.scss、PropertyPages.vue、BrokerPages.vue、PropertyDetailDialog.vue、RentalDetailDialog.vue
 - 所属项目：门户；来源会话 f3136e73-1172-459f-872c-cc4efe5d4b2f；代码基线 e1f8e0b

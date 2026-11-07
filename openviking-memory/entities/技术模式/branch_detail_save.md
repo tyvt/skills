@@ -11,6 +11,7 @@
 - 涉及 `detailMixins.js`、`form.js`、`OperationBtnGroup/index.vue` 等共用逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/112.md
 - 涉及文件：institution/agencyBranch/components/AgencyBranchDetail.vue、institution/agencyPersonnel/components/AgencyPersonnelDetail.vue、mixins/detailMixins.js、property/complex/detail.vue、components/OperationBtnGroup/index.vue、institution/agencyBranch/components/AgencyBranchList.vue、mixins/form.js、main.js
 - 所属项目：苏州市房地产监测V3；来源会话：27689708-9f9b-4386-9993-e547142b1ab3；代码基线：none

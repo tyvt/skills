@@ -16,6 +16,8 @@
 - .workbuddy/memory/2026-09-23.md
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/118.md
 - 来源会话：09f6b31e-b744-41e8-aa52-b2310e44a3a9；代码基线：none
 

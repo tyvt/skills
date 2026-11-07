@@ -15,6 +15,8 @@
 - `e2e/fixtures/company-helpers.js`、`e2e/company/personnel-record.spec.js`
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/030.md
 - 来源会话ID：7cf9d7c3-1aa5-441c-b2af-a459deebc0b4
 

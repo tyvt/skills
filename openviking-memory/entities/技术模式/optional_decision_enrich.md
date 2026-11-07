@@ -19,6 +19,7 @@
 - 排查同类「只显时间/空白」先比对同模块已修兄弟页面有无 pickResponseId+详情补全逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 2d84eea4（基线 8fc3cc5）用户报「我的表决—选项表决-我的决策内容看不到，一般表决和选举改过」
 - 涉及文件：pages_vote/decision/optional/DecisionResult.vue、DecisionRecord.vue、detail.vue、common/DecisionResult.vue、api/autonomy.js
 - 所属项目：苏住房C；来源会话ID：2d84eea4-83d0-4cd8-82b5-903f4772c353；代码基线：8fc3cc5

@@ -22,6 +22,7 @@
 - d:/repository/产品2.0/zhi2-web-admin/src/settings.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：2128505f-8e3c-45e5-8ca0-aa7871402fb0、428cfc70-782c-4061-9b59-52d8ce8ccbd5；代码基线：none
 
 

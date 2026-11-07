@@ -11,6 +11,8 @@
 - 在列模板中添加 `v-if="row"` 作为渲染防御
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：3893ccfd-88f3-46aa-bc62-e0f4d3d00ac6
 - 验证证据: src=苏州市房地产监测V3/277.md
 - 涉及文件: EducationTable.vue, AgencyPersonnelDetail.vue, CertificateList.vue, zs-table.vue, zs-table-column.vue, ServiceSchemePanel.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 3893ccfd-88f3-46aa-bc62-e0f4d3d00ac6; Baseline: none

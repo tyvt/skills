@@ -19,6 +19,7 @@
 - d:/repository/园区公共收益/zhi2-web-admin/src/views/benefit/pubBusinessItem/components/businessItemTable.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：src=园区公共收益/030.md
 - 来源会话ID：b4ffaae4-3716-42a9-af99-762e8ed9a217；代码基线：none
 - 所属项目：园区公共收益

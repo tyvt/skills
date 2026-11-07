@@ -12,6 +12,7 @@
 - 修复后新增页底部只显示「保存」；查看已提交记录才按状态权限显示操作按钮
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 3c3a27ee 一般表决刚新增就出现一排其他按钮；修复后正常
 - 涉及文件：zhi1-web-admin/src/views/estate/generalDecision/detail.vue、ownerDecision/detail.vue、src/mixins/detailMixins.js、optionDecision/detail.vue
 - 所属项目：太仓G；来源会话：3c3a27ee-5748-4f83-bd05-d3e2e69d6434；代码基线：none

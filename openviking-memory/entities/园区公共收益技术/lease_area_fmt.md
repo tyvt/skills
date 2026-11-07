@@ -11,6 +11,7 @@
 - 修改位置约 498:507 行
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：resourcesLeaseContractFiling/detail.vue、area.js、assetsLeaseContractFiling/index.vue
 - 所属项目：园区公共收益；来源会话：6bb1b34b-eb24-4b0a-b69b-69e34156d925；代码基线：none
 

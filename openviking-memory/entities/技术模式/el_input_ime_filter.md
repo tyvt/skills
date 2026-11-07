@@ -15,6 +15,7 @@
 - 凡是「输入触发过滤」场景均适用此规则。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 0f4d7bcd 用户报「菜单图标，用中文搜索不生效」，修复为 @input.native 改 @input 且 filterIcons 直接用事件参数，刷新后输入「三方」可正确过滤。
 - 涉及文件：src/views/system/menu/IconSelect.vue。
 - 所属项目：园区物管2.0；来源会话：0f4d7bcd-4f58-428d-a808-a25b8e090d3a；代码基线：7f13a8a38。

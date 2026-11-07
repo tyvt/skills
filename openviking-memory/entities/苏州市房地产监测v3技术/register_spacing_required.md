@@ -12,6 +12,7 @@
 - 未填写时第1步显示必填星号并阻止进入下一步，避免第4步「申请入网」才报错
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证建议：第4步查看股东列表列宽是否正常；第1步不填成立日期点「下一步」应提示「成立日期不能为空」
 - 所属项目：苏州市房地产监测V3
 - 涉及文件：Step4Shareholders.vue、Step1CompanyInfo.vue、companyInfo.vue、registerValidate.js

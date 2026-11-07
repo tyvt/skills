@@ -14,6 +14,7 @@
 - 将子表移出 zs-form，弹窗改用 el-button，查看模式按钮文案改为「关闭」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：92e30909-1160-4e65-bfae-414e923ee760；代码基线：none
 
 <!-- MEMORY_FIELDS

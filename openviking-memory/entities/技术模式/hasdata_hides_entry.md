@@ -20,6 +20,7 @@
 - components/overviewSubTableTemplate.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/071.md
 - 来源会话ID：35553223-dace-4e9a-b3e2-6d7267b933f7
 - 代码基线：none

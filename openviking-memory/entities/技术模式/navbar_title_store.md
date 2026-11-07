@@ -6,6 +6,8 @@
 - 添加 computed title() 返回 this.platformConfig.platformName || import.meta.env.VITE_APP_PROJECT_NAME。
 - 移除 data 中对 title 的定义。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：6a14ed22-6423-4953-948b-32e9d3050f1b
 - 验证证据: cursor session=6a14ed22-6423-4953-948b-32e9d3050f1b
 - 涉及文件: src/layout/components/Navbar.vue, src/store/modules/app.js
 - 所属项目: 2-0; 代码库: none

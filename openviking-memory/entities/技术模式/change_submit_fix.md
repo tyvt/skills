@@ -14,6 +14,10 @@
 - 涉及文件：toB/companyRecord/detail.vue、company-record-change.spec.js
 - 所属项目：产品2.0；来源会话：81d50d9d-8547-44b3-96d3-8541338567c3；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

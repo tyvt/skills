@@ -12,6 +12,7 @@
 - `loadEntryNetworkDetail`：仅当路由有 ID 时调用 `getEntryNetworkDetail`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`@/utils/ruoyi.js`、`DeveloperBasicInfoDetail.vue`、`detailMixins.js`
 - 所属项目：苏州市房地产监测V3；来源会话：34b3aff3-436f-4179-ac42-dfbfa838e9d3；代码基线：none
 

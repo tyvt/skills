@@ -14,6 +14,7 @@
 - companyCancel/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 字典使用 ECONOMIC_INSTITUTIONS_REGION
 - 所属项目：苏州市房地产监测V3；来源会话：c41f1e6e-6285-4e62-b90d-cf6473627bf9；代码基线：none
 

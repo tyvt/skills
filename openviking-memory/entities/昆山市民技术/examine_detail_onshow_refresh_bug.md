@@ -11,6 +11,7 @@
 - `operationBtn.vue` watch 增 `refreshKey` 并 `await init()` 重校验权限
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证证据：src=昆山市民/007.md
 - 涉及文件：src/pages_examine/examineDetail.vue、src/pages_examine/components/operationBtn.vue、src/api/modules/examine.js、src/pages_examine/components/approveDialog.vue、src/request/index.js、src/pages_examine/examineList.vue
 - 所属项目：昆山市民；来源会话ID：73a8f90b-b76b-4c0a-817c-91bc79c7d47c；代码基线：none

@@ -18,6 +18,7 @@
 - 前端「能调起但没结果」查桥接，「完全调不起」先看arg0是否拿错网关ID
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C(zhi2-mobile-shimin)
 - 来源会话：8cccd282-23de-4677-8488-fd1b2de11ef6
 - 代码基线：d43894b

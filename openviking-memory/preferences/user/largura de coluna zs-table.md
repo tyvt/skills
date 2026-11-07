@@ -3,6 +3,12 @@
 - 将 `scheduleDistributeRemainingWidth` 改为 `rAF + $nextTick`，移除 16ms 延迟。
 - 验证证据: src=苏州市房地产监测V3-leftover/021.md; 会话 533e9595-631f-446e-8081-9e0ce442a190.
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：533e9595-631f-446e-8081-9e0ce442a190
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

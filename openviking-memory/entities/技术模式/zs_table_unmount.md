@@ -11,6 +11,7 @@
 - 修改文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证方式：切换路由离开触发卸载，观察控制台是否仍出现 beforeUnmount hook 报错
 - 所属项目：2-0；来源会话ID：03d38e43-915e-4d67-8a3b-63c1ee8a02cf；代码基线：none
 

@@ -15,6 +15,11 @@
 - 涉及文件：e2e/register/company-register.spec.js、playwright-report/index.html
 - 项目：苏州市房地产监测V3；来源会话ID：bbf4455e-d301-4701-a090-882f15126648
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

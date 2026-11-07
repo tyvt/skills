@@ -15,6 +15,8 @@
 - zhi2-web-admin/package.json
 
 ## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：门户/023.md
 - 来源会话ID：b952859d-fcbb-4bce-b690-b2e5ad915c03；代码基线：none
 

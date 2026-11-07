@@ -13,6 +13,7 @@
 - 改在共享的 components/detail.vue 一处生效，资金缴存与资金支用两个详情页同时修好，无需逐页改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 会话 151c21b4：用户报资金缴存详情页附件不能预览，根因 type:'text'，改 type:'image' 后两处详情同时生效
 - 涉及文件：maintenance/guaranteeDeposit/components/detail.vue、guaranteeDeposit/detail.vue、guaranteeDeposit/deposit/detail.vue
 - 所属项目：产品2.0；来源会话：151c21b4-932f-40b4-a857-68f078ae0b56；代码基线：414029f

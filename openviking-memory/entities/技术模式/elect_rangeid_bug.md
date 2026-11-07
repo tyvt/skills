@@ -12,6 +12,8 @@
 - 通过 `getDecisionRecordDetail` 完整列出名称和摘要
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：ebfaaf3c-dafe-4784-b0a0-fc04dca7dec7
 - 所属项目: 苏住房C (zhi2-mobile-shimin)
 - 源会话: ebfaaf3c-dafe-4784-b0a0-fc04dca7dec7
 - 涉及文件: src/pages_owner/elect/index.vue, src/pages_owner/elect/DecisionResult.vue, src/pages_vote/elect/index.vue, src/pages_vote/elect/DecisionResult.vue, src/pages_vote/decision/common/DecisionResult.vue, src/pages.json

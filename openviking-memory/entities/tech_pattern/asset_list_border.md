@@ -25,6 +25,12 @@ Asset change lists lacked the `list-card` container, causing tables to have no o
 ## Source
 - Extracted from cursor session 97b1025a-9dba-4821-8e14-0be39a728d87.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：97b1025a-9dba-4821-8e14-0be39a728d87
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

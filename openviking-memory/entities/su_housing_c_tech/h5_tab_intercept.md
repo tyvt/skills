@@ -15,6 +15,10 @@
 - 修改文件：`src/utils/appNavigation.js`(新建)、`src/utils/tabBar.js`
 - 所属项目：苏住房C(zhi2-mobile-shimin)；来源会话ID：34bbb144-2648-4883-b2f5-4039faa3aa6e
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

@@ -12,6 +12,7 @@
 - `zhi2-web-admin/e2e/fixtures/company-helpers.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 运行结果：01 / 01b / 02 / 03 / 04 全部 ok，约 1.2 分钟
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：12a2e42b-6de6-49de-9205-d3b77e75c3bf

@@ -21,6 +21,8 @@
 - d:/repository/惠山小程序/src/utils/busCode.js
 
 ## 验证与归属
+- 所属项目：惠山小程序
+- 验证证据：extracted source=cursor project=惠山小程序
 - 验证证据：src=惠山小程序/002.md
 - 来源会话：afda119d-96d6-4114-922d-328d363e131d
 - 代码基线：none

@@ -13,6 +13,7 @@
 - ZsImage内部节点尺寸受组件样式控制，外层改宽高需写到深度选择器:deep里。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话5d912c3c【掌服务-小区管理-云守护】UI调整，结论第3、4条补充分包路径与复制svg修复。
 - 涉及文件：zhi2-mobile-shimin/src/pages_guard/index/index.vue、guardApply/components/step1.vue、components/ZsImage/ZsImage.vue。
 - 所属项目：苏住房C；代码基线：8fc3cc5；来源会话ID：5d912c3c-3130-4cf8-9e0a-0d48f904b5f4。

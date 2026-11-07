@@ -7,6 +7,8 @@
 - 避免在每个使用 el-icon 旧写法的页面单独修改。
 - 仅剩少量直接在 el-button 或特殊场景使用 `icon="el-icon-..."` 的地方未覆盖，需按页面精修。
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 4eaf5cdc（cursor session=4eaf5cdc-4638-4f11-acea-647d5111b462）。
 - 涉及文件：zs-button.vue；来源会话ID：4eaf5cdc-4638-4f11-acea-647d5111b462；代码基线：none。
 

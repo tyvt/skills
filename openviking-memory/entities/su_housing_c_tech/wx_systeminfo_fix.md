@@ -11,6 +11,7 @@
 - main.ts 首行引入 polyfill，确保早于框架代码执行
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：970c1102-ef4a-4650-b2b0-7044abd68b9e
 - 涉及文件：src/utils/system-info.js、vendor.js、src/polyfills/mp-weixin-system-info.js、main.ts
 - 代码基线：none

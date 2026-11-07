@@ -17,6 +17,7 @@
 - 排查提示：“点击无响应但无报错”优先查更高z-index自绘遮罩拦截，再查控件是否真被解析(uv-*非本库)，别先查业务逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话c2002207根因定位H5下自定义遮罩z-index:996挡住弹层，去遮罩+改uni-popup+ZsDatePicker type="range"后修复
 - 涉及文件：src/pages_benefit/tenant/index.vue、src/components/ZsDatePicker
 - 所属项目：苏住房C；来源会话ID：c2002207-e827-4fb1-95af-8409ac89d1b0；代码基线：200c2f3

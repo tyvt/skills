@@ -13,6 +13,8 @@ handleHouseOwner 非 200 时 HTTP 拦截器自动 showToast 并 reject，页面�
 - addHouseContract.vue：`ZsPopup` 移到页面根级；抽取 `handleVerifyResult`；增加 `.catch()` 兜底；部分成功场景与 addHouse.vue 对齐；补充 `z-index: 9999`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：2bea3534-bd43-456f-baef-32b59c649b85
 - 验证证据：cursor 会话 2bea3534-bd43-456f-baef-32b59c649b85；补充会话 0e3de74d-cc4d-4e34-8770-dd23e2757471
 - 涉及文件：httpInstance.js、addHouse.vue、addHouseContract.vue、TypeChoose_Suzhufang.vue、authentication.vue、property.js、PropertyAdd.vue、add.vue、index.js
 - 所属项目：苏住房C（zhi2-mobile-shimin）；代码基线：none

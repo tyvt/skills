@@ -15,6 +15,7 @@
 - 验证需硬刷新（Ctrl+F5）排除缓存；新增页面报全局变量未定义，第一步核对静态脚本引入清单
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 会话 1bc8fc71（2026-08-26，基线 a357f32）结论：文件存在仅漏 script 标签，修复为 index.html 补引用 + passwordEncrypt.js 加空值检查
 - 涉及文件：src/views/login.vue、src/utils/passwordEncrypt.js、index.html；所属项目：产品2.0；来源会话：1bc8fc71-bc44-4ec0-8afd-e7a6ff8608f0
 

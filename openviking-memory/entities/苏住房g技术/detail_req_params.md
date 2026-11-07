@@ -11,6 +11,7 @@
 - 排查特征：控制台有 `[getDetail] 缺少接口必需参数，已跳过请求：id`，全页 -、无报错、network 查不到详情请求。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话 6b03f817 companyInfo 全字段空白，定位 commit 01a0aa7cf 新增 validateDetailRequiredParams 要求 id；在 companyRecord/detail.vue 重写 getDetailRequiredParams 去掉 id 后恢复。
 - 涉及文件：zhi2-web-admin/src/mixins/form.js；zhi2-web-admin/src/views/toB/companyRecord/detail.vue
 - 所属项目：苏住房G；来源会话ID：6b03f817-799f-459f-9742-e7b1d4894401；代码基线：5ccda28

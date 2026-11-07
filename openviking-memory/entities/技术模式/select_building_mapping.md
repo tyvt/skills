@@ -10,6 +10,9 @@
 - SelectBuildingDialog.vue, SupervisionTable.vue, EntrustBuildingTable.vue, SelectDialog.vue, entrust-sale 详情, 监管 jgxm 详情, entrust-sale-helpers.js, spec e2e
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：1c6ebe99-e7de-4325-94b6-5e285bed7910
 - 验证: src=苏州市房地产监测V3/174.md
 - 源会话: 1c6ebe99-e7de-4325-94b6-5e285bed7910; 代码基线: none
 

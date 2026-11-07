@@ -16,6 +16,7 @@
 - `路由信息.json`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据: src=苏州市房地产监测V3/187.md
 - 来源会话: 41805f07-b6a7-46c0-90b9-f28d770d61ab
 - 所属项目: 苏州市房地产监测V3; 代码基线: none

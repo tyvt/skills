@@ -11,6 +11,7 @@
 - zs-table：移除错误的 gapBelowContainer 扣减，新增 getFillHeightFromContainerBounds()，分页未显示时预留52px，取三种算法最大值
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话：284420f4-9651-4522-a204-e61d73fc5079；代码基线：none
 
 <!-- MEMORY_FIELDS

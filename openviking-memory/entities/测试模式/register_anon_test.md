@@ -7,6 +7,7 @@
 - E2E real-api-flow.spec.js：用 clearAuthStorage + ensureRegisterAnonymousSession 替代 injectRealApiAuth；Step3 上传沿用 setupHybridUploadMock
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：companyRegister.js、register-helpers.js、real-api-flow.spec.js
 - 所属项目：产品2.0；来源会话：c3f9e4f8-0f4c-49cd-ab93-f6b6ee988f87；代码基线：none
 

@@ -9,6 +9,7 @@
 - `PresaleBuildingTable.vue` 的 `handleProgressMaintain` 传递整行交由父组件处理
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/157.md
 - 涉及文件：presale/permit/components/PresalePlanFillForm.vue、PresaleBuildingTable.vue、PresaleBuildingSection.vue、detail.vue、PresaleProgressDialog.vue、docs/commercial-contract-migration-api.md、e2e/fixtures/presale-permit-helpers.js、e2e/presale/presale-permit-real-api-flow.spec.js
 - 所属项目：苏州市房地产监测V3；来源会话：4ad74818-9e10-4ec9-a586-ce529fd33e4b；代码基线：none

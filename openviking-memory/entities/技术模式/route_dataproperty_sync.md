@@ -9,6 +9,7 @@
 - 全局排查 `zhi2-web-admin/src/**/*.{vue,js}`，将 `moduleName` 改为 `'dataProperty'` 以匹配 `businessName` 路由。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/010.md
 - 涉及文件：publicQuery/complex/components/facilityTable.vue、maintenance/facility/index.vue、maintenance/facilityDefinition/facilityDefinitionDialog.vue、maintenance/facilityDefinition/FieldTableDialog.vue
 - 所属项目：2-0；来源会话ID：f27111ea-1764-4c3e-9978-077951c4dd1b；代码基线：none

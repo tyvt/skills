@@ -4,6 +4,12 @@
 - Submit buttons on three pages unified width `330px` and reuse `ZsTextarea` word count
 - Applies to: Suzhou Housing C zhi2-mobile-shimin elevator application pages (source session 195edae6-0f6a-4414-80de-36297794ff9a)
 
+## 验证与归属
+- 所属项目：pages_owner_extra
+- 验证证据：extracted source=cursor project=pages_owner_extra
+- 来源会话：195edae6-0f6a-4414-80de-36297794ff9a
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

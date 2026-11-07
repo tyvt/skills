@@ -18,6 +18,10 @@
 - 用户反馈标题栏贴顶与「要页面居中，现在跑到页面顶部了」
 - 结论确认全局 margin:auto !important 但遮罩无 flex 导致顶到页顶，flex 居中修复
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

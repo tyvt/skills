@@ -11,6 +11,7 @@
 - 同类组件要么用内置属性，要么把指令绑到组件内部真实 DOM
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 c1098e7c，zs-dialog.vue 去掉 v-dialogDrag，改为 :draggable
 - 涉及文件：zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue
 - 所属项目：2-0；来源会话ID：c1098e7c-136f-424c-bd78-3be376262378；代码基线：none

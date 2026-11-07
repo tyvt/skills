@@ -10,6 +10,8 @@
 - 在G视图中，将`showPersonnelRoleField`定义为true
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：78eb4f58-a263-44aa-9a8e-3ccff66ca115
 - 验证证据: src=苏州市房地产监测V3/277.md
 - 涉及文件: AgencyPersonnelDetail.vue, agencyBasicInfoContent.js, agencyPersonnelBasicInfoFields.js, detailLayout.js, AgencyPersonnelBasicInfoFormFields.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 78eb4f58-a263-44aa-9a8e-3ccff66ca115; Baseline: none

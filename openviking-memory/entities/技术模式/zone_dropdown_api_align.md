@@ -11,6 +11,7 @@
 - 修复 `list` 相关片区下拉数据加载逻辑以解决无值
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/118.md
 - 涉及文件：supervision/agreement/version/detail.vue、benefit/pubRegAccountChange/detail.vue、presale/entrustSale/detail.vue、api/zone/zone.js、api/system/zone.js、property/propertyAccount/detail.vue、api/index.js、mixins/detailMixins.js
 - 所属项目：苏州市房地产监测V3；来源会话：ff916423-d72a-4b4e-b8d0-925acbfa29d1；代码基线：none

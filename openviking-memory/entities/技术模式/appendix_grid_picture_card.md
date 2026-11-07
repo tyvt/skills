@@ -12,6 +12,7 @@
 - `EntrustSaleAddAppendix.vue` 同步接入 `:on-remove-file`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/181.md
 - 涉及文件：Headline/index.vue、DetailAppendixPanel/index.vue、DeveloperBasicInfoDetail.vue、permit/detail.vue、AppendixPackageSection/index.vue、AppendixRequirementCard.vue、AppendixRequirementGrid.vue、AppendixFileThumbnail.vue 等
 - 所属项目：苏州市房地产监测V3；来源会话：d645224e-9b5c-4725-8923-04a22668da18；代码基线：none

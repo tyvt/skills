@@ -14,6 +14,11 @@
 - 涉及文件: presale/entrustSale/detail.vue, presale/entrustSale/index.vue, e2e/fixtures/entrust-sale-helpers.js, mixins/detailMixins.js, e2e/presale/entrust-sale-real-api-flow.spec.js, mixins/form.js
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: 74428e0b-126e-4f90-9fc3-2fbe6b27a399; Base: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：74428e0b-126e-4f90-9fc3-2fbe6b27a399
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "padrao_tecnico",

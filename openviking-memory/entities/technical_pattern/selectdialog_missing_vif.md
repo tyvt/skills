@@ -11,6 +11,7 @@
 - 实现关闭即销毁，消除空白占位
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/052.md
 - 涉及文件：commercialHousingSales/presale/template/detail.vue、contractRevoke/detail.vue、detailMixins.js、exchangeContract/index.vue、OperationBtnGroup/index.vue、zs-select-dialog-func.vue、zs-dialog.vue、zs-select-dialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话：31e3d43d-5804-493b-b7d0-f41ce35c1bc8；代码基线：none

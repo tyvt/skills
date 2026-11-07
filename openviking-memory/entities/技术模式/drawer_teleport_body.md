@@ -10,6 +10,7 @@
 - `attachmentDraw.vue` 增设 `div.attachment-drawer-root`，配合 `v-show` 与 `position:fixed; width:0; visibility:hidden` 样式裁掉外漏。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/010.md
 - 涉及文件：OperationBtnGroup/index.vue、attachmentDraw.vue
 - 所属项目：2-0；来源会话ID：606fcea2-85a1-4821-b6e0-0d6ddd8fddeb；代码基线：none

@@ -15,6 +15,8 @@
 - 回跳结果暂存于 SDK success 回调，避免成功态丢失。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：d303f251-dbaf-4d2c-8f51-16248a0b7e3d
 - 验证会话：d303f251-dbaf-4d2c-8f51-16248a0b7e3d（基线 none）。
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/api/security.js、src/pages/verifyUser/index.vue、src/store/user.js。
 - 所属项目：无锡市区小程序嵌入H5。

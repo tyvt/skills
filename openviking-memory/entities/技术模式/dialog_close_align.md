@@ -17,6 +17,8 @@
 - `zhi2-web-admin/package.json`
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/143.md
 - 来源会话ID：186a234b-b8c5-43be-8142-a0b0c30a7e10；代码基线：none
 

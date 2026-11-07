@@ -10,6 +10,10 @@
 - 文件：publicQuery/complex/index.vue、mixins/listMixins.js
 - 所属项目：苏住房G；来源会话：9be9f4ff-05e2-405b-8ad5-b23dec6b243f；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房G技术修复",

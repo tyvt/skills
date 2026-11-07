@@ -7,6 +7,7 @@
 - maintenance 模块详情统一 POST ${url}/detail 并含动态主键
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/019.md
 - 涉及文件：路由信息.json、cbyh/detail.vue、cbyh/index.vue、detailMixins.js、form.js、api/zjjg/xy.js、jgwd/detail.vue、wtjgxy/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：5f12d6ca-c193-45eb-984f-d206aaa583d3；代码基线：none

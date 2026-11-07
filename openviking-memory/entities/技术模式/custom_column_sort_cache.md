@@ -14,6 +14,12 @@
 - cursor 会话 23259f03-6ebe-4aaa-8a85-fd3a770bfa1b
 - 涉及文件: src/views/autonomy/regulation/components/index.vue, src/components/global-table-config/global-table-config.vue, src/mixins/table.js, src/mixins/listMixins.js, src/mixins/ListTemplate.js, src/store/modules/table.js, src/components/zs-table-column/zs-table-column.vue, src/components/zs-table/zs-table.vue
 
+## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
+- 来源会话：23259f03-6ebe-4aaa-8a85-fd3a770bfa1b
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

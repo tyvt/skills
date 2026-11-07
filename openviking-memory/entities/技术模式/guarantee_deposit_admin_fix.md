@@ -8,6 +8,7 @@
 - 管理员点击账户名称弹出选择账户对话框，可按左侧区域树筛选，选中后自动填充账户名称和业务账户
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：`guaranteeDeposit/components/AddDialog.vue`、`guaranteeDeposit/components/index.vue`
 - 所属项目：产品2.0；来源会话：8cce6e5f-7212-46e4-b856-ac58b146cde8；代码基线：none
 

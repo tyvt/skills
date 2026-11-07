@@ -17,6 +17,7 @@
 - 禁止在 ZsMap 标签写 style 字符串或写死像素高度
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证会话 a8639b2e / fc3995fc：houseMap.vue 移除 style 改 calc 高度，info/index.vue 参照 newHouse/detail.vue 用 .map-container 包裹
 - 涉及文件：src/components/ZsMap/ZsMap.vue、src/pages_main/houseMap/houseMap.vue、src/pages_owner/project/info/index.vue、src/pages_transaction/newHouse/detail.vue
 - 所属项目：苏住房C；来源会话ID：a8639b2e-9ee0-4789-a462-e47f95ce5510, fc3995fc-3653-441b-9537-8ac6acc697e9；代码基线：4630e8e、5f0f4dc

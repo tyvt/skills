@@ -11,6 +11,7 @@ i淮安H5 的 benefit 模块移除 mock 分支，列表与小区均走真实接�
 - 保留单小区 showPicker 的 toast 等非 mock 逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安H5
 - 验证：src=i淮安H5/001.md
 - 涉及文件：src/pages_benefit/benefit/index.vue、src/pages_benefit/assetsPublicity/index.vue、src/pages.json、src/hooks/useLoadMore.js、package.json、node_modules/@dcloudio/uni-ui/lib/uni-load-more/uni-load-more.vue、src/api/benefit.js、src/store/user.js
 - 所属项目：i淮安H5；来源会话：472544ee-238b-483c-9e2d-72850c506abd；代码基线：none

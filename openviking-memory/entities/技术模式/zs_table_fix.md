@@ -14,6 +14,10 @@
 - 文件：`receiptin/index.vue`、`zs-table.vue`、`ZsSummaryText/index.vue`、`src/styles/index.scss`
 - 来源会话：8e29a239-a740-473b-921d-cd75f2915a3e；项目：产品2.0
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

@@ -14,6 +14,12 @@ SuZhuFangC mini-program: a subpackage page cross-referencing static resources ca
 - Involved files: `package.json`, `src/pages.json`, `src/components/ZsPicker/ZsPicker.vue`, `src/manifest.json`, `scripts/relocate-datetime-picker.mjs`, `scripts/validate-dist.mjs`, `dist/pages_main/node-modules/@dcloudio/uni-ui/lib/uni-datetime-picker/uni-datetime-picker.js`.
 - Project: SuZhuFangC; source session: 283d2149-aad6-4b95-83d3-698be7a1f675; code baseline: none.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：283d2149-aad6-4b95-83d3-698be7a1f675
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "suzhufangc_tech",

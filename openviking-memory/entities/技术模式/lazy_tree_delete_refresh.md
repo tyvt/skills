@@ -9,6 +9,7 @@ lazy+load 树表删三级子节点后仅调 getList() 不清 lazyTreeNodeMap 缓
 - 同类思路见 system/dept 清空 lazyTreeNodeMap，key 更简单。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 183f0f0d 用户反馈删三级刷新异常；结论说明 lazyTreeNodeMap 缓存与 tableRenderKey 重挂载方案。
 - 涉及文件：zhi2-web-admin/src/views/maintenance/standardItemType/index.vue、zhi2-web-admin/src/views/system/dept/index.vue
 - 所属项目：2-0；来源会话ID：183f0f0d-e87d-4696-8caa-bb0bbdf0d30f；代码基线：none

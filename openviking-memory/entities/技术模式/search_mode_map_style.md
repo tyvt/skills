@@ -11,6 +11,7 @@
 - 失败后回到行政区划气泡样式并重新展示区县级数据
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue
 - 所属项目：园区物管2.0；来源会话：a3789a5a-09f2-4f9a-8236-5d37e21277d1；代码基线：none
 

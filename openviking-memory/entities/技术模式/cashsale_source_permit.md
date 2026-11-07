@@ -17,6 +17,7 @@
 - `e2e/presale/cashsale-transfer-real-api-flow.spec.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据: src=苏州市房地产监测V3/188.md
 - 来源会话: 2d5fa078-1499-48cb-8fca-5cc13ccc4a4d
 - 所属项目: 苏州市房地产监测V3; 代码基线: none

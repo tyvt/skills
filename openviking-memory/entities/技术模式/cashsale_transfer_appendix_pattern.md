@@ -12,6 +12,7 @@
 - e2e/fixtures/cashsale-transfer-helpers.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话：b682e5d0-7ff0-4125-961e-04c9a7ebb147；代码基线：none
 
 <!-- MEMORY_FIELDS

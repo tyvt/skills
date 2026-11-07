@@ -13,6 +13,7 @@
 - 经验：主包预算紧张时，分包已有的兜底/占位图一律不进白名单，宁可走 subpackage 预加载。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 dbea5b5a（2026-08-31，基线 0cea241）结论：主包构建失败因上传预估 2057.4KB 超 2048KB；调整后磁盘 1742.2KB、上传预估 2038.4KB。
 - 涉及文件：zhi2-mobile-shimin/src/utils/mainStaticPaths.js、scripts/prune-main-static.mjs、src/components/commonNew/houseCard.vue、src/pages.json。
 - 所属项目：苏住房C；来源会话ID：dbea5b5a-3444-443d-a782-07bd1b65d66e；代码基线：0cea241

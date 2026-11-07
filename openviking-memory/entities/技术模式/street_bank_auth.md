@@ -13,6 +13,7 @@
 - 保存后GET /streetBankPolicy/page刷新列表；街道编码须从树/上级节点解析，勿从行对象想当然取
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话dc798ac5用户给接口文档并反馈subdistrictCode为空，最终改下拉源与并行请求等
 - 涉及文件：system/regionBankAuth/index.vue、StreetAuthDialog.vue、utils.js、property/complex/components/RegionTreeLayout.vue
 - 所属项目：苏住房G；来源会话：dc798ac5-5460-4582-83cb-9f9c7bf0266f；代码基线：92ce738

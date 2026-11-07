@@ -14,6 +14,8 @@
 - 数据超5条显示「查看全部」，分别跳转`/pages_owner/project/jurisdiction/index`与`/pages_owner/subdistrict/jurisdiction/index`
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 修改文件：`zhi2-mobile-shimin/src/pages_owner/community/info/index.vue`、`zhi2-mobile-shimin/src/pages_owner/subdistrict/info/index.vue`
 - 项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：af66ed37-017b-4e3f-95ee-12512b07c08f；代码基线：none
 

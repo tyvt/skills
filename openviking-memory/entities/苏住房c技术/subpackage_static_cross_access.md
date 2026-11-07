@@ -11,6 +11,8 @@
 - 用 :deep() 修复 scoped 样式穿透问题
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 9b333521 用户反馈电子业主卡图标加载失败，agent 复制资源并修复样式穿透
 - 涉及文件：src/pages.json、src/pages_owner/ownerCard/index.vue、src/pages_owner_extra/ownerCard/index.vue、src/pages_tab/components/menu/MenuSection.vue、src/store/menu.js、src/components/ZsImage/ZsImage.vue、src/utils/index.js、src/pages_tab/components/menu/MenuImage.vue
 - 验证证据：src=苏住房C/042.md；来源会话ID：9b333521-93bd-4e07-8e91-b6a53dcd962f；代码基线：none

@@ -14,6 +14,10 @@
 - zhi2-web-admin/tests/e2e/fixtures/public-portal-designs.ts
 - 所属项目：门户；来源会话：f3136e73-1172-459f-872c-cc4efe5d4b2f；代码基线：e1f8e0b
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

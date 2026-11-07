@@ -11,6 +11,7 @@ pages_owner/maintain/index.vue的维修资金房屋信息由两步外部接口�
 - 报错来自该页拉取维修资金房屋信息时的接口调用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：src/pages_owner/maintain/index.vue、src/utils/h5Context.js、@/api/index.js
 - 来源会话：a343d1aa-9a2b-44b9-9046-e30e130c5be6
 - 所属项目：无锡市区小程序嵌入H5

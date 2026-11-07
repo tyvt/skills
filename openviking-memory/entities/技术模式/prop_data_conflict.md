@@ -15,6 +15,7 @@
 - src/mixins/tableComponents.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/072.md
 - 来源会话ID：09ed34db-94d4-41c6-856b-023f0668f865
 - 代码基线：none

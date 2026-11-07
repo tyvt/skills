@@ -16,6 +16,7 @@
 - 结论：间距类需求优先改「包裹层」，不要反复调组件上的工具类——这是该类「改了没效果」需求的默认第一反应。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 a2751523：用户先报 type 页「下一步按钮距离上面提示文字的间距」未调整，第二次直接回「未生效」。最终结论为 ZsButton 上的 margin/UnoCSS mt-80 不作用到内部按钮，改为原生 view 包裹 .next-step-btn 设 margin-top:80rpx，并给 .publish-type-box 加 flex 纵向防外边距折叠。
 - 涉及文件：src/pages_transaction/publishHouse/type.vue、src/components/ZsButton/ZsButton.vue、uno.config.ts。
 - 所属项目：苏住房C；来源会话ID：a2751523-b238-42d9-b41f-5da721879c3a；代码基线：f1939b0。

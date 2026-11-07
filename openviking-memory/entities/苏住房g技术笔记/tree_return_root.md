@@ -18,6 +18,7 @@
 - 配套：退出登录必须清缓存（对应会话 c14c5230-321b-471a-a40a-e48d33f20dbb 的退出清缓存修复），否则换账号继承上一账号部门筛选
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证会话 5decc0c2（064.md 会话 5decc0c2）：部门树从详情返回后回到苏州市节点，根因未缓存 parentDeptId+tree-ready 顺序错
 - 修复涉及 regionBankAuth/index.vue 与 RegionTreeLayout.vue 的 queryParams、setNodeContext、handleTreeReady、getQueryParams、树节点点击与 tree-ready 顺序
 - 涉及文件：system/regionBankAuth/index.vue、property/complex/components/RegionTreeLayout.vue、property/complex/components/regionTree.vue、mixins/listMixins.js

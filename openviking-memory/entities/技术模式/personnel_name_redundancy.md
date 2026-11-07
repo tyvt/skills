@@ -10,6 +10,9 @@
 - 在 agency-personnel-real-api-flow.spec.js 中添加了 E2E 断言以确保仅使用 keyWord 标签
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：c1779a4f-3141-425a-bf33-25bd2342d93d
 - 验证证据: src=苏州市房地产监测V3/178.md
 - 涉及文件: AgencyPersonnelList.vue, agency-personnel-real-api-flow.spec.js, LeasePersonnelList.vue, AgencyBranchList.vue, index.vue
 - 会话: c1779a4f-3141-425a-bf33-25bd2342d93d; baseline: none

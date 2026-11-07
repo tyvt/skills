@@ -12,6 +12,8 @@ zs-button.vue 与 zs-image.vue 中 isFinish 使用已格式化的 endDate 传入
 - zs-image.vue
 
 ## 验证与归属
+- 所属项目：H5
+- 验证证据：extracted source=cursor project=H5
 - 验证证据：src=H5/002.md
 - 来源会话ID：3685bc2c-c0df-4a55-a8ea-c6e71917e105
 - 代码基线：none

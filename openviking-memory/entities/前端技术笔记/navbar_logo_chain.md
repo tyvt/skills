@@ -13,6 +13,7 @@
 - 注册/未登录页顶栏品牌信息（系统名称+LOGO）统一从 platformConfig 读，且与 Navbar 共用同一条优先级链
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 acfae044 最终结论确认 Navbar.vue 已改从 store 读取 logo 并保留 defaultLogo 兜底
 - 涉及文件：src/layout/components/Navbar.vue
 - 所属项目：产品2.0；来源会话ID：acfae044-ec7d-4f5e-bb61-36dc593a35da；代码基线：bd398ef

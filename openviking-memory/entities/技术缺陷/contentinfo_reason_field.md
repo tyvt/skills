@@ -14,6 +14,7 @@
 - 与本次修改无关的 TS 提示（如 changeApplyTable.getList）为原有问题，未改动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：zhi2-web-admin/src/views/maintenance/accountCancel/detail.vue
 - 所属项目：园区物管2.0（项目2-0）
 - 来源会话：491cb20a-e8f3-44cb-9648-5a18d4740d5d

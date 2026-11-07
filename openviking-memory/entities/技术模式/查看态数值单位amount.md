@@ -21,6 +21,10 @@
 - 来源会话ID：f3762574-10fb-4d07-adb1-cfcfca9fd8aa
 - 代码基线：401d884
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

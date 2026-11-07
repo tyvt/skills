@@ -11,6 +11,7 @@
 - 有 ID 时返回 view 隐藏保存按钮
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/147.md
 - 涉及文件：路由信息.json、store/modules/permission.js、前端技术信息.md、.workbuddy/memory/MEMORY.md、utils/ruoyi.js、main.js、components/OperationBtnGroup/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：2d76dc77-4d43-4e28-9eff-4af234266cb7；代码基线：none

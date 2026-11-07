@@ -9,6 +9,7 @@ ListTemplate.js 操作列绑定 operationColumnWidth，页面仅用 listMixins �
 - 各列表页可在自身 data 覆盖加宽。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 0613463c AccountCancel 渲染告警；结论指向 ListTemplate 写死宽度、table mixin 缺字段，已在 table.js 补默认值。
 - 涉及文件：zhi2-web-admin/src/mixins/ListTemplate.js、zhi2-web-admin/src/mixins/table.js、zhi2-web-admin/src/views/maintenance/accountCancel/index.vue
 - 所属项目：2-0；来源会话ID：0613463c-dedd-4264-a38a-7d944299a97c；代码基线：none

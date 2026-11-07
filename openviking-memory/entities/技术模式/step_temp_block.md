@@ -7,6 +7,8 @@
 - 仅当 isPicture === '1' 且 stepFormImages 完全无图时提示未上传。
 - 保存取 stepFormImages，去除临时路径校验，改为 map(el => el.rawUrl || el.fileID || el.url).filter(Boolean).join(',')。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/006.md
 - 涉及文件：src/staff/pages_facility/record/add.vue、src/staff/components/ZsUploader/ZsUploader.vue、src/components/ZsDialog/ZsDialog.vue、src/staff/api/file.js、src/staff/pages_facility/record/addScrap.vue、src/api/file.js、src/components/ZsUploader/ZsUploader.vue、src/env/mp.js
 - 来源会话ID：1cc3bd97-be24-4f8d-abe0-a7fa7f804986

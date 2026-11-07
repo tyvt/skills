@@ -16,6 +16,10 @@
 - 涉及文件：src/views/benefit/mapOverview/index.vue；所属项目：园区物管2.0；来源会话 ID：15514253-88df-4a75-b299-5e0fcb7ba067；代码基线：e75a12737。
 - 验证：index.vue 写两个 computed，后块 threeAssetsMax 顶掉 districtStatsByName 变 undefined，悬停执行 this.districtStatsByName['锡山区'] 报错；修复为合并进同一个 computed。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

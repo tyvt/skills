@@ -12,6 +12,9 @@
 - 确保了 `company-register-fields.spec.js` 的通过（会话 417eac43 附验证 082.md）
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：417eac43-30d4-48c7-97e2-73f5e4d9cdd0
 - 涉及文件: Step1CompanyInfo.vue, companyRegister.vue, QualificationFormSection.vue, Step1BasicInfo.vue, Step2LegalPerson.vue, Step3Appendix.vue, Step4Shareholders.vue, registerValidate.js, company-register-reset.spec.js, mapQxtEntInfo.js, package.json
 - 验证证据: src=苏州市房地产监测V3-rest/065.md; src=苏州市房地产监测V3/082.md
 - 会话: 417eac43-30d4-48c7-97e2-73f5e4d9cdd0, 0c678471-cf7f-47eb-a5c0-ed61ba99b0f8; 代码库: none

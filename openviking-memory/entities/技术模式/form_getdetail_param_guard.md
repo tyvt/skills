@@ -12,6 +12,7 @@
 - 扩展方式是覆盖方法而非改 mixin 本体，所有进入详情接口的路径都有统一参数守卫
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：用户要求「没有定义接口必须的参数则不调用接口，并打印警告日志」；实现 getDetailRequiredParams/validateDetailRequiredParams，与 detailMixins.init() 的 if (this.id) 互补
 - 涉及文件：src/mixins/form.js、src/mixins/detailMixins.js、src/views/benefit/alert/detail.vue
 - 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：6a9618e6-98db-4bc4-8e98-8bedd424f2b4

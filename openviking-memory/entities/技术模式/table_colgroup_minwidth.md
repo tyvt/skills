@@ -12,6 +12,7 @@
 - 外层 `.stat-table-wrap` 保留 `overflow: auto` 承载窄屏横向滚动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证分宽屏/窄屏两态：宽屏看是否铺满且第一列不被异常拉伸，窄屏看是否横滚而非压缩换行
 - 此类「原生表格 + colgroup」页与 zs-table 列宽算法无关，勿改公共 zs-table（会误伤全站列表）
 - 验证：detail.vue 里 width→minWidth、.stat-table 恢复 width:100%，依赖 .stat-table-wrap 的 overflow:auto 处理窄屏

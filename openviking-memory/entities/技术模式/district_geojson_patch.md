@@ -11,6 +11,7 @@
 - 其他城市出现开发区/功能区缺失，同样往 districtMapSupplements/ 加对应市级 adcode 补丁文件，通用机制已内建
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：tencentDistrictBoundary.js 新增 mergeGeoJsonSupplements 并在 loadPlatformDistrictMapGeoJson 中合并；补丁数据来自 transaction/screen/components/suzhou.json
 - 涉及文件：utils/tencentDistrictBoundary.js、utils/districtMapSupplements/320500.json、benefit/mapOverview/index.vue
 - 所属项目：产品2.0；来源会话：f1c849f4-3cc5-4b13-8600-6f3cd3f51e32；代码基线：50767de

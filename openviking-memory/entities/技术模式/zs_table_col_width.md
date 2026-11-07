@@ -13,6 +13,7 @@
 - 列表页纯文本列仍走默认测算，不要照抄 min-width
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：zhi2-web-admin/src/views/system/syncLog/index.vue
 - 所属项目：产品2.0
 - 来源会话ID：d9f3c68c-3ec6-4725-adf0-590b032f0388

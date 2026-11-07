@@ -15,6 +15,10 @@
 - 涉及文件：utils/index.js、detail.vue、ZsNav.vue、tabLine.vue、tabBtn.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：7e811367-b5c4-4dfb-83e7-e8f29ef7909c
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

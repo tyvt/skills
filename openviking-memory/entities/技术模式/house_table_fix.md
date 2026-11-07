@@ -13,6 +13,7 @@
 - 该组件也用于合同备案等页面，一并受益。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：598aac99-dabd-44cd-9cf8-08c0eb4260e3；代码基线：none
 - 涉及文件：houseTable.vue、index.scss、zs-table.vue 等
 

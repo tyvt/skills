@@ -3,6 +3,12 @@
 - 涉及的文件：autonomy/option/detail.vue, components/CancelReasonDialog.vue, styles/index.scss, maintenance/depositNotice/components/CancelReasonDialog.vue, styles/element-ui.scss, autonomy/multiply/components/VotingItemsDialog.vue, components/zs-dialog/zs-dialog.vue, components/zs-textarea/zs-textarea.vue
 - 验证证据: session=cursor a5325fb9-2e64-40bc-b6ba-0a3479233656
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：a5325fb9-2e64-40bc-b6ba-0a3479233656
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

@@ -15,6 +15,7 @@
 - 删/改 pages.json 路由前全仓 grep 路径字符串确认无调用方；改完必须重新编译
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话 17b77da9（基线 db06361）：用户贴报错并要求恢复，补回 4 个路由注册
 - 涉及文件：src/pages.json、src/pages/login/index.vue
 - 所属项目：苏住房C；来源会话ID：17b77da9-0fa5-4835-918b-0363e0ec5bf1

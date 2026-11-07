@@ -13,6 +13,9 @@
 - 文件：`spFeeBill/components/import.vue`、`bill/components/import.vue`、`spFeeBill/components/index.vue`
 - 所属项目：产品2.0；来源会话：7e35018a-3038-4ded-afb4-236a2607fad5；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

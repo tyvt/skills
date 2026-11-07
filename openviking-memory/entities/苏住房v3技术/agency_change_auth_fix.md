@@ -11,6 +11,7 @@
 - AgencyBasicInfoForm.vue、toB/agencyRecord/detail.vue、companyRecordAgency/change/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：6c91b23f-bba3-49fb-bd85-76e4879db720；代码基线：none
 
 <!-- MEMORY_FIELDS

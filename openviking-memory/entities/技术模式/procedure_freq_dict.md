@@ -7,6 +7,8 @@
 - 兼容字段 `frequency`，未匹配时回退原始值。
 - 无值显示 `--`。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/018.md
 - 涉及文件：src/pages_facility/maintain-detail.vue、src/pages_facility/record-detail.vue、src/pages_facility/detail.vue、src/styles/cell.scss、src/components/CardCell/CardCell.vue、src/components/CardCell/CellFulline.vue、src/pages_facility/maintain.vue、src/api/maintenance.js
 - 来源会话ID：a8d2449b-d164-43b2-85d3-6742b02d3c70

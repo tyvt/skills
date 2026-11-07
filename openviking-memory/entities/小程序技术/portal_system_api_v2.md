@@ -8,6 +8,7 @@ webview/门户首页接轮播等 /system/* 能力时须拼文件服务域名、�
 - 新接 /system 接口前先对照 user/index 的 base 与 header 写法
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：会话 eb625bb1 token 参考 user/index；/system 前加 v2.0；pictureUrl 相对路径需拼域名；getBannerList 调 /system/banner/page
 - 涉及文件：pages/webview/home.vue、api/home.js、pages/user/index/index.vue
 - 所属项目：小程序；来源会话ID：eb625bb1-51ca-49ee-a579-ba01827034bb；代码基线：none

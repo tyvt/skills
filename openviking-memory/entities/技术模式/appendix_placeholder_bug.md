@@ -11,6 +11,8 @@
 - institutionRegister.js 与 companyRegister.js 分别调用 listInstitutionAppendixPackage 与 listAppendixPackageForRegister
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/103.md
 - 涉及文件：Step3Appendix.vue、InstitutionUploadItem.vue、institutionRegister.js、companyRegister.js、InstitutionRegisterPage.vue、appendix-package-helpers.js
 - 来源会话ID：b5012ad6-36f9-46ad-a9b1-913b5fdf7d66；代码基线：none

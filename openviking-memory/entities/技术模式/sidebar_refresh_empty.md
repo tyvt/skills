@@ -13,6 +13,11 @@
 ## 验证
 - 涉及文件：menuVisibility.js、permission.js、Sidebar/index.vue、Navbar.vue、RecursiveMenu.vue；来源会话 f1e6a91e-9b3c-44e9-9570-576bc6246461；项目门户。
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

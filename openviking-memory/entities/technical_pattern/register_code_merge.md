@@ -11,6 +11,7 @@
 - 企业端提交 payload 仅含 smsCode 需对齐后端
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/011.md
 - 涉及文件：register/components/single-page/CompanyRegisterSingleForm.vue、institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue、utils/registerValidate.js、utils/registerFormContext.js、register/companyRegister.vue、api/company/companyRegister.js
 - 所属项目：苏州市房地产监测V3；来源会话：022a69f3-9841-423f-b378-ec7448b32510；代码基线：none

@@ -12,6 +12,7 @@
 - 同步修复同类隐患
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/090.md
 - 涉及文件：refund/detail.vue、presale/exchangeContract/detail.vue、presale/specialcontract/detail.vue、agreement/account/detail.vue、detail-template.vue、dict-tag.vue、supervision/bank/cbyh/detail.vue、mixins/detailMixins.js、scripts/scan-tag-mismatch.js
 - 所属项目：苏州市房地产监测V3；来源会话：78d15986-f89e-4ac8-b7bf-426222e6b9db；代码基线：none

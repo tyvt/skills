@@ -13,6 +13,7 @@ B端单点登录先开空白窗再异步换授权URL时，window.open第三个�
 - 等待期间显示「正在跳转」占位文案
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 验证：010.md 会话 7ffb3be2 用户「直接打开为空白，手动点击打开正常」；结论明确 noopener 导致无法操作新窗口 location，已改为 opener=null + replace
 - 涉及文件：zhi2-web-admin/src/views/sso/bTerminalRedirect/index.vue、zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue、zhi2-web-admin/src/api/security/oauth2.js
 - 所属项目：惠山二期G；来源会话：7ffb3be2-f8de-4608-8768-cc04a3088249；代码基线：43b1b40

@@ -19,6 +19,7 @@ building/detail.vue 中 getFloor 调 mathjs add 计算总层数时空值抛类�
 - zhi2-web-admin/src/views/building/unitChange/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：园区公共收益/035.md
 - 来源会话：748fb1f8-e625-4295-9c80-d99233536464；代码基线：none
 - 所属项目：园区公共收益

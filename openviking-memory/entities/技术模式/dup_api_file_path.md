@@ -12,6 +12,7 @@
 - 排查顺序固定：先看Network是否发请求且URL是否一致（路径分叉伪装成没调接口），再疑zs-tabs懒加载，最后看组件逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话08444023用户诉求楼幢接口未调/presale/priceBuilding/list，贴BuildingsTable render异常，要求改回/page并加rows||[]兜底
 - 涉及文件：zhi2-web-admin/src/api/pricehouse/recordPriceHouse.js、zhi2-web-admin/src/api/presale/recordPriceHouse.js、recordPriceMngSuzhou/detail.vue及BuildingsTable/PriceTable/RecordTable组件
 - 所属项目：产品2.0；来源会话：08444023-c60e-41b0-9e6e-c49324a5d33b；代码基线：62d5fb9

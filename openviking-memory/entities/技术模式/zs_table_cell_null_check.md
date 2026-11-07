@@ -9,6 +9,7 @@
 - 两方法内增加空值判断，仅 `cell?.parentElement` 存在时才添加或移除 `hover-row` 类
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：src=园区公共收益/040.md
 - 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、src/views/building/house/index.vue、src/components/zs-table-column/zs-table-column.vue、src/mixins/listMixins.js、src/mixins/table.js、package.json
 - 所属项目：园区公共收益；来源会话：65ff3dc2-6a51-41e1-8dfa-f8e3a9d71203；代码基线：none

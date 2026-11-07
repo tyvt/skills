@@ -15,6 +15,8 @@
 - `views/institutionRegister/components/InstitutionUploadItem.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：2026e41e-c4eb-4375-afbb-6894581445bf
 - 验证证据: src=苏州市房地产监测V3/025.md
 - 会话ID: 2026e41e-c4eb-4375-afbb-6894581445bf
 - 所属项目: Suzhou Real Estate Monitoring V3; 代码基线: none

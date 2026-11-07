@@ -14,6 +14,11 @@
 - 案例 1：会话 1dad72c5 — /toB/companyInfo 在 companyRecord/detail.vue 中使用了未注册的 propertyContractTable，解析失败。 涉及文件: zhi2-web-admin/src/views/toB/companyRecord/detail.vue; zhi2-web-admin/src/views/company/companyManagement/components/propertyContractTable.vue. 所属项目: 2-0; 会话: 1dad72c5-73f0-43c2-8c13-cda8490370ba.
 - 案例 2：会话 cdb8c8d2 — bankTable.vue（预览模式）使用了未注册的 DetailTemplate；仅 mixin subTableMixins 不包含该组件。修正：显式导入并注册 DetailTemplate，同样在 companyManagement/components/bankTable.vue 中。 涉及文件: src/views/company/companyRegister/components/bankTable.vue; src/views/company/companyManagement/components/bankTable.vue; src/mixins/subTableMixins.js; src/views/company/companyManagement/components/qualificationDialog.vue; src/main.js; src/views/maintenance/components/AllocationDialog.vue; src/views/company/companyRegister/dialog.vue; src/mixins/dialogMixins.js. 会话: cdb8c8d2-612f-4ad7-a826-8e4470159f9f.
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
+- 来源会话：1dad72c5-73f0-43c2-8c13-cda8490370ba
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

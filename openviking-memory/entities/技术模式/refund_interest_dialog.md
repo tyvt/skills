@@ -16,6 +16,7 @@
 - 房屋坐落优先取 position，否则用楼幢号-单元号-户室号拼接
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0
 - 来源会话ID：fa1e34a2-4bd1-44f4-88bc-016e3ac401d3
 - 涉及文件：AccountRefundTable.vue

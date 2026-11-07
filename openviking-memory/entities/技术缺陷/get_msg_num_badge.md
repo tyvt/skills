@@ -15,6 +15,7 @@
 - 联调用 vConsole 看 /msg/msg/msgNum?readFlag=0&projectType=1 返回体定位
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 318a55ec 全部已读角标不消失，已在 loadUnread 补齐参数
 - 涉及文件：pages_tab/components/My_Suzhufang.vue、pages/index/components/My_Suzhufang.vue、pages/message/index.vue、api/msg.js
 - 所属项目：苏住房C；来源会话：318a55ec-f120-4633-be9b-7750ed534251；代码基线：f1939b0

@@ -18,6 +18,10 @@
 - 所属项目：园区公共收益；来源会话：4901c51b-48fd-4552-a991-5fc17b4c1409；代码基线：none
 - 涉及文件：zs-operate-column.vue、houseTable.vue（assetsLeaseContractFiling/detail.vue）
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "园区公共收益技术",

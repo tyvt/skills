@@ -11,6 +11,7 @@
 - 重新提交时需将 `apply.svg` 与 `index.vue` 一并加入暂存区
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、src/assets/images/mapOverview/apply.svg、eslintrc.cjs、package.json
 - 所属项目：园区物管2.0；来源会话：ef34d9ad-7535-4fd3-a353-b17efa7397bf
 

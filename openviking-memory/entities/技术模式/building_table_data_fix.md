@@ -11,6 +11,7 @@
 - 保留 BuildingStateTable.vue 布局修复：自适应 Grid、动态列宽、overflow 可见，确保同层多户完整显示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 当前行为：接口返回什么展示什么；后端修正楼层分组后前端自动跟随
 - 涉及文件：buildingFloorGroup.js、buildingTable/index.vue、BuildingStateTable.vue
 - 所属项目：惠山二期G；来源会话：9da606ce-856f-468c-9dca-d8063172f462；代码基线：none

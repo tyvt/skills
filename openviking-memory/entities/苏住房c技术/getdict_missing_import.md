@@ -15,6 +15,7 @@
 - 字典驱动下拉/单选建议列表为空时打可控日志，区分「接口没发」与「发了没数据」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话 1a7c73a2（基线 0011377）：用户反馈注销原因不显示，补 import 修复
 - 涉及文件：src/pages_my/setting/cancellationReason.vue、src/api/common.js、src/components/ZsRadio/ZsRadio.vue
 - 所属项目：苏住房C；来源会话ID：1a7c73a2-9bb1-429e-a2b6-09950e71add3

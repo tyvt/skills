@@ -9,6 +9,7 @@ src/utils/index.js 第322行 amountTransform 函数多余右括号导致语法�
 - 函数正确返回格式化数值
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i-H5
 - 验证证据：src=i-H5/001.md
 - 涉及文件：src/utils/index.js
 - 所属项目：i-H5；代码基线 none；来源会话 875e0e77-9f6b-4bd3-97c0-7a51e3f5ec9f

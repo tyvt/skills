@@ -16,6 +16,7 @@
 - 新增/编辑点击「监管项目名称」弹出选择对话框，点击列表项目名称触发 handView 回填并关闭弹窗
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：c236f45d-1867-422f-aa31-f4acbb751ce8
 - 代码基线：none

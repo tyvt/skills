@@ -11,6 +11,7 @@
 - 删除 `HomeDeveloperIconRow.vue`。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：src=门户/032.md
 - 涉及文件：zhi2-web-admin/src/views/home/components/HomeBizSection.vue、src/views/home/config/homeLayout.js、src/views/home/index-new.vue、src/views/home/mixins/homeDataMixin.js、src/views/home/components/HomeDeveloperIconRow.vue、src/views/home/components/layouts/HomeLayoutSidebar.vue、src/views/home/components/layouts/HomeLayoutAdmin.vue
 - 所属项目：门户；来源会话ID：439693b0-982f-4355-a0e8-3210cd7a2d24；代码基线：none

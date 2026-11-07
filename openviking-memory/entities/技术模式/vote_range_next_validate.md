@@ -11,6 +11,7 @@
 - 修复后必填未填时显示校验提示且无法进入「候选人选举」步骤
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 81005aa4 用户报没有校验必填就可以点下一步，修复后正常
 - 涉及文件：ownerDecision/components/VoteRangeDialog.vue、decisionCommon/components/VoteRangeDialog.vue
 - 所属项目：太仓G；来源会话：81005aa4-3a6b-4f6a-9054-7ab69341ff3f；代码基线：none

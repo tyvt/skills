@@ -9,6 +9,8 @@
 - 添加「业务状态」下拉框，随 `/benefit/pubHouse/page` 请求提交
 
 ## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/views/benefit/pubHouse/index.vue、src/views/benefit/pubRevenueContract/index.vue、src/mixins/listMixins.js、src/views/benefit/pubParkingSpace/index.vue、src/api/benefit/pubHouse.js
 - 来源会话ID：55d70a90-ab8b-466b-88a5-7221f59b6b06；代码基线：none
 

@@ -14,6 +14,7 @@
 - initDict() 加载 sys_yes_no 时同步赋值给 hasSubAccountOptions
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：7e4c18c0-5ce0-41ce-b4dd-d28988df5d00；代码基线：none
 
 <!-- MEMORY_FIELDS

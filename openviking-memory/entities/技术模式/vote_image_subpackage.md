@@ -17,6 +17,10 @@
 - 来源会话: 5a891058-8e80-44d0-9a37-a7ff9e578ff9
 - 所属项目: zhi2-mobile-shimin
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -14,6 +14,10 @@
 - 涉及文件：zhi2-web-admin/src/views/dataProperty/recordProcess/components/recordProcessStepDialog.vue、scrappedRecord/detail.vue、mixins/detailMixins.js、maintenance/facility/components/FacilitySelectDialog.vue
 - 所属项目：产品2.0；来源会话：321b7eb6-d1b4-4f6b-865c-11661215d619；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -3,6 +3,12 @@
 - Add `page{height:100%}` and call `updateFixedLayout` in `onShow`.
 - Reference fix session: 964238bf-2553-4990-9244-37619f4aadbe
 
+## 验证与归属
+- 所属项目：无锡市区小程序嵌入H5
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：964238bf-2553-4990-9244-37619f4aadbe
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

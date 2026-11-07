@@ -8,6 +8,8 @@
 - 需确认 CDN 资源部署状态。
 - 本机访问该 CDN 地址目前返回 404，与组织架构页使用同一资源；若图标仍不显示，需确认 CDN 已部署 `static/staff/organization/search.png` 或将图片加入 `src/static/` 使用本地资源。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/017.md
 - 涉及文件：src/staff/pages/complex-select/index.vue、src/staff/components/ZsSearch/ZsSearch.vue、src/pages/staff/organization/index.vue、src/pages.json、src/components/ZsImage/ZsImage.vue、src/env/mp.js、vite.config.ts
 - 来源会话ID：9d087ad1-9371-48e0-a759-a1977d0f33fa

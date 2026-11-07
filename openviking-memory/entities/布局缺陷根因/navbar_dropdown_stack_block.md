@@ -14,6 +14,7 @@
 - 主内容区需通过 isolation:isolate 建立独立层叠上下文，避免任意页面高 z-index 盖住顶栏
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/layout/components/AppMain.vue、src/views/benefit/statisticsMap/index.vue、src/views/benefit/statisticsMap/components/map.vue、src/layout/components/Navbar.vue
 - 所属项目：园区物管2.0
 - 来源会话ID：afe24635-17e4-4855-b880-847a1c56ae6f

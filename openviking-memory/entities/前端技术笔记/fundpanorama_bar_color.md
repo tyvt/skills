@@ -12,6 +12,7 @@
 - mock 内 colors 可与展示解耦单独维护；若希望 mock.js 里的 colors 也与展示一致可再改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 418857f1 用户要求各类支出分布柱体全部 #FFA94D，结论指出未传 uniformBarColor 根因及 index.vue 修改行（参考 园区物管2.0/061.md）
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/mock.js
 - 所属项目：园区物管2.0；来源会话：418857f1-8122-4137-97aa-db7576f9cb72；代码基线：f00310232

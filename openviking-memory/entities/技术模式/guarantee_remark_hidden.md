@@ -20,6 +20,10 @@
 - 涉及文件：guaranteeDepositAccount/detail.vue、detailMixins.js、detail-template.vue
 - 所属项目：产品2.0；来源会话：3faac03b-5c75-454c-a0d1-79ae56a3ac95；基线：a5e7e78
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

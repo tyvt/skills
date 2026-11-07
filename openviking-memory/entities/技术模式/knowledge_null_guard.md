@@ -11,6 +11,8 @@
 - `handleQuote` 为空时直接返回
 
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/082.md
 - 涉及文件：property/workOrder/order/components/KnowledgePreviewDialog.vue、WorkOrderActionDialog.vue、property/workOrder/order/detail.vue
 - 来源会话：4041b099-030a-481a-8753-6ecca6c475fd；代码基线：none

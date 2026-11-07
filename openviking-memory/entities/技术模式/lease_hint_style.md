@@ -16,6 +16,7 @@
 - 详情页 Headline 显式传 titleText="基本信息"；查看态 basicInfoList / payeeInfoList 补两列布局（lg/xl: 12）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 8331b045 用户参考样式图诉求
 - 涉及文件：benefit/pubHouse/components/pubHouseTable.vue、benefit/assetLeaseApply/index.vue、benefit/assetLeaseApply/detail.vue
 - 所属项目：产品2.0；来源会话：8331b045-2515-4a08-946d-7d95ffaf7dd5；代码基线：41c6961

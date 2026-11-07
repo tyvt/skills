@@ -20,6 +20,10 @@
 - 涉及文件：views/system/user/detail.vue、mixins/detailMixins.js
 - 所属项目：苏住房G、产品2.0；来源会话：08df6a66-6dbe-4a03-8d68-a6fa9506abe6、536f025f-ffaf-4424-bbcf-b53ebfb5d0d4；代码基线：44d6576、ee952eb
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

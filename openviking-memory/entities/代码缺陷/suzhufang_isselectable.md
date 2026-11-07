@@ -9,6 +9,7 @@
 - 提交时只取预警行ID，避免误勾草稿当预警提交
 - 批量删除按钮加禁用条件(选中含已备案行时保持禁用)，防借用放宽通道误删
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话19d60287，已备案合同不能选忽略预警；修复为assetsLeaseContractFiling/index.vue覆盖isSelectable、getIgnore只提交预警行ID、批量删除按钮保持禁用
 - 涉及文件：src/mixins/table.js、src/views/benefit/assetsLeaseContractFiling/index.vue；所属项目：苏住房G；来源会话：19d60287-cf61-42b7-8cdf-70ebe430e846；代码基线：82999dc
 

@@ -12,6 +12,10 @@ account/detail.vue 顶部操作区由 operation-container 替换为 operation-bt
 - 涉及文件：zhi2-web-admin/src/views/supervision/agreement/account/detail.vue、BankAccountTable.vue、detail-template.vue、allocation/detail.vue、detailMixins.js、deposit/refund/detail.vue、jgxm/detail.vue、deposit/additional/detail.vue
 - 所属项目：产品2.0；来源会话：0e82149c-16e9-4beb-8408-fb6a25429487；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

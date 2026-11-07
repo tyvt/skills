@@ -3,6 +3,12 @@
 - 参考文件：depositNotice/elevator/index.vue, depositNotice/components/index.vue, ListTemplate.js, styles/index.scss, zs-table.vue, listMixins.js, layout/index.vue, mapProperty/index.vue。
 - 验证证据: cursor 会话 15ef611b-2214-4e2e-a0e8-5e0cdc4659ca.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：15ef611b-2214-4e2e-a0e8-5e0cdc4659ca
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

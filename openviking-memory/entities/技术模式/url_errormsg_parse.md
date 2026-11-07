@@ -15,6 +15,7 @@
 - 若取到数组取第一个；用 instance.$message.error 展示（Element 的 $message 在 Vue.use(Element) 后才挂原型，时序上必须在其之后）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：zhi2-web-admin/src/main.js
 - 所属项目：产品2.0；来源会话：a70a9913-e202-4f48-9ff9-a75c6d3d3699；基线：183f795 / c420af5
 

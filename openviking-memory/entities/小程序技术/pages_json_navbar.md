@@ -7,6 +7,8 @@ uni-app 小程序在 pages.json 的 style 中可为单个页面单独设置导�
 - 无需全局改 navigationStyle 即可实现单页白底黑字导航栏
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：007.md 用户诉求：这个页面可以单独设置导航栏为白底黑字吗
 - 涉及文件：pages.json
 - 来源会话ID：f1c8f7f6-c39d-4e69-96a6-072e8babb312；代码基线：none

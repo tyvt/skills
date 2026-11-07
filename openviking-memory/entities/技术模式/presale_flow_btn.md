@@ -17,6 +17,8 @@
 - d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permitCancel/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：3042833a-7ef3-4a0c-a806-d3d5885f5ff1
 - 验证证据: src=苏州市房地产监测V3-rest/025.md
 - 会话: 3042833a-7ef3-4a0c-a806-d3d5885f5ff1
 - 所属项目: 苏州市房地产监测V3; baseline: none

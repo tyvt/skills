@@ -14,6 +14,9 @@
 - detail-form.scss, index.scss, zs-dialog.vue, BuildingChangeDialog.vue
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：dababdf0-87af-4d0b-95f2-6a4f1ceb21fd
 - 验证证据: src=苏州市房地产监测V3-rest/139.md
 - 源会话: dababdf0-87af-4d0b-95f2-6a4f1ceb21fd; 代码库: none
 

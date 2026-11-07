@@ -13,6 +13,10 @@ i淮安公版项目 vite.config.ts 中因 runMode 推断错误导致 H5 打包 b
 - 涉及文件：vite.config.ts、src/manifest.js、dist/index.html。
 - 所属项目：i淮安公版；来源会话：68fa8b3e-063d-4913-b4bd-a9e072b71884。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安公版
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "i淮安公版技术",

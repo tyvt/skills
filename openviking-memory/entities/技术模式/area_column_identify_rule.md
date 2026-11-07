@@ -11,6 +11,7 @@
 - `align` 覆盖问题已在改动中处理
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 无需额外跟进新 `*Area` 列与全量 lint 缩进
 - 验证证据：src=苏州市房地产监测V3/116.md
 - 涉及文件：路由信息.json、companyRegister/index.vue、ListTemplate.js、zs-table-column.vue、tableColumnMeasure.js、formatters/index.js、package.json

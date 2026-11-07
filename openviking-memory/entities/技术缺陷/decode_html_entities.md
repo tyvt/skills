@@ -16,6 +16,7 @@
 - 若布局正常仍只有标题，问题在后台 szf.user.cancellation 未配完整富文本
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 b5ae7e42 注销页 UI 异常，改解码判定并移除 min-height、flex 居中
 - 涉及文件：utils/index.js、pages_my/setting/cancellationWarning.vue、components/ZsRichText/ZsRichText.vue
 - 所属项目：苏住房C；来源会话：b5ae7e42-f2bf-4ced-a0de-6ca8ba5bd6e2；代码基线：77666f8

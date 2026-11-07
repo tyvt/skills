@@ -9,6 +9,8 @@
 - 三区块统一 `DetailTemplate` 并抽取 `buildAccountContentInfo` 精简代码
 
 ## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/views/benefit/pubRegulatoryAccount/components/InfoDialog.vue、src/views/benefit/pubRegulatoryAccount/detail.vue、src/components/detail-template/detail-template.vue、src/views/benefit/components/BankReceiptDetailDialog.vue、src/mixins/dialogMixins.js、src/views/maintenance/accountOpen/owner/components/OpenDetailDialog.vue
 - 来源会话ID：b7d835d3-09e8-402c-8ec6-a570d7456e30；代码基线：none
 

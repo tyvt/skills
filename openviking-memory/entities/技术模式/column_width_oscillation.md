@@ -13,6 +13,7 @@
 - `zs-table.vue`：用稳定的 `floor(getBoundingClientRect().width)` 计算可分配宽度
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`zs-table-column.vue`、`zs-table.vue`
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：f256b057-029c-4ddc-84b5-b6e65fa514cf

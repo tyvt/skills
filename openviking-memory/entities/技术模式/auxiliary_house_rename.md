@@ -17,6 +17,7 @@
 - 苏州市房地产监测V3/路由信息.json
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/141.md
 - 来源会话ID：0fcad87d-b6db-4906-a704-25d2a6908a00
 - 所属项目：苏州市房地产监测V3；代码基线：none

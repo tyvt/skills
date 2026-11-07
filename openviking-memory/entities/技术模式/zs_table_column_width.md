@@ -11,6 +11,7 @@ zs-table-column 按 canvas 测宽：<280px 输出固定 width，否则输出 min
 - 微调分配效果优先改公共组件阈值，不要在业务页再写列宽
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：用户要求「不要写任何宽度，直接组件内部计算」；最终实现为 zs-table-column 增强 + HomeTodoTable 去掉全部列宽
 - 涉及文件：zhi2-web-admin/src/views/home/components/HomeTodoTable.vue、zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、zhi2-web-admin/src/components/zs-table/zs-table.vue
 - 所属项目：门户；来源会话：fd264e18-0e1a-4414-bf35-742d17d79c11；代码基线：b84b4e7

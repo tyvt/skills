@@ -19,6 +19,7 @@
 - E2E mock / 断言改为校验 `administrativeArea: '9'`（园区）等
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`leaseContractConstants.js`、`PropertyVerifyDialog.vue`、`index.vue`、`detail.vue`、`PartyTable.vue`、`PartyDialog.vue`、`lease-contract-mocks.js`、`lease-contract-real-api-flow.spec.js` 及对接文档
 - 所属项目：苏州市房地产监测V3；来源会话ID：6631c584-2e4d-4124-840c-3e4918698ae7；代码基线：none
 

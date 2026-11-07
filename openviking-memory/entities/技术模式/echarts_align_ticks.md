@@ -12,6 +12,7 @@
 - 单位标签对齐逻辑改用计算后的 countScale.max、fundScale.max
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 典型结果：收入图左轴 0–2000（步长400）右轴 0–300（步长60）；支出图左轴 0–600（步长120）右轴 0–80（步长20）
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、mock.js
 - 所属项目：园区物管2.0；来源会话：7ed0f29d-3da8-4470-918b-f0872f9b6a9f；代码基线：none

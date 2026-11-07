@@ -13,6 +13,7 @@
 - pubAllotNotice/detail.vue 将 :file-type 改为 :fileType
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：a28865de-bc9e-4a81-8cd6-95d66e5ba32a；代码基线：none
 - 涉及文件：zs-file-upload.vue、pubAllotNotice/detail.vue
 

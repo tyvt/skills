@@ -5,6 +5,7 @@
 ## 解决方案
 - 在 `src/utils/index.js` 中增加 Element Plus 主题变量同步设置，确保内置变量随自定义变量更新。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/014.md
 - 涉及文件：src/utils/index.js
 - 所属项目：2-0；来源会话ID：0b556b10-58ea-46e4-ba45-77143b7f3de9；代码基线：none

@@ -21,6 +21,8 @@
 - `views/property/workOrder/order/components/BatchReplyDialog.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：81825ca3-8f1a-442f-a106-ef98a5c8c238
 - 验证证据: src=苏州市房地产监测V3/025.md
 - 会话 ID: 81825ca3-8f1a-442f-a106-ef98a5c8c238
 - 所属项目: Suzhou Real Estate Monitoring V3; 基线: none

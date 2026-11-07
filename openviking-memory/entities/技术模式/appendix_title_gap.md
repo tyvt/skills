@@ -7,6 +7,8 @@
 - 由 AppendixRequirementGrid 注入 CSS 变量实现间距控制
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：872e66a4-1acc-44d6-ac4e-811259ddf984
 - 验证证据：cursor 会话 872e66a4-1acc-44d6-ac4e-811259ddf984
 - 涉及文件：AppendixRequirementCard.vue、AnnexUpload/index.vue、AppendixRequirementGrid.vue、presale/permit/components/detail.vue、appendix-requirement-grid.scss、Headline/index.vue、register-form.scss、utils/appendix.js
 - 所属项目：苏州市房地产监测V3；代码基线：none

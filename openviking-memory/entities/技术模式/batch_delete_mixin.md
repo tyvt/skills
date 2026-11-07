@@ -11,6 +11,7 @@
 - handleDelete回退this.ids避免personnelRecordId读取错误
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/116.md
 - 涉及文件：toB/personnelRecord/index.vue、toB/personnelRecord/components/index.vue、mixins/listMixins.js、mixins/table.js、package.json、路由信息.json、前端技术信息.md、workbuddy/memory/MEMORY.md
 - 所属项目：苏州市房地产监测V3；来源会话：46f44839-514d-49c6-b6e2-858af0e1b263；代码基线：none

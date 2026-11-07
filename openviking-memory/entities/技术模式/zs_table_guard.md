@@ -13,6 +13,7 @@ zs-table 包装 Element 表格原生事件回调时，合计行/固定列/重绘
 - 合计行与固定列是两类必然触发 undefined 的场景
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 2e92212a 中 zs-table.vue 461-468 行加入 cell?.parentElement 空值守卫，复现路径为租赁申请列表悬停合计行/固定列
 - 涉及文件：src/components/zs-table/zs-table.vue
 - 所属项目：产品2.0；来源会话ID：2e92212a-8c81-44e4-9cc6-e2feecfe6e5e；代码基线：41c6961

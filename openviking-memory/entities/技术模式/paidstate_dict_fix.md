@@ -18,6 +18,7 @@
 - 「收款」按钮在 paidState != '2'（非已支付）时显示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0
 - 来源会话ID：80a1a5aa-28bf-448e-ab1d-e5b881e76943
 - 涉及文件：enums.js、index.vue、detail.vue、import.vue

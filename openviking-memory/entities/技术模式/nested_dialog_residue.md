@@ -10,6 +10,7 @@ VoteRangeDialog.vue 中嵌套「线下票录入信息确认」弹框由独立 ti
 - `close()` 统一重置该状态
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：光标会话 161a2f78-6494-4326-934c-d2a31ef3bbc2 提取
 - 涉及文件：ownerDecision/components/VoteRangeDialog.vue、ownerDecision/components/DecisionRangeTable.vue、optionDecision/components/VoteRangeDialog.vue
 - 所属项目：太仓G；来源会话：161a2f78-6494-4326-934c-d2a31ef3bbc2；代码基线：none

@@ -8,6 +8,7 @@
 - getForm() 增加空引用保护，避免 tree 未渲染时直接报错
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/system/user/detail.vue、zhi2-web-admin/src/mixins/detailMixins.js、zhi2-web-admin/src/mixins/form.js
 - 所属项目：园区物管2.0
 - 来源会话：b62c693b-964b-4ea2-85e8-10ced80ddbfd

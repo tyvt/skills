@@ -11,6 +11,7 @@
 - onOpen复用同一个Promise，不会重复加载
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：刷新页面后在企业注册Step1再次打开地图弹窗；若失败检查系统配置中腾讯地图Key（qq.map.key）
 - 涉及文件：src/components/ZsTencentMap/index.vue、mapLoader.js、views/register/components/Step1CompanyInfo.vue
 - 所属项目：产品2.0；来源会话：c02c94c0-4ea3-4558-a2c3-49dd740548de；代码基线：none

@@ -8,6 +8,7 @@
 - 已具备过滤无需修改：guaranteeDeposit/components/index.vue（资金缴存/支用列表）、AddDialog.vue（新增缴存/支用弹窗账户选择）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：dfe1828a-18d8-4f50-bd96-5b846ee22649；代码基线：none
 
 <!-- MEMORY_FIELDS

@@ -8,6 +8,8 @@
 - `register-helpers.js` 中 `REGISTER_MAX_LENGTH_FIELDS.step2` 法人姓名 `max` 从 150 改为 30
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - `Step2 法人信息字段 maxlength` 用例已通过（1 passed, 2.0s）
 - 涉及文件：`Step2LegalPerson.vue`、`register-helpers.js`
 - 项目：苏州市房地产监测V3；来源会话ID：e3d71734-ab93-48dc-b3f5-54b9eddd55be

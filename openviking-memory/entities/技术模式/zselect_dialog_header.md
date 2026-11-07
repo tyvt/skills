@@ -7,6 +7,7 @@
 - 将 isProjectDialogVisible 与 isBuildDialogVisible 对应弹窗的 title= 改为 header=。
 - 文件内既有 TS 报错非本次引入，仅做弹窗属性对齐。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：src/views/maintenance/depositNotice/components/PaymentRangeTable.vue、company/components/PaymentRangeTable.vue。
 - 所属项目：2-0；来源会话：64df7727-22c7-4f7d-ab8e-726440dc4ed9；代码基线：none
 

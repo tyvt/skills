@@ -11,6 +11,7 @@
 - 须实机确认（Android苏服办）：完成扫脸后仅见成功提示、无重复实名toast、能正常进入bdc/不动产/投票流程
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages/face/face.vue、src/utils/sfbFaceAuth.js、src/pages/face/bdc.vue
 - 所属项目：无锡市区小程序嵌入H5
 - 来源会话：a6aaabb6-4559-4143-b37a-e11a1ba37fed

@@ -7,6 +7,8 @@
 - 测试草稿在 `e2e/fixtures/register-helpers.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：bc67591b-a7e5-4c59-bfbf-ecc997f7c3f3
 - 记忆类型: pattern
 - 验证证据: src=产品2.0/033.md
 - 涉及文件: d:/repository/产品2.0/zhi2-web-admin/src/views/company/companyRegister/index.vue, src/views/register/companyRegister.vue, src/api/company/companyRegister.js, src/views/register/components/companyInfo.vue, e2e/fixtures/company-helpers.js, src/views/company/companyRegister/detail.vue, src/views/login.vue, src/utils/registerValidate.js

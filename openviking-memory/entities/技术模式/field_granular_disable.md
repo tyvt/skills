@@ -13,6 +13,7 @@
 - openSelectDialog 方法可保留（新增变更仍靠物管会编号 + setOwner 回填区域），不要因移除点击调用就连方法删
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 254661f7 用户贴图指出置灰反了并给出产品口径，最终按上述修改
 - 涉及文件：zhi2-web-admin/src/views/autonomy/change/property/detail.vue、zhi2-web-admin/src/views/autonomy/change/property/index.vue、zhi2-web-admin/package.json、zhi2-web-admin/src/views/autonomy/change/industry/detail.vue、zhi2-web-admin/src/views/autonomy/change/supervisory/detail.vue、zhi2-web-admin/src/views/autonomy/record/components/detail.vue、zhi2-web-admin/src/mixins/detailMixins.js、zhi2-web-admin/src/views/autonomy/regulation/change/detail.vue
 - 所属项目：苏住房G；来源会话ID：254661f7-ea9b-45c8-84f6-063fdca139f1；代码基线：4f7c2c3

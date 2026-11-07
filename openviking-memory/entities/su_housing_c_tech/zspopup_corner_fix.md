@@ -8,6 +8,7 @@
 - 兜底增加 `:deep(.uni-popup__wrapper) { background: transparent !important; }`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - `npm run build` 通过，`validate-dist` 正常
 - 需在微信开发者工具重新导入 `dist`，打开「添加房屋（业主）」页触发「核验失败」弹窗确认无蓝色方角
 - 涉及文件：ZsPopup.vue、pages_owner/house/owner/addHouse.vue

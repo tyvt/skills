@@ -12,6 +12,7 @@
 - `ParcelDialog.vue` 等同步调整
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：f8b24da1-fc8e-489b-974f-b2fbccebc6a9
 

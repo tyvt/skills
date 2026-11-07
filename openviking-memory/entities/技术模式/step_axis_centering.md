@@ -10,6 +10,7 @@
 - 连接线 ::after 改用相对行高计算 top 与高度以留空
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/maintenance/query/components/sideBar.vue
 - 所属项目：园区物管2.0；代码基线：none；来源会话：09b1a4c9-aac5-4969-af5d-8a1c524b2f0e
 

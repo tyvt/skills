@@ -2,6 +2,11 @@
 - 涉及文件：zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue、zhi2-web-admin/src/mixins/tableComponents.js
 - 验证：来源会话 87f0dc25-1868-4178-8a96-df8892eb0b8f
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

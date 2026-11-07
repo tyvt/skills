@@ -19,6 +19,7 @@
 - zhi2-web-admin/docs/price-filing-backend-issues.md
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/184.md
 - 来源会话ID：9fca34d7-37be-413a-b809-d8a56f769025
 - 所属项目：苏州市房地产监测V3；代码基线：none

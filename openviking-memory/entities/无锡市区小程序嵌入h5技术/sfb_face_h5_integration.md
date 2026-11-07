@@ -21,6 +21,7 @@
 - 后端 `Authorization` 须用 `sfbEncryptionLogin`（`/security/ctAuth/sfbEncryptionLogin`）换取内部token
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 所属项目：无锡市区小程序嵌入H5
 - 来源会话：29e8fb63-fada-4c3c-a4c3-485a533bae2f、d5e17de9-b54b-41c7-804d-32a7473aa185（token不进请求头修复）
 - 代码基线：7993464

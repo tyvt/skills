@@ -11,6 +11,7 @@ Vue3 + Element Plus 迁移后 `el-dialog` 标题插槽名为 `#header`，须为�
 - 具体改法：`<template #header>` 内嵌 `<slot name="title">` 并保留 `{{ $attrs['header'] || $attrs['title'] }}` 默认内容
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 98fe164c 中 zs-dialog 报 Codegen node is missing，改为单一 #header 解决
 - 涉及文件：zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue；另见 @assets/views/login.vue、D:/repository/产品2.0/zhi2-web-admin/src/components/global-table-config/global-table-config.vue
 - 验证证据补充：src=2-0/007.md

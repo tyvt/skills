@@ -14,6 +14,7 @@ zs-select-dialog（及 func 版）在浏览器缩放 125% 时 pageSize=10 的数
 - 修改要同步 zs-select-dialog.vue 与 zs-select-dialog-func.vue 两个副本
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - tableTrCount 写死 8 与 pageSize 10 不符 + 125% 缩放下 maxScrollTop 偏小 + flex 压缩；修复为 min(行数,pageSize)、doLayout、flex-shrink:0、DOM 实测行高二次校准
 - 涉及文件：zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue、zs-select-dialog.vue、zhi2-web-admin/src/components/zs-table/zs-table.vue
 - 所属项目：产品2.0；代码基线：dfe69d6；来源会话：319f1f67-a4c9-4880-b1fc-1857c5d03b4b

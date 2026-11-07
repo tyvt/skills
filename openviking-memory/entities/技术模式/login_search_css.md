@@ -9,6 +9,10 @@ UnifiedLogin.vue 搜索框旋转描边三处纯 CSS 调整已审过，无必须�
 - UnifiedLogin.vue、package.json
 - 所属项目：门户；来源会话ID：2bbf9339-f27f-497c-a8ae-e6cdae2bfea4
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

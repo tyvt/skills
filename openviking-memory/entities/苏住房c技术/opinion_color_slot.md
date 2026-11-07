@@ -12,6 +12,12 @@
 ## 验证
 - 验证证据: src=苏住房C/031.md; 会话 656e6a75-7f8b-4804-98e6-133f13d94700; base none.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：656e6a75-7f8b-4804-98e6-133f13d94700
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "Tecnologia SuzhouC",

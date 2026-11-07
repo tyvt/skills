@@ -12,6 +12,7 @@
 - 注意：resolveStaticUrl / subpackage / mainStaticPaths 属 shimin 端实现，同源于 C 的其它项目需先核对是否有同名机制。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 65302824（主包图标加白名单）、5c003f25（ownerCard 导航图标与箭头 500，根因 ZsImage default local 按当前路由推断分包，补 subpackage="pages_owner" 后恢复）、b6ae18fa（play.png/soldOut-shadow.png/default-avatar.png 等主包图在分包页被推断成 /pages_x/static/ 返回 500，新增 mainStaticPaths.js 让 resolveStaticUrl 优先主包，并修正 pages_owner 中 3 处 question.svg 显式分包）、13824f1b（子包图标显式 subpackage+定尺寸容器修复）。
 - 涉及文件：src/utils/mainStaticPaths.js、src/utils/index.js、components/ZsImage/ZsImage.vue、pages_owner_extra/ownerCard/index.vue、pages_vote/elect/detail.vue、pages_transaction/publishHouse/type.vue、pages_owner/house/owner/authentication.vue 等。
 - 所属项目：苏住房C；来源会话ID：65302824-2836-4c68-a79c-8824fab43793, 5c003f25-6041-4bd4-854d-61f76247907c, b6ae18fa-c2e7-4036-8bde-244c6a95c718, 13824f1b-0d06-4c7a-8d3f-79edcf5ccfe4；代码基线：8fc3cc5、b7bf813、9832ba3。

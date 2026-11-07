@@ -13,6 +13,7 @@
 - 新增 `buildNavigationByFilePath`：优先用命名路由 `{ name: 'Per...' }`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`presale/permit/components/detail.vue`、`src/utils/ruoyi.js`、`property/spFeeBill/components/index.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：91b53615-9131-4fec-94ff-01cc463a59ef；代码基线：none
 

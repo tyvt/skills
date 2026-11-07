@@ -12,6 +12,9 @@
 - 与 `PresalePlanFillForm.vue` 分离
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：c9033c2c-3a69-4b73-b22e-394f818a3b2b
 - 验证证据: src=苏州市房地产监测V3/070.md
 - 涉及文件: cashsale-apply-menu-config.js, presale/cashsale/plan/detail.vue, presale/permit/plan/detail.vue, CashsaleDetail.vue, PresalePlanFillForm.vue, Headline/index.vue, AnnexUpload/index.vue, cashsale-apply-helpers.js
 - 会话: c9033c2c-3a69-4b73-b22e-394f818a3b2b; baseline: none

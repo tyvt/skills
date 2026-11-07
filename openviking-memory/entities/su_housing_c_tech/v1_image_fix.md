@@ -13,6 +13,7 @@
 - 微信小程序侧 ZsImage.vue 的 /zs-fym 仍可用 IMAGE_BASE_V1（https://szfang.szfcweb.cn），其他用 IMAGE_BASE（V2）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：bb5ef4f6-787c-49c9-b071-0b62385878d7、3774cb0b-97a2-4a97-9edb-ca41b73ddf3e
 - 涉及文件：src/utils/index.js、src/components/ZsImage/ZsImage.vue、vite.config.ts、swiperImage.vue
 - 代码基线：none

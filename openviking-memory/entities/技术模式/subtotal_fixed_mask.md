@@ -16,6 +16,7 @@
 - 改动点在 zs-table 公共组件，页面级 CSS 无法修
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 8e29a239 用户反馈横滚+小计时操作列显示底部数据，最终恢复 ::after（right:-1px, bottom:1px）并有合计行时 fixed-right 设 overflow:visible
 - 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、src/styles/index.scss、src/views/maintenance/receiptin/index.vue
 - 所属项目：产品2.0；来源会话ID：8e29a239-a740-473b-921d-cd75f2915a3e；代码基线：49a7aa3

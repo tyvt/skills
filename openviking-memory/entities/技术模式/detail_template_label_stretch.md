@@ -14,6 +14,7 @@
 - .detail-item 保留 min-height: 44px 作最小行高；核心原则：网格/行式布局占位与内容格必须用 stretch + min-height，禁止固定 height。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：032.md 会话 9d741535 detail-template.vue 四项修改，根因为固定 44px 占位列与 align-items: center。
 - 涉及文件：src/components/detail-template.vue；所属项目：园区物管2.0；来源会话：9d741535-927f-4374-aff7-ef6d5c347226；代码基线：55cd8653c。
 

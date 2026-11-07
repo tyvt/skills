@@ -11,6 +11,7 @@ OperationBtnGroup 的「取消审核」按钮移除图标并绑定 loading 防�
 - feeDeclare2/detail.vue 配置 :cancelApproval="true" 后所有启用该属性的详情页同步生效
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：苏住房G/071.md
 - 涉及文件：components/OperationBtnGroup/index.vue、utils/flowApi.js、zs-button/zs-button.vue、property/feeDeclare2/detail.vue
 - 所属项目：苏住房G；来源会话ID：aa70668a-bf0c-4bc0-91cc-ee27bdd35194；代码基线：none

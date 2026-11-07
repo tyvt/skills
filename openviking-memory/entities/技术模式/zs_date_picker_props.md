@@ -12,6 +12,7 @@
 - 范围选择继续用 `update:start`/`update:end`。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：zs-search-form/SearchFormItem 动态组件 v-model 对比示例不生效，改组件 props。
 - 涉及文件：zhi2-web-admin/src/components/zs-date-picker/zs-date-picker.vue、zhi2-web-admin/src/components/zs-search-form/SearchFormItem.vue。
 - 具体位置：SearchFormItem.vue 49:51、zs-date-picker.vue 12:32。

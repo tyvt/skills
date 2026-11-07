@@ -11,6 +11,11 @@ utils/portal-user.js 引入了 houseBoundViaAuth 标志，仅当 LingXi authCode
 - 来源会话：05b9061d-bcb6-412b-9bf6-24c69eb80182；代码基线：none
 - 文件：utils/portal-user.js, pages/webview/externalWebview.vue
 
+## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "mini_program_tech",

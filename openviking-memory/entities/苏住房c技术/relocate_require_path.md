@@ -15,6 +15,7 @@
 - 修完在开发者工具重新编译，必要时先清缓存
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 498170bd 用户贴完整运行时错误栈（VM57 WASubContext, lib 3.7.12），结论定位为 relocate-z-paging.mjs 拷贝后未更新 require 路径，已改造脚本支持拷贝后动态修正+对已构建产物重新修补，dist 下三个分包均已修正
 - 涉及文件：scripts/relocate-z-paging.mjs、scripts/relocate-datetime-picker.mjs、scripts/validate-dist.mjs、package.json
 - 所属项目：苏住房C；来源会话ID：498170bd-f084-43ab-8e01-034612613ebd；代码基线：b7bf813

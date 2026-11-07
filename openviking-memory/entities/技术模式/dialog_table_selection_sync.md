@@ -16,6 +16,10 @@
 - 验证证据：src=园区物管2.0/042.md
 - 所属项目：园区物管2.0；来源会话：c6be946b-abae-4b93-9a83-f55f6a1bc67a；代码基线：7814a0c2a。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

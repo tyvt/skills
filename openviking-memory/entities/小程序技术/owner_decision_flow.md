@@ -18,6 +18,7 @@ wygl小程序业主决策H5打开成功后再消费缓存，普通绑房入口�
 - h5ExternalWebview 返回优先跳记录入口页
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 验证：会话5176f41c用户要求回调在个人中心消费postAction成功后清缓存防普通绑房再触发
 - 回跳路由验证：会话4674d2ec 灵犀选屋 backUrl 固定致小程序落「我的」而非首页，记录入口页并 redirectTo 修复
 - 涉及文件：pages/webview/home.vue、pages/webview/externalWebview.vue、utils/portal-h5-webview.js、pages/face/bdc.vue、pages/face/verify.vue、components/custom-tabbar/custom-tabbar.vue、pages/webview/h5ExternalWebview.vue、utils/portal-user.js

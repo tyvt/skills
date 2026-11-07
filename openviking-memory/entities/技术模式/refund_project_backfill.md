@@ -14,6 +14,7 @@
 - 编辑态使用FORM_COL_FULL实现退款说明整行通栏
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/116.md；src=苏州市房地产监测V3/160.md；src=苏州市房地产监测V3/189.md
 - 涉及文件：supervision/deposit/refund/detail.vue、supervision/deposit/notice/detail.vue、supervision/deposit/refund/components/PaymentNoticeDialog.vue、supervision/deposit/refund/index.vue、components/detail-template/detail-template.vue、styles/detail-form.scss、styles/index.scss、components/zs-textarea/zs-textarea.vue、utils/noticeValidity.js、supervision/utils/selectDialog/project.js、mixins/detailMixins.js、supervision/deposit/other_record/detail.vue、supervision/utils/selectDialog/paymentNotice.js
 - 所属项目：苏州市房地产监测V3；来源会话：79b2f3ac-4eb2-4ae2-8e42-9d7ca8c66c0f、338d857d-c247-465e-90b4-4a4ce268d455；代码基线：none

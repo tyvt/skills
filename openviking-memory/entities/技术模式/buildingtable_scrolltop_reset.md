@@ -14,6 +14,12 @@ In the 园区公共收益 (zhi2-web-admin) project, BuildingTableViewTabs.vue ke
 - Files: autonomy/candidateCollect/components/CandidateDialog.vue, candidateCollect/collect/preparatoryGroup/detail.vue, components/BuildingTableViewTabs.vue, zs-select-dialog/zs-select-dialog-func.vue, zs-pagination/zs-pagination.vue, zs-select-dialog/zs-select-dialog.vue, election/components/apply/CandidateDialog.vue
 - Project: 园区公共收益; Source session: 491750ff-24a5-4f32-af45-003b31a62769
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：491750ff-24a5-4f32-af45-003b31a62769
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

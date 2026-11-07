@@ -15,6 +15,8 @@ Vue 审查发现未验证的经纪人照片 URL 以及布局残留。
 - `BrokerPages.vue`, `public-portal-designs.ts`, `portal.scss`, `brokers.js`, `portalPersonPhoto.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：5913f527-6905-47bc-8ed0-a0c22c08e59b
 - 验证证据: `src=门户/024.md`
 - 所属项目: portal (门户)
 - 会话: `5913f527-6905-47bc-8ed0-a0c22c08e59b`

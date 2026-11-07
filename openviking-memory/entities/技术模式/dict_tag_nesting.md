@@ -14,6 +14,7 @@
 - 同模式页面（VenueAssetDialog 等 span+dict-tag 组合）按同套路排查
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 f8f12066 HouseAssetDialog 展示错误，根因为 span 内嵌块级 dict-tag 被 HTML 解析器拆标签 + break-all 断词，修复为 div 容器 + minmax(0,1fr) + min-width:0 + overflow-wrap
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/HouseAssetDialog.vue、zhi2-web-admin/src/components/dict-tag/dict-tag.vue
 - 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：f8f12066-4a2e-407f-8919-3b1feebdc139

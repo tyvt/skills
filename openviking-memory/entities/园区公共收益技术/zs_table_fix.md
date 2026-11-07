@@ -12,6 +12,7 @@ zs-table.vue 的单元格鼠标移入/移出处理函数增加空值判断，修
 - 属于全局组件修复，所有使用 zs-table 的列表页（如房屋列表页）均受益
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/components/zs-table/zs-table.vue、src/views/building/house/index.vue
 - 所属项目：园区公共收益；来源会话：65ff3dc2-6a51-41e1-8dfa-f8e3a9d71203
 

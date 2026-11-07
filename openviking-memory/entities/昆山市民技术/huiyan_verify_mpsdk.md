@@ -14,6 +14,7 @@
 - 官方文档要求 `wx.startVerify` 成功回调里 iOS 需约 500ms `setTimeout` 再执行业务逻辑，否则后续代码可能不跑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 所属项目：昆山市民；代码基线：a1b8beb
 - 来源会话ID：d204db33-771f-44d5-97bb-400ec850e59f
 - 涉及文件：src/wxcomponents/verify_mpsdk/、src/utils/useTencentFaceVerify.js、src/pages/verify/index.vue、src/App.vue、src/pages.json

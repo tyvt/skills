@@ -11,6 +11,7 @@
 - 为 `handleAdd` 增加 `busCode` 校验：需先选左侧菜单树业务编码，否则提示「请先选择左侧菜单业务编码」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 刷新验证「新增」「删除」按钮是否正常显示；若仍看不到，打开控制台查看 `[权限不足]` 警告
 - 按钮权限标识为 `print:config:add`，需在角色权限中配置
 - 涉及文件：`fjflpz/index.vue`、`src/views/tool/print/index.vue`、`src/mixins/subTableMixins.js`、`src/mixins/table.js`、`src/mixins/permsMixins.js`

@@ -1,6 +1,12 @@
 - zhi2-web-admin/src/views/property/complex/components/rangeTable.vue 的 address formatter 拼接前判断 buildingNo 是否包含 projectName 并 replace 剔除，再拼接单元与房号，避免项目名重复显示
 - 验证来源：cursor session=82637904-0381-4770-bd0e-d8b2748c371c；涉及文件 d:/repository/产品2.0/zhi2-web-admin/src/views/property/complex/components/rangeTable.vue
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：82637904-0381-4770-bd0e-d8b2748c371c
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

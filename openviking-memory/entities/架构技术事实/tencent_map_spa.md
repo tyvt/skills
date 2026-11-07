@@ -16,6 +16,10 @@
 - 所属项目：园区物管2.0
 - 来源会话：265a0398-04ab-4311-b536-f18b5d57b75e
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "架构技术事实",

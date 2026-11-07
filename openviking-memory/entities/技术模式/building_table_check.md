@@ -8,6 +8,7 @@
 - 用 `watch tableData`（deep + immediate）调用 `syncUnitCheckState()` 按 `isUnitChecked` 写回。
 - 房屋 `checked` 同时认可 `=== 1` 与 `== '1'`，半选仍走 `indeterminate`。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证：弹窗打开场景用户二次反馈未生效后按 data+watch 修复；会话结论确认 el-checkbox 需 v-model。
 - 涉及文件：zhi2-web-admin/src/views/components/BuildingTable.vue；所属项目：2-0；来源会话：c16817a9-7cdf-427a-b135-24efd6fe2d95。
 

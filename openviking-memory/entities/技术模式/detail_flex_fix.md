@@ -16,6 +16,7 @@
 - zhi2-web-admin/src/styles/index.scss
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：9e24bb6d-a477-4e3c-8373-f4b406541525
 - 代码基线：none

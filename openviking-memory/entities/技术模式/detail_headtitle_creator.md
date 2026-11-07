@@ -17,6 +17,7 @@
 - d:/repository/园区物管2.0/zhi2-web-admin/src/views/article/components/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 来源会话：c9355ab5-7e88-44c0-9187-09826e7c3a8d
 - 所属项目：园区物管2.0；代码基线 none
 

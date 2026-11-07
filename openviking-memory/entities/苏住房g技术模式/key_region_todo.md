@@ -7,6 +7,7 @@
 - getTaskCount({})与列表请求均不带regionCode
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：苏住房G/086.md
 - 涉及文件：src/views/home/index-v2.vue、src/views/home/v2/components/KeyDataNav.vue、tests/e2e/home-v2.spec.mjs、src/api/portal/home.js
 - 所属项目：苏住房G；来源会话ID：9baedf91-d8d6-40c2-8e79-314e529e757a；代码基线：none

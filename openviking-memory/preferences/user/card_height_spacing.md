@@ -2,6 +2,12 @@
 - category-repair.vue: unified li and card height 192rpx, list padding 0 24rpx with gap 24rpx for consistent spacing
 - Source session: f240ab83-5e55-4643-91c8-a291d7ec92fd; baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：f240ab83-5e55-4643-91c8-a291d7ec92fd
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

@@ -15,6 +15,10 @@
 - 涉及文件：zhi2-web-admin/src/constants/companyOrgan.js、zhi2-web-admin/src/views/company/companyAdmin/index.vue、companyAdmin/agency/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：45c552dc-2133-4822-8720-0b09881d4cdf
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

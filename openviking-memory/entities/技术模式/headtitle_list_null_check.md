@@ -10,6 +10,8 @@
 - 计算属性使用 this.list.filter((item) => item && item.value)
 
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/014.md
 - 涉及文件：zhi2-web-admin/src/components/HeadTitle/index.vue
 - 来源会话ID：81bba5d5-8e98-492f-90aa-3fa01f341b6d

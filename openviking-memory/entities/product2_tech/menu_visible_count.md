@@ -17,6 +17,12 @@ Visible menu count calculated by full .top-nav-container width miscounts 1~2 ite
 - Source session ID: 97dd3a0f-1563-44f7-9957-aea69e5270ca
 - Code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：97dd3a0f-1563-44f7-9957-aea69e5270ca
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "product2_tech",

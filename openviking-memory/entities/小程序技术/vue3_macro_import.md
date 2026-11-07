@@ -16,6 +16,7 @@
 - 本次在 page-query/components 下修了 5 个文件：FilterPopupComponent、NewFilterComponent、CompanyItem、PropertyCard、PropertyItem
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：b7ff0fc8-8e3a-4961-ab91-06155333fe7b；代码基线：5f0f4dc
 - 涉及文件：src/page-query/components/FilterPopupComponent.vue、NewFilterComponent.vue、CompanyItem.vue、PropertyCard.vue、PropertyItem.vue
 

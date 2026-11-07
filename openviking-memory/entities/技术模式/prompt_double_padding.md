@@ -10,6 +10,7 @@
 - 下方：提示语到表格 = 12px（由表格容器上内边距提供）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubRevenueContract/index.vue、zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/index.vue 等
 - 所属项目：园区物管2.0；来源会话：14b45942-7d90-49e2-9568-f168ec1c668e
 

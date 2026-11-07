@@ -17,6 +17,7 @@
 - 迁移后全局巡检：有tab切换的列表页验证“切tab→回第1页→数据与空态都刷新”
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话15b35540诉求1要求全站改z-paging移除useLoadMore；诉求2-5连续报切换失效、诉求6报无loading；结论约15页面无#empty但默认空态不白屏
 - 涉及文件：src/hooks/useLoadMore.js、src/components/ListLoading/ListLoading.vue、src/pages/index/components/Project_Suzhufang.vue、src/pages/collect/index.vue、src/pages/news/index.vue、src/pages/publicNotice/publicNotice.vue
 - 所属项目：苏住房C；来源会话ID：15b35540-03c7-44b7-9ef5-69b1b346d1bb；代码基线：83c4136

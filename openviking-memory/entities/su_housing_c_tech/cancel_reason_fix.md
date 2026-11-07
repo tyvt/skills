@@ -8,6 +8,7 @@
 - 去掉 `margin-left:24px`，输入框与「请选择注销原因」标题及「提交」按钮同宽对齐。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：pages_my/setting/cancellationReason.vue、components/ZsTextarea/ZsTextarea.vue、pages_feedback/feedback/add_feedback.vue。
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：eb56a9b9-d956-416b-b204-677b8008eb20。
 

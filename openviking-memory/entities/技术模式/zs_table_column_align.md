@@ -14,6 +14,10 @@
 - 涉及文件：`src/components/detail-template/detail-template.vue`、`src/views/autonomy/multiply/components/DecisionDetailDialog.vue`、`src/views/autonomy/suggest/detail.vue` 等
 - 所属项目：产品2.0；来源会话：378359c0-4d34-425d-b45d-2717c2d30bbf；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

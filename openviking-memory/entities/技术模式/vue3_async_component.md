@@ -13,6 +13,10 @@ Vue3 在 `components` 选项里直接写 `() => import(...)` 会把 Promise 当�
 - 涉及文件：zhi2-web-admin/src/layout/components/Settings/index.vue、zhi2-web-admin/src/components/OperationBtnGroup/attachmentDraw.vue、zhi2-web-admin/router/index.js、zhi2-web-admin/src/store/modules/permission.js、zhi2-web-admin/src/views/home/index.vue、zhi2-web-admin/src/views/system/config/detail.vue、zhi2-web-admin/src/layout/components/TagsView/index.vue
 - 所属项目：2-0；来源会话：b06efc30-d150-4428-a1c0-f054d8e38798、d4e317f1-0c0f-4664-a597-3028cba67933、78c42ac6-3d01-4efb-aa4f-c62740fb9e52；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -9,6 +9,7 @@ candidateCollect 选户室弹窗中已报名户室在楼盘表与列表双视图
 - checked 统一用 '0'/'1' 字符串，楼盘表点击后同步列表选中
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue、zhi2-web-admin/src/views/components/BuildingTable.vue
 - 所属项目：园区公共收益；来源会话：473e272c-6e60-4e72-b905-e02eba29cfd7；代码基线：0abcb96
 

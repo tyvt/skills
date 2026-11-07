@@ -9,6 +9,7 @@
 - 触发路径：首次loadAll发taskCount+todoTaskList；区域切换0个待办请求；待办Tab切换只发列表
 - 验证：会话9baedf91，切区域Tab时Network不应再出现taskCount/todoTaskList
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：src/views/home/index-v2.vue、src/views/home/v2/components/KeyDataNav.vue、src/api/portal/home.js
 - 所属项目：苏住房G；来源会话：9baedf91-d8d6-40c2-8e79-314e529e757a；代码基线：15e201a
 

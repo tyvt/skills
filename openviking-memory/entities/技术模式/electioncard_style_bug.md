@@ -13,6 +13,10 @@
 - 涉及文件：src/views/election/ElectionIndex.vue、src/views/election/components/ElectionCardList.vue、src/views/decision/styles/card.css、src/views/components/TagTrapezoid.vue、src/views/decision/components/CardList.vue、src/views/owner-decision/components/CardList.vue、src/store/election.ts
 - 所属项目：太仓一网通办H5；来源会话：69a22d86-4cf1-4cd8-b941-8efefd992b50；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=太仓一网通办H5
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -12,6 +12,7 @@
 - devRefreshPortalHouseIfEmpty 应内部复用 mergeCtUserIdentityHouseIntoPortalUser，勿复制两套解析逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 验证：会话 eb625bb1：房屋接口原先只在 develop 的 devRefreshPortalHouseIfEmpty；已在 refreshPortalProfile 中 profile 后 await 房屋合并；user/index 去掉二次 devRefresh
 - 涉及文件：d:/repository/小程序/wygl-wxxcx-dev-slh/utils/portal-user.js ; d:/repository/小程序/wygl-wxxcx-dev-slh/pages/user/index/index.vue
 - 所属项目：小程序；来源会话ID：eb625bb1-51ca-49ee-a579-ba01827034bb；代码基线：none

@@ -13,6 +13,10 @@
 - `zhi2-web-admin/src/api/company/personnelRecord.js`、`toB/personnelRecord/components/detail.vue`、`company/staffManagement/components/detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话ID：0346d640-687b-4a1c-9bec-71a1eee36694
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

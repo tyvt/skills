@@ -4,6 +4,11 @@
 - 涉及文件：pages_benefit/elevatorPubEngCons/detail.vue、index.vue、pages_benefit/assetsPublicity/index.vue、pages_owner/payment/index.vue、api/benefit.js、pages_owner/repair/index.vue
 - 验证：src=无锡市区小程序嵌入H5/014.md；来源会话 18d36ae9-021f-4f26-8bea-d76327f2b6e8
 
+## 验证与归属
+- 所属项目：无锡市区小程序嵌入H5
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

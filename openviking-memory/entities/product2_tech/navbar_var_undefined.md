@@ -18,6 +18,12 @@ Navbar.vue uses --sidebar-expanded-width, but that variable is only defined in t
 - Source session ID: 3c5a02bd-dab4-4af1-8656-5c6fc9ed5b9d
 - Code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：3c5a02bd-dab4-4af1-8656-5c6fc9ed5b9d
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "product2_tech",

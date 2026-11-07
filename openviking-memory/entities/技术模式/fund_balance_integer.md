@@ -11,6 +11,7 @@
 - 图表柱高仍按原始精度绘制
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：src/views/benefit/mapOverview/index.vue、dataHelpers.js、chartOptions.js
 - 所属项目：园区物管2.0；来源会话：fbe088ea-8487-4ab9-a6e1-cc180b6a6a04；代码基线：none
 

@@ -11,6 +11,7 @@
 - 引用组件 `toB/agencyRecord/detail.vue` 未传 `mode` 故无需改父组件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/062.md
 - 涉及文件：AgencyBasicInfoDetail.vue、detailMixins.js、toB/agencyRecord/detail.vue、DeveloperBasicInfoDetail.vue、form.js、formComponents.js
 - 所属项目：苏州市房地产监测V3；来源会话：d7c5546b-aa33-4b71-aad6-e797b69bb1eb；代码基线：none

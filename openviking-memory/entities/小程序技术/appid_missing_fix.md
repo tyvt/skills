@@ -7,6 +7,8 @@
 - 非微信端直接 return，使用基础 webViewUrl，不再报错
 - 保留登录成功后拼接 ?code=xxx 的逻辑
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 微信开发者工具（小程序编译）打开页面应看到 wx login code
 - H5/其他端打开页面不再触发 login fail 41002，直接加载基础地址
 - 若微信开发者工具仍报 appid missing，属工具项目配置问题，需检查 AppID 设置

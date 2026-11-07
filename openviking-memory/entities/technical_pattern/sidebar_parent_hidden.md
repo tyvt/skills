@@ -21,6 +21,7 @@
 - `zhi2-web-admin/src/layout/components/TagsView/index.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据来源：cursor 提取，portal/027.md
 - 所属项目：门户
 - 来源会话ID：92104882-f56a-49cf-931b-814063421ad6

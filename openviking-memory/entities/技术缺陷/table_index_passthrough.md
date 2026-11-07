@@ -11,6 +11,12 @@ zs-table-column.vue 的重构将 index/function 泄漏给 el-table-column，并�
 - 涉及文件: BranchOneDialog.vue; YhwdDialog.vue; YhwdTable.vue; zs-table-column.vue; tableColumnConfig.js; pubRegulatoryBranchDialog.vue; zs-select-dialog.vue; zs-select-dialog-func.vue
 - 会话: bb86fbc4-fb2e-46ab-8ef7-7ec642005b52; 代码库: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：bb86fbc4-fb2e-46ab-8ef7-7ec642005b52
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术缺陷",

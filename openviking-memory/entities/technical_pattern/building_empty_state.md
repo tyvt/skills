@@ -16,6 +16,12 @@ buildingTable.vue empty data prompt was changed to plain text, removing the Over
 - Source session: b5037f07-6db9-4962-b4ff-c907c3a62fea
 - Code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：b5037f07-6db9-4962-b4ff-c907c3a62fea
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

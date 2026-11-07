@@ -10,6 +10,7 @@
 - 在 `wxLogin.js` 增加 URL 防御处理
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证证据：src=昆山市民/004.md
 - 涉及文件：src/pages_election/election/options.vue、src/pages_election/election/Participate.vue、src/stores/election.js、src/api/modules/election.js、src/pages.json、src/utils/wxLogin.js、src/request/index.js、src/pages_vote/vote/votedetail.vue
 - 所属项目：昆山市民；来源会话ID：efd7fd9b-1f86-49c6-8815-9bbd75f57fcb；代码基线：none

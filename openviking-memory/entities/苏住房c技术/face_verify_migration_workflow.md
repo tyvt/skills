@@ -13,6 +13,7 @@
 - 非居民身份证（FormNonLocal）仍走人工审核；迁移后必须真机走完整流程验证，模拟器不具备。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；代码基线：4630e8e；来源会话ID：42b7efbf-3412-4580-bb0d-1b92c50a5d89。
 - 涉及文件：zhi2-mobile-shimin/src/pages_my/verification/FormLocal.vue、TypeChoose.vue、src/api/security.js、泰兴小程序/src/pages_common/verifyUser/index.vue。
 - 验证：用户诉求参考泰兴小程序实现迁移，结论列出六项接入点与两条注意事项。

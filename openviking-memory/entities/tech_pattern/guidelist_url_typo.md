@@ -16,6 +16,11 @@ In zhi2-mobile-shimin, guideList.vue had extra question mark in jump URL and gui
 ## Verification
 - Extracted from cursor session 396b7339-8e50-4545-8923-92c3135143b9
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：396b7339-8e50-4545-8923-92c3135143b9
+
 
 <!-- MEMORY_FIELDS
 {

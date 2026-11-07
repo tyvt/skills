@@ -6,6 +6,8 @@
 ## 解决方案
 - 在 `staff/styles/theme.scss` 定义 `$staff-primary`，页面引入 `@include staff-page-theme` 将硬编码改为 CSS 变量。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/003.md
 - 涉及文件：src/uni.scss、src/staff/pages_facility/issue/index.vue、src/App.vue、src/staff/components/PageButton/PageButton.vue、src/staff/styles/theme.scss、src/staff/styles/filter.scss、src/staff/styles/tab.scss、src/staff/components/ZsButton/ZsButton.vue
 - 来源会话ID：2ca2f1e5-7a7d-4825-ba87-50c96508692b

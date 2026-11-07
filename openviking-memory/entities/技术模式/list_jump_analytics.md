@@ -11,6 +11,7 @@
 - 推广：既要埋点又要跳转的列表项不依赖组件内置跳转；埋点走 api/appAnalytics.js 的 eventDataAdd（内建 noReject+catch），跳转单独一行
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 4cc1a55a，基线 4630e8e；houseLoanGuide/index.vue 去 link/to，goToDetail 内先 eventDataAdd 再 goto
 - 涉及文件：src/pages_transaction/houseLoanGuide/index.vue、src/pages_transaction/buyHousePolicy/index.vue、src/api/appAnalytics.js、src/pages_transaction/taxGuide/index.vue、src/pages_transaction/transactionFlowGuide/index.vue、src/pages_owner/ownerCard/index.vue、src/api/index.js、src/api/httpInstance.js、src/pages_owner/family/index.vue
 - 所属项目：苏住房C；来源会话ID：4cc1a55a-ca40-4bc8-a6d2-4081c8a09783；代码基线：4630e8e

@@ -16,6 +16,10 @@
 - 文件：zhi2-web-admin/src/views/building/project/detail.vue、mixins/detailMixins.js、area.js、form.js
 - 所属项目：产品2.0；来源会话：61def959-83e3-4215-8e69-6489f5d1ff6f；代码基线：645607c
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

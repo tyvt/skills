@@ -20,6 +20,7 @@ Vue Object prop 整体替换默认值不合并，致 zs-select-dialog-func 缺�
 - zhi2-web-admin/src/views/benefit/pubRegulatoryStopAgreement/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：园区公共收益/036.md
 - 来源会话：e19f246b-8b3f-4ed0-b2bc-12291e2e6315；代码基线：none
 - 所属项目：园区公共收益

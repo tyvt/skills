@@ -18,6 +18,7 @@
 - 修改位置：regionBankAuth/index.vue 的 handleEnableChange 方法
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：regionBankAuth/index.vue、property/utilityLinkConfig/index.vue
 - 所属项目：苏住房G；来源会话ID：2523c7eb-f1c1-4b26-8a60-77d3793a4bcf
 

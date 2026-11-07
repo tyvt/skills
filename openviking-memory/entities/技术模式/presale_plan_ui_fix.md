@@ -11,6 +11,7 @@
 - 输入框固定宽度（数字框 88px / 面积 108px，地名 280px），不再撑满全行
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新页面后「项目基本概况」恢复为紧凑填空样式；若仍偏宽可再收紧数字框宽度
 - 涉及文件：`PermitPlanPanel.vue`、`PresalePlanFillForm.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：3b1ff38c-e27a-4867-a215-6627c1d4380c；代码基线：none

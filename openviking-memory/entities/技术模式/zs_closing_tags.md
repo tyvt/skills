@@ -11,6 +11,9 @@
 - 对目录 `commercialHousingSales` 和 `contract` 的扫描已通过，dev server 正常编译
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：c7884ca9-0f78-4e4e-9359-8fa478960362
 - 验证证据: src=苏州市房地产监测V3/232.md
 - 涉及文件: d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/commercialHousingSales/presale/contractRevoke/detail.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/dialogs/saleAgencyDialog.vue
 - 源会话: c7884ca9-0f78-4e4e-9359-8fa478960362; 基线: none

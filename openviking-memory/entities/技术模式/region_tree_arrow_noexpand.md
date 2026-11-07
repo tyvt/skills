@@ -14,6 +14,7 @@
 - 排序列表无匹配时回退使用接口返回的完整区县数据
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话bd3cdf70用户报「部门树不展开」，结论列三点根因并修复为node-key="id"+补唯一id+移除受控key+手动展开根节点+expand-on-click-node=false+无匹配回退
 - 涉及文件：publicQuery/complex/index.vue、property/complex/components/RegionTreeLayout.vue、property/complex/components/regionTree.vue
 - 所属项目：苏住房G；代码基线：4e59087；来源会话：bd3cdf70-1309-4f6d-b4b3-b918206e8052

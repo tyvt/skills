@@ -11,6 +11,7 @@
 - 涉及 enums.js、detailMixins.js、subTableMixins.js、form.js 等逻辑协同
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：src=园区公共收益/032.md、src=园区公共收益/033.md
 - 来源会话：4686b4cc-9df1-4168-a0c5-e5e69fe7b2df、37dbc28a-32eb-4a0c-a154-c7353dc061f8；代码基线：none
 - 所属项目：园区公共收益

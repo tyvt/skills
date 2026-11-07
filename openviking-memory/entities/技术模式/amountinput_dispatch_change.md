@@ -21,6 +21,10 @@ AmountInput 等自封装 v-model 输入组件需手动向最近 ElFormItem 分�
 - 涉及文件：src/components/AmountInput/index.vue、src/components/zs-input/zs-input.vue；所属项目：园区物管2.0 / 产品2.0
 - 来源会话：8430758d-a3eb-412d-97d4-0ab68ebf0303（基线 7814a0c2a）、96954bb5-7491-4bdf-854e-917a5232b9e6（基线 bd398ef）
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

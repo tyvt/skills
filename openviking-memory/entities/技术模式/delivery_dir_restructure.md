@@ -9,6 +9,7 @@
 - 后端 SQL component/filePath 采用新路径
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/048.md
 - 涉及文件：项目交付备案-前端对接文档.md、交付范围-前端对接文档.md、CashsaleDetail.vue、cashsale-apply-helpers.js、jffw.js、MEMORY.md、路由信息.json、2026-09-13.md
 - 所属项目：苏州市房地产监测V3；来源会话：c1ba3f9c-6614-48bf-aa3e-5d69f6494ccc；代码基线：none

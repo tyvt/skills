@@ -14,6 +14,7 @@ z-paging 默认全屏 fixed 布局嵌套在卡片中会覆盖标题，需提升�
 - 补充 page { height: 100% } 和 onShow 中的 updateFixedLayout 保证布局计算正确
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证：标题、汇总、Tab、表头和列表应正常纵向排列不再重叠
 - 涉及文件：pages_benefit/elevatorPubEngCons/detail.vue、index.vue、pages_owner/payment/index.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话：964238bf-2553-4990-9244-37619f4aadbe

@@ -24,6 +24,10 @@
 - 文件：`zhi2-web-admin/src/views/property/bill/components/index.vue`、`declare/components/index.vue`、`feeDeclare2/index.vue`、`spFeeBill/components/index.vue`、`enums.js`、`discountDialog.vue`
 - 项目：产品2.0；来源会话：3bad7169-f39b-4cf0-bf68-090703c11dcb；代码基线：none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

@@ -16,6 +16,7 @@
 - 该组件被 pages_owner 下多个成功页复用，改一处即全域生效
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 1b2ede19（基线 4630e8e）用户报 AuthorizedSuccess 页面 UI 损坏并贴出 500 日志；结论确认 SuccessCard.vue 的 success 分支用原生 <img> 导致相对路径按组件目录解析；核对当前代码 SuccessCard.vue 四分支均已改为 ZsImage，utils/index.js 的 resolveStaticUrl、resolveSubpackageForStatic、inferSubpackageFromRoute、分包映射均与描述一致
 - 涉及文件：src/components/shared/SuccessCard.vue、src/components/ZsImage/ZsImage.vue、src/utils/index.js、src/utils/mainStaticPaths.js、src/pages_my/verification/AuthorizedSuccess.vue
 - 所属项目：苏住房C；来源会话ID：1b2ede19-fcac-48a1-8f1a-9548ba379034；代码基线：4630e8e

@@ -13,6 +13,7 @@
 - 验证必须清理dist/unpackage旧产物重新打包，并排查后端菜单路径是否仍指向旧地址
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证会话e0538ad3：用户两次报同错，最终删页合并+组件上提+同步脚本
 - 涉及文件：pages.json、intention/list.vue、IntentionMyList.vue、utils/menuNav.js、scripts/merge-main-leaks.mjs
 - 所属项目：苏住房C；代码基线：f1939b0；来源会话ID：e0538ad3-fc2d-43a5-8b21-e951b74289dd

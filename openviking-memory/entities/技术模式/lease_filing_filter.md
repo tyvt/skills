@@ -10,6 +10,7 @@
 - 原 `pubRevenueContract/index.vue` 列表有「业务状态」列但搜索区无此筛选项
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：`resourcesLeaseContractFiling/index.vue`、`pubRevenueContract/index.vue`
 - 所属项目：产品2.0；来源会话：7fcdcc25-208a-4099-b05d-179f9783abeb
 

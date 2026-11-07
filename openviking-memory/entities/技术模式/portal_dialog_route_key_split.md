@@ -13,6 +13,10 @@
 - zhi2-web-admin/tests/e2e/public-portal-interactions.spec.ts
 - 所属项目：门户；来源会话：e9f92d71-8255-4a86-a77b-f58a8d4170ac；代码基线：e1f8e0b
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -10,6 +10,7 @@ VoteRangeDialog.vue 用路由名 pageType == 'owner' 判断一般表决，而一
 - 以 `decisionPolicy === 'general'` 判定，显示单页表单
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：光标会话 e9e71106-e4a9-41fe-a2ee-72a4cf99c6d9 提取
 - 涉及文件：decisionCommon/components/DecisionRangeTable.vue、ownerDecision/components/VoteRangeDialog.vue、optionDecision/components/VoteRangeDialog.vue、ownerDecision/detail.vue、decisionCommon/components/VoteRangeDialog.vue、ownerDecision/components/DecisionRangeTable.vue、decisionCommon/components/DecisionRangeDialog.vue
 - 所属项目：太仓G；来源会话：e9e71106-e4a9-41fe-a2ee-72a4cf99c6d9；代码基线：none

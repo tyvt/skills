@@ -5,6 +5,9 @@
 - 覆盖范围：所有使用 `CT_AUTH_API_BASE_URL_MAP` 基址的接口（`portal-user.js` 内全部 CT 接口、`api/common.js` 轮播图接口、`portal-h5-webview.js` 等）已接入统一 401 处理
 - 所属项目：小程序；来源会话：aa013c4c-2e46-4f0b-b583-82a65c4f0fe2；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
+
 
 <!-- MEMORY_FIELDS
 {

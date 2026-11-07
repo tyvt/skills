@@ -11,6 +11,7 @@ zs-table未设table-tr默认按约10行渲染，超弹窗高度致分页被overf
 - 表格区flex:1; min-height:0，搜索与分页flex-shrink:0确保可见
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：src=园区公共收益/022.md
 - 涉及文件：maintenance/depositNotice/company/components/ScopeSelectDialog.vue、PaymentRangeTable.vue、AccountDetailDialog.vue、dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue、components/zs-table/zs-table、components/zs-dialog/zs-dialog.vue、maintenance/accountOpen/owner/components/ScopeSelectDialog.vue
 - 所属项目：园区公共收益；来源会话：773efa7a-31cf-4846-a29c-73b73be85156；代码基线：none

@@ -10,6 +10,7 @@
 - `resolveRowTagOptions` 置 `methods` 并靠近 `getDictLabel` 供模板 `resolveRowTagOptions(scope.row)` 调用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/018.md
 - 涉及文件：AgencyPersonnelList.vue、zs-table-column.vue、personnelStatus.js、toB/personnelRecord/components/index.vue、company/staffManagement/components/index.vue、LeasePersonnelList.vue、AgencyBranchList.vue、branchStatus.js
 - 所属项目：苏州市房地产监测V3；来源会话：e0d81e5e-2d37-4e0c-aea3-ee55f794628f；代码基线：none

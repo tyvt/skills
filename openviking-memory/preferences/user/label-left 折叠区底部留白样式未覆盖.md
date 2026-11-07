@@ -2,6 +2,11 @@
 - 拆分 el-form--label-top 块并增加 .detail-from-container 选择器
 - 验证证据：src=苏州市房地产监测V3/086.md；来源会话：22342137-7680-4a86-9ec8-e4647eb82f33
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

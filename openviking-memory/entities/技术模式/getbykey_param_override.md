@@ -9,6 +9,7 @@
 - 验证后请求体变为 `{"configKey": "qq.map.key"}`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：请刷新页面或重启 dev server 后再试
 - 涉及文件：src/utils/apiV3Normalize.js、src/api/system/config.js、src/utils/tencentMapKey.js
 - 所属项目：产品2.0；来源会话：8dceac0c-7274-47ed-980f-09eb44a4fd17；代码基线：none

@@ -17,6 +17,9 @@
 - 涉及文件：d:\repository\苏住房G\zhi2-web-admin\src\views\register\companyRegister.vue；register\components\companyInfo.vue；register\components\accountInfo.vue
 - 所属项目：苏住房G；来源会话ID：c7ab501f-d841-4b86-85f5-4abc8de685fc；代码基线：805ea8c
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
 
 <!-- MEMORY_FIELDS
 {

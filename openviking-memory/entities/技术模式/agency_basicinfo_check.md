@@ -11,6 +11,7 @@
 - 开发企业 `DeveloperBasicInfoDetail`（修前）存在差异
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`AgencyBasicInfoDetail.vue`、`DeveloperBasicInfoDetail.vue`、`companyBasicInfo/detail.vue`
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：e15a1da6-99f2-4436-b12d-c0e94bfb9658

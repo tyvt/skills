@@ -11,6 +11,8 @@
 - 加载完触发 layout-sync 重算高度
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/003.md
 - 涉及文件：zhi2-web-admin/src/views/presale/permit/components/detail.vue、presale/permit/detail.vue、presale/permit/components/PermitInfoPanel.vue、presale/permit/components/PermitAppendixPanel.vue、presale/permit/components/PresaleAddAppendix.vue、src/mixins/detailMixins.js、src/mixins/form.js、src/views/presale/permit/permitConstants.js
 - 来源会话ID：80adc70b-981c-4804-9369-1f47d63c1006；代码基线：none

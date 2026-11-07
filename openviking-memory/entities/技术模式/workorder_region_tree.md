@@ -14,6 +14,10 @@
 - 文件：`src/views/property/workOrder/order/index.vue`、`RegionTreeLayout.vue`、`regionTree.vue` 等（路径前缀 `d:/repository/产品2.0/zhi2-web-admin`）。
 - 所属项目：产品2.0；来源会话：ca01e574-0616-48a5-8f5a-4a6bbe304b4b。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

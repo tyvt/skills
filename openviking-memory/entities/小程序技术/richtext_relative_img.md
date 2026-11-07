@@ -15,6 +15,7 @@
 - 修正buyHousePolicy/index.vue、fundPolicy/index.vue的detail??id=多余问号；vConsole Network确认图片200
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话5dc51561用户诉求「购房政策为空」；结论正文相对路径rich-text无法加载，修复加两函数并修问号
 - 涉及文件：src/utils/index.js、pages/news/components/ListDetail.vue、pages_transaction/buyHousePolicy/index.vue、detail.vue、pages_my/onlineService/PolicyDetail.vue
 - 所属项目：苏住房C；来源会话ID：5dc51561-f159-4aea-926e-8205773be7f2；代码基线：77666f8

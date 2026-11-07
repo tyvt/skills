@@ -18,13 +18,14 @@
 - bug#6084（2026-11-03）复用同法：DBX 事务化 UPDATE zt_bug 置 status=resolved/resolution=fixed/resolvedBy=tiany/resolvedBuild=trunk/assignedTo=lichandan，并 INSERT zt_action 一条 resolved 动作（含根因+修复+验证说明）；事务内与提交后双校验确认持久化
 - bug#6094（2026-11-03）复用同法：DBX 事务化 UPDATE zt_bug 置 status=resolved/resolution=fixed/resolvedBy=tiany/resolvedDate=2026-11-03 15:07:59/resolvedBuild=trunk/assignedTo=lichandan，并 INSERT zt_action 一条 resolved 动作（id 86125，含根因+修复+验证说明）；事务内与提交后双校验确认持久化
 - bug#6328（2026-11-06）复用同法：DBX 事务化 UPDATE zt_bug 置 status=resolved/resolution=fixed/resolvedBy=tiany/resolvedDate=2026-11-06 18:27:06/resolvedBuild=trunk/assignedTo=zhunan，并 INSERT zt_action 一条 resolved 动作（id 88670，action=resolved，extra=fixed，注释含根因+修复+提交号+验证说明）；事务内与提交后双校验确认持久化
+- bug#6306（2026-11-06）复用同法：首次 INSERT zt_action 因主键冲突失败且仅 close_session 未 commit 被回滚（zt_bug 仍 active）；新开会话 begin→update/insert→commit→close 重写，DBX 事务化 UPDATE zt_bug 置 status=resolved/resolution=fixed/resolvedBy=tiany/resolvedDate=2026-11-06 18:05:33/resolvedBuild=trunk/assignedTo=zhunan，并 INSERT zt_action 一条 resolved 动作（id 88656，action=resolved，注释含根因+修复+提交号说明）；事务内与提交后双校验确认持久化
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "禅道回写DBX绕行",
-  "source_extraction_id": "6d44fa72cc78443fae668b0f4b7c8463",
-  "version": 4,
+  "source_extraction_id": "342432de5f534760a18ca39a507a161b",
+  "version": 5,
   "memory_type": "entities"
 }
 -->

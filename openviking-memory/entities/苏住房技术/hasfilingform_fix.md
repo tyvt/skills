@@ -10,6 +10,8 @@
 - 列表直接使用接口返回的 `1`/`0` 以正确匹配字典映射。
 
 ## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/079.md；来源会话：e2fee71e-d35b-4416-a61c-a83ca1559a53。
 - 涉及文件：propertyContract/components/index.vue、zs-table-column.vue、dict-tag.vue、mixins/listMixins.js、mixins/table.js。
 

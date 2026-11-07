@@ -17,6 +17,10 @@
 - api/index.js
 - 所属项目：产品2.0；来源会话：d5ae2f3e-c3d7-4c77-8ef2-048ffc7b39f4；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -14,6 +14,7 @@ B 端选择类字段的「未选」状态应统一用空字符串 '' 表示，�
 - 与「清空外键写成 undefined 会被 JSON.stringify 省略导致解绑失败」是同一根因在不同组件上的实例，但此处是新建选择框的默认值约定
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：zs-advanced-query 操作符/字段下拉区分「启用且有占位符」与「禁用且无占位符」，多操作符字段默认值从首项改为空交由用户选择
 - 涉及文件：zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue
 - 所属项目：苏住房G；来源会话：429acee0-eca5-4450-8610-60939deb48d6；代码基线：5ccda28

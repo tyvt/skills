@@ -16,6 +16,7 @@
 - 可在页面切换 view/edit/add 模式
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：allocation/detail.vue、version/detail.vue、unblock/usemoney/detail.vue
 - 所属项目：产品2.0；来源会话：80f0da60-1767-4d5d-82a5-1eb17414467f；代码基线：none
 

@@ -13,6 +13,10 @@
 - 涉及文件：presale/surveyChange/detail.vue、components/OperationBtnGroup/index.vue、presale/surveyChange/components/ApprovalDialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：50f44d3e-02d2-4be8-afe1-7e75bad426fa；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -15,6 +15,12 @@
 - 涉及文件: presale/entrustSale/detail.vue, index.vue, e2e/fixtures/entrust-sale-helpers.js, detailMixins.js, e2e/presale/entrust-sale-real-api-flow.spec.js, form.js
 - 会话: 74428e0b-126e-4f90-9fc3-2fbe6b27a399; baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：74428e0b-126e-4f90-9fc3-2fbe6b27a399
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -27,6 +27,10 @@
 - 文件：`spFeeBill/components/import.vue`、`importUploadDialog.vue`
 - 所属项目：产品2.0；来源会话：17074586-b181-47e4-98de-bff948d7a54e、a10aadfb-a1ed-4720-8d24-06f8099d14c1；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

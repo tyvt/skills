@@ -11,6 +11,7 @@
 - `pages_home/home.vue` 与 `personal.vue` 需同步修改。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证：会话 2a8a8393 截图「数量图标被遮挡」，结论指向 badge 定位与 swiper 裁切。
 - 涉及文件：src/pages_home/home.vue、src/pages_home/personal.vue。
 - 所属项目：昆山市民；代码基线：38d1482；来源会话ID：2a8a8393-4a19-4102-99ee-abcb1056e854。

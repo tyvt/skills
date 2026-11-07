@@ -15,6 +15,7 @@
 - 正确参考：buildinginfo/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：27b13db9-d5eb-4224-b277-0551d3f307f5
 - 代码基线：none

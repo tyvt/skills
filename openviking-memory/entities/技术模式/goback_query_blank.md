@@ -20,6 +20,11 @@
 - cursor 会话: e6ed7dbc-1d6e-459f-aec6-1548de9852da
 - 所属项目: 淮安物管 zhi2-web-admin; baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
+- 来源会话：e6ed7dbc-1d6e-459f-aec6-1548de9852da
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

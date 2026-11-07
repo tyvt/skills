@@ -12,6 +12,8 @@
 - onLoad 拉取用户信息后赋值 model.receiveAddress、model.workUnit
 
 ## 验证与归属
+- 所属项目：0
+- 验证证据：extracted source=cursor project=0
 - 涉及文件：@src/pages-rent/my/per.vue、@src/pages-rent/my/perEdit.vue
 - 来源会话：163cd24f-0205-4241-941b-7ad8647f2e4c；代码基线：none
 

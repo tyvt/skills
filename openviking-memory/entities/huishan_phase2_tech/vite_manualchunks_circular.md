@@ -13,6 +13,7 @@
 - H5 修复后需重新构建：npm run build:h5；本地开发重启 npm run dev:h5
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期H5
 - 验证：src=惠山二期H5/007.md
 - 涉及文件：package.json、vite.config.ts
 - 所属项目：惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）；来源会话：7e939ba2-7874-4ea9-9bce-1323e58f9e11；代码基线：none

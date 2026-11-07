@@ -12,6 +12,7 @@
 - 行政区划使用 `pickRegionFieldValue` 对齐详情展示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/061.md
 - 涉及文件：utils/formChangeTooltip.js、companyManagement/components/DeveloperBasicInfoDetail.vue、toB/companyRecord/detail.vue、DeveloperBasicInfoForm.vue、companyBasicInfoShared.js、directives/form/index.js、detail-template.vue、developerBasicInfoContent.js、AgencyBasicInfoForm.vue
 - 所属项目：苏州市房地产监测V3；来源会话：52921acc-1bb2-40b9-9679-abb2a470ef0a；代码基线：none

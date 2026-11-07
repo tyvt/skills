@@ -13,6 +13,7 @@
 - 外层 `.login` 避免 `transform` 以免 fixed 相对该层定位
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：src=园区物管2.0/030.md
 - 涉及文件：zhi2-web-admin/src/views/login.vue
 - 所属项目：园区物管2.0；代码基线 none；来源会话 4b4a9576-d928-45cc-bdb7-cc109ec7c990

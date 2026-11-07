@@ -14,6 +14,7 @@
 - 若无数据，检查操作人员列表接口是否返回 operatorAuthId 字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：operatorTable.vue、operatorAuthRangeTable.vue、detail.vue
 - 所属项目：园区公共收益；来源会话：92e02400-281a-4942-997e-0a53b4d14822；代码基线：none
 

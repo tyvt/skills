@@ -10,6 +10,7 @@
 - cbyh/index.vue 移除重复局部 handleAdd 避免整页刷新
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/019.md
 - 涉及文件：cbyh/index.vue、cbyh/detail.vue、listMixins.js、detailMixins.js、ListTemplate.js、form.js、router/index.js、table.js
 - 所属项目：苏州市房地产监测V3；来源会话：d05a4bd7-de6f-4b41-9315-000271ae8a10；代码基线：none

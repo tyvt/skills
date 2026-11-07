@@ -12,6 +12,10 @@
 - 涉及文件：zhi2-web-admin/src/layout/components/AppMain.vue、Navbar.vue、views/benefit/statisticsMap/index.vue、components/ZsTencentMap。
 - 所属项目：园区物管2.0；来源会话：afe24635-17e4-4855-b880-847a1c56ae6f；代码基线：c97957703。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

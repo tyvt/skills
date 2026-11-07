@@ -15,6 +15,7 @@ zs-select-dialog.vue 同时声明函数型 prop `selectable` 又混入含同名 
 - 经验：给已有同名 data/prop 的公共弹窗组件补 mixin 时，优先选只注册组件的轻量 mixin（tableComponents），完整 table mixin 只给真正跑列表逻辑的页面用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 09ed34db 报错栈定位 zs-select-dialog.vue，根因为 prop selectable（函数）与 table mixin data selectable（布尔）同名；修复为 mixins 由 table 换成 tableComponents，警告消失
 - 涉及文件：zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue、zhi2-web-admin/src/mixins/table.js、zhi2-web-admin/src/mixins/tableComponents.js
 - 所属项目：产品2.0；来源会话：09ed34db-94d4-41c6-856b-023f0668f865；代码基线：0161609

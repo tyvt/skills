@@ -8,6 +8,8 @@ iHomePC 个人中心我的账单页通过 personalCenter.js 新增 Mock 接口�
 - `src/views/personalCenter/myBill/index.vue` 接入上述接口，完成补充缴费与退费申请功能。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=iHomePC
+- 来源会话：c9107b11-9ae9-4591-b0c3-471f403a194a
 - 验证：来源 cursor 会话 c9107b11-9ae9-4591-b0c3-471f403a194a。
 - 涉及文件：`src/api/modules/personalCenter.js`、`src/views/personalCenter/myBill/index.vue`；所属项目：iHomePC；代码基线：none。
 

@@ -14,6 +14,11 @@
 - 涉及文件: generalDecision/detail.vue, ownerDecision/detail.vue, optionDecision/detail.vue, sortDecison/detail.vue, maintainDecision/detail.vue
 - 所属项目: 太仓G; 代码库: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
+- 来源会话：5498a264-de28-46af-8525-e64606a2220e
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

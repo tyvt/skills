@@ -13,6 +13,8 @@ portal-h5-webview.js新增请求日志包装器，为关键H5接口打印请求�
 - 失败阶段打印：url、method、error
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：utils/portal-h5-webview.js、utils/portal-user.js
 - 来源会话：57f4069f-fd57-4bea-aab1-45b00ad189d9
 - 代码基线：none

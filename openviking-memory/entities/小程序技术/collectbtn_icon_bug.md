@@ -16,6 +16,7 @@
 - utils/index.js 的 resolveStaticUrl 在微信小程序分支改为返回本地路径如 /pages_transaction/static/images/szf/aixin_e.svg
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 d53574b2（2026-08-21，基线 9832ba3）改 collectBtn.vue / newHouse/detail.vue / utils/index.js 后图标出现在「收藏」文字上方
 - 涉及文件：src/components/collectBtn/collectBtn.vue、src/pages_transaction/newHouse/detail.vue、src/utils/index.js、src/components/ZsImage/ZsImage.vue
 - 所属项目：苏住房C；来源会话ID：d53574b2-2d92-4663-9c80-ced6a44b903a；代码基线：9832ba3

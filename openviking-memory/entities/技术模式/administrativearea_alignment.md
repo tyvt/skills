@@ -7,6 +7,7 @@
 - companyApply.js 补充注释并新增 updateCompanyApply 接口
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/207.md
 - 涉及文件：companyApplyAudit/index.vue、companyApplyAudit/detail.vue、companyCancel/index.vue、api/company/companyApply.js、api/company/companyRecord.js、companyManagement/components/companyBasicInfoContent.js、mixins/listMixins.js、companyRecordAgency/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：0b852a77-0d91-4864-8952-efcea41ccc4f；代码基线：none

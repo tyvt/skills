@@ -12,6 +12,7 @@
 - 查询文案冒号保留
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：src=门户/019.md
 - 涉及文件：zhi2-web-admin/src/views/home/UnifiedLogin.vue、zhi2-web-admin/src/views/home/publicPortal/pages/InformationPages.vue、PropertyPages.vue、RentalPages.vue、BrokerPages.vue、publicPortal/components/PortalSearch.vue、RentalDetailDialog.vue、PropertyDetailDialog.vue
 - 所属项目：门户；来源会话ID：2fd56787-bd18-4625-bb06-d6a35e3562b5；代码基线：none

@@ -15,6 +15,7 @@
 - zhi2-web-admin/src/views/building/building/components/houseTable.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话 f087205d-f215-464e-b55c-d86410257745；代码基线 b6bf87d
 
 <!-- MEMORY_FIELDS

@@ -13,6 +13,12 @@ resourcesLeaseContractFiling/detail.vue property-area dialog returns subdistrict
 - Files: src/views/benefit/resourcesLeaseContractFiling/detail.vue, src/views/benefit/assetsLeaseContractFiling/index.vue, src/views/benefit/assetsLeaseContractFiling/detail.vue, src/mixins/area.js, src/mixins/detailMixins.js, src/components/zs-select-dialog/zs-select-dialog-func.vue, src/components/zs-select-dialog/zs-select-dialog.vue, src/views/benefit/resourcesLeaseContractFiling/index.vue.
 - Project: 园区公共收益; source session: 6bb1b34b-eb24-4b0a-b69b-69e34156d925; code baseline: none.
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：6bb1b34b-eb24-4b0a-b69b-69e34156d925
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

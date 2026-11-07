@@ -10,6 +10,7 @@ maintain/index.vue 所属小区原仅读 URL 参数或 userStore.projectName，�
 - h5Context.js 中 getH5Selection 增加 houseId 查 houseList 兜底
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 来源会话：6c36b4fe-74d0-426f-82e3-e6ed3c6e89a6；代码基线：none
 - 涉及文件：src/pages_owner/maintain/index.vue、src/store/repair.js、src/api/repair.js、src/utils/h5Context.js、src/pages/index/useProjectState.js、src/store/user.js、src/api/maintenance.js、src/pages_owner/maintain/detail.vue
 - 所属项目：无锡市区小程序嵌入H5

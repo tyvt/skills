@@ -15,6 +15,7 @@
 - .tree-wrap 使用 height: 100% + overflow: auto，节点少时在固定框内滚动，节点多时在 .type-left-tree 内滚动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 bb65a7e2 用户要求树边框高度固定不随数据缩短，结论明确两点 CSS 根因及 RegionTreeLayout.vue 修改方式
 - 涉及文件：zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue、zhi2-web-admin/src/views/property/complex/components/regionTree.vue
 - 所属项目：园区物管2.0；来源会话：bb65a7e2-6e02-4948-ae2d-480611ff86ef；代码基线：49e7729ce

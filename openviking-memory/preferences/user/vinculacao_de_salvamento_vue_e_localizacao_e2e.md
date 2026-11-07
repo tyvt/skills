@@ -2,6 +2,12 @@
 - 在 E2E 测试中，定位器 `button:visible` 不准确；spec 应使用 `getByRole('button',{name:/保存/})` 并等待其可见。
 - 验证证据: cursor session=840f26b2-59e0-4f58-a690-fdd616477176; 涉及文件: e2e/company/personnel-certificate-crud.spec.js, src/components/OperationBtnGroup/index.vue, src/views/company/staffManagement/personnelRecord/detail.vue
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：840f26b2-59e0-4f58-a690-fdd616477176
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

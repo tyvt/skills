@@ -16,6 +16,7 @@
 - d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/guaranteeDepositAccount/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：0462a732-b177-45a1-9056-c252739c0ac9；代码基线：none
 
 <!-- MEMORY_FIELDS

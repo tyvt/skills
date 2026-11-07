@@ -16,6 +16,7 @@ Vue2 中 v-for + 动态字符串 :ref 场景下 $refs[name] 是 DOM 数组而非
 - 凡 v-for 批量初始化图表（多卡片仪表盘场景）都应内置这层解包
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 d6bc9dfb 精简代码后 7 个图表全部崩溃，报错栈指向 echarts 内部 getContext；修复为 chartRenderers.js 增加 asChartDom() + index.vue 增加 resolveRef(name)
 - 验证证据：src=园区物管2.0/029.md
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/chartRenderers.js、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue、zhi2-web-admin/src/views/benefit/mapOverview/dataHelpers.js、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/mock.js、zhi2-web-admin/src/views/benefit/dataSandbox/pieLegendHover.js、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/chartConstants.js、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/dataHelpers.js

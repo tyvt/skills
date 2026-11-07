@@ -14,6 +14,7 @@
 - 新建弹窗若需展示区划，直接照抄这一对 formatter
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 63c29103 确认 showPropertyProjectDialog 已在 2.6.2 加 formatter，showCompanyDialog 漏改仍显示编码，随后补齐
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue、src/mixins/area.js、src/mixins/detailMixins.js
 - 所属项目：苏住房G；来源会话ID：63c29103-0eb8-4867-986d-5ca6a0993ecb；代码基线：92ce738

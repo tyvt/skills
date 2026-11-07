@@ -9,6 +9,7 @@
 - `src/views/personalCenter/personalInfo/personalInfo.vue`。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=iHomePC
 - 验证：增加删除个人基本信息功能后点击提示删除成功，但仅前端清表单。
 - 所属项目：iHomePC；来源会话：2dc7e41c-982b-4291-bc42-b9f1df70756a；代码基线：none。
 

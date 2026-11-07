@@ -14,6 +14,12 @@
 - 涉及文件: presale/permit/components/detail.vue, PermitPlanPanel.vue, resolveServerAssetUrl.js, companyApplyAudit/detail.vue, detailMixins.js, form.js, .workbuddy/memory/MEMORY.md, .workbuddy/memory/2026-09-11.md
 - 源会话: 6976122d-456e-461d-a9a7-8ac465dc9b76; 代码基线: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：6976122d-456e-461d-a9a7-8ac465dc9b76
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

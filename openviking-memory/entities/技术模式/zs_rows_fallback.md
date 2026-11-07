@@ -10,6 +10,8 @@ zs-select-dialog.vue 的 getList 写死 listKey='rows'，接口返回 data 数�
 - rows 缺失时回退至 data 字段取数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：79196650-1f8f-4250-a924-1f5ed127ab56
 - 验证证据：src=cursor session=79196650-1f8f-4250-a924-1f5ed127ab56
 - 涉及文件：supervision/agreement/jgxm/components/RegulatoryDialog.vue、components/zs-select-dialog/zs-select-dialog.vue、zs-select-dialog-func.vue、main.js、mixins/table.js、supervision/agreement/version/index.vue
 - 所属项目：苏州市房地产监测V3；代码基线：none

@@ -8,6 +8,7 @@
 - 数据更新整对象替换chartOption；切换年份/Tab用动态canvasId+key强制重建；金额先Number()转数值再喂ECharts
 - 确须跟随滚动只能改用同层渲染方案
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话9446951a，Bug#3479年度预算图表不显示；修复为移出scroll-view等配套改造
 - 涉及文件：budget/index.vue、echarts-uniapp.vue、balancePublicity/index.vue、api/benefit.js
 - 所属项目：苏住房C；来源会话ID：9446951a-feff-46d8-9660-d4cca2cd85fd；代码基线：5f0f4dc

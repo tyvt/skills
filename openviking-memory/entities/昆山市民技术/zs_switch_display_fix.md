@@ -11,6 +11,7 @@
 - `assetsPublicity/index.vue`：删除未使用的 `.mid-switch` 冗余样式
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 所属项目：昆山市民；来源会话ID：3123da20-6d5f-4805-879f-6708af6c6456；代码基线：none
 - 涉及文件：zs-switch.vue、assetsPublicity/index.vue
 

@@ -13,6 +13,7 @@
 - 恢复方式：取消 tabs 里 publicity 行注释即可，无需新建页面
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话 3046796a git 结论确认 commit 0fa7b58 注释 publicity 行
 - 涉及文件：src/pages_benefit/sharedFunds/index.vue、src/pages_benefit/benefit/index.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话：3046796a-f407-4dcd-ada2-855aada9eac3；代码基线：86395e1

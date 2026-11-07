@@ -11,6 +11,7 @@
 - 修改位置约 238:240 行
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/OpenDetailDialog.vue
 - 所属项目：园区公共收益；来源会话：3ef9c696-10c0-4826-b1f5-80042dfc681b；代码基线：none
 

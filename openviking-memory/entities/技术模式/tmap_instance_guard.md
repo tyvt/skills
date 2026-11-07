@@ -16,6 +16,7 @@
 - 用 _mapViewToken/_destroyed 标志防止销毁后仍绘制；此套路适用于所有 WebGL/地图实例引入 Vue2 场景。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：032.md 会话 b8c9482d 列出三类根因与 mapLoader.js 单例 + _tmapCtx 非响应式 + token 防竞态修改。
 - 涉及文件：src/components/ZsTencentMap/mapLoader.js、src/views/benefit/statisticsMap/components/map.vue；所属项目：园区物管2.0；来源会话：b8c9482d-979a-4abb-bdf3-cd1b595616ce；代码基线：c97957703。
 

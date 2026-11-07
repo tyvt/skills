@@ -16,6 +16,7 @@
 - 修好后空数据由 ZsPaging 默认空态承接
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 d96faf99 用户诉求未添加过房屋用户点击历史添加记录页一直加载期望显示暂无数据并附接口截图；结论 pages_owner/house/history.vue 的 res.rows.map 崩溃致 completeByTotal 不被调用，已改可选链+默认空数组并补 .catch(reject)
 - 涉及文件：src/pages_owner/house/history.vue、src/pages_owner/house/index.vue、src/hooks/usePaging.js
 - 所属项目：苏住房C；来源会话ID：d96faf99-8932-4fca-b475-a68344311240；代码基线：d43894b

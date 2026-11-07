@@ -11,6 +11,7 @@
 - 编辑态 AnnexUpload 仍传真实 handler 保持行为不变
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/285.md
 - 涉及文件：AnnexUpload/components/AppendixRequirementCard.vue、companyManagement/components/DeveloperBasicInfoDetail.vue、AnnexUpload/components/AppendixRequirementGrid.vue、AppendixPackageSection/index.vue、AnnexUpload/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：fe17d399-463d-45e5-9c19-4d7ebc506fcd；代码基线：none

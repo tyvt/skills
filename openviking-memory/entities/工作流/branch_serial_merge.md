@@ -13,6 +13,7 @@
 - 合并链完成后停在最终定制分支，推送远程需用户另行确认
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：三分支合并表与冲突处理说明，v2.6.1 提交修复、v2.6.2 与 v2.6.2-yulin 逐级合并
 - 涉及文件：zhi2-web-admin/src/views/property/knowledgeBase/index.vue、zhi2-web-admin/src/styles/index.scss
 - 所属项目：园区物管2.0；代码基线 c52866fc8；来源会话 4d3be41b-6a5f-45bb-ae11-8782ac069dd6

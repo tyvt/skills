@@ -19,6 +19,7 @@
 - src/pages_transaction/newHouse/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C（zhi2-mobile-shimin）
 - 来源会话：9ab5f462-ee46-4fde-9e2b-8231f0fab02d
 - 代码基线：none

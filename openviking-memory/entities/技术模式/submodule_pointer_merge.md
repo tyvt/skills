@@ -13,6 +13,8 @@
 - zhi2-web-admin/src/views/property/complexChange/components/rangeTable.vue
 
 ## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证证据：src=淮安物管/015.md
 - 来源会话：7756c9bc-d9e8-42f7-84ab-da399d9a7ecd；代码基线：none
 

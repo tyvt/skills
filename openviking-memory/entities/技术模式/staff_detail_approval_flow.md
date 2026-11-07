@@ -20,6 +20,11 @@
 - 文件：`detail.vue`、`OperationBtnGroup/index.vue`、`detailMixins.js`（路径 `zhi2-web-admin/src/views/company/staffManagement/` 等）
 - 来源会话：2f709dc5-4ae2-4b08-9df3-6698a076d982；项目：产品2.0
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

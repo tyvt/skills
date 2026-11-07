@@ -9,6 +9,11 @@ On 2026-11-03, a bug was fixed where `PermitPlanPanel.vue`'s '预售方案' sect
 【来源会话ID】4544dadc-80b6-40ef-8002-3d6ab970a0b4
 【代码基线】none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "permit_dup_render",

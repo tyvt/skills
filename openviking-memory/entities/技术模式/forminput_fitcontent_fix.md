@@ -9,6 +9,7 @@ FormInput 在 fitContent 非 true 时误读 $el 宽度触发 Vue 警告，已改
 - 通过外层 span 的 inputWrap ref 读取 clientWidth
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/207.md
 - 涉及文件：contract/components/formInput.vue、contract/components/hashTitle.vue、contract/chapters/cash/chapter2.vue、contract/mixins/formComp.js、contract/components/originalTip.vue、contract/components/contractContent.vue、contract/chapters/cash/chapter3.vue、contract/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：b7e96737-7bf9-4f61-9517-70baf4f0966c；代码基线：none

@@ -12,6 +12,8 @@
 - deptTree 移除无效的 queryData 监听器
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：e8e1b511-6b3a-4a1c-a292-a25e3a8b00fd
 - 验证证据: src=产品2.0/048.md
 - 涉及文件: zhi2-web-admin/src/views/system/message/components/selectRangeDialog.vue, rangeTable.vue, deptTree.vue, src/mixins/subTableMixins.js, table.js, area.js, src/components/zs-search-form/zs-search-form.vue, QueryResetButtons.vue
 - 所属项目: 产品 2.0; 会话: e8e1b511-6b3a-4a1c-a292-a25e3a8b00fd; 代码库: 无

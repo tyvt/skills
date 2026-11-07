@@ -23,6 +23,10 @@
 - 涉及文件：zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue、regionTree.vue 及 16 个迁移页面。
 - 所属项目：园区物管2.0；来源会话：47c0000a-51d9-4a99-82c5-48d1b26e9c97、7fe70b14-eb68-49c3-87b6-e00e6b7abf8f；代码基线：7fe15a8cb。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

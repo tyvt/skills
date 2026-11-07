@@ -9,6 +9,7 @@
 - 批量删除作用域单独收窄为草稿态(删除回调过滤或禁用删除入口)，保证「能选」不等于「能删」
 - 避免误删已备案数据
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话e972de96，用户反馈「选不了下面的数据」；修复为building/project/index.vue覆写勾选、批量删除仅作用草稿
 - 涉及文件：src/views/building/project/index.vue、src/mixins/listMixins.js、src/mixins/table.js
 - 所属项目：苏住房G；来源会话：e972de96-ea86-4046-8a3e-d5e86948f61f；代码基线：3697a62

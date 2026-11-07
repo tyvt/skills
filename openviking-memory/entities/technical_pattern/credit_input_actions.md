@@ -11,6 +11,7 @@
 - `institution-register-flow.spec.js` 同步更新
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/106.md
 - 涉及文件：Step1BasicInfo.vue、zs-input.vue、institutionRegister/index.vue、前端技术信息.md、路由信息.json、package.json、vite.config.js
 - 所属项目：苏州市房地产监测V3；来源会话：4b2f9d95-14ba-4d66-a8c1-5657389a2a88；代码基线：none

@@ -10,6 +10,7 @@
 - 页面初始化应无条件触发数据加载，不依赖 `formMode === 'view'`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/050.md
 - 涉及文件：companyManagement/components/DeveloperBasicInfoDetail.vue、companyManagement/companyBasicInfo/detail.vue、mixins/detailMixins.js、mixins/form.js、companyManagement/components/AgencyBasicInfoDetail.vue、api/company/companyRecord.js、companyManagement/components/AgencyEntryNetworkDetail.vue、zljg/companyRecord/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：e15a1da6-99f2-4436-b12d-c0e94bfb9658；代码基线：none

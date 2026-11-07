@@ -11,6 +11,7 @@
 - 数据少时左侧边框保持 `calc(100vh - 180px)` 高度；数据多时在 `.type-left-tree` 内滚动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue；zhi2-web-admin/src/views/property/complex/components/regionTree.vue
 - 所属项目：园区物管2.0；来源会话：bb65a7e2-6e02-4948-ae2d-480611ff86ef；代码基线：none
 

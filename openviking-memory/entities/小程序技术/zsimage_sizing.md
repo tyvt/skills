@@ -9,6 +9,7 @@ ZsImage组件内部写死width/height:100%，页面直接挂固定尺寸class会
 - 不在ZsImage上写尺寸class，改用固定尺寸容器包裹：logo用80×80px盒子、电话/地址图标用16×16px盒子
 - ZsImage放在盒子里100%撑满即可，此为项目内cancellationWarning等已有页面既定写法
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话ID：cf3f235e-357f-45ef-a9c7-36f63007668f；代码基线：9832ba3
 - 涉及文件：src/pages_main/about/AboutUs.vue、src/components/ZsImage/ZsImage.vue、src/static/images/logo-szf.svg
 

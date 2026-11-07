@@ -11,6 +11,8 @@
 - Template 使用该 computed 来控制字段和 Tab。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：5c1b8a24-76c6-4187-b758-d05c9e6ba67e
 - 验证证据: src=苏州市房地产监测V3/106.md
 - 所属项目: 苏州市房地产监测V3; 会话: 5c1b8a24-76c6-4187-b758-d05c9e6ba67e; baseline: none
 

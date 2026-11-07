@@ -14,6 +14,10 @@
 - 涉及文件：zhi2-web-admin/src/utils/portalApiRewrite.js、zhi2-web-admin/src/views/system/dept/index.vue
 - 所属项目：产品2.0；来源会话：06d23df6-d9e0-472b-bdcb-895195ece6ab；代码基线：eab0458
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

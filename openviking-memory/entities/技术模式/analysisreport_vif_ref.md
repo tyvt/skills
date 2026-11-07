@@ -10,6 +10,8 @@ analysisReport.vue 的 getList() 赋值 assessmentId 后同步调用子组件 re
 - 对 ref 使用可选链 ?. 做安全调用
 
 ## 验证与归属
+- 所属项目：bugfix
+- 验证证据：extracted source=cursor project=bugfix
 - 验证证据：src=bugfix/002.md
 - 涉及文件：analysisReport.vue
 - 来源会话ID：230619a7-705b-45e2-8e99-9fb5aa4b094f

@@ -13,6 +13,7 @@
 - 若某接口要单独弹窗，可在请求配置加 noMessage: true（当前弹窗已关闭，该配置暂时无实际作用）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 所属项目：园区物管2.0；来源会话：e4c07993-740c-4ed4-936b-ea9e9f31c8b1；验证证据：cursor 会话提取
 
 <!-- MEMORY_FIELDS

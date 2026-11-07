@@ -14,6 +14,12 @@ In Suzhou Real Estate Monitoring V3, the bank branch list requested the wrong es
 - Files: cbyh/index.vue, yhwdgl.js, jgwd/index.vue, cbyh/detail.vue, listMixins.js, YhwdTable.vue, superviseBank/detail.vue, table.js
 - Source session: f9ae239b-1970-4f62-b9f6-43dcba0723b3; code baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：f9ae239b-1970-4f62-b9f6-43dcba0723b3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

@@ -7,6 +7,7 @@
 - vite.config.ts 的 drop_console 必须仅在生产模式生效，避免测试环境 vConsole 日志被清除
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期H5
 - 验证来源：惠山二期H5/004.md
 - 涉及文件：package.json、vite.config.ts、src/main.ts、惠山V1小程序/src/main.js、index.html、src/env.d.ts、src/api/index.js、main.ts
 - 所属项目：惠山二期H5；来源会话：ce82ed4f-71c3-4c81-b7b8-45a7512f22f8；代码基线：无

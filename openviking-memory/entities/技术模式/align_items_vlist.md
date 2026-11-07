@@ -10,6 +10,8 @@ main.ts 全局开启 z-paging 虚拟列表，.list-container 的 align-items:cen
 - 子项宽改百分比
 
 ## 验证与归属
+- 所属项目：H5
+- 验证证据：extracted source=cursor project=H5
 - 验证证据：src=H5/001.md
 - 涉及文件：main.ts
 - 来源会话：5ddd3520-e931-43a9-9abb-08080d4f075f；代码基线：none

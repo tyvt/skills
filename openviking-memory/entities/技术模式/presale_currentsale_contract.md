@@ -9,6 +9,8 @@
 - 页面引用于 `commercialHousingSales/presale/contractView` 等路由
 - 路由信息见 `d:/repository/苏州市房地产监测V3/路由信息.json`
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：来源会话 d1778753-1044-48f0-a6e3-b3b3124bd28e
 - 代码基线：none
 

@@ -11,6 +11,7 @@
 - 自定义页需补充 `:key="tableColumnsKey"` 以在保存后触发表格重排
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：4b2a6426-193d-4d85-9729-2061d23f61d0；代码基线：none
 - 涉及文件：`property/complex/index.vue`、`ListTemplate.js`
 

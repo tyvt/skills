@@ -13,6 +13,7 @@
 - 前端靠显式 dict-url 区分两条链路，不用 formMode 分流
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 会话 455456f0（基线 b0f2039）用户诉求：新增 organ_type_all，回显用新字典，新增编辑用原字典
 - 结论 19 处改动并剔除 3 处不在全量路由 JSON 与 constantRoutes 的条目
 - 涉及文件：zhi2-web-admin/src/utils/dict.js、system/user/detail.vue、companyRegister 下 detail.vue/dialog.vue/index.vue

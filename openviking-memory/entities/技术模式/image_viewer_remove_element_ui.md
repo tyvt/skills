@@ -14,6 +14,7 @@
 - 可补齐缺失依赖或改回 yarn/npm 安装启动链路解决
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：zhi2-web-admin/src/components/ImageViewer/index.vue、element-ui/packages/image/src/image-viewer.vue
 - 所属项目：2-0；来源会话：05e68b5b-3b5d-4912-9698-90636098e05c；代码基线：none
 

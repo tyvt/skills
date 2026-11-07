@@ -18,6 +18,8 @@
 - d:/repository/园区公共收益/zhi2-web-admin/src/views/maintenance/accountChange/detail.vue
 
 ## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：src=园区公共收益/005.md；来源会话 46eb821e-f488-4bb3-b973-6647aedb4d2b
 
 <!-- MEMORY_FIELDS

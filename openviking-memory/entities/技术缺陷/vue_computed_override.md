@@ -10,6 +10,7 @@
 - 以后若需拆分多个 `computed`，必须合并为一个对象，或改用 `Object.assign` / 展开运算符合并。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=bugfix
 - 涉及文件：`index.vue`
 - 所属项目：bugfix
 - 来源会话：89fc7f13-a8bf-4d3a-bbd4-188054ca21b7

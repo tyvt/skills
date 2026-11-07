@@ -11,6 +11,7 @@
 - 选完下拉后等待面板关闭，不再用 `Escape` 清掉已选值
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：重跑 `cd zhi2-web-admin && npm run test:e2e:real-api-flow`，录像在 test-results/../video.webm
 - 涉及文件：AnnexUpload/index.vue、companyRegister/dialog.vue、FjDialog.vue
 - 所属项目：产品2.0；来源会话：a48b51e8-5524-4296-ac1b-f971accfcfcb；代码基线：none

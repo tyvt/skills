@@ -9,6 +9,8 @@ zs-image 原依赖运行时 /static/... 字符串拼接加载本地图易失效�
 - resolvedSrc 优先返回映射 URL
 
 ## 验证与归属
+- 所属项目：H5
+- 验证证据：extracted source=cursor project=H5
 - 验证证据：src=H5/001.md
 - 涉及文件：src/components/zs-image/zs-image.vue
 - 来源会话：3210cab9-2079-4e56-bb7d-c9763b228c00；代码基线：none

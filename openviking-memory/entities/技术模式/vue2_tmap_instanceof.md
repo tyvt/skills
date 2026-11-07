@@ -13,6 +13,7 @@
 - 地图与图层实例不存入 data()
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：园区物管2.0/032.md
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、statisticsMap/components/map.vue、components/ZsTencentMap/mapLoader.js、transaction/screen/components/map.vue、property/mapProperty/index.vue、components/ZsTencentMap/index.vue、main.js
 - 所属项目：园区物管2.0

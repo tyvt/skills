@@ -11,6 +11,7 @@
 - 改 env 后需 `npm run build:mp` 重新上传。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证：会话 76e058f1 用户反馈小程序打包接口不对，修复恢复 envVersion 分支表；验证证据 src=昆山市民/006.md。
 - 涉及文件：src/env/mp.js、src/request/index.js、package.json、vite.config.js、src/manifest.json、src/api/index.js。
 - 所属项目：昆山市民；代码基线：1e46691；来源会话ID：76e058f1-ba17-479b-89f8-7c7af2202d46。

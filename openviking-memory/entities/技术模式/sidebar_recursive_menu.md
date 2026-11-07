@@ -24,6 +24,10 @@
 - 涉及文件：zhi2-web-admin/src/layout/components/Sidebar/index.vue、zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue。
 - 所属项目：园区物管2.0；来源会话：b096fe20-ff70-474d-bf2b-1e39449b1ce9；代码基线：f101dd464。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

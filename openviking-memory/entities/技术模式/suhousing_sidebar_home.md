@@ -11,6 +11,7 @@
 - 首页菜单改为仅精确匹配，避免 /index/xxx 同级菜单误触发高亮
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：router/index.js、utils/homeRoute.js、utils/permission.js
 - 所属项目：苏住房G；来源会话：cb0377ba-165d-4411-88e0-da19021618ab
 

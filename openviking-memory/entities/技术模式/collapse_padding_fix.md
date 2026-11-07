@@ -12,6 +12,10 @@
 - 来源会话：22342137-7680-4a86-9ec8-e4647eb82f33
 - 涉及文件：`zhi2-web-admin/src/styles/detail-form.scss`
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

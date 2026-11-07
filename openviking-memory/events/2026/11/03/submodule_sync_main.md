@@ -9,6 +9,11 @@ Submodule zhi2-mobile-shimin on sfb branch committed b3b21821 adjusting public b
 【来源会话ID】2a28d769-4a41-4a8a-a03f-b7cdd347e192
 【代码基线】none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "submodule_sync_main",

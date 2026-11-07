@@ -12,6 +12,7 @@
 - `companyAdmin/index.vue` 列表统一用 `resolveCompany` 解析机构类型
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/116.md
 - 涉及文件：companyAdmin/index.vue、constants/companyOrgan.js、companyAdmin/agency/index.vue、companyAdmin/developer/index.vue、mixins/companyOrganContext.js、utils/ruoyi.js、mixins/listMixins.js、mixins/table.js
 - 所属项目：苏州市房地产监测V3；来源会话：45c552dc-2133-4822-8720-0b09881d4cdf；代码基线：none

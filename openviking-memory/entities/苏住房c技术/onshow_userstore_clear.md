@@ -10,6 +10,8 @@
 - 提交改读快照并增加空值兜底校验
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=苏住房C/058.md
 - 涉及文件：pages_my/verification/FormManual.vue、api/security.js、pages_my/verification/FormLocal.vue、pages_my/verification/FormNonLocal.vue、store/user.js、api/index.js、api/httpInstance.js、App.vue
 - 来源会话ID：fe7db194-e3eb-4ff2-81a5-4fc5d0da76f3；代码基线：none

@@ -10,6 +10,7 @@ Vue3 中 data() 返回对象被 Proxy 深度代理，BpmnJS 实例内部只读 $
 - 模板与 methods 仍可正常调用实例方法
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：index.vue
 - 所属项目：2-0；代码基线：none
 - 验证证据：src=2-0/016.md

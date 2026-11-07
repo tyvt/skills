@@ -11,6 +11,7 @@ UnifiedLoginMenuMoreDialog.vue 与 UnifiedLogin.vue 的 ESLint 通过，但存�
 - previewCount 边界、空列表弹窗等
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - E2E 已覆盖 7 项菜单与 dialogTitle 文案
 - 涉及文件：UnifiedLoginMenuMoreDialog.vue、UnifiedLogin.vue、unified-login-visual.spec.ts、ExternalInfoDialog.vue
 - 所属项目：门户；来源会话ID：ecbf0459-d7d2-4d99-934b-c0bdf8b4c2cb

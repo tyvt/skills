@@ -10,6 +10,8 @@
 - 旧TypeChoose/FormNonLocal链接onLoad重定向至FormLocal
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：苏住房C/046.md；来源会话6e25ee6f-ffc6-40be-bf9d-065779c41cdc
 - 涉及文件：src/utils/index.js、src/pages_my/verification/TypeChoose.vue、FormLocal.vue、pages.json、src/pages_owner/project/auth.vue、UnauthorizedPage.vue、src/pages_my/setting/userInfo.vue、AuthorizedFail.vue
 - 代码基线：none

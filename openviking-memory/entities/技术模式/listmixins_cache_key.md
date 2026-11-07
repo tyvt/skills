@@ -10,6 +10,7 @@
 - 子表格设 `${route.path}#decisionRange` 与 `#votingItems` 独立缓存
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 e0903bbe 用户报决策范围数据为空
 - 涉及文件：optionDecision/detail.vue、optionDecision/components/DecisionRangeTable.vue、VotingItemsTable.vue、mixins/listMixins.js、api/estate/decisionRange.js、ownerDecision/components/DecisionRangeTable.vue、api/estate/option.js、decisionCommon/components/VotingItemsTable.vue
 - 所属项目：太仓G；来源会话：e0903bbe-197e-4316-9a21-245f9310dae3；代码基线：none

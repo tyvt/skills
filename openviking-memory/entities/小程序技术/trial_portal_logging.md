@@ -10,6 +10,8 @@
 - 微信开发者工具 → 体验版 → 打开「我的」页 → 登录或刷新 → Console 搜索 `[体验版][PortalAPI]` 与 `[体验版][房屋]`
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：utils/portal-user.js、pages/webview/externalWebview.vue、utils/portal-env-config.js
 - 来源会话ID：0f172dbf-633a-4df4-a1bc-5adc70d60876
 - 代码基线：none

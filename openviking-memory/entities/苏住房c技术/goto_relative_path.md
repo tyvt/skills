@@ -12,6 +12,7 @@
 - 搜不带前导/的goto/navigateTo参数；本页history→/pages_owner/house/history也同坑一并修
 - 勿把normalizeLegacyPageUrl当万能兜底扩展成「猜目录」，会让错误路径更难定位
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话d7258436：navigateTo失败，goto(`TypeChoose?...`)被补成/TypeChoose，改为完整路径
 - 涉及文件：src/pages_owner/house/index.vue、src/utils/route-map.js、src/pages_owner/house/owner/success.vue
 - 所属项目：苏住房C；来源会话ID：d7258436-2f74-40b3-a7d1-bb994d1239c1；代码基线：b7bf813

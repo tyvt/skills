@@ -16,6 +16,7 @@
 - zhi2-web-admin 根目录（package.json、vite.config.js、src/main.js）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/097.md
 - 来源会话：52e97276-20ef-4050-8053-34217a106e19
 - 所属项目：苏州市房地产监测V3；代码基线：none

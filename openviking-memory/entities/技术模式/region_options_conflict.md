@@ -16,6 +16,8 @@
 - 还涉及 companyApplyAudit/detail.vue、CompanyBasicInfoForm/Detail、transferDiscount/detail.vue、companyApply/detail.vue 等。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：8173eb01-8b73-474d-a30a-4662d6fb521e
 - 验证证据: src=苏州市房地产监测V3-rest/073.md; src=苏州市房地产监测V3/122.md; src=苏州市房地产监测V3/239.md
 - 涉及文件: toB/companyRecord/detail.vue, area.js, detailMixins.js, companyApplyAudit/detail.vue, companyRecordAgency/change/detail.vue, CompanyBasicInfoForm.vue, CompanyBasicInfoDetail.vue, transferDiscount/detail.vue, companyCancel/detail.vue, companyApply/detail.vue, form.js
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: 8173eb01-8b73-474d-a30a-4662d6fb521e, 9aaca310-0d97-443b-83c2-2382ce1e8d98; 代码库: none

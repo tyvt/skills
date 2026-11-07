@@ -8,6 +8,8 @@
 - view 模式使用 DetailTemplate 与 contentInfo 系列
 - edit/add 保留原 el-form-item 字段
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/068.md
 - 涉及文件：supervision/agreement/allocation/detail.vue、version/detail.vue、unblock/usemoney/detail.vue、unblock/notice/detail.vue、property/propertyContract/components/detail.vue、supervision/agreement/end/detail.vue
 - 来源会话：80f0da60-1767-4d5d-82a5-1eb17414467f；代码基线：none

@@ -18,6 +18,7 @@
 - 已知清单无此约定，可复用性高
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话c67476bc/cf4b4d2c/09f68d49围绕index-v2.vue拆分keyRegionCode与checkRegionCode、去platformConfig.region覆盖、benefit/repair/study改传{}；09f68d49 review确认queryParams()仅被loadKeyData/loadCheckData使用
 - 涉及文件：zhi2-web-admin/src/views/home/index-v2.vue、home/v2/components/RegionTabs.vue、src/api/portal/home.js
 - 所属项目：苏住房G；来源会话：c67476bc-3452-4236-a711-0e3a61e0d8f5等4个；代码基线：15e201a

@@ -12,6 +12,7 @@
 - detail.vue：新增/编辑保存时若发布范围与全局不同，表单附带complexId
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话：f09d0d8f-6e96-496a-8a72-7934ff001122；代码基线：none
 
 <!-- MEMORY_FIELDS

@@ -3,6 +3,11 @@
 - 来源会话：2c17338a-e53b-49fc-afee-3c701ab5cbc9
 - 涉及 fix(经营用房) 详情弹窗资产部位表格左右缺少间距改动同样采用 cherry-pick 至上述分支（来源会话：2ee3fa7e-3302-4162-9884-a54bd1cffc7f）
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

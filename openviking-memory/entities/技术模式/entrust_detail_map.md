@@ -14,6 +14,7 @@
 - detailMixins.js、entrust-sale-real-api-flow.spec.js、form.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/084.md
 - 所属项目：苏州市房地产监测V3；来源会话：0c82c47e-a307-43e4-a68f-3eaae32f3c3d；代码基线：none
 

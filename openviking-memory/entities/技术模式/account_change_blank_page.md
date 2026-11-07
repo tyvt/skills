@@ -16,6 +16,12 @@
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue、pubRegAccountChange/detail.vue、pubRegAccountChange/index.vue等
 - 代码基线：none
 
+## 验证与归属
+- 所属项目：无锡市区G
+- 验证证据：extracted source=cursor project=无锡市区G
+- 来源会话：be9a1d85-fae7-46fb-9f25-1f3d40a49c4d
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

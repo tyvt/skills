@@ -13,6 +13,12 @@ mfap_MfapFinalSharePublicDetail.js shareDetailPrint() missing submitConTig=true 
 - Involved files: mfap_MfapFinalSharePublicDetail.js, mtpl_MtplMoneySharePubDetail.js, mfap_MfapFinalSharePublicDetail.shtml.
 - Source session ID: 553dcf6a-8386-4166-a8c5-2cbd36497fe6.
 
+## 验证与归属
+- 所属项目：园区V0
+- 验证证据：extracted source=cursor project=园区V0
+- 来源会话：553dcf6a-8386-4166-a8c5-2cbd36497fe6
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

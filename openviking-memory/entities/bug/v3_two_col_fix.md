@@ -14,6 +14,7 @@
 - PermitPlanPanel.vue、AgencyPersonnelDetail.vue 等同步清理
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：8938ed10-af4c-44bf-8d0c-5e1178985b2e
 - 涉及文件：detail-template.vue、auxiliaryProject/detail.vue、PermitPlanPanel.vue、AgencyPersonnelDetail.vue
 

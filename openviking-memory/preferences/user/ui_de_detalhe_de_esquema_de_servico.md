@@ -2,6 +2,12 @@
 - 查看模式 `detailItems` 使用 `FORM_COL_THREE`/`FORM_COL_FULL`；"服务内容" 从 `richtext` 改为 `textarea` 以避免 `v-html` 风险
 - 验证证据: src=苏州市房地产监测V3-rest/096.md; 涉及文件: companyScheme/detail.vue, detail-form.scss, AgencyBasicInfoForm.vue, detail-template.vue, detailLayout.js, SupervisionAddDialog.vue, toB/agencyRecord/detail.vue, companyRecordAgency/detail.vue; 会话: 3186cfc4-7158-4eb1-b135-f23262301582
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：3186cfc4-7158-4eb1-b135-f23262301582
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

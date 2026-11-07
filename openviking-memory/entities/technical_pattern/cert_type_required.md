@@ -9,6 +9,8 @@
 - 在`zhi2-web-admin/src/views/company/staffManagement/components/certificatesDialog.vue`和`personnelRecord/certificatesDialog.vue`的`rules`中添加`certificateType: [{ required: true, message: '证书类型不能为空', trigger: ['change'] }]`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：7c358850-cada-4f48-ae63-ef09a5db0ee9
 - 验证证据: src=苏州市房地产监测V3/246.md
 - 涉及文件: zhi2-web-admin/src/views/company/staffManagement/components/certificatesDialog.vue, personnelRecord/certificatesDialog.vue, components/certificatesTable.vue, toB/personnelRecord/components/certificatesDialog.vue, institution/personnel/components/certificatesDialog.vue, company/staffManagement/components/detail.vue
 - 所属项目: 苏州市房地产监测V3; Session: 7c358850-cada-4f48-ae63-ef09a5db0ee9; 代码库: none

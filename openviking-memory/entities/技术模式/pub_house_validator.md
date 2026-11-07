@@ -10,6 +10,7 @@
 - houseCategory 支持数字 0 与字符串 '0'。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证：新增时不选「经营用房类别」点确定，应见表单项下红色提示「经营用房类别不能为空」，不弹后端错误。
 - 涉及文件：pubHouseDialog.vue、benefit/pubHouse/detail.vue、api/benefit/pubHouseDetail.js、benefit/pubHouse/components/pubHouseDialog.vue。
 - 所属项目：淮安物管；来源会话：f1ee611c-8cd6-4f31-969d-934eec1bceb2；代码基线：none。

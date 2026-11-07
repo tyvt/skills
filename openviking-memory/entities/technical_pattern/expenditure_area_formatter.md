@@ -14,6 +14,11 @@ pubExpenditureContract/detail.vue property-management-area select dialog binds s
 - Files: pubExpenditureContract/detail.vue, pubPaymentNotice/detail.vue, pubRegulatoryAccount/detail.vue, assetLeaseApply/detail.vue, area.js, detailMixins.js, zs-select-dialog-func.vue, zs-select-dialog.vue.
 - Project: 园区公共收益; source session: fad5a385-6cf5-49cb-86a0-1abe38b27af6; code baseline: none.
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：fad5a385-6cf5-49cb-86a0-1abe38b27af6
+
 
 <!-- MEMORY_FIELDS
 {

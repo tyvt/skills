@@ -18,6 +18,12 @@ Fix for voting tables' building area column not centered, unified width 130 and 
 ## Verification
 - Source cursor session `51317350-fbe8-4ba5-8ad7-1e8ca1e088d0`; code baseline none.
 
+## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
+- 来源会话：51317350-fbe8-4ba5-8ad7-1e8ca1e088d0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端缺陷",

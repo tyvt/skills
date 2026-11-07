@@ -18,6 +18,10 @@
 - 涉及 zhi2-web-admin/src/components、src/styles/index.scss、src/utils/detailLayout.js、e2e/fixtures/auth-helpers.js、e2e/list/table-column-width.spec.js、playwright.config.ts、src/views/home/UnifiedLogin.vue、package.json（含「门户」与「苏州市房地产监测V3」两仓对应路径）
 - 所属项目：门户；来源会话 f1dec228-6407-422d-9866-035a036d169f；代码基线 b84b4e7（对话注 none）
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

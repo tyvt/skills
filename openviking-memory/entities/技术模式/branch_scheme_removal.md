@@ -10,6 +10,7 @@
 - 机构注册审核详情 `company/institutionRegister/detail.vue` 和企业端「服务方案」列表模块仍保留
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话：56c16879-b869-4c53-a45f-31cf519e5fa1
 - 涉及文件：`AgencyBranchDetail.vue`、`ServiceSchemePanel.vue`
 

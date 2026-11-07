@@ -14,6 +14,11 @@
 - 涉及文件: houseCard.vue, Project_Suzhufang.vue (多个路径), index/project.vue, utils/index.js, houseSupermarket/index.vue, ZsImage.vue
 - 所属项目: Su Zhu Fang C (zhi2-mobile-shimin); baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：61371a3a-6a5f-4dcd-a98f-26224110a6a9
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "Tecnologia Su Zhu Fang C",

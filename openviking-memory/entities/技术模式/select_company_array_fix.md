@@ -22,6 +22,11 @@
 - 会话: 4367cc38-7b0c-49de-b6aa-65bb248d7532
 - 所属项目: 苏州市房地产监测V3
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：4367cc38-7b0c-49de-b6aa-65bb248d7532
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

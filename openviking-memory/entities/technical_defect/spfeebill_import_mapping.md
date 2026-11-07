@@ -15,6 +15,7 @@
 - `feeCycleFromText` 缺失时回退用 `feeCycleFrom` 补全
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：产品2.0/053.md
 - 涉及文件：property/spFeeBill/components/import.vue；property/spFeeBill/components/importUploadDialog.vue；property/spFeeBill/components/enums.js；property/bill/components/import.vue
 - 所属项目：产品2.0；来源会话ID：a10aadfb-a1ed-4720-8d24-06f8099d14c1；代码基线：none

@@ -13,6 +13,11 @@
 - 涉及文件: src/views/benefit/statisticsMap/components/map.vue, src/components/ZsTencentMap/index.vue, src/components/ZsTencentMap/mapLoader.js, src/views/benefit/statisticsMap/operatingAssets.vue, src/views/benefit/statisticsMap/mockApi.js, src/views/benefit/statisticsMap/mock.js, src/views/benefit/statisticsMap/components/ParkingAssetDialog.vue, src/views/benefit/statisticsMap/components/VenueAssetDialog.vue
 - 所属项目: 产品2.0; 会话: 95e2008d-fb62-4d82-a1ce-c691d8ecfd29; base: none; 验证证据: 产品2.0/030.md
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：95e2008d-fb62-4d82-a1ce-c691d8ecfd29
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

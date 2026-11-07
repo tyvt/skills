@@ -10,6 +10,7 @@
 - `getRowKey` 返回 `row.deliveryScopeId`（已保存）或 `row.buildingId`（草稿）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/098.md
 - 涉及文件：supervision/projectDelivery/components/DeliveryScopeSection.vue、components/zs-table/zs-table.vue、components/zs-table/zs-select-column.vue、supervision/projectDelivery/components/ProjectDeliveryDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：a11f72ad-6551-4d69-a2d0-e12bb33736a2；代码基线：none

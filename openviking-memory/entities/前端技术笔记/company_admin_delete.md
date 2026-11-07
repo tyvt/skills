@@ -10,6 +10,7 @@
 - 在 handleDelete 中增加拦截：即使绕过 UI 触发，企业管理员也不执行删除
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：01e7eed0-b3c3-4b15-9fda-320771899793；代码基线：none
 - 涉及文件：operatorAuthRangeTable.vue、detail.vue
 

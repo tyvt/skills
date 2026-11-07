@@ -13,6 +13,7 @@
 - zhi2-web-admin/src/views/flowable/components/BatchApprovalDialog.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - BatchApprovalDialog：batch-tip 移入 form-box；batch-tip 增加 nowrap
 - 所属项目：园区公共收益；来源会话 7bba50ec-878d-4ecc-aa51-2d784ce86b6d；代码基线 0abcb96
 

@@ -12,6 +12,7 @@
 - 自查：在 `src/pages_*` 下 grep `import.*\\.(png|svg|jpg)`，命中基本都要改；改完确认文件已在对应 `pages_*/static/` 下
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：@src/pages_my/verification/TypeChoose.vue 图片不显示，根因是分包内import路径无法访问分包静态图，修复为 resolveStaticUrl 并列出H5与小程序两种解析结果
 - 涉及文件：pages_my/verification/TypeChoose.vue、pages_my/verification/FormLocal.vue、pages_owner/authentication/TypeChoose.vue、utils/index.js、pages.json
 - 所属项目：苏住房C；来源会话ID：00a9d48a-4fa1-45d7-911c-3c025eccb8fc；代码基线：4630e8e

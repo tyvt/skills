@@ -18,6 +18,7 @@
 - 详情页 houseTable.vue 资产列表「面积」列改用 amountFormatter 显示千分位（如 1000 → 1,000）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：8331b045-2515-4a08-946d-7d95ffaf7dd5、e48b01c6-3065-4048-9afa-2de4be8dac2a；代码基线：none
 
 <!-- MEMORY_FIELDS

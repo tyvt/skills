@@ -9,6 +9,7 @@
 - 在 `DecisionRangeTable.vue` 的 `getSearchCondition()` 中根据缓存的 `buildingId`、`unitId` 同步恢复级联下拉数据
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 fee0d28c 用户报刷新后单元下拉空
 - 涉及文件：ownerDecision/detail.vue、ownerDecision/components/DecisionRangeTable.vue、decisionCommon/components/DecisionRangeTable.vue、optionDecision/components/DecisionRangeTable.vue、mixins/listMixins.js
 - 所属项目：太仓G；来源会话：fee0d28c-75fe-4a1f-9098-bb41f8526e92；代码基线：none

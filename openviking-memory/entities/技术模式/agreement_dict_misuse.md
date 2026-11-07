@@ -15,6 +15,10 @@
 - 涉及文件：zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue、index.vue、mixins/detailMixins.js、components/detail-template/detail-template.vue、components/dict-tag/dict-tag.vue、guaranteeDepositAgreementEnd/detail.vue、components/zs-table-column/zs-table-column.vue、mixins/ListTemplate.js
 - 所属项目：产品2.0；来源会话：654476f2-c8c2-4687-a36b-cfc42a35337b；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

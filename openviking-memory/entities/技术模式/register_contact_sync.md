@@ -16,6 +16,7 @@
 - register/components/Step4Shareholders.vue、package.json
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/107.md
 - 所属项目：苏州市房地产监测V3；来源会话：0c678471-cf7f-47eb-a5c0-ed61ba99b0f8；代码基线：none
 

@@ -11,6 +11,8 @@
 - BuildingDialog.vue、SelectRoomDialog.vue、RegulatoryAccountDialog.vue、VotingItemsDialog.vue 原生列宽改为 80
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/136.md
 - 涉及文件：zs-table-column.vue、styles/index.scss、zs-table.vue、dataEntryDetail/index.vue、ListTemplate.js、RelatedBuildingsTable.vue、bankTable.vue、JymxTable.vue
 - 来源会话：361222fd-00ea-45a7-a172-1112a1552ff8；代码基线：none

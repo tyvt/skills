@@ -16,6 +16,7 @@
 - 加固侧把点击事件换成@tap.stop+抽出统一isRepairNav谓词，在入口click与goToOther两处双重拦截
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话eac9139c用户轮次4「还是可以点进去啊」；结论明确源码已加拦截但工具跑dist/dev旧包无该逻辑，要求改导dist/build、清缓存重新编译
 - 涉及文件：src/pages_owner_extra/ownerCard/index.vue、src/pages_owner/ownerCard/index.vue
 - 所属项目：苏住房C；来源会话ID：eac9139c-3367-4784-8577-a513c71c95c0；代码基线：48bdb17

@@ -11,6 +11,7 @@
 - 所有通过 `ZsImage`（`:local="false"`）或 `resolveMediaUrl` 加载的服务器图片都会生效
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新构建并部署 H5 后即可验证
 - 涉及文件：`src/utils/index.js`、`vite.config.ts`、`src/components/ZsImage/ZsImage.vue`
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：288c6ff2-ac59-4b55-b6ee-a561f76eeba1；代码基线：none

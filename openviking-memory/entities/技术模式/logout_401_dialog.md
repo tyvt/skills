@@ -9,6 +9,8 @@
 - store/modules/user.js 的 LogOut 与 FedLogOut 开头先 setLoggingOut(true) 覆盖所有手动退出入口
 - utils/auth.js 的 setToken() 中必须 setLoggingOut(false) 复位，避免重新登录后真过期不提示
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：ffd2efe4-6853-464a-a9e4-0fe7137a2cf0
 - 验证：会话 ffd2efe4-6853-464a-a9e4-0fe7137a2cf0，用户明确要求退出不提示过期
 - 涉及文件：zhi2-web-admin/src/utils/request.js、store/modules/user.js、utils/auth.js
 - 所属项目：苏住房G；代码基线：2a3ef8a

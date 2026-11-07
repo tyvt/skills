@@ -19,6 +19,10 @@
 - 来源会话：5eee9074-4df3-4e60-a122-c6a55131f0d7
 - 代码基线：a63180c9a 时代之前即存在该布局结构
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "布局缺陷根因",

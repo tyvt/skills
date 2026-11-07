@@ -9,6 +9,8 @@
 - `detail.vue` 在 `isRecorded` 且为查看模式时渲染该按钮，启动流程
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：8f60e217-5cbf-4370-829a-83d765cd7761
 - 验证证据: src=cursor session=8f60e217-5cbf-4370-829a-83d765cd7761
 - 涉及文件: presale/permit/components/detail.vue, components/OperationBtnGroup/index.vue, detail-template-long-labels.md, permitConstants.js, utils/resolveServerAssetUrl.js, presale/entrustSale/components/detail.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 8f60e217-5cbf-4370-829a-83d765cd7761

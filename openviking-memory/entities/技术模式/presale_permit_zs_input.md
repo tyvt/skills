@@ -11,6 +11,8 @@
 - 涉及文件：permitExtend/detail.vue、PermitInfoPanel.vue、permitCancel/detail.vue、PermitSelectDialog.vue 等
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/066.md
 - 来源会话ID：d6b4b8eb-01cf-400b-bf07-683831f325f0；代码基线：none
 

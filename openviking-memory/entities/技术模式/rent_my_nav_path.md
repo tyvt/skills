@@ -12,6 +12,8 @@
 - 新增 onNavItemTap，在 item.path 存在时调用 handleLocation(item.path)
 
 ## 验证与归属
+- 所属项目：0
+- 验证证据：extracted source=cursor project=0
 - 涉及文件：@src/pages/rent/my/index.vue
 - 来源会话：c0c95cb0-30f5-40de-ab39-160aaecbf11b；代码基线：none
 

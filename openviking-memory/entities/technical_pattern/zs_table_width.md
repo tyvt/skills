@@ -19,6 +19,12 @@ Writing a fixed width on zs-table-column bypasses the component's automatic colu
 - Verification: src=榆林G/002.md
 - Source session: ca119077-96d7-4634-b180-497cbdf98617
 
+## 验证与归属
+- 所属项目：榆林G
+- 验证证据：extracted source=cursor project=榆林G
+- 来源会话：ca119077-96d7-4634-b180-497cbdf98617
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

@@ -17,6 +17,7 @@
 - zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：cursor 会话提取，建议强刷后核对竖缝对齐
 - 所属项目：门户；来源会话：bfe00b75-42a6-4d80-bfb4-a79e98b5a2fe
 

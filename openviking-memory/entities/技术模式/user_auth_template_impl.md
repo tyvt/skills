@@ -8,6 +8,7 @@
 - 字段与 index.vue 对齐
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 来源会话：c9a03628-31e0-4f0e-bc33-82c25af46a98
 - 涉及文件：dataProperty/procedure/detail.vue、autonomy/userAuth/index.vue、autonomy/userAuth/detail.vue、autonomy/general/detail.vue、mixins/detailMixins.js、autonomy/ownerCommitteeWorker/detail.vue、mixins/form.js、dataProperty/procedure/index.vue
 - 所属项目：园区物管2.0；代码基线 none

@@ -13,6 +13,8 @@
 - zhi2-web-admin/src/views/login.vue
 - zhi2-web-admin/src/store/modules/app.js
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：3afb8aa3-9bf0-4ba2-89fb-792f225e0b5a
 - 验证证据：cursor 会话 3afb8aa3-9bf0-4ba2-89fb-792f225e0b5a
 - 所属项目：门户
 

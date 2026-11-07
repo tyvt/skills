@@ -18,6 +18,7 @@
 - 选 page-block 方案后不再让子组件自带 margin-top，否则双份间距；两者必须二选一并在公共卡片组件注明
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 5ebe7a6f（2026-08-28，基线 8fc3cc5）三轮反馈后定位双根因，改原生 div.page-block 方案
 - 涉及文件：src/pages_owner/company/info/contracts.vue、index.vue、src/components/commonNew/baseCard.vue
 - 所属项目：苏住房C；来源会话ID：5ebe7a6f-b511-41ff-8030-0bf23da25e31；代码基线：8fc3cc5

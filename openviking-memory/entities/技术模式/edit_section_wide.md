@@ -12,6 +12,8 @@
 - detail-template.vue, permitExtendConstants.js, permitSelectConstants.js, surveyChangeConstants.js
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据: src=苏州市房地产监测V3-rest/140.md
 - 来源会话: f7e32c84-3538-433f-bf02-d17f353e9e06; 代码库: none
 

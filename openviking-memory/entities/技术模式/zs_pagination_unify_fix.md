@@ -9,6 +9,7 @@
 - `PresaleBuildingTable.vue`、`PresaleHouseTable.vue`、`PermitHistoryPanel.vue`、`PermitEntrustPanel.vue`、`Step4Shareholders.vue`、`SurveyTopicInfoTable.vue` 等改为 `zs-pagination`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及 11 个文件，所属项目：苏州市房地产监测V3
 - 来源会话：72ae64bd-b712-4696-939b-846ceff48c3c
 

@@ -15,6 +15,7 @@
 - `catch` 不再重复 Toast，由 `http` 层统一提示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=江阴H5
 - 验证：`npm run build` 已通过；端到端需真实 `?option=` 在江阴 dev 域名联调
 - 涉及文件：src/api/security.ts、src/pages/login.vue、src/store/user.ts、src/App.vue、src/utils/url.ts、src/package.json、src/pages.js
 - 所属项目：江阴H5；来源会话：ca38c4c5-da57-4fd8-a4a2-3740d6a3c6e3；代码基线：none

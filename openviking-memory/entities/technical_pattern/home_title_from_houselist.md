@@ -13,6 +13,12 @@ DisplayHouseTitle and displayHouseSubTitle in home.vue now read from userStore.h
 - Evidence: src=i淮安公版/002.md
 - Source session: 888c04f6-7ea6-471f-a22f-fd6d92d637f3
 
+## 验证与归属
+- 所属项目：i淮安公版
+- 验证证据：extracted source=cursor project=i淮安公版
+- 来源会话：888c04f6-7ea6-471f-a22f-fd6d92d637f3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

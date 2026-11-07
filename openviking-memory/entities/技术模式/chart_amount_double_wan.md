@@ -14,6 +14,7 @@
 - 顶部「收入金额/资金支出」卡片用的 totalAmount 直接赋值，未做 ÷10000，无需改动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：regionBalance 返回 0.22 正常而 categoryAmount 图为空，根因是 parseCategoryAmount 多做一次 yuanToWan，改用 toChartWanAmount 后修复
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/dataHelpers.js、index.vue、mock.js
 - 所属项目：园区物管2.0；代码基线：5a288f142；来源会话：028698e5-6e86-4303-861e-cf865cc0fb59

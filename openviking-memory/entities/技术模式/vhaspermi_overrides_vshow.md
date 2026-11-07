@@ -13,6 +13,7 @@
 - 该按钮仅在维修资金表决且表决已结束（`decisionState === '3'`）并有结果时显示，未开始状态不显示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 149638fc 与 627ed433 用户报按钮误显/仍显示
 - 涉及文件：ownerDecision/detail.vue、sortDecison/detail.vue、optionDecision/detail.vue、generalDecision/detail.vue、directives/permission/hasPermi.js、utils/permission.js、maintainDecision/detail.vue、api/estate/ownerDecision.js、repairFunds/usage/publicity/components/StartPublicityBtn.vue、mixins/detailMixins.js
 - 所属项目：太仓G；来源会话：149638fc-44a7-4dab-b512-5ab121c6a255、627ed433-0312-4248-8d0c-0ba8b9adafb6；代码基线：none

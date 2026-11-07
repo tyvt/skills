@@ -11,6 +11,7 @@
 - 结论表仅按 bizState，不限制查看/编辑模式。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：用户诉求 2「查看状态也可以操作，只根据bizState判断」。
 - 涉及文件：zhi2-web-admin/src/views/benefit/assetLeaseApply/components/houseTable.vue、zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/detail.vue
 - 所属项目：园区公共收益；来源会话ID：f1d10e9a-1ce1-4000-b675-9ed44669437d；代码基线：4468dfa

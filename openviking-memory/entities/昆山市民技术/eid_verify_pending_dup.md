@@ -12,6 +12,7 @@
 - 调试搜 `[EidVerify]`、`[VerifyUser]` 日志。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证：会话 3178d4d9 faceRecognition 已成功仍停留在修改实名信息页，列出重复跳转三点根因与防重修复。
 - 涉及文件：src/pages/common/useEidVerify.js、src/pages/verifyUser/index.vue、src/pages/verifyUser/info.vue、src/pages/common/useFaceVerify.js。
 - 所属项目：昆山市民；代码基线：827c0d4；来源会话ID：3178d4d9-97a5-4520-8ff8-c7b1235a110f。

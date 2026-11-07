@@ -10,6 +10,8 @@
 - 保留真实富文本场景（如 zs-editor）不改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=bugfix
+- 来源会话：c26b5af2-98bb-45f3-8246-0a1d95b9d310
 - 本轮自动修正 75 个文件，加上此前手工修正，当前这批类似情况已全部覆盖
 - 复查：zs-textarea 与 type: 'richtext' 同文件错配已清空
 - label: '备注' + type: 'richtext' 仅剩 maintenance/accountQuery/detail.vue 1 处（该文件未发现 zs-textarea，不属于此类错配）

@@ -12,6 +12,12 @@
 ## 验证
 - 源会话: `176808fe-ac0e-40e4-872f-fa68fc7638ab`
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：176808fe-ac0e-40e4-872f-fa68fc7638ab
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

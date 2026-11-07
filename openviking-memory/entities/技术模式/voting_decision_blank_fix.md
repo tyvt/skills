@@ -14,6 +14,7 @@
 - 详情页去掉外层重复 Headline 包裹，避免双层标题和布局冲突
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：7a62e9a6-5f35-46c3-b3af-b44bad9ba866；代码基线：none
 
 <!-- MEMORY_FIELDS

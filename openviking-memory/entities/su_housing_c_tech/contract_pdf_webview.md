@@ -11,6 +11,7 @@
 - 通过 `openPdfByUrl` 下载并用微信原生文档预览打开。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：进入「合同示范文本」，分别点击买卖合同与托管协议，应正常弹出 PDF 预览。
 - 涉及文件：pages_transaction/contractDemo/index.vue、pages.json、pages_transaction、pages/common/webViewNav.vue。
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：020e9c50-2c1d-44df-92a0-ef6ed7aed251。

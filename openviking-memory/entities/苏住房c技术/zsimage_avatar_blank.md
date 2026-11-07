@@ -15,6 +15,7 @@
 - 排查顺序：先确认容器有实际宽高，再确认图片URL返回200，都过才怀疑组件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话0c646bb9用户两次反馈「还是没显示头像」，定位样式隔离+分包路径，改div包裹+复制主包+MAIN_STATIC_PATHS
 - 涉及文件：src/pages_guard/index/components/guard-info-card.vue、src/components/ZsImage/ZsImage.vue、src/utils/index.js
 - 所属项目：苏住房C；来源会话ID：0c646bb9-d1fa-4e8d-a2e1-e84fc34f6838；代码基线：8fc3cc5

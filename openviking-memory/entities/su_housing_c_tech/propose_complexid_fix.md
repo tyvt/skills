@@ -13,6 +13,10 @@
 - 涉及文件：propose/index.vue、api/autonomy.js、StepPropose.vue、decision/index.vue、elect/index.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：0b18d994-45da-45ee-a48d-fd532610f70b
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

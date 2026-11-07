@@ -10,6 +10,7 @@
 - `src/pages_owner/ownerCard/index.vue` 的 `goToOther` 中，点击报事报修（`value === "2"`）时提示「功能暂未开放」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 改动已应用到子模块 `zhi2-mobile-shimin` 的 `suzhou-shiqu-suzhufang-main-v2.1` 分支
 - 涉及文件：useAnnouncementPaging.js、community/announcement/index.vue、subdistrict/announcement/index.vue、ownerCard/index.vue
 - 所属项目：苏住房C；来源会话ID：c6f5e6b8-04ec-4597-8607-ff8f6c062f99

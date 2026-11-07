@@ -11,6 +11,7 @@
 - CDN 与 bun 缺 lodash.merge/zrender 等是另一条依赖链，勿混为一谈
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证：dev 不再报 image-viewer.vue resolve 失败，预览功能仍可用
 - 验证证据：会话 78e2d6bf 用户说明 element-ui 是 CDN 引入，结论 ImageViewer 改为纯本地实现；另有 src=2-0/012.md、来源会话 05e68b5b-3b5d-4912-9698-90636098e05c 印证 CDN 引入致内包解析失败、ImageViewer 重构为纯本地预览遮罩层、残留 lodash.merge 缺失属独立依赖问题
 - 涉及文件：zhi2-web-admin/src/components/ImageViewer/index.vue

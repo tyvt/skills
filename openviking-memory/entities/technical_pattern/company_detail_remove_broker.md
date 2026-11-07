@@ -8,6 +8,7 @@
 - 附件以 `LicenseAppendix` 替换 `AnnexUpload` 修复乱码
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/094.md
 - 涉及文件：CompanyBasicInfoDetail.vue、companyBasicInfoContent.js、detail.vue、AnnexUpload/index.vue、toB/companyRecord/detail.vue、companyRecord.js、companyRegister.js、CompanyBasicInfoForm.vue
 - 所属项目：苏州市房地产监测V3；来源会话：2c756fb1-3104-49e3-a267-f18e9110ae47；代码基线：none

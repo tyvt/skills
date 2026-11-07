@@ -3,6 +3,11 @@
 - 涉及文件: utils/ruoyi.js, flowable/todo.vue, home/index-v2.vue, home/v2/components/TodoPanel.vue, store/modules/permission.js, router/index.js, utils/index.js, tests/e2e/home-v2.spec.mjs.
 - 所属项目: 苏住房G; 验证证据: src=苏住房G/055.md; 会话: f1c7af59-850a-422f-aaa3-9169cf16f750.
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：f1c7af59-850a-422f-aaa3-9169cf16f750
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

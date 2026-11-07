@@ -11,6 +11,7 @@
 - e2e/fixtures/register-mocks.js：Mock 改为解析 JSON body 中的 dictType 字段。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 影响所有通过 getDicts() 获取字典的页面（含企业注册流程 company_type 等下拉）。
 - 涉及文件：src/utils/dict.js、src/utils/apiV3Normalize.js、e2e/fixtures/register-mocks.js 等（路径前缀 d:/repository/产品2.0/zhi2-web-admin）。
 - 所属项目：产品2.0；来源会话：2565718c-2639-4d49-96b3-c97a40e2cfd2；代码基线：none

@@ -19,6 +19,12 @@ Only unpaid and non-voided bills are editable; otherwise hide edit entry.
 ## Verification
 - Source: 产品2.0/040.md; session: 5d376bda-346d-42a9-b39d-cc3b000dca1e
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：5d376bda-346d-42a9-b39d-cc3b000dca1e
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

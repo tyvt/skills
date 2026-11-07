@@ -11,6 +11,7 @@
 - row-key 改 bankBranchManageId，左侧树 getBranch() 不变
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/231.md
 - 涉及文件：supervision/bank/superviseBank/detail.vue、supervision/bank/cbyh/components/YhwdTable.vue、api/system/unionBank.js、supervision/bank/superviseBank/components/WdmcDialog.vue、api/jgyh/yhwdgl.js、supervision/bank/cbyh/components/WdmcDialog.vue、supervision/bank/superviseBank/index.vue、supervision/bank/superviseBank/components/YhwdDialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话：c3f3c00e-8252-4a2c-ac62-969e7898c321；代码基线：none

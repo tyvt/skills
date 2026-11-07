@@ -23,6 +23,11 @@ In Suzhou Real Estate Monitoring V3, the service scheme dialog removed pre-load 
 - Session: fe8e14a9-62e2-477a-bd32-f3f069ed26fd
 - Project: Suzhou Real Estate Monitoring V3; code baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：fe8e14a9-62e2-477a-bd32-f3f069ed26fd
+
 
 <!-- MEMORY_FIELDS
 {

@@ -8,6 +8,7 @@ wygl小程序切换小区后点击「维修资金」会带上与当前选中小�
 - 小区信息入口同样改走 `preparePortalNavigateContext()`，与维修资金行为一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 跳转 URL 示例：`/pages/webview/portalH5Webview?miniRoute=%2Fpages_owner%2Fmaintain%2Findex&complexId=x`
 - 涉及文件：pages/webview/home.vue、utils/portal-h5-webview.js、utils/portal-user.js
 - 所属项目：小程序（wygl-wxxcx-dev-slh）；来源会话：2b96f5ea-125e-4e83-a90a-a1b32b6482be；代码基线：none

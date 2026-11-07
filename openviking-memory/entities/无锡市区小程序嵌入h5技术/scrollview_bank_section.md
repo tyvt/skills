@@ -10,6 +10,8 @@
 - 重复点击时需先清空scrollIntoView再赋值，否则同一id无法再次触发滚动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：fd9f5f4e-e4c8-42f5-a93d-27c3c6883bde
 - 验证会话：fd9f5f4e-e4c8-42f5-a93d-27c3c6883bde（基线6aeee0b），用户要求自动滑到底显示账户余额
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/OverviewTab.vue、src/pages_benefit/sharedFunds/index.vue
 - 所属项目：无锡市区小程序嵌入H5

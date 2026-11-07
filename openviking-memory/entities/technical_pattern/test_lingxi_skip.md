@@ -11,6 +11,7 @@
 - 测试环境打包走完整灵锡流程
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期H5
 - 验证：src=惠山二期H5/002.md
 - 涉及文件：src/utils/lingxi.js、package.json、vite.config.ts、node_modules/uni-preset-vue/src/utils/lingxi.js、src/pages/index/newHome.vue、src/pages/index/components/complexCard.vue、index.html、src/pages/login/index.vue、src/utils/index.js
 - 所属项目：惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）；来源会话：0f545aba-3c46-42a6-8e9b-1967f22cd702, acf753e7-5c5e-4a4b-813f-ee605ac49acf；代码基线：none

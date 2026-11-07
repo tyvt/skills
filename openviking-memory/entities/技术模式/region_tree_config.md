@@ -14,6 +14,12 @@ region-tree-layout 组件接受可配置的树 URL 和参数，并传递给 regi
 - 涉及文件: property/workOrder/order/index.vue, complex/components/RegionTreeLayout.vue, complex/components/regionTree.vue, mixins/listMixins.js, mixins/table.js
 - 光标会话: ca01e574-0616-48a5-8f5a-4a6bbe304b4b
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：ca01e574-0616-48a5-8f5a-4a6bbe304b4b
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

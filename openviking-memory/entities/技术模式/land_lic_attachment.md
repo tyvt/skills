@@ -16,6 +16,10 @@
 - 涉及文件：conLandLic/detail.vue、conLandLic/changeDetail.vue、ProjectCertificateTabs.vue、AppendixPackageSection/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：08d158aa-14a3-438a-98bd-09ead4ebdacd
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

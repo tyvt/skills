@@ -12,6 +12,7 @@
 - 增加空值保护，避免接口未返回主题色时报错
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/store/modules/app.js、zhi2-web-admin/src/api/index.js
 - 所属项目：园区物管2.0；来源会话：5a11ca4b-0f0d-4cb0-b4f1-e9e574a65811
 - 已通过该文件 lint 检查

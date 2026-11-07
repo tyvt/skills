@@ -12,6 +12,7 @@
 - login.vue / LoginForm.vue 登录时重置 roles 与 terminalType
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：src=园区物管2.0/018.md
 - 涉及文件：views/home/bProjectDialog.vue、components/ProjectDialog/index.vue、layout/index.vue、layout/components/Navbar.vue、store/modules/user.js、permission.js、utils/projectContext.js、main.js
 - 所属项目：园区物管2.0；来源会话：84a73d0e-bafd-4217-bef6-71383e10d880

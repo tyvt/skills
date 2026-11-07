@@ -12,6 +12,7 @@
 - process.vue 与详情页撤回统一走该函数；联调时 approvalApi 改成 /benefit/pubAllotNotice/approval
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 b81ac1e2 撤回请求 URL /api/v2/2、POST、405；结论写 approvalApi 错配为 2，新增 withdrawProcess 校验与 key 补齐
 - 涉及文件：src/utils/flowApi.js、src/views/flowable/process.vue、src/views/tool/workflow/components/ConfigDialog.vue
 - 所属项目：园区公共收益；来源会话：b81ac1e2-1917-4945-a8fc-a5c38eb2ae6f；代码基线：0c9b8c2

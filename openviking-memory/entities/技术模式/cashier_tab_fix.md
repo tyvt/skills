@@ -11,6 +11,7 @@
 - 改用 staff 版 ZsTab（@/staff/components/ZsTab/ZsTab.vue），与页面 :deep(.tab-indicator) 样式一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 涉及文件：src/staff/pages/cashier/result.vue、src/staff/pages/cashier/index.vue、src/staff/pages/cashier/payment.vue、src/components/ZsTab/ZsTab.vue、src/styles/tab.scss、src/pages_owner/company/staff/index.vue、src/staff/components/ZsTab/ZsTab.vue、src/staff/styles/tab.scss
 - 所属项目：泰兴小程序；来源会话ID：0f7f9703-05b8-407c-bf56-acd901e44636
 - 代码基线：none

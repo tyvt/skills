@@ -12,6 +12,12 @@ In the detail page view mode, the handover date range field only bound startDate
 - Files: property/handover/detail.vue, benefit/resourcesLeaseContractFiling/detail.vue, evaluation/assessmentPlan/detail.vue
 - Source session: a6391fef-ca00-4f65-9b24-3652ab37afa9; code baseline: none
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：a6391fef-ca00-4f65-9b24-3652ab37afa9
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

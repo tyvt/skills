@@ -18,6 +18,8 @@
 - zhi2-web-admin/src/views/presale/permit/permitConstants.js
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/155.md
 - 来源会话：76e18476-410b-48e2-8684-b252aafae89d；代码基线：none
 

@@ -11,6 +11,8 @@
 - 实现分区标题蓝色圆点统一
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：cursor session=e6742834-ef8f-41c0-9875-0bc367ca292b
 - 涉及文件：components/Headline/index.vue、views/presale/permit/components/PermitInfoPanel.vue、views/presale/permit/components/detail.vue、views/presale/permitCancel/detail.vue、components/zs-tabs/zs-tabs.vue、views/presale/permit/components/PermitPlanPanel.vue、views/presale/cashsale/components/CashsaleInfoPanel.vue
 - 来源会话ID：e6742834-ef8f-41c0-9875-0bc367ca292b

@@ -11,6 +11,7 @@
 - 缺少 `presalePermitId` 时点击许可证号提示「暂无关联预售许可，无法查看」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话：e640535c-8323-466a-a60a-7228d3fd7819
 
 <!-- MEMORY_FIELDS

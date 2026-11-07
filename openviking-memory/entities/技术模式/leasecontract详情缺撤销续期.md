@@ -16,6 +16,11 @@
 - 来源会话：7960c55c-7c3d-42e6-bf96-34c332d19e0a
 - 代码基线：none
 
+## 验证与归属
+- 所属项目：G
+- 验证证据：extracted source=cursor project=G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -13,6 +13,7 @@
 - 提交后通过 `ZsSubmit` 调用 `/benefit/pubAllotNotice/submit`，并校验是否已配置审批流
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：`pubAllotNotice/detail.vue`
 - 所属项目：苏住房G（zhi2-web-admin）；来源会话：f617c3b3-c39f-4cb6-9983-bc3591e1a21a；代码基线：none
 

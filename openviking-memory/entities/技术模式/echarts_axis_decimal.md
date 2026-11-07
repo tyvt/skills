@@ -11,6 +11,7 @@
 - 多处展示同一指标时（图表 + 地图轮播提示）必须复用同一格式化函数，避免口径漂移。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：mapOverview 会话最终结论新增 computeHundredCountYAxis（Y 轴刻度间隔最小 0.01）、axisLabel 用 formatHundredValue，柱顶标签/tooltip 统一同一函数，formatHundredCount 也复用它。
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/dataHelpers.js、chartOptions.js、index.vue；所属项目：园区物管2.0；来源会话：cbc563ef-17dc-4a57-9a8a-a924dda959a7；代码基线：3965548b6；验证证据：src=园区物管2.0/043.md。
 

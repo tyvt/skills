@@ -15,6 +15,12 @@ The parent repo's zhi2-web-admin submodule reference locally points to 000c168 w
 - Involved files: zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue、src/views/autonomy/election/components/apply/CandidateDialog.vue、src/views/autonomy/candidateCollect/components/CandidateTable.vue
 - Project: 产品2.0; source session: d1128cb7-0606-40a0-b1b8-83b92090485f; code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：d1128cb7-0606-40a0-b1b8-83b92090485f
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

@@ -17,6 +17,8 @@
 - zhi2-web-admin/src/views/presale/permit/permitConstants.js 与 e2e/fixtures/cashsale-apply-helpers.js
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/203.md
 - 来源会话：5c4d5204-0c97-4a4d-bcb7-2b81ff546339；代码基线：none
 

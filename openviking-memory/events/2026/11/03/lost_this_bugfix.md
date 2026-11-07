@@ -9,6 +9,11 @@ A bug where `disabled: this.disableButton` passed a method reference that lost `
 【来源会话ID】f1d10e9a-1ce1-4000-b675-9ed44669437d
 【代码基线】none
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "lost_this_bugfix",

@@ -12,6 +12,7 @@
 - handleDown/handleUp 空选时直接返回
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/069.md
 - 涉及文件：chooseHouseDialog.vue、contractMainInfo/index.vue、contract-sign-helpers.js
 - 所属项目：苏州市房地产监测V3；来源会话：62a1ffcb-1ad7-433b-9cc8-6f6f5585bd2e；代码基线：none

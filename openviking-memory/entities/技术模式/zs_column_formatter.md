@@ -11,6 +11,7 @@
 - 列配置侧应逐步改为函数引用（如 `this.formatters.amountFormatter`）；后端返回的列配置可在生成阶段做名称到函数的映射。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 ce31747c（maintenanceProject 列表 formatter 类型警告）；会话 667b9605（MaintenanceProject 等页告警 Expected Function, got String "amountFormatter"，修复 zs-table-column.vue 与 plot/index.vue 字符串用法）。
 - 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue；zhi2-web-admin/src/formatters/index.js；zhi2-web-admin/src/views/building/plot/index.vue；index.ts（告警出处）。
 - 所属项目：2-0；来源会话ID：ce31747c-5502-4d03-83c2-364130d7d52d 与 667b9605-d636-4fd0-9033-f298688576f0；代码基线：none。

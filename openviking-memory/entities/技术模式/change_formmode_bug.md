@@ -10,6 +10,7 @@
 - E2E用例 `company-record-change.spec.js` 避免 `getByText('')` 匹配空节点，仅联系人有值时断言回显
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/075.md
 - 涉及文件：institutionRegister/index.vue、companyBasicInfo/detail.vue、change/detail.vue、DeveloperBasicInfoDetail.vue、companyBasicInfoShared.js、toB/companyRecord/detail.vue、detailMixins.js、OperationBtnGroup/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：db089cf1-03c8-448c-a942-78bec363a420；代码基线：none

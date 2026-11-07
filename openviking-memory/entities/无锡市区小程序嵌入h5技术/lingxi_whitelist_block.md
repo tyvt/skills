@@ -12,6 +12,7 @@
 - 走小程序原生h5ExternalWebview还需在微信公众平台配置该业务域名
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话406654b6用户投票URL被拦截
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/webViewUrl.js、.env.production
 - 所属项目：无锡市区小程序嵌入H5；来源会话：406654b6-603a-41e0-9bc2-ae70c13fbcbd；代码基线：7de00b1

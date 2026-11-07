@@ -20,6 +20,7 @@
 - 来源会话：a8453950-74d6-4a0a-9b84-7e8797aa1443
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：会话 13ba8b85 用户要求弹窗头部用公共写法并排查所有首页弹窗；会话 b0657f58 统一 PortalDetailHeader 样式；会话 bcf22123674b5cdf5bb7fdb1484b1568 将标题改为左对齐、灰底、高 57px，首页“更多”菜单弹窗与公告弹窗改用公共 header
 - 涉及文件：PortalDetailHeader.vue、portal.scss、PropertyDetailDialog.vue、RentalDetailDialog.vue、PortalDialogHost.vue（均在 zhi2-web-admin/src/views/home/publicPortal 下）
 - 所属项目：门户；来源会话ID：13ba8b85-74b6-4803-94c3-9d075b44558c、b0657f58-c3a5-4ffd-a3ba-7e97031b4770、session_bcf22123674b5cdf5bb7fdb1484b1568；代码基线：e1f8e0b、dfee5a6

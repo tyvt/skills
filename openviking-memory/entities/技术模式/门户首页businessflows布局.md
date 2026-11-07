@@ -23,6 +23,10 @@
 - 涉及文件：homeDataMixin.js、homeLayout.js、HomeLayoutSidebar.vue、HomeLayoutAdmin.vue、index-new.vue
 - 所属项目：门户；代码基线：fd73e47；来源会话：034544ce-33ea-4a3e-a159-062dba42270d
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

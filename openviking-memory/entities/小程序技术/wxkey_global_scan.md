@@ -15,6 +15,7 @@
 - 改完必须复扫一次确认 0 处缺失；复扫已 0 处仍有警告则责任在第三方组件或编译产物，可停止排查
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 82ba9b4f 用户要求全局排查补全 wx:key，扫描 src 全部 .vue 修复 8 处，复扫 0 处缺失
 - 涉及文件：scan-missing-keys.js、components/ZsPicker/ZsPicker.vue、pages_transaction/newHouse/detail.vue、pages_owner/house/detail.vue、pages_guard/guardApply/components/step3.vue
 - 所属项目：苏住房C；来源会话ID：82ba9b4f-a6c5-499b-9c0c-8585ce86cdc9；代码基线：4630e8e

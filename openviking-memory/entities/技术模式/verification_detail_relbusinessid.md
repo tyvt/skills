@@ -10,6 +10,7 @@
 - buildSubmitPayload 显式带上 relBusinessId，优先级：当前表单 → 原始表单 → 列表行数据。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：编辑保存后 PUT /v2.0/benefit/pubReceiptVerificationDetail 请求体包含 relBusinessId。
 - 涉及文件：benefit/pubVerificationReceipts/components/VerificationReceiptDetailDialog.vue、VerificationReceiptDetailTable.vue。
 - 所属项目：园区物管2.0；来源会话：1ee4f9a4-13b3-4034-ad86-3721cc8340be；代码基线：none。

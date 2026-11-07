@@ -8,6 +8,7 @@
 - 包裹层 `.next-step-btn` 设 `margin-top: 80rpx`
 - `.publish-type-box` 加 `flex` 纵向布局避免外边距折叠
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译预览，间距应正确；若仍不对可告知期望距离继续调
 - 涉及文件：publishHouse/type.vue、publishHouse/verification.vue、owner/authentication.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：a2751523-b238-42d9-b41f-5da721879c3a；代码基线：none

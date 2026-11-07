@@ -22,6 +22,12 @@ The statisticsMap drawer should only let detail blocks participate in height str
 ## Source
 - Extracted from cursor session 2431564f-227c-4069-96c8-0f3f02adf6c3.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：2431564f-227c-4069-96c8-0f3f02adf6c3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

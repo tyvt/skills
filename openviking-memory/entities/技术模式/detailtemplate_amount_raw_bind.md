@@ -11,6 +11,7 @@
 - 全量检索 `value: this.formatters.amountFormatter('', '', this.form.` 清零并跑 lint 验证
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：owner/vote/detail.vue:410-424 写法不正确，应以 building/project/detail.vue:601-614 为范例
 - 涉及文件：autonomy/election/owner/vote/detail.vue、building/project/detail.vue（正确范例）
 - 所属项目：产品2.0；来源会话：959c4f79-0192-4b53-a367-9630388e7f62；代码基线：645607c

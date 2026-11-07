@@ -13,6 +13,7 @@
 - 微调容器 z-index 保持在 8～1999，勿再接近弹窗默认段。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证：会话 a7d237af 遮罩打开时 more 按钮左边线明显压在遮罩上。
 - 涉及文件：zhi2-web-admin/src/layout/components/TagsView/index.vue
 - 所属项目：淮安物管；来源会话：a7d237af-56e5-49f4-a9d3-51c02c04b0cb；代码基线：0e429b0

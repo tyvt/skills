@@ -12,6 +12,7 @@
 - 将 `attachmentBusId` 传给 `ZsSubmit` 和附件抽屉的 `AnnexUpload`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`commercialHousingSales/presale/specialcontract/detail.vue`、`OperationBtnGroup`、路由信息
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：00603096-ce00-485a-bc85-12cd53fdaa6b

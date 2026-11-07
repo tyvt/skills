@@ -12,6 +12,7 @@ detailMixins 的 originForm 提前同步使程序化赋值被误判为用户编�
 - 编辑恢复缓存时同步 originForm 并校验主键 ID
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：src=园区公共收益/029.md
 - 涉及文件：building/plot/detail.vue、mixins/detailMixins.js、mixins/form.js、utils/ruoyi.js、mixins/area.js、components/AmountInput/index.vue、building/project/detail.vue、building/landPlotChange/detail.vue
 - 所属项目：园区公共收益；来源会话：0bafb3e6-385f-404a-b48a-91cebb47c939；代码基线：none

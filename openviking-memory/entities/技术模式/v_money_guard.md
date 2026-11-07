@@ -10,6 +10,7 @@
 - 与 AmountInput 组件选型（zs-input+v-money）是不同层面问题，勿混淆
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 8f9057d0 maintainDecision/detail 报 directive money inserted 解构 undefined；结论在 money.js 两处加 value||{}
 - 涉及文件：zhi1-web-admin/src/directives/formatter/money.js、maintainDecision/detail.vue、AmountInput/index.vue
 - 所属项目：太仓G；来源会话：8f9057d0-7dbf-4966-9b52-d5d8411e8e4b；代码基线：9638e2f

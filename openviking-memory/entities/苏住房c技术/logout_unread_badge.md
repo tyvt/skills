@@ -16,6 +16,7 @@
 - 验收四步：登录有未读→显示；注销→消失；重登→恢复；注销时请求在途→不复发
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 a54442c4 结论含 onShow else 清零、messageBadge computed 兜底、loadUnread 前后校验 token；验收四条通过
 - 涉及文件：pages_tab/components/My_Suzhufang.vue、store/user.js、pages_tab/components/menu/MenuSection.vue、HaveBgItem.vue、pages_my/setting/cancellationReason.vue、pages_my/setting/userInfo.vue、pages/index/my.vue、pages_my/setting/index.vue
 - 所属项目：苏住房C；来源会话ID：a54442c4-8431-4207-b588-fa848d7bf178；代码基线：9cdf7b8

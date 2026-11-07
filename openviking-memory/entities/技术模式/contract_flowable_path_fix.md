@@ -9,6 +9,7 @@
 - 重新部署前端后，在合同预售审批页（`/flowable/task/flowViewer`）刷新验证
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`contract/utils/contractRequest.js`、`api/flowable/definition.js`、`api/flowable/todo.js`、`vite.config.js`、路由信息
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：957b5194-9887-4b03-a4b2-f48dde8ed5fa

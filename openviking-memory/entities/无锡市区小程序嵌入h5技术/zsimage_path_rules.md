@@ -12,6 +12,7 @@ zhi2-mobile-admin-h5-c-unlimited部署在/sz/等二级路由且vite base为'./'�
 - 落地点在ZsImage单组件，与全项目相对路径约定一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话c7f8cfb5用户要求ZsImage改相对路径、不写死环境变量，结论给出H5/小程序分支与路径对照表
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/components/ZsImage/ZsImage.vue、vite.config.ts、src/env/mp.js
 - 所属项目：无锡市区小程序嵌入H5；来源会话ID：c7f8cfb5-52f7-44a5-a4bf-81cfbf4e58af；代码基线：7a2a29b

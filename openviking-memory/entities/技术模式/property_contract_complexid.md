@@ -13,6 +13,7 @@
 - 写法与 benefit/alert、property/complex 等页面保持一致，不另造项目上下文来源。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 35c4f338（基线 401d884）用户诉求「property/propertyContract 接口加 complexId 参数，从全局 store 获取B端选择项目」。
 - 落地为 components/index.vue 的 getQueryParams 与 components/detail.vue 的 initComplexFromRoute。
 - 涉及文件：src/views/property/propertyContract/components/index.vue、detail.vue、src/utils/projectContext.js、src/mixins/listMixins.js。

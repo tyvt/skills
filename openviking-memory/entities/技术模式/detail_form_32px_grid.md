@@ -10,6 +10,11 @@
 - 涉及文件: supervision/agreement/end/detail.vue, detailLayout.js, styles/index.scss, styles/detail-form.scss, detail-template.vue, Headline/index.vue, commercialHousingSales/priceFiling/recordPriceMngSuzhou/detail.vue, supervision/agreement/allocation/detail.vue
 - 来源会话: c6c36197-e683-4727-86cf-a23980045e4e; baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

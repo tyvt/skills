@@ -14,6 +14,10 @@ AmountInput 组件对齐 ElInput 在值变化时通知 ElFormItem 的行为，�
 - 涉及文件：zhi2-web-admin/src/components/AmountInput/index.vue、zhi2-web-admin/package.js。
 - 所属项目：园区物管2.0；来源会话：8430758d-a3eb-412d-97d4-0ab68ebf0303；代码基线：none。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

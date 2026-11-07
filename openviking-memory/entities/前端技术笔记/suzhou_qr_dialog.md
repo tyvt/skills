@@ -11,6 +11,7 @@
 - `zhi2-web-admin/src/views/home/publicPortal/mock/properties.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：cursor 提取
 - 所属项目：门户
 - 来源会话ID：2b16ec8a-8acf-4c77-a414-b61a81601259

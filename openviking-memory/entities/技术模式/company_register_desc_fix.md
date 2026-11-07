@@ -10,6 +10,7 @@
 - `src/views/register/companyRegister.vue`、`src/views/institutionRegister/InstitutionRegisterPage.vue`、`register-helpers.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新注册页可见标题下说明
 - 所属项目：苏州市房地产监测V3；来源会话：18b3580d-c81f-4cff-9830-320ca69ec535
 

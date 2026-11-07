@@ -9,6 +9,7 @@
 - 补提交前缺漏的表单 validate，避免空值 reject。
 - 分析「确定后不关」先看三点：close 是否只在 then 内；拦截器 reject 行为；then 内 code 判断是否重复。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 427d58f8 分析 ScopeSelectDialog 与 OpeningBuildingDialog 的 submitForm，close() 仅在 then+res.code==200 内且无 catch/finally，提交前未校验。
 - 涉及文件：zhi2-web-admin/src/views/maintenance/components/OpeningBuildingDialog.vue、zhi2-web-admin/src/utils/request.js。
 - 所属项目：产品2.0；来源会话ID：427d58f8-75b8-425c-af42-6fe424dbe22b；代码基线：6b9d9d7。

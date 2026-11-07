@@ -12,6 +12,10 @@
 - 涉及文件：`src/components/zs-input/zs-input.vue`、`src/components/AmountInput/index.vue`、`src/styles/element-ui.scss`、`vite.config.js`、`input-group-fix.css`
 - 所属项目：产品2.0；来源会话：49ff6642-e504-475e-9982-4f88a028a3b9；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

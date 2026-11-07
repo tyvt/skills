@@ -16,6 +16,9 @@
 - maintenance/maintenanceApply/detail.vue
 
 ## 验证与归属
+- 所属项目：惠山二期G
+- 验证证据：extracted source=cursor project=惠山二期G
+- 来源会话：7fd96eae-ff4a-4cde-8f71-536de88bfa82
 - 验证证据: cursor 会话 7fd96eae-ff4a-4cde-8f71-536de88bfa82
 - 代码库: none
 

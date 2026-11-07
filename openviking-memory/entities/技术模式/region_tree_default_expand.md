@@ -10,6 +10,7 @@
 - 树区域滚动容器改为 .type-left
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue、regionTree.vue、src/views/property/complex/index.vue
 - 所属项目：园区物管2.0
 - 来源会话ID：47c0000a-51d9-4a99-82c5-48d1b26e9c97

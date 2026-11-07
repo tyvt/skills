@@ -15,6 +15,11 @@
 - 源会话: b84da848-f75a-4ee3-8fc5-7e4346f247b5
 - 所属项目: zhi2-mobile-shimin (Suzhou Housing C端)
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：b84da848-f75a-4ee3-8fc5-7e4346f247b5
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

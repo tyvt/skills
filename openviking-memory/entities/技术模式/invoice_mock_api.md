@@ -8,6 +8,8 @@ iHomePC 个人中心发票管理页通过 personalCenter.js 新增 Mock 接口�
 - `src/views/personalCenter/invoiceManage/index.vue` 中打印与下载功能前置调用上述接口：下载点击先 `downloadInvoiceApi` 显示「正在准备下载...」loading，`code===200` 后生成 HTML 触发下载并提示「下载成功」，失败或异常关闭 loading 提示错误；打印逻辑类似。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=iHomePC
+- 来源会话：ec637371-49d1-4d1e-b60f-a99e73b4d64d
 - 验证：来源 cursor 会话 ec637371-49d1-4d1e-b60f-a99e73b4d64d。
 - 涉及文件：`src/api/modules/personalCenter.js`、`src/views/personalCenter/invoiceManage/index.vue`；所属项目：iHomePC；代码基线：none。
 

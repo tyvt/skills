@@ -16,6 +16,7 @@
 - ZsEmpty 位于主包 components 供各分包复用，须显式传 subpackage（如 subpackage="pages_main"）才能正确解析分包静态资源
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 269bb15a 用户反馈 pages_main/my/myContract 空数据图片不显示；修复 .empty-pic 改固定 320rpx×320rpx，myContract.vue 显式传 subpackage="pages_main"
 - 涉及文件：src/components/ZsEmpty/ZsEmpty.vue、src/components/ZsImage/ZsImage.vue、src/pages_main/my/myContract.vue
 - 所属项目：苏住房C；来源会话ID：269bb15a-f2a2-4040-ac11-d7ad84921432；代码基线：4630e8e

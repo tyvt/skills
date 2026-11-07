@@ -15,6 +15,12 @@ face.vue must call startFacialRecognitionVerify only after web-view is ready, or
 - Files: pages/face/face.vue, pages/face/verify.vue, pages/face/bdc.vue, login/login/choose/choose.vue, pages/home/new/index.vue, pages/active/active.vue, uni_modules/uview-ui/libs/function/md5.js, pages.json
 - Project: 小程序 (wygl-wxxcx-dev-slh); Source session: f3266edb-f8f0-4d5e-9fbf-b55ae9f2fdac; Baseline: none
 
+## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
+- 来源会话：f3266edb-f8f0-4d5e-9fbf-b55ae9f2fdac
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "miniprogram_tech",

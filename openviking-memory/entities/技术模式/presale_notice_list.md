@@ -29,6 +29,7 @@
 - zhi2-web-admin/package.json
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：审查结论指出 presaleList 初始空且无 loading、解析只用 res.data、cancelFlag 未覆盖数字 1；另含 src=门户/033.md 与 cursor 会话提取
 - 所属项目：门户；来源会话：074a72f3-331b-40b4-8c2f-331816b2d29d、6b002207-e45f-4242-836c-3b25c34bb174；代码基线：04586c4
 

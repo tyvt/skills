@@ -10,6 +10,7 @@
 - `ownerDecision/detail.vue` 等同步优化 `handleChange` 延迟 `doLayout()`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 d53534ba 用户报动态增列后内容空
 - 涉及文件：ownerDecision/detail.vue、maintainDecision/detail.vue、decisionCommon/components/DecisionRangeTable.vue、api/estate/decisionRange.js、components/zsTable/index.vue、ownerDecision/components/DecisionRangeTable.vue、decisionCommon/components/VoteView.vue、mixins/listMixins.js、generalDecision/detail.vue
 - 所属项目：太仓G；来源会话：d53534ba-0c28-4ea3-96ec-37f34b0b2967；代码基线：none

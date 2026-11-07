@@ -16,6 +16,7 @@
 - `src/views/supervision/agreement/jgxm/components/ProjectNameDialog.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据: src=苏州市房地产监测V3-leftover/032.md
 - 来源会话: 8ed69fd8-6062-4732-bc26-b18e22054b54; linha de base: none
 

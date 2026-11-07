@@ -25,6 +25,7 @@
 - 判定文档：docs/登录判断条件.md
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=家园区一网通办
 - 验证证据：src=家园区一网通办/001.md、cursor session=e801dbc3-fe45-4c53-9f67-0eb8418cef3c
 - 所属项目：家园区一网通办
 - 来源会话：527af833-af1a-4cfa-8e1f-f5a042a2da67、e801dbc3-fe45-4c53-9f67-0eb8418cef3c

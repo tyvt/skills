@@ -8,6 +8,7 @@
 - 按钮文案：改为「确认并推送APP」，成功提示与昆山一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证：刷新后重新打开「结果维护」核对
 - 涉及文件：`decisionCommon/components/MaintainResultDialog.vue`、`MaintainResultDialogLite.vue`、`decisionCommon/config.js`
 - 所属项目：太仓G；来源会话：b4e53b8e-164f-4672-9854-192edd804ed5；代码基线：none

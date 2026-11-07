@@ -12,6 +12,8 @@
 - 个人中心页采用相同处理。
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 涉及文件：d:/repository/昆山市民/src/pages_home/home.vue、src/pages_home/personal.vue、src/pages.json、node_modules/@dcloudio/uni-ui
 - 来源会话ID：2a8a8393-4a19-4102-99ee-abcb1056e854
 - 代码基线：none

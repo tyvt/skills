@@ -13,6 +13,7 @@
 - 提醒用户核对账号是否有对应权限码（如 presale:recordPriceMng:add）而非继续怀疑代码
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - isApplyRoute 在 meta.title==='价格备案查询' 时返回 false 隐藏按钮；改为 isRecordPriceMngSuzhou 判定并恢复筛选与编辑按钮
 - 涉及文件：zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/index.vue
 - 所属项目：产品2.0；代码基线：62d5fb9；来源会话：49b771f7-5363-446e-b96b-bb0ff3c61363

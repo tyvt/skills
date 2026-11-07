@@ -3,6 +3,10 @@
 - 涉及文件：EstateManagement-Park/src/main/webapp/mfap/js/mfap_MfapOwnerVoteDetail.js、EstateManagement-Park/src/main/webapp/mtpl/js/mtpl_MtplOwnerVoteDetail.js；所属项目：0
 - 来源会话：e4d03a1c-d0d5-4abe-adb4-7410fadeb65a
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=0
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

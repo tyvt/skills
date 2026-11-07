@@ -8,6 +8,7 @@
 - 经纪端侧栏并排板块同样加上 stretch 属性
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证：会话 94cb407a 修复商品房被拉满挤掉下方板块问题；刷新确认商品房下方重新出现存量房、住房租赁和右侧常用功能且底边对齐
 - 涉及文件：zhi2-web-admin/src/views/home/components/layouts/HomeLayoutSidebar.vue、config/homeLayout.js、HomeLayoutAdmin.vue
 - 所属项目：门户；来源会话ID：94cb407a-5b39-4218-8e57-162fde013753；代码基线：none

@@ -15,6 +15,12 @@
 - 涉及文件: AgencyBasicInfoDetail.vue; companyRecordAgency/detail.vue; utils/ruoyi.js; e2e/fixtures/company-menu-config.js; companyRecordAgency/change/detail.vue; toB/agencyChange/detail.vue; toB/agencyRecord/detail.vue; toB/change/detail.vue
 - 会话: 6c91b23f-bba3-49fb-bd85-76e4879db720; 代码库: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：6c91b23f-bba3-49fb-bd85-76e4879db720
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

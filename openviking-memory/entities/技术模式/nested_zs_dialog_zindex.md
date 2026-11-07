@@ -13,6 +13,7 @@
 - 下拉面板仍用 `popper-cl`（原文截断，保留原有 popper 方案）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：@zhi2-web-admin/src/views/solicitation/components/maintenanceFeeDtlDialog.vue
 - 所属项目：2-0；来源会话：f7fa3bf8-e11d-41c2-ab82-7f380cbd83c7；代码基线：none
 

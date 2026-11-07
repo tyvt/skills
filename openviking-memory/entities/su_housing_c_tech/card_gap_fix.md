@@ -15,6 +15,7 @@
 - 来源会话ID：80f4d555-4b91-4605-a249-4affc7710dfd
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译预览后，顶部小区信息卡片和「小区周边」之间应能看到灰色背景分隔；所有卡片间距应正常
 - 所属项目：苏住房C（zhi2-mobile-shimin）；代码基线：none
 

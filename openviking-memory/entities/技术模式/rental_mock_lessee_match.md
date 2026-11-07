@@ -18,6 +18,11 @@
 ## 关系
 - 来源会话: a64b0300-ecc7-4dc4-8634-47c21fd95aed
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

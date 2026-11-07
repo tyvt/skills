@@ -13,6 +13,7 @@
 - `refreshSubTabData` 重置 `pageNum`、调 `getList()` 与 `doLayout`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 涉及文件：`optionDecision/detail.vue`、`DecisionRangeTable.vue`、`mixins/listMixins.js`、`ownerDecision/detail.vue`
 - 所属项目：太仓G；来源会话：642bb8f5-b288-4d41-8b2a-f3c3c981319f；代码基线：none
 

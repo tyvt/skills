@@ -16,6 +16,7 @@
 - 与「列表分页统一用 z-paging」约定不冲突：仍是 z-paging，仅非全屏列表页显式关掉 fixed
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 adb68ad1 用户贴图报「电子业主卡-报事报修，页面显示把顶部前往报事报修筛选等操作盖住了」，定位 z-paging 默认 fixed 全屏，修复为 :fixed="false" + .repair-page flex 纵向 + 顶部 flex-shrink:0 + .page-body flex:1/min-height:0
 - 涉及文件：src/pages_owner/repair/index.vue、src/hooks/usePaging.js、src/pages_owner/propose/index.vue、src/pages_owner/tenant/index.vue
 - 所属项目：苏住房C；来源会话ID：adb68ad1-d25d-4cff-8fc2-1aef22ec90cb；代码基线：d43894b

@@ -6,6 +6,8 @@
 ## 修复内容
 - 在 home.vue 与 externalWebview.vue 对齐体验版逻辑，使首页菜单认可 ctUserIdentity 识别的房屋
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：pages/webview/externalWebview.vue、pages/webview/home.vue、utils/portal-user.js
 - 来源会话ID：0058f23d-986e-4656-8a58-d2a02848f549；代码基线：none
 

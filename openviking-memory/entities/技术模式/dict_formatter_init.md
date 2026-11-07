@@ -8,6 +8,8 @@
 - `created()` 调用 `initDict()` 拉取 `benefit_is_correction` 与 `benefit_is_business_reconciliation` 字典补全选项。
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 涉及文件：incomeExpenseDetail.vue
 - 来源会话：7111a4be-91a8-4d4e-86f1-04e6cabb0d0c；代码基线：none
 

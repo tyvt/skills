@@ -22,6 +22,10 @@
 - 文件：property/feeDeclare2/detail.vue、index.vue、components/feeBindScopeTable.vue
 - 所属项目：苏住房G；来源会话：a0b29235-6dfc-41c7-a72a-ffbd03aa1059、4da73cea-1332-41ff-a953-da6a317d328b、6603fa3e-f69e-4d14-86c8-5c183dff620d；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

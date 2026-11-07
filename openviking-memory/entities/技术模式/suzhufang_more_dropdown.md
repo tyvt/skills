@@ -7,6 +7,7 @@
 - `Navbar.vue` 为 `.more-menu-dropdown` 补宽度策略：`min-width: max(100%, 180px)`、`width: max-content`、`max-width: min(320px, 90vw)`、`word-break: keep-all`
 - 父级 `.more-menu`、`.top-nav-menus` 增加 `overflow: visible` 避免下拉被裁切
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 刷新后点「更多功能」子菜单完整横向展示
 - 所属项目：苏住房G；来源会话：a25ae0ba-98fc-4e97-93d2-e8f696d4b6b0；代码基线：none
 

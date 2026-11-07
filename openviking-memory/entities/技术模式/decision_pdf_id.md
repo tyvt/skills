@@ -20,6 +20,7 @@
 - d:/repository/园区1.0表决页面/src/api/common.ts
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区1.0表决页面
 - 来源会话：c01ceb33-3a8e-412b-b7c4-7ee892caff45
 - 所属项目：园区1.0表决页面；代码基线 none
 

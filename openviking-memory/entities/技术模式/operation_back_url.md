@@ -9,6 +9,7 @@
 - 解除限制无 `backUrl` 时解析 `building/houseLimitAudit/index` 对应列表 path
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/007.md
 - 涉及文件：路由信息.json、building/houseLimitAudit/index.vue、e2e/fixtures/house-limit-menu-config.js、building/houseLimit/detail.vue、utils/ruoyi.js、building/houseLimit/limitFormMixin.js、e2e/fixtures/house-limit-helpers.js、building/houseLimit/houseLimitConstants.js
 - 所属项目：苏州市房地产监测V3；来源会话：2ad68687-4880-41bf-8458-37e18e5ed806；代码基线：none

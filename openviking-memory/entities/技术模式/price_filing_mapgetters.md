@@ -6,6 +6,8 @@
 - 在价格登记页面补全 mapGetters('common', ['areas'])。
 - 通过 currentRoute 规范化验证；69 个 E2E 测试通过。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：758460b0-2a05-4d83-8594-0821de46c25c
 - 验证证据: cursor session=758460b0-2a05-4d83-8594-0821de46c25c
 - 涉及文件: src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/index.vue, src/store/modules/permission.js
 - 所属项目: 2-0; 代码库: none

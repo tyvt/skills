@@ -12,6 +12,7 @@
 - 分页指示器跟随swiper的current更新
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证预期：第一页只显示5个图标，滑动后显示第二页，底部指示器同步切换
 - 涉及文件：Project_Suzhufang.vue、MidModuleGrid.vue、Home_Suzhufang.vue
 - 所属项目：苏住房C；来源会话ID：1d4644c7-b4d9-4f0e-ae82-7cbe27b40a19；代码基线none

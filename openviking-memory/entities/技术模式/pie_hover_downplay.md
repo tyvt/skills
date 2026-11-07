@@ -11,6 +11,7 @@
 - 同步将图例重置为默认状态
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/pieLegendHover.js、fundPanorama/index.vue、fundPanorama/chartRenderers.js
 - 所属项目：园区物管2.0；来源会话：1ffbe0a9-01c9-4c6e-8964-74902067048b；代码基线：none
 

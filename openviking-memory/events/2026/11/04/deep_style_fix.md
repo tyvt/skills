@@ -9,6 +9,11 @@ In contracts.vue, parent scoped styles failed to penetrate the base-card child c
 【来源会话ID】9fcef1ba-4f8b-422b-b728-7de7e7801513
 【代码基线】none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "deep_style_fix",

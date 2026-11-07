@@ -13,6 +13,7 @@
 - flowable/process.vue（我发起的流程）通过 mixins/listMixins.js 的 listCallback 对 response.rows 规范化后再赋表格数据，统一复用 normalizeTodoTaskRows，避免单独复制字符串规则导致与待办列表视觉不一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：接口返回 comment.type === '3' 或 comment.comment === '驳回'；新增 todoTask.js 并改三处入口
 - 涉及文件：src/utils/todoTask.js、src/views/flowable/todo.vue、src/views/home/index.vue、src/views/home/components/TodoTable.vue、src/views/flowable/process.vue、src/mixins/listMixins.js
 - 所属项目：园区公共收益；来源会话：35f936a1-c453-4bbf-9d57-01b517ff7164、1b62db88-88d8-4a66-9497-8fe956659bab；代码基线：0c9b8c2

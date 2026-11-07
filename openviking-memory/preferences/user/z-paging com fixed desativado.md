@@ -4,6 +4,12 @@
 - 文件：`pages_transaction/buyHouse/myBuy.vue`, `pages_transaction/intention/my.vue`, `pages.json` 等。
 - 验证：会话 31d82de8-28b1-42cc-8741-623368194dca。
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：31d82de8-28b1-42cc-8741-623368194dca
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

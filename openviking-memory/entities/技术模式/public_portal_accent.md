@@ -16,6 +16,12 @@
 - MEDIUM：PortalDialogHost portalSegment 数组类型
 - 文件：portalTheme.js、PortalDialogHost.vue；项目：门户；会话：b642c935-7aec-4bc3-b375-5091c39f01f7；基线：e1f8e0b
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：b642c935-7aec-4bc3-b375-5091c39f01f7
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

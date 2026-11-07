@@ -9,6 +9,11 @@ indexMore.vue called listRecommendProject with URL type directly as halfYearAgo,
 【来源会话ID】86696cb3-e77a-4306-8d93-2aa391d79f46
 【代码基线】none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "indexmore_enum_fix",

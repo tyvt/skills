@@ -6,6 +6,7 @@
 - company-record-change.spec.js 改为 gotoCompanyInfoView 刷新后通过 getOwnCompany 与 isChangeUnderAdminReview 断言在途审核
 - 提交后页面可能无「审核中」文案，故检查「审核流程查看」按钮代替
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/016.md
 - 涉及文件：institutionRegister/index.vue、companyRegister/table.vue、companyManagement/companyBasicInfo/detail.vue、DeveloperBasicInfoForm.vue、change/detail.vue、DeveloperBasicInfoDetail.vue、toB/companyRecord/detail.vue、utils/registerQualification.js 等
 - 所属项目：苏州市房地产监测V3；来源会话：19d37368-a31d-41a5-9880-9f1ccae0e31d；代码基线：none

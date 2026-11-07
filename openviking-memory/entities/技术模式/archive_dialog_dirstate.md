@@ -10,6 +10,8 @@ ArchiveDetailDialog.vue 的 contentInfo 中"状态"项绑定 this.dirStateOption
 - 将该 options 改为 this.fileDirStateOptions 以匹配 initDict 赋值
 
 ## 验证与归属
+- 所属项目：bugfix
+- 验证证据：extracted source=cursor project=bugfix
 - 验证证据：src=bugfix/003.md
 - 涉及文件：ArchiveDetailDialog.vue
 - 来源会话ID：c7437440-9b9d-4339-9758-66a24e4c7ff7

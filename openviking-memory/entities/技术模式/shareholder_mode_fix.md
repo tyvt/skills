@@ -11,6 +11,7 @@
 - 依 `dialogMode` 控制 `view` 态使用 `DetailTemplate` 且仅显返回按钮
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/099.md
 - 涉及文件：Step4Shareholders.vue、ShareholderDialog.vue、shareholderTable.vue、toB/shareholder/detail.vue、companyInfo.vue、companyRegister.vue、Step3Appendix.vue、detailMixins.js
 - 所属项目：苏州市房地产监测V3；来源会话：bc548255-f57a-4017-8739-5446258f1073；代码基线：none

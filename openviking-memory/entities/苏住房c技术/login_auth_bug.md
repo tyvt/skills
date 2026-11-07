@@ -13,6 +13,7 @@
 - 「我的」页删掉自带loadIdentityTypes改由refreshAuthState统一负责。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话db56ec08用户反馈登录后点菜单仍提示认证，根因明确为getUserInfo未await listStatus且登录后未刷新。
 - 涉及文件：zhi2-mobile-shimin/src/store/user.js、pages_main/login/index.vue、utils/tabBar.js、App.vue、My_Suzhufang.vue、utils/index.js、api/property.js、pages/login/index.vue、pages_main/login/success.vue、pages_main/login/password.vue。
 - 验证证据：src=苏住房C/033.md

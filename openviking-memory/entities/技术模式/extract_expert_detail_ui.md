@@ -11,6 +11,7 @@
 - credit/extract/detail.vue、BlockExpertTable.vue、ExpertResultTable.vue、property/extract/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 所属项目：园区物管2.0；来源会话：87a99be6-6232-4f70-af80-05cf6659e728
 
 <!-- MEMORY_FIELDS

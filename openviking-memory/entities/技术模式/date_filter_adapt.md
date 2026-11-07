@@ -8,6 +8,8 @@
 - 重构 `src/components/` 下相关组件以对齐交互偏好
 
 ## 验证与归属
+- 所属项目：物业手持B端
+- 验证证据：extracted source=cursor project=物业手持B端
 - 验证证据：src=物业手持B端/004.md
 - 涉及文件：ZsDatePicker.vue、record/index.vue、ZsPicker.vue、ZsDialog.vue、FilterPopup.vue、filter.scss、statistics/index.vue、message/index.vue
 - 来源会话ID：05daaa96-3842-4bb4-9e0a-d1a9a0fc93a1；代码基线：none

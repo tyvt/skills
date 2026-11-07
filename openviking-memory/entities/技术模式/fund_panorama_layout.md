@@ -8,6 +8,7 @@
 - 左列剩余空间由下方两个趋势图块均分。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：benefit/dataSandbox/fundPanorama/index.vue 等。
 - 所属项目：园区物管2.0；来源会话：f81f2bdd-ae72-42a0-b507-70f5cad7acb8；代码基线：none。
 

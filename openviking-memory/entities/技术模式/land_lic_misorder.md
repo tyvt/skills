@@ -10,6 +10,7 @@
 - 查看态与编辑态同步，校验规则不变
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/216.md
 - 涉及文件：projectManagement/certificate/planLic/detail.vue、stateLandLic/detail.vue、路由信息.json、conLandLic/detail.vue、conLandLic/components/BaseLandLicForm.vue、conLandLicChange/detail.vue、conLandLic/changeDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：2ad09f88-3393-44cf-96b0-eda0601788c6；代码基线：none

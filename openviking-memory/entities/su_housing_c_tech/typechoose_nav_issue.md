@@ -10,6 +10,10 @@
 - 涉及文件：src/pages_owner/house/index.vue、src/utils/route-map.js、success.vue、guardApply/step1.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：d7258436-2f74-40b3-a7d1-bb994d1239c1
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

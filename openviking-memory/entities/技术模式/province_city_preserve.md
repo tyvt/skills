@@ -24,6 +24,11 @@
 - 会话: b9e75113-bcab-4880-a9ad-aff2106e5082
 - 所属项目: 苏州市房地产监测V3; 代码库: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b9e75113-bcab-4880-a9ad-aff2106e5082
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

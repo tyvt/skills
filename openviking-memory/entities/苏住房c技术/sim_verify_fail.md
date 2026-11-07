@@ -13,6 +13,7 @@
 - 遇到微信专有能力报 unexplained fail，优先换真机复测
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话 13ed1683：用户诉求「没有 wechat/verify 请求，是不是模拟器原因？」；结论确认 startFacialRecognitionVerify 在模拟器走 fail 回调，附模拟器/真机/H5 三环境对照表
 - 涉及文件：src/api/security.js、pages_my/verification/FormLocal.vue、FormNonLocal.vue、FormManual.vue、utils/constant.js
 - 所属项目：苏住房C；代码基线：5f0f4dc；来源会话ID：13ed1683-e44e-4216-95c3-4499d21022e8

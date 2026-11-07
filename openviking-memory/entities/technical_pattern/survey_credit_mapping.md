@@ -12,6 +12,12 @@ In Suzhou Real Estate Monitoring V3, `/presale/surveyChange/selectProject` retur
 ## Attribution
 - Project: Suzhou Real Estate Monitoring V3; source session: 754ddf0b-9295-4421-b9b9-93fc87b9b996; evidence: 苏州市房地产监测V3-leftover/081.md.
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：754ddf0b-9295-4421-b9b9-93fc87b9b996
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

@@ -13,6 +13,8 @@ statisticsMap/index.vue 已对接真实搜索接口，完成搜索框联动地�
 - 因 Map 组件未监听 markList 变化，页面用 mapVisible 重建刷新保证搜索后点位更新
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 涉及文件：src/views/benefit/statisticsMap/index.vue
 - 来源会话：fbdf2d00-85f2-47af-8a5a-b24f097bad6f
 - 已检查 lint 无新增报错

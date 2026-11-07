@@ -14,6 +14,12 @@
 - 涉及文件: PermitPlanPanel.vue, PresalePlanFillForm.vue, plan/detail.vue, detail.vue, Headline/index.vue, presale-permit-helpers.js, PermitAppendixPanel.vue.
 - 验证证据: src=苏州市房地产监测V3-rest/057.md; session 3b1ff38c-e27a-4867-a215-6627c1d4380c.
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：3b1ff38c-e27a-4867-a215-6627c1d4380c
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

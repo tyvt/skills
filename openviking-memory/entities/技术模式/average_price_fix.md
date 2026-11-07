@@ -13,6 +13,8 @@
 - `src/api/pricemng/recordPriceMng.js`, `src/api/presale/recordPriceMng.js`, `src/api/index.js`, `src/utils/request.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：a9f5fddf-6da7-4aa2-811e-c9b3d7941b5e
 - 验证证据: 提取自 cursor session=a9f5fddf-6da7-4aa2-811e-c9b3d7941b5e
 - 基线: none; 所属项目: Produto 2.0
 

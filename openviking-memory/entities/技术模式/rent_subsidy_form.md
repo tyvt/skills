@@ -7,6 +7,8 @@
 - 校验通过则 uni.showToast 提示申请成功，不跳外链
 
 ## 验证与归属
+- 所属项目：0
+- 验证证据：extracted source=cursor project=0
 - 涉及文件：src/pages-rent/subsidy.vue
 - 来源会话：0b6c14cb-8ef7-4458-9e20-74433b5f44f4；代码基线：none
 

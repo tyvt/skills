@@ -17,6 +17,7 @@
 - `src/views/autonomy/repair/components/DecisionRangeTable.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 所属项目: 惠山二期G
 - 验证证据: `src=惠山二期G/009.md`
 - 来源会话: `da4d5f02-fc36-4e8c-8717-0c4503f50d5e`

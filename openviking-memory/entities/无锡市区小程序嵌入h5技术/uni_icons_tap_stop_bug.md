@@ -12,6 +12,7 @@
 - 将查询时间图标的@tap.stop改为@tap，与同页其他提示图标（共有资金余额、账户余额）保持一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 需刷新后再试点击图标
 - 涉及文件：src/pages_benefit/sharedFunds/components/DetailsTab.vue、src/api/sharedFunds.js
 - 所属项目：无锡市区小程序嵌入H5；来源会话：26ca4c09-5707-4402-a54f-9c9491ec3455；代码基线：none

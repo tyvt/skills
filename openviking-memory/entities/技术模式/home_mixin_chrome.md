@@ -23,6 +23,8 @@ homeDataMixin 在 created 中设置 hideLayoutChrome=true，并在 beforeDestroy
 - zhi2-web-admin/src/layout/components/Sidebar/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：40f4d280-b5c1-4c8e-8477-9f099246ba53
 - 验证证据: cursor 会话提取
 - 所属项目: portal; session: 40f4d280-b5c1-4c8e-8477-9f099246ba53
 

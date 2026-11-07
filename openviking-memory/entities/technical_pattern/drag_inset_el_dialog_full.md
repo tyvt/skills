@@ -13,6 +13,12 @@ v-dialogDrag directive wrote inset:0 to .el-dialog causing el-dialog__wrapper to
 - Source session: 003d6075-c1af-4232-b337-c044d45c5078
 - Files: detail.vue, zs-select-dialog.vue, zs-select-dialog-func.vue, zs-dialog.vue, zs-table.vue, index.scss, package.json, SelectRecordProcedureDialog.vue
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：003d6075-c1af-4232-b337-c044d45c5078
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

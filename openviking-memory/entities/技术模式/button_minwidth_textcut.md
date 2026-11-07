@@ -12,6 +12,8 @@
 - chitchatDetail.vue（微聊页）同步相同样式加固，避免同类问题
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：139110b4-03df-4c4d-bf70-e95f95be8853
 - 验证证据：cursor 会话 139110b4-03df-4c4d-bf70-e95f95be8853
 - 涉及文件：pages_main/automaticRobot/index.vue、pages_my/robot/index.vue、pages_my/robot/chitchatDetail.vue、pages_my/robot/chitchat.vue、pages.json、ZsButton.vue、problemListCard.vue、automaticRobot/index.vue、chitchatDetail.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；代码基线：none

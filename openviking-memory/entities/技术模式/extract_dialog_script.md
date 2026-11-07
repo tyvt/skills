@@ -15,6 +15,10 @@ extract-dialog-content.js 在 @maintenance 目录处理中增加了循环超时�
 - 涉及文件：zhi2-web-admin/scripts/functions/extract-dialog-content.js
 - 所属项目：2-0；来源会话：2566f7d9-ebd6-469e-91d9-d90e7554d3d0；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

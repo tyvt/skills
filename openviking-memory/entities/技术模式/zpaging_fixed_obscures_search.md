@@ -9,6 +9,11 @@
 - cursor 会话 671da04e-7711-4f45-b4cb-a4bcab90d503 记录了修复。
 - 涉及文件: gridNav.vue, conditionScreening.vue, ZsPaging.vue, etc.
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：671da04e-7711-4f45-b4cb-a4bcab90d503
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

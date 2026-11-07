@@ -15,6 +15,7 @@
 - d:/repository/产品2.0/zhi2-web-admin/src/mixins/area.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：117b67e8-4e61-4da7-9503-e0038e998ea7；代码基线：none
 
 

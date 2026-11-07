@@ -11,6 +11,7 @@
 - 把 FileList 的 <img> 统一改为 <ZsImage> 交给 resolveStaticUrl 解析，pages_owner/pages_main/pages_vote 三个分包同改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 复发自查：先查报错路径有无分包前缀（白名单与文件是否对得上），再看是否对 svg/xxx.svg 用了原生 img 没过 ZsImage
 - 验证：会话 be666288 报错 location.svg 与 file_szf_pdf.svg 均 500，定位白名单与文件不一致及原生 img 漏改
 - 涉及文件：src/components/ZsImage/ZsImage.vue、src/utils/index.js、scripts/migrate-main-empty-static.mjs、src/pages_owner/components/FileList/FileList.vue、Type2.vue、Type3.vue

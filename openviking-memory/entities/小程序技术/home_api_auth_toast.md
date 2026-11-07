@@ -8,6 +8,7 @@ pages/webview/home.vue 调维修资金、业主决策等前置接口时须带门
 - 401 时返回空串，避免与门户「登录已过期」类全局提示重复弹两次
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：会话 9b72f418 维修资金接口加 auth；extractMaintenanceApiErrorMessage + home.vue showApiErrorToast；示例 code 500 msg 房屋信息不存在 直接 toast
 - 涉及文件：pages/webview/home.vue、utils/portal-h5-webview.js
 - 所属项目：小程序；来源会话ID：9b72f418-a53c-458b-aed6-239b94496419；代码基线：none

@@ -11,6 +11,7 @@
 - E2E test:e2e:company-admin-add 通过，本地需清 sessionStorage 中 routers 或改 e2e/.env.e2e 的 E2E_BASE_URL 连 8082
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/034.md
 - 涉及文件：utils/ruoyi.js、company/companyAdmin/index.vue、e2e/company/company-admin-routes-probe.spec.js、mixins/detailMixins.js、company/companyAdmin/developer/index.vue、mixins/listMixins.js、permission.js、company/companyManagement/components/AgencyEntryNetworkDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：d698b1b1-35a3-4409-8b54-ec6572857a14；代码基线：none

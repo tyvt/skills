@@ -11,6 +11,7 @@
 - 增加 try/catch 兜底，避免清理失败中断用例。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：e2e/fixtures/auth-helpers.js、e2e/company/company-record-change.spec.js、CompanyBasicInfoDetail.vue。
 - 所属项目：产品2.0；来源会话：c24a0b77-252c-498f-8424-de964da60242；代码基线：none。
 

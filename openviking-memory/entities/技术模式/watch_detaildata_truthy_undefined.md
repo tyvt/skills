@@ -10,6 +10,8 @@
 - 对字段做空值保护，避免直接覆盖导致表单字段变 `undefined`
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证证据：012.md 会话 f57d7e7f：stepHouseInfo watch detailData 默认 {} 触发把表单值改 undefined
 - 涉及文件：src/pages/leaseContract/stepHouseInfo.vue
 - 来源会话：f57d7e7f-9439-484d-b703-784cb50ce8c1；代码基线：none

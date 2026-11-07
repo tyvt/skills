@@ -16,6 +16,7 @@
 - 边界：跨页复用骨架进 index.scss，单页特性仍留组件 scoped，不冲突
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 e48b01c6 三 index.vue 统一调整上下间距一致、操作栏垂直居中、说明文字纳入表头、全局样式写入 index.scss；顺带修复 houseTable.vue 面积列用 amountFormatter、subAdvertiseTable.vue 增 sub-container 包裹
 - 涉及文件：d:\repository\产品2.0\zhi2-web-admin\src\styles\index.scss、src\views\benefit\assetsLeaseContractFiling\index.vue、src\views\benefit\resourcesLeaseContractFiling\index.vue、src\views\benefit\parkingSpaceContractFiling\index.vue
 - 所属项目：产品2.0；来源会话：e48b01c6-3065-4048-9afa-2de4be8dac2a；代码基线：49a7aa3

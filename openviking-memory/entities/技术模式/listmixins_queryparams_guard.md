@@ -12,6 +12,8 @@
 - set：若 this.queryParams == null 则跳过缓存写入。
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证证据：会话 e7f13f04（VenueAssetDialog 因缺 queryParams 报错，listMixins 增加防护）。
 - 涉及文件：src/mixins/listMixins.js、src/views/benefit/statisticsMap/components/VenueAssetDialog.vue、src/views/benefit/statisticsMap/operatingAssets.vue、packages/tabs/src/tab-pane.vue。
 - 来源会话ID：e7f13f04-7af6-4354-8122-d5aee1779dac；代码基线：none。

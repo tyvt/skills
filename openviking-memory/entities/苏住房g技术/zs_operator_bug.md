@@ -10,6 +10,7 @@
 - 未选禁用字段不显示占位符
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/093.md
 - 涉及文件：zs-advanced-query.vue、complex/index.vue、zs-select.vue、SingleSelect.vue、complexFieldConfig.js
 - 所属项目：苏住房G；来源会话ID：429acee0-eca5-4450-8610-60939deb48d6；代码基线：none

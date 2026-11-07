@@ -12,6 +12,8 @@
 - `src/views/building/project/components/buildingTable.vue`, `package.json`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：a4b83bc3-a943-4439-b513-3c52d63c3302
 - 验证证据: 提取自 cursor session=a4b83bc3-a943-4439-b513-3c52d63c3302
 - 基线: none; 所属项目: Produto 2.0
 

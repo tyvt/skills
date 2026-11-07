@@ -10,6 +10,7 @@ ZsImage.vue已改为H5端图片使用相对路径，不再依赖IMAGE_BASE或VIT
 - 仍使用 @/env/mp.js 的 IMAGE_BASE，行为与改前一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：src/components/ZsImage/ZsImage.vue、src/env/mp.js、vite.config.ts
 - 来源会话：c7f8cfb5-52f7-44a5-a4bf-81cfbf4e58af
 - 所属项目：无锡市区小程序嵌入H5

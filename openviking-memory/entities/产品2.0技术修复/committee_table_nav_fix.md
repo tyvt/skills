@@ -13,6 +13,10 @@
 - 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/components/committeeTable.vue、autonomy/record/components/index.vue、autonomy/record/components/enums.js、publicQuery/complex/detail.vue
 - 所属项目：产品2.0；来源会话：6a98c35a-f7f0-46a2-9882-8721000ff3f1；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "产品2.0技术修复",

@@ -10,6 +10,7 @@
 - 交由 `handleTreeReady` 按树默认节点刷新列表
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/077.md
 - 涉及文件：property/complex/components/RegionTreeLayout.vue、property/complex/index.vue、regionTree.vue、mixins/listMixins.js、mixins/table.js、property/complexChange/index.vue
 - 所属项目：园区物管2.0；来源会话：47d34879-47c4-4fc8-beb8-6a3e1375d999；代码基线：none

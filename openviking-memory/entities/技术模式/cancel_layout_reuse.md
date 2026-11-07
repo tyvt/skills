@@ -11,6 +11,7 @@ companyCancel/detail.vue 中「注销信息」原与「基本信息」卡片间�
 - 查看态 layout 由 THIRD_LAYOUT 改为 HALF_LAYOUT 并移除该常量
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/278.md（另见 leftover/078.md）
 - 涉及文件：companyCancel/detail.vue、Headline/index.vue、CompanyBasicInfoForm.vue、companyApply/detail.vue、detail-template.vue、companyApplyAudit/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：e29a66b7-c226-49ac-b501-5a592c4091f8；代码基线：none

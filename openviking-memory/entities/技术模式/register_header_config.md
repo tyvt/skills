@@ -7,6 +7,7 @@
 - 引用该组件的注册页无需改动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/113.md
 - 涉及文件：register/companyRegister.vue、propertyCompanyRegister.vue、components/RegisterPageHeader/index.vue、institutionRegister/index.vue、router/index.js、login.vue、system/platformConfig/detail.vue、main.js
 - 所属项目：苏州市房地产监测V3；来源会话：b7ae39a7-4a70-4443-afa8-63ba883783a8；代码基线：none

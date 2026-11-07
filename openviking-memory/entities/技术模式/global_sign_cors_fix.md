@@ -10,6 +10,7 @@
 - 修正 `fetch` 的 GET 查询串获取逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：src=园区物管2.0/055.md
 - 涉及文件：public/assets/js/sign.js、vite.config.js
 - 所属项目：园区物管2.0；来源会话：73936be3-9ab2-412b-8043-33c8c47df458

@@ -12,6 +12,7 @@
 - 主包瘦身核对路由时优先查是否误改了本来正确的 /pages/face/* 等路径
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：会话 404cce7e 结论「分包后业务跳转路径不需要改」「uni-app/微信小程序分包只改变打包位置，页面完整路径不变」
 - 涉及文件：pages.json、pages/webview/home.vue、pages/webview/externalWebview.vue、pages/face/bdc.vue
 - 所属项目：小程序；来源会话ID：404cce7e-39c8-4d87-8c7d-0d9d3fe66028；代码基线：none

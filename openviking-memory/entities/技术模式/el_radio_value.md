@@ -11,6 +11,7 @@ Element Plus 弃用 el-radio / el-radio-button 用 label 表示选中值的写�
 - 存量页面需全局搜 <el-radio 与 <el-radio-button 批量替换。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 ed53b5d6：error.ts debugWarn useDeprecated；已在 flowable、system/menu、paymentChannel、maintenance/facility 等多处批量改 label→value。补充证据：src=2-0/010.md，涉及 element-plus 官方 radio 文档、error.ts、index.ts。
 - 涉及文件：zhi2-web-admin/src
 - 所属项目：2-0；来源会话ID：ed53b5d6-854c-4ba8-8358-b4d73be5bd8b、f04aaad0-6d0c-450e-807c-fdf4dbf5a214；代码基线：none。

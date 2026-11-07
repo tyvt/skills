@@ -13,6 +13,7 @@
 - 逐处用标签栈判定外层确为 zs-table-column 才改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 全量复查通过，共 20 个文件 25 处同类缺陷
 - 所属项目：苏州市房地产监测V3；来源会话：609a8f76-e371-401d-92fa-3592fbd4cbd8、848529ca-dbef-4317-ac0a-f071aba151fb
 

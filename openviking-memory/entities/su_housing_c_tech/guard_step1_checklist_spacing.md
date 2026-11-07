@@ -11,6 +11,7 @@
 - 说明：`index.vue` 仅为步骤容器，实际渲染在 `step1.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 刷新小程序后可见选项间距
 - 涉及文件：`step1.vue`、`uni.scss`
 - 所属项目：苏住房C；来源会话ID：f19a79a2-7549-477c-9068-dfc6f1414d26；代码基线：none

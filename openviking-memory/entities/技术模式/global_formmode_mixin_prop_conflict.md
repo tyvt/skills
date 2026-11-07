@@ -11,6 +11,7 @@
 - 子组件沿用全局 mixin 提供的 formMode
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/153.md
 - 涉及文件：zhi2-web-admin/src/views/presale/permit/components/PermitInfoPanel.vue、presale/permit/components/detail.vue、components/zs-form/zs-form.vue、mixins/detailMixins.js、mixins/form.js、mixins/formComponents.js、mixins/area.js、presale/permit/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：c8141e9b-07dc-46ab-b4d6-78d2e9881aa2；代码基线：none

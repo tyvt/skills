@@ -12,6 +12,7 @@
 - 不再出现表体下方大块空白
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：zs-table.vue、company/companyApplyAudit/index.vue、institution/record/index.vue、company/companyRecordAgency/index.vue、company/companyApply/index.vue
 - 所属项目：苏州市房地产监测V3
 - 来源会话：deee3f49-3c02-4d81-a251-d57518e4e866

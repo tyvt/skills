@@ -11,6 +11,7 @@
 - 导出接口 /property/dataEntryDetail/export 若含该列需后端同步调整
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=江阴公共收益
 - 验证证据：src=江阴公共收益/001.md
 - 涉及文件：zhi2-web-admin/src/views/property/dataEntryDetail/index.vue
 - 所属项目：江阴公共收益；来源会话：b9b7af23-2eb0-46dd-a358-fe3486c2fad1；代码基线：none

@@ -11,6 +11,7 @@
 - B 端 add/edit 会请求 `selectProject`、`selectAgency`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`zhi2-web-admin/src/views/presale/entrustSale/detail.vue`
 - 所属项目：苏州市房地产监测V3
 - 来源会话：c99f65e0-5f2b-48aa-ba0d-5c31de5fb43b

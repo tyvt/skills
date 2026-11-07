@@ -20,6 +20,8 @@
 - src/pages_home/home.js
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 来源会话ID：03eda42a-989a-414d-9b8a-46649f591538
 - 代码基线：none
 

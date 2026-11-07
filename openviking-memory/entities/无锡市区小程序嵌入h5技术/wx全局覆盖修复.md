@@ -12,6 +12,7 @@ uni-app 主包覆盖 window.wx 导致微信 web-view 内 H5 的 wx.miniProgram �
 - 注意 miniProgram 仅微信小程序 web-view 有效，苏服办原生容器无此 API 属环境限制
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话 718e1271 用户怀疑框架覆盖 wx；结论采用 index.html 守卫 + restoreWeixinWx.js 两层防护
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/index.html、src/utils/restoreWeixinWx.js、src/main.ts
 - 所属项目：无锡市区小程序嵌入H5；来源会话：718e1271-a4de-433f-9316-5f9d2f58fafe；代码基线：6c9a164

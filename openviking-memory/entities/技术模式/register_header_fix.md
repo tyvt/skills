@@ -13,6 +13,7 @@
 - E2E 文件 `e2e/register/property-register-entry.spec.js` 同步
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：68d82378-123e-4cc2-9f31-e6e96769846c；代码基线：none
 
 <!-- MEMORY_FIELDS

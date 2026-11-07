@@ -8,6 +8,7 @@
 - 同步 `login.vue`、`LoginForm.vue` 等组件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/075.md
 - 涉及文件：router/index.js、store/modules/permission.js、utils/ruoyi.js、login.vue、RecursiveMenu.vue、LoginForm.vue、companyLogin.vue、Navbar.vue
 - 所属项目：苏州市房地产监测V3；来源会话：4f960b97-1c4b-4b74-94fb-4c515763dae7；代码基线：none

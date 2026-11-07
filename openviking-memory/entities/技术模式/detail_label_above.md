@@ -8,6 +8,7 @@
 - 空值必须给空串而非 undefined/null，否则渲染空白行占位；说明文案属展示层补充，不拼进 field label 或另起 Headline 区块。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 6a520d7b 用户要求用款申请名称后增加社区已见证通过，字段有值才展示、加在标签上面。
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue
 - 所属项目：苏住房G；来源会话ID：6a520d7b-daeb-45ff-b2c6-7701acbb59d1；代码基线：44d6576

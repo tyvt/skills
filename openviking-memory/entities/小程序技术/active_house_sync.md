@@ -13,6 +13,7 @@
 - 普通绑房入口在合适时机清残留避免重复触发
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：会话 7ebdef37 两边切换小区未同步第二轮修复
 - 涉及文件：pages/webview、utils、pages/webview/home.vue、pages/webview/externalWebview.vue、utils/portal-user.js
 - 所属项目：小程序；来源会话ID：7ebdef37-14ee-44a0-8372-b1a08283e34e；代码基线：none

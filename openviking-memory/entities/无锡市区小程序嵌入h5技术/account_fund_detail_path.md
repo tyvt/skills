@@ -8,6 +8,8 @@ getAccountFundDetail 请求路径须为 POST /benefit/app/accountStatistics/stat
 - 总览块仍用 `/benefit/app/accountStatistics/{projectId}` 与 bankReceiptDetail 等字段约定
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：c3697b27-3a83-450d-a4a0-5c2a22ae4a0e
 - 验证会话：2ef3a945-8783-45dc-882c-71a6f4dc772e、c3697b27-3a83-450d-a4a0-5c2a22ae4a0e、0d2c6516-1930-4d19-b020-1182a8c885bb
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/api/sharedFunds.js、src/pages_benefit/sharedFunds/components/DetailsTab.vue
 - 所属项目：无锡市区小程序嵌入H5；代码基线：ffd97b8

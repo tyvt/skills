@@ -10,6 +10,11 @@
 - 函数：createProxyConfig(target, proxyContext)中shouldStripApiPrefix判断并rewrite
 - 来源会话ID：f8066b62-67af-4b9b-a005-48c4a5ce8926；项目：产品2.0；代码基线：none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

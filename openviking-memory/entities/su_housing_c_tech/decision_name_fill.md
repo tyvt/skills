@@ -24,6 +24,12 @@ In Su Housing C project, getMaintainResult returns decisionOptionResponseAllList
 - Source cursor session: 6e6436fe-112d-4645-b690-9d9bb72bae0c
 - Project: Su Housing C (zhi2-mobile-shimin)
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：6e6436fe-112d-4645-b690-9d9bb72bae0c
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

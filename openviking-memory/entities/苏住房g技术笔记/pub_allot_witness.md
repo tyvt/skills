@@ -11,6 +11,8 @@
 - 依赖后端/benefit/pubAllotNotice/{id}返回approvalDeptName字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：6a520d7b-daeb-45ff-b2c6-7701acbb59d1
 - 来源：苏住房G/044.md；会话6a520d7b-daeb-45ff-b2c6-7701acbb59d1
 - 涉及文件：benefit/pubAllotNotice/detail.vue、pubPaymentNotice/detail.vue、api/capital/node.js、api/capital/paymentDetail.js、benefit/pubTradeModel/index.vue、api/finance/appropriation.js、pubAllotNotice/index.vue、pubAllotNotice/components/pubTradeDetailTable.vue
 - 所属项目：苏住房G

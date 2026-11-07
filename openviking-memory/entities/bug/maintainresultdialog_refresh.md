@@ -11,6 +11,7 @@
 - `detail.vue`：添加 `@refresh="getDetail"`，保持详情页数据同步
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 需重新点击「确认」提交表决结果，应能正常保存并刷新列表
 - 涉及文件：`MaintainResultDialog.vue`、`VotingItemsTable.vue`、`detail.vue`
 - 所属项目：园区公共收益；来源会话：efcad380-fb66-4184-a744-9ea41461ecde；代码基线：none

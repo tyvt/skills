@@ -15,6 +15,7 @@
 - 套路泛化：子表弹窗 form 一律用工厂函数声明全字段，不许依赖「后面再加」；回填外部数据一律 $set
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：zhi2-web-admin/src/views/company/companyRegister/components/bankTable.vue、companyManagement/components/bankTable.vue
 - 所属项目：产品2.0；来源会话：44cfc1d2-8149-4819-b5f1-42bdc46f2173；基线：50767de
 

@@ -11,6 +11,7 @@
 - 通用套路：任何「全部」类 tab/下拉选项都用独立哨兵值 + 提交前转换，绝不用空串或 0 兼做「不限」语义（0 本身可能是有效业务值）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：修复为「全部」用专用值 'all'，getQueryParams 把 'all' 转 undefined，刷新后点「全部」接口不再带 orderStatus=0
 - 涉及文件：zhi2-web-admin/src/views/property/workOrder/order/index.vue
 - 所属项目：产品2.0

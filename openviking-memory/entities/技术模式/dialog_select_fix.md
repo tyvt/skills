@@ -16,6 +16,7 @@
 - 剩余 linter 报错仅存在于 maintenanceFeeDtlDialog.vue，属该文件原有类型提示噪音
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：SingleSelect.vue、maintenanceFeeDtlDialog.vue、element-ui.scss（诊断）、selectPopperMixin.js、MultiSelect.vue
 - 所属项目：2-0（产品2.0）；来源会话：c442cea0-961e-4e15-b4e3-627396d2834e、074f871c-28c4-41be-986b-cadac0bc2bc2；代码基线：none
 

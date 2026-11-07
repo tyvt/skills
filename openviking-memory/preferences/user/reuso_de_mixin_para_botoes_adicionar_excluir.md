@@ -3,6 +3,12 @@
 - 重复的 `handleQuery`/`resetQuery` 被移除，使用 mixin 的默认实现；`showButton` 控制编辑按钮的可见性。
 - 验证: src=苏州市房地产监测V3-rest/124.md; 涉及文件: AgencyBranchList.vue, order/index.vue, chargeItem/index.vue, listMixins.js, table.js, permsMixins.js, AgencyBranchDetail.vue, agencyBranch.js; 会话 b02c7339-410a-4155-9af2-1dd4826ef29d
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b02c7339-410a-4155-9af2-1dd4826ef29d
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

@@ -10,6 +10,7 @@
 - 在 `apiV3Normalize.js` 的 `normalizeTrailingPathParams` 中修复 `cancel` 误判逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`presale/permitCancel/index.vue`、`mixins/table.js`、`apiV3Normalize.js`、`presale/permitExtend/index.vue`、`permitCancelConstants.js`
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：f82e7cc4-5b9a-49e7-9c22-7583b0a8d615

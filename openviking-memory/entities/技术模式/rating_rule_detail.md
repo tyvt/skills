@@ -16,6 +16,7 @@
 - 分值区间两输入框等宽对齐；查看展示为 `> X <= Y` 格式。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/evaluation/ratingRule/table.vue、detail.vue、dialog.vue、src/mixins/subTableMixins.js。
 - 所属项目：园区物管2.0；来源会话 15e3f1e2-9505-4347-bf12-82cca18b71ec；代码基线 none。
 

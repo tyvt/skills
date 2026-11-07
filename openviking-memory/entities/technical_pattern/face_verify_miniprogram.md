@@ -11,6 +11,7 @@
 - 非微信环境因缺失 wx.miniProgram.navigateTo 及 JSSDK 不可用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓一网通办H5
 - 验证证据：src=太仓一网通办H5/004.md
 - 涉及文件：src/views/decision/common/faceSuccess.vue、src/views/decision/components/FaceStep.vue、src/router/index.ts、src/views/decision/ParticipateIn.vue、src/views/decision/common/faceError.vue、src/api/modules/auth.ts、src/views/election/ElectionForm.vue、src/views/owner-decision/ParticipateIn.vue
 - 所属项目：太仓一网通办H5；来源会话：b060c68b-f941-46b5-a260-a8364b05b083；代码基线：none

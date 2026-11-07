@@ -17,6 +17,11 @@
 - cursor 会话: be883941-555c-45f9-bd6f-1078dd8d0fc0
 - 所属项目: 淮安物管 zhi2-web-admin; baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
+- 来源会话：be883941-555c-45f9-bd6f-1078dd8d0fc0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

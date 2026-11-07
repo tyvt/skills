@@ -3,6 +3,12 @@
 - Replace hardcoded colors (e.g. `#007A39`) with theme variables `var(--primary-color)` and `rgba(var(--primary-color-rgb),0.1)` for Tab active state and summary background.
 - Reference fix session: 518350aa-c9b8-4693-b776-97fb2bd8ddb3
 
+## 验证与归属
+- 所属项目：无锡市区小程序嵌入H5
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：518350aa-c9b8-4693-b776-97fb2bd8ddb3
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

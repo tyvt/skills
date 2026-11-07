@@ -12,6 +12,7 @@
 - 自动补齐 `=` 至 4 的倍数，校正密文格式后再解密
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=靖江物管G
 - 验证证据：src=靖江物管G/001.md
 - 涉及文件：src/request/index.js、src/utils/request.js
 - 所属项目：靖江物管G；来源会话：6b27025b-cc03-4bb5-ab31-083c121c2826

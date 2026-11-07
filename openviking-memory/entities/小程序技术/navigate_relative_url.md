@@ -9,6 +9,7 @@
 - 多级相对如common/DecisionResult?id=...同样拼接；已是/pages_...或http://等协议开头原样返回
 - 一处收口覆盖全项目goto/redirectTo调用，不必逐页改pages_vote下倡议/投票/维修资金等模块
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话010bdda8报错navigateTo:fail page，源码两处goto相对路径；结论在openPage内新增解析覆盖多模块
 - 涉及文件：src/utils/index.js、src/pages_vote/decision/index.vue、src/pages.json
 - 所属项目：苏住房C；来源会话ID：010bdda8-aa5a-4e50-bc2e-6187b98c3ce5；代码基线：b7bf813

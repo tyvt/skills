@@ -12,6 +12,7 @@
 - 切换金额类型时对该字段 clearValidate，避免隐藏字段残留必填提示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 4262bed0，用户报新增时类型显示0且切换不回，定位 detail.vue 默认写死 '0' 与比较不一致
 - 涉及文件：zhi2-web-admin/src/views/property/expenditureContract/detail.vue；zhi2-web-admin/src/mixins/detailMixins.js
 - 所属项目：苏住房G；来源会话ID：4262bed0-d061-41ed-8364-ba4f6496d209；代码基线：4fad664

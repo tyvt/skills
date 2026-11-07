@@ -12,6 +12,7 @@
 - 同步更新 mounted、beforeDestroy 及相关方法引用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/097.md
 - 涉及文件：zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue、zhi2-web-admin/src/views/property/complex/index.vue
 - 所属项目：苏住房G；来源会话ID：9585b1b4-8f7c-4b98-81e1-bf7e7b44659c；代码基线：none

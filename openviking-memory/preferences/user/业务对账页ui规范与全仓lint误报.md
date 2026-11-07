@@ -5,6 +5,11 @@
 - 涉及文件：路由信息.json、repairFunds/finance/rec/index.vue、mixins/ListTemplate.js、repairFunds/finance/rec/detail.vue、components/zs-search-form/SearchFormItem.vue、styles/index.scss、components/zs-select/zs-select.vue、repairFunds/verifyRecord/index.vue
 - 验证：src=苏州市房地产监测V3/095.md（另见 苏州市房地产监测V3-rest/046.md）；来源会话：6c2ced12-a350-48f6-a3e1-2355e67d6ccf
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

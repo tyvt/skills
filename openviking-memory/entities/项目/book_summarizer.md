@@ -19,6 +19,11 @@
 ## 关联
 - 记录于 book-summarizer/001.md（会话 16cfcbd7-f1da-4c37-85fc-9b33c312a150）
 
+## 验证与归属
+- 所属项目：book-summarizer
+- 验证证据：extracted source=cursor project=book-summarizer
+- 来源会话：16cfcbd7-f1da-4c37-85fc-9b33c312a150
+
 
 <!-- MEMORY_FIELDS
 {

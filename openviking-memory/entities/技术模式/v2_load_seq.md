@@ -11,6 +11,7 @@
 - 评审按「加载函数清单」逐个核对 seq，新增面板把 seq 当必写项
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：评审指出 index-v2.vue:274-291 loadStudyList 未用 seq，230-272 loadBenefitData/loadRepairData 同样无保护
 - 涉及文件：zhi2-web-admin/src/views/home/index-v2.vue
 - 所属项目：苏住房G；来源会话ID：22db11e4-4ebb-4504-8a6e-e93aa9791182；代码基线：9e5c499

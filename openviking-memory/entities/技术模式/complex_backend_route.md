@@ -14,6 +14,10 @@
 - 涉及文件：property/complex/detail.vue、mixins/form.js、detailMixins.js、OperationBtnGroup/index.vue、terminalUser.js、projectContext.js、.gitmodules、env/.env
 - 所属项目：苏住房G；来源会话：231da5b0-82db-4a83-819f-b9b0376ce290；代码基线：2a3ef8a
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -17,6 +17,8 @@
 - presale/permit/plan/detail.vue
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/134.md e src=苏州市房地产监测V3/169.md
 - 来源会话：5c76bcbe-41b3-4397-80d0-5a0934fb8fbd；代码基线：none
 

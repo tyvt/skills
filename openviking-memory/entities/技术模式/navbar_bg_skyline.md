@@ -8,6 +8,8 @@
 ## 涉及文件
 - `zhi2-web-admin/src/layout/components/Navbar.vue`
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：来源会话 34e98571-54c2-446a-b11e-33e725fa6bc5
 - 代码基线：none
 

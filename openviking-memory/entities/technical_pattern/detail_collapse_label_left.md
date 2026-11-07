@@ -10,6 +10,12 @@ In Suzhou Real Estate Monitoring V3, the `label-position="left"` collapse area (
 - Files: detail-form.scss, index.scss, detail.vue, variables.css, Headline/index.vue, detail-template.vue, detailLayout.js
 - Source session: 22342137-7680-4a86-9ec8-e4647eb82f33; code baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：22342137-7680-4a86-9ec8-e4647eb82f33
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

@@ -9,6 +9,11 @@
 【来源会话ID】975225e8-e1a6-4da7-93a6-729b6c448b11
 【代码基线】none
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "合并suzhufang分支更新子模块",

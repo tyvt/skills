@@ -12,6 +12,10 @@
 - 文件：`zhi2-web-admin/src/views/property/propertyContract/components/detail.vue`、`detail-template.vue`
 - 项目：产品2.0；来源会话：f3762574-10fb-4d07-adb1-cfcfca9fd8aa；代码基线：none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

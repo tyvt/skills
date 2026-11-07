@@ -10,6 +10,7 @@
 - 确保动态路由注册完成后再跳转
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/164.md
 - 涉及文件：router/index.js、store/modules/permission.js、utils/permission.js、views/login、main.js、store/modules/user.js、utils/ruoyi.js、views/home/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：5657d5ac-3d67-4095-b7de-c93ba44cfa41；代码基线：none

@@ -10,6 +10,7 @@
 - `detail.vue` 改调统一 `filePreview`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证证据：src=昆山市民/005.md
 - 涉及文件：src/pages_contract/detail.vue、src/utils/index.js、package.json、src/utils/resolveAssetUrl.js、src/pages_vote/vote/material.vue、src/env/mp.js、src/pages.json、vite.config.js
 - 所属项目：昆山市民；来源会话ID：80b2d970-e79a-47cf-80f8-ee0a0c415a96；代码基线：none

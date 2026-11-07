@@ -13,6 +13,7 @@
 - src/api/presale/contractMainInfo.js、src/api/finance/vendee.js、src/api/finance/account.js 等
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：d2a25c11-5573-4bb1-8287-710071ae4f2f
 - 代码基线：none

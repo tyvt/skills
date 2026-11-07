@@ -8,6 +8,7 @@
 - advertiseTable.vue（约 44:46 行发起请求），mixins/table.js（约 273:280 行）
 - publicQuery/complex/index.vue、publicQuery/complex/detail.vue
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话：412004c0-e9c3-4f85-9196-c4db04c58e93；代码基线：none
 
 <!-- MEMORY_FIELDS

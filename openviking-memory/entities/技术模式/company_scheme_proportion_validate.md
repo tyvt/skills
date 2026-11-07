@@ -7,6 +7,7 @@
 - 监听 form.chargeType 切换重新校验
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/183.md
 - 涉及文件：company/companyScheme/detail.vue、api/company/companyScheme.js、institution/agencyPersonnel/components/AgencyPersonnelDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：6b993f54-a54c-46d4-bd1e-32b8da6cc3ba；代码基线：none

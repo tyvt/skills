@@ -7,6 +7,8 @@
 - 最常见原因为重复触发登录流程，并发请求互相打断
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 来源会话ID：abc57820-2b35-4849-8e23-0d665121c69f
 - 代码基线：none
 - 涉及文件：src/utils/wxLogin.js、src/api/modules/estate.js、src/request/index.js、src/App.vue、src/pages_vote/vote/index.vue、src/env/mp.js、src/pages_home/home.vue

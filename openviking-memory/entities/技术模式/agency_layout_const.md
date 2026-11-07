@@ -14,6 +14,7 @@
 - companyApply/detail.vue、AgencyBranchDetail.vue、AgencyPersonnelDetail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/084.md
 - 所属项目：苏州市房地产监测V3；来源会话：a842ef5b-a67e-4ebf-9a51-02e32f93dfee；代码基线：none
 

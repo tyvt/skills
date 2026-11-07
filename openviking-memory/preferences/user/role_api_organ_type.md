@@ -4,6 +4,12 @@
 - Role dropdown loads the corresponding org-role list only after an org type is selected
 - Verification: src=园区公共收益/027.md; Files: autonomy/ownerCommitteeWorker/detail.vue, system/user/detail.vue, autonomy/record/components/enums.js, company/userManagement/operator/operatorTable.vue, operatorAddDialog.vue, toB/personnelRecord/components/detail.vue, system/role/detail.vue, login.vue; Source session: 9878244d-a568-49fa-8751-9ff53a3f3559
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：9878244d-a568-49fa-8751-9ff53a3f3559
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

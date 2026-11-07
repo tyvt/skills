@@ -11,6 +11,7 @@
 - 在 `announcement/index.vue` 的 map 中补充 `msgType: el.msgType`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 来源会话：636ac7f6-e11f-4469-91e7-916792d8743b；代码基线：none
 - 涉及文件：src/pages/announcement/index.vue、NoticeList.vue、src/pages/project/announcement/index.vue
 - 所属项目：无锡市区小程序嵌入H5

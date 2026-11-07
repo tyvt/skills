@@ -21,6 +21,12 @@ FjDialog.vue used dialogMixins but old REST endpoints caused wrong addresses; ad
 ## Verification
 - Source: 产品2.0/041.md; session: 4d504758-e807-4d71-ab92-00820c1154ef
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：4d504758-e807-4d71-ab92-00820c1154ef
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

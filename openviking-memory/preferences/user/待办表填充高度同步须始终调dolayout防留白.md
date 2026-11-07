@@ -3,6 +3,11 @@
 - 涉及文件：zhi2-web-admin/src/views/home/components/HomeTodoTable.vue、zhi2-web-admin/src/views/home/index.vue、zhi2-web-admin/src/views/home/index-new.vue、zhi2-web-admin/src/views/home/index-wrapper.vue、zhi2-web-admin/src/views/home/components/layouts/HomeLayoutAdmin.vue、zhi2-web-admin/package.json、zhi2-web-admin/e2e/list/table-column-width.spec.js、zhi2-web-admin/src/components/zs-table/zs-table.vue
 - 验证：cursor 会话提取；来源会话 b25bdc8a-c0a8-4fca-bcff-d85e7e292acd
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

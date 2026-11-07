@@ -12,6 +12,7 @@
 - 新增 compact 模式最多展示 2 标签 + +N；增加 .label-tags-column-cell .cell{overflow:hidden}
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话：cd131f8a-851c-4400-9f82-ea7bc72a8626
 - 涉及 complex/index.vue、dict-tag.vue 等
 

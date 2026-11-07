@@ -13,6 +13,7 @@
 - `src/views/presale/permit/permitConstants.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/171.md
 - 来源会话ID：76e18476-410b-48e2-8684-b252aafae89d
 - 所属项目：苏州市房地产监测V3；代码基线：none

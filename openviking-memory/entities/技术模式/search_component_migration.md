@@ -11,6 +11,7 @@
 - 修复 `AddParcelDialog.vue` 与 `SelectUnitDialog.vue` 按钮组
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：7f91916e-63e0-4f5a-adb3-32a34614d089；代码基线：none
 
 <!-- MEMORY_FIELDS

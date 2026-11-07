@@ -16,6 +16,10 @@
 - 涉及文件：zhi2-web-admin/src/mixins/ListTemplate.js；所属项目：园区物管2.0；来源会话 ID：d7cb3247-4f21-4218-9399-5bdae428c354；代码基线：f101dd464 / fc994977f。
 - 验证：全局排查 179 个带 list-container 的 index.vue，44 个缺 list-card 包裹已补齐，含特殊布局处理表。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -7,6 +7,8 @@
 - 将字段验证移至 company-register-fields.spec.js，且不录制视频。
 - 生成 test-results/company-register-full.webm（~58s），保持断言覆盖率。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：1a0da812-3129-4757-ad86-ae58155f438e
 - 验证证据: cursor session=1a0da812-3129-4757-ad86-ae58155f438e
 - 涉及文件: package.json, playwright.config.js, real-api-flow.spec.js, register-helpers.js, real-api.spec.js, flow.spec.js, ui.spec.js, input-maxlength.spec.js
 - 所属项目: 2-0; 代码基础: none

@@ -17,6 +17,11 @@
 - 验证来源：src=榆林G/001.md
 - 来源会话：3e1bb84d-7826-444e-ba65-f297d674c06d
 
+## 验证与归属
+- 所属项目：榆林G
+- 验证证据：extracted source=cursor project=榆林G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "bug",

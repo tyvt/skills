@@ -12,6 +12,7 @@
 - 用 defineAsyncComponent(loader) 注册 glob 异步组件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 1210ef9d，main.js:39 registerGlobalComponents 多次触发，已改幂等保护与单例 mount；src=2-0/017.md
 - 涉及文件：zhi2-web-admin/src/main.js
 - 所属项目：2-0；来源会话ID：1210ef9d-24f4-4452-a7cc-89267ce1e575；代码基线：none

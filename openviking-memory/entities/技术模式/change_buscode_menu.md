@@ -16,6 +16,7 @@
 - `路由信息.json`、`src/store/modules/permission.js`、`src/api/institution/institutionRegister.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/127.md、src=苏州市房地产监测V3/170.md
 - 来源会话ID：c777f773-e3dd-4546-82b0-7c8dc39476e8
 - 所属项目：苏州市房地产监测V3；代码基线：none

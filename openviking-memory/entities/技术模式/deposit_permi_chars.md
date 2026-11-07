@@ -10,6 +10,7 @@
 - 补录、人工记账、打印等按钮需各自对应权限字符（会话未载全）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 所属项目：太仓G；来源会话：4c6ee833-9c90-4028-9924-d76a48a30e77；代码基线：none
 - 涉及文件：hasPermi.js、hasRole.js、store、directives/permission/index.js
 

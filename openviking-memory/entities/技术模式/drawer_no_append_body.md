@@ -11,6 +11,7 @@
 - 对齐 pubPropertyManage 的实现方式
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 来源会话：359338e5-7bdc-4836-8f28-c8e35d451719
 - 涉及文件：benefit/pubQuarterlyDeclaration/detail.vue、mobilePreview/pubQuarterlyDeclaration/index.vue、benefit/pubAdvertiseSpace/detail.vue、mobilePreview/components/mobileContainer.vue、mobilePreview/pubPropertyManage/index.vue、mixins/detailMixins.js、mixins/form.js、styles/index.scss
 - 所属项目：园区物管2.0；代码基线 none

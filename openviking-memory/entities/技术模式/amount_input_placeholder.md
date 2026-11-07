@@ -20,6 +20,7 @@
 - d:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/presale/cashsale-apply-detail-layout.spec.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/020.md
 - 来源会话ID：6b280839-f450-444e-b4d9-5cb55916b900
 - 所属项目：苏州市房地产监测V3；代码基线：none

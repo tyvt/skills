@@ -11,6 +11,11 @@
 - 文件：`xy/index.vue`、`progress/gcht/index.vue`、`progress/change/index.vue`、`progress/bdcdj/index.vue`
 - 项目：产品2.0；来源会话：0c55b984-d193-404d-80bd-37db6196ab05；代码基线：none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -14,6 +14,7 @@
 - `dataHelpers.js` 新增 `applyFundIncomeExpenditureTrendFromApi` 解析函数（约 84:114 行）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：cursor 会话 89f3491d 提取，当前代码已适配
 - 涉及文件：benefit/mapOverview/dataHelpers.js、benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；来源会话：89f3491d-92ec-4f80-ad71-e695f8826a01；代码基线：none

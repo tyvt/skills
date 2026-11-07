@@ -13,6 +13,12 @@ Warning `There is a chart instance already initialized on the dom` comes from mo
 - Files: zhi2-web-admin/src/views/benefit/dataStatistics/components/communityStatistics.vue, zhi2-web-admin/src/views/dataStatistics/components/componentCharts.vue, zhi2-web-admin/src/views/monitor/components/ComponentCharts.vue
 - Project: 2-0; Source session: 2a9f420a-f2ff-426a-a5c2-7881713c1a52; Code baseline: none
 
+## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
+- 来源会话：2a9f420a-f2ff-426a-a5c2-7881713c1a52
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

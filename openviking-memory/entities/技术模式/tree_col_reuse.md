@@ -11,6 +11,7 @@
 - 加请求序号保护 listRequestId，响应回来序号不匹配则丢弃
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：064.md 会话 ecdea30a 用户纠正「不是设计问题，而是反复点击市级区级街道会错乱」
 - 涉及文件：system/regionBankAuth/index.vue、system/regionBankAuth/utils.js、mixins/listMixins.js
 - 所属项目：苏住房G；来源会话ID：ecdea30a-99b2-441c-917e-7cbad52000ed；代码基线：864b409

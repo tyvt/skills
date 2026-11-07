@@ -18,6 +18,12 @@
 - 源会话: d88a1f97-8d9a-4d6d-a7cd-02ddf13b5a0d.
 - 代码基线: none.
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：d88a1f97-8d9a-4d6d-a7cd-02ddf13b5a0d
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "缺陷修复",

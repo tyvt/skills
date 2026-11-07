@@ -11,6 +11,8 @@
 - `src/views/register/companyRegister.vue`, `accountInfo.vue`, `registerValidate.js`, `dialog.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：005d84fc-8f79-4a0c-9b99-de4b2a6bcd0a
 - 验证证据: 提取自 cursor session=005d84fc-8f79-4a0c-9b99-de4b2a6bcd0a
 - 代码基线: none; 所属项目: Produto 2.0
 

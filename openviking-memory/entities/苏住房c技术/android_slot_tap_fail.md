@@ -14,6 +14,7 @@
 - 验证须在安卓真机点按钮，模拟器不一定复现
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 365c14a6「我的决策点击参与决策还是没有反应，但是直接点击整个卡片可以进入」
 - 涉及文件：src/pages_vote/decision/index.vue、DecisionList.vue、detail.vue、src/pages_vote/elect/index.vue
 - 所属项目：苏住房C；来源会话ID：365c14a6-d64c-46e7-af26-8a237fa7b8c3；代码基线：f1939b0

@@ -12,6 +12,7 @@
 - 新增脚本 `scripts/fix-detail-chunk-load.mjs` 辅助修复
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 批量修复已完成，`npm run build` 通过
 - 所属项目：苏州市房地产监测V3；来源会话ID：d05a4bd7-de6f-4b41-9315-000271ae8a10；代码基线：none
 

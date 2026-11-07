@@ -14,6 +14,7 @@
 - 与苏房系「meta → 流程配置表解析 submitApi」旧三级方案不同，属同一产品线接口约定演进，改园区项目勿照搬 resolveFlowSubmitApi
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证会话：51f3071e（新增 flowApi.js、操作前 flowConfig 校验；workflow 配置去掉接口字段）
 - 补充验证会话：4ad7e2c6（ApprovalProcessDialog 等审核弹窗改走 getApprovalApi，与 OperationBtnGroup 一致；示例路径 pubRegulatoryAccount；代码基线 b6bf87d）
 - 涉及文件：utils/flowApi.js、OperationBtnGroup/index.vue、ZsSubmit/index.vue、zs-approval/index.vue、tool/workflow/index.vue、ConfigDialog.vue、zhi2-web-admin/src/views/benefit/components/ApprovalProcessDialog.vue、zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue

@@ -9,6 +9,7 @@
 - 创建弹窗实例时注入 `store`、`router` 并设置 `parent`，与 `main.js` 中 `window.__VUE_APP_STORE__` 设计一致。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：src/components/zs-select-dialog/zs-select-dialog-func.vue、src/mixins/table.js、src/main.js、src/views/autonomy/general/detail.vue
 - 所属项目：园区物管2.0；来源会话：7f55cc88-82e0-457b-85fe-e1f0ed843e51；代码基线：none
 

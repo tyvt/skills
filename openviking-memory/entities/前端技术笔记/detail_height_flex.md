@@ -11,6 +11,7 @@
 - 右侧 .area-overview-wrapper 及内部 Headline（.collapse-container、.collapse-content）逐级 flex:1 填满高度。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：刷新「物业管理区域变更详情」页面后左右底部应对齐。
 - 涉及文件：complexChange/detail.vue、complex/detail.vue、components/Headline/index.vue 等（路径前缀 d:/repository/产品2.0/zhi2-web-admin/src）。
 - 所属项目：产品2.0；来源会话：1e61e3a9-dc70-4426-b664-29e85e61ae8d；代码基线：none

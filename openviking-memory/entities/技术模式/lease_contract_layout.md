@@ -11,6 +11,8 @@
 - 按收支类型映射 `customerName`/`supplierName` 等字段
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 涉及文件：leaseContract.vue
 - 来源会话：43549acf-0aa1-4cd4-8f0e-ee68c6c1e2c8
 - 代码基线：none

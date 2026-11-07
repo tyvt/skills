@@ -8,6 +8,7 @@
 - 防重复点击：`showCount || sendLoading` 时 `sendCode()` 直接 return
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：3c5a3522-257e-40bb-9d05-80dadfbbb3a7；代码基线：none
 - 涉及文件：`companyRegister.vue`、`accountInfo.vue`（路径 `zhi2-web-admin/src/views/register/components/accountInfo.vue`）
 

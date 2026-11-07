@@ -18,6 +18,7 @@
 - zhi2-web-admin/e2e/fixtures/contract-sign-helpers.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/027.md
 - 来源会话：aa2afcf7-1398-4cdf-93b4-30183eff923a
 - 所属项目：苏州市房地产监测V3；代码基线：none

@@ -12,6 +12,12 @@ The logininfor list column bound `prop` to `loginName` while the API returns `us
 - File: zhi2-web-admin/src/views/system/logininfor/index.vue
 - Project: 产品2.0; source session: 84875e01-4384-43b4-be86-efa80af55ef5; code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：84875e01-4384-43b4-be86-efa80af55ef5
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

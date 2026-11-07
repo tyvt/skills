@@ -2,6 +2,11 @@
 - `src/utils/index.js` 移除 `/zs-fym` 特殊分支统一用 `VITE_APP_API_PROXY`；`vite.config.ts` 本地代理同步指向该变量；`swiperImage.vue` 补充 `:local` 属性绑定
 - 验证证据：src=苏住房C/075.md；来源会话：bb5ef4f6-787c-49c9-b071-0b62385878d7
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

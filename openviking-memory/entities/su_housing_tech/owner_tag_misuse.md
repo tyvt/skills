@@ -13,6 +13,12 @@ In the 苏住房C mobile end, the bottom "contact owner" area avatar used an HTM
 - Files: pages_transaction/stockHouse/detail.vue, components/ZsImage/ZsImage.vue, pages_transaction/stockHouse/agentDetail.vue, uni.scss, pages.json
 - Project: 苏住房C (zhi2-mobile-shimin); source session: 3c86796a-b65f-466f-a1d2-266feae580a5; code baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：3c86796a-b65f-466f-a1d2-266feae580a5
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_tech",

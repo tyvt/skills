@@ -12,6 +12,12 @@ The zs-operate-column button container style was changed from center to flex-sta
 - Source cursor session: 10245f13-6519-46f8-a323-cd84d8946449
 - Code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：10245f13-6519-46f8-a323-cd84d8946449
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

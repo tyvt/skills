@@ -13,6 +13,7 @@
 - 通用结论：小程序固定列数卡片墙含nowrap文本+图片+图标时，优先Grid+minmax(0,1fr)+min-width:0三件套。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话9774c8d1用户先贴截图问UI崩，修图标后仍两列未恢复，最终给四项修复。
 - 涉及文件：zhi2-mobile-shimin/src/pages_main/publicNotice/index.vue、components/ZsImage/ZsImage.vue。
 - 所属项目：苏住房C；代码基线：bb6d74a；来源会话ID：9774c8d1-2b21-4a57-a4db-44c6514d4939。

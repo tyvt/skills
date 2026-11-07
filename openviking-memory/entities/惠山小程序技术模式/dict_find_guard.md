@@ -14,6 +14,8 @@
 - index.vue
 
 ## 验证与归属
+- 所属项目：惠山小程序
+- 验证证据：extracted source=cursor project=惠山小程序
 - 验证证据：src=惠山小程序/004.md
 - 来源会话：a609b7a6-492a-4565-8427-a19d3fa0849f
 - 代码基线：none

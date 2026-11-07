@@ -12,6 +12,7 @@
 - 搜索筛选项：从 `select` + 手动 options 改为 `type: 'dict'` + `dictUrl`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新页面后业务类型显示中文；若仍显示 `1` 需核对后台字典 `house_limit_business_type` 配置
 - 所属项目：苏州市房地产监测V3；来源会话：a4b95ede-26b5-43a3-8433-7a4a7725ca8c
 - 涉及文件：`src/views/building/houseLimitAudit/index.vue`、`houseLimitConstants.js`

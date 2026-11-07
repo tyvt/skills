@@ -12,6 +12,8 @@
 - 合并前 filter 过滤 value 为空项，仅保留手动添加项（会话 0d2c6516）
 
 ## 验证与归属
+- 所属项目：无锡市区小程序嵌入H5
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：src=无锡市区小程序嵌入H5/012.md
 - 涉及文件：src/pages_benefit/sharedFunds/components/DetailsTab.vue、src/api/common.js、src/pages_benefit/sharedFunds/components/OverviewTab.vue、src/pages_benefit/sharedFunds/components/PublicityTab.vue
 - 来源会话：c3697b27-3a83-450d-a4a0-5c2a22ae4a0e、0d2c6516-1930-4d19-b020-1182a8c885bb；代码基线：none

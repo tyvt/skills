@@ -16,6 +16,8 @@ uni-app 构建后 Vite 重新注入入口脚本且不带原 onload，导致生�
 - 可选方案：将隐藏动作挪到 main.js 的 `createApp().mount()` 完成后（仅等 main.js 下载完而非挂载完），未实施
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证：会话 0c26f1bc/128b09bc 生产一直 loading，根因 Vite 注入覆盖 onload，移到 onLaunch（证据 012.md）
 - 涉及文件：index.html、src/App.vue
 - 来源会话ID：0c26f1bc-7368-462a-ba7f-eae1213f73a1, 128b09bc-4bce-4355-8562-746d9dba13c3；代码基线：none

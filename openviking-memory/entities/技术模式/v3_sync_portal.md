@@ -18,6 +18,10 @@
 ## 归属信息
 - 所属项目：门户；来源会话：f1dec228-6407-422d-9866-035a036d169f
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

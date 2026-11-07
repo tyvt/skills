@@ -14,6 +14,7 @@
 - zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 所属项目：园区物管2.0；来源会话：b290ab4f-dc47-412c-b6bb-780421a0a4ae
 
 <!-- MEMORY_FIELDS

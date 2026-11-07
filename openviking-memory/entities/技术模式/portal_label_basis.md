@@ -12,6 +12,7 @@ publicPortal 表单项标签若仅用 min-width 会因长文案变宽导致值�
 - Fix 已对齐 PropertyDetailDialog
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：会话 03d20bf9 [HIGH] 标签仅用 min-width，值列对齐弱于许可弹窗；Fix 对齐 PropertyDetailDialog
 - 涉及文件：zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue；zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue
 - 所属项目：门户；来源会话ID：03d20bf9-e86f-46c1-aa96-4b6f60f3e8f1；代码基线：门户 zhi2-web-admin @ e1f8e0b

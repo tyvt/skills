@@ -7,6 +7,7 @@ i淮安公版项目 zhi2-mobile-admin-h5-c-unlimited 的 benefit.js 中 4 个接
 - 去掉多余的分号和 `options` 透传，风格与本文件其它接口保持一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安公版
 - 已检查 lint 无报错
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/api/benefit.js
 - 所属项目：i淮安公版；来源会话：11851de5-f99c-42f7-a3d4-0a24cc94bf1c；代码基线：none

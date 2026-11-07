@@ -2,6 +2,10 @@
 - 实现方式：新增 createEmptyPanoramaCards() 保留标题、单位、配色等静态配置而数值置空（summaryValue: 0、donutData: []、barValues 全为 0）；初始化改为 `USE_MOCK_DATA ? cloneMockCards() : createEmptyPanoramaCards()`。
 - 适用页面：assetPanorama、fundPanorama 等数据沙盘页；所属项目：园区物管2.0；来源会话：0d12bfa5-5326-44a2-8e2c-d1e5aeef584f。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

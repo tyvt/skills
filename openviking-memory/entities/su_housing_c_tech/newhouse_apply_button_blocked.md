@@ -12,6 +12,7 @@
 - 列表区域保留在默认插槽中
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译小程序后，进入「我的→一手房交易→选择区域」点击「去申请」应正常跳转
 - 涉及文件：newHouseCertification/index.vue、detail.vue等
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：1cc8c845-4c5d-4565-a1fd-23d08d025e11；代码基线：none

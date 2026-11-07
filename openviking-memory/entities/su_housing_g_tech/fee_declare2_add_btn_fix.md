@@ -11,6 +11,7 @@
 - 若仍不显示，检查当前账号是否拥有 `property:feeDeclare2:add` 权限
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：`feeDeclare2/index.vue`、`detail.vue`、`bankReceiptApply/index.vue`
 - 所属项目：苏住房G；来源会话：f4e0ac7d-a0ef-4129-865f-513d5d38a34d；代码基线：none
 

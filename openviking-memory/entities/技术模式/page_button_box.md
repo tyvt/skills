@@ -7,6 +7,8 @@
 - `PageButton.vue` 增加 `box-sizing: border-box` 与 `min-height: calc(136rpx + safe-area-inset-bottom)` 及 `constant()` 兼容。
 - `uni.scss` 新增 `--page-button-area-height` 变量，`record/index.vue` 与 `record/add.vue` 等 `padding-bottom` 改为该变量。
 ## 验证与归属
+- 所属项目：物业手持B端
+- 验证证据：extracted source=cursor project=物业手持B端
 - 验证证据：src=物业手持B端/002.md
 - 涉及文件：src/components/PageButton/PageButton.vue、src/pages_facility/record/add.vue、src/pages_facility/record/index.vue、src/pages_facility/record/addScrap.vue、src/pages_facility/issue/detail.vue、src/pages/cashier/index.vue、src/App.vue、src/pages_facility/repair/submit.vue
 - 来源会话ID：5f92693a-f239-424f-9269-4366a09e5165

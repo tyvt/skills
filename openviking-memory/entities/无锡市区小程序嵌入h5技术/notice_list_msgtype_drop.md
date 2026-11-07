@@ -15,6 +15,7 @@ NoticeList等子组件用getDictLabel展示类型标签时因父页map漏传msgT
 - 改完刷新列表验证标签文案与配色；若仍裁切再查固定宽度样式（如72rpx）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 来源会话：636ac7f6-e11f-4469-91e7-916792d8743b
 - 代码基线：3c384c1
 - 涉及文件：pages/announcement/index.vue、pages/announcement/components/NoticeList.vue

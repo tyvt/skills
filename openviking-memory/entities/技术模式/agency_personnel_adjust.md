@@ -10,6 +10,7 @@
 - 同步涉及 CancelDialog.vue、AgencyPersonnelDetail.vue 与 e2e 流程测试文件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/210.md
 - 涉及文件：zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelList.vue、StatusAdjustDialog.vue、CancelDialog.vue、AgencyPersonnelDetail.vue、e2e/institution/agency-personnel-real-api-flow.spec.js、agencyBranch/components/CancelDialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话：a69a7578-b9cb-4b52-8576-558dbd40c136；代码基线：none

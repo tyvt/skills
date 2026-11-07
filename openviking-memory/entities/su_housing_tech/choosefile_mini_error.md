@@ -14,6 +14,12 @@ ImageUploader.vue called uni.chooseFile directly, unsupported in WeChat mini-pro
 - Files: ImageUploader.vue, register.vue, file.js, api/index.js, utils/index.js, ZsUploader.vue
 - Source session: f62dbdc4-5a71-4b38-86cc-ade4a540eb59
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：f62dbdc4-5a71-4b38-86cc-ade4a540eb59
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_tech",

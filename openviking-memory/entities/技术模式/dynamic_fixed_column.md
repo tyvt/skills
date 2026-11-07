@@ -12,6 +12,7 @@
 - 切换 Tab 时清掉残留筛选
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 c17819e8 用户两次反馈切换 tag 数据不显示；改 optionDecision/DecisionRangeTable 与 detail Tab 后 doLayout
 - 涉及文件：zhi1-web-admin/src/views/estate/optionDecision/components/DecisionRangeTable.vue、optionDecision/detail.vue、components/zsTable/index.vue
 - 所属项目：太仓G；来源会话：c17819e8-f61e-40ed-99cc-c04ba5efd9a5；代码基线：2ded8f9

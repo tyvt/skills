@@ -10,6 +10,7 @@
 - `.operation-btn-group` 设置 `order: -1`，保证按钮组始终置顶
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 价格备案详情页验证：按钮 top 128px，表单 top 209px，按钮在表单上方
 - 刷新后价格备案、项目管理、预售资金等模块详情页按钮均应回顶部
 - 若个别页面异常，发具体菜单路径即可

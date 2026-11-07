@@ -13,6 +13,7 @@
 - 先 grep 同名方法：`complexBuildingAuth/detail.vue` 有同名 handleChangeFloorArea 但模板无对应面积输入框，属死代码勿改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 推论：凡是只读派生字段（合计、面积、里程、比例）都由 watch 驱动，勿依赖交互事件
 - 验证：移除面积字段 @change、新增 watch 监听 aboveFloorArea/underFloorArea，同步到 complex、complexChange、complexSearch 三处
 - 涉及文件：zhi2-web-admin/src/views/property/complex/detail.vue、property/complexChange/detail.vue、building/complexSearch/detail.vue

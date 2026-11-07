@@ -15,6 +15,11 @@ In Suzhou Real Estate Monitoring V3, building number display logic uniformly pre
 - Evidence: src=苏州市房地产监测V3/122.md
 - Project: 苏州市房地产监测V3; Session: 762f7645-68ac-43ea-9ab7-f47dca205482; Baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：762f7645-68ac-43ea-9ab7-f47dca205482
+
 
 <!-- MEMORY_FIELDS
 {

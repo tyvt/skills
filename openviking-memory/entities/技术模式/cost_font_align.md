@@ -8,6 +8,8 @@
 - 单位标签字体由 `24rpx` 调整为 `28rpx`，并加高标签尺寸。
 - 右侧费用标签统一：`right-wrap` 调整为 `34rpx`。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/017.md
 - 涉及文件：src/pages_maintain_project/final-cost-detail.vue、src/pages_maintain_project/maintainProject.js、src/pages_maintain_project/apply-detail.vue、src/pages_maintain_project/project.vue、src/pages.json、src/pages_maintain_project/object-detail.vue、src/pages_maintain_project/index.vue
 - 来源会话ID：4c90dc3a-eeec-4537-9d3c-3ea81520df95

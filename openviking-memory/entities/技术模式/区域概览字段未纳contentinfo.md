@@ -13,6 +13,8 @@
 - zhi2-web-admin/src/views/property/propertyContract/components/detail.vue
 - zhi2-web-admin/src/components/change-record-dialog/change-record-dialog.vue
 ## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
 - 来源会话：3badcbf0-1f78-46b6-adad-d5ac25a98bda；代码基线：none
 
 <!-- MEMORY_FIELDS

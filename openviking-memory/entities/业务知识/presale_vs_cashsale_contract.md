@@ -13,6 +13,10 @@
 - 所属项目：苏州市房地产监测V3；来源会话：d1778753-1044-48f0-a6e3-b3b3124bd28e
 - 涉及文件：PresaleSelectBuildingDialog.vue、CashsaleSelectBuildingDialog.vue、路由信息.js
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "业务知识",

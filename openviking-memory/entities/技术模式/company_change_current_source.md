@@ -7,6 +7,8 @@
 - `companyRecord/detail` 仅用于变更前比较或资质回退
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：3f9ce4c0-b3bb-452e-a7ac-6701f6c35e2e
 - 验证证据: src=cursor session=3f9ce4c0-b3bb-452e-a7ac-6701f6c35e2e
 - 涉及文件: toB/companyRecord/detail.vue, api/company/companyRecord.js, company/companyManagement/components/DeveloperBasicInfoDetail.vue, DeveloperBasicInfoForm.vue, utils/registerQualification.js
 - 所属项目: 苏州市房地产监测V3; 会话: 3f9ce4c0-b3bb-452e-a7ac-6701f6c35e2e

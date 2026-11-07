@@ -21,6 +21,12 @@ In the zhi2-web-admin project's mapOverview page, the administrative division ma
 - Source session: cddb6eee-4c9a-4c3f-9de6-1a21655f7967 (cursor extraction).
 - Project: zhi2-web-admin (Wuxi urban area G / Campus Property Management 2.0).
 
+## 验证与归属
+- 所属项目：无锡市区G
+- 验证证据：extracted source=cursor project=无锡市区G
+- 来源会话：cddb6eee-4c9a-4c3f-9de6-1a21655f7967
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

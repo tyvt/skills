@@ -16,6 +16,7 @@
 - 验收：主按钮禁用=半透明主题蓝、plain=半透明主题色边框文字、默认/取消=灰底
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 a82b1c4d「很多按钮禁用状态下的背景色是绿色，全局排查修复」；会话 2a7e26fd「pages_vote/elect/needToKnow 按钮禁用背景色为什么是绿色」
 - 涉及文件：src/components/ZsButton/ZsButton.vue、src/styles/zs-button.scss、src/styles/index.css、src/uni.scss、src/App.vue、src/pages_main/login/index.vue、src/pages_vote/decision/needToKnow.vue、src/pages_vote/elect/needToKnow.vue、src/components/shared/AgreementPage.vue
 - 所属项目：苏住房C；来源会话ID：a82b1c4d-6931-4bc6-bd80-8e4198e22765, 2a7e26fd-2145-4c85-840c-3ea11b150b32；代码基线：4d6dba9, b7bf813

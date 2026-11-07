@@ -9,6 +9,7 @@ contentInfo/contentInfo2 计算属性中 label 含特定关键词的项需统一
 - 涉及 166 个 `.vue` 文件 197 处替换，脚本校验零遗漏
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=web-admin
 - 验证证据：src=web-admin/001.md
 - 涉及文件：`.vue`
 - 所属项目：园区物管2.0；代码基线 none；来源会话：16386daf-af1e-478d-8f26-18c54b8c5204

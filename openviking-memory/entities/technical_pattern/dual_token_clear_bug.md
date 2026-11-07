@@ -13,6 +13,7 @@
 - login.vue 等补充 token 校验与日志
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡锡山业主决策H5
 - 验证：src=无锡锡山业主决策H5/001.md
 - 涉及文件：src/store/user.js、src/apiV1/index.js、src/apiV1/auth.js、src/http/http.ts、src/pages/common/login.vue、src/pages/index/home.vue、src/api/security.ts、src/pages/login/index.vue
 - 所属项目：无锡锡山业主决策H5；来源会话：d1439aa9-599c-4c6a-9480-89632916160e；代码基线：none

@@ -13,6 +13,8 @@
 - `src/views/company/companyManagement/components/DeveloperBasicInfoForm.vue`、`developerBasicInfoContent.js`
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/031.md
 - 来源会话ID：afc7fb85-765b-420b-b678-2404699727de
 

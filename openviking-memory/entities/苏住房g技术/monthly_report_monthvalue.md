@@ -10,6 +10,7 @@
 - 对regionValues映射及total统一解包为数字
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：苏住房G/085.md
 - 涉及文件：src/views/publicQuery/monthlyReport/detail.vue、src/views/publicQuery/monthlyReport/components/ReportItemsTable.vue、src/utils/monthlyReport.js、src/views/publicQuery/monthlyReportStat/detail.vue
 - 所属项目：苏住房G；来源会话ID：697d27f0-7752-400c-9d86-9e7940bec722；代码基线：none

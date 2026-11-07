@@ -24,6 +24,12 @@ Setting el-tab-pane :name to empty string is illegal in Element UI and makes the
 - Evidence: src=产品2.0/056.md
 - Project: 产品2.0; session: 896a4167-b34c-4afa-9eed-b4e49624b8d5; baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：896a4167-b34c-4afa-9eed-b4e49624b8d5
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

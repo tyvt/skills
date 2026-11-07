@@ -12,6 +12,7 @@ addHouseContract 页面「添加」按钮因布局与组件属性问题显示为
 - 为 button 补充 width: 100%
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：af4e72e7-03c6-4e90-a546-a36ef38a5c56
 - 涉及文件：src/pages_owner/house/owner/addHouseContract.vue、addHouse.vue、src/components/ZsButton/ZsButton.vue
 - 代码基线：none

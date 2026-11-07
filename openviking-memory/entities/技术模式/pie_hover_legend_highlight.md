@@ -14,6 +14,7 @@
 - 监听 mouseover/highlight/mouseout/globalout，兼容单行与多行图例
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：园区物管2.0/035.md
 - 涉及文件：node_modules/zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue、fundPanorama/index.vue、zhi2-web-admin 下同路径 index.vue、package.json、pieLegendHover.js
 - 所属项目：园区物管2.0

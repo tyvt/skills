@@ -11,6 +11,7 @@ building/unit 系列详情页 getFloor 用 mathjs add 求和，floorNumberAbove/
 - building/detail、unit/detail、buildingChange/detail、unitChange/detail 四份详情页需一并排查并同步修复
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：Vue warn 指向 AmountInput，实际为 building/detail.vue getFloor 未对操作数 || 0；修复后四份 building 相关 detail 同步
 - 涉及文件：zhi2-web-admin/src/views/building/building/detail.vue、unit/detail.vue、buildingChange/detail.vue、unitChange/detail.vue、zhi2-web-admin/src/components/AmountInput/index.vue
 - 所属项目：园区公共收益；来源会话：748fb1f8-e625-4295-9c80-d99233536464；代码基线：f783ca2

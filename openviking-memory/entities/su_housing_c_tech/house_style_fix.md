@@ -11,6 +11,7 @@
 - tenant/index.vue 同步采用相同 PageBg 方案
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：house/index.vue、TypeChoose_Suzhufang.vue、tenant/index.vue
 - 所属项目：苏住房C；来源会话ID：41740334-7cda-42d7-b1c3-97712e6c8e6a
 

@@ -12,6 +12,11 @@ js 文件 policy_SmPolicyCommunityRecordAdd.js 在移除 HTML 标签后判定内
 - 涉及文件: policy_SmPolicyCommunityRecordAdd.shtml, policy_SmPolicyCommunityRecordEdit.shtml, js/policy_SmPolicyCommunityRecordAdd.js, js/policy_SmPolicyCommunityRecordEdit.js.
 - 来源会话: c95e7ecd-3f26-4fcc-b024-33db02cc9535.
 
+## 验证与归属
+- 所属项目：园区物管V0
+- 验证证据：extracted source=cursor project=园区物管V0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

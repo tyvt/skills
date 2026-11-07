@@ -16,6 +16,8 @@
 - 在 onLoad 中调用 ensureProjectInfo() 确保进入页面时房屋/项目信息已就绪，地址能正确显示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：ba74b018-bf87-4283-b5cd-cdbfcdac22a7
 - 验证会话：ba74b018-bf87-4283-b5cd-cdbfcdac22a7、c484b1ef-d8e5-4052-a213-4476498f8145（基线0804e57），用户报benefit/elevatorPubEngCons字段未赋值或projectAddress为-；会话07179d96参照benefit页调整elevatorPubEngCons地址取值模式（代码基线：none）
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/App.vue、src/pages/index/useProjectState.js、src/pages_benefit/benefit/index.vue、src/pages_benefit/elevatorPubEngCons/index.vue、src/store/user.js
 - 所属项目：无锡市区小程序嵌入H5

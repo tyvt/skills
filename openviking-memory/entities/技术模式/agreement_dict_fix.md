@@ -10,6 +10,7 @@
 - pubRegulatoryStopAgreement/index.vue 做了相同替换
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 本地冒烟：共有资金→协议签署各选「审核中」「已备案」，Network 确认参数与列表列展示一致
 - 涉及文件：pubRegulatoryAgreement/index.vue、pubRegulatoryStopAgreement/index.vue
 - 所属项目：苏住房G；来源会话ID：c376e461-5508-4c08-8192-16ac1392a65f

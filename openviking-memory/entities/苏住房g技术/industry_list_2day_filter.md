@@ -18,6 +18,11 @@
 - 涉及文件：zhi2-web-admin/src/utils/companyListQuery.js、zhi2-web-admin/src/views/company/companyManagement/property/index.vue、change/index.vue、components/index.vue、trust/index.vue、companyRegister/index.vue、staffManagement/components/index.vue
 - 所属项目：苏住房G
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：84fe40ac-f546-41bc-9d7e-76bd876f4594
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房G技术",

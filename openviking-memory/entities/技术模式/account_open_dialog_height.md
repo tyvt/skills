@@ -10,6 +10,7 @@
 - 通过 ResizeObserver 将表格高度与容器实际高度对齐，避免被 zs-table 固定行高计算覆盖
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 刷新后重新打开弹窗列表区域应显示接近 10 条数据（视屏幕高度），超过可视区域仍可滚动
 - 涉及文件：maintenance/components/OpeningBuildingDialog.vue、accountOpen/owner/components/ScopeSelectDialog.vue、maintenance/components/ScopeSelectDialog.vue；所属项目：产品2.0；来源会话：082a4d1c-6379-4946-a74a-7dab35a3ffd7；代码基线：none
 

@@ -11,6 +11,7 @@
 - 组件内 computed 同名字段可覆盖 mixin 默认值，保持灵活扩展
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/018.md
 - 涉及文件：permsMixins.js
 - 所属项目：2-0；来源会话ID：2f8cc0e9-9cb1-43cb-af76-79b01f8f468f；代码基线：none

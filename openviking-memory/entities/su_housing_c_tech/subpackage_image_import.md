@@ -23,6 +23,12 @@ In WeChat mini-program subpackage pages, writing relative image paths in templat
 - Source cursor session: ea94d6f1-423c-4f81-89fd-77047f891ebe
 - Project: Su Housing C (zhi2-mobile-shimin)
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：ea94d6f1-423c-4f81-89fd-77047f891ebe
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

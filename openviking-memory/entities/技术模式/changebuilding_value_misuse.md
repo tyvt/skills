@@ -9,6 +9,8 @@
 - 修正 `changeBuilding` 内的响应式变量引用，避免误用 `.value`。
 
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/022.md
 - 涉及文件：d:/repository/泰兴小程序/src/pages_facility/facility.vue、d:/repository/泰兴小程序/src/hooks/useAreaDict.js、d:/repository/泰兴小程序/src/pages_owner/repair/chooseFacility.vue、d:/repository/泰兴小程序/src/pages_owner/house/verify.vue、d:/repository/泰兴小程序/src/api/property.js、d:/repository/泰兴小程序/src/pages/index/property.vue
 - 来源会话ID：6a37a278-9845-42f7-b74d-370fb350d16a

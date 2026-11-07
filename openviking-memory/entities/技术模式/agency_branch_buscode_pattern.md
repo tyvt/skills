@@ -10,6 +10,7 @@
 - `companyChangeManage/index.vue` 依据 `busCode === fzjgbg` 跳转分支详情
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/155.md
 - 涉及文件：institution/agencyBranch/components/AgencyBranchDetail.vue、institution/agencyBranch/components/CancelDialog.vue、institution/agencyBranch/detail.vue、api/company/agencyBranchChange.js、institution/agencyPersonnel/components/AgencyPersonnelDetail.vue、company/companyChangeManage/index.vue、e2e/fixtures/institution-menu-config.js、e2e/utils/appendix-requirement-grid.spec.js
 - 所属项目：苏州市房地产监测V3；来源会话：0a4df64c-e15c-40ae-81df-5b5eed7d1ceb；代码基线：none

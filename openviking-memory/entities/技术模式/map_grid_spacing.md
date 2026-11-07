@@ -9,6 +9,7 @@
 - 若需更宽可将 `1.22fr` 调到 `1.28fr`～`1.35fr`；若左侧柱状图过挤则往回调。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；来源会话：1063d8bb-91e2-41cc-a94c-d70270312b59；代码基线：none
 

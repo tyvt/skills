@@ -13,6 +13,7 @@
 - 若新接口字段名与 /property/complex/page 不一致导致地图点不出，需补一层字段映射。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue、property/mapProperty/index.vue。
 - 所属项目：园区物管2.0；来源会话 f2d1a9a6-0158-4986-829e-bf8d662f3dff；代码基线 none。
 

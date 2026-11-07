@@ -7,6 +7,8 @@
 - 已更新 `e2e/fixtures/register-helpers.js` 和 `e2e/fixtures/register-mocks.js`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：008732db-2f2d-46d5-8491-ec57ab3fe2ea
 - 记忆类型: pattern
 - 验证证据: src=产品2.0/034.md
 - 涉及文件: d:/repository/产品2.0/zhi2-web-admin/src/views/register/components/Step3Appendix.vue, src/views/company/companyRegister/detail.vue, src/views/tool/fjflpz/components/FjDialog.vue, e2e/fixtures/register-mocks.js, src/api/company/companyRegister.js, e2e/fixtures/register-helpers.js, src/views/register/companyRegister.vue, src/views/register/components/companyInfo.vue

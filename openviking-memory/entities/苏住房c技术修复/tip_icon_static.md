@@ -11,6 +11,7 @@
 - 修复后路径正确解析为 `/static/icon/tip-szf.png`。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：pages_vote/elect/detail.vue、Tips.vue、utils/mainStaticPaths.js、pages.js。
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：65302824-2836-4c68-a79c-8824fab43793。
 

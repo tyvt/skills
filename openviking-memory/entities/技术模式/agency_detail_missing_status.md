@@ -11,6 +11,8 @@
 - 在 `agencyApplyOverview.js` 中添加共享逻辑 `shouldShowApplyConditionMet`，限定于 `detailScope === 'own'` 及机构展示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：31f62931-8476-44d0-9fee-9330529a9b8b
 - 验证证据: src=苏州市房地产监测V3-leftover/016.md
 - 涉及文件: institution/record/index.vue, router/index.js, institution/company/admin.vue, AgencyBasicInfoDetail.vue, agencyBasicInfoContent.js, toB/agencyRecord/detail.vue, utils/agencyApplyOverview.js, components/HeadTitle/index.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 31f62931-8476-44d0-9fee-9330529a9b8b; Baseline: none

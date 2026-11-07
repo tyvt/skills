@@ -12,6 +12,7 @@
 - 发现「某间距类完全没效果、但元素结构与其他页一致」时，第一反应核对类名拼写规则，而非加 !important 或改父容器 padding
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：用户反馈列表图片太贴边；goodProject/index.vue 改 px-32 为 p-x-32 后列表左右留 32rpx 与搜索栏一致
 - 涉及文件：uno.config.ts、pages_transaction/goodProject/index.vue、pages_transaction/newHouse/index.vue
 - 所属项目：苏住房C；来源会话ID：f0a63c2c-8cc1-48d5-b969-3d5c734700b9；代码基线：77666f8

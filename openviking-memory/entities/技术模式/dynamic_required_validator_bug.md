@@ -11,6 +11,7 @@
 - 枚举/字典值为数字 0 时，判空要同时接受 0 与字符串 '0'（如 houseCategory），避免误报未选。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 验收：新增时不选「经营用房类别」点确定，应在表单项下出现前端红色提示，而非仅弹后端错误。
 - 验证：会话 f1ee611c（2026-06-25，基线 1664d0f）pubHouseDialog.vue 动态 required 未拦住空值提交；结论为增加自定义 validator、submitForm 二次检查，houseCategory 兼容 0 与 '0'。
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubHouse/components/pubHouseDialog.vue；所属项目：淮安物管；来源会话：f1ee611c-8cd6-4f31-969d-934eec1bceb2；代码基线：1664d0f。

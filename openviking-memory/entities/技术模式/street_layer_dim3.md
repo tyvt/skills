@@ -10,6 +10,7 @@
 - 点击下钻：经 `getRegionCode()` 取区县编码且 `dimension: 2`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue
 - 所属项目：园区物管2.0；来源会话：b54c0d36-213e-49e1-97a6-50af9ae3922e；代码基线：none
 

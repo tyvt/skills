@@ -10,6 +10,7 @@
 - 刷新后用款申请图例应为 #EEB57F，与柱体一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 来源会话：74cda9bf-bc09-433c-99cf-1a36768b982a
 - 涉及文件：benefit/dataSandbox/fundPanorama/index.vue
 - 所属项目：园区物管2.0；代码基线 none

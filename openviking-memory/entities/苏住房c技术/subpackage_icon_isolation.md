@@ -16,6 +16,7 @@
 - 心智模型：页面在哪个分包，静态资源就必须在该分包或主包 src/static 下
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 9b333521 用户报电子业主卡图标不显示；结论复制 owner_nav_1~3.png/jiantou.png/question-dark.svg/Bg.svg 到 pages_owner_extra/static/，subpackage 从 pages_owner 改为 pages_owner_extra 并同步 resolveStaticUrl，加 :deep() 修尺寸
 - 涉及文件：src/pages_owner_extra/ownerCard/index.vue、src/pages_owner/ownerCard/index.vue、src/pages.json
 - 所属项目：苏住房C；来源会话ID：9b333521-93bd-4e07-8e91-b6a53dcd962f；代码基线：f1939b0

@@ -22,6 +22,8 @@
 - 优先将 `VITE_APP_PROXY_ADDRESS` 配置为与证书一致的域名（同可选做法）。
 
 ## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证证据：src=淮安物管/017.md
 - 来源会话：c0419709-71ee-413d-b8bd-e7489ed2c10c；代码基线：none
 

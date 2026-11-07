@@ -22,6 +22,7 @@ portal.scss 对 .portal-detail-dialog 正文区统一内边距规则，并规定
 - zhi2-web-admin/tests/e2e/public-portal-visual.spec.ts
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 会话 8088d086 按「首页所有弹窗」统一内边距；租赁企业/信用弹窗由 32px 改为走全局 40px
 - 会话 a4628c5f 将分散在各组件的 padding 收敛至 portal.scss（PropertyDetailDialog、RentalDetailDialog、UnifiedLoginMenuMoreDialog）
 - 验证证据：portal/038.md、portal/039.md；E2E 布局断言与 ESLint 通过

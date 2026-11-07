@@ -15,6 +15,12 @@ In 苏住房C (zhi2-mobile-shimin), the electronic owner card truncated long com
 - Files: pages_owner/ownerCard/index.vue, pages_guard/index/index.vue, pages_owner/tenant/index.vue, pages_owner/house/components/TypeChoose_Suzhufang.vue, pages_owner/house/index.vue
 - Project: 苏住房C (zhi2-mobile-shimin); code baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：5a765087-11ff-4a31-9326-3d3a3b8980b1
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

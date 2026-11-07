@@ -12,6 +12,7 @@ uni-app H5 部署在子路径时，后端 `/statics` 资源与本地 `static` �
 - 修复手段：H5 本地资源改完整 URL，与视频 `/statics/` 双前缀问题同类但路径段不同。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证：会话 8ef2aa73 用户反馈在线课堂封面不显示，根因本地图 `/wyzx/static/...` 被 uni 再加 `/wyzx/`。
 - 涉及文件：src/utils/resolveAssetUrl.js、src/components/zs-image/zs-image.vue、src/pages_onlineService/onlineIndex.vue、src/pages_onlineService/OnlineCass.vue、vite.config.js、src/env/mp.js。
 - 所属项目：昆山市民；代码基线：c8c1c24；来源会话ID：8ef2aa73-67f1-4e34-9fc7-6ad739924137。

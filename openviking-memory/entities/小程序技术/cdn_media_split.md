@@ -11,6 +11,7 @@
 - 协议必须 https（曾写http真机被拦截）；改动只影响V1分支，不要顺手改V2拼接逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话3774cb0b用户指出/zs-fym前缀图片应用 https://szfang.szfcweb.cn/ 拼接，V2图片不需修改；改resolveMediaUrl、ZsImage、vite.config.ts代理与两个env文件、src/env/mp.js
 - 当前代码核实：utils/index.js:76-83维护MEDIA_PATH_PREFIXES与isV1MediaPath，143-155 buildH5AbsoluteMediaUrl分流V1/V2，389/416小程序端按isV1MediaPath选IMAGE_BASE_V1/IMAGE_BASE；env/mp.js:11,17,23三环境IMAGE_BASE_V1均为https；vite.config.ts:140-141 /zs-fym代理target取VITE_APP_IMG_PROXY_V1
 - 涉及文件：src/utils/index.js、src/components/ZsImage/ZsImage.vue、src/env/mp.js、vite.config.ts、.env.production、.env.development

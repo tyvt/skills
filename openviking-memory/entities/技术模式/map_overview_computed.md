@@ -17,6 +17,10 @@
 - 涉及文件：src/views/benefit/mapOverview/index.vue、src/views/property/largeScreen/index.vue
 - 所属项目：园区物管2.0；来源会话：15514253-88df-4a75-b299-5e0fcb7ba067；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

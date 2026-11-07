@@ -11,6 +11,7 @@
 - 下拉面板 popper-class 再设更高（如 5100）保证展开层在内层弹窗之上
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证：会话 f7fa3bf8 中 solicitation/maintenanceFeeDtlDialog 嵌套编辑弹窗内 el-select 无法点击，结论为层级在 wrapper/遮罩而非 dropdown
 - 涉及文件：zhi2-web-admin/src/views/solicitation/components/maintenanceFeeDtlDialog.vue；所属项目：2-0
 - 来源会话ID：f7fa3bf8-e11d-41c2-ab82-7f380cbd83c7；代码基线：none

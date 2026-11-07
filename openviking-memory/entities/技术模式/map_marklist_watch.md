@@ -10,6 +10,8 @@
 - 页面里统一将 lng/lat 映射为 longitude/latitude 再传入地图组件。
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证证据：009.md 会话 fbdf2d00/e9da2cc8（Map markList watch 重绘 + lng/lat 映射）。
 - 涉及文件：src/components/Map/index.vue、src/views/benefit/statisticsMap/index.vue。
 - 来源会话ID：fbdf2d00-85f2-47af-8a5a-b24f097bad6f, e9da2cc8-539e-440d-8eed-4630633a5b6e；代码基线：none。

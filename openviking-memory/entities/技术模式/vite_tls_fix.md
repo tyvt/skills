@@ -10,6 +10,7 @@
 - 本地开发：在 vite.config.js 的 createProxyConfig 增加 secure: false，开发代理不校验上游 HTTPS 证书
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/vite.config.js、env/.env
 - 所属项目：园区物管2.0
 - 来源会话：ee9a14e8-3ae5-42f3-9d6a-f8fb0fad0e5c

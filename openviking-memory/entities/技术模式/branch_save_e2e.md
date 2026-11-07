@@ -10,6 +10,7 @@
 - 于 `institution-helpers.js` 增加 `uploadRequiredAppendix` 与 `clickSaveAndWaitForSubmit` 辅助函数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/202.md
 - 涉及文件：e2e/institution/agency-branch-real-api-flow.spec.js、src/views/institution/agencyBranch/components/AgencyBranchDetail.vue、src/utils/appendix.js、e2e/institution/agency-personnel-real-api-flow.spec.js、src/views/institution/agencyBranch/components/ServiceSchemePanel.vue、src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue、e2e/fixtures/institution-helpers.js
 - 所属项目：苏州市房地产监测V3；来源会话：78e37b39-59fb-4f08-9f79-e96bf254bdd1；代码基线：none

@@ -11,6 +11,7 @@
 - 合同范本：body 为 { templateIds: [...] }
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：versionManagement/index.vue、template/index.vue、table.js、contract-version-helpers.js
 - 新增 E2E 删除用例（contract-version-helpers.js）
 - 所属项目：苏州市房地产监测V3

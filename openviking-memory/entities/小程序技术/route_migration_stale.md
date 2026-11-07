@@ -17,6 +17,7 @@
 - 长期做法：跳转路径统一引用集中常量（如 src/utils 的 PAGES.login / route-map.js），禁止各页面写字面量路径，迁移时只改常量一处
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 73f5531d 报错 MiniProgramError navigateTo:fail page "pages/login/index" is not found，定位登录页已迁 pages_main/login/index 但多处代码仍跳旧路径，逐文件替换（utils/index.js 改用 PAGES.login，另 6 个组件/页面共 9 处）
 - 涉及文件：src/pages.json、src/utils/index.js、src/utils/route-map.js、src/pages_main/login/index.vue、scripts/migrate-pages-tab.mjs
 - 所属项目：苏住房C；来源会话ID：73f5531d-ca8f-4227-9e76-d2fa4b5c98a1；代码基线：9832ba3

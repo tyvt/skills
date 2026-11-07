@@ -10,6 +10,7 @@
 - 改为 `this.form.printConfigId = this.id` 直接使用 prop
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 数据流：PrintDialog → PrintParamsTable(:id="form...") → ParamsDialog
 - 涉及文件：ParamsDialog.vue、dialogMixins.js、PrintParamsTable.vue、PrintDialog.vue
 - 所属项目：产品2.0；来源会话：6fdd2549-8d41-469b-94b8-8cd8fe8a1f20；代码基线：none

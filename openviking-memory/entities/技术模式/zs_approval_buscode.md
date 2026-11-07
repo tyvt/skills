@@ -17,6 +17,10 @@
 - 涉及文件：company/companyRegister/detail.vue、OperationBtnGroup/index.vue、mixins/detailMixins.js、companyRegister.js
 - 所属项目：产品2.0；来源会话：784bbb09-19cb-4209-8311-17aa5fdd0e9f；代码基线：5169909
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

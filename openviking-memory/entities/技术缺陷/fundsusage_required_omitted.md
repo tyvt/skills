@@ -17,6 +17,7 @@
 - 通用原则：下线表单字段时要过一遍「提交载荷里这个字段后端还要不要、从哪来」，否则保存链路在用户看不到的地方断掉
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 0ec35fee（050.md）pubUseMoneyApply/detail 结论：vue 的 setBusinessSubItem 缺 fundsUsage 赋值、form 里 undefined 提交被序列化省略，后端仍必填
 - 涉及文件：src/views/benefit/pubUseMoneyApply/detail.vue；src/views/property/useMoneyApply/detail.vue
 - 所属项目：产品2.0；来源会话ID：0ec35fee-2fec-4d29-8269-642ebfd5c257；代码基线：产品2.0 zhi2-web-admin

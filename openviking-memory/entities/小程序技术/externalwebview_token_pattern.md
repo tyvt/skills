@@ -10,6 +10,7 @@
 - 登录弹窗从独立页迁入壳页，点击「登录」再打开弹层，避免首页与登录页双份状态
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：「登录后如果判断用户未实名认证，显示设计图页面。如果已实名认证，显示web-view，同时不要给web-view传递loginCode参数，改为传递token」
 - 涉及文件：pages/webview/externalWebview.vue、pages/home/login/index.vue、static/images/zhishu/login-bg@2x.png
 - 所属项目：小程序；来源会话ID：0931abc6-673c-4efb-91bc-d74159322efb；代码基线：none

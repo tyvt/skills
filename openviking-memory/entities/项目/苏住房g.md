@@ -24,6 +24,12 @@
 - companyProjectStats 搜索按钮 handleQuery 为空不调接口，改为调用 getDetails()。（会话 5fd50fdd）
 - 首页关键数据与检查数据导航拆分独立 regionCode，默认全市。（会话 c67476bc）
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：765750a0-13d8-4789-8d78-9bb82bdf1e1f
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "项目",

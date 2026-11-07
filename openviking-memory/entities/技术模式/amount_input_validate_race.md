@@ -16,6 +16,10 @@ AmountInput（vue-currency-input 封装）本地开发正常、打包后字段�
 ## 关联信息
 - 涉及文件：zhi2-web-admin/src/components/AmountInput/index.vue、src/views/property/feeDeclare2/components/feeBindScopeTable.vue（使用 AmountInput）；所属项目：园区物管2.0；来源会话：65814715-d99f-446d-b239-bd55aaced626；代码基线：7814a0c2a
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

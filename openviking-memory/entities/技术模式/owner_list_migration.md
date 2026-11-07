@@ -13,6 +13,7 @@
 - 散落reload()修正为refresh()（tenant、income等）；building/info两useLoadMore合并为单z-paging按Tab切query
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话7024cb11用户给出完整迁移规则，最终列出26个迁移文件并顺带修复reload()→refresh()
 - 涉及文件：src/hooks/usePaging.js、pages_owner/building/info/index.vue、company/service/index.vue、tenant/index.vue、authentication/family/index.vue、uni.scss
 - 所属项目：苏住房C；来源会话ID：7024cb11-2918-467a-b059-55fd7409fdbc；代码基线：83c4136

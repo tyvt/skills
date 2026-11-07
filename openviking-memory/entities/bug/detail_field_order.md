@@ -13,6 +13,7 @@
 - 原有 `ts-plugin never` 类报错未新增，改动未引入新语法问题
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：cursor 会话 ff097cf6 提取
 - 涉及文件：zhi2-web-admin/src/views/building/project/detail.vue、zhi2-web-admin/src/views/building/projectChange/detail.vue
 - 所属项目：产品2.0；来源会话：ff097cf6-67f8-45c1-8b04-753136cfda5d；代码基线：none

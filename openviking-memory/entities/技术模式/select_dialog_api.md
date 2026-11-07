@@ -11,6 +11,7 @@
 - 同类模式：可选项 = 主数据 + 业务状态约束时，一律走 *Optional* / *CanUse* 类专用接口。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 70fffb2b 用户报「未完成开户的物业管理区域也显示了」，根因是弹窗调了 /property/complex/page，修复把 SelectDialog.open 的 url 改为 /maintenance/guaranteeDepositAgreement/pageOptionalComplex。
 - 涉及文件：zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue；所属项目：园区物管2.0；来源会话：70fffb2b-1949-40f5-a6e2-10d76989883b；代码基线：c52866fc8。
 

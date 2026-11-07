@@ -16,6 +16,7 @@
 - Tab 锚点滚动 scrollTop 偏移改动态计算，不写死常量；排查时 web-view 内开 vConsole 打印环境确认宿主
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 7e811367（基线 d43894b）用户指 web-view 嵌入，新增 isMiniProgramWebView()/getPageHeaderOffset()，web-view 强制 top:0
 - 涉及文件：pages_transaction/newHouse/detail.vue、pages/commonNew/tabLine.vue、tabBtn.vue、utils/index.js
 - 所属项目：苏住房C；来源会话ID：7e811367-b5c4-4dfb-83e7-e8f29ef7909c；代码基线：d43894b

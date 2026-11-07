@@ -16,6 +16,11 @@
 - 涉及文件：`detail.vue`、`changeDetail.vue`、`index.vue`、`ExtractDialog.vue`、`BuildingForm.vue`
 - 项目：苏州市房地产监测V3；来源会话ID：eda148ea-5077-4e6e-a126-ed8b88e4742b
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

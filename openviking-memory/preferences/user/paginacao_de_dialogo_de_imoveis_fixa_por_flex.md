@@ -3,6 +3,12 @@
 - 涉及文件: d:/repository/园区公共收益/zhi2-web-admin/src/views/autonomy/option/components/DecisionRangeTable.vue; d:/repository/园区公共收益/zhi2-web-admin/src/views/components/BuildingTableViewTabs.vue; d:/repository/园区公共收益/zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue; d:/repository/园区公共收益/zhi2-web-admin/src/views/autonomy/option/detail.vue; d:/repository/园区公共收益/zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue; d:/repository/园区公共收益/zhi2-web-admin/src/components/zs-select-dialog/SKILL.md; d:/repository/园区公共收益/zhi2-web-admin/src/views/autonomy/general/components/DecisionRangeTable.vue; d:/repository/园区公共收益/zhi2-web-admin/src/views/benefit/pubElevMaintenanceIncome/detail.vue
 - 验证: src=园区公共收益/022.md; 会话 e0c9e026-360f-4210-a247-b1f275759fea
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：e0c9e026-360f-4210-a247-b1f275759fea
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

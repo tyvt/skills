@@ -9,6 +9,11 @@
 【来源会话ID】b551ec7a-093b-429a-9873-1c1de6cde7f8
 【代码基线】none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "企业注册E2E预期跳过",

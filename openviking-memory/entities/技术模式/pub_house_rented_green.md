@@ -11,6 +11,7 @@
 - 物业管理用房（`houseCategory == '1'`）无租赁状态列，仍沿用后端 `color` 字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：cursor 会话 3f441280 提取，已修复
 - 涉及文件：pubHouseTable.vue、operatingAssets.vue、pubHouse/components/assetPositionSubTable.vue、publicQuery/complex/components/pubHouseTable.vue
 - 所属项目：园区物管2.0；来源会话：3f441280-c7e8-4f56-84ea-ee7480edfb5d；代码基线：none

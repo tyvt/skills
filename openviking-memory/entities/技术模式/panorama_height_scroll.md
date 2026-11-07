@@ -14,6 +14,7 @@
 - 与「详情页 calc(100vh-120px) 少减像素」是不同的根因与场景。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 a2b24d85 中 assetPanorama 与 fundPanorama 同步做「去 min-height + max-height:100% + min-height:0」三处修改后，横向滚动条无需先滚到底即可见。
 - 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/fundPanorama/index.vue、src/layout/components/AppMain.vue。
 - 所属项目：园区物管2.0；来源会话：a2b24d85-02d0-461f-afbd-1db973bf08f3；代码基线：f00310232。

@@ -15,6 +15,7 @@
 - zhi2-web-admin/src/views/maintenance/depositRegister/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 所属项目：园区物管2.0（2-0）；来源会话：43075a31-52ec-4f80-8279-94db3e9b341c；代码基线：none
 
 <!-- MEMORY_FIELDS

@@ -11,6 +11,7 @@
 - vite.config.js, mcp-servers.json, extensions.json, package.json (根目录和 zhi2-web-admin), jsconfig.json, settings.json, mcp.json
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据: src=苏州市房地产监测V3/177.md 和 src=苏州市房地产监测V3-rest/144.md
 - 来源会话: 5d1c2a9f-7bac-4b86-936c-8870cfdb6c90
 - 所属项目: 苏州市房地产监测V3; 代码基线: none

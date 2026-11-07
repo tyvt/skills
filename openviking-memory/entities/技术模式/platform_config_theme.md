@@ -13,6 +13,7 @@
 - 新增主题相关样式一律消费这些 CSS 变量，不写死色值
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 5a11ca4b 中 app.js getPlatformConfig 接入 changeThemeColor，按 buttonDefaultColor 动态设置 --primary-color 及浅/深变量并做空值保护
 - 涉及文件：zhi2-web-admin/src/store/modules/app.js、zhi2-web-admin/src/api/index.js
 - 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：5a11ca4b-0f0d-4cb0-b4f1-e9e574a65811

@@ -18,6 +18,7 @@
 - 反向回合同样走子模块提交推送合并再父仓库提交指针推送合并，完成后切回 dev-sfb
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 72fc5cce 解决 118 冲突，子模块 a4811aa0/fa6929e2、主仓库 af36c7c，排除 doc/docx，build 成功；会话 2a28d769 展示双推送完整流程
 - 涉及文件：pages.json、.env.development、package.json、.gitmodules
 - 所属项目：苏住房C；来源会话：72fc5cce-130f-44b1-bd46-0257f06c74e4, 2a28d769-4a41-4a8a-a03f-b7cdd347e192；代码基线：9832ba3

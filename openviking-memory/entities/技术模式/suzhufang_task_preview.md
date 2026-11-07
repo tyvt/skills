@@ -13,6 +13,10 @@
 - 所属项目：苏住房G；来源会话：24929f7a-3693-4ae6-b04b-d0abf802ee41；代码基线：cb37a39
 - 本条目为归纳性模式，引用前请核对代码
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

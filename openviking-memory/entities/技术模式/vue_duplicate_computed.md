@@ -10,6 +10,8 @@
 - 使用展开运算符（`...mapState`）注入所需状态，避免重复声明 `computed` 选项
 
 ## 验证与归属
+- 所属项目：bugfix
+- 验证证据：extracted source=cursor project=bugfix
 - 验证证据：src=bugfix/002.md
 - 涉及文件：index.vue
 - 来源会话ID：89fc7f13-a8bf-4d3a-bbd4-188054ca21b7

@@ -12,6 +12,12 @@
 - cursor 会话 2d7e9be2-2c2b-4dc0-bb76-1942eb9b0244
 - 涉及文件: D:/repository/淮安物管/zhi2-web-admin/src/views/system/branchInformation/detail.vue
 
+## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
+- 来源会话：2d7e9be2-2c2b-4dc0-bb76-1942eb9b0244
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

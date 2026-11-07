@@ -6,6 +6,7 @@
 - 单个要件名称行与缩略图：`AppendixRequirementCard` 缩略图区域上边距由 12px 改为 token `APPENDIX_TITLE_TO_THUMB_GAP = 16`（经 `AppendixRequirementGrid` 注入 CSS 变量）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新预售许可申请详情查看效果；可要求只改其中一处
 - 所属项目：苏州市房地产监测V3；来源会话：872e66a4-1acc-44d6-ac4e-811259ddf984
 - 涉及文件：`src/components/AnnexUpload/components/AppendixRequirementCard.vue`、`src/components/AnnexUpload/index.vue`

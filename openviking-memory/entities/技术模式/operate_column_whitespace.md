@@ -10,6 +10,7 @@ AgencyPersonnelList.vue 中 zs-operate-column 固定宽度 :width="480" 导致�
 - 保留 show-all 属性使按钮平铺不换行
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/137.md
 - 涉及文件：AgencyPersonnelList.vue、zs-operate-column.vue、package.json、e2e/institution/agency-personnel-real-api-flow.spec.js、vite.config.js、e2e/fixtures/institution-menu-config.js、institution-helpers.js、auth-helpers.js
 - 所属项目：苏州市房地产监测V3；来源会话：c07f2835-00f4-4f26-8f40-499ded465259；代码基线：none

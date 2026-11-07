@@ -16,6 +16,11 @@
 - 涉及文件：`PermitPlanPanel.vue`、`detail.vue`
 - 项目：苏州市房地产监测V3；来源会话ID：c979272c-3442-49d7-883a-b7048db0acbc
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

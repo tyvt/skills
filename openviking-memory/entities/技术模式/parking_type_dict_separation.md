@@ -9,6 +9,7 @@
 - 新增 `parkingSpaceTypeFilterOptions` 随产权类型变化，仅用于搜索条件下拉框
 - `pubParkingSpaceDetailChange/index.vue`（停车泊位变更）存在相同逻辑，按需一并修复
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zhi2-web-admin/src/views/benefit/parkingSpace/index.vue、pubParkingSpaceDetailChange/index.vue、pubParkingSpace/components/parkingTable.vue、mixins/listMixins.js
 - 所属项目：园区公共收益；来源会话：8f234827-4934-41b5-9ea5-1d36dd635cc0；代码基线：none
 

@@ -13,6 +13,12 @@
 - cursor 会话 1d686e0a-d458-44a4-bb4f-d49a87fb35e2
 - 涉及文件: src/views/property/propertyContract/components/detail.vue, src/components/detail-template/detail-template.vue
 
+## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
+- 来源会话：1d686e0a-d458-44a4-bb4f-d49a87fb35e2
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

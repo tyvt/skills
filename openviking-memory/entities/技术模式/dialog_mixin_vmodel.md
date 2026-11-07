@@ -7,6 +7,8 @@ Vue 3 中弹窗 mixin 借 `$attrs` 透传 `v-model` 相关属性，父级无需�
 - 配合 `<zs-dialog v-bind="$attrs">`，所有引用该 mixin 的弹窗无需在父级显式绑定 `:model-value` 与事件
 
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/009.md
 - 涉及文件：dialogMixins.js、ArchiveDetailDialog.vue（已还原，移除单独加的 :model-value 与 @update:model-value 两行）
 - 来源会话：42e79baa-7d82-4041-a640-3f06d3408440；代码基线：none

@@ -12,6 +12,7 @@ Vue3 已移除 `.native` 修饰符，模板里的 `@click.native`/`@input.native
 - 判定「点击没反应也没报错」时，优先怀疑事件监听根本没绑上（.native / 拼错事件名 / 被上层遮罩挡住），而非先查跳转函数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 98fe164c 中 login.vue:28 的 `.native` 写法未生效，用户要求全局搜类似写法改 Vue3
 - 涉及文件：zhi2-web-admin/assets/views/login.vue、zhi2-web-admin/src/views/login.vue
 - 所属项目：2-0；来源会话：98fe164c-3ca7-4574-8920-11075d32c5c9；代码基线：none

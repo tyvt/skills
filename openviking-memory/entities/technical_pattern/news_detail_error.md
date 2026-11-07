@@ -15,6 +15,12 @@ News detail page moved to `pages_main/news/detail` subpackage, but `Home_Suzhufa
 - Files: pages.json; utils/route-map.js; pages/index/components/Home_Suzhufang.vue; utils/menuRouteMap.js
 - Project: Suzhou Housing C (zhi2-mobile-shimin); code baseline: none; session: 29317b48-dcb1-481b-a230-4459674df2a0
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：29317b48-dcb1-481b-a230-4459674df2a0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

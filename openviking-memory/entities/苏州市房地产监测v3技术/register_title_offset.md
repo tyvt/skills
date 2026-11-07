@@ -9,6 +9,8 @@
 - RegisterPageHeader改用.register-wrap的CSS变量--register-content-max-width、--register-page-padding实现三页对齐
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：router/index.js、companyRegister.vue、institutionRegister/index.vue、leaseInstitutionRegister/index.vue、RegisterPageHeader/index.vue等
 - 来源会话：d258d735-cf1c-4ea1-b3c3-bf1f9a80262c；代码基线：none
 

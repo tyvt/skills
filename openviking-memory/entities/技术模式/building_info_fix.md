@@ -10,6 +10,7 @@
 - zs-table-column.vue：列类型判断改用 $attrs.type（columnType），保证动态表格中 dict、tag、link 等自定义列正确渲染
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0
 - 来源会话：dbc7cb9d-a0a8-4e87-8a32-7d0db2961532
 - 代码基线：none

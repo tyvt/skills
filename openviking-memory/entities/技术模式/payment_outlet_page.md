@@ -15,6 +15,8 @@
 - `maintenance/bank/components/YhwdTable.vue`
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/154.md
 - 来源会话：eab9bc90-2387-4c8e-a6b6-383aca8454a6；代码基线：none
 

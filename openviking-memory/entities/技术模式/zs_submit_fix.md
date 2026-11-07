@@ -18,6 +18,7 @@
 - zhi2-web-admin/src/mixins/form.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话ID：e92d4f55-1a75-41cb-a38f-01916f1c4db8
 
 <!-- MEMORY_FIELDS

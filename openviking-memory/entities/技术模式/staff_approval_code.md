@@ -10,6 +10,8 @@
 - 集成 `ApprovalProcess` 抽屉和变更单加载
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：2f709dc5-4ae2-4b08-9df3-6698a076d982
 - 涉及文件: company/staffManagement/components/detail.vue, components/OperationBtnGroup/index.vue, mixins/detailMixins.js, company/staffManagement/personnelRecord/detail.vue, mixins/form.js, toB/personnelRecord/components/detail.vue, mixins/formComponents.js, main.js
 - 所属项目: 产品2.0; 来源: 035.md; 会话: 2f709dc5-4ae2-4b08-9df3-6698a076d982
 

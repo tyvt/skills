@@ -10,6 +10,7 @@
 - `WorkCardDialog.vue` 同步修改避免同类错误
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/126.md
 - 涉及文件：src/views/institution/agencyPersonnel/components/InfoCardDialog.vue、AgencyPersonnelList.vue、WorkCardDialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话：cdaad0ce-2308-42bc-a23c-6aa39e6341a6；代码基线：none

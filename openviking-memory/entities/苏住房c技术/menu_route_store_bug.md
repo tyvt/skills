@@ -11,6 +11,8 @@
 - 修正 menus.fallback.json 中对应路由码为 1_0_0 与 2_0_24
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 9f4ea5c1 用户反馈菜单路由跳转异常，agent 修正 store 字段读取与 fallback 路由码
 - 涉及文件：src/pages_owner/repair/submit.vue、src/api/property.ts、src/api/property.js、src/pages_owner/authentication/owner/index.vue、src/pages_guard/index/index.vue、src/pages_transaction/publishHouse/houseList.vue、src/pages/property/index.vue、src/pages/index/components/menu/MenuSection.vue
 - 验证证据：src=苏住房C/043.md；来源会话ID：9f4ea5c1-0697-4185-b730-1f8bb8246a06；代码基线：none

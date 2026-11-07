@@ -13,6 +13,8 @@
 - 相关文件: `zs-button.vue`, `PriceTable.vue`, `BuildRecordTable.vue`, `HouseScopeTable.vue`, `detail.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：a93d9024-80c0-483e-b0d2-40a3f424626b
 - 验证证据: 提取自cursor session=a93d9024-80c0-483e-b0d2-40a3f424626b
 - 基线: none; 所属项目: 产品 2.0
 

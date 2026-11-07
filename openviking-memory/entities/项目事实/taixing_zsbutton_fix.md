@@ -11,6 +11,7 @@
 - 新增 `src/staff/styles/theme.js`，与 `theme.scss` 保持颜色一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证方式：重新编译后在小程序打开「修改密码」页，保存按钮应显示天蓝色 `#1677ff`，不对可清缓存
 - 涉及文件：`src/staff/components/ZsButton/ZsButton.vue`、`src/staff/styles/theme.js`、`theme.scss`、`src/staff/pages/profile/change-password.vue`、`src/staff/pages/profile/personal-info.vue`
 - 所属项目：泰兴小程序；来源会话ID：d75b7b33-1f22-4fb0-8e53-852cff55d9e9

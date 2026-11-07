@@ -12,6 +12,7 @@
 - 套路可复用于任何慢接口（导入、批量处理、报表生成）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：已为 import 接口单独设置300000ms超时，enums.js 新增常量，importUploadDialog.vue 传 timeout
 - 涉及文件：src/enums.js、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue
 - 所属项目：产品2.0；来源会话：f95fd685-fb92-457c-98a8-0d5d19ac9f6f；代码基线：62d5fb9

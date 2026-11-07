@@ -10,6 +10,8 @@
 - 移除 `:deep` 写法，白卡片沿用 `facilityDetail` 规范（圆角16rpx、间距24rpx）
 
 ## 验证与归属
+- 所属项目：物业手持B端
+- 验证证据：extracted source=cursor project=物业手持B端
 - 验证证据：src=物业手持B端/003.md
 - 涉及文件：detailScrap.vue、detail.vue、addScrap.vue、facilityDetail.vue、record/index.vue、issue/index.vue、workbench/index.vue
 - 来源会话ID：98d5b47c-5806-4707-a116-9d28de128902；代码基线：none

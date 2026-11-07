@@ -18,6 +18,7 @@
 - src/components/zs-table/zs-table.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：94e9fe38-5ccd-4e61-8fa5-8929f8b1a0cb；代码基线：none
 
 <!-- MEMORY_FIELDS

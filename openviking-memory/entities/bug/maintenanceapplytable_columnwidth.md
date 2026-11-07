@@ -17,6 +17,7 @@
 - zhi2-web-admin/src/mixins/table.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 所属项目：园区物管2.0（2-0）；来源会话：751fbf61-9cad-490e-9eb7-c4aa5a8ffe55；代码基线：none
 
 <!-- MEMORY_FIELDS

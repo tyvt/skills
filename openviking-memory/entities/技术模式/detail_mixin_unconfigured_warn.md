@@ -17,6 +17,8 @@
 - src/utils/registerFormContext.js、src/mixins/formComponents.js
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/191.md
 - 来源会话ID：5584ad88-6363-48c5-9d3d-5f769967f5f6
 - 代码基线：none

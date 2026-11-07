@@ -12,6 +12,7 @@
 - 本控件属「部门树 dept 级联」体系（parentDeptId + deptTypes），与 zs-region-select 编码体系不可互相替代
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：property/propertyContract/components/index.vue、system/regionBankAuth/index.vue、行政区划筛选-前端对接文档.md
 - 所属项目：苏住房G；来源会话：d4bb3d02-d460-4b98-9bc4-430cdeb11f1d；代码基线：9e5c499
 - 用户要求「第一级就是区，不要苏州市」，最终核对与对接文档一致

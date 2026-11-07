@@ -10,6 +10,7 @@
 - 排序、字典、操作列保持原样。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：src/views/system/menu/index.vue、zs-table-column.vue。
 - 所属项目：苏州市房地产监测V3；来源会话：72843b32-55a1-45bf-be49-4196528a7cf8。
 - 验证：刷新菜单管理页查看；仍窄可反馈期望「加宽列」或「横向滚动」。

@@ -14,6 +14,12 @@ In the 园区公共收益 (zhi2-web-admin) project, ScopeSelectDialog.vue skippe
 - Files: maintenance/accountOpen/owner/components/ScopeSelectDialog.vue, OpenDetailTable.vue, zs-table/zs-table.vue, mixins/subTableMixins.js, mixins/table.js, accountOpen/owner/components/detail.vue
 - Project: 园区公共收益; Source session: acf40130-9dda-4c08-b943-34292e01cab4
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：acf40130-9dda-4c08-b943-34292e01cab4
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

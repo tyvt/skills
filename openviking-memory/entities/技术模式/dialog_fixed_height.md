@@ -10,6 +10,7 @@
 - 分页区始终占位（容器给定与单行分页器等高 min-height，或隐藏内容不隐藏盒子），表格可视高度按「N行×行高」定死，不足留白
 - 删掉弹窗内写死的列 width，让其按内容算 min-width
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：用户诉求固定10条高度、分页器隐藏高度塌陷、列展示不全疑全局失效；结论显式宽度导致截断
 - 涉及文件：SelectRecordProcedureDialog.vue、FacilitySelectDialog.vue、ScopeSelectDialog.vue、zs-table.vue
 - 所属项目：苏住房G；来源会话：db287272-e3da-43d4-8c77-915cb66320da；代码基线：d9c2e9f

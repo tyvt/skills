@@ -12,6 +12,7 @@
 - 排查同类「双头/双标题」问题时，先拿 ZsNav 的使用点与 pages.json 的 navigationStyle 做一次全量对照；若配完仍双头，先清缓存、确认编译到的是最新包
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话 18d9a799：用户贴图报「慧物业-投票表决，查看我的决策头部重复显示两次」；结论给出根因（pages.json 未设 navigationStyle: custom）与修改项，并指出 income/index 等同类页面已配、只有此页漏了
 - 涉及文件：pages_owner/decision/index.vue、src/pages.json、pages_owner/decision/detail.vue
 - 所属项目：苏住房C；代码基线：4316025；来源会话ID：18d9a799-b438-480c-b29c-cf616ca0f008

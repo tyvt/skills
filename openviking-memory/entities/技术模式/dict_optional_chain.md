@@ -8,6 +8,7 @@
 - 类型不一致时可用 == 或统一类型后再 === 比较。
 - 字典缺项时界面可能空白，需补字典或接口数据。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：zhi2-web-admin/src/views/maintenance/depositNotice/company/components/detail.vue。
 - 验证证据：会话 4642db27 中 detail.vue 的 bizStateName、stateName 报错。
 - 所属项目：2-0；来源会话：4642db27-d773-418d-b3f6-c2109f85a0e4；代码基线：none

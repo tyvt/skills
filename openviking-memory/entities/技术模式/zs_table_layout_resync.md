@@ -10,6 +10,7 @@
 - table.js（mixins）配套调整
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：综合查询列表小计行对齐正常
 - 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、zhi2-web-admin/src/mixins/table.js、query/index.vue（业务页未改）
 - 所属项目：园区公共收益；来源会话：e46fb06f-9444-4980-9554-1217995da3ec；代码基线：none

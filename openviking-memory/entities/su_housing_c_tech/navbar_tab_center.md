@@ -23,6 +23,12 @@ In Su Housing C project, placing tab-line inside uni-nav-bar slot defaulted to l
 - Source cursor session: e5260577-7b96-471b-8868-7016b41f64dd
 - Project: Su Housing C (zhi2-mobile-shimin)
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：e5260577-7b96-471b-8868-7016b41f64dd
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

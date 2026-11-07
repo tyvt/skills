@@ -15,6 +15,7 @@ zs-table 设 :border=false 仍显示列竖线，因全局样式无条件给单�
 - 公共层改完须回归其他模块列表，属全站表格边框规范一部分
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 会话 49ee8efa 根因明确为 .list-card 全局无条件加 border-right，index.scss 收窄到 el-table--border、zs-table.vue 增 isBorderEnabled/zs-table-container--border
 - 涉及文件：styles/index.scss、components/zs-table/zs-table.vue、benefit/assetLeaseApply/index.vue
 - 所属项目：产品2.0；来源会话：49ee8efa-ceee-4350-9446-1a98b38420eb；代码基线：41c6961

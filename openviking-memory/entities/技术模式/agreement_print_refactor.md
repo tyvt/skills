@@ -12,6 +12,7 @@
 - 在 operation-btn-group 插槽内使用 AgreementPrint
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安存量房
 - 涉及文件：ZsPrint/index.vue、OperationBtnGroup/index.vue、agreement/components/AgreementPrint.vue、agreement/detail.vue
 - 所属项目：淮安存量房；来源会话：1380cc44-ab73-4c9b-ad7a-d5b711689e32；代码基线：none
 

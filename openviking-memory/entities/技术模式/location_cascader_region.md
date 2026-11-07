@@ -12,6 +12,7 @@ location-cascader.vue 移除 region 的 required: true 避免告警，新增 def
 - eorg/detail.vue 的 setErogName 写入 form.provinceCityArea 实现选机构后区划回显
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/138.md
 - 涉及文件：location-cascader.vue、eorg/detail.vue、main.js、companyRegister/detail.vue、institution/company/index.vue、BuyerDialog.vue、DeveloperBasicInfoForm.vue、api/eorg/eorg.js
 - 所属项目：苏州市房地产监测V3；来源会话：e660a1c1-9825-434a-be21-3120be9ea83f；代码基线：none

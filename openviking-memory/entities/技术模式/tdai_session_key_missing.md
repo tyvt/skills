@@ -13,6 +13,11 @@
 - 涉及文件: api/xmxx/jgxm.js, supervision/agreement/jgxm/components/SupervisionAddDialog.vue, supervision/agreement/jgxm/components/RegulatoryDialog.vue, utils/apiV3Normalize.js, api/index.js, utils/request.js, mixins/ListTemplate.js, components/zs-select-dialog/zs-select-dialog-func.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 003bc3d6-55d2-4909-bd30-0c1d02f0083d; baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：003bc3d6-55d2-4909-bd30-0c1d02f0083d
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

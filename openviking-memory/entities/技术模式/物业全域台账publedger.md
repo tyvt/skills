@@ -16,6 +16,10 @@
 - 验证：会话 968e6aef（2026-06-30，基线 1b9f773）用户给出台账模板与 Apifox 契约要求建表统计与导出，追加导出无 Loading 后补 exportLoading。
 - 涉及文件：property/pubLedger/index.vue、api/index.js；所属项目：淮安物管；来源会话：968e6aef-a864-48b6-8689-93f6af2352ef；代码基线：1b9f773
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

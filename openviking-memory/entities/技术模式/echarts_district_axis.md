@@ -12,6 +12,7 @@
 - 参数写在同目录 chartOptions.js 的 buildXxxOption 里，靠已有 handleResize → chart.resize() 覆盖缩放场景
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 725e800e 用户反馈监管账户数量横坐标区域显示不清；改动 chartOptions.js 的 buildDistrictManageOption 与 index.vue 容器 padding
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js、zhi2-web-admin/src/views/benefit/mapOverview/index.vue
 - 所属项目：苏住房G；来源会话ID：725e800e-590a-4121-bcda-f06988a87527；代码基线：db4f82c

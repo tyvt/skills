@@ -20,6 +20,7 @@
 - zhi2-web-admin/src/views/building/complexSearch/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：0cbe9323-9602-4630-99d3-b3fb037c7d96
 
 <!-- MEMORY_FIELDS

@@ -11,6 +11,7 @@
 - 避免对 HTML 解析 JSON，生产环境正确加载 loadPlatformDistrictMapGeoJson 链路区划数据
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：src=园区物管2.0/020.md
 - 涉及文件：views/benefit/mapOverview/index.vue、mapOverview/wuxiFallback.js、statisticsMap/components/map.vue、mapOverview/constants.js、utils/tencentDistrictBoundary.js、vite.config.js、package.json、dist/index.html
 - 所属项目：园区物管2.0；来源会话：507339ea-ef77-48b3-981b-3f1a11ff9959

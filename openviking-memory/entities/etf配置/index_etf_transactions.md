@@ -6,6 +6,8 @@
 - `id:26`：标的黄金ETF `518880`，买入 1400 股 @10.990，金额 15386，手续费 5，无 lint 报错
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证证据：session 5e61bba2（新增513880）、session 552a8855（新增518880）
 - 涉及文件：index.html；来源会话：5e61bba2-5a53-4c49-8fd0-fc5535c622d1、552a8855-21c6-4a4a-9949-b15abaf1b7bd；代码基线：none
 

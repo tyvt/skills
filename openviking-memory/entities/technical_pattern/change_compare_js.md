@@ -11,6 +11,8 @@
 - propertychange/detail.vue 回退建造年份专项代码，仅保留 parseBeforeChangeData 用于解析后端 JSON 字符串格式的 beforeChangeData。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=兴化物管
+- 来源会话：efb19730-94e6-49b0-b515-a5225a01129c
 - 验证证据：cursor 会话 efb19730-94e6-49b0-b515-a5225a01129c（兴化物管）。
 - 涉及文件：src/utils/changeCompare.js、src/main.js、propertychange/detail.vue、mixins/detailMixins.js、propertyProject/detail.vue、directives/form/index.js、api/estate/propertyChange.js、buildinginfo/changeDetail.vue、project/projectinfo/changeDetail.vue。
 - 所属项目：兴化物管 zhi1-web-admin。

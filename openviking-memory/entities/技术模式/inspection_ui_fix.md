@@ -11,6 +11,7 @@
 - 做法与 MoreDialog、RejectDialog 等已有弹窗一致：在弹窗根节点单独注入主题变量（#1677ff）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 涉及文件：src/staff/pages_facility/record/add.vue、src/staff/pages_facility/record/addScrap.vue、src/staff/pages_facility/record/detail.vue、src/staff/pages/complex-select/index.vue、src/components/ZsDialog/ZsDialog.vue、src/staff/styles/theme.scss
 - 所属项目：泰兴小程序；来源会话ID：3d76cb6a-e2bc-44af-a9ab-3973a218005a
 - 代码基线：none

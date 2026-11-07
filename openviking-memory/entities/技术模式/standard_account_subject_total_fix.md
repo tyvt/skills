@@ -9,6 +9,7 @@
 - `financialSubjectsTable.vue`：当接口未返回 `total` 时，递归统计树形数据节点数作为总数（`response.total ?? this.countTreeNodes(...)`）。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：`financialSubjectsTable.vue`、`zs-pagination.vue`、`pubFinanceAccount/index.vue`
 - 所属项目：产品2.0；来源会话：ef0140d8-d676-4240-a00f-31f065725288；代码基线：none
 

@@ -10,6 +10,7 @@
 - 若需保留正圆仅变大，可改回 `circle` 并调宽高至如 12×12
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 2072cf12 用户反馈饼图图标偏压缩，改 roundRect+16×9 后改善
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue
 - 所属项目：园区物管2.0；来源会话：2072cf12-f804-48fc-bb6d-3bb1bf4de438；代码基线：none

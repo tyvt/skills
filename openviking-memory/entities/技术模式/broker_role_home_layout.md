@@ -24,6 +24,7 @@
 - zhi2-web-admin/src/permission.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：用户提供经纪机构测试账号并反馈首页判断不对；结论两点根因（terminalType 误判、仅板块权限选布局），已改 terminalUser/homeLayout/homeDataMixin 使 jjjg/zljg 优先 broker 布局；另 src=门户/037.md
 - 来源会话ID：78e839c9-bf59-41e5-bc24-89a6b50ab45b；代码基线：ac6513b；所属项目：门户
 

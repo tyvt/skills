@@ -18,6 +18,7 @@
 - 推广：小程序里任何图片（签字、证照、缩略图）都必须由外部容器定尺寸，不要依赖 height:100% 自行撑开
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 55bd76cb（2026-08-28，基线 8fc3cc5）用户报「optional/DecisionResult 最近一次决策下面有大量空白，也可能是签字没展示」
 - 涉及文件：src/pages_vote/decision/optional/DecisionResult.vue、src/pages_vote/decision/common/DecisionResult.vue、src/pages_vote/decision/styles/page.scss
 - 所属项目：苏住房C；来源会话ID：55bd76cb-6679-4d29-9b33-6cebc5d1203e；代码基线：8fc3cc5

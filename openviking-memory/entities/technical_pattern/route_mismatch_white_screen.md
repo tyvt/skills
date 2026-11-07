@@ -14,6 +14,12 @@ Hardcoded route names failed to match refactored menus and `$route.name.split('/
 - Affected files: step4-5.vue, ownerDecision/detail.vue, MaintainResultDialog.vue, DecisionRangeTable.vue, ownerDecision/components/DecisionRangeTable.vue, detailMixins.js, MaintainObjectDialog.vue, listMixins.js
 - Project: 太仓G zhi1-web-admin; code baseline: none
 
+## 验证与归属
+- 所属项目：太仓G
+- 验证证据：extracted source=cursor project=太仓G
+- 来源会话：5ba671bd-1b41-4095-aeb7-c9806fc7b5c2
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

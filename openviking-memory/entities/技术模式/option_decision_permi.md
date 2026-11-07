@@ -11,6 +11,7 @@
 - 按用户要求未添加「生成表决二维码」按钮（对照昆山参考页）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 50577729 用户报选项表决详情按钮不显示
 - 涉及文件：optionDecision/detail.vue、ownerDecision/detail.vue、decisionCommon/components/VoteViewLite.vue、sortDecison/detail.vue、api/estate/ownerDecision.js、decisionCommon/components/MaintainResultDialogLite.vue、optionDecision/components/DecisionRangeTable.vue、optionDecision/components/VoteResult.vue
 - 所属项目：太仓G；来源会话：50577729-472e-46b8-9882-400332133ecd；代码基线：none

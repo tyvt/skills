@@ -9,6 +9,8 @@
 - `home/index.vue` 中 `countFields` 仅映射 `reportCount`/`repairCount`，`handlePending` 增加 `navigateTo` 失败提示。
 - `issue/index.vue` 在 `backlog=1` 进入时显式设置 `orderStatusList = '1,2,3'`，Tab 切换正确切换筛选逻辑。
 ## 验证与归属
+- 所属项目：物业手持B端
+- 验证证据：extracted source=cursor project=物业手持B端
 - 验证证据：src=物业手持B端/001.md
 - 涉及文件：src/pages/home/index.vue、src/api/home.js、src/pages_facility/issue/index.vue、src/pages/workbench/index.vue、docs/handheld-redevelopment-architecture.md、src/pages.json、src/api/property.js、src/components/ZsImage/ZsImage.vue
 - 来源会话ID：57ff6f54-c412-4288-ba40-47fedb188050

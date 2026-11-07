@@ -15,6 +15,7 @@
 - 不要在父级 scoped 里 :deep 到子组件根上做间距
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 80f4d555（基线 8fc3cc5）结论为父组件 scoped 作用不到自定义组件根导致 module-gap 无效，改 flex+gap 后修复
 - 涉及文件：pages_owner/project/info/index.vue、components/commonNew/baseCard.vue、pages_owner/community/info/index.vue、pages_owner/subdistrict/info/index.vue
 - 所属项目：苏住房C；来源会话：80f4d555-4b91-4605-a249-4affc7710dfd；代码基线：8fc3cc5

@@ -5,6 +5,12 @@
 - Production `VITE_APP_API_PROXY` value: `https://szfweb.szzfcjj.cn:8887`
 - Source evidence: src=苏住房C/075.md; session: bb5ef4f6-787c-49c9-b071-0b62385878d7
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：bb5ef4f6-787c-49c9-b071-0b62385878d7
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

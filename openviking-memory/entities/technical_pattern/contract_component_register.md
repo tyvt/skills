@@ -11,6 +11,7 @@
 - 按文件名 + `ctrl.name` 双注册，兼顾大小写与文件名匹配
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/059.md
 - 涉及文件：contract/index.vue、contract/components/contractContent.vue、contract/chapters/pre/data.js、contract/chapters/pre/cover.vue、vite.config.js、main.js、index.html、stock/contract/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：b0e0e476-6db0-4fd6-be74-9dfdfcfeb066；代码基线：none

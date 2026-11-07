@@ -7,6 +7,8 @@
 - 新增 `src/staff/utils/response.js` 的 `extractArrayData` 与 `src/staff/utils/knowledgeCategory.js` 的 `resolveCategory` 兜底。
 - `index.vue` 改交互为 `<view @tap>` 并失败 toast 提示。
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/006.md
 - 涉及文件：src/staff/pages/knowledge/index.vue、src/pages/staff/workbench/index.vue、src/pages.json、src/staff/api/knowledge.js、src/staff/pages/knowledge/detail.vue、src/staff/pages_facility/issue/components/TransferKnowledgeDialog.vue、src/staff/api/index.js、src/pages_owner/community/info/index.vue
 - 来源会话ID：890a75f9-c359-46c7-a778-43eec2b971b6

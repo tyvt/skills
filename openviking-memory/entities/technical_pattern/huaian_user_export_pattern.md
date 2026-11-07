@@ -13,6 +13,12 @@ Huaian Property Management export fixes for system/user lists covering consisten
 - Verified src=淮安物管/007.md (session 1f213572-ce02-4c37-b44f-d1f8f9f8b64c) and src=淮安物管/008.md (session bd0165fe-77d2-4973-ae1f-2a40fac12ebc); baseline none.
 - Files: system/publicPage/index.vue, system/user/index.vue, system/role/index.vue, system/publicPage/detail.vue, property/eventReport/index.vue, publicQuery/complex/index.vue, building/building/index.vue, api/index.js, mixins/listMixins.js, mixins/table.js, mixins/permsMixins.js, components/zs-button/zs-button.vue, package.json.
 
+## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
+- 来源会话：1f213572-ce02-4c37-b44f-d1f8f9f8b64c
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

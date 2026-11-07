@@ -11,6 +11,7 @@
 - 实现方式与 `indemnity/components/detail.vue` 中的正确写法一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话：8ce4793f-7535-4c0c-af5d-1eaf1173062c
 - 涉及文件：`AnnexUpload/index.vue`、`indemnity/components/detail.vue`、`EntrustSaleAddAppendix.vue`
 

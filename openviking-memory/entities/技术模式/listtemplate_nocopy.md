@@ -18,6 +18,10 @@
 - 涉及文件：zhi2-web-admin/src/views/maintenance/accountCancel/index.vue 等 4 个页面及 src/mixins/ListTemplate.js；所属项目：园区物管2.0；来源会话 ID：d930377c-63a5-48c1-9276-9e6f283932ed；代码基线：3353ef164 等。
 - 验证：AI 复盘三个页面复制 HTML 无新增能力，修正为增强 ListTemplate.js + mixin 默认值，4 页面改回 template: template 只写 script。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

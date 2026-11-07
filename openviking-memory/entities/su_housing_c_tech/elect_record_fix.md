@@ -16,6 +16,10 @@
 - 涉及文件：pages_vote/elect/DecisionResult.vue、ResultRecord.vue、decision/common/DecisionRecord.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：35a00989-4b03-4dae-8d47-d5841ef5d71f；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

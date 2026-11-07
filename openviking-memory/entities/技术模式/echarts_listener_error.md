@@ -13,6 +13,7 @@
 - src/pages_owner/income/components/StatisticsCard.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=苏住房C/072.md
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：8cedd4de-3840-43fc-828d-12511bc40dc9
 

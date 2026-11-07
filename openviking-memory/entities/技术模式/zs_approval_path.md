@@ -12,6 +12,7 @@
 - 约定：审批请求体 = path + 通用 approveMessage + 业务 approvalMessage，新增/改造审批接入点逐项核对。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 5a5032e9 用户报告 ApprovalProcessDialog 审批接口没传 path；修复为新增 path prop + 请求体补 path。
 - 涉及文件：zhi2-web-admin/src/components/zs-approval/ApprovalProcessDialog.vue、zs-approval/index.vue。
 - 所属项目：产品2.0；来源会话：5a5032e9-1eb3-4c40-9529-326bcd83ba44；代码基线：94b86fa–62d5fb9。

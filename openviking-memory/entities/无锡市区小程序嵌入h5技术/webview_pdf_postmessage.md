@@ -9,6 +9,7 @@ H5 运行在微信小程序 web-view 内时，PDF 预览需通过 wx.miniProgram
 - 若已有等价 web-view 容器，可只合并 message 处理而不重复注册 pages/common/webView
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/index.js、src/pages/common/webView.vue、src/pages.json
 - 所属项目：无锡市区小程序嵌入H5；来源会话：78182e2b-9fbc-480c-ac57-e8389e0b26c0；代码基线：0804e57
 

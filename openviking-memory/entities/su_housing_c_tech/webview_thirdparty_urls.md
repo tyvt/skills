@@ -12,6 +12,7 @@
 - https://cc.szfcweb.cn:9999/pages/policy/fzzsscc：二手房非住宅交易税收测算，入口 pages_transaction/taxGuide/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：webView.vue、webViewNav.vue、thirdMap/index.vue、taxGuide/index.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：c5d58c85-6292-401f-b7fb-abc1ca9f514c；代码基线：none
 

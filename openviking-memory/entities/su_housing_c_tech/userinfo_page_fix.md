@@ -13,6 +13,10 @@
 - 涉及文件：src/pages.js、src/pages/index/components/My_Suzhufang.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：4cc33d41-1cbc-4887-bc8a-15d1fdcc8a0e
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

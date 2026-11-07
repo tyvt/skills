@@ -17,6 +17,10 @@
 - 涉及文件：src/views/benefit/dataSandbox/fundPanorama/index.vue、mock.js
 - 所属项目：园区物管2.0；来源会话：a7eff455-f431-4f3e-8c5e-2dd6890bc140；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

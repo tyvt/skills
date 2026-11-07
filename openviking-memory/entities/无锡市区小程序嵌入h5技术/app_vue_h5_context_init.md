@@ -12,6 +12,7 @@
 - benefit/index.vue补全同步逻辑：找到当前小区时也同步setProjectInfo，保证projectAddress正确拼接
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 来源会话：ba74b018-bf87-4283-b5cd-cdbfcdac22a7；代码基线：none
 - 涉及文件：src/App.vue、src/useProjectState.js、src/pages_owner/house/newHome.vue、src/pages_benefit/benefit/index.vue
 - 所属项目：无锡市区小程序嵌入H5

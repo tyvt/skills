@@ -10,6 +10,7 @@
 - 兼容 `res.data` 为对象、数组或空值
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=cursor session=e5a11fd1-77fb-4778-8bf6-a4cb438ff07d
 - 涉及文件：stockHouseContract.vue、houseNewContract.vue、transaction.js、houseNewContractDetail.vue、stockHouseContractDetail.vue、myContract.vue、contractCard.vue、out.js
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话：e5a11fd1-77fb-4778-8bf6-a4cb438ff07d；代码基线：none

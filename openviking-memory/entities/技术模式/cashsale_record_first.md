@@ -15,6 +15,7 @@
 - entrust-sale-detail-layout.spec.js、cashsale-apply-helpers.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/129.md
 - 所属项目：苏州市房地产监测V3；来源会话：88abd213-0e65-43a2-9a47-f93417d5524d；代码基线：none
 

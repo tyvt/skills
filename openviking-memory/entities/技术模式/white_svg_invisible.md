@@ -14,6 +14,11 @@
 - 同时影响 `stockHouse/detail.vue`, `ZsImage.vue`, `utils/index.js`, `bottomBtn.vue`, `houseCard.vue`, `NewHouse.vue`
 - 所属项目: 苏住房C (zhi2-mobile-shimin); 会话: 31b6e9ca-2ea3-4981-827d-9dac98d0e40f
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：31b6e9ca-2ea3-4981-827d-9dac98d0e40f
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "padrao_tecnico",

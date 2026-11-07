@@ -18,6 +18,7 @@
 - 空态区域水平居中、默认图约320rpx并垂直居中
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话42343a4e用户诉求加空数据默认图；结论4点改动含try/finally与!list.length
 - 涉及文件：src/pages/property/index.vue、src/pages_owner/company/service/index.vue
 - 所属项目：苏住房C；来源会话ID：42343a4e-0f73-462e-bedb-6499ef092a49；代码基线：89637fb

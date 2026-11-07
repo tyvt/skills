@@ -19,6 +19,10 @@
 - 所属项目：园区物管2.0；来源会话：0c43b56c-d4b3-4a08-9e9f-7c6394b3a716；代码基线：8f4427ecd。
 - 验证：会话 0c43b56c 用户要求改公共组件，最终实现三个函数修复。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

@@ -13,6 +13,7 @@
 - 登录成功后从地址栏移除 `code` 参数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 所属项目：昆山市民；代码基线：1e46691
 - 来源会话ID：438b59b9-1f57-49a0-a674-06c5f58fdd8f
 - 涉及文件：src/utils/wxLogin.js、src/App.vue、src/pages_home/home.vue、src/api/modules/estate.js、src/pages_home/personal.vue、src/utils/vconsole.js、src/utils/index.js、src/main.js、src/api/modules/user.js

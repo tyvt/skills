@@ -3,6 +3,12 @@
 - 原因：`vue-qr` 默认内联样式使 `margin:0 auto` 失效，标签宽度不一致且卡片无宽度限制
 - 验证：src=苏州市房地产监测V3/238.md; 会话 3bb79189-7e5a-4f02-909b-f9bdf9a2ecb3
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：3bb79189-7e5a-4f02-909b-f9bdf9a2ecb3
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

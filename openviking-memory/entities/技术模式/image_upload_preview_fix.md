@@ -12,6 +12,7 @@
 - 组件为全局共用，`housePart/detail.vue` 等使用页面均受益
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：src/components/ImageUpload/index.vue、src/views/benefit/housePart/detail.vue
 - 所属项目：园区物管2.0；代码基线：none
 - 来源会话：90aa41bd-ec8d-452e-9246-bbbc58df8558

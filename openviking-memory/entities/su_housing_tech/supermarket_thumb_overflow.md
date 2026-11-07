@@ -17,6 +17,12 @@ In the 苏住房C mobile end property supermarket list page, the thumbnail conta
 - Files (session 9576e757): pages_transaction/houseSupermarket/index.vue, components/ZsImage/ZsImage.vue, utils/index.js, pages_transaction/service/bankList.vue, pages_transaction/houseSupermarket/detail.vue, pages_tab/components/Property_Suzhufang.vue
 - Project: 苏住房C (zhi2-mobile-shimin); source sessions: 8c3976ef-34b9-45cd-8872-edd95968dc75, 9576e757-ad86-4348-8122-af82c2ba31b7; code baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：8c3976ef-34b9-45cd-8872-edd95968dc75
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_tech",

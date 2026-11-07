@@ -12,6 +12,7 @@
 - 编辑绑定改绑 `localForm`，不再直改 prop
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：产品2.0/054.md
 - 涉及文件：company/companyManagement/components/CompanyBasicInfoForm.vue；toB/companyRecord/detail.vue；company/companyManagement/components/CompanyBasicInfoDetail.vue；zs-form/zs-form.vue；company/companyManagement/change/detail.vue；company/companyManagement/companyBasicInfo/detail.vue
 - 所属项目：产品2.0；来源会话ID：f4820caa-7dba-4a66-83ef-64ac5b12adb3；代码基线：none

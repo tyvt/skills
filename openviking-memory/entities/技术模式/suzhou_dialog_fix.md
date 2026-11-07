@@ -11,6 +11,7 @@
 - 「项目名称」列改为普通文本，与同项目其他 SelectDialog 用法一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新页面后重开「开发项目」选择弹窗，左侧应出现勾选列、底部为「取消 / 确定」
 - 仍异常可硬刷新或重启前端 dev 服务
 - 涉及文件：recordPriceMngSuzhou/detail.vue、List.vue、zs-select-dialog-func.vue

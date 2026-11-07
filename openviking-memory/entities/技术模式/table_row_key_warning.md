@@ -11,6 +11,7 @@
 - 参照 `EducationTable.vue` 实现
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/311.md
 - 涉及文件：ServiceSchemePanel.vue、zs-table.vue、EducationTable.vue、AgencyBranchDetail.vue 等
 - 所属项目：苏州市房地产监测V3；来源会话：25e4469c-7d8e-407b-89ca-9f7744f1f475；代码基线：none

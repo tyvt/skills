@@ -19,6 +19,12 @@
 - 验证证据: src=苏州市房地产监测V3/029.md
 - 会话: 6ce24e16-f765-47a3-bfb6-b6b8daf87b3a
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：6ce24e16-f765-47a3-bfb6-b6b8daf87b3a
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

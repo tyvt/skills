@@ -12,6 +12,7 @@
 - 当前状态：代码已注释，未实际调用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 所属项目：昆山市民；来源会话ID：cbf090fd-dbf7-4699-9af7-6c33b203af19；代码基线：none
 - 涉及文件：verifyUser/index.vue、home.vue、home.js、personal.vue
 

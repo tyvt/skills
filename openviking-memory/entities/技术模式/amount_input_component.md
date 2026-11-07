@@ -11,6 +11,10 @@
 - 涉及文件：`src/components/AmountInput/index.vue`、`src/components/zs-input/zs-input.vue`
 - 所属项目：产品2.0；来源会话：96954bb5-7491-4bdf-854e-917a5232b9e6、49ff6642-e504-475e-9982-4f88a028a3b9；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

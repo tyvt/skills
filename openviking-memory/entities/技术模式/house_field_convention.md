@@ -9,6 +9,7 @@
 - form-tip 风险提示文案须与输入框通过 aria-describedby 建立无障碍关联。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 验证证据：src=惠山二期G/008.md
 - 涉及文件：zhi2-web-admin/src/views/building/house/detail.vue、building/houseChange/detail.vue、building/houseChange/index.vue、building/unitChange/detail.vue、package.json
 - 所属项目：惠山二期G；来源会话：88de92b5-3f00-4807-b98d-08daf1365189；代码基线：none

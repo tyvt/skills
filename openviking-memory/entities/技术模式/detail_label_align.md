@@ -10,6 +10,7 @@
 - 值区域保持原有左对齐逻辑未改动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 a563fde7 将 text-align 由 right 改为 left 修复标签右偏
 - 涉及文件：zhi2-web-admin/src/components/detail-template/detail-template.vue
 - 所属项目：园区物管2.0；来源会话：a563fde7-487c-404f-a47e-ae62b28abbc3；代码基线：none；验证证据：园区物管2.0/025.md

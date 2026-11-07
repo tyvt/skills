@@ -13,6 +13,7 @@
 - 看到「标题/按钮位置反了」要先怀疑 DOM 顺序而非间距
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 0ccf674f（2026-09-15，基线 320507d）将 template-header 移到 Headline 之后即修复
 - 涉及文件：zhi2-web-admin/src/views/publicQuery/monthlyReportTemplate/index.vue、TemplateTreeTable.vue、survey/template/detail.vue、publicQuery/monthlyReport/detail.vue
 - 所属项目：苏住房G；来源会话ID：0ccf674f-a815-4bdd-b0ea-8b4c07143b54；代码基线：320507d

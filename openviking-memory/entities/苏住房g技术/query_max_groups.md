@@ -14,6 +14,7 @@ zs-advanced-query 的 max-groups 是「最大组数」硬上限，默认组数�
 - 凡是 max-xxx 型受控上限 prop（max-groups / max-length / max-count），先确认是否兼任默认值，否则「只能有一个」类反馈往往是上限写死导致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话用户反馈「条件组默认一个，再最多加一个，一共最多两个，现在只有一个了」；结论改 :max-groups="2"，改后行为（默认 1 组、可加 1 组、2 组时可删至 1 组、组间且/或切换）
 - 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/index.vue、src/components/zs-advanced-query/zs-advanced-query.vue
 - 所属项目：苏住房G；来源会话：20e31648-4d28-46f2-81a2-de9c591a691a；代码基线：e590ffa

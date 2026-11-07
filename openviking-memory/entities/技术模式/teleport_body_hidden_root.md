@@ -13,6 +13,7 @@
 - zhi2-web-admin/src/views/property/complexChange/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 所属项目：2-0；来源会话ID：606fcea2-85a1-4821-b6e0-0d6ddd8fddeb
 - 代码基线：none
 

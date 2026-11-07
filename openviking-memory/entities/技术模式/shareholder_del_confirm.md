@@ -11,6 +11,7 @@
 - `deleteShareholderByName`、`batchDeleteShareholders` 在点击删除后先确认再继续断言
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - `company-register-branch.spec.js`「步骤返回与股东维护」用例通过（含单行、批量删除流程）
 - 涉及文件：`Step4Shareholders.vue`、`table.js`、`register-helpers.js`、`company-register-branch.spec.js`
 - 所属项目：苏州市房地产监测V3；来源会话：be083398-3966-4e2a-b4e7-52daef8b2c73；代码基线：none

@@ -5,6 +5,7 @@
 ## 解决方案
 - 新增 `utils/route-map.js` 的 `normalizeLegacyPageUrl`，在 `utils/index.js` 的 `goto`/`openPage` 及 `message.vue` 跳转前将旧前缀映射为 `pages_main/`
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：utils/route-map.js、utils/index.js、pages/message/index.vue、pages/message/detail.vue、pages/msg/detail.vue、pages/redirect/index.vue、menuRouteMap.js、pages.json、package.json、scripts/merge-main-leaks.mjs
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 01893cc7-e8de-4690-b98f-18f412beec9e；验证证据 苏住房C/023.md
 

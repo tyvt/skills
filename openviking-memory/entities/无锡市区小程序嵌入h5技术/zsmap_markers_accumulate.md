@@ -12,6 +12,7 @@ H5嵌入小程序时小区周边地图无数据，需避免失败路径静默ret
 - 涉及文件：pages_owner/project/info/index.vue、utils/index.js、utils/qqMapKey.js、utils/transaction.js、pages/facility/index.vue、components/ZsMap/ZsMap.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 来源会话：44e9f45b-f8b3-4cdb-b60b-c803993c0d4a
 - 验证证据：src=无锡市区小程序嵌入H5/017.md
 - 代码基线：ca82c96

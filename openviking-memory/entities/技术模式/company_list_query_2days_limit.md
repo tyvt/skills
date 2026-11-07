@@ -15,6 +15,10 @@
 - 文件：`zhi2-web-admin/src/utils/companyListQuery.js` 及上述 Vue 页面
 - 所属项目：苏住房G；来源会话：84fe40ac-f546-41bc-9d7e-76bd876f4594；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -20,6 +20,7 @@
 - 补 isHomeMenuRoute 完整路径约束；sidebarRoutes 与 rewriteRoutes 用同一去重；handleClick 补全父路径并 canonical
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：进入首页高亮、切走后不再高亮
 - 涉及文件：router/index.js、utils/homeRoute.js、utils/permission.js、store、layout/components/Sidebar/RecursiveMenu.vue
 - 所属项目：苏住房G；来源会话 cb0377ba-165d-4411-88e0-da19021618ab（基线 c17e4d8）；补充会话 ea05a521-a616-40d9-b860-3870b34a52ab（基线 db4f82c）指出高亮根因

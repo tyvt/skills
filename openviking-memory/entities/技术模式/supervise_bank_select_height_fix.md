@@ -7,6 +7,8 @@
 - 若下拉箭头略偏，可加 `:deep(.el-input__suffix) { display: flex; align-items: center; }`
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 需在本地刷新银行名单详情页用 DevTools 确认 `.el-input__inner` 为 38px
 - 涉及文件：`superviseBank/detail.vue`、`element-ui.scss`、`index.scss`
 - 项目：苏州市房地产监测V3；来源会话ID：0bafd576-0208-4918-be87-43b71abea60c

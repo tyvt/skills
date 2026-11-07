@@ -11,6 +11,7 @@
 - 刷新后「所属小区」应显示（如「海悦花园」），仍为空需确认getHouseInfo是否返回小区名字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：src/pages_owner/maintain/index.vue、src/utils/h5Context.js、src/store/repair.js、src/api/repair.js
 - 来源会话：6c36b4fe-74d0-426f-82e3-e6ed3c6e89a6
 - 所属项目：无锡市区小程序嵌入H5；代码基线：none

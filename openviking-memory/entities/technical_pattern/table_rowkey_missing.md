@@ -13,6 +13,7 @@
 - `DeliveryScopeSection.vue` 绑定 `:row-key="getRowKey"`，方法返回 `row.deliveryScopeId || row.buildingId` 区分已保存记录与草稿楼幢
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/111.md；另 src=苏州市房地产监测V3/299.md
 - 涉及文件：ServiceSchemePanel.vue、zs-table.vue、EducationTable.vue、AgencyBranchDetail.vue、DeliveryScopeSection.vue、zs-select-column.vue、ProjectDeliveryDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：25e4469c-7d8e-407b-89ca-9f7744f1f475；另 a11f72ad-6551-4d69-a2d0-e12bb33736a2；代码基线：none

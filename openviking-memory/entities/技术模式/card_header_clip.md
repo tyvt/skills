@@ -14,6 +14,11 @@
 - Playwright 已加「文字完整落在 header 盒内」断言，当前 2 passed。
 - 涉及文件：zhi2-web-admin/src/views/home/index-new.vue；来源会话 36da1bfd-d85e-47d1-a0e0-3a2d922f74ca；项目门户。
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

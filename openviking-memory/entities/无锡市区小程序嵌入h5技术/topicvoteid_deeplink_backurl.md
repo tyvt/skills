@@ -11,6 +11,7 @@
 - backUrl：Base64(UTF-8) 编码的回调地址
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话 099b07e0 用户确认实现
 - 涉及文件：portal.js、usePortal.js、bdc.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话：099b07e0-3f22-4afe-a5e8-451cf8675f31；代码基线：none

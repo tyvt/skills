@@ -12,6 +12,7 @@
 - budgetAmount 统一用 Number() 转换，避免 ECharts 无法识别字符串。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证路径：慧物业 → 阳光物业 → 年度预算，检查 Tab 切换与年份切换后饼图显示。
 - 涉及文件：pages_benefit/budget/index.vue、components/echarts-uniapp/echarts-uniapp.vue、api/benefit.js。
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：9446951a-feff-46d8-9660-d4cca2cd85fd。

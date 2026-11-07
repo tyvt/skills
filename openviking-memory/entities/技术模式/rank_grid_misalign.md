@@ -11,6 +11,7 @@
 - 金额列用固定宽度（如 72px）并 text-align:left，超长金额再调大固定宽
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 2aa6472f，mapOverview/index.vue 物业管理区域账户余额排名表头与数据左对齐问题
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；代码基线：f00310232；来源会话：2aa6472f-742a-4bc7-bb9f-76eedbe8d7a9

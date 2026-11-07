@@ -12,6 +12,7 @@
 - `detail-form.scss` 同步调整
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`variables.css`、`index.scss`、`detail-form.scss`
 - 所属项目：苏州市房地产监测V3；来源会话：5c76bcbe-41b3-4397-80d0-5a0934fb8fbd；代码基线：none
 

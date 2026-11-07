@@ -10,6 +10,7 @@
 - 联调时在网络面板核对 query/body；若列表接口未返回 `operatorAuthId`（首次授权），需后端补字段或先调 `/company/operatorAuth/authorize` 初始化授权记录。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证会话：92e02400（用户反馈授权选不到物业管理区域、未传 operatorAuthId；改为 operatorAuthId 并与 operatorAuthRangeTable 对齐）
 - 涉及文件：zhi2-web-admin/src/views/company/userManagement/operator/operatorTable.vue、zhi2-web-admin/src/views/company/userManagement/operatorAuth/operatorAuthRangeTable.vue
 - 所属项目：园区公共收益；代码基线：0c9b8c2；来源会话：92e02400-281a-4942-997e-0a53b4d14822

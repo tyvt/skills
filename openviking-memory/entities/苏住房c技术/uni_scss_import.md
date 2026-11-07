@@ -13,6 +13,7 @@
 - 改完跑一次 npm run build 核对，而不是只看 dev 热更新
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话 8f10f353：报错来自 terminals/15.txt:21-35；结论明确「uni.scss 被注入每个页面样式，相对路径按当前页面文件解析」，修复为 @import '@/styles/zs-button.scss'，改后 npm run build 通过
 - 涉及文件：src/uni.scss、pages_tab/benefit/index.vue、src/styles/zs-button.scss、src/styles/btn.scss
 - 所属项目：苏住房C；代码基线：5f0f4dc；来源会话ID：8f10f353-5bab-456e-8115-00b593a5bd85

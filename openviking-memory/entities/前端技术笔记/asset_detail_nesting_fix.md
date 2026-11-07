@@ -12,6 +12,7 @@
 - 值的 `word-break: break-all` 改为更合理的断行方式。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/HouseAssetDialog.vue、VenueAssetDialog.vue、ParkingAssetDialog.vue、AdvertiseAssetDialog.vue、AssetLeaseInfoTable.vue
 - 所属项目：园区物管2.0；来源会话：f8f12066-4a2e-407f-8919-3b1feebdc139；代码基线：none
 

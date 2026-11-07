@@ -10,6 +10,7 @@
 - 写入 env/ 各环境文件，确保 Vite 可读取
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/037.md
 - 涉及文件：IframePage/index.vue、vite.config.js、placeApproval/index.vue、placeManage/index.vue、announcement/index.vue、runbook/index.vue、路由信息.json、package.json
 - 所属项目：苏州市房地产监测V3；来源会话：2babe7dd-0254-4d05-849d-9a99a05365df；代码基线：none

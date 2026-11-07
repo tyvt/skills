@@ -10,6 +10,7 @@
 - 从三个证书表格组件中删掉重复的 computed.showListName
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新后警告消失；项目详情内嵌证书列表仍不显示标题，独立菜单页正常显示
 - 涉及文件：table.js、projectEmbeddedCertificateList.js、ProjectCertificateDetailDialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话：82c57f89-5320-4ad9-a2ed-1c48587b738a；代码基线：none

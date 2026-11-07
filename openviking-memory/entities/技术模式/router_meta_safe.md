@@ -15,6 +15,7 @@
 - 在 `src/main.js` 全局 mixin 中，computed 的 `currentRoute` 与 `formMode` 经 `router.currentRoute.value` 获取路由信息。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/011.md；src=2-0/014.md；src=2-0/013.md；main.js:80 formMode 报错；index.vue:140 报错；AppMain.vue 报错。
 - 涉及文件：
   - zhi2-web-admin/src/main.js（全局 mixin）

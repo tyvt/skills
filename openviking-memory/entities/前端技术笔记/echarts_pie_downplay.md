@@ -12,6 +12,7 @@
 - 写任何「手动 dispatchAction 交互增强」时都按此对称原则自查
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：pieLegendHover.js 增加 resetPieHover 在 mouseout/globalout 派发 downplay 并恢复图例
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/pieLegendHover.js、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue
 - 所属项目：园区物管2.0；代码基线：已知图表类条目为裁剪包缺 series(#1)、markRaw(#4)、type=2d 同层渲染(#40)、穿屏与图例缺色(#47)、原生叠加层(#38)，无「highlight 后必须 downplay」条目；来源会话：1ffbe0a9-01c9-4c6e-8964-74902067048b

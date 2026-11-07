@@ -8,6 +8,7 @@
 - `isOperateButtonVisible` 先判断 `rowVisible`，再判断原 `visible` 函数，最后走 `checkPermission`，行为与原先一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/maintenance/budget/components/feeCustomTypeTable.vue、zhi2-web-admin/src/views/autonomy/candidateCollect/components/index.vue
 - 所属项目：园区物管2.0；来源会话：7ac74063-2500-4985-8cbb-650d6052d19f
 

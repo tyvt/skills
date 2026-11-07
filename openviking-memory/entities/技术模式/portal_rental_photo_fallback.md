@@ -8,6 +8,7 @@ publicPortal 的 RentalDetailDialog 基本信息区 102×128 证件照位按多�
 - 专用占位图可放 `public/assets/images/` 并改组件内 DEFAULT_PERSON_PHOTO 常量
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - mock 无真实照片时 E2E 可断言 src 含 empty.svg
 - 验证证据：截图标注「没照片放一张缺省图」；结论写明字段优先级、empty.svg 与 E2E 断言
 - 涉及文件：zhi2-web-admin/src/views/home/publicPortal/components/RentalDetailDialog.vue、zhi2-web-admin/tests/e2e/public-portal-interactions.spec.ts、zhi2-web-admin/src/views/home/publicPortal/mock/rental.js

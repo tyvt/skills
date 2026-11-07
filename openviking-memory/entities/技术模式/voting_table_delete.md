@@ -10,6 +10,7 @@
 - 待提交状态下操作列删除按钮可正常点击；顶部「批量删除」逻辑未改动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证：刷新页面后在待提交状态尝试删除表决项
 - 涉及文件：optionDecision/components/VotingItemsTable.vue、optionDecision/detail.vue、ownerDecision/components/VotingItemsTable.vue
 - 所属项目：太仓G；来源会话：92a52a39-5ec2-4b9b-afa1-fb9772a75eae；代码基线：none

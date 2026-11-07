@@ -11,6 +11,7 @@
 - 清理 50+ 文件环境分支
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/042.md
 - 涉及文件：refund/detail.vue、exchangeContract/detail.vue、detailMixins.js、form.js、area.js、vite.config.js、main.js、app.js
 - 所属项目：苏州市房地产监测V3；来源会话：ac832c35-75b7-4b62-81d0-dc57db9325d0；代码基线：none

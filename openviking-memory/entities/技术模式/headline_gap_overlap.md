@@ -11,6 +11,8 @@
 - AgencyBasicInfoForm 内部续用 row-gap:16px 不加 margin-top
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/010.md
 - 涉及文件：institutionRegister/detail.vue、AppendixPackageSection/index.vue、Headline/index.vue、AppendixEmpty/index.vue、AgencyBasicInfoDetail.vue、AgencyBranchDetail.vue、companyApplyAudit/detail.vue、entrustSale/detail.vue
 - 来源会话：7d944204-556e-42c4-aea2-49cfa70bd1db；代码基线：none

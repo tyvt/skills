@@ -15,6 +15,12 @@ Number inputs in zhi2-web-admin views were switched from el-input/zs-input with 
 - Source cursor session: d7c7c5d4-1f13-462a-8aeb-c77645611399
 - Code baseline: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：d7c7c5d4-1f13-462a-8aeb-c77645611399
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

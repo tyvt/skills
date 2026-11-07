@@ -17,6 +17,7 @@ zs-table 等表格需统一行悬停背景色，固定列与操作列因独立 D
 - zs-table.vue 悬停时把 hover-row 同步派发到主表体与所有固定列（含反向触发）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：最终结论「问题原因」两条 + 修改内容四点
 - 涉及文件：variables.css、element-ui.scss、zs-table.vue、benefit/pubSubjectInfo/index.vue
 - 所属项目：产品2.0；来源会话：80a5b505-898c-436f-8ccc-b4d6fd8cd107；代码基线：41c6961

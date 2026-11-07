@@ -14,6 +14,7 @@ zs-table 被放入 zs-dialog 的 form-box 后缺失左右 padding，须将水平
 - 改完须截图在多个弹窗（含公房车位、房屋部位）逐个复核左右是否一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 改动落在 zs-table.vue 与 styles/index.scss（公共层）后一次对齐，子模块提交后 cherry-pick 到 v2.6.2/v2.6.2-yulin
 - 涉及文件：components/zs-table/zs-table.vue、styles/index.scss、pubHouse/components/pubHouseDialog.vue、pubParkingSpace/components/parkingDialog.vue、housePart/components/assetDialog.vue
 - 所属项目：产品2.0；来源会话：2ee3fa7e-3302-4162-9884-a54bd1cffc7f；代码基线：6accf9a

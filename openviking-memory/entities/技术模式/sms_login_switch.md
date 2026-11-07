@@ -10,6 +10,7 @@
 - 开启时走手机号 + 短信验证码流程
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/views/system/platformConfig/detail.vue、src/views/login.vue、src/views/LoginForm.vue、src/views/home/ForgotPassword.vue、src/store/modules/user.js、src/views/companyLogin.vue、src/utils/auth.js、src/views/register/components/accountInfo.vue
 - 所属项目：园区公共收益；来源会话：75dc4e9d-04cf-42a2-9e3f-7822ba6d3b69
 

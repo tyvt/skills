@@ -9,6 +9,7 @@ vite.config.ts 中 build.sourcemap 重复定义会触发 Duplicate key 警告，
 - 根据 UNI_PLATFORM 条件赋值
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i-H5
 - 验证证据：src=i-H5/001.md
 - 涉及文件：vite.config.ts
 - 所属项目：i-H5；代码基线 none；来源会话 fc61c1ee-9ad7-4ba4-9fe6-cff205ed2251

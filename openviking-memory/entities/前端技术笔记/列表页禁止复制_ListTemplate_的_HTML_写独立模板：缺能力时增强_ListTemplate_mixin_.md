@@ -9,6 +9,11 @@
 **所属项目**：园区物管2.0
 **来源会话**：d930377c-63a5-48c1-9276-9e6f283932ed
 **代码基线**：3353ef164 / f00310232 / 193a9a3b6 / d48841f13
+
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "layout的根本原因",

@@ -9,6 +9,11 @@
 - @src/pages-rent/rent-project-detail.vue
 - 来源会话：0bc20f1f-ffa2-45b3-af16-c1871ca5ce82；代码基线：none。
 
+## 验证与归属
+- 所属项目：0
+- 验证证据：extracted source=cursor project=0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

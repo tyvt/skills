@@ -20,6 +20,11 @@ Playwright 跨端 clearBrowserSession 在 about:blank 访问 storage 时抛出 S
 - 涉及文件: e2e/fixtures/auth-helpers.js, e2e/fixtures/company-helpers.js, e2e/fixtures/register-helpers.js, e2e/company/company-record-change.spec.js, src/views/company/companyManagement/components/CompanyBasicInfoDetail.vue, src/views/company/companyManagement/change/detail.vue, src/views/toB/change/detail.vue, src/views/toB/companyRecord/detail.vue, package.json
 - 所属项目: 产品2.0; session: c24a0b77-252c-498f-8424-de964da60242; 代码库: 62d5fb9
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：c24a0b77-252c-498f-8424-de964da60242
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

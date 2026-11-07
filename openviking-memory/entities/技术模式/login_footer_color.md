@@ -8,6 +8,7 @@
 - system/platformConfig/detail.vue 增补 el-color-picker 表单项供后台配置
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/login.vue、src/store/modules/app.js、src/views/system/platformConfig/detail.vue、src/permission.js、src/main.js、src/App.vue
 - 所属项目：园区物管2.0；来源会话：3a00e2ae-df89-4fd3-a9ef-788bec02c44f；代码基线：none
 

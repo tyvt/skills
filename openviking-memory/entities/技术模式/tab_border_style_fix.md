@@ -10,6 +10,12 @@
 - 涉及文件: supervision/progress/change/detail.vue, BuildingChangeTable.vue, Headline/index.vue, styles/index.scss, supervision/progress/node/detail.vue, AgreementDetailsTable.vue, ShareholderTable.vue, supervision/unblock/usemoney/detail.vue
 - 源会话: 347d795c-a17e-454d-9b6d-e10334fa6635; baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：347d795c-a17e-454d-9b6d-e10334fa6635
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

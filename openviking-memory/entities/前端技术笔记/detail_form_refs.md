@@ -15,6 +15,8 @@
 - 排查口诀：编辑页「无字段可改」先查模板有没有 zs-form 分支，「保存无反应」先查 $refs.form 是否存在
 
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
 - guaranteeDeposit/components/detail.vue 无编辑分支与 form ref，validateForm 因 $refs.form undefined 静默失败；参照 guaranteeDepositAccount/detail.vue 补 zs-form 后修复
 - 涉及文件：src/views/maintenance/guaranteeDeposit/components/detail.vue、src/views/maintenance/guaranteeDeposit/deposit/detail.vue、src/mixins/detailMixins.js；来源会话 b0ca50b6-00f0-4d36-8845-29a8aaad4b5c；代码基线 b0ca50b6~f59c6be
 

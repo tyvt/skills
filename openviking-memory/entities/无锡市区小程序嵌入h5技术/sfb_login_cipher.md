@@ -19,6 +19,7 @@
 - 规范侧应要求拼 URL 时用 `%2B`；H5 端还原作为兜底，验证用含 + 的真实跳转链接对比还原前后密文长度与解密结果
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话 8a10b942 用户明确「不需要解密啊，都是后端解密，url拿到什么就传什么」；会话1d789cb5用户给含+的unlimited测试URL，结论为URLSearchParams将+解码为空格破坏Base64，在h5Context.js增加restoreBase64Plus并在performSfbLoginIfNeeded对四个密文字段应用
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js、src/api/security.js、src/store/user.js、src/App.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话：8a10b942-72e3-49f5-b5b6-415b24f7c1ec、1d789cb5-e259-4d57-ada7-dfb786d89609；代码基线：37bd5a1、3fb9434

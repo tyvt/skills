@@ -11,6 +11,10 @@ i淮安公版 H5 首页用户卡片点击无响应体验问题的修复记录。
 - 若检测到 `miniprogram` 但桥未就绪，在 `WeixinJSBridgeReady` 后再补发一次 `requestLogin`。
 - 涉及文件：src/pages/index/home.vue；所属项目：i淮安公版；来源会话：e7ab2701-0d0c-4c0d-b39d-ab250ce924e8。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安公版
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "i淮安公版技术",

@@ -10,6 +10,7 @@
 - 同步修改 `AgencyEntryNetworkDetail.vue` 与 `AgencyEntryNetworkAdminDetail.vue` 的 data、`initDict`、模板 `:region-options`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/313.md
 - 涉及文件：AgencyEntryNetworkDetail.vue、companyOrganContext.js、area.js、detailMixins.js、AgencyEntryNetworkAdminDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：5bc132a2-9d67-4e01-bb16-34e9f3a56c64；代码基线：none

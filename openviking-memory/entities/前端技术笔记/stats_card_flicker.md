@@ -14,6 +14,7 @@
 - 若仍有轻微抖动，可在全局布局加 scrollbar-gutter:stable 兜底滚动条占位
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 2fc8efe8（2026-05-21）用户报「表格加载完后页面上半部分会闪烁」；结论定位为滚动条出现使 .app-main 宽度缩 ~15px + width:20% 卡片 + transition:all 0.3s 触发布局过渡；改动为收窄 transition 属性并给 zs-table 加 :tableTr 预留 10 行高度
 - 涉及文件：zhi2-web-admin/src/views/benefit/alert/index.vue、src/components/zs-table/zs-table.vue、src/mixins/listMixins.js
 - 所属项目：园区物管2.0；代码基线：5a288f142 之后的 fc994977f；来源会话ID：2fc8efe8-20f3-454c-8e49-fdfcaf343a87

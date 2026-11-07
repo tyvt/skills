@@ -9,6 +9,8 @@
 - 配套脚本 `scripts/fix-relative-static-paths.mjs` 与 `src/utils/mainStaticPaths.js` 辅助路径修正
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=苏住房C/056.md；来源会话ID：7f47849c-ba9e-4b0a-8c84-2445f8137134；代码基线：none
 - 涉及文件：src/pages_main/houseMap/houseMap.vue、src/components/ZsImage/ZsImage.vue、src/utils/index.js、scripts/fix-relative-static-paths.mjs、src/utils/mainStaticPaths.js、src/components/collectBtn/collectBtn.vue、src/pages_main/houseMap/components/StockHouse.vue、src/pages_main/houseMap/components/NewHouse.vue
 

@@ -7,6 +7,8 @@ wygl小程序用户协议文档结构调整，删除原第七条争议解决并�
 - 最终结构为一至六条加七其他条款
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：pages/face/user-agreement.vue
 - 来源会话：61587d91-395e-4b29-9edf-63f0a5d87927
 - 代码基线：none

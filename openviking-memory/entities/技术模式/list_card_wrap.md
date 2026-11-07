@@ -13,6 +13,12 @@
 - 涉及文件: ListTemplate.js; scripts/wrap-list-card.mjs; 多个 index.vue (property/serviceItem, building/unit, article/components, benefit/pubManagementOrg, property/bankReceiptApply, property/complex, building/building).
 - 验证证据: cursor session=2a132670-9deb-4220-9d16-a2853aa45068.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：2a132670-9deb-4220-9d16-a2853aa45068
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

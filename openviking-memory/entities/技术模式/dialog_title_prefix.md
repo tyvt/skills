@@ -15,6 +15,8 @@
 - zhi2-web-admin/tests/e2e/fixtures/public-portal-designs.ts
 - zhi2-web-admin/src/views/home/UnifiedLogin.vue
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：06427c5a-9173-45f7-a7df-44983a3e8b04
 - 验证证据：cursor 会话 06427c5a-9173-45f7-a7df-44983a3e8b04
 - 所属项目：门户
 

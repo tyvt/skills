@@ -12,6 +12,12 @@
 - 光标会话 75ba0721-e96d-4590-bbf7-51d468632dec
 - 涉及文件: src/views/benefit/pubRegulatoryAccount/detail.vue, components/PubManagementTable.vue, pubManagementOrg/detail.vue, api/benefit/pubRegulatoryAccount.js, pubRegulatoryAgreement/detail.vue, pubRegAccountChange/detail.vue
 
+## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
+- 来源会话：75ba0721-e96d-4590-bbf7-51d468632dec
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

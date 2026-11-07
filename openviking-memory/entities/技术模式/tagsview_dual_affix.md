@@ -12,6 +12,7 @@
 - 删除对path === 'index'的特殊分支
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：用户反馈「tag里面有两个固定的待办任务」；改完无论落地/flowable/todo或回退/index只保留一个固定待办
 - 涉及文件：src/router/index.js、src/store/modules/permission.js、src/layout/components/TagsView/index.vue、src/views/flowable/todo.vue、src/views/home/index-wrapper.vue
 - 所属项目：园区公共收益；来源会话：3bcff305-97a0-45ac-a995-1878bd7ee92b；代码基线：f783ca2

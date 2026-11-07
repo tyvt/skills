@@ -11,6 +11,7 @@
 - 新增明确 getForm()，保存时显式提交 remark 字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0
 - 来源会话：3faac03b-5c75-454c-a0d1-79ae56a3ac95
 - 代码基线：none

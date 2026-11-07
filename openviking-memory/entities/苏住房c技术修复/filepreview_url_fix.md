@@ -9,6 +9,7 @@
 - 统一使用项目已有 resolveMediaUrl，按路径前缀正确拼接 IMAGE_BASE / IMAGE_BASE_V1 域名，且不破坏协议头。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：contracts.vue、Type2.vue、utils/index.js。
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：114830fb-d6f5-4964-849d-72fac1151285。
 

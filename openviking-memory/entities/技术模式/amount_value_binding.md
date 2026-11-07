@@ -13,6 +13,10 @@
 - 涉及文件：`owner/vote/detail.vue`、`building/project/detail.vue`、`benefit/pubUseMoneyApply/detail.vue` 等
 - 所属项目：产品2.0；来源会话：959c4f79-0192-4b53-a367-9630388e7f62；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

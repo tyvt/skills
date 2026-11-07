@@ -17,6 +17,10 @@
 - 涉及文件：zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js
 - 所属项目：2-0；来源会话：5af92aab-06ab-48cb-be81-b133e170a41b；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "测试模式",

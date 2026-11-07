@@ -9,6 +9,8 @@
 - 修正字段名为 `isDefaultOptions`/`isEnableOptions`，使 `options` 正确注入 `dict-tag`
 
 ## 验证与归属
+- 所属项目：bugfix
+- 验证证据：extracted source=cursor project=bugfix
 - 验证证据：src=bugfix/002.md
 - 涉及文件：detail.vue
 - 来源会话ID：f06b2a1d-1232-42cd-9d82-5e09b2d5e785

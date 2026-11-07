@@ -11,6 +11,7 @@ uni-app会向window.wx写入空对象覆盖苏服办JSSDK，导致wx.miniProgram
 - src/utils/restoreWeixinWx.js + src/main.ts二次恢复：应用启动后再调用restoreWeixinWx()作为兜底
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证方式：重新部署dist后在微信webview控制台执行wx.miniProgram应有navigateTo等方法
 - 所属项目：无锡市区小程序嵌入H5；来源会话：718e1271-a4de-433f-9316-5f9d2f58fafe
 - 涉及文件：index.html、src/utils/restoreWeixinWx.js、src/main.ts

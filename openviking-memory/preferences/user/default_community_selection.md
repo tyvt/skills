@@ -3,6 +3,12 @@
 - Property_Suzhufang.vue reuses the same hook to avoid logic inconsistency
 - Source session: 975a7c63-ba48-4d7b-a799-8262cfc26787
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：975a7c63-ba48-4d7b-a799-8262cfc26787
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

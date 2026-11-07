@@ -9,6 +9,7 @@
 - 改用fetch(resolveServerAssetUrl(filePath))→blob→URL.createObjectURL生成<a download>，禁手拼window.origin
 - 与已知1070「地址解析统一收口」互补，本条补下载链路消费方
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话684bd892，错误地址https://szf.szzfcjj.cn/zhi2-test/2026/...缺前缀；修复恢复fetch(resolveServerAssetUrl(filePath))
 - 涉及文件：src/views/benefit/pubRecBankFile/index.vue、src/utils/resolveServerAssetUrl.js、src/utils/imgPrfix.js
 - 所属项目：苏住房G；来源会话：684bd892-9f31-405c-be6b-c5c9fdc86eef；代码基线：864b409

@@ -19,6 +19,7 @@
 - 不要先怀疑字体或rpx换算
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话9bedfd55：用户报tabUI出问题并附竖排截图，定位修复
 - 涉及文件：pages_main/news/index.vue、ListIndex.vue、tabBtn.vue
 - 所属项目：苏住房C；来源会话ID：9bedfd55-6428-4419-b1a7-8396206c9412；代码基线：9832ba3

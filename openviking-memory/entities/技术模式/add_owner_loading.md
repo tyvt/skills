@@ -9,6 +9,7 @@ i淮安H5 在确认添加业主调用 addOwnerDirectly 时增加全屏 loading �
 - 仅当已选房屋且 currentSelect.houseId 存在时请求 addOwnerDirectly；无 houseId 只 navigateTo 不调接口
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安H5
 - 涉及文件：src/pages_owner/house/automaticAdd.vue、src/pages_owner/repair/submit.vue、src/components/ZsButton/ZsButton.vue、ViewOptionsList.vue
 - 所属项目：i淮安H5；来源会话：0827ee09-4d39-4174-b6b1-6333e223e06e；代码基线：none
 

@@ -16,6 +16,7 @@ externalWebview 的 onLoad 解析 redirectUrl 得到含 authCode 的 query 时�
 - 维护 autoLoginTriggered（或等价标志）防止 onShow 或重复初始化再次触发自动登录
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：「redirectUrl + 解析出 authCode 就自动跑完整链路」「authCode（即使为 0 也算）」「wx.login → wechat/login → profile → selectMyHouseByLingXi → token/complexId/houseId」「加了 autoLoginTriggered 防止 onShow 或重复初始化再次触发」
 - 涉及文件：pages/webview/externalWebview.vue
 - 所属项目：小程序；来源会话ID：0931abc6-673c-4efb-91bc-d74159322efb；代码基线：none

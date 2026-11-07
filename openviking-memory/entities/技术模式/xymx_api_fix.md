@@ -9,6 +9,7 @@
 - 监管协议终止详情页「监管范围」表格由此正常加载
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/010.md
 - 涉及文件：zhi2-web-admin/src/api/zjjg/xymx.js、benefit/xymx.js、supervision/agreement/end/detail.vue、supervision/agreement/xy/components/AgreementDetailsTable.vue、mixins/listMixins.js、路由信息.json
 - 所属项目：苏州市房地产监测V3；来源会话：d33916e8-66d0-4dad-b5a9-9efd7da908c8；代码基线：none

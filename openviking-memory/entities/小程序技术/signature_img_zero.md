@@ -18,6 +18,7 @@
 - 仍不显示用vConsole看图片请求是否404区分尺寸塌陷与资源加载失败
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话e7007608用户报选举/决策记录签字不显示+JSON；后续空白不展示；结论固定尺寸wrap+ :deep覆盖
 - 涉及文件：src/pages_vote/decision/common/DecisionRecord.vue、src/pages_vote/elect/ResultRecord.vue、src/components/ZsImage/ZsImage.vue
 - 所属项目：苏住房C；来源会话ID：e7007608-941f-47f8-a082-3768ad6aa6e3；代码基线：8fc3cc5

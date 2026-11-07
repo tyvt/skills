@@ -21,6 +21,7 @@ pages/service/index/index.vue 智能客服中「公共收益能用在哪些地�
 - 修改前为4项：优先补充维修资金、小区维修应急支出、业委会日常经费、业主分红
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：pages/service/index/index.vue
 - 所属项目：小程序（wygl-wxxcx-dev-slh）
 - 来源会话：4bfb6494-e801-45c9-9f42-54ebab08c373

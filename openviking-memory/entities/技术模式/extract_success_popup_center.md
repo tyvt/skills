@@ -12,6 +12,7 @@
 - 若仍偏上或偏下可继续微调 min-height
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/property/extract/components/SelectJudgesDialog.vue
 - 所属项目：园区物管2.0
 - 来源会话ID：b185be66-bd45-4dfc-803b-68a0ab11cd87

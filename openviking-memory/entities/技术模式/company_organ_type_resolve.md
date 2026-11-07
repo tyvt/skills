@@ -18,6 +18,7 @@
 - companyOrgan.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：ffdc5b21-cec5-4d42-a465-057d2d68d9d7；代码基线：none
 
 <!-- MEMORY_FIELDS

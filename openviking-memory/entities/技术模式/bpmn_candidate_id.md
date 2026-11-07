@@ -12,6 +12,8 @@
 - 非数字表达式(${INITIATOR}、#{approval})必须用数字正则拦截，避免误请求无效地址
 - 备选：打开设计器时预拉角色/用户字典以 dic 传入；保留 allowCreate 语义不静默清空未匹配 ID
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：1688d337-3c59-4439-8b61-494a949b35cb
 - 验证会话1：1688d337-3c59-4439-8b61-494a949b35cb，结论远程下拉回显未预取 label
 - 验证会话2：24929f7a-3693-4ae6-b04b-d0abf802ee41，修复后短暂显示编号随后自动替换为角色名
 - 涉及文件：components/Process/components/nodePanel/task.vue、common/XForm.vue、PropertyPanel.vue、common/parseElement.js、views/tool/definition/detail.vue、components/zs-remote-select/index.vue

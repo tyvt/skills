@@ -11,6 +11,7 @@
 - ZsPaging 外包 .paging-host 并写 :deep(.zs-paging){height:100%} 让内部滚动区继承确定高度
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 改完必须 build:suzhufang:mp-weixin 后真机验证，区分「空白/只显示顶部/显示暂无数据」三种现象
 - 所属项目：苏住房C；来源会话：86040ce3-4045-4591-bad4-02ee7724cc1b；代码基线：b7bf813
 - 涉及文件：src/pages_main/message/index.vue、message.vue、chitchat.vue、src/pages/message/index.vue

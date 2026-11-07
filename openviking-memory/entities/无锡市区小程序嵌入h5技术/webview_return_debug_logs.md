@@ -11,6 +11,7 @@
 - 退出导航：exit:start / exit:redirectTo:ok|fail / exit:reLaunch:ok|fail
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages/common/webView.vue、src/utils/webViewUrl.js、src/pages.js
 - 所属项目：无锡市区小程序嵌入H5
 - 来源会话：3418c5a2-4fda-48cf-98cf-7a8c6d1ea069

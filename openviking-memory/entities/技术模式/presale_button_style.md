@@ -15,6 +15,7 @@
 - zhi2-web-admin/src/views/presale/permit/components/PermitPlanPanel.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新预售许可申请详情页即可看到效果
 - 所属项目：苏州市房地产监测V3；来源会话：5c21d128-6eca-4044-a0fe-b74043e3170a；代码基线：none
 

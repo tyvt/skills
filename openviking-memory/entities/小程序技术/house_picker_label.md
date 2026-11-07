@@ -10,6 +10,8 @@ formatPortalHousePickerLabel 控制 externalWebview.vue 与 home.vue 的房屋 p
 - 两处 picker 一并生效
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：utils/portal-user.js、externalWebview.vue、home.vue
 - 来源会话：fcf4ca3d-d26a-4766-bee4-2c1f57b061cf
 - 代码基线：none

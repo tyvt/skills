@@ -18,6 +18,10 @@
 - detail.vue
 - 所属项目：产品2.0；来源会话：d9f3c68c-3ec6-4725-adf0-590b032f0388；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

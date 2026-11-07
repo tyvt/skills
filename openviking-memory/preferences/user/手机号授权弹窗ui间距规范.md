@@ -4,6 +4,11 @@
 - 登录页(pages_main/login/index)与「我的」页自动复用该弹窗样式，业务逻辑未改动
 - 验证：src=苏住房C/059.md；来源会话 fc2a8c5e-bff6-4e3d-a36d-309db1a4029c
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

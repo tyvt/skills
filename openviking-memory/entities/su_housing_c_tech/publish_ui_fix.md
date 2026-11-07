@@ -7,6 +7,7 @@
 - 按钮上方间距 +40px：「下一步」按钮 `margin-top` 从 80rpx 调整为 160rpx
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 需在「首页 → 我要卖房 → 选择发布角色」页面验证
 - 涉及文件：type.vue、form2.scss、pages_owner/house/owner/authentication.vue
 - 所属项目：苏住房C；来源会话ID：0a834aef-a81b-437e-98de-264832c5f82e

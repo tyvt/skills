@@ -15,6 +15,7 @@
 - 收入与支出趋势图共用同一渲染函数（如 renderFundTrendMixed）时改一处即同时生效。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：032.md 会话 12d47513 原因段落明确 alignTicks 致 8÷3 分段浮点误差，修改含 formatter toFixed(2)、min:0、测宽同步。
 - 涉及文件：src/views/benefit/dataSandbox/fundPanorama/index.vue；所属项目：园区物管2.0；来源会话：12d47513-9d93-4058-b4a5-541ebd520733；代码基线：f00310232。
 

@@ -12,6 +12,7 @@
 - clearCompanyLeader 清空负责人姓名与电话。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：components/zs-select-dialog/zs-select-dialog-func.vue、property/propertyContract/components/detail.vue。
 - 所属项目：园区物管2.0；来源会话：ad936249-80e2-4ff9-b8bd-66d0f776406d；代码基线：none。
 

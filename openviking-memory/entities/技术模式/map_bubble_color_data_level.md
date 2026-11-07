@@ -17,6 +17,10 @@
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue
 - 所属项目：园区物管2.0；来源会话：7f4f3f1b-a0fd-4692-88cc-921192593ee3；代码基线：49e7729ce
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

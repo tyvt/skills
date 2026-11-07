@@ -14,6 +14,7 @@
 - 刷新后「当前状态」应显示「正常」，与下方「状态」字段一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：detail.vue、index.vue、workerDeptTable.vue
 - 所属项目：园区公共收益；来源会话：1e42f919-9755-4602-9b5f-c64546ba5da0
 

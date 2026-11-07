@@ -11,6 +11,7 @@
 - 原图表沿用旧主色（如 `#2f7cff`），行政区维度配色未统一
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：src=园区物管2.0/055.md
 - 涉及文件：fundPanorama/index.vue、fundPanorama/mock.js
 - 所属项目：园区物管2.0；来源会话：3f34cc31-619a-4d49-89fa-8ac011406d40

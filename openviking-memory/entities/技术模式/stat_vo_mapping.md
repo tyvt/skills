@@ -13,6 +13,7 @@
 - 改完刷新详情页逐项核对数值，不只验有无
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：property/feeDeclare2/detail.vue
 - 所属项目：苏住房G；来源会话：eaff5bf3-1e81-45b7-9600-20eebd931629；代码基线：f78f7e7
 

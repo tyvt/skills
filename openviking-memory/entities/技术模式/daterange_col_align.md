@@ -10,6 +10,7 @@
 - 编辑区改用section-form与section-field并套用detail-form.scss的min-width:0栅格实现同宽
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/063.md
 - 涉及文件：personnelCertificate/detail.vue、detail-form.scss、QualificationFormSection.vue、DeveloperBasicInfoForm.vue等
 - 所属项目：苏州市房地产监测V3；来源会话：819c3c2f-b512-4af8-bde8-ad7a2b56d9c1；代码基线：none

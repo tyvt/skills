@@ -15,6 +15,7 @@ zs-select-dialog 的 rowKey 误写为接口不存在的字段时，所有行 key
 - 排查提示：凡「选中态莫名扩散/全选」现象，第一步把 rowKey 与接口返回字段逐字对一遍
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 5af5c221 结论 rowKey 误设为 complexId 导致全 undefined、整表高亮，改为 projectId 并在 rowClassName 增空值过滤
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubBankReceiptApply/detail.vue、src/components/zs-select-dialog/zs-select-dialog.vue、src/components/zs-table/zs-table.vue
 - 所属项目：产品2.0；来源会话ID：5af5c221-8134-4622-ae26-0886a69a35ed；代码基线：41c6961

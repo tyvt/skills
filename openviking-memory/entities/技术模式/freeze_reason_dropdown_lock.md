@@ -14,6 +14,7 @@
 - 关联缺陷（会话 d80e5a47）：onFreezeReasonSelect 对 val==='其他' 特判并 $emit 清空值，导致「其他」永远存不进、界面跳输入态；修复为去掉特判
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：选「管理员手动冻结」仍可编辑，原本自动冻结账号仍只读
 - 涉及文件：system/user/detail.vue、AccountFreezeFields.vue、utils/accountFreeze.js
 - 所属项目：苏住房G；来源会话：92b6e126-dfc6-494c-a323-5344cc8169de；代码基线：805ea8c

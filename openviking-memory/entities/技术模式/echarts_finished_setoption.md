@@ -13,6 +13,7 @@
 - 该套路与小程序端 2d 同层渲染问题相互独立
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 94419466（fundPanorama/index.vue）根因为 renderFundTrendMixed 在 finished 事件里同步 setOption（约 767 行），修复为 rAF 推迟+lastTrendUnitPos 缓存+replaceMerge:['graphic']，刷新后告警消失且单位对齐逻辑不变
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue
 - 所属项目：园区物管2.0；代码基线：7814a0c2a…f00310232；来源会话：94419466-19b6-4c9f-a1f3-1926eccfdd49

@@ -11,6 +11,7 @@
 - 同一宗地下可多选楼幢；切换到其他宗地时之前选择被清除，无法跨宗地一并提交
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：complex/components/rangeTable.vue、complexChange/components/rangeTable.vue、complex/detail.vue、zs-select-dialog-func.vue
 - 所属项目：园区公共收益；来源会话：fed5c973-84de-4f18-adfd-4d38f2f4dcd8；代码基线：none
 

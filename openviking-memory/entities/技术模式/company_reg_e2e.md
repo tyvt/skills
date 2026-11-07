@@ -10,6 +10,8 @@
 - save-auth-state.mjs：默认地址从 8096/sys/fdc 改为 8098，与注册环境一致
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 全流程用例通过（35s）：E2E_BASE_URL=http://192.168.1.129:8098 npx playwright test e2e/register/company
 - 涉及文件：e2e/.auth/zsbase.js、auth-helpers.js、e2e/register/company-register.spec.js、e2e/fixtures/register-helpers.js
 - 项目：苏州市房地产监测V3；来源会话ID：bbaca6f0-5087-4168-ba51-8a2343915f2e

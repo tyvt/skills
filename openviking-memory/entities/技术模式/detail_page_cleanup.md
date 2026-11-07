@@ -13,6 +13,12 @@
 ## 验证
 - 来源: cursor session=117b67e8-4e61-4da7-9503-e0038e998ea7
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：117b67e8-4e61-4da7-9503-e0038e998ea7
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

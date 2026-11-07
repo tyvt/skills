@@ -17,6 +17,7 @@
 - 排查「与APP不一致」优先对比请求参数结构，而非先怀疑UI或排序逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话65d67b1c用户诉求推荐房屋排列与APP一致，结论改回扁平传参后与线上一致
 - 涉及文件：Project_Suzhufang.vue、Home_Suzhufang.vue、buyHouse/index.vue
 - 所属项目：苏住房C；来源会话ID：65d67b1c-b2d4-4547-b8ef-f723249dbd4e；代码基线：f1939b0

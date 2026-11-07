@@ -20,6 +20,7 @@
 - 文件：`guaranteeDeposit/components/index.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：b33c9a86-2657-44fd-82c7-9dec68b27f44；代码基线：none
 
 <!-- MEMORY_FIELDS

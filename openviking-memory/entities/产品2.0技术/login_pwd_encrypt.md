@@ -17,6 +17,7 @@
 - 验证方式：登录页抓包看两接口 password 字段是否为 Base64 密文而非明文
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 会话 c77f4406 结论：新增 passwordEncrypt.js 封装 AES-CBC，login.vue 两分支均传密文，参数与 bug43754 一致
 - 涉及文件：utils/passwordEncrypt.js、views/login.vue、index.html
 - 所属项目：产品2.0；来源会话：c77f4406-8fd7-4cd0-b97f-9bc57e4e5db2；代码基线：dfe69d6

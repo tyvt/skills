@@ -15,6 +15,7 @@
 - src/layout/components/iframeToggle/BTerminalRedirectFrame.vue 等集成视图池
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区G
 - 来源会话：2c02c8f7-aee0-47dd-b23d-d8d8f94a007a、47301bc4-8faf-4838-b33c-54afa184fa11、f702fc2e-fea8-44f2-ac57-30fa5c4f7b79；所属项目：无锡市区G（产品2.0）；代码基线：none
 
 <!-- MEMORY_FIELDS

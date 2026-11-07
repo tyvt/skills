@@ -13,6 +13,7 @@ i淮安公版项目中小程序与 H5（web-view）通信有多种可选方案�
 - 若场景为“登录结果必须可靠到达”，建议主链路采用后端中转
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安公版
 - 涉及文件：src/pages/index/home.vue
 - 所属项目：i淮安公版；来源会话：13c153e8-478a-41cb-b96b-542c5621b6d8；代码基线：none
 

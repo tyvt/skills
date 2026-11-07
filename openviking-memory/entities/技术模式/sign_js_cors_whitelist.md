@@ -14,6 +14,7 @@
 - 顺带修正 fetch 首参为 URL/Request 时取查询串的逻辑。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 73936be3 CORS 报错定位到 sign.js 全局加签，补 shouldApplySign（同源 + /api/v2.0 前缀）后外链不再加签。
 - 涉及文件：public/assets/js/sign.js、vite.config.js、env/.env。
 - 所属项目：园区物管2.0；来源会话：73936be3-9ab2-412b-8043-33c8c47df458；代码基线：f00310232。

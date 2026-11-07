@@ -12,6 +12,11 @@
 - 涉及文件: vote/component/pieChartCom.js, ownerVote/components/votePreview.js, vote/component/votePreview.js, ownerVote_Detail.shtml, vote_ownervoteDetail.shtml, vote_ownervoteDetail.js, commonJs/BaseJs.js, committePer/component/committePerPreview.js.
 - 来源会话: be9616f8-0da6-4e20-a64e-2ae5ed979631.
 
+## 验证与归属
+- 所属项目：园区物管V0
+- 验证证据：extracted source=cursor project=园区物管V0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

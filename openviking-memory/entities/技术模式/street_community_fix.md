@@ -12,6 +12,7 @@
 - 调整 initCurrentProject：缺少街道/社区时用当前或默认 projectId 重新拉取小区并补全数据
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：B 端进入新增页、带默认小区时街道社区能正确写入表单并随保存提交
 - 涉及文件：pubParkingRate/detail.vue、assetLeaseApply/detail.vue、mixins/area.js 等
 - 所属项目：园区物管2.0；来源会话：6e97f2b9-b0d9-4363-889e-533667c5bbef；代码基线：none

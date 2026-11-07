@@ -19,6 +19,7 @@
 - 验收必须真机复跑，模拟器通过不算通过
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话82516bfa用户连报三次真机member/add等页面空白，定位ZsPicker未使用ctx.$attrs行，删除+ref(null)+绝对路径后恢复
 - 涉及文件：src/components/ZsPicker/ZsPicker.vue、src/pages_owner/family/index.vue、src/pages_owner_extra/family/memberForm.vue
 - 所属项目：苏住房C；来源会话ID：82516bfa-31ef-44c0-9835-1b565029f672；代码基线：b7bf813

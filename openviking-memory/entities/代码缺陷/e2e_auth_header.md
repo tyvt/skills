@@ -16,6 +16,7 @@
 - E2E 走接口拿到「服务器异常」而同账号 UI 操作正常 → 先核对请求头有无 Token，而非翻业务数据或报工单
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 会话 3111df9a：用户反馈接口返回异常，新增 buildApiRequestHeaders(page) 并让 fetchOwnCompanyPendingInfo/fetchLastChangeId/assertCompanyPortalReady 统一使用；修复后完整流程 4/4 通过，用例 04 从失败变 35s 通过
 - 涉及文件：e2e/fixtures/auth-helpers.js、e2e/fixtures/company-helpers.js、e2e/company/company-record-change.spec.js
 - 所属项目：产品2.0；来源会话：3111df9a-32f8-4a19-9e72-e8ecba17ca9c；代码基线：62d5fb9

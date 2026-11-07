@@ -13,6 +13,10 @@
 - 涉及文件：`transaction/screen/components/suzhou.json`、`zhi2-web-admin/src/utils/districtMapSupplements/320500.js`、`tencentDistrictBoundary.js`
 - 所属项目：产品2.0；来源会话：f1c849f4-3cc5-4b13-8600-6f3cd3f51e32；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "项目事实",

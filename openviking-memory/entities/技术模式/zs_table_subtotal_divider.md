@@ -8,6 +8,7 @@
 - 将小计行底部分隔线 `.zs-table-subtotal-divider` 的 `z-index` 提至 `14`（高于固定列 `12`），线叠在固定列上方，左右同一条线统一绘制底边。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：benefit/statisticsMap/operatingAssets.vue 等。
 - 所属项目：园区物管2.0；来源会话：0e1620c2-4c35-4648-9da8-0d943e149a68；代码基线：none。
 

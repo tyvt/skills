@@ -12,6 +12,7 @@
 - 页面侧改用 this.$message({ offset: 80 })，提示落顶栏下方不再遮挡首个信息区块；校验失败仍走 msgError、无数据仍走 msgWarning。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 6d8979fc（基线 320507d）物业管理信息月报表详情上传 Excel 后提示重叠，改动后成功只一条提示位于页面顶部。
 - 涉及文件：zhi2-web-admin/src/components/zs-import/zs-import.vue；zhi2-web-admin/src/views/publicQuery/monthlyReport/components/ReportImportDialog.vue；zhi2-web-admin/src/views/publicQuery/monthlyReport/detail.vue；zhi2-web-admin/src/utils/index.js
 - 所属项目：苏住房G；来源会话ID：6d8979fc-de82-4dd7-a47a-65cec5d98ae6；代码基线：320507d

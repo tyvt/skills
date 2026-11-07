@@ -15,6 +15,10 @@
 - 涉及utils/form-cache.js、pages_guard/guardApply/index.vue、step1.vue、step2.vue
 - 所属项目：苏住房C(zhi2-mobile-shimin)；来源会话ID：4b82f232-7ddb-41e7-b369-187d3bfea551
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

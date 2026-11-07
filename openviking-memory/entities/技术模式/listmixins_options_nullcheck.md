@@ -9,6 +9,7 @@
 - 在 src/mixins/listMixins.js 的 data() 判断逻辑前增加 this.$options 判空：`if (!this.$options || !this.$options.props || !this.$options.props.desensitizeFlag)`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 9b1d4896，runtime-core 报错 Cannot read properties of undefined，补 $options 判空
 - 涉及文件：zhi2-web-admin/src/mixins/listMixins.js
 - 所属项目：2-0（产品2.0）；来源会话：9b1d4896-b6df-43ec-8825-e0a68abff6e2；代码基线：none

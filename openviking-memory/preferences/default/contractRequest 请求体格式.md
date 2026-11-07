@@ -4,6 +4,12 @@
 - 涉及文件: 路由信息.json, MEMORY.md, 前端技术信息.md, BuildingDialog.vue, NoticeContractDialog.vue, notice.js, vite.config.js, convert-api-v3.mjs
 - 验证: src=苏州市房地产监测V3/046.md; session 6c4e1de0-c778-4353-bd4e-b5ee4ceccaab
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：6c4e1de0-c778-4353-bd4e-b5ee4ceccaab
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "default",

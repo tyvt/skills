@@ -7,6 +7,7 @@
 - 调用 /benefit/pubReceiptVerificationDetail/page 自动携带 receiptVerifyFilter=1
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue
 - 所属项目：园区物管2.0
 - 来源会话：b331eedd-7085-47c5-8c87-81435ab799fb

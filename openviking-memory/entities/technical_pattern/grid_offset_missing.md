@@ -14,6 +14,12 @@ Full-width grid row lacking gridOffset caused next row misalignment; fixed with 
 - Source session: db3f4214-4b5b-4cbc-b081-3c46c8cde75a
 - Files: permitCancel/detail.vue, permitExtend/detail.vue, permitExtendConstants.js, detail-template.vue, permitCancelConstants.js, permitConstants.js, PermitInfoPanel.vue, index.scss
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：db3f4214-4b5b-4cbc-b081-3c46c8cde75a
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

@@ -13,6 +13,7 @@
 - autonomy/repair/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=G
 - 所属项目：G（泰兴G / zhi2-web-admin）
 - 来源会话：26e165bf-22a0-4580-8d7f-37cb7636e500；代码基线：none
 

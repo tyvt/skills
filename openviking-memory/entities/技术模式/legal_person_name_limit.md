@@ -18,6 +18,7 @@
 - `views/institutionRegister/components/Step2AdminInfo.vue` 与 `views/register/components/Step1CompanyInfo.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/255.md
 - 来源会话ID：e3d71734-ab93-48dc-b3f5-54b9eddd55be
 - 所属项目：苏州市房地产监测V3；代码基线：none

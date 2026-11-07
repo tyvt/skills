@@ -16,6 +16,7 @@
 - 验收标准：重新编译小程序后控制台无该类错误，且两端背景都真实显示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 5fbd3e35（基线 9832ba3）报错 pages_owner/house/index.wxss 本地资源图片无法通过 WXSS 获取（第 251 行 background: url("../../static/images/history-szf.png")），环境 Windows/mp 2.01.2510260 lib 3.16.2；结论改为条件编译
 - 涉及文件：src/pages_owner/house/index.vue、src/pages_owner/house/components/TypeChoose_Suzhufang.vue、src/components/ZsImage/ZsImage.vue
 - 所属项目：苏住房C；来源会话ID：5fbd3e35-025c-45df-996f-22495a68d907；代码基线：9832ba3

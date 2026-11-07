@@ -11,6 +11,8 @@
 - 涉及文件：building/building/index.vue、building/mapProperty/index.vue、mixins/listMixins.js、main.js
 
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/080.md
 - 来源会话ID：00c2a786-4f55-4891-9c14-a133f9c5c856
 - 代码基线：none

@@ -10,6 +10,7 @@
 - 仅用于买卖点可视化，不改变组合回测统计与真实持仓逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=投资推送
 - 验证证据：用户反馈「中证1000在HTML里面没有看到卖点」；修复后下拉可见 000905/HSTECH/000300
 - 涉及文件：backtest_trade_signals.py、config.py、output/backtest/inception_present.html
 - 所属项目：投资推送；来源会话ID：2c9ec957-ab6d-4729-86cb-b327133a72dd

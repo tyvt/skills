@@ -13,6 +13,7 @@
 - CSS 变量注入用 MAP_OVERVIEW_CSS_VARS 配置表替代逐项 setProperty；拆分后人工过一遍筛选/轮播/图表刷新等交互验证逻辑等价
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：用户仅要求「精简代码，保持逻辑不变」，结论给出四文件职责表与 8 条等价精简点；2641→1590 行（约 -40%）
 - 涉及文件：src/views/benefit/mapOverview/index.vue、constants.js、dataHelpers.js、chartOptions.js
 - 所属项目：园区物管2.0；代码基线：6a4835a08；来源会话：c5eed802-2959-479a-9b04-332f3bcf855d

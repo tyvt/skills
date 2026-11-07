@@ -10,6 +10,8 @@
 - `UnifiedLogin.vue` 的 ESLint 中断时 IDE 无报错致隐患遗漏，须执行 `npm run lint -- src/views/home/UnifiedLogin.vue` 校验公示区与 Tab 切换。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：26652725-5aa2-4402-bcd5-3f757453c90c
 - 指引唯一性验证：子任务 sess_subagent_agent_1103d0f4 全库检索「This is the only place the three cards exist」，index-new/index-bak/index-wrapper 无对应文案。
 - lint 要求来源：src=门户/006.md；会话 26652725-5aa2-4402-bcd5-3f757453c90c。
 - 涉及文件：zhi2-web-admin/src/views/home/UnifiedLogin.vue、zhi2-web-admin/src/router/index.js、zhi2-web-admin/public/assets/images/UnifiedLogin/text_1.svg、text_2.svg、publicAnnouncement.js、externalInfo.js、login.vue、api/index.js、utils/request.js、package.json、utils/portalApiRewrite.js。

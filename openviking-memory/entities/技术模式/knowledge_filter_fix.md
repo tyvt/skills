@@ -8,6 +8,7 @@
 - 选中状态：backToFilterRoot 不再清空 draftSelected，下钻后点「全部」再确定仍有效；底部增加「已选：xxx / 未选择」提示；面包屑高亮当前选中分类（isDraftPathCrumbActive）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 涉及文件：src/staff/pages/knowledge/index.vue、src/staff/utils/knowledgeCategory.js、src/staff/api/knowledge.js、src/pages/staff/workbench/index.vue、src/staff/utils/response.js
 - 所属项目：泰兴小程序；来源会话ID：95a61c6a-dd2f-492d-af4c-e29fff661c43
 - 代码基线：none

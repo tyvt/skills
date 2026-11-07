@@ -13,6 +13,7 @@
 - 验收用 B 端账号切换不同小区确认只返回该小区数据，再用 G 端账号回归没被误过滤
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 dfe1828a（2026-07-23）用户截图指 B 端未做权限过滤，要求传 propertyProjectId，房屋质量保证金相关列表菜单都加
 - 涉及文件：guaranteeDepositAccount/index.vue、guaranteeDepositAgreement/index.vue、guaranteeDepositAgreementEnd/index.vue、guaranteeDeposit/components/index.vue、AddDialog.vue、AccountDetailTable.vue
 - 所属项目：产品2.0；来源会话：dfe1828a-18d8-4f50-bd96-5b846ee22649；代码基线：414029f

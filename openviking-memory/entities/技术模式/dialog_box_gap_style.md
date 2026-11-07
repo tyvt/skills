@@ -8,6 +8,10 @@
 - 涉及路径：d:\repository\苏州市房地产监测V3\zhi2-web-admin 等相关视图与配置
 - 所属项目：苏州市房地产监测V3；来源会话ID：aa2afcf7-1398-4cdf-93b4-30183eff923a；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

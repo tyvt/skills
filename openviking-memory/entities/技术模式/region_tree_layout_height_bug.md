@@ -12,6 +12,7 @@
 - 分页条未显示时也预留52px避免高度突变
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：property/complex/components/RegionTreeLayout.vue、components/zs-table/zs-table.vue、property/complex/index.vue
 - 所属项目：苏住房G；来源会话ID：284420f4-9651-4522-a204-e61d73fc5079；代码基线：2a3ef8a
 

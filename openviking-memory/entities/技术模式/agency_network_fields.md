@@ -8,6 +8,8 @@
 - `companyRecord.js` 接收接口注释
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：55b4a7f2-9aca-4e4f-906e-0245c0774837
 - 验证证据: src=苏州市房地产监测V3-leftover/059.md
 - 涉及文件: companyRecord.js, AgencyEntryNetworkDetail.vue, AgencyEntryNetworkSections.vue, agencyBasicInfoContent.js, companyBasicInfoShared.js, companyRecordAgency/change/detail.vue, AgencyBasicInfoForm.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 55b4a7f2-9aca-4e4f-906e-0245c0774837; Baseline: none

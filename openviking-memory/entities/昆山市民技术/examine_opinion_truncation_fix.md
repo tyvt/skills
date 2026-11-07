@@ -11,6 +11,7 @@
 - `align-items: flex-start`：多行换行时标签与内容顶部对齐
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 所属项目：昆山市民；来源会话ID：c9e0ab1a-d943-488e-93f3-b7fa5f8cd74e；代码基线：none
 - 涉及文件：examineDetail.vue、common.scss
 

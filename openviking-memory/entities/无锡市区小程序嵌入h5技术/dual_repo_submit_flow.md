@@ -11,6 +11,7 @@
 - 用户要求「市区/苏服办两边都要提交」时须两条分支都落地，不能只改单一分支
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited 下维修资金模块（pages_owner/maintain/*、api/maintenance.js、store/repair.js、utils/transaction.js、pages.json 等）
 - 会话 365fb309：维修资金交易详情项目信息不显示修复，子模块 dev_wuxi-sfb 提交 7866125，cherry-pick 至 dev_shiqu 生成 69ed86d，父仓 main-sfb 更新子模块引用至 06aa6e2
 - 会话 b06c94d8：dev_wuxi-sfb 提交 69363c8 合并详情页字段，dev_shiqu 合并生成 50b65d1 并解决 index.vue、utils.js 冲突（采用 getAccountTransInfos 等实现），父仓 main-sfb 更新子模块引用至 4883b08

@@ -21,6 +21,10 @@ zhi2-web-admin 用 Vite 跑 dev 时，若报 `Could not resolve "element-ui/pack
 - 来源会话：90a7260d-f70a-4ecc-b36f-75044e76566b
 - 代码基线：zhi2-web-admin Vite + Vue2 + element-ui
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

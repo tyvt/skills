@@ -17,6 +17,11 @@ commercialHousingSales 和 repairFunds 的列表页面已重构为 ListTemplate 
 ## 验证
 - cursor 会话: 43c84fe7-2b4f-4b61-b5ff-d697d2feb8ba
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：43c84fe7-2b4f-4b61-b5ff-d697d2feb8ba
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -10,6 +10,7 @@
 - 结果维护限已结束且实际结束（非提前结束）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 6916310e 用户报表决结果按钮误显示
 - 涉及文件：optionDecision/detail.vue、ownerDecision/detail.vue、sortDecison/detail.vue、optionDecision/components/MaintainResultDialog.vue、api/estate/ownerDecision.js、decisionCommon/components/MaintainResultDialogLite.vue、mixins/detailMixins.js、components/OperationContainer/index.vue
 - 所属项目：太仓G；来源会话：6916310e-241a-4a0c-b811-df4a25b8ae2d；代码基线：none

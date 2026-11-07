@@ -7,6 +7,9 @@
 - 工作区干净，等待推送
 
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：0ebb2365-b4e4-48a3-b882-09b95f93edb2
 - 文件: zhi2-web-admin/vite.config.js
 - 验证证据: src=产品2.0/074.md; 会话 0ebb2365-b4e4-48a3-b882-09b95f93edb2; base none
 

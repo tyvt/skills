@@ -3,6 +3,12 @@
 - 表单项对齐到 `ScrappedRecordDto` 和设计要求
 - 涉及的文件：`dataProperty/procedure/detail.vue`, `scrappedRecord/detail.vue`, `scrappedRecord/index.vue`, `mixins/detailMixins.js`, `mixins/form.js`, `recordProcess/components/detail.vue`, `FacilitySelectDialog.vue`, `repair/detail.vue` (会话 `9d46bdf7-9e8f-42c5-85bc-23a99ef581f6`)
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：9d46bdf7-9e8f-42c5-85bc-23a99ef581f6
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

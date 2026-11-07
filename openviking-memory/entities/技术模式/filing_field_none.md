@@ -13,6 +13,7 @@
 - 列表列直接渲染 managementSubjectName（未备案为空、不显示占位符），收费方式走全局 dictFormatter + property_charging_method
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：publicQuery/complex/index.vue、zs-advanced-query/complexFieldConfig.js、benefit/assetLeaseApply/index.vue、benefit/pubManagementOrg/detail.vue、zs-advanced-query/advancedQueryCore.js、benefit/pubChangeleadershipAudit/detail.vue、benefit/pubHouseDetailChange/index.vue、publicQuery/propertyCompany/index.vue、docs/complex-pageNew-backend-handoff.md
 - 所属项目：苏住房G；来源会话：579a0b70-5ca8-42fa-86cb-0af96a7205d9；代码基线：ad5bbd9
 

@@ -23,6 +23,11 @@ accountNameDialog.vue 使用了自定义的 zs-dialog+zs-table，与 zs-select-d
 - 会话来源: c7c58078-a865-450f-bba0-bff68effa3c3 (cursor)
 - 所属项目: 产品 2.0
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：c7c58078-a865-450f-bba0-bff68effa3c3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

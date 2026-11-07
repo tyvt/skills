@@ -13,6 +13,12 @@ In SuzhouHousingG admin, account type field disabled on empty historical data ca
 ## Verification
 - Source: 苏住房G/062.md; session 08df6a66-6dbe-4a03-8d68-a6fa9506abe6.
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：08df6a66-6dbe-4a03-8d68-a6fa9506abe6
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

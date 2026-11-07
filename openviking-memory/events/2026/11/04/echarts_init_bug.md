@@ -9,6 +9,11 @@ The error 'el.addEventListener is not a function' originated from ECharts 5.3+ (
 【来源会话ID】8cedd4de-3840-43fc-828d-12511bc40dc9
 【代码基线】none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "echarts_init_bug",

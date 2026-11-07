@@ -11,6 +11,7 @@
 - index.vue：打开收款弹窗前用当前表格最新行数据同步账单，避免缓存过期
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：应收 0.01 时收款金额应显示 0.01；余额抵扣后合计可能 0.00 属正常
 - 文件：property/spFeeBill/components/collectionDialog.vue、components/index.vue
 - 所属项目：产品2.0；来源会话：a3cfd7af-98f1-41cd-a0ce-0592087251ad；代码基线：none

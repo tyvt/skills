@@ -15,6 +15,7 @@
 - d:/repository/榆林G/zhi2-web-admin/src/patterns/index.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=榆林G
 - 所属项目：榆林G；来源会话：ea514d30-3de8-4e8a-beb7-f0690c0e8a2b；代码基线：none
 
 <!-- MEMORY_FIELDS

@@ -15,6 +15,10 @@
 - 文件：`zhi2-web-admin/src/views/maintenance/accountSplit/components/accountNameDialog.vue`、`detail.vue` 等（前缀 `d:/repository/产品2.0`）。
 - 所属项目：产品2.0；来源会话：c7c58078-a865-450f-bba0-bff68effa3c3。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

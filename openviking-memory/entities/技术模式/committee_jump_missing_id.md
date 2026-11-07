@@ -10,6 +10,7 @@
 - 存量与新增均在路径后拼接 `row.committeeVersionId`（存量 `directDetail`、新增 `detail`）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/078.md
 - 涉及文件：publicQuery/complex/detail.vue、publicQuery/complex/components/committeeTable.vue、autonomy/record/components/enums.js、directDetail.vue、index.vue
 - 所属项目：园区物管2.0；来源会话：6a98c35a-f7f0-46a2-9882-8721000ff3f1；代码基线：none

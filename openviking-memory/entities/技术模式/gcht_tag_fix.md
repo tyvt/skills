@@ -10,6 +10,7 @@
 - 刷新后该字段显示为「是/否」（以 sys_yes_no 配置为准），不再显示原始 0/1
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：zhi2-web-admin/src/views/supervision/progress/gcht/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：d49568e5-a843-4c12-a1f4-5c724b9f21e1；代码基线：none
 

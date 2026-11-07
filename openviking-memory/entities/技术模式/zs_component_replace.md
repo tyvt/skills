@@ -11,6 +11,7 @@
 - 相关文件无 linter 报错
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：da4d6410-f867-47a9-acf7-3468a014ca81
 

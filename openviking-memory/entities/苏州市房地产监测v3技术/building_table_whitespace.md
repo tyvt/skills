@@ -10,6 +10,8 @@
 - buildingTable/index.vue去overflow与margin-top并收紧行高
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：buildingTable/index.vue、projectForm.vue、styles/index.scss、zs-tabs.vue、BuildingTableViewTabs.vue、BuildingStateTable.vue等
 - 来源会话：c9764d9b-dbcd-4ca7-b755-422b671095e6；代码基线：none
 

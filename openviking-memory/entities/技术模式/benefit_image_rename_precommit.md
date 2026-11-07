@@ -10,6 +10,7 @@
 - 更新 import 路径后 import/no-unresolved 错误消除，可重新提交
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：src/views/benefit/mapOverview/index.vue、src/views/benefit/statisticsMap、src/views/benefit/statisticsMap/operatingAssets.vue
 - 所属项目：园区物管2.0；来源会话：0599d819-a6e3-4454-9b2f-cd11e82c7dc5
 

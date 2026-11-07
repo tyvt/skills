@@ -15,6 +15,9 @@
 - zhi2-web-admin/src/utils/resolveServerAssetUrl.js
 - 所属项目：园区物管2.0（代码基线 f00310232，来源会话 659b9b99-3806-4640-804a-486f070d2eef）
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
 
 <!-- MEMORY_FIELDS
 {

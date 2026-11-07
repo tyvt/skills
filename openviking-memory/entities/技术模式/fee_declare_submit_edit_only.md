@@ -9,6 +9,11 @@
 - 涉及文件: property/feeDeclare2/detail.vue, index.vue, components/OperationBtnGroup/index.vue, mixins/detailMixins.js, form.js, declare/components/detail.vue, main.js, ZsSubmit/index.vue.
 - 所属项目: 苏住房G; 验证证据: src=苏住房G/052.md; 会话: 9ce5c9a2-4e7d-41cf-bb2c-201ef6f68770.
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：9ce5c9a2-4e7d-41cf-bb2c-201ef6f68770
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

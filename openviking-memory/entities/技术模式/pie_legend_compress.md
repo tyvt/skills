@@ -10,6 +10,7 @@
 - 设 `itemWidth:16`、`itemHeight:9` 减轻压缩
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue
 - 所属项目：园区物管2.0；来源会话：2072cf12-f804-48fc-bb6d-3bb1bf4de438；代码基线：none
 

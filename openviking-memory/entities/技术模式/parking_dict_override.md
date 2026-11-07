@@ -19,6 +19,8 @@
 - src/views/benefit/pubParkingSpaceDetailChange/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：8f234827-4934-41b5-9ea5-1d36dd635cc0
 - 所属项目: Park Public Benefit; 会话: 8f234827-4934-41b5-9ea5-1d36dd635cc0; base: none
 
 <!-- MEMORY_FIELDS

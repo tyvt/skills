@@ -17,6 +17,8 @@
 - `zhi2-web-admin/src/views/company/companyRecordAgency/detail.vue`
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/142.md
 - 来源会话ID：3186cfc4-7158-4eb1-b135-f23262301582；代码基线：none
 

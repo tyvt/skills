@@ -7,6 +7,8 @@
 - 底部图标区回调尺寸与间距以贴合设计稿
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 来源会话：816053e2-056a-43aa-b164-fbf6cbc32d48
 - 涉及文件：pages/home/new/index.vue
 - 代码基线：none

@@ -16,6 +16,7 @@
 - 测试库缺少附件配置：/file/appendixConfig/listByBusCode 传 busCode=8 返回空数组，页面显示「暂无附件配置」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：real-api.spec.js、security.js、companyRegister.vue、accountInfo.vue
 - 所属项目：产品2.0；来源会话：f750b067-6c90-4a44-8c42-69fa4ec69c0d；代码基线：none
 

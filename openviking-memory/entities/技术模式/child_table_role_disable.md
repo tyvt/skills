@@ -9,6 +9,7 @@
 - 角色标志由详情页把接口字段 :isCompanyAdmin="form.isCompanyAdmin" 传给子表，详情页本身不用改。
 - 与已知 #823（复用 multiDeleteButton 不要自造按钮）互补：本条补充按角色置灰需重写+方法层双保险。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 01e7eed0 operatorAuthRangeTable.vue 重写 multiDeleteButton 使企业管理员删除按钮置灰，并在 handleDelete 中拦截。
 - 涉及文件：zhi2-web-admin/src/views/company/userManagement/operatorAuth/operatorAuthRangeTable.vue。
 - 所属项目：产品2.0；来源会话ID：01e7eed0-b3c3-4b15-9fda-320771899793；代码基线：0161609~94b86fa（2026-07）。

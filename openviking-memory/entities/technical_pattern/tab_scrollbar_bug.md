@@ -19,6 +19,12 @@ Global CSS scrollbar styling in main.css added left/right arrows to all scrollba
 - Involved files: d:/repository/园区V0/EstateManagement-Base/src/main/webapp/commonJs/BaseJs.js; EstateManagement-Park index.html; bootstrap-tab.js; BaseJs.js; main.css; bootstrap-tab.css; template.css; ServerInterface.js.
 - Source session ID: a726fbc6-506c-419b-8b8c-b02f10958d6b.
 
+## 验证与归属
+- 所属项目：园区V0
+- 验证证据：extracted source=cursor project=园区V0
+- 来源会话：a726fbc6-506c-419b-8b8c-b02f10958d6b
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

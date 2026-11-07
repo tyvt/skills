@@ -16,6 +16,8 @@
 - zhi2-web-admin/src/views/home/index.vue
 - zhi2-web-admin/src/views/home/config/homeLayout.js
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：94f6bd16-5aae-45b8-9e02-e7fe99ee07bc
 - 验证证据：cursor 会话 94f6bd16-5aae-45b8-9e02-e7fe99ee07bc
 - 所属项目：门户
 

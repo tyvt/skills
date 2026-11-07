@@ -11,6 +11,7 @@
 - 对 handleMap 缩放事件做防抖，避免高频触发
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：苏住房G/082.md
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue
 - 所属项目：苏住房G；来源会话：08185609-5b39-49e3-a32e-abce2cd09d68；代码基线：none

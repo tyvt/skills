@@ -16,6 +16,10 @@
 - 来源会话ID：f62dbdc4-5a71-4b38-86cc-ade4a540eb59
 - 代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

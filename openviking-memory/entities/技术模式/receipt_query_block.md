@@ -14,6 +14,8 @@
 - src/views/benefit/components/BankReconciliation.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：859f5de6-bf9f-4503-94b7-53f26a6002a5
 - 所属项目: Park Public Benefit; 会话: 859f5de6-bf9f-4503-94b7-53f26a6002a5; base: none
 
 <!-- MEMORY_FIELDS

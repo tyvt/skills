@@ -15,6 +15,7 @@
 - 每新增共用详情页入口，核对 入口页→中间列表组件→详情页 query→uni.setNavigationBarTitle 链路
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话 3fa76366（基线 8fc3cc5）：用户要求从物业服务计划进入详情页就叫物业服务计划
 - 涉及文件：src/pages_main/publicNotice/detail.vue、components/ListIndex.vue、publicNotice.vue
 - 所属项目：苏住房C；来源会话ID：3fa76366-cf4a-4cdf-87de-dd2b1e81d2e9

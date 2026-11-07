@@ -15,6 +15,7 @@
 - 当前在 develop/v2.6.2-yulin 分支，本地超前远程 3 个提交
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 来源会话：450a52c6-5b85-4188-8de8-04fb775f08f1
 - 涉及文件：evaluation/ratingRule/detail.vue、components/detail-template/detail-template.vue、evaluation/assessmentPlan/detail.vue
 - 所属项目：园区物管2.0；代码基线 none

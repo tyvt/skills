@@ -11,6 +11,8 @@ detail.vue 中 zs-table 绑定 :summary-method 与 :show-summary，但 PlanDetai
 - 在 methods 添加空实现 showMethod({columns, data}) {}
 
 ## 验证与归属
+- 所属项目：bugfix
+- 验证证据：extracted source=cursor project=bugfix
 - 验证证据：src=bugfix/003.md
 - 涉及文件：detail.vue；table.js
 - 来源会话ID：f6fa84f3-a7b5-454e-a756-e51303a42d72

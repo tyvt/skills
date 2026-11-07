@@ -13,6 +13,8 @@
 - zhi2-web-admin/e2e/scripts/merge-company-register-video.mjs
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/202.md
 - 来源会话：bbf4455e-d301-4701-a090-882f15126648；代码基线：none
 

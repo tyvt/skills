@@ -10,6 +10,8 @@
 - 将 `.page-top` 修改为居中布局，对齐 `goodProject/index`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：1fdb1e84-2130-4a0e-9e11-7525a8813edf
 - 所属项目: 苏住房C (zhi2-mobile-shimin)
 - 源会话: 1fdb1e84-2130-4a0e-9e11-7525a8813edf
 - 涉及文件: src/pages_transaction/houseVideo/index.vue, src/components/ZsSearch/ZsSearch.vue, src/pages_transaction/goodProject/index.vue, src/pages_transaction/newHouse/index.vue, src/pages_owner/community/announcement/index.vue, src/pages_transaction/intention/search.vue, src/pages_transaction/components/ZsPaging/ZsPaging.vue, src/pages_transaction/newHouse/indexMore.vue

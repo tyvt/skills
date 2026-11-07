@@ -11,6 +11,7 @@
 - 若列表仍显示未备案数据，需后端在 forPart=1 查询里支持 houseBizState 过滤
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：views/benefit/housePart/index.vue、views/benefit/pubHouse/index.vue
 - 所属项目：苏住房G；来源会话：ae403e03-b7dd-4d19-be74-3b70c0306a26
 

@@ -18,6 +18,12 @@
 ## 验证
 - 会话: 7228345d-b39b-4e14-b319-e0de248ed26e
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：7228345d-b39b-4e14-b319-e0de248ed26e
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

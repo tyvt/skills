@@ -4,6 +4,12 @@
 - 涉及文件: portalTheme.js, PortalDialogHost.vue, UnifiedLogin.vue, PropertyPages.vue
 - 会话： b642c935-7aec-4bc3-b375-5091c39f01f7
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：b642c935-7aec-4bc3-b375-5091c39f01f7
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

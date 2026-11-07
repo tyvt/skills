@@ -11,6 +11,7 @@
 - 业务请求延至登录完成
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证证据：src=昆山市民/005.md
 - 涉及文件：src/stores/user.js、src/utils/wxLogin.js、src/App.vue、src/api/index.js、src/request/index.js、src/main.js、src/pages_home/home.vue、src/pages_vote/vote/votedetail.vue
 - 所属项目：昆山市民；来源会话ID：5879f04f-c762-41db-942c-5ca6acb2e3ce；代码基线：none

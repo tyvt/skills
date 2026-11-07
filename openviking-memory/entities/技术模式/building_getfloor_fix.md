@@ -12,6 +12,7 @@
 - 涉及文件：building/building/detail.vue、building/unit/detail.vue、UnitDialog.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益
 - 来源会话ID：748fb1f8-e625-4295-9c80-d99233536464
 - 代码基线：none

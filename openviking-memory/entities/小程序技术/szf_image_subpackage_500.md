@@ -16,6 +16,7 @@
 - 排查同类 500 先核对 src 串与 resolveSzfImageSubpackage 解析出的分包路径，再到 target 分包目录 ls 确认文件存在
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 ffbc909f conditionScreening.vue 第204行引用 reset.svg；修复复制 reset.svg 到 pages_transaction 分包 static/images/szf/
 - 涉及文件：conditionScreening.vue、ZsImage.vue、utils/index.js、pages_transaction/static/images/szf/reset.svg、主包 static/images/szf/reset.svg、scripts/migrate-vote-static.mjs、utils/mainStaticPaths.js
 - 所属项目：苏住房C；来源会话ID：ffbc909f-a8cb-4166-8285-a0ac8381920f；代码基线：f1939b0

@@ -11,6 +11,7 @@
 - content-scroll 占满剩余视口高度，卡片列表区域改透明灰底避免白色断层。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译运行：科目应只显示「代收代缴收入」，灰色背景铺满全屏。
 - 涉及文件：pages_benefit/budget/index.vue 等
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：6222418a-4f22-4b84-9de7-cbcaaf49e929

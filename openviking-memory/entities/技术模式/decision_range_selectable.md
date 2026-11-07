@@ -11,6 +11,7 @@
 - 同步修复 optionDecision 模块中相同问题
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证：刷新页面，在「业主决策明细」→「决策明细」勾选记录，「线下投票录入」按钮可点击
 - 涉及文件：`decisionCommon/components/DecisionRangeTable.vue`、`optionDecision/detail.vue`、`optionDecision/components/DecisionRangeTable.vue`
 - 所属项目：太仓G；来源会话：1e824235-0e5e-44dd-9dc4-238cd6a1389a；代码基线：none

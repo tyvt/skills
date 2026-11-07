@@ -8,6 +8,7 @@
 - 补回 `import mfcontractguardDriver from '@/views/repairFunds/usage/fundUsageKs/driver'` 恢复引用。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：src=太仓G/009.md
 - 涉及文件：zhi1-web-admin/src/views/estate/maintainDecision/detail.vue、directives/formatter/money.js、ownerDecision/detail.vue、components/AmountInput/index.vue、fundUsageKs/driver.js
 - 所属项目：太仓G；来源会话：8f9057d0-7dbf-4966-9b52-d5d8411e8e4b；代码基线：none

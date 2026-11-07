@@ -6,6 +6,7 @@
 - `tableLayoutFix.js` 删除未使用的 `clearBaseColumnWidths` 导出
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：可照常验证侧栏收起与列宽展示
 - 涉及文件：zs-table.vue、tableLayoutFix.js、guaranteeDepositAgreement/index.vue、mixins/ListTemplate.js
 - 所属项目：产品2.0；来源会话：ed54ca3b-8927-46de-b31e-4658f9f285d7；代码基线：none

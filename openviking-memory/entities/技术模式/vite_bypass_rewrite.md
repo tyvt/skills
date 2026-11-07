@@ -12,6 +12,11 @@
 - zhi2-web-admin/vite.config.js
 - 来源会话：8199e2bb-60dc-46d6-9a57-47b7757e9d8b
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

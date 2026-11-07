@@ -11,6 +11,8 @@ wygl小程序externalWebview在正式版且authCode=0时改为展示特定弹窗
 - 开发版与体验版保持原逻辑不变
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：pages/webview/externalWebview.vue、pages/webview/home.vue
 - 来源会话：496a842d-c8f7-4bf8-a412-e621b81b9e60
 - 代码基线：none

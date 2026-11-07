@@ -15,6 +15,7 @@
 - 只读模式 listAppendixPackage 与 AnnexUpload 对齐，增加 companyId 等参数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：3005c34e-34a1-4ca2-8aba-d990a0327a79
 - 代码基线：none

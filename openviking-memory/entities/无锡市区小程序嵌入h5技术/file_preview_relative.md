@@ -9,6 +9,8 @@
 - 调用方若已传入完整 URL 勿重复拼接
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：da88fbd0-10ce-496a-a71f-84d83cffcc43
 - 验证会话：da88fbd0-10ce-496a-a71f-84d83cffcc43（基线 0804e57）
 - 涉及文件：src/utils/index.js、src/components/ZsImage/ZsImage.vue
 - 所属项目：无锡市区小程序嵌入H5

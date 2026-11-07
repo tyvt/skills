@@ -16,6 +16,7 @@
 - 排查技巧：布尔判断「恒真/恒假且怎么改都不变」时，先 grep 模板里该方法有没有漏写 ()
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 2128505f 调查结论，模板第 94 行与 isActive 第 581 行均未加 () 调用
 - 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue
 - 所属项目：产品2.0；来源会话ID：2128505f-8e3c-45e5-8ca0-aa7871402fb0；代码基线：39e3114

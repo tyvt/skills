@@ -12,6 +12,8 @@
 - @/api/index.js 拦截器在 `userStore.token` 存在时自动注入 `Authorization: Bearer <token>` 请求头
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：ef15cdae-5895-485b-9248-03961a3b0697
 - 验证会话：ef15cdae-5895-485b-9248-03961a3b0697（基线 2e9862a）
 - 涉及文件：src/App.vue、src/utils/qqMapKey.js、src/api/index.js
 - 所属项目：无锡市区小程序嵌入H5

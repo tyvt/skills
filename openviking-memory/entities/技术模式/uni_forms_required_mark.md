@@ -17,6 +17,7 @@ uni-app 的 uni-forms-item 只有自身 required 属性才渲染红色 *，rules
 - 单元、补充证件信息属非必填保持不标
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验收：会话 63944abd 逐项对齐截图星号，确认带星号字段空值被拦截
 - 涉及文件：zhi2-mobile-shimin/src/pages_owner/house/owner/register.vue、styles/form2.scss
 - 所属项目：苏住房C；来源会话：63944abd-5398-403d-9293-6bf00fd0e33d；代码基线：b7bf813

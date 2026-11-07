@@ -16,6 +16,7 @@
 - zhi2-web-admin/src/utils/element.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：a70a9913-e202-4f48-9ff9-a75c6d3d3699
 - 所属项目：产品2.0
 

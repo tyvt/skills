@@ -11,6 +11,7 @@
 - 字典异步加载完成后标签照常更新；如需兜底可在 `dict-tag.vue` 用 `(this.options || []).find(...)`。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=bugfix
 - 涉及文件：`detail.vue`、`dict-tag.vue`、`vue.js`
 - 所属项目：bugfix
 - 来源会话：f06b2a1d-1232-42cd-9d82-5e09b2d5e785

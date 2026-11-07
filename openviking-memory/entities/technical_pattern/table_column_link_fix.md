@@ -17,6 +17,12 @@ A refactor of `zs-table-column.vue` caused table link buttons to fail due to att
 - Evidence: src=苏州市房地产监测V3-rest/005.md
 - Source session: bb86fbc4-fb2e-46ab-8ef7-7ec642005b52
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：bb86fbc4-fb2e-46ab-8ef7-7ec642005b52
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

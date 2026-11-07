@@ -15,6 +15,7 @@
 - 适用面：所有「点一个元素 → 请求 → 重绘同一容器」的图表/地图/看板，都应在请求前清空旧数据并把失败回退一并设计，而非只做 loading
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话用户诉求「点了区域接口返回一条街道但圆圈仍显示区域名称，缩放后还原正常」+「接口慢能否点了先移除点再渲染」；结论点击时 markList=[]，回包走 applyMarkListAfterDrillView，失败走 restoreParentAreaLayerAfterDrillFail
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue
 - 所属项目：苏住房G；来源会话：7c8a2586-a002-4baf-abaf-c868fa7a8a63；代码基线：ff55f8f

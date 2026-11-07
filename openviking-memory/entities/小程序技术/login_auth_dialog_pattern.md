@@ -9,6 +9,8 @@
 - 底部双按钮：左按钮 navigateBack，右按钮跳转 /pages/face/verify
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 来源会话：cf9e07b8-2418-4ea4-8944-e6e30fe516eb
 - 涉及文件：pages.json、pages/home/login/index.vue、pages/face/verify.vue、pages/face/face.vue、App.vue、pages/area-manage/area-manage.vue
 - 代码基线：none

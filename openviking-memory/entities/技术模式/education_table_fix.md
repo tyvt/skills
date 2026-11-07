@@ -11,6 +11,7 @@ EducationTable 使用 computed 做 v-model，新增时父组件 emit 与 zs-tabl
 - 配置 :table-tr='innerList.length || 1' 与列 v-if='row' 防御
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/077.md
 - 涉及文件：EducationTable.vue、AgencyPersonnelDetail.vue、CertificateList.vue、zs-table.vue、ServiceSchemePanel.vue、zs-table-column.vue
 - 所属项目：苏州市房地产监测V3；来源会话：3893ccfd-88f3-46aa-bc62-e0f4d3d00ac6；代码基线：none

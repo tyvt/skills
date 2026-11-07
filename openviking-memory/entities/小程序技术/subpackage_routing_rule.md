@@ -13,6 +13,7 @@ uni-app / 微信小程序分包只改变打包位置，页面完整路径保持�
 - pages/face/user-agreement.vue → 分包配置 → 完整路由 pages/face/user-agreement
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
 - 验证证据：会话 404cce7e 主包大小超限优化，核对分包后路由无需改动
 - 涉及文件：pages.js、pages/face/verify.vue、pages/face/bdc.vue
 - 所属项目：小程序；来源会话ID：404cce7e-39c8-4d87-8c7d-0d9d3fe66028；代码基线：none

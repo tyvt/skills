@@ -10,6 +10,8 @@
 - 消除警告并允许正常请求 `/prefund/useMoneyApply/detail`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：e533c035-bd03-4c12-aa72-72937c898843
 - 验证证据: src=苏州市房地产监测V3-leftover/004.md
 - 涉及文件: guarantee/detail.vue, mixins/detailMixins.js, guarantee/index.vue, usemoney/detail.vue, guarantee/changedetail.vue, usemoneyRevoke/detail.vue, mixins/form.js, notice/detail.vue
 - 所属项目: 苏州市房地产监测V3; 会话: e533c035-bd03-4c12-aa72-72937c898843; Baseline: none

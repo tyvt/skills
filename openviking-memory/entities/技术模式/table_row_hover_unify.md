@@ -12,6 +12,7 @@
 - zs-table.vue 悬停时同步主表体与所有固定列的 hover-row 状态（含从固定列触发）。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：variables.css、element-ui.scss、zs-operate-column.vue、zs-table.vue。
 - 验收：列表页、详情子表、弹窗内表格、带固定操作列的表格悬停背景色均统一为 #f5f7fa。
 - 所属项目：产品2.0；来源会话：80a5b505-898c-436f-8ccc-b4d6fd8cd107；代码基线：none。

@@ -16,6 +16,8 @@
 - `src/views/company/companyApplyAudit/detail.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：933f8c6e-62d9-4070-9cc4-09de061894a6
 - 验证证据: src=苏州市房地产监测V3/186.md
 - 源会话: 933f8c6e-62d9-4070-9cc4-09de061894a6
 - 所属项目: 苏州市房地产监测V3; 代码基线: none

@@ -13,6 +13,7 @@
 - 若仍挤或松，可微调 gap 在 2px～8px 之间
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；来源会话：76615610-2741-4c89-accc-c5cfe6621d05；代码基线：none
 

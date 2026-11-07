@@ -4,6 +4,11 @@
 - 涉及文件: UnifiedLoginMenuMoreDialog.vue, UnifiedLogin.vue, ExternalInfoDialog.vue, tests/e2e/unified-login-visual.spec.ts
 - 来源会话: ecbf0459-d7d2-4d99-934b-c0bdf8b4c2cb
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

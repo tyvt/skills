@@ -10,6 +10,12 @@
 - 来源: cursor session `0bc574c1-233a-406d-9cc5-678ea3dabed5`
 - 代码库: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：0bc574c1-233a-406d-9cc5-678ea3dabed5
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -15,6 +15,10 @@
 - 涉及文件：app.suzhufang.config、Home_Suzhufang.vue、home.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：5b209d2f-cd82-4005-8b65-1e07b8e31017；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

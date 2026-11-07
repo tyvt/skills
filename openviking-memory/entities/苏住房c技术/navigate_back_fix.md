@@ -13,6 +13,7 @@
 - 凡「A页→选数据页→回带结果给A页」结构均按此模式写返回逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 9e111257「搜索到小区然后第一次都不会自动弹到添加求购信息页面，后面的2、3、4次才会」
 - 涉及文件：src/pages_transaction/intention/add.vue、search.vue、src/components/ZsSearch/ZsSearch.vue
 - 所属项目：苏住房C；来源会话ID：9e111257-31c8-47e5-b4c2-c258dbd7cb93；代码基线：d43894b

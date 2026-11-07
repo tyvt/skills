@@ -18,6 +18,10 @@
 - 来源会话ID：0e145147-abb9-4862-9f20-b936ec9fd6cf
 - 代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "bug",

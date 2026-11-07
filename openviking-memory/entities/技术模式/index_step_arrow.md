@@ -11,6 +11,9 @@
 - `v-for` 应使用稳定的业务键代替 `si`
 
 ## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：d6e2d37c-78bf-4548-8cba-1179801832f4
 - 验证证据: portal/037.md
 - 涉及文件: zhi2-web-admin/src/views/home/index-new.vue; tests/e2e/portal-home-visual.spec.ts; package.json
 - 会话: d6e2d37c-78bf-4548-8cba-1179801832f4

@@ -11,6 +11,7 @@
 - 业主端 src/pages_owner/repair/detail.vue 原本即用 /static/svg/star-*.svg，恢复 SVG 后一并生效
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证建议：重编译后进入工作台→报事工单，打开已有评价工单详情确认星星高亮、文字标签正常、弹窗可点击
 - 涉及文件：src/staff/pages_facility/issue/detail.vue、src/pages_owner/repair/detail.vue 等
 - 所属项目：泰兴小程序；来源会话ID：02e556af-812d-4a11-bb67-1891918531a5

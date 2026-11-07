@@ -9,6 +9,7 @@
 - 源码 src/pages_owner/payment/index.vue 已无相关引用
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i-H5
 - 验证证据：src=i-H5/001.md
 - 涉及文件：index.js、src/pages_owner/payment/index.vue
 - 所属项目：i-H5；代码基线 none；来源会话 2acd9711-2f9b-410a-bf4b-dc8c613c647f

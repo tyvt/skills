@@ -18,6 +18,8 @@
 - `components/zs-dialog/zs-dialog.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：e2df1fba-88d3-49d5-bd1b-602953368329
 - 验证证据: src=苏州市房地产监测V3/026.md
 - 会话ID: e2df1fba-88d3-49d5-bd1b-602953368329
 - 所属项目: Suzhou Real Estate Monitoring V3; 基线: none

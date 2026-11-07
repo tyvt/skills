@@ -14,6 +14,7 @@
 - 兜底用正则去掉 detailA/detail0/detail1/detail2 中间段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话：1b309caa-a18a-44ca-875c-cf2bf43466a7；代码基线：none
 
 <!-- MEMORY_FIELDS

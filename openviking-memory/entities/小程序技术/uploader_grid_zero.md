@@ -18,6 +18,7 @@
 - 网格内图片/上传格子均不用 grid-auto-rows 推高度，用 aspect-ratio + min-height 双保险
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 3f889ff2（基线 5f0f4dc）用户先报「图片上传组件有问题」再报「上传组件不显示，按钮宽度太窄」
 - 涉及文件：components/ImageUploader/ImageUploader.vue、pages_owner/house/owner/manual.vue、pages_owner/house/owner/register.vue
 - 所属项目：苏住房C；来源会话ID：3f889ff2-2daa-476e-86b3-963833ee9ca2；代码基线：5f0f4dc

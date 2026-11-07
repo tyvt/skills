@@ -15,6 +15,10 @@
 - 涉及文件：zhi2-web-admin/src/styles/index.scss、zhi2-web-admin/src/views/maintenance/accountQuery/type.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue。
 - 所属项目：园区物管2.0；来源会话：1eca0e2f-d760-4bdb-bbc2-11cb409dd899；代码基线：d48841f13。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

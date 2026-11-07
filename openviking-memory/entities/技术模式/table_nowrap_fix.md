@@ -10,6 +10,7 @@
 - 辖区列 min-width 设为 140px，保证「经济技术开发区」等名称单行显示，过长时 tooltip 展示。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证：刷新页面后辖区名称应能单行显示。
 - 涉及文件：benefit/pubAccountBalance/index.vue、property、evaluation/companyReport/components/index.vue 等。
 - 所属项目：淮安物管；来源会话：5abb161f-954b-4fa6-83c3-5af2e2cb829f；代码基线：none。

@@ -14,6 +14,12 @@
 - 涉及文件: change/index.vue, change/detail.vue, companyRecord.js, companyBasicInfoContent.js, companyRecordAgency/index.vue, CompanyBasicInfoForm.vue, detail.vue, company-record-change.spec.js
 - 会话: 81bf5be6-c0ce-46ce-b29f-c26f9c1c7127; baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：81bf5be6-c0ce-46ce-b29f-c26f9c1c7127
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

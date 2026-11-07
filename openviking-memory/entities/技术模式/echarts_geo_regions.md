@@ -13,6 +13,7 @@
 - 「全市」汇总幻灯片用独立字段标记汇总页，避免硬编码文案判断
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 89d6d616-b337-43c4-bc8d-a3268340e46f 中 mapOverview/index.vue 轮播到某区 SVG 对应区高亮，用 setOption+三处触发点+飞地同步实现
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；来源会话ID：89d6d616-b337-43c4-bc8d-a3268340e46f；代码基线：fb0e2899f / 3353ef164

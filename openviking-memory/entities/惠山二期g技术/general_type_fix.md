@@ -10,6 +10,7 @@
 - initDict 过滤从排除 ['0', '2'] 改为仅排除 ['2']，与详情页保持一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 涉及文件：zhi2-web-admin/src/views/autonomy/general/index.vue
 - 所属项目：惠山二期G；来源会话：24864aca-3eff-4a2b-8d94-e4ce7b40b21d；代码基线：none
 - 验证建议：刷新列表页确认 TPBJ20260928000001 业务类型显示「维修资金使用表决」，其他记录仍正常显示

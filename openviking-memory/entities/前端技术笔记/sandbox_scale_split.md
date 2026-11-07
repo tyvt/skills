@@ -14,6 +14,7 @@
 - 折中：高度紧张时 sx≠sy 图标会略有非等比变形，若不可接受需切 min(sx,sy) 等比分支
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 77a735af 用户反馈侧边菜单展开收起会等比放大图标、随后高度溢出；最终在 fundPanorama 拆 layoutScaleX/layoutScaleY 双比例解决
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue
 - 所属项目：园区物管2.0；代码基线：f00310232；来源会话：77a735af-afdd-4ef8-b842-d6aea8630229

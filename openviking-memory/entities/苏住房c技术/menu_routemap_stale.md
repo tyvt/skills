@@ -13,6 +13,7 @@
 - 批量对账menuRouteMap.js中仍写/pages/前缀项（home/search、message/index、collect/index等）
 - 首页入口类页面同步：二手房地图找房type=1、首页type=0路径相同query不同，别只改一处
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话395868ae：navigateTo失败，houseMap已迁至pages_main，menuRouteMap.js与stockHouse二手房入口仍指向旧路径
 - 涉及文件：src/utils/menuRouteMap.js、src/utils/route-map.js、src/pages.json、src/pages_transaction/stockHouse/index.vue
 - 所属项目：苏住房C；来源会话ID：395868ae-5e71-4d74-afd9-9f02b478b2f1；代码基线：9832ba3

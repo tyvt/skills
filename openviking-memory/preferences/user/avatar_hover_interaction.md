@@ -2,6 +2,12 @@
 - Files: views/system/user/profile/userAvatar.vue, views/system/user/profile/index.vue
 - Verification: source session 131a52c3-5204-4b7a-b895-8e3be39ebfcb; code baseline none
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：131a52c3-5204-4b7a-b895-8e3be39ebfcb
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

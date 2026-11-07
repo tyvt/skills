@@ -9,6 +9,12 @@ Huaian Property Management pattern where adding a phone query field to a list pa
 - Verified src=淮安物管/009.md; session 82c31af5-e691-4bcd-babb-0636c7bb1b31; baseline none.
 - Files: system/publicPage/index.vue, system/user/index.vue, maintenance/components/userDialog.vue, mixins/listMixins.js, system/publicPage/detail.vue, mixins/table.js.
 
+## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
+- 来源会话：82c31af5-e691-4bcd-babb-0636c7bb1b31
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

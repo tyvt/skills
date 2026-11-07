@@ -10,6 +10,8 @@ H5 部署在 /h5/ 子路径时，Tab 图标禁止用 /static 根路径，须用 
 - custom-tabbar.vue 中间按钮绑定 middleIcon 作为 src
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：f82a50f9-f635-4d0d-8382-d57ff27fd4c7
 - 验证会话：f82a50f9-f635-4d0d-8382-d57ff27fd4c7
 - 验证证据：src=无锡市区小程序嵌入H5/006.md；另可改用相对路径或构建工具 resolve 别名映射资源位置
 - 涉及文件：wygl-wxxcx-dev-slh 的 pages.json、components/custom-tabbar/custom-tabbar.vue、pages/service/index/index.vue、pages/webview/home.vue、pages/webview/externalWebview.vue；zhi2-mobile-admin-h5-c-unlimited 的 src/utils/zhishuAsset.js、src/pages/index/newHome.vue、src/pages.json、src/components/custom-tabbar/custom-tabbar.vue

@@ -13,6 +13,11 @@
 - 涉及：zhi2-web-admin/src/views/commercialHousingSales/presale/template/detail.vue、index.vue、package.json、vite.config.js、buildingTreeDialog.vue、main.js、index.html、public/assets/js/debounce.js。
 - 验证：src=苏州市房地产监测V3/244.md；来源会话：0159ba54-715b-46dc-8f41-850347ae8ed3。
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

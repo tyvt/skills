@@ -11,6 +11,7 @@
 - 只要求文案与 label 同源，不需动校验逻辑与 trigger
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话 a4130aa3 用户要求提示显示为「入职日期不能为空」，结论将 message 改为与 label 一致
 - 涉及文件：zhi2-web-admin/src/views/property/propertyManager/detail.vue
 - 所属项目：苏住房G；来源会话：a4130aa3-2533-4320-b64f-86af85ae97c6；代码基线：805ea8c

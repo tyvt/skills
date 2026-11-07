@@ -17,6 +17,7 @@
 - 双 Y 轴不同量纲时不要依赖 alignTicks 自动对齐，自己按友好步长算刻度既消除警告又保证可读
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：园区物管2.0/047.md
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/mock.js
 - 所属项目：园区物管2.0；来源会话：7ed0f29d-3da8-4470-918b-f0872f9b6a9f；代码基线：c97957703

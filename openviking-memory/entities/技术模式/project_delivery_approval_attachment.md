@@ -13,6 +13,10 @@
 - zhi2-web-admin/src/views/supervision/projectDelivery/components/ProjectDeliveryDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：f25b074f-2774-4b55-bbb6-fe05b1d2cad4；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

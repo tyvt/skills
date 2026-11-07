@@ -12,6 +12,8 @@
 - 加载态用 v-loading 结合 listMixins 的 getList loading
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/010.md
 - 涉及文件：SupervisionAddDialog.vue、建湖G/package.json、V3/package.json、listMixins.js、建湖G/stock/agreement/index.vue、superviseBank/index.vue、ListTemplate.js、detailMixins.js
 - 来源会话：005ca51a-2e96-4282-b80d-8c9843005a56；代码基线：none

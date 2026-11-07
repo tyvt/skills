@@ -11,6 +11,12 @@ Vue DevTools jump-to-source requires an editor launch command configured in the 
 - Files: zhi1-web-admin/vite.config.js, src/main.js, index.html, package.json, node_modules/launch-editor/package.json, node_modules/vite/package.json, node_modules/vite/dist/node/chunks/dep-NjL7WTE1.js
 - Project: 惠山G (zhi1-web-admin); Source session: c500dd33-22a6-40cf-9da0-977a1fb237b1; Code baseline: none
 
+## 验证与归属
+- 所属项目：惠山G
+- 验证证据：extracted source=cursor project=惠山G
+- 来源会话：c500dd33-22a6-40cf-9da0-977a1fb237b1
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

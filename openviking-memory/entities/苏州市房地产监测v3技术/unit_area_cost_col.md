@@ -9,6 +9,8 @@
 - 查看模式DETAIL_COL_THREE不变
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：presale/surveyChange/components/List.vue、recordPriceMngSuzhou/detail.vue、recordPriceMngContentInfo.js、utils/detailLayout.js
 - 来源会话：c17eb850-8da8-45be-8e07-7991bc836b23；代码基线：none
 

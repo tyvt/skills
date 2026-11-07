@@ -12,6 +12,8 @@
 - 在表单中保留默认值 `idType: '01'` 并在保存 payload 中保留该值；后端逻辑保持兼容
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：5d103f6d-b346-4d26-8144-3e36ee398668
 - 验证证据: src=苏州市房地产监测V3-leftover/066.md
 - 涉及文件: AgencyPersonnelDetail.vue, LeasePersonnelDetail.vue, e2e/institution/agency-personnel-real-api-flow.spec.js
 - 所属项目: 苏州市房地产监测V3; 会话: 5d103f6d-b346-4d26-8144-3e36ee398668; Baseline: none

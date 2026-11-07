@@ -10,6 +10,8 @@
 - 诸如 `zljg` 的包装页面共享该效果
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：1412adc3-5a64-46ef-9d42-ab80e4e6c02f
 - 验证证据: src=苏州市房地产监测V3/181.md
 - 涉及文件: api/company/institutionRegister.js, api/institution/institutionRegister.js, company/institutionRegister/detail.vue, institutionRegister/InstitutionRegisterPage.vue, mixins/detailMixins.js, mixins/form.js, zljg/institutionRegister/detail.vue, OperationBtnGroup/index.vue
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: 1412adc3-5a64-46ef-9d42-ab80e4e6c02f; Base: none

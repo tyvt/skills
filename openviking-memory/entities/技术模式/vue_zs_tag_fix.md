@@ -13,6 +13,8 @@
 - 修正后，对 `commercialHousingSales` 和 `contract` 目录下的模板扫描通过
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：c7884ca9-0f78-4e4e-9359-8fa478960362
 - 验证证据: src=苏州市房地产监测V3-leftover/032.md
 - 涉及文件: d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/commercialHousingSales/presale/contractRevoke/detail.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/components/tables/MortgageEntitiesTable.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/components/tables/CommercialHousingTable.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/chapters/cash/chapter1.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/components/tables/PricingModeTable.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/dialogs/saleAgencyDialog.vue
 - 源会话: c7884ca9-0f78-4e4e-9359-8fa478960362; 基线: none

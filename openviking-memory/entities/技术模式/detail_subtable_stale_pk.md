@@ -14,6 +14,7 @@
 - mounted 且过滤参数就绪后再拉数，用 filterSignature 统一 watch 过滤条件变化
 - 同类「重置后立刻查询」列表（资金缴存/账户列表）也要等区域树就绪再刷新，否则 parentDeptId 丢失
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：guaranteeDepositAccount/detail.vue、AccountDetailTable.vue、guaranteeDeposit/components/detail.vue、deposit/index.vue
 - 所属项目：产品2.0；代码基线：414029f
 - 来源会话ID：a2b93bb4-760d-4bb3-93a2-a4c0506cfb2f

@@ -11,6 +11,7 @@
 - 修改文件：`src/pages_owner/company/info/contracts.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 刷新「物业合同」页面后，应能正常显示如「张静」「17751215965」等项目负责人信息
 - 涉及文件：`contracts.vue`、`property-detail.vue`、`index.vue`、`page-query/property-detail.vue`、`api/property.js`
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：d0c4c430-2836-4d0f-89fe-307fffe632fd；代码基线：none

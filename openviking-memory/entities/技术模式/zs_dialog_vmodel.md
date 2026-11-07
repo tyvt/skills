@@ -15,6 +15,7 @@
 - 配套移除具体弹窗（如 `maintenanceItemDialog.vue`）的定制化 CSS 段落与 `custom-class`、`draggable=false`，恢复默认行为（来源会话 04d92724-d809-4b20-a0c6-fbdaca7dbf64）。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：src/components/zs-dialog/zs-dialog.vue、layout/index.vue、dialogMixins.js、@zhi2-web-admin/src/layout/components/Navbar.vue、maintenanceItemDialog.vue。
 - 所属项目：2-0（产品2.0）；来源会话：9385abcc-fd97-45d9-bf1e-ac59ebef7392, 04d92724-d809-4b20-a0c6-fbdaca7dbf64；代码基线：none。
 

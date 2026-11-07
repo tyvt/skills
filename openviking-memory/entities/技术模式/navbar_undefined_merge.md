@@ -11,6 +11,7 @@
 - 写 localStorage 前对名称做规范化，读取侧（Navbar isLabel 等）对已存的 "undefined" 字符串做过滤兜底。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：Navbar 切小区会话最终结论三处修复——bProjectDialog 合并优先保留 projectName 回退 complexName 且先拉新小区详情；Navbar isLabel 加 complexName 兜底并过滤 localStorage 里的 "undefined"；layout 写入前规范化。
 - 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue、zhi2-web-admin/src/views/home/bProjectDialog.vue、zhi2-web-admin/src/layout/index.vue；所属项目：园区物管2.0；来源会话：420324f6-d038-423b-8496-387e3126ed25；代码基线：7fe15a8cb。
 

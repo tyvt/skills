@@ -13,6 +13,7 @@
 - 在 `setOption` 前对 series 做 `filter(Boolean)` 并补 `type: 'line'`；同时修正 `LineChart.vue` 的事件监听。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 74a5d328 用户贴 LineView.js:567 stack，结论为 series 空值 + 新增 echartsOption 归一化；会话 8dac8daf 补充 LineView.js:567 报错源于 props 默认 `()=>{}` 返回 undefined，图表组件 props 改默认 `()=>({})`、setOption 前 filter(Boolean) 并补 `type:'line'`、修正 LineChart.vue。
 - 涉及文件：zhi2-web-admin/src/utils/echartsOption.js；zhi2-web-admin/src/views/benefit/mobilePreview/pubQuarterlyDeclaration/index.vue；zhi2-web-admin/src/views/home/components/BubblesChart.vue；zhi2-web-admin/src/views/transaction/screen/components/map.vue；zhi2-web-admin/src/views/monitor/components/mapChart/index.vue；LineView.js；LineChart.vue。
 - 所属项目：2-0；来源会话ID：74a5d328-683e-4a0f-84af-32d70a0281e6 与 8dac8daf-d2d6-4f13-a79c-6e0143d0dbce；代码基线：none。

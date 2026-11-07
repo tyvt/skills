@@ -11,6 +11,7 @@ zs-select-dialog 开启 building-table-mode 后共享 BuildingTable 在右侧宽
 - 宿主 RangeTable 侧包 .building-table-wrapper 横向滚动、cell-width="120"，避免继续压缩格子适配宽表
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 改动 BuildingTable.vue 防压扁 + RangeTable building-table-mode 与横向滚动容器
 - 涉及文件：zhi2-web-admin/src/views/components/BuildingTable.vue、zhi2-web-admin/src/views/maintenance/facility/components/RangeTable.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue
 - 所属项目：园区公共收益；来源会话ID：f5c910bd-d8dd-4878-952a-b6286f9f507f；代码基线：0abcb96

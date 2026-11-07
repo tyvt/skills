@@ -10,6 +10,8 @@
 - 搜索区保持 `padding-bottom: 0`
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/002.md
 - 涉及文件：src/styles/index.scss、src/styles/detail-form.scss、src/styles/element-ui.scss、src/views/presale/cashsale/components/CashsaleDetail.vue、src/styles/variables.css、src/views/presale/cashsale/components/CashsaleInfoPanel.vue、src/views/stock/contract/detail.vue、package.json
 - 来源会话ID：b34cefdf-bb09-4582-a539-6c0a8a4fcc9e

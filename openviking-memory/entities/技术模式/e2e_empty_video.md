@@ -14,6 +14,7 @@
 - 排查口诀：录屏空壳先数跑了几个用例，而非先怀疑 video 配置或 ffmpeg
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 f8ffbc1c 用户诉求空视频与双账号分工
 - 涉及文件：e2e/company/company-record-change.spec.js、e2e/scripts/merge-company-record-change-video.mjs
 - 所属项目：产品2.0；来源会话：f8ffbc1c-7b40-482d-bf84-4868214af266；代码基线：62d5fb9

@@ -12,6 +12,8 @@
 - `DetailTop.vue` 修正展示逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
+- 来源会话：3942ce22-16bf-4c69-b5d2-a3469d6db4fb
 - 验证证据：src=cursor session=3942ce22-16bf-4c69-b5d2-a3469d6db4fb
 - 所属项目：昆山市民；代码基线：none
 - 涉及文件：src/pages_vote/vote/index.vue、src/pages.json、src/stores/vote.js、src/pages_vote/vote/votedetail.vue、src/pages_vote/vote/components/DetailTop.vue、src/api/modules/vote.js、src/pages_vote/vote/detail.vue、src/pages_vote/vote/components/Screen.vue

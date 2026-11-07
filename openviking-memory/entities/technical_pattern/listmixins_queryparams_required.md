@@ -8,6 +8,8 @@
 - 约定：任何混入 listMixins 的组件应定义 queryParams 数据属性
 - 修复：在 mixin 的 computed query get/set 与 created 中对 `this.queryParams == null` 做防护（return 或 `{}`），避免纯展示弹窗崩溃
 ## 验证与归属
+- 所属项目：惠山G
+- 验证证据：extracted source=cursor project=惠山G
 - 惠山G 项目（zhi1-web-admin）：src=001.md，文件 refundDetailTable.vue、listMixins.js、refundDetailDialog.vue、DrawDetailTable.vue、DepositDetailsTable.vue，来源会话 0a343062-5aa6-4690-ac12-8d034bff8777
 - 010.md 会话 e7f13f04：VenueAssetDialog 报 TypeError，根因 listMixins queryParams 未定义，加防护，文件 src/mixins/listMixins.js，来源会话 e7f13f04-7af6-4354-8122-d5aee1779dac
 

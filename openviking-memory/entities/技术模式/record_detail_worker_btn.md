@@ -9,6 +9,7 @@ detail.vue 与 directDetail.vue 在指定条件下渲染「创建工作人员」
 - 直备(directDetail)与登记(detail)详情行为一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：src=园区公共收益/028.md
 - 涉及文件：autonomy/record/components/detail.vue、autonomy/record/components/directDetail.vue、mixins/detailMixins.js
 - 所属项目：园区公共收益；来源会话：16feeb76-4fb6-4182-823c-4dd71eb00369；代码基线：none

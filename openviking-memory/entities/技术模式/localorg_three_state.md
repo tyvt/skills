@@ -18,6 +18,10 @@
 - 涉及文件：src/utils/localOrganizationFlow.js、mixins/localOrganizationFlowMixin.js、mixins/approval.js、components/OperationBtnGroup/index.vue、components/zs-approval/index.vue、ApprovalProcessDialog.vue、views/company/companyManagement/components/detail.vue、companyRegister/detail.vue、staffManagement/components/detail.vue
 - 所属项目：苏住房G；来源会话：9c8f0d10-8555-4605-9555-1d8641db8e16；代码基线：3192070
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

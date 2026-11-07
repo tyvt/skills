@@ -16,6 +16,12 @@ Root cause: In queryIsResidentialContractList.vue, two .main-box elements both s
 - Project: 太仓存量房 (Taicang existing housing).
 - Source session: 40ebf349-c632-4932-a588-7e64f006ba8d; code baseline: none.
 
+## 验证与归属
+- 所属项目：太仓存量房
+- 验证证据：extracted source=cursor project=太仓存量房
+- 来源会话：40ebf349-c632-4932-a588-7e64f006ba8d
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

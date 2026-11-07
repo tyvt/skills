@@ -3,6 +3,11 @@
 - 涉及文件：RentalDetailDialog.vue、BrokerPages.vue、public-portal-interactions.spec.ts、rental.js、public-portal-designs.ts、detail.vue（personnelRecord）、PortalDetailHeader.vue、RentalPages.vue。
 - 验证证据：src=门户/017.md；来源会话ID：44666f5e-377b-4054-95b9-ebfb3f53c03e。
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

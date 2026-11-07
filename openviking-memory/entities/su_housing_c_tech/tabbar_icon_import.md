@@ -23,6 +23,12 @@ In Su Housing C project, AppTabBar did not import local icons and some pages had
 - Source cursor session: 7004b2d1-f4ed-47aa-b1b7-975f6fb37b58
 - Project: Su Housing C (zhi2-mobile-shimin)
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：7004b2d1-f4ed-47aa-b1b7-975f6fb37b58
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

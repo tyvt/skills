@@ -20,6 +20,7 @@
 - d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/projectManagement/certificate/conLandLic/changeDetail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/020.md
 - 来源会话ID：f08e4450-7e4c-4f7a-8514-96638563fc99
 - 所属项目：苏州市房地产监测V3；代码基线：none

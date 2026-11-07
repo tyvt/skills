@@ -10,6 +10,7 @@
 - 街道数据经 listCallback 转字符串后由字典列直接渲染启用状态
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：苏住房G/069.md
 - 涉及文件：system/regionBankAuth/index.vue、StreetAuthDialog.vue、utils.js、detail.vue
 - 所属项目：苏住房G；来源会话ID：a1374881-763d-4840-b3aa-3eaf7ccde1c3；代码基线：none

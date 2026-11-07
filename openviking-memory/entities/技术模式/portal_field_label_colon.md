@@ -16,6 +16,7 @@
 - 查询表单（可售房屋、合同备案、租赁查询等）本身无标签冒号
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 刷新页面即可生效；遗漏处可据页面路径或截图补改
 - 涉及文件：PropertyPages.vue、InformationPages.vue、BrokerPages.vue、RentalPages.vue、PropertyDetailDialog.vue、RentalDetailDialog.vue
 - 所属项目：门户；来源会话ID：2fd56787-bd18-4625-bb06-d6a35e3562b5；代码基线：none

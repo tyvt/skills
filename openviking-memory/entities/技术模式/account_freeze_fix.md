@@ -11,6 +11,7 @@
 - 历史自定义原因仍显示在输入框，但不再作为下拉选项
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话：cbb5f1e2-ec0c-4fd3-8323-b22f7cdd9fa6、d80e5a47-d726-4c05-bb4a-d5ce5d209b4b
 - 涉及文件：AccountFreezeFields.vue、accountFreeze.js
 

@@ -11,6 +11,7 @@
 - 若 property/allotNotice 物业模块有相同问题，可同样改为 POST
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G
 - 涉及文件：src/api/benefit/pubAllotNotice.js、src/views/benefit/pubAllotNotice/detail.vue
 - 来源会话：88353e21-0780-4546-bee7-b6730a012d30

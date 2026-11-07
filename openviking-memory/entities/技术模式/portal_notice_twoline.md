@@ -8,6 +8,7 @@ index-new 右侧公示公告列表项采用两行结构：第一行圆点+标题
 - 标题 font-weight:500 并加 :title 悬停全文；v-for 用 announcementId 作 key
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：会话 3189eeb5，用户反馈通知公告与设计稿不一致；结论 flex-wrap 导致标签跟标题同行，已改为 notice-text/notice-footer 两行结构、实心圆点、虚线分隔与标签色值，并改用 announcementId 作 key
 - 涉及文件：zhi2-web-admin/src/views/home/index-new.vue
 - 所属项目：门户；来源会话：3189eeb5-f453-4f06-a88b-e017c31ce460；代码基线：04586c4

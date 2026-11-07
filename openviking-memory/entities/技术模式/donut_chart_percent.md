@@ -15,6 +15,10 @@
 - 所属项目：园区物管2.0；代码基线：none
 - 来源会话：e98b3c2b-020e-45a5-bbab-7177966aefbc
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

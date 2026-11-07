@@ -12,6 +12,7 @@
 - 把 catch 里静默吞错改成显式报错，避免同类问题再次隐形。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 1401b92d 用户反馈「工单分类选不到数据」并补充「list接口存在」；定位原代码 `response.data || response.rows` 在返回对象时出错。
 - 修复为按 rows/data.records/data.list/data.rows/data 多结构解析，补充 workOrderCategoryId、_categoryName 字段映射，去掉误加状态过滤与 /page 调用。
 - 涉及文件：src/views/property/workOrder/report/index.vue、components/AddOrderDialog.vue、src/components/zs-select/zs-select.vue、src/mixins/listMixins.js。

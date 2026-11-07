@@ -15,6 +15,12 @@ In 苏住房C (zhi2-mobile-shimin), using ul/li in the news page broke the horiz
 - Files: pages_main/news/index.vue, components/article/ListIndex.vue, pages.json, components/commonNew/baseCard.vue, pages/news/detail.vue, pages/news/index.vue, pages_main/news/detail.vue, components/article/ListDetail.vue
 - Project: 苏住房C (zhi2-mobile-shimin); code baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：81595210-d77b-4b6b-b35b-a2d8a5bf4a14
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

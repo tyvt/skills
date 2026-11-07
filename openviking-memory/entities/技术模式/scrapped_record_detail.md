@@ -8,6 +8,7 @@
 - 设施设备：FacilitySelectDialog，/dataProperty/facility/page，固定 bizState 2 + complexId，增加 excludeScrapped
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0
 - 来源会话：9d46bdf7-9e8f-42c5-85bc-23a99ef581f6
 - 代码基线：none

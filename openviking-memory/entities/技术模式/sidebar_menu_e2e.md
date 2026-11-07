@@ -9,6 +9,7 @@ navbar-sidebar-accessibility用例需遍历全部直接子叶子，同URL用main
 ## 涉及文件
 - zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 所属项目：2-0；代码基线：none
 - 验证证据：会话97cb886a诉求2指出目录类型sidebar只点最后一个菜单；结论增加beforeMainText与URL不变时内容变化等待
 - 来源会话ID：97cb886a-e67c-42b6-8516-f9591fa85219

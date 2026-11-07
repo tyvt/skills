@@ -15,6 +15,7 @@
 - 补activated钩子，从详情返回时重置tab为本周并重新拉数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话d23cbaf7用户反馈首页办件量分析切换数量紊乱且不能稳定复现，给出复现路径（点当日→点待办进详情→返回首页停本周显示当日数）
 - 涉及文件：zhi2-web-admin/src/views/home/index.vue、zhi2-web-admin/src/views/home/index-wrapper.vue、zhi2-web-admin/src/router/index.js
 - 可复用结论：用户报数字与选中项不一致/偶发不稳定复现时，优先按keep-alive缓存+tab索引独立状态+并发响应乱序三项排查

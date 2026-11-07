@@ -10,6 +10,7 @@
 - 各区账户余额横柱状图维持固定 `280px` 不受影响
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：src/views/benefit/dataSandbox/fundPanorama/index.vue、src/views/benefit/dataSandbox/fundPanorama/chartConstants.js、src/views/benefit/dataSandbox/assetPanorama/index.vue
 - 所属项目：园区物管2.0；代码基线：none
 - 来源会话：03064ac9-644e-4263-ae50-f1c88bdea7a6

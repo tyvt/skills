@@ -9,6 +9,7 @@
 - `openProjectDialog`：手动切换且无可选区域时显示 warning 提示「暂无可用物业管理区域，请联系主管部门授权物业管理区域」且不打开弹窗
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：7c3abcbc-5c9f-492d-b81b-9b709f37b81c；代码基线：none
 - 涉及文件：`zhi2-web-admin/src/layout/index.vue`
 

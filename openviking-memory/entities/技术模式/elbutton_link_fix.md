@@ -11,6 +11,7 @@ Element Plus 3.0 将废弃 ElButton 的 type="text"，项目统一改为 link �
 - 修改文件：zhi2-web-admin/src/components/zs-button/zs-button.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证方式：重新启动或刷新页面后该告警应不再出现
 - 所属项目：2-0；来源会话ID：00b18628-52c8-4770-87e2-b9abc61e87b6；代码基线：none
 

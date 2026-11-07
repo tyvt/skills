@@ -12,6 +12,7 @@
 - 全量 `npm run lint` 因仓库既有报错失败
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/154.md；src=苏州市房地产监测V3/194.md
 - 涉及文件：presale/permit/permitConstants.js、presale/permit/components/PermitInfoPanel.vue、components/detail-template/detail-template.vue、presale/permit/detail.vue、presale/permit/accept/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：9e684438-f355-4543-99b7-09b123b9464c；代码基线：none

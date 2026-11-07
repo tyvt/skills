@@ -13,6 +13,9 @@ buildingTable/index.vue 和 project/index.vue 从 @/api 导入了 downloadJson�
 - building/project/index.vue
 
 ## 验证与归属
+- 所属项目：惠山二期G
+- 验证证据：extracted source=cursor project=惠山二期G
+- 来源会话：c97a341a-e901-4694-932b-d2c0da48f539
 - 验证证据: cursor 会话 c97a341a-e901-4694-932b-d2c0da48f539
 - 代码库: none
 

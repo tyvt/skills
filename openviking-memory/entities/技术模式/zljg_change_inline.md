@@ -7,6 +7,7 @@
 ## 菜单配置
 - 「机构基本信息」组件应配置为 `zljg/companyRecord/detail`（或 `zljg/agencyRecord/detail`）
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`zljg/companyRecord/detail.vue`、`zljg/agencyRecord/detail.vue`、`LeaseEntryNetworkSections.vue`、`agencyBasicInfoContent.js`
 - 所属项目：苏州市房地产监测V3；来源会话ID：015a09b1-527e-4f9f-b78f-3ba02a284fe9；代码基线：none
 

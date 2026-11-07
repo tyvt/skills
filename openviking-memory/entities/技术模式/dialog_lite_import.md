@@ -10,6 +10,7 @@
 - 跨模块复用表决子组件以optionDecision下VoteRangeDialog为参照，不假设decisionCommon内有同名表组件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证：会话a96ffabd改全路径后构建通过；src=太仓G/005.md
 - 涉及文件：zhi1-web-admin/src/views/estate/decisionCommon/components/VoteRangeDialogLite.vue、optionDecision/components/CandidateConfigTable.vue、optionDecision/components/VoteRangeDialog.vue
 - 所属项目：太仓G；来源会话：a96ffabd-ef31-4e34-998f-48051d851e40；代码基线：f458bc8

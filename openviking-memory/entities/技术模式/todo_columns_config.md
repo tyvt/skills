@@ -12,6 +12,10 @@
 - 文件：`todo.vue`、`ListTemplate.js`、`listMixins.js`、`table.js`
 - 项目：产品2.0；来源会话：43c31fa0-2afa-4155-861c-52d80df36f42；代码基线：none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

@@ -13,6 +13,7 @@
 - 这是所有「flex 长内容把兄弟元素顶飞」问题的通用解法
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 93662ada-0765-4626-a08c-941236de904d 中 Navbar.vue 长标题把右侧昵称顶出屏幕；结论为 min-width:auto + nowrap 根因，逐层 min-width:0 + ellipsis + flex-shrink 修复
 - 涉及文件：src/layout/components/Navbar.vue
 - 所属项目：园区物管2.0；来源会话ID：93662ada-0765-4626-a08c-941236de904d；代码基线：5a57bb20d

@@ -10,6 +10,7 @@
 - tableComponents 只注册 zs-table、zs-select-column 等组件，不包含 selectable 等 data；组件自身已实现列表查询、选择逻辑，不需完整 table mixin。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：刷新页面后打开「新增报事工单」物业管理区域选择弹窗，警告不再出现。
 - 涉及文件：zs-select-dialog.vue、mixins/table.js、views/property/workOrder/report/components/AddOrderDialog.vue 等（路径前缀 d:/repository/产品2.0/zhi2-web-admin/src）。
 - 所属项目：产品2.0；来源会话：09ed34db-94d4-41c6-856b-023f0668f865；代码基线：none

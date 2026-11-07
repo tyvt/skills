@@ -18,6 +18,11 @@
 - Cursor 会话: 5dde2ae1-89fa-428b-838d-b1e71ffd7a23
 - 所属项目: 淮安物管 zhi2-web-admin; baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
+- 来源会话：5dde2ae1-89fa-428b-838d-b1e71ffd7a23
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

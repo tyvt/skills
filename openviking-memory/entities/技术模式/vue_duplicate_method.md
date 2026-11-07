@@ -14,6 +14,7 @@
 - `pubExpenditureContract/index.vue` 与 `pubManualBookkeeping/index.vue` 将 `initDict` 与 `getQueryParams` 合并到同一个 `methods` 块，运行 `eslint --fix` 通过
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/assetLeaseApply/index.vue、zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/index.vue
 - 所属项目：园区物管2.0；来源会话：38ac27d7-c45f-4497-b949-64781b2d3118
 - 另涉及文件：zhi2-web-admin/src/views/benefit/pubExpenditureContract/index.vue、zhi2-web-admin/src/views/benefit/pubManualBookkeeping/index.vue；来源会话：5701a45c-6524-4251-ba21-1407b7cdc8af

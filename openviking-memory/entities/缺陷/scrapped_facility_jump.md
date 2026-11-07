@@ -16,6 +16,12 @@
 - 来源: cursor session=71a2b0ad-3e39-4680-9567-9bb5c7e84b89
 - 代码基线: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：71a2b0ad-3e39-4680-9567-9bb5c7e84b89
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "defeito",

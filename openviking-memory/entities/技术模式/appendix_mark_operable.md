@@ -10,6 +10,7 @@
 - `checkRequiredAppendix` 校验逻辑保持不变。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证来源：苏州市房地产监测V3-leftover/045.md
 - 涉及文件：zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementCard.vue、AppendixRequirementGrid.vue、src/views/toB/companyRecord/detail.vue、src/components/AnnexUpload/index.vue、src/views/company/companyManagement/components/DeveloperBasicInfoDetail.vue、src/components/AppendixPackageSection/index.vue、src/views/institution/agencyBranch/components/AgencyBranchDetail.vue、e2e/utils/appendix-requirement-grid.spec.js
 - 所属项目：苏州市房地产监测V3；来源会话：b4676408-39dd-4ce7-bd44-3126514f23d0；代码基线：none

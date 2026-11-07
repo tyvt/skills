@@ -10,6 +10,7 @@
 - 页面自身兜底：TypeChoose.vue的onLoad判断生产就redirectTo到FormLocal，FormNonLocal.vue同样拦掉非居民身份证流程。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话a48c524a诉求生产跳过选择身份认证类型页，结论列出工具函数、三处入口更新、两处onLoad兜底，并以产物内联redirectTo为生效证据。
 - 涉及文件：zhi2-mobile-shimin/src/utils/index.js、pages_my/verification/TypeChoose.vue、FormNonLocal.vue、setting/userInfo.vue、UnauthorizedPage.vue、AuthorizedFail.vue。
 - 所属项目：苏住房C；代码基线：0801b84；来源会话ID：a48c524a-2cd1-4f84-88a2-2dc51b597b93。

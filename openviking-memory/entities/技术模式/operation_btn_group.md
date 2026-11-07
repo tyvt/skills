@@ -11,6 +11,8 @@
 - 清理 99 个 operation-btn-group 重复绑定避免 getDetail 重复调用
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/056.md
 - 涉及文件：supervision/agreement/jgxm/detail.vue、components/OperationBtnGroup/index.vue、mixins/detailMixins.js、components/ZsSubmit/index.vue、scripts/scan-missing-update.py、supervision/agreement/account/detail.vue、supervision/unblock/usemoney/detail.vue、benefit/alert/detail.vue
 - 来源会话：30be24cb-105f-4bdc-aa08-3b0e6ab11f36

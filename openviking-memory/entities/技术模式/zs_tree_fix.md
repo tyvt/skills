@@ -12,6 +12,7 @@
 - 涉及文件：zs-select-dialog-func.vue、pubExpenditureContract/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益
 - 来源会话ID：e19f246b-8b3f-4ed0-b2bc-12291e2e6315
 - 代码基线：none

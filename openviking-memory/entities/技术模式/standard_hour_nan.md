@@ -10,6 +10,8 @@
 - `detail.vue` 将历史 `NaN` 展示兜底为 `-`。
 
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/022.md
 - 涉及文件：d:/repository/泰兴小程序/src/staff/pages_facility/record/add.vue、d:/repository/泰兴小程序/src/staff/pages_facility/record/detail.vue
 - 来源会话ID：407faa95-0a72-4db7-b335-97797a083932

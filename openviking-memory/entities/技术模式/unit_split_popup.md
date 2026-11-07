@@ -13,6 +13,7 @@
 - 打开先显示 loading 避免闪烁；表格限制 max-height=360 避免过高；无数据显示 el-empty 不再空表格+搜索栏
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：cursor 会话 5b2911f5 提取，已修复并请用户刷新验证
 - 涉及文件：zhi2-web-admin/src/views/building/houseImport/detail.vue、zhi2-web-admin/src/views/benefit/pubMerchantNumber/components/pubMerchantTerminalTable.vue、zhi2-web-admin/src/views/building/unit/index.vue
 - 所属项目：园区物管2.0；来源会话：5b2911f5-d317-4814-93d2-d063ea72a749；代码基线：none

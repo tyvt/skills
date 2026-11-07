@@ -20,6 +20,10 @@
 - 涉及文件：benefit/pubBankDetailDay/index.vue、benefit/bankDetailDay/index.vue
 - 所属项目：产品2.0；来源会话：a42d5cdd-87c9-4207-ab15-4eaa0e897ab6
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

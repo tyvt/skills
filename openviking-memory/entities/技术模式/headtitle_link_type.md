@@ -7,6 +7,7 @@
 - link 类型不渲染 getIconUrl 图标，样式与 detail-template 的 detail-link 一致（主题色、下划线、pointer）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证：会话 ae811080 扩展 HeadTitle/index.vue，propertyBid/detail 将招标计划编号改为 type link + link: goToComplexDetail
 - 涉及文件：zhi2-web-admin/src/components/HeadTitle/index.vue、zhi2-web-admin/src/views/property/propertyBid/detail.vue
 - 所属项目：2-0；来源会话ID：ae811080-a0ec-4d52-b603-a6fb72f9ca69；代码基线：none

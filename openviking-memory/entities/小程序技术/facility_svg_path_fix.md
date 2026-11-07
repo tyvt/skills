@@ -11,6 +11,7 @@
 - 同步修复 `facility.vue` 中相同用法（列表按钮图标也会不显示）。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 编译后可在 `dist/dev/mp-weixin/static/images/facility/` 看到对应 SVG。
 - 若仍有个别图标空白，可能是 SVG 里 `linearGradient` 在微信端兼容问题。
 - 涉及文件：`index.vue`、`facility.vue` 等；所属项目：泰兴小程序；来源会话ID：53b40878-aa25-43cb-931e-2a1d70f719c9

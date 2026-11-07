@@ -8,6 +8,8 @@
 - 变更与撤销改为按钮，变更弹窗可编辑协议名称并更新本地 agreementName
 
 ## 验证与归属
+- 所属项目：0
+- 验证证据：extracted source=cursor project=0
 - 验证：src=0/002.md
 - 涉及文件：src/components/zs-sign-canvas/zs-sign-canvas.vue、myAgreementDetail.vue
 - 来源会话：ca6ff164-836b-45c4-8c3b-f46fab9f0850；代码基线：none

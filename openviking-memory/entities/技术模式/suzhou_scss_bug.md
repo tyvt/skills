@@ -17,6 +17,10 @@
 - 会话 0e3dadb0 用户指认 detail.vue 查通用审批流并给出原始路径，最终修复 showApprovalHeader.vue 用 var(--primary-color)、showApproval.vue 用 rgba(var(--primary-color-rgb), .4)、图片改 /assets/images/icon-flow.png，构建通过
 - 所属项目：产品2.0；来源会话 0e3dadb0-95af-45c8-ad5c-3b978035c651；代码基线 62d5fb9
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

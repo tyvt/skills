@@ -18,6 +18,10 @@ T_SP_BILL 模块 property 业务 spF 修复了 getRouterPathByFilePath 找不到
 - 涉及文件：src/views/article/components/index.vue、src/views/article/richTextOne/index.vue、src/views/property/bill/components/index.vue
 - 所属项目：产品2.0；来源会话：69de9222-9bbc-454a-9a3b-a2baa4720a55
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

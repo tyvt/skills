@@ -11,6 +11,7 @@
 - 需具备 `estate:generalDecision:advanceEnd` 权限，刷新后延期状态可见按钮
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 5498a264 用户报延期后无提前结束按钮，修复后正常
 - 涉及文件：zhi1-web-admin/src/views/estate/generalDecision/detail.vue、ownerDecision/detail.vue
 - 所属项目：太仓G；来源会话：5498a264-de28-46af-8525-e64606a2220e；代码基线：none

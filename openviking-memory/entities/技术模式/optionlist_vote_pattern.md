@@ -9,6 +9,7 @@
 - 参照 decision/optional/ResultStatistics.vue 以 detail.optionList.map 映射 weightSocre 与 weightSocreRatio 实现
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓一网通办H5
 - 验证证据：src=太仓一网通办H5/002.md
 - 涉及文件：d:/repository/太仓一网通办H5/src/views/owner-decision/components/ResultStatisticsTab.vue、d:/repository/太仓一网通办H5/src/views/decision/common/ResultStatistics.vue、d:/repository/太仓一网通办H5/src/views/decision/components/ProgressBar.vue、d:/repository/太仓一网通办H5/src/views/components/ProgressBar.vue、d:/repository/太仓一网通办H5/src/store/vote.js、d:/repository/太仓一网通办H5/src/views/election/components/GroupResult.vue、d:/repository/太仓一网通办H5/src/views/election/ElectionResult.vue、d:/repository/太仓一网通办H5/src/store/election.ts
 - 所属项目：太仓一网通办H5；来源会话：77cef414-e757-45c7-ac15-5e03769e0bd4；代码基线：none

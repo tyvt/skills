@@ -12,6 +12,7 @@
 - 短信验证码按钮放输入框后缀插槽(append slot)
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/views/login.vue
 - 所属项目：园区公共收益；来源会话：a6727568-bde2-4da6-a70a-31bf732716a4；代码基线：bd275b5
 

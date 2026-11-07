@@ -9,6 +9,8 @@
 - 保持右侧使用 `flex: 1` 以填充剩余空间
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：f882f9ab-4b6d-42b0-8cfa-ee45d52f7c6b
 - 验证证据: src=苏州市房地产监测V3/199.md
 - 所属项目: 苏州市房地产监测V3
 - 涉及文件: chooseHouseDialog.vue (contractMainInfo), zs-select-dialog.vue, ElevatorOpeningDialog.vue, zs-dialog.vue, chooseHouseDialog.vue (contractView), contractMainInfo/index.vue, vite.config.js

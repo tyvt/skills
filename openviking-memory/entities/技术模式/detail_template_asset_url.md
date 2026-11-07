@@ -16,6 +16,7 @@
 - src/vite.config.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：2339a924-fde7-4822-9f1d-c02ed74f8b35；代码基线：none
 
 <!-- MEMORY_FIELDS

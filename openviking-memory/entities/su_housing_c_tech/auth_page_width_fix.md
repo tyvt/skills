@@ -12,6 +12,8 @@
 - `addTypeChoose.vue` 按钮同步设 `width:100%`
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 刷新后三个选项卡片和「下一步」按钮铺满内容区，右侧单选圆圈正常显示
 - 项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：b057f782-58f8-4cae-917c-9f6600520843
 

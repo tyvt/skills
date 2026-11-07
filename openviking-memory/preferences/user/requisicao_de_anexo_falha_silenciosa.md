@@ -4,6 +4,12 @@
 - 涉及文件: `src/api/common.js`, `src/api/index.js`, `src/api/httpInstance.js`, `src/api/property.js`.
 - 验证：会话 175eae30-82c4-41a9-8ce2-4d7f29dee217.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：175eae30-82c4-41a9-8ce2-4d7f29dee217
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

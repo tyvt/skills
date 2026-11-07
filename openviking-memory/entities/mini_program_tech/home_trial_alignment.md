@@ -11,6 +11,12 @@ home.vue ensureHouseSelected required houseBoundViaAuth && houseId and cleared h
 - Source session: 0058f23d-986e-4656-8a58-d2a02848f549; code baseline: none
 - Files: externalWebview.vue, home.vue, portal-user.js
 
+## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
+- 来源会话：0058f23d-986e-4656-8a58-d2a02848f549
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "mini_program_tech",

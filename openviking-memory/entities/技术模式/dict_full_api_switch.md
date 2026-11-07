@@ -12,6 +12,7 @@
 - 使用方示例：staffManagement/components/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：dict.js、staffManagement/components/index.vue、companyListQuery.js
 - 所属项目：苏住房G；来源会话ID：58dcbdff-1362-4418-9b41-bd4b7e15dd6c
 

@@ -11,6 +11,7 @@
 - 检查 lint 无新增报错
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡锡山业主决策H5
 - 涉及文件：src/pages/common/login.vue
 - 所属项目：无锡锡山业主决策H5；来源会话：b52e14fe-c430-4ac6-91d3-cc3e34a5328d；代码基线：none
 

@@ -10,6 +10,8 @@
 - 在 5 个记录页面根容器 `@include staff-page-theme` 注入主题变量。
 
 ## 验证与归属
+- 所属项目：泰兴小程序
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 验证证据：src=泰兴小程序/008.md
 - 涉及文件：src/staff/pages_facility/record/index.vue、src/styles/index.css、src/staff/pages_facility/components/FilterPopup.vue、src/staff/components/PageButton/PageButton.vue、src/styles/filter.scss、src/staff/components/ZsButton/ZsButton.vue、src/pages/staff/workbench/index.vue、src/staff/styles/index.css
 - 来源会话ID：fbfc005c-6b27-416e-b681-be3d510d845e

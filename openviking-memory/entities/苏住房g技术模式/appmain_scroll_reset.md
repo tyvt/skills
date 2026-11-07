@@ -11,6 +11,7 @@
 - 一处改动对所有路由跳转生效，同类布局（#app-main / #app-content 类内部滚动容器）适用同一套路
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 a1789e06 用户反馈跳转新页面滚动位置问题需全局修改；结论给出根因及 afterEach + Vue.nextTick 的 resetPageScroll 修复代码
 - 涉及文件：src/router/index.js、src/layout/components/AppMain.vue、src/views/publicQuery/complex/index.vue、src/views/publicQuery/complex/components/propertyContractTable.vue
 - 所属项目：苏住房G；来源会话ID：a1789e06-01db-41b3-b240-eb61d9addf8b；代码基线：e590ffa

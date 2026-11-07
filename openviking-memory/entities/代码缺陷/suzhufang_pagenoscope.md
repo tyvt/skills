@@ -10,6 +10,7 @@
 - 改完须拉跨区县有数据的账号验证，不能只跑同区县用例
 - v2.6.1全量合v2.6.2冲突多，改为cherry-pick单条修复提交
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话5380defe，已增梯维护新增选择小区显示外区县，定位detail.vue的handleOpenProjectDialog中url改为/page后恢复
 - 提交：18986faec(v2.6.1)→cherry-pick 3ae901631(v2.6.2)→d8d0090b2(v2.6.2-suzhufang)
 - 涉及文件：src/views/property/census/detail.vue；所属项目：苏住房G；来源会话：5380defe-19ed-4a64-b4c5-f45d134d8f43；代码基线：d109b83

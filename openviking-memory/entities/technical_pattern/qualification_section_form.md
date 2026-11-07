@@ -10,6 +10,7 @@
 - 删除 scoped 单列补丁
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/067.md；另 src=苏州市房地产监测V3/117.md
 - 涉及文件：QualificationFormSection.vue、detail-form.scss、zs-form.vue、index.scss、Headline/index.vue、Step1CompanyInfo.vue、DeveloperBasicInfoForm.vue、companyRegister/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：ae3c4552-cf65-45ec-8e81-c709ae573cb8；代码基线：none

@@ -7,6 +7,8 @@
 - 支持sampleImage属性覆盖默认图
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - E2E断言改为查加载（personnel-basic-info-visual.spec.js）
 - 涉及文件：PersonnelPhotoField.vue、personnel-basic-info-helpers.js
 - 来源会话：d7ebf2d0-69b6-470e-b1b9-11873a199e6d；代码基线：none

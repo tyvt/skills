@@ -11,6 +11,7 @@ zhi2-web-admin 在 Element Plus 下 class="el-icon-close" 已无对应字体图�
 - 样式选择器从 .el-icon-close 改为 .close-icon 保留 hover 尺寸
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 90372e07，关闭图标不显示，改为 Close 组件 + el-icon 包裹并更新样式类名
 - 涉及文件：zhi2-web-admin/src/layout/components/TagsView/index.vue
 - 所属项目：2-0（产品2.0）；来源会话：90372e07-25eb-4a0f-84f3-f63f39000430；代码基线：none

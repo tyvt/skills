@@ -8,6 +8,7 @@
 - AgreementPage点击处理加`if (isCounting) return`第二道守卫
 - 今后凡靠倒计时/状态锁按钮，先确认组件真声明并下发disabled
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话c9900767，needToKnow满5秒前可点；修复为ZsButton增disabled+AgreementPage判断isCounting
 - 涉及文件：ZsButton.vue、AgreementPage.vue、needToKnow.vue、useCountDown.js
 - 所属项目：苏住房C；来源会话ID：c9900767-72b2-4323-9462-1cd68d147b99；代码基线：4630e8e

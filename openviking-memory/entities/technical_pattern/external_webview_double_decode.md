@@ -16,6 +16,7 @@
 - 用带%3D的真实投票链接做联调验收
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages/common/webView.vue、src/hooks/useUrlQueryParam.js、src/pages.json
 - 所属项目：无锡市区小程序嵌入H5；来源会话：9b0c382d-6f57-4324-ab6b-ebafaf8e1362；代码基线：3fb9434
 

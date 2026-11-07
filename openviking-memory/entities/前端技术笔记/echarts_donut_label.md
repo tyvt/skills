@@ -19,6 +19,10 @@
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue、zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js。
 - 所属项目：园区物管2.0；来源会话：98ef0df4-45f3-4381-a79d-760eb1b00c62；代码基线：3965548b6。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

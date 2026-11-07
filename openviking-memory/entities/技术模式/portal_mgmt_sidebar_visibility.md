@@ -18,6 +18,10 @@
 - 验证：对照 portalLayout.js、terminalUser.js、layout/index.vue 与 getters isSuperAdmin，明确否定「仅超管显示侧栏」
 - 所属项目：门户；来源会话 ID：92954991-a2a3-4de6-bff0-9d78b9e27081；代码基线：8c17ba3
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

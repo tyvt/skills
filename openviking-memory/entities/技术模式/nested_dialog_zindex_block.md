@@ -10,6 +10,8 @@ Element 的 PopupManager 给嵌套父 zs-dialog 的内层 .el-dialog__wrapper �
 - 需给内层 zs-dialog 提升层级，或用 ref 控制显隐与层级
 
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/013.md
 - 涉及文件：@zhi2-web-admin/src/views/solicitation/components/maintenanceFeeDtlDialog.vue
 - 来源会话ID：f7fa3bf8-e11d-41c2-ab82-7f380cbd83c7

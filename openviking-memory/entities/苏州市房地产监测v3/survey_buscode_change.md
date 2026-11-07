@@ -7,6 +7,7 @@
 - validateSurveyFile() 中 listAppendixPackage 的 busCode 同步更新，文件头注释改为 busCode=ysxkcs。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：permitConstants.js、PermitApprovalDialog.vue、presale-permit-real-api-flow.spec.js。
 - 所属项目：苏州市房地产监测V3；来源会话：b1bb7368-21ce-4ac4-9add-5db7c2bf8aa9。
 

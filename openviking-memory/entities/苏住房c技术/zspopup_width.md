@@ -12,6 +12,7 @@
 - 配合已有box-sizing:border-box与border-radius；100vw即屏宽不需减scrollbar
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话2795d7c1用户要求弹窗留白20px，结论加约束于ZsPopup.vue并作用于所有使用该组件的弹窗
 - 涉及文件：src/components/ZsPopup/ZsPopup.vue、src/pages_my/verification/FormLocal.vue
 - 所属项目：苏住房C；来源会话：2795d7c1-b57e-448c-bc6a-90330c419f2b；代码基线：0801b84

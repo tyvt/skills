@@ -19,6 +19,7 @@
 - d:/repository/园区物管2.0/zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 来源会话：7cb81d4c-7323-41b8-ba59-bb27cc4083ad
 - 所属项目：园区物管2.0；代码基线 none
 

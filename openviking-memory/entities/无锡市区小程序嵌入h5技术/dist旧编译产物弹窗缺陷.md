@@ -10,6 +10,7 @@
 - 重新执行npm run build，更新dist/assets/usePortal.be15442a.js（新包已无「业主电子表决」弹窗文案）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 需刷新/重新加载小程序或H5使用的dist资源（微信开发者工具重新编译、清缓存后预览）
 - 涉及文件：dist/assets/usePortal.be15442a.js、src/pages.json、src/pages_owner/house/detail.vue等
 - 所属项目：无锡市区小程序嵌入H5；来源会话：9b0c382d-6f57-4324-ab6b-ebafaf8e1362；代码基线：none

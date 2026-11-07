@@ -11,6 +11,8 @@
 - 涉及文件：detail.vue、transaction.js、stockHouse/detail.vue、info/index.vue
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=苏住房C/079.md
 - 来源会话ID：7f29f06a-70ca-4db2-9199-e681d3284e78
 

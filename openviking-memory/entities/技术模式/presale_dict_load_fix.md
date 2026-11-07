@@ -16,6 +16,12 @@
 - 涉及文件: PermitPlanPanel.vue, PresalePlanFillForm.vue, permitConstants.js, plan/detail.vue, detail.vue, presale-permit-helpers.js
 - 会话: 44a56ca5-f11d-40ff-a9f2-cd4a229a1f75
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：44a56ca5-f11d-40ff-a9f2-cd4a229a1f75
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

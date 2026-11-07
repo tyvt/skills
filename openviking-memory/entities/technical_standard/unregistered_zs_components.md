@@ -21,6 +21,11 @@ Usage of unregistered `<zs-button-group>` and `<zs-attachment>` tags triggered u
 - Sessions: da4d6410-f867-47a9-acf7-3468a014ca81, bf4f4ff9-8f97-43fa-9336-a48464455213
 - Files: companyAdmin/detail.vue, contract/index.vue, commercialHousingSales/presale/versionManagement/detail.vue, template/detail.vue, contractRevoke/detail.vue, scripts/migrate-detail-framework.mjs, supervision/progress/node/detail.vue, mixins/detailMixins.js, package.json, buildinginfo/detail.vue, e2e/fixtures/contract-version-helpers.js, chooseHouseDialog.vue, saleAgencyDialog.vue, vite.config.js, main.js, zs-button/index.vue, zs-button/zs-button.vue
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：da4d6410-f867-47a9-acf7-3468a014ca81
+
 
 <!-- MEMORY_FIELDS
 {

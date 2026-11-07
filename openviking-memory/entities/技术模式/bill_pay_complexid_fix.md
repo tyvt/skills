@@ -10,6 +10,7 @@
 - `collectionDialog.vue`：打开后先调 `payDetail` 接口取 `complexId` 再加载支付渠道
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：eb97ca91-bf05-47bd-962a-06182b75ff56；代码基线：none
 
 <!-- MEMORY_FIELDS

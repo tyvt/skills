@@ -16,6 +16,7 @@
 - 判别口径：报错路径出现「分包 + 页面子目录 + /static/」时，先查是否 ./static/ 写法，而非先怀疑 ZsImage 的 subpackage 参数。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 bf727bff：add.vue 从 ./static/ 引用三张图标，产物路径 /pages_owner/repair/static/… 返回 500；同模块 submit.vue 用 ../static/（即 pages_owner/static/）可正常打包。修复为把 icon_feedback.png、icon_repair.png 复制到 pages_owner/static/ 并改 import 为 '../static/'，icon_arrow_right.png 本已存在。
 - 涉及文件：src/pages_owner/repair/add.vue、src/pages_owner/repair/index.vue、src/pages_owner/static/right.svg。
 - 所属项目：苏住房C；来源会话ID：bf727bff-d0f8-4d85-8723-cfa12502510a；代码基线：9832ba3。

@@ -13,6 +13,12 @@
 - 验证证据: src=苏住房C/029.md (内部文档).
 - 源会话: 04bd980d-60cb-4228-859f-9dca707763e9; 代码库: none.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：04bd980d-60cb-4228-859f-9dca707763e9
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "Tecnologia SuzhouC",

@@ -8,6 +8,8 @@ pages_main/automaticRobot/ 页面输入框高度 76rpx 与发送按钮 80rpx 不
 - 统一两者高度值以对齐布局
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：77cf72a2-1093-447c-94f7-20320099f3ff
 - 验证证据：cursor 会话 77cf72a2-1093-447c-94f7-20320099f3ff
 - 涉及文件：pages_main/automaticRobot/index.vue、ZsButton.vue、pages_my/robot/chitchatDetail.vue、pages_my/robot/index.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；代码基线：none

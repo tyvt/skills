@@ -12,6 +12,7 @@
 - `pubRegulatoryStopAgreement`：接口 `/benefit/pubRegulatoryAccount/page`，同步填充管理主体、管理银行等相关字段；抽取 `applyPropertyProjectRow` 方法供自动填充与手动选择共用。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：benefit/pubManagementOrg/detail.vue 等。
 - 所属项目：园区物管2.0；来源会话：93317773-d26a-4a23-9229-5c568913c133；代码基线：none。
 

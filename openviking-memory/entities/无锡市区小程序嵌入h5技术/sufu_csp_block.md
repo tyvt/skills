@@ -12,6 +12,7 @@
 - 排查时区分「白名单拦截」与「frame-ancestors拦截」两种报错
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话c2d03879苏服办打开业主自治三方页失败
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/.env.production、src/utils/webViewUrl.js
 - 所属项目：无锡市区小程序嵌入H5；来源会话：c2d03879-fbdf-4092-8416-a9b7a9d79600；代码基线：7de00b1

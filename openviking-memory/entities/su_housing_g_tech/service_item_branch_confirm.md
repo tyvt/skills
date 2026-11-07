@@ -11,6 +11,7 @@
 - 262-suzhufang 分支无新提交，因早已包含该修复
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话：e97486f2-5d9a-4ca1-85fc-b2597c02cd4a；代码基线：none
 
 <!-- MEMORY_FIELDS

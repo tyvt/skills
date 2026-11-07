@@ -10,6 +10,7 @@
 - 其他页面需返回按钮时直接引入ReturnAppBtn组件即可
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：src/components/ReturnAppBtn/ReturnAppBtn.vue、src/utils/backToApp.js、src/pages_owner/decision/index.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话：bcab9206-8b7b-478a-a355-2173f531fd74；代码基线：none
 

@@ -11,6 +11,7 @@
 - tooltip 正确显示「区名 360.43万元 (50.0%)」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证证据：会话 da8341d1-4c60-4e14-998d-ee6afa53037c
 - 涉及文件：src/views/benefit/dataSandbox/fundPanorama/index.vue、chartRenderers.js、dataHelpers.js、mock.js、chartConstants.js
 - 所属项目：园区物管2.0；来源会话ID：da8341d1-4c60-4e14-998d-ee6afa53037c；代码基线：none

@@ -13,6 +13,10 @@ certificatesTable.vue 的 operationButtons 在 attrs 中定义 permission:false�
 - 涉及文件：zhi2-web-admin/src/components/zs-button/zs-button.vue、staffManagement/components/certificatesTable.vue、credit/assessment/components/assessmentProjectTable.vue、staffManagement/components/index.vue、companyManagement/components/bankTable.vue、mixins/subTableMixins.js、src/main.js、src/utils/permission.js
 - 所属项目：产品2.0；来源会话：238293ef-3bd5-4396-98d5-3034f011a25c；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

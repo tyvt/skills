@@ -16,6 +16,7 @@
 - agencyBasicInfoContent.js、companyBasicInfoShared.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/066.md
 - 所属项目：苏州市房地产监测V3；来源会话：8c3c7790-3198-42c7-8854-d0b971635778；代码基线：none
 

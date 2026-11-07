@@ -21,6 +21,8 @@
 - 对照控制台 `[苏服办人脸识别]` 日志定位
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：2a5dc010-d890-4a11-a627-83db6d26d2b6
 - 验证来源：无锡市区小程序嵌入H5/006.md；会话 2a5dc010-d890-4a11-a627-83db6d26d2b6 用户反馈苏服办与支付宝均令牌失效
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js、src/pages/face/face.vue、src/pages/index/home.vue、newHome.vue、webview/home.vue、utils/h5Context.js、src/main.ts、src/App.vue
 - 所属项目：无锡市区小程序嵌入H5；代码基线：none

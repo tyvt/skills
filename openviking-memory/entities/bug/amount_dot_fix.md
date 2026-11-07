@@ -11,6 +11,7 @@
 - 失焦按 `formatFixedDecimal` 保留 2 位；展示走 `v-money`/`currencyFormatter` 也是 2 位
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证：刷新页面后投资金额显示为如 `1,085.57` 万元
 - 所属项目：苏州市房地产监测V3；来源会话：808426b7-f075-4d66-95f6-bcfc95218970
 

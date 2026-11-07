@@ -12,6 +12,7 @@
 - 通用约定：详情页顶栏按钮显隐（保存/提交/打印）一律只由 formMode + 业务状态决定，页内 active/step 等 UI 下标不得参与。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 a1f996bc（基线 ad5bbd9）产品要求一键申报进详情去掉保存按钮，改 operation-btn-group showSave 为 "formMode == 'edit'"，行为 add 不显示、edit 显示、view 不显示。
 - 涉及文件：zhi2-web-admin/src/views/property/feeDeclare2/detail.vue、index.vue。
 - 所属项目：苏住房G；来源会话ID：a1f996bc-685b-423d-a130-f23d676a6962；代码基线：ad5bbd9

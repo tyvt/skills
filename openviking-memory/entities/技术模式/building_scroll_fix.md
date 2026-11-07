@@ -11,6 +11,7 @@
 - CandidateDialog.vue 保留 treePageSize: 10，每页仍按 10 条请求
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴G
 - 涉及文件：zs-select-dialog-func.vue、CandidateDialog.vue
 - 所属项目：泰兴G；来源会话：908f5228-a584-4485-a746-432febf5a60f；代码基线：none
 

@@ -14,6 +14,10 @@
 - 涉及文件：system/message/components/selectRangeDialog.vue、rangeTable.vue、components/zs-table/zs-table.vue、index.vue
 - 所属项目：园区物管2.0；来源会话：c6be946b-abae-4b93-9a83-f55f6a1bc67a；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术缺陷",

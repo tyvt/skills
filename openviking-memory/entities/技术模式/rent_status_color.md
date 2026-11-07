@@ -15,6 +15,7 @@
 - benefit/statisticsMap/operatingAssets.vue 等
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 所属项目：园区物管2.0；代码基线：none
 - 来源会话：3f441280-c7e8-4f56-84ea-ee7480edfb5d
 

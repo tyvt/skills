@@ -14,6 +14,7 @@
 - 树异步加载完成后，针对「当前区级节点且已解析 regionCode」自动补发一次列表请求
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 47d60d2a 确认根因为 areaCodeTree 返回 areaCode 而合并只读了 region 字段
 - 涉及文件：zhi2-web-admin/src/views/system/regionBankAuth/utils.js、index.vue
 - 所属项目：苏住房G；来源会话ID：47d60d2a-587e-4806-bba5-e7aa15aae607；代码基线：c176892

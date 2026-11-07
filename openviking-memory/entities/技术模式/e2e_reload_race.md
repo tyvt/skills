@@ -10,6 +10,7 @@
 - 用例 02 提交后去除多余跳转直接断言在途变更
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/007.md
 - 涉及文件：zhi2-web-admin/src/api/company/companyRecord.js、e2e/fixtures/company-helpers.js、companyRecordAgency/change/detail.vue、companyManagement/components/DeveloperBasicInfoDetail.vue、utils/flowApi.js、e2e/company/company-record-change.spec.js、toB/companyRecord/detail.vue、components/OperationBtnGroup/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：12a2e42b-6de6-49de-9205-d3b77e75c3bf；代码基线：none

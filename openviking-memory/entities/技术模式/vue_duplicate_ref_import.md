@@ -9,6 +9,12 @@
 - 会话 cursor 82027868-3f83-446c-a0bf-5e3fec501631 记录了此次更改。
 - 基础代码: none.
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：82027868-3f83-446c-a0bf-5e3fec501631
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

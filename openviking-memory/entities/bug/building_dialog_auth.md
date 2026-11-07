@@ -10,6 +10,10 @@
 - 修改已应用到工作区，尚未提交
 - 所属项目：产品2.0；来源会话：dc881812-1513-477b-8342-59b5f3fc62ac；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "bug",

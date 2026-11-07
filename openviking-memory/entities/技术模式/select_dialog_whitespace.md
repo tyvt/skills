@@ -15,6 +15,12 @@
 - 涉及文件: presale/permit/components/PresaleSelectBuildingDialog.vue; components/zs-select-dialog/zs-select-dialog.vue; building/houseLimit/components/HouseSelectDialog.vue; presale/cashsale/components/CashsaleSelectBuildingDialog.vue; presale/permit/components/PresaleBuildingTable.vue; supervision/riskmanage/riskregister/components/superviseDialog.vue; presale/permitSelectConstants.js; property/decision/components/SelectComplexDialog.vue
 - 会话: b5dcbf27-aa94-4d27-a97a-978ba9a2e7cd; 代码库: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b5dcbf27-aa94-4d27-a97a-978ba9a2e7cd
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

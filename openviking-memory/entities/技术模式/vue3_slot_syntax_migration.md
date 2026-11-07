@@ -12,6 +12,7 @@
 - runtime-core.esm-bundler.js（报错来源）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 所属项目：2-0；来源会话ID：56daed33-b372-4f48-a73c-1d78207c080e
 - 代码基线：none
 

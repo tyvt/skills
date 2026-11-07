@@ -10,6 +10,8 @@
 - 页面内部捕获 res 自行展示错误弹层
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证：004.md 会话中 src/request/index.js 增加配置不提示接口错误返回信息，由页面处理
 - 涉及文件：src/request/index.js、src/components/zs-popup/zs-popup.vue、src/App.vue
 - 来源会话ID：86d428a7-ae46-4ef6-9e04-9cc6aa14eeb3

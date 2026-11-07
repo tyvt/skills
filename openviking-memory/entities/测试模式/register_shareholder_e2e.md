@@ -13,6 +13,7 @@
 - 批量删除按钮限定为 .table-action
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：e2e/register/navigation-shareholder.spec.js、Step3Appendix.vue、e2e/fixtures/register-helpers.js
 - 所属项目：产品2.0；来源会话：706c30d3-6c4d-4142-b37e-3c31a05c20b6；代码基线：none
 

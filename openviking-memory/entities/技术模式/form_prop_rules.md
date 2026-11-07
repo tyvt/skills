@@ -13,6 +13,7 @@ zhi2-web-admin 详情页用 el-form 时，el-form-item 的 prop 需与 rules 键
 - 新增表单项先对齐 prop 再写 rules，不要按 label 起名。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：停车泊位租赁详情 prop 为 parkingChargeStandardId、rules 写在 parkingChargeStandardName 导致无必填星号，改 rules 键后星号与提示一致。
 - 涉及文件：parkingSpaceContractFiling/detail.vue。
 - 所属项目：园区公共收益；来源会话：7a6ec4bf-c697-4a2c-85ae-f84db3a2a972；代码基线：08d3255。

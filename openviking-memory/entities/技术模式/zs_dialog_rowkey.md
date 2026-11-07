@@ -11,6 +11,7 @@
 - 宜兴公共收益 pubBankDetailDay/index.vue 补充 row-key="regulatoryAccount" 对齐 bankDetailDay 等页面
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=宜兴公共收益
 - 验证：会话 300657ce，accountQuery/type.vue 选择弹窗未传 row-key，补 row-key="complexId" 后警告消失
 - 涉及文件：zhi2-web-admin/src/views/maintenance/accountQuery/type.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue
 - 所属项目：园区物管2.0；代码基线：177bc3ce4；来源会话：300657ce-6fc5-408d-932e-3dc812b1084d

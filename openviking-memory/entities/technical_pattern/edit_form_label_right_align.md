@@ -11,6 +11,12 @@ Zhi2-web-admin adjusted edit-state horizontal form labels to right-align globall
 - Source session: fc1bfee3-7801-4bc0-80fd-6f073ce051f3
 - Files: index.scss, detail-form.scss, NodeDetailsDialog.vue, zs-dialog.vue, package.json, element-ui.scss, detail-template.vue, ParcelDialog.vue
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：fc1bfee3-7801-4bc0-80fd-6f073ce051f3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

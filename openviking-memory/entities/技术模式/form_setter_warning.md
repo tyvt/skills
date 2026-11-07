@@ -15,6 +15,11 @@
 - 涉及文件: register/components/single-page/CompanyRegisterSingleForm.vue, register/components/RegisterUploadItem.vue, utils/registerValidate.js, utils/registerFormContext.js, mixins/detailMixins.js, mixins/form.js, register/companyRegister.vue, register/components/Step1CompanyInfo.vue
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: 87dc18b1-c6cb-4944-ae78-7dd985b6bc0d; Base: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：87dc18b1-c6cb-4944-ae78-7dd985b6bc0d
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "padrao_tecnico",

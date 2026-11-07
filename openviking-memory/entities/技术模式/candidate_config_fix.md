@@ -13,6 +13,7 @@
 - 同步修复选举模块 `election/components/decision/CandidateConfigTable.vue` 相同问题
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：进入业主决策→选项表决，打开一条表决
 - 涉及文件：`autonomy/option/components/CandidateConfigTable.vue`、`election/components/decision/CandidateConfigTable.vue`、`VoteRangeDialog.vue`、`DecisionRangeTable.vue`
 - 所属项目：苏住房G；来源会话：eaa4289e-4d04-4653-a9b5-6141668140fe；代码基线：none

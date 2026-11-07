@@ -20,6 +20,7 @@
 - mixins/table.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/190.md
 - 来源会话ID：f9ae239b-1970-4f62-b9f6-43dcba0723b3
 - 所属项目：苏州市房地产监测V3；代码基线：none

@@ -7,6 +7,8 @@
 - zhi2-web-admin/src/views/property/complex/detail.vue中contentInfo增加void this.communityOptions触发依赖收集
 - 改用formatCommunityDisplay从communityOptions匹配名称
 ## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/032.md
 - 涉及文件：detail.vue、index.vue、area.js、detailMixins.js、form.js、main.js、package.json
 - 来源会话：1d1dcbd1-daa8-4961-bfb9-d16249fa1d19

@@ -9,6 +9,7 @@
 - stepHouseInfo.vue 对 detailData 的 watch：默认值 {} 为 truthy，if(val) 判断会把 otherData 字段赋值成 undefined
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=repository
 - 涉及文件：src/pages/leaseContract/stepHouseInfo.vue、index.vue（宿迁苏服办）
 - 来源会话：f57d7e7f-9439-484d-b703-784cb50ce8c1
 - 所属项目：repository；代码基线 none

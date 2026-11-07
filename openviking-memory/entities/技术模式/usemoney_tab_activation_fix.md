@@ -11,6 +11,7 @@
 - 子表用 watch currentTab（immediate）在 Tab 就绪后再 getColumn/getList，并带上分页参数
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 硬刷新后只有一个页签高亮，各自楼幢数据能出来；若仍为空，检查 /prefund/planDetail/page 入参和返回
 - 涉及文件：supervision/unblock/usemoney/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：66577926-e9f6-4492-b968-4c342f004cbe；代码基线：none

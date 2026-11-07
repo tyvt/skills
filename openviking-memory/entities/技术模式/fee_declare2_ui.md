@@ -12,6 +12,7 @@
 - 修复单选模式下确定按钮 `row` 未定义的 bug
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：`feeDeclare2/index.vue`、`detail.vue`、`components/feeBindScopeTable.vue`、`feeBindScopeDialog.vue`
 - 所属项目：产品2.0；来源会话：b37d508c-a09b-4cbb-bac4-008c8f7645fb
 

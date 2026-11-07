@@ -8,6 +8,8 @@
 - 后续在 analytics.js 新增 /appAnalytics/** 接口需同样加 skip401:true
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期H5
+- 来源会话：73b006e7-ce1b-4f15-8ff8-b6623e838eb0
 - 验证：会话 73b006e7-ce1b-4f15-8ff8-b6623e838eb0 完成修改
 - 涉及文件：src/api/index.js、src/api/analytics.js、src/utils/track/client.js
 - 所属项目：惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）；代码基线：none

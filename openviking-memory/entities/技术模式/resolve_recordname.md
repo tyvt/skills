@@ -9,6 +9,7 @@
 - 在 add 模式 created 钩子用源数据把 complexName 回填进 recordName
 - 展示区(contentInfo 查看态)、detailCallback、子表 prop 全部改为调用 resolveRecordName(this.form)
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话 81e0c5dc（基线 2a3ef8a）修复前后对比，备案名称正常显示
 - 涉及文件：zhi2-web-admin/src/views/property/complexChange/detail.vue
 - 所属项目：苏住房G；来源会话ID：81e0c5dc-49f5-4db4-8eef-299f62b77144；代码基线：2a3ef8a

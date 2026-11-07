@@ -14,6 +14,10 @@
 - 接口行数据需带 `landPlotId`/`landPlotName` 等宗地字段供校验与汇总文案。
 - 所属项目：园区公共收益；来源会话：fed5c973-84de-4f18-adfd-4d38f2f4dcd8；代码基线：86a4227。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

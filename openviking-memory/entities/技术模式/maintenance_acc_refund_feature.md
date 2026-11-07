@@ -15,6 +15,7 @@
 - 详情页：基本信息含物业管理区域、账户类型（业主基本账户/电梯消防资金专户）、出款账号及自动带出字段；退款申请信息含退款类型
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：index.vue、detail.vue、AccountRefundTable.vue、HistoryRefundNoticeDialog.vue；所属项目：产品2.0；来源会话：f23a2459-353c-41d6-93aa-1abf998360f7；代码基线：none
 
 <!-- MEMORY_FIELDS

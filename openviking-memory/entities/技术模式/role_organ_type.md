@@ -9,6 +9,7 @@
 - 需先选择组织类型，角色下拉框才会加载对应机构角色列表
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：ownerCommitteeWorker/detail.vue、system/user/detail.vue
 - 所属项目：园区公共收益；来源会话：9878244d-a568-49fa-8751-9ff53a3f3559；代码基线：none
 

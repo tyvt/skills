@@ -16,6 +16,7 @@
 - property/complexDeliveryApply/detail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 另含 property/spotChecking/checkingDia（文件名截断，疑似 checkingDialog.vue）
 - 所属项目：2-0；来源会话：74b0cccb-98ed-4ca2-b756-cfe54408c16b
 - 代码基线：none

@@ -15,6 +15,7 @@
 - index.vue与indexMore.vue双入口一并核对
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话86696cb3用户报最新楼盘无数据，agent对比确认type=1被当halfYearAgo=1，在indexMore.vue:65-91加映射修复
 - 涉及文件：src/pages_transaction/newHouse/indexMore.vue、index.vue、src/api/transaction.js、src/hooks/usePaging.js
 - 所属项目：苏住房C；来源会话ID：86696cb3-e77a-4306-8d93-2aa391d79f46；代码基线：5f0f4dc

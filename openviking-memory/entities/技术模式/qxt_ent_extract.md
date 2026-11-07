@@ -12,6 +12,7 @@
 - `registerValidate.js` 等参与校验
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/033.md
 - 涉及文件：Step1CompanyInfo.vue、companyRegister.js、unitRegister.vue、companyRegister.vue、registerValidate.js、Step1BasicInfo.vue、detail.vue、api/index.js
 - 所属项目：苏州市房地产监测V3；来源会话：eb2f9a1f-31c8-4c08-ace9-5835eebfaf22；代码基线：none

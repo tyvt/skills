@@ -16,6 +16,11 @@
 - 淮安导出原先缺少 Loading 状态，与 `building/unit` 及 `credit/record` 列表页不一致；将 `exportLoading` 变量绑定到按钮 `loading` 属性并在 `download` 的 `finally` 中重置。
 - 文件：zhi2-web-admin/src/views/benefit/pubAccountBalance/index.vue、property/propertyAccount/index.vue、evaluation/evaluation/quarter/index.vue、property/census/index.vue、api/index.js、mixins/listMixins.js、mixins/table.js、mixins/ListTemplate.js。
 
+## 验证与归属
+- 所属项目：宜兴公共收益
+- 验证证据：extracted source=cursor project=宜兴公共收益
+- 来源会话：0ed8887c-bd1f-4c05-a0c0-05c9ac915e28
+
 
 <!-- MEMORY_FIELDS
 {

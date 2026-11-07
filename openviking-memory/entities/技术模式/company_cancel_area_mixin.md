@@ -11,6 +11,7 @@
 - 表格和「选择机构」弹窗仍走 `formatRegion` 回显
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`@/mixins/area.js`、`companyCancel/detail.vue`、`companyCancel/index.vue`
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：43523a7a-7791-4eb2-8963-fb30588ceb6e

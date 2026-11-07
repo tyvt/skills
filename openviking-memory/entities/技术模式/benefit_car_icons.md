@@ -11,6 +11,7 @@
 - property/complex/components/RegionTreeLayout.vue 等
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 所属项目：园区物管2.0；代码基线：none
 - 来源会话：9167d986-66b5-4e82-9f45-7f540aae6789
 

@@ -6,6 +6,8 @@
 ## 解决方案
 - 账单总金额→billAmountSum、优惠→discountAmountSum、实收→actualReceivedAmount、欠费→arrearsAmount
 ## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/033.md
 - 涉及文件：feeBindScopeTable.vue、detail.vue、formatters/index.js、subTableMixins.js、table.js、tableComponents.js、zs-table-column.vue、feeBindScopeDetailDialog.vue
 - 来源会话：2b5e91c2-08d1-43eb-b794-4d03b269f91a

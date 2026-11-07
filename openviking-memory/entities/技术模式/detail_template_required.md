@@ -16,6 +16,8 @@
 - views/company/companyManagement/components/agencyBasicInfoContent.js
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/099.md
 - 来源会话ID：99e93fa9-bdba-48d1-9456-be2dc7b45c5f
 

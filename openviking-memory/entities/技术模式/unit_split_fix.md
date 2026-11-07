@@ -16,6 +16,7 @@
 - zhi2-web-admin/src/views/building/unit/components/UnitSplitDialog.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：c25170fe-e1f9-496c-b733-e6745dc10d5b；代码基线：none
 
 <!-- MEMORY_FIELDS

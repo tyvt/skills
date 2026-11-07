@@ -16,6 +16,7 @@
 - padList/refreshList 用 res.rows || res.data || [] 防 undefined 展开；同类「有返回无展示」优先按这三顺序查
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 c9de4a3c 结论改为 async/await、可选链取值、去掉无效 computed.list、useLoadMore 补 .catch、padList 用 res.rows||res.data||[]
 - 涉及文件：pages_transaction/stockHouse/index.vue、hooks/useLoadMore.js、api/v1Instance.js、utils/ui.js
 - 所属项目：苏住房C；来源会话ID：c9de4a3c-a1a8-45ce-b4b9-2a181a353c95；代码基线：e383380

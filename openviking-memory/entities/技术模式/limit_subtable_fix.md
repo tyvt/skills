@@ -9,6 +9,9 @@
 - `limitFormMixin.js` 添加 `hydrateSelectedHousesForEdit()` 以按优先级填充，并提取辅助方法以解耦。
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：de78bf5d-ff1d-4c2d-b6b5-2faf54f81d39
 - 验证证据: src=苏州市房地产监测V3/128.md
 - 涉及文件: limitFormMixin.js, limitCancel.vue, limitAdd.vue, detailMixins.js, main.js, house-limit-helpers.js, house-limit-list-detail.spec.js, .workbuddy/memory/2026-09-23.md
 - 会话: de78bf5d-ff1d-4c2d-b6b5-2faf54f81d39; Base: none

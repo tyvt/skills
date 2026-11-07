@@ -10,6 +10,7 @@
 - 业务页 `benefit/pubRegulatoryAccount` 无需改动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：苏住房G/042.md
 - 涉及文件：vite.config.js、maintenance/accountOpen/components/OpenDetailDialog.vue、property/components/BranchOneDialog.vue、system/workBank/components/pubRegulatoryBranchDialog.vue、maintenance/accountOpen/components/detail.vue、system/workBank/components/BranchOneDialog.vue、benefit/components/BranchOneDialog.vue、property/propertyAccount/index.vue
 - 所属项目：苏住房G；来源会话：e54e19e2-5d01-4169-ace4-1cfb25836888

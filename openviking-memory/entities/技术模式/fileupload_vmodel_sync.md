@@ -10,6 +10,9 @@
 - 影响了 `staffManagement` 中的两个 `certificatesDialog.vue`
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：6ae031ba-01c4-4fb7-b554-8fab64e1aa45
 - 验证证据: src=苏州市房地产监测V3/232.md
 - 涉及文件: d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/FileUpload/index.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/staffManagement/components/certificatesDialog.vue; d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/staffManagement/personnelRecord/certificatesDialog.vue
 - 源会话: 6ae031ba-01c4-4fb7-b554-8fab64e1aa45; 基线: none

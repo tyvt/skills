@@ -12,6 +12,12 @@
 - 验证证据: src=门户/019.md; 会话: 2fd56787-bd18-4625-bb06-d6a35e3562b5
 - 涉及的文件: UnifiedLogin.vue, InformationPages.vue, PropertyPages.vue, RentalPages.vue, PortalSearch.vue, RentalDetailDialog.vue, BrokerPages.vue, PropertyDetailDialog.vue.
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：2fd56787-bd18-4625-bb06-d6a35e3562b5
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

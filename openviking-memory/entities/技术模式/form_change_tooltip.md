@@ -20,6 +20,8 @@
 - zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoForm.vue
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/112.md
 - 来源会话：52921acc-1bb2-40b9-9679-abb2a470ef0a；代码基线：none
 

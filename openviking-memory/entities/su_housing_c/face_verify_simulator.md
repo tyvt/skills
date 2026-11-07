@@ -11,6 +11,12 @@ Simulator's uni.startFacialRecognitionVerify usually goes fail callback, only su
 - Involved files: d:\repository\苏住房C\zhi2-mobile-shimin\src\api\security.js ; d:\repository\苏住房C\zhi2-mobile-shimin\src\pages_my\verification\FormLocal.vue ; d:\repository\苏住房C\zhi2-mobile-shimin\src\pages_my\verification\FormNonLocal.vue ; d:\repository\苏住房C\zhi2-mobile-shimin\src\utils\index.js ; d:\repository\苏住房C\zhi2-mobile-shimin\src\pages_my\verification\FormManual.vue ; d:\repository\苏住房C\zhi2-mobile-shimin\src\utils\constant.js ; d:\repository\苏住房C\zhi2-mobile-shimin\src\api\index.js
 - Source session: 13ed1683-e44e-4216-95c3-4499d21022e8; baseline: none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：13ed1683-e44e-4216-95c3-4499d21022e8
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c",

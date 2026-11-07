@@ -10,6 +10,7 @@
 - 在 VoteRangeDialog 中用 `decisionPolicy === 'general'` 判断是否为一般表决
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 修复后一般表决线下投票弹框显示单页表单（决策项选择、表决意见、签字图片上传、直接「确定」提交），不再显示候选人选举步骤条
 - 涉及文件：`decisionCommon/VoteRangeDialog.vue`、`decisionCommon/components/DecisionRangeTable.vue`、`ownerDecision/components/VoteRangeDialog.vue`
 - 所属项目：太仓G；来源会话：e9e71106-e4a9-41fe-a2ee-72a4cf99c6d9；代码基线：none

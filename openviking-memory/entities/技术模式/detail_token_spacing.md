@@ -19,6 +19,12 @@
 ## 验证
 - cursor 会话: 280dea0c-9d8d-46bc-8e8f-9208741e4322
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：280dea0c-9d8d-46bc-8e8f-9208741e4322
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -12,6 +12,7 @@
 - 注意 src/pages/index/components 与 src/pages_tab/components 下 Project_Suzhufang.vue 同名副本，确认渲染哪份
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：ab547a32-fb28-436d-b850-9344b46f646a；代码基线：4630e8e
 - 涉及文件：pages/index/project.vue、Project_Suzhufang.vue（两处副本）、ZsPaging.vue、useReachBottom.js
 

@@ -8,6 +8,7 @@
 - statusOptions 等异步字典列表用 || [] 兜底。
 - 字段口径未与后端确认（如 businessType vs accountType）时回退错误改动，只保留字典展示修复，避免误链 committeeVersionId。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：dd85a874 诉求4「当前状态显示了数字0」、诉求5-6 要求回退 BusinessType 改动，最终保留字符串化与兜底。
 - 涉及文件：zhi2-web-admin/src/views/autonomy/ownerCommitteeWorker/detail.vue
 - 所属项目：园区公共收益；来源会话：dd85a874-0175-478e-81cc-c4afa02d3b86；代码基线：635e747

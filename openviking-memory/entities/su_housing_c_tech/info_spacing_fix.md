@@ -15,6 +15,10 @@
 - 原先部分页面用 20rpx 间距，大屏设备随 rpx 换算显宽，统一 10px 保持视觉一致
 - 所属项目：苏住房C；来源会话ID：a98e9087-2a10-4769-bbf6-6e47eb7b7590
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",

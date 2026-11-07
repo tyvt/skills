@@ -14,6 +14,10 @@ OperationBtnGroup 的返回使用 $router.go(-1)，在新增保存跳详情后�
 - 涉及文件：zhi2-web-admin/src/mixins/form.js、src/views/system/user/detail.vue、src/mixins/formComponents.js、src/mixins/detailMixins.js、src/main.js、src/components/OperationBtnGroup/index.vue
 - 所属项目：产品2.0；来源会话：65432183-de0d-46d6-bd78-1b5f9fc846c8；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

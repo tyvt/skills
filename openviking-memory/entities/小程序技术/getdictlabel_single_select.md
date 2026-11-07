@@ -16,6 +16,7 @@
 - 背景解法：page 与页面根节点都设底色并改 min-height:100vh，卡片区背景改透明灰避免白色断层
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C
 - 来源会话：6222418a-4f22-4b84-9de7-cbcaaf49e929（2026-08-06）
 - 代码基线：8fc39d4

@@ -6,6 +6,9 @@
 - saveLegalPersonInfo 和错误文本仅存在于前端调用层和E2E报告
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：da1f55b0-ae33-4080-aba0-5b657c8f820e
 - 验证证据: src=苏州市房地产监测V3/179.md
 - 涉及文件: package.json, auth-helpers.js, idCard.js, Step2LegalPerson.vue, register-helpers.js, companyRegister.js, src/patterns/index.js, Step4Shareholders.vue
 - 会话: da1f55b0-ae33-4080-aba0-5b657c8f820e; baseline: none

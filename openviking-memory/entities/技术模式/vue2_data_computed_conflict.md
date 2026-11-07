@@ -10,6 +10,8 @@ subTableMixins 的 table.js 在 data 声明 operationColumnWidth，本组件 com
 - bizState === '0' 时宽 160 否则 100
 
 ## 验证与归属
+- 所属项目：2-0
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：table.js
 - 验证证据：src=2-0/022.md
 - 来源会话ID：751fbf61-9cad-490e-9eb7-c4aa5a8ffe55

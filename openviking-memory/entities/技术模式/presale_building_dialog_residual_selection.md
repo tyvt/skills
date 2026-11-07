@@ -14,6 +14,10 @@
 - 关联：PresaleBuildingTable.vue
 - 所属项目：苏州市房地产监测V3；来源会话：b7de0fee-b743-4846-9174-5348514dc8db
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

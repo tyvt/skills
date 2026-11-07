@@ -15,6 +15,8 @@
 - user/index.vue 等共 15 个 .vue 文件
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+- 来源会话：5fbf0b20-9378-4a13-8296-bd55786a876a
 - 验证：会话 5fbf0b20-9378-4a13-8296-bd55786a876a
 - 所属项目：园区物管2.0；代码基线：none
 

@@ -11,6 +11,12 @@
 - 涉及文件: `benefit/pubHouse/index.vue`, `benefit/pubHouse/components/pubHouseDialog.vue`, `benefit/pubHouse/detail.vue`, `benefit/pubVenue/detail.vue`, `benefit/pubParkingSpace/detail.vue`.
 - 来源: cursor 会话 b86fe772-d48c-4f14-83ed-0fae40ff6861.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：b86fe772-d48c-4f14-83ed-0fae40ff6861
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

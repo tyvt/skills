@@ -12,6 +12,7 @@
 - 同类 DecisionResult/ResultDetail/ResultRecord 副本一并复核，避免残留。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 aa7c3d25（2026-08-27，基线 f1939b0）修改第2组：「ResultDetail.vue / ResultRecord.vue 非分组选举将错误 selects.rows 改为 selectOptions」。
 - 涉及文件：zhi2-mobile-shimin/src/pages_vote/elect/ResultRecord.vue、zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue。
 - 所属项目：苏住房C；来源会话ID：aa7c3d25-bd1a-4ca4-bb8f-8c55d6730cc6；代码基线：f1939b0

@@ -13,6 +13,7 @@
 - `LeasePersonnelDetail.vue` 做同样调整（`zlcyrybg` 变更场景）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 管理端从「变更管理」进入经纪从业人员变更单（`bizState=1`）再点审批，应走 `/company/personnelRecordChange/approval`
 - 涉及文件：AgencyPersonnelDetail.vue、LeasePersonnelDetail.vue、api/company/personnelRecord.js
 - 所属项目：苏州市房地产监测V3；来源会话：6023b157-4f28-471e-8f2b-868c05df16b7

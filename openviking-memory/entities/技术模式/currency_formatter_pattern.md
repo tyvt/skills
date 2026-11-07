@@ -13,6 +13,7 @@
 - 与表格列「prop + :formatter」并列的文案级千分位约定，两处都禁止页面内自写正则加逗号
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 e7b17454-44cc-4737-a77d-b8aa48d3a424 中 ZsSummaryText 数字千分位用全局 currencyFormatter + patterns.number 判定，非数字原样返回
 - 涉及文件：zhi2-web-admin/src/components/ZsSummaryText/index.vue、src/formatters/index.js、src/patterns/index.js
 - 所属项目：园区物管2.0；来源会话ID：e7b17454-44cc-4737-a77d-b8aa48d3a424；代码基线：3965548b6

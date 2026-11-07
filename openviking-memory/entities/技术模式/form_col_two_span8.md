@@ -9,6 +9,8 @@
 - 在 `developerBasicInfoContent.js` 的 `buildOfficeContentInfo` 中，办公地址布局改为使用 `FORM_COL_WIDE` (span=16) 以占据两列
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：9ec6ae3b-87cf-4803-bc6c-838d26b02903
 - 验证证据: src=苏州市房地产监测V3/293.md
 - 涉及文件: developerBasicInfoContent.js, detailLayout.js, DeveloperBasicInfoForm.vue, detail-template.vue, agencyBasicInfoContent.js, detail-form.scss
 - 所属项目: 苏州市房地产监测V3; Session: 9ec6ae3b-87cf-4803-bc6c-838d26b02903; Baseline: none

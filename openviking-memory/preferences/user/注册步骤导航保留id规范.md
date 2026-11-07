@@ -2,6 +2,11 @@
 - `institutionRegister.js` 需新增 `getInstitutionRegisterDetail`（`noMessage/noReject`）以补拉详情。
 - 验证证据：src=苏州市房地产监测V3/076.md；来源会话：9fe9ee18-7352-4a5c-bc63-a249f00380ff；代码基线：none。
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

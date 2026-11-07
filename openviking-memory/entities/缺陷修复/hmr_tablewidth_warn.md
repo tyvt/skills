@@ -16,6 +16,12 @@
 - 源会话: e2b799d6-2c74-4d75-98c4-123b9c9d51db.
 - 代码基线: none.
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：e2b799d6-2c74-4d75-98c4-123b9c9d51db
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "缺陷修复",

@@ -8,6 +8,7 @@
 - 将 xAxis 和 yAxis 恢复为独立配置，刷新页面后路由正常加载。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：恢复独立配置后路由正常加载。
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js、mock.js、index.vue
 - 所属项目：园区物管2.0；来源会话：54b299a4-635f-450d-90d0-0fb23196a9f4；代码基线：none

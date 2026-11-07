@@ -18,6 +18,12 @@
 - 来源: cursor session `73c71c1b-5198-4b26-a346-52710620b322`
 - 代码库: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：73c71c1b-5198-4b26-a346-52710620b322
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -14,6 +14,7 @@
 - 验证话术：明确告知「编辑模式下该参数不应出现」，否则被当成漏改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 修复后 queryStartBank 带 isPubRegulatoryAccount=1&isStart=1&sourceModel=property，selectTJgBankBranchList 带该参数，编辑模式不带
 - 涉及文件：property/propertyAccount/detail.vue、property/account/detail.vue、property/account/components/AccountDialog.vue、utils/workBank.js
 - 所属项目：苏住房G；来源会话：4cfcd91c-2679-4f6f-b33f-ee016bf89b9f；代码基线：a700def

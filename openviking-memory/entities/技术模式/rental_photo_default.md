@@ -16,6 +16,10 @@
 - E2E 断言照片 src 包含 empty.svg（当前 mock 数据无真实照片）
 - 本地刷新 portal=rental-staff 点任一行「基本信息」即可看到缺省图
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

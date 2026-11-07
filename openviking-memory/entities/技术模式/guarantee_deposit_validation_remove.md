@@ -9,6 +9,7 @@
 - 移除新增弹窗中余额不足、缴存超协议金额等前端校验及多条提示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：d36ae770-4f20-4b95-9e87-4e3c0ac46142；代码基线：none
 
 <!-- MEMORY_FIELDS

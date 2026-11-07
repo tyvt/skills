@@ -12,6 +12,7 @@
 - 修复后提示：联系电话 → 联系电话不能为空；证件号码 → 证件号码不能为空
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：f96d8adf-ae69-47ed-80a8-22928637bcaa；代码基线：none
 - 涉及文件：`operatorAddDialog.vue`、`operatorDialog.vue`
 

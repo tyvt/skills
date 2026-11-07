@@ -6,6 +6,7 @@
 - 排除接口行上 `selectable` / `hasActiveSurveyChange` 等不可用标记
 - 按楼幢号勾选第一个可用行；无可用行则关弹窗返回 `false`（用例 `test.skip('无可选楼幢')`）
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 本地复跑：`cd zhi2-web-admin && npx playwright test e2e/presale/presale-survey-change-real-api-flow.spec.js`
 - 涉及文件：`e2e/fixtures/presale-survey-change-helpers.js`、`e2e/presale/presale-survey-change-real-api-flow.spec.js`、`src/styles/index.scss`
 - 所属项目：苏州市房地产监测V3；来源会话ID：917bcc72-bb40-4ee4-a078-26ffa623d83b；代码基线：none

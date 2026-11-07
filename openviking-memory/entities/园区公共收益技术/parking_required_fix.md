@@ -11,6 +11,7 @@
 - 现「收费标准名称」显示必填 *，未填写保存时前端提示「收费标准名称不能为空」
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/views/benefit/parkingSpaceContractFiling/detail.vue
 - 所属项目：园区公共收益；来源会话：7a6ec4bf-c697-4a2c-85ae-f84db3a2a972
 

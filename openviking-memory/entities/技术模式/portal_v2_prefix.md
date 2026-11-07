@@ -22,6 +22,10 @@ zhi2-web-admin 子模块与主仓「门户」的 v2 API 网关前缀未统一对
 ## 关联信息
 - 所属项目：门户；来源会话 ID：66c9378e-4cf9-4d89-9040-e0be3ea73d99；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

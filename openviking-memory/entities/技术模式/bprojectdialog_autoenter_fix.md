@@ -16,6 +16,10 @@
 - 文件：zhi2-web-admin/src/views/home/bProjectDialog.vue、zhi2-web-admin/src/layout/index.vue、zhi2-web-admin/src/views/home/ResetPwdDialog.vue
 - 所属项目：园区公共收益；来源会话：022cfbb6-b498-4713-a286-66050471cfb5；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -11,6 +11,8 @@
 - 该防护对所有使用 zs-table-column 的列表生效，不仅限于 businessItemTable.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=bugfix
+- 来源会话：4bab2422-f3d5-47d6-ac5c-bc239d948ba1
 - 验证证据：src=bugfix；会话：4bab2422-f3d5-47d6-ac5c-bc239d948ba1；涉及文件：businessItemTable.vue、zs-table-column.vue、vue.js
 - 所属项目：bugfix；代码基线：none
 

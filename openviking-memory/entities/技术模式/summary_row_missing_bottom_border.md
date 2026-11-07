@@ -12,6 +12,7 @@
 - resourcesLeaseContractFiling/index.vue：绑定 :border="border"，设 bottom-summary-variant="table" 使合计区与表格边框衔接
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zs-table.vue、index.scss、resourcesLeaseContractFiling/index.vue、ZsSummaryText/index.vue
 - 所属项目：园区物管2.0；来源会话：9a3daf50-8a49-4516-af4c-070c6201cf9b
 

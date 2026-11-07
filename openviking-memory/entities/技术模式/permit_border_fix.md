@@ -14,6 +14,10 @@
 - 来源会话：93be20d8-831b-48da-b8df-1a5b31730ca5
 - 涉及文件：`index.scss`、`PermitInfoPanel.vue`、`presale/permit/detail.vue`
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

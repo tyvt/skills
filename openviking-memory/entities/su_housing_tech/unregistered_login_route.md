@@ -10,6 +10,7 @@
 - 涉及文件：src/pages/login/index.vue、src/pages.json
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=苏住房C/079.md
 - 来源会话ID：17b77da9-0fa5-4835-918b-0363e0ec5bf1
 - 所属项目：苏住房C（zhi2-mobile-shimin）

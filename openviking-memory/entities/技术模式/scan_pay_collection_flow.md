@@ -11,6 +11,7 @@
 - 4) 若账户余额全额抵扣（无需扫码）直接提示收款成功，不进二维码分支；payData 为空按失败提示，不放出二维码弹窗
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：053.md 会话 af2c138b 的 collectionDialog.vue 最终结论给出 fetchPayInfo/showQrCode/handleConfirm 核心代码与五步支付流程
 - 涉及文件：property/spFeeBill/components/collectionDialog.vue、property/bill/components/PaymentDialog.vue
 - 所属项目：产品2.0；来源会话：af2c138b-8a07-4a0c-9b27-adf12153be13；代码基线：6accf9a/0ec4b79/bca8b74/2f68042/94b86fa

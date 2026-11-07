@@ -10,6 +10,7 @@
 - 将面板移出父级 `zs-form` 避免嵌套异常
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/048.md
 - 涉及文件：institution/agencyBranch/components/ServiceSchemePanel.vue、AgencyBranchDetail.vue、agencyPersonnel/components/EducationTable.vue、agencyBranch/components/CancelDialog.vue、e2e/institution/agency-branch-flow.spec.js 等
 - 所属项目：苏州市房地产监测V3；来源会话：98c0fa61-1285-419f-a294-44b52af2945d；代码基线：none

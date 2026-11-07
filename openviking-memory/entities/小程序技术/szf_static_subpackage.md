@@ -11,6 +11,7 @@
 - 新增图片先确认落在哪个分包目录再决定是否补进映射表；组件侧（如collectBtn）未显式传subpackage时的默认值也要与映射表一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话7f47849c报错Failed to load local image resource /pages_main/static/images/szf/aixin_g.png与default.png，状态500，文件实际在pages_transaction/static/images/szf/；修复为按文件名映射分包，修正collectBtn的imageSubpackage默认值
 - 补充验证：会话 e3873d64（基线9832ba3）新房详情页 dianhua.svg/building_banner.png/dunpai.png 在 pages_transaction/static/images/szf/，ZsImage 未指定 subpackage 时 resolveStaticUrl 按主包前缀拼成主包路径致 500；在 utils/index.js 加 inferSubpackageFromRoute 按栈顶 route 首段推断分包修复；同批腾讯地图鉴权失败与图片无关
 - 当前代码核实：utils/index.js:250-296三个Set+resolveSzfImageSubpackage，298-313 resolveSubpackageForStatic优先查表、最后inferSubpackageFromRoute；实测各分包static文件数pages_transaction 148、pages_tab 136、pages_owner 103、pages_owner_extra 45

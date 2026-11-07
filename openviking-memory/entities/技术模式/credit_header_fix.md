@@ -12,6 +12,10 @@
 - 涉及文件：zhi2-web-admin/src/views/evaluation/creditChangeDeclaration/detail.vue、creditDeclarationComponents/detail.vue、components/OperationBtnGroup/index.vue、evaluation/companyReport/components/detail.vue
 - 所属项目：产品2.0；来源会话：7f4c692f-1a01-4348-afe9-003fd8ee2a08；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -13,6 +13,12 @@ Submit logic for decision/elect forms assigns decisionPlayerName from userStore.
 - Evidence: src=i淮安公版/002.md
 - Source session: b9a67129-a3c8-45ef-a049-365dbe342883
 
+## 验证与归属
+- 所属项目：i淮安公版
+- 验证证据：extracted source=cursor project=i淮安公版
+- 来源会话：b9a67129-a3c8-45ef-a049-365dbe342883
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

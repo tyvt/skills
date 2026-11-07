@@ -12,6 +12,7 @@ i淮安H5 项目中对 benefit 相关页面移除 mock 分支，改走真实接�
 - zs-picker-popup 里对 findIndex/空列表的修复（与 mock 无关）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=i淮安H5
 - 涉及文件：src/pages_benefit/benefit/index.vue、src/pages_benefit/assetsPublicity/index.vue、src/pages.json、src/hooks/useLoadMore.js 等
 - 所属项目：i淮安H5；来源会话：472544ee-238b-483c-9e2d-72850c506abd；代码基线：none
 

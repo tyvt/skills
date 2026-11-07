@@ -11,6 +11,7 @@
 - pubRegulatoryStopAgreement 抽取 applyPropertyProjectRow 共用赋值逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：benefit/pubManagementOrg/detail.vue、benefit/pubBankReceiptApply/detail.vue、benefit/pubExpenditureContract/detail.vue、benefit/pubElevMaintenanceNew/detail.vue、benefit/pubRegulatoryAgreement/detail.vue、benefit/pubMerchantNumber/detail.vue、store/getters.js、store/modules/user.js
 - 所属项目：园区物管2.0；来源会话：93317773-d26a-4a23-9229-5c568913c133；代码基线：none
 

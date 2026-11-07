@@ -14,6 +14,12 @@ building/project/detail.vue 和 projectChange/detail.vue 中的 DetailTemplate(c
 - 涉及文件: building/project/detail.vue; building/projectChange/detail.vue.
 - 验证证据: cursor会话 ff097cf6-67f8-45c1-8b04-753136cfda5d.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：ff097cf6-67f8-45c1-8b04-753136cfda5d
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

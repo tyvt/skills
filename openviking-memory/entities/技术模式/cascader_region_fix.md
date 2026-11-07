@@ -14,6 +14,10 @@
 - 涉及：`location-cascader.vue`、`eorg/detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话ID：e660a1c1-9825-434a-be21-3120be9ea83f；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

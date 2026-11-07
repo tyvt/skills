@@ -9,6 +9,11 @@ The full merge of develop/v2.6.1 to develop/v2.6.2 had many conflicts; the team 
 【来源会话ID】23fa39f4-c905-4fc1-b62e-36ce2d716c82
 【代码基线】none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "cherry_pick_merge",

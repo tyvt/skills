@@ -14,6 +14,11 @@
 - 涉及文件: optionDecision/detail.vue, OperationContainer/index.vue, detailMixins.js, ownerDecision/detail.vue, optionDecision/index.vue, sortDecison/detail.vue, main.js, directives/permission/hasPermi.js
 - 所属项目: 太仓G; 代码库: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
+- 来源会话：d78da6c5-2f67-48d6-9fd2-d7742debc541
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

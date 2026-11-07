@@ -13,6 +13,12 @@ Element UI 的 el-upload 组件即使通过 http-request 进行自定义上传�
 - 涉及文件: certificatesDialog.vue; userAvatar.vue.
 - 验证证据: src=产品2.0/085.md; session: a3245b72-8923-4386-a8ad-ff00068ae739.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：a3245b72-8923-4386-a8ad-ff00068ae739
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

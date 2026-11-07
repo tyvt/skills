@@ -22,6 +22,12 @@ In the WeChat mini-program, parent scoped or :deep() styles cannot reliably cons
 - Project: SuHousingC (zhi2-mobile-shimin)
 - Source session: fd31d266-ac37-45f4-a828-8a29b307c443
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：fd31d266-ac37-45f4-a828-8a29b307c443
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_tech",

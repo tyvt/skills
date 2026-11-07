@@ -17,6 +17,10 @@
 - 验证证据：src=门户/029.md；全仓 npm run lint 退出码0但掩盖单文件 ESLint 风格报错，合并前需对 src/views/login/SuzhouDaoQrLoginDialog.vue 单独校验。
 - 来源会话ID：2b16ec8a-8acf-4c77-a414-b61a81601259；代码基线：dfee5a6
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

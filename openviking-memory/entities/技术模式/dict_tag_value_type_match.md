@@ -11,6 +11,8 @@
 - 若仍不显示，需核对接口返回字段名与 fields 里 prop 是否对齐。
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证证据：会话 3ee096c3（车位类型数据值1不显示，转字符串后修复）。
 - 涉及文件：src/views/benefit/statisticsMap/components/ParkingAssetDialog.vue。
 - 来源会话ID：3ee096c3-3217-4512-83ef-b5204479f8cb；代码基线：none。

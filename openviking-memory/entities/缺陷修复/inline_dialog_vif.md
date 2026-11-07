@@ -8,6 +8,8 @@
 - 为 SelectDialog 添加 `v-if="showProjectDialog"`，在打开时挂载，在关闭时销毁。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：31e3d43d-5804-493b-b7d0-f41ce35c1bc8
 - 验证证据: src=苏州市房地产监测V3/105.md
 - 所属项目: 苏州房地产监测V3; 会话: 31e3d43d-5804-493b-b7d0-f41ce35c1bc8; baseline: none
 

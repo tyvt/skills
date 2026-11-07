@@ -9,6 +9,7 @@
 - 不再使用 `v-dialogDrag`，改用 Element Plus 原生 `draggable` 属性（当前 element-plus@2.8.0 支持）。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 c1098e7c 报 Runtime directive 告警；修复见 zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue 1:10。
 - 涉及文件：zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue
 - 所属项目：2-0；来源会话ID：c1098e7c-136f-424c-bd78-3be376262378；代码基线：none

@@ -17,6 +17,11 @@
 - 验证证据: src=苏州市房地产监测V3/141.md
 - 所属项目: 苏州市房地产监测V3; session: b13e0131-0391-4d9f-9e4c-9a23fc4f3322; baseline: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b13e0131-0391-4d9f-9e4c-9a23fc4f3322
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

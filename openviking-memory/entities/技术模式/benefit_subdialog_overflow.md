@@ -10,6 +10,7 @@
 - 弹窗根或内容容器设 `overflow: hidden` 并底部按钮右对齐，与全局 `sub-container` 去竖线规范一并验收。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：会话 e326e1ef 中 subAdvertiseDialog 移除 Headline、overflow:hidden 修复取消按钮；subVenueDialog 同步。
 - 涉及文件：zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subAdvertiseDialog.vue、zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subVenueDialog.vue
 - 所属项目：园区公共收益；来源会话ID：e326e1ef-cd40-49fe-b333-beabfaaa0ee3；代码基线：36a9a7e

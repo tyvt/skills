@@ -10,6 +10,7 @@
 - 联调失败先核对小程序入参链路与后端映射，而非先改前端文案
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话a343d1aa引用getH5Selection代码段，截图H320214000001603即getHouseInfo入参来源
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js、src/pages_owner/maintain/index.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话ID：a343d1aa-9a2b-44b9-9046-e30e130c5be6；代码基线：38bd192

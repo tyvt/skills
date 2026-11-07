@@ -13,6 +13,7 @@
 - 经纪 / 租赁入网审核详情共用该页，改一处即可
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - E2E 新增：`zhi2-web-admin/e2e/company/institution-register-audit-scheme.spec.js`
 - 涉及文件：`zhi2-web-admin/src/views/company/institutionRegister/detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话ID：f93aa12c-1cdd-411f-adfa-0e6cc96d1075；代码基线：none

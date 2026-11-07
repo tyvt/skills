@@ -13,6 +13,11 @@
 - 涉及文件: src/styles/element-ui.scss, src/components/AmountInput/index.vue, src/components/zs-input/zs-input.vue, public/assets/css/element-ui.css, src/styles/index.scss, src/views/home/components/SearchInput.vue, src/views/property/localPropertyBid/detail.vue, vite.config.js
 - 所属项目: 产品2.0; 会话: 1542c9a5-d487-4b61-a6aa-8a7eb0b7f7c8; base: none; 验证证据: 产品2.0/032.md
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：1542c9a5-d487-4b61-a6aa-8a7eb0b7f7c8
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "代码缺陷",

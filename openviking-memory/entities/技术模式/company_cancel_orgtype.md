@@ -14,6 +14,11 @@
 - 涉及文件: zhi2-web-admin/src/views/company/companyCancel/index.vue, src/api/company/companyCancel.js, zhi2-web-admin/src/views/zljg/companyCancel/index.vue, src/mixins/companyOrganContext.js, companyRecordAgency/index.vue, companyCancel/detail.vue, e2e/list/list-card-spacing.spec.js, src/constants/companyOrgan.js
 - 所属项目: 苏州市房地产监测V3; 会话: 50257d35-25d2-4753-bbb1-55a3c981474e
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：50257d35-25d2-4753-bbb1-55a3c981474e
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

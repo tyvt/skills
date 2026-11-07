@@ -11,6 +11,7 @@
 - 修正模板内明显语法错误（如 `"options": this.[...]`）。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：feeCustomTypeDialog、initiation/detail 等修完后 build exit 0。
 - 涉及文件：zhi2-web-admin/src/views/maintenance/budget/components/feeCustomTypeDialog.vue、zhi2-web-admin/src/views/maintenance/final/components/feeCustomTypeDialog.vue、zhi2-web-admin/src/views/maintenance/initiation/detail.vue。
 - 所属项目：2-0（产品2.0）；来源会话：69747f30-d768-4dea-bd2e-d230f2593e18；代码基线：none。

@@ -11,6 +11,7 @@
 - `getList` 完成后调用 `doLayout()` 重算布局
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：zs-select-dialog.vue、zs-select-dialog-func.vue、pubBankDetailDay/index.vue
 - 所属项目：园区公共收益；来源会话：0369602c-e19b-47c4-b72b-a8e1c7d91b45
 

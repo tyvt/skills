@@ -9,6 +9,12 @@
 - 涉及文件: empj_EstateDetail.js, empj_EstateDetail.shtml, empj_EstateDetail.css, BuildingMapper.xml.
 - 源会话: 47a15a5b-96fc-44bf-a48d-4d88ec7e305c.
 
+## 验证与归属
+- 所属项目：园区物管V0
+- 验证证据：extracted source=cursor project=园区物管V0
+- 来源会话：47a15a5b-96fc-44bf-a48d-4d88ec7e305c
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -12,6 +12,7 @@
 - 当前 `zhi2-web-admin` 子模块 `detail.vue` 有未提交修改
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：`detail.vue` 等 `benefit/pubRegulatoryAgreement` 目录
 - 所属项目：苏住房G；来源会话：fcec66f6-3880-4027-9916-7ed4c8786fe9；代码基线：none
 

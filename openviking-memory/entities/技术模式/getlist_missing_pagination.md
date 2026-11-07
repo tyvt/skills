@@ -14,6 +14,10 @@
 - 涉及文件：benefit/statisticsMap/rentIncomeExpense.vue、mixins/subTableMixins.js、leaseContract.vue
 - 所属项目：园区物管2.0；来源会话：29f1c84f-97cf-49da-9e1a-a78cdde386a4；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

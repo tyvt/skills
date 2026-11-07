@@ -11,6 +11,7 @@
 - 重新编译后进「物业合同」页数据自动加载，不用滑动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 涉及文件：src/pages_contract/list.vue、src/hooks/useLoadMore.js、src/api/modules/contract.js、src/pages_home/home.vue、src/pages_benefit/benefit/index.vue
 - 所属项目：昆山市民；来源会话ID：36463f59-a953-4d01-8c85-f8ed807c8d73；代码基线：none
 

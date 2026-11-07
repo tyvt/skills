@@ -16,6 +16,8 @@
 - D:/repository/惠山小程序/src/workers/pdf.worker.entry.js
 
 ## 验证与归属
+- 所属项目：惠山小程序
+- 验证证据：extracted source=cursor project=惠山小程序
 - 验证证据：src=惠山小程序/002.md
 - 来源会话：427fdc69-ed6e-4b9c-811d-7f88c8d2f375
 - 代码基线：none

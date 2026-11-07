@@ -11,6 +11,10 @@
 - 涉及文件：zhi2-web-admin/src/views/autonomy/change/industry/index.vue、zhi2-web-admin/src/views/autonomy/record/components/index.vue
 - 所属项目：产品2.0；来源会话：eebfec63-b202-465d-bb64-bb589b6deaf9；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

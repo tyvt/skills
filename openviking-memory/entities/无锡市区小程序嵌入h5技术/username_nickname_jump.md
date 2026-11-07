@@ -10,6 +10,8 @@
 - home.vue与usePortal.js跳转前await getUserInfo并调用ensureProfileForBdcJump校验分流
 
 ## 验证与归属
+- 所属项目：无锡市区小程序嵌入H5
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：src=无锡市区小程序嵌入H5/011.md
 - 涉及文件：src/pages/index/home.vue、src/store/user.js、src/api/security.js、src/pages/login/index.vue、src/App.vue、src/utils/h5Context.js、src/pages/index/property.vue、src/pages_owner/house/automaticAdd.vue
 - 来源会话：b91f733f-c012-4895-a19d-a04b64d87630；代码基线：none

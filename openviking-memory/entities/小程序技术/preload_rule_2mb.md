@@ -15,6 +15,7 @@
 - 已预加载过的分包（如pages_tab）无需重复配置；修复后复查其他preloadRule是否接近上限
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话4a12fc00（基线f1939b0）用户报白屏贴出80058，修复为删除pages/index/project预加载规则
 - 涉及文件：src/pages.json、src/utils/menuNav.js、src/pages/redirect/index.vue、src/pages_owner/ownerCard/index.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：4a12fc00-b2b5-4a2f-9855-3ac716f228d9；代码基线：f1939b0

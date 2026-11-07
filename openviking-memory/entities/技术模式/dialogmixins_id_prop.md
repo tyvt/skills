@@ -12,6 +12,7 @@
 - 凡是 mixin 声明过的 prop（id、visible 等）都不能再从 $attrs 取
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 6fdd2549，dialogMixins.js props 里声明 id，ParamsDialog.vue confirm 中 this.$attrs.id 为 undefined，改为 this.id 修复
 - 涉及文件：zhi2-web-admin/src/mixins/dialogMixins.js；zhi2-web-admin/src/views/tool/print/components/ParamsDialog.vue
 - 所属项目：产品2.0；来源会话ID：6fdd2549-8d41-469b-94b8-8cd8fe8a1f20；代码基线：bc9b2a3

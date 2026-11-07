@@ -18,6 +18,7 @@
 - 默认图必须与使用方同分包或主包，并确认该分包已预加载，否则「回退」是假的
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 2d0beecf「苏找房—部分图片不显示，没法访问的图片回退到默认图」
 - 涉及文件：src/utils/index.js、src/components/ZsImage/ZsImage.vue、src/components/commonNew/houseCard.vue、src/pages_tab/components/Project_Suzhufang.vue、src/pages.json
 - 所属项目：苏住房C；来源会话ID：2d0beecf-aa60-4c38-a236-78238bca1303；代码基线：f1939b0

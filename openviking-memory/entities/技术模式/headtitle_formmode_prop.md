@@ -12,6 +12,7 @@
 - 其它详情页复用同样传参方式
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：会话 b0a46c27，HeadTitle 内容不显示，补 prop 并在 complex/detail.vue 传入 formMode
 - 涉及文件：zhi2-web-admin/src/components/HeadTitle/index.vue、zhi2-web-admin/src/views/property/complex/detail.vue
 - 所属项目：2-0；来源会话ID：b0a46c27-17bc-4baf-82e4-aedd0e490a02；代码基线：none

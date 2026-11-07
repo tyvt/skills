@@ -13,6 +13,7 @@
 - 同一改动同步pages/commonNew/swiperComponent.vue与pages_transaction下两份副本
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话db12bfb7用户贴weapp:///components/commonNew/swiperComponent.js:212:61完整堆栈；结论detail.vue逐条push+视频插前使索引偏移叠加:key=index致item undefined；修复为一次性赋值、可选链、filter、稳定key、越界空判
 - 涉及文件：src/components/commonNew/swiperComponent.vue、src/pages/commonNew/swiperComponent.vue、src/pages_transaction/newHouse/detail.vue、src/pages_transaction/stockHouse/detail.vue
 - 所属项目：苏住房C；来源会话ID：db12bfb7-5b5d-404f-93cd-258941957c3c；代码基线：4630e8e

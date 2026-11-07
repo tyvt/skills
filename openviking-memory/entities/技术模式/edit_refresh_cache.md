@@ -18,6 +18,10 @@
 - 来源会话：0bafb3e6-385f-404a-b48a-91cebb47c939
 - 代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

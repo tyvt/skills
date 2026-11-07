@@ -12,6 +12,7 @@ pages_owner/project/info/index.vue的小区详情、地图Key与周边配套分�
 - 列表距离来自_distance，纯展示地图不要与维修资金接口混淆
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话b30d2f3f用户问小区信息页用的接口，结论列出后端详情、配置Key、腾讯WebService两步及facilityCategory表
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue、src/api/property.js、src/utils/transaction.js、src/utils/qqMapKey.js
 - 所属项目：无锡市区小程序嵌入H5；来源会话ID：b30d2f3f-1f15-46f0-9efa-aa95170ed55f；代码基线：289666e

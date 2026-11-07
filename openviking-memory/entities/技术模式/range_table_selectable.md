@@ -14,6 +14,11 @@
 - 涉及文件: optionDecision/detail.vue, DecisionRangeTable.vue, VoteRangeDialog.vue, ownerDecision/DecisionRangeTable.vue, ownerDecision/detail.vue, generalDecision/detail.vue, decisionCommon/DecisionRangeTable.vue, zsSelectColumn/index.vue
 - 所属项目: 太仓G; 代码库: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
+- 来源会话：1e824235-0e5e-44dd-9dc4-238cd6a1389a
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

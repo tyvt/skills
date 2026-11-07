@@ -7,6 +7,7 @@
 - 验证截图：zhi2-web-admin/test-results/step3-ui-capture/register-step-3-full.png
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/107.md
 - 涉及文件：register/companyRegister.vue、institutionRegister/index.vue、e2e/fixtures/register-helpers.js、register/components/Step3Appendix.vue、register/components/RegisterUploadItem.vue、institutionRegister/components/Step3Appendix.vue、institutionRegister/components/InstitutionUploadItem.vue、e2e/register/register-layout.spec.js
 - 所属项目：苏州市房地产监测V3；来源会话：d6cb8ad3-8dfb-4e62-9fde-b959b79e5c28；代码基线：none

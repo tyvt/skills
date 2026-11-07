@@ -14,6 +14,7 @@
 - 外部图片保持不变，仅转换内网路径
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 2e8372a6 用户反馈H5图片失败，提取路径拼接代理域名后修复
 - 涉及文件：src/components/ZsImage/ZsImage.vue、src/utils/index.js、src/vite.config.ts、src/api/httpInstance.js、src/pages/index/components/menu/MenuImage.vue、src/pages/commonNew/swiperImage.vue、src/components/ImageUploader/ImageUploader.vue、src/pages/index/components/Home_Suzhufang.vue
 - 所属项目：苏住房C；来源会话ID：2e8372a6-9098-488b-857d-9bb7ec7f209a；代码基线：none

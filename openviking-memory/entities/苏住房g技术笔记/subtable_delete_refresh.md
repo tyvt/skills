@@ -18,6 +18,7 @@
 - 改动 cherry-pick 到多分支时逐分支确认子表是否都补了钩子
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证会话 5bdbdabe（064.md 会话 5bdbdabe）：删除单据后基本信息「本次核销金额」不归零，根因 handleDelete 只调 getList 未触发 refresh
 - 修复为 VerificationReceiptDetailTable.vue 增加 deleteSuccessCallback 发 refresh，billDetailSubTable.vue 补 $emit('refresh')
 - 已 cherry-pick 到 develop/v2.6.1 (a7ed8c1db)、develop/v2.6.2 (bcf3d9fba)、develop/v2.6.2-suzhufang (ed0acf3c0+dcf7a6c80)、develop/v2.6.2-yulin (7b57d355d 等)

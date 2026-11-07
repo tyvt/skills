@@ -11,6 +11,7 @@
 - 本地 `npm run build` 已通过（exit code 0），提交后 CI 应能正常构建
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：cursor 会话 77670b3d 提取，本地构建通过
 - 涉及文件：zhi2-web-admin/src/views/projectManagement/buildinginfo/detail.vue
 - 所属项目：产品2.0；来源会话：77670b3d-757c-4c9b-81a1-088b6d675376；代码基线：none

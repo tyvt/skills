@@ -13,6 +13,7 @@
 - 本地preview-main.js补platformConfig.region:'320500'与接口mock，E2E加mockRegionSortList并拦截
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：views/property/largeScreen/utils.js、views/home/index-v2.vue、v2/components/RegionTabs.vue、publicQuery/complex/index.vue、tests/e2e/home-v2.spec.mjs、tests/e2e/home-v2-mocks.js、preview/stub/api.js、preview-main.js等
 - 所属项目：苏住房G；来源会话ID：ce428e8e-b7cf-41be-97cd-31a190c4c9fb；代码基线：15e201a
 - 注意：若platformConfig.region登录后才写store，需watch重新加载

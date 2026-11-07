@@ -10,6 +10,7 @@ PortalTable 组件 displayedPages 误用 Math.max 导致总页数为 1 时仍渲
 - 刷新「可售楼盘展示」等使用 PortalTable 的页面验证
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 涉及文件：zhi2-web-admin/src/views/home/publicPortal/components/PortalTable.vue
 - 所属项目：门户；来源会话：176808fe-ac0e-40e4-872f-fa68fc7638ab
 

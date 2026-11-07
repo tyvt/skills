@@ -13,6 +13,7 @@
 - 组件层已用 refreshColumnOrderKey 处理列变更时，仍应验证「仅改用户列配置顺序」场景是否需此 key。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 4b2a6426 物业管理区域备案列表自定义排序保存后列顺序没变，根因缺 tableColumnsKey。
 - 涉及文件：property/complex/index.vue、complexChange/index.vue、ListTemplate.js、listMixins.js。
 - 所属项目：园区公共收益；来源会话：4b2a6426-193d-4d85-9729-2061d23f61d0；代码基线：0c9b8c2。

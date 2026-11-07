@@ -12,6 +12,7 @@ zs-input 默认 clearable 在窄框与占位符重叠，已通过关闭清除图
 - 其它均价拆 3 行；数字框 sm 宽增至 64px
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/036.md
 - 涉及文件：presale/permit/components/PresalePlanFillForm.vue、PermitPlanPanel.vue、e2e/fixtures/presale-permit-helpers.js、permit/plan/detail.vue、.workbuddy/memory/2026-09-11.md、package.json、vite.config.js、main.js
 - 所属项目：苏州市房地产监测V3；来源会话：2e82688a-7c17-45fc-82e8-25c79990e1a7；代码基线：none

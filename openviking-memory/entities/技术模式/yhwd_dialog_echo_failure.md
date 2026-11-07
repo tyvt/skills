@@ -10,6 +10,8 @@
 - `YhwdTable.vue` 对行数据进行浅拷贝并在 `$nextTick` 后触发 `@open`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：224ebc32-0868-4266-a756-0afa83014b18
 - 验证证据: src=苏州市房地产监测V3/219.md
 - 涉及文件: supervision/bank/cbyh/components/YhwdDialog.vue, supervision/bank/cbyh/components/YhwdTable.vue, api/jgyh/yhwdgl.js, supervision/bank/superviseBank/components/YhwdDialog.vue, supervision/bank/jgwd/detail.vue, components/OperationBtnGroup/index.vue, maintenance/bank/components/YhwdDialog.vue, mixins/dialogMixins.js
 - 所属项目: 苏州市房地产监测V3; 会话: 224ebc32-0868-4266-a756-0afa83014b18; 代码库: none

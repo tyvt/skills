@@ -16,6 +16,7 @@
 - 最终规则：/zs-fym/... 与 /zhi2-pro/file/... 都拼 API 代理；已是 https:// 的完整 URL 原样返回不重复拼接
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 bb5ef4f6 用户判断正确域名应为 VITE_APP_API_PROXY + 接口返回地址；确认 /zs-fym 分支拼到 VITE_APP_IMG_PROXY_V1，已改 utils/index.js、vite.config.ts、swiperImage.vue
 - 涉及文件：src/utils/index.js、vite.config.ts、src/pages/commonNew/swiperImage.vue、.env.production、src/components/ZsImage/ZsImage.vue
 - 所属项目：苏住房C；来源会话ID：bb5ef4f6-787c-49c9-b071-0b62385878d7；代码基线：a444c05

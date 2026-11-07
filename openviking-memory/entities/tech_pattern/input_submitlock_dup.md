@@ -16,6 +16,11 @@ In zhi2-mobile-shimin, input.vue had a duplicate import of useSubmitLock causing
 ## Verification
 - Extracted from cursor session 90f801fd-16cc-4974-98c1-c375232f80c4
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+- 来源会话：90f801fd-16cc-4974-98c1-c375232f80c4
+
 
 <!-- MEMORY_FIELDS
 {

@@ -21,12 +21,15 @@ zhi2-web-admin 是父仓库的子模块，拥有独立 git 仓库，改动须走
 - 远程 develop/v3.0.0 被并行任务推进（不可 fast-forward）时禁止强推：先在子模块把 fix 分支合并入 develop/v3.0.0 并推送（fix 文件与远程改动零交集则无冲突），再在父仓库合并远程 develop 并解决 gitlink 冲突指向新子模块头
 - worktree 清理安全：其内若含指向主仓库 node_modules 的 junction，须先 cmd /c rmdir 摘除 junction 本体再删 worktree，否则递归删除会穿透 junction 清空主仓库依赖
 
+## 父仓库本地配置
+- 父仓库 env/.env 记录本地代理地址切换（两条 proxy 间切换），属本地联调配置，非任务改动，按规范不纳入提交与推送
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zhi2_admin_git",
-  "source_extraction_id": "8afb15f87ad94b18abbb9aef77a3aa4d",
-  "version": 5,
+  "source_extraction_id": "ac9a1eaec61d4fad91225e9cf85ff1b7",
+  "version": 6,
   "memory_type": "entities"
 }
 -->

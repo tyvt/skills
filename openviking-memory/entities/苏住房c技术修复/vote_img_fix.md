@@ -17,6 +17,9 @@
 - 所属项目：苏住房C（zhi2-mobile-shimin）
 - 来源会话ID：5a891058-8e80-44d0-9a37-a7ff9e578ff9；新修复会话ID：939b9f86-bba1-485a-8ec9-d84e2983f4b2；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
 
 <!-- MEMORY_FIELDS
 {

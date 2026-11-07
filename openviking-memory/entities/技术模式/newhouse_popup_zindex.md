@@ -9,6 +9,7 @@
 - 在 `detail.vue` 通过 `:deep(.uni-popup) { z-index: 10000 !important; }` 提升弹窗层级
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=cursor session=a8678de5-9bd2-4b68-94a6-efa9178c65de
 - 涉及文件：newHouse/detail.vue、commonNew/bottomBtn.vue、stockHouse/detail.vue、bottomBtn.vue、detail.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话：a8678de5-9bd2-4b68-94a6-efa9178c65de；代码基线：none

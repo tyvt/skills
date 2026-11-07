@@ -11,6 +11,8 @@
 - 页面 prop 改为 :fileType 驼峰写法
 
 ## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：a28865de-bc9e-4a81-8cd6-95d66e5ba32a
 - 涉及文件：zs-file-upload.vue、FileUpload/index.vue、pubAllotNotice/detail.vue、property/allotNotice/detail.vue、assetLeaseApply 子组件、pubVerificationReceipts/detail.vue、ImageUpload/index.vue
 

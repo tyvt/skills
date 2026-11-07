@@ -11,6 +11,7 @@
 - 去掉面积字符串里多余的空格
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译预览后应显示为单行：435,872.00 m²
 - 涉及文件：project/info/index.vue、infoCard.vue、property-detail.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：2bd50aeb-5d2b-4b29-b38e-f1aa4ae7ac4c；代码基线：none

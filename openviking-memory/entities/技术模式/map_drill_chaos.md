@@ -11,6 +11,7 @@ GIS 地图从街道下钻到物业管理区域时接口参数和数据错乱，�
 - programmaticViewGuard 时长要覆盖 zoom 动画（本项目从 450ms 延长到 900ms），否则守护窗口短于动画时长就会误触发回退
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 ae57812c 删除重复调用 AREA_COMPLEX_NUM_API 的遗留代码并加 drillInProgress + 900ms 守护后，下钻只发一次正确请求
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue；zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue
 - 所属项目：园区物管2.0；代码基线：3965548b6；来源会话：ae57812c-b3cb-4223-9f82-106d7065e69c

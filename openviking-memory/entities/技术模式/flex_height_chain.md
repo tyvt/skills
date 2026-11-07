@@ -14,6 +14,12 @@
 - 涉及文件: src/views/property/complexChange/detail.vue; src/views/property/complex/detail.vue; src/components/Headline/index.vue; src/components/detail-template/detail-template.vue.
 - 会话: 1e61e3a9-dc70-4426-b664-29e85e61ae8d; 基础代码: none.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：1e61e3a9-dc70-4426-b664-29e85e61ae8d
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -6,6 +6,7 @@
 - `projectInfoView` 中业务状态、委托状态、电子签状态改为 `dictLabel()` 预翻译，与 `entrustInfoView` 的销售方式一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3
 - 来源会话ID：98dea9b7-0496-43cc-8f46-c865905aa071
 

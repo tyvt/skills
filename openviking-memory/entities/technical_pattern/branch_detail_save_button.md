@@ -16,6 +16,11 @@ AgencyBranchDetail.vue defines header-button gating so the "保存" button only 
 - Files: institution/agencyBranch/components/AgencyBranchDetail.vue, institution/agencyPersonnel/components/AgencyPersonnelDetail.vue, mixins/detailMixins.js, property/complex/detail.vue, OperationBtnGroup/index.vue, institution/agencyBranch/components/AgencyBranchList.vue, mixins/form.js, main.js
 - Project: 苏州市房地产监测V3; source session: 27689708-9f9b-4386-9993-e547142b1ab3; code baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：27689708-9f9b-4386-9993-e547142b1ab3
+
 
 <!-- MEMORY_FIELDS
 {

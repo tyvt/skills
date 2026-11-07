@@ -15,6 +15,10 @@
 - 文件：benefit/statisticsMap/overviewContent.vue、index.vue、operatingAssets.vue
 - 所属项目：苏住房G；来源会话：59f13d6d-cf6d-464d-b961-060063675ca1
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房G技术修复",

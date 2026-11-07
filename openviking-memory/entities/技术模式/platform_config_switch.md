@@ -16,6 +16,9 @@
 - 文件：`zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue`
 - 所属项目：产品2.0；来源会话：62402fac-2ae0-4b94-a392-c3ba8b3662d4；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
 
 <!-- MEMORY_FIELDS
 {

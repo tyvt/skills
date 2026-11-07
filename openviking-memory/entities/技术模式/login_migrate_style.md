@@ -14,6 +14,7 @@
 - 组件库默认无尺寸兜底，不要指望 zs-input 自动给出设计稿高度；验收需登录页+忘记密码页+验证码按钮三处同比。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 acfae044 用户连续诉求迁移后 CSS 样式、输入框高度、图标对齐、忘记密码样式、按钮高宽色问题。
 - 涉及文件：src/views/login.vue、src/views/home/ForgotPassword.vue、src/components/zs-input/zs-input.vue、src/router/index.js
 - 所属项目：产品2.0；来源会话：acfae044-ec7d-4f5e-bb61-36dc593a35da；代码基线：bd398ef

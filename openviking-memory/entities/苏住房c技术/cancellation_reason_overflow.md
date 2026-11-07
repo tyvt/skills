@@ -7,6 +7,8 @@
 - 移除 margin-left:24px，使输入框与标题及提交按钮同宽对齐
 - 该样式源于公共组件 ZsTextarea，影响注销、反馈、签约等多处表单
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：苏住房C/036.md
 - 涉及文件：cancellationReason.vue、ZsTextarea.vue、add_feedback.vue、signInfo.vue、ZsRadio.vue、form2.scss、uni.scss、app.js
 - 来源会话ID：eb56a9b9-d956-416b-b204-677b8008eb20；代码基线：none

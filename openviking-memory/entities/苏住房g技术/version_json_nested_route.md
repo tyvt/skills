@@ -10,6 +10,7 @@
 - 在 zhi2-web-admin/vite.config.js 抽取 writeVersionJson 并增 middleware 显式响应 /version.json
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/035.md
 - 涉及文件：package.json、.workbuddy/memory/2026-09-11.md、index.html、dist/version.json、src/utils/version-check.js、src/main.js、vite.config.js、zhi2-web-admin/package.json
 - 所属项目：苏住房G；来源会话ID：13762d7c-a3f0-424d-9ceb-6eb384cdcb36；代码基线：none

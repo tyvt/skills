@@ -11,6 +11,7 @@
 - LeasePersonnelDetail.vue 同步调整
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-leftover/031.md
 - 涉及文件：api/company/personnelRecord.js、company/staffManagement/components/detail.vue、institution/agencyPersonnel/components/AgencyPersonnelDetail.vue、components/OperationBtnGroup/index.vue、utils/flowApi.js、institution/leasePersonnel/components/LeasePersonnelDetail.vue、company/companyChangeManage/index.vue、components/ZsApproval/index.vue
 - 所属项目：苏州市房地产监测V3；来源会话：6023b157-4f28-471e-8f2b-868c05df16b7；代码基线：none

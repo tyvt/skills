@@ -6,6 +6,11 @@
 - 涉及文件：h5Context.js、api/index.js、usePortal.js、App.vue、store/user.js、utils/portal.js、sfbFaceAuth.js、api/security.js
 - 验证：src=无锡市区小程序嵌入H5/013.md；来源会话 d5e17de9-b54b-41c7-804d-32a7473aa185
 
+## 验证与归属
+- 所属项目：无锡市区小程序嵌入H5
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

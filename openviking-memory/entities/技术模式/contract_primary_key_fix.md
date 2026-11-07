@@ -13,6 +13,7 @@
 - zhi2-web-admin/src/views/commercialHousingSales/presale/contractMainInfo/components/chooseHouseDialog.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：2f167a0c-4e6a-4493-a802-ed1e537f2f6a；代码基线：none
 
 <!-- MEMORY_FIELDS

@@ -9,6 +9,12 @@
 - 涉及文件: agency-personnel-real-api-flow.spec.js, institution-menu-config.js, index.vue, AgencyPersonnelList.vue, listMixins.js, table.js, detail.vue, AgencyBranchList.vue.
 - 验证证据: src=苏州市房地产监测V3-rest/059.md; session 727ebb5f-f730-4f04-859a-246e4ec3b2a7.
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：727ebb5f-f730-4f04-859a-246e4ec3b2a7
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

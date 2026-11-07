@@ -14,6 +14,8 @@
 - `159980` 有色ETF大成 已从上述四个配置映射移除（交易记录保留见偏好）
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证证据：session 1f76fd6e（新增159981等权）、session 7df4151d（移除159985）、session ea4aedc2（分档配置与偏离阈值映射及159985新增至配置映射）
 - 涉及文件：index.html；来源会话：1f76fd6e-d89a-458b-944c-33368cb75cd4、7df4151d-0bd9-481e-9050-c6497d096212、ea4aedc2-db69-496e-8208-4907694c7bb7；代码基线：none
 

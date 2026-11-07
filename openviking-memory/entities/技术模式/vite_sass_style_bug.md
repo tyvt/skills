@@ -12,6 +12,7 @@
 - 属「Vue 标签闭合错乱伪装成工具链错误」家族，优先做标签配对检查而非改语法
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：zhi2-web-admin/src/views/dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue
 - 所属项目：产品2.0
 - 来源会话ID：91caa295-2c37-448d-8386-139abc7c3402

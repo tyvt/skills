@@ -10,6 +10,9 @@
 - `ProjectDeliveryDetail.vue` 和 `ProjectDeliveryInfoPanel.vue` 进行了调整
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：f25b074f-2774-4b55-bbb6-fe05b1d2cad4
 - 验证证据: src=苏州市房地产监测V3/071.md
 - 涉及文件: doc frontend, 路由信息.json, 前端技术信息.md, xmjf.js, ProjectDeliveryApprovalDialog.vue, ProjectDeliveryDetail.vue, projectDeliveryConstants.js, ProjectDeliveryInfoPanel.vue
 - 会话: f25b074f-2774-4b55-bbb6-fe05b1d2cad4; baseline: none

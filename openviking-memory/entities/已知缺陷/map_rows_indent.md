@@ -13,6 +13,12 @@
 - 文件: src/views/benefit/mapOverview/index.vue
 - 会话: 0c9c218b-0876-4484-af0e-4452a8f8c076; 基础代码: none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：0c9c218b-0876-4484-af0e-4452a8f8c076
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "已知缺陷",

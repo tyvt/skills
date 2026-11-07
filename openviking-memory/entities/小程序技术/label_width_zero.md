@@ -16,6 +16,7 @@
 - 手机号/协议等固定无标签行从开始就写 label-width="0"
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：ff73a0da-4c2f-4e0f-ba3a-30d82fa7c7d6；代码基线：4630e8e
 - 涉及文件：src/pages_my/verification/FormLocal.vue、src/components/shared/AgreementCheck.vue、src/styles/form2.scss、src/styles/radio.scss
 

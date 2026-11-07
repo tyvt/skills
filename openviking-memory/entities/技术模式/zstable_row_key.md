@@ -10,6 +10,8 @@
 - 按数据唯一字段设 row-key，如 row-key="assetLeaseId" 或 row-key="id"。
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证证据：010.md 会话 55858be7（AssetLeaseInfoTable 加 row-key="assetLeaseId" 消除警告）。
 - 涉及文件：src/components/zsTable/index.vue、src/views/benefit/statisticsMap/components/AssetLeaseInfoTable.vue。
 - 来源会话ID：55858be7-9946-4755-bea9-40068591d59b；代码基线：none。

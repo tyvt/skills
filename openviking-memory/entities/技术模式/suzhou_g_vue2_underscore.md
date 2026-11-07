@@ -20,6 +20,10 @@
 - 涉及文件：zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue、property/complex/index.vue
 - 所属项目：苏住房G；来源会话：9585b1b4-8f7c-4b98-81e1-bf7e7b44659c；代码基线：2a3ef8a
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

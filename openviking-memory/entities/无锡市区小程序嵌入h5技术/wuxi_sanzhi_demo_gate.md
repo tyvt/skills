@@ -13,6 +13,7 @@
 - `api/index.js` 的401处理改为reLaunch到newHome（因已无TabBar）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 来源会话：092e322c-b977-4c98-acfd-3459f57a3abb
 - 代码基线：2e9862a
 - 涉及文件：src/App.vue、src/pages/index/newHome.vue、src/pages.json

@@ -10,6 +10,7 @@
 - 取值对齐权限标识 `bankagent/operlog:remove` 等，消除 Vue 警告并正常校验权限
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：src=园区公共收益/041.md
 - 涉及文件：zhi2-web-admin/src/views/system/operlog/index.vue、src/mixins/listMixins.js、src/views/system/logininfor/index.vue、src/mixins/table.js、src/mixins/permsMixins.js
 - 所属项目：园区公共收益；来源会话：6be2e0b2-c654-4450-88c2-a78a8fe79c79；代码基线：none

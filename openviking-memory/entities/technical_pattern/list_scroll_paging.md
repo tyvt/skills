@@ -13,6 +13,12 @@ List data not filling visible height causes no scrollbar, so scroll-to-bottom ev
 - Evidence: src=泰兴G/002.md; project: 泰兴G (zhi2-web-admin); source session 908f5228-a584-4485-a746-432febf5a60f; code baseline none.
 - Involved files: autonomy/record/components/CandidateDialog.vue, autonomy/election/components/apply/CandidateDialog.vue, zs-select-dialog/zs-select-dialog-func.vue, property/complex/components/rangeTable.vue, zs-select-dialog/SKILL.md, zs-select-dialog/zs-select-dialog.vue, autonomy/candidateCollect/components/CandidateDialog.vue, zs-pagination/zs-pagination.vue.
 
+## 验证与归属
+- 所属项目：泰兴G
+- 验证证据：extracted source=cursor project=泰兴G
+- 来源会话：908f5228-a584-4485-a746-432febf5a60f
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

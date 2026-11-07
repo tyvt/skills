@@ -11,6 +11,7 @@
 - spFeeBill 表格在 tabs 内去掉 table-tr 保持默认自适应；pubParkingRate 保持 auto-height 未改动
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：zs-table.vue、mixins/listMixins.js、mixins/table.js、views/property/complexChange/index.vue
 - 所属项目：苏住房G；来源会话：b5e42f56-b78e-4251-a412-5cb4a5f7e449
 

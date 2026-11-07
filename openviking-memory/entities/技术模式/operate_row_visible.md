@@ -10,6 +10,7 @@
 - isOperateButtonVisible 内依次判 rowVisible、原 visible 函数、checkPermission，行为与改造前一致
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 7ac74063，feeCustomTypeTable.vue 对齐 candidateCollect filter 写法；编辑按钮 rowVisible 控制 contractBizState/bizState，查询态用 visible: !this.isQuery 从数组剔除
 - 涉及文件：zhi2-web-admin/src/views/maintenance/budget/components/feeCustomTypeTable.vue、zhi2-web-admin/src/views/autonomy/candidateCollect/components/index.vue
 - 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：7ac74063-2500-4985-8cbb-650d6052d19f

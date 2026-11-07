@@ -9,6 +9,8 @@ Suzhou Real Estate Monitoring V3 系统：当字典项缺失时直接访问 `.di
 - 当字典缺失时，`refund/detail.vue` 提示手动选择而不是抛出错误
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：78d15986-f89e-4ac8-b7bf-426222e6b9db
 - 验证证据: src=苏州市房地产监测V3-rest/038.md
 - 涉及文件: refund/detail.vue, noticeValidity.js, detail-template.vue, dict-tag.vue, detailMixins.js, scan-tag-mismatch.js 等
 - 所属项目: Suzhou Real Estate Monitoring V3; 会话: 78d15986-f89e-4ac8-b7bf-426222e6b9db; Base: none

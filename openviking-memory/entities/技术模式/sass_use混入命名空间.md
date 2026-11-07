@@ -9,6 +9,8 @@
 - zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue
 - zhi2-web-admin/src/styles/anim.scss
 ## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
 - 来源会话：accd9996-fe0d-415a-8f78-8a9d3a18e109；代码基线：none
 
 <!-- MEMORY_FIELDS

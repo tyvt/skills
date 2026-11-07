@@ -11,6 +11,7 @@
 - 根因：点击「手工输入」先触发输入框 @focus 打开单位选择弹窗，掩盖切换；已在 append 区域加 `@mousedown.prevent` 阻止抢焦点
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：pubRevenueContract/index.vue、pubRevenueContract/detail.vue、benefit/pubChangeleadershipAudit/detail.vue
 - 所属项目：产品2.0；来源会话：7e50b554-a8ad-43a6-b845-69894b24519f；代码基线：none
 

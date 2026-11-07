@@ -11,6 +11,7 @@
 - 用户主动点击跨模块跳转仍用严格 getRouterPathByFilePath，无权限提示属预期
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 b2ceb96d 全局排查 10 个 benefit/detail.vue，根因定为新增页自动弹窗+初始化链接触发；ruoyi.js 新增 getBTerminalRegulatoryDialogConfig
 - 涉及文件：utils/ruoyi.js、benefit/pubUseMoneyApply/detail.vue、pubExpenditureContract/detail.vue、pubPaymentNotice/detail.vue、parkingSpaceContractFiling/detail.vue、pubRegulatoryAgreement/detail.vue
 - 所属项目：园区公共收益；来源会话：b2ceb96d-3372-48d3-9c13-5aed7776c612；代码基线：08d3255

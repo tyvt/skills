@@ -11,6 +11,7 @@
 - `main.ts` 首行引入该 polyfill 确保优先执行
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：苏住房C/055.md
 - 涉及文件：package.json、src/components/ZsNav/ZsNav.vue、src/utils/index.js、src/utils/system-info.js、src/components/StatusBar/StatusBar.vue、src/pages_my/robot/index.vue、src/components/shared/SignBoard.vue、src/pages_owner/elevator/index.vue、src/polyfills/mp-weixin-system-info.js、main.ts
 - 所属项目：苏住房C；来源会话ID：970c1102-ef4a-4650-b2b0-7044abd68b9e

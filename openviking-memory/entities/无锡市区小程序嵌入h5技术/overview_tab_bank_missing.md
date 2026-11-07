@@ -12,6 +12,7 @@
 - cherry-pick commit 3208cd5至dev_wuxi-sfb分支新增展示（提交a6ce6ce），本地超前远程1 commit待推送
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：src/pages_benefit/sharedFunds/components/OverviewTab.vue、src/pages_benefit/benefit/index.vue(DetailsTab.vue)、src/pages_benefit/balancePublicity/index.vue、src/pages_benefit/elevatorPubEngCons/index.vue、src/pages_owner/sharedFunds/components/OverviewTab.vue
 - 来源会话：2a3a71f6-93f5-424c-bbfe-dc2f0e4470fb（cherry-pick）、8f524774-dcb8-476a-93c6-dcf4a5936cd2（OverviewTab修正）
 - 所属项目：无锡市区小程序嵌入H5；代码基线：none

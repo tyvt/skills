@@ -11,6 +11,8 @@
 - transDetail.vue在onLoad/onShow重取规范化detail.proDeal渲染
 
 ## 验证与归属
+- 所属项目：无锡市区小程序嵌入H5
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：src=无锡市区小程序嵌入H5/011.md
 - 涉及文件：src/pages_owner/maintain/transDetail.vue、src/pages_owner/maintain/utils.js、src/api/transaction.js、src/pages_owner/maintain/components/ExpenseList.vue、src/pages_owner/maintain/detail.vue、src/pages_owner/maintain/index.vue、src/pages_owner/maintain/components/TransactionTable.vue、src/hooks/useLocalLoadMore.js
 - 来源会话：c1b915a6-9ab8-420f-abd0-e1ca4246a1f9；代码基线：none

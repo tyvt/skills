@@ -18,6 +18,9 @@
 - property/complex/index.vue
 
 ## 验证与归属
+- 所属项目：惠山二期G
+- 验证证据：extracted source=cursor project=惠山二期G
+- 来源会话：6db21291-c1ac-4c3b-921b-5f99e82885a2
 - 验证证据: 会话 cursor 6db21291-c1ac-4c3b-921b-5f99e82885a2
 - 代码库: none
 

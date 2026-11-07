@@ -10,6 +10,10 @@
 - 模拟CI低内存构建已通过
 - 所属项目：惠山二期G；来源会话：b2d5de3f-5090-4bd2-97e9-fac732c844c4
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -6,6 +6,7 @@
 - institutionRegister/detail.vue 加载字典并在 displayValue 增加 industryAssociation 转写，dictLabel 改 String() 比较
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新机构备案详情页后「行业协会组织」显示字典名称
 - 涉及文件：companyApplyAudit/detail.vue、institutionRegister/detail.vue 等
 - 所属项目：苏州市房地产监测V3；来源会话：a2724dfa-738f-4f54-bbf4-4303a1e6cf98

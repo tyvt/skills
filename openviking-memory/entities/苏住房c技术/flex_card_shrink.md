@@ -13,6 +13,7 @@
 - 同类布局（消息列表、附件行、成员卡片）默认套用这三件套
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 1db8ec36 用户截图反馈地址挤压封面图；修改 .link-icon 增 flex-shrink:0 固定 100px×76px，.item_bottom 增 flex:1; min-width:0，.item_address 增 word-break:break-all
 - 涉及文件：pages_owner/community/info/index.vue、subdistrict/info/index.vue、company/info/index.vue、committee/info/index.vue
 - 所属项目：苏住房C；来源会话ID：1db8ec36-d2b1-4f40-9ca7-140c53112d51；代码基线：4630e8e

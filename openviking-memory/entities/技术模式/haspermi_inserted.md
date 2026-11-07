@@ -12,6 +12,7 @@
 - 与「空div包v-hasPermi撑gap」的DOM结构问题区分，本条是指令生命周期
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证：会话6bb25673修改hasPermi.js增inserted、有权限恢复display；bundle 008讨论hasPermi改动与*:*:*放行
 - 涉及文件：zhi1-web-admin/src/directives/permission/hasPermi.js、zhi1-web-admin/src/main.js
 - 所属项目：太仓G；来源会话：6bb25673-a3f0-4f17-9c69-8943d17f4cb8；代码基线：e177dad

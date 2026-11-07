@@ -9,6 +9,7 @@
 - Home_Suzhufang.vue 的 `.szf-scroll` 改为 `flex:1; height:0; min-height:0` 以正确撑开滚动区
 - 同步核对 AppTabBar.vue、Community_Suzhufang.vue 等共用结构
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=苏住房C/066.md；加 page-body 包裹并修正 .szf-scroll 高度后滚动恢复
 - 涉及文件：pages.json、home.vue、Home_Suzhufang.vue、AppTabBar.vue、community.vue、project.vue、Community_Suzhufang.vue、uni.scss
 - 所属项目：苏住房C；来源会话ID：74c14a7b-0504-4015-b6d9-6f7ee91882e7；代码基线：none

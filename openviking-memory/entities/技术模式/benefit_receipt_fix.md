@@ -16,6 +16,10 @@
 - 文件：`pubBankReceiptApply/detail.vue`、`zs-table.vue`、`VerificationReceiptDetailDialog.vue`、`zs-select-dialog.vue` 等
 - 来源会话：5af5c221-8134-4622-ae26-0886a69a35ed；项目：产品2.0
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

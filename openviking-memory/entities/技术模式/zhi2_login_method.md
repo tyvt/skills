@@ -11,6 +11,7 @@
 - 后端未提供方式3时前端仍预留UI与接口封装
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 涉及文件：src/views/system/platformConfig/detail.vue、src/views/login.vue、src/api/index.js
 - 所属项目：园区公共收益；来源会话：a6727568-bde2-4da6-a70a-31bf732716a4；代码基线：bd275b5
 

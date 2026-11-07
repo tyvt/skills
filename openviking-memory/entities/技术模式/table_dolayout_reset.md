@@ -10,6 +10,7 @@ optionDecision/detail.vue 切到「投票信息」tab 时表格列增多，未�
 - 切换时重置 `cardValue`、`pageNum` 并调用 `getList()` 与 `doLayout()`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：光标会话 642bb8f5-b288-4d41-8b2a-f3c3c981319f 提取
 - 涉及文件：optionDecision/detail.vue、optionDecision/components/DecisionRangeTable.vue、mixins/listMixins.js、ownerDecision/detail.vue、components/zsTable/index.vue、components/zsTabs/index.vue、sortDecison/detail.vue、ownerDecision/components/DecisionRangeTable.vue
 - 所属项目：太仓G；来源会话：642bb8f5-b288-4d41-8b2a-f3c3c981319f；代码基线：none

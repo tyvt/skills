@@ -9,6 +9,7 @@
 - 必要时可微调至 `1.28fr`~`1.35fr` 以进一步加宽
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：src=园区物管2.0/055.md
 - 涉及文件：mapOverview/index.vue
 - 所属项目：园区物管2.0；来源会话：1063d8bb-91e2-41cc-a94c-d70270312b59

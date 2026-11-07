@@ -23,6 +23,11 @@
 - 来源会话ID：949376aa-2a8f-4366-9f75-db6d23ef2d53
 - 代码基线：none
 
+## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房C技术",

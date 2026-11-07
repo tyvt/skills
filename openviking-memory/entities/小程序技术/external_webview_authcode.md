@@ -9,6 +9,8 @@ externalWebview.vue 根据 envVersion 与 authCode 决定是否调用 selectMyHo
 - lingXiQueried 仍置为 true 避免重复触发
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 改动已通过该文件 linter 检查（无新增报错）
 - 涉及文件：pages/webview/externalWebview.vue
 - 来源会话ID：591f20d2-2801-494e-9917-cd9943d6d175

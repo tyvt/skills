@@ -8,6 +8,8 @@
 - 电子业主卡：pages_owner_extra/ownerCard/index.vue、pages_owner/ownerCard/index.vue
 - 首页我的苏住房：pages/index/components/My_Suzhufang.vue、pages/index/my.vue、pages_tab/components/My_Suzhufang.vue
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：苏住房C/036.md
 - 涉及文件：src/utils/index.js、src/pages.json、src/pages_owner/ownerCard/index.vue、src/static/project.json、src/pages_owner_extra/ownerCard/index.vue、src/pages/index/components/My_Suzhufang.vue、src/pages/index/my.vue、src/pages_tab/components/My_Suzhufang.vue
 - 来源会话ID：76b4ec2e-0c31-43e8-b39a-197cc32de4fd；代码基线：none

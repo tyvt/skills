@@ -7,6 +7,7 @@
 - index.vue 操作列改为使用 mixin 配置：保留业务自定义按钮（如“注销”），并加入 this.viewButton、this.editButton、this.deleteButton
 - certificatesTable.vue 同步改为 mixin 按钮，补充 moduleName、businessName 传给 zs-operate-column 使权限校验正常
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 刷新页面后操作列按钮显示统一样式：查看（蓝色）、编辑（描边）、删除（红色描边）
 - 所属项目：产品2.0；来源会话：fdcfaacc-7f87-437f-8701-5f61b9154edb；代码基线：none
 - 涉及文件：staffManagement/components/index.vue、certificatesTable.vue、mixins/table.js、mixins/subTableMixins.js

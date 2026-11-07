@@ -2,6 +2,12 @@
 - `edit` 和 `view` 模式保持原有显示；列表中的提交验证不受影响
 - 会话: 01ec4000-abc2-413c-9bfb-a006f9dbb8f8
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：01ec4000-abc2-413c-9bfb-a006f9dbb8f8
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

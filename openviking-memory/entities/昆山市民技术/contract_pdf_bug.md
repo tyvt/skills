@@ -11,6 +11,8 @@
 - 使用 Vue `nextTick` 确保容器 DOM 挂载后渲染。
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 涉及文件：d:/repository/昆山市民/src/pages/common/filePreview.vue、src/pages_contract/detail.vue、src/utils/index.js、src/utils/resolveAssetUrl.js、src/pages.json、src/env/mp.js、package.json
 - 来源会话ID：a046a6f8-9e58-45ea-a7be-81dc2f303792
 - 代码基线：none

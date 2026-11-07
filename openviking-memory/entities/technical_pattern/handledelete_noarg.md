@@ -14,6 +14,12 @@
 - Involved files: company/brand/index.vue, mixins/listMixins.js, mixins/table.js
 - Project: 苏州市房地产监测V3; source session: 5bbc22cc-cdf5-42d9-8521-6ed4291d2efc; code baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：5bbc22cc-cdf5-42d9-8521-6ed4291d2efc
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

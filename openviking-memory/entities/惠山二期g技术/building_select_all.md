@@ -14,6 +14,7 @@
 - syncSelectionViews 批量操作后同步刷新缓存与列表视图勾选状态
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 所属项目：惠山二期G；代码基线：none
 - 涉及文件：decisionRangeBuildingSelectMixins.js、zs-select-dialog.vue、multiply/components/DecisionRangeTable.vue、option/components/DecisionRangeTable.vue
 - 来源会话：ce7dea61-1961-4abb-adbd-9512add57f6a、c29b0f5b-9525-4f3a-8736-42c569de1575

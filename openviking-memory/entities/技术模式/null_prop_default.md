@@ -14,6 +14,7 @@
 - 约定：常驻挂载的预览/详情弹窗组件一律通过归一化计算属性消费对象型 prop，不要信任 prop 默认值能兜住 null；父组件初始值用 null 表示「无」时尤其要注意
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话 4041b099，previewKnowledge 初始 null 且弹窗始终挂载；结论指出 default 只对 undefined 生效，新增 knowledgeData 计算属性归一化并加空守卫
 - 涉及文件：zhi2-web-admin/src/views/property/workOrder/order/components/KnowledgePreviewDialog.vue；zhi2-web-admin/src/views/property/workOrder/order/components/WorkOrderActionDialog.vue
 - 所属项目：产品2.0；来源会话ID：4041b099-030a-481a-8753-6ecca6c475fd；代码基线：42b6033

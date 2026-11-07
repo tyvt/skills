@@ -10,6 +10,7 @@
 - setAccountName 类回写应用字段级 merge，避免整对象覆盖冲掉主单主键字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：账户拆分会话修复 AccountListTable :form="form"（原 $attrs.form 无效）；setAccountName 改 merge
 - 涉及文件：maintenance/accountSplit/components/AccountListTable.vue、maintenance/accountSplit/detail.vue
 - 所属项目：园区公共收益；来源会话：46eb821e-f488-4bb3-b973-6647aedb4d2b；代码基线：7458acc

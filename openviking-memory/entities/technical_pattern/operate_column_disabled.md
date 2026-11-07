@@ -16,6 +16,12 @@ zs-operate-column.vue disabled state still fires @click.native, and houseTable.v
 - Files: src/views/benefit/assetsLeaseContractFiling/detail.vue, src/views/benefit/assetLeaseApply/components/houseTable.vue, src/mixins/subTableMixins.js, src/components/zs-operate-column/zs-operate-column.vue, src/mixins/table.js, src/views/benefit/assetLeaseApply/components/subAdvertiseTable.vue, src/mixins/leaseContractMixins.js, src/mixins/detailMixins.js.
 - Project: 园区公共收益; source session: 4901c51b-48fd-4552-a991-5fc17b4c1409; code baseline: none.
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：4901c51b-48fd-4552-a991-5fc17b4c1409
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

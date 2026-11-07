@@ -11,6 +11,7 @@
 - guaranteeDeposit/components/index.vue 同步调整
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：guaranteeDepositAccount/index.vue、zs-table-column.vue、guaranteeDeposit/components/index.vue
 - 所属项目：产品2.0；来源会话：c317fddb-86ba-44b7-bf23-24b241e4ba3e；代码基线：none
 

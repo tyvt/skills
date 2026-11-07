@@ -7,6 +7,8 @@
 - 4处调用文件改为标准写法，全仓库消除IDCardNumber.test
 - AmountInput/index.vue等其余正则.test()用法正常，无需改动
 ## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/033.md
 - 涉及文件：patterns/index.js、companyInfo.vue、zs-form.vue、main.js、companyRegister/detail.vue、secondHouse/detail.vue、ResponseDialog.vue、companyManagement/components/detail.vue
 - 来源会话：c04c21a5-56cc-45fa-9f36-152f64faba9d

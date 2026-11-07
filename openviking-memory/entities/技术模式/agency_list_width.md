@@ -11,6 +11,7 @@
 - 待提交行（3 按钮）查看/编辑/删除正常显示，相关 E2E 列表用例已通过
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件: AgencyPersonnelList.vue
 - 所属项目: 苏州市房地产监测V3
 - 来源会话ID: c07f2835-00f4-4f26-8f40-499ded465259

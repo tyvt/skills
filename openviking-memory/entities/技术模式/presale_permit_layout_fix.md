@@ -10,6 +10,7 @@
 - 「预售描述」用 section-field--full（整行），使「统一社会信用代码」从下一行第一列开始，纵向与「所属项目名称」对齐
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：presale/permit 下 detail.vue、PermitInfoPanel.vue
 - 所属项目：苏州市房地产监测V3；来源会话：f7e32c84-3538-433f-bf02-d17f353e9e06；代码基线：none
 

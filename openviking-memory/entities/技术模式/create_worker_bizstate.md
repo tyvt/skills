@@ -7,6 +7,7 @@
 - directDetail.vue 与 detail.vue 两处组件改按钮 v-if 时保持一致。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：已备案物管会登记待提交仍显示创建工作人员，需增加 bizState==2 条件。
 - 涉及文件：zhi2-web-admin/src/views/autonomy/record/components/directDetail.vue、zhi2-web-admin/src/views/autonomy/record/components/detail.vue
 - 所属项目：园区公共收益；来源会话：e8bd1ba5-4e51-4622-a994-695e0ceb3e3a；代码基线：bd275b5

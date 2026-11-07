@@ -14,6 +14,8 @@
 - 调试时在 success 日志打印 accepted:true/false。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：d303f251-dbaf-4d2c-8f51-16248a0b7e3d
 - 验证会话：d303f251-dbaf-4d2c-8f51-16248a0b7e3d（基线 afd47ed），用户提供 success 日志 {"result":"true","appId":"jisnzjk","msg":"成功"}，结论对照表说明旧版未判断 result/msg 导致 reject(Error("成功"))，并补充 sessionStorage 与支付宝 token 策略。
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js、src/pages/face/face.vue、src/pages/verifyUser/index.vue、src/store/user.js。
 - 所属项目：无锡市区小程序嵌入H5。

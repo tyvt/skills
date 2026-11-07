@@ -8,6 +8,7 @@
 - 弹窗被拦则在当前页用 blob 打开，不要回退到静态路径导航。
 - E2E 断言响应为 application/pdf、当前 hash 路由未误开弹层。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 会话 b92385ab：用户反馈点击预览仍是页面；根因 Vite 下 window.open 按页面导航处理。
 - 改为 fetch+blob URL，unified-login-visual.spec.ts 6/6 通过。
 - 涉及文件：zhi2-web-admin/src/views/home/UnifiedLogin.vue、publicPortal/pages/InformationPages.vue、tests/e2e/unified-login-visual.spec.ts。

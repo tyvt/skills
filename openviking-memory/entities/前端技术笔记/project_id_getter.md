@@ -19,6 +19,10 @@ Navbar 切换小区后刷新页面，各业务列表页（67 处）查询条件 
 - 所属项目：园区物管2.0；来源会话：c38a681a-e3b0-4637-8706-f8e910c1b6d0；代码基线：5a288f142。
 - 验证：会话 c38a681a 排查 67 处直读，通过 projectContext.js+user.js 启动恢复+getters 兜底+批量替换修复。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

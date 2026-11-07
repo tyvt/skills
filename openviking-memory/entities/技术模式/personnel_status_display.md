@@ -12,6 +12,7 @@
 - 同步调整 InfoCardDialog.vue、StatusAdjustDialog.vue、zs-table-column.vue、listMixins.js、dict-tag.vue 及 property/workOrder/order/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/210.md
 - 所属项目：苏州市房地产监测V3；来源会话：7dd6eb02-0c67-4ffd-81c7-628d978d0085；代码基线：none
 

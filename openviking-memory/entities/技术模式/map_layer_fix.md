@@ -16,6 +16,7 @@ benefit/statisticsMap 缩放或下钻时偶发街道气泡与小区点同时显�
 - 回归标准：街道↔小区反复缩放不混显；下钻过渡旧气泡消失；快速滚轮无叠加；搜索定位正常。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 验证：小区台账地图有时显示小区又显示街道，子模块 2.6.2-suzhufang 修复过迁移过来；新增 areaLayerLoadSeq；markerRenderSig 全列表签名；markList 为空立即清图层；保留惠山修复 setProgrammaticView bug3619、syncMapView zoomUnchanged+panTo bug2966。
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue
 - 所属项目：惠山二期G；来源会话：73211399-9c08-4ecc-af7f-b78cecabbc2e；代码基线：341682e

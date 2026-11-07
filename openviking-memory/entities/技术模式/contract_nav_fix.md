@@ -11,6 +11,7 @@
 - 代码实现与计划一致，可在有权限环境中手工点击验证
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`zhi2-web-admin/src/views/commercialHousingSales/presale/template/detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：abab47cb-8bf9-42ce-b594-9c7268af90e8；代码基线：none
 

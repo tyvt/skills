@@ -10,6 +10,10 @@
 - 文件：benefit/assetsLeaseContractFiling/index.vue、benefit/parkingSpaceContractFiling/index.vue
 - 所属项目：苏住房G；来源会话：7960611d-0d3b-4ae8-a217-98664ba2c7a2、19d60287-cf61-42b7-8cdf-70ebe430e846；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "苏住房G技术修复",

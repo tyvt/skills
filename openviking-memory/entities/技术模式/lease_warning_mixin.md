@@ -12,6 +12,7 @@
 - 可选条件为「预警合同或对应可操作状态」；未选中预警合同时按钮禁用；文案由mixin统一
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：已备案+橙色预警可勾选执行忽略；待提交仍可勾选；已备案非预警不可勾选
 - 涉及文件：mixins/leaseContractWarningMixin.js及四个列表页、mixins/table.js
 - 所属项目：苏住房G；来源会话：1e8e4ca2-26cb-4b86-b061-d23f725e38ef；代码基线：320507d

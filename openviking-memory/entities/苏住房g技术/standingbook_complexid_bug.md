@@ -11,6 +11,7 @@
 - 避免 200 空数据问题
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/034.md
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、statisticsMapDetail/index.vue、operatingAssets.vue、overviewContent.vue、leaseContract.vue、rentIncomeExpense.vue、utils/request/index.js、vite.config.js
 - 所属项目：苏住房G；来源会话ID：5aabb73b-5e1d-4042-9c52-01a66874380d；代码基线：none

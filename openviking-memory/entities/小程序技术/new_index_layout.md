@@ -12,6 +12,8 @@ pages/home/new/index.vue 回拉过度压缩的布局，贴近设计稿。
 - 可最后一轮精调 3~5 个关键值（如「我的房屋」字号、公告卡高度、图标行上边距）
 
 ## 验证与归属
+- 所属项目：小程序
+- 验证证据：extracted source=cursor project=小程序
 - 涉及文件：pages/home/new/index.vue
 - 来源会话：816053e2-056a-43aa-b164-fbf6cbc32d48
 - 代码基线：none

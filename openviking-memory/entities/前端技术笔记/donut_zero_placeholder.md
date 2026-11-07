@@ -17,6 +17,10 @@
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue。
 - 所属项目：园区物管2.0；来源会话：26ce6808-4e6b-41fc-88d2-b31cbed282bf；代码基线：同源未提炼过此图表层解法。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

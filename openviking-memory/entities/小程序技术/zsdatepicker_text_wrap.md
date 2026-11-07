@@ -16,6 +16,7 @@
 - 同步三处 ZsDatePicker 副本（pages_owner_extra、pages_owner、pages_main）分隔符 flex 与不换行样式
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 c59bc687 用户截图「上报日期 UI 问题」，根因列为分隔符 flex:1 与未 nowrap；修复 filter.scss+三处副本
 - 涉及文件：zhi2-mobile-shimin/src/styles/filter.scss、pages_owner_extra/repair/index.vue、pages_owner/income/index.vue、pages_owner/repair/index.vue
 - 所属项目：苏住房C；来源会话ID：c59bc687-6e91-42f1-ba7a-8d423e305220；代码基线：f1939b0

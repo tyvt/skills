@@ -10,6 +10,7 @@
 - 在 `table.js` 的 `computed` 中增加默认 `tableRowStyle` 返回 `null`，自定义页面可重写覆盖
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/076.md
 - 涉及文件：publicQuery/complex/components/parkingTable.vue、mixins/subTableMixins.js、ListTemplate.js、mixins/table.js、components/zs-table/zs-table.vue、benefit/pubHouse/components/pubHouseTable.vue
 - 所属项目：园区物管2.0；来源会话：9acb00ce-4277-4a60-97c9-c4001384dfcd；代码基线：none

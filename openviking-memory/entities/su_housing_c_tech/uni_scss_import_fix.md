@@ -11,6 +11,7 @@
 - npm run build 已成功通过
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C；来源会话：8f10f353-5bab-456e-8115-00b593a5bd85
 - 涉及文件：src/uni.scss、pages_tab/benefit/index.vue
 - 代码基线：none

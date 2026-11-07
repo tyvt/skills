@@ -10,6 +10,8 @@
 - buildingTable/index.vue 将 $--color-primary 替换为 var(--primary-color)，编译成功
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：607e0008-39cd-4f41-ac93-f621b4844489
 - 验证证据: src=产品2.0/046.md
 - 涉及文件: zhi2-web-admin/src/views/indemnity/homePage/components/cardData.vue, src/utils/resolveServerAssetUrl.js, src/views/projectManagement/buildingTable/index.vue, vite.config.js
 - 所属项目: 产品2.0; 会话: 607e0008-39cd-4f41-ac93-f621b4844489; 代码库: none

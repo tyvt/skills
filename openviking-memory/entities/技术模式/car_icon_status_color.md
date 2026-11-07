@@ -11,6 +11,8 @@
 - `#f7cbcb` 映射 `car-red.png`
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 涉及文件：src/views/benefit/statisticsMap/operatingAssets.vue
 - 来源会话：b05a1c98-e264-4355-b218-abd698bfef65
 - 代码基线：none

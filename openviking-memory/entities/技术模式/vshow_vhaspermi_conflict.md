@@ -11,6 +11,7 @@
 - 不再混用 `v-show` + `v-hasPermi`，参照「提前结束」按钮写法
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 627ed433 用户报提前开始成功后按钮仍显示
 - 涉及文件：ownerDecision/detail.vue、optionDecision/detail.vue、sortDecison/detail.vue、directives/permission/hasPermi.js
 - 所属项目：太仓G；来源会话：627ed433-0312-4248-8d0c-0ba8b9adafb6；代码基线：none

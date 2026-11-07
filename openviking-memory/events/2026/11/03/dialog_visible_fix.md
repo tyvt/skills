@@ -9,6 +9,11 @@ On 2026-11-03, a bug was fixed where `mountSelectDialogComponent` used `propsDat
 【来源会话ID】643201ce-b344-4b8f-9d1d-ca5948636201
 【代码基线】none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "dialog_visible_fix",

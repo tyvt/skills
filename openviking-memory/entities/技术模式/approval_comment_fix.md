@@ -12,6 +12,7 @@
 - 请求体示例使用 `approveMessage` 作为意见说明字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件如上；所属项目：苏州市房地产监测V3
 - 来源会话：cf534ef4-25d6-4a32-b82b-358de4a68ed6
 

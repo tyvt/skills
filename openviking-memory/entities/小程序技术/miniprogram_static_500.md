@@ -18,6 +18,7 @@
 - 改完必须 npm run build 并核对 dist 下对应目录确有产物，再重新导入 dist（开发者工具「编译」不重跑构建）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 e7e357b4（基线 6599714）AboutUs.vue 两 SVG 500，新增文件+登记修复；会话 4b96617b（基线 9832ba3）family/index.vue 相对路径 500，恢复文件+改主包路径修复
 - 涉及文件：src/utils/index.js、mainStaticPaths.js、pages_main/about/AboutUs.vue、pages_owner/family/index.vue、components/ZsImage/ZsImage.vue
 - 所属项目：苏住房C；来源会话ID：e7e357b4-638f-4ace-8ca0-7fa9ff707a43, 4b96617b-0fec-4c96-af40-e0ec9f6a6e13；代码基线：6599714/9832ba3

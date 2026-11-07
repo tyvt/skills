@@ -14,6 +14,11 @@
 - 文件：VerificationReceiptDetailTable.vue, subTableMixins.js, VerificationReceiptDetailDialog.vue, zs-table-column.vue, assessmentContentItemTable.vue, vite.config.js, assetsLeaseContractFiling/index.vue, resourcesLeaseContractFiling/index.vue
 - 会话：08b73ebd-1692-46da-8e18-00b4de13e612；代码基线：none
 
+## 验证与归属
+- 所属项目：无锡市区G
+- 验证证据：extracted source=cursor project=无锡市区G
+- 来源会话：08b73ebd-1692-46da-8e18-00b4de13e612
+
 
 <!-- MEMORY_FIELDS
 {

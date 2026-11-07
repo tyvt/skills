@@ -8,6 +8,7 @@
 - watch selectedCompany，当v-model变为{}或空值时显式form.companyName=undefined、form.companyId=undefined，不依赖清除事件冒泡。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：zhi2-web-admin/src/views/maintenance/depositNotice/company/components/AddDialog.vue
 - 所属项目：园区物管2.0（项目2-0）
 - 来源会话：76d28965-e3f4-48ff-bdb9-b55a6b87279b

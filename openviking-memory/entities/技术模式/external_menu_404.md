@@ -14,6 +14,12 @@
 - 涉及文件: api/security/oauth2.js, sso/bTerminalRedirect/index.vue, property/culturalTourism/index.vue, store/permission.js, api/index.js, api/property/cultourPlatform.js, components/iFrame/index.vue, InnerLink/index.vue
 - 会话: 2c02c8f7-aee0-47dd-b23d-d8d8f94a007a; baseline: none
 
+## 验证与归属
+- 所属项目：无锡市区G
+- 验证证据：extracted source=cursor project=无锡市区G
+- 来源会话：2c02c8f7-aee0-47dd-b23d-d8d8f94a007a
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

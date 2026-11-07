@@ -13,6 +13,12 @@ In the 园区公共收益 (zhi2-web-admin) project, finished.vue (done list) and
 - Files: flowable/todo.vue, flowable/index.vue, home/components/TodoTable.vue, utils/todoTask.js, flowable/finished.vue, flowable/process.vue, home/index.vue, zs-table-column/zs-table-column.vue
 - Project: 园区公共收益; Source session: 3924b519-9c9c-4c23-8add-6fd9b72aa24a
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+- 来源会话：3924b519-9c9c-4c23-8add-6fd9b72aa24a
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

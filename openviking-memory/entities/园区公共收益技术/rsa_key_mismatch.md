@@ -13,6 +13,7 @@
 - 用与 publicKey 配对的私钥解密：成功
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：546d781a-5f68-46d0-9e05-4f2817562b38；代码基线：none
 - 涉及文件：utils/responseDecrypt.js、env/.env、jsencrypt
 

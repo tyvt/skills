@@ -15,6 +15,9 @@
 - 来源会话ID：cdb00ca8-ca47-462a-8aa6-e2db4d35b371
 - 代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
 
 <!-- MEMORY_FIELDS
 {

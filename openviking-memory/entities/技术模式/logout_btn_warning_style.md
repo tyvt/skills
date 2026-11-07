@@ -15,6 +15,7 @@
 - zhi2-web-admin/e2e/fixtures/auth-helpers.js
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/185.md（另见 rest/144.md）
 - 来源会话ID：179c726e-0dbb-4fbb-9cb6-41517bdd74a9
 - 所属项目：苏州市房地产监测V3；代码基线：none

@@ -7,6 +7,8 @@
 - 宽表单布局不受影响
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/092.md
 - 涉及文件：companyRegister.vue、Step2LegalPerson.vue、Step5Result.vue、Step1CompanyInfo.vue、路由信息.json、package.json、company-register-visual.spec.js、vite.config.js
 - 来源会话：af3642fe-ee91-400a-8b23-d627c47ceb5b；代码基线：none

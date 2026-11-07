@@ -19,6 +19,7 @@
 - zhi2-web-admin/src/layout/components/AppMain.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证证据：src=淮安物管 cursor 提取
 - 所属项目：淮安物管；来源会话：a7d237af-56e5-49f4-a9d3-51c02c04b0cb；代码基线：none
 

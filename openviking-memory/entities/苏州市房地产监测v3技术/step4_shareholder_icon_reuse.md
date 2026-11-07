@@ -6,6 +6,7 @@
 - PNG 加载失败时回退至 `el-icon-s-custom`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/074.md
 - 涉及文件：RegisterStepper/index.vue、companyRegister.vue、institutionRegister/index.vue、company-register-reset.spec.js、package.json、playwright.config.js
 - 所属项目：苏州市房地产监测V3；来源会话：03f0598b-1d17-4053-8f92-746ad230caef；代码基线：none

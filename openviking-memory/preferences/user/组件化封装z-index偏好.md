@@ -7,6 +7,11 @@
 - 涉及文件：src/components/ZsPopup/ZsPopup.vue、src/pages_owner/decision/form.vue、src/pages_owner/decision/components/StepSign.vue
 - 验证证据：cursor session 2d1d0d28-89de-4c7e-9e05-5135f6725d28；代码基线：none
 
+## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
+- 来源会话：2d1d0d28-89de-4c7e-9e05-5135f6725d28
+
 
 <!-- MEMORY_FIELDS
 {

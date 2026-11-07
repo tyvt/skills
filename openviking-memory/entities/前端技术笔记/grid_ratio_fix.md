@@ -9,6 +9,7 @@
 - 若需更接近 62.5% / 37.5%（5:3），可把 `3fr 2fr` 换成 `5fr 3fr`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；来源会话：bd7c381a-dfc6-4484-8f46-7a8bc8ff605f
 

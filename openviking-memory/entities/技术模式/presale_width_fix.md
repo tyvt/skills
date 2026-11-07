@@ -11,6 +11,7 @@
 - `zhi2-web-admin/src/views/presale/permit/plan/detail.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 刷新页面即可看到效果
 - 所属项目：苏州市房地产监测V3；来源会话ID：76e18476-410b-48e2-8684-b252aafae89d；代码基线：none
 

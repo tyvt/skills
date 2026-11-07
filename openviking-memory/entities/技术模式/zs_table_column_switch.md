@@ -16,6 +16,7 @@
 - 两处必须一起改，只改宽度会让「...」消失但黑色空框依旧。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话 1cc96294 工单分类状态栏省略号 + 黑色空提示，根因在公共组件非业务页。
 - 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、zhi2-web-admin/src/views/property/workOrder/category/index.vue。
 - 所属项目：苏住房G；来源会话：1cc96294-89aa-419f-a3f0-3c4fbc943d76；代码基线：e590ffa。

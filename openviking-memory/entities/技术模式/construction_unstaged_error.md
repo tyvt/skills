@@ -10,6 +10,7 @@
 - 确保修复文件在 git 暂存区中再触发构建
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/maintenance/construction/index.vue
 - 所属项目：园区物管2.0；代码基线：none；来源会话：88565b66-71d3-4d18-8d9c-edb6a2b3c7c1
 

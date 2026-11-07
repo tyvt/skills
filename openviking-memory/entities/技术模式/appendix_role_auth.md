@@ -18,6 +18,8 @@
 - `components/AnnexUpload/index.vue`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：77fa1a75-24f0-43b1-bb5c-38c9efb094bb
 - 验证证据: src=苏州市房地产监测V3/027.md
 - 会话 ID: 77fa1a75-24f0-43b1-bb5c-38c9efb094bb
 - 所属项目: Suzhou Real Estate Monitoring V3; 基线: none

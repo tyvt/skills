@@ -5,6 +5,10 @@
 - 从门户「绑定房屋」入口进入时会清空 `pendingPortalPostAction`，避免误触发业主决策
 - 所属项目：小程序；来源会话：3a9cefa7-d876-4dcb-bc47-8944def53bc0；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=小程序
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

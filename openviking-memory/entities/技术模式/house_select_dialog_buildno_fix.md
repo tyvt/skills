@@ -15,6 +15,7 @@
 - 新增 normalizeHouse：houseId、buildingNo/buildNo 与当前楼幢对齐；loadHouseList 成功后对列表 map 处理
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 该文件无新的 lint 问题
 - 所属项目：苏州市房地产监测V3；来源会话：09f6b31e-b744-41e8-aa52-b2310e44a3a9
 

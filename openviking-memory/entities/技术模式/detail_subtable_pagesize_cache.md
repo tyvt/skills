@@ -14,6 +14,8 @@
 - PayDetailsTable.vue 启用 skipSearchParamsCache 并显式绑定 :page-size
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/065.md
 - 涉及文件：PayDetailsTable.vue、listMixins.js、table.js、detail.vue、zs-pagination.vue、zs-table.vue、RelatedBuildingsTable.vue、tableComponents.js
 - 来源会话ID：ad7a580b-3a8f-4044-8329-77ea3f59363a；代码基线：none

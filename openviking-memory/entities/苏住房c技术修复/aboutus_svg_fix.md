@@ -10,6 +10,7 @@
 - 在 src/utils/index.js 登记分包映射：'svg/headphone.svg': ['pages_main']、'svg/location.svg': ['pages_main']
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - npm run build 成功，产物 dist/pages_main/static/svg/ 下两个 SVG 文件均存在
 - 需在微信开发者工具重新导入 dist 目录，打开「关于我们」页面确认图标正常、控制台无 500 错误
 - 涉及文件：utils/index.js、AboutUs.vue、ZsImage.vue

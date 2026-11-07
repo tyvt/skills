@@ -17,6 +17,7 @@
 - 用户明确要求预警合同即使已备案也必须能勾选
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：会话 7960611d，用户报「经营用房租赁合同：已备案的合同，不能选，选忽略预警时提示请选择合同」
 - 涉及文件：zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/index.vue
 - 所属项目：苏住房G；代码基线：320507d；来源会话：7960611d-0d3b-4ae8-a217-98664ba2c7a2

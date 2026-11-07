@@ -9,6 +9,7 @@
 - 将 import 路径改为 `@/views/estate/optionDecision/components/CandidateConfigTable`，本地 `npm run test` 构建成功（约 55s）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 a96ffabd 用户报构建报错，修复后通过
 - 涉及文件：`VoteRangeDialogLite.vue`、`optionDecision/components/VoteRangeDialog.vue`、`optionDecision/components/CandidateConfigTable`
 - 所属项目：太仓G；来源会话：a96ffabd-ef31-4e34-998f-48051d851e40；代码基线：none

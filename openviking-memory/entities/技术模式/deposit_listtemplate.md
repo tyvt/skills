@@ -18,6 +18,11 @@
 ## 验证
 - cursor 会话: 5db9c51e-2b5e-440b-9222-d5a6f6452a33
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：5db9c51e-2b5e-440b-9222-d5a6f6452a33
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

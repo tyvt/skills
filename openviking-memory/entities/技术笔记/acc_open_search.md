@@ -14,6 +14,10 @@
 ## 归属
 - 所属项目：园区V0；来源会话ID：161089c1-ddcd-4bb1-9706-c8f3b5f595d3；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区V0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术笔记",

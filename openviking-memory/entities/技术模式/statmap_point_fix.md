@@ -12,6 +12,7 @@
 - components/map.vue打点前再次兼容两套字段并转数值，非法经纬度直接跳过
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：刷新statisticsMap页面查看小区模拟点恢复；若未恢复继续排查mockApi返回与地图SDK脚本加载
 - 涉及文件：src/views/benefit/statisticsMap/index.vue、components/map.vue
 - 所属项目：产品2.0；来源会话：4e071976-4604-4c8f-972d-87c97674c807；代码基线：none

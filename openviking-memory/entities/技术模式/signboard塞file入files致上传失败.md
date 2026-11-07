@@ -13,6 +13,8 @@ src/api/file.ts 薄封装逻辑正确，失败根因在 SignBoard.vue 将 File �
 - SignBoard.vue
 
 ## 验证与归属
+- 所属项目：H5
+- 验证证据：extracted source=cursor project=H5
 - 验证证据：src=H5/002.md
 - 来源会话ID：c76f4349-6ce7-4c32-afeb-fa8a10bb8c00
 - 代码基线：none

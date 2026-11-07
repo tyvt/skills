@@ -11,6 +11,7 @@
 - detail-template.vue 中 tag 的 getItemValueDisplayString 同样改为 dict 匹配逻辑。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：detail-template.vue、property/complexChange/detail.vue、src/mixins、src/main.js。
 - 所属项目：产品2.0；来源会话：b608284d-b42b-4810-99bd-afe869af0cbd；代码基线：none。
 

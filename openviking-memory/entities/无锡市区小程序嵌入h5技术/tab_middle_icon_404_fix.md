@@ -11,6 +11,7 @@ H5部署在/h5/子路径时，中间Tab图标用了绝对路径/static/icon/icon
 - 问答页机器人头像同步修复
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 验证证据：会话 f82a50f9 用户反馈中间凸起按钮不显示
 - 涉及文件：zhishuAsset.js、custom-tabbar.vue、pages.js 等
 - 所属项目：无锡市区小程序嵌入H5；来源会话：f82a50f9-f635-4d0d-8382-d57ff27fd4c7；代码基线：none

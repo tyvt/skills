@@ -12,6 +12,7 @@ layout/index.vue 在登录后依据 operableProjectList / bProjectData 自动弹
 - 修复仅改动 layout/index.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：用户反馈未关联区域登录弹框关不了；修复仅改 layout/index
 - 涉及文件：zhi2-web-admin/src/layout/index.vue
 - 所属项目：园区公共收益；来源会话：7c3abcbc-5c9f-492d-b81b-9b709f37b81c；代码基线：0abcb96

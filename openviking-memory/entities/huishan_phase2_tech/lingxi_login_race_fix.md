@@ -17,6 +17,8 @@
 - d:/repository/惠山二期H5/zhi2-mobile-admin-h5-c-unlimited/src/store/user.js
 
 ## 验证与归属
+- 所属项目：惠山二期H5
+- 验证证据：extracted source=cursor project=惠山二期H5
 - 验证证据：src=惠山二期H5/001.md
 - 来源会话ID：605fa942-84e9-4a40-b2f2-1535b9c67767；代码基线：none
 

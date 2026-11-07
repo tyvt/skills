@@ -10,6 +10,7 @@
 - 修正 `setData` 遍历实际选中 `row` 以兼容新旧字段映射
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/130.md
 - 涉及文件：SelectBuildingDialog.vue、SupervisionTable.vue、EntrustBuildingTable.vue、SelectDialog.vue、entrustSale/detail.vue、jgxm/detail.vue、entrust-sale-helpers.js、entrust-sale-real-api-flow.spec.js
 - 所属项目：苏州市房地产监测V3；来源会话：1c6ebe99-e7de-4325-94b6-5e285bed7910；代码基线：none

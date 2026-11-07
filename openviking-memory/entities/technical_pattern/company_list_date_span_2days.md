@@ -11,6 +11,12 @@ In SuzhouHousingG `companyListQuery.js`, date span restricted to 2 days with ove
 ## Verification
 - Source: 苏住房G/063.md; session 84fe40ac-f546-41bc-9d7e-76bd876f4594.
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+- 来源会话：84fe40ac-f546-41bc-9d7e-76bd876f4594
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

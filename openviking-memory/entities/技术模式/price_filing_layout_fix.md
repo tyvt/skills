@@ -13,6 +13,7 @@
 - src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/changeDetail.vue
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话：d1912a45-dc41-4e50-8470-0a1d18d1c8c0；代码基线：none
 
 <!-- MEMORY_FIELDS

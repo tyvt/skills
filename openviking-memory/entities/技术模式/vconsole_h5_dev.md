@@ -9,6 +9,8 @@
 - vite.config.ts 中 drop_console 改为仅 production 生效，测试环境日志可在 vConsole Log 面板显示
 
 ## 验证与归属
+- 所属项目：惠山二期H5
+- 验证证据：extracted source=cursor project=惠山二期H5
 - 惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）验证：会话 ce82ed4f-71c3-4c81-b7b8-45a7512f22f8 完成替换与日志接入
 - 早期验证：会话 9314668a 加 vconsole，H5+DEV 启用，拦截器打印响应（证据 012.md）
 - 涉及文件：main.ts、src/api/index.js、vite.config.ts、.env.test、package.json；早期涉及 src/main.js、src/request/index.js、src/api/gateway.js

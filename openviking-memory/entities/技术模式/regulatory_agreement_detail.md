@@ -10,6 +10,7 @@
 - bankC...（bankCompany等）存在相同缺陷的复制/变体逻辑
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=淮安存量房
 - 所属项目：淮安存量房；来源会话：d95a1342-ee75-4624-826f-714037b1fe02；代码基线：none
 
 <!-- MEMORY_FIELDS

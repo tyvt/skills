@@ -8,6 +8,7 @@
 - 为相关 `ZsImage` 增加 `subpackage="pages_owner"`
 - 示例：`<ZsImage class="nav-icon" :src="item.icon" subpackage="pages_owner" />`
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 重新编译后图片应正常加载，无渲染层网络层错误
 - 涉及文件：ownerCard/index.vue、ZsImage.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：5c003f25-6041-4bd4-854d-61f76247907c；代码基线：none

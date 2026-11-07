@@ -12,6 +12,8 @@ getOwnCompany 经纪机构返回 administrativeArea（字典 ECONOMIC_INSTITUTIO
 - CompanyBasicInfoDetail.vue 新增 regionOptions 加载 ECONOMIC_INSTITUTIONS_REGION 字典渲染
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/090.md；src=苏州市房地产监测V3-rest/133.md；src=苏州市房地产监测V3/145.md；src=苏州市房地产监测V3/176.md
 - 涉及文件：companyRecord.js、institution/record/index.vue、companyApply/detail.vue、CompanyBasicInfoDetail.vue、companyBasicInfoContent.js、toB/companyRecord/detail.vue、companyRecordAgency/detail.vue、companyApplyAudit/detail.vue、personnelRecord/components/detail.vue、staffManagement/components/detail.vue、companyManagement/components/CompanyBasicInfoForm.vue
 - 来源会话：b82a2bdb-bc43-4b64-8752-65616c815a12；69acdb4b-1c0e-45f8-bc4e-41d66fa2aa9c；代码基线：none

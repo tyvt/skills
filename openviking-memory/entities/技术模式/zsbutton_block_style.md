@@ -18,6 +18,7 @@
 - 修复落 ZsButton 组件层，其他写 block 的按钮一并生效
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 3f889ff2（基线 5f0f4dc）用户报「按钮宽度太窄」
 - 涉及文件：components/ZsButton/ZsButton.vue、pages_owner/house/owner/manual.vue
 - 所属项目：苏住房C；来源会话ID：3f889ff2-2daa-476e-86b3-963833ee9ca2；代码基线：5f0f4dc

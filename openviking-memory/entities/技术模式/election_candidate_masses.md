@@ -12,6 +12,7 @@
 - 切换清理：选择「群众」时自动清空「所属党组织」并清除该字段校验提示；党员等其它面貌仍显示且必填
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=太仓G
 - 验证证据：会话 ed64bbc0 用户选群众仍提示所属党组织必填；结论说明 dictLabel 匹配、条件显示与动态 rules
 - 涉及文件：zhi1-web-admin/src/views/repairFunds/ownerApply/components/CandidateDialog.vue
 - 所属项目：太仓G；来源会话：ed64bbc0-e94c-47ef-8caf-b46b1c3f85c0；代码基线：none

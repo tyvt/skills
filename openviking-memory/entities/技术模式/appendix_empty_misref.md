@@ -5,6 +5,8 @@
 - 修正导入路径并在 `AppendixPackageSection/index.vue` 中注册 `AppendixEmpty`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：3e018025-42b0-4579-8189-908990fe5d69
 - 验证证据: src=苏州市房地产监测V3/267.md
 - 涉及文件: conLandLic/detail.vue, conLandLic/changeDetail.vue, AppendixPackageSection/index.vue, AppendixEmpty/index.vue, presale/surveyChange/detail.vue, presale/permitCancel/detail.vue, company/companyAdmin/detail.vue
 - 所属项目: 苏州市房地产监测V3; 会话: 3e018025-42b0-4579-8189-908990fe5d69; base: none

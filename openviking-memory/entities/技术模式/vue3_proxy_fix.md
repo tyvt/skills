@@ -11,6 +11,7 @@
 - 所有直接删 `$attrs` 的地方（如 formData.userType watch 两处）改为调用该方法
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 涉及文件：task.vue、parseElement.js、startEnd.vue
 - 所属项目：2-0（产品2.0）；来源会话：438ecac1-fc8f-4115-89d2-b8e10fee8055；代码基线：none
 

@@ -12,6 +12,8 @@ pages_owner/maintain/index.vue的维修资金链路是GET /external/maintenanceH
 - houseId示例H320214000001603
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+- 来源会话：a343d1aa-9a2b-44b9-9046-e30e130c5be6
 - 验证会话：a343d1aa-9a2b-44b9-9046-e30e130c5be6（基线38bd192），用户截图报错页对应maintain/index.vue
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/index.vue、src/api/repair.js、src/api/index.js
 - 所属项目：无锡市区小程序嵌入H5

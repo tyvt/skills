@@ -12,6 +12,7 @@
 - 新增验证脚本 `zhi2-web-admin/scripts/resolve-list-route-path-hint.test.mjs` 覆盖
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/061.md
 - 涉及文件：路由信息.json、supervision/deposit/notice/index.vue、notice/detail.vue、refund/index.vue、refund/detail.vue、mixins/listMixins.js、mixins/detailMixins.js、utils/ruoyi.js
 - 所属项目：苏州市房地产监测V3；来源会话：b58596af-97c9-4eba-bfba-cac9335e72f0；代码基线：none

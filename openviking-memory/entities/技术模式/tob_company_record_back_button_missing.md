@@ -15,6 +15,10 @@
 - 关联：DeveloperBasicInfoForm.vue、DeveloperBasicInfoDetail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：785103ae-ef4a-4772-bf72-7d837fa9f30c
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

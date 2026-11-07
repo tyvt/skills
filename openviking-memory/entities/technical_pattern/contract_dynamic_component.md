@@ -12,6 +12,7 @@
 - 通过 prop 传递映射以消除未知组件告警
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/051.md；src=苏州市房地产监测V3/094.md
 - 涉及文件：contractContent.vue、pre/data.js、contract/index.vue、indexFrame.js、pre/chapter1.vue、stock/contract/detail.vue、package.json、main.js
 - 所属项目：苏州市房地产监测V3；来源会话：fe9ef9d6-919d-4d8f-b826-5f333b310c11；代码基线：none

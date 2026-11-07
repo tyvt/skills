@@ -11,6 +11,7 @@
 - 修正 `env/.env` 配置恢复跳转（开启中间件、改正确编辑器）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/092.md
 - 涉及文件：env/.env、vite.config.js、.vscode/settings.json、package.json
 - 所属项目：苏住房G；来源会话ID：31b1bd1f-868a-41df-9b2d-8d9b9ada1333；代码基线：none

@@ -13,6 +13,7 @@
 - 截图里新增操作操作模块为空，修改/删除/审批有值
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：020b4402-aa87-4f14-bc0e-617da146dbe4；代码基线：none
 - 涉及文件：request.js、pageRequestContext.js、system/operlog/index.vue
 

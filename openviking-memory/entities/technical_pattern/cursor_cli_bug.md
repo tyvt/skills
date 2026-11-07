@@ -12,6 +12,8 @@
 - API Key 界面 Scope 标 Admin 属误标不影响 CLI
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3-rest/067.md
 - 验证证据：src=苏州市房地产监测V3/102.md
 - 涉及文件：settings.json、feishu-config.json、README_CN.md、cli-launcher.js、daemon-install.js、mcp-server.js、storage.json、mcp.json

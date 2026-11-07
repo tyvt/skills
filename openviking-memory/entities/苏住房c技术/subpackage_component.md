@@ -12,6 +12,7 @@
 - 后续同类错误同样按移到主包src/components/处理，不给每个包各复制一份
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话903d152b用户贴报错，结论抽ListIndex/ListDetail到src/components/article/并更新6个引用文件；验证证据：src=苏住房C/057.md
 - 涉及文件：src/components/article/ListIndex.vue、ListDetail.vue、pages_my/onlineService/index.vue、pages_main/news/index.vue等
 - 所属项目：苏住房C；来源会话：903d152b-dae2-46f3-94af-775912aee86f；代码基线：9832ba3

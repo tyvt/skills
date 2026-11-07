@@ -9,6 +9,7 @@ zhi2-web-admin 侧边栏 RecursiveMenu 激活态图标未应用主题色，需�
 - 在 `zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue` 为 `.menu-title.active-menu .menu-title--icon` 与 `.menu-title.active-parent .menu-title--icon` 设置 `color: var(--primary-color)`，覆盖默认图标色
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证证据：src=2-0/008.md；会话 `db9b9d8a-7b5f-4e97-ba73-4fdf181714a1` 最终结论修改两条选择器后激活态图标与文字一致
 - 涉及文件：zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue
 - 所属项目：2-0（产品2.0）；来源会话：db9b9d8a-7b5f-4e97-ba73-4fdf181714a1；代码基线：产品2.0 侧栏 RecursiveMenu

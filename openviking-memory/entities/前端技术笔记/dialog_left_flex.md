@@ -19,6 +19,11 @@
 - 来源会话：f882f9ab-4b6d-42b0-8cfa-ee45d52f7c6b
 - 项目：苏州市房地产监测V3（zhi2-web-admin）
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

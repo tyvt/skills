@@ -10,6 +10,8 @@
 - 通过 `AnnexUpload` 拼接当前订单的 `yszxs` 附件。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：b682e5d0-7ff0-4125-961e-04c9a7ebb147
 - 验证证据: src=苏州市房地产监测V3-rest/070.md
 - 涉及文件: presale/cashsale/components/CashsaleDetail.vue, permit/components/PermitAppendixPanel.vue, components/AnnexUpload/index.vue, e2e/presale/cashsale-transfer-real-api-flow.spec.js, e2e/fixtures/cashsale-transfer-helpers.js, presale/permit/components/detail.vue, permitConstants.js, cashsaleConstants.js
 - 所属项目: 苏州市房地产监测V3; 会话: b682e5d0-7ff0-4125-961e-04c9a7ebb147; Base: none

@@ -9,6 +9,7 @@
 - 在 `conditionScreening.vue` 中，定义固定图标 `16×16px` 和 `margin-bottom: 4px`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 所属项目: 苏住房C (zhi2-mobile-shimin)
 - 来源会话: dcb389f5-4d39-4923-958e-bf04219059c1
 - 涉及文件: src/components/commonNew/conditionScreening.vue, src/components/ZsImage/ZsImage.vue, src/utils/index.js, src/pages_transaction/newHouse/index.vue, src/pages_transaction/stockHouse/components/moreForm.vue, src/utils/mainStaticPaths.js, src/components/commonNew/gridNav.vue

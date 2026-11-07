@@ -16,6 +16,8 @@
 - 接口参数始终带当前资产类型，保留从地图传入的 leaseProje
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证：会话 6baca9f8-fd57-451d-8849-6e4937fcffa8 资产类型列空白修复
 - 涉及文件：assetLease.vue、pubAssetLease/index.vue
 - 来源会话ID：6baca9f8-fd57-451d-8849-6e4937fcffa8

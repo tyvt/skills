@@ -12,6 +12,10 @@
 - 涉及文件：robot/index.vue、api/msg.js、pages.json、message/index.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：72fc01c4-8530-4edb-8ed0-13cf0599aa37；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

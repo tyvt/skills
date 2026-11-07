@@ -16,6 +16,11 @@
 - 涉及文件: QualificationFormSection.vue, detailMixins.js, form.js, Step1CompanyInfo.vue, registerValidate.js, DeveloperBasicInfoForm.vue, registerFormContext.js, formComponents.js
 - 会话: 5584ad88-6363-48c5-9d3d-5f769967f5f6; Base: none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：5584ad88-6363-48c5-9d3d-5f769967f5f6
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "padrao_tecnico",

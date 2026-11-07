@@ -10,6 +10,7 @@
 - 补充样式：`:deep(.description) { min-height: 300rpx !important; height: auto !important; align-items: flex-start !important; padding-bottom: 24rpx; }` 并为标签增加 `margin-bottom`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：addAlone.vue、add.vue、form2.scss、signInfo.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）
 - 来源会话ID：d8d3c33d-5a07-488c-9663-dd7409ec4528

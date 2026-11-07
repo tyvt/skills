@@ -7,6 +7,7 @@
 - 在 playwright.config 或对应 project 配置 baseURL（如本地 dev http://127.0.0.1:端口 或与 E2E_BASE_URL 一致）。
 - 或 goto 写完整 URL。
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 验证：会话 44f9e8a5 诉求 2 报错 page.goto: Protocol error … Cannot navigate to invalid URL，定位 login.spec.js:15。
 - 涉及文件：zhi2-web-admin/tests/e2e/login.spec.js、zhi2-web-admin/playwright.config.js；所属项目：2-0；来源会话：44f9e8a5-1336-42c2-9226-9d3dc33ccb9a
 

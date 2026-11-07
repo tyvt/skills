@@ -11,6 +11,7 @@
 - 保留cbyh的prefixUrl、isSuzhouzhizai条件字段、YhwdTable子表、WtmcDialog选网点等专有逻辑，只换外壳
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话b653273d改造三个详情页，逐页给出参数
 - 涉及文件：supervision/bank/cbyh/detail.vue、jgwd/detail.vue、wtjgxy/detail.vue、maintenance/bank/detail.vue、mixins/detailMixins.js
 - 所属项目：产品2.0；来源会话：b653273d-87b4-4092-97cd-01c7ae965dff；代码基线：39e3114

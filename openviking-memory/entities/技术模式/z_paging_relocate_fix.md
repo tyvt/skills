@@ -14,6 +14,10 @@
 - 涉及 dist/node-modules/z-paging/.../z-paging.wxss、common/vendor.js、relocate 脚本、scripts/restore-main-vendor-deps.mjs、vite.config.ts
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 87fe1c13-6937-4a04-8752-5102a7dffe63；代码基线 none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

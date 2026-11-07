@@ -20,6 +20,12 @@
 - 涉及文件：index.scss、zs-table.vue等
 - 代码基线：none
 
+## 验证与归属
+- 所属项目：无锡市区G
+- 验证证据：extracted source=cursor project=无锡市区G
+- 来源会话：93dc00ea-d07f-4b3d-ba3e-0060780b7cdb
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

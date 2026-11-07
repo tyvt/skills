@@ -19,6 +19,10 @@
 - 涉及文件：portalApiRewrite.js、store/modules/user.js、api/index.js、request.js、login.vue、env/.env（均在 d:\repository\产品2.0\zhi2-web-admin\src 下）
 - 所属项目：产品2.0；来源会话 2caa4ea9-415d-4bd1-9439-0264ee8f6342；代码基线 1d563df
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

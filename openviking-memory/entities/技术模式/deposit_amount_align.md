@@ -11,6 +11,10 @@
 - 文件：`AccountDetailTable.vue`、`detail.vue`、`zs-table-column.vue`
 - 项目：产品2.0；来源会话：9ce2b292-a0dd-4ce0-84c9-8366477a8a75；代码基线：none
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
 
 <!-- MEMORY_FIELDS
 {

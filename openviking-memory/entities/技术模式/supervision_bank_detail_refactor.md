@@ -12,6 +12,7 @@
 - 保留 prefixUrl、isSuzhouzhizai 条件字段、YhwdTable 子表等原有逻辑。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：cbyh/detail.vue、jgwd/detail.vue、wtjgxy/detail.vue、detail-template.vue。
 - 所属项目：产品2.0；来源会话：b653273d-87b4-4092-97cd-01c7ae965dff；代码基线：none。
 

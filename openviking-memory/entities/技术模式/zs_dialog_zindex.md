@@ -10,6 +10,8 @@ scoped 样式对 el-dialog 内部渲染的 el-dialog__wrapper 生效不确定，
 - 移除各弹窗里 scoped 的 el-dialog__wrapper z-index 写法
 
 ## 验证与归属
+- 所属项目：repository
+- 验证证据：extracted source=cursor project=repository
 - 验证：会话 7b431f08 资产弹窗有时从后面弹出，根因层级被盖，wrapper-class 提至 100000（证据 011.md）
 - 涉及文件：src/components/zs-dialog/zs-dialog.vue、src/views/benefit/statisticsMap/components/AdvertiseAssetDialog.vue
 - 来源会话ID：7b431f08-6086-40c9-8c0f-6dc67a2167c3；代码基线：none

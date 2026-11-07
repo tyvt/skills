@@ -11,6 +11,7 @@
 - 推广规则：凡用 flex/grid 控制子组件+兄弟节点排列，一律显式套 div 承载布局类；子组件内部样式用 props 或 :deep()+权重。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：会话 0654e8d6 用户反馈「详情页箭头显示有问题，记得之前修复过」，定位根因为 scoped CSS 未穿透，改动 ListIndex.vue 与 ListContractIndex.vue 移 class 到内层 div。
 - 验证方式：npm run build 通过，微信开发者工具刷新进「双晒公示→维修资金使用」确认。
 - 涉及文件：pages_main/publicNotice/components/ListIndex.vue、ListContractIndex.vue、publicNotice.vue。

@@ -11,6 +11,8 @@
 - 搜索项改为 `type: 'dict'` + `dictUrl`
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：a4b95ede-26b5-43a3-8433-7a4a7725ca8c
 - 验证证据: src=cursor session=a4b95ede-26b5-43a3-8433-7a4a7725ca8c
 - 涉及文件: building/houseLimitAudit/index.vue, building/houseLimit/houseLimitConstants.js, mixins/ListTemplate.js, components/zs-table-column/zs-table-column.vue, components/dict-tag/dict-tag.vue, building/houseLimit/limitFormMixin.js, components/zs-search-form/SearchFormItem.vue
 - 所属项目: 苏州市房地产监测V3; 会话: a4b95ede-26b5-43a3-8433-7a4a7725ca8c

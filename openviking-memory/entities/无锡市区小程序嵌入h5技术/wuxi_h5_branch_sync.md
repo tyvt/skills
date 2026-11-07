@@ -27,6 +27,10 @@
 - 验证证据：src=无锡市区小程序嵌入H5/007.md；来源会话：73e008e0-9dd9-46de-b9f7-c3c8d2356bbe
 - 涉及文件：src/api/repair.js、src/pages_benefit/fundPublicity、src/store/repair.js、src/pages/index/newHome.vue 等
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "无锡市区小程序嵌入H5技术",

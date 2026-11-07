@@ -11,6 +11,7 @@
 - 刷新后编号列按内容撑开显示
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、views/dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue
 - 所属项目：苏住房G；来源会话：db287272-e3da-43d4-8c77-915cb66320da
 

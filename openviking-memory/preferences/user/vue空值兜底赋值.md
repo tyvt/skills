@@ -6,6 +6,12 @@
 - 在 `zhi2-web-admin/src/views/evaluation/creditDeclarationComponents/detail.vue` 的 `detailCallback` 中，对可能为 undefined 的 `response.data.itemList` / `verifiedItemList` 使用可选链与空值兜底（多选用 `?.map(...) ?? []`，单选用 `?.[0]?.configItemId ?? ''`），避免 `Cannot read properties of undefined` 崩溃。
 - 验证证据: src=bugfix; 会话: df013261-b203-4ad7-9640-ec25607e0664
 
+## 验证与归属
+- 所属项目：bugfix
+- 验证证据：extracted source=cursor project=bugfix
+- 来源会话：7237df2f-31b9-4f24-abf3-253139b16a09
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

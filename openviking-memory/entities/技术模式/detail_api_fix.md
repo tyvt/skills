@@ -11,6 +11,7 @@
 - `indemnity/product/detail.vue`：删除 `getProductById/${id}` 自定义逻辑，走 mixin 默认
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 全局 `/detail` 规范排查与修复已完成
 - 所属项目：苏州市房地产监测V3；来源会话ID：5f12d6ca-c193-45eb-984f-d206aaa583d3；代码基线：none
 

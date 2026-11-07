@@ -16,6 +16,7 @@
 - 复测流程固定为“清缓存→重新导入dist→点编译”
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话672f088f连续三条source size exceed报错，用户反馈标准不一致；结论bigPackageSizeSupport仅写配置不够必须UI勾选4M，wx.onLazyLoadError返回undefined正常，Console的[object Object]非完整错误
 - 涉及文件：project.config.json、scripts/size-main-package.mjs、scripts/split-pages-vote.mjs、src/pages.json
 - 所属项目：苏住房C；来源会话ID：672f088f-9a28-4d5f-8510-9425d8259a76；代码基线：5f0f4dc

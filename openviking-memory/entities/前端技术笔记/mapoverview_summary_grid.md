@@ -10,6 +10,7 @@
 - 减小 gap 与左右 padding（如 gap 4px、padding 6px）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：会话 76615610 mapOverview 物业管理区域三项间距过大，结论指向 .summary-list 的 1fr 三等分根因及四处样式调整
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；来源会话：76615610-2741-4c89-accc-c5cfe6621d05；代码基线：f00310232

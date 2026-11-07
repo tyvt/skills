@@ -10,6 +10,8 @@
 - 涉及文件：src/views/maintenance/guaranteeDeposit/components/index.vue、guaranteeDepositAccount/components/AccountDetailTable.vue
 
 ## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：src=产品2.0/080.md
 - 来源会话ID：8e75823d-70d8-480e-aee1-0a132b175de7
 - 代码基线：none

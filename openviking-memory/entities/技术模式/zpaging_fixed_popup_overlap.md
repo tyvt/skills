@@ -14,6 +14,7 @@
 - 排查提示：弹窗内列表位置乱飞/挡按钮，先查分页组件是否 fixed 全屏模式。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证：会话 451f9781（基线 d43894b）「我的求购」附近小区弹窗重叠；修复为 flex 三段 + :fixed="false" + :use-page-scroll="false" + min-height:500rpx + max-height:75vh + 底部 flex-shrink:0。
 - 涉及文件：src/pages_transaction/intention/popup.vue、src/pages_transaction/intention/add.vue
 - 所属项目：苏住房C；来源会话ID：451f9781-7f9a-465f-90a9-7f258714b1cc；代码基线：d43894b。

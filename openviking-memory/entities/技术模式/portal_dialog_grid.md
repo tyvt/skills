@@ -11,6 +11,7 @@ publicPortal 租赁/开业类详情弹窗在 CSS Grid 双列布局中沿用「�
 - 人员/信用等区块改用 rental-field-row，值区域 flex:1 且 min-width:0
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
 - 验证证据：会话 89cd2e8d 用户反馈「开业信息公示→基本信息」排版问题，根因是双列网格每字段仍用标签150px+flex导致半列不够
 - 涉及文件：zhi2-web-admin/src/views/home/publicPortal/components/RentalDetailDialog.vue、zhi2-web-admin/src/views/home/publicPortal/portal.scss
 - 所属项目：门户；来源会话ID：89cd2e8d-f0c3-42b4-8c98-dd51867d7a1f；代码基线：e1f8e0b

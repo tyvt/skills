@@ -11,6 +11,7 @@
 - enlargePicture 改为 arr.map(url => resolveMediaUrl(url)).filter(Boolean) 后传入 uni.previewImage
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证路径：首页 → 我要买房 → 地图找房 → 打开小区详情 → 楼盘相册预览
 - 涉及文件：buildingAlbum/index.vue、houseSupermarket/detail.vue、newHouse/detail.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：b5c173dc-ea32-4e53-9c29-1ef11624641c；代码基线：none

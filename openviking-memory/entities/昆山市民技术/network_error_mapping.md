@@ -8,6 +8,8 @@
 - 该报错指请求未连上服务端（域名不可达、证书或宕机），属网络层失败而非业务 `code` 错误。
 
 ## 验证与归属
+- 所属项目：昆山市民
+- 验证证据：extracted source=cursor project=昆山市民
 - 涉及文件：d:/repository/昆山市民/src/request/index.js、src/pages_home/home.js、src/api/modules/estate.js、src/stores/vote.js、src/env/mp.js、src/pages_home/home.vue、src/api/modules/myhouse.js、src/stores/user.js
 - 来源会话ID：33ab37e2-0079-458d-a791-5eab0baa4197
 - 代码基线：none

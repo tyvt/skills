@@ -11,6 +11,7 @@
 - 联调前与第三方确认解码方式
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/portal.js、src/pages/face/face.vue、src/pages/face/bdc.vue
 - 所属项目：无锡市区小程序嵌入H5；来源会话：2adff739-19f3-452a-bfc9-ae1b4ad9efc9；代码基线：7de00b1
 

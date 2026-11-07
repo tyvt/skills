@@ -10,6 +10,7 @@
 - initDict 过滤条件改为仅排除 ['2']。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
 - 验证证据：src=惠山二期G/007.md
 - 涉及文件：zhi2-web-admin/src/views/autonomy/general/index.vue、autonomy/general/detail.vue、autonomy/election/components/vote/enums.js、maintenance/maintenanceApply/components/VoteTable.vue、autonomy/repair/detail.vue、autonomy/repair/index.vue、autonomy/option/index.vue、package.json
 - 所属项目：惠山二期G；来源会话：24864aca-3eff-4a2b-8d94-e4ce7b40b21d；代码基线：none

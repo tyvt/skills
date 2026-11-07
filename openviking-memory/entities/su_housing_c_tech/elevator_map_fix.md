@@ -18,6 +18,7 @@
 - 为字数统计 `.word-limit` 添加 `pointer-events: none`，避免绝对定位元素挡住输入区域
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 若仍不能输入，先点上方表单区域让地图消失，再点「申请说明」输入框；重新编译小程序后测试「申请说明」字段，应可正常点击并输入。
 - 涉及文件：addAlone.vue、add.vue、ZsTextarea.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）

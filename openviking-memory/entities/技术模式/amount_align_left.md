@@ -12,6 +12,11 @@
 - 会话: 9d21af84-c650-421a-bfb6-02ee07eee6e0
 - 所属项目: bugfix
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=bugfix
+- 来源会话：9d21af84-c650-421a-bfb6-02ee07eee6e0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

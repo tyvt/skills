@@ -12,6 +12,8 @@
 - `detail.vue` 和 `plan/detail.vue` 集成了该函数并具备加载回退
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：954f078a-f048-4ccb-a30d-b2fce225de05
 - 验证证据: src=苏州市房地产监测V3/198.md
 - 所属项目: 苏州市房地产监测V3
 - 涉及文件: PermitPlanPanel.vue, detail.vue, plan/detail.vue, detailMixins.js, form.js, ruoyi.js, permitConstants.js, e2e/fixtures/presale-permit-helpers.js

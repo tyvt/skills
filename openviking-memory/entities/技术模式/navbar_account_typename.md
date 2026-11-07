@@ -12,6 +12,7 @@ zhi2-web-admin 顶栏 Navbar 在 nickName 后追加组织类型时判断解析�
 - 要显示真实组织类型语义需后端补 accountTypeName 或确认 B 对应字典类型
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证证据：accountType "B" 不在 sys_account_type_all，accountTypeName 为空，导航栏仅显示「卢司」；修复后预期「卢司（严严物业）」
 - 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue、zhi2-web-admin/src/store/modules/user.js、zhi2-web-admin/src/store/getters.js、zhi2-web-admin/src/views/system/user/detail.vue
 - 所属项目：园区公共收益；来源会话：51ce30f1-9974-4744-a846-7c5a5c12cf6d；代码基线：bd275b5

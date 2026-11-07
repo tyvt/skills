@@ -12,6 +12,7 @@
 - 凡「限 1 个文件 + 重新选择即替换」需求都套此模式，不要试图在 on-change 里补救
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：会话 3b0f6cd2 结论明确「设 :limit=1 后再次选择走 on-exceed，不进入 on-change」，给出 handleExceed{ clearFiles + handleStart } 代码
 - 涉及文件：zhi2-web-admin/src/components/FileUpload/index.vue、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue、src/components/ImageUpload/index.vue、src/components/zs-import/zs-import.vue、src/components/AnnexUpload/index.vue、src/views/benefit/components/AnnexUploadDialog/index.vue、src/views/property/allotNotice/detail.vue
 - 所属项目：产品2.0

@@ -10,6 +10,10 @@
 - 重启dev服务器并硬刷新，Network中确认oldPassword/newPassword为Base64密文
 - 所属项目：惠山二期G；来源会话：c458c0e2-e264-43ca-a51b-78d564dfcdd6
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=惠山二期G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

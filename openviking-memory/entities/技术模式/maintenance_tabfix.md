@@ -12,6 +12,7 @@
 - 保留原有触发点：选择小区、加载详情时仍会拉取业委会/物管会信息。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山G
 - 涉及文件：d:/repository/昆山G、d:/repository/昆山G/src/views/estate/MaintenanceProject/initiation/detail.vue
 - 所属项目：昆山G；来源会话：42c65495-f5cf-48ac-8138-4f4fe0a5e388；代码基线：none
 

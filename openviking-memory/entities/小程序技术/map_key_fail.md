@@ -11,6 +11,8 @@
 - 涉及文件：manifest.json、ZsMap.vue、utils/index.js、unionBank.vue、package.json
 
 ## 验证与归属
+- 所属项目：苏住房C
+- 验证证据：extracted source=cursor project=苏住房C
 - 验证证据：src=苏住房C/080.md
 - 来源会话ID：b1546e14-b5e1-43ee-beef-578fcfc4626f
 

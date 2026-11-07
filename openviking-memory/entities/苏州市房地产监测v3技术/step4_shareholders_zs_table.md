@@ -10,6 +10,7 @@
 - RegisterStepper/index.vue 步骤优先使用蓝色 currentIcon 替代绿色勾选
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - register-helpers.js 扩展 assertRegisterStep4Ui 覆盖 UI 断言
 - 验证证据：src=苏州市房地产监测V3-rest/041.md
 - 涉及文件：Step4Shareholders.vue、Step4ServiceScheme.vue、RegisterStepper/index.vue、company-register-visual.spec.js、companyRegister.vue、register-helpers.js、company-register-branch.spec.js、Step3Appendix.vue

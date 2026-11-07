@@ -14,6 +14,11 @@
 - 文件：`collectionDialog.vue`、`index.vue`（路径 `zhi2-web-admin/src/views/property/spFeeBill/components/`）
 - 来源会话：22489706-6592-40f4-b567-7d65ec1e013f；项目：产品2.0
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

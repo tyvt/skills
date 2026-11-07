@@ -16,6 +16,10 @@
 - 涉及：`index.scss`、`detail-form.scss`、`Headline/index.vue`、`src/styles/index.scss`
 - 所属项目：苏州市房地产监测V3；来源会话ID：e0841e83-95db-4936-a337-ee597853b74f；代码基线：none
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

@@ -10,6 +10,12 @@ permitExtend/index.vue columns() 将项目名称设置为文本，将延期申�
 - 项目：苏州市房地产监测V3
 - 文件：permitExtend/index.vue, listMixins.js, zs-table-column.vue, ListTemplate.js
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：c0158687-53dd-4468-a19c-21916c1b2d50
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "technical_pattern",

@@ -15,6 +15,7 @@
 - 排查顺序固定：先在字典 JSON 找该字段 dictValue → grep 前端同名 key → 确认是 key 不一致而非 remark 解析失败
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证：会话贴出 complex_field 全量 JSON，确认 dictValue=propertyCompanyCreditRating 与前端 companyCreditLevel 不匹配，修复后走 selectOptionsMap.creditLevel
 - 涉及文件：zhi2-web-admin/src/components/zs-advanced-query/complexFieldConfig.js、zs-advanced-query.vue、src/views/publicQuery/complex/index.vue
 - 所属项目：苏住房G；来源会话：04b34f92-8311-4af3-95f1-c6899f1c1f94；代码基线：5ccda28

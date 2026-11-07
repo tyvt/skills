@@ -12,6 +12,7 @@
 - 只在用户真正改过指定方式时清空人员字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：zhi2-web-admin/src/components/Process/components/nodePanel/task.vue、common/parseElement.js、common/XForm.vue
 - 所属项目：产品2.0；来源会话：8e2e88bc-89fe-4391-8ce3-07a15df52e5c；代码基线：none
 

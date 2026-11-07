@@ -9,6 +9,7 @@
 - 移除 onUnload 中的多级 navigateBack 逻辑，依赖系统导航栏默认单级返回。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
 - 验证：会话 3731b85d 用户要求改为通用返回，两处列表页一并处理；验证证据：src=昆山市民/006.md
 - 涉及文件：src/utils/wxLogin.js、src/pages_vote/vote/index.vue、src/pages_election/election/index.vue、src/pages_vote/vote/votedetail.vue、src/pages_vote/vote/affirm.vue、src/pages_vote/vote/participate.vue、src/pages_vote/vote/faceSuccess.vue、src/pages/common/components/ZsNav.vue。
 - 所属项目：昆山市民；代码基线：38d1482；来源会话ID：3731b85d-c4b8-48f3-b25e-7cf1583be2da。

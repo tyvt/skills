@@ -11,6 +11,7 @@
 - issue/detail.vue 相应调整
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=泰兴小程序
 - 涉及文件：src/staff/components/PageButton/PageButton.vue、src/staff/components/ZsButton/ZsButton.vue、src/staff/pages_facility/issue/detail.vue、src/staff/styles/theme.scss
 - 所属项目：泰兴小程序；来源会话ID：77cbc4d5-1383-48ff-89a4-e4c89c975bd9
 

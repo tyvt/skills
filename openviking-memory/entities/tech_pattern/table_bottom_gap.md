@@ -22,6 +22,12 @@ The zs-table-container--bottom-spacing adds padding-bottom:12px when pagination 
 ## Source
 - Extracted from cursor session c719772b-6ff9-441f-b247-7d29dfa7d3e2; project: zhi2-web-admin.
 
+## 验证与归属
+- 所属项目：产品2.0
+- 验证证据：extracted source=cursor project=产品2.0
+- 来源会话：c719772b-6ff9-441f-b247-7d29dfa7d3e2
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "tech_pattern",

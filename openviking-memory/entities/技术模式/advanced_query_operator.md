@@ -13,6 +13,7 @@
 - 对「一字段存多个类型组合值」的字段需允许 LIKE，并保留代码侧 EQ+LIKE 兜底，否则查不出组合值
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房G
 - 落地前须确认后端 operator_type 字典已配置 EQ 与 LIKE，否则下拉空、查询失败无提示
 - 验证证据：会话 7352b93f 用户明确操作符只从字典取值；改动 complexFieldConfig.js 与 zs-advanced-query.vue
 - 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/index.vue、zhi2-web-admin/src/components/zs-advanced-query/complexFieldConfig.js

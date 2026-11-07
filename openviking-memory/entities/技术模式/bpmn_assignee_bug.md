@@ -13,6 +13,7 @@ BPMN 流程设计器给用户任务选「指定人员」后，点画布空白或
 - ④ parseElement.js 把 assignee 统一规范为字符串
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证：选人→点空白→重新选中节点应保留，保存后用「查看 XML」确认 userTask 节点带 assignee 属性
 - 涉及文件：zhi2-web-admin/src/components/Process/components/nodePanel/task.vue、XForm.vue、PropertyPanel.vue、parseElement.js
 - 所属项目：产品2.0

@@ -15,6 +15,11 @@ The "项目坐落" field occupies two columns in a three-column grid to avoid mi
 - Files: presale/permit/components/detail.vue, presale/permit/components/PermitInfoPanel.vue, presale/permit/permitConstants.js, detail-template/detail-template.vue, presale/permitExtend/permitExtendConstants.js, presale/permitSelectConstants.js, presale/permitExtend/detail.vue, presale/surveyChange/surveyChangeConstants.js
 - Project: 苏州市房地产监测V3; source session: f7e32c84-3538-433f-bf02-d17f353e9e06; code baseline: none
 
+## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+- 来源会话：f7e32c84-3538-433f-bf02-d17f353e9e06
+
 
 <!-- MEMORY_FIELDS
 {

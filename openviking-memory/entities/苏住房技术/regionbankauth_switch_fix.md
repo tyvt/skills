@@ -10,6 +10,8 @@
 - 拦截 `bizState !== '2'` 的未备案单据，提示并回滚开关。
 
 ## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
 - 验证证据：src=苏住房G/080.md；来源会话：aadf551a-5fa3-495e-9cfd-2fe0eba45d5b。
 - 涉及文件：system/regionBankAuth/index.vue、regionBankAuth/detail.vue、property/utilityLinkConfig/index.vue、zs-table-column.vue。
 

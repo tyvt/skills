@@ -18,6 +18,10 @@
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/operatingAssets.vue、zhi2-web-admin/src/components/zs-table/zs-table.vue、zhi2-web-admin/src/styles/element-ui.scss。
 - 所属项目：园区物管2.0；来源会话：0e1620c2-4c35-4648-9da8-0d943e149a68；代码基线：55cd8653c。
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "前端技术笔记",

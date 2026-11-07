@@ -12,6 +12,7 @@
 - 禁止页面侧用模板字符串预拼单位，避免 undefined/undefined㎡ 脏字符串穿透组件判空逻辑。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=产品2.0
 - 验证证据：会话结论确认根因是模板字符串拼接在 undefined 时产出非空字符串绕过判空，改为 type:'amount'+unit 交 getAmountDisplay 处理。
 - 涉及文件：zhi2-web-admin/src/views/property/propertyContract/components/detail.vue、zhi2-web-admin/src/components/detail-template/detail-template.vue。
 - 所属项目：产品2.0；来源会话ID：f3762574-10fb-4d07-adb1-cfcfca9fd8aa；代码基线：401d884。

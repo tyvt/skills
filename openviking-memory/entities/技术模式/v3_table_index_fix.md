@@ -18,6 +18,10 @@
 - 涉及文件：zs-table-column.vue、WdmcDialog.vue、YhwdDialog.vue、superviseBank/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：bb86fbc4-fb2e-46ab-8ef7-7ec642005b52
 
+## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

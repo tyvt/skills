@@ -8,6 +8,11 @@
 - 在 src/views/property/workOrder/order/detail.vue 定义并重写 submit
 - 全项目共 7 个文件 11 处引用（来源会话 f2c4d1f7-640e-4ba2-9775-aab1b1b3d524）
 
+## 验证与归属
+- 所属项目：苏住房G
+- 验证证据：extracted source=cursor project=苏住房G
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "代码变量",

@@ -10,6 +10,8 @@
 - 三字段改为 `zs-select` 绑定对应 Options，移除硬编码 1/2 选项
 
 ## 验证与归属
+- 所属项目：苏州市房地产监测V3
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：PermitPlanPanel.vue、PresalePlanFillForm.vue、plan/detail.vue、permitConstants.js、presale-permit-helpers.js、ruoyi.js、前端技术信息.md、2026-09-11.md
 - 验证证据：src=苏州市房地产监测V3/089.md
 - 来源会话ID：efd9562e-b10f-4594-b813-0ef6e60b60d2；代码基线：none

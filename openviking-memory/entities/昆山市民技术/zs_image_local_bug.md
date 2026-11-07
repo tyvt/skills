@@ -10,6 +10,8 @@
 - `election.js` 删除无用 `headUrl` 字段
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=昆山市民
+- 来源会话：1ffc6a54-b6d6-4dcc-ba0b-74ef9650cccc
 - 验证证据：src=cursor session=1ffc6a54-b6d6-4dcc-ba0b-74ef9650cccc
 - 所属项目：昆山市民；代码基线：none
 - 涉及文件：src/pages_election/election/index.vue、src/pages_election/election/listStyle.scss、src/pages_vote/vote/index.vue、src/components/zs-image/zs-image.vue、src/stores/election.js、src/utils/resolveAssetUrl.js、src/pages/common/components/ZsImage.vue

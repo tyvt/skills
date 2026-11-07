@@ -9,6 +9,11 @@ The B-end hid the left 'property management area' selector but `complexId` was n
 【来源会话ID】2e2052e0-5af7-4539-ad66-24c40bd630fb
 【代码基线】none
 
+## 验证与归属
+- 所属项目：园区公共收益
+- 验证证据：extracted source=cursor project=园区公共收益
+
+
 <!-- MEMORY_FIELDS
 {
   "event_name": "facility_complexid_fix",

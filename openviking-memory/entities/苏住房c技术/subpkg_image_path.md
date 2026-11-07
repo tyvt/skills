@@ -14,6 +14,7 @@
 - 排查「某图不显示而同类图正常」先比对走ZsImage还是裸<image>
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏住房C
 - 会话e7bbf5fb（2026-08-24，基线4630e8e）用户报机器人客服头像没出来，改用ZsImage修复
 - 涉及文件：chitchat.vue、ZsImage.vue、utils/index.js
 - 所属项目：苏住房C；来源会话ID：e7bbf5fb-a194-4fdc-9755-8546e1c8585b；代码基线：4630e8e

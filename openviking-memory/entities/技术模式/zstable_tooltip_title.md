@@ -13,6 +13,7 @@
 - 业务侧：过窄固定 width 改为 minWidth（如房屋套数 90px）。
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 验证：会话 4d5ba10a 物业管理区域授权楼幢关联弹框字段显示不全且不能悬浮，改 BuildingDialogAuth 列宽与 zs-table-column.vue。
 - 涉及文件：zs-table-column.vue、BuildingDialogAuth.vue。
 - 所属项目：园区公共收益；来源会话：4d5ba10a-398d-499d-aa18-07403294d1a3；代码基线：b6bf87d。

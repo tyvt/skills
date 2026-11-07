@@ -12,6 +12,7 @@
 - 已有自定义 list-footer 页面（如楼盘详情走服务端分页）不受影响，增强须向后兼容既有插槽消费方
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：修复为新增 listData 属性，更新 12 处弹窗，楼盘详情等已有自定义 list-footer 页面不受影响
 - 涉及文件：autonomy/election/components/apply/RangeTable.vue、autonomy/record/components/CandidateDialog.vue
 - 所属项目：园区物管2.0；代码基线 f101dd464；来源会话 4fa38c48-5759-47ff-967b-9289cd0f35ff

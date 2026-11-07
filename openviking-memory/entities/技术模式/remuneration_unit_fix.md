@@ -15,6 +15,8 @@
 - zhi2-web-admin/src/formatters/index.js
 
 ## 验证与归属
+- 所属项目：淮安物管
+- 验证证据：extracted source=cursor project=淮安物管
 - 验证证据：src=淮安物管/014.md
 - 来源会话：d33d4f62-bcd8-4af4-8adc-3a0f5ac7884d；代码基线：none
 

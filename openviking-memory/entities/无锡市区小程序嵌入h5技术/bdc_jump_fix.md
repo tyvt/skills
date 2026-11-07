@@ -8,6 +8,7 @@
 - usePortal.js 的 navigateToAddHouse 改 async，跳转前 ensureProfile
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=无锡市区小程序嵌入H5
 - 涉及文件：user.js、portal.js、home.vue、usePortal.js
 - 所属项目：无锡市区小程序嵌入H5；来源会话：b91f733f-c012-4895-a19d-a04b64d87630
 

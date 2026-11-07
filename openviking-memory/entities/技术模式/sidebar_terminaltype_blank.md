@@ -20,6 +20,8 @@ portalLayout.js 的 shouldShowLayoutSidebar 仅判断 terminalType === 'B'，经
 - zhi2-web-admin/src/utils/terminalUser.js
 - zhi2-web-admin/src/layout/index.vue
 ## 验证与归属
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：bec4fb19-9aca-4ba2-84f0-886af959966f
 - 验证证据：cursor 会话 bec4fb19-9aca-4ba2-84f0-886af959966f
 - 所属项目：门户
 

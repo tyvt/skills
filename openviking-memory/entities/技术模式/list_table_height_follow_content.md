@@ -11,6 +11,7 @@
 - develop/v2.6.2-yulin：合并自 262，提交 5b3b058de，改动未 push 远程
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、src/styles/index.scss
 - 所属项目：园区物管2.0；来源会话：a3cdf258-43f5-4adb-9bc0-7f0801f15768
 

@@ -10,6 +10,7 @@
 - 详情页底部仍保留仅在新吴项目（`xinwu`）下显示的「同步房屋信息」按钮（另一套接口）
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：41b55088-8b1f-425d-947d-96448d09b77e；代码基线：none
 - 涉及文件：`houseTable.vue`、`building/detail.vue`
 

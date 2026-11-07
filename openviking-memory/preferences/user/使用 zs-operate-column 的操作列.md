@@ -3,6 +3,12 @@
 - 涉及文件: zhi2-web-admin/src/views/home/index-new.vue, syncLog/index.vue, integrationConfig/index.vue, components/zs-operate-column/zs-operate-column.vue, components/zs-button/zs-button.vue, main.js
 - 源会话：20fa127f-80b8-45d0-9e77-f3b6b55a7902
 
+## 验证与归属
+- 所属项目：门户
+- 验证证据：extracted source=cursor project=门户
+- 来源会话：20fa127f-80b8-45d0-9e77-f3b6b55a7902
+
+
 <!-- MEMORY_FIELDS
 {
   "user": "user",

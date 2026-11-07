@@ -7,6 +7,7 @@
 ## 后端菜单 SQL
 - `component/filePath` 使用：`supervision/projectDelivery/index` 与 `supervision/projectDelivery/detail`
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`index.vue`、`detail.vue`、`project-delivery-menu-config.js`、项目交付备案-前端对接文档.md、交付范围-前端对接文档.md、`CashsaleDetail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话ID：c1ba3f9c-6614-48bf-aa3e-5d69f6494ccc；代码基线：none
 

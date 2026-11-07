@@ -6,6 +6,7 @@
 - 密码：ZS001Aa!
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=2-0
 - 所属项目：2-0；来源会话：be5b577d-159c-4126-a301-a93c2e1de71f；代码基线：none
 
 <!-- MEMORY_FIELDS

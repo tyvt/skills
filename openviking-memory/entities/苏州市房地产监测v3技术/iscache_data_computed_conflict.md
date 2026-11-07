@@ -12,6 +12,7 @@ detailMixins 在 computed 定义 isCache，AgencyBranchDetail.vue 与 AgencyPers
 - 关闭表单 sessionStorage 缓存并消除警告
 
 ## 验证与归属
+- 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 验证证据：src=苏州市房地产监测V3/323.md
 - 涉及文件：detailMixins.js、AgencyBranchDetail.vue、AgencyPersonnelDetail.vue
 - 所属项目：苏州市房地产监测V3
