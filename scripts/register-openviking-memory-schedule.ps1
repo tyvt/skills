@@ -8,8 +8,13 @@ param(
 $ErrorActionPreference = "Stop"
 $TaskName = "OpenViking-Memory-Snapshot"
 $SkillsRoot = "D:\repository\skills"
-$Node = (Get-Command node -ErrorAction Stop).Source
-$Script = Join-Path $SkillsRoot "scripts\snapshot-openviking-memory.mjs"
+$Runner = Join-Path $SkillsRoot "scripts\run-openviking-snapshots.ps1"
+function Resolve-Pwsh {
+  $p = Get-Command pwsh -ErrorAction SilentlyContinue
+  if ($p) { return $p.Source }
+  return (Get-Command powershell.exe -ErrorAction Stop).Source
+}
+$Pwsh = Resolve-Pwsh
 
 if ($Unregister) {
   Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
@@ -17,14 +22,19 @@ if ($Unregister) {
   exit 0
 }
 
-if (-not (Test-Path $Script)) { throw "Missing script: $Script" }
+if (-not (Test-Path $Runner)) { throw "Missing script: $Runner" }
 
-$commitArgs = "--commit --reason scheduled"
-if ($Push) { $commitArgs += " --push" }
+$runnerArgs = @(
+  "-NoProfile",
+  "-ExecutionPolicy", "Bypass",
+  "-File", "`"$Runner`"",
+  "-Reason", "scheduled"
+)
+if ($Push) { $runnerArgs += "-Push" }
 
 $action = New-ScheduledTaskAction `
-  -Execute $Node `
-  -Argument "`"$Script`" $commitArgs" `
+  -Execute $Pwsh `
+  -Argument ($runnerArgs -join " ") `
   -WorkingDirectory $SkillsRoot
 
 $parts = $At -split ":"
@@ -40,20 +50,21 @@ if ($Weekly) {
 $settings = New-ScheduledTaskSettingsSet `
   -StartWhenAvailable `
   -DontStopOnIdleEnd `
-  -ExecutionTimeLimit (New-TimeSpan -Hours 2)
+  -ExecutionTimeLimit (New-TimeSpan -Hours 3)
 
 Register-ScheduledTask `
   -TaskName $TaskName `
   -Action $action `
   -Trigger $trigger `
   -Settings $settings `
-  -Description "Sync OpenViking memories to skills/openviking-memory (see scripts/README-openviking-snapshot.md)" `
+  -Description "Daily: snapshot-openviking-data + snapshot-openviking-memory 鈫?tyvt/skills (see scripts/README-openviking-snapshot.md)" `
   -Force | Out-Null
 
 $schedule = if ($Weekly) { "weekly Sunday $At" } else { "daily $At" }
 $gitMode = if ($Push) { "commit + push" } else { "commit only (no push)" }
 
 Write-Host "Registered: $TaskName"
-Write-Host "  script: $Script"
+Write-Host "  runner: $Runner"
+Write-Host "  jobs: snapshot-openviking-data.mjs, then snapshot-openviking-memory.mjs"
 Write-Host "  schedule: $schedule"
 Write-Host "  git: $gitMode"

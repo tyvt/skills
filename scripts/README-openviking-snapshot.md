@@ -34,10 +34,15 @@ node .\scripts\snapshot-openviking-memory.mjs --commit --push --reason manual
 
 ## 定时快照（Windows 计划任务）
 
-默认：**每天 03:00** 执行 `--commit --push`（同步并推送到 `origin/main`）。
+默认：**每天 03:00** 依次跑 **`snapshot-openviking-data.mjs`** 与 **`snapshot-openviking-memory.mjs`**（`--commit --push`）。
+
+包装脚本：`scripts/run-openviking-snapshots.ps1`（拷 data 前若服务在跑会短暂停 `openviking-server`，结束后自动拉起；日志 `%TEMP%\openviking-snapshot\`）。
 
 ```powershell
-# 注册（管理员 PowerShell 可选；当前用户任务一般不需要）
+# 注册每日 + 推送（推荐）
+pwsh -File D:\repository\skills\scripts\register-openviking-memory-schedule.ps1 -Push
+
+# 仅每日 commit 不推送
 pwsh -File D:\repository\skills\scripts\register-openviking-memory-schedule.ps1
 
 # 自定义：每周日 02:30，并推送
