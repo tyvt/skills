@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_087",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T10:47:35.580695+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/windows_java_build.md",
+                "memory_type": "entities",
+                "after": "# Windows 本机首次构建 Java 后端拦路虎\n在从未本地构建过的 Windows 机器上跑 Maven 编译会连续撞上空的 .m2 与公司 Nexus 被镜像和 HTTP blocker 双重拦截两个环境坑。\n\n## 问题根因\n- 本地 `.m2` 为空，父 POM `zhi2-be-parent` 解析不到，构建直接失败\n- `com.aspose:aspose-words` 等商业依赖只存在于公司 Nexus（http 协议），被 `mirrorOf=*` 全量镜像重定向到 central 而找不到\n- Maven 3.9 默认启用 HTTP blocker（`maven-default-http-blocker`），拒绝非 https 仓库，http Nexus 被拒\n- 工具链缺失：机器没装 JDK、没装 Maven，jar 都是别处来的\n\n## 解决方案\n- 工具链装到独立目录 `D:\\tools`：Temurin JDK 8 + Maven 3.9.16，用 `mvn -v` / `javac -v` 验证\n- 空 `.m2` 下先在父 POM 目录跑 `mvn -N install`（`-N` 非递归只装根 POM），把 `zhi2-be-parent` 装进本地库再编子模块\n- 改 `settings.xml`：`mirrorOf` 从 `*` 改为 `<mirrorOf>central</mirrorOf>`，让公司 Nexus 直连；同时禁用 HTTP blocker（`<blocked>false</blocked>` 或排除仓库 id）\n- 验证顺序：先 `mvn -B compile` 全量通过 → `clean package -DskipTests` 出 jar → 最后才重启服务，先验证再停机避免白停\n- 复盘结论写清根因是「这台机器从没本地构建过」，而非「依赖有冲突」\n\n## 验证与归属\n- 验证：会话 session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6（基线 6156653）最终结论确认两个拦路虎及修复后 BUILD SUCCESS\n- 涉及文件：pom.xml、settings.xml\n- 来源会话ID：session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6；代码基线：6156653"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/backend_restart_sop.md",
+                "memory_type": "entities",
+                "after": "# 更新后端并重启标准 SOP\n更新代码后必须先全量编译通过再停机，用原参数重启并以进程存活+端口监听+网关可连作为健康口径。\n\n## 标准顺序\n- 更新代码（如 `666c38f → ce348a3`，+8 提交，子模块同步、clean/ahead-0/fast-forward）\n- `mvn -B compile`（14 模块 BUILD SUCCESS）→ `clean package -DskipTests`（BUILD SUCCESS，4 个 jar 重建）\n- 以上通过后**才**停旧服务、用原参数启新服务，避免白停一轮\n\n## 关键原则\n- 用原参数重启保证端口、Nacos 注册、配置一致\n- 健康判定仅做到「进程存活 + 端口监听 + 网关可连」，不做逐接口冒烟，需在交付中显式声明为未验证项\n- 敏感配置（Nacos 密码等）内存内复用，不落盘、不打印\n- 工具链装在 `D:\\tools` 时注明未写入系统环境变量，换终端需重新指定 PATH\n\n## 服务实例与配置\n- common-gateway 33864/8080、service-expand-server 24192/9610\n- common-framework-server 15264/9211、common-flowable-server 16176/9700\n- 每步记 BUILD SUCCESS 与 jar mtime，重启后记新 PID/端口\n\n## 验证与归属\n- 验证：会话 session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6（基线 6156653）最终结论表与未覆盖风险段\n- 涉及文件：pom.xml、settings.xml\n- 来源会话ID：session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6；代码基线：6156653"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/e2e_flood_package.md",
+                "memory_type": "entities",
+                "after": "# 测试人员用 E2E 独立 npm 包目录规范\n防汛等测试用例需内聚为独立目录、不依赖前端代码、统一用 data-testid 定位元素。\n\n## 背景与目的\n- 测试人员不是前端开发者，需要能单独跑、看懂、改用例，而非先读懂 Vue 源码\n- 用例散落前端仓库会绑死开发环境；靠 CSS 类名或文本定位元素，页面改样式就全红\n- 加 `testid` 把定位契约从视觉层独立出来\n\n## 目录结构\n- 仓库根新建 `e2e-flood/` 独立目录（如 `D:\\repository\\苏住房G\\e2e-flood\\`），未改动前端任何文件\n- 包含 package.json（name=e2e-flood、private、playwright ^1.63.0）、README.md、.env.example、.gitignore\n- run-all.cjs 批量入口、lib/flood-lib.cjs 公共库、cases/*.cjs 用例、e2e-fixtures/ 固定附件（如 plan.pdf）\n\n## 关键规范\n- 每个 `.cjs` 用 `node --check` 过语法，README 写清怎么跑\n- 元素定位统一走 `data-testid`，优先给公共组件加 testid 一次生效，再改写所有脚本选择器重跑回归\n- 公共库设为只读契约，禁止修改本文件，新增能力走新文件\n- 用例自包含：不引用前端源码路径、不依赖前端构建产物，只打部署后的站点\n\n## 验证与归属\n- 验证：会话 session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6（基线 6156653）交付清单含上述文件且 `node --check` 通过\n- 涉及文件：e2e-flood/package.json、run-all.cjs、lib/flood-lib.cjs、README.md 等\n- 来源会话ID：session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6；代码基线：6156653"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/frontend_field_db.md",
+                "memory_type": "entities",
+                "after": "# 前端字段名以数据库表结构为准\n修复字段时应查达梦 all_tab_columns 拿到真实列，砍掉前端自造的 ID/CODE 参数只留 NAME 列。\n\n## 问题背景\n- 禅道 2162 要求按后端给的字段修复；前端原用 `supervisionBankName` 还自造 `supervisionBankId/Code` 状态与提交参数\n- 核实达梦测试库：`SYS_BANK_BRANCH` 与 `PUB_REGULATORY_AGREEMENT` 只有 `SUPERVISION_BANK_BRANCH_NAME` 一列，无 ID/CODE 列\n- 自造 id/code 会提交脏数据，且为自洽写反查 ID 兜底逻辑徒增分支\n\n## 解决方案\n- 先查库拿铁证：`SELECT column_name FROM all_tab_columns WHERE table_name='...'`（达梦）确认实际列\n- 字段改名全量替换 `supervisionBankName` → `supervisionBankBranchName`（3 文件：benefit/pubRegulatoryAgreement/detail.vue、system/sysBankBranch/detail.vue、system/workBank/components/pubRegulatoryBranchDialog.vue）\n- 顺手删掉前端自造 id/code 状态与提交参数，只提交 name\n- 必须保留的历史兼容写明兜底（如开户行账户兜底兼容旧 `row.supervisionBankName`）\n- 改完按 prop/rules/v-model/getForm 四层 grep 核对 9 处键名对齐，再加 node 语法检查与 lint-staged eslint --fix\n\n## 验证与归属\n- 验证：会话 session-07a67f50-976b-4f8b-9852-d834ed53c453（基线 6156653）最终结论「字段对齐交付」表\n- 涉及文件：上述三个 .vue 文件\n- 来源会话ID：session-07a67f50-976b-4f8b-9852-d834ed53c453；代码基线：6156653"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793647361230/history/archive_016",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T19:47:58.230423+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/h5context_geth5selection.md",
+                "memory_type": "entities",
+                "after": "# web-view嵌入场景的houseId统一解析\n小程序web-view嵌入H5时，维修资金等页的房屋上下文统一由utils/h5Context.getH5Selection解析，避免各页散落读URL。\n\n## 解析规则\n- houseId优先取getH5Param('houseId')，否则回退userStore.houseId\n- communityName等同理通过getH5Selection统一获取\n\n## 联调约束\n- 传给/external/maintenanceHouse/getHouseInfo的houseId须与维修资金侧「房屋唯一号」一致\n- 联调失败先核对小程序入参链路与后端映射，而非先改前端文案\n\n## 验证与归属\n- 验证证据：会话a343d1aa引用getH5Selection代码段，截图H320214000001603即getHouseInfo入参来源\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js、src/pages_owner/maintain/index.vue\n- 所属项目：无锡市区小程序嵌入H5；来源会话ID：a343d1aa-9a2b-44b9-9046-e30e130c5be6；代码基线：38bd192"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/zsimage_path_rules.md",
+                "memory_type": "entities",
+                "after": "# ZsImage在H5子路径部署下的路径规则\nzhi2-mobile-admin-h5-c-unlimited部署在/sz/等二级路由且vite base为'./'时，ZsImage.vue在H5端走相对路径，小程序仍用IMAGE_BASE。\n\n## H5端路径规则\n- local图用static/xxx，随当前页解析为/sz/static/xxx\n- 服务端路径以/开头则加./前缀（如/api/file/1.jpg→./api/file/1.jpg）\n- http(s)/data/blob原样透传\n- 失败兜底同样使用static/${fallBackSrc}\n\n## 小程序分支\n- 微信小程序分支仍使用@/env/mp.js的IMAGE_BASE，行为与改前一致\n- 落地点在ZsImage单组件，与全项目相对路径约定一致\n\n## 验证与归属\n- 验证证据：会话c7f8cfb5用户要求ZsImage改相对路径、不写死环境变量，结论给出H5/小程序分支与路径对照表\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/components/ZsImage/ZsImage.vue、vite.config.ts、src/env/mp.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话ID：c7f8cfb5-52f7-44a5-a4bf-81cfbf4e58af；代码基线：7a2a29b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/zsmap_logo_poi.md",
+                "memory_type": "entities",
+                "after": "# uni-app ZsMap的Logo误点与enable-poi限制\nZsMap使用uni-app原生<map>（腾讯地图），需处理Logo误点跳转及H5上enable-poi限制。\n\n## Logo误点拦截\n- 左下角腾讯地图Logo/版权无官方禁用点击配置，协议要求保留，不宜CSS隐藏\n- 防误点在map外包relative容器，左下角加绝对定位透明view（约120rpx×48rpx，z-index高于地图）拦截点击\n\n## POI与展示限制\n- 地图POI路名/商铺名可试:enable-poi=\"false\"，但H5（含web-view）文档未保证生效\n- 小区周边仅展示不要跳转时：project/info可关zoom/scroll，或改用腾讯静态图API/容器pointer-events:none（仅保留自定义marker）\n\n## 验证与归属\n- 验证证据：会话8caf0d1f用户问腾讯地图文字可否禁用点击，结论区分Logo、POI、静态展示三场景并给map-logo-blocker示例与平台表\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/components/ZsMap/ZsMap.vue、src/pages_owner/project/info/index.vue\n- 所属项目：无锡市区小程序嵌入H5；来源会话ID：8caf0d1f-dcbc-42e1-947f-e60d56e58eef；代码基线：afae6cd"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/project_info_poi_api.md",
+                "memory_type": "entities",
+                "after": "# 小区信息页数据与周边POI接口分工\npages_owner/project/info/index.vue的小区详情、地图Key与周边配套分别调用不同接口，避免与维修资金接口混淆。\n\n## 小区详情与Key\n- 小区详情GET /property/complex/getExtendedByComplexId/{complexId}（property.js getPropertyDetail），含complexName、address、buildingCount、houseCount等\n- 展示「交付日期」用deliveryYear映射，后端deliveryDate为空则显示-\n- 地图Key：GET /system/config/getByKey/qq.map.key（与园区项目同一配置键）\n\n## 周边配套localSearch\n- 先调腾讯geocoder/v1逆地理取adcode拼boundary，再place/v1/search\n- keyword为分类名，filter为facilityCategory（transaction.js）中的poi编码，orderby _distance\n- 列表距离来自_distance，纯展示地图不要与维修资金接口混淆\n\n## 验证与归属\n- 验证证据：会话b30d2f3f用户问小区信息页用的接口，结论列出后端详情、配置Key、腾讯WebService两步及facilityCategory表\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue、src/api/property.js、src/utils/transaction.js、src/utils/qqMapKey.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话ID：b30d2f3f-1f15-46f0-9efa-aa95170ed55f；代码基线：289666e"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

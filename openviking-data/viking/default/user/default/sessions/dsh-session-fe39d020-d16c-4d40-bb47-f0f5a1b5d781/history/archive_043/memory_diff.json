@@ -1,0 +1,36 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-fe39d020-d16c-4d40-bb47-f0f5a1b5d781/history/archive_043",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T09:11:49.491463+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/dsh插件/openviking_dsh_plugin.md",
+                "memory_type": "entities",
+                "before": "# @openviking/dsh-memory-plugin\nOpenViking 官方 DSH 插件，负责将 DSH 会话实时镜像到 OpenViking 服务。\n\n## 基本信息\n- 版本 0.5.31（官方插件，非社区版 @yadsh）\n- 默认端点 http://127.0.0.1:1933，无需额外配置即可直连\n- 会话 URI 格式为 viking://user/default/sessions/dsh-session-<id>\n\n## 行为\n- 实时镜像 DSH 会话消息到 OpenViking（pending tokens 累积）\n- commit 触发机制：turn/end 时若 pending_tokens >= commitTokenThreshold（默认 20000）才触发抽取，非实时\n- 由 VLM（hy3）从镜像会话中抽取记忆\n- 2026-11-02 确认已成功将当前会话写入 OpenViking\n- autoRecall（别名 syncTurns）默认开启：每步前自动 find 召回相关记忆注入，默认 recallLimit=10、scoreThreshold=0.35、recallTokenBudget=2000\n\n## 已知问题\n- 并发 commit 静默丢数据：手动 commit 与插件自动 commit 同时提交同一会话时，后队任务被挂起、extracted 返回空 {} 且不报错；此为 2026-11-02 确认的前次\"记忆丢失\"同一根因，全量导入须串行\n- 长会话不触发 commit：commitTokenThreshold 默认 20000 仅在 turn/end 判定，长会话中 pending_tokens 会持续累积（实测达 59706）而不提交",
+                "after": "# @openviking/dsh-memory-plugin\nOpenViking 官方 DSH 插件，负责将 DSH 会话实时镜像到 OpenViking 服务。\n\n## 基本信息\n- 版本 0.5.31（官方插件，非社区版 @yadsh）\n- 与 import-to-ov.mjs 批量导入脚本是两条独立链路（实时镜像 vs 历史批量迁移）\n- 默认端点 http://127.0.0.1:1933，无需额外配置即可直连\n- 会话 URI 格式为 viking://user/default/sessions/dsh-session-<id>\n\n## 行为\n- 实时镜像 DSH 会话消息到 OpenViking（pending tokens 累积）\n- commit 触发机制：turn/end 时若 pending_tokens >= commitTokenThreshold（默认 20000）才触发抽取，非实时\n- 由 VLM（hy3）从镜像会话中抽取记忆\n- 2026-11-02 确认已成功将当前会话写入 OpenViking\n- autoRecall（别名 syncTurns）默认开启：每步前自动 find 召回相关记忆注入，默认 recallLimit=10、scoreThreshold=0.35、recallTokenBudget=2000\n- 2026-11-05 实测：业务会话每轮注入 <openviking-context> 约 2-3 次/会话；简单改 bug 会话 Agent 主动 MCP=0 属合理用法（AGENTS 约定优先用注入而非重复检索）\n\n## 已知问题\n- 并发 commit 静默丢数据：手动 commit 与插件自动 commit 同时提交同一会话时，后队任务被挂起、extracted 返回空 {} 且不报错；此为 2026-11-02 确认的前次\"记忆丢失\"同一根因，全量导入须串行\n- 长会话不触发 commit：commitTokenThreshold 默认 20000 仅在 turn/end 判定，长会话中 pending_tokens 会持续累积（实测达 59706）而不提交\n- 2026-11-05 观测多个会话 pending_tokens 高（如 19009）且 memories_extracted=0，因 commit 阈值叠加 SessionCommit 队列堆积导致写回滞后"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/记忆服务程序/openviking.md",
+                "memory_type": "entities",
+                "before": "# OpenViking\n开源记忆服务程序，负责会话存储、向量索引与记忆抽取；被 DeepSeek Harness 用作长期记忆替代旧库。\n\n## 基本信息\n- 版本 0.5.3，端口 1933，auth_mode=dev 无鉴权；/health 返回 {\"status\":\"ok\",\"healthy\":true}\n- 数据目录 ~/.openviking（含 vectordb、viking 文件层与日志）；记忆文件路径 data/viking/default/user/default/memories/，含 identity/soul/entities/events/preferences\n\n## 组件与配置\n- 嵌入模型 bge-m3-ov（litellm/ollama，dim 1024，num_batch=1024、num_ctx=8192 解决 batch 超限）\n- 抽取 VLM：openai/auto/hy3（复用 magpie 网关），VLM max_concurrent=4 限制并发提交；DSH 插件 @openviking/dsh-memory-plugin 写会话镜像\n- allow_metadata_override: true 避免换模型后元数据不匹配拒绝启动\n\n## 命令行工具与运行\n- ov CLI 需 ovcli.conf（url 字段，dev 无鉴权）连本地；ov add-memory 自动分类结构化（无 --file 走 HTTP API）\n- ov mv 经 API 移动/重命名并保持向量索引一致；ov rm 删记忆及索引条目；二者处理手动改名的幽灵条目（旧 URI 残留、检索返回不存在路径）\n- ov reindex --mode vectors_only --wait true 重建向量索引（CLI 调 HTTP reindex 异步，大批量易超时但后台继续）；ov wait 等待后台任务（命令超时不等同任务失败）\n- start-server.bat 先启 Ollama 再启 server，启动文件夹放 OpenVikingServer.lnk 开机自启；会话按 token 阈值或结束触发 commit，同日冷启动全杀后 12 秒内自恢复",
+                "after": "# OpenViking\n开源记忆服务程序，负责会话存储、向量索引与记忆抽取；被 DeepSeek Harness 用作长期记忆替代旧库。\n\n## 基本信息\n- 版本 0.5.3，端口 1933，auth_mode=dev 无鉴权；/health 返回 {\"status\":\"ok\",\"healthy\":true}\n- 数据目录 ~/.openviking（含 vectordb、viking 文件层与日志）；记忆文件路径 data/viking/default/user/default/memories/，含 identity/soul/entities/events/preferences\n- 2026-11-05 观测导入会话 dsh-session-fe39d020：pending_tokens ~7459、commit_count 42、memories_extracted.total 29，本 session 回写 29 条（write 11/edit 17）\n\n## 组件与配置\n- 嵌入模型 bge-m3-ov（litellm/ollama，dim 1024，num_batch=1024、num_ctx=8192 解决 batch 超限）\n- 抽取 VLM：openai/auto/hy3（复用 magpie 网关），VLM max_concurrent=4 限制并发提交；DSH 插件 @openviking/dsh-memory-plugin 写会话镜像\n- allow_metadata_override: true 避免换模型后元数据不匹配拒绝启动\n- 每轮注入记录存于会话的 .recall_log.json（如 dsh-session-fe39d020 在 turn 2524 记录 10 条 URI）\n- SessionCommit 队列堆积会拖慢写回记忆（2026-11-05 观测与 bulk import 抢资源）\n\n## 命令行工具与运行\n- ov CLI 需 ovcli.conf（url 字段，dev 无鉴权）连本地；ov add-memory 自动分类结构化（无 --file 走 HTTP API）\n- ov mv 经 API 移动/重命名并保持向量索引一致；ov rm 删记忆及索引条目；二者处理手动改名的幽灵条目（旧 URI 残留、检索返回不存在路径）\n- ov reindex --mode vectors_only --wait true 重建向量索引（CLI 调 HTTP reindex 异步，大批量易超时但后台继续）；ov wait 等待后台任务（命令超时不等同任务失败）\n- start-server.bat 先启 Ollama 再启 server，启动文件夹放 OpenVikingServer.lnk 开机自启；会话按 token 阈值或结束触发 commit，同日冷启动全杀后 12 秒内自恢复"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/程序/dsh.md",
+                "memory_type": "entities",
+                "before": "# DSH\nDeepSeek Harness（DSH），用户的 AI 会话工作台，其历史会话计划导入 OpenViking 作为长期记忆。\n\n## 基本信息\n- 会话总数 1602 个（截至 2026-11-04），为历史会话导入序列第一项\n- 会话数据结构：source.kind === \"user\" 为真人输入须保留，其余为注入的上下文须过滤\n\n## 既有产物\n- 工作区 memory-migration/ 目录已存在上一次 distill（提炼）完整产物与脚本，可沿用其质量口径，避免重复处理\n- 2026-11-02 统计：提炼产物含 memories-final.json（顶层单个项目「泰兴小程序」162 条）与 distilled-projects/（831 条项目记忆）\n- 2026-11-02 统计：结构化记忆总量 4431 条，类型分布为 bug 1712、pattern 941、preference 923、fact 571、workflow 284\n\n## 关系\n- 通过官方 @openviking/dsh-memory-plugin 实时镜像会话到 OpenViking\n- 历史会话导入顺序：DSH 率先，其后为 cursor、workbuddy、opencode",
+                "after": "# DSH\nDeepSeek Harness（DSH），用户的 AI 会话工作台，其历史会话计划导入 OpenViking 作为长期记忆。\n\n## 基本信息\n- 会话总数 1602 个（截至 2026-11-04），为历史会话导入序列第一项\n- 会话数据结构：source.kind === \"user\" 为真人输入须保留，其余为注入的上下文须过滤\n\n## 既有产物\n- 工作区 memory-migration/ 目录已存在上一次 distill（提炼）完整产物与脚本，可沿用其质量口径，避免重复处理\n- 2026-11-02 统计：提炼产物含 memories-final.json（顶层单个项目「泰兴小程序」162 条）与 distilled-projects/（831 条项目记忆）\n- 2026-11-02 统计：结构化记忆总量 4431 条，类型分布为 bug 1712、pattern 941、preference 923、fact 571、workflow 284\n\n## 关系\n- 通过官方 @openviking/dsh-memory-plugin 实时镜像会话到 OpenViking\n- 历史会话导入顺序：DSH 率先，其后为 cursor、workbuddy、opencode\n- 2026-11-05 导入会话 dsh-session-fe39d020 通过插件大量调用 OpenViking MCP（search ~45、read ~35、remember ~9）并回写 29 条记忆（write 11/edit 17）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 3,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793663675616/history/archive_007",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T00:06:38.179839+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_dolayout.md",
+                "memory_type": "entities",
+                "after": "# 弹窗内zs-table重置搜索后末行裁切修复（listTableTr不变跳过doLayout）\n在ScopeSelectDialog内嵌zs-table时，若计算listTableTr与上次相同则跳过doLayout，重置搜索后行数恢复但内部滚动高度未重算致末行裁切。\n\n## 问题根因\n- updateListTableTr在listTableTr与上次相同时直接return，未在$nextTick调用表格doLayout\n- 搜索→重置后行数回到初次一致，但内部滚动区域高度仍按少行状态未重算\n\n## 解决方案\n- 数据刷新后无论listTableTr是否变化都在$nextTick执行doLayout\n- resetQuery统一走handleQuery()保证pageNum=1并与listMixins重置链路一致\n- 偶发时在getList回调用requestAnimationFrame双帧再doLayout\n- 与「table-tr固定行数契约+异步后doLayout」互补：行数契约值不变时也不能省略布局重算\n\n## 验证与归属\n- 验证：会话acf40130中ScopeSelectDialog.vue去掉listTableTr不变即return，重置改调handleQuery；搜索后重置再滚到底检查末行完整\n- 涉及文件：zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue、zhi2-web-admin/src/components/zs-table/zs-table\n- 所属项目：园区公共收益；来源会话：acf40130-9dda-4c08-b943-34292e01cab4；代码基线：弹窗内zs-table+table-tr定高场景"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/account_type_dict.md",
+                "memory_type": "entities",
+                "after": "# 业主开户账户类型显示数字修复（dictValue未对齐表单存值）\n业主开户详情查看账户类型显示50等数字，因表单存acctypeVal而字典选项dictValue用acctypeId导致不匹配。\n\n## 问题根因\n- form.accountType存的是账户类型值acctypeVal（如50）\n- initDict原从/maintenance/acctype/list拉选项且dictValue用acctypeId，与字段值域不一致\n- DetailTemplate tag匹配失败后回退原始值\n\n## 解决方案\n- 查看/编辑弹窗统一getDicts('ACCOUNT_TYPE')，保证选项dictValue与form.accountType同一套编码\n- 排查字典展示为码值时：先核对「表单字段实际存什么」再选字典或接口列表，不能假设列表主键就是下拉value\n\n## 验证与归属\n- 验证：会话3ef9c696中OpenDetailDialog initDict改为ACCOUNT_TYPE后查看与编辑弹窗均显示字典文案\n- 涉及文件：zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/OpenDetailDialog.vue\n- 所属项目：园区公共收益；来源会话：3ef9c696-10c0-4826-b1f5-80042dfc681b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_mixins_cache.md",
+                "memory_type": "entities",
+                "after": "# 编辑态F5不拉详情修复（detailMixins误写sessionStorage假缓存）\n编辑态详情依赖detailMixins的sessionStorage缓存，程序化改form被误判为用户编辑写入缓存，刷新后跳过getDetail。\n\n## 问题根因\n- form deep watch在form!==originForm时写缓存\n- 详情返回后detailCallback过早同步originForm，而getArea()、子组件金额格式化等仍改form，被当已编辑写入缓存\n- 刷新后读假缓存不再请求详情\n\n## 解决方案\n- 加载期skipFormCache禁止写缓存\n- 重写getDetail，在detailCallback后用syncOriginFormAfterLoad()于$nextTick再对齐originForm（等子组件渲染完）\n- 从缓存恢复时同步originForm并校验缓存主键与路由id一致\n- 页面侧在同步originForm前完成getArea()等派生赋值，勿再手写originForm\n\n## 验证与归属\n- 验证：地块编辑页未改任何字段直接F5，因sessionStorage假缓存跳过getDetail；结论程序化赋值与originForm时序是根因\n- 涉及文件：zhi2-web-admin/src/mixins/detailMixins.js、zhi2-web-admin/src/views/building/plot/detail.vue\n- 所属项目：园区公共收益；来源会话：0bafb3e6-385f-404a-b48a-91cebb47c939；代码基线：86a4227"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_select_role.md",
+                "memory_type": "entities",
+                "after": "# 改角色只传roleIds保存后名称错乱修复（zs-select须label.sync）\n组织工作人员等详情改角色只更新roleIds，roleName保留旧值，保存提交错误角色名。\n\n## 问题根因\n- 改角色时只更新roleIds，roleName仍保留详情接口旧值\n- 保存请求体把错误角色名（如仍显示「社区」）提交后端，界面与物管会等选项不一致\n\n## 解决方案\n- 角色下拉使用zs-select的:label.sync=\"form.roleName\"与id同步\n- getForm()显式提交roleName，缺省时从roleOptions按roleIds兜底\n- 切换组织类型时与roleIds一并清空roleName\n\n## 验证与归属\n- 验证：修改角色为物管会保存后仍显示社区；根因只传roleIds、roleName未随选择更新\n- 涉及文件：zhi2-web-admin/src/views/autonomy/ownerCommitteeWorker/detail.vue\n- 所属项目：园区公共收益；来源会话：64889348-1c95-4eb4-8199-6ee031bb7e1e；代码基线：b6bf87d"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/building_table_tabs.md",
+                "memory_type": "entities",
+                "before": "# 楼盘表选择弹窗统一约定\n所有涉及楼盘表选择的弹窗（14 处）Tab 切换时高度跳动、内容撑破弹窗，需统一公共组件与弹窗属性固定尺寸。\n\n## 现象\n- 楼幢详情、房屋拆分/合并、业主自治表决范围、维修资金缴存范围 ScopeSelectDialog、收益管理等 14 处弹窗切换「列表视图/楼盘表视图」时高度跳动、内容撑破弹窗。\n- 各弹窗各自实现切换，v-if 切换导致面板重建、尺寸随内容浮动。\n\n## 根因\n- 各弹窗独立实现 Tab 切换，缺乏统一尺寸约束。\n\n## 解决方案\n- 抽公共组件 BuildingTableViewTabs.vue：Tab 用 zs-tabs type=\"line\"，文案统一「列表视图 / 楼盘表视图」，两面板用 v-show 切换保留 DOM 防高度跳动。\n- 内容区固定高度，表格/楼盘表超出时在面板内部滚动。\n- zs-select-dialog 新增 building-table-mode 属性：宽度 80%（最大 1300px）、高度固定 720px、左右分栏自适应、内容区不撑开弹窗。\n- owner/company 版 ScopeSelectDialog 的 v-if 改 v-show；新增同类弹窗直接复用，不再各写一套。\n- 与「zs-tabs 重型子面板用 v-if 懒渲染」区分：本约定针对同弹窗内两固定面板尺寸稳定性，优先 v-show。\n\n## 已知缺陷与修复\n- BuildingTableViewTabs 列表视图分页被裁切：表格区 min-height:360px/400px 与分页栏约68px 合计超过 panel min-height:400px 且 overflow:hidden，分页只露上半截。修复：flex 链表格容器改 min-height:0，表格区 flex:1 内滚，分页 flex-shrink:0 并增 padding-bottom；zs-select-dialog 右侧 .dialog-right.building-table-right 补 display:flex; flex-direction:column; flex:1。涉及文件 BuildingTableViewTabs.vue、zs-select-dialog.vue、DecisionRangeTable.vue；所属项目：园区公共收益；来源会话 e0c9e026-360f-4210-a247-b1f275759fea；代码基线 0abcb96。\n- ScopeSelectDialog（缴存范围选择）zs-table 未设 table-tr 时默认约10行固定高度，叠加搜索与分页超弹窗可视高度被裁切。修复：表格外包 scope-select-table-wrap 绑 :table-tr=\"listTableTr\"，ResizeObserver 动态算行数，onOpen/getTable/tabClick 刷新；布局表格区 flex:1 min-height:0，搜索分页 flex-shrink:0。涉及文件 company/depositNotice/.../ScopeSelectDialog.vue 等；所属项目：园区公共收益；来源会话 773efa7a-31cf-4846-a29c-73b73be85156；代码基线 0abcb96。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue、zhi2-web-admin/src/views/building/building/detail.vue、zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue。\n- 所属项目：园区物管2.0；来源会话：929d6385-61c5-4f3f-bea0-a34f4b6d5432；代码基线：d7a305a44。\n- 验证：008.md 会话 929d6385 新增组件与属性，14 处弹窗统一改造，v-show 防跳动、固定 720px 内部滚动。",
+                "after": "# 楼盘表选择弹窗统一约定\n所有涉及楼盘表选择的弹窗（14处）Tab切换时高度跳动、内容撑破弹窗，需统一公共组件与弹窗属性固定尺寸。\n\n## 现象与根因\n- 楼幢详情、房屋拆分/合并、业主自治表决范围、维修资金缴存范围ScopeSelectDialog、收益管理等14处弹窗切换「列表视图/楼盘表视图」时高度跳动、内容撑破弹窗\n- 各弹窗独立实现Tab切换，v-if切换导致面板重建、尺寸随内容浮动，缺乏统一尺寸约束\n\n## 解决方案\n- 抽公共组件BuildingTableViewTabs.vue：zs-tabs type=\"line\"，文案「列表视图/楼盘表视图」，两面板v-show切换保留DOM防高度跳动\n- 内容区固定高度，表格/楼盘表超出时在面板内部滚动\n- zs-select-dialog新增building-table-mode属性：宽80%（最大1300px）、高固定720px、左右分栏自适应、内容区不撑开弹窗\n- owner/company版ScopeSelectDialog的v-if改v-show；新增同类弹窗直接复用\n\n## 已知缺陷与修复\n- BuildingTableViewTabs列表视图分页裁切：表格区min-height与分页栏合计超panel min-height且overflow:hidden，分页只露上半截。修复：flex链表格容器min-height:0，表格区flex:1内滚，分页flex-shrink:0+padding-bottom；zs-select-dialog右侧补display:flex列。文件BuildingTableViewTabs.vue、zs-select-dialog.vue、DecisionRangeTable.vue；会话e0c9e026；基线0abcb96\n- ScopeSelectDialog（缴存范围选择）zs-table未设table-tr时默认约10行固定高度，叠加搜索分页超弹窗可视高度被裁切。修复：表格外包scope-select-table-wrap绑:table-tr=\"listTableTr\"，ResizeObserver动态算行数，onOpen/getTable/tabClick刷新；布局表格区flex:1 min-height:0，搜索分页flex-shrink:0。文件company/depositNotice/.../ScopeSelectDialog.vue等；会话773efa7a；基线0abcb96\n\n## 关联信息\n- 涉及文件：zs-select-dialog.vue、building/detail.vue、accountOpen/owner/components/ScopeSelectDialog.vue\n- 所属项目：园区物管2.0；来源会话929d6385；基线d7a305a44\n- 验证：会话929d6385新增组件与属性，14处弹窗统一改造，v-show防跳动、固定720px内部滚动"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

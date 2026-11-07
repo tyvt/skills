@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_057",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T14:49:15.671688+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/publicnotice_title_center_fix.md",
+                "memory_type": "entities",
+                "after": "# 双晒类别列表标题垂直居中修复\n苏住房C(zhi2-mobile-shimin)小程序中双晒公示页类别卡片标题垂直居中问题已修复。\n\n## 问题根因\n- 卡片仅设上内边距 `padding: 32rpx 0 0 32rpx`，内容偏上\n- 标题与箭头图标纵向堆叠，标题无法相对卡片高度居中\n\n## 修复方案\n- 卡片改为 `flex` 布局，上下内边距对称(`32rpx`)\n- 左侧区域固定 `128rpx` 高度(与右侧图标一致)\n- 标题在箭头上方空间内通过 `align-items: center` 垂直居中\n- 箭头图标绝对定位在左下角，不影响标题居中\n\n## 验证与归属\n- 四个类别卡片(物业服务合同、物业服务计划、公共收益收支、维修资金使用)标题上下居中\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`pages_main/publicNotice/index.vue`\n- 来源会话ID：0ec624e9-b4c9-406a-8cb8-9a62616cca2e；代码基线none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/stockhouse_loadmore_fix.md",
+                "memory_type": "entities",
+                "after": "# 库存房列表加载与请求失败修复\n苏住房C(zhi2-mobile-shimin)小程序中 `stockHouse/index.vue` 与 `hooks/useLoadMore.js` 的列表加载与请求失败处理已修复。\n\n## 问题根因\n- `getList` 使用手写 `new Promise`，`.then` 里抛错会导致 Promise 挂死\n- 结构异常时 `.map` 抛错；无效 `computed.list` 读取本页从未写入的 store\n- 请求失败时 `pageNum` 白占一页且 `status` 卡在 `loading`\n\n## 修复方案\n- `stockHouse/index.vue` 的 `getList` 改为 `async/await`，使用 `res?.result?.records ?? []`、`res?.result?.total ?? 0`，统一 `return { ...res, rows, total }`\n- 删除无效 `computed.list` 及对 `houseStore` 的引用(模板实际用 `useLoadMore` 的 `list`)\n- `hooks/useLoadMore.js` 为 `fn()` 增加 `.catch`：请求失败时将 `pageNum` 减回、把 `status` 置回 `'more'`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`stockHouse/index.vue`、`hooks/useLoadMore.js`\n- 来源会话ID：c9de4a3c-a1a8-45ce-b4b9-2a181a353c95；代码基线none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/basecard_click_fix.md",
+                "memory_type": "entities",
+                "after": "# 自定义组件点击无响应修复\n苏住房C(zhi2-mobile-shimin)小程序中因微信小程序 `@click` 绑在自定义组件 `baseCard` 上不触发，导致列表项点击无响应，已修复。\n\n## 问题根因\n- 微信小程序里 `@click` 绑在自定义组件 `baseCard` 上不会触发，事件未传到跳转逻辑\n\n## 修复方案\n- `baseCard.vue` 根节点绑定 `@tap` 并 `emit('click')` / `emit('tap')`，使所有使用 `base-card` 的页面都能响应点击\n- `ListContractIndex.vue` / `ListIndex.vue` 将 `@click` 改为 `@tap`(与 `bankList.vue`、`HalfCard.vue` 写法一致)\n\n## 验证与归属\n- 点击「物业服务合同」列表项跳转到 `/pages_owner/company/info/contracts`\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`baseCard.vue`、`ListContractIndex.vue`、`ListIndex.vue`\n- 来源会话ID：3aa806fa-2f71-4575-9cb6-ed1ea81e5795；代码基线none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/typechoose_pagebg_fix.md",
+                "memory_type": "entities",
+                "after": "# 业主端户型选择页背景拉伸修复\n苏住房C(zhi2-mobile-shimin)小程序业主端 `TypeChoose` 页因 `PageBg` 组件铺满父容器，导致 `Bg.svg` 顶部横幅被拉成全屏，已修复。\n\n## 问题根因\n- `Bg.svg` 为 375×190px 顶部横幅，但 `PageBg` 默认 `position: absolute; inset: 0; object-fit: cover` 铺满父容器\n- `.type-container` 设 `flex: 1` 占满整屏，蓝色背景被拉成全屏\n\n## 修复方案\n- 参考 `house/index.vue` 的 `.top-empty` 做法，用固定高度 `.type-bg`(`380rpx`，即 190px)包裹 `PageBg`，背景只显示在顶部，下方保持 `$uni-bg-color` 白色\n\n## 验证与归属\n- 预期效果：顶部蓝色渐变横幅，下方白底卡片区域\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`house/index.vue`、`TypeChoose.vue`、`TypeChoose_Suzhufang.vue`、`TypeChoose_Jiayuanqu.vue`\n- 来源会话ID：1d447664-822a-4688-ab03-ac7488c5ab2d；代码基线none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

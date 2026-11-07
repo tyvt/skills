@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_039",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:50:41.184689+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/localorg_three_state.md",
+                "memory_type": "entities",
+                "after": "# 本地非本地二态流程的isLocalOrganization三值判定\n苏住房G项目中同一业务需同时服务本地机构与非本地机构（如市住建）两套流程，isLocalOrganization 必须是「是/否/未返回」三态，不能把 undefined 塌缩成布尔。\n\n## 问题背景\n- 苏州V3 同一批公司/人员详情页同时服务本地机构与市住建等非本地机构，两类主体各有 busCode（本地码→*XQFBD 非本地码）\n- isLocalOrganization 是「是/否/还没拿到」三态，undefined 与 false 合并处理（如 if(!isLocalOrganization) return localBusCode）会把未返回字段永久锁在本码\n- 详情异步返回前用默认码发起提交/审批会打错流程，也不能把 undefined 当成「非本地」\n\n## 解决方案\n- mapper 三个分支显式分开：true→localBusCode；false→LOCAL_TO_NON_LOCAL_BUS_CODE[localBusCode]||localBusCode；undefined/null/''→优先保留 route.meta.busCode，否则回退 localBusCode\n- 与后端约定详情 DTO 必返 isLocalOrganization（'0'|'1'），data()/detailCallback 显式保留，不能被 getForm 白名单/归一化过滤掉\n- 详情 loading 结束前用 v-if=\"!loading\" 禁用 OperationBtnGroup 内提交/审批，消除错误编码窗口\n- busCode 变化后靠 :key 重建审批状态；mixin.flowBusCode→详情页:bus-code→OperationBtnGroup→ZsSubmit/zs-approval/流程查看\n\n## 与已知差异及验证\n- 区别于已知 #295/#404/#445/#857/#939（只讲要件与流程 busCode 同源、按 formMode/业务态 resolve），本条补主体维度二态分流+三值判定+异步窗口封锁\n- 验证：会话 9c8f0d10 审查 HIGH「isLocalOrganization 为 undefined 时强制走本地码」「详情 form 侧未见契约」「加载前存在错误 busCode 操作窗口」\n- 涉及文件：src/utils/localOrganizationFlow.js、mixins/localOrganizationFlowMixin.js、mixins/approval.js、components/OperationBtnGroup/index.vue、components/zs-approval/index.vue、ApprovalProcessDialog.vue、views/company/companyManagement/components/detail.vue、companyRegister/detail.vue、staffManagement/components/detail.vue\n- 所属项目：苏住房G；来源会话：9c8f0d10-8555-4605-9555-1d8641db8e16；代码基线：3192070"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/change_schema_tableid.md",
+                "memory_type": "entities",
+                "after": "# 变更列表复用新增schema须白名单过滤并bump tableId\n苏住房G项目中 propertyContractChange（变更列表）复用 contract info schema 后，请求侧残留旧字段且缓存未失效，须按 schema 白名单过滤并升版 tableId 做缓存击穿。\n\n## 问题背景\n- 变更列表从专用 isAddListPage 逻辑扩展为与新增列表共用 contract info schema（isContractInfoSchema 统一 formItems/columns/initDict/listCallback）\n- 筛选字段由 contractStatus+recordTimeStart/End 换成 hasFilingForm 等新字段\n- listMixins created 按路由 path 合并 cachedSearchParams 回 queryParams，getQueryParams() 把整个 queryParams（含残留旧字段）原样发接口\n- 表现：UI 已换新筛选项，请求仍带旧参数做隐性过滤，列表结果莫名变少且极难排查\n\n## 解决方案\n- getQueryParams()（或合并缓存后）按当前 schema 白名单过滤，contract info schema 下显式剔除 contractStatus、recordTimeStart、recordTimeEnd\n- 给变更列表 tableId 升版（property_propertyContract…_v2，仅 BUSINESS_TYPE.CHANGE 使用），换缓存空间让旧缓存自然失效\n- 上线时清理对应 route 的 cachedSearchParams\n- ADD 默认 bizState:'2'（已备案），CHANGE 不默认；CHANGE 旧版有「业务状态」列，contract info schema 无，若产品需要需在 columns 分支补 bizState 并确认 ADD 同步\n\n## 与已知差异及验证\n- 区别于已知 #930（只记 listMixins 搜索缓存残留已删除字段），本条补根因（缓存按路由 path 合并+全量发送）与 tableId 版本号第二道解法\n- 验证：会话 4dc38163 审查 HIGH「变更列表路由搜索缓存带旧 schema 字段」；聚焦项结论表确认 tableId _v2 仅 CHANGE 使用、CHANGE 不默认 bizState:'2' 且含 hasFilingForm\n- 涉及文件：views/property/propertyContract/components/index.vue、enums.js、mixins/listMixins\n- 所属项目：苏住房G；来源会话：4dc38163-ebfe-4eb0-bebf-f3851a071ec1；代码基线：3192070"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/shared_list_btn_text.md",
+                "memory_type": "entities",
+                "after": "# 多套同类规则共用列表组件时按钮文案须从枚举派生\n苏住房G项目中业主自治-规约管理下管理规约/议事规则/工作规则三套规则共用同一列表组件，按钮中文名写死导致串味，须从类型枚举派生。\n\n## 问题背景\n- 管理规约/议事规则/工作规则三套规则共用 src/views/autonomy/regulation/components/index.vue，靠路由传入 regulationType 区分\n- 列表顶部「已备案XX」按钮写死成「已备案管理规约」，导致议事规则/工作规则页也显示「已备案管理规约」\n- 项目中文名已集中放 enums.js（VERSION_TYPE/REGULATION_TYPE/REGULATION_NAME），组件另写字面量必然漂移\n\n## 解决方案\n- 从 enums.js 引 REGULATION_TYPE、REGULATION_NAME，用 getKeyByValue(REGULATION_TYPE, this.regulationType) 取枚举 key，再查 REGULATION_NAME 得中文名，兜底返回「规约」\n- 包成 computed（regulationName），按钮用模板字符串 label:`已备案${this.regulationName}`\n- 只改文案，权限标识与跳转逻辑一律不动（备案详情/变更页本就按 regulationType 动态生成）\n\n## 与已知差异及验证\n- 区别于已知 #856/#734（只讲列表页标题从路由 meta.title 读取），此处标题在业务枚举里，需 getKeyByValue+名称枚举查表\n- 排查指引：遇「A 菜单名出现在 B 菜单」先确认是否共用组件，再 grep 组件中文字面量\n- 验证：会话 ba726002 用户反馈按钮名错误；修复落唯一硬编码处，node --check 通过；三套规则分别显示已备案管理规约/议事规则/工作规则\n- 涉及文件：views/autonomy/regulation/components/index.vue、enums.js、discuss/final/index.vue、work/final/index.vue、regulation/final/index.vue\n- 所属项目：苏住房G；来源会话：ba726002-0b18-413d-9066-a944320c62c9；代码基线：9e5c499"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/autogen_field_deadlock.md",
+                "memory_type": "entities",
+                "after": "# 自动生成禁止编辑字段遇历史空值会死锁须读originForm\n苏住房G项目中用户管理新增「账号类型」自动生成而禁用编辑，但历史数据该字段为空，编辑时字段既禁用又必填导致整张表单无法保存。\n\n## 问题背景\n- 用户管理新增「账号类型」后因关联用户编码自动生成而设为「编辑态禁用」\n- 历史数据该字段为空，编辑用户时字段既禁用又必填，整张表单无法保存\n- 根因：禁用条件用当前表单值，必填校验是规则常量，两者对「空」判定不同源\n\n## 解决方案\n- 禁用判定改「仅当原始数据已有值才禁用」：编辑模式按 this.originForm.accountType 是否为空决定禁用，add 模式永不禁用\n- 下拉选项分档：add 或「编辑且原始值为空」用可选项字典 sys_account_type，有值时切只读展示全集字典 sys_account_type_all\n- 抽 isAccountTypeEmpty 同时判 null/undefined/空串/纯空格，避免「一个空格」绕过\n- 关键顺序：detailCallback 里把 originForm 赋值移到所有表单字段处理完成之后，否则禁用门控先读到空 originForm\n\n## 与已知差异及验证\n- 比已知「accountType='4' 禁止编辑」更深一层：那条只讲取值，本条讲空值历史数据下的可编辑性门控\n- 验证：用户报历史数据账号类型空致无法编辑保存；改为按 originForm 判空、选项按空切换字典、originForm 赋值后移\n- 涉及文件：views/system/user/detail.vue、mixins/detailMixins.js\n- 所属项目：苏住房G；来源会话：08df6a66-6dbe-4a03-8d68-a6fa9506abe6；代码基线：44d6576"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

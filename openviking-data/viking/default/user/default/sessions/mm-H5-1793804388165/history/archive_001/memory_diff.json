@@ -1,0 +1,42 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-H5-1793804388165/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T15:02:59.422553+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/iframe_plugin_inject.md",
+                "memory_type": "entities",
+                "before": "# 插件未注入iframe子页失效\n页面在 iframe 中渲染，脚本仅注入主页面未进子 frame 致插件不生效，需配置 all_frames 注入（含 about:blank 子页）。\n\n## 问题根因\n- 页面在 iframe 中渲染，脚本仅注入主页面未进入子 frame\n- 导致插件在子页不生效\n\n## 修复方案\n- 插件需配置 all_frames 注入（含 about:blank 子页）\n\n## 验证与归属\n- 验证证据：src=H5/001.md\n- 涉及文件：@混淆图片.html\n- 来源会话：6ecaed5d-de7a-48b4-9f19-36f8045db884；代码基线：none",
+                "after": "# 插件未注入iframe子页失效\n页面在 iframe 中渲染，脚本仅注入主页面未进子 frame 致插件不生效，需配置 all_frames 注入（含 about:blank 子页）。\n\n## 问题根因\n- 页面在 iframe 中渲染，脚本仅注入主页面未进入子 frame\n- 导致插件在子页不生效\n\n## 修复方案\n- 插件需配置 all_frames 注入（含 about:blank 子页）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=H5\n- 涉及文件：@混淆图片.html\n- 来源会话：6ecaed5d-de7a-48b4-9f19-36f8045db884；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/benefit_mock_switch.md",
+                "memory_type": "entities",
+                "before": "# benefit页加mock开关排查列表不显示\n在 src/pages/benefit/index.vue 增加 USE_MOCK 开关，开启直显模拟数据以排查列表不显示问题源于接口或 z-paging 渲染/样式层。\n\n## 修改内容\n- 在 src/pages/benefit/index.vue 增加 USE_MOCK 开关\n- 开启后直显模拟数据以排查问题\n\n## 排查目标\n- 定位列表不显示问题源于接口或 z-paging 渲染/样式层\n\n## 验证与归属\n- 验证证据：src=H5/001.md\n- 涉及文件：src/pages/benefit/index.vue\n- 来源会话：b3b6701e-0df0-4f87-983e-b6c426eb20fc；代码基线：none",
+                "after": "# benefit页加mock开关排查列表不显示\n在 src/pages/benefit/index.vue 增加 USE_MOCK 开关，开启直显模拟数据以排查列表不显示问题源于接口或 z-paging 渲染/样式层。\n\n## 修改内容\n- 在 src/pages/benefit/index.vue 增加 USE_MOCK 开关（const USE_MOCK = false 改为 true 开启）\n- 开启后直接显示 12 条模拟数据（不走接口）；改回 false 恢复走真实接口\n- 开启 mock 仍不显示，说明问题在 z-paging 渲染/样式层（容器高度、slot/滚动区域、组件版本配置）\n- mock 能显示而接口不显示，则把 res.rows 兼容成 res.data.rows / res.data.list 等返回结构\n\n## 排查目标\n- 定位列表不显示问题源于接口或 z-paging 渲染/样式层\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=H5\n- 涉及文件：src/pages/benefit/index.vue\n- 来源会话：b3b6701e-0df0-4f87-983e-b6c426eb20fc；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/getdictlabel_type_fix.md",
+                "memory_type": "entities",
+                "before": "# getDictLabel 类型兼容修复避免 find is not a function\n无锡锡山业主决策H5 中 getDictLabel 对 options 类型假设过严，导致 detail.vue 渲染报错。\n\n## 问题根因\n- src/utils/index.ts 的 getDictLabel 原假设 options 为数组，其他类型触发 find is not a function\n- detail.vue 拿到的字典数据结构不一致时渲染报错\n\n## 解决方案\n- 支持 options 直接为数组（原有场景）\n- 支持 options 为对象且字典在 options.data 或 options.list\n- 其他类型一律回退为空数组，避免 find is not a function\n\n## 验证与归属\n- 涉及文件：src/utils/index.ts、src/pages_ownerV2/elect/detail.vue\n- 所属项目：无锡锡山业主决策H5；来源会话：3164adcd-5fdf-440f-a10b-0dfd4c2797b0；代码基线：none",
+                "after": "# getDictLabel 类型兼容修复避免 find is not a function\ngetDictLabel 对 options 调用 .find() 必须是数组，字典接口返回 data 为对象时触发报错，已用 normalizeDictList 统一成数组修复。\n\n## 问题根因\n- src/utils/index.ts 的 getDictLabel 对第二个参数调用 .find()，它必须是数组\n- 字典接口返回的 data 可能是对象（常见 {rows:[...]} 或包一层 list），赋值给 stateOptions/businessTypeOptions 后，模板执行 getDictLabel(detailInfo.state, stateOptions) 时第二个参数是普通对象，没有 .find，压缩后报 t.find is not a function\n- 与 decisionBusinessTypeList 等为 null 无直接关系；详情页用单独请求的字典接口，只要返回的 data 不是数组就会炸\n\n## 解决方案\n- 在 src/utils/index.ts 增加 normalizeDictList：把 data 统一成数组（支持直接数组，以及常见字段 rows / data / records / list）\n- getDictLabel 里先用 normalizeDictList(options) 再 .find()\n- 其他类型回退空数组避免报错\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=H5\n- 涉及文件：src/utils/index.ts（无锡锡山业主决策H5 另见 src/pages_ownerV2/elect/detail.vue）\n- 所属项目：H5（另见于 无锡锡山业主决策H5）；来源会话：ccfe1852-05a9-47a2-add7-5f4e21296652（另见 3164adcd-5fdf-440f-a10b-0dfd4c2797b0）；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/benefit_api_only.md",
+                "memory_type": "entities",
+                "before": "# benefit页移除mock后列表仅走接口\n在 src/pages/benefit/index.vue 删除 USE_MOCK_LIST、mockRows 等 mock 逻辑，列表数据仅请求 pubQuarterlyDeclaration 接口，失败维持 paging.value.complete(false)。\n\n## 修改内容\n- 在 src/pages/benefit/index.vue 删除 USE_MOCK_LIST、mockRows 等 mock 逻辑\n- 列表数据仅请求 pubQuarterlyDeclaration 接口\n\n## 失败处理\n- 请求失败维持 paging.value.complete(false)\n\n## 验证与归属\n- 验证证据：src=H5/001.md\n- 涉及文件：src/pages/benefit/index.vue\n- 来源会话：66666cff-f4cc-497a-bea8-ef223cd4cb3c；代码基线：none",
+                "after": "# benefit页移除mock后列表仅走接口\n在 src/pages/benefit/index.vue 删除 USE_MOCK_LIST、mockRows 等 mock 逻辑，列表数据仅请求 pubQuarterlyDeclaration 接口，失败维持 paging.value.complete(false)。\n\n## 修改内容\n- 在 src/pages/benefit/index.vue 删除 USE_MOCK_LIST、mockRows 等 mock 逻辑\n- 删除 queryList 中开发环境直接返回 mock + 失败回退 mock 的逻辑\n- 删除 getDict(\"benefit_quarter\") 的兜底季度数据（属于 mock/兜底逻辑一并移除）\n- 列表数据仅请求 pubQuarterlyDeclaration 接口\n\n## 失败处理\n- 请求失败维持 paging.value.complete(false)\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=H5\n- 涉及文件：src/pages/benefit/index.vue\n- 来源会话：66666cff-f4cc-497a-bea8-ef223cd4cb3c；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 4,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房后端-1793629176805/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T14:23:22.147784+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/local_nacos_register_disable.md",
+                "memory_type": "entities",
+                "after": "# 本地批量启动多后端须禁 Nacos 注册\n本地一次性启动 12 个后端服务时必须加 spring.cloud.nacos.discovery.register-enabled=false，否则会注册进团队共用 Nacos 命名空间污染同名服务。\n\n## 问题根因\n- 本地一次性启动 common-gateway(8080)、common-framework(9211)、data-property(9603)、zhi2-property(9604)、zhi2-maintenance(9605)、zhi2-autonomy(9606)、zhi2-credit(9616)、zhi2-external(9701)、zhi2-benefit(9803)、zhi2-evaluation(9608)、service-expand(9610)、common-flowable(9700) 共 12 个实例时，不加参数会自注册进 Nacos\n- 这些服务连团队共用命名空间（如 suzhou-shiqu-suzhufang-v2），环境里已跑着 172.10.1.1 上的同名服务\n- 本地实例注册后同名服务列表多出本机地址，网关负载均衡随机转发，请求打到本地机器，表现为「同事的环境莫名跑着我的代码」，极难定位\n\n## 解决方案\n- 本地启动统一带 spring.cloud.nacos.discovery.register-enabled=false，一并规避只注册不发现的问题\n- 端口规划固定成表（8080 网关 + 9603~9803 业务服务），一次起 12 个不冲突\n- 启动后逐个核对端口 LISTEN（12 个全在）再谈「服务可用」\n- 联调前跟同组人打招呼这条纪律，避免别人环境被本地实例污染\n- 启动参数留档（哪几个模块、哪些端口、关了注册），方便复现同一套本地环境\n\n## 验证与归属\n- 验证：会话 2010156f（基线 02900b8）用户诉求初始化所有子模块并启动检查，最终结论「12/12 全部在跑」并主动决策 12 个实例带 register-enabled=false 启动，给出 12 个端口与服务对应表\n- 涉及文件：common-gateway、common-framework、data-property、service-expand 等 12 个模块\n- 来源会话ID：2010156f-5fb3-49c1-859a-daa3a63a94f2；代码基线：02900b8"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

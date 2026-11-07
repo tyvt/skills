@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793663675616/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T00:04:31.549178+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/g_regiontree.md",
+                "memory_type": "entities",
+                "after": "# G端区域树平铺与重置根节点\n园区公共收益项目 G 端 RegionTreeLayout 默认平铺，重置与切换模式均锚定根节点 parentDeptId，避免清空查全量。\n\n## 默认平铺\n- `table.js` 的 `init()` 中，当 `terminalType !== 'B'` 且页面使用 RegionTreeLayout 时，平铺开关 `value` 初始化为 `true`。\n- 平铺模式下左侧树不渲染，组件 `created` 时静默请求树接口缓存根节点 ID 供初始化与重置使用。\n\n## 首屏延迟\n- 调整 `shouldDeferListForRegionTree()`：G 端无论树状还是平铺，均等根节点上下文就绪后再 `getList`，避免 `parentDeptId` 为空请求错参。\n\n## 重置与切换语义\n- G 端 `resetQuery()` 调用 `regionTreeLayout.reset()`，不清空 `parentDeptId` 查全量。\n- `RegionTreeLayout.reset()`：平铺模式设 `parentDeptId` 为根节点 ID 并刷新；树状模式重载树选中根节点经 `handleTreeReady` 同步。\n- 切换平铺/树状时 likewise 用根节点 ID 而非清空。\n\n## 关联信息\n- 与已知 `shouldDeferListForRegionTree`、`切换模式清专属筛选` 条目互补，本条为 G 端具体实现。\n- 涉及文件：zhi2-web-admin/src/mixins/table.js、RegionTreeLayout.vue、listMixins.js、area.js。\n- 所属项目：园区公共收益；来源会话：eda03875-a0d0-4d2a-9f99-12390cefe15c；代码基线：ba114dc。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/selectdialog_landplot.md",
+                "memory_type": "entities",
+                "after": "# 楼幢弹窗禁止跨宗地多选\n园区公共收益项目楼幢授权类弹窗要求单次仅选一个宗地下的楼幢，通过 `clearSelectionOnTreeChange` 与提交校验实现。\n\n## 配置与行为\n- 在 `zs-select-dialog-func` / SelectDialog 增加配置 `clearSelectionOnTreeChange: true`。\n- 点击左侧切换宗地时清空右侧表格勾选与内部 `selection`。\n\n## 提交校验\n- 点确定时校验已选行 `landPlotId` 必须与当前左侧宗地一致。\n- 不一致提示「不允许跨宗地选择楼幢，请重新选择」并清空勾选。\n\n## 涉及入口与字段\n- 入口示例：`property/complex/components/rangeTable.vue`、`complexChange/components/rangeTable.vue`、`complex/detail.vue`。\n- 接口行数据需带 `landPlotId`/`landPlotName` 等宗地字段供校验与汇总文案。\n- 所属项目：园区公共收益；来源会话：fed5c973-84de-4f18-adfd-4d38f2f4dcd8；代码基线：86a4227。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/operlog_dataid_jump.md",
+                "memory_type": "entities",
+                "after": "# 操作日志关联单据跳转\n园区公共收益系统操作日志列表关联单据列绑定 `dataId`，仅当同时存在 `dataId` 与 `menuPath` 时渲染可点链接跳业务详情。\n\n## 列与搜索收敛\n- 保留序号、IP、操作人、操作时间、操作类型、操作模块、关联单据；去掉日志编号、请求方式、操作状态及操作列。\n- 搜索区合并为操作人、操作时间范围、操作类型、操作模块。\n\n## 跳转条件\n- 关联单据列绑定 `dataId` 展示；仅有 `dataId` 无 `menuPath` 显示普通文本，需后端补 `menuPath` 才能跳转。\n- 同时存在 `dataId` 与 `menuPath` 时渲染链接，点击路由到对应业务详情（如 `formMode: view`）。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/system/operlog/index.vue。\n- 所属项目：园区公共收益；来源会话：1b7f5e8f-ac1f-4935-9652-385023facdc9；代码基线：ba114dc。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/subdialog_disabled_inject.md",
+                "memory_type": "entities",
+                "after": "# 详情页子表弹窗取消按钮禁用级联\n园区公共收益 Vue2 + Element UI 详情页将子表移出 zs-form 后，嵌套弹窗 footer 按钮仍可能因 inject 链继承查看态 disabled。\n\n## 现象与根因\n- 经营资源租赁合同详情查看态下，广告位等子表弹窗「取消」按钮呈禁用，但弹窗内无独立 form。\n- Element UI 的 el-button 通过 inject 读取祖先 el-form 的 disabled；子表虽渲染在 zs-form 闭合标签后，Vue 组件树仍是详情页子孙节点，disabled 仍传到弹窗 footer 按钮。\n\n## 修法与排查\n- 仅把子表块移出 zs-form 不够，需对齐同业务已验证页面（如 assetLeaseApply/detail）的挂载位置与组件边界。\n- 排查沿「详情 zs-form disabled → 子表 → 子弹窗 footer el-button」看 inject 链，不要只在弹窗模板找 form。\n\n## 关联信息\n- 涉及文件：benefit/resourcesLeaseContractFiling/detail.vue、assetLeaseApply/detail.vue、assetLeaseApply/components/subAdvertiseDialog.vue。\n- 所属项目：园区公共收益；来源会话：8b780ae8-507b-43c5-a453-8d14ffb784a3；代码基线：Vue2 + Element UI + zs-form 详情页。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

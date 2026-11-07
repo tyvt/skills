@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_025",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:09:30.469778+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/guarantee_remark_hidden.md",
+                "memory_type": "entities",
+                "after": "# 房屋质量保证金详情备注查看态整行不显示\n房屋质量保证金管理详情页维护备注保存后，查看态整行不显示，由 contentInfo 的 visible 短路与 detailCallback 只取 summary 两处根因叠加导致。\n\n## 问题现象\n- 维护备注并保存后，查看态看不到备注，且无任何报错\n- 只修 visible 或只修 detailCallback 任一处都不生效\n\n## 根因\n- contentInfo 该字段配了 visible: !!this.form.remark，备注为空时整行不渲染，回填未拿到 remark 则整行消失\n- detailCallback 只解构 response.data.summary 赋给 form，而接口把 remark 放在 data 根节点，导致 remark 被丢掉\n\n## 解决方案\n- 查看态不用 visible 做「有值才显示」，改为始终渲染，空值交给 DetailTemplate 显示（与结算账户等模块一致）\n- detailCallback 合并 summary 与根级字段再赋给 form，不要只取一层子对象\n- 若保存侧漏字段，补显式 getForm() 把该字段写进提交体\n\n## 排查与归属\n- 同类「查看态某字段没了」固定按三层顺序查：visible 条件 → detailCallback 取值层级 → getForm 字段白名单\n- 已知 #919 讲 contentInfo 的 add() 过滤空值、#941 讲取了没写回 form，均未覆盖本条两个具体根因\n- 涉及文件：guaranteeDepositAccount/detail.vue、detailMixins.js、detail-template.vue\n- 所属项目：产品2.0；来源会话：3faac03b-5c75-454c-a0d1-79ae56a3ac95；基线：a5e7e78"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/v3_normalize_add.md",
+                "memory_type": "entities",
+                "after": "# V3拦截器把编辑POST补成/add导致打到新增接口\n流程配置弹窗点编辑保存时，Network 出现 POST /flowable/flowConfig/add 而非更新接口，表现为「编辑当成新增」。\n\n## 问题现象\n- 源码写 $put('/flowable/flowConfig')，发出去却是 POST /flowable/flowConfig/add\n- 新增与编辑命中同一地址，后端按新增处理，编辑数据被当新增\n\n## 根因\n- V3 的 $post 补丁与 normalizeV3ApiUrl 是链式改写\n- 第一段把非安全白名单的 $put 一律降级成 POST\n- 第二段对「两段路径 + POST」统一补 /add 动作后缀\n\n## 解决方案\n- 不要用 $put 表达更新；新增留 $post('/flowable/flowConfig') 靠规范化补成 /add\n- 编辑必须显式写全动作 $post('/flowable/flowConfig/update')，末段已是动作则不再被补\n- 改完用 normalizeV3ApiUrl 跑一遍确认最终 URL 后才交付\n\n## 排查与归属\n- 同类「编辑打了 add」先看目标路径是否两段：两段 + POST 必然被补 /add，改成三段或直接写全动作\n- 验证：$post('/flowable/flowConfig') → /add；$post('/flowable/flowConfig/update') → /update\n- 涉及文件：ConfigDialog.vue、table.js、utils(normalizeV3ApiUrl)\n- 所属项目：产品2.0；来源会话：db0afc1e-0b50-40e1-afa6-15d8133f8ee0；基线：62d5fb9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_proxy_slash.md",
+                "memory_type": "entities",
+                "after": "# Vite代理context缺前导斜杠导致永远匹配不上\n产品2.0 后端接口全部 404/返回前端首页，改目标地址、重启都无效，根因是代理 context 缺前导斜杠。\n\n## 问题现象\n- 后端接口全部 404 或返回前端首页，看起来像「代理失效」\n- VITE_APP_BASE_API 写成 api/v2.0（无前导 /）时，代理规则永远不命中\n\n## 根因\n- Vite 用 doesProxyContextMatchUrl → req.url.startsWith(context) 判定命中\n- 浏览器 req.url 必以 / 开头，而 context 为 'api/v2.0' 时 '/api/v2.0/xxx'.startsWith('api/v2.0') 恒为 false\n- 请求被当成前端静态资源处理\n\n## 解决方案\n- 在 vite.config.js 的 loadEnv 后加 normalizeProxyContext(baseApi)：trim、去尾 /、不以 / 开头则补上，再注册为代理 key\n- baseApi 为空时回退 /api/v2.0；改完必须重启 npm run dev（Vite 仅启动时读配置）\n- VITE_APP_PROXY_ADDRESS 不带端口走 80，后端在 :8080/:9605 须写完整 host:port\n\n## 排查与归属\n- 与已知「env 被 .env.development.local 覆盖」是不同根因，两者分别排查\n- 涉及文件：vite.config.js、env/.env\n- 所属项目：产品2.0；来源会话：317d62ff-fec1-4cf3-a02d-1ac604d82396；基线：5a86102"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/workorder_type_wrapper.md",
+                "memory_type": "entities",
+                "after": "# 工单报事/报修两个菜单共享index/detail加orderType薄包装\n工单列表只有 order/index.vue 与 detail.vue 一套，需拆出「报事」(orderType=1) 与「报修」(orderType=2) 两个独立菜单，用共享组件 + 薄包装套路避免复制漂移。\n\n## 问题背景\n- 工单列表只有 order/index.vue 与 detail.vue 一套，需要拆两个独立菜单页面\n- 复制两份会立刻漂移；项目已有 article 模块成熟做法（父组件 type prop + 子目录薄包装）\n\n## 解决方案\n- order/components/enums.js 定义 ORDER_TYPE.REPORT='1'/REPAIR='2'，禁止页面写字面量\n- 共享 index.vue/detail.vue 增加 orderType prop，在 getQueryParams() 注入，按类型切换标题/列名/权限前缀/分类接口 categoryType\n- report/index.vue、repair/index.vue、report/detail.vue、repair/detail.vue 只做薄包装，import 共享组件并钉死 orderType\n- AddOrderDialog 加 orderType prop，弹窗标题/表单标签随类型变化，提交体带 orderType\n\n## 配套约束\n- 路由必须指向 report/index 与 repair/index，不能指向 order/index，否则 listMixins 默认 handleView 跳到 order 详情页\n- 原有 handleView 里的「待开发」提示要删掉，交还给 listMixins\n\n## 验证与归属\n- 用户明确点名参考 article 用法；改造后 report/repair 引用 order 的 index/detail，区分 1=报事 2=报修\n- 涉及文件：order/index.vue、order/detail.vue、report/index.vue、repair/index.vue\n- 所属项目：产品2.0；来源会话：d004f28a-5899-46e7-af27-f1b3531c2289；基线：42b6033"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

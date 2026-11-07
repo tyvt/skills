@@ -1,38 +1,38 @@
-# OpenViking 用户 data 快照（知识层）
+# OpenViking data 全量快照（记忆质量相关）
 
-本目录是 `%USERPROFILE%\.openviking\data\viking\default\user\default\` 的 **Git 备份**，与运行时 VikingFS **不是符号链接**；恢复时需复制回对应路径并由 OpenViking 服务重载 / 重建索引。
+本目录镜像 `%USERPROFILE%\.openviking\data\` 中**影响记忆抽取、检索与上下文质量**的部分，提交到 `tyvt/skills` 做异地版本备份。**非符号链接**；恢复时复制回 `~/.openviking\data\` 对应路径并重启 OpenViking 服务。
 
-## 包含（影响记忆质量）
+## 包含
 
 | 路径 | 说明 |
 |------|------|
-| `viking/.../memories/` | 实体 / 事件 / 偏好等长期记忆 `.md` |
-| `viking/.../peers/*/memories/` | 按仓库 peer 分区的记忆 |
-| `viking/.../.overview.md`、`.abstract.md` | 用户根摘要 |
+| `viking/default/user/default/**` | **整棵用户树**：`memories/`、`peers/`（含各 peer 记忆）、`sessions/`（DSH 镜像原文，抽取输入）、`skills/`、`resources/`、`privacy/`、`.overview.md`、`.abstract.md` |
+| `vectordb/**` | 向量索引（检索质量与重算成本） |
+| `viking/default/backend_meta.json` | 后端元数据（若存在） |
 
-## 故意不包含
+## 不包含（运行时噪声）
 
 | 路径 | 原因 |
 |------|------|
-| `sessions/` | DSH 会话原文镜像（~120MB），可由本地会话重新镜像 |
-| `data/vectordb/` | 向量索引，可由 embedding 从 `.md` 重算 |
-| `data/_system/` | SQLite 运行时锁/队列 |
+| `data/_system/` | SQLite 锁/队列，无知识价值 |
+| `data/.openviking.lock` | 进程锁 |
+| `pending/`、`state/` | 导入队列与进程状态 |
 
-若还需 **会话原文** 灾备，请单独备份 `sessions/` 或 DSH `~/.dsh/sessions/`。
+## 与 `openviking-memory/`
 
-## 与 `openviking-memory/` 的区别
-
-- **`openviking-memory/`**：仅 `memories/` 扁平快照（历史约定，便于 diff）。
-- **`openviking-data/`**：完整用户知识树 + **peers**，更贴近磁盘真源，利于整树恢复。
+- **`openviking-memory/`**：仅 `memories/` 扁平副本，便于人工 diff。
+- **`openviking-data/`**：**全量质量相关 data**（含 sessions + vectordb），用于灾备与整树恢复。
 
 ## 同步
 
 ```powershell
 cd D:\repository\skills
-node .\scripts\snapshot-openviking-data.mjs
 node .\scripts\snapshot-openviking-data.mjs --commit --push --reason manual
+node .\scripts\snapshot-openviking-memory.mjs --commit --push --reason manual
 ```
 
-可与 `snapshot-openviking-memory.mjs` 同跑；导入大批量结束后建议两者都 `--commit --push`。
+导入大批量或质量治理后建议两者都跑。元数据：`.snapshot-meta.json`。
 
-元数据：`.snapshot-meta.json`。
+## 体积说明
+
+典型约 **200MB+**（含 sessions 与 vectordb）。推送较慢属正常；仓库已用 `.gitattributes` 将 `*.ldb` 等标为 binary。

@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793820561401/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T19:39:54.087081+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/sfb_face_auth_json_fix.md",
+                "memory_type": "entities",
+                "after": "# 苏服办人脸识别回调JSON字符串修复\n苏服办SDK的success回调返回JSON字符串而非对象，导致人脸识别被误判失败，已在sfbFaceAuth.js修复。\n\n## 问题根因\n- 苏服办SDK的success回调返回JSON字符串（如{\"retcode\":\"000000\",\"msg\":\"认证成功\"}）而非对象\n- 原代码直接读data.retcode得到undefined，被误判为失败\n\n## 修复方案\n- sfbFaceAuth.js新增normalizeSfbFaceResponse：若返回值为字符串先JSON.parse再判断\n- isSfbFaceSuccess满足retcode==='000000'或msg==='认证成功'任一即视为成功\n- 识别成功后正常走goBdc()并带verifyResult=true跳转不动产授权页\n\n## 验证与归属\n- 所属项目：无锡市区小程序嵌入H5；来源会话：9641a1de-5bbe-4afe-a7ab-487324afb826\n- 涉及文件：src/utils/sfbFaceAuth.js、src/pages/face/bdc.vue、src/pages/face/face.vue\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/wx_override_guard_fix.md",
+                "memory_type": "entities",
+                "after": "# 全局wx对象被覆盖的双层防护修复\nuni-app会向window.wx写入空对象覆盖苏服办JSSDK，导致wx.miniProgram不可用，已用守卫脚本与二次恢复修复。\n\n## 问题根因\n- uni-app在启动时向window.wx写入{}，覆盖苏服办JSSDK注入的真实wx\n- 导致wx.miniProgram.navigateTo等方法丢失，人脸识别流程报错\n- wx.miniProgram仅微信小程序web-view内有效，普通浏览器或苏服办APP原生容器无此方法\n\n## 修复方案\n- index.html内联守卫脚本（主防护）：苏服办JSSDK之后、应用主包前安装；监听window.jWeixin赋值；Object.defineProperty拦截window.wx在uni-app写入{}时保留真实JSSDK；轮询等待jweixin异步加载\n- src/utils/restoreWeixinWx.js + src/main.ts二次恢复：应用启动后再调用restoreWeixinWx()作为兜底\n\n## 验证与归属\n- 验证方式：重新部署dist后在微信webview控制台执行wx.miniProgram应有navigateTo等方法\n- 所属项目：无锡市区小程序嵌入H5；来源会话：718e1271-a4de-433f-9316-5f9d2f58fafe\n- 涉及文件：index.html、src/utils/restoreWeixinWx.js、src/main.ts\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/shared_funds_query_time.md",
+                "memory_type": "entities",
+                "after": "# 共有资金查询明细查询时间取值模式\n共有资金查询明细的查询时间与账户余额直接取自accountStatistics接口，不再用本地冗余状态兜底。\n\n## 数据来源\n- 查询时间取自bankAccountUpdateTime\n- 账户余额取自bankBalanceAmount\n- 二者均来自/benefit/app/accountStatistics/{projectId}接口返回\n\n## 交互逻辑\n- 点击「查询明细」→调用getBenefitList→请求accountStatistics/{projectId}→更新benefitInfo\n- 页面通过accountInfo（即benefitInfo）直接读取bankAccountUpdateTime与bankBalanceAmount\n- 查询时间格式化为YYYY.MM.DD HH:mm:ss展示\n\n## 优化点\n- 已去掉本地冗余状态\n- 已去掉bankReceiptDetail的兜底取值，完全依赖accountStatistics接口返回\n\n## 验证与归属\n- 所属项目：无锡市区小程序嵌入H5；来源会话：ff85538f-d398-42e4-ba21-d4efd07edadb\n- 涉及文件：src/pages_benefit/sharedFunds/components/OverviewTab.vue、src/api/sharedFunds.js、src/pages_benefit/sharedFunds/index.vue\n- 代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

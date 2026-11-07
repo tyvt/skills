@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793872912374/history/archive_019",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T11:06:01.430640+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dept_list_rewrite_fix.md",
+                "memory_type": "entities",
+                "after": "# 部门管理页旧接口重写修复\n产品2.0 中部门管理页展开子部门时仍请求旧接口 `system/dept/list`，原因是懒加载路径缺少前导 `/`，`portalApiRewrite` 无法匹配重写规则。\n\n## 问题根因\n- 懒加载请求路径 `system/dept/list` 缺少前导 `/`，`portalApiRewrite` 重写规则无法匹配，导致请求旧接口而非 `/portal/dept/list`\n\n## 修复方案\n- `portalApiRewrite.js` 新增精确映射 `/system/dept/list` → `/portal/dept/list`，并在重写前自动补全前导 `/`，避免 `system/dept/list` 这类路径漏匹配\n- `dept/index.vue` 修正 `load()` 中的请求路径，统一为 `/${moduleName}/${businessName}/${apiSuffix}`\n\n## 验证与归属\n- 验证：刷新部门管理页后，展开子部门应请求 `/portal/dept/list?parentId=100`，不再请求 `/system/dept/list?parentId=100`\n- 涉及文件：src/utils/portalApiRewrite.js、src/views/system/dept/index.vue、src/utils/request.js、src/mixins/subTableMixins.js、src/mixins/table.js\n- 所属项目：产品2.0；来源会话：06d23df6-d9e0-472b-bdcb-895195ece6ab；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/platformconfig_getdetail_skip.md",
+                "memory_type": "entities",
+                "after": "# 平台配置页 getDetail 必需参数守卫跳过请求\n产品2.0 中平台配置页因重写了详情接口（无需 id 的 `/system/platformConfig/getInfo`），触发 `form.js` 的 `getDetail()` 必需参数守卫，导致请求被跳过并打印警告。\n\n## 问题根因\n- `form.js` 混入的 `getDetail()` 通过 `validateDetailRequiredParams()` 校验必需参数，默认要求 `id` 存在\n- 平台配置页重写了详情接口 `detailApiFull` 返回 `/${moduleName}/${businessName}/getInfo`（无需 id），路由里没有 id，导致 `this.id` 为 `undefined`，校验失败跳过请求\n\n## 修复方案\n- 平台配置页需覆盖 `getDetailRequiredParams()` 以适配无 id 的 getInfo 接口，或在守卫中放行该场景\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=产品2.0\n- 涉及文件：src/mixins/form.js、src/views/system/platformConfig/detail.vue\n- 所属项目：产品2.0；来源会话：aac565c5-b02e-4808-812b-4d72d0017085；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/getbykey_param_override.md",
+                "memory_type": "entities",
+                "after": "# apiV3Normalize getByKey 参数名覆盖修复\n产品2.0 中 `getByKey` 接口请求体参数名错误，原因是 `ByKey` 规则优先将其推断为 `key`，`ACTION_PATH_PARAM_KEYS` 里的 `getByKey: 'configKey'` 映射走不到。\n\n## 问题根因\n- `getByKey` 会先被 `ByKey` 规则推断成 `key`，导致 `ACTION_PATH_PARAM_KEYS` 里的 `getByKey: 'configKey'` 映射根本走不到，请求体参数名错误\n\n## 修复方案\n- 将映射加到优先级更高的 `ACTION_PARAM_KEY_OVERRIDES`：`getByKey: 'configKey'`，其他如 listHouseGroupByFloor: 'buildingId'、getContentDetailById: 'complexServiceDetailId'、getPatrolPackage4ManageById: 'patrolPackageId'\n- 验证后请求体变为 `{\"configKey\": \"qq.map.key\"}`\n\n## 验证与归属\n- 验证：请刷新页面或重启 dev server 后再试\n- 涉及文件：src/utils/apiV3Normalize.js、src/api/system/config.js、src/utils/tencentMapKey.js\n- 所属项目：产品2.0；来源会话：8dceac0c-7274-47ed-980f-09eb44a4fd17；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/appendix_config_code_fix.md",
+                "memory_type": "entities",
+                "before": "# 附件字段名 appendixConfigCode 修正\n前端误用 configAppendixCode 而后端实体为 appendixConfigCode，已在表单与 normalizeAppendixConfig 统一改为输出 appendixConfigCode 并兼容旧字段。\n\n## 问题根因\n- 前端误用 configAppendixCode，而后端实体字段为 appendixConfigCode，导致字段名不匹配\n\n## 解决方案\n- FjDialog.vue 等表单及 companyRegister.js 的 normalizeAppendixConfig 统一改为输出 appendixConfigCode\n- 兼容旧字段，请求体使用 appendixConfigCode\n\n## 涉及文件\n- d:/repository/产品2.0/zhi2-web-admin/src/api/company/companyRegister.js 与 register/components/Step3Appendix.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/views/tool/fjflpz/components/FjDialog.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/views/register/components/RegisterUploadItem.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/views/benefit/components/AnnexUploadDialog/index.vue\n- d:/repository/产品2.0/zhi2-web-admin/e2e/fixtures/register-mocks.js\n\n## 验证与归属\n- 验证证据：extracted source=cursor session=a81708f2-6b5e-407d-830f-ba4b0d31b6bc\n- 代码基线：none",
+                "after": "# 附件字段名 appendixConfigCode 修正\n前端误用 configAppendixCode 而后端实体为 appendixConfigCode，已在表单与 normalizeAppendixConfig 统一改为输出 appendixConfigCode 并兼容旧字段。\n\n## 问题根因\n- 前端误用 configAppendixCode，而后端实体字段为 appendixConfigCode，导致字段名不匹配\n\n## 解决方案\n- FjDialog.vue 等表单及 companyRegister.js 的 normalizeAppendixConfig 统一改为输出 appendixConfigCode\n- 兼容旧字段，请求体使用 appendixConfigCode，示例：`{\"appendixConfigCode\": \"company_register_license\"}`\n\n## 涉及文件\n- d:/repository/产品2.0/zhi2-web-admin/src/api/company/companyRegister.js 与 register/components/Step3Appendix.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/views/tool/fjflpz/components/FjDialog.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/views/register/components/RegisterUploadItem.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/views/benefit/components/AnnexUploadDialog/index.vue\n- d:/repository/产品2.0/zhi2-web-admin/e2e/fixtures/register-mocks.js\n\n## 验证与归属\n- 验证证据：extracted source=cursor session=a81708f2-6b5e-407d-830f-ba4b0d31b6bc\n- 代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

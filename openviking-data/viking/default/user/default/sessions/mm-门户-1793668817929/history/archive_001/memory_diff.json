@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793668817929/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T01:21:37.898967+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/门户技术/portal_card_header_clip.md",
+                "memory_type": "entities",
+                "after": "# 门户首页卡片丝带标题被裁半\n门户首页（index-new 类卡片）出现标题贴底只剩一半字，根因是 card-header 的 overflow:hidden 与白底 card-body 叠层。\n## 问题现象\n- 标题伸出 header 盒外被裁切，叠上 .card-body 白底后像被内容区盖住。\n- 验收可用 Playwright 断言标题文字完整落在 header 盒内。\n## 修复做法\n- .card-header 改为 overflow: visible 并抬高 z-index（如 3）。\n- .card-header-tab 用不对称内边距把字收进丝带厚区。\n- .card-header-text 可用 translateY(dw(-3)) 微调垂直位置。\n- .card-body 恢复四边 padding 与标题区留白。\n## 验证与归属\n- 会话 36da1bfd 最终结论：原因 .card-header 用了 overflow:hidden，叠上 card-body 白底后标题下半截被裁掉。\n- 已改 overflow:visible、z-index:3、tab 内边距 4/14/11、translateY(dw(-3))、card-body padding dw(14)；Playwright 加 header 盒内断言 2 passed。\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue、zhi2-web-admin/tests/e2e。\n- 所属项目：门户；代码基线：04586c4；来源会话ID：36da1bfd-d85e-47d1-a0e0-3a2d922f74ca。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/门户技术/portal_pdf_window_open.md",
+                "memory_type": "entities",
+                "after": "# Vite 开发环境用 window.open 打开 public 下 PDF 落到 index.html\n门户 UnifiedLogin 等 hash 路由页面里，直接 window.open 打开 public 下 PDF 在 Vite dev 常被当成 SPA 导航回 index.html。\n## 问题现象\n- 点击预览仍是页面而非 PDF，URL 带上 #/UnifiedLogin?redirect=...。\n- 同路径 fetch 却能拿到 content-type: application/pdf。\n## 修复做法\n- 先 fetch PDF → URL.createObjectURL 在新标签打开。\n- 弹窗被拦则在当前页用 blob 打开，不要回退到静态路径导航。\n- E2E 断言响应为 application/pdf、当前 hash 路由未误开弹层。\n## 验证与归属\n- 会话 b92385ab：用户反馈点击预览仍是页面；根因 Vite 下 window.open 按页面导航处理。\n- 改为 fetch+blob URL，unified-login-visual.spec.ts 6/6 通过。\n- 涉及文件：zhi2-web-admin/src/views/home/UnifiedLogin.vue、publicPortal/pages/InformationPages.vue、tests/e2e/unified-login-visual.spec.ts。\n- 所属项目：门户；代码基线：dfee5a6；来源会话ID：b92385ab-4138-464e-904b-5e1850ffa89d。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/门户技术/portal_detail_header_pattern.md",
+                "memory_type": "entities",
+                "after": "# 门户 publicPortal 详情弹窗统一 Header/Footer 与标签列宽\n首页开业信息公示等 publicPortal 弹窗抽公共 PortalDetailHeader/Footer，统一标签列宽与间距。\n## 做法要点\n- 抽 PortalDetailHeader（标题左对齐、灰底、高 57px）与 PortalDetailFooter（按钮居右、80×40、距右 40px）。\n- 字段区长地址等独占一行；标签列宽按该列最长标签定宽，标签与值间距统一 12px。\n- 样式收敛在 portal.scss，去掉与公共组件重复的标题栏规则，修正正文 padding 重复叠加。\n- 改 DOM 后同步 public-portal-interactions.spec.ts 回归。\n## 验证与归属\n- 会话 session_bcf22123：用户要求地址单独一行、标签值间距过大、首页弹窗排查 header/footer。\n- 交付 RentalDetailDialog 改布局、新增 PortalDetailHeader/Footer、portal.scss 去重、更多/公告弹窗改用公共 header；e2e 与 build 通过。\n- 涉及文件：RentalDetailDialog.vue、PortalDetailHeader.vue、PortalDetailFooter.vue、portal.scss、public-portal-interactions.spec.ts。\n- 所属项目：门户；代码基线：dfee5a6；来源会话ID：session_bcf22123674b5cdf5bb7fdb1484b1568。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/门户技术/portal_operation_guide_visual.md",
+                "memory_type": "entities",
+                "after": "# 门户操作指引页视觉回归独立 Playwright 配置\n操作指引多页按设计稿验收，使用独立 Playwright 配置、设计图 fixtures 与区域掩膜。\n## 做法要点\n- 设计 PNG 入库 tests/e2e/fixtures/operation-guide-designs/，跑 npm run test:e2e:operation-guide（视口 1920×1080、DPR 2）。\n- 设计图 Lanczos 缩到 CSS 尺寸，截图 ÷2 后 pixelmatch（threshold=0.1、includeAA=false），相似度门槛 95%。\n- Banner 插画未定稿时顶栏与 Banner 区两侧置白；备案查询页淡蓝插画归一化为白；heightDelta 负常是设计画布底部留白。\n- 轮播图替换 public/assets/images/operationGuide/banner_*.jpg 或 config/operationGuideBanners.js 追加 { src }。\n## 验证与归属\n- 会话 session_e82fa10a：9 张设计图视觉比对均 ≥95%，16 用例全过。\n- 涉及文件：playwright.operation-guide.config.ts、fixtures/operation-guide-designs、config/operationGuideBanners.js、config/operationGuideContent.js、public/assets/images/operationGuide。\n- 所属项目：门户；代码基线：dfee5a6；来源会话ID：session_e82fa10a2d53a413d9975e6ae6524bd0。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

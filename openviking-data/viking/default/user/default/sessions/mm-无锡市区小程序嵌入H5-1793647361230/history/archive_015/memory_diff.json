@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793647361230/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T19:46:38.143655+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/h5context_init_race.md",
+                "memory_type": "entities",
+                "after": "# 小程序web-view内H5的localStorage恢复与异步init竞态\n切换小区后web-view URL参数已更新，但H5页仍显示旧小区名或houseId与名称错位，需h5Context同步URL并await whenH5ContextReady。\n\n## 问题根因\n- userStore启动从uni.getStorageSync('user')恢复上次选房\n- App.vue的initH5Context/refreshH5Context异步拉房屋列表，子页onLoad立即读store常在初始化完成前请求\n- URL已带houseId时若走applyProjectSelection可能把houseId改成该小区第一套房\n\n## 解决方案\n- utils/h5Context.js进入时同步把URL的complexId、houseId、name写入store\n- 提供whenH5ContextReady()与getH5Selection()（优先URL）\n- App.vue的onLaunch/onShow均调refreshH5Context()（切换小区重开web-view时重同步）\n- 业务页（如维修资金）在onShow里await whenH5ContextReady()后用getH5Selection()取参，勿单独信任可能过期的store\n\n## 验证与归属\n- 验证会话：400a262f-e497-46ec-9234-87e452dc4641（基线fb55fa9），用户反馈切换小区后URL正确但数据相反\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js、src/App.vue、src/pages_owner/maintain/index.vue、src/pages/index/useProjectState.js\n- 所属项目：无锡市区小程序嵌入H5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/projectaddress_fallback.md",
+                "memory_type": "entities",
+                "after": "# 小程序嵌入H5只写project/projectName时公共收益地址显示-的修复\n嵌入场景未同步regionName等导致benefit页projectAddress为空或显示-，须setProjectInfo与projectAddress多级回退。\n\n## 问题根因\n- 嵌入场景App.vue曾只写project/projectName，未通过setProjectInfo/applyHouseSelection/applyProjectSelection同步regionName、subdistrictName、communityName、address等\n- benefit/index仅在找不到当前小区时才setProjectInfo，找到时未同步导致projectAddress仍空\n- 部分页误用不存在的userStore.constructionNo/roomNo\n\n## 解决方案\n- 有token时initH5Context拉getMyHouseList，按URL的houseId/complexId调用applyHouseSelection或applyProjectSelection（逻辑与newHome.vue一致，可抽到useProjectState.js）\n- projectAddress显示优先区划拼接，其次userStore.address，再从houseList取当前小区房屋\n- 页面onShow在字段仍空且已登录时重复拉房屋/小区接口补全\n- 楼栋展示用userStore.address（楼栋-单元-房号格式），勿引用未定义store字段\n\n## 验证与归属\n- 验证会话：ba74b018-bf87-4283-b5cd-cdbfcdac22a7、c484b1ef-d8e5-4052-a213-4476498f8145（基线0804e57），用户报benefit/elevatorPubEngCons字段未赋值或projectAddress为-\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/App.vue、src/pages/index/useProjectState.js、src/pages_benefit/benefit/index.vue、src/pages_benefit/elevatorPubEngCons/index.vue、src/store/user.js\n- 所属项目：无锡市区小程序嵌入H5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/scrollview_bank_section.md",
+                "memory_type": "entities",
+                "after": "# 共有资金查询明细展开下方区域scroll-view滚动修复\n总览页点查询明细后银行流水与账户余额在下方展开，但外层scroll-view不滚动，用户误以为页面没变化，需用scroll-into-view带动画滚到bank-section。\n\n## 问题根因\n- 总览页点「查询明细」后银行流水与账户余额在下方展开，但外层scroll-view不滚动，用户仍停在原位置\n\n## 解决方案\n- 子组件为展开区设固定id（如bank-section），查询完成并渲染后$emit('scroll-to-bank')\n- 父页scroll-view开启scroll-into-view与scroll-with-animation，收到事件后将目标设为该id\n- 重复点击时需先清空scrollIntoView再赋值，否则同一id无法再次触发滚动\n\n## 验证与归属\n- 验证会话：fd9f5f4e-e4c8-42f5-a93d-27c3c6883bde（基线6aeee0b），用户要求自动滑到底显示账户余额\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/OverviewTab.vue、src/pages_benefit/sharedFunds/index.vue\n- 所属项目：无锡市区小程序嵌入H5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/external_maintenance_house.md",
+                "memory_type": "entities",
+                "after": "# 业主维修资金首页走external/maintenanceHouse双步接口\npages_owner/maintain/index.vue的维修资金链路是GET /external/maintenanceHouse/getToken再POST /external/maintenanceHouse/getHouseInfo，非AppMaintain。\n\n## 接口链路\n- GET /external/maintenanceHouse/getToken取外部系统token\n- POST /external/maintenanceHouse/getHouseInfo，body含token与houseId（字符串）\n- 完整前缀为VITE_APP_API_BASE_URL或小程序注入的BASE_URL/api/v2.0\n- Toast「查询房屋信息失败」等多为后端返回的msg，经@/api/index.js拦截器统一弹出，表示外部维修资金系统按该房屋唯一号查不到数据\n\n## 区别与注意\n- 项目内另有/estate/AppMaintain/*（repair.js，如selectAccount）供其他维修资金列表/明细页使用，勿与当前H5首页混查\n- houseId示例H320214000001603\n\n## 验证与归属\n- 验证会话：a343d1aa-9a2b-44b9-9046-e30e130c5be6（基线38bd192），用户截图报错页对应maintain/index.vue\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/index.vue、src/api/repair.js、src/api/index.js\n- 所属项目：无锡市区小程序嵌入H5"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

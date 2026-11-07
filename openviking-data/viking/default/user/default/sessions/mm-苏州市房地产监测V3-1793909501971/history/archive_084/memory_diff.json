@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_084",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T00:38:47.841989+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_dialog_close_fix.md",
+                "memory_type": "entities",
+                "after": "# zs-dialog关闭按钮垂直居中修复\n苏州市房地产监测V3 全局修复 `zs-dialog` / `el-dialog` 标题栏关闭按钮（×）未垂直居中的问题。\n\n## 问题根因\n- `zs-dialog` 标题栏使用较大的 `--zs-dialog-padding-y`（32px），关闭按钮用 `top: var(--zs-dialog-padding-y)` 对齐上内边距，而非相对整条标题栏居中\n- 无标题时（如机构注册弹窗 `header=\"\"`）灰色标题区更高，偏移更明显\n- 关闭图标设置 `line-height: 1.5`，进一步拉偏视觉中心\n\n## 修改内容\n- `src/styles/element-ui.scss`（全局覆盖所有 `el-dialog` / `zs-dialog`）：标题栏 `position: relative`；关闭按钮 `top: 50%` + `translateY(-50%)` 并用 `inline-flex` 居中图标；关闭图标 `line-height: 1`\n- 例外：`.approval-dialog` 使用 flex 标题栏 + `position: static` 关闭按钮，重置 `top` / `transform` 避免二次位移\n- `src/components/zs-dialog/zs-dialog.vue`：去掉错误的 `top: var(--zs-dialog-padding-y)`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`src/styles/element-ui.scss`、`src/components/zs-dialog/zs-dialog.vue`、`PrintDialog.vue`、`ChangeLogDialog.vue`\n- 所属项目：苏州市房地产监测V3；来源会话ID：186a234b-b8c5-43be-8142-a0b0c30a7e10；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/register_appendix_cleared.md",
+                "memory_type": "entities",
+                "after": "# 查询暂存后要件附件被清空\n苏州市房地产监测V3 单页机构注册中，点击「查询」回填暂存单会导致本地已上传要件附件被清空。\n\n## 问题根因\n- 文件：`zhi2-web-admin/src/views/institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue`（578-625 行）\n- 单页注册合并后，用户可在尚未关联 `companyRegisterId` 时先上传要件\n- 点击「查询」回填暂存单时，`applyInitialRecord` 无条件调用 `loadAppendixPackage`，用服务端要件列表整体覆盖 `uploadedList` 与 `attachmentList`\n- 导致本次会话内已上传且尚未随注册单持久化的附件从界面和提交载荷中消失\n\n## 修复说明\n- 多步流程中要件上传发生在获得 `companyRegisterId` 之后，故不出现该顺序；单页重构把上传与查询放在同一页，但未在加载暂存要件时合并或保留本地已上传记录\n\n## 验证与归属\n- 类别：LOGIC_BUG；严重度：medium\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`zhi2-web-admin/src/views/institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue`\n- 所属项目：苏州市房地产监测V3；来源会话ID：10959bb2-382a-4576-ba66-7d409fabf99d；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/price_pattern_missing.md",
+                "memory_type": "entities",
+                "after": "# 网格最高备案均价校验pattern缺失修复\n苏州市房地产监测V3 中「网格最高备案均价」因引用未定义的校验 pattern 导致合法小数被误判。\n\n## 问题根因\n- 文件：`priceParameters/detail.vue` 使用 `this.patterns.twoNumber` 做格式校验\n- `@/patterns/index.js` 中一直未定义 `twoNumber`（同文件被引用的 `twoDecimalNumber` 也缺失）\n- 校验规则无效或不一致时，合法小数如 `10000.89` 仍提示「请输入正确数字」\n- 同目录价格备案页面（如 `recordPriceMngSuzhou`）对类似数字字段使用 `this.patterns.numeral`\n\n## 修改内容\n- `src/patterns/index.js`：补充 `twoNumber`、`twoDecimalNumber`（非负数，最多两位小数），修复存量、协议等页面引用\n- `priceParameters/detail.vue`：将「网格最高备案均价」格式校验改为 `this.patterns.numeral`，与同模块其它价格字段一致；`10000.89`、`10000`、`0.5` 等均可通过\n\n## 验证与归属\n- 验证：重新编译/刷新后，在「价格备案参数维护」填 `10000.89` 失焦或保存验证\n- 涉及文件：`priceParameters/detail.vue`、`@/patterns/index.js`、`src/patterns/index.js`\n- 所属项目：苏州市房地产监测V3；来源会话ID：2543dc3c-a272-4323-8d7b-c3aed6515a71；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/annex_upload_align.md",
+                "memory_type": "entities",
+                "after": "# 要件上传组件与标题栏左对齐修复\n苏州市房地产监测V3 修复上传图片组件虚线框比标题文字更靠左的对齐问题。\n\n## 问题根因\n- 标题栏有 12px 左内边距，但上传框之前贴在整列最左边，虚线框比「* / 文字」更靠左\n\n## 修改内容\n- 增加 `requirement-column`，标题和上传区在同一列里排版\n- 上传区用 `margin-left: 12px`（与标题栏 `padding-left` 相同），让虚线框左边与标题文字（含 `*`）起点对齐\n- 标题栏最小宽度与缩略图列宽一致，并去掉 `el-upload` 列表可能带来的额外外边距\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementCard.vue`、`zhi2-web-admin/src/styles/appendix-requirement-grid.scss`\n- 所属项目：苏州市房地产监测V3；来源会话ID：01e8df3d-6c81-47b3-9085-07a3082b51b9；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

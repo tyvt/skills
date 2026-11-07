@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793813941148/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T17:52:04.710826+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/decision_range_selectable.md",
+                "memory_type": "entities",
+                "after": "# 一般表决决策明细勾选与线下投票录入修复\n太仓G 一般表决详情「业主决策明细」标签下，决策明细行无法勾选且「线下投票录入」按钮禁用的问题已修复。\n\n## 问题根因\n- DecisionRangeTable.vue 复选框 `selectable` 错误绑定 `canEditRange`（仅草稿 `bizState==='0'` 可勾选）\n- 已提交表决 `bizState==='2'`，导致决策明细行无法勾选\n- 「线下投票录入」按钮因 `single` 恒为 `true` 而保持禁用\n\n## 修复方案\n- 新增 `isRowSelectable` 计算属性：草稿态（`canEditRange`）或已提交且表决进行中（`showSuccess && !voteDisabled`）即可勾选\n- 同步修复 optionDecision 模块中相同问题\n\n## 验证与归属\n- 验证：刷新页面，在「业主决策明细」→「决策明细」勾选记录，「线下投票录入」按钮可点击\n- 涉及文件：`decisionCommon/components/DecisionRangeTable.vue`、`optionDecision/detail.vue`、`optionDecision/components/DecisionRangeTable.vue`\n- 所属项目：太仓G；来源会话：1e824235-0e5e-44dd-9dc4-238cd6a1389a；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/general_kunshan_result.md",
+                "memory_type": "entities",
+                "after": "# 一般表决结论维护弹窗对齐昆山\n太仓G 已按昆山对齐「一般表决 → 表决结论维护」弹窗，主要差异均已修复。\n\n## 修复差异\n- NaN%：改用昆山同款 `ownerCalculationChart` 字段计算并加 `|| 0`，无数据显示 `0.00`\n- 字段：补「参与权数占比」；「同意占参与户数占比」改为「同意占参与权数占比」；参与/同意占比加民法典提示\n- 暂无数据：一般/维修资金表决不再渲染候选人表（仅业委会/监委会选举显示）\n- 按钮文案：改为「确认并推送APP」，成功提示与昆山一致\n\n## 验证与归属\n- 验证：刷新后重新打开「结果维护」核对\n- 涉及文件：`decisionCommon/components/MaintainResultDialog.vue`、`MaintainResultDialogLite.vue`、`decisionCommon/config.js`\n- 所属项目：太仓G；来源会话：b4e53b8e-164f-4672-9854-192edd804ed5；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/option_kunshan_result.md",
+                "memory_type": "entities",
+                "after": "# 选项表决结论维护弹窗对齐昆山\n太仓G 已修复选项表决「表决结论维护」弹窗与昆山不一致的问题，修正占比计算字段。\n\n## 问题根因\n- 占比计算误用 `actualTotal`、`notVote`、`totalAreaAll` 等字段\n- `ownerCalculationChart` 实际返回昆山同款字段（`voteHouseNum`、`totalHouseNum`、`voteWeight`、`totalWeight`、`voteArea`、`totalArea`），导致 NaN 且缺「参与权数占比」\n\n## 修复方案\n- `MaintainResultDialogLite.vue` 新增「参与权数占比」字段\n- 按昆山逻辑修正三项占比：参与户数=`voteHouseNum/totalHouseNum*100`、参与权数=`voteWeight/totalWeight*100`、参与面积=`voteArea/totalArea*100`\n- 增加 `|| 0` 兜底避免除零显示 NaN\n\n## 验证与归属\n- 验证：刷新后重开「结果维护」弹窗，三项占比应与昆山一致\n- 涉及文件：`optionDecision/components/MaintainResultDialog.vue`、`ownerDecision/components/MaintainResultDialog.vue`、`decisionCommon/components/MaintainResultDialogLite.vue`\n- 所属项目：太仓G；来源会话：cde16b85-11ac-44ea-ab98-1f40f5fa5fb4；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/option_tab_layout.md",
+                "memory_type": "entities",
+                "after": "# 选项表决详情Tab切换表格布局修复\n太仓G 选项表决详情切到「投票信息」后表格体为空（分页有数据），因 el-table 列变化后未重新布局。\n\n## 问题根因\n- 复现路径：基本信息 → 表决项 → 投票信息，`showSearch`/`showVote` 变 true 多出「表决状态」「表决方式」等列\n- `getList` 已返回数据（86 条）但 el-table 未 `doLayout()`，表体高度 0 行不显示\n- 相比一般表决详情缺 tab 切换后的 `doLayout` 与 `pageNum` 重置逻辑\n\n## 修复方案\n- `optionDecision/detail.vue` 用 `div` 包裹 `DecisionRangeTable`，与一般表决详情结构一致\n- 增加 `:key=\"'decision-range-'+mainCardValue\"`，切换顶层 tab 强制重建表格\n- `handleMainTabChange` 切到「投票信息」重置 `cardValue` 并刷新\n- `refreshSubTabData` 重置 `pageNum`、调 `getList()` 与 `doLayout`\n\n## 验证与归属\n- 涉及文件：`optionDecision/detail.vue`、`DecisionRangeTable.vue`、`mixins/listMixins.js`、`ownerDecision/detail.vue`\n- 所属项目：太仓G；来源会话：642bb8f5-b288-4d41-8b2a-f3c3c981319f；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

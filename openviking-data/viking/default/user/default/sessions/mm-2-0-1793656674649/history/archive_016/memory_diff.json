@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793656674649/history/archive_016",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T22:22:51.018590+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/component_reuse_register.md",
+                "memory_type": "entities",
+                "after": "# 跨目录复用子组件必须 import 并注册\n在 Vue2/Options API 页面模板中使用 PascalCase/camelCase 自定义标签时，若未 import 并在 components 中注册，运行时会报 Failed to resolve component。\n\n## 问题根因\n- 从其他业务目录复用组件（如 company 下的 propertyContractTable.vue）必须在当前 SFC 显式 import 路径并注册。\n- 未注册时 Vue 无法解析组件，报错 Failed to resolve component，与是否原生 custom element 无关。\n\n## 解决方案\n- 在当前 SFC 中显式 import 组件路径，并在 components 选项注册后再使用。\n- 避免依赖全局注册或误认为原生 custom element。\n\n## 验证与归属\n- 验证证据：会话 1dad72c5：/toB/companyInfo 对应 companyRecord/detail.vue 使用 propertyContractTable 未注册导致解析失败。\n- 涉及文件：zhi2-web-admin/src/views/toB/companyRecord/detail.vue；zhi2-web-admin/src/views/company/companyManagement/components/propertyContractTable.vue\n- 所属项目：2-0；来源会话ID：1dad72c5-73f0-43c2-8c13-cda8490370ba；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/el_radio_value.md",
+                "memory_type": "entities",
+                "after": "# Element Plus el-radio 选中值改用 value\nElement Plus 弃用 el-radio / el-radio-button 用 label 表示选中值的写法（3.0 将移除），控制台会出现 [el-radio] label act as value is about to be deprecated。\n\n## 问题根因\n- Element Plus 2.x 中 el-radio / el-radio-button 使用 label 作为选中值会触发弃用警告。\n- 3.0 将移除该写法，需提前迁移。\n\n## 解决方案\n- 模板中将 label=\"1\"、:label=\"dict.dictValue\"、label=\"table\" 等改为对应的 value / :value。\n- 展示文案仍放在默认插槽内，不受影响。\n- 存量页面需全局搜 <el-radio 与 <el-radio-button 批量替换。\n\n## 验证与归属\n- 验证证据：会话 ed53b5d6：error.ts debugWarn useDeprecated；已在 flowable、system/menu、paymentChannel、maintenance/facility 等多处批量改 label→value。\n- 涉及文件：zhi2-web-admin/src\n- 所属项目：2-0；来源会话ID：ed53b5d6-854c-4ba8-8358-b4d73be5bd8b；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/playwright_chromium_spec.md",
+                "memory_type": "entities",
+                "after": "# Playwright 单用例仅跑 Chromium 命令\n在 zhi2-web-admin 目录对单个 spec 只使用 Chromium 项目：npx playwright test tests/e2e/<文件名>.spec.js --project=chromium。\n\n## 使用场景\n- 多浏览器项目在 playwright.config.js 中定义时，不加 --project 会跑全部浏览器。\n- 仅验证 Chrome 时需显式指定 --project=chromium。\n\n## 命令示例\n- 进入 zhi2-web-admin 目录执行：npx playwright test tests/e2e/navbar-sidebar-accessibility.spec.js --project=chromium。\n\n## 验证与归属\n- 验证证据：会话 ae02b45e：用户要 navbar-sidebar-accessibility.spec.js 仅 Chrome 测试。\n- 涉及文件：zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js；zhi2-web-admin/playwright.config.js\n- 所属项目：2-0；来源会话ID：ae02b45e-8b1c-42ef-ab79-e188825e8cee；代码基线：none。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_column_formatter.md",
+                "memory_type": "entities",
+                "before": "# zs-table-column must not pass string formatter to ElTableColumn\nWhen column config has `formatter: 'amountFormatter'`, `<zs-table-column v-bind=\"column\" />` passes the string into $attrs and forwards it to ElTableColumn, triggering `Expected Function, got String`.\n\n## Root Cause\n- zs-table-column uses `v-bind=\"column\"` for passthrough; the string formatter enters $attrs and is passed to ElTableColumn.\n- Even with `:formatter=\"formatters[attrs.formatter]\"`, the warning fires first.\n\n## Solution\n- In zs-table-column.vue, strip the string `formatter` from passthrough attrs.\n- Resolve via resolvedFormatter: use function directly, or map string to same-named export in @/formatters/index.js; only pass the function to ElTableColumn.\n\n## Verification & Attribution\n- Evidence: session ce31747c, maintenanceProject list formatter type warning.\n- Files: zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue, zhi2-web-admin/src/formatters/index.js\n- Project: 2-0; Source session: ce31747c-5502-4d03-83c2-364130d7d52d; Code baseline: none",
+                "after": "# ZsTableColumn 字符串 formatter 兼容与阻断透传\n在 zs-table-column 封装层中，若列配置的 formatter 为字符串，需从 @/formatters/index.js 取同名函数后传给 ElTableColumn，且禁止经 v-bind=\"attrs\" 透传字符串 formatter。\n\n## 问题根因\n- 动态列配置或历史代码可能把 ElTableColumn 的 formatter 写成字符串（如 formatter: 'amountFormatter'），Element Plus 只接受 Function，触发 Vue prop 类型告警 `Expected Function, got String`。\n- zs-table-column 使用 `v-bind=\"column\"` 透传，字符串 formatter 进入 $attrs 并转发给 ElTableColumn；即使绑定 `:formatter=\"formatters[attrs.formatter]\"` 警告仍先触发。\n\n## 解决方案\n- 在 zs-table-column.vue 中，若 formatter 为字符串，则从 @/formatters/index.js 取同名函数（resolvedFormatter），仅将函数传给 ElTableColumn。\n- 将字符串 formatter 从透传 attrs 中剔除，禁止经 `v-bind=\"attrs\"` 传给 ElTableColumn。\n- 列配置侧应逐步改为函数引用（如 `this.formatters.amountFormatter`）；后端返回的列配置可在生成阶段做名称到函数的映射。\n\n## 验证与归属\n- 验证证据：会话 ce31747c（maintenanceProject 列表 formatter 类型警告）；会话 667b9605（MaintenanceProject 等页告警 Expected Function, got String \"amountFormatter\"，修复 zs-table-column.vue 与 plot/index.vue 字符串用法）。\n- 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue；zhi2-web-admin/src/formatters/index.js；zhi2-web-admin/src/views/building/plot/index.vue。\n- 所属项目：2-0；来源会话ID：ce31747c-5502-4d03-83c2-364130d7d52d 与 667b9605-d636-4fd0-9033-f298688576f0；代码基线：none。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

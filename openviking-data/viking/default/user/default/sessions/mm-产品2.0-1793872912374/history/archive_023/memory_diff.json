@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793872912374/history/archive_023",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T11:15:25.920062+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/adspace_view_path.md",
+                "memory_type": "entities",
+                "after": "# 广告位查看路由路径错误修复\n产品2.0 公共查询详情页点击广告位列表「查看」时，因路由路径写错导致提示无权限，实为路径错误。\n\n## 问题原因\n- `advertiseTable.vue` 的 `handleView` 跳转路径误写为 `benefit/pubAdvertiseSpaceDetail/detail`\n- 项目中不存在该页面路由（`pubAdvertiseSpaceDetail` 只是子表 API，无独立详情页）\n- `getRouterPathByFilePath` 在授权菜单找不到路由时提示「没有授权相关菜单」，掩盖了真实路由错误\n\n## 修复要点\n- 正确路径应为 `benefit/pubAdvertiseSpace/detail` + 主键 + query formMode\n- 从菜单进入时 `listMixins` 使用 `${this.$route.path}/${id}` 即正确路径\n\n## 涉及文件\n- zhi2-web-admin/src/views/publicQuery/complex/components/advertiseTable.vue\n- zhi2-web-admin/src/views/publicQuery/complex/components/parkingTable.vue（同类参考）\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：产品2.0\n- 来源会话：36a17d3e-c6f3-43ee-ac8c-949fca0f9cbd"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/reserve_selection_fix.md",
+                "memory_type": "entities",
+                "after": "# 物业管理区域备案跨页保留选中修复\n产品2.0 物业管理区域备案列表全选含未备案数据点击同步时，因跨页保留选中导致校验失败。\n\n## 问题原因\n- `zs-select-column` 默认 `reserve-selection: true` 跨页保留选中\n- 第1页全选含未备案数据后翻页再全选，`this.ids` 仍含第1页未备案 ID\n- 点击「权利人信息同步」接口校验到未备案数据并提示\n\n## 修复要点\n- `complex/index.vue` 设置 `:reserve-selection=\"false\"`\n- 重写 `listCallback`，翻页/搜索加载新数据后调用 `clearSelection()`\n- 翻页后选中重置，同步只提交当前页实际选中数据\n\n## 涉及文件\n- zhi2-web-admin/src/views/property/complex/index.vue\n- zhi2-web-admin/src/mixins/listMixins.js\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：产品2.0\n- 来源会话：f30c7962-32af-468a-9d91-311b5e899302"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/user_add_goback_fix.md",
+                "memory_type": "entities",
+                "after": "# 用户管理新增保存后返回逻辑修复\n产品2.0 用户管理新增保存后点返回退到新增页而非列表页，因返回逻辑使用 history.go(-1)。\n\n## 问题原因\n- 新增保存后 `changeFormState` 从 `/system/user/add` 跳转到 `/system/user/{id}`（详情页）\n- 浏览器历史：列表页 → 新增页 → 详情页\n- `OperationBtnGroup` 的「返回」用 `$router.go(-1)` 只退到新增页\n\n## 修复要点\n- 返回逻辑与全局 `goBack` 对齐：去掉当前路径最后一段回到父路径（如 `/system/user/123` → `/system/user`）\n- 修改 `OperationBtnGroup/index.vue`\n\n## 涉及文件\n- zhi2-web-admin/src/components/OperationBtnGroup/index.vue\n- zhi2-web-admin/src/mixins/form.js\n- zhi2-web-admin/src/views/system/user/detail.vue\n- zhi2-web-admin/src/mixins/formComponents.js\n- zhi2-web-admin/src/mixins/detailMixins.js\n- zhi2-web-admin/src/main.js\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：产品2.0\n- 来源会话：65432183-de0d-46d6-bd78-1b5f9fc846c8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/download_template_json.md",
+                "memory_type": "entities",
+                "after": "# 下载模板接口JSON报错兼容修复\n产品2.0 下载账单模板接口报错时返回 JSON 被当作 Blob 处理，需兼容 JSON 错误响应。\n\n## 问题原因\n- `importTemplate` 使用 `responseType: 'blob'`\n- HTTP 4xx/5xx 时 axios 错误拦截器 `response.data` 为 Blob 读不到 `msg`\n- HTTP 200 但 body 为 JSON 错误时会误当 Excel 下载\n\n## 修复要点\n- `src/utils/request.js` 错误拦截器支持解析 Blob 中 JSON 展示 `msg`\n- `src/utils/index.js` 新增 `downloadBlobFileWithCheck` 下载前判断是否为 JSON 错误\n- `spFeeBill/components/import.vue` 的 `getTemplate` 改用该方法\n\n## 涉及文件\n- zhi2-web-admin/src/utils/request.js\n- zhi2-web-admin/src/utils/index.js\n- zhi2-web-admin/src/views/property/spFeeBill/components/import.vue\n- zhi2-web-admin/src/views/property/bill/components/import.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：产品2.0\n- 来源会话：3f404cf2-9522-42c1-aa00-9a2837b4eb10"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

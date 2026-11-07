@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_026",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:20:49.825745+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/long_name_dropdown.md",
+                "memory_type": "entities",
+                "after": "# 长名称下拉框截断修复\n行业管理-物业服务项目检查-分析报表的「扣分指标占比分析」切换检查表时，下拉选中名称被截断，需用弹性宽度+tooltip+内层撑满三件套解决。\n\n## 问题根因\n- 下拉框固定 width:220px，长名称必然溢出被省略。\n- zs-select/el-select 内层输入区不自动跟随外层宽度变化，仅放宽外层仍显示不全。\n\n## 解决方案\n- 外层宽度改 flex:1; min-width:220px; max-width:480px，占标题栏右侧剩余空间但不无限增长。\n- 新增 selectedAssessmentLabel 计算属性，用 el-tooltip 包裹 zs-select 悬停看全称，作为截断通用兜底。\n- .minus-assessment-input 设 width:100%，补 :deep 样式让内部 el-select 跟随外层宽度。\n- 适用面：任何「标题栏/工具栏右侧放承载长文本的下拉」都按弹性宽度+tooltip+内层撑满写，不给死宽度。\n\n## 验证与归属\n- 验证证据：会话 33479cb9（基线 a700def）切换检查表名称截断，改后 linter 无报错但构建因环境内存中断未做产物级验证，需人工多档考评切换确认。\n- 涉及文件：zhi2-web-admin/src/views/credit/assessment/components/minusScorePercentage.vue、analysisReport.vue、averageScoreAnalysis.vue。\n- 所属项目：苏住房G；来源会话ID：33479cb9-240b-4448-8a64-d699334a5f9c；代码基线：a700def"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/showsave_formmode.md",
+                "memory_type": "entities",
+                "after": "# 一键申报详情保存按钮显隐修复\n物业费申报页点「一键申报」进详情后「保存」按钮误显示，需将显隐判定收敛为仅看 formMode。\n\n## 问题根因\n- 原写法 showSave = formMode != 'view' && (formMode == 'edit' || active == 0)。\n- 一键申报进来 formMode=add 且 active=0，条件恒真，保存按钮一直显示。\n- active 是页内步骤下标，与业务形态无关，属「把视图状态当业务权限」典型误用。\n\n## 解决方案\n- showSave 收敛成 formMode == 'edit' 单一条件：新增只留「返回」「下一步」，编辑态显示保存，查看态不显示。\n- 新增落库继续由第一步「下一步」调用 submitForm() 完成，保存链路不动。\n- 通用约定：详情页顶栏按钮显隐（保存/提交/打印）一律只由 formMode + 业务状态决定，页内 active/step 等 UI 下标不得参与。\n\n## 验证与归属\n- 验证证据：会话 a1f996bc（基线 ad5bbd9）产品要求一键申报进详情去掉保存按钮，改 operation-btn-group showSave 为 \"formMode == 'edit'\"，行为 add 不显示、edit 显示、view 不显示。\n- 涉及文件：zhi2-web-admin/src/views/property/feeDeclare2/detail.vue、index.vue。\n- 所属项目：苏住房G；来源会话ID：a1f996bc-685b-423d-a130-f23d676a6962；代码基线：ad5bbd9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zstable_slot_div.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column 插槽根节点 div 致复杂列定宽截断\n综合查询页动态考评列列表头显示成「物业...」，因插槽用 div 被判定复杂列固定宽 80px，且动态列异步追加致错位。\n\n## 问题根因\n- zs-table-column 按插槽内容根节点判断复杂列，用 <div> 包裹即进复杂列分支，列宽固定约 80px，表头被截。\n- 动态列在 mounted 里异步追加、列表数据先渲染，造成表头与 tbody 列错位。\n- 与「窄屏列宽被省略/内容最宽优先」根因不同（那条在宽度测算算法），与「列宽抖动补三处重测」也不同（那条靠重测非 :key 重建）。\n\n## 解决方案\n- 插槽内换 <span> 渲染，按表头文字长度设 minWidth（至少 100），不写死 width。\n- 改为先加载完列配置再发列表请求，表格加 :key=\"tableColumnsKey\" 让列集合变化时整表重建，数据回填后调 doLayout()。\n- 考评周期等短文本列用 minWidth 100 而非固定 width 220，避免挤占剩余均分空间。\n\n## 验证与归属\n- 验证证据：会话 6c3d92d7（基线 864b409）用户反馈表头省略、表格错位，改 <span>+minWidth≥100、先加载列再请求数据+:key+doLayout、考评周期 width220→minWidth100。\n- 涉及文件：zhi2-web-admin/src/views/credit/assessment/search.vue。\n- 所属项目：苏住房G；来源会话ID：6c3d92d7-7d4f-47a5-a873-d3825a9cd6b4；代码基线：864b409"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/listmixins_post_method.md",
+                "memory_type": "entities",
+                "after": "# listMixins 切 POST 接口旁路请求同源\n综合查询多条件混合搜索接口换 pageNew 且只支持 POST，需页面声明 apiMethod:'post' 并让导出/打印校验共用同一请求方法。\n\n## 问题根因\n- 列表接口换 v2.0/property/complex/pageNew 仅支持 POST，listMixins 的 getList 用 this[`$${this.apiMethod}`] 自动走 $post。\n- 页面「导出/打印前先查一次数据校验」常自写 this.$get(...)，只改列表会留 GET 打 POST 接口的死路（405 或空数据），验收末尾才暴露。\n- 与已知 /list→/page 路径改造不同：本条是同路径下请求方法切换，风险点在导出、打印、统计等旁路调用。\n\n## 解决方案\n- 页面声明 apiMethod:'post'，列表自动走 $post，页面不必另写请求。\n- 导出、打印前的数据校验统一写成 this[`$${this.apiMethod}`]，与列表共用同一请求方法来源。\n- pageNew 参数结构不同，pageNum/pageSize 与条件字段一起核对，不能只改 apiMethod。\n\n## 验证与归属\n- 验证证据：会话 80913079（基线 26069c8）用户要求替换接口并确认 POST，增加 apiMethod:'post' 且导出打印校验改同源，实际请求 POST api/v2.0/property/complex/pageNew。\n- 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/index.vue、src/mixins/listMixins.js、src/mixins/table.js。\n- 所属项目：苏住房G；来源会话ID：80913079-78af-4fe5-b215-9a8e1583a91f；代码基线：26069c8"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

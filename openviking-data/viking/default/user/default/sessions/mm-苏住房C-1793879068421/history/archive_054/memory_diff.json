@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_054",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T14:40:54.957483+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/notice_list_pkg_fix.md",
+                "memory_type": "entities",
+                "after": "# 分包组件跨包引用限制修复（NoticeList）\n苏住房C 小程序因分包组件跨包引用限制导致 NoticeList 组件找不到，已将组件移至主包公共目录。\n\n## 问题根因\n- `Home_Jiayuanqu` 位于分包 `pages_tab`，`NoticeList` 原在分包 `pages_main/announcement/components/`\n- 分包 A 组件不能直接引用分包 B 组件，报错需配置 `componentPlaceholder`\n- 主包页面 `pages/index/temp` 已对 `home-jiayuanqu` 占位，但内部 `NoticeList` 仍跨分包引用失败\n\n## 修复要点\n- 将 `NoticeList` 移到主包公共组件目录 `src/components/NoticeList/NoticeList.vue`\n- 更新所有引用，导入路径统一为 `@/components/NoticeList/NoticeList.vue`\n- 涉及 `pages_tab/components/Home_Jiayuanqu.vue`、`pages_main/announcement/index.vue`、`pages_owner` 下 5 个公告相关页面\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：454c97fd-ca5c-4c7f-a2dd-54da7553d258\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/result_stat_path_fix.md",
+                "memory_type": "entities",
+                "after": "# ResultStatistics 资源路径与SVG修复\n苏住房C `ResultStatistics.vue` 因路径多写一级且 SVG 为空导致资源加载失败，已修复。\n\n## 问题根因\n- `ResultStatistics.vue` 位于 `pages_owner/decision/sort/`，`StepConfirm.vue` 位于 `pages_owner/decision/components/`\n- 资源实际在 `pages_owner/static/images/svg/flag-szf.svg`，应使用 `./../static/...` 而非 `../../../static/...`（后者指向不存在的 `src/static/...`）\n- `flag-szf.svg` 为 0 字节空文件\n\n## 修复要点\n- 修正路径为 `./../static/images/svg/flag-szf.svg`\n- 补充苏住房主题色（`#5583D0` → `#1354BE`）的排序旗帜图标到 `flag-szf.svg`\n- 设计稿有指定切图时可替换为正式资源\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`ResultStatistics.vue`、`StepConfirm.vue`、`pages_owner/static/images/svg/flag-szf.svg`\n- 来源会话ID：860e18b1-7843-41e3-a393-6d3279b805da\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/auth_build_fix.md",
+                "memory_type": "entities",
+                "after": "# 构建报错资源路径修复（authentication/publishHouse）\n苏住房C 因 `authentication.vue` 等资源路径解析到错误目录导致构建失败，已改为 `ZsImage` 并修正相对路径，构建通过。\n\n## 问题根因\n- `authentication.vue` 位于 `pages_owner/house/owner/`，模板用 `./../../static/images/szf/icon-checked.svg` 解析到 `src/static`，但文件实际在 `pages_owner/static/images/szf/`\n- Vite 打包找不到文件报错\n\n## 修复要点\n- `authentication.vue` 勾选图标 `<img>` 改为 `ZsImage`，与 `addTypeChoose.vue` 一致（项目约定：`ZsImage` + `/images/szf/...`）\n- `publishHouse/index.vue`：`warn.png` 在 `src/static/images/`，将 `../static` 改为 `./../static`；`yiwen.png` 仍在 `src/static`，继续用 `../../../static`\n- 本地执行 `npm run build:suzhufang` 构建通过\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`authentication.vue`、`addTypeChoose.vue`、`publishHouse/index.vue`\n- 来源会话ID：4f2dff10-9967-4330-9845-304bfa354448\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/radiogroup_color_mismatch.md",
+                "memory_type": "entities",
+                "before": "# RadioGroup按序绑色致选项颜色错位\n苏住房C 投票/决策页中 `RadioGroup` 按列表顺序（`item-1/2/3`）绑定颜色，接口返回顺序不固定时导致选项颜色错位。\n\n## 问题根因\n- `RadioGroup` 按列表顺序 `item-1/2/3` 绑定颜色\n- 接口返回顺序不固定时，颜色与选项错位\n\n## 修复要点\n- 改为按选项文字映射颜色：同意绿 / 不同意红 / 弃权橙\n- 调整 `DetailTopCard` 渐变起始为 15% 透明\n- `form.vue` 按钮圆角 8px\n- `DecisionResult.vue` 间距 20px\n\n## 涉及文件\n- src/pages_vote/decision/common/DecisionRecord.vue\n- src/pages_vote/elect/ResultRecord.vue\n- src/pages.json\n- src/pages_owner/decision/common/StepChoose.vue\n- src/pages_owner/decision/components/RadioGroup.vue\n- src/pages_owner/decision/common/DecisionResult.vue\n- src/pages_vote/decision/common/StepChoose.vue\n- src/pages_vote/decision/components/RadioGroup.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor session=a8484b7a-a33d-4ba0-b1e1-1102d7ae0a91\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：a8484b7a-a33d-4ba0-b1e1-1102d7ae0a91；代码基线：none",
+                "after": "# RadioGroup按序绑色致选项颜色错位\n苏住房C 投票/决策页中 `RadioGroup` 按列表顺序（`item-1/2/3`）绑定颜色，接口返回顺序不固定时导致选项颜色错位。\n\n## 问题根因\n- `RadioGroup` 按列表顺序 `item-1/2/3` 绑定颜色\n- 接口返回顺序不固定时，颜色与选项错位\n\n## 修复要点\n- 改为按选项文字映射颜色：同意→绿色 `rgba(123, 190, 19, 1)`、不同意→红色 `#e40a0a`、弃权→橙色 `#eb7d12`\n- 调整 `DetailTopCard` 渐变起始为 15% 透明（`rgba(var(--primary-color-rgb), 0.15)`）\n- `form.vue` 中「我已知晓」按钮增加 `border-radius: 8px`\n- `DecisionResult.vue` 中决策结果（如「弃权」）与下方「签字」间距调整为 20px\n\n## 涉及文件\n- src/pages_vote/decision/common/DecisionRecord.vue\n- src/pages_vote/elect/ResultRecord.vue\n- src/pages.json\n- src/pages_owner/decision/common/StepChoose.vue\n- src/pages_owner/decision/components/RadioGroup.vue\n- src/pages_owner/decision/common/DecisionResult.vue\n- src/pages_vote/decision/common/StepChoose.vue\n- src/pages_vote/decision/components/RadioGroup.vue\n- `pages_vote/decision/form.vue`\n- `pages_vote/decision/components/DetailTopCard.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor session=a8484b7a-a33d-4ba0-b1e1-1102d7ae0a91\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：a8484b7a-a33d-4ba0-b1e1-1102d7ae0a91；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

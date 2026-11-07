@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-惠山二期G-1793640843595/history/archive_013",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T17:59:15.058571+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/padrão técnico/voting_items_dialog_optionnum_bug.md",
+                "memory_type": "entities",
+                "after": "# Bug de configuração de máximo de opções em dialog de votação\nNo zhi2-web-admin (Huishan Fase 2G), `VotingItemsDialog.vue` no modo visualização (`DetailTemplate` `contentInfo`) configurava apenas `minOptionNum` erroneamente rotulado \"选择项\", faltando `mixOptionNum`, inconsistente com edição.\n\n## Problema\n- `VotingItemsDialog.vue` modo detalhe: `contentInfo` só tinha `minOptionNum` mal nomeado como \"选择项\" (itens selecionados)\n- Ausência de `mixOptionNum` causava divergência com modo edição\n\n## Correção\n- Alterado `contentInfo` para \"最少选择项\" (mínimo de seleção) e adicionado \"最多选择项\" (`mixOptionNum`)\n- Exibido quando múltipla escolha (`optionType==='1'`)\n\n## Arquivos\n- src/views/autonomy/multiply/components/VotingItemsDialog.vue\n- src/views/autonomy/option/components/VotingItemsDialog.vue\n- src/views/autonomy/option/components/VoteView.vue\n- src/views/autonomy/option/detail.vue\n\n## Verificação\n- Sessão cursor: 5f4bd9ba-c920-4b33-ab4f-5d2525ca5150; base de código: none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/padrão técnico/ci_low_memory_oom_vite.md",
+                "memory_type": "entities",
+                "after": "# OOM em build CI de baixa memória por pico paralelo Vite\nNo projeto zhi2-web-admin (Huishan Fase 2G), ambiente CI com 4GB RAM e limite de heap 4096MB ainda apresentava OOM; causa raiz: operações paralelas de arquivo e compressão aumentavam pico de memória.\n\n## Causa raiz\n- CI 4GB RAM, heap max 4096MB ainda OOM\n- Operações paralelas de arquivos e compressão elevam pico de memória\n\n## Solução\n- `scripts/vite-build.mjs` detecta automaticamente baixa memória e limita heap a 3840MB\n- `vite.config.js` em modo baixa memória define `maxParallelFileOps:1`, desliga compressão e `manualChunks` para reduzir pico\n\n## Arquivos\n- package.json, vite.config.js, scripts/vite-build.mjs, eslint-rules/package.json, src/router/index.js, node_modules/vite/package.json\n\n## Verificação\n- Sessão cursor: b2d5de3f-5090-4bd2-97e9-fac732c844c4; base de código: none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/parâmetro tencent get_polygon=3.md",
+                "memory_type": "preferences",
+                "after": "- Uso do `get_polygon=3` para contorno de ruas: não é interface independente, é parâmetro da API de divisão administrativa WebService do Tencent.\n- Em telão de nível distrito, chamar `ws/district/v1/getchildren` com `id` e `get_polygon=3` para obter contorno de ruas."
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/padrão técnico/todo_backurl_router.md",
+                "memory_type": "entities",
+                "before": "# 待办返回 backUrl 合法喂给 Vue Router 3\n惠山二期G zhi2-web-admin 在「flowable 待办→业务详情→返回」场景中，backUrl 字符串如何合法、安全地喂给 Vue Router 3 的约定。\n\n## 背景\n- `utils/ruoyi.js` 的 `navigateToTodoTask` 写入 `query.backUrl`，`main.js`/`OperationBtnGroup` 的 `goBack` 走 `resolveBackNavigationPath` + `router.push({ path, query: { type: 'back' } })`。\n\n## 踩坑与修复\n- 踩坑1（Vue Router 3 解析）：带 `?pageNum=2` 的地址原样塞进 `path` 会解析失败或 404；须按 `?`/`#` 拆分或 `new URL(backUrl, origin)` 再 push，或约定 backUrl 禁止含 query 并在入口校验。\n- 踩坑2（安全）：`query.backUrl`/`options.backUrl` 未校验时 `//evil.com`、带 scheme 的 URL 可能越权跳转；仅接受以单个 `/` 开头的站内 path（拒绝 `//`、`:`、`http`），非法则忽略走路径回退。\n- 踩坑3（状态丢失 MEDIUM）：`navigateToTodoTask` 只记 `current.path` 不含 query，从带筛选/分页列表进详情再返回会丢列表态；需「完整还原」时用 `fullPath` 或序列化 query。\n\n## 验证与归属\n- 验证：会话 26959102 HIGH「backUrl 含查询串时 router.push 用法不兼容」、HIGH「backUrl 未校验即用于编程式导航」、MEDIUM「backUrl 仅记录 path 丢失来源页 query」。\n- 涉及文件：utils/ruoyi.js、main.js、components/OperationBtnGroup/index.vue。\n- 所属项目：惠山二期G；来源会话：26959102-f851-4ffb-b534-01c3957b3e3e；代码基线：adccd7e",
+                "after": "# Retorno de pendências com backUrl alimentado à Vue Router 3\nNo projeto zhi2-web-admin (Huishan Fase 2G), no cenário \"pendência flowable → detalhe de negócio → retorno\", definição de como a string backUrl é passada de forma válida e segura à Vue Router 3.\n\n## Contexto\n- `utils/ruoyi.js` `navigateToTodoTask` grava `query.backUrl`; `goBack` em `main.js`/`OperationBtnGroup` usa `resolveBackNavigationPath` + `router.push({ path, query: { type: 'back' } })`.\n- `resolveBackNavigationTarget` em `utils/ruoyi.js` foi corrigido para retornar corretamente à lista, complementar `backUrl`, reconhecer rota `directDetail` e unificar o caminho de detalhe.\n\n## Problemas e correções\n- Problema 1 (parse Vue Router 3): endereço com `?pageNum=2` inserido cru em `path` falha ou 404; dividir por `?`/`#` ou usar `new URL(backUrl, origin)` antes de push, ou proibir query em backUrl e validar na entrada.\n- Problema 2 (segurança): `query.backUrl`/`options.backUrl` sem validação permite redirecionamento malicioso (`//evil.com`, scheme); aceitar apenas path interno começando por único `/` (rejeitar `//`, `:`, `http`), senão ignorar e voltar por caminho.\n- Problema 3 (perda de estado MEDIUM): `navigateToTodoTask` registra apenas `current.path` sem query, retorno de lista com filtro/paginação perde estado; usar `fullPath` ou query serializada para restauração completa.\n- Bug específico (session 1f86f5fa): pendência na home entrando em detalhe via `navigateToTodoTask` sem `backUrl`; antigo `lastIndexOf('/')` cortava `detail/{id}` caindo em página casca sem ID causando erro de parâmetro; rota `directDetail` não reconhecida. Corrigido em `utils/ruoyi.js` `resolveBackNavigationTarget` para retornar lista, adicionar `backUrl`, reconhecer `directDetail` e uniformizar caminho de detalhe.\n\n## Arquivos envolvidos\n- utils/ruoyi.js, main.js, components/OperationBtnGroup/index.vue\n- views/autonomy/record/components/detail.vue, components/detail-template/detail-template.vue, views/autonomy/record/components/directDetail.vue, mixins/detailMixins.js, mixins/form.js\n\n## Verificação e origem\n- Sessões: 26959102 (HIGH incompatibilidade router.push com query; HIGH backUrl sem validação; MEDIUM perda de query), 1f86f5fa-6621-449b-b902-a3be952fcbd5 (bug backUrl pendências)\n- Projeto: Huishan Fase 2G; base de código: adccd7e (e none para o novo)"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

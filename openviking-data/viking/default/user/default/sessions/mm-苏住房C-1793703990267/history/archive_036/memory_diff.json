@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_036",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:19:25.380754+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/cms_angle_bracket_bug.md",
+                "memory_type": "entities",
+                "after": "# CMS富文本尖括号误判导致正文白屏\n苏住房C市民端CMS富文本页因书名号误写尖括号被rich-text当非法HTML标签解析失败，整块白屏仅控制台Parse Error。\n\n## 问题现象\n- 市民端「在线服务→流程指南/政策法规/公告」等CMS富文本页，进入某条时标题显示、正文整块白屏\n- 控制台仅有`Parse Error`，页面无JS异常，易误判为组件或接口问题\n\n## 根因\n- 正文HTML经页面→ZsRichText→formatRichTextContent→`<rich-text>`渲染\n- CMS录入将书名号《》误写成尖括号`<业主大会>`，被当作HTML标签解析失败，`<rich-text>`整块不渲染\n\n## 解决方案\n- 在formatRichTextContent内加escapeInvalidHtmlAngleBrackets：`String(html).replace(/<(?!\\/?[a-zA-Z!])/g, '&lt;')`转义非合法标签`<`\n- 一处修复覆盖所有ZsRichText消费页；同时通知后台CMS改回《业主大会议事规则》从源头修数据\n- 验收：首页→在线服务→流程指南→物业服务→第二篇指南正文正常显示\n\n## 验证与归属\n- 会话3a1c5d68用户贴截图正文与Parse Error，定位`<业主大会>`覆盖书名号，改utils/index.js后恢复\n- 涉及文件：src/utils/index.js、src/components/ZsRichText/ZsRichText.vue、src/pages_my/onlineService/PolicyDetail.vue\n- 所属项目：苏住房C；来源会话ID：3a1c5d68-e7a3-441a-a399-b1778fbaea6f；代码基线：d43894b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/login_base_lib_bug.md",
+                "memory_type": "entities",
+                "after": "# 登录页clickCheckTask报错因基础库与旧编译器冲突\n苏住房C市民端登录页在微信基础库3.8.6+与2023版uni-app编译器组合下报clickCheckTask err，多为控制台噪音不影响功能。\n\n## 问题现象\n- 登录页(pages_main/login/index，含多input)报`clickCheckTask err: TypeError: Cannot read property '0' of null`\n- 伴随渲染层`undefined is not iterable`/webviewScriptError，但登录功能多数情况正常\n\n## 根因\n- 微信基础库3.8.0以上与项目uni-app编译器(3.0.0-3080720230703001)已知兼容问题\n- 社区结论基础库3.8.0以上必现、3.8.0以下不报，非登录业务逻辑错误\n\n## 解决方案\n- 临时消噪：微信开发者工具本地设置调试基础库降到3.8.0或3.7.x(如3.7.12)\n- manifest.json设libVersion=3.7.12、mergeVirtualHostAttributes=false，移除全局virtualHost:true，在login/index.vue、ImgCode、VerifyCode显式`virtualHost: false`\n- 长期根治需升级uni-app依赖；排查先确认功能是否真异常再动依赖\n\n## 验证与归属\n- 会话2a7afd34用户贴报错栈(lib 3.16.2)，比对DCloud案例确认组合触发，给降基础库+manifest方案\n- 涉及文件：src/pages_main/login/index.vue、src/components/VerifyCode/index.vue、src/components/ImgCode/index.vue、src/App.vue\n- 所属项目：苏住房C；来源会话ID：2a7afd34-614f-40f8-8140-36dc5cc4cbe3；代码基线：9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/native_map_textarea_bug.md",
+                "memory_type": "entities",
+                "after": "# 加梯申请页地图遮挡textarea无法输入\n苏住房C市民端加梯申请页因原生map层级最高且v-show不销毁原生层，底部textarea点不进字。\n\n## 问题现象\n- pages_owner_extra/elevator/addAlone顶部map、底部「申请说明」textarea，输入框点不进、打不出字\n- 仅加min-height无效，需区分「完全点不进」与「能聚焦但打不出字」(后者多因ZsPicker弹层遮挡)\n\n## 根因\n- 微信小程序map与聚焦态textarea均为原生组件，层级最高浮在WebView之上\n- v-show隐藏地图只隐藏视觉不销毁原生层，地图仍拦截下方点击致textarea无焦点\n- ZsTextarea中`adjust-position=\"false\"`字符串恒真，须`:adjust-position=\"false\"`\n\n## 解决方案\n- 地图改v-if真正销毁原生map，不再v-show\n- 多时机主动销毁：页面滚动超120px、点击表单任意区域、触摸或聚焦申请说明输入框\n- 给description区域补z-index兜底；修正adjust-position布尔绑定\n- 验收：滚到申请说明点击弹键盘，字数统计随输入更新(如5/120)\n\n## 验证与归属\n- 会话12995d5b用户二次反馈「addAlone申请说明还是无法输入」，改v-if销毁+多时机+修正绑定后恢复\n- 涉及文件：src/pages_owner_extra/elevator/addAlone.vue、src/components/ZsTextarea/ZsTextarea.vue\n- 所属项目：苏住房C；来源会话ID：12995d5b-1f0e-4084-87fa-bb16ee2b7b73；代码基线：8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zsimage_avatar_blank.md",
+                "memory_type": "entities",
+                "after": "# ZsImage头像不显示因样式隔离与分包路径\n苏住房C市民端guard页默认头像不显示，根因新版ZsImage内部100%宽高+组件样式隔离+分包static路径不可达两处叠加。\n\n## 问题现象\n- pages_guard/index/index左侧默认头像不显示，照main-v2.1分支抄写法仍不显示\n- devtools选中看盒模型为0宽高，或图片URL返回非200\n\n## 根因\n- 新版ZsImage内部width:100%/height:100%，尺寸类写在组件标签上；小程序自定义组件样式隔离致父级class透不进内部节点，图片0宽高\n- 默认头像在主包src/static/images/default-avatar-gary.png，当前分支仅放分包pages_guard/static，页面引用主包绝对路径/static/images/..访问不到\n\n## 解决方案\n- 外层用带尺寸div.header-img包裹ZsImage，尺寸落div上\n- 头像文件复制回主包static/images并登记进MAIN_STATIC_PATHS，与v2.1一致\n- 排查顺序：先确认容器有实际宽高，再确认图片URL返回200，都过才怀疑组件\n\n## 验证与归属\n- 会话0c646bb9用户两次反馈「还是没显示头像」，定位样式隔离+分包路径，改div包裹+复制主包+MAIN_STATIC_PATHS\n- 涉及文件：src/pages_guard/index/components/guard-info-card.vue、src/components/ZsImage/ZsImage.vue、src/utils/index.js\n- 所属项目：苏住房C；来源会话ID：0c646bb9-d1fa-4e8d-a2e1-e84fc34f6838；代码基线：8fc3cc5"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_060",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T13:14:52.603116+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/repair_onshow_reset.md",
+                "memory_type": "entities",
+                "after": "# 报修提交页onShow重载覆盖已选房屋\n苏住房C市民端报修提交页在onShow中无条件重载房屋列表，导致从子页返回时用户手动选择的房屋被默认逻辑重置，报修挂错房屋。\n\n## 问题现象与根因\n- 报修提交页表单「所在房屋」从A切到B，点「报修设施设备」进入选择页，返回后房屋变回A，后续报修挂到错误房子\n- submit.vue的onShow每次调getHouseList()重新拉列表，按优先级自动纠正选中项（userStore.houseId全局默认→当前小区房屋→列表第一项）\n- 从子页面返回触发onShow，手动选择被默认逻辑覆盖；此类「onShow重载数据+表单默认值推导」组合必现且不明显报错\n\n## 解决方案\n- getHouseList内先判断form.house是否已有值：有则在刷新后列表找到对应项，补齐complexId/complexName/userIdentityId/houseId/position等联动字段后return，跳过默认房屋逻辑\n- 仅用户未选过时才走默认优先级\n- 同类排查：任何onShow/onActivated调用带默认值推导的加载函数都要检查是否覆盖已填内容，从选择类子页返回是最高发触发路径\n\n## 验证与归属\n- 验证：会话f5c3361f用户报切换房屋A→B返回变回A；定位submit.vue的onShow→getHouseList按默认重置；修复为data.house有值时按选中项回填5个字段并return\n- 涉及文件：src/pages_owner_extra/repair/submit.vue、chooseFacility.vue、src/pages_owner/repair/submit.vue、chooseFacility.vue\n- 所属项目：苏住房C；来源会话ID：f5c3361f-ac2a-43fa-8586-7a2d7934e203；代码基线：b7bf813"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/gateway_file_param.md",
+                "memory_type": "entities",
+                "after": "# 苏服办网关上传参数须传{file}\n苏住房C市民端在苏服办H5内上传签字图片时因调用方传{files:[...]}导致网关静默退化成普通POST，签名图片被丢弃且无报错。\n\n## 问题现象与根因\n- 上传签字图片报「请求异常」，无字段级错误；网关日志显示走POST业务接口szffluzm-whyhxx、version=2.1、header含zs-sign/zs-param，FormData无file字段\n- api/gateway.js靠config.file真假判定是否文件上传；有才切到上传专用interface_id(szffluzm-wjsc)+精简header+version=v2.1\n- httpInstance.js的file()只读data.file或data.filePath；调用方写fileUpload({files:[{file,name:'file'}]})时config.file为undefined，整条链路静默按普通POST发出\n\n## 解决方案\n- H5上传一律传扁平对象fileUpload({file})，与ImageUploader、ZsUploader等组件一致；仅需换字段名时用name\n- 验收标准：日志出现interface_id=szffluzm-wjsc、version=v2.1、header不再有zs-sign/zs-param\n- 新写上传调用点按这四条特征自查，而非只看有无报错\n\n## 验证与归属\n- 验证：会话79a544a0用户贴网关日志对比；定位gateway.js第222-232行isFileUpload=!!config.file，httpInstance.js第214-223行file:data.file||data.filePath；根因SignBoard.vue写fileUpload({files:[...]})；修复为fileUpload({file})\n- 涉及文件：src/components/SignBoard.vue、src/api/gateway.js、src/api/httpInstance.js、src/api/file.js\n- 所属项目：苏住房C；来源会话ID：79a544a0-5a29-4c3d-acb1-c80b3b9dfa2c；代码基线：77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/tab_vmodel_override.md",
+                "memory_type": "entities",
+                "after": "# uni-app自定义tab同时写v-model与@update致切tab不请求\n苏找房页面切换标签时高亮变化但列表不刷新，因对自定义tab组件同时写v-model与@update:model-value导致监听被覆盖，逻辑未执行。\n\n## 问题现象与根因\n- 苏找房页切「推荐/新房/二手房」tab高亮正常，但列表数据不刷新、不发请求、控制台无报错\n- 模板对ProjectTabBar同时写v-model和@update:model-value=\"tabChange\"；uni-app中v-model编译的update:modelValue监听覆盖同名自定义监听\n- 结果curTab被v-model更新（高亮切换），tabChange从不执行，$refs.paging.reload()不被调，列表接口不重发\n\n## 解决方案\n- 去掉v-model，只保留:model-value + @update:model-value=\"tabChange\"单一数据流\n- tabChange里写入新tab后在$nextTick之后调reload()，保证curIndex更新再触发分页请求\n- 删掉手动this.houseList=[]，列表重置交z-paging的reload()统一负责，避免自动重置与手动清空打架闪烁\n- 修完按tab核对请求：推荐listRecommend、新房pageByKeyWord、二手房houseInfoDisplayList\n\n## 验证与归属\n- 验证：会话6e707628用户报苏找房切换tag没调接口；定位Project_Suzhufang.vue第67行原含v-model；修复为去v-model、$nextTick后reload、删手动清空\n- 涉及文件：src/pages/index/components/Project_Suzhufang.vue、menu/ProjectTabBar.vue、src/pages/index/project.vue、src/components/ZsPaging/ZsPaging.vue\n- 所属项目：苏住房C；来源会话ID：6e707628-a295-466a-98ef-4fff34cf5423；代码基线：9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/push_key_undefined.md",
+                "memory_type": "entities",
+                "after": "# 小程序列表逐条push加:key=index致item undefined崩溃\n苏住房C小程序新房详情页因接口返回后逐条push图片且轮播用:key=\"index\"，渲染时item变undefined报fileSite of undefined。\n\n## 问题现象与根因\n- 新房详情页报TypeError: Cannot read property 'fileSite' of undefined，堆栈落在swiperComponent.js的_sfc_render渲染阶段\n- 详情页在接口返回后逐条push图片到allImg，视频插到allList最前，每次push触发重渲染，小程序真实渲染中间半成品状态\n- 轮播用:key=\"index\"，头部插入视频后索引整体后移复用上一帧key，取到undefined item读fileSite崩；排查入口应是数据一次性赋值+key稳定\n\n## 解决方案\n- 数据侧改一次性赋值this.allImg = mediaList消除中间态\n- swiperComponent模板改用可选链item?.fileSite，allList加filter过滤无效项，:key改item.fileSite||index稳定键\n- 兜住tabChange切「图集」时currentSlide越界、getVideoType入参空值；父组件显式传:detailData=\"detailData\"\n- 同一改动同步pages/commonNew/swiperComponent.vue与pages_transaction下两份副本\n\n## 验证与归属\n- 验证：会话db12bfb7用户贴weapp:///components/commonNew/swiperComponent.js:212:61完整堆栈；结论detail.vue逐条push+视频插前使索引偏移叠加:key=index致item undefined；修复为一次性赋值、可选链、filter、稳定key、越界空判\n- 涉及文件：src/components/commonNew/swiperComponent.vue、src/pages/commonNew/swiperComponent.vue、src/pages_transaction/newHouse/detail.vue、src/pages_transaction/stockHouse/detail.vue\n- 所属项目：苏住房C；来源会话ID：db12bfb7-5b5d-404f-93cd-258941957c3c；代码基线：4630e8e"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

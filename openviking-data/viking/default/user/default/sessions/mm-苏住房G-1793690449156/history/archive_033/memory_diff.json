@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_033",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:33:30.389677+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术笔记/suzhufang_datepicker_lock.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G 日期范围选择器锁死问题\n机构注册审核/企业管理/人员管理列表共用的「更新时间」日期范围选择器，先选结束日后再选开始日被锁死。\n\n## 问题现象\n- 先点 2026-10-30 作结束日，10月30日前日期全部置灰，无法选更早开始日\n- 先选今天作开始日，未来日期应禁用，但过去两年外的日期也未放开\n\n## 根因\n- disabledDate 把「已点第一下」的日期当不可越过起始边界（day < anchor 一律禁用）\n- Element range 选择器两端点共用同一套谓词，无法区分正在选第一项还是第二项，首日期变成范围下限，规则方向写反\n\n## 解决方案\n- companyListQuery.js 抽三层纯函数：getUpdateTimeSelectableBounds 给「今天起向前2个自然年」全局窗口\n- isUpdateTimeDayDisabled 分两态：未选第一项超全局窗口（含未来）禁用；已选第一项只要求锚点±2年跨度内可选，不再限制早于锚点\n- validateUpdateTimeRange 校验起止都在全局窗口，失败清空 _updateTimePickAnchor 避免面板残留错误禁用态\n\n## 验证与归属\n- 验证会话 5992a86f：用户指出先选结束日不能再选更早开始日、先选开始日未来应禁用但两年外未放开\n- 涉及文件：zhi2-web-admin/src/utils/companyListQuery.js、zhi2-web-admin/src/views/company/companyRegister/index.vue\n- 所属项目：苏住房G；代码基线：3192070"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术笔记/suzhufang_adv_filter_eq.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G 高级筛选返回暂无数据问题\n公共查询列表页用高级筛选查询后点查看再返回，条件摘要正常但表格暂无数据。\n\n## 问题现象\n- 物业服务企业查询等页：搜索后点查看进详情，再点返回，条件条显示原条件，表格却「暂无数据」\n- UI 条件摘要与请求结果对不上，易误判接口没数据或缓存坏\n\n## 根因\n- 返回时列表页重建并立刻 getList()，operator_type 等字典未加载完\n- sanitizeConditionGroups 在字典为空时把所有字段当固定运算符字段，把 IN/LE/GE 统一改写 EQ，请求参数错致零结果\n- 筛选摘要渲染用缓存原始条件，故 UI 与结果不符\n\n## 解决方案\n- advancedQueryCore.js 两处改：字典未加载时勿视字段为固定运算符，保留 condition.operator 原值\n- 固定运算符字段取默认值时也以 condition.operator 兜底\n- 原则：摘要与实际请求参数来自不同数据源时，字典未就绪须降级「保留原条件」而非「按默认值兜底改写」\n- 排查先比对条件摘要与实际 payload 运算符，而非先查分页或接口\n\n## 验证与归属\n- 验证会话 6373eaaa：用户报物业服务企业查询搜索后查看返回条件保存但显示暂无数据\n- 涉及文件：zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue、zhi2-web-admin/src/views/publicQuery/propertyCompany/index.vue\n- 所属项目：苏住房G；代码基线：864b409"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术笔记/suzhufang_list_cache_default.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G 列表默认查询值改 undefined 的缓存治理\n物业管理变更单列表把 bizState 默认值由 '2' 改 undefined 做查全部，但 listMixins 条件缓存让老用户仍见旧默认。\n\n## 问题现象\n- complexChange 列表首屏原只查「已备案」，改 queryParams.bizState 为 undefined、占位符改「全部」\n- 新访问者正常，回访用户仍只看到已备案\n- resetQuery() 走 this.$options.data().queryParams 回到 undefined，与「全部」一致\n\n## 根因\n- listMixins 把 query 写 store 做搜索条件缓存，进同路由 merge 回 queryParams，缓存里 bizState:'2' 覆盖代码新默认\n- 新默认仅对「无缓存」访问生效\n\n## 解决方案\n- 评估默认值改动影响面时，把「代码默认值」和「路由级缓存」当两个来源分开评估\n- 产品要求升级后一律新默认：该路由 created 剔掉旧缓存字段；否则发布说明提示用户点一次「重置」\n- 确认下拉 clearable，未选即查全部，占位符文案与实际语义一致\n\n## 验证与归属\n- 验证会话 5fa69af7：复核 complexChange/index.vue 改动，结论 APPROVE 但提 MEDIUM：listMixins 缓存可能覆盖新默认、首屏范围扩到全部属产品行为变化\n- 涉及文件：zhi2-web-admin/src/views/property/complexChange/index.vue、zhi2-web-admin/src/mixins/listMixins.js、zhi2-web-admin/src/mixins/table.js\n- 所属项目：苏住房G；代码基线：4f7c2c3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术笔记/suzhufang_zsselect_sync.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G 子表行内 zs-select 的 :value.sync 失效\nproperty/serviceItem/detail.vue 行内用 zs-select :value.sync 切选项不刷新，且表格重构误删顶部预览区。\n\n## 问题现象\n- 阳光物业服务事项新增页行内下拉切「固定内容/文本输入」看似无反应，仅部分列跟随变\n- 同期表格上方「服务内容：xxx」预览区因重构被删，用户报「切换不生效且顶部预览没了」\n\n## 根因\n- Vue 2 对插槽作用域对象嵌套属性的 .sync 双向绑定不可靠：zs-select $emit('update:value') 后父层 .sync 赋值路径落 tableData[i] 二级属性\n- 该属性行对象创建时未声明，运行时追加不触发响应式（与 data 未声明状态→对 undefined 调 forEach 同类根因）\n\n## 解决方案\n- 行内控件改单向 :value + 显式 @update:value 回调\n- 回调用 this.$set(this.tableData, rowIndex, {...row, contentType: val}) 回写保响应式\n- initDefaultContentType 字典加载写默认值也改 $set\n- 改版确认被删派生视图（contentStr 计算属性）是否有业务方依赖，新增态文本输入给 [x] 占位符\n\n## 验证与归属\n- 验证会话 b1211693（2026-07-27，基线 d109b83）：用户报服务事项新增切换不生效且顶部无预览\n- 修复为 :value + @update:value + handleContentTypeChange 配 $set 更新 tableData，恢复 contentStr + initDefaultContentType 改 $set\n- 涉及文件：zhi2-web-admin/src/views/property/serviceItem/detail.vue、zhi2-web-admin/src/views/property/serviceItem/index.vue\n- 所属项目：苏住房G；代码基线：d109b83\n- 与已知「行内可编辑子表 computed setter 当 v-model 让 zs-table 重算高度 row 为 undefined」根因修法不同，勿混"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

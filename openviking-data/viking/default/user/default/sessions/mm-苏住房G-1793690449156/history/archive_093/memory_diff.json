@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_093",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T10:59:39.637048+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/工作流/cross_repo_ci_fix.md",
+                "memory_type": "entities",
+                "after": "# 跨仓库同类修复幂等迁移与一致性体检\n针对几十个仓库出现同一类 CI 报错（如 ERR_MODULE_NOT_FOUND: vite），不应手改 N 份，而用幂等迁移脚本加 blob hash 一致性体检统一修复。\n\n## 适用场景\n- CI 报错 `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite' imported from .../vite-build.mjs`，同类问题在几十个仓库出现\n- 本次覆盖 36 个仓库，统一安装配置与构建脚本\n\n## 核心做法\n- 固化可重复执行、幂等的迁移脚本 `fix-ci-vite.mjs`，配套一致性体检 `verify-ci-fix.mjs` 与批量提交/推送 `commit-ci-fix.mjs`、`fix-push.mjs`，统一放 `D:\repository\\.work\\`\n- 统一安装配置：提交 `bunfig.toml`（`chore: 提交 bun 安装配置（isolated linker）`），同步 `install.mjs`/`vite-build.mjs`/`ci-doctor.mjs` 三个脚本入库\n- 用 blob hash 证明一致性：`ci-doctor.mjs` 已入库 36/36，blob 全部 = `5ac43604`；`install.mjs`/`vite-build.mjs` blob 全部 = `d00fef0`/`0b4449a`\n- 体检项含「子模块指针全部指向远端已存在的 commit」；批量前后核对每个仓库当前分支；无关的本地改动不带上（列举多个项目路径未碰）\n\n## 验证证据\n- 来源会话 session-654aca6b-55f0-4a66-99a1-cac31cb91b3b（基线 f36e340）\n- 最终状态：仓库数 36 / 与远端同步 36/36；涉及文件 zhi2-web-admin/scripts/vite-build.mjs、scripts/install.mjs、scripts/ci-doctor.mjs、bunfig.toml、package.json"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/concurrent_branch_check.md",
+                "memory_type": "entities",
+                "after": "# 批量操作多仓库时工作区并发切老分支的核对规范\n跨仓库批量修复期间，工作区可能被并发进程切到老分支，必须在批量前后逐仓库核对当前分支与落后提交数。\n\n## 适用场景\n- 批量修 36 个仓库过程中，`园区公共收益` 工作区被切到 `develop/v.2.6.2`（2026-09-20 老分支，落后 90 提交）\n- 修复本身在 `develop/v2.6.1` 提交推送成功（`456fa54`），仅工作区跑偏\n\n## 核心做法\n- 批量开始前记录每个仓库当前分支与 HEAD；结束后逐仓库核对分支与落后/领先提交数\n- 发现跑偏先确认修复提交在正确分支已推送，再把工作区切回，不慌着重做\n- 分支名看全（`v.2.6.2` vs `v2.6.1` 只差一字符）；切回后检查关键文件齐全（如 `scripts/` 三脚本）\n- 无关本地改动不携带\n\n## 验证证据\n- 来源会话 session-654aca6b-55f0-4a66-99a1-cac31cb91b3b（基线 f36e340）\n- 涉及文件 scripts/vite-build.mjs、scripts/install.mjs、scripts/ci-doctor.mjs"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/submodule_four_way_check.md",
+                "memory_type": "entities",
+                "after": "# 子模块交付前四方一致性校验\n子模块与父仓推送完成后，须证明别人 clone 主仓并 submodule update 能拿到正确代码，做四方一致性校验。\n\n## 适用场景\n- 子模块与父仓都推送完成，需验证主仓本地=远端=gitlink记录=子模块实际 HEAD\n- 本次校验：主仓本地=远端 `c27a390`；submodule 指针 `ecf0afcf5`；实际 HEAD `ecf0afcf5`\n\n## 核心做法\n- 交付前核对四值：主仓本地 HEAD、主仓远端 HEAD（`git ls-remote`）、主仓 tree 子模块指针（`git ls-tree`）、子模块实际 HEAD（`git rev-parse HEAD`）\n- 四值须落同一提交；远端 tree 查远端分支 tree 而非本地 HEAD tree\n- 推送出现仓库重定向提示（如带 `.git` 后缀）属正常，以 ref 更新为准；校验表随交付给出\n\n## 验证证据\n- 来源会话 session-85f8a862-df80-4607-8c2d-5efd15506dc4（基线 5d68a74）\n- 推送结果 submodule `6a5960bab..ecf0afcf5`、主仓库 `4826471..c27a390`；涉及 zhi2-web-admin、.gitmodules"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/frontend_delivery_doc.md",
+                "memory_type": "entities",
+                "after": "# 前端交付附配置说明文档规范\n前端改完需后台配合的交付，要在仓库放配置说明文档，写明菜单授权与后端发布核对要求，不留在聊天里。\n\n## 适用场景\n- 跨项目（榆林G+苏住房G）同步修复工单迁移权限标识后，除代码推送还需配置说明 `zhi2-web-admin/docs/task-2095.md`\n- 权限标识需后台菜单授权、后端同批标识发布，否则前后端不匹配\n\n## 核心做法\n- 交付放文档含：菜单授权清单（模块/业务/动作/权限字符）、后端发布核对项、验证方式\n- 禅道回写写入文档路径、提交号、验证结果、发布注意事项；权限标识按接口附件核对大小写，跑通 108 组权限场景及 ESLint\n- 交付表列全「四仓库×两级」分支与提交号，注明子模块任务分支尚未合并；禅道状态回写带工时（done、指派 huzhihao、消耗0.5h、剩余0h）\n\n## 验证证据\n- 来源会话 session-ebd327a2-fffc-48f6-97f4-7e6f70574beb（基线 5d68a74）\n- 四仓库提交：榆林子模块 `cfdd4c55e`、榆林父仓 `bf38de4`、苏住房子模块 `a0b414d36`、苏住房父仓 `5f5d22a`；涉及文件 zhi2-web-admin/docs/task-2095.md"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

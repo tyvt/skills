@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_051",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T14:26:23.947931+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/main_img_fix.md",
+                "memory_type": "entities",
+                "after": "# 主包图片误解析到分包路径修复\n苏住房C 小程序主包静态图片因 resolveStaticUrl 按分包推断路径导致 500 错误，已通过主包清单优先加载修复。\n\n## 问题根因\n- `play.png`、`close.png`、`soldOut-shadow.png`、`default-avatar.png`、`default.png`、`aixin_r.png` 均位于主包 `src/static/images/`。\n- `resolveStaticUrl` 根据当前页面分包自动推断路径，例如在 `pages_transaction/newHouse/detail` 页面将 `images/szf/soldOut-shadow.png` 解析为 `/pages_transaction/static/images/szf/soldOut-shadow.png`（错误），正确应为 `/static/images/szf/soldOut-shadow.png`。\n- 分包目录无这些文件，微信开发者工具报 500。\n\n## 修复方案\n- 新增 `src/utils/mainStaticPaths.js`，维护主包 `static` 下全部资源路径清单。\n- 调整 `resolveStaticUrl`：若资源在主包清单中，优先走主包 `/static/`，不被分包路由推断覆盖。\n- 修正 `pages_owner` 中 3 处 `question.svg` / `ques...` 引用。\n\n## 涉及文件\n- `src/utils/mainStaticPaths.js`\n- `src/utils/index.js`\n- `src/components/commonNew/swiperComponent.vue`\n- `src/components/collectBtn/collectBtn.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：b6ae18fa-c2e7-4036-8bde-244c6a95c718\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/owner_repair_static.md",
+                "memory_type": "entities",
+                "after": "# 业主报修页本地静态图未打包修复\n苏住房C 中 `pages_owner/repair/add.vue` 引用 `./static/` 图片未被 uni-app 打包导致 500，已迁移至 `pages_owner/static/` 并修正引入路径。\n\n## 问题根因\n- `add.vue` 从 `./static/` 引用图片，构建后路径为 `/pages_owner/repair/static/xxx.png`。\n- uni-app 不会把 `pages_owner/repair/static/` 复制到小程序输出目录，运行时找不到文件返回 500。\n- 同模块 `submit.vue` 使用 `./static/`（即 `pages_owner/static/`）会被正确打包。\n\n## 修复内容\n- 将 `icon_feedback.png`、`icon_repair.png` 复制到 `pages_owner/static/`。\n- 修改 `add.vue` 的 import 路径：`import iconArrowRight from './static/icon_arrow_right.png'`、`import iconRepair from '../static/icon_repair.png'`、`import iconFeedback from './static/icon_feedback.png'`。\n\n## 涉及文件\n- `src/pages_owner/repair/add.vue`\n- `src/pages_owner/repair/submit.vue`\n- `src/pages_owner/repair/index.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：bf727bff-d0f8-4d85-8723-cfa12502510a\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/chitchat_avatar_fix.md",
+                "memory_type": "entities",
+                "after": "# 微聊机器人头像加载失败修复\n苏住房C `pages_main/message/index` 中机器人客服头像因使用原生 image 标签致路径错误空白，已改为 ZsImage 组件修复。\n\n## 问题根因\n- `chitchat.vue` 机器人客服头像使用原生 `<image src=\"./static/images/auto-robot.png\">`。\n- 编译到微信小程序后路径变为主包 `/static/images/auto-robot.png`，但 `auto-robot.png` 实际在分包 `pages_main/static/images/` 下，加载失败头像空白。\n- 同页其他联系人头像用 `ZsImage`，经 `resolveStaticUrl` 正确解析分包静态资源路径。\n\n## 修复方案\n- 将机器人头像改为与其他联系人一致的 `ZsImage`：`<ZsImage class=\"header-img\" src=\"images/auto-robot.png\" />`。\n- 重新编译运行后微聊列表机器人客服头像正常显示。\n\n## 涉及文件\n- `chitchat.vue`\n- `src/pages.json`\n- `src/pages/message/index.vue`\n- `src/pages_main/message/index.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：e7bbf5fb-a194-4fdc-9755-8546e1c8585b\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/decision_result_fix.md",
+                "memory_type": "entities",
+                "after": "# 决策记录决策者姓名缺失修复\n苏住房C `DecisionResult.vue` 决策记录因数据覆盖未显示决策者姓名，已改用接口返回列表直接构建修复。\n\n## 问题根因\n- `enrichRecordList` 额外请求 `getDecisionRecordDetail` 并用 `...record` 展开详情数据，可能覆盖列表项 `decisionPlayerName` 等字段。\n- 列表只设置 `remark`（时间），未设置 `value`（决策选项），界面仅显示时间。\n\n## 修复方案\n- 改用接口返回 `decisionOptionResponseAllList` 构建列表：\n  - `label` 取 `decisionPlayerName`（决策者姓名，如「田*」）\n  - `value` 取 `decisionOptionName`（决策选项，如「弃权」）\n  - `remark` 取 `createTime`（决策时间）\n- 每条记录显示：左侧决策者姓名、右侧决策选项、下方决策时间。\n\n## 涉及文件\n- `src/pages_vote/decision/common/DecisionResult.vue`\n- `src/pages_vote/elect/DecisionResult.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：84a82111-c481-4df3-bfc7-e5397b1d1fed\n- 代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

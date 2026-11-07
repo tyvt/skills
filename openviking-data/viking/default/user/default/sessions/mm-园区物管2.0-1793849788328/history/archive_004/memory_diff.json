@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793849788328/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T03:49:33.122375+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/login_footer_fix.md",
+                "memory_type": "entities",
+                "after": "# 登录底栏固定定位水平居中修复\n园区物管2.0 登录页 `.el-login-footer` 因 fixed 定位 left/right 为 auto 且父级 flex-end 导致底栏靠左不居中，需显式贴齐视口左右。\n\n## 问题现象\n- 登录页底栏 `.el-login-footer` 文字不水平居中，整体靠左显示\n- 父级 `.login.login--form-only` 使用 `align-items: flex-end`，底栏作为 flex 子节点在 `position: fixed` 且 left/right 默认 auto 时，水平位置按 flex 静态位置计算\n\n## 根因\n- 底栏 `el-login-footer` 虽为 `position: fixed`，但 left/right 未设置（默认 auto），固定定位水平位置回退到 flex 静态位置，导致整块底栏被摆到靠左\n\n## 解决方案\n- 给 `.el-login-footer` 加 `left: 0; right: 0;` 显式贴齐视口左右\n- 加 `box-sizing: border-box`，靠内部 `text-align: center` 居中文字\n- 若仍异常，检查外层 `.login` 是否用 `transform`（会把 fixed 改成相对该层定位）\n\n## 验证与归属\n- 验证证据：src=园区物管2.0\n- 涉及文件：zhi2-web-admin/src/views/login.vue\n- 所属项目：园区物管2.0；代码基线 none；来源会话 4b4a9576-d928-45cc-bdb7-cc109ec7c990"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_flicker_fix.md",
+                "memory_type": "entities",
+                "after": "# 首次打开弹窗闪烁修复\n园区物管2.0 中 bProjectDialog 首次打开出现遮罩闪烁与空状态跳动，根因为重复挂载、数据未就绪打开、打开重复初始化。\n\n## 问题现象\n- 首次点击打开项目选择弹窗时遮罩层闪烁\n- 弹窗先显示「暂无可用物业区域」，数据到达后切换成列表，造成内容跳动\n\n## 根因\n- 重复挂载：`layout/index.vue` 与 `Navbar.vue` 各有一个 `bProjectDialog`，两个 `el-dialog` 同时挂在 body 上\n- 数据未就绪就打开：`layout` 的 watcher 在 `bProjectData` 请求完成前就把 `projectDialogVisible` 设为 true\n- 打开时重复初始化：`onOpen` 里再次调用 `initRegionList()` 重建列表触发重渲染\n\n## 解决方案\n- `Navbar` 移除重复的 `bProjectDialog`，点击项目名称时通过 `open-project-dialog` 事件通知父组件打开弹窗\n- `layout` 统一管理弹窗状态；等项目列表接口返回后再决定是否自动弹出；新增 `openProjectDialog` 供 Navbar 调用\n- `bProjectDialog` 新增 `dataLoading`，加载中显示 loading 不显示空状态；`onOpen` 不再重复调用 `initRegionList`；仅在必要时初始化\n\n## 验证与归属\n- 验证证据：src=园区物管2.0\n- 涉及文件：zhi2-web-admin/src/layout/index.vue、zhi2-web-admin/src/layout/components/Navbar.vue、zhi2-web-admin/src/views/home/bProjectDialog.vue、zhi2-web-admin/src/mixins/dialogMixins.js\n- 所属项目：园区物管2.0；代码基线 none；来源会话 99e0bdb9-a041-402c-9293-6e332ef231d4"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/表单控件宽度全局兜底.md",
+                "memory_type": "entities",
+                "before": "# 表单输入控件无需手写width:100%\n园区物管2.0 中 zs-input / amount-input 等表单输入控件普遍带冗余的 width:100% 内联样式，全局 element-ui.scss 已兜底。\n\n## 问题现象\n- 页面里 zs-input / amount-input 等输入控件上普遍带 :style=\"{ width: '100%' }\" 或 style=\"width: 100%\"，属冗余样板代码\n\n## 根因\n- src/styles/element-ui.scss 已有两条全局兜底规则，表单内控件宽度已被全局保证\n- 规则一：.el-form .el-input/.el-input-number/... { width: 100%; }\n- 规则二：.el-form-item__content > * { width: 100%; max-width: 100%; }\n\n## 解决方案\n- 全项目清理时只删「纯 100% 宽度」的 style 写法（含单双引号、可选分号），不动带其他样式值的复合 style\n- 范围按组件类型（zs-input、amount-input）圈定，清理后用 grep 复查归零并跑 lint 确认无新增错误\n- 新页面写表单控件时不要再补 width:100%\n\n## 验证与归属\n- 验证：会话 06f932da 全局排查后确认 element-ui.scss 两条规则兜底，实际清理 140 个文件，复查冗余写法为 0、lint 无新增错误\n- 涉及文件：zhi2-web-admin/src/styles/element-ui.scss、zhi2-web-admin/src/components/zs-input/zs-input.vue、zhi2-web-admin/src/components/zs-input-number/zs-input-number.vue\n- 所属项目：园区物管2.0；代码基线 7814a0c2a；来源会话 06f932da-3393-48a6-bff2-4f09b55cb82b",
+                "after": "# 表单输入控件宽度全局兜底无需手写width:100%\n园区物管2.0 中 zs-input / amount-input 等表单输入控件普遍带冗余的 width:100% 内联样式，全局 element-ui.scss 已兜底。\n\n## 问题现象\n- 页面里 zs-input / amount-input 等输入控件上普遍带 :style=\"{ width: '100%' }\" 或 style=\"width: 100%\"，属冗余样板代码\n- src/styles/element-ui.scss 中 .el-form 与 .el-form-item__content > * 已全局设置 width: 100%，zs-input 及 amount-input 上的 width:100% 内联样式冗余\n\n## 根因\n- src/styles/element-ui.scss 已有两条全局兜底规则，表单内控件宽度已被全局保证\n- 规则一：.el-form .el-input/.el-input-number/... { width: 100%; }\n- 规则二：.el-form-item__content > * { width: 100%; max-width: 100%; }\n\n## 解决方案\n- 全项目清理时只删「纯 100% 宽度」的 style 写法（含单双引号、可选分号），不动带其他样式值的复合 style\n- 范围按组件类型（zs-input、amount-input）圈定，清理后用 grep 复查归零并跑 lint 确认无新增错误\n- 实际已在 zhi2-web-admin/src 清理 140 个文件纯 100% 宽度写法，lint 无报错\n- 新页面写表单控件时不要再补 width:100%\n\n## 验证与归属\n- 验证：会话 06f932da 全局排查后确认 element-ui.scss 两条规则兜底，实际清理 140 个文件，复查冗余写法为 0、lint 无新增错误\n- 涉及文件：zhi2-web-admin/src/styles/element-ui.scss、zhi2-web-admin/src/components/zs-input/zs-input.vue、zhi2-web-admin/src/components/zs-input-number/zs-input-number.vue、zhi2-web-admin/src/views/benefit/components/AutoReconciliationDialog.vue、zhi2-web-admin/src/main.js、zhi2-web-admin/src/components/zs-textarea/zs-textarea.vue、zhi2-web-admin/src/components/zs-select/zs-like-select.vue、zhi2-web-admin/src/components/Process/common/XForm.vue、zhi2-web-admin/src/components/AmountInput/index.vue\n- 所属项目：园区物管2.0；代码基线 7814a0c2a；来源会话 06f932da-3393-48a6-bff2-4f09b55cb82b"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/global_input_width_redundant.md",
+                "memory_type": "entities",
+                "deleted_content": "# 全局样式已兜底input宽度冗余style可删\nsrc/styles/element-ui.scss 已全局设置 input 宽度 100%，zs-input 及 amount-input 上的 width:100% 内联样式冗余可删。\n\n## 问题现象\n- `src/styles/element-ui.scss` 中 `.el-form` 与 `.el-form-item__content > *` 已全局设置 `width: 100%`\n- `zs-input` 及 `amount-input` 上的 `width: 100%` 内联样式冗余\n\n## 解决方案\n- 已在 `zhi2-web-admin/src` 清理 140 个文件纯 100% 宽度写法，lint 无报错\n\n## 验证与归属\n- 验证证据：src=园区物管2.0/029.md\n- 涉及文件：zhi2-web-admin/src/views/benefit/components/AutoReconciliationDialog.vue、zhi2-web-admin/src/components/zs-input/zs-input.vue、zhi2-web-admin/src/main.js、zhi2-web-admin/src/components/zs-input-number/zs-input-number.vue、zhi2-web-admin/src/components/zs-textarea/zs-textarea.vue、zhi2-web-admin/src/components/zs-select/zs-like-select.vue、zhi2-web-admin/src/components/Process/common/XForm.vue、zhi2-web-admin/src/components/AmountInput/index.vue\n- 所属项目：园区物管2.0；代码基线 none；来源会话 06f932da-3393-48a6-bff2-4f09b55cb82b"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

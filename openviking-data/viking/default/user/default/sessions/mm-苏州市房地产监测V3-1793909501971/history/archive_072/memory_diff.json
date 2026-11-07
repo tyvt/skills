@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_072",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T23:52:41.917862+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_cancel_area_mixin.md",
+                "memory_type": "entities",
+                "after": "# 机构注销列表页接入area mixin\n苏州市房地产监测V3 的机构注销列表页已改用公共 `@/mixins/area.js` 处理行政区划展示，并与详情页命名和回显逻辑对齐。\n\n## 修改内容\n- 引入 `area` mixin（与 `benefit/alert`、`buildinginfo` 等列表一致），提供 `findRegionLabel`、`ensureAreaTreeLoaded` 加载区划数据\n- `regionOptions` 重命名为 `economicRegionOptions`，避免与 `area` mixin 的 computed `regionOptions` 冲突，并与 `companyCancel/detail.vue` 一致\n- `formatRegion` 回显顺序：先查 `ECONOMIC_INSTITUTIONS_REGION` 字典，再用 `this.formatters.fullRegionFormatter`，最后用 mixin 的 `findRegionLabel` 兜底\n\n## 使用规则\n- 筛选下拉仍用 `economicRegionOptions`（字典数据）\n- 表格和「选择机构」弹窗仍走 `formatRegion` 回显\n\n## 验证与归属\n- 涉及文件：`@/mixins/area.js`、`companyCancel/detail.vue`、`companyCancel/index.vue`\n- 所属项目：苏州市房地产监测V3\n- 来源会话ID：43523a7a-7791-4eb2-8963-fb30588ceb6e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/permit_cancel_rest_misjudge.md",
+                "memory_type": "entities",
+                "after": "# 预售许可注销接口cancel被误判为REST动作\n苏州市房地产监测V3 中 `apiV3Normalize.js` 的请求拦截器将 `cancel` 误判为 REST 动作，导致分页接口 400，已在 `normalizeTrailingPathParams` 修复。\n\n## 问题根因\n- `index.vue` 通过 `listMixins` 拼出的地址正确：`POST /presale/permit/cancel/page`\n- `apiV3Normalize.js` 拦截器把 `cancel` 当 REST 动作，把末尾 `page` 当成 `id` 移进 body，URL 被改成 `/presale/permit/cancel`，返回 400\n- `permit/extend` 不受影响，因 `extend` 不在 `REST_ACTIONS` 里，仅 `cancel` 触发误判\n\n## 修复方案\n- 在 `apiV3Normalize.js` 的 `normalizeTrailingPathParams` 中修复 `cancel` 误判逻辑\n\n## 验证与归属\n- 涉及文件：`presale/permitCancel/index.vue`、`mixins/table.js`、`apiV3Normalize.js`、`presale/permitExtend/index.vue`、`permitCancelConstants.js`\n- 所属项目：苏州市房地产监测V3\n- 来源会话ID：f82e7cc4-5b9a-49e7-9c22-7583b0a8d615"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/contract_flowable_path_fix.md",
+                "memory_type": "entities",
+                "after": "# 合同接口flowable路径由definition改为task\n苏州市房地产监测V3 的 `contractRequest.js` 中 `getFlowViewer` 和 `isApprovalAuth` 接口路径已从 `/flowable/definition/*` 改为 `/flowable/task/*`。\n\n## 背景\n- 原 `/flowable/definition/*` 路径不正确，合同预售审批页接口调用失败\n\n## 修改内容\n- `contractRequest.js` 的 `getFlowViewer` 和 `isApprovalAuth` 接口路径由 `/flowable/definition/*` 改为 `/flowable/task/*`\n- 重新部署前端后，在合同预售审批页（`/flowable/task/flowViewer`）刷新验证\n\n## 验证与归属\n- 涉及文件：`contract/utils/contractRequest.js`、`api/flowable/definition.js`、`api/flowable/todo.js`、`vite.config.js`、路由信息\n- 所属项目：苏州市房地产监测V3\n- 来源会话ID：957b5194-9887-4b03-a4b2-f48dde8ed5fa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/specialcontract_attachment_busid_fix.md",
+                "memory_type": "entities",
+                "after": "# 合同网签备案比例变更附件busId修正\n苏州市房地产监测V3 中「合同网签备案比例变更」详情因 `OperationBtnGroup` 误用路由防伪码作 `busId`，已改为传入业务主键 `specialContractId`。\n\n## 问题根因\n- 详情路由用防伪码 `antiCounterfeitingCode`（URL UUID），而附件接口 `listAppendixPackage` 的 `busId` 应传业务主键 `specialContractId`\n- `OperationBtnGroup` 一直用 `getId()`（路由防伪码）作为 `busId`，请求出现 UUID\n\n## 修复方案\n- `specialcontract/detail.vue` 给操作栏传入业务主键 `:id=\"form.specialContractId\"`\n- `OperationBtnGroup` 新增 `id` prop，用 `attachmentBusId` 作为附件/提交 `busId`\n- 页面显式传 `id` 时，在 `specialContractId` 未返回前不再回退到路由防伪码\n- 将 `attachmentBusId` 传给 `ZsSubmit` 和附件抽屉的 `AnnexUpload`\n\n## 验证与归属\n- 涉及文件：`commercialHousingSales/presale/specialcontract/detail.vue`、`OperationBtnGroup`、路由信息\n- 所属项目：苏州市房地产监测V3\n- 来源会话ID：00603096-ce00-485a-bc85-12cd53fdaa6b"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

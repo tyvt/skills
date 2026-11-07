@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_041",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:52:52.174618+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/resolve_server_asset_url.md",
+                "memory_type": "entities",
+                "after": "# 后端相对资源路径解析：new URL 相对 location.href\n产品2.0 前端通过 resolveServerAssetUrl 用 new URL(相对路径, window.location.href) 按当前页面地址解析后端返回的资源路径，自适应子路径部署。\n\n## 问题现象\n- 后端返回资源路径形如 /zhi2/（带前导/，相对站点根），前端部署在 /sz/ 子路径时按 origin 拼接会丢掉 /sz 前缀导致 404\n- 写死 origin + '/zhi2' 或依赖 VITE_APP_PUBLIC_PATH 都与部署子路径耦合，换环境失效\n\n## 解决方案\n- 在 resolveServerAssetUrl 里把后端路径去掉开头斜杠，用 new URL('zhi2/...', window.location.href) 按浏览器相对解析规则对齐当前页面地址\n- /sz/login 下解析为 /sz/zhi2/…，本地 dev 下解析为根路径 /zhi2/…，行为与旧 origin 拼接一致但自适应子路径\n- 配套删掉 env/.env 里的 VITE_APP_PUBLIC_PATH 注释\n\n## 边界与约束\n- 该方案要求页面 URL 以 / 结尾或 hash 前有 /，否则最后一段被当文件名\n- 部署侧须保证 /sz 301 到 /sz/，避免相对解析落到站点根\n\n## 涉及与来源\n- 涉及文件：zhi2-web-admin/src/utils/resolveServerAssetUrl.js、zhi2-web-admin/src/views/login.vue、env/.env\n- 所属项目：产品2.0；来源会话：9d79292e-940d-4d5f-b243-3a366235b459；代码基线：5a86102"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_api_rewrite_slash.md",
+                "memory_type": "entities",
+                "after": "# 门户接口重写前导斜杠归一化\n产品2.0 后台通过 portalApiRewrite.js 把旧 system/* 接口重写到门户 /portal/* 前缀，匹配前须补全前导斜杠否则懒加载路径静默漏匹配。\n\n## 问题现象\n- 部门管理页懒加载展开子部门时请求旧接口 /system/dept/list?parentId=100，重写规则没命中\n- 懒加载路径写成不带前导斜杠的 `system/dept/list`，而映射表按「以前导 / 开头的完整路径」精确匹配，缺斜杠直接漏匹配且不报任何错误\n\n## 解决方案\n- 重写器内部在匹配前自动补全前导 /（normalize），让带不带斜杠都能命中\n- 页面侧按约定统一拼 `/${moduleName}/${businessName}/${apiSuffix}` 生成路径\n- 排查同类问题：某接口「明明配了重写却没生效」先打印实际发出的 path 字符串，核对首字符是不是 /\n\n## 涉及与来源\n- 涉及文件：zhi2-web-admin/src/utils/portalApiRewrite.js、zhi2-web-admin/src/views/system/dept/index.vue\n- 所属项目：产品2.0；来源会话：06d23df6-d9e0-472b-bdcb-895195ece6ab；代码基线：eab0458"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/apiv3_normalize_overrides.md",
+                "memory_type": "entities",
+                "after": "# apiV3Normalize 参数键映射优先级\n产品2.0 前端 apiV3Normalize 对能被后缀规则（ByXxx/ById）推断覆盖的动作名，参数键映射须放 ACTION_PARAM_KEY_OVERRIDES 而非 ACTION_PATH_PARAM_KEYS。\n\n## 问题现象\n- system/config/getByKey 接口前端把参数包成 { key: 'qq.map.key' }，后端要 configKey，接口 400/参数为空\n- apiV3Normalize 路径动作解析先按「ByKey 后缀规则」把 getByKey 推断成动作 key、参数键推断为 key，优先级高于 ACTION_PATH_PARAM_KEYS 表\n\n## 解决方案\n- 把映射加进优先级更高的 ACTION_PARAM_KEY_OVERRIDES（与 listHouseGroupByFloor: 'buildingId' 同表），如 getByKey: 'configKey'\n- 改后请求体正确输出 { configKey: 'qq.map.key' }\n- 教训：凡能被后缀规则先行推断覆盖的动作名，一律放 OVERRIDES 表，放 PATH_PARAM_KEYS 会被静默忽略\n\n## 涉及与来源\n- 涉及文件：zhi2-web-admin/src/utils/apiV3Normalize.js（76-81行）、zhi2-web-admin/src/api/system/config.js\n- 所属项目：产品2.0；来源会话：8dceac0c-7274-47ed-980f-09eb44a4fd17；代码基线：39e3114"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/operate_column_mixin_buttons.md",
+                "memory_type": "entities",
+                "after": "# 操作列按钮复用 mixin 三件套\n产品2.0 列表/详情子表操作列须复用 mixin 的 viewButton/editButton/deleteButton，zs-operate-column 需带 moduleName/businessName 才能拼对权限码。\n\n## 问题现象\n- 列表/详情子表操作列按钮样式不统一（查看 primary、编辑 plain、删除 danger plain），disabled/权限逻辑与全站不一致\n- 页面重写 buttons() 用手写配置替代 mixin 现成按钮，丢掉了统一样式档位与禁用逻辑\n- zs-operate-column 权限校验依赖 moduleName/businessName，页面漏传导致权限判定失效\n\n## 解决方案\n- 操作列 buttons() 里保留业务自定义按钮（如注销），再追加 this.viewButton、this.editButton、this.deleteButton，不要手写三件套\n- 子表（如 certificatesTable.vue）使用 mixin 按钮时还要补传 moduleName 与 businessName 给 zs-operate-column\n\n## 验证与来源\n- 验证：staffManagement/components/index.vue 改回 [业务按钮, this.viewButton, this.editButton, this.deleteButton] 后按钮样式统一\n- 涉及文件：zhi2-web-admin/src/views/company/staffManagement/components/index.vue、zhi2-web-admin/src/mixins/table.js\n- 所属项目：产品2.0；来源会话：fdcfaacc-7f87-437f-8701-5f61b9154edb；代码基线：62d5fb9"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-淮安物管-1793818314138/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T19:11:36.227981+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/ranking_fullscreen_blank.md",
+                "memory_type": "entities",
+                "after": "# 全屏排名列表区域空白修复\n淮安物管物业管理大屏全屏时「项目负责人技能等级排名」区域未填满，底部出现大片空白，已通过弹性布局与动态计算行数修复。\n\n## 问题根因\n- rankingList.vue 列表容器写死 height:160px（约5行），全屏后左侧第三块卡片经 grid-template-rows:1fr 变高，列表高度不变致底部空白。\n\n## 解决方案\n- baseCard.vue 卡片设 height:100% + flex 纵向布局，内容区 flex:1 占满剩余高度。\n- rankingList.vue 列表区域改 flex:1 自适应高度，保留 min-height:160px 作为非全屏最小高度。\n- 用 ResizeObserver 根据实际高度计算可见行数，仅当数据行数超过可见行数时才启用滚动动画。\n- index.vue 为排名卡片增加 ranking-card 样式，content-box 加 min-height:0 保证 grid 子项高度向下传递。\n\n## 验证与归属\n- 验证：刷新页面并切换全屏验证效果。\n- 涉及文件：rankingList.vue、baseCard.vue、index.vue（路径 d:\\repository\\淮安物管\\zhi2-web-admin\\src\\views\\...）。\n- 所属项目：淮安物管；来源会话：fe8e0d01-94c7-4681-a866-26e1177ed9e4；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/column_order_ineffective.md",
+                "memory_type": "entities",
+                "after": "# 自定义列顺序调整失效修复\n淮安物管后台自定义列显示调整顺序后未生效，已通过重建表格与本地配置恢复修复。\n\n## 问题根因\n- Element UI 的 el-table 在子组件 column 仅调换 v-for 顺序时，内部列缓存不按新顺序重排，界面看似未排序。\n- displayColumns 只从 Vuex 读配置，整页刷新后 Vuex 未从 localStorage 恢复，保存顺序丢失。\n- 本地旧配置可能缺 order 字段，a.order - b.order 得 NaN 致排序不稳定。\n\n## 解决方案\n- mixins/table.js 增加计算属性 tableColumnsKey（用当前列 prop 顺序拼字符串）；loadTableConfigFromStore 在 Vuex 为空时从 localStorage 读出并 commit 到 store；排序改 (a.order ?? 0)-(b.order ?? 0)。\n- mixins/ListTemplate.js 在 <zs-table> 上增 :key=\"tableColumnsKey\"，列顺序变化时重建表格。\n- global-table-config.vue 等相关文件同步调整。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=淮安物管。\n- 涉及文件：mixins/table.js、mixins/ListTemplate.js、global-table-config.vue 等（路径 d:\\repository\\淮安物管\\zhi2-web-admin\\src\\...）。\n- 所属项目：淮安物管；来源会话：23259f03-6ebe-4aaa-8a85-fd3a770bfa1b；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/export_button_permission.md",
+                "memory_type": "entities",
+                "after": "# 开户申请导出按钮权限控制\n淮安物管开户申请列表页无导出权限时仍显示导出按钮，已通过增加 permission 属性隐藏按钮修复。\n\n## 问题根因\n- 开户申请列表页导出按钮未配置 permission 字段，zs-button 仅在有时才通过 checkPermission 控制显示，缺失时按钮常显，点击后接口返回无权限提示。\n\n## 解决方案\n- 在 pubRegulatoryAccount/index.vue 导出按钮增加 permission: [this.perms.export]，对应标识 benefit:pubRegulatoryAccount:export。\n- 与项目其他列表页（如项目管理）权限控制方式一致。\n\n## 验证与归属\n- 无导出权限用户不再看到该按钮。\n- 涉及文件：pubRegulatoryAccount/index.vue、mixins/listMixins.js（路径 d:\\repository\\淮安物管\\zhi2-web-admin\\src\\...）。\n- 所属项目：淮安物管；来源会话：1e81a46d-d7d6-4b7a-9e41-93e0635341db；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/remuneration_unit_display.md",
+                "memory_type": "entities",
+                "after": "# 酬金数额单位动态显示修复\n淮安物管物业合同详情中酬金提取方式为固定金额（月）时，酬金数额错误显示百分号，已改为动态 unit 修复。\n\n## 问题根因\n- 查看模式下 contentInfo 里「酬金数额」写死 unit:'%'，导致固定金额（月）等类型仍被格式化为带 % 展示。\n- 编辑区已按 remunerationExtractionMethod 区分 %、元/月、元/年，仅详情配置不一致。\n\n## 解决方案\n- 详情「酬金数额」按模板 amount-input 规则设动态 unit 与 dot：比例(==0)为 % 小数0位；固定金额月(==1)为 元/月 小数2位；其余为 元/年 小数2位。\n- 修改文件 detail.vue（路径 .../propertyContract/components/detail.vue）及 detail-template.vue。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=淮安物管。\n- 涉及文件：detail.vue、detail-template.vue（路径 d:\\repository\\淮安物管\\zhi2-web-admin\\src\\...）。\n- 所属项目：淮安物管；来源会话：d33d4f62-bcd8-4af4-8adc-3a0f5ac7884d；代码基线：none。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

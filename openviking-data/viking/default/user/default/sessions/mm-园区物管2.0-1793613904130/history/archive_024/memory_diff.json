@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_024",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T11:08:22.872144+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/operate_row_visible.md",
+                "memory_type": "entities",
+                "after": "# 操作列按钮 visible 与 rowVisible 拆分\n园区物管2.0 中 zs-table / zs-operate-column 把操作列按钮从 if-push 改为「数组 + filter」时需区分数组级布尔 visible 与行级 rowVisible。\n\n## 问题描述\n- 把 buttons 改为数组 + filter((item) => item.visible === undefined || item.visible) 后，若行级条件仍写在 visible: (row) => ... 上，visible 会被数组级 filter 当成布尔开关，与函数语义冲突\n\n## 约定方案\n- 数组级用布尔 visible（如 visible: !this.isQuery）控制按钮是否进入数组\n- 行级显示改用 rowVisible: (row) => ... 承载行级条件\n- isOperateButtonVisible 内依次判 rowVisible、原 visible 函数、checkPermission，行为与改造前一致\n\n## 验证与归属\n- 验证：会话 7ac74063，feeCustomTypeTable.vue 对齐 candidateCollect filter 写法；编辑按钮 rowVisible 控制 contractBizState/bizState，查询态用 visible: !this.isQuery 从数组剔除\n- 涉及文件：zhi2-web-admin/src/views/maintenance/budget/components/feeCustomTypeTable.vue、zhi2-web-admin/src/views/autonomy/candidateCollect/components/index.vue\n- 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：7ac74063-2500-4985-8cbb-650d6052d19f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/select_tree_cache.md",
+                "memory_type": "entities",
+                "after": "# 树+表选择弹窗树节点字段缓存\n园区物管2.0 中 SelectDialog.open / zs-select-dialog-func 左侧树 + 右侧明细表场景下，回填主数据应以左侧树选中节点为准。\n\n## 问题描述\n- 右侧分页行常缺树级字段或字段不完整，只读 row 会导致回填空值或错值\n- 组件打开后默认树节点点击可让未手动点树时仍有初始选中\n\n## 解决方案\n- open 前声明 selectedTreeRow，onTreeClick 实时写入选中节点\n- then 里用 selectedTreeRow 赋值 businessItemId/Code/Name，不假设右侧 row 带全量 businessItem*\n\n## 验证与归属\n- 验证：会话 1aa18ac2，pubPaymentNotice/detail.vue showBusinessItemDialog 改为 onTreeClick 缓存 + selectedTreeRow 回填 businessItem*\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue\n- 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：1aa18ac2-4320-4a6b-abb4-c64bc4cfcd68"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/rank_grid_misalign.md",
+                "memory_type": "entities",
+                "after": "# 排名列表表头与数据行列宽不一致\n园区物管2.0 大屏自定义排名块中，表头与数据行各自 display:grid 且含 auto 列会导致列宽不一致、左缘对不齐。\n\n## 问题描述\n- 表头 .xxx__head 与每行 .xxx__row 各自 display:grid，若第三列用 auto，每行按本行内容算宽\n- 表头「余额（元）」与下方数字左缘会对不齐\n\n## 解决方案\n- 公共父级（如 .balance-rank）定义 CSS 变量统一列模板，如 --balance-rank-grid-cols: 28px minmax(48px, 1fr) 72px\n- 表头与数据行 grid-template-columns 均引用该变量\n- 金额列用固定宽度（如 72px）并 text-align:left，超长金额再调大固定宽\n\n## 验证与归属\n- 验证：会话 2aa6472f，mapOverview/index.vue 物业管理区域账户余额排名表头与数据左对齐问题\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue\n- 所属项目：园区物管2.0；代码基线：f00310232；来源会话：2aa6472f-742a-4bc7-bb9f-76eedbe8d7a9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_proxy_cert.md",
+                "memory_type": "entities",
+                "after": "# Vite 开发代理 HTTPS 连 IP 证书校验失败\n园区物管2.0（苏房）中 VITE_APP_PROXY_ADDRESS 配成 https://IP:端口 时触发 ERR_TLS_CERT_ALTNAME_INVALID，/api 代理失败。\n\n## 问题根因\n- 上游证书 SAN 只含域名不含该 IP，Node TLS 握手拒绝（ERR_TLS_CERT_ALTNAME_INVALID）\n- 改 env 后需重启 dev；若仍不生效查是否被 env/.env.development.local 覆盖（见已知 #1113）\n\n## 解决方案\n- 优先级①：改回证书对应域名（本机 hosts 指到 IP）\n- 优先级②：仅本地开发在 vite.config.js 的 createProxyConfig 对目标代理加 secure: false 跳过证书校验\n- 优先级③：若后端支持改 http://IP 避开 TLS；secure: false 只影响 dev server proxy，不影响 build 产物\n\n## 验证与归属\n- 验证：会话 ee9a14e8，env/.env 使用 https://222.184.31.232:15777 触发校验失败，createProxyConfig 增加 secure: false 后本地代理恢复\n- 涉及文件：env/.env、zhi2-web-admin/vite.config.js\n- 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：ee9a14e8-3ae5-42f3-9d6a-f8fb0fad0e5c"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

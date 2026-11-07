@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_045",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:05:02.937957+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/代码缺陷/suzhufang_header_ascii.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G请求头中文导致保存报错\n在苏住房G项目(zhi2-web-admin)中，请求拦截器将含中文的landPlotCode写入zs-remark请求头，触发浏览器setRequestHeader非ISO-8859-1异常，仅保存链路报错。\n## 根因\n- request.js自动附加自定义头，pageRequestContext.js的getLandPlotCodeRequestHeaders把表单宗地号landPlotCode写入zs-remark\n- HTTP头值仅允许ISO-8859-1，含中文等非ASCII字符时浏览器在setRequestHeader阶段抛错，请求未发出\n- GET加载页不带landPlotCode，故仅新增/编辑保存触发，易误判为后端或数据问题\n## 解决方案\n- 业务字段透传自定义请求头处一律经toAsciiHeaderValue编码(内部encodeURIComponent)，与zs-menu-name同约定\n- 修复位置：pageRequestContext.js:178-180对zs-remark使用toAsciiHeaderValue(landPlotCode)\n- 排查仅POST报错无响应时，优先grep页面上下文请求头取值来源\n## 验证与归属\n- 验证：会话369f9db2基线d109b83，项目楼盘表保存异常，定位并修复\n- 涉及文件：src/utils/pageRequestContext.js、src/utils/request.js、src/views/building/project/detail.vue\n- 所属项目：苏住房G；来源会话：369f9db2-2fde-436c-9e46-1d22237a54a6；代码基线：d109b83"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/代码缺陷/suzhufang_pagenoscope.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G选择小区弹窗显示外区县数据\n在苏住房G项目(zhi2-web-admin)物业侧业务页，SelectDialog选择小区时误显示非当前区县数据，因复用pageNoScope接口而非带权限的page接口。\n## 根因\n- /property/complex有pageNoScope和page两条并列接口，pageNoScope不做区县数据权限过滤\n- 页面早期随手复用pageNoScope，将外区县数据捞出\n- 该问题不报错、不返回400，仅数据多出来，靠肉眼发现\n## 解决方案\n- 当前业务上下文选小区/项目一律用带数据权限的/property/complex/page\n- 仅明确跨区县全量场景(如后台管理查询)才用pageNoScope\n- 改完须拉跨区县有数据的账号验证，不能只跑同区县用例\n- v2.6.1全量合v2.6.2冲突多，改为cherry-pick单条修复提交\n## 验证与归属\n- 验证：会话5380defe，已增梯维护新增选择小区显示外区县，定位detail.vue的handleOpenProjectDialog中url改为/page后恢复\n- 提交：18986faec(v2.6.1)→cherry-pick 3ae901631(v2.6.2)→d8d0090b2(v2.6.2-suzhufang)\n- 涉及文件：src/views/property/census/detail.vue；所属项目：苏住房G；来源会话：5380defe-19ed-4a64-b4c5-f45d134d8f43；代码基线：d109b83"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhufang_b_layer.md",
+                "memory_type": "entities",
+                "after": "# 苏住房GB端管理员与从业人员分层\n在苏住房G项目(zhi2-web-admin)中，B端(terminalType==='B')在terminalType之上按isCompanyAdmin再分企业管理员与从业人员两层，区域弹窗仅属从业人员。\n## 分层规则\n- isBTerminalPractitioner = terminalType==='B' && !isCompanyAdmin，仅此层需选区域、三资模块按区域隔离、右上角显示切换区域\n- isGTerminalLike = terminalType!=='B' || isCompanyAdmin，企业管理员与G端同菜单流程，不弹窗、右上角不显区域名\n- 区域弹窗显示规则：0区域不弹、1区域静默选中不弹、多个才弹\n## 排查与修复\n- 遇「B端不该弹却弹」先打印terminalType/isCompanyAdmin/isBTerminalPractitioner三值，多数因后端getInfo未回isCompanyAdmin:true致降级从业人员\n- isCompanyAdmin缺失必须当非管理员处理，否则造成相反越权展示\n- 历史7-13用ENABLE_B_TERMINAL_PROJECT_DIALOG_ON_LOGIN=false临时全关，7-15按区域数量恢复\n## 验证与归属\n- 验证：会话cbfb89e8，用户确认B端企业管理员不应显区域；代码在utils/terminalUser.js的isBTerminalPractitioner/isGTerminalLike，弹窗BProjectDialog仅对从业人员渲染\n- 提交：bf2512af8(7-13全关)→b9412a507(7-15恢复)\n- 涉及文件：src/utils/terminalUser.js、src/layout/index.vue、src/views/home/bProjectDialog.vue；所属项目：苏住房G；来源会话：cbfb89e8-705e-429a-96b7-fa329df51e3e；代码基线：ac184e6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/代码缺陷/suzhufang_isselectable.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G表格行勾选门禁连坐忽略预警\n在苏住房G项目(zhi2-web-admin)经营用房租赁合同列表，mixins/table.js默认isSelectable仅放行草稿行，导致已备案预警行无法勾选执行「忽略预警」。\n## 根因\n- table.js的isSelectable(row){return row.bizState=='0'||!row.bizState}为批量删除设计，只放行草稿\n- 已备案行bizState非'0'，row-selectable=false，勾选集合拿不到，忽略预警操作提示请选择合同\n- 同一门禁承载删除与忽略预警两种语义，后者被前者状态限制连坐\n## 解决方案\n- 页面覆盖isSelectable而非改公共mixin：放行草稿行+带预警标记行(whetherWarning==1)，其余不可选\n- 提交时只取预警行ID，避免误勾草稿当预警提交\n- 批量删除按钮加禁用条件(选中含已备案行时保持禁用)，防借用放宽通道误删\n## 验证与归属\n- 验证：会话19d60287，已备案合同不能选忽略预警；修复为assetsLeaseContractFiling/index.vue覆盖isSelectable、getIgnore只提交预警行ID、批量删除按钮保持禁用\n- 涉及文件：src/mixins/table.js、src/views/benefit/assetsLeaseContractFiling/index.vue；所属项目：苏住房G；来源会话：19d60287-cf61-42b7-8cdf-70ebe430e846；代码基线：82999dc"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793639107798/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T17:11:57.004641+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/v_money_guard.md",
+                "memory_type": "entities",
+                "after": "# v-money 指令空值守卫\n太仓G 项目大量 `v-money:2` 未传对象绑定，指令 inserted 时 binding.value 为 undefined，直接解构会抛 TypeError。\n\n## 问题根因\n- 项目大量 `v-money:2` 未传对象绑定，inserted hook 中 `binding.value` 为 undefined\n- money.js 直接解构 `const { normal, limit, maxIntLength } = value` 会在 inserted hook 抛 TypeError\n\n## 解决方案\n- 约定在 inserted/unbind 使用 `const { normal, limit, maxIntLength } = value || {}`\n- 与 AmountInput 组件选型（zs-input+v-money）是不同层面问题，勿混淆\n\n## 验证与归属\n- 验证证据：会话 8f9057d0 maintainDecision/detail 报 directive money inserted 解构 undefined；结论在 money.js 两处加 value||{}\n- 涉及文件：zhi1-web-admin/src/directives/formatter/money.js、maintainDecision/detail.vue、AmountInput/index.vue\n- 所属项目：太仓G；来源会话：8f9057d0-7dbf-4966-9b52-d5d8411e8e4b；代码基线：9638e2f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/election_candidate_masses.md",
+                "memory_type": "entities",
+                "after": "# 业委会选举候选业主群众隐藏党组织\n太仓G 业委会选举 CandidateDialog 若把所属党组织写死 required，选政治面貌「群众」仍会显示红星并校验失败。\n\n## 问题根因\n- CandidateDialog 把所属党组织写死 required，选政治面貌「群众」仍显示红星并校验失败\n- 园区公共收益有按身份切换附件的类似模式，但本弹窗是党组织字段联动\n\n## 解决方案\n- 用字典项 dictLabel 判定是否群众（兼容不同 dictValue），计算属性 isMassesPoliticsStatus\n- 群众时 v-if 隐藏所属党组织、rules 改为计算属性仅在非群众时必填\n- 切到群众时清空党组织并 clearValidate；党员等其它面貌仍显示且必填\n\n## 验证与归属\n- 验证证据：会话 ed64bbc0 用户选群众仍提示所属党组织必填；结论说明 dictLabel 匹配、条件显示与动态 rules\n- 涉及文件：zhi1-web-admin/src/views/repairFunds/ownerApply/components/CandidateDialog.vue\n- 所属项目：太仓G；来源会话：ed64bbc0-e94c-47ef-8caf-b46b1c3f85c0；代码基线：cf80bc8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/decision_range_branch.md",
+                "memory_type": "entities",
+                "after": "# 一般表决新增决策范围分流\n太仓G 一般表决（`decision-policy=\"general\"`）点击「+ 新增」须打开选择户室弹窗走 batchAdd，维修资金表决（maintain）保留原表单链路。\n\n## 问题根因\n- 从昆山等源站迁移时 DecisionRangeTable.vue 若一律用「新增决策范围」表单弹窗并调单条新增接口，一般表决会与正确产品行为不符并可能触发后端异常\n- 左侧户室树「暂无数据」时另查 propertyProjectId 与树接口数据\n\n## 解决方案\n- 一般表决点击「+ 新增」打开 RangeHouseDialog「选择户室」，选中后调 batchAdd 批量写入并刷新列表\n- 维修资金表决（maintain）仍保留原「新增决策范围」表单链路\n\n## 验证与归属\n- 验证证据：会话 0a72f656 用户对比昆山截图，太仓一般表决详情新增走错弹窗导致系统异常；结论引入 RangeHouseDialog + batchAdd 按 general/maintain 分支\n- 涉及文件：zhi1-web-admin/src/views/estate/decisionCommon/components/DecisionRangeTable.vue、generalDecision/detail.vue、api/estate/decisionRange.js\n- 所属项目：太仓G；来源会话：0a72f656-dc31-41e6-9305-4a7371db4213；代码基线：e083bd5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/option_vote_api.md",
+                "memory_type": "entities",
+                "after": "# 选项表决两套接口区分\n太仓G 选项表决的投票弹窗与详情「表决项」Tab 是两套接口，排查弹窗表决项为空应先看 optionGroup 而非 option 系列。\n\n## 投票弹窗接口\n- 线下/线上投票弹窗（VoteRangeDialog + CandidateConfigTable）加载分组表决项：`GET /estate/optionGroup/list?decisionId=`，返回 rows（含 tMfOptionApplyList）与 costMap.waiver\n- 提交投票 `POST /estate/decisionRecord`（optionList）\n\n## 详情表决项 Tab 接口\n- 详情页「表决项」Tab 配置维护（VotingItemsTable / api/estate/option.js）才是 `GET/POST/PUT/DELETE /estate/option*`\n\n## 验证与归属\n- 验证证据：会话 efe5e07f 用户问截图弹窗表决项接口；结论区分 optionGroup/list + decisionRecord 与 option 系列\n- 涉及文件：zhi1-web-admin/src/views/estate/optionDecision/components/VoteRangeDialog.vue、CandidateConfigTable.vue、api/estate/option.js\n- 所属项目：太仓G；来源会话：efe5e07f-1a8b-4cb4-ba67-c0e514354498；代码基线：e177dad"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

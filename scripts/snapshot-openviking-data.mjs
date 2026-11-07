@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 /**
- * 备份 OpenViking 用户 data 树（知识相关部分）到 skills/openviking-data/
- * 源：%USERPROFILE%\.openviking\data\viking\default\user\default\
- * 含：memories/、peers 下各 peer 的 memories/、根目录 .overview.md / .abstract.md
- * 不含：sessions/（DSH 原文镜像，~120MB，可本地重镜像）、vectordb（可重算）
+ * 备份所有影响 OpenViking 记忆质量的 data 子树 → skills/openviking-data/
+ *
+ * 含：
+ *   - data/viking/default/user/default/ 整树（memories、peers、sessions、skills、resources、privacy、摘要）
+ *   - data/vectordb/ 向量索引
+ *   - data/viking/default/backend_meta.json 等同级元数据（若存在）
+ *
+ * 不含（纯运行时，无知识价值或可重算且会膨胀仓库）：
+ *   - data/_system/、data/.openviking.lock、pending/、state/
  *
  * node scripts/snapshot-openviking-data.mjs [--commit] [--push] [--reason manual]
  */
@@ -13,18 +18,69 @@ import { spawnSync } from "child_process";
 import { fileURLToPath } from "url";
 import { setTimeout as sleep } from "timers/promises";
 
+function copyFileRetry(from, to, tries = 8) {
+  fs.mkdirSync(path.dirname(to), { recursive: true });
+  for (let i = 0; i < tries; i++) {
+    try {
+      fs.copyFileSync(from, to);
+      return;
+    } catch (e) {
+      if ((e.code === "EBUSY" || e.code === "EPERM") && i < tries - 1) {
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1500);
+        continue;
+      }
+      throw e;
+    }
+  }
+}
+
+function mirrorVectordbRobocopy(srcRoot, dstRoot) {
+  if (!fs.existsSync(srcRoot)) return { files: 0, bytes: 0, copied: 0, removed: 0, missing: true };
+  fs.mkdirSync(dstRoot, { recursive: true });
+  const r = spawnSync(
+    "robocopy",
+    [srcRoot, dstRoot, "/E", "/XO", "/R:3", "/W:2", "/NFL", "/NDL", "/NJH", "/NJS", "/NP"],
+    { encoding: "utf8", windowsHide: true }
+  );
+  const code = r.status ?? 0;
+  if (code >= 8) {
+    console.error("robocopy vectordb failed", code, r.stderr || r.stdout);
+    process.exit(1);
+  }
+  let files = 0;
+  let bytes = 0;
+  for (const abs of walkFiles(dstRoot)) {
+    files++;
+    bytes += fs.statSync(abs).size;
+  }
+  return { files, bytes, copied: files, removed: 0, missing: false, robocopyExit: code };
+}
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILLS_ROOT = path.resolve(__dirname, "..");
 const DST_ROOT = path.join(SKILLS_ROOT, "openviking-data");
-const SRC_USER = path.join(
-  process.env.USERPROFILE || "",
-  ".openviking",
-  "data",
-  "viking",
-  "default",
-  "user",
-  "default"
-);
+const DATA_ROOT = path.join(process.env.USERPROFILE || "", ".openviking", "data");
+
+const SECTIONS = [
+  {
+    key: "userDefault",
+    src: path.join(DATA_ROOT, "viking", "default", "user", "default"),
+    dst: path.join(DST_ROOT, "viking", "default", "user", "default"),
+  },
+  {
+    key: "vectordb",
+    src: path.join(DATA_ROOT, "vectordb"),
+    dst: path.join(DST_ROOT, "vectordb"),
+  },
+];
+
+const EXTRA_FILES = [
+  {
+    key: "backendMeta",
+    src: path.join(DATA_ROOT, "viking", "default", "backend_meta.json"),
+    dst: path.join(DST_ROOT, "viking", "default", "backend_meta.json"),
+  },
+];
 
 const args = process.argv.slice(2);
 const doCommit = args.includes("--commit");
@@ -33,27 +89,23 @@ const reasonIdx = args.indexOf("--reason");
 const reason = reasonIdx >= 0 ? args[reasonIdx + 1] || "manual" : "manual";
 
 const RESERVED = new Set(["readme.md", ".snapshot-meta.json"]);
-const EXCLUDE_DIRS = new Set(["sessions"]);
 
-function shouldSkipDir(name) {
-  return EXCLUDE_DIRS.has(name);
-}
-
-function* walkFiles(dir) {
-  for (const name of fs.readdirSync(dir)) {
-    const p = path.join(dir, name);
+function* walkFiles(root) {
+  if (!fs.existsSync(root)) return;
+  for (const name of fs.readdirSync(root)) {
+    const p = path.join(root, name);
     const st = fs.statSync(p);
-    if (st.isDirectory()) {
-      if (shouldSkipDir(name)) continue;
-      yield* walkFiles(p);
-    } else if (name.endsWith(".md") && !name.startsWith(".")) {
-      yield p;
-    }
+    if (st.isDirectory()) yield* walkFiles(p);
+    else yield p;
   }
 }
 
-function relFromUser(abs) {
-  return path.relative(SRC_USER, abs).replace(/\\/g, "/");
+function relFiles(root) {
+  const out = new Set();
+  for (const abs of walkFiles(root)) {
+    out.add(path.relative(root, abs).replace(/\\/g, "/"));
+  }
+  return out;
 }
 
 function validateMd(abs) {
@@ -69,104 +121,110 @@ function validateMd(abs) {
   return { ok: true };
 }
 
-function collectSources() {
-  const rels = new Set();
-  if (!fs.existsSync(SRC_USER)) return rels;
-  for (const abs of walkFiles(path.join(SRC_USER, "memories"))) {
-    rels.add(relFromUser(abs));
+function shouldValidateMd(rel) {
+  const base = path.basename(rel);
+  if (base.startsWith(".")) return false;
+  if (!rel.endsWith(".md")) return false;
+  if (rel.startsWith("memories/")) return true;
+  if (rel.includes("/memories/")) return true;
+  return false;
+}
+
+function mirrorTree(srcRoot, dstRoot) {
+  const empty = { files: 0, bytes: 0, copied: 0, removed: 0, missing: !fs.existsSync(srcRoot) };
+  if (!fs.existsSync(srcRoot)) return empty;
+  const srcRel = relFiles(srcRoot);
+  let bytes = 0;
+  let copied = 0;
+  for (const rel of srcRel) {
+    const from = path.join(srcRoot, rel);
+    const to = path.join(dstRoot, rel);
+    copyFileRetry(from, to);
+    copied++;
+    bytes += fs.statSync(to).size;
   }
-  const peersRoot = path.join(SRC_USER, "peers");
-  if (fs.existsSync(peersRoot)) {
-    for (const peer of fs.readdirSync(peersRoot)) {
-      const memDir = path.join(peersRoot, peer, "memories");
-      if (!fs.existsSync(memDir)) continue;
-      for (const abs of walkFiles(memDir)) {
-        rels.add(relFromUser(abs));
+  let removed = 0;
+  if (fs.existsSync(dstRoot)) {
+    for (const rel of relFiles(dstRoot)) {
+      if (!srcRel.has(rel)) {
+        fs.unlinkSync(path.join(dstRoot, rel));
+        removed++;
       }
     }
   }
-  for (const f of [".overview.md", ".abstract.md"]) {
-    const p = path.join(SRC_USER, f);
-    if (fs.existsSync(p)) rels.add(f);
-  }
-  return rels;
+  return { files: srcRel.size, bytes, copied, removed, missing: false };
 }
 
-function listDstMd() {
-  const out = [];
-  if (!fs.existsSync(DST_ROOT)) return out;
-  const userDst = path.join(DST_ROOT, "viking", "default", "user", "default");
-  if (!fs.existsSync(userDst)) return out;
-  for (const abs of walkFiles(userDst)) {
-    const rel = path.relative(DST_ROOT, abs).replace(/\\/g, "/");
-    if (RESERVED.has(path.basename(rel).toLowerCase())) continue;
-    out.push(rel);
-  }
-  for (const f of [".overview.md", ".abstract.md"]) {
-    const p = path.join(userDst, f);
-    if (fs.existsSync(p)) out.push(`viking/default/user/default/${f}`);
-  }
-  return out;
+const stats = {
+  files: 0,
+  bytes: 0,
+  copied: 0,
+  removed: 0,
+  bySection: {},
+};
+
+for (const sec of SECTIONS) {
+  const local =
+    sec.key === "vectordb" ? mirrorVectordbRobocopy(sec.src, sec.dst) : mirrorTree(sec.src, sec.dst);
+  stats.files += local.files;
+  stats.bytes += local.bytes;
+  stats.copied += local.copied;
+  stats.removed += local.removed;
+  stats.bySection[sec.key] = local;
 }
 
-if (!fs.existsSync(SRC_USER)) {
-  console.error("ERR: 源目录不存在", SRC_USER);
-  process.exit(1);
-}
-
-const srcRel = collectSources();
-let copied = 0;
-for (const rel of srcRel) {
-  const from = path.join(SRC_USER, rel);
-  const to = path.join(DST_ROOT, "viking", "default", "user", "default", rel);
-  fs.mkdirSync(path.dirname(to), { recursive: true });
-  fs.copyFileSync(from, to);
-  copied++;
-}
-
-const dstRelSet = new Set(listDstMd());
-const srcDstRel = new Set([...srcRel].map((r) => `viking/default/user/default/${r}`));
-let removed = 0;
-for (const rel of dstRelSet) {
-  if (RESERVED.has(path.basename(rel).toLowerCase())) continue;
-  if (!srcDstRel.has(rel)) {
-    fs.unlinkSync(path.join(DST_ROOT, rel));
-    removed++;
-  }
+for (const ef of EXTRA_FILES) {
+  if (!fs.existsSync(ef.src)) continue;
+  fs.mkdirSync(path.dirname(ef.dst), { recursive: true });
+  copyFileRetry(ef.src, ef.dst);
+  const b = fs.statSync(ef.dst).size;
+  stats.bytes += b;
+  stats.files += 1;
+  stats.copied += 1;
+  stats.bySection[ef.key] = { files: 1, bytes: b };
 }
 
 const bad = [];
-let bytes = 0;
-for (const rel of srcDstRel) {
-  const abs = path.join(DST_ROOT, rel);
-  if (!fs.existsSync(abs)) continue;
-  bytes += fs.statSync(abs).size;
-  const v = validateMd(abs);
-  if (!v.ok) bad.push({ rel, why: v.why });
+const userDst = path.join(DST_ROOT, "viking", "default", "user", "default");
+if (fs.existsSync(userDst)) {
+  for (const abs of walkFiles(userDst)) {
+    const rel = path.relative(userDst, abs).replace(/\\/g, "/");
+    if (!shouldValidateMd(rel)) continue;
+    const v = validateMd(abs);
+    if (!v.ok) bad.push({ rel: `viking/default/user/default/${rel}`, why: v.why });
+  }
 }
 
 if (bad.length) {
-  console.error("ERR: 校验失败", bad.slice(0, 10));
+  console.error("ERR: 记忆 md 校验失败", bad.slice(0, 10));
   process.exit(2);
+}
+
+if (!fs.existsSync(SECTIONS[0].src)) {
+  console.error("ERR: 用户 data 源不存在", SECTIONS[0].src);
+  process.exit(1);
 }
 
 const meta = {
   syncedAt: new Date().toISOString(),
   reason,
-  src: SRC_USER,
+  src: DATA_ROOT,
   dst: DST_ROOT,
-  fileCount: srcDstRel.size,
-  bytes,
-  copied,
-  removed,
-  excludes: ["sessions", "vectordb", "data/_system"],
+  fileCount: stats.files,
+  bytes: stats.bytes,
+  copied: stats.copied,
+  removed: stats.removed,
+  bySection: stats.bySection,
+  excludes: ["data/_system", "data/.openviking.lock", "pending", "state"],
 };
+
 fs.mkdirSync(DST_ROOT, { recursive: true });
 fs.writeFileSync(path.join(DST_ROOT, ".snapshot-meta.json"), JSON.stringify(meta, null, 2), "utf8");
 
 console.log(
-  `OK: ${meta.fileCount} md, ${(bytes / 1024 / 1024).toFixed(2)} MB | copy=${copied} remove=${removed} | ${reason}`
+  `OK: ${meta.fileCount} files, ${(stats.bytes / 1024 / 1024).toFixed(2)} MB | copy=${stats.copied} remove=${stats.removed} | ${reason}`
 );
+console.log(JSON.stringify(stats.bySection, null, 2));
 
 if (!doCommit) process.exit(0);
 
@@ -185,7 +243,13 @@ if (!st) {
   console.log("Git: 无变更，跳过提交");
   process.exit(0);
 }
-git(["-c", "core.safecrlf=false", "commit", "-m", `chore(openviking-data): 快照 ${meta.fileCount} md (${reason})`]);
+git([
+  "-c",
+  "core.safecrlf=false",
+  "commit",
+  "-m",
+  `chore(openviking-data): 全量快照 ${meta.fileCount} files (${reason})`,
+]);
 console.log("Git:", git(["log", "--oneline", "-1"]));
 
 if (!doPush) process.exit(0);

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_010",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T23:00:12.405625+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/define_async_component.md",
+                "memory_type": "entities",
+                "after": "# 微信小程序不支持 defineAsyncComponent\n苏住房C（uni-app Vue3）小程序端编译/预览时报 defineAsyncComponent is not suppprted，页面组件不渲染，需改静态导入或走分包/easycom。\n\n## 现象与根因\n- zhi2-mobile-shimin 某次编译/预览报 `defineAsyncComponent is not suppprted`（原文拼写），页面组件不渲染\n- 根因在 src/components/ZsPaging/ZsPaging.vue 用 `defineAsyncComponent(() => import('z-paging/components/z-paging/z-paging.vue'))` 延迟加载 z-paging\n- 微信小程序运行时无 Vue 动态 import/异步组件能力，该 API 仅 Web/SSR 构建下成立，编译阶段不报，易误判为 z-paging 问题\n\n## 解决方案\n- 改为静态顶部导入 `import ZPagingInner from 'z-paging/components/z-paging/z-paging.vue'`，其余 ref/useSlots/useAttrs/computed/provide 保持不动\n- 若有主包体积诉求，走 pages.json 的 `subPackages` 分包或 `easycom` 自动引入，不依赖异步组件\n- 注意分包不能跨包引用组件与静态资源（根治套路：迁移组件 + componentPlaceholder）\n- 排查口诀：小程序端任何 `defineAsyncComponent`/`() => import()` 组件加载先怀疑不支持，而非先查路径与依赖\n\n## 验证与归属\n- 验证证据：用户报错原文「defineAsyncComponent is not suppprted」；改为静态导入后本地构建通过编译阶段\n- 涉及文件：src/components/ZsPaging/ZsPaging.vue、src、package.json\n- 所属项目：苏住房C；来源会话ID：5aa7d8b1-67f8-4176-87c9-4be5cb616b81；代码基线：5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/unocss_dash_class.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C UnoCSS 水平内边距短横线类名\n苏住房C 移动端 UnoCSS 水平内边距需用短横线分段写法 `p-x-32`，写错为 `px-32` 不报错但静默不生效。\n\n## 现象与根因\n- 「两智一全」等列表页给列表项写 `px-32` 想留 32rpx，实际图片贴屏幕左边，搜索栏区域正常\n- 根因：项目 UnoCSS preset 里水平内边距类名是 `p-x-32`（见 uno.config.ts），`px-32` 不匹配任何规则，类名原样留元素上但无 CSS\n- 编译不报错、控制台不警告，只能靠肉眼看布局异常；uni-app 生态与 Tailwind 习惯多为 `px-4` 连写，易从别处抄错\n\n## 解决方案\n- 改 `px-32` → `p-x-32` 即恢复左右各 32rpx，与搜索栏对齐；垂直方向对应 `p-y-*`\n- 新增或复刻页面先打开 uno.config.ts 确认 padding/margin 命名规则，全项目统一\n- 发现「某间距类完全没效果、但元素结构与其他页一致」时，第一反应核对类名拼写规则，而非加 !important 或改父容器 padding\n\n## 验证与归属\n- 验证证据：用户反馈列表图片太贴边；goodProject/index.vue 改 px-32 为 p-x-32 后列表左右留 32rpx 与搜索栏一致\n- 涉及文件：uno.config.ts、pages_transaction/goodProject/index.vue、pages_transaction/newHouse/index.vue\n- 所属项目：苏住房C；来源会话ID：f0a63c2c-8cc1-48d5-b969-3d5c734700b9；代码基线：77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/wx_window_scrollto.md",
+                "memory_type": "entities",
+                "after": "# 小程序禁用 window.scrollTo 锚点滚动\n苏住房C 市民端新房详情页用 `window.scrollTo` 做 tab 锚点滚动，微信小程序抛 TypeError，需改 uni.createSelectorQuery + uni.pageScrollTo。\n\n## 现象与根因\n- pages_transaction/newHouse/detail.vue 的 setTab 用 `window.scrollTo({...})` 做「详情/户型/相册/周边」tab 锚点滚动\n- 微信开发者工具抛 TypeError: Cannot read property 'scrollTo' of undefined（栈顶 setTab），H5 预览却正常\n- 根因：小程序逻辑层无 window 对象，uni-app 编译到 mp-weixin 后 window 为 undefined；此类「H5 能跑、小程序崩」是跨端移植常见 bug\n\n## 解决方案\n- 滚动统一改跨端 API：uni.createSelectorQuery().select('#md0').boundingClientRect() 拿位置，再算偏移调 uni.pageScrollTo({ scrollTop: scrollTop + rect.top, duration })\n- 锚点定位优先用 class 选择器而非 ref——原代码只有 ref=\"md0\" 无 class，需补 md0 class\n- 锚点 class 名与 tab 的 value 严格对应（原有 md3 对应 tab value \"6\"，已统一改 md6）\n- 改完重新构建 dist 后在微信开发者工具逐个点击 tab 验证，H5 预览通过不算验证\n\n## 验证与归属\n- 验证证据：会话 41a4e64f 用户贴 weapp 报错 TypeError at Proxy.setTab；修复改用 uni.createSelectorQuery + uni.pageScrollTo，补 md0 class，md3 改 md6\n- 涉及文件：src/pages_transaction/newHouse/detail.vue\n- 所属项目：苏住房C；来源会话ID：41a4e64f-0b65-4969-b0c2-d0d6514d2d0c；代码基线：9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/flex_card_shrink.md",
+                "memory_type": "entities",
+                "after": "# flex 横向卡片长文本挤压封面图\n苏住房C 辖区小区列表 flex 横向卡片中长地址把左侧封面图挤压变形，需三件套 flex-shrink:0 + min-width:0 + word-break。\n\n## 现象与根因\n- pages_owner/community/info/index 的 .detail_item 为 flex 横向排列（左封面图 .link-icon，右文字区 .item_bottom），地址一长左侧封面图被挤窄变形\n- 根因：flex 子项默认 flex-shrink:1，只写 width:100px 不能阻止压缩；右侧文字区未设 min-width:0 时默认 min-width:auto 让长串文字反向撑开抢空间\n- 两个方向力叠加使图片变窄；任何「图标/头像/缩略图 + 可变长文本」横排卡片有极端长文本即复现\n\n## 解决方案\n- 图片侧加 flex-shrink: 0 并显式写死宽高 100px × 76px（像素为准）\n- 文字容器加 flex: 1; min-width: 0，占剩余空间不撑开\n- 地址等长文本加 word-break: break-all，保证换行不外溢\n- 同类布局（消息列表、附件行、成员卡片）默认套用这三件套\n\n## 验证与归属\n- 验证证据：会话 1db8ec36 用户截图反馈地址挤压封面图；修改 .link-icon 增 flex-shrink:0 固定 100px×76px，.item_bottom 增 flex:1; min-width:0，.item_address 增 word-break:break-all\n- 涉及文件：pages_owner/community/info/index.vue、subdistrict/info/index.vue、company/info/index.vue、committee/info/index.vue\n- 所属项目：苏住房C；来源会话ID：1db8ec36-d2b1-4f40-9ca7-140c53112d51；代码基线：4630e8e"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

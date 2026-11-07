@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793758965904/history/archive_037",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T03:42:53.741832+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/ci_binding_heal.md",
+                "memory_type": "entities",
+                "after": "# CI原生绑定自愈：Node版本与optionalDependencies\nCI构建报Cannot find native binding时，根因是Node版本不达标导致npm静默跳过平台optionalDependencies，需升级Node并泛化install.mjs自愈扫描补装。\n## 根因\n- CI runner的Node v22.3.0不满足engines(^20.19.0 || >=22.12.0)，npm静默跳过rolldown/oxc-parser等平台optionalDependencies\n- 运行时缺失@rolldown/binding-*、@oxc-parser/binding-*等原生二进制，报Cannot find native binding\n- 逐个单包打补丁脆弱：修好rolldown后更深处的oxc-parser又炸，属同一根因换中招者\n## 解决方案\n- 治本：CI runner的Node升到≥22.12.0（宿主机/home/gitlab-runner/scripts/nodejs-build.sh），升级后自愈逻辑变空操作\n- 泛化：scripts/install.mjs安装后扫描整个node_modules，找出带平台optionalDependencies的host包(rolldown/oxc-parser/rollup/esbuild/lightningcss/@parcel/watcher全覆盖)\n- 补装：当前平台binding全缺失的按host声明版本批量点名补装；循环「扫描→补装」最多3轮直至补齐\n- 匹配需考虑平台/架构/libc(glibc/musl)，Windows/macOS/Linux的x64+arm64均适用；提供INSTALL_SKIP_BINDING_HEAL=1开关跳过\n## 验证与归属\n- 验证：node v18.18.0仿真全新安装(检测缺失→批量补装@rolldown/binding-win32-x64-msvc@1.2.16+@oxc-parser/binding-win32-x64-msvc@0.153.0→复扫确认补齐)，node v22.23.2真跑npm run test(exit 0、version.json生成)\n- 涉及文件：scripts/install.mjs、scripts/ci-doctor.mjs、zhi2-web-admin/package.json\n- 来源会话：session-6534e790-727a-4437-bfd6-314164ee1939；代码基线：d8addc3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/mock_api_removal.md",
+                "memory_type": "entities",
+                "after": "# 后端接口不存在时的前端全链路拆除\n后端接口确认不存在时，前端需将api层、组件、配置、布局引用与e2e fixture一起拆除，并grep确认无悬挂引用。\n## 背景\n- 前端为首页统计卡自造了/v3.0/portal/home/stats接口：api层有getHomeStats，失败时回退mock(homeLayout.js的normalizeStatsFromApi)，页面层有三个专属组件\n- 只删api函数会留下「组件还在、数据永远来自mock」的假实现，统计卡显示编出来的数字\n## 解决方案\n- 按链路逐层拆干净：删getHomeStats、清homeDataMixin的stats data/computed/watch/method、移除homeLayout.js的mock归一化函数\n- index-new.vue去掉stats绑定与handleStatsMore；布局壳HomeLayoutAdmin.vue/HomeLayoutSidebar.vue移除组件引用与props\n- 删除三个专属组件HomeStatsBar/HomeStatCard/HomeDeveloperStatsRow；tests/e2e/fixtures/portalHomeMock.ts同步去掉mock数据\n- 全仓搜索确认无残留引用，pre-commit的lint-staged/eslint通过等于第三方再验无悬挂引用；子模块先提、父仓再更新gitlink指针\n## 验证与归属\n- 验证：本批实际改动11个文件(+5/-508)，子模块8改+3删，pre-commit lint-staged/eslint通过\n- 涉及文件：zhi2-web-admin/src/api/portal/home.js、homeDataMixin.js、homeLayout.js、index-new.vue、portalHomeMock.ts等\n- 来源会话：session-abb4dea8-9a5a-453d-9ffc-6bfb4ac5327a；代码基线：65275e9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_upgrade_block.md",
+                "memory_type": "entities",
+                "after": "# Vite5升Vite8硬阻塞与首屏优化\n迁移Vite 5.4.11→8.3.5、unocss 66.5.10→66.12.0时，@vitejs/plugin-vue2不再支持、require()引用静态图成构建硬阻塞。\n## 根因\n- Vite 8不再支持@vitejs/plugin-vue2，需换vite-ng-plugin-vue2\n- cardData.vue里require('down.png')/require('up.png')这种CommonJS式引用静态图，在Vite 8下是构建硬阻塞点(文件已删+引用方式不支持)，非警告\n- vite.config.js里Vite 8已移除maxParallelFileOps，保留会直接报错\n## 解决方案\n- 插件换vite-ng-plugin-vue2 1.0.0，移除@vitejs/plugin-vue2；cardData.vue改el-icon趋势图标，去掉已删png的require\n- vite.config.js删maxParallelFileOps；manualChunks置空交Rollup按动态import自动分包\n- 标注插件(report/analyze)仅REPORT=1启用；virtual:svg-icons-register改动态import()异步chunk，入口降到约0.89MB，svg块独立1.72MB异步不进首屏\n## 依赖与环境\n- 父仓package.json补@unocss/core 66.12.0并npm install重算package-lock(根vite@5.4.11只保留给vite-plugin-externals的peer)；锁文件不強改避免与bun hoisting冲突\n- 逐条核对环境差异(如V3有env/.env.production关VITE_CRYPTO_ENABLED，门户无此变量则跳过)；构建后还原public/version.json\n## 验证与归属\n- 验证：首屏0.89MB/异步chunk 1.72MB实测\n- 涉及文件：zhi2-web-admin/package.json、vite.config.js、src/main.js、SvgIcon/index.vue、cardData.vue、根package.json\n- 来源会话：session-6a38945c-e285-4f83-a76e-70731f47427f；代码基线：d8addc3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/visual_baseline_overwrite.md",
+                "memory_type": "entities",
+                "after": "# 视觉回归基线与设计稿不一致的处理\n视觉回归相似度下降时，先归因基线过期还是样式退化；基线过期则覆盖同名fixture图并标注「当前实现截图」，原设计稿留git历史。\n## 背景\n- 基线图两种来源：原始设计稿(交付物)与「当前实现截图」(回归基准)；实现偏离原设计稿时混在一套fixture里无法解释相似度下降\n- 后人会把基线图误当设计交付物\n## 解决方案\n- 先归因：对比页面高度与基线图高度是否错位——本批页面高度1864→1911，确认基线过期而非样式退化\n- 重拍基线覆盖同名fixture文件而非新增：operation-guide-designs.ts里index 4/5/6的maskBanner、normalizeIllustration归一化逻辑按原文件路径设计，保留路径即复用参考图管线\n- 拍摄参数固定(1920×1080、DPR 2、fullPage、animations:disabled)\n- README.md标注这三张是「当前实现截图」、商品房四张仍是原始设计稿；原设计稿留git历史可git checkout取回；临时采集脚本删掉不入库\n## 验证与归属\n- 验证：覆盖住房租赁(3).png(企业)/住房租赁(2).png(经纪机构)/住房租赁.png(个人)；相似度下降归因页面高度错位\n- 涉及文件：tests/e2e/fixtures/operation-guide-designs.ts、src/views/home/operationGuide/README.md、operation-guide-visual.spec.ts\n- 来源会话：session-eb7cae1d-c1b7-4d63-a83b-4f50c9385846、session-8d2fa9f1；代码基线：b6165db"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

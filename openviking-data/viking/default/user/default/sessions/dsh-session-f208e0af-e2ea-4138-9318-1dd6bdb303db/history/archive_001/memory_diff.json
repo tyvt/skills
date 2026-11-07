@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-f208e0af-e2ea-4138-9318-1dd6bdb303db/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T12:37:29.099388+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷任务/zentao_bug_6209.md",
+                "memory_type": "entities",
+                "after": "# 禅道Bug 6209 已办事项仍显示在待办\n房产管理系统zhi2-web-admin中「待办事项」页已审核单据仍显示，根因为账户开户提交按钮误走审批流创建挂起任务。\n\n## 根因\n- 待办页 src/views/flowable/todo.vue 纯渲染后端 /flowable/task/todoTaskList，该查询直接取 ACT_RU_TASK 活动任务\n- 账户开户详情页 supervision/agreement/account/detail.vue（菜单 busCode 070401）的通用 ZsSubmit 提交走审批流配置，调用 /prefund/regulatoryAccount/submit 起流程生成「审批」待办\n- 开户单据实际通过「备案」openAccountRecord 直接完结，流程任务永不完成 → 滞留待办\n- DB 佐证：SYS_FLOW_CONFIG 中 070401 配 submitApi=/prefund/regulatoryAccount/submit，V1 直调 openAccountSubmit 仅改状态不起流程（备注 87989 方向）\n\n## 修复方案\n- 按用户指示「按备注改前端」：detail.vue 中 ACCOUNT_OPEN 隐藏通用流程提交(:show-submit=\"isBank\")\n- 新增「提交」按钮直接调用 auditAccount → /prefund/regulatoryAccount/openAccountSubmit，仅置单据为已提交，不再建流程实例\n- 销户(ACCOUNT_CLOSE)银行流程等行为不变\n\n## 验证与交付\n- eslint 0 error（13 条为原文件 el-form-item 存量告警）\n- npm run test 构建 EXIT=0 通过（仅 Sass deprecation 告警）\n- 子模块 zhi2-web-admin develop/v3.0.0 提交 1d58176dd（含合并远端），已推送\n- 父仓库 develop/v3.0.0 提交 f8bf4f8（gitlink 更新），已推送，两仓与 origin 同步\n- worktree zhi2-web-admin-wt-bug6209 合并后删除\n\n## 禅道回写与未验证\n- bug 6209 status=resolved, resolution=fixed, resolvedBuild=trunk, resolvedBy=tiany, assignedTo=lichandan\n- DBX 事务补 resolved action 含根因/修复/证据，内外复核一致\n- 未验证：未启动 dev server，无测试站点登录态，未浏览器点选复现；env/.env 改动为会话前既有非本次提交"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷任务/zentao_bug_6129.md",
+                "memory_type": "entities",
+                "before": "# 禅道Bug 6129 楼幢变更证书字段调整\n房产管理系统zhi2-web-admin中楼幢变更记录页证书信息字段调整缺陷任务，severity 3，zhunan提交、指派tiany。\n\n## 需求与定位\n- 截图标注：移除「国有土地使用证」「商品房预售许可证」（楼幢维护与变更页均不需要）\n- 「建设工程规划许可证」「建设工程施工许可证」需支持编辑\n- 菜单「楼幢变更记录」组件为 projectManagement/buildingChange/detail.vue，实为 buildinginfo/changeDetail.vue 的薄封装，实际改动 changeDetail.vue\n- 参照 buildinginfo/detail.vue（楼幢维护）已实现的证书选择弹窗\n- 数据库 DATA_PROPERTY.T_BUILDING_CHANGE 无证书ID列、仅证书号列，变更页只回填许可证号\n\n## 修复方案\n- changeDetail.vue 删除两项旧证书表单项，查看态 contentInfo1 同步只保留两项建设工程证书\n- 两项证书由 disabled 只读改为 readonly + clearable + suffix-icon=\"el-icon-search\" 选择输入框\n- @focus 打开选择弹窗（/presale/planLic/page、/presale/consLic/page，按 projectId + bizState='2' 过滤已备案证书），弹窗前校验所属项目，@clear 清空\n- 新增 openPlanLicSelect/openConsLicSelect/clearPlanLicSelect/clearConsLicSelect/checkProjectBeforeCertSelect\n\n## 验证与交付\n- npx eslint 该文件 0 error（16 warning为存量）；全量 eslint 6052 errors/7499 warnings 与改动前基线一致（warning减2）；7个 check-*.mjs 无新增命中\n- npm run build 通过（buildTime 2026/11/4 10:47:25，gitHash 6e4e46ab6）；产物 changeDetail-OlDUrsNR.js 不含旧证、含「选择建设工程规划许可证」\n- 本地 nginx 8098 站点 root 即本仓库 dist/，已加载新构建，index.html 与变更 chunk 均返回 200\n- 子模块 zhi2-web-admin：c25d1fa29 → 合并提交 51630109e（分支 fix/bug6129-cert-fields，已合入 develop/v3.0.0 并推送，worktree 已删）；父仓库 zhi3-web-admin-h5-g-unlimited：ff6599a（gitlink → 6e4e46ab6，含本次修复）已推送；台账文档 50b9213 已推送\n- 台账 docs/frontend/common-errors.md 新增 E-032\n\n## 禅道回写与未验证\n- bug 6129：status=resolved、resolution=fixed、resolvedBuild=trunk、resolvedBy=tiany、resolvedDate=2026-11-04 10:49:50、assignedTo=zhunan\n- 新增 zt_action id 86734（action=resolved），comment 记录根因/修复/验证证据\n- 未验证：未用客测账号在页面真机选证书并保存，弹窗回填与后端入库未端到端联调\n- 过程环境事故已修复：worktree junction 指向主工作区 node_modules 被 git worktree remove --force 穿透删除，bun install 重建依赖复验通过；教训写入 E-032（worktree 勿用 junction 指向主工作区 node_modules）\n- 并行任务 bug6128、bug6131 及他人未完成 merge 均未触碰，父仓库 merge 在冲突已解决、gitlink 指向含本次修复的 6e4e46a 前提下收尾推送",
+                "after": "# 禅道Bug 6129 楼幢变更证书字段调整\n房产管理系统zhi2-web-admin楼幢变更记录页证书信息字段调整缺陷，severity 3，zhunan提交、指派tiany。\n\n## 需求与定位\n- 截图标注：移除「国有土地使用证」「商品房预售许可证」（楼幢维护与变更页均不需要）\n- 「建设工程规划许可证」「建设工程施工许可证」需支持编辑\n- 菜单「楼幢变更记录」组件 projectManagement/buildingChange/detail.vue 封装 buildinginfo/changeDetail.vue，实际改 changeDetail.vue\n- 参照 buildinginfo/detail.vue 证书选择弹窗；DATA_PROPERTY.T_BUILDING_CHANGE 无证书ID列仅证书号列\n\n## 修复方案\n- changeDetail.vue 删除两项旧证书表单项，查看态 contentInfo1 同步留两项建设工程证书\n- 两项证书改 readonly+clearable+suffix-icon 选择输入框\n- @focus 打开弹窗(/presale/planLic/page、/presale/consLic/page 按 projectId+bizState='2' 过滤)，@clear 清空，新增 openPlanLicSelect 等5个方法+checkProjectBeforeCertSelect\n\n## 验证与交付\n- eslint 该文件 0 error（16 warning存量）；全量 eslint 与基线一致；7个 check-*.mjs 无新增\n- npm run build 通过（2026/11/4 10:47:25，gitHash 6e4e46ab6）；产物含新逻辑不含旧证\n- nginx 8098 部署返回200\n- 子模块 zhi2-web-admin c25d1fa29→合并 51630109e（分支 fix/bug6129-cert-fields 合入 develop/v3.0.0 推送，worktree删）；父仓库 ff6599a(gitlink→6e4e46ab6)推送；台账 50b9213 推送，common-errors.md 增 E-032\n\n## 禅道回写与未验证\n- bug 6129 status=resolved,resolution=fixed,resolvedBuild=trunk,resolvedBy=tiany,resolvedDate=2026-11-04 10:49:50,assignedTo=zhunan；zt_action 86734(action=resolved)\n- 未验证：未用客测账号真机选证书保存，弹窗回填与后端入库未端到端联调\n- 过程事故：worktree junction 指向主工作区 node_modules 被 git worktree remove --force 穿透删除，bun install 重建复验；教训 E-032（worktree 勿用 junction 指向主工作区 node_modules）\n- 并行 bug6128/6131 及他人 merge 未触碰，父仓库 merge 冲突已解决 gitlink 指向 6e4e46a 收尾推送"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

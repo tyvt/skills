@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793660207561/history/archive_007",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T23:07:46.318851+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_elcol_bug.md",
+                "memory_type": "entities",
+                "after": "# 详情页外层 el-col 挤压表单\n园区公共收益项目详情页为对齐子表宽度在 zs-form 外再包 el-col，会把整页挤到左侧约四成。\n\n## 问题根因\n- 在已有 el-row 下给整块 zs-form 再套一层 el-col，触发 Element 横向 flex\n- el-col 只占默认栅格宽度，表单区被压到左侧、右侧大面积留白\n- 会话结论：页面被挤到左侧是上次为对齐表格宽度在外层加 el-col 引起的\n\n## 解决方案\n- 去掉外层包裹用的 el-col，保持与同模块详情页一致\n- zs-form 直接作为 el-row 子节点占满整行\n- 子表宽度用表单内块级 width:100% 或子表容器样式微调，不要用额外 el-col 包整表\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue、zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue、zhi2-web-admin/src/components/detail-template/detail-template.vue\n- 所属项目：园区公共收益；来源会话ID：f53fddf6-9d9b-42a6-9a58-e51a3a7f7298；代码基线：7cc1625"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/upload_scene_switch.md",
+                "memory_type": "entities",
+                "after": "# 弹窗多业务线附件口径分流\n园区公共收益项目同一弹窗组件服务多业务线时，用场景标志切换 ImageUpload 与 zs-file-upload，勿先改全局上传组件。\n\n## 问题背景\n- 租赁/经营资源 subVenueDialog 等弹窗同时服务「经营资源租赁合同详情」与「租赁申请」等入口\n- 附件口径可能不同：仅图片 vs doc/pdf 等文档\n- 为单一路径改全局 zs-file-upload/FileUpload accept 或提示文案，会误伤租赁申请等仍要文档的页面\n\n## 解决方案\n- 在弹窗内用场景 prop（如 isRevenueContractFiling）分支\n- 合同备案详情走 ImageUpload（png/jpg/jpeg），其他场景保留 zs-file-upload\n- 客户后续要求全站仅图片时，再单独推进 ImageUpload 默认化，与本次局部分流无关\n\n## 验证与归属\n- 用户结论：在 subVenueDialog 按 isRevenueContractFiling 使用 ImageUpload，租赁申请等仍用 zs-file-upload，并撤销对全局上传组件的修改\n- 涉及文件：zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subVenueDialog.vue、zhi2-web-admin/src/components/zs-file-upload/zs-file-upload.vue、zhi2-web-admin/src/components/ImageUpload/index.vue\n- 所属项目：园区公共收益；来源会话ID：64ba5321-fee1-4c2c-b025-17c5b576d64a；代码基线：4468dfa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/image_10mb_default.md",
+                "memory_type": "entities",
+                "after": "# 全站图片上传上限 10MB 默认化\n园区公共收益项目客户要求附件统一仅图片且上限 10MB 时，改 ImageUpload 组件默认 fileSize 并对业务弹窗显式传值。\n\n## 改动方案\n- 将 ImageUpload 默认 fileSize 从 5 调整为 10（未传 file-size 的页面一并生效）\n- 租赁申请/公共场地等关键弹窗再显式 :file-size=\"10\" 避免遗漏\n- 提示文案随组件默认显示「大小不超过 10MB，格式为 png/jpg/jpeg」\n\n## 例外保留\n- 已单独配置更小上限的页面（如平台 Logo 1MB、注册页 5MB）保持原 props 不变\n- 全站切换前若曾按场景分流文档上传，需与客户确认是否所有入口都改为 ImageUpload\n\n## 验证与归属\n- 用户诉求：「可以都改为 imageupload」「图片限制都改为10MB」\n- 涉及文件：zhi2-web-admin/src/components/ImageUpload/index.vue、zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subVenueDialog.vue、zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subAdvertiseDialog.vue、zhi2-web-admin/src/views/benefit/pubVenue/components/venueDialog.vue\n- 所属项目：园区公共收益；来源会话ID：6d0d4a75-b40f-4a8d-835d-d20d317c84ca；代码基线：fc47501"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/operlog_dataid_bug.md",
+                "memory_type": "entities",
+                "after": "# 操作日志 dataId 误用路由段\n园区公共收益项目列表删除等操作日志误把路由段（unit、building、add）当 dataId，致关联单据跳转必然失败。\n\n## 问题根因\n- 关联跳转只判断 dataId/menuPath 非空，未区分「业务主键」与「路由片段」\n- building/unit 删除日志 dataId 误记为 unit，operlog 关联单据渲染成可点链接\n\n## 解决方案\n- 在 zhi2-web-admin/src/utils/ruoyi.js 抽 isNavigableDataId：排除空值、add、纯字母模块段\n- 数字主键（如 2071871954305007618）仍视为可跳转\n- operlog/index.vue 模板层与 handleViewDataDetail 跳转前双重校验，无效 ID 渲染为普通文本并直接 return\n- 排查套路：先核对日志 dataId 是否来自 $route.params 而非行主键字段\n\n## 验证与归属\n- 会话 bf7d8178：building/unit 删除日志 data-id 误记为 unit；同步加固 operlog 关联单据跳转\n- 涉及文件：zhi2-web-admin/src/utils/ruoyi.js、zhi2-web-admin/src/views/system/operlog/index.vue、zhi2-web-admin/src/views/building/unit/index.vue\n- 所属项目：园区公共收益；来源会话ID：bf7d8178-91af-4c4d-8226-59e3910a54bd；代码基线：36a9a7e"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

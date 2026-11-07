@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-投资推送-1793649920734/history/archive_030",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T20:52:39.151797+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/红利回测全收益指数不等价价格加分红.md",
+                "memory_type": "entities",
+                "after": "# 红利类回测：全收益指数 ≠ 价格指数 + 现金分红\n项目红利回测使用全收益指数等价于分红自动再投，改用价格指数或基金A类NAV会低估收益。\n\n## 回测实现\n- dividend_data.attach_total_return_close 合并 total_return_close，_simulate_dca_returns 买卖与估值均用该列，等价于分红自动再投\n- 涉及文件：dividend_data.py、backtest_buy_signals.py、config.py、market_data.py\n\n## 口径差异\n- 改用价格指数 close 严重低估长期收益（例：930955 十年价格约 +27% vs 全收益约 +85%）\n- 基金 A 类「NAV 涨跌 + 现金分红不复投」也不等于全收益指数（021550/020602 实测差数个百分点）\n- 业绩比较基准为价格指数×95%+活期，非全收益\n\n## 建模建议\n- 贴近现金分红持有体验需单独建模分红现金\n- 贴近再投假设应继续用全收益指数\n- akshare 可拉 021550、020602 历次分红每份金额验证\n\n## 验证与归属\n- 验证证据：akshare 分红数据；基准为价格指数×95%+活期\n- 所属项目：投资推送；来源会话ID：3200971f-eca9-40ab-9bff-7d222c281889"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/parquet离线库manifest缺口与重复行.md",
+                "memory_type": "entities",
+                "after": "# Parquet 离线库：manifest 缺口、残留键与多 part 重复行\ndata/parquet 的 manifest 存在记账缺口与残留键，多 part 追加可能导致重复行，需针对性处理。\n\n## manifest 缺口与残留键\n- stock_daily_qfq 的 manifest 有历史遗留记账缺口，不影响 DuckDB 查询，就绪判断应单独统计 qfq_ok 并注明缺口\n- daily manifest 中约数百只「曾 ok 但已不在当前 stock_codes」的残留键会累积，宜提供 --prune-manifest\n\n## 多 part 重复行\n- 同一 year 下多个 part_* 增量追加时，同一 symbol 出现在旧/新 part，read_parquet 返回重复行\n- 当前 --resume 按 symbol 整只跳过无重复；未来按 year 粒度重导需显式去重\n\n## 验证与归属\n- 验证证据：文档修订补 qfq 输出行、重复行说明、残留键清理建议\n- 涉及文件：data/parquet/README.md、data/parquet_constants.py、scripts/export_to_parquet.py\n- 所属项目：投资推送；来源会话ID：f26e414b-5ffc-41af-87fb-2940b83bf8da"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/index_daily分区symbol为6位指数代码.md",
+                "memory_type": "entities",
+                "after": "# index_daily 分区 symbol 为 6 位指数代码，非 RQAlpha 后缀格式\n导出到 index_daily 分区的 symbol 列存 6 位指数代码，不可误用 RQAlpha 后缀格式。\n\n## 写入规范\n- index_daily 分区 symbol 列写入 6 位指数代码（如 000300、000001），与 stock_daily 列宽一致但语义为指数\n- 从 RQAlpha bundle 拉数使用 INDEX_ORDER_BOOK_IDS（如 000001.XSHG），勿误以为分区内存 RQAlpha 格式或对指数错误调用 to_rqalpha_id 再写入\n\n## 验证与归属\n- 验证证据：实查分区样例 ['000300', '000001']；导出逻辑用 DEFAULT_INDEX_SYMBOLS 写 symbol\n- 涉及文件：data/parquet/README.md、scripts/export_to_parquet.py、data/parquet_constants.py\n- 所属项目：投资推送；来源会话ID：f26e414b-5ffc-41af-87fb-2940b83bf8da"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/买入回测与完整策略回测分脚本约定.md",
+                "memory_type": "entities",
+                "before": "# 买入回测与完整策略回测分脚本约定\n买入择时回测与含卖出规则的完整策略回测必须分脚本，文档须标明是否含卖出，避免策略文档与回测表冲突。\n\n## 脚本分工\n- `backtest_buy_signals.py` 验证「买入择时 + 假设长期持有」，默认不跑 README 中的移动止盈/估值卖点\n- `backtest_trade_signals.py` 验证含止盈/估值卖出的完整链路\n- 两脚本共用数据面板与买入信号，回测产物统一输出到 `output/backtest/`（由 config 的 `BACKTEST_OUTPUT_DIR` 指定）\n- `backtest_buy_signals.py` 默认输出 `inception_present.md/html`；`backtest_trade_signals.py` 默认输出 `trade_inception_present.md/html`\n- 全量入口 `run_backtest_inception.bat` 依次运行两脚本；`sell_trailing.py` 提供移动止盈/估值卖点，`backtest_metrics.py` 负责指标统计\n\n## 文档标注要求\n- 报告或 README 须明确标注：「仅买入择时」或「含卖出规则」\n- `inception_present.md` 卖出次数为 0 时仍可能显示较高收益率，不代表完整策略已回测\n\n## 验证与归属\n- 验证证据：会话 efd15316 指出 inception_present.md 与 README 止盈策略不符，中证1000/科创50/创业板指均为买入多次、卖出 0 次\n- 涉及文件：d:/repository/投资推送/backtest_buy_signals.py、backtest_trade_signals.py、output/backtest/inception_present.md、README.md\n- 所属项目：投资推送；来源会话ID：efd15316-7993-488b-8278-c5e62b92d106\n- 补充验证：会话 45b1dc47 架构概览、会话 b98f272b 将 buy/trade 与 sell_trailing、backtest_metrics 分工对应到 report 与 push；验证完整卖点策略必须看 trade 管线，buy 管线仅测买入择时",
+                "after": "# 买入回测与完整策略回测分脚本约定\n买入择时回测与含卖出规则的完整策略回测必须分脚本，文档须标明是否含卖出，避免策略文档与回测表冲突。\n\n## 脚本分工\n- `backtest_buy_signals.py` 验证「买入择时 + 假设长期持有」，默认不跑 README 中的移动止盈/估值卖点\n- `backtest_trade_signals.py` 验证含止盈/估值卖出的完整链路\n- 两脚本共用数据面板与买入信号，回测产物统一输出到 `output/backtest/`（由 config 的 `BACKTEST_OUTPUT_DIR` 指定）\n- `backtest_buy_signals.py` 默认输出 `inception_present.md/html`；`backtest_trade_signals.py` 默认输出 `trade_inception_present.md/html`\n- 全量入口 `run_backtest_inception.bat` 依次运行两脚本；`sell_trailing.py` 提供移动止盈/估值卖点，`backtest_metrics.py` 负责指标统计\n- `backtest_buy_signals.py` 支持 `--from-inception` 输出 `output/backtest/{年}.md`（买入信号统计与定投收益）\n- `backtest_trade_signals.py` 默认 2015 至今按日模拟（买卖波段 vs 持有对比）\n- 宽基沪深300/科创50 等信号在 `cn_broad_signal.py`，创业板在 `cyb_signal.py`，价格位置卖点在 `price_position.py`\n- 阈值与卖出开关集中在 `config.py`；优化与卖出诊断另有 `optimize_strategy_backtest.py`、`diagnose_sell_issues.py`\n\n## 文档标注要求\n- 报告或 README 须明确标注：「仅买入择时」或「含卖出规则」\n- `inception_present.md` 卖出次数为 0 时仍可能显示较高收益率，不代表完整策略已回测\n\n## 验证与归属\n- 验证证据：会话 efd15316 指出 inception_present.md 与 README 止盈策略不符，中证1000/科创50/创业板指均为买入多次、卖出 0 次\n- 涉及文件：d:/repository/投资推送/backtest_buy_signals.py、backtest_trade_signals.py、output/backtest/inception_present.md、README.md、cn_broad_signal.py、cyb_signal.py、price_position.py、config.py、optimize_strategy_backtest.py、diagnose_sell_issues.py、run_backtest_inception.bat\n- 所属项目：投资推送；来源会话ID：efd15316-7993-488b-8278-c5e62b92d106\n- 补充验证：会话 45b1dc47 架构概览、会话 b98f272b 将 buy/trade 与 sell_trailing、backtest_metrics 分工对应到 report 与 push；验证完整卖点策略必须看 trade 管线，buy 管线仅测买入择时"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

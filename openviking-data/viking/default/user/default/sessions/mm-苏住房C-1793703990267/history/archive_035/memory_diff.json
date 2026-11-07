@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_035",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:17:10.714293+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_tab_clear_project.md",
+                "memory_type": "entities",
+                "after": "# 首页 tab 切换清空小区缓存模式\n首页多 tab 切换时按绑定小区列表刷新缓存，空列表必须清掉本地小区信息，避免幽灵小区。\n\n## 现象与根因\n- 苏住房C 首页多 tab（home/property/project/community/my）各自展示小区数据，解绑全部小区后页面仍显示旧小区名与旧数据。\n- 小区信息持久化在 user store（project/projectName/community 等），仅进入时拉一次；解绑后未触发清空，形成幽灵小区。\n- 多组件各自持有 projectList 导致列表状态不一致。\n\n## 解决方案\n- userStore 增加 clearProjectInfo() 集中清空 project、projectName、community 等小区字段。\n- useBoundProjects.js 将 projectList 提为模块级单例，接口返回空数组时调 clearProjectInfo()。\n- 抽 tabBar.js 的 onTabPageShow() 统一处理 tab 切换：设置选中态+加载菜单+有 token 时调 loadBoundProjects()。\n- 五个 tab 页 onShow 调用 onTabPageShow；Home_Suzhufang 删除重复 loadBoundProjects 调用。\n- 行为：有小区保持/自动选第一个，无小区清缓存。\n\n## 验证与归属\n- 验证证据：会话 30f38fb2（2026-08-04，基线 ce9e460）用户诉求「tab 页面切换时，如果小区列表为空，则清除缓存」。\n- 涉及文件：src/hooks/useBoundProjects.js、src/store/user.js、pages/index/property.vue、components/Property_Suzhufang.vue 等。\n- 所属项目：苏住房C；来源会话ID：30f38fb2-cdce-4fec-b6e7-513b5e74f474；代码基线：ce9e460。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsimage_dual_bug.md",
+                "memory_type": "entities",
+                "after": "# ZsImage 图片不显示双重根因\n苏住房C 中 ZsImage 图片不显示存在分包静态资源路径推断错误与默认高度为零两重根因，需按主包白名单或显式分包名修复。\n\n## 现象与根因\n- 页面 ZsImage 引用图标整块不显示，控制台报 Failed to load local image resource 状态 500，或不报错但看不见。\n- 根因一：resolveStaticUrl 按当前页面路由推断分包，非文件真实位置；主包图标被 pages_vote 页面引用解析到子包致 500，子包图标被其他页面引用解析到主包丢图。\n- 根因二：ZsImage 内部 height:100%，父节点无确定高度时高度算成 0，表现为路径对但看不见。\n\n## 解决方案\n- 跨页面共用图标加入 src/utils/mainStaticPaths.js 的 MAIN_STATIC_PATHS 白名单强制走主包；分包独有图标调用处显式传 subpackage=\"pages_transaction\"。\n- 给 ZsImage 套定尺寸容器（如 w-28 h-28 的 view），与 authentication.vue 写法对齐。\n- 排查顺序：先看控制台请求路径与文件真实位置是否同包，再查父级有无高度。\n\n## 验证与归属\n- 验证证据：会话 65302824（主包图标加白名单）、13824f1b（子包图标显式 subpackage+定尺寸容器）。\n- 涉及文件：src/utils/mainStaticPaths.js、components/ZsImage/ZsImage.vue、pages_transaction/publishHouse/type.vue、pages_owner/house/owner/authentication.vue、pages_vote/elect/detail.vue 等。\n- 所属项目：苏住房C；来源会话ID：13824f1b-0d06-4c7a-8d3f-79edcf5ccfe4, 65302824-2836-4c68-a79c-8824fab43793；代码基线：8fc3cc5、b7bf813。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/component_scoped_css.md",
+                "memory_type": "entities",
+                "after": "# 自定义组件标签 class 与 scoped CSS 不生效\n苏住房C 小程序中父级布局类写在自定义组件标签上导致 scoped CSS 不穿透、flex 失效，需将布局类下移到内层原生包裹节点。\n\n## 现象与根因\n- 公示/公告列表卡片右侧箭头不显示在右侧，被当块级元素堆在日期下方，同一 bug 反复复发。\n- 模板把布局类写在自定义组件标签 `<base-card class=\"notice-list-card\">`，而 flex 样式写在页面 scoped 中。\n- 小程序端 scoped 只加在组件渲染层，父页面无法给子组件根节点应用 scoped 规则，宿主节点 layout 不被父级 flex 接管。\n\n## 解决方案\n- 把布局类从组件标签下移到内层包裹的原生元素 `<base-card><div class=\"notice-list-card\">...`，样式不变，flex 立即作用。\n- 推广规则：凡用 flex/grid 控制子组件+兄弟节点排列，一律显式套 div 承载布局类；子组件内部样式用 props 或 :deep()+权重。\n\n## 验证与归属\n- 验证证据：会话 0654e8d6 用户反馈「详情页箭头显示有问题，记得之前修复过」，定位根因为 scoped CSS 未穿透，改动 ListIndex.vue 与 ListContractIndex.vue 移 class 到内层 div。\n- 验证方式：npm run build 通过，微信开发者工具刷新进「双晒公示→维修资金使用」确认。\n- 涉及文件：pages_main/publicNotice/components/ListIndex.vue、ListContractIndex.vue、publicNotice.vue。\n- 所属项目：苏住房C；来源会话ID：0654e8d6-e325-415f-81d9-23f35e1436b6；代码基线：bb6d74a。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/transaction_zpaging_migration.md",
+                "memory_type": "entities",
+                "after": "# pages_transaction 整包迁移 z-paging 规则集\n苏住房C 的 pages_transaction 分包统一将 useLoadMore/uni-load-more 列表页迁移到 z-paging，形成标准规则集与五类例外处理法。\n\n## 背景与规则\n- 基础设施统一为 src/hooks/usePaging.js 暴露 {list,pagingRef,queryList,refresh,reset,auto}，z-paging 走 easycom，空态样式统一 .paging-empty 等。\n- useLoadMore→usePaging，getList 入参改 getList(pageParams) 不再用 arguments；列表外包 `<z-paging :ref=\"pagingRef\" v-model=\"list\" @query=\"queryList\">`；删除 uni-load-more 与状态依赖。\n\n## 五类例外\n- 弹层内列表用 usePaging(fn,{auto:false})+:auto=\"false\"，弹窗打开手动 refresh()。\n- 自定义无更多文案改用 loading-more-no-more-text prop；手工 IntersectionObserver 分页直接删观察器改 script setup+usePaging。\n- Tab 内列表与总数=0 才整页空态保留 totalSum==0 顶层空态，列表空态交 #empty；空态统一 ZsEmpty→#empty 内 ZsImage+view.paging-empty-text 保留原图与文案。\n- buyHouse/myBuy.vue 原本手写分页，迁移时 total 改在 getList 内维护。\n\n## 验证与归属\n- 验证证据：会话 df586279 用户给出 11 条迁移规则并要求迁移全部 useLoadMore/uni-load-more 页，最终改动 19 文件，目录下无旧引用。\n- 涉及文件：src/hooks/usePaging.js、pages.json、pages_transaction 下 stockHouse/index.vue、commonBuildings.vue、intention/popup.vue、publishHouse/index.vue、buyHouse/myBuy.vue、service/unionBank.vue 等。\n- 所属项目：苏住房C；来源会话ID：df586279-57e8-4ba0-8689-fbab9df6771b；代码基线：83c4136。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793959099950/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T10:14:27.046554+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_suffix_fix.md",
+                "memory_type": "entities",
+                "after": "# 全局 dialog picker 放大镜图标修复\n苏州市房地产监测V3 项目新增 CI 检查脚本并批量补齐 zs-input 弹窗选择的放大镜图标。\n\n## CI 检查\n- 新增 scripts/check-dialog-picker-suffix-icon.mjs\n- 规则：zs-input 带 @focus 弹窗选择时必须有 suffix-icon=\"el-icon-search\"（排除 Dialog 内「请输入关键字」、GIS/地图等）\n- 已挂到 npm run lint → check:dialog-picker-suffix\n\n## 批量修复\n- 自动补齐 56 处放大镜图标（全库扫描约 58 处，其余为排除项或已合规）\n- node scripts/check-dialog-picker-suffix-icon.mjs 已通过\n\n## 存量房细节对齐\n- 免监管协议 agreementExempt/detail.vue：监管机构名称增加 suffix-icon + readonly\n- 监管账户注销 accountCancellation/detail.vue 同步增加 suffix-icon\n- 监管账户 account/detail.vue 同步增加 suffix-icon\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：scripts/check-dialog-picker-suffix-icon.mjs、agreementExempt/detail.vue、accountCancellation/detail.vue、account/detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：b9e1a88a-1413-48f8-9089-482054877b8a；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/form_getdetail_fix.md",
+                "memory_type": "entities",
+                "after": "# QualificationFormSection 与 detailMixins 修复\n苏州市房地产监测V3 项目修复子组件误调 getDetail() 导致 [getDetail] 缺少接口必需参数问题。\n\n## QualificationFormSection.vue 改动\n- 去掉 detailMixins，只保留 registerFormConsumerMixin\n- 子组件不再监听 formMode、不再误调 getDetail()，也不再拉片区/街道/社区等无关接口\n- initDict() / getDicts 不变（走 Vue.prototype.getDicts）\n\n## detailMixins.js 改动\n- init() 在缺少 moduleName、businessName、primaryKey 时直接返回，不再进入 getDetail()\n- 已配置三字段的详情页逻辑不变；详情页配置错误时仍由 validateDetailRequiredParams 打 warn\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：register/components/QualificationFormSection.vue、mixins/detailMixins.js、mixins/form.js\n- 所属项目：苏州市房地产监测V3；来源会话：5584ad88-6363-48c5-9d3d-5f769967f5f6；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/supporting_house_pattern.md",
+                "memory_type": "entities",
+                "after": "# 配套用房需求前端调整\n苏州市房地产监测V3 项目将「小区配套用房」统一为「配套用房」并删除「封闭设施」表单。\n\n## 配套用房命名\n- 当前仓库无「小区配套用房」文案，配套用房模块已统一为「配套用房」\n- 列表/路由：路由信息.json、e2e/fixtures/menu-config.js\n- 详情子表：houseTable.vue 标题为「配套用房」\n- 若侧栏仍显示「小区配套用房」，多为后台菜单/权限名称，需在系统管理改菜单标题或等接口 meta.title 更新\n\n## 删除封闭设施\n- 修改 projectManagement/auxiliaryProject/detail.vue：去掉整块「封闭设施」表单与查看态展示\n- 删除相关 form 字段、校验规则及 facilityInfo\n- 详情页现为：基本信息 + 配套用房子表\n- 若详情接口仍返回封闭设施字段，detailMixins 可能随 form 一并提交（界面已不可编辑）；如需彻底不回写可在保存前剔除\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：路由信息.json、e2e/fixtures/menu-config.js、houseTable.vue、auxiliaryProject/detail.vue、auxiliaryProject/index.vue\n- 所属项目：苏州市房地产监测V3；来源会话：0fcad87d-b6db-4906-a704-25d2a6908a00；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/supervise_bank_fix.md",
+                "memory_type": "entities",
+                "before": "# 监管银行详情页分支行接口修复\n苏州市房地产监测V3 项目修复监管银行详情页及弹窗的银行分支行列表接口。\n\n## detail.vue 改动\n- 新增 `bankBranchPrefixUrl` computed：commercial → `/prefund/bankBranch/`，其他 → `/estate/mfBankBranch/`\n- `getList` 由 `pageUnionBank` 改为 `POST ${bankBranchPrefixUrl}list`，参数沿用 `queryParams`（含 `bankBranchId`）\n- 表格 `row-key` 改为 `bankBranchManageId`（与删除/多选逻辑一致）\n- 左侧监管银行树 `getBranch()` 仍用 `pageUnionBank`，未改动\n\n## WdmcDialog.vue 改动\n- 弹窗列表改为 `POST ${bankBranchPrefixUrl}list`\n- 去掉 `isSupervisionBank: '1'` 覆盖，保留 `isSup` 相关参数\n\n## 验证与归属\n- 涉及文件：superviseBank/detail.vue、WdmcDialog.vue、cbyh/components/YhwdTable.vue\n- 所属项目：苏州市房地产监测V3；来源会话：c3f3c00e-8252-4a2c-ac62-969e7898c321",
+                "after": "# 监管银行详情页分支行接口修复\n苏州市房地产监测V3 项目修复监管银行详情页及弹窗的银行分支行列表接口，将 `bankBranchPrefixUrl` 固定为 `/prefund/bankBranch/`。\n\n## 问题根因\n- `Supervisebank/:tableid` 路由名不含 `commercial`，原先动态判断会误走 `estate` 路径导致 404\n- 同页面删除、批量新增接口早已使用 `prefund`，现已对齐\n\n## detail.vue 改动\n- 将 `bankBranchPrefixUrl` 固定为 `/prefund/bankBranch/`，不再根据路由判断 `commercial`，统一请求 `POST /prefund/bankBranch/list`\n- `getList` 由 `pageUnionBank` 改为 `POST ${bankBranchPrefixUrl}list`，参数沿用 `queryParams`（含 `bankBranchId`）\n- 表格 `row-key` 改为 `bankBranchManageId`（与删除/多选逻辑一致）\n- 左侧监管银行树 `getBranch()` 仍用 `pageUnionBank`，未改动\n\n## WdmcDialog.vue 改动\n- 弹窗列表改为 `POST ${bankBranchPrefixUrl}list`\n- 去掉 `isSupervisionBank: '1'` 覆盖，保留 `isSup` 相关参数\n\n## 验证与归属\n- 涉及文件：superviseBank/detail.vue、WdmcDialog.vue、cbyh/components/YhwdTable.vue、cbyh/index.vue、jgyh/yhwdgl.js、jgwd/index.vue、api/system/unionBank.js、cbyh/components/WdmcDialog.vue、superviseBank/index.vue、superviseBank/components/YhwdDialog.vue\n- 所属项目：苏州市房地产监测V3；来源会话：f9ae239b-1970-4f62-b9f6-43dcba0723b3、c3f3c00e-8252-4a2c-ac62-969e7898c321"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bank_prefix_fix.md",
+                "memory_type": "entities",
+                "deleted_content": "# 银行详情页支行列表接口未适配路由前缀\n苏州市房地产监测V3 中银行详情页支行列表接口误用 pageUnionBank 且缺类型前缀，须新增 bankBranchPrefixUrl 计算属性适配。\n\n## 问题根因\n- detail.vue 的 getList 与 WdmcDialog.vue 弹窗列表误用 pageUnionBank\n- 缺类型前缀，未区分 commercial 与其他类型路由\n\n## 解决方案\n- 新增 bankBranchPrefixUrl computed（commercial→/prefund/bankBranch/，其他→/estate/mfBankBranch/）\n- 列表改 POST ${bankBranchPrefixUrl}list\n- detail.vue 的 row-key 改 bankBranchManageId\n- 移除 isSupervisionBank: '1' 覆盖\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3-leftover/031.md\n- 涉及文件：supervision/bank/superviseBank/detail.vue、cbyh/components/YhwdTable.vue、api/system/unionBank.js、superviseBank/components/WdmcDialog.vue、api/jgyh/yhwdgl.js、cbyh/components/WdmcDialog.vue、superviseBank/index.vue、superviseBank/components/YhwdDialog.vue\n- 所属项目：苏州市房地产监测V3；来源会话：c3f3c00e-8252-4a2c-ac62-969e7898c321；代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

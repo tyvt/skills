@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_057",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T13:07:44.586569+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/webview_shell_migration.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C原生页改web-view嵌入流程\n将已上线原生页改为web-view嵌入第三方H5时，必须保留原生壳页、配置域名白名单、多分支同步提交。\n\n## 核心约束\n- 同一原生页常被多入口打开（首页浮层→automaticRobot，个人中心→robot），第三方H5登录态/来源参数可能不一致，不能统一成一个URL，须保留两个原生壳页只替换web-view地址\n- 第三方域名必须加入小程序后台「业务域名/合法域名」白名单，否则真机空白或拒绝加载，需与运维/后台协同，不能只提交前端代码\n- 多分支项目（v2.1 / v2.1-mp / sfb）改同一处配置时各分支单独提交一条commit，便于cherry-pick与回滚，未授权不push\n\n## 操作步骤\n- 先 `git branch -a` 列全部分支 → 逐分支修改目标页 → 每分支一条commit → 回切主干核对工作树干净\n- 输出「分支/commit hash」对照表并提醒用户把新域名加进业务域名白名单\n\n## 验证与归属\n- 验证证据：聊天机器人页改为web-view嵌入，三分支迁移 v2.1=7b60b2a9、v2.1-mp=aa6466dd、sfb=61961cd4，新域名 digital-accumulation-fund-fe.paas.cmbchina.com 需加白名单，仍未push\n- 涉及文件：pages_my/robot/index.vue、pages_main/automaticRobot/index.vue、utils/openAutomaticRobot.js、utils/route-map.js、pages.json\n- 所属项目：苏住房C；来源会话ID：f15f2eb0-4255-4cba-a3f7-e1e287df3238；代码基线：a8c9568"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/wxss_not_bug.md",
+                "memory_type": "entities",
+                "after": "# 微信小程序WXSS不支持:not()伪类\n微信小程序WXSS整类不支持 `:not()` 等伪类（不只禁通配符），编译报 error at token ':'，需包容器承接样式。\n\n## 问题根因\n- WXSS选择器支持面比标准CSS窄，`:not(...)` 被整类拒绝；只要任一被引入的scss（uni.scss全局、页面scss、被多组件@import的样式）出现 `:not(`，就会被打进每份wxss造成一连串报错\n- 典型来源：`.container-main > :not(.page-bg)` 与 uni.scss 里的 `.page:not(.page-wrapper)`\n\n## 解决方案\n- 搜索全仓 `:not(` 改写为显式类名枚举，如 `> :not(.page-bg)` → 给内容区套 `<div class=\"container-body\">` 再写 `.container-body`\n- 套容器时必须把原有 `flex: 1`、`min-height: 0` 一起搬到新容器，否则滚动区域失效\n- 改完在页面/组件级扫 `:not` 数量应为0，重新构建后到微信开发者工具重新编译验证\n\n## 验证与归属\n- 验证证据：pages_owner/income/index.wxss 与另两处 error at token ':'，根因确认WXSS不支持:not()，逐文件替换后三个wxss中:not数量为0；随后修改maintain/detail.vue保留flex/min-height构建通过\n- 涉及文件：pages_owner/income/index.vue、pages_owner/maintain/detail.vue、uni.scss、styles/filter.scss、components/PageBg/PageBg.vue\n- 所属项目：苏住房C；来源会话ID：42b1dbae-331e-42a5-8f4d-a65e0368e56b；代码基线：9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/subpackage_import_bug.md",
+                "memory_type": "entities",
+                "after": "# 分包内静态资源禁止import\n小程序里 import 静态资源生成按文件物理位置推算的路径，页面在别的分包就必然404，须用 resolveStaticUrl 显式传分包名。\n\n## 问题根因\n- 重构把背景图从条件编译 `background-image` 改成 `import bg from '@/pages_my/static/images/xxx.png'` 后，微信小程序入口背景图整块不显示、控制台404/500\n- 小程序打包时 import 生成的是按源文件与打包后文件的物理相对位置推算的URL，页面编进 pages_my 分包后相对路径不再指向 pages_my/static，分包页面永远取不到图片\n- 这类失败不报编译错误，只有渲染层网络错误，易误判成「图片没打包」\n\n## 解决方案\n- 小程序端静态资源一律走 `resolveStaticUrl(src, subpackage)`，显式传目标分包名如 `resolveStaticUrl('images/verification-bg-1.png', 'pages_my')`，微信下返回 `/pages_my/static/...`，H5下返回 `{base}/pages_my/static/...`\n- 模板用 `ZsImage` 时同样用 `src` + `subpackage` 两属性，不 import 后绑 `:src`\n- 自查：在 `src/pages_*` 下 grep `import.*\\\\.(png|svg|jpg)`，命中基本都要改；改完确认文件已在对应 `pages_*/static/` 下\n\n## 验证与归属\n- 验证证据：@src/pages_my/verification/TypeChoose.vue 图片不显示，根因是分包内import路径无法访问分包静态图，修复为 resolveStaticUrl 并列出H5与小程序两种解析结果\n- 涉及文件：pages_my/verification/TypeChoose.vue、pages_my/verification/FormLocal.vue、pages_owner/authentication/TypeChoose.vue、utils/index.js、pages.json\n- 所属项目：苏住房C；来源会话ID：00a9d48a-4fa1-45d7-911c-3c025eccb8fc；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/scss_leak_regex.md",
+                "memory_type": "entities",
+                "after": "# uni.scss末尾marker改动致LEAK_END正则失配\nuni.scss 末尾 marker 规则增删属性会让 prune-component-wxss-leak.mjs 的 LEAK_END 正则失配，主包上传体积暴涨超限。\n\n## 问题根因\n- 在 uni.scss 给 `.page-wrapper` / `.page` / `.add-page` 等 marker 规则加 `min-height: 100%`，uni编译把这段全局样式注入每个组件wxss末尾并带marker注释用于裁剪\n- 原末尾形如 `{width:100%;box-sizing:border-box}`，加属性后变成 `{width:100%;min-height:100%;box-sizing:border-box}`\n- `scripts/prune-component-wxss-leak.mjs` 的 LEAK_END 正则按旧文本写死，匹配失败 → 裁剪空转，32个主包组件各重复注入约8KB，合计+258KB，主包从约1793KB顶到2094.8KB越过2048KB上传上限\n- 磁盘体积（1790.5KB）ok，只有「上传预估/source size」超标，只看磁盘会误判正常\n\n## 解决方案\n- 正则里新增属性做成可选段：`{width:100%;(?:min-height:100%;)?box-sizing:border-box}`\n- 修复后 components 421.1KB→163.1KB、MAIN磁盘1532.5KB、上传预估1793.1KB通过\n- 长期约定：凡改动 uni.scss 末尾marker规则（增删任意属性），必须同步检查 LEAK_END 是否仍匹配，并同时看「磁盘」与「上传预估」两指标\n\n## 验证与归属\n- 验证证据：构建日志 MAIN磁盘1790.5KB ok / 上传预估2094.8KB OVER LIMIT / validate-dist失败；改可选段后构建完整通过\n- 涉及文件：src/uni.scss、scripts/prune-component-wxss-leak.mjs、scripts/validate-dist.mjs、scripts/size-main-package.mjs、package.json\n- 所属项目：苏住房C；来源会话ID：fc94b08c-d7f0-4ffe-9070-050d77fd5bb1；代码基线：9cdf7b8"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

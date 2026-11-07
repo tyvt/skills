@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-惠山二期G-1793640843595/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T17:45:19.707161+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sso_blank_window.md",
+                "memory_type": "entities",
+                "after": "# B端SSO空白窗noopener冲突\nB端单点登录先开空白窗再异步换授权URL时，window.open第三个参数带noopener会导致无法编程式跳转。\n\n## 问题现象\n- 先 `window.open('about:blank')` 再异步设授权URL的B端SSO，若第三个参数写 `noopener,noreferrer`，父页拿不到可操作的新窗口引用\n- `newWindow` 为 null 或无法设 `location`，空白页一直停在 `about:blank`\n- 用户手动点链接带URL打开则正常\n\n## 根因与修复\n- 去掉 `noopener,noreferrer` 以保留对子窗口的跳转权\n- 跳转前 `newWindow.opener = null` 断开与原页关联\n- 用 `location.replace(url)` 替代 `href`\n- 等待期间显示「正在跳转」占位文案\n\n## 验证与归属\n- 验证：010.md 会话 7ffb3be2 用户「直接打开为空白，手动点击打开正常」；结论明确 noopener 导致无法操作新窗口 location，已改为 opener=null + replace\n- 涉及文件：zhi2-web-admin/src/views/sso/bTerminalRedirect/index.vue、zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue、zhi2-web-admin/src/api/security/oauth2.js\n- 所属项目：惠山二期G；来源会话：7ffb3be2-f8de-4608-8768-cc04a3088249；代码基线：43b1b40\n- 区分：与「外链菜单走 InnerLink」「Vite 下 window.open PDF」不同，本条是异步赋址的新窗口与 noopener 的冲突"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_static_redirect.md",
+                "memory_type": "entities",
+                "after": "# 首页静态别名重定向\nstripDuplicateHomeRoutes 裁掉 /index/home 后守卫 canonicalize 来不及，须在 constantRoutes 加静态别名重定向。\n\n## 问题现象\n- 侧栏点「首页」进 /index/home 弹「页面未授权或不存在」，常伴随落入 `*` → /404 再被守卫改写\n- 菜单仍可能 push /index/home 或 /index/index，这些 path 已无匹配记录\n\n## 根因链\n- permission.js 注册动态路由时 stripDuplicateHomeRoutes 删掉 /index 树下 home/index 子路由，避免覆盖静态首页\n- beforeEach 里 canonicalizeHomePath 把别名归一到 /index 发生在路由解析之后，救不了未匹配\n- 先命中 path: '*' 兜底 → 404/未授权提示\n\n## 修复方案\n- 在 router/index.js 的 constantRoutes、且排在 `*` 之前增加静态重定向 `{ path: '/index/home', redirect: '/index' }` 与 `{ path: '/index/index', redirect: '/index' }`\n- 排查时同时看 utils/homeRoute.js 的 strip/canonical 与 RecursiveMenu 的 push 目标是否一致\n\n## 验证与归属\n- 验证：会话 a4d2b610（基线 89672a4）用户点侧栏首页报未授权；结论为 stripDuplicateHomeRoutes 裁子路由 + canonicalizeHomePath 在解析后执行；在 constantRoutes 增加 /index/home、/index/index → /index 静态重定向\n- 涉及文件：zhi2-web-admin/src/router/index.js、zhi2-web-admin/src/utils/homeRoute.js、zhi2-web-admin/src/store/modules/permission.js、zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue\n- 所属项目：惠山二期G；来源会话：a4d2b610-041f-4020-b150-da4ace92e015；代码基线：89672a4\n- 关联：已知「侧栏首页归一到 /index」只解决链接与高亮，未注册别名 path 仍会踩本条"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/completion_tip_error.md",
+                "memory_type": "entities",
+                "after": "# 竣工备案detail相邻tip复制错文案\n维修模块 completion/detail.vue 相邻金额字段共用 tip 计算属性时易整段复制错字段文案，静默不报错。\n\n## 问题现象\n- 维修模块 maintenance/completion/detail.vue 在「施工结算总额」与「线下核查费」等相邻金额字段上用独立 computed（constructionSettleAmountTip、offlineCheckFeeAmountTip）\n- 两 computed 同时挂到编辑态 el-tooltip（label slot）与查看态 contentInfo 的 labelTooltip\n- 新增线下核查费后误把其长说明留在 constructionSettleAmountTip，导致「施工结算总额」问号提示显示成核查费文案（静默，不报错）\n\n## 修复与预防\n- 按产品原文改对应 tip 计算属性（施工结算：「维修工程的实际造价，仅针对维修施工阶段发生的费用。」）\n- 一处 computed 改完要确认表单与 contentInfo 两处引用都已指向该属性\n- 加相邻 tip 时复制粘贴后对照字段中文名与需求截图\n- 同一页面多个 *Tip 命名相近，改一个要 grep 另一字段是否仍引用旧文案\n\n## 验证与归属\n- 验证：会话 6bac5a7c（基线 413ac3f）用户反馈施工结算总额注释不对；根因 constructionSettleAmountTip 仍为线下核查费说明；改文案后 el-tooltip 与 contentInfo labelTooltip 同步生效\n- 涉及文件：zhi2-web-admin/src/views/maintenance/completion/detail.vue、zhi2-web-admin/src/components/detail-template/detail-template.vue\n- 所属项目：惠山二期G；来源会话：6bac5a7c-3034-4609-9345-03915c598bc6；代码基线：413ac3f"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/附件字段解析.md",
+                "memory_type": "preferences",
+                "after": "- 后端C端写入数据将附件字段以JSON字符串返回，无附件时为\"[]\"，前端解析需兼容JSON串/数组并过滤无效占位，不能只按逗号分割。\n- 新增 src/utils/attachments.js 的 normalizeAttachmentList 统一处理附件解析，detail.vue 及 repairDtlDialog.vue 等改调用该工具。\n- 无附件时显示\"-\"而非可点击链接。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

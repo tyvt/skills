@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_010",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:44:45.271223+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/account_status_dict.md",
+                "memory_type": "entities",
+                "after": "# 银行账户状态字典统一到ACCOUNT_STATUS\n多个页面「银行账户状态」字段因绑定不同字典导致销户编码6无法回显，需统一到银行侧ACCOUNT_STATUS。\n\n## 问题根因\n- 同一业务字段在不同页面绑了两套字典：开户申请详情用平台侧benefit_account_status，银行账户查询子表用银行侧ACCOUNT_STATUS\n- benefit_account_status无「销户」项，银行回传accountStatus=6时dict-tag静默降级成原始码\n\n## 解决方案\n- 所有「银行账户状态」相关页面统一切到ACCOUNT_STATUS，与BankAccountTable一致\n- 标准编码：1正常/2冻结/3查封/4限制/5账号不存在/6销户\n- 排查「显示原始码」分两步：先确认前端引用字典类型正确，再确认环境字典管理配全（如补6-销户）\n\n## 验证与归属\n- 验证证据：会话011d6472用户报开户申请字典缺少销户编码，结论列两套字典对比与6个待改文件\n- 涉及文件：pubRegulatoryAccount/detail.vue、BankAccountTable.vue、pubRegAccountChange/detail.vue、pubRegAccPropMgmt/detail.vue、propertyAccount/detail.vue、account/detail.vue、pubBankAccountBalance/index.vue等\n- 所属项目：苏住房G；来源会话：011d6472-82b1-4b34-b862-5f88d5e951ce；代码基线：315702f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bool_prop_shortcircuit.md",
+                "memory_type": "entities",
+                "after": "# Vue2布尔prop短路求值告警\nB端页面将`a && b`短路结果绑到布尔prop，返回字符串ID触发prop类型警告且禁用态可能不生效。\n\n## 问题根因\n- `:disabled=\"isBTerminal() && currentProjectId\"`当两侧为真时返回右侧19位雪花ID字符串而非true\n- Vue2/Element的Boolean prop做类型校验，遇非true字符串语义分叉，控件可能仍可编辑\n- 同类写法在v-if/:class/纯JS分支无害，仅绑给Boolean prop时暴露\n\n## 解决方案\n- 传给Boolean prop的表达式末段一律加`!!`归一，如`return terminalType === 'B' && !!currentProjectId`\n- 多个同类禁用条件（详情表单、批量导入弹窗等）一起改，避免只修报错处\n- 改后刷新确认警告消失且禁用态视觉真正生效\n\n## 验证与归属\n- 验证证据：会话6628d00f用户贴Invalid prop: type check failed for prop \"disabled\". Expected Boolean, got String \"667570210075104\"\n- 涉及文件：feeDeclare2/components/bulkImportDialog.vue、feeDeclare2/detail.vue、feeDeclare2/index.vue\n- 所属项目：苏住房G；来源会话：6628d00f-987f-45b2-80c7-d0bedcc72598；代码基线：69e9d4d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/street_bank_auth.md",
+                "memory_type": "entities",
+                "after": "# 街道银行授权下拉数据源改造\n街道银行授权弹窗下拉选项须来自上级区有效授权接口，失效历史值补回下拉并disabled，保存走{subdistrictCode}+rowVersion。\n\n## 问题根因\n- 旧实现用/system/bank/list全量银行+父组件districtAvailableBankIds前端过滤，属「前端猜口径」易不同步\n- 已保存街道授权可能残留区级失效银行，直接按新接口渲染会显示空白像丢数据\n\n## 解决方案\n- 下拉源换GET /streetBankPolicy/{subdistrictCode}/authorizedBanks，删前端bankIds过滤\n- 弹窗打开并行请求详情（bankIds+rowVersion）与可选银行，本地合并\n- 详情有下拉无的银行补进选项标「区级已失效」并disabled\n- 保存统一/streetBankPolicy/{subdistrictCode}，首次不传rowVersion，编辑带版本号乐观锁\n- 保存后GET /streetBankPolicy/page刷新列表；街道编码须从树/上级节点解析，勿从行对象想当然取\n\n## 验证与归属\n- 验证证据：会话dc798ac5用户给接口文档并反馈subdistrictCode为空，最终改下拉源与并行请求等\n- 涉及文件：system/regionBankAuth/index.vue、StreetAuthDialog.vue、utils.js、property/complex/components/RegionTreeLayout.vue\n- 所属项目：苏住房G；来源会话：dc798ac5-5460-4582-83cb-9f9c7bf0266f；代码基线：92ce738"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/role_orgtype_linkage.md",
+                "memory_type": "entities",
+                "after": "# 角色下拉按机构类型联动修复\n人员管理新增/编辑人员页角色下拉因organType写死默认值'02'导致跨机构返回错误角色集，须改为动态取类型。\n\n## 问题根因\n- form.organType默认值硬编码'02'（物业企业），无论实际所属企业类型均按'02'过滤角色接口\n- 编辑历史人员沿用默认值，非按人员所属企业取类型；角色加载在initDict并行发导致时序错误\n\n## 解决方案\n- form.organType默认值改undefined，禁兜底\n- 抽loadRoleOptions(organType)：organType空时清选项不请求\n- 抽resolveAndLoadRoles()：优先form.organType，缺失用companyRecordId查企业详情补\n- setCompany切换企业先清roleIds再重拉；detailCallback里补调loadRoleOptions避免并行时序错\n- isChange场景按源人员organType加载\n\n## 验证与归属\n- 验证证据：会话4d653d37用户报信托公司时角色框显物业企业角色，定位listRolePage未传企业类型\n- 涉及文件：toB/personnelRecord/components/detail.vue、institution/personnel/detail.vue、company/staffManagement/components/detail.vue、register/components/accountInfo.vue、company/userManagement/operator/detail.vue、toB/adminOperator/detail.vue\n- 所属项目：苏住房G；来源会话：4d653d37-aa8a-4614-b734-2b2e40476bec；代码基线：b8ae114"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

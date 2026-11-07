@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-惠山二期G-1793790737742/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T11:15:23.792124+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/owner_audit_load.md",
+                "memory_type": "entities",
+                "after": "# APP业主审核页自动加载修复\n修复APP业主人工审核页进入即弹“请在姓名、证件号、手机号中任选至少两个信息查询”异常的技术模式。\n\n## 问题根因\n- 通用列表mixin `table.js` 的 `init()` 在页面 `created` 时无条件调用 `getList()`，空条件请求被后端拦截并弹窗\n- 报错页面：`zhi2-web-admin/src/views/property/appOwnerAudit/index.vue`（接口 `property/ctUserIdentity/pageAudit`）\n\n## 修复方案\n- 在 `src/mixins/table.js` 新增 `autoLoadList` 开关，默认 `true`，其他列表页行为不变\n- `init()` 中 `autoLoadList === false` 时跳过自动查询\n- 在 `appOwnerAudit/index.vue` 设 `autoLoadList: false`，进入页面不调列表接口，表格为空无弹窗\n- 重写 `handleQuery()`：点击搜索时前端先校验姓名/证件号/手机号至少填两项，满足才重置页码请求\n\n## 项目与验证\n- 所属项目：惠山二期G\n- 来源会话：333318b1-4f2d-4f92-b2b0-f97f02e88d67\n- 验证：eslint通过，进入页面无异常弹窗"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_input_number.md",
+                "memory_type": "entities",
+                "after": "# zs-input-number无按钮内边距修复\n修复 `zs-input-number` 组件在 `:controls=\"false\"` 时错误保留112px内边距导致文字被裁的技术模式。\n\n## 问题根因\n- `zs-input-number` 组件对 root 样式写 `:not(.is-controls-right) /deep/ .el-input__inner { padding-left:56px; padding-right:56px }`\n- `:controls=\"false\"` 时 element-ui 加的是 `is-without-controls`，规则仍命中，无按钮却白占112px，placeholder被裁成「请输入最少选」\n\n## 修复方案\n- `src/components/zs-input-number/zs-input-number.vue` 规则加 `:not(.is-without-controls)`，无按钮时回落默认15px\n- `src/views/autonomy/multiply/components/VotingItemsDialog.vue` 栅格 `md/lg/xl` 6→8，输入框再宽1/3\n- 连带恢复 `benefit/pubHousePart/detail.vue`、`partDialog.vue`、`housePartDialog.vue`、`assetLeaseApply/components/houseTable.vue` 正常显示\n\n## 项目与验证\n- 所属项目：惠山二期G\n- 来源会话：2381e8b3-483f-4cd3-afac-2e88786cc72a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_time_echo.md",
+                "memory_type": "entities",
+                "after": "# 业主决策时间回显覆盖修复\n修复 `autonomy/general/detail.vue` 选时间后被强制改写导致回显成0点的问题。\n\n## 问题根因\n- `@change=\"handleDecisionTimeChange\"` 在用户选完时间后强行改写：开始非当天→00:00:00，结束→23:59:59，开始当天→当前+1小时\n- 导致选择时间被覆盖，回显为 `2026-09-30 00:00:00 - 2026-10-23 23:59:59` 之类\n\n## 修复方案\n- 模板删除 `@change=\"handleDecisionTimeChange\"`，改为 `:default-time=\"['00:00:00', '23:59:59']\"`\n- 删除 `handleDecisionTimeChange` 方法（全库无其他引用）\n- 手动选时间原样回显提交；只选日期不点时间仍默认00:00:00/23:59:59，与本项目的 `surveyRelease`、`utilityLinkConfig` 写法一致\n\n## 项目与验证\n- 所属项目：惠山二期G\n- 来源会话：599febc8-15af-4a92-bfc3-4d8864681fc6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/house_backfill.md",
+                "memory_type": "entities",
+                "after": "# 房屋变更页楼幢单元选择缺失项目信息修复\n修复房屋信息变更详情页因缺 `projectId` 导致点楼幢/单元弹“请先选择开发项目”的问题。\n\n## 问题根因\n- 从房屋信息跳转变更页（`formMode:'add'`）时接口 `/building/house/{houseId}` 返回数据只带 `projectName` 缺 `projectId`\n- 点击楼幢/单元选择框时 `openBuildingDialog`/`openUnitDialog` 校验 `form.projectId` 不存在而弹窗\n\n## 修复方案\n- 新增 `backfillProjectInfo()` 方法，在新增模式加载房屋数据后、编辑模式 `detailCallback` 后调用\n- 有 `buildingId` → 请求 `/building/building/{buildingId}` 取回 `projectId/projectName/projectCode` 回填，补齐 `buildingNo/buildingCode`\n- 无 `buildingId` 但有 `u` 开头关联信息时亦做对应回填（源会话原文截断）\n\n## 项目与验证\n- 所属项目：惠山二期G\n- 来源会话：9c47b930-1e4a-454a-bb8b-450970d0136c\n- 涉及文件：`zhi2-web-admin/src/views/building/houseChange/detail.vue`"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

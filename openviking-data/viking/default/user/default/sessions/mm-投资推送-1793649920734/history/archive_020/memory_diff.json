@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-投资推送-1793649920734/history/archive_020",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T20:34:42.604163+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/根readme统一指数定投与红利子策略.md",
+                "memory_type": "entities",
+                "after": "# 根README统一指数定投与红利子策略\n多 README 易与实现漂移时，将主体、子目录业务与共享数据基础设施合并为单一根 README 并做一致性核对。\n\n## 合并规则\n- 将主体（指数定投策略）、子目录业务（红利低波个股）、共享数据基础设施（Parquet/因子集市等）合并为单一根 README\n- 删除分散的子 README\n- 合并后做链接、命令、路径、代码围栏与实现一致性核对\n\n## 验证与归属\n- 验证证据：会话 rollout-2026-08-25 用户诉求「将项目里面多个 readme 合并…主体是指数定投策略，子目录有个红利选股策略」及最终结论\n- 涉及文件：README.md\n- 所属项目：投资推送；来源会话ID：rollout-2026-08-25T09-43-58-01a03696-a7e2-72a1-90b8-2aaa05fb347f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/月调仓低波band相对top优势被换手侵蚀.md",
+                "memory_type": "entities",
+                "after": "# 月调仓低波Band相对Top优势被换手侵蚀\n红利低波策略月调仓并计入交易成本后，Band 的毛利优势被换手大幅侵蚀，常不如 Top + 缓冲。\n\n## 诊断与实盘差异\n- 固定 20 日诊断口径下 Band 筛选往往优于 Top（例 Band 13.85% vs Top 9.92%）\n- 月调仓并计入交易成本后，Band 毛利优势大幅缩窄（约 1.5%→0.1% 量级）\n- Top 换手率可仅为 Band 的约 40%（月调仓毛回测 9.69% vs 8.20%，含成本 7.26% vs 7.14%，换手 51.92% vs 22.61%）\n\n## 结论与决策依据\n- 不能只用短窗诊断选筛选模式；月频实盘/回测应以含成本换手为决策依据\n- Band 在月调仓下常不如 Top + 缓冲；回滚 Top+Buffer 后年化 16.71%、夏普 0.70、年均单边换手 23.37%\n\n## 验证与归属\n- 验证证据：会话对比表与回测数据\n- 涉及文件：config/vectorbt/strategy_params.yaml、vbt/strategies/signal_generators.py、vbt/strategies/dividend_lowvol.py、vbt/strategies/ablation.py\n- 所属项目：投资推送；来源会话ID：rollout-2026-08-27T08-48-51-01a040b0-e9b4-7a90-8b73-d9b8e9142ea5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/低波top加调仓缓冲保留池与卖上限.md",
+                "memory_type": "entities",
+                "after": "# 低波Top加调仓缓冲保留池与卖上限\nvectorbt 红利低波实现约定：波动率 strict Top10、缓冲保留池、每期卖上限与买卖互斥。\n\n## 实现约定\n- 波动率按截面 strict Top10（与股息 Top10 对齐），配置入口 volatility_filter.mode=top、top_n=10\n- 缓冲保留要求持仓仍在「波动率 Top30 且股息率 Top30」池内，仍合格则尽量不卖\n- 每期最多卖出 3 只，其余不合格顺延\n- 满仓扩展遵守单股 ≤8%，平均持仓约 13–14 只\n\n## 验收要求\n- 验收需保证调仓期买卖集合无重叠（同月卖出又买回为 0）\n- 消融与三阶段对比脚本用于验收\n\n## 验证与归属\n- 验证证据：119 次调仓均满足每期最多卖 3 只；买卖重叠 0；缓冲池 Top30+Top30；42/42 测试通过\n- 涉及文件：config/vectorbt/strategy_params.yaml、config/vectorbt/ablation_config.yaml、vbt/strategies/signal_generators.py、vbt/strategies/dividend_lowvol.py、scripts/run_ablation.py、scripts/compare_ablation_results.py\n- 所属项目：投资推送；来源会话ID：rollout-2026-08-27T08-48-51-01a040b0-e9b4-7a90-8b73-d9b8e9142ea5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/原生backtest与rqalphanav不一致根因.md",
+                "memory_type": "entities",
+                "after": "# 原生backtest与RQAlphaNAV不一致根因\n原生 backtest 与 RQAlpha 成交一致但 NAV 不符时，根因在现金与公司行为顺序。\n\n## 问题机制\n- DLV_BACKTEST_PRICE_SOURCE=rqalpha 且 DLV_EXECUTION_AT_CLOSE=true 时，调仓成交与 RQAlpha 完全一致但期末 NAV 仍差约 0.7%（例 ~6881 元），市值可对齐、现金不对齐\n- 首日/调仓成交价：原生用约两位小数价，RQ 用 bar 全精度，首日总成本可差 ~1000 元量级\n- 除权日处理顺序：应先送股再派息，顺序反了会在送股标的（如 600188）上累积现金差\n- 佣金差异可忽略\n\n## 修复方案\n- 以 RQAlpha/实盘为真值，改 dividend_lowvol_rotation/backtest.py 的公司行为顺序与调仓成交价来源\n- 用 compare_baseline 收敛到 0.05% 以内\n\n## 验证与归属\n- 验证证据：2025-08-01 原生现金 408656 vs RQ 401774，市值均为 790056；首日成本 993678 vs 994672；全期佣金 370.90 vs 370.96\n- 涉及文件：dividend_lowvol_rotation/backtest.py、dividend_lowvol_rotation/rqalpha/dividend_lowvol_strategy.py、dividend_lowvol_rotation/rqalpha/native_cash_ledger.py、dividend_lowvol_rotation/rqalpha/dividend_tax_sync.py、dividend_lowvol_rotation/rqalpha/compare_baseline.py\n- 所属项目：投资推送；来源会话ID：cc5e8c6c-5c51-4f79-b39b-f7ed3b7df657"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

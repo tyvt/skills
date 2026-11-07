@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_039",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:46:55.789710+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/login_cryptojs_script_missing.md",
+                "memory_type": "entities",
+                "after": "# 登录CryptoJS未定义脚本缺失\n产品2.0后台登录按钮点击报错 CryptoJS undefined，根因是 index.html 漏引 crypto-js.min.js 的 script 标签。\n\n## 问题现象\n- 后台点登录按钮报错，login.vue 调 encryptPassword() 做 AES 加密时访问 window.CryptoJS.enc 报 CryptoJS undefined\n- public/assets/js/crypto-js.min.js 文件实际存在，仅 index.html 漏写 script 标签\n\n## 根因分析\n- 登录链路依赖的全局工具函数靠 index.html 静态脚本注入，非 npm import；文件在但没引等于不存在\n- 与 #899「index.html 全局脚本引入 ≠ 挂到 Vue 原型」根因不同：本例是静态资源引入缺失而非挂载方式问题\n\n## 解决方案\n- 遇到 XXX is undefined 且怀疑全局脚本时，先核对 index.html 是否有对应 script 标签，而非先查函数实现\n- 修复即补 script 引用，并给加密工具函数加与 responseDecrypt.js 一致的空值检查（CryptoJS 未定义时给出可读报错）\n- 验证需硬刷新（Ctrl+F5）排除缓存；新增页面报全局变量未定义，第一步核对静态脚本引入清单\n\n## 验证与归属\n- 会话 1bc8fc71（2026-08-26，基线 a357f32）结论：文件存在仅漏 script 标签，修复为 index.html 补引用 + passwordEncrypt.js 加空值检查\n- 涉及文件：src/views/login.vue、src/utils/passwordEncrypt.js、index.html；所属项目：产品2.0；来源会话：1bc8fc71-bc44-4ec0-8afd-e7a6ff8608f0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/money_paste_maxlength_truncate.md",
+                "memory_type": "entities",
+                "after": "# 金额指令粘贴被maxlength截断\n产品2.0 金额输入框粘贴「1,111,111」时被截断成 1111，根因是 maxlength 在清洗前抢先截断含千分位逗号的原文。\n\n## 问题现象\n- 金额输入框粘贴「1,111,111」只能进 4~5 位变成 1111，后几位凭空丢失\n- 发生在 src/directives/formatter/money.js 的 onpaste 逻辑\n\n## 根因分析\n- 输入框带 maxlength 时，浏览器先把剪贴板原文（含千分位逗号）按字符数截断，之后指令 setTimeout 才去 input.value 去逗号\n- 逗号在截断时已占用 maxlength 配额，被删后得到的就是双重损耗的值\n\n## 解决方案\n- 粘贴处理必须 e.preventDefault() 放弃浏览器默认插入，用 e.clipboardData.getData('text') 取原文\n- 用 stripMoneyGrouping 正则（/[,，\\s\\u00A0\\u202F]/g，覆盖中英文逗号与各类不间断空格空白）先去分组符，再按当前选区拼进已有值，最后对整段再统一去一次分组符\n- 重写 value 前先算 prefixCleanLen，用 requestAnimationFrame 恢复光标位置避免错位\n- 核心结论：凡「先插入、后异步清洗」的输入处理都会被 maxlength 抢先截断，清洗必须前移到 preventDefault 之后的同步阶段\n\n## 验证与归属\n- 会话 9c57feb1 结论：onpaste 改为 preventDefault + clipboardData 取原文 + stripMoneyGrouping 先清洗再拼值，修复「1,111,111 被卡成 1111」\n- 涉及文件：src/directives/formatter/money.js；所属项目：产品2.0；来源会话：9c57feb1-7d80-4322-82da-ffd6c882352d；代码基线：8d416b2"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/detail_template_layout_mapping.md",
+                "memory_type": "entities",
+                "after": "# DetailTemplate查看态layout归一化映射\n产品2.0 的 DetailTemplate 查看态 layout 值会做归一化映射（16→整行24、8→半宽12），与编辑态 el-col 原生 span 语义不同。\n\n## 问题现象\n- 查看态用 DetailTemplate 想让「发布范围」和「查阅人次」并排一行，配 layout 16+8 却各占一行/错行\n- 与「DetailTemplate column prop 无效、只能逐项配 layout」是互补的更深一层问题\n\n## 根因分析\n- DetailTemplate 的 layout 不是原样透传的栅格 span：查看态把 16 映射为整行 24、8 映射为 12\n- 编辑态的 el-col 是原生 span 直接生效（16+8 本身正确），两套语义不一致导致按编辑态直觉配查看态必错行\n\n## 解决方案\n- 查看态配置 layout 必须按「映射后的值合计 24」推算：两个半宽字段各配 12（或按映射规则换算），而非照抄编辑态 16+8\n- 改这类布局前先确认当前是编辑态 el-col 链路还是查看态 layout 映射链路，两态分别核算\n\n## 验证与归属\n- 会话 49aa0c4f 结论：查看模式 layout 中 16 映射为整行 24，将发布范围 layout 从 16 改 12、与查阅人次 8（映射12）合计 24 后并排\n- 涉及文件：src/views/property/dailyService/detail.vue、src/components/DetailTemplate；所属项目：产品2.0；来源会话：49aa0c4f-506a-4246-af2e-a77dde771e08；代码基线：bc9b2a3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/download_get_method.md",
+                "memory_type": "entities",
+                "after": "# GET下载接口须用downloadGet\n产品2.0 物业费账单「下载错误报告」接口是 GET，但页面用固定走 POST 的 this.download() 导致下载失败。\n\n## 问题现象\n- 接口 property/spFeeBill/import/errorReport/{id} 是 GET，页面用 this.download() 调用后下载必然失败\n- 前端表现为下载无反应/报错，易被误判为权限或网关问题\n\n## 根因分析\n- 挂到 Vue.prototype 的 this.download 内部固定用 POST 发请求拿 blob，接口方法不对时后端不返回文件流\n\n## 解决方案\n- 在 src/api/index.js 新增 downloadGet 方法（GET 请求 + blob 响应），main.js 挂载 Vue.prototype.downloadGet\n- 页面里 GET 下载一律改用 this.downloadGet；接入下载类接口先确认 HTTP 方法，POST 用 download、GET 用 downloadGet\n\n## 验证与归属\n- 会话 e7bc06b9 结论：错误报告接口 GET 但 this.download() 走 POST 致失败；新增 api/index.js downloadGet + main.js 挂载，import.vue/importUploadDialog.vue 改用 downloadGet\n- 涉及文件：src/api/index.js、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue；所属项目：产品2.0；来源会话：e7bc06b9-bcea-4473-b16e-d02f4f8e8045；代码基线：018ae18"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

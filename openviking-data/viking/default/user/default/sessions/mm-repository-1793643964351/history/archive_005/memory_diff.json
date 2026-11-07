@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-repository-1793643964351/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T18:33:52.283668+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dict_tag_value_string.md",
+                "memory_type": "entities",
+                "after": "# dict-tag 值类型须与字典 dictValue 一致\ndict-tag 渲染依赖字典匹配，字典 dictValue 多为字符串，接口返回数字会导致匹配不到显示空白。\n## 问题根因\n- dict-tag 渲染依赖字典匹配，字典 dictValue 多为字符串（如 \"1\"）\n- 接口返回数字（如 1）时匹配不到，显示空白\n## 解决方案\n- 传给 dict-tag 的 `:value` 先 `String()` 转换（空值不处理），数字型字典值才能正确显示\n- 示例：车位类型 1 转字符串后匹配显示「人防车位」\n## 验证与归属\n- 010.md 会话 3ee096c3：ParkingAssetDialog 车位类型值 1 不显示，转字符串后匹配\n- 涉及文件：src/views/benefit/statisticsMap/components/ParkingAssetDialog.vue\n- 来源会话ID：3ee096c3-3217-4512-83ef-b5204479f8cb；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/popup_form_row_detail_merge.md",
+                "memory_type": "entities",
+                "after": "# 弹窗表单详情优先、列表补空合并回显\n点击表格行打开弹窗时，先把行数据塞进 form 即时回显，再请求详情接口覆盖，详情缺失时保留行值。\n## 方案说明\n- 点击表格行打开弹窗时，先把点击行 row 塞进 form 即时回显\n- 再请求详情接口，详情字段覆盖到 form\n- 详情为空/缺失时保留 row 的值，避免「列表有值弹窗空白」\n## 验证与归属\n- 010.md 会话 a5ae1f4d：operatingAssets 弹窗带入列表那一条合并展示\n- 涉及文件：src/views/benefit/statisticsMap/operatingAssets.vue\n- 来源会话ID：a5ae1f4d-8f55-452a-94db-c33e62acddb7；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_scroll_table_body.md",
+                "memory_type": "entities",
+                "after": "# 表格滚动改为整体 table-body 而非每行独立滚动\n抽屉/Tab 固定高度布局里，把滚动放在每行上会出现多个滚动条且被裁切，应移到表体。\n## 问题根因\n- 抽屉/Tab 固定高度布局里，把 max-height+overflow-y 放在每行 name-grid 上会出现「每行一个滚动条」\n- 每行滚动条会被外层 overflow:hidden 裁切\n## 解决方案\n- 把 overflow-y:auto 与 max-height 移到表体（&__table-body）\n- 容器设 display:flex;flex-direction:column 让表头不随滚动，表头加 position:sticky; top:0\n## 验证与归属\n- 011.md 会话 e780a0dd/1fb2d557：operatingAssets 滚动从 name-grid 移到 table-body，flex column 分离表头\n- 涉及文件：src/views/benefit/statisticsMap/operatingAssets.vue\n- 来源会话ID：e780a0dd-fe30-4f74-9569-c9d33cce3fc1, 1fb2d557-1e32-434c-916c-0095fdd829ee；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/technical_pattern/listmixins_queryparams_required.md",
+                "memory_type": "entities",
+                "before": "# listMixins Requires queryParams Or Assignment Errors\n`listMixins.js` `created` hook runs `Object.assign(this.queryParams, val)` via the `query` setter, so components importing it must declare `queryParams`.\n## Root Cause\n- `listMixins.js` created hook does `Object.assign(this.queryParams, val)` through the query setter\n- A component importing the mixin without `queryParams` declared triggers `Cannot convert undefined` error\n## Convention\n- Any component importing `listMixins` must define a `queryParams` data attribute\n## Verification\n- Verified: src=惠山G/001.md\n- Files: refundDetailTable.vue, listMixins.js, refundDetailDialog.vue, DrawDetailTable.vue, DepositDetailsTable.vue\n- Project: 惠山G (zhi1-web-admin); Source session: 0a343062-5aa6-4690-ac12-8d034bff8777; Code baseline: none",
+                "after": "# listMixins queryParams 未定义触发 TypeError\n`listMixins.js` 的 created 钩子与 query setter 会执行 `Object.assign(this.queryParams, val)`，组件未声明 queryParams 时抛出 Cannot convert undefined or null to object。\n## 问题根因\n- `listMixins.js` created 钩子通过 query setter 执行 `Object.assign(this.queryParams, val)`\n- 组件仅混入 listMixins 未在 data() 定义 queryParams（如纯展示弹窗）时 this.queryParams 为 undefined 抛 TypeError\n## 约定与修复\n- 约定：任何混入 listMixins 的组件应定义 queryParams 数据属性\n- 修复：在 mixin 的 computed query get/set 与 created 中对 `this.queryParams == null` 做防护（return 或 `{}`），避免纯展示弹窗崩溃\n## 验证与归属\n- 惠山G 项目（zhi1-web-admin）：src=001.md，文件 refundDetailTable.vue、listMixins.js、refundDetailDialog.vue、DrawDetailTable.vue、DepositDetailsTable.vue，来源会话 0a343062-5aa6-4690-ac12-8d034bff8777\n- 010.md 会话 e7f13f04：VenueAssetDialog 报 TypeError，根因 listMixins queryParams 未定义，加防护，文件 src/mixins/listMixins.js，来源会话 e7f13f04-7af6-4354-8122-d5aee1779dac"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

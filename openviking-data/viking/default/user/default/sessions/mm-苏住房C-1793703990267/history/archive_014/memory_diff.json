@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:33:51.856327+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/svg_css_fallback.md",
+                "memory_type": "entities",
+                "after": "# SVG图标重构误删改用组件内置CSS绘制\n苏住房C小程序在重构中误删SVG矢量图标文件，导致状态指示类小图标静默失效，最终改用组件内置CSS绘制。\n\n## 问题现象\n- 卡片右侧勾选圆圈整块不显示，页面无任何报错\n- 小程序里SVG加载失败不会抛错，仅呈现透明占位，需肉眼发现\n- 根因为icon-checked.svg、icon-nocheck.svg等在重构中被删，模板仍通过ZsImage引用致404\n\n## 排查与解决\n- 排查顺序：确认仅图标类缺失→检查src/static目录文件是否存在→从git历史恢复被删SVG（本例恢复8个）\n- 最终采纳更稳做法：状态由数据决定的小图标用组件内置CSS画（未选中灰空心圆，选中蓝渐变圆+白勾）\n- 落地TitleCard组件内，删除失效的ZsImage插槽引用避免死代码\n- 判断标准：装饰性大图走static资源，状态指示类小图标优先内置CSS/SVG字符串\n\n## 验证与归属\n- 验证会话7f2654d5：用户报选择样式与勾选圆圈缺失，恢复8个SVG并在TitleCard内置CSS单选圆圈\n- 涉及文件：pages_owner/house/components/TitleCard.vue、owner/authentication.vue、TypeChoose_Suzhufang.vue\n- 所属项目：苏住房C；代码基线：9832ba3；来源会话ID：7f2654d5-5bab-4165-aa36-1e84ddbdfa13"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/subpkg_page_android.md",
+                "memory_type": "entities",
+                "after": "# 分包内二级目录页面安卓端报Component not found\n苏住房C小程序「求购信息」在安卓端整页空白并报页面路径找不到，根因为分包内再套子目录页面路径在安卓产物解析不到。\n\n## 问题现象\n- 苏找房「求购信息」安卓端整页空白，控制台报`Component is not found in path pages_transaction/intention/my/list`\n- iOS/开发者工具可能正常，易被当作偶发\n- 仅抽组件到components目录而未删旧页面注册，安卓端仍按旧路径加载，报错照旧\n\n## 根因与解决\n- 根因：intention/my/list在分包intention目录下再建my子目录放页面，安卓端产物chunk位置对不上\n- 正确三件套：删旧页面注册与文件；合并为intention/list用query区分mode；共享组件放分包components下\n- 同步更新menuRouteMap.js与scripts/merge-main-leaks.mjs的stub路径（list.js→pages_transaction/intention/list.js）\n- 验证必须清理dist/unpackage旧产物重新打包，并排查后端菜单路径是否仍指向旧地址\n\n## 验证与归属\n- 验证会话e0538ad3：用户两次报同错，最终删页合并+组件上提+同步脚本\n- 涉及文件：pages.json、intention/list.vue、IntentionMyList.vue、utils/menuNav.js、scripts/merge-main-leaks.mjs\n- 所属项目：苏住房C；代码基线：f1939b0；来源会话ID：e0538ad3-fc2d-43a5-8b21-e951b74289dd"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zpaging_bottom_bar.md",
+                "memory_type": "entities",
+                "after": "# z-paging固定模式底部白条遮挡loading\n苏住房C自定义TabBar下z-paging的fixed模式因多重底部留白叠加，导致列表底部白条遮挡loading，看似不加载更多。\n\n## 问题现象\n- 列表滚到底部不会自动加载更多，修完页面空白，再修底部出现白色区域挡住loading\n- 用户原话「页面最底下为什么有白色的，把loading也挡住了」\n- 白条来源三叠加：tab-bar-placeholder占位、z-paging fixed按原生TabBar高度上缩、loading被盖\n\n## 解决方案\n- 删掉tab-bar-placeholder和无效bottom-offset死参数\n- 用paging-style.bottom对齐自定义TabBar真实高度：`calc(106rpx + env(safe-area-inset-bottom))`\n- 关闭safe-area-inset-bottom避免重复加安全区；页面背景统一#f5f5f5防刺眼白块\n- ZsPaging在本项目有4份副本（pages_main/owner/owner_extra/transaction），改组件层评估四份同步\n\n## 验证与归属\n- 验证会话dc3620d1三轮：用户报不加载→空白→白条挡loading，改为显式bottom+关安全区+背景统一\n- 涉及文件：pages/index/project.vue、pages_main/components/ZsPaging/ZsPaging.vue、pages_main/index/project.vue\n- 所属项目：苏住房C；代码基线：4630e8e；来源会话ID：dc3620d1-8787-4997-ad0a-327ea076910f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/uni_checkbox_zsradio.md",
+                "memory_type": "entities",
+                "after": "# uni-data-checkbox样式隔离需换ZsRadio\n苏住房C市民端微信小程序中uni-data-checkbox因组件样式隔离，页面:deep无法改间距，须换自研ZsRadio。\n\n## 问题现象\n- guardApply表单「是否有电梯」选项间距改了三轮均不生效，图片上传组件间距却生效\n- 用户原话「单选还是不行，运行环境是微信小程序」\n- 仅全局uni.scss的.checklist-box{margin-right:0!important}生效，页面scoped与:deep均穿透不进\n\n## 根因与解决\n- 根因：uni-data-checkbox编译为独立自定义组件，微信样式隔离阻断页面样式穿透\n- 做法：需精确控制单选/复选样式处直接换项目自研ZsRadio（圆圈文字10px、选项间1em）\n- 个别页面加大间距通过传props或包裹类调，不覆盖u-*内部类\n- 判断分水岭：改样式只有某控件不变，先断定是否uni_modules组件再决定换组件或走全局\n\n## 验证与归属\n- 验证会话2d5e45dc：用户三轮反馈未修复，结论为样式隔离换ZsRadio\n- 涉及文件：pages_guard/guardApply/index.vue、step1.vue、step2.vue\n- 所属项目：苏住房C；代码基线：6aca310；来源会话ID：2d5e45dc-c7a7-4161-9f6d-ee9bee35d68d"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

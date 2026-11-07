@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T12:13:12.516960+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/szf_img_blank.md",
+                "memory_type": "entities",
+                "after": "# 苏找房全部Tab二手房图片空白修复\n苏住房C 苏找房「全部」Tab 二手房图片空白问题已定位并修复，根因含接口缺图、分包默认图不可达、字段映射错与 H5 混内容。\n\n## 问题根因\n- `listRecommend`（全部 Tab）返回二手房记录 `thumbnail` 均为 `null`（如「绿聚未来商业中心」「湖居世家」），接口本身无图片字段\n- 默认占位图 `default.png` 放在 `pages_transaction` 分包，苏找房 Tab 属主包页面，分包未预加载时占位图路径不可访问致空白\n- 部分接口返回 `imageUrl` 而非 `thumbnail`，原映射 `imageUrl: e.thumbnail` 覆盖已有图片地址\n- 生产配置图片代理用 `http://`，HTTPS WebView 中可能拦截 `/zs-fym/` 图片（影响有图房源）\n\n## 修复要点\n- 将 `src/static/images/szf/default.png` 复制到主包，确保 Tab 页直接访问\n- `src/utils/mainStaticPaths.js` 注册主包默认图路径\n- 调整 `src/components/commonNew/houseCard.vue` 与 `src/pages_tab/components/Project_Suzhufang.vue` 图片字段映射\n- `src/pages_transaction/stockHouse/index.vue` 同步修复\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：fa5768fc-b738-4e95-83d7-d7bd81e5939a\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/owner_repair_block.md",
+                "memory_type": "entities",
+                "after": "# 业主卡报事报修功能暂未开放拦截\n苏住房C 业主卡「报事报修」改为「功能暂未开放」，根因是开发者工具仍跑旧 dist 包缺拦截逻辑。\n\n## 问题根因\n- 源码已加拦截，但微信开发者工具运行的 `dist/dev/mp-weixin` 为旧包，`goToOther` 无「功能暂未开放」逻辑仍可跳进报修页\n\n## 修复要点\n- `ownerCard/index.vue` 改用 `@tap.stop=\"handleNavClick(item)\"`（小程序比 `@click` 更稳）\n- 抽出 `isRepairNav`，在 `handleNavClick` 与 `goToOther` 双重拦截「报事报修」\n- 验证需重新编译并清缓存，导入新包 `zhi2-mobile-shimin/dist/build/mp-weixin`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`zhi2-mobile-shimin/src/pages_owner_extra/ownerCard/index.vue`\n- 来源会话ID：eac9139c-3367-4784-8577-a513c71c95c0\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/empty_img_fix.md",
+                "memory_type": "entities",
+                "after": "# 工作动态空数据默认图修复\n苏住房C 为「工作动态」列表页补充空数据默认图，并修复接口失败时空白不显示的问题。\n\n## 修复要点\n- 使用 `ZsEmpty` 组件，指定默认图 `images/empty.png`，无数据时显示图片与「暂无数据」/「未查询到相关数据」文案\n- 接口失败时 `requested` 未置 `true` 致不显列表也不显空状态，改用 `try/finally` 保证请求结束进入空状态判断\n- 判断逻辑由 `total === 0` 改为 `!list.length`，接口异常也能正确显示空状态\n- 空状态区域居中，默认图尺寸 320rpx 垂直居中\n\n## 涉及文件\n- `zhi2-mobile-shimin/src/pages/property/index.vue`\n- `zhi2-mobile-shimin/src/pages_property/rcService/daily.vue`\n- `zhi2-mobile-shimin/src/pages_property/rcService/index.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：42343a4e-0f73-462e-bedb-6499ef092a49\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/phone_icon_mainpkg.md",
+                "memory_type": "entities",
+                "after": "# 手机号授权页图标主包化修复\n苏住房C 安卓手机号授权弹窗图标原先放 `pages_main` 分包且未打入构建产物，导致不显示，已迁入主包改用 ZsImage。\n\n## 问题根因\n- 图标原先放在 `pages_main` 分包，且未打入构建产物，致授权弹窗顶部图标不显示\n\n## 修复要点\n- 将 `phone-auth-icon.png` 放 `src/static/images/`，`mainStaticPaths.js` 注册 `images/phone-auth-icon.png` 与兜底图 `images/warn.png`\n- 删除 `pages_main/static/images/phone-auth-icon.png` 避免重复维护\n- `WechatPhoneAuthPopup.vue` 原生 `<image>` 改 `<ZsImage>` 支持加载失败回退，去掉硬编码 `pages_main` 分包路径\n\n## 涉及文件\n- `mainStaticPaths.js`、`WechatPhoneAuthPopup.vue`\n- `zhi2-mobile-shimin/src/pages/login/index.vue`、`src/pages/components/PhoneForm.vue`、`src/pages_my/verification/UnauthorizedPage.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：a1a45147-a211-4056-89f4-a6d870d42790\n- 代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

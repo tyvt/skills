@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793788552577/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T10:43:16.172657+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/trustee_appendix_display.md",
+                "memory_type": "entities",
+                "after": "# 授权委托书改为始终显示不过滤\n苏州市房地产监测V3 中授权委托书改为始终显示、不过滤，另有 spec 中其他用例属既有基线失败。\n\n## 既有失败用例\n- spec 文件里另外 3 个用例（多图回显、要件删除、注册全流程）目前失败\n- 用 git stash 在改动前代码上跑过同样全失败，属既有基线问题，非本次改动引起\n- 失败原因：用例仍用 `institution-appendix-*` 测试 id 和 `.file-row`、`上传` 旧选择器，而单页表单实际渲染 `appendix-requirement-*` 和图片式上传占位\n- 这几个需单独一轮修复，超出「授权委托书」范围，未改动\n\n## 循环依赖说明\n- eslint 对 `registerAppendixAdminType.js` 报 `import/no-cycle`（import `api/company/companyRegister.js`，后者 import `utils/appendix.js`，而 `appendix.js` import 回本文件）\n- 该循环在改动前已存在，沿用同样 `normalizeAppendixConfig` 导入方式，未引入新循环\n\n## 验证与归属\n- 验证证据：extracted source=zcode project=苏州市房地产监测V3\n- 涉及文件：registerAppendixAdminType.js、api/company/companyRegister.js、utils/appendix.js、appendix.js\n- 所属项目：苏州市房地产监测V3；来源会话：session_de8fcbd46f273208201b79f1dca6500e；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/building_table_ui.md",
+                "memory_type": "entities",
+                "after": "# 参考设计图修改楼盘表UI\n苏州市房地产监测V3 中楼盘表页面已按两张设计图改完，图表与列表视图均用真实组件配假数据验证通过。\n\n## 页面与视图改动\n- `src/views/projectManagement/buildingTable/index.vue` 重写：拆成「项目信息」与「楼盘表」两张卡片，去掉内嵌 Tab 与顶部楼幢标签行，改右上角「图表视图/列表视图」分段切换\n- 图表视图：楼幢横向标签（1幢、2幢…），「楼盘状态：」图例行（可售、合同草签、备案申请、合同备案、自留、抵押、限制）+ 右侧「状态统计」弹出层 + 楼层×单元网格\n- 列表视图：左侧竖排楼幢侧栏（选中蓝底高亮），右侧户室表格（序号、户室号、预测建筑面积、实测建筑面积、所属层、房屋用途、状态、操作·查看），底部带分页\n\n## 新增状态模块\n- 新增 `components/buildingTableStatus.js`：状态定义统一收口（名称、判定字段 isAvailableSale/isInitial/isPreRecord/isRecord/retention/mortgage/limited、图标配色、可售徽标）\n- 含楼层排序和面积取值兜底，兼容 `predictFloorArea`\n\n## 验证与归属\n- 验证证据：extracted source=zcode project=苏州市房地产监测V3\n- 涉及文件：src/views/projectManagement/buildingTable/index.vue、components/buildingTableStatus.js、components/BuildingTableGrid.vue、components/BuildingTableList.vue\n- 所属项目：苏州市房地产监测V3；来源会话：session_d78560c48c308d3ff1ae8629726ae3a4；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/land_domain_config.md",
+                "memory_type": "entities",
+                "after": "# 地名域名配置改为参数读取\n苏州市房地产监测V3 中地名相关页面（land.do）的域名配置改为从后端参数设置读取。\n\n## 配置要求\n- 后端参数库需有 `land.domain` 配置，键值为完整根地址（如 `https://fdc.szzfcjj.cn/dmsp`），末尾斜杠自动去掉\n- 缺失时页面空白并在 `placeApproval` 给出提示\n\n## 环境差异\n- 各环境原地址不同（test 为 `http://58.240.192.148:9996`），现统一由参数配置决定\n- 切环境时需在对应环境后台各配一次\n\n## 验证与归属\n- 验证证据：extracted source=zcode project=苏州市房地产监测V3\n- 涉及文件：src/utils/placeDmsp.js、public/version.js、src/api/system/config.js\n- 所属项目：苏州市房地产监测V3；来源会话：session_f915ba6c510a5289dbc91c768090573a；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/max_batch_no_field.md",
+                "memory_type": "entities",
+                "after": "# 预售许可批次号字段取数\n苏州市房地产监测V3 中 `maxBatchNo` 为预售许可批次号字段，前端只读、系统自动生成。\n\n## 取数与容错\n- `/presale/permit/project/list` 返回项挂在 `projectOptions[].raw` 上，`handleProjectChange` 从 raw 带出项目名、行政区划等，`maxBatchNo` 同样从此取\n- `maxBatchNo` 为 null/空串时 `batchNo` 置 undefined，输入框显示「系统自动生成」占位符，不显示 NaN\n- 用 `String(Number(raw.maxBatchNo) + 1)` 兼容后端返回字符串或数字两种类型\n\n## 提交与回填\n- `getForm()` 提交 payload 仍是白名单字段、不包含 `batchNo`\n- 详情/审批态由 `/presale/permit/detail` 回填 `batchNo` 并覆盖（`detailCallback` 里 `...data` 在后），查看态展示不受影响\n- 界面语义目前是「预售批次」而非「预售许可批次号」\n\n## 验证与归属\n- 验证证据：extracted source=zcode project=苏州市房地产监测V3\n- 涉及文件：src/views/property/bill/components/declarationRecord.vue、src/views/property/declare/components/declarationRecord.vue、permitConstants.js、PermitInfoPanel.vue、permitExtend/detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：session_738a2a4d2ad93a91c77adf4b7c511d52；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

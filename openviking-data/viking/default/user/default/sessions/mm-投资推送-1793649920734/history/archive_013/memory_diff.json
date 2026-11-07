@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-投资推送-1793649920734/history/archive_013",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T20:24:22.264674+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/申万行业映射静态快照与unmapped停线.md",
+                "memory_type": "entities",
+                "after": "# 申万行业映射静态快照与unmapped停线\n投资推送项目中申万二级向一级行业归并时的分类快照限制、unmapped 处理与因子优先级调整规则。\n\n## 分类与限制\n- 申万二级向一级归并（名称含「银行」的二级→「银行」，其余向上归并一级）时，行业分类是当前静态快照而非 PIT，历史调样期存在未知方向错配\n- 无法映射的记录必须标 unmapped 并统计占比，禁止猜测填充\n- 所有引用该分类的报告固定披露上述限制\n\n## 停线与调整规则\n- 若 unmapped 占比 >10%，应先解决数据源再继续后续因子实验\n- 银行权重若长期显著（实测 12 期均值约 27%、均低于冻结阈值 35%），按预注册规则调整因子优先级（C2 支付率筛选升首位、C1 行业内股息率居次），而非认定 C1 失效\n\n## 验证与归属\n- 用户四项确认：披露文案、unmapped>10% 停线、银行 27.39% 触发 C2/C1 顺序调整、外部「银行约50%」须用实测核验\n- 涉及文件：output/phase7b/\n- 所属项目：投资推送；来源会话ID：rollout-2026-08-27T19-28-27-01a042fa-7e61-7451-b55b-60e15f97475d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/融合排序稳健性持仓上限与buffer归因.md",
+                "memory_type": "entities",
+                "after": "# 融合排序稳健性持仓上限与buffer归因\n投资推送项目中股息+低波融合策略的持仓上限显式化、buffer 归因与生产配置规则。\n\n## 持仓与归因规则\n- 股息+低波融合策略应将 fusion_candidate_n（如 100）与 top_n（如 10）拆分，并在代码中显式 max_holding = top_n + NDrop（如 13），避免候选池逻辑隐式膨胀持仓\n- Layer2 收益归因须按逐日实际权重计算 core/buffer 贡献，不能用调仓日静态权重，否则缓冲仓收益被低估\n- 若 buffer_contribution 长期 >30%，说明 Alpha 仍依赖缓冲，应回炉\n\n## 生产配置\n- 综合验收矩阵（如 7 项中 ≥5 项）未通过前，融合配置保持 experimental，生产默认 fusion_mode: false\n\n## 验证与归属\n- 稳健性会话 1/7 通过未升级；原策略 buffer 贡献约 100%、候选枯竭频率 100%；用户确认 max_holding=13、逐日动态权重\n- 涉及文件：output/robustness/robustness_report.md ; output/ablation/metrics_fusion_optimal.json\n- 所属项目：投资推送；来源会话ID：rollout-2026-08-27T10-00-16-01a040f2-4dca-7810-b246-594ac1915afc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/调仓敏感性bootstrap主辅方案.md",
+                "memory_type": "entities",
+                "after": "# 调仓敏感性Bootstrap主辅方案\n投资推送项目中检验调仓时点与收益稳健性的 Bootstrap 主辅方案规则。\n\n## 主方案\n- 对每个调仓日做交易日随机偏移（如 ±13 日）后全路径重跑并重复足够次数（如 1000），直接测执行延迟与滑点敏感性\n\n## 辅助方案\n- 按调仓周期收益的分块 Bootstrap（块长如 36 个月）估计区间，因标准 i.i.d. 重采样会低估短期自相关带来的尾部风险\n- 两方案独立输出，不与「仅改限价」混为一谈\n\n## 验证与归属\n- 用户确认 Bootstrap 方案 B 为主、Block Bootstrap 为辅；标准 Bootstrap 对动量/自相关的局限说明\n- 涉及文件：output/robustness/\n- 所属项目：投资推送；来源会话ID：rollout-2026-08-27T10-00-16-01a040f2-4dca-7810-b246-594ac1915afc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/宽基买入信号年际频率估值分位分析.md",
+                "memory_type": "entities",
+                "after": "# 宽基买入信号年际频率估值分位分析\n投资推送项目中宽基买入信号年际频率骤降时优先查估值分位而非仅调阈值的分析规则。\n\n## 分析原则\n- 对比 2022–2024 高买入占比与 2025–2026 接近零信号时，常见解释是当前宽基估值处于高位（分位偏高），而非单一阈值写错\n- 微调创业板等指标后，部分年份仍为 0 买入天（如 2020、2021），说明当年低点估值分位本身不满足条件\n\n## 操作方法\n- 用多年 logs/backtest 分年表做指标松紧分析时，应分指数独立阈值并记录买入占比与信号收益，再决定改 config 还是接受「高位少买」\n\n## 验证与归属\n- 2025–2026 A 股宽基（含中证500、科创50）零或近零信号；创业板微调后 2020/2021 仍为 0 天\n- 涉及文件：logs/backtest/2021.md ; logs/backtest/2025.md ; config.py ; cyb_signal.py\n- 所属项目：投资推送；来源会话ID：355a3923-8a06-43e6-aab7-a7daba7d869f, 802ca60b-38e3-47fa-af25-da9516660471"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

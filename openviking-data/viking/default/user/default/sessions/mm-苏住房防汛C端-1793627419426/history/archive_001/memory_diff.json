@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房防汛C端-1793627419426/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T13:51:44.458588+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/uniapp_back_fallback.md",
+                "memory_type": "entities",
+                "after": "# uni-app 刷新后返回按钮失效兜底\n刷新后页面栈被重建为 1 层，navigateBack 静默失败，需用栈深分支到 reLaunch 兜底。\n\n## 现象\n- 历史详情页返回按钮在刷新页面后点不动，页面还在但无反应；从列表进入时正常。\n- 该类 bug 用「列表→详情→返回」正常路径永远测不出来。\n\n## 根因\n- uni-app 页面栈在 H5 刷新 / 小程序重新进入后被重建，栈深变成 1。\n- uni.navigateBack 在只有 1 层时静默失败：不报错也不跳转，表现为返回按钮失效。\n\n## 解决方案\n- 抽离 useBack.ts 统一处理返回：取当前页面栈深度，栈深 >1 才 navigateBack，否则 reLaunch 跳兜底页。\n- 业务页面禁止散落 navigateBack 调用，全部走该 composable。\n- 兜底页选一定存在的页面（如首页/列表页），避免 reLaunch 到未注册路由白屏。\n- 页面栈深度用 uni 官方 API 读取，不要自维护计数器（刷新后失真）。\n- 回归覆盖两条路径：列表→详情正常返回，与刷新后直接返回兜底（易漏测）。\n\n## 关联信息\n- 涉及文件：src/composables/useBack.ts、src/pages/history/index.vue。\n- 所属项目：uni-app Vue3 + TypeScript + Pinia + z-paging 工作台；来源会话：5ff6b6db-7cd5-4fef-9b29-75110106902c；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zpaging_scroll_hook.md",
+                "memory_type": "entities",
+                "after": "# z-paging 页面滚动模式显式注册钩子\nz-paging 页面滚动模式必须显式注册 useZPaging 钩子才继续加载，且其为默认导出，命名导入致 H5 构建失败。\n\n## 现象\n- 历史上拉加载不追加：首屏 10 条之后不再触发下一页。\n- 改成 import { useZPaging } 后 H5 端直接构建失败。\n\n## 根因\n- 页面滚动模式不会自动接管分页，必须显式注册 useZPaging 钩子把滚动事件转成分页请求，否则只走首屏一页。\n- fixed 模式由组件自己滚动不暴露此问题，两模式触发机制不同。\n- useZPaging 是默认导出，命名导入拿不到定义，构建阶段失败（小程序可能不报错，H5 才炸）。\n\n## 解决方案\n- 页面滚动模式显式注册 useZPaging，接上查询/加载回调。\n- 导入写 import useZPaging from 'z-paging'（默认导入），不要加花括号。\n- 排查「列表只加载一次」先确认是否为页面滚动模式而非 fixed 模式。\n- 注册后必须验证第二页真追加进列表，而非只看首屏渲染。\n- 双端（H5 + 微信小程序）都跑一遍，两端模块导出形态与构建链不同。\n\n## 关联信息\n- 涉及文件：src/pages/history/index.vue。\n- 验证：单元测试 4 文件 18 项通过、typecheck 通过、H5 端到端 7 项全通过、build:h5 与 build:mp-weixin 均通过。\n- 所属项目：uni-app 双端交付；来源会话：5ff6b6db-7cd5-4fef-9b29-75110106902c；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/pixel_residual_attribution.md",
+                "memory_type": "entities",
+                "after": "# 像素级还原验收残差三档归因\n逐像素还原后差异比对非零时，按亚像素抗锯齿、平台原生控件、演示数据差异三档归因；小程序端不可能与 H5 逐像素一致。\n\n## 现象\n- 按参考站做逐像素还原后差异仍非零：工作台 0/329160（一致），汛中巡检 101 像素（0.031%），汛前检查 1158 像素（0.352%）。\n- 用户要求「UI 需要和这个100%一样，如果不行告诉我原因」。\n\n## 根因\n- 非零残差非布局偏差：4 倍放大核对差异全在输入框文字与步进器数字亚像素抗锯齿（字形字号字重位置一致，栅格化取整不同）。\n- 结构性不可消除：原生控件由平台渲染（uni-input/uni-number-box 与参考站 React 原生控件不同）；演示数据不同（参考站预置 14 条静态工单，本应用空态起步）；参考站无对应页面（记录详情页为本应用新增）。\n\n## 解决方案\n- 差异归因按固定三档输出并给量化占比（差异像素÷总像素），不笼统说「基本一致」。\n- 逐像素比对用固定视口 390×844 + 阈值 delta>24，差异蒙层图落 artifacts/diff/。\n- 字体必须与参考站同源（同一份 Figma 托管 woff2：Noto Sans SC / Plus Jakarta Sans），不做本地替换。\n- 微信小程序端与 H5 不可能逐像素一致，两端共用 theme.css 保证同源，但须分别开发者工具与真机验收。\n- 交付时把「无法 100% 一致的部分及原因」单独成节并附量化证据。\n\n## 关联信息\n- 涉及文件：src/styles/theme.css、tests/e2e/flows.spec.ts、README.md。\n- 来源会话：5ff6b6db-7cd5-4fef-9b29-75110106902c；代码基线：none。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:07:18.285248+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/form_validate_scroll_to_error.md",
+                "memory_type": "entities",
+                "after": "# 表单校验失败滚动定位\nElement UI 校验失败仅标红不滚动，需在自定义滚动容器内新增 scrollFormToFirstError 实现定位聚焦。\n\n## 现象\n- 弹窗表单过长出现内部滚动时，点确定校验失败页面无效果，错误项在可视区外看不到标红。\n\n## 根因\n- Element UI 校验失败只给 el-form-item 加 is-error 类，不滚动定位。\n- 项目滚动发生在自定义容器（.candidate-form-box、.app-main），非 window，通用 scrollIntoView 可能滚错容器。\n\n## 解决方案\n- utils/validate.js 新增 scrollFormToFirstError：查找第一个 .el-form-item.is-error，向上找最近可滚动父容器，平滑滚动并聚焦输入框。\n- 逻辑收口进公共 zs-form 的 validate 失败分支，所有消费 zs-form 的页面/弹窗一次性获得定位+聚焦能力。\n\n## 关联信息\n- 涉及文件：src/utils/validate.js、src/components/zs-form/zs-form.vue、src/views/autonomy/candidateCollect/components/CandidateDialog.vue。\n- 所属项目：园区物管2.0；来源会话：b7798d11-726e-4733-aeb4-7435cb7b009a；代码基线：55cd8653c。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/amountinput_dispatch_change.md",
+                "memory_type": "entities",
+                "after": "# 自封装输入组件校验必填误判\nAmountInput 等自封装 v-model 输入组件需补 el.form.change/blur 派发契约，否则填了仍提示必填。\n\n## 现象\n- AmountInput 用户填了值，el-form 校验仍提示必填。\n\n## 根因\n- ElInput 原生在 v-model 值变化时 dispatch('el.form.change')，使 change 规则随值更新重校验。\n- AmountInput 只在原生 change/清空事件 dispatch，值写回 form.model 路径不触发校验，读到旧值误判空。\n- blur 与父组件更新同帧执行时校验也可能读旧 model。\n\n## 解决方案\n- numberValue watch 里 emit('input') 后 nextTick 中 dispatchToFormItem('el.form.change', value)。\n- handleBlur 先 emit('blur') 再 nextTick dispatch('el.form.blur')；去掉 handleChange 重复 dispatch。\n- listeners 先判存在再调用（兼容 Vue 2.7 listeners 为 undefined）。\n- 凡自封装 v-model 输入组件都要补此 form 事件派发契约。\n\n## 关联信息\n- 涉及文件：src/components/AmountInput/index.vue；所属项目：园区物管2.0；来源会话：8430758d-a3eb-412d-97d4-0ab68ebf0303；代码基线：7814a0c2a。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/logout_clear_project_context.md",
+                "memory_type": "entities",
+                "after": "# 退出登录清理小区业务上下文\n退出登录必须清 localStorage 三键 + Vuex + 组件 local 状态三处小区/项目上下文，否则切换账号残留。\n\n## 现象\n- 顶部 Navbar 显示小区在切换账号登录后仍显示上一账号小区，刷新后才正常。\n\n## 根因\n- 小区上下文散落三处：localStorage（currentProjectId/Name/lastLoginProjectId）、Vuex user.currentProject、Navbar mounted 从 localStorage 读入的 localProjectName。\n- LogOut/FedLogOut 只清 token 和权限，不清小区数据；刷新后 layout/index.vue 校验清除无效缓存才正常。\n\n## 解决方案\n- user.js 新增 clearProjectContext，在 LogOut 与 FedLogOut 统一清除上述 localStorage 键与 Vuex 状态。\n- 通用教训：凡挂 localStorage 的跨账号业务上下文，登出与强制登出两路径都要显式清理，不依赖下次进入校验兜底。\n\n## 关联信息\n- 涉及文件：src/store/modules/user.js、src/layout/components/Navbar.vue、src/layout/index.vue。\n- 所属项目：园区物管2.0；来源会话：7cc4a853-05fc-4b7d-833f-c45e8ba67283；代码基线：49e7729ce。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/list_table_height_policy.md",
+                "memory_type": "entities",
+                "after": "# 列表页表格高度跟随内容约定\n园区物管2.0 后台列表页表格高度随内容收缩，取消 .list-card 自动撑满，禁止业务页各自覆盖。\n\n## 现象\n- 列表页表格下方出现大片空白，逐页改样式无效。\n\n## 根因\n- zs-table 在 .list-card 内自动撑满剩余高度（flex/height:100%），行数少时留白。\n\n## 解决方案\n- zs-table.vue 取消 .list-card 内自动撑满高度逻辑，index.scss 表格容器改 height:auto 按内容收缩。\n- 改动经 develop/v2.6.1 → 2.6.2 → 2.6.2-yulin 按分支顺序逐级合并。\n- 约定：列表页表格高度策略只改 zs-table 组件与全局 index.scss 两公共落点，禁止业务页面各自覆盖高度。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、zhi2-web-admin/src/styles/index.scss、zhi2-web-admin/src/mixins/ListTemplate.js。\n- 所属项目：园区物管2.0；来源会话：a3cdf258-43f5-4adb-9bc0-7f0801f15768；代码基线：036.md。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/苏州市房地产监测v3.md",
+                "memory_type": "entities",
+                "before": "# 苏州市房地产监测V3\n苏州市房地产监测V3（简称苏房V3）是用户维护的房地产监测 Vue 前端项目，主仓库位于 `D:\\repository\\苏州市房地产监测V3`。\n\n## 描述\n- 前端基于 Vue，依赖 Element UI（el-dialog），含自研组件 zs-dialog、zs-import 等\n- zhi2-web-admin 为其 git 子模块，在 worktree `D:/repository/szfc-v3-wt-bug6049` 上开发\n- 与园区物管2.0 为同源仓库，共用 zhi2-web-admin 组件库\n\n## 代码特征\n- zs-import 为通用导入弹窗组件，全项目已有 16 处调用，统一使用 `:visible.sync`、`:url`、`@refresh`、`@close` 模式\n- zs-dialog 透传全部 `$listeners`（含 close、update:visible）到 el-dialog，自身不处理 close\n- el-dialog 的 `hide()` 同时 emit `update:visible,false` 与 `close`，关闭事件链天然闭环\n- 导入成功提示统一走 `msgSuccess`/`msgError`，旧 `$alert`/`el-upload`/`getToken` 写法已废弃\n\n## 近期修复\n- bug6049（价格导入统一 UI）在分支 `fix/bug6049-price-import-uniform-ui`，单文件改动 +17/-86\n- 2026-11-02 经只读复核（task-1）7 条全部通过，重点风险「导入后弹窗打不开」判定为无此风险\n- 价格备案模块修复提交 `b49e622f1` 已合入 `origin/develop/v3.0.0`，本地子模块 HEAD 为 `e76797592`，重新构建后 4 个 chunk 含修复\n\n## 后端联调与测试\n- API 源站由环境变量 `VITE_APP_PROXY_ADDRESS` 决定；真实接口位于开发网关（unlimited.g.h5.admin.web.v3...）的 `/api/v3.0/...` 路径\n- 本地 8080 网关已死（返回 502），真实数据须走开发网关而非本地 8080\n- 2026-11-02 将 nginx 8098 开发站点配置为代理到开发网关：保留 `/api` 路径，且 `Host` 头须显式设为网关域名（不可用 `$host`，否则发 `127.0.0.1` 被拒），代理后返回 401 表示鉴权链路通\n- Playwright e2e 用例使用 `price-filing-helpers.js`，内含 `loginWithRealAccount` 与 `gotoPageByFilePath` 辅助函数\n- 已保存的 Playwright auth state 仅适用于 `localhost:8081`，不适用于 8098 站点，须浏览器内真实登录\n- 价格备案申请页的项目选择弹窗含「项目所在地」列，为本次联调截图目标\n\n## 预售资金监管新需求与前端架构\n- 2026-11-02 接到禅道需求 1413（账户管理）与 1415（监管协议），要求新建菜单实现，老页面保持可用\n- 后端分支 feature/feat-ligy-260825 已提交；前端新建 worktree `szfc-v3-wt-prefund-new`，分支 `feature/prefund-account-agreement-1413-1415`（未提交）\n- 路由动态生成（/system/menu/getRouters），新页面只需在 `src/views/` 下建文件 + 后端配菜单，不改 `router/index.js`\n- 列表页契约：`listMixins` + `ListTemplate`，`moduleName`+`businessName` 拼接口路径；详情页 `detailMixins` 自动拼 add/update/detail\n- 新建 8 个页面 + 3 个 api 文件位于 `src/views/supervision/account/` 下（regulatorOrg、mainAccount、regulatoryAccountNew、superviseAgreementNew）\n- 新监管账户走 `/prefund/regulatoryAccountNew` 与老接口 `/prefund/regulatoryAccount` 隔离；监管协议沿用 `/prefund/superviseAgree` 仅新增字段",
+                "after": "# 苏州市房地产监测V3\n苏州市房地产监测V3（苏房V3）是用户维护的房地产监测 Vue 前端项目，主仓库位于 `D:\\repository\\苏州市房地产监测V3`。\n\n## 描述\n- 前端基于 Vue，依赖 Element UI，含自研 zs-dialog、zs-import 等组件\n- zhi2-web-admin 为 git 子模块，在 worktree `D:/repository/szfc-v3-wt-bug6049` 开发\n- 与园区物管2.0 同源，共用 zhi2-web-admin 组件库\n\n## 代码特征\n- zs-import 通用导入弹窗已 16 处调用，统一 `:visible.sync`、`:url`、`@refresh`、`@close` 模式\n- zs-dialog 透传全部 `$listeners` 到 el-dialog，自身不处理 close；el-dialog `hide()` 同时 emit `update:visible,false` 与 `close` 闭环\n- 导入提示统一 `msgSuccess`/`msgError`，旧 `$alert`/`el-upload`/`getToken` 写法废弃\n\n## 近期修复\n- bug6049（价格导入统一 UI）分支 `fix/bug6049-price-import-uniform-ui`，单文件 +17/-86\n- 2026-11-02 只读复核 task-1 七条全过，「导入后弹窗打不开」风险判定无\n- 价格备案修复 `b49e622f1` 合入 `origin/develop/v3.0.0`，本地子模块 HEAD `e76797592`，重建后 4 chunk 含修复\n\n## 后端联调与测试\n- API 源站由 `VITE_APP_PROXY_ADDRESS` 决定；真实接口在开发网关 `/api/v3.0/...`\n- 本地 8080 网关死（502），真实数据走开发网关非本地 8080\n- 2026-11-02 nginx 8098 代理开发网关：保 `/api`，`Host` 头显设网关域名（禁 `$host` 否则发 127.0.0.1 被拒），代理返 401 鉴权通\n- Playwright e2e 用 `price-filing-helpers.js`（`loginWithRealAccount`、`gotoPageByFilePath`）\n- 已存 Playwright auth state 仅适用 `localhost:8081`，不适用 8098，须浏览器真实登录\n- 价格备案申请页项目选择弹窗含「项目所在地」列，为联调截图目标\n\n## 预售资金监管新需求与前端架构\n- 2026-11-02 接禅道需求 1413（账户管理）与 1415（监管协议），新建菜单老页面可用\n- 后端分支 `feature/feat-ligy-260825` 已提交；前端 worktree `szfc-v3-wt-prefund-new` 分支 `feature/prefund-account-agreement-1413-1415` 未提交\n- 路由动态生成（/system/menu/getRouters），新页面仅 `src/views/` 建文件+后端配菜单，不改 `router/index.js`\n- 列表页契约 `listMixins`+`ListTemplate` 拼接口；详情页 `detailMixins` 自动拼增改查\n- 新建 8 页+3 api 于 `src/views/supervision/account/`（regulatorOrg、mainAccount、regulatoryAccountNew、superviseAgreementNew）\n- 新监管账户走 `/prefund/regulatoryAccountNew` 与老 `/prefund/regulatoryAccount` 隔离；协议沿用 `/prefund/superviseAgree` 仅新增字段"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793647361230/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T19:24:11.521954+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/technical_pattern/sfb_face_container_bug.md",
+                "memory_type": "entities",
+                "after": "# 苏服办/支付宝H5扫脸拉不起：容器人脸上下文缺失\n无锡市区H5嵌在苏服办/支付宝WebView，生产未改代码也突然无法拉起人脸识别，相同token重登容器后可识别。\n\n## 问题根因\n- 支付宝/苏服办登录时除下发token外，还在容器内部建立人脸识别所需认证上下文，该状态不出现在URL里\n- 清缓存会销毁容器内人脸认证上下文，重新登录会重建\n- 业务token仍可复用，URL参数与H5 Storage不是根因，不能统一提示为「token失效」\n\n## 验证与定位\n- 用「相同URL+相同token→清缓存失败/重登成功」向业务方证明问题在宿主容器会话\n- 分别验证「只重登苏服办」「只重登支付宝」「仅杀进程不重登」以定位层级\n- 会话e195dccb：宿主H5 location跳转、此前可扫脸且做过支付宝与苏服办返回值兼容；最终结论token可复用\n\n## 解决方案\n- 用户提示改为「人脸识别环境未就绪，请重新登录苏服办后从业务入口进入」\n- 与支付宝/苏服办扫脸成功返回值不一致的兼容逻辑单独回归\n- 避免将容器状态问题误判为业务代码回归\n\n## 验证与归属\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js、src/pages/face/face.vue、src/utils/h5Context.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话：e195dccb-9f1b-45aa-92cf-65961851f833；代码基线：7993464"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/technical_pattern/external_webview_double_decode.md",
+                "memory_type": "entities",
+                "after": "# 外跳投票页h5ExternalWebview二次解码破坏Base64 token\n业主决策等外跳投票页URL的query中token、certificateNum等为Base64形态，经h5ExternalWebview进入后鉴权失败。\n\n## 问题根因\n- 路由或中间层已对query做过一次解码\n- 页面再对整个URL做decodeURIComponent会把仍带百分号编码的片段二次解码成+、/、=\n- 二次解码破坏密文参数（%2B/%2F/%3D变成+、/、=）\n\n## 验证与定位\n- 会话9b0c382d：定位h5ExternalWebview对URL做了二次decodeURIComponent导致token参数损坏\n- 示例URL含token=…%3D，修复方向为storage传递并修正解码逻辑\n\n## 解决方案\n- 长URL或含敏感query的外跳优先用uni.setStorageSync传完整URL，目标页只读storage不再二次decode\n- 若必须走query，只解码一次且避免对已解码token子串再decode\n- 用带%3D的真实投票链接做联调验收\n\n## 验证与归属\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages/common/webView.vue、src/hooks/useUrlQueryParam.js、src/pages.json\n- 所属项目：无锡市区小程序嵌入H5；来源会话：9b0c382d-6f57-4324-ab6b-ebafaf8e1362；代码基线：3fb9434"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/technical_pattern/h5_dist_stale_build.md",
+                "memory_type": "entities",
+                "after": "# H5改源码仍弹业主表决框：实际跑的是dist旧编译产物\n无锡市区H5嵌小程序已删除showOwnerDecisionConfirmModal改为直接进WebView，真机/预览仍出现登录校验→实名校验→uni.showModal二次确认。\n\n## 问题根因\n- 小程序或宿主加载的是历史npm run build的dist/assets，其中usePortal等chunk未更新\n- 改src不会自动反映到已部署的dist\n- 一侧仍弹窗可能因H5与wygl-wxxcx小程序两侧业主决策入口未同步删modal逻辑\n\n## 验证与定位\n- 会话9b0c382d最终结论：实际跑的是dist目录旧编译产物，usePortal仍走登录校验→实名校验→uni.showModal\n- 已删showOwnerDecisionConfirmModal并npm run build更新usePortal.be15442a.js\n\n## 解决方案\n- 改交互后必须重新build，并在产物里grep确认弹窗文案已消失\n- 微信开发者工具/宿主侧清缓存并确认web-view指向新dist\n- H5与wygl-wxxcx小程序两侧若都有业主决策入口需同步删modal逻辑\n\n## 验证与归属\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js、zhi2-mobile-admin-h5-c-unlimited/dist\n- 所属项目：无锡市区小程序嵌入H5；来源会话：9b0c382d-6f57-4324-ab6b-ebafaf8e1362；代码基线：3fb9434"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/technical_pattern/webview_https_whitelist.md",
+                "memory_type": "entities",
+                "after": "# 无锡市区嵌入H5通用webView仅允许https且域名白名单\n安全审计要求堵住WebView开放重定向（任意URL加载），通用webView入口需做协议与域名校验。\n\n## 解决方案\n- 在common/webView及同类入口加载前校验协议必须为https\n- 主机名命中项目维护的白名单，显式拒绝javascript:、data:与非白名单域\n- 清理历史无用域名配置（如已不再使用的szf.szzfcjj.cn、txzhwy.cn）\n- 配合生产环境去掉会打印Authorization/token的console，并移除废弃ihaAuth整条链路\n\n## 验证与定位\n- 会话bbb5f32c：诉求含移除ihaAuth、生产去除console防Token泄露、WebView仅https+白名单\n- 用户确认部分域名用不到\n\n## 验证与归属\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages/common/webView.vue、src/App.vue、src/api/index.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话：bbb5f32c-e6eb-4a34-80f6-4ee2c2629c62；代码基线：0804e57"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

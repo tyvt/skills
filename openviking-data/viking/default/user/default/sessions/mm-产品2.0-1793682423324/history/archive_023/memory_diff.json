@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_023",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:04:24.363083+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/benefit_finance_scatter.md",
+                "memory_type": "entities",
+                "after": "# 公共收益财务管理模块分散无聚合页\n在产品2.0的zhi2-web-admin中，公共收益-财务管理功能没有pubFinanceManage聚合页，而是分散在三个独立业务目录。\n\n## 实际落点\n- 标准账套：views/benefit/pubStandardAccountSet/（index.vue、detail.vue、components/financialSubjectsTable.vue、financialSubjectsDialog.vue），接口api/benefit/pubStandardAccountSet.js与pubStandardFinancialAccount.js\n- 生成凭证：入口在views/benefit/pubTradeModel/index.vue批量/单条「生成凭证」，查看凭证弹窗components/modelDialog.vue；pubCheckoutManage也带凭证表格\n- 凭证模板：views/benefit/pubVoucherTemplate/（detail.vue、components/templateStyleTable.vue、templateStyleDialog.vue），「选择会计科目」弹窗即components/treeTable.vue\n\n## 检索做法\n- 用中文业务关键词（会计科目/凭证模板/物业管理区域）反查目录，不要按拼音缩写猜目录名\n- 按「目录=列表index+detail+components子表/弹窗」骨架确认四件套是否齐全\n\n## 验证与归属\n- 验证证据：会话53a077ce探索「公共收益-财务管理」页面，结论未找到pubFinanceManage\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubStandardAccountSet/*、pubTradeModel/index.vue、pubVoucherTemplate/*等\n- 所属项目：产品2.0；来源会话：53a077ce-fa1c-4e73-8454-1aa02c59eacb；代码基线：2e3ec05"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/record_process_reuse.md",
+                "memory_type": "entities",
+                "after": "# 记录流程页被维保/巡检/年检三入口复用\n在产品2.0的zhi2-web-admin中，dataProperty/recordProcess下的components/index.vue是巡检、维保、年检三个入口共用的记录列表内核。\n\n## 问题背景\n- 原统一「巡检人」列需按类型显示为巡检人/维保单位/年检单位\n- 在模板写死字符串会导致三入口分叉，新增类型需改模板\n\n## 解决方案\n- 页面域enums.js增加RECORD_ORG_COLUMN_LABEL映射：'1'维保→维保单位，'2'巡检→巡检人，'3'年检→年检单位，缺省「巡保人」\n- 组件加computed orgColumnLabel = RECORD_ORG_COLUMN_LABEL[this.recordType]，列配置label: this.orgColumnLabel\n- 保留原有formatInspectUser回退（inspectOrg为空显recordUser），列名分支与取值回退独立\n\n## 验证与归属\n- 验证证据：会话3ea78a99诉求3列名按类型显示\n- 涉及文件：dataProperty/recordProcess/enums.js、components/index.vue、patrol/index.vue、maintain/index.vue\n- 所属项目：产品2.0；来源会话：3ea78a99-5d38-464d-b621-452601150b10；代码基线：64fa9e2"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bank_detail_migration.md",
+                "memory_type": "entities",
+                "after": "# 详情页迁移新版框架operation-btn-group传主键字段名\n产品2.0的zhi2-web-admin中，supervision/bank下cbyh/jgwd/wtjgxy三个旧detail.vue迁到新版详情框架，operation-btn-group的primaryKey传字段名而非值。\n\n## 关键约定\n- moduleName与businessName是接口路径段（如prefund/workBank），primaryKey传主键字段名（workBankId/bankBranchManageId/entrustSupervisionAgreeId）而非主键值\n- 组件放模板顶部只传moduleName/businessName/primaryKey/:form/:biz-state，接@save/@refresh/@update\n- 删旧zs-attachment与operation-container，内置附件流程已集成；权限用zs-button的:permission数组而非v-hasPermi\n- view模式用DetailTemplate+Headline区块contentInfo/contentInfo2，edit/add用zs-form包zs-input/zs-select\n\n## 业务保留\n- 保留cbyh的prefixUrl、isSuzhouzhizai条件字段、YhwdTable子表、WtmcDialog选网点等专有逻辑，只换外壳\n\n## 验证与归属\n- 验证证据：会话b653273d改造三个详情页，逐页给出参数\n- 涉及文件：supervision/bank/cbyh/detail.vue、jgwd/detail.vue、wtjgxy/detail.vue、maintenance/bank/detail.vue、mixins/detailMixins.js\n- 所属项目：产品2.0；来源会话：b653273d-87b4-4092-97cd-01c7ae965dff；代码基线：39e3114"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/payment_channel_prefetch.md",
+                "memory_type": "entities",
+                "after": "# 弹窗预拉渠道查询误读创单请求体\n产品2.0的zhi2-web-admin中，spFeeBill弹窗打开即预拉listPayablePaymentChannel，其报文被误认为创单createFromBill多了查询条件。\n\n## 根因\n- 渠道查询报文带businessId/hasStudy/hasVerify，用户误当作创单payload\n- 弹窗无条件发起查询，即使scanPayAmount=0不需扫码，叠加旧构建缓存显得参数未清\n\n## 解决方案\n- 仅scanPayAmount>0时才调渠道接口，否则不发请求\n- 同业务多弹窗查同一接口时参数集逐字段对齐，删掉只在一边出现的hasVerify等字段\n- 创单接口严格只传文档字段（billIds/useDeduct/orderDesc，需扫码加paymentChannelId/payMode）\n- 排查时先按URL区分接口再怀疑代码，不混改buildXxxPayload\n\n## 验证与归属\n- 验证证据：会话ff1c31d0用户贴图问查询条件还在，结论为渠道查询非创单\n- 涉及文件：property/spFeeBill/components/collectionDialog.vue、property/bill/components/PaymentDialog.vue、utils/request.js\n- 所属项目：产品2.0；来源会话：ff1c31d0-1595-44b3-95e1-129dad1f7eae；代码基线：6accf9a"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

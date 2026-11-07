@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793820561401/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T20:12:18.376165+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/project_info_poi_debug.md",
+                "memory_type": "entities",
+                "after": "# 小区信息页周边配套调试日志\npages_owner/project/info/index.vue 的周边配套无数据时，已加 [小区周边]/[小区周边/QQMap] 日志帮助定位宿主、Key、坐标与接口链路问题。\n\n## 日志判断项\n- 宿主：区分 H5 与小程序 web-view（wx.miniProgram.getEnv）\n- Key：qq.map.key 是否取到（脱敏）\n- 坐标：详情接口经纬度是否存在、是否合法\n- 接口链路：逆地理 JSONP/wx.request → boundary → 地点搜索；失败区分超时、script 报错、业务 status/message\n\n## 已发现代码问题\n- 失败路径原先全部静默 return []，无数据时无法区分 Key、坐标、逆地理或搜索故障（现已打点）\n- onShow 重复拉详情时 markers.push 会累加，已改为每次重置为单个 marker\n\n## 日志关键字对照\n- 地图 Key 为空：配置/登录问题，请求未发出\n- 小区未配置经纬度：业务数据问题，未调地图\n- JSONP 超时 / script.onerror：宿主/网络拦截 apis.map.qq.com\n\n## 验证与归属\n- 验证证据：会话 44e9f45b 用户反馈小区周边无数据要求加日志\n- 涉及文件：src/pages_owner/project/info/index.vue、src/utils/index.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话ID：44e9f45b-f8b3-4cdb-b60b-c803993c0d4a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/file_preview_relative_path.md",
+                "memory_type": "entities",
+                "after": "# 文件预览地址相对路径改造\nfilePreview 的地址解析改为与 ZsImage 一致，新增 resolveFilePreviewUrl 按平台处理路径。\n\n## 平台行为\n- H5：已是 http(s):// 等绝对地址则原样使用；以 / 开头转为相对路径（如 /api/file → ./api/file），走当前域名与 Vite 代理\n- 微信小程序：仍拼接 BASE_URL，逻辑不变\n\n## 改动要点\n- filePreview 不再使用 IMAGE_BASE 拼接 H5 地址，已移除对应 import\n- DescribePopup.vue 等调用前若手动拼接 IMAGE_BASE，H5 下为空不受影响；小程序传入完整 URL 识别为绝对地址不重复拼接\n\n## 验证与归属\n- 验证证据：会话 da88fbd0 用户要求文件预览路径改为相对路径\n- 涉及文件：DescribePopup.vue、src/utils/index.js、src/env/mp.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话ID：da88fbd0-10ce-496a-a71f-84d83cffcc43"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/苏服办登录失败提示.md",
+                "memory_type": "preferences",
+                "after": "- 苏服办登录失败时，使用 uni.showModal（showCancel: false，仅「确定」按钮）替代 Toast 弹窗，需手动点击关闭\n- 弹窗展示完整调试信息：错误信息（接口 msg 或异常描述）、入参（name/idType/idNumber/phone）、接口返回完整响应 JSON\n- 覆盖所有失败场景：接口返回非 200/0、返回成功但无 accessToken、网络请求异常\n- 统一在 src/utils/h5Context.js 的 showSfbLoginErrorModal 中处理，src/hooks/usePortal.js 移除重复逻辑"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/project_info_poi_api.md",
+                "memory_type": "entities",
+                "before": "# 小区信息页数据与周边POI接口分工\npages_owner/project/info/index.vue的小区详情、地图Key与周边配套分别调用不同接口，避免与维修资金接口混淆。\n\n## 小区详情与Key\n- 小区详情GET /property/complex/getExtendedByComplexId/{complexId}（property.js getPropertyDetail），含complexName、address、buildingCount、houseCount等\n- 展示「交付日期」用deliveryYear映射，后端deliveryDate为空则显示-\n- 地图Key：GET /system/config/getByKey/qq.map.key（与园区项目同一配置键）\n\n## 周边配套localSearch\n- 先调腾讯geocoder/v1逆地理取adcode拼boundary，再place/v1/search\n- keyword为分类名，filter为facilityCategory（transaction.js）中的poi编码，orderby _distance\n- 列表距离来自_distance，纯展示地图不要与维修资金接口混淆\n\n## 验证与归属\n- 验证证据：会话b30d2f3f用户问小区信息页用的接口，结论列出后端详情、配置Key、腾讯WebService两步及facilityCategory表\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue、src/api/property.js、src/utils/transaction.js、src/utils/qqMapKey.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话ID：b30d2f3f-1f15-46f0-9efa-aa95170ed55f；代码基线：289666e",
+                "after": "# 小区信息页数据与周边POI接口分工\npages_owner/project/info/index.vue的小区详情、地图Key与周边配套分别调用不同接口，避免与维修资金接口混淆。\n\n## 小区详情与Key\n- 小区详情GET /property/complex/getExtendedByComplexId/{complexId}（property.js getPropertyDetail），含complexName、address、buildingCount、houseCount、subdistrictName、communityName、xcoordinate/ycoordinate等字段\n- 展示「交付日期」用deliveryYear映射，后端deliveryDate为空则显示-\n- 地图Key：GET /system/config/getByKey/qq.map.key（与园区项目同一配置键）\n\n## 周边配套localSearch\n- 先调腾讯geocoder/v1逆地理取adcode拼boundary，再place/v1/search\n- keyword为分类名，filter为facilityCategory（transaction.js）中的poi编码，orderby _distance\n- 列表距离来自_distance，纯展示地图不要与维修资金接口混淆\n\n## 验证与归属\n- 验证证据：会话b30d2f3f用户问小区信息页用的接口，结论列出后端详情、配置Key、腾讯WebService两步及facilityCategory表\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue、src/api/property.js、src/utils/transaction.js、src/utils/qqMapKey.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话ID：b30d2f3f-1f15-46f0-9efa-aa95170ed55f；代码基线：289666e"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

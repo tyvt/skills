@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_051",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:54:17.325415+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/basecard_click_tap.md",
+                "memory_type": "entities",
+                "after": "# 自定义组件@click不触发需改@tap并emit\n苏住房C 小程序中自定义组件（如 commonNew/baseCard.vue）标签上的 @click 不会触发，需改用 @tap 并在根节点同时 emit click/tap。\n\n## 问题现象\n- pages_main/publicNotice 列表项「点击没反应」，页面看似可点但跳转逻辑未执行，控制台无报错\n- 单选按钮、view 上的 @click 有时因编译器兼容侥幸生效，但自定义组件标签上的 @click 最不稳且失败时不报错不冒泡\n\n## 根因\n- 微信小程序事件是 @tap（bindtap），把 @click 绑在自定义组件标签上不会触发\n- 组件内部未将点击事件 emit 出来，事件在组件边界静默丢失\n\n## 解决方案\n- 小程序端点击一律写 @tap\n- 公共卡片组件 baseCard 在根节点绑 @tap 并同时 emit('click') 与 emit('tap')，兼容历史 @click 调用方\n- 业务列表 ListIndex.vue / ListContractIndex.vue 统一改 @tap，与 bankList.vue、HalfCard.vue 等既有写法对齐\n- 排查「点击无反应」先确认事件绑在原生节点还是自定义组件标签，再看组件是否 emit，勿先怀疑路由或权限\n\n## 验证与归属\n- 验证证据：会话 3aa806fa 最终结论「@click 绑在自定义组件 baseCard 上不会触发，事件没传到跳转逻辑」；修复为 baseCard.vue 根节点绑 @tap 并 emit，列表改 @tap\n- 涉及文件：src/components/commonNew/baseCard.vue、pages_main/publicNotice/components/ListIndex.vue、ListContractIndex.vue、publicNotice.vue、pages/publicNotice/components/ListContractIndex.vue\n- 所属项目：苏住房C；来源会话ID：3aa806fa-2f71-4575-9cb6-ed1ea81e5795；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/pagebg_fullscreen.md",
+                "memory_type": "entities",
+                "after": "# PageBg背景图变全屏需固定高度包裹盒\n苏住房C 小程序中 PageBg 组件因绝对定位铺满 flex:1 容器导致背景图变成全屏，需用固定高度包裹盒约束。\n\n## 问题现象\n- pages_owner/house/TypeChoose 页面顶部蓝色背景图变成铺满整屏，下方卡片区域被整块盖住\n- 不是图片尺寸问题也不是 cache，改 bg 尺寸或调 object-fit 都没用\n\n## 根因\n- Bg.svg 本身是 375×190px 顶部横幅，PageBg.vue 默认 position:absolute + inset:0 + object-fit:cover 铺满父容器\n- 该页 .type-container 写 flex:1 把父容器撑到整屏高，背景图随之被拉伸成整屏\n\n## 解决方案\n- 参照 house/index.vue 的 .top-empty，用固定高度包裹盒（.type-bg，height:380rpx 即 190px）包住 PageBg\n- 背景只占顶部条带，下方回落到 $uni-bg-color 白底\n- 高度微调改包裹盒 height，不改组件内定位\n- 判断口径：任何「背景图溢出/变全屏」先看父容器是否 flex:1/100vh，再看 PageBg 绝对定位是否缺高度约束包裹层\n\n## 验证与归属\n- 验证证据：会话 1d447664 最终结论「Bg.svg 是 375×190px 横幅，PageBg 绝对定位铺满父容器，.type-container flex:1 占满整屏」；修复用 .type-bg（380rpx）包裹\n- 涉及文件：pages_owner/house/TypeChoose.vue、components/PageBg/PageBg.vue、pages_owner/house/index.vue、pages_owner/house/components/TypeChoose_Suzhufang.vue\n- 所属项目：苏住房C；来源会话ID：1d447664-822a-4688-ab03-ac7488c5ab2d；代码基线：5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/logout_unread_badge.md",
+                "memory_type": "entities",
+                "after": "# 注销后消息未读角标不消失三层防护\n苏住房C 小程序注销/退出登录后「消息」未读角标仍显示，需状态层、展示层、请求层三层防护才能彻底解决。\n\n## 问题现象\n- 用户在「我的」页注销账号后，顶部功能区消息图标仍显示未读数字角标（如 4），未登录不应展示未读数\n- 注销瞬间在途的 getMsgNum 请求返回后无条件写回 unreadCount，造成「清了又冒出来」竞态复发\n\n## 根因\n- unreadCount 是页面局部 ref，只在登录态拉取后写入，注销流程既没重置也没在渲染层拦截登录态\n- 在途请求返回后覆盖清零结果，导致角标复发\n\n## 解决方案\n- 状态层：onShow 的 else（未登录）分支里 unreadCount.value = 0\n- 展示层：模板绑 computed messageBadge = unlogin ? 0 : unreadCount，让角标渲染带登录态兜底\n- 请求层：loadUnread 进入前若无 token 直接清零 return，await 返回后再判一次 token，销毁期间旧响应丢弃，catch 里置 0\n- 验收四步：登录有未读→显示；注销→消失；重登→恢复；注销时请求在途→不复发\n\n## 验证与归属\n- 验证证据：会话 a54442c4 结论含 onShow else 清零、messageBadge computed 兜底、loadUnread 前后校验 token；验收四条通过\n- 涉及文件：pages_tab/components/My_Suzhufang.vue、store/user.js、pages_tab/components/menu/MenuSection.vue、HaveBgItem.vue、pages_my/setting/cancellationReason.vue\n- 所属项目：苏住房C；来源会话ID：a54442c4-8431-4207-b588-fa848d7bf178；代码基线：9cdf7b8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zsimage_media_url.md",
+                "memory_type": "entities",
+                "after": "# ZsImage图片地址统一走resolveMediaUrl\n苏住房C 小程序中 ZsImage 手动拼 IMAGE_BASE 会拼出 /ttp:// 非法串导致 500，需统一走 resolveMediaUrl 处理 src。\n\n## 问题现象\n- 微信小程序渲染层报 Failed to load local image resource /ttp://218.4.168.198:8887/zhi2-pro/...png，status 500\n- 开头 /ttp 少一个 h，是被当相对路径截错的标志\n\n## 根因\n- 接口可能直接返回完整内网地址 http://...，ZsImage 在小程序端无条件执行 `${IMAGE_BASE}${props.src}` 拼出非法 URL\n- utils 的 resolveMediaUrl 在小程序端原本只返回相对路径未拼 IMAGE_BASE，<image> 同样加载不出\n\n## 解决方案\n- 地址拼接收敛到唯一出口 resolveMediaUrl，ZsImage 一律通过它处理 src，禁止组件内手写 IMAGE_BASE + src\n- resolveMediaUrl 需：小程序端拼完整 HTTPS；已带 http(s):// 绝对地址原样透传；兼容 /http:// 误加前导斜杠（先剥斜杠再判前缀）\n- 排查顺序：打印最终 src 看是否重复拼接 → 查微信后台 downloadFile 合法域名 → 确认服务器文件真实存在\n\n## 验证与归属\n- 验证证据：会话 d56ce156（基线 9832ba3）报错 /ttp://... 500；接口返完整内网地址，ZsImage 拼出非法 URL；修复 utils/index.js 的 resolveMediaUrl 拼 IMAGE_BASE 并兼容 /http://，ZsImage 改调用\n- 涉及文件：src/utils/index.js、src/components/ZsImage/ZsImage.vue、src/env/mp.js、vite.config.ts、src/page-query/components/PropertyCard.vue、src/pages/index/components/menu/MenuImage.vue\n- 所属项目：苏住房C；来源会话ID：d56ce156-0a63-4298-b177-fd3d0430fcf2；代码基线：9832ba3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

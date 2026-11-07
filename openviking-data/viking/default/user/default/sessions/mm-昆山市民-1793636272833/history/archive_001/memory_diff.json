@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-昆山市民-1793636272833/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T16:19:37.053181+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/h5_static_path_rule.md",
+                "memory_type": "entities",
+                "after": "# 昆山市民H5子目录静态资源路径规则\nuni-app H5 部署在子路径时，后端 `/statics` 资源与本地 `static` 目录不能共用同一套相对路径规则，本地资源须返回完整 URL 避免二次拼接。\n\n## 问题背景\n- uni-app H5 部署在子路径（如 /wyzx/）时，资源 URL 会被运行时再拼一次部署 base。\n- 本地图返回 `/wyzx/static/...` 或 `./static/...` 会变成 `/wyzx/wyzx/static/...`，Network 拿到 HTML 而非图片。\n- 后端资源路径 `/statics/xxx` 由 uni 自动加一次 base，可写 `/statics/xxx`。\n\n## 解决方案\n- 本地 `static` 目录在 H5 下应通过 `resolveLocalStaticUrl` 返回完整 URL（`origin + 部署前缀 + /static/...`），完整 URL 不会被二次改写。\n- 线上课堂封面、菜单图标等需按类型走 `resolveServerAssetUrl` / `resolveLocalStaticUrl`，并在 vConsole 核对只有一个部署前缀且 Content-Type 为 image/*。\n- 修复手段：H5 本地资源改完整 URL，与视频 `/statics/` 双前缀问题同类但路径段不同。\n\n## 验证与归属\n- 验证：会话 8ef2aa73 用户反馈在线课堂封面不显示，根因本地图 `/wyzx/static/...` 被 uni 再加 `/wyzx/`。\n- 涉及文件：src/utils/resolveAssetUrl.js、src/components/zs-image/zs-image.vue、src/pages_onlineService/onlineIndex.vue、src/pages_onlineService/OnlineCass.vue、vite.config.js、src/env/mp.js。\n- 所属项目：昆山市民；代码基线：c8c1c24；来源会话ID：8ef2aa73-67f1-4e34-9fc7-6ad739924137。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/h5_relative_url_pattern.md",
+                "memory_type": "entities",
+                "after": "# 昆山市民H5资源与接口相对路径规范\nH5 嵌入/子目录场景下，接口与媒体地址统一走相对路径（无前导斜杠、不加 /h5 段），小程序端仍用 IMAGE_BASE 拼完整域名。\n\n## 问题背景\n- H5 嵌入/子目录场景下，接口与媒体地址若带前导 `/` 或人为加 `/h5` 段，请求会落到站点根。\n- 早期用 `VITE_IMAGE_URL` 拼绝对域名，H5 下不适配子路径部署。\n\n## 解决方案\n- 接口与媒体地址统一走相对路径（如 `statics/xxx`、`./static/images/...`），不要前导 `/`，不要加 `/h5` 段。\n- `src/env/mp.js` 在 H5 将 `IMAGE_BASE` 置空，业务不再用 `VITE_IMAGE_URL` 拼绝对域名；小程序端仍用 `IMAGE_BASE` 拼完整域名。\n- 新增 `resolveServerAssetUrl` / `resolveLocalStaticUrl` 按 `#ifdef H5` 分支；`ZsImage` 与附件/头像/富文本图片统一调用。\n- 本地图标用 `:src=\"staticUrl('...')\"` 动态绑定，避免编译期写死绝对路径；开发环境 `vite.config.js` 保留 `/statics` 代理到 `VITE_IMAGE_URL` 预览后端静态资源。\n\n## 验证与归属\n- 验证：会话 c0160254 用户明确要求接口前缀相对路径、H5 用、不带前导 `/`、不加 `/h5`，网络图与本地图都要相对。\n- 涉及文件：src/utils/resolveAssetUrl.js、src/env/mp.js、src/request/index.js、vite.config.js、.env.development、.env.production。\n- 所属项目：昆山市民；代码基线：bf3efcf；来源会话ID：c0160254-f57e-4417-b5f5-15ff6a735c30。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/eid_verify_pending_dup.md",
+                "memory_type": "entities",
+                "after": "# 昆山市民E证通实名变更重复消费pending\n实名信息变更流程中 `onSuccess` 与 `onShow` 各处理一次同一 pending，叠加过早重置导致卡在修改页，需防重并修正回跳逻辑。\n\n## 问题根因\n- 内部录入页 → E证通（`useEidVerify`，回跳参数 key 取 `eidToken`）→ 回业务页 → 应 `redirectTo` 实名信息页而非停在 `editUserInfo`。\n- `onSuccess` 与 `onShow` 内 `tryConsumePendingResult` 各处理一次同一 pending。\n- `verifyBeforeChange` 过早重置 `isHandlingResult`，叠加 onShow 多次轮询放大重复跳转。\n\n## 解决方案\n- `onSuccess` 后立即 `takePendingVerifyResult()`；用 `resultId` + `HANDLED_RESULT_KEY` 防重；onShow 仅保留一次 600ms 兜底。\n- 跳转修改页前写 `ACTIVE_PAGE_TYPE=editUserInfo`；`onLoad` 优先读 URL `pageType`。\n- 调试搜 `[EidVerify]`、`[VerifyUser]` 日志。\n\n## 验证与归属\n- 验证：会话 3178d4d9 faceRecognition 已成功仍停留在修改实名信息页，列出重复跳转三点根因与防重修复。\n- 涉及文件：src/pages/common/useEidVerify.js、src/pages/verifyUser/index.vue、src/pages/verifyUser/info.vue、src/pages/common/useFaceVerify.js。\n- 所属项目：昆山市民；代码基线：827c0d4；来源会话ID：3178d4d9-97a5-4520-8ff8-c7b1235a110f。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/use_loadmore_async.md",
+                "memory_type": "entities",
+                "after": "# 昆山市民useLoadMore异步函数压缩冲突\n小程序编译后 `useLoadMore(async function(){...})` 生成的 regenerator 包装会令内部变量与外层压缩 ref 同名，运行时报 `read-only` 错误，需改普通函数并改名易冲突 ref。\n\n## 问题根因\n- 小程序编译后 `useLoadMore(async function getList(){...})` 生成 regenerator 包装，内部临时变量与外层 `const` 的 title/list/status 经压缩后同名。\n- 运行时报 `TypeError: \"t\" is read-only`（`_readOnlyError`），表现像接口或赋值问题而非业务逻辑。\n\n## 解决方案\n- 列表请求改普通函数 + `.then()` 返回新对象（勿 mutate `res`）；易冲突的 ref 改名（如 `type` → `articleType`）。\n- 全局排查同类 `useLoadMore` 页面；验证重编 `dist/build/mp-weixin` 并清开发者工具缓存。\n\n## 验证与归属\n- 验证：会话 e2662fbf onlineIndex 编译后仍报 read-only，根因在 async+regenerator 变量冲突而非 res.rows 赋值。\n- 涉及文件：src/pages_onlineService/onlineIndex.vue、src/hooks/useLoadMore.js、src/pages_home/home.vue。\n- 所属项目：昆山市民；代码基线：2f4bf04；来源会话ID：e2662fbf-7e20-4064-8bc6-9c43baa98d56。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-rest-1793671943641/history/archive_020",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T03:04:24.213618+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/padrão técnico/agency_personnel_edit.md",
+                "memory_type": "entities",
+                "after": "# Bloqueio de edição de detalhes de pessoal de agência\nSistema Suzhou Real Estate Monitoring V3: AgencyPersonnelDetail.vue teve lógica de edição do G-terminal removida, restrincando entrada a terminal empresarial e estado pendente.\n\n## Pontos de implementação\n- Removido `:allow-edit-when-recorded='isGTerminal'`; `canEditInHeader` passou a ser apenas terminal B com `bizState==='0'`\n- Removida lista branca e lógica especial do G-terminal em AgencyPersonnelBasicInfoFormFields.vue, unificando avisos de estado de registro\n- Envolve AgencyPersonnelList.vue e testes e2e de fluxo\n\n## Verificação e origem\n- Evidência: src=苏州市房地产监测V3-rest/037.md\n- Arquivos: AgencyPersonnelDetail.vue, AgencyPersonnelBasicInfoFormFields.vue, AgencyPersonnelList.vue, e2e/institution/agency-personnel-real-api-flow.spec.js\n- Projeto: Suzhou Real Estate Monitoring V3; Sessão: 01a1631d-9a15-70c5-a400-7668d0d29bb4; Base: none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/padrão técnico/refund_dict_missing.md",
+                "memory_type": "entities",
+                "after": "# Busca segura para dicionário ausente em detalhe de reembolso\nSistema Suzhou Real Estate Monitoring V3: acesso direto a `.dictValue` quando item de dicionário faltava causava erro; adicionada busca segura com aviso.\n\n## Causa raiz\n- `refund/detail.vue` em `initDict()` acessava `.dictValue` de resultado `find()` quando `REFUND_NOTICE_VALIDITY` faltava, lendo undefined\n\n## Correção\n- Criado `getNoticeValidityDays` em `src/utils/noticeValidity.js` para busca segura\n- Em falta de dicionário, `refund/detail.vue` avisa para seleção manual em vez de lançar erro\n\n## Verificação e origem\n- Evidência: src=苏州市房地产监测V3-rest/038.md\n- Arquivos: refund/detail.vue, noticeValidity.js, detail-template.vue, dict-tag.vue, detailMixins.js, scan-tag-mismatch.js, entre outros\n- Projeto: Suzhou Real Estate Monitoring V3; Sessão: 78d15986-f89e-4ac8-b7bf-426222e6b9db; Base: none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/padrão técnico/zs_fixed_col.md",
+                "memory_type": "entities",
+                "after": "# Coluna custom de largura fixa não participa de divisão em zs-table\nSistema Suzhou Real Estate Monitoring V3: zs-table tratava coluna fixa como esticável, causando espaço em branco; corrigido para usar slot-width.\n\n## Causa raiz\n- `zs-table` via `type=\"custom\"` e `slot-width` tratava coluna fixa como esticável em divisão de largura restante, gerando espaço à direita\n\n## Correção\n- `zs-table-column.vue` não inclui mais coluna fixa custom na divisão\n- `getBaseWidth` usa diretamente `slot-width` alinhando largura real\n\n## Verificação e origem\n- Evidência: src=苏州市房地产监测V3-rest/039.md\n- Arquivos: zs-table-column.vue, zs-table.vue, FranchiseTable.vue, detail-template.vue, houseTable.vue, appendix.js, README.md, companyApplyAudit/detail.vue\n- Projeto: Suzhou Real Estate Monitoring V3; Sessão: 00b4659f-08fb-4133-a80c-e461befbd2cf; Base: none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/notas técnicas de frontend/number_precision_bug.md",
+                "memory_type": "entities",
+                "after": "# Perda de precisão de Snowflake Long em store.flood.ts (colapso de Number())\nNo store.flood.ts da extremidade C de prevenção de enchentes de habitação Su, usar Number() para converter IDs Snowflake Long de 19 dígitos (eventId/templateItemId) perde os últimos dígitos, causando erros 400 no backend e sintoma falso de \"itens duplicados\".\n\n## Causa raiz\n- submitInspectionRemote/submitRescueRemote usaram Number() em Snowflake Long de 19 dígitos nas linhas 176, 177, 180, 183.\n- Excede o inteiro seguro JS 2^53, distorcendo o último dígito, fazendo o backend reportar 400 \"aviso não existe\".\n- Dois templateItemIds distintos colapsaram no mesmo valor, aparecendo como itens duplicados em e2e.\n\n## Correção\n- Lado store (corrigido pelo líder, fora do escopo de escrita do assistente): eventId/complexId/templateItemId usam String(), id de envio usa String(saved), removendo todos Number().\n- Lado página (corrigido pelo assistente): buildRemoteValues() do payload de envio de inspeção agora usa itens de template como única fonte e deduplica por templateItemId; eventId/complexId também passados como String como proteção extra.\n\n## Verificação\n- Líder testou por proxy reverso evento 1186: salvar e enviar retornaram code=200 com eco correto de detalhe.\n- typecheck EXIT=0, build:h5 EXIT=0, test 20/20 todos verdes; task-1 marcada como concluída.\n- Arquivos relacionados: store.flood.ts (submitInspectionRemote/submitRescueRemote); página de inspeção da extremidade C de prevenção de enchentes de habitação Su."
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/roteamento de modelo de contrato.md",
+                "memory_type": "preferences",
+                "after": "- Em navegação de modelo de contrato, evita nome de rota hardcoded; usa `buildNavigationByFilePath` buscando por `contract/index` e `pathHint` para diferenciar pré-venda de venda direta, preenchendo `templateId`\n- Quando rota não encontrada, avisa para contatar administrador e `router.push` usa `.catch` para evitar erro de navegação duplicada\n- Evidência: src=苏州市房地产监测V3-rest/038.md; Sessão: abab47cb-8bf9-42ce-b594-9c7268af90e8"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

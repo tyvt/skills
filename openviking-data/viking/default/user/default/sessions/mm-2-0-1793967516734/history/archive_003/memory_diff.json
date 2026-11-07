@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793967516734/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T12:23:38.759554+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_reuse_fix.md",
+                "memory_type": "entities",
+                "after": "# ECharts 实例复用与 resize 监听修复\n在 zhi2-web-admin 的多个统计组件中，因重复 echarts.init 与匿名 resize 监听导致 `There is a chart instance already initialized on the dom` 告警，已统一改为复用实例并清理监听。\n\n## 问题根因\n- 组件在 `mounted` 与 `watch(dataList)`/`watch(setOption)` 中均调用 `drawCharts()`，每次直接 `echarts.init(dom)` 不复用已有实例。\n- 反复 `window.addEventListener('resize', () => ...)` 使用匿名函数，无法移除，导致监听越绑越多。\n\n## 解决方案\n- 改用 `echarts.getInstanceByDom(dom) || echarts.init(dom)` 复用实例。\n- resize 监听只绑定一次：用组件字段保存 handler，销毁时 `removeEventListener`。\n- 组件销毁时执行 `chart.dispose()` 清理。\n- watch 里用 `$nextTick` 避免 DOM 未渲染就初始化。\n\n## 涉及文件与归属\n- 涉及文件：`zhi2-web-admin/src/views/benefit/dataStatistics/components/communityStatistics.vue`、`paymentsStatistics.vue`、`quarterPaymentsStatistics.vue`、`managementTypeStatistics.vue`。\n- 所属项目：2-0；来源会话ID：2a9f420a-f2ff-426a-a5c2-7881713c1a52；验证证据：extracted source=cursor project=2-0。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/property_table_reg.md",
+                "memory_type": "entities",
+                "after": "# companyRecord detail.vue 补注册 propertyContractTable 组件\n在 `/toB/companyInfo` 对应的 `src/views/toB/companyRecord/detail.vue` 中使用了 `<propertyContractTable>` 但未 import 与注册，导致运行时 `Failed to resolve component` 告警，已修复。\n\n## 问题根因\n- `detail.vue` 模板中使用 `<propertyContractTable>` 组件，但未从 `@/views/company/companyManagement/components/propertyContractTable.vue` 引入。\n- 未在 `components` 选项中注册，Vue 无法解析该组件。\n\n## 修复方案\n- 添加 `import propertyContractTable from '@/views/company/companyManagement/components/propertyContractTable.vue'`。\n- 在 `components` 中注册 `propertyContractTable`。\n- Vite HMR 已更新 `detail.vue`，刷新后警告消失。\n\n## 涉及文件与归属\n- 涉及文件：`src/views/toB/companyRecord/detail.vue`、`@/views/company/companyManagement/components/propertyContractTable.vue`。\n- 所属项目：2-0；来源会话ID：1dad72c5-73f0-43c2-8c13-cda8490370ba；验证证据：extracted source=cursor project=2-0。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/radio_label_fix.md",
+                "memory_type": "entities",
+                "after": "# Element Plus el-radio label 弃用告警修复\nElement Plus 中 `el-radio` / `el-radio-button` 使用 `label` 作为选中值的写法将在 3.0 废弃，需改为 `value`，已修复多处文件。\n\n## 问题根因\n- 旧写法 `<el-radio label=\"1\">`、`<el-radio :label=\"dict.dictValue\">`、`<el-radio-button label=\"table\">` 等将 `label` 当选中值，触发弃用告警。\n- Element Plus 3.0 起 `label` 仅作显示文本，`value` 才是选中值。\n\n## 修复方案\n- 将所有 `label` 改为 `value`：如 `<el-radio value=\"1\">`、`<el-radio :value=\"dict.dictValue\">`、`<el-radio-button value=\"table\">` 等。\n- 涉及组件 `el-radio` 与 `el-radio-button` 均需同步修改。\n\n## 涉及文件与归属\n- 涉及文件：`flowable/index.vue`、`system/menu/index.vue`、`system/paymentChannel/detail.vue`、`maintenance/facility/detail.vue`、`error.ts`。\n- 所属项目：2-0；来源会话ID：ed53b5d6-854c-4ba8-8358-b4d73be5bd8b；验证证据：extracted source=cursor project=2-0；参考 https://element-plus.org/en-US/component/radio.html。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_column_formatter.md",
+                "memory_type": "entities",
+                "before": "# ZsTableColumn 字符串 formatter 兼容与阻断透传\n在 zs-table-column 封装层中，若列配置的 formatter 为字符串，需从 @/formatters/index.js 取同名函数后传给 ElTableColumn，且禁止经 v-bind=\"attrs\" 透传字符串 formatter。\n\n## 问题根因\n- 动态列配置或历史代码可能把 ElTableColumn 的 formatter 写成字符串（如 formatter: 'amountFormatter'），Element Plus 只接受 Function，触发 Vue prop 类型告警 `Expected Function, got String`。\n- zs-table-column 使用 `v-bind=\"column\"` 透传，字符串 formatter 进入 $attrs 并转发给 ElTableColumn；即使绑定 `:formatter=\"formatters[attrs.formatter]\"` 警告仍先触发。\n\n## 解决方案\n- 在 zs-table-column.vue 中，若 formatter 为字符串，则从 @/formatters/index.js 取同名函数（resolvedFormatter），仅将函数传给 ElTableColumn。\n- 将字符串 formatter 从透传 attrs 中剔除，禁止经 `v-bind=\"attrs\"` 传给 ElTableColumn。\n- 列配置侧应逐步改为函数引用（如 `this.formatters.amountFormatter`）；后端返回的列配置可在生成阶段做名称到函数的映射。\n\n## 验证与归属\n- 验证证据：会话 ce31747c（maintenanceProject 列表 formatter 类型警告）；会话 667b9605（MaintenanceProject 等页告警 Expected Function, got String \"amountFormatter\"，修复 zs-table-column.vue 与 plot/index.vue 字符串用法）。\n- 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue；zhi2-web-admin/src/formatters/index.js；zhi2-web-admin/src/views/building/plot/index.vue。\n- 所属项目：2-0；来源会话ID：ce31747c-5502-4d03-83c2-364130d7d52d 与 667b9605-d636-4fd0-9033-f298688576f0；代码基线：none。",
+                "after": "# ZsTableColumn 字符串 formatter 兼容与阻断透传\n在 zs-table-column 封装层中，若列配置的 formatter 为字符串，需从 @/formatters/index.js 取同名函数后传给 ElTableColumn，且禁止经 v-bind=\"attrs\" 透传字符串 formatter。\n\n## 问题根因\n- 动态列配置或历史代码可能把 ElTableColumn 的 formatter 写成字符串（如 formatter: 'amountFormatter'），Element Plus 只接受 Function，触发 Vue prop 类型告警 `Expected Function, got String`。\n- zs-table-column 使用 `v-bind=\"column\"` 透传，字符串 formatter 进入 $attrs 并转发给 ElTableColumn；即使绑定 `:formatter=\"formatters[attrs.formatter]\"` 警告仍先触发。\n\n## 解决方案\n- 在 zs-table-column.vue 中，若 formatter 为字符串，则从 @/formatters/index.js 取同名函数（resolvedFormatter），仅将函数传给 ElTableColumn。\n- 将字符串 formatter 从透传 attrs 中剔除，禁止经 `v-bind=\"attrs\"` 传给 ElTableColumn。\n- 列配置侧应逐步改为函数引用（如 `this.formatters.amountFormatter`）；后端返回的列配置可在生成阶段做名称到函数的映射。\n\n## 验证与归属\n- 验证证据：会话 ce31747c（maintenanceProject 列表 formatter 类型警告）；会话 667b9605（MaintenanceProject 等页告警 Expected Function, got String \"amountFormatter\"，修复 zs-table-column.vue 与 plot/index.vue 字符串用法）。\n- 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue；zhi2-web-admin/src/formatters/index.js；zhi2-web-admin/src/views/building/plot/index.vue；index.ts（告警出处）。\n- 所属项目：2-0；来源会话ID：ce31747c-5502-4d03-83c2-364130d7d52d 与 667b9605-d636-4fd0-9033-f298688576f0；代码基线：none。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

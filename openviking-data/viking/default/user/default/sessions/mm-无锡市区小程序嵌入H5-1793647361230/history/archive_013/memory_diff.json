@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793647361230/history/archive_013",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T19:43:22.008311+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/sfb_face_h5_integration.md",
+                "memory_type": "entities",
+                "after": "# 无锡苏服办H5人脸集成落点\n无锡苏服办H5的人脸识别通过官方jssdk与sfbFaceAuth/h5Context封装实现，入口token仅限人脸SDK使用，业务Authorization须换内部token。\n\n## 集成架构\n- `index.html` 加载官方 `https://www.jszwfw.gov.cn/jmopen/jssdk/index.js`\n- `utils/sfbFaceAuth.js` 封装 `callSfbLivenessFaceAuth()` 调起扫脸\n- `utils/h5Context.js` 读取缓存URL上的 `token`、`appId`\n- `pages/face/face.vue` 业务页对「webview not ready」做重试\n- `pages/face/bdc.vue` 人脸成功后跳不动产\n\n## 容器路由\n- 官方SDK按UA路由子SDK：hanweb（jmportal+deviceready）、harmony、wechat、alipay等\n- 须从苏服办/对应容器入口带 `token`+`appId` 打开H5\n\n## 鉴权分离\n- 苏服办入口 `token` 仅供人脸识别SDK使用，不得作为业务 `Authorization`\n- 后端 `Authorization` 须用 `sfbEncryptionLogin`（`/security/ctAuth/sfbEncryptionLogin`）换取内部token\n- 与「web-view扫脸失败三处根因」互补：本仓实现集中在上述文件\n\n## 验证与归属\n- 所属项目：无锡市区小程序嵌入H5\n- 来源会话：29e8fb63-fada-4c3c-a4c3-485a533bae2f\n- 代码基线：7993464\n- 涉及文件：index.html、src/utils/sfbFaceAuth.js、src/utils/h5Context.js、src/pages/face/face.vue、src/pages/face/bdc.vue、src/api/security.js"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/wuxi_sanzhi_demo_gate.md",
+                "memory_type": "entities",
+                "after": "# 无锡三资监管演示门禁\n无锡小程序嵌入H5在对外演示时未登录仅允许访问newHome极简门户，移除TabBar后401统一reLaunch回首页。\n\n## 场景与需求\n- 小程序嵌入H5需对外展示极简门户，未登录不能进业务页\n- 若需「无论有无Token都只能看首页」需再收紧拦截逻辑\n\n## 实现要点\n- `App.vue` 全局路由拦截：无Token时只允许 `/pages/index/newHome`，否则 `uni.reLaunch` 回首页\n- 有Token时保留正常嵌入访问\n- `newHome.vue` 仅居中展示「无锡三资监管」文案，去掉轮播/菜单/接口\n- `pages.json` 将newHome设为启动页并去掉TabBar\n- `api/index.js` 的401处理改为reLaunch到newHome（因已无TabBar）\n\n## 验证与归属\n- 来源会话：092e322c-b977-4c98-acfd-3459f57a3abb\n- 代码基线：2e9862a\n- 涉及文件：src/App.vue、src/pages/index/newHome.vue、src/pages.json\n- 所属项目：无锡市区小程序嵌入H5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/release_submodule_flow.md",
+                "memory_type": "entities",
+                "after": "# 无锡市区H5发版子模块流程\n无锡市区小程序嵌入H5主仓通过git submodule引用子模块，发版须先推子模块再更新主仓指针并打时间tag。\n\n## 仓库拓扑\n- 主仓 `无锡市区小程序嵌入H5`（分支如 `main-sfb`）\n- 通过git submodule引用 `zhi2-mobile-admin-h5-c-unlimited`（分支如 `dev_wuxi-sfb`）\n\n## 发版流程\n- 先在子模块commit+push功能修复\n- 再在主仓 `chore: 更新子模块引用` 提交并push\n- 最后在主仓打tag（示例 `202608282148` 与 `202608282148-sfb`）并推送\n- 避免只推子模块导致线上主仓仍指向旧commit\n\n## 验证与归属\n- 来源会话：5e649194-e4f2-40db-bdc7-51c0016d5541\n- 代码基线：05f9a28\n- 涉及文件：.gitmodules、zhi2-mobile-admin-h5-c-unlimited\n- 所属项目：无锡市区小程序嵌入H5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/owner_decision_deeplink_bug.md",
+                "memory_type": "entities",
+                "after": "# 业主决策深链URL查询失败须消费topicvoteid\n无锡H5业主决策深链在URL查询接口失败时也须清理topicvoteid，否则会反复弹窗或跳转陷入循环。\n\n## 问题现象\n- 小程序web-view嵌入H5，URL带topicvoteid（portal侧portal_topic_vote_id）时拉业主决策页\n- 接口抛错时若只return false不清理URL/待执行动作，每次进首页都会再试，用户被困重复确认/跳转循环\n\n## 根因\n- `usePortal.openOwnerDecisionVoteH5` 先调getToken+getH5VoteUrl拉业主决策页地址\n- tryAutoStartOwnerDecisionFromTopicVote与tryConsumeOwnerDecisionPostAction每次进首页都会再试\n\n## 修复方案\n- `fetchOwnerDecisionVoteUrl` 异常分支置failed=true\n- finally里hideLoading后，失败时调用 `markOwnerDecisionConsumed()` 清portal_topic_vote_id、portalPostAction、返回路由并标记已消费\n- 补toast「业主决策页面打开失败，请稍后重试」（延后50ms避免被hideLoading吞掉）\n- 成功路径逻辑不变\n\n## 验证与归属\n- 来源会话：02076a8a-747c-4891-a785-497ddd2c8a97\n- 代码基线：38bd192\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js、src/utils/portal.js\n- 所属项目：无锡市区小程序嵌入H5"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

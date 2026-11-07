@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793647361230/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T19:30:48.676366+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/repair_zpaging_top_cover.md",
+                "memory_type": "entities",
+                "after": "# 报事报修列表 z-paging 盖住顶部操作区修复\n无锡市区小程序嵌入H5中「我的-电子业主卡-报事报修」列表页顶部操作区被 z-paging 滚动层覆盖的修复约定。\n\n## 现象\n- 「前往报事报修」蓝色条与搜索/筛选被列表滚动层盖住。\n\n## 根因\n- z-paging 在页面 flex 布局下未占满高度，列表内容区 position:absolute 叠到 #top 之上。\n\n## 解决方案\n- 「前往报事报修」与搜索筛选一并放进 #top 插槽。\n- z-paging 设 height:100% + flex 纵向布局。\n- 顶部区 z-index:10，列表 content-z-index:1。\n- page 高度相关样式用非 scoped 保证高度链贯通。\n- 注意：库内另有「fixed 全屏盖住顶栏」场景需 :fixed=\"false\"，本页是 fixed 布局下的高度/z-index 问题，两套解法不要混用。\n\n## 验证与归属\n- 验证会话：35c311a0-d465-4e73-b3b7-f836ef5c6b40（基线 6c9a164），结论写明 z-paging 未 height 100%、顶部缺层级、按钮未进 #top，修改 repair/index.vue 与 pages.json 标题。\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/repair/index.vue、zhi2-mobile-admin-h5-c-unlimited/src/pages.json。\n- 所属项目：无锡市区小程序嵌入H5。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/qqmap_webview_jsonp_105.md",
+                "memory_type": "entities",
+                "after": "# 小程序 web-view 内腾讯地点搜索 JSONP 报 105 修复\n无锡市区小程序嵌入H5中 H5 被微信小程序 web-view 打开时腾讯地点搜索 JSONP 稳定 105 的修复约定。\n\n## 现象\n- 浏览器用 apis.map.qq.com 直链 nearby 返回 status:0，但 web-view 内走 JSONP 稳定 105。\n- 旧代码 nearby 失败降级 region(adcode) 同样 105，表现「Key/额度/域名都配了仍无周边」。\n\n## 根因\n- web-view 里 JSONP 鉴权链路与浏览器直链不等价，不能拿直链成功反证前端 Key 配置无误。\n\n## 解决方案\n- 去掉 region 降级，边界策略与联调通过的 nearby 保持一致。\n- H5 改请求同源路径 /qqmap/...，用 uni.request + output=json（开发 vite 配 proxy，生产 nginx location /qqmap/ { proxy_pass https://apis.map.qq.com/; proxy_set_header Host apis.map.qq.com; }）。\n- 部署后用 https://{H5域名}/qqmap/ws/place/v1/search?... 自测 status:0，再在 web-view 强刷验证日志不再出现 region(adcode) 与 JSONP 降级。\n\n## 验证与归属\n- 验证会话：ba685907-d68a-4e81-8abb-1388fb268339（基线 5241320），用户验证 nearby 直链 Success、web-view 内 JSONP 105，结论写明 nearby 失败→region(320513) 二次 105，修复为固定 nearby + /qqmap 代理 + uni.request JSON。\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/index.js、src/utils/qqMapKey.js、src/pages_owner/project/info/index.vue、vite.config.ts。\n- 所属项目：无锡市区小程序嵌入H5。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/sfb_face_alipay_result.md",
+                "memory_type": "entities",
+                "after": "# 苏服办人脸支付宝 success 误判失败修复\n无锡市区小程序嵌入H5中支付宝容器内扫脸 SDK 回调 success 却被判失败的修复约定。\n\n## 现象\n- 支付宝容器内扫脸 SDK 已回调 success（日志含 result:\"true\", msg:\"成功\"），业务页仍显示人脸识别失败，失败文案甚至是「成功」。\n- 从支付宝返回后还可能无法再次唤起。\n\n## 根因\n- 成功判断只认 retcode===\"000000\" 或 msg===\"认证成功\"，未兼容支付宝返回的 result 字符串 \"true\" 与 msg \"成功\"，会 reject(new Error(msg))。\n\n## 配套约束\n- 支付宝场景不要用 getTicket 换票，须用原始苏服办 token（tokenType=1）。\n- SDK success 时先把结果写入 sessionStorage，在 onShow/visibilitychange 读取暂存完成后续跳转，避免跨应用返回导致 Promise 链断裂。\n- 调试时在 success 日志打印 accepted:true/false。\n\n## 验证与归属\n- 验证会话：d303f251-dbaf-4d2c-8f51-16248a0b7e3d（基线 afd47ed），用户提供 success 日志 {\"result\":\"true\",\"appId\":\"jisnzjk\",\"msg\":\"成功\"}，结论对照表说明旧版未判断 result/msg 导致 reject(Error(\"成功\"))，并补充 sessionStorage 与支付宝 token 策略。\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js、src/pages/face/face.vue、src/pages/verifyUser/index.vue、src/store/user.js。\n- 所属项目：无锡市区小程序嵌入H5。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/webview_asset_abs_path.md",
+                "memory_type": "entities",
+                "after": "# 嵌 web-view 的 H5 轮播/静态资源绝对路径约定\n无锡市区小程序嵌入H5中接口返回的媒体路径须拼发布前缀绝对路径，禁止 ./ 相对当前路由的约定。\n\n## 现象\n- banner 接口返回 pictureUrl 如 /zhi2/2026/.../xxx.jpg，前端拼成 ./sfb/zhi2/... 或裸相对路径后，在 /szh5/pages/webview/home 等页面被解析为 /szh5/pages/webview/sfb/zhi2/...（路由污染），图片 404。\n\n## 根因\n- SPA 内相对 URL 相对的是当前 pathname，不是静态资源根。\n\n## 做法\n- 用 VITE_APP_H5_PUBLIC_BASE（与 manifest h5.router.base 一致，如 /szh5）得到 getH5PublicBase()。\n- 媒体路径统一为绝对路径：raw 以 /sfb/ 开头则保留，否则 `/sfb${raw}`，再 `${getH5PublicBase()}${mediaPath}`，最终形如 https://host/szh5/sfb/zhi2/...。\n- 不要用「仅相对站点」的 ./sfb 指望在所有路由下正确。\n\n## 验证与归属\n- 验证会话：47414239-c758-44c5-b55e-6c30c3687109（基线 6c9a164），用户反馈图片 URL 含 pages/webview 路由段，结论说明 ./sfb 相对当前页解析错误，改为 getH5PublicBase() + /sfb 前缀绝对路径。\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/zhishuAsset.js、src/hooks/usePortal.js、.env.production、src/manifest.json。\n- 所属项目：无锡市区小程序嵌入H5。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

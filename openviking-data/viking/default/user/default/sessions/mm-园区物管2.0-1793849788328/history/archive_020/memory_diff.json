@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793849788328/history/archive_020",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T04:43:18.052657+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_store_fix.md",
+                "memory_type": "entities",
+                "after": "# zs-select-dialog 动态实例未注入 store 修复\n园区物管2.0 中 SelectDialog.open() 动态创建弹窗实例时未注入 Vuex store，导致使用 @/mixins/table 的组件报错。\n\n## 问题原因\n- `SelectDialog.open()` 通过 `new instance.constructor(component)` 创建弹窗根实例，未注入 `$store`。\n- `ZsSelectDialogFunc` 使用 `@/mixins/table`，其 `tableConfig` 计算属性访问 `this.$store.getters['table/getTableConfig']`，动态实例无 `$store` 报错 `Cannot read properties of undefined (reading 'getters')`。\n\n## 修复方式\n- 创建弹窗实例时注入 `store`、`router` 并设置 `parent`，与 `main.js` 中 `window.__VUE_APP_STORE__` 设计一致。\n\n## 验证与归属\n- 涉及文件：src/components/zs-select-dialog/zs-select-dialog-func.vue、src/mixins/table.js、src/main.js、src/views/autonomy/general/detail.vue\n- 所属项目：园区物管2.0；来源会话：7f55cc88-82e0-457b-85fe-e1f0ed843e51；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/经营资产接口数据单位处理.md",
+                "memory_type": "preferences",
+                "after": "- 经营资产接口（如 `getBusinessAssetDistribution`）返回的 `count` 本身已是「百个」单位，图表渲染时不要额外调用 `hundredFromCount` 做除以 100 的转换。\n- `chartOptions.js` 的 `buildOperatingAssetsOption` 直接使用接口原始数值，`parseMetric(item.count)` 仅做数值解析不做单位换算。\n- 示例：停车泊位接口返回 3.83 百个，刷新页面后柱状图应正确显示该原始值。"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/mixin getlist 调用方式.md",
+                "memory_type": "preferences",
+                "after": "- 在 `benefit/alert` 等页面中，使用 mixin 默认的 `getList()`，不要向它传参；查询按钮先切换预警类型再调用无参 `getList()`。\n- 删除页面自定义 `getList` 覆盖实现，通过 `moduleName: 'benefit'`、`businessName: 'warningAnalys'` 等 mixin 配置驱动，而非传入参数。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/软件项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，采用 Vite + Vue，前端代码位于 zhi2-web-admin。\n\n## 部署与构建约定\n- 生产发版必须整目录全量上传 dist/，逐个传文件易漏传导致 chunk 502。\n- vite.config.js 需设 emptyOutDir:true，并为大型页面单独分包（如 module-map-overview-[hash].js）。\n- 验证 chunk 用 curl -I 确认返回 200 且 Content-Type 为 application/javascript。\n- 榆林子模块 zhi2-web-admin 的 vite.config.js 中 rootDir = path.resolve(__dirname, \"../\") 解析到父目录 D:/repository/榆林G，故各 worktree（bug6213/bug6217/bug6220 等）的 vite build 均输出到同一 D:/repository/榆林G/dist，多任务并行会互相覆盖产物。\n- 规避：用 vite CLI --outDir 指定独立产物目录（如 D:/repository/榆林G-bug6220-dist），并在 nginx-ui 新建独立站点（如端口 8109）指向该目录验证，避免占用共享站点 榆林G.conf（端口 8108，曾被 bug6217 任务指向其 D:/repository/榆林G-wt-bug6217-dist）。\n\n## 已知问题\n- 生产路由懒加载曾报 TypeError: Failed to fetch dynamically imported module，根因发版不完整（主包更新但个别 chunk 在 nginx 502），例 index-CJ4J-IEu.js（mapOverview 旧 chunk）502，因 outDir 在仓库根 dist/ 且 emptyOutDir=false 致残留。\n- 另一根因：源码中文命名静态资源被 Vite 打成中文名 chunk，子路径/CDN 对 URL 编码中文路径不友好致 404，需改英文短名。例 operatingAssets.vue 曾用中文名 import statisticsMap/images/ 下 PNG 与 assets/images/benefit/ 下三张车位图，后改名为 club.png、tent-lease.png、parking-space-total.png 等（来源会话 d9094763）。\n- zhi2-web-admin/src/permission.js 对 chunk 加载失败（404/502）自动刷新一次，缓解发版后 HTML 与 JS hash 不一致。\n\n## 代码与功能特征\n- 自研 zs-table、zs-table-column 与 ECharts 图表模块；业务含资产详情弹窗、运营报告 Tab、统计卡片等。\n- 图表交互需手动配对 ECharts dispatchAction highlight/downplay。\n- benefit/dataSandbox/assetPanorama 饼图图例仅展示 value>0 分类，无数据时隐藏图例并居中显示「暂无数据」，避免 ECharts legend 与 series 不匹配警告（来源会话 adffdf74）。\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可均分撑满。\n- 多附件字段逗号分隔多路径，消费前拆数组逐张处理。\n\n## 分支与关联文件\n- 子模块 zhi2-web-admin 含 develop/v2.6.1、v2.6.2、v2.6.2-yulin 等并行分支。\n- 父仓库仅有 develop/v2.6.1 与 v2.6.2 分支，无 262-yulin；榆林变更仅落子模块。\n- 关联文件：zhi2-web-admin/vite.config.js、zhi2-web-admin/src/permission.js。",
+                "after": "# 园区物管2.0\n园区物管2.0（榆林G）园区物业管理 Vue 前端，Vite + Vue，代码位于 zhi2-web-admin 子模块。\n\n## 部署与构建\n- 生产发版须整目录全量上传 dist/，逐文件易漏传致 chunk 502。\n- vite.config.js 须 emptyOutDir:true 并为大页面单独分包（如 module-map-overview-[hash].js）；curl -I 验证 chunk 200 + application/javascript。\n- 子模块 vite rootDir=__dirname/../ 解析到父目录 D:/repository/榆林G，各 worktree build 均写同一 dist 互相覆盖；用 CLI --outDir 指定独立目录（如 榆林G-bug6220-dist）并在 nginx-ui 建独立站点（如 8109）验证，避免占用共享站点 榆林G.conf(8108)。\n\n## 已知问题\n- 生产路由懒加载曾报 Failed to fetch dynamically imported module：根因发版不完整（主包更新但个别 chunk nginx 502，因 outDir 在根 dist/ 且 emptyOutDir=false 残留）；另因中文命名静态资源被打成中文名 chunk，URL 编码不友好致 404，须改英文短名（如 operatingAssets.vue 图片改 club.png 等）。\n- zhi2-web-admin/src/permission.js 对 chunk 加载失败(404/502)自动刷新一次缓解 hash 不一致。\n\n## 代码特征\n- 自研 zs-table/zs-table-column 与 ECharts；图表交互须手动 dispatchAction highlight/downplay。\n- 饼图图例仅展示 value>0 分类，无数据居中「暂无数据」。\n- 表格列宽由 zs-table-column 计算，min-width 弹性列均分撑满；多附件字段逗号分隔，消费前拆数组。\n\n## 分支\n- 子模块含 develop/v2.6.1、v2.6.2、v2.6.2-yulin 并行分支；父仓库仅 develop/v2.6.1/v2.6.2，无 262-yulin，榆林变更仅落子模块。\n- 关联文件：zhi2-web-admin/vite.config.js、src/permission.js。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/chart_config_merge.md",
+                "memory_type": "entities",
+                "before": "# 图表结构配置驱动与加载合并\n园区物管2.0 资产全景页将重复的环形/条形图结构合并为配置驱动，并统一数据加载与图表更新。\n\n## 问题描述\n- `assetPanorama/index.vue` 原先环形图与条形图结构重复书写，维护成本高\n\n## 解决方案\n- 将重复结构合并为 `v-for=\"block in CHART_BLOCKS\"` 配置驱动渲染\n- 纯函数上提至模块级，避免组件内重复定义\n- 四个 `loadXxxData` 合并为 `PANORAMA_API_LOADERS` + `Promise.all` 并行加载\n- 图表更新统一 `upsertChart`，按 `cardIndex*2` 与 `cardIndex*2+1` 槽位写入\n\n## 验证与归属\n- 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/assetPanorama/mock.js、src/views/benefit/dataSandbox/pieLegendHover.js\n- 所属项目：园区物管2.0；代码基线：none\n- 来源会话：c9fce210-f5e5-4591-b857-e112b3ac6150",
+                "after": "# 图表结构配置驱动与加载合并\n园区物管2.0 资产全景页将重复的环形/条形图结构合并为配置驱动，并统一数据加载与图表更新。\n\n## 问题描述\n- `assetPanorama/index.vue` 原先环形图与条形图结构重复书写，维护成本高\n\n## 解决方案\n- 将重复结构合并为 `v-for=\"block in CHART_BLOCKS\"` 配置驱动渲染\n- 纯函数上提至模块级，避免组件内重复定义\n- 四个 `loadXxxData` 合并为 `PANORAMA_API_LOADERS` + `Promise.all` 并行加载\n- 图表更新统一 `upsertChart`，按 `cardIndex*2` 与 `cardIndex*2+1` 槽位写入\n- 组件由约 863 行精简至 808 行，功能保持不变\n- 上提的纯函数包括 `formatThousands`、`parseAssetCategories`、`parseRegionAsset`、`extractPanoramaStatPayload`、`getDonutSlicePercent` 等\n- 删除冗余代码：`layoutScale`（仅转发 `layoutWidthScale`）、`createMockDataState` / `applyMockData`\n\n## 验证与归属\n- 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/assetPanorama/mock.js、src/views/benefit/dataSandbox/assetPanorama/chartOptions.js、src/views/benefit/dataSandbox/pieLegendHover.js\n- 所属项目：园区物管2.0；代码基线：none\n- 来源会话：c9fce210-f5e5-4591-b857-e112b3ac6150"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

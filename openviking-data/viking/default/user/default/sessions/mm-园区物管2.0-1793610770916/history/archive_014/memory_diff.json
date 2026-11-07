@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:46:42.276307+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/echarts_legend_sync.md",
+                "memory_type": "entities",
+                "after": "# ECharts图例与Series同源过滤\n园区物管2.0 中饼图等图表在过滤 0 值数据后，图例未同步导致 resize 报错 series not exists 的已知 bug。\n\n## 问题根因\n- 无有效数据时 series.data 过滤掉 count=0 项，但 legend.data 写死全部 13 个子分类名称\n- ECharts 强制图例名称必须与 series 名称或数据项名称一致，不一致则每次 resize 报 `series not exists. Legend data should be same with series name or data name`\n\n## 解决方案\n- 图例与 series 必须同源派生：只展示 value>0 的分类，保证 legend.data 与 series.data 名称集合一致\n- 无有效数据时隐藏图例，中心显示「暂无数据」\n- 凡是按条件过滤 series 数据的图表（0 值过滤、状态过滤等），都用同一份过滤后数据生成 legend，不各自维护两份列表\n\n## 验证与归属\n- 验证：会话 adffdf74 修复为图例仅展示 value>0 分类并无数据时隐藏图例\n- 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/assetPanorama/mock.js\n- 所属项目：园区物管2.0；代码基线 3965548b6；来源会话 adffdf74-a80c-4a6c-8841-4709866ec450"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_bterminal_filter.md",
+                "memory_type": "entities",
+                "after": "# 公共选择弹窗端别过滤逐页注入\n园区物管2.0 中公共函数式选择弹窗 zs-select-dialog-func 不塞端别业务逻辑，B 端 projectId 由调用页注入 filterParams 的约定。\n\n## 问题背景\n- 物业服务监管账户选择弹窗需按端别区分过滤：B 端必须带 projectId，G 端不带\n- 最初把「B 端追加 projectId」写进公共组件内部，导致通用组件绑定单一业务语义，复用行为不可控\n- 端别条件本质是调用方上下文，不是弹窗自身职责\n\n## 解决方案\n- 将业务逻辑从 zs-select-dialog-func.vue 剥离，还原为纯通用组件\n- 全部 17 个调用页面（assetLeaseApply、pubUseMoneyApply、pubBankReceiptApply、pubCommunityBook 等 benefit 域页面）在 SelectDialog.open 处统一注入：const isBTerminal = this.$store.state.user.terminalType === 'B'，再按 isBTerminal ? { projectId: this.$store.getters.currentProjectId } : {} 展开 filterParams\n- 套路与「B 端按 terminalType 隐藏搜索项要逐页过滤」同源但方向相反：靠调用方 filterParams 注入端别差异，禁止改公共组件\n\n## 验证与归属\n- 验证：会话 e5aac6dd 撤销公共组件业务逻辑，17 个页面清单加 B 端 projectId 查询条件\n- 涉及文件：src/components/zs-select-dialog/zs-select-dialog-func.vue 及 17 个 benefit 域调用页\n- 所属项目：园区物管2.0；代码基线 177bc3ce4；来源会话 e5aac6dd-3ab0-4e2f-9913-fb3d8282eb18"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/opbar_zindex_clip.md",
+                "memory_type": "entities",
+                "after": "# 吸顶操作栏被固定列遮挡与按钮裁切\n园区物管2.0 维修资金立项配置详情页吸顶按钮组被表格固定列遮挡、子表操作列按钮裁切的叠加根因与修复。\n\n## 问题根因\n- OperationBtnGroup 的 z-index 曾从 10 降到 1，Element UI 表格 fixed 列 z-index 为 10，吸顶层低于固定列被盖\n- zs-operate-column 计算列宽时单元格 padding 按 24px 估算，全局样式实际为 padding:0 16px（共 32px），三个按钮时列宽偏小导致裁切\n\n## 解决方案\n- OperationBtnGroup z-index 提到 11（高于表格固定列 10 即可）\n- zs-operate-column：内边距按 32px 估算、加 8px 宽度缓冲、新增 columnWidth 计算属性避免初始宽度 0、watch buttons 变化重算列宽\n- Headline 展开态 overflow 设为 visible，避免子表格操作按钮被容器裁掉\n- 排查同类「吸顶被固定列盖住」先对 z-index 数值，别先怀疑权限或渲染\n\n## 验证与归属\n- 验证：会话 bab7ae04 列明 z-index 10→1 被盖、24px 与 32px padding 偏差及三处修改\n- 涉及文件：src/components/OperationBtnGroup/index.vue、src/components/zs-operate-column/zs-operate-column.vue、src/components/Headline/index.vue、src/views/maintenance/projectConfig/detail.vue\n- 所属项目：园区物管2.0；代码基线 177bc3ce4；来源会话 bab7ae04-5ce6-4273-85a2-99300d7e520e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/large_screen_scale.md",
+                "memory_type": "entities",
+                "after": "# 大屏等比缩放右侧留白修复\n园区物管2.0 数据沙箱/全景类大屏页按 1920 设计稿缩放导致右侧留白的根因与动态设计稿宽度方案。\n\n## 问题根因\n- 缩放比取 min(按宽比例, 按高比例)；内容偏高时 scale = vh/内容高度 < vw/1920\n- 设计稿固定 1920px 时实际显示宽度 = 1920 × scale < 视口宽，右侧必然空白；高度写死也导致压出一屏\n\n## 解决方案\n- 动态设计稿宽度：高度受限时设设计稿宽 = max(1920, ceil(视口宽/scale))，保证 设计稿宽 × scale = 视口宽横向铺满\n- 统一 scale = min(按宽, 按高)，一屏内完整不变形\n- 收紧各区块默认高度（柱图/饼图/趋势图/指标卡各减 30~50px）减轻高度约束\n- 侧栏收起/展开后重新计算缩放；新增大屏页直接复用 assetPanorama 的缩放处理，不各页自写比例逻辑\n\n## 验证与归属\n- 验证：会话 aedd6cfa 给出根因推导与动态设计稿宽度公式\n- 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/fundPanorama/index.vue、src/views/benefit/mapOverview/index.vue\n- 所属项目：园区物管2.0；代码基线 f00310232；来源会话 aedd6cfa-10c2-4204-ace0-2dc1b2eb8a12"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、sidebar_recursive_menu\n- 图表与样式类：echarts_donut_label、chart_amount_format、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、sidebar_recursive_menu、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）\n- 图表与样式类：echarts_donut_label、chart_amount_format、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

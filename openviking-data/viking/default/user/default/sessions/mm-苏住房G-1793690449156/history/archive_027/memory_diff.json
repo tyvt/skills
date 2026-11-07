@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_027",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:22:16.399575+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_date_picker_monthrange.md",
+                "memory_type": "entities",
+                "after": "# zs-date-picker 缺少 monthrange 分支：拆成两个单月选择器\n在对账文件列表改造中，zs-date-picker 在 range:true 时仅支持 daterange/datetimerange，无 monthrange 分支，需用两个单月选择器实现月份区间。\n## 问题根因\n- zs-date-picker 源码 type 计算表达式在 range:true 时只在 daterange/datetimerange 间切换，无 monthrange 分支\n- 原生 el-date-picker 支持 monthrange，照搬到 zs-date-picker 会误以为支持\n- 通过 attrs 透传 type:'monthrange' 理论可行，但项目无此用法，唯一验证过的月份用法是单月 type:'month'\n## 解决方案\n- 拆成两个单月选择器（开始月份/结束月份），查询参数保持后端约定的 xxxBegin/xxxEnd 成对字段\n- 改日期区间控件前先读 zs-date-picker 的 type 计算表达式确认支持的类型组合\n- 凡组件未声明的类型一律拆成单值控件，比透传 attrs 更可控\n- 与「营业期限结束可为 null 时不用 daterange」不同：本条是组件能力缺类型，而非可空值语义问题\n## 验证与归属\n- 验证证据：会话 16e73830，用户要求按框架规范改 pubRecBankFile 列表，追问 monthrange 支持情况，结论拆两单月选择器\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubRecBankFile/index.vue、zhi2-web-admin/src/components/zs-date-picker/zs-date-picker.vue\n- 所属项目：苏住房G；来源会话ID：16e73830-99fb-4000-928d-063072072d4d；代码基线：e590ffa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/el_select_label_arrow.md",
+                "memory_type": "entities",
+                "after": "# el-select 多选长标签遮挡下拉箭头：预留 suffix 空间并加宽弹窗\n「新增银行授权」弹窗银行名称多选时，长标签挤满输入框导致右侧下拉箭头被遮挡无法展开。\n## 问题根因\n- 多选标签容器未给 suffix 图标预留宽度，标签直接覆盖到箭头位置\n- 520px 弹窗内一行放不下时不会换行，箭头被挤出可视区\n- 组件内部靠 $children 反向调 resetInputHeight 调整高度，在 v-if/多层嵌套下不稳\n## 解决方案\n- 弹窗宽 520→720，表单 label-position=\"top\" 让多选独占整行\n- 标签区 max-width: calc(100% - 40px) 显式留位并允许 flex-wrap 换行\n- 输入框 min-height:40px 随多行标签自然增高，不再依赖 $children 调内部方法\n- 验收需选最长选项截图确认箭头可见且能展开\n## 验证与归属\n- 验证证据：会话 25f90065，用户反馈银行名称区域太小下拉按钮被遮挡，定位 StreetAuthDialog.vue 修改\n- 涉及文件：zhi2-web-admin/src/views/system/regionBankAuth/components/StreetAuthDialog.vue\n- 所属项目：苏住房G；来源会话ID：25f90065-5711-4fcc-a0ab-c949d750a651；代码基线：315702f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/list_column_id_prop.md",
+                "memory_type": "entities",
+                "after": "# 列表操作人列误绑 ID 字段：横向比对同模块兄弟页改 prop\n信用管理-检查记录列表「操作人」列渲染成 19 位雪花 ID 形态数字，实为列 prop 绑了存用户 ID 的 evaluator 字段。\n## 问题根因\n- 列 prop 误用 evaluator（存用户 ID），同模块「综合查询」页同语义用 recordUser（姓名）\n- 非脱敏失效也非雪花 ID 精度丢失（后者末位变 0），而是 ID 被当文本展示\n- 定位法：列表列出现雪花 ID 形态纯数字串，先判定为 ID 被展示而非精度丢失，再横向比对同模块正确字段\n## 解决方案\n- 只动列 prop 从 evaluator 改回 recordUser，不动接口、不加 evaluator||recordUser 兜底\n- 字段语义明确后必须收敛到唯一正确字段，联调阶段才用多候选回退\n- 与「新列整列为 -」「雪花 ID 精度丢失」不同：本条字段选错但渲染正常，仅看内容形态可发现\n## 验证与归属\n- 验证证据：会话 d199a1b4，用户截图指出信用管理-检查记录不应显示流水号，改 credit/record/index.vue 列 prop\n- 涉及文件：zhi2-web-admin/src/views/credit/record/index.vue、zhi2-web-admin/src/views/publicQuery/assessment/index.vue\n- 所属项目：苏住房G；来源会话ID：d199a1b4-ccfd-4bfe-a151-d44cceb9f4c9；代码基线：d109b83"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/submodule_gitignore.md",
+                "memory_type": "entities",
+                "after": "# 子模块 .gitignore 收录边界：E2E/预览产物不入库，本地 AI 记忆要入库\n子模块工作区中 report.html、preview PNG、E2E 产物等每次运行变动污染 git status，需按产物/源码脚本/记忆文档三分类书写 ignore 规则。\n## 问题根因\n- report.html、public/version.json、preview 下 PNG 与 report*.json、E2E 的 actual.png/diff.png/report.json/probe* 每跑一次就变\n- 图省事整目录 ignore 会把脚本、HTML 模板、记忆文档一起排除\n## 解决方案\n- 上述产物加入子模块 .gitignore，已入库的用 git rm --cached 停止跟踪并保留磁盘文件，与 ignore 改动同 commit\n- 明确 .workbuddy/memory 等本地 AI/Workbuddy 会话记忆必须可跟踪，规则写具体产物目录+具体文件名\n- preview/verify.mjs 等模板脚本保持可提交\n- 改完用 git check-ignore -v 逐条验证：产物命中、脚本与记忆未命中再提交\n- 与「提交时显式排除 env/.env」不同：本条讲 ignore 规则本身按三分类书写避免目录级一刀切\n## 验证与归属\n- 验证证据：会话 dce1075f，用户要求分析子模块不需跟踪文件并明确本地 AI 记忆可跟踪，执行后验证脚本与记忆未 ignore\n- 涉及文件：zhi2-web-admin/.gitignore、zhi2-web-admin/preview/verify.mjs、zhi2-web-admin/tests/e2e/home-v2.spec.mjs\n- 所属项目：苏住房G；来源会话ID：dce1075f-dcad-4d5b-978b-b09c8f0c73ab；代码基线：3192070"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

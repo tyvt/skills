@@ -1,0 +1,51 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793713174058/history/archive_142",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T18:20:33.636029+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/navbar_activation_blur.md",
+                "memory_type": "entities",
+                "after": "# 顶栏激活菜单文字发糊根因\n顶栏激活菜单白字在蓝底上发糊，根因是仅引入 Regular 字体却用了 font-weight:600 触发浏览器合成假粗体。\n\n## 问题根因\n- 全局只引入 `SourceHanSansCN-Regular` 一个字重，无对应粗体文件\n- 激活态设 `font-weight: 600`，浏览器用 faux bold 合成粗体，笔画变形边缘发虚\n- 与字号、分辨率、渲染性能无关\n\n## 修复方案\n- 首选去掉激活态加粗，未激活与激活均保持 `font-weight: 400`\n- 如需更醒目，引入 `SourceHanSansCN-Medium` 并补 `@font-face`，仅用 `font-weight: 500`\n- 辅助手段：给 `.nav-item__text` 加 `-webkit-font-smoothing: antialiased` / `-moz-osx-font-smoothing: grayscale`\n- 未激活态基准：`font-weight: 400; font-size: 16px; color: #C5DEFF`，改动需对齐\n\n## 涉及文件与归属\n- 文件：`zhi2-web-admin/src/layout/components/Navbar.vue`、`TabBar.vue`、`src/styles`\n- 来源会话：`session-5cd9c334-f122-4347-ad7a-53e297af0222`；代码基线：`d9a1380`\n\n## 验证证据\n- 会话结论写明原因与改动：去掉激活加粗，保持 400，加抗锯齿；提示可补 Medium 字重用 500"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dataanalysis_mock_fields.md",
+                "memory_type": "entities",
+                "after": "# 数智分析看板数据契约在 mock/index.js\n数智分析各看板页数据来自 `mock/index.js` 具名导出，字段名以实际导出为准，照抄任务描述会导致图表空白。\n\n## 已确认导出清单\n- 商品房：`newKpis`(8)/`newSupplyTrend`/`newDealTrend`/`newInventoryTrend`/`newPriceRanges`/`newProjectRankByArea`/`newProjectRankBySuite`/`newAnnualSupply`\n- 存量房：`stockKpis`(7)/`stockListTrend`/`stockDealTrend`/`stockInventoryTrend`/`stockPriceRanges`/`stockAreaSegments`/`stockRegionRank`/`stockProjectRank`/`stockAnnualTrend`\n- 租赁：`rentKpis`(5)/`rentTrend`(`{months, contract, area, price}`)/`rentRegionRank`/`rentInstitutionRank`/`rentPriceRanges`\n- 行业管理：`industryKpis`(5)/`industryComplaintTrend`(`{months, value}`)/`industryRefundRisk`(`[{name,value}]`)/`industryInstitutionRank`\n- 热力：`heatNewProject`/`heatStockList`/`heatStockDeal`/`heatRent`\n\n## 关键差异与坑\n- 描述写 `heatStock`，实际导出 `heatStockList` 与 `heatStockDeal`\n- 投诉趋势实际为 `industryComplaintTrend` 且结构 `{months, value}`，非 `complaint`\n- `stockAreaSegments` 实际为单序列 `[{name, value}]`，无 `newVal/stockVal`\n- 地图 `mock/suzhou.json` 的 `properties.name` 用 10 个短名（新区/吴中/相城/姑苏/吴江/常熟/张家港/昆山/太仓/园区），须与页面 `districtValues` 完全一致\n\n## 涉及文件与归属\n- 文件：`src/views/dataAnalysis/mock/index.js`、`mock/suzhou.json`、`pages/MarketOverview.vue`\n- 来源会话：`99019521-96f2-4316-b309-dc2f6f8cc441` 等三子会话；代码基线：`a86bf95`\n\n## 开发约定\n- 动手前读全 `mock/index.js`，以实际导出名为准，不调接口不造数\n- 改真实接口时保持同一字段契约，页面层不用改"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dashboard_chart_conventions.md",
+                "memory_type": "entities",
+                "after": "# 看板图表四条硬约定\n数智分析看板新增/调整图表须遵守注册名、双 Y 轴、环形数据结构、去标签等约定，否则静默失败。\n\n## 组件注册与基础\n- ECharts 封装注册名必须为 `DaEchart`（`components:{ DaEchart }`，模板 `<da-echart :option=\"...\" height=\"300px|520px\"/>`）\n- 绝对不能注册成 `DaEChart`（Vue2 局部注册区分大小写，kebab 变 `da-e-chart` 匹配不上，图表空白不报错）\n- 导入路径：`./components/EChart.vue` 或热力子目录 `../../components/EChart.vue`\n\n## 坐标轴与数据结构\n- 量纲差异大的双序列（如合同备案份数 vs 备案面积万㎡）必须用双 Y 轴，否则面积序列被压平贴底\n- 环形/饼图统一 `[{name, value}]`（如 `industryRefundRisk` 与 `houseNature` 同构）\n- 面积占比环形图去掉所有文字标签（含 hover 强调），仅 tooltip 展示统计\n\n## 样式与骨架\n- 配色坐标轴统一取 `theme.js` 的 `C`、`PALETTE`、`baseTooltip`、`baseAxis`、`legendStyle`、`baseGrid`、`areaGradient`，禁写死色值\n- 区县热力用 `visualMap` 连续色阶 `#e8f4ff → #1a5599`、`type:'map'` + `map:'suzhou'`，高度 520px\n- 页面骨架照抄 `MarketOverview.vue`：根 `.da-page`，内部 `.grid`/`.grid-2`/`.grid-32`\n\n## 涉及文件与归属\n- 文件：`components/EChart.vue`、`theme.js`、`ChartCard.vue`、`KpiRow.vue`、`RankBar.vue`、`pages/MarketOverview.vue`\n- 来源会话：`99019521-96f2-4316-b309-dc2f6f8cc441`、`20534a15-4562-4579-9c65-7b7deff9eaac`、`session-6c46bea2-2d63-4a2d-b33f-f111655982f2`；代码基线：`a86bf95`"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dev_register_buscode_040100.md",
+                "memory_type": "entities",
+                "after": "# 开发企业注册与入网认证共用 busCode 040100\n开发企业注册与入网认证取附件配置共用同一 busCode `040100`，靠复用同一常量保证一致；经纪/租赁必须分开。\n\n## 代码链路\n- 常量定义：`src/api/company/companyRegister.js` 中 `const BUS_CODE = '040100'`\n- 入网侧 `src/api/company/companyRecord.js` 直接 `import { BUS_CODE as ... }` 并导出 `ENTRY_NETWORK_APPENDIX_BUS_CODE`\n- 两条链路（企业端/管理端入网详情、主管入网确认）均调 `/file/appendix/listAppendixPackage`，busCode 恒为 `040100`，仅 busId 不同\n\n## 跨主体编码\n- 经纪机构注册 `030100`、经纪入网认证/确认/基本信息 `030110`\n- 租赁入网 `030300`、租赁开业/G端审核 `030310`（见 `institutionRegister.js`）\n- 产品2.0 注册包与入网包为 `040900` 与 `040100`，不可外推本条结论到其他主体\n\n## 查码位置\n- 注册侧：`RegisterUploadItem.vue` 的 `resolvedBusCode = busCode || BUS_CODE` 兜底\n- 入网侧：`DeveloperBasicInfoDetail.vue` 的 `displayAppendixBusCode`/`toolbarBusCode`，最终由 `AppendixPackageSection` 传接口\n\n## 涉及文件与归属\n- 文件：`companyRegister.js`、`companyRecord.js`、`DeveloperBasicInfoDetail.vue`、`DeveloperEntryNetworkAdminDetail.vue`、`RegisterUploadItem.vue`、`AppendixPackageSection/index.vue`\n- 来源会话：`session-f030e21f-90d1-4e58-867a-89aef8b09352`；代码基线：`a86bf95`"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/recursive_menu_icon_color.md",
+                "memory_type": "entities",
+                "before": "# RecursiveMenu 激活态图标颜色未随主题色\nzhi2-web-admin 侧边栏 RecursiveMenu 激活态图标未应用主题色，需补样式覆盖。\n\n## 问题根因\n- 激活态图标未应用主题色 var(--primary-color)，导致图标颜色不随文字变主题色\n\n## 解决方案\n- 在 zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue 添加 `.menu-title.active-menu .menu-title--icon` 与 `.menu-title.active-parent .menu-title--icon` 样式覆盖\n\n## 验证与归属\n- 验证证据：src=2-0/008.md\n- 涉及文件：zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue\n- 所属项目：2-0（产品2.0）；来源会话：db9b9d8a-7b5f-4e97-ba73-4fdf181714a1；代码基线：none",
+                "after": "# RecursiveMenu 激活态图标颜色未随主题色\nzhi2-web-admin 侧边栏 RecursiveMenu 激活态图标未应用主题色，需补样式覆盖使其与文字同色。\n\n## 问题根因\n- 激活态图标未应用主题色 `var(--primary-color)`，导致图标颜色不随文字变主题色\n- 接口下发的菜单图标在激活时仅文字变色，图标仍为灰色\n\n## 解决方案\n- 在 `zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue` 为 `.menu-title.active-menu .menu-title--icon` 与 `.menu-title.active-parent .menu-title--icon` 设置 `color: var(--primary-color)`，覆盖默认图标色\n\n## 验证与归属\n- 验证证据：src=2-0/008.md；会话 `db9b9d8a-7b5f-4e97-ba73-4fdf181714a1` 最终结论修改两条选择器后激活态图标与文字一致\n- 涉及文件：zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue\n- 所属项目：2-0（产品2.0）；来源会话：db9b9d8a-7b5f-4e97-ba73-4fdf181714a1；代码基线：产品2.0 侧栏 RecursiveMenu"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/recursivemenu_icon_color.md",
+                "memory_type": "entities",
+                "deleted_content": "# RecursiveMenu激活态侧栏图标跟文字同色\n自定义侧栏 RecursiveMenu 中，接口下发的菜单图标在激活时应与文字一致使用主题色。\n\n## 现象\n- 激活菜单时仅文字变色，图标仍为灰色\n\n## 解决方案\n- 在 `RecursiveMenu.vue` 为 `.menu-title.active-menu .menu-title--icon` 与 `.menu-title.active-parent .menu-title--icon` 设置 `color: var(--primary-color)`，覆盖默认图标色\n\n## 关联信息\n- 验证证据：会话 db9b9d8a 最终结论修改两条选择器后激活态图标与文字一致\n- 涉及文件：zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue\n- 所属项目：2-0\n- 来源会话：db9b9d8a-7b5f-4e97-ba73-4fdf181714a1\n- 代码基线：产品2.0 侧栏 RecursiveMenu"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

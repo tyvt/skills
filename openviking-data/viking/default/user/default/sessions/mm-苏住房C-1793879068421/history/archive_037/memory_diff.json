@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_037",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T13:36:34.981982+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/richtext_parse_fix.md",
+                "memory_type": "entities",
+                "after": "# 流程指南富文本 Parse Error 白屏修复\n苏住房C 小程序流程指南详情（如业主大会议事规则通知）因书名号被误解析为 HTML 标签导致正文白屏，已通过转义非法尖括号修复。\n\n## 问题根因\n- 流程指南详情通过 `ZsRichText` → `formatRichTextContent` → `rich-text` 渲染 HTML\n- 第二篇指南（业主大会相关）正文写成 `关于印发<业主大会>议事规则》等示范文本的通知》`，其中 `<业主大会>` 被当 HTML 标签解析失败，导致标题能显示、正文白屏\n\n## 修复内容\n- 在 `formatRichTextContent` 中新增 `escapeInvalidHtmlAngleBrackets`，将非合法 HTML 标签的 `<` 转义为 `&lt;`\n- 正则：`String(html).replace(/<(?!\\/?[a-zA-Z!])/g, '&lt;')`\n- 修复作用于所有使用 `ZsRichText` 的页面\n\n## 涉及文件与归属\n- 涉及文件：`src/utils/index.js`、`src/pages_my/onlineService/PolicyDetail.vue`、`src/pages_my/onlineService/index.vue`、`src/pages/news/components/ListDetail.vue`\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：3a1c5d68-e7a3-441a-a399-b1778fbaea6f；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/addalone_input_fix.md",
+                "memory_type": "entities",
+                "after": "# 加梯申请页原生组件层级冲突导致无法输入修复\n苏住房C 加梯申请页（addAlone）因地图与输入框原生组件层级冲突无法聚焦输入，已通过 v-if 销毁地图并提升输入区层级修复。\n\n## 问题根因\n- `addAlone` 页面同时存在顶部 `map`（原生组件）与底部申请说明 `textarea`（聚焦时也是原生组件）\n- 微信小程序原生组件层级最高，且 `v-show` 只隐藏视觉不销毁原生层，地图仍拦截下方点击，导致申请说明无法聚焦输入\n- 之前仅加 `min-height` 样式未解决根因\n\n## 修复内容\n- 地图改用 `v-if` 真正销毁原生 map 而非仅隐藏\n- 多种时机销毁地图：页面滚动超 120px、点击表单任意区域、触摸/聚焦申请说明输入框\n- 提升输入区层级：`description` 区域增加 `z-index`\n- 修正 `ZsTextarea`：`adjust-position=\"false\"` → `:adjust-position=\"false\"`（布尔绑定）\n\n## 涉及文件与归属\n- 涉及文件：`src/pages_owner_extra/elevator/addAlone.vue`、`src/components/ZsTextarea/ZsTextarea.vue`、`src/styles/form2.scss`\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：12995d5b-1f0e-4084-87fa-bb16ee2b7b73；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/guard_avatar_fix.md",
+                "memory_type": "entities",
+                "after": "# 门禁首页头像不显示修复\n苏住房C 门禁首页（pages_guard）头像不显示，根因为 ZsImage 样式隔离与资源路径错误，已通过包裹尺寸层与复制资源修复。\n\n## 问题根因\n- 样式问题：新版 `ZsImage` 内部用 `width: 100%; height: 100%`，尺寸类 `header-img` 写在组件上；微信小程序自定义组件样式隔离，父级尺寸传不进去，图片渲染为 0 宽高\n- 资源路径问题：`main-v2.1` 头像在主包 `src/static/images/default-avatar-gary.png`，当前分支只放分包 `pages_guard/static`，主包路径访问不到\n\n## 修复内容\n- 用带尺寸的 `div.header-img` 包裹 `ZsImage`，确保 132rpx 显示区域\n- 将 `default-avatar-gary.png` 复制回主包 `static/images/`\n- 加入 `MAIN_STATIC_PATHS`，与 v2.1 一样走 `/static/images/default-avatar-gary.png`\n\n## 涉及文件与归属\n- 涉及文件：`src/pages_guard/index/index.vue`、`src/components/ZsImage/ZsImage.vue`、`src/utils/index.js`\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：0c646bb9-d1fa-4e8d-a2e1-e84fc34f6838；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/owner_repair_block.md",
+                "memory_type": "entities",
+                "before": "# 业主卡报事报修功能暂未开放拦截\n苏住房C 业主卡「报事报修」改为「功能暂未开放」，根因是开发者工具仍跑旧 dist 包缺拦截逻辑。\n\n## 问题根因\n- 源码已加拦截，但微信开发者工具运行的 `dist/dev/mp-weixin` 为旧包，`goToOther` 无「功能暂未开放」逻辑仍可跳进报修页\n\n## 修复要点\n- `ownerCard/index.vue` 改用 `@tap.stop=\"handleNavClick(item)\"`（小程序比 `@click` 更稳）\n- 抽出 `isRepairNav`，在 `handleNavClick` 与 `goToOther` 双重拦截「报事报修」\n- 验证需重新编译并清缓存，导入新包 `zhi2-mobile-shimin/dist/build/mp-weixin`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`zhi2-mobile-shimin/src/pages_owner_extra/ownerCard/index.vue`\n- 来源会话ID：eac9139c-3367-4784-8577-a513c71c95c0\n- 代码基线：none",
+                "after": "# 业主卡报事报修功能暂未开放拦截\n苏住房C 业主卡「报事报修」改为「功能暂未开放」提示，不再跳转报修页。涉及路径：我的 → 电子业主卡 → 报事报修。\n\n## 问题根因\n- 源码已加拦截，但微信开发者工具运行的 `dist/dev/mp-weixin` 为旧包，`goToOther` 无「功能暂未开放」逻辑仍可跳进报修页\n\n## 修复要点\n- `pages_owner_extra/ownerCard/index.vue` 的 `goToOther` 方法，对「报事报修」（`value === \"2\"`）优先拦截并弹出「功能暂未开放」提示\n- 拦截方式与项目中 `goMenu` / `menuNav` 的「暂未开放」处理方式一致\n- `ownerCard/index.vue` 改用 `@tap.stop=\"handleNavClick(item)\"`（小程序比 `@click` 更稳）\n- 抽出 `isRepairNav`，在 `handleNavClick` 与 `goToOther` 双重拦截「报事报修」\n- 其他入口（投票选举、投票表决、我要出售）不受影响\n- 验证需重新编译并清缓存，导入新包 `zhi2-mobile-shimin/dist/build/mp-weixin`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`zhi2-mobile-shimin/src/pages_owner_extra/ownerCard/index.vue`\n- 来源会话ID：eac9139c-3367-4784-8577-a513c71c95c0、76b4ec2e-0c31-43e8-b39a-197cc32de4fd\n- 代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

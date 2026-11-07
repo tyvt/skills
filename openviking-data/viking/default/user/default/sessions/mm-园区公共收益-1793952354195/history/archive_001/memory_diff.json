@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793952354195/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T08:08:26.916739+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/deposit_subaccount_fix.md",
+                "memory_type": "entities",
+                "after": "# 公共收益缴存子账户字典修复\n园区公共收益 zhi2-web-admin 修复「公共收益缴存/新增选择结算账户」中「是否启用子账户」列显示为空的问题。\n\n## 问题原因\n- 全局 dictFormatter 按列 prop 查找 {prop}Options 字典\n- hasSubAccount 列需要 hasSubAccountOptions，但页面仅加载了 yesOrNoOptions，导致该列显示为空\n\n## 修改文件\n- zhi2-web-admin/src/views/maintenance/depositNotice/components/detail.vue\n- zhi2-web-admin/src/views/maintenance/depositNotice/company/components/detail.vue\n\n## 主要改动\n- data 中增加 hasSubAccountOptions: []\n- initDict() 加载 sys_yes_no 时同步赋值给 hasSubAccountOptions\n\n## 验证与归属\n- 所属项目：园区公共收益；来源会话：7e4c18c0-5ce0-41ce-b4dd-d28988df5d00；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/receipt_delete_fix.md",
+                "memory_type": "entities",
+                "after": "# 回单核销删除单据金额同步修复\n园区公共收益 zhi2-web-admin 修复回单核销详情页删除单据后「基本信息」中「本次核销金额」不更新的问题。\n\n## 问题原因\n- 删除单据时 table.js 的 handleDelete 仅刷新子表列表，不通知父页面\n- 详情页 detail.vue 已通过 @refresh=\"getDetail\" 绑定刷新，但删除操作从未触发该事件\n- 导致「基本信息」里的「本次核销金额」仍显示旧值\n\n## 修改文件\n- zhi2-web-admin/src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue\n\n## 主要改动\n- 新增 deleteSuccessCallback() 方法，删除单据成功后 this.$emit('refresh')\n- 触发父组件 getDetail 重新调用详情接口，同步更新「本次核销金额」（列表清空时变为 0 或空）\n\n## 验证与归属\n- 所属项目：园区公共收益；来源会话：dca7c647-3133-4108-a280-c82a7ee0abb4；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/preferences/user/接口请求头menu-name与menu-path添加范围.md",
+                "memory_type": "preferences",
+                "before": "- 仅对 OperationBtnGroup 点保存（formMode=edit）触发的编辑接口、列表页 handleDelete 触发的删除接口添加 menu-name/menu-path 请求头，其他接口（查询、新增、详情等）不加\n- 通过 pageRequestContext.js 的 pendingOperHeaders 标记下一次请求类型（edit/delete），仅在匹配的 PUT/DELETE 请求上消费并附加对应请求头\n- 编辑保存调用 enableDetailSaveHeaders(primaryKey, form) 打标；删除调用 enableListDeleteHeaders() 打标\n- 适用于园区公共收益项目 pageRequestContext.js、OperationBtnGroup/index.vue、mixins/table.js、mixins/form.js",
+                "after": "- 所有通过 axios 拦截器发出的接口请求都自动附加 zs-menu-name、zs-menu-path、zs-data-id 审计请求头，无需手动触发\n- zs-menu-name 取自当前路由 meta.title，zs-menu-path 取自路由 meta.filePath，zs-data-id 通过 getId() 从当前路由 URL 解析（解析不到则不传）\n- 通过 pageRequestContext.js 的 getPageRequestHeaders() 实现，在 request.js 请求拦截器中对所有请求调用，替代原仅保存/新增/删除时附加的逻辑\n- 原 enableDetailSaveHeaders、enableListDeleteHeaders 等手动打标函数保留为空实现，后续可逐步清理\n- 适用于园区公共收益项目 zhi2-web-admin（pageRequestContext.js、request.js）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_078",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T00:19:24.502528+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/limit_subtable_refresh.md",
+                "memory_type": "entities",
+                "after": "# 限制单据保存后子表不刷新修复\n苏州市房地产监测V3 修复了限制单据保存后子表不刷新的问题，变更集中在 `limitFormMixin.js`。\n\n## 修改要点\n- `limitFormMixin.js` 新增 `syncSelectedHousesFromSubTablePage()`：编辑态在 `detail` 未返回 `houseList` 时，调用子表分页接口回填数据\n- 限制接口：`POST /building/houseLimit/page`；解除接口：`POST /building/houseLimit/pageLimitRemoval`，解除限制会同步重建 `limitRecordsByHouse`\n- 调整 `detailCallback`：仅当 `houseList.length > 0` 时才覆盖 `selectedHouses`，避免空数组清空本地数据\n- 查看态仍走 `loadHouseLimitLines()`；编辑态且无有效 `houseList` 时调用 `syncSelectedHousesFromSubTablePage()`\n- 加固 `projectLimitSaveCallback`：首次保存后在 `$nextTick` 中显式 sync\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：苏州市房地产监测V3\n- 涉及文件：`limitFormMixin.js`、`house-limit-helpers.js`\n- 来源会话：f7ff995f-0339-4200-9550-e6b17381deaf；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/code_extract_rowkey.md",
+                "memory_type": "entities",
+                "after": "# 立项登记编码提取弹窗row-key修复\n苏州市房地产监测V3 修复了「立项登记编码提取」弹窗勾选无反应、「确定」不可用的 bug。\n\n## 问题原因\n- 弹窗数据来自 `exportList`，行上是 `prjNum`（立项登记编码）等外部字段，一般还没有 `projectInitiationChangeId`\n- 表格却用子表主键 `projectInitiationChangeId` 作为 `row-key`，多行 key 都是 `undefined`\n- Element UI 多选列无法正确维护勾选，表现为点复选框无反应、「确定」一直不可用\n\n## 修改要点\n- `ProjectCodeExtractDialog.vue`：表格 `row-key` 改为 `prjNum`；多选列关闭 `reserve-selection`；分页/打开时清空勾选；`batchInsert`/查询优先用传入的 `id`\n- `RecordCodeTable.vue`：向弹窗传入 `:id=\"isChange ? projectChangeId : projectId\"`，与当前变更单/项目一致\n- 验证路径：项目变更 → 立项登记编码 → 提取 中再试勾选并确定\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：苏州市房地产监测V3\n- 涉及文件：`ProjectCodeExtractDialog.vue`、`RecordCodeTable.vue`\n- 来源会话：2ad0a6d1-00bd-4325-b11b-d24bc3592b7f；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/guarantee_detail_layout.md",
+                "memory_type": "entities",
+                "after": "# 保函相关详情页布局调整\n苏州市房地产监测V3 按截图要求调整了保函相关详情页布局，改动集中在 `RelatedBuildingsTable.vue` 与 `detail.vue`/`changedetail.vue`。\n\n## 改动要点\n- `RelatedBuildingsTable.vue`：去掉子表「明细」`Headline` 标题\n- 使用 `SubTableToolbar`，将「新增 / 删除」注册到外层 `zs-tabs` 的 `.tabs-header-action`（与宗地信息、付款进度等页一致）\n- 修正路由判断：原 `guaranteechange` 无效，变更详情为 `changedetail`；非 `guarantee` 路由不展示顶栏按钮，并隐藏批量选择列\n- `detail.vue` / `changedetail.vue`：页签文案由「保函金额分配楼幢」改为「保函金额分配明细」，与 Tab 胶囊标题一致\n- 效果：Tab 栏左侧为「保函金额分配明细」，右侧为新增/删除；表格上方不再出现「明细」标题和重复按钮区\n\n## 验证与归属\n- 验证路径：请在「保函替换资金申请」与「保函替换资金申请变更」详情页各刷新确认一次布局\n- 验证证据：extracted source=cursor；所属项目：苏州市房地产监测V3\n- 涉及文件：`RelatedBuildingsTable.vue`、`detail.vue`、`changedetail.vue`\n- 来源会话：ef5ed4c6-63e2-4fa0-a241-8cfaf1359e28；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_container_scroll.md",
+                "memory_type": "entities",
+                "before": "# detail-container禁滚改由表单容器滚动\n苏州市房地产监测V3将 detail-container 禁用滚动并改由内部表单容器承载滚动，避免双滚动条与操作栏冲突。\n\n## 修复方案\n- `index.scss` 中 `detail-container` 设 `height: calc(100vh - 120px)` 与 `overflow: hidden`\n- `detail-from-container` 设 `flex: 1`、`min-height: 0`、`overflow-y: auto` 承载滚动\n- `#app-main:has(> .detail-container)` 设 `overflow: hidden` 防双滚动条\n- `OperationBtnGroup` 移除 `position: sticky`，操作栏通过 `flex-shrink: 0` 固定避免冲突\n\n## 涉及文件\n- src/styles/index.scss、src/styles/detail-form.scss、src/styles/variables.css\n- src/components/detail-template/detail-template.vue\n- src/layout/components/AppMain.vue、src/utils/detailLayout.js\n- views/company/companyManagement/components/DeveloperBasicInfoForm.vue\n- src/components/OperationBtnGroup/index.vue\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3-rest/080.md\n- 来源会话：057dc9a5-e1bd-4c11-b65c-c659a035ce17；代码基线：none",
+                "after": "# detail-container禁滚改由表单容器滚动\n苏州市房地产监测V3将 detail-container 禁用滚动并改由内部表单容器承载滚动，避免双滚动条与操作栏冲突。\n\n## 修复方案\n- `index.scss` 中 `detail-container` 设 `height: calc(100vh - 120px)` 与 `overflow: hidden`\n- `detail-from-container` 设 `flex: 1`、`min-height: 0`、`overflow-y: auto` 承载滚动\n- `#app-main:has(> .detail-container)` 设 `overflow: hidden` 防双滚动条\n- `OperationBtnGroup` 移除 `position: sticky`，操作栏通过 `flex-shrink: 0` 固定避免冲突\n- 滚动条悬停样式从 `detail-container` 改为 `detail-from-container`，仅表单区域滚动\n\n## 涉及文件\n- src/styles/index.scss、src/styles/detail-form.scss、src/styles/variables.css\n- src/components/detail-template/detail-template.vue\n- src/layout/components/AppMain.vue、src/utils/detailLayout.js\n- views/company/companyManagement/components/DeveloperBasicInfoForm.vue\n- src/components/OperationBtnGroup/index.vue\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3-rest/080.md\n- 来源会话：057dc9a5-e1bd-4c11-b65c-c659a035ce17；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

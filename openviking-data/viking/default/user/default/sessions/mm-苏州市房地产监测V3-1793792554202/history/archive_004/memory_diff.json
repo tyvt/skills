@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793792554202/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T11:55:48.060177+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/contract_frontend_rebuild.md",
+                "memory_type": "entities",
+                "after": "# 合同页面改造前端\n苏州市房地产监测V3 中合同页面前端改造已完成，覆盖入口版本控制、公共组件、第一章当事人表格与章节字段补充。\n\n## 入口与版本控制\n- `src/views/contract/index.vue`：合同签订 / 数据变更 / 范本入口统一强制渲染 2016 组件\n- `contractType` 改为按路由 `/cash` 判定现售（原 2016 硬编码预售），放开 2016 保存 / 提交入口\n- 修正 `reSign` 现售跳转 `/pre` 缺陷，2016 分支在合同签订入口渲染完整按钮组\n\n## 新增公共组件\n- `components/ContractOperationActions.vue`：保存 / 提交 / 审批 / 撤销 / 重签 / 人工备案 / 缴款 / 数据变更 / 打印 / 返回，两个分支共用\n\n## 第一章当事人表格\n- `chapters/suzhou2016/chapter1.vue`：出卖人单行只读表格（开发商唯一），买受人多行 `zs-table` 新增 / 编辑 / 删除复用 `vendeeAgentDialog`\n- 销售代理机构字段重命名对齐主表 + `agencyId` + 机构选择弹窗，字段按第五节映射重命名（sellerName→seller 等）\n\n## 章节字段与归属\n- chapter2 `decorationType→decorateType`，chapter3 `paymentMode→payment...` 等字段重命名\n- 涉及文件：`src/views/contract/index.vue`、`components/ContractOperationActions.vue`、`chapters/suzhou2016/chapter1.vue`、`chapters/pre/chapter1.vue`、`utils/contractRequest.js`\n- 来源会话：52faca44-46f3-48c0-9ba2-d452448948d2；所属项目：苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/contract_validation_anchor.md",
+                "memory_type": "entities",
+                "after": "# 合同未填项双通道定位\n苏州市房地产监测V3 中 2016 版合同保存时按「跟以前一样」实现未填项精确定位，采用前端校验 + 后端兜底双通道。\n\n## 根因\n- `suzhou2016/mixins/szForm.js` 的 `checkValidate()` 为空实现，保存时前端不校验，`SzContent` 滚动到 `.is-error` 不触发，只能由后端报 `请输入商品房总价款`\n\n## 实现思路\n- 各 `Sz*` 填空组件从 `v-model` 表达式自动推导字段名，渲染成 `data-field` 锚点（`components/fieldAnchor.js`）用于精确查找高亮\n\n## 通道一前端校验\n- 点保存 → `SzContent.getFormData()` 逐章校验，命中首个未填项即红框高亮 + 闪烁 + 聚焦 + 平滑滚动居中 + toast 并中断保存\n- 正文必填项登记在 `suzhou2016/validation.js` 的 `CHAPTER_REQUIRED`，按章节条款登记，二选一 / 条件条款按分支校验\n\n## 通道二与归属\n- 通道 2 拦截后端报错文案作兜底\n- 涉及文件：`suzhou2016/mixins/szForm.js`、`components/fieldAnchor.js`、`suzhou2016/validation.js`、`index.vue`\n- 来源会话：2ad932d3-7ddf-426e-a8a3-320e8d8f9b66；所属项目：苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/enterprise_change_badge.md",
+                "memory_type": "entities",
+                "after": "# 企业信息变更角标比对\n苏州市房地产监测V3 中新增企业信息变更列表与详情菜单（主管部门审批用），变更项角标比对已实现，lint 0 错误。\n\n## 公共 Mixin\n- 新增 `src/mixins/changeObjectMixins.js`（资质 / 从业人员复用）\n- `parseChangeObject(raw)`：`JSON.parse(changeObject)`，失败 / 为空返回 null\n- `applyChangeObjectSnapshot(data)`：详情返回体提取快照写入 `beforeForm`；`changeObject` 为空时跳过比对并回落 `originInfo`\n- `changeBadgeValue(field)`：逐字段比对，不一致返回快照原值显示角标；日期字段只比对 `yyyy-MM-dd`\n\n## 变更详情\n- 资质变更详情 `qualificationManagement/components/detail.vue` 重写 `detailCallback`，加载时快照入 `beforeForm`，编辑态 8 个表单项比对\n- 从业人员变更详情 `staffManagement/components/detail.vue` 同步接入角标比对\n\n## 验证与归属\n- 涉及文件：`src/mixins/changeObjectMixins.js`、`qualificationManagement/components/detail.vue`、`staffManagement/components/detail.vue`\n- 来源会话：57beaecb-baa4-4b9f-8dba-33b703218dcd；所属项目：苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/list_search_perpage_filter.md",
+                "memory_type": "entities",
+                "after": "# 列表搜索条件逐页过滤\n苏州市房地产监测V3 中所有列表搜索条件的企业 / 机构名称筛选已改为逐页自行处理，公共组件恢复原样。\n\n## 回退内容\n- `src/components/zs-search-form/zs-search-form.vue` 已 `git checkout` 还原\n- `src/utils/searchFormVisibility.js` 已删除\n\n## 现行方式\n- 每个列表页在自己的 `formItems` 计算属性里过滤，不改组件、不留共享黑盒\n- B 端角色（`terminalType === 'B'`）不展示企业 / 机构主体筛选条件\n\n## 改动范围与归属\n- 共 60 个列表页按业务模块改动（benefit 2 页、building 3 页等）\n- 涉及文件：`src/components/zs-search-form/zs-search-form.vue`、`src/utils/searchFormVisibility.js`、`src/utils/terminalUser.js`、`src/views`\n- 来源会话：6f79068a-cd61-40ba-8614-03f0626172ad；所属项目：苏州市房地产监测V3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

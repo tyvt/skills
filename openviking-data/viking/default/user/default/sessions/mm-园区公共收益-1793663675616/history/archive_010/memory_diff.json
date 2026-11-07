@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793663675616/history/archive_010",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T00:13:05.817807+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dictformatter_zero_blank.md",
+                "memory_type": "entities",
+                "after": "# 全局dictFormatter零值误判空白\n园区公共收益项目(zhi2-web-admin)中，main.js 的全局 dictFormatter 用 `if (!cellValue) return \"\"` 会把合法字典值 0（如 status、布尔型）显示成空白。\n\n## 问题根因\n- 字典翻译实现为 `if (!cellValue) return \"\"`，status=0、布尔型字典等合法取值 0 被当成空值，整列不显示「成功/是」等文案，1 仍正常\n- 根因在 main.js dictFormatter 的 falsy 判断\n\n## 修复做法\n- 空值判断只排除 null、undefined、空字符串，让 0 继续走 options 匹配\n- 单页若硬编码文案需与列表筛选口径一致（如操作日志成功用「成功」而非「正常」）\n\n## 涉及文件\n- zhi2-web-admin/src/main.js\n- zhi2-web-admin/src/views/system/operlog/index.vue\n- 所属项目：园区公共收益；来源会话：a2c3210a-38a4-4169-bda2-87a7f0f5a713；代码基线：635e747"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/contract_payee_fields.md",
+                "memory_type": "entities",
+                "after": "# 支出合同收款字段与资金拨付带入\n园区公共收益项目(zhi2-web-admin)中，支出合同(pubExpenditureContract)需维护收款五字段，资金拨付(pubAllotNotice)选合同时从合同带入而非用款申请。\n\n## 字段约定\n- 支出合同基本信息必填：收款人 payeeName、收款账号 payeeBankAccount、收款开户行 payeeBankName\n- 开户行选网点时同步写入 payeeBankCode、payeeBankUnionCode\n- 资金拨付选支出合同后，上述五字段一律从合同对象带入；金额与监管账户等仍从用款申请接口取\n\n## 联调注意\n- 联调前确认合同列表/详情接口已返回并持久化这五字段，否则拨付页无法自动回填\n\n## 涉及文件\n- zhi2-web-admin/src/views/benefit/pubExpenditureContract/detail.vue\n- zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue\n- 所属项目：园区公共收益；来源会话：f1fba927-0937-4139-b4e5-1db96673d052；代码基线：08d3255"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/lease_contract_fee_block.md",
+                "memory_type": "entities",
+                "after": "# 租赁合同详情管理费与公共收益金额块\n园区公共收益项目(zhi2-web-admin)中，assetsLeaseContractFiling 与 resourcesLeaseContractFiling 为同类详情页，字段块易漂移，需对齐管理费与公共收益金额展示与计算。\n\n## 字段块约定\n- 租赁总额后应有只读「扣除管理费后归公共收益金额」与可编辑「管理费」\n- 公共收益金额 = 租赁总额 − 管理费\n- 管理费校验 0 ≤ 管理费 ≤ 租赁总额，保存前重算\n- 查看模式 basicInfoList 同步展示两字段\n\n## 复用规则\n- 新改一类合同时先对照另一份已上线 detail.vue 的表单项与计算逻辑再改\n- 经营资源合同(resourcesLeaseContractFiling)详情租赁总额后缺两字段，按资产租赁合同(assetsLeaseContractFiling)已有实现补\n\n## 涉及文件\n- zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/detail.vue\n- zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/detail.vue\n- 所属项目：园区公共收益；来源会话：cf131df6-f786-496a-8f96-1551776fc8f6；代码基线：4468dfa"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/rejected_todo_prefix.md",
+                "memory_type": "entities",
+                "before": "# 园区公共收益待办驳回前缀规范\n园区公共收益项目(zhi2-web-admin)中，被驳回后回到待提交的单据需在待办主题展示层统一加「<驳回>」前缀。\n\n## 识别与抽取\n- 识别驳回单据：comment.type === '3' 或 comment.comment === '驳回'\n- 列表是否收录由后端查询决定，前端仅在展示层加前缀\n- 新增 utils/todoTask.js，导出 isRejectedTodoTask、formatTodoTaskTitle、normalizeTodoTaskRows\n\n## 规范入口\n- flowable/todo.vue 的 listCallback\n- home/index.vue 拉待办后\n- home/components/TodoTable.vue 三处入口须同步规范化，避免首页与工作中心不一致\n\n## 验证与归属\n- 验证：接口返回 comment.type === '3' 或 comment.comment === '驳回'；新增 todoTask.js 并改三处入口\n- 涉及文件：src/utils/todoTask.js、src/views/flowable/todo.vue、src/views/home/index.vue、src/views/home/components/TodoTable.vue\n- 所属项目：园区公共收益；来源会话：35f936a1-c453-4bbf-9d57-01b517ff7164；代码基线：0c9b8c2",
+                "after": "# 园区公共收益待办驳回前缀规范\n园区公共收益项目(zhi2-web-admin)中，被驳回后回到待提交的单据需在待办主题展示层统一加「<驳回>」前缀。\n\n## 识别与抽取\n- 识别驳回单据：comment.type === '3' 或 comment.comment === '驳回'\n- 列表是否收录由后端查询决定，前端仅在展示层加前缀\n- 新增 utils/todoTask.js，导出 isRejectedTodoTask、formatTodoTaskTitle、normalizeTodoTaskRows\n\n## 规范入口\n- flowable/todo.vue 的 listCallback\n- home/index.vue 拉待办后\n- home/components/TodoTable.vue 三处入口须同步规范化，避免首页与工作中心不一致\n- flowable/process.vue（我发起的流程）通过 mixins/listMixins.js 的 listCallback 对 response.rows 规范化后再赋表格数据，统一复用 normalizeTodoTaskRows，避免单独复制字符串规则导致与待办列表视觉不一致\n\n## 验证与归属\n- 验证：接口返回 comment.type === '3' 或 comment.comment === '驳回'；新增 todoTask.js 并改三处入口\n- 涉及文件：src/utils/todoTask.js、src/views/flowable/todo.vue、src/views/home/index.vue、src/views/home/components/TodoTable.vue、src/views/flowable/process.vue、src/mixins/listMixins.js\n- 所属项目：园区公共收益；来源会话：35f936a1-c453-4bbf-9d57-01b517ff7164、1b62db88-88d8-4a66-9497-8fe956659bab；代码基线：0c9b8c2"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

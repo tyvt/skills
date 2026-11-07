@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_034",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T13:26:12.569328+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/newhouse_layout_fix.md",
+                "memory_type": "entities",
+                "after": "# 新房列表页布局筛选栏吸顶修复\n苏住房C 新房列表页(newHouse/index.vue)修复 z-paging 全屏 fixed 导致列表遮挡导航栏、筛选栏吸顶失效的问题。\n\n## 问题原因\n- z-paging 默认 `fixed: true`，以全屏固定定位从页面顶部(`top: 0`)铺开\n- 列表遮挡顶部导航栏「新房」标题栏\n- 筛选栏 `position: sticky` 失效，因其不在同一滚动上下文\n\n## 修复方案\n- 给 z-paging 设置 `:fixed=\"false\"`，避免全屏覆盖\n- 页面容器使用 `flex` 纵向布局 + `height: 100vh`\n- 列表区域 `flex: 1; min-height: 0`，只在剩余空间内滚动\n- 对齐二手房页(`stockHouse/index.vue`)布局方式\n\n## 修复结果\n- 搜索框 → 快捷入口 → 筛选栏固定在顶部，列表在下方独立滚动\n- 「最新楼盘」「在售楼盘」等子页面若有同类问题可按此方式调整\n\n## 验证与归属\n- 涉及文件：newHouse/index.vue、stockHouse/index.vue、conditionScreening.vue、pages.js\n- 验证证据：extracted source=cursor project=苏住房C；来源会话ID：3346e472-72e7-4a7c-857b-e8e4f61316e0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/sfb_login_unified.md",
+                "memory_type": "entities",
+                "after": "# 移除登录入口统一苏服办登录\n苏住房C 移除独立登录入口，统一改为苏服办(sfb)登录。\n\n## 主要改动\n- 新增 `src/utils/sfb.js` 封装苏服办登录能力\n- 从 `pages.js` 删除登录相关路由：login/index、login/forget、login/password、login/success\n- 所有跳转 `/pages/login/index` 的位置改为调用 `promptSfbLogin()`\n\n## sfb.js 能力\n- `hasLightAppJssdk()` 检测是否在苏服办容器内\n- `ensureSfbTicket()` / `triggerSfbLogin()` 静默或主动获取 ticket\n- `loginWithSfbTicket()` 用 ticket 换 token 并拉取用户信息\n- `initSfbUser()` App 启动时静默登录\n- `promptSfbLogin()` 替代原登录页用户主动登录入口\n\n## 统一拦截位置\n- `goMenu()` 鉴权拦截(`utils/index.js`)\n- 「我的」页头部(`My_Suzhufang.vue`)\n- 收藏、二手房详情、在线课堂点赞、实名认证等\n\n## 验证与归属\n- 涉及文件：src/utils/sfb.js、pages.js、utils/index.js、My_Suzhufang.vue\n- 验证证据：extracted source=cursor project=苏住房C；来源会话ID：92b16b83-222f-4c4d-93dd-2c8f89738fb1"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/res_code_removed.md",
+                "memory_type": "entities",
+                "after": "# 批量移除res.data.code==200判断\n苏住房C 批量移除 `res.data.code == 200` 成功判断及对应 else 分支，依赖 HTTP 拦截器自动 reject。\n\n## 修改范围\n- 共修改 10 个 Vue 文件和 2 个 API 文件\n- Vue 文件移除 `if (res.data.code == 200)` 及对应 `else` 分支\n- API 文件移除 `noReject: true`，让非成功响应走 `.catch()`\n\n## 涉及Vue文件\n- house/owner/manual.vue、addHouseContract.vue、addHouse.vue、add.vue\n- house/verify.vue\n- decision/common/StepChoose.vue、decision/optional/StepChoose.vue\n- elect/components/StepChoose.vue、StepChooseGroup.vue、elect/detail.vue\n\n## 涉及API文件\n- api/autonomy.js 的 ownerDecision\n- api/property.js 的 handleHouseOwner\n\n## 验证与归属\n- HTTP 拦截器(`httpInstance.js`)已在 `code != 200` 时自动 `reject` 并弹窗\n- 验证证据：extracted source=cursor project=苏住房C；来源会话ID：732c8290-b822-4472-af21-d64590d4673f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/branch_rebase_warning.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C分支rebase冲突警告\n苏住房C 分支 suzhou-shiqu-suzhufang-main-v2.1-mp 曾因 rebase 子模块历史分叉失败，需避免再次 rebase。\n\n## 事件经过\n- 后台 rebase 脚本在第 48/103 个提交处因子模块历史分叉失败\n- 已执行 `git rebase --abort`，分支恢复到 `25d2063`，子模块 `d2a5917`，工作区干净\n\n## 当前状态\n- 分支：suzhou-shiqu-suzhufang-main-v2.1-mp (25d2063)\n- 子模块指针：d2a5917\n- 工作区：干净\n\n## 重要警告\n- 不要对该分支再做 `rebase onto 017efba`\n- 109 个提交里有 64 个改子模块指针，极易反复冲突\n- 保持现状或改用 merge 即可\n\n## 验证与归属\n- 涉及文件：.gitmodules、pages.json、.gitignore、package.json\n- 验证证据：extracted source=cursor project=苏住房C；来源会话ID：98536349-484b-4850-bba5-19593e068a4d"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_022",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:50:01.713207+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sfb_callphone_fallback.md",
+                "memory_type": "entities",
+                "after": "# 苏服办微信拨号降级方案\n苏住房C 在苏服办生态拨号需「SDK 优先 + tel: 协议降级」双通道，否则微信内必失败。\n## 问题根因\n- 苏服办 App 走 jmportal.communication.callPhone 可用；微信环境走 lightAppJssdk.device.call 依赖 wx.miniProgram.navigateTo\n- 页面不在苏服办小程序 webview 时 window.wx.miniProgram 不存在，SDK 同步抛错且无降级，表现为点电话报错或无反应\n## 解决方案\n- 封装统一拨号函数：先动态加载 jweixin 并等待就绪，尝试苏服办 SDK；不可用或抛错时自动降级为 tel: 协议拨号\n- 调用点外层包 try-catch 捕获 navigateTo 同步异常避免整页崩溃；苏服办 App 内只走官方 SDK 不加降级分支\n- 排查先问清「微信内置浏览器」还是「某小程序 webview」，两者限制不同；改完必须重新构建部署，dev 热更新看不到效果\n## 验证与归属\n- 涉及文件：src/utils/sfb.js、src/pages/policy/fddydetail.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 11c71496；代码基线 77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/项目约定/empty_state_unify.md",
+                "memory_type": "entities",
+                "after": "# 同源副本空状态统一规范\n苏住房C 同类详情页空状态统一为缺省图加「暂无数据」，以主字段判据加 v-else ZsEmpty 实现。\n## 统一方案\n- 页面外层套 flex flex-column justify-center h-full bg-fff，内容区用 v-if 主字段有值（如 detailInfo.name）包原信息模块，v-else 直接放 ZsEmpty，不另造空态组件\n- 以已做对的页（业委会信息 committee/info）为模板复制结构\n- 配套待统一：小区/项目信息、企业信息、街道信息、社区信息（project/info、company/info、subdistrict/info、community/info）\n## 跨分支合并\n- mainv2.1-mp 合并到 mainv2.1 只挑逻辑改动，保留目标分支自身引用路径（baseCard 用 @/pages/commonNew/baseCard.vue，不跟 mp 分支改 @/components/commonNew）\n- 落地按「子模块先提交 + 父仓库只更新子模块指针」两步走，核对本地领先远程提交数\n## 验证与归属\n- 涉及文件：community/info/index.vue、subdistrict/info/index.vue、committee/info/index.vue、ZsEmpty.vue\n- 所属项目：苏住房C；来源会话 6999b799；代码基线 0cea241"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/住房小程序脱敏规则与实现.md",
+                "memory_type": "preferences",
+                "after": "- 住房类小程序中「系统自动获取」的姓名/手机号/身份证号必须脱敏，规则由用户统一指定，各页面不得自行决定\n- 中文姓名保留第 1 位其余用 *（示例：朱楠→朱*，李小明→李**）\n- 身份证号保留前 2 位和后 2 位（示例：32**************34）\n- 手机号保留第 1 位和后 2 位（示例：18360916552→1********52）\n- 三个脱敏函数（含新增 blurIdNumber）统一收口在 src/utils/formatter.js，页面只引用 userStore.secureUsername / securePhone / secureIdNumber\n- secure* 字段必须是 getter 由原始数据实时计算，不能是 state 缓存值，避免旧 session 缓存使新规则不生效；改完需提示用户重新登录刷新用户信息\n- 适用口径为「展示层脱敏，提交仍用原始值」，覆盖加装电梯、业代报名、房源网签、房源核验、电子业主卡、个人信息、我要买房等自动填充场景"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sfb_dispatcher_gateway.md",
+                "memory_type": "entities",
+                "before": "# 苏服办网关统一转发模式\n苏住房C 按江苏省「苏服办」接入规范改造接口层，后端只上架 getDispatcher/postDispatcher 两个统一转发接口。\n\n## 背景与目的\n- 苏服办要求请求头带 zs- 前缀参数并做 SM3 签名，本地开发无网关注入会全部失败\n- 生产必须走网关才能拿到免登录凭证，但本地仍需直连调试\n\n## 解决方案\n- 用环境变量 useDispatcher 控制是否走 dispatcher，开发默认关闭、测试/生产默认开启\n- 集中到 api/dispatcher.js 管理苏服办配置、签名与 zs- 请求头组装，index.js/v1Instance.js 只保留 base、token、tag 等差异（约 20 行）\n- 抽 api/httpInstance.js 承载请求/响应拦截、dispatcher 封装、日志、文件上传公共逻辑\n- 请求日志同时打印请求头、请求地址、请求参数与响应体，便于 dispatcher 转发失败定位\n- 参数缺失先整理清单找后端补齐（interface_id 等），不在前端硬编码占位\n\n## 验证与归属\n- 涉及文件：src/api/dispatcher.js、src/api/httpInstance.js、src/api/index.js、src/api/v1Instance.js、src/utils/sfb.js\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 b5d791be；代码基线 83c4136",
+                "after": "# 苏服办网关统一转发模式\n苏住房C 按江苏省「苏服办」接入规范改造接口层，后端只上架 2 个统一转发接口，前端统一请求、后端内部转发到真实业务接口。\n## 背景与目的\n- 苏服办开放平台（ydzt.jszwfw.gov.cn/jpaas-jags-server/interface/gateway.do）要求请求头带 zs- 前缀参数并做 SM3 签名，本地开发无网关注入会全部失败，生产必须走网关拿免登录凭证\n- 宿迁同源项目旧做法为每个业务接口上架一个 interface_id，苏住房C 未迁移该配置导致文档要求的 gateway.do 不存在\n## 解决方案\n- 开放平台只上架 2 个 interface_id（GET/POST），前端统一 POST 到 gateway.do，真实业务路径放 formData 的 header.zs-path，后端解析后内部转发，业务代码一行不改\n- 开启 VITE_APP_USE_SFB_DISPATCHER=1 后 dispatcher.js 构建 formData{app_id, interface_id, biz_content, header(Authorization+zs-path+zs-sign+zs-timestamp+zs-nonce), sign(SM3), timestamp, charset, origin, version}\n- httpInstance.js 网关模式直连网关地址并解析响应；sign.js 跳过对 gateway.do 重复签名；.env.* 新增 VITE_APP_SFB_GATEWAY_URL 与两个 INTERFACE_ID；vite.config.ts 加 /sfb-gateway 代理绕 CORS\n- api/dispatcher.js 集中管理苏服办配置与 zs- 请求头组装，index.js/v1Instance.js 只保留 base、token、tag 等差异；请求日志打印请求头/地址/参数/响应体便于定位\n## 验证与归属\n- 涉及文件：src/api/dispatcher.js、src/api/httpInstance.js、src/api/index.js、src/api/v1Instance.js、src/utils/sign.js、src/static/js/sign.js、src/utils/sfb.js、.env.*、vite.config.ts\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 b5d791be 与 87362be2；代码基线 83c4136 与 8b5f883"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

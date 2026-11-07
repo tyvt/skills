@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_009",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:28:32.803953+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/copy_tab_three_sync.md",
+                "memory_type": "entities",
+                "after": "# 复制Tab区块三处同步遗漏\n园区物管2.0 中从其他页面复制 Tab/区块后，因三类同步点未对齐导致 Tab 不加载、不请求、不展示的已知坑。\n\n## 问题根因\n- 从地图抽屉页 overviewContent.vue 复制「运营报告」Tab 到详情页后，切到该 Tab 既不发 PDF 请求也不展示且无报错\n- Tab 值契约不一致：sourceMenuList 中该 Tab value 为 \"7\"，但 activeContentValue 的 watcher 判的是复制来源页的 \"report\"，watcher 永不命中\n- contentShow 是复制来源页的显隐开关，详情页从未置 true，即使接口返回也会被丢弃\n- getDetail 只更新了 form 没同步 sourceData，reportComplexId 等下游依赖取不到值\n\n## 解决方案\n- 复制 Tab/区块后必须逐一核对三类同步点：菜单列表与 watcher 判断逻辑的 Tab value 是否同一字符串\n- 复制页自带的显隐开关（contentShow 类）要在新页面生命周期里正确赋值\n- 详情接口回调除 form 外还要把原始响应同步给所有依赖对象（sourceData）\n- 排查顺序：watcher 判断值 → 显隐开关 → 详情数据同步\n\n## 验证与归属\n- 验证：运营报告 Tab 三个独立原因（value \"7\" vs watcher 判 \"report\"、contentShow 未置 true、sourceData 未赋值），修在 statisticsMapDetail/index.vue\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMapDetail/index.vue、zhi2-web-admin/src/views/benefit/statisticsMap/overviewContent.vue\n- 所属项目：园区物管2.0；代码基线：从苏房V3同源仓库复制而来，此前未记录「复制 Tab 页遗漏三处同步」；来源会话：a65a6cae-bf1f-497f-a3c3-feeccadacb96"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/zstable_minwidth_elastic.md",
+                "memory_type": "entities",
+                "after": "# zs-table全列设宽右侧留白\n园区物管2.0 中 zs-table 全列设 width/min-width 时右侧留白，需组件层改造让 min-width 弹性列参与剩余空间均分。\n\n## 问题根因\n- 列表页所有列都写了 width 或 min-width，右侧留白，表格撑不满容器\n- zs-table 默认 fit:false，列宽由 zs-table-column 自行计算分配\n- 原先只有「既无 width 也无 min-width」的列才参与剩余空间均分；设了 min-width 的列不参与分配，设固定 width 的列更不会，总宽小于容器就留白\n\n## 解决方案\n- 组件层改造：zs-table-column 新增 min-width 弹性列支持，仅设 min-width 未设 width 的列按内容计算宽度并参与剩余空间分配，分配结果不低于配置的 min-width\n- 固定 width 列行为保持不变\n- 页面侧把「银行账号 width=220」「交易时间 width=250」改成 min-width 即可撑满\n- 约定：希望列既保底又参与均分时用 min-width 不写 width；min-width 去掉则完全走自动宽度\n\n## 验证与归属\n- 验证：改 zs-table-column.vue 增加 min-width 弹性列分支，pubBankAccountInfo/index.vue 固定 width 改 min-width\n- 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、zhi2-web-admin/src/views/benefit/pubBankAccountInfo/index.vue\n- 所属项目：园区物管2.0；代码基线：已知 zs-table 固定宽列参与均分(#486)、写死 width 致表头省略(#871)、拉伸列注册 uid 不一致(#724)，但「min-width 列不参与均分导致右侧留白」组件层改造未记录；来源会话：a13d9179-fa05-481f-b22b-445c139f6f77"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/api_deadcode_judgment.md",
+                "memory_type": "entities",
+                "after": "# 清理src/api死代码判定口径\n园区物管2.0 中清理 src/api 死代码的唯一口径是全量扫描 import/require 引用，页面存在不代表 api 模块被引用。\n\n## 问题根因\n- 清理 zhi2-web-admin/src/api 下未被引用文件，删掉 191/253 个，其中不少（如 pubExpenditureContract.js）对应业务页面仍在线上使用\n- 本项目的页面有两种调接口方式：import 具体 api 模块，或用 businessName + 通用 request 直接拼路径调接口\n- 后者不会 import api 文件，因此「该业务的页面存在」不能作为 api 模块被引用的证据，反之 api 模块存在也不代表被引用\n\n## 解决方案\n- 判定 api 文件是否死代码的唯一口径是全量扫描 src 下 .vue/.js/.ts 文件中对 @/api/... 的 import/require 引用，而不是按业务模块名对应关系推断\n- 保留 index.js（请求基础封装）与确实被引用的模块\n- 删除前先做引用扫描脚本（scripts/find-unused-api.cjs），并告知用户可 git 还原兜底\n- 清理这类文件时不要顺手删业务页面\n\n## 验证与归属\n- 验证：253→62 个文件，明确「页面通过 businessName + 通用 request 直接调接口，并未 import 这些 API 模块，因此属于死代码」\n- 涉及文件：zhi2-web-admin/scripts/find-unused-api.cjs、zhi2-web-admin/src/api\n- 所属项目：园区物管2.0；代码基线：已知 #788 记录用户删除 api 文件「按模块点名」偏好，但「页面存在不代表 api 被引用」判定口径未记录；来源会话：4dcb3aac-8c69-43f1-a70b-6dfffc8c42c7"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/echarts_pie_downplay.md",
+                "memory_type": "entities",
+                "after": "# ECharts饼图hover高亮不消失\n园区物管2.0 中 ECharts 饼图手动 dispatchAction highlight 后必须配 downplay 成对，否则 mouseout 后扇区保持放大不恢复。\n\n## 问题根因\n- ECharts 饼图实现「图例/扇区 hover 联动高亮放大」，鼠标移出后扇区仍保持放大高亮不恢复\n- 共享模块 pieLegendHover.js 在 mouseover 时用 dispatchAction({type:'highlight'}) 触发 emphasis（PIE_SERIES_EMPHASIS scale:true）\n- mouseout/globalout 只重置了图例 DOM 样式，没有派发 downplay，ECharts 内部的 emphasis 状态不会被图表外部样式操作还原\n\n## 解决方案\n- 手动 dispatchAction highlight 与 downplay 必须成对出现：mouseout（按 seriesType==='pie' 且带 seriesIndex/name）和 globalout（无条件清全部）里调 dispatchAction({type:'downplay'})，同时把图例恢复默认态\n- 该逻辑收敛在共享的 pieLegendHover 模块，多个页面的饼图/环形图共用，一处修全局生效\n- 写任何「手动 dispatchAction 交互增强」时都按此对称原则自查\n\n## 验证与归属\n- 验证：pieLegendHover.js 增加 resetPieHover 在 mouseout/globalout 派发 downplay 并恢复图例\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/pieLegendHover.js、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue\n- 所属项目：园区物管2.0；代码基线：已知图表类条目为裁剪包缺 series(#1)、markRaw(#4)、type=2d 同层渲染(#40)、穿屏与图例缺色(#47)、原生叠加层(#38)，无「highlight 后必须 downplay」条目；来源会话：1ffbe0a9-01c9-4c6e-8964-74902067048b"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid、stats_card_flicker\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、edit_popup_detail_field_loss、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、amount_input_precision_loss、project_switch_soft_refresh",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid、stats_card_flicker、copy_tab_three_sync、zstable_minwidth_elastic\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal、echarts_pie_downplay\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、edit_popup_detail_field_loss、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、amount_input_precision_loss、project_switch_soft_refresh、api_deadcode_judgment"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

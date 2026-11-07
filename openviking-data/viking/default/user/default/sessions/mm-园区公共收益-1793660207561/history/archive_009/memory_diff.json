@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793660207561/history/archive_009",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T23:10:26.776644+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/approval_flowviewer_gate.md",
+                "memory_type": "entities",
+                "after": "# 企业注册审核按钮权限与flowViewer挂载三道闸\n园区公共收益项目中，company:companyRegister:approval 仅约束 zs-button 渲染，不会触发 flowViewer；flowViewer 调用受 bizState、busCode、dataId 三道闸拦截。\n\n## 问题根因\n- v-hasPermi 的 company:companyRegister:approval 只控制按钮壳，特定角色无审核按钮且 Network 无 /flowable/task/flowViewer 时勿先查此权限\n- zs-approval 仅在 OperationBtnGroup 中 bizState==1 && showApproval 时挂载；flowViewer 在挂载且 getKey() 未提前 return 时才调用\n- getKey() 在 !getId()&&!id 或 !$route.meta.busCode 时直接 return，常见为该角色菜单树叶子路由未配 busCode（经 /system/menu/listRouters 按角色生成 meta）\n\n## 排查与解决方案\n- 排查顺序：当前路由 meta.busCode → URL/primaryKey 取 dataId → form.bizState → 对比角色菜单配置\n- 次要原因：角色看到 bizState !== 1 导致组件未挂载\n- 确保角色菜单「企业注册」叶子路由配置 busCode，或从待办/全量菜单进入与残缺菜单进入 meta 一致\n\n## 验证与归属\n- 验证：会话 af6dbc70 用户反馈特定角色未调 flowViewer、超管正常，结论列三道拦截及菜单 busCode 按角色下发差异\n- 涉及文件：zs-approval/index.vue、OperationBtnGroup/index.vue、companyRegister/detail.vue、system/menu/index.vue\n- 所属项目：园区公共收益；来源会话：af6dbc70-f0b6-4b96-8516-bdf350b8dbe6；代码基线：b6bf87d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/resetpwd_dialog_skip.md",
+                "memory_type": "entities",
+                "after": "# 强制改密弹窗刷新被跳过与isUpdatePwd门禁覆盖\n园区公共收益项目中，登录响应 isUpdatePwd:false 需强制改密，但 GetInfo 异步回写可能覆盖 store 标记导致刷新跳过弹窗。\n\n## 问题根因\n- 登录响应 isUpdatePwd:false（需改密）时，layout/permission 展示 ResetPwdDialog 后，GetInfo 或其他用户信息拉取把 store 改密标记冲掉\n- 现象：「刷新页面就跳过强制改密」「isUpdatePwd 为 false 却不弹窗」\n- 仅用单次 login 响应驱动弹窗而无并发拉取保护会导致状态丢失\n\n## 修复要点\n- 在 user 模块与路由守卫链路保证强制改密标记在 GetInfo 之后仍生效（或 GetInfo 合并时保留需改密状态）\n- 直到用户完成改密前不清除标记；profile/resetPwd 提交后再清理状态\n- 涉及 permission.js、layout、ResetPwdDialog 与 store/modules/user.js\n\n## 验证与归属\n- 验证：会话 b3e919f5 用户报强制改密刷新跳过、isUpdatePwd false 无弹窗；子模块提交 fix(user) 修复覆盖问题（27cece7ce）\n- 涉及文件：store/modules/user.js、permission.js、layout/index.vue、home/ResetPwdDialog.vue\n- 所属项目：园区公共收益；来源会话：b3e919f5-8279-449b-bd26-f23578eddea1；代码基线：bac29bb"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/workflow_config_buscode.md",
+                "memory_type": "entities",
+                "after": "# 流程配置维护页无busCode禁止开弹窗\n园区公共收益项目中，tool/workflow 与流程配置弹窗联动规则要求业务编码隐藏且来自菜单，无 busCode 时不打开 ConfigDialog。\n\n## 问题根因\n- 流程名称改为必填；业务编码字段 UI 隐藏，实际 busCode 来自菜单\n- 新增/编辑流程配置时若选中菜单数据没有业务编码，打开弹窗会导致手填 busCode 与线上路由 meta 双源不一致\n\n## 解决方案\n- 无业务编码时不打开 ConfigDialog，直接 message 提示「请先前往菜单管理配置菜单业务编码」\n- 避免在流程工具里手填 busCode，统一从菜单管理配置\n\n## 验证与归属\n- 验证：会话 51f3071e 用户诉求业务编码隐藏、无业务编码不弹窗并提示前往菜单管理配置\n- 涉及文件：tool/workflow/index.vue、ConfigDialog.vue、ConfigTable.vue\n- 所属项目：园区公共收益；来源会话：51f3071e-0992-4ca2-b14d-e0fa6c2d181d；代码基线：479ebe7"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/repo_frontend_only.md",
+                "memory_type": "entities",
+                "after": "# 园区公共收益仓库仅含前端与2.0接口对照\n园区公共收益仓库 d:\\repository\\园区公共收益 仅含 zhi2-web-admin 前端，contractGuard 等 2.0 接口需查独立 BE 或 V0 对照。\n\n## 事实描述\n- 全盘搜索无 Java/MyBatis 后端，前端调用的 /maintenance/contractGuard 属于 2.0 独立后端（GitLab BE 或网关 Swagger）\n- 联调 usccBName 模糊查询、已付金额/付款比例等逻辑时，旧实现可参考 d:\\repository\\园区V0\\EstateManagement-Park\\...\\mtpl\\ 下 MtplContractGuard* 与 Mapper.xml\n- 模块与 URL 与 2.0 不是同一套，只能作字段与 SQL 思路对照，不能直接当现网契约\n\n## 验证与归属\n- 验证：会话 9a44f1a5 工作区 Java 搜索无结果，发现园区 V0 mtpl 合同守护实现与 2.0 接口分离\n- 涉及文件：maintenance/contractGuard/index.vue、detail.vue\n- 所属项目：园区公共收益；来源会话：9a44f1a5-9f37-49c4-994c-c50b9acce0c6；代码基线：0abcb96"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

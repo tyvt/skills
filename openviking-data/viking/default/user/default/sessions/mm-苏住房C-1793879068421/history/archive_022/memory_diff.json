@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_022",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T12:49:37.115592+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/sfb_gateway_do.md",
+                "memory_type": "entities",
+                "after": "# 苏服办网关分发请求格式\n苏住房C 在开启 VITE_APP_USE_SFB_DISPATCHER=1 后，所有接口统一 POST 到苏服办开放平台 gateway.do，由 header 中的 zs-path 指定真实路径。\n\n## 请求地址与开关\n- 开启 VITE_APP_USE_SFB_DISPATCHER=1 后，所有接口统一 POST 到 https://ydzt.jszwfw.gov.cn/jpaas-jags-server/interface/gateway.do\n- 苏服办开放平台仅上架 2 个 interface_id（GET 类 / POST 类），替代旧方案每个业务接口单独上架 interface_id\n\n## FormData 字段\n- app_id：应用 ID；interface_id：GET 类或 POST 类接口 ID\n- biz_content：业务参数 JSON，如 {\"pageNum\":1,\"pageSize\":10}\n- header：含 Authorization、zs-path、zs-sign 等\n- sign：SM3 网关签名；timestamp：时间戳\n\n## 转发机制\n- 真实路径由 header 里的 zs-path 告诉后端，后端内部转发\n- 改造涉及 dispatcher.js、httpInstance.js、sign.js 等文件\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：87362be2-5517-4bea-9e71-248ff12f95d1\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/uniform_desensitize.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C 统一脱敏规则\n苏住房C 已统一全项目脱敏规则，并在用户 Store 中以 getter 实时计算脱敏值，避免旧缓存导致规则不生效。\n\n## 脱敏规则（src/utils/formatter.js）\n- 中文姓名：保留第 1 位，其余用 *（如 朱楠 → 朱*，李小明 → 李**）\n- 手机号：保留第 1 位和最后 2 位（如 18360916552 → 1********52）\n- 身份证号：保留前 2 位和后 2 位（如 320105199001011234 → 32**************34）\n- 新增 blurIdNumber 函数用于身份证脱敏\n\n## 用户 Store 改造（src/store/user.js）\n- secureUsername、securePhone、secureIdNumber 改为 getter，根据原始数据实时计算脱敏值\n- 避免旧缓存导致脱敏规则不生效\n\n## 使用范围\n- 加装电梯模块 addAlone.vue、add.vue、input.vue 已使用 userStore.secureUsername 和 userStore.securePhone\n- committee/application/index.vue 也适用统一规则\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：2f8d30cf-a249-4fbe-8c17-0429bc7bc7e6\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/wechat_call_fallback.md",
+                "memory_type": "entities",
+                "after": "# 苏服办拨号兼容与降级策略\n苏住房C 在苏服办 App 与微信环境采用不同拨号方式，微信环境增加 tel: 协议降级以避免页面崩溃。\n\n## 环境差异\n- 苏服办 App：使用 jmportal.communication.callPhone，已可用\n- 微信：依赖 lightAppJssdk.device.call 与 wx.miniProgram.navigateTo；若不在苏服办小程序 webview 中，wx.miniProgram 不存在会报错\n\n## 微信降级策略\n- 优先尝试苏服办 SDK（等待 / 动态加载 jweixin）\n- SDK 不可用或调用失败时，自动降级为 tel: 协议拨号\n- 用 try-catch 捕获 wx.miniProgram.navigateTo 的同步报错，避免页面崩溃\n- 苏服办 App 仍只走官方 SDK，逻辑不变\n\n## 涉及文件\n- src/utils/sfb.js、src/pages.json、src/pages/policy/fddydetail.vue、szffluzm/index.html\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：11c71496-2c86-4af0-8987-a08453f769f0\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/housecard_icon_fix.md",
+                "memory_type": "entities",
+                "after": "# houseCard 定位图标布局修复\n苏住房C 的 houseCard 卡片底部地址栏定位图标在双列窄卡片中被压缩消失，已通过补充 flex-shrink:0 修复。\n\n## 问题原因\n- 地址栏为 flex 布局，新房 | 前缀设 flex-shrink: 0，但定位图标 .orientation 未设置\n- 双列窄卡片里图标被压缩到 0 宽度，只显示「新房 | 高新区」而看不到图标\n\n## 修复方式\n- 在 houseCard.vue 中为 .orientation 补上 flex-shrink: 0（width: 9px; height: 10px; margin-right: 5px）\n- 该组件用于苏找房页「推荐 / 新房 / 二手房」三个 Tab，修复后三列表均正常显示白色定位图标\n\n## 涉及文件\n- zhi2-mobile-shimin/src/components/commonNew/houseCard.vue\n- zhi2-mobile-shimin/src/pages/index/components/Project_Suzhufang.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：61371a3a-6a5f-4dcd-a98f-26224110a6a9\n- 代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

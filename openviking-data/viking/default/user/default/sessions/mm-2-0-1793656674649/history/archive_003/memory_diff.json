@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793656674649/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T22:03:11.757092+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/el_dialog_header.md",
+                "memory_type": "entities",
+                "after": "# Element Plus el-dialog 标题插槽须用 #header\nVue3 + Element Plus 迁移后 `el-dialog` 标题插槽名为 `#header`，须为直接子节点，不可嵌套或重复 `#title`。\n\n## 问题根因\n- Vue3 + Element Plus 中 `el-dialog` 标题插槽名为 `#header`，而非 Vue2/Element UI 习惯的 `#title`\n- 具名插槽必须是 `el-dialog` 直接子节点；两个 `#title` 或把标题插槽包在 `.dialog-box` 等 div 内会触发 vite:vue 编译错误 \"Codegen node is missing for element/if/for node\"\n\n## 解决方案\n- 推荐结构：`<template #header>`（内可 `<slot name=\"title\">` + attrs 兜底）+ 默认内容 div + `<template #footer>`\n- 结论改为单一 `#header` 并去掉重复 `#title`\n\n## 验证与归属\n- 验证证据：会话 98fe164c 中 zs-dialog 报 Codegen node is missing，改为单一 #header 解决\n- 涉及文件：zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue\n- 所属项目：2-0（园区物管2.0）；来源会话：98fe164c-3ca7-4574-8920-11075d32c5c9；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue3_async_component.md",
+                "memory_type": "entities",
+                "after": "# Vue3 局部异步组件须用 defineAsyncComponent\nVue3 在 `components` 选项里直接写 `() => import(...)` 会把 Promise 当组件渲染，须改用 `defineAsyncComponent` 包裹。\n\n## 问题根因\n- 在 `components` 选项写 `Foo: () => import('...')`，Vue3 会把 Promise 当组件渲染，页面出现 `[object Promise]`（如 Settings、attachmentDraw 等）\n\n## 解决方案\n- `import { defineAsyncComponent } from 'vue'` 并写 `Foo: defineAsyncComponent(() => import('...'))`\n\n## 边界与归属\n- 路由表 `component: () => import(...)` 与 `store/modules/permission.js` 动态路由组件赋值保持原样，由 Vue Router 处理懒加载，不要套 defineAsyncComponent\n- 验证证据：会话 b06efc30 中 Settings 显示 [object Promise]，全局 20 个文件替换且明确未改 router/permission\n- 涉及文件：zhi2-web-admin/src/layout/components/Settings/index.vue、zhi2-web-admin/src/components/OperationBtnGroup/attachmentDraw.vue、zhi2-web-admin/router/index.js、zhi2-web-admin/src/store/modules/permission.js\n- 所属项目：2-0；来源会话：b06efc30-d150-4428-a1c0-f054d8e38798；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue3_native_modifier.md",
+                "memory_type": "entities",
+                "after": "# Vue3 迁移移除 .native 修饰符\nVue3 已移除 `.native` 修饰符，模板里的 `@click.native`/`@input.native` 会静默不生效，须全局检索改法。\n\n## 问题根因\n- Vue3 移除 `.native` 修饰符，`@click.native`、`@input.native` 等会静默不生效，无报错但事件不绑定\n\n## 解决方案\n- 迁 Vue3 时全局检索 `.native`（含 login 等页），改为组件自身支持的 `@click`/`v-on` 或在包裹元素上监听原生事件\n\n## 验证与归属\n- 验证证据：会话 98fe164c 中 login.vue:28 的 `.native` 写法未生效，用户要求全局搜类似写法改 Vue3\n- 涉及文件：zhi2-web-admin/assets/views/login.vue、zhi2-web-admin/src/views/login.vue\n- 所属项目：2-0；来源会话：98fe164c-3ca7-4574-8920-11075d32c5c9；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sidebar_recursive_menu.md",
+                "memory_type": "entities",
+                "before": "# 侧边栏自定义 RecursiveMenu 缩进\n园区物管2.0 的侧边栏是自定义递归组件 RecursiveMenu，缩进靠 level prop + paddingLeft 实现，与 el-menu 无关。\n\n## 现象\n- 排查侧边栏子菜单缩进/层级问题时，按 RuoYi 经典结构找 el-menu / SidebarItem / el-submenu 必然找不到病灶。\n- 全仓库仅 element-ui 静态 CSS 里还有 el-menu 样式。\n\n## 根因\n- 缩进完全不依赖 el-menu 的 indent/default-openeds，而是 RecursiveMenu.vue 内部实现。\n\n## 解决方案\n- 入口 Sidebar/index.vue 遍历 sidebarRouters，每项从 level=1 起。\n- RecursiveMenu.vue 用 level prop + 内联 paddingLeft：目录节点 paddingLeft = 24 + (level-1)*18，叶子节点 = 父组件的 paddingLeft + 18（用父级 computed，非 24+level*18），子目录递归传 :level=\"level+1\"。\n- 菜单管理页（system/menu）用 zs-table 树表懒加载，缩进走 Element 树表默认机制。\n- 改缩进/层级逻辑只动 RecursiveMenu.vue；菜单 JSON 深嵌套 + ParentView 展平时核对 level 传递是否断链。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/layout/components/Sidebar/index.vue、zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue。\n- 所属项目：园区物管2.0；来源会话：b096fe20-ff70-474d-bf2b-1e39449b1ce9；代码基线：f101dd464。",
+                "after": "# 侧边栏自定义 RecursiveMenu 组件\n园区物管2.0 的侧边栏是自定义递归组件 RecursiveMenu，缩进靠 level prop + paddingLeft 实现，与 el-menu 无关。\n\n## 现象\n- 排查侧边栏子菜单缩进/层级问题时，按 RuoYi 经典结构找 el-menu / SidebarItem / el-submenu 必然找不到病灶。\n- 全仓库仅 element-ui 静态 CSS 里还有 el-menu 样式。\n\n## 根因\n- 缩进完全不依赖 el-menu 的 indent/default-openeds，而是 RecursiveMenu.vue 内部实现。\n\n## 解决方案\n- 入口 Sidebar/index.vue 遍历 sidebarRouters，每项从 level=1 起。\n- RecursiveMenu.vue 用 level prop + 内联 paddingLeft：目录节点 paddingLeft = 24 + (level-1)*18，叶子节点 = 父组件的 paddingLeft + 18（用父级 computed，非 24+level*18），子目录递归传 :level=\"level+1\"。\n- 菜单管理页（system/menu）用 zs-table 树表懒加载，缩进走 Element 树表默认机制。\n- 改缩进/层级逻辑只动 RecursiveMenu.vue；菜单 JSON 深嵌套 + ParentView 展平时核对 level 传递是否断链。\n\n## E2E 测试方案\n- Playwright 点击不要用 `.menu-item`/`evaluate` 收集子项或全页 `a[href]`（易点到其他目录同名叶子或展开后旧 locator 卡死）\n- 组件加 data-testid：`sidebar-menu-item`（菜单块）、`sidebar-submenu`（展开子区）、`sidebar-leaf-link`（叶子链接）\n- 测试用父级标题文本定位对应 `sidebar-menu-item`，等待块内 `sidebar-submenu` 可见后，对该块内所有 `sidebar-leaf-link` 按 `.nth(j)` 顺序点击；只传标题字符串，不持有展开前的 parent 引用\n- 验证：会话 80e7c3dd E2E 与手工 DOM 顺序不一致、点「项目管理」卡住，回退点击逻辑改动后采用 testid 方案；涉及文件 RecursiveMenu.vue；所属项目 2-0；来源会话 80e7c3dd-abcf-4d74-acdd-8c8eca3b6dcc\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/layout/components/Sidebar/index.vue、zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue。\n- 所属项目：园区物管2.0；来源会话：b096fe20-ff70-474d-bf2b-1e39449b1ce9；代码基线：f101dd464。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

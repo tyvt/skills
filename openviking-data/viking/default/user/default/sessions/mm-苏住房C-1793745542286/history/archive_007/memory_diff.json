@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_007",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T22:53:49.808000+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/subpackage_page_unregistered.md",
+                "memory_type": "entities",
+                "after": "# 分包新增.vue未注册pages.json致page not found\n苏住房C小程序在 pages_my 分包新增 setting/userInfo、setting/realInfo 等 .vue 页面后，未在 pages.json 对应分包 pages 数组补注册，运行时报 navigateTo:fail page not found。\n\n## 问题现象\n- 「我的」点头像报 navigateTo:fail page \"pages_my/setting/userInfo\" is not found，但 .vue 文件确实存在\n- 编译期无任何提示，只有运行期跳转才报错\n- 同分包内 realInfo.vue（实名信息页）同理未被注册\n\n## 根因\n- uni-app 小程序页面可见性只由 pages.json 决定，右键建 .vue 不会自动注册\n- subPackages[].pages 数组漏了 setting/userInfo 等条目，运行期找不到页面\n\n## 解决方案\n- 新增页面后立刻在 pages.json 对应分包 pages 数组补一条（路径相对分包 root，如 setting/userInfo）并配 style.navigationBarTitleText\n- 报 page not found 时先搜文件是否存在：存在→查注册；不存在→查路径前缀是否写错\n- 入口页跳转路径同步核对（如 My_Suzhufang.vue），避免注册与跳转两侧各写一路径\n- 批次搬迁后做一次「分包目录下 .vue 文件 vs pages.json 注册项」对账\n\n## 验证与归属\n- 验证：会话 4cc33d41 报 userInfo 页 not found，文件存在但未在 pages_my 分包注册；补注册 setting/userInfo（个人信息）与 setting/realInfo（实名信息）两条路由\n- 涉及文件：src/pages.json、src/pages/index/components/My_Suzhufang.vue、src/pages_my/setting/userInfo.vue、src/pages_my/setting/realInfo.vue\n- 所属项目：苏住房C；来源会话ID：4cc33d41-1cbc-4887-bc8a-15d1fdcc8a0e；代码基线：9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/cursor_npm_false_alarm.md",
+                "memory_type": "entities",
+                "after": "# Cursor报npm任务检测无法分析package.json是IDE误报\n苏住房C小程序项目在 Cursor 中提示「npm 任务检测: 无法分析文件 .../zhi2-mobile-shimin/package.json」，实为 IDE 误报而非 monorepo 配置损坏。\n\n## 问题现象\n- Cursor 弹「npm 任务检测: 无法分析文件 package.json」，看起来像 npm workspaces 配错\n- 实际终端 npm run dev / build 完全正常\n\n## 根因\n- package.json 本身正常：JSON 合法、UTF-8 无 BOM、npm pkg get scripts 能读全脚本、node_modules 在仓库根（workspaces 结构）\n- 真正原因：Cursor 内置 npm 任务检测的 openTextDocument 在启动竞态 / 多 package.json 的 monorepo / 路径含中文（苏住房C）/ 依赖分析类扩展冲突时失败，被统一报成「无法分析文件」\n\n## 解决方案\n- 先确认文件没问题（JSON.parse + npm pkg get scripts），再判定为 IDE 误报，不要动 package.json\n- 处理顺序：Developer: Reload Window → 在编辑器打开并保存一次该文件 → 临时禁用依赖分析类扩展 → 仍要消提示则设 \"task.autoDetect\": \"off\"（会隐藏 NPM Scripts 面板）\n- 顺带发现：子目录 .npmrc 的 shamefully-hoist=true 是 pnpm 专用项，npm workspaces 下被忽略并产生告警，应收到根 .npmrc 并去掉 pnpm 专有项\n\n## 验证与归属\n- 验证：会话 0cb5d788 Cursor 报无法分析 zhi2-mobile-shimin/package.json；确认 JSON 合法、UTF-8 无 BOM、npm pkg get scripts 正常、node_modules 在仓库根，判定为误报并给三级处理\n- 涉及文件：zhi2-mobile-shimin/package.json、package.json（仓库根）、zhi2-mobile-shimin/.npmrc\n- 所属项目：苏住房C；来源会话ID：0cb5d788-fca6-42d1-a6c7-7f13c139c57c；代码基线：ce9e460"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/media_url_domain_mismatch.md",
+                "memory_type": "entities",
+                "after": "# resolveMediaUrl对/zs-fym走独立图片域名致生产图片404\n苏住房C小程序/H5 生产环境图片整块不显示，因 src/utils/index.js 的 resolveMediaUrl 对 /zs-fym 开头路径拼了错误的独立图片域名，未跟随 VITE_APP_API_PROXY。\n\n## 问题现象\n- 生产环境图片整块不显示，接口返回路径形如 /zs-fym/xxx/xxx.jpg\n- 排查时浏览器 Network 看图片请求完整 URL 前缀即可定位是否拼错域名\n\n## 根因\n- resolveMediaUrl 对以 /zs-fym 开头的路径走单独分支，拼 VITE_APP_IMG_PROXY_V1（http://szfang.szfcweb.cn）\n- 与 .env.production 的 VITE_APP_API_PROXY（https://szfweb.szzfcjj.cn:8887）不是同一台服务，请求落到错误域名\n\n## 解决方案\n- 去掉 /zs-fym 特殊分支，生产环境所有相对路径统一用 VITE_APP_API_PROXY 拼接\n- vite.config.ts 里本地 dev 的 /zs-fym 代理也指向同一变量，保证 dev 与 prod 同源\n- swiperImage.vue 补 :local=\"false\"，避免 ZsImage 把服务器地址当本地静态资源\n- 最终规则：/zs-fym/... 与 /zhi2-pro/file/... 都拼 API 代理；已是 https:// 的完整 URL 原样返回不重复拼接\n\n## 验证与归属\n- 验证：会话 bb5ef4f6 用户判断正确域名应为 VITE_APP_API_PROXY + 接口返回地址；确认 /zs-fym 分支拼到 VITE_APP_IMG_PROXY_V1，已改 utils/index.js、vite.config.ts、swiperImage.vue\n- 涉及文件：src/utils/index.js、vite.config.ts、src/pages/commonNew/swiperImage.vue、.env.production、src/components/ZsImage/ZsImage.vue\n- 所属项目：苏住房C；来源会话ID：bb5ef4f6-787c-49c9-b071-0b62385878d7；代码基线：a444c05"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/news_route_stale.md",
+                "memory_type": "entities",
+                "after": "# 新闻详情页迁pages_main后旧路径残留致page not found\n苏住房C小程序首页点「新闻资讯」报 navigateTo:fail page \"pages/news/detail?id=...\" is not found，因新闻详情页已迁 pages_main 分包但跳转仍用旧 /pages 路径。\n\n## 问题现象\n- 首页点「新闻资讯」报 navigateTo:fail page \"pages/news/detail?id=...\" is not found\n- 页面已迁到 pages_main/news/detail，pages.json 无旧 /pages/news/detail\n\n## 根因\n- 新闻详情页从 /pages/news/detail 迁到 pages_main/news/detail\n- 首页 Home_Suzhufang.vue 的 goNewsDetail 仍硬编码旧路径\n- menuRouteMap.js 同一批菜单也残留旧路径（3_1_10 列表、3_1_16 详情）\n\n## 解决方案\n- 跳转路径不要在各页面手写字符串，统一走 src/utils/route-map.js 的 PAGES 构造器（如 PAGES.news.detail(id)），页面迁移只改 route-map 一处\n- menuRouteMap.js 同一批菜单也需同步改成 /pages_main/news/...\n- 出现同类 page not found 按「菜单 key → menuRouteMap.js → route-map.js → 页面内硬编码跳转」顺序全量排查未迁移的 /pages/... 路径，不只修报错那处\n\n## 验证与归属\n- 验证：会话 29317b48 用户贴 MiniProgramError 报 pages/news/detail not found；定位页面已迁 pages_main，修复 Home_Suzhufang.vue 的 goNewsDetail 改用 PAGES.news.detail() 并同步 menuRouteMap.js 的 3_1_10 / 3_1_16\n- 涉及文件：src/pages/index/components/Home_Suzhufang.vue、src/utils/route-map.js、src/utils/menuRouteMap.js、src/pages.json\n- 所属项目：苏住房C；来源会话ID：29317b48-dcb1-481b-a230-4459674df2a0；代码基线：9832ba3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

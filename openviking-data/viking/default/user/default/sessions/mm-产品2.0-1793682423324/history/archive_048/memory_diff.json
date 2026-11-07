@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_048",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:06:38.649425+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tmap_onopen_loadmap.md",
+                "memory_type": "entities",
+                "after": "# ZsTencentMap弹窗TMap未定义需await loadMap\nZsTencentMap地图弹窗因SDK异步加载未等待导致TMap is not defined的缺陷与修复方案。\n\n## 问题根因\n- 组件created()调用loadMap()加载腾讯地图SDK脚本但不等待完成\n- 弹窗onOpen()在$nextTick里直接init()，此时SDK脚本尚未加载完，全局TMap不存在\n- 根因：脚本动态加载是异步的，任何依赖全局SDK的init都必须await\n\n## 解决方案\n- onOpen()改为loadMap().then(() => this.$nextTick(() => this.init())).catch(() => msgError('腾讯地图加载失败，请检查系统配置'))\n- created()里loadMap()保留作预加载，loadMap内部复用同一个Promise，不会重复注入脚本\n- 适用于所有以<script>注入方式加载的第三方地图/图表SDK\n- 若仍失败需检查系统配置的腾讯地图Key（qq.map.key）\n\n## 验证与归属\n- 验证证据：会话c02c94c0报错栈在ZsTencentMap/index.vue；修复代码onOpen()串接loadMap().then\n- 涉及文件：zhi2-web-admin/src/components/ZsTencentMap/index.vue、zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js\n- 所属项目：产品2.0；来源会话ID：c02c94c0-4ea3-4558-a2c3-49dd740548de；代码基线：5169909"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/listtemplate_tablerowstyle.md",
+                "memory_type": "entities",
+                "after": "# ListTemplate模板绑定tableRowStyle缺mixin默认实现\nListTemplate.js模板绑定:row-style=\"tableRowStyle\"但table.js mixin未定义导致的渲染报错与契约修复。\n\n## 问题根因\n- ListTemplate.js模板绑定:row-style=\"tableRowStyle\"，该方法应由table.js mixin提供\n- subTableMixins→table链路里mixin未定义tableRowStyle，子表渲染命中未定义绑定\n- 属于模板与mixin之间的契约缺口，非页面写错选项位置\n\n## 解决方案\n- 在table.js的computed中补默认tableRowStyle返回null（无自定义行样式用默认）\n- 需要行样式的页面在各自组件里重写该计算属性\n- 排查类似问题：ListTemplate模板出现的绑定在页面报未定义，优先怀疑mixin缺默认实现\n\n## 验证与归属\n- 验证证据：会话9acb00ce报错组件parkingTable.vue（经zs-tabs/Headline/detail.vue链路）；修复为table.js computed增加返回null默认tableRowStyle\n- 涉及文件：zhi2-web-admin/src/mixins/table.js、ListTemplate.js、subTableMixins.js\n- 所属项目：产品2.0；来源会话ID：9acb00ce-4277-4a60-97c9-c4001384dfcd；代码基线：76646e6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tree_flat_filter_clear.md",
+                "memory_type": "entities",
+                "after": "# 树状平铺双模式切换需清理专属筛选字段\n楼盘/项目列表页树状与平铺模式共用queryParams时，切换模式须清理对方专属筛选字段以防残留。\n\n## 问题根因\n- 列表页同时支持树状（左侧行政区域树）与平铺，共用同一套queryParams\n- 平铺模式按region/subdistrict/community/address/日期筛选后切回树状，树重置但列表仍显示旧筛选\n- syncListParentDeptFilter只清parentDeptId，平铺专属字段（region、subdistrict、community、address、startDate、endDate）仍留queryParams\n- handleTreeReady设置新parentDeptId后getList()带旧条件查询\n\n## 解决方案\n- 切换模式同步函数按模式清理对方专属字段：切回树状时clearFlatModeQueryParams遍历平铺专属字段置undefined\n- 再由树就绪回调handleTreeReady按默认节点刷新列表\n- 通用套路：同一列表组件多模式复用时，queryParams必须在模式切换时做模式专属字段清理，不能只清模式主键\n\n## 验证与归属\n- 验证证据：会话47d34879根因是切换展示模式时列表筛选条件没和树同步，修复为syncListParentDeptFilter切回树状清除flatOnlyFields后由handleTreeReady刷新\n- 涉及文件：zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue\n- 所属项目：产品2.0；来源会话ID：47d34879-47c4-4fc8-beb8-6a3e1375d999；代码基线：645607c"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/ruoyi_getid_action.md",
+                "memory_type": "entities",
+                "after": "# getId解析路由主键须排除动作段\nutils/ruoyi.js的getId()从路径末段解析业务主键时须排除/add等动作段，否则新增页拿到假主键。\n\n## 问题根因\n- getId()按约定从路由路径末段解析业务主键\n- 新增页路由末段是字面量'add'（如/xxx/project/add），会把'add'当id返回\n- getId的「末段即主键」启发式未排除非ID动作词段，新增路由无:tableid动态段\n\n## 解决方案\n- 在getId解析处排除'add'及类似动作段，命中动作词时不当作主键返回\n- 推广：所有「从路径末段取主键」工具都要对已知动作段（add/detail/edit等）做排除白名单\n- 新增页要用主键时走query.id或保存后返回值，而非路径段\n\n## 验证与归属\n- 验证证据：用户诉求ruoyi.js:47-53需排除/add；修复随提交ee38c27合入\n- 涉及文件：zhi2-web-admin/src/utils/ruoyi.js\n- 所属项目：产品2.0；来源会话ID：8f101920-674b-4cf2-a996-0d54083efaac；代码基线：c420af5"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

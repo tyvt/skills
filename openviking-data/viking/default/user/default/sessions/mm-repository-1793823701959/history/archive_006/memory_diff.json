@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-repository-1793823701959/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T20:43:27.842720+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/income_expense_dict_blank.md",
+                "memory_type": "entities",
+                "after": "# incomeExpenseDetail字典缺失致列空白\nincomeExpenseDetail.vue 中两列使用全局 dictFormatter 因未初始化字典选项数组导致单元格显示空白，已补齐字典。\n\n## 问题根因\n- 表格列使用 :formatter=\"dictFormatter\" 依赖全局字典选项数组\n- incomeExpenseDetail.vue 未初始化 isCorrectionOptions / isBusinessReconciliationOptions\n- dictFormatter 找不到对应选项返回空字符串，导致“是否冲正”“是否已对账”列空白\n\n## 解决方案\n- 在 incomeExpenseDetail.vue 中定义 isCorrectionOptions: [] 与 isBusinessReconciliationOptions: []\n- created() 调用 initDict() 拉取 benefit_is_correction 与 benefit_is_business_reconciliation 字典\n- 刷新后对应列正常显示文案\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=repository\n- 涉及文件：src/views/benefit/statisticsMap/incomeExpenseDetail.vue\n- 来源会话ID：7111a4be-91a8-4d4e-86f1-04e6cabb0d0c\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/operating_assets_empty.md",
+                "memory_type": "entities",
+                "after": "# operatingAssets无数据空白修复\noperatingAssets.vue 在资产明细无数据时未显示占位，已添加“暂无数据”条件渲染与样式。\n\n## 问题根因\n- 表格 body 区域未处理 tableRows.length === 0 的空状态\n- 原 bug 反馈接口有数据但页面没展示，实际修复为空状态展示\n\n## 解决方案\n- 在表格 body 增加条件渲染：tableRows.length > 0 渲染列表，否则显示 <div class=\"operating-assets__table-empty\">暂无数据</div>\n- 新增 operating-assets__table-empty 样式，保证明细区域内居中展示\n- 修改文件 src/views/benefit/statisticsMap/operatingAssets.vue，无新增 lint 报错\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=repository\n- 涉及文件：src/views/benefit/statisticsMap/operatingAssets.vue\n- 来源会话ID：009b156c-7e38-4831-9716-5483987c41c5\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/map_zoom_overview.md",
+                "memory_type": "entities",
+                "before": "# Map组件缩放监听误触概览显示\nMap组件监听地图zoom_changed事件并emit clickMark/hoverMark false，导致搜索引发缩放变动时误触发概览内容显示。\n\n## 问题根因\n- src/components/Map/index.vue 监听地图 zoom_changed 事件\n- 监听回调内 emit clickMark/hoverMark 为 false\n- 搜索操作引发缩放级别变动，间接触发 overview-content 显示\n\n## 解决方案\n- 审查 zoom_changed 监听逻辑，避免搜索缩放联动误 emit 关闭标记\n- 区分用户主动交互与程序缩放变动的触发来源\n\n## 验证与归属\n- 验证：会话 0c978c4d-3266-400e-856a-6b12b6446659 中搜索导致概览异常显示\n- 涉及文件：src/components/Map/index.vue\n- 来源会话ID：0c978c4d-3266-400e-856a-6b12b6446659\n- 代码基线：none",
+                "after": "# Map组件缩放监听误触概览显示\nMap组件监听地图zoom_changed事件并emit clickMark/hoverMark false，导致搜索引发缩放变动时误触发概览内容显示。\n\n## 问题根因\n- src/components/Map/index.vue 监听地图 zoom_changed 事件\n- 监听回调内 emit clickMark/hoverMark 为 false\n- 搜索操作引发缩放级别变动，间接触发 overview-content 显示\n- 父组件 src/views/benefit/statisticsMap/index.vue 中 @clickMark 绑定 showOverviewContent\n- showOverviewContent 原仅接收 menu 参数并无条件将 contentVisible 设为 true，导致传入 false 也被当作点击标记处理而打开抽屉\n\n## 解决方案\n- 在 statisticsMap/index.vue 的 showOverviewContent 中增加参数判断，仅当参数为 true 时才设 contentVisible 为 true\n- 保留 Map 组件 zoom_changed 监听逻辑，父组件不再误响应 false 而打开概览\n\n## 验证与归属\n- 验证：会话 0c978c4d-3266-400e-856a-6b12b6446659 中搜索导致概览异常显示\n- 涉及文件：src/components/Map/index.vue、src/views/benefit/statisticsMap/index.vue\n- 来源会话ID：0c978c4d-3266-400e-856a-6b12b6446659\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/dict_init_blank.md",
+                "memory_type": "entities",
+                "before": "# dictFormatter缺字典初始化致列空白\n资产类型列使用 dictFormatter 展示时因字典未预加载导致列内容空白，需在组件补齐字典初始化逻辑。\n\n## 问题根因\n- 资产类型列使用 dictFormatter 依赖预加载字典\n- assetLease.vue 未初始化字典，导致格式化无数据可查\n\n## 解决方案\n- 在 assetLease.vue 补齐与 pubAssetLease/index.vue 一致的字典初始化逻辑\n- 确保字典在列渲染前完成加载\n\n## 验证与归属\n- 验证：会话 6baca9f8-fd57-451d-8849-6e4937fcffa8 资产类型列空白修复\n- 涉及文件：assetLease.vue、pubAssetLease/index.vue\n- 来源会话ID：6baca9f8-fd57-451d-8849-6e4937fcffa8\n- 代码基线：none",
+                "after": "# assetLease.vue字典初始化与切换按钮修复\n资产租赁页 assetLease.vue 存在资产类型列空白及顶部切换按钮未传资产类型重新请求接口的问题，已在会话 6baca9f8 中修复。\n\n## 问题根因\n- 资产类型列使用 dictFormatter 依赖预加载字典\n- assetLease.vue 未初始化字典，导致格式化无数据可查\n- 缺失字典包括 BIZ_STATE、PUB_ASSET_TYPE、PUB_SETTLEMENT_MODE、PUB_LEASE_MODE、PUB_LEASE_TYPE、sys_yes_no\n\n## 解决方案\n- 在 assetLease.vue 补齐与 pubAssetLease/index.vue 一致的字典初始化逻辑，包含 BIZ_STATE、PUB_ASSET_TYPE、PUB_SETTLEMENT_MODE、PUB_LEASE_MODE、PUB_LEASE_TYPE、sys_yes_no\n- 确保字典在列渲染前完成加载，资产类型列正常显示中文名称\n\n## 切换按钮传参修复\n- 顶部 4 个圆角按钮 value 分别为 '4' | '3' | '2' | '1'\n- 点击时更新 activeAssetType、写入 queryParams.assetType、重置 pageNum=1 并调用 getList() 重新请求 listPubAssetLease 接口\n- 接口参数始终带当前资产类型，保留从地图传入的 leaseProje\n\n## 验证与归属\n- 验证：会话 6baca9f8-fd57-451d-8849-6e4937fcffa8 资产类型列空白修复\n- 涉及文件：assetLease.vue、pubAssetLease/index.vue\n- 来源会话ID：6baca9f8-fd57-451d-8849-6e4937fcffa8\n- 代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

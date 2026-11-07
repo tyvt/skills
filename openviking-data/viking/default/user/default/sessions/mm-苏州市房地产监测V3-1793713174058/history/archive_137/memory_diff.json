@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793713174058/history/archive_137",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T18:12:16.223610+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/area_js_zoneoptions.md",
+                "memory_type": "entities",
+                "after": "# area.js getZoneNameByCode 读不存在的 this.zoneOptions\narea.js 的 getZoneNameByCode 方法内部读取了本 mixin 及其依赖中根本不存在的 this.zoneOptions，任何调用路径都会抛出 TypeError。\n\n## 问题根因\n- getZoneNameByCode 内部读取 this.zoneOptions，但该属性在 area.js mixin 及其依赖里根本不存在\n- 全仓近乎零引用，页面上不发作，躲过运行时与常规回归\n- 直到逐行读源码或写文档时才暴露，属潜伏缺陷\n\n## 影响与风险\n- 下次有人「顺手用一下」该导出方法时会直接抛 TypeError: Cannot read properties of undefined\n- 没被调用 ≠ 没问题，潜伏缺陷会在新调用方接入时爆掉\n\n## 核对结论与上报\n- 本项目核对 src/mixins 全部 18 个文件，产出 4 条待裁决结论（任务文本写 19 个文件但实际 18 个）\n- bTerminalProjectMixin/approval 全仓零引用；area.js getZoneNameByCode 读不存在的 this.zoneOptions\n- dialog-form-mode → dialogMode 映射无源码确证\n- 核对结论已作为独立产出上报 Lead（session-dd2640d3），不直接改源码\n\n## 涉及文件与归属\n- 涉及文件：zhi2-web-admin/src/mixins/area.js、bTerminalProjectMixin.js、approval.js、docs/frontend/mixins-guide.md\n- 来源会话：session-dd2640d3-2200-4bc4-8109-659264d6ff88、207843bf-0a68-4693-b234-2fc82bfa727b；代码基线：a86bf95"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/four_upload_components.md",
+                "memory_type": "entities",
+                "after": "# 四个上传组件别混用：值类型与契约各异\n本项目四个上传附件组件（zs-file-upload / FileUpload / AnnexUpload / AppendixPackageSection）的 props 契约、绑定方式与值类型均不同，写错一个不报错但数据为空。\n\n## 组件差异\n- zs-file-upload：回填字段是 url，适用于普通单文件上传\n- FileUpload：回填字段是 fileSite，与 zs-file-upload 的 url 不能互换，写错字段名回显即空\n- AnnexUpload：非 v-model 绑定，传 bus+id 让组件自行按业务编码拉附件列表；查看态须切只读要件组件，不能复用 AnnexUpload\n- AppendixPackageSection：要件包组件，值类型与前几者不同，新增态与编辑态校验时机不同源\n\n## 选型检查项\n- 改造前先确认：① 组件是哪个 ② 回填字段叫什么 ③ 要件 busCode 来源（路由 meta 优先，不依赖路由时按主体给固定值，不能全站回退同一值）④ 请求是否需进加解密白名单\n- 接口加解密是全局链路，某上传组件请求未进白名单时文件传不上去\n\n## 加密改造原则\n- 加密改造按接口逐个核查（docs/加密改造-非JSON接口核查清单.md 只引结论），不要整体开关式替换\n- 验签与加解密是两套独立链路，需分别确认\n\n## 涉及文件与归属\n- 涉及文件：zs-file-upload.vue、FileUpload/index.vue、AnnexUpload/index.vue、AppendixPackageSection/index.vue、docs/frontend/page-recipes.md、docs/加密改造-非JSON接口核查清单.md\n- 来源会话：session-dd2640d3-2200-4bc4-8109-659264d6ff88、9c09226d-8b25-4c30-a875-1a0f0848acda；代码基线：a86bf95"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/page_four_paradigms.md",
+                "memory_type": "entities",
+                "after": "# 本后台页面四范式：可直接复制的页面骨架\n本 Vue2 生成式模板后台的新页面落地需遵循四套页面范式（列表/详情/子表/弹窗），而非每页自创结构。\n\n## 四种页面范式\n- 范式 A 列表：building/plot/index.vue 为 <script>-only（不写 <template>），配 ListTemplate.js + listMixins；列表列统一用公共 ListTemplate + 字典列配置，不改写 tableData\n- 范式 B 详情/保存：building/plot/detail.vue 用 zs-form ref=\"form\" + operation-btn-group；提交体接 :submit-data，主键走 getDetailParams 返回裸 id\n- 范式 C 子表：ParcelTable.vue 用模板 A + SubTableToolbar（挂区块标题栏）；bizState 四处同改表，与 docs/子表增删按钮显隐判断规范.md 一致\n- 范式 D 弹窗：CandidateDialog.vue 用 dialogMixins + @open 拉数（不在 created 拉，避免复用脏数据）；选择项统一走 SelectDialog.open()\n\n## 硬约束\n- ESLint 禁止 label-width、禁止 label-position=\"left\"，Options API 须简写；弹窗布局与选择器后缀有专用 scripts/check-*.mjs\n- 占位合同统一用 /example/record + recordId，示例页须来自仓库真实页面\n\n## 涉及文件与归属\n- 涉及文件：building/plot/index.vue、detail.vue、ParcelTable.vue、CandidateDialog.vue、ListTemplate.js、docs/frontend/page-recipes.md\n- 来源会话：session-dd2640d3、9c09226d-8b25-4c30-a875-1a0f0848acda；代码基线：a86bf95"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/button_permission_empty.md",
+                "memory_type": "entities",
+                "after": "# 临时放开按钮权限只能写 permission: [] 且交付前接回真实权限串\n四个证书管理页调试时将按钮 attrs.permission 改为 [] 或 false 以绕过校验，但空权限数组语义是「无任何权限要求」，等于对所有登录用户开放。\n\n## 问题根因\n- permission: [] 语义是「没有任何权限要求」而非「权限待定」，按钮对所有登录用户可见可点\n- 列表页 mixin table.js 的 operationButtons()（工具栏）与 buttons()（行操作）产出按钮，ListTemplate.js 渲染前做权限过滤，空数组一路放行\n- 不报错也不告警，是最易被忽略的状态\n\n## 交付红线\n- permission: [] / permission: false 只能本地调试，不得进入提交；交付前必须接回真实权限串 [this.perms.add] / [this.perms.remove]\n- 真实权限串由页面 perms 映射提供，菜单权限与代码权限串须同一口径\n- 排查「按钮该显未显/不该显却显」时先看 attrs.permission 是否为空数组或 false\n\n## 涉及文件与归属\n- 涉及文件：stateLandLic/index.vue、StateTable.vue、PlanTable.vue、LicTable.vue、src/mixins/table.js、ListTemplate.js\n- 来源会话：session-5a6b17af-0563-48cc-9291-a5ae66869a16；代码基线：235e6ee"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

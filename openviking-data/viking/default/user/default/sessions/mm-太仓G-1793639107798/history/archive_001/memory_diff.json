@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793639107798/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T17:06:46.457162+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/maintain_decision_permi.md",
+                "memory_type": "entities",
+                "after": "# 维修资金表决菜单权限前缀不一致致按钮隐藏\n太仓G端重构后维修资金表决页面组件路径与后台菜单权限前缀不一致，导致详情按钮全隐藏。\n\n## 问题根因\n- 页面组件为 `estate/maintainDecision/*`，代码按钮权限常写 `estate:maintainDecision:*`\n- 后台菜单可能仍配旧前缀 `estate:ownerDecision:*`，角色只配旧串时 `v-hasPermi`/`checkPermission` 全部失配\n- `ownerDecision` 固定 `decisionType=OWNERS`，运维误配会查错数据\n\n## 修复约定\n- 页面与 `decisionCommon/config` 权限判断同时接受两套前缀（`estate:ownerDecision:xxx` 与 `estate:maintainDecision:xxx` 任一命中即可）\n- 运维侧按模块核对菜单组件路径必须是 `maintainDecision` 而非 `ownerDecision`\n\n## 验证与归属\n- 验证证据：会话 0a42918d 用户报维修资金表决很多按钮看不到但权限已配\n- 涉及文件：zhi1-web-admin/src/views/estate/maintainDecision/detail.vue、ownerDecision/detail.vue、decisionCommon/config.js、components/OperationContainer/index.vue\n- 所属项目：太仓G；来源会话：0a42918d-d7b1-492b-8365-de6556f0a811；代码基线：9638e2f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/decision_vote_source.md",
+                "memory_type": "entities",
+                "after": "# 决策明细投票来源列须绑定字典\n太仓G端 decisionCommon 公共表组件未绑定 voteSource 与 vote_source 字典，导致决策明细单元格空白。\n\n## 问题根因\n- 一般表决、业委会选举等详情共用 `decisionCommon/components/DecisionRangeTable.vue`\n- 字段为 `voteSource`，展示依赖字典 `vote_source`（getDict + dictFormatter / voteSourceOptions）\n- 列未接字典映射时接口有值但单元格空白\n\n## 修复方案\n- 在公共表组件内补列与 formatter，不要只改各业务目录下已废弃的 `ownerDecision/components/DecisionRangeTable.vue` 副本\n- 仍为空时核对系统字典是否存在与接口返回值同型的项（如值为 \"1\"）\n\n## 验证与归属\n- 验证证据：会话 b44fb3cc 一般表决详情决策明细「投票来源」未显示；修复后业委会选举同步生效\n- 涉及文件：zhi1-web-admin/src/views/estate/decisionCommon/components/DecisionRangeTable.vue、generalDecision/detail.vue、ownerDecision/detail.vue\n- 所属项目：太仓G；来源会话：b44fb3cc-ab35-40cd-83f7-88fb4078ce58；代码基线：cf80bc8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dynamic_fixed_column.md",
+                "memory_type": "entities",
+                "after": "# Tab切换动态插入fixed列致表体空白\n太仓G端选项表决详情切换 Tab 时动态渲染 fixed 操作列触发 Element UI 表格已知问题，表体不渲染但分页有总数。\n\n## 问题根因\n- 从「基本信息」切到「投票信息」时 `showSearch` 为 true 动态渲染 `fixed=\"right\"` 操作列\n- `type=\"selection\"` 的 `:selectable` 误传布尔而非函数\n- 切换 Tab 时残留 voteWay/voteState 等筛选\n\n## 修复方案\n- 避免动态加 fixed 列（去掉 fixed 或列结构常驻）\n- `:selectable` 必须传函数；数据加载与 Tab 切换后 nextTick 调表格 `doLayout()`\n- 切换 Tab 时清掉残留筛选\n\n## 验证与归属\n- 验证证据：会话 c17819e8 用户两次反馈切换 tag 数据不显示；改 optionDecision/DecisionRangeTable 与 detail Tab 后 doLayout\n- 涉及文件：zhi1-web-admin/src/views/estate/optionDecision/components/DecisionRangeTable.vue、optionDecision/detail.vue、components/zsTable/index.vue\n- 所属项目：太仓G；来源会话：c17819e8-f61e-40ed-99cc-c04ba5efd9a5；代码基线：2ded8f9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vshow_haspermi_mix.md",
+                "memory_type": "entities",
+                "after": "# 表决详情按钮禁止v-show与v-hasPermi混用\n太仓G端表决类详情页底部业务按钮混用 `v-show` 与 `v-hasPermi` 导致状态已变仍显示错误按钮，且状态比较须归一类型。\n\n## 问题根因\n- 同时写 `v-show`（按 bizState/decisionState）和 `v-hasPermi`，有权时 `el.style.display=''` 覆盖 `display:none`\n- 接口返回 `decisionState`/`bizState` 可能是数字，`['1','2','5'].includes(x)` 对数字 5 失效\n\n## 修复方案\n- 业务状态与权限合并进单一 `v-if`，权限用 `checkPermission([...])` 或计算属性\n- 比较前 `String(x)` 或统一计算属性；延期态 `decisionState=5` 纳入「提前结束」「撤销」等展示条件\n\n## 验证与归属\n- 验证证据：会话 6bb25673 一般表决延期态缺按钮；同主题 bundle 002/008 归纳 v-show 与 v-hasPermi 互相覆盖\n- 涉及文件：zhi1-web-admin/src/views/estate/optionDecision/detail.vue、ownerDecision/detail.vue、directives/permission/hasPermi.js\n- 所属项目：太仓G；来源会话：6bb25673-a3f0-4f17-9c69-8943d17f4cb8；代码基线：e177dad"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

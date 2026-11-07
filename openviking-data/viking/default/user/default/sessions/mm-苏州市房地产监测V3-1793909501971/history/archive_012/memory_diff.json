@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_012",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T20:48:00.556550+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/v3_bank_fix.md",
+                "memory_type": "entities",
+                "after": "# 银行选择弹窗确定锁与联行选择统一修复\n苏州市房地产监测V3 中修复 zs-select-dialog-func.vue 确定无效果问题，并统一联行选择弹窗。\n\n## 问题原因\n- SelectDialog.open 点「确定」先 setData（应 resolve），关窗触发 update:visible(false) 再 reject('cancel')，若 reject 覆盖 resolve，handleAdd 的 .catch(() => {}) 吞掉错误，表现为关窗但列表不刷新\n\n## 修复内容\n- zs-select-dialog-func.vue 增加 settled 锁，保证只结算一次（成功或取消）\n- 未选左侧分行时提示「请先在左侧选择监管银行分行」\n- 挂接成功后 msgSuccess('添加成功')\n- 未选行时提示「请至少选择一条网点」\n- 新增 openUnionBankWdmcSelect（unionBankWdmc.js），对接 /system/unionBank/page，单选+勾选+确定\n- 银行网点管理 jgwd/detail.vue、委托监管协议 wtjgxy/detail.vue 改用该弹窗\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：zs-select-dialog-func.vue、unionBankWdmc.js、jgwd/detail.vue、wtjgxy/detail.vue\n- 来源会话ID：b1936cf8-2758-4591-92a8-a76aef6e1db5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/v3_union_api.md",
+                "memory_type": "entities",
+                "after": "# 联行号接口全局统一迁移\n苏州市房地产监测V3 联行号接口已全局统一迁移至 /system/unionBank/page。\n\n## 核心改动\n- 新增统一 API 模块 zhi2-web-admin/src/api/system/unionBank.js，导出 UNION_BANK_PAGE_URL、BANK_LIST_TREE_URL、UNION_BANK_TREE_CONFIG、UNION_BANK_SELECT_COLUMNS、pageUnionBank()\n- VITE_APP_BASE_API=/api/v3.0，前端统一拼接为 /api/v3.0/system/unionBank/page\n- yhlhhgl.js：listYhlhhgl → pageUnionBank（CRUD 仍保留旧 unionCodeManage/*，按计划未动）\n- yhwdgl.js：listYhwdgl、listYhwdglzbxz、listYhwdsDialog 等迁移至 pageUnionBank\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：api/system/unionBank.js、api/jgyh/yhlhhgl.js、api/jgyh/yhwdgl.js、maintenance/receiptin/detail.vue\n- 来源会话ID：6ce24e16-f765-47a3-bfb6-b6b8daf87b3a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/v3_e2e_helper.md",
+                "memory_type": "entities",
+                "after": "# 开户银行选择弹窗 E2E Helper 修复\n苏州市房地产监测V3 修复 E2E helper 以对齐开户银行选择弹窗 UI。\n\n## 改动说明\n- 文件：e2e/fixtures/supervision-bank-helpers.js\n- clickSubTableAdd：「新增」在 Headline 标题行内（不在 sub-container），改由「网点列表」折叠区块定位 getByRole('button', { name: '新增' })\n- pickUnionBankInDialog 增加 clickAndMaybeWaitUnionBankList：未触发 /system/unionBank/page 时最多等 10s，避免重复选银行每次卡满 30s\n- 左侧银行点 .el-radio__label 并 force: true\n- 表格已有数据时不再盲目点「搜索」，仅空表时再搜；等 loading 遮罩消失后再操作；选完断言「银行网点」弹窗关闭\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：e2e/fixtures/supervision-bank-helpers.js、BranchOneDialog.vue\n- 来源会话ID：0a326684-ca2c-4bf1-8ca1-c6b881d8f927"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/v3_personnel_edit.md",
+                "memory_type": "entities",
+                "after": "# 开发企业从业人员变更改为默认编辑\n苏州市房地产监测V3 已将已备案从业人员详情的「变更」按钮改为「编辑」，并更新 E2E 用例跑通测试。\n\n## 测试用例改动\n- e2e/toB/company-personnel-flow.spec.js：07 列表断言显示「编辑」不显示「变更」；08/08b 新增提交备案+管理端审批；10 已备案详情验证「编辑」无「变更」并尝试保存；09 清理支持已备案「注销」；修复 06b 表单 flaky\n- e2e/company/personnel-record.spec.js：新增 08b 已备案默认编辑；增加 assertPersonnelDetailNoChangeButton、clickDetailEditButton 辅助函数\n\n## 前端补充\n- ToB/管理端详情：已备案（bizState=2）保存时走 companyUpdatePersonnel\n\n## 测试结果\n- company-personnel-flow.spec.js：10 通过 1 跳过（test 10 保存）；personnel-record.spec.js 跑通\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：e2e/toB/company-personnel-flow.spec.js、e2e/company/personnel-record.spec.js、staffManagement/components/detail.vue、toB/personnelRecord/components/detail.vue、OperationBtnGroup/index.vue\n- 来源会话ID：7cf9d7c3-1aa5-441c-b2af-a459deebc0b4"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

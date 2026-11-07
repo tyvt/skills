@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-c328a20c-d09b-4c4a-9d8f-87cb3ca2d1ba/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T12:26:14.107087+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/06/目标股指标缺口报告.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-06 用户指出 7 只目标股（格力电器000651、洪城环境600461、平安银行000001、唐山港601000、渝农商行601077、青岛港601298、永兴股份601033）缺失 ocfd2y/payout2y 字段，导致「连续两年」规则无法校验，要求在 config/选股脚本补齐。\n# 2026-11-06 (Friday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 数据完整度：7 只目标缺 ocfd2y/payout2y（格力电器(000651)、洪城环境(600461)、平安银行(000001)、唐山港(601000)、渝农商行(601077)、青岛港(601298)、永兴股份(601033)），「连续两年」规则无法校验——请在 config/选股脚本补齐。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/06/组合脚本指标补齐计划.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-06 助手承诺在 final_portfolio_v3.py 的 _fill_metrics 中为每个标的计算最近两年 payout2y/ocfd2y 并写入 targets，同时补齐 governance 映射与 _cfg 的 margin/rules 字段。\n# 2026-11-06 (Friday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 数据完整度：7 只目标缺 ocfd2y/payout2y（格力电器(000651)、洪城环境(600461)、平安银行(000001)、唐山港(601000)、渝农商行(601077)、青岛港(601298)、永兴股份(601033)），「连续两年」规则无法校验——请在 config/选股脚本补齐。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 正在实现：在 `final_portfolio_v3.py` 的 `_fill_metrics` 中为每个标的计算最近两年的 `payout2y`、`ocfd2y`，并在写入 `targets` 时合并；随后在 panel extra 路径补充相同字段。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/数据湖选股模块.md",
+                "memory_type": "entities",
+                "before": "# 数据湖选股模块\n数据湖项目中的「分析产出」目录，包含选股数据更新与沪深筛选脚本。\n\n## 关键脚本\n- `scripts/update_selection_lake.py` 是数据更新入口，抓取市场、基本面、事件及外部银行/股东数据入湖\n- `screen_sh.py` 与 `screen_sz.py` 为筛选脚本，重新生成沪深筛选结果 CSV\n- `分析产出/external_lake.py` 含 `configure_proxy()` 配置网络代理\n- `cne backfill daily_bars --start <d1> --end <d2>` 可绕开当日盘中保护补历史行情（end<today 时通过）\n\n## 代理与网络\n- `configure_proxy()` 从策略文件强制设置 `HTTP_PROXY/HTTPS_PROXY=http://127.0.0.1:7890`\n- 2026-11-05 初始诊断时 7890 代理未监听，直连 eastmoney/tencent 返回 200、sina 返回 403（需 Referer）；用户启动 7890 代理后出口测试 200 正常\n- 上一轮 2026-11-04 运行因代理死掉导致 ProxyError(WinError 10061) 整轮失败；启动代理后解决\n\n## 运行状态\n- 2026-11-05 完成数据更新：事件流（公告/新闻/监管）、财务、外部银行16家+实控人20只均更新至 2026-11-05\n- 行情遇 A股盘中保护（15:05 前拒绝写入未定稿当日K线），改用 `cne backfill daily_bars --start 2026-10-30 --end 2026-11-04` 补历史行情至 2026-11-04\n- 数据新鲜度：daily_bars/adj_factors 至 2026-11-04，trading_status 与事件/新闻/监管至 2026-11-05\n- 筛选结果（基准日 2026-11-04）：沪市主池 19 只（过⑫⑬⑭ 11 只），深市专用标准 26 只；CSV 均输出至 分析产出/\n- 筛选脚本需设 PYTHONIOENCODING=utf-8 避免 GBK 编码报错（UnicodeEncodeError: 'gbk' codec can't encode ⑫）；须以 分析产出 为工作目录运行方能落盘至 分析产出/",
+                "after": "# 数据湖选股模块\n数据湖项目中的「分析产出」目录，包含选股数据更新与沪深筛选脚本。\n\n## 关键脚本\n- `scripts/update_selection_lake.py` 是数据更新入口，抓取市场、基本面、事件及外部银行/股东数据入湖\n- `screen_sh.py` 与 `screen_sz.py` 为筛选脚本，重新生成沪深筛选结果 CSV\n- `final_portfolio_v3.py` 构建组合目标 `targets`：`_fill_metrics` 计算各标的指标（含 `payout2y`/`ocfd2y`），`_gov_of` 提供治理映射，`_cfg` 含 `margin`/`rules`/`targets` 字段，并输出 `panel_extra` 路径\n- `分析产出/external_lake.py` 含 `configure_proxy()` 配置网络代理\n- `cne backfill daily_bars --start <d1> --end <d2>` 可绕开当日盘中保护补历史行情（end<today 时通过）\n\n## 代理与网络\n- `configure_proxy()` 从策略文件强制设置 `HTTP_PROXY/HTTPS_PROXY=http://127.0.0.1:7890`\n- 2026-11-05 初始诊断时 7890 代理未监听，直连 eastmoney/tencent 返回 200、sina 返回 403（需 Referer）；用户启动 7890 代理后出口测试 200 正常\n- 上一轮 2026-11-04 运行因代理死掉导致 ProxyError(WinError 10061) 整轮失败；启动代理后解决\n\n## 运行状态\n- 2026-11-05 完成数据更新：事件流（公告/新闻/监管）、财务、外部银行16家+实控人20只均更新至 2026-11-05\n- 行情遇 A股盘中保护（15:05 前拒绝写入未定稿当日K线），改用 `cne backfill daily_bars --start 2026-10-30 --end 2026-11-04` 补历史行情至 2026-11-04\n- 数据新鲜度：daily_bars/adj_factors 至 2026-11-04，trading_status 与事件/新闻/监管至 2026-11-05\n- 筛选结果（基准日 2026-11-04）：沪市主池 19 只（过⑫⑬⑭ 11 只），深市专用标准 26 只；CSV 均输出至 分析产出/\n- 筛选脚本需设 PYTHONIOENCODING=utf-8 避免 GBK 编码报错（UnicodeEncodeError: 'gbk' codec can't encode ⑫）；须以 分析产出 为工作目录运行方能落盘至 分析产出/"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/profile.md",
+                "memory_type": "profile",
+                "before": "# github.com-tyvt-financial-data-lake\n- 正在维护个人持仓面板项目（单页 HTML + holding.sqlite）(as of 2026-11-06)",
+                "after": "# github.com-tyvt-financial-data-lake\n- 正在维护个人持仓面板项目（单页 HTML + holding.sqlite）(as of 2026-11-06)\n- 正在维护数据湖选股模块（final_portfolio_v3.py、annual_review.py 等分析产出脚本）(as of 2026-11-06)"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

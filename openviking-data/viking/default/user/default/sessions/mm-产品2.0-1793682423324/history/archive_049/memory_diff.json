@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_049",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:08:10.557218+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_attach_split.md",
+                "memory_type": "entities",
+                "after": "# 只读详情附件点击三分流套路\n产品2.0 的 detail-template 只读详情中，附件点击需按文件类型分流：图片缩略图预览、PDF 新窗口打开、其余 fetch blob 下载。\n\n## 判定规则\n- 图片后缀白名单：jpg/jpeg/png/gif/bmp/webp/svg 走 <img> 预览，避免无后缀或未知文件误塞 <img> 加载失败\n- PDF 使用 window.open(url,'_blank','noopener,noreferrer') 由浏览器原生预览\n- 其余类型走 downloadAttachmentFile：优先 fetch（credentials:'same-origin' 带 Cookie）取 blob 后 downloadBlobFile 保存，失败回退带 download 属性的 <a> 点击\n\n## 边界事实\n- 附件 URL 跨域且未配 CORS 时 fetch 会失败，浏览器可能忽略 download 属性变成预览\n- 完全可控必须后端配合 Content-Disposition: attachment 或走带鉴权下载接口，前端兜底无法根治\n\n## 涉及文件与归属\n- 改动文件：zhi2-web-admin/src/components/detail-template/detail-template.vue、zhi2-web-admin/src/utils/index.js\n- 所属项目：产品2.0；来源会话：f249a45a-ccde-47e1-8e0c-9e45f3720ad5；代码基线：8d416b2"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_mixins_area.md",
+                "memory_type": "entities",
+                "after": "# detailMixins 内含 form+area 避免重复引入\n产品2.0 中 detail 模板页只需 mixins:[detailMixins]，因 detailMixins 已内部 mixins:[form, area]，页面再引 area 会重复合并同名选项。\n\n## 冗余点\n- 页面级 mixins 写成 [detailMixins, area] 重复引入 area\n- data 里重复声明 originForm（form mixin 已声明）\n- contentInfo 末尾挂恒真 .filter(visible)（无 visible 字段的数组 filter 恒全保留）\n- watch form.region 加不必要 deep:true；仅单点使用的方法单独定义\n\n## 清理原则\n- 只删冗余不改行为，删前确认字段不是对 mixin 默认值的覆盖\n- currentRegionCode/currentSubdistrictCode 覆盖 area 默认 regionCode/subdistrictCode，是对齐关键不能删\n- 深度 watch 仅用于对象内部属性变更；合并多次 getDicts、精简 form 未用字段需先对照接口与提交字段\n\n## 涉及文件与归属\n- 文件：zhi2-web-admin/src/views/building/project/detail.vue、mixins/detailMixins.js、area.js、form.js\n- 所属项目：产品2.0；来源会话：61def959-83e3-4215-8e69-6489f5d1ff6f；代码基线：645607c"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/list_mixins_route.md",
+                "memory_type": "entities",
+                "after": "# listMixins 列表页同步路由 query 参数\n产品2.0 中从详情页跳列表页带查询参数时，listMixins 不会消费 $route.query，需在列表页重写 init() 在 getList 前同步路由参数。\n\n## 问题根因\n- listMixins 在 created 里读本地缓存后立刻 init()→getList()，整个链路不把 $route.query 合入 queryParams\n- 路由 query 只是躺在 $route 上没人消费，导致搜索表单为空、首次请求不带参\n\n## 解决方案\n- 列表页重写 init()（与 table mixin 默认逻辑一致），在 initDict/getList 前先执行同步函数\n- 从 $route.query 取目标参数（兼容数组形式）写入 queryParams，zs-search-form 也会回显\n- 同一路由下只改 query 不销毁组件还需再 watch $route.query\n\n## 涉及文件与归属\n- 文件：zhi2-web-admin/src/views/property/complexChange/index.vue、mixins/listMixins.js\n- 所属项目：产品2.0；来源会话：56028024-cb08-49e4-ab44-98078061fc8a；代码基线：6da8974"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/代码缺陷/callback_field_mismatch.md",
+                "memory_type": "entities",
+                "after": "# 选关联回调与跳转读取字段不一致\n产品2.0 中表单选关联数据回调写入 companyId，但跳转函数读 companyRecordId 导致点击跳转静默失效。\n\n## 问题现象\n- 选人/带出类回调（handlePick 选关联招标备案、setCompany 选招标方）填充企业字段后，点「招标方」跳企业详情页无反应\n- if (!companyRecordId) return 静默拦截，companyRecordId 始终为空\n\n## 根因与修复\n- 跳转函数读 this.form.companyRecordId，两回调只赋 this.form.companyId，字段名不一致\n- 修复：回调里同时写 companyRecordId 与 companyId，或跳转处兜底 this.form.companyRecordId || this.form.companyId\n- 教训：为跳转主键引入别名/兼容字段时，所有写入点都要同步，否则静默 return 难察觉\n\n## 涉及文件与归属\n- 文件：zhi2-web-admin/src/views/property/propertyTenderPlan/detail.vue\n- 所属项目：产品2.0；来源会话：1dbfe5a3-173e-4c2f-b2c8-f27d4a2193ae；代码基线：9dc17bd"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

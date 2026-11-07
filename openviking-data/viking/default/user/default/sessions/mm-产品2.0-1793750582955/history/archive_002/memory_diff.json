@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793750582955/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T00:06:05.381785+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/fixed_column_classname.md",
+                "memory_type": "entities",
+                "after": "# el-table 固定列单元格样式走 class-name + 非 scoped\n要改 el-table 固定列（如 zs-operate-column，fixed=\"right\"）单元格背景/样式，必须走「列级 class-name + 非 scoped 全局样式」通道。\n\n## 问题现象\n- 在组件自身 scoped 样式里写选择器改 zs-operate-column 操作列单元格背景/样式，怎么都不生效\n- 固定列默认透明背景，横向滚动时会「透」出下层行内容\n\n## 根因\n- 固定列的 td/th 单元格由外层 el-table 渲染，不在本组件 DOM 子树内\n- scoped 样式靠 data-v 属性选择器，选不中这些格子\n\n## 解决方案\n- 在 el-table-column 上同时加 class-name 和 label-class-name（表体与表头都要），值为自定义类名如 zs-operate-column-cell\n- 在组件里写一段不带 scoped 的 <style> 块：.el-table .zs-operate-column-cell { background-color: #fff !important; }\n- 凡是需要命中 el-table 内部渲染的 td/th 的定制（固定列、单元格背景、hover 行配合），都走此通道，不要在页面或组件 scoped 里找选择器\n\n## 验证与归属\n- 验证证据：会话 5c0be161，用户要求操作列背景改白色；结论指出 td 由外层 el-table 画出、不在组件 DOM 里，通过 class-name/label-class-name + 非 scoped 样式实现\n- 涉及文件：zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue\n- 所属项目：产品2.0；来源会话ID：5c0be161-3528-400f-9c2b-4a3ebdeb2d79；代码基线：bd398ef"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/submodule_merge_conflict.md",
+                "memory_type": "entities",
+                "after": "# 子模块指针合并冲突按祖先关系裁决\n父仓库与远端合并时冲突落在子模块指针上，应先查祖先关系再决定保留哪边，不重做子仓 merge。\n\n## 问题现象\n- 父仓库（superproject）与远端合并时冲突落在 zhi2-web-admin 子模块指针上（gitlink 160000，stage2/stage3 各指向不同 commit）\n- 两边开发各自推进了子模块并更新指针，父仓合并无法自动裁决\n\n## 根因\n- 两边开发各自推进子模块并更新指针，父仓合并时无法自动选择\n\n## 解决方案\n- 不要盲目重置或重合并；先进入子仓库核对两个 commit 的祖先关系（git merge-base / git log 判断）\n- 若我方指针已是对方指针的祖先提交（我方已包含对方改动），直接保留我方指针，在父仓 git add <submodule> 标记冲突解决即可，无需在子模块里再做 merge；反之亦然\n- 判断依据是包含关系而非时间，能避免选到不含对方改动的假新提交\n- 完成后工作区校验与 push 由用户确认网络/权限后自行执行\n\n## 验证与归属\n- 验证证据：会话 329b50fe，冲突为子模块 gitlink；结论核对 b827de55 是 aeb35975 的祖先提交后保留 aeb35975，git add 子模块即解决\n- 涉及文件：.gitmodules\n- 所属项目：产品2.0；来源会话ID：329b50fe-128b-4e82-b350-dc2a3e01a7f8；代码基线：6b9d9d7"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_formmode.md",
+                "memory_type": "entities",
+                "after": "# 详情页模式标志用 detailMixins 的 formMode\n走 detailMixins 的整页详情页统一用 mixin 提供的 formMode（add/edit/view），不能用弹窗子组件的 dialogMode。\n\n## 问题现象\n- 详情页（detailMixins 驱动）内嵌弹窗复制了独立弹窗子组件写法，模板引用 dialogMode，控制台报 Vue warn「Property or method dialogMode is not defined」且查看/编辑判断失效\n\n## 根因\n- dialogMode 是弹窗子组件通过 props 接收的模式标志\n- 走 detailMixins 的整页详情页统一用 formMode，页面自身没定义 dialogMode，渲染期读取 undefined\n\n## 解决方案\n- 详情页内弹窗/区块按查看态分流一律用 formMode == 'view' 走只读（DetailTemplate/contentInfo），新增/编辑走可编辑表单，与页面其他区块保持同一判定字段\n- 复刻弹窗子组件代码到详情页时必须做「模式标志名对齐」检查（dialogMode→formMode），同模块兄弟详情页（如 facilityChange）有相同写法要一并修\n\n## 验证与归属\n- 验证证据：会话 46f27f37，Vue warn dialogMode not defined；结论改为 v-if=\"formMode == 'view'\"，facilityChange 同步修改\n- 涉及文件：zhi2-web-admin/src/views/maintenance/facility/detail.vue；zhi2-web-admin/src/views/maintenance/facilityChange/detail.vue；zhi2-web-admin/src/mixins/detailMixins.js\n- 所属项目：产品2.0；来源会话ID：46f27f37-13c0-41e5-8c63-7986f337f5da；代码基线：0161609"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/null_prop_default.md",
+                "memory_type": "entities",
+                "after": "# 对象 prop 传 null 不触发 default 致常驻弹窗崩溃\n常驻挂载的预览/详情弹窗组件，对象型 prop 显式传 null 会绕过 Vue 的 default 机制，渲染期读取属性崩溃。\n\n## 问题现象\n- 弹窗常驻模板（非 v-if）里渲染 KnowledgePreviewDialog，父组件把数据对象初始为 null，弹窗未打开也报「Cannot read properties of null (reading 'title')」渲染错误\n\n## 根因\n- Vue 的 prop 默认值 default: () => ({}) 只在传入值为 undefined 时生效\n- 显式传 null 绕过默认值机制，子组件模板直接 knowledge.title 就崩\n\n## 解决方案\n- 子组件内加计算属性做 null 归一化（knowledgeData = this.knowledge || {}），模板与派生列表都经计算属性访问\n- 操作类方法（如 handleQuote）对 knowledge 为空直接 return 守卫\n- 约定：常驻挂载的预览/详情弹窗组件一律通过归一化计算属性消费对象型 prop，不要信任 prop 默认值能兜住 null；父组件初始值用 null 表示「无」时尤其要注意\n\n## 验证与归属\n- 验证证据：会话 4041b099，previewKnowledge 初始 null 且弹窗始终挂载；结论指出 default 只对 undefined 生效，新增 knowledgeData 计算属性归一化并加空守卫\n- 涉及文件：zhi2-web-admin/src/views/property/workOrder/order/components/KnowledgePreviewDialog.vue；zhi2-web-admin/src/views/property/workOrder/order/components/WorkOrderActionDialog.vue\n- 所属项目：产品2.0；来源会话ID：4041b099-030a-481a-8753-6ecca6c475fd；代码基线：42b6033"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

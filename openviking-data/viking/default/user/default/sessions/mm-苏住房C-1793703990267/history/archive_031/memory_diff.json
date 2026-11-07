@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_031",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:10:12.218252+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/共享卡片字段不显示排查.md",
+                "memory_type": "entities",
+                "after": "# 共享卡片字段不显示排查\n在新页面使用共享卡片/列表组件（houseCard 一类）某块内容不显示时，按固定顺序排查，不要先改样式。\n## 现象与规则\n- 渲染层：模板有无结构，开关 prop 有无分支（如 show-type-prefix 传了但组件未实现，属开关空转）\n- 条件层：显示条件是否被别的语义参数挡掉（如徽章要求 type 为空，二手房传了 type=\"stock\"）\n- 数据层：列表页是否把后端字段映射成卡片消费字段，最易反复\n## 根因与字段不一致\n- 同一含义字段在不同列表落成不同名字：新房侧用 publishRole，二手房列表给 publishUserType + agentCompanyName\n- 两处需在各自列表页显式映射，不能指望卡片内部兼容两套字段名\n## 修复与回归范围\n- 修复后回归所有卡片入口页：houseCard 被首页收藏、二手房列表、新房列表共用，改条件映射要一次覆盖\n- 涉及文件：houseCard.vue、stockHouse/index.vue、newHouse/index.vue、indexMore.vue、collect/index.vue 等\n- 所属项目：苏住房C；来源会话：2259f4fa-0848-4e14-8c96-c105c4a664e3；代码基线：5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/验证码按钮卡死缺陷.md",
+                "memory_type": "entities",
+                "after": "# 验证码按钮卡死缺陷\n忘记密码页图形码错误后获取验证码按钮永远停在「发送中…」，用户被卡死无法重试。\n## 现象\n- 填错图形验证码点获取验证码，Toast 提示错误，但按钮不倒计时也不恢复\n- 控件内部置 sending=true，复位依赖调用方回调，失败分支未处理致永置 loading\n## 根因\n- VerifyCode/index.vue 点击即置 sending=true，复位依赖传入的成功/失败回调\n- PhoneForm.vue 的 sendCode 只处理成功分支，接口失败不调 onFail 也不刷新图形码\n## 修复做法\n- 控件用 settle 统一收敛成功/失败，保证只结算一次、任何分支都复位\n- 调用方在每条异常路径显式 onFail，最好 try/finally 兜底\n- 图形码失败必须 resetImageCode()（刷新图片+清空输入）\n- 成功回调仅在接口 code 200 后调，本项目无独立图形码校验接口，不要造两段式\n## 涉及文件与归属\n- 涉及：PhoneForm.vue、VerifyCode/index.vue、security.js、forget.vue\n- 所属项目：苏住房C；来源会话：1b8c2026-4de2-4989-a73b-49a661ba145a；代码基线：9cdf7b8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/决策选举姓名不显示缺陷.md",
+                "memory_type": "entities",
+                "after": "# 决策选举姓名不显示缺陷\n决策记录列表与我的选举页投票人姓名列空白，根因是姓名来自不同数据层级且选举页未同步插槽。\n## 现象\n- DecisionResult.vue 决策记录列表姓名空白，选举页同样问题\n- 意见颜色误改为全黑，未保持同意绿/不同意红/弃权橙\n## 根因\n- 记录行自带 decisionPlayerName（脱敏「田*」），详情 recordMap 键为 decisionResponseId 字符串，需按链对齐取「李*丹」\n- 选举页照抄决策页取数逻辑但 CardCell 插槽没同步，两边一起坏\n## 修复做法\n- 收敛 resolvePlayerName(row) 单函数（候选 decisionPlayerName → recordMap[x].decisionPlayerName，键 String 归一），两页共用\n- 小程序端 CardCell 的 label 属性冲突，显示姓名用 #label 具名插槽\n- 改姓名时一并回归意见颜色绑定\n## 涉及文件与归属\n- 涉及：decision/common/DecisionResult.vue、elect/DecisionResult.vue、DecisionRecord.vue、CardCell.vue、autonomy.js\n- 所属项目：苏住房C；来源会话：656e6a75-7f8b-4804-98e6-133f13d94700；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/公共组件抽取路径死链.md",
+                "memory_type": "entities",
+                "after": "# 公共组件抽取路径死链\n从 pages_main 抽公共组件到 src/components 后编译报 Component is not found，因相对路径引用少一级。\n## 现象\n- 编译报 Component is not found in path \"pages_main/collect/components/collectBtn\"\n- 伴随 componentPlaceholder 提示，易误导向分包/异步配置\n## 根因\n- collectBtn 已抽到 @/components/collectBtn/collectBtn.vue，houseCard 改对，但 StockHouse.vue、NewHouse.vue 仍用旧相对路径 ../../collect/components/collectBtn.vue\n- 相对路径按引用者自身位置算，组件搬家后所有引用者路径需重算\n## 修复做法\n- 抽公共组件用 grep 搜组件名全仓排查引用，不能只改报错点名文件\n- 公共组件一律用 @/components/xxx/xxx.vue 别名引用，杜绝跨目录相对路径\n- 看到 Component is not found 先确认文件是否存在报错路径，再看 componentPlaceholder，不加占位掩盖\n## 涉及文件与归属\n- 涉及：houseCard.vue、houseMap/components/StockHouse.vue、NewHouse.vue、collectBtn/collectBtn.vue\n- 所属项目：苏住房C；来源会话：3ae4dee9-19f6-4db4-8759-c97af7318eb7；代码基线：017efba"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

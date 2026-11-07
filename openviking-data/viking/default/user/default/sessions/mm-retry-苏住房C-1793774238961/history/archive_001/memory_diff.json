@@ -1,0 +1,23 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-retry-苏住房C-1793774238961/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T06:38:27.736832+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/wrong_build_mode.md",
+                "memory_type": "entities",
+                "after": "# 测试环境产物误用生产构建模式\n在 Vite 多环境构建中，部署到测试环境的产物却内嵌生产域名与配置，可通过搜值取证定性为打包命令用错模式。\n\n## 问题根因\n- Vite 的 `vite build -m test` 仅加载 `.env` + `.env.test`，永远不加载 `.env.production`\n- 常误以为「部署在测试环境」=「用 test 模式构建」，差一个 `-m test` 就差出整个生产域名\n- 本例内联生产配置位于 `src/utils/index.js:84-87` 的 `buildH5AbsoluteMediaUrl` 内联 `VITE_APP_API_PROXY`\n\n## 取证与验证\n- 查产物构建时间与构建提交，回溯源码定位\n- 在产物搜 `.env.test` 的值（期望命中）应为 0 命中\n- 在产物搜生产域名 `szzfcjj.cn` 应为 1 命中，定位到 `utils/index.js:84-87`\n- 实测表：产物内嵌 `VITE_APP_API_PROXY=https://szfweb.szzfcjj.cn:8887`，搜 `test.zhi.com` 0 次命中\n\n## 修复与防复发\n- 改用 `npm run test`（即 `uni build -m test`）重新打包部署\n- 重打后再次搜值验证：`test.zhi.com` 出现、`szzfcjj` 消失才算闭环\n- 在发布脚本/CI 加闸：目标环境为测试时扫描产物，含 `szzfcjj.cn` 直接 fail\n- 结论须落在「产物实测」而非「我觉得」，否则是甩锅\n\n## 验证与归属\n- 涉及文件：`zhi2-mobile-shimin/src/utils/index.js`、`.env.test`、`.env.production`\n- 来源会话：1fa1dab6-7740-4a7a-825d-1d4173dd3bcc；代码基线：9e0fdde\n- 项目：业主端 H5（zhi2-mobile-shimin）"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_033",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T13:23:11.664346+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/publicnotice_grid_fix.md",
+                "memory_type": "entities",
+                "after": "# 双晒公示页两列网格布局修复\n苏住房C(zhi2-mobile-shimin)小程序中双晒公示页因卡片最小宽度超出容器导致两列布局失效，已通过CSS Grid等方案修复。\n\n## 问题根因\n- 卡片设 `flex: 0 0 48%`，但标题 `white-space: nowrap`，加图标和箭头后最小宽度约400rpx，超出48%容器宽度(约340rpx)\n- 每行只能放1张卡，右侧留空，2列布局未恢复\n\n## 修复方案\n- 在 `publicNotice/index.vue` 中将 Flex 改为 CSS Grid：`grid-template-columns: repeat(2, minmax(0, 1fr))` 强制两列等宽\n- 标题允许换行：去掉 `nowrap`，改为 `word-break: break-all`\n- 略微缩小图标至 96×110rpx，给 `ZsImage` 宿主元素设置固定宽高\n- 卡片加 `overflow: hidden` 和 `min-width: 0`，避免内容撑破网格\n\n## 验证与归属\n- 预期效果为 2×2 网格、左右对称铺满，需重新编译后在微信开发者工具查看\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`src/pages_main/publicNotice/index.vue`\n- 来源会话ID：9774c8d1-2b21-4a57-a4db-44c6514d4939；代码基线none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/cloud_guard_fix.md",
+                "memory_type": "entities",
+                "after": "# 云守护相关页面UI调整\n苏住房C(zhi2-mobile-shimin)中【掌服务-小区管理-云守护】相关UI已调整，涉及云守护首页与申请Step1组件。\n\n## 云守护首页(pages_guard/index/index.vue)\n- 页面容器 `padding` 设为 0，顶部信息区背景仅保留下方内边距，信息卡片顶角圆角去除以贴合屏幕边缘\n- 头像改用 `userStore.avatar`，加载失败时回退到默认头像\n- 梯形背景图 `icon_tip_bg.png` 补充分包路径 `subpackage=\"pages_guard\"` 并设固定高度，修复不显示问题\n\n## 申请云守护Step1(guardApply/components/step1.vue)\n- 房屋选中图标 `.select-yes` 设 `40rpx × 40rpx` 尺寸\n- 「是否有电梯」单选项间距由 `20rpx` 调整为 `32rpx`(16px)\n- 添加紧急联系人加号 `::before` 伪元素改 `inline-flex` 居中，修复加号不在圆心\n- 上传附件「+」图标 `up-loader.svg` 复制到 `pages_guard/static/svg/`，修复分包静态资源缺失\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`pages_guard/index/index.vue`、`guardApply/components/step1.vue`、`step2.vue`、`ZsImage.vue`\n- 来源会话ID：5d912c3c-3130-4cf8-9e0a-0d48f904b5f4；代码基线none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/repo_structure_explore.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C仓库结构与认证流程\n苏住房C 仓库主体为 zhi2-mobile-shimin(uni-app + Vue3 + Vite)，代码区分实名认证与身份认证两套流程。\n\n## 技术栈\n- 仓库路径：`d:\repository\\苏住房C\\zhi2-mobile-shimin`\n- 技术栈：uni-app + Vue3 + Vite 小程序\n\n## 认证流程区分\n- 实名认证(`pages_my/verification`)：账号实名，含「居民身份证 / 非居民身份证」选择\n- 身份认证(`pages_owner/authentication`)：业主 / 家庭成员 / 租客 房屋身份认证\n\n## 实名认证相关文件\n- `pages_my/verification/TypeChoose.vue`：证件类型选择页\n- `pages_my/verification/FormLocal.vue`：居民身份证实名(人脸核身)\n- `pages_my/verification/FormNonLocal.vue`：非居民身份证信息填写\n- `pages_my/verification/FormManual.vue`：人工实名表单\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：954ffa8f-ec2a-42e2-9922-79c7c7b82379；代码基线none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/prod_skip_idtype.md",
+                "memory_type": "entities",
+                "after": "# 生产环境跳过证件类型选择模式\n苏住房C因非居民身份证后台管理系统不可用，生产环境跳过证件类型选择页，直接进入居民身份证实名认证流程。\n\n## 实现方式\n- `utils/index.js` 新增 `shouldSkipIdTypeChoose()`：生产环境(`import.meta.env.PROD`)返回 `true`\n- `getRealNameEntryUrl()` / `getRealNameEntryRelativeUrl()`：生产返回 `FormLocal`，开发/测试返回 `TypeChoose`\n- 入口跳转更新：`userInfo.vue`、`UnauthorizedPage.vue`、`AuthorizedFail.vue` 均按环境走对应入口\n\n## 背景原因\n- 非居民身份证后台管理系统不能正常使用，故生产环境强制走居民身份证实名流程\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`utils/index.js`、`userInfo.vue`、`UnauthorizedPage.vue`、`AuthorizedFail.vue`\n- 来源会话ID：a48c524a-2cd1-4f84-88a2-2dc51b597b93；代码基线none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

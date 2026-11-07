@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_031",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:27:00.142893+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/keepalive_tab_stats.md",
+                "memory_type": "entities",
+                "after": "# 首页keep-alive缓存致tab与统计数字错位\n[苏房]产品2.0首页「办件量分析」切到当日后进待办详情再返回，tab回默认本周但数字仍当日，出现选中与数据错乱。\n\n## 问题根因\n- 页面被keep-alive缓存，activated时组件未重建，tab索引与数字区为两套独立状态\n- DOM复用致数字未及时刷新\n- 多次统计请求并发返回时旧响应覆盖新响应\n- 重新激活后未重新取数\n\n## 解决方案\n- 数字区加:key=\"'task-stats-'+currentTab\"强制重渲染，杜绝DOM复用串数据\n- 用currentTaskStats计算属性统一安全读取当前tab对应数据，不在模板按索引散取\n- 抽refreshStatsData()，刷新前先清空todoCount/bubbleList/lineData避免短暂显示旧值\n- 加statsFetchSeq自增序号，响应回来比对序号丢弃过期响应（并发防御通用写法）\n- 补activated钩子，从详情返回时重置tab为本周并重新拉数\n\n## 验证与归属\n- 验证证据：会话d23cbaf7用户反馈首页办件量分析切换数量紊乱且不能稳定复现，给出复现路径（点当日→点待办进详情→返回首页停本周显示当日数）\n- 涉及文件：zhi2-web-admin/src/views/home/index.vue、zhi2-web-admin/src/views/home/index-wrapper.vue、zhi2-web-admin/src/router/index.js\n- 可复用结论：用户报数字与选中项不一致/偶发不稳定复现时，优先按keep-alive缓存+tab索引独立状态+并发响应乱序三项排查\n- 所属项目：产品2.0；来源会话：d23cbaf7-ad9b-42a8-baa6-7897239ffefe；代码基线：c98afb0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dup_api_file_path.md",
+                "memory_type": "entities",
+                "after": "# 同模块两份同名api文件致接口路径分叉\n苏州V3价格备案详情页楼幢Tab打开不发请求且报undefined.length渲染错误，根因为同名api文件多副本仅改一份。\n\n## 问题根因\n- src/api下同一业务存在两份同名封装recordPriceHouse.js（api/pricehouse/与api/presale/）\n- 组件批量迁移后引用一份，路径规范改造只改另一份，导致实际调用不存在旧路径\n- 接口404后被拦截，getList返回undefined，模板访问xxx.length炸成渲染错误\n\n## 解决方案\n- 改分页接口路径前先grep同名api文件名，确认全局唯一或一模块多副本，所有副本一起改或删未使用那份\n- 子表getList写成response.rows||[]、response.total||0，让接口异常退化成空表而非渲染崩溃\n- 排查顺序固定：先看Network是否发请求且URL是否一致（路径分叉伪装成没调接口），再疑zs-tabs懒加载，最后看组件逻辑\n\n## 验证与归属\n- 验证证据：会话08444023用户诉求楼幢接口未调/presale/priceBuilding/list，贴BuildingsTable render异常，要求改回/page并加rows||[]兜底\n- 涉及文件：zhi2-web-admin/src/api/pricehouse/recordPriceHouse.js、zhi2-web-admin/src/api/presale/recordPriceHouse.js、recordPriceMngSuzhou/detail.vue及BuildingsTable/PriceTable/RecordTable组件\n- 所属项目：产品2.0；来源会话：08444023-c60e-41b0-9e6e-c49324a5d33b；代码基线：62d5fb9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/list_fk_guard.md",
+                "memory_type": "entities",
+                "after": "# 操作前置守卫依赖缺失外键静默拦截\n物业费账单列表点收款提示缺少物业管理区域信息且接口未发，根因为handlePay用列表行缺失的complexId做硬校验。\n\n## 问题根因\n- handlePay打开收款弹窗前用row.complexId做硬校验\n- 列表分页接口返回行对象通常只带complexName等展示字段，不带关联外键complexId\n- 守卫永远不过，收款弹窗和payDetail请求被静默拦截，仅一条业务提示无报错\n\n## 解决方案\n- 操作类前置守卫只校验发起操作必需的最小主键（如账单row.id），不校验列表行可能缺失的关联外键\n- 弹窗打开后先调detail接口（/property/spFeeBill/payDetail/{billId}）取回complexId，再依赖该ID加载后续数据（如支付渠道listPayablePaymentChannel）\n- 形成「主键校验→detail补ID→再拉依赖数据」顺序，凡列表行缺外键致按钮被拦/接口不发皆可套用\n\n## 验证与归属\n- 验证证据：会话eb97ca91修复方案为index.vue的handlePay只校验row?.id，collectionDialog.vue打开后先调GET /property/spFeeBill/payDetail/{billId}取complexId再加载支付渠道\n- 涉及文件：zhi2-web-admin/src/views/property/spFeeBill/components/index.vue、collectionDialog.vue\n- 所属项目：产品2.0；来源会话：eb97ca91-bf05-47bd-962a-06182b75ff56；代码基线：a357f32/075e6e9等（zhi2-web-admin子模块）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/account_serial_dep.md",
+                "memory_type": "entities",
+                "after": "# 自动默认账户须沿协议账户依赖链串行查询\nB端新增资金缴存时自动填充的缴存账户来自已终止协议对应账户，根因为查账户与查协议并行独立过滤各自状态。\n\n## 问题根因\n- fetchAccountAndAgreement将查账户和查协议设计成两个并行独立查询\n- 账户只按bizState:'2'取第一条，完全不感知协议状态\n- 协议虽过滤agreementState:'1'，但账户查询不引用协议结果，两边可能指向不同协议\n\n## 解决方案\n- 改为串行依赖：先查已生效协议，再按propertyProjectId、companyId反查账户，账户查询本身加agreementState:'1'过滤兜底\n- B端无已生效协议或无可用账户时直接提示「当前物业管理区域暂无已生效的协议，无法新增缴存」并阻止打开弹窗\n- G端选择账户弹窗同样补agreementState过滤；协议生效态等魔数值抽成常量（如EFFECTIVE_AGREEMENT_STATE='1'）放enums.js\n- 通用套路：任何按主体自动默认关联对象逻辑须沿业务依赖链串行取数，并行独立过滤不够；后端分页不支持关联状态参数需推动后端支持\n\n## 验证与归属\n- 验证证据：会话9f380095 fetchAccountAndAgreement并行查询、账户bizState:'2'未关联协议状态，修复改components/index.vue串行+AddDialog.vue同步过滤\n- 涉及文件：zhi2-web-admin/src/views/maintenance/guaranteeDeposit/components/index.vue、AddDialog.vue、enums.js\n- 所属项目：产品2.0；来源会话：9f380095-1ae6-4b79-936e-82358c3999ad；代码基线：产品2.0 zhi2-web-admin"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

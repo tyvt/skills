@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-投资推送-1793649920734/history/archive_032",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T20:55:59.702352+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/roe_volatility与roe_volatility_ratio回看窗口不同.md",
+                "memory_type": "entities",
+                "after": "# roe_volatility 与 roe_volatility_ratio 回看窗口不同\n投资推送项目中 `roe_volatility` 因子与 `roe_volatility_ratio` 风控指标使用不同年限的 ROE 回看窗口，询问「用了几年 ROE」时须先分清路径。\n\n## 因子定义（factor_builder）\n- `scripts/factor_builder.py` 的 `roe_volatility`：取最近 8 个年度 ROE\n- 计算样本标准差，且必须刚好有 8 条年度观测，不足则为 NULL\n\n## 风控逻辑（risk_screening）\n- `dividend_lowvol_rotation/risk_screening.py` 的 `roe_volatility_ratio`：默认最近 5 年 ROE 波动\n- 可用环境变量 `DLV_RISK_LOOKBACK_YEARS` 覆盖回看年限\n\n## 验证与归属\n- 验证证据：会话 rollout-2026-08-26T11-20-14 用户问 roe_volatility 几年标准差；助手查代码给出 8 年因子 vs 5 年风控 ratio 及 DLV_RISK_LOOKBACK_YEARS\n- 涉及文件：scripts/factor_builder.py、dividend_lowvol_rotation/risk_screening.py\n- 所属项目：投资推送；来源会话ID：rollout-2026-08-26T11-20-14-01a03c15-2861-78e3-a5c0-1d8a29f75765"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/回测报告慢因逐行遍历与排名未缓存.md",
+                "memory_type": "entities",
+                "after": "# 回测报告慢因逐行遍历与排名未缓存\n投资推送回测与报告性能瓶颈源于 `iterrows` 逐行判断及排名重复计算未缓存，已通过向量化与缓存优化。\n\n## 性能瓶颈\n- `iterrows` 逐行判断买卖信号，效率低下\n- 排名重复计算且未缓存，重复开销大\n\n## 优化措施\n- `cn_broad_signal.py` 新增 `vectorized_cn_broad_buy_mask` 并设 `buy_only=True` 跳过卖出\n- `backtest_buy_signals.py` 改用向量化掩码与 `build_daily_table_range` 批量构建\n- `buy_amount_ranking.py` 并行预加载并将排名落盘 `cache/ranking_allocation.json` 命中缓存\n- `config.py` 增加配置缓存\n\n## 验证与归属\n- 验证证据：src=投资推送/008.md\n- 涉及文件：report.py、backtest_buy_signals.py、backtest_trade_signals.py、data_cache.py、cn_broad_data.py、realtime_quote.py、buy_amount_ranking.py、market_data.py\n- 所属项目：投资推送；来源会话ID：17bbafc8-a23f-4d2e-9dc4-3980f571ac77"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/回测诊断ic不一致修正口径.md",
+                "memory_type": "preferences",
+                "after": "- 回测表现与诊断 IC 不一致时，按用户归纳的三类根因修正：频率错配、交集过窄、现金假象\n- 频率错配：实盘/回测改为月末调仓、持有约 20 日，与诊断 IC 口径严格对齐\n- 交集过窄：ROE、负债率改为全市场排名分位筛选（如 ROE 剔除后 20%、负债率剔除前 20%），不再用绝对阈值压候选池\n- 现金假象：强制满仓且最少 10 只持仓，不足 10 只时放宽到 Top 100 再分配权重\n- 该修正表在来源会话中仅作为待落地需求，改仓库文件/提示词路径前须先与用户确认\n- 验证：会话 rollout-2026-08-26T15-00-29 用户贴根因/修正措施对照表并写「有疑问先和我确认」；项目：投资推送"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/实盘报告与回测信号口径分叉.md",
+                "memory_type": "entities",
+                "before": "# 投资推送：实盘报告与回测对同一指数的信号口径刻意分叉\nREADME/配置约定中，报告与回测路径对同一指数采用刻意不同的买卖信号口径，改阈值或卖点前须分清路径。\n\n## 信号口径分叉\n- 创业板指：报告与回测均仅买、无卖点\n- 宽基卖出：报告中仅移动止盈（中证1000 回撤兜底、科创50 分批），去掉估值卖点\n- 红利/美股：报告侧仅买，回测可经智能轮动触发移动止盈（美股回测另有估值卖点）\n\n## 买入与分配\n- 买入默认「位置分配 + 年度预算缩放 + 涨跌缩放」\n- 实盘与回测各有一套分配逻辑，缓存 cache/position_allocation.json\n- backtest_trade_signals 默认走智能轮动（共享资金池 + 轮动门控）\n\n## 验证与归属\n- 验证证据：会话 d293249a 按 config.py/report/backtest 脚本补全 README；红利近1年区间阈值 58% 与 config 对齐\n- 涉及文件：README.md、config.py、buy_amount_allocation.py、rotation_sell.py、market_regime.py、backtest_trade_signals.py\n- 所属项目：投资推送；来源会话ID：d293249a-9042-45c7-bb0f-b5bf6f037589",
+                "after": "# 投资推送：实盘报告与回测对同一指数的信号口径刻意分叉\nREADME/配置约定中，报告与回测路径对同一指数采用刻意不同的买卖信号口径，改阈值或卖点前须分清路径。\n\n## 信号口径分叉\n- 创业板指：报告与回测均仅买、无卖点\n- 宽基卖出：报告中仅移动止盈（中证1000 回撤兜底、科创50 分批），去掉估值卖点\n- 红利/美股：报告侧仅买，回测可经智能轮动触发移动止盈（美股回测另有估值卖点）\n\n## 买入与分配\n- 买入默认「位置分配 + 年度预算缩放 + 涨跌缩放」\n- 实盘与回测各有一套分配逻辑，缓存 cache/position_allocation.json\n- backtest_trade_signals 默认走智能轮动（共享资金池 + 轮动门控）\n\n## 验证与归属\n- 验证证据：会话 d293249a 按 config.py/report/backtest 脚本补全 README；红利近1年区间阈值 58% 与 config 对齐\n- 涉及文件：README.md、config.py、buy_amount_allocation.py、rotation_sell.py、market_regime.py、backtest_trade_signals.py、backtest_rotation.py\n- 所属项目：投资推送；来源会话ID：d293249a-9042-45c7-bb0f-b5bf6f037589"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

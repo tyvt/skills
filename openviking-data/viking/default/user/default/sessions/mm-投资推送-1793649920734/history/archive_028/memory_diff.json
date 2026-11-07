@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-投资推送-1793649920734/history/archive_028",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T20:49:05.892056+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cn_broad分指数阈值环境变量与csindex指标url约定.md",
+                "memory_type": "entities",
+                "after": "# cn_broad分指数阈值环境变量与CSIndex指标URL约定\n投资推送项目里 cn_broad 宽基信号阈值通过环境变量与默认值管理，并约定中证指数估值文件 URL 拼接规则。\n\n## 阈值与环境变量\n- 宽基信号阈值读取 `get_cn_broad_signal_config(index_code)`：全局 `CN_BROAD_*` + `_CN_BROAD_PER_INDEX_DEFAULTS` 按 code 覆盖\n- 环境变量命名：`CN_BROAD_{指数code}_{SUFFIX}`（如 `CN_BROAD_000300_BUY_SPREAD_PERCENTILE_MIN`），兼容旧前缀 `A500_*`\n\n## 中证指数数据URL\n- 估值历史：`market_data.read_indicator_history(code)` 拉 `{CSINDEX_INDICATOR_BASE_URL}/{code}indicator.xls`\n- 成分权重：`{code}closeweight.xls`\n\n## 新指数接入流程\n- 新指数接入前全库检索 code 是否已存在，再补白名单、config 分指数默认与 report 模块路由\n\n## 验证与归属\n- 验证证据：会话 66471137 给出 URL 拼接规则、env 格式及 cn_broad 数据链（indicator.xls → cn_broad_data → cn_broad_signal → report/push/backtest）\n- 涉及文件：config.py、market_data.py、cn_broad_data.py、report.py\n- 所属项目：投资推送；来源会话ID：66471137-806e-41aa-b92c-c3ddc7dbd584"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/push_env密钥管理与gitignore约定.md",
+                "memory_type": "entities",
+                "after": "# push_env密钥管理与gitignore约定\n投资推送项目中含 SERVERCHAN_SENDKEY 的 push.env 不得入库，若历史泄露需轮转密钥，并规范 .gitignore 覆盖。\n\n## 密钥管理\n- 含 `SERVERCHAN_SENDKEY` 的 `push.env` 不得进 git（README 亦要求）\n- 若曾在 `init` 等提交中入库，本地 `git rm --cached` 后仍视为密钥已泄露，应在 Server酱 重新生成 SendKey\n\n## gitignore 规范\n- 宜覆盖：`.venv-*/`、`config/push.env`、`config/cache/`、`config/data/`、`*.parquet`、回测输出与 `*.bak`/`*.tmp`\n- 模板保留 `push.example.env`\n\n## 验证与归属\n- 验证证据：会话 9c1154a6 更新 .gitignore 并从索引移除 push.env；指出 da7019c init 曾提交 SendKey，建议远程仓库轮转密钥\n- 涉及文件：.gitignore、push.env、push.example.env、config/env.py、README.md\n- 所属项目：投资推送；来源会话ID：9c1154a6-3e96-4992-aec9-9cc0b44fae86"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/merge_dataframes_by_date日期类型导致merge_asof失败.md",
+                "memory_type": "entities",
+                "after": "# merge_dataframes_by_date日期类型导致merge_asof失败\n投资推送中 `data_cache.merge_dataframes_by_date` 将日期转 python date 致 object dtype，并发缓存刷新后 merge_asof 混用类型报错。\n\n## 问题根因\n- 若用 `combined['_merge_dt'].dt.date` 写回日期列，得 object dtype\n- 缓存过期并发刷新（创业板 PE/PB、美股等）后内存与 `cyb_data`/`us_index_data` 的 `merge_asof` 混用 datetime64 与 object，报 `Incompatible merge dtype, dtype('O') and dtype('O')`（易误判为 akshare 网络问题）\n\n## 修复方式\n- 日期列保留 `datetime64[ns]`，如 `combined[date_col] = combined['_merge_dt']`\n- 仍失败可删 `data/cache/cyb/`、`data/cache/us/` 强制重拉\n\n## 验证与归属\n- 验证证据：会话 4ffab379 报错出现在 akshare tqdm 刷新缓存时；改保留 datetime64 后 merge_asof 与 `python report.py` 验证通过\n- 涉及文件：data_cache.py、cyb_data.py、us_index_data.py、report.py\n- 所属项目：投资推送；来源会话ID：4ffab379-d597-4f7b-b836-4964bddd5105"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/波动率分位诊断年化不等同月度调仓回测.md",
+                "memory_type": "entities",
+                "after": "# 波动率分位诊断年化不等同月度调仓回测\n投资推送 volatility_60d 分位 Band 验证须区分「固定20日」诊断年化与「月度调仓」可执行回测，后者优势弱且成本后更小。\n\n## 口径差异\n- 「固定持有 20 个交易日」诊断年化 Q3 约 13.85%\n- 「月度调仓、持有至下次调仓」毛年化 Q3 约 9.69%，Q1 约 8.20%，配对月收益 t≈1.01\n- Q3 单边换手约为 Q1 两倍，计入佣金/滑点/印花税后净优势更小\n\n## 结论\n- Band 方向仅弱支持，IC/诊断强度应下调\n- 须单独检查策略约束与 Band 的兼容性\n\n## 实现与验证\n- 实现见 `scripts/backtest_volatility_quantiles.py`\n- 验证证据：会话 rollout-2026-08-27T08-23-54 用户要求无约束分位回测验证 13.85%；结论表对比固定20日 vs 月调仓毛/含成本年化与换手\n- 涉及文件：scripts/backtest_volatility_quantiles.py、tests/test_volatility_quantile_backtest.py、output/volatility_quantile_backtest/summary.csv\n- 所属项目：投资推送；来源会话ID：rollout-2026-08-27T08-23-54-01a0409a-1524-7612-bd45-47273e00dc7b"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-昆山市民-1793812170720/history/archive_009",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T17:36:38.574384+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/network_error_toast.md",
+                "memory_type": "entities",
+                "after": "# 后端接口连接异常为网络层失败\n昆山市民小程序中「后端接口连接异常」提示来自 axios 响应拦截器对 Network Error 的兜底文案，非业务错误码。\n\n## 错误来源\n- `src/request/index.js` 的 axios 响应拦截器中，当 `error.message === \"Network Error\"` 时文案改为「后端接口连接异常」\n- 另含 `timeout` 映射「系统接口请求超时」、`Request failed with status code` 映射「系统接口XXX异常」\n\n## 含义与排查\n- 该提示表示请求根本未连上服务端：域名不可达、未配置合法域名、HTTPS 证书、服务宕机等\n- 不是接口返回 `code != 200` 的业务错误\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=昆山市民\n- 涉及文件：src/request/index.js、App.vue、home.vue\n- 所属项目：昆山市民；来源会话ID：33ab37e2-0079-458d-a791-5eab0baa4197；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/wxlogin_request_aborted.md",
+                "memory_type": "entities",
+                "after": "# 微信登录请求被中途取消\n昆山市民小程序微信登录调用 getInfoByCode 报错 MiniProgramError: Request aborted，属请求被取消而非业务错误。\n\n## 错误现象\n- 报错：`MiniProgramError: Request aborted`\n- 对应请求：`GET /estate/wechatOauth/getInfoByCode?code=...`\n- 作用：用 `wx.login` 拿到的 `code` 经 `wxLogin.js` 的 loginWithWxCode 去后端换 accessToken 与用户信息\n\n## 常见原因\n- 重复触发登录导致请求互相打断（最可能）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=昆山市民\n- 涉及文件：src/utils/wxLogin.js、App.vue、home.vue\n- 所属项目：昆山市民；来源会话ID：abc57820-2b35-4849-8e23-0d665121c69f；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/examine_no_refresh.md",
+                "memory_type": "entities",
+                "after": "# 保险立项审核后页面未刷新\n昆山市民小程序从消息通知再次进入保险立项详情时，审批成功后按钮与详情未刷新，再点审核报单据已被处理。\n\n## 问题根因\n- 页面复用未刷新：再次进入详情页只触发 onShow 不触发 onLoad，详情与按钮状态仍旧\n- 审批成功后未更新按钮：operationBtn 的 watch 只监听 busCode/dataId，审批后两值不变不重校验\n- 审批成功只返回上一页：updateBtn 仅 navigateBack，无刷新\n\n## 修复方案\n- examineDetail.vue 增加 onShow 重新拉取详情，并增 refreshKey 递增通知子组件重校验\n- operationBtn.vue watch 增加 refreshKey，审批/指派成功后先 updateDetail 再 await init() 再返回\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=昆山市民\n- 涉及文件：src/pages_examine/examineDetail.vue、examineList.vue、components/operationBtn.vue、api/modules/examine.js、components/approveDialog.vue、request/index.js\n- 所属项目：昆山市民；来源会话ID：73a8f90b-b76b-4c0a-817c-91bc79c7d47c；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/navigate_edituserinfo_bug.md",
+                "memory_type": "entities",
+                "before": "# 更改实名navigateTo同路由静默失败\n昆山市民小程序更改实名人脸成功后用uni.navigateTo跳转同路由致静默失败，已在当前页直接切换模式修复。\n\n## 问题根因\n- 更改实名人脸成功后用 `uni.navigateTo` 跳转 `/pages/verifyUser/index?pageType=editUserInfo`\n- 当前页已在栈中，小程序禁止 `navigateTo` 同路由，导致跳转静默失败\n\n## 修复方案\n- 人脸成功后在当前页直接切 `editUserInfo` 模式\n- 更新 `pageType`、清空表单并刷新导航栏标题\n\n## 验证与归属\n- 验证证据：src=昆山市民/007.md\n- 涉及文件：src/pages/verifyUser/index.vue、src/pages/common/useEidVerify.js、src/pages/verifyUser/info.vue、src/api/modules/estate.js\n- 所属项目：昆山市民；来源会话ID：bc96deeb-f24b-4f60-a14d-059e81f1caf8；代码基线：none",
+                "after": "# 更改实名navigateTo同路由静默失败\n昆山市民小程序更改实名人脸成功后用uni.navigateTo跳转同路由致静默失败，已在当前页直接切换模式修复。\n\n## 问题根因\n- 更改实名人脸成功后用 `uni.navigateTo` 跳转 `/pages/verifyUser/index?pageType=editUserInfo`\n- 当前页已在栈中，小程序禁止 `navigateTo` 同路由，导致跳转静默失败\n- 解绑和首次实名不受影响，因分别用 `reLaunch` 跳到其他页面\n\n## 修复方案\n- 人脸成功后在当前页直接切 `editUserInfo` 模式\n- 更新 `pageType`、清空表单并刷新导航栏标题\n\n## 验证与归属\n- 验证证据：src=昆山市民/007.md\n- 涉及文件：src/pages/verifyUser/index.vue、src/pages/common/useEidVerify.js、src/pages/verifyUser/info.vue、src/api/modules/estate.js\n- 所属项目：昆山市民；来源会话ID：bc96deeb-f24b-4f60-a14d-059e81f1caf8；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793813941148/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T17:46:21.632299+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/option_table_tab_render.md",
+                "memory_type": "entities",
+                "after": "# 选项表决切换Tab表格空白修复\n太仓G端选项表决详情从「基本信息」切到「投票信息」Tab时，表格内容为空但分页显示有数据，需移除动态固定列并修正选择函数。\n\n## 问题根因\n- 切换到「投票信息」Tab 时 `showSearch` 变为 `true`，表格动态新增带 `fixed=\"right\"` 的操作列\n- Element UI 表格动态插入固定列后表体可能不渲染，表现为分页有数据但内容空\n- `isRowSelectable` 原先返回布尔值，而 `selectable` 需要函数，影响表格渲染\n\n## 修复方案\n- `optionDecision/components/DecisionRangeTable.vue`：移除操作列 `fixed=\"right\"`；`isRowSelectable` 改为方法 `rowSelectable(row)` 传给选择列\n- 同上文件：`showSearch` 切换时清除 `voteWay`/`voteState` 筛选；缩短 `getList` 防抖；数据加载后执行 `doLayout`\n- `optionDecision/detail.vue`：Tab 切换后数据请求完成延迟 400ms 执行 `doLayout`；「表决结果」按钮跳转同步刷新表格\n\n## 验证与归属\n- 验证证据：会话 c17819e8 选项表决详情切换 Tab 表格空白；修复后正常显示\n- 涉及文件：zhi1-web-admin/src/views/estate/optionDecision/components/DecisionRangeTable.vue、optionDecision/detail.vue、decisionCommon/components/VoteRangeDialog.vue、ownerDecision/components/VoteRangeDialog.vue\n- 所属项目：太仓G；来源会话：c17819e8-f61e-40ed-99cc-c04ba5efd9a5；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/option_detail_button_fix.md",
+                "memory_type": "entities",
+                "after": "# 选项表决详情操作按钮不显示修复\n太仓G端选项表决详情页操作按钮（提前结束、延期等）不显示，需统一权限指令与状态判断。\n\n## 问题根因\n- bug2436 将按钮从 `v-hasPermi` 改为 `hasPerm()` + `v-if`，与维修资金表决等页面不一致，部分环境下按钮不渲染\n- `decisionState`、`bizState` 可能为数字，而 `showRevoke` 用 `['1','2','5'].includes(this.form.decisionState)`，数字 5 时 includes 失败\n- `v-hasPermi` 指令缺陷：仅有 update 钩子，首次挂载不校验权限，无权限隐藏后不恢复 display\n\n## 修复方案\n- `optionDecision/detail.vue`：操作按钮改回 `v-show` + `v-hasPermi`（与 ownerDecision 一致）\n- 权限同时支持 `estate:optionDecision:*` 和 `estate:ownerDecision:*`\n- 用 `decisionStateValue`、`isSubmittedBiz` 等计算属性统一状态判断\n- 延期（状态 5）时也会显示对应按钮\n\n## 验证与归属\n- 验证证据：会话 6bb25673 选项表决详情未显示提前结束等按钮；修复后正常\n- 涉及文件：zhi1-web-admin/src/views/estate/optionDecision/detail.vue、src/directive/permission/hasPermi.js、src/mixins/detailMixins.js、src/router\n- 所属项目：太仓G；来源会话：6bb25673-a3f0-4f17-9c69-8943d17f4cb8；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/general_detail_button_fix.md",
+                "memory_type": "entities",
+                "after": "# 一般表决新增页多余按钮修复\n太仓G端一般表决详情页底部按钮同时用 `v-show` 与 `v-hasPermi`，导致新增页也显示撤销、延期等操作按钮。\n\n## 问题根因\n- 一般表决详情页底部按钮同时用 `v-show` 和 `v-hasPermi`\n- `v-hasPermi` 指令在有权限时强制设置 `display: ''`，覆盖 `v-show` 隐藏效果\n- 新增页（`formMode=add`）时只要账号有权限，撤销、延期、提前开始等按钮全部显示\n\n## 修复方案\n- `generalDecision/detail.vue`：增加 `isSubmittedBiz` 计算属性，仅查看模式且单据已提交（`bizState == '2'`）时为 true\n- 将 `v-show` + `v-hasPermi` 改为 `v-if` + `checkPermission()`，权限判断合并进显示条件\n- 修复后新增页底部只显示「保存」；查看已提交记录才按状态权限显示操作按钮\n\n## 验证与归属\n- 验证证据：会话 3c3a27ee 一般表决刚新增就出现一排其他按钮；修复后正常\n- 涉及文件：zhi1-web-admin/src/views/estate/generalDecision/detail.vue、ownerDecision/detail.vue、src/mixins/detailMixins.js、optionDecision/detail.vue\n- 所属项目：太仓G；来源会话：3c3a27ee-5748-4f83-bd05-d3e2e69d6434；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

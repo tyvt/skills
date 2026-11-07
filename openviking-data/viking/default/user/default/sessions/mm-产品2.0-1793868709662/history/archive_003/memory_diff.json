@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793868709662/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T08:59:49.261633+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/complex_change_display_fix.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0复杂变更角标与字典显示修复\n产品2.0 项目物业变更详情接入单元格右上角红色三角形变更角标，并修复字典标签匹配导致显示代码的问题。\n\n## 背景与原因\n- 物业类型等字典在 formatSelectOptionsDisplay 与 detail-template 的 tag 展示中按 value/label 查找，而 getDicts 与 DictTag 实际用 dictValue/dictLabel，匹配不到回退显示代码。\n- 所属社区依赖 communityOptions，dictFormatter 与 communityFormatter 等价；变更后街道与原街道不一致时，当前列表无「变更前」社区只能显示代码。\n- 若并行拉取「变更前街道」列表，可能被后返回的当前街道请求整表覆盖，合并失效。\n\n## 修改内容\n- formatSelectOptionsDisplay：优先用 dictValue/dictLabel，没有再用 value/label。\n- detail-template.vue 中 tag 的 getItemValueDisplayString 同样改为 dict 匹配逻辑。\n\n## 验证与归属\n- 涉及文件：detail-template.vue、property/complexChange/detail.vue、src/mixins、src/main.js。\n- 所属项目：产品2.0；来源会话：b608284d-b42b-4810-99bd-afe869af0cbd；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_row_hover_unify.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0表格行悬停色统一\n产品2.0 项目统一 zs-table 及固定列、操作列的悬停背景色为 #f5f7fa，消除列表页不一致。\n\n## 问题原因\n- 列表页 zs-table 悬停背景色为 #f5f7fa，但 zs-operate-column 将操作列单元格强制设为 #ffffff，悬停时操作列不变色。\n- 悬停 class 只加在主表体行上，左侧/右侧固定列未同步悬停状态。\n\n## 修改内容\n- variables.css 新增全局变量 --table-row-hover-background-color: #f5f7fa。\n- element-ui.scss 统一所有 el-table 悬停样式，覆盖主表体、固定列、选中行悬停优先级。\n- zs-operate-column.vue 操作列在悬停/选中时跟随行背景色。\n- zs-table.vue 悬停时同步主表体与所有固定列的 hover-row 状态（含从固定列触发）。\n\n## 验证与归属\n- 涉及文件：variables.css、element-ui.scss、zs-operate-column.vue、zs-table.vue。\n- 验收：列表页、详情子表、弹窗内表格、带固定操作列的表格悬停背景色均统一为 #f5f7fa。\n- 所属项目：产品2.0；来源会话：80a5b505-898c-436f-8ccc-b4d6fd8cd107；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/e2e_clear_session_fix.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0 E2E会话清理SecurityError修复\n产品2.0 项目修复 E2E 用例因 about:blank 页清理 localStorage 触发 SecurityError 导致「待提交完即审核中」的问题。\n\n## 问题现象\n- 03 用例开始时 page 仍为 about:blank，直接 page.evaluate 清理 localStorage 会抛出 SecurityError。\n- 根因位于 clearBrowserSession，导致用例状态异常（没有待确认，待提交完即审核中）。\n\n## 修改内容\n- e2e/fixtures/auth-helpers.js 的 clearBrowserSession 改为：先 clearCookies，判断当前页协议是否为 http/https。\n- 若当前页不可清理（非 http/https），先 page.goto('/#/') 再清理 localStorage。\n- 增加 try/catch 兜底，避免清理失败中断用例。\n\n## 验证与归属\n- 涉及文件：e2e/fixtures/auth-helpers.js、e2e/company/company-record-change.spec.js、CompanyBasicInfoDetail.vue。\n- 所属项目：产品2.0；来源会话：c24a0b77-252c-498f-8424-de964da60242；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/supervision_bank_detail_refactor.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0监管银行详情页改造\n产品2.0 项目将 supervision/bank 三个详情页按新版框架规范改造，并为 DetailTemplate 增加 type:'dict' 渲染支持。\n\n## 改造范围\n- 涉及 cbyh/detail.vue（承办银行）、jgwd/detail.vue、wtjgxy/detail.vue 三个 supervision/bank 详情页。\n- 顺带为 detail-template.vue 的 DetailTemplate 增加 type:'dict' 渲染支持，与 tag 一致，配合 options 显示字典标签。\n\n## 主要改动\n- 顶部 operation-btn-group 配置 moduleName/businessName/primaryKey，关闭内置编辑/提交/审核/打印，slot 内自定义权限按钮。\n- 删除 operation-container、zs-attachment，表单改为 zs-form 包裹，view 用 DetailTemplate + contentInfo/contentInfo2。\n- edit 模式 el-input→zs-input、el-select→zs-select（银行名称保留 el-select filterable）。\n- 保留 prefixUrl、isSuzhouzhizai 条件字段、YhwdTable 子表等原有逻辑。\n\n## 验证与归属\n- 涉及文件：cbyh/detail.vue、jgwd/detail.vue、wtjgxy/detail.vue、detail-template.vue。\n- 所属项目：产品2.0；来源会话：b653273d-87b4-4092-97cd-01c7ae965dff；代码基线：none。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

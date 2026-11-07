@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793713174058/history/archive_139",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T18:15:40.713172+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/工作流/fetch_first_push.md",
+                "memory_type": "entities",
+                "after": "# 推送被拒(fetch first)标准处理流程\n远端返回 fetch first 拒绝推送时，用 stash→rebase→push→stash pop 四步处理，并同步更新禅道备注里的提交号。\n\n## 适用场景\n- 准备推送时远端已有他人新提交，直接 push 被拒（fetch first）\n- 工作区留有与本次任务无关的未提交改动，不能带进本次提交\n\n## 标准步骤\n- 先 git stash 暂存与本次无关的未提交改动\n- git rebase origin/<branch> 变基到远端最新，无文件重叠时不冲突，提交号会被重写\n- 推送成功后再 git stash pop 恢复被暂存的改动\n- 变基后提交号变化，必须同步把禅道备注或交付说明里的旧提交号更新为新值\n\n## 禁忌与核对\n- 禁止直接 git pull --rebase 把未提交改动卷进提交，禁止 --force 改写他人历史\n- 事后核对本次提交文件清单是否只有预期文件、本地未提交改动是否原样还在\n- 分支含大量子模块指针提交时禁 rebase 改 merge\n\n## 验证与归属\n- 来源会话 session-7bb9e4cf-3051-4312-9646-5446cebb8f9e（基线 89e5947），禅道 Bug 5756\n- 提交号由 036e3ba85 变为 0fd25ef15；涉及 router/index.js、utils/ruoyi.js、Navbar.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bell_no_auth.md",
+                "memory_type": "entities",
+                "after": "# 门户铃铛提示没有授权的根因与修复\n固定或隐藏路由（如消息中心）后端菜单不下发，前端未显式注册导致点铃铛提示「没有授权」，实际是路由缺失而非权限问题。\n\n## 问题现象\n- 门户右上角铃铛点击后提示「没有授权」，但用户确有对应菜单权限\n- 同类表现：跳转时把 component: \"Layout\" 的壳菜单当有效组件，点了直接打开 Layout 壳而非目标页\n\n## 根因\n- 本项目路由绝大部分由后端菜单动态下发（listRouters）\n- 消息中心等固定或隐藏路由后端菜单没有、不会下发，前端不显式注册就没有路由\n\n## 修复做法\n- 后端不下发但前端要直达的固定页须在 src/router/index.js 的 constantRoutes 显式注册\n- 判别信号：页面在菜单管理搜不到但用户确实要能点进去\n- 排查时先分清路由未注册（前端补注册）vs 路由注册但权限串不对（后端菜单权限）\n- 权限判定逻辑在 src/utils/ruoyi.js，固定路由命中时不要再按菜单权限判定\n\n## 验证与归属\n- 来源会话 session-7bb9e4cf-3051-4312-9646-5446cebb8f9e（基线 89e5947），禅道 Bug 5756\n- 远端 HEAD 提交 0fd25ef15 fix(router): 消息中心注册固定隐藏路由，修复门户铃铛提示没有授权\n- 涉及文件 router/index.js、utils/ruoyi.js"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_table_scroll.md",
+                "memory_type": "entities",
+                "after": "# 弹窗内表格双滚动条的根因与修复\n弹窗里表格出现外层弹窗滚、表格不滚的双滚动条，多半是自绘表格没走公共 zs-select-dialog，改用公共组件后高度自适应。\n\n## 问题现象\n- 「提取楼幢」弹窗右侧出现两个滚动条，但表格内部本身没有内容超出\n- 期望：表格高度自适应，上方项目或地块编号固定顶部，下方页签固定窗口底部，滚动条只在表格内\n\n## 根因\n- 自绘表格容器未参与弹窗高度分配，按内容自然撑高把弹窗撑出可滚动区\n- 表格溢出被压住看不到表尾数据；本项目老问题，弹窗内表格或楼盘表必须走公共选择弹窗组件\n\n## 修复做法\n- 楼盘表或选择类弹窗统一用 zs-select-dialog（可加 building-table-mode 固定尺寸），不要页面自绘\n- 公共组件自带固定头尾加内部滚动区布局：上方固定、表格区内部滚动、下方页签固定底部\n- 弹窗内表格禁止被压缩（flex-shrink: 0）并保证可横向滚动，否则列被裁掉\n- 改完真机或浏览器验证滚动位置，并同步到同类弹窗\n\n## 验证与归属\n- 来源会话 session-2627b7f9-4768-41fe-9dce-865dad493f52（基线 235e6ee）\n- 子模块提交 2935fcb928（楼幢导入弹窗修复 3 个文件）\n- 涉及 ExtractDialog.vue、zs-select-dialog.vue、zs-dialog.vue、zs-table.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/approval_missing_id.md",
+                "memory_type": "entities",
+                "after": "# 流程查看点击不发请求的根因与修复\n同一流程能力被多主体页复用时，若页面未传自己的业务主键，审批流组件拿不到 id 就静默不发请求。\n\n## 问题现象\n- 机构端「住房租赁机构管理→开业信息报送」页面点「流程查看」无任何网络请求，审批流抽屉打不开\n- 按钮还在、点击无反应、不报错；同类根因：权限配了 company:xxx:approval 仍不调 flowViewer（三道闸是 bizState/busCode/dataId）\n\n## 根因\n- 审批流组件（OperationBtnGroup 内置流程查看/ApprovalProcess/attachmentDraw.vue）需业务主键\n- 租赁端复用机构端详情组件却没传自己的业务主键，组件静默不发请求\n\n## 修复做法\n- 发起审批流前确认 busCode、bizState、dataId 三样齐备，缺 dataId 即本症状\n- 同一能力被多主体页（机构端/租赁端/管理端）复用时，每个页面都要传自己的业务主键\n- 修复形态：流程查看携带该页 companyRecordId 请求审批流（fix(company): 开业信息报送流程查看携带 companyRecordId）\n- 复用组件时对主键缺失做显式处理（禁用按钮或提示），不要静默无响应\n\n## 验证与归属\n- 来源会话 session-89c5aa9f-2377-4a54-9569-b4a6e8387e23（基线 89e5947）\n- 子模块提交 e09210bd7 fix(company): 开业信息报送流程查看携带 companyRecordId 请求审批流\n- 涉及 detail.vue、OperationBtnGroup/index.vue、attachmentDraw.vue、ApprovalProcess/index.vue"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

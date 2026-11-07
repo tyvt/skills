@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793952354195/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T08:19:00.936570+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bprojectdialog_autoenter_fix.md",
+                "memory_type": "entities",
+                "after": "# 物业管理区域弹窗2秒自动进入修复\n园区公共收益项目物业管理区域选择弹窗（bProjectDialog.vue）2秒自动进入失效问题已修复。\n\n## 问题原因\n- 倒计时被反复重置：弹窗挂载时 visible 监听器在无 currentProjectId 时强制 emit('update:visible', true)，与父组件 layout/index.vue 的 syncProjectDialogVisibility 抢控制权，2秒倒计时一直被清掉。\n- visible 状态不可靠：原用 this.$attrs.visible 判断弹窗打开，Vue 2 下响应不稳定，setTimeout 回调可能读到 false，自动提交不执行。\n- 数据未加载完就启动倒计时：区域列表接口还在加载时就开始倒计时，与 onOpen 异步逻辑冲突。\n\n## 修复内容\n- 将 visible 改为显式 prop，用 dialogVisible 正确绑定 el-dialog。\n- 仅在用户主动关闭且未选区域时重新打开弹窗，初始挂载不再强制打开。\n- 等数据加载完成（!dataLoading）后再启动自动进入倒计时。\n- 用 generation 令牌避免过期定时器误触发，倒计时数字正常从 2 递减。\n\n## 涉及文件与来源\n- 文件：zhi2-web-admin/src/views/home/bProjectDialog.vue、zhi2-web-admin/src/layout/index.vue、zhi2-web-admin/src/views/home/ResetPwdDialog.vue\n- 所属项目：园区公共收益；来源会话：022cfbb6-b498-4713-a286-66050471cfb5；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/fee_share_fix.md",
+                "memory_type": "entities",
+                "after": "# 项目结算费用分摊小计错位修复\n园区公共收益项目结算费用分摊表格小计错位问题已修复，涉及 zs-table 布局重同步与费用分摊表格修正。\n\n## zs-table 主修复（zhi2-web-admin/src/components/zs-table/zs-table.vue）\n- refreshColumnOrderKey()：columnOrderKey 变化且开启合计行时，双 $nextTick 调用 resyncTableLayout()，确保 remount 后 footer 同步。\n- 新增 watch: flexColumnCount：动态 v-if 列导致 fit 切换时触发重排。\n- refreshSummaryColumns()：列集合变化时触发 resyncTableLayout()。\n\n## 费用分摊表格修正\n- zhi2-web-admin/src/views/maintenance/final/components/feeShareTable.vue\n- zhi2-web-admin/src/views/maintenance/budget/components/feeShareTable.vue\n\n## 涉及文件与来源\n- 文件：zs-table.vue、final/components/feeShareTable.vue、budget/components/feeShareTable.vue\n- 所属项目：园区公共收益；来源会话：3936cf21-6925-44f4-a5c6-987975681a38；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cancel_dialog_fix.md",
+                "memory_type": "entities",
+                "after": "# 提前结束等弹框校验提示残缺显示修复\n园区公共收益项目选项表决详情页撤销/延期/提前结束弹框校验提示被裁切问题已修复，改动集中在 CancelReasonDialog.vue。\n\n## 修改内容\n- 样式覆盖：为 zs-dialog 增加 custom-class=\"cancel-reason-dialog\"，将错误提示改为文档流布局，避免被 overflow: hidden 裁切（与 ResetPwdDialog 方案一致）。\n- 校验触发：revokeReason、postponeDate 的 trigger 从 ['blur'] 改为 ['blur', 'change']，输入后错误提示即时清除。\n- 打开时重置：在 onOpen 中调用 clearValidate()，避免上次校验状态残留。\n\n## 影响范围\n- 该组件被选项表决详情页的撤销、延期、提前结束三个弹框共用，本次修复一并生效，无需改各 detail 页面。\n\n## 验证与归属\n- 文件：zhi2-web-admin/src/views/components/CancelReasonDialog.vue、zhi2-web-admin/src/views/autonomy/option/detail.vue、zhi2-web-admin/src/styles/index.scss\n- 所属项目：园区公共收益；来源会话：a5325fb9-2e64-40bc-b6ba-0a3479233656；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bank_receipt_column_fix.md",
+                "memory_type": "entities",
+                "before": "# 银行回单表格列顺序错乱修复\n修复园区公共收益项目银行回单点击后右侧表格列顺序因动态宽度计算错乱的问题，并调整列配置。\n## 修改说明\n- 列顺序错乱原因：zs-table-column 未设固定宽度时动态计算 min-width，数据加载后列宽重算打乱顺序。\n- 用 v-for + bankReceiptColumns 配置列，顺序写死在数组里。\n- 每列设置固定 width，避免动态宽度计算。\n- 关闭合计行（:show-summary=\"false\"）。\n- 给表格加固定 key，切换模式时完整重建。\n## 正确列顺序\n- 序号 → 对方账户名称 → 通知书号 → 交易日期 → 交易金额 → 用途 → 手续费 → 记账金额 → 银行平台流水号 → 结算渠道 → 操作\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubBankDetailDay/index.vue、benefit/pubVerificationReceipts/index.vue\n- 所属项目：园区公共收益；来源会话：94e9fe38-5ccd-4e61-8fa5-8929f8b1a0cb；代码基线：none",
+                "after": "# 银行回单表格列顺序错乱修复\n修复园区公共收益项目银行回单点击后右侧表格列顺序因动态宽度计算错乱的问题，并调整列配置。\n## 修改说明\n- 列顺序错乱原因：zs-table-column 未设固定宽度时动态计算 min-width，数据加载后列宽重算打乱顺序。\n- 用 v-for + bankReceiptColumns 配置列，顺序写死在数组里。\n- 每列设置固定 width，避免动态宽度计算。\n- 关闭合计行（:show-summary=\"false\"）。\n- 给表格加固定 key，切换模式时完整重建。\n## 复发与另一修复方案（来源会话 31028abc）\n- 列顺序错乱另一根因：bankReceiptColumns 定义顺序本身正确，但用 v-for 动态渲染列时与右侧固定「操作」列组合，Element Table 列渲染顺序错乱（该问题曾复发）。\n- 对应修复：将银行回单表格改回与银行对账单一致的静态列定义，数据加载后调用 doLayout() 重新布局。\n- 修复后正确列顺序同下，请刷新页面后重新点击「银行回单」确认；若仍异常需上报当前列顺序。\n\n## 正确列顺序\n- 序号 → 对方账户名称 → 通知书号 → 交易日期 → 交易金额 → 用途 → 手续费 → 记账金额 → 银行平台流水号 → 结算渠道 → 操作\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubBankDetailDay/index.vue、benefit/pubVerificationReceipts/index.vue\n- 所属项目：园区公共收益；来源会话：94e9fe38-5ccd-4e61-8fa5-8929f8b1a0cb、31028abc-b8ae-4e20-8edb-702fd8eb1e0c；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

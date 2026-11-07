@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-pages_owner_extra-1793946779036/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T06:35:28.624218+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/elevator_ui_adjust.md",
+                "memory_type": "entities",
+                "after": "# 加梯申请页UI设计稿调整\n已按设计稿完成苏住房C小程序加梯申请相关页面的UI样式调整，涉及地图首页与多个表单页。\n\n## 修改内容\n- 地图首页（index.vue）：地图改为 fixed 全屏铺满（100vw × 100vh）作为底层背景；搜索栏左右间距改为 12px（margin: 20rpx 12px）\n- 申请表单（add.vue / addAlone.vue / input.vue）：页面左右内边距统一为 20px，去掉表单内部多余 40rpx 横向 padding 避免双重间距\n- 申请说明字段：标题「申请说明」与输入框同区块，去掉 164rpx 大间距；标题颜色改为 #666666；字数统计保留在输入框内部右下角（沿用 ZsTextarea 组件）\n- 提交按钮：三个表单页「提交申请」按钮宽度统一为 330px\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=pages_owner_extra\n- 涉及文件：地图首页 index.vue；申请表单 add.vue、addAlone.vue、input.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：195edae6-0f6a-4414-80de-36297794ff9a；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/elevator_marker_path_fix.md",
+                "memory_type": "entities",
+                "after": "# 加梯申请页地图marker图片路径错误修复\n苏住房C小程序加梯申请页地图 marker 图片 location-red.png 因路径引用错误导致500，已修复。\n\n## 问题根因\n- 代码用 `@/static/icon/location-red.png` 引用，实际文件在 `pages_main/static/icon/` 下\n- 微信解析为 `/static/icon/location-red.png` 导致 500\n\n## 修复方案\n- 改用 `resolveStaticUrl('icon/location-red.png', 'pages_main')`（与 houseMap.vue 同方式）\n\n## 验证与归属\n- 涉及文件：addAlone.vue、houseMap.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：85a3ba6b-0da3-48e5-b7f4-7ebc9f354ad6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/elevator_description_style_fix.md",
+                "memory_type": "entities",
+                "after": "# 加梯申请页申请说明输入框高度塌陷修复\n苏住房C小程序加梯申请页「申请说明」输入框因样式问题高度塌陷、标题叠加拦截点击，已修复。\n\n## 问题根因\n- `form2.scss` 表单项默认横向 flex 布局，区域缺少高度\n- 全局 `.uni-forms-item` 使用 `align-items: center`，多行输入区域约 200rpx 但容器未撑开，导致「地理位置」标题叠在输入框上拦截点击\n\n## 修复方案\n- 在 `addAlone.vue` 显式引入 `ZsTextarea`，参考 `signInfo.vue` 调整 `.description` 样式（固定高度、`flex-direction: column`）\n- 补充样式：`:deep(.description) { min-height: 300rpx !important; height: auto !important; align-items: flex-start !important; padding-bottom: 24rpx; }` 并为标签增加 `margin-bottom`\n\n## 验证与归属\n- 涉及文件：addAlone.vue、add.vue、form2.scss、signInfo.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：d8d3c33d-5a07-488c-9663-dd7409ec4528"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/elevator_map_fix.md",
+                "memory_type": "entities",
+                "before": "# 加梯申请页地图与输入框原生组件冲突修复\n苏住房C小程序 `pages_owner_extra/elevator/addAlone.vue`（及 add.vue）修复地图原生组件与「申请说明」输入框互相遮挡导致无法输入的问题。\n\n## 问题根因\n- 微信小程序里 `map` 和 `textarea` 都是原生组件，层级最高，同页会互相遮挡，导致输入框点不到\n- 「申请说明」放在 `uni-forms-item` 里并改纵向 flex 后，输入区域被压扁、触摸失效\n- 之前仅加 `min-height` 样式未解决根因；原生组件层级最高，且 `v-show` 只隐藏视觉不销毁原生层，地图仍拦截下方点击\n- 上次只加了 `min-height` 仍不够，说明样式隔离下原生层遮挡需结构性规避\n\n## 修复内容（多次迭代）\n- 将「申请说明」移出 `uni-forms`，单独用 `description-section` 区块，标签在上、输入框在下\n- 恢复 `touchstart.capture` 和 `@click=\"hideMap\"`，点击时销毁地图原生层\n- 地图默认不显示（`showMap = false`），仅选中小区后显示，滚动或点表单任意处即隐藏\n- 早期用 `v-if` 真正销毁原生 map（而非仅隐藏），触发时机：页面滚动超 120px、点击表单任意区域、触摸/聚焦申请说明输入框\n- 提升输入区层级：`description` 区域增加 `z-index`\n- 修正 `ZsTextarea`：`adjust-position=\"false\"` → `:adjust-position=\"false\"`（布尔绑定）\n- 将地图移到表单上方（与 `add.vue` 一致），让 textarea 与 map 在页面上拉开距离，避免原生层遮挡\n- 接入已有的 `inputHidden` 逻辑：textarea 聚焦时用 `v-show=\"!inputHidden\"` 隐藏地图，输入时键盘不会被地图干扰\n- 为字数统计 `.word-limit` 添加 `pointer-events: none`，避免绝对定位元素挡住输入区域\n\n## 补充修复（会话85a3ba6b）\n- 地图 marker 图片 location-red.png 路径错误：代码用 `@/static/icon/location-red.png` 引用，实际文件在 `pages_main/static/icon/` 下，微信解析为 `/static/icon/location-red.png` 导致 500；修复：改用 `resolveStaticUrl('icon/location-red.png', 'pages_main')`（与 houseMap.vue 同方式）\n- 「申请说明」输入框高度塌陷另一原因：`form2.scss` 表单项默认横向 `flex` 布局，区域缺少高度；修复：在 `addAlone.vue` 显式引入 `ZsTextarea`，参考 `signInfo.vue` 调整 `.description` 样式（固定高度、`flex-direction: column`）。另在会话 d8d3c33d-5a07-488c-9663-dd7409ec4528 中补充：全局 `.uni-forms-item` 使用 `align-items: center`，多行输入区域约 200rpx 但容器未撑开，导致「地理位置」标题叠在输入框上拦截点击；修复为 `:deep(.description) { min-height: 300rpx !important; height: auto !important; align-items: flex-start !important; padding-bottom: 24rpx; }` 并为标签增加 `margin-bottom`。\n- 补充涉及文件：houseMap.vue、signInfo.vue；来源会话ID：85a3ba6b-0da3-48e5-b7f4-7ebc9f354ad6\n\n## 验证与归属\n- 若仍不能输入，先点上方表单区域让地图消失，再点「申请说明」输入框；重新编译小程序后测试「申请说明」字段，应可正常点击并输入。若仍有问题，请告知是在微信开发者工具还是真机上测试。\n- 涉及文件：addAlone.vue、add.vue、form2.scss、houseMap.vue、signInfo.vue、ZsTextarea.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：be5add1d-7616-4020-9f82-4d25046636fb（基础）；12995d5b-1f0e-4084-87fa-bb16ee2b7b73（v-if方案）；85a3ba6b-0da3-48e5-b7f4-7ebc9f354ad6（补充）；e052a49f-6b89-46d9-8914-0630e3aa30fb（地图移上/inputHidden/word-limit）；d8d3c33d-5a07-488c-9663-dd7409ec4528（description样式补充）",
+                "after": "# 加梯申请页地图与输入框原生组件冲突修复\n苏住房C小程序 `pages_owner_extra/elevator/addAlone.vue`（及 add.vue）修复地图原生组件与「申请说明」输入框互相遮挡导致无法输入的问题。\n\n## 问题根因\n- 微信小程序里 `map` 和 `textarea` 都是原生组件，层级最高，同页会互相遮挡，导致输入框点不到\n- 「申请说明」放在 `uni-forms-item` 里并改纵向 flex 后，输入区域被压扁、触摸失效\n- 之前仅加 `min-height` 样式未解决根因；原生组件层级最高，且 `v-show` 只隐藏视觉不销毁原生层，地图仍拦截下方点击\n\n## 修复内容\n- 将「申请说明」移出 `uni-forms`，单独用 `description-section` 区块，标签在上、输入框在下\n- 恢复 `touchstart.capture` 和 `@click=\"hideMap\"`，点击时销毁地图原生层\n- 地图默认不显示（`showMap = false`），仅选中小区后显示，滚动或点表单任意处即隐藏\n- 早期用 `v-if` 真正销毁原生 map（而非仅隐藏），触发时机：页面滚动超 120px、点击表单任意区域、触摸/聚焦申请说明输入框\n- 提升输入区层级：`description` 区域增加 `z-index`\n- 修正 `ZsTextarea`：`adjust-position=\"false\"` → `:adjust-position=\"false\"`（布尔绑定）\n- 将地图移到表单上方（与 `add.vue` 一致），让 textarea 与 map 在页面上拉开距离，避免原生层遮挡\n- 接入已有的 `inputHidden` 逻辑：textarea 聚焦时用 `v-show=\"!inputHidden\"` 隐藏地图，输入时键盘不会被地图干扰\n- 为字数统计 `.word-limit` 添加 `pointer-events: none`，避免绝对定位元素挡住输入区域\n\n## 验证与归属\n- 若仍不能输入，先点上方表单区域让地图消失，再点「申请说明」输入框；重新编译小程序后测试「申请说明」字段，应可正常点击并输入。\n- 涉及文件：addAlone.vue、add.vue、ZsTextarea.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：be5add1d-7616-4020-9f82-4d25046636fb（基础）；12995d5b-1f0e-4084-87fa-bb16ee2b7b73（v-if方案）；e052a49f-6b89-46d9-8914-0630e3aa30fb（地图移上/inputHidden/word-limit）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

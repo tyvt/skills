@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793820561401/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T20:15:33.708892+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/shared_funds_dup.md",
+                "memory_type": "entities",
+                "after": "# 共有资金明细类型\"全部共有资金\"重复Bug\n无锡市区小程序嵌入H5中 DetailsTab.vue 的类型选择器出现两条相同的「全部共有资金」选项。\n\n## 问题根因\n- `DetailsTab.vue` 的 `loadTypeOptions` 在加载字典 `benefit_app_account_fund_type` 时，手动在列表头部插入了「全部共有资金」\n- 字典本身已包含该项（`value` 为空表示「全部」），导致选择器出现重复选项\n\n## 修复方案\n- 合并字典数据前先 `filter` 掉 `value` 为空或 `null` 的项，仅保留手动添加的那一条「全部共有资金」\n- 代码：`dict.filter((item) => item.value !== \"\" && item.value != null)`\n\n## 验证与归属\n- 来源会话：0d2c6516-1930-4d19-b020-1182a8c885bb；代码基线：none\n- 涉及文件：src/pages_benefit/sharedFunds/components/DetailsTab.vue、src/api/sharedFunds.js\n- 所属项目：无锡市区小程序嵌入H5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/sfb_url_encode.md",
+                "memory_type": "entities",
+                "after": "# 苏服办跳转URL中Base64密文\"+\"被解码为空格致解密失败\n无锡市区小程序嵌入H5中苏服办跳转URL的密文参数因URL编码规则被篡改，导致后端解密失败。\n\n## 问题根因\n- 苏服办跳转URL中 `phone`、`idNumber` 等参数为Base64密文，包含 `+` 字符\n- H5 使用 `URLSearchParams` 解析时按 `application/x-www-form-urlencoded` 规则把 `+` 当成空格解码\n- Base64密文里的 `+` 被替换成空格后后端解密失败\n\n## 修复方案\n- 在 `h5Context.js` 的苏服办登录逻辑中，读取密文参数后将空格还原为 `+`\n\n## 验证与归属\n- 来源会话：1d789cb5-e259-4d57-ada7-dfb786d89609；代码基线：none\n- 涉及文件：src/utils/h5Context.js、src/utils/portal.js\n- 所属项目：无锡市区小程序嵌入H5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/notice_msgtype_bug.md",
+                "memory_type": "entities",
+                "after": "# 公告列表类型文字未展示（msgType缺失）\n无锡市区小程序嵌入H5中 `NoticeList.vue` 的类型标签一直显示为「-」，因父页面未传递 `msgType`。\n\n## 问题根因\n- `NoticeList.vue` 苏住房样式用 `item.msgType` 配合 `getDictLabel` 显示类型\n- 父页面 `announcement/index.vue` 在 `res.rows.map` 转列表项时未带上 `msgType`\n- `getDictLabel` 在 `val` 为空时返回 `''`，模板落到 `|| \"-\"` 故类型显示为「-」\n- 对比 `project/announcement/index.vue` 用 `...el` 展开保留了 `msgType`，显示正常\n\n## 修复方案\n- 在 `announcement/index.vue` 的 map 中补充 `msgType: el.msgType`\n\n## 验证与归属\n- 来源会话：636ac7f6-e11f-4469-91e7-916792d8743b；代码基线：none\n- 涉及文件：src/pages/announcement/index.vue、NoticeList.vue、src/pages/project/announcement/index.vue\n- 所属项目：无锡市区小程序嵌入H5"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/qqmapkey_init_order.md",
+                "memory_type": "entities",
+                "before": "# 苏服办H5初始化顺序与qqMapKey请求约束\n无锡市区小程序嵌入H5中 initQqMapKeys 必须在 await initH5Context 之后执行，且无 token 时不请求 getConfigKey。\n\n## 现象与根因\n- getConfigKey（拉 qq.map.key）走 @/api 拦截器，请求头却无 Authorization\n- 小程序 web-view 嵌入 H5 时，URL token 由 initH5Context 写入 userStore\n- 若 App.vue 在 initQqMapKeys() 早于 await initH5Context(getH5Param) 执行，拦截器里 userStore.token 仍为空\n\n## 修复方案\n- 启动顺序：await initH5Context 后再 initQqMapKeys()\n- qqMapKey.js 无 token 时直接跳过 getConfigKey（小程序端从 storage 恢复 token 时一般不受影响）\n\n## 验证与归属\n- 验证会话：ef15cdae-5895-485b-9248-03961a3b0697（基线 2e9862a）\n- 涉及文件：src/App.vue、src/utils/qqMapKey.js、src/api/index.js\n- 所属项目：无锡市区小程序嵌入H5",
+                "after": "# 苏服办H5初始化顺序与qqMapKey请求约束\n无锡市区小程序嵌入H5中 initQqMapKeys 必须在 await initH5Context 之后执行，且无 token 时不请求 getConfigKey。\n\n## 现象与根因\n- getConfigKey（拉 qq.map.key）走 @/api 拦截器，请求头却无 Authorization\n- 小程序 web-view 嵌入 H5 时，URL token 由 initH5Context 写入 userStore\n- 若 App.vue 在 initQqMapKeys() 早于 await initH5Context(getH5Param) 执行，拦截器里 userStore.token 仍为空\n\n## 修复方案\n- 启动顺序：await initH5Context 后再 initQqMapKeys()\n- qqMapKey.js 无 token 时直接跳过 getConfigKey（小程序端从 storage 恢复 token 时一般不受影响）\n- @/api/index.js 拦截器在 `userStore.token` 存在时自动注入 `Authorization: Bearer <token>` 请求头\n\n## 验证与归属\n- 验证会话：ef15cdae-5895-485b-9248-03961a3b0697（基线 2e9862a）\n- 涉及文件：src/App.vue、src/utils/qqMapKey.js、src/api/index.js\n- 所属项目：无锡市区小程序嵌入H5"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_033",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:13:45.723499+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/login_auth_bug.md",
+                "memory_type": "entities",
+                "after": "# 登录后业主认证态缺失bug\n登录成功进入各tab仍误提示「请先进行业主身份认证」，根因为getUserInfo未await身份列表且登录只存token未刷新认证态。\n\n## 问题根因\n- store/user.js的getUserInfo中identities赋值未await listStatus()，接口未返回就置空数组，goMenu的v3校验读空身份判定未认证。\n- 登录链路只保存token，未拉取身份列表与绑定房屋列表，整个会话生命周期认证态无数据源。\n\n## 解决方案\n- getUserInfo改为串行：先await用户信息/状态接口，拿到结果再写identities。\n- 新增refreshAuthState()，按「用户信息接口→getMyHouseList」顺序拉齐两类状态。\n- 两处身份类型比较统一String()归一，避免数字1与字符串\"1\"比较失败。\n- 登录页两分支跳转前await refreshAuthState；utils/tabBar.js各tab的onShow对已登录用户调一次；App.vue的H5 hash注入token分支同样刷新。\n- 「我的」页删掉自带loadIdentityTypes改由refreshAuthState统一负责。\n\n## 验证与归属\n- 验证：会话db56ec08用户反馈登录后点菜单仍提示认证，根因明确为getUserInfo未await listStatus且登录后未刷新。\n- 涉及文件：zhi2-mobile-shimin/src/store/user.js、pages_main/login/index.vue、utils/tabBar.js、App.vue、My_Suzhufang.vue。\n- 所属项目：苏住房C；代码基线：5f0f4dc；来源会话ID：db56ec08-2aeb-407a-bde0-498f081066b6。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/publicnotice_grid_bug.md",
+                "memory_type": "entities",
+                "after": "# 双晒公示页两列卡片塌陷bug\n双晒公示页卡片塌成一列，根因为flex:0 0 48%配合nowrap标题使最小宽度超出容器，改用CSS Grid兜底。\n\n## 问题根因\n- 卡片内容最小宽度(min-content)超48%分配宽度：标题white-space:nowrap+图标+右箭头，实测最小宽约400rpx，容器48%约340rpx。\n- flex布局无法将卡片压到48%，只能每行放一张，右侧留空。\n\n## 解决方案\n- 容器从flex改CSS Grid：grid-template-columns: repeat(2, minmax(0,1fr))，minmax(0,1fr)允许子项压缩到内容最小宽度以下。\n- 去掉标题nowrap，改word-break: break-all允许换行降低最小宽度。\n- 卡片加min-width:0与overflow:hidden防止内容撑破网格。\n- ZsImage宿主元素显式固定宽高(96×110rpx)避免图片按原始尺寸参与测宽。\n- 通用结论：小程序固定列数卡片墙含nowrap文本+图片+图标时，优先Grid+minmax(0,1fr)+min-width:0三件套。\n\n## 验证与归属\n- 验证：会话9774c8d1用户先贴截图问UI崩，修图标后仍两列未恢复，最终给四项修复。\n- 涉及文件：zhi2-mobile-shimin/src/pages_main/publicNotice/index.vue、components/ZsImage/ZsImage.vue。\n- 所属项目：苏住房C；代码基线：bb6d74a；来源会话ID：9774c8d1-2b21-4a57-a4db-44c6514d4939。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/subpackage_zsimage_bug.md",
+                "memory_type": "entities",
+                "after": "# 分包页面图标背景图不显示bug\n云守护首页梯形背景图与上传「+」号在分包页空白，根因为ZsImage未补subpackage属性致静态资源404。\n\n## 问题根因\n- 小程序分包内图片必须让ZsImage知道所在分包，否则按主包路径拼URL直接404，读屏为空白或纯色。\n- 分包内新引用svg需复制到该分包自身static目录，不能引用主包或别的分包文件。\n\n## 解决方案\n- 给ZsImage补subpackage=\"pages_guard\"之类分包名，并固定高度避免无内在高度塌成0。\n- 分包内svg复制到pages_guard/static/svg/。\n- 头像改读userStore.avatar并配加载失败回退。\n- 伪元素画图标父元素用inline-flex+align-items/justify-content居中，避免真机偏位。\n- ZsImage内部节点尺寸受组件样式控制，外层改宽高需写到深度选择器:deep里。\n\n## 验证与归属\n- 验证：会话5d912c3c【掌服务-小区管理-云守护】UI调整，结论第3、4条补充分包路径与复制svg修复。\n- 涉及文件：zhi2-mobile-shimin/src/pages_guard/index/index.vue、guardApply/components/step1.vue、components/ZsImage/ZsImage.vue。\n- 所属项目：苏住房C；代码基线：8fc3cc5；来源会话ID：5d912c3c-3130-4cf8-9e0a-0d48f904b5f4。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/env_skip_pattern.md",
+                "memory_type": "entities",
+                "after": "# 生产环境按环境变量跳过业务分支模式\n某功能后端未就绪时，生产环境跳过中间页直接进目标页，但开发测试环境保留，可用入口URL工厂+页面onLoad重定向双层拦截。\n\n## 适用场景\n- 需求形态：后端未就绪（如非居民身份证认证后台不可用），生产跳过「证件类型选择」页直达居民身份证实名认证页，且能低成本恢复。\n\n## 可复用套路\n- 环境判定收敛成工具函数：utils/index.js的shouldSkipIdTypeChoose()用import.meta.env.PROD判断，配套getRealNameEntryUrl()/getRealNameEntryRelativeUrl()返回绝对与相对入口地址。\n- 所有跳转入口改调这两个工厂（如「我的-实名信息」入口、未实名拦截确认页、审核失败页），漏一处则半跳过。\n- 页面自身兜底：TypeChoose.vue的onLoad判断生产就redirectTo到FormLocal，FormNonLocal.vue同样拦掉非居民身份证流程。\n\n## 验证与归属\n- 验证：会话a48c524a诉求生产跳过选择身份认证类型页，结论列出工具函数、三处入口更新、两处onLoad兜底，并以产物内联redirectTo为生效证据。\n- 涉及文件：zhi2-mobile-shimin/src/utils/index.js、pages_my/verification/TypeChoose.vue、FormNonLocal.vue、setting/userInfo.vue、UnauthorizedPage.vue、AuthorizedFail.vue。\n- 所属项目：苏住房C；代码基线：0801b84；来源会话ID：a48c524a-2cd1-4f84-88a2-2dc51b597b93。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

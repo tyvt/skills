@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_016",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:44:21.157203+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/version_base_url.md",
+                "memory_type": "entities",
+                "after": "# 子路径版本检查BASE_URL相对路径\n园区物管2.0 在子路径部署下，前端版本检查必须改用 BASE_URL 相对路径而非绝对 /version.json。\n## 问题背景\n- vite.config.js 的 base 为 \"./\"、应用部署在子路径（如 /sz/）且路由为 hash 模式时，绝对路径 /version.json 请求打到站点根，检查失败或拿错文件。\n- hash 路由下直接用 location 拼 URL 会把 #/xxx 当路径拼错。\n## 解决方案\n- 默认路径写成 `${import.meta.env.BASE_URL}version.json`，随 base 解析为 ./version.json。\n- fetch 前用 new URL(this.versionUrl, window.location.href) 把相对路径解析成完整 URL，规避 hash 路由拼接问题。\n- 所有 public 目录静态文件轮询类需求（版本检查、配置热更）都应遵循此约定。\n## 验证与归属\n- 验证：会话 6e40a9a4 中 version-check.js 由 /version.json 改为 BASE_URL 相对路径 + new URL 解析，部署 /sz/ 时正确请求 /sz/version.json。\n- 涉及文件：src/utils/version-check.js、public/version.json、src/utils/resolveServerAssetUrl.js、vite.config.js；所属项目：园区物管2.0；代码基线：f00310232。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/eslint_virtual_import.md",
+                "memory_type": "entities",
+                "after": "# ESLint虚拟模块导入忽略\n园区物管2.0 的 pre-commit ESLint 会因 Vite 虚拟模块与 ?raw 导入报 import/no-unresolved，需在 eslintrc 配 ignore。\n## 问题背景\n- 对暂存 *.vue 执行 ESLint，提交被 import/no-unresolved 拦截，报无法解析的模块。\n- 代码含 import 'virtual:svg-icons-register'，是 Vite 插件生成的虚拟模块，ESLint import 解析器无对应路径必然 unresolved。\n## 解决方案\n- 在 .eslintrc.cjs 给 import/no-unresolved 配置 ignore：['error', { ignore: ['^virtual:', '\\?raw$'] }]，覆盖 virtual: 模块与 ?raw 原始导入。\n- 该配置文件必须一并 git add 进暂存区，否则其他同事或后续会话改到含 virtual: 导入的文件时会复现拦截。\n## 验证与归属\n- 验证：会话 dc317c9d 中 SvgIcon/index.vue 的 virtual: 导入触发失败，以 .eslintrc.cjs 增加 ignore 规则解决并说明需加入暂存区。\n- 涉及文件：zhi2-web-admin/.eslintrc.cjs、zhi2-web-admin/src/components/SvgIcon/index.vue；所属项目：园区物管2.0；代码基线：f00310232。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zstable_data_prop.md",
+                "memory_type": "entities",
+                "after": "# zs-table数据prop化高度计算\n园区物管2.0 的 zs-table 把 data 从 $attrs 改成显式 prop 后，$attrs.data 恒为 undefined 导致表格高度只算 1 行。\n## 问题背景\n- 重构时 data 从透传 attr 改显式 prop，但 getBaseTableHeight() 仍读 this.$attrs.data?.length，prop 声明后不再出现在 $attrs，恒为 undefined、长度按 0，displayRows 算成 max(0,1)=1。\n- 原监听 $attrs.data 变化的 calculateTableHeight() 随之失效，改成 watch data prop 后只调 doLayout()，异步数据后高度不再重算。\n## 解决方案\n- 从 $attrs 迁移为显式 prop 的字段，必须全量排查组件内所有 this.$attrs.xxx 引用并改为直接访问 prop。\n- 数据 prop 的 watcher 除 doLayout 外要恢复 calculateTableHeight()、observeTableResize()、syncFixedColumnOffset() 等派生动作。\n- Vue prop/attr 边界通用坑：声明即从 $attrs 消失，静默返回 undefined 不报错。\n## 验证与归属\n- 验证：会话 8733f1c6 中 zs-table.vue 重构 data 为 prop 后高度失效，修复为读 tableData.length 并在 data watcher 恢复三个派生方法。\n- 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue；所属项目：园区物管2.0；代码基线：736a824e7。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bar_axis_scale.md",
+                "memory_type": "entities",
+                "after": "# 柱状图数值轴上限算法\n园区物管2.0 数据大屏柱状图 Y 轴上限算法收敛为细刻度集合 + 峰值 1.1 倍取整，避免留白过大。\n## 问题背景\n- 原 computeBarAxisMax 只取 1/2/5/10 粗刻度，向上取整跨度太大，峰值 450 上限算到 1000，柱体压矮、顶部空白。\n## 解决方案\n- 统一到 computeBarValueAxisScale 函数，刻度步长细化为 1、1.2、1.5、2、2.5、3、4、5、6、8、10，峰值上方留 10% 空间（BAR_AXIS_PADDING_RATIO=1.1）再向上取整。\n- 所有柱状图共用该函数（computeOperatingAssetsYAxis、computeHundredCountYAxis 等），横向柱状图固定 max 也改为动态计算，避免多处独立计算二次放大。\n- 调整松紧只改 BAR_AXIS_PADDING_RATIO 一个常量。\n## 验证与归属\n- 验证：会话 706dd33e 中 chartOptions.js 统一函数，细刻度+1.1倍 padding，五处柱状图 Y/X 上限动态计算，峰值 450→500、330→400、85→100。\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js；所属项目：园区物管2.0；代码基线：fc994977f。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid、stats_card_flicker、copy_tab_three_sync、zstable_minwidth_elastic、select_func_store\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal、echarts_pie_downplay、echarts_map_dehighlight、attachments_multi_path、map_bubble_color_data_level、echarts_dual_y_scale、no_double_unit、shared_mock_constants、echarts_axis_mid\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、edit_popup_detail_field_loss、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、amount_input_precision_loss、project_switch_soft_refresh、api_deadcode_judgment",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid、stats_card_flicker、copy_tab_three_sync、zstable_minwidth_elastic、select_func_store、zstable_data_prop\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal、echarts_pie_downplay、echarts_map_dehighlight、attachments_multi_path、map_bubble_color_data_level、echarts_dual_y_scale、no_double_unit、shared_mock_constants、echarts_axis_mid、bar_axis_scale\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、edit_popup_detail_field_loss、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、amount_input_precision_loss、project_switch_soft_refresh、api_deadcode_judgment、version_base_url、eslint_virtual_import"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

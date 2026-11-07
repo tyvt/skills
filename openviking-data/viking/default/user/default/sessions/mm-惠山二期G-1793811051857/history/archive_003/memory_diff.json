@@ -1,0 +1,52 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-惠山二期G-1793811051857/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T16:59:17.198126+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/todo_backurl_routing.md",
+                "memory_type": "entities",
+                "after": "# 待办详情返回路由与 backUrl 修复\n惠山二期G 项目中，待办从首页进入详情未带 backUrl、返回路径截错、directDetail 未识别的修复套路。\n\n## 现象\n- 首页待办用 navigateToTodoTask 进入详情不带 backUrl，返回只能靠截断路径\n- 详情路径为 .../detail/{committeeVersionId} 时，lastIndexOf('/') 截到 .../detail 无 ID 壳页，缺少 formMode=view，误判为新增并触发 committeeVersionId 参数类型错误\n- directDetail（已备案物管会）未纳入详情路由识别，待办可能解析到错误详情路由\n\n## 修复方案\n- utils/ruoyi.js 的 resolveBackNavigationTarget：正确从 detail/{id} 回到列表\n- 待办跳转补充 backUrl；识别 directDetail 路由\n- 详情路径与列表页保持一致，使用 getRouterPathByFilePath + id\n\n## 验证与归属\n- 涉及文件：utils/ruoyi.js、OperationBtnGroup/index.vue、main.js\n- 所属项目：惠山二期G；来源会话：1f86f5fa-6621-449b-b902-a3be952fcbd5；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/building_table_data_fix.md",
+                "memory_type": "entities",
+                "after": "# 楼盘表展示数据不全修复\n惠山二期G 项目中，楼盘表因前端兜底分组逻辑裁切数据，改为直接展示接口返回并修复布局的修复套路。\n\n## 问题根因\n- buildingFloorGroup.js 用房号推断楼层并重新分组，导致展示不全\n- buildingTable/index.vue 的 getBuildHouse() 对接口返回数据做转换，可能裁切真实数据\n\n## 修复方案\n- 删除 buildingFloorGroup.js（去除房号推断楼层与重新分组逻辑）\n- 恢复 buildingTable/index.vue 中 getBuildHouse() 直接使用接口返回的 response.data，不做任何转换\n- 保留 BuildingStateTable.vue 布局修复：自适应 Grid、动态列宽、overflow 可见，确保同层多户完整显示\n\n## 验证与归属\n- 当前行为：接口返回什么展示什么；后端修正楼层分组后前端自动跟随\n- 涉及文件：buildingFloorGroup.js、buildingTable/index.vue、BuildingStateTable.vue\n- 所属项目：惠山二期G；来源会话：9da606ce-856f-468c-9dca-d8063172f462；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/lingxi_bind_view.md",
+                "memory_type": "entities",
+                "after": "# 灵锡绑定查看功能页\n惠山二期G 项目中新增的「灵锡绑定查看」页面，用于统计物业管理区域的业主绑定与投票情况。\n\n## 功能说明\n- 搜索条件：物业管理区域（complexName）、地址（address）、所属街道（subdistrictCode）、所属社区（communityCode）\n- 表格列：物业管理区域、所属街道、所属社区、地址、总房屋数、投票业主数、已绑业主数、投票率、绑定率、总面积、已绑定面积、面积绑定率\n- 底部汇总调用 /property/userStatistics/summary，展示房屋总数、已绑业主数、房屋绑定率\n- 列表接口：GET /property/userStatistics/list（apiSuffix: 'list'）\n\n## 菜单配置\n- 后端动态下发菜单，需在菜单管理新增：组件路径 property/userStatistics/index、菜单名称 灵锡绑定查看、权限标识 property:userStatistics:list\n\n## 验证与归属\n- 涉及文件：property/userStatistics/index.vue、router/index.js、mixins/listMixins.js\n- 所属项目：惠山二期G；来源会话：6db21291-c1ac-4c3b-921b-5f99e82885a2；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/adspace_popup_detail.md",
+                "memory_type": "entities",
+                "before": "# 小区台账空置广告位弹窗：不跳过备案详情\n惠山二期G 项目中，统计地图/小区台账点空置广告位无图，因无 revenueContractId 误跳过备案详情的修复套路。\n\n## 现象\n- 统计地图/小区台账点空置广告位无图\n- 常见误判：没有 revenueContractId 就不请求备案详情\n\n## 根因\n- 空置条目往往只有台账主键（detailId/resourcesId/advertiseSpaceDetailId），备案附件在 GET /benefit/pubAdvertiseSpaceDetail/{id} 的 attachments 里\n\n## 修复方案\n- 打开弹窗并行拉台账详情与合同详情：台账失败仍可尝试合同；合同未成功时不要整页切租赁字段导致基础信息全为 -\n- 图片侧与经营用房一致：逗号拆 attachments + resolveServerAssetUrl，无附件回退 picUrl 等\n- revenueContractResourcesId 同时从列表行与明细 form 取值\n- 若接口有数据仍无图，核对列表 resourcesId 是否等于后端 advertiseSpaceDetailId（映射问题需接口补字段）\n\n## 验证与归属\n- 验证：去掉无 revenueContractId 就不请求的逻辑；用 detailId/resourcesId 调 getPubAdvertiseSpaceDetail；台账与合同分开请求；仅合同成功才切租赁字段\n- 涉及文件：benefit/statisticsMap/components/AdvertiseAssetDialog.vue、benefit/statisticsMap/operatingAssets.vue、benefit/statisticsMap/components/ParkingAssetDialog.vue、benefit/statisticsMap/components/VenueAssetDialog.vue、benefit/statisticsMap/components/HouseAssetDialog.vue、benefit/pubAdvertiseSpace/components/advertiseDialog.vue、utils/resolveServerAssetUrl.js、api/benefit/pubAdvertiseSpaceDetail.js\n- 所属项目：惠山二期G；来源会话：5a741fb2-5020-4358-a55c-ed838e2739cc；代码基线：none",
+                "after": "# 小区台账空置广告位弹窗：不跳过备案详情\n惠山二期G 项目中，统计地图/小区台账点空置广告位无图，因无 revenueContractId 误跳过备案详情的修复套路。\n\n## 现象\n- 统计地图/小区台账点空置广告位无图\n- 常见误判：没有 revenueContractId 就不请求备案详情\n\n## 根因\n- 空置条目往往只有台账主键（detailId/resourcesId/advertiseSpaceDetailId），备案附件在 GET /benefit/pubAdvertiseSpaceDetail/{id} 的 attachments 里\n\n## 修复方案\n- 打开弹窗并行拉台账详情与合同详情：台账失败仍可尝试合同；合同未成功时不要整页切租赁字段导致基础信息全为 -\n- 图片侧与经营用房一致：逗号拆 attachments + resolveServerAssetUrl，无附件回退 picUrl 等\n- revenueContractResourcesId 同时从列表行与明细 form 取值\n- 组件 name 改为 AdvertiseAssetDialog；无合同或合同详情未加载成功时展示基础字段（名称、类别、类型、共享/独有、数量、位置、备注），合同详情加载成功时展示租赁字段（租赁编号、金额、期限等）\n- 若接口有数据仍无图，核对列表 resourcesId 是否等于后端 advertiseSpaceDetailId（映射问题需接口补字段）\n\n## 验证与归属\n- 验证：去掉无 revenueContractId 就不请求的逻辑；用 detailId/resourcesId 调 getPubAdvertiseSpaceDetail；台账与合同分开请求；仅合同成功才切租赁字段\n- 涉及文件：benefit/statisticsMap/components/AdvertiseAssetDialog.vue、benefit/statisticsMap/operatingAssets.vue、benefit/statisticsMap/components/ParkingAssetDialog.vue、benefit/statisticsMap/components/VenueAssetDialog.vue、benefit/statisticsMap/components/HouseAssetDialog.vue、benefit/pubAdvertiseSpace/components/advertiseDialog.vue、utils/resolveServerAssetUrl.js、api/benefit/pubAdvertiseSpaceDetail.js\n- 所属项目：惠山二期G；来源会话：5a741fb2-5020-4358-a55c-ed838e2739cc；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/house_backfill.md",
+                "memory_type": "entities",
+                "before": "# 房屋变更页楼幢单元选择缺失项目信息修复\n修复房屋信息变更详情页因缺 `projectId` 导致点楼幢/单元弹“请先选择开发项目”的问题。\n\n## 问题根因\n- 从房屋信息跳转变更页（`formMode:'add'`）时接口 `/building/house/{houseId}` 返回数据只带 `projectName` 缺 `projectId`\n- 点击楼幢/单元选择框时 `openBuildingDialog`/`openUnitDialog` 校验 `form.projectId` 不存在而弹窗\n\n## 修复方案\n- 新增 `backfillProjectInfo()` 方法，在新增模式加载房屋数据后、编辑模式 `detailCallback` 后调用\n- 有 `buildingId` → 请求 `/building/building/{buildingId}` 取回 `projectId/projectName/projectCode` 回填，补齐 `buildingNo/buildingCode`\n- 无 `buildingId` 但有 `u` 开头关联信息时亦做对应回填（源会话原文截断）\n\n## 项目与验证\n- 所属项目：惠山二期G\n- 来源会话：9c47b930-1e4a-454a-bb8b-450970d0136c\n- 涉及文件：`zhi2-web-admin/src/views/building/houseChange/detail.vue`",
+                "after": "# 房屋变更页楼幢单元选择缺失项目信息修复\n修复房屋信息变更详情页因缺 `projectId` 导致点楼幢/单元弹“请先选择开发项目”的问题。\n\n## 问题根因\n- 从房屋信息跳转变更页（`formMode:'add'`）时接口 `/building/house/{houseId}` 返回数据只带 `projectName` 缺 `projectId`\n- 点击楼幢/单元选择框时 `openBuildingDialog`/`openUnitDialog` 校验 `form.projectId` 不存在而弹窗\n\n## 修复方案\n- 新增 `backfillProjectInfo()` 方法，在新增模式加载房屋数据后、编辑模式 `detailCallback` 后调用\n- 有 `buildingId` → 请求 `/building/building/{buildingId}` 取回 `projectId/projectName/projectCode` 回填，补齐 `buildingNo/buildingCode`\n- 无 `buildingId` 但有 `u` 开头关联信息时亦做对应回填（源会话原文截断）\n\n## 项目与验证\n- 所属项目：惠山二期G\n- 来源会话：9c47b930-1e4a-454a-bb8b-450970d0136c\n- 涉及文件：`zhi2-web-admin/src/views/building/houseChange/detail.vue`、`zhi2-web-admin/src/views/building/house/detail.vue`、`zhi2-web-admin/src/views/building/buildingTable/index.vue`\n- 验证证据：src=惠山二期G/012.md"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/惠山二期g技术/house_change_bug.md",
+                "memory_type": "entities",
+                "deleted_content": "# 房屋变更页缺项目信息Bug\n房屋变更页从房屋数据跳转时缺projectId致楼幢单元选择失败，已通过backfillProjectInfo修复。\n\n## 问题根因\n- zhi2-web-admin/src/views/building/houseChange/detail.vue 接口返回缺 projectId\n- 触发楼幢/单元对话框校验失败\n\n## 修复方案\n- 新增 backfillProjectInfo() 在新增/编辑模式加载后回填 projectId 等关联信息\n\n## 验证与归属\n- 验证证据：src=惠山二期G/012.md\n- 涉及文件：src/views/building/houseChange/detail.vue、src/views/building/house/detail.vue、src/views/building/buildingTable/index.vue\n- 所属项目：惠山二期G；来源会话：9c47b930-1e4a-454a-bb8b-450970d0136c；代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

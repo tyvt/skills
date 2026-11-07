@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793647361230/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T19:25:56.853853+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/qa_oauth_workflow.md",
+                "memory_type": "entities",
+                "after": "# 智能问答改三方OAuth流程\n将 Tab 内智能问答替换为三方页面，需对齐无锡市区 G 项目调用 security/oauth2/authorize，并保留原页逻辑仅口令触发新链。\n\n## 背景与需求\n- 将 Tab 内智能问答替换为三方页面，与无锡市区 G 项目一致调用 security/oauth2/authorize 取跳转地址\n- 路由换成当前 H5 工程路径（zhi2-mobile-admin-h5-c-unlimited）\n\n## 实现要点\n- 封装 qaOAuth（或同等工具）拉取授权 URL\n- 默认保留原问答 UI/逻辑，仅当用户在原页输入隐藏口令「进入新页面」时走 OAuth 打开三方（如 znws 域名）\n- 调试口令「打开控制台」可初始化 eruda\n- complexId 等附加 query 与 G 项目对齐，三方暂不需要时显式关闭拼接（qaOAuth 直接返回接口 URL），避免未文档化参数导致三方拒登\n\n## 验证与归属\n- 验证会话：f4aa86cd-c715-4ff0-ada8-5790054a7607\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/qaOAuth.js、zhi2-mobile-admin-h5-c-unlimited/src/api/security.js\n- 所属项目：无锡市区小程序嵌入H5；代码基线：df08cea"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/webview_static_404.md",
+                "memory_type": "entities",
+                "after": "# 迁入门户webview后本地图404修复\n小程序页面迁入门户 H5 后静态资源被错误拼到 /h5/pages/webview/static 导致 404，改用 resolveZhishuAsset + import.meta.url。\n\n## 问题根因\n- 把小程序 pages/webview、pages/face 等迁入 H5 后，请求变成 /h5/pages/webview/static/images/zhishu/… 全部 404\n- 模板或脚本按「当前页面路径」拼接 /static 或 ./static，Vite base 为 /h5/ 时解析到错误目录\n- 接口返回的 /zhi2/… 远程轮播在未代理环境也会 404\n\n## 解决方案\n- 与 home.vue 一致，用 resolveZhishuAsset（new URL(..., import.meta.url)）引用 src/static/images/zhishu/，由 Vite 打包出正确 URL\n- 门户轮播固定本地 背景@2x.jpg、banner.jpg，菜单图标走同一解析函数\n- 迁移时检查 getH5Param 等工具勿重复声明，否则整页 async 组件加载失败（报 SyntaxError）\n\n## 验证与归属\n- 验证会话：ddd4e8f5-1767-467c-8d93-f66c079e9dca\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/zhishuAsset.js、src/pages/webview/home.vue、src/pages/index/home.vue\n- 所属项目：无锡市区小程序嵌入H5；代码基线：9267b1a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/uni_icons_tap_stop.md",
+                "memory_type": "entities",
+                "after": "# H5下uni-icons勿用@tap.stop\nuni-app 编译到 H5 时 uni-icons 触发事件非标准 DOM Event，模板写 @tap.stop 会导致 event 为 undefined 报错并中断点击。\n\n## 问题根因\n- uni-app 编译到 H5 时，uni-icons 触发的事件对象不是标准 DOM Event\n- 模板写 @tap.stop 时 Vue 仍调用 event.stopPropagation()，但 handler 收到的 event 为 undefined，控制台报错且点击逻辑中断\n- 典型案例：共有资金明细查询时间旁的提示图标点击失效\n\n## 解决方案\n- 与同页其他 uni-icons 保持一致，改用 @tap\n- 若必须阻止冒泡，在方法内先判断 event 再 stopPropagation，或把点击绑在外层 view 上处理\n\n## 验证与归属\n- 验证会话：26ca4c09-5707-4402-a54f-9c9491ec3455\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/DetailsTab.vue、src/components/ZsDateRangePicker/ZsDateRangePicker.vue\n- 所属项目：无锡市区小程序嵌入H5；代码基线：a951bf3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/zs_date_range_picker.md",
+                "memory_type": "entities",
+                "after": "# ZsDateRangePicker快捷区间须确认且查询手动触发\n共有资金等页的 ZsDateRangePicker 快捷项仅更新预选区间，须点「确定」关弹层回传，且父组件显式调用查询不用 watch。\n\n## 行为约束\n- 点「当季/当年/自定义」等快捷项只更新内部预选区间，不能立刻关弹层并当作已提交\n- 必须等用户点「确定」再关闭遮罩并回传区间\n- 切换快捷项或自定义日期后，父组件显式调用列表查询，不用 watch 监听区间对象自动拉数\n\n## 避坑要点\n- 用户明确要求「不用 watch，在需要调用的地方手动调用」，避免首次选快捷项不刷新、遮罩残留\n- 自定义模式下嵌套日期面板要抬高层级或收紧父弹层 overflow，防止子面板被父层遮挡\n\n## 验证与归属\n- 验证会话：26ca4c09-5707-4402-a54f-9c9491ec3455（同会话多轮）\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/components/ZsDateRangePicker/ZsDateRangePicker.vue、src/pages_benefit/sharedFunds/components/DetailsTab.vue\n- 所属项目：无锡市区小程序嵌入H5；代码基线：a951bf3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

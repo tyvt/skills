@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-惠山二期H5-1793810038403/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T16:46:51.257999+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/huishan_phase2_tech/analytics_401_skip_login.md",
+                "memory_type": "entities",
+                "after": "# Analytics接口401不跳转登录态\n惠山二期H5中批量埋点接口返回401时不登出、不跳转，由flushTrack静默失败重入队列。\n\n## 行为说明\n- src/api/index.js 全局401处理增加 skip401 判断：未设置 skip401 时才清session并switchTab到「我的」\n- src/api/analytics.js 批量埋点请求（/appAnalytics/track/events/batch）增加 skip401:true（与 noReject:true 同用）\n- 其它业务接口401仍清登录态并跳转\n- 后续在 analytics.js 新增 /appAnalytics/** 接口需同样加 skip401:true\n\n## 验证与归属\n- 验证：会话 73b006e7-ce1b-4f15-8ff8-b6623e838eb0 完成修改\n- 涉及文件：src/api/index.js、src/api/analytics.js、src/utils/track/client.js\n- 所属项目：惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/huishan_phase2_tech/lingxi_skip_house_auth_out_login.md",
+                "memory_type": "entities",
+                "after": "# 关闭外部登录时跳过灵锡房屋授权检查\n惠山二期H5在 VITE_APP_OUT_LOGIN=false 时一律跳过灵锡房屋授权检查，避免测试环境误弹授权提示。\n\n## 修改说明\n- 原 checkLingxiHouseAuth 仅在 VITE_APP_OUT_LOGIN=false 且 MODE==='development' 时跳过，test模式仍弹提示\n- 修改后复用 VITE_APP_OUT_LOGIN：export const skipLingxiHouseAuth = !isOutLoginEnabled\n- checkLingxiHouseAuth(url) 中若 skipLingxiHouseAuth 则返回 true，跳过业务决策/选举的房屋授权检查\n\n## 验证与归属\n- 验证：会话 acf753e7-5c5e-4a4b-813f-ee605ac49acf 完成修改\n- 涉及文件：src/utils/lingxi.js、src/utils/index.js、.env.test\n- 所属项目：惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vconsole_h5_dev.md",
+                "memory_type": "entities",
+                "before": "# vconsole 仅 H5+开发环境启用并统一打印接口响应\n接 vconsole 用 uni-app 条件编译 #ifdef H5 且仅 import.meta.env.DEV 时初始化，避免非 H5 端打包和生产出现调试面板。\n\n## 方案说明\n- 用 uni-app 条件编译 #ifdef H5 且仅 import.meta.env.DEV 时初始化 vconsole\n- 两套 axios 实例（业务网关 + VITE_BASE_API）的拦截器都统一打印 [API Response](url/method/data) 与 [API Response Error](非取消请求)\n\n## 验证与归属\n- 验证：会话 9314668a 加 vconsole，H5+DEV 启用，拦截器打印响应（证据 012.md）\n- 涉及文件：src/main.js、src/request/index.js、src/api/gateway.js\n- 来源会话ID：9314668a-621e-4143-a254-3f09b85eb124；代码基线：none",
+                "after": "# vconsole H5调试面板启用与接口日志\n惠山二期H5等项目在H5环境下通过vConsole进行调试，并按环境开关打印接口请求/响应/错误日志。\n\n## 方案说明\n- 依赖使用 vconsole（原 eruda 已替换，版本 vconsole@3.15.1）\n- 环境变量 VITE_APP_VCONSOLE 控制：开发/测试=1，生产=0；早期仅 import.meta.env.DEV 启用，后扩展至测试环境\n- 在 main.ts（或 main.js）中判断 H5 且开启时加载 vConsole，页面右下角出现绿色按钮\n- src/api/index.js 中当 VITE_APP_VCONSOLE=1 时打印：[API Request]（url、method、params、headers）、[API Response]（url、method、statusCode、responseHeaders、data）、[API Error]（含error）；普通请求与文件上传均记录\n- vite.config.ts 中 drop_console 改为仅 production 生效，测试环境日志可在 vConsole Log 面板显示\n\n## 验证与归属\n- 惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）验证：会话 ce82ed4f-71c3-4c81-b7b8-45a7512f22f8 完成替换与日志接入\n- 早期验证：会话 9314668a 加 vconsole，H5+DEV 启用，拦截器打印响应（证据 012.md）\n- 涉及文件：main.ts、src/api/index.js、vite.config.ts、.env.test、package.json；早期涉及 src/main.js、src/request/index.js、src/api/gateway.js\n- 来源会话ID：ce82ed4f-71c3-4c81-b7b8-45a7512f22f8 与 9314668a-621e-4143-a254-3f09b85eb124；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/huishan_phase2_tech/lingxi_login_bind_separate.md",
+                "memory_type": "entities",
+                "before": "# 灵锡登录成功后仍需单独调用绑房接口\n惠山二期H5中灵锡登录与绑房是两个独立步骤，仅登录成功不代表绑房成功。\n\n## 流程说明\n- 登录和绑房是两个独立步骤\n- security.js 的 bindHouseByLingXi 通过 POST /security/ctAuth/lingXi/bindHouse 提交授权页回跳URL中的 authCode\n- lingxi.js 在登录成功后调用绑房接口\n- 仅登录成功不能证明绑房成功\n\n## 验证与归属\n- 验证：extracted source=cursor session=3f88a068-ae31-4d50-8668-4179cc6f38aa\n- 涉及文件：src/pages/index/newHome.vue、src/pages/index/useProjectState.js、src/api/index.js、src/utils/lingxi.js、src/App.vue 等\n- 所属项目：惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）；来源会话：3f88a068-ae31-4d50-8668-4179cc6f38aa；代码基线：none",
+                "after": "# 灵锡登录成功后仍需单独调用绑房接口\n惠山二期H5中灵锡登录与绑房是两个独立步骤，仅登录成功不代表绑房成功。\n\n## 流程说明\n- 登录和绑房是两个独立步骤\n- 前端方法 bindHouseByLingXi 定义于 src/api/security.js（POST /security/ctAuth/lingXi/bindHouse），于 src/utils/lingxi.js 登录成功后调用（传 authCode）\n- security.js 的 bindHouseByLingXi 通过 POST /security/ctAuth/lingXi/bindHouse 提交授权页回跳URL中的 authCode\n- lingxi.js 在登录成功后调用绑房接口\n- 仅登录成功不能证明绑房成功\n\n## 验证与归属\n- 验证：extracted source=cursor session=3f88a068-ae31-4d50-8668-4179cc6f38aa\n- 涉及文件：src/pages/index/newHome.vue、src/pages/index/useProjectState.js、src/api/index.js、src/utils/lingxi.js、src/App.vue 等\n- 所属项目：惠山二期H5（zhi2-mobile-admin-h5-c-unlimited）；来源会话：3f88a068-ae31-4d50-8668-4179cc6f38aa；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

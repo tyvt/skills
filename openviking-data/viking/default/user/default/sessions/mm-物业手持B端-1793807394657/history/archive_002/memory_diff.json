@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-物业手持B端-1793807394657/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T15:57:00.939675+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/inspection_scroll_cover.md",
+                "memory_type": "entities",
+                "after": "# 巡检记录添加页滚动条遮盖文字\n物业手持B端工作台巡检记录添加/详情页因嵌套滚动导致滚动条遮盖文字，已改为弹性布局并去除内层滚动。\n\n## 问题根因\n- `record/add.vue` 步骤弹框使用 `scroll-view` 嵌套 `max-height: 55vh`，产生内层滚动条遮盖文字\n- 底部留白不足导致字数统计被裁切\n\n## 解决方案\n- `record/add.vue`（巡检/维保/年检）步骤弹框 `scroll-view` 改为 `div.step-form-body`，去掉 `max-height: 55vh` 嵌套滚动\n- 弹框内容区改 `flex: 1` + `overflow-y: auto`，仅整体超 85vh 时滚动\n- `.warp` 底部留白 `48rpx` 增至 `60rpx`，避免字数统计被裁切\n- `.step-form-textarea` 与 `.step-result-card` 增加 `:deep` 样式 `min-height: 200rpx`、`height: auto`、`overflow-y: hidden`，消除 textarea 内部滚动条\n- `record/detail.vue` 与 `record/addScrap.vue` 步骤弹框同步改为 `div.step-form-body`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=物业手持B端\n- 涉及文件：src/pages_facility/record/add.vue、src/pages_facility/record/detail.vue、src/pages_facility/record/addScrap.vue、src/pages.json、src/components/ZsTextarea/ZsTextarea.vue、src/pages_facility/record/index.vue\n- 来源会话ID：e30414f9-6aa0-4b85-a036-8d290dd756bb\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/inspection_filter_reset.md",
+                "memory_type": "entities",
+                "after": "# 巡检记录筛选重置图标缺失\n物业手持B端巡检/维保/年检/报废记录页筛选弹窗底部重置图标丢失，已将组件图标改为 uni-icons 恢复。\n\n## 问题根因\n- `FilterPopup.vue` 使用 `ZsImage` 渲染重置图标，图标丢失导致四处筛选弹窗均无重置图标\n\n## 解决方案\n- `FilterPopup.vue` 模板将 `ZsImage` 替换为 `uni-icons type=\"reload\"`，与消息页、知识库页一致\n- `.footer` 栅格列宽 `48rpx 1fr` 调整为 `74rpx 1fr`，删除无效 `.img` 样式，`.footer-btn-left` 增加 `gap: 2rpx`\n- 组件被巡检/维保/年检/报废四种记录页共用（均通过 `record/index.vue`），四处重置图标一并恢复\n- `resetFilter` 逻辑未改动，点击重置仍清空筛选条件并刷新列表\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=物业手持B端\n- 涉及文件：src/pages_facility/components/FilterPopup.vue、src/pages_facility/record/index.vue、src/components/ZsImage/ZsImage.vue、src/styles/filter.scss、src/pages/workbench/index.vue\n- 来源会话ID：968007f3-27fb-42d1-8f25-77718e3e4f44\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/inspection_bottom_bar.md",
+                "memory_type": "entities",
+                "after": "# 巡检记录添加页底部灰色边距条\n物业手持B端巡检/维保/年检/报废记录页底部出现灰色边距条，已统一底部高度变量铺满安全区。\n\n## 问题根因\n- `PageButton.vue` 缺少 `box-sizing: border-box` 及安全区高度，白色背景未铺满屏幕物理底部\n- 各页面 `padding-bottom` 写死（如 `220rpx`/`180rpx`），与底部按钮区高度不一致产生灰色边距\n\n## 解决方案\n- `PageButton.vue` 增加 `box-sizing: border-box`、`min-height: calc(136rpx + safe-area-inset-bottom)`，补充 `constant()` 兼容，白色背景铺满至物理底部\n- `uni.scss` 新增 `--page-button-area-height` 与 `PageButton` 高度一致，各页面内容区 `padding-bottom` 统一引用\n- `record/index.vue` `padding-bottom: 220rpx` 改为 `var(--page-button-area-height)`\n- `record/add.vue` `padding-bottom: 180rpx` 改为 `var(--page-button-area-height)`\n- `record/addScrap.vue` 同步修改\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=物业手持B端\n- 涉及文件：src/components/PageButton/PageButton.vue、src/uni.scss、src/pages_facility/record/index.vue、src/pages_facility/record/add.vue、src/pages_facility/record/addScrap.vue\n- 来源会话ID：5f92693a-f239-424f-9269-4366a09e5165\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/todo_card_tap.md",
+                "memory_type": "entities",
+                "before": "# 首页待办卡片tap穿透与隐藏巡检项\n首页待办卡片因 `@click` 及图标遮挡不支持穿透且含多余巡检维保项，需改用 `@tap` 并隐藏。\n## 问题根因\n- `home/index.vue` 中待办卡片使用 `@click` 且 `pending-icon` 未设 `pointer-events: none`，导致图标遮挡不支持穿透。\n- 卡片包含多余的巡检维保项，未达到仅留报事报修的要求。\n## 解决方案\n- 在 `home/index.vue` 改用 `@tap` 事件，设 `.pending-icon` 为 `pointer-events: none`。\n- 卡片仅保留报事报修项，同步在 `issue/index.vue` 恢复待办筛选。\n## 验证与归属\n- 验证证据：src=物业手持B端/001.md\n- 涉及文件：src/pages/home/index.vue、src/api/home.js、src/pages_facility/issue/index.vue、src/pages/workbench/index.vue、docs/handheld-redevelopment-architecture.md、src/pages.json、src/api/property.js、src/components/ZsImage/ZsImage.vue\n- 来源会话ID：57ff6f54-c412-4288-ba40-47fedb188050\n- 代码基线：none",
+                "after": "# 首页待办卡片tap穿透与隐藏巡检项\n首页待办卡片因 `@click` 及图标遮挡不支持穿透且含多余巡检维保项，需改用 `@tap` 并隐藏。\n## 问题根因\n- `home/index.vue` 中待办卡片使用 `@click` 且 `pending-icon` 未设 `pointer-events: none`，导致图标遮挡不支持穿透。\n- 卡片包含多余的巡检维保项，未达到仅留报事报修的要求。\n## 解决方案\n- 在 `home/index.vue` 改用 `@tap` 事件，设 `.pending-icon` 为 `pointer-events: none`。\n- 卡片仅保留报事报修项，同步在 `issue/index.vue` 恢复待办筛选。\n- `home/index.vue` 中 `countFields` 仅映射 `reportCount`/`repairCount`，`handlePending` 增加 `navigateTo` 失败提示。\n- `issue/index.vue` 在 `backlog=1` 进入时显式设置 `orderStatusList = '1,2,3'`，Tab 切换正确切换筛选逻辑。\n## 验证与归属\n- 验证证据：src=物业手持B端/001.md\n- 涉及文件：src/pages/home/index.vue、src/api/home.js、src/pages_facility/issue/index.vue、src/pages/workbench/index.vue、docs/handheld-redevelopment-architecture.md、src/pages.json、src/api/property.js、src/components/ZsImage/ZsImage.vue\n- 来源会话ID：57ff6f54-c412-4288-ba40-47fedb188050\n- 代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-榆林G-1793630516726/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T14:46:06.254083+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/screen_drill_filter.md",
+                "memory_type": "entities",
+                "after": "# 大屏穿透筛选参数与目标页对齐模式\n园区物管2.0 物业数据大屏左菜单穿透到列表页时，穿透参数必须在目标页有同名筛选项，否则用户看到的是全量数据。\n## 问题根因\n- 大屏穿透参数与列表页筛选参数是两份互不相干的约定：穿透侧传什么字段名，页面侧就得用同一个字段名接到查询条件。\n- 缺任一环，过滤条件要么完全不生效、要么只作用于「进页面的那一瞬间」，用户无入口可调，口径永久错位。\n- 物管会/业委会页面本无「状态」筛选项，穿透带过去的 committeeState=1 在页面上无处可改。\n## 解决方案\n- 建「大屏穿透参数 ↔ 目标页 queryParams ↔ 页面筛选项」三方对照表，一次性对齐字段名与取值（本批 #8/#9 物业服务合同与前期合同补 isEffect=1；#10/#11 物管会与业委会补 committeeState=1）。\n- 目标页缺筛选项时按字典补下拉（autonomy/record/components/index.vue 的 queryParams 加 committeeState，筛选面板新增「物管会/业委会状态」下拉，字典编码 IS_START，initDict 加载 IS_START）。\n- 页面已有同名字段直接复用（如 #8/#9 页面已有「执行状态」下拉 effect_state，穿透直接回填，不新增重复项）。\n- 后端改统计口径不急着换前端接口/字段（本批招标计划→招标备案单、企业生效合同口径→企业档案口径，确认前端无需替换），只标注「大屏数字会变」并回头检查告警阈值与文案。\n- 交付前用对照表逐项打勾，不只看大屏数字对不对。\n## 验证与归属\n- 验证：会话 859e9c31（基线 23d6668）用户诉求 1「页面没有筛选条件也需要加」、诉求 2「后端反馈有修改对照文档完善」，最终结论表格逐项列出穿透参数补齐与页面筛选项补充，#7/#13 属后端改统计口径前端无需替换（物业服务企业备案数 4→13）。\n- 涉及文件：zhi2-web-admin/src/views/smartPropertyScreen/components/PropertyManageLeft.vue、zhi2-web-admin/src/views/autonomy/record/components/index.vue；来源会话：859e9c31-a0be-49d9-8fc3-d4c91555496e；代码基线：23d6668。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/submodule_rebase_gitlink.md",
+                "memory_type": "entities",
+                "after": "# 子模块指针 rebase 冲突用 gitlink 直写\n父仓库 rebase 时上游改了子模块指针，冲突落在 zhi2-web-admin 这个 gitlink 上，用 git update-index --cacheinfo 160000,<sha> 直接落 gitlink，不要重做子仓 merge。\n## 问题根因\n- gitlink 冲突不是内容冲突，而是「指针指向哪个提交」的冲突：两个父仓提交各自记录不同子模块 SHA，git 无法自动决定保留哪个。\n- 常规的「both modified」解法不适用，正确解法不是去子模块里 merge，而是直接把 index 里的 gitlink 条目写成目标 SHA。\n## 解决方案\n- 先在子模块里 rebase/cherry-pick 到目标基线，确定最终子模块 HEAD SHA（本批为 0bdb66cd3…）。\n- 回到父仓执行 git update-index --cacheinfo 160000,<子模块完整 SHA> zhi2-web-admin 直接写 index 条目（160000 即 gitlink 文件模式），再 git add zhi2-web-admin 或 git rebase --continue。\n- 冲突解决后必须核对父仓 gitlink 与子模块当前 HEAD 逐一对应（git ls-tree HEAD zhi2-web-admin 看记录的 SHA），不能只看「无冲突标记」。\n- 交付按「子模块先行、父仓库只更新指针」成对提交推送，父仓 gitlink 与子模块 HEAD 必须一一对应后再推。\n- rebase 会改写子模块侧提交 SHA，对外汇报用 rebase 后的新值（本批 e95443d20/feea23728 → 1ba018635/0bdb66cd3）。\n## 验证与归属\n- 验证：会话 0aa4ef46（基线 3aca541）用户诉求 2「迁移到其他项目」、诉求 3「跑 vite build 成功都提交子模块+主模块」，最终结论写明园区子模块落后 6 提交 rebase 后自检报错 0 但两提交 SHA 改变，园区父仓库 rebase 在 zhi2-web-admin gitlink 上冲突，用 update-index 解决无丢失改动。\n- 涉及文件：zhi2-web-admin；来源会话：0aa4ef46-4eac-412c-ba34-ac2adf87394d；代码基线：3aca541。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/submodule_build_dirty.md",
+                "memory_type": "entities",
+                "after": "# 构建产物未提交致父仓显示 m zhi2-web-admin\n前端 npm run build 后按用户要求只提交业务改动、不提交 public/version.json 与 report.html，父仓显示小写 m 是子模块工作区脏标记，不是指针不一致。\n## 问题根因\n- 小写 m 表示「子模块工作区有改动」，与「指针不一致」（父仓记录 SHA ≠ 子模块当前 HEAD，显示 M / new commits）是两码事。\n- build 重写子模块工作区里的 public/version.json（版本号/构建信息）和 report.html（打包分析报告），两文件改过又没提交，子模块工作区脏，父仓自然显示 m zhi2-web-admin，指针其实一致。\n## 解决方案\n- 交付前分清两类状态：指针用 git diff --submodule=log 或 git ls-tree HEAD zhi2-web-admin 与子模块 HEAD 对比；脏标记用 git -C zhi2-web-admin status --porcelain 查工作区。\n- 构建产物默认不提交，但要把 public/version.json、report.html 还原成提交时内容（git checkout -- public/version.json report.html），让工作区彻底干净，否则 m 标记一直挂着。\n- 把「构建 → 还原产物 → 只提交业务改动」固化成提交前检查项。\n- 汇报写清「父仓仍显示 m zhi2-web-admin 是子模块工作区有构建产物的脏标记，指针本身一致」，避免下一棒重复排查。\n## 验证与归属\n- 验证：会话 0aa4ef46（基线 3aca541）用户诉求 3「跑 vite build 成功都提交」、诉求 4「只提交你改的内容主子都提交推送」，最终结论写明榆林G 与园区子模块的 public/version.json、report.html 残留未提交，父仓仍显示 m 为脏标记非指针不一致。\n- 涉及文件：zhi2-web-admin/public/version.json、zhi2-web-admin/report.html；来源会话：0aa4ef46-4eac-412c-ba34-ac2adf87394d；代码基线：3aca541。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/deposit_organ_type.md",
+                "memory_type": "entities",
+                "after": "# 质保金协议物业弹窗 organType 须用 02\n房屋质量保证金协议物业服务企业弹窗误用 organType '03'（会计机构），正确为 '02'，导致列表为空，须修正并规范自动填充逻辑。\n## 问题根因\n- 物业服务企业弹窗误用 organType: '03'（会计机构），正确应为 '02'，导致列表为空查不到数据。\n## 解决方案\n- 修复 guaranteeDepositAgreement/detail.vue 将 organType 改为 '02'。\n- 选物业管理区域后调 /property/propertyContract/getByComplexId/{complexId} 自动填充合同字段并置只读，无合同则保留 /maintenance/propertyProject/companyInfo 兜底手动选择。\n## 验证与归属\n- 验证：会话 a8ef8efd 用户报弹窗列表为空，根因 organType 用错，修复改 '02' 并加自动填充兜底。\n- 涉及文件：榆林G 项目 zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue、petition/petition/detail.vue、maintenance/initiation/detail.vue、credit/record/components/handle.vue、property/handover/detail.vue、company/companyManagement/components/detail.vue、property/propertyContract/components/detail.vue、src/components/zs-select-dialog/zs-select-dialog.vue；来源会话：a8ef8efd-ce98-4799-a804-7ad84b70236e；代码基线：none。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

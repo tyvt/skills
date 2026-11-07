@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793663675616/history/archive_012",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T00:18:05.730586+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_columns_key.md",
+                "memory_type": "entities",
+                "after": "# 自定义列表列顺序保存后表格不重排修复\n园区公共收益项目中使用自定义列表模板（非 ListTemplate.js）保存列顺序后，el-table 缓存列顺序导致界面不重排，需给 zs-table 补 :key=\"tableColumnsKey\"。\n\n## 现象\n- 使用「自定义列表显示」且页面自写模板时，displayColumns 顺序保存后数据已更新，但 el-table 缓存列顺序，仅改 v-for 列顺序界面不变。\n\n## 根因\n- Element UI el-table 会缓存列顺序，通用列表模板已在 zs-table 绑 :key=\"tableColumnsKey\"，自定义页未绑定该 key。\n\n## 修复方案\n- 自定义页（property/complex/index.vue、complexChange/index.vue）给 zs-table 加 :key=\"tableColumnsKey\"。\n- 列 v-for 的 :key 与 ListTemplate 保持一致：(column.prop||'')+'-'+(column.label||'')。\n- 组件层已用 refreshColumnOrderKey 处理列变更时，仍应验证「仅改用户列配置顺序」场景是否需此 key。\n\n## 验证与归属\n- 验证：会话 4b2a6426 物业管理区域备案列表自定义排序保存后列顺序没变，根因缺 tableColumnsKey。\n- 涉及文件：property/complex/index.vue、complexChange/index.vue、ListTemplate.js、listMixins.js。\n- 所属项目：园区公共收益；来源会话：4b2a6426-193d-4d85-9729-2061d23f61d0；代码基线：0c9b8c2。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zstable_tooltip_title.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column 自定义渲染绕过 tooltip 补齐\n园区公共收益弹窗内 zs-table 自定义渲染列截断且无悬浮提示，组件层需补 title 并放宽过窄 width，业务侧过窄固定 width 改 minWidth。\n\n## 现象\n- 弹窗内 zs-table 列（如楼幢关联「房屋套数」width:80px）表头被 ellipsis 截成「房屋...」。\n- 自定义单元格模板绕过 Element show-overflow-tooltip，长文本（楼幢坐落）无法悬浮查看。\n\n## 根因\n- 自定义列宽仍截断且缺 title 属通用补齐问题，与「插槽根节点用 div 被判复杂列定宽 80px」场景不同。\n\n## 修复方案\n- 组件层：表头与文本单元格增加 title 展示全文；配置 width 小于表头所需宽度时自动放宽。\n- 业务侧：过窄固定 width 改为 minWidth（如房屋套数 90px）。\n\n## 验证与归属\n- 验证：会话 4d5ba10a 物业管理区域授权楼幢关联弹框字段显示不全且不能悬浮，改 BuildingDialogAuth 列宽与 zs-table-column.vue。\n- 涉及文件：zs-table-column.vue、BuildingDialogAuth.vue。\n- 所属项目：园区公共收益；来源会话：4d5ba10a-398d-499d-aa18-07403294d1a3；代码基线：b6bf87d。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/optional_router_path.md",
+                "memory_type": "entities",
+                "after": "# 选择弹窗辅助链接无权限用 Optional 路由解析\n园区公共收益 benefit 等业务选择弹窗的辅助链接，无菜单权限时应用 getRouterPathByFilePathOptional 静默跳过，避免连弹授权错误。\n\n## 现象\n- 选择弹窗选项旁挂「前往开户」「签署协议」等辅助链接，用 getRouterPathByFilePath 解析，无菜单权限时每次调用都弹「没有授权相关菜单」。\n- 多个链接连弹多条相同错误，且区域选择本身仍应可用。\n\n## 根因\n- getRouterPathByFilePath 在缺菜单时直接报错，未区分「无权限静默跳过」与「区域选择可用」的场景。\n\n## 修复方案\n- 参照 pubUseMoneyApply/detail.vue：辅助链接一律走 getRouterPathByFilePathOptional，有权限渲染链接，无权限静默跳过。\n- assetLeaseApply、pubBankReceiptApply 等同写法页面需批量排查。\n\n## 验证与归属\n- 验证：无「监管账户开户/监管协议签署」菜单时 getRouterPathByFilePath 连弹两条相同授权错误，改 Optional 后弹窗可正常选区域。\n- 涉及文件：ruoyi.js、assetLeaseApply/detail.vue、pubUseMoneyApply/detail.vue。\n- 所属项目：园区公共收益；来源会话：82837732-6269-4a38-bb56-614e39f5bbeb；代码基线：36a9a7e。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/form_prop_rules.md",
+                "memory_type": "entities",
+                "after": "# Element UI 必填红星要求 prop 与 rules 键名一致\nzhi2-web-admin 详情页用 el-form 时，el-form-item 的 prop 需与 rules 键名完全一致，否则标签前不显红色必填星号且校验提示不一致。\n\n## 现象\n- el-form-item 的 prop 绑定提交字段（如 parkingChargeStandardId），rules 写在展示名字段（parkingChargeStandardName）上。\n- 保存时自定义/异步校验仍报「xxx不能为空」，但标签前无红色必填 *，用户以为非必填。\n\n## 根因\n- Element UI 必填红星由 prop 与 rules 键名匹配驱动，键名不一致时星号不渲染。\n\n## 修复方案\n- 把 rules 的键改成与 prop 完全一致，message 仍用业务文案（如「收费标准名称不能为空」）。\n- 新增表单项先对齐 prop 再写 rules，不要按 label 起名。\n\n## 验证与归属\n- 验证：停车泊位租赁详情 prop 为 parkingChargeStandardId、rules 写在 parkingChargeStandardName 导致无必填星号，改 rules 键后星号与提示一致。\n- 涉及文件：parkingSpaceContractFiling/detail.vue。\n- 所属项目：园区公共收益；来源会话：7a6ec4bf-c697-4a2c-85ae-f84db3a2a972；代码基线：08d3255。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区公共收益.md",
+                "memory_type": "entities",
+                "before": "# 园区公共收益\n园区公共收益是用户维护的园区物业管理 Vue 前端项目（代码仓库 zhi2-web-admin），聚焦公共收益模块。\n\n## 描述\n- Vue 前端项目，与园区物管2.0 同源，均基于 zhi2-web-admin\n- 业务含物业管理区域四图位、账户拆分、楼盘表视图、收益类新增页（用款申请、支出合同备案等）\n- 分支命名如 develop/v2.6.2-suzhufang、develop/v2.6.2-yuanqu\n\n## 关联说明\n- 技术模式（ComplexPhoto四槽位、子表form传递、视图切换高度、监管链接初始化等）作为独立「技术模式」实体维护\n- 园区公共收益专项技术模式另有独立实体：资金缴款通知书合同名称跳转、自治公示新增动态路由、提交审批URL迁flowApi（均属「园区公共收益技术」类）\n- 另含弹窗窄栏分页器折行修复、银行明细日对账回单查看分流、弹窗批量提示与表单并排换行修复等技术模式实体\n- 另含待办驳回前缀规范、撤回approvalApi校验、landPlotCode写zs-remark头、银行回单列镜像错乱等技术模式实体\n- 另含楼幢范围字段改landPlotCode/landPlotName、DetailTemplate PDF混排卡片、zs-operate-column固定宽裁切三按钮、回单核销凭证0附件bug等技术模式实体\n\n## 验证与归属\n- 所属项目在多处技术模式记忆中提及；来源会话见各技术模式实体",
+                "after": "# 园区公共收益\n园区公共收益是用户维护的园区物业管理 Vue 前端项目（代码仓库 zhi2-web-admin），聚焦公共收益模块。\n\n## 描述\n- Vue 前端项目，与园区物管2.0 同源，均基于 zhi2-web-admin\n- 业务含物业管理区域四图位、账户拆分、楼盘表视图、收益类新增页（用款申请、支出合同备案等）\n- 分支命名如 develop/v2.6.2-suzhufang、develop/v2.6.2-yuanqu\n\n## 关联说明\n- 技术模式（ComplexPhoto四槽位、子表form传递、视图切换高度、监管链接初始化等）作为独立「技术模式」实体维护\n- 园区公共收益专项技术模式另有独立实体：资金缴款通知书合同名称跳转、自治公示新增动态路由、提交审批URL迁flowApi（均属「园区公共收益技术」类）\n- 另含弹窗窄栏分页器折行修复、银行明细日对账回单查看分流、弹窗批量提示与表单并排换行修复等技术模式实体\n- 另含待办驳回前缀规范、撤回approvalApi校验、landPlotCode写zs-remark头、银行回单列镜像错乱等技术模式实体\n- 另含楼幢范围字段改landPlotCode/landPlotName、DetailTemplate PDF混排卡片、zs-operate-column固定宽裁切三按钮、回单核销凭证0附件bug等技术模式实体\n- 另含自定义列表列顺序不重排补key（table_columns_key）、zs-table-column补title放宽宽度（zstable_tooltip_title）、选择弹窗辅助链接用Optional路由（optional_router_path）、el-form的prop与rules键名一致（form_prop_rules）等技术模式实体\n\n## 验证与归属\n- 所属项目在多处技术模式记忆中提及；来源会话见各技术模式实体"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

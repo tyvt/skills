@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_068",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T23:43:05.009779+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_admin_change_nav_fix.md",
+                "memory_type": "entities",
+                "after": "# 企业管理变更跳转失败修复\n苏州市房地产监测V3 修复企业管理变更（companyAdminChange）发起变更后跳转报错问题。\n\n## 问题根因\n- `getLast` 在 HTTP 200 / code:200 时已成功，失败发生在下一步跳转\n- `handleStartChange` 用 `getRouterPathByFilePath('company/companyAdminChange/.../detail')` 解析路由，未传 `busCode`（如开发企业 `qyglybg`）\n- 动态菜单里变更详情多为 hidden，仅靠 `filePath` 常匹配不到\n- 匹配失败 `getRouterPathByFilePath` 抛错或拼出空 path，`router.push` 再失败\n- 外层空 `catch` 统一提示「发起变更失败，请稍后重试」，实为路由未登记/未解析\n\n## 修复方案\n- `detail.vue` 用 `buildNavigationByFilePath` 按 `filePath` + `busCode` + `pathHint` + `routeId` 生成跳转（支持 `:tableid` 与命名路由 + `query.id`）\n- `resolveChangeId(res.data, res)` 兼容多种返回结构\n- `ruoyi.js` 对应 `get` 方法调整\n\n## 涉及文件与归属\n- 涉及：`detail.vue`、`ruoyi.js`、`resolveChangeId.js`\n- 所属项目：苏州市房地产监测V3；来源会话ID：a6708ea4-5668-470a-8195-2f5b2f48cf71；验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/project_change_id_fix.md",
+                "memory_type": "entities",
+                "after": "# 项目备案变更ID解析修复\n苏州市房地产监测V3 修复项目备案详情点「变更」后详情误用备案主键问题。\n\n## 问题根因\n- 从**项目备案详情**点「变更」进入 `/customerProjectChange/detail/add?projectId=原备案ID`\n- 保存成功后路径变为 `/detail/{变更单ID}`，但 query 仍带 `projectId`\n- 原 `getId()` 优先读 query 的 `projectId`，详情接口用备案主键而非保存返回的 `projectChangeId`\n\n## 修复方案\n- `ruoyi.js` — `resolveIdFromRoute`：路径末段已是业务主键时优先用路径 ID；`query.projectId` 仅作兜底（如列表跳转只有 query、无路径 ID 场景）\n- `customerProject/changeDetail.vue` — `addCallback`：保存成功后用 `resolveResponseId(response, 'projectChangeId')` 跳转，并从 query 去掉 `projectId`\n\n## 验证要求\n- 已备案项目 → 变更 → 保存，确认详情请求体为 `projectChangeId`，页面数据为变更单内容\n\n## 涉及文件与归属\n- 涉及：`ruoyi.js`、`customerProject/changeDetail.vue`、`customerProject/auxiliaryProject/index.vue`、`buildingTable/components/projectForm.vue`\n- 所属项目：苏州市房地产监测V3；来源会话ID：2771a096-b3e2-4777-978c-59d66df37c8e；验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/qualification_form_fix.md",
+                "memory_type": "entities",
+                "after": "# 资质表单布局塌陷修复\n苏州市房地产监测V3 修复资质表单变成「1行1列」的布局问题，并全局排查类似问题。\n\n## 修改内容\n- `QualificationFormSection.vue`：根节点改为 `section-form`，各字段用 `section-field` 包裹，备注用 `section-field--full`；去掉 `el-row`/`el-col`，逻辑与 `data-testid` 不变\n- `DeveloperBasicInfoForm.vue`：资质区直接渲染组件，删除 `qualification-form` 包裹及 scoped 单列补丁\n- `companyRegister/detail.vue`：去掉多余嵌套 `el-row`\n- `detail-form.scss`：全局兜底样式调整\n\n## 涉及文件与归属\n- 涉及：`QualificationFormSection.vue`、`DeveloperBasicInfoForm.vue`、`companyRegister/detail.vue`、`detail-form.scss`\n- 所属项目：苏州市房地产监测V3；来源会话ID：ae3c4552-cf65-45ec-8e81-c709ae573cb8；验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/agency_record_align_fix.md",
+                "memory_type": "entities",
+                "after": "# 机构备案详情字段对齐修复\n苏州市房地产监测V3 修复机构备案「基本信息」整行字段与上方三列第一列数值起始位置不对齐问题。\n\n## 问题根因\n- `注册地址`、`经营地址`、`经营范围` 为整行（FULL_LAYOUT / span=24）\n- 整行按自身标签算宽度（如「注册地址」4字），而上方三列第一列按该列最长标签算（如「法人联系电话」6字），导致第一列数值起始位置不对齐\n\n## 修复方案\n- `detail-template.vue`：整行字段标签区宽度与第1列一致，数值与上方三列第一列纵向对齐\n- 两列宽字段（span=16）：按所在栅格列取该列最长标签，并正确推进列序号\n- 行末空列占位：按前面单元格推算列下标，不再简单用 `index % 3`\n\n## 涉及文件与归属\n- 涉及：`detail-template.vue`、`Headline/index.vue`、`variables.css`\n- 所属项目：苏州市房地产监测V3；来源会话ID：51fa41b5-0944-419a-8136-e8948f55f67f；验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

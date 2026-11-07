@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-泰兴小程序-1793791039125/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T11:25:23.847250+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/statistic_canvas_issue.md",
+                "memory_type": "entities",
+                "after": "# 物业端统计页canvas渲染排查结论\n泰兴小程序物业端统计页图表未渲染，经逐层验证代码与编译产物正常，疑似运行环境同层渲染兼容或运行时状态问题。\n\n## 排查结论\n- vendor.js 运行时对组件无条件 r0=1，wx:if=\"{{r0}}\" 恒真，canvas 正常渲染（与正常页同模式）。\n- tabbar 产物 wxss 完整（position:fixed; z-index:999 都在）。\n- 页面 json 组件引用正确、无 Skyline 渲染器、基础库 3.7.12 支持 2d 同层。\n- 组件 JS 编译正确：renderFailed 兜底、串行队列、重试、warn 日志全部就位。\n\n## 待定位项\n- 新包已确认加载但问题仍在，剩余可能为模拟器同层渲染兼容问题或不可见运行时状态。\n- 需用户提供 Console 红黄日志、趋势图卡片现状、canvas 实际尺寸以进一步定位。\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=泰兴小程序。\n- 涉及文件：vendor.js、src/pages/staff/statistics/index.vue、src/staff/components/StaffCustomTabbar/StaffCustomTabbar.vue、src/staff/pages/components/echarts-uniapp/echarts-uniapp.vue。\n- 来源会话ID：6773d96e-d234-4462-9be0-46ed7e68500d\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/banner_stretch_fix.md",
+                "memory_type": "entities",
+                "after": "# 组织架构页顶部横幅拉伸修复\n泰兴小程序物业端组织架构页顶部横幅图因组件样式覆盖与高度错误导致拉伸变形，已调整为完整铺满屏宽。\n\n## 问题根因\n- 远程横幅图 header.png 实测尺寸 1125×240（宽高比 4.69:1）。\n- 旧实现 hero 高 400rpx + 图片写死 width:1875rpx 右对齐裁切，但 ZsImage 组件内部 .img {width/height:inherit} 与页面 .hero-image 同权重且后生效，实际渲染 750×400rpx 盒子，aspectFill 裁切放大变形。\n- 文字行错误加状态栏+导航高度偏移，而该页用原生导航栏不需要。\n\n## 解决方案\n- 仅改 src/pages/staff/organization/index.vue：hero 高度改为 160rpx（=750×240/1125），整图铺满屏宽。\n- .hero-image 改为 width/height:100% !important（压过组件内部 inherit），左对齐铺满。\n- .area-row 改为绝对定位垂直居中，移除多余 headerPaddingTop 及 useStatusBar。\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=泰兴小程序。\n- 涉及文件：src/pages/staff/organization/index.vue、src/components/ZsImage/ZsImage.vue、src/staff/hooks/useStatusBar.js、src/pages.js 等。\n- 来源会话ID：371a6c86-dc85-4ff6-8ae9-d65fa186df19\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/custom_tabbar_switchtab_fail.md",
+                "memory_type": "entities",
+                "before": "# 物业端自定义tabBar致switchTab静默失败\n泰兴小程序物业端 tabBar 为 `custom: true` 时 `uni.switchTab` 静默失败，选中小区后停留原页，改用 `uni.reLaunch` 可靠跳回目标 tab。\n\n## 问题根因\n- 项目 tabBar 为 `custom: true` 时 `uni.switchTab` 静默失败无回调。\n- `src/staff/pages/complex-select/index.vue` 的 `handleSelect` 选中小区后停留原页无法跳转。\n\n## 解决方案\n- 改用 `uni.reLaunch(returnTab)` 并加 `fail` 兜底 reLaunch 首页，清空返回栈可靠跳回目标 tab。\n\n## 验证与归属\n- 验证证据：src=泰兴小程序/010.md\n- 涉及文件：src/pages/index/components/complexCard.vue、src/pages/index/newHome.vue、src/staff/pages/complex-select/index.vue、src/pages.json、src/pages/staff/home/index.vue、src/staff/store/user.js、src/staff/components/StaffCustomTabbar/StaffCustomTabbar.vue、src/staff/hooks/useAuthPage.js\n- 来源会话ID：86ee6d91-474f-47ce-90e2-2b4e4363811b\n- 代码基线：none",
+                "after": "# 物业端自定义tabBar致switchTab静默失败\n泰兴小程序物业端 tabBar 为 custom:true 时 uni.switchTab 静默失败，选中小区后停留原页，改用 uni.reLaunch 可靠跳回目标 tab。\n\n## 问题根因\n- 项目 tabBar 为 \"custom\": true 自定义模式，StaffCustomTabbar 还会调 uni.hideTabBar。\n- 原代码用 setTimeout(250) + uni.switchTab(...)，此状态下 switchTab 静默失败（无回调、不跳转）。\n- src/staff/pages/complex-select/index.vue 的 handleSelect 选中小区后停留原页无法跳转。\n\n## 解决方案\n- 改用 uni.reLaunch(returnTab) 替代 uni.switchTab，可靠关闭所有页面并打开目标 tab，不受自定义 tabBar/页面栈影响，清空返回栈。\n- 加 fail 兜底：reLaunch 失败时再兜底 reLaunch 回物业端首页，并用 console.warn 记录原因（生产构建保留 warn）。\n- returnTab 为物业端首页（及工作台/组织/统计/登录页等链路）。\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=泰兴小程序（原 src=泰兴小程序/010.md）。\n- 涉及文件：src/staff/pages/complex-select/index.vue、src/pages/index/components/complexCard.vue、src/pages/index/newHome.vue、src/staff/components/StaffCustomTabbar/StaffCustomTabbar.vue 等。\n- 来源会话ID：86ee6d91-474f-47ce-90e2-2b4e4363811b\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/handheld_login_blue.md",
+                "memory_type": "entities",
+                "before": "# 手持端登录立即登录按钮主色为蓝色\n物业手持端登录页「立即登录」按钮主色设定为蓝色，原组件引用默认色值未适配手持端规范。\n## 问题根因\n- 登录页「立即登录」按钮原组件引用默认色值，未适配手持端规范。\n- 手持端规范要求该按钮主色为蓝色。\n## 解决方案\n- 将按钮主色设定为蓝色，适配手持端规范。\n## 验证与归属\n- 验证证据：src=泰兴小程序/014.md\n- 涉及文件：src/staff/pages/login/index.vue、src/staff/components/ZsButton/ZsButton.vue、src/staff/styles/theme.scss、src/staff/styles/index.css、src/styles/index.css、src/staff/components/ImgCode/index.vue、src/staff/pages_facility/record/index.vue、src/package.json\n- 来源会话ID：6a2c3ba7-f36d-4655-8e1c-0836814c4317\n- 代码基线：none",
+                "after": "# 手持端登录立即登录按钮主色为蓝色\n物业手持端登录页「立即登录」按钮主色已切换为蓝色，通过注入 staff 主题变量实现。\n\n## 问题根因\n- 按钮用 ZsButton type=\"primary\"，背景色由组件内 var(--primary-color) 决定。\n- 登录页此前未注入 staff 主题变量，小程序端继承全局业主端主色 #0A3D62（深藏青）。\n- 页面残留 background: #2583f5 因同权重打不过组件样式，一直是死代码。\n\n## 解决方案\n- 修改 src/staff/pages/login/index.vue：样式块改为 scoped lang=\"scss\"，引入 @/staff/styles/theme.scss，在 .login-page 根节点 @include staff-page-theme。\n- 主题蓝 #1677ff 通过 CSS 变量继承流入按钮组件（与 pages_facility 下 13 处页面成熟写法一致）。\n- 删除无效残留 background: #2583f5；修复 disabled/登录中半透明态正确解析为半透明蓝。\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=泰兴小程序（原 src=泰兴小程序/014.md）。\n- 涉及文件：src/staff/pages/login/index.vue、@/staff/styles/theme.scss、src/staff/components/ZsButton/ZsButton.vue、src/staff/styles/index.css、src/styles/index.css 等。\n- 来源会话ID：6a2c3ba7-f36d-4655-8e1c-0836814c4317\n- 代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

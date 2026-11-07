@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_023",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:15:15.230658+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dynamic_region_tab.md",
+                "memory_type": "entities",
+                "after": "# 区域Tab动态配置筛选模式\n苏住房G首页/大屏区域Tab禁止前端写死，须由platformConfig.region推导市级编码并异步拉取行政区划，加请求序号防竞态。\n\n## 背景与动机\n- 项目按地市复制部署，区县清单属部署配置而非代码常量，写死会导致复制到其他城市时Tab与后台不一致需改码发版\n- 旧分支直接读platformConfig.regions或硬编码苏州区县名，需统一动态化\n\n## 解法要点\n- 新增fetchCityRegionTabOptions：getCityRegionCode()取市级编码，调/system/region/list拉下属区划，mapRegionSortListToTabOptions映射，导出CITY_WIDE_TAB_OPTION「全市」置顶\n- 页面index-v2.vue删除硬编码与platformConfig.regions分支，改异步loadRegionOptions()\n- 异步必须加regionOptionsFetchSeq请求序号守卫，只接受最新响应防快速切地市竞态\n- 接口失败或空时仅保留「全市」并console.warn，不白屏\n- 本地preview-main.js补platformConfig.region:'320500'与接口mock，E2E加mockRegionSortList并拦截\n\n## 验证与归属\n- 涉及文件：views/property/largeScreen/utils.js、views/home/index-v2.vue、preview-main.js、tests/e2e/home-v2-mocks.js等\n- 所属项目：苏住房G；来源会话ID：ce428e8e-b7cf-41be-97cd-31a190c4c9fb；代码基线：15e201a\n- 注意：若platformConfig.region登录后才写store，需watch重新加载"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/submodule_merge.md",
+                "memory_type": "entities",
+                "after": "# 子模块版本合并逐文件取舍流程\n苏住房G的zhi2-web-admin子模块合并不同分支时，需逐文件保留双方语义而非整体ours/theirs，并分两步提交推送。\n\n## 背景与动机\n- develop/v2.6.1合并develop/v2.6.0出现8文件20处冲突，两侧各自演进功能，整块选一侧会静默丢功能\n- 与「子模块指针冲突选较新SHA」不同，本条是子模块内部源码冲突逐文件取舍\n\n## 解法要点\n- resolveServerAssetUrl.js保留v2.6.1的origin实现，并入v2.6.0的resolvePublicAssetUrl两函数并存\n- 详情/表单页统一采用v2.6.0页面结构与表单组件口径(zs-form、HeadTitle等)，避免新旧混用\n- 功能角标与附件预览并存侧都保留；creditCard.vue采用v2.6.0的showCycle并删误合并detail方法\n- 子模块先提交(1624646)，父仓再提交指针更新(123fae3)，推送先cd子模块git push再回父仓git push\n\n## 验证与归属\n- 涉及文件：utils/resolveServerAssetUrl.js、credit/companyEvaluation组件、evaluation多个组件等\n- 所属项目：苏住房G；来源会话ID：fa76006a-862d-4f4b-9ae4-06673805a62a；代码基线：22baec7"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_readonly_dual.md",
+                "memory_type": "entities",
+                "after": "# 详情页查看态表格只读双判模式\n苏住房G物业费申报详情页需去除showEdit=false，子表readOnly同时判formMode与bizState，仅编辑态+草稿可操作。\n\n## 背景与动机\n- 原detail.vue用:showEdit=\"false\"关掉编辑入口，永远进不了编辑态\n- 子表readOnly只判bizState，草稿查看态被判可编辑，露出操作列与导入按钮\n\n## 解法要点\n- 去掉:showEdit=\"false\"，用operation-btn-group默认行为：查看模式且草稿态顶栏自动出现「编辑」\n- 子表只读条件改为:readOnly=\"formMode == 'view' || form.bizState != 0\"\n- 验证以刷新后详情页为准，覆盖查看草稿、点编辑后、已提交三态\n\n## 验证与归属\n- 涉及文件：property/feeDeclare2/detail.vue、components/feeBindScopeTable.vue\n- 所属项目：苏住房G；来源会话ID：2b6910b1-af76-49c6-87c1-e6cbab4a1b46；代码基线：e590ffa\n- 与已知1077条差异：补showEdit=false杀入口根因与bizState==0才可编辑表达式"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dict_case_mismatch.md",
+                "memory_type": "entities",
+                "after": "# 字典编码大小写错位导致筛选反序\n苏住房G共有资金协议列表因getDicts('BIZ_STATE')大写键残留，使筛选参数与展示完全反序，须统一小写biz_state。\n\n## 问题根因\n- 系统字典同时存在BIZ_STATE与biz_state但dictValue-label对应不同，大写键回退到别的字典\n- 下拉框「审核中」绑定码值与后端bizState过滤语义相反，勾选值与dict-tag展示不同源\n\n## 解法要点\n- 搜索区字典键必须与表格列dict-tag、全局store的biz_state三者同名同源\n- pubRegulatoryAgreement/index.vue与pubRegulatoryStopAgreement/index.vue的getDicts('BIZ_STATE')改为getDicts('biz_state')\n- 修完须逐项在Network核对传参与label一致；同类复制页面一并替换\n\n## 验证与归属\n- 现象：按审核中查返回已备案、按已备案查返回审核中\n- 涉及文件：benefit/pubRegulatoryAgreement/index.vue、pubRegulatoryStopAgreement/index.vue\n- 所属项目：苏住房G；来源会话ID：c376e461-5508-4c08-8192-16ac1392a65f；代码基线：9e5c499"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

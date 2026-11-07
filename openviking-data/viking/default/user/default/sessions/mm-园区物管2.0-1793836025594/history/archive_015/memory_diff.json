@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793836025594/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T00:45:40.542841+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/events/2026/11/05/UI参考图2修改分支合并.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户汇报园区物管2.0项目完成分支合并：develop/v2.6.1 已提交修复 3689c959d，develop/v2.6.2 已从261合并，develop/v2.6.2-yulin 已从262合并，当前所在分支为 develop/v2.6.2-yulin。涉及 publicQuery/complex/index.vue 等文件。用户表示如需推送到远程可告知。发生日期：2026-11-05。\n# 2026-11-05 (Thursday) ChatLog:\n**user**: 【记忆类型】pattern\n【标题】图1是现在的UI，参考图2修改：（默认情况下是选中榆\n【内容】合并已完成，当前分支状态如下： | 分支 | 状态 | |------|------| | `develop/v2.6.1` | 已提交修复 `3689c959d` | | `develop/v2.6.2` | 已从 261 合并 | | `develop/v2.6.2-yulin` | 已从 262 合并 | 当前所在分支：`develop/v2.6.2-yulin` 如需推送到远程，告诉我即可。\n【验证证据】extracted source=cursor project=园区物管2.0\n【涉及文件】涉及文件：d:/repository/园区物管2.0/zhi2-web-admin、d:/repository/园区物管2.0/zhi2-web-admin/src/views/publicQuery/complex/index.vue、d:/repository/园区物管2.0/zhi2-web-admin/src/views/publicQuery、d:/repository/园区物管2.0/zhi2-web-admin/src/views/property/largeScreen/utils.js\n【所属项目】园区物管2.0\n【来源会话ID】0e718ede-cd05-40ef-932a-12e15396c92d\n【代码基线】none\n【语言要求】请用简体中文抽取并写入记忆，不要输出葡萄牙语或其他语言。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/street_community_fix.md",
+                "memory_type": "entities",
+                "after": "# 默认小区缺失街道社区数据修复\n园区物管2.0 的 B 端新增页在带默认小区时，因竞态与提前返回导致街道、社区名称未写入表单的 bug 与修复。\n\n## 问题根因\n- initCurrentProject 请求 /property/complex/{projectId} 并调用 applyPropertyProjectRow，街道/社区需通过 getSubdistrictNameByCode/getCommunityNameByCode 从 area mixin 字典反查\n- 竞态：initDict 立即执行 initCurrentProject，而街道/社区列表在 created 里异步加载，反查时字典常为空得 undefined\n- 提前返回：若 form.projectId 已有值（如 session 缓存）直接 return，即使街道/社区为空也不再补全\n\n## 修复方案\n- 在 pubParkingRate/detail.vue 新增 syncSubdistrictCommunityFromCodes：字典未就绪时用 $watch 等待加载完成再写入名称\n- 调整 initCurrentProject：缺少街道/社区时用当前或默认 projectId 重新拉取小区并补全数据\n\n## 验证与归属\n- 验证：B 端进入新增页、带默认小区时街道社区能正确写入表单并随保存提交\n- 涉及文件：pubParkingRate/detail.vue、assetLeaseApply/detail.vue、mixins/area.js 等\n- 所属项目：园区物管2.0；来源会话：6e97f2b9-b0d9-4363-889e-533667c5bbef；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/operation_btn_group_fix.md",
+                "memory_type": "entities",
+                "after": "# OperationBtnGroup渲染报错修复\n园区物管2.0 的 pubElevMaintenanceNew 页面因 OperationBtnGroup 缺少必要属性且 businessName 误用导致读取 undefined 的 bug 与修复。\n\n## 问题根因\n- OperationBtnGroup 渲染时访问 form[primaryKey] 用于打印按钮 url-params\n- detail.vue 未传入 :form、:primaryKey、:moduleName、:businessName\n- 错误写 business-name=\"benefit:pubElevMaintenanceNew\" 把权限字符串当成 businessName\n- primaryKey 为 undefined 且 form 未传入时触发 Cannot read properties of undefined (reading 'undefined')\n\n## 修复方案\n- 为 operation-btn-group 补全必要属性，与 pubElevMaintenance/detail.vue 保持一致\n- 新增计算属性按路由区分业务：EnergyDeclaration → pubElevMaintenanceNew/maintainId；其他路由 → pubPublicEnergyConsumption/consumptionId\n- 发布按钮权限改为动态：${moduleN...（原文截断，保留动态权限意图）\n\n## 验证与归属\n- 验证：问题已修复，会话 99b102a3 给出修改内容\n- 涉及文件：pubElevMaintenanceNew/index.vue、components/expendTable.vue、pubElevMaintenance/detail.vue 等\n- 所属项目：园区物管2.0；来源会话：99b102a3-dcff-4e89-a5a6-982a16f73b88；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/large_screen_scale.md",
+                "memory_type": "entities",
+                "before": "# 大屏等比缩放右侧留白修复\n园区物管2.0 数据沙箱/全景类大屏页按 1920 设计稿缩放导致右侧留白的根因与动态设计稿宽度方案。\n\n## 问题根因\n- 缩放比取 min(按宽比例, 按高比例)；内容偏高时 scale = vh/内容高度 < vw/1920\n- 设计稿固定 1920px 时实际显示宽度 = 1920 × scale < 视口宽，右侧必然空白；高度写死也导致压出一屏\n\n## 解决方案\n- 动态设计稿宽度：高度受限时设设计稿宽 = max(1920, ceil(视口宽/scale))，保证 设计稿宽 × scale = 视口宽横向铺满\n- 统一 scale = min(按宽, 按高)，一屏内完整不变形\n- 收紧各区块默认高度（柱图/饼图/趋势图/指标卡各减 30~50px）减轻高度约束\n- 侧栏收起/展开后重新计算缩放；新增大屏页直接复用 assetPanorama 的缩放处理，不各页自写比例逻辑\n\n## 验证与归属\n- 验证：会话 aedd6cfa 给出根因推导与动态设计稿宽度公式\n- 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/fundPanorama/index.vue、src/views/benefit/mapOverview/index.vue\n- 所属项目：园区物管2.0；代码基线 f00310232；来源会话 aedd6cfa-10c2-4204-ace0-2dc1b2eb8a12",
+                "after": "# 大屏等比缩放右侧留白修复\n园区物管2.0 数据沙箱/全景类大屏页按 1920 设计稿缩放导致右侧留白的根因与动态设计稿宽度方案。\n\n## 问题根因\n- 缩放比取 min(按宽比例, 按高比例)；内容偏高时 scale = vh/内容高度 < vw/1920\n- 设计稿固定 1920px 时实际显示宽度 = 1920 × scale < 视口宽，右侧必然空白；高度写死也导致压出一屏\n\n## 解决方案\n- 动态设计稿宽度：高度受限时设设计稿宽 = max(1920, ceil(视口宽/scale))，保证 设计稿宽 × scale = 视口宽横向铺满\n- 统一 scale = min(按宽, 按高)，一屏内完整不变形\n- 收紧各区块默认高度减轻高度约束（具体：柱图/画布 188px→156px；饼图区 276px→220px、画布 232px→196px；趋势图 242px→200px、容器 200px→168px；区县柱图 208px→172px；指标卡 72px→64px）\n- 侧栏收起/展开后重新计算缩放\n- 新增大屏页直接复用 assetPanorama 的缩放处理，不各页自写比例逻辑\n\n## 验证与归属\n- 验证：会话 aedd6cfa 给出根因推导与动态设计稿宽度公式，调整设计稿宽度与统一缩放比，收紧默认高度并侧栏重算；用户提示刷新后宽度贴边铺满，若某列偏窄可指定左/中/右单独调列宽比例\n- 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/fundPanorama/index.vue、src/views/benefit/mapOverview/index.vue\n- 所属项目：园区物管2.0；代码基线 f00310232；来源会话 aedd6cfa-10c2-4204-ace0-2dc1b2eb8a12；验证证据：园区物管2.0/027.md"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/large_screen_1920_scale.md",
+                "memory_type": "entities",
+                "deleted_content": "# 固定1920设计稿按高度缩放右侧留白修复\n园区物管2.0 大屏固定 1920px 设计稿按内容高度缩放时，内容偏高导致实际显示宽度小于视口宽，出现右侧留白。\n\n## 问题根因\n- 当内容偏高时 scale = vh / 内容高度 小于 vw / 1920\n- 固定 1920px 设计稿按较小 scale 缩放后，实际显示宽度小于视口宽，右侧留白\n\n## 解决方案\n- 动态设置设计稿宽度为 max(1920, ceil(视口宽 / scale))\n- 统一缩放取 scale = min(按宽比例, 按高比例)\n- 柱图默认高度 188px→156px、饼图区 276px→220px 等同步收紧\n- 侧栏收起/展开后重新计算缩放\n\n## 验证与归属\n- 验证：会话 aedd6cfa 调整设计稿宽度与统一缩放比，收紧默认高度并侧栏重算\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue、fundPanorama/index.vue、mapOverview/index.vue\n- 所属项目：园区物管2.0；来源会话：aedd6cfa-10c2-4204-ace0-2dc1b2eb8a12；代码基线：none；验证证据：园区物管2.0/027.md"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

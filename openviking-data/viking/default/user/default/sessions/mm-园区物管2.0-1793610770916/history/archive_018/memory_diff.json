@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_018",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:58:47.605400+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_alignticks_decimal.md",
+                "memory_type": "entities",
+                "after": "# ECharts 双 Y 轴 alignTicks 无限小数刻度\n园区物管2.0 中双 Y 轴混合图（左轴份数、右轴万元）开启 alignTicks 后右轴出现 2.6666666666666665 这类无限小数刻度。\n\n## 问题现象\n- 双 Y 轴 ECharts 混合图右轴刻度出现 2.6666666666666665 等无限小数，且刻度宽度测量与标签错位。\n- 左轴最大 16、右轴最大 8 时右轴按 8÷3 分段产生浮点误差。\n\n## 根因\n- 开启 alignTicks: true 后 ECharts 强制左右轴刻度段数一致，浮点除法产生无限小数。\n\n## 解决方案\n- 轴标签在 axisLabel.formatter 里 toFixed(2)（金额轴）或取整（计数轴）。\n- 数据非负时两轴都显式 min: 0，避免无意义负刻度。\n- 按刻度文本测宽定位单位文字的逻辑，测量也按格式化后两位小数计算，保证与标签一致。\n- 收入与支出趋势图共用同一渲染函数（如 renderFundTrendMixed）时改一处即同时生效。\n\n## 验证与归属\n- 验证：032.md 会话 12d47513 原因段落明确 alignTicks 致 8÷3 分段浮点误差，修改含 formatter toFixed(2)、min:0、测宽同步。\n- 涉及文件：src/views/benefit/dataSandbox/fundPanorama/index.vue；所属项目：园区物管2.0；来源会话：12d47513-9d93-4058-b4a5-541ebd520733；代码基线：f00310232。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tmap_instance_guard.md",
+                "memory_type": "entities",
+                "after": "# 腾讯地图 TMap 实例校验失败防御\n园区物管2.0 中腾讯地图 GL JS API 创建 MultiPolygon/MultiMarker/MultiLabel 时报「所传入参数并非 TMap.Map 的实例」的三类根因与统一防御套路。\n\n## 问题现象\n- 创建 MultiPolygon/MultiMarker/MultiLabel 时报「所传入参数并非 TMap.Map 的实例」。\n\n## 三类根因\n- TMap.Map/图层对象放 Vue2 data() 被响应式代理破坏原型链，instanceof TMap.Map 校验失败（marker/label/图层作响应式属性同样中招）。\n- created 与 mounted 各调一次 loadMap 重复插入 gljs 脚本，window.TMap 被替换后旧实例不再属新构造函数。\n- JSONP 异步竞态，组件销毁后仍用旧 map 创建图层。\n\n## 解决方案\n- 地图脚本加载器做单例（window.TMap 已存在直接 resolve），只在 mounted 调一次。\n- 地图及全部图层对象统一存非响应式上下文（如 this._tmapCtx），绝不放 data()。\n- 创建图层前显式校验 map instanceof TMap.Map。\n- 用 _mapViewToken/_destroyed 标志防止销毁后仍绘制；此套路适用于所有 WebGL/地图实例引入 Vue2 场景。\n\n## 验证与归属\n- 验证：032.md 会话 b8c9482d 列出三类根因与 mapLoader.js 单例 + _tmapCtx 非响应式 + token 防竞态修改。\n- 涉及文件：src/components/ZsTencentMap/mapLoader.js、src/views/benefit/statisticsMap/components/map.vue；所属项目：园区物管2.0；来源会话：b8c9482d-979a-4abb-bdf3-cd1b595616ce；代码基线：c97957703。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_template_label_stretch.md",
+                "memory_type": "entities",
+                "after": "# DetailTemplate 长 label 背景色高度不齐\n园区物管2.0 中 DetailTemplate 类只读详情模板长字段 label 换行拉高行高后，同行右侧蓝底 label 背景色没跟着拉伸。\n\n## 问题现象\n- 长字段 label 换行拉高行高后，同行右侧（或空占位列）蓝底 label 背景色没跟着拉伸，出现高度不齐。\n\n## 根因\n- 空占位列写死 height: 44px 不随内容伸缩；label-area 用 align-items: center 时子项只按自身高度排布、未撑满整行。\n\n## 解决方案\n- 空占位列由固定 height 改 min-height: 44px + align-self: stretch，允许被撑高。\n- .label-area 改 align-items: stretch，让背景铺满整格。\n- .detail-label 补 flex: 1 + align-self: stretch。\n- .detail-item 保留 min-height: 44px 作最小行高；核心原则：网格/行式布局占位与内容格必须用 stretch + min-height，禁止固定 height。\n\n## 验证与归属\n- 验证：032.md 会话 9d741535 detail-template.vue 四项修改，根因为固定 44px 占位列与 align-items: center。\n- 涉及文件：src/components/detail-template.vue；所属项目：园区物管2.0；来源会话：9d741535-927f-4374-aff7-ef6d5c347226；代码基线：55cd8653c。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/b_terminal_form_autofill.md",
+                "memory_type": "entities",
+                "after": "# B 端新增表单默认填充物业管理区域\n园区物管2.0 中 benefit 模块申报/备案类详情页（pubManagementOrg、pubParkingRate、pubQuarterlyDeclaration 等）新增表单自动带入物业管理区域的可复制套路。\n\n## 问题背景\n- B 端用户顶部已选好「物业管理区域」，进入新增表单应自动带入，不让用户再手动弹窗选择。\n- 小区接口返回的 row.subdistrict / row.community 本身是编码，前端若用 getSubdistrictNameByCode / getCommunityNameByCode 转名称赋值，提交时街道社区字段变名称而非代码，后端对不上。\n\n## 解决方案\n- 抽 initCurrentProject()（新增模式用 store 的 currentProjectId 请求 /property/complex/{id} 取区域信息）与 applyPropertyProjectRow()（统一处理字段赋值，街道/社区直接赋接口返回编码，不做名称转换）。\n- showPropertyProjectDialog() 在 B 端（isBTerminal）直接 return 不弹选择框。\n- 字段转名称依赖删掉后，waitForAreaOptions（等街道社区字典加载）随之移除，减少无谓字典等待。\n- 默认小区与手动选择小区两条链路必须走同一套赋值逻辑，避免提交体不一致。\n\n## 验证与归属\n- 验证：会话 2e908be5 applyPropertyProjectRow 直接赋 row.subdistrict/community 编码、去掉名称转换与 waitForAreaOptions；会话 82479c58 pubParkingRate/pubQuarterlyDeclaration 按 pubManagementOrg 模式补齐 isBTerminal + initCurrentProject + applyPropertyProjectRow + showPropertyProjectDialog 四件套。\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubManagementOrg/detail.vue、pubParkingRate/detail.vue、pubQuarterlyDeclaration/detail.vue、zhi2-web-admin/src/mixins/area.js；所属项目：园区物管2.0；来源会话：2e908be5-90f0-4ee1-998f-327c7c2fb67b、82479c58-f984-4f4d-8b85-c7a042ecea51；代码基线：55cd8653c / 7fe15a8cb / 8f4427ecd / f101dd464 / b2b559778。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite地图代理路径适配.md",
+                "memory_type": "entities",
+                "before": "# Vite地图代理路径适配\n园区物管2.0 地图区划（腾讯行政区划）数据拉取在 Vite 相对路径部署下的适配演进与最终方案。\n\n## 问题背景\n- 早期 base='./' 部署时，代理转发写死绝对路径 /map/... 导致子路径下 404 静默失败，后用 getDistrictProxyPrefix 返回 './map' 相对路径暂解。\n- 后续生产环境报 `Unexpected token '<', \"<!DOCTYPE\"... is not valid JSON`：tencentDistrictBoundary.js 用 `import.meta.env.DEV` 分流，dev 走 fetch('./map/...') 依赖 Vite /map 代理，生产无该代理，请求落 SPA index.html 被 res.json() 解析报错。\n- 更隐蔽：terser 压缩后 DEV 分支被错误保留、JSONP 分支被当死代码删除，生产包实际跑开发分支。\n- 具体错误写法：源码写 `if (void 0 !== import.meta && l && !0)` 这类运行时探测 import.meta 是否存在的判断，esbuild/terser 压缩后条件被错误求值为恒真，导致生产仍走 dev 才有的 ./map 代理而非回落 JSONP（apis.map.qq.com）。验证：旧构建 index-DUzdsYzz.js 中条件压缩为 `void 0 !== import.meta && l && !0` 恒真走 ./map 代理；新构建改用 import.meta.env.DEV 后正确走 JSONP。\n\n## 解决方案\n- 区划 GeoJSON 等依赖 dev 代理的第三方数据拉取，统一改为 JSONP 直连腾讯行政区划 API（apis.map.qq.com），与 statisticsMap/map.vue 同套路，彻底摆脱本地代理依赖。\n- 环境判断必须直接使用 `import.meta.env.DEV`，让压缩器把分支固化成布尔常量、dead code 直接剔除，而不是运行时探测 import.meta 对象是否存在；此类写法在所有「仅开发环境存在的代理/路径」判断里通用。\n- 修复后重新构建并核对产物 chunk 含 JSONP 调用、不含 fetch('./map')；部署整包替换 dist 并清 CDN/浏览器缓存。\n- 前置确认：后台 platformConfig.region 配 6 位 adcode、腾讯地图 Key 开通 WebServiceAPI（JSONP 必需）。\n\n## 排查要点\n- 生产报 HTML 解析错误先查网络请求是否落到 index.html；用控制台确认腾讯接口具体错误（Key 权限/配额）而非 HTML 解析。\n- 生产 404 另一类根因是哈希 chunk 部署/缓存不一致：Network 看失败文件哈希是否还在 index.html/module-main 的新引用里；处理方式是整包 dist 覆盖部署+清缓存，不要只拷部分文件。\n- 涉及文件：tencentDistrictBoundary.js、mapOverview/index.vue、statisticsMap/components/map.vue；所属项目：园区物管2.0（zhi2-web-admin）。",
+                "after": "# Vite地图代理路径适配\n园区物管2.0 地图区划（腾讯行政区划）数据在 Vite 相对路径部署下的适配与最终方案。\n\n## 问题背景\n- 早期 base='./' 部署时代理写死绝对路径 /map/... 致子路径 404，用 getDistrictProxyPrefix 返回 './map' 暂解。\n- 生产报 `Unexpected token '<'... is not valid JSON`：tencentDistrictBoundary.js 用 `import.meta.env.DEV` 分流，dev 走 fetch('./map/...') 依赖 Vite 代理，生产无代理落 index.html 被 res.json() 报错。\n- terser 压缩后 DEV 分支被保留、JSONP 分支当死代码删，生产包实际跑开发分支。\n- 错误写法 `if (void 0 !== import.meta && l && !0)` 运行时探测 import.meta 是否存在，压缩后恒真走 ./map 代理而非 JSONP（apis.map.qq.com）；旧构建 index-DUzdsYzz.js 验证此问题，新构建改用 import.meta.env.DEV 正确走 JSONP。\n\n## 解决方案\n- 区划 GeoJSON 等依赖 dev 代理的第三方数据拉取，统一改 JSONP 直连腾讯行政区划 API（apis.map.qq.com），与 statisticsMap/map.vue 同套路，摆脱本地代理。\n- 环境判断必须直接用 `import.meta.env.DEV`，让压缩器固化布尔常量、剔除 dead code，而非运行时探测 import.meta；此写法通用于所有「仅开发环境代理/路径」判断。\n- 修复后重新构建核对产物含 JSONP 调用、不含 fetch('./map')，整包替换 dist 并清 CDN/浏览器缓存。\n- 前置：后台 platformConfig.region 配 6 位 adcode、腾讯地图 Key 开通 WebServiceAPI（JSONP 必需）。\n\n## 排查要点\n- 生产报 HTML 解析错误先查请求是否落 index.html，用控制台确认腾讯接口具体错误（Key 权限/配额）。\n- 生产 404 另一根因是哈希 chunk 部署/缓存不一致：Network 看失败文件哈希是否还在新引用里，处理为整包 dist 覆盖+清缓存，勿只拷部分文件。\n- 涉及文件：tencentDistrictBoundary.js、mapOverview/index.vue、statisticsMap/components/map.vue；所属项目：园区物管2.0（zhi2-web-admin）。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

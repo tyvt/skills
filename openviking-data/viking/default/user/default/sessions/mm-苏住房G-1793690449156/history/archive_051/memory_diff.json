@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_051",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:20:29.864180+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术模式/appmain_scroll_reset.md",
+                "memory_type": "entities",
+                "after": "# 跳新页面后内容停在中部：滚动容器是 #app-main 而非 window，scrollBehavior 对它完全无效\n从「物业管理区域查询」详情页进入子页面时新页面从中段显示，根因是 SPA 实际滚动发生在 #app-main 而非 window，router 的 scrollBehavior 对其无效。\n\n## 问题根因\n- 项目 router 已配 scrollBehavior: () => ({x:0, y:0})，但 Vue 中 #app-main 带 overflow-y: auto，window 几乎不滚\n- vue-router 的 scrollBehavior 只处理 window 滚动，对 #app-main 内部滚动容器无效，跨路由保留 scrollTop\n\n## 解决方案\n- 在 router/index.js 的 afterEach 守卫显式重置滚动：定义 resetPageScroll()（getElementById('app-main') 置 scrollTop=0，同时 window.scrollTo(0,0) 兜底）\n- 必须包在 Vue.nextTick 里执行，等新页面 DOM 渲染完成后再置零，否则设置被后续渲染顶掉\n- 一处改动对所有路由跳转生效，同类布局（#app-main / #app-content 类内部滚动容器）适用同一套路\n\n## 验证与归属\n- 验证证据：会话 a1789e06 用户反馈跳转新页面滚动位置问题需全局修改；结论给出根因及 afterEach + Vue.nextTick 的 resetPageScroll 修复代码\n- 涉及文件：src/router/index.js、src/layout/components/AppMain.vue、src/views/publicQuery/complex/index.vue、src/views/publicQuery/complex/components/propertyContractTable.vue\n- 所属项目：苏住房G；来源会话ID：a1789e06-01db-41b3-b240-eb61d9addf8b；代码基线：e590ffa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术模式/fee_arrears_amount.md",
+                "memory_type": "entities",
+                "after": "# 物业费申报明细欠缴金额字段须用 arrearsAmount\n物业费申报详情编辑申报明细时欠缴金额不显示且不回显，根因是列绑定 oweAmountSum、编辑弹窗用计算禁用、保存取计算值，需统一为 arrearsAmount。\n\n## 问题根因\n- 表格列绑定 oweAmountSum，接口实际返回 arrearsAmount，保存成功但列取不到值 → 不显示\n- 编辑弹窗欠缴金额用 calcArrearsAmount() 自动计算且 disabled，没绑 item.arrearsAmount → 不回显\n- 保存提交用计算值而非用户输入的 arrearsAmount，输入被丢弃\n\n## 解决方案\n- 在 feeBindScopeTable.vue 收敛：列 prop oweAmountSum → arrearsAmount\n- 欠缴金额改为可编辑 v-model=\"item.arrearsAmount\"（去掉 disabled）\n- 保存直接用 item.arrearsAmount；提交校验增加欠缴金额必填；checkTableDataFields 改查 arrearsAmount；删掉 calcArrearsAmount\n- 教训：自动计算+禁用的派生字段若接口有同义落库字段，必须在绑定 prop/可编辑/提交取值/校验字段四处保持同一字段名\n\n## 验证与归属\n- 验证证据：会话 0cbbf182 用户诉求使用 arrearsAmount；结论列三条根因及六项修改清单\n- 涉及文件：src/views/property/feeDeclare2/detail.vue、src/views/property/feeDeclare2/components/feeBindScopeTable.vue\n- 所属项目：苏住房G；来源会话ID：0cbbf182-783b-42fb-ad93-4e0e2a8c76bc；代码基线：d109b83"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术模式/tree_leaf_dual.md",
+                "memory_type": "entities",
+                "after": "# 树表叶子/分支状态字段与树结构双轨判定\n月报模板维护等树表行上类型字段与 children 结构不一致，导致显示分支但校验按叶子，须以 children 为唯一真值。\n\n## 问题根因\n- utils/monthlyReport.js 的 isLeafNode(node) 只看节点自己 leafFlag，而非 children.length\n- addBranch()/removeBranch() 改写父节点 leafFlag，结构一变状态字段落后一次\n- 同一结构存两份（children 树和 leafFlag 标量），写漏路径（addSibling、createTemplateNode）致永久不一致\n\n## 解决方案\n- 判定一律以 children 为准（isLeafNode 只读 children，[] 或不存在算叶子），leafFlag 退化为保存前派生写出冗余字段\n- 变更树结构时父变分支清空叶子专属字段并置 leafFlag='0'，删光子节点按默认回填并置 '1'\n- 保证 normalizeTemplateOrder 之类递归归一在保存/提交路径被调用，统一出口同步 leafFlag 并清分支字段\n\n## 验证与归属\n- 验证证据：审查 monthlyReport.js 改 isLeafNode 只读 children；新增 clearBranchNodeFields；ensureLeafFields 设 leafFlag；normalizeTemplateOrder 同步；结论 MEDIUM 指仓库内未见调用点\n- 涉及文件：zhi2-web-admin/src/utils/monthlyReport.js、zhi2-web-admin/src/views/publicQuery/monthlyReportTemplate/components/TemplateTreeTable.vue\n- 所属项目：苏住房G；来源会话ID：65ff5e0a-abf7-48c3-8b4c-301501c73c48；代码基线：4f7c2c3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术模式/tree_list_double_req.md",
+                "memory_type": "entities",
+                "after": "# 左侧树+右侧列表页首屏请求翻倍\n系统管理用户管理等左树右列表页面 Network 中 page 接口调两次，根因是 init() 直接 getList() 与树加载后自动选首节点两条取数路径叠加。\n\n## 问题根因\n- init() 里除 getTreeselect() 还直接调一次 getList()；getTreeselect 的 then 里 handleNodeClick(deptOptions[0]) 再拉一次列表\n- 「默认选中第一个节点」与「无条件拉全量列表」语义冲突，无参 getList() 被覆盖成无用请求且先到先渲染误导\n- 与已知 977（生命周期钩子叠加）形态相近但触发源不同：本条是异步回调自动设默认值开销\n\n## 解决方案\n- 列表首屏只留一条主路径：有树时去掉 init() 里 getList()，让树默认选中首节点负责首次取数\n- 树为空（deptOptions.length===0）时明确不发列表请求，不补无参兜底\n- maintenance/components/userDialog.vue 里同款写法改公共取数函数或同源改造\n\n## 验证与归属\n- 验证证据：用户报用户查询接口调用2次；定位 system/user/index.vue 的 init() 同时调两函数，修复后只剩带 deptId 的 page 请求\n- 涉及文件：zhi2-web-admin/src/views/system/user/index.vue、src/mixins/listMixins.js、src/views/maintenance/components/userDialog.vue\n- 所属项目：苏住房G；来源会话ID：7130b223-ea5d-4df2-a81c-47b905abbd28；代码基线：315702f"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

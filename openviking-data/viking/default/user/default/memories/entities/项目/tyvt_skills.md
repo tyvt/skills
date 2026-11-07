@@ -7,6 +7,7 @@ GitHub 上的 tyvt/skills 仓库（本地路径 D:\repository\skills），用于
 
 ## 内容
 - openviking-memory/ 目录存放 OpenViking 记忆库快照
+- openviking-data/ 目录存放 OpenViking 的 memories 与 peers/*/memories 同步备份（约13MB，不含 sessions 与 vectordb）
 - skills/scripts/ 目录含 patch-ov-cursor-evidence.mjs、fix-ov-memory-footer-order.mjs、refresh-cursor-import-state.mjs 等导入质量脚本
 
 ## 关系
@@ -17,8 +18,8 @@ GitHub 上的 tyvt/skills 仓库（本地路径 D:\repository\skills），用于
 {
   "category": "项目",
   "name": "tyvt_skills",
-  "source_extraction_id": "eb02bb05760c4fa5bed877964c5f0249",
-  "version": 1,
+  "source_extraction_id": "85b2659f2ed048b4b9cd65cb1ccdcdcf",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

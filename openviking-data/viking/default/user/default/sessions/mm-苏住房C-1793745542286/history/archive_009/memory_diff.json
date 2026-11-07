@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_009",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T22:58:31.058389+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/label_width_zero.md",
+                "memory_type": "entities",
+                "after": "# 无标签表单行 label-width 占位致 checkbox 偏右\n苏住房C 市民端实名认证页协议勾选行因 uni-forms 保留 label-width 占位而偏右，改用 label-width=\"0\" 与 flex 行内排布修复。\n\n## 问题现象\n- 业主实名认证页 src/pages_my/verification/FormLocal.vue 的协议勾选行未与上方「姓名」「证件号码」左对齐\n- 整行 checkbox 明显偏右，协议文字用 position:absolute;left:28px 叠在 checkbox 上易错位或压住点击区\n\n## 根因\n- 表单容器设 :label-width=\"80\"，协议行是 uni-forms-item 但无 label，框架仍按 label-width 保留 80px 标签区使内容右推\n- 协议文字绝对定位叠层在机型差异下会错位或压住点击区，本身布局不稳\n\n## 解决方案\n- 协议行显式加 label-width=\"0\"（Vue 中数字 0 需绑定写法）取消标签占位，使右边缘与上方字段左边缘对齐\n- 勾选框与协议文字改 flex 横向排列、gap 控制间距，彻底去掉绝对定位\n- 直接复用登录页共享组件 src/components/shared/AgreementCheck.vue，不在页面重画一份\n- 手机号/协议等固定无标签行从开始就写 label-width=\"0\"\n\n## 验证与归属\n- 所属项目：苏住房C；来源会话：ff73a0da-4c2f-4e0f-ba3a-30d82fa7c7d6；代码基线：4630e8e\n- 涉及文件：src/pages_my/verification/FormLocal.vue、src/components/shared/AgreementCheck.vue、src/styles/form2.scss、src/styles/radio.scss"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/textarea_align_fix.md",
+                "memory_type": "entities",
+                "after": "# 全局 align-items:center 致 textarea 被下方区块遮挡\n苏住房C 业主端加装电梯申请页「申请说明」textarea 因全局 .uni-forms-item align-items:center 不撑高，被下方区块盖住无法输入。\n\n## 问题现象\n- pages_owner_extra/elevator/addAlone.vue 的「申请说明」多行输入框点不进去、无法输入\n- 下方「地理位置」标题压在输入框上，拦截点击与聚焦事件，形似「输入框坏了」\n\n## 根因\n- 全局 .uni-forms-item 用了 align-items:center，多行输入区实际渲染高度约 200rpx\n- 表单项容器未为 textarea 预留高度，元素高度不被内容撑开，后续区块叠进输入框区域\n\n## 解决方案\n- 给该行（如 .description）补 min-height:300rpx、height:auto、align-items:flex-start，留 padding-bottom 与下方区块分开\n- 标签加 margin-bottom 增加呼吸；参考项目内 signInfo.vue 成熟写法\n- 不要动全局 .uni-forms-item 的 align-items，以免连累所有单行表单项垂直居中\n- 排查顺序：先看容器高度与遮挡，再看 focus/v-model 逻辑，最后才怀疑组件\n\n## 验证与归属\n- 所属项目：苏住房C；来源会话：d8d3c33d-5a07-488c-9663-dd7409ec4528；代码基线：8fc3cc5\n- 涉及文件：src/pages_owner_extra/elevator/addAlone.vue、add.vue、input.vue、src/styles/form2.scss、src/components/ZsTextarea/ZsTextarea.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/redirect_loading_depth.md",
+                "memory_type": "entities",
+                "after": "# 中转页多接口共用单一 loading 深度计数\n苏住房C 扫码/分享中转页并发多接口，用 _apiLoadingDepth 与 trackApi 包装保证全页只有一个 loading。\n\n## 问题现象\n- onLoad 并发发起 getUserInfo、listComplexCommunitySubdistrictByToken、getTokenV1、埋点 eventDataAdd 等多个互不相关接口\n- uni.showLoading/hideLoading 全局单例计数，先返回的接口会 hideLoading 掉别人未完成的 loading，界面闪烁\n- 原 lanch() 自带 showLoading 在埋点未完成时就 hideLoading，属同类误关\n\n## 根因\n- uni.showLoading/hideLoading 是全局单例计数，多个接口各自 show/hide 时无法协调，先完成者误关他人 loading\n\n## 解决方案\n- 页面实例维护 _apiLoadingDepth，封装 _beginApiLoading/_endApiLoading（0→1 才 showLoading，回到 0 才 hideLoading）\n- 封装 trackApi(promise)：非 Promise 直接 Promise.resolve 透传，否则 begin 后用 .finally(end) 保证成功失败都关\n- 所有接口调用一律包 this.trackApi(...)，埋点再包 eventDataAddWithLoading 复用同一计数\n- onUnload 时循环 end 直到深度归 0，避免离开页面后 loading 残留\n- 该套路可搬到任何「一屏多请求」中转/聚合页，新增接口只需包一层 trackApi 即自动接入\n\n## 验证与归属\n- 所属项目：苏住房C；来源会话：3446b277-c59f-4c0d-8572-2a95877d79e3；代码基线：97a1f31\n- 涉及文件：src/pages/redirect/index.vue、src/store/user.js、src/api/appAnalytics.js"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/vue3_macro_import.md",
+                "memory_type": "entities",
+                "after": "# Vue3 script setup 误 import 编译器宏警告\n苏住房C 小程序多个 SFC 在 <script setup> 里误 import defineProps/defineEmits，编译时持续刷 compiler macro 警告。\n\n## 问题现象\n- zhi2-mobile-shimin 多个 SFC 写 `import { defineProps, defineEmits } from 'vue'`\n- 编译/差量编译时终端持续刷 Vue 3 编译器提示，提示二者是 compiler macro、无需 import\n\n## 根因\n- defineProps/defineEmits 是编译器宏，由 <script setup> 编译期注入，显式 import 被识别为错误用法\n- 虽不阻断编译但污染编译输出掩盖真正报错；首次全量编译旧输出残留终端易误以为没修好\n\n## 解决方案\n- 把 defineProps/defineEmits 从 vue 的 import 列表删掉，只保留真正需要的 ref/computed/onMounted 等\n- 若文件只用到宏不需要任何 vue 导出，直接整行 import 删除\n- 改完只需差量编译，终端仍出现旧提示属全量编译旧输出可忽略\n- 本次在 page-query/components 下修了 5 个文件：FilterPopupComponent、NewFilterComponent、CompanyItem、PropertyCard、PropertyItem\n\n## 验证与归属\n- 所属项目：苏住房C；来源会话：b7ff0fc8-8e3a-4961-ab91-06155333fe7b；代码基线：5f0f4dc\n- 涉及文件：src/page-query/components/FilterPopupComponent.vue、NewFilterComponent.vue、CompanyItem.vue、PropertyCard.vue、PropertyItem.vue"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

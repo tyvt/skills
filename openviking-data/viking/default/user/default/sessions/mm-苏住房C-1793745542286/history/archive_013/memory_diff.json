@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_013",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T23:05:57.171697+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/intention_viewitem_browserapi.md",
+                "memory_type": "entities",
+                "after": "# 小程序列表复用详情方法误用浏览器API致ReferenceError\n苏住房C（uni-app mp-weixin）在 pages_transaction/intention 的 list.vue 与 my.vue 共用 viewItem 时，因误用 sessionStorage/window 等浏览器API，点击「联系方式」抛 ReferenceError 致跳转失效。\n\n## 问题现象\n- 点击「联系方式」调用 viewItem 时微信开发者工具报 `ReferenceError: sessionStorage is not defined`，栈指向 my.js 的 viewItem，跳转详情完全失效\n- 错误仅在运行时点击暴露，编译期与预览首页不报，易被当成偶发\n- 同文件 editItem 已正确用 `uni.setStorageSync`，viewItem 却是浏览器写法，两套并存只坏一条路径\n\n## 根因\n- uni-app 编译到 mp-weixin 后代码跑在小程序 appservice，没有 `window`、`sessionStorage`、`localStorage`、`document`\n- 项目里同源复制自 Web 后台的代码片段（尤其列表项→详情页传参）被直接搬过来\n\n## 解决方案\n- 小程序端存储一律 `uni.setStorageSync/getStorageSync`，禁止 `sessionStorage/localStorage`\n- 读侧加空值兜底：`JSON.parse(uni.getStorageSync(key) || '{}')`，避免首次无缓存 JSON.parse(undefined) 再抛错盖住根因\n- 排查顺序：同页面 grep `sessionStorage|localStorage|window\\.|document\\.`，Web 后台复制来的页面/方法优先怀疑\n- 列表页与详情页共用方法时（list 复用 my.vue），改一处要检查另一处是否也有同样浏览器 API\n\n## 验证与归属\n- 会话 f3006cc6：报错 ReferenceError at viewItem (appservice/my.js)，根因为 list 复用 my.vue 的 viewItem 误用浏览器 API\n- 修复为 my.vue 的 viewItem 改 uni.setStorageSync（与同文件 editItem 一致），detail.vue 改 uni.getStorageSync 并加 `|| '{}'` 防解析报错\n- 涉及文件：src/pages_transaction/intention/my.vue、detail.vue、list.vue；所属项目：苏住房C；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/defineoptions_compile_macro.md",
+                "memory_type": "entities",
+                "after": "# Vue 3.2.45 禁用 defineOptions 编译宏\n苏住房C（zhi2-mobile-shimin）组件写 `defineOptions({ inheritAttrs: false })` 在微信开发者工具打开页面即崩，报 `ReferenceError: defineOptions is not defined`，因项目 Vue 为 3.2.45 不支持 3.3+ 宏。\n\n## 问题现象\n- 组件写 defineOptions 后微信开发者工具打开页面即白屏，报 `ReferenceError: defineOptions is not defined`，堆栈落在 weapp:///components/ZsMap/ZsMap.js 的 setup\n- 页面整块白屏，非组件逻辑错误\n\n## 根因\n- 项目 Vue 版本为 3.2.45，而 `defineOptions` 是 3.3+ 才提供的编译宏\n- uni-app/Vue3 web 端构建里宏会被编译器吸收，但当前版本编译器不识别，宏原样落到运行时代码，setup 执行时找不到标识符\n\n## 解决方案\n- 删掉 defineOptions，改成不带 setup 的独立 `<script>` 块 `export default { inheritAttrs: false }`，与项目内 ZsPaging.vue 惯例一致\n- 语义不变：仍禁止 attrs 自动透传，组件内手动把 class/style 绑到真实节点\n- 排查同类「未定义」报错时，先确认语法/宏是否超出项目 Vue 版本，再怀疑代码\n- 改完需重新构建并刷新开发者工具，热更新对编译宏改动不生效\n\n## 验证与归属\n- 会话 7b29aae4：用户贴 ReferenceError at setup (ZsMap.js:45:5)，结论为 Vue 3.2.45 不支持 defineOptions，按 ZsPaging.vue 改为独立 script 导出 inheritAttrs: false\n- 涉及文件：src/components/ZsMap/ZsMap.vue、src/components/ZsPaging/ZsPaging.vue、package.json；所属项目：苏住房C；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/gateway_zsparam_base64.md",
+                "memory_type": "entities",
+                "after": "# 网关 zs-param 请求头中文变 ?? 统一改 base64 编码\n苏住房C（zhi2-mobile-shimin）经 gateway.js 发请求时业务参数放自定义头 `zs-param`，带中文后端收到全变 `??`，需在 gateway.js 收口 base64 编码。\n\n## 问题现象\n- 经 src/api/gateway.js 发出的请求，业务参数放自定义请求头 zs-param；带中文时（如报修 contactName「朱楠」、eventDesc「测试上传」）后端收到中文全变 `??`\n- 功能静默失败但不报错，难察觉\n\n## 根因\n- HTTP Header 只允许 ASCII（latin-1）字符集，未编码的中文 JSON/查询串在传输层被替换成 ?\n- encodeURIComponent 只是把问题推后：值变长且不同网关/代理解 URL 编码行为不一致\n\n## 解决方案\n- 在 gateway.js 里收口一处，新增 encodeZsParam：空值直接返回；否则 `btoa(unescape(encodeURIComponent(value)))`（先转 UTF-8 字节再 base64，避免 btoa 对非 ASCII 抛 InvalidCharacterError）\n- resolveZsParam 里 GET 走 serializeQueryParams(bizContent)、POST 走 JSON.stringify(bizContent)，统一过 encodeZsParam 再写 zs-param\n- 这是前后端契约变更：后端必须先 base64 解码再解析 JSON/查询串，否则全量接口 400，联调须显式同步\n\n## 验证与归属\n- 会话 ebbcd94a：用户给出两种编码方案并指定 base64，最终在 gateway.js 新增 encodeZsParam + resolveZsParam，POST 先 JSON 序列化再 base64、GET 先序列化查询参数再 base64，并提示服务端需 base64 解码\n- 涉及文件：src/api/gateway.js、src/pages_owner/repair/add.vue；所属项目：苏住房C；代码基线：e04432d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/tech_stack_warnings.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C 市民端技术栈与构建告警口径\n苏住房C 市民端 zhi2-mobile-shimin 是 Vue3 + Vite 的 uni-app 工程，index.html 全局脚本与 vite sourcemap 重复是两类高频噪声，需分清噪声与真错。\n\n## 技术栈与结构\n- 移动端工程 zhi2-mobile-shimin：uni-app，Vue3 + Vite，页面按 pages_owner / pages_owner_extra / pages_transaction / pages_my / pages_tab 业务域分包\n- 静态资源按页面目录 static 就近放，如 pages_owner/repair/static/\n- /static/js/utils 下国密/字节工具（如 byteUtil.js）走 pre-commit ESLint 门禁\n\n## 构建噪声与真错\n- index.html 里 /static/js/crypto-js.min.js、/static/js/sign.js 用 `<script defer>` 经典脚本加载，Vite 只 bundle ES module，提示「未被 module 化」属预期行为可忽略（sign.js 依赖全局 window.CryptoJS 必须用经典脚本），只需确认产物可访问\n- vite.config.ts 的 build 里若条件编译写两个 sourcemap 键，esbuild 报 duplicate-object-key 且静默覆盖，是真正要修的配置错误\n- sourcemap 收敛为一条：`sourcemap: process.env.UNI_PLATFORM === 'h5' ? mode !== 'production' : false`\n\n## 提交门禁与修复\n- byteUtil.js 混用空格与 Tab 触发 no-mixed-spaces-and-tabs 直接拦提交，统一缩进后对该文件跑 eslint --fix 再 git add 重新提交\n- 处理构建日志先分层：「脚本未 module」类忽略；duplicate-object-key、resolve 失败清单才是要改的\n\n## 验证与归属\n- 会话 2adc93a0 / f3ee482c（基线 0011377）：解释 index.html 两个 defer 脚本 WARN 为预期；修 vite.config.ts 重复 sourcemap 合并为条件表达式\n- 会话 926ce7a5（基线 166ed47）：byteUtil.js 混用空格 Tab 触发 no-mixed-spaces-and-tabs，eslint --fix 后提交通过\n- 涉及文件：index.html、vite.config.ts、src/static/js/sign.js、src/static/js/utils/byteUtil.js；所属项目：苏住房C"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

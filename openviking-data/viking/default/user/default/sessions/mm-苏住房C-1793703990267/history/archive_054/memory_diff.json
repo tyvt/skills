@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_054",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T13:01:19.591536+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/owner_house_complexid.md",
+                "memory_type": "entities",
+                "after": "# 业主端添加房屋流程complexId缺失报错\n业主端「添加房屋→人工登记→提交人工审核」因register.vue未从useHouseStore带complexId，后端报「物业管理区域权限不能为空」。\n\n## 问题背景\n- 报错发生在register.vue调用ctUserIdentityApply时未传complexId，同流程addHouse.vue、addHouseContract.vue均已携带\n- complexId非表单字段，而是从project/auth.vue进入流程时写入useHouseStore的上下文参数，模板不可见故易漏\n- 前端无提示，后端报错文案指向「权限」易误导排查方向\n\n## 解决方案\n- 同流程内所有提交接口页面统一从useHouseStore补齐业务上下文（complexId与identityPhoto/certificatePhoto等拼接字段）\n- 以同流程已跑通页面为基准逐字段比对payload，新增页先grep同目录其他提交页字段清单\n- 排查「xx不能为空」类报错先确认参数是表单字段还是store上下文参数，勿先查权限\n\n## 验证与归属\n- 验证证据：会话75b9fd04用户截图报错并指出复杂小区参数即可；当前代码核实register.vue:173-176已含complexId\n- 涉及文件：pages_owner/house/owner/register.vue、addHouse.vue、bindProject.vue、store/house.js、api/property.js\n- 所属项目：苏住房C；来源会话：75b9fd04-a06e-4dd9-a25b-46eb96b4328a；代码基线：0011377"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/message_readflag.md",
+                "memory_type": "entities",
+                "after": "# 小程序消息页未读数统计与头部滚动跟随\n消息页未读数统计须带readFlag:0，顶部管理/筛选移入z-paging并关闭fixed以跟随列表滚动。\n\n## 问题背景\n- 个人中心/消息角标调getMsgNum/unReadMsgNum不带参数拿到全量消息数而非未读数，角标永不为0\n- 消息列表页将「管理」「筛选」固定在page-top顶部，用户觉占位且与列表割裂\n- z-paging默认将整页容器当滚动区，头部区块留外层必固定，放入内才同滚动流\n\n## 解决方案\n- 未读数统计统一readFlag:0（getMsgNum另带projectType:1），列表筛选readFlag空串表示全部\n- page-top移入z-paging内部，z-paging显式:fixed=\"false\"，页面容器overflow:hidden，内容区flex:1，滚动交z-paging\n- 底部批量操作栏（全选/设为已读/删除）保持固定，避免批操作丢失列表滚动位置\n\n## 验证与归属\n- 验证证据：会话bcb98835用户诉求加readFlag:0及头部跟随滚动；代码核实index.vue:56,62带readFlag:0，My_Suzhufang.vue:114带projectType:1\n- 涉及文件：pages_main/message/index.vue、message.vue、pages_main/my.vue、pages_tab/components/My_Suzhufang.vue、hooks/usePaging.js\n- 所属项目：苏住房C；来源会话：bcb98835-f1ec-41eb-9aea-afdbf1871d66；代码基线：77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zspopup_width.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C弹窗ZsPopup左右留白约束\n苏住房C认证失败等弹窗因ZsPopup缺少视口相对宽度约束贴边，需在公共组件加max-width与margin居中。\n\n## 问题背景\n- 认证失败、重复账号、撤销确认等弹窗左右贴边，用户要求左右各留20px\n- 根因是ZsPopup的.popup-container只给max-width:360px，无相对视口宽度约束，小屏下贴边\n- 页面侧未覆盖宽度，造成各弹窗口径不一\n\n## 解决方案\n- 在公共组件ZsPopup的.popup-container统一加width:360px; max-width:calc(100vw - 40px); margin:0 auto\n- 语义为最大360px且无论屏宽左右至少留20px并水平居中，勿在业务页面单独加padding\n- 配合已有box-sizing:border-box与border-radius；100vw即屏宽不需减scrollbar\n\n## 验证与归属\n- 验证证据：会话2795d7c1用户要求弹窗留白20px，结论加约束于ZsPopup.vue并作用于所有使用该组件的弹窗\n- 涉及文件：src/components/ZsPopup/ZsPopup.vue、src/pages_my/verification/FormLocal.vue\n- 所属项目：苏住房C；来源会话：2795d7c1-b57e-448c-bc6a-90330c419f2b；代码基线：0801b84"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/subpackage_component.md",
+                "memory_type": "entities",
+                "after": "# 微信小程序分包组件跨包引用限制\n苏住房C小程序分包页面引用另一分包组件会构建失败，需抽到主包src/components/<业务域>/并改引用路径。\n\n## 问题背景\n- 编译/运行报Component is not found in path \"pages_main/news/components/ListIndex\" (using by \"pages_my/onlineService/index\")\n- 根因是微信小程序不允许一个分包页面直接引用另一分包组件，componentPlaceholder仅异步补救治不了跨包路径非法\n- 文章/政策列表组件被多包共用，遗漏则多处报错\n\n## 解决方案\n- 将组件下沉到主包公共目录src/components/<业务域>/（如article/ListIndex.vue、ListDetail.vue）\n- 改掉所有消费方import路径，删除分包内原文件避免两份漂移\n- 后续同类错误同样按移到主包src/components/处理，不给每个包各复制一份\n\n## 验证与归属\n- 验证证据：会话903d152b用户贴报错，结论抽ListIndex/ListDetail到src/components/article/并更新6个引用文件\n- 涉及文件：src/components/article/ListIndex.vue、ListDetail.vue、pages_my/onlineService/index.vue、pages_main/news/index.vue等\n- 所属项目：苏住房C；来源会话：903d152b-dae2-46f3-94af-775912aee86f；代码基线：9832ba3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

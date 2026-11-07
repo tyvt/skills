@@ -1,0 +1,42 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793827333622/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T21:25:32.964019+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/extract_dialog_script.md",
+                "memory_type": "entities",
+                "after": "# 模板解析超时保护脚本\nextract-dialog-content.js 在 @maintenance 目录处理中增加了循环超时与上限保护，避免死循环卡死。\n\n## 功能描述\n- 脚本用于从 zhi2-web-admin 模板中提取 zs-dialog 内容，遍历目录下文件。\n- 原实现易在「提取属性」内层循环或带引号属性值循环处死循环，导致整体卡住。\n\n## 超时与保护方案\n- 外循环每次开头检查 `Date.now()`，超过 5 秒立即 `break` 退出解析。\n- 「提取属性」内层循环加次数上限 `attrLoops < maxAttrLoops`（约 `min(模板长度*3, 100000)`）与时间检查 `Date.now() - startTime > PARSE_TEMPLATE_TIMEOUT_MS`。\n- 三处「读到闭合引号」的 `while` 加 `quoted++ < template.length` 长度上限，防未闭合引号无限循环。\n- 单文件解析超 5 秒放弃该文件，打印「模板解析超时」并继续下一个。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/scripts/functions/extract-dialog-content.js\n- 所属项目：2-0；来源会话：2566f7d9-ebd6-469e-91d9-d90e7554d3d0；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sidebar_menu_e2e.md",
+                "memory_type": "entities",
+                "before": "# 侧栏目录型菜单E2E遍历规范\nnavbar-sidebar-accessibility用例需遍历全部直接子叶子，同URL用main-content文本变化判定跳转成功。\n## 解决方案\n- 递归侧栏时只处理直接子级sidebar-leaf-link，避免getByTestId捞到更深层后代\n- 每次点击前记录beforeUrl与[data-testid=\"main-content\"]的innerText\n- 点击后优先waitForURL与beforeUrl不同；若URL未变用waitForFunction比较main-content文本变化超时约4s再记成功\n- 依次点击目录下每一个叶子而非只点最后一个\n- 目录展开、滚动与pointer遮挡问题仍按侧栏专项用例里的展开/scrollIntoView处理\n## 涉及文件\n- zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js\n## 验证与归属\n- 所属项目：2-0；代码基线：none\n- 验证证据：会话97cb886a诉求2指出目录类型sidebar只点最后一个菜单；结论增加beforeMainText与URL不变时内容变化等待\n- 来源会话ID：97cb886a-e67c-42b6-8516-f9591fa85219",
+                "after": "# 侧栏目录型菜单E2E遍历规范\nnavbar-sidebar-accessibility用例需遍历全部直接子叶子，同URL用main-content文本变化判定跳转成功。\n## 解决方案\n- 递归侧栏时只处理当前目录直接子叶子；现实现为用 `.locator('.menu-collapse-wrapper .sub-menu a').nth(i)` 顺序点击，早期曾用 sidebar-leaf-link 的 testid+closest 过滤避免捞到深层后代\n- 每次点击前记录beforeUrl与[data-testid=\"main-content\"]的innerText\n- 点击后优先waitForURL与beforeUrl不同；若URL未变用waitForFunction比较main-content文本变化超时约4s再记成功\n- 依次点击目录下每一个叶子而非只点最后一个\n- 目录展开、滚动与pointer遮挡问题仍按侧栏专项用例里的展开/scrollIntoView处理\n## 涉及文件\n- zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js\n## 验证与归属\n- 所属项目：2-0；代码基线：none\n- 验证证据：会话97cb886a诉求2指出目录类型sidebar只点最后一个菜单；结论增加beforeMainText与URL不变时内容变化等待\n- 来源会话ID：97cb886a-e67c-42b6-8516-f9591fa85219"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/测试模式/sidebar_leaf_filter.md",
+                "memory_type": "entities",
+                "before": "# 嵌套侧栏E2E叶子过滤\n在 zhi2-web-admin 的 navbar-sidebar-accessibility E2E 用例中，Playwright 的 getByTestId 默认匹配所有后代，导致嵌套目录误点深层叶子。\n\n## 现象\n- 两层目录（如「规约管理 > 管理规约 > 管理规约拟定」）下，父层直接点到深层叶子，或子菜单顺序与页面不符。\n- 街道/社区/小区、物业管理区域等被误判无子菜单；物业管理区域子菜单顺序与页面不符。\n\n## 根因\n- Playwright locator.getByTestId 匹配所有后代而非仅直接子节点。\n- submenu.getByTestId('sidebar-menu-item') 会把更深层目录算进来，递归展开状态错乱。\n\n## 解决方案\n- 叶子只点满足 `leaf.closest('[data-testid=\"sidebar-menu-item\"]') === 当前 menuItem` 的 sidebar-leaf-link。\n- 嵌套目录只递归「其 sidebar-menu-item 祖先链上紧邻父级就是当前目录」的项。\n- 菜单顺序以 DOM 实际出现顺序为准，不做 index/href 跨上下文排序；日志带面包屑便于对照。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js\n- 所属项目：2-0；来源会话：97cb886a-e67c-42b6-8516-f9591fa85219；代码基线：none",
+                "after": "# 嵌套侧栏E2E叶子过滤\n在 zhi2-web-admin 的 navbar-sidebar-accessibility E2E 用例中，Playwright 的 getByTestId 默认匹配所有后代，导致嵌套目录误点深层叶子。\n\n## 现象\n- 两层目录（如「规约管理 > 管理规约 > 管理规约拟定」）下，父层直接点到深层叶子，或子菜单顺序与页面不符。\n- 街道/社区/小区、物业管理区域等被误判无子菜单；物业管理区域子菜单顺序与页面不符。\n\n## 根因\n- Playwright locator.getByTestId 匹配所有后代而非仅直接子节点。\n- submenu.getByTestId('sidebar-menu-item') 会把更深层目录算进来，递归展开状态错乱。\n\n## 解决方案\n- 精简重写 `clickLeafMenusUnderParent`：去掉基于 index/href 的跨上下文数据结构，DOM 侧仅统计当前目录下 `.menu-collapse-wrapper .sub-menu a` 的 `<a>` 子菜单数量。\n- Playwright 侧用 `.locator('.menu-collapse-wrapper .sub-menu a').nth(i)` 按顺序点击每个子菜单。\n- 点击后短暂等待并调用 `assertMainContentNotBlank`；断言失败仅记录到 `uiErrorRecords` 不阻塞后续菜单。\n- 每个子菜单点击用 `try/catch` 包裹，异常仅记日志，避免整个目录卡死。\n- 早期方案曾用 `sidebar-leaf-link` 的 `closest` 过滤直接子级（避免 getByTestId 捞深层后代），现简化为上述最小可靠版本。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js\n- 所属项目：2-0；来源会话：97cb886a-e67c-42b6-8516-f9591fa85219；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/login_ocr_workflow.md",
+                "memory_type": "entities",
+                "before": "# 登录图形验证码E2E识别不可靠\nzhi2-web-admin 登录 E2E 用 Tesseract+规则纠错识别扭曲算式图常失败，测试环境应返回 answer 或降难度。\n## 问题现象\n- login.spec.js 用 OCR 识别 /code 返回的 GIF 算式验证码自动登录，常 skip「OCR 未识别到有效验证码」或识别结果为 yee/CW 等无数字串。\n- 验证码为纯数字运算图，但扭曲/噪声下 Tesseract 多轮 PSM+sharp 预处理仍常看不出算式。\n- 登录页若过早识别会在图片未渲染时拿到空图。\n## 解决方案\n- 测试环境优先让 /code 增加 answer 字段或专用 /test/code，E2E 有 answer 则直填并跳过 OCR。\n- 也可让测试环境后端将 /code 返回固定值（如 1234）或弱化校验，而非前端 OCR 识别，避免实现复杂且偏离 E2E 用户流程目标。\n- 或测试环境换无扭曲简单算式图；OCR 仅作无 answer 时的兜底，且必须 wait 验证码 img/src 就绪后再截屏。\n## 验证与归属\n- 验证：会话 44f9e8a5 诉求 3–6 与最终结论：三字段未填、识别内容 yee/CW、图片未出现就识别；结论建议测试环境 answer + 前端预留 res.answer。\n- 涉及文件：zhi2-web-admin/tests/e2e/login.spec.js、assets/views/login.vue；所属项目：2-0；来源会话：44f9e8a5-1336-42c2-9226-9d3dc33ccb9a\n- 另据会话 be5b577d-159c-4126-a301-a93c2e1de71f：根因 OCR 不稳定且实现复杂，测试环境后端 /code 返回固定值或弱化校验；涉及 tesseract.js、res.js；代码基线 none。",
+                "after": "# 登录图形验证码E2E识别不可靠\nzhi2-web-admin 登录 E2E 用 Tesseract+规则纠错识别扭曲算式图常失败，测试环境应返回 answer 或降难度。\n## 问题现象\n- login.spec.js 用 OCR 识别 /code 返回的 GIF 算式验证码自动登录，常 skip「OCR 未识别到有效验证码」或识别结果为 yee/CW 等无数字串。\n- 验证码为纯数字运算图，但扭曲/噪声下 Tesseract 多轮 PSM+sharp 预处理仍常看不出算式。\n- 登录页若过早识别会在图片未渲染时拿到空图。\n## 识别逻辑细节\n- `parseCaptchaText` 预处理先做通用替换：`O→0, L/I→1, S→5, Z→2, B→8, g/q→9` 等。\n- 用 `raw.replace(/[^0-9+\\-*/=?A-Za-z]/g, '')` 过滤非字母数字运算符，再尝试提取「一位数字 运算符 一位数字」。\n- 像 `yee`、`CW` 去掉非数字运算符后变空串或纯字母，故返回空。\n- 针对已知模式（`ELC`, `ENS`, `ETN`, `NA` 等）做字母→数字映射（如 `E→8`、`L→*`、`C→1`，`ENS→8-5`）再试，但仍可能因无数字失败。\n\n## 解决方案\n- 测试环境优先让 /code 增加 answer 字段或专用 /test/code，E2E 有 answer 则直填并跳过 OCR。\n- 也可让测试环境后端将 /code 返回固定值（如 1234）或弱化校验，而非前端 OCR 识别，避免实现复杂且偏离 E2E 用户流程目标。\n- 或测试环境换无扭曲简单算式图；OCR 仅作无 answer 时的兜底，且必须 wait 验证码 img/src 就绪后再截屏。\n## 验证与归属\n- 验证：会话 44f9e8a5 诉求 3–6 与最终结论：三字段未填、识别内容 yee/CW、图片未出现就识别；结论建议测试环境 answer + 前端预留 res.answer。\n- 涉及文件：zhi2-web-admin/tests/e2e/login.spec.js、assets/views/login.vue；所属项目：2-0；来源会话：44f9e8a5-1336-42c2-9226-9d3dc33ccb9a\n- 另据会话 be5b577d-159c-4126-a301-a93c2e1de71f：根因 OCR 不稳定且实现复杂，测试环境后端 /code 返回固定值或弱化校验；涉及 tesseract.js、res.js；代码基线 none。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 3,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

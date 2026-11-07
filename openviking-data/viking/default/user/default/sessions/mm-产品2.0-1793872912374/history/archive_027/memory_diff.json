@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793872912374/history/archive_027",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T11:27:09.495923+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/buildings_delete_fix.md",
+                "memory_type": "entities",
+                "after": "# BuildingsTable 删除按钮禁用条件修复\n产品2.0 的 zhi2-web-admin 中修复楼栋子表删除按钮在未选中行时仍可点击的问题。\n\n## 问题根因\n- `BuildingsTable.vue` 中删除按钮 `disabled` 只判断 `form.bizState != '0'`，未判断是否有选中行\n- 虽传了 `:multi=\"multiple\"`，但 `zs-button` 不会根据该属性禁用按钮\n\n## 修复内容\n- 删除按钮禁用条件改为 `:disabled=\"form.bizState != '0' || multiple\"`\n- `multiple` 在 `handleSelectionChange` 中维护：未选中任何行时为 `true`，选中后变为 `false`\n- 写法与项目其他子表（如 `HouseScopeTable.vue`）一致\n\n## 预期效果\n- 刷新页面后，未勾选数据时删除按钮呈灰色不可点击\n\n## 涉及文件\n- d:/repository/产品2.0/zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/components/BuildingsTable.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/components/HouseScopeTable.vue\n\n## 验证与归属\n- 所属项目：产品2.0；来源会话：a93d9024-80c0-483e-b0d2-40a3f424626b；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/procedure_id_query.md",
+                "memory_type": "entities",
+                "after": "# 步骤子表按 procedureId 查询 dataProperty\n产品2.0 的 zhi2-web-admin 中按 `procedureId` 查询 `dataProperty` 以驱动步骤子表必填项。\n\n## 行为说明\n- `detail.vue` 给步骤子表增加 `:procedure-id=\"form.procedureId\"`，与当前单据上的巡保程序一致\n- `recordProcessStepTable.vue` 增加 `procedureId` 透传给 `RecordProcessStepDialog`\n- `recordProcessStepDialog.vue` 新增 `procedureId` 属性\n\n## 查询逻辑\n- 在 `view`/`edit` 下调用 `GET /dataProperty/procedureProcess/page`，参数 `procedureId`、`pageNum: 1`、`pageSize: 500`\n- 用返回列表中 `processSerial` 与当前步骤一致的那条记录，取 `isExplain`、`isPicture`（`'1'` 为必填）驱动原 `dynamicRules`\n- 若没有 `procedureId`、没有步骤编号、请求失败或未匹配到行，则仍用 `detailForm`\n\n## 涉及文件\n- d:/repository/产品2.0/zhi2-web-admin/src/views/dataProperty/recordProcess/components/recordProcessStepDialog.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/views/dataProperty/recordProcess/components/recordProcessStepTable.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/views/dataProperty/recordProcess/components/detail.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/views/dataProperty/procedure/components/procedureProcessDialog.vue\n\n## 验证与归属\n- 所属项目：产品2.0；来源会话：4d8f8198-d7b1-458f-891e-5a0c95b1090a；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/complex_detail_cleanup.md",
+                "memory_type": "entities",
+                "after": "# publicQuery 物业综合体详情页冗余代码清理\n产品2.0 的 zhi2-web-admin 中清理 `publicQuery/complex/detail.vue` 从物业详情页复制但未使用的代码。\n\n## 清理内容\n- 文件从 601 行减至 506 行\n- 移除 import/组件：`area` mixin（与 `detailMixins` 重复）、`PROPERTY_COMPLEX_TYPE`、`houseTable`、`propertyServicesTable`\n- 移除 data 字段：弹窗/列表状态 `showProjectDialog`、`showCompanyDialog`、`isQueryDialogVisible`、`isQrCodeDialogVisible`、`isBuildingAuth`；未引用列表 `projectList`、`committeeList`、`contractList`、`propertyCommitteeVoList`；`form` 中未展示字段（如 `projectName`、`otherHouse`、`remark`）\n- 移除样式：`.property-type-*` 相关（模板无对应 DOM）\n- 接口返回时仍通过 `detailCallback` 的 `{ ...this.form, ...response.data }` 合并进来\n\n## 涉及文件\n- d:/repository/产品2.0/zhi2-web-admin/src/views/publicQuery/complex/detail.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/views/property/complex/detail.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/mixins/detailMixins.js\n- d:/repository/产品2.0/zhi2-web-admin/src/mixins/area.js\n\n## 验证与归属\n- 所属项目：产品2.0；来源会话：117b67e8-4e61-4da7-9503-e0038e998ea7；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/navbar_ishomeactive_fix.md",
+                "memory_type": "entities",
+                "before": "# Navbar isHomeActive 误用修复\n产品2.0 的 zhi2-web-admin 中修复顶部导航「首页」永远高亮、子菜单不高亮的问题。\n\n## 问题根因\n- `Navbar.vue` 中 `isHomeActive` 是 methods 方法，但模板和 `isActive()` 把它当作属性使用（未加 `()`）\n- 函数引用恒为 truthy，导致「首页」永远带 active 样式\n- 各模块 `isActive()` 被 `if (this.isHomeActive) return false` 短路，永远返回 false\n\n## 涉及文件\n- d:/repository/产品2.0/zhi2-web-admin/src/layout/components/Navbar.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/layout/index.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/settings.js\n\n## 验证与归属\n- 所属项目：产品2.0；来源会话：2128505f-8e3c-45e5-8ca0-aa7871402fb0；代码基线：none",
+                "after": "# Navbar isHomeActive 误用修复\n产品2.0 的 zhi2-web-admin 中修复顶部导航「首页」永远高亮、子菜单不高亮的问题。\n\n## 问题根因\n- `Navbar.vue` 中 `isHomeActive` 是 methods 方法，但模板和 `isActive()` 把它当作属性使用（未加 `()`）\n- 函数引用恒为 truthy，导致「首页」永远带 active 样式\n- 各模块 `isActive()` 被 `if (this.isHomeActive) return false` 短路，永远返回 false\n\n## 修复内容\n- 将 `isHomeActive` 改为 computed 属性，模板和 `isActive()` 都能正确读取布尔值\n- 新增 `syncActiveMenuFromRoute` 方法，根据当前路由自动匹配对应的一级模块\n- 路由监听增加 `immediate: true`，页面刷新或直接访问子页面时也能正确高亮\n\n## 预期效果\n- 访问 `/index` → 高亮「首页」\n- 访问 `/to-C/authentication/ctUserIdentityApply` 等子模块 → 高亮对应父级模块（如「维修资金」），「首页」不再高亮\n\n## 涉及文件\n- d:/repository/产品2.0/zhi2-web-admin/src/layout/components/Navbar.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/layout/components/TagsView/index.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/layout/index.vue\n- d:/repository/产品2.0/zhi2-web-admin/src/settings.js\n\n## 验证与归属\n- 所属项目：产品2.0；来源会话：2128505f-8e3c-45e5-8ca0-aa7871402fb0、428cfc70-782c-4061-9b59-52d8ce8ccbd5；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

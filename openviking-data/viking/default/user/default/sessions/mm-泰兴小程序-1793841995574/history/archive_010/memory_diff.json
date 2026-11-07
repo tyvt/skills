@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-泰兴小程序-1793841995574/history/archive_010",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T02:04:26.657283+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/decision_view_options_fix.md",
+                "memory_type": "entities",
+                "after": "# 决策项选择后不显示且提交无数据修复\n泰兴小程序决策页选完决策项后「我的选择」为空、提交无数据，根因是子组件生命周期与路由跳转方式错误，已修复。\n\n## 问题根因\n- `ViewOptionsList.vue` 子组件内误用页面生命周期 `onLoad`，`uni.getStorageSync('decisionInfoList')` 从未执行，`decisionInfoList` 恒为 `[]`。\n- `OptionCardList.vue` 的「下一步」用 `goto`（`navigateTo`）从 `multipleForm` 跳到同路由 `multipleForm?mode=view`，微信小程序限制不能对当前页路径再 `navigateTo`。\n\n## 解决方案\n- `ViewOptionsList.vue` 去掉 `onLoad`，改在 `onMounted` 且 `!isVotedOrResult` 时读取 `decisionInfoList` 缓存，校验非空数组后再赋值。\n- `OptionCardList.vue` 的「下一步」改用 `redirectTo` 关闭当前页再打开 `mode=view` 实例，符合确认页预期。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=泰兴小程序\n- 涉及文件：src/pages_owner/decision/multipleForm.vue、src/pages_owner/decision/components/multiple/ViewOptionsList.vue、src/store/vote.js、src/pages_owner/decision/components/multiple/OptionCardList.vue\n- 来源会话ID：929fd106-a6ce-450a-b1b3-7746d49574d5\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/facility_zpaging.md",
+                "memory_type": "entities",
+                "after": "# facility.vue改用z-paging分页\n泰兴小程序设施设备列表页 `facility.vue` 已改为使用 `z-paging` 分页，与维修项目等页面保持一致。\n\n## 修改内容\n- 移除 `useLoadMore`、`uni-load-more`、`ZsEmpty`，接入 `z-paging`。\n- 搜索/筛选放入 `#top` 插槽，滚动时固定在顶部。\n- `queryList` 负责分页请求，成功调用 `complete(rows)`，失败调用 `complete(false)`。\n- 搜索、切换楼幢/单元时调用 `reload()` 重新加载，并修复原代码 `reload` 未定义问题。\n- 下拉刷新、上拉加载更多、空状态由 `z-paging` 自动处理。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=泰兴小程序\n- 涉及文件：src/pages_facility/facility.vue、src/api/maintenance.js、src/pages_maintain_project/index.vue、src/hooks/useLoadMore.js、src/pages_facility/index.vue、src/pages_maintain_project/project.vue\n- 来源会话ID：77ea70f5-2c1b-4d8c-9f54-46a209a8a7d4\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/imagegrid_mainpkg.md",
+                "memory_type": "entities",
+                "after": "# ImageGrid移至主包公共组件\n泰兴小程序因分包间不能互相引用组件，`maintain-detail` 引用 `pages_owner` 分包的 `ImageGrid` 报错，已将其移至主包。\n\n## 问题根因\n- 微信小程序分包之间不能互相引用组件。\n- `pages_facility/maintain-detail` 在 `pages_facility` 分包，却引用了 `pages_owner/repair/components/ImageGrid`（属 `pages_owner` 分包），导致 `Component is not found` 报错。\n\n## 解决方案\n- 新增 `src/components/ImageGrid/ImageGrid.vue` 主包公共组件。\n- 更新 `maintain-detail.vue` 的 import 为 `@/components/ImageGrid/ImageGrid.vue`。\n- 同步更新 `pages_owner/repair/detail.vue` 引用。\n- 删除原分包内 `pages_owner/repair/components/ImageGrid.vue`，避免重复。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=泰兴小程序\n- 涉及文件：src/components/ImageGrid/ImageGrid.vue、maintain-detail.vue、pages_owner/repair/detail.vue\n- 来源会话ID：1417821d-8f00-4c9e-bb90-7ad9e702968e\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/process_picture_domain.md",
+                "memory_type": "entities",
+                "before": "# processPictureList未拼域名H5加载失败\n泰兴小程序 `processPictureList` 返回 `/zhi2/...` 相对路径直接传 `ImageGrid` 致 H5 图片加载失败，需按平台拼接完整 URL。\n\n## 问题根因\n- `processPictureList` 返回 `/zhi2/...` 相对路径直接传 `ImageGrid`。\n- 致 H5 图片加载失败。\n\n## 解决方案\n- `maintain-detail.vue` 参照 `daily.vue` 按平台拼接 `VITE_APP_API_BASE_URL` 或 `IMAGE_BASE` 为完整 URL 后传入。\n\n## 验证与归属\n- 验证证据：src=泰兴小程序/022.md\n- 涉及文件：d:/repository/泰兴小程序/src/pages_facility/maintain-detail.vue、d:/repository/泰兴小程序/src/pages_facility/record-detail.vue、d:/repository/泰兴小程序/src/components/ImageGrid/ImageGrid.vue、d:/repository/泰兴小程序/src/components/ZsImage/ZsImage.vue、d:/repository/泰兴小程序/src/pages_owner/repair/detail.vue、d:/repository/泰兴小程序/src/pages_property/rcService/daily.vue、d:/repository/泰兴小程序/src/pages_facility/detail.vue、d:/repository/泰兴小程序/src/pages_property/rcService/components/ServiceItem.vue\n- 来源会话ID：5e4b840b-e829-4269-ac04-0e7b59b6a428\n- 代码基线：none",
+                "after": "# processPictureList未拼域名H5加载失败\n泰兴小程序 `processPictureList` 返回 `/zhi2/...` 相对路径直接传 `ImageGrid` 致 H5 图片加载失败，需按平台拼接完整 URL。\n\n## 问题根因\n- `processPictureList` 返回 `/zhi2/...` 相对路径直接传 `ImageGrid`。\n- 致 H5 图片加载失败。\n\n## 解决方案\n- `maintain-detail.vue` 参照 `daily.vue` 按平台拼接 `VITE_APP_API_BASE_URL` 或 `IMAGE_BASE` 为完整 URL 后传入。\n- `ZsImage.vue` 若传入已是 `http(s)://` 完整地址则不再重复拼接 `base`，避免域名被加两次。\n\n## 验证与归属\n- 验证证据：src=泰兴小程序/022.md\n- 涉及文件：d:/repository/泰兴小程序/src/pages_facility/maintain-detail.vue、d:/repository/泰兴小程序/src/pages_facility/record-detail.vue、d:/repository/泰兴小程序/src/components/ImageGrid/ImageGrid.vue、d:/repository/泰兴小程序/src/components/ZsImage/ZsImage.vue、d:/repository/泰兴小程序/src/pages_owner/repair/detail.vue、d:/repository/泰兴小程序/src/pages_property/rcService/daily.vue、d:/repository/泰兴小程序/src/pages_facility/detail.vue、d:/repository/泰兴小程序/src/pages_property/rcService/components/ServiceItem.vue\n- 来源会话ID：5e4b840b-e829-4269-ac04-0e7b59b6a428\n- 代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

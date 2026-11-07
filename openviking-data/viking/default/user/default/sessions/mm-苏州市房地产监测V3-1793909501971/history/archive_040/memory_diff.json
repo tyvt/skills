@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_040",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T22:14:42.031084+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_spacing_e2e.md",
+                "memory_type": "entities",
+                "after": "# 表格底部空白全局排查修复\n苏州市房地产监测V3 项目对表格底部空白做全局排查，并用 E2E 验证 list-card 间距修复。\n\n## 验证结果\n- 机构注销 list-card 间距用例通过（与本次修复直接相关、真正执行断言的唯一用例）\n- 价格备案详情「楼幢」Tab 用例跳过：账号未授权「价格备案查询」菜单或列表无数据/无楼幢 Tab，与 test.skip 条件一致\n- 车位租赁合同（区域树）用例失败：路由 benefit/parkingSpaceContractFiling/index 未找到、菜单未授权，与本次表格改动无关\n\n## 后续建议\n- 若需 detail 用例跑通，E2E 账号需具备「价格备案查询」且列表有可查看详情、楼幢子表有数据\n- 可将车位用例改为与详情一致「无菜单则 skip」，避免 CI 误报失败\n\n## 涉及文件与归属\n- 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue\n- 项目：苏州市房地产监测V3；来源会话ID：f6a19dce-3b89-49cd-bb3f-a111e400f3d8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_reg_e2e.md",
+                "memory_type": "entities",
+                "after": "# 企业注册 E2E 登录会话修复\n苏州市房地产监测V3 修复企业注册 E2E 中主管部门登录与注册流程会话不一致导致的身份证号碰撞问题。\n\n## 根因\n- 原 loginWithRealAccount 在设置 E2E_BASE_URL 时强制走 storageState 恢复登录，需事先手动保存 e2e/.auth/zsbase.json\n- 注册流程在 http://192.168.1.129:8098 用账号完成，clearBrowserSession 后主管部门登录无法复用已清除会话\n\n## 主要改动\n- auth-helpers.js：loginWithRealAccount 优先用账号密码在同一 baseURL 登录，仅无凭据时回退 storageState；并修复 loginFromStorageState 在 clearBrowserSession 后从文件重新注入 cookies/storage\n- save-auth-state.mjs：默认地址从 8096/sys/fdc 改为 8098，与注册环境一致\n\n## 验证与归属\n- 全流程用例通过（35s）：E2E_BASE_URL=http://192.168.1.129:8098 npx playwright test e2e/register/company\n- 涉及文件：e2e/.auth/zsbase.js、auth-helpers.js、e2e/register/company-register.spec.js、e2e/fixtures/register-helpers.js\n- 项目：苏州市房地产监测V3；来源会话ID：bbaca6f0-5087-4168-ba51-8a2343915f2e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/institution_step_fix.md",
+                "memory_type": "entities",
+                "after": "# 经纪机构注册步骤回退回显修复\n苏州市房地产监测V3 修复经纪机构注册 Step3 回退时管理员信息无法回显、点下一步报「注册单 ID 缺失」的问题。\n\n## 根因\n- Step3 的 @prev 绑定 goStep2，无参调用会把 URL 里 companyRegisterId 写成 undefined 并清空 queryRegisterRecord\n- 导致管理员信息无法回显、点「下一步」报「注册单 ID 缺失」\n\n## 主要改动\n- index.vue：统一用 goStep(step) 导航保留 companyRegisterId；Step1 走 handleStep1Next；路由变化调用 loadRegisterDetailIfNeeded() 拉详情；增加 ensureValidStep() 校验\n- institutionRegister.js：新增 getInstitutionRegisterDetail（noMessage/noReject，避免详情加载失败弹全局错误）\n- 涉及 Step1BasicInfo.vue、Step2AdminInfo.vue 等组件\n\n## 涉及文件与归属\n- 文件：zhi2-web-admin/src/views/institutionRegister/index.vue、src/api/institution/institutionRegister.js、components/Step1BasicInfo.vue、components/Step2AdminInfo.vue\n- 项目：苏州市房地产监测V3；来源会话ID：9fe9ee18-7352-4a5c-bc63-a249f00380ff"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_admin_change.md",
+                "memory_type": "entities",
+                "after": "# 企业管理员变更能力实现\n苏州市房地产监测V3 新增 companyAdminChange 管理员变更（拆单）能力，对齐对接文档要求。\n\n## 排查结论\n- 代码库原先无 companyAdminChange 能力：管理员详情仍走 companyAdmin 的 /edit + 同表审批（allow-edit-when-recorded），与文档「拆单」要求不一致\n\n## 已实现改造\n- API src/api/company/companyAdminChange.js：新增 getLast/detail/update，与文档 2.1–2.3 一致\n- 常量 companyOrgan.js：变更要件编码 qyglybg/jgglybg/zlglybg 及 resolveCompanyAdminChangeBusCode()\n- 变更详情路由（需后端菜单登记 meta.filePath）：company/companyAdminChange/detail、developer/detail、agency/detail；统一跳转 /company/companyAdminChange/detail?dataId={变更单ID}（支持 dataId 查询参数）\n\n## 涉及文件与归属\n- 文件：src/api/company/companyAdminChange.js、companyOrgan.js、companyAdmin/detail.vue、company-record-change.spec.js\n- 项目：苏州市房地产监测V3；来源会话ID：30daf179-c00a-4ab2-91ef-33d98ef90302"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-fe39d020-d16c-4d40-bb47-f0f5a1b5d781/history/archive_049",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T10:04:25.628679+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/entities/项目/openviking_import_progress.md",
+                "memory_type": "entities",
+                "after": "# OpenViking 历史导入进度\n2026-11-05 本地历史导入（import-local-sources）处于暂停/中断状态，无 node 进程在跑。\n\n## 各源进度\n- OpenCode / zcode：✅ 已结束，2/2 项目成功，约 29 条记忆\n- WorkBuddy：✅ 已结束，16/22 项目成功，约 135 条记忆\n- Cursor：⚠️ 未整段跑完，门户、园区公共收益、园区物管2.0、2-0、产品2.0 等多项目串行 import-to-ov 部分失败\n\n## 关键中断点\n- 园区物管2.0：第 7 批提交超时（task f117635e），已中止该项目避免队列死锁\n- 产品2.0 续跑（resume）：RECOVERY RESTART 后 --from-project=产品2.0，会话 mm-产品2.0-1793868709662，共 54 批；1-11 批 completed，第 12 批（task fc7e9003）停住，日志约 17:28 无新行\n- import-local-sources-state.json 的 finishedAt 2026-11-04 为旧失败快照，不反映当前进度"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/程序/dsh.md",
+                "memory_type": "entities",
+                "before": "# DSH\nDeepSeek Harness（DSH），用户的 AI 会话工作台，其历史会话计划导入 OpenViking 作为长期记忆。\n\n## 基本信息\n- 会话总数 1602 个（截至 2026-11-04），为历史会话导入序列第一项\n- 会话数据结构：source.kind === \"user\" 为真人输入须保留，其余为注入的上下文须过滤\n\n## 既有产物\n- 工作区 memory-migration/ 目录已存在上一次 distill（提炼）完整产物与脚本，可沿用其质量口径，避免重复处理\n- 2026-11-02 统计：提炼产物含 memories-final.json（顶层单个项目「泰兴小程序」162 条）与 distilled-projects/（831 条项目记忆）\n- 2026-11-02 统计：结构化记忆总量 4431 条，类型分布为 bug 1712、pattern 941、preference 923、fact 571、workflow 284\n\n## 关系\n- 通过官方 @openviking/dsh-memory-plugin 实时镜像会话到 OpenViking\n- 历史会话导入顺序：DSH 率先，其后为 cursor、workbuddy、opencode\n- 2026-11-05 导入会话 dsh-session-fe39d020 通过插件大量调用 OpenViking MCP（search ~45、read ~35、remember ~9）并回写 29 条记忆（write 11/edit 17）",
+                "after": "# DSH\nDeepSeek Harness（DSH），用户的 AI 会话工作台，其历史会话计划导入 OpenViking 作为长期记忆。\n\n## 基本信息\n- 会话总数 1602 个（截至 2026-11-04），为历史会话导入序列第一项\n- 会话数据结构：source.kind === \"user\" 为真人输入须保留，其余为注入的上下文须过滤\n\n## 既有产物\n- 工作区 memory-migration/ 目录已存在上一次 distill（提炼）完整产物与脚本，可沿用其质量口径，避免重复处理\n- 2026-11-02 统计：提炼产物含 memories-final.json（顶层单个项目「泰兴小程序」162 条）与 distilled-projects/（831 条项目记忆）\n- 2026-11-02 统计：结构化记忆总量 4431 条，类型分布为 bug 1712、pattern 941、preference 923、fact 571、workflow 284\n\n## 关系\n- 通过官方 @openviking/dsh-memory-plugin 实时镜像会话到 OpenViking\n- 历史会话导入顺序：DSH 率先，其后为 cursor、workbuddy、opencode\n- 2026-11-05 导入会话 dsh-session-fe39d020 通过插件大量调用 OpenViking MCP（search ~45、read ~35、remember ~9）并回写 29 条记忆（write 11/edit 17）；截至 09:58 该会话 extracted=40、commits=48，插件镜像与抽取仍在更新"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/dsh插件/openviking_dsh_plugin.md",
+                "memory_type": "entities",
+                "before": "# @openviking/dsh-memory-plugin\nOpenViking 官方 DSH 插件，负责将 DSH 会话实时镜像到 OpenViking 服务。\n\n## 基本信息\n- 版本 0.5.31（官方插件，非社区版 @yadsh）\n- 与 import-to-ov.mjs 批量导入脚本是两条独立链路（实时镜像 vs 历史批量迁移）\n- 默认端点 http://127.0.0.1:1933，无需额外配置即可直连\n- 会话 URI 格式为 viking://user/default/sessions/dsh-session-<id>\n\n## 行为\n- 实时镜像 DSH 会话消息到 OpenViking（pending tokens 累积）\n- commit 触发机制：turn/end 时若 pending_tokens >= commitTokenThreshold（默认 20000）才触发抽取，非实时\n- 由 VLM（hy3）从镜像会话中抽取记忆\n- 2026-11-02 确认已成功将当前会话写入 OpenViking\n- autoRecall（别名 syncTurns）默认开启：每步前自动 find 召回相关记忆注入，默认 recallLimit=10、scoreThreshold=0.35、recallTokenBudget=2000\n- 2026-11-05 实测：业务会话每轮注入 <openviking-context> 约 2-3 次/会话；简单改 bug 会话 Agent 主动 MCP=0 属合理用法（AGENTS 约定优先用注入而非重复检索）\n\n## 已知问题\n- 并发 commit 静默丢数据：手动 commit 与插件自动 commit 同时提交同一会话时，后队任务被挂起、extracted 返回空 {} 且不报错；此为 2026-11-02 确认的前次\"记忆丢失\"同一根因，全量导入须串行\n- 长会话不触发 commit：commitTokenThreshold 默认 20000 仅在 turn/end 判定，长会话中 pending_tokens 会持续累积（实测达 59706）而不提交\n- 2026-11-05 观测多个会话 pending_tokens 高（如 19009）且 memories_extracted=0，因 commit 阈值叠加 SessionCommit 队列堆积导致写回滞后",
+                "after": "# @openviking/dsh-memory-plugin\nOpenViking 官方 DSH 插件，负责将 DSH 会话实时镜像到 OpenViking 服务。\n\n## 基本信息\n- 版本 0.5.31（官方插件，非社区版 @yadsh）\n- 与 import-to-ov.mjs 批量导入脚本是两条独立链路（实时镜像 vs 历史批量迁移）\n- 默认端点 http://127.0.0.1:1933，无需额外配置即可直连\n- 会话 URI 格式为 viking://user/default/sessions/dsh-session-<id>\n\n## 行为\n- 实时镜像 DSH 会话消息到 OpenViking（pending tokens 累积）\n- commit 触发机制：turn/end 时若 pending_tokens >= commitTokenThreshold（默认 20000）才触发抽取，非实时\n- 由 VLM（hy3）从镜像会话中抽取记忆\n- 2026-11-02 确认已成功将当前会话写入 OpenViking\n- autoRecall（别名 syncTurns）默认开启：每步前自动 find 召回相关记忆注入，默认 recallLimit=10、scoreThreshold=0.35、recallTokenBudget=2000\n- 2026-11-05 实测：业务会话每轮注入 <openviking-context> 约 2-3 次/会话；简单改 bug 会话 Agent 主动 MCP=0 属合理用法（AGENTS 约定优先用注入而非重复检索）\n\n## 已知问题\n- 并发 commit 静默丢数据：手动 commit 与插件自动 commit 同时提交同一会话时，后队任务被挂起、extracted 返回空 {} 且不报错；此为 2026-11-02 确认的前次\"记忆丢失\"同一根因，全量导入须串行\n- 长会话不触发 commit：commitTokenThreshold 默认 20000 仅在 turn/end 判定，长会话中 pending_tokens 会持续累积（实测达 59706）而不提交\n- 2026-11-05 观测多个会话 pending_tokens 高（如 19009）且 memories_extracted=0，因 commit 阈值叠加 SessionCommit 队列堆积导致写回滞后\n\n## 2026-11-05 实测补充\n- 重启后全局配置 commitTokenThreshold 设为 8000（原为默认 20000），recallPeerScope: actor 生效\n- 短模拟（2 条无工具结果）commit 42s 完成但 memories_extracted.total=0，抽取器判定不足成条记忆；长模拟（24 条≈8500 字）session_commit 卡死约 20 分钟，需 ov-cancel-stuck-commit-tasks 取消\n- 产品2.0 仓库根目录 D:\\repository\\产品2.0 开会话时 peer 推导为 gitlab.zhi.com-zhi-unlimited-unlimited-product-fe-zhi2-web-admin-h5-g-unlimited（来自 git origin），与旧 cursor 导入用的 wuxi-huishan-product 非同一 peer"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

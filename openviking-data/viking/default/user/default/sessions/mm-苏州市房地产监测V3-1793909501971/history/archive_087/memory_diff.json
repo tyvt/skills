@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_087",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T00:46:44.483419+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/supervision_save_fix.md",
+                "memory_type": "entities",
+                "after": "# 监管标准详情页查看模式保存按钮修复\n苏州市房地产监测V3 修复监管标准详情页在查看模式下隐藏「保存」按钮的问题，通过完善 formMode 兜底逻辑实现。\n\n## 修改内容\n- 修改 `zhi2-web-admin/src/components/OperationBtnGroup/index.vue`\n- 引入 `getId`，与 `main.js` 全局 mixin 保持一致\n- 将 `formMode` 计算属性改为完整兜底逻辑：先读 `query.formMode`，再判断 `/add` 路径，有 ID 时默认 `view`，否则 `add`\n\n## 涉及文件\n- zhi2-web-admin/src/components/OperationBtnGroup/index.vue\n- main.js\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3\n- 来源会话：2d76dc77-4d43-4e28-9eff-4af234266cb7\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/shareholder_dialog_fix.md",
+                "memory_type": "entities",
+                "after": "# 股东信息查看弹窗修复\n苏州市房地产监测V3 修复股东查看弹窗始终表现为「新增」且可编辑的问题，改用 `dialogMode` prop 区分模式。\n\n## 问题根因\n- `ShareholderDialog` 的 prop `mode` 被 `detailMixins` 的 computed `mode`（来自路由 `formMode`，注册页多为 `'add'`）覆盖\n- 父组件传入的 `'view'` / `'edit'` 无效，弹窗一直表现为「新增」且可编辑\n\n## 修改内容\n- `ShareholderDialog.vue`：prop 改为 `dialogMode`，标题与保存逻辑均基于 `dialogMode`\n- `view`：使用 `DetailTemplate` + `contentInfo`（与 toB/shareholder/detail.vue 一致）\n- `view` 底部仅「返回」，不显示「保存」\n- 增加 `data-testid=\"register-shareholder-dialog-view\"`\n\n## 涉及文件\n- zhi2-web-admin/src/views/register/components/ShareholderDialog.vue\n- zhi2-web-admin/src/views/toB/shareholder/detail.vue\n- zhi2-web-admin/src/views/register/components/Step4Shareholders.vue\n- zhi2-web-admin/e2e/fixtures/register-helpers.js\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3\n- 来源会话：bc548255-f57a-4017-8739-5446258f1073\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/entrust_building_select.md",
+                "memory_type": "entities",
+                "after": "# 委托代售楼幢选择公共弹窗改造\n苏州市房地产监测V3 委托代售「选择楼幢」已改为公共 `SelectDialog.open`（`zs-select-dialog`），与测绘变更等预售模块一致。\n\n## 变更摘要\n- 新增 `entrustSaleConstants.js`：`buildEntrustSaleBuildingSelectDialogOptions(projectId)`\n- 接口 `POST /presale/entrustSaleBuilding/selectBuilding`、`noPagination` + `stripPaginationParams`（仅传 `projectId`）、多选、列与原先私有弹窗一致\n- 保留 E2E 用 `dialogTestId` / `confirmTestId`\n- 改造 `EntrustBuildingTable.vue`：`openSelectDialog` 调用 `SelectDialog.open(...).then(...)`\n\n## 涉及文件\n- zhi2-web-admin/src/views/presale/entrustSale/entrustSaleConstants.js\n- zhi2-web-admin/src/views/presale/entrustSale/components/EntrustBuildingTable.vue\n- SelectBuildingDialog.vue\n- zhi2-web-admin/e2e/fixtures/entrust-sale-helpers.js\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3\n- 来源会话：a0a69d61-f390-4745-a03b-d19b25e490af\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tableid_route_fix.md",
+                "memory_type": "entities",
+                "after": "# 信息报送路由 tableid 拼写修复\n苏州市房地产监测V3 修复「信息报送备案 / 信息报送变更」详情菜单因路由动态段拼写错误导致查看页路由错位的问题。\n\n## 问题根因\n- 后端路由把动态段写成 `:tableld`（少了 `i`），而前端 `buildDetailNavigation` 只识别 `:tableid`\n- 「新增」走 `列表路径/add` 正常；「查看」误判为「无 tableid 的命名路由」，只带 `query`、不带主键路径，导致路由错位、侧边栏匹配失败、页面空白\n\n## 修改内容\n- `permission.js`：加载菜单时把 `:tableld` 统一纠正为 `:tableid`（含 `sessionStorage` 缓存的路由）\n- `ruoyi.js`：路径规范化同样处理该拼写错误\n- `路由信息.json`：本地参考数据已改为 `:tableid`（线上仍应在系统菜单里改库）\n- 验证：重新登录（或清掉 `sessionStorage` 里的 `routers`）后，在列表点「查看」应进入 `…/InformationPush/{id}`\n\n## 涉及文件\n- permission.js\n- ruoyi.js\n- 路由信息.json\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3\n- 来源会话：27799520-77e6-4e97-a27b-0e20a371490f\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

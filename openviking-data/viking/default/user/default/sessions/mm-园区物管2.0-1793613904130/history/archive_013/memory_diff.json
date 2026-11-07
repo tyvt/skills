@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_013",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:36:42.975245+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_geo_regions.md",
+                "memory_type": "entities",
+                "after": "# ECharts Geo+SVG 轮播高亮套路\n园区物管2.0 地图大屏用 ECharts geo + registerMap 注册 SVG 底图，轮播切换区域时需同步高亮对应区，与 hover emphasis 效果一致。\n\n## 问题根因\n- 轮播是程序驱动状态变化，dispatchAction hover 类事件在 SVG geo 上不稳且会被下次交互打断\n- 一个行政区可能对应多个 path（如江阴市主体+飞地），飞地不显示标签也需加高亮否则只盖住主体\n\n## 解决方案\n- 抽常量 WUXI_GEO_HIGHLIGHT_ITEM_STYLE 与 geo.emphasis.itemStyle 完全相同保证高亮色一致\n- 写 buildMapGeoCarouselRegions(highlightName) 生成 regions 数组：「全市」只保留飞地 path 静默配置、其它区恢复默认底色；轮到某区追加高亮 regions 项\n- 用 chart.setOption({ geo: { regions } }) 增量更新\n- 三处触发点：watch 轮播索引（$nextTick 更新）、轮播重置回第0张（手动同步）、initMap 首帧 setOption 后调一次\n- 「全市」汇总幻灯片用独立字段标记汇总页，避免硬编码文案判断\n\n## 验证与归属\n- 验证：会话 89d6d616-b337-43c4-bc8d-a3268340e46f 中 mapOverview/index.vue 轮播到某区 SVG 对应区高亮，用 setOption+三处触发点+飞地同步实现\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue\n- 所属项目：园区物管2.0；来源会话ID：89d6d616-b337-43c4-bc8d-a3268340e46f；代码基线：fb0e2899f / 3353ef164"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/currency_formatter_pattern.md",
+                "memory_type": "entities",
+                "after": "# 数字千分位全局统一入口\n园区物管2.0 非表格场景（摘要文案组件、大屏统计文案）需给数字加千分位，值可能为非数字混排文案。\n\n## 问题根因\n- 直接 Intl.NumberFormat 或 toLocaleString 会把非数字值变 NaN 或报错\n- 各页面自写千分位会造成展示口径不一致\n\n## 解决方案\n- 统一复用 @/formatters/index.js 的 currencyFormatter（内部 Intl.NumberFormat，与 amountFormatter 同源）\n- 先判 undefined/null/'' 直接返回空，再用 @/patterns/index.js 的 patterns.number 正则判定是否数字字符串——非数字原样 return\n- 数字调 currencyFormatter(v, 0, 20, v)，小数上限放宽到 20 保留金额类小数\n- 必须固定两位小数时给数据项加可选字段 decimals:2 分支调用 currencyFormatter(v,2,2)，不改调用方数据形状\n- 与表格列「prop + :formatter」并列的文案级千分位约定，两处都禁止页面内自写正则加逗号\n\n## 验证与归属\n- 验证：会话 e7b17454-44cc-4737-a77d-b8aa48d3a424 中 ZsSummaryText 数字千分位用全局 currencyFormatter + patterns.number 判定，非数字原样返回\n- 涉及文件：zhi2-web-admin/src/components/ZsSummaryText/index.vue、src/formatters/index.js、src/patterns/index.js\n- 所属项目：园区物管2.0；来源会话ID：e7b17454-44cc-4737-a77d-b8aa48d3a424；代码基线：3965548b6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/upload_preview_mismatch.md",
+                "memory_type": "entities",
+                "after": "# ImageUpload 多图预览错位\n园区物管2.0 公共组件 ImageUpload 新增态连续上传多图后，点击缩略图预览总是打开第一张。\n\n## 现象与根因\n- 预览列表 urlList 存 resolveServerAssetUrl() 处理后的完整地址，而当前图索引用 urlList.indexOf(file.fileUrl) 匹配后端返回原始相对路径\n- 两套格式不一致时 indexOf 恒为 -1，索引 -1 兜成第一张\n\n## 解决方案\n- 索引匹配改为 findIndex 多条件兜底（依次比对 uid、fileUrl、name、url 及解析后 URL），任一命中即定位\n- handleUploadSuccess 中保留 Element UI 传入的 file.uid，保证上传中精确对应\n- 该组件全局共用，修一处全项目受益；排查「点哪张都看错」优先怀疑预览列表与匹配键 URL 格式不一致\n\n## 验证与归属\n- 验证：会话 90aa41bd-020e-45a5-bbab-7177966aefbc 用户报 housePart/detail.vue:57 新增时多图预览匹配错乱；定位 handlePictureCardPreview 的 indexOf 格式不一致，改 findIndex + 保留 uid\n- 涉及文件：src/components/ImageUpload/index.vue、src/utils/resolveServerAssetUrl.js\n- 所属项目：园区物管2.0；来源会话ID：90aa41bd-020e-45a5-bbab-7177966aefbc；代码基线：5a288f142"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/flex_ellipsis_pattern.md",
+                "memory_type": "entities",
+                "after": "# flex 长文本挤掉右侧元素解法\n园区物管2.0 顶栏标题很长时右侧昵称被推出屏幕外，因 flex 子项默认 min-width:auto 与 nowrap 组合撑死最小宽度。\n\n## 问题根因\n- flex 容器子项默认 min-width:auto（宽度不能小于内容最小宽度），标题 white-space:nowrap 被算成超长内容\n- 左侧整块最小宽度被撑死，中间 flex:1 拿不到空间，右侧整组被挤出视口；嵌套多层 flex 每层都要处理\n\n## 解决方案\n- 给每层 flex 容器（.navbar、.top-nav-container 等）加 min-width:0 并配 overflow:hidden 打破最小宽度约束\n- 标题用 flex:1 1 0% + min-width:0 + text-overflow:ellipsis 单行省略\n- 不应收缩内容（logo、右侧操作区）显式 flex-shrink:0\n- 昵称等可变长文案去掉固定 width，改 max-width: min(240px, 32vw) + 省略\n- 这是所有「flex 长内容把兄弟元素顶飞」问题的通用解法\n\n## 验证与归属\n- 验证：会话 93662ada-0765-4626-a08c-941236de904d 中 Navbar.vue 长标题把右侧昵称顶出屏幕；结论为 min-width:auto + nowrap 根因，逐层 min-width:0 + ellipsis + flex-shrink 修复\n- 涉及文件：src/layout/components/Navbar.vue\n- 所属项目：园区物管2.0；来源会话ID：93662ada-0765-4626-a08c-941236de904d；代码基线：5a57bb20d"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_067",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T15:13:34.577666+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/intention_nearby_popup_fix.md",
+                "memory_type": "entities",
+                "after": "# 求购附近小区弹窗布局修复\n苏住房C小程序「添加求购信息」页点击「附近小区」弹窗的布局重叠问题已修复。\n\n## 问题原因\n- `z-paging` 默认 `fixed: true`，在弹窗内按全屏固定定位渲染，列表区与底部「取消」「保存」按钮重叠\n- 原弹窗内容含按钮放在同一 `overflow-y: auto` 容器，列表高度受限，滚动体验差\n\n## 修复内容\n- 弹窗改为 flex 纵向布局：标题区 → 可滚动列表区 → 固定底部按钮区，三者分离\n- 为 `z-paging` 设置 `:fixed=\"false\"` 和 `:use-page-scroll=\"false\"`，按父容器高度渲染\n- 列表区设 `min-height: 500rpx`，弹窗整体 `max-height: 75vh`，扩大可视与滑动区域\n- 底部按钮区 `flex-shrink: 0` 并加安全区适配，避免与列表重叠\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`zhi2-mobile-shimin/src/pages_transaction/intention/popup.vue`、`add.vue`\n- 来源会话ID：451f9781-7f9a-465f-90a9-7f258714b1cc\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/zsimage_subpackage_infer_fix.md",
+                "memory_type": "entities",
+                "after": "# ZsImage分包路径自动推断修复\n苏住房C小程序中因静态资源主包路径解析错误导致图片加载500，已通过路由自动推断分包修复。\n\n## 问题原因\n- `dianhua.svg`、`building_banner.png`、`dunpai.png` 实际在分包 `pages_transaction/static/images/szf/` 下\n- `ZsImage` 未指定 `subpackage` 时，`resolveStaticUrl` 解析成主包路径，主包无这些文件返回500\n\n## 修复内容\n- 在 `resolveStaticUrl` 中增加路由自动推断：当前页面在 `pages_transaction`、`pages_owner` 等分包内时自动使用对应分包 `static` 目录\n- 修改文件：`src/utils/index.js` 新增 `inferSubpackageFromRoute` 函数（约111-135行）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`src/utils/index.js`、`Project_Suzhufang.vue`、`manifest.js`、`ZsMap.vue`、`manifest.json`、`utils/file.js`\n- 来源会话ID：e3873d64-6106-455a-aff6-e426cf0638d1\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/publish_house_ui_fix.md",
+                "memory_type": "entities",
+                "after": "# 我的房源页面UI回归修复\n苏住房C小程序「我的房源」页面UI回归问题已修复，涉及 pages_transaction/publishHouse/index.vue。\n\n## 问题原因\n- 顶部 Banner 不显示：`ZsImage` 内部 image 使用 `width/height:100%`，父级无有效尺寸致高度0被折叠\n- 空状态插图不显示：`ZsEmpty` 的 `url` 写成 `../static/images/szf/empty-publish.svg` 路径解析错误\n- Tab 栏逻辑：原版始终显示 Tab，当前代码在 `totalSum==0` 时隐藏 Tab，与原版不一致\n\n## 修复内容\n- 参考同目录 `stockHouse/index.vue` 实现：Banner 改为直接 `import publishBanner` 用原生 `<img>` 渲染\n- 空状态图片路径改为 `images/szf/empty-publish.svg` 并指定 `subpackage=\"pages_transaction\"`\n- Tab 栏和列表区域始终显示，与原版布局一致\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`publishHouse/index.vue`、`components/ZsEmpty/ZsEmpty.vue`、`components/ZsImage/ZsImage.vue`、`stockHouse/index.vue`\n- 来源会话ID：0ebb8db9-ff2f-4012-8c52-e519ed22bee2\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/main_package_size_fix.md",
+                "memory_type": "entities",
+                "after": "# 主包体积超限修复\n苏住房C小程序主包上传预估从2110.8KB降到1798.4KB（限制2048KB），已修复。\n\n## 问题原因\n- `uni.scss` 新增页面容器类（`.container`、`.success-page` 等）并把 `min-height:100%` 改为 `min-height:inherit`\n- 构建后脚本 `prune-component-wxss-leak.mjs` 的 `LEAK_END` 正则仍旧，匹配失败，32个组件各泄漏约8.3KB合计267KB\n\n## 修复内容\n- 更新 `scripts/prune-component-wxss-leak.mjs` 正则，兼容新增页面类与 `min-height:inherit` 及旧 `min-height:100%`\n- 效果：components 431.6KB→164.6KB，MAIN磁盘1804.1KB→1537.1KB，MAIN上传预估2110.8KB(OVER)→1798.4KB\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`uni.scss`、`scripts/size-main-package.mjs`、`src/pages.js`\n- 来源会话ID：ec247072-d32c-44f5-838a-cfbdfe935169\n- 代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

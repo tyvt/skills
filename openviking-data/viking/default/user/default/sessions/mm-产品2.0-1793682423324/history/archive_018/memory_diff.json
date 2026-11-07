@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_018",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T05:52:18.303895+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_build_scoped_layout.md",
+                "memory_type": "entities",
+                "after": "# Vite build 产物 scoped 样式布局错乱\nvite build 产物与本地 dev 的 scoped 样式编译和 CSS 合并顺序不同，导致依赖父级 flex 行布局的提示语在生产环境排版错乱。\n## 问题现象\n- survey 模板 TopicDialog 的题目分组提示语（.topic-group-tip）本地 dev 正常，生产环境（www.ylzhwy.com:8081，vite build 产物）排版错乱\n- 写死宽度或依赖父级 flex 行布局的提示语在生产侧被挤成窄条或错行，dev 环境复现不出\n## 根因\n- 本地 dev 与 build 产物的 scoped 样式编译、CSS 合并顺序不同\n- 这类布局问题在 dev 环境下复现不出来，靠肉眼验证等于没验证\n## 解决方案\n- 涉及布局的生产问题一律以 build 产物为准核对，不靠 dev 肉眼验证\n- 提示语块显式撑满整行：width: 100% + flex-basis: 100%\n- 通过 :deep(.el-form-item__content) 把外层表单项内容改成纵向 flex，让提示语落在控件下方\n- :deep() 必须是 scoped 块里可编译的写法，生产验证需说明「需重新构建部署后生效」\n- 改完按仓库分支口径 cherry-pick 到对应版本分支（develop/v2.6.2、develop/v2.6.1），而非只留开发分支\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/survey/template/components/TopicDialog.vue、src/styles/element-ui.scss、src/styles/index.scss\n- 所属项目：产品2.0；代码基线：71e6ed9\n- 来源会话ID：e1ad93b0-6622-47db-907c-870e43850734；cherry-pick 到 develop/v2.6.2（0e8e5ad22）与 develop/v2.6.1（02155506c）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_terminate_redirect.md",
+                "memory_type": "entities",
+                "after": "# 详情页终止按钮跳转带数据新建页\n房屋质量保证金协议终止入口从列表页移到详情页，点终止打开新建页并自动带出源协议数据，需避开 detailMixins add 模式不取数与路由拼错两个坑。\n## 问题现象\n- 终止新建页字段全空，因走 add 模式时 detailMixins 不调 init()，页面里 loadAgreementById 从未执行\n- 跳转把 detail 路由直接拼 add 生成 ...Endadd 错误路径，触发详情接口报「请求参数格式错误或类型不匹配」\n## 根因\n- detailMixins 取数只挂在 view/edit 模式，add 模式要带数据必须自己显式加载\n- 路由拼接须用列表路由 + /add 约定路径，不能拿详情路由当基底\n## 解决方案\n- 终止列表页去掉「新增」按钮；协议详情页终止按钮跳到 guaranteeDepositAgreementEnd/index + /add 并带 agreementId\n- 终止新建页在 created 中按 agreementId 主动加载源协议数据，并清掉 sessionStorage 旧缓存防止覆盖\n- 从协议带过来的区域/企业等字段以只读方式展示，不显示「点击选择协议」\n## 验证与归属\n- 涉及文件：guaranteeDepositAgreementEnd/index.vue、guaranteeDepositAgreementEnd/detail.vue、guaranteeDepositAgreement/index.vue、propertyAgreement/detail.vue\n- 所属项目：产品2.0；代码基线：414029f\n- 来源会话ID：c2c05a52-f049-49d4-a534-d9c5df814673"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/two_column_tree_height.md",
+                "memory_type": "entities",
+                "after": "# 左树右内容两栏页左栏高度锁视口剩余高度\n维护类模块「左侧分类树 + 右侧列表」两栏布局，左栏默认随树节点增高撑长整页，需用 flex 拉伸 + min-height:0 + 内部分区滚动锁定高度。\n## 问题现象\n- 设施设备 facility/index.vue、标准维修项目 standardItem、设施定义 facilityDefinition 为左树右列表两栏布局\n- 左栏随树节点数量增高，节点多时整页撑长、右侧列表被顶到视口外，出现两条独立滚动条\n## 根因\n- 左栏是内容驱动块级高度，不读视口也不参与父容器高度约束\n- 树区无独立滚动出口，overflow 落在整页上\n## 解决方案\n- 页面容器统一 height: calc(100vh - 120px)，与同模块既有页面保持一致，不各写一个减法常量\n- 左栏 flex 布局用 align-self: stretch + min-height: 0 撑满剩余高度而非撑内容\n- 树放在 sort-left-body 内层盒滚动，顶部「物业管理区域」选择与搜索框留在滚动区外固定\n- 改动前先搜同模块已有左栏高度写法对齐，避免同一模块出现两个减法基准\n## 验证与归属\n- 涉及文件：facility/index.vue、facilityDefinition/index.vue、standardItem/index.vue、src/styles/index.scss\n- 所属项目：产品2.0；代码基线：2f68042\n- 来源会话ID：7c1acafc-7c01-47e5-b2e6-f66543e21e10"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_subtable_stale_pk.md",
+                "memory_type": "entities",
+                "after": "# 详情页子表按未就绪主键发请求查到别的数据\n房屋质量保证金账户明细页子表未按物业管理区域过滤，因路由复用残留旧 accountId、subTableMixins 提前请求、detailCallback 浅合并不覆盖，查到别的账户数据。\n## 问题现象\n- 缴存明细/支用明细未按所属物业管理区域过滤，余额 1856.53 却出现 266.62 记录，子表查到其他账户数据\n- 子表只传 accountId/account，压根没传 propertyProjectId\n## 根因\n- 同一详情路由复用进另一条记录时 form 保留上一次 accountId\n- subTableMixins 在 created 自动调 getList()，早于详情接口返回，用旧 accountId 发请求\n- detailCallback 用 {...this.form, ...data} 合并，接口未返回 accountId 时旧值不覆盖，错误状态固化\n## 解决方案\n- 子表在 !loading 且 resolvedAccountId（form.accountId || 路由 id）就绪后再用 v-if 渲染\n- detailCallback 改为先重置 form 再合并，用路由 id 兜底 accountId\n- 子表组件新增 propertyProjectId 参数且 accountId 与 account 同时传；覆盖 init() 阻止 mixin 提前请求\n- mounted 且过滤参数就绪后再拉数，用 filterSignature 统一 watch 过滤条件变化\n- 同类「重置后立刻查询」列表（资金缴存/账户列表）也要等区域树就绪再刷新，否则 parentDeptId 丢失\n## 验证与归属\n- 涉及文件：guaranteeDepositAccount/detail.vue、AccountDetailTable.vue、guaranteeDeposit/components/detail.vue、deposit/index.vue\n- 所属项目：产品2.0；代码基线：414029f\n- 来源会话ID：a2b93bb4-760d-4bb3-93a2-a4c0506cfb2f"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

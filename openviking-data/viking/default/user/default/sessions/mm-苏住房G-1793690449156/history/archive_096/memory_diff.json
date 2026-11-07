@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_096",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:06:23.770622+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/e2e_exclude_noise.md",
+                "memory_type": "entities",
+                "after": "# E2E 偶发超时先排除并行噪音\n跑全流程 E2E 首次出现偶发超时时，先排除 dev server 冷编译与并行排查噪音，再判定产品缺陷。\n\n## 问题根因\n- E2E 偶发失败有两类根因：产品缺陷与环境噪音\n- 环境噪音常见来源：dev server 冷编译占满 CPU、同时跑别的排查任务（DB 查询、日志 tail、脚本探针）\n- 噪音会拖穿 Playwright 默认超时，被误判为缺陷\n\n## 排查做法\n- 超时先分类：随机散布多用例且耗时接近阈值多为噪音；固定某步每次都在多为真缺陷\n- 排查时串行化：先停并行探针/日志/DB 查询，待 dev server 冷编译完成再跑 E2E\n- 给冷启动留余量（预热页面或调大超时），但不用调大超时掩盖稳定失败\n- 记录每个用例耗时，便于下次超时对比同一位置\n- 重跑全绿后结论写「首次超时因环境噪音，清空干扰后全绿」，不只报 PASS\n\n## 验证证据\n- 会话 session-80e78cbf-5439-4db6-bf65-920d4fe3ee80（基线 b6ffc68）全流程 E2E 首次超时因冷编译+并行噪音，清空干扰后 6/6 全绿\n- 用例耗时：verify-flood 16.8s / flood-crud 71.0s / flood-crud-video 96.1s / batch1-video 537.2s / batch2-video 384.7s / flood-menus-video 126.2s"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/git_exclude_others.md",
+                "memory_type": "entities",
+                "after": "# 提交前排除他人未提交改动\n共享工作区提交前需识别并排除别人进行中的未提交改动，只在交付里逐条列出被排除文件。\n\n## 背景与问题\n- 共享工作区「我的改动」与「别人的改动」混在一起，git add . 一把梭会把别人半成品误提交进主干\n- 不说明则提交者自己下次也困惑「为什么这几个文件变了我没改」\n\n## 做法\n- 提交前 git status --short 逐条判断归属，只 stage 明确是自己的文件\n- 提交后 git show --stat 核对文件清单与行数是否一致\n- 交付里明确列出被排除文件及原因（他人进行中 / 本地环境配置），提醒对方知悉\n- 本地环境类文件（如 env/.env）默认不入库，需要时单独提交\n- PowerShell 下 git commit/push 退出码 1 是 stderr 被当错误流，实际以 log 与同步状态为准\n\n## 验证证据\n- 会话 session-06bff897-c6b6-4484-ae0c-434e66e78369（基线 5d68a74）提交 RepairPanel 修复时排除他人未提交改动（home.js、index-v2.vue、EvaluationPanel.vue、evaluationNav.js 等）\n- 父仓 env/.env 为本地环境修改未提交；退出码 1 实际成功"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/e2e_pixel_baseline.md",
+                "memory_type": "entities",
+                "after": "# E2E 像素对比失败先判基线过期\nE2E 像素对比失败时，先分清是基线过期（页面演进）还是本次改动引入，不盲目换 baseline。\n\n## 判断要点\n- 像素基线是历史快照，页面正常演进后基线天然过期\n- 尺寸/结构差能对上「页面最近新增 UI」即为基线过期；局部内容/位置偏移更像本次改动引入\n- 直接换 baseline 会掩盖真回归\n\n## 做法\n- 先量尺寸差并与页面新增 UI 对账，能对上就是基线过期\n- 换 baseline 作为独立动作单独提出，不用来掩盖问题\n- DOM 断言排在像素对比之前执行，像素卡住仍能拿功能验证结论\n- 像素之外跑 npm run build 与 ESLint 兜底\n- 基线确认过期时改请用户在真实环境手工点验（1920 宽、已登录、有菜单权限）\n\n## 验证证据\n- 会话 session-8f03a474-c1ad-4a51-ab3e-9f85f59280fb（基线 f36e340）像素对比 size_mismatch：baseline 1919×1246、actual 1919×1258\n- 差异因 actual 多「区域 Tab + 当前数据统计周期」等 UI，与本次热区 CSS 无直接关系\n- 热区 DOM 断言（3 个 .kd__value 在 .kd__metric-main--clickable 内）在像素对比前通过"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/std_e2e_api_map.md",
+                "memory_type": "entities",
+                "after": "# 标准化评价E2E造数捷径（api-map.md）\n为「物业标准化评价」E2E 用例作者产出的接口契约文档 docs/std-evaluation/api-map.md 沉淀出直接决定 E2E 写法的结论。\n\n## 文档概况\n- docs/std-evaluation/api-map.md 共 1310 行 / 78KB，覆盖 110 个接口 / 16 个 Controller，九个域\n- 后端子模块 zhi2-evaluation（develop/v2.6.2-suzhufang-dev），核心包 stdEvaluation 下 148 个文件\n\n## 三条造数捷径\n- 种子数据已有 5 份市标，雪花 id 2120000000000000001~...005，可直接全链路复用，E2E 无需新建标准\n- H5 端 16 个接口无任何 @RequiresPermissions 注解，是最省事造数入口\n- 写操作沿 zs-method 隧道：修改=POST+zs-method: put、删除=POST+zs-method: delete（直发 PUT/DELETE 不命中路由）；新增不传主键、响应 data 即雪花 id；提交用 id、审批用 dataId\n\n## 注意点\n- 写 E2E 前先读 api-map.md「0 通用约定」「数据准备链路」「可用基础数据」「各模块最小新增请求体」四节，造数优先走 H5 接口\n- StdEvalGradeChangeSaveDto.changeReason 注释要求必填但无校验注解，按必填传值别指望后端拦截\n- Nacos context-path 与网关路由本地核实不了（文档 §12 共 10 条待确认），用前实测一次 GET /v2.0/evaluation/standard/page\n\n## 验证证据\n- 会话 bdc91889-bdc1-4864-8a03-4e3a6f7cceb5（基线 05caac8）产出 api-map.md，未改任何源码\n- 主要不确定项：Nacos context-path 与网关路由无法本地核实；changeReason 注释必填无校验"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

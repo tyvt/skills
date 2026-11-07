@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_058",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:39:28.963525+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/rule_message_label.md",
+                "memory_type": "entities",
+                "after": "# 表单项校验提示文案须与 label 逐字一致\n苏住房G 物业管家等表单中，必填校验 rules.message 必须与表单项 label 文案完全复用，避免近义词造成字段误判。\n\n## 问题现象\n- employmentDate 必填提示曾写「就职日期不能为空」，而表单项标签为「入职日期」，用户以为校验对错字段\n- 同业务域近义词对（就职/入职、缴款/缴纳、备案/登记）易产生此类残留\n\n## 解决方案\n- rules 里的 message 不是自由文案，必须是该字段 label 的逐字复用\n- 新增字段时先按 label 文案复制粘贴再改字段名；改字段中文名时必须同步改 rules 的 message\n- 只要求文案与 label 同源，不需动校验逻辑与 trigger\n\n## 验证与归属\n- 验证：会话 a4130aa3 用户要求提示显示为「入职日期不能为空」，结论将 message 改为与 label 一致\n- 涉及文件：zhi2-web-admin/src/views/property/propertyManager/detail.vue\n- 所属项目：苏住房G；来源会话：a4130aa3-2533-4320-b64f-86af85ae97c6；代码基线：805ea8c"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_tab_order.md",
+                "memory_type": "entities",
+                "after": "# 首页区域 Tab 顺序须兜底清单与接口结果排序双处落地\n苏住房G 首页区域 Tab 展示顺序需同时固定在 DEFAULT_REGIONS 兜底与 initRegion() 接口结果排序，否则跟随后端返回顺序。\n\n## 问题根因\n- 区域 Tab 有两个消费方：DEFAULT_REGIONS 无配置时兜底，initRegion() 从 platformConfig.regions 拉列表\n- 若 initRegion 直接用接口原顺序渲染，后端调整顺序或返回无序时界面跟着变\n\n## 解决方案\n- DEFAULT_REGIONS 改文案与数组顺序（区划代码不变），initRegion() 用同一套区划代码序列对接口结果排序\n- regionOptions 被关键数据与检查数据两条区域条共用，改一处两处同步生效\n- 动态取数改造后「前端固定排序」是新增层，勿把接口取数改回硬编码数组，也勿只改 DEFAULT_REGIONS 不排序接口结果\n\n## 验证与归属\n- 验证：会话 c09eef71 用户要求顺序张家港→常熟→…→新区，结论两处同步排序\n- 涉及文件：zhi2-web-admin/src/views/home/index-v2.vue、zhi2-web-admin/src/views/home/v2/components/RegionTabs.vue\n- 所属项目：苏住房G；来源会话：c09eef71-ed5e-4ee0-afac-90e1a65e8696；代码基线：15e201a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/trend_y_nan.md",
+                "memory_type": "entities",
+                "after": "# 柱线混合趋势图自算 Y 轴刻度需先过滤非有限值\n苏住房G 首页 RepairPanel.vue 趋势图用 Math.max(0, ...数组) 驱动显式 min/max 刻度，遇 null 整轴 NaN 失效。\n\n## 问题根因\n- buildTrendYScale 后用 Math.max(0, ...bar, ...doneLine, ...undoneLine) 驱动刻度\n- spread 进 Math.max 后只要有一个 null/undefined/非数字结果即 NaN，传进显式 min/max/interval 的 yAxis 致整图崩\n- 接口或映射偶发空值、非法数值时必现；显式 min/max 让问题从偶发脏点变整图失效\n\n## 解决方案\n- 先过滤再取最大值：reduce 里对 Number(v) 做 Number.isFinite 判断，或 map(Number).filter(Number.isFinite) 后 Math.max(0, ...)\n- 保留 maxVal<=0 时回落 0–10 / interval 2 兜底，避免全零数据 max===min\n- grid.left:8 依赖 containLabel:true，大数值仍可能裁切，改完须在目标分辨率截图确认；buildTrendYScale 放 script 顶层勿挪进 data\n\n## 验证与归属\n- 验证：会话 2caad9cb 审查 RepairPanel.vue 判出 Math.max 含 null 致 NaN 与 grid.left 裁切两条 MEDIUM\n- 涉及文件：zhi2-web-admin/src/views/home/v2/components/RepairPanel.vue\n- 所属项目：苏住房G；来源会话：2caad9cb-0616-4022-a3ba-01eadd581393；代码基线：9e5c499"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/freeze_reason_dropdown_lock.md",
+                "memory_type": "entities",
+                "before": "# 冻结原因下拉自锁导致字段选中即只读\n苏住房G系统用户管理页将系统写入的冻结原因暴露为下拉可选项，命中锁定判据造成选中即禁用编辑的自锁。\n\n## 问题根因\n- 原锁定条件：当前原因===「多次输入错误密码」就禁用编辑\n- 该原因是系统自动冻结写入的值，却被放入人工下拉项，用户选中即命中条件，字段立刻只读\n- 已知清单未覆盖「把系统写入值当可选项再作锁定判据」这类自锁根因\n\n## 解决方案\n- 从人工下拉删除「多次输入错误密码」，系统原因不应可选\n- 锁定判据改为加载时原始状态：originUserAccountState为冻结且原始原因为该项时才只读\n- 选「其他」自动切手工输入态；控件保留手动输入/下拉切换按钮（后缀切换组件）\n\n## 验证与归属\n- 验证：选「管理员手动冻结」仍可编辑，原本自动冻结账号仍只读\n- 涉及文件：system/user/detail.vue、AccountFreezeFields.vue、utils/accountFreeze.js\n- 所属项目：苏住房G；来源会话：92b6e126-dfc6-494c-a323-5344cc8169de；代码基线：805ea8c",
+                "after": "# 冻结原因下拉自锁导致字段选中即只读\n苏住房G系统用户管理页将系统写入的冻结原因暴露为下拉可选项，命中锁定判据造成选中即禁用编辑的自锁。\n\n## 问题根因\n- 原锁定条件：当前原因===「多次输入错误密码」就禁用编辑\n- 该原因是系统自动冻结写入的值，却被放入人工下拉项，用户选中即命中条件，字段立刻只读\n- 已知清单未覆盖「把系统写入值当可选项再作锁定判据」这类自锁根因\n- 另需注意：对「其他」等选项在选中回调里做 setState 特判（如 showManualInput=true 并清空值）会造成选项无法选中、控件形态突变（会话 d80e5a47）\n\n## 解决方案\n- 从人工下拉删除「多次输入错误密码」，系统原因不应可选\n- 锁定判据改为加载时原始状态：originUserAccountState为冻结且原始原因为该项时才只读\n- 「其他」仅作为普通下拉选项，选中即写入表单值，不自动切手工输入态；仅用户显式点击右侧「手工输入」按钮才切换到文本框\n- 关联缺陷（会话 d80e5a47）：onFreezeReasonSelect 对 val==='其他' 特判并 $emit 清空值，导致「其他」永远存不进、界面跳输入态；修复为去掉特判\n\n## 验证与归属\n- 验证：选「管理员手动冻结」仍可编辑，原本自动冻结账号仍只读\n- 涉及文件：system/user/detail.vue、AccountFreezeFields.vue、utils/accountFreeze.js\n- 所属项目：苏住房G；来源会话：92b6e126-dfc6-494c-a323-5344cc8169de；代码基线：805ea8c"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

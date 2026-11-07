@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_047",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:46:19.201248+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/subpackage_page_static_500.md",
+                "memory_type": "entities",
+                "after": "# 分包页面 ./static/ 不被 uni-app 打包致 500\n苏住房C 小程序中分包页面用 import './static/xxx.png' 引用图片时，构建产物落在页面子目录 /分包/页面/static/，uni-app 只复制分包根部 static，导致运行时 500。\n\n## 问题现象\n- 分包页报 /pages_owner/repair/static/icon_arrow_right.png、icon_feedback.png、icon_repair.png 全部 500，同模块其它页正常。\n- 控制台提示 Failed to load local image resource，图片整块不显示。\n\n## 根因\n- 与 ZsImage 路由推断 500 是独立根因：add.vue 用 import iconX from './static/xxx.png'，构建后路径为 /pages_owner/repair/static/。\n- uni-app 只把分包根部的 static 目录（pages_owner/static/）复制进小程序输出目录，页面级子目录 repair/static/ 不产出，运行时找不到文件。\n\n## 解决方案\n- 分包页面的图片一律放分包根 static（如 pages_owner/static/），引用写相对路径 '../static/xxx.png'。\n- 已存在的图片直接改 import 路径，缺的先复制到分包根 static 再改路径。\n- 改完重新编译（npm run dev/构建）后在开发者工具刷新验证。\n- 判别口径：报错路径出现「分包 + 页面子目录 + /static/」时，先查是否 ./static/ 写法，而非先怀疑 ZsImage 的 subpackage 参数。\n\n## 验证与归属\n- 验证：会话 bf727bff：add.vue 从 ./static/ 引用三张图标，产物路径 /pages_owner/repair/static/… 返回 500；同模块 submit.vue 用 ../static/（即 pages_owner/static/）可正常打包。修复为把 icon_feedback.png、icon_repair.png 复制到 pages_owner/static/ 并改 import 为 '../static/'，icon_arrow_right.png 本已存在。\n- 涉及文件：src/pages_owner/repair/add.vue、src/pages_owner/repair/index.vue、src/pages_owner/static/right.svg。\n- 所属项目：苏住房C；来源会话ID：bf727bff-d0f8-4d85-8723-cfa12502510a；代码基线：9832ba3。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zspicker_compound_trigger.md",
+                "memory_type": "entities",
+                "after": "# ZsPicker 复合按钮触发器不响应\n苏住房C 小程序中 ZsPicker 作为「图标+文字」复合按钮触发器时，仅内部文字区绑事件，外层容器无事件，导致整块点不动。\n\n## 问题现象\n- 「我的 → 电子业主卡」右上角「切换」按钮点不动，无任何响应也无报错。\n\n## 根因\n- 切换按钮由图标 + ZsPicker 组成，只有 ZsPicker 内部很小的文字区域绑了 @click，外层 .switch-btn 没绑事件，点图标区域等于没点。\n- ZsPicker 加了 virtualHost 后，在绝对定位的 flex 布局里内部点击更容易失效。\n\n## 解决方案\n- 给整个按钮容器绑 @tap=\"openHousePicker\"（小程序统一用 @tap 而非 @click）。\n- ZsPicker 通过 defineExpose 暴露 show 方法，由父组件调用，不再依赖点中内部文字。\n- 按钮内嵌的 picker 设 pointer-events: none，避免事件被内部元素拦截。\n- 顺带排查同类「恢复上次选中」逻辑：findIndex(...) > 0 会把合法的首项 index 0 排除，必须写 >= 0。\n- 结论：凡是用 ZsPicker 做「图标 + 文案」复合按钮，一律按上述四点实现，不要指望组件内部可点区域。\n\n## 验证与归属\n- 验证：会话 16685517：用户报「小程序：我的-电子业主卡-切换无响应」。修复 ownerCard/index.vue 给整块切按钮绑 @tap，ZsPicker 增 defineExpose 暴露 show，按钮内 picker 设 pointer-events:none，并把 findIndex > 0 改为 >= 0 以正确恢复上次选中房屋。\n- 涉及文件：src/pages_owner_extra/ownerCard/index.vue、src/components/ZsPicker/ZsPicker.vue。\n- 所属项目：苏住房C；来源会话ID：16685517-eda4-4fc5-8357-db2568f09adb；代码基线：b7bf813。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zsbutton_margin_ineffective.md",
+                "memory_type": "entities",
+                "after": "# 自定义组件 ZsButton 上 margin/UnoCSS 间距类不生效\n苏住房C 小程序中写在 ZsButton 等自定义组件标签上的 margin（含 UnoCSS mt-80 原子类）不会作用到组件内部真实按钮节点，间距改了无效。\n\n## 问题现象\n- publishHouse/type.vue「下一步」按钮与上方提示文字的间距改了两轮都不生效，用户回「未生效」。\n\n## 根因\n- 微信小程序里写在自定义组件标签上的 margin（包括 UnoCSS 的 mt-80 这类原子类）往往不会作用到组件内部真实按钮节点——与「class 透传不到组件内部」是同一类问题。\n- 普通块级布局下相邻元素的外边距折叠也会吞掉一部分间距。\n\n## 解决方案\n- 不在自定义组件标签上写 margin/间距原子类。\n- 用原生 view 包一层（如 .next-step-btn），把 margin-top: 80rpx 写在包裹层的 scoped 样式里。\n- 父容器显式加 flex 纵向布局（display:flex; flex-direction:column），避免外边距折叠。\n- 改完必须重新编译再预览，dev 热更新对小程序不总可靠。\n- 结论：间距类需求优先改「包裹层」，不要反复调组件上的工具类——这是该类「改了没效果」需求的默认第一反应。\n\n## 验证与归属\n- 验证：会话 a2751523：用户先报 type 页「下一步按钮距离上面提示文字的间距」未调整，第二次直接回「未生效」。最终结论为 ZsButton 上的 margin/UnoCSS mt-80 不作用到内部按钮，改为原生 view 包裹 .next-step-btn 设 margin-top:80rpx，并给 .publish-type-box 加 flex 纵向防外边距折叠。\n- 涉及文件：src/pages_transaction/publishHouse/type.vue、src/components/ZsButton/ZsButton.vue、uno.config.ts。\n- 所属项目：苏住房C；来源会话ID：a2751523-b238-42d9-b41f-5da721879c3a；代码基线：f1939b0。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsimage_dual_bug.md",
+                "memory_type": "entities",
+                "before": "# ZsImage 图片不显示双重根因\n苏住房C 中 ZsImage 图片不显示存在分包静态资源路径推断错误与默认高度为零两重根因，需按主包白名单或显式分包名修复。\n\n## 现象与根因\n- 页面 ZsImage 引用图标整块不显示，控制台报 Failed to load local image resource 状态 500，或不报错但看不见。\n- 根因一：resolveStaticUrl 按当前页面路由推断分包，非文件真实位置；主包图标被 pages_vote 页面引用解析到子包致 500，子包图标被其他页面引用解析到主包丢图。\n- 根因二：ZsImage 内部 height:100%，父节点无确定高度时高度算成 0，表现为路径对但看不见。\n\n## 解决方案\n- 跨页面共用图标加入 src/utils/mainStaticPaths.js 的 MAIN_STATIC_PATHS 白名单强制走主包；分包独有图标调用处显式传 subpackage=\"pages_transaction\"。\n- 给 ZsImage 套定尺寸容器（如 w-28 h-28 的 view），与 authentication.vue 写法对齐。\n- 给 ZsImage 增加 mode prop（默认 aspectFill 保持兼容），mode==='widthFix' 时内部改 height:auto，由宽度按比例决定高度；调用侧对宽定高不定图文统一写 mode=\"widthFix\"（会话 09b69b5c 验证）。\n- 引用页需显式注册 components:{ ZsImage }，绕开 easycom 在分支切换后失效导致的静默不渲染。\n- 排查顺序：先看控制台请求路径与文件真实位置是否同包，再查父级有无高度。\n\n## 验证与归属\n- 验证证据：会话 65302824（主包图标加白名单）、13824f1b（子包图标显式 subpackage+定尺寸容器）、09b69b5c（新增 mode prop 走 widthFix 修复高度塌零）。\n- 涉及文件：src/utils/mainStaticPaths.js、components/ZsImage/ZsImage.vue、pages_transaction/publishHouse/type.vue、pages_owner/house/owner/authentication.vue、pages_vote/elect/detail.vue、pages_transaction/publishHouse/errorTipOne.vue、errorTip.vue、errorTipTwo.vue 等。\n- 所属项目：苏住房C；来源会话ID：13824f1b-0d06-4c7a-8d3f-79edcf5ccfe4, 65302824-2836-4c68-a79c-8824fab43793；代码基线：8fc3cc5、b7bf813。",
+                "after": "# ZsImage 图片不显示双重根因\n苏住房C 中 ZsImage 图片不显示存在分包静态资源路径推断错误与默认高度为零两重根因，需按主包白名单或显式分包名修复。\n\n## 现象与根因\n- 页面 ZsImage 引用图标整块不显示，控制台报 Failed to load local image resource 状态 500，或不报错但看不见。\n- 根因一：resolveStaticUrl 按当前页面路由推断分包，非文件真实位置；主包图标被 pages_vote 页面引用解析到子包致 500，子包图标被其他页面引用解析到主包丢图。\n- 根因二：ZsImage 内部 height:100%，父节点无确定高度时高度算成 0，表现为路径对但看不见。\n\n## 解决方案\n- 跨页面共用图标加入 src/utils/mainStaticPaths.js 的 MAIN_STATIC_PATHS 白名单强制走主包；分包独有图标调用处显式传 subpackage=\"pages_transaction\"。\n- 给 ZsImage 套定尺寸容器（如 w-28 h-28 的 view），与 authentication.vue 写法对齐。\n- 给 ZsImage 增加 mode prop（默认 aspectFill 保持兼容），mode==='widthFix' 时内部改 height:auto，由宽度按比例决定高度；调用侧对宽定高不定图文统一写 mode=\"widthFix\"（会话 09b69b5c 验证）。\n- 引用页需显式注册 components:{ ZsImage }，绕开 easycom 在分支切换后失效导致的静默不渲染。\n- 排查顺序：先看控制台请求路径与文件真实位置是否同包，再查父级有无高度。\n- 注意：resolveStaticUrl / subpackage / mainStaticPaths 属 shimin 端实现，同源于 C 的其它项目需先核对是否有同名机制。\n\n## 验证与归属\n- 验证证据：会话 65302824（主包图标加白名单）、13824f1b（子包图标显式 subpackage+定尺寸容器）、09b69b5c（新增 mode prop 走 widthFix 修复高度塌零）、5c003f25（ownerCard 导航图标与箭头 500，根因 ZsImage default local 按当前路由推断分包，补 subpackage=\"pages_owner\" 后恢复）、b6ae18fa（play.png/soldOut-shadow.png/default-avatar.png 等主包图在分包页被推断成 /pages_x/static/ 返回 500，新增 mainStaticPaths.js 让 resolveStaticUrl 优先主包，并修正 pages_owner 中 3 处 question.svg 显式分包）。\n- 涉及文件：src/utils/mainStaticPaths.js、src/utils/index.js、components/ZsImage/ZsImage.vue、pages_transaction/publishHouse/type.vue、pages_owner/house/owner/authentication.vue、pages_owner_extra/ownerCard/index.vue、pages_vote/elect/detail.vue、pages_transaction/publishHouse/errorTipOne.vue、errorTip.vue、errorTipTwo.vue 等。\n- 所属项目：苏住房C；来源会话ID：13824f1b-0d06-4c7a-8d3f-79edcf5ccfe4, 65302824-2836-4c68-a79c-8824fab43793, 5c003f25-6041-4bd4-854d-61f76247907c, b6ae18fa-c2e7-4036-8bde-244c6a95c718；代码基线：8fc3cc5、b7bf813、9832ba3。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

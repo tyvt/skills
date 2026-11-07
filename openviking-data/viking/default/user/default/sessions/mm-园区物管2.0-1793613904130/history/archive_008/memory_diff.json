@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:26:08.864185+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/amount_input_precision_loss.md",
+                "memory_type": "entities",
+                "after": "# 金额输入框失焦精度被静默改写\n金额输入框（AmountInput）对超大数值（整数部分接近 15-17 位双精度上限）失焦时执行 parseFloat().toFixed(2)，导致末位精度被静默改写且用户改不动。\n\n## 现象\n- 用户输入 125624562315348.15，失焦后自动变回 .16 且无法改回\n- 不是表单校验问题，而是 JS 双精度浮点表示极限所致\n\n## 根因\n- parseFloat('125624562315348.15') 本身被舍入成 125624562315348.16，任何走 Number 通道的格式化都必然丢失末位精度\n\n## 解决方案\n- 失焦格式化改用字符串处理函数 formatFixedDecimal，彻底绕开 parseFloat/toFixed\n- 千分位展示的 currencyFormatter 也一并改为字符串处理\n- 若业务需要更大金额，后端用字符串或 Decimal 类型存储，前端全程按字符串处理\n- 排查「值改完又跳回去」类问题时先看数值位数是否超 15 位\n\n## 验证与归属\n- 验证：会话 5c77c754 用户报告 125624562315348.15 失焦变 .16；根因定位为 AmountInput 失焦执行 parseFloat().toFixed(2) 浮点舍入，改为字符串格式化后修复\n- 涉及文件：src/components/AmountInput/index.vue、src/formatters/index.js、src/directives/formatter/money.js\n- 所属项目：园区物管2.0；来源会话ID：5c77c754-4ae9-4947-9275-18a14a38dd9d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/edit_popup_detail_field_loss.md",
+                "memory_type": "entities",
+                "after": "# 编辑弹窗重拉详情丢字段\n子表编辑弹窗打开时重请求详情接口，但详情接口不返回某些字段（如 relBusinessId），导致提交更新接口时该字段缺失，后端参数校验 400。\n\n## 现象\n- 列表行有 relBusinessId 值，但编辑弹窗重建 payload 时该字段被静默丢掉\n- 提交更新接口因字段缺失直接 400\n\n## 根因\n- 编辑弹窗表单数据源从「列表行」切换成「详情接口返回」，详情接口未携带的字段在重建 payload 时丢失\n\n## 解决方案\n- 打开编辑弹窗时先把列表行中的该字段预填进表单\n- 详情加载完成后仅在该字段缺失时回退使用列表行数据（不覆盖详情已返回的值）\n- buildSubmitPayload 中按「当前表单 → 原始表单 → 列表行数据」三级优先级显式带上该字段\n- 同类「编辑弹窗重拉详情」的子表都应检查详情接口字段覆盖面，缺的字段用列表行兜底\n\n## 验证与归属\n- 验证：会话 1ee4f9a4 核销明细编辑保存 400，根因是详情接口未返回 relBusinessId；通过 handleUpdate 传行数据、弹窗预填、buildSubmitPayload 三级优先兜底修复\n- 涉及文件：src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue、VerificationReceiptDetailDialog.vue\n- 所属项目：园区物管2.0；来源会话ID：1ee4f9a4-13b3-4034-ad86-3721cc8340be"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/stats_card_flicker.md",
+                "memory_type": "entities",
+                "after": "# 表格加载后统计卡片闪烁\n列表页表格数据加载完成后，页面上半部分统计卡片会「闪烁」一下。\n\n## 现象\n- 表格渲染后页面总高度增加，右侧滚动条出现，.app-main 可用宽度缩小约 15px\n- 上半部分 width:20% 布局的统计卡片随之变化，视觉上出现闪烁\n\n## 根因\n- 卡片样式写 transition:all 0.3s，宽度这一布局属性也参与过渡动画，5 张卡片同时做 300ms 宽度过渡\n\n## 解决方案\n- 把 transition:all 收窄为只过渡 hover 需要的属性（transform、box-shadow），禁止布局属性参与过渡——通用套路，统计卡片/卡片组写 transition:all 都有此隐患\n- 给 zs-table 传 :tableTr=\"queryParams.pageSize\" 预留行高，减少表格加载前后高度突变、降低滚动条出现概率\n- 若仍有轻微抖动，可在全局布局加 scrollbar-gutter:stable 兜底滚动条占位\n\n## 验证与归属\n- 验证：会话 2fc8efe8（2026-05-21）用户报「表格加载完后页面上半部分会闪烁」；结论定位为滚动条出现使 .app-main 宽度缩 ~15px + width:20% 卡片 + transition:all 0.3s 触发布局过渡；改动为收窄 transition 属性并给 zs-table 加 :tableTr 预留 10 行高度\n- 涉及文件：zhi2-web-admin/src/views/benefit/alert/index.vue、src/components/zs-table/zs-table.vue、src/mixins/listMixins.js\n- 所属项目：园区物管2.0；代码基线：5a288f142 之后的 fc994977f；来源会话ID：2fc8efe8-20f3-454c-8e49-fdfcaf343a87"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、project_switch_soft_refresh",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid、stats_card_flicker\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、edit_popup_detail_field_loss、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、amount_input_precision_loss、project_switch_soft_refresh"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/多版本分支修复工作流.md",
+                "memory_type": "preferences",
+                "before": "- 修复线上多版本分支并存问题时，从最低版本分支（如 develop/v2.6.1）开始修复，不在当前高版本分支直接改。\n- 修复完成后先把提交号与结果汇报给用户，等用户明确确认「没问题了」后才动手合并。\n- 按版本链路顺序逐级 merge（如 v2.6.1 → v2.6.2 → v2.6.2-yulin），不得跳级或反向。\n- 合并完成后逐个核对所有相关分支本地均已包含该修复提交，最后询问是否推送远程，不自行 push。\n- 总结为用户明确偏好：改低不改高、先确认后合并、合并后全链核对。\n- 若用户确认推送，在子模块 zhi2-web-admin 内用一条命令同时 push 三个分支（如 cd zhi2-web-admin && git push origin develop/v2.6.1 develop/v2.6.2 develop/v2.6.2-yulin），子模块最后停留在最末端分支 develop/v2.6.2-yulin。",
+                "after": "- 修复线上多版本分支并存问题时，从最低版本分支（如 develop/v2.6.1）开始修复，不在当前高版本分支直接改。\n- 修复完成后先把提交号与结果汇报给用户，等用户明确确认「没问题了」后才动手合并。\n- 按版本链路顺序逐级 merge（如 v2.6.1 → v2.6.2 → v2.6.2-yulin），不得跳级或反向。\n- 逐级合并时每个分支单独生成一个独立的 merge 提交，不在一个分支上一次性合入多级改动。\n- 合并完成后逐个核对所有相关分支本地均已包含该修复提交，最后询问是否推送远程，不自行 push。\n- 总结为用户明确偏好：改低不改高、先确认后合并、合并后全链核对。\n- 若用户确认推送，在子模块 zhi2-web-admin 内用一条命令同时 push 三个分支（如 cd zhi2-web-admin && git push origin develop/v2.6.1 develop/v2.6.2 develop/v2.6.2-yulin），子模块最后停留在最末端分支 develop/v2.6.2-yulin。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

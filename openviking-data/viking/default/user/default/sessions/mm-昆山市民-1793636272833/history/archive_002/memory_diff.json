@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-昆山市民-1793636272833/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T16:21:21.403166+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/huiyan_verify_mpsdk.md",
+                "memory_type": "entities",
+                "after": "# 腾讯慧眼 verify_mpsdk 集成落点与去重\n昆山市民（昆物通）uni-app 小程序接入腾讯云慧眼实名核身的目录规范、封装方式与去重结论。\n\n## 集成落点\n- 运行目录固定为 `src/wxcomponents/verify_mpsdk/`（非微信原生根目录写法）\n- 在 `pages.json` 注册 SDK 活体验证页；在 `App.vue` 的 `onLaunch` 中 `require` 并 `Verify.init()`\n- 业务侧通过 `src/utils/useTencentFaceVerify.js` 封装 `wx.startVerify`，承载页为 `src/pages/verify/index.vue`\n\n## 去重结论\n- 集成后若 `src/utils/cloud-faceid-micro-sdk-*/` 仍保留完整 SDK 副本且无任何引用，应删除\n- 最终删除 `src/utils/cloud-faceid-micro-sdk-v1.0.37/`（81 文件），保留 `wxcomponents/verify_mpsdk`、`useTencentFaceVerify.js`、`pages/verify/index.vue`\n\n## 关键注意事项\n- 官方文档要求 `wx.startVerify` 成功回调里 iOS 需约 500ms `setTimeout` 再执行业务逻辑，否则后续代码可能不跑\n\n## 验证与归属\n- 所属项目：昆山市民；代码基线：a1b8beb\n- 来源会话ID：d204db33-771f-44d5-97bb-400ec850e59f\n- 涉及文件：src/wxcomponents/verify_mpsdk/、src/utils/useTencentFaceVerify.js、src/pages/verify/index.vue、src/App.vue、src/pages.json"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/vote_detail_nan_bug.md",
+                "memory_type": "entities",
+                "after": "# 已完成决策详情空白与 NaN Bug\n昆山市民「我的决策 → 已完成 → 决策详情」字段全空、面积显示 NaN 的根因与修复套路。\n\n## 问题根因\n- `stores/vote.js` 的 `getVoteDetail` 拉主详情后串行调 `getVoteChart`\n- 排序表决等类型在已完成态下图表接口易失败，未捕获导致整个 action 中断，`voteDetail` 从未写入\n- 页面 `roundUp(undefined, 2)` 等格式化直接出 NaN\n\n## 修复套路\n- `getVoteChart` 失败只记空图表、不 reject 主流程\n- 主详情无数据时回退 `selectDecisionViewById`；户数/面积/权数优先图表聚合字段，否则用详情接口字段\n- 列表跳 `votedetail` 必须带 `decisionRangeId`（列表项有该字段时），详情请求同步传参\n- 展示层对空面积做兜底，禁止裸 `roundUp`\n\n## 验证与归属\n- 所属项目：昆山市民；代码基线：c8c1c24\n- 来源会话ID：b9110830-8233-4a5d-a89c-cf8b384f6805\n- 涉及文件：src/stores/vote.js、src/pages_vote/vote/votedetail.vue、src/pages_vote/vote/index.vue、src/api/modules/vote.js"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/llt_h5_login_code.md",
+                "memory_type": "entities",
+                "after": "# 鹿路通 H5 登录 code 一次性去重 Bug\n昆物通嵌入鹿路通后 H5 登录 code 一次性与并发重复调用的根因与四类去重策略。\n\n## 问题根因\n- H5 入口 URL 形如 `.../wyzx?code=xxx#/`，登录走 `POST /estate/weChatOauth/llt/getInfoByCode?code=`，返回结构与微信登录一致\n- 须 `#ifdef H5` 走鹿路通、`#ifdef MP-WEIXIN` 保留原小程序登录\n- `code` 只能使用一次，但 `App.vue` 的 `onShow` 与 `home.vue` 的 `onLoad` 等多处并发调 `loginWithWxCode()`，重复读 URL 会二次请求报错\n\n## 去重策略\n- `src/utils/wxLogin.js` 约定模块级 `loginPromise` 合并并发\n- 已有持久化 token 则直接返回并 `history.replaceState` 去掉 `code`\n- 成功后将 code 标记已用（本地存储），拦截已消费 code\n- 登录成功后从地址栏移除 `code` 参数\n\n## 验证与归属\n- 所属项目：昆山市民；代码基线：1e46691\n- 来源会话ID：438b59b9-1f57-49a0-a674-06c5f58fdd8f\n- 涉及文件：src/utils/wxLogin.js、src/App.vue、src/pages_home/home.vue、src/api/modules/estate.js、src/pages_home/personal.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/修改实名入口平台限制.md",
+                "memory_type": "preferences",
+                "after": "- 同源 uni-app 在鹿路通 web-view/H5 与微信小程序双端交付时，「个人中心 → 修改实名」入口须在 H5 侧禁用（不可进入修改实名页），微信小程序保留原能力。\n- 实现用 uni-app 条件编译或运行时平台判断，避免 H5 用户绕进仅支持小程序实名链路的页面。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

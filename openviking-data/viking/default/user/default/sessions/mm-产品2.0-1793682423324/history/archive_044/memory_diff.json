@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_044",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:58:40.730217+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsbutton_permission.md",
+                "memory_type": "entities",
+                "after": "# ZsButton 布尔 permission 透传类型警告\nZsButton 的 permission prop 声明为 Array，通过 v-bind=\"attrs\" 透传布尔 permission:false 会触发类型警告。\n\n## 问题根因\n- ZsButton 的 permission prop 声明为 Array 类型，布尔值会触发 Vue 类型警告 `Expected Array, got Boolean`\n- 把按钮配置对象里的 permission:false 经 v-bind=\"button.attrs\" 透传给 ZsButton 会触发告警\n- zs-operate-column 的 permission 语义不同：布尔为开关（内部 if(!button.permission) return true），写在 buttons 配置里合法\n\n## 解决方案\n- ZsButton 按钮 attrs 里不要写 permission:false，直接省略即可达到「不受权限限制」效果\n- 确需权限控制时传数组如 permission:['company:personnelRecord:add']\n- 排查此类警告时先分清 permission 流向哪个组件（ZsButton 还是 zs-operate-column）\n\n## 验证与归属\n- 验证证据：会话 238293ef，从 certificatesTable.vue 操作按钮 attrs 移除 permission:false，buttons 配置里的保留给 zs-operate-column\n- 涉及文件：zhi2-web-admin/src/components/zs-button/zs-button.vue；zhi2-web-admin/src/views/company/staffManagement/components/certificatesTable.vue\n- 所属项目：产品2.0；来源会话ID：238293ef-3bd5-4396-98d5-3034f011a25c；代码基线：62d5fb9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/api_prefix_migration.md",
+                "memory_type": "entities",
+                "after": "# 维护类接口前缀批量迁移 maintenance→dataProperty\n全局把维护类接口前缀从 /maintenance/ 换成 /dataProperty/ 时，需同时覆盖拼接式调用并防止误伤前端 import 路径。\n\n## 问题根因\n- 直接写死字符串的接口路径与 moduleName+businessName 拼接式调用（如统一 request 封装按模块名拼 URL）是两种调用点，后者易残留旧前缀\n- 全局字符串替换会把 import '@/views/maintenance/...' 这类前端页面路径误替换成 dataProperty，导致编译报错\n- 接口前缀与前端目录名可能同名但含义完全不同\n\n## 解决方案\n- 批量迁移接口前缀时同时覆盖字面量 URL 与 moduleName/businessName 拼接点（可按 businessName 是否属于目标接口判定）\n- 替换范围限定在接口路径上下文，替换后必须复查 @/views/ 等 import 路径是否被误伤并恢复\n- 收尾用旧路径残留 grep 复查归零\n\n## 验证与归属\n- 验证证据：会话 2a1a3c5d，49 个文件替换后，发现并恢复 3 处被误改的 import '@/views/maintenance/...'\n- 涉及文件：zhi2-web-admin/src/api/index.js；zhi2-web-admin/src/views/maintenance/facility/index.vue\n- 所属项目：产品2.0；来源会话ID：2a1a3c5d-9f69-436a-93ed-f2b987edfc4a；代码基线：6cf33a8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialogmixins_id_prop.md",
+                "memory_type": "entities",
+                "after": "# dialogMixins 声明 id 为 prop 后 $attrs.id 恒 undefined\n混入 dialogMixins 的弹窗组件若把 id 声明为 prop，Vue 不会将其放入 $attrs，取主键必须用 this.id 而非 this.$attrs.id。\n\n## 问题根因\n- 打印参数保存报「打印配置ID不能为空」，请求体 printConfigId 始终缺失但数据流本身是通的\n- ParamsDialog 混入的 dialogMixins 已把 id 声明为 prop，已声明为 prop 的属性不会进入 $attrs\n- 代码里写 this.$attrs.id 恒为 undefined，赋值给 form.printConfigId 后随请求发出的是空\n\n## 解决方案\n- 混入 dialogMixins 的组件直接用 this.id 取主键\n- 出现「某 ID 字段没随请求发出但父组件确实传了」时，优先排查是否取值走了 $attrs 而 prop 已被声明\n- 凡是 mixin 声明过的 prop（id、visible 等）都不能再从 $attrs 取\n\n## 验证与归属\n- 验证证据：会话 6fdd2549，dialogMixins.js props 里声明 id，ParamsDialog.vue confirm 中 this.$attrs.id 为 undefined，改为 this.id 修复\n- 涉及文件：zhi2-web-admin/src/mixins/dialogMixins.js；zhi2-web-admin/src/views/tool/print/components/ParamsDialog.vue\n- 所属项目：产品2.0；来源会话ID：6fdd2549-8d41-469b-94b8-8cd8fe8a1f20；代码基线：bc9b2a3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detailtemplate_align.md",
+                "memory_type": "entities",
+                "after": "# DetailTemplate 详情页字段对齐规范\n详情页 DetailTemplate 只读态字段行须垂直居中、横向左对齐，任何字段禁止单独 align:'center'。\n\n## 规范内容\n- 垂直方向：标签与值在同一行内垂直居中（标签区与值区用 display:flex + align-items:center）\n- 横向方向：一律左对齐，标签、文本、金额均左对齐；带操作按钮时文字在左、按钮在右\n- 任何字段不得单独 align:'center' 或 labelAlign:'center'，否则与同行其他字段错位\n\n## 解决方案\n- 页面侧移除字段配置里的 align:'center'/labelAlign:'center'，金额字段统一 align:'left'\n- 组件侧在 detail-template.vue 把行内单元格 align-items 改为 stretch 保证同行等高\n- 改公共组件一处，所有详情页同时生效；字典标签在值区内也垂直居中\n\n## 验证与归属\n- 验证证据：会话 b7d66167，pubPaymentNotice/detail.vue 移除 center 配置，detail-template.vue 行内单元格改 stretch + flex 垂直居中\n- 涉及文件：zhi2-web-admin/src/components/detail-template/detail-template.vue；zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue\n- 所属项目：产品2.0；来源会话ID：b7d66167-3cc1-4c4a-8a14-79f95779a579；代码基线：49a7aa3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

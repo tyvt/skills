@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:49:05.322947+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/area_dict_race.md",
+                "memory_type": "entities",
+                "after": "# B端默认小区街道/社区反查为空\n园区物管2.0 中 B 端新增页带默认小区进入时，街道、社区字段因字典异步加载竞态与提前 return 而缺失。\n\n## 问题根因\n- initDict 里立刻执行 initCurrentProject（请求 /property/complex/{projectId} 后调 applyPropertyProjectRow），街道/社区名称靠 area mixin 的 getSubdistrictNameByCode / getCommunityNameByCode 从字典反查。\n- 该字典在 created 里异步加载，反查执行时字典仍为空，拿到 undefined。\n- 原逻辑若 form.projectId 已有值（如 session 缓存）就直接 return，即使街道/社区为空也不再补全。\n\n## 解决方案\n- 新增 syncSubdistrictCommunityFromCodes：字典未就绪时用 $watch 等待字典加载完成后再写入名称。\n- 调整 initCurrentProject：缺少街道/社区时用当前或默认 projectId 重新拉取小区补全，而非提前 return。\n- 凡使用 initCurrentProject + area mixin 反查的页面（pubQuarterlyDeclaration 等）按同方式处理。\n\n## 验证与归属\n- 验证：027.md 会话 6e97f2b9 最终结论确认竞态与提前 return 问题及两处修改。\n- 涉及文件：src/views/benefit/pubParkingRate/detail.vue、src/mixins/area.js。\n- 所属项目：园区物管2.0；来源会话 6e97f2b9-b0d9-4363-889e-533667c5bbef；代码基线 3965548b6。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/btn_group_props.md",
+                "memory_type": "entities",
+                "after": "# OperationBtnGroup 渲染期必传四件套\n园区物管2.0 中详情页渲染 OperationBtnGroup 时若缺 :form/:primaryKey 会直接崩，businessName 不能填权限串。\n\n## 问题根因\n- OperationBtnGroup 内部渲染打印按钮时访问 form[primaryKey] 拼 url-params；页面未传 :form、:primaryKey 时 primaryKey 为 undefined 且 form 未传，渲染期直接崩溃（Cannot read properties of undefined）。\n- 页面把权限串当成 business-name（business-name=\"benefit:pubElevMaintenanceNew\"），导致 moduleName 未定义告警。\n\n## 解决方案\n- 给 operation-btn-group 补全 :form、:primaryKey、:moduleName、:businessName 四个必要属性（对齐同模块已有 detail.vue 写法）。\n- moduleName 与 businessName 分开：moduleName 是模块段、businessName 是业务名（不带模块前缀），发布类按钮权限按 ${moduleName}:${businessName}:publish 动态拼。\n- form 中须含业务主键字段（如 consumptionId/consumptionNo）供打印 url-params 使用。\n- 同一详情页按路由区分业务时，用 computed 按路由名返回不同的 moduleName/primaryKey 组合。\n\n## 验证与归属\n- 验证：会话最终结论确认缺属性与权限串误用，修复为补全属性并新增按路由区分业务的 computed（EnergyDeclaration→pubElevMaintenanceNew/maintainId，其他→pubPublicEnergyConsumption/consumptionId）。\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubElevMaintenanceNew/detail.vue、zhi2-web-admin/src/components/OperationBtnGroup/index.vue、zhi2-web-admin/src/views/benefit/pubElevMaintenanceNew/components/expendTable.vue。\n- 所属项目：园区物管2.0；来源会话 99b102a3-dcff-4e89-a5a6-982a16f73b88；代码基线 fc994977f。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/driver_top_clip.md",
+                "memory_type": "entities",
+                "after": "# driver.js 引导聚焦贴顶元素被裁切\n园区物管2.0 中用 driver.js 做新手引导时，聚焦贴顶元素（如顶部导航栏「切换项目」按钮）聚焦框上边框被屏幕裁掉。\n\n## 问题根因\n- driver.js 默认给聚焦区域加 10px padding，聚焦框比元素大一圈，贴顶元素的高亮框顶部≈元素顶部−10px，落到视口外。\n- border 是向外画的，贴顶时上边框同样在视口外，怎么改 border 都显示不全。\n\n## 解决方案\n- 设 padding: 0 让聚焦框与元素等大，不再向外溢出。\n- 高亮标识不用 border，改用内描边 box-shadow: inset ...，边框画在框内，贴顶/贴边时四边都能完整显示。\n- driver.js 的引导标记存在 localStorage（如 driverProjectSwitch），改完引导配置后要 localStorage.removeItem(key) 清除旧标记才能重新验证。\n\n## 验证与归属\n- 验证：会话最终结论确认 padding:0 + 红色标识改 box-shadow: inset 内描边，并提示 localStorage.removeItem('driverProjectSwitch') 清除引导标记后重验。\n- 涉及文件：zhi2-web-admin/src/utils/driver.js、zhi2-web-admin/src/views/home/bProjectDialog.vue。\n- 所属项目：园区物管2.0；来源会话 b97cc65a-b35d-4756-a207-7c59f24b16eb；代码基线 5a288f142。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_summary.md",
+                "memory_type": "entities",
+                "after": "# zs-table 小计/合计双来源\n园区物管2.0 中 zs-table 的 shouldRenderBottomSummary 原是计算属性不是 prop，且 ZsSummaryText 写死「合计：」。\n\n## 问题根因\n- 父页面传 :shouldRenderBottomSummary=\"false\" 想只保留表格内小计行、去掉底部合计条，但合计依然显示。\n- zs-table 里 shouldRenderBottomSummary 原先只是计算属性（有 resolvedBottomSummaryItems 就为 true），父组件传的同名值落入 $attrs 被 v-bind 透传给 el-table，zs-table 自身根本不消费，等于静默无效。\n- 表格下方自动挂的 ZsSummaryText 组件标题写死「合计：」，与「只要小计」冲突。\n\n## 解决方案\n- 给 zs-table 正式声明 shouldRenderBottomSummary prop（默认 true 保持旧行为）。\n- 用 effectiveBottomSummaryVisible = shouldRenderBottomSummary && hasBottomSummaryContent 控制 ZsSummaryText 渲染。\n- 原同名计算属性改名为 hasBottomSummaryContent 避免与 prop 撞名。\n\n## 教训\n- 给封装表格加开关时必须确认它是真 prop 而非同名计算属性，否则 $attrs 透传会造成「传了不生效」的假 bug。\n\n## 验证与归属\n- 验证：会话 442d7a82 确认配置 false 仍显示合计；修复落在 zs-table.vue（新增 prop + effectiveBottomSummaryVisible + 计算属性改名）与 ZsSummaryText/index.vue（写死「合计：」标题）。\n- 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、zhi2-web-admin/src/components/ZsSummaryText/index.vue、zhi2-web-admin/src/views/benefit/pubBankAccountBalance/index.vue。\n- 所属项目：园区物管2.0；来源会话 442d7a82-5af6-497e-bb37-b6b32de6979b；代码基线 b2b559778。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、sidebar_recursive_menu、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）\n- 图表与样式类：echarts_donut_label、chart_amount_format、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、sidebar_recursive_menu、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）\n- 图表与样式类：echarts_donut_label、chart_amount_format、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、zs_table_summary（zs-table小计合计双来源）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793758965904/history/archive_028",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T03:25:28.349797+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/router_region_500.md",
+                "memory_type": "entities",
+                "after": "# 路由守卫冗余区域列表接口调用返回500\n路由守卫登录后基础数据加载误调 `store.dispatch('common/getRegions')` 请求 `/system/region/list` 无 query 且后端持续返回 500，已在多处移除。\n\n## 问题根因\n- 路由守卫 login 后基础数据加载调用 `common/getRegions` 请求 `/system/region/list`，无 query，后端持续 500\n- `baseDataActionNames` 含 '行政区域列表' 冗余触发该 dispatch\n\n## 修复要点\n- 于 `zhi2-web-admin/src/router/index.js:174-180` 移除该 dispatch 及 `baseDataActionNames` 中 '行政区域列表'\n- 于 `zhi2-web-admin/src/store/modules/common.js` 删除 `getRegions` action\n- `common.allAreas` 与 `SET_ALL_AREAS` 因 `src/formatters/index.js` 等 20+ 处引用保留\n\n## 验证与归属\n- 验证证据：src=门户/048.md\n- 涉及文件：zhi2-web-admin/src/store/modules/common.js、src/api/system.js、src/router/index.js、src/formatters/index.js、package.json 等\n- 所属项目：门户；来源会话ID：cdc17e3f-09bf-4fff-8fd3-2d66641390ae；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/broker_flow_filter.md",
+                "memory_type": "entities",
+                "after": "# 经纪端首页业务流程须按 permittedCodes 过滤板块\n门户首页 `mergeBusinessFlows` 在 `variant === 'broker'` 时若固定用 `BROKER_SECTION_CODES` 而不按 `permittedCodes` 过滤，仅部分权限用户仍见完整默认流程。\n\n## 问题根因\n- `mergeBusinessFlows` 在 broker 下固定 `BROKER_SECTION_CODES`，不像 admin/developer 用 `permittedCodes`/`authorizedSectionCodes` 过滤\n- 仅有 `portal:bizSection:*` 部分权限用户仍见完整「住房租赁」等默认流程（含可点击步骤），与旧版 `flows.filter(perms...)` 不一致\n\n## 修复要点\n- `sectionCodes = BROKER_SECTION_CODES.filter((code) => permitted.has(code))`\n- 超管走 `isSuperAdmin` 全量分支不受影响\n\n## 验证与归属\n- 验证证据：代码审查 [HIGH] 经纪端板块未按权限过滤：homeLayout.js:182-183 固定 BROKER_SECTION_CODES，仅有 secondHandHouseTrade 权限仍渲染完整住房租赁流程\n- 涉及文件：zhi2-web-admin/src/views/home/config/homeLayout.js、zhi2-web-admin/src/views/home/mixins/homeDataMixin.js\n- 所属项目：门户；代码基线：b84b4e7；来源会话ID：a55a779b-e7ae-4471-b38f-138e8f7b8d30"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/todo_stripe_hover.md",
+                "memory_type": "entities",
+                "after": "# HomeTodoTable 斑马纹 !important 冲突 el-table 悬停\n首页待办表对斑马纹行写 `#fafafa !important` 会压过 element-ui 与操作列组件的 hover 规则，致悬停无背景。\n\n## 问题根因\n- `HomeTodoTable.vue` 对 `tr.el-table__row--striped > td.el-table__cell` 写 `#fafafa !important`\n- 选择器权重压过 `element-ui.scss` 与 `zs-operate-column` 的 `tr.hover-row` 规则\n- 斑马纹行悬停时整行（含操作列）可能无 hover 背景\n\n## 修复要点\n- 删除重复斑马纹声明（全站已由 element-ui + 操作列组件覆盖）\n- 或改为 `:not(.hover-row)` / 去掉 `!important` 仅保留非悬停默认态\n\n## 验证与归属\n- 验证证据：样式审查 [HIGH] HomeTodoTable.vue:150-153 斑马纹 !important 与 hover 冲突，审查结论 BLOCK 直至修复\n- 涉及文件：zhi2-web-admin/src/views/home/components/HomeTodoTable.vue、zhi2-web-admin/src/styles/element-ui.scss、zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue\n- 所属项目：门户；代码基线：ac6513b；来源会话ID：c8240256-b927-47c2-8905-36e64b77e5f3"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/card_body_padding.md",
+                "memory_type": "entities",
+                "before": "# 门户首页 card-body 上 padding 被更具体选择器覆盖\n门户 index-new.vue 只改基础 .card-body 的 padding 常不生效，业务中心、常用功能、待办/公告等子区块用更具体选择器与 !important 把 padding 设回。\n\n## 问题根因\n- 基础 .card-body padding 改动被后续更具体规则覆盖\n- 业务中心 .business-center .card-body 写 padding: 16px 20px\n- 常用功能 .func-grid 带 padding: 20px !important\n- 待办/公告 .todo-body、.notice-body 用 !important 单独设上内边距\n\n## 修复方向\n- 去掉「上 padding」需在子选择器里将 padding-top 改为 0，左右与下保持不变\n- 业务中心内容垂直居中悬空多为 .business-center .card-body 的 justify-content:center，贴顶需改 flex-start\n- 排查 592–602 行基础样式后定位到子选择器与 !important 设回\n\n## 验证与归属\n- 验证证据：用户改 592–602 行基础样式后反馈仍有多余上 padding，改子选择器 top 为 0 后生效\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue\n- 所属项目：门户；来源会话ID：53c81de5-13e7-48d9-a133-ec5ba59583c5；代码基线：04586c4",
+                "after": "# 门户首页 card-body 上 padding 被更具体选择器覆盖\n门户 index-new.vue 只改基础 .card-body 的 padding 常不生效，业务中心、常用功能、待办/公告等子区块用更具体选择器与 !important 把 padding 设回。\n\n## 问题根因\n- 基础 .card-body padding 改动被后续更具体规则覆盖\n- 业务中心 .business-center .card-body 写 padding: 16px 20px\n- 常用功能 .func-grid 带 padding: 20px !important\n- 待办/公告 .todo-body、.notice-body 用 !important 单独设上内边距\n\n## 修复方向\n- 去掉「上 padding」需在子选择器里将 padding-top 改为 0，左右与下保持不变\n- 业务中心内容垂直居中悬空多为 .business-center .card-body 的 justify-content:center，贴顶需改 flex-start\n- 排查 592–602 行基础样式后定位到子选择器与 !important 设回\n\n## 验证与归属\n- 验证证据：用户改 592–602 行基础样式后反馈仍有多余上 padding，改子选择器 top 为 0 后生效；另见 src=门户/047.md\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue\n- 所属项目：门户；来源会话ID：53c81de5-13e7-48d9-a133-ec5ba59583c5；代码基线：04586c4"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

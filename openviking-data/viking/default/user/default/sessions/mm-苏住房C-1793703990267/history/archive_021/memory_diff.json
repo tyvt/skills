@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_021",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:46:36.209425+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/optional_decision_enrich.md",
+                "memory_type": "entities",
+                "after": "# 选项表决列表详情补全缺失\n苏住房C 小程序选项表决（OPTION）分支未同步一般表决/选举的列表详情补全逻辑，导致「我的决策/决策记录」仅显示时间、决策人与选项名空白。\n\n## 问题现象\n- 「我的表决—选项表决—我的决策」页面「最近一次决策」「决策记录」只显示时间戳，决策人与选项名全空\n- 点「决策详情」进入后空白，因 detail.decisionResponseId 取不到，跳转携带记录 ID 为空\n- 列表接口只返轻字段（投票时间），未做详情补全的分支整体空白且不报错\n\n## 根因\n- 选项表决走 optional/DecisionResult.vue 直接消费列表行，未像一般表决/选举页那样接「记录详情」补全\n- 投票类列表接口仅保证返回时间，决策人/签字/选项摘要/记录 ID 需二次详情接口取\n- 凡是列表页直接渲染未补全分支，接口不返字段就整体空白\n\n## 解决方案\n- 在 optional/DecisionResult.vue 增 pickResponseId（按 decisionResponseId→recordId→行内候选字段解析）、fetchRecordDetail、enrichRecordList 三函数，逐条并发补全 merge 回行\n- 用 onShow 而非 onLoad 触发刷新，保证从详情返回数据最新\n- 跳详情前将补全后行数据写本地缓存，详情页优先读缓存再接口兜底；详情页 selectOptdec 空时回退 optionList\n- common/DecisionResult.vue「最近一次决策」同样走详情补全\n- 排查同类「只显时间/空白」先比对同模块已修兄弟页面有无 pickResponseId+详情补全逻辑\n\n## 验证与归属\n- 验证：会话 2d84eea4（基线 8fc3cc5）用户报「我的表决—选项表决-我的决策内容看不到，一般表决和选举改过」\n- 涉及文件：pages_vote/decision/optional/DecisionResult.vue、DecisionRecord.vue、detail.vue、common/DecisionResult.vue、api/autonomy.js\n- 所属项目：苏住房C；来源会话ID：2d84eea4-83d0-4cd8-82b5-903f4772c353；代码基线：8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/prune_main_static.md",
+                "memory_type": "entities",
+                "after": "# 主包静态图被裁导致跨包import 500\n苏住房C 小程序为压主包体积将公共图标拆到各分包 static，构建后 prune-main-static 删主包同名文件，仍用主包路径 import 的页面运行时 500 且静默退默认 marker。\n\n## 问题现象\n- 微信开发者工具报「Failed to load local image resource /static/icon/location-red.png … status 500」并提示「改为用默认 marker」\n- pages_main/houseMap/houseMap.vue 红色定位图标变系统默认图标\n- 生产包中其他地图页（pages_transaction、pages_owner 等）用 @/static/... 也可能同样 500\n\n## 根因\n- 项目把公共图标拆到各分包 static 目录，scripts/prune-main-static.mjs 构建后删主包同名文件\n- 页面仍 import redImage from \"@/static/icon/location-red.png\"（主包绝对路径），产物路径不存在请求 500\n- 小程序不报编译错，只静默退回默认 marker\n\n## 解决方案\n- 需要图的页面把图标复制到自身分包 static 目录（如 src/pages_main/static/icon/location-red.png）\n- 在 utils 的 SUBPACKAGE_STATIC_IMAGES 映射表为该分包补文件名登记\n- 页面改用 import { resolveStaticUrl } from \"@/utils\" 后 const markerIcon = resolveStaticUrl(\"icon/location-red.png\", \"pages_main\")\n- 全仓排查同类 @/static/... import 写法改为带分包名 resolveStaticUrl；新增静态图先确认主包/分包，分包用图必登记映射\n\n## 验证与归属\n- 验证：会话 bb55af39（基线 8fc3cc5）报 location-red.png 500 与「改为用默认marker」\n- 涉及文件：pages_main/houseMap/houseMap.vue、utils/index.js、pages_main/static/icon/location-red.png、scripts/prune-main-static.mjs\n- 所属项目：苏住房C；来源会话ID：bb55af39-97ad-4deb-943d-2c10c3c7ff61；代码基线：8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/uploader_grid_zero.md",
+                "memory_type": "entities",
+                "after": "# 上传宫格因grid-auto-rows算零高度不显示\n苏住房C 人工添加房屋页 ImageUploader 因容器固定高 h-144 与 grid-auto-rows 按宽度算行高失准导致格子高度 0，整块上传组件不可见。\n\n## 问题现象\n- 人工添加房屋页面（pages_owner/house/owner/manual.vue）图片上传组件看不到灰色上传框\n- 同一组件在其他页面正常，此处用户描述「上传组件不显示」\n- 四列网格下每格约 36rpx，视觉上等于没显示\n\n## 根因\n- 容器被加 h-144（固定 144rpx 高），四列网格每格只剩约 36rpx\n- 组件用 grid-auto-rows 依据宽度反推行高，小程序环境测量常失准，行高算成 0 格子塌陷\n- 非组件未注册，而是高度被压成 0\n\n## 解决方案\n- 重写 ImageUploader 布局：每格 aspect-ratio:1 由宽度自带高度，叠加 min-height:144rpx 保底，删掉 h-144 与宽度测量行高逻辑\n- 在 pages_owner/house/owner/register.vue 显式 import 并注册 ImageUploader，避免分包下组件未注册同样不显示\n- 排查顺序：devtools 量格子实际高度是否为 0 → 查容器固定高与 grid-auto-rows/measure → 最后怀疑分包组件注册\n- 网格内图片/上传格子均不用 grid-auto-rows 推高度，用 aspect-ratio + min-height 双保险\n\n## 验证与归属\n- 验证：会话 3f889ff2（基线 5f0f4dc）用户先报「图片上传组件有问题」再报「上传组件不显示，按钮宽度太窄」\n- 涉及文件：components/ImageUploader/ImageUploader.vue、pages_owner/house/owner/manual.vue、pages_owner/house/owner/register.vue\n- 所属项目：苏住房C；来源会话ID：3f889ff2-2daa-476e-86b3-963833ee9ca2；代码基线：5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsbutton_block_style.md",
+                "memory_type": "entities",
+                "after": "# ZsButton的long/block类名无对应样式\n苏住房C 人工添加页底部提交按钮因父容器 align-items:center 且 long 类未定义，只按文字宽度撑开，需在组件内补 .zs-button--block{width:100%} 并改 stretch。\n\n## 问题现象\n- 人工添加页底部「提交人工审核」按钮宽度只到文字宽度，缩在左边一小截\n- 页面模板写了 long 类、父容器纵向 flex，但按钮既不铺满也不居中\n- ZsButton 的 block 属性同样因缺 .zs-button--block 规则不生效\n\n## 根因\n- 父容器用 align-items:center 覆盖默认 stretch，flex 交叉轴对齐后子项只按内容宽度撑开\n- 模板 long 类在项目样式中无定义，属无效类名不报错\n- 组件内原本没有 .zs-button--block 规则，传 block 属性不生效\n\n## 解决方案\n- 父容器由 align-items:center 改为 align-items:stretch\n- 按钮改用 ZsButton 的 block 属性，并在 components/ZsButton/ZsButton.vue 补 .zs-button--block { width:100% } 让类名有真实样式\n- 给 ZsButton 传类名/属性前先确认修饰类在组件样式确实存在，遇「样式不生效」优先核对类名再疑权重\n- 修复落 ZsButton 组件层，其他写 block 的按钮一并生效\n\n## 验证与归属\n- 验证：会话 3f889ff2（基线 5f0f4dc）用户报「按钮宽度太窄」\n- 涉及文件：components/ZsButton/ZsButton.vue、pages_owner/house/owner/manual.vue\n- 所属项目：苏住房C；来源会话ID：3f889ff2-2daa-476e-86b3-963833ee9ca2；代码基线：5f0f4dc"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

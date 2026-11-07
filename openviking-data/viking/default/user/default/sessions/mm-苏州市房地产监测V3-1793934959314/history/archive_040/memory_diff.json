@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793934959314/history/archive_040",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T05:16:24.849805+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/column_width_oscillation.md",
+                "memory_type": "entities",
+                "after": "# zs-table 列宽抖动修复\n苏州市房地产监测V3 修复 zs-table / zs-table-column 在大分辨率/高 DPI/系统缩放下列宽「一直跳」的问题。\n\n## 问题根因\n- 列表用封装的 `zs-table` / `zs-table-column`（智能列宽 + 剩余宽度均分）\n- `zs-table-column` 每次 Vue `updated()` 重新用 DOM 量列宽，量完 `doLayout()`，父表再 `distributeRemainingWidth()` 拉伸，布局变化又触发子列 `updated()`，形成闭环\n- 大分辨率/高 DPI/系统缩放下 `getBoundingClientRect()` 常在亚像素边界来回变 1px，列宽肉眼可见地抖动\n\n## 修改内容\n- `zs-table-column.vue`：去掉 `updated()` 全量 DOM 量测（打断反馈环），仅在挂载、表格数据引用变化、字典/选项变化时量测\n- 列宽对齐到偶数像素 + 2px 容差，避免 1px 振荡；合并 `requestAnimationFrame` 避免同帧多次量测\n- 字典异步加载完成后补一次量测（避免状态列偏窄）\n- `zs-table.vue`：用稳定的 `floor(getBoundingClientRect().width)` 计算可分配宽度\n\n## 验证与归属\n- 涉及文件：`zs-table-column.vue`、`zs-table.vue`\n- 所属项目：苏州市房地产监测V3\n- 来源会话ID：f256b057-029c-4ddc-84b5-b6e65fa514cf"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/filing_nav_fix.md",
+                "memory_type": "entities",
+                "after": "# 价格备案详情导航修复\n苏州市房地产监测V3 修复价格备案「备案列表」与「变更列表」共用页面时，变更菜单误进备案详情的问题。\n\n## 问题根因\n- 价格备案的「备案列表」与「变更列表」共用 `recordPriceMngSuzhou/index.vue`，列表点「查看」走公共方法 `buildDetailNavigation`\n- 变更菜单（如 `countychange`、`citychange`）详情组件是 `changeDetail`，但导航仍按 `detail` 匹配路由\n- `pathHint` 对不上任意 `detail` 路由时误命中第一个备案 `detail` 路由，从「价格备案变更(区县)」进了备案详情\n\n## 修改内容\n- 在 `zhi2-web-admin/src/utils/ruoyi.js` 的 `buildDetailNavigation` 中：当列表路由 `pathHint` 含 `change`（含 `countychange`、`citychange`、`filingschange`）时，解析 `changeDetail` 而非 `detail`\n- 若解析到的路由 path/name 不包含当前 `pathHint`，视为无效，回退为 `列表路径/${id}`（如 `.../countychange/{priceRecordId}`），避免跳错备案详情\n- 普通「价格备案(区县/市级)」「价格备案申请」等菜单逻辑不变\n\n## 验证与归属\n- 涉及文件：`recordPriceMngSuzhou/index.vue`、`zhi2-web-admin/src/utils/ruoyi.js`\n- 所属项目：苏州市房地产监测V3\n- 来源会话ID：dbc55dba-6010-4384-9d71-56be65335631"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/agency_basicinfo_check.md",
+                "memory_type": "entities",
+                "after": "# 机构基本信息接口调用排查结论\n苏州市房地产监测V3 排查确认经纪/租赁机构侧「机构基本信息」页面不存在开发企业侧的接口未调用问题。\n\n## 排查结论\n- 对经纪/租赁机构相关的「机构基本信息」「入网申请」等页面做对照\n- 经纪机构侧（AgencyBasicInfoDetail）没有与开发企业侧相同的接口未调用问题\n\n## 代码对照\n- 入口：`toB/agencyRecord/detail.vue`（租赁 `zljg/companyRecord/detail` 复用同一页）\n- `AgencyBasicInfoDetail.vue` 在 `created` 里无条件调用 `loadDetail()`，内部 B 端走 `getOwnCompany`，不依赖 `detailMixins` 的 `formMode === 'view'` 才 `init()`\n- 开发企业 `DeveloperBasicInfoDetail`（修前）存在差异\n\n## 验证与归属\n- 涉及文件：`AgencyBasicInfoDetail.vue`、`DeveloperBasicInfoDetail.vue`、`companyBasicInfo/detail.vue`\n- 所属项目：苏州市房地产监测V3\n- 来源会话ID：e15a1da6-99f2-4436-b12d-c0e94bfb9658"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/institution_register_creditcode_fix.md",
+                "memory_type": "entities",
+                "before": "# 经纪机构注册统一社会信用代码输入框显示修复\n苏州市房地产监测V3 修复经纪机构注册 Step1 统一社会信用代码输入框被 append 区域挤压的问题。\n\n## 变更说明\n- `Step1BasicInfo.vue` 将「统一社会信用代码」从 `append-buttons` 改为 `input-with-actions` 布局（与开发企业注册一致）\n- 输入框单独占 `flex: 1`，「查询/提取/重置」改为右侧 `link-action` 链接\n- 查询、提取在 loading 时显示「查询中...」「提取中...」并禁用点击\n- 补充 `data-testid`：`institution-register-btn-query`、`institution-register-btn-extract`、`institution-register-btn-reset`\n\n## 测试与归属\n- E2E `institution-register-extract.spec.js` 选择器改为 `getByTestId('institution-register-btn-extract')` 并增加断言\n- 所属项目：苏州市房地产监测V3；来源会话：4b2f9d95-14ba-4d66-a8c1-5657389a2a88",
+                "after": "# 经纪机构注册统一社会信用代码输入框显示修复\n苏州市房地产监测V3 修复经纪机构注册 Step1 统一社会信用代码输入框被 append 区域挤压的问题。\n\n## 变更说明\n- `Step1BasicInfo.vue` 将「统一社会信用代码」从 `append-buttons` 改为 `input-with-actions` 布局（与开发企业注册一致）\n- 输入框单独占 `flex: 1`，「查询/提取/重置」改为右侧 `link-action` 链接\n- 三个按钮包在 `.action-buttons` 容器内，`.input-with-actions` 设 `flex-wrap: nowrap`\n- 输入框 `flex: 1 1 19ch; min-width: 0` 可收缩为按钮让出空间，按钮组 `flex-shrink: 0`、组内间距 `8px`\n- 同类布局同步对齐至 `Step1CompanyInfo.vue`\n- 查询、提取在 loading 时显示「查询中...」「提取中...」并禁用点击\n- 补充 `data-testid`：`institution-register-btn-query`、`institution-register-btn-extract`、`institution-register-btn-reset`\n\n## 测试与归属\n- E2E `institution-register-extract.spec.js` 选择器改为 `getByTestId('institution-register-btn-extract')` 并增加断言\n- E2E `register-layout.spec.js` 经纪机构用例 `minUsciWidth` 由 240 调整为 180，新增 `assertInstitutionUsciActionsSameRow` 断言三按钮与输入框 Y 坐标对齐，4 个用例全部通过（含「提取中 USCI 不被截断」）\n- 所属项目：苏州市房地产监测V3；来源会话：4b2f9d95-14ba-4d66-a8c1-5657389a2a88、01447af2-d905-4a03-a903-55e9e5594222"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

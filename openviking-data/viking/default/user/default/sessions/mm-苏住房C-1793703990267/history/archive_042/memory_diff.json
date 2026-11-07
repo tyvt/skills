@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_042",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:33:54.897242+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/subpackage_icon_isolation.md",
+                "memory_type": "entities",
+                "after": "# 分包页面跨包引用图标不显示\n苏住房C 移动端「电子业主卡」页面图标全不显示，根因为微信分包隔离限制，须复制资源到本分包并改 subpackage。\n\n## 问题现象\n- pages_owner_extra 分包的「我的→电子业主卡」页面功能入口图标、箭头、背景图全部不显示\n- 路径用 subpackage/resolveStaticUrl 拼出来完全正确，开发者工具里也能找到文件，但真机加载失败\n\n## 根因\n- 微信小程序限制分包页面不能引用其他分包的静态资源，资源不在当前分包产物里则加载必失败\n- scoped 样式穿不透 ZsImage 内部 img，图标即使加载出来尺寸也是错的\n\n## 解决方案\n- 把图标资源整体复制到当前分包自己的 static 目录（images/xxx.png、icon/xxx.svg、背景 svg、箭头小图标一并复制）\n- 把 ZsImage 的 subpackage 从源分包改为当前分包，背景图与图标走 resolveStaticUrl 的地方同步改\n- 用 :deep() 修图标尺寸样式\n- 心智模型：页面在哪个分包，静态资源就必须在该分包或主包 src/static 下\n\n## 验证与归属\n- 验证：会话 9b333521 用户报电子业主卡图标不显示；结论复制 owner_nav_1~3.png/jiantou.png/question-dark.svg/Bg.svg 到 pages_owner_extra/static/，subpackage 从 pages_owner 改为 pages_owner_extra 并同步 resolveStaticUrl，加 :deep() 修尺寸\n- 涉及文件：src/pages_owner_extra/ownerCard/index.vue、src/pages_owner/ownerCard/index.vue、src/pages.json\n- 所属项目：苏住房C；来源会话ID：9b333521-93bd-4e07-8e91-b6a53dcd962f；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/echarts_label_cut.md",
+                "memory_type": "entities",
+                "after": "# 小程序柱状图数值标签右侧裁断\n苏住房C 小程序横向条形图金额标签被 canvas 裁断，根因为 grid.right 写死值不随最长标签动态留白。\n\n## 问题现象\n- 横向条形图金额标签显示不全，截图看像字体问题而非裁切\n- 表现为「数值缺尾巴/少一位」，易被误判成数据类型或 toFixed 问题\n\n## 根因\n- ECharts label.position:'right' 挂在柱子末端向容器外延伸，不参与 grid 计算\n- grid.right 写死小值（本项目原 12）时超宽标签直接被 canvas 裁断；containLabel:true 只补偿坐标轴管不到 series.label\n- 金额带千分位+两位小数+¥，标签宽度随数值增长，写死 right 必崩\n\n## 解决方案\n- grid.right 由常量改为按当前数据最长标签宽度计算：遍历 list 用同一 label 格式化函数生成文本取最长，按 字符数×字号 估算并给下限兜底（本项目 Math.max(88, maxLen*8)）\n- label.formatter 与估算必须共用同一函数（如 getChartAmountLabel），否则估算与实际渲染漂移\n\n## 验证与归属\n- 验证：会话 9f66fd77 用户诉求图表金额显示不全并附截图；结论提交 f4939ee4「fix(balancePublicity): 修复经营性收支公示图表金额显示不全」合入 mainv2.1\n- 仓库现行代码 pages_benefit/balancePublicity/index.vue 中 grid.right: getChartRightPadding(list)，getChartRightPadding 遍历标签取最长并按 Math.max(88, maxLabel.length*8) 兜底，label.formatter 与估算共用 getChartAmountLabel\n- 涉及文件：src/pages_benefit/balancePublicity/index.vue、components/echarts-uniapp/echarts-uniapp.vue、src/utils/index.js、src/utils/formatter.js\n- 所属项目：苏住房C；来源会话ID：9f66fd77-28bc-4259-95fb-94906c451e54；代码基线：c7d6817"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/relocate_require_path.md",
+                "memory_type": "entities",
+                "after": "# 分包体积优化脚本未改 require 路径\n苏住房C 构建脚本把 z-paging 复制进分包后未重写 require 路径，致分包启动报 module not defined。\n\n## 问题现象\n- 为压主包体积用脚本把 z-paging 从主包 relocate 到各分包（pages_transaction、pages_main、pages_owner_extra）\n- 构建产物跑通，真机/开发者工具一进分包页面就崩：Error: module 'pages_transaction/common/vendor.js' is not defined, require args is '../../../../common/vendor.js'\n\n## 根因\n- uni-app 编译产物里每个分包页面模块用相对路径 require 主包 common/vendor.js，相对层级按源码树原始位置生成\n- 脚本只做文件拷贝，被搬过去的 .js 仍保留原层级 ../../../../，在分包解析成不存在的 foo/common/vendor.js\n\n## 解决方案\n- relocate 脚本必须两步：拷贝 + 重写依赖路径，遍历目标分包内该组件全部 .js，把 common/vendor.js 的 require 路径按新深度改成真正指向主包\n- 脚本要支持对「已构建产物」二次执行修补（主包那份已删除时也要能跑，否则只能整包重建）\n- 修完在开发者工具重新编译，必要时先清缓存\n\n## 验证与归属\n- 验证：会话 498170bd 用户贴完整运行时错误栈（VM57 WASubContext, lib 3.7.12），结论定位为 relocate-z-paging.mjs 拷贝后未更新 require 路径，已改造脚本支持拷贝后动态修正+对已构建产物重新修补，dist 下三个分包均已修正\n- 涉及文件：scripts/relocate-z-paging.mjs、scripts/relocate-datetime-picker.mjs、scripts/validate-dist.mjs、package.json\n- 所属项目：苏住房C；来源会话ID：498170bd-f084-43ab-8e01-034612613ebd；代码基线：b7bf813"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zpaging_null_rows.md",
+                "memory_type": "entities",
+                "after": "# z-paging 返回 rows:null 致列表永久加载\n苏住房C 列表页用 z-paging 取数，接口返回 rows:null 时 res.rows.map() 抛错且 Promise 悬空，列表永远停在「正在加载」。\n\n## 问题现象\n- 列表/历史记录页用 z-paging 取数，接口无数据时返回 { total: \"0\", rows: null }\n- 页面写 res.rows = res.rows.map(el => ...)，未添加数据用户点进去一直转圈，不出现「暂无数据」\n- total 已是 0 说明请求成功，不能按「接口失败」方向查\n\n## 根因\n- null.map() 抛异常，发生在传给 paging 的查询函数内部，异常既没 resolve 也没 reject\n- z-paging 的 completeByTotal 永远不被调用，加载态无法收敛，表现「一直加载」而非报错或空态\n\n## 解决方案\n- 取值走可选链 + 默认空数组：res.rows?.map(...) || []，并把全项目同类写法对齐（tenant/history.vue 已有正确写法，house/history.vue 漏了）\n- 查询函数结尾补 .catch(reject)，保证接口异常时也能结束加载\n- 修好后空数据由 ZsPaging 默认空态承接\n\n## 验证与归属\n- 验证：会话 d96faf99 用户诉求未添加过房屋用户点击历史添加记录页一直加载期望显示暂无数据并附接口截图；结论 pages_owner/house/history.vue 的 res.rows.map 崩溃致 completeByTotal 不被调用，已改可选链+默认空数组并补 .catch(reject)\n- 涉及文件：src/pages_owner/house/history.vue、src/pages_owner/house/index.vue、src/hooks/usePaging.js\n- 所属项目：苏住房C；来源会话ID：d96faf99-8932-4fca-b475-a68344311240；代码基线：d43894b"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793849788328/history/archive_030",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T05:17:20.594005+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/asset_detail_nesting_fix.md",
+                "memory_type": "entities",
+                "after": "# 资产明细值区域嵌套与断行修复\n园区物管2.0 修复资产明细弹窗中因非法嵌套与断行导致的展示错乱问题。\n\n## 问题根因\n- `dict-tag` 组件根节点为 `<div>`，外层使用 `<span class=\"asset-detail-top__value\">`，块级 div 放入 span 导致浏览器自动拆标签、DOM 重排，flex 中「标签+值」不再成对，右侧列被挤窄。\n- `word-break: break-all` 在极窄列中任意位置断行，房屋编号、日期等短字符串被拆碎、逐字换行。\n\n## 解决方案\n- 值区域由 `<span>` 改为 `<div>`，与 `dict-tag` 块级根节点合法嵌套，flex 布局恢复正常。\n- 网格列改为 `minmax(0, 1fr)`，避免 grid 子项按最小内容宽度撑死列。\n- `.asset-detail-top__info-item` 加 `min-width: 0`，保证在 grid/flex 中正常收缩。\n- 值的 `word-break: break-all` 改为更合理的断行方式。\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/HouseAssetDialog.vue、VenueAssetDialog.vue、ParkingAssetDialog.vue、AdvertiseAssetDialog.vue、AssetLeaseInfoTable.vue\n- 所属项目：园区物管2.0；来源会话：f8f12066-4a2e-407f-8919-3b1feebdc139；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/map_label_ghosting_fix.md",
+                "memory_type": "entities",
+                "after": "# 地图行政区文字重影修复\n园区物管2.0 修复统计地图中苏州市等行政区文字重影问题。\n\n## 问题根因\n- `doMapPolygon` 用 `TMap.MultiLabel` 在行政区中心画名称（如「苏州市」），矢量底图默认还会画 POI 文字（`point`），市中心叠加两套字造成重影。\n- `styles` 仅定义键 `label`，但 `geometries` 使用不存在的 `styleId: 'area_label_style' + uid`，渲染异常。\n\n## 解决方案\n- `initMap` 为矢量底图增加 `baseMap` 并去掉 `point`，保留 `base`、`road`、`building`、`label`，避免与行政区中心自定义标签重复。\n- 修正行政区 `MultiLabel` 的 `styleId` 为 `'label'`。\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue、src/components/ZsTencentMap/mapLoader.js\n- 所属项目：园区物管2.0；来源会话：f3c5b382-87a4-49cf-9a4e-27efde2b94d2；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/asset_panorama_subcategory.md",
+                "memory_type": "entities",
+                "before": "# 资产全景经营资源子分类拆分与配色\n园区物管2.0 中资产全景页「经营资源统计分析」已适配 operatingResources 接口广告位子分类拆分。\n\n## 数据处理\n- assetPanorama/index.vue 已有 subCategory 解析：当 assetCategories 含 subCategory 时，环形图按子类展示（如「电梯广告」「室外广告」「其他广告」），不再合并为「广告位」。\n- 按样例显示 4 段：电梯广告(8)、临时摊位(1)、其他场地(2)、快递柜/驿站(2)；count 为 0 的子类被过滤。\n\n## 配色修复\n- 原先颜色优先取父级 category，导致广告位、公共场地的子类颜色相同；改为优先按 subCategory 名称取色，父级作兜底。\n- mock.js 已补充广告位与公共场地全部子类的颜色配置，mock 数据改为子分类结构。\n\n## 验证与归属\n- 验证：刷新资产全景页「经营资源统计分析」即可看到按子类拆分的环形图。\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue、src/api/benefit/assetPanorama.js、assetPanorama/mock.js\n- 所属项目：园区物管2.0；来源会话：a6a0fd71-ab08-4e2c-9280-8cd64cf07ee1；代码基线：none",
+                "after": "# 资产全景经营资源子分类解析适配\n园区物管2.0 资产全景页 `assetPanorama/index.vue` 已根据新接口结构更新 `operatingResources` 的解析逻辑。\n\n## 数据接口\n- `operatingResources.assetCategories` 现为扁平列表：同一 `category`（如「公共场地」）下有多条带 `subCategory` 的记录。\n- `subCategory` 为 `null` 时表示大类本身（如「广告位」）。\n\n## 解析逻辑\n- `parseAssetCategories` 自动识别：若列表中存在非空 `subCategory`，则按子类展示；否则用 `category`。\n- 展示名称：有 `subCategory` 用子类名（如「快递柜/驿站」「其他场地」），否则用 `category`（如「广告位」）。\n- 配色：仍按父级 `category` 取色（`operatingResourceCategoryColors` 中的「广告位」「公共场地」），子类与父类同色。\n- 其它字段 `count`、`ratio`、`regionAsset` 逻辑不变，区域条形图仍按区名读取。\n\n## 验证与归属\n- 按示例数据，环形图显示 `count > 0` 的 4 项：广告位(4)、快递柜/驿站(1)、其他场地(2)、临时摊位(1)，合计 8，与 `data.count` 一致。\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue、src/api/benefit/assetPanorama.js、assetPanorama/mock.js\n- 所属项目：园区物管2.0；来源会话：c124ec6d-cfdd-4039-bf13-b501e1b22a3a；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

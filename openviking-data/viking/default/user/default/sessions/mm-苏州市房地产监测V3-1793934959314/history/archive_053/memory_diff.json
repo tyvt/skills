@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793934959314/history/archive_053",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T05:58:14.295841+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/delivery_scope_rowkey_fix.md",
+                "memory_type": "entities",
+                "after": "# 交付范围表格多选列缺 row-key 警告修复\n苏州市房地产监测V3 的 DeliveryScopeSection 中 zs-table 使用多选列未提供 row-key，数据更新时报 [Vue warn] 错，已修复。\n\n## 问题根因\n- DeliveryScopeSection 的 zs-table 使用 zs-select-column 多选列\n- Element UI 的 ElTable 在有选择列且数据更新时必须提供 row-key\n- loadScopePage 设置 scopeList 时因缺 row-key 报错\n\n## 修复方案\n- 表格增加 :row-key=\"getRowKey\"\n- getRowKey(row) 返回 row.deliveryScopeId || row.buildingId\n- 已保存记录（服务端分页）使用 deliveryScopeId\n- 草稿楼幢（新建未保存）使用 buildingId\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：supervision/projectDelivery/components/DeliveryScopeSection.vue、src/components/zs-table、src/components/zs-table/zs-table.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：a11f72ad-6551-4d69-a2d0-e12bb33736a2"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/house_table_bizstate_fix.md",
+                "memory_type": "entities",
+                "after": "# 楼幢详情房屋子表误带 bizState 过滤修复\n苏州市房地产监测V3 的楼幢详情「房屋」子表 houseTable.vue 在 queryParams 固定带 bizState:'2'，导致只查已备案房屋，已改为去掉该字段。\n\n## 问题根因\n- houseTable.vue 的 queryParams 固定带 bizState: '2'\n- subTableMixins / table.js 的 getList 将其传给 GET /building/house/page\n- 结果只查已备案房屋，分页不符合预期\n\n## 修复方案\n- 去掉 bizState 字段，分页请求仅保留 pageNum、pageSize、buildingId（及有单元时的 unitId）\n- 未改动：detail.vue 楼盘表弹窗 getList、HouseDialog 选主房等其它 /building/house/page 调用、选许可证弹窗里的 bizState:'2'（非房屋分页）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：projectManagement/buildinginfo 下 houseTable.vue、table.js、detail.vue、HouseDialog.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：9a1689ee-8f4c-466c-8de7-f10950b6c863"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/parcel_dialog_required_fix.md",
+                "memory_type": "entities",
+                "after": "# 宗地信息弹窗取消必填校验修复\n苏州市房地产监测V3 的新增/编辑宗地信息弹窗 ParcelDialog.vue 取消字段必填校验与 GIS 绘制校验，已可空值保存。\n\n## 修改内容\n- rules() 改为返回空对象，地块编号、不动权证号、土地用途、面积、出让价格/日期、宗地坐落、四至范围等不再显示红星也不拦截提交\n- 去掉提交前「请绘制地图后再保存」的 gis 校验，地图 iframe 被拦截时仍可点确定保存（gis 可为空，需后端允许）\n\n## 备注\n- 若仅希望绘制非必填、其余字段仍必填，可只去 GIS 校验并恢复其它字段规则\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：projectManagement/customerProject/components/ParcelDialog.vue、ProjectCertificateTabs.vue、ParcelTable.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：260e58d6-3f0e-4efb-b6ab-5ed116832ca3"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/permit_address_fix.md",
+                "memory_type": "entities",
+                "before": "# 预售许可详情字段映射缺失致坐落为空\n苏州市房地产监测V3 预售许可详情接口返回 `projectAddress` 但表单绑定 `form.address`，未映射致「项目坐落」为空，已兼容修复。\n\n## 问题根因\n- `presale/permit/components/detail.vue` 详情接口返回 `projectAddress` 但表单绑定 `form.address`\n- `detailCallback` 未做字段映射致「项目坐落」显示为空\n\n## 修复方案\n- `detailCallback` 与 `handleProjectChange` 增加 `address: data.address ?? data.projectAddress` 兼容映射\n\n## 验证与归属\n- 验证证据：extracted source=cursor session=d7e90979-d433-4c59-ae3d-c5fc390cc9c4\n- 涉及文件：presale/permit/components/detail.vue、PermitInfoPanel.vue、presale/entrustSale/detail.vue、e2e/presale/presale-permit-real-api-flow.spec.js、e2e/fixtures/presale-permit-helpers.js\n- 来源会话ID：d7e90979-d433-4c59-ae3d-c5fc390cc9c4",
+                "after": "# 预售许可详情字段映射缺失致坐落为空\n苏州市房地产监测V3 预售许可详情接口返回 `projectAddress` 但表单绑定 `form.address`，未映射致「项目坐落」为空，已兼容修复。\n\n## 问题根因\n- `presale/permit/components/detail.vue` 详情接口返回 `projectAddress` 但表单绑定 `form.address`\n- `detailCallback` 未做字段映射致「项目坐落」显示为空\n\n## 修复方案\n- `detailCallback` 与 `handleProjectChange` 增加 `address: data.address ?? data.projectAddress` 兼容映射\n- 该写法与委托销售模块的 `normalizeDetail` 保持一致\n\n## 验证与归属\n- 验证证据：extracted source=cursor session=d7e90979-d433-4c59-ae3d-c5fc390cc9c4\n- 涉及文件：presale/permit/components/detail.vue、PermitInfoPanel.vue、presale/entrustSale/detail.vue、e2e/presale/presale-permit-real-api-flow.spec.js、e2e/fixtures/presale-permit-helpers.js\n- 来源会话ID：d7e90979-d433-4c59-ae3d-c5fc390cc9c4"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

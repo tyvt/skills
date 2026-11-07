@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793656674649/history/archive_028",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T22:41:07.922123+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dicttag_empty_eltag.md",
+                "memory_type": "entities",
+                "after": "# DictTag 空 type 传入 ElTag 导致校验失败\n产品2.0 中 DictTag 在 colorMap 模式会把空字符串传给 Element Plus 的 ElTag，触发 prop 校验告警，已改为传 undefined。\n\n## 问题根因\n- DictTag 在 colorMap 模式下将空字符串 `\"\"` 传给 Element Plus `ElTag` 的 `type` 属性\n- ElTag 的 `type` 合法值不含空串，传空串会触发 Vue 的 prop 校验失败告警\n- DictDataTable 中原本存在将值映射为 `\"\"` 的逻辑，加剧该问题\n\n## 解决方案\n- 在 `zhi2-web-admin/src/components/dict-tag/dict-tag.vue` 改传 `undefined` 替代空串\n- 去除 `DictDataTable` 中映射 `\"\"` 的逻辑，从源头避免空串流入\n\n## 验证与归属\n- 验证证据：src=2-0/017.md\n- 涉及文件：zhi2-web-admin/src/components/dict-tag/dict-tag.vue\n- 所属项目：2-0；来源会话ID：d39becce-af94-4451-b0d2-6ffd7cf94261；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/permsmixin_extra_perms.md",
+                "memory_type": "entities",
+                "after": "# permsMixin 缺 extraPerms 展开导致警告\n产品2.0 中 permsMixins.js 的 perms 计算属性展开 `...this.extraPerms`，部分列表页未实现该字段触发 Vue warn，已补默认空对象。\n\n## 问题根因\n- `permsMixins.js` 的 `perms` 计算属性通过 `...this.extraPerms` 展开混入字段\n- 部分列表页（如 `AnnouncementMsg`）未在组件中声明 `extraPerms` 字段\n- 访问未定义字段触发 Vue warn 警告\n\n## 解决方案\n- 于 `permsMixins.js` 增补默认 `extraPerms(){return{}}`，提供安全兜底\n- 组件内 computed 同名字段可覆盖 mixin 默认值，保持灵活扩展\n\n## 验证与归属\n- 验证证据：src=2-0/018.md\n- 涉及文件：permsMixins.js\n- 所属项目：2-0；来源会话ID：2f8cc0e9-9cb1-43cb-af76-79b01f8f468f；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/mainjs_createinstance_singleton.md",
+                "memory_type": "entities",
+                "before": "# main.js 重复 createInstance 导致全局组件二次注册\n产品2.0 中入口连续触发 createInstance 会使 registerGlobalComponents 重复注册组件并报已注册警告。\n\n## 问题根因\n- URL 带 token 等场景可能连续触发 createInstance（token 分支已创建，后续 else 再调一次）\n- registerGlobalComponents 重复 app.component 出现 `Component \"xxx\" has already been registered`\n- 与 token + iframe 双路径各调一次并列，需单例挂载 + 注册幂等双保险\n\n## 解决方案\n- createInstance 若 instance 已存在直接返回（挂载单例）\n- registerGlobalComponents 在 `app._context.components[name]` 已存在时 continue\n- 用 defineAsyncComponent(loader) 注册 glob 异步组件\n\n## 验证与归属\n- 验证证据：会话 1210ef9d，main.js:39 registerGlobalComponents 多次触发，已改幂等保护与单例 mount\n- 涉及文件：zhi2-web-admin/src/main.js\n- 所属项目：2-0；来源会话ID：1210ef9d-24f4-4452-a7cc-89267ce1e575；代码基线：none",
+                "after": "# main.js 重复 createInstance 导致全局组件二次注册\n产品2.0 中入口连续触发 createInstance 会使 registerGlobalComponents 重复注册组件并报已注册警告。\n\n## 问题根因\n- URL 带 token 等场景可能连续触发 createInstance（token 分支已创建，后续 else 再调一次）\n- registerGlobalComponents 重复 app.component 出现 `Component \"xxx\" has already been registered`\n- 与 token + iframe 双路径各调一次并列，需单例挂载 + 注册幂等双保险\n\n## 解决方案\n- createInstance 若 instance 已存在直接返回（挂载单例）\n- registerGlobalComponents 在 `app._context.components[name]` 已存在时 continue\n- 用 defineAsyncComponent(loader) 注册 glob 异步组件\n\n## 验证与归属\n- 验证证据：会话 1210ef9d，main.js:39 registerGlobalComponents 多次触发，已改幂等保护与单例 mount；src=2-0/017.md\n- 涉及文件：zhi2-web-admin/src/main.js\n- 所属项目：2-0；来源会话ID：1210ef9d-24f4-4452-a7cc-89267ce1e575；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/loadview_path_mapping.md",
+                "memory_type": "entities",
+                "before": "# 动态菜单 loadView 路径兼容映射\n后端下发的路由 component 字符串与前端 views 目录迁移改名不一致时，在 permission.js 的 loadView 增加旧路径到新路径的兼容映射表。\n## 问题背景\n- 后端路由 component 如 property/propertyManagementHouseDetail/index，前端 views 已改名，import.meta.glob 映射失败报 `[permission] loadView 未找到组件`。\n## 解决方案\n- 在 permission.js 的 loadView 增加「后端旧路径 → 前端新路径」映射表。\n- 日志输出 `原始 => 归一化后` 便于补映射。\n- 本批示例：houseInstructionExt/index→instruction/index；propertyHandoverInspectionRange/index→handover/index；propertyManagementHouseDetail/index→propertyManagementHouseConfirm/index。\n## 验证与归属\n- 验证证据：会话 9a9d1373 三条缺失组件经 loadView 兼容映射修复。\n- 涉及文件：zhi2-web-admin/src/store/modules/permission.js；所属项目：2-0；来源会话ID：9a9d1373-b7fc-470f-b1c6-c3488fb59dc9；代码基线：none。",
+                "after": "# 动态菜单 loadView 路径兼容映射\n后端下发的路由 component 字符串与前端 views 目录迁移改名不一致时，在 permission.js 的 loadView 增加旧路径到新路径的兼容映射表。\n## 问题背景\n- 后端路由 component 如 property/propertyManagementHouseDetail/index，前端 views 已改名，import.meta.glob 映射失败报 `[permission] loadView 未找到组件`。\n## 解决方案\n- 在 permission.js 的 loadView 增加「后端旧路径 → 前端新路径」映射表。\n- 日志输出 `原始 => 归一化后` 便于补映射。\n- 本批示例：houseInstructionExt/index→instruction/index；propertyHandoverInspectionRange/index→handover/index；propertyManagementHouseDetail/index→propertyManagementHouseConfirm/index。\n## 验证与归属\n- 验证证据：会话 9a9d1373 三条缺失组件经 loadView 兼容映射修复；src=2-0/017.md。\n- 涉及文件：zhi2-web-admin/src/store/modules/permission.js；所属项目：2-0；来源会话ID：9a9d1373-b7fc-470f-b1c6-c3488fb59dc9；代码基线：none。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

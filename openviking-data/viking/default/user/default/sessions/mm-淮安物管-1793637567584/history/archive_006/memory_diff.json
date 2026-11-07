@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-淮安物管-1793637567584/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T16:50:00.063257+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_operate_column_header.md",
+                "memory_type": "entities",
+                "after": "# zs-operate-column 表头白底误命中修复\n淮安物管 zs-operate-column 组件非 scoped 白底规则误命中表头 th 导致表头背景缺失的修复约定。\n\n## 现象\n- 列表「操作」列表头背景发白或与 #fafafa 表头不一致，固定右列叠层时像表头背景缺失。\n\n## 根因\n- 组件内非 scoped 规则 `.el-table .zs-operate-column-cell { background:#fff !important }` 同时命中 `label-class-name`/`class-name` 上的 th 与 td。\n- `!important` 压过 ZsTable `header-cell-style` 的 #fafafa。\n\n## 做法\n- 白底只限定表体：`.el-table__body-wrapper .zs-operate-column-cell` 与 `.el-table__fixed-body-wrapper .zs-operate-column-cell`。\n- 表头跟随 ZsTable 表头样式。\n- 未用 ZsTable 的页面需自行设 `header-cell-style` 或全局表头色。\n\n## 验证与归属\n- 验证：会话 90849550 dataStatistics 等页操作列表头背景异常，收窄选择器后表头恢复 #fafafa。\n- 涉及文件：zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue\n- 所属项目：淮安物管；来源会话：90849550-cbec-4e10-ad4a-35a4b2cf03ba；代码基线：0e429b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tagsview_more_zindex.md",
+                "memory_type": "entities",
+                "after": "# TagsView 更多下拉 z-index 收敛\n淮安物管 TagsView「更多」下拉 z-index 高于弹窗遮罩导致边线浮于遮罩上的修复约定。\n\n## 现象\n- 打开带遮罩的 Dialog 时，TagsView 右侧「更多」区域左侧 border 浮在遮罩上。\n\n## 根因\n- `.more-btn-wrapper`、`.dropdown-menu` 使用 `z-index:3000`，高于 Element UI 遮罩常见 2000 段。\n\n## 做法\n- `.tags-view-container` 设 `position:relative` + `z-index:8`（整体低于弹窗层、仍能盖住主内容下拉）。\n- `.more-btn-wrapper` 用 21、`.dropdown-menu` 用 22，仅在标签栏内部叠在滚动按钮（10～20）之上。\n- 微调容器 z-index 保持在 8～1999，勿再接近弹窗默认段。\n\n## 验证与归属\n- 验证：会话 a7d237af 遮罩打开时 more 按钮左边线明显压在遮罩上。\n- 涉及文件：zhi2-web-admin/src/layout/components/TagsView/index.vue\n- 所属项目：淮安物管；来源会话：a7d237af-56e5-49f4-a9d3-51c02c04b0cb；代码基线：0e429b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/complex_filing_entry.md",
+                "memory_type": "entities",
+                "after": "# 公共查询小区详情备案入口常驻\n淮安物管公共查询小区详情页下各子块备案入口无论是否有数据均须常驻显示的约定。\n\n## 约定\n- `publicQuery/complex/detail` 下业委会/物管会、管理主体、开户申请等子块：无论表格是否已有数据，右上角「××备案》」入口始终显示（与 propertyContractTable、buildingTable 一致）。\n\n## 反模式\n- 勿用 `v-if=\"!hasData\"` 或按 `hasIndustryData/hasPropertyData` 隐藏备案按钮。\n- 有数据时仍展示表格/详情，备案仅作跳转入口。\n\n## 验证与归属\n- 验证：会话 4a4ea16a 用户要求有数据时仍显示前往备案按钮；改 committeeTable、managementOrgPanel、regulatoryAccountPanel。\n- 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/components/committeeTable.vue、managementOrgPanel.vue、regulatoryAccountPanel.vue\n- 所属项目：淮安物管；来源会话：4a4ea16a-5909-4259-b187-a74d02887a92；代码基线：dc21427"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/building_vite_proxy.md",
+                "memory_type": "entities",
+                "after": "# 本地联调 building 接口 Vite 代理模板\n淮安物管 zhi2-web-admin 本地将 /api/2.0/building 代理到联调机的 Vite 配置写法约定。\n\n## 场景\n- `zhi2-web-admin` 本地把 `/api/2.0/building` 指到联调机。\n\n## 写法\n- 对齐 maintenance 代理：`target` + `rewrite`（`/api/2.0/building` → `/2.0/building`）+ `changeOrigin: true`。\n- `bypass` 里写 `req.headers['zhi-project-id']='homeland'` 并 `res.setHeader('full-url', target+rewrittenUrl)`。\n\n## 注意\n- 上游若要求保留 `/api` 前缀则不要 strip `/api`，按后端真实路径改 rewrite。\n- target IP/端口随环境替换。\n\n## 验证与归属\n- 验证：会话 05e9d9be 用户要求 /api/2.0/building 代理 192.168.1.158:9603 并参考 maintenance 配置。\n- 涉及文件：zhi2-web-admin/vite.config.js、env/.env\n- 所属项目：淮安物管；来源会话：05e9d9be-749c-4320-b671-df76d21301bb；代码基线：a87b1e9"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

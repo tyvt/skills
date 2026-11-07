@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_023",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T11:06:05.149201+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/mapoverview_city_highlight.md",
+                "memory_type": "entities",
+                "after": "# mapOverview 全市轮播高亮修复\n无锡地图 SVG 轮播在「全市」分支需为全部区县推入 geo regions 高亮项，否则视觉上全部不亮。\n\n## 问题根因\n- 单区轮播会对 highlightName 推入带 WUXI_GEO_HIGHLIGHT_ITEM_STYLE 的 regions 项\n- 轮播到「全市」时若 highlightName 设为 null 且 buildMapGeoCarouselRegions 对 !highlightName || highlightName==='全市' 直接 return regions（仅留江阴飞地 silent），则无区县带高亮 itemStyle，全部不亮\n\n## 修复方案\n- 全市分支仍遍历 WUXI_SVG_GROUP_REGIONS（除飞地外）为每个区县推一条与单区轮播相同的高亮样式与 wuxiGeoCarouselHighlightLabel()\n- 飞地 silent 项补上与「江阴市」单区时一致的 emphasis/itemStyle，使全市态与单区态视觉一致\n\n## 验证与归属\n- 验证：会话 d90e73b5 用户报全市应全部高亮却全部不亮；根因全市分支未设置 WUXI_GEO_HIGHLIGHT_ITEM_STYLE，改遍历区县加 regions 后修复\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue、zhi2-web-admin/src/views/benefit/mapOverview/mock.js\n- 所属项目：园区物管2.0；代码基线：3353ef164；来源会话：d90e73b5-e60c-4919-b4fa-937e9f6f410d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/platform_config_switch.md",
+                "memory_type": "entities",
+                "after": "# platformConfig 功能开关默认隐藏\n跨页面按钮展示可挂在 Vuex app.platformConfig，用严格等于 true 判定避免后端未下发时误开敏感操作。\n\n## 问题背景\n- 跨页面按钮（如「发布公告」）是否展示需统一控制在 Vuex app.platformConfig\n- 接口 /system/platformConfig/getInfo 对齐，初始对象声明 isShowPublishButton: undefined\n\n## 解决方案\n- 页面用 mapState 取出后，v-if 最前面加 isShowPublishButton === true，再叠原有 bizState/msgId/征集类型/publishState 等业务条件\n- 严格等于 true 时未配置或 undefined/false 一律不显示，避免后端未下发时误开敏感操作\n- 若产品要求「未配置则沿用旧逻辑」，改为 isShowPublishButton !== false 并文档化\n\n## 验证与归属\n- 验证：会话 f61307bd，app.js 增 isShowPublishButton，candidateCollect detail 发布公告按钮仅在 === true 且原条件满足时显示\n- 涉及文件：zhi2-web-admin/src/store/modules/app.js、zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue\n- 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：f61307bd-7d75-4fff-ad85-3385c42878ea"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/mixed_series_label.md",
+                "memory_type": "entities",
+                "after": "# 线柱混图去 series label\n数据沙盘 fundPanorama 等 ECharts 柱+双折线混图应去掉各 series label，仅保留 tooltip 避免顶部数字拥挤。\n\n## 问题根因\n- 柱与折线都设 label.show:true、position:'top' 会在图形上方叠满数字，展示型大屏只需形态对比\n\n## 解决方案\n- 统一将各 series 改为 label:{ show:false }，具体数值用 tooltip 查看\n- 删除仅服务标签的 labelFmtWan/labelFmtCount 等格式化函数，避免死代码\n\n## 验证与归属\n- 验证：会话 2f483f91 用户要求线柱混色图上方不显示数值；renderFundTrendMixed 三系列 label 改 false，tooltip 仍可用\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue\n- 所属项目：园区物管2.0；代码基线：f00310232；来源会话：2f483f91-4f7f-47c1-9cad-5b1a96c6ab37"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_dialog_rowkey.md",
+                "memory_type": "entities",
+                "after": "# zs-select-dialog row-key 必传\n打开 zs-select-dialog 默认勾选列时，宿主未传 row-key 会导致 ElTable 报警告，须显式传主键。\n\n## 问题根因\n- 组件内部默认 showCheckbox: true 会渲染选择列；宿主未传 row-key 时组件 rowKey 默认空字符串\n- 有选择列的 ElTable 在 data 变化时必须提供有效 row-key（同属「row-key 为空导致 tbody 不渲染」契约一类）\n\n## 修复方案\n- 弹窗显式传入与选中回填字段一致的主键，如物业管理区域用 row-key=\"complexId\"，与 handlePick/setProject 使用的 row.complexId 对齐\n- 其他业务对照列表主键字段（houseId、projectId 等）同理\n\n## 验证与归属\n- 验证：会话 300657ce，accountQuery/type.vue 选择弹窗未传 row-key，补 row-key=\"complexId\" 后警告消失\n- 涉及文件：zhi2-web-admin/src/views/maintenance/accountQuery/type.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue\n- 所属项目：园区物管2.0；代码基线：177bc3ce4；来源会话：300657ce-6fc5-408d-932e-3dc812b1084d"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

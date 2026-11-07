@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_032",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:12:05.353104+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/sfb_cherrypick_api_fork.md",
+                "memory_type": "entities",
+                "after": "# sfb分支cherry-pick接口分叉处理\n苏服办(sfb)分支与主分支在房屋核验失败逻辑上因API调用族不同而产生cherry-pick冲突，需保留目标分支API仅搬交互。\n\n## 背景与根因\n- 主分支修好「我的-添加房屋-核验失败缺少人工登记入口」后需pick到sfb分支\n- 原提交6f2df161冲突根因：sfb走verifyAndSubmitOwnerByToken（token换主信息独立通道），主分支走handleHouseOwner\n- 两侧业主核验提交接口已不是同一个，不能简单跟代码\n\n## 正确取舍\n- 保留目标分支(sfb)现有API调用方式，只补「核验失败→弹人工登记弹窗→走人工登记提交」交互\n- 凡是换了接口族/鉴权方式的代码段一律不跟，只跟交互与提示文案\n\n## 落地清单\n- 子模块zhi2-mobile-shimin在sfb分支解决冲突并提交fix(property): enhance house owner handling and error messaging，推origin/sfb\n- 父仓库切dev-sfb，只更新子模块指针（旧SHA→新SHA）再单独提交推送\n- 核对顺序：子模块先行、父仓库只更新指针，不混入本地环境文件\n- 分支对应：主分支suzhou-shiqu-suzhufang-main-v2.1，苏服办是父仓dev-sfb+子模块sfb，切回主分支时父仓与子模块都要checkout\n\n## 验证与归属\n- 会话90a7df70：用户诉求核验失败缺人工登记入口，需pick到sfb；解决后提交6cc8c352推origin/sfb，父仓提交929d4bb（子模块引用2a237c2→6cc8c352）推origin/dev-sfb\n- 涉及文件：addHouse.vue、api/property.js、api/index.js；所属项目苏住房C；代码基线5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/global_component_sink.md",
+                "memory_type": "entities",
+                "after": "# 全局组件下沉分包解决主包超限\nuni-app小程序主包上传体积上限2048KB，仅被单个分包使用的全局组件必须下沉进分包目录，否则白占主包体积。\n\n## 问题现象\n- 构建失败主包上传预估2055.4KB，超上限约7.4KB，磁盘主包1748.7KB\n- IntentionMyList只被pages_transaction/intention/list.vue使用，却因放src/components/被打进主包占约14KB\n\n## 根因\n- uni-app只要组件放全局src/components/下就无条件打进主包，与实际使用页面数无关\n- 小程序分包之间不能跨包引用组件，故组件正确位置是唯一使用方所在分包目录\n\n## 解决方案\n- 将IntentionMyList从src/components/IntentionMyList/移到src/pages_transaction/intention/components/IntentionMyList.vue，list.vue改相对路径导入\n- 重新构建后上传预估降至2046.0KB通过（余量约2KB）\n\n## 结论性约定\n- 新增组件先看消费者是否只在某一分包，是则放分包目录，不丢进src/components\n- 主包余量近0，后续全局组件/mixin/工具函数都会直接触发超限\n- 排查顺序：先量体积→再定位只被单个分包使用的全局组件→下沉，而非先删功能\n\n## 验证与归属\n- 会话1a74b0e2：构建失败日志限制2048KB/预估2055.4KB；移动后主包磁盘1748.7KB、上传预估2046.0KB通过\n- 涉及文件：list.vue、IntentionMyList.vue、src/components/IntentionMyList/；所属项目苏住房C；代码基线f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/dual_api_instance.md",
+                "memory_type": "entities",
+                "after": "# 双API实例架构与接口清单产出\nzhi2-mobile-shimin同时对接苏找房旧系统(V1)与新版服务(V2)，两套接口走不同代理不同axios实例，整理接口清单须按导出实例归类。\n\n## 实例划分\n- src/api/index.js对应V2，H5代理到VITE_APP_API_PROXY，路径前缀/api，共282个接口\n- src/api/v1Instance.js对应V1，代理到VITE_APP_API_PROXY_V1，前缀/szf，共57个接口\n- 看路径前缀看不出归属，必须看api方法从哪个实例导出\n\n## 接口清单产出方式\n- 按模块文件(property.js/common.js/article.js/transaction.js/security.js/file.js)逐个确认import来源是api还是apiV1再归类\n- 动态参数${id}统一替换成{id}占位；第三方外部接口(腾讯地图等)不计入\n\n## 业务分布\n- V1集中二手房交易、收藏/足迹、房源核验、网签合同、文章(/v2.0/article/*)、短信验证码、文件上传等苏找房旧系统能力\n- 新增功能优先走V2；改接口前先确认所属实例，否则路径对但代理错表现为404或打错服务\n\n## 验证与归属\n- 会话164e3d8a：用户要求整理接口按V1/V2区分生成markdown，产出API接口地址.md：V2 282个、V1 57个并说明V1覆盖业务\n- 涉及文件：index.js、v1Instance.js、property.js、common.js、article.js、transaction.js、security.js、file.js、API接口地址.md；所属项目苏住房C；代码基线83c4136"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/身份证号脱敏偏好.md",
+                "memory_type": "preferences",
+                "after": "- 明确要求身份证号不做脱敏，全局去掉字符脱敏逻辑，仅保留后端Desensitize-Flag:0请求头兜底\n- 姓名(blurName)、手机号(blurPhone/securePhone)脱敏逻辑保持不动，不顺手扩散\n- 具体改动：删utils/formatter.js的blurIdNumber与store/user.js的secureIdNumber；页面直接用完整字段(userStore.idNumber/form.idNumber/form.zjhm)\n- 家庭成员改从getFamilyMember取完整号，并删api/property.js的noDesensitize接口；列表组件无条件展示完整号\n- 原因：业主/租客需在自己业务看到完整证件号核对信息，展示层糊星妨碍确认，属稳定偏好而非临时需求"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

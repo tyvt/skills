@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_037",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:41:42.226315+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/detail_template_image.md",
+                "memory_type": "entities",
+                "after": "# DetailTemplate image 类型无后缀退化成链接\n产品2.0 的 zhi2-web-admin 中，DetailTemplate 查看态 type:'image' 会因 URL 无后缀而退化成可点链接而非缩略图。\n\n## 问题现象\n- 配置 type:'image' 的图片字段（如维保记录步骤图）显示成可点链接而非缩略图，尽管接口返回了图片地址\n- 已知 type:'link' 分支只认 item.link 的问题与此是 image 分支的另一个独立坑\n\n## 根因\n- type:'image' 分支按 URL 取后缀，仅 jpg/jpeg/png/gif/bmp/webp/svg 渲染 `<img>`，否则走「附件」分支用 detail-link 当链接\n- 设计初衷是避免把 PDF 等当图加载，但本项目图片地址常无后缀（如 /profile/xxx 或带 token 查询串）被误判为非图片\n\n## 修复做法\n- 查看模式改用 type:'images'，直接用 resolveServerAssetUrl 拼 `<img>`，不做后缀判断，无后缀站内图也能显示\n- 用计算属性把原始数据统一整理成字符串 URL 数组（兼容 url/fileSite/path/link 多字段、逗号分隔串），与编辑态 detailCallback 同源\n- 无图时回退 type:'text' 显示占位，保持空值「-」行为\n- 其他页面遇到「传了 type:'image' 却变链接」同理改 images + URL 数组，或在 detail-template 层放宽无后缀默认按图展示\n\n## 验证与归属\n- 来源会话 163b2e12-92bf-4951-9a98-c06e20a552e8；代码基线 64fa9e2\n- 涉及文件：zhi2-web-admin/src/views/dataProperty/recordProcess/components/recordProcessStepDialog.vue、zhi2-web-admin/src/views/dataProperty/scrappedRecord/detail.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/detail_container_reverse.md",
+                "memory_type": "entities",
+                "after": "# 详情页骨架依赖 detail-container 的 column-reverse\n产品2.0 的 zhi2-web-admin 详情页，页头必须放进 detail-container，套 list-container 会掉到页底。\n\n## 问题现象\n- 详情页「页头（返回/标题/附件/流程查看等 operation-btn-group）」跑到页面最底部而非顶部\n- 页面残留 list-container 包裹（列表页骨架写法）时页头掉到底部\n\n## 根因\n- 详情页骨架约定 detail-container 内部样式为 flex-direction: column-reverse，写在该容器内页头放 DOM 后面也渲染到顶部\n- 页头被放在外层 list-container 等普通纵向布局容器里，按 DOM 顺序排到表单内容下方\n\n## 修复做法\n- 详情页不要套 list-container，operation-btn-group 必须是 detail-container 的子节点\n- 新增/复刻详情页时对照同模块已正确页面（如 creditDeclarationComponents/detail.vue）核对骨架层级\n- 排查「页头位置错乱」先看元素落在哪个容器，再判断该容器是否依赖 column-reverse 反转\n\n## 验证与归属\n- creditChangeDeclaration/detail.vue 的页头被放在 detail-container 外的 list-container 中导致显示在底部，移入后恢复\n- 涉及文件：src/views/evaluation/creditChangeDeclaration/detail.vue、src/styles/index.scss；来源会话 7f4c692f-1a01-4348-afe9-003fd8ee2a08；代码基线 414029f~f59c6be"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/detail_form_refs.md",
+                "memory_type": "entities",
+                "after": "# 详情页仅 DetailTemplate 无编辑表单致保存无反应\n产品2.0 的 zhi2-web-admin 详情页，只渲染只读 DetailTemplate 而无 zs-form 时，编辑/保存会因 $refs.form 不存在被静默拦截。\n\n## 问题现象\n- 详情页点击「编辑」后页面无任何可编辑字段，点「保存」无反应、无报错\n- 保存链路 submitForm → validateForm 依赖 ref=\"form\" 表单实例，$refs.form 为 undefined 时校验直接失败并被静默拦截\n\n## 根因\n- 该详情页只渲染了只读 DetailTemplate，没有 zs-form；formMode 变 edit 但无对应编辑分支\n- 缺 $refs.form 的校验静默失败，表现为「点保存没反应」\n\n## 修复做法\n- 复用 DetailTemplate 的详情页若业务要求可编辑，必须补 formMode 分支：查看态走 DetailTemplate，编辑态渲染 zs-form（只放开允许编辑字段，其余只读）\n- 补校验规则；缺 $refs.form 的静默失败可从「保存无反应且无报错」直接联想\n- 排查口诀：编辑页「无字段可改」先查模板有没有 zs-form 分支，「保存无反应」先查 $refs.form 是否存在\n\n## 验证与归属\n- guaranteeDeposit/components/detail.vue 无编辑分支与 form ref，validateForm 因 $refs.form undefined 静默失败；参照 guaranteeDepositAccount/detail.vue 补 zs-form 后修复\n- 涉及文件：src/views/maintenance/guaranteeDeposit/components/detail.vue、src/views/maintenance/guaranteeDeposit/deposit/detail.vue、src/mixins/detailMixins.js；来源会话 b0ca50b6-00f0-4d36-8845-29a8aaad4b5c；代码基线 b0ca50b6~f59c6be"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/sign_js_verify.md",
+                "memory_type": "entities",
+                "after": "# sign.js 验签与 request.js 加解密是两套独立链路\n产品2.0 的 zhi2-web-admin 中，public/assets/js/sign.js 验签与 request.js 的 SM2/SM4 加解密是两套独立机制。\n\n## 问题现象\n- 浏览器控制台持续出现对 /api/v3.0/secret/key 的 404 请求\n- sign.js 在页面加载时拦截全局 XMLHttpRequest 和 fetch，请求该接口取签名密钥，环境里没有此接口时 404\n\n## 根因\n- sign.js 是一层「验签」逻辑，与 request.js 里的 SM2/SM4 加解密通信（keyExchange/requestCrypto/responseCrypto）是两套独立机制\n- sign.js 为业务接口自动附加 sign、nonce、timestamp 请求头\n\n## 移除做法\n- 移除验签要删三处：public/assets/js/sign.js 文件本身、index.html 里对 sign.js 和 crypto-js.min.js 的 script 引用（crypto-js 仅服务于验签）、vite.config.js 中 viteExternalsPlugin 的 crypto-js external 配置\n- request.js 的 SM2/SM4 加密链路与此无关，不能连带误删\n- 排查「每页都多一个请求」优先怀疑 index.html 里引的全局拦截脚本\n\n## 验证与归属\n- 删除 sign.js、清理 index.html 引用与 vite.config.js external 后，/api/v3.0/secret/key 404 消失；request.js 加密链路未动\n- 涉及文件：src/utils/request.js、src/utils/crypto/keyExchange.js、public/assets/js/sign.js、index.html、vite.config.js；来源会话 79a525ee-5819-4c89-ac6f-cb0b07af846f；代码基线 adc516a"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793713174058/history/archive_140",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T18:16:49.062246+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/menu_category_jump.md",
+                "memory_type": "entities",
+                "after": "# 跨项目跳转用 query 传菜单大类标题\n门户跳本项目时在 URL query 带菜单大类标识，本项目 navbar 在配置标题后追加括号显示。\n\n## 背景与原因\n- 同一后台被门户多个大类入口共用，navbar 仅显示配置名时使用户分不清来源入口。\n- 跨项目信息只能靠 URL 传参，这是唯一干净通道。\n\n## 解决方案\n- 门户侧跳转 URL 的 query 带大类编码（优先编码，不传中文名做业务判断）。\n- 本项目 navbar 读取 query，在配置标题后追加「（大类）」展示，不替换原标题。\n- 两端均改：门户前端子模块+主仓、本项目前端子模块+主仓，共 4 仓库分别提交 gitlink。\n- query 缺失时仅显示配置标题，不报错或空括号。\n\n## 验证与归属\n- 验证：会话 session-30a69780（基线 89e5947）用户诉求从门户跳本项目带大类标题追加 navbar。\n- 四仓库提交：门户前端子模块 bf5902a10、门户主仓 04cc4ec、房地产监测V3前端子模块 596d8a786、主仓 837bffd。\n- 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue、permission.js、.gitmodules；所属项目：苏州市房地产监测V3；来源会话：session-30a69780-4954-4a8a-935b-5ab33a65444e。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/appendix_config_misconfig.md",
+                "memory_type": "entities",
+                "after": "# 附件配置主数据错配导致提示与拦截不一致\n开发企业注册上传附件时页面提示 5MB 但实际拦截 0.48MB，根因是附件配置表 FILE_MAX_SIZE 误配而非代码 bug。\n\n## 背景与原因\n- 页面顶部提示取所有要件 fileMaxSize 最大值（5MB），真正拦截用该要件自身值（504000 字节≈0.48MB），导致不一致。\n- 「超过限制：0MB」是后端按字节换算整 MB（504000/1024/1024 取整=0）回显。\n- 双重提示叠加：后端按 file_type 字典名称回显「仅支持：Word、img、pdf」。\n\n## 解决方案\n- 先定位真相源：附件上限配在 COMMON_FRAMEWORK.T_APPENDIX_CONFIG（busCode+APPENDIX_CONFIG_ID 定位），修配置即可，无需改代码。\n- 回查同 busCode 下所有要件口径统一（本次 4 条要件统一为 5MB=5242880 字节）。\n- 隐患：页面上传提示用「取最大值」生成全局提示是潜在雷，建议按要件展示或统一口径。\n- 支持新格式顺序：先维护字典 img 的 remark，再放开前端白名单。\n- 用文件真实大小反推上限（509288 字节↔0.48MB）是快速定位配置错配手段。\n\n## 验证与归属\n- 验证：会话 session-6e4a0982（基线 a86bf95）禅道 Bug 5945，结论为配置主数据配错非代码 bug。\n- 配置对照：busCode=040100，授权委托书 5024000、受托人身份证件原件 504000 应改 5242880（APPENDIX_CONFIG_ID 2108475306731003905 / 2108475136693919746）。\n- 涉及文件：institutionRegisterAppendix.js、CompanyRegisterSingleForm.vue、RegisterUploadItem.vue、e2e spec；来源会话：session-6e4a0982-6141-4510-8f0a-ef5f2b44900c。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/line_filled_icons.md",
+                "memory_type": "entities",
+                "after": "# 线/面双态菜单图标替换方案\n顶栏与首页热门应用菜单图标换为 line/filled 两套 SVG sprite 资源，未选中线性、选中面性。\n\n## 背景与原因\n- 原 <img> 逐个引入 18 组×2 套=36 请求且无法 CSS 切换选中态。\n- SVG sprite 单文件全图标，<use> 按 id 引用，CSS 控制显隐尺寸。\n- 线性/面性是两套不同路径，必须分别入库。\n\n## 解决方案\n- 资源入库 public/assets/images/menu-icons/ 分 line/ 与 filled/ 目录。\n- 脚本 scripts/generate-navbar-menu-icons.mjs 生成 navbarMenuIcons.generated.html 由 Navbar.vue 注入，改图标集后重跑脚本不手改。\n- 标题→图标映射放 src/utils/menuPlatformIcons.js，未配置有效 meta.icon 时按菜单标题回退匹配。\n- 顶栏未选中取 line/、选中取 filled/；首页热门应用优先后台 meta.picture，无图时回退本地 menu-icons/filled。\n- 匹配不上时改映射表关键词，不改图标文件名硬凑。\n\n## 验证与归属\n- 验证：会话 session-1b69e852（基线 a86bf95）用户诉求按下载目录换菜单图标。\n- 完成 18 组 line/filled 图标替换，注入 SVG sprite，映射表维护。\n- 涉及文件：Navbar.vue、navbarMenuIcons.generated.html、menuPlatformIcons.js、home/index.vue、generate 脚本、menu-icons 目录；来源会话：session-1b69e852-fa02-43ca-8384-0d3cec1fde78。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/admin_phone_linkage.md",
+                "memory_type": "entities",
+                "after": "# 注册页管理员身份联动联系电话\n开发企业/机构注册页管理员选法人则联系电话只读取法人电话，选受托人则可改且切换时清空。\n\n## 背景与原因\n- 管理员=法人时联系电话是被引用值，改了会与法人信息不一致，故只读。\n- 管理员=受托人时独立主体可自填；切换身份若只改可编辑性不清空，会残留旧值。\n\n## 解决方案\n- 身份切换同时更新字段 disabled/readonly 状态，切受托人时清空原值（绑定值与显示 label 都清）。\n- 选法人时联系电话自动取法定代表人电话，字段只读。\n- 两注册页一致实现：CompanyRegisterSingleForm.vue 与 InstitutionRegisterSingleForm.vue。\n- 联动规则有 e2e 覆盖：company-register-branch.spec.js 与 institution-register-flow.spec.js。\n\n## 验证与归属\n- 验证：会话 session-472ff013（基线 a86bf95）用户诉求管理员身份联动电话清空。\n- 子模块提交 d27e1b95d fix(register): 法定代表人口径管理员联系电话跟随法人且不可修改。\n- 涉及文件：两个 SingleForm.vue、两个 e2e spec；来源会话：session-472ff013-180f-4f26-9208-d9b4e94c8c55。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

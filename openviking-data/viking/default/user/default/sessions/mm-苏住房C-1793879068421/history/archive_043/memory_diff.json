@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_043",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T14:02:04.173886+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/newhouse_enum_fix.md",
+                "memory_type": "entities",
+                "after": "# 最新楼盘页type与接口枚举未对齐修复\n苏住房C新房「最新楼盘」列表页因页面type直接当作halfYearAgo传给后端，导致查询条件错误返回空数据，已通过增加映射表修复。\n\n## 问题根因\n- `indexMore.vue`调用`listRecommendProject`时把URL参数`type`直接当作`halfYearAgo`传给后端\n- 在售楼盘type=0→halfYearAgo=0(后端枚举应为1)，最新楼盘type=1→halfYearAgo=1(后端枚举应为2)\n- 「最新楼盘」实际按「在售楼盘」条件查询，返回空数据；APP端用正确halfYearAgo=2故有数据\n- 源于2025年5月「最新楼盘调整」时页面type与接口枚举未对齐\n\n## 修复方案\n- `indexMore.vue`新增映射表`HALF_YEAR_AGO_MAP = { 0: 1, 1: 2 }`，将页面type正确转换为接口参数\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：src/pages_transaction/newHouse/indexMore.vue、src/api/transaction.js\n- 来源会话ID：86696cb3-e77a-4306-8d93-2aa391d79f46"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/auth_img_fix.md",
+                "memory_type": "entities",
+                "after": "# 不动产权证区分页图片空白修复\n苏住房C「如何区分不动产权证和房产证」页面(`authentication.vue`→`errorTipOne.vue`)图片空白，根因为CSS样式问题，已修复。\n\n## 问题根因\n- `ZsImage`组件内部设置`height: 100%`，外层`.img-box`无固定高度\n- 页面`.img-box .img`为scoped样式，无法穿透到`ZsImage`子组件内部`<img>`\n- 结果图片实际高度为0，只见灰色占位框与下方文字\n- 图片文件本身存在于`pages_transaction/static/images/szf/fcz_1~3.png`，非资源缺失\n\n## 修复内容\n- 修改`errorTipOne.vue`、`errorTip.vue`、`errorTipTwo.vue`三个文件\n- 使用`:deep(img)`穿透子组件，设置`height: auto`让图片按原始比例显示\n- 为`ZsImage`显式添加`subpackage=\"pages_transaction\"`确保静态资源路径解析正确\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：authentication.vue、errorTipOne.vue、errorTip.vue、errorTipTwo.vue\n- 来源会话ID：293e9168-99d3-401f-9f8a-68fd6f4853a1"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/h5_tab_intercept.md",
+                "memory_type": "entities",
+                "after": "# APP内嵌H5的Tab页拦截返回修复\n苏住房C在APP WebView内嵌H5场景下，已实现tab页拦截，任何回到H5 tab的行为都调用原生`backInfo`返回APP。\n\n## 问题背景\n- APP WebView中用户后退可能落到H5的tab页(首页、苏找房、慧物业、掌服务、我的)，但这些tab应由原生实现，不应在H5展示\n\n## 方案要点\n- 新增`utils/appNavigation.js`，检测原生APP环境(webkit/android/harmony，排除SZDJSBridge)时统一拦截\n- `uni.navigateBack`：若目标为tab页或栈中只剩一页→调用`backInfo()`\n- `uni.switchTab`：直接调用`backInfo()`\n- `uni.reLaunch`/`redirectTo`到tab页：调用`backInfo()`\n- tab页`onShow`(`tabBar.js`兜底)：展示tab时调用`backInfo()`\n\n## 修改文件与归属\n- 修改文件：`src/utils/appNavigation.js`(新建)、`src/utils/tabBar.js`\n- 所属项目：苏住房C(zhi2-mobile-shimin)；来源会话ID：34bbb144-2648-4883-b2f5-4039faa3aa6e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/owner_icon_fix.md",
+                "memory_type": "entities",
+                "after": "# 电子业主卡图标不显示分包限制修复\n苏住房C「我的→电子业主卡」页面图标不显示，根因为微信小程序分包不能引用其他分包静态资源，已通过将资源复制至当前分包修复。\n\n## 问题根因\n- 电子业主卡页面在`pages_owner_extra`分包，但图标却从`pages_owner`分包加载(投票选举、投票表决、报事报修、我要出售等导航图标及箭头、背景图)\n- 分包页面不能引用其他分包的静态资源，导致图标加载失败\n\n## 修复内容\n- 将图标资源复制到当前分包`pages_owner_extra/static/`：owner_nav_1.png、owner_nav_2.png、owner_nav_3.png、jiantou.png、question-dark.svg、szf/Bg.svg\n- 更新`pages_owner_extra/ownerCard/index.vue`：`subpackage`从`pages_owner`改为`pages_owner_extra`，背景图/问号图标`resolveStaticUrl`同步调整，用`:deep()`修复图标尺寸样式\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：pages_owner_extra/ownerCard/index.vue\n- 来源会话ID：9b333521-93bd-4e07-8e91-b6a53dcd962f"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

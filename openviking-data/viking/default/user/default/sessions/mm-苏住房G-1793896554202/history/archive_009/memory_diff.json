@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793896554202/history/archive_009",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T17:05:17.856069+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bg_company_admin.md",
+                "memory_type": "entities",
+                "after": "# B/G分离企业管理员保持G端展示\n苏住房G项目在B/G端分离改造中，企业管理员角色仍沿用G端展示与操作流程。\n\n## 角色区分\n- 企业管理员：isCompanyAdmin === true，行为与G端一致（G端菜单、不选管理区域、原有操作流程）\n- 从业人员：terminalType === 'B' && !isCompanyAdmin，登录后先选物业管理区域，三资模块按所选区域隔离\n- G端用户：terminalType !== 'B'，保持原逻辑\n\n## 主要改动\n- 新增 isCompanyAdmin 字段，在 getInfo 接口与 terminalType 同处获取并写入 store\n- store 提交：commit(\"TERMINAL_TYPE\", user.terminalType || null) 与 commit(\"SET_IS_COMPANY_ADMIN\", user.isCompanyAdmin === true)\n- 涉及文件：zhi2-web-admin/src/store/modules/user.js、getters.js、utils/projectContext.js\n\n## 验证与归属\n- 所属项目：苏住房G；来源会话：b5a23ac7-b66b-4ff9-8e21-ce2011adbf7d；代码基线：none\n- 验证证据：extracted source=cursor project=苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/personnel_role_fix.md",
+                "memory_type": "entities",
+                "after": "# 人员管理角色下拉框数据源错误修复\n苏住房G项目修复 toB 人员管理详情页角色下拉框硬编码机构类型导致的数据源错误。\n\n## 修改内容\n- 移除硬编码：form.organType 默认值由 '02' 改为 undefined\n- 新增 loadRoleOptions(organType)：按机构类型请求 /system/role/roles，无 organType 时清空选项\n- 新增 resolveAndLoadRoles()：优先用 form.organType，否则通过 companyRecordId 查询企业详情获取 organType\n- initDict()：普通新增/编辑调用 resolveAndLoadRoles()；变更场景按 res.data.organType 加载角色\n- setCompany(row)：企业类型变化时清空 roleIds 并重新加载对应角色列表\n\n## 涉及文件\n- zhi2-web-admin/src/views/toB/personnelRecord/components/detail.vue（主改）\n- 关联：register/components/accountInfo.vue、institution/personnel/detail.vue\n\n## 验证与归属\n- 所属项目：苏住房G；来源会话：4d653d37-aa8a-4614-b734-2b2e40476bec；代码基线：none\n- 验证证据：extracted source=cursor project=苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/lease_warning_fix.md",
+                "memory_type": "entities",
+                "after": "# 租赁合同忽略预警勾选修复\n苏住房G项目通过新增公共 mixin 统一租赁合同列表页预警合同勾选与忽略逻辑。\n\n## 新增公共 Mixin\n- 文件：zhi2-web-admin/src/mixins/leaseContractWarningMixin.js\n- 封装 isWarningContract（兼容 1/'1'/true）、isLeaseWarningSelectable、setWarningRowStyle、handleIgnoreWarning（校验+仅提交预警合同ID）\n\n## 修改的 4 个列表页\n- 经营用房租赁合同：预警合同 或 待提交（bizState=0）\n- 停车泊位租赁管理：预警合同 或 待提交/审核中（0/1）\n- 资源租赁合同：预警合同 或 待提交（0）\n- 收入合同（旧页）：同上\n- 各页统一将勾选列改为 :selectable=\"(row) => isSelectable(row)\" 避免 this 丢失；「忽略预警」按钮在未选中预警合同时禁用\n\n## 验证与归属\n- 所属项目：苏住房G；来源会话：1e8e4ca2-26cb-4b86-b061-d23f725e38ef；代码基线：none\n- 验证证据：extracted source=cursor project=苏住房G；涉及 zhi2-web-admin/src/mixins/table.js"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bizstate_dict_fix.md",
+                "memory_type": "entities",
+                "after": "# 开户申请已备案筛选字典编码对调修复\n苏住房G项目修复监管账户列表因字典编码对调导致「已备案/审核中」筛选结果相反的缺陷。\n\n## 问题根因\n- 筛选「已备案」实际传 bizStatus=1，但系统约定 1=审核中、2=已备案\n- detail.vue 按 bizState==1 审核、=='2' 已备案；列表却用 getDicts('BIZ_STATE')\n- UAT 环境该字典将 1、2 的文案与后端编码对调，导致选「已备案」查到审核中数据、反之同理\n\n## 修复方案\n- 在 zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/index.vue 将业务状态字典改为与详情页、全局 store 一致的 biz_state\n- 约定：biz_state（0待提交 1审核中 2已备案）；勿用 BIZ_STATE，部分环境 1/2 对调\n\n## 验证与归属\n- 所属项目：苏住房G；来源会话：7fa26724-2d29-4dbe-accb-87098bace420；代码基线：none\n- 验证证据：extracted source=cursor project=苏住房G；涉及 detail.vue"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/苏住房g.md",
+                "memory_type": "entities",
+                "before": "# 苏住房G\n苏住房G 是用户提及的一个 frontend 管理项目，包含房地产管理、企业登记等模块。\n\n## Description\n- Frontend zhi2-web-admin 涵盖房地产合同、企业登记、月度报告、评估等模块。\n- 用户积累了多个调试和重构的工作流。\n\n## Significance\n- 用于偏好和技术模式记忆的项目上下文。\n\n## 已知技术模式\n- detail_readonly_dual: 子表 readOnly 判断 formMode 和 bizState，仅编辑+草稿可操作。\n- showsave_formmode: showSave 在 operation-btn-group 中限制为 formMode=='edit'。\n- fee_declare_submit_edit_only: showSubmit 由 formMode 控制，编辑时隐藏。\n- rectification_bizstate_default: bizState 在 rectificationNotice index 中默认为 undefined。\n- company_change_bizstate_multivalue: bizState 不应是 companyChange 中的多值字符串 '1,2'。\n- pending_oper_headers: 审计仅在保存编辑和列表删除时。\n- change_double_fetch: 变更详情不应使用登记 detail 覆盖 form。\n- shell route storedPath: shell 路由在 getRouteFilePath 中返回 '' (见偏好)。\n- todo_shell_menu: single menu Layout shell mistaken as valid component.\n- jump_align_pattern: top nav + empty state link + URL preset trio change.\n- zsprint_panel_sizing: ZsPrint remove min-height to flow.\n- bizstate_search_bug: zs-search-form global multiple flip history.\n- filing_menu_config: empty state link old filePath parse fail.\n- dialog_col_width: dialog table column width minmax equal.\n- fee_declare_step_layout: step bar vertical to avoid overflow.\n- shared_api_filter_param: multi-page shared api specific param only at call site.\n- navbar_menu_width_sync: style and JS const sync 120px.\n- home_variant_ready_bug: homeVariantReady add roles second signal.\n- company_founding_asset_validation: companyManagement/detail.vue mandatory foundingDate/registeredAssets.\n- regulatory_agreement_print: frontend only adjusts field order by prototype.\n- log_feature_branch_sync: new files in both develop branches cherry-pick.\n- minus_score_dropdown_tooltip: dropdown flex with tooltip to prevent truncation.\n- bulk_import_feemode: bulkImportDialog requires feeMode else block.\n- area_cascade_clear: area.js mixin 集中实现级联清空，区域/街道变化清空下级，详情回显(_lastRegionCode比较)不清空。\n- fee_declare_noReject: request.js 支持 noReject 返回 res.data；错误文件 URL 用 window.location.origin + filePath 拼接；导入请求加 noMessage:true 避免重复提示。\n- screen_responsive_fix: 物业管理区域信息页小屏幕自适应修复，合并至 develop/v2.6.2 等分支。\n- study_panel_download_jump: 学习园地 StudyPanel 条件下载与详情跳转，新增 studyNav.js 映射 type 1-5。\n- work_bank_query_param: queryStartBank 统一传入 sourceModel 与 regionCode，新增 workBank.js 工具。\n- complex_query_api_param: 物业管理区域查询实际用 /property/complex/pageNew 与 pageNum/propertyTypes。\n- account_status_dict: 银行账户状态字典统一到 ACCOUNT_STATUS，销户编码6回显。",
+                "after": "# 苏住房G\n苏住房G 是用户提及的一个 frontend 管理项目，包含房地产管理、企业登记等模块。\n\n## Description\n- Frontend zhi2-web-admin 涵盖房地产合同、企业登记、月度报告、评估等模块。\n- 用户积累了多个调试和重构的工作流。\n\n## Significance\n- 用于偏好和技术模式记忆的项目上下文。\n\n## 已知技术模式\n- detail_readonly_dual: 子表 readOnly 判断 formMode 和 bizState，仅编辑+草稿可操作。\n- showsave_formmode: showSave 在 operation-btn-group 中限制为 formMode=='edit'。\n- fee_declare_submit_edit_only: showSubmit 由 formMode 控制，编辑时隐藏。\n- rectification_bizstate_default: bizState 在 rectificationNotice index 中默认为 undefined。\n- company_change_bizstate_multivalue: bizState 不应是 companyChange 中的多值字符串 '1,2'。\n- pending_oper_headers: 审计仅在保存编辑和列表删除时。\n- change_double_fetch: 变更详情不应使用登记 detail 覆盖 form。\n- shell route storedPath: shell 路由在 getRouteFilePath 中返回 '' (见偏好)。\n- todo_shell_menu: single menu Layout shell mistaken as valid component.\n- jump_align_pattern: top nav + empty state link + URL preset trio change.\n- zsprint_panel_sizing: ZsPrint remove min-height to flow.\n- bizstate_search_bug: zs-search-form global multiple flip history.\n- filing_menu_config: empty state link old filePath parse fail.\n- dialog_col_width: dialog table column width minmax equal.\n- fee_declare_step_layout: step bar vertical to avoid overflow.\n- shared_api_filter_param: multi-page shared api specific param only at call site.\n- navbar_menu_width_sync: style and JS const sync 120px.\n- home_variant_ready_bug: homeVariantReady add roles second signal.\n- company_founding_asset_validation: companyManagement/detail.vue mandatory foundingDate/registeredAssets.\n- regulatory_agreement_print: frontend only adjusts field order by prototype.\n- log_feature_branch_sync: new files in both develop branches cherry-pick.\n- minus_score_dropdown_tooltip: dropdown flex with tooltip to prevent truncation.\n- bulk_import_feemode: bulkImportDialog requires feeMode else block.\n- area_cascade_clear: area.js mixin 集中实现级联清空，区域/街道变化清空下级，详情回显(_lastRegionCode比较)不清空。\n- fee_declare_noReject: request.js 支持 noReject 返回 res.data；错误文件 URL 用 window.location.origin + filePath 拼接；导入请求加 noMessage:true 避免重复提示。\n- screen_responsive_fix: 物业管理区域信息页小屏幕自适应修复，合并至 develop/v2.6.2 等分支。\n- study_panel_download_jump: 学习园地 StudyPanel 条件下载与详情跳转，新增 studyNav.js 映射 type 1-5。\n- work_bank_query_param: queryStartBank 统一传入 sourceModel 与 regionCode，新增 workBank.js 工具。\n- complex_query_api_param: 物业管理区域查询实际用 /property/complex/pageNew 与 pageNum/propertyTypes。\n- account_status_dict: 银行账户状态字典统一到 ACCOUNT_STATUS，销户编码6回显。\n- bg_company_admin: B/G分离企业管理员保持G端展示，新增 isCompanyAdmin 字段写入 store。\n- personnel_role_fix: toB人员详情角色下拉移除硬编码 organType，按机构类型动态加载。\n- lease_warning_fix: 租赁合同列表新增 leaseContractWarningMixin 统一预警勾选与忽略。\n- bizstate_dict_fix: 监管账户列表改用 biz_state 字典修复已备案/审核中筛选对调。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

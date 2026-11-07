@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_056",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T13:05:19.184902+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/manual_audit_realname_empty_bug.md",
+                "memory_type": "entities",
+                "after": "# 人工审核实名提交证件类型为空bug\n提交人工审核实名时请求体为空导致后端报「证件类型不能为空」，根因是提交时读userStore被onShow清空。\n\n## 现象\n- 人工审核页提交 checkRepeatRealName 与 manualAuditRealName 请求体为空，后端返回 400 / code 1101「证件类型不能为空」。\n\n## 根因\n- 提交时才从 userStore 读取 idType、idNumber、username、nationality、oldIdNumber。\n- 上传身份证照片返回小程序触发 App.onShow → getUserInfo 清空 store 临时身份数据。\n\n## 修复方案\n- 在 FormManual.vue 的 onLoad 做一次性快照存本地 verifyInfo（含上述字段）。\n- 所有提交请求一律用 verifyInfo.*，不在提交时读 store。\n- 加快照兜底校验：快照为空提示「证件信息缺失，请返回上一步重新填写」并阻断提交。\n- 覆盖两条上游链路：非本地证件 FormNonLocal→humanReview()写store→FormManual；本地身份证 FormLocal→setTmpUserInfo()(idType='01')→FormManual?local=true。\n- 凡「上一步写store、下一步跨小程序前后台后提交」表单均按 onLoad 快照+提交校验模式处理。\n\n## 验证与归属\n- 所属项目：苏住房C；代码基线：6599714；来源会话ID：fe7db194-e3eb-4ff2-81a5-4fc5d0da76f3。\n- 涉及文件：zhi2-mobile-shimin/src/pages_my/verification/FormManual.vue、FormLocal.vue、FormNonLocal.vue、src/store/user.js。\n- 验证：会话贴出 getRepeatByIdTypeAndIdNumber 返回 code 1101 完整请求，结论确认 onLoad 快照与兜底提示。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/gateway_zs_param_pattern.md",
+                "memory_type": "entities",
+                "after": "# V1/V2网关请求参数统一进zs-param模式\n苏住房C的V1/V2接口经网关转发，业务参数须序列化进请求头zs-param，路径放zs-path。\n\n## 背景与坑点\n- V1/V2接口非REST直连，而是网关转发：zs-param放业务参数，zs-path放业务路径，另配zs-authorization、zs-sign、zs-source。\n- 踩坑：V1的listRecommendProject等接口只发空zs-param(\"\")，服务端取不到pageNo/pageSize。\n\n## 正确形态\n- V1示例：{\"zs-path\":\"/transaction/ProjectType/listRecommend\",\"zs-param\":\"{\\\"pageNo\\\":1,\\\"pageSize\\\":10,\\\"t\\\":{}}\",\"zs-authorization\":\"\",\"zs-sign\":\"\",\"zs-source\":\"v1\"}\n- V2示例：zs-path=/security/ctAuth/login、zs-param={\"username\":\"...\",\"password\":\"...\"}、zs-source=v2。\n\n## 统一处理做法\n- 拦截器层统一：GET把参数拼key=value&...塞进zs-param；POST把业务参数JSON.stringify后塞进zs-param（非body）。\n- V1、V2两种source都按此规则；空参数V1接口也必须显式给{\"t\":{}}骨架，不能留空串。\n- 新增api方法只写业务参数与路径，序列化对调用方透明。\n\n## 验证与归属\n- 所属项目：苏住房C；代码基线：653505a；来源会话ID：23766583-b4b2-4f89-a0e7-86314d84c9ae。\n- 涉及文件：zhi2-mobile-shimin/src/api/v1Instance.js、httpInstance.js、gateway.js、security.js、transaction.js。\n- 验证：会话指出V1的zs-param不对并给期望header，结论确认所有POST接口序列化进zs-param。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/face_verify_migration_workflow.md",
+                "memory_type": "entities",
+                "after": "# 从泰兴小程序迁移微信人脸核身实名认证\n苏住房C以泰兴小程序已跑通页面为模板，整体迁移居民身份证实名认证的人脸核身链路。\n\n## 迁移落地点\n- src/api/security.js 新增 weChatVerify，对接 /security/ctAuth/wechat/verify（与泰兴同名同路径）。\n- FormLocal.vue 参照泰兴 pages_common/verifyUser/index.vue 接入：温馨提示收集姓名与身份证号、用户协议与隐私政策勾选（未勾选不允许提交）、uni.startFacialRecognitionVerify 调起人脸、人脸成功 wx.login 拿 code 调 weChatVerify 完成实名、成功後 getUserInfo() 刷新并跳 AuthorizedSuccess。\n- 保留重复账号提醒（可继续认证或去登录）与人工审核兜底（人脸失败跳 FormManual）。\n- TypeChoose.vue 不改，入口仍进 FormLocal。\n\n## 前置条件与限制\n- 人脸核身仅微信小程序真机可用，H5需显式提示「请在微信小程序中进行实名认证」。\n- 需微信公众平台开通人脸核身能力，否则 startFacialRecognitionVerify 直接失败。\n- 非居民身份证（FormNonLocal）仍走人工审核；迁移后必须真机走完整流程验证，模拟器不具备。\n\n## 验证与归属\n- 所属项目：苏住房C；代码基线：4630e8e；来源会话ID：42b7efbf-3412-4580-bb0d-1b92c50a5d89。\n- 涉及文件：zhi2-mobile-shimin/src/pages_my/verification/FormLocal.vue、TypeChoose.vue、src/api/security.js、泰兴小程序/src/pages_common/verifyUser/index.vue。\n- 验证：用户诉求参考泰兴小程序实现迁移，结论列出六项接入点与两条注意事项。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/vote_decision_playername_empty_bug.md",
+                "memory_type": "entities",
+                "after": "# 投票选举结果记录姓名与决策人空bug\n选举记录列表与详情决策人姓名空白，根因是分组只留首行且enrich展开覆盖已取字段。\n\n## 现象\n- 接口 decisionOptionResponseAllList 返回 decisionPlayerName:\"李*丹\"，但选举记录列表左侧姓名空白，详情「决策人」也空。\n\n## 根因\n- pages_vote/elect/DecisionResult.vue 的 groupRecordRows 按 decisionResponseId 分组只保留同组第一条，未合并其它行 decisionPlayerName。\n- enrichRecordList 对列表项做 ...record 展开，把已从接口取好的姓名冲掉。\n\n## 修复方案\n- 分组/合并遍历同组所有记录，逐个字段取第一个非空值（至少合并 decisionPlayerName）。\n- 新增 buildRecordList，与决策模块 decision/common/DecisionResult.vue 同一取数口径：先从 decisionOptionResponseAllList 取姓名与选项再渲染。\n- enrichRecordList 只异步补充选项摘要，禁止整体展开 record 覆盖已有字段。\n- 详情页 ResultRecord.vue 自己按 ID 拉取决策人姓名，不依赖列表传参；选举与决策同构双份改一处同步另一处。\n\n## 验证与归属\n- 所属项目：苏住房C；代码基线：f1939b0；来源会话ID：35a00989-4b03-4dae-8d47-d5841ef5d71f。\n- 涉及文件：zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue、pages_vote/decision/common/DecisionResult.vue、pages_vote/elect/ResultRecord.vue、components/CardList/CardList.vue、api/autonomy.js。\n- 验证：会话贴出 detail 接口完整响应含 decisionPlayerName，结论归因分组丢字段与覆盖。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

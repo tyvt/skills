@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区G-1793789771992/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T10:58:16.781025+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/iframe_view_pool.md",
+                "memory_type": "entities",
+                "after": "# 智能问答iframe切页签强制刷新修复\n无锡市区G项目中，智能问答（iframe容器页）在答案生成中切页签再切回，页面强制刷新、内容丢失。\n\n## 问题根因\n- `AppMain.vue` 使用 `<router-view :key=\"$route.fullPath\" />` 且全项目无 keep-alive\n- 切页签即销毁 InnerLink 组件 → iframe 从 DOM 移除（流式请求中断）\n- 切回时 iframe 整页重载；iframe 不能用 keep-alive 修（DOM 摘下再挂回必然重载）\n\n## 解决方案\n- 采用 RuoYi 式 **iframe 视图池**方案：常驻渲染所有已打开 InnerLink 页签\n- 新建 `src/utils/innerLink.js`：池准入判定 `isInnerLinkRoute()` + src 拼接 `buildInnerLinkSrc()`（保留 token/deptId 与 `#` 哈希处理）\n- 新建 `src/layout/components/iframeToggle/index.vue`：iframe 池 v-for 常驻渲染所有已打开 InnerLink 页签\n- 新建 `src/layout/components/iframeToggle/InnerLinkFrame.vue`\n- 共改动 9 个文件，约 165 行\n\n## 验证与归属\n- 所属项目：无锡市区G\n- 来源会话：2a5bfa8e-2977-4228-8985-a83a230944d2\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/receipt_multivalue_dict.md",
+                "memory_type": "entities",
+                "after": "# 回单核销详情单据类型显示编码修复\n无锡市区G项目中，回单核销详情的「单据类型」列显示编码而非中文。\n\n## 问题根因\n- `relBusinessType` 字段存逗号分隔多值（如 `1,2`，一条合同可关联多个类型）\n- 原翻译逻辑只做单值精确匹配（`dictValue === \"1,2\"` 匹配不到），匹配失败原样显示编码\n\n## 解决方案\n- `VerificationReceiptDetailTable.vue`：移除原 formatter，改用作用域插槽渲染，新增 `contractTypeText()` 按逗号拆分后逐个查字典翻译，再用顿号拼接（`1,2` → `经营资产、停车位`）\n- 未匹配到的编码仍回退显示原值；插槽渲染对字典加载响应式，消除「列表先于字典返回导致整列显示编码」时序隐患\n- `VerificationReceiptDetailDialog.vue`：`contractTypeLabel()` 同样升级为多值拆分翻译，逻辑一致\n- 已知限制：编辑弹窗「合同类型」为单选下拉，对已存在多值 `1,2` 无法回显（属交互设计问题，本次未动）\n\n## 验证与归属\n- 所属项目：无锡市区G\n- 来源会话：65ea08fa-ce59-454d-b8a6-f105c14c87a0\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/config_no_request.md",
+                "memory_type": "entities",
+                "after": "# 平台配置详情页未调接口修复\n无锡市区G项目中，`zhi2-web-admin` 平台配置详情页不调用接口，表单全空。\n\n## 问题根因\n- `src/views/system/platformConfig/detail.vue` 是单例配置页，路由上无 id\n- 公共 mixin `mixins/form.js` 的 `getDetail()` 先执行 `validateDetailRequiredParams()`，发现 id 为空就跳过请求（控制台打印 `[getDetail] 缺少接口必需参数，已跳过请求：id`）\n\n## 解决方案\n- 在该页面 `methods` 中重写 `getDetailRequiredParams()` 返回 `{}`，跳过 mixin 的 id 必填校验\n- 详情接口路径本已重写为不带 id 的 `/system/platformConfig/getInfo`，修复后进入 view 模式即正常调接口回填数据\n\n## 涉及文件与归属\n- 涉及文件：`zhi2-web-admin/src/views/system/platformConfig/detail.vue`、`mixins/form.js`、`mixins/detailMixins.js`\n- 所属项目：无锡市区G\n- 来源会话：ab2855cc-75e4-4430-85d8-acdddf2c429b\n- 代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

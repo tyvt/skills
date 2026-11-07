@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793713174058/history/archive_138",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T18:13:51.913448+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/el_upload_promise_false.md",
+                "memory_type": "entities",
+                "after": "# el-upload before-upload 异步返回 false 拦截失效\n禅道 Bug 5798 揭示 el-upload 的 before-upload 写成 async 返回 Promise<false> 无法拦截上传，且前端白名单须与后端字典对齐。\n\n## 问题根因\n- 测试环境未部署：测试环境构建时间 2026-10-27 11:46 早于首次修复提交 5424755ae（19:56），线上产物仍是旧白名单 [\"png\",\"jpg\",\"jpeg\",\"pdf\"]\n- 代码未修到位：before-upload 写成 async 并返回 Promise<false>\n- Element UI 的 before-upload 支持 Promise，但仅在 resolve 出 File/Blob 时才采用返回值，返回 Promise<false> 走 reject/其他分支，文件照样提交\n- 异步函数返回假值在 JS 语义上是 Promise<false> 而非 false，正是踩坑点\n\n## 修复方案\n- before-upload 的同步校验分支必须 return false\n- 若校验本身异步，应让 Promise reject 而非 resolve 成 false，否则拦截无效\n- 白名单与后端一致：后端按字典 sys_dict_data(file_type) 的 remark 判定（img = .png, .jpg），前端不能另写更大名单\n- 接收 .jpeg 时先维护字典 img 的 remark 再放开前端白名单，顺序不能反\n\n## 验证与排查\n- 标准排查顺序：先比对测试环境构建时间 vs 修复提交时间，再核对代码是否真的修到位，两原因可能同时存在\n- 修复上线客观判据：写产物校验脚本 node e2e/scripts/check-testenv-appendix-build.mjs 返回 0 表示修复已上线\n- 回归覆盖新增 8 条用例 + 相关既有链路回归（公司注册要件 3 条），再回写禅道\n\n## 涉及文件与归属\n- 涉及：zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementGrid.vue 等（AnnexUpload、institutionRegister 相关）\n- 来源会话 session-eeaa919a-8892-4f7c-b26b-70f4ed5ab48f；代码基线 a86bf95；禅道 Bug 5798"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/zentao_bug_writeback.md",
+                "memory_type": "entities",
+                "after": "# 禅道 Bug 闭环回写规范\n修完代码提交推送后须将禅道 bug/任务状态改掉并写备注，否则测试看到未解决且单子挂看板。\n\n## 状态与指派\n- bug 置 resolved（已解决）+ 解决方案 fixed + 解决版本 trunk（主干）\n- 任务置 done，登记消耗工时、剩余工时归零\n- 指派回提单人让其验证，不要自己留着\n\n## 备注六段式\n- 根因 → 修复 → 验证 → 改动文件 → 待办（环境侧/后端侧未完成事项写明，如“测试环境需重新构建发布后再验证”）\n- 操作历史核对：确认 zt_action 新增记录存在且 action=resolved、extra=fixed 与备注一致\n\n## 提交号与复查\n- 若 rebase 导致提交号变化，禅道备注提交号同步更新（如从 036e3ba85 更新为 0fd25ef15）\n- 写回后复查禅道页面状态与指派人再回复用户\n- 无关文件（public/version.json、report.html、临时脚本、.tmp-evidence/）不夹带进提交，未验证项显式列为待办\n\n## 验证与归属\n- 来源会话 session-eeaa919a（bug 5798 回写）、session-975f5f14（任务 2131 置 done 指派回戴志超）、session-c850280a（Bug 5971 指回 zhunan）\n- 示例：bug 5798 解决人 tiany / 2026-10-30 11:06:11，zt_action #83849"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/parent_dist_e2e_url.md",
+                "memory_type": "entities",
+                "after": "# 构建产物落父仓库根 dist 与 E2E 静态站约定\n本项目构建产物在父仓库根 dist/ 而非子模块，E2E 须显式设 E2E_BASE_URL 指向静态站否则 playwright 自动拉 dev server。\n\n## 构建与部署\n- 父仓为 npm workspaces 根（workspaces: [\"zhi2-web-admin\"]），但 vite.config.js 的 rootDir 指向上一级\n- 因此 outDir/envDir 上移，构建产物在父仓库根 dist/ 而非 zhi2-web-admin/dist\n- deploy/nginx.conf（监听 8098）的 root 同指父仓库根 dist/\n\n## E2E 约定\n- playwright.config.js 未设 E2E_BASE_URL 时会挂 webServer: npm run dev，与“不启 dev server 只走 nginx 静态站”硬约定冲突\n- E2E 前显式设置 E2E_BASE_URL 指向静态站（如 http://127.0.0.1:8098）让 playwright 走静态站\n- deploy/nginx.conf 注释禁令当硬约束读：把 E2E_BASE_URL 指到静态站是为让 e2e 跑真实产物\n- 交付验证结论基于部署站点而非 dev server\n\n## 验证与归属\n- 来源会话 416a4ff8-360e-45ae-a95e-7e170ffdcd65；基线 a86bf95\n- 涉及文件：zhi2-web-admin/vite.config.js、playwright.config.js、deploy/nginx.conf、package.json"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/check_label_width_conflict.md",
+                "memory_type": "entities",
+                "after": "# check 脚本禁 label-width 与历史口径冲突\nnpm run lint 当前整体失败，check:label-width 禁一切 label-width 与 2026-09-23 要求搜索区显式 70px 防换行互相打架。\n\n## 实测结果\n- npm run lint 为 eslint 加 7 个 check 脚本串行；当前整体失败不可写“通过”\n- label-width 退出码 1（11 文件）、amount-input-placeholder 1（1 处）、dialog-picker-suffix 1（5 处），其余 0\n- 扫描规模：dialog-form-layout 扫 2236 Vue 文件、dialog-double-effective 扫 123 双列弹窗\n\n## 口径冲突\n- check:label-width 禁模板一切 label-width，但旧记忆要求搜索区显式 70px 防换行\n- 11 处命中混两类（真违规 + 按旧口径该保留），修一条必破另一条，口径未定前不批量改\n- 例外：label-width=\"0px\" 承担布局语义（去标签宽度占满控件）不能删\n- 同页“窄容器三列+label-width=auto”与“编辑/查看态两套配置”是不同根因不混谈\n\n## 文档规范\n- 写验证文档如实报告每个脚本退出码与命中数，不美化为 lint 通过\n- 命中数区分两类混合，台账显式标冲突（如 E-004 与 E-019 互引标“口径未定前修一条必破另一条”）\n\n## 验证与归属\n- 来源会话 416a4ff8-360e-45ae-a95e-7e170ffdcd65（基线 a86bf95）本轮只读核对 2026-10-30\n- 涉及 check 脚本 7 个及 docs/frontend/common-errors.md、verification.md"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:52:36.302775+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_tree_arrow_noexpand.md",
+                "memory_type": "entities",
+                "after": "# 行政区域树点击箭头不展开根因与修复\n苏住房G项目物业管理区域查询页左侧行政区划树点展开箭头无反应，根因为node-key不稳定叠加异步默认展开失效。\n\n## 问题根因\n- node-key='areaCode'不稳定：接口返回的areaCode可能重复或为空，破坏el-tree内部节点映射，表现「点了没反应」\n- 绑定:current-node-key受控值与不稳定key配合，重渲染时干扰展开状态\n- default-expanded-keys对异步数据天然失效：树数据接口返回后才赋值，初始化展开已跑完，赋data不重放默认展开\n\n## 解决方案\n- node-key改为加载时补全的唯一id（遍历treeData生成/补id后赋值）\n- 删掉:current-node-key和无效default-expanded-keys\n- 数据加载完成回调里手动setCurrentKey+展开根节点\n- 设:expand-on-click-node=\"false\"避免点文字触发筛选与展开打架\n- 排序列表无匹配时回退使用接口返回的完整区县数据\n\n## 验证与归属\n- 验证：会话bd3cdf70用户报「部门树不展开」，结论列三点根因并修复为node-key=\"id\"+补唯一id+移除受控key+手动展开根节点+expand-on-click-node=false+无匹配回退\n- 涉及文件：publicQuery/complex/index.vue、property/complex/components/RegionTreeLayout.vue、property/complex/components/regionTree.vue\n- 所属项目：苏住房G；代码基线：4e59087；来源会话：bd3cdf70-1309-4f6d-b4b3-b918206e8052\n\n## 关联区分\n- 与已知「node-key类型与setCurrentKey入参类型不一致」不是同一坑：那条是类型不匹配，本条是key本身不唯一+异步默认展开失效"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_container_reverse.md",
+                "memory_type": "entities",
+                "after": "# 统计页标题按钮被反转至底部根因\n苏住房G项目统计展示类页面套全局.detail-container后标题栏与操作按钮组出现在页面最底部，视觉完全颠倒。\n\n## 问题根因\n- 全局.detail-container为表单详情页设计，样式写flex-direction: column-reverse\n- 目的是让模板最后面的操作按钮固定在视觉底部，代价是DOM第一个子元素（标题栏）被排到最底部\n- 页面DOM顺序本身没错，查模板/v-if/CSS优先级都查不出，难联想到「容器把顺序反了」\n\n## 解决方案\n- 先判断页面性质：有表单提交语义、需操作按钮常驻底部才用.detail-container\n- 纯统计/看板/多维汇总类页面（月报统计、信用申报统计）应换.list-container，标题与按钮组回到顶部\n- 不要靠页面里写order或加flex-direction:column !important硬掰，会与容器底部按钮策略打架\n\n## 验证与归属\n- 验证：会话c63cd57e用户问「标题和按钮组怎么到页面最下面去了」，结论明确原因为column-reverse，已改外层容器为list-container\n- 涉及文件：publicQuery/monthlyReportStat/detail.vue、publicQuery/monthlyReportStat/index.vue\n- 所属项目：苏住房G；代码基线：320507d；来源会话：c63cd57e-5fe2-4369-a1ab-b24c51627de2\n\n## 关联区分\n- 已知detail-container经验多是滚动所有权、底部白条高度、间距叠加，本条补「方向本身被反转」这一独立根因"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/status_col_rowlevel.md",
+                "memory_type": "entities",
+                "after": "# 同列按行层级切换字典与开关渲染\n苏住房G项目机构银行权限列表「启用状态」列需市级行显示字典文字、区级行显示可操作开关，同列按行运行时分流。\n\n## 问题根因\n- 列渲染形态是列级配置，列上写死type:'switch'或type:'dict'后整列只能同一种\n- 切换分层后字典没转换：走switch分支的行不触发字典翻译，走dict分支的市级行拿不到options，两条链路各自漏一半\n- 用户否掉「统一成开关」「统一成文字」两种偷懒做法\n\n## 解决方案\n- 该列从纯配置改成插槽/自定义渲染，渲染处先判当前行层级（市级/区级标志字段）\n- 市级分支渲染dict文案（显式传options或dict-url，不指望组件按prop自动推字典）\n- 区级分支渲染开关并绑状态变更事件，两分支共用同一份字典options来源\n- 改完手动点「市级→区级→市级」验证切层后不残留上一种形态\n\n## 验证与归属\n- 验证：会话60af88ee用户依次反馈「启用状态显示不正确」→「点完市级再点区级还是显示成文字」→「市级字典、区级开关」→「市级字典没转换」\n- 涉及文件：system/regionBankAuth/index.vue、system/regionBankAuth/detail.vue、mixins/listMixins.js\n- 所属项目：苏住房G；代码基线：864b409；来源会话：60af88ee-274a-46dc-82a1-ad6da4012c53\n\n## 关联区分\n- 与已知「查看态误用开关控件」「有无类字段字典选型」区别：那两条是选错控件/字典，本条是同列按行运行时分流"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tree_table_btn_hidden.md",
+                "memory_type": "entities",
+                "after": "# 左树右列表页新增按钮被溢出挤出\n苏住房G项目打印配置等「左菜单树(200px)+右列表」布局页表格正常但右上角「新增」「删除」按钮看不到，根因为布局溢出。\n\n## 问题根因\n- 合并分支/恢复业务代码时丢失中间table-container包裹层，右栏list-card直接落进横向flex并带width:100%\n- 200px树+100%右栏=超出容器宽度，操作按钮右对齐定位被挤出可视区，表现像「按钮没渲染」\n- 最易误判为权限不足或v-if条件不成立，实际是纯布局溢出\n\n## 解决方案\n- 按同类正确页（fjflpz/index.vue）恢复三层结构：list-container(flex row)→左menu-tree，右table-container显式width:calc(100% - 200px)→里面放list-card（表格+操作按钮）和弹窗\n- 排查：元素面板看按钮节点是否存在DOM（存在=布局问题，不存在=条件/权限），再看右栏计算宽度是否等于父容器100%\n- 顺手补busCode校验提示（请先选择左侧菜单业务编码），避免按钮修好后点下去还是空\n\n## 验证与归属\n- 验证：会话d409e8fd用户报tool/print/index.vue「新增按钮不显示」，结论指develop/v2.6.2合并恢复丢失table-container，按fjflpz恢复结构并为handleAdd增busCode校验\n- 涉及文件：tool/print/index.vue、mixins/subTableMixins.js、components/zs-button/zs-button.vue\n- 所属项目：苏住房G；代码基线：9fb6c2c；来源会话：d409e8fd-ad8b-47a8-999b-763e63e18e32"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793857471066/history/archive_016",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T06:39:50.755312+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/guarantee_deposit_end_fix.md",
+                "memory_type": "entities",
+                "after": "# 房屋质量保证金协议终止页修复\n产品2.0 项目修复房屋质量保证金协议终止（add 模式）页面数据未加载与路由错误问题。\n\n## 修改文件\n- guaranteeDepositAgreementEnd/index.vue（终止页 detail.vue）\n- guaranteeDepositAgreement/index.vue（协议详情页）\n\n## 问题根因\n- add 模式下 detailMixins 不会调用 init()，虽写了 loadAgreementById 但从未执行，页面字段为空\n- 跳转用 detail 路由拼接 add，可能生成错误路径（如 ...Endadd），触发错误详情接口请求，报「请求参数格式错误或类型不匹配」\n\n## 主要改动\n- 终止页 detail.vue：在 created 中根据 agreementId 自动加载协议数据，并清除 sessionStorage 缓存避免覆盖\n- 协议详情页：跳转改为使用列表路由 guaranteeDepositAgreementEnd/index + /add，确保路径正确\n- 展示优化：从协议详情带过来的数据（物业管理区域、开发企业、物业服务企业、建设单位及协议信息）以只读方式展示，不再显示「点击选择协议」\n\n## 验证与归属\n- 验证：从协议详情页点击「终止」应自动带出相关信息，只需填写终止原因和附件\n- 所属项目：产品2.0；来源会话：c2c05a52-f049-49d4-a534-d9c5df814673；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/guarantee_account_detail_fix.md",
+                "memory_type": "entities",
+                "after": "# 房屋质量保证金账户明细子表修复\n产品2.0 项目修复房屋质量保证金账户明细（缴存/支用明细）查到其他账户数据及资金缴存列表重置问题。\n\n## 修改文件\n- guaranteeDepositAccount/detail.vue\n- AccountDetailTable.vue（子表组件）\n\n## 问题根因\n- 路由复用时 form 保留上一次访问的 accountId；子表在详情接口返回前就挂载并用旧的 accountId 请求数据\n- detailCallback 用 { ...this.form, ...data } 合并，若接口未返回 accountId 旧值不被覆盖\n- 子表只传 accountId/account，未传 propertyProjectId（物业管理区域）；subTableMixins 在 created 时自动调 getList()，可能在过滤参数就绪前发起请求\n- 资金缴存列表重置时 handleQuery() 在区域树就绪前执行，parentDeptId 未带上就请求接口\n\n## 主要改动\n- guaranteeDepositAccount/detail.vue：子表在 !loading 且 resolvedAccountId（form.accountId 就绪）后才请求数据，并补全 propertyProjectId 过滤条件\n\n## 验证与归属\n- 验证：余额为 1856.53 元却出现 266.62 元记录，说明子表查到其他账户数据，修复后应仅显示当前账户\n- 所属项目：产品2.0；来源会话：a2b93bb4-760d-4bb3-93a2-a4c0506cfb2f；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/property_contract_api_fix.md",
+                "memory_type": "entities",
+                "after": "# 物业合同列表接口路径与参数修复\n产品2.0 项目修正物业合同列表接口实际路径并注入 B 端当前项目 complexId。\n\n## 修改文件\n- property/propertyContract/components/index.vue（列表页）\n- property/propertyContract/components/detail.vue（详情页）\n\n## 主要改动\n- 列表接口实际路径为 /property/propertyContract/page（moduleName + businessName + apiSuffix）\n- 列表页 index.vue 在 getQueryParams 中，B 端（terminalType === 'B'）从全局 store 读取当前选中项目并作为 complexId 传给列表接口\n- 该组件被以下页面共用：物业服务合同备案、前期物业服务合同备案、合同变更 / 解聘等\n\n## 验证与归属\n- 所属项目：产品2.0；来源会话：35c4f338-b3f4-4660-b726-f1bf15f29ea7；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/lease_filing_style_fix.md",
+                "memory_type": "entities",
+                "before": "# 租赁合同备案模块样式统一修复\n产品2.0 项目在三个租赁合同备案模块统一修复列表页与详情页样式问题。\n\n## 修改文件\n- assetsLeaseContractFiling/index.vue 与 detail.vue（经营资产租赁合同）\n- resourcesLeaseContractFiling/index.vue 与 detail.vue（经营资源租赁合同）\n- parkingSpaceContractFiling/index.vue 与 detail.vue（停车泊位租赁管理）\n\n## 主要改动\n- 列表页说明文字对齐 pubHouseTable 的 operation-hint：左对齐带橙色警告图标，正文 #333 仅标记橙色，上下内边距 8px\n- 修复经营资产、停车泊位页面表格标签多余的 >\n- 详情页基本信息标题 Headline 补充 titleText=\"基本信息\" 避免标题缺失\n- 查看模式 basicInfoList、payeeInfoList 增加 lg/xl:12 两列布局配置\n\n## 验证与归属\n- 所属项目：产品2.0；来源会话：8331b045-2515-4a08-946d-7d95ffaf7dd5；代码基线：none",
+                "after": "# 租赁合同备案模块样式统一修复\n产品2.0 项目在三个租赁合同备案模块统一修复列表页与详情页样式问题。\n\n## 修改文件\n- assetsLeaseContractFiling/index.vue 与 detail.vue（经营资产租赁合同）\n- resourcesLeaseContractFiling/index.vue 与 detail.vue（经营资源租赁合同）\n- parkingSpaceContractFiling/index.vue 与 detail.vue（停车泊位租赁管理）\n- src/styles/index.scss（全局样式）\n\n## 主要改动\n- 列表页说明文字对齐 pubHouseTable 的 operation-hint：左对齐带橙色警告图标，正文 #333 仅标记橙色，上下内边距 8px\n- 修复经营资产、停车泊位页面表格标签多余的 >\n- 详情页基本信息标题 Headline 补充 titleText=\"基本信息\" 避免标题缺失\n- 查看模式 basicInfoList、payeeInfoList 增加 lg/xl:12 两列布局配置\n- 列表容器增加 lease-contract-list 类，搜索区与表格卡片之间统一为 12px 间距\n- 操作栏垂直居中：标题/按钮行与预警说明合并为 list-card-header，操作栏使用 min-height: 48px + padding: 12px，内容垂直居中\n- 说明文字对齐：预警说明纳入表头区域，上下内边距均为 12px\n- 详情页 houseTable.vue 资产列表「面积」列改用 amountFormatter 显示千分位（如 1000 → 1,000）\n\n## 验证与归属\n- 所属项目：产品2.0；来源会话：8331b045-2515-4a08-946d-7d95ffaf7dd5、e48b01c6-3065-4048-9afa-2de4be8dac2a；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

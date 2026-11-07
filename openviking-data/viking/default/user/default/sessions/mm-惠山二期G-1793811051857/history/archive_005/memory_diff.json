@@ -1,0 +1,58 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-惠山二期G-1793811051857/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T17:07:23.296477+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/events/2026/11/04/全选楼幢改动审查暂不合并.md",
+                "memory_type": "events",
+                "after": "# Summary\n对惠山二期G「全选楼幢」相关改动的 Vue 代码审查已完成，结论为建议先不要合并。主要问题在 general 的 DecisionRangeTable.setData：用户点过任一楼幢后 buildingTableData 非空，确定只提交当前楼幢，全选其它楼幢勾选会丢失；election 的 setData 与 preparatory 的 handlePick 从完整 treeData 汇总，逻辑正确。其它问题：exist==1 户室在 initHouseChecked 被标 checked='1'，提交若不过滤可能重复入库；isAllBuildingsSelected 依赖 $refs.dialog.treeData，仅改楼盘表时按钮文案可能不刷新；筹建列表 checked 混用数字 0 与字符串 '1'。本地 eslint 已跑完（命令成功），大量报错来自其它文件与本次改动无直接关系。建议优先修 general 的 setData，再统一提交侧对 exist 过滤与 checked 类型。来源会话 da4d5f02。\n# 2026-11-04 (Wednesday) ChatLog:\n**user**: 【记忆类型】preference\n【标题】Briefly inform the user ab\n【内容】「全选楼幢」相关改动的 Vue 审查已完成。 **结论：建议先不要合并**，主要问题在 **general 的 `DecisionRangeTable.setData`**：只要用户点过任一楼幢，`buildingTableData` 非空后确定只会提交**当前楼幢**，全选其它楼幢的勾选会丢；election 的 `setData` 和 preparatory 的 `handlePick` 从完整 `treeData` 汇总，逻辑是对的。 另外还有：`exist==1` 户室在 `initHouseChecked` 里被标成 `checked='1'`，提交若不过滤可能重复入库；`isAllBuildingsSelected` 依赖 `$refs.dialog.treeData`，仅改楼盘表时按钮文案可能不刷新；筹建列表里 `checked` 混用数字 `0` 与字符串 `'1'`。 本地 eslint 已跑完（命令成功），输出里大量报错来自其它文件，与本次改动无直接关系。 若要改代码，优先修 general 的 `setData`，再统一提交侧对 `exist` 的过滤和 `checked` 类型。需要我直接改可以说一声。\n【验证证据】extracted source=cursor project=惠山二期G\n【涉及文件】涉及文件：d:/repository/惠山二期G/zhi2-web-admin、d:/repository/惠山二期G/zhi2-web-admin/src/views/autonomy/mixins/decisionRangeBuildingSelectMixins.js、d:/repository/惠山二期G/zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue\n【所属项目】惠山二期G\n【来源会话ID】da4d5f02-fc36-4e8c-8717-0c4503f50d5e\n【代码基线】none\n【语言要求】请用简体中文抽取并写入记忆，不要输出葡萄牙语或其他语言。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/惠山二期g技术/sso_window_fix.md",
+                "memory_type": "entities",
+                "after": "# SSO新窗口跳转修复\n惠山二期G 后台 SSO B端授权页通过新窗口打开跳转的缺陷修复。\n\n## 问题根因\n- 原代码 window.open('about:blank', '_blank', 'noopener,noreferrer')，加 noopener 后父页面拿不到新窗口引用（newWindow 为 null），空白页停在 about:blank；手动点击链接正常。\n\n## 修复方案\n- 去掉 noopener,noreferrer，保留对子窗口的跳转控制权\n- 跳转前设置 newWindow.opener = null，断开与原页面关联\n- 用 location.replace(url) 替代 location.href，避免多余历史记录\n- 等待期间在新窗口显示「正在跳转，请稍候...」\n\n## 涉及文件与归属\n- 涉及文件：zhi2-web-admin/src/views/sso/bTerminalRedirect/index.vue、src/views/sso、src/layout/components/Sidebar/RecursiveMenu.vue、src/store/modules/permission.js\n- 所属项目：惠山二期G；来源会话：7ffb3be2-f8de-4608-8768-cc04a3088249；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/惠山二期g技术/voting_items_fix.md",
+                "memory_type": "entities",
+                "after": "# 选项表决附件显示修复\n惠山二期G 后台选项表决详情查看表决项时附件显示不正确的修复，已合并三个分支。\n\n## 问题根因\n- VotingItemsDialog.vue 查看模式中 detailCallback 将 ownerFileList 转成对象数组（含 url、name 等字段），但 contentInfo 里用 this.form.ownerFileList.join(',') 对对象数组执行 join 得到 [object Object]，导致附件显示异常。\n\n## 修复方案\n- 将 value 直接传对象数组，由 DetailTemplate 的 getAttachmentFiles 正确解析并展示（label: '其他材料', value: this.form.ownerFileList）。\n\n## 分支合并情况\n- develop/v2.6.1 提交 13adf4dab\n- develop/v2.6.2 提交 c151152cc（cherry-pick）\n- 另有一分支已合并（来源会话未列全提交号）\n\n## 涉及文件与归属\n- 涉及文件：zhi2-web-admin/src/views/autonomy/option/components/VotingItemsDialog.vue\n- 所属项目：惠山二期G；来源会话：462b8a83-d68c-46cb-bae9-7553f60772a3；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/floor_area_required.md",
+                "memory_type": "entities",
+                "before": "# 预测建筑面积前端去除必填校验\n惠山二期G 后台房产变更与详情页预测建筑面积 predictFloorArea 前端去除 required 校验，后端异常需同步调整。\n\n## 修复方案\n- 在 zhi2-web-admin/src/views/building/houseChange/detail.vue 与 house/detail.vue 的 computed.rules 中删除 predictFloorArea 的 required: true 校验。\n- 若后端保存仍报空值异常，需同步调整后端的校验规则。\n\n## 验证与归属\n- 验证证据：src=惠山二期G/009.md\n- 涉及文件：zhi2-web-admin/src/views/building/houseChange/detail.vue、zhi2-web-admin/src/views/building/house/detail.vue\n- 所属项目：惠山二期G；来源会话：925383ae-ed0a-489f-85a3-b976ba1ec9e0；代码基线：none",
+                "after": "# 预测建筑面积前端去除必填校验\n惠山二期G 后台房产变更与详情页预测建筑面积 predictFloorArea 前端去除 required 校验，后端异常需同步调整。\n\n## 修复方案\n- 在 zhi2-web-admin/src/views/building/houseChange/detail.vue 与 house/detail.vue 的 computed.rules 中删除 predictFloorArea 的 required: true 校验。\n- 若后端保存仍报空值异常，需同步调整后端的校验规则。\n\n## 当前仍必填项（未改动）\n- 项目名称、楼幢号、单元名称、房号、实测建筑面积、物理层、名义层、房屋用途\n\n## 验证与归属\n- 验证证据：src=惠山二期G/009.md；两个文件均无 linter 报错，页面「预测建筑面积」标签前不再显示红色 *，清空后保存应能通过前端校验\n- 涉及文件：zhi2-web-admin/src/views/building/houseChange/detail.vue、zhi2-web-admin/src/views/building/house/detail.vue\n- 所属项目：惠山二期G；来源会话：925383ae-ed0a-489f-85a3-b976ba1ec9e0；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/惠山二期g技术/house_change_project_required.md",
+                "memory_type": "entities",
+                "before": "# 房屋信息变更项目前置校验\n房屋信息变更（houseChange）弹窗未选项目时楼幢/单元查询返回全量数据，已加项目与楼幢前置校验。\n\n## 问题根因\n- zhi2-web-admin/src/views/building/houseChange/detail.vue 楼幢弹窗 filterParams: { projectId } 未选项目时 projectId 为 undefined → 后端返回全部项目楼幢\n- 单元查询原先也未带 buildingId 过滤，同样返回全量\n\n## 修复方案\n- openBuildingDialog：无 projectId 时提示「请先选择开发项目」并 return，不打开弹窗\n- openUnitDialog：新增 buildingId 前置校验，并补 filterParams: { buildingId }\n- setProject：切换项目时清空已选楼幢/单元，避免残留旧项目数据\n- UI 层保留 :disabled=\"!form.projectName\" 作为双重保险\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=惠山二期G\n- 涉及文件：zhi2-web-admin/src/views/building/houseChange/detail.vue、zhi2-web-admin/src/views/building/buildingChange/detail.vue\n- 所属项目：惠山二期G；来源会话：11ad0957-fe32-4048-b697-514a71caef0a；代码基线：none",
+                "after": "# 房屋信息变更项目前置校验\n房屋信息变更（houseChange）弹窗未选项目时楼幢/单元查询返回全量数据，已加项目与楼幢前置校验。\n\n## 问题根因\n- zhi2-web-admin/src/views/building/houseChange/detail.vue 楼幢弹窗 filterParams: { projectId } 未选项目时 projectId 为 undefined → 后端返回全部项目楼幢\n- 单元查询原先也未带 buildingId 过滤，同样返回全量\n\n## 修复方案\n- openBuildingDialog：无 projectId 时提示「请先选择开发项目」并 return，不打开弹窗\n- openUnitDialog：新增 buildingId 前置校验，并补 filterParams: { buildingId }\n- setProject：切换项目时清空已选楼幢/单元，避免残留旧项目数据\n- UI 层保留 :disabled=\"!form.projectName\" 作为双重保险\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=惠山二期G；另见 src=惠山二期G/013.md\n- 涉及文件：zhi2-web-admin/src/views/building/houseChange/detail.vue、zhi2-web-admin/src/views/building/buildingChange/detail.vue\n- 所属项目：惠山二期G；来源会话：11ad0957-fe32-4048-b697-514a71caef0a；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/house_required_remove.md",
+                "memory_type": "entities",
+                "before": "# 房屋详情页取消六字段前端必填校验\n惠山二期G 项目房屋详情页移除六个字段前端必填校验的修改模式。\n\n## 修改要点\n- 在 houseChange/detail.vue 与 house/detail.vue 的 computed.rules 移除 floorStart、floorEnd、buildingStructure、plannedUse、buildingProperty、deliveryType 的 required: true\n- 表单项 prop 与数据绑定未改动，留空时前端不再拦截保存，后端报错需同步调整接口\n- 仍保持必填的字段：项目名称、楼幢号、单元名称、房号、预测/实测建筑面积、物理层、名义层、房屋用途\n\n## 验证与归属\n- 验证证据：src=惠山二期G/006.md\n- 涉及文件：views/building/houseChange/detail.vue、views/building/house/detail.vue、views/building/houseChange/index.vue、mixins/detailMixins.js、views/benefit/pubHouseDetailChange/detail.vue、mixins/form.js、package.json\n- 所属项目：惠山二期G；来源会话：c5a4d977-566c-4ca9-8964-c533818a64d6；代码基线：none",
+                "after": "# 房屋详情页取消六字段前端必填校验\n惠山二期G 项目房屋详情页移除六个字段前端必填校验的修改模式。\n\n## 修改要点\n- 在 houseChange/detail.vue 与 house/detail.vue 的 computed.rules 移除 floorStart、floorEnd、buildingStructure、plannedUse、buildingProperty、deliveryType 的 required: true\n- 表单项 prop 与数据绑定未改动，留空时前端不再拦截保存，后端报错需同步调整接口\n- 仍保持必填的字段：项目名称、楼幢号、单元名称、房号、实测建筑面积、物理层、名义层、房屋用途（预测建筑面积已改为非必填，见 floor_area_required）\n\n## 验证与归属\n- 验证证据：src=惠山二期G/006.md\n- 涉及文件：views/building/houseChange/detail.vue、views/building/house/detail.vue、views/building/houseChange/index.vue、mixins/detailMixins.js、views/benefit/pubHouseDetailChange/detail.vue、mixins/form.js、package.json\n- 所属项目：惠山二期G；来源会话：c5a4d977-566c-4ca9-8964-c533818a64d6；代码基线：none"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/惠山二期g技术/house_filter_bug.md",
+                "memory_type": "entities",
+                "deleted_content": "# 房屋变更未选项目致楼幢查询无过滤\n惠山二期G zhi2-web-admin 房屋变更页未先选项目时楼幢弹窗返回全部楼幢的缺陷与修复。\n\n## 问题根因\n- zhi2-web-admin/src/views/building/houseChange/detail.vue 中楼幢弹窗 filterParams.projectId 未选项目时为 undefined\n- 后端因缺 projectId 返回全部楼幢，缺少项目维度过滤\n\n## 修复方案\n- openBuildingDialog 无 projectId 时提示并 return\n- openUnitDialog 增加 buildingId 校验及 filterParams.buildingId\n- setProject 切换时清空残留，保留 UI :disabled 双重保险\n\n## 验证与归属\n- 验证证据：src=惠山二期G/013.md\n- 涉及文件：zhi2-web-admin/src/views/building/houseChange/detail.vue、zhi2-web-admin/src/views/building/buildingChange/detail.vue\n- 所属项目：惠山二期G；来源会话：11ad0957-fe32-4048-b697-514a71caef0a；代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 3,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

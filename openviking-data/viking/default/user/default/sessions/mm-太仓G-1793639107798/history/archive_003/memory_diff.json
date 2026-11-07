@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793639107798/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T17:10:23.638917+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/propertychange_build_range.md",
+                "memory_type": "entities",
+                "after": "# 物业小区基本信息变更模块无楼幢范围新增接口，备案组件被 show-button=false 截断\n太仓G端物业小区基本信息变更模块缺少楼幢范围新增接口，备案组件因写死 show-button=false 导致关联楼栋链路被截断。\n\n## 问题根因\n- `propertychange`(`propertyChange.js`) 仅基本信息变更 CRUD，无类似规划/施工许可的 `*ChangeBuild` 楼幢接口。\n- 楼幢关联在备案模块 `propertyProject.js`：提供 `GET/POST/DELETE /estate/proyprojectRange`、`selectPropertyBuildingList` 等。\n- 变更详情复用 `propertyProjectHouseTable.vue` 但写死 `:show-button=\"false\"`，整条「弹窗选楼幢 → POST proyprojectRange」链路不执行，已备案小区未关联楼栋时变更页看不到「新增」。\n\n## 可选方案\n- 方案 A：前端放开按钮并接备案接口，后端须确认已备案是否允许直接 POST。\n- 方案 B：新增变更专用范围接口待审核同步。\n- 本仓库无 Java，后端行为需另行确认。\n\n## 验证与归属\n- 验证：会话 8434f9d1 已备案小区要关联楼栋无新增按钮；排查 propertychange API 与 propertyProjectHouseTable 的 show-button、addProyprojectRange 调用对比。\n- 涉及文件：zhi1-web-admin/src/api/estate/propertyProject.js、zhi1-web-admin/src/views/property/propertychange/detail.vue、zhi1-web-admin/src/views/property/propertyProject/components/propertyProjectHouseTable.vue、zhi1-web-admin/src/views/property/propertyProject/detail.vue\n- 所属项目：太仓G；来源会话：8434f9d1-cba5-4cf2-bb2f-c0e77e746c05；代码基线：df87537"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/voteviewlite_waiver_field.md",
+                "memory_type": "entities",
+                "after": "# 选项表决 VoteViewLite 投票表只展示配置表决项，弃权在顶层 waiver 字段\n太仓G端选项表决详情「投票信息」中 VoteViewLite 表格仅展示配置的表决项，弃权统计位于接口顶层 waiver 字段而非表决项列表。\n\n## 数据来源\n- `VoteViewLite` 表格由 `listOption`(GET /estate/option/list, bizState:1) 与 `getVoteResult`(GET /estate/ownerDecision/ownerCalculationChart/{decisionId}) 按 optionId 合并。\n- 列绑定 optionName、weightSocre、weightSocreRatio、areaSocre、areaSocreRatio。\n- 弃权不是表决项配置，投票弹窗单独勾选，接口不会在 optionList 返回 optionName=弃权 的行。\n\n## 统计与展示\n- 弃权票数、面积统计在 voteRes.data 顶层 `waiver`、`waiverArea`，饼图 `VoteResultLite` 已用但表格默认不展示。\n- 若要在表内显示弃权，需在 getDetail 合并后手动 append 一行或单独区块，不能指望 option/list。\n\n## 验证与归属\n- 验证：会话 aa345530 用户问表决项表缺弃权；结论说明两接口字段来源、弃权与表决项两套逻辑及 waiver 仅饼图使用。\n- 涉及文件：zhi1-web-admin/src/views/estate/decisionCommon/components/VoteViewLite.vue、VoteResultLite.vue、zhi1-web-admin/src/api/estate/option.js、zhi1-web-admin/src/api/estate/ownerDecision.js\n- 所属项目：太仓G；来源会话：aa345530-4486-428c-873f-fdc119c020eb；代码基线：e083bd5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/optiondecision_cardvalue_watch.md",
+                "memory_type": "entities",
+                "after": "# 选项表决详情切到「投票信息」须 watch mainCardValue 重置 cardValue\n太仓G端选项表决详情从表决项切到顶层「投票信息」时，因 cardValue 滞留导致底部区域空白，需 watch mainCardValue 强制重置。\n\n## 问题根因\n- 复现路径：基本信息 → 表决项(子 Tab cardValue=1) → 顶层「投票信息」，子 Tab 只剩「决策明细」(name:0) 但 cardValue 仍为 1。\n- DecisionRangeTable(需 cardValue==0) 与 VotingItemsTable(需 mainCardValue==0) 的 v-if 都不满足，底部空白。\n- 仅在 handleMainTabChange 重置 cardValue 有竞态，从表决项切过来易漏。\n\n## 修复方案\n- watch mainCardValue，切换顶层 Tab 时强制 cardValue=0 并刷新子表。\n- 合并重复的 DecisionRangeTable 实例，用 mainCardValue 控制 show-search/show-vote/show-icon（对齐一般表决详情）。\n- showVoteResult 等入口也应走同一重置逻辑。\n\n## 验证与归属\n- 验证：会话 f7e76921 用户报选项表决详情切换 Tab 后决策明细不显示；结论定位 cardValue 滞留与 v-if 全假，给出 watch 与组件合并方案。\n- 涉及文件：zhi1-web-admin/src/views/estate/optionDecision/detail.vue、optionDecision/components/DecisionRangeTable.vue、zhi1-web-admin/src/components/zsTabs/index.vue\n- 所属项目：太仓G；来源会话：f7e76921-282e-489a-956f-276a0ef62028；代码基线：cf80bc8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/repairfunds_publicity_days.md",
+                "memory_type": "entities",
+                "after": "# 维修资金公示「重新公示」新增接口必须带 publicityDays\n太仓G端维修资金公示详情点击「重新公示」若报系统异常，常见根因是新增接口请求体未传 publicityDays（公示天数）。\n\n## 问题根因\n- 公示详情维护公示结论后出现「重新公示」；点击若报系统异常，常见根因是重新公示走新增接口但请求体未传 publicityDays。\n- 须从当前公示单/表单已维护的 publicityDays 带入提交参数，不能依赖后端默认。\n\n## 涉及范围\n- 涉及 publicity 详情、ConclusionDialog、PublicityTable 与 usage/publicity API 封装。\n- 修复后提交 tag 202608141220。\n\n## 验证与归属\n- 验证：会话 29bd7c7d 用户报重新公示系统异常；诉求 2 明确「重新公示操作新增接口参数 publicityDays 未传值」。\n- 涉及文件：zhi1-web-admin/src/views/repairFunds/usage/publicity/detail.vue、repairFunds/usage/publicity/components/ConclusionDialog.vue、src/api/usage/publicity.js、repairFunds/usage/fundUsageKs/components/PublicityTable.vue\n- 所属项目：太仓G；来源会话：29bd7c7d-cc3f-4553-9be2-11c3a7255586；代码基线：bc8f979"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

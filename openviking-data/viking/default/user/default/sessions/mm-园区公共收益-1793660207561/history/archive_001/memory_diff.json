@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793660207561/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T22:58:01.010969+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zhi2_accesstoken_bug.md",
+                "memory_type": "entities",
+                "after": "# 园区公共收益Web后台登录鉴权须用accessToken写请求头\n园区公共收益项目(zhi2-web-admin)登录成功后接口仍401，根因是请求拦截器误用登录返回里的token字段而非accessToken。\n\n## 问题根因\n- 登录响应可能同时含`token`(临时令牌)与`accessToken`，网关校验的是`accessToken`\n- `request.js`拦截器原将`UserLoginInfo.token`塞进Authorization导致鉴权失败\n- 仅修store未改拦截器会遗留问题\n\n## 解决方案\n- 持久化与`getToken()`只认`accessToken`\n- `request.js`统一`Authorization: Bearer ${accessToken}`\n- 改登录页或`store/modules/user.js`时核对`auth.js`读写键名\n\n## 验证与归属\n- 涉及文件：src/utils/request.js、src/utils/auth.js、src/store/modules/user.js、src/views/login.vue\n- 所属项目：园区公共收益；来源会话：a6727568-bde2-4da6-a70a-31bf732716a4；代码基线：bd275b5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zhi2_login_method.md",
+                "memory_type": "entities",
+                "after": "# 平台配置loginMethod驱动登录页三种形态\n园区公共收益项目将布尔开关改为字符串`loginMethod`(字典`login_method`)，动态展示登录字段与校验。\n\n## 配置定义\n- `loginMethod`取值：`1`用户名+密码、`2`手机+短信验证码、`3`用户名+密码+短信验证码\n- 系统配置页用下拉维护该字段\n\n## 登录页行为\n- `login.vue`按配置动态展示字段与校验规则\n- 方式3调`POST /v2.0/security/auth/loginWithCode`，body为`{username,password,smsCode}`，响应含`accessToken`\n- 后端未提供方式3时前端仍预留UI与接口封装\n\n## 验证与归属\n- 涉及文件：src/views/system/platformConfig/detail.vue、src/views/login.vue、src/api/index.js\n- 所属项目：园区公共收益；来源会话：a6727568-bde2-4da6-a70a-31bf732716a4；代码基线：bd275b5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zhi2_login_layout.md",
+                "memory_type": "entities",
+                "after": "# 登录页多字段模式固定预留校验区高度\n园区公共收益登录方式3字段多、容器高度固定时，用CSS变量预留错误区避免布局跳动。\n\n## 问题现象\n- 校验错误随显隐撑开`el-form-item`会导致按钮和字段整体跳动\n- 短信验证码按钮若用表单项外独立文字按钮会破坏布局\n\n## 解决方案\n- 定义CSS变量`--login-error-h`(默认18px，方式3可16px)\n- 每个`el-form-item__content`固定`padding-bottom`预留错误区\n- 错误文案用`position:absolute`落在预留区内，不遮挡下一项\n- 短信验证码按钮放输入框后缀插槽(append slot)\n\n## 验证与归属\n- 涉及文件：src/views/login.vue\n- 所属项目：园区公共收益；来源会话：a6727568-bde2-4da6-a70a-31bf732716a4；代码基线：bd275b5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zhi2_subtotal_bug.md",
+                "memory_type": "entities",
+                "after": "# zs-table小计数字落到固定操作列修复\n园区公共收益综合查询等列表因element-ui 2.15.13列宽同步时序问题，小计金额偶发显示在操作列。\n\n## 问题根因\n- 表头/表体/合计行依赖layout observer写colgroup，内部`__updated__`闩锁只在mounted与首次updated同步列宽\n- 数据到达后弹性列重测、滚动条出现、固定列激活，合计行重渲染未再`notifyObservers('columns')`会停过期布局\n- 仅1条数据时zs-table自动高度分支历史不调doLayout\n\n## 解决方案\n- `zs-table.vue`增加去抖`resyncTableLayout()`(nextTick后`table.doLayout()`+`table.layout.notifyObservers('columns')`+滚动条偏移同步)\n- 在data变化、containerHeight变化、滚动条显隐、有小计updated、自动高度分支数据变化等时机调用\n- 该修复覆盖所有带小计+固定操作列的列表\n\n## 验证与归属\n- 涉及文件：src/components/zs-table/zs-table.vue、src/views/maintenance/query/index.vue\n- 所属项目：园区公共收益；来源会话：8cf85830-9fc8-4151-9f52-885208388c12、797b8ce9-32a7-41fc-8031-23d0a604bf9a；代码基线：0abcb96"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

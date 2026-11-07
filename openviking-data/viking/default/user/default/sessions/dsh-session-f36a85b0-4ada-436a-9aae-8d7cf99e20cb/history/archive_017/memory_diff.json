@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-f36a85b0-4ada-436a-9aae-8d7cf99e20cb/history/archive_017",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T09:18:38.669032+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited/memories/events/2026/11/06/处置协同记录排版问题反馈.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户反馈处置协同记录（详情页时间线）排版异常：期望标题与时间在第一行、正文在第二行，实际标题被竖排挤压、正文贴旁缩窄。\n# 2026-11-06 (Friday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: 这里排版有问题，标题和时间第一行，下面大段文字应该在第二行\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: The issue is in the **处置协同记录 (timeline)** of the detail page: layout is broken — the title「【物业企业】发起求援」appears vertically squeezed into a narrow column while the date \"10-28 45\" is beside it, and the large body text wraps badly. You want: **标题 + 时间 on the first line, the big body text on the second line**.\n\nLet me inspect the timeline markup and CSS in Ref8443Detail."
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited/memories/events/2026/11/06/时间线排版根因定位.md",
+                "memory_type": "events",
+                "after": "# Summary\n定位到根因：theme.css 中的旧全局规则 `.timeline-item{display:flex}` 将时间线项设为横向排列，导致标题、时间、正文三者并排，标题竖排、正文被挤压在旁边。\n# 2026-11-06 (Friday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: 这里排版有问题，标题和时间第一行，下面大段文字应该在第二行\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: **Root cause found**: `.timeline-item` itself is **`display: flex; flex-direction: row`** (width 318px)! So its children (head + p) are laid out **side by side as flex row** — head 74px on left, p 195px on right. That's why the title wraps vertically and body is beside it.\n\nWhy is `.timeline-item` flex? The CSS L191 says `.timeline-item{position:relative;margin-left:8px;padding-left:18px;border-left:...;font-size:13px}` — no display:flex. So something else sets it flex. Probably a **global `view` or `uni-view` default** — no. Or another rule. Let me search for a rule making timeline-item or generic flex. Actually likely a global `.ui-ref8443 view{display:flex}`? Let me check what sets it. But regardless, the fix: force `.timeline-item{display:block}` (or flex-direction:column). Since I want head (row) then p (block) stacked vertically, set `.timeline-item{display:block}` or `flex-direction:column`.\n\nLet me check what's setting it flex to understand, then fix by forcing column/block.\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: There it is: an **earlier `theme.css` rule** `.timeline-item{display:flex;gap:10px;font-size:15px;line-height:20px}` (from theme.css, applied globally). This sets `.timeline-item` to flex row. My ref8443 rule doesn't override `display`, so item stays flex row → children side by side.\n\nFix: add `display:block` (or flex-direction:column) to `.ui-ref8443 .timeline-item`. Since I have head (flex row) + p (block), `display:block` is cleanest. Let me update the ref8443 `.timeline-item` rule to include `display:block`."
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited/memories/events/2026/11/06/时间线排版修复完成.md",
+                "memory_type": "events",
+                "after": "# Summary\n修复完成并部署：重构 Ref8443Detail.vue 模板（标题与时间包入 .timeline-head 作第一行，正文 <p> 独立第二行），ref8443.css 中 .timeline-item 强制 display:block、.timeline-head 用 flex 两端对齐、time 去除 float:right。提交 72f57a6，合并 dev 为 17d6187，部署至 nginx 8095 验证通过。\n# 2026-11-06 (Friday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: 这里排版有问题，标题和时间第一行，下面大段文字应该在第二行\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: Now correct:\n- `.timeline-item` = **block** (was flex)\n- **Head**: title (left, w251, h17 single line) + time (right at x318) — **same line** ✓\n- **p (body)**: top 912 (below head bottom 904), **full width 299** ✓ — second line\n\nLet me view the screenshot.\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: Now the timeline is correct:\n- **First line**: 【物业企业】发起求援 (blue, left) + 10:28:45 (gray, right) ✓\n- **Second line**: 现场暴雨积水过快… body text full width below ✓\n\nLayout fixed. Now clean up, commit, merge, deploy, remove worktree.\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: Merged `17d6187`. Deploy to main dist, verify live, cleanup.\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: 完成。处置协同记录排版已修正。\n\n## 根因\n\n`.timeline-item` 被 theme.css 里的旧全局规则 `.timeline-item{display:flex}` 设成了 **flex 横向排列**，导致「【物业企业】发起求援」标题 + 时间 + 正文 `<p>` 三者被并排挤在一行，标题竖排、正文贴着旁边缩窄。\n\n## 改动\n\n**[Ref8443Detail.vue](<src/components/flood/Ref8443Detail.vue>)**：把标题 `<b>` 与时间 `<time>` 包进 `.timeline-head`（第一行），正文 `<p>` 独立在其后（第二行）。\n**[ref8443.css](<src/styles/ref8443.css>)**：\n- `.timeline-item` 强制 **`display:block`**（覆盖旧的 flex）\n- `.timeline-head` 用 flex 两端对齐：标题左、时间右\n- `time` 去掉 `float:right`\n\n## 验证（测试环境 8095 实测）\n- `.timeline-item` = block ✓\n- 标题与时间**同一行**（标题左、时间右对齐）✓\n- 正文 `<p>` 在标题下方**另起一行、占满宽度（299px）** ✓\n- 截图确认\n\n## 归属\n- 提交 `72f57a6`，合并 `dev` 为 `17d6187`；独立 worktree 完成/合并/删除，主工作区干净\n- `dist` 已用本版本测试产物覆盖并部署到 nginx 8095\n\n改动已提交合并到 `dev`。`dev` 已累计领先远程大量提交，需要我把 `dev` 推送到远程吗？"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

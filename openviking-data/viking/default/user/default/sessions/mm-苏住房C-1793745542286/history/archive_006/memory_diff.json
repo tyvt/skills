@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T22:51:45.703187+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/budget_no_reject.md",
+                "memory_type": "entities",
+                "after": "# 预算页未传noReject致数据层错位\n苏住房C业主端年度预算页因接口未传noReject，拦截器已解包导致response.data即为业务数组，自写解析取response.data.data得到undefined而显示空态。\n## 问题现象\n- 业主端zhi2-mobile-shimin年度预算页pages_benefit/budget/index.vue显示「暂无相关数据」\n- 接口code=200且预算数组确实返回，但页面自写resolveBudgetResponse按response.data.data取数组得undefined\n- 最终被兜底成[]，表现为接口成功但页面空态\n## 根因\n- getAnnualBudgetByComplexId未将{noReject:true}传给api.get\n- 拦截器已解包并reject异常，实际返回{code,msg,data:[...]}，response.data本身是预算数组\n- 再点.data得到undefined，静默空数组\n## 解决方案\n- 新增接口封装先确认是否传noReject；没传不写response.data.data这层\n- 统一用项目通用写法res.data || [] / res.rows，删掉自造多层解析函数\n- 加载后若当前年份无数据（如2026）自动回退到接口返回最新有数据年份（如2025）\n- 排查顺序：先打日志确认拦截器返回层级，再怀疑渲染\n## 验证与归属\n- 会话ad82d807：预算页「暂无相关数据」，根因为resolveBudgetResponse期望response.data.data而接口未传noReject\n- 涉及文件：src/pages_benefit/budget/index.vue、src/api/benefit.js、src/api/index.js\n- 所属项目：苏住房C；来源会话ID：ad82d807-c9eb-4693-a967-eec366f6e641；代码基线：3ab0cff"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/menu_routemap_stale.md",
+                "memory_type": "entities",
+                "after": "# 菜单码跳转表menuRouteMap页面迁移漏改\n苏住房C小程序因houseMap迁入pages_main分包后，菜单码映射表menuRouteMap.js仍指向旧路径，导致点菜单报page not found。\n## 问题现象\n- 小程序点「地图找房」报navigateTo:fail page \"pages/houseMap/houseMap?type=0\" is not found\n- houseMap已迁入pages_main分包（注册为pages_main/houseMap/houseMap）\n- 菜单码1_4_5路径仍是旧/pages/houseMap/houseMap\n## 根因\n- menuRouteMap.js是「后端菜单码→前端页面路径」硬编码表，页面搬迁不自动改\n- 不在pages.json校验范围，编译不报错只有点到才炸\n## 解决方案\n- 收到page not found先到pages.json搜路径确认真实分包前缀\n- 除页面内router调用，必须额外排查menuRouteMap.js与utils/route-map.js（旧路径归一化层）\n- 批量对账menuRouteMap.js中仍写/pages/前缀项（home/search、message/index、collect/index等）\n- 首页入口类页面同步：二手房地图找房type=1、首页type=0路径相同query不同，别只改一处\n## 验证与归属\n- 会话395868ae：navigateTo失败，houseMap已迁至pages_main，menuRouteMap.js与stockHouse二手房入口仍指向旧路径\n- 涉及文件：src/utils/menuRouteMap.js、src/utils/route-map.js、src/pages.json、src/pages_transaction/stockHouse/index.vue\n- 所属项目：苏住房C；来源会话ID：395868ae-5e71-4d74-afd9-9f02b478b2f1；代码基线：9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/goto_relative_path.md",
+                "memory_type": "entities",
+                "after": "# 分包页相对路径跳转被补斜杠致找不到\n苏住房C分包内跳转写相对路径TypeChoose?...，被goto的normalizeLegacyPageUrl补成/TypeChoose致navigateTo失败。\n## 问题现象\n- pages_owner/house/index.vue点「前往添加」报navigateTo:fail page \"TypeChoose?unauthorizedHouseNum=0\" is not found\n- 跳转写相对路径`TypeChoose?unauthorizedHouseNum=${n}`\n- 同目录success.vue、guardApply/step1.vue写完整/pages_owner/house/TypeChoose故仅此一处炸\n## 根因\n- 项目goto先走normalizeLegacyPageUrl：不以/开头就补前导斜杠得/TypeChoose\n- 只做补斜杠不按当前目录补分包前缀，页面自然找不到\n## 解决方案\n- 分包页内跳转一律写完整路径/pages_xxx/目录/页面，禁相对路径（哪怕同目录）\n- 搜不带前导/的goto/navigateTo参数；本页history→/pages_owner/house/history也同坑一并修\n- 勿把normalizeLegacyPageUrl当万能兜底扩展成「猜目录」，会让错误路径更难定位\n## 验证与归属\n- 会话d7258436：navigateTo失败，goto(`TypeChoose?...`)被补成/TypeChoose，改为完整路径\n- 涉及文件：src/pages_owner/house/index.vue、src/utils/route-map.js、src/pages_owner/house/owner/success.vue\n- 所属项目：苏住房C；来源会话ID：d7258436-2f74-40b3-a7d1-bb994d1239c1；代码基线：b7bf813"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/subpkg_static_url.md",
+                "memory_type": "entities",
+                "after": "# 分包静态资源须用resolveStaticUrl解析\n苏住房C分包内WXSS引用本地图片因路径错误报无法通过WXSS获取，须用resolveStaticUrl按分包名拼路径。\n## 问题现象\n- 控制台报「pages_owner/ownerCard/index.wxss中的本地资源图片无法通过WXSS获取」\n- 指向background-image:url(\"../static/images/szf/Bg.svg\")\n- 改用@/static/images/szf/Bg.svg后node层报找不到模块\n## 根因\n- Bg.svg实际在分包目录pages_owner/static/images/szf/Bg.svg，不在主包src/static\n- @/别名固定指向src，拼出主包路径文件不存在\n- WXSS写相对路径违反小程序「WXSS不能引用本地图片」限制\n## 解决方案\n- 分包资源统一用resolveStaticUrl('images/szf/Bg.svg','pages_owner')按分包名拼出/pages_owner/static/images/szf/Bg.svg\n- 背景图在script先算URL再绑style（backgroundImage），不写wxss的url()\n- 先确认资源在主包src/static还是分包static：主包可跨分包引用，分包只能本包用\n- 同页已用resolveStaticUrl的图标（如questionIcon）当模板参考，新增照抄\n## 验证与归属\n- 会话ec20b896：ownerCard/index.wxss报本地资源图片无法获取，Bg.svg位于分包static，@/static找不到；改为resolveStaticUrl\n- 涉及文件：src/pages_owner/ownerCard/index.vue、src/utils/index.js、src/pages_owner/static/images/szf/Bg.svg\n- 所属项目：苏住房C；来源会话ID：ec20b896-8b24-4392-8c67-822594278f60；代码基线：9832ba3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

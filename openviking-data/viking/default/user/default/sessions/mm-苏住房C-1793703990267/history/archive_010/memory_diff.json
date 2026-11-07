@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_010",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:26:06.196624+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/tab_list_param.md",
+                "memory_type": "entities",
+                "after": "# Tab组列表接口传参结构不统一导致条件丢失\n苏住房C找房Tab组内各列表接口method与参数形态不同，错误套用嵌套t会静默丢弃筛选条件。\n\n## 问题现象\n- 苏找房「推荐」列表与APP排序/内容不一致，怀疑查询条件不一致\n- 给listRecommend发`{pageNo,pageSize,t:{xcoordinate,ycoordinate}}`时GET序列化嵌套对象失败，坐标条件静默丢失\n- 对listRecommend使用POST会直接500\n\n## 根因\n- listRecommend为GET、参数扁平(pageNo,pageSize,xcoordinate,ycoordinate)\n- pageByKeyWord(新房)与houseInfoDisplayList(二手房)为POST、条件塞在嵌套对象t中\n- 开发按兄弟Tab结构类推，把坐标包成嵌套t发给GET接口，后端按无坐标返回\n\n## 解决方案\n- 接入列表接口前先到api层确认实际method与参数形态，不按兄弟Tab类推\n- GET接口一律扁平传参，仅POST接口需要嵌套条件\n- 排查「与APP不一致」优先对比请求参数结构，而非先怀疑UI或排序逻辑\n\n## 验证与归属\n- 验证：会话65d67b1c用户诉求推荐房屋排列与APP一致，结论改回扁平传参后与线上一致\n- 涉及文件：Project_Suzhufang.vue、Home_Suzhufang.vue、buyHouse/index.vue\n- 所属项目：苏住房C；来源会话ID：65d67b1c-b2d4-4547-b8ef-f723249dbd4e；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/gateway_method_fix.md",
+                "memory_type": "entities",
+                "after": "# 网关传输层GET/POST判定须在调用入口定型\n苏住房C小程序请求经网关按method选interface_id，旧实现回读被改写的config.method致GET认成POST丢参。\n\n## 问题现象\n- common.js里用api.get写的GET接口被识别成POST\n- 另一接口zs-params为空，查询条件没传出去\n- 后端按错误interface_id接收，参数丢失\n\n## 根因\n- 所有请求走createHttpClient→网关，GET走szffluzm-yhcq，POST/PUT/DELETE走szffluzm-whyhxx，上传走szffluzm-wjsc\n- 旧实现先看config.method再判断，而method在拦截器可能被改写(如api.post+headers zs-method:put/delete)\n- 真正GET被认成POST，选错interface_id并丢参\n\n## 解决方案\n- 在httpInstance调用api.get/post/put/file那一刻定下backendMethod与gatewayInterfaceMethod显式传网关，不回读config.method\n- 核对业务层：GET用api.get(200+处)、POST用api.post(100+处)、PUT/DELETE统一api.post+zs-method头(8处)、上传用api.file\n- 修复参数位置错误：api.get第三参数headers须合并进第二config；`{params,status:1}`的status须并入params\n- 请求日志加「网关接口类型」字段对照interface_id\n\n## 验证与归属\n- 验证：会话3863efc7用户报GET被识别为post、zs-params空，结论给出httpInstance层对照表并修复两处参数传递错误\n- 涉及文件：httpInstance.js、common.js、gateway.js、index.js、sign.js\n- 所属项目：苏住房C；来源会话ID：3863efc7-4edd-492d-93be-201508d84835；代码基线：77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/msg_url_map.md",
+                "memory_type": "entities",
+                "after": "# 消息中心msgUrl旧分包路径须前端归一化映射\n苏住房C小程序消息接口返回迁移前分包路径，直接navigateTo必报页面不存在，须在normalizePageUrl集中映射。\n\n## 问题现象\n- 「我的-消息」点「业主决策」消息无响应，报navigateTo:fail page \"pages_owner/decision/detail?id=...\" is not found\n- 分包改造后真实路径为/pages_vote/decision/detail，但msgUrl仍是/pages_owner/decision/detail\n- 后端存历史字符串不随前端调整，直接用必命中页面不存在\n\n## 根因\n- 业主决策/选举/投票/建议页已迁到pages_vote分包，消息接口下发旧前缀pages_owner/\n- 前端无集中路径兼容，散落判断易漏\n\n## 解决方案\n- 在消息跳转唯一入口normalizePageUrl加旧路径前缀映射表：pages_owner/decision|elect|poll|propose → pages_vote/\n- 前缀命中即替换后再拼query，不逐条改后端数据也不写if分支\n- 推广：凡后端下发前端路由字符串(消息中心、待办、扫码)都应有集中归一化函数做路径兼容\n- 排查直接看vConsole报错完整URL与pages.json注册路径差异\n\n## 验证与归属\n- 验证：会话72fc01c4用户贴MiniProgramError，结论在normalizePageUrl增加前缀映射修复\n- 涉及文件：msg.js、message/index.vue、message.vue、pages.json\n- 所属项目：苏住房C；来源会话ID：72fc01c4-8530-4edb-8ed0-13cf0599aa37；代码基线：5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zsbutton_virtualhost.md",
+                "memory_type": "entities",
+                "after": "# ZsButton全局virtualHost致mini按钮撑满整行\n苏住房C小程序在ZsButton开virtualHost:true使全局窄按钮参与父级flex被撑满，须去掉并在弹窗底栏局部处理。\n\n## 问题现象\n- 「选择身份→授权确认」弹窗双按钮不等宽、左钮背景色不生效、位置偏\n- 「我的房屋」卡片size=\"mini\"操作钮(完善信息、撤销添加)被拉成整行宽，布局乱\n\n## 根因\n- ZsButton组件options开启virtualHost:true，组件级全局生效，小程序按钮真实节点直接参与父级flex\n- 叠加.zs-button{width:100%}全局规则，所有窄按钮被撑满父容器，flex收缩对齐随父级变\n\n## 解决方案\n- 去掉ZsButton上的virtualHost:true，恢复组件包裹行为\n- 弹窗底栏等宽仅在ZsPopup底栏作用域处理：给底栏ZsButton加:style=\"{width:'100%',display:'flex',minWidth:0}\"，配合popup-footer__item/popup-footer-btn类\n- 验证顺序：先看房屋卡片按钮恢复，再开弹窗看双钮等宽；同源项目(泰兴/G)出现mini按钮变整行宽优先grep virtualHost\n\n## 验证与归属\n- 验证：会话d365c947用户连续4轮反馈弹窗双钮不等宽，最终去掉virtualHost仅底栏加样式修复\n- 涉及文件：ZsButton.vue、ZsPopup.vue、authorization.vue、TypeChoose_Suzhufang.vue\n- 所属项目：苏住房C；来源会话ID：d365c947-62dc-48ad-abbf-b9814a607332；代码基线：48bdb17"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

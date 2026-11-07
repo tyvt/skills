@@ -1,0 +1,36 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区G-1793802747377/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T14:40:04.423870+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/benefit_receipt_dict_load.md",
+                "memory_type": "entities",
+                "after": "# 银行回单核销子表字典加载修复\n无锡市区G（zhi2-web-admin）benefit/pubVerificationReceipts 模块的核销回单详情子表，曾因字典未加载导致业务类型显示原始码值 1、2 而非转译文本。\n\n## 根因\n- 子表在 created 里拉字典时，父页尚未算出 isIncome（依赖异步 loanDirction）\n- 原代码写 `if (!this.isIncome) return`，导致字典一直未加载\n- dictFormatter 找不到 relBusinessTypeOptions，将原始码值 1、2 原样显示\n\n## 修复方案\n- 进入页面即加载合同类型字典（资产 + 资源 + PUB_LEASE_CONTRACT_TYPE 合并）\n- isIncome 变为 true 时再补拉一次（已加载则跳过）\n- 字典到位后刷新 detailList，触发表格重新渲染\n\n## 验证与归属\n- 验证：Ctrl+F5 强刷后打开回单详情；若仍显示数字，在 DevTools→Network 看 benefit_contract_resource_type 是否 200 并确认是否有 dictValue 为 1、2 的项；没有则需后端补字典或核对字段含义\n- 涉及文件：src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue、src/views/benefit/pubVerificationReceipts、src/mixins/subTableMixins.js\n- 来源会话：08b73ebd-1692-46da-8e18-00b4de13e612；所属项目：无锡市区G；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bterminal_redirect.md",
+                "memory_type": "entities",
+                "before": "# bTerminalRedirect iframe view pool\nbTerminalRedirect tab keep-alive uses an iframe view pool (v-show persistent DOM) instead of Vue keep-alive.\n\n## Description\n- bTerminalRedirect tab keep-alive uses an iframe view pool with v-show to keep iframes resident in DOM\n- Chosen over Vue keep-alive to preserve iframe state across tab switches\n\n## Solution\n- src/utils/innerLink.js adds isBTerminalRedirectRoute and isIframePoolRoute\n- src/utils/bTerminalRedirect.js extracts fetchBTerminalIframeSrc\n- src/store/modules/permission.js sets meta.bTerminalRedirect = true\n- AppMain.vue, iframeToggle/index.vue, layout/index.vue, tagsView.js, InnerLink/index.vue integrate the pool\n\n## Verification and source\n- Verified in src=无锡市区G/003.md\n- Project: zhi2-web-admin (无锡市区G); source session: 47301bc4-8faf-4838-b33c-54afa184fa11; code base: none",
+                "after": "# bTerminalRedirect 路由与保活\n无锡市区G（zhi2-web-admin）的 sso/bTerminalRedirect/index 组件，原先未纳入 InnerLink 的路由规范化导致配 HTTPS 菜单路径时 404，后实现 iframe 视图池保活。\n\n## 路由规范化（修复 404）\n- 根因：菜单 path 配成 https://... 时 Vue Router 无法匹配内部路由，落到兜底 path:'*' 重定向 /404，守卫提示「页面未授权或不存在」\n- 仅 InnerLink 组件在 permission.js 做路径规范化：HTTPS 写入 meta.link，path 转为内部路由（如 https://b.example.com/callback → b/example/com/callback）\n- 修复：permission.js 把 bTerminalRedirect 纳入与 InnerLink 相同的内嵌 iframe 路由规范化；侧边栏 RecursiveMenu 对该组件改走 router-link，不再当纯外链新开窗口\n- 涉及文件：permission.js、src/api/security/oauth2.js、src/views/sso/bTerminalRedirect/index.vue\n\n## iframe 视图池保活\n- bTerminalRedirect 页签保活采用与 InnerLink 相同的 iframe 视图池（v-show 常驻 DOM），而非 Vue keep-alive\n- src/utils/innerLink.js 新增 isBTerminalRedirectRoute、isIframePoolRoute\n- src/utils/bTerminalRedirect.js 抽取 OAuth 取址逻辑 fetchBTerminalIframeSrc\n- src/store/modules/permission.js 为 sso/bTerminalRedirect/index 设置 meta.bTerminalRedirect = true\n- src/layout/components/iframeToggle/BTerminalRedirectFrame.vue 等集成视图池\n\n## 验证与归属\n- 来源会话：2c02c8f7-aee0-47dd-b23d-d8d8f94a007a、47301bc4-8faf-4838-b33c-54afa184fa11；所属项目：无锡市区G；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/区域字段输入方式.md",
+                "memory_type": "preferences",
+                "before": "- 在已使用 `region` 的页面（如 `pubBankAccountBalance`）保留 `region`；`subdistrict`/`community` 仍为文本输入，不要改为代码下拉框。\n- 在无区域的页面（如 `pubRegAccountChange`）移除新增的 `regionCode`；详情页中写入 `regionCode` 的逻辑予以保留。",
+                "after": "- 在已使用 `region` 的页面（如 `pubBankAccountBalance`）继续用 `region`；其中 `pubBankAccountBalance` 的 `subdistrict` 为下拉，`regulatoryBankName` 管理银行仍为文本输入。\n- `pubManagementOrg`、`pubRegulatoryAccount`、`pubRegAccountChange` 的街道/社区保持原字段名和控件类型：`subdistrict`/`community` 为文本输入，不改成编码下拉。\n- `pubManagementOrg` 保留 `regionCode`；`pubRegulatoryAccount`、`pubRegAccountChange` 等原本无行政区域的页面不新增 `regionCode`（开户申请、开户变更已去掉新增的 `regionCode`）。\n- 详情页里的街道/社区字段未改动；此前在详情页新增的 `regionCode` 写入逻辑（对应「新增/编辑时写入 regionCode」需求）仍保留。若详情页也要回退，需另行告知。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

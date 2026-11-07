@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_090",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T10:54:01.212098+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/std_e2e_data_chain.md",
+                "memory_type": "entities",
+                "after": "# 标准化评价E2E造数据依赖链\n标准化评价E2E需按单向依赖链造数据，顺序错会导致新增失败或审批无反应。\n\n## 依赖链路\n- 外部小区/企业主数据 → 物业服务等级（提交+审批=已备案）→ 检查记录（initItems取题→新增→提交→审批）→ 整改（reply/confirm/close/supervise）\n- 检查记录只认「已备案」的物业服务等级，等级没走完提交+审批就引用不到合规等级\n- 审批通过后自动生成整改通知书，手工造通知书会与检查记录对不上账，测不到自动生成链路\n\n## 检查记录最小集\n- 新增体最小集：checkType + complexId + 5类等级 + 2个签字 + isGenerateNotice + itemList[{contentId, isNotApplicable}]，缺一项后端拒\n- checkType 4类：自查/街镇/区县/市级，同一套 controller /evaluation/checkRecord/*\n- 种子标准直接用 2120000000000000001~...005（市标一~五级，每份5类别/5项目/15内容/60选项），别自己造题库\n\n## 造数入口与主键\n- 优先用H5接口造检查记录：H5端16个接口无任何@RequiresPermissions，比管理端简单得多\n- H5接口列举：/v2.0/evaluation/h5/check/stat|task/page|record/page|complex/page|start|{id}/form|save|{id}/submit|{id}/detail、/h5/rectify/{id}|save|submit|{id}/pdf\n- 主键按 checkRecordId / rectificationNoticeId 取，别用通用的 id\n\n## 验证与归属\n- 来源会话 d38c482b-a854-4693-99d7-ccd429f31165（基线05caac8）用户诉求2\n- 涉及文件 e2e/std-evaluation/cases/01-standard-crud.cjs、e2e/std-evaluation/lib/std-eval-lib.cjs、D:/evalrun/endpoints.txt"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/std_rectify_bug.md",
+                "memory_type": "entities",
+                "after": "# 整改API封装死代码与参数位置bug\nrectificationApi全仓库无人import是死代码；confirm/close参数放body而后端@RequestParam会报1105。\n\n## 死代码判定与处理\n- rectificationApi（stdEvaluation.js:145-161）9个方法全仓库无人import，唯一命中是定义处→死代码；页面实际走listMixins/detailMixins通用封装\n- 判断api封装是否在用：grep全仓库找import它的文件（不是找方法名字符串命中），命中0处标死代码\n- 死代码要么删、要么接线，不要留着误导；报告单列「死代码清单」而非当功能缺口\n\n## 参数位置错误（1105）\n- rectificationApi.confirm/close把参数放body，后端签名@RequestParam→按现状接线直接报1105 rectificationNoticeId不能为空\n- Spring的@RequestParam只从query string取值，放body等于没传；报错文案是「参数不能为空」而非「位置错了」，指错方向\n- 接@RequestParam接口参数必须放query：api.confirm(url,{rectificationNoticeId})走query序列化或显式拼query string\n- 报错1105「xxx不能为空」时除查字段名还要查参数该放body还是query\n\n## 入口缺失真相\n- reply无独立入口但反馈功能不缺失——详情页编辑问题项后保存走update，同样置「已解决」\n- 真正无入口的是confirm/close/supervise\n\n## 验证与归属\n- 来源会话 d38c482b-a854-4693-99d7-ccd429f31165（基线05caac8）最终结论\n- 涉及文件 zhi2-web-admin/src/api/evaluation/stdEvaluation.js、e2e/std-evaluation/lib/std-eval-lib.cjs、docs/std-evaluation/api-map-check.md"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/std_report_company_gap.md",
+                "memory_type": "entities",
+                "after": "# 报告编制企业列表恒空的根因链\n报告编制接口companyCount恒为0、companyList恒空，根因是跨服务DTO契约缺口，需锁定到行号。\n\n## 现象与实测\n- 报告编制接口返回companyCount恒为0、companyList恒为空\n- 用有生效物业合同的小区实测（complexId 667579428045292等5个，合同bizState=2）仍为0，说明非数据未配\n\n## 根因链（逐行）\n- StdEvalReportPrepareServiceImpl.deriveCompanies依赖ComplexDto.getCompanyId()\n- 物业侧ComplexApiImpl.listByIdList（POST /api/property/complex/listByIds）走ComplexServiceImpl.listByComplexIds，只做Complex→ComplexVo的BeanUtil拷贝\n- ComplexVo根本没有companyId字段；ComplexApiImpl也只回填companyName/联系电话/负责人，没回填companyId\n- 过滤条件全空→派生结果空→StdEvalReportPrepareServiceImpl:315抛错\n- 对照组单小区详情接口（ComplexServiceImpl:2302）才有setCompanyId(contract.getCompanyRecordId())\n\n## 排查与修复原则\n- 遇「字段拿不到」先定位字段从哪个DTO来，再看该DTO有无此属性——BeanUtil拷贝不会凭空造字段\n- 批量接口与单条接口逐字段对比：单条有批量没有，就是批量侧映射漏了（本次ComplexVo缺companyId+ComplexApiImpl:239只回填企业名）\n- 根因链逐行记下并注明对照组行号，责任方可直接定位\n- 对方服务不在本地部署时明确写「当前环境无法验证修复」，不假装已修\n- 修复方向是让批量接口也回填companyId（或DTO加字段），而非消费侧兜底造值\n\n## 验证与归属\n- 来源会话 b1c0919f-1d59-4d84-b098-af6f3b182d48（基线05caac8）用户诉求4\n- 涉及文件 zhi2-web-admin/src/views/evaluation/stdEvaluation/report/detail.vue、docs/std-evaluation/api-map-report.md"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/std_approval_ddl_gap.md",
+                "memory_type": "entities",
+                "after": "# 实体继承BaseApprovalDO但建表SQL漏列\nStdEvalReportPrepare/StdEvalReport继承BaseApprovalDO带三列，但建表脚本漏建→报无效列名APPROVE_STATE。\n\n## 现象与根因\n- 报告编制接口报无效的列名[APPROVE_STATE]\n- 实体继承BaseApprovalDO（带APPROVE_STATE/RECORD_USER/RECORD_TIME三列），但建表脚本V2.6.2-20261027-004.sql漏建这三列\n- 区域维度那张表（areaReport对应表）是对的，说明是逐表手工写脚本的漏写而非设计如此\n- StdEvalReportPrepare.complexIds缺@TableField(exist=false)导致MyBatis报Type handler was null（该字段transient不落库）\n\n## 修复做法\n- 补changelog：新增V2.6.2-20261031-001.sql，以ALTER补上缺失三列并应用到测试库（本次12条ALTER全成功）\n- 实体非持久化字段一律加@TableField(exist=false)并补import（本次report/domain/StdEvalReportPrepare.java），与reportArea版本对齐\n- 修完用mvn -pl zhi2-evaluation/zhi2-evaluation-server -am compile验证（exit 0）\n- 同族表横向核对DDL一致性（普通维度vs区域维度、编制表vs报告表），漏列常只出现在其中几张\n\n## 结果验证\n- 修完POST /v2.0/evaluation/reportPrepare返回{\"code\":200,\"data\":...}且detail可查\n\n## 验证与归属\n- 来源会话 b1c0919f-1d59-4d84-b098-af6f3b182d48（基线05caac8）用户诉求3/4\n- 涉及文件 zhi2-web-admin/src/views/evaluation/stdEvaluation/report/detail.vue、docs/std-evaluation/api-map-report.md"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

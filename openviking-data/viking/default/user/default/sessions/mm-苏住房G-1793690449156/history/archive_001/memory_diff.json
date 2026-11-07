@@ -1,0 +1,61 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:24:12.253479+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/organ_type_all.md",
+                "memory_type": "entities",
+                "after": "# organ_type_all 全量回显字典\n为解决已停用字典项导致历史数据回显空白，后端新增全量字典 organ_type_all 专供回显，新增/编辑仍用原 organ_type。\n\n## 问题背景\n- 字典项被停用后，列表/详情历史数据状态列显示空白或原始码值，因前端只拿到启用项\n- 根因是字典存在但业务停用部分项，不同于 #796（编码静默降级）和 #1061（未配置显原始值）\n\n## 解决方案\n- 后端新建纯回显全量字典 organ_type_all，内容与原字典同步但不剔除停用项\n- 回显链路（列表 type=\"dict\"/dict-url、详情 DetailTemplate type:'dict' options、dictLabel 转换）统一切到全量字典编码\n- 新增/编辑表单下拉数据源保持原 organ_type 编码，不改\n- 全局修复用 grep 找 organ_type 硬编码，逐处判定回显或候选，不整仓替换\n- 前端靠显式 dict-url 区分两条链路，不用 formMode 分流\n\n## 验证与归属\n- 会话 455456f0（基线 b0f2039）用户诉求：新增 organ_type_all，回显用新字典，新增编辑用原字典\n- 结论 19 处改动并剔除 3 处不在全量路由 JSON 与 constantRoutes 的条目\n- 涉及文件：zhi2-web-admin/src/utils/dict.js、system/user/detail.vue、companyRegister 下 detail.vue/dialog.vue/index.vue\n- 所属项目：苏住房G；来源会话ID：455456f0-90b2-47a3-b49f-b114ac5d4dbb；代码基线：b0f2039"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/表格公共组件验收.md",
+                "memory_type": "entities",
+                "after": "# 表格公共组件验收规范\n设计稿一致性验收须先确认是否复用公共组件，表格类区域被点名后必须用 zs-table + zs-select-column。\n\n## 验收顺序\n- 用户验收顺序：先用公共组件 → 再对齐设计稿，像素对齐但手写表格仍不过\n- 手写 el-table 会丢失列宽测算、选中行高亮、空态、固定列、剩余宽度均分等公共能力\n\n## 改造做法\n- 复选框列用 zs-select-column，不手写 type=selection\n- 序号列用 zs-table-column type=\"index\" 并绑 :index=tableIndex\n- 操作列按钮用 plain 边框档（编辑灰框、删除红框，宽度自适应参照 #875）\n- 批量删除走 mixins 的 multiDeleteButton\n- 表底统计统一 zs-pagination（:show-pagination=\"false\" 只留统计见 #521）\n- 样式微调写在列/组件配置，不给 el-table 加页面级覆盖\n\n## 验证与归属\n- 会话 58064992（基线 9fb6c2c）用户诉求 5「UI问题」→ 诉求 6「表格没有用公共的组件」\n- 最终结论：zs-select-column 复选框列、序号列蓝色、操作列 plain 边框 160px、表底「共 X 条」\n- 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/index.vue；所属项目苏住房G；来源会话ID 58064992-2eec-4abe-b13a-68134cbd67f2；基线 9fb6c2c"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/公共组件字典逻辑禁忌.md",
+                "memory_type": "preferences",
+                "after": "- 禁止把具体字典编码的双口径特例写进公共组件 zs-table-column.vue 与全局入口 main.js\n- 公共层只提供可配置通用能力，具体业务取值在消费端声明：列表列显式传 dict-url/:options，详情/表单在 fieldPlan/contentInfo/constants 声明编码\n- main.js 只注册组件，不承载任何字典映射\n- 判断标准：删掉这段逻辑后别的业务模块会少功能，就说明放错了层\n- 改动后复扫公共组件 diff 确认无残留业务常量\n- 已知 #725 同类后果：zs-table-column 对 bizState 硬编码全局字典导致列级 options 被静默忽略\n- 验证：会话 455456f0（基线 b0f2039）用户直接驳回该做法；所属项目苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/新增模块api文件禁忌.md",
+                "memory_type": "preferences",
+                "after": "- 新增业务模块优先顺着同目录既有页面写法，直接在页面/组件内用全局 $get/$post，不新建 api 封装文件\n- 仅当接口确实被多个页面消费才考虑下沉 api 层；用户点名的 api 文件才删（已知 #788 按模块点名）\n- 动手前先看目标目录最相近 2-3 个页面的取数方式\n- 组件内通过 mapGetters/inject 拿 $get/$post，参数就地组装\n- 注意删除接口形态 POST + Header zs-method: delete，导入 multipart/form-data 字段名 file\n- 已知 #364 同向：Web 管理后台新增模块 mixins 驱动 CRUD，目录名=接口路径，不写 api 文件\n- 验证：会话 58064992（基线 9fb6c2c）用户诉求「不要新建api模型，按照其他页面的方式处理」；涉及 complexTag 六接口"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/模型部署偏好.md",
+                "memory_type": "preferences",
+                "after": "- 偏好通过国内镜像部署开源模型，而非 GitHub/HuggingFace 直链，因直链易网络超时失败\n- 将 llama.cpp (b10617) 部署至 bin/ 目录，Qwen2.5-1.5B 模型放入 models/ 目录做本地推理"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/drop_console_prod_only.md",
+                "memory_type": "entities",
+                "before": "# drop_console only enabled in production to keep test logs\nTest environment debugging uses vconsole@3.15.1 controlled by VITE_APP_VCONSOLE in main.ts; vite.config.ts drop_console must run only in production.\n\n## Description\n- Test env uses vconsole@3.15.1 loaded via VITE_APP_VCONSOLE in main.ts\n- Request logs printed in src/api/index.js\n- drop_console in vite.config.ts must only be active in production mode to keep vConsole logs visible in test\n\n## Verification\n- Verification: src=惠山二期H5/004.md\n- Files: package.json, vite.config.ts, src/main.ts, 惠山V1小程序/src/main.js, index.html, src/env.d.ts, src/api/index.js, main.ts\n- Project: 惠山二期H5; Source session: ce82ed4f-71c3-4c81-b7b8-45a7512f22f8; Baseline: none",
+                "after": "# drop_console 仅生产环境启用\n为保证测试日志可见，drop_console 仅在生产环境启用，测试环境用 vconsole 调试。\n\n## 描述\n- 测试环境通过 main.ts 中 VITE_APP_VCONSOLE 控制加载 vconsole@3.15.1\n- 请求日志打印在 src/api/index.js\n- vite.config.ts 的 drop_console 必须仅在生产模式生效，避免测试环境 vConsole 日志被清除\n\n## 验证与归属\n- 验证来源：惠山二期H5/004.md\n- 涉及文件：package.json、vite.config.ts、src/main.ts、惠山V1小程序/src/main.js、index.html、src/env.d.ts、src/api/index.js、main.ts\n- 所属项目：惠山二期H5；来源会话：ce82ed4f-71c3-4c81-b7b8-45a7512f22f8；代码基线：无"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/preferences/user/model_deployment.md",
+                "memory_type": "preferences",
+                "deleted_content": "- Prefers deploying open-source models via domestic mirrors instead of GitHub/HuggingFace direct links, because direct links fail with network timeouts.\n- Deploys llama.cpp (b10617) into `bin/` and Qwen2.5-1.5B model into `models/` for local inference."
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/implantação de modelos.md",
+                "memory_type": "preferences",
+                "deleted_content": "- Prefere implantar modelos open-source via mirrors nacionais em vez de usar links diretos do GitHub/HuggingFace, pois links diretos falham por timeout de rede.\n- Implanta llama.cpp (b10617) no diretório `bin/` e o modelo Qwen2.5-1.5B no diretório `models/` para inferência local."
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 1,
+        "total_deletes": 2,
+        "total_skipped": 0
+    }
+}

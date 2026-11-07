@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_092",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T10:57:52.518519+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/git_stderr_exit1.md",
+                "memory_type": "entities",
+                "after": "# PowerShell 将 git stderr 误报为 exit code 1\n在 PowerShell/CI 中，git 写入 stderr 的进度/redirect 提示会被包装层计成非零退出码，导致成功推送被误报为失败。\n\n## 现象与根因\n- 两次 `git push` 均显示 `exit code: 1`，但推送实际成功\n- PowerShell/CI 中外部命令只要往 stderr 写任何内容（进度条、提示、警告），包装层就可能计为非零退出码\n- git 的正常输出（如 `Receiving objects`、`remote: redirecting to …`）恰好走 stderr，于是「成功」被误报为「失败」\n- 真失败（如认证失败）也写 stderr，故不能只信退出码，也不能只信 stderr 有无内容\n\n## 判定规则\n- 判定 push 是否成功用仓库状态而非退出码：`git status -sb` 看 `ahead=0 behind=0`，或 `git log origin/<branch>..HEAD` 为空\n- 辅助证据：远端 ref 更新记录（如 `f6de19ef5..6a5960bab` 表示远端已前进）\n- 看到 exit code 1 先看 stderr 内容是否为「进度/redirect 提示」，是则按成功处理\n- 真失败仍表现为 ref 未更新，需两者结合判断\n\n## 验证与归属\n- 来源会话 session-a80585ad-f4f6-47a5-982d-91ec43234a02（基线 5d68a74）最终结论「两点说明」第 2 条\n- 同段记录父仓库 → `5ea5402..4826471` → `zhi2-web-admin-h5-g-unlimited`（远端做了 redirect，git 已自动跟随）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/signature_field_alias.md",
+                "memory_type": "entities",
+                "after": "# 后端字段未契约化时前端多别名容错\n后端签名字段名未定（#2145/#1977 仍 wait）时，前端主用 `signatureUrl` 并兼容多个兜底别名，先跑通链路并显式记录收敛风险。\n\n## 背景与原因\n- C 端「业主倡议签字环节」需往提交体带签名，但后端字段名尚未定稿\n- 后端未就绪时，前端等则阻塞联调，硬编码猜字段名则猜错静默丢签名\n- 多别名容错让当前链路先跑通，同时显式记录不确定性避免将来无人记得收敛\n\n## 做法要点\n- 主字段 `signatureUrl` 首选，其余 `signUrl`/`promoterSign`/`initiatorSignature` 为兜底，按优先级依次尝试\n- 别名列表只放一处常量，提交侧用主字段，回显侧用同一套取值函数\n- 必须写明遗留风险「待后端定字段后可能需要收敛」并关联后端任务号 #2145/#1977\n- 后端定稿后回头删掉多余别名，别让兼容层永久留存\n\n## 分支改动形态\n- 覆盖 main-v2.1-mp / sfb(父 dev-sfb) / main-v2.1 三支，每支 `propose/form.vue` 的 `submit()` 补 `signatureUrl: voteStore.signUrl`\n- 每支 `propose/detail.vue` 新增「发起人签字」卡片回显，并分别提交子模块与父仓 gitlink\n\n## 验证与归属\n- 来源会话 session-4208fc64-80b9-409d-8aad-a50126748229（基线 c35a24a）「剩余风险（明示）」与「C端 #1976 三个分支全补全签字环节」\n- 三分支两级提交号：main-v2.1-mp 子 `7b6c2017`/父 `eef287f`；sfb 子 `7a302eb8`/父 `e6e6d31`；main-v2.1 子 `8adcc4ff`/父 `190dd38`\n- 涉及文件：ResponseTable.vue、ResponseDialog.vue、suggest/detail.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/submodule_commit_bug.md",
+                "memory_type": "entities",
+                "after": "# 提交子模块 gitlink 禁用 git commit -- <path>\n用 `git commit -- <path>` 提交子模块指针会绕过暂存区、取子模块工作区当前 HEAD，把别的分支指针误写进父仓。\n\n## 问题现象\n- 在 worktree 修完子模块并提交推送后，更新父仓 gitlink 用 `git commit -- <path>`\n- 父仓提交 `ab8412e` 把子模块指针误记为防汛分支 `83422e02e`，而非本次修复所在 `develop/v2.6.2-suzhufang` 的 `8ba16de62`\n- 后续提交 `d423d12` 才用暂存区值修正回 `8ba16de62`\n\n## 根因\n- `git commit -- <path>` 语义是提交工作区该路径当前内容，绕过暂存区直接取工作区状态\n- 对子模块「工作区当前状态」= 子模块此刻检出的 HEAD，可能停在另一分支（本次为防汛分支 `develop/v2.6.2-suzhufang-li`）\n- 多分支并行开发时此坑必现\n\n## 正确做法\n- 先 `git add <子模块路径>` 把期望 gitlink 写进暂存区，再 `git commit`（不加路径限定），`git show --stat` 确认\n- 永远不用 `git commit -- <path>` 提交子模块指针\n- 提交后用 `git ls-tree origin/<branch> <子模块路径>` 核对远端树里的指针值，不只看本地\n- 若已推错不强制回滚历史，用后续提交修正（远端当前指针正确则无需 force push）\n\n## 验证与归属\n- 来源会话 session-57c99e3d-1829-4ba2-81e3-d70296ccc2fe（基线 6156653）最终结论\n- 防汛工作区零触碰：`zhi2-web-admin` 仍 `develop/v2.6.2-suzhufang-li`，11 已跟踪 + 9 未跟踪与开始一致\n- 父仓 `origin/develop/v2.6.2-suzhufang` tree 里 gitlink 已是 `8ba16de62`（已核对远端）\n- 涉及文件：zhi2-web-admin、.gitmodules"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/build_branch_check.md",
+                "memory_type": "entities",
+                "after": "# 「没效果」先定位测试环境构建的是哪条分支\n修复只在功能分支、没合入测试分支等于没交付；用户实际运行的分支若也没构建，看到的仍是旧代码。\n\n## 问题现象\n- 用户反馈「没效果」，截图请求仍带 `parentDeptId=494439248`，页面 `build-time` 为 `85116e921`\n- 回查 Git 确认修复代码根本没在测试环境运行\n- 分支对照：`feat/task-2095-workorder-migration` 含修复（`d12d062de`）但未合测试分支；`develop/v2.6.2-suzhufang`（测试分支）原本只有 `a64d58b67`；`feat/task-2146-suggest-signature`（截图构建 `85116e921`）原本没有修复\n\n## 根因\n- 「把修复推到功能分支」被当成「完成交付」，但测试环境构建哪条分支决定修复是否生效\n- 同一 bug 分散在功能分支/测试分支/用户实际分支三线时，只推一条 = 用户看到旧代码\n- 隐蔽性：代码没问题、提交在、CI 绿，只是没被构建到\n\n## 做法要点\n- 「没效果」第一动作取版本指纹：页面 `build-time` 唯一定位环境跑的提交/分支（本次 `85116e921` → `feat/task-2146-suggest-signature`）\n- 做三线对照：修复分支 / 测试构建分支 / 用户实际分支，缺哪条补哪条\n- 用 worktree + cherry-pick 补：测试分支 `2d9918c7d`，再 cherry-pick 到用户实际分支 `85116e922..f62ea4265`\n- 要用户触发重新构建才生效，验收判据为 `build-time` 不再是旧值\n- 补完后做真实行为验证（dev server 8182 跑 e2e），不只跑单测\n\n## 验证与归属\n- 来源会话 session-d0dd96df-7bb2-4f65-86b1-3ecd10abac87（基线 c35a24a）用户诉求 6「没效果」\n- e2e 验证 bug #5819 回归通过：「非本地」跳转列表请求均未携带 parentDeptId；「本地」跳转仍携带区域条件\n- 涉及文件：homeStatNav.js、index-v2.vue、tests/e2e/bug-5819-nonlocal-no-region-param.spec.mjs"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

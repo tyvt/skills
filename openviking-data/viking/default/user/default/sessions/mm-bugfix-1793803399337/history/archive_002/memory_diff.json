@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-bugfix-1793803399337/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T14:52:30.769724+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术缺陷/vue_computed_override.md",
+                "memory_type": "entities",
+                "after": "# index.vue中重复computed选项覆盖projectId\n在 `index.vue` 中定义两个 `computed` 选项，导致 `projectId` 未被注册并触发 Vue 警告，需合并为一个 computed 对象。\n\n## 问题根因\n- 第一个 `computed` 仅含 `...mapState({ projectId: ... })`，第二个含 `formItems`、`columns`、`operationButtons` 等。\n- Vue 选项中同名选项只保留最后一个，第一个 `computed` 被完全覆盖，`projectId` 从未注册到实例，模板中使用的 `projectId`（如第 12、178、243 行）报警告。\n\n## 解决方案\n- 删除单独的 `computed`，把 `mapState` 的 `projectId` 合并进下方 `computed` 对象的最前面。\n- 以后若需拆分多个 `computed`，必须合并为一个对象，或改用 `Object.assign` / 展开运算符合并。\n\n## 验证与归属\n- 涉及文件：`index.vue`\n- 所属项目：bugfix\n- 来源会话：89fc7f13-a8bf-4d3a-bbd4-188054ca21b7\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术缺陷/dicttag_options_field_mismatch.md",
+                "memory_type": "entities",
+                "after": "# DictTag选项字段名不匹配致options为undefined\n在 `detail.vue` 的 `contentInfo2` 中误用 `hasDefaultOptions` / `hasEnableOptions`，实际应为 `isDefaultOptions` / `isEnableOptions`，导致传给 `dict-tag` 的 `options` 为 undefined 而报错。\n\n## 问题根因\n- `DictTag` 组件会对 `this.options` 调用 `.find()`。\n- `detail.vue` 的 `contentInfo2` 两处写成 `hasDefaultOptions`、`hasEnableOptions`，但组件 `data`/`initDict` 中实际字段为 `isDefaultOptions`（`sys_yes_no`）与 `isEnableOptions`（`is_enable`）。\n- 传给 `dict-tag` 的 `options` 始终为 undefined，渲染即报错。\n\n## 解决方案\n- 将两处改为与数据一致：`默认渠道` 用 `options: this.isDefaultOptions`，`启用状态` 用 `options: this.isEnableOptions`。\n- 字典异步加载完成后标签照常更新；如需兜底可在 `dict-tag.vue` 用 `(this.options || []).find(...)`。\n\n## 验证与归属\n- 涉及文件：`detail.vue`、`dict-tag.vue`、`vue.js`\n- 所属项目：bugfix\n- 来源会话：f06b2a1d-1232-42cd-9d82-5e09b2d5e785\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/preferences/user/vue空值兜底赋值.md",
+                "memory_type": "preferences",
+                "before": "- 在 `zhi2-web-admin/src/views/maintenance/accountQuery/type.vue` 的 `listCallback` 中，当 `response.costMap` 为 `null/undefined` 时，赋值为空对象默认值，以避免 `accountClassifySummary` 渲染错误。\n- 验证证据: src=bugfix/002.md; 文件: zhi2-web-admin/src/views/maintenance/accountQuery/type.vue; 会话: 7237df2f-31b9-4f24-abf3-253139b16a09\n- 在模板中，读取可能为 null 的对象属性时使用可选链和短路 fallback：对于 `threeData[threeDataIndex]` 为 undefined 的情况，使用 `v-if=\"threeData[threeDataIndex]?.companyNames?.length\"` 和 `:dataList=\"threeData[threeDataIndex]?.companyNames || []\"` 以避免 TypeError。\n- 验证证据: src=bugfix/003.md; 涉及文件: index.vue, vue.js; 会话: 57ee5fc8-b902-4632-8d17-f084cf9e6c5d\n- 在 `src/views/benefit/statisticsMap/operatingAssets.vue` 中移除 `statsConfig` 和 fallback，统计区域仅使用后端的 `statistics`；当 `assetStatsMap` 缺失/null/非对象/为空时返回 []，页面不报错且区域",
+                "after": "- 在 `zhi2-web-admin/src/views/maintenance/accountQuery/type.vue` 的 `listCallback` 中，当 `response.costMap` 为 `null/undefined` 时，赋值为空对象默认值 `{ totalAccount, totalInAmount, totalOutAmount, totalAccountBalance }`，以避免 `accountClassifySummary` 渲染错误。\n- 验证证据: src=bugfix/002.md; 文件: zhi2-web-admin/src/views/maintenance/accountQuery/type.vue; 会话: 7237df2f-31b9-4f24-abf3-253139b16a09\n- 在模板中，读取可能为 null 的对象属性时使用可选链和短路 fallback：对于 `threeData[threeDataIndex]` 为 undefined 的情况，使用 `v-if=\"threeData[threeDataIndex]?.companyNames?.length\"` 和 `:dataList=\"threeData[threeDataIndex]?.companyNames || []\"` 以避免 TypeError。\n- 验证证据: src=bugfix/003.md; 涉及文件: index.vue, vue.js; 会话: 57ee5fc8-b902-4632-8d17-f084cf9e6c5d\n- 在 `src/views/benefit/statisticsMap/operatingAssets.vue` 中移除 `statsConfig` 和 fallback，统计区域仅使用后端的 `statistics`；当 `assetStatsMap` 缺失/null/非对象/为空时返回 []，页面不报错且区域\n- 在 `zhi2-web-admin/src/views/evaluation/creditDeclarationComponents/detail.vue` 的 `detailCallback` 中，对可能为 undefined 的 `response.data.itemList` / `verifiedItemList` 使用可选链与空值兜底（多选用 `?.map(...) ?? []`，单选用 `?.[0]?.configItemId ?? ''`），避免 `Cannot read properties of undefined` 崩溃。\n- 验证证据: src=bugfix; 会话: df013261-b203-4ad7-9640-ec25607e0664"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

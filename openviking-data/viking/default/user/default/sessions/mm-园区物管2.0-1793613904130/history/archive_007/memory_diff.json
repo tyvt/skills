@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_007",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:23:49.438482+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/select_dialog_api.md",
+                "memory_type": "entities",
+                "after": "# 业务选择弹窗专用过滤接口模式\n园区物管2.0 中带业务前置条件的选值弹窗必须走业务专用可选列表接口，不能复用通用列表接口在前端筛选。\n\n## 问题根因\n- 房屋质量保证金协议新增页「选择物业管理区域」弹窗调用通用接口 /property/complex/page，列出所有已备案区域，包含尚未开立保证金账户的区域，业务不允许选择。\n- 通用列表接口只承载全部备案数据，业务约束（如已开户）是后端才知道的过滤条件，前端筛选既不可靠也不完整。\n\n## 解决方案\n- 带业务前置条件的选值弹窗优先向后端要/查专用可选列表接口：本项目用 /maintenance/guaranteeDepositAgreement/pageOptionalComplex，只返回已开立账户的物业管理区域。\n- 在 SelectDialog.open 里直接把 url 换成专用接口，筛选参数（bizState: '2'、当前项目 complexId）按接口约定传，表格列配置保持不变。\n- 同类模式：可选项 = 主数据 + 业务状态约束时，一律走 *Optional* / *CanUse* 类专用接口。\n\n## 验证与归属\n- 验证：会话 70fffb2b 用户报「未完成开户的物业管理区域也显示了」，根因是弹窗调了 /property/complex/page，修复把 SelectDialog.open 的 url 改为 /maintenance/guaranteeDepositAgreement/pageOptionalComplex。\n- 涉及文件：zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue；所属项目：园区物管2.0；来源会话：70fffb2b-1949-40f5-a6e2-10d76989883b；代码基线：c52866fc8。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_axis_decimal.md",
+                "memory_type": "entities",
+                "after": "# ECharts Y轴刻度小数位失控\n园区物管2.0 中 ECharts 图表 Y 轴刻度出现三位小数时，必须单独格式化 axisLabel 并约束最小 interval。\n\n## 问题根因\n- 经营资产图表柱顶标签、tooltip 已限 2 位小数，但 Y 轴刻度仍出现 0.004 这类三位小数。\n- ECharts 的 interval 由数据范围自动计算，数据很小时（如 0.01~0.02 百个）刻度间隔会算出三位小数；只在 series label 和 tooltip 上做格式化管不到 axisLabel。\n\n## 解决方案\n- 把数值格式化收敛成统一函数（如 formatHundredValue），Y 轴 axisLabel、柱顶 label、tooltip 三条通道全部复用同一函数，不各写一份。\n- 给 Y 轴刻度间隔设最小值（如 interval 最小 0.01）防止极小数据产生超长小数。\n- 多处展示同一指标时（图表 + 地图轮播提示）必须复用同一格式化函数，避免口径漂移。\n\n## 验证与归属\n- 验证：mapOverview 会话最终结论新增 computeHundredCountYAxis（Y 轴刻度间隔最小 0.01）、axisLabel 用 formatHundredValue，柱顶标签/tooltip 统一同一函数，formatHundredCount 也复用它。\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/dataHelpers.js、zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js；所属项目：园区物管2.0；来源会话：cbc563ef-17dc-4a57-9a8a-a924dda959a7；代码基线：3965548b6。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/navbar_undefined_merge.md",
+                "memory_type": "entities",
+                "after": "# 切换小区后导航栏显示 undefined\n园区物管2.0 切换小区后导航栏项目名称显示字符串 \"undefined\"，根因是展开合并被详情接口 undefined 字段覆盖。\n\n## 问题根因\n- 选择弹窗用 `{ ...selectedProject, ...this.tempData }` 把列表行与小区详情合并，详情接口里 projectName 是 undefined（真实名称在 complexName），展开合并会用 undefined 覆盖列表行里正确的 projectName。\n- 写入 Vuex / localStorage 时 undefined 被 JSON 序列化成字符串 \"undefined\"，之后读取永远显示 undefined。\n\n## 解决方案\n- 对象合并禁止盲目展开覆盖，业务关键字段写显式合并函数（mergeProjectWithComplex）：已有值优先、无值才取别名兜底（projectName → complexName）。\n- 切换目标后重新请求新选中项的详情再合并，不能沿用旧项的 tempData。\n- 写 localStorage 前对名称做规范化，读取侧（Navbar isLabel 等）对已存的 \"undefined\" 字符串做过滤兜底。\n\n## 验证与归属\n- 验证：Navbar 切小区会话最终结论三处修复——bProjectDialog 合并优先保留 projectName 回退 complexName 且先拉新小区详情；Navbar isLabel 加 complexName 兜底并过滤 localStorage 里的 \"undefined\"；layout 写入前规范化。\n- 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue、zhi2-web-admin/src/views/home/bProjectDialog.vue、zhi2-web-admin/src/layout/index.vue；所属项目：园区物管2.0；来源会话：420324f6-d038-423b-8496-387e3126ed25；代码基线：7fe15a8cb。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/selectdialog_bterminal_projectid.md",
+                "memory_type": "entities",
+                "after": "# 同一接口 SelectDialog 同步补 B 端 projectId 隔离\n园区物管2.0 同一接口被多处 SelectDialog 消费时，须同步补齐 B 端 projectId 隔离条件防止数据越权。\n\n## 问题根因\n- 需给 B 端用户的公共收益监管账户选择弹窗加项目隔离（查询条件追加 projectId）。\n- 同一接口 /benefit/pubRegulatoryAccount/page 被多处 SelectDialog 消费，只改一处会出现 B 端部分弹窗能看到全部项目数据的数据越权。\n- B 端当前项目存在全局 store，G 端 projectId 来自表单自身。\n\n## 解决方案\n- 以接口为线索全局检索所有 SelectDialog 调用点（本次 5 处）逐处补齐，不能只改提出问题的页面。\n- B 端判定用 isBTerminal/terminalType，projectId 一律取 this.$store.getters.currentProjectId（当前所选项目），G 端保持原 form.projectId 不动。\n- 两个端别条件并存时注意 B 端取全局上下文、G 端取表单值的分流写法。\n\n## 验证与归属\n- 验证：pubRegulatoryAgreement 会话最终结论表格列出 5 处 SelectDialog（含 pubBankReceiptApply 的 B/G 分流），统一逻辑为 B 端用 $store.getters.currentProjectId、G 端不变。\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue、pubRegulatoryStopAgreement/detail.vue、pubManualBookkeeping/detail.vue、pubBankReceiptApply/detail.vue；所属项目：园区物管2.0；来源会话：3f0ee1c5-4542-423d-b899-f75e4c942d75；代码基线：177bc3ce4。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配、map_drill_down_order（地图下钻SVG顺序耦合与下钻视野等待）、map_marker_spread（地图打点null过滤与重合点圆环错开）\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze（Element UI树全部展开卡死分批套路）、sidebar_recursive_menu、recursive_menu_icon_indent（RecursiveMenu图标占位缩进）、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）、search_container_deprecated（旧search-container废弃改zs-search-form）、appmain_isolation（AppMain加isolation隔离层叠上下文）、zs_select_single_choice（页面级选择弹窗对齐zs-select-dialog单选契约）、zs_table_summary_border（zs-table合计行下边框缺失）、account_dual_dict（新增可选与全量展示双字典+formMode切换）、region_defer_list（区域树列表首屏闪烁延迟请求）、dialog_table_double_border（弹窗表格底部双重边框去重）、allow_custom_three_state（可手输选择组件三态回填）、dialog_table_selection_sync（弹窗表格选中项与外部默认值同步）\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan（分类金额图二次÷10000柱形不显示）、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）、echarts_axis_max_ceiling（ECharts轴刻度上限取整）、svg_fill_replace（SVG图标换色只替换path fill）、line_y_axis_adapt（多系列折线图Y轴自适应刻度）、four_module_split（超大页面四件套拆分）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace（移除xcrud依赖本地XForm兼容替换）、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、form_getdetail_param_guard（getDetail必需参数守卫钩子）、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、area_field_code_assignment（街道社区字段统一赋编码移除字典等待）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、platform_config_race（平台配置异步加载竞态误报）、project_dialog_cache_restore（全局选项目弹窗缓存恢复）、amount_input_validate_race（AmountInput打包后el-form校验为空竞态）、project_switch_soft_refresh（切项目软刷新工具）",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、project_switch_soft_refresh"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

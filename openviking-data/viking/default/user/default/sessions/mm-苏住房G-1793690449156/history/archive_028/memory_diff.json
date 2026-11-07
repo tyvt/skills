@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_028",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:24:04.369688+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/rollup_glibc_wasm.md",
+                "memory_type": "entities",
+                "after": "# CI 报 @rollup/rollup-linux-x64-gnu 缺失（glibc 过低）\n苏房G 项目 CI 中 Vite 构建（Rollup 4）报 Cannot find module @rollup/rollup-linux-x64-gnu，真实根因是 Runner 的 glibc 版本过低，而非依赖损坏。\n\n## 问题根因\n- 报错文案把人带去「删 package-lock.json 重装依赖」的死路，实际是 Runner 系统 glibc 太低（Ubuntu 18.04 / CentOS 7 常见）\n- Rollup 4.x 原生二进制要求 glibc ≥ 2.32，加载失败被原生命令层包装成「模块找不到」\n- 另一诱因：把 Windows 上装的 node_modules 缓存/挂载进 Linux 构建环境，平台原生包不匹配\n\n## 解决方案\n- 判定阶段勿删 lock 文件，先 `ldd --version` 确认 Runner 镜像 glibc 版本\n- 加 `@rollup/wasm-node` 依赖，在 `zhi2-web-admin/scripts/vite-build.mjs` 检测 `CI` 环境变量，CI 下替换原生 Rollup 为 WASM 版，本地仍用原生（更快）\n- CI 必须在 Runner 容器内自己 `npm install`，勿复用宿主机 node_modules\n- 根治：Runner 镜像升到 Ubuntu 22.04+（glibc 2.35）\n\n## 验证与归属\n- 多项目同源：报错指向 h5-g-unlimited 等独立项目时需同步改动才生效\n- 与 #743（CI heap OOM 是构建脚本写死小堆上限）不同类：本条是原生二进制的 libc 依赖，那条是内存参数\n- 验证：package.json 加 @rollup/wasm-node 并在 vite-build.mjs 于 CI 自动替换；本地 `CI=true npm run test` 构建通过\n- 涉及文件：zhi2-web-admin/package.json、zhi2-web-admin/scripts/vite-build.mjs、package.json、package-lock.json、.gitignore\n- 所属项目：苏住房G；来源会话：f6d6c62a-14d0-412a-9d68-6e36fe00948f；代码基线：d109b83"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/derived_field_watch.md",
+                "memory_type": "entities",
+                "after": "# 派生汇总字段必须用 watch 而非 @change\n苏房G 物业管理区域编辑页中由子字段相加得出的只读派生字段（如总建筑面积），挂 @change 会因复制粘贴/程序化赋值不触发而存脏数据。\n\n## 问题根因\n- 原实现把重算挂在子字段 `@change` 上，@change 语义是「用户交互引发的值变化」\n- 鼠标右键粘贴、拖拽填充、上游回填、程序化赋值只改 model 不派发 change，监听不触发\n- 总建筑面积又是只读展示/参与保存字段，于是静默存成脏数据\n\n## 解决方案\n- 改用 `watch` 监听 `form.aboveFloorArea` 与 `form.underFloorArea`（可带 `immediate: true` 保证详情回填后立刻算一遍）\n- `handleChangeFloorArea` 只留纯计算体、不再绑模板 change 事件\n- 三处同构页面一次改齐：`property/complex/detail.vue`（编辑）、`property/complexChange/detail.vue`（变更）、`building/complexSearch/detail.vue`（查询）\n- 先 grep 同名方法：`complexBuildingAuth/detail.vue` 有同名 handleChangeFloorArea 但模板无对应面积输入框，属死代码勿改\n\n## 验证与归属\n- 推论：凡是只读派生字段（合计、面积、里程、比例）都由 watch 驱动，勿依赖交互事件\n- 验证：移除面积字段 @change、新增 watch 监听 aboveFloorArea/underFloorArea，同步到 complex、complexChange、complexSearch 三处\n- 涉及文件：zhi2-web-admin/src/views/property/complex/detail.vue、property/complexChange/detail.vue、building/complexSearch/detail.vue\n- 所属项目：苏住房G；来源会话：0c58b1c2-0dda-4b30-a6fc-15ae19f0f03b；代码基线：320507d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_colgroup_minwidth.md",
+                "memory_type": "entities",
+                "after": "# 原生 table + colgroup 统计表右侧留白\n苏房G 公共查询-物业管理信息月报统计详情页（原生 `<table class=\"stat-table\">` + `<colgroup>`）调整列宽后右侧出现留白，根因是列宽写死 width 且样式兜底被覆盖。\n\n## 问题根因\n- 该页非 zs-table，而是原生 table + colgroup 写死各列 `width`\n- 列宽改固定值后，所有列宽之和小于容器宽度时 table 不会自动分配剩余空间，右边留白\n- 样式表里 `.stat-table` 的 `width:100%` 被内联/局部覆盖后连兜底也没了\n\n## 解决方案\n- `colgroup`/列上的 `width` 改 `minWidth`（列宽语义从「定宽」变「下限」），内容总宽不足时浏览器把余量分给各列，超出触发容器横滚\n- `.stat-table` 回收 `width: 100%`，与同模块其它统计页保持同一口径\n- 外层 `.stat-table-wrap` 保留 `overflow: auto` 承载窄屏横向滚动\n\n## 验证与归属\n- 验证分宽屏/窄屏两态：宽屏看是否铺满且第一列不被异常拉伸，窄屏看是否横滚而非压缩换行\n- 此类「原生表格 + colgroup」页与 zs-table 列宽算法无关，勿改公共 zs-table（会误伤全站列表）\n- 验证：detail.vue 里 width→minWidth、.stat-table 恢复 width:100%，依赖 .stat-table-wrap 的 overflow:auto 处理窄屏\n- 涉及文件：zhi2-web-admin/src/views/publicQuery/monthlyReportStat/detail.vue、index.vue\n- 所属项目：苏住房G；来源会话：89bf3d7d-179a-4d0a-8a4f-3157bdf4d110；代码基线：a724727"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/biz_state_mismatch.md",
+                "memory_type": "entities",
+                "after": "# 查询筛选与列表结果反着来（BIZ_STATE 常量错位）\n苏房G 整改通知书列表筛「已备案」查出审核中、筛「审核中」查出已备案，根因是查询区用了本地 BIZ_STATE 常量而列表走全局 biz_state 字典。\n\n## 问题根因\n- 同一页面并存两套字典：查询下拉用本地 `BIZ_STATE` 常量（码值与后端约定相反），列表展示走全局 `biz_state`（1=审核中、2=已备案）\n- 两套口径码值非简单对调而是语义错位，导致接口入参 status 与展示列对不上\n\n## 解决方案\n- 查询区字典统一改为全局 `biz_state`，参数名从 `status` 收敛为 `bizState`，与同模块申诉、修复等页一致\n- 改完按「选已备案→传 bizState=2」「选审核中→传 bizState=1」两条验证，并同步检查重置逻辑\n- 排查顺序：先确认列表展示用哪个字典，再找查询区用哪份常量，不一致即根因，勿先怀疑后端\n\n## 验证与归属\n- 与 #249（业务状态统一走全局 biz_state，但只替换本地静态数组、BIZ_STATE 常量保持原样）区别：本条给直接症状，#249 讲改动边界「别误改常量」\n- 验证：rectificationNotice/index.vue 查询区 BIZ_STATE 与列表 biz_state 码值不一致；修复为统一 biz_state、参数改 bizState，两状态互不串\n- 涉及文件：zhi2-web-admin/src/views/evaluation/rectificationNotice/index.vue、src/mixins/listMixins.js、src/mixins/table.js\n- 所属项目：苏住房G；来源会话：d13d65c9-9c9c-46c7-a385-c74d24a4cbbb；代码基线：d109b83"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

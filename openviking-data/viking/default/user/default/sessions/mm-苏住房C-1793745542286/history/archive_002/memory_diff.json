@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T22:43:26.806112+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/wxss_local_image_conditional_compile.md",
+                "memory_type": "entities",
+                "after": "# WXSS本地背景图必须条件编译\n苏住房C 小程序 WXSS 中 background:url() 引用本地图片必然失败，需条件编译区分 H5 本地路径与小程序 CDN 绝对地址。\n\n## 问题现象\n- 编译小程序报「渲染层网络层错误：pages_owner/house/index.wxss 中的本地资源图片无法通过 WXSS 获取」\n- 指向 background: url(\"../../static/images/history-szf.png\") 这类相对路径写法\n- pages_owner 目录多处相同写法往往一次只报一处，其余会在后续编译陆续报错\n\n## 根因\n- WXSS 不支持本地资源图片引用（官方限制），小程序 CSS 的 url() 只能是网络图片、base64 或改用 <image> 标签\n- H5 端本地相对路径完全正常，故问题只在编译小程序时暴露\n\n## 解决方案\n- 页面背景图统一写条件编译：H5 用本地路径（如 ../../static/images/szf/Bg-szf.png），小程序用 CDN 绝对地址（如 https://szf.szzfcjj.cn:8888/static/images/szf/Bg-szf.png）\n- 改动时将该页所有 WXSS 背景图一次改完（示例页同时处理 .top-empty 与 .history-container），不要等逐条报错再补\n- 验收标准：重新编译小程序后控制台无该类错误，且两端背景都真实显示\n\n## 验证与归属\n- 验证证据：会话 5fbd3e35（基线 9832ba3）报错 pages_owner/house/index.wxss 本地资源图片无法通过 WXSS 获取（第 251 行 background: url(\"../../static/images/history-szf.png\")），环境 Windows/mp 2.01.2510260 lib 3.16.2；结论改为条件编译\n- 涉及文件：src/pages_owner/house/index.vue、src/pages_owner/house/components/TypeChoose_Suzhufang.vue、src/components/ZsImage/ZsImage.vue\n- 所属项目：苏住房C；来源会话ID：5fbd3e35-025c-45df-996f-22495a68d907；代码基线：9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/api_image_relative_path_500.md",
+                "memory_type": "entities",
+                "after": "# 接口图片相对路径须补全域名\n苏住房C 小程序把以 / 开头的接口图片地址当包内资源加载致 500，须先经 resolveFullMediaUrl/resolveMediaUrl 补全域名或改用 ZsImage。\n\n## 问题现象\n- 用户上传头像后「我的」页报 Failed to load local image resource /zhi2-pro/2026/.../xxx.png the server responded with a status of 500\n- 个人信息页（userInfo.vue）同一头像正常显示\n\n## 根因\n- 接口返回的头像等图片字段是文件服务相对路径（以 / 开头，如 /zhi2-pro/...）\n- 微信小程序把「以 / 开头的 src」优先解释为小程序包内本地资源，不走网络请求，渲染层打本地文件返回 500\n- userInfo.vue 用 <ZsImage :local=\"false\">，组件内部拼 IMAGE_BASE 输出完整 https 地址故正常\n- 与「静态资源按分包推断」是两类不同问题：前者 src 是服务端相对路径漏了域名，后者是本地 static 包路径推断错\n\n## 解决方案\n- 凡绑定接口返回的图片字段（头像、房源图、证件照）一律先过 resolveFullMediaUrl()/resolveMediaUrl() 转成完整 URL 再用，或统一改用 <ZsImage :local=\"false\">\n- 不要在模板里把接口字段直接塞进原生 <image>\n- 排查口径：看到 Failed to load local image resource + 路径形如服务端目录（/zhi2-pro、/zs-fym）即可判定为漏拼域名\n- 补完域名后仍不显示，再检查微信开发者工具 downloadFile 合法域名是否包含该图片域名\n\n## 验证与归属\n- 验证证据：会话 785096f4（基线 4d6dba9）用户贴出 Failed to load local image resource /zhi2-pro/... 500 并说明上传头像后被当本地图片；结论 My_Suzhufang.vue 原生 <image> 直接绑 userStore.avatar 是错误写法，userInfo.vue 因 ZsImage :local=\"false\" 正确；修复为改用 resolveFullMediaUrl() 解析，失败时再查 downloadFile 合法域名\n- 涉及文件：src/pages/index/components/My_Suzhufang.vue、src/pages_my/setting/userInfo.vue、src/components/ZsImage/ZsImage.vue、src/utils/index.js、src/env/mp.js\n- 所属项目：苏住房C；来源会话ID：785096f4-4ab9-4c30-b361-cd9f73a774e6；代码基线：4d6dba9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/subpackage_native_img_500.md",
+                "memory_type": "entities",
+                "after": "# 子包组件原生img相对路径必500\n苏住房C 小程序子包组件内用原生 <img> + 相对路径写静态图必 500，须统一走 ZsImage/resolveStaticUrl 的分包感知解析。\n\n## 问题现象\n- pages_my/verification/AuthorizedSuccess 页面 UI 损坏，控制台报 Failed to load local image resource /components/shared/images/authorized.png status 500\n- 同组件 fail/warning 分支用 ZsImage 正常，仅 success 分支坏\n\n## 根因\n- components/shared/SuccessCard.vue 的 success 分支用原生 <img src=\"images/authorized.png\">\n- 微信小程序里组件内相对路径按「组件所在目录」解析，拼成 /components/shared/images/authorized.png 不存在路径\n- resolveStaticUrl 会按 MAIN_STATIC_PATHS 判断是否主包，否则查 SUBPACKAGE_STATIC_IMAGES 映射（images/authorized.png → ['pages_my','pages_owner']）并用 inferSubpackageFromRoute() 从 getCurrentPages() 栈顶 route 首段推断分包，最终拼成 /<分包>/static/<path>；原生 <img> 完全没有这层逻辑\n\n## 解决方案\n- 小程序内所有本地图一律用 ZsImage（或直接调 resolveStaticUrl），禁止原生 <img> + 相对路径\n- 公共卡片多个状态分支要统一控件类型，避免只改到其中一支\n- 该组件被 pages_owner 下多个成功页复用，改一处即全域生效\n\n## 验证与归属\n- 验证证据：会话 1b2ede19（基线 4630e8e）用户报 AuthorizedSuccess 页面 UI 损坏并贴出 500 日志；结论确认 SuccessCard.vue 的 success 分支用原生 <img> 导致相对路径按组件目录解析；核对当前代码 SuccessCard.vue 四分支均已改为 ZsImage，utils/index.js 的 resolveStaticUrl、resolveSubpackageForStatic、inferSubpackageFromRoute、分包映射均与描述一致\n- 涉及文件：src/components/shared/SuccessCard.vue、src/components/ZsImage/ZsImage.vue、src/utils/index.js、src/utils/mainStaticPaths.js、src/pages_my/verification/AuthorizedSuccess.vue\n- 所属项目：苏住房C；来源会话ID：1b2ede19-fcac-48a1-8f1a-9548ba379034；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/苏服办渠道原生能力入口处理.md",
+                "memory_type": "preferences",
+                "after": "- 苏服办（政务 App 内嵌）环境下，未适配的小程序原生能力入口（如扫一扫）要整块下线，不得保留「请使用APP扫一扫」之类引导提示（点了没用的按钮比藏起来更糟）\n- 下线做法：从首页顶部快捷入口 names 数组移除该项，并连带删掉图标映射项、点击分支与 openScanCode import，不能只把 handler 改成 return\n- 入口由 names 数组 + 图标字典表 + 点击 if 分支三处拼成，改名/删项时三处须同步，漏掉任何一处会渲染出没图的空位或死点击区\n- 同类需求再出现时先核对代码现状（曾发生会话记为已完成但代码漂移/回滚，pages_tab/components/Home_Suzhufang.vue 仍保留 openScanCode 与「扫一扫」），别默认已下线"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

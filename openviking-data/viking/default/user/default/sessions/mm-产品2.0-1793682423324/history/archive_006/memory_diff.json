@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T05:19:30.784461+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/batch_detail_framework.md",
+                "memory_type": "entities",
+                "after": "# 详情页批量迁新框架\n存量迁移模块的 detail.vue 停留在旧框架，需用脚本批量落地五条统一改造标准，再人工处理例外文件。\n\n## 问题背景\n- 旧详情页写法高度同构，差异仅在 moduleName/businessName/permsPrefix 与个别自定义按钮\n- 人工逐个改一二十个文件既慢又易漏项、各页口径漂移\n- 涉及 supervision/progress、riskmanage、unblock、presale、repairFunds、价格备案等多个业务域\n\n## 五条改造标准\n- operation-container → operation-btn-group，并补 moduleName/businessName/primaryKey（须与该目录 index.vue 一致）\n- 查看态改用 DetailTemplate + contentInfo\n- v-hasPermi → zs-button :permission（permission 为数组，见 #1115）\n- 删除独立 zs-attachment（附件与流程由 operation-btn-group 内置）\n- 审批由私有 showApproval/showApprovalProcessDialog 改为内置 zs-approval + @/components/zs-approval/ApprovalProcessDialog，保留区县受理等自定义审批按钮\n\n## 交付与脚本\n- 写 scripts/migrate-detail-framework.mjs 固化规则供后续同类批量迁移复用\n- 交付输出：改动文件数 + 按业务域分组清单 + 未改文件及原因（如用户排除的 superviseBank、verifyRecord 无 detail.vue）\n- 先跑脚本再人工复核例外，避免正则误伤 props/watch（见 #204/#815）\n\n## 验证与归属\n- 来源会话 df7ea01a：改造 6 组 detail.vue，最终改动 24 个文件，新增 scripts/migrate-detail-framework.mjs\n- 涉及文件：supervision/progress/gcht/detail.vue、supervision/unblock/plan/detail.vue、commercialHousingSales/presale/specialcontract/detail.vue、repairFunds/finance/rec/detail.vue、zs-approval/ApprovalProcessDialog.vue、scripts/migrate-detail-framework.mjs\n- 所属项目：产品2.0；代码基线：39e3114"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/register_anon_upload.md",
+                "memory_type": "entities",
+                "after": "# 注册件匿名上传不带 Token\n企业注册上传接口本不需要鉴权，但残留过期 Admin-Token 会导致必然 401，需前端不附带 Authorization 并清理 E2E Token。\n\n## 问题根因\n- 企业注册（/file/appendix/upload，busCode=040100）是匿名流程，上传接口本身不需鉴权\n- sessionStorage 残留过期 Admin-Token 时，uploadAppendixFile 仍带 Authorization 头，后端按「有 Token 必须有效」返回 401\n- 与「机密白名单路径下 $get 发真实 GET 返回 405」是两条不同链路，根因是请求头鉴权语义而非请求方法\n\n## 解决方案\n- companyRegister.js 的 uploadAppendixFile 显式不附带 Authorization\n- E2E 删硬编码 REAL_API_TOKEN，新增 ensureRegisterAnonymousSession()，进注册页前与加载后再各清一次 Admin-Token/Tmp-Token，injectRealApiAuth 标 deprecated\n- E2E 上传步骤改用 setupHybridUploadMock 兜住网关仍校验 Token 的联调环境\n- 直连网关仍 401 说明网关白名单未放行上传路径，非前端问题\n\n## 验证与归属\n- 来源会话 c3f9e4f8：companyRegister.js 不再携带 Authorization、register-helpers.js 新增 ensureRegisterAnonymousSession()、injectRealApiAuth 标记 deprecated\n- 效果对比 Step3 由失败转通过，Step4 因 Mock 未落库仍报「缺少要件」\n- 涉及文件：src/api/companyRegister.js、e2e/fixtures/register-helpers.js、e2e/company/real-api-flow.spec.js、e2e/fixtures/auth-helpers.js\n- 所属项目：产品2.0；代码基线：5169909"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/watermark_bg_block.md",
+                "memory_type": "entities",
+                "after": "# 页面白底盖住水印背景\n水印挂在 #app-main 背景层，中间链路不透明 background:#fff 卡片会整块盖死水印，需逐层把容器背景改 transparent。\n\n## 问题背景\n- 用户要求 app-main 加全站水印，但详情页看不到或局部被白块挡住，反复反馈「还是被挡住」\n- 已知「全局水印被页面高层遮挡」由水印侧解决（水印层改挂 body + fixed 对齐，z-index 1990），本条是不动水印改容器透明度\n- 详情页链路最易漏的是公共 detail-template 根节点白底，其次是小按钮块\n\n## 解决步骤\n- 定位链路 #app-main → 页面容器 → ListTemplate/detail-container → detail-template 根节点，按层实测背景色\n- .detail-template 把 background:#fff 换 background-color:transparent，保留 border 与圆角\n- .detail-text-button 默认 background-color 改 transparent，:hover/:active 保留浅蓝 #ecf5ff\n- 标签与值区域不要单独加白底；若仍被挡优先怀疑 v-html 富文本行内 background 或 .detail-container 卡片底色\n\n## 验证与归属\n- 来源会话 0dd4d311：用户连续 3 轮反馈详情页看不到水印，定位 detail-template 根节点白底盖住\n- 涉及文件：detail-template.vue、src/styles/index.scss、AppMain.vue、mixins/ListTemplate.js\n- 所属项目：产品2.0；代码基线：e0dae0d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/login_wrong_branch.md",
+                "memory_type": "entities",
+                "after": "# 登录页改版改错分支\n后台登录页改造需落在 develop/v2.6.2-portal 分支并基于门户逻辑重新整合，不可直接套用其他分支 UI 代码。\n\n## 问题背景\n- 按设计图改造登录页（授权/账号密码登录、第三方入口、注册链接，去二级 Tab 与图形验证码）后，用户指出改错分支\n- 项目并行多条发布分支（develop/v2.6.2-yulin、develop/v2.6.2-portal 等），各分支登录逻辑不等价\n- portal 分支走门户登录接口 /portal/sso/login（字段 userName）并有 setStoredUserId 等专属逻辑\n\n## 解决方案\n- 源分支 stash 登录页 + 注册页共享组件 accountInfo.vue + 新登录图标静态资源\n- 切到 develop/v2.6.2-portal 解决冲突，基于 portal 原有逻辑重新整合 UI 改动\n- 逐项保留 /portal/sso/login、userName 字段、setStoredUserId，勿整文件套用源分支\n- zhi2-web-admin 是子模块，父仓库也要一并切到 develop/v2.6.2-portal，源分支工作区恢复干净再交付\n- 改分支前先与用户确认目标分支\n\n## 验证与归属\n- 来源会话 453c62ef：用户第 5 轮明确改错分支，从 yulin 暂存切到 portal 解冲突重新整合\n- 涉及文件：src/views/login.vue、LoginForm.vue、home/RegisterLogin.vue、companyLogin.vue、register/components/accountInfo.vue\n- 所属项目：产品2.0；代码基线：8e16dca"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

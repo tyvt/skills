@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793872912374/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T10:51:32.152243+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/scrappedrecord_facility_name.md",
+                "memory_type": "entities",
+                "after": "# 报废记录设施设备类别列显示修复\n产品2.0 的 scrappedRecord 列表因接口返回类别名称不在顶层字段或为名数组，导致「设施设备类别」列空白，后通过 formatter 兼容多级路径与数组。\n\n## 问题根因\n- 列表接口返回的类别名称可能不在顶层 `facilityDefinitionName`，而在 `facilityDefinition`、`facility` 等子对象里\n- 名称也可能是字符串数组（多级路径），表格列只绑了 `prop: 'facilityDefinitionName'`，所以一直为空\n\n## 修复方案\n- 在 `scrappedRecord/index.vue` 为「设施设备类别」列增加 `formatter`，通过 `resolveFacilityDefinitionName` 按优先级取值并转字符串\n- 取值优先级：顶层 `row.facilityDefinitionName` → `row.facilityDefinition.facilityDefinitionName` → `row.facility.facilityDefinitionName`\n- 若上述任一为字符串数组，则用 ` / ` 拼接展示\n\n## 涉及文件与归属\n- 涉及文件：`src/views/dataProperty/scrappedRecord/index.vue`、`detail.vue`、`src/mixins/listMixins.js`\n- 所属项目：产品2.0；来源会话：f8b4bd31-2a17-4162-a6aa-7b14123bf0f6；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/login_cryptojs_missing.md",
+                "memory_type": "entities",
+                "after": "# 登录页CryptoJS未引入致加密报错\n产品2.0 的 login.vue 调用 encryptPassword 依赖 window.CryptoJS，但 index.html 漏引 crypto-js.min.js，导致登录报错，后补脚本并加空值检查。\n\n## 问题根因\n- 点击登录时 `login.vue` 调用 `encryptPassword()` 对密码做 AES 加密，依赖全局 `window.CryptoJS`\n- `index.html` 未引入 `crypto-js.min.js`，致 `CryptoJS` 为 `undefined`，访问 `.enc` 时报错\n- `public/assets/js/crypto-js.min.js` 文件存在，只是漏了 script 标签\n\n## 修复方案\n- 在 `index.html` 中补充 CryptoJS 脚本引用\n- 在 `passwordEncrypt.js` 中增加与 `responseDecrypt.js` 一致的空值检查，便于排查\n\n## 验证与归属\n- 验证：硬刷新页面（Ctrl+F5）后重新登录；开发服务热更新或重启 npm run dev\n- 涉及文件：`src/views/login.vue`、`index.html`、`passwordEncrypt.js`、`responseDecrypt.js`、`public/assets/js/crypto-js.min.js`\n- 所属项目：产品2.0；来源会话：1bc8fc71-bc44-4ec0-8afd-e7a6ff8608f0；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/committee_member_optional.md",
+                "memory_type": "entities",
+                "after": "# 物管会业委会备案委员字段非必填\n产品2.0 的 CandidateDialog 委员信息弹窗中头像上传与任职起止日期原为必填，后改为非必填以适配物管会/业委会备案与变更。\n\n## 背景\n- 委员信息弹窗由 `MemberInformationTable` 统一承载，物管会/业委会的备案与变更共用同一套组件\n- 物管会备案与业委会直接备案（`sourceType=1`）用 `CandidateDialog.vue`；业委会备案与变更的编辑用 `MemberInformationDialog.vue`\n\n## 具体改动\n- 在 `zhi2-web-admin/src/views/autonomy/record/components/CandidateDialog.vue` 移除 `photo`（头像上传）的必填校验\n- 同时移除 `appointmentStartDate`（任职起止日期）的必填校验，移除后不再显示红色星号也不在提交时校验\n\n## 涉及文件与归属\n- 涉及文件：`CandidateDialog.vue`、`MemberInformationDialog.vue`\n- 所属项目：产品2.0；来源会话：14cca6c3-1374-4ef4-99d2-752064a64d18；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bterminal_redirect.md",
+                "memory_type": "entities",
+                "before": "# bTerminalRedirect 路由与保活\n无锡市区G（zhi2-web-admin）的 sso/bTerminalRedirect/index 组件，原先未纳入 InnerLink 的路由规范化导致配 HTTPS 菜单路径时 404，后实现 iframe 视图池保活。\n\n## 路由规范化（修复 404）\n- 根因：菜单 path 配成 https://... 时 Vue Router 无法匹配内部路由，落到兜底 path:'*' 重定向 /404，守卫提示「页面未授权或不存在」\n- 仅 InnerLink 组件在 permission.js 做路径规范化：HTTPS 写入 meta.link，path 转为内部路由（如 https://b.example.com/callback → b/example/com/callback）\n- 修复：permission.js 把 bTerminalRedirect 纳入与 InnerLink 相同的内嵌 iframe 路由规范化；侧边栏 RecursiveMenu 对该组件改走 router-link，不再当纯外链新开窗口\n- 涉及文件：permission.js、src/api/security/oauth2.js、src/views/sso/bTerminalRedirect/index.vue\n\n## iframe 视图池保活\n- bTerminalRedirect 页签保活采用与 InnerLink 相同的 iframe 视图池（v-show 常驻 DOM），而非 Vue keep-alive\n- src/utils/innerLink.js 新增 isBTerminalRedirectRoute、isIframePoolRoute\n- src/utils/bTerminalRedirect.js 抽取 OAuth 取址逻辑 fetchBTerminalIframeSrc\n- src/store/modules/permission.js 为 sso/bTerminalRedirect/index 设置 meta.bTerminalRedirect = true\n- src/layout/components/iframeToggle/BTerminalRedirectFrame.vue 等集成视图池\n\n## 验证与归属\n- 来源会话：2c02c8f7-aee0-47dd-b23d-d8d8f94a007a、47301bc4-8faf-4838-b33c-54afa184fa11；所属项目：无锡市区G；代码基线：none",
+                "after": "# bTerminalRedirect 路由与保活\n无锡市区G（zhi2-web-admin）的 sso/bTerminalRedirect/index 组件，原先未纳入 InnerLink 的路由规范化导致配 HTTPS 菜单路径时 404，后实现 iframe 视图池保活。\n\n## 路由规范化（修复 404）\n- 根因：菜单 path 配成 https://... 时 Vue Router 无法匹配内部路由，落到兜底 path:'*' 重定向 /404，守卫提示「页面未授权或不存在」；侧边栏可能把该菜单当成纯外链用 `<a target=\"_blank\">` 打开，绕过 SSO 跳转逻辑\n- 仅 InnerLink 组件在 permission.js 做路径规范化：HTTPS 写入 meta.link，path 转为内部路由（如 https://b.example.com/callback → b/example/com/callback）\n- 修复：permission.js 新增 isBTerminalRedirectComponent 判定 component 为 sso/bTerminalRedirect 或 sso/bTerminalRedirect/index，把其纳入与 InnerLink 相同的内嵌 iframe 路由规范化；侧边栏 RecursiveMenu 对该组件改走 router-link，不再当纯外链新开窗口\n- 涉及文件：permission.js、src/api/security/oauth2.js、src/views/sso/bTerminalRedirect/index.vue、src/router/index.js、src/utils/ruoyi.js\n\n## iframe 视图池保活\n- bTerminalRedirect 页签保活采用与 InnerLink 相同的 iframe 视图池（v-show 常驻 DOM），而非 Vue keep-alive\n- src/utils/innerLink.js 新增 isBTerminalRedirectRoute、isIframePoolRoute\n- src/utils/bTerminalRedirect.js 抽取 OAuth 取址逻辑 fetchBTerminalIframeSrc\n- src/store/modules/permission.js 为 sso/bTerminalRedirect/index 设置 meta.bTerminalRedirect = true\n- src/layout/components/iframeToggle/BTerminalRedirectFrame.vue 等集成视图池\n\n## 验证与归属\n- 来源会话：2c02c8f7-aee0-47dd-b23d-d8d8f94a007a、47301bc4-8faf-4838-b33c-54afa184fa11、f702fc2e-fea8-44f2-ac57-30fa5c4f7b79；所属项目：无锡市区G（产品2.0）；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

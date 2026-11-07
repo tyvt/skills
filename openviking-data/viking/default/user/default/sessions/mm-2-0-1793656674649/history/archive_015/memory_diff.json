@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793656674649/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T22:21:29.303292+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/technical_pattern/multiselect_recursive_updated.md",
+                "memory_type": "entities",
+                "after": "# MultiSelect recursive update via resetInputHeight in updated()\nIn zhi2-web-admin, MultiSelect.vue of zs-select unconditionally calls resetInputHeight in updated(), causing \"Maximum recursive updates exceeded\".\n\n## Root Cause\n- Error `Maximum recursive updates exceeded` with `ElSelectDropdown` in the stack.\n- MultiSelect updated() unconditionally calls `this.$refs.elSelect.resetInputHeight()`, which triggers inner dropdown update and re-enters updated() in an infinite loop.\n\n## Solution\n- Remove the forced call inside updated().\n- Only trigger once when `$attrs.value` / `$attrs.options` change (dedupe + timer merge).\n\n## Verification & Attribution\n- Evidence: session 533423a8, recursive update at 8081/#/index/todo, root cause MultiSelect updated to resetInputHeight.\n- Files: zhi2-web-admin/src/components/zs-select/MultiSelect.vue\n- Project: 2-0; Source session: 533423a8-81bd-4094-9c97-d30615178fc1; Code baseline: none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/technical_pattern/zs_column_formatter.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column must not pass string formatter to ElTableColumn\nWhen column config has `formatter: 'amountFormatter'`, `<zs-table-column v-bind=\"column\" />` passes the string into $attrs and forwards it to ElTableColumn, triggering `Expected Function, got String`.\n\n## Root Cause\n- zs-table-column uses `v-bind=\"column\"` for passthrough; the string formatter enters $attrs and is passed to ElTableColumn.\n- Even with `:formatter=\"formatters[attrs.formatter]\"`, the warning fires first.\n\n## Solution\n- In zs-table-column.vue, strip the string `formatter` from passthrough attrs.\n- Resolve via resolvedFormatter: use function directly, or map string to same-named export in @/formatters/index.js; only pass the function to ElTableColumn.\n\n## Verification & Attribution\n- Evidence: session ce31747c, maintenanceProject list formatter type warning.\n- Files: zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue, zhi2-web-admin/src/formatters/index.js\n- Project: 2-0; Source session: ce31747c-5502-4d03-83c2-364130d7d52d; Code baseline: none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/technical_pattern/echarts_repeat_init.md",
+                "memory_type": "entities",
+                "after": "# Web chart repeated init: reuse via getInstanceByDom plus single resize bind plus dispose\nWarning `There is a chart instance already initialized on the dom` comes from mounted and watch(dataList/setOption) calling drawCharts() many times, each doing echarts.init(dom) and binding resize with an anonymous function (cannot remove).\n\n## Solution\n- Unified pattern: `echarts.getInstanceByDom(dom) || echarts.init(dom)`.\n- Store the resize handler in a component field; bind only once.\n- In `beforeUnmount`/`destroyed`, call `removeEventListener` + `chart.dispose()`.\n- Use `$nextTick` before drawing when triggered by watch.\n- Batch-align isomorphic componentCharts in benefit statistics, monitor, property dashboard, etc.\n\n## Verification & Attribution\n- Evidence: session 2a9f420a, stack at communityStatistics.vue:35; batch-fixed benefit/dataStatistics and multiple componentCharts.\n- Files: zhi2-web-admin/src/views/benefit/dataStatistics/components/communityStatistics.vue, zhi2-web-admin/src/views/dataStatistics/components/componentCharts.vue, zhi2-web-admin/src/views/monitor/components/ComponentCharts.vue\n- Project: 2-0; Source session: 2a9f420a-f2ff-426a-a5c2-7881713c1a52; Code baseline: none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dicttag_empty_type.md",
+                "memory_type": "entities",
+                "before": "# DictTag 向 ElTag 传空 type 触发校验失败\nElement Plus 的 ElTag 的 type 仅允许特定值或不传，DictTag 在 colorMap 或 listClass 空时传空串会报 Invalid prop type。\n## 问题根因\n- ElTag type 只能是 primary/success/info/warning/danger 或不传。\n- DictTag 在 colorMap 模式或 listClass 为空时绑定 `:type=\"''\"` 导致校验失败。\n## 解决方案\n- colorMap 开启时不传 type（undefined）。\n- 无 listClass 时返回 undefined 而非空串。\n- DictDataTable 勿把 primary 映射成空字符串。\n## 验证与归属\n- 验证证据：会话 d39becce 中 dict-tag.vue、DictDataTable.vue 去掉向 ElTag 传空 type。\n- 涉及文件：zhi2-web-admin/src/components/dict-tag/dict-tag.vue、zhi2-web-admin/src/views/system/dict/components/DictDataTable.vue；所属项目：2-0；来源会话ID：d39becce-af94-4451-b0d2-6ffd7cf94261；代码基线：none。",
+                "after": "# DictTag passes illegal type to ElTag causing validation failure\nElement Plus ElTag type only allows specific values or undefined. DictTag passing empty string or illegal enum (e.g. listClass=\"default\") to ElTag type triggers Invalid prop type.\n\n## Root Cause\n- ElTag type can only be primary/success/info/warning/danger or omitted.\n- DictTag binds `:type=\"''\"` in colorMap mode or when listClass is empty, causing validation failure.\n- Dict item with listClass \"default\" (including variant \"Default\") is treated as ElTag type; Element Plus rejects this enum, raising `Invalid prop: custom validator check failed for prop \"type\"` (stack in DictTag/ElTag).\n\n## Solution\n- Do not pass type (undefined) when colorMap is enabled.\n- Return undefined instead of empty string when listClass is absent.\n- In dict-tag.vue getTagType(): return undefined (no type) for `default`/empty; otherwise `trim().toLowerCase()` to avoid `Default` variants.\n- DictDataTable must not map primary to empty string.\n\n## Verification & Attribution\n- Evidence: session d39becce, dict-tag.vue and DictDataTable.vue removed empty type passed to ElTag.\n- Evidence: session 19b58a9e, maintenanceProject page DictTag to ElTag type validation failure (listClass=default case).\n- Files: zhi2-web-admin/src/components/dict-tag/dict-tag.vue, zhi2-web-admin/src/views/system/dict/components/DictDataTable.vue\n- Project: 2-0; Source sessions: d39becce-af94-4451-b0d2-6ffd7cf94261, 19b58a9e-4df5-44f1-8286-0667d6776a04; Code baseline: none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

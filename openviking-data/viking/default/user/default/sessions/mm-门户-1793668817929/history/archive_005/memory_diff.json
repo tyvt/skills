@@ -1,0 +1,43 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793668817929/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T01:29:54.794856+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/工作流/portal_design_png_sync.md",
+                "memory_type": "entities",
+                "after": "# 门户设计稿 PNG 与 PORTAL_DESIGNS 对接\n仓库视觉底座默认要求设计目录恰好 24 张 PNG、按文件名 Unicode 排序并与 PORTAL_DESIGNS 24 条逐条对应。\n\n## 背景\n- 新版设计仅 20 张时不能只替换下载目录，需通过 portal-visual-reference.py 等生成 hybrid 参考、更新夹具索引/几何，并在报告中记录「忽略的旧变体」\n- 未改 mock、路由与原始下载目录\n\n## 操作流程\n- 对齐任务前应快照分支便于回滚\n- 交付报告需含「忽略的 10 个旧变体」与 portal-visual-reference.py；新版 20 张、旧版 24 张路径并列说明\n\n## 涉及文件\n- zhi2-web-admin/tests/e2e/fixtures/public-portal-designs.ts\n- zhi2-web-admin/scripts/portal-visual-reference.py\n- zhi2-web-admin/test-results/portal-design-sync-report.md\n\n## 关联信息\n- 所属项目：门户；来源会话 ID：2bcfc14a-d4b3-4c95-bd2c-a5ae8c791258；代码基线：2785dd9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_menu_visibility.md",
+                "memory_type": "entities",
+                "after": "# 门户侧栏菜单可见性组合缺陷\n门户侧栏 hidden 菜单仍显示、切页签出现幽灵父级、首页刷新只剩箭头、顶栏一级菜单空白，是 menuVisibility 归一化、侧栏写入时机与 constantRoutes 污染叠加根因。\n\n## 现象\n- 后台菜单 meta 隐藏，RecursiveMenu 仍渲染\n- 切回页签出现不存在的上级目录\n- 硬刷新首页侧栏只剩一列 `>` 空标题目录节点\n- 顶栏一级菜单整行空白\n\n## 根因\n- menuVisibility.js 需统一首页归属 `/`、strip `/redirect`、不 mutate Vuex 路由树、剔除子项全 hidden 目录节点\n- TagsView 首页须 SET_SIDEBAR_ROUTERS 为空，routesLoaded 后再次 syncSidebarWithRoute\n- permission.js 初始化侧栏不拼 constantRoutes，避免幽灵父级\n- Navbar.visibleMenus 误返 [] 致顶栏空白；topMenus 应取首个可见子菜单\n\n## 修复要点\n- 集中改 menuVisibility.js、TagsView、Navbar.vue、permission.js\n- hidden 过滤与空目录剔除放在构建侧栏 children 统一入口，不在 RecursiveMenu 打补丁\n\n## 涉及文件\n- zhi2-web-admin/src/utils/menuVisibility.js\n- zhi2-web-admin/src/layout/components/TagsView/index.vue\n- zhi2-web-admin/src/layout/components/Navbar.vue\n- zhi2-web-admin/src/layout/components/Sidebar/index.vue\n- zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue\n- zhi2-web-admin/src/store/modules/permission.js\n\n## 关联信息\n- 与 #732/#973/#1301 顶栏模式侧栏同步边界不同；本条含 visibleMenus 误返空独立缺陷\n- 所属项目：门户；来源会话 ID：f1e6a91e-9b3c-44e9-9570-576bc6246461；代码基线：b84b4e7"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_api_v2_prefix.md",
+                "memory_type": "entities",
+                "after": "# 门户 v2 网关前缀 /api/v2.0 三处对齐\n门户 monorepo 中部分接口缺 `/api` 前缀或走旧网关致 404，需父仓 env/nginx 与子模块 rewrite/sign 同步修改。\n\n## 现象\n- listTree、上传等请求 URL 缺 `/api` 前缀或仍走旧网关路径，页面 404 或网关拒收\n\n## 根因\n- 父仓管 env/.env 与 deploy/nginx.conf，子模块含 portalApiRewrite.js、public/sign.js 及 vue 硬编码 basePath，只改一处会漂移\n- 已知 #1793/#1828 覆盖菜单路由重写，#1189/#1823 覆盖 env 相对路径，未覆盖 listTree 漏改 + 主仓 nginx 与子模块 sign 同步提交\n\n## 解决方案\n- 父仓 env/.env 与 deploy/nginx.conf 统一前缀 `/api/v2.0`\n- 子模块 portalApiRewrite.js 全量扫 v2 接口族，懒加载 path 带前导 `/`\n- sign.js、FileUpload、登录 vue、README 中 API 前缀常量同步改\n- 主仓与子模块各建分支分别提交，子模块指针再进主仓 commit\n\n## 验收\n- 抓 listTree、上传、登录三类请求，浏览器最终 URL 均含同一 gateway 前缀，nginx 日志无 strip 错误\n\n## 涉及文件\n- env/.env\n- deploy/nginx.conf\n- zhi2-web-admin/src/utils/portalApiRewrite.js\n- zhi2-web-admin/public/sign.js\n- zhi2-web-admin/src/utils/request.js\n- zhi2-web-admin/src/components/FileUpload/index.vue\n- zhi2-web-admin/src/views/login.vue\n\n## 关联信息\n- 所属项目：门户；来源会话 ID：66c9378e-4cf9-4d89-9040-e0be3ea73d99；代码基线：3e8673b；子模块 commit 374ecad，主仓 commit f10ff03"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/项目/门户.md",
+                "memory_type": "entities",
+                "after": "# 门户\n门户是用户维护的面向公众的房产门户前端项目，代码仓库为 zhi2-web-admin（作为某 monorepo 子模块），与园区物管2.0 同仓不同子模块/项目。\n\n## 描述\n- 含 UnifiedLogin 首页、publicPortal 二级页、侧栏菜单、v2 网关接口等\n- 视觉底座默认要求设计目录 24 张 PNG 与 PORTAL_DESIGNS 对应\n\n## 技术特征\n- monorepo：父仓管 env/.env 与 deploy/nginx.conf，子模块 zhi2-web-admin 内含 portalApiRewrite.js、public/sign.js 等\n- 侧栏菜单可见性由 menuVisibility.js 等工具层统一处理\n\n## 关联说明\n- 各类技术模式（设计稿同步、菜单可见性、网关前缀、骨架屏）作为独立「技术模式」实体维护"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/unifiedlogin 操作指引卡片布局.md",
+                "memory_type": "preferences",
+                "after": "- 门户首页 UnifiedLogin 操作指引卡片与设计一致时应为纵向两行：第一行业务分类名（商品房/存量房/租赁），第二行「操作指引」+箭头；去掉中间 `|` 分隔符，略增卡片高度容纳两行（涉及 zhi2-web-admin/src/views/home/UnifiedLogin.vue）\n- 验收用 Playwright 截图对比，目标约 95% 还原；用户曾反馈「操作指引和 UI 偏差过大」并要求截图比对"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

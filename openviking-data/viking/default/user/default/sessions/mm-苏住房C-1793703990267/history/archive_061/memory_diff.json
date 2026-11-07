@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_061",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T13:17:46.149621+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/sfb_v1_token.md",
+                "memory_type": "entities",
+                "after": "# 苏服办登录漏调V2换V1 token\n苏住房C的苏服办免登链路initSfbUser只写V2 token漏换V1，导致依赖apiV1功能不可用。\n\n## 现象\n- 苏服办(ticket换token免登)登录成功后，依赖apiV1的文件上传、交易等功能全部不可用\n- 普通登录页、扫码redirect页一切正常\n\n## 根因\n- 项目有V2(主接口szf.szzfcjj.cn,/api)与V1(http://szfang.szfcweb.cn,/prod-api)两套token\n- 普通登录页与redirect/index.vue拿到accessToken后会调getTokenV1()换V1 token写入userStore.tokenV1\n- 苏服办逻辑独立写在App.vue的initSfbUser里(ticket换token)，只写了V2 token，漏了换V1这一步\n- 这是一条并行的第三套登录链路\n\n## 修复与可复用套路\n- 在initSfbUser设置完V2 token后立即await getTokenV1()\n- 按data.code==200把data.msg存进userStore.setTokenV1\n- 失败也要显式setTokenV1('')，保持与其它登录入口一致\n- 新增任何登录/免登入口时，把「存V2 token + 换V1 token」收敛成一个共用函数\n- 三个入口都调它，避免再次漏写\n\n## 验证与归属\n- 来源会话cf09ca87(基线0d96de2)：用户指出苏服办登录成功后需立刻调用V2换V1 token接口\n- 涉及文件：App.vue、store/user.js、pages/redirect/index.vue、api/index.js\n- 所属项目：苏住房C"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/preview_resolve_url.md",
+                "memory_type": "entities",
+                "after": "# uni.previewImage预览问号占位图\n苏住房C楼盘相册点开预览是问号占位图，因enlargePicture绕过ZsImage路径解析直接传相对路径。\n\n## 现象\n- 楼盘相册列表缩略图正常显示，点开预览却是问号占位图\n- 在苏服办H5等「没有反向代理把/zs-fym/转发到文件服务」的环境必现\n\n## 根因\n- ZsImage组件内部先resolveMediaUrl把接口返回的相对路径转成完整URL再赋给image src，缩略图没问题\n- 点击预览的enlargePicture直接把原始相对路径数组传给uni.previewImage，绕过这层解析\n- 浏览器按当前站点根域去拼相对路径自然404\n\n## 修复与推广\n- 调用uni.previewImage之前对urls做一次map(resolveMediaUrl)并filter(Boolean)\n- 保留原下标作为current，空数组直接return\n- 凡是把后端相对路径交给「不受ZsImage管」的原生能力都必须先经resolveMediaUrl\n- 包括uni.previewImage、uni.setNavigationBarImage、downloadFile、web-view url、分享封面\n- 路径解析不能只依赖渲染组件\n\n## 验证与归属\n- 来源会话b5c173dc(基线62fd49e)：地图找房→小区详情→楼盘相册预览无法显示\n- 涉及文件：buildingAlbum/index.vue、ZsImage.vue、utils\n- 所属项目：苏住房C"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/bottom_bar_penetrate.md",
+                "memory_type": "entities",
+                "after": "# 列表滑动图片穿透底部固定栏\n苏住房C新房详情页滑动时内容/图片盖到固定「购房咨询」底部栏上，由三层根因叠加导致。\n\n## 现象\n- 新房详情页上下滑动时，「户型介绍」等下方内容与图片会盖到固定的「购房咨询」底部栏上(穿屏)\n- 滑到「项目周边」地图区域时更明显\n\n## 根因\n- 底部栏z-index:998太低，低于页面里部分浮层/图片的层级\n- 底部栏组件被放在滚动内容容器内部，形成层叠上下文后跟着内容一起被后续节点覆盖\n- 未处理底部安全区，底栏与内容留白都不足\n\n## 修复做法与限制\n- 全局底部栏bottomBtn.vue：z-index提到9999，加transform:translateZ(0)强制独立合成层，补env(safe-area-inset-bottom)\n- 页面侧把<bottom-btn>移出滚动内容容器(与houseTypeDetail.vue保持一致)\n- 内容底部留白改calc(120px + env(safe-area-inset-bottom))，内容根节点加position:relative;z-index:1\n- 小程序原生map组件永远在最顶层，属已知限制，无法靠z-index解决，需单独降级方案\n\n## 验证与归属\n- 来源会话fb9e853d(基线77666f8)：用户报「新房详情，滑动的过程中会出现穿屏」\n- 涉及文件：bottomBtn.vue、newHouse/detail.vue、houseTypeDetail.vue、ZsRichText.vue\n- 所属项目：苏住房C"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/api_prefix_domain.md",
+                "memory_type": "entities",
+                "after": "# 双后端域名API前缀按域名分别配置\n苏住房C前端同时对接两套后端，szfcweb.cn必须用/prod-api，主接口用/api，不可全局替换。\n\n## 背景\n- 主接口szf.szzfcjj.cn(V2+V1业务)与苏州市区房产交易网上服务平台http://szfang.szfcweb.cn\n- 路径前缀约定不同：szfcweb.cn必须是/prod-api，主接口是/api\n- 写成/api会因网关没配该前缀而404/502\n\n## 配置做法\n- 小程序端(mp)：API基地址集中在src/env/mp.js，V1实例在src/api/v1Instance.js里拼，BASE=`${BASE_URL_V1}/prod-api/v2.0`\n- 改前缀只改这一处，不要散落到各个api文件\n- H5端走环境变量代理，VITE_APP_API_PROXY_V1已指向http://szfang.szfcweb.cn/prod-api，无需改代码\n- 主接口szf.szzfcjj.cn仍保持/api/v2.0，切换前缀时务必确认没有误伤它\n\n## 判定口径\n- 需求说「xx域名开头的接口」时，先按域名分组再动前缀\n- 不要全局替换/api → /prod-api\n\n## 验证与归属\n- 来源会话bfce31c8(基线9832ba3)：用户两次强调szfang.szfcweb.cn开头接口用/prod-api\n- 涉及文件：v1Instance.js、mp.js、index.js、vite.config.ts\n- 所属项目：苏住房C"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

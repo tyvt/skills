@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793792554202/history/archive_013",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T12:21:05.688521+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/institution_detail_scroll.md",
+                "memory_type": "entities",
+                "after": "# 机构注册详情页内容被裁切且无法滚动\n苏州市房地产监测V3 中 `company/institutionRegister/detail.vue` 的四个区块直接挂在 `.detail-container` 下导致内容超出固定高度后被裁切且无法滚动。\n\n## 问题根因\n- `styles/index.scss` 中 `.detail-container` 为 `height: calc(100vh - 120px); overflow: hidden` 的 flex 列容器，本身不滚动\n- 真正滚动容器是 `.detail-from-container`（`flex: 1; min-height: 0; overflow-y: auto`）\n- 该页面四个 `Headline` 直接挂在 `.detail-container` 下，缺少这层包装 → 内容超出后被裁掉且滚不动\n\n## 解决方案\n- 在 `company/institutionRegister/detail.vue` 中将「基本信息 / 机构管理员信息 / 要件上传 / 服务方案」四个区块包进 `<div class=\"detail-from-container\">` 并缩进\n- 操作按钮组与弹窗留在外层，与 `companyApplyAudit/detail.vue`、`companyCancel/detail.vue` 写法一致\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=苏州市房地产监测V3\n- 涉及文件：styles/index.scss、zhi2-web-admin/src/views/company/institutionRegister/detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：cdc32b79-3b70-462e-be5f-487ebd59e555；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_admin_fields.md",
+                "memory_type": "entities",
+                "after": "# 机构管理员详情页人员类型与住所不显示且不保存\n苏州市房地产监测V3 中 `company/companyAdmin/detail.vue` 因 `isAgency` 依赖 `organType` 且保存报文漏字段，导致查看不显示、编辑不保存人员类型/住所。\n\n## 问题根因\n- 查看态与编辑态均用 `isAgency` 判断是否渲染「人员类型/住所」，而 `isAgency` 依赖 `form.organType`\n- 详情接口未返回 `organType` 时，即使数据存在也被隐藏\n- `getForm()` 提交报文中漏掉 `personnelType`、`householdAddress`（及 `personnelCode`），编辑后保存等于没改\n\n## 解决方案\n- 新增计算属性 `showAgencyFields`：`isAgency` 或记录中存在 `personnelType/householdAddress/personnelCode` 时为真，作为兜底判断\n- 编辑态表单、查看态 `contentInfo`、校验规则统一改用 `showAgencyFields`\n- `getForm()` 在 `showAgencyFields` 时把 `personnelCode、personnelType、householdAddress` 加入保存报文\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=苏州市房地产监测V3\n- 涉及文件：zhi2-web-admin/src/views/company/companyAdmin/detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：1aa60fcd-fb6c-40ed-85a3-935deaae7e9d；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/agency_network_formitem.md",
+                "memory_type": "entities",
+                "after": "# 经纪机构入驻网络详情页 el-form-item 缺 el-form 祖先报错\n苏州市房地产监测V3 中 `companyManagement/components/AgencyEntryNetworkSections.vue` 直接使用 `<el-form-item>` 但整棵组件树无 `<el-form>` 祖先，导致查看页必现 Vue warn 报错。\n\n## 问题根因\n- `AgencyEntryNetworkSections.vue` 直接使用 `<el-form-item>`，父级 `AgencyEntryNetworkAdminDetail.vue`、`AgencyEntryNetworkDetail.vue` 均无 `<el-form>` 祖先\n- Element UI 的 `el-form-item` 通过 `inject: ['elForm']` 获取表单上下文，取不到时 `form` 计算属性读 `undefined.$options` 触发报错\n- 详情页（view 态）「业务范围」块的 form-item 不受 `v-else` 保护，始终渲染，故查看页必现\n\n## 解决方案\n- 在 `AgencyEntryNetworkSections.vue` 中，「基本信息」编辑态与「业务范围」块的 `el-form-item` 外层各包一层 `<el-form :model=\"form\" label-width=\"auto\">`\n- 新增 scoped 样式把 grid 移到 `.section-form > .el-form` 相关层级（原 `.section-form` 为 3 列 grid）\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=苏州市房地产监测V3\n- 涉及文件：zhi2-web-admin/src/views/company/companyManagement/components/AgencyEntryNetworkSections.vue、AgencyEntryNetworkAdminDetail.vue、AgencyEntryNetworkDetail.vue、components/Headline/index.vue\n- 所属项目：苏州市房地产监测V3；来源会话：6a44b07c-5c77-4c89-bebf-6f7395f38ffe；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/permit_cancel_path.md",
+                "memory_type": "entities",
+                "before": "# 预售注销列表硬编码路径致跳转错位\n苏州市房地产监测V3 中 `permitCancel/index.vue` 硬编码模块路径致跳至预售许可申请详情，改为基于 meta 推导本模块路径。\n\n## 问题根因\n- `permitCancel/index.vue` 的 `handleViewPermit` 硬编码 `presale/permit/detail` 与 `presalePermitId` 导致点击跳至申请详情\n\n## 解决方案\n- 改为通用 `handleView(row)` 利用路由 `meta.filePath` 推导 `presale/permitCancel/detail` 及主键 `presalePermitCancelId`\n- 要件 busCode 由 `resolveCancelAppendixBusCode` 解析\n- 移除无效引入 `buildNavigationByFilePath` 与 `PERMIT_APPENDIX_BUS_CODE`\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3/309.md\n- 涉及文件：路由信息.json、permitCancel/index.vue、detail.vue、permitCancelConstants.js、mixins/listMixins.js、utils/ruoyi.js、e2e/presale/presale-cancel-real-api-flow.spec.js 等\n- 所属项目：苏州市房地产监测V3；来源会话：ced7c12b-e4ad-4fd7-ab5c-966c08d44923；代码基线：none",
+                "after": "# 预售注销列表硬编码路径致跳转错位\n苏州市房地产监测V3 中 `permitCancel/index.vue` 硬编码模块路径致跳至预售许可申请详情，改为基于 meta 推导本模块路径。\n\n## 问题根因\n- `permitCancel/index.vue` 的 `handleViewPermit` 硬编码 `presale/permit/detail` 与 `presalePermitId` 导致点击跳至申请详情\n\n## 解决方案\n- 改为通用 `handleView(row)` 利用路由 `meta.filePath` 推导 `presale/permitCancel/detail` 及主键 `presalePermitCancelId`\n- 要件 busCode 由 `resolveCancelAppendixBusCode` 从注销菜单解析，不再串到预售许可申请\n- 移除无效引入 `buildNavigationByFilePath` 与 `PERMIT_APPENDIX_BUS_CODE`\n- 结果：点许可证号 / 项目名称 / 「查看」按钮均进入本模块注销详情\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3/309.md\n- 涉及文件：路由信息.json、permitCancel/index.vue、detail.vue、permitCancelConstants.js、mixins/listMixins.js、utils/ruoyi.js、e2e/presale/presale-cancel-real-api-flow.spec.js 等\n- 所属项目：苏州市房地产监测V3；来源会话：ced7c12b-e4ad-4fd7-ab5c-966c08d44923；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

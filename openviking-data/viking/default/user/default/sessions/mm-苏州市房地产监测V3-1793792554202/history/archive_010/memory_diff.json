@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793792554202/history/archive_010",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T12:15:36.511752+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_spacing_fix.md",
+                "memory_type": "entities",
+                "after": "# 弹窗左侧间距双重间距修复\n苏州市房地产监测V3 中多处弹窗因全局 zs-dialog 样式与组件样式优先级打平，导致左面板与右侧出现双重间距，已统一修复。\n\n## 根因\n- 全局 zs-dialog 样式 .dialog-left 自带 margin-right: 20px; padding: 20px，弹窗 body padding: 30px\n- 组件内新样式与全局选择器优先级打平未生效，导致左面板与右侧之间出现双重间距\n\n## 修复内容\n- BuildingUnitLazyTree.vue：左面板选择器提升为 .dialog-box .dialog-left.building-unit-lazy-tree（0,4,0），确保 margin-right: 0、padding: 20px 16px 16px 压过全局样式\n- ContractDialog.vue（选择合同）、NoticeContractDialog.vue（选择合同号）：加 select-contract-dialog 类，body 内边距 20px 24px 24px、左右面板 gap: 16px、去除左面板 margin，与 chooseHouseDialog 一致\n- buildingTreeDialog.vue（选择缴款通知书）：加 select-notice-dialog 类并统一间距覆盖，左面板样式选择器同步提升优先级\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=苏州市房地产监测V3\n- 涉及文件：BuildingUnitLazyTree.vue、ContractDialog.vue、NoticeContractDialog.vue、buildingTreeDialog.vue、chooseHouseDialog.vue\n- 所属项目：苏州市房地产监测V3；来源会话：7342d846-a274-472d-aa53-0402cfe58bdb；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/personnel_detail_fix.md",
+                "memory_type": "entities",
+                "after": "# 从业人员变更详情页核对与修复\n苏州市房地产监测V3 中从业人员变更详情页已存在，核对文档后发现并修复 1 处不符（缺失 personnelRecordChangeId）。\n\n## 现状核对\n- 入口 src/views/company/staffManagement/personnelChange/detail.vue（复用 components/detail.vue，isChange=true），流程闭环完整\n- 与文档逐条比对：getLast 发起变更 ✅、detail+originInfo 快照角标 ✅、update 须携带 personnelRecordChangeId ❌ 缺失已修复、submit ✅、approval ✅\n\n## 修复内容\n- components/detail.vue、personnelRecord.js：补充 update 携带 personnelRecordChangeId\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=苏州市房地产监测V3\n- 涉及文件：src/views/company/staffManagement/personnelChange/detail.vue、components/detail.vue、personnelRecord.js\n- 所属项目：苏州市房地产监测V3；来源会话：1f77392c-bb7c-4811-9034-aba84953e2f6；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/select_dialog_bug.md",
+                "memory_type": "entities",
+                "after": "# SelectEntryDialog 直接改 prop 致弹窗重开\n苏州市房地产监测V3 中 SelectEntryDialog.vue 内部对 prop 直接赋值关闭弹窗，导致父组件状态不同步，列表页 re-render 时弹窗重开并重复请求。\n\n## 根因\n- SelectEntryDialog.vue 用 :visible.sync=\"visible\" 关闭弹窗，visible 是 prop，handlePick 中 this.visible=false 直接改 prop 不通知父组件\n- 父组件 showSelectEntryDialog 仍为 true（无 update:visible 事件）\n- 列表页任意 re-render（点搜索 → handleQuery → getList → loading 变化）将子组件 prop 重置为 true → 弹窗重开 → watch visible 触发 getList() → 重复调用 selectableEntryPage\n\n## 涉及文件\n- SelectEntryDialog.vue、zhi2-web-admin/src/views/presale/leaseContract/components/SelectEntryDialog.vue、PropertyVerifyDialog.vue、listMixins.js、presale/leaseContract/index.vue\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=苏州市房地产监测V3\n- 所属项目：苏州市房地产监测V3；来源会话：c5c2d0c8-f7eb-434b-9656-71388be8c06d；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/trustee_appendix_display.md",
+                "memory_type": "entities",
+                "before": "# 授权委托书改为始终显示不过滤\n苏州市房地产监测V3 中授权委托书改为始终显示、不过滤，另有 spec 中其他用例属既有基线失败。\n\n## 既有失败用例\n- spec 文件里另外 3 个用例（多图回显、要件删除、注册全流程）目前失败\n- 用 git stash 在改动前代码上跑过同样全失败，属既有基线问题，非本次改动引起\n- 失败原因：用例仍用 `institution-appendix-*` 测试 id 和 `.file-row`、`上传` 旧选择器，而单页表单实际渲染 `appendix-requirement-*` 和图片式上传占位\n- 这几个需单独一轮修复，超出「授权委托书」范围，未改动\n\n## 循环依赖说明\n- eslint 对 `registerAppendixAdminType.js` 报 `import/no-cycle`（import `api/company/companyRegister.js`，后者 import `utils/appendix.js`，而 `appendix.js` import 回本文件）\n- 该循环在改动前已存在，沿用同样 `normalizeAppendixConfig` 导入方式，未引入新循环\n\n## 验证与归属\n- 验证证据：extracted source=zcode project=苏州市房地产监测V3\n- 涉及文件：registerAppendixAdminType.js、api/company/companyRegister.js、utils/appendix.js、appendix.js\n- 所属项目：苏州市房地产监测V3；来源会话：session_de8fcbd46f273208201b79f1dca6500e；代码基线：none",
+                "after": "# 授权委托书显示与过滤逻辑\n苏州市房地产监测V3 中授权委托书（busCode: glygly）显示受管理员类型过滤影响；另有改动使其始终显示、不过滤，spec 中其他用例属既有基线失败。\n\n## 过滤逻辑（根因）\n- listAppendixPackage 返回要件仅一条：appendixConfigName \"授权委托书\"，busCode \"glygly\"，isRequired \"1\"，appendices null\n- companyAdmin/detail.vue 给 AppendixPackageSection 传 :admin-type=\"normalizedAdminType\"，法人 → adminType='0'\n- AppendixPackageSection/index.vue 的 appendixHandleConfig：adminType≠'1'（非受托人）时用 isTrusteeOnlyAppendixConfig 过滤受托人专属要件\n- src/utils/registerAppendixAdminType.js:16-19 名称匹配 授权委托书|授权书|受托人.*身份证 的均被过滤\n- 该 busCode 仅配置授权委托书一条，过滤后 fileList 为空 → 不显示配置附件\n\n## 既有失败用例\n- spec 文件里另外 3 个用例（多图回显、要件删除、注册全流程）目前失败\n- 用 git stash 在改动前代码上跑过同样全失败，属既有基线问题，非本次改动引起\n- 失败原因：用例仍用 `institution-appendix-*` 测试 id 和 `.file-row`、`上传` 旧选择器，而单页表单实际渲染 `appendix-requirement-*` 和图片式上传占位\n- 这几个需单独一轮修复，超出「授权委托书」范围，未改动\n\n## 循环依赖说明\n- eslint 对 `registerAppendixAdminType.js` 报 `import/no-cycle`（import `api/company/companyRegister.js`，后者 import `utils/appendix.js`，而 `appendix.js` import 回本文件）\n- 该循环在改动前已存在，沿用同样 `normalizeAppendixConfig` 导入方式，未引入新循环\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=苏州市房地产监测V3；extracted source=zcode project=苏州市房地产监测V3\n- 涉及文件：companyAdmin/detail.vue、AppendixPackageSection/index.vue、src/utils/registerAppendixAdminType.js、api/company/companyRegister.js、utils/appendix.js、appendix.js\n- 所属项目：苏州市房地产监测V3；来源会话：5be31fea-c6b7-4f9d-b928-c2eb49a504a0、session_de8fcbd46f273208201b79f1dca6500e；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

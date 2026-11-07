@@ -1,0 +1,51 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T22:56:35.696923+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/sim_verify_fail.md",
+                "memory_type": "entities",
+                "after": "# 模拟器实名认证不发wechat/verify\n苏住房C 居民实名认证在开发者工具/模拟器中完全不发出 /security/ctAuth/wechat/verify 请求，根因为人脸核身 fail 回调而非前端代码问题。\n\n## 现象与根因\n- 提交实名认证后只看到 getRepeatByIdTypeAndIdNumber 返回 {hasRepeat:\"0\", phone:null}，随后弹「认证失败」，且完全没有 wechat/verify 请求\n- 认证链路：提交认证 → getRepeatByIdTypeAndIdNumber 校验重复 → uni.startFacialRecognitionVerify 微信人脸核身 → 仅 success 分支才 wx.login 再调 wechat/verify\n- 开发者工具/模拟器不支持或无法完成人脸核身，直接走 fail 回调，所以 wechat/verify 永远发不出来\n- H5 端直接提示「请在微信小程序中进行实名认证」，同样不调该接口\n\n## 排查与做法\n- 实名认证必须在真机微信小程序里验证（开发者工具 → 预览 → 手机扫码），再看 Network 是否出现 wechat/verify\n- 排查「接口没发但也没前端报错」类问题，先确认前置异步能力（人脸核身、授权、扫码等）在模拟器是否可用，再怀疑代码\n- 遇到微信专有能力报 unexplained fail，优先换真机复测\n\n## 验证与归属\n- 会话 13ed1683：用户诉求「没有 wechat/verify 请求，是不是模拟器原因？」；结论确认 startFacialRecognitionVerify 在模拟器走 fail 回调，附模拟器/真机/H5 三环境对照表\n- 涉及文件：src/api/security.js、pages_my/verification/FormLocal.vue、FormNonLocal.vue、FormManual.vue、utils/constant.js\n- 所属项目：苏住房C；代码基线：5f0f4dc；来源会话ID：13ed1683-e44e-4216-95c3-4499d21022e8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/uni_scss_import.md",
+                "memory_type": "entities",
+                "after": "# uni.scss相对路径@import构建失败\n苏住房C 的 uni.scss 被注入每个页面样式块，其中相对路径 @import 会按当前页面目录解析导致构建找不到文件，必须改用 @/ 别名。\n\n## 现象与根因\n- zhi2-mobile-shimin 在 pages_tab/benefit/index.vue 编译时构建失败，报找不到 styles/zs-button.scss；文件确实存在于 src/styles/ 下\n- src/uni.scss 是 uni-app 全局变量注入入口，会被塞进每个页面/组件的样式块\n- 其中写的相对路径 @import './styles/zs-button.scss' 以「当前正在编译的 .vue 文件所在目录」为基准解析（如 pages_tab/benefit/），而非以 src/uni.scss 所在目录解析，路径落空\n- 同一页面在 H5 可能侥幸不出错，构建 mp-weixin 时必现\n\n## 解决方案\n- uni.scss 及任何被全局注入的 scss 里，样式导入一律写项目别名 @import '@/styles/zs-button.scss'（与既有 @import \"@/styles/btn.scss\" 保持一致），禁止用 ./ 或 ../ 相对路径\n- 新增公共样式文件时先在 uni.scss 里按别名挂好，再在页面里按需补充\n- 改完跑一次 npm run build 核对，而不是只看 dev 热更新\n\n## 验证与归属\n- 会话 8f10f353：报错来自 terminals/15.txt:21-35；结论明确「uni.scss 被注入每个页面样式，相对路径按当前页面文件解析」，修复为 @import '@/styles/zs-button.scss'，改后 npm run build 通过\n- 涉及文件：src/uni.scss、pages_tab/benefit/index.vue、src/styles/zs-button.scss、src/styles/btn.scss\n- 所属项目：苏住房C；代码基线：5f0f4dc；来源会话ID：8f10f353-5bab-456e-8115-00b593a5bd85"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/uni_dev_outdir.md",
+                "memory_type": "entities",
+                "after": "# uni dev脚本不支持--outDir参数\n苏住房C 移动端 npm run dev 带上 --outDir 即报 Unknown option 启动失败，该参数仅 uni build 子命令解析，dev 产物固定落 dist/dev/mp-weixin。\n\n## 现象与根因\n- 执行 npm run dev（mp-weixin）启动即报 Unknown option --outDir，dev 起不来，而 build 正常\n- @dcloudio vite-plugin-uni 的 CLI 只在 uni build 子命令上解析 --outDir，uni dev 不认这个参数，会以未知参数直接退出\n- 项目 package.json 里 dev 脚本照抄了 build 的写法：uni -p mp-weixin --outDir ../dist\n\n## 解决方案\n- 把 dev 脚本改回 uni -p mp-weixin，build 脚本保留 --outDir ../dist\n- dev 落 zhi2-mobile-shimin/dist/dev/mp-weixin，生产构建落 monorepo 根 dist；验收构建产物按对应目录看，别拿 dev 产物验证发布包（同源项目第 79 条踩过 dev 产物含未分包页面导致体积误判）\n- 若确实要让 dev 也输出到 ../dist，只能在 vite.config.ts 里配 build.outDir，命令行传参一定不生效\n\n## 验证与归属\n- 会话 3541fbbe：用户贴 terminals/16.txt:16-26 的报错；结论写明「--outDir 只在 uni build 下有效，dev 不支持该参数」，从 dev 脚本移除后恢复\n- 涉及文件：zhi2-mobile-shimin/package.json、vite.config.ts、根 package.json\n- 所属项目：苏住房C；代码基线：9832ba3；来源会话ID：3541fbbe-c057-47a6-9bce-5cea5500bd20"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zsnav_double_title.md",
+                "memory_type": "entities",
+                "after": "# ZsNav漏配navigationStyle导致双标题\n苏住房C 页面用了自定义 ZsNav 却在 pages.json 漏配 navigationStyle:\"custom\"，会出现系统导航栏与 ZsNav 两条标题叠加。\n\n## 现象与根因\n- 业主端「我的决策」列表页（pages_owner/decision/index.vue）头部标题重复显示两次，两条都写「我的决策」，用户截图报障\n- 该页模板里用了自定义导航组件 ZsNav，但 pages.json 里这条路由仍保留默认系统导航（只配了 navigationBarTitleText），没设 navigationStyle:\"custom\"\n- 于是系统顶栏渲染一次、ZsNav 再渲染一次，两条叠加；同模块其他带 ZsNav 的页面（如 income/index）都已配置 custom，只有 decision/index 漏了\n\n## 解决方案\n- 在 pages.json 对应页面节点补 \"navigationStyle\": \"custom\"，重新编译验证只剩一条头部\n- 本项目成对约定：用了自定义导航组件就必须配 custom；反之没配 custom 的页面不要引 ZsNav，只保留系统导航（与决策详情等子页一致）\n- 排查同类「双头/双标题」问题时，先拿 ZsNav 的使用点与 pages.json 的 navigationStyle 做一次全量对照；若配完仍双头，先清缓存、确认编译到的是最新包\n\n## 验证与归属\n- 会话 18d9a799：用户贴图报「慧物业-投票表决，查看我的决策头部重复显示两次」；结论给出根因（pages.json 未设 navigationStyle: custom）与修改项，并指出 income/index 等同类页面已配、只有此页漏了\n- 涉及文件：pages_owner/decision/index.vue、src/pages.json、pages_owner/decision/detail.vue\n- 所属项目：苏住房C；代码基线：4316025；来源会话ID：18d9a799-b438-480c-b29c-cf616ca0f008"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/wxss_not_unsupported.md",
+                "memory_type": "entities",
+                "before": "# 微信小程序WXSS不支持:not()伪类\n苏住房C（uni-app Vue3）构建时微信开发者工具报wxss编译错误，根因是WXSS不支持:not()伪类。\n\n## 现象与根因\n- zhi2-mobile-shimin自动预览/构建报wxss编译错误ErrorFileCount[3]，error at token ':'\n- 同时命中TypeChoose_Suzhufang.vue、pages_owner/house/index.vue、pages_owner/tenant/index.vue三文件\n- 微信小程序WXSS不支持:not()伪类，编译产物出现即整条报错直接打断构建（不同于min()/max()静默丢弃）\n- 两处来源：页面直系选择> :not(.page-bg)与uni.scss全局.page:not(.page-wrapper)污染所有页面\n\n## 解决方案\n- 把:not()展开成显式选择器清单，如> :not(.page-bg)改为.type-text, .title_card_container等\n- 全局uni.scss里.page:not(.page-wrapper)直接降级为.page\n- 改完构建后dist的wxss里grep :not数量应为0，再回开发者工具编译\n- 新增样式禁用:not()/:has()一类现代伪类\n\n## 验证与归属\n- 会话7482cc2e（2026-08-25，基线5f0f4dc）用户贴wxss编译错误，逐文件替换并改uni.scss，复核:not数量为0\n- 涉及文件：TypeChoose_Suzhufang.vue、house/index.vue、tenant/index.vue、uni.scss\n- 所属项目：苏住房C；来源会话ID：7482cc2e-dca0-4d98-8721-da0bc1b7dffd；代码基线：5f0f4dc",
+                "after": "# 微信小程序WXSS不支持:not()伪类\n苏住房C（uni-app Vue3）构建时微信开发者工具报wxss编译错误，根因为WXSS整类不支持:not()等伪类，需改写显式选择器或套容器承接样式。\n\n## 现象与根因\n- zhi2-mobile-shimin 自动预览/构建报 wxss 编译错误 ErrorFileCount[3]，error at token ':'\n- 微信小程序 WXSS 选择器支持面比标准 CSS 窄，`:not(...)` 被整类拒绝，任一被引入的 scss 出现 `:not(` 都会被打进每份 wxss 造成一连串报错\n- 典型来源：页面直系选择 `> :not(.page-bg)`、`.container-main > :not(.page-bg)` 与 uni.scss 全局 `.page:not(.page-wrapper)` 污染所有页面\n- 命中文件示例：TypeChoose_Suzhufang.vue、pages_owner/house/index.vue、pages_owner/tenant/index.vue、pages_owner/income/index.vue\n\n## 解决方案\n- 把 `:not()` 展开成显式选择器清单，如 `> :not(.page-bg)` 改为 `.type-text, .title_card_container`\n- 全局 uni.scss 里 `.page:not(.page-wrapper)` 直接降级为 `.page`\n- 套容器承接样式时必须把原有 `flex: 1`、`min-height: 0` 一起搬到新容器，否则滚动区域失效\n- 改完在页面/组件级扫 `:not` 数量应为 0，再回开发者工具重新编译验证；新增样式禁用 `:not()/:has()` 一类现代伪类\n\n## 验证与归属\n- 会话 7482cc2e（2026-08-25，基线 5f0f4dc）：用户贴 wxss 编译错误，逐文件替换并改 uni.scss，复核 :not 数量为 0；涉及 TypeChoose_Suzhufang.vue、house/index.vue、tenant/index.vue、uni.scss\n- 会话 42b1dbae（基线 9832ba3）：pages_owner/income/index.wxss 等三处 error at token ':'，逐文件替换后 :not 数量为 0；随后修改 maintain/detail.vue 保留 flex/min-height 构建通过；涉及 income/index.vue、maintain/detail.vue、styles/filter.scss、components/PageBg/PageBg.vue\n- 所属项目：苏住房C"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/wxss_not_bug.md",
+                "memory_type": "entities",
+                "deleted_content": "# 微信小程序WXSS不支持:not()伪类\n微信小程序WXSS整类不支持 `:not()` 等伪类（不只禁通配符），编译报 error at token ':'，需包容器承接样式。\n\n## 问题根因\n- WXSS选择器支持面比标准CSS窄，`:not(...)` 被整类拒绝；只要任一被引入的scss（uni.scss全局、页面scss、被多组件@import的样式）出现 `:not(`，就会被打进每份wxss造成一连串报错\n- 典型来源：`.container-main > :not(.page-bg)` 与 uni.scss 里的 `.page:not(.page-wrapper)`\n\n## 解决方案\n- 搜索全仓 `:not(` 改写为显式类名枚举，如 `> :not(.page-bg)` → 给内容区套 `<div class=\"container-body\">` 再写 `.container-body`\n- 套容器时必须把原有 `flex: 1`、`min-height: 0` 一起搬到新容器，否则滚动区域失效\n- 改完在页面/组件级扫 `:not` 数量应为0，重新构建后到微信开发者工具重新编译验证\n\n## 验证与归属\n- 验证证据：pages_owner/income/index.wxss 与另两处 error at token ':'，根因确认WXSS不支持:not()，逐文件替换后三个wxss中:not数量为0；随后修改maintain/detail.vue保留flex/min-height构建通过\n- 涉及文件：pages_owner/income/index.vue、pages_owner/maintain/detail.vue、uni.scss、styles/filter.scss、components/PageBg/PageBg.vue\n- 所属项目：苏住房C；来源会话ID：42b1dbae-331e-42a5-8f4d-a65e0368e56b；代码基线：9832ba3"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

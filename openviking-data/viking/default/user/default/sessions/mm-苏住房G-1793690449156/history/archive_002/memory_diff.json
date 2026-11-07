@@ -1,0 +1,43 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:26:59.851626+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/events/2026/11/03/axios序列化版本兼容修复.md",
+                "memory_type": "events",
+                "after": "# Summary\n在苏住房G项目 zhi2-web-admin 前端中，列表页 created 阶段调用 getList 时直接抛出 AxiosError: options must be an object，列表空白。根因为项目实际使用 axios 0.28，而请求封装里传了老版本的函数签名 paramsSerializer，新版把 serializer 当对象处理从而报错。修复方式为移除 request.js 中的自定义 paramsSerializer，改为在 getQueryParams 里手工将数组参数 join 成逗号串（如 propertyTypes=low,multi、complexIds=1,2,3），不再出现 xxx[] 键。来源会话 466205e5，代码基线 4fad664。\n# 2026-11-03 (Tuesday) ChatLog:\n**user**: 【记忆类型】bug\n【标题】axios 0.28 下自定义 paramsSerializer 与数组参数会抛 AxiosError: options must be an object（页面 created 直接炸）\n【内容】现象：页面加载即报 `[Vue warn]: Error in created hook: \"AxiosError: options must be an object\"`，堆栈落在列表页 index.vue 的 created，且整条 getList 未发出、列表空白。根因：为让后端收到 `propertyTypes[]=a&propertyTypes[]=b` 形式，在请求封装里传了自定义 `paramsSerializer`（老版本 axios 的函数签名），而项目实际是 axios 0.28——新版把 serializer 当对象处理，传函数或在其中读错参数位置就抛 options must be an object。这与「后端契约错误」「代理 404」都无关，是纯粹的库版本兼容问题。做法：不要为单个页面的数组参数去动 request.js 的 paramsSerializer；把多选数组在 getQueryParams 里手工 join 成逗号串（`propertyTypes=low,multi`），导出的 ID 集合同理（`complexIds=1,2,3`），从此不再出现 `xxx[]` 键。差异点：已知 #338 只界定「改 utils 请求体形态、不动路径」，#740 只讲逗号串回显；本条补的是「数组参数序列化的版本兼容根因」——先确认 axios 版本再用自定义 serializer，否则整个页面的生命周期钩子一起挂掉。\n【验证证据】会话 466205e5（基线 4fad664）：用户报 `[Vue warn]: Error in created hook: \"AxiosError: options must be an object\"`，指向 publicQuery/complex/index.vue；结论「根因是 axios 0.28 与自定义 paramsSerializer 不兼容，页面 created 阶段调用 getList 时触发」，修复为移除 paramsSerializer、在 getQueryParams 里把 propertyTypes / complexIds 转逗号串。\n【涉及文件】zhi2-web-admin/src/views/publicQuery/complex/index.vue\n【所属项目】苏住房G\n【来源会话ID】466205e5-ee7c-4c88-9a01-a864233745f0\n【代码基线】4fad664"
+            },
+            {
+                "uri": "viking://user/default/memories/events/2026/11/03/同路径多路由消歧改造.md",
+                "memory_type": "events",
+                "after": "# Summary\n在苏住房G项目 zhi2-web-admin 中，首页「检查数据导航」点击「正常/逾期 N 份」本应进入整改通知列表，却跳到错误页或详情页。根因为后端下发的菜单里同一 meta.filePath 注册了多条路由（列表入口为静态 path，详情入口带 :tableid 动态段），ruoyi.js 的 find 只取第一条常命中详情入口。做法是将 filePath 反查统一改为 score-and-pick：filter 出所有同 filePath 路由，多于一条时优先选 path 中不含数字 (/\\d/) 的那条，排序为静态优先→无动态段→路径更短，都相同才退回取第一条。该规则被 getCurrentRouterByFilePath、getRouterPathByFilePath、getRouterPathByFilePathNew、resolveRegisteredRoute 四处共用。来源会话 35ea5c25，基线 15e201a。\n# 2026-11-03 (Tuesday) ChatLog:\n**user**: 【记忆类型】bug\n【标题】同一 meta.filePath 命中多条菜单路由时，find 会挑中带 :tableid 动态段的详情入口，跳转落到详情而非列表\n【内容】现象：首页「检查数据导航」点「正常：N 份 / 逾期：N 份」本该进整改通知列表，却跳到错误页（或侧栏异常/无数据），排查后确认跳转代码本身没问题。根因：后端下发的菜单里，同一个 `meta.filePath` 被注册了不止一条路由——列表入口 path 是静态串，详情入口则带数字动态段（如 `.../:tableid`）。`ruoyi.js` 里 `routes.find(r => r.meta?.filePath === filePath)` 只取第一条命中，顺序上常先命中详情入口，于是拿到一条带参数占位符的 path 直接 push。做法：把 filePath 反查统一改造成「score-and-pick」——先 `filter` 出所有 filePath 相同的路由；多于一条时优先选 path 中**不含数字**（`/\\d/`）的那条；排序为 pareto（静态优先 → 无动态段 → 路径更短），都相同时才退回原来的「取第一条」以保证零行为变化。该规则被 `getCurrentRouterByFilePath`、`getRouterPathByFilePath`、`getRouterPathByFilePathNew`、`resolveRegisteredRoute` 四处共用，改一处即全站收敛。差异点：已知 #504 的根因是「flattenTree 后 filePath 变成 Layout/ParentView」，#703 是「动态段拼写错」，本条是第三个独立根因——filePath 本身合法但一 filePath 多路由，必须靠「静态优先」消歧。\n【验证证据】会话 35ea5c25（基线 15e201a）：用户两轮反馈首页「检查数据导航」链接落错页，最终在 @/utils/ruoyi.js 里统一处理「同一 meta.filePath 对应多条路由」，规则为优先选 path 中不含数字(/\\d/)的那条，都不含或都含时取第一条；影响 getCurrentRouterByFilePath / getRouterPathByFilePath / getRouterPathByFilePathNew / resolveRegisteredRoute。\n【涉及文件】zhi2-web-admin/src/utils/ruoyi.js ; zhi2-web-admin/src/views/home/v2/components/CheckDataNav.vue\n【所属项目】苏住房G\n【来源会话ID】35ea5c25-1234-41c5-8b15-0f3de8592c07\n【代码基线】15e201a"
+            },
+            {
+                "uri": "viking://user/default/memories/events/2026/11/03/B端小区数据隔离补全.md",
+                "memory_type": "events",
+                "after": "# Summary\n在苏住房G项目 zhi2-web-admin 中，B 端企业从业人员登录后，物业服务人员、收费标准、物业费账单、年度预算、支用合同、保单管理、用款申请、支取通知书等 9 个模块看到全量数据（选择区域弹窗列出全部 2624 条）而非授权小区。根因为这些模块只按机构维度过滤，登录时选中的小区只存在 store 未拼入请求。做法：以 isBTerminalPractitioner 判定入口（不能用 terminalType 判空），在 utils/projectContext.js 抽 applyBTerminalProjectFilter()，mixins/bTerminalProjectMixin.js 统一注入 projectId 与 complexId 双参数、区域弹窗带同双参数、新增页区域字段自动回填并 regionLocked 禁止改。来源会话 8aa7c044，基线 805ea8c。\n# 2026-11-03 (Tuesday) ChatLog:\n**user**: 【记忆类型】bug\n【标题】B 端企业人员按「登录选中小区」做数据隔离：projectId + complexId 双参数 + 区域锁定回填，靠公共 mixin 一次覆盖多模块\n【内容】现象：B 端企业从业人员登录后，物业服务人员、收费标准、物业费账单、年度预算、支用合同、保单管理、用款申请、支取通知书等模块看到的是全量数据（选择物业管理区域弹窗列出全部 2624 条），而不是自己获授权的那一个小区。根因：这些模块的列表与选择弹窗只按机构维度过滤，没有任何「当前项目/小区」上下文；登录时选中的小区只存在 store 里，从未拼进请求。做法：判定入口统一为 `isBTerminalPractitioner`（不能用 terminalType 判空，见已知 #990）；在 `utils/projectContext.js` 抽 `applyBTerminalProjectFilter()`，`mixins/bTerminalProjectMixin.js` 统一做三件事——① 列表 getQueryParams 同时注入 `projectId` 与 `complexId`（值都取登录时选中的小区 ID，多数接口两个都认）；② 选择区域弹窗的 filterParams 带同双参数，避免拉全量；③ 新增页把区域字段自动回填并 regionLocked 禁止改。接入方式是逐模块 `getQueryParams` 调同一个函数，而不是各页自写一份。注意：某接口只认其中一个参数时单独调整，不要为了统一而删掉另一个。差异点：已知清单里没有「B 端多租户数据隔离」这一类条目，#990 只讲端别判定，#102 的 complexId 是另一个项目的字段名语义。\n【验证证据】会话 8aa7c044（基线 805ea8c）：用户要求「阳光物业: 物业服务人员、收费标准、物业费账单、年度预算、支用合同、保单管理、用款申请、支取通知书等需要只显示选中的授权物业管理区域。企业人员要加 projectId 参数，complexId 也传，都是登录时选中的小区 ID」。结论：projectContext.js 新增 applyBTerminalProjectFilter()，bTerminalProjectMixin.js 支持双参数过滤/区域锁定/新增页自动回填，覆盖 9 个列表页 + 各详情页与选择弹窗；效果为「选择弹窗不再出现全部 2624 条」。\n【涉及文件】zhi2-web-admin/src/mixins/bTerminalProjectMixin.js ; zhi2-web-admin/src/utils/projectContext.js ; zhi2-web-admin/src/utils/terminalUser.js ; zhi2-web-admin/src/views/property/propertyWorker/index.vue ; zhi2-web-admin/src/views/property/propertyWorker/detail.vue\n【所属项目】苏住房G\n【来源会话ID】8aa7c044-e925-4a4e-ba97-9a655aee1d58\n【代码基线】805ea8c"
+            },
+            {
+                "uri": "viking://user/default/memories/events/2026/11/03/编码字段类型归一化修复.md",
+                "memory_type": "events",
+                "after": "# Summary\n在苏住房G项目 zhi2-web-admin 中，阳光物业→协议管理→新增共管协议点保存直接抛后端异常 For input string: \"\"，前端无校验。根因为 subdistrictCode、communityCode、regionCode 等以 Code 结尾的字段后端是 Long，前端却填了中文名称或空串提交，Long.parseLong 抛 NumberFormatException；展示侧 formatter 改造只治理读未治理写。做法：提交前对 *Code 字段做类型归一化（非 /^\\d+$/ 一律置空或取选择器 id），选择器同时维护 label 与 value 两份、提交只取 value，排错时先让用户贴后端 msg 定位具体接口。来源会话 a757e64c，基线 fb3e960。\n# 2026-11-03 (Tuesday) ChatLog:\n**user**: 【记忆类型】bug\n【标题】保存报 For input string: \"\" 的根因：编码类字段（*Code）被填了中文名称，后端 Long.parseLong 炸在提交侧\n【内容】什么情况：Web 后台（阳光物业→协议管理→新增共管协议）点保存直接抛后端异常 `For input string: \"\"`，前端无任何校验提示。根因不在展示层，而在提交侧：`subdistrictCode`、`communityCode`、`regionCode` 这类以 Code 结尾的字段在后端是 Long，前端表单却把它们当成「显示名称」来填，于是把「郭巷街道」「姜庄社区」这类中文串、或空串原样提交，`Long.parseLong` 立刻抛 NumberFormatException。\n为什么容易踩：区划相关的 formatter 改造（展示侧统一到区级、拼接串换字典码）只治理了「读出来怎么显示」，没人管「写回去是什么类型」——同一批字段的展示与提交走的是两条独立链路，展示端做了归一化不等于提交端也做了。\n怎么做：① 提交前对 `*Code` 字段做类型归一化，凡匹配 `/^\\d+$/` 之外的值一律置空或从选择器的 id 取值，宁可空也不要送中文；② 选择器要同时维护 `label`（中文名）与 `value`（数字编码）两份，提交只取 value，禁止两个字段共用一个值；③ 排错时不要只盯前端——请求体看起来「字段都在」也可能全错，先让用户贴后端返回的 `msg`，并能明确指出需要看哪个接口的返回值（本例是协议保存接口的响应体，而不是详情接口）；④ 修复链路是多接口拼接：`getExtendedByComplexId` 补区域/街道/社区编码 → 账号详情取账号信息 → 网点列表反查网点 ID，任何一环缺失都会退化成空串。\n【验证证据】用户诉求 1 报「新增共管协议，保存时提示异常」；诉求 3 的请求体里 `communityCode: \"姜庄社区\"`、`subdistrictCode: \"郭巷街道\"`、`regionName: \"江苏省,苏州市,吴中区\"`；诉求 4 修正后变成 `communityCode: \"320506004006\"`、`subdistrictCode: \"320506004\"`、`regionCode: \"320506\"`、`regionName: \"吴中区\"`，并在诉求 6 之后结论明确「之前导致 For input string: \"\" 的空 ID / 中文名称当编码的问题，在这份 payload 里都已消除」。\n【涉及文件】d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAgreement\\index.vue ; d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAgreement\\detail...."
+            },
+            {
+                "uri": "viking://user/default/memories/entities/软件项目/苏住房g.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G\n苏住房G 是用户长期维护的住房保障管理类 Web 软件项目，前端仓库名为 zhi2-web-admin。\n\n## Description\n- 面向住房保障业务的后台管理系统，覆盖 B 端企业人员与 C 端居民等多类角色。\n- 前端代码库位于 d:\\repository\\苏住房G\\zhi2-web-admin，基于 Vue 与 RuoYi 框架。\n\n## Relations\n- 已知模块包括 publicQuery/complex、home/v2/components/CheckDataNav、property/*、benefit/pubRegulatoryAgreement 等。\n- 技术栈涉及 axios 0.28、Vue created 生命周期钩子、RuoYi 路由与 mixin 体系。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

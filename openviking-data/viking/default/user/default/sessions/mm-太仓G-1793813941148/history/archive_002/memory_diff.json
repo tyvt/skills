@@ -1,0 +1,36 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793813941148/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T17:43:42.390924+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vshow_vhaspermi_conflict.md",
+                "memory_type": "entities",
+                "after": "# 提前开始按钮混用v-show与v-hasPermi致状态变更后不隐藏\n太仓G端 ownerDecision/detail.vue 等页面按钮混用 v-show 与 v-hasPermi 指令，导致状态变更后按钮错误显示。\n\n## 问题根因\n- 「提前开始」按钮同时使用 `v-show` 和 `v-hasPermi`\n- `v-hasPermi` 直接修改元素 `style.display`，覆盖 `v-show` 的隐藏效果\n- 状态变为 `decisionState=2` 后，`v-show` 想隐藏但 `v-hasPermi` 把 display 设回 `''`\n\n## 修复约定\n- 将「提前开始」「延期」「撤销」「结果维护」等按钮统一改为 `v-if` + `checkPermission`\n- 不再混用 `v-show` + `v-hasPermi`，参照「提前结束」按钮写法\n\n## 验证与归属\n- 验证证据：会话 627ed433 用户报提前开始成功后按钮仍显示\n- 涉及文件：ownerDecision/detail.vue、optionDecision/detail.vue、sortDecison/detail.vue、directives/permission/hasPermi.js\n- 所属项目：太仓G；来源会话：627ed433-0312-4248-8d0c-0ba8b9adafb6；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/option_decision_permi.md",
+                "memory_type": "entities",
+                "before": "# 选项表决详情权限前缀错致按钮不显示\n太仓G端 optionDecision/detail.vue 按钮权限前缀写死 ownerDecision 致部分按钮缺失，需兼容 optionDecision 前缀。\n\n## 问题根因\n- 按钮权限前缀写死 `estate:ownerDecision:*`，缺失「表决状态更新」「表决结果」且提前结束条件过严\n- `optionDecision/detail.vue` 未适配自身模块权限串\n\n## 修复约定\n- 新增 `hasPerm()` 兼容 `estate:optionDecision:*` 前缀\n- 补充缺失按钮，提前结束支持 `decisionState=='5'`\n\n## 验证与归属\n- 验证证据：会话 50577729 用户报选项表决详情按钮不显示\n- 涉及文件：optionDecision/detail.vue、ownerDecision/detail.vue、decisionCommon/components/VoteViewLite.vue、sortDecison/detail.vue、api/estate/ownerDecision.js、decisionCommon/components/MaintainResultDialogLite.vue、optionDecision/components/DecisionRangeTable.vue、optionDecision/components/VoteResult.vue\n- 所属项目：太仓G；来源会话：50577729-472e-46b8-9882-400332133ecd；代码基线：none",
+                "after": "# 选项表决详情权限前缀错致按钮不显示\n太仓G端 optionDecision/detail.vue 按钮权限前缀写死 ownerDecision 致部分按钮缺失，需兼容 optionDecision 前缀。\n\n## 问题根因\n- 按钮权限前缀写死 `estate:ownerDecision:*`，缺失「表决状态更新」「表决结果」且提前结束条件过严\n- `optionDecision/detail.vue` 未适配自身模块权限串\n\n## 修复约定\n- 新增 `hasPerm()` 兼容 `estate:optionDecision:*` 前缀\n- 补充缺失按钮（表决状态更新调用 `updateActivation`、表决结果跳转投票信息页签），提前结束支持 `decisionState=='5'`\n- 按用户要求未添加「生成表决二维码」按钮（对照昆山参考页）\n\n## 验证与归属\n- 验证证据：会话 50577729 用户报选项表决详情按钮不显示\n- 涉及文件：optionDecision/detail.vue、ownerDecision/detail.vue、decisionCommon/components/VoteViewLite.vue、sortDecison/detail.vue、api/estate/ownerDecision.js、decisionCommon/components/MaintainResultDialogLite.vue、optionDecision/components/DecisionRangeTable.vue、optionDecision/components/VoteResult.vue\n- 所属项目：太仓G；来源会话：50577729-472e-46b8-9882-400332133ecd；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/maintain_decision_permi.md",
+                "memory_type": "entities",
+                "before": "# 维修资金表决菜单权限前缀不一致致按钮隐藏\n太仓G端重构后维修资金表决页面组件路径与后台菜单权限前缀不一致，导致详情按钮全隐藏。\n\n## 问题根因\n- 页面组件为 `estate/maintainDecision/*`，代码按钮权限常写 `estate:maintainDecision:*`\n- 后台菜单可能仍配旧前缀 `estate:ownerDecision:*`，角色只配旧串时 `v-hasPermi`/`checkPermission` 全部失配\n- `ownerDecision` 固定 `decisionType=OWNERS`，运维误配会查错数据\n\n## 修复约定\n- 页面与 `decisionCommon/config` 权限判断同时接受两套前缀（`estate:ownerDecision:xxx` 与 `estate:maintainDecision:xxx` 任一命中即可）\n- 运维侧按模块核对菜单组件路径必须是 `maintainDecision` 而非 `ownerDecision`\n\n## 验证与归属\n- 验证证据：会话 0a42918d 用户报维修资金表决很多按钮看不到但权限已配\n- 涉及文件：zhi1-web-admin/src/views/estate/maintainDecision/detail.vue、ownerDecision/detail.vue、decisionCommon/config.js、components/OperationContainer/index.vue\n- 所属项目：太仓G；来源会话：0a42918d-d7b1-492b-8365-de6556f0a811；代码基线：9638e2f",
+                "after": "# 维修资金表决菜单权限前缀不一致致按钮隐藏\n太仓G端重构后维修资金表决页面组件路径与后台菜单权限前缀不一致，导致详情按钮全隐藏。\n\n## 问题根因\n- 页面组件为 `estate/maintainDecision/*`，代码按钮权限常写 `estate:maintainDecision:*`\n- 后台菜单可能仍配旧前缀 `estate:ownerDecision:*`，角色只配旧串时 `v-hasPermi`/`checkPermission` 全部失配\n- `ownerDecision` 固定 `decisionType=OWNERS`，运维误配会查错数据\n\n## 修复约定\n- 页面与 `decisionCommon/config` 权限判断同时接受两套前缀（`estate:ownerDecision:xxx` 与 `estate:maintainDecision:xxx` 任一命中即可）\n- 运维侧按模块核对菜单组件路径必须是 `maintainDecision` 而非 `ownerDecision`\n- 列表页权限标识如 `estate:ownerDecision:query/add/edit/remove/list` 任一旧串亦可命中\n\n## 验证与归属\n- 验证证据：会话 0a42918d 用户报维修资金表决很多按钮看不到但权限已配\n- 涉及文件：zhi1-web-admin/src/views/estate/maintainDecision/detail.vue、ownerDecision/detail.vue、decisionCommon/config.js、components/OperationContainer/index.vue\n- 所属项目：太仓G；来源会话：0a42918d-d7b1-492b-8365-de6556f0a811；代码基线：9638e2f"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

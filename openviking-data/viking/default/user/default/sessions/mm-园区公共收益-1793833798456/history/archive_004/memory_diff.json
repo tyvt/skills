@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793833798456/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T23:27:13.294454+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_submit_fix.md",
+                "memory_type": "entities",
+                "after": "# ZsSubmit 提交前流程配置校验修复\n园区公共收益项目(zhi2-web-admin)中，ZsSubmit 提交流程原在解析 submitApi 前调用 ensureFlowConfigured，导致误报「审核流程未维护完成」。\n\n## 问题根因\n- submitApi 由 getSubmitApi 按约定拼出 /autonomy/ownerCommitteeLog/submit，本身正常\n- ZsSubmit 在解析 submitApi 之前先调用 ensureFlowConfigured 查 /flowable/flowConfig/list\n- 该步骤与 submitApi 是否配置无关，却复用同一条提示「审核流程未维护完成」，造成误导\n\n## 解决方案\n- ZsSubmit 改为先通过 getSubmitApi(route.meta, moduleName, businessName) 解析提交接口，仅解析不到路径时才报错，不再提交前调用 ensureFlowConfigured\n- flowApi.js 统一 getSubmitApi / getApprovalApi 回退逻辑，菜单 submitApi 为空或未配置时使用 moduleName + businessName 拼接\n- OperationBtnGroup 将 busCode、form 传给 ZsSubmit\n\n## 涉及文件\n- zhi2-web-admin/src/utils/flowApi.js\n- zhi2-web-admin/src/views/autonomy/record/components/directDetail.vue\n- zhi2-web-admin/src/mixins/approval.js\n- zhi2-web-admin/src/mixins/form.js\n\n## 验证与归属\n- 所属项目：园区公共收益；来源会话ID：e92d4f55-1a75-41cb-a38f-01916f1c4db8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/unit_table_fix.md",
+                "memory_type": "entities",
+                "after": "# 楼栋详情新增单元弹窗重复拉取列表修复\n园区公共收益项目(zhi2-web-admin)中，building 详情页 UnitDialog 的 unitTable 在挂载时会重复调用 getList。\n\n## 问题根因\n- subTableMixins 的 created → init() → getList() 拉一次列表\n- buildingId 的 watch 设置 immediate: true，初始化时再调一次 getList()\n- 两处叠加导致首次加载请求两次 listByBuildingId\n\n## 解决方案\n- 去掉 buildingId watch 的 immediate: true，首次加载只走 init()\n- buildingId 变化时仍由 watch 触发刷新\n\n## 涉及文件\n- zhi2-web-admin/src/views/building/building/components/UnitDialog.vue\n- zhi2-web-admin/src/views/building/unit/detail.vue\n- zhi2-web-admin/src/views/building/building/detail.vue\n\n## 验证与归属\n- 所属项目：园区公共收益；来源会话ID：f56f967d-d8bb-4514-b129-333b667ba178"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_elcol_bug.md",
+                "memory_type": "entities",
+                "before": "# 详情页外层 el-col 挤压表单\n园区公共收益项目详情页为对齐子表宽度在 zs-form 外再包 el-col，会把整页挤到左侧约四成。\n\n## 问题根因\n- 在已有 el-row 下给整块 zs-form 再套一层 el-col，触发 Element 横向 flex\n- el-col 只占默认栅格宽度，表单区被压到左侧、右侧大面积留白\n- 会话结论：页面被挤到左侧是上次为对齐表格宽度在外层加 el-col 引起的\n\n## 解决方案\n- 去掉外层包裹用的 el-col，保持与同模块详情页一致\n- zs-form 直接作为 el-row 子节点占满整行\n- 子表宽度用表单内块级 width:100% 或子表容器样式微调，不要用额外 el-col 包整表\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue、zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue、zhi2-web-admin/src/components/detail-template/detail-template.vue\n- 所属项目：园区公共收益；来源会话ID：f53fddf6-9d9b-42a6-9a58-e51a3a7f7298；代码基线：7cc1625",
+                "after": "# 详情页外层 el-col 挤压表单\n园区公共收益项目详情页为对齐子表宽度在 zs-form 外再包 el-col，会把整页挤到左侧约四成。\n\n## 问题根因\n- 在已有 el-row 下给整块 zs-form 再套一层 el-col，触发 Element 横向 flex\n- el-col 只占默认栅格宽度，表单区被压到左侧、右侧大面积留白\n- 会话结论：页面被挤到左侧是上次为对齐表格宽度在外层加 el-col 引起的\n\n## 解决方案\n- 去掉外层包裹用的 el-col，保持与同模块详情页一致\n- zs-form 直接作为 el-row 子节点占满整行\n- 保留「上传支付凭证」下移 24px\n- 子表宽度用表单内块级 width:100% 或子表容器样式微调，不要用额外 el-col 包整表\n- 银行划拨记录仍在表单内纵向排列，并限制为 100% 宽度\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue、zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue、zhi2-web-admin/src/views/benefit/pubPaymentNotice/components/pubTradeDetailTable.vue、zhi2-web-admin/src/components/Headline/index.vue、zhi2-web-admin/src/components/detail-template/detail-template.vue\n- 所属项目：园区公共收益；来源会话ID：f53fddf6-9d9b-42a6-9a58-e51a3a7f7298；代码基线：7cc1625"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/complex_recordname_merge.md",
+                "memory_type": "entities",
+                "before": "# 物业管理区域名称与备案名称合并为 recordName\n园区公共收益项目(zhi2-web-admin)中，complex 系列详情页将「备案名称」与「物业管理区域名称」合并展示为 recordName。\n\n## 字段合并规则\n- complex/detail.vue 与 complexChange/detail.vue 合并「备案名称」与「物业管理区域名称」为 recordName，输入同步 complexName\n- 移除 complexName 必填校验\n- 查看模式合并展示两名称\n- detailCallback 与 getForm 兼容同步\n\n## 涉及文件\n- zhi2-web-admin/src/views/property/complex/detail.vue\n- zhi2-web-admin/src/views/transaction/complex/detail.vue\n- zhi2-web-admin/src/views/property/complexChange/detail.vue\n- zhi2-web-admin/src/views/property/complexAdjust/detail.vue\n- zhi2-web-admin/src/mixins/detailMixins.js\n- zhi2-web-admin/src/mixins/form.js\n- zhi2-web-admin/src/views/publicQuery/complex/detail.vue\n- zhi2-web-admin/src/views/building/complexSearch/detail.vue\n\n## 验证与归属\n- 所属项目：园区公共收益；来源会话：0cbe9323-9602-4630-99d3-b3fb037c7d96",
+                "after": "# 物业管理区域名称与备案名称合并为 recordName\n园区公共收益项目(zhi2-web-admin)中，complex 系列详情页将「备案名称」与「物业管理区域名称」合并展示为 recordName。\n\n## 字段合并规则\n- complex/detail.vue 与 complexChange/detail.vue 合并「备案名称」与「物业管理区域名称」为 recordName，输入同步 complexName\n- 移除 complexName 必填校验\n- 查看模式合并展示两名称\n- detailCallback 与 getForm 兼容同步\n- complexChange/detail.vue 变更对比保留 field: 'recordName'\n- complex/detail.vue 修复后第一行恢复三列布局\n\n## 涉及文件\n- zhi2-web-admin/src/views/property/complex/detail.vue\n- zhi2-web-admin/src/views/transaction/complex/detail.vue\n- zhi2-web-admin/src/views/property/complexChange/detail.vue\n- zhi2-web-admin/src/views/property/complexAdjust/detail.vue\n- zhi2-web-admin/src/mixins/detailMixins.js\n- zhi2-web-admin/src/mixins/form.js\n- zhi2-web-admin/src/views/publicQuery/complex/detail.vue\n- zhi2-web-admin/src/views/building/complexSearch/detail.vue\n\n## 验证与归属\n- 所属项目：园区公共收益；来源会话：0cbe9323-9602-4630-99d3-b3fb037c7d96"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

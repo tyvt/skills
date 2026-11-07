@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_045",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:01:10.102115+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/register_e2e_flow_missing.md",
+                "memory_type": "entities",
+                "after": "# 注册真实接口 E2E「该业务未配置流程」根因\n企业注册真实接口全流程 E2E 在 editAndSubmit 提交审核时返回 HTTP 500「该业务未配置流程」，根因是后端工作流未配置，非前端或脚本问题。\n\n## 问题现象\n- saveCompanyRegister→saveLegalPersonInfo→要件上传→saveDraft 均通过，仅最后 editAndSubmit 报 HTTP 500\n- 业务消息为「该业务未配置流程」，前端所有步骤（股东信息、协议勾选）均已完成\n\n## 根因分析\n- 提交审核接口按业务编码去 flowable 找已发布审批流程，新业务或新环境未配置流程时后端直接 500\n- 报错形态像代码故障，实际是环境配置缺失，勿在前端或测试脚本侧找原因\n\n## 解决方案\n- 从对应 api 文件（如 companyRegister.js）查出业务编码，040100=开发企业注册\n- 登录管理端进入工作流/流程配置菜单，为该业务编码配置并发布审批流程后重跑 E2E\n\n## 验证与归属\n- 来源会话 63a99906：Step1-Step4 保存通过，仅 editAndSubmit 500，结论为后端工作流未配置\n- 涉及文件：e2e/register/real-api-flow.spec.js、src/views/company/companyRegister.js\n- 所属项目：产品2.0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/zs_global_import_ban.md",
+                "memory_type": "entities",
+                "after": "# 已全局注册 zs 组件禁止局部 import\n页面复制粘贴时把全局注册的 zs 组件写成不存在路径做局部 import，会引发 Vite resolve 失败，应删除多余本地 import。\n\n## 问题现象\n- 模板用 <zs-tencent-map> 有效，但局部 import 写成不存在路径（如 '@/views/.../zsTencentMap/index.vue'）\n- Vite 报 Failed to resolve import，构建/启动失败，整页编译不过\n\n## 根因分析\n- main.js 已用 import.meta.glob 按「父目录名即标签名」把 src/components 下组件全局注册\n- ZsTencentMap 真实位置是 @/components/ZsTencentMap/index.vue；对全局组件再写局部 import 引入会被静态分析的假路径\n- 与已知「Unknown custom element 时用 import.meta.glob 全局注册修复」(#529/#553) 反方向，属不同根因\n\n## 解决方案\n- 模板用全局注册标签（zs-* 小写）时，删除多余的本地 import 与 components 注册，与 venueDialog.vue 等写法对齐\n- 排查此类报错先核对组件真实目录，再确认是否已全局注册\n\n## 验证与归属\n- 来源会话 0ce851e8：ParcelDialog.vue 与 BaseProjectForm.vue 错误 import 不存在的 zsTencentMap 路径，删除后错误消失\n- 涉及文件：ParcelDialog.vue、ZsTencentMap/index.vue、src/main.js\n- 所属项目：产品2.0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/cross_layer_contract_break.md",
+                "memory_type": "entities",
+                "after": "# 跨层传递业务标志/列注册契约断链静默失效\n多个「按钮不显示/样式不对」类问题的根因都是跨 2 层以上传递的标志或注册契约断链，断链时全部静默退化且无报错。\n\n## 典型断链场景\n- 公共查询复杂详情页入口按钮用 v-if=\"!hasData\" 控制，有数据反而消失；入口型按钮应常显，数据存在性只控空态文案\n- 列表跳转路由 query 带 ifHistory=1（历史合同维护免审批），中间层详情页未透传给提交组件，子组件用默认 0 走错流程且无报错\n- zs-table 的 flexColumnCount 弹性列机制漏调 registerFlexColumn，flexColumnCount 恒 0，fit 恒 false，列按极小 min-width 显示且与 fixed 列间大片空白\n\n## 解决方案\n- 入口按钮移除 v-if=\"!hasData\"，空态文案单独处理\n- getForm() 建立「路由参数 > 表单数据 > prop」取值优先级，确保编辑后二次提交不丢标志\n- zs-table 列在 created 调 registerFlexColumn、beforeDestroy 注销，flexColumnCount 由 0 变非 0 触发 doLayout() 重算\n\n## 共性教训\n- 跨 2 层以上传递的标志/注册契约，断链时全部静默退化，排查沿「路由→页面→组件→提交报文/渲染计数」逐层核对值是否还活着\n\n## 验证与归属\n- 来源会话 35553223/d952db17/f54cd7c5：移除 v-if、补 ifHistory 透传、补 registerFlexColumn\n- 涉及文件：publicQuery/complex/detail.vue、property/propertyContractTemporary/detail.vue、zs-table.vue、zs-table-column.vue\n- 所属项目：产品2.0；代码基线：42b6033 等"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/navbar_class_method_truthy.md",
+                "memory_type": "entities",
+                "after": "# 模板 :class 绑定方法引用恒为 truthy 致首页永远高亮\nNavbar.vue 把 methods 里的方法直接绑到 :class，函数引用恒 truthy，导致首页永远高亮、其他模块永不高亮的静默视觉错误。\n\n## 问题现象\n- 顶部导航「永远默认选中首页」，点其他子模块也不高亮\n- isActive() 里 if (this.isHomeActive) return false 恒成立，其他模块高亮分支永远走不到\n\n## 根因分析\n- Navbar.vue 中 isHomeActive 定义在 methods，模板写成 :class=\"{ active: isHomeActive }\" 绑定的是函数引用本身\n- 任何函数引用都是 truthy，故「首页」恒 active；与已知「computed 写成方法简写导致构建失败」同族但表现不同，此处不报错\n\n## 解决方案\n- 将 isHomeActive 改为 computed 属性，让模板与 isActive() 读到真实布尔\n- 补 syncActiveMenuFromRoute 按当前路由匹配一级模块，路由监听加 immediate: true，刷新或直访子页面 URL 也能回填高亮\n- 凡「某状态恒真/恒假且无报错」，先查模板绑的是方法名还是计算属性\n\n## 验证与归属\n- 来源会话 428cfc70：函数引用恒 truthy 修复为 computed + syncActiveMenuFromRoute + immediate watcher\n- 涉及文件：layout/components/Navbar.vue、layout/components/TagsView/index.vue\n- 所属项目：产品2.0；代码基线：8e16dca"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

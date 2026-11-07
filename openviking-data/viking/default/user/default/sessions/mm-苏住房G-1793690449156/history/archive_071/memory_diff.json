@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_071",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T10:13:32.130008+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/preferences/user/data_field_formatting.md",
+                "memory_type": "preferences",
+                "after": "- 申报明细表格普通字段（楼幢号、单元名称等）直接绑定后端字段，不加自定义格式化。\n- 金额/面积字段（actualFloorArea、billAmount 等）统一使用 `formatters.amountFormatter`。\n- 删除 `formatBillAmountColumn` 等自定义格式化方法与 `billAmountSum` 等字段兜底映射。"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/response_decryption.md",
+                "memory_type": "preferences",
+                "after": "- 参考 `develop/v2.6.1-yuanqu` 分支新增 `src/utils/responseDecrypt.js`，实现 `expand.encrypt` 响应解密（RSA 解密 AES 密钥、AES/CBC 解密正文）。\n- 在 `src/utils/request.js` 响应拦截器 `returnRawResponse` 判断前插入解密逻辑。\n- 依赖 `jsencrypt@^3.3.2`，`index.html` 已引 `crypto-js.min.js`。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dict_include_disabled.md",
+                "memory_type": "entities",
+                "before": "# 全量字典接口改 listByType\ngetDictsIncludeDisabled 由 /system/dictData/list 分页改为 /system/dictData/listByType/{type}?isAll=1，响应取值由 res.rows 变 res.data。\n\n## 问题背景\n- 原实现调 /system/dictData/list?dictType=xxx&pageNum=1&pageSize=500，把 pageSize 写死 500 当全量用\n- 分页接口拿全量要赌 pageSize 足够大，超出被静默截断，字典多了会悄悄丢项\n\n## 解决方案\n- 只改 dict.js 一个函数：URL 改成模板拼接 /listByType/${dictType}，参数对象传 { isAll: 1 }\n- 解包改成 (res.data || [])，再 map 出 dictLabel、dictValue、remark、listClass、cssClass、status 六个字段\n- 缓存 key 必须保持 ${dictType}_all，与普通 getDicts（不传 isAll）区分开，否则「含停用」和「仅启用」两份选项会互相覆盖\n- 切换后全库不应再有 /system/dictData/list 调用，筛选下拉仍走 getDicts，业务页面代码零改动\n\n## 验证与归属\n- 验证证据：会话 58dcbdff 用户要求改用 listByType 接口查全量并用于回显，最终仅改 dict.js\n- 涉及文件：zhi2-web-admin/src/utils/dict.js、zhi2-web-admin/src/views/company/staffManagement/components/index.vue\n- 所属项目：苏住房G；来源会话ID：58dcbdff-1362-4418-9b41-bd4b7e15dd6c；代码基线：d5eee56",
+                "after": "# 全量字典接口改 listByType\ngetDictsIncludeDisabled 由 /system/dictData/list 分页改为 /system/dictData/listByType/{type}?isAll=1，响应取值由 res.rows 变 res.data。\n\n## 问题背景\n- 原实现调 /system/dictData/list?dictType=xxx&pageNum=1&pageSize=500，把 pageSize 写死 500 当全量用\n- 分页接口拿全量要赌 pageSize 足够大，超出被静默截断，字典多了会悄悄丢项\n\n## 解决方案\n- 只改 dict.js 一个函数：URL 改成模板拼接 /listByType/${dictType}，参数对象传 { isAll: 1 }\n- 解包改成 (res.data || [])，再 map 出 dictLabel、dictValue、remark、listClass、cssClass、status 六个字段\n- 缓存 key 必须保持 ${dictType}_all，与普通 getDicts（不传 isAll）区分开，否则「含停用」和「仅启用」两份选项会互相覆盖\n- 切换后全库不应再有 /system/dictData/list 调用，筛选下拉仍走 getDicts，业务页面代码零改动\n\n## 验证与归属\n- 验证证据：会话 58dcbdff 用户要求改用 listByType 接口查全量并用于回显，最终仅改 dict.js\n- 涉及文件：zhi2-web-admin/src/utils/dict.js、zhi2-web-admin/src/views/company/staffManagement/components/index.vue、zhi2-web-admin/src/utils/companyListQuery.js\n- 所属项目：苏住房G；来源会话ID：58dcbdff-1362-4418-9b41-bd4b7e15dd6c；代码基线：d5eee56"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/field_granular_disable.md",
+                "memory_type": "entities",
+                "before": "# 置灰逻辑按字段粒度判定\n业主自治-物管会变更页需按字段逐个控制可编辑性，且置灰字段仍保留只读导航能力，不能一刀切或删跳转入口。\n\n## 问题背景\n- autonomy/change/property/detail.vue 中「物业管理区域名称」与「任职起止日期」两个字段的禁用状态写反了\n- 与产品确认：变更态下区域名称必须置灰不可编辑，任职起止日期反而可编辑\n- 常见误伤是把「禁用」做成了「连跳转也一起干掉」\n\n## 解决方案\n- 按字段逐个下 disabled：区域名称 zs-input 直接 disabled，任职起止日期 zs-date-picker 去掉 disabled，仅 add/edit 可改\n- 置灰字段仍保留只读导航：点击只调 goToComplexDetail()（有 complexId 才跳区域详情），把编辑态 openSelectDialog() 从点击链路摘掉\n- 查看态照旧走 DetailTemplate 分支不动，禁用与「查看态渲染」是两条独立链路\n- openSelectDialog 方法可保留（新增变更仍靠物管会编号 + setOwner 回填区域），不要因移除点击调用就连方法删\n\n## 验证与归属\n- 验证证据：会话 254661f7 用户贴图指出置灰反了并给出产品口径，最终按上述修改\n- 涉及文件：zhi2-web-admin/src/views/autonomy/change/property/detail.vue、zhi2-web-admin/src/views/autonomy/change/property/index.vue\n- 所属项目：苏住房G；来源会话ID：254661f7-ea9b-45c8-84f6-063fdca139f1；代码基线：4f7c2c3",
+                "after": "# 置灰逻辑按字段粒度判定\n业主自治-物管会变更页需按字段逐个控制可编辑性，且置灰字段仍保留只读导航能力，不能一刀切或删跳转入口。\n\n## 问题背景\n- autonomy/change/property/detail.vue 中「物业管理区域名称」与「任职起止日期」两个字段的禁用状态写反了\n- 与产品确认：变更态下区域名称必须置灰不可编辑，任职起止日期反而可编辑\n- 常见误伤是把「禁用」做成了「连跳转也一起干掉」\n\n## 解决方案\n- 按字段逐个下 disabled：区域名称 zs-input 直接 disabled，任职起止日期 zs-date-picker 去掉 disabled，仅 add/edit 可改\n- 置灰字段仍保留只读导航：点击只调 goToComplexDetail()（有 complexId 才跳区域详情），把编辑态 openSelectDialog() 从点击链路摘掉\n- 查看态照旧走 DetailTemplate 分支不动，禁用与「查看态渲染」是两条独立链路\n- openSelectDialog 方法可保留（新增变更仍靠物管会编号 + setOwner 回填区域），不要因移除点击调用就连方法删\n\n## 验证与归属\n- 验证证据：会话 254661f7 用户贴图指出置灰反了并给出产品口径，最终按上述修改\n- 涉及文件：zhi2-web-admin/src/views/autonomy/change/property/detail.vue、zhi2-web-admin/src/views/autonomy/change/property/index.vue、zhi2-web-admin/package.json、zhi2-web-admin/src/views/autonomy/change/industry/detail.vue、zhi2-web-admin/src/views/autonomy/change/supervisory/detail.vue、zhi2-web-admin/src/views/autonomy/record/components/detail.vue、zhi2-web-admin/src/mixins/detailMixins.js、zhi2-web-admin/src/views/autonomy/regulation/change/detail.vue\n- 所属项目：苏住房G；来源会话ID：254661f7-ea9b-45c8-84f6-063fdca139f1；代码基线：4f7c2c3"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

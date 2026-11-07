@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793967516734/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T12:21:50.226212+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_unmount.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column 卸载保护\n在 ZsTableColumn 组件增加卸载标记与生命周期兼容，避免卸载后状态更新引发 beforeUnmount 异常。\n\n## 问题根因\n- 组件或表格开始卸载后，字典异步回写、computedWidth/getHeader 仍触发状态更新\n- 引发 ElTableColumn 的 beforeUnmount 阶段异常（Unhandled error during execution of beforeUnmount hook）\n\n## 解决方案\n- 增加 `_zsUnmounted` 标记，在 created() 字典异步回写及 computedWidth/getHeader 中做保护\n- 同时实现 beforeDestroy 与 beforeUnmount，兼容 Vue2/Vue3 迁移阶段\n- 修改文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue\n\n## 验证与归属\n- 验证方式：切换路由离开触发卸载，观察控制台是否仍出现 beforeUnmount hook 报错\n- 所属项目：2-0；来源会话ID：03d38e43-915e-4d67-8a3b-63c1ee8a02cf；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/elbutton_link_fix.md",
+                "memory_type": "entities",
+                "after": "# ElButton type=\"text\" 弃用兼容\nElement Plus 3.0 将废弃 ElButton 的 type=\"text\"，项目统一改为 link 按钮样式。\n\n## 问题根因\n- 控制台出现 ElementPlusError: [props] type.text deprecated 弃用提示\n- ElButton 的 type=\"text\" 在 3.0 将废弃，官方推荐改用 link 按钮样式\n\n## 解决方案\n- 将项目里直接写的 `<el-button type=\"text\">` 改为 `<el-button link>`（共 4 处）\n- 在公共组件 zs-button 做兼容：当 rest.type === 'text' 时删除 type 并设置 rest.link = true\n- 修改文件：zhi2-web-admin/src/components/zs-button/zs-button.vue\n\n## 验证与归属\n- 验证方式：重新启动或刷新页面后该告警应不再出现\n- 所属项目：2-0；来源会话ID：00b18628-52c8-4770-87e2-b9abc61e87b6；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_select_recursion.md",
+                "memory_type": "entities",
+                "after": "# zs-select MultiSelect 递归更新修复\n修复 MultiSelect.vue 中 updated() 无条件调用 resetInputHeight() 导致的递归更新死循环。\n\n## 问题根因\n- updated() 钩子里无条件调用 this.$refs.elSelect.resetInputHeight()\n- resetInputHeight() 引发 ElSelectDropdown 内部状态更新，形成 update→updated→resetInputHeight→update 死循环\n- 最终抛出 Maximum recursive updates exceeded in <ElSelectDropdown>\n\n## 解决方案\n- 移除 updated() 里的强制调用\n- 改为只在 $attrs.value / $attrs.options 变化时调用一次，并做去重与定时器合并\n- 修改文件：zhi2-web-admin/src/components/zs-select/MultiSelect.vue\n\n## 验证与归属\n- 验证状态：该文件无新增 linter 错误，本地开发服务可正常启动（端口占用自动切到 8084）\n- 所属项目：2-0；来源会话ID：533423a8-81bd-4094-9c97-d30615178fc1；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-泰兴小程序-1793791039125/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T11:23:33.885227+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_render_fix.md",
+                "memory_type": "entities",
+                "after": "# 工单统计图表穿屏与空白修复\n泰兴小程序统计概览-工单统计图表因旧版 canvas 渲染与日期格式化问题显示异常，已修复并出包。\n## 问题根因\n- 旧版 `<canvas canvas-id>` + `ctx.draw()` 渲染导致图表穿屏与工单趋势空白。\n- `ZsMonthRangeCalendar` 的 `formatMonth` 使用 `new Date('2...')` 在 iOS 存在兼容问题。\n- 多图表并发初始化未串行化导致串台。\n## 解决方案\n- `echarts-uniapp.vue` 改用 `<canvas type=\"2d\">` 同层渲染，节点查询 `fields({node,size})` + dpr 缩放。\n- 模块级 Promise 队列串行化 init，尺寸重试 20×100ms。\n- `ZsMonthRangeCalendar.vue` 的 `formatMonth` 改用 `dayjs().year(y).month(m-1).date(1).format(...)`。\n## 验证与归属\n- 验证证据：src=泰兴小程序\n- 涉及文件：src/staff/pages/components/echarts-uniapp/echarts-uniapp.vue、src/staff/components/ZsMonthRangeCalendar/ZsMonthRangeCalendar.vue、src/pages/staff/statistics/index.vue\n- 来源会话ID：ad70e25f-8d4b-4189-a874-e4ee471ab959\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/popup_zindex_tabbar.md",
+                "memory_type": "entities",
+                "after": "# 底部日期弹窗被tabbar遮挡修复\n泰兴小程序底部自定义日期弹窗因 uni-popup 无 z-index 属性致层级失效，被自定义 tabbar 遮挡，已修复并出包。\n## 问题根因\n- uni-ui 的 `uni-popup` 无 z-index 属性，内部 `.uni-popup` 写死 `position:fixed; z-index:99`。\n- `ZsBottomPopup` 通过 `:style=\"{ zIndex: 10001 }\"` 传的层级落在自定义组件节点上，非定位元素致 z-index 不生效。\n- 自定义 tabbar `z-index:999` > 99，压在弹窗上遮挡 footer。\n- `src/pages/index/newHome.vue` 曾有页面级 z-index 覆盖，但仅对首页生效，统计概览页吃不到。\n## 解决方案\n- `src/App.vue` 的 `<style>` 末尾新增 `.uni-popup{z-index:10000!important}` 全局覆盖。\n## 验证与归属\n- 验证证据：src=泰兴小程序\n- 涉及文件：src/App.vue、src/pages/index/newHome.vue\n- 来源会话ID：6884f3c7-6d34-4ece-b13b-5f42ff2422e1\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/issue_input_ui.md",
+                "memory_type": "entities",
+                "after": "# 巡检issue页输入框UI对齐修复\n泰兴小程序物业手持端巡检 issue 页输入框 UI 与设计图不一致，已修复样式。\n## 问题根因\n- `.page-top` 背景为 `#fff` 致搜索行白色药丸不清晰。\n- `.tab-box` 无背景、`.search-wrap` padding 与设计图不符。\n## 解决方案\n- `src/staff/pages_facility/issue/index.vue` 的 `<style scoped>` 调整：`.page-top` 改 `background:transparent`，`.tab-box` 加 `background:#fff`，`.search-wrap` padding 改为 `0 24rpx`，`:deep(.uni-searchbar)` padding 改 `24rpx 0 0`。\n- 保留 `:deep(.uni-searchbar__box)` 的 `background:#FFFFFF!important` 不动。\n## 验证与归属\n- 验证证据：src=泰兴小程序\n- 涉及文件：src/staff/pages_facility/issue/index.vue、dist/build/mp-weixin/staff/pages_facility/issue/index.wxss\n- 来源会话ID：e4455f6a-1b4d-496a-9b8d-c1d66976df97\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/step_form_extract_page.md",
+                "memory_type": "entities",
+                "before": "# 步骤表单抽离独立页致新开页及图片丢失\ncommit `0a68e52` 将步骤表单弹窗抽离为独立页面，借 navigateTo 与存储回传，致新开页且巡检图片因生命周期脱节丢失，后恢复内嵌弹窗。\n## 问题根因\n- commit `0a68e52` 将 `add.vue` 步骤表单弹窗抽离为 `record/editStep.vue` 独立页面。\n- 借 `uni.navigateTo` 与 `uni.setStorageSync`/`uni.$emit` 回传，致新开页且「巡检图片」因生命周期脱节丢失。\n## 解决方案\n- 于 `src/staff/pages_facility/record/add.vue` 恢复内嵌弹窗及上传组件。\n## 验证与归属\n- 验证证据：src=泰兴小程序/005.md\n- 涉及文件：src/staff/pages_facility/record/editStep.vue、src/pages.json、src/staff/pages_facility/record/add.vue、src/staff/components/ZsUploader/ZsUploader.vue、src/components/ZsBottomPopup/ZsBottomPopup.vue、src/components/ZsDialog/ZsDialog.vue、C:/Users/Administrator/.workbuddy/plans/toasty-vortex-babbage-oDFMsTxx.md、src/.workbuddy/memory/2026-09-10.md\n- 来源会话ID：a76a97a2-e1d3-41ae-8139-d4a6dd188d85\n- 代码基线：none",
+                "after": "# 步骤表单抽离独立页致新开页及图片丢失\ncommit `0a68e52` 将步骤表单弹窗抽离为独立页面，借 navigateTo 与存储回传，致新开页且巡检图片因生命周期脱节丢失，后恢复内嵌弹窗。\n## 问题根因\n- commit `0a68e52` 将 `add.vue` 步骤表单弹窗抽离为 `record/editStep.vue` 独立页面。\n- 借 `uni.navigateTo` 与 `uni.setStorageSync`/`uni.$emit` 回传，致新开页且「巡检图片」因生命周期脱节丢失。\n## 解决方案\n- 于 `src/staff/pages_facility/record/add.vue`（+328/-53，唯一实质性文件）恢复 `<ZsDialog v-model:show=\"showStepFormPopup\" position=\"bottom\">` 底部弹窗，字段含步骤名称/标准工时/说明/巡检图片（`ZsUploader` `:limit=\"9\" :max=\"5\" size=\"small\" iconType=\"default\"` 带红色提示语）。\n- 恢复状态变量 `showStepFormPopup`、`isEditStep`、`editingStep`、`stepForm`、`stepFormImages`。\n## 验证与归属\n- 验证证据：src=泰兴小程序/005.md\n- 涉及文件：src/staff/pages_facility/record/editStep.vue、src/pages.json、src/staff/pages_facility/record/add.vue、src/staff/components/ZsUploader/ZsUploader.vue、src/components/ZsBottomPopup/ZsBottomPopup.vue、src/components/ZsDialog/ZsDialog.vue、C:/Users/Administrator/.workbuddy/plans/toasty-vortex-babbage-oDFMsTxx.md、src/.workbuddy/memory/2026-09-10.md\n- 来源会话ID：a76a97a2-e1d3-41ae-8139-d4a6dd188d85\n- 代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-投资推送-1793649920734/history/archive_024",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T20:42:08.249376+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/投资推送按策略类型扩展新指数.md",
+                "memory_type": "entities",
+                "after": "# 投资推送按策略类型扩展新指数\n投资推送仓库新增指数不依赖单一全局 registry，而是按策略族对齐各自的代码与报告注册方式。\n\n## 策略族注册方式\n- 红利族：走 `config.INDICES` + `dividend_data`/`core` + `report -m dividend --index CODE`\n- A股宽基：在 `cn_broad_data.CN_BROAD_INDEX_BY_CODE` 增 code，共用 `cn_broad_signal` 与 `generate_cn_broad_report`\n- 创业板/美股等：独立 `config.*_INDEX` + 成对 `*_data.py`/`*_signal.py`\n\n## report.py 模块注册\n- 需补 `MODULE_*` 常量、`generators` 映射与 `_resolve_modules()` 默认列表\n- 接入前全库检索确认代码是否已存在（如恒生科技当时无 HSTECH 实现）\n\n## 验证与归属\n- 验证证据：探索会话归纳四类策略表与 report.py 模块注册方式，确认库内无恒生科技相关实现\n- 涉及文件：config.py、cn_broad_data.py、report.py\n- 所属项目：投资推送；来源会话ID：9aaf372d-57a1-46dc-96cf-d9a7d6f30ae2"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/红利低波轮动止损与优化流水线.md",
+                "memory_type": "entities",
+                "after": "# 红利低波轮动止损与优化流水线\n投资推送的红利低波轮动子项目全库无 ATR 止损，卖出侧为固定百分比止损，并配有超参优化流水线。\n\n## 止损与卖出\n- 全库 grep ATR 零匹配，无 ATR 止损实现\n- 固定百分比止损 `resolve_stop_loss_pct`（risk_regime.py）：低波约 -12%，池中位波动≥25% 时约 -8%\n- 其他卖出：紧急大跌、静态止盈、移动止盈、动量卖出\n\n## 选股约束\n- `scoring.select_with_industry_cap` 从约 `top_n*3` 候选贪心选股\n- 单行业权重超 `MAX_INDUSTRY_WEIGHT`（默认约 34%）则跳过该行业下一档\n\n## 超参优化流水线\n- `backtest_optimize.py`：`screen` 单参扫描 → `grid` 粗网格（如 top_n×rebalance_days×sell_rank_multiplier 共 27 组）→ `bayesian` 精调\n- 任务开关 `--task screen|grid|bayesian|all`\n\n## 验证与归属\n- 验证证据：grep ATR 零匹配并列卖出类型与 COARSE_GRID 三维网格\n- 涉及文件：backtest.py、scoring.py、backtest_optimize.py、risk_regime.py\n- 所属项目：投资推送；来源会话ID：7d8be0ac-1851-4d3b-9493-fbdadb789d12"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术问题/windows计划任务中文名创建.md",
+                "memory_type": "entities",
+                "after": "# Windows 计划任务中文名创建\n在部分 Windows 上用 `schtasks /Create` 创建中文计划任务时，需禁用 `/tz` 且 `/tn` 勿加引号。\n\n## 问题与根因\n- 部分 Windows 不支持 `/tz`，会直接报「无效参数」\n- 系统已是 China Standard Time（UTC+8）时应去掉 `/tz`，`/st 14:00` 即上海本地 14:00\n- 任务名含中文时 `/tn` 不能写成 `/tn \"红利指数投资信号\"`，应写成 `/tn 红利指数投资信号`，否则语法错误\n\n## 修复与验证\n- `setup_task.bat` 需按此改写后管理员重跑\n- 验证：会话 4a33133f 用户管理员运行仍失败，修复后可创建「红利指数投资信号」周一至周五 14:00\n\n## 涉及文件与归属\n- 涉及文件：setup_task.bat、run_push.bat\n- 所属项目：投资推送；来源会话ID：4a33133f-ce51-49e2-a37d-804c789adaf3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术问题/推送脚本gbk编码冲突.md",
+                "memory_type": "entities",
+                "after": "# 推送脚本 GBK 编码冲突\n在中文 Windows 默认 GBK 控制台直接运行 `push.py` 时，报告打印含 `✗` 等字符会触发编码错误导致进程在推送前失败。\n\n## 问题与影响\n- 中文 Windows 默认 GBK 控制台无法显示 `✗` 等 Unicode 符号，运行 push.py 触发编码错误\n- 进程在正式推送前即失败，用户收不到微信推送\n\n## 规避方式\n- 补发或排障用 `python push.py --quiet` 跳过控制台打印、仅走微信推送\n- 定时任务 `run_push.bat` 将 stdout 重定向到 `logs/push.log`，通常不受此影响\n\n## 验证与归属\n- 验证证据：会话 2f2e0718 用户未收到推送，--quiet 后微信返回成功并说明 GBK 无法显示 ✗\n- 涉及文件：push.py、run_push.bat、logs/push.log\n- 所属项目：投资推送；来源会话ID：2f2e0718-b2a8-41ff-a8e8-c3a997260734"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

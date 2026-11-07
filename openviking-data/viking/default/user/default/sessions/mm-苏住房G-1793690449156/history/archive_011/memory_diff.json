@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:46:29.087631+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/uat_biz_state_dict_reversal.md",
+                "memory_type": "entities",
+                "after": "# UAT环境BIZ_STATE字典1/2文案与编码对调\n苏住房G的zhi2-web-admin列表页因UAT字典配置反了导致业务状态筛选结果颠倒，统一改用biz_state字典修复。\n\n## 问题根因\n- 列表页用getDicts('BIZ_STATE')同时做下拉选项和表格回显，UAT环境该字典把1、2的文案与后端编码对调\n- 前端原样用dictValue/dictLabel作查询参数，导致选「已备案」实际传bizStatus=1（系统约定1=审核中、2=已备案）\n- 静态检查与页面都不报错，属于第三类根因（非字典缺失、非双口径）\n\n## 解决方案\n- 列表页业务状态字典统一改成小写biz_state（0待提交/1审核中/2已备案），与详情页、全局store同源\n- 在getDicts调用处加注释「勿用BIZ_STATE，部分环境1/2文案与后端编码颠倒」\n- 改后下拉若为空先确认系统字典配置的是biz_state而非BIZ_STATE；运维可把BIZ_STATE文案与biz_state对齐\n\n## 验证与归属\n- 验证：选「已备案」→请求bizStatus/bizState应为2，列表为已备案记录\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/index.vue\n- 所属项目：苏住房G；来源会话：7fa26724-2d29-4dbe-accb-87098bace420；代码基线：315702f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/freeze_reason_dropdown_lock.md",
+                "memory_type": "entities",
+                "after": "# 冻结原因下拉自锁导致字段选中即只读\n苏住房G系统用户管理页将系统写入的冻结原因暴露为下拉可选项，命中锁定判据造成选中即禁用编辑的自锁。\n\n## 问题根因\n- 原锁定条件：当前原因===「多次输入错误密码」就禁用编辑\n- 该原因是系统自动冻结写入的值，却被放入人工下拉项，用户选中即命中条件，字段立刻只读\n- 已知清单未覆盖「把系统写入值当可选项再作锁定判据」这类自锁根因\n\n## 解决方案\n- 从人工下拉删除「多次输入错误密码」，系统原因不应可选\n- 锁定判据改为加载时原始状态：originUserAccountState为冻结且原始原因为该项时才只读\n- 选「其他」自动切手工输入态；控件保留手动输入/下拉切换按钮（后缀切换组件）\n\n## 验证与归属\n- 验证：选「管理员手动冻结」仍可编辑，原本自动冻结账号仍只读\n- 涉及文件：system/user/detail.vue、AccountFreezeFields.vue、utils/accountFreeze.js\n- 所属项目：苏住房G；来源会话：92b6e126-dfc6-494c-a323-5344cc8169de；代码基线：805ea8c"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_tree_layout_regression.md",
+                "memory_type": "entities",
+                "after": "# 隐藏切换按钮顺手改表格致树表错位\n苏住房G的regionBankAuth列表页仅要求隐藏平铺/树状切换按钮，但改动引入:tableKey与fill-height导致列错位与空白。\n\n## 问题根因\n- 加:Key=\"tableViewKey\"使切树节点整表重建，Element列宽缓存与表头/表体分离渲染不同步造成列错位\n- 加fill-height使数据少时表格被拉伸到容器高度出现大片空白\n- RegionTreeLayout里.type-right-body重复定义；已知清单未覆盖「用:Key强制重渲染修树表联动」反向坑\n\n## 解决方案\n- 回退：删掉:Key=\"tableViewKey\"、删掉fill-height、合并重复.type-right-body\n- 保留：:show-flat-switch=\"false\"隐藏切换、左侧区域树完整保留、listRequestId防竞态\n- 树表联动正确姿势：切树节点后调doLayout()修正列对齐，而非整表重建\n\n## 协作教训与归属\n- 用户说「只去掉X」须最小改动，不得顺手改布局；样式问题先diff上次提交确认改坏行再回退\n- 涉及文件：system/regionBankAuth/index.vue、property/complex/components/RegionTreeLayout.vue\n- 所属项目：苏住房G；来源会话：3afefc54-4c44-41c7-a8c6-998c856214d4；代码基线：864b409"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/lease_warning_mixin.md",
+                "memory_type": "entities",
+                "after": "# 多租赁合同忽略预警勾选规则收口mixin\n苏住房G四份租赁合同列表的「忽略预警」勾选规则漂移，抽成leaseContractWarningMixin统一封装。\n\n## 问题根因\n- 各列表选择列按状态写死可选性（仅待提交/审核中可选），已备案橙色预警合同被禁选\n- 「忽略预警」收集行选择，未勾到预警行便提示「请选择合同」\n- 各页selectable与handleIgnoreWarning规则文案逐渐漂移，改一处漏三处\n\n## 解决方案\n- 新建mixins/leaseContractWarningMixin.js封装isWarningContract、isLeaseWarningSelectable、setWarningRowStyle、handleIgnoreWarning\n- 四页统一:selectable=\"(row) => isSelectable(row)\"（箭头函数避免this丢失，本坑复发点）\n- 可选条件为「预警合同或对应可操作状态」；未选中预警合同时按钮禁用；文案由mixin统一\n\n## 验证与归属\n- 验证：已备案+橙色预警可勾选执行忽略；待提交仍可勾选；已备案非预警不可勾选\n- 涉及文件：mixins/leaseContractWarningMixin.js及四个列表页、mixins/table.js\n- 所属项目：苏住房G；来源会话：1e8e4ca2-26cb-4b86-b061-d23f725e38ef；代码基线：320507d"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

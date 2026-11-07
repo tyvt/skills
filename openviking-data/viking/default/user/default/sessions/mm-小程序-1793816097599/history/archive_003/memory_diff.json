@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-小程序-1793816097599/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T18:25:53.240583+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/repair_fund_complex_context.md",
+                "memory_type": "entities",
+                "after": "# 切换小区后维修资金参数一致性\nwygl小程序切换小区后点击「维修资金」会带上与当前选中小区一致的参数。\n\n## 实现说明\n- 新增 `preparePortalNavigateContext()`：跳转前调用 `syncPortalHouseSelection` 与 picker 选中项对齐，从当前选中房屋解析 `complexId`/`houseId`，写入本地门户快照\n- 扩展 `openWebViewForMiniRoute` 支持第二参数 `portalContext`，跳转 URL 显式带 `complexId`、`houseId`，由 `portalH5Webview`→`buildPortalH5FlatQuery` 优先使用（高于快照回退）\n- 维修资金入口：点击先取当前小区上下文，无 `complexId` 提示「缺少小区信息」；有则带当前小区 `complexId`、`houseId` 打开 H5\n- 小区信息入口同样改走 `preparePortalNavigateContext()`，与维修资金行为一致\n\n## 验证与归属\n- 跳转 URL 示例：`/pages/webview/portalH5Webview?miniRoute=%2Fpages_owner%2Fmaintain%2Findex&complexId=x`\n- 涉及文件：pages/webview/home.vue、utils/portal-h5-webview.js、utils/portal-user.js\n- 所属项目：小程序（wygl-wxxcx-dev-slh）；来源会话：2b96f5ea-125e-4e83-a90a-a1b32b6482be；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/业主决策回调portalpostaction参数区分.md",
+                "memory_type": "preferences",
+                "after": "- 通过回调参数 `portalPostAction=ownerDecisionVote` 区分「绑定房屋」与「进入业主决策」，选屋成功后自动走现有投票 H5 逻辑\n- 第三方选屋 `backUrl`（H5 `pages/index/home`）增加可选参数：`portalPostAction=ownerDecisionVote` 为业主决策选屋回调；不传则保持原绑定房屋逻辑\n- 链路：`bdc.vue` → `verify.vue` → `home.vue` 的 `queryParams.portalPostAction`\n- 点击「业主决策」：已登录+已实名+已有房屋→直接 `openOwnerDecisionVoteH5()`；无房屋→跳转灵犀选屋(`bdc`)带 `portalPostAction=ownerDecisionVote`；未实名→先 `verify` 再把 `portalPostAction` 传到 `bdc`\n- 从门户「绑定房屋」入口进入时会清空 `pendingPortalPostAction`，避免误触发业主决策\n- 所属项目：小程序；来源会话：3a9cefa7-d876-4dcb-bc47-8944def53bc0；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/仅灵犀选屋成功算绑定房屋.md",
+                "memory_type": "preferences",
+                "after": "- 只有灵犀 `authCode` 选屋成功（`selectMyHouse` 成功）才算绑定房屋；登录或 profile/身份接口返回的房屋数据不再视为已绑定\n- `utils/portal-user.js` 新增 `houseBoundViaAuth` 标记，仅在 `mergeLingXiHouseIntoPortalUser`（`selectMyHouse` 成功）时置 `true`\n- `refreshPortalProfile` 默认不再用 `ctUserIdentity` 填充房屋；未绑定时清空 `houseList`/`houseId`/`project`，新增 `clearPortalHouseFields` 清理未授权房屋展示数据\n- `pages/webview/externalWebview.vue` 的 `hasHouse` 改为检查 `houseBoundViaAuth && houseId`，不再看 `houseList.length`\n- `refreshFromServer` 传 `{ mergeHouseIdentity: false }`，避免登录后接口房屋误显示为已绑定；「我的房屋」「我的消息」改走 `ensureHouseSelected()`，未绑定则弹添加房屋门禁\n- 所属项目：小程序；来源会话：05b9061d-bcb6-412b-9bf6-24c69eb80182；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/preferences/default/ct_auth_401.md",
+                "memory_type": "preferences",
+                "before": "- In `utils/portal-user.js`, `requestCtAuth` on HTTP 401 must call `handleCtAuthUnauthorized`: run `clearPortalStorage()` to clear `__ew_external_webview_ct_token__` and `__ew_external_webview_portal__`, broadcast `portal-auth-expired`, and exclude `/wechat/login` to avoid false prompts.",
+                "after": "- 在 `utils/portal-user.js` 新增 `requestCtAuth`：CT 认证 API 统一请求封装，当请求携带 `Authorization` 且返回 HTTP 401 时自动触发登出逻辑\n- `handleCtAuthUnauthorized` 401 处理逻辑：调用 `clearPortalStorage()` 清空门户 token（`__ew_external_webview_ct_token__`）与用户快照（`__ew_external_webview_portal__`），提示「登录已过期，请重新登录」，广播 `portal-auth-expired` 事件让各页面同步清空内存中的 `pageToken`\n- 排除微信登录接口 `/wechat/login`：返回 401 时不触发，避免首次登录失败误提示「登录已过期」\n- 覆盖范围：所有使用 `CT_AUTH_API_BASE_URL_MAP` 基址的接口（`portal-user.js` 内全部 CT 接口、`api/common.js` 轮播图接口、`portal-h5-webview.js` 等）已接入统一 401 处理\n- 所属项目：小程序；来源会话：aa013c4c-2e46-4f0b-b583-82a65c4f0fe2；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

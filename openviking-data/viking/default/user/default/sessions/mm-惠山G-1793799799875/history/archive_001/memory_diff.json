@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-惠山G-1793799799875/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T13:46:21.511172+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue_devtools_fix.md",
+                "memory_type": "entities",
+                "after": "# Vue DevTools 无法跳转源码修复\n惠山G 项目 zhi1-web-admin 中 Vue DevTools 无法跳转到组件源码，相关配置已修复并写入项目。\n\n## 现象\n- Vue DevTools 中选中组件后无法通过「在编辑器中打开」跳转到源码\n\n## 解决方案\n- 修改 vite.config.js 等配置文件以支持 Vue DevTools 打开编辑器\n- 本机重新执行 `npm run dev` 后，在 Vue DevTools 选中组件点击「在编辑器中打开」验证\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=惠山G\n- 涉及文件：zhi1-web-admin/vite.config.js、zhi1-web-admin/src/main.js、zhi1-web-admin/index.html、env/.env、package.json\n- 所属项目：惠山G；来源会话：c500dd33-22a6-40cf-9da0-977a1fb237b1；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/refund_code_cleanup.md",
+                "memory_type": "entities",
+                "after": "# refund 目录冗余代码清理\n惠山G 项目 zhi1-web-admin 中 refund 目录下 commonTable.vue 与 refundDetailTable.vue 完成冗余代码清理，功能逻辑保持不变。\n\n## commonTable.vue 变更\n- 组件名 `RefundDetailDialog` 修正为 `CommonTable`\n- 移除未使用的 `dialogForm` prop、`isFormDisabled` 计算属性、`autoQuery` prop、`dialogFormMode` 状态\n- 移除传给 selectBuildingDialog 的无效属性（`dialog-form`、`dialog-form-mode`）及无效的 `@getList` 监听\n- 合并生命周期：`created` 仅加载字典，`mounted` 统一触发 `getQuery()`\n- 删除与 listMixins 重复的 `total` 定义，修正 `setData` 中逗号运算符写法\n\n## refundDetailTable.vue 变更\n- 移除未使用的 `purposeOptions`、`total` 及 `initDict` 方法（模板未引用字典）\n- 移除重复的 `created()` 钩子，改由 listMixins 统一调用 `init()`\n- 移除 `refundDetailDialog` 上无效的 `@getList` 监听\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=惠山G\n- 涉及文件：refund/components/commonTable.vue、refundDetailTable.vue、refundDetailDialog.vue\n- 所属项目：惠山G；来源会话：730dd1cd-f8d3-4003-a2f1-4eb7db405ae1；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/refund_api_bug.md",
+                "memory_type": "entities",
+                "after": "# 弹窗打开时接口重复调用修复\n惠山G 项目 zhi1-web-admin 中 refundDetailDialog 打开弹窗时接口重复调用，已修复为每次打开仅请求一次。\n\n## 问题根因\n- `onOpen` 和 `maintenanceObjectId` 的 watch 都会调用 `loadDialogData()` → `getQuery()`，在 `handleView` 同时设置 id 和 `visible` 时可能各触发一次\n- `loadDialogData` 用 `$nextTick` 调 `getQuery`，和 `v-if` 挂载 `commonTable` 的时序叠在一起容易出现重复请求\n\n## 解决方案\n- 去掉 `maintenanceObjectId` 的 watch 和 `loadDialogData`\n- `onOpen` 只负责填充表单，不再请求接口\n- `commonTable` 在 `autoQuery=false` 时于 `mounted` 中调用一次 `getQuery()`\n- 配合 `v-if=\"$attrs.visible\"`，每次打开挂载一次、请求一次\n\n## 预期请求\n- `getDicts`（字典）1 次、`getBuilding`、`getUnit`、`listRefundObjShare` 各 1 次\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=惠山G\n- 涉及文件：refund/components/refundDetailDialog.vue、refundDetailTable.vue\n- 所属项目：惠山G；来源会话：69fe4877-9065-40ce-b4bb-17b22cfdb965；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/listmixins_queryparams_bug.md",
+                "memory_type": "entities",
+                "after": "# listMixins queryParams 未定义致 TypeError 修复\n惠山G 项目 zhi1-web-admin 中 listMixins.js 的 created 钩子因 refundDetailTable.vue 未定义 queryParams 触发 `Cannot convert undefined` 报错，需补充定义。\n\n## 问题根因\n- listMixins.js 的 `created` 钩子读取 `$store.state.common.cachedSearchParams` 并对 `query` 赋值\n- `query` 的 setter 执行 `Object.assign(this.queryParams, val)`\n- refundDetailTable.vue 引入 listMixins 但未定义 `queryParams`，导致 `this.queryParams` 为 undefined 触发报错\n\n## 解决方案\n- refundDetailTable.vue 需定义 `queryParams` 字段，或调整 listMixins 对 queryParams 的引用以兼容未定义场景\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=惠山G\n- 涉及文件：src/mixins/listMixins.js、refundDetailTable.vue、refundDetailDialog.vue\n- 所属项目：惠山G；来源会话：0a343062-5aa6-4690-ac12-8d034bff8777；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

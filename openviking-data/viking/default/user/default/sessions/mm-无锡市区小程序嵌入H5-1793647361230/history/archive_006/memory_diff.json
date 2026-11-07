@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793647361230/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T19:32:42.981536+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/lingxi_whitelist_block.md",
+                "memory_type": "entities",
+                "after": "# 灵犀投票H5WebView白名单拦截缺陷\n业主决策外链（灵犀H5Vote含Base64 query）在H5内打开报「该链接不在允许访问的域名范围内」。\n\n## 问题根因\n- webViewUrl.js的isHostInWebViewWhitelist校验主机名\n- wxzj.wxwgzx.com未写入VITE_WEBVIEW_ALLOW_HOSTS且各环境变量为空时所有外链被拦\n- 报错来自本方白名单，与灵犀服务器响应头无关\n\n## 解决方案\n- 在.env.development/.env.production/.env.test加入wxzj.wxwgzx.com\n- 改env后必须重启dev server\n- 走小程序原生h5ExternalWebview还需在微信公众平台配置该业务域名\n\n## 验证与归属\n- 验证证据：会话406654b6用户投票URL被拦截\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/webViewUrl.js、.env.production\n- 所属项目：无锡市区小程序嵌入H5；来源会话：406654b6-603a-41e0-9bc2-ae70c13fbcbd；代码基线：7de00b1"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/sufu_csp_block.md",
+                "memory_type": "entities",
+                "after": "# 苏服办内嵌灵犀H5Vote CSP拦截缺陷\n苏服办轻应用WebView直接打开wxzj.wxwgzx.com/lxapptp/H5Vote失败，控制台net::ERR_BLOCKED_BY_RESPONSE。\n\n## 问题根因\n- 灵犀站点返回X-Frame-Options: SAMEORIGIN与Content-Security-Policy: frame-ancestors 'self'\n- 跨域嵌入被浏览器拦截\n- 本方VITE_WEBVIEW_ALLOW_HOSTS只能放行己方H5内web-view跳转，无法改写灵犀响应头\n\n## 解决方案\n- 优先联系灵犀运维在H5Vote路径放宽frame-ancestors（含*.jszwfw.gov.cn等苏服办域）\n- 苏服办侧用JSSDK openUrl + showMode: 'outer'或先进/szh5/再window.location.href顶层跳转，勿iframe/web-view嵌套\n- 排查时区分「白名单拦截」与「frame-ancestors拦截」两种报错\n\n## 验证与归属\n- 验证证据：会话c2d03879苏服办打开业主自治三方页失败\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/.env.production、src/utils/webViewUrl.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话：c2d03879-fbdf-4092-8416-a9b7a9d79600；代码基线：7de00b1"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/sufu_token_bug.md",
+                "memory_type": "entities",
+                "after": "# 苏服办livenessFaceAuth令牌失效缺陷\n加forceFresh+getTicket后苏服办/支付宝均报「用户扫脸核验令牌已失效」，清理缓存后更严重。\n\n## 问题根因\n- SDK要求arg1为苏服办用户token、arg2为'1'（用户token类型）\n- 默认换票会把tokenType改成'0'，与SDK预期不符\n\n## 解决方案\n- sfbFaceAuth.js默认不走getTicket，仅显式forceFresh:true时才尝试\n- face.vue去掉强刷票据\n- 勿在每次调起前清faceAppid缓存\n- 仍失效时让用户完全退出苏服办从入口重进以拿新URL token，并对照[苏服办人脸识别]日志\n\n## 验证与归属\n- 验证证据：会话2a5dc010用户反馈支付宝与苏服办均令牌失效\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js、src/pages/face/face.vue\n- 所属项目：无锡市区小程序嵌入H5；来源会话：2a5dc010-d890-4a11-a627-83db6d26d2b6；代码基线：afd47ed"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/sufu_json_bug.md",
+                "memory_type": "entities",
+                "after": "# 苏服办人脸SDK成功响应JSON字符串缺陷\n控制台打印苏服办返回成功JSON，业务仍判失败。\n\n## 问题根因\n- livenessFaceAuth的success有时给字符串（如retcode为000000的JSON字符串）\n- 直接读data.retcode为undefined\n\n## 解决方案\n- sfbFaceAuth.js增加normalizeSfbFaceResponse（字符串先JSON.parse）\n- isSfbFaceSuccess兼容retcode==='000000'或msg==='认证成功'\n- 不动产授权回跳在goBdc()拼接verifyResult=true\n- 生产人脸入口基址为https://wygl.wxwgzx.com:8989/szh5，对方跳转不带token时用己方已解析的苏服办登录态\n\n## 验证与归属\n- 验证证据：会话9641a1de截图显示SDK成功JSON被误判\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js、src/pages/face/face.vue、src/pages/face/bdc.vue\n- 所属项目：无锡市区小程序嵌入H5；来源会话：9641a1de-5bbe-4afe-a7ab-487324afb826；代码基线：3fb9434"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

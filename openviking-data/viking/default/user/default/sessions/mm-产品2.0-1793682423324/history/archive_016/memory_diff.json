@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_016",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T05:47:10.327584+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/navbar_logo_chain.md",
+                "memory_type": "entities",
+                "after": "# 顶栏 LOGO 优先级链\n登录页与登录后顶栏的 LOGO 统一走「后台配置 sysLogo 覆盖内置静态图、defaultLogo 兜底」的同一优先级链。\n\n## 现象与需求\n- 同一前端有公开页（登录/注册）与管理端顶栏两类页面，用户要求内置 logo 与后台配置两者都覆盖、优先用平台配置地址\n- 登录前后 logo 必须一致，否则体验割裂\n\n## 解决方案\n- Navbar.vue 不再静态 import 图片，改为从 store 读 state.app.platformConfig.sysLogo，用 computed logo 输出，模板保持 :src=\"logo\"\n- 保留 defaultLogo 常量兜底：平台配置未返回 sysLogo 时仍能显示，并作为公开页回退\n- 删除 data() 里冗余的 logo 字段，切换账号/刷新 platformConfig 后 logo 随 computed 自动更新，不再缓存进 data\n- sysLogo 可能是相对路径，需走 resolveServerAssetUrl 统一拼域名，禁止直接 :src 相对路径\n- 注册/未登录页顶栏品牌信息（系统名称+LOGO）统一从 platformConfig 读，且与 Navbar 共用同一条优先级链\n\n## 验证与归属\n- 验证证据：会话 acfae044 最终结论确认 Navbar.vue 已改从 store 读取 logo 并保留 defaultLogo 兜底\n- 涉及文件：src/layout/components/Navbar.vue\n- 所属项目：产品2.0；来源会话ID：acfae044-ec7d-4f5e-bb61-36dc593a35da；代码基线：bd398ef"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/subtotal_fixed_mask.md",
+                "memory_type": "entities",
+                "after": "# 小计行固定操作列穿透遮罩修复\n带合计/小计行且横向滚动时，右侧固定操作列被小计数据穿透，需用 td:last-child 选择器与伪元素遮罩修复。\n\n## 现象\n- 表格有合计/小计行且横向滚动时，右侧固定操作列下方能看到小计行数据「穿透」上来，z-index 观感错乱\n- 操作列小计单元格右侧多出一条竖线、底边横线又缺失\n\n## 根因\n- 固定列（fixed-right）的表体与小计行是不同层叠上下文，小计行单元格没有表体 class（class-name 只作用于表体，小计/合计行命中不到）\n- 针对 zs-operate-column-cell 的选择器完全没生效；列间 1px 右边框由列本身绘制，会穿过固定层露出\n\n## 解决方案\n- 选择器改用 td:last-child 命中操作列小计单元格，不靠 class-name\n- 保留/恢复 fixed-footer-wrapper::after 白色伪元素遮罩盖住右侧 1px 竖线，bottom 刻意留 1px 以保留操作列底边横线（整块 inset:0 会把底边一起盖掉）\n- 有合计行时把固定右列容器设 overflow:visible，否则伪元素遮罩被裁切\n- 改动点在 zs-table 公共组件，页面级 CSS 无法修\n\n## 验证与归属\n- 验证证据：会话 8e29a239 用户反馈横滚+小计时操作列显示底部数据，最终恢复 ::after（right:-1px, bottom:1px）并有合计行时 fixed-right 设 overflow:visible\n- 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、src/styles/index.scss、src/views/maintenance/receiptin/index.vue\n- 所属项目：产品2.0；来源会话ID：8e29a239-a740-473b-921d-cd75f2915a3e；代码基线：49a7aa3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_rowkey_bug.md",
+                "memory_type": "entities",
+                "after": "# zs-select-dialog rowKey 误用导致整表高亮\nzs-select-dialog 的 rowKey 误写为接口不存在的字段时，所有行 key 为 undefined，选中后整表高亮。\n\n## 现象\n- 在「选择物业管理区域」等 zs-select-dialog 里点选一行，整张表每一行都被加选中高亮\n- 删除/回填等按 key 的操作也一起错乱\n\n## 根因\n- 页面把 rowKey 写成 complexId，而接口返回的候选列表里无此字段，所有行 rowKey 均为 undefined\n- Element 内部按 key 建立的映射塌成一条，选中状态被广播到全表\n\n## 解决方案\n- 页面侧 rowKey 对齐同模块已跑通页面用同一业务主键字段（此处 projectId），不要按业务语义想当然取名\n- 组件侧在 zs-table 的 rowClassName 加空值过滤，遇到 undefined/null 的 row key 直接跳过，公共组件层防止坏 key 放大成整表高亮（兜底不能替代把字段改对）\n- 排查提示：凡「选中态莫名扩散/全选」现象，第一步把 rowKey 与接口返回字段逐字对一遍\n\n## 验证与归属\n- 验证证据：会话 5af5c221 结论 rowKey 误设为 complexId 导致全 undefined、整表高亮，改为 projectId 并在 rowClassName 增空值过滤\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubBankReceiptApply/detail.vue、src/components/zs-select-dialog/zs-select-dialog.vue、src/components/zs-table/zs-table.vue\n- 所属项目：产品2.0；来源会话ID：5af5c221-8134-4622-ae26-0886a69a35ed；代码基线：41c6961"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/voucher_field_pattern.md",
+                "memory_type": "entities",
+                "after": "# 文件凭证类字段承载方式\n表单里的凭证预览/附件图片字段，查看态走 DetailTemplate 的 type:'image'，编辑态用 ImageUpload，底部不再单挂缩略图。\n\n## 适用场景\n- 表单出现「凭证预览/附件图片」类文件字段，且该表单已被 DetailTemplate 封装成只读详情\n- 用户要求：凭证预览也是一个表单字段，用 imageupload 组件，详情状态需要使用 detail-template 封装\n\n## 解决方案\n- 查看态改渲染 `<DetailTemplate :data=\"xxxDetailItems\" />`，items 与表单字段一一对应，文件字段作最后一项 { type:'image', value:voucherFileUrl }（link 分支只认 item.link，附件必须走 image 类型）\n- 编辑/新增态在同一表单加整行 el-form-item，控件用 ImageUpload，v-model 绑逗号分隔地址串，limit=\"1\"，透传 isFormDisabled 保证只读禁用上传、隐藏 tip\n- 弹窗底部不再放独立缩略图展示凭证，统一收敛到 DetailTemplate 或表单项，避免同一份数据两个入口两种样式\n\n## 数据契约\n- ImageUpload 的 v-model 是逗号分隔的图片 URL 串\n- 后端若只存 voucherFileId 而非可访问地址，必须在接口层补全 URL，或打开详情时把可访问地址写进 voucherFileUrl，否则 DetailTemplate 图片列恒为空且不报错\n\n## 验证与归属\n- 验证证据：会话 c26c8f38 结论 simplifiedLayout && dialogFormMode==='view' 时改渲染 DetailTemplate，凭证预览 type:'image' 用 voucherFileUrl、无则回退 voucherFileId，编辑态末尾加 ImageUpload(limit=1)，弹窗底部去掉左侧缩略图\n- 涉及文件：zhi2-web-admin/src/views/benefit/components/BankReceiptDetailDialog.vue、src/components/HeadTitle/index.vue、src/views/benefit/pubBankReceiptApply/detail.vue\n- 所属项目：产品2.0；来源会话ID：c26c8f38-d604-41d2-b12e-edbdfd3c8e06；代码基线：6b9d9d7"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_035",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:37:07.379998+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/regorg_code_name.md",
+                "memory_type": "entities",
+                "after": "# 街道社区编码名称统一工具 regOrg.js\n产品2.0 中公共收益/物业协议等模块选择街道/社区后页面显示编码而非名称，抽公共工具 regOrg.js 统一收敛口径。\n\n## 问题根因\n- 接口/表单长期只存 subdistrict/community 编码，名称字段是后补的\n- 「社区=哪个编码值」在模块间口径不同：公共收益模块 0=街道、1=社区，物业模块 3=社区、其他=街道\n- 硬写一套判断必错，页面展示的是编码（如 320508018）而非名称\n\n## 解决方案\n- 抽公共工具 src/utils/regOrg.js：getSubdistrictName/getCommunityName 优先取名称字段、无名称回退编码（兼容旧数据）\n- getBenefitRegCompanyName/getPropertyRegCompanyName 分别按两套模块口径判街道/社区\n- assignSubdistrictCommunity 从监管账户行数据同时赋值编码与名称\n- 所有用 /benefit/pubRegulatoryAccount/page（及 pageIsAgreement）的选择弹窗：街道/社区列展示名称字段，表单赋值同时写入 subdistrictName + communityName\n- 后端未返回名称字段时前端已兼容回退编码；选择管理区域时成对保存「编码+名称」是本项目约定\n\n## 验证与归属\n- 批量更新 19 个调用监管账户接口的页面，新建 utils/regOrg.js 收敛四类函数\n- 涉及文件：zhi2-web-admin/src/utils/regOrg.js、zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue、zhi2-web-admin/src/views/property/propertyAgreement/detail.vue\n- 所属项目：产品2.0；代码基线：526c1ff；来源会话：8a66ad42-2f27-4ff8-b445-5f8e160f357f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/recordprice_button.md",
+                "memory_type": "entities",
+                "after": "# 申请查询页按钮显隐按 routeKey 判定\n产品2.0 的 recordPriceMngSuzhou 页面因按菜单标题文字分流导致查询页缺失按钮，需对齐参考仓库按路由 key 判定。\n\n## 问题根因\n- 产品2.0 用 isApplyRoute 按 meta.title === '价格备案查询' / busCode==='jiagechaxun' 区分申请页与查询页\n- 查询页因此隐藏了「申请表模板下载」「新增」「编辑」按钮\n- 按菜单标题文字判定脆弱且与参考项目（苏州市房地产监测）实现不一致\n\n## 解决方案\n- 页面身份/按钮显隐判定对照参考仓库实际实现（按路由 key 判定），不用按菜单标题字符串分流\n- 参考项目判定为 routeKey === 'recordpricemngsuzhou'，申请和查询页都显示按钮\n- 恢复按钮时同步恢复被隐藏的「业务状态」筛选项和行内「编辑」（待提交态可用）\n- 提醒用户核对账号是否有对应权限码（如 presale:recordPriceMng:add）而非继续怀疑代码\n\n## 验证与归属\n- isApplyRoute 在 meta.title==='价格备案查询' 时返回 false 隐藏按钮；改为 isRecordPriceMngSuzhou 判定并恢复筛选与编辑按钮\n- 涉及文件：zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/index.vue\n- 所属项目：产品2.0；代码基线：62d5fb9；来源会话：49b771f7-5363-446e-b96b-bb0ff3c61363"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_select_scroll.md",
+                "memory_type": "entities",
+                "after": "# 选择弹窗 125% 缩放下末行滚不到\nzs-select-dialog（及 func 版）在浏览器缩放 125% 时 pageSize=10 的数据最后一条滚动不到，根因为 tableTrCount 写死与行高偏差。\n\n## 问题根因\n- tableTrCount 写死为 8 而 pageSize 默认 10，表格高度按 8 行算却展示 10 行，被迫在表格内部滚动\n- 125% 缩放下固定 48px 行高与实际渲染高度有偏差，Element UI 表格内部滚动 maxScrollTop 偏小，最后一行永远滚不到\n- .dialog-right 是 flex 布局，表格容器被压缩加剧问题\n\n## 解决方案\n- tableTrCount 改为 min(实际行数, pageSize)，按实际行数算高度避免表格内滚\n- 数据加载后调用 doLayout() 重新布局\n- 给 .zs-table-container 设 flex-shrink:0 防被压缩\n- zs-table 层改用 DOM 实测行高/表头高度计算表格高度以兼容缩放，首次渲染后二次校准，窗口缩放时重算高度\n- 修改要同步 zs-select-dialog.vue 与 zs-select-dialog-func.vue 两个副本\n\n## 验证与归属\n- tableTrCount 写死 8 与 pageSize 10 不符 + 125% 缩放下 maxScrollTop 偏小 + flex 压缩；修复为 min(行数,pageSize)、doLayout、flex-shrink:0、DOM 实测行高二次校准\n- 涉及文件：zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue、zs-select-dialog.vue、zhi2-web-admin/src/components/zs-table/zs-table.vue\n- 所属项目：产品2.0；代码基线：dfe69d6；来源会话：319f1f67-a4c9-4880-b1fc-1857c5d03b4b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/slow_pay_qrcode.md",
+                "memory_type": "entities",
+                "after": "# 慢三方支付接口交互套路\n收款/支付弹窗依赖慢三方接口生成二维码时，改为「先弹窗占位、异步拉取、失败可刷新」三段式避免用户无反馈。\n\n## 问题根因\n- 原流程「创建订单 → 等三方返回 → 才弹窗」，用户长时间面对无反馈\n- 收款/支付弹窗依赖三方接口（如 property/spOrder/payInfo）生成二维码，该接口可能较慢\n\n## 解决方案\n- 创建订单后立即弹出扫码窗并展示订单号、金额\n- 后台异步请求 payInfo，请求中显示 loading 与「正在生成支付二维码...」占位文案\n- 成功后展示二维码并开始轮询支付状态\n- 失败时二维码区域显示错误提示并提供「刷新」按钮重调 payInfo，刷新前先停止轮询，成功后再展示二维码并恢复轮询\n- payInfo 请求带 noMessage: true，避免全局错误 toast 与弹窗内错误提示重复\n- 套路适用于所有慢三方接口的前置展示场景：弹窗先给确定信息，慢数据异步补齐，失败留手动重试入口\n\n## 验证与归属\n- 立即弹扫码窗显示订单号金额 → 异步请求 payInfo → 成功展示二维码并轮询；失败区显示提示+刷新按钮，刷新先停轮询再恢复；payInfo 用 noMessage:true 防提示重复\n- 涉及文件：zhi2-web-admin/src/views/property/spFeeBill/components/collectionDialog.vue、zhi2-web-admin/src/views/property/bill/components/PaymentDialog.vue\n- 所属项目：产品2.0；代码基线：6accf9a；来源会话：ba1c8c6a-7b49-465a-aab9-2c949eb85f07"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

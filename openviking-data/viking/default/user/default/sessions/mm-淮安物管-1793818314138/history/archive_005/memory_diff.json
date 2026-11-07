@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-淮安物管-1793818314138/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T19:09:09.378491+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/publicquery_back_query.md",
+                "memory_type": "entities",
+                "after": "# 公共查询备案返回保留query\n淮安物管公共查询小区详情从业委会/物管会备案返回时，需保留原详情页 query 以免页面空白的技术修复模式。\n\n## 问题根因\n- `goBack()` 统一写 `query: { type: 'back' }`，覆盖原 `formMode=view`，导致详情页不调用 `init()` 拉数据。\n- `committeeTable` 中 `backUrl` 仅用 `this.$route.path`，未带 `?formMode=view`。\n- `AppMain` 用 `:key=\"$route.fullPath\"`，query 变化会重建组件，必须返回时保留正确 query 才能重新加载。\n\n## 修复方案\n- `main.js` 的 `goBack()`：有 `backUrl` 时直接 `router.push(backUrl)`，保留完整路径与 query。\n- `committeeTable.vue` 的 `backUrl` 改为携带完整 query（如 `this.$route.fullPath`）。\n- 广告位备案等因未传 `backUrl`，返回不改写 query，原 `formMode=view` 仍在，故正常。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=淮安物管；来源会话：e6ed7dbc-1d6e-459f-aec6-1548de9852da\n- 涉及文件：src/main.js、publicQuery/complex/components/committeeTable.vue、changeDetailMixin.js、publicQuery/complex/detail.vue\n- 所属项目：淮安物管；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/complexchange_areafields.md",
+                "memory_type": "entities",
+                "after": "# 物业管理区域变更区域概览变更记录\n淮安物管物业管理区域变更详情中，区域概览字段需注册到变更记录对比的技术修复模式。\n\n## 问题根因\n- 变更记录弹窗通过 `changeRecordMixins` 的 `allChangeContentInfo` 仅合并 `contentInfo`、`contentInfo2`、`contentInfo3` 等计算属性。\n- 区域概览字段（占地面积、总建筑面积、地上/地下面积、楼幢数量、房屋总数）仅在模板渲染并带 `isAreaFieldChanged`，未纳入任何 `contentInfo*`，变更记录不可见。\n\n## 修复方案\n- 在 `complexChange/detail.vue` 新增 `contentInfo3`，注册区域概览字段：`landArea`、`totalFloorArea`、`aboveFloorArea`、`underFloorArea`、`totalBuilding`、`totalHouse`。\n- 面积类用 `type: 'amount'` 带 `㎡` 单位；数量类通过 `formatDisplay` 显示「幢」「户」后缀。\n- `changeRecordMixins` 自动收集 `contentInfo3`，无需改弹窗组件。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=淮安物管；来源会话：3badcbf0-1f78-46b6-adad-d5ac25a98bda\n- 涉及文件：property/complexChange/detail.vue、mixins/changeRecordMixins.js、utils/contentInfoChange.js、property/complex/detail.vue\n- 所属项目：淮安物管；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/regulatory_account_view.md",
+                "memory_type": "entities",
+                "after": "# 开户申请详情显示银行账号\n淮安物管开户申请详情页在查看模式需固定显示银行账号相关字段的修复模式。\n\n## 问题根因\n- `benefit/pubRegulatoryAccount/detail.vue` 的「管理银行」区块由 `showRegulatoryAccountFields` 控制。\n- 原逻辑：查看模式仅当已填账号或 `accountOpenType === '1'`（已开户备案）才显示。\n- 普通「新增」开户申请 `accountOpenType` 为 `'0'` 且无账号信息，导致字段隐藏。\n\n## 修复方案\n- 修改：当 `formMode === 'view'` 时始终显示「银行账号」「银行账户名称」，位于「网点联系电话」与「备注」之间。\n- 编辑/新增模式仍按原逻辑控制。\n- 账号未回传时显示为空，已保存则正常显示。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=淮安物管；来源会话：4d35ab61-aca0-48ea-856a-b970e5251900\n- 涉及文件：benefit/pubRegulatoryAccount/detail.vue、property/propertyAccount/detail.vue、benefit/pubRegulatoryAccount/index.vue、mixins/detailMixins.js\n- 所属项目：淮安物管；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dict_tag_valuelabel.md",
+                "memory_type": "entities",
+                "after": "# DictTag支持value/label字典\n淮安物管合同详情中 `DictTag` 需同时支持 `value`/`label` 与 `dictValue`/`dictLabel` 的修复模式。\n\n## 问题根因\n- 合同详情 `物业类型` 走 `DetailTemplate` → `DictTag`，数据来自 `propertyTypeOptions`（接口 `response.data`），很多字典接口用 `value`/`label`。\n- `DictTag` 原只按 `dictValue`/`dictLabel` 查找，`getLabel` 为空但 `el-tag` 仍渲染，出现只有底色无文字的标签。\n- `detail-template` 的 `getItemValueDisplayString` 已支持两种格式，故 `hasTagRenderableValue` 为 true，问题集中在 `DictTag`。\n\n## 修复方案\n- `dict-tag.vue` 的 `rawDictParts` 采用与详情一致的解析（空串、`[]`、逗号分隔、数组等），避免 `String([])` 变 `['']`。\n- `optVal`/`optLabel`/`findOption` 与 `detail-template` 相同，同时支持 `dictValue`/`dictLabel` 与 `value`/`label`。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=淮安物管；来源会话：0063c43c-fc2e-49bb-afad-13adaef1e7f5\n- 涉及文件：components/dict-tag/dict-tag.vue、components/detail-template/detail-template.vue、property/complex/detail.vue、propertyContract/components/detail.vue\n- 所属项目：淮安物管；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

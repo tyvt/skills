@@ -1,0 +1,52 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793827333622/history/archive_009",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T21:54:24.541794+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_dialog_vmodel.md",
+                "memory_type": "entities",
+                "after": "# zs-dialog Vue3 v-model 绑定模式\n产品2.0 中 zs-dialog 已改造为支持 `v-model` 绑定（modelValue prop），全项目统一用 v-model 打开弹窗。\n\n## 组件改造\n- zs-dialog 增加 `modelValue` prop，支持 `v-model`；新增计算属性 `dialogVisible`：`modelValue ?? this.$attrs.visible`，兼容未改完的 `v-model:visible`。\n- 关闭时 emit `update:modelValue`，并兼容 Vue3（从 `$attrs` 取事件，不再用 `$listeners`）。\n\n## 使用约定\n- 父组件一律改为 `v-model=\"xxxVisible\"`，不再使用 `v-model:visible`。\n- 已对全项目批量替换 `v-model:visible=` → `v-model=`。\n- 已改造组件示例：ChangePasswordDialog（Navbar 中 `v-model=\"isChangePasswordDialogVisible\"`）、zs-select-dialog 等。\n\n## 验证与归属\n- 涉及文件：src/components/zs-dialog/zs-dialog.vue、layout/index.vue、dialogMixins.js、@zhi2-web-admin/src/layout/components/Navbar.vue。\n- 所属项目：2-0（产品2.0）；来源会话：9385abcc-fd97-45d9-bf1e-ac59ebef7392；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/构建与修复工作流.md",
+                "memory_type": "preferences",
+                "after": "- 运行 build 后根据终端报错修复问题，循环重新构建直到 exit_code 为 0 才视为完成。\n- 在 2-0 项目中习惯用 `SelectDialog.open()` + `columns` 配置替代模板内 `<zs-select-dialog>` 写法，避免构建阶段错误提取 slot 内容。"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/vue3 弹窗绑定方式.md",
+                "memory_type": "preferences",
+                "after": "- 在 2-0 项目 Vue3 迁移中，弹窗统一用 `v-model` 绑定（modelValue prop），不再使用 `v-model:visible`。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/router_meta_safe.md",
+                "memory_type": "entities",
+                "before": "# Vue Router meta 安全访问模式\nVue3 迁移中直接访问 `router.currentRoute.meta.xxx` 会抛 Cannot read properties of undefined，因 router.currentRoute 为 Ref 须先取 value 再安全访问。\n## 问题根因\n- Vue Router 4 中 `router.currentRoute` 是 Ref 对象，直接访问 `.meta.busCode` 会得到 undefined 并抛出 Cannot read properties of undefined。\n## 解决方案\n- 统一改为先取 `const current = router.currentRoute && router.currentRoute.value`，再用 `current?.meta?.busCode` 等安全访问消除异常。\n## 验证与归属\n- 验证证据：src=2-0/011.md；src=2-0/014.md\n- 涉及文件：index.vue、@zhi2-web-admin/src/components/OperationBtnGroup/index.vue\n- 所属项目：2-0；来源会话ID：11afbbee-3388-4e8f-8411-f15186e36c48；58dcfdc3-e0eb-4a9d-a77c-6b00ecbf41cf；代码基线：none",
+                "after": "# Vue Router meta 安全访问模式\n产品2.0 在 Vue3 迁移中直接访问 `router.currentRoute.meta.xxx` 会抛 Cannot read properties of undefined，须先取 Ref 的 value 再安全访问。\n\n## 问题根因\n- Vue Router 4 中 `router.currentRoute` 是 Ref 对象，直接访问 `.meta.busCode`、`.query` 或 `.meta` 会因 undefined 触发 TypeError。\n- `OperationBtnGroup` 等组件直接读 `router.currentRoute.meta.busCode`，meta 未就绪或路由切换瞬间会报 `Cannot read properties of undefined (reading 'busCode')`，index.vue:140 报错。\n\n## 解决方案\n- 统一改为先取 `const current = router.currentRoute && router.currentRoute.value`，再读 `current.query`、`current.meta.busCode` 等。\n- 使用可选链 `current?.meta?.busCode` 做空值守卫消除异常。\n- 对同类 `this.$route.meta.xxx` 也做全局排查并改为安全访问（如 `this.$route?.meta?.busCode`）；用户要求全局修复类似问题。\n\n## 验证与归属\n- 验证证据：src=2-0/011.md；src=2-0/014.md；index.vue:140 报错。\n- 涉及文件：index.vue、@zhi2-web-admin/src/components/OperationBtnGroup/index.vue。\n- 所属项目：2-0（产品2.0）；来源会话ID：11afbbee-3388-4e8f-8411-f15186e36c48；58dcfdc3-e0eb-4a9d-a77c-6b00ecbf41cf；代码基线：none。\n- 全部改成安全访问后，`Cannot read properties of undefined (reading 'busCode')` 错误基本解决；建议多切路由、刷新页面、从登录页直接进详情页等场景验证控制台是否还有类似错误。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_date_picker_props.md",
+                "memory_type": "entities",
+                "before": "# zs-date-picker Vue3 v-model 走 props\n产品2.0 搜索表单动态组件 zs-date-picker 在 Vue3 中须显式声明 modelValue prop，否则选中值无法回填。\n\n## 问题根因\n- 搜索表单项用 `<component :is=\"zs-date-picker\" v-model=\"queryParams[...]\">` 时，Vue3 的 `modelValue` 在 props 而非 `$attrs`。\n- 若 `zs-date-picker` 只在 `$attrs` 读写，选中值无法回填且不会 emit `update:modelValue`。\n\n## 解决方案\n- 显式声明 `modelValue`（兼容旧 `value`），getter 优先 `modelValue`，setter 同时 `$emit('update:modelValue')` 与 `update:value`。\n- 范围选择继续用 `update:start`/`update:end`。\n\n## 验证与归属\n- 验证证据：zs-search-form/SearchFormItem 动态组件 v-model 对比示例不生效，改组件 props。\n- 涉及文件：zhi2-web-admin/src/components/zs-date-picker/zs-date-picker.vue、zhi2-web-admin/src/components/zs-search-form/SearchFormItem.vue。\n- 所属项目：2-0（产品2.0）；来源会话：0c3557ae-26cf-42a4-8a27-e0d0002a07b4；代码基线：none。",
+                "after": "# zs-date-picker Vue3 v-model 走 props\n产品2.0 搜索表单动态组件 zs-date-picker 在 Vue3 中须显式声明 modelValue prop，否则选中值无法回填。\n\n## 问题根因\n- 搜索表单项用 `<component :is=\"zs-date-picker\" v-model=\"queryParams[...]\">` 时，Vue3 的 `modelValue` 在 props 而非 `$attrs`。\n- 若 `zs-date-picker` 只在 `$attrs` 读写，选中值无法回填且不会 emit `update:modelValue`。\n- 搜索表单用 `<component :is=\"getComponentType()\" v-model=\"queryParams[item.model]\" v-bind=\"item.attrs\" ...>` 渲染 zs-date-picker，Vue3 的 `v-model` 传 `modelValue` prop 并监听 `update:modelValue` 事件。\n- 旧 zs-date-picker 仅在 `$attrs` 里找 `modelValue`（Vue3 中它在 props 上），导致 getter 读不到值、回填失败；setter 用 `'modelValue' in this.$attrs` 判断也失效。\n\n## 解决方案\n- 显式声明 `modelValue`（兼容旧 `value`），getter 优先 `modelValue`，setter 同时 `$emit('update:modelValue')` 与 `update:value`。\n- 范围选择继续用 `update:start`/`update:end`。\n\n## 验证与归属\n- 验证证据：zs-search-form/SearchFormItem 动态组件 v-model 对比示例不生效，改组件 props。\n- 涉及文件：zhi2-web-admin/src/components/zs-date-picker/zs-date-picker.vue、zhi2-web-admin/src/components/zs-search-form/SearchFormItem.vue。\n- 具体位置：SearchFormItem.vue 49:51、zs-date-picker.vue 12:32。\n- 所属项目：2-0（产品2.0）；来源会话：0c3557ae-26cf-42a4-8a27-e0d0002a07b4；代码基线：none。"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/route_meta_safe_access.md",
+                "memory_type": "entities",
+                "deleted_content": "# OperationBtnGroup 路由 meta 安全访问\n产品2.0 中组件直接读取 router.currentRoute.meta.busCode 在 meta 未就绪时抛错，且因 router.currentRoute 为 Ref 须先取 value 再做空值守卫。\n## 问题根因\n- `OperationBtnGroup` 等组件直接读 `router.currentRoute.meta.busCode`，meta 未就绪或路由切换瞬间会 `Cannot read properties of undefined (reading 'busCode')`。\n- index.vue:140 报错。\n- Vue Router 4 中 `router.currentRoute` 为 Ref 对象，直接访问 `.query` 或 `.meta` 会因 undefined 触发 TypeError。\n## 解决方案\n- 先取 `const current = router.currentRoute && router.currentRoute.value`\n- 再读 `current.query`、`current.meta.busCode` 等，并对 `current` 做空值守卫（或可选链 `current?.meta?.busCode`）\n- 对同类 `this.$route.meta.xxx` 做全局排查；用户要求「全局修复类似问题」。\n## 验证与归属\n- 验证证据：index.vue:140 报错；src=2-0/014.md；src=2-0/011.md\n- 涉及文件：zhi2-web-admin/src/components/OperationBtnGroup/index.vue\n- 所属项目：2-0（产品2.0）；来源会话：11afbbee-3388-4e8f-8411-f15186e36c48；58dcfdc3-e0eb-4a9d-a77c-6b00ecbf41cf；代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

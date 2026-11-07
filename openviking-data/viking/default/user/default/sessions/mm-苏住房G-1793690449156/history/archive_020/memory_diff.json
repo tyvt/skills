@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_020",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:08:52.399412+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/multi_detail_backpath.md",
+                "memory_type": "entities",
+                "after": "# 多详情菜单共享列表的返回路径截断坑\n苏住房G整改通知书等详情页点「返回」报「页面未授权或不存在」，根因是同一列表按字典拆出多个详情菜单时截断路径落到未注册兄弟路径。\n\n## 现象与根因\n- 信用管理-整改通知书详情页点「返回」报「页面未授权或不存在」，从待办打开时尤其必现\n- #198 记录的「用截断路径回列表页而非 go(-1)」本身没错，但同一列表按 source_dept 拆成 detailA/detail0/detail1/detail2 四个组件路径、四个菜单\n- 详情路由 path 中间段随拆分分化，单纯截掉末段业务主键得到 `../detail1` 之类的兄弟详情路径，无对应菜单或未被注册，router 落到 catch-all 报未授权\n- meta.activeMenu 也可能缺失，截断结果无从纠正\n\n## 解法与边界\n- 在统一的 getBackPathFromRoute 里按「权威优先」分层兜底：① 先按 routeMeta 详情识别用列表菜单 filePath 经 getCurrentRouterByFilePath 反查真实列表 path 并去掉 :tableid 占位符\n- ② 再试 query.backUrl；③ 再试 meta.activeMenu；④ 最后才截断路径，且截断后必须用 isRegisteredRoutePath 复核\n- 未注册则按 meta.filePath 把 /detail 换成 /index 再反查一次\n- 本条根因是「多详情菜单共享一个列表」，不是 #198 的「截断路径本身取错」；解法是引入「按 filePath 反查路由」的正向权威来源，而非在路径字符串上打补丁\n\n## 验证与归属\n- 会话 35fa87f5：用户报「信用管理-整改通知书，查看详情后点击返回报页面未授权或不存在」\n- 修复提交 6f33429af（fix(rectificationNotice): 修复整改通知书详情页返回跳转错误）\n- 涉及文件：zhi2-web-admin/src/utils/sidebarActivePath.js、zhi2-web-admin/src/views/evaluation/rectificationNotice/constants.js、routeMeta.js、zhi2-web-admin/src/components/OperationBtnGroup/index.vue\n- 所属项目：苏住房G；代码基线：415629d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/ledger_id_mismatch.md",
+                "memory_type": "entities",
+                "after": "# 台账类接口 ID 主键优先级错配致 200 空数据\n苏住房G统计地图/小区台账点物业管理区域 marker 打开抽屉，Network 全 200 但页面显示全 0 和「暂无数据」，根因是台账接口 ID 主键被改成 complexId 优先。\n\n## 现象与根因\n- 统计地图/小区台账点物业管理区域 marker 打开抽屉，XHR 全部 200，页面却显示全 0 和「暂无数据」\n- DevTools 只截取 URL 最后一段显示请求名，两个「数字 ID」实为 selectOperatingAssetsCategory/{id} 和 selectOperatingAssetsCategoryHouseList/{id}，另两个 list 是地图层 selectOptionalComplexList，故「看起来 4 个 XHR」不等于漏调接口\n- 某次提交把 resolvedProjectId 取值优先级改成 complexId 优先，而 standingBook 台账路径参数历来是 projectId || leaseProjectId\n- 当 marker 上 complexId 与 leaseProjectId 不是同一值时，用复杂区 ID 查台账，后端按业务契约返回 200 + 空 data，前端渲染全 0\n\n## 解法与边界\n- 台账/合同类接口统一按 projectId → leaseProjectId → complexId 逐级兜底，complexId 只用于地图/GIS 维度（如运营报告 PDF 的 reportComplexId）\n- 同一页面两套主键拆成两个变量（markerProjectId / reportComplexId），子组件按用途分别传 complex-id / project-id / lease-project-id，避免一个变量到处复用被优化时误改优先级\n- loadPageData 补 skipFetch 判断，与 G 端详情页行为一致；地图抽屉与小区台账详情页两处入口都要对齐同一套传参\n- 本条是「200 + 空 data」的 ID 语义错配（GIS 主键 vs 台账主键），与已知清单「跳转页 projectId 多来源互相覆盖」不同\n\n## 验证与归属\n- 会话 5aabb73b：用户「物业管理区域点进来帮看下是不是有接口没调，这是正式环境调的」；排查结论「接口已返回 200，但 data 为空」\n- 根因 commit 5d50941f2 把 ID 优先级改成 complexId 优先；修复 resolvedProjectId 改回 projectId → leaseProjectId → complexId，overviewContent 拆分 markerProjectId 与 reportComplexId\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/operatingAssets.vue、overviewContent.vue、index.vue、statisticsMapDetail/index.vue\n- 所属项目：苏住房G；代码基线：3c282a5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/ledger_tab_removal.md",
+                "memory_type": "entities",
+                "after": "# 按项目裁剪台账 Tab 需三处入口同步移除\n苏住房G已隐藏「租赁申请」菜单，但统计地图/小区台账里仍能看到对应 Tab，点进去必报错，根因是 Tab 配置在三处各自维护。\n\n## 现象与根因\n- 苏住房项目已隐藏「租赁申请」相关菜单，但统计地图/小区台账里仍能看到对应 Tab，点进去必然报错或无意义\n- 台账 Tab 不是单一配置，而是「地图抽屉 + 台账详情页 + 本地组件块」三处各自维护：sourceMenuList 定义 value，详情页 index.vue 复制一份 Tab 配置，地图抽屉 overviewContent.vue 按 value === '4' 单独 v-if 渲染组件\n- 只改一处会出现「Tab 消失但组件还挂/或组件区空白」的半残状态\n\n## 解法与边界\n- 按项目隐藏某个台账 Tab 的标准动作：① statisticsMap/index.vue 的 sourceMenuList 移除 { label: '租赁申请', value: '4' }\n- ② statisticsMapDetail/index.vue 同步移除 Tab 配置并删除对应组件块与 import\n- ③ overviewContent.vue 删除 value === '4' 的渲染块与 import\n- ④ 底部组件文件 assetLease.vue 保留不删，便于后续恢复；改完核对剩余 Tab 顺序连续、默认 Tab（经营资产）仍可正常渲染切换\n- 本条针对「同源项目 Tab 配置三副本 + 按 value 分支渲染」，重点是「三处同改、组件文件留档」，与已知清单「隐藏字段/栏目的开关式做法」不同\n\n## 验证与归属\n- 会话 8f867382：用户「因苏住房项目，将『租赁申请』相关菜单隐藏了，需同步隐藏『小区台账-租赁申请』tab」\n- 结论共修改 3 个文件：sourceMenuList 移除 { label: '租赁申请', value: '4' }；statisticsMapDetail/index.vue 移除 Tab 配置并删 asset-lease 组件块及引用；overviewContent.vue 删除 value === '4' 渲染块；assetLease.vue 保留未删\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、statisticsMapDetail/index.vue、overviewContent.vue、assetLease.vue\n- 所属项目：苏住房G；代码基线：3c282a5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/noid_detail_params.md",
+                "memory_type": "entities",
+                "after": "# 无 id 详情接口失效的三点落地清单\n苏住房G详情页接口有返回但页面只显示表单默认值，根因是 mixins/form.js 的 getDetail 默认校验路由 id 导致请求被跳过，需页面内三点重写。\n\n## 现象与根因\n- 详情页接口有返回，但页面只显示表单默认值（如 platformConfig 基础配置走 /system/platformConfig/getInfo，不依赖路由 id）\n- mixins/form.js 的 getDetail() 先过 validateDetailRequiredParams()/getDetailRequiredParams()，默认三要素 moduleName+businessName+id 缺任一即 console.warn 并 return，请求根本没发\n- 已知结论 #912 只点到校验层这一层；本批补三点落地清单\n\n## 解法与边界\n- ① 正确做法是页面内重写 getDetailRequiredParams() 只返回 moduleName+businessName（与 companyRecord 的 getOwnCompany 模式对齐），不要改公共 mixin\n- ② detailApiFull 也要一并重写（默认是 /${moduleName}/${businessName}/${detailApiSuffix}/${id}，会渲染出 .../getInfo/undefined），本仓 platformConfig 覆盖成 /getInfo 放在 computed\n- ③ detailCallback 必须兼容两种结构 response?.data ?? response，因为无 id 接口有的直接返回数据\n- 排查时在控制台搜「[getDetail] 缺少接口必需参数」即可确认\n\n## 验证与归属\n- 会话 beb84a33：用户「接口有返回，修改详情接口逻辑」；结论指出 form.js 的 getDetail 校验路由 id 导致请求被跳过\n- 基线核验 form.js L51-77（getDetailRequiredParams 默认含 id、warn 后 return）、platformConfig/detail.vue L317-340（重写 detailApiFull 为 /getInfo + 重写 getDetailRequiredParams 去掉 id）、L349-351（detailCallback 用 response?.data ?? response）\n- 涉及文件：zhi2-web-admin/src/mixins/form.js、zhi2-web-admin/src/views/system/platformConfig/detail.vue\n- 所属项目：苏住房G；代码基线：b6932ba"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

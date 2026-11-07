@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_050",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T22:46:40.935668+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/contract_nav_fix.md",
+                "memory_type": "entities",
+                "after": "# 合同范本跳转改造\n苏州市房地产监测V3 中 `commercialHousingSales/presale/template/detail.vue` 的 `gotoContractTemplate` 改为使用公共路由解析函数，跳转更可靠。\n\n## 改动说明\n- `gotoContractTemplate` 不再硬编码 `name: 'ContractTemplate/:type/:tableid'`，改用 `buildNavigationByFilePath` 按 `contract/index` 组件路径查找合同正文编辑页路由\n- 用 `pathHint: 'cash' | 'pre'` 区分现售/预售，用 `preferDetail: true` + `routeId` 填入范本 `templateId`\n- 未找到路由时提示「没有授权相关菜单，请联系管理员」；`router.push` 增加 `.catch(() => {})` 避免重复导航报错\n\n## 验证情况\n- 已尝试运行 `npm run test:e2e:contract-template`，因 E2E 登录凭据错误未能完成自动化验证\n- 代码实现与计划一致，可在有权限环境中手工点击验证\n\n## 验证与归属\n- 涉及文件：`zhi2-web-admin/src/views/commercialHousingSales/presale/template/detail.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：abab47cb-8bf9-42ce-b594-9c7268af90e8；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/entrust_delete_fix.md",
+                "memory_type": "entities",
+                "after": "# 委托代售楼幢列表删除按钮修复\n苏州市房地产监测V3 中委托代售详情页 `EntrustBuildingTable.vue` 的行内删除按钮无效问题已修复。\n\n## 根因\n- `zs-table-column` 通过 `:scope=\"scope\"` 透传插槽参数，父组件需用 `slot-scope=\"{ scope }\"` 解构\n- 原先写成 `slot-scope=\"scope\"` 直接访问 `scope.row` 得到 `undefined`，确认删除因 `row.id` 报错被 `.catch(() => {})` 静默吞掉\n\n## 修改内容\n- `EntrustBuildingTable.vue` 操作列插槽改为 `slot-scope=\"{ scope }\"`\n- 删除按钮增加 `data-testid=\"entrust-sale-building-delete-btn\"`\n- `handleDelete` / `handleBatchDelete` 增加 `id` 校验、`res.code` 检查，取消确认时不再吞掉其他错误\n\n## E2E 与归属\n- 新增 `deleteBuildingByRowButton` 辅助函数，全流程用例覆盖行内删除与批量删除两种路径\n- 涉及文件：`EntrustBuildingTable.vue`、`e2e/presale/entrust-sale-real-api-flow.spec.js`、`presale/entrustSale/detail.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：ad31939a-64bd-4cd1-bc4c-21c4d54679cd；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/build_navigation_util.md",
+                "memory_type": "entities",
+                "after": "# 公共路由解析工具 buildNavigationByFilePath 修复\n苏州市房地产监测V3 中 `ruoyi.js` 的路由按文件路径查找工具已修复并新增 `buildNavigationByFilePath`。\n\n## 真正原因\n- 控制台匹配用 `(r.meta?.filePath || r.component) === 'presale/permit/plan/detail'`\n- 原 `getRouterPathByFilePath` 内部只用 `meta.filePath === filePath` 判断\n- 菜单节点经 `flattenTree` 后 `meta.filePath` 可能写成 `Layout`/`ParentView`，真正组件路径在 `component` 字段，导致工具函数找不到\n- 方案页路由名 `PermitPlan/:tableid` 用 path 拼接在 `ParentView` 嵌套下易跳错\n\n## 本次修改\n- `routeMatchesFilePath`：与控制台一致，`meta.filePath` 或 `component`（字符串）任一命中即可\n- `collectRoutesByFilePath`：优先直接扫描 `originalRoutes` 扁平数组\n- 新增 `buildNavigationByFilePath`：优先用命名路由 `{ name: 'Per...' }`\n\n## 验证与归属\n- 涉及文件：`presale/permit/components/detail.vue`、`src/utils/ruoyi.js`、`property/spFeeBill/components/index.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：91b53615-9131-4fec-94ff-01cc463a59ef；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/operation_btn_refresh.md",
+                "memory_type": "entities",
+                "after": "# OperationBtnGroup 提交后自动刷新修复\n苏州市房地产监测V3 中 `OperationBtnGroup` 组件统一在提交/审核成功后触发刷新，解决提交审核后页面不自动刷新的问题。\n\n## 统一事件\n- `OperationBtnGroup/index.vue` 新增 `emitStateChange()`，提交、审核、取消提交/取消审核成功后触发 `refresh` + `update`\n- `handleApproval()`、`handleSubmit()` 均调用 `emitStateChange()`，`handleSubmit` 额外 `$emit('after-submit')`\n- `jgxm/detail.vue` 等 33 个只绑了 `@refresh=\"init\"` 的页面提交后会自动刷新，无需逐页修改\n\n## 清理重复绑定\n- 为避免提交时 `getDetail` 被调用两次，已从 99 个 `operation-btn-group` 标签移除重复绑定\n\n## 验证与归属\n- 涉及文件：`OperationBtnGroup/index.vue`、`supervision/agreement/jgxm/detail.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：30be24cb-105f-4bdc-aa08-3b0e6ab11f36；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

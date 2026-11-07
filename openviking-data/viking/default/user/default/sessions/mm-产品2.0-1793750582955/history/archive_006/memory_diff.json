@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793750582955/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T00:14:59.459123+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_todo_seq_guard.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0首页待办消息中心并发请求序号守卫\n产品2.0(zhi2-web-admin)首页 home/index.vue 中待办与消息中心面板共用同一 todos 数据源，并发请求时因响应乱序导致过期数据覆盖。\n\n## 问题根因\n- 首页待办/消息中心共用同一 todos 数据源，两个请求并发发出，接口慢时先发请求后返回，把过期列表写进 todos\n- 导致「停在消息中心却显示待办数据」、点击处理跳错页面\n- 异步 .then 不感知请求是否已过期，只按返回顺序写响应式数据，乱序返回必然覆盖新数据\n\n## 解决方案\n- 模块内维护自增序号 this.todoPanelFetchSeq，发请求前 ++ 并把本次序号存闭包 seq\n- .then 里仅当 seq === 最新序号才赋值数据\n- .finally 里同样序号匹配才关 loading（防止旧请求关掉新请求的 loading）\n- 顺带给 res.rows 做 || [] 防护\n- 所有「同一数据源可被多入口/多条件并发刷新」的列表都套用此 seq 守卫模式，比 AbortController 更简单且不依赖 axios 版本\n\n## 验证与归属\n- 验证：home/index.vue 增加 todoPanelFetchSeq，then/finally 中 seq === this.todoPanelFetchSeq 才写入 todos / 关 todoLoading\n- 涉及文件：zhi2-web-admin/src/views/home/index.vue\n- 所属项目：产品2.0；来源会话：17a66e94-0a17-42dc-94f3-4fbe933bf043；代码基线：6da8974"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/workorder_category_map_guard.md",
+                "memory_type": "entities",
+                "after": "# 工单分类接口对象数据直接map致下拉空\n产品2.0(zhi2-web-admin)工单分类下拉因接口返回结构变化，原解析取到对象后 .map() 抛错被 catch 吞掉，导致 categoryOptions 为空。\n\n## 问题根因\n- 原代码 `const list = response.data || response.rows || []`\n- `/property/workOrder/category/list` 返回 `{data:{list:[]}}` 时取到对象，`.map()` 抛错被 catch 吞掉致 `categoryOptions` 空\n\n## 解决方案\n- 保持该接口，兼容 `rows`/`data.records`/`data.list`/`data.rows`/`data` 数组等结构解析\n- 映射 `workOrderCategoryId`/`_categoryName` 等字段\n- 移除状态过滤与 `/page` 调用\n\n## 验证与归属\n- 验证证据：src=产品2.0/024.md\n- 涉及文件：zhi2-web-admin/src/views/property/workOrder/report/index.vue、report/components/AddOrderDialog.vue、components/zs-select/zs-select.vue、mixins/listMixins.js、components/zs-select/SingleSelect.vue、zs-search-form/SearchFormItem.vue、property/workOrder/category/index.vue、mixins/table.js\n- 所属项目：产品2.0；来源会话：1401b92d-0ad2-433b-83f9-aa435e2c7296；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/git子模块指针同步.md",
+                "memory_type": "preferences",
+                "after": "- 子模块 `zhi2-web-admin` 在某分支修复缺陷后，父仓库其他各分支须同步更新子模块指针到对应 commit，避免分支间代码偏差（如修复分页重叠 commit `dac8a93e7` 后，`develop/v2.6.2` 须指向 `fa00918cc`）\n- 本地代理配置文件 `env/.env` 保持未提交状态"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

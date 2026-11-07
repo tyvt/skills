@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_017",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:38:55.472377+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/elect_nongroup_selectoptions.md",
+                "memory_type": "entities",
+                "after": "# 选举详情非分组分支取错字段\n苏住房C 投票选举模块非分组选举详情页候选人整块不显示，因非分组分支误用 selects.rows 而非 selectOptions。\n\n## 问题根因\n- 详情组件按是否分组走两套数据，分组分支读 selects.rows（列表接口包装），非分组分支沿用同写法。\n- 非分组分支数据实际在 selectOptions 上，取到 undefined 数组后 v-for 渲染零条，页面无任何报错。\n- 此类「同组件两条分支、其中一条复制来的」是投票/选举模块重复踩点。\n\n## 解决方案\n- 改前先确认当前走哪条分支（decisionType 分组与否），将非分组分支取数统一改为 selectOptions 并给空值兜底。\n- 改完两条分支都要各自验证一遍，不要只测出问题的那一种。\n- 同类 DecisionResult/ResultDetail/ResultRecord 副本一并复核，避免残留。\n\n## 验证与归属\n- 验证：会话 aa7c3d25（2026-08-27，基线 f1939b0）修改第2组：「ResultDetail.vue / ResultRecord.vue 非分组选举将错误 selects.rows 改为 selectOptions」。\n- 涉及文件：zhi2-mobile-shimin/src/pages_vote/elect/ResultRecord.vue、zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue。\n- 所属项目：苏住房C；来源会话ID：aa7c3d25-bd1a-4ca4-bb8f-8c55d6730cc6；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/biz_popup_noreject.md",
+                "memory_type": "entities",
+                "after": "# 页面自己弹业务弹窗时核验接口须带 noReject\n苏住房C 小程序添加房屋核验失败时，因全局拦截器抢先弹 toast 并 reject，页面自定义「人工登记」弹窗不可达。\n\n## 问题根因\n- 全局 HTTP 拦截器对 code!=200 响应统一 showToast 并 reject，页面 .then 里 showPopup=true 永远执行不到。\n- 页面未写 .catch，连错误分支都进不去，用户只看到底部 toast 一闪而过。\n- 与「noReject 返回结构解析」不同层：此处是拦截器抢先处理导致 UI 分支不可达。\n\n## 解决方案\n- 凡「失败也要走页面自定义 UI」的接口，api 层默认带 noReject:true（如 handleHouseOwner），页面拿 normalized 响应自己判 code。\n- 所有调用方补 code 判断与 .catch() 兜底，不能假设 then 只收成功。\n- 业务弹窗组件（ZsPopup）移到页面根级、补 z-index，用 immediate watch + nextTick 打开兼容 H5/政务容器。\n- 新增同类核验接口先问「失败要不要弹窗」，要就默认 noReject。\n\n## 验证与归属\n- 验证：会话 0e3de74d（2026-09-28，基线 2c4e3d9）用户报「我的房屋-添加房屋，人工登记弹窗入口不显示」，根因结论如上。\n- 涉及文件：zhi2-mobile-shimin/src/api/httpInstance.js、src/api/property.js、src/pages_owner/house/owner/addHouseContract.vue、addHouse.vue、src/components/ZsPopup/ZsPopup.vue。\n- 所属项目：苏住房C；来源会话ID：0e3de74d-cc4d-4e34-8770-dd23e2757471；代码基线：2c4e3d9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/main_pkg_static_whitelist.md",
+                "memory_type": "entities",
+                "after": "# 主包白名单多余兜底图占体积\n苏住房C 小程序主包上传预估贴边时，因把分包已有的兜底图加入 MAIN_STATIC_PATHS 致主包构建超 2048KB 失败。\n\n## 问题根因\n- 为修图片空白把 images/szf/default.png（约16KB）加进主包白名单 mainStaticPaths.js，使 prune-main-static.mjs 跳过裁剪、文件常驻主包。\n- 该图只是 pages_transaction 场景兜底图，分包里本有一份，两份白占 16KB。\n- 与「主包体积按 dist/build 产物统计」「白名单让资源走主包路径」不同性质：本次白名单反过来吃掉体积预算。\n\n## 解决方案\n- 定位具体文件后把该项从 MAIN_STATIC_PATHS 移除并删主包副本，恢复 houseCard 的 subpackage=\"pages_transaction\" 让兜底图从分包加载。\n- 配合 pages.json 里苏找房 Tab 预加载该分包，不再有 500。\n- 改完必须重跑 size 脚本核对磁盘体积与上传预估（×1.17）。\n- 经验：主包预算紧张时，分包已有的兜底/占位图一律不进白名单，宁可走 subpackage 预加载。\n\n## 验证与归属\n- 验证：会话 dbea5b5a（2026-08-31，基线 0cea241）结论：主包构建失败因上传预估 2057.4KB 超 2048KB；调整后磁盘 1742.2KB、上传预估 2038.4KB。\n- 涉及文件：zhi2-mobile-shimin/src/utils/mainStaticPaths.js、scripts/prune-main-static.mjs、src/components/commonNew/houseCard.vue、src/pages.json。\n- 所属项目：苏住房C；来源会话ID：dbea5b5a-3444-443d-a782-07bd1b65d66e；代码基线：0cea241"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sfb_gateway_env.md",
+                "memory_type": "entities",
+                "after": "# 苏服办网关环境变量只保留需申请4类\n苏住房C 小程序接入江苏省苏服办网关时，env 文件堆了 9 个 VITE_APP_SFB_* 变量，需只保留需申请的 4 类、固定值下沉代码默认。\n\n## 问题根因\n- 网关文档规定 app_id、interface_id、version、charset、biz_content、timestamp、origin、sign 九入参，其中 version=1.0.0、charset=UTF-8、origin=1 是文档写死示例常量，每套环境填一遍纯属噪声。\n- APP_KEY/APP_SECRET 文档未要求且代码未用到，属历史遗留。\n- 返回体是 data 字段里再套一层原接口 JSON 字符串（含 custom/status），解析需二次 JSON.parse。\n\n## 解决方案\n- 环境变量只留真正需开放平台申请的 4 类：VITE_APP_USE_SFB_DISPATCHER、VITE_APP_SFB_APP_ID、VITE_APP_SFB_GET_INTERFACE_ID、VITE_APP_SFB_POST_INTERFACE_ID。\n- version/charset/origin 收进 dispatcher.js 默认值；biz_content 序列化、timestamp 时间戳、sign 验签返回均为运行时生成不能配。\n- 判断原则：一份 env 只说明「环境间会变」和「需人工申请」的，协议常量一律代码默认。\n\n## 验证与归属\n- 验证：会话 0f1c6af9 用户贴网关/验签参数表后要求移除不必要参数，处理结果如上。\n- 涉及文件：zhi2-mobile-shimin/.env.development、.env.production、.env.test、src/utils/dispatcher.js。\n- 所属项目：苏住房C；来源会话ID：0f1c6af9-9dca-4fad-8282-c48ebf2f048d；代码基线：166ed47"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

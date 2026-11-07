@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793656674649/history/archive_030",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T22:44:55.805232+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dict_tag_type.md",
+                "memory_type": "entities",
+                "after": "# DictTag 字典 default 致 ElTag type 校验告警\nDictTag 组件将字典 listClass（如 \"default\"）直接传给 ElTag 的 type，触发 Element Plus 自定义校验告警。\n\n## 问题根因\n- DictTag 组件将字典 listClass（如 \"default\"）直接传给 ElTag 的 type 属性\n- Element Plus 对 ElTag type 有自定义校验，default 及空值触发告警\n\n## 解决方案\n- 在 zhi2-web-admin/src/components/dict-tag/dict-tag.vue 的 getTagType() 中，将 default 及空值返回 undefined\n- 统一对 listClass 调用 trim() 与 toLowerCase() 规范化后再判断类型\n\n## 验证与归属\n- 验证证据：src=2-0/019.md\n- 涉及文件：zhi2-web-admin/src/components/dict-tag/dict-tag.vue\n- 所属项目：2-0；来源会话ID：19b58a9e-4df5-44f1-8286-0667d6776a04；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_dup_init.md",
+                "memory_type": "entities",
+                "after": "# 同 DOM 重复 init 致 ECharts 实例已存在告警\n组件在 mounted 及 watch 中直接 echarts.init 同一 DOM 且绑定匿名 resize 监听，导致实例已存在告警与监听泄漏。\n\n## 问题根因\n- 组件（如 communityStatistics.vue）在 mounted 及 watch 中直接 echarts.init 同一 DOM\n- 绑定匿名 resize 监听函数导致无法移除，产生监听泄漏与实例已存在告警\n\n## 解决方案\n- 改用 echarts.getInstanceByDom(dom) || echarts.init(dom) 复用实例\n- resize 监听用组件字段保存引用，销毁时 removeEventListener 与 dispose\n- watch 中套 $nextTick 确保 DOM 就绪后再操作\n\n## 验证与归属\n- 验证证据：src=2-0/019.md\n- 涉及文件：communityStatistics.vue\n- 所属项目：2-0；来源会话ID：2a9f420a-f2ff-426a-a5c2-7881713c1a52；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/find_dictlabel.md",
+                "memory_type": "entities",
+                "after": "# 计算属性 find 无果直取 dictLabel 报错\nbizStateName 与 stateName 计算属性中 Array.prototype.find() 未匹配返回 undefined 后直取 .dictLabel 报错。\n\n## 问题根因\n- 计算属性中 Array.prototype.find() 未匹配返回 undefined 后直取 .dictLabel 报错\n- 因 dictValue 与 form.bizState 类型不一致或字典项缺失导致 find 无果\n\n## 解决方案\n- 先赋值 find 结果到变量，再使用可选链 row?.dictLabel 安全取值\n- 比较改用 == 宽松相等或保留空判断，避免类型不一致致匹配失败\n\n## 验证与归属\n- 验证证据：src=2-0/020.md\n- 涉及文件：src/views/maintenance/depositNotice/company/components/detail.vue\n- 所属项目：2-0；来源会话ID：4642db27-d773-418d-b3f6-c2109f85a0e4；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue_router_catchall.md",
+                "memory_type": "entities",
+                "before": "# 动态路由首跳 catch-all 兜底\n在 constantRoutes 增加 catch-all 路由消除首帧 No match 警告，动态路由仍按原守卫 replace。\n\n## 问题根因\n- 刷新直进 `/system/config` 等权限路由时，Vue Router 4 先打 `[Vue Router warn]: No match found`。\n- `beforeEach` 里 `GenerateRoutes` + `addRoute` 再 `replace` 到目标，页面能开但控制台吵。\n- 与「落地页未注册」类问题不同，本条专消首次匹配前的 warn。\n\n## 解决方案\n- 在 `router/index.js` 的 `constantRoutes` 增加 `path: '/:pathMatch(.*)*'` 指向 404 组件，让首帧至少匹配一条静态路由。\n- 动态路由挂上后仍按原守卫 `replace` 到真实页面。\n\n## 验证与归属\n- 验证证据：会话 e69bf570「进入路由之前会报这个错，但是实际上路由可以正常打开」；加 catch-all 兜底。\n- 涉及文件：zhi2-web-admin/src/router/index.js。\n- 所属项目：2-0；来源会话ID：e69bf570-f1df-461a-a4e3-2caf768354d7；代码基线：none。",
+                "after": "# 动态路由首跳 catch-all 兜底\n在 constantRoutes 增加 catch-all 路由消除首帧 No match 警告，动态路由仍按原守卫 replace。\n\n## 问题根因\n- 刷新直进 `/system/config` 等权限路由时，Vue Router 4 先打 `[Vue Router warn]: No match found`。\n- `beforeEach` 里 `GenerateRoutes` + `addRoute` 再 `replace` 到目标，页面能开但控制台吵。\n- 与「落地页未注册」类问题不同，本条专消首次匹配前的 warn。\n\n## 解决方案\n- 在 `router/index.js` 的 `constantRoutes` 增加 `path: '/:pathMatch(.*)*'` 指向 404 组件，让首帧至少匹配一条静态路由。\n- 动态路由挂上后仍按原守卫 `replace` 到真实页面。\n\n## 验证与归属\n- 验证证据：会话 e69bf570「进入路由之前会报这个错，但是实际上路由可以正常打开」；加 catch-all 兜底。验证文档：src=2-0/019.md。\n- 涉及文件：zhi2-web-admin/src/router/index.js。\n- 所属项目：2-0；来源会话ID：e69bf570-f1df-461a-a4e3-2caf768354d7；代码基线：none。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

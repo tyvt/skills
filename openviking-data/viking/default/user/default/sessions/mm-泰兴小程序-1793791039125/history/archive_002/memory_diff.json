@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-泰兴小程序-1793791039125/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T11:21:33.769234+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cashier_payment_channel_api.md",
+                "memory_type": "entities",
+                "after": "# 收银台支付方式仅出银联支付因接口调用错误\n员工端收银台弹层仅显示「银联支付」一种支付方式，根因是员工端与业主端调用了不同的支付渠道接口。\n## 问题根因\n- 员工端调 `GET /system/paymentChannel/list`，业主端同场景调 `POST /system/paymentChannel/listPayablePaymentChannel`。\n- 员工端应调与业主端一致的 `listPayablePaymentChannel` 接口，错误调用导致仅返回「银联支付」。\n## 解决方案\n- 员工端改为调用 `POST /system/paymentChannel/listPayablePaymentChannel` 获取可用支付方式。\n## 验证与归属\n- 验证证据：src=泰兴小程序\n- 涉及文件：src/staff/api/cashier.js、src/api/system.js、src/staff/pages/cashier/result.vue\n- 来源会话ID：54c23926-7b8a-40d1-a6aa-2e3dcc903484\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tab_hero_bg_margin.md",
+                "memory_type": "entities",
+                "after": "# 含背景tab页顶部留白边距不一致\n多个员工端 tab 页（home/workbench/profile/organization）含背景图时顶部留白与边距不一致，通过调整 `ZsImage` 的 `mode` 与各自 hero 背景宽度/定位修复。\n## 问题根因\n- 各 tab 页 hero 背景图缺少统一 `mode` 与宽度/定位规则，导致含背景时顶部留白边距不一致。\n## 解决方案\n- `src/components/ZsImage/ZsImage.vue` 新增 `mode` prop（默认 `aspectFit`），内部 `<image>` 改用 `:mode=\"mode\"`。\n- `src/pages/staff/home/index.vue`：`<ZsImage mode=\"aspectFill\">` + `.hero-background{width:815rpx; top:0; right:0}`。\n- `src/pages/staff/workbench/index.vue`：去掉 `.hero-bg-wrap` 包裹，图片直挂 hero，`width:1071rpx`。\n- `src/pages/staff/profile/index.vue`：hero 高度改纯 px 计算（`uni.upx2px(280)+statusBarHeight`），新增 `heroBgStyle` 动态宽度，`mode=\"aspectFill\"`。\n- `src/pages/staff/organization/index.vue`：同步调整 hero 背景。\n## 验证与归属\n- 验证证据：src=泰兴小程序\n- 涉及文件：src/components/ZsImage/ZsImage.vue、src/pages/staff/home/index.vue、src/pages/staff/workbench/index.vue、src/pages/staff/profile/index.vue、src/pages/staff/organization/index.vue\n- 来源会话ID：46d3f531-42c8-47d5-a99d-50772f08989d\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsdialog_root_portal.md",
+                "memory_type": "entities",
+                "after": "# ZsDialog真机弹窗内容缺失因未用root-portal\n模拟器弹窗内能看到巡检图片、真机看不到，根因是 `ZsDialog` 原地渲染 `uni-popup`，真机上受祖先层叠上下文/transform 影响，而真机验证过的 `ZsBottomPopup` 用了 `root-portal`。\n## 排查结论\n- 排除证书问题：`www.ylzhwy.com:19002` 证书有效（TrustAsia 泛域名，2027-01 到期，TLS 1.3），`<image>` 不受小程序域名白名单限制。\n- `ZsBottomPopup` 外包 `root-portal`（弹层挂页面根节点）；`ZsDialog`（全站 20 处）原地渲染 `uni-popup`，fixed 弹层在真机受祖先层叠上下文/transform 影响，导致「模拟器正常、真机内容缺失/底层页面透出」。\n## 解决方案\n- `src/components/ZsDialog/ZsDialog.vue`：MP-WEIXIN 下加 `<root-portal>` 包裹 `uni-popup`，对齐 ZsBottomPopup 真机方案；`App.vue` 的 z-index 覆盖对 root-portal 内部同样生效，全站 20 处 ZsDialog 一并受益。\n- 编译产物 `ZsDialog.wxml` 已确认含 root-portal。\n- `src/staff/components/ZsUploader/ZsUploader.vue` 同步调整。\n## 验证与归属\n- 验证证据：src=泰兴小程序\n- 涉及文件：src/components/ZsDialog/ZsDialog.vue、App.vue、src/staff/components/ZsUploader/ZsUploader.vue\n- 来源会话ID：1f1cffd7-ca4f-4638-a390-b56e691f9e57\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/pagebutton_color_inline.md",
+                "memory_type": "entities",
+                "before": "# PageButton颜色未传入内联样式致背景白\n`detail.vue:378` 中 `#F39C12` 配置正确，但 `PageButton` 将颜色转为内联 `:style` 时未传入，导致按钮背景显示为白色。\n## 问题根因\n- `detail.vue:378` 中 `#F39C12` 配置正确。\n- `PageButton` 将颜色转为内联 `:style` 时未传入颜色属性，导致按钮背景显示为白色。\n## 解决方案\n- 需确保 `PageButton` 正确接收并绑定颜色属性。\n## 验证与归属\n- 验证证据：src=泰兴小程序/004.md\n- 涉及文件：src/staff/pages_facility/issue/detail.vue、src/staff/components/PageButton/PageButton.vue、src/staff/components/ZsButton/ZsButton.vue、src/components/ZsButton/ZsButton.vue、src/components/StatusBar/StatusBar.vue、src/staff/utils/virtualHost.js、src/utils/virtualHost.js、src/main.ts\n- 来源会话ID：a6595586-e4f7-4b47-9b7a-2844397b091d\n- 代码基线：none",
+                "after": "# PageButton颜色内联样式未透传致背景白\n`detail.vue:378` 中 `反馈进度` 的橙色 `#F39C12` 配置正确，但 `PageButton` 将颜色转为内联 `:style` 挂在 `<ZsButton>` 自定义组件标签上，在微信小程序里不会透传到组件内部真实 `<button>`，导致按钮背景显示为白色。\n## 问题根因\n- `detail.vue:378` 中 `反馈进度` 橙色 `#F39C12` 配置本身没错。\n- `PageButton` 把颜色转成内联 `:style` 挂在 `<ZsButton>` 自定义组件标签上；微信小程序里写在组件标签上的 `class`/`style`（含 `--css-var`）只落在外层包装节点，不会透传到组件内部的真实 `<button>`。\n- 内部原生 `<button>` 默认背景 `#f8f8f8`（≈白）盖住橙色；文字色 `#FFFFFF` 被 `.zs-button{color:#333}` 压成深灰字，呈现「白底+深灰字」。\n- 提交 4635cee 加的 `.zs-button.btn-custom{background-color:var(--btn-bg-color)!important}` 因 `btn-custom` 类只在外层节点、选择器匹配不到，是死代码。\n## 受影响范围\n- 不止 `反馈进度`，同页 `催办`、`<ZsButton class=\"submit-btn\">` 也受影响。\n## 验证与归属\n- 验证证据：src=泰兴小程序/004.md\n- 涉及文件：detail.vue、src/components/ZsButton/ZsButton.vue、src/staff/components/ZsButton/ZsButton.vue、src/staff/components/PageButton/PageButton.vue\n- 来源会话ID：a6595586-e4f7-4b47-9b7a-2844397b091d\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/wxss_deep_discard.md",
+                "memory_type": "entities",
+                "before": "# WXSS静默丢弃:deep致弹层变窄卡片\n`src/staff/pages/cashier/result.vue` 使用 `:deep(.payment-popup){ width: min(100vw, 750rpx) }`，该写法被 WXSS 静默丢弃，导致弹层宽度失效变为窄卡片悬浮。\n## 问题根因\n- `result.vue` 使用 `:deep(.payment-popup){ width: min(100vw, 750rpx) }` 写法。\n- WXSS 静默丢弃该选择器，导致弹层宽度失效变为窄卡片悬浮。\n## 解决方案\n- 需改用小程序支持的样式方案（如直接写类名或内联样式）。\n## 验证与归属\n- 验证证据：src=泰兴小程序/004.md\n- 涉及文件：src/staff/pages/cashier/index.vue、src/staff/pages/cashier/result.vue、src/pages_property/payment/components/PaymentChannelPopup.vue、src/staff/api/cashier.js、src/components/ZsPopup/ZsPopup.vue、src/staff/pages/cashier/payment.vue、src/components/ZsBottomPopup/ZsBottomPopup.vue、plans/radiant-forging-einstein-6FZZmxPl.md\n- 来源会话ID：54c23926-7b8a-40d1-a6aa-2e3dcc903484\n- 代码基线：none",
+                "after": "# WXSS不支持min()致:deep弹层宽度失效变窄卡片\n`src/staff/pages/cashier/result.vue` 使用 `:deep(.payment-popup){ width: min(100vw, 750rpx) }`，因 WXSS 不支持 `min()/max()/clamp()`，该声明被静默丢弃，弹层宽度回落到 `ZsPopup` 默认 `560rpx` 并居中，变为窄卡片悬浮。\n## 问题根因\n- `result.vue` 使用 `:deep(.payment-popup){ width: min(100vw, 750rpx) }` 写法。\n- WXSS 不支持 `min()/max()/clamp()`，这条声明被静默丢弃；同规则里的 `margin:0 auto`、`padding:0`、圆角照常生效。\n- 宽度回落到 `ZsPopup` 默认的 `.popup-container{width:560rpx}` 并被居中（截图量得白卡宽 450px，592px 屏下≈560rpx）。\n- 卡片比账单卡窄，账单明细右侧金额/日期从弹层旁漏出，底部「合计」被挤到换行。\n## 解决方案\n- 需改用小程序支持的样式方案（如直接写类名或内联样式，避免 `min()/max()/clamp()`）。\n## 验证与归属\n- 验证证据：src=泰兴小程序\n- 涉及文件：src/staff/pages/cashier/result.vue、src/components/ZsPopup/ZsPopup.vue\n- 来源会话ID：54c23926-7b8a-40d1-a6aa-2e3dcc903484\n- 代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

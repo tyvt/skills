@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-小程序-1793645595020/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T18:58:12.175215+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/h5_external_url_storage.md",
+                "memory_type": "entities",
+                "after": "# 外链H5长URL用storage中转再开web-view\n灵犀投票等外链 query 很长，直接 navigateTo?url= 易超长或编码丢失，改用 storage 中转。\n\n## 中转约定\n- 跳转前 uni.setStorageSync(H5_EXTERNAL_URL_STORAGE_KEY, fullUrl)，页面参数带 from=storage\n- h5ExternalWebview/externalWebview 的 onLoad 在 from===storage 时读 storage、赋给 webViewSrc 后 立即 removeStorageSync，否则下次误用旧链\n- 其余情况走 resolveExternalWebViewUrlFromQuery / buildExternalWebViewSrc 统一拼 src\n- 小程序侧仍需配置业务域名（如 wxzj.wxwgzx.com），与 storage 中转无关\n\n## 验证与归属\n- 验证证据：会话 20f0fb9d 对 h5ExternalWebview 引入 H5_EXTERNAL_URL_STORAGE_KEY、from=storage、resolveExternalWebViewUrlFromQuery、buildExternalWebViewSrc\n- 涉及文件：pages/portal/h5ExternalWebview.vue、utils/portal-h5-webview.js\n- 所属项目：小程序；来源会话ID：20f0fb9d-f129-47b3-bf27-cc7eb42adc16；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/home_api_auth_toast.md",
+                "memory_type": "entities",
+                "after": "# webview首页维修资金接口带门户auth且toast展示后端msg\npages/webview/home.vue 调维修资金、业主决策等前置接口时须带门户 Token，并用统一 toast 展示后端错误。\n\n## 请求规范\n- 请求头 auth 必须与 pages/user/index/index.vue 一致的门户 Token，不要用全局旧 token\n- utils/portal-h5-webview.js 用 extractMaintenanceApiErrorMessage 从 Error、响应体 msg/message、errMsg 提取文案\n- HTTP 非 200 优先 body 中的 msg/message，页面侧 showApiErrorToast(error, fallback) 统一 uni.showToast\n- 401 时返回空串，避免与门户「登录已过期」类全局提示重复弹两次\n\n## 验证与归属\n- 验证证据：会话 9b72f418 维修资金接口加 auth；extractMaintenanceApiErrorMessage + home.vue showApiErrorToast；示例 code 500 msg 房屋信息不存在 直接 toast\n- 涉及文件：pages/webview/home.vue、utils/portal-h5-webview.js\n- 所属项目：小程序；来源会话ID：9b72f418-a53c-458b-aed6-239b94496419；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/portal_system_api_v2.md",
+                "memory_type": "entities",
+                "after": "# 门户首页轮播与/system接口对齐我的页的v2.0前缀与Token\nwebview/门户首页接轮播等 /system/* 能力时须拼文件服务域名、加 /v2.0 前缀并用门户 Token。\n\n## 接口规范\n- 接口形如 GET /system/banner/page（bannerType 对字典 banner_type），取 rows[].pictureUrl 前须 拼文件服务域名，相对路径会以本地资源加载并 500\n- 网关路径在小程序侧要在 /system 前加 /v2.0，与 pages/user/index/index.vue 一致\n- Token 也按该页门户快照/刷新逻辑取用，禁止沿用无关全局 token\n- 新接 /system 接口前先对照 user/index 的 base 与 header 写法\n\n## 验证与归属\n- 验证证据：会话 eb625bb1 token 参考 user/index；/system 前加 v2.0；pictureUrl 相对路径需拼域名；getBannerList 调 /system/banner/page\n- 涉及文件：pages/webview/home.vue、api/home.js、pages/user/index/index.vue\n- 所属项目：小程序；来源会话ID：eb625bb1-51ca-49ee-a579-ba01827034bb；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/subpackage_route_unchanged.md",
+                "memory_type": "entities",
+                "after": "# uni-app分包瘦身页面挪进subPackages后业务跳转完整路径不变\n主包超限把页面从 pages 挪到 subPackages 后，业务跳转 URL 不必批量改写。\n\n## 原理\n- 微信小程序/uni-app 分包只改变打包落点，页面运行时完整路由仍是 root 与 path 拼接（例：pages/face/bdc），与挪包前一致\n- 仅「目录整体迁分包且改了 pages.json 注册方式」或「历史路径废弃」时才需全仓替换 URL\n\n## 做法\n- 改 pages.json 的 subPackages 与物理文件位置即可\n- 用「文件路径 ↔ root+path ↔ 代码里跳转字符串」三张对照表全量核对，一致则不动业务 URL\n- 主包 redirectTo 分包 Tab 页、分包 reLaunch 回主包 webview 均合法\n- 主包瘦身核对路由时优先查是否误改了本来正确的 /pages/face/* 等路径\n\n## 验证与归属\n- 验证证据：会话 404cce7e 结论「分包后业务跳转路径不需要改」「uni-app/微信小程序分包只改变打包位置，页面完整路径不变」\n- 涉及文件：pages.json、pages/webview/home.vue、pages/webview/externalWebview.vue、pages/face/bdc.vue\n- 所属项目：小程序；来源会话ID：404cce7e-39c8-4d87-8c7d-0d9d3fe66028；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

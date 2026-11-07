@@ -1,0 +1,51 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-02283e3e-2697-4722-9678-182d0b7c222f/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T10:08:44.465399+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/06/现售备案缺陷复现反馈.md",
+                "memory_type": "events",
+                "after": "# Summary\n禅道 #6306（现售备案营业执照带出校验失败）曾被标为 resolved，但提交人于 17:45 激活并反馈「更新后依然不行」，触发本次重新排查与修复（会话日期 2026-11-06）。\n# 2026-11-06 (Friday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6306\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 缺陷已有人标注 resolved，但提交人 17:45 激活并反馈「更新后依然不行」。正在拉取完整步骤、评论及附件信息，并在代码库中定位现售备案页面。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/06/现售备案附件竞态根因定位.md",
+                "memory_type": "events",
+                "after": "# Summary\n定位到禅道 #6306 根因为 AnnexUpload.getList() 在请求签名不一致时仍返回旧的进行中 Promise，导致 AppendixPackageSection.reload() 中的 applyPrefillToUpload 在 fileList 更新前执行，保存校验误报营业执照必填（2026-11-06）。\n# 2026-11-06 (Friday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6306\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 定位到可能的竞态：`reload()` 在 `getList()` 因去重返回“进行中的同一签名 Promise”时，`applyPrefillToUpload()` 可能在 `fetchAppendixFileList` 真正写完 `fileList` 之前执行。正在确认 `AnnexUpload` 中 `appendixFetchPromise` 的暴露方式并实施等待该 Promise 完成后再 `applyPrefill` 的修复。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/06/现售备案附件修复合并推送.md",
+                "memory_type": "events",
+                "after": "# Summary\n在 worktree 修复 AnnexUpload.getList() 与 AppendixPackageSection.validateRequired() 后，将子模块 zhi2-web-admin 分支 fix/bug-6306-appendix-prefill-race 合并并推送到 develop/v3.0.0（提交 c74a2893f + merge），父仓库子模块指针更新 497ec55 并推送（2026-11-06）。\n# 2026-11-06 (Friday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6306\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 正在将子模块改动提交、合并到 `develop/v3.0.0` 并推送，随后在主工作区更新子模块引用并推送。\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 合并与推送已完成，`苏州市房地产监测V3-wt-bug-6306` 已从 `git worktree list` 中移除。\n\n---\n\n## 禅道 #6306 结论\n\n**现象**：现售备案申请里营业执照已自动带出，保存仍提示「营业执照」等必填。\n\n**根因**：`AnnexUpload.getList()` 在**已有进行中的拉取**且**本次签名与进行中的不一致**（例如 `busId`/上下文刚变）时，原先直接 `return` 旧的 `appendixFetchPromise`。`AppendixPackageSection.reload()` 里 `getList().then(() => applyPrefillToUpload())` 会在**旧请求结束**就执行 prefill，而**新签名对应的列表尚未拉完**，`fileList` 仍是旧状态，导致带出未写入校验用的列表。\n\n**修复**：\n1. **[zhi2-web-admin/src/components/AnnexUpload/index.vue](<zhi2-web-admin/src/components/AnnexUpload/index.vue>)** `getList()`：签名不一致时 `appendixFetchPendingSignature = signature` 且 `return this.appendixFetchPromise.finally(() => this.getList())`，保证最终等到**当前签名**的拉取完成。\n2. **[zhi2-web-admin/src/components/AppendixPackageSection/index.vue](<zhi2-web-admin/src/components/AppendixPackageSection/index.vue>)** `validateRequired()`：有 `prefillContext` 时先调用 `applyPrefillToUpload()`（幂等），降低「保存瞬间列表未对齐」的误报。\n\n## Git 结果\n\n| 仓库 | 分支 | 说明 |\n|------|------|------|\n| **zhi2-web-admin** | `develop/v3.0.0` | 合并 `fix/bug-6306-appendix-prefill-race` 后 **已 push**（含提交 `c74a2893f` + merge；远端 `HEAD` 约 **d9c2be7aa**） |\n| **苏州市房地产监测V3（父仓）** | `develop/v3.0.0` | 子模块指针更新 **497ec55** **已 push** |\n\n主工作区子模块已与 `origin/develop/v3.0.0` 上的修复一致。本地仍有 **未提交的** `env/.env` 与若干 `?? .tmp-*.png`（未纳入本次提交）。\n\n## 验证建议\n\n在客测部署最新 `develop/v3.0.0` 后：现售备案申请 → 选企业使营业执照带出 → **直接保存**，应不再出现营业执照必填误报。\n\n---\n\n是否在禅道将 #6306 标为已解决并写备注（需你确认客测已通过或同意先标记）："
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/06/现售备案缺陷回写已解决.md",
+                "memory_type": "events",
+                "after": "# Summary\n经 DBX 事务将禅道 #6306 回写为 resolved 并插入 action 备注，完成缺陷闭环（2026-11-06，待客测复验）。\n# 2026-11-06 (Friday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6306\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 正在通过 DBX 事务将禅道 #6306 回写为已解决，并插入 action 备注。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/工具系统/禅道.md",
+                "memory_type": "entities",
+                "before": "# 禅道 (ZenTao)\n团队使用的缺陷跟踪系统，托管于 zentao-biz.zhi.com。\n## 相关\n- bug 6169 记录现售方案维护页要件上传布局缺陷。\n- 助手通过 DBX 事务回写 bug 状态为 resolved。\n- bug 6279 记录项目管理-项目备案申请在奇安信可信浏览器上滚动条仅控制基本信息的缺陷（分析中）。\n- bug 6298 记录预售许可申请新增态点方案维护返回后楼幢列表清空的缺陷（已修复）。\n- bug 6315 记录（分析中，zhunan 提交指派 tiany，附件为 PNG 误命为 txt 的截图）。",
+                "after": "# 禅道 (ZenTao)\n团队使用的缺陷跟踪系统，托管于 zentao-biz.zhi.com。\n## 相关\n- bug 6169 记录现售方案维护页要件上传布局缺陷。\n- 助手通过 DBX 事务回写 bug 状态为 resolved。\n- bug 6279 记录项目管理-项目备案申请在奇安信可信浏览器上滚动条仅控制基本信息的缺陷（分析中）。\n- bug 6298 记录预售许可申请新增态点方案维护返回后楼幢列表清空的缺陷（已修复）。\n- bug 6315 记录（分析中，zhunan 提交指派 tiany，附件为 PNG 误命为 txt 的截图）。\n- bug 6306 记录现售备案申请营业执照已带出但保存报必填的附件竞态缺陷（二次修复后已解决）。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷任务/zentao_bug_6306.md",
+                "memory_type": "entities",
+                "before": "# 禅道Bug 6306 现售备案营业执照带出校验失败\n房产管理系统zhi2-web-admin中现售备案申请页营业执照已自动带出但保存仍提示必填，根因为AppendixPackageSection的reload时序导致prefill未写入fileList，修复后解决。\n\n## 根因与定位\n- 标题：现售备案-现售备案申请，营业执照已自动带出但保存仍提示营业执照必填；zhunan提交、指派tiany\n- 现象：要件网格显示营业执照为空（圆形占位图标），保存前validateRequired判定必填未上传\n- 根因：reload()内ensurePrefillPackages异步拉取040100企业备案包后调用AnnexUpload.getList()，但此刻子组件handleConfig prop仍为旧值false，applyAppendixPrefill未生效，带出件未写入upload.fileList\n- 数据侧核对：目标槽营业执照(ysxksq必填)匹配来源营业执照正本原件(040100)，别名配置正确；后端PresaleProjectVo返回companyRecordId，非数据缺失\n\n## 修复方案\n- 修改 zhi2-web-admin/src/components/AppendixPackageSection/index.vue\n- reload()在getList()完成后用父级最新prefillContext再执行一次applyAppendixPrefill（幂等）\n- 新增applyPrefillToUpload()方法，仅当prefillContext存在时生效，对预售许可等复用组件无回归\n\n## 验证与交付\n- 子模块worktree bugfix/6306-cashsale-license-prefill开发，fast-forward合并develop/v3.0.0，提交92250ea56已推送\n- 父仓库gitlink更新提交32341a3已推送\n- ESLint通过；npm run build成功（仅存量Sass弃用警告）\n- 本地nginx站点8098返回200，部署产物AppendixPackageSection-DIBvwW80.js含applyPrefillToUpload\n- 禅道回写bug6306 status=resolved、resolution=fixed、resolvedBuild=trunk、resolvedBy=tiany、assignedTo=zhunan、action 88539记录根因+修复+验证\n\n## 未验证项\n- 未做真实浏览器登录态端到端复测（项目不启dev server），建议客测环境按原路径复测选项目→保存确认不再弹必填",
+                "after": "# 禅道Bug 6306 现售备案营业执照带出校验失败\n房产管理系统zhi2-web-admin中现售备案申请页营业执照已自动带出但保存仍提示必填，根因为AnnexUpload.getList()在请求签名不一致时返回旧的进行中Promise，导致prefill在fileList更新前执行，二次修复后解决。\n\n## 基本信息\n- 标题：现售备案-现售备案申请，营业执照已自动带出但保存仍提示营业执照必填；zhunan提交、指派tiany\n- 状态演变：曾标resolved，提交人17:45激活反馈「更新后依然不行」，2026-11-06二次修复后经DBX事务回写resolved并插入action备注\n- 历史修复：首次修复（提交92250ea56、父仓32341a3）按handleConfig旧值根因修改，未彻底解决被激活\n\n## 根因与定位\n- 现象：现售备案申请选企业后营业执照看似已带出，但保存校验仍报「营业执照」等必填\n- 根因：AnnexUpload.getList()在已有进行中的拉取且本次签名与进行中的不一致（例如busId/上下文刚变）时，原先直接return旧的appendixFetchPromise；AppendixPackageSection.reload()里getList().then(()=>applyPrefillToUpload())会在旧请求结束就执行prefill，而新签名对应的列表尚未拉完，fileList仍是旧状态，导致带出未写入校验用的列表\n- 数据侧核对：目标槽营业执照(ysxksq必填)匹配来源营业执照正本原件(040100)，别名配置正确；后端PresaleProjectVo返回companyRecordId，非数据缺失\n\n## 修复方案\n- 修改 zhi2-web-admin/src/components/AnnexUpload/index.vue 的 getList()：签名不一致时 appendixFetchPendingSignature = signature 且 return this.appendixFetchPromise.finally(() => this.getList())，保证最终等到当前签名的拉取完成（约629–642行）\n- 修改 zhi2-web-admin/src/components/AppendixPackageSection/index.vue 的 validateRequired()：有 prefillContext 时先幂等调用 applyPrefillToUpload()（约470–478行），避免保存瞬间列表仍在刷新的假阴性\n- applyPrefillToUpload() 为幂等方法，仅当 prefillContext 存在时生效，对预售许可等复用组件无回归\n\n## 验证与交付\n- Worktree：D:\\repository\\苏州市房地产监测V3-wt-bug-6306，分支 fix/bug-6306-appendix-prefill-race（跟踪 origin/develop/v3.0.0）\n- 子模块 zhi2-web-admin：合并 fix/bug-6306-appendix-prefill-race 到 develop/v3.0.0 已 push（提交 c74a2893f + merge；远端 HEAD 约 d9c2be7aa）\n- 父仓库 苏州市房地产监测V3：develop/v3.0.0 子模块指针更新 497ec55 已 push\n- 构建：worktree 内 npm run build 成功；对2个改动文件单独跑 eslint 无报错（未跑全量 lint，全仓为存量基线）\n- 本地仍有未提交 env/.env 与若干 ?? .tmp-*.png（未纳入本次提交）\n- 禅道回写：经 DBX 事务置 bug 6306 status=resolved，并插入 action 备注（2026-11-06）\n\n## 未验证项\n- 客测环境部署 develop/v3.0.0 后，需复验「现售备案申请→选企业带出营业执照→保存无必填误报」\n- 未做真实浏览器登录态端到端复测（项目不启 dev server）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_019",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T05:54:23.355818+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/property_contract_complexid.md",
+                "memory_type": "entities",
+                "after": "# B端项目上下文complexId注入口径\n物业合同等B端业务列表需带全局当前项目complexId，详情新增态仅在缺值时从store兜底，防止跨项目数据混查。\n\n## 问题背景\n- B端业务列表（如 property/propertyContract/page）要求带全局当前项目 complexId，否则跨项目数据混查。\n- 项目选择存于全局 store 的 currentProjectId getter（由B端项目选择弹窗写入），接口不收路由上下文。\n- 列表查询参数与详情表单是两处独立构造，只补一处会漏。\n\n## 解决方案\n- 列表侧在 getQueryParams 里判 `this.$store.state.user.terminalType === 'B'` 才注入 `result.complexId = this.$store.getters.currentProjectId`，G端一律不传。\n- 该组件常被多个菜单共用（物业服务合同备案/前期物业服务合同备案/合同变更/解聘），改一处全域生效，需提前评估放大效应。\n- 详情侧新增态（formMode==='add' 且 form.complexId 为空）按 `路由 query.complexId || (B端 ? currentProjectId : null)` 兜底回填，取不到就直接 return 不做处理。\n- 写法与 benefit/alert、property/complex 等页面保持一致，不另造项目上下文来源。\n\n## 验证与归属\n- 验证证据：会话 35c4f338（基线 401d884）用户诉求「property/propertyContract 接口加 complexId 参数，从全局 store 获取B端选择项目」。\n- 落地为 components/index.vue 的 getQueryParams 与 components/detail.vue 的 initComplexFromRoute。\n- 涉及文件：src/views/property/propertyContract/components/index.vue、detail.vue、src/utils/projectContext.js、src/mixins/listMixins.js。\n- 所属项目：产品2.0；来源会话：35c4f338-b3f4-4660-b726-f1bf15f29ea7；代码基线：401d884"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bill_selectable_split.md",
+                "memory_type": "entities",
+                "after": "# 批量操作表格可勾选与执行判定拆分\n物业服务费账单列表需将「行是否可勾选」与「能否执行收款/优惠」拆成两层判定，否则已支付账单无法选中。\n\n## 问题背景\n- 账单列表里「有效+已支付」账单勾不上，导致收款、优惠、作废无法先选中行。\n- isSelectable 直接复用 isBillPayable（只允许待支付/部分支付且未作废），合并了「选中能力」与「动作准入」两个层级。\n- 勾选是表格通用选择能力，收款/优惠是每个动作各自准入条件，合并后出现「行有效但选不中」。\n\n## 解决方案\n- 在 enums.js 拆成两个纯函数：isBillValid（有效=未作废）用于 isSelectable，让所有有效账单可勾选。\n- validateBillsForCollect / validateBillsForDiscount 保留在各自动作入口做准入校验，优惠要求「有效且待支付」，收款只认待支付/部分支付。\n- 用户勾了不符合条件的行点按钮时给明确提示，而非锁死行。\n- 状态比较全部改成 `==`，兼容后端返回数字或字符串两种形态，避免严格相等误判不可选。\n\n## 验证与归属\n- 验证证据：会话 3bad7169（基线 c98afb0）用户诉求「有效账单也要可勾选 做收款和优惠」。\n- 修改 spFeeBill 模块 enums.js（新增 isBillValid / validateBillsForDiscount、状态比较改 ==）与 index.vue 的 isSelectable。\n- 涉及文件：src/views/property/bill/components/index.vue、src/views/property/declare/components/index.vue、src/views/property/feeDeclare2/index.vue。\n- 所属项目：产品2.0；来源会话：3bad7169-f39b-4cf0-bf68-20903c11dcb；代码基线：c98afb0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/platform_agent_logo.md",
+                "memory_type": "entities",
+                "after": "# 城市项目专属视觉素材抽离平台配置\n带地域语义的视觉素材（如智能体形象logo）不能写死进代码仓库，应抽成 platformConfig 配置项由后端下发、未配置则不渲染。\n\n## 问题背景\n- 数据可视化-行政划分页硬编码「无锡智能体-水蜜桃形象」logo.gif，本项目是泰兴，形象与城市不符，且功能要部署到其他项目必错。\n- 把地域语义素材写死在源码/静态资源，复制部署时不会改变，属同源复制项目典型污染源；图体积大（约2.8MB）进构建产物。\n\n## 解决方案\n- 系统管理-基础配置末尾加「智能体形象」字段（非必填，支持 png/jpg/jpeg/gif、单张10MB内），对应后端 agentLogo。\n- 去掉代码与常量里 logo.gif 引用并删除静态资源（同时清 constants.js 引用）。\n- 展示端改读 platformConfig.agentLogo，有配置才渲染、没有不渲染（不留占位图或默认形象）。\n- store/modules/app.js 补 agentLogo 默认字段，ImageUpload 增加 acceptTypes 属性支持 gif 等自定义格式。\n- 交付提示后端 /system/platformConfig/getInfo 与保存接口需支持该字段。推广口径：带城市/项目语义的图片、文案、默认值一律走平台配置。\n\n## 验证与归属\n- 验证证据：会话 d5195af1（基线 94b86fa）用户诉求「数智分析增加无锡智能体形象，部署其他项目不符，需单独配置删除gif用配置展示」。\n- 落地为 platformConfig/detail.vue 新增字段、benefit/mapOverview 改读 platformConfig.agentLogo、删除 assets/images/mapOverview/logo.gif 与 constants.js 引用。\n- 涉及文件：src/views/system/platformConfig/detail.vue、src/views/property/largeScreen/index.vue、componentMap.vue、svgMap.vue、src/store/modules/app.js。\n- 所属项目：产品2.0；来源会话：d5195af1-3732-4c62-8c98-deedb2a38fa9；代码基线：94b86fa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dropdown_silent_empty.md",
+                "memory_type": "entities",
+                "after": "# 下拉选项列表静默为空根因与修复\n页面用 `response.data || response.rows` 取选项列表时，若 data 为对象则短路取到对象，.map() 抛错被空 catch 吞掉导致下拉无选项。\n\n## 问题背景\n- 工单分类下拉 categoryOptions 恒为空、选不到数据，接口正常且 list 路径存在。\n- 接口返回 `{code:200, data:{list:[...]}}`，response.data 是对象而非数组，`||` 短路优先取对象，response.rows 回退不执行。\n- 对该对象调用 .map() 抛 TypeError，外层 try/catch 吞掉异常，categoryOptions 被赋空数组，表现为「接口有数据、下拉无选项、控制台无明显报错」。\n\n## 解决方案\n- 禁止用 `||` 直接从响应挑列表，写统一列表提取函数：先判类型再逐层回退。\n- 依次尝试 Array.isArray(res) → res.rows / res.data.records / res.data.list / res.data.rows / res.data，每步校验后才返回，全不命中返回 [] 并给可观测日志。\n- 把 catch 里静默吞错改成显式报错，避免同类问题再次隐形。\n\n## 验证与归属\n- 验证证据：会话 1401b92d 用户反馈「工单分类选不到数据」并补充「list接口存在」；定位原代码 `response.data || response.rows` 在返回对象时出错。\n- 修复为按 rows/data.records/data.list/data.rows/data 多结构解析，补充 workOrderCategoryId、_categoryName 字段映射，去掉误加状态过滤与 /page 调用。\n- 涉及文件：src/views/property/workOrder/report/index.vue、components/AddOrderDialog.vue、src/components/zs-select/zs-select.vue、src/mixins/listMixins.js。\n- 所属项目：产品2.0；来源会话：1401b92d-0ad2-433b-83f9-aa435e2c7296；代码基线：42b6033"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

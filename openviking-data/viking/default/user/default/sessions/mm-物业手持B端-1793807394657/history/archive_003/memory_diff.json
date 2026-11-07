@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-物业手持B端-1793807394657/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T16:03:54.456462+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_region_missing.md",
+                "memory_type": "entities",
+                "after": "# 首页切换小区后行政区域不显示调查\n物业手持B端首页切换小区后行政区域名与三级行政区域筛选不显示的调查结论与关键文件梳理。\n\n## 问题范围\n- 涉及两条 UI 链路：首页顶栏当前区域名；小区选择页三级行政区域筛选（区域/街道/社区）\n- 现象：切换小区后行政区域不显示\n\n## 关键页面与状态\n- 首页：`src/pages/home/index.vue`\n- 小区选择（含行政区域筛选）：`src/pages/complex-select/index.vue`\n- 用户/小区状态：`src/store/user.js`\n- 行政区域 Picker：`src/components/ZsPicker/ZsPicker.vue`\n\n## 相关API\n- 首页 API：`src/api/home.js`\n- 小区分页 API：`src/api/property.js`\n- 部门树（行政区域）API：`src/api/system.js`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=物业手持B端\n- 来源会话ID：fb0c52c4-df72-4879-926b-5994451035e6\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_todo_fix.md",
+                "memory_type": "entities",
+                "after": "# 首页工作待办两个问题修复\n物业手持B端首页「工作待办」切换小区数字不变与点击报事/报修提示建设中的修复方案。\n\n## 问题根因\n- 切换小区数字不变：`loadHomeData` 在 `homeLoading` 为 true 时直接 return，快速切换可能跳过刷新；统计接口未显式传入当前 `complexId`\n- 点击报事/报修提示建设中：`handlePending` 统一调用 `showDevelopingToast()`，未做页面跳转\n\n## 解决方案\n- `home/index.vue`：统计接口请求传入 `complexId: userStore.projectId`；用 `loadSerial` 替代 `homeLoading` 防重复请求；小区变化时先重置数字为 `--` 再加载\n- 报事待办点击穿透至 `/pages_facility/issue/index?orderType=1&backlog=1`；报修待办至 `orderType=2&backlog=1`\n- `issue/index.vue` 工单列表页配套优化\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=物业手持B端\n- 涉及文件：src/pages/home/index.vue、src/api/home.js、src/pages/complex-select/index.vue、src/pages/workbench/index.vue、src/pages_facility/issue/index.vue\n- 来源会话ID：d6765f9e-f18c-4d82-bd7a-2e28452fae2d\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/issue_plain_override.md",
+                "memory_type": "entities",
+                "before": "# 工单按钮橙色实心被plain描边样式覆盖\n物业手持B端工单详情页催办、回复按钮因设 plain 与 borderColor 致橙色实心样式被描边覆盖。\n\n## 问题根因\n- 根因：`src/pages_facility/issue/detail.vue` 中催办、回复按钮设 `plain: true` 与 `borderColor` 致描边覆盖橙色实心样式\n\n## 解决方案\n- 移除 `plain` 与 `borderColor` 改为橙色实心按钮，相关组件同步调整\n\n## 验证与归属\n- 验证证据：src=物业手持B端/002.md\n- 涉及文件：src/pages/workbench/index.vue、src/pages_facility/issue/index.vue、src/components/PageButton/PageButton.vue、src/components/ZsButton/ZsButton.vue、src/pages_facility/issue/components/MoreDialog.vue、src/pages_facility/issue/detail.vue、src/uni.scss、src/pages_facility/record/add.vue\n- 来源会话ID：c763d5aa-a951-4be2-a239-69bc3c433230\n- 代码基线：none",
+                "after": "# 工单按钮橙色实心被plain描边样式覆盖\n物业手持B端工单详情页催办、回复按钮因设 plain 与 borderColor 致橙色实心样式被描边覆盖。\n\n## 问题根因\n- 根因：`src/pages_facility/issue/detail.vue` 中催办、回复/反馈进度按钮设 `plain: true` 与 `borderColor` 致描边覆盖橙色实心样式\n\n## 解决方案\n- `detail.vue`：催办、回复/反馈进度改为橙色实心按钮，移除 `plain: true` 与 `borderColor`，避免被描边样式覆盖\n- `ZsButton.vue`：`plain` 按钮保留 `::after` 描边且颜色继承 `border-color`；非 `plain` 按钮继续清除 `::after` 边框；补充 `type=\"default\"`+`plain` 默认蓝色描边（`#0168F0`）\n- `PageButton.vue`：自定义配色按钮增加 `btn-custom` class；全局 plain 样式仅作用于无自定义配色的按钮，避免覆盖橙色按钮\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=物业手持B端\n- 涉及文件：src/pages/workbench/index.vue、src/pages_facility/issue/index.vue、src/components/PageButton/PageButton.vue、src/components/ZsButton/ZsButton.vue、src/pages_facility/issue/components/MoreDialog.vue、src/pages_facility/issue/detail.vue、src/uni.scss、src/pages_facility/record/add.vue\n- 来源会话ID：c763d5aa-a951-4be2-a239-69bc3c433230\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/scrap_icon_missing.md",
+                "memory_type": "entities",
+                "before": "# 报废记录图标消失因未设flex-shrink防挤\n物业手持B端报废记录页因 .address-box 未用 flex 且图标无 flex-shrink，长文本挤压致图标消失。\n\n## 问题根因\n- 根因：`src/pages_facility/record/addScrap.vue` 中 `.address-box` 未用 flex 且图标无 `flex-shrink`，长文本挤压致图标消失\n\n## 解决方案\n- `.address-box` 改 `display:flex; gap:12rpx`\n- `:deep(.address-img/.icon-address)` 设 `40rpx` 与 `flex-shrink:0`\n- 文本区加 `flex:1; min-width:0`\n\n## 验证与归属\n- 验证证据：src=物业手持B端/002.md\n- 涉及文件：src/pages_facility/record/addScrap.vue、src/components/ZsImage/ZsImage.vue、src/pages_facility/record/add.vue、src/pages_facility/record/index.vue、src/pages/workbench/index.vue、src/components/ZsDialog/ZsDialog.vue、src/pages_facility/facility/index.vue、src/pages_facility/repair/submit.vue\n- 来源会话ID：be2f7a12-9ddb-4fb6-9c2d-69d56e0b5c96\n- 代码基线：none",
+                "after": "# 报废记录图标消失因未设flex-shrink防挤\n物业手持B端报废记录页因 .address-box 未用 flex 且图标无 flex-shrink，长文本挤压致图标消失。\n\n## 问题根因\n- 根因：`src/pages_facility/record/addScrap.vue` 中 `.address-box` 未用 flex 且图标无 `flex-shrink`，长文本挤压致图标消失\n\n## 解决方案\n- `.address-box` 改 `display:flex; align-items:flex-start; gap:12rpx`，页面顶部卡片与弹窗列表共用同一套规则\n- `:deep(.address-img)`（弹窗内信用代码、注册地址前图标）与 `:deep(.icon-address)`（顶部设施设备地址图标）均设 `40rpx` 并加 `flex-shrink:0`\n- `.address-box-text` 增加 `flex:1; min-width:0`，让长文本在剩余空间展示不挤占图标\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=物业手持B端\n- 构建通过 `npm run build` 且无 linter 报错；真机/H5 验证路径：工作台→报废记录→添加报废记录→点击「鉴定单位」查信用代码与注册地址前蓝色图标\n- 涉及文件：src/pages_facility/record/addScrap.vue、src/components/ZsImage/ZsImage.vue、src/pages_facility/record/add.vue、src/pages_facility/record/index.vue、src/pages/workbench/index.vue、src/components/ZsDialog/ZsDialog.vue、src/pages_facility/facility/index.vue、src/pages_facility/repair/submit.vue\n- 来源会话ID：be2f7a12-9ddb-4fb6-9c2d-69d56e0b5c96\n- 代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

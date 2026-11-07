@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-小程序-1793645595020/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T18:54:57.387734+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/meta_url_bug.md",
+                "memory_type": "entities",
+                "after": "# uni-app 小程序 import.meta.url 编译失败\nuni-app 编译 mp-weixin 时页面 script 使用 import.meta.url 会触发 babel 编译失败，需分端处理静态资源解析。\n\n## 问题根因\n- 页面 `<script>` 内写 `new URL('../../static/...', import.meta.url).href`（常见于 resolveZhishuAsset）会在 babel 阶段报 `Module parse failed: Unexpected token`\n- 报错链路含 babel-loader、webpack-uni-mp-loader，错误指向 `return new URL(\"./../static/images/zhishu/\".concat(filePath), import.meta.url).href`\n- 与 H5/Vite 不同：H5 可用 import.meta.url 解析静态资源，但小程序端编译链根本不支持该语法\n\n## 解决方案\n- 微信小程序端改用主包绝对路径 `/static/images/...`（或项目约定的 IMAGE_BASE 拼接），不要用 import.meta.url\n- 若必须保留 H5 写法，用条件编译 `#ifdef H5` / `#ifndef MP-WEIXIN` 分端实现 resolveZhishuAsset\n- 合并页面（如把 home 逻辑迁入 externalWebview）后优先检查 script 顶层是否仍含 import.meta 语法\n\n## 验证与归属\n- 验证证据：`Error: Module parse failed: Unexpected token (29:71)`\n- 涉及文件：pages/webview/externalWebview.vue、pages/webview/home.vue、static/images/zhishu/\n- 所属项目：小程序；来源会话ID：b1d684d7-0aba-4f92-948d-241c1309f18c；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/externalwebview_shell_workflow.md",
+                "memory_type": "entities",
+                "after": "# 门户首页作壳不自动开 web-view\nexternalWebview 作为小程序首页时，带 complexId/houseId 入参不自动激活 web-view，仅二级菜单点击拼接 H5。\n\n## 行为规则\n- 路由 query 带 complexId、houseId 时，页面初始化不自动激活 `<web-view>`，先展示本页菜单/门户 UI\n- 仅用户点击当前页「二级菜单」时再打开 web-view\n- 参数拼接规则与原 H5 跳转保持一致（token、complexId、houseId 等）\n- H5 地址改为「配置的基础地址 + 原页面路由路径」，不整段外链硬编码\n\n## 目的\n- 区分「带房号深链进首页」与「从首页点进子业务 H5」两种路径，避免一进小程序就全屏 web-view 盖住门户\n\n## 验证与归属\n- 验证证据：「如果query参数里面有complexId和houseId，也不要激活webview，现在本页面作为首页，只有二级菜单使用webview」\n- 涉及文件：pages/webview/externalWebview.vue、pages.json\n- 所属项目：小程序；来源会话ID：b1d684d7-0aba-4f92-948d-241c1309f18c；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/externalwebview_token_pattern.md",
+                "memory_type": "entities",
+                "after": "# externalWebview 向 H5 传 token 不传 loginCode\n门户 externalWebview 登录链路按实名状态分流壳页与 web-view，已实名才传 token 给 H5 且不传 loginCode。\n\n## 登录分流\n- 未登录：展示设计稿门户壳（背景走 static/images/zhishu/，如 login-bg@2x）；登录弹窗内嵌原 pages/home/login 授权 UI，手机号走微信 getPhoneNumber 授权而非纯文案「同意授权」\n- 已登录未实名：仍显示门户/引导壳，不加载业务 H5\n- 已登录且已实名：展示 `<web-view>`，向 H5 传递 token，不要再传 loginCode（避免 H5 旧 code 换票逻辑与小程序票不一致）\n\n## 弹窗迁移\n- 登录弹窗从独立页迁入壳页，点击「登录」再打开弹层，避免首页与登录页双份状态\n\n## 验证与归属\n- 验证证据：「登录后如果判断用户未实名认证，显示设计图页面。如果已实名认证，显示web-view，同时不要给web-view传递loginCode参数，改为传递token」\n- 涉及文件：pages/webview/externalWebview.vue、pages/home/login/index.vue、static/images/zhishu/login-bg@2x.png\n- 所属项目：小程序；来源会话ID：0931abc6-673c-4efb-91bc-d74159322efb；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/门户externalwebview鉴权状态与全局userstore隔离.md",
+                "memory_type": "preferences",
+                "after": "- 门户首页 externalWebview 作为独立入口时，页面内 Token、用户信息、绑房结果应与全局 userStore 及全局公共登录/请求封装分开维护，用页面级 storage（或页面内 state + 本地缓存）读写\n- 涉及 userStore 的字段在本页改为页面存储，不要复用会把全局 token 注入请求的公共方法，为本页单独封装最小请求（仍可用 uni.request，但 header/参数来源只读本页状态）\n- 合并页面后若出现运行时 `Cannot find module '@/store/user'`，需一并去掉 store 依赖"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

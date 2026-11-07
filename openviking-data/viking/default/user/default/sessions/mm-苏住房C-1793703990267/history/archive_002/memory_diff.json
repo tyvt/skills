@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:10:03.135185+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sfb_dispatcher_gateway.md",
+                "memory_type": "entities",
+                "after": "# 苏服办网关统一转发模式\n苏住房C 按江苏省「苏服办」接入规范改造接口层，后端只上架 getDispatcher/postDispatcher 两个统一转发接口。\n\n## 背景与目的\n- 苏服办要求请求头带 zs- 前缀参数并做 SM3 签名，本地开发无网关注入会全部失败\n- 生产必须走网关才能拿到免登录凭证，但本地仍需直连调试\n\n## 解决方案\n- 用环境变量 useDispatcher 控制是否走 dispatcher，开发默认关闭、测试/生产默认开启\n- 集中到 api/dispatcher.js 管理苏服办配置、签名与 zs- 请求头组装，index.js/v1Instance.js 只保留 base、token、tag 等差异（约 20 行）\n- 抽 api/httpInstance.js 承载请求/响应拦截、dispatcher 封装、日志、文件上传公共逻辑\n- 请求日志同时打印请求头、请求地址、请求参数与响应体，便于 dispatcher 转发失败定位\n- 参数缺失先整理清单找后端补齐（interface_id 等），不在前端硬编码占位\n\n## 验证与归属\n- 涉及文件：src/api/dispatcher.js、src/api/httpInstance.js、src/api/index.js、src/api/v1Instance.js、src/utils/sfb.js\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 b5d791be；代码基线 83c4136"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sfb_sign_coexist.md",
+                "memory_type": "entities",
+                "after": "# 苏服办与业务签名共存约定\n苏住房C 接入苏服办后请求头共存两套签名，通过 zs- 前缀区分业务侧与网关侧参数。\n\n## 问题背景\n- 苏服办网关要求 sign/nonce/timestamp，与本项目原有业务签名 key 冲突\n- 若把业务签名改名苏服办 sign 会导致业务验签挂；反之苏服办参数不加前缀会被业务签名覆盖\n\n## 解决方案\n- 项目原有签名逻辑保持不变，请求头键名改为 zs-sign\n- nonce、timestamp 也加 zs- 前缀（zs-nonce、zs-timestamp），与业务方约定同名不同前缀\n- 苏服办自己的 sign 及配套参数严格按苏服办规范单独计算，走各自字段名\n- utils/sign.js 供 uni.request 模块使用，static/js/sign.js 供 H5 侧 XHR 拦截使用，运行环境不同保留双份勿合并\n\n## 验证与归属\n- 涉及文件：src/utils/sign.js、src/static/js/sign.js、src/api/dispatcher.js\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 b5d791be；代码基线 83c4136"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sfb_face_bug.md",
+                "memory_type": "entities",
+                "after": "# H5 苏服办 SDK 扫脸在 web-view 失败\n苏住房C 移动端 H5 包进苏服办小程序 web-view 后，微信/支付宝端人脸识别失败的三处根因。\n\n## 问题现象\n- 苏服办内扫脸正常，微信内报 script error/人脸识别测试失败，支付宝内点击无反应\n- H5 被包进苏服办官方小程序（微信端/支付宝端）的 web-view 打开\n\n## 根因分析\n- 苏服办把扫脸凭证放页面地址 index.html?token=（hash 前），App.vue 只读 hash 里的 ?token= 导致微信凭证未被识别\n- loginWithSfbTicket 登录后若后端无 sfbToken 会用空串覆盖 localStorage.tokenjssdk，清掉 SDK 写入的正确值\n- 扫脸凭证取值优先用登录接口返回的空值而非 URL 里的；支付宝无 URL token 只能靠 getTicket 换，my.onMessage 未绑定则无反应\n\n## 解决方案\n- 启动 initSfbTokenFromPageUrl() 读页面级 ?token= 写入 sfbToken + tokenjssdk\n- 凭证获取收敛为 ensureFaceCertifyToken()：URL token → SDK 缓存 → store → ticket 登录\n- loginWithSfbTicket 禁止空值覆盖已有苏服办 token；App.vue 区分页面 ?token=（苏服办）与 hash ?token=（业务 accessToken）\n- 支付宝端恢复 my.onMessage 桥接；不按环境分支处理，差异只在凭证来源\n\n## 验证与归属\n- 涉及文件：src/hooks/useFaceVerify.js、src/pages/common/face.vue、src/pages/index/my.vue、src/pages/index/components/My_Suzhufang.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 618cde10；代码基线 77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/main_pkg_slim.md",
+                "memory_type": "entities",
+                "after": "# 小程序主包瘦身与白名单同步\n苏住房C 小程序主包超 2048KB 上传限制，通过迁移分包专属资源并同步裁剪 mainStaticPaths 白名单解决。\n\n## 问题背景\n- 主包 2204KB 超出微信 2048KB 限制，主包 static 堆了约 300KB 只在分包使用的空状态图\n- uni-app 打包时只要资源被主包代码引用（含被 mainStaticPaths 白名单列入）就进主包\n\n## 解决方案\n- 盘点主包 static 每张图真实使用方，把 apply-empty.png、empty_house.png 等迁到对应消费分包\n- 同步从 src/utils/mainStaticPaths.js 白名单移除 14 项——白名单是「强制留主包」开关，不移除等于白搬\n- 只被分包使用的组件（HouseList/PersonList）迁入对应分包 components\n- 迁移后回每个引用点修正静态资源路径及 ZsEmpty 默认图与各分包路径\n- 迁移逻辑落成脚本 scripts/migrate-main-empty-static.mjs 便于复现\n\n## 验证与归属\n- 构建后实测主包 1842KB、pages_owner 1.61MB、pages_transaction 1.80MB\n- 涉及文件：src/utils/mainStaticPaths.js、scripts/size-main-package.mjs、scripts/migrate-main-empty-static.mjs、src/pages.json\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话 bee1d6dc；代码基线 9832ba3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

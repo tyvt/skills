@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_046",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:42:52.500749+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/getfiles_noreject_data.md",
+                "memory_type": "entities",
+                "after": "# getFiles在noReject模式需读res.data.data取附件数组\n苏住房C小程序附件列表整块空白，根因为getFiles在noReject模式下响应被包两层，附件数组实际位于res.data.data。\n\n## 问题现象\n- 物业合同扫描件等附件列表整块空白，接口已正常返回（appendixConfig + appendices 都在）\n- noReject 模式将响应原样返回不抛错，属于静默失败，无任何报错提示\n\n## 根因\n- src/api/common.js 的 getFiles 在 noReject 模式响应被包两层，外层是通用壳，附件数组在 res.data.data\n- 老代码按普通模式只取 res.data（即整个业务对象或壳），页面拿到非数组，附件区判定为空\n\n## 解决方案\n- 在 noReject 分支显式按 res.data.data 解析附件数组，不要和普通分支共用同一个取值路径\n- 同步到子模块同源分支：main-v2.1 的 df64ea39 与 sfb 的 6dd541c3，改完切回 -mp 工作分支\n\n## 验证与归属\n- 验证：会话 0abe2b53 附件事例返回体含 appendixConfig 与 appendices 数组但页面不显示，定位为 getFiles 在 noReject 模式取 res.data.data\n- 涉及文件：src/api/common.js、pages_owner/company/info/contracts.vue、pages_owner/components/FileList/FileList.vue\n- 所属项目：苏住房C；来源会话ID：0abe2b53-4747-4832-ada4-d092ef565928；代码基线：b7bf813"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/subpackage_static_fallback.md",
+                "memory_type": "entities",
+                "after": "# 分包迁移后静态图需SUBPACKAGE_STATIC_IMAGES映射回退pages_main\n苏住房C小程序空态图迁到分包后代码仍写主包路径，resolveStaticUrl未登记致500空白，需映射表回退pages_main。\n\n## 问题现象\n- 空态图 empty.png / apply-empty.png 从主包迁入各分包后，代码仍写 images/empty.png\n- 微信开发者工具报「Failed to load local image resource /static/images/empty.png … 500」，整块空态图空白\n\n## 根因\n- 静态地址统一走 resolveStaticUrl，按当前页面所属分包推断真实目录\n- 主包 Tab 页（pages/index/*）路由根是 pages 无法推断分包；未单独登记的分包也推不出，都落默认 /static/images/，主包文件已迁走故 500\n\n## 解决方案\n- 在 src/utils/index.js 增加 SUBPACKAGE_STATIC_IMAGES 映射表（分包 → 该包内实有图片名）\n- resolveStaticUrl 改为「当前分包有该图用当前分包，否则回退 pages_main/static/images/<file>」\n- 后续图片迁包须同步映射表与 scripts 下迁移脚本，两者同一口径\n\n## 验证与归属\n- 验证：会话 9b92579b 报错「Failed to load local resource /static/images/empty.png 500」；定位 17443e68 迁包提交，加映射表并回退 pages_main\n- 涉及文件：src/utils/index.js、components/ZsImage/ZsImage.vue、utils/mainStaticPaths.js、scripts/prune-main-static.mjs\n- 所属项目：苏住房C；来源会话ID：9b92579b-9f3a-4e44-a8e1-f17d395f2790；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zsimage_size_bug.md",
+                "memory_type": "entities",
+                "after": "# ZsImage默认width:100%/height:100%需父容器给确定尺寸否则算成0\n苏住房C小程序两处图片不显示，资源路径都存在，根因都是ZsImage默认尺寸在父容器里失去参照算成0宽或0高。\n\n## 问题现象\n- pages_owner/house/index「历史添加记录」前的蓝色历史图标看不见\n- pages_owner/house/owner/addHouse 帮助弹窗里的示例图只剩空白占位（margin-bottom 还在）\n\n## 根因\n- ZsImage 内部默认 width:100%、mode=aspectFill 时 height:100%\n- 图标放 flex 行且自身没定尺寸，父容器宽度由内容撑开 → 100% 参照为 0，算成 0 宽\n- 弹窗 .instructions-img 写固定 height:284rpx 与组件内部 height:100% 冲突，实际渲染高度为 0\n\n## 解决方案\n- 图标外套固定尺寸容器（如 28rpx×28rpx）让 100% 有参照，补 subpackage=\"pages_owner\" 并设 mode=\"aspectFit\"\n- 演示/说明图改用 mode=\"widthFix\" 按宽等比缩放，删掉外层固定 height 不再冲突\n- 弹窗内图用 v-if=\"visible\" 等打开后再渲染，小程序对隐藏容器里的 image 不加载\n\n## 验证与归属\n- 验证：会话 2d44d303 图标宽度算成0改固定28rpx容器+subpackage+aspectFit；会话 44137331 弹窗改 widthFix 去固定高 + v-if 延后渲染\n- 涉及文件：components/ZsImage/ZsImage.vue、pages_owner/house/index.vue、pages_owner/house/owner/addHouse.vue、utils/index.js\n- 所属项目：苏住房C；来源会话ID：2d44d303-a0e8-48dd-9747-099eab934704, 44137331-91dc-4b0c-ad74-f6c700c9aaf6；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/wxkey_global_scan.md",
+                "memory_type": "entities",
+                "after": "# wx:key缺失须用全局脚本扫描并复扫归零重点在公共组件\n苏住房C小程序wx:key缺失警告易忽略，但公共组件缺key会致列表项错位等真实故障，须全局扫描脚本复扫归零。\n\n## 问题现象\n- 控制台持续输出「Now you can provide attr wx:key for a wx:for to improve performance」\n- 报错只指向编译产物里的直接责任页面，不含公共组件与第三方组件，逐页改会漏\n\n## 根因\n- uni-app 编译时把 :key 透传成 wx:key，缺失只是性能警告不阻塞渲染，易被当噪声忽略\n- ZsPicker、FileList、houseCard 等公共组件缺 key 会致「重渲染后选项错位」「空数据时索引访问异常」\n\n## 解决方案\n- 写一次性扫描脚本 scan-missing-keys.js 覆盖 src 下全部 .vue 模板，兼容跨行多属性标签与属性内 => 误判\n- 本轮扫出 8 处并修复：公共组件、template v-for 的 key 写 template 上、内容列表用 item.xxxId || index 兜底\n- 改完必须复扫一次确认 0 处缺失；复扫已 0 处仍有警告则责任在第三方组件或编译产物，可停止排查\n\n## 验证与归属\n- 验证：会话 82ba9b4f 用户要求全局排查补全 wx:key，扫描 src 全部 .vue 修复 8 处，复扫 0 处缺失\n- 涉及文件：scan-missing-keys.js、components/ZsPicker/ZsPicker.vue、pages_transaction/newHouse/detail.vue、pages_owner/house/detail.vue、pages_guard/guardApply/components/step3.vue\n- 所属项目：苏住房C；来源会话ID：82ba9b4f-a6c5-499b-9c0c-8585ce86cdc9；代码基线：4630e8e"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

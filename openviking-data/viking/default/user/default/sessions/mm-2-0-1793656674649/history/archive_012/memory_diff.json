@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793656674649/history/archive_012",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T22:16:57.520782+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/headtitle_formmode_prop.md",
+                "memory_type": "entities",
+                "after": "# HeadTitle 必须声明并接收 formMode prop\n产品2.0 中 HeadTitle 组件需在 props 声明 formMode 并由父级传入，否则整块不显示或条件渲染异常。\n\n## 问题根因\n- 子组件 HeadTitle 未在 props 声明 formMode，内部值为 undefined\n- 父级 detail 页 mixin 虽有 formMode 但未通过 :formMode 下发\n- v-if=\"formMode !== 'add'\" 因 formMode 为 undefined 导致行为不可靠\n\n## 解决方案\n- HeadTitle 增加 `formMode: { type: String, default: '' }`（默认非 add 则显示标题区）\n- 父级调用改为 `<HeadTitle :list=\"headTitleList\" :formMode=\"formMode\" />`\n- 其它详情页复用同样传参方式\n\n## 验证与归属\n- 验证证据：会话 b0a46c27，HeadTitle 内容不显示，补 prop 并在 complex/detail.vue 传入 formMode\n- 涉及文件：zhi2-web-admin/src/components/HeadTitle/index.vue、zhi2-web-admin/src/views/property/complex/detail.vue\n- 所属项目：2-0；来源会话ID：b0a46c27-17bc-4baf-82e4-aedd0e490a02；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue_router_hash_nomatch.md",
+                "memory_type": "entities",
+                "after": "# hash 路由 No match 路径形态与动态路由时机\n产品2.0 中 zhi2-web-admin 使用 createWebHashHistory 时，缺 /#/ 或动态路由未 addRoute 会报 No match 警告。\n\n## 问题根因\n- 浏览器直开 `http://host/to-C/xqgl/project`（无 /#/）触发 `[Vue Router warn]: No match found`\n- 通配符路由在 GenerateRoutes 动态添加，直链首次解析可能在 addRoute 完成前先 warn 一次\n\n## 解决方案\n- 外链/菜单统一 hash 形态或只用 router.push 的 path\n- 若去 # 则改 createWebHistory 并配服务器 history fallback\n- 进不去则核对后端菜单 component/path 与前端 views 是否一致\n- 页面最终能进多为时机问题，无需特殊处理\n\n## 验证与归属\n- 验证证据：会话 dab975d3，用户报 /to-C/xqgl/project 无匹配，区分 hash URL 形态与动态路由首次解析时机\n- 涉及文件：zhi2-web-admin/src/router/index.js、zhi2-web-admin/src/store/modules/permission.js\n- 所属项目：2-0；来源会话ID：dab975d3-8f02-4099-9922-936f5a02194f；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/mainjs_createinstance_singleton.md",
+                "memory_type": "entities",
+                "after": "# main.js 重复 createInstance 导致全局组件二次注册\n产品2.0 中入口连续触发 createInstance 会使 registerGlobalComponents 重复注册组件并报已注册警告。\n\n## 问题根因\n- URL 带 token 等场景可能连续触发 createInstance（token 分支已创建，后续 else 再调一次）\n- registerGlobalComponents 重复 app.component 出现 `Component \"xxx\" has already been registered`\n- 与 token + iframe 双路径各调一次并列，需单例挂载 + 注册幂等双保险\n\n## 解决方案\n- createInstance 若 instance 已存在直接返回（挂载单例）\n- registerGlobalComponents 在 `app._context.components[name]` 已存在时 continue\n- 用 defineAsyncComponent(loader) 注册 glob 异步组件\n\n## 验证与归属\n- 验证证据：会话 1210ef9d，main.js:39 registerGlobalComponents 多次触发，已改幂等保护与单例 mount\n- 涉及文件：zhi2-web-admin/src/main.js\n- 所属项目：2-0；来源会话ID：1210ef9d-24f4-4452-a7cc-89267ce1e575；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsdialog_draggable_directive.md",
+                "memory_type": "entities",
+                "after": "# ElDialog 挂运行时指令致 Teleport 失效告警\n产品2.0 中 Vue3 在 ElDialog 等根非单元素组件上用自定义运行时指令会报 Teleport 失效告警。\n\n## 问题根因\n- Vue3 在根非单元素组件（Element Plus ElDialog 内部 Teleport）上使用自定义运行时指令（如 v-dialogDrag）\n- 报错 `Runtime directive used on component with non-element root node`\n\n## 解决方案\n- ZsDialog 改用 Element Plus 原生 `draggable`（element-plus@2.8.0+）\n- 勿把指令写在 `<el-dialog>` 标签上\n- 同类组件要么用内置属性，要么把指令绑到组件内部真实 DOM\n\n## 验证与归属\n- 验证证据：会话 c1098e7c，zs-dialog.vue 去掉 v-dialogDrag，改为 :draggable\n- 涉及文件：zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue\n- 所属项目：2-0；来源会话ID：c1098e7c-136f-424c-bd78-3be376262378；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

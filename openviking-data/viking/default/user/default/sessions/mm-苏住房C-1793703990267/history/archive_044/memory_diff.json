@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_044",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:37:37.348100+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/tab_scroll_sticky.md",
+                "memory_type": "entities",
+                "after": "# Tab首页整页上滑与搜索框吸顶套路\n苏住房C「掌服务」Tab页通过合并独立滚动区为单一scroll-view并配合搜索区sticky实现整页上滑与吸顶。\n## 问题场景\n- 首页/Tab页要求Banner整体滚出、搜索框滚动后吸附顶部（苏住房C「掌服务」页）\n- 给Banner、搜索区、功能区各套独立scroll-view会互相抢滚动，仅局部可滑\n## 解决方案\n- 三段合并进同一个scroll-view，获得连续上滑手势\n- 搜索区写position:sticky配合top偏移，滚到顶后固定在导航栏下方，初始与Banner保留20px重叠，无需监听滚动算offset\n- 搜索背景区用align-items:center仅作用于该行，左右对称padding（如0 20px），不再套整页居中\n- 切换图标显示不全根因是图标容器尺寸小于图标被裁切，给32×32固定容器后居中；SVG裁切/不渲染改投PNG（icon-list.png/icon-grid.png）并补全等价三行列表样式\n- 降级路径：sticky在自定义导航栏+自定义tabBar机型失效时，改「滚动事件+fixed」兼容\n- 分割线间距需求放在MenuSection的variant分支加margin-top，不在业务页覆盖\n## 验证与归属\n- 验证：会话fb3ff994用户要求整页上滑+搜索框吸顶+图标不全修复，实现为单scroll-view+sticky+32×32容器+variant-service下.section-divider margin-top:20px\n- 涉及文件：pages_tab/components/Community_Suzhufang.vue、pages_tab/components/menu/MenuSection.vue、pages_tab/static/images/service/icon-list.svg\n- 所属项目：苏住房C；来源会话ID：fb3ff994-ae45-4f45-8468-aefcc1bc3ce7；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/analytics_401_skip.md",
+                "memory_type": "entities",
+                "after": "# 埋点接口401不阻塞跳转\n苏住房C移动端埋点接口返回401时通过标记与拦截器排除避免阻塞页面跳转与清登录态。\n## 问题场景\n- 调/appAnalytics/eventData/add埋点返回401，导致redirect中转页报错、后续跳转中断，甚至被当登录失效触发重新登录\n- redirect页写成trackApi(...).finally(()=>lanch(path))，埋点成为跳转前置依赖\n- 全局HTTP拦截器对所有401统一执行userStore.clear()+appLogin()，埋点旁路请求不应有此副作用\n## 解决方案\n- api层对埋点接口同时标记noReject/skipToken/skipAuth，失败不弹错、不触发登录\n- httpInstance中将带noReject或skipAuth的请求从401→清登录态+拉登录分支排除（兼容HTTP statusCode形态401）\n- redirect页改为「先跳转、埋点后台发」：去掉finally包裹，直接trackMenuEvent(url)后立刻lanch(path)\n## 验证与归属\n- 验收：埋点401时页面照常跳转、登录态不被清，其他业务接口401处理不受影响\n- 验证：会话885fa7c0用户要求eventData/add的401不影响跳转；appAnalytics.js增skipAuth:true与noReject/skipToken并列，httpInstance.js排除对应请求\n- 涉及文件：src/api/appAnalytics.js、src/api/httpInstance.js、src/api/index.js、src/pages/redirect/index.vue\n- 所属项目：苏住房C；来源会话ID：885fa7c0-9559-4361-80e6-9a88eb687621；代码基线：9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/navigate_relative_url.md",
+                "memory_type": "entities",
+                "after": "# 小程序navigateTo相对路径跳转失败修复\n苏住房C小程序通过openPage统一解析相对路径为绝对路径，解决navigateTo找不到页面的问题。\n## 问题场景\n- 投票表决「参与决策」、业委会选举「参与选举」点击报navigateTo:fail page \"detail?id=...\" is not found，按钮点不动\n- 页面直接写goto(`detail?id=${data.id}`)相对路径，微信小程序navigateTo只认/开头完整路由\n- H5端对相对路径有容忍度，问题仅在小程序真机/开发者工具暴露\n## 解决方案\n- 在utils/index.js的openPage增加resolveRelativePageUrl：跳转前按当前页面路由把相对路径拼成绝对路径\n- 多级相对如common/DecisionResult?id=...同样拼接；已是/pages_...或http://等协议开头原样返回\n- 一处收口覆盖全项目goto/redirectTo调用，不必逐页改pages_vote下倡议/投票/维修资金等模块\n## 验证与归属\n- 验证：会话010bdda8报错navigateTo:fail page，源码两处goto相对路径；结论在openPage内新增解析覆盖多模块\n- 涉及文件：src/utils/index.js、src/pages_vote/decision/index.vue、src/pages.json\n- 所属项目：苏住房C；来源会话ID：010bdda8-aa5a-4e50-bc2e-6187b98c3ce5；代码基线：b7bf813"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zs_button_scoped_bug.md",
+                "memory_type": "entities",
+                "before": "# ZsButton宽度padding失效因scoped样式作用不到组件内部\n苏住房C小程序大量页面按钮宽度/padding不生效，根因是页面scoped样式无法作用到自定义组件ZsButton内部的真实button节点，收敛为全局zs-button.scss一套布局规则。\n\n## 问题现象\n- 苏住房C小程序zhi2-mobile-shimin大量页面按钮宽度/padding/margin不生效，登录按钮只剩文字宽\n- 决策详情底部“参与决策”不是长按钮，用户四轮连续报“全局排查”“还是有问题”“登录页按钮也不对”\n- 逐个页面补class永远补不完，每次修完又暴露新页面\n\n## 根因\n- ZsButton是自定义组件，页面style scoped写的.btn-login{display:block}/width等按小程序样式隔离作用不到内部真实<button>节点\n- 组件自身又写width:auto/display默认值，进一步压掉外部意图\n\n## 解决方案\n- 新增styles/zs-button.scss统一维护全部按钮布局规则，在uni.scss全局引入\n- 规则：默认非mini全宽100%；mini保持inline-flex自适应；.btn-login全宽+上下间距；.page-button-container/.submit-button-wrapper内全宽\n- .button-group/.btn-container内并排固定300rpx；.popup-footer内220rpx×90rpx；搜索栏.reset-button/.search-button固定宽；.btn-block内fit-content\n- 删掉ZsButton组件里覆盖全局的width:auto/display，只保留高度、padding、颜色\n- 后续个别页面不对往zs-button.scss补一条规则，不再改页面\n\n## 验证与归属\n- 验证：会话2a76ac67用户4轮反复报按钮不生效，定位scoped样式作用不到组件内部<button>，新增全局scss并删组件覆盖规则后修复\n- 涉及文件：src/components/ZsButton/ZsButton.vue、src/uni.scss、src/styles/btn.scss、src/App.vue、src/pages_owner/decision/index.vue、DecisionList.vue、decision/styles/btn.css\n- 所属项目：苏住房C；来源会话ID：2a76ac67-47ce-4046-a986-f88a0614d57f；代码基线：5f0f4dc",
+                "after": "# ZsButton宽度padding失效因scoped样式作用不到组件内部\n苏住房C小程序大量页面按钮宽度/padding不生效，根因是页面scoped样式无法作用到自定义组件ZsButton内部的真实button节点，收敛为全局zs-button.scss一套布局规则。\n\n## 问题现象\n- 苏住房C小程序zhi2-mobile-shimin大量页面按钮宽度/padding/margin不生效，登录按钮只剩文字宽\n- 决策详情底部“参与决策”不是长按钮，用户四轮连续报“全局排查”“还是有问题”“登录页按钮也不对”\n- 逐个页面补class永远补不完，每次修完又暴露新页面\n\n## 根因\n- ZsButton是自定义组件，页面style scoped写的.btn-login{display:block}/width等按小程序样式隔离作用不到内部真实<button>节点\n- 组件自身又写width:auto/display默认值，进一步压掉外部意图\n- 会话76068bd5补充：ZsButton默认width:inherit在父容器flex+align-items:center下收缩成文字宽；页面加class=\"long\"想100%但写在组件scoped样式中，父组件传入的class在小程序端命不中scoped规则，width:100%从未生效\n\n## 解决方案\n- 新增styles/zs-button.scss统一维护全部按钮布局规则，在uni.scss全局引入\n- 规则：默认非mini全宽100%；mini保持inline-flex自适应；.btn-login全宽+上下间距；.page-button-container/.submit-button-wrapper内全宽\n- .button-group/.btn-container内并排固定300rpx；.popup-footer内220rpx×90rpx；搜索栏.reset-button/.search-button固定宽；.btn-block内fit-content\n- 删掉ZsButton组件里覆盖全局的width:auto/display，只保留高度、padding、颜色\n- 会话76068bd5进一步：移除width:inherit，新增block属性绑定zs-button--block类，round属性改绑zs-button--round类，宽度由显式prop表达\n- 在uni.scss全局以白名单统一满宽：.zs-button.long、.zs-button--block、.btn-container > .zs-button:only-child、.submit-button-wrapper > .zs-button四条选择器width:100%，避免波及弹窗双按钮等\n- 后续个别页面不对往zs-button.scss补一条规则，不再改页面\n\n## 验证与归属\n- 验证：会话2a76ac67用户4轮反复报按钮不生效，定位scoped样式作用不到组件内部<button>，新增全局scss并删组件覆盖规则后修复\n- 补充验证：会话76068bd5用户「按钮宽度不对，全局核查修复」，根因1为width:inherit收缩，根因2为.long scoped不命中；修复为ZsButton.vue移除width:inherit、新增block属性、round绑类，uni.scss增加四条满宽规则；涉及pages_my/verification/FormManual.vue、pages_owner/house/owner/manual.vue；代码基线：5f0f4dc\n- 涉及文件：src/components/ZsButton/ZsButton.vue、src/uni.scss、src/styles/btn.scss、src/App.vue、src/pages_owner/decision/index.vue、DecisionList.vue、decision/styles/btn.css\n- 所属项目：苏住房C；来源会话ID：2a76ac67-47ce-4046-a986-f88a0614d57f；代码基线：5f0f4dc"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

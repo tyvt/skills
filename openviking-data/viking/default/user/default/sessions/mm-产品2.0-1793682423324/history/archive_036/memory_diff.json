@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_036",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:39:21.455545+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/eltabs_all_bug.md",
+                "memory_type": "entities",
+                "after": "# el-tabs「全部」筛选空串 name 被写成索引 0\n列表页用 el-tabs 做状态筛选时，「全部」tab 的 name 设为空串会导致点击后接口收到 orderStatus=0。\n\n## 问题根因\n- Element UI 的 el-tab-pane 要求 name 是合法非空值，空串不合法，点击时 v-model 被写入 Tab 数字索引（首个 tab 为 0）\n- getQueryParams 里 `this.queryParams.orderStatus || undefined` 对字符串 '0' 仍为真值，会把 0 原样传给接口\n\n## 解决方案\n- 「全部」tab 不用空串也不直接用 0，改用专用哨兵值常量 `ALL_ORDER_STATUS = 'all'`\n- 页面初始 orderStatus 设为 'all'，在 getQueryParams 里把 'all' 转成 undefined 表示不按状态筛选\n- 通用套路：任何「全部」类 tab/下拉选项都用独立哨兵值 + 提交前转换，绝不用空串或 0 兼做「不限」语义（0 本身可能是有效业务值）\n\n## 验证与归属\n- 验证：修复为「全部」用专用值 'all'，getQueryParams 把 'all' 转 undefined，刷新后点「全部」接口不再带 orderStatus=0\n- 涉及文件：zhi2-web-admin/src/views/property/workOrder/order/index.vue\n- 所属项目：产品2.0\n- 来源会话ID：896a4167-b34c-4afa-9eed-b4e49624b8d5\n- 代码基线：50767de（zhi2-web-admin，develop/v2.6.2 分支，Element UI / Vue2 Web 后台）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/navbar_width_bug.md",
+                "memory_type": "entities",
+                "after": "# 顶栏标题区误用 --sidebar-width 致收起侧栏被裁切\nWeb 后台侧栏收起后顶栏标题被裁切，根因是标题区宽度误用了随收起变 0 的 --sidebar-width 变量。\n\n## 问题根因\n- 2.6.2 某次 commit（790f35205，bug1594）把顶栏标题区/顶部菜单容器宽度从固定值改成 var(--sidebar-width)\n- 侧栏收起时 --sidebar-width 变为 0px，导致不随侧栏收起变化的顶栏占位也被压缩为 0\n- 2.6.1 分支用固定 276px 无此问题，问题只在 2.6.2 引入\n\n## 解决方案\n- 在 variables.scss 新增常量 --sidebar-expanded-width（如 288px），不随收起状态变化\n- Navbar 的标题区和顶部菜单用 --sidebar-expanded-width，侧栏自身继续用 --sidebar-width 控制收起\n- 通用原则：同一个 CSS 变量只表达一种布局语义，收起态变量不能被不随动收缩的区域引用\n\n## 验证与归属\n- 验证：2.6.1 固定 276px 无问题；2.6.2 改 var(--sidebar-width) 致标题裁切；修复为新增 --sidebar-expanded-width: 288px\n- 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue、zhi2-web-admin/src/styles/variables.scss\n- 所属项目：产品2.0\n- 来源会话ID：d115a3e1-0619-44d4-8a93-3c964fe93a54\n- 代码基线：50767de（zhi2-web-admin，develop/v2.6.1 与 develop/v2.6.2 双分支对比）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bpmn_assignee_bug.md",
+                "memory_type": "entities",
+                "after": "# BPMN 设计器点空白/保存清空「指定人员」的三层根因\nBPMN 流程设计器给用户任务选「指定人员」后，点画布空白或直接保存会清空人员并保存失败，有三层根因。\n\n## 问题根因\n- ① 取消选中节点时 PropertyPanel 卸载 task.vue，el-select 卸载时可能触发空值 input，assignee 的 watch 把模型里的指定人员抹掉\n- ② XForm.setFieldValue 用 `{ ...formModel, [name]: value }` 整对象替换 formData，触发字段 watch 时序异常，选中值未及时写入模型\n- ③ 下拉选项 userId 是字符串而模型解析出的 assignee 可能是数字等类型，类型不一致导致回显为空\n\n## 解决方案\n- ① task.vue 在 beforeDestroy 时跳过人员字段同步，且同时写标准 assignee 与 flowable:assignee 两个属性\n- ② XForm 用 $set 就地更新字段，禁止整对象替换\n- ③ PropertyPanel 对同一节点重复选中不销毁面板\n- ④ parseElement.js 把 assignee 统一规范为字符串\n\n## 验证与归属\n- 验证：选人→点空白→重新选中节点应保留，保存后用「查看 XML」确认 userTask 节点带 assignee 属性\n- 涉及文件：zhi2-web-admin/src/components/Process/components/nodePanel/task.vue、XForm.vue、PropertyPanel.vue、parseElement.js\n- 所属项目：产品2.0\n- 来源会话ID：9368bed1-6d47-4b7e-aa8e-585db398488b\n- 代码基线：2e3ec05"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/elupload_exceed_pattern.md",
+                "memory_type": "entities",
+                "after": "# el-upload :limit=1 再选文件替换须走 on-exceed\n上传组件设 :limit=\"1\" 后再次选文件走 on-exceed 而非 on-change，替换逻辑必须挂在 on-exceed 上。\n\n## 问题根因\n- Element UI 在文件数已达 limit 时再选文件走 on-exceed 回调，根本不会进入 on-change\n- 挂在 on-change 上的替换/去重逻辑永远收不到新文件，这是 limit 生效后的必然行为而非组件 bug\n\n## 解决方案\n- 新增 handleExceed(files)：取 files[0]，先做与 on-change 相同的 validateFile 校验\n- 然后 this.$refs.upload.clearFiles() 清空组件内部列表并重置 fileList/localFiles\n- 最后手动调用 this.$refs.upload.handleStart(file) 把新文件重新加入上传流程（handleStart 是 el-upload 实例方法，非公开 API 但稳定）\n- 凡「限 1 个文件 + 重新选择即替换」需求都套此模式，不要试图在 on-change 里补救\n\n## 验证与归属\n- 验证：会话 3b0f6cd2 结论明确「设 :limit=1 后再次选择走 on-exceed，不进入 on-change」，给出 handleExceed{ clearFiles + handleStart } 代码\n- 涉及文件：zhi2-web-admin/src/components/FileUpload/index.vue、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue\n- 所属项目：产品2.0\n- 来源会话ID：3b0f6cd2-34d8-446f-830d-2c1d4d5eda2f\n- 代码基线：94b86fa"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

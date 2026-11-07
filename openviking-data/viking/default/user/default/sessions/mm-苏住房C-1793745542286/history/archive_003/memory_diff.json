@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T22:45:29.557991+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/wxcanvas_addeventlistener.md",
+                "memory_type": "entities",
+                "after": "# ECharts 5.3+ 初始化报 el.addEventListener is not a function\n苏住房C 小程序用 echarts-uniapp 渲染图表时，因 WxCanvas 缺 DOM 事件接口导致 ZRender 初始化抛错、图表空白。\n\n## 问题现象\n- uni-app 小程序用 pages_benefit/components/echarts-uniapp 渲染图表（如「资金公示」balancePublicity 页），控制台报 initChart error: TypeError: el.addEventListener is not a function\n- 调用栈从 ZRender → HandlerDomProxy → mountLocalDOMEventListeners 一路抛错，图表整块空白\n- 堆栈全在 vendor.js，易误判为 echarts 包被裁剪坏而去折腾构建配置\n\n## 根因\n- 项目用 ECharts 5.4.1（5.3+），ZRender 初始化 canvas 时直接在容器元素上 addEventListener/removeEventListener 绑定 DOM 事件\n- echarts-uniapp 的自定义 WxCanvas（wx-canvas.js）只实现旧 attachEvent/detachEvent，无 addEventListener，ZRender 构造 HandlerDomProxy 必然抛错\n- 低版本 ECharts 不暴露，升级后必然失败\n\n## 解决方案\n- 在 wx-canvas.js 的 WxCanvas 类补空实现 addEventListener() {} 与 removeEventListener() {}，注释「ECharts 5.3+ 需要，小程序 canvas 无真实 DOM 事件」\n- 触摸交互不依赖此链路，仍由组件模板 @touchstart/@touchmove/@touchend 手动转发给 ECharts，空实现不影响缩放/提示\n- 排查提示：小程序端 echarts 报错优先核对「ECharts 版本要求 vs WxCanvas 适配层实现方法」，而非先怀疑裁剪包 series 缺失（那类根因表现为静默空白无报错）\n\n## 验证与归属\n- 会话 8cedd4de（基线 5f0f4dc）：用户贴出完整堆栈，定位 WxCanvas 只实现 attachEvent/detachEvent，补 addEventListener/removeEventListener 空实现后图表恢复\n- 涉及文件：src/pages_benefit/components/echarts-uniapp/wx-canvas.js、echarts-uniapp.vue、echarts-instance.js、src/pages_benefit/balancePublicity/index.vue\n- 所属项目：苏住房C"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/decision_detail_fallback.md",
+                "memory_type": "entities",
+                "after": "# 小程序表决详情页内容为空：跳转前写缓存+详情页三级数据回退\n苏住房C 业主表决「选项表决·我的决策」详情页空白，因列表跳详情未预写缓存且详情页纯依赖接口，需跳转侧预写+详情侧多源回退。\n\n## 问题现象\n- 「选项表决·我的决策」页点「决策详情 >」进入 optional/detail.vue 空白：列表显示决策摘要，详情却取不到，也无报错\n- 详情页单纯依赖接口，接口返回选项列表为空（部分决策来自本地记录或旧接口）时页面无数据源\n\n## 解决方案（三级回退套路）\n- 跳转侧（DecisionResult.vue 的 goLatestDetail）：跳转前把摘要、签字、决策时间等写入 voteStore 与本地缓存，详情页无论如何有一份数据\n- 详情侧（detail.vue）按优先级取数：1) selectOptdec 接口返回的选项列表；2) getAppRecordDetail/getDecisionRecordDetail 返回的 optionList；3) 缓存 value 摘要按「、」拆分成多条展示\n- 补齐「决策信息」卡片（决策人、签字、决策时间），字段与 DecisionRecord.vue 对齐\n- DecisionRecord.vue 同步同一套缓存回退逻辑，避免两入口对同一记录展示不一致\n- 推广：凡「列表有摘要、详情页可能取不到同一份数据」的移动端场景，都按「跳转侧预写缓存+详情侧多源逐级回退+摘要可反解析成列表项」三件套处理，勿把详情页写成纯接口驱动\n\n## 验证与归属\n- 会话 30045e67（基线 8fc3cc5）：用户报「业主表决-选项表决：我的决策内容」详情为空，修复为 goLatestDetail 跳转前写 voteStore+缓存，detail.vue 实现三级回退并补「决策信息」卡片\n- 涉及文件：src/pages_vote/decision/optional/DecisionResult.vue、optional/detail.vue、optional/DecisionRecord.vue\n- 所属项目：苏住房C"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/移动端调试面板偏好.md",
+                "memory_type": "preferences",
+                "after": "- 明确要求用 vConsole 替代 eruda 作为移动端调试面板（小程序/H5 项目）\n- 封装 src/utils/vconsole.ts 的 initVConsole() 单例，内部判重避免重复创建，多处入口调用也只一个面板\n- src/main.ts 在 H5 环境下根据环境变量或 localStorage 的 devtool 标记初始化 vConsole\n- 调试开关按环境分档：development 默认关闭（VITE_APP_VCONSOLE=0），test/production 默认开启（=1）\n- 保留隐藏入口：二手房详情页（pages_transaction/stockHouse/detail.vue）连续点击 10 次触发 initVConsole()，方便线上临时调试\n- 依赖 eruda 换成 vconsole@3.15.1；环境变量 VITE_APP_ERUDA 重命名为 VITE_APP_VCONSOLE，各 .env（development/test/production）必须同步改名，漏改会导致开关静默失效\n- 新增 H5/小程序页面或接入新调试能力时复用 initVConsole 单例与同一套环境变量命名，勿引入第二个调试库或另写开关逻辑"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/miniprogram_style_isolation.md",
+                "memory_type": "entities",
+                "before": "# 微信小程序样式隔离使:deep无法穿透自定义组件\n苏住房C（uni-app小程序zhi2-mobile-shimin）投票决策表单 StepChoose 中 ZsCheckbox 的 highlight 模式选中项贴边，父页 :deep(.checkbox-item) 设 padding 静默无效。\n\n## 问题现象\n- 选中项（ZsCheckbox highlight 模式）蓝色高亮背景完全贴边，与设计稿「背景内有内边距」不符\n- 父页写 :deep(.checkbox-item) 设 padding，怎么调都没反应，无告警\n\n## 根因\n- 微信小程序自定义组件默认样式隔离，父页面的 :deep() 无法穿透进 ZsCheckbox 内部真实节点，声明被静默丢弃\n- 与「组件标签上的 class/style 不透传」「WXSS 编译不报错但整条声明丢失」是同一类根因\n\n## 解决方案\n- 把 padding: 24rpx 28rpx、border-radius: 12rpx、box-sizing: border-box 写进 ZsCheckbox.vue 中 .highlight .checkbox-item 自身\n- 选中态 .highlight .checkbox-item.active 只负责背景色（rgba(19,84,190,.08)）与文字色 var(--primary-color)\n- 相邻项间距也放组件内（.highlight.v .checkbox-item + .checkbox-item { margin-top: 24rpx }）\n- 删掉父页那段无效的 :deep(.checkbox-item)，避免两处维护、误以为改父页就能生效\n- 推广：凡「组件自带的视觉形态（高亮、卡片、选中态）」一律组件内闭环；父页只应通过 props 控制形态开关而非用 CSS 覆盖内部节点\n\n## 验证与归属\n- 验证证据：会话 fee54f55（2026-08-28，基线 8fc3cc5）用户反馈「选中还是没有内边距」，根因为父页 StepChoose.vue 的 :deep(.checkbox-item) 无法生效\n- 涉及文件：src/components/ZsCheckbox/ZsCheckbox.vue、src/pages_vote/decision/optional/StepChoose.vue、src/pages_vote/decision/common/StepChoose.vue、src/pages_vote/decision/form.vue\n- 所属项目：苏住房C；来源会话ID：fee54f55-f0e6-4815-a66f-9e7605482cf9；代码基线：8fc3cc5",
+                "after": "# 微信小程序样式隔离使:deep无法穿透自定义组件\n苏住房C（uni-app小程序zhi2-mobile-shimin）中，父页 :deep() 无法穿透 ZsCheckbox 等自定义组件内部节点，选中态背景色与内边距等样式静默失效。\n\n## 问题现象\n- ZsCheckbox highlight 模式选中项贴边（无内边距），父页 :deep(.checkbox-item) 设 padding 静默无效\n- 「选项表决」页 :deep(.checkbox-item.active) 设选中浅蓝背景+主题色文字，勾选图标正常但背景色完全不出现\n- 同页其它区域有背景，视觉不一致；加 !important 同样无效（选择器不匹配而非被覆盖）\n\n## 根因\n- 微信小程序自定义组件默认样式隔离，父页面 :deep() 有效范围只到子组件根节点，无法穿透进 ZsCheckbox 内部真实节点，声明被静默丢弃\n- 与「组件标签上的 class/style 不透传」「WXSS 编译不报错但整条声明丢失」是同一类根因\n\n## 解决方案\n- 把「选中高亮」变成组件自身能力：ZsCheckbox.vue 新增 highlight prop，组件内部按选中态绑背景色 rgba(19,84,190,0.08) 与文字色 var(--primary-color)\n- 选中态内边距/圆角也写进组件：.highlight .checkbox-item 设 padding:24rpx 28rpx、border-radius:12rpx、box-sizing:border-box；.highlight.v .checkbox-item + .checkbox-item 设相邻项间距 margin-top:24rpx\n- 调用方改写成 <ZsCheckbox highlight ...>，删掉无效的 :deep(.checkbox-item.active) 与 :deep(.checkbox-item)，避免死样式误导后人\n- 推广：凡「组件自带的视觉形态（高亮、卡片、选中态、内部图标、内部间距）」一律组件内闭环；父页只应通过 props 控制形态开关而非 CSS 覆盖内部节点；只有子组件根节点上的间距类调整才可用 :deep（如 base-card 的 margin-top）\n\n## 验证与归属\n- 会话 fee54f55（2026-08-28，基线 8fc3cc5）：用户反馈「选中还是没有内边距」，根因为父页 StepChoose.vue 的 :deep(.checkbox-item) 无法生效\n- 会话 6c34628f（基线 8fc3cc5）：用户反馈「选项表决选择还是没有背景色」，定位 :deep(.checkbox-item.active) 无法穿透 ZsCheckbox，改为新增 highlight prop 内部实现选中背景\n- 涉及文件：src/components/ZsCheckbox/ZsCheckbox.vue、src/pages_vote/decision/optional/StepChoose.vue、src/pages_vote/decision/common/StepChoose.vue、src/pages_vote/decision/components/RadioGroup.vue、src/pages_vote/decision/form.vue\n- 所属项目：苏住房C"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

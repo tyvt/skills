@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_017",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T21:02:22.398849+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/register_business_term_fields.md",
+                "memory_type": "entities",
+                "after": "# 企业注册营业期限字段统一\n苏州市房地产监测V3 中开发企业、经纪机构、租赁企业三种注册入口统一改用共享营业期限字段组件与校验规则。\n\n## 统一规则\n- UI：开始日期 + 结束日期（占位「长期」），不再用 daterange（避免 businessTermEnd 为 null 无法回显）\n- 校验：createBusinessTermRangeRules（registerValidate.js）— 开始必填，结束可空，有结束则校验先后\n- 企信通：仍走 mapQxtEntInfo.js（起止映射，null 结束 → ''）\n- 提交：businessTermEnd 用 omitEmpty，空表示长期\n\n## 涉及入口与改动\n- 开发企业：CompanyRegisterSingleForm 已改用共享组件（此前已改逻辑）\n- 经纪机构：InstitutionRegisterSingleForm（非租赁布局）新增营业期限 + 校验 + 提交字段\n- 租赁企业：同上（isLeaseOrgan 布局）新增相同字段\n\n## 抽取复用\n- 组件：src/components/RegisterBusinessTermFields.vue\n- E2E：fillLeaseIns 相关用例\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：registerValidate.js、mapQxtEntInfo.js、src/components/RegisterBusinessTermFields.vue、companyInfo.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：a4953b9d-852c-46bc-8834-4c71e8adf5c6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_record_id_fix.md",
+                "memory_type": "entities",
+                "after": "# 企业备案ID占位符过滤修复\n苏州市房地产监测V3 中修复 getByCompanyRecordId 请求体携带菜单未替换占位符（如 tabUuid）的问题，统一解析可用企业备案ID。\n\n## 问题原因\n- getByCompanyRecordId 请求体出现占位符 companyRecordId: \"tabUuid\"（非真实备案主键）\n- 原先从 query / getOwnCompany 取 ID 时未统一过滤占位符，占位值仍可能被发到接口\n\n## 修改说明\n- 新增 src/utils/companyRecordId.js：isUsableCompanyRecordId 排除 tabUuid、tableId 等占位符\n- resolveCompanyRecordIdFromRoute：从 query（含 id）、:tableid、路径段解析并忽略占位\n- shouldResolveCompanyRecordIdFromOwnCompany：仅 B 端本企业用户在无路由 ID 时回落 getOwnCompany\n- toB/qualificationRecord/detail.vue 使用上述工具解析 ID，getOwnCompany 结果同样校验，监听 $route.fullPath 切换侧栏菜单时重新拉数\n- qualificationRecord.js 的 getQualificationRecordByCompanyRecordId 接入校验\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：src/utils/companyRecordId.js、toB/qualificationRecord/detail.vue、qualificationRecord.js、companyAdmin/detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：a02500a7-b2e2-4433-9f71-b3fd7a6ccd98"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/contract_toolbar_button_fix.md",
+                "memory_type": "entities",
+                "after": "# 预售合同签订列表工具栏按钮颜色修复\n苏州市房地产监测V3 中预售/现售签订列表与合同撤销列表工具栏按钮去掉 plain 样式，统一实心配色。\n\n## 代码侧改动\n- 预售/现售签订列表与合同撤销列表工具栏去掉 plain\n- 显示/新增为实心蓝，删除仍为实心红\n\n## E2E 说明\n- test:e2e:contract-sign-pre 未通过原因为 Playwright 账号路由无「预售合同签订」菜单授权，非按钮样式改动\n- 若需自动化回归，给 E2E 账号开通「预售合同签订」菜单后重跑 npm run test:e2e:contract-sign-pre\n- 否则在页面刷新后目视确认即可\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：commercialHousingSales/presale/contractView/index.vue、mixins/ListTemplate.js\n- 所属项目：苏州市房地产监测V3；来源会话ID：a816325c-00a0-41f5-b764-20f675698e98"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/developer_register_qualification.md",
+                "memory_type": "entities",
+                "after": "# 开发企业入网注册增加资质信息\n苏州市房地产监测V3 中开发企业入网注册流程已增加资质信息（qualificationList），并通过全流程 E2E 与字段 maxlength 测试。\n\n## 测试结果\n- 全流程 E2E（含审核）通过：e2e/register/company-register.spec.js 的 Step1→Step5，约 1.1 分钟\n- Step1 saveCompanyRegister 请求体含 qualificationList，certificateName = 房地产开发企业资质证书\n- Step4 editAndSubmit 同样携带完整 qualificationList\n- 管理端审核前详情「资质信息」区块可见，回显证书名称；审核同意流程正常完成\n- 资质弹窗 maxlength 通过：e2e/register/company-register-fields.spec.js\n\n## 测试过程小修复\n- assertRegisterStep1Ui 中 getByText('资质信息') 匹配多元素，已改为在 register-step-1 内用 .section-title 精确匹配\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：e2e/register/company-register.spec.js、e2e/register/company-register-fields.spec.js、companyRegister/detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：2cc4f912-53ec-4229-917e-0977129cd28e"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

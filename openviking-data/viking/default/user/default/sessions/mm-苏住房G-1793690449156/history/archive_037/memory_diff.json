@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_037",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:45:22.552851+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/captcha_fail_branch.md",
+                "memory_type": "entities",
+                "after": "# 验证码失败提示分流策略\n机构注册页创建账号时，后端图形验证码失败有超时与输错两种语义，需按正向关键词二分分流提示。\n\n## 问题背景\n- register/components/accountInfo.vue 的 goNextStep() 中 isCaptchaError(msg) 命中即无条件弹「图形验证码已超时，已自动刷新，请重新输入」\n- 用户仅输错一位也被提示超时，误导其反复等待而非重新输入\n\n## 解决方案\n- 不按「是否验证码类错误」二分，改按「是否属于已知超时场景」二分\n- msg 含「超时/过期/失效」走超时文案（已由截图证实），其余全部落到「验证码错误，请重新输入」\n- 两条分支都保留原副作用：自动刷新验证码图片、清空输入、清除校验红字\n- 必须验证第三类失败（如手机号已注册）仍走原异常弹窗且不刷新图片，避免误卷进验证码分支\n\n## 验证与归属\n- 验证用例：过期→超时文案、输错→错误文案（两者图片都刷新）、已注册→异常提示且图片不动\n- 涉及文件：zhi2-web-admin/src/views/register/components/accountInfo.vue、zhi2-web-admin/src/utils/request.js、zhi2-web-admin/src/api/index.js\n- 所属项目：苏住房G；来源会话ID：937828b7-6805-47c5-9130-1fe04124d458；代码基线：b0f2039"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dict_include_disabled.md",
+                "memory_type": "entities",
+                "after": "# 全量字典接口改 listByType\ngetDictsIncludeDisabled 由 /system/dictData/list 分页改为 /system/dictData/listByType/{type}?isAll=1，响应取值由 res.rows 变 res.data。\n\n## 问题背景\n- 原实现调 /system/dictData/list?dictType=xxx&pageNum=1&pageSize=500，把 pageSize 写死 500 当全量用\n- 分页接口拿全量要赌 pageSize 足够大，超出被静默截断，字典多了会悄悄丢项\n\n## 解决方案\n- 只改 dict.js 一个函数：URL 改成模板拼接 /listByType/${dictType}，参数对象传 { isAll: 1 }\n- 解包改成 (res.data || [])，再 map 出 dictLabel、dictValue、remark、listClass、cssClass、status 六个字段\n- 缓存 key 必须保持 ${dictType}_all，与普通 getDicts（不传 isAll）区分开，否则「含停用」和「仅启用」两份选项会互相覆盖\n- 切换后全库不应再有 /system/dictData/list 调用，筛选下拉仍走 getDicts，业务页面代码零改动\n\n## 验证与归属\n- 验证证据：会话 58dcbdff 用户要求改用 listByType 接口查全量并用于回显，最终仅改 dict.js\n- 涉及文件：zhi2-web-admin/src/utils/dict.js、zhi2-web-admin/src/views/company/staffManagement/components/index.vue\n- 所属项目：苏住房G；来源会话ID：58dcbdff-1362-4418-9b41-bd4b7e15dd6c；代码基线：d5eee56"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/field_granular_disable.md",
+                "memory_type": "entities",
+                "after": "# 置灰逻辑按字段粒度判定\n业主自治-物管会变更页需按字段逐个控制可编辑性，且置灰字段仍保留只读导航能力，不能一刀切或删跳转入口。\n\n## 问题背景\n- autonomy/change/property/detail.vue 中「物业管理区域名称」与「任职起止日期」两个字段的禁用状态写反了\n- 与产品确认：变更态下区域名称必须置灰不可编辑，任职起止日期反而可编辑\n- 常见误伤是把「禁用」做成了「连跳转也一起干掉」\n\n## 解决方案\n- 按字段逐个下 disabled：区域名称 zs-input 直接 disabled，任职起止日期 zs-date-picker 去掉 disabled，仅 add/edit 可改\n- 置灰字段仍保留只读导航：点击只调 goToComplexDetail()（有 complexId 才跳区域详情），把编辑态 openSelectDialog() 从点击链路摘掉\n- 查看态照旧走 DetailTemplate 分支不动，禁用与「查看态渲染」是两条独立链路\n- openSelectDialog 方法可保留（新增变更仍靠物管会编号 + setOwner 回填区域），不要因移除点击调用就连方法删\n\n## 验证与归属\n- 验证证据：会话 254661f7 用户贴图指出置灰反了并给出产品口径，最终按上述修改\n- 涉及文件：zhi2-web-admin/src/views/autonomy/change/property/detail.vue、zhi2-web-admin/src/views/autonomy/change/property/index.vue\n- 所属项目：苏住房G；来源会话ID：254661f7-ea9b-45c8-84f6-063fdca139f1；代码基线：4f7c2c3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/index_v2_merge.md",
+                "memory_type": "entities",
+                "after": "# 首页合并审查三缺陷\n首页 index-v2.vue 分支合并后审查发现三类真实缺陷：方法漏写括号、统计周期双源、合并冲突丢布局。\n\n## 问题背景\n- 首页 index-v2.vue 做分支合并（79f0 四行布局含双晒/标准化评价 + 另一分支 CheckDataNav/loadCheckData/openRectification）\n- 接线项齐全但查出三类问题\n\n## 缺陷清单\n- [HIGH] params.month = this.currentMonth 漏写调用括号，把 methods 函数引用当值传，接口收到的不是 'yyyy-MM'；函数引用是非空真值不报错也不走兜底\n- [MEDIUM] 顶部 statPeriodText 按本地「本月1日～今天」算，而 CheckDataNav/openRectification 用接口 checkData.statStartTime/statEndTime，注释却写「与顶部统计周期同源」不符\n- [LOW] 合并提交 a2479b828 解冲突时丢掉双晒/评价行，完整四行布局仅在工作区未提交文件，线上仍是残版\n\n## 解决方案\n- 赋值到请求参数凡引用 methods 必须显式 this.currentMonth()，合并后对 params 做「值类型断言」\n- 统计周期只保留一个来源，并改正误导注释\n- 合并提交 a2479b828 解冲突时丢掉的布局必须把文件提交后再推\n\n## 验证与归属\n- 验证证据：会话 2516a955 用户要求审查 index-v2.vue 合并结果，结论列出上述三类\n- 涉及文件：zhi2-web-admin/src/views/home/index-v2.vue、home/v2/components/CheckDataNav.vue、home/v2/checkDataMap.js、evaluation/rectificationNotice/constants.js\n- 所属项目：苏住房G；来源会话ID：2516a955-34bc-44d5-b0a9-366106d14e71；代码基线：1e5b44d"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_049",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T22:43:50.439067+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/regulator_dialog_project_fix.md",
+                "memory_type": "entities",
+                "after": "# 监管弹窗项目参数缺失修复\n苏州市房地产监测V3 中修复 `regulatorDialog.vue`（保函+用款）请求缺少项目参数导致 `getRegProjectByProId` 异常的问题。\n\n## 根因\n- `regulatorDialog.vue` 请求时未写入 `projectId`、`regulatorProjectId`、`useMoneyApplyType`，导致监管项目查询异常\n\n## 弹窗修复内容\n- 新增 `useMoneyApplyType` prop 由父表单传入；抽取 `buildQueryParams()` 每次请求前写入 `projectId`、`regulatorProjectId`、`useMoneyApplyType`\n- `handleQuery()` 改为调用 `getList()` 避免搜索时丢失参数；`resetQuery()` 重置后调用 `handleQuery()`\n- 打开弹窗无 `projectId` 时提示「请先选择项目名称」并中止请求；删除无用 `userMoneyApplyType` 拼写错误字段\n\n## 父页面改动\n- `guarantee/detail.vue`、`changedetail.vue`、`usemoney/detail.vue` 向 `regulatorDialog` 传入 `:use-money-apply-type=\"form.useMoneyApplyType\"`\n- `setProject` 使用 `row.projectId ?? row.id` 兼容接口字段；切换项目时显式清空监管项目、保函相关字段\n- 移除 `resetFields()` 避免把刚选的 `project` 清空\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`regulatorDialog.vue`、`guarantee/detail.vue`、`changedetail.vue`、`usemoney/detail.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：44c8588d-291f-4d97-ae02-6e6896d8ed9c；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_change_selectable_fix.md",
+                "memory_type": "entities",
+                "after": "# 企业变更备案列表删除入口隐藏修复\n苏州市房地产监测V3 中修复企业变更确认备案列表多选删除入口无法隐藏的问题。\n\n## 根因\n- `table.js` mixin 已有 `data.selectable: true`；Vue 2 中同名 `computed` 与 `data` 冲突时以 `data` 为准，导致 `v-if=\"selectable\"` 恒为 true，多选列无法去除\n\n## 修复内容\n- 删除 computed 里的 `selectable`，在组件 `data()` 写 `selectable: !this.isChange`（组件 data 覆盖 mixin）\n- 入网变更备案（`change/index` 传 `isChange=true`）时 `selectable` 为 false，整列勾选框不再渲染\n- 提示刷新页面查看；dev 未热更新可强刷或重启 Vite\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`table.js`、`company/companyRecordAgency/change/index.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：8530b5ce-8b7c-4942-9abf-bfbaed7a0d36；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tab_subtable_style_fix.md",
+                "memory_type": "entities",
+                "after": "# Tab内子表去内框与工具栏同行样式修复\n苏州市房地产监测V3 中优化详情页 Tab 内子表样式，去除内层边框并将工具栏与标题同行。\n\n## 全局样式改动\n- 文件：`zhi2-web-admin/src/styles/index.scss`，对详情页 card/line 型 `zs-tabs` 的 `.tabs-content` 内 Headline（`.collapse-container`）统一处理\n- 去掉内层 `border`/`border-radius`（只保留 Tab 卡片一圈外框）\n- `.collapse-header` 去底边、固定高度，改为 `min-height: 40px`、`padding: 0`\n- `.collapse-content` 顶部 `padding-top: 0` 避免与 Tab 内容区叠间距；用 `:not(.collapse-container--border-only)` 保留「仅边框」模式\n\n## 工具栏排查\n- 已执行 `node scripts/move-subtable-toolbar-to-headline-right.mjs`，Would update 0 files\n- Tab 子表（含 `BuildingChangeTable.vue`）工具栏无需移动\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`zhi2-web-admin/src/styles/index.scss`、`BuildingChangeTable.vue`、`progress/change/detail.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：fae19a03-f81a-4ccb-b45c-d5f02b9804a5；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/refund_notice_validity_fix.md",
+                "memory_type": "entities",
+                "after": "# 定金退款通知书有效期字典缺失修复\n苏州市房地产监测V3 中修复 `refund/detail.vue` 在字典缺少 `REFUND_NOTICE_VALIDITY` 项时抛错的问题。\n\n## 根因\n- `refund/detail.vue` 的 `initDict()` 加载 `NOTICE_VALIDITY` 字典后直接对 `find()` 结果访问 `.dictValue`；字典缺项时抛 `Cannot read properties of undefined (reading 'dictValue')`\n\n## 修复内容\n- 新增工具函数 `zhi2-web-admin/src/utils/noticeValidity.js`：`getNoticeValidityDays(list, key)` 安全查找有效天数，`formatNoticeEffectiveDate(dayjs, days)` 计算有效日期\n- 修复 `refund/detail.vue`：字典项存在时自动填充「通知书有效日期」；缺失时提示「未配置退款通知书有效期，请手动选择通知书有效日期」且不抛错\n- 同步修复同类隐患（4 个文件，含 `allocation/detail.vue`）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`refund/detail.vue`、`zhi2-web-admin/src/utils/noticeValidity.js`、`allocation/detail.vue` 等\n- 所属项目：苏州市房地产监测V3；来源会话：78d15986-f89e-4ac8-b7bf-426222e6b9db；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

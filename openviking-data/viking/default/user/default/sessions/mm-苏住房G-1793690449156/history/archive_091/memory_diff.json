@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_091",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T10:56:08.252774+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/area_publish_arg.md",
+                "memory_type": "entities",
+                "after": "# 区域报告 publish 接口额外参数陷阱\n区域报告链路的 publish 接口可能带第二个参数（区域维度），只按文档或姊妹链路调用会缺参导致数据落错分区。\n\n## 现象与根因\n- 区域报告链路 areaReportPrepare：complex/page 取小区 → add → submit → approval → generate → publish → /areaReport 查询\n- 源码里 areaReport 的 publish 有第二个参数（区域编码之类维度参数），普通报告 publish 没有\n- 同一族业务路径相似（/v2.0/evaluation/...）但方法签名不一定对称，凭直觉调用必缺参\n\n## 正确做法\n- 调用 publish/generate/submit 等有副作用接口前，先读后端 controller 方法签名确认参数个数与类型\n- 对照源码逐个列参数，区域版按 StdEvalReportPrepareController / 区域版 controller 签名传\n- 主键字段名分清：编制 reportPrepareId、报告 reportId、区域编制同样 reportPrepareId\n- 调用后必须回查列表/详情确认数据落在预期维度，不只看接口返回 200\n- 签名差异记进 docs/std-evaluation/api-map.md 的「不符清单」供后续复用\n\n## 验证与归属\n- 来源会话 b1c0919f-1d59-4d84-b098-af6f3b182d48（基线 05caac8）用户诉求 2\n- 涉及文件 e2e/std-evaluation/cases/06-report-prepare-flow.cjs、07-area-report-flow.cjs、docs/std-evaluation/api-map-report.md"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/blocked_case_assert.md",
+                "memory_type": "entities",
+                "after": "# 后端缺陷阻塞用例的受阻断言法\n当 E2E 用例被后端缺陷阻塞时，改用「不写库的负向断言」记录真实行为与无副作用，而非造数据硬闯。\n\n## 适用场景\n- 报告编制 generate 步骤因后端缺陷 D7（企业列表恒空）走不通，报「尚未关联参与评价企业」\n- 造数据绕过后端缺陷会掩盖真缺陷，直接跳过又丢失信息\n\n## 受阻断言三件套\n- 错误码不等 200 + 错误文案包含关键短语（如 msg 含「尚未关联参与评价企业」）\n- 副作用指标前后不变（本次用「报告总数前后不变」），全程不写库、不造数据\n- 用例分段：可跑通段写 A 段（全绿断言），受阻段写 B 段（受阻断言）\n\n## 交付纪律\n- 缺陷用编号（D7/R-01~R-04）写进 docs/std-evaluation/api-map-report.md，并说明「当前环境无法验证修复」\n- 用例整体仍 exit 0（受阻断言预期内通过），但报告必须列出受阻段与缺陷编号，不能只报「全绿」\n- 阻塞期间不发起会写库的用例（后端重启窗口 20–40s 请求会失败），等明确通知再继续\n\n## 验证与归属\n- 来源会话 b1c0919f-1d59-4d84-b098-af6f3b182d48（基线 05caac8）最终结论 06 的 A/B 口径\n- 交付物 06-report-prepare-flow.cjs PASS 17 步/0 失败、07-area-report-flow.cjs PASS 18 步/0 失败"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/e2e_data_prefix.md",
+                "memory_type": "entities",
+                "after": "# E2E 测试数据统一前缀与清理规范\nE2E 造的测试数据统一加业务前缀命名，接口删不掉的已备案数据按主键走 DB 批量清理。\n\n## 问题背景\n- 跑完报告编制/区域报告 E2E 后库里留两条接口删不掉的已备案数据（业务状态已备案不允许删）\n- 本次残留：报告编制E2E1031104628改（主键 2116361154115497985）、区域报告E2E1031104816（主键 2116361603476451330）\n- 已备案单据业务上不可删除，接口层清理路径无效；随机名/真实业务名既认不出又不敢删\n\n## 命名与清理做法\n- 造数据强制加统一前缀（如 E2E + 时间戳 + 模块名），一眼可辨、可按前缀批量筛\n- 交付时列出残留数据名称 + 主键 + 原因，不能只说「有残留」\n- 清理走 DB 直删（mcp_gateway 的 dbx 工具），因为接口删不掉\n- 用例结束前把可删的待提交数据在用例里删干净，只留业务不可删的待 DB 清理\n- 临时探针脚本（如 tools/probe-local-backend.cjs）用完即删，不留仓库当噪声\n\n## 验证与归属\n- 来源会话 b1c0919f-1d59-4d84-b098-af6f3b182d48（基线 05caac8）最终结论\n- 涉及文件 e2e/std-evaluation/cases/06-report-prepare-flow.cjs、07-area-report-flow.cjs"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zentao_edit_loss.md",
+                "memory_type": "entities",
+                "after": "# 禅道 biz 版 task edit 表单丢失式渲染\n禅道 biz 版 task 的 pri/deadline/status 不在 f=edit 表单里，用 edit 补字段会把它们冲成空/0/NULL。\n\n## 问题现象\n- 对禅道任务 #2146 执行 start 动作因未传 assignedTo，指派人被清空\n- 用 f=edit 表单补指派人时，pri/deadline/status 被冲成空/0/NULL（表单无这些控件）\n- desc 本就为空、name 未受损；最终用 dbx_execute_batch 精准 UPDATE 复原\n\n## 根因\n- 禅道 f=edit 是表单渲染型接口：只渲染表单存在的控件，提交时只带这些控件，缺控件字段被当「没传」写成空值\n- 与 REST 式 PATCH 语义完全不同，「用 edit 表单修一个字段」实际是「重写整条记录」\n\n## 正确做法\n- 绝不把 f=edit 当 PATCH 用，修单个字段走 DB 精准 UPDATE（dbx_execute_batch）或禅道专用接口\n- 用 edit 前确认目标字段在表单里存在，不在就别用\n- start 动作必须带 assignedTo，否则清空指派人\n- 改完逐字段核对（status/pri/deadline/assignedTo/name/desc），与未受损记录基线对照\n- 状态回写优先走标准动作接口（如 start）留 zt_action 审计记录\n\n## 验证与归属\n- 来源会话 session-4208fc64-80b9-409d-8aad-a50126748229（基线 c35a24a）RCA 结论\n- #2146 恢复 doing/pri=2/deadline；#1976 补 tiany；audit started records present"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

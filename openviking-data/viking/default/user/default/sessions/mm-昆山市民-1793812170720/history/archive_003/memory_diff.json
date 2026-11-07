@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-昆山市民-1793812170720/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T17:18:05.815729+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/verify_mpsdk_integration.md",
+                "memory_type": "entities",
+                "after": "# 腾讯人脸核身 SDK 集成与冗余清理\n昆山市民小程序已移除重复的云核身 SDK 副本，保留实际运行目录与调用封装，调用 init 方法初始化。\n\n## 已删除冗余\n- src/utils/cloud-faceid-micro-sdk-v1.0.37/（81 个文件）为 SDK 原始副本，集成时已复制到运行目录，项目无任何引用，属重复文件\n\n## 保留并在用\n- src/wxcomponents/verify_mpsdk/ — SDK 实际运行目录\n- src/pages/verify/index.vue — 核身承载页\n- src/utils/useTencentFaceVerify.js — 调用封装（调用 init 方法初始化）\n- 相关接入文件：src/pages/verifyUser/index.vue、src/App.vue、src/main.js、src/pages.json、src/manifest.js\n\n## 验证与归属\n- 来源会话ID：d204db33-771f-44d5-97bb-400ec850e59f\n- 代码基线：none\n- 验证证据：extracted source=cursor project=昆山市民"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/vote_detail_load_bug.md",
+                "memory_type": "entities",
+                "after": "# 决策详情数据加载失败修复\n昆山市民小程序「我的决策-已完成表决-决策详情」页面曾因图表接口失败阻断详情加载，导致字段空白或 NaN，已修复。\n\n## 问题原因\n- getVoteDetail 先调详情接口再调图表接口 getVoteChart，排序表决等类型在已完成状态下图表接口易失败，导致整个 getVoteDetail 中断，详情数据未写入 voteDetail\n- 页面渲染时 voteDetail 为空，roundUp(undefined, 2) 显示 NaN，其他字段空白\n- 跳转详情页未传 decisionRangeId，部分决策查不到完整数据\n\n## 修复内容\n- stores/vote.js：getVoteChart 失败不再阻断详情加载；主接口无数据时回退 selectDecisionViewById；户数/面积/权数优先用图表数据否则用详情接口字段\n- votedetail.vue：请求补充 decisionRangeId；面积为空不再显示 NaN\n- index.vue：跳转详情带上 decisionRangeId 参数\n\n## 验证与归属\n- 来源会话ID：b9110830-8233-4a5d-a89c-cf8b384f6805\n- 代码基线：none\n- 验证证据：extracted source=cursor project=昆山市民\n- 涉及文件：stores/vote.js、votedetail.vue、index.vue、DetailTop.vue 等"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/lulutong_code_dup_bug.md",
+                "memory_type": "entities",
+                "after": "# 鹿路通 code 重复调用修复\n昆山市民小程序鹿路通登录因多处调用 loginWithWxCode 且 URL code 每次被读取，导致 /llt/getInfoByCode 重复请求，已修复。\n\n## 问题原因\n- App.vue 的 onShow、home.vue 的 onLoad 等多处调用 loginWithWxCode()\n- URL 中 code 每次都被读取，导致 /llt/getInfoByCode 被重复请求\n\n## 修复策略（wxLogin.js）\n- 请求去重：用 loginPromise 合并并发调用，App.vue 与 home.vue 同时触发只发一次\n- 已有 token 则跳过：H5 已登录直接返回本地用户信息，不再调接口并清除 URL 中 code\n- code 一次性使用：登录成功记本地存储并标记已用，history.replaceState 移除 URL code 参数\n- 已使用 code 拦截：检测到 code 已消费直接拒绝不再请求\n\n## 验证与归属\n- 来源会话ID：438b59b9-1f57-49a0-a674-06c5f58fdd8f\n- 代码基线：none\n- 验证证据：extracted source=cursor project=昆山市民\n- 涉及文件：App.vue、home.vue、wxLogin.js"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/记忆写入语言要求.md",
+                "memory_type": "preferences",
+                "after": "- 抽取并写入记忆时一律使用简体中文，不要输出葡萄牙语或其他语言"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/benefit_api_bug.md",
+                "memory_type": "entities",
+                "before": "# 进入页面与切换小区无接口调用缺陷\n昆山市民小程序“受益页/切换小区”进入页面及切换小区均无接口请求，根因为多类设计缺陷叠加。\n\n## 问题根因\n- 进入页面及切换小区均无接口请求，非单一 bug\n- 开发过程逐步叠加多类设计缺陷，需梳理各生命周期与状态监听逻辑\n\n## 涉及文件\n- src/pages_benefit/benefit/index.vue\n- src/api/modules/myhouse.js\n- src/hooks/useLoadMore.js\n- src/api/modules/common.js\n- src/request/index.js\n- src/stores/user.js\n- src/env/mp.js\n- src/pages_contract/list.vue\n\n## 验证与归属\n- 来源会话ID：2c38c33c-ca79-4a52-aad9-5b1eb44802bd\n- 代码基线：none\n- 验证证据：cursor session 提取",
+                "after": "# 公共收益页面接口调用缺陷\n昆山市民小程序公共收益页面（benefit）从开发至今逐步叠加多类接口调用设计缺陷，导致列表数据无法正常加载。\n\n## 问题时间线\n- 2024-09-07 提交 dc138d6 公共收益页面开发：列表接口 getList 为空壳，Promise 不 resolve；list 用 8 条假数据占位\n- 2024-09-18 提交 a14d084 公共收益对接：接入 getPubQuarterlyDeclaration，但 onShow 从未调用 refresh()\n- 2024-09-24 提交 2a6ba01 bug修复：补上 projectId: useUser.project（此前请求缺关键参数）\n- 2024-09 至 2026-06 中间多次小改：一直靠交叉观察器被动加载，未在 projectId 就绪后主动拉列表\n- 2026-06-26 上午 提交 6418fe7 bug1250：加 syncProjectInfoFromHouseList + refresh()，试图修「C 端无法展示」\n\n## 问题根因\n- 进入页面及切换小区均无接口请求，非单一 bug 而是多类设计缺陷叠加\n- 开发过程逐步叠加缺陷，需梳理各生命周期与状态监听逻辑\n\n## 涉及文件\n- src/pages_benefit/benefit/index.vue\n- src/api/modules/myhouse.js\n- src/hooks/useLoadMore.js\n- src/api/modules/common.js\n- src/request/index.js\n- src/stores（含 user 相关）\n- src/env/mp.js（既有记录）\n- src/pages_contract/list.vue（既有记录）\n\n## 验证与归属\n- 来源会话ID：2c38c33c-ca79-4a52-aad9-5b1eb44802bd\n- 代码基线：none\n- 验证证据：cursor session 提取（extracted source=cursor project=昆山市民）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793758965904/history/archive_040",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T03:49:59.089273+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/biz_section_padding.md",
+                "memory_type": "entities",
+                "after": "# 首页板块菜单项分支padding漂移\n门户首页 HomeBizSection 组件因 step-grid 分支与默认分支菜单项 padding 不一致，导致跨板块菜单高度差约8px。\n\n## Description\n- 现象：商品房与面积管理两板块菜单项高度不一致，用户报「菜单高度不一致」。\n- 根因：菜单项有两套渲染分支，step-grid 分支 padding 为 12px/10px，默认分支为 18px/12px，改一处不同步另一处。\n- 本批实测两板块菜单项盒高分别为 93px 与 85px，差约8px。\n\n## Solution\n- 统一各分支菜单项 padding 到同一组值，本批将 step-grid 改为 `18px 4px 12px`。\n- 补 e2e 断言锁死跨板块一致性：商品房 vs 面积管理菜单项高度差 ≤1px。\n- 用「带修复/不带修复(stash)两条路径结果一致」判定存量问题；存量红点为 `.home-nav-menu .home-nav-item` 断言要求 `isHomeSuperAdmin`，e2e 环境为 false，与本次改动无关。\n\n## Verification\n- 来源会话ID：session-76cd9c3e-5100-45f7-b730-fdea8d1a6d85；代码基线：65275e9。\n- 涉及文件：zhi2-web-admin/src/views/home/components/HomeBizSection.vue、zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts。\n- 修复位置：HomeBizSection.vue 第210行附近统一为 18px 4px 12px。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/button_min_height.md",
+                "memory_type": "entities",
+                "after": "# 操作指引页主按钮定高居中\n操作指引页主按钮原靠 padding 撑高导致文字不垂直居中，改为 min-height 定高 + inline-flex 居中，并同步窄屏断点。\n\n## Description\n- 现象：操作指引页主按钮文字不是真正的垂直居中，改完发现窄屏断点高度又不对。\n- 根因：按钮用 `display:inline-block` + `padding:14px 56px` 靠内边距撑高，文字受行盒与内边距叠加偏上；窄屏(≤1024px)叠加上下10px padding 与 inline-flex 混用后高度不可控。\n- 涉及文件：zhi2-web-admin/src/views/home/operationGuide/components/OperationGuideBody.vue。\n\n## Solution\n- `display:inline-block` 改为 `inline-flex` + `align-items:center` + `justify-content:center`，高度由 `min-height` 决定。\n- 上下内边距归零（`padding:0 56px`），高度只由 `min-height`（本批48px）决定。\n- 窄屏断点同步改 `min-height:40px; padding:0 28px`，避免混出别的盒高。\n- 字号与行高配套微调：font-size 32px→28px、line-height 1.4→1.2；宽度、圆角、配色、hover、focus-visible、点击行为均不动。\n\n## Verification\n- 来源会话ID：session-3e238ff9-f252-4506-899f-41ea1c9881c7；代码基线：b6165db。\n- 修改位置：OperationGuideBody.vue 第365-380行。\n- 效果：桌面高度约73px→48px，移动端约40px。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/card_neg_margin_clip.md",
+                "memory_type": "entities",
+                "after": "# 首页卡片负上边距与溢出隐藏裁切\n门户首页 index-new 卡片因 .card-body 设负 margin-top 且容器 overflow:hidden，导致顶部图标与文字被裁切。\n\n## Description\n- 现象：常用功能图标与公告首行被切，根因为 .card-body 设 margin-top:-8px 且容器 overflow:hidden。\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue、src/styles/index.scss 等。\n- 来源会话ID：2a87516f-bc63-420e-9c43-3e2e10205bfd（extracted source=cursor）。\n\n## Solution\n- 去掉负 margin，统一 `$design-card-body-padding-top:6`（约506行）。\n- 将常用功能/公示公告 .card-body 改 overflow:visible。\n- 同步修改 e2e 文件 portal-home-visual.spec.ts 等确保布局。\n\n## Verification\n- 验证证据：extracted source=cursor session=2a87516f-bc63-420e-9c43-3e2e10205bfd。\n- 涉及文件含 index-new.vue、index.scss、zs-table.vue、package.json、playwright.config.ts。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/flow_overflow_col.md",
+                "memory_type": "entities",
+                "after": "# 业务中心流程区溢出与列宽不约束\n门户首页 index-new 业务中心流程区因 overflow:visible 使步骤条溢入 column-gap，且 flow-grid 列宽未约束导致上下行不对齐。\n\n## Description\n- 现象：流程区步骤条溢出、上下行不对齐。\n- 根因：业务中心流程区 overflow:visible 使步骤条溢入 column-gap；flow-grid 列宽未约束导致上下行不对齐。\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue、src/layout/index.vue 等。\n\n## Solution\n- home-main 限制卡片不超出网格列。\n- card-body 与 flow-steps 设 overflow:hidden。\n- flow-grid 第二列 minmax(0,1fr) 且子项 width:100%。\n\n## Verification\n- 来源会话ID：bfe00b75-42a6-4d80-bfb4-a79e98b5a2fe（extracted source=cursor）。\n- 涉及文件含 index-new.vue、layout/index.vue、portal-home-visual.spec.ts、package.json、playwright.config.ts。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

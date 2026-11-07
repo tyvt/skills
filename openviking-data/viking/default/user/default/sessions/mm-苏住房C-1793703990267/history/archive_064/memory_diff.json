@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_064",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T13:24:27.096100+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zpaging_fixed_searchbar.md",
+                "memory_type": "entities",
+                "after": "# z-paging默认fixed盖住同屏搜索栏\n苏住房C（uni-app小程序zhi2-mobile-shimin）「搜索小区」页顶部搜索框点不动、无法输入，因 z-paging 默认 fixed 全屏覆盖压住同屏搜索栏。\n\n## 问题现象\n- 「搜索小区」页顶部搜索框点不动、无法输入，看起来像搜索栏坏了\n- 搜索栏与列表同屏时，搜索栏被 z-paging 的 fixed 全屏列表压在下层，点击被列表容器吃掉\n\n## 根因\n- z-paging 默认 fixed:true，将列表渲染成全屏固定定位并叠在页面其他内容之上，把同样位于顶部的搜索栏压在下层\n\n## 解决方案\n- 搜索栏与列表同屏的页面显式传 :fixed=\"false\"，让 z-paging 回到普通文档流，配合外层 flex 纵向布局让列表吃剩余高度\n- 搜索栏在 flex 中设 flex-shrink: 0，避免被列表挤压\n- 配 :autoFocus=\"true\"，进入页面即聚焦输入法，减少一次点击\n- 在空状态插槽补「暂无数据」文案（z-paging 缺省图只给图不给字），与项目其他列表页样式一致\n- 判定顺序：z-paging 页面里出现「某块区域点不动/被盖住」，先查 fixed，再查 z-index\n\n## 验证与归属\n- 验证证据：会话 1bbaff8b（2026-07-16，基线 77666f8）用户报「搜索小区页」搜索框无法点击并缺「暂无数据」提示\n- 涉及文件：src/pages_transaction/intention/search.vue、src/components/ZsSearch/ZsSearch.vue、src/pages/common/searchPage.vue\n- 所属项目：苏住房C；来源会话ID：1bbaff8b-e027-4764-86e9-41dd7092d234；代码基线：77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/miniprogram_style_isolation.md",
+                "memory_type": "entities",
+                "after": "# 微信小程序样式隔离使:deep无法穿透自定义组件\n苏住房C（uni-app小程序zhi2-mobile-shimin）投票决策表单 StepChoose 中 ZsCheckbox 的 highlight 模式选中项贴边，父页 :deep(.checkbox-item) 设 padding 静默无效。\n\n## 问题现象\n- 选中项（ZsCheckbox highlight 模式）蓝色高亮背景完全贴边，与设计稿「背景内有内边距」不符\n- 父页写 :deep(.checkbox-item) 设 padding，怎么调都没反应，无告警\n\n## 根因\n- 微信小程序自定义组件默认样式隔离，父页面的 :deep() 无法穿透进 ZsCheckbox 内部真实节点，声明被静默丢弃\n- 与「组件标签上的 class/style 不透传」「WXSS 编译不报错但整条声明丢失」是同一类根因\n\n## 解决方案\n- 把 padding: 24rpx 28rpx、border-radius: 12rpx、box-sizing: border-box 写进 ZsCheckbox.vue 中 .highlight .checkbox-item 自身\n- 选中态 .highlight .checkbox-item.active 只负责背景色（rgba(19,84,190,.08)）与文字色 var(--primary-color)\n- 相邻项间距也放组件内（.highlight.v .checkbox-item + .checkbox-item { margin-top: 24rpx }）\n- 删掉父页那段无效的 :deep(.checkbox-item)，避免两处维护、误以为改父页就能生效\n- 推广：凡「组件自带的视觉形态（高亮、卡片、选中态）」一律组件内闭环；父页只应通过 props 控制形态开关而非用 CSS 覆盖内部节点\n\n## 验证与归属\n- 验证证据：会话 fee54f55（2026-08-28，基线 8fc3cc5）用户反馈「选中还是没有内边距」，根因为父页 StepChoose.vue 的 :deep(.checkbox-item) 无法生效\n- 涉及文件：src/components/ZsCheckbox/ZsCheckbox.vue、src/pages_vote/decision/optional/StepChoose.vue、src/pages_vote/decision/common/StepChoose.vue、src/pages_vote/decision/form.vue\n- 所属项目：苏住房C；来源会话ID：fee54f55-f0e6-4815-a66f-9e7605482cf9；代码基线：8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/signature_image_blank.md",
+                "memory_type": "entities",
+                "after": "# 签字图不显示+大片空白：图片容器须固定尺寸并兼容sign字段\n苏住房C（uni-app小程序zhi2-mobile-shimin）投票决策结果页 DecisionResult 的「最近一次决策」下方大片空白，签字图未显示。\n\n## 问题现象\n- DecisionResult「最近一次决策」下方出现大片空白，本该有的签字图没显示\n- 「决策详情」被做成整行 CardCell，额外贡献一段行高\n\n## 根因\n- 签字用 CardCell 包 ZsImage，图片容器无固定尺寸，内部 height:100% 在 flex 测量链里拿不到确定高度，图片退化成 0 高导致空白\n- 取值只读了 signature，后端在另一种返回结构里给的是 sign，字段不匹配时同样只剩空白\n- 「决策详情」被做成整行 CardCell，本身额外贡献一段行高\n\n## 解决方案\n- 签字区不用 CardCell，改用 cell-item + 专用 sign-picture-wrap，容器固定 153×68px，图片 mode=\"aspectFit\" 保证不拉伸\n- 取值做多候选回退：recordDetail.signature || recordDetail.sign || detail.signature || detail.sign\n- 「决策详情」从整行卡片降级为决策内容下方的紧凑链接行\n- 同一业务的复制页面（optional/ 与 common/ 下同名文件）互相对齐，改一份同步另一份\n- 推广：小程序里任何图片（签字、证照、缩略图）都必须由外部容器定尺寸，不要依赖 height:100% 自行撑开\n\n## 验证与归属\n- 验证证据：会话 55bd76cb（2026-08-28，基线 8fc3cc5）用户报「optional/DecisionResult 最近一次决策下面有大量空白，也可能是签字没展示」\n- 涉及文件：src/pages_vote/decision/optional/DecisionResult.vue、src/pages_vote/decision/common/DecisionResult.vue、src/pages_vote/decision/styles/page.scss\n- 所属项目：苏住房C；来源会话ID：55bd76cb-6679-4d29-9b33-6cebc5d1203e；代码基线：8fc3cc5"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue3_native_modifier.md",
+                "memory_type": "entities",
+                "before": "# Vue3 迁移移除 .native 修饰符\nVue3 已移除 `.native` 修饰符，模板里的 `@click.native`/`@input.native` 会静默不生效，须全局检索改法。\n\n## 问题根因\n- Vue3 移除 `.native` 修饰符，`@click.native`、`@input.native` 等会静默不生效，无报错但事件不绑定\n\n## 解决方案\n- 迁 Vue3 时全局检索 `.native`（含 login 等页），改为组件自身支持的 `@click`/`v-on` 或在包裹元素上监听原生事件\n\n## 验证与归属\n- 验证证据：会话 98fe164c 中 login.vue:28 的 `.native` 写法未生效，用户要求全局搜类似写法改 Vue3\n- 涉及文件：zhi2-web-admin/assets/views/login.vue、zhi2-web-admin/src/views/login.vue\n- 所属项目：2-0；来源会话：98fe164c-3ca7-4574-8920-11075d32c5c9；代码基线：none",
+                "after": "# Vue3 迁移移除 .native 修饰符\nVue3 已移除 `.native` 修饰符，模板里的 `@click.native`/`@input.native`/`@tap.native` 会静默不生效，须全局检索改法。\n\n## 问题根因\n- Vue3 移除 `.native` 修饰符，`@click.native`、`@input.native`、`@tap.native` 等会静默不生效，无报错但事件不绑定\n- 在 uni-app 的 Vue3 编译产物里，`.native` 监听不会被挂上，表现为点击完全静默失效\n\n## 解决方案\n- 迁 Vue3 时全局检索 `.native`（含 login 等页），改为组件自身支持的 `@click`/`@tap`/`v-on` 或在包裹元素上监听原生事件\n- 小程序端点击一律写 `@tap`；不要把 `@tap.native` 写在组件上，把 `@tap` 绑到包裹它的 view 容器上\n- 搜索控件等补 `@focus` 事件走同一条跳转逻辑，避免点中边缘空隙无响应\n- 判定「点击没反应也没报错」时，优先怀疑事件监听根本没绑上（.native / 拼错事件名 / 被上层遮罩挡住），而非先查跳转函数\n\n## 验证与归属\n- 验证证据：会话 98fe164c 中 login.vue:28 的 `.native` 写法未生效，用户要求全局搜类似写法改 Vue3\n- 涉及文件：zhi2-web-admin/assets/views/login.vue、zhi2-web-admin/src/views/login.vue\n- 所属项目：2-0；来源会话：98fe164c-3ca7-4574-8920-11075d32c5c9；代码基线：none\n- 验证证据2：会话 1bbaff8b（2026-07-16，基线 77666f8）苏住房C 小程序「我的求购-添加求购」搜索框点击无反应，根因 add.vue 用 @tap.native 在 Vue3 失效，改为外层容器绑 @tap 并在 @focus 时跳转\n- 涉及文件2：src/pages_transaction/intention/add.vue、src/pages_transaction/intention/search.vue\n- 所属项目2：苏住房C；来源会话ID：1bbaff8b-e027-4764-86e9-41dd7092d234；代码基线：77666f8"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

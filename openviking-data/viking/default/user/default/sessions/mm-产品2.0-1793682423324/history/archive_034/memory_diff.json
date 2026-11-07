@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_034",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:34:28.041424+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sign_prefix_sync.md",
+                "memory_type": "entities",
+                "after": "# sign.js 加签脚本 API 前缀双写同步约定\n园区物管2.0 的 public/sign.js 放弃运行时注入 API 前缀，改为写死常量 SIGN_API_BASE 并与 VITE_APP_BASE_API 双处同步。\n\n## 问题背景\n- sign.js 在 Vite 打包流程之外（public/assets/js，不进打包），读不到 import.meta.env / define 注入\n- 原先靠 index.html 的 meta 标签 + window.__APP_BASE_API__ 传 API 前缀，链路分散易漏改\n\n## 解决方案\n- 在 sign.js 写死常量 SIGN_API_BASE = 'api/v2.0'，与 env/.env 的 VITE_APP_BASE_API 保持一致\n- resolveSecretKeyUrl() 按该常量拼出 /api/v2.0/secret/key\n- 删掉 index.html 的 app-base-api meta 与 vite.config.js inject.data 的 appBaseApi\n- 约定：改环境 API 前缀须同时改 sign.js 的 SIGN_API_BASE 和 VITE_APP_BASE_API 两处（sign.js 注释已标注）\n\n## 关键事实\n- sign.js 请求 /secret/key 获取加签密钥，密钥需带 token 放 header，响应体需 base64 解码才是真结果\n- 所属项目：产品2.0；来源会话：2cd9858a-f845-438d-8395-c6461b78ce48；代码基线：0ec4b79"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/fee_bill_import.md",
+                "memory_type": "entities",
+                "after": "# 账单两段式导入约定\n园区物管2.0 的 spFeeBill 账单导入采用「/import 拿 importId 预览，/import/confirm 收尾」的三步流程。\n\n## 流程说明\n- 第一步选 complexId/feeTypeId/feeStandardId 条件\n- 第二步 POST /property/spFeeBill/import，从 data 取 importId、successCount/failCount、errorSummary、errorReportUrl、bills\n- 第三步预览 bills（与 errorData 合并，行级用 valid/errorMsg 判失败并动态加「校验错误」列，行唯一标识用 rowNum 作 _rowKey）\n- 最后 POST /import/confirm { importId, complexId, feeTypeId, feeStandardId }\n\n## 预览与容错规则\n- 预览放行：importId 存在 + 有预览数据 + 无 errorReportUrl，即使 failCount>0 也允许预览（错误第三步提示）\n- 返回 errorReportUrl 时阻断预览，要求下载错误报告后重新上传\n- 接口未返回 complexName 时用第一步选中区域名称补全，feeCycle 文本缺失回退原字段\n\n## 关键事实\n- 导入接口先做行级校验落临时批次，confirm 才真正入库，前端须按 importId 串联否则重复解析或入库失败\n- 所属项目：产品2.0；来源会话：a10aadfb-a1ed-4720-8d24-06f8099d14c1；代码基线：a10aadfb"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/node_candidate_echo.md",
+                "memory_type": "entities",
+                "after": "# 流程节点面板候选组回显丢失\n园区物管2.0 流程设计器节点面板（task.vue）候选组回显为空，根因是 watch(formData.dataType) 缺 oldVal 首次判空。\n\n## 问题现象\n- 候选组下拉有选项、保存后详情再进回显为空\n- 再点保存会把被清空的模型写回 XML，造成库里数据真的丢失\n\n## 根因\n- data() 里 formData 先为 {}（无 dataType），created() 整份换成 XML 解析结果（含 dataType:'fixed' 和 candidateGroups）\n- watch(formData.dataType) 在 undefined→'fixed' 首次赋值时执行了「切换指定方式清空关联字段」清理逻辑，删掉刚解析出的候选组\n- 同文件 formData.userType 的同款逻辑写了 if(oldVal) 所以没事，只有 dataType 少了首次判断\n\n## 解决方案\n- watcher 处理首次绑定：oldVal 为 undefined/null/'' 视为初次赋值不清空，且仅 val !== oldVal 时才清空人员字段\n- 已损坏流程 XML 需重新选候选组保存一次恢复\n- 通用规则：任何「值变化即清空关联字段」的 watcher 都要防组件初始化/数据注水触发的首次赋值\n\n## 关键事实\n- 涉及文件：zhi2-web-admin/src/components/Process/components/nodePanel/task.vue\n- 所属项目：产品2.0；来源会话：8e2e88bc-89fe-4391-8ce3-07a15df52e5c；代码基线：6b9d9d7"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tree_single_dialog.md",
+                "memory_type": "entities",
+                "after": "# 树+筛选+单选表组合弹窗样式约定\n园区物管2.0 的「左侧筛选多选 + 右侧表格单选」组合弹窗，single-choice 圆形样式须限定 .el-table 内避免污染左侧多选。\n\n## 问题现象\n- 单选语义靠 custom-class 挂 single-choice 实现，全局样式 .single-choice .el-checkbox__inner { border-radius:50% } 作用于弹窗内所有 checkbox\n- 左侧分类多选也被画成圆形，视觉语义错乱\n\n## 解决方案\n- 全局规则收窄作用域：改成 .single-choice .el-table .el-checkbox__inner { border-radius:50% }（与「隐藏表头全选」同类写法）\n- 左侧 el-checkbox-group 恢复方形多选，右侧表格选择列保持圆形单选 + handleSelectionChange 只保留一行\n- 新增同类弹窗直接复用此约定，弹窗上保留 single-choice class 即可，组件零改动\n\n## 关键事实\n- 修复只改 element-ui.scss 一处，弹窗组件零改动\n- 涉及文件：zhi2-web-admin/src/styles/element-ui.scss、zhi2-web-admin/src/views/dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue\n- 所属项目：产品2.0；来源会话：6b9584dd-8399-40b2-8b79-9baf367ed910；代码基线：64fa9e2"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

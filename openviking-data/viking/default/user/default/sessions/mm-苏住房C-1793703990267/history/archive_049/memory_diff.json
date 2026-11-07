@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_049",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:49:55.618745+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/h5_native_drawable_baseline.md",
+                "memory_type": "entities",
+                "after": "# H5插图以Android原生为视觉基准\n当H5与Android/iOS原生端同页视觉不一致时，原生端写死的资源为权威源，抄图并统一走本地静态路径。\n## 问题背景\n- 「我的」页电子业主卡右侧插图不显示，Android端写死@drawable/icon_card，CardAdapter不读接口iconPath\n- H5侧走MenuImage+接口iconPath，远程地址WebView可能加载失败，本地fallback经resolveMediaUrl二次处理改错路径\n- menu.js误指icon-owner-card.png（首页小图标）而非卡片右侧大图，三处共同导致空白\n## 解决方案\n- 从Android工程复制drawable-xxhdpi/icon_card.png到src/pages_tab/static/images/my/owner-card.png（约56KB）\n- MenuSection.vue卡片右侧改用tabStaticUrl本地图，与头部背景图同方式，不再经MenuImage\n- menu.js电子业主卡统一引用images/my/owner-card.png，不再依赖接口远程图标\n## 验证与归属\n- 所属项目：苏住房C；来源会话ID：d6842107-6287-4385-849e-b409c4545d53；代码基线：8fc3cc5\n- 涉及文件：src/pages_tab/components/menu/MenuSection.vue、MenuImage.vue、src/utils/index.js、suzhufang-android-app/app/src/main/res/layout/item_my_card.xml"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/index_html_script_path.md",
+                "memory_type": "entities",
+                "after": "# index.html脚本绝对路径注入\nzhi2-mobile-shimin的index.html脚本须按location.pathname计算资源根再用绝对路径，避免无尾斜杠入口404。\n## 问题现象\n- 微信/支付宝WebView内index.html第19-22行四个加密脚本加载失败，苏服办App内正常\n- 脚本提供window.Hex/window.SM3Digest/window.CryptoJS，是网关SM3签名与业务接口签名必需\n## 根因\n- 原相对路径./static/js/...按当前页面URL解析；无尾斜杠入口https://域名/szffluzm被解析到https://域名/static/js/...少了/szffluzm段\n- 苏服办WebView入口带尾斜杠故正常，表现为部分容器正常\n## 解决方案\n- index.html根据location.pathname计算资源根（兼容有/无尾斜杠、带index.html三种），以绝对路径注入脚本\n- 保证/szffluzm、/szffluzm/、/szffluzm/index.html均解析到/szffluzm/static/js/...\n- H5内嵌App/公众号时禁止任何相对资源路径\n## 验证与归属\n- 所属项目：苏住房C；来源会话ID：43c2d24d-9340-4131-a043-2b0f220ba0b9；代码基线：77666f8\n- 涉及文件：index.html、szffluzm/index.html、src/static/js/sign.js、vite.config.ts"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zsimage_sizing.md",
+                "memory_type": "entities",
+                "after": "# ZsImage尺寸须外层定尺寸盒子\nZsImage组件内部写死width/height:100%，页面直接挂固定尺寸class会被撑满父容器，必须外层包定尺寸盒子。\n## 问题现象\n- 「关于我们」页UI紊乱：logo-szf.svg（设计80×80）被拉满整屏宽度，底部联系信息错位\n- ZsImage内部<image>设width:100%;height:100%，页面class=\"logo\"优先级更低被吃掉\n## 根因\n- ZsImage本身无尺寸，尺寸完全由父盒决定；内部样式压过页面同名规则\n## 解决方案\n- 不在ZsImage上写尺寸class，改用固定尺寸容器包裹：logo用80×80px盒子、电话/地址图标用16×16px盒子\n- ZsImage放在盒子里100%撑满即可，此为项目内cancellationWarning等已有页面既定写法\n## 验证与归属\n- 所属项目：苏住房C；来源会话ID：cf3f235e-357f-45ef-a9c7-36f63007668f；代码基线：9832ba3\n- 涉及文件：src/pages_main/about/AboutUs.vue、src/components/ZsImage/ZsImage.vue、src/static/images/logo-szf.svg"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/gateway_upload_contract.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C市民端网关文件上传契约\n苏住房C市民端所有上传走苏服办网关专用上传接口，二进制multipart独立字段+精简header，禁止base64塞进biz_content。\n## 契约要点\n- 接口interface_id=szffluzm-wjsc、version=v2.1；api.file()/ImageUploader/ZsUploader/签字板复用同链路\n- 文件通过formData.append(fileField, fileBlob, fileName)以二进制字段提交，biz_content只放业务参数JSON\n- 上传header走独立buildUploadGatewayHeader，仅留zs-authorization、zs-path、zs-source三头\n- 绝手动设Content-Type:multipart/form-data（boundary须运行时自动生成），httpInstance不再透传多余Authorization\n## 错误根因\n- 早期base64写进biz_content并带全套zs-sign/zs-param/zs-method头，网关期望不符\n- 文件未进FormData时网关降级普通POST(szffluzm-whyhxx)报请求异常；传files而非file致config.file为undefined\n## 同源适用\n- 泰兴小程序/苏住房G若接苏服办网关，上传一律按此契约，不退base64\n## 验证与归属\n- 所属项目：苏住房C；来源会话ID：0b56ec32-ad5b-4d9a-918c-7580d24e744d；代码基线：e04432d\n- 涉及文件：src/api/gateway.js、httpInstance.js、file.js、src/pages_owner/repair/add.vue"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

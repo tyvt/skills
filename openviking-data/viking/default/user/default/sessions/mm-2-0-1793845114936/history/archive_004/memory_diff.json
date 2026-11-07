@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793845114936/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T02:31:04.671648+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/image_viewer_remove_element_ui.md",
+                "memory_type": "entities",
+                "after": "# ImageViewer组件去除element-ui依赖\n产品2.0（zhi2-web-admin）中 ImageViewer 组件改为纯本地预览遮罩层实现，不再依赖 element-ui 包。\n\n## 问题背景\n- 使用 CDN 引入 element-ui 时，源码里不能再 import element-ui/packages/...，否则报 `element-ui/packages/image/src/image-viewer.vue could not be resolved`\n- 原 ImageViewer 依赖 element-ui 包导致上述解析错误\n\n## 解决方案\n- 将 `zhi2-web-admin/src/components/ImageViewer/index.vue` 改成纯本地预览遮罩层实现，不再依赖 `element-ui` 包\n- 原 `element-ui/packages/image/src/image-viewer.vue could not be resolved` 错误消失\n\n## 其他依赖问题\n- 后续 `bun run dev` 报的 `lodash.merge / zrender / tslib / @babel/runtime / typed-function / form-data` 属另一批依赖问题，与 element-ui CDN 无关\n- 可补齐缺失依赖或改回 yarn/npm 安装启动链路解决\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/components/ImageViewer/index.vue、element-ui/packages/image/src/image-viewer.vue\n- 所属项目：2-0；来源会话：05e68b5b-3b5d-4912-9698-90636098e05c；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/nested_zs_dialog_zindex.md",
+                "memory_type": "entities",
+                "after": "# 嵌套zs-dialog内层弹窗z-index提升修复\n产品2.0 中「维修项」弹窗嵌在「编辑维修项」父 zs-dialog 里，内层弹窗可点区域（含下拉三角）点不动，因父级遮罩吃掉事件。\n\n## 问题根因\n- Element 的 PopupManager 给内层 `.el-dialog__wrapper` / 配套 `.v-modal` 的 z-index 仍不高于父级遮罩，事件被父级全屏遮罩吃掉\n- 仅加 `el-select-dropdown` 的 z-index 无法抬高内层弹窗本身，对「打不开」无帮助\n\n## 解决方案\n- 给内层 `zs-dialog` 加 `ref=\"feeDtlZsDialog\"`，在 `@opened=\"raiseNestedDialogStack\"` 里用 `!important` 强制：\n  - 内层 `.el-dialog__wrapper` → `z-index: 5000`\n  - 其相邻 `.v-modal`（前/后兄弟都判断）→ `5000 - 1`\n  - 在 `$nextTick` + `setTimeout(0)` 各执行一次，避免被 Element 随后写回的 inline 样式覆盖\n- 下拉面板仍用 `popper-cl`（原文截断，保留原有 popper 方案）\n\n## 验证与归属\n- 涉及文件：@zhi2-web-admin/src/views/solicitation/components/maintenanceFeeDtlDialog.vue\n- 所属项目：2-0；来源会话：f7fa3bf8-e11d-41c2-ab82-7f380cbd83c7；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/head_title_link_click.md",
+                "memory_type": "entities",
+                "after": "# HeadTitle组件链接点击跳转改造\n产品2.0 中 HeadTitle 组件支持 `item.type === 'link'` 可点击跳转，并按 link 类型执行不同路由逻辑。\n\n## 模板改动\n- 当 `item.type === 'link'` 时，用可点击 `span.value-link` 展示 `item.value`，绑定 `@click=\"handleLinkClick(item)\"`\n- 仅非 link 类型渲染图标（`item.type !== 'link'` 时才用 `getIconUrl`）\n\n## 方法逻辑\n- 新增 `handleLinkClick(item)`：\n  - 先 `this.$emit('link-click', item)`\n  - 若 `item.link` 为函数：只执行 `item.link()`，由调用方内部做路由跳转\n  - 若 `item.link` 为字符串路径（以 `/` 开头）：`this.$router.push(path)`，支持 `item.query`\n  - 若 `item.link` 为对象（含 `path`）：按对象处理（原文截断）\n\n## 其他说明\n- 当前 lint 报错为项目原有 TypeScript/Vue 类型推断问题，非本次改动引入\n- 涉及文件：zhi2-web-admin/src/components/HeadTitle/index.vue、propertyBid/detail.vue\n- 所属项目：2-0；来源会话：ae811080-a0ec-4d52-b603-a6fb72f9ca69；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dropdown_fixed_position_pattern.md",
+                "memory_type": "entities",
+                "before": "# 祖先overflow裁剪下拉改fixed定位\n祖先容器 `overflow:auto` 场景下下拉层被裁剪，改为 `position: fixed` 定位。\n\n## 问题描述\n- `zs-like-select.vue` 下拉层原为 `position: absolute`，在 `AddDialog.vue` 等祖先 `overflow:auto` 场景下被裁剪\n\n## 解决方案\n- 下拉层由 `position: absolute` 改为 `position: fixed`\n- 依据输入框 `getBoundingClientRect()` 同步 `top/left/width`\n- 监听滚动与 `resize` 事件重算位置\n\n## 验证与归属\n- 验证证据：src=2-0/012.md\n- 涉及文件：zs-like-select.vue、AddDialog.vue\n- 来源会话ID：e46496c1-c5d8-41f4-9fe7-15b3f4530f3a；代码基线：none",
+                "after": "# 祖先overflow裁剪下拉改fixed定位（zs-like-select）\n祖先容器 `overflow:auto` 场景下下拉层被裁剪，改为 `position: fixed` 定位。\n\n## 问题描述\n- `zs-like-select` 下拉层原为 `position: absolute`，在 `AddDialog.vue` 等祖先 `overflow:auto` 场景下被裁剪\n- dialog body 设 overflow:auto 时，下拉列表被父级裁剪或定位错位\n\n## 解决方案\n- 下拉层由 `position: absolute` 改为 `position: fixed`（固定覆盖层），绕开祖先 `overflow:auto` 裁剪\n- 打开时依据输入框 `getBoundingClientRect()` 计算并同步 `top/left/width`\n- 监听弹窗滚动与 `window` 的 `scroll/resize`，滚动时自动重算坐标，保证位置跟随输入框\n\n## 验证与归属\n- 验证：长表单 dialog 内打开 like-select，滚动 dialog 后下拉仍贴齐输入框且不被裁切；也可打开弹窗，光标点到“资金专户/资金专户名称”附近靠下位置，确认下拉完整显示且弹窗滚动不受影响\n- 涉及文件：zhi2-web-admin/src/components/zs-select/zs-like-select.vue（亦称 index.vue）、AddDialog.vue\n- 所属项目：2-0；来源会话：e46496c1-c5d8-41f4-9fe7-15b3f4530f3a、7f3a94cb-8b2a-4c1e-9d3e-4f8a1b2c3d4e；代码基线：none"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/like_select_fixed.md",
+                "memory_type": "entities",
+                "deleted_content": "# zs-like-select在可滚动dialog内下拉定位修复\ndialog body 设 overflow:auto 时，zs-like-select 下拉列表被父级裁剪或定位错位，需改用 fixed 定位。\n\n## 问题根因\n- dialog body 设 overflow:auto 时，下拉层依赖 absolute 相对于被 overflow 裁剪的祖先导致错位\n\n## 解决方案\n- 下拉层使用 position: fixed + 较高 z-index\n- 打开时用 trigger 的 getBoundingClientRect 计算 left/top/width\n- 监听所属 dialog 的 scroll 与 window resize，滚动时重算位置\n\n## 验证与归属\n- 验证：长表单 dialog 内打开 like-select，滚动 dialog 后下拉仍贴齐输入框且不被裁切\n- 验证证据：会话 7f3a94cb 诉求 4 用户要求 like 组件下拉不被 dialog overflow 裁剪，结论 fixed 定位 + scroll/resize 同步\n- 涉及文件：zhi2-web-admin/src/components/zs-like-select/index.vue\n- 所属项目：2-0；来源会话：7f3a94cb-8b2a-4c1e-9d3e-4f8a1b2c3d4e；代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

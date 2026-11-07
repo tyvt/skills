@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_063",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T15:03:03.452901+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/intention_search_nav_fix.md",
+                "memory_type": "entities",
+                "after": "# 求购搜索小区跳转修复\n苏住房C 小程序「我的求购」添加页搜索小区时因重复跳转事件导致页面栈异常，已修复。\n\n## 问题原因\n- 添加求购信息页（add.vue）搜索框同时绑定 div 的 @tap 与 ZsSearch 的 @focus，点击时连续触发两次 navigateTo\n- 页面栈变成：我的求购 → 添加求购信息 → 搜索小区 → 搜索小区（重复）\n- 搜索小区页选中小区后 navigateBack({delta:1}) 只退一层，仍停留搜索页，需再选 2~4 次才能回到添加页\n\n## 修复内容\n- add.vue 去掉重复 @tap 和 @focus，改为与其他页面一致的 @click.native 单次跳转\n- search.vue 选中小区后在页面栈查找「添加求购信息」页并一次性回退到该页\n- 验证路径：我的求购 → 添加 → 点击搜索框 → 搜索并选择小区 → 第一次选择后直接回到添加页并显示已选小区\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：src/pages_transaction/intention/my.vue、add.vue、search.vue\n- 来源会话ID：9e111257-31c8-47e5-b4c2-c258dbd7cb93\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/id_verify_migration.md",
+                "memory_type": "entities",
+                "after": "# 身份证微信实名认证迁移\n苏住房C 项目已迁移泰兴小程序的微信身份证实名认证能力，新增 API 并更新认证页。\n\n## 改动说明\n- 新增 src/api/security.js 的 weChatVerify 接口，对接 /security/ctAuth/wechat/verify\n- 更新 FormLocal.vue 参考泰兴 pages_common/verifyUser/index.vue 接入完整人脸识别流程\n- 认证流程：TypeChoose（居民身份证）→ FormLocal → 填写姓名/身份证号 + 微信人脸识别\n\n## 功能细节\n- 温馨提示收集姓名和身份证号；需勾选《用户协议》《隐私政策》才能提交\n- uni.startFacialRecognitionVerify 调起人脸核身，成功后 wx.login + weChatVerify 完成实名\n- 保留重复账号提醒（可继续认证或去登录），人脸失败可跳 FormManual 人工审核\n- 认证成功调用 userStore.getUserInfo() 刷新用户信息\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：src/api/security.js、FormLocal.vue、pages_common/verifyUser/index.vue、TypeChoose.vue\n- 来源会话ID：42b7efbf-3412-4580-bb0d-1b92c50a5d89\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/uni_icons_relocate.md",
+                "memory_type": "entities",
+                "after": "# uni-icons 分包路径修复\n苏住房C 小程序修复 uni-icons 因分包路径解析导致 vendor.js 引用错误的问题，新增构建补丁脚本。\n\n## 问题原因\n- uni-icons 通过 easycom 打入分包后，JS 仍写 require(\"./../../../../common/vendor.js\")\n- 从分包内往上 6 层落到分包 common/vendor.js，而实际在主包 common/vendor.js，导致报错\n- 涉及分包：pages_main、pages_owner、pages_owner_extra\n\n## 修复方案\n- 新增 scripts/relocate-uni-icons.mjs 扫描所有分包 uni-icons，将 vendor.js 引用改为主包正确相对路径\n- vite.config.ts 在 closeBundle 钩子自动执行该脚本\n- 已对当前 dist 执行补丁，3 个分包均已修复\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：scripts/relocate-uni-icons.mjs、vite.config.ts、各分包内 uni-icons\n- 来源会话ID：829a9465-5450-4144-a178-49e21c221320\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/phone_popup_ui_fix.md",
+                "memory_type": "entities",
+                "after": "# 手机号授权弹窗 UI 调整\n苏住房C 小程序完成 WechatPhoneAuthPopup.vue 的 UI 调整，对齐设计稿标注。\n\n## 间距调整\n- 弹窗顶部内边距：28px → 24px\n- 图标到标题：16px → 8px\n- 标题到说明文案：12px → 24px\n\n## 图标与文案\n- 移除固定 72×72 容器，避免图标下方额外空白\n- 图标显示尺寸：40px → 49px（对应 98×98 素材一半）\n- 标题、说明文案 text-align: center；权益列表保持 width:100% 左对齐\n- 业务逻辑、按钮样式、遮罩与授权交互均未改动\n\n## 验证与归属\n- 登录页（pages_main/login/index）和「我的」页自动使用更新后弹窗样式\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：src/components/shared/WechatPhoneAuthPopup.vue\n- 来源会话ID：fc2a8c5e-bff6-4e3d-a36d-309db1a4029c\n- 代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

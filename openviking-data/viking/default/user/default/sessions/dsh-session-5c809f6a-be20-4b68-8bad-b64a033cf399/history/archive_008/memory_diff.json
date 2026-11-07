@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-5c809f6a-be20-4b68-8bad-b64a033cf399/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T01:05:30.460741+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/前端缺陷/bug_6084.md",
+                "memory_type": "entities",
+                "after": "# bug#6084 监管账户开户弹窗分页遮挡\n房地产监管后台模块中监管账户开户页选择开户网点弹窗的分页条被滚动遮挡缺陷。\n\n## Description\n- 禅道 bug#6084，2026-11-03 上报。\n- 监管账户开户页「选择开户网点」弹窗（BranchOneDialog.vue）分页「共85条记录」与翻页未在一屏显示，需滚动才能看到。\n- 弹窗经路由 /spfzjjg/zjjg/ACCOUNT_OPEN/account/add 进入 supervision/agreement/account/detail.vue，由 openUnionBankBranchSelect 打开。\n\n## RootCause\n- Playwright 登录测试站点 58.210.252.230:9002（zsbase/ZS001Aa!，算术验证码）复现确认。\n- 弹窗 body scrollHeight 741 > clientHeight 591，分页条被推到滚动区下方不可见。\n- 接口返回 total=85、rows=10，分页元素已渲染只是被滚动遮挡，非 total=0。\n\n## Fix\n- worktree wt-bug6084 中，BranchOneDialog.vue 新增 tableScroll 布尔属性（默认 false，避免影响 7+ 共用页面）并透传至 zs-select-dialog 的 table-scroll。\n- unionBankBranch.js 转发 options.tableScroll。\n- agreement/account/detail.vue 与 regulatoryAccountNew/detail.vue 的 showVisionOfBank 调用传入 tableScroll:true。\n- table-scroll 为代码库既有方案（ExtractDialog 已用）：弹窗占满视口高度、表格内部滚动、分页固定底部可见，满足「一屏显示」诉求。\n- 并行任务 wt-bug6085 不触碰。\n\n## Relations\n- 属于 zhi3-web-admin-h5-g 的房地产监管模块（见 zhi3_regulatory_module）。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/前端项目/zhi3_regulatory_module.md",
+                "memory_type": "entities",
+                "before": "# 房地产监管后台前端模块\n\nzhi3-web-admin-h5-g 中的房地产监管模块，包含监管机构管理、主账户管理、监督开户确认、监管账户四个子模块。\n\n## 模块结构\n- 监管机构管理：列表含机构编码、机构名称、统一社会信用代码、行政区划编码、机构类型、负责人。\n- 监督开户确认：列表数据含 ZHKH260910002、苏州绿地、云来客栈、福福客栈 等。\n- 主账户管理、监管账户为另两个子模块，菜单树中并列展示。\n\n## 路由结构\n- 监管机构管理：列表 /regulatorOrg，详情 /regulatorOrg/:tableid，新增跳转 /regulatorOrg/add?formMode=add，正常。\n- 主账户管理：列表 /mainAccount，详情 /mainAccount/:tableid（动态段匹配 add），新增正常。\n- 监管账户：列表 /regulatoryAccountNew，详情 /regulatoryAccountNew/:tableid，2026-11-03 因 SYS_PROJECT_MENU 缺失关联记录导致路由未注册，已补录修复。\n- 监督开户确认（监管协议）：列表 /superviseAgreementNew，详情 /superviseAgreementNew/:tableid，同上修复。\n\n## E2E 测试配置\n- 管理员账号（zsbase）密码：`ZS001Aa!`（.env.e2e.example 中的值；初始化 SQL 常量 ZS0001Aa! 已过期）。\n- 登录辅助：auth-helpers.js 提供 loginAsAdmin、fetchLoginCaptcha、resolveRoutePath、gotoPageByFilePath。\n- E2E 框架：Playwright 1.62.1，含 form-helpers.js 的 pickSelectOption 封装。\n\n## 验证与归属\n- 2026-11-02 浏览器 UI 实测四个子模块菜单注册与列表渲染 9/9 通过，新增机构落库成功；2026-11-03 修复 DETAIL_COL_FULL 导入缺失及监管账户与监管协议详情路由未注册问题（SYS_PROJECT_MENU 补录），4 个模块新增流程全部跑通。\n- 所属项目：zhi3-web-admin-h5-g。\n\n## 已知缺陷与修复\n- bug#6084（禅道，2026-11-03 上报）：监管账户开户页「选择开户网点」弹窗（BranchOneDialog.vue）分页「共85条记录」与翻页未在一屏显示，需滚动才能看到。弹窗经路由 /spfzjjg/zjjg/ACCOUNT_OPEN/account/add 进入 supervision/agreement/account/detail.vue，由 openUnionBankBranchSelect 打开。\n- 根因：Playwright 登录测试站点 58.210.252.230:9002（zsbase/ZS001Aa!，算术验证码）复现确认，弹窗 body scrollHeight 741 > clientHeight 591，分页条被推到滚动区下方不可见；接口返回 total=85、rows=10，分页元素已渲染只是被滚动遮挡，非 total=0。\n- 修复：worktree wt-bug6084 中，BranchOneDialog.vue 新增 tableScroll 布尔属性（默认 false，避免影响 7+ 共用页面）并透传至 zs-select-dialog 的 table-scroll；unionBankBranch.js 转发 options.tableScroll；agreement/account/detail.vue 与 regulatoryAccountNew/detail.vue 的 showVisionOfBank 调用传入 tableScroll:true。\n- table-scroll 为代码库既有方案（ExtractDialog 已用）：弹窗占满视口高度、表格内部滚动、分页固定底部可见，满足「一屏显示」诉求。并行任务 wt-bug6085 不触碰。",
+                "after": "# 房地产监管后台前端模块\n\nzhi3-web-admin-h5-g 中的房地产监管模块，包含监管机构管理、主账户管理、监督开户确认、监管账户四个子模块。\n\n## 模块结构\n- 监管机构管理：列表含机构编码、机构名称、统一社会信用代码、行政区划编码、机构类型、负责人。\n- 监督开户确认：列表数据含 ZHKH260910002、苏州绿地、云来客栈、福福客栈 等。\n- 主账户管理、监管账户为另两个子模块，菜单树中并列展示。\n\n## 路由结构\n- 监管机构管理：列表 /regulatorOrg，详情 /regulatorOrg/:tableid，新增跳转 /regulatorOrg/add?formMode=add，正常。\n- 主账户管理：列表 /mainAccount，详情 /mainAccount/:tableid（动态段匹配 add），新增正常。\n- 监管账户：列表 /regulatoryAccountNew，详情 /regulatoryAccountNew/:tableid，2026-11-03 因 SYS_PROJECT_MENU 缺失关联记录导致路由未注册，已补录修复。\n- 监督开户确认（监管协议）：列表 /superviseAgreementNew，详情 /superviseAgreementNew/:tableid，同上修复。\n\n## E2E 测试配置\n- 管理员账号（zsbase）密码：`ZS001Aa!`（.env.e2e.example 中的值；初始化 SQL 常量 ZS0001Aa! 已过期）。\n- 登录辅助：auth-helpers.js 提供 loginAsAdmin、fetchLoginCaptcha、resolveRoutePath、gotoPageByFilePath。\n- E2E 框架：Playwright 1.62.1，含 form-helpers.js 的 pickSelectOption 封装。\n\n## 验证与归属\n- 2026-11-02 浏览器 UI 实测四个子模块菜单注册与列表渲染 9/9 通过，新增机构落库成功；2026-11-03 修复 DETAIL_COL_FULL 导入缺失及监管账户与监管协议详情路由未注册问题（SYS_PROJECT_MENU 补录），4 个模块新增流程全部跑通。\n- 所属项目：zhi3-web-admin-h5-g。\n\n## 已知缺陷与修复\n- 详见独立实体 bug_6084：监管账户开户页「选择开户网点」弹窗分页被滚动遮挡，已记录根因与修复方案。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

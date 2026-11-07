@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793668817929/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T01:23:23.976803+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_skeleton_pattern.md",
+                "memory_type": "entities",
+                "after": "# 公共门户二级页骨架屏\n门户对外首页（UnifiedLogin + publicPortal）为约 24 个二级页提供加载骨架，核心是单组件 `PortalSkeleton.vue` 按真实版式输出占位，落地 15 种版式（列表类、公告正文、汇总、合同查询、楼幢/楼盘表网格、机构/经纪人基本信息等）。\n\n## 架构要点\n- `PortalSkeleton.vue` 按真实版式输出占位，已落地 15 种版式\n- `PortalDialogHost.vue` 复用 `@/utils/loading.js` 最短展示 600ms，递增 token 丢弃被后一次切换覆盖的异步等待\n- 叠加打开的详情弹窗不应再次触发二级页骨架屏\n\n## 验收标准\n- 同视口（如 1920×1080）逐页比对骨架与真实页总高度，目标误差约 ≤3px\n- `tests/e2e/public-portal-skeleton.spec.ts` 4 项用例全部通过（版式归属、直刷二级路由不出现首页骨架、高度一致、下钻切换版式、详情弹窗不重复加载）\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/components/PortalSkeleton.vue、zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue、zhi2-web-admin/src/utils/loading.js、zhi2-web-admin/tests/e2e/public-portal-skeleton.spec.ts\n- 所属项目：门户；来源会话 ID：session_8fedec701ebfbbfa2d3c0a93a4c98a27；代码基线：dfee5a6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_route_skeleton.md",
+                "memory_type": "entities",
+                "after": "# 门户直刷二级路由跳过首页骨架\n用户直接刷新带门户查询参数的 URL（如 `?portal=projects`）时，不应先闪对外首页骨架再进入二级页。\n\n## 做法\n- 抽出 `portalRoutes.js` 集中二级页标题/路由表\n- `UnifiedLogin.vue` 在初始路由已指向二级页时跳过首页级骨架\n- `PortalDialogHost` 只展示与该 `portal` 值匹配的二级页骨架版式\n- 改二级页清单或直链入口时须同时核对路由解析与 skeleton 版式映射\n\n## 验证与归属\n- 验证：portalRoutes.js（新文件）+ UnifiedLogin.vue 首页在路由本身就是二级页时跳过首页骨架屏，直接刷新 `?portal=projects` 只看到该页对应的二级页骨架屏\n- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/portalRoutes.js、zhi2-web-admin/src/views/home/UnifiedLogin.vue、zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue\n- 所属项目：门户；来源会话 ID：session_8fedec701ebfbbfa2d3c0a93a4c98a27；代码基线：dfee5a6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_banner_bug.md",
+                "memory_type": "entities",
+                "after": "# 门户 banner 骨架高度差弹跳修复\n二级页顶部城市 banner 骨架若同时挂 `portal-skeleton-bar` 与 `portal-banner-skeleton`，后者先设 `position: absolute`，但全局 `.portal-skeleton-bar { position: relative; height: 22px }` 会覆盖绝对定位，骨架落入文档流（约 22px 块叠在 165px 图下 → 总高 187px），骨架消失后回到 165px，标题栏上移出现缝隙。\n\n## 修复\n- 在 `portal.scss` 中于 `.portal-skeleton-bar` 规则之后增加更高优先级选择器：`.portal-city-banner-box .portal-banner-skeleton { position: absolute; inset: 0; height: auto; border-radius: 0; }`\n- 使加载前后 banner 区高度一致，避免揭开时跳版\n\n## 验证与归属\n- 验证：修复前 bannerH 187 → 165；修复后加载中与加载完成一致\n- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/portal.scss、zhi2-web-admin/src/views/home/publicPortal/components/PortalSkeleton.vue\n- 所属项目：门户；来源会话 ID：01a1626e-5d09-70c5-a400-7518fbdd30f5；代码基线：fd9ef3e"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/二级页骨架屏范围.md",
+                "memory_type": "preferences",
+                "after": "- 公共门户二级页骨架屏范围：仅「将来会动态拉数」的区域需要占位（表格 tbody、表单字段值区、二级页面顶部图片等）\n- 搜索条件、表头等静态结构不要套骨架，否则噪音大且与产品预期不符\n- 首页级骨架屏策略单独维护，调整二级页骨架时不要误改首页骨架\n- 表格/表单区若接口未接好导致看不到骨架，应检查加载态是否绑在数据区组件上而非整页\n- 验证：只有将来需要动态获取数据的位置才需要加骨架屏；首页骨架屏不需要调整；表格和表单数据将来从接口获取，这一块加上；搜索条件、表格表头不需要加；二级页面顶部图片也要纳入骨架屏，不然页面会有弹跳\n- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/components/PortalSkeleton.vue、PortalTable.vue、pages/InformationPages.vue、pages/RentalPages.vue；所属项目：门户；来源会话 ID：01a1626e-5d09-70c5-a400-7518fbdd30f5；代码基线：fd9ef3e"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

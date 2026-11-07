@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_089",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T10:51:11.789715+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/std_approval_key.md",
+                "memory_type": "entities",
+                "after": "# 审批key从flowViewer响应动态获取（std-evaluation）\n在标准化评价E2E审批中，ApprovalInfoDto的key必须是当前实例待办节点id，从flowViewer响应里取completed:false节点的id，禁止硬编码。\n\n## 背景与约束\n- Flowable流程版本id与任务节点id均为运行时生成，环境重建或流程版本变更后硬编码立即失效，失败表现为审批无反应或报节点不存在\n- 审批key须与当前实例待办节点对应，任何写死的值只是「这次能用」\n\n## 正确做法\n- 审批前调 POST /v2.0/flowable/task/flowViewer {busCode, dataId} 获取节点列表\n- 从响应挑 completed:false 的节点取它的 id 作为 key，不要取第一个或固定index\n- 组装审批体 {dataId, busCode, key, approveResults:'1', approveMessage}（approveResults:'1'为同意）\n- 用例断言真实 0→1→2 流转，不用mock节点id\n- 取key逻辑封装进公共库 e2e/std-evaluation/lib/std-eval-lib.cjs 供所有审批动作共用\n\n## 验证与归属\n- 来源会话 d38c482b-a854-4693-99d7-ccd429f31165（基线05caac8）用户诉求3\n- 涉及文件 e2e/std-evaluation/lib/std-eval-lib.cjs、e2e/std-evaluation/cases/01-standard-crud.cjs"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/std_dto_fields.md",
+                "memory_type": "entities",
+                "after": "# 提交与审批DTO主键字段差异及busCode来源（std-evaluation）\n提交接口用SubmitInfoDto.id、审批接口用ApprovalInfoDto.dataId，两者字段名不同且busCode/key仅在前端拼装，后端仓库无硬编码。\n\n## 问题现象\n- 调提交接口报主键为空（1105类），因提交用id、审批用dataId混用\n- busCode与key在后端仓库内搜不到，只查后端会误判「字段不可能有值」\n\n## 根因\n- 同一提交流程拆两套DTO是Flowable通用封装历史设计，字段名不一致但接口路径相同（/{module}/{business}/submit|approval）\n- busCode/key由页面运行时拼出（flowApi.buildBusinessApi与route.meta.submitApi兜底），后端自然无硬编码\n\n## 排查与做法\n- 分清两套DTO：提交 {id, deptId, busCode, key, ...}，审批 {dataId, busCode, key, approveResults, approveMessage}\n- busCode/key找不到时去前端 zhi2-web-admin/src/api/evaluation/*.js 与 views，或读 src/utils/flowApi.js 的 buildBusinessApi\n- 本页面传 moduleName:'evaluation'、businessName:'rectification' → 实际路径 POST /v2.0/evaluation/rectification/submit 与 /approval\n- 报错先确认提交还是审批接口再对字段名；字段映射写进E2E公共库避免重踩\n\n## 验证与归属\n- 来源会话 d38c482b（基线05caac8）用户诉求2、4\n- 涉及文件 e2e/std-evaluation/lib/std-eval-lib.cjs、zhi2-web-admin/src/utils/flowApi.js、zhi2-web-admin/src/views/evaluation/stdEvaluation/rectification/detail.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/std_wiring_audit.md",
+                "memory_type": "entities",
+                "after": "# 提交/审批接线判定须沿调用链核查（std-evaluation）\n不能因模块api文件无submit/approval方法就判定功能未接线，实际走通用OperationBtnGroup + flowApi.buildBusinessApi拼接路径。\n\n## 错误结论与纠正\n- 审计曾据 rectificationApi 无submit/approval方法得出D8「前端未接提交/审批」，被lead逐行核对源码推翻\n- 真实链路：提交/审批走通用组件 OperationBtnGroup（ZsSubmit/zs-approval）+ flowApi.buildBusinessApi，各模块api文件仅封装业务数据接口\n\n## 正确判定链\n- 沿调用链查：组件(OperationBtnGroup) → 路径拼接(flowApi.buildBusinessApi/route.meta.submitApi) → 页面传参(moduleName/businessName) → 后端@PostMapping，四处对上才算通\n- 报告分「已接线」与「封装风格不一致」两栏，别混成缺陷\n- 列表页无提交/审批按钮非缺陷（本项目约定详情页做提交审批）\n- 真实前端缺口单独列（本次4个整改操作+1个生成入口未接线）\n\n## 审计留痕\n- 结论被挑战时逐行核对源码+controller，改正文档（只改文档用例未重跑），做「原结论/实际/处理」对照表\n- rectificationApi 全仓库无人import，9个方法死代码；页面走listMixins/detailMixins通用封装\n\n## 验证与归属\n- 来源会话 d38c482b（基线05caac8）用户诉求4\n- 涉及文件 OperationBtnGroup/index.vue、flowApi.js、detail.vue、docs/std-evaluation/api-map-check.md"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/std_button_permission.md",
+                "memory_type": "entities",
+                "after": "# 按钮权限走zs-button:permission而非v-hasPermi（std-evaluation）\n本项目前端按钮权限用zs-button的:permission属性经checkPermission/hasPermission校验，后端stdEvaluation包@PreAuthorize实测0命中。\n\n## 错误推论与事实\n- 审计用grep v-hasPermi得「按钮无权限控制」(D9前端)被纠正：项目用组件prop+自研checkPermission，非Vue指令\n- 后端stdEvaluation包15个Controller @PreAuthorize实测0命中是真实事实，但须表述为「接口层无鉴权，仅靠菜单隐藏+网关token」\n\n## 正确检测方式\n- 判断按钮权限先读zs-button的permission prop与checkPermission实现，再grep permission=/:permission，勿grep v-hasPermi\n- 权限串统一 moduleName:businessName:action（如 evaluation:rectification:submit）\n- OperationBtnGroup逐按钮校验 module:business:action\n\n## 报告与补鉴权\n- 报告分「前端有控制」「后端无鉴权」两节，不合成一句\n- 前端按钮隐藏不能替代后端鉴权，结论写「渲染层已控制，但不能替代后端鉴权」\n- 提后端补鉴权附Controller清单与实测0命中检索证据\n\n## 验证与归属\n- 来源会话 d38c482b（基线05caac8）最终结论核对表D9\n- 涉及文件 zs-button.vue、OperationBtnGroup/index.vue、docs/std-evaluation/api-map-check.md"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

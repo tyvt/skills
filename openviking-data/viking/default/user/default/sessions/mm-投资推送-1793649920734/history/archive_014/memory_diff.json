@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-投资推送-1793649920734/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T20:25:51.682388+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/宽基回测向量化掩码优化.md",
+                "memory_type": "entities",
+                "after": "# 宽基回测向量化掩码优化\n回测中将对每行调用 evaluate_cn_broad_buy 的 iterrows 标量评估改为 vectorized_cn_broad_buy_mask 向量化掩码。\n\n## 问题背景\n- 回测若对每行调用 evaluate_cn_broad_buy（iterrows），全量回测可达百秒级（约 194s）\n\n## 优化方案\n- 实现 vectorized_cn_broad_buy_mask，回测路径设 buy_only=True 跳过卖出评估\n- 图表侧用 build_daily_table_range 批量建表\n- 向量化结果须与标量逻辑做全量行对行校验（约 16582 行）后再替换\n\n## 验证与归属\n- 验证证据：回测全套 194s→74s；已做 16582 行全量校验\n- 涉及文件：backtest_buy_signals.py、cn_broad_signal.py、backtest_trade_signals.py\n- 所属项目：投资推送；来源会话ID：17bbafc8-a23f-4d2e-9dc4-3980f571ac77"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/买入金额排名重复计算与磁盘缓存优化.md",
+                "memory_type": "entities",
+                "after": "# 买入金额排名重复计算与磁盘缓存优化\n全量报告慢的主因之一是各指数/图表重复触发收益率排名，通过并行预加载与落盘缓存修复。\n\n## 问题背景\n- 各指数/图表重复触发收益率排名（单次约 25s，红利+宽基可各占 ~173s）\n- 组合模式下 get_chart_buy_amount 重复触发排名\n\n## 修复方案\n- 并行预加载面板、排名结果落盘 cache/ranking_allocation.json（数据未变则秒级命中）\n- config 侧对 get_cn_broad_signal_config 使用 lru_cache\n- 修复组合模式下 get_chart_buy_amount 重复触发排名的问题\n- 数据更新后需跑 sync_data_cache.py 刷新排名缓存\n\n## 验证与归属\n- 验证证据：优化后报告冷启动 ~26s、缓存命中 ~8s\n- 涉及文件：buy_amount_ranking.py、config.py、report.py、data_cache.py、sync_data_cache.py\n- 所属项目：投资推送；来源会话ID：17bbafc8-a23f-4d2e-9dc4-3980f571ac77, 28c65c3e-a410-4135-a663-7a2b650b4170"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/本地报告与微信推送脚本分离约定.md",
+                "memory_type": "entities",
+                "after": "# 本地报告与微信推送脚本分离约定\n投资推送项目将本地看报告与微信推送脚本分离，职责清晰划分。\n\n## 职责划分\n- core.py：本地看报告，默认不推送，须具备 if __name__ == \"__main__\" 入口（仅作模块库时 IDE 直接运行无输出）\n- push.py：生成报告并走 Server酱，供定时任务；推送行为统一为仅显式 --push 时才推送\n- notify.py：承载推送实现\n\n## 验证与归属\n- 验证证据：用户「推送解耦」「运行 core.py 没有输出」；结论表 core.py / push.py / notify.py 职责划分\n- 涉及文件：core.py、push.py、notify.py、run_report.bat、run_push.bat\n- 所属项目：投资推送；来源会话ID：44ec2513-8219-4016-9443-488909474cfe, ed0c79a0-7954-45ec-a6e8-6498987b7dc4"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/投资推送连续买卖信号阈值展示.md",
+                "memory_type": "preferences",
+                "after": "- 买入/卖出条件可能连续多日成立，推送或回测 markdown 不能只写「满足买入」而不给出当日可操作的数字\n- 应在报告中列出触发所依据的阈值与实际读数（利差、PB 分位、股债利差等），便于用户区分「仍满足」与「已临界」，并核对是否与 config 一致\n- 验证证据：用户诉求「满足买入和卖出条件的，也要标出什么数字可以买或者卖，因为会有多天连续的买入或者卖出」\n- 涉及文件：backtest_buy_signals.py、logs/backtest/；所属项目：投资推送；来源会话ID：802ca60b-38e3-47fa-af25-da9516660471"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

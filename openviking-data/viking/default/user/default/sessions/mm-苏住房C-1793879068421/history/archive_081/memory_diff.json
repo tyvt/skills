@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_081",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T15:51:30.434650+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/http_noreject_fix.md",
+                "memory_type": "entities",
+                "after": "# 房源核验网络错误提示修复\n苏住房C小程序二手房房源发布校验时接口成功但页面误报\"网络错误，请稍后再试\"，已修复 HTTP 拦截器配置。\n\n## 问题根因\n- 接口外层 code: 200 表示成功，但业务层 code: 500（message: \"核验失败...\"）表示核验失败\n- secondVerifyLogVerify 配置了 noReject: true，希望由页面自行处理业务错误\n- v1Instance.js 未开启 supportNoReject: true，导致 noReject 配置未生效\n- 拦截器把 code: 500 当成请求失败，且内层响应用 message 而非 msg，最终 fallback 成通用提示\n- verification.vue 已写好 code == 500 跳转核验失败页的逻辑，但从未被执行到\n\n## 修复内容\n- v1Instance.js 补充 supportNoReject: true（与 V2 的 api/index.js 保持一致）\n- 使 noReject: true 生效，页面可拿到业务错误并自行跳转核验失败页展示具体原因\n\n## 涉及文件与归属\n- 涉及文件：src/api/httpInstance.js（v1Instance.js）、verification.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：df98a5b7-7af2-4775-8bc5-f19612418dfd；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/phone_linkify_fix.md",
+                "memory_type": "entities",
+                "after": "# 房源核验记录编号误显蓝色链接修复\n苏住房C小程序房源核验失败页记录编号被误识别为电话号码显示为蓝色可点击，已通过正则加数字边界修复。\n\n## 问题根因\n- 核验失败页通过 ZsRichText 渲染接口返回的错误信息\n- formatRichTextContent 调用 linkifyPhoneNumbersInHtml 将文本数字自动转成蓝色可点击电话链接\n- 原正则包含 \\d{8}（任意 8 位连续数字），记录编号 202607220192 等长数字串会被误识别为电话号码\n\n## 修复内容\n- 在 zhi2-mobile-shimin/src/utils/index.js 的电话号码正则前后增加数字边界判断 (?<!\\d) 和 (?!\\d)\n- 只匹配独立出现的电话号码，不再匹配更长数字串的一部分\n- 记录编号 202607220192 恢复为普通灰色文本，真实手机号、固话仍可正常识别点击拨打\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：zhi2-mobile-shimin/src/utils/index.js、publishStatus.vue、verification.vue\n- 来源会话ID：971ae865-b9cb-40f4-b093-4ddfce0be730；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/housevideo_search_fix.md",
+                "memory_type": "entities",
+                "after": "# 视频看房搜索框被覆盖修复\n苏住房C小程序「视频看房」页面搜索框被 z-paging 遮挡，已通过将搜索框移入 #top 插槽修复。\n\n## 问题根因\n- ZsSearch 放在 z-paging 外面\n- z-paging 默认全屏固定定位，会盖住上方的搜索框，导致搜索栏不可见\n\n## 修复内容\n- 参考同项目 goodProject/index.vue，将搜索框移到 z-paging 的 #top 插槽\n- 列表组件正确预留顶部区域，搜索框正常显示在列表上方\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：zhi2-mobile-shimin/src/pages_transaction/houseVideo/index.vue、goodProject/index.vue\n- 来源会话ID：4c88e3b6-b478-4a11-8f21-8050ecd743a5；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/option_vote_blank_fix.md",
+                "memory_type": "entities",
+                "before": "# 选项表决我的决策页空白修复\n苏住房C小程序选项表决「我的决策」页因未同步数据补全逻辑显示空白，已参照选举页补齐。\n\n## 问题根因\n- 选项表决（OPTION）走 optional/DecisionResult.vue，原实现较简单\n- 直接用 detail.decisionResponseId 取记录 ID，字段缺失时决策详情链接无效\n- 列表只用 el.decisionPlayerName，接口未返回时仅剩时间戳\n- 未像选举页调用 getAppRecordDetail / getDecisionRecordDetail 补全详情\n- optional/detail.vue 因 CardList/CardCell 在微信小程序分包中渲染异常，仅显示标题不显示内容\n- selectOptdec 只解构 rows，接口返回 data 数组时拿不到选项列表\n- voteStore 缓存匹配问题：从决策详情跳转时可能读取到其他记录缓存\n\n## 修复内容\n- optional/DecisionResult.vue 增加 pickResponseId、fetchRecordDetail、enrichRecordList，正确解析 recordId 补全决策人、选项摘要，onShow 刷新数据，跳转详情写入缓存，跳转前补充写入 decisionPlayerName、summary 保证详情页显示决策人\n- optional/DecisionRecord.vue 从缓存+详情接口补全决策人、签字、时间，selectOptdec 无数据时回退 optionList\n- optional/detail.vue 改为与 common/DecisionRecord.vue 相同的 view/text 模板结构确保小程序稳定渲染，兼容 rows/data 两种接口返回格式，优化缓存读取逻辑优先匹配当前 recordId，增加 summary 字段作为决策内容兜底\n\n## 涉及文件与归属\n- 涉及文件：optional/DecisionResult.vue、optional/DecisionRecord.vue、optional/detail.vue、common/DecisionRecord.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：2d84eea4-83d0-4cd8-82b5-903f4772c353、e45253dc-68ce-40ba-b3ff-5949e2df65d4；代码基线：none",
+                "after": "# 选项表决我的决策页空白修复\n苏住房C小程序选项表决「我的决策」页因未同步数据补全逻辑显示空白，已参照选举页补齐。\n\n## 问题根因\n- 选项表决（OPTION）走 optional/DecisionResult.vue，原实现较简单\n- 直接用 detail.decisionResponseId 取记录 ID，字段缺失时决策详情链接无效\n- 列表只用 el.decisionPlayerName，接口未返回时仅剩时间戳\n- 未像选举页调用 getAppRecordDetail / getDecisionRecordDetail 补全详情\n- optional/detail.vue 因 CardList/CardCell 在微信小程序分包中渲染异常，仅显示标题不显示内容\n- selectOptdec 只解构 rows，接口返回 data 数组时拿不到选项列表\n- voteStore 缓存匹配问题：从决策详情跳转时可能读取到其他记录缓存\n\n## 修复内容\n- optional/DecisionResult.vue 增加 pickResponseId、fetchRecordDetail、enrichRecordList，正确解析 recordId 补全决策人、选项摘要，onShow 刷新数据，跳转详情写入缓存，跳转前补充写入 decisionPlayerName、summary 保证详情页显示决策人\n- optional/DecisionRecord.vue 从缓存+详情接口补全决策人、签字、时间，selectOptdec 无数据时回退 optionList\n- optional/detail.vue 改为与 common/DecisionRecord.vue 相同的 view/text 模板结构确保小程序稳定渲染，兼容 rows/data 两种接口返回格式，优化缓存读取逻辑优先匹配当前 recordId，增加 summary 字段作为决策内容兜底\n- goLatestDetail 跳转前将摘要、签字、时间等写入 voteStore 和本地缓存\n- detail.vue 补齐与 DecisionRecord.vue 一致的数据加载逻辑，支持三级回退：1. selectOptdec 接口返回的选项列表 2. getAppRecordDetail / getDecisionRecordDetail 的 optionList 3. 缓存中的 value 摘要（按、拆分展示）\n- detail.vue 新增「决策信息」卡片展示决策人、签字、决策时间\n\n## 涉及文件与归属\n- 涉及文件：optional/DecisionResult.vue、optional/DecisionRecord.vue、optional/detail.vue、common/DecisionRecord.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：2d84eea4-83d0-4cd8-82b5-903f4772c353、e45253dc-68ce-40ba-b3ff-5949e2df65d4、30045e67-bafd-468a-a56a-1f3d2ed7b2fe；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/optional_result_layout.md",
+                "memory_type": "entities",
+                "before": "# 选项表决决策结果页（optional）布局修复\n苏住房C小程序修复 optional/DecisionResult.vue 的两个布局问题，对齐已修好的 common/DecisionResult.vue 实现。\n\n## 空白与签字问题\n- 原因：签字用 CardCell 包裹 ZsImage 无固定尺寸，且只取 signature 未兼容 sign 字段\n- 修复：签字区改为 cell-item + sign-picture-wrap（153×68px）+ mode=\"aspectFit\"\n- 签字取值兼容：recordDetail.signature || recordDetail.sign || detail.signature || detail.sign\n- 「决策详情」从整行 CardCell 改为决策内容下方的紧凑链接行\n\n## 按钮溢出问题\n- 原因：BackBtn 自带 margin: 20px 叠加固定底栏后按钮偏右溢出，且缺少 block 属性\n- 修复：按钮加 block 属性；底栏容器加 padding: 18px 16（原文截断）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：src/pages_vote/decision/optional/DecisionResult.vue、src/pages_vote/decision/common/DecisionResult.vue\n- 来源会话ID：55bd76cb-6679-4d29-9b33-6cebc5d1203e；代码基线：none",
+                "after": "# 选项表决决策结果页（optional）布局修复\n苏住房C小程序修复 optional/DecisionResult.vue 的两个布局问题，对齐已修好的 common/DecisionResult.vue 实现。\n\n## 空白与签字问题\n- 原因：签字用 CardCell 包裹 ZsImage 无固定尺寸，且只取 signature 未兼容 sign 字段\n- 修复：签字区改为 cell-item + sign-picture-wrap（153×68px）+ mode=\"aspectFit\"\n- 签字取值兼容：recordDetail.signature || recordDetail.sign || detail.signature || detail.sign\n- 「决策详情」从整行 CardCell 改为决策内容下方的紧凑链接行\n- 决策摘要与「决策详情 >」调整为同一行左右对齐：左侧决策选项摘要，右侧决策详情入口\n\n## 按钮溢出问题\n- 原因：BackBtn 自带 margin: 20px 叠加固定底栏后按钮偏右溢出，且缺少 block 属性\n- 修复：按钮加 block 属性；底栏容器加 padding: 18px 16（原文截断）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：src/pages_vote/decision/optional/DecisionResult.vue、src/pages_vote/decision/common/DecisionResult.vue\n- 来源会话ID：55bd76cb-6679-4d29-9b33-6cebc5d1203e、30045e67-bafd-468a-a56a-1f3d2ed7b2fe；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

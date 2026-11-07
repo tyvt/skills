@@ -1,0 +1,60 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-6a13b9f0-a4a7-4ae8-9bd0-e671bffb4e49/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T01:31:21.785084+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/D--repository------C-/memories/events/2026/11/03/防汛后端服务启动.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-03，service-expand 服务启动完成，监听端口 9610，启动耗时 32 秒，无报错，随后开始后端 Flood 接口联调。\n# 2026-11-03 (Tuesday) ChatLog:\n**assistant [peer=D--repository------C-]**: 服务已经连上 Nacos，正在启动。等它启动完成。\n**assistant [peer=D--repository------C-]**: `service-expand` 已启动，监听端口 9610，启动耗时 32 秒，没有报错。\n\n现在开始联调。先确认前端实际调用了哪些接口，避免盲目测试。"
+            },
+            {
+                "uri": "viking://user/default/peers/D--repository------C-/memories/events/2026/11/03/联调确认真实数据.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-03，后端 Flood 接口联调确认存在真实数据：事件 2 条、检查单 9 条、抢险 3 条、隐患 30 条；此前 patrol 查不到数据是因找错了服务。\n# 2026-11-03 (Tuesday) ChatLog:\n**assistant [peer=D--repository------C-]**: **重大进展**：这套接口确实有真实数据（事件 2、检查单 9、抢险 3、隐患 30）。之前 `patrol` 查不到数据，是因为找错了服务。\n\n23 个通过，5 个有问题。逐个分析：\n\n| 接口 | 现象 | 判断 |\n|---|---|---|\n| `event/options?inspectionStage=pre` | 未知的检查单类型：pre | **我用错了参数值** |\n| `inspection/template?...stage=pre` | 同上 | 同上 |\n| `plan/complexPage` | 服务器异常 | **URL 拼错**（两个 `?`） |\n| `eventChange/1`、`plan/xxx` | 不存在 | **ID 传错**（我猜的） |\n\n先查清真实枚举值。"
+            },
+            {
+                "uri": "viking://user/default/peers/D--repository------C-/memories/events/2026/11/03/服务注册环境不一致发现.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-03，发现 zhi2-property 使用 dev profile 注册到 nacos.dev.zhi.com，而 service-expand 与 common-framework 使用 test profile 注册到 nacos.test.zhi.com，两者分属不同 Nacos 互相不可见，导致 Feign 调用失败。\n# 2026-11-03 (Tuesday) ChatLog:\n**assistant [peer=D--repository------C-]**: **根因明确了**：\n\n- `zhi2-property` 的 profile 是 **dev**，注册到 `nacos.dev.zhi.com`，有 3 个实例：其中包含本机 `192.168.1.129`。\n- `service-expand` 的 profile 是 **test**，注册到 `nacos.test.zhi.com`，而它的 Feign 要调用的 `zhi2-property` **没有注册在 test 上**。\n\n两个服务查询的是**不同的 Nacos 服务器**，所以互相看不见对方。`service-expand` 在 `nacos.test.zhi.com` 查 `zhi2-property`，只能找到一条错误的 `172.10.1.2` 实例。\n\n确认 `service-expand` 的配置。"
+            },
+            {
+                "uri": "viking://user/default/peers/D--repository------C-/memories/events/2026/11/03/统一服务环境决定.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-03，用户决定将在 test 环境的 service-expand 与 common-framework 改为 dev 环境，以与 zhi2-property（dev）互通。\n# 2026-11-03 (Tuesday) ChatLog:\n**assistant [peer=D--repository------C-]**: 确认了这个不一致：**`zhi2-property` 使用 `dev`，其他两个使用 `test`**。三个服务分处两套 Nacos，Feign 调用必然失败。\n\n这是唯一需要你决定的地方。\n**assistant [peer=D--repository------C-]**: 按你的选择执行：把 `service-expand` 和 `common-framework` 改成 `dev`。\n\n先确认 dev 那套 Nacos 里这两个服务是否已有正常的注册配置。"
+            },
+            {
+                "uri": "viking://user/default/peers/D--repository------C-/memories/events/2026/11/03/服务环境切换重启.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-03，service-expand 与 common-framework 的 profile 改为 dev 并重启，两个服务均注册为本机 192.168.1.129，重新连入 nacos.dev.zhi.com。\n# 2026-11-03 (Tuesday) ChatLog:\n**assistant [peer=D--repository------C-]**: dev 那套上有必需的基础配置：`common-framework.yml`、`shared-druid.yml`、`application.yml` 都在；`service-expand.yml` 不存在，但 test 上也不存在，因为项目用的是默认配置。\n\n现在修改这两个服务的 profile。\n**assistant [peer=D--repository------C-]**: profile 已经改成 dev。需要重启这两个服务，新配置才会生效。\n**assistant [peer=D--repository------C-]**: 两个服务已启动，但注册信息里还看不到本机 `192.168.1.129`（显示的是 `192.168.1.116` 和 `172.10.1.1`，都是别人的）。等心跳刷新后再查。\n\n先确认服务确实启动成功。\n**assistant [peer=D--repository------C-]**: 两个服务都启动成功，并且注册为 `192.168.1.129`（本机）。现在重新运行联调脚本验证。"
+            },
+            {
+                "uri": "viking://user/default/peers/D--repository------C-/memories/events/2026/11/03/物业区域接口持续报错.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-03，环境统一后联调脚本仍 27 成功 1 失败，失败接口 plan/complexPage 报 404；Feign 调用 zhi2-property 的 notScopePage 仍失败，dev 环境 3 个实例直连均返回 200，根因截至会话结束仍在调查中。\n# 2026-11-03 (Tuesday) ChatLog:\n**assistant [peer=D--repository------C-]**: 结果仍是 27 个成功、1 个失败。需要确认这 1 个失败是否仍来自 `plan/complexPage`。\n**assistant [peer=D--repository------C-]**: 仍是同一个错误。现在两个服务都在 dev 了，所以我看一下最新的错误详情。\n**assistant [peer=D--repository------C-]**: **仍然是 404**，但现在情况正常：Feign 已能连到 `zhi2-property`，因为响应里的 `path` 就是请求的路径；问题在于 `zhi2-property` 上确实没有这个端点。\n\n奇怪的是我直连 `127.0.0.1:9604` 测过，返回 200。区别在于：Feign 带着 `Authorization` 请求头；直连测试时我只带了 `zhi-project-id`。\n\n接下来对比两种情况。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/服务/service_expand.md",
+                "memory_type": "entities",
+                "after": "# service-expand 防汛接口服务\n苏住房防汛 C 端（防汛巡检）的后端微服务，承载 Flood 全部接口，依赖 zhi2-property 的 Feign 接口。\n\n## Description\n- 服务名 service-expand，端口 9610，属苏住房物业系统多模块后端项目\n- 承载 Flood 全部 60 个 HTTP 接口，覆盖 7 个 Controller\n- 联调确认含真实数据：事件 2 条、检查单 9 条、抢险 3 条、隐患 30 条（2026-11-03）\n\n## Profile 与环境\n- 原 profile 为 test，注册到 nacos.test.zhi.com，与 zhi2-property（dev / nacos.dev.zhi.com）不在同一 Nacos，Feign 互不可见\n- 2026-11-03 用户决定将其与 common-framework 改为 dev，重启后注册为本机 192.168.1.129\n\n## 关键接口问题\n- plan/complexPage 经 Feign 调用 zhi2-property 的 remoteComplexService.notScopePage()，环境统一后仍报 404\n- dev 环境 3 个 zhi2-property 实例（192.168.1.129 / 172.10.1.1 / 192.168.1.116）直连均返回 200 且含数据\n- Feign 404 根因截至 2026-11-03 会话结束仍未定位，疑与请求头或实例路由有关\n\n## Relations\n- 依赖 zhi2-property（9604）的 Feign 接口 zhi2-property-api（ComplexApiImpl 实现 notScopePage）\n- 与 common-framework（9211）同为防汛 C 端后端依赖"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/苏住房防汛c端.md",
+                "memory_type": "entities",
+                "before": "# 苏住房防汛C端\n防汛巡检相关仓库（C端），含后端服务与前端 H5 部署。\n\n## Description\n- 仓库名为「苏住房防汛C端」，分支 master，无远程，首次提交 8311331\n- 包含后端服务 zhi2-property-server（端口9604）与 common-framework-server（端口9211）\n- 联调文档位于 docs/backend-integration.md 与 docs/backend-integration.mjs\n- 前端 H5 经本地 nginx 部署，站点配置 D:\nginx\\conf\\conf.d\flood-c-h5.conf，root 为 D:/repository/苏住房防汛C端/dist/build/h5\n\n## Key Facts\n- 登录鉴权需 AES 加密密码：AES/CBC/PKCS5Padding，KEY=`A-16-Byte-keyValA-16-Byte-keyVal`，IV=`A-16-Byte-String`\n- 内部 Feign 调用需带 `zhi-project-id` 请求头\n- `/v2.0/property/patrol/item/page` 联调时始终返回 total=0，疑似存在未公开多数据源切换逻辑（截至2026-11-03未定位）\n- 前端当前为 demo 数据模式（VITE_DATA_MODE=demo、VITE_API_BASE_URL 为空），页面数据均为前端内置模拟数据，未连接后端（截至2026-11-03）\n\n## Relations\n- 关联达梦数据库 schema：ZHISHU_PROPERTY 与 SERVICE_EXPAND 均有 T_PATROL_ITEM 表但结构不同\n- 与「昆山物管」站点曾因共用 nginx 8103 端口冲突，已将本站点迁至 8095 解决（2026-11-03）\n\n## 前端部署\n- 前端 H5 通过本地 nginx 部署，站点配置指向 `D:/repository/苏住房防汛C端/dist/build/h5`\n- 监听端口 8095（2026-11-03 由 8103 迁出并去掉 default_server，以避免抢占昆山物管 8103 请求）\n- 构建产物 38 个文件，最近构建于 2026-11-03 09:07:49\n- 站点返回 HTTP 200，页面标题为「苏住房防台防汛」，入口 JS 正常加载\n- 访问地址：http://192.168.1.129:8095/ 与 http://127.0.0.1:8095/\n- 本机回环与局域网 192.168.1.129 可访问；nginx 监听 8094-8103 端口段，本站点占 8095\n\n## 代码改动\n- 提交 d3c7440（2026-11-03）：修复详情页核验项标签折行，改动 src/styles/theme.css 第 188-193 行，将 .detail-row-label 由 flex:0 0 104px 改为内容自适应宽度 + nowrap + max-width:62% 省略号兜底",
+                "after": "# 苏住房防汛C端\n防汛巡检相关仓库（C端），含后端服务与前端 H5 部署。\n\n## Description\n- 仓库名为「苏住房防汛C端」，分支 master，无远程，首次提交 8311331\n- 包含后端服务 zhi2-property-server（端口9604）、common-framework-server（端口9211）与 service-expand（端口9610，防汛接口后端，承载全部 60 个 Flood 接口/7 个 Controller）\n- 联调文档位于 docs/backend-integration.md 与 docs/backend-integration.mjs\n- 前端 H5 经本地 nginx 部署，站点配置 D:\nginx\\conf\\conf.d\flood-c-h5.conf，root 为 D:/repository/苏住房防汛C端/dist/build/h5\n\n## Key Facts\n- 登录鉴权需 AES 加密密码：AES/CBC/PKCS5Padding，KEY=`A-16-Byte-keyValA-16-Byte-keyVal`，IV=`A-16-Byte-String`\n- 内部 Feign 调用需带 `zhi-project-id` 请求头\n- `/v2.0/property/patrol/item/page` 联调时始终返回 total=0，疑似存在未公开多数据源切换逻辑（截至2026-11-03未定位）\n- 前端当前为 demo 数据模式（VITE_DATA_MODE=demo、VITE_API_BASE_URL 为空），页面数据均为前端内置模拟数据，未连接后端（截至2026-11-03）\n- service-expand（端口9610）为防汛接口后端，2026-11-03 联调发现其原 profile 为 test（nacos.test.zhi.com），与 zhi2-property 的 dev（nacos.dev.zhi.com）不在同一 Nacos，Feign 互不可见；用户决定将其与 common-framework 改为 dev（2026-11-03）\n- plan/complexPage 接口经 Feign 调用 zhi2-property 的 notScopePage，环境统一后仍报 404；dev 环境 3 个 zhi2-property 实例直连均返回 200 且含数据，Feign 404 根因截至 2026-11-03 会话结束仍未定位\n\n## Relations\n- 关联达梦数据库 schema：ZHISHU_PROPERTY 与 SERVICE_EXPAND 均有 T_PATROL_ITEM 表但结构不同\n- 与「昆山物管」站点曾因共用 nginx 8103 端口冲突，已将本站点迁至 8095 解决（2026-11-03）\n\n## 前端部署\n- 前端 H5 通过本地 nginx 部署，站点配置指向 `D:/repository/苏住房防汛C端/dist/build/h5`\n- 监听端口 8095（2026-11-03 由 8103 迁出并去掉 default_server，以避免抢占昆山物管 8103 请求）\n- 构建产物 38 个文件，最近构建于 2026-11-03 09:07:49\n- 站点返回 HTTP 200，页面标题为「苏住房防台防汛」，入口 JS 正常加载\n- 访问地址：http://192.168.1.129:8095/ 与 http://127.0.0.1:8095/\n- 本机回环与局域网 192.168.1.129 可访问；nginx 监听 8094-8103 端口段，本站点占 8095\n\n## 代码改动\n- 提交 d3c7440（2026-11-03）：修复详情页核验项标签折行，改动 src/styles/theme.css 第 188-193 行，将 .detail-row-label 由 flex:0 0 104px 改为内容自适应宽度 + nowrap + max-width:62% 省略号兜底"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 7,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

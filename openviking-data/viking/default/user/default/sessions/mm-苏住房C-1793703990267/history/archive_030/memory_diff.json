@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_030",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:08:31.628682+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/szdjsbridge_cleanup.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C SZDJSBridge遗留逻辑清退\n苏住房C小程序由早期H5嵌入原生APP改造而来，需移除残留的SZDJSBridge及webkit/android分支，统一走appLogin。\n\n## 背景与原因\n- 苏住房C原为H5嵌入原生APP形态，残留苏周到SZDJSBridge(jsbridge-3.0.4.min.js)及webkit/android分支\n- 用户明确要求「现在是微信小程序，不需要了，移除相关逻辑」\n- 桥接代码注册在全局window与组件生命周期，不存在时会走进错误分支（登录不跳转、tab状态错乱、定位回退异常）\n\n## 代码清退落点（前端）\n- index.html删除SZDJSBridge脚本\n- utils/index.js的goMenu未登录统一跳PAGES.login，不再区分SZDJSBridge/webkit/android\n- utils/app.js移除backInfo、isNativeApp、device、clickEvent、face等原生桥接，只保留appLogin、getMap、toService、getLocation、openPDF\n- api/httpInstance.js的401统一调appLogin()\n\n## 页面与组件清退\n- 各tab组件去掉onShow里用backInfo同步原生tab的代码\n- pages/redirect/index.vue去掉backInfo()（该页是否整页删需先问用户）\n- unionBank.vue去掉webkit/android分支，统一定位或默认坐标\n\n## 待确认与结论\n- redirect深链中转页是否整页删除需用户确认\n- _Jiayuanqu旧版tab组件是否随之一并清理需确认，不要擅自删\n- 清理完成后同类改造：401/未登录一律收敛到appLogin()单一入口\n- 来源会话：1116fda6；代码基线：9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/propose_complexid_bug.md",
+                "memory_type": "entities",
+                "after": "# 业主倡议列表缺complexId报请求异常\n苏住房C小区管理→业主提倡页面因缺失complexId调用接口失败报「请求异常」，兄弟页正常，已修复。\n\n## 现象与根因\n- 首页→小区管理→业主提倡打开后提示「请求异常」，同模块其他页面正常\n- propose/index.vue调用的/autonomy/suggest/listByComplexIdAndStatus从接口名声明需要complexId，但只传suggestStatusFlag与initiatorIdNumber\n- 同模块StepPropose.vue传了complexId: userStore.project，decision/index.vue、elect/index.vue从URL读complexId，仅倡议列表两处都没做\n\n## 修复做法\n- 排查策略：同模块某页异常而兄弟页正常，先diff兄弟页请求参数，别先怀疑后端或登录态\n- 取值顺序固定为「URL query的complexId → userStore.project → 空字符串」，写成complexId.value || userStore.project || ''\n- menuRouteMap.js给3_0_3业主倡议、5_1_2倡议与响应菜单自动带当前小区ID\n- 仍报错再确认userStore.project是否有值（账号是否已绑定小区）\n\n## 验证与归属\n- 来源会话：0b18d994；代码基线：ce9e460\n- 涉及文件：propose/index.vue、api/autonomy.js、ownerCard/index.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/housecard_badge_bug.md",
+                "memory_type": "entities",
+                "after": "# houseCard徽章被type当开关致二手房缺徽章\n苏找房二手房Tab房源卡片缺「个人/中介」徽章，根因是houseCard把徽章显示条件写成type为空才渲染，而二手房必须传type=\"stock\"。\n\n## 现象与根因\n- 苏找房「二手房」Tab房源卡片缺少发布角色徽章，同页新房卡片正常\n- components/commonNew/houseCard.vue把徽章显示条件写成「type为空才渲染」\n- 苏找房二手房列表必须传type=\"stock\"区分房源形态与图片底部前缀，于是徽章被自己的形态参数关掉\n- type是「房源形态」而非「是否显示徽章」，两个语义挤在同一prop上\n- 同源项目（苏州房地产监测V3/泰兴小程序/苏住房G）此处写法已分叉，直接同步会带偏徽章逻辑\n\n## 修复做法\n- 徽章显示条件改为按房源形态白名单判定（type为空或type==='stock'都渲染发布角色徽章）\n- 个人=蓝、中介=橙，颜色绑定到发布角色字段而非写死\n- 更彻底收敛是把「是否显示徽章/是否显示前缀」拆成独立boolean prop（如showPublishRole）\n- 列表页传了type的场景（二手房、租房、新房）都要回归徽章与图片前缀\n\n## 验证与归属\n- 来源会话：2259f4fa；代码基线：5f0f4dc\n- 涉及文件：houseCard.vue、stockHouse/index.vue、Project_Suzhufang.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/housecard_showtypeprefix.md",
+                "memory_type": "entities",
+                "after": "# 卡片图片底部形态前缀条showTypePrefix\n苏找房二手房卡片图片底部「二手 | 📍 区域名」前缀条由showTypePrefix控制，需同时落地prop、模板渲染、列表页数据映射三段。\n\n## 需求与现象\n- 苏找房二手房卡片要在图片底部显示「二手 | 📍 区域名」前置说明条\n- 父组件Project_Suzhufang已传show-type-prefix但卡片上什么都没出现——只有开关没有渲染实现，开关空转\n\n## 展示约定\n- 图片容器底部叠绝对定位前缀条：「形态文字(二手/新房/租房) + 竖线 + 定位图标 + 地址文字」\n- 渲染由showTypePrefix prop单独控制，默认关，仅苏找房这类需区分形态的入口才开\n- 地址文字取值口径固定为「中介房源优先agentCompanyName，个人房源回退regionName」，不要反过来\n- 同一容器「热」推荐标用独立showHot prop控制，避免与形态前缀抢角落\n- 列表页负责把regionName/agentCompanyName映射到卡片数据，卡片本身不做字段兼容\n\n## 要点与验证\n- 新增展示开关必须同时落地「prop→模板渲染→列表页数据映射」三段，只传prop不实现渲染是最常见的静默无效\n- 来源会话：2259f4fa；代码基线：5f0f4dc\n- 涉及文件：houseCard.vue、stockHouse/index.vue、Project_Suzhufang.vue"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

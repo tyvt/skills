@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793668817929/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T01:47:57.360985+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_home_index_wrapper.md",
+                "memory_type": "entities",
+                "after": "# 门户首页 index-wrapper 路由与挂载\n门户首页 `/index` 经 index-wrapper.vue 按 localStorage.cwzxt 在 index-new.vue 与 index-bak.vue 间分流，设计以 index-new 为准。\n\n## 路由与挂载规则\n- `/index` 指向 `index-wrapper.vue`，无 `localStorage.cwzxt` 时挂载 `index-new.vue`（业务中心/常用功能/待办/公告）\n- 存在 `cwzxt` 时改用财务专用 `index-bak.vue`\n- 设计还原与首页改版以 `index-new.vue` 为准，勿误改已废弃的 `index.vue`\n\n## 数据与权限\n- 业务中心数据可由 `/portal/home/functions` 覆盖默认 `DEFAULT_BUSINESS_FLOWS`\n- 板块显隐受权限 `portal:bizSection:{functionCode}` 控制\n\n## 验证与归属\n- 验证证据：探索结论写明「当前生产路由指向新版首页 index-new.vue」；index-wrapper 按 cwzxt 在 index-bak 与 index-new 间分流\n- 涉及文件：zhi2-web-admin/src/router/index.js、zhi2-web-admin/src/views/home/index-wrapper.vue、zhi2-web-admin/src/views/home/index-new.vue、zhi2-web-admin/src/api/portal/home.js\n- 所属项目：门户；来源会话：ef134e9f-783a-4c4b-b2ef-c977bdfedeb4；代码基线：04586c4"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_column_width.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column 测宽自适应列宽\nzs-table-column 按 canvas 测宽：<280px 输出固定 width，否则输出 min-width 作弹性列，页面层不写列宽。\n\n## 实现规则\n- 测算结果 < SHORT_COLUMN_FIX_THRESHOLD（门户首页待办改造时为 280px）时输出固定 `width`，不参与 zs-table `fit` 的剩余宽度放大\n- 测算较大（主题/任务名等，上限仍 500）时输出 `min-width` 作为弹性列吸收剩余宽度\n- 页面层（如 HomeTodoTable）应去掉列上的 width/min-width，操作列交给 zs-operate-column 按按钮文案测算\n\n## 调整原则\n- 微调分配效果优先改公共组件阈值，不要在业务页再写列宽\n\n## 验证与归属\n- 验证证据：用户要求「不要写任何宽度，直接组件内部计算」；最终实现为 zs-table-column 增强 + HomeTodoTable 去掉全部列宽\n- 涉及文件：zhi2-web-admin/src/views/home/components/HomeTodoTable.vue、zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、zhi2-web-admin/src/components/zs-table/zs-table.vue\n- 所属项目：门户；来源会话：fd264e18-0e1a-4414-bf35-742d17d79c11；代码基线：b84b4e7"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_menu_notopen_intercept.md",
+                "memory_type": "entities",
+                "after": "# 门户存量房菜单暂未开放拦截\nUnifiedLogin 对未上线菜单项加 `notOpen: true`，点击时提示「暂未开放」并阻止进入二级页面，三处入口统一拦截。\n\n## 实现规则\n- 菜单配置对未上线项加 `notOpen: true`（保留原 path，开放时去掉标记即可恢复跳转）\n- `handleMenuClick` 在 `openPortal` 前判断 notOpen，命中则 `this.$message.warning('「xx」暂未开放，敬请期待')` 并 return\n- 须同步透传到 `getMenuChildren` 预览映射与 `getMenuMoreItems`，并在 `handleMenuMoreSelect` 做同样早返回，防止「更多」弹窗或接口配置绕过\n\n## 验证与归属\n- E2E 对这类项应断言出现 `.el-message` 且 `.public-portal-screen` 不存在\n- 验证证据：用户诉求「点了先提示暂未开放，不要进入二级页面」；结论列出 4 项存量房菜单加 notOpen 及三处拦截 + spec 调整\n- 涉及文件：zhi2-web-admin/src/views/home/UnifiedLogin.vue、zhi2-web-admin/tests/e2e/public-portal-interactions.spec.ts\n- 所属项目：门户；来源会话：session_189d43301512159d00ca913b34ce741d；代码基线：dfee5a6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_rental_photo_fallback.md",
+                "memory_type": "entities",
+                "after": "# 门户住房租赁人员弹窗证件照兜底\npublicPortal 的 RentalDetailDialog 基本信息区 102×128 证件照位按多字段读取，失败展示 empty.svg。\n\n## 实现规则\n- URL 按多候选读取：`photo` / `photoUrl` / `avatar` / `headPortrait`\n- 无 URL 或 `@error` 加载失败时展示 `/assets/images/empty.svg`（项目「暂未上传图片」规范）\n- 切换人员或记录变更时重置加载失败状态\n- 专用占位图可放 `public/assets/images/` 并改组件内 DEFAULT_PERSON_PHOTO 常量\n\n## 验证与归属\n- mock 无真实照片时 E2E 可断言 src 含 empty.svg\n- 验证证据：截图标注「没照片放一张缺省图」；结论写明字段优先级、empty.svg 与 E2E 断言\n- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/components/RentalDetailDialog.vue、zhi2-web-admin/tests/e2e/public-portal-interactions.spec.ts、zhi2-web-admin/src/views/home/publicPortal/mock/rental.js\n- 所属项目：门户；来源会话：44666f5e-377b-4054-95b9-ebfb3f53c03e；代码基线：e1f8e0b"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

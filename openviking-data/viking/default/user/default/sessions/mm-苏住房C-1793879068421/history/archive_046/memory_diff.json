@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_046",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T14:09:50.446841+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/zsbutton_width_global_fix.md",
+                "memory_type": "entities",
+                "after": "# 按钮宽度全局修复\n苏住房C小程序因 ZsButton 默认 width:inherit 与 .long 写在 scoped 样式中，导致底部提交按钮过窄，已全局修复。\n\n## 问题根因\n- `ZsButton` 默认 `width: inherit`，在 `display:flex; align-items:center` 父容器中按钮收缩为文字宽度\n- `.long` 写在组件 scoped 样式中，父组件传入的 `class=\"long\"` 在小程序端无法命中 scoped 规则，`width:100%` 不生效\n\n## 修复内容\n- `ZsButton.vue` 移除 `width: inherit`，新增 `block` 属性绑定 `zs-button--block` 类\n- `ZsButton.vue` 将 `round` 属性绑定到 `zs-button--round` 类\n- `uni.scss` 全局增加 `.zs-button.long`、`.zs-button--block`、`.btn-container > .zs-button:only-child`、`.submit-button-wrapper > .zs-button` 的 `width:100%` 覆盖规则\n\n## 涉及文件\n- 涉及文件：`register.vue`、`ZsButton.vue`、`uni.scss`、`bindProject.vue`\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：76068bd5-64a1-4185-a1a3-b190ca34998b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/vote_relative_path_fix.md",
+                "memory_type": "entities",
+                "after": "# 投票表决相对路径跳转报错修复\n苏住房C小程序投票表决「参与决策」、业委会选举「参与选举」因相对路径跳转导致 navigateTo 找不到页面，已修复。\n\n## 问题根因\n- 代码使用相对路径跳转，如 `goto(`detail?id=${data.id}`)`，微信小程序 `navigateTo` 需完整路径（如 `/pages_vote/decision/detail?id=...`）\n- 相对路径 `detail?id=...` 被当成页面名，从而找不到页面\n- H5 环境可能正常，故只在小程序端暴露该问题\n\n## 修复方案\n- 在 `utils/index.js` 的 `openPage` 中增加 `resolveRelativePageUrl`，跳转前根据当前页面路由把相对路径解析为绝对路径\n- 示例：`detail?id=123`（当前在 `pages_vote/decision/index`）→ `/pages_vote/decision/detail?id=123`\n\n## 涉及文件\n- 涉及文件：`utils/index.js`、`route-map.js`、`pages.js`、`pages_vote/decision/index.vue`\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：010bdda8-aa5a-4e50-bc2e-6187b98c3ce5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/szf_image_blank_fix.md",
+                "memory_type": "entities",
+                "after": "# 苏找房列表图片空白修复\n苏住房C小程序苏找房列表图片无法访问时显示空白，因默认图分包路径错误与分包未预加载，已修复。\n\n## 问题根因\n- 默认图分包路径错误：`images/szf/default.png` 映射到 `pages_owner` 分包，而苏找房 Tab 在主包（`pages/index/project`），未加载 `pages_owner` 时回退图无法显示\n- 分包未预加载：苏找房 Tab 未预加载 `pages_transaction`，即使路径正确默认图也可能尚未下载\n\n## 修改内容\n- `utils/index.js`：将 `default.png` 从 `PAGES_OWNER_SZF_FILES` 移除，默认解析到 `pages_transaction`\n- `houseCard.vue`：指定 `subpackage=\"pages_transaction\"`，并过滤无效图片 URL（null、空字符串等）\n- `ZsImage.vue`：空/无效 `src` 直接显示默认图；加载失败时通过 `@error` 回退\n- `pages.json`：苏找房 Tab 预加载 `pages_tab` + `pages_transaction`\n\n## 涉及文件\n- 涉及文件：`utils/index.js`、`houseCard.vue`、`ZsImage.vue`、`pages.js`\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：2d0beecf-aa60-4c38-a236-78238bca1303"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/home_ui_three_fix.md",
+                "memory_type": "entities",
+                "after": "# 首页三处 UI 修复\n苏住房C小程序根据截图标注完成首页 3 处 UI 修复，修改 `Home_Suzhufang.vue` 与 `OnlineServiceGrid.vue`。\n\n## 搜索框渐变背景\n- `.search-strip` 从斜向纯色渐变改为纵向透明→蓝色渐变：`linear-gradient(180deg, rgba(19,84,190,0) 0%, rgba(85,131,208,0.75) 55%, rgb(19,84,190) 100%)`\n\n## 热门活动 Banner 间距\n- 图片 `mode` 从 `aspectFit` 改为 `aspectFill`，消除上下留白\n- 去掉 `.banner-img-wrap` 的灰色背景 `#eef2f8`\n- 增加 `line-height: 0` 消除图片底部空隙\n\n## 热点资讯与底部间距\n- 无数据时不渲染空白 `news-card`，避免热点资讯区域出现空白块\n\n## 涉及文件\n- 涉及文件：`Home_Suzhufang.vue`、`OnlineServiceGrid.vue`、`pages.json`、`home.vue`\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：f12bdce7-635e-42f0-b034-e806a17e8c7e"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

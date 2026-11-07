@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793713174058/history/archive_141",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T18:18:54.055192+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/home_samesite_bug.md",
+                "memory_type": "entities",
+                "after": "# 同站门户跳转缺陷（返回首页）\n顶栏「返回首页」跳同站点门户时，因使用 window.location.href 导致浏览器视为同页导航，表现为后退/无反应，需改用 replace 并同址时 reload。\n\n## 现象\n- 用户点击「返回首页」后仅浏览器后退，未重定向到配置的门户地址\n- 门户地址与当前访问地址同站点（如 unlimited.g.h5.admin.web）时必现\n\n## 根因\n- 原实现 `window.location.href = url` 在同站同址时被浏览器当作同页导航，地址栏不变、历史被压掉\n- 配置地址与当前地址相同（去 hash 后）时再次 assign 同样 URL 不会重新初始化\n\n## 修复方案\n- 改用 `window.location.replace(target)` 强制整页重定向且不留历史记录\n- 先去掉 hash 再比较目标与当前地址，避免同页不同锚点误判\n- 去 hash 后地址相同则直接 `location.reload()` 强制刷新\n- 取不到配置值回退管理端 `/index`，按钮不无响应\n- 门户地址配在系统参数设置，由后台库维护，前端只读；dev 即刻生效，dev/test 服务器需重新构建发布\n\n## 涉及文件与验证\n- 文件：Navbar.vue、src/api/system/config.js、detail.vue、env/.env.production\n- 来源会话：session-2e06934c-aa3c-4834-aec0-4710dafa1929（基线 c5d74f4）\n- 用户诉求：参数设置加门户地址、点击无效、需直接重定向"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/scrollbar_gutter_jitter.md",
+                "memory_type": "entities",
+                "after": "# 详情页表单抖动缺陷（滚动条槽位）\n项目变更详情页部分分辨率下表单持续抖动，根因是内滚容器滚动条槽位不稳定，用 scrollbar-gutter: stable 预留槽位修复。\n\n## 现象\n- 某些屏幕分辨率下表单内容反复上下跳动，换机器不复现\n- 仅当内容高度≈容器高度跨临界点时命中，表现为特定分辨率必现\n\n## 根因\n- 内滚动容器内容跨过滚动条出现/消失临界点，可用宽度变化引发重排抖动循环\n- 滚动条槽位（scrollbar gutter）不稳定导致宽度变化\n\n## 修复方案\n- 内滚容器加 `scrollbar-gutter: stable` 预留槽位，跨临界点时宽度不变\n- 改全局样式 `src/styles/index.scss` 而非逐页加，避免多页面各修\n- 排查「某些分辨率复现」抖动先怀疑滚动条槽位/容器高度，而非调间距\n- 改动聚焦：仅改 index.scss +9 行，按路径暂存，不夹带构建产物与临时脚本\n\n## 涉及文件与验证\n- 文件：src/styles/index.scss、src/views/building/projectChange/detail.vue\n- 来源会话：session-a760b8e9-9a10-4358-9ae7-6e1c8f2b10a9（基线 c5d74f4）\n- 提交：15523eab0 fix(detail) 仅改 index.scss +9 行，暂存纪律严格"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/git_push_verify.md",
+                "memory_type": "entities",
+                "after": "# Git 推送成功校验模式\n`git push` 返回 `Everything up-to-date` 不代表未推送，须用 `git ls-remote` 比对远程 ref 与本地 HEAD 确认。\n\n## 现象\n- 两仓库 `git push` 均返回 `Everything up-to-date`，易误判推送失败而重复操作\n- 实际远程已含本次提交，因钩子/同步通道在推送前已送达\n\n## 校验步骤\n- `git ls-remote` 取子模块与主仓远程 ref，与本地 HEAD 一致才算成功\n- 父仓 gitlink 核对：`git ls-tree HEAD zhi2-web-admin` 须等于子模块当前 HEAD\n- `git status -sb` 看 ahead/behind 为 `0 0` 确认无遗漏\n- 交付结论写具体命令与哈希，不写「已推送」\n\n## 涉及与验证\n- 会话 session-1f0a75c8-f454-4cb8-93f2-485ebf92d3b5（基线 a86bf95）企业资质附件改造推送\n- 远程校验：子模块 3343efea3、主仓 b44a496d8 与本地 HEAD 一致，gitlink 匹配\n- 涉及文件：CompanyRegisterSingleForm.vue、registerAppendixAdminType.js、vite.config.js"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/appendix_config_source.md",
+                "memory_type": "entities",
+                "after": "# 要件配置驱动真相源\n页面「要件上传」格子的定义不在前端代码，而在附件配置中心按 busCode 配置，前端仅读取渲染。\n\n## 链路\n- 配置维护：tool/fjflpz/index.vue 选 busCode，`/file/appendixConfig/page` 查配置\n- 单条定义：FjDialog.vue 含业务编码、是否必填、文件类型、大小限制等\n- 页面读取：详情页 AppendixPackageSection 传 `:bus-code` 取自路由 `meta.busCode`\n- 拉取接口：`/file/appendix/listAppendixPackage` 入参 `{busCode, busId}`\n- 必填校验：`checkRequiredAppendix` 按 `isRequired==='1'` 校验\n\n## 结论\n- 增减/改名/调整必填均在附件配置中心按 busCode 维护，无需改代码\n- 确认页面 busCode 查其菜单路由 meta.busCode（后端菜单管理配）\n\n## 涉及与验证\n- 会话 session-142446f5-2a07-4b22-8cc7-74b787304073（基线 235e6ee）用户问证书管理要件\n- 文件：fjflpz/index.vue、FjDialog.vue、AppendixPackageSection、utils/appendix.js、conLandLic/detail.vue"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_route_normalize.md",
+                "memory_type": "entities",
+                "before": "# 侧栏首页路径归一与精确匹配\n苏住房G项目中，侧栏「首页」报错未授权及高亮错乱，需统一首页路径为 /index 且菜单仅精确匹配。\n## 问题现象\n- 点侧栏首页提示「页面未授权或不存在」\n- 修复后首页不高亮，或切到别的菜单首页仍高亮\n## 根因\n- 后端菜单下发首页 path 可能带斜杠或不同写法，路由守卫兜底、侧栏跳转、首页识别函数各自比较字符串导致口径不一致\n- 仅归一「渲染出来的链接地址」不够：getLinkProps 用 canonicalizeHomePath 使 router-link 指向 /index，但 isItemActive/checkActiveByPath/hasActiveRoute 仍用未归一的 fullMenuPath（如 /index/home）与 $route.path（已是 /index）比较，永不相等，首页菜单不高亮（会话 ea05a521）\n- E2E 只断言 Tab 数量，未覆盖侧栏 active 样式，测试全绿也发现不了该问题\n## 解决方案\n- 抽公共归一函数 homeRoute，把首页统一成 /index，在一级叶子菜单点击、路由守卫兜底、首页识别三处共用\n- 侧栏高亮比较时对当前路由同样归一\n- 首页菜单只允许精确匹配，避免 /index/xxx 同级菜单误触发高亮\n- 修复方向：把「当前路径」与「菜单完整路径」都灌进同一个 canonicalizeHomePath 再比较，或在 getSidebarActivePath 里对门户首页路径统一 canonical，且该函数必须与 homeRoute.js 规则同源\n- isHomeMenuRoute 仅按子菜单 path 段判定、不校验父级链，若后端在 /system 下配 path:'index' 会把 /system/index 错误链到 /index；应补「完整路径为 /index、/index/home 或在 /index 树下」约束\n- permission.js 的 rewriteRoutes 过了 stripDuplicateHomeRoutes，而 sidebarRoutes 仍对原始 sdata 过滤，侧栏仍出现两个首页项，两处须用同一份去重\n- 内层叶子菜单 handleClick 直接 $router.push(menuItem.path)，未拼父路径也未 canonical，需补全\n## 验证与归属\n- 验证覆盖：进入首页高亮、切走后不再高亮\n- 涉及文件：router/index.js、utils/homeRoute.js、utils/permission.js、store\n- 所属项目：苏住房G；来源会话：cb0377ba-165d-4411-88e0-da19021618ab；代码基线：c17e4d8\n- 补充验证：会话 ea05a521-a616-40d9-b860-3870b34a52ab（基线 db4f82c）审查指出 getLinkProps 使用 canonicalizeHomePath 使 router-link 指向 /index，但 isItemActive/checkActiveByPath 仍用未归一的 fullMenuPath 导致侧栏首页不高亮；涉及文件新增 zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue",
+                "after": "# 侧栏首页路径归一与精确匹配\n苏住房G项目侧栏「首页」报错未授权及高亮错乱，需统一首页路径为 /index 且菜单仅精确匹配。\n\n## 现象\n- 点侧栏首页提示「页面未授权或不存在」\n- 修复后首页不高亮，或切到别的菜单首页仍高亮\n\n## 根因\n- 后端菜单首页 path 写法不一，路由守卫兜底、侧栏跳转、首页识别函数各自比较字符串口径不一致\n- getLinkProps 用 canonicalizeHomePath 使 router-link 指向 /index，但 isItemActive/checkActiveByPath/hasActiveRoute 仍用未归一的 fullMenuPath（如 /index/home）与 $route.path（/index）比较，永不相等致不高亮（会话 ea05a521）\n- E2E 只断言 Tab 数量，未覆盖侧栏 active 样式，测试全绿也发现不了\n- isHomeMenuRoute 仅按子菜单 path 段判定、不校验父级链，若后端在 /system 下配 path:'index' 会把 /system/index 错链到 /index；需补「完整路径为 /index、/index/home 或在 /index 树下」约束\n- permission.js 的 rewriteRoutes 过了 stripDuplicateHomeRoutes，而 sidebarRoutes 仍对原始 sdata 过滤，侧栏仍出现两个首页项，两处须用同一份去重\n- 内层叶子菜单 handleClick 直接 $router.push(menuItem.path)，未拼父路径也未 canonical，需补全\n\n## 解决方案\n- 抽公共归一函数 homeRoute，把首页统一成 /index，在一级叶子菜单点击、路由守卫兜底、首页识别三处共用\n- 侧栏高亮比较时对当前路由同样归一；首页菜单只允许精确匹配，避免 /index/xxx 同级误高亮\n- 把「当前路径」与「菜单完整路径」都灌进同一个 canonicalizeHomePath 再比较，或 getSidebarActivePath 对门户首页路径统一 canonical 且与 homeRoute.js 同源\n- 补 isHomeMenuRoute 完整路径约束；sidebarRoutes 与 rewriteRoutes 用同一去重；handleClick 补全父路径并 canonical\n\n## 验证与归属\n- 验证：进入首页高亮、切走后不再高亮\n- 涉及文件：router/index.js、utils/homeRoute.js、utils/permission.js、store、layout/components/Sidebar/RecursiveMenu.vue\n- 所属项目：苏住房G；来源会话 cb0377ba-165d-4411-88e0-da19021618ab（基线 c17e4d8）；补充会话 ea05a521-a616-40d9-b860-3870b34a52ab（基线 db4f82c）指出高亮根因"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

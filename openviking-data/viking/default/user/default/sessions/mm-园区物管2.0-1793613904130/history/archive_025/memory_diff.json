@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_025",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T11:09:59.908622+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/auth_scope_tree_required.md",
+                "memory_type": "entities",
+                "after": "# 用户详情授权范围树勾选必填校验\n园区物管2.0 中 system/user/detail.vue 通过 beforeSaveHook 与 getForm 空树保护实现 el-tree 授权范围至少勾选一个节点。\n\n## 问题背景\n- 授权范围是 el-tree 勾选，不是带 prop 的 el-form-item，无法单靠 rules 表达「至少勾选一个节点」\n- 普通文本/选择项必填仍优先 rules+prop；树/自定义控件无 prop 时用 beforeSaveHook 补校验（关联 #958）\n\n## 解决方案\n- 重写 beforeSaveHook：表单 rules 通过后、发保存请求前读取树勾选 keys，为空则 msgWarning「授权范围不能为空」并 return 阻止提交\n- getForm() 取勾选值时对 tree ref 做存在性判断，避免树未渲染时 getCheckedKeys 空引用报错\n\n## 验证与归属\n- 验证：会话 b62c693b 保存时要求授权范围非空，实现 beforeSaveHook 拦截未勾选并加固 getForm\n- 涉及文件：zhi2-web-admin/src/views/system/user/detail.vue、zhi2-web-admin/src/mixins/detailMixins.js、zhi2-web-admin/src/mixins/form.js\n- 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：b62c693b-964b-4ea2-85e8-10ced80ddbfd"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/org_verify_cascade_clear.md",
+                "memory_type": "entities",
+                "after": "# 自治用户授权组织核验失败级联清空\n园区物管2.0 中 autonomy/userAuth/detail.vue 在组织名称核验失败或切换业务类型时须级联清空组织与从属用户字段。\n\n## 问题根因\n- onOrganizationSelected 调 checkUserUnique 核验组织后，接口失败表单仍保留上一轮选择/回填，用户会误以为已核验通过\n- handleBusinessTypeChange 切换业务类型时也可能残留无效数据\n\n## 解决方案\n- catch 中不能只 toast：须调用 clearOrganizationFields() 统一清空组织名称、组织版本 ID、物业管理区域、登录名\n- 复用 clearMemberFields 清空姓名/性别/手机号等从属字段；切换业务类型也应走同一清空方法\n\n## 验证与归属\n- 验证：会话 04c36a87 核验失败与换组织失败均需在 catch 中清空组织及关联用户字段\n- 涉及文件：zhi2-web-admin/src/views/autonomy/userAuth/detail.vue\n- 所属项目：园区物管2.0；代码基线：5a288f142；来源会话：04c36a87-d4a7-48a6-bd8d-6bdcfbe29f08"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/select_dialog_b_extra.md",
+                "memory_type": "entities",
+                "after": "# B 端物业管理区域 SelectDialog extra 提示\n园区物管2.0 中 B 端（terminalType === 'B'）区域选择弹窗通过 SelectDialog.open 的 extra 与 extraLinks 提示开户与签协议。\n\n## 业务差异\n- 复刻 assetLeaseApply 到 assetsLeaseContractFiling 等区域选择时，B 端增加 extra 文案说明仅可选已开户且已签署公共收益监管协议的物业管理区域\n- extraLinks 提供「前往开户」「签署协议」跳转；非 B 端不传 extra，行为与原先一致\n\n## 架构约定\n- 与 SelectDialog.open 收口（#251/#284）配合：业务差异用 open 参数表达，不要各页再嵌一套弹窗模板\n\n## 验证与归属\n- 验证：会话 48461073 合同备案页区域弹窗按租赁申请页补齐 B 端 extra/extraLinks\n- 涉及文件：zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/detail.vue、zhi2-web-admin/src/views/benefit/assetLeaseApply/detail.vue\n- 所属项目：园区物管2.0；代码基线：7fe15a8cb；来源会话：48461073-b842-4049-8c74-3522cec9ab5b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_border_data.md",
+                "memory_type": "entities",
+                "after": "# 模板 :border=\"border\" 须在 data 定义 border\n园区物管2.0 中 el-table 等使用 :border=\"border\" 时若 data() 未声明 border 会触发 Vue 运行时警告。\n\n## 问题现象\n- 渲染期报 Property or method \"border\" is not defined\n- ScopeSelectDialog 漏定义即触发此类警告，属复制表格片段时常见遗漏\n\n## 解决方案\n- 项目内 OpenDetailTable、OwnerAddDialog 约定 data 里 border: true\n- 模板不要同时写静态 border 与 :border 重复；缺失时补 border: true 并去掉重复静态 border\n\n## 验证与归属\n- 验证：会话 024ea5fe ScopeSelectDialog.vue 第 18 行 :border=\"border\" 无 data.border，补 border: true 并去掉重复静态 border\n- 涉及文件：zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue\n- 所属项目：园区物管2.0；代码基线：177bc3ce4；来源会话：024ea5fe-fd81-439f-8f02-a139f7fd07d3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

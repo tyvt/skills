@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-i淮安公版-1793801808663/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T14:22:38.463400+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/house_id_source.md",
+                "memory_type": "entities",
+                "after": "# H5外链houseId来源修复\ni淮安公版 H5 外链或带参打开时，维修资金页因 currentHouse 为空一直走「请先选择房屋」，已统一 houseId 解析来源。\n\n## 问题根因\n- App.vue 第 52–56 行 H5 启动时仅将 URL 的 houseId 写入 userStore.houseId，未写入 houseStore.currentHouse。\n- 维修资金页原只认 useHouseStore.currentHouse 上的 houseId / id，外链或带参打开时 currentHouse 常为空，持续走「请先选择房屋」。\n\n## 修复方案\n- 增加 userStore.houseId 作为与 App.vue 一致的来源。\n- 增加 onLoad(options) 里的 options.houseId，避免站内 navigateTo(?houseId=) 时只靠 house store 仍拿不到。\n- 解析顺序：currentHouse.houseId → currentHouse.id → userStore.houseId → 路由参数 houseId，再判断是否为空。\n- 所属小区仍优先用 currentHouse.complexName；若只有 URL 的 houseId 而未在站内选过房，小区名可能为空，此为预期现象（接口仍会按 houseId 拉余额和 ad）。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=i淮安公版\n- 涉及文件：App.vue、src/pages_owner/maintain/index.vue、src/store/house.js\n- 所属项目：i淮安公版；来源会话 ID：6c60ae7e-b3c8-4c99-89c3-1566ac38e388；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/home_house_title.md",
+                "memory_type": "entities",
+                "after": "# 首页房屋标题改为houseList取值\ni淮安公版首页房屋标题与副标题改为从 userStore.houseList[0] 取 complexName 和 address，并保留兜底文案。\n\n## 修改内容\n- displayHouseTitle 改为从 userStore.houseList[0].complexName 取值。\n- displayHouseSubTitle 改为从 userStore.houseList[0].address 取值。\n- 均保留原兜底文案：「我的房屋」、「请选择房屋」。\n\n## 验证与归属\n- 已检查 lint，无新增报错。\n- 验证证据：extracted source=cursor project=i淮安公版\n- 涉及文件：src/pages/index/home.vue、src/App.vue、src/store/user.js\n- 所属项目：i淮安公版；来源会话 ID：888c04f6-7ea6-471f-a22f-fd6d92d637f3；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/decision_player_realname.md",
+                "memory_type": "entities",
+                "after": "# 决策提交人姓名统一用实名\ni淮安公版提交决策时 decisionPlayerName 统一改为用户实名 realName，展示页保持接口返回值。\n\n## 修改内容\n- src/store/user.js 新增 getter realName，对应实名姓名字段（username / data.realName）。\n- 以下 3 处提交逻辑全部改为 userStore.realName：src/pages_owner/decision/form.vue、src/pages_owner/elect/form.vue、src/pages_owner/decision/components/multiple/ViewOptionsList.vue。\n\n## 未改动范围\n- 展示页面（DecisionRecord.vue、DecisionResult.vue、ResultRecord.vue 等）仍使用接口返回的 detailInfo.decisionPlayerName / el.decisionPlayerName，展示已保存决策记录，不改为当前登录用户 store 值。\n- 配合此前 getUserInfo 修复（realName: data.realName），提交时 decisionPlayerName 会正确带上用户实名。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=i淮安公版\n- 涉及文件：src/store/user.js、src/pages_owner/decision/form.vue、src/pages_owner/elect/form.vue、src/pages_owner/decision/components/multiple/ViewOptionsList.vue\n- 所属项目：i淮安公版；来源会话 ID：b9a67129-a3c8-45ef-a049-365dbe342883；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/project_name_fix.md",
+                "memory_type": "entities",
+                "after": "# H5外链complexId缺projectName修复\ni淮安公版 H5 外链仅解析 complexId 未同步 projectName，导致资产公示、公共收益等页项目名显示为空，已修复。\n\n## 问题根因\n- H5 外链进入时只解析了 complexId，没有同步 projectName，依赖 userStore.projectName 的页面（如资产公示、公共收益等）项目名称显示为空。\n\n## 修复内容\n- 从 URL 解析项目名称：支持 name 和 complexName 两个参数名（兼容不同外链格式）。\n- 写入 store：解析到名称后设置 userStore.projectName。\n- API 兜底：URL 没有名称但有 token + complexId 时，调用 listComplexCommunitySubdistrictByToken 按 complexId 匹配并补全 projectName（与 benefit/index.vue 逻辑一致）。\n- 清空逻辑：无 complexId 时同时清空 project 和 projectName。\n- 外链 URL 示例：...?token=xxx&complexId=123&name=某某小区 或 ...?token=xxx&complexId=123&complexName=某某小区。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=i淮安公版\n- 涉及文件：App.vue、benefit/index.vue、assetsPublicity/index.vue、elevatorPubEngCons/index.vue、my.vue\n- 所属项目：i淮安公版；来源会话 ID：1f0e9970-bd03-4731-9554-11ef4c522ce2；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

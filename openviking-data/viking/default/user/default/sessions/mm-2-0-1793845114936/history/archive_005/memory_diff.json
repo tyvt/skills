@@ -1,0 +1,57 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793845114936/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T02:39:29.279171+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue_list_null_guard.md",
+                "memory_type": "entities",
+                "after": "# Vue 组件列表空值保护模式\n产品2.0 中 `HeadTitle` 等组件的列表元素可能为 `undefined`/`null`，直接访问 `item.value` 会报 `Cannot read properties of undefined (reading 'value')`，须加空值保护。\n\n## 问题根因\n- `this.list` 中存在 `undefined`/`null` 元素，计算属性 `this.list.filter((item) => item.value)` 与模板 `v-if=\"item.value\"` 直接访问属性导致 TypeError。\n\n## 解决方案\n- 模板中改为 `v-for=\"(item, index) in displayedList\" :key=\"index\" v-if=\"item && item.value\"`\n- 计算属性中改为 `const visibleItems = this.list.filter((item) => item && item.value)`\n- `showExpandButton` 等逻辑同样加 `item &&` 守卫。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=2-0\n- 涉及文件：zhi2-web-admin/src/components/HeadTitle/index.vue、row.vue\n- 所属项目：2-0（产品2.0）；来源会话ID：81bba5d5-8e98-492f-90aa-3fa01f341b6d；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/router_meta_safe.md",
+                "memory_type": "entities",
+                "before": "# Vue Router meta 安全访问模式\n产品2.0 在 Vue3 迁移中直接访问 `router.currentRoute.meta.xxx` 会抛 Cannot read properties of undefined，须先取 Ref 的 value 再安全访问。\n\n## 问题根因\n- Vue Router 4 中 `router.currentRoute` 是 Ref 对象，直接访问 `.meta.busCode`、`.query` 或 `.meta` 会因 undefined 触发 TypeError。\n- `OperationBtnGroup` 等组件直接读 `router.currentRoute.meta.busCode`，meta 未就绪或路由切换瞬间会报 `Cannot read properties of undefined (reading 'busCode')`，index.vue:140 报错。\n\n## 解决方案\n- 统一改为先取 `const current = router.currentRoute && router.currentRoute.value`，再读 `current.query`、`current.meta.busCode` 等。\n- 使用可选链 `current?.meta?.busCode` 做空值守卫消除异常。\n- 对同类 `this.$route.meta.xxx` 也做全局排查并改为安全访问（如 `this.$route?.meta?.busCode`）；用户要求全局修复类似问题。\n\n## 验证与归属\n- 验证证据：src=2-0/011.md；src=2-0/014.md；index.vue:140 报错。\n- 涉及文件：index.vue、@zhi2-web-admin/src/components/OperationBtnGroup/index.vue。\n- 所属项目：2-0（产品2.0）；来源会话ID：11afbbee-3388-4e8f-8411-f15186e36c48；58dcfdc3-e0eb-4a9d-a77c-6b00ecbf41cf；代码基线：none。\n- 全部改成安全访问后，`Cannot read properties of undefined (reading 'busCode')` 错误基本解决；建议多切路由、刷新页面、从登录页直接进详情页等场景验证控制台是否还有类似错误。",
+                "after": "# Vue Router 4 currentRoute 为 Ref 须取 value 安全访问\n产品2.0 在 Vue3 迁移中，Vue Router 4 的 `router.currentRoute` 是 Ref 对象，直接访问其属性（`.query`、`.meta`、`.params` 等）会因 undefined 触发 TypeError，须先取 `.value` 再安全访问。\n\n## 问题根因\n- Vue Router 4 中 `router.currentRoute` 是 Ref 对象，直接访问 `.meta.busCode`、`.query.formMode`、`.query` 等会因 undefined 触发 `Cannot read properties of undefined`。\n- `main.js` 全局 mixin 的 computed `formMode`/`currentRoute` 及 methods 直接读 `router.currentRoute.query.formMode`，导致报错。\n- `OperationBtnGroup` 组件本地 computed `formMode` 覆盖全局 mixin，且使用错误写法 `router.currentRoute.meta.busCode` 等。\n- `AppMain.vue` 中使用 `router.currentRoute.query.formMode` 报 undefined。\n- 路由切换瞬间或 meta 未就绪时易报错（如 index.vue:140 报 `reading 'busCode'`）。\n\n## 解决方案\n- 统一改为先取 `const current = router.currentRoute && router.currentRoute.value`，再读 `current.query`、`current.meta.busCode` 等。\n- 使用可选链 `current?.meta?.busCode` 做空值守卫消除异常。\n- 对同类 `this.$route.meta.xxx` 也做全局排查并改为安全访问（如 `this.$route?.meta?.busCode`）；用户要求全局修复类似问题。\n- 在 `src/main.js` 全局 mixin 中，computed 的 `currentRoute` 与 `formMode` 经 `router.currentRoute.value` 获取路由信息。\n\n## 验证与归属\n- 验证证据：src=2-0/011.md；src=2-0/014.md；src=2-0/013.md；main.js:80 formMode 报错；index.vue:140 报错；AppMain.vue 报错。\n- 涉及文件：\n  - zhi2-web-admin/src/main.js（全局 mixin）\n  - zhi2-web-admin/src/components/OperationBtnGroup/index.vue\n  - zhi2-web-admin/src/layout/components/AppMain.vue\n  - zhi2-web-admin/src/views/maintenance/depositNotice/company/components/index.vue\n  - zhi2-web-admin/src/views/maintenance/depositNotice/components/detail.vue\n  - 其他使用 `router.currentRoute.xxx` 的文件\n- 所属项目：2-0（产品2.0）\n- 来源会话ID：\n  - b6010e11-77ce-4a06-bc26-84bea5793888（main.js mixin 修复）\n  - 58dcfdc3-e0eb-4a9d-a77c-6b00ecbf41cf（OperationBtnGroup 等全局修正）\n  - 10b68c5e-e8dd-4ad6-b706-b4db9da0103d（AppMain.vue 改用 this.$route）\n  - 11afbbee-3388-4e8f-8411-f15186e36c48（meta 安全访问）\n- 代码基线：none\n- 全部改成安全访问后，错误基本解决；建议多切路由、刷新页面、从登录页直接进详情页等场景验证控制台是否还有类似错误。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue3_async_component.md",
+                "memory_type": "entities",
+                "before": "# Vue3 局部异步组件须用 defineAsyncComponent\nVue3 在 `components` 选项里直接写 `() => import(...)` 会把 Promise 当组件渲染，须改用 `defineAsyncComponent` 包裹。\n\n## 问题根因\n- 在 `components` 选项写 `Foo: () => import('...')`，Vue3 会把 Promise 当组件渲染，页面出现 `[object Promise]`（如 Settings、attachmentDraw 等）\n\n## 解决方案\n- `import { defineAsyncComponent } from 'vue'` 并写 `Foo: defineAsyncComponent(() => import('...'))`\n\n## 边界与归属\n- 路由表 `component: () => import(...)` 与 `store/modules/permission.js` 动态路由组件赋值保持原样，由 Vue Router 处理懒加载，不要套 defineAsyncComponent\n- 验证证据：会话 b06efc30 中 Settings 显示 [object Promise]，全局 20 个文件替换且明确未改 router/permission；另会话 d4e317f1 将在 views/home/index.vue、views/system/config/detail.vue 等文件的 components 选项内直接函数导入改写为 defineAsyncComponent 形式（src=2-0/009.md）\n- 涉及文件：zhi2-web-admin/src/layout/components/Settings/index.vue、zhi2-web-admin/src/components/OperationBtnGroup/attachmentDraw.vue、zhi2-web-admin/router/index.js、zhi2-web-admin/src/store/modules/permission.js、zhi2-web-admin/src/views/home/index.vue、zhi2-web-admin/src/views/system/config/detail.vue\n- 所属项目：2-0；来源会话：b06efc30-d150-4428-a1c0-f054d8e38798、d4e317f1-0c0f-4664-a597-3028cba67933；代码基线：none",
+                "after": "# Vue3 局部异步组件须用 defineAsyncComponent\nVue3 在 `components` 选项里直接写 `() => import(...)` 会把 Promise 当组件渲染，须改用 `defineAsyncComponent` 包裹。\n\n## 问题根因\n- 在 `components` 选项写 `Foo: () => import('...')`，Vue3 会把 Promise 当组件渲染，页面出现 `[object Promise]`（如 Settings、attachmentDraw、TagsView 等）\n\n## 解决方案\n- `import { defineAsyncComponent } from 'vue'` 并写 `Foo: defineAsyncComponent(() => import('...'))`\n\n## 边界与归属\n- 路由表 `component: () => import(...)` 与 `store/modules/permission.js` 动态路由组件赋值保持原样，由 Vue Router 处理懒加载，不要套 defineAsyncComponent\n- 验证证据：会话 b06efc30 中 Settings 显示 [object Promise]，全局 20 个文件替换且明确未改 router/permission；另会话 d4e317f1 将在 views/home/index.vue、views/system/config/detail.vue 等文件的 components 选项内直接函数导入改写为 defineAsyncComponent 形式（src=2-0/009.md）；会话 78c42ac6-3d01-4efb-aa4f-c62740fb9e52 中 TagsView/index.vue 的 ScrollPane、Hamburger 改用 defineAsyncComponent 解决 [object Promise]\n- 涉及文件：zhi2-web-admin/src/layout/components/Settings/index.vue、zhi2-web-admin/src/components/OperationBtnGroup/attachmentDraw.vue、zhi2-web-admin/router/index.js、zhi2-web-admin/src/store/modules/permission.js、zhi2-web-admin/src/views/home/index.vue、zhi2-web-admin/src/views/system/config/detail.vue、zhi2-web-admin/src/layout/components/TagsView/index.vue\n- 所属项目：2-0；来源会话：b06efc30-d150-4428-a1c0-f054d8e38798、d4e317f1-0c0f-4664-a597-3028cba67933、78c42ac6-3d01-4efb-aa4f-c62740fb9e52；代码基线：none"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/router_currentroute_ref.md",
+                "memory_type": "entities",
+                "deleted_content": "# Vue Router 4 全局 mixin 须用 currentRoute.value 访问\nzhi2-web-admin 在 Vue Router 4 下 router.currentRoute 是 Ref，直接读 query/formMode 会报 undefined。\n\n## 问题根因\n- main.js 全局 mixin 的 computed formMode/currentRoute 及 methods goBack、changeFormState 直接读 router.currentRoute.query.formMode\n- 因 router.currentRoute 是 Ref，直接访问 .query 得到 undefined，抛 Cannot read properties of undefined (reading 'formMode')\n\n## 解决方案\n- 先取 const current = router.currentRoute && router.currentRoute.value\n- 再读 current.query、current.path 等，并对 current 做空值守卫\n\n## 验证与归属\n- 验证证据：会话 b6010e11，main.js:80 formMode 报错，改为 currentRoute.value 后恢复\n- 涉及文件：zhi2-web-admin/src/main.js\n- 所属项目：2-0（产品2.0）；来源会话：b6010e11-77ce-4a06-bc26-84bea5793888；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue_router4_currentroute_ref.md",
+                "memory_type": "entities",
+                "deleted_content": "# 路由4中currentRoute为Ref须取value\nVue Router 4 中 router.currentRoute 为 Ref 对象，直接访问其属性会因 undefined 触发 TypeError。\n\n## 问题根因\n- router.currentRoute 是 Ref 而非普通对象\n- 直接访问 router.currentRoute.query.formMode 会因 undefined 触发 TypeError\n\n## 解决方案\n- 在 src/main.js 的全局 mixin 中，computed 的 currentRoute 与 formMode 需经 router.currentRoute.value 获取路由信息\n\n## 验证与归属\n- 验证证据：src=2-0/013.md\n- 涉及文件：src/main.js\n- 来源会话ID：b6010e11-77ce-4a06-bc26-84bea5793888\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue_router4_ref.md",
+                "memory_type": "entities",
+                "deleted_content": "# Vue Router 4 currentRoute 是 ref 而非路由对象\n在 Vue Router 4 中，`router.currentRoute` 是一个 `ref`，直接访问其属性会得到 `undefined`，需改用 `this.$route`。\n\n## 问题现象\n- 在 `AppMain.vue` 中使用 `router.currentRoute.query.formMode` 报 `undefined`，因 `currentRoute` 是 ref 而非路由对象。\n\n## 解决方案\n- 改用组件自带的 `this.$route` 访问路由信息，并加空值保护。\n- 避免在 `router.currentRoute` 上直接取 `.query` / `.params` 等属性。\n\n## 涉及文件\n- zhi2-web-admin/src/layout/components/AppMain.vue\n\n## 验证与归属\n- 所属项目：2-0；来源会话：10b68c5e-e8dd-4ad6-b706-b4db9da0103d\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/router4_currentroute_ref.md",
+                "memory_type": "entities",
+                "deleted_content": "# Vue Router4中currentRoute为ref非对象\nVue Router 4 中 router.currentRoute 是 ref 而非路由对象，直接访问 .query 得 undefined。\n\n## 问题根因\n- Vue Router 4 中 router.currentRoute 是 ref 而非路由对象\n- 直接访问 .query 得 undefined\n\n## 解决方案\n- AppMain.vue 改用组件内 this.$route 并加空值保护\n\n## 验证与归属\n- 涉及文件：AppMain.vue\n- 验证证据：extracted source=cursor session=10b68c5e-e8dd-4ad6-b706-b4db9da0103d\n- 来源会话ID：10b68c5e-e8dd-4ad6-b706-b4db9da0103d\n- 代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 2,
+        "total_deletes": 4,
+        "total_skipped": 0
+    }
+}

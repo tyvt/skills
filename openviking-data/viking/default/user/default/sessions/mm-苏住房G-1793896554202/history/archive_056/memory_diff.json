@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793896554202/history/archive_056",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T19:41:18.786703+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/monthly_report_monthvalue.md",
+                "memory_type": "entities",
+                "after": "# 月报统计合计列 monthValue 取值修复（苏住房G）\n苏住房G 月报统计详情页「合计」列已修复，正确解包 monthValue 显示数字。\n\n## 修复内容\n- `monthlyReport.js` 新增 `extractMonthValue(item)` 辅助函数：`return item?.monthValue ?? null`\n- `buildStatTableRows` 中对 `regionValues` 与 `total` 统一调用 `extractMonthValue` 解包，不再显示 `{\"monthValue\": 3}` 这类对象\n\n## 验证结果\n- 本地验证：`regionValues` 输出 `[1, 2]`，`total` 输出 `3`\n- 刷新月报统计详情页后「合计」列正常显示数字\n\n## 涉及文件与归属\n- 文件：`zhi2-web-admin/src/utils/monthlyReport.js`、`zhi2-web-admin/src/views/publicQuery/monthlyReport/detail.vue` 等\n- 所属项目：苏住房G；来源会话：697d27f0-7752-400c-9d86-9e7940bec722；验证证据：extracted source=cursor project=苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术修复/home_todo_decouple.md",
+                "memory_type": "entities",
+                "after": "# 关键数据区域切换不再刷新待办（苏住房G）\n苏住房G 首页 v2 已改动，切换关键数据区域时不再触发待办数据接口。\n\n## 改动内容\n- `index-v2.vue` 的 `onKeyRegionChange` 去掉 `loadTodoPanel()`，切换关键数据区域只刷新关键数据、公共收益、报修、学习园地\n- 待办与区域解耦：`loadTaskCounts` 改为 `getTaskCount({})`（不带 `regionCode`）；`loadTodoPanelList` 仅用 `{ pageNum: 1, pageSize: 4 }`\n- 两处加注释说明待办按用户维度、不随关键数据区域变化\n\n## 请求触发路径\n- 首次 `loadAll()`：`taskCount` + `todoTaskList`（无 `regionCode`）\n- 关键数据区域切换：无待办请求\n- 待办 Tab 切换：仅列表接口\n\n## 验证与归属\n- Vue 侧 review 结论 OK，当前文件无新 lint 问题；浏览器切换关键数据区域 Tab 时 Network 不应再出现 `taskCount` / `todoTaskList`\n- 所属项目：苏住房G；来源会话：9baedf91-d8d6-40c2-8e79-314e529e757a；验证证据：extracted source=cursor project=苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术修复/router_scroll_reset.md",
+                "memory_type": "entities",
+                "after": "# 路由切换重置主内容区滚动位置（苏住房G）\n苏住房G 已全局修复从详情页进入其他页面时主内容区滚动位置残留的问题。\n\n## 问题原因\n- Vue Router 虽配置 `scrollBehavior: () => ({ x: 0, y: 0 })`，但实际滚动容器为布局主内容区 `#app-main`（`AppMain.vue` 中 `overflow-y: auto`），而非 `window`\n- 从「物业管理区域查询」详情页（已向下滚动）进入「前期物业合同备案」或「物业合同备案」时，`#app-main` 保留原滚动位置，新页面从中间开始显示\n\n## 修复方案\n- 在 `router/index.js` 的 `afterEach` 守卫中每次路由切换后重置 `#app-main` 滚动位置：`mainEl.scrollTop = 0` 并 `window.scrollTo(0, 0)`\n\n## 涉及文件与归属\n- 文件：`zhi2-web-admin/src/router/index.js`、`zhi2-web-admin/src/layout/components/AppMain.vue`、`zhi2-web-admin/src/views/publicQuery/complex/index.vue` 等\n- 所属项目：苏住房G；来源会话：a1789e06-01db-41b3-b240-eb61d9addf8b；验证证据：extracted source=cursor project=苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术修复/home_v2_review.md",
+                "memory_type": "entities",
+                "after": "# 首页 v2 Vue 代码审查结论（苏住房G）\n苏住房G 首页 v2（`index-v2.vue` 及组件/导航/API）代码审查结论与遗留风险项。\n\n## 审查结论\n- Options API 与父子事件绑定整体正常\n- 需优先处理：`CheckDataNav` 里 `progressPct` 的 `console.log`；`index-v2` 中附件 `window.open`、消息 `msgUrl` 跳转的 URL 校验\n- 中等风险项：列表 `key`、字典竞态、图表 `watch`（上一轮已列明细）\n\n## Lint 情况\n- `npm run lint` 命令成功退出，但全量 `eslint src/**/*.{vue,js}` 在非本次范围文件上报既有 quotes/semi 问题，输出被 `head -40` 截断，未单独验证 home v2 文件是否零告警\n- 合入前门禁建议单独跑：`eslint src/views/home/**/*.{vue,js}`\n\n## 涉及文件与归属\n- 文件：`zhi2-web-admin/src/views/home/index-v2.vue`、`KeyDataNav.vue`、`CheckDataNav.vue`、`PublicBenefit.vue` 等\n- 所属项目：苏住房G；来源会话：a6d1b5a7-1983-49a4-8898-bb4bc9230465；验证证据：extracted source=cursor project=苏住房G"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

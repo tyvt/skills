@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793829535564/history/archive_012",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T22:45:14.577851+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/user_type_sidebar.md",
+                "memory_type": "entities",
+                "after": "# 侧栏按用户类型显隐逻辑\n门户登录后左侧菜单栏是否渲染由 `shouldShowLayoutSidebar` 控制，按用户类型（G 端管理端 vs B 端企业端）区分，而非仅超级管理员。\n\n## 逻辑说明\n- 布局里侧栏由 `showLayoutSidebar` 控制（layout/index.vue 中 `<sidebar v-if=\"showLayoutSidebar && ...\">`）。\n- 该 getter 来自 `shouldShowLayoutSidebar`，核心条件与顶栏「门户首页」隐藏逻辑相同，调用 `shouldPersistHideLayoutChrome(rootState)`。\n- 规则：仅管理端（G 端 / 超管）展示左侧菜单栏；B 端企业、经纪机构等不展示。超级管理员只是其中一种「始终显示」的情况。\n\n## 涉及文件\n- `zhi2-web-admin/src/layout/index.vue`\n- `zhi2-web-admin/src/utils/portalLayout.js`\n- `zhi2-web-admin/src/store/getters.js`\n\n## 验证与归属\n- 验证证据：cursor 提取\n- 所属项目：门户\n- 来源会话ID：92954991-a2a3-4de6-bff0-9d78b9e27081\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/suzhou_qr_dialog.md",
+                "memory_type": "entities",
+                "after": "# 苏周到扫码弹窗宽度审查\n苏周到扫码弹窗（SuzhouDaoQrLoginDialog）宽度调整审查结论为通过，登录轮询与关闭逻辑未改。\n\n## 审查结论\n- 去掉 `zs-size=\"mini\"`（616px）改为 `width=\"320px\"` 并配合 `::v-deep .el-dialog`，消除 240px 二维码两侧多余留白；登录轮询与关闭逻辑未改，未见功能性回归。\n- 仅两处 320px 重复声明、窄屏提示多行换行等 MEDIUM 维护性提示，不阻塞合并。\n- Lint：后台 `npm run lint` 以 exit 0 结束，但 ESLint 实际报约 3500 条问题（多为全仓 `semi`/`quotes` 风格项，脚本扫 `src/**/*` 而非单文件）；本次改动未单独做「仅该文件零报错」校验，建议合并前对该文件单独 `eslint src/views/login/SuzhouDaoQrLoginDialog.vue` 或按团队规范处理。\n\n## 涉及文件\n- `zhi2-web-admin/src/views/login/SuzhouDaoQrLoginDialog.vue`\n- `zhi2-web-admin/src/views/home/publicPortal/mock/properties.js`\n\n## 验证与归属\n- 验证证据：cursor 提取\n- 所属项目：门户\n- 来源会话ID：2b16ec8a-8acf-4c77-a414-b61a81601259\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/technical_pattern/sidebar_parent_hidden.md",
+                "memory_type": "entities",
+                "before": "# Sidebar Parent Hidden Not Traced\nSidebar child items incorrectly display when a parent Layout has hidden: true because visibility checks ignore ancestor hidden state.\n\n## Root Cause\n- `listRouters` child routes set `hidden: false` which conflicts with menu management hidden status.\n- `buildNavbarChildrenMenus` flattens children without tracing parent Layout `hidden: true`.\n- `isRouteHidden()` only evaluates the current node, not ancestor hidden flags.\n\n## Fix Points\n- Add parent-level `hidden` status judgment in `buildNavbarChildrenMenus` and `isRouteHidden()`.\n- Alternatively synchronize the `hidden` field on child nodes within `listRouters`.\n\n## Involved Files\n- `zhi2-web-admin/src/layout/components/Sidebar/index.vue`\n- `zhi2-web-admin/src/utils/menuVisibility.js`\n- `zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue`\n- `zhi2-web-admin/src/store/modules/permission.js`\n- `zhi2-web-admin/src/layout/components/Navbar.vue`\n- `zhi2-web-admin/src/api/portal/menu.js`\n- `zhi2-web-admin/src/layout/components/TagsView/index.vue`\n\n## Verification and Attribution\n- Validation evidence source: portal/027.md\n- Project: portal (门户)\n- Source session ID: 92104882-f56a-49cf-931b-814063421ad6\n- Code baseline: none",
+                "after": "# 侧栏父级隐藏未追溯导致子菜单误显\n当父级 Layout 设置 hidden: true 时，侧栏子项仍错误显示，因为可见性判断未追溯祖先隐藏状态。\n\n## 根因\n- `listRouters` 子路由设置 `hidden: false`，与菜单管理中的「隐藏」状态冲突（如「应用管理详情」父 Layout 为 hidden:true，子节点 application/:tableid 为 hidden:false，且 listRouters 未在子节点体现 hidden:true 或 visible:1）。\n- `buildNavbarChildrenMenus` 将 children 扁平化，未追溯父 Layout 的 hidden: true。\n- `isRouteHidden()` 仅判断当前节点，未判断祖先 hidden 标志。\n- 门户将大量菜单拆分为多个 `path: \"/\"` 的 Layout，侧栏实际使用扁平化后的 children；原逻辑只看子项是否 hidden，父已隐藏、子仍为 hidden:false 时（如「应用管理详情」因排在第一个常出现在侧栏最上方）仍会被推进侧栏列表。\n\n## 修复要点\n- 在 `buildNavbarChildrenMenus` 与 `isRouteHidden()` 中增加父级 hidden 状态判断。\n- 或在 `listRouters` 中同步子节点的 hidden 字段。\n\n## 涉及文件\n- `zhi2-web-admin/src/layout/components/Sidebar/index.vue`\n- `zhi2-web-admin/src/utils/menuVisibility.js`\n- `zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue`\n- `zhi2-web-admin/src/store/modules/permission.js`\n- `zhi2-web-admin/src/layout/components/Navbar.vue`\n- `zhi2-web-admin/src/api/portal/menu.js`\n- `zhi2-web-admin/src/layout/components/TagsView/index.vue`\n\n## 验证与归属\n- 验证证据来源：cursor 提取，portal/027.md\n- 所属项目：门户\n- 来源会话ID：92104882-f56a-49cf-931b-814063421ad6\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_layout_variant.md",
+                "memory_type": "entities",
+                "before": "# 首页三角色布局变体\n门户首页 index-new.vue 作为编排器，按 layoutVariant（admin/developer/broker）渲染不同角色布局，数据逻辑抽至 homeDataMixin.js。\n\n## 架构设计\n- index-new.vue 作为编排器，按 layoutVariant 字段分发渲染 admin/developer/broker 三种布局\n- 数据逻辑抽离至 homeDataMixin.js，布局配置集中在 homeLayout.js\n- 新增 HomeHeroBanner 等组件承载各角色区块\n\n## 涉及文件\n- zhi2-web-admin/src/views/home/index-new.vue\n- zhi2-web-admin/src/api/portal/home.js\n- zhi2-web-admin/src/views/home/mixins/homeDataMixin.js\n- zhi2-web-admin/src/views/home/config/homeLayout.js\n- zhi2-web-admin/src/views/home/components/HelloCard.vue\n- zhi2-web-admin/src/layout/components/Navbar.vue\n- zhi2-web-admin/src/store/modules/user.js\n- zhi2-web-admin/src/utils/terminalUser.js\n- zhi2-web-admin/src/views/home/index-wrapper.vue\n- zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts\n\n## 验证与归属\n- 验证证据：cursor 会话提取\n- 所属项目：门户；来源会话：6756ce12-ea8e-4edc-8e34-96c59e3ed137",
+                "after": "# 首页三角色布局变体\n门户首页 index-new.vue 作为编排器，按 layoutVariant（admin/developer/broker）渲染不同角色布局，数据逻辑抽至 homeDataMixin.js。\n\n## 架构设计\n- index-new.vue 作为编排器，按 layoutVariant 字段分发渲染 admin/developer/broker 三种布局\n- 数据逻辑抽离至 homeDataMixin.js，布局配置集中在 homeLayout.js\n- 新增 HomeHeroBanner 等组件承载各角色区块\n\n## 涉及文件\n- zhi2-web-admin/src/views/home/index-new.vue\n- zhi2-web-admin/src/api/portal/home.js\n- zhi2-web-admin/src/views/home/mixins/homeDataMixin.js\n- zhi2-web-admin/src/views/home/config/homeLayout.js\n- zhi2-web-admin/src/views/home/components/HelloCard.vue\n- zhi2-web-admin/src/layout/components/Navbar.vue\n- zhi2-web-admin/src/store/modules/user.js\n- zhi2-web-admin/src/utils/terminalUser.js\n- zhi2-web-admin/src/views/home/index-wrapper.vue\n- zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts\n\n## 验证与归属\n- 验证证据：cursor 会话提取\n- 所属项目：门户；来源会话：6756ce12-ea8e-4edc-8e34-96c59e3ed137\n\n## 首页布局审查结论（会话034544ce）\n- 首页已统一用 `businessFlows` 驱动 admin/侧栏布局，并移除 `BROKER_SECTION_CODES`。\n- listPerms 同时有商品房、存量房板块权限时，按顺序首行商品房、次行存量房，两者可同时展示（相对旧版经纪侧栏只显示二手/租赁、开发侧栏只显示商品房，为预期修复）。\n- `resolveHomeLayoutVariant` 不再根据「仅有二手/租赁板块权限」自动切到 broker 皮肤，broker/developer 主要看 roleKey。\n- 待确认 HIGH 项：若「只有二手权限、没有经纪 roleKey」的用户仍应看到经纪统计条，需补回基于 `bizSectionCodes` 的 fallback 或书面确认产品已改为「皮肤只看角色」。\n- 审查结论 BLOCK，待上述 HIGH 项与产品口径对齐后再合；其余为 MEDIUM（仅二手+租赁时排版与 admin 对齐、权限判定改进、`fetchStats` 时机等），无 CRITICAL 安全问题。\n- 涉及审查文件：home、homeDataMixin.js、HomeLayoutSidebar.vue、index-new.vue；来源会话ID：034544ce-33ea-4a3e-a159-062dba42270d"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

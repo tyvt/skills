@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_029",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:05:43.086710+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/miniprogram_card_spacing.md",
+                "memory_type": "entities",
+                "after": "# 小程序卡片间距双失效\n苏住房C 小程序多个 owner 页卡片区块上下间距为 0，根因是 flex gap 对自定义组件根节点支持不稳定，且排查时清掉了组件自带 margin，双通道同时断掉。\n\n## 问题现象\n- 企业信息页、合同页等 owner 页卡片区块上下间距为 0\n- 用户连续三轮反馈「还是没有间距」「缺少 10px 间距」\n- 父容器写了 flex+gap、子组件清过样式仍无视觉变化\n\n## 根因\n- 微信小程序对 flex gap 在自定义组件根节点（如 `<base-card>` 标签）支持不稳定，父容器 gap:10px 不生效\n- 排查时把 base-card 自带的 margin-top 一并清掉，gap 与 margin 两条通道同时断掉\n- 只补其中一条都会继续复现，是问题被反复打回的直接原因\n\n## 解决方案\n- 不依赖父级 flex/gap 给自定义组件间距\n- 页面模板给每个区块外包原生 `div.page-block`，用相邻兄弟选择器 `.page-block + .page-block { margin-top: 10px }`（值用 `$uni-spacing-row-base`）\n- margin 作用在原生 div 上，不经过组件边界，表现稳定\n- 选 page-block 方案后不再让子组件自带 margin-top，否则双份间距；两者必须二选一并在公共卡片组件注明\n\n## 验证与归属\n- 验证：会话 5ebe7a6f（2026-08-28，基线 8fc3cc5）三轮反馈后定位双根因，改原生 div.page-block 方案\n- 涉及文件：src/pages_owner/company/info/contracts.vue、index.vue、src/components/commonNew/baseCard.vue\n- 所属项目：苏住房C；来源会话ID：5ebe7a6f-b511-41ff-8030-0bf23da25e31；代码基线：8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/miniprogram_static_500.md",
+                "memory_type": "entities",
+                "after": "# 分包页面引用静态图 500 双根因\n苏住房C 小程序页面报本地图片资源 500，根因是相对路径被解析成分包路径且未在分包映射表登记，属文件缺失+路径错误双根因。\n\n## 问题现象\n- 页面报 `Failed to load local image resource /pages_main/static/svg/headphone.svg` 或 `/static/images/family-empty.png` 500\n- 图标/插图整块不显示，UI 看起来紊乱\n\n## 根因\n- 项目双份维护「主包 static + 分包 static」，由 utils 内「路径→允许分包列表」映射决定构建产物目录\n- 页面写 `../static/images/xxx.png` 相对路径，被解析成分包路径 `/<分包>/static/...` 但该目录无此文件\n- 资源只存在主包 src/static 但页面用分包内路径引用，构建时主包同名文件被裁剪，运行时 500\n- 属「文件缺失+路径错误」双根因，非 CDN 或网络问题\n\n## 解决方案\n- 需放分包内的资源，实际创建到 src/<分包>/static/... 并在 utils/index.js 映射表登记如 `'svg/headphone.svg': ['pages_main']`\n- 应走主包的资源，路径改主包格式（如 `images/family-empty.png`）交给 ZsImage，并在 mainStaticPaths.js 登记\n- 文件曾被重构提交删除的，从 git 历史恢复而不是另找图\n- 改完必须 npm run build 并核对 dist 下对应目录确有产物，再重新导入 dist（开发者工具「编译」不重跑构建）\n\n## 验证与归属\n- 验证：会话 e7e357b4（基线 6599714）AboutUs.vue 两 SVG 500，新增文件+登记修复；会话 4b96617b（基线 9832ba3）family/index.vue 相对路径 500，恢复文件+改主包路径修复\n- 涉及文件：src/utils/index.js、mainStaticPaths.js、pages_main/about/AboutUs.vue、pages_owner/family/index.vue、components/ZsImage/ZsImage.vue\n- 所属项目：苏住房C；来源会话ID：e7e357b4-638f-4ace-8ca0-7fa9ff707a43, 4b96617b-0fec-4c96-af40-e0ec9f6a6e13；代码基线：6599714/9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/miniprogram_zsmap_height.md",
+                "memory_type": "entities",
+                "after": "# ZsMap 标签样式不生效致地图高度塌陷\n苏住房C 新房详情页「项目周边」地图不显示，根因是 mergeVirtualHostAttributes:false 让标签 height 不透传，且隐藏态初始化，地图区域塌缩成 0 高。\n\n## 问题现象\n- 新房详情页「项目周边」地图不显示，控制台无报错，页面无任何地图区域\n- 整页用 v-show=\"showPage\" 控制，地图在隐藏态初始化也容易不渲染\n\n## 根因\n- manifest.json 中 mergeVirtualHostAttributes:false，写在自定义组件标签的 `<ZsMap style=\"height:200px\">` 不透传到内部真实 `<map>` 节点\n- ZsMap 内部只有 height:100%，父级无确定高度，地图区域塌缩成 0 高\n- 与泰兴端 virtualHost 关闭表现同源\n\n## 解决方案\n- ZsMap 新增 height prop，组件内 inheritAttrs:false 并把高度直接绑到内部 `<map>`\n- 页面用 map-container 固定 200px 高度，在「有经纬度且页面已显示」后 v-if 挂载\n- markers 赋值前把经纬度统一 Number 转换，脏字符串会让标记静默丢失\n- 通用结论：包装原生能力（map/canvas/video）的自定义组件，尺寸与属性都要用 prop + inheritAttrs:false 显式落到原生节点\n\n## 验证与归属\n- 验证：会话 f0892537（基线 4630e8e）「地图没显示」，改 height prop + inheritAttrs:false + v-if 挂载 + 经纬度转 Number 修复\n- 涉及文件：src/components/ZsMap/ZsMap.vue、pages_transaction/newHouse/detail.vue、pages_main/houseMap/houseMap.vue\n- 所属项目：苏住房C；来源会话ID：f0892537-a924-473d-9d3b-16bf6d6ea239；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/miniprogram_webview_sticky.md",
+                "memory_type": "entities",
+                "after": "# web-view 内 H5 吸顶偏移须为 0\n苏找房新房详情页 H5 嵌在三方小程序 web-view 内时 Tab 吸顶出现「穿屏」，根因是回退导航栏高度 40px 在 web-view 内凭空多出缝隙。\n\n## 问题现象\n- 滑动时详情户型/相册/周边吸顶 Tab 未贴顶，缝隙透出下面内容（穿屏）\n- 首次修复后仍复现，用户补充关键事实「作为 web-view 嵌入到三方小程序内部」\n\n## 根因\n- H5 运行在宿主小程序 web-view 中，顶部导航栏由宿主提供，H5 内无 uni-page-head（全局 navigationStyle:custom）\n- 上一版修复在「找不到导航栏」时回退 top:40px，仅独立 H5 成立；web-view 里凭空多 40px 缝隙\n\n## 解决方案\n- utils/index.js 增加 isMiniProgramWebView()（识别微信/支付宝 web-view，如 window.__wxjs_environment）与 getPageHeaderOffset()，web-view 内强制返回 0\n- 仅存在可见 uni-page-head 的独立 H5 才用导航栏高度\n- 页面 CSS 默认 top:0，删掉 40px 回退；加载时与 jweixin 注入后各校准一次吸顶偏移\n- Tab 锚点滚动 scrollTop 偏移改动态计算，不写死常量；排查时 web-view 内开 vConsole 打印环境确认宿主\n\n## 验证与归属\n- 验证：会话 7e811367（基线 d43894b）用户指 web-view 嵌入，新增 isMiniProgramWebView()/getPageHeaderOffset()，web-view 强制 top:0\n- 涉及文件：pages_transaction/newHouse/detail.vue、pages/commonNew/tabLine.vue、tabBtn.vue、utils/index.js\n- 所属项目：苏住房C；来源会话ID：7e811367-b5c4-4dfb-83e7-e8f29ef7909c；代码基线：d43894b"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

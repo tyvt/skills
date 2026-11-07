@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793836025594/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T23:59:51.015162+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/asset_panorama_bar_clip.md",
+                "memory_type": "entities",
+                "after": "# 资产全景页横向柱状图坐标轴裁切与纵向滚动缺失\n园区物管2.0 资产全景页（assetPanorama）横向条形图底部坐标轴被裁切且内容无法纵向滚动，已通过 ECharts grid 配置与布局裁切调整修复。\n## 问题根因\n- `grid.bottom` 仅 4px，数值轴刻度、轴线无足够空间，X 轴看不见\n- 原 `xAxis.axisLine.show: false` 轴线不画；`scale-clip` 与 `.chart-block__canvas` 均用 `overflow: hidden` 裁掉贴边坐标轴\n- `stage` 使用 `flex: 1` + `height: 100%` + `overflow: hidden`，高度锁在视口内，内容再高也撑不开滚动条\n## 解决方案\n- ECharts 横向条形图 `grid.bottom` 改为 32，`top`/`right` 略增，给刻度和右侧数值留空\n- `xAxis.axisLine.show: true` 画出底部轴线（浅灰）\n- `scale-clip` 去掉纵向 `hidden`，改在 CSS 里 `overflow` 调整；`.chart-block__canvas` 不再裁切贴边轴\n## 验证与归属\n- 验证证据：extracted source=cursor project=园区物管2.0\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue、mock.js\n- 所属项目：园区物管2.0；来源会话：d9192f5b-c2bf-4f01-ba6a-ecefdcde18d0；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/building_table_view_tabs.md",
+                "memory_type": "entities",
+                "after": "# 楼幢信息详情楼盘表统一改造\n园区物管2.0 楼幢信息详情相关弹窗已统一改造，新增共用组件 `BuildingTableViewTabs.vue` 并增强 `zs-select-dialog`，共 14 处页面按参考样式对齐。\n## 改造内容\n- 新增 `BuildingTableViewTabs.vue`：用 `zs-tabs type=\"line\"`（蓝色下划线），Tab 文案为「列表视图 / 楼盘表视图」，`v-show` 切换避免高度跳动，内容区固定高度内部滚动\n- 增强 `zs-select-dialog`：新增 `building-table-mode` 属性，弹窗宽 80%（最大 1300px）、高 720px，左右分栏自适应，内容区不撑开弹窗\n## 涉及页面\n- 楼幢管理：`building/detail.vue`、`buildingChange/detail.vue`\n- 房屋拆分/合并：`houseSplit/detail.vue`、`houseMerge/detail.vue`、`houseMerge/components/RangeTable.vue`\n- 业主自治：`general/option/multiply/repair` 下 `DecisionRangeTable.vue`、`preparatoryRangeTable.vue`、`CandidateDialog.vue` 等\n## 验证与归属\n- 验证证据：extracted source=cursor project=园区物管2.0\n- 涉及文件：BuildingTableViewTabs.vue 及上述各页面\n- 所属项目：园区物管2.0；来源会话：929d6385-61c5-4f3f-bea0-a34f4b6d5432；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_column_fix.md",
+                "memory_type": "entities",
+                "after": "# 公共组件 zs-table-column 列宽塌陷修复\n园区物管2.0 公共组件 `zs-table-column` 在 `v-for`+`v-if` 场景下误判自定义列导致列宽塌陷，已在组件内修复，所有使用页受益。\n## 问题根因\n- 原 `zs-table-column` 只要检测到 `$scopedSlots.default` 存在就把列宽固定为 80px\n- Vue 2 在 `v-for`+`v-if` 下为每一列注册插槽函数，即使 `v-if=false` 不渲染也被误判为「自定义列」，整表列宽塌陷\n## 解决方案\n- `hasEffectiveCustomSlot`：实际执行插槽函数判断真实渲染内容（过滤 `v-if=false` 空插槽）\n- `isMeasurableFlexSlot`：区分文本类插槽（弹性 `min-width`）与复杂组件插槽（固定 `width`，可用 `slot-width` 覆盖）\n- `measureSlotContentWidth`：从插槽 vnode 提取文本按实际内容计算列宽\n- 弹性列注册：用 `watch isFlexColumn` 动态注册/注销，保证表格 `fit` 正确开启\n## 验证与归属\n- 验证证据：extracted source=cursor project=园区物管2.0\n- 涉及文件：zhi2-web-admin/src/views/credit/evaluationPlanReport/index.vue、detail.vue、components/CompanyTable.vue 及公共组件 zs-table-column.vue\n- 所属项目：园区物管2.0；来源会话：0c43b56c-d4b3-4a08-9e9f-7c6394b3a716；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/parking_type_filter.md",
+                "memory_type": "entities",
+                "after": "# 切换车位类型数据未筛选问题\n园区物管2.0 切换车位类型时下方数据未筛选，后端文件未找到，以前端字典解析+标签匹配+切换带参重请求方案为准。\n## 问题根因\n- 后台代码检索：在 `d:/repository` 按 `*StandingBook*`、`*ParkingSpace*List*` 搜索约 5 分钟未找到 Java/后端文件（当前仓库主要是前端 `zhi2-web-admin`）\n## 解决方案\n- 人防车位筛选以前端方案为准：字典解析 + 标签匹配 + 切换筛选时带查询参数重新请求列表\n- 若仍异常需对照真实接口 `selectParkingSpaceList` 返回字段，或到独立后端项目查 `StandingBook` 实现\n## 验证与归属\n- 验证证据：extracted source=cursor project=园区物管2.0\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/operatingAssets.vue、benefit/pubParkingSpace/components/parkingDialog.vue\n- 所属项目：园区物管2.0；来源会话：a9ba015b-6bbe-4dd8-aec5-80470e748ad2；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

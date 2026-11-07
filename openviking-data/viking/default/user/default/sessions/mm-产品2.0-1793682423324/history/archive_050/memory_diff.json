@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_050",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T01:01:25.874774+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/router_404_global_intercept.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0 路由 404 全局拦截约定\n产品2.0 后台在 router.beforeEach 中统一拦截 to.path==='/404'，改为消息提醒而非渲染 404 页。\n\n## 背景与问题\n- 原用通配路由 { path: '*', redirect: '/404' } 处理未匹配地址，用户要求不进 404 页。\n- 通配重定向在 beforeEach 之后，仅守卫判断通配会漏掉显式 push('/404') 场景。\n- 直接渲染 404 页体验差且丢失来源上下文。\n\n## 解决方案\n- 在 router.beforeEach 开头（handleExternalToken 之后、登录态处理之后）拦截 to.path === '/404'。\n- 有上一跳有效匹配时 next({ path: from.fullPath, replace: true }) 留在原页并抹掉无效历史。\n- 首次打开即非法地址时 next({ path: '/index', replace: true }) 回首页并 Message.warning 提示。\n- /404 路由配置保留不删，避免影响其他引用，但实际不再渲染。\n\n## 验证与归属\n- 验证证据：会话 4ccb79cb 用户要求全局拦截跳 404 改为消息提醒，方案写入 router/index.js。\n- 涉及文件：zhi2-web-admin/src/router/index.js。\n- 所属项目：产品2.0；来源会话ID：4ccb79cb-b7a0-47a0-8d7a-1873a520064f；代码基线：6b9d9d7（2026-05-08）。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_public_absolute_path.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0 Vite public 目录资源绝对路径约定\nVite 构建中 public 目录资源必须用以 / 开头的绝对路径引用，带 public/ 前缀会导致模块解析构建失败。\n\n## 问题根因\n- zhi2-web-admin 中 UnifiedLogin.vue 图片写成 public/assets/images/... 致 Vite 构建报错。\n- public 目录是「原样拷贝、按根路径服务」的特殊目录，引用须用 / 开头绝对路径（如 /assets/...）。\n- 带 public/ 前缀的路径被 Rollup 当成模块导入解析文件系统路径，构建直接失败（dev 下也解析不到）。\n\n## 解决方案\n- 把模板/CSS 里所有 public/ 前缀替换为根绝对路径（该文件一次性替换 13 处）。\n- 与项目内其他页面（如 StatisticsDialog.vue）及同文件 CSS 引用 banner_1.png 既有写法保持一致。\n- 排查构建失败若报错指向 public/ 路径 import 解析，先查这类路径写法再怀疑依赖。\n\n## 验证与归属\n- 验证证据：会话 e9d3b12e 确认 UnifiedLogin.vue 13 处 public/assets/ 全部替换为 /assets/ 后构建成功（exit 0，约 3 分 20 秒）。\n- 涉及文件：zhi2-web-admin/src/views/home/UnifiedLogin.vue。\n- 所属项目：产品2.0；来源会话ID：e9d3b12e-b9f2-4d0b-97e0-bd14f38d344c；代码基线：62d5fb9（2026-09-02）。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tencent_map_polygon_nan.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0 腾讯地图多边形坐标安全构造\n统计地图页因园区多边形 path 按错误分隔符解析成 NaN 崩溃，所有 LatLng 构造须走安全校验函数。\n\n## 问题根因\n- benefit/statisticsMap 在 mounted 抛腾讯地图异常「LatLng 传入参数 (NaN, 120.311972) 非合法数字」。\n- 后端返回园区多边形 path 是「分号 ; 分隔各点、逗号 , 分隔经纬度」，解析函数却按空格 split(' ') 切分。\n- 构造 LatLng 前无合法性校验，一条脏数据就让整个地图初始化崩溃。\n\n## 解决方案\n- 解析函数统一按 ';' 切点、',' 切经纬度，对接字符串型几何数据须先确认实际分隔符。\n- 封装 createSafeLatLng(lat, lng)，内部 Number 转换 + isFinite 校验，非法返回 null 并跳过该点。\n- initMap、updateCenter、区域标注 nameLocation 等所有构造坐标入口都走安全构造，避免个别异常炸页面。\n\n## 验证与归属\n- 验证证据：会话结论确认根因是分隔符错误，新增 createSafeLatLng，getBuildingPaths 改 split(';')，各入口改走安全构造。\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue、zhi2-web-admin/src/constant/map.js。\n- 所属项目：产品2.0；来源会话ID：4ba54bd2-24d5-4b33-92bc-49f3cc906331；代码基线：a53a27c。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_template_unit_undefined.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0 查看态带单位数值字段规范\n查看态模板字符串手拼单位会让 undefined 变成「undefined㎡」，数值字段必须走 type:'amount' + unit。\n\n## 问题根因\n- 物业合同详情页「物业管理区域」占地面积/总建筑面积在数据未维护时显示「undefined㎡」。\n- 查看态字段配 type:'text'，页面手动拼 `${this.form.landArea}㎡`；landArea 为 undefined 时拼出非空字符串。\n- DetailTemplate 空值判断（非空字符串显示原值）被绕过，永远轮不到「-」占位。\n\n## 解决方案\n- 带单位数值字段查看态一律配 type:'amount' + unit:'㎡'（小数位再配 dot:2）。\n- 原始数值交给 DetailTemplate 的 getAmountDisplay 处理——空值自动显示「-」、有值时才拼单位。\n- 禁止页面侧用模板字符串预拼单位，避免 undefined/undefined㎡ 脏字符串穿透组件判空逻辑。\n\n## 验证与归属\n- 验证证据：会话结论确认根因是模板字符串拼接在 undefined 时产出非空字符串绕过判空，改为 type:'amount'+unit 交 getAmountDisplay 处理。\n- 涉及文件：zhi2-web-admin/src/views/property/propertyContract/components/detail.vue、zhi2-web-admin/src/components/detail-template/detail-template.vue。\n- 所属项目：产品2.0；来源会话ID：f3762574-10fb-4d07-adb1-cfcfca9fd8aa；代码基线：401d884。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

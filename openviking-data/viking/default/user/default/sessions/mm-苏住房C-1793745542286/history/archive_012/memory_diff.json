@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_012",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T23:03:16.497262+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zsmap_string_style_ignored.md",
+                "memory_type": "entities",
+                "after": "# ZsMap 仅合并 object 型 attrs.style 致地图高度塌陷\n苏住房C 市民端小区信息页「小区周边」地图因 ZsMap 忽略字符串 inline style 被压成细线。\n\n## 问题现象\n- 移动端 pages_owner/project/info/index.vue 的「小区周边」地图只显示细缝（仅腾讯地图 logo）\n- houseMap.vue 相反：页面写死内联 height:200px 锁死高度，地图占不满屏\n\n## 根因\n- ZsMap 内部 mapStyle 计算属性仅合并 object 类型 attrs.style（typeof === 'object' 才展开）\n- 字符串 inline style 被整体丢弃，高度回退默认 100%，父容器无固定高度致百分比高度无参照\n- 同源组件 houseMap.vue 因写死像素高度导致另一极端\n\n## 解决方案\n- 统一写法：外层 .map-container 给固定高度（240rpx/400rpx/200px），删除组件 inline style\n- ZsMap 内部 <map> 用 width:100%; height:100% 撑满\n- 整屏时容器 height: calc(100vh - 43px - env(safe-area-inset-top))，地图绝对定位铺满、筛选栏浮上方\n- 禁止在 ZsMap 标签写 style 字符串或写死像素高度\n\n## 验证与归属\n- 验证会话 a8639b2e / fc3995fc：houseMap.vue 移除 style 改 calc 高度，info/index.vue 参照 newHouse/detail.vue 用 .map-container 包裹\n- 涉及文件：src/components/ZsMap/ZsMap.vue、src/pages_main/houseMap/houseMap.vue、src/pages_owner/project/info/index.vue、src/pages_transaction/newHouse/detail.vue\n- 所属项目：苏住房C；来源会话ID：a8639b2e-9ee0-4789-a462-e47f95ce5510, fc3995fc-3653-441b-9537-8ac6acc697e9；代码基线：4630e8e、5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/publicnotice_null_data_crash.md",
+                "memory_type": "entities",
+                "after": "# 单对象接口返回 null 被强加列表致模板崩溃\n苏住房C 市民端公告详情因接口 data:null 被包装成列表唯一行，子组件读字段崩。\n\n## 问题现象\n- 进入公告详情报 TypeError: Cannot read properties of null (reading 'companyName')\n- 堆栈落在 ListContractIndex.vue 首行经 baseCard 插槽渲染时\n\n## 根因\n- 合同公告接口 getContractNoticeList 无合同时返回 data: null\n- publicNotice.vue 无条件 res.rows = [res.data] 将 null 塞成列表唯一行\n- 子组件模板访问 detailData.companyName 崩溃，属单对象接口硬塞分页列表形态\n\n## 解决方案\n- 数据侧：res.rows = res.data ? [res.data] : []; res.total = res.data ? 1 : 0\n- 展示侧：ListContractIndex 根节点加 v-if=\"detailData\"，prop 默认值从 {} 改工厂函数 () => ({})\n- 无合同正常显示「暂无相关数据」；凡单对象包装列表处均需空值判定\n\n## 验证与归属\n- 验证会话 ddfa164f：堆栈 Vue2 renderSlot → baseCard.vue 插槽 → ListContractIndex.vue:4；修复 publicNotice.vue 赋值与 ListContractIndex.vue 防御\n- 涉及文件：src/pages/publicNotice/publicNotice.vue、src/pages/publicNotice/components/ListContractIndex.vue、src/api/notice.js、src/components/commonNew/baseCard.vue\n- 所属项目：苏住房C；来源会话ID：ddfa164f-7797-420b-afa6-c5e85e60b348；代码基线：83c4136"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/userinfo_desensitize_formatter.md",
+                "memory_type": "entities",
+                "after": "# 个人身份信息展示须走 formatter 脱敏\n苏住房C 新房核验申请页直接展示 userStore 姓名与身份证号原文，漏掉项目脱敏约定。\n\n## 问题现象\n- newHouseCertification/detail.vue 直接渲染 userStore 里姓名与身份证号原文，未脱敏\n- 新页面复刻只接数据源，漏掉展示层脱敏约定\n\n## 根因\n- 项目约定用户信息展示一律脱敏，新页漏接导致原样渲染\n- 与后端无关，属前端展示层规范缺失\n\n## 解决方案\n- 调用 src/utils/formatter.js 的 blurName（保留首字，张三→张*）与 blurIdNumber（保留前2后2，中间*）\n- 关键约定「只脱敏展示」：页面显示脱敏串，form 内仍存完整明文，提交接口不受影响\n- 凡是新建/复刻申请页、签约页出现姓名或证件号展示，必须套这对 formatter，不自写截断\n\n## 验证与归属\n- 验证会话 ec2c21f5：申请页 detail.vue 直接用 userStore 原始数据；参照 stockHouseSign/apply.vue、publishHouse/verification.vue 改用 formatter\n- 涉及文件：src/pages_transaction/newHouseCertification/detail.vue、src/utils/formatter.js、src/pages_transaction/publishHouse/verification.vue、src/store/user.js\n- 所属项目：苏住房C；来源会话ID：ec2c21f5-1d1e-4abb-a5d4-f34c93d6919a；代码基线：77666f8"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zsmap_tencent_key_auth.md",
+                "memory_type": "entities",
+                "before": "# ZsMap 腾讯位置服务 Key 鉴权失败属平台配置\n苏住房C 市民端 ZsMap 报错「鉴权失败：当前产品鉴权失败」「海外图鉴权失败」与静态图片 500 无关，属腾讯位置服务 Key 未绑定。\n\n## 现象与根因\n- 真机/开发者工具同屏出现地图鉴权失败报错，干扰图片 500 排查。\n- 根因：ZsMap 的腾讯位置服务 Key 未在该小程序 AppID 下绑定或未启用「微信小程序」产品；Key 过期或属他项目亦如此，代码无法修。\n\n## 解决方案\n- 到腾讯位置服务控制台为 Key 勾选「微信小程序」并填 AppID。\n- 若 Key 过期或属他项目，需在 ZsMap.vue、manifest.json 中同步换新 Key。\n- 别把地图鉴权报错与图片 500 混成一个问题处理。\n\n## 验证与归属\n- 验证：会话 e3873d64 用户贴出两条地图鉴权失败与三张图片 500；结论指出鉴权失败是平台配置问题，与图片无关。\n- 涉及文件：src/components/ZsMap/ZsMap.vue、src/manifest.json\n- 所属项目：苏住房C；来源会话ID：e3873d64-6106-455a-aff6-e426cf0638d1；代码基线：9832ba3。",
+                "after": "# ZsMap 腾讯位置服务 Key 鉴权失败属平台配置\n苏住房C 市民端 ZsMap 报错「鉴权失败：当前产品鉴权失败」「海外图鉴权失败」与静态图片 500 无关，属腾讯位置服务 Key 未绑定。\n\n## 现象与根因\n- 真机/开发者工具同屏出现地图鉴权失败报错，干扰图片 500 排查。\n- 根因：ZsMap 的腾讯位置服务 Key 未在该小程序 AppID 下绑定或未启用「微信小程序」产品；Key 过期或属他项目亦如此，代码无法修。\n- 具体 AppID 为 wx29004322ee722713；开发者工具 AppID 与 Key 绑定不一致同样触发「鉴权失败」「海外图鉴权失败」连带报错。\n\n## 解决方案\n- 到腾讯位置服务控制台为 Key 勾选「微信小程序」并填 AppID。\n- 若 Key 过期或属他项目，需同步替换四处硬编码 Key：ZsMap.vue 的 subkey、utils/file.js 的 QQ_MAP_KEY、utils/index.js 中 localSearch 的 key、manifest.json 的 h5.sdkConfigs.maps.qqmap.key；建议抽成统一常量避免散落。\n- 别把地图鉴权报错与图片 500 混成一个问题处理。\n\n## 验证与归属\n- 验证：会话 e3873d64 用户贴出两条地图鉴权失败与三张图片 500；结论指出鉴权失败是平台配置问题，与图片无关。\n- 验证：会话 b1546e14 定位为腾讯地图 Key 鉴权问题，列出 ZsMap.vue subkey=\"3SQBZ-QJL66-TV5SJ-ETW3L-LADIS-T6FKA\" 与 manifest.json appid；给出控制台检查、公众平台接口开通、清缓存、真机验证步骤及新 Key 替换四处落点。\n- 涉及文件：src/components/ZsMap/ZsMap.vue、src/manifest.json、src/utils/index.js、src/utils/file.js\n- 所属项目：苏住房C；来源会话ID：e3873d64-6106-455a-aff6-e426cf0638d1, b1546e14-b5e1-43ee-beef-578fcfc4626f；代码基线：9832ba3。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

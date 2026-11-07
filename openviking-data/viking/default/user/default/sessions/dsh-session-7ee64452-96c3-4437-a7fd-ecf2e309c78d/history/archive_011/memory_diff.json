@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-7ee64452-96c3-4437-a7fd-ecf2e309c78d/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T01:18:35.351336+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/03/监管账户详情页禁止滚动要求.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户要求监管账户详情页也不要出现滚动条（消息[54]「这个也不要滚动」）。经排查，原页面因全局 index.scss 整页滚动触发条件不匹配（Headline 位于 zs-form 内而非直接子级 .collapse-container），内容超出时被裁切且无滚动。最终采用页面级 scoped 样式让 .detail-from-container 在内容溢出时自身滚动，未溢出时无滚动条；截至会话结束已通过 Playwright 4/4 验证，正在跑全量回归。\n# 2026-11-03 (Tuesday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 这个也不要滚动\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: **问题已经复现并确认**：卡片的 `bottom` 为 1026，大于容器底部 953，即 `hiddenBelow: true`；但 `canScroll: false`，且 `overflowY: hidden`，说明内容被直接裁掉，无法滚动查看。\n\n这正是你截图中的问题。现在我用页面级 `scoped` 样式修正：内容超出时让容器自身滚动，内容够时不滚动（满足你「不要滚动、够就撑满」的原意）：\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 重要发现：这张截图是**真实数据**，并非克隆卡片。而且「开户回传信息」卡片已经渲染出来，说明 `openNoticeCode` 有值，我之前的判断有误。三张卡片确实叠在一起，但**「开户附件」卡片的内容被截断**了，只露出标题。\n\n`canScroll: false` 说明 `.detail-container` 自身没有滚动。真正的原因在 `flex: 0 1 auto`：`.detail-from-container` 被压缩到容器高度内，但它的**子元素**溢出，却没有人负责滚动。\n\n我需要让 `.detail-from-container` 在内容超出时自身滚动：\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: **这是决定性的验证结果**：在三张卡片场景下，卡片底部为 962，大于容器底部 953（内容溢出），`formAreaCanScroll: true`；滚动之后，卡片底部变为 929，小于容器底部 953（完整可见）。\n\n修复确认生效。现在看截图做最终视觉确认："
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/前端技术笔记/详情页滚动溢出修复.md",
+                "memory_type": "entities",
+                "after": "# 详情页内容溢出滚动修复模式\n园区房产 zhi3-web-admin-h5-g 监管账户等详情页在卡片过多、内容超出视口时被裁切，需改为内容区自身滚动。\n\n## 问题根因\n- 详情页结构为 `.detail-container`（overflow:hidden）内含 `.detail-from-container`\n- 全局 `index.scss` 整页滚动触发条件 `:has(> .detail-from-container):has(> .collapse-container)` 要求 `.collapse-container` 为直接子级；Headline 卡片位于 zs-form 内（即 `.detail-from-container` 内部），不匹配，故不触发整页滚动，内容超出即被裁切\n- 仅表单分支让 `.detail-from-container` 收缩（flex:0 1 auto），但 `.detail-container` 仍 overflow:hidden，超出部分被裁掉\n\n## 修复方案\n- 按 AGENTS.md §10，不修改全局 `index.scss`，改用页面级 `scoped` 样式\n- 让 `.detail-from-container` 在内容溢出时 `overflow-y:auto` 自身滚动；内容未溢出时无滚动条、保持撑满\n- 监管协议页因 `AgreementDetailsTable` 已命中整页滚动分支，仅补充滚动条槽位，不重复加表单区滚动\n\n## 应用与验证\n- 监管主账户、监管机构、监管协议三页的 scoped 样式随提交 f9f10a393 落地；监管账户页同类修复在本轮会话完成（验证 Playwright 4/4 通过）"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/技术模式/attachment_buscode_config.md",
+                "memory_type": "entities",
+                "before": "# 附件业务码 busCode 命名与后端配置约定\n园区房产 zhi3-web-admin-h5-g 附件组件依赖后端 T_APPENDIX_CONFIG 表的 BUS_CODE 配置，业务码命名需严格对齐。\n\n## 命名规范\n- 现有可用业务码均为小写拼音缩写：ysxksq=预售许可申请、xsbasq=现售备案申请、jjjgxx=经纪机构信息、jgjbxx=机构基本信息\n- 新增页面若使用大写英文名（如 MAIN_ACCOUNT）会与后端配置不匹配，永远拉不到要件数据\n- 业务码必须与 T_APPENDIX_CONFIG.BUS_CODE 字段完全一致，否则返回空数组、显示\"暂无附件\"\n\n## 配置现状\n- T_APPENDIX_CONFIG 中预售资金相关（主账户、监管账户、监管机构、监管协议）四个 busCode 配置数均为 0\n- 此为业务侧待配置项，非前端代码缺陷；前端 AppendixPackageSection 行为正常",
+                "after": "# 附件业务码 busCode 命名与后端配置约定\n园区房产 zhi3-web-admin-h5-g 附件组件依赖后端 T_APPENDIX_CONFIG 表的 BUS_CODE 配置，业务码命名需严格对齐。\n\n## 命名规范\n- 现有可用业务码均为小写拼音缩写：ysxksq=预售许可申请、xsbasq=现售备案申请、jjjgxx=经纪机构信息、jgjbxx=机构基本信息\n- 预售资金四个详情页（监管主账户、监管账户、监管机构、监管协议）采用小写拼音缩写业务码：zfzjjgxx、zfzjzzh、zfzjzh、zfjgxy，已在提交 f9f10a393 落地\n- 新增页面若使用大写英文名（如 MAIN_ACCOUNT）会与后端配置不匹配，永远拉不到要件数据\n- 业务码必须与 T_APPENDIX_CONFIG.BUS_CODE 字段完全一致，否则返回空数组、显示\"暂无附件\"\n\n## 配置现状\n- T_APPENDIX_CONFIG 中预售资金相关（主账户、监管账户、监管机构、监管协议）四个 busCode 配置数均为 0\n- 此为业务侧待配置项，非前端代码缺陷；前端 AppendixPackageSection 行为正常"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

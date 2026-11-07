@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-泰兴小程序-1793791039125/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T11:19:07.824452+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/taixing_echarts_line_missing.md",
+                "memory_type": "entities",
+                "after": "# 泰兴小程序 echarts 裁剪包缺失 line 系列\n工单趋势图空白的真正原因是图表库定制裁剪包缺了 line 系列，而非业务代码。\n\n## 问题根因\n- 项目三处 echarts.min.js（staff、pages_benefit、pages_owner/decision）是同一份 624KB 定制裁剪包，2026-09-10 18:45 被同时替换，基于 echarts 5.2.1\n- grep 注册标记发现 `series.bar`/`series.pie`/`series.gauge` 均在，唯独 `series.line` 完全不存在\n- `type:'line'` 被 echarts 静默跳过（零报错），导致折线不画、legend 无系列、yAxis 无数据范围，全部级联空白\n- 柱状图/饼图/仪表盘一直正常，实验中柱状图在同一画布完整画出印证此点\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=泰兴小程序\n- 涉及文件：src/staff/pages/components/echarts-uniapp/echarts.min.js、src/pages/staff/statistics/index.vue、src/staff/pages/components/echarts-uniapp/echarts-uniapp.vue、src/staff/api/statistics.js\n- 来源会话ID：d49c732e-8ba3-4835-a555-2cc946440322"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/knowledge_category_circular.md",
+                "memory_type": "entities",
+                "after": "# 知识库筛选因循环引用 JSON 报错失效\n工作台知识库筛选点击无反应，根因是分类树带环导致 uni-app setData 校验抛错并截断后续请求。\n\n## 问题根因\n- `src/staff/utils/knowledgeCategory.js` 的 `normalizeCategory(item, parent, top)` 给每个分类节点挂反向指针：`parent` 父子反向链 + `top` 指向顶级节点（顶层节点 `top` 自指）\n- `src/staff/pages/knowledge/index.vue` 的 `loadCategories` 把带环树直接塞进 `topCategories.value`，模板读取后 uni-app 走 `JSON.stringify` 校验 setData payload 抛 `TypeError: Converting circular structure to JSON`\n- 同步截断 `confirmFilter` 后续的 `await loadKnowledge({ reset: true })`\n- `api/index.js` 静默删除 `undefined` 参数，使请求里 `categoryId` 永远 undefined，接口返回全量，表现为\"筛选点了没反应\"\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=泰兴小程序\n- 涉及文件：src/staff/utils/knowledgeCategory.js、src/staff/pages/knowledge/index.vue、src/staff/api/index.js、uni-mp-vue/dist/vue.runtime.esm.js\n- 来源会话ID：294e988e-512b-4041-9a2b-8f790756917a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsimage_fallback_splice.md",
+                "memory_type": "entities",
+                "after": "# 业主端图片图标因 ZsImage 兜底图双重拼接缺失\n调整分包后业主端大量图片与 icon 不显示，根因是 ZsImage 兜底逻辑把完整远程 URL 拼进本地 static 前缀。\n\n## 问题根因\n- 报错 URL `__pageframe__/static/https://www.ylzhwy.com:8081/...` 暴露完整远程 URL 被运行时拼进本地 `static/` 前缀\n- `ZsImage` 组件的 `buildStaticUrl`（负责给本地路径拼 `static/` 前缀）不判断 http 开头\n- 从 2026-09-01 提交起，8 处 `fallBackSrc`（我的页默认头像、首页 news 封面 no_img、ImageGrid、选举/决策系列）被改成完整远程 URL，兜底时拼成 `static/https://...` 必然加载失败\n- `OptionResult.vue` 的 fallback 还指向已被删除的本地 png\n- 2026-09-09 版本因测试数据有图未触发 fallback 而潜伏，当前测试数据无图集中暴露；bug 自 9/1 起就在，非版本回退\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=泰兴小程序\n- 涉及文件：src/components/ZsImage/ZsImage.vue、src/pages_owner/decision/components/multiple/OptionResult.vue、src/pages.json、vite.config.ts、scripts/findUnUseImages.mjs\n- 来源会话ID：9e999a07-f853-49b6-96db-57e8f64f3141"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/uniapp_popup_bottom_gap.md",
+                "memory_type": "entities",
+                "after": "# 底部弹窗距底空隙因 addGlobalClass 穿透与 padding\n项目多处底部弹出弹窗距页面底部有空隙，根因是 uni-app 注入 addGlobalClass 且 App.vue 在弹窗最外层容器加了安全区内边距。\n\n## 问题根因\n- uni-app 编译小程序时给所有组件注入 `options.addGlobalClass = true`（≈ `styleIsolation: 'apply-shared'`），证据在 `dist/build/mp-weixin/common/vendor.js`：`const a={multipleSlots:!0,addGlobalClass:!0,...}`\n- 这意味着 `app.wxss`（src/App.vue 的 `<style>`）的 class 规则会穿透进组件内部（含第三方 uni-popup），而兄弟组件自己写的 `:deep()` 进不去\n- `src/App.vue` 把 `padding-bottom: env(safe-area-inset-bottom)` 打在弹窗最外层容器 `.uni-popup__wrapper.bottom` 上，内容底部白卡片填不满约 34px，底下露出遮罩灰\n- `ZsDialog`/`ZsBottomPopup` 里 `:deep(.uni-popup__wrapper){padding-bottom:0!important}` 因全局类穿透失效\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=泰兴小程序\n- 涉及文件：dist/build/mp-weixin/common/vendor.js、src/App.vue\n- 来源会话ID：9c0ae57b-34e1-42e1-a284-87b375e87284"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:22:47.929889+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/icon_layer_mismatch.md",
+                "memory_type": "entities",
+                "after": "# 宫格图标单层/双层素材渲染不匹配\n苏住房C小程序「我要买房」宫格中「地图找房」图标不显示或裂图，根因是后台双层素材结构与前端单层渲染组件不匹配，而非 URL 路径错误。\n\n## 现象与根因\n- 同一图标在「苏找房」区域显示正常，在「我要买房」宫格裂图/空白，两条配置 iconPath/bgPath/url/isShow 完全一致且 curl 均 HTTP 200\n- 普通宫格 iconPath 为 6~7KB「背景+图标一体」大图、bgPath 为空；地图找房复用苏找房双层素材：iconPath 约 1.6KB 白色小图标，bgPath 约 4.9KB 圆形底色\n- 苏找房 HomeNavItem 同时渲染 MenuImage(bgPath,aspectFill)+MenuImage(iconPath,aspectFit)；MidModuleGrid 只渲染 iconPath(aspectFit) 贴固定灰底 #eceef9，故裂图\n\n## 解决方案\n- 优先改前端：宫格组件检测到 bgPath 存在时按 HomeNavItem 方式叠两层（底图 aspectFill + 图标 aspectFit 绝对居中）\n- 不要逐个改后台配置，同一 url/编码在两模块共用，改一处会连带另一模块\n- 远程地址端口易被看错（如 8887），排查必须自己 curl 复核而非凭肉眼读配置\n\n## 验证与归属\n- 会话 66cc6474：对比 navigation.home 与 navigation.mid 地图找房，iconPath/bgPath/url/isShow 一致且 curl 200；文件大小 6507/6582(单层) vs 1633+4924(双层)\n- 涉及文件：MidModuleGrid.vue、HomeNavItem.vue、Home_Suzhufang.vue、MenuCard.vue；代码基线 4d6dba9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/sfb_merge_checklist.md",
+                "memory_type": "entities",
+                "after": "# 跨 sfb 分支合并验收口径\n苏住房C小程序把原分支近一月修复的 bug 与需求合并到 sfb 分支，要求除 sfb 特殊逻辑外业务逻辑与页面展示保持一致。\n\n## 做法与判据\n- 先复现再合并：确认缺陷在 sfb 分支确实存在，不存在则跳过，避免移植因架构不同的「伪缺陷」\n- 差异需求以原分支改动为主，把 sfb 专属逻辑摘出单独保留，不用 sfb 旧实现覆盖原分支业务改动\n- 合并后清冲突并跑 npm run build:test 构建验证，不只看 diff\n- 构建报「Cannot read properties of undefined」或模块缺失，先按报错文件回查 import 的工具文件是否被漏同步\n\n## 核心心法\n- 分支合并缺陷常是「新代码+旧工具库」半合并状态，以「构建通过+主链路页面展示一致」为验收，非以「无冲突」为完成\n- 典型坑：redirect/index.vue 引用 @/utils/app.js 的 backInfo，合并时 utils/app.js 未同步，补回整个原生桥接工具文件（backInfo/device/getMap）后构建通过\n\n## 验证与归属\n- 会话 b173b982：先确认 sfb 分支存在同样问题再合并，补回 utils/app.js 后 npm run build:test 通过，提交 5bdcbd01 推送 origin/sfb\n- 涉及文件：redirect/index.vue、utils/app.js、utils/index.js、ZsImage.vue；代码基线 c7d6817"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/wxss_wildcard_error.md",
+                "memory_type": "entities",
+                "after": "# 小程序 WXSS 不支持通配选择器\n苏住房C小程序编译报 WXSS error at token `*`，根因是微信不支持 `> *` 通配子选择器，需写具体类名撑满宽度。\n\n## 现象与根因\n- 微信开发者工具编译报 [WXSS 文件编译错误]，定位 app.wxss 与 pages_owner/elevator/add.wxss 某行 token `*`（lib 3.7.12）\n- 小程序 WXSS 不支持 `> *` 通配子选择器（同类还有 min()/max()/clamp()），解析到 `*` 直接报错，报错行号指向生成后 wxss 易误判\n- 「撑满不生效」非宽度问题：uni-app 的 picker/easyinput 有内部节点，外层 width:100% 到不了真正输入节点\n\n## 正确做法\n- 不追求通配，在全局 uni.scss 用具体类名开白名单：.zs-picker-root、.uni-easyinput 等逐类设置 width:100%\n- 删掉 styles/form2.scss 与 uni.scss 重复的同类规则，避免两份来源互相覆盖\n- 修完删 dist/dev/mp-weixin 重新 npm run dev，微信开发者工具清缓存再编译，否则旧产物继续报同一行错误\n- ZsPicker 自研组件宽度问题优先在组件内部节点解决，不往全局塞通配规则\n\n## 验证与归属\n- 会话 9094fe77：用户要求 picker 表单内撑满 100% 反馈不行，贴 app.wxss(555:28) 与 add.wxss(276:45) token `*` 错误；改 uni.scss 具体类名、移除 form2.scss 重复样式、清 dist 重编译通过\n- 涉及文件：uni.scss、form2.scss、ZsPicker.vue、elevator/add.vue；代码基线 5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/uniapp_conditional_import.md",
+                "memory_type": "entities",
+                "after": "# uni-app 条件编译同名 import 触发 ESLint 重复声明\n苏住房C小程序提交时 pre-commit 的 ESLint 报重复定义，根因是 uni-app 条件编译块里同名 import 被静态分析误判，需抽单一实例模块按平台赋值。\n\n## 现象与根因\n- 提交时 pre-commit ESLint 报重复定义，报错文件 echarts-uniapp.vue，但代码在微信开发者工具能正常编译运行\n- 组件用 #ifdef MP / #ifndef MP 条件编译，两分支各写一句 import echarts，运行时只留一支；ESLint 不识别条件编译指令，把两份声明当同作用域重复声明\n- ESLint 纯静态分析看不到 uni-app 编译期裁剪，条件编译块出现同名 import/const/let 必误报\n\n## 解决方案\n- 把平台相关依赖下沉到独立实例模块（如 echarts-instance.js），模块内只写一次 let echarts，内部条件编译按平台赋值并默认导出\n- 组件侧统一 import echarts from './echarts-instance.js'，不再出现条件编译包裹的声明\n- 所有「两端/多端实现不同」依赖（echarts、原生桥接、SDK）都走此模式；遇 pre-commit 被拦且报错指向条件编译文件时优先重构，不加 eslint-disable 掩盖\n\n## 验证与归属\n- 会话 da028f64：从泰兴小程序迁移阳光物业/共有资金功能后 pre-commit ESLint 报错，根因 echarts-uniapp.vue 两处 echarts 声明被判重复；新增 echarts-instance.js 单一声明后通过\n- 涉及文件：echarts-uniapp.vue、echarts-instance.js、pages.json；代码基线 77666f8"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

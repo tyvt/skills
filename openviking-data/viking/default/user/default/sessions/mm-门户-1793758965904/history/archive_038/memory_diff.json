@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793758965904/history/archive_038",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T03:45:42.209830+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/门户v3域名是环境槽位.md",
+                "memory_type": "entities",
+                "after": "# 门户v3域名是环境槽位\n用户贴出的 unlimited.g.h5...v3 域名里的 v3 是部署环境槽位/网关版本，并非独立代码分支。\n## 根因与对应关系\n- 域名 http://unlimited.g.h5.admin.web.v3.fangdichan.shiqu.suzhou.dev.zhi.com 对应父仓远程 zhi2-web-admin-h5-g-unlimited\n- 父仓仅有 develop/v2.6.2-portal 一个远端分支，v3 是部署环境槽位/网关版本（.env 中 API 前缀为 /api/v3.0）\n- 子模块里的 2.6.2-portal-v3（落后 120 提交旧分叉）与 develop/v3.0.0（无对应父仓分支）均非该环境来源\n## 排查与处理要点\n- 排查环境问题先对齐「域名 → 父仓远程 → 分支」：git remote -v + git branch -r 看清父仓远端分支\n- 仅将 develop/v2.6.2-portal 部署到 v3 环境槽位即可生效，远程主机发布走 CI/发布流水线\n- 改完对目标环境强制刷新（静态资源带 hash，index 不缓存）\n- 同分支可能有别人并发生成提交，本批父仓指针最终指向含自身修复的较新提交 c1791b7ae（含 cf0005ff7）\n## 验证与归属\n- 验证证据：会话 session-d381026e-1539-4fb2-8133-316742038b5b（基线 d8addc3）用户诉求「点击跳转菜单时名称没显示」\n- 涉及文件：zhi2-web-admin/src/router/index.js、src/utils/portalCategory.js、src/layout/components/Navbar.vue\n- 来源会话：session-d381026e-1539-4fb2-8133-316742038b5b；代码基线：d8addc3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/playwright版本不匹配处理.md",
+                "memory_type": "entities",
+                "after": "# playwright版本不匹配处理\n在 nginx 部署站点跑 Playwright 用例时，包版本与浏览器版本不匹配会导致浏览器起不来。\n## 根因\n- Playwright 按自身版本去 ~/.cache/ms-playwright 找对应版本号目录\n- 机器装的是旧版浏览器（如 1243）而包是新版（如去找 1248），目录名对不上直接失败，E2E 连启动都做不到\n## 处理要点\n- 先核对两边版本：包版本看 node_modules/@playwright/test 的 version，浏览器目录看 ~/.cache/ms-playwright 下的目录名\n- 临时用目录联接（junction）补出期望的版本目录指向已装浏览器目录（本批建了两个 1248 目录联接）\n- 验证完把临时联接全部删除，并确认原有 1243 浏览器包完好（310 个文件）\n- 长期解法是让浏览器版本与包版本对齐，不要长期留联接以免掩盖不匹配\n## 验证与归属\n- 验证证据：会话 session-c8f6771f-0380-4bad-a2ab-8390785d2a68（基线 d8addc3）最终结论第 4 点\n- 涉及文件：zhi2-web-admin/tests/e2e/public-portal-interactions.spec.ts、zhi2-web-admin/package.json\n- 来源会话：session-c8f6771f-0380-4bad-a2ab-8390785d2a68；代码基线：d8addc3"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/default/前端功能下线静态资源处理.md",
+                "memory_type": "preferences",
+                "after": "- 移除前端功能时只删代码与样式，保留静态资源文件（如 public/assets/images/ 下的 svg），等确认全仓（后端配置 + 各端）无引用再单独清理\n- 静态资源路径由后端配置动态拼接（统一走 img() 助手），编译期无法校验引用，删掉会让其他端 404 且本页面测试看不出\n- 删除功能后全仓搜索确认无残留引用，并 npm run build 验证产物不含相关 class\n- 用 nginx 部署站点（非 dev server）跑 Playwright 验证全链路\n- 汇报时把「保留的静态文件及其理由」写清楚，避免后人以为漏删"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/default/git提交工作流.md",
+                "memory_type": "preferences",
+                "after": "- 提交时若 husky 钩子退出码为 1，先 git log -1 --oneline + git show --stat HEAD 核实提交对象是否已落地、内容是否只含本次目标文件，内容完整就不要再提交\n- 提交必须按具体路径暂存（不要 git add .），避免纳入别人正在改的文件\n- 两层仓库都提交：子模块先行、父仓只更新 gitlink 指针，核对父仓指针与子模块 HEAD 一致、两层与远程 0/0 同步\n- 构建产生的 public/version.json 不纳入提交\n- 每笔提交都过 lint-staged 钩子，中文提交信息确保无乱码"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

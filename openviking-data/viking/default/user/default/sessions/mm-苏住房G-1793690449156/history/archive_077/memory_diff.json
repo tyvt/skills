@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_077",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T10:27:14.635546+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/events/2026/11/03/资金拨付通知书恢复合同必填流程.md",
+                "memory_type": "events",
+                "after": "# Summary\n在 zhi2-web-admin 子模块提交 1b8d60d 回滚 d0ca9657f5，于 src/views/benefit/pubAllotNotice/detail.vue 与 index.vue 移除「是否有合同」分支及筛选项，复原先选支出合同、用款申请由合同带出的流程。保留 4b23557b4 中 biz_state 字典修复，父仓库子模块指针已变更待提交。\n# 2026-11-03 (Tuesday) ChatLog:\n**user**: 【记忆类型】bug\n【标题】资金拨付支取通知书恢复合同必填流程\n【内容】在 `zhi2-web-admin` 子模块提交 `1b8d60d` 回滚 `d0ca9657f5`，于 `src/views/benefit/pubAllotNotice/detail.vue` 与 `index.vue` 移除「是否有合同」分支及筛选项，复原先选支出合同、用款申请由合同带出的流程。保留 `4b23557b4` 中 `biz_state` 字典修复，父仓库子模块指针已变更待提交。\n【验证证据】src=苏住房G/081.md\n【涉及文件】d:/repository/苏住房G/zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue ; d:/repository/苏住房G/zhi2-web-admin/src/views/benefit/pubAllotNotice/index.vue ; src/views/benefit/pubAllotNotice/detail.vue ; index.vue\n【来源会话ID】5e0541e9-3a3b-4fc6-ac02-908632628340\n【代码基线】none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/map_zoom_race_guard.md",
+                "memory_type": "entities",
+                "after": "# 地图聚合层级缩放竞态序号守卫\n苏住房G 资金统计地图在聚合层级切换时异步请求返回顺序不确定，旧响应覆盖新层级数据且旧标记残留。\n\n## 问题根因\n- 聚合层级切换时 loadAreaComplexLayer 异步请求返回顺序不确定\n- 旧响应覆盖新层级数据，且旧标记残留地图\n\n## 解决方案\n- index.vue 的 loadAreaComplexLayer 采用 areaLayerLoadSeq 序号守卫，丢弃过期响应\n- 层级变化（nextMarkListLayerLevel !== markListLayerLevel）时置 markList = [] 清空旧标记\n- 对 handleMap 缩放事件做防抖，避免高频触发\n\n## 验证与归属\n- 验证证据：苏住房G/082.md\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue\n- 所属项目：苏住房G；来源会话：08185609-5b39-49e3-a32e-abce2cd09d68；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_column_auto_width_override.md",
+                "memory_type": "entities",
+                "after": "# 表格列未设 width 触发全局样式强制单行省略\n苏住房G 评价/信用指标表格「指标名称」列因未设 width 被加 auto-width 类，全局样式强制单行省略。\n\n## 问题根因\n- src/views/evaluation/indicatorComponents/index.vue 共用表格「指标名称」列仅设 minWidth 未设 width\n- 组件库加 zs-table-column--auto-width 类\n- 全局样式 src/styles/element-ui.scss 对该类强制 white-space: nowrap !important 致单行省略\n\n## 解决方案\n- 组件内以更高特异性选择器 td.indicator-config__name-cell .cell 加 !important 覆盖\n- 设置 white-space: normal 与 word-break: break-word 允许换行\n\n## 验证与归属\n- 验证证据：苏住房G/085.md\n- 涉及文件：zhi2-web-admin/src/views/evaluation/indicatorComponents/index.vue、zhi2-web-admin/src/styles/element-ui.scss、zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、zhi2-web-admin/src/views/credit/creditIndicator/index.vue、zhi2-web-admin/src/views/evaluation/indicatorBasicConfig/index.vue\n- 所属项目：苏住房G；来源会话：ce112429-0d94-4d8f-98f1-35543c91d958；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/el_select_allow_create.md",
+                "memory_type": "entities",
+                "before": "# el-select 开启 allow-create 把历史脏值预置为下拉第一项\n[苏房G] 账号冻结原因等「预设枚举 + 历史手填」的 el-select 开 allow-create 后，历史自定义值被 Element 自动追加到下拉首项。\n\n## 现象\n- 账号冻结原因预设三项 + 允许管理员手填，历史单据存过自定义文案（如「额度与无业务」）。\n- 再次打开时下拉多出第一项「用户手动输入的原因」，回车即选中该脏值。\n\n## 根因\n- el-select 配 allow-create: true 后，Element UI 把 v-model 中不在 options 内的项自动追加到下拉选项（通常首项）。\n- filterable/default-first-option 放大观感，回车即选中第一项；属 Element 既有行为非数据配置错。\n\n## 修复方案\n- 此类「预设枚举 + 历史脏值」下拉去掉 allow-create、default-first-option、filterable。\n- 只渲染后端字典/本地预设；历史自定义文案仍在输入框只读回显，不再进候选列表。\n- 经验外推：凡是想「受限选择」的下拉都不要顺手加 allow-create。\n\n## 验证与归属\n- 验证：会话 cbb5f1e2 用户澄清下拉多出手动输入原因，结论为 allow-create 自动加首项。\n- 涉及文件：zhi2-web-admin/src/components/AccountFreezeFields/AccountFreezeFields.vue、zhi2-web-admin/src/utils/accountFreeze.js。\n- 所属项目：苏住房G；来源会话：cbb5f1e2-ec0c-4fd3-8323-b22f7cdd9fa6；代码基线：805ea8c。",
+                "after": "# el-select 开启 allow-create 把历史脏值预置为下拉第一项\n[苏房G] 账号冻结原因等「预设枚举 + 历史手填」的 el-select 开 allow-create 后，历史自定义值被 Element 自动追加到下拉首项。\n\n## 现象\n- 账号冻结原因预设三项 + 允许管理员手填，历史单据存过自定义文案（如「额度与无业务」）。\n- 再次打开时下拉多出第一项「用户手动输入的原因」，回车即选中该脏值。\n\n## 根因\n- el-select 配 allow-create: true 后，Element UI 把 v-model 中不在 options 内的项自动追加到下拉选项（通常首项）。\n- filterable/default-first-option 放大观感，回车即选中第一项；属 Element 既有行为非数据配置错。\n\n## 修复方案\n- 此类「预设枚举 + 历史脏值」下拉去掉 allow-create、default-first-option、filterable。\n- 只渲染后端字典/本地预设；历史自定义文案仍在输入框只读回显，不再进候选列表。\n- 经验外推：凡是想「受限选择」的下拉都不要顺手加 allow-create。\n\n## 验证与归属\n- 验证：会话 cbb5f1e2 用户澄清下拉多出手动输入原因，结论为 allow-create 自动加首项。\n- 涉及文件：zhi2-web-admin/src/components/AccountFreezeFields/AccountFreezeFields.vue、zhi2-web-admin/src/utils/accountFreeze.js、zhi2-web-admin/src/components/zs-select/SingleSelect.vue、zhi2-web-admin/src/views/system/user/detail.vue、zhi2-web-admin/src/views/company/userManagement/operator/operatorAddDialog.vue。\n- 所属项目：苏住房G；来源会话：cbb5f1e2-ec0c-4fd3-8323-b22f7cdd9fa6；代码基线：805ea8c。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

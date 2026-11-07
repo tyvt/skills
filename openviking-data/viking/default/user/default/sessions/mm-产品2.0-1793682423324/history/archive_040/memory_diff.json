@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_040",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:50:08.759660+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术bug/zs_pagination_tree_total.md",
+                "memory_type": "entities",
+                "after": "# zs-pagination 树形无 total 时统计条被隐藏\n产品2.0 标准账套详情页财务科目表格接 treeList 树形接口（无 total 字段），导致 zs-pagination「共 XX 条记录」整块被隐藏。\n\n## 问题现象\n- treeList 返回 data 树但无 total，代码 `this.total = response.total || 0` 把总数写成 0\n- zs-pagination 用 v-show=\"total > 0\" 控制显隐，total 为 0 时整个底部（含统计文案和间距）被隐藏\n- 看起来像「缺了共 XX 条记录」而非数据问题\n\n## 根因\n- 树形接口不返回 total，前端兜底写 0 触发分页组件隐藏逻辑\n\n## 解决方案\n- 接口未返回 total 时不要写 0，用递归统计树形节点数兜底：`this.total = response.total ?? this.countTreeNodes(this.list)`\n- countTreeNodes 递归累加 children\n- 以后树形数据接 zs-pagination 都要处理「无 total」形态，否则统计条被静默隐藏\n\n## 涉及与来源\n- 涉及文件：financialSubjectsTable.vue、zs-pagination.vue；所属项目：产品2.0\n- 来源会话：ef0140d8；代码基线：49a7aa3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术bug/zs_table_column_dict.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column 字典列推导与 dict-url 写法问题\n产品2.0 中 zs-table-column 的 dict-url kebab 写法不被读取，且 prop 驼峰会自动转下划线推导字典名，导致字典列显示原始码值。\n\n## 问题现象\n- 网络面板出现 POST /system/dictData/listByType { dictType: 'build_type' }，但全项目搜不到 'build_type' 字符串\n- 表格字典列显示原始码值（如 1）\n\n## 根因\n- type=\"dict\" 未指定字典时，组件把 prop 从驼峰自动转下划线（underline 方法：replace(/[A-Z]/g, '_$&小写')），prop=\"buildType\" 推导出 build_type 并发请求\n- 后端没配该字典时 options 为空，getDictLabel 显示原始值\n- 模板写 `<zs-table-column dict-url=\"building_type\">`（kebab-case）组件不读取，静默回退自动推导\n- 正确字典名是 building_type（building/detail.vue 用 getDicts('building_type')）\n\n## 解决方案\n- 排查特征：网络面板的字典名在代码里搜不到 = prop 自动推导\n- 字典列必须用驼峰显式传 dictUrl（或让组件兼容 dictUrl 与 dict-url 两种写法，参照 min-width/minWidth 处理）\n- 字典选项存后端 sys_dict_type/sys_dict_data，前端不写死；显示原始码还需核对后端字典是否有对应 dictValue 条目\n\n## 涉及与来源\n- 涉及文件：zs-table-column.vue、BuildRecordTable.vue、dict.js；所属项目：产品2.0\n- 来源会话：ee495a83；代码基线：62d5fb9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sz_subpath_relative.md",
+                "memory_type": "entities",
+                "after": "# 项目部署在 /sz/ 子路径：地址自适应相对路径\n产品2.0 前端部署在网关 /sz/ 子路径下，所有对后端/静态资产的地址须走相对当前页面 URL 解析，禁止写死前缀（含 version.json）。\n\n## 问题现象\n- 部署在 /sz/ 子路径（如 https://…/sz），接口 base、version.json 版本校验地址若写死根路径前缀就 404\n- 写死 '/version.json' 或 VITE_APP_PUBLIC_PATH 这类前缀与部署子路径耦合，换环境就失效\n\n## 解决方案\n- 所有地址走相对当前页面 URL 解析；version-check.js 默认地址从 '/version.json' 改为相对 'version.json'\n- vite.config.js 里 public/version.json 是构建时写文件的磁盘路径，不是浏览器请求 URL，不存在前缀问题，不要误改\n- env/.env 不再依赖 VITE_APP_PUBLIC_PATH\n\n## 部署硬约束\n- 访问 https://…/sz（无尾斜杠）或 /sz#/login（sz 与 # 之间无 /）时，浏览器把最后一段当文件名，相对解析会落到站点根\n- Nginx 须把 /sz 301 到 /sz/，hash 路由地址保持 /sz/#/xxx 形态\n\n## 涉及与来源\n- 涉及文件：version-check.js、vite.config.js、env/.env；所属项目：产品2.0\n- 来源会话：faf38ec5；代码基线：b2ce3e2 / c420af5"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_proxy_slash.md",
+                "memory_type": "entities",
+                "before": "# Vite代理context缺前导斜杠导致永远匹配不上\n产品2.0 后端接口全部 404/返回前端首页，改目标地址、重启都无效，根因是代理 context 缺前导斜杠。\n\n## 问题现象\n- 后端接口全部 404 或返回前端首页，看起来像「代理失效」\n- VITE_APP_BASE_API 写成 api/v2.0（无前导 /）时，代理规则永远不命中\n\n## 根因\n- Vite 用 doesProxyContextMatchUrl → req.url.startsWith(context) 判定命中\n- 浏览器 req.url 必以 / 开头，而 context 为 'api/v2.0' 时 '/api/v2.0/xxx'.startsWith('api/v2.0') 恒为 false\n- 请求被当成前端静态资源处理\n\n## 解决方案\n- 在 vite.config.js 的 loadEnv 后加 normalizeProxyContext(baseApi)：trim、去尾 /、不以 / 开头则补上，再注册为代理 key\n- baseApi 为空时回退 /api/v2.0；改完必须重启 npm run dev（Vite 仅启动时读配置）\n- VITE_APP_PROXY_ADDRESS 不带端口走 80，后端在 :8080/:9605 须写完整 host:port\n\n## 排查与归属\n- 与已知「env 被 .env.development.local 覆盖」是不同根因，两者分别排查\n- 涉及文件：vite.config.js、env/.env\n- 所属项目：产品2.0；来源会话：317d62ff-fec1-4cf3-a02d-1ac604d82396；基线：5a86102",
+                "after": "# Vite代理前导斜杠处理（产品2.0）\n产品2.0 的 Vite 开发代理 key 必须以 / 开头，但生产环境接口必须是相对路径 api/v2.0（无前导 /），两者对同一环境变量 VITE_APP_BASE_API 的要求冲突。\n\n## 问题现象\n- 后端接口全部 404 或返回前端首页，看起来像「代理失效」（proxy context 缺前导斜杠时）\n- VITE_APP_BASE_API 写成 api/v2.0（无前导 /）时，代理规则永远不命中\n- 若把 env 改成 /api/v2.0 本地代理可用，但生产要求相对路径，直接改 env 会破坏生产部署\n\n## 根因\n- Vite 用 doesProxyContextMatchUrl → req.url.startsWith(context) 判定命中\n- 浏览器 req.url 必以 / 开头，而 context 为 'api/v2.0' 时 '/api/v2.0/xxx'.startsWith('api/v2.0') 恒为 false\n- 请求被当成前端静态资源处理\n- Vite server.proxy 匹配 key 要求以 / 开头，生产又不能带前导斜杠，两者对同一个环境变量要求冲突\n\n## 解决方案\n- env/.env 保持相对路径 api/v2.0 不动（满足生产 Nginx 部署相对解析需求）\n- vite.config.js 里对开发代理单独规范化：`const proxyApiPath = env.VITE_APP_BASE_API?.startsWith(\"/\") ? env.VITE_APP_BASE_API : `/${env.VITE_APP_BASE_API}``，用规范化后的值做 proxy key\n- baseApi 为空时回退 /api/v2.0；开发代理与生产 base 路径语义解耦\n- 改完必须重启 npm run dev（Vite 仅启动时读配置）；VITE_APP_PROXY_ADDRESS 不带端口走 80，后端在 :8080/:9605 须写完整 host:port\n\n## 排查与验证\n- 验证代理生效看响应头 frontend-proxy\n- 与已知「env 被 .env.development.local 覆盖」是不同根因，分别排查\n- 涉及文件：vite.config.js、env/.env；所属项目：产品2.0；来源会话：317d62ff、dace033e；基线：5a86102、dfe69d6"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

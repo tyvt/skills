@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793934959314/history/archive_035",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T04:59:18.047206+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/annexupload_delete_fix.md",
+                "memory_type": "entities",
+                "after": "# AnnexUpload 删除接口修复\n苏州市房地产监测V3 项目 zhi2-web-admin 中公共组件 AnnexUpload 的删除逻辑写错，已修复。\n\n## 问题根因\n- 原删除逻辑调用 `DELETE /file/appendix/detail`，而后端期望 `POST /file/appendix/delete`\n- 请求体应为附件 ID 数组（单个传 `[appendixId]`，批量传 `[id1, id2, ...]`）\n- 预售方案维护页、EntrustSaleAddAppendix.vue 均使用该组件\n\n## 修复内容\n- `AnnexUpload/index.vue` 的 `handleDelete(id)` 改为 `this.$post('/file/appendix/delete', ids)`\n- 实现方式与 `indemnity/components/detail.vue` 中的正确写法一致\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3；来源会话：8ce4793f-7535-4c0c-af5d-1eaf1173062c\n- 涉及文件：`AnnexUpload/index.vue`、`indemnity/components/detail.vue`、`EntrustSaleAddAppendix.vue`"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/record_change_fix.md",
+                "memory_type": "entities",
+                "after": "# 机构入网详情「变更」接口扩展\n苏州市房地产监测V3 项目 zhi2-web-admin 中机构入网详情「变更」接口已扩展，支持传入 companyRecordId。\n\n## 修改内容\n- `companyRecord.js` 的 `getLastChangeByLogin` 现支持可选 `data` 与 `config` 参数，企业端无参调用保持兼容\n- `companyRecordAgency/detail.vue` 的 `startChange()` 调用时传入当前详情页的 `companyRecordId`：`getLastChangeByLogin({ companyRecordId: this.companyRecordId })`\n- 租赁机构管理端 `zljg/companyRecordAgency/detail.vue` 复用同一核心页，一并生效\n\n## 验证要点\n- 管理端：经纪机构管理 → 机构入网信息 → 详情 → 变更，Network 请求体应为 `{\"companyRecordId\":\"<当前详情ID>\"}` 并跳转变更编辑页\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3；来源会话：7228345d-b39b-4e14-b319-e0de248ed26e\n- 涉及文件：`companyRecord.js`、`companyRecordAgency/detail.vue`、`zljg/companyRecordAgency/detail.vue`"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/branch_scheme_removal.md",
+                "memory_type": "entities",
+                "after": "# 分支机构信息详情去掉「服务方案」\n苏州市房地产监测V3 项目 zhi2-web-admin 中分支机构信息详情页已移除「服务方案」整块内容。\n\n## 修改内容\n- `AgencyBranchDetail.vue`：查看态删除「服务方案」表格区块（左侧锚点一并消失）；编辑态删除底部 `ServiceSchemePanel`；同步去掉 `schemeList`、收费类型字典、保存时 `schemeList` 提交逻辑\n- 删除仅用于该页的 `ServiceSchemePanel.vue`\n- `buildSavePayload` 仍是字段白名单，不再提交服务方案数据；若后端 `/company/agencyBranch/submit` 仍强制要求服务方案，保存可能报错，需后端放宽校验\n\n## 未改动范围\n- 机构注册审核详情 `company/institutionRegister/detail.vue` 和企业端「服务方案」列表模块仍保留\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3；来源会话：56c16879-b869-4c53-a45f-31cf519e5fa1\n- 涉及文件：`AgencyBranchDetail.vue`、`ServiceSchemePanel.vue`"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zstable_slot_fix.md",
+                "memory_type": "entities",
+                "before": "# zs-table-column slot-scope解构批量修复\n苏州市房地产监测V3 项目 zhi2-web-admin 中 zs-table-column 下 slot-scope=\"scope\" 误用导致行数据取不到，批量修复 20 个文件 25 处同类缺陷。\n\n## 问题根因\n- zs-table-column 下 slot-scope=\"scope\" 应改为 slot-scope=\"{ scope }\"，解构后 scope.row 才是行数据\n- 原生 el-table-column（如 PricingModeTable.vue 操作列）不受影响，一律不动\n\n## 修复清单\n- 合同模块：CommercialHousingTable、MortgageEntitiesTable.vue（操作列 查看/编辑/删除）\n- 楼栋/楼盘表：buildingTable/index.vue（全部单元格）、MoneyInformation.vue、PresaleSelectBuildingDialog.vue（「监管标准」「初始监管额度」列，doLayout 重渲染后暴露 row 取不到报错）\n- 资金监管：RelatedBuildingsTable.vue、AppropriateTable.vue（计划节点日期选择）、ExpenseTable.vue\n- 逐处用标签栈判定外层确为 zs-table-column 才改\n\n## 验证与归属\n- 全量复查通过，共 20 个文件 25 处同类缺陷\n- 所属项目：苏州市房地产监测V3；来源会话：609a8f76-e371-401d-92fa-3592fbd4cbd8",
+                "after": "# zs-table-column slot-scope解构批量修复\n苏州市房地产监测V3 项目 zhi2-web-admin 中 zs-table-column 下 slot-scope=\"scope\" 误用导致行数据取不到，批量修复 20 个文件 25 处同类缺陷。\n\n## 问题根因\n- zs-table-column 向插槽传递的是 `{ scope }`（见 zs-table-column.vue `<slot :scope=\"scope\">`），消费方必须解构为 `{ scope }` 并用 `scope.row` 取行数据；误用 `{ row }` 或 `slot-scope=\"scope\"` 均会导致 row 为 undefined\n- 原生 el-table-column（如 PricingModeTable.vue 操作列）不受影响，一律不动\n\n## 修复清单\n- 合同模块：CommercialHousingTable、MortgageEntitiesTable.vue（操作列 查看/编辑/删除）\n- 楼栋/楼盘表：buildingTable/index.vue（全部单元格）、MoneyInformation.vue、PresaleSelectBuildingDialog.vue（「监管标准」「初始监管额度」列，doLayout 重渲染后暴露 row 取不到报错）\n- 资金监管：RelatedBuildingsTable.vue、AppropriateTable.vue（计划节点日期选择）、ExpenseTable.vue\n- 预售模块：PresaleBuildingTable.vue（工程形象进度、预售套数/预售总面积、监管标准/初始监管额度、操作列）、PermitHistoryPanel.vue、PermitEntrustPanel.vue（后两者用 { row } 解构，打开对应 Tab 时可能仍取不到 row，待验证）\n- 逐处用标签栈判定外层确为 zs-table-column 才改\n\n## 验证与归属\n- 全量复查通过，共 20 个文件 25 处同类缺陷\n- 所属项目：苏州市房地产监测V3；来源会话：609a8f76-e371-401d-92fa-3592fbd4cbd8、848529ca-dbef-4317-ac0a-f071aba151fb"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

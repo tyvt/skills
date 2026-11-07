@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T05:40:16.542320+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/程序_产品/产品2.0.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0（zhi2-web-admin）\n产品2.0 是苏州市房地产监测相关的企业/机构管理前端项目，代码仓库为 zhi2-web-admin，技术栈 Vue 2.7 + Element UI + Vite。\n\n## 企业侧 busCode 编码\n- 真实 busCode 以登录后 GET /system/menu/listRouters 返回的 meta.busCode 为准，勿用苏州市房地产监测V3常量或旧版「路由信息.json」（旧 cyjg/* 快照，不含 company/companyManagement/* 与 company/companyRegister/* 新菜单树）。\n- 「企业入网审核」≈ 外网注册：busCode=040900、menuId=60000001，列表 company/companyRegister/index、详情 company/companyRegister/detail，审批 /company/info/approval、提交 /company/info/submit。\n- 外网注册 Step3 要件上传用 040100（开发企业注册要件），与审核页 040900 不是同一编码，配附件要件必须分开配，否则「配了但传了看不到」。\n- 企业信息详情按机构类型分：可审批备案详情 040100（带 approvalApi/submitApi），只读查看详情 0401000（无审批接口）。\n- 企业端 toB/companyRecord/detail 执照附件是 8（LICENSE_BUS_CODE），与管理端 040100 无关。\n\n## 机构类型 busCode\n- 机构类型 busCode：监理 040200、施工 040300、经纪 040500、物业 040600、设计 040700、招投标 041000、审价 041100、鉴定 041200、维修 041300、工程 041400、供应商 041500、金融 041700。\n\n## 测试命令语义\n- 仓库无任何单元测试框架（无 Jest/Vitest/Mocha，无 *.test.* / *.spec.* 文件）。\n- npm test 实际是 vite build --mode test（测试环境构建），跑通仅代表构建成功、不验证任何行为；失败应先怀疑构建/环境问题。\n- 唯一真实自动化测试是 Playwright E2E：配置 playwright.config.js，用例在 e2e/，npm run test:e2e 自动拉起 dev server(:8081)，另有 test:e2e:ui/flow/real-api/tob 分场景脚本。\n- 运行前需按 e2e/.env.e2e.example 建 e2e/.env.e2e，配 PLAYWRIGHT_LOGIN_USER / PLAYWRIGHT_LOGIN_PASSWORD。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/程序组件/zs_table.md",
+                "memory_type": "entities",
+                "after": "# zs-table\nzhi2-web-admin 的底层共用表格组件，被列表页、详情页 Tab 子表、弹窗表格共同消费。\n\n## 方法改名回归风险\n- 给 zs-table 新加/改名方法（如 shouldUseAutoHeight，替换原固定表格高度/留白策略）时，若漏掉任一并存旧实现（方法定义、mixin 或旧行数计算入口），mounted 钩子调用会拿到 undefined，报 this.xxx is not a function。\n- 实例：detail 页报「Error in mounted hook: TypeError: this.shouldUseAutoHeight is not a function」，调用链 zs-tabs → Headline → DecisionRangeTable → zs-table；DecisionRangeTable 在 autonomy/multiply 与 autonomy/general 多目录存在副本。\n- 报错栈位置（如 DecisionRangeTable/detail.vue）只是首个使用方而非元凶；应先 git log 找 zs-table 最近改动提交，git show 看清删了哪个方法名，再全仓 grep 旧方法名一次性替换。\n- 验证须覆盖三类消费方：普通列表页、详情页 Tab 子表、弹窗内表格，逐页确认表格高度与数据正常。\n- 注意与已知条目 #1000（syncFillHeight 误关满页撑高、did 与 shouldSparseAutoHeight 同源）区分：那条讲高度判定口径，本条讲方法缺失后的全仓回归面与定位方法。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流_概念/跨账号e2e四步流程.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0 跨账号 E2E 四步串行流程\n针对必须两端角色才能闭环的功能（如企业变更备案），单角色用例只能覆盖一半，须把同一 spec 写成默认串行的 4 步，用账号切换走完真实操作链。\n\n## 四步写法\n- 01 企业账号登录，确认单据已备案(bizState=2)且能发起变更。\n- 02 企业账号点「变更」→ 改字段 → 保存 → 提交 → 回企业信息页断言「审核流程查看」可见。\n- 03 loginAsAdmin 重新登录 → 进企业变更列表 → 按统一社会信用代码/企业名搜索 → 进详情 → 审批通过。\n- 04 loginAsCompany 登回企业账号，断言字段已更新、变更按钮恢复、无在途审核。\n\n## 三条硬约束\n- 管理端必须走「列表搜索→进入详情→审批」真实路径，不要拼 URL 直进详情绕过导航/权限，否则测出的绿是假绿。\n- 两端切换靠 fixtures（auth-helpers / company-helpers 的 loginAsCompany、loginAsAdmin），不手写登录表单。\n- 前置数据不满足（企业 bizState=1 而非已备案 2）时整组按预期 skip 并在报告写明原因，不改断言硬凑通过。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

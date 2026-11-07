@@ -1,0 +1,58 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_023",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T12:52:15.104545+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/events/2026/11/05/img标签混写修复.md",
+                "memory_type": "events",
+                "after": "# Summary\n全局排查并修复同类Invalid end tag问题，因批量替换图片组件把`<img />`和`</ZsImage>`混写，修复7处文件并修正畸形静态路径。\n# 2026-11-05 (Thursday) ChatLog:\n**user**: 【记忆类型】bug\n【标题】全局修复类似错误\n【内容】已全局排查并修复同类 **Invalid end tag** 问题，汇总如下。 ## 问题原因 批量替换图片组件时，把 `<img />` 和 `</ZsImage>` / `</ImageUploader>` 混写在一起，导致开始/结束标签不匹配。 ## 已修复文件（共 7 处） | 文件 | 修复方式 | |------|----------| | `pages_main/publicNotice/index.vue` | `<img /></ZsImage>` → `<ZsImage />` | | `pages_guard/index/index.vue` | 同上 | | `pages_owner/project/info/index.vue` | 同上 | | `pages_guard/emergencyContact/index.vue` | 同上 | | `pages_guard/guardApply/components/step1.vue` | 同上 | | `pages_owner/committee/application/index.vue` | 拆分为正确的 `<img />` + `</ImageUploader>` 结构 | ## 附带修复的畸形静态资源路径 同批替换还留下了错误路径（如 `..../../`、`../..../../../../`）\n【验证证据】extracted source=cursor project=苏住房C\n【涉及文件】`pages_main/publicNotice/index.vue ; `pages_guard/index/index.vue ; `pages_owner/project/info/index.vue ; `pages_guard/emergencyContact/index.vue\n【所属项目】苏住房C\n【来源会话ID】e6b2c88e-db79-4d03-ada4-c17e191d6830\n【代码基线】none\n【语言要求】请用简体中文抽取并写入记忆，不要输出葡萄牙语或其他语言。"
+            },
+            {
+                "uri": "viking://user/default/memories/events/2026/11/05/旧路径兼容函数新增.md",
+                "memory_type": "events",
+                "after": "# Summary\n因公告详情页迁至pages_main分包但后端返回旧路径，新增normalizeLegacyPageUrl函数在跳转前映射旧前缀，修改route-map.js、index.js、message.vue。\n# 2026-11-05 (Thursday) ChatLog:\n**user**: 【记忆类型】fact\n【标题】Error: MiniProgramError {\"\n【内容】## 问题原因 报错路径是： `pages/announcement/detail?msgId=...&msgType=4` 但公告详情页已迁到 **`pages_main`** 分包，实际注册路径是： `pages_main/announcement/detail` 消息中心点击时走的是后端返回的 `msgUrl`，仍是旧的 `pages/announcement/...`，所以 `navigateTo` 找不到页面。 ## 修复方案 已增加统一的旧路径兼容函数 `normalizeLegacyPageUrl`，在跳转前把 `pages/announcement/` 等旧前缀映射为 `pages_main/announcement/`： 1. `zhi2-mobile-shimin/src/utils/route-map.js` — 新增 `normalizeLegacyPageUrl` 2. `zhi2-mobile-shimin/src/utils/index.js` — `goto` / `openPage` 跳转前自动做路径修正 3. `zhi2-mobile-shimin/src/pages_main/message/message.vue` — 消息列表使用同一函数处理 `msgUrl` 映射示例： ``` pages/announcement/detail?msgI\n【验证证据】extracted source=cursor project=苏住房C\n【涉及文件】`zhi2-mobile-shimin/src/utils/route-map.js ; `zhi2-mobile-shimin/src/utils/index.js ; `zhi2-mobile-shimin/src/pages_main/message/message.vue ; 涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\package.js\n【所属项目】苏住房C\n【来源会话ID】01893cc7-e8de-4690-b98f-18f412beec9e\n【代码基线】none\n【语言要求】请用简体中文抽取并写入记忆，不要输出葡萄牙语或其他语言。"
+            },
+            {
+                "uri": "viking://user/default/memories/events/2026/11/05/主包体积超限修复.md",
+                "memory_type": "events",
+                "after": "# Summary\n构建失败因主包上传预估2095.4KB超限制，移除mainStaticPaths.js中误加图片并将bg_szf.png迁至分包static，重新构建通过。\n# 2026-11-05 (Thursday) ChatLog:\n**user**: 【记忆类型】pattern\n【标题】问题诊断 构建失败是因为主包上传预估体积超限： | \n【内容】## 问题诊断 构建失败是因为**主包上传预估体积超限**： | 指标 | 数值 | 限制 | |------|------|------| | 磁盘体积 | 1790.9KB | 2048KB | | **上传预估** | **2095.4KB** | **2048KB** | 超出约 **47KB**，与最近加入主包白名单的两张图体积一致： - `images/empty.png` — 19KB - `images/bg_szf.png` — 28KB 它们本应在各分包 `static` 中（`migrate-main-empty-static.mjs` 已有迁移逻辑），却被误加回 `mainStaticPaths.js`，`prune-main-static.mjs` 构建时就会把它们保留在主包。 ## 已做修复 1. 从 `mainStaticPaths.js` 移除上述两项 2. 将 `bg_szf.png` 迁至 `pages_vote/static/images/` 3. 在 `utils/index.js` 的 `SUBPACKAGE_STATIC_IMAGES` 中注册 `bg_szf.png` 4. 删除 `src/static/images/` 下对应主包副本 ## 构建结果 重新构建已通过： ``` MAIN 磁盘 1744.4KB ok MAIN 上传预估\n【验证证据】extracted source=cursor project=苏住房C\n【涉及文件】`mainStaticPaths.js ; `utils/index.js ; 涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\scripts\\size-main-package.mjs、c:\\Users\\Administrator\\.cursor\\projects\\d-repository-C\\terminals\\8.txt、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\package.js\n【所属项目】苏住房C\n【来源会话ID】60972d80-2ade-40e7-a35c-5daa665ecffd\n【代码基线】none\n【语言要求】请用简体中文抽取并写入记忆，不要输出葡萄牙语或其他语言。"
+            },
+            {
+                "uri": "viking://user/default/memories/events/2026/11/05/分包日期组件路径修正.md",
+                "memory_type": "events",
+                "after": "# Summary\n分包announcement/index.vue使用ZsDatePicker导致require指向不存在的分包vendor.js，新增relocate-datetime-picker.mjs补丁修正为主包vendor.js，并补充relocate-z-paging.mjs。\n# 2026-11-05 (Thursday) ChatLog:\n**user**: 【记忆类型】fact\n【标题】[App.onError] MiniProgramE\n【内容】## 问题原因 这是 uni-app 微信小程序**分包**里的经典问题： `pages_main/announcement/index.vue` 使用了 `ZsDatePicker` → 内部依赖 `uni-datetime-picker`。构建后该组件被复制到分包 `pages_main/node-modules/...`，但其 `require` 仍指向： ``` ../../../../../common/vendor.js → pages_main/common/vendor.js（不存在） ``` 实际 `vendor.js` 在**主包** `dist/common/vendor.js`。 `relocate-z-paging.mjs` 已有 vendor 路径修正逻辑，但 `relocate-datetime-picker.mjs` 之前缺少这一步；`npm run dev` 也不会执行这些后处理脚本。 ## 已做修复 1. **`scripts/relocate-datetime-picker.mjs`** — 新增 `patchVendorRequiresInDir`，将 vendor 路径修正为主包 `common/vendor.js` 2. **`scripts/relocate-z-paging.mjs`** — 补充 `dist/dev/mp-weixi\n【验证证据】extracted source=cursor project=苏住房C\n【涉及文件】`pages_main/announcement/index.vue ; ../../../../../common/vendor.js ; pages_main/common/vendor.js ; `vendor.js\n【所属项目】苏住房C\n【来源会话ID】283d2149-aad6-4b95-83d3-698be7a1f675\n【代码基线】none\n【语言要求】请用简体中文抽取并写入记忆，不要输出葡萄牙语或其他语言。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/img_zsimage_tag_mismatch.md",
+                "memory_type": "entities",
+                "after": "# img与ZsImage标签混写导致无效结束标签\n在苏住房C小程序批量替换图片组件时，将`<img />`与`</ZsImage>`/`</ImageUploader>`混写，导致开始/结束标签不匹配。\n\n## 问题根因\n- 批量替换图片组件时，把`<img />`和`</ZsImage>`/`</ImageUploader>`混写在一起，导致标签不匹配\n- 同批替换还留下了错误静态资源路径（如`..../../`、`.././../../../`）\n\n## 修复方式\n- 将`<img /></ZsImage>`改为`<ZsImage />`\n- 将混写结构拆分为正确的`<img />` + `</ImageUploader>`\n- 修正畸形静态资源路径\n\n## 涉及文件\n- `pages_main/publicNotice/index.vue`\n- `pages_guard/index/index.vue`\n- `pages_owner/project/info/index.vue`\n- `pages_guard/emergencyContact/index.vue`\n- `pages_guard/guardApply/components/step1.vue`\n- `pages_owner/committee/application/index.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：e6b2c88e-db79-4d03-ada4-c17e191d6830"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/normalize_legacy_page_url.md",
+                "memory_type": "entities",
+                "after": "# 旧页面路径兼容修复\n苏住房C小程序消息中心点击公告详情时因后端返回旧路径导致navigateTo找不到页面，新增统一兼容函数修复。\n\n## 问题根因\n- 公告详情页已迁至`pages_main`分包，实际注册路径为`pages_main/announcement/detail`\n- 消息中心走后端返回`msgUrl`仍是旧路径`pages/announcement/detail?...`，导致跳转失败\n\n## 修复方案\n- 新增`normalizeLegacyPageUrl`函数映射旧前缀到新分包路径\n- 在`route-map.js`新增函数，`index.js`的`goto`/`openPage`跳转前自动修正\n- `message.vue`消息列表使用同一函数处理`msgUrl`\n\n## 涉及文件\n- `zhi2-mobile-shimin/src/utils/route-map.js`\n- `zhi2-mobile-shimin/src/utils/index.js`\n- `zhi2-mobile-shimin/src/pages_main/message/message.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：01893cc7-e8de-4690-b98f-18f412beec9e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/main_static_paths_fix.md",
+                "memory_type": "entities",
+                "after": "# 主包上传体积超限修复\n苏住房C小程序构建失败因主包上传预估体积超限，误加图片到主包白名单导致。\n\n## 问题诊断\n- 主包上传预估2095.4KB超出限制2048KB约47KB\n- `images/empty.png`(19KB)与`images/bg_szf.png`(28KB)被误加回`mainStaticPaths.js`\n- `prune-main-static.mjs`构建时保留它们在主包\n\n## 已做修复\n- 从`mainStaticPaths.js`移除上述两项\n- 将`bg_szf.png`迁至`pages_vote/static/images/`\n- 在`utils/index.js`的`SUBPACKAGE_STATIC_IMAGES`注册`bg_szf.png`\n- 删除`src/static/images/`下对应主包副本\n\n## 构建结果\n- 重新构建通过，主包上传预估降至合规\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：60972d80-2ade-40e7-a35c-5daa665ecffd"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/datetime_picker_vendor_fix.md",
+                "memory_type": "entities",
+                "after": "# 分包日期组件vendor路径修正\n苏住房C小程序分包页面使用ZsDatePicker依赖uni-datetime-picker，构建后require指向不存在的分包vendor.js。\n\n## 问题根因\n- `pages_main/announcement/index.vue`使用`ZsDatePicker`→`uni-datetime-picker`\n- 构建后组件复制到分包但require仍指向`pages_main/common/vendor.js`（不存在）\n- 实际vendor.js在主包`dist/common/vendor.js`\n- `relocate-datetime-picker.mjs`缺少vendor路径修正，`npm run dev`不执行后处理脚本\n\n## 已做修复\n- `scripts/relocate-datetime-picker.mjs`新增`patchVendorRequiresInDir`修正为主包`common/vendor.js`\n- `scripts/relocate-z-paging.mjs`补充`dist/dev/mp-weixin`相关修正\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：283d2149-aad6-4b95-83d3-698be7a1f675"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 8,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

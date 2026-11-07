@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-2bdfa038-0866-49cd-b1e9-f0b194a37ffc/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T04:08:19.204471+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-yulin-all-wuguan-fe-zhi2-web-admin-h5-g-unlimited/memories/events/2026/11/05/综合大屏全屏穿透页签丢失修复.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-05，榆林G 项目 zhi2-web-admin 的禅道 bug 6217 修复完成并推送到 develop/v2.6.2-yulin。根因为 layout/index.vue 中 tags-view 用 v-if 绑定 contentFullscreen，全屏穿透后组件重建触发 delAllVisitedViews 误关综合大屏页签；改为 v-show 保留挂载后解决。子模块提交 e840b7e99，父仓库 榆林G 提交 6fcb185，禅道 bug 6217 回写为 resolved/fixed 指派回 zhunan（action #87585）。\n# 2026-11-05 (Thursday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-yulin-all-wuguan-fe-zhi2-web-admin-h5-g-unlimited]**: http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6217\n...\n**assistant [peer=gitlab.zhi.com-zhi-yulin-all-wuguan-fe-zhi2-web-admin-h5-g-unlimited]**: User approved push + Zentao writeback. Let me push submodule first (bottom-up), then parent, verifying remote.\n...\n**assistant [peer=gitlab.zhi.com-zhi-yulin-all-wuguan-fe-zhi2-web-admin-h5-g-unlimited]**: All complete. Here's the summary.\n\n## bug 6217 修复完成\n\n**问题**：系统监控-综合大屏，全屏模式下穿透后会自动把大屏页签（综合大屏）关掉。\n\n### 根因\n大屏全屏用的是「内容全屏」机制，`layout/index.vue` 里 `tags-view` 用 `v-if=\"... && !contentFullscreen\"` 控制：\n1. 进入全屏 → 页签组件被**整体卸载**；\n2. 全屏下点击统计数字穿透（`goMenu` 先 `setContentFullscreen(false)` 再 `router.push`）→ 页签组件被**重新创建**，其 `mounted()` 里的 `delAllVisitedViews()` 会清空所有非固定页签；\n3. 时序竞态下「综合大屏」页签就被误关。\n\n### 修复\n`zhi2-web-admin/src/layout/index.vue`：把 `tags-view` 的显示控制由 `v-if` 改为**保留挂载 + `v-show=\"!contentFullscreen\"`**（外层仍 `v-if=\"outLink != 1 && needTagsView\"`）。全屏切换只做显隐、不再卸载重建，彻底消除重建导致的页签清空竞态。\n\n### 验证（Playwright + nginx 部署真实构建）\n复现「进入全屏 → 点物业管理区域总数穿透到物业管理区域备案」：\n\n| | 页签容器事件序列 | 结果 |\n|---|---|---|\n| 修复前 | `[false,true,false,true]` | 全屏卸载、穿透返回**重建**（触发竞态窗口） |\n| 修复后 | `[false,true]` | 全程**不卸载**，穿透后页签栏为「首页 / 综合大屏 / 物业管理区域备案」，大屏页签不再丢失 |\n\nlint 通过，构建成功。\n\n### 提交 / 推送（均已推到 `develop/v2.6.2-yulin`）\n- 子模块 `zhi2-web-admin`：`44f86d045`（修复）→ `e840b7e99`（合并），远程已确认\n- 父仓库 `榆林G`：`6fcb185`（gitlink 更新），远程已确认\n\n### 禅道\nbug 6217 已事务化回写为 **resolved / fixed**，指派回原提交人 `zhunan`，并补充根因+修复+验证说明（action #87585）。\n\n> 说明：本次全程在独立 worktree `zhi2-web-admin-wt-bug6217` 完成，已清理；期间探测到同机会有其他并行任务（bug6213/bug6220）在争用共享的仓库根 `dist`，因此验证改用独立 dist 目录，未影响他人工作。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/fullscreen_tab_loss.md",
+                "memory_type": "entities",
+                "after": "# 大屏全屏穿透丢失综合大屏页签（Bug 6217）\n榆林G 项目（园区物管2.0）系统监控-综合大屏在全屏模式下穿透后，会丢失「综合大屏」页签。\n## 问题根因\n- 大屏全屏使用「内容全屏」机制：layout/index.vue 中 tags-view 用 v-if=\"outLink != 1 && needTagsView && !contentFullscreen\" 控制。\n- 进入全屏 → tags-view 组件整体被卸载；全屏下穿透（goMenu 先 setContentFullscreen(false) 再 router.push）退出全屏 → tags-view 重新挂载。\n- TagsView 的 mounted() 会执行 delAllVisitedViews() 清空所有非固定（affix）页签，时序竞态下「综合大屏」页签被误关。\n- contentFullscreen 是全屏当前页通用机制（TagsView 右键菜单也有），故任何页全屏后导航都会触发同类问题。\n## 解决方案\n- 修改 zhi2-web-admin/src/layout/index.vue：tags-view 外层保留 v-if=\"outLink != 1 && needTagsView\"，内层显示控制改为 v-show=\"!contentFullscreen\"。\n- 全屏切换仅做 CSS 显隐、不再卸载重建，彻底消除重建导致的 delAllVisitedViews 竞态。\n## 验证与归属\n- 构建验证（Playwright + 本地 nginx 部署真实构建）：原码页签容器事件序列 [false,true,false,true]（全屏卸载、穿透返回重建）；修复后 [false,true]（全程不卸载），穿透后页签栏为「首页 / 综合大屏 / 物业管理区域备案」。\n- 为避免并行任务争用共享仓库根 dist（vite.config rootDir 解析到父目录 D:/repository/榆林G，多个 worktree 构建会互相覆盖），验证改用独立 --outDir 隔离 dist 目录部署。\n- 来源会话：2026-11-05 修复 bug 6217；文件 zhi2-web-admin/src/layout/index.vue；分支 develop/v2.6.2-yulin；子模块提交 44f86d045→合并 e840b7e99，父仓库 榆林G 提交 6fcb185；禅道 bug 6217 回写 resolved/fixed 指派回 zhunan（action #87585）。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/screen_drill_default_query.md",
+                "memory_type": "entities",
+                "after": "# 大屏穿透默认筛选未清除（Bug 6220 变体）\n园区物管2.0 大屏穿透到列表页时，目标页既有默认 queryParams 未被清除，导致列表额外叠加默认筛选、数量与大屏不一致。\n## 问题根因\n- 目标页本身有默认 queryParams（如 maintenanceProject/index.vue 默认 currentState='00' 即当前节点=项目立项）。\n- 大屏穿透只传 bizState=2（已备案）时，listMixins 只写入 URL 参数、未清除页面默认 currentState，列表被额外按当前节点过滤。\n- 期望行为（禅道 bug 6220）：大屏维修项目穿透应只按已备案筛选，不带上当前节点默认筛选。\n## 解决方案\n- 目标页重写 applyScreenQuery()，调用原 mixin 逻辑后 this.$set(this.queryParams, 'currentState', undefined)，使 from=screen 时清掉默认节点筛选。\n- 大屏侧入口：smartPropertyScreen/components/RepairFundRight.vue 的 goMenu('maintenance/maintenanceProject/index', buildScreenQuery({ bizState: 2 }, 'region'))。\n## 验证与归属\n- 来源会话：2026-11-05 修复 bug 6220；文件 zhi2-web-admin/src/views/maintenance/maintenanceProject/index.vue；分支 develop/v2.6.2-yulin；提交 53a49c076。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/screen_drill_filter.md",
+                "memory_type": "entities",
+                "before": "# 大屏穿透筛选参数与目标页对齐模式\n园区物管2.0 物业数据大屏左菜单穿透到列表页时，穿透参数必须在目标页有同名筛选项，否则用户看到的是全量数据。\n## 问题根因\n- 大屏穿透参数与列表页筛选参数是两份互不相干的约定：穿透侧传什么字段名，页面侧就得用同一个字段名接到查询条件。\n- 缺任一环，过滤条件要么完全不生效、要么只作用于「进页面的那一瞬间」，用户无入口可调，口径永久错位。\n- 物管会/业委会页面本无「状态」筛选项，穿透带过去的 committeeState=1 在页面上无处可改。\n## 解决方案\n- 建「大屏穿透参数 ↔ 目标页 queryParams ↔ 页面筛选项」三方对照表，一次性对齐字段名与取值（本批 #8/#9 物业服务合同与前期合同补 isEffect=1；#10/#11 物管会与业委会补 committeeState=1）。\n- 目标页缺筛选项时按字典补下拉（autonomy/record/components/index.vue 的 queryParams 加 committeeState，筛选面板新增「物管会/业委会状态」下拉，字典编码 IS_START，initDict 加载 IS_START）。\n- 页面已有同名字段直接复用（如 #8/#9 页面已有「执行状态」下拉 effect_state，穿透直接回填，不新增重复项）。\n- 后端改统计口径不急着换前端接口/字段（本批招标计划→招标备案单、企业生效合同口径→企业档案口径，确认前端无需替换），只标注「大屏数字会变」并回头检查告警阈值与文案。\n- 交付前用对照表逐项打勾，不只看大屏数字对不对。\n## 验证与归属\n- 验证：会话 859e9c31（基线 23d6668）用户诉求 1「页面没有筛选条件也需要加」、诉求 2「后端反馈有修改对照文档完善」，最终结论表格逐项列出穿透参数补齐与页面筛选项补充，#7/#13 属后端改统计口径前端无需替换（物业服务企业备案数 4→13）。\n- 涉及文件：zhi2-web-admin/src/views/smartPropertyScreen/components/PropertyManageLeft.vue、zhi2-web-admin/src/views/autonomy/record/components/index.vue；来源会话：859e9c31-a0be-49d9-8fc3-d4c91555496e；代码基线：23d6668。\n\n## 穿透时目标页默认筛选未清除（Bug 6220 变体）\n- 与「缺筛选项」相反的另一类穿透口径错位：目标页本身有默认 queryParams（如 maintenanceProject/index.vue 默认 currentState='00' 即当前节点=项目立项），大屏穿透只传 bizState=2（已备案）时，listMixins 只写入 URL 参数、未清除页面默认 currentState，列表被额外按当前节点过滤，数量与大屏（全部已备案）不一致。\n- 期望行为（禅道 bug 6220）：大屏维修项目穿透应只按已备案筛选，不带上当前节点默认筛选。\n- 修复：在目标页重写 applyScreenQuery()，调用原 mixin 逻辑后 this.$set(this.queryParams, 'currentState', undefined)，使 from=screen 时清掉默认节点筛选。\n- 大屏侧入口：smartPropertyScreen/components/RepairFundRight.vue 的 goMenu('maintenance/maintenanceProject/index', buildScreenQuery({ bizState: 2 }, 'region'))。\n- 来源会话：2026-11-05 修复 bug 6220；文件 zhi2-web-admin/src/views/maintenance/maintenanceProject/index.vue；分支 develop/v2.6.2-yulin；提交 53a49c076。",
+                "after": "# 大屏穿透筛选参数与目标页对齐模式\n园区物管2.0 物业数据大屏左菜单穿透到列表页时，穿透参数必须在目标页有同名筛选项，否则用户看到的是全量数据。\n## 问题根因\n- 大屏穿透参数与列表页筛选参数是两份互不相干的约定：穿透侧传什么字段名，页面侧就得用同一个字段名接到查询条件。\n- 缺任一环，过滤条件要么完全不生效、要么只作用于「进页面的那一瞬间」，用户无入口可调，口径永久错位。\n- 物管会/业委会页面本无「状态」筛选项，穿透带过去的 committeeState=1 在页面上无处可改。\n## 解决方案\n- 建「大屏穿透参数 ↔ 目标页 queryParams ↔ 页面筛选项」三方对照表，一次性对齐字段名与取值（本批 #8/#9 物业服务合同与前期合同补 isEffect=1；#10/#11 物管会与业委会补 committeeState=1）。\n- 目标页缺筛选项时按字典补下拉（autonomy/record/components/index.vue 的 queryParams 加 committeeState，筛选面板新增「物管会/业委会状态」下拉，字典编码 IS_START，initDict 加载 IS_START）。\n- 页面已有同名字段直接复用（如 #8/#9 页面已有「执行状态」下拉 effect_state，穿透直接回填，不新增重复项）。\n- 后端改统计口径不急着换前端接口/字段（本批招标计划→招标备案单、企业生效合同口径→企业档案口径，确认前端无需替换），只标注「大屏数字会变」并回头检查告警阈值与文案。\n- 交付前用对照表逐项打勾，不只看大屏数字对不对。\n## 验证与归属\n- 验证：会话 859e9c31（基线 23d6668）用户诉求 1「页面没有筛选条件也需要加」、诉求 2「后端反馈有修改对照文档完善」，最终结论表格逐项列出穿透参数补齐与页面筛选项补充，#7/#13 属后端改统计口径前端无需替换（物业服务企业备案数 4→13）。\n- 涉及文件：zhi2-web-admin/src/views/smartPropertyScreen/components/PropertyManageLeft.vue、zhi2-web-admin/src/views/autonomy/record/components/index.vue；来源会话：859e9c31-a0be-49d9-8fc3-d4c91555496e；代码基线：23d6668。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

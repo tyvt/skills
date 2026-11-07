@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793792554202/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T12:08:11.788916+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/login_auto_scale.md",
+                "memory_type": "entities",
+                "after": "# 登录页JS动态放大修复\n苏州市房地产监测V3 登录页因JS动态计算尺寸导致加载中自动放大拉伸的bug与修复要点。\n\n## 问题现象\n- 输入登录地址页面自动放大拉伸，视觉上不该有的拉升\n- 后台左侧图片加载后 syncLoginBoxLayout() 按图片宽高比和表单高度改写面板宽度/最小高度\n- ResizeObserver 与 window.resize 反复触发重算，加载过程多次跳变\n- dist 中无 CSS 过渡，确认是 JS 逻辑导致\n\n## 解决方案\n- 仅修改 zhi2-web-admin/src/views/login.vue\n- 删除整套动态尺寸逻辑：loginBgInlineStyle、syncLoginBoxLayout、measureLoginFormHeight、ResizeObserver、resize 监听及相关 data/watcher\n- 布局首帧即固定：面板宽度固定 520px，图片用 object-fit: cover 填充左侧区域，加载零跳动\n- 顺带修复短视口溢出：.login 由 height:100% 改为 min-height:100%，内容超高页面滚动，“主办方/技术支持”不再压住登录按钮\n\n## 验证与归属\n- 验证：浏览器复现线上问题（登录框撑大、底部文字压按钮），本地 dev serve 通过\n- 涉及文件：zhi2-web-admin/src/views/login.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：68b279ff-7526-4e1e-b55d-551e0e5c8376；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cert_form_fields.md",
+                "memory_type": "entities",
+                "after": "# 专业资格证书表单字段完善\n苏州市房地产监测V3 专业资格证书管理详情表单按设计稿调整为14字段3列栅格并新增性别等字段。\n\n## 改动背景\n- 原表单字段未对齐设计稿，需修改 zhi2-web-admin/src/views/company/personnelCertificate/detail.vue\n- 列表页 index.vue 列已与设计稿一致，无需改动\n\n## 表单结构\n- 最终14字段（3列栅格）：行1 姓名* name、证件号码* idNumber、性别* sex；行2 证书管理号* certificateCode、发证日期* issueDate、资格证书类型* certificateType；行3 证书级别* level、发证机关* issueOrgan、证书状态* certStatus；行4 联系电话* phone、证书登记号 registrationNumber、证书登记日期 registrationDate；行5 证书登记从业机构 registrationOrgan；行6 备注 remark 整行\n- 新增字段：性别（字典 sys_user_sex，必填；证件号码失焦且性别为空时反填逻辑在 utils/idCard.js）\n\n## 验证与归属\n- 验证：仅改动 detail.vue、index.vue、utils/idCard.js\n- 所属项目：苏州市房地产监测V3；来源会话ID：3faee039-2b79-4d3e-be53-0d46273c923b；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/register_bottom_gap.md",
+                "memory_type": "entities",
+                "after": "# 租赁机构注册底部空白过大修复\n苏州市房地产监测V3 租赁机构注册页因全局 padding 与协议 margin 叠加导致底部空白过大的 bug 与修复。\n\n## 根因\n- 全局样式给 .institution-register-form 加 padding-bottom:48px（为无协议勾选机构注册避让固定底栏）\n- 租赁机构有协议勾选且 .agreement-wrap 自带 margin-bottom:88px，两者叠加导致约136px空白\n\n## 解决方案\n- 修改 InstitutionRegisterSingleForm.vue\n- 根节点动态加 has-agreement 类（isLeaseOrgan 时）\n- 租赁机构（有协议）时 padding-bottom:0，仅保留协议自带88px下边距避让固定按钮栏\n- 经纪机构（无协议）保持原48px不变\n\n## 验证与归属\n- 涉及文件：InstitutionRegisterSingleForm.vue 等\n- 所属项目：苏州市房地产监测V3；来源会话ID：08c8c33f-395a-42c3-ab4b-468a9d18c04b；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/lease_menu_split.md",
+                "memory_type": "entities",
+                "after": "# 租赁合同录入与备案菜单拆分\n苏州市房地产监测V3 按接口文档将租赁合同备案前置菜单拆分为“录入”与“备案”两个独立菜单的前端实现要点。\n\n## 租赁合同录入（leaseContractEntry，无审批流）\n- 列表 apiSuffix 改为 entryPage（全部有效数据）；保留产权核验新增、编辑、删除（仅待提交）\n- 详情 :show-submit=\"false\" :show-approval=\"false\"；附件区与附件抽屉 busCode 均改为 zlhtlr，要件随 /save 的 attachmentList 挂载；已备案后仍可打印\n\n## 租赁合同备案（leaseContract，有审批流）\n- 列表接口走 /page（仅审核中/已备案）；新增入口改为「选择录入数据」弹窗（新组件 SelectEntryDialog.vue，调 /selectableEntryPage，仅待提交数据，支持备案编号/签订日期筛选）；移除编辑/删除按钮与多选列；移除无效「业务状态」筛选；选中后携带 leaseContractId 以 formMode=view 进详情\n- 详情 :show-edit=\"false\" :show-save=\"false\"（不调 /save）；拆为两个附件区\n\n## 验证与归属\n- 前端共改6个文件：SelectEntryDialog.vue、leaseContractConstants.js、LeaseContractAddAppendix.vue、index.vue 等\n- 所属项目：苏州市房地产监测V3；来源会话ID：67cf2f7e-1814-4fa2-bdbe-e15987a18993；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

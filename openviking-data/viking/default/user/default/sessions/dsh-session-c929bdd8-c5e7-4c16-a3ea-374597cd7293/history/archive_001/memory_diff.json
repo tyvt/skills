@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-c929bdd8-c5e7-4c16-a3ea-374597cd7293/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T04:41:32.048918+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bug6213_tree_select.md",
+                "memory_type": "entities",
+                "after": "# Bug 6213 大屏穿透左树未选中区域\n榆林G 项目（园区物管2.0）系统监控-综合大屏点选区域穿透到「物业管理区域备案」(property/complex)，左树未选中所选区域。\n\n## 问题根因\n- 大屏 goMenu 跳转携带 region=行政区划码&from=screen；列表按 region 过滤正常。\n- 左树初始选中仅依据 store 缓存 cachedParentDeptId；穿透场景不写缓存也无 parentDeptId，导致左树退化为根节点「榆林市」。\n- 部门树节点 id 为 deptId，区域码(610802)须名称映射才能定位节点；高新区(610893)/科创新城(610894) 无独立树节点。\n\n## 解决方案\n- RegionTreeLayout.vue：from=screen 且带 region 时计算 resolvedInitialRegionName（仅在无缓存 parentDeptId、非平铺/重置时生效），传给 region-tree。\n- regionTree.vue：新增 initialRegionName prop，按区域名(deptName/name/label，去区/县/市后缀兜底)匹配节点默认选中，优先级 initialSelectedId > initialRegionName > 根节点。\n- constants/region.js：新增 getTreeRegionNameByCode；高新区→榆阳区、科创新城→横山区。\n\n## 验证与归属\n- 本地全链路 E2E：region=610802→左树自动选中榆阳区✓；610803→横山区✓；子区域610893(高新区)→榆阳区✓；无 from 正常进入→默认榆林市✓（无回归）。\n- 真实 Dameng 核对：部门树 榆林市→榆阳区(826)/横山区(827)… 与区域名一致，子区域无独立节点，假设成立。\n- 来源会话：2026-11-05 修复 bug 6213；文件 RegionTreeLayout.vue/regionTree.vue/constants/region.js；分支 develop/v2.6.2-yulin；子模块提交 ab1d0f4f2→合并 716172438，父仓库 榆林G 提交 f70cf9a；禅道 bug 6213 回写 resolved/fixed 指派回 zhunan（action #87593）。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/项目/estate_manage_backend.md",
+                "memory_type": "entities",
+                "after": "# 园区物管2.0后端（estate-manage）\n园区物管2.0（榆林G）Spring Cloud 微服务后端，仓库 http://gitlab.zhi.com/zhishu/estate-manage，分支 develop/v2.6.2-yulin。\n\n## 架构与服务\n- 多模块 Maven Spring Cloud Alibaba（gateway + 14+ 服务），Java 8，Nacos 配置/注册，Dameng，无 Docker。\n- 关键端口：common-gateway(8080)、common-framework(9211，鉴权/登录/部门树)、zhi2-property(9604，物业区域备案列表)。\n- Nacos nacos.test.zhi.com namespace yulin-all-wuguan；配置 application.yml/shared-druid.yml/shared-redis.yml/shared-seata.yml。\n\n## 数据库\n- 达梦「榆林G-物管后端」dameng.v2.wuguan.all.yulin.test.zhi.com:5236，SYSDBA/DaMeng_qZXhjHBFdEB8kInP（已加 DBX 连接）。\n- 单实例多 schema：COMMON_FRAMEWORK(SYS_DEPT 部门树)、ZHISHU_PROPERTY(T_COMPLEX)、DATA_PROPERTY、SERVICE_EXPAND。\n- Redis 172.10.0.2:6379(密码 Redis_gqpVKeIEUGia1tQe)；Seata 192.168.10.10:8091。\n\n## 本地启动要点\n- Java 8 必须 -Dfile.encoding=UTF-8 防 Nacos 中文 YAML 被 GBK 解析失败（首次本地启动根因）。\n- 登录密码前端 AES 加密后传输（与苏住房同套机制）；服务间 Feign 须带 zhi-project-id 头。\n- 部门树：榆林市(825)→榆阳区(826)/横山区(827)/神木市(837)…(DEPT_TYPE 0)；子区域(高新区/科创新城)无独立节点。\n- 临时测试账号须赋有 SYS_PROJECT_MENU(wuguan) 映射的角色（如 role 9 市州）才能加载动态路由；USER_ID=1 或 1152921504609992704 才被视为 admin。\n\n## 联调注意\n- 共享测试 Nacos 集群，本地启动服务会注册进去与测试实例混部，可能破坏 Feign 调用；验证完应停止本地服务。\n- 前端 zhi2-web-admin 的 vite rootDir 指向父目录，多 worktree 构建互相覆盖 dist，须用 --outDir 隔离。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/软件项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，采用 Vite + Vue，前端代码位于 zhi2-web-admin。\n\n## 部署与构建约定\n- 生产发版必须整目录全量上传 dist/，逐个传文件易漏传导致 chunk 502。\n- vite.config.js 需设 emptyOutDir:true，并为大型页面单独分包（如 module-map-overview-[hash].js）。\n- 验证 chunk 用 curl -I 确认返回 200 且 Content-Type 为 application/javascript。\n- 榆林子模块 zhi2-web-admin 的 vite.config.js 中 rootDir = path.resolve(__dirname, \"../\") 解析到父目录 D:/repository/榆林G，故各 worktree（bug6213/bug6217/bug6220 等）的 vite build 均输出到同一 D:/repository/榆林G/dist，多任务并行会互相覆盖产物。\n- 规避：用 vite CLI --outDir 指定独立产物目录（如 D:/repository/榆林G-bug6220-dist），并在 nginx-ui 新建独立站点（如端口 8109）指向该目录验证，避免占用共享站点 榆林G.conf（端口 8108，曾被 bug6217 任务指向其 D:/repository/榆林G-wt-bug6217-dist）。\n\n## 已知问题\n- 生产路由懒加载曾报 TypeError: Failed to fetch dynamically imported module，根因发版不完整（主包更新但个别 chunk 在 nginx 502），例 index-CJ4J-IEu.js（mapOverview 旧 chunk）502，因 outDir 在仓库根 dist/ 且 emptyOutDir=false 致残留。\n- 另一根因：源码中文命名静态资源被 Vite 打成中文名 chunk，子路径/CDN 对 URL 编码中文路径不友好致 404，需改英文短名。例 operatingAssets.vue 曾用中文名 import statisticsMap/images/ 下 PNG 与 assets/images/benefit/ 下三张车位图，后改名为 club.png、tent-lease.png、parking-space-total.png 等（来源会话 d9094763）。\n- zhi2-web-admin/src/permission.js 对 chunk 加载失败（404/502）自动刷新一次，缓解发版后 HTML 与 JS hash 不一致。\n\n## 代码与功能特征\n- 自研 zs-table、zs-table-column 与 ECharts 图表模块；业务含资产详情弹窗、运营报告 Tab、统计卡片等。\n- 图表交互需手动配对 ECharts dispatchAction highlight/downplay。\n- benefit/dataSandbox/assetPanorama 饼图图例仅展示 value>0 分类，无数据时隐藏图例并居中显示「暂无数据」，避免 ECharts legend 与 series 不匹配警告（来源会话 adffdf74）。\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可均分撑满。\n- 多附件字段逗号分隔多路径，消费前拆数组逐张处理。\n\n## 分支与关联文件\n- 子模块 zhi2-web-admin 含 develop/v2.6.1、v2.6.2、v2.6.2-yulin 等并行分支。\n- 父仓库仅有 develop/v2.6.1 与 v2.6.2 分支，无 262-yulin；榆林变更仅落子模块。\n- 关联文件：zhi2-web-admin/vite.config.js、zhi2-web-admin/src/permission.js。",
+                "after": "# 园区物管2.0\n园区物管2.0（榆林G）园区物业管理 Vue 前端，Vite + Vue，代码位于 zhi2-web-admin 子模块。\n\n## 部署与构建\n- 生产发版须整目录全量上传 dist/，逐文件易漏传致 chunk 502。\n- vite.config.js 须 emptyOutDir:true 并为大页面单独分包（如 module-map-overview-[hash].js）；curl -I 验证 chunk 200 + application/javascript。\n- 子模块 vite rootDir=__dirname/../ 解析到父目录 D:/repository/榆林G，各 worktree build 均写同一 dist 互相覆盖；用 CLI --outDir 指定独立目录（如 榆林G-bug6220-dist）并在 nginx-ui 建独立站点（如 8109）验证，避免占用共享站点 榆林G.conf(8108)。\n\n## 已知问题\n- 生产路由懒加载曾报 Failed to fetch dynamically imported module：根因发版不完整（主包更新但个别 chunk nginx 502，因 outDir 在根 dist/ 且 emptyOutDir=false 残留）；另因中文命名静态资源被打成中文名 chunk，URL 编码不友好致 404，须改英文短名（如 operatingAssets.vue 图片改 club.png 等）。\n- zhi2-web-admin/src/permission.js 对 chunk 加载失败(404/502)自动刷新一次缓解 hash 不一致。\n\n## 代码特征\n- 自研 zs-table/zs-table-column 与 ECharts；图表交互须手动 dispatchAction highlight/downplay。\n- 饼图图例仅展示 value>0 分类，无数据居中「暂无数据」。\n- 表格列宽由 zs-table-column 计算，min-width 弹性列均分撑满；多附件字段逗号分隔，消费前拆数组。\n\n## 分支\n- 子模块含 develop/v2.6.1、v2.6.2、v2.6.2-yulin 并行分支；父仓库仅 develop/v2.6.1/v2.6.2，无 262-yulin，榆林变更仅落子模块。\n- 关联文件：zhi2-web-admin/vite.config.js、src/permission.js。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,52 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_013",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:44:07.548450+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/css静态资源url注入.md",
+                "memory_type": "entities",
+                "after": "# CSS静态资源URL注入\n园区物管2.0 的 Vite 项目中，<style> 里 url() 无法执行 JS 解析子路径部署地址，通过 JS 注入 CSS 变量配合 resolveServerAssetUrl 解决。\n\n## 问题背景\n- Vite 项目里 <img> :src 和 ECharts rich 图标可用 import + resolveServerAssetUrl 解析（兼容子路径部署），但 <style> 里的 url(\"@/assets/...\") 无法执行 JS、拿不到解析后地址，子路径部署时背景图/装饰图会 404。\n- CSS 是静态产物，编译期 url() 与运行时代理/子路径前缀解析是两条链路。\n\n## 解决方案\n- 图片统一用 import assetXxx from '@/assets/...'（Vite 下比 require 稳），集中构造 MAP_OVERVIEW_ASSET_URL 映射对象，每个字段都过 resolveServerAssetUrl；data 里暴露一份给模板与 initMap 共用。\n- 样式需图处，在 mounted 最前面同步执行 injectXxxCssAssetVars()，在页面根元素上 setProperty('--mov-xxx', `url(${JSON.stringify(已解析地址)})`)，样式改写为 var(--mov-xxx)；注入放 mounted 同步执行、再 $nextTick 初始化图表，减轻首帧闪烁。\n- 函数入参判 el instanceof HTMLElement 以过类型检查。\n\n## 涉及文件\n- zhi2-web-admin/src/views/benefit/mapOverview/index.vue\n- zhi2-web-admin/src/utils/resolveServerAssetUrl.js\n- 所属项目：园区物管2.0（代码基线 f00310232，来源会话 659b9b99-3806-4640-804a-486f070d2eef）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/银行回单核销业务约定.md",
+                "memory_type": "entities",
+                "after": "# 银行回单核销业务约定\n园区物管2.0 的 benefit/pubVerificationReceipts 模块对接后端时，借贷方向字段与回单流水号编辑态锁定的业务契约与技术做法。\n\n## 业务契约\n- 借贷方向字段 loanDirction 后端收中文「借/贷」而非 1/2 数字字典值，语义相反需归一化。\n- 回单流水号与子表单据列表强绑定：重选回单需删除已选子表单据全部重选，故编辑态禁止换选。\n\n## 实现做法\n- 抽 normalizeLoanDirction 归一化函数，在保存(getForm)、详情回填(detailCallback)、选回单回填(fillFormFromBankReceipt)三处统一把 1/2 或字典值转成「借/贷」；选回单弹窗按业务语义筛选：收入类传「贷」、支出类传「借」。\n- 用 isReceiptSerialEditable 控制回单流水号仅新增态可点选/清空，编辑态 disabled 并在选择弹窗入口和清空函数加守卫。\n- 通用启示：与「子表数据来源于某个主选择项」的单据，编辑态应锁定主选择项而非允许换选后再批量清理。\n\n## 涉及文件\n- zhi2-web-admin/src/views/benefit/pubVerificationReceipts/detail.vue\n- zhi2-web-admin/src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue\n- zhi2-web-admin/src/mixins/detailMixins.js、form.js\n- 所属项目：园区物管2.0（代码基线 fc994977f，来源会话 8e7e3010-be24-4507-a451-7199a958a01e）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/vite_chinese_chunk_404.md",
+                "memory_type": "entities",
+                "after": "# Vite中文文件名chunk404\n园区物管2.0 中因中文命名静态资源被 Vite 打成中文名 chunk，子路径/CDN 部署时 404 伪装成动态模块加载失败的问题与修复。\n\n## 现象\n- 生产环境报 TypeError: Failed to fetch dynamically imported module（如 ../assets/index-BJlYXbMW.js），本地构建正常。\n- 控制台请求形如 .../assets/%E4%BC%9A%E6%89%80-xxx.js（URL 编码中文），是 Vite 为被 import 的静态资源模块打出的小 JS chunk（再导出图片 URL），chunk 名来自源文件路径。\n\n## 根因\n- 页面用中文文件名 import PNG（如 会所.png、帐篷租赁.png），部署在 /sz/ 子路径且部分 Nginx/CDN 对 URL 编码中文路径不友好，导致 404 进而触发顶层动态模块加载失败。\n\n## 解决方案\n- 源码所有中文命名静态资源统一改英文短名（会所.png→club.png），import 路径同步替换，业务层中文 key 映射表（如 STAT_ICON_MAP）无需改动。\n- 重建后确认 dist/assets 不再出现中文命名 chunk。\n- 若部署后仅主入口 chunk 仍报 Failed to fetch，多半是整包未同步完/CDN 或浏览器缓存旧 index.html 指向新 hash/网关只转发部分静态文件，处理办法全量发布 dist 并强刷/清 CDN，保证 index.html 与各 assets/*.js 来自同一次构建。\n\n## 涉及文件\n- src/views/benefit/statisticsMap/images/、src/assets/images/benefit/、src/views/benefit/statisticsMap/components/operatingAssets.vue\n- 所属项目：园区物管2.0（代码基线 f00310232，来源会话 d9094763-20ae-4fff-969b-13dc3c307504）"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/软件项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是采用 Vite + Vue 的前端项目，前端代码位于 zhi2-web-admin，构建产物 outDir 在仓库根 dist/（不在 zhi2-web-admin 内）。\n## 部署约定\n- 生产环境发版必须整目录全量上传 dist/，逐个传文件极易漏传导致 chunk 502。\n- Vite 默认 emptyOutDir=false，需在 vite.config.js 设 emptyOutDir:true，并为大型页面单独分包（如 module-map-overview-[hash].js）。\n- 验证 chunk 用 curl -I 确认返回 200 且 Content-Type 为 application/javascript。\n## 已知问题\n- 生产路由懒加载曾报 TypeError: Failed to fetch dynamically imported module，根因是发版部署不完整（主包更新但个别 chunk 在 nginx 上 502），非源码或路由代码问题。\n- zhi2-web-admin/src/permission.js 对 chunk 加载失败（404/502）自动刷新一次，缓解发版后 HTML 与 JS hash 不一致。\n## 关联文件\n- zhi2-web-admin/vite.config.js、zhi2-web-admin/src/permission.js。",
+                "after": "# 园区物管2.0\n园区物管2.0 是采用 Vite + Vue 的前端项目，前端代码位于 zhi2-web-admin，构建产物 outDir 在仓库根 dist/（不在 zhi2-web-admin 内）。\n## 部署约定\n- 生产环境发版必须整目录全量上传 dist/，逐个传文件极易漏传导致 chunk 502。\n- Vite 默认 emptyOutDir=false，需在 vite.config.js 设 emptyOutDir:true，并为大型页面单独分包（如 module-map-overview-[hash].js）。\n- 验证 chunk 用 curl -I 确认返回 200 且 Content-Type 为 application/javascript。\n## 已知问题\n- 生产路由懒加载曾报 TypeError: Failed to fetch dynamically imported module，根因是发版部署不完整（主包更新但个别 chunk 在 nginx 上 502），非源码或路由代码问题。\n- 另一类动态模块加载失败根因：源码中文命名静态资源被 Vite 打成中文名 chunk，子路径/CDN 对 URL 编码中文路径不友好致 404，需改英文短名（见前端技术笔记/vite_chinese_chunk_404）。\n- zhi2-web-admin/src/permission.js 对 chunk 加载失败（404/502）自动刷新一次，缓解发版后 HTML 与 JS hash 不一致。\n## 关联文件\n- zhi2-web-admin/vite.config.js、zhi2-web-admin/src/permission.js。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite地图代理路径适配.md",
+                "memory_type": "entities",
+                "before": "# Vite地图代理路径适配\n园区物管2.0 地图区划（腾讯行政区划）数据拉取在 Vite 相对路径部署下的适配演进与最终方案。\n\n## 问题背景\n- 早期 base='./' 部署时，代理转发写死绝对路径 /map/... 导致子路径下 404 静默失败，后用 getDistrictProxyPrefix 返回 './map' 相对路径暂解。\n- 后续生产环境报 `Unexpected token '<', \"<!DOCTYPE\"... is not valid JSON`：tencentDistrictBoundary.js 用 `import.meta.env.DEV` 分流，dev 走 fetch('./map/...') 依赖 Vite /map 代理，生产无该代理，请求落 SPA index.html 被 res.json() 解析报错。\n- 更隐蔽：terser 压缩后 DEV 分支被错误保留、JSONP 分支被当死代码删除，生产包实际跑开发分支。\n\n## 解决方案\n- 区划 GeoJSON 等依赖 dev 代理的第三方数据拉取，统一改为 JSONP 直连腾讯行政区划 API（apis.map.qq.com），与 statisticsMap/map.vue 同套路，彻底摆脱本地代理依赖。\n- 修复后重新构建并核对产物 chunk 含 JSONP 调用、不含 fetch('./map')；部署整包替换 dist 并清 CDN/浏览器缓存。\n- 前置确认：后台 platformConfig.region 配 6 位 adcode、腾讯地图 Key 开通 WebServiceAPI（JSONP 必需）。\n\n## 排查要点\n- 生产报 HTML 解析错误先查网络请求是否落到 index.html；用控制台确认腾讯接口具体错误（Key 权限/配额）而非 HTML 解析。\n- 涉及文件：tencentDistrictBoundary.js、mapOverview/index.vue、statisticsMap/components/map.vue；所属项目：园区物管2.0（zhi2-web-admin）。",
+                "after": "# Vite地图代理路径适配\n园区物管2.0 地图区划（腾讯行政区划）数据拉取在 Vite 相对路径部署下的适配演进与最终方案。\n\n## 问题背景\n- 早期 base='./' 部署时，代理转发写死绝对路径 /map/... 导致子路径下 404 静默失败，后用 getDistrictProxyPrefix 返回 './map' 相对路径暂解。\n- 后续生产环境报 `Unexpected token '<', \"<!DOCTYPE\"... is not valid JSON`：tencentDistrictBoundary.js 用 `import.meta.env.DEV` 分流，dev 走 fetch('./map/...') 依赖 Vite /map 代理，生产无该代理，请求落 SPA index.html 被 res.json() 解析报错。\n- 更隐蔽：terser 压缩后 DEV 分支被错误保留、JSONP 分支被当死代码删除，生产包实际跑开发分支。\n- 具体错误写法：源码写 `if (void 0 !== import.meta && l && !0)` 这类运行时探测 import.meta 是否存在的判断，esbuild/terser 压缩后条件被错误求值为恒真，导致生产仍走 dev 才有的 ./map 代理而非回落 JSONP（apis.map.qq.com）。验证：旧构建 index-DUzdsYzz.js 中条件压缩为 `void 0 !== import.meta && l && !0` 恒真走 ./map 代理；新构建改用 import.meta.env.DEV 后正确走 JSONP。\n\n## 解决方案\n- 区划 GeoJSON 等依赖 dev 代理的第三方数据拉取，统一改为 JSONP 直连腾讯行政区划 API（apis.map.qq.com），与 statisticsMap/map.vue 同套路，彻底摆脱本地代理依赖。\n- 环境判断必须直接使用 `import.meta.env.DEV`，让压缩器把分支固化成布尔常量、dead code 直接剔除，而不是运行时探测 import.meta 对象是否存在；此类写法在所有「仅开发环境存在的代理/路径」判断里通用。\n- 修复后重新构建并核对产物 chunk 含 JSONP 调用、不含 fetch('./map')；部署整包替换 dist 并清 CDN/浏览器缓存。\n- 前置确认：后台 platformConfig.region 配 6 位 adcode、腾讯地图 Key 开通 WebServiceAPI（JSONP 必需）。\n\n## 排查要点\n- 生产报 HTML 解析错误先查网络请求是否落到 index.html；用控制台确认腾讯接口具体错误（Key 权限/配额）而非 HTML 解析。\n- 生产 404 另一类根因是哈希 chunk 部署/缓存不一致：Network 看失败文件哈希是否还在 index.html/module-main 的新引用里；处理方式是整包 dist 覆盖部署+清缓存，不要只拷部分文件。\n- 涉及文件：tencentDistrictBoundary.js、mapOverview/index.vue、statisticsMap/components/map.vue；所属项目：园区物管2.0（zhi2-web-admin）。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、sidebar_recursive_menu\n- 图表与样式类：echarts_donut_label、chart_amount_format、unused_sprite_cleanup、dialog_dual_layout\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、企业关联ID统一companyRecordId",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、sidebar_recursive_menu\n- 图表与样式类：echarts_donut_label、chart_amount_format、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 3,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

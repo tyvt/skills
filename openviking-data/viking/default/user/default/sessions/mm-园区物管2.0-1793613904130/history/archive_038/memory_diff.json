@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_038",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T11:44:24.852533+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/search_mode_reset_bug.md",
+                "memory_type": "entities",
+                "after": "# 搜索失败未复位isSearchMode致样式错乱\n园区物管2.0 统计地图中 handleSearch 过早设 isSearchMode=true，搜索失败未恢复致地图样式错乱。\n\n## 问题根因\n- handleSearch 在接口返回前过早设置 isSearchMode=true\n- mapMarkerMode 在搜索模式下固定使用 project 样式\n- 接口失败或异常时未恢复 isSearchMode，导致行政区划图层样式错乱\n\n## 解决方案\n- 仅当搜索成功且有数据时设置 isSearchMode=true\n- 失败或异常调用 restoreAreaLayerAfterSearchFail() 重置 false 并重载 loadAreaComplexLayer 行政区划图层\n\n## 验证与归属\n- 验证证据：src=园区物管2.0/047.md\n- 涉及文件：benefit/statisticsMap/index.vue\n- 所属项目：园区物管2.0；来源会话：a3789a5a-09f2-4f9a-8236-5d37e21277d1"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_donut_ratio_drop.md",
+                "memory_type": "entities",
+                "after": "# 饼图比例弃用接口ratio仅取ECharts计算值\n园区物管2.0 资产全景饼图改造中 getDonutSlicePercent 仅用 ECharts percent，弃用接口 ratio 字段。\n\n## 问题根因\n- getDonutSlicePercent 移除 card.donutData 的 ratio 读取，仅保留 Math.round(p.percent)\n- parseAssetCategories 不再解析写入接口字段 ratio\n- tooltip 与 label 的 formatter 调用 getDonutSlicePercent(p)\n\n## 已知缺陷\n- count===0 扇区以占位值 1 绘图时 ECharts 占比偏离真实数量\n- 需一致须恢复 ratio 或剔除 0 项出 series\n\n## 验证与归属\n- 验证证据：src=园区物管2.0/053.md\n- 涉及文件：benefit/dataSandbox/assetPanorama/index.vue\n- 所属项目：园区物管2.0；来源会话：e98b3c2b-020e-45a5-bbab-7177966aefbc"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/顶栏布局样式偏好.md",
+                "memory_type": "preferences",
+                "after": "- 顶栏固定 78px 高度与过大内边距导致控件不高时多余空白，改用 grid-template-rows: auto 1fr 使高度随内容\n- .title-box 上下 padding 改为 2px/3px\n- 筛选项下拉框高度由 28px 改为 24px\n- 右侧时间字号由 18px 改为 16px 并加 line-height: 1.2\n- .content-box 上 padding 由 10px 改为 6px\n- 若仍显空需排查外层 router-view 或全屏容器 padding 撑高\n- 验证证据：src=园区物管2.0/049.md；涉及文件：benefit/mapOverview/index.vue；来源会话：a2d41117-a470-4df0-9e10-f38bf616d640"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/select_func_store.md",
+                "memory_type": "entities",
+                "before": "# 函数式挂载选择弹窗需注入上下文\n园区物管2.0 中通过 SelectDialog.open() 动态创建 zs-select-dialog-func 实例时，必须注入 parent/store/router，否则混入 table 的 tableConfig getter 崩溃。\n\n## 问题根因\n- 动态创建的根实例未挂 Vuex store，而 zs-select-dialog-func 混入 @/mixins/table，其 tableConfig 计算属性访问 this.$store.getters 导致 $store 为 undefined 崩溃\n- 与已知函数式弹窗坑（propsData 传 visible 被丢、resolve/reject 竞态）是不同的第三个根因\n\n## 解决方案\n- 创建实例时除组件 options 外注入 parent: instance、store: window.__VUE_APP_STORE__ || instance.$store、router: window.__VUE_APP_ROUTER__ || instance.$router\n- 与 main.js 既有设计对齐，新增「函数式挂载组件 + 访问 $store 的 mixin」组合时必须检查此注入，不能只传 propsData\n\n## 验证与归属\n- 验证：会话 7f55cc88 报错栈指向 open() 经 mixins/table.js 的 tableConfig getter；修复代码注入三参数\n- 涉及文件：zs-select-dialog-func.vue、mixins/table.js、autonomy/general/detail.vue；所属项目：园区物管2.0；代码基线：736a824e7",
+                "after": "# 函数式挂载选择弹窗需注入上下文\n园区物管2.0 中通过 SelectDialog.open() 动态创建 zs-select-dialog-func 实例时，必须注入 parent/store/router，否则混入 table 的 tableConfig getter 崩溃。\n\n## 问题根因\n- 动态创建的根实例未挂 Vuex store，而 zs-select-dialog-func 混入 @/mixins/table，其 tableConfig 计算属性访问 this.$store.getters 导致 $store 为 undefined 崩溃\n- 与已知函数式弹窗坑（propsData 传 visible 被丢、resolve/reject 竞态）是不同的第三个根因\n\n## 解决方案\n- 创建实例时除组件 options 外注入 parent: instance、store: window.__VUE_APP_STORE__ || instance.$store、router: window.__VUE_APP_ROUTER__ || instance.$router\n- 与 main.js 既有设计对齐，新增「函数式挂载组件 + 访问 $store 的 mixin」组合时必须检查此注入，不能只传 propsData\n\n## 验证与归属\n- 验证：会话 7f55cc88 报错栈指向 open() 经 mixins/table.js 的 tableConfig getter；修复代码注入三参数；验证证据 src=园区物管2.0/048.md\n- 涉及文件：zs-select-dialog-func.vue、mixins/table.js、autonomy/general/detail.vue、main.js、utils/tableColumnConfig.js；所属项目：园区物管2.0；代码基线：736a824e7"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

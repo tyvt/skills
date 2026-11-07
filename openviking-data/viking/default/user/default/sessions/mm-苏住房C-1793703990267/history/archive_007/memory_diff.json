@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_007",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:20:57.566811+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/page_bg_inherit.md",
+                "memory_type": "entities",
+                "after": "# 全局页面背景色铺满修复\n小程序根节点 min-height:100% 依赖父级高度致背景不铺满，改用 uni-page-body 100vh 加根节点 inherit 全局解决。\n\n## 现象与根因\n- 页面根节点写 min-height:100%，百分比高度依赖父级已解析高度\n- 小程序/H5 的 uni-page-body 高度等于内容高度时，父级高度=内容高度，100% 退化，背景只铺到内容底部\n- 属全局根节点高度链断裂，非单页样式写错\n\n## 解决方案\n- 非 H5 端给 uni-page-body 加 min-height:100vh 建立视口高度基准\n- 页面根节点 uni-page-body > view/div 的 min-height 从 100% 改为 inherit 继承父级视口高度\n- 公共根类(.container/.container-box/.index-page/.user-info-box/.setting-page 等)统一改 min-height:inherit\n- 用 inherit 而非全写 100vh，避免白底页透明区露白，有背景色页彻底铺满\n\n## 验证与归属\n- 验证会话 f1b859df（基线 6aca310）：用户报 TypeChoose.vue 灰背景不满一屏，要求全局排查所有页面\n- 涉及文件：zhi2-mobile-shimin/src/uni.scss、TypeChoose.vue、App.vue、setting/index.vue、FormLocal.vue\n- 所属项目：苏住房C；代码基线：6aca310"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/subpackage_slim_2048.md",
+                "memory_type": "entities",
+                "after": "# 分包超2048KB瘦身套路\n单个分包源码超 2048KB 限制时，整页迁出到空闲分包并禁跨包引用、全库核对跳转路径。\n\n## 现象与根因\n- 上传报 subpackage /pages_owner/ source size 2185KB exceed max limit 2048KB\n- 小程序对主包和每个分包分别卡 2048KB（源码态），往分包塞资源无法解决\n- 需整块功能迁到空闲分包，且迁出页不可反向引用原分包静态资源（跨包引用真机取不到图）\n\n## 解决方案\n- 选迁移目标：成链路页面整体迁到空闲分包（如 income+maintain 迁到 pages_benefit）\n- 扫跨包引用：原分包静态图改本分包并复制进目标分包 static，grep 全库确认无原路径残留\n- 同步路由：pages.json 迁出页挂新分包；跨分包入口改绝对路径\n- 跳转路径全库核对：menuRouteMap 业务编码、tab 组件跳转、外部页入口逐条改新路径\n- 重建按分包量体积确认落 2048KB 以下（本次 2037.1KB）\n\n## 验证与归属\n- 验证会话 8626c623（基线 48bdb17）：用户要求不跨包引图且核对全库跳转路径\n- 涉及文件：pages.json、utils/menuRouteMap.js、pages_benefit/income/index.vue、maintain/detail.vue、pages_tab/components/Project_Jiayuanqu.vue、My_Jiayuanqu.vue、ownerCard/index.vue、scripts/size-owner-package.mjs、validate-dist.mjs\n- 所属项目：苏住房C；代码基线：48bdb17"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/capability_cleanup_keep_contract.md",
+                "memory_type": "entities",
+                "after": "# 下线外部能力保留后端契约\n苏住房C uni-app 项目清理人脸/原生桥接能力时，只删调用与页面、保留后端契约字段与工具文件，避免流程断。\n\n## 适用与根因\n- 适用 zhi2-mobile-admin-h5-c-unlimited 与 zhi2-mobile-shimin 整体下线人脸/原生桥接\n- 能力耦合五处：页面目录+工具文件+路由白名单+表单签字流+后端接口字段\n- 只删页面会导致白名单放行旧路径、签字流 await 不存在步骤、误删后端字段\n\n## 解决方案\n- 先按能力名全仓 grep 列出页面/工具/白名单/API 四类命中\n- 删页面与工具后回首改路由白名单与所有跳转点\n- 流程节点改签字后直接提交，验证链路改调本地业务方法\n- 后端契约字段保留、前端不再调 SDK，失败文案改中性（人脸识别失败→身份验证失败）\n- 遗留入口一并清掉，按主链路回归添加房屋→实名认证→授权\n\n## 验证与归属\n- 验证会话 220195cd（基线 d43894b）：移除人脸后白名单更新、保留 faceRecognition:'1'、文案改身份验证失败\n- 验证会话 1a8b3ac8（基线 a444c05）：删 utils/app.js 后原生桥接替换为 uni API，提示暂未开放\n- 涉及文件：usePortal.js、App.vue、home.vue、utils/app.js、api/security.js\n- 所属项目：苏住房C；来源会话ID：220195cd, 1a8b3ac8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/bottom_btn_flex_column.md",
+                "memory_type": "entities",
+                "after": "# 底部固定按钮居中撑满修复\n底部固定按钮区需居中且撑满宽度时，用 flex-direction:column + align-items:stretch 而非横排 align-items:center。\n\n## 现象与根因\n- 按钮不居中，加 display:flex+align-items:center 后左右居中但上下贴顶、按钮变窄\n- 根因：默认横向 flex，加 align-items:center 使纵向居中但主轴横向子元素按内容收缩变窄\n- 三个现象同属错误轴造成\n\n## 解决方案\n- 容器改 flex-direction:column + justify-content:center（纵向居中）+ align-items:stretch（横向撑满）\n- 通过 :deep(.btn-container)、:deep(.zs-button) 强制 width:100% 钉死宽度契约\n- 底部固定按钮为跨页面复制结构，修一处后全局搜同类容器统一修（用户要求全局修复）\n- 修改后刷新页面复看，不用旧构建判断\n\n## 验证与归属\n- 验证会话 e1dc3fb9（基线 9cdf7b8）：用户报选举按钮不居中，逐步修正最终用 column+stretch+width:100%\n- 涉及文件：pages_owner/elect/DecisionResult.vue、pages_vote/elect/DecisionResult.vue、pages_vote/decision/components/BackBtn.vue\n- 所属项目：苏住房C；代码基线：9cdf7b8"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

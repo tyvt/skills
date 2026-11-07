@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793758965904/history/archive_009",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T02:44:12.478185+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/flow_step_label.md",
+                "memory_type": "entities",
+                "after": "# 业务中心流程条标签防挤入相邻格\n门户首页 index-new 业务中心横向步骤条标签与下一格图标重叠时，用 min-width: max(..., min-content) 配合 flex-shrink: 0 让文字在本格撑开。\n\n## Description\n- 现象：业务中心横向步骤条标签与相邻步骤的图标重叠，文字被压入下一格。\n- 根因：标签列缺少最小宽度约束且可收缩，窄内容区下文字溢出到相邻列。\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue；zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts\n\n## Solution\n- 对 .flow-step-cell / .flow-step / .flow-step-label 的标签列设 min-width: max(..., min-content) 并 flex-shrink: 0，文字在本格内撑开不压入邻格。\n- 合并前需排查：箭头宽度写死 12px 而间距用 dw(14) 可能在窄屏错位；整行或横向溢出需单独验收。\n- 模板步骤 :key 宜用稳定业务键而非索引 si；全仓 npm run lint 不能单独证明本次 CSS 无问题（历史风格告警过多）。\n\n## Verification\n- 验证证据：会话 d6e2d37c 审查 flow-step 相关 CSS，结论 Warning 可合并，认可 min-width max + flex-shrink:0 方向。\n- 所属项目：门户；代码基线：04586c4；来源会话ID：d6e2d37c-78bf-4548-8cba-1179801832f4"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_resize.md",
+                "memory_type": "entities",
+                "after": "# zs-table 侧栏收展容器级 resize 重算布局\n门户首页待办等 zs-table 在侧边栏折叠变宽后列间出现空隙，需监听表格容器并走完整布局重算分支。\n\n## Description\n- 现象：侧边栏折叠使内容区变宽后，zs-table 列间出现空隙。\n- 根因：内容区宽度变化不触发 window.resize，仅 syncFixedColumnOffset 不足以重算布局。\n- 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue\n\n## Solution\n- 在 observeTableResize 中 observe 表格容器（$el），回调走与 handleWindowResize 相同的 handleTableResize 分支（syncFillHeight / calculateTableHeight / doLayout）。\n- 优化方向：对 handleTableResize 做 rAF 合并；或宽度问题只 observe 容器，避免重复触发 doLayout。\n\n## Risk\n- 同一 RO 同时 observe container、bodyWrapper、bodyTable 会在一次尺寸变化里连触 2～3 次 doLayout。\n- fill-height 模式下 observeFillHeight 与 observeTableResize 还可能重复 observe $el；未合并 RO 导致重复 doLayout 为 MEDIUM 风险。\n\n## Verification\n- 验证证据：会话审查结论认可容器级 RO + 完整布局修复思路正确，列出未合并 RO 重复 doLayout 的 MEDIUM 风险。\n- 所属项目：门户；代码基线：ac6513b；来源会话ID：188f5624-936a-4a00-b89b-99684b5bec13"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/login_dev_tab.md",
+                "memory_type": "entities",
+                "after": "# 开发环境放开账号密码登录 Tab\n门户本地 npm run dev 需直接看到「账号密码登录」Tab 时，在 showPasswordLogin 中增加 import.meta.env.DEV 判断。\n\n## Description\n- 场景：本地 npm run dev 调试时需要账号密码登录入口，但生产/测试默认依赖 IP 白名单接口校验。\n- 涉及文件：zhi2-web-admin/src/views/login.vue；zhi2-web-admin/src/App.vue\n\n## Solution\n- 在 login.vue 的 showPasswordLogin 计算属性中增加 import.meta.env.DEV 为 true 则始终展示账号密码登录。\n- 与项目内 App.vue 等处的 DEV 判断保持一致；生产/测试构建行为不变，仍依赖 IP 白名单接口校验通过后才显示。\n\n## Verification\n- 验证证据：用户要求开发环境放开账号密码登录，实现为 showPasswordLogin 增加 DEV 判断并说明生产仍走白名单。\n- 所属项目：门户；代码基线：04586c4；来源会话ID：5236cf21-0cd9-483b-99dd-26c7a89bddb3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/index_card_padding.md",
+                "memory_type": "entities",
+                "after": "# 首页 index-new 去 card-body 顶距同步 flex 对齐\n门户首页 index-new top-row 两卡去 card-body 顶距时须同步左右栏 flex 对齐，否则视觉重心上移、垂直不对齐。\n\n## Description\n- 现象：top-row 两卡 stretch 等高，去 .card-body 顶 padding 仍 justify-content: center，而 func-grid 改 align-content: start 且 padding 22px→0 20px 20px，右侧栏重心上移与左侧流程区不对齐。\n- 根因：去顶距未成对改对齐策略，待办/公告区 padding-top:0 叠加 body 顶距削减让表头贴丝带标题。\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue；zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts\n\n## Solution\n- 去顶距时成对改为 justify-content: flex-start（或恢复网格垂直居中），并在标题与内容间保留固定间距。\n- 用 portal-home-visual.spec.ts（如 1024 截图）做对比验收。\n\n## Verification\n- 验证证据：布局审查 HIGH 顶栏两列垂直对齐不一致；MEDIUM 业务中心 flex 内边距不对称、待办/公告更贴标题、func-grid 整体上行。\n- 所属项目：门户；代码基线：04586c4；来源会话ID：fe95f322-13c9-4f4f-9871-824196102f03"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

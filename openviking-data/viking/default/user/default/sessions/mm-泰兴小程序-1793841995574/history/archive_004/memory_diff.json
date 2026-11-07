@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-泰兴小程序-1793841995574/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T01:40:47.930706+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/facility_svg_path_fix.md",
+                "memory_type": "entities",
+                "after": "# 设施页SVG图标路径修复\n泰兴小程序设施设备页因 import SVG 路径无效导致图标不显示，已通过将图标放入主包并使用 ZsImage 字符串路径修复。\n\n## 问题根因\n- 通过 `import xxx.svg` 引入后构建结果指向 `/pages_facility/static/type_*.svg`，但 `dist/dev/mp-weixin/pages_facility/static/` 下无这些文件，`<image>` 加载失败。\n- 与项目惯例不一致：首页等本地图标放在主包 `src/static/`，用 `ZsImage` 走 `/static/images/..` 路径；分包内 `import` 的 SVG 不会稳定落到小程序可访问目录。\n\n## 修复方案\n- 将 5 个图标复制到 `src/static/images/facility/`（主包 static，会打进小程序）。\n- `index.vue` 改用 `ZsImage`，`iconMap` 使用 `images/facility/type_*.svg` 字符串路径。\n- 同步修复 `facility.vue` 中相同用法（列表按钮图标也会不显示）。\n\n## 验证与归属\n- 编译后可在 `dist/dev/mp-weixin/static/images/facility/` 看到对应 SVG。\n- 若仍有个别图标空白，可能是 SVG 里 `linearGradient` 在微信端兼容问题。\n- 涉及文件：`index.vue`、`facility.vue` 等；所属项目：泰兴小程序；来源会话ID：53b40878-aa25-43cb-931e-2a1d70f719c9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/css_nesting_fix.md",
+                "memory_type": "entities",
+                "after": "# CSS嵌套警告修复\n泰兴小程序 3 个页面因 `:deep(.zs-button)` 写在容器内部产生 chrome53 不支持的嵌套 CSS，已改为平铺写法消除警告。\n\n## 问题根因\n- 根因是 3 个页面里把 `:deep(.zs-button)` 写在 `.page-button-container { }` 内部，编译后会变成 chrome53 不支持的嵌套 CSS。\n- 该嵌套 CSS 触发构建警告，但按钮样式本身未受影响。\n\n## 修复方案\n- 已改为平铺写法（`list.vue`、`create.vue`、`proposal-item-detail.vue`）。\n- 重新构建后该警告不再出现，按钮样式不受影响。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=泰兴小程序。\n- 涉及文件：`list.vue`、`create.vue`、`proposal-item-detail.vue` 等。\n- 来源会话ID：27f4bf24-bca2-4fd1-8aad-6b6ad61ac1e1"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/main_pkg_size_report.md",
+                "memory_type": "entities",
+                "after": "# 泰兴小程序主包体积测量报告\n泰兴小程序主包构建产物体积未超 2048KB 限额，dev 与 build 差异源于过期 dev 产物及 vendor/static 体积不同。\n\n## 测量结论\n- `dist/build/mp-weixin` 主包 9 页（与 `src/pages.json` 一致），体积 1901.7 KB，低于限额 146.3 KB。\n- `dist/dev/mp-weixin` 主包 3 页（过期，缺 login + 5 个 staff 页），体积 1876.9 KB，低于限额 171.1 KB。\n- 报告的 2051 KB > 2048 KB 与当前 `dist/build` 有约 149 KB 差距。\n\n## 差异原因\n- 使用了 dev 编译产物或未完整 rebuild：dev 的 `vendor.js` 为 902 KB（build 仅 453 KB），dev 的 `static/` 为 317 KB / 178 文件（build 仅 91 KB / 39 文件）。\n- `dist/dev` 已过期：`app.json` 只有 3 个主包页，源码 `pages.json` 已有 9 个。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=泰兴小程序。\n- 涉及文件：`src/pages.js`、`vendor.js`、`app.js` 等。\n- 来源会话ID：5a1f78af-e1da-490b-b9a5-cb8ff88db9ce"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/subpackage_asset_rule.md",
+                "memory_type": "entities",
+                "before": "# 分包静态资源跨包访问限制\n泰兴小程序分包间不可跨包访问静态资源，须将静态资源置于引用方分包或主包目录内，否则图标加载失败。\n## 问题根因\n- 分包调整后，业主端图片与 icon 通过跨分包路径引用，触发小程序静态资源跨包访问限制。\n- `staff/pages` 分包引用 `pages_property` 分包路径，导致图标空白。\n- 跨包引用导致图标加载失败。\n## 解决方案\n- 静态资源须置于引用方分包或主包目录内，禁止跨分包路径引用。\n- 将 4 个支付图标复制到主包 `src/static/images/payment/`，并更新 `src/staff/pages/cashier/result.vue` 引用路径为 `/static/images/payment/..`。\n## 验证与归属\n- 验证证据：src=泰兴小程序/002.md；src=泰兴小程序/015.md\n- 涉及文件：src/pages.json、_diag.js、vite.config.ts、scripts/findUnUseImages.mjs、_scan_refs.js、src/components/ZsImage/ZsImage.vue、src/env/mp.js、src/pages/staff/home/index.vue、src/staff/pages/cashier/result.vue、src/pages_property/payment/components/PaymentChannelPopup.vue、src/staff/components/ZsUploader/ZsUploader.vue\n- 来源会话ID：9e999a07-f853-49b6-96db-57e8f64f3141；063926e1-81eb-4ec1-8c58-48628b674723\n- 代码基线：none",
+                "after": "# 分包静态资源跨包访问限制\n泰兴小程序分包间不可跨包访问静态资源，须将静态资源置于引用方分包或主包目录内，否则图标加载失败。\n## 问题根因\n- 分包调整后，业主端图片与 icon 通过跨分包路径引用，触发小程序静态资源跨包访问限制。\n- `staff/pages` 分包引用 `pages_property` 分包路径，导致图标空白。\n- 跨包引用导致图标加载失败。\n## 解决方案\n- 静态资源须置于引用方分包或主包目录内，禁止跨分包路径引用。\n- 将 4 个支付图标（payment-security.png、payment-alipay.png、payment-wechat.png、payment-unionpay.png）复制到主包 `src/static/images/payment/`，并更新 `src/staff/pages/cashier/result.vue` 中 4 处引用路径为 `/static/images/payment/..`；构建产物 `dist/build/mp-weixin/static/images/payment/` 下已确认输出这 4 个文件。\n## 验证与归属\n- 验证证据：src=泰兴小程序/002.md；src=泰兴小程序/015.md\n- 涉及文件：src/pages.json、_diag.js、vite.config.ts、scripts/findUnUseImages.mjs、_scan_refs.js、src/components/ZsImage/ZsImage.vue、src/env/mp.js、src/pages/staff/home/index.vue、src/staff/pages/cashier/result.vue、src/pages_property/payment/components/PaymentChannelPopup.vue、src/staff/components/ZsUploader/ZsUploader.vue\n- 来源会话ID：9e999a07-f853-49b6-96db-57e8f64f3141；063926e1-81eb-4ec1-8c58-48628b674723\n- 代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

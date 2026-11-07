@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793765649631/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T04:25:49.981646+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/uni_calendar_sticky.md",
+                "memory_type": "entities",
+                "after": "# uni-app 日历吸顶双类同改\n业主端 H5 报事报修列表日期筛选面板吸顶后残留灰边，需同时修改定位与外观两处 uni-ui 类。\n## 现象\n- 日历面板吸顶/贴顶后顶部仍残留灰色圆角与阴影灰边，看似未吸住。\n- 只改定位处 wrapper 贴顶但内容盒自带圆角+投影仍在，视觉多一道灰边。\n## 根因\n- uni-ui 日历入场样式分两处：`.uni-calendar--fixed` 负责定位（position/transform）。\n- `.uni-calendar__content-mobile` 负责外观（`border-top-radius:10px` + `box-shadow:0 0 5px 3px rgba(0,0,0,.1)`）。\n- 这些是 uni-ui 库内置类，业务 CSS 变量改不到，只改一处不解决。\n## 解决方案\n- 业务侧用 `:deep()` 同时覆盖两处：`:deep(.uni-calendar--fixed){...}` 处理定位，`:deep(.uni-calendar__content-mobile){ border-top-radius:0; box-shadow:none; }` 处理外观。\n- 改完必须在 H5 上肉眼复验（微信/支付宝 web-view CSS 表现与浏览器不同）。\n- 验收标准写清「贴顶无灰边」，不要只报「已吸顶」。\n## 验证与归属\n- 验证证据：会话 104c83d6（基线 69cd251，禅道 bug 5916 入口）与会话 182a8cfd（基线 9e0fdde，修复提交 e92564c1）。\n- 涉及文件：zhi2-mobile-shimin/src/components/ZsDatePicker/ZsDatePicker.vue、pages_owner/repair/index.vue、pages/components/FilterPopup.vue、node_modules/@dcloudio/uni-ui/lib/uni-datetime-picker/uni-datetime-picker.vue。\n- 长期记忆库 popup-layer--mp-2.md 条目标题「x5916 · 日期面板吸顶后仍残留灰色圆角/留白：uni-calendar__content-mobile 的顶部圆角与投影」。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/popup_wrapper_narrow.md",
+                "memory_type": "entities",
+                "after": "# 页面级裸选 uni-popup wrapper 污染全页弹层\n报事报修详情页裸选 `:deep(.uni-popup__wrapper){height:100%}` 命中全页所有弹层，居中弹窗被撑满贴顶。\n## 现象\n- 详情页三个弹层（撤销确认、满意度评价、评价成功）同时贴到屏幕顶部，居中弹窗变横幅。\n- 截图似弹层组件坏了，实际是某处 CSS 污染全页。\n## 根因\n- `:deep(.uni-popup)` / `:deep(.uni-popup__wrapper){height:100%!important}` 无作用域限定，命中该页所有 uni-popup 实例。\n- wrapper 被强制 100% 高，弹层内容从自适应高度+居中变撑满视口；`!important` 让组件自带 flex 居中规则失效。\n## 解决方案\n- 分清哪种弹层该占满：底部/全屏弹层才允许 height:100%，居中弹层保持自适应高度。\n- 覆盖收窄到具体弹层根类（如给满意度弹窗加 `satisfaction-popup` 类，写 `.satisfaction-popup :deep(.uni-popup__wrapper){ height:auto; }`）。\n- 用 grep 把页面所有 `:deep(.uni-popup` 找出来逐条判定归属，回归同页其它弹层。\n- 顺带排查同类隐患（如 `pages_owner/ownerCard/index.vue:376` 的 `:deep(.uni-popup__wrapper){height:610rpx}` 压住居中提示弹窗）。\n## 验证与归属\n- 验证证据：会话 dff5eff3（基线 9e0fdde，禅道 bug 5915 入口）结论根因 detail.vue 裸选命中全页弹层，修复为收窄并披露遗留隐患。\n- 涉及文件：zhi2-mobile-shimin/src/pages_owner/repair/detail.vue、pages_owner_extra/repair/detail.vue、components/ZsPopup/ZsPopup.vue、pages_owner/ownerCard/index.vue。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/config_img_root_path.md",
+                "memory_type": "entities",
+                "after": "# 后台配置图同源根路径与 nginx 代理\n后台下发的配置图统一走同源根路径（`/zhi2-pro/...`），H5 挂子目录部署时必须在 nginx 站点根配 `/zhi2-pro` 代理。\n## 现象\n- 业主端 H5 菜单图标等后台配置图片在测试环境仍指向生产域名；部署到子目录后图片可能 404。\n- 前端按环境变量拼测试域绝对 URL 会与页面站点解耦。\n## 根因\n- 配置图路径由后端下发（菜单 iconPath 等）。拼成同源根路径 `/zhi2-pro/...` 则图片走当前域名+`/zhi2-pro`，与页面部署子目录无关。\n- 代价是 nginx 必须在站点根路径配 `/zhi2-pro` 反代，只挂在 `/testh5/` 下不够，子目录前缀不会自动带过去。\n## 解决方案\n- 前端统一去掉环境变量拼域名，改成同源根路径（形如 `/zhi2-pro/2025/.../xxx.png`）。\n- 部署侧核对三类路径：打包静态资源相对路径、接口走 `/testh5/api/` 与 `/testh7/szf/`、后台配置图走站点根 `/zhi2-pro/`（及 `/zs-fym/`）。\n- 自测：打开 `/testh5/` 首页，Network 看菜单图期望 `https://host/zhi2-pro/...` 返回 200，不再出现 `unlimited.c.h5-zhishu.../zhi2-pro/...`。\n## 验证与归属\n- 验证证据：会话 2f6a0465（基线 69cd251）用户诉求配置图不写死环境变量及子目录部署疑问，结论给出三类资源路径矩阵。\n- 涉及文件：zhi2-mobile-shimin/src/utils/index.js、utils/mainStaticPaths.js、store/menu.js、vite.config.ts。\n- 判断口径：缺的是 nginx 根路径代理，不是子目录部署本身。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/empty_table_no_render.md",
+                "memory_type": "entities",
+                "after": "# 后端基础表空致功能块不渲染\n功能整块不渲染且前端无报错时，先查后端指标/字典类基础表是否为空，别默认前端迁移遗漏。\n## 现象\n- 业主端报事报修详情页「满意度评价」区域整块不渲染（星星与标签都没有），模板/SVG/接口路径全对，似前端漏代码。\n- 接口 `/property/workOrder/satisfaction/app/metrics/{workOrderId}` 正常返回空数组。\n## 根因\n- 测试库 `ZHISHU_PROPERTY.T_SATISFACTION_METRIC` 是空表，接口返回空数组，前端按数组渲染自然无内容。\n- 指标/字典/枚举型基础配置表由后台配置，测试环境常未初始化；接口不报错只返空集合，现象同代码没写。\n## 解决方案\n- 排查顺序：先 curl 接口看空数组 → 查后端基础配置表 → 有数据再查前端映射，勿一上来翻前端 diff。\n- 补数据带必填与状态位：插 3 条通用 STAR 指标（ORDER_TYPE=NULL 通用、必填、启用、未删除，ID 2115692100000000001~3，CREATE_USER='pua-fix'）。\n- 补完回查落库，同页面重开验证（`detail?id=2115692010430087170` 出现 3 行指标×5 星+标签）。\n- 若仍无星星抓接口响应，可能后端按 dept 过滤（指标行 DEPT_ID 补成 667599881032181）。\n- 回归整条链路：评星→提交→详情页评价记录展示星星。\n## 验证与归属\n- 验证证据：会话 ea231417（基线 1660dca）根因测试库空表非前端遗漏，插入 3 条通用 STAR 指标并回查。\n- 涉及文件：zhi2-mobile-shimin/src/pages_owner_extra/repair/detail.vue、pages_owner/repair/detail.vue、src/api/property.js。\n- 提醒：3 条为测试数据，生产前由后端配正式指标后删除。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

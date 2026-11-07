@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_095",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T01:14:54.632834+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3技术/register_spacing_required.md",
+                "memory_type": "entities",
+                "after": "# 开发企业注册列间距与成立日期必填修复\n苏州市房地产监测V3 项目完成开发企业注册 Step4 股东列表列间距调整与 Step1 成立日期必填校验。\n\n## Step4 股东列表列间距\n- `Step4Shareholders.vue` 序号列：`width=\"96\"` 改为 `width=\"60\"`\n- 股东名称列：`min-width=\"180\"` 改为 `width=\"140\"`，并增加 `show-overflow-tooltip`（长名称悬停显示）\n- 表格增加 `:fit=\"false\"`，避免列被强行拉满容器宽度\n\n## Step1 成立日期必填\n- `Step1CompanyInfo.vue` 表单规则新增 `foundingDate: [{ required: true, message: '成立日期不能为空', trigger: ['change'] }]`\n- 与旧版 `companyInfo.vue` 及最终 `editAndSubmit` 提交要求一致\n- 未填写时第1步显示必填星号并阻止进入下一步，避免第4步「申请入网」才报错\n\n## 验证与归属\n- 验证建议：第4步查看股东列表列宽是否正常；第1步不填成立日期点「下一步」应提示「成立日期不能为空」\n- 所属项目：苏州市房地产监测V3\n- 涉及文件：Step4Shareholders.vue、Step1CompanyInfo.vue、companyInfo.vue、registerValidate.js\n- 来源会话：07ea18e2-6956-4c76-aee4-59cf48b781f9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3技术/node_dialog_single_col.md",
+                "memory_type": "entities",
+                "after": "# 节点明细弹窗一行一列修复\n苏州市房地产监测V3 项目修复节点明细弹窗字段未单列排布、仍显示多列的问题。\n\n## 问题原因\n- `zs-dialog` 内 `.form-box` 全局样式仅作用于 `zs-form` 直接子级 `el-col`（强制 `width: 100%`）\n- 原结构为 `zs-form > el-row > el-col`，样式未命中，`el-row` 仍按 Element 栅格多列排布\n\n## 修复方案\n- 将 `el-row` 提到 `zs-form` 外层，使 `el-col` 成为 `zs-form` 直接子节点\n- 结构与缴款楼栋弹窗 `PaymentBuildingDialog.vue` 一致，五个字段各占一行\n- 需硬刷新（Ctrl+F5）或重启 dev 后查看「新增节点明细」\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3\n- 涉及文件：NodeDetailsDialog.vue、PaymentBuildingDialog.vue\n- 来源会话：dababdf0-87af-4d0b-95f2-6a4f1ceb21fd"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3技术/cert_level_echo_fix.md",
+                "memory_type": "entities",
+                "after": "# 从业人员资格证书等级回显修复\n苏州市房地产监测V3 项目修复从业人员资格证书「证书等级」回显异常问题。\n\n## 修改内容\n- `AgencyPersonnelCertificateTable.vue` 列表列：`certificateLevel` 改为 `level`，并增加 `type=\"dict\"`、`dict-url=\"company_certificate_level\"`\n- 查看弹窗：证书等级改为 `type: 'dict'`，使用 `item.level` 和 `levelOptions`\n- 编辑表单：`zs-input` 改为 `zs-select`，绑定 `level` 字段\n- `created()` 中调用 `getDicts('company_certificate_level')` 加载字典\n- `AgencyPersonnelDetail.vue` 的 `loadDetail()` 同步调整\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3\n- 涉及文件：AgencyPersonnelCertificateTable.vue、AgencyPersonnelDetail.vue\n- 来源会话：fee19692-41de-42b8-a8ed-8e08fa99ede8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3技术/todo_landing_race_fix.md",
+                "memory_type": "entities",
+                "after": "# 首页待办落地页竞态修复\n苏州市房地产监测V3 项目修复部分账号登录后提示「页面未授权或不存在」的问题。\n\n## 问题原因\n- 登录后多处硬编码 `router.push('/todo')` 且 `DEFAULT_LANDING_PATH` 设为 `/todo`\n- 待办页路由来自 `listRouters` 动态注册，真实 path 可能是 `/flowable/.../todo`，不一定是 `/todo`\n- 路由守卫竞态：首次导航触发 `GetInfo` 后 `roles` 已有值但 `GenerateRoutes`+`addRoute` 未完成，再次进入守卫走 `roles.length > 0` 分支直接 `next()`，访问未注册的 `/todo` 命中通配符 `*` 跳转 `/404`\n\n## 修复方案\n- `router/index.js` 使用 `needsDynamicRoutes()`（`roles` 为空或 `addRoutes` 为空）+ `loadDynamicRoutes` 单例 Promise，保证菜单注册完成后再落地\n- `utils/defaultLanding.js` 同步调整落地页逻辑\n\n## 验证与归属\n- 所属项目：苏州市房地产监测V3\n- 涉及文件：router/index.js、utils/defaultLanding.js、store/modules/permission.js、utils/permission.js\n- 来源会话：5657d5ac-3d67-4095-b7de-c93ba44cfa41"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

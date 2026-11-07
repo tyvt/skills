@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T23:01:32.143372+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/detail_navbar_label.md",
+                "memory_type": "entities",
+                "after": "# 多入口共用详情页导航栏标题透传\n多个列表入口共用同一详情页时，导航栏标题必须由列表将 label 透传至详情页，不能依赖页面硬编码默认值。\n\n## 问题现象\n- pages_main/publicNotice/detail 被物业服务计划/公共收益/维修资金/双晒内容等多个入口共用\n- 从「物业服务计划」进入时导航栏仍显示默认「双晒内容」，用户要求按入口命名\n\n## 根因\n- 列表页 publicNotice.vue 已将 title 作为 noticeLabel 传给子组件 ListIndex\n- ListIndex 在 router/uni 跳转详情时未继续携带 label，参数断在中间层，详情页回退默认标题\n\n## 解决方案\n- ListIndex 显式接收 noticeLabel 并作为 label 参数拼进详情跳转，保证参数链贯通\n- detail.vue 导航标题改为有 label 即用原文，不再拼「内容」后缀，无 label 才回退默认\n- 每新增共用详情页入口，核对 入口页→中间列表组件→详情页 query→uni.setNavigationBarTitle 链路\n\n## 验证与归属\n- 会话 3fa76366（基线 8fc3cc5）：用户要求从物业服务计划进入详情页就叫物业服务计划\n- 涉及文件：src/pages_main/publicNotice/detail.vue、components/ListIndex.vue、publicNotice.vue\n- 所属项目：苏住房C；来源会话ID：3fa76366-cf4a-4cdf-87de-dd2b1e81d2e9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/getdict_missing_import.md",
+                "memory_type": "entities",
+                "after": "# 注销页字典列表空且静默：getDict 未导入\n苏住房C 小程序注销页因未导入 getDict 导致注销原因选项全空且无报错，需作为固定排查项。\n\n## 问题现象\n- 我的-账号安全-注销页 pages_my/setting/cancellationReason.vue 只显示标题和提交按钮，单选无选项\n- 页面不白屏、无明显报错，易被误判为「后端字典没配数据」\n\n## 根因\n- initDict() 调用 getDict('cancel_reason')，但文件顶部从未 import getDict\n- onShow 抛 ReferenceError: getDict is not defined，异常在赋值前被吞，cancelReasonList 恒为空，ZsRadio 无渲染\n\n## 解决方案\n- 先查 script 顶部是否 import { getDict } from '@/api/common'（本项目字典统一从此走）\n- 界面与「字典未配置」相同时，判定顺序：先证前端是否发请求→再查后端字典类型数据\n- 字典驱动下拉/单选建议列表为空时打可控日志，区分「接口没发」与「发了没数据」\n\n## 验证与归属\n- 会话 1a7c73a2（基线 0011377）：用户反馈注销原因不显示，补 import 修复\n- 涉及文件：src/pages_my/setting/cancellationReason.vue、src/api/common.js、src/components/ZsRadio/ZsRadio.vue\n- 所属项目：苏住房C；来源会话ID：1a7c73a2-9bb1-429e-a2b6-09950e71add3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/pages_json_route_missing.md",
+                "memory_type": "entities",
+                "after": "# navigateTo 报 page not found：vue 在但 pages.json 路由被删\n苏住房C 小程序多处跳转报页面不存在，根因是 pages.json 路由注册被删而 .vue 文件仍在，与 H5 直觉相反。\n\n## 问题现象\n- 多处跳转报 errMsg: 'navigateTo:fail page `/pages/login/index` is not found'\n- src/pages/login/index.vue 文件存在、代码未删，却无法跳转\n\n## 根因\n- pages.json 中对应 4 个页面注册被删（commit 61febf6 统一苏服办登录流程移除）\n- 项目仍大量代码 navigateTo('/pages/login/index')；uni-app 路由以 pages.json 为准，文件存在不影响运行时\n\n## 解决方案\n- 报 page not found 先 grep pages.json 有无路径注册，再确认 .vue 是否存在，勿反向\n- 恢复时整条链路补回：login/index、login/forget、login/password、login/success 四注册缺一不可\n- 删/改 pages.json 路由前全仓 grep 路径字符串确认无调用方；改完必须重新编译\n\n## 验证与归属\n- 会话 17b77da9（基线 db06361）：用户贴报错并要求恢复，补回 4 个路由注册\n- 涉及文件：src/pages.json、src/pages/login/index.vue\n- 所属项目：苏住房C；来源会话ID：17b77da9-0fa5-4835-918b-0363e0ec5bf1"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/vshow_template_eval.md",
+                "memory_type": "entities",
+                "after": "# v-show 不阻止模板求值致首屏渲染崩\n苏住房C 新房详情页因 v-show 隐藏下模板仍求值、空数组下标取属性，首屏直接 TypeError 打不开。\n\n## 问题现象\n- pages_transaction/newHouse/detail.vue 报 TypeError: Cannot read property 'icon' of undefined\n- 栈在 Proxy._sfc_render（渲染函数内），页面打不开\n\n## 根因\n- 模板写 :src=\"facilityCategory[activeCategory]?.icon\"，facilityCategory 初始空数组，onLoad 才赋值，首屏 [0] 为 undefined\n- 根节点用 v-show=\"showPage\"，仅 CSS 隐藏，模板表达式照样求值（v-if 才阻止渲染）\n\n## 解决方案\n- 配置类常量直接在 data() 用导入配置初始化（如 facilityCategory: FACILITY_CATEGORY），消除首屏空数据窗口\n- 模板取值统一加可选链 ?. 兜底边界\n- 排查渲染期 undefined 时定位模板中 `xxx[i].yyy` 写法，看首屏数组是否有值，勿查接口\n\n## 验证与归属\n- 会话 7f29f06a（基线 4630e8e）：用户贴报错栈，修复为 data 初始化+可选链\n- 涉及文件：src/pages_transaction/newHouse/detail.vue、src/utils/transaction.js、src/pages_transaction/stockHouse/detail.vue\n- 所属项目：苏住房C；来源会话ID：7f29f06a-70ca-4db2-9199-e681d3284e78"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

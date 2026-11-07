@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793827333622/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T21:38:07.423774+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_pagination_migration.md",
+                "memory_type": "entities",
+                "after": "# zs-pagination v-model 迁移与全局替换\n产品2.0（zhi2-web-admin）将分页组件从 .sync 语法迁移到 Vue3 v-model 语法，并通过全局正则一次性批量替换。\n\n## 变更背景\n- zs-pagination 组件已改为 `v-model:current-page` / `v-model:page-size`\n- property/complex/index.vue 已从 `:page.sync` / `:limit.sync` 改为 `v-model:page` / `v-model:limit`，翻页正常\n- 仓库仍有大量其它页面在用 `.sync`，单文件逐个改不现实且易漏\n\n## 全局替换规则\n- 在 `zhi2-web-admin/src` 目录下用全局正则替换\n- `:page\\.sync=\"` → `v-model:page=\"`\n- `:limit\\.sync=\"` → `v-model:limit=\"`\n- `<zs-select([^>]*):value\\.sync=\"` → `<zs-select$1v-model:value=\"`\n\n## 验证与归属\n- 涉及文件：property/complex/index.vue、@zhi2-web-admin/src/components/zs-pagination/zs-pagination.vue\n- 所属项目：2-0（产品2.0）；来源会话：73a5ecd2-f9fb-443b-b4b0-8e8521acce74；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue3_proxy_fix.md",
+                "memory_type": "entities",
+                "after": "# Vue3 Proxy $attrs 报错与 toRaw 修复\n产品2.0（zhi2-web-admin）在 Vue3 中因 prop 为响应式 Proxy，直接删 $attrs 报错，改用 toRaw 拿原始对象后删除。\n\n## 问题根因\n- 作为 prop 的 `this.element` 是响应式 Proxy，直接访问或 `delete this.element.businessObject.$attrs[...]` 会走到代理上的 `$attrs`（只读、不可配置）\n- 与 BPMN 业务对象上的 `$attrs` 冲突，导致 parseElement.js:4 Uncaught 报错\n\n## 修复内容\n- task.vue 从 vue 引入 `toRaw`：`import { defineAsyncComponent, toRaw } from 'vue'`\n- 新增 `deleteFlowableAttr(key)`：用 `toRaw(this.element)`、`toRaw(bo.$attrs)` 拿原始对象后再 `delete attrs[key]`\n- 所有直接删 `$attrs` 的地方（如 formData.userType watch 两处）改为调用该方法\n\n## 验证与归属\n- 涉及文件：task.vue、parseElement.js、startEnd.vue\n- 所属项目：2-0（产品2.0）；来源会话：438ecac1-fc8f-4115-89d2-b8e10fee8055；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_select_fix.md",
+                "memory_type": "entities",
+                "after": "# 嵌套弹窗中 zs-select 下拉异常修复\n产品2.0（zhi2-web-admin）多个 zs-dialog 打开时 zs-select 下拉出现位置错乱且不展示，最终以最小化改动修复。\n\n## 问题根因\n- 真正异常是 `top: -732px` 与 `min-width: 1.87px`：Element Popper 用参考节点（`.el-select` 内 input）的 `getBoundingClientRect()` 算位置，参考宽度≈2px 时坐标错乱、下拉被甩到视口上方\n- `z-index: 30000 !important` 已生效、非层级问题\n- 根因：「质保期」一行是 `flex gap-4` 里并排 `zs-input` + `zs-select`，表单又有 `.el-form .el-select { width: 100% }`，两者互相挤压使 `el-select` 被压成极窄，参考宽度≈0\n\n## 最终修复（最小化改动）\n- `zhi2-web-admin/src/components/zs-select/SingleSelect.vue`：仅给单选下拉补嵌套弹窗场景下的面板重定位、宽度同步和层级修正，未动 MultiSelect\n- `maintenanceFeeDtlDialog.vue`：仅保留「质保期单位」zs-select 固定宽度 `width: 140px; flex: 0 0 140px;`（因在 flex 容器需明确宽度）\n\n## 已移除的早期改动\n- 早期曾在 element-ui.scss 为「表单项内容直接子元素是 .flex」增加 `.flex` 下每个直接子元素 `flex:1`、`width:...` 规则，最终未保留，改为对具体 zs-select 设固定宽度\n- 移除了 `selectPopperMixin.js`、MultiSelect.vue 联动修改、maintenanceMode/measuringUnit 额外 `style=\"width: 100%\"`\n- 剩余 linter 报错仅存在于 maintenanceFeeDtlDialog.vue，属该文件原有类型提示噪音\n\n## 验证与归属\n- 涉及文件：SingleSelect.vue、maintenanceFeeDtlDialog.vue、element-ui.scss（诊断）、selectPopperMixin.js、MultiSelect.vue\n- 所属项目：2-0（产品2.0）；来源会话：c442cea0-961e-4e15-b4e3-627396d2834e、074f871c-28c4-41be-986b-cadac0bc2bc2；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

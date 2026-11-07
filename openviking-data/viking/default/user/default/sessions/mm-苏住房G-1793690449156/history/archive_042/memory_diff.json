@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_042",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:59:11.223285+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tree_col_reuse.md",
+                "memory_type": "entities",
+                "after": "# 树层级切换同列文字开关错乱\n苏住房G行政区域银行授权页左侧树在市/区/街道间切换时，「启用状态」列有时显示字典文字、有时显示开关，静止正常，快速切换更乱。\n\n## 问题根因\n- 表格列 :key 仅用 column.prop || column.label，市级 enableStatus 列 type=dict、区级 type=switch，prop 相同致 Vue 复用同列组件实例，内部渲染器不重建残留上一种形态\n- 快速切换时多个 getList 并发，后发先回用旧层级响应覆盖新层级数据，放大错乱\n\n## 解决方案\n- 表格加层级 key：:key=\"tableViewKey\"，值取 city/district/street 强制重建\n- 列 key 带层级与类型：`${tableViewKey}-${column.prop}-${column.type}`\n- 加请求序号保护 listRequestId，响应回来序号不匹配则丢弃\n\n## 验证与归属\n- 验证：064.md 会话 ecdea30a 用户纠正「不是设计问题，而是反复点击市级区级街道会错乱」\n- 涉及文件：system/regionBankAuth/index.vue、system/regionBankAuth/utils.js、mixins/listMixins.js\n- 所属项目：苏住房G；来源会话ID：ecdea30a-99b2-441c-917e-7cbad52000ed；代码基线：864b409\n- 排查提示：用户说「有时候A有时候B」且与操作速度相关，优先怀疑同prop不同type列复用+异步竞态"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/image_upload_pdf.md",
+                "memory_type": "entities",
+                "after": "# ImageUpload的PDF缩略图破图\n苏住房G通用 ImageUpload 组件在 picture-card 模式把 PDF 地址当 img.src，导致上传 PDF 后缩略图破图、预览异常。\n\n## 问题根因\n- 字段用通用 ImageUpload，内部 el-upload 的 picture-card 直接把文件 URL 塞进 <img src>，PDF 非可渲染图片必破图\n- 与「附件扩展名不能用后端 fileType 字典码推断」同源但落点不同：本条是上传组件内部缩略图/预览，那条是详情页附件区展示分组\n\n## 解决方案\n- 组件级修复（所有用 ImageUpload 传 PDF 场景受益）：抽 getFileExtension(url) 先去查询串再取扩展名\n- isImageFile(url) 判断是否在 imageType 白名单；getThumbnail(url) 图片走 resolveServerAssetUrl，否则返回 /assets/images/file.png 文件图标\n- 预览分流：PDF 用新窗口打开，不走 v-viewer/el-image 图片预览器；详情页查看态已区分无需改\n\n## 验证与归属\n- 验证：064.md 会话 b316e20e「项目经理：劳动合同上传PDF时为破图」\n- 涉及文件：components/ImageUpload/index.vue、company/staffManagement/components/detail.vue、institution/personnel/detail.vue\n- 所属项目：苏住房G；来源会话ID：b316e20e-0ccc-42dd-a146-455063df0ac0；代码基线：b8ae114"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/shared_list_ui.md",
+                "memory_type": "entities",
+                "after": "# 多菜单共用列表组件入口UI归属\n苏住房G「物业合同」与「前期物业合同」两菜单共用同一列表组件，测试环境有橙色说明框+默认已备案筛选，正式环境没有，实为环境差异与入口UI归属问题。\n\n## 问题根因\n- 说明框、默认 bizState、重置回默认值写在共用组件页面级状态，非各入口独立；一处缺失两入口同缺\n- 日志截图只覆盖测试环境易误判为代码未走到正式；实际是一级环境差异：动态路由下菜单由 sys_menu 下发，入口缺失/未授权/旧版本菜单致正式环境没有\n\n## 解决方案\n- 需「只在某入口出现」的区块用基于路由/入口判定（如 isAddListPage）做 v-if，不为两菜单复制组件\n- 入口级默认值（默认筛选、重置回退、提示文案配色）写同一处并注释「两个入口共用」，避免只在一个入口验证\n- 收尾明确告知：代码已改、build通过但未提交未推送，正式环境需重新部署才出现，用户所见「没有」可能只是未发布\n\n## 验证与归属\n- 验证：本批会话 325b93f2 用户诉求「测试环境有说明、正式环境没有」\n- 结论：共用组件 propertyContract/components/index.vue 恢复 v-if=\"isAddListPage\" 说明框、默认 bizState:'2'、重置回已备案、#fff7e6 背景，注明两入口共用且尚未提交\n- 涉及文件：property/propertyContract/components/index.vue、propertyContract/index.vue、propertyContractTemporary/index.vue\n- 所属项目：苏住房G；来源会话ID：325b93f2-5682-453d-a064-b7974bf0dfa4；代码基线：a700def"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/v2_load_seq.md",
+                "memory_type": "entities",
+                "after": "# 首页V2多数据源并发加载序号保护\n苏住房G首页 V2（views/home/index-v2.vue）并发加载多面板，每个面板有 tab 切换，需每个加载函数独立持有请求序号防竞态。\n\n## 问题根因\n- Vue2 无通用丢弃过期响应机制，多加载函数共享状态只能用「每函数一个 seq」\n- 已有 keyDataFetchSeq/todoPanelFetchSeq，但后加的 loadStudyList 无 seq，快速连点 tab 时旧慢响应先返回覆盖新 tab 内容，表面「点 tab 没反应/数据串了」无报错\n- loadBenefitData/loadRepairData 同样缺竞态保护\n\n## 解决方案\n- 每个异步加载函数声明模块内递增计数器（如 studyListFetchSeq++），请求前 const seq = ++xxxSeq，then/finally 先判 if (seq !== xxxSeq) return 再写状态\n- 评审按「加载函数清单」逐个核对 seq，新增面板把 seq 当必写项\n\n## 验证与归属\n- 验证：评审指出 index-v2.vue:274-291 loadStudyList 未用 seq，230-272 loadBenefitData/loadRepairData 同样无保护\n- 涉及文件：zhi2-web-admin/src/views/home/index-v2.vue\n- 所属项目：苏住房G；来源会话ID：22db11e4-4ebb-4504-8a6e-e93aa9791182；代码基线：9e5c499"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

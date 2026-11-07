@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-1a1cc463-dd46-403a-ae31-f59c1354e2e6/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T08:10:38.562544+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited/memories/events/2026/11/04/全屏跳转时序修复提交.md",
+                "memory_type": "events",
+                "after": "# Summary\n修复门户（zhi2-web-admin）首页「查看更多数据」按钮先全屏再跳转的时序问题：index-new.vue 的 handleStatsMore 改为先 $router.push('/market-monitor') 再在同一点击手势内 requestFullscreen()，保留浏览器用户手势。2026-11-04 仅提交该文件改动，子模块 develop/v2.6.2-portal 提交 1f012e5e4、父仓库 gitlink 提交 d128bee 均推送成功，临时 worktree 已撤除。\n# 2026-11-04 (Wednesday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited]**: 点击查看更多数据的时候，跳转之后再全屏，现在感觉先全屏了才跳转\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited]**: User wants commit + push. I'll commit only the `index-new.vue` fix (not the pre-existing uncommitted feature work), then push, then handle the parent repo gitlink.\n\nFirst, which branch/remote? Current submodule branch is `develop/v2.6.2-portal`.\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited]**: Both repos committed and pushed:\n- Submodule: `b76b0d7..1f012e5e4` → `develop/v2.6.2-portal`\n- Parent: `b0b3216..d128bee` → `develop/v2.6.2-portal`\n\nLet me do a final verification of clean state and no leftover jobs.\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited]**: 完成。已修复「点击查看更多数据时先全屏再跳转」的时序问题并提交推送。\n\n## 问题根因\n[HomeStatsBar.vue](<zhi2-web-admin/src/views/home/components/HomeStatsBar.vue>) 点击「查看更多数据」发出 `more` 事件，父页 [index-new.vue](<zhi2-web-admin/src/views/home/index-new.vue>) 的 `handleStatsMore` 原逻辑是：**先 `requestFullscreen()`，等全屏 Promise 完成后才 `.then(nav)` 跳转** —— 所以首页先进入全屏、页面还停在原处，然后才切到市场监测大屏，造成「先全屏了才跳转」的观感。\n\n## 修复\n改为**先发起路由跳转 `$router.push('/market-monitor')`，紧接着在同一点击手势内请求全屏**。两点关键：\n- 跳转在前，视觉上页面先切走；\n- `requestFullscreen` 仍保留在同步的点击手势里（浏览器要求用户手势才能进全屏），只是不再等它的 Promise 才跳转，避免延迟。\n\n改动仅 [index-new.vue](<zhi2-web-admin/src/views/home/index-new.vue>) 一个文件（+10 −1）。编译产物 `dist/assets/index-new-*.js` 已确认新顺序生效。\n\n## 构建与部署\n- `npm run build` 成功（仅 Sass `@import` 弃用警告）。\n- 构建输出到 `D:/repository/门户/dist`，现存 nginx 站点 [门户.conf](<D:/nginx/conf/sites-enabled/门户.conf>)（端口 8092）root 已指向该 dist，**无需改配置**，`http://127.0.0.1:8092/` 返回 200 已服务最新产物。\n- `npx eslint` 该文件无报错。\n\n## 提交推送（均按用户选择「提交并推送」）\n| 仓库 | 分支 | 提交 | 结果 |\n|---|---|---|---|\n| zhi2-web-admin（子模块） | develop/v2.6.2-portal | `1f012e5e4` | 已推送（b76b0d7..1f012e5e4） |\n| 门户（父仓库 gitlink） | develop/v2.6.2-portal | `d128bee` | 已推送（b0b3216..d128bee） |\n\n说明：子模块里 `marketMonitor/`、`router/index.js`、e2e 测试等是该功能原有的**未提交在改内容**，非本次任务产生，未纳入提交；父仓库的 `.gitignore`、`env/.env` 也是既有改动，同样未纳入，仅提交了本次修复与子模块引用。临时 worktree 已按你的选择撤除，当前无残留 worktree、无后台任务。\n\n建议你在部署站点上实际点一次「查看更多数据」确认观感符合预期（全屏行为依赖浏览器对用户手势的判定）。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited/memories/entities/技术模式/market_monitor_fullscreen_home.md",
+                "memory_type": "entities",
+                "before": "# 市场监测大屏默认全屏与返回首页\n门户（zhi2-web-admin）项目市场监测大屏（/market-monitor）改为进入即默认全屏，右上角全屏切换按钮替换为「返回首页」按钮。\n\n## 现象与约束\n- 浏览器 Fullscreen API 必须由用户手势触发，无法在页面加载（mount）时自动全屏。\n- 原右上角「全屏展示/退出全屏」按钮在需求变更后不再需要。\n\n## 解决方案\n- MarketHeader.vue 右上角按钮改为「返回首页」（house 图标），点击 emit `go-home`。\n- index.vue 新增 goHome()：若处于浏览器全屏先 exitFullscreen()，再 router.push('/index') 回门户首页；组件销毁时自动退出全屏。\n- 默认全屏在首页入口手势内实现：index-new.vue 的 handleStatsMore() 点击手势中先 document.documentElement.requestFullscreen() 再 router.push，SPA 路由切换保留全屏；平台不支持时优雅降级为直接进入（页面本身铺满视口）。\n\n## 验证与归属\n- 验证：Playwright 实测旧全屏按钮 0 个、返回首页按钮 1 个；真实点击手势后 fullscreenElement 为 true；点返回首页后 fullscreenElement 为 false 且跳转 /index（登录态即门户首页）。\n- 涉及文件：zhi2-web-admin/src/views/property/marketMonitor/components/MarketHeader.vue、zhi2-web-admin/src/views/property/marketMonitor/index.vue、zhi2-web-admin/src/views/home/index-new.vue\n- 所属项目：门户（zhi2-web-admin）；来源会话：2026-11-04；用户确认不提交，改动保留工作区",
+                "after": "# 市场监测大屏默认全屏与返回首页\n门户（zhi2-web-admin）项目市场监测大屏（/market-monitor）改为进入即默认全屏，右上角全屏切换按钮替换为「返回首页」按钮。\n\n## 现象与约束\n- 浏览器 Fullscreen API 必须由用户手势触发，无法在页面加载（mount）时自动全屏。\n- 原右上角「全屏展示/退出全屏」按钮在需求变更后不再需要。\n\n## 解决方案\n- MarketHeader.vue 右上角按钮改为「返回首页」（house 图标），点击 emit `go-home`。\n- index.vue 新增 goHome()：若处于浏览器全屏先 exitFullscreen()，再 router.push('/index') 回门户首页；组件销毁时自动退出全屏。\n- 默认全屏在首页入口手势内实现：index-new.vue 的 handleStatsMore() 点击手势中先 router.push('/market-monitor') 再 requestFullscreen()，两者处于同一同步点击手势内以保留浏览器用户手势；SPA 路由切换保留全屏；平台不支持时优雅降级为直接进入（页面本身铺满视口）。\n\n## 验证与归属\n- 验证：Playwright 实测旧全屏按钮 0 个、返回首页按钮 1 个；真实点击手势后 fullscreenElement 为 true；点返回首页后 fullscreenElement 为 false 且跳转 /index（登录态即门户首页）。\n- 涉及文件：zhi2-web-admin/src/views/property/marketMonitor/components/MarketHeader.vue、zhi2-web-admin/src/views/property/marketMonitor/index.vue、zhi2-web-admin/src/views/home/index-new.vue\n- 所属项目：门户（zhi2-web-admin）；来源会话：2026-11-04；改动已提交并推送：子模块 develop/v2.6.2-portal 提交 1f012e5e4，父仓库门户 gitlink 提交 d128bee（均推送至 develop/v2.6.2-portal）。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

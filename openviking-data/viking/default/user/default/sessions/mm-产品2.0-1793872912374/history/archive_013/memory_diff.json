@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793872912374/history/archive_013",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T10:45:47.904904+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/facility_image_fix.md",
+                "memory_type": "entities",
+                "after": "# 设施设备记录步骤图片回显修复\n物业/设施详情中步骤图片因 DetailTemplate 的 image 类型做后缀判断而不显示，改用 images 类型修复。\n\n## 问题根因\n- `DetailTemplate` 中 `type: 'image'` 先按 URL 取后缀，仅 `jpg/jpeg/png/gif/bmp/webp/svg` 用 `<img>`，否则走「附件」分支显示成可点链接\n- 接口地址常无后缀或路径不含 `.jpg`（如 `/profile/xxx`、带 token 查询串），被当非图片，显示为链接而非缩略图\n\n## 解决方案\n- 新增计算属性 `stepPictureUrlList`，从 `stepImages`（或对象 `url` 等字段）统一整理成字符串 URL 数组，与 `detailCallback` 编辑态数据一致\n- 查看模式改为 `type: 'images'`：`DetailTemplate` 对 `images` 直接用 `resolveServerAssetUrl` 拼 `<img>`，不做后缀判断，无后缀站内图也能显示\n- 无图片时仍用 `type: 'text'` 显示占位，与原空图 `-` 行为一致\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/dataProperty/recordProcess/components/recordProcessStepDialog.vue、scrappedRecord/detail.vue、mixins/detailMixins.js、maintenance/facility/components/FacilitySelectDialog.vue\n- 所属项目：产品2.0；来源会话：321b7eb6-d1b4-4f6b-865c-11661215d619；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/credit_header_fix.md",
+                "memory_type": "entities",
+                "after": "# 申报变更记录详情页头位置修复\n信用管理申报变更记录详情页因 operation-btn-group 置于 detail-container 外，页头显示到了页面底部，已修复。\n\n## 问题根因\n- 申报变更记录详情页（`creditChangeDeclaration/detail.vue`）将 `operation-btn-group`（标题+返回/附件/流程查看/打印信息）放在 `detail-container` 外的 `list-container` 中\n- `.detail-container` 使用 `flex-direction: column-reverse`，容器内页头正常在顶部；外层 `list-container` 为普通纵向布局，页头被排到表单内容下方，出现在页面底部\n\n## 修复方案\n- 去掉多余 `list-container` 嵌套，将 `operation-btn-group` 移入 `detail-container`，与同模块其他详情页（如 `creditDeclarationComponents/detail.vue`）保持一致\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/evaluation/creditChangeDeclaration/detail.vue、creditDeclarationComponents/detail.vue、components/OperationBtnGroup/index.vue、evaluation/companyReport/components/detail.vue\n- 所属项目：产品2.0；来源会话：7f4c692f-1a01-4348-afe9-003fd8ee2a08；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/parking_margin_fix.md",
+                "memory_type": "entities",
+                "after": "# 统计地图停车泊位区块边距修复\n统计地图抽屉停车泊位 Tab 汇总卡因缺少统一内边距，与其他 Tab 间距不一致，已修复。\n\n## 问题根因\n- `operatingAssets.vue` 中已统一调整区块间距：`collapse-content` 上边距 `24px`→`10px`；经营资产/经营资源统计区用 `operating-assets__stats`，带 `padding: 10px 0 14px`\n- 停车泊位汇总区用 `.parking-total-card`，未补同样内边距，导致与下方「停车泊位明细」间距不一致\n\n## 修复方案\n- 为 `.parking-total-card` 补充 `padding: 10px 0 14px`，与 `operating-assets__stats` 一致\n- 样式：`display: grid; grid-template-columns: 260px 1fr; gap: 24px; padding: 10px 0 14px;`\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/operatingAssets.vue、benefit/statisticsMapDetail/index.vue、components/Headline/index.vue\n- 所属项目：产品2.0；来源会话：870b5b21-223f-480d-b1ef-f92c770baf5b；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/deposit_edit_fix.md",
+                "memory_type": "entities",
+                "after": "# 资金缴存详情编辑无表单修复\n房屋质量保证金资金缴存详情页点击编辑无输入框、保存无反应，已通过编辑态切换 zs-form 修复。\n\n## 问题根因\n- `guaranteeDeposit/components/detail.vue` 始终渲染只读 `DetailTemplate`，点击编辑 `formMode` 变 `edit` 但未切换到可编辑表单\n- 保存调用 `submitForm`→`validateForm` 需 `ref=\"form\"` 表单实例；页面无表单，`$refs.form` 为 undefined，校验失败被静默拦截\n\n## 修复方案\n- 参考 `guaranteeDepositAccount/detail.vue` 与 `AddDialog.vue`：查看模式用 `DetailTemplate`，编辑模式用 `zs-form`\n- 可编辑字段：缴存金额、缴存日期、备注；只读字段：业务申请编号、账户名称、业务账户、余额、业务状态\n- 补充校验规则：金额必填且大于0、日期必填、备注最长500字；日期选择器禁选未来日期\n- 该组件同时用于「资金缴存」与「资金支用」详情，支用页金额/日期字段一并支持编辑\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/maintenance/guaranteeDeposit/components/detail.vue、guaranteeDepositAccount/detail.vue、AddDialog.vue、guaranteeDeposit/deposit/detail.vue、deposit/index.vue\n- 所属项目：产品2.0；来源会话：b0ca50b6-00f0-4d36-8845-29a8aaad4b5c；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

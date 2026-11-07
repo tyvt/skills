@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793750582955/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T00:09:54.038410+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/view_select_split.md",
+                "memory_type": "entities",
+                "after": "# 双视图选房弹窗统计提交须按视图分流\nScopeSelectDialog 同时支持列表与楼盘表两种选房视图，数据形态不同，展示统计与提交取数必须同一套分流逻辑。\n\n## 问题背景\n- 弹窗支持 zs-table 列表视图与 BuildingTable 楼盘表视图，靠 cardValue 切换\n- 列表视图通过 @selection-change 更新 tableSelection（完整行对象数组）\n- 楼盘表视图通过 @checked → getCheckedData 只更新 selection（houseId 字符串数组）\n- sumLabel 原只统计 tableSelection.length，楼盘表勾选时恒为 0，但确定按钮用 selection.length || tableSelection.length 能点\n\n## 解决方案\n- 展示统计与提交取数必须同一套分流函数：cardValue（注意 tabs 同步可能转字符串，用 Number() === 0 判等）为楼盘表时，将 selection 内 id 去 fullHouseData find 回解析成房屋对象再统计\n- 列表视图仍用 tableSelection，含用途分布按 dictValue 匹配 dictLabel\n- 凡弹窗内并存多种选择来源，统计、禁用态、提交三处都要走同一分流函数\n\n## 验证与归属\n- 验证：会话 d72ba8af 根因说明列表走 @selection-change 更新 tableSelection，楼盘表走 @checked 只更新 selection，sumLabel 只读 tableSelection 恒 0，确定按钮用 selection.length || tableSelection.length 能点\n- 涉及文件：zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue、BuildingTable.vue\n- 所属项目：产品2.0；来源会话ID：d72ba8af-0d4f-4b21-8c49-8ed7640dbfdb；代码基线：6d7b8af"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_guard.md",
+                "memory_type": "entities",
+                "after": "# zs-table 单元格悬停回调须空值守卫\nzs-table 包装 Element 表格原生事件回调时，合计行/固定列/重绘瞬间 cell 可能为 undefined，须在 handler 开头加空值守卫。\n\n## 问题背景\n- 租赁申请列表页控制台报 [Vue warn] Error in v-on handler: \"TypeError: Cannot read properties of undefined (reading 'parentElement')\"\n- zs-table.vue 的 handleCellMouseEnter / handleCellMouseLeave 直接访问 cell.parentElement\n- Element UI 在鼠标经过 show-summary 合计行、固定列与主表体事件不同步、表格重绘或数据刷新瞬间传 undefined\n- setRowHoverState 内部校验 rowElement 但调用前 cell 未做空值判断\n\n## 解决方案\n- 在两个 handler 开头加 `if (!cell?.parentElement) return` 守卫再调 setRowHoverState\n- 凡在 zs-table 层包装 Element 表格原生事件回调（cell 系列、row 系列）都应做同类空值防御\n- 合计行与固定列是两类必然触发 undefined 的场景\n\n## 验证与归属\n- 验证：会话 2e92212a 中 zs-table.vue 461-468 行加入 cell?.parentElement 空值守卫，复现路径为租赁申请列表悬停合计行/固定列\n- 涉及文件：src/components/zs-table/zs-table.vue\n- 所属项目：产品2.0；来源会话ID：2e92212a-8c81-44e4-9cc6-e2feecfe6e5e；代码基线：41c6961"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/btn_visible_config.md",
+                "memory_type": "entities",
+                "after": "# 按钮显隐改由 getCustomConfig 配置控制\n楼盘详情页按钮显隐需求应改为后端配置驱动，禁止用 projectId 写死判断。\n\n## 问题背景\n- 楼盘详情页「权利人信息同步」按钮原用 visible: ['wuguan'].includes(this.projectId) 按项目 ID 写死\n- 换环境就要改代码，每次开关都要发版，无法跨环境复用\n\n## 解决方案\n- 页面加 isShowSycHouseObligeeBtn 状态（默认 false）\n- created 里请求 /property/common/getCustomConfig，读 res.data.complex.isShowSycHouseObligeeBtn\n- 用 parseCustomConfigBool 兼容 true/false、\"1\"/\"0\"、\"true\"/\"false\" 多种布尔形态后赋给 visible\n- 按钮开关类需求优先走 getCustomConfig 配置位 + 布尔归一化函数，前端禁止用 projectId/环境值写死显隐\n\n## 验证与归属\n- 验证：会话 a89f37b2 中 property/complex/index.vue 将 visible 从 projectId includes 判断改为 getCustomConfig 返回的 isShowSycHouseObligeeBtn，parseCustomConfigBool 兼容三种布尔写法\n- 涉及文件：src/views/property/complex/index.vue\n- 所属项目：产品2.0；来源会话ID：a89f37b2-f922-4d18-a1d2-898f3a0c0db6；代码基线：41c6961"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/autogen_field_deadlock.md",
+                "memory_type": "entities",
+                "before": "# 自动生成禁止编辑字段遇历史空值会死锁须读originForm\n苏住房G项目中用户管理新增「账号类型」自动生成而禁用编辑，但历史数据该字段为空，编辑时字段既禁用又必填导致整张表单无法保存。\n\n## 问题背景\n- 用户管理新增「账号类型」后因关联用户编码自动生成而设为「编辑态禁用」\n- 历史数据该字段为空，编辑用户时字段既禁用又必填，整张表单无法保存\n- 根因：禁用条件用当前表单值，必填校验是规则常量，两者对「空」判定不同源\n\n## 解决方案\n- 禁用判定改「仅当原始数据已有值才禁用」：编辑模式按 this.originForm.accountType 是否为空决定禁用，add 模式永不禁用\n- 下拉选项分档：add 或「编辑且原始值为空」用可选项字典 sys_account_type，有值时切只读展示全集字典 sys_account_type_all\n- 抽 isAccountTypeEmpty 同时判 null/undefined/空串/纯空格，避免「一个空格」绕过\n- 关键顺序：detailCallback 里把 originForm 赋值移到所有表单字段处理完成之后，否则禁用门控先读到空 originForm\n\n## 与已知差异及验证\n- 比已知「accountType='4' 禁止编辑」更深一层：那条只讲取值，本条讲空值历史数据下的可编辑性门控\n- 验证：用户报历史数据账号类型空致无法编辑保存；改为按 originForm 判空、选项按空切换字典、originForm 赋值后移\n- 涉及文件：views/system/user/detail.vue、mixins/detailMixins.js\n- 所属项目：苏住房G；来源会话：08df6a66-6dbe-4a03-8d68-a6fa9506abe6；代码基线：44d6576",
+                "after": "# 自动生成禁止编辑字段遇历史空值会死锁须读originForm\n苏住房G项目中用户管理新增「账号类型」自动生成而禁用编辑，但历史数据该字段为空，编辑时字段既禁用又必填导致整张表单无法保存。\n\n## 问题背景\n- 用户管理新增「账号类型」后因关联用户编码自动生成而设为「编辑态禁用」\n- 历史数据该字段为空，编辑用户时字段既禁用又必填，整张表单无法保存\n- 根因：禁用条件用当前表单值，必填校验是规则常量，两者对「空」判定不同源\n\n## 解决方案\n- 禁用判定改「仅当原始数据已有值才禁用」：编辑模式按 this.originForm.accountType 是否为空决定禁用，add 模式永不禁用\n- 下拉选项分档：add 或「编辑且原始值为空」用可选项字典 sys_account_type（产品2.0 对应 accountTypeSelectOptions），有值时切只读展示全集字典 sys_account_type_all（产品2.0 对应 accountTypeAllOptions）\n- 抽 isAccountTypeEmpty 同时判 null/undefined/空串/纯空格，避免「一个空格」绕过\n- 登录名等始终不可改字段在编辑态直接禁用，不参看 originForm 判空\n- 禁用计算属性三分支：新增模式可编辑／编辑态 originForm.accountType 为空可编辑／有值禁用\n- 关键顺序：detailCallback 里把 originForm 赋值移到所有表单字段处理完成之后，否则禁用门控先读到空 originForm\n\n## 与已知差异及验证\n- 比已知「accountType='4' 禁止编辑」更深一层：那条只讲取值，本条讲空值历史数据下的可编辑性门控\n- 验证：用户报历史数据账号类型空致无法编辑保存；改为按 originForm 判空、选项按空切换字典、originForm 赋值后移\n- 涉及文件：views/system/user/detail.vue、mixins/detailMixins.js\n- 所属项目：苏住房G、产品2.0；来源会话：08df6a66-6dbe-4a03-8d68-a6fa9506abe6、536f025f-ffaf-4424-bbcf-b53ebfb5d0d4；代码基线：44d6576、ee952eb"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

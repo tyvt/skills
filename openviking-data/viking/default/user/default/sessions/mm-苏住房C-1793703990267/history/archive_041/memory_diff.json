@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_041",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:31:28.429420+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/gateway_null_bug.md",
+                "memory_type": "entities",
+                "after": "# 苏服办网关data:\"null\"误报网络错误\n苏住房C移动端走苏服办JPAAS网关的接口在后端返回data:\"null\"时，前端误报「网络错误」而掩盖真实业务错误。\n\n## 问题现象\n- 接口如addOwnerByToken实际返回{\"success\":true,\"code\":0,\"msg\":\"请求异常\",\"data\":\"null\"}，前端却提示「网络错误，请稍后再试」\n- 用户误以为断网，真实业务错误文案被完全盖掉\n\n## 根因\n- gateway.js用isJSON(responseObj.data)判断，isJSON(\"null\")为假，字符串\"null\"原样当业务数据透传\n- 下游httpInstance.js拿到字符串无code/msg字段，code!=200且!=0且!=10000全成立，落到兜底showToast\n\n## 解决方案\n- gateway.js对data===\"null\"（及空串/\"undefined\"）单独分支，按msg/message/sub_msg抛真实业务错误，不当数据透传\n- httpInstance.js兜底提示兼容message、sub_msg字段，三者皆无才显示「网络错误」\n- 排查顺序：先curl复现看data是否为字符串\"null\"，再怀疑网络层\n\n## 验证与归属\n- 验证：会话949376aa用户给完整curl，agent定位gateway.js:300-304与httpInstance.js:101-104，修复后提示变「请求异常」\n- 涉及文件：src/api/gateway.js、src/api/httpInstance.js、src/api/index.js\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：949376aa-2a8f-4366-9f75-db6d23ef2d53；代码基线：12ef89c"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/type_enum_bug.md",
+                "memory_type": "entities",
+                "after": "# 页面URL的type误当接口枚举致列表空数据\n苏住房C移动端「最新楼盘」页把路由type直接当halfYearAgo枚举传参，实际按「在售」查询返回空列表。\n\n## 问题现象\n- 「苏找房→新房→最新楼盘」打开无数据，同功能APP端有数据\n- 后端不报错、前端不报错，只表现为空列表，易误判成「没数据」或权限问题\n\n## 根因\n- listRecommendProject按halfYearAgo枚举过滤（1=在售，2=最新），indexMore.vue把URL页面type直接赋给halfYearAgo\n- 在售type=0需1、最新type=1需2，2025-05调整时页面layer与接口layer语义未对齐，参数类型合法故不报错\n\n## 解决方案\n- 页面建映射表HALF_YEAR_AGO_MAP={0:1,1:2}，用if(MAP[pageType]!=null)t.halfYearAgo=MAP[pageType]避免0被falsy吞掉\n- 对照原生端真实请求体对表；开发者工具Network确认请求体halfYearAgo是否为期望枚举值\n- index.vue与indexMore.vue双入口一并核对\n\n## 验证与归属\n- 验证：会话86696cb3用户报最新楼盘无数据，agent对比确认type=1被当halfYearAgo=1，在indexMore.vue:65-91加映射修复\n- 涉及文件：src/pages_transaction/newHouse/indexMore.vue、index.vue、src/api/transaction.js、src/hooks/usePaging.js\n- 所属项目：苏住房C；来源会话ID：86696cb3-e77a-4306-8d93-2aa391d79f46；代码基线：5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/h5_tab_backinfo.md",
+                "memory_type": "entities",
+                "after": "# APP内嵌H5回到tab页统一转交原生backInfo\n苏住房C移动端H5内嵌原生APP时，所有回到H5同名tab页的跳转/后退须收口转交原生backInfo，避免看到「第二套tab」。\n\n## 问题现象\n- 原生APP五个tab（首页、苏找房、慧物业、掌服务、我的）由原生实现，H5同名tab页仅兜底\n- 任何回到H5 tab的行为让用户看到「第二套tab」，后退落回H5 tab页错误\n\n## 根因\n- tab页真实归属在运行环境不在路由表，逐页改navigateBack/switchTab无法覆盖全量入口\n- onShow兜底、redirectTo、reLaunch、公共back()各有一条路径须统一拦截\n\n## 解决方案\n- 新建utils/appNavigation.js按环境判定是否原生APP（webkit/android/harmony，显式排除SZDJSBridge容器）\n- 覆盖四类拦截点：navigateBack目标为tab或栈剩一页、switchTab直接调用、reLaunch/redirectTo目标为tab、tab页onShow兜底（tabBar.js的onTabPageShow）\n- 公共back()走同逻辑，main.ts注册全局拦截；浏览器独立访问与子页面间正常后退不受影响\n\n## 验证与归属\n- 验证：会话34bbb144用户明确嵌入APP的H5会后退回H5 tab，agent新建appNavigation.js并在tabBar.js/utils/index.js/main.ts三处接线\n- 涉及文件：src/utils/appNavigation.js、src/utils/tabBar.js、src/utils/index.js、src/main.ts、src/pages/redirect/index.vue\n- 所属项目：苏住房C；来源会话ID：34bbb144-2648-4883-b2f5-4039faa3aa6e；代码基线：b7bf813"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zsimage_height_zero.md",
+                "memory_type": "entities",
+                "after": "# ZsImage图片高度塌成0的双重条件\n苏住房C移动端ZsImage组件因外层盒子无固定高度且页面scoped样式穿不透内部img，导致图片高度计算为0只显示占位框。\n\n## 问题现象\n- 部分图示/图标整块不显示（如我的房屋→未查询到房屋的三张图示、电子业主卡入口图标）\n- 图片文件存在、路径正确，属纯CSS问题，易被误判成「图片资源缺失/路径错」\n\n## 根因\n- ZsImage内部真实img写height:100%，高度依赖外层盒子\n- 外层.img-box无固定高度，页面.img-box .img是scoped样式无法穿透子组件内部img，img计算高度0\n\n## 解决方案\n- 先确认文件真实存在再查样式链；用:deep(.img){height:auto}穿透子组件让图片按原比例撑开\n- 若伴路径问题显式给ZsImage传subpackage指定分包，与同目录正常页面写法对齐\n- errorTip/errorTipOne/errorTipTwo同目录同类页面一并改，避免漏改\n\n## 验证与归属\n- 验证：会话293e9168用户反馈图标不显示附截图，agent定位ZsImage内部height:100%加.img-box无高度加scoped无法穿透，三处加:deep(.img){height:auto}并补subpackage\n- 涉及文件：src/pages_transaction/publishHouse/errorTipOne.vue、errorTipTwo.vue、src/components/ZsImage/ZsImage.vue\n- 所属项目：苏住房C；来源会话ID：293e9168-99d3-401f-9f8a-68fd6f4853a1；代码基线：b7bf813"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

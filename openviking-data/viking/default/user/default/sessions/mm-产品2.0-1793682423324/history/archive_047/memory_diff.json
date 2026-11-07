@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_047",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:04:48.892971+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_dialog_data_overflow.md",
+                "memory_type": "entities",
+                "after": "# 数据量不可控的 zs-dialog 弹窗溢出\n当详情页打开承载多个数据区块的 zs-dialog 弹窗时，数据量超出视口会将标题栏和关闭按钮顶出屏幕外，导致无法关闭。\n## 问题根因\n- zs-dialog 默认按内容自动计算高度且不设上限，内容高度不受视口约束。\n- 数据量不可控的弹窗（如综合查询弹窗同时展示开发企业、物业企业、物管会、业委会）必须自行兜底。\n## 解决方案\n- 在弹窗组件自身样式（非调用方 detail.vue）加整体 max-height（如 88vh）。\n- 内容区 .dialog-box 设 overflow-y:auto，超长内容在弹窗内滚动。\n- 标题栏固定顶部，关闭按钮始终可见。\n## 验证与归属\n- 验证证据：会话 fe6a9c71 物业管理区域备案详情页综合查询弹窗过长无法关闭。\n- 修复文件：zhi2-web-admin/src/views/property/complex/components/StatisticsDialog.vue、zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue。\n- 所属项目：产品2.0；来源会话ID：fe6a9c71-d8dc-4321-9d4d-34e4729e5e46；代码基线：a357f32。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_close_reject.md",
+                "memory_type": "entities",
+                "after": "# 弹窗提交 close 仅在 then 内导致关不掉\n审查弹窗「点确定后关不掉」时，发现 close() 写在 request().then(res=>res.code==200) 分支里，接口 reject 会静默导致弹窗无法关闭。\n## 问题根因\n- 全局 request 封装下，业务码非200、网络错误、HTTP异常均走拦截器 Promise.reject，不进 then，close() 不执行且无 catch/finally 兜底。\n- then 内再判 res.code==200 属双重判断，成功体缺 code 字段（undefined==200）也会假失败。\n- 手动输入金额为空等也会导致 reject 不关；close() 自身抛错（如 $refs 已卸载）会造成「半关」观感。\n## 解决方案\n- 提交请求加 catch/finally 或成功后无条件关弹窗。\n- 补提交前缺漏的表单 validate，避免空值 reject。\n- 分析「确定后不关」先看三点：close 是否只在 then 内；拦截器 reject 行为；then 内 code 判断是否重复。\n## 验证与归属\n- 验证证据：会话 427d58f8 分析 ScopeSelectDialog 与 OpeningBuildingDialog 的 submitForm，close() 仅在 then+res.code==200 内且无 catch/finally，提交前未校验。\n- 涉及文件：zhi2-web-admin/src/views/maintenance/components/OpeningBuildingDialog.vue、zhi2-web-admin/src/utils/request.js。\n- 所属项目：产品2.0；来源会话ID：427d58f8-75b8-425c-af42-6fe424dbe22b；代码基线：6b9d9d7。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/area_mixin_region_select.md",
+                "memory_type": "entities",
+                "after": "# 列表页行政区域筛选标准接入\n在 V3 后台列表页新增「行政区域」筛选时，应使用项目公共 area mixin + region-select 搜索项类型，避免手写下拉。\n## 问题根因\n- 项目已把区划能力沉淀在公共 mixins/area.js（regionOptions、region-select 控件），手写会造出第二套区划数据源与口径。\n## 解决方案\n- 引入 @/mixins/area.js；queryParams 增加 regionCode 参数随列表请求传后端。\n- 筛选项配 type:'region-select'，与 building/plot 等既有列表页写法一致。\n- 街道/社区升级为按编码联动下拉时参考 autonomy/preparatoryApply/index.vue，重写 currentRegionCode 并改用 subdistrictCode/communityCode 编码字段。\n- 与已知条目 #595 区别：#595 是页面同名 regionOptions 与 mixin computed 撞车，本条是标准接入方式。\n## 验证与归属\n- 验证证据：会话 56dbde32 在 pubManagementOrg/index.vue 筛选栏加行政区域筛选采用三件套写法。\n- 涉及文件：zhi2-web-admin/src/mixins/area.js、zhi2-web-admin/src/views/benefit/pubManagementOrg/index.vue。\n- 所属项目：产品2.0；来源会话ID：56dbde32-7046-4d21-81d3-05ad6a8e4261；代码基线：64fa9e2~94b86fa（2026-05~07）。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/child_table_role_disable.md",
+                "memory_type": "entities",
+                "after": "# 子表按角色禁用操作按钮\n需求为某角色（如企业管理员 isCompanyAdmin）在详情页子表上「新增/删除」按钮可见但置灰时，需重写 multiDeleteButton + handleDelete 双层拦截。\n## 问题根因\n- 只改「新增」按钮 disabled 不够：「删除」走 listMixins/table mixin 默认 multiDeleteButton，不重写仍可被点击。\n- 前端置灰可被绕过，需在方法层兜底。\n## 解决方案\n- 子表组件重写 multiDeleteButton，把角色条件并入 disabled（如 disabled: isCompanyAdmin || selection.length===0），保持 permission/multi 等契约不变。\n- handleDelete 开头加同条件拦截，即使绕过 UI 也不执行删除。\n- 角色标志由详情页把接口字段 :isCompanyAdmin=\"form.isCompanyAdmin\" 传给子表，详情页本身不用改。\n- 与已知 #823（复用 multiDeleteButton 不要自造按钮）互补：本条补充按角色置灰需重写+方法层双保险。\n## 验证与归属\n- 验证证据：会话 01e7eed0 operatorAuthRangeTable.vue 重写 multiDeleteButton 使企业管理员删除按钮置灰，并在 handleDelete 中拦截。\n- 涉及文件：zhi2-web-admin/src/views/company/userManagement/operatorAuth/operatorAuthRangeTable.vue。\n- 所属项目：产品2.0；来源会话ID：01e7eed0-b3c3-4b15-9fda-320771899793；代码基线：0161609~94b86fa（2026-07）。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

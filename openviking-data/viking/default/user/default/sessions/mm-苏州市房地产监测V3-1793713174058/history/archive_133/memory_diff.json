@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793713174058/history/archive_133",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T18:05:00.407970+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3技术/vite_file_proxy_target.md",
+                "memory_type": "entities",
+                "after": "# vite文件代理复用接口代理地址\n苏州市房地产监测V3 的 vite.config.js 中 getFileProxyTarget 直接返回 VITE_APP_PROXY_ADDRESS，使开发服务器 /zhi2* 文件代理与接口代理同目标。\n\n## 问题背景\n- 原 getFileProxyTarget 读取 VITE_APP_FILE_PROXY_ADDRESS 并剥离 /v3.0 后缀\n- deploy/nginx.conf 原已指向 fdc_api_gateway 无需变动\n\n## 修复方案\n- getFileProxyTarget 直接返回 VITE_APP_PROXY_ADDRESS，不再读取旧变量及剥离后缀\n- env/.env 中旧变量 VITE_APP_FILE_PROXY_ADDRESS 可清理\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3/330.md\n- 涉及文件：vite.config.js、src/utils/resolveServerAssetUrl.js、deploy/nginx.conf\n- 所属项目：苏州市房地产监测V3；来源会话：be25274a-6970-4bda-b365-0ac3a21f1320；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3技术/el_upload_action_required.md",
+                "memory_type": "entities",
+                "after": "# el-upload未设action必填项触发警告\n苏州市房地产监测V3 的 InstitutionUploadItem 仅用 :http-request 未传 action，触发 el-upload 必填校验警告，增加 action=\"#\" 修复。\n\n## 问题根因\n- Element UI `el-upload` 要求 `action` 为必填字符串\n- `InstitutionUploadItem.vue` 仅用 `:http-request` 未传 `action`，于 `initAppendix` 渲染时触发警告\n\n## 修复方案\n- 两处 `el-upload` 增加 `action=\"#\"`，与 `RegisterUploadItem.vue` 一致\n- 实际请求仍走 `handleUpload`/`uploadInstitutionAppendix`，`#` 仅满足组件校验\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3/331.md\n- 涉及文件：src/views/institutionRegister/components/InstitutionUploadItem.vue、src/views/register/components/RegisterUploadItem.vue\n- 所属项目：苏州市房地产监测V3；来源会话：7d2c6ace-ba93-4a45-988e-36327eaa2c19；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3技术/permission_char_conflict_workflow.md",
+                "memory_type": "entities",
+                "after": "# 菜单权限字符与代码校验字符口径冲突处理规则\n苏州市房地产监测V3 四证类多证照模块权限字符冲突时，先查 SYS_MENU 实际数据再定谁改谁，OperationBtnGroup 只走 permission-module-name/permission-business-name。\n\n## 问题背景\n- 四证（planLic/consLic/conLandLic/stateLandLic）及变更单按钮权限不显示\n- 前端校验用 `certificate:*`，数据库 SYS_MENU 配的是 `presale:*`，仅 stateLandLic 配对\n- 变更单前端业务名（landLicChange）与后端（conEngPlanLicChange 等）不一致\n\n## 处理规则\n- 先查 SYS_MENU 实际 perms 字符串，确认前再决定改代码还是改库\n- 权限前缀只从 `permission-module-name`/`permission-business-name` 取，业务名原样传后端，接口零改动\n- 变更单业务名必须以后端实际接口命名为准，前端拼错会导致 404\n- 多证照模块正证+变更单共 11 个文件权限字符成组对齐，避免半对齐\n- 对齐后用普通角色账号重新登录核对按钮显隐\n\n## 验证与归属\n- 验证证据：会话 session-56f7fbda-e26c-465e-b7a1-7aad8886f6f0（基线 235e6ee）\n- 涉及文件：projectManagement/certificate/*/changeDetail.vue、BaseLandLicForm.vue 等 11 个文件\n- 所属项目：苏州市房地产监测V3；来源会话：session-56f7fbda-e26c-465e-b7a1-7aad8886f6f0；代码基线：235e6ee"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3技术/imageupload_filetype_bug.md",
+                "memory_type": "entities",
+                "before": "# ImageUpload误传数组file-type致报错\n苏州市房地产监测V3 的 AgencyPersonnelDetail 向 ImageUpload 误传数组 file-type，导致 allowedTypes 为 undefined 并调用 .join('/') 报错，移除传参修复。\n\n## 问题根因\n- `ImageUpload/index.vue` 的 `file-type` 仅接受字符串映射内置类型列表\n- `AgencyPersonnelDetail.vue` 误传数组导致 `allowedTypes` 计算为 undefined 并调用 `.join('/')` 报错\n\n## 修复方案\n- 移除错误 `file-type` 传参（默认 image 涵盖 png/jpg/jpeg）\n- 自定义后缀应改用 `accept-types` 属性\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3-leftover/129.md\n- 涉及文件：src/components/ImageUpload/index.vue、src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：9449756e-c27f-4b6f-8d25-58ca3b632943；代码基线：none",
+                "after": "# ImageUpload误传数组file-type致报错\n苏州市房地产监测V3 的 AgencyPersonnelDetail 向 ImageUpload 误传数组 file-type，导致 allowedTypes 为 undefined 并调用 .join('/') 报错，移除传参修复。\n\n## 问题根因\n- `ImageUpload/index.vue` 的 `file-type` 仅接受字符串映射内置类型列表\n- `AgencyPersonnelDetail.vue` 误传数组导致 `allowedTypes` 计算为 undefined 并调用 `.join('/')` 报错\n\n## 修复方案\n- 移除错误 `file-type` 传参（默认 image 涵盖 png/jpg/jpeg）\n- 自定义后缀应改用 `accept-types` 属性\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3/330.md\n- 涉及文件：d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/ImageUpload/index.vue、d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：9449756e-c27f-4b6f-8d25-58ca3b632943；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

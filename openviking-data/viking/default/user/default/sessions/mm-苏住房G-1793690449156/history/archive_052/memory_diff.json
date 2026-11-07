@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_052",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:22:23.929521+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/todo_panel_mock_removal.md",
+                "memory_type": "entities",
+                "after": "# 待办面板移除Mock与补齐逻辑坑\n苏住房G首页V2的TodoPanel.vue移除mock数据时，仅删DEMO_ROW常量不够，还需拆除while补齐循环并按Tab拆分空态文案。\n## 问题根因\n- 原实现用while循环把list补齐到固定4行，删DEMO_ROW保留循环仍会补出undefined空壳行。\n- 待办与消息两Tab共用面板，空态文案原同写\"暂无数据\"，移除mock后必须按active tab分流为\"暂无待办\"/\"暂无消息\"。\n- 风险方向与\"0是有效值\"归一化相反：此处是视觉凑满而凭空构造行。\n## 解决方案\n- 删除DEMO_ROW常量，rows简化为this.list.slice(0,4).map(字段映射)单向尾部截断，不补齐不补位。\n- 空态按active tab分支渲染各自文案；父组件index-v2.vue不动，数据仍由getTaskCount/getTodoTaskList/消息接口提供。\n## 验证与归属\n- 验证：会话9f5320c6删除DEMO_ROW、简化rows计算属性、两Tab空态分流；父组件未改。\n- 涉及文件：src/views/home/v2/components/TodoPanel.vue、StudyPanel.vue、src/views/home/index-v2.vue\n- 所属项目：苏住房G；来源会话：9f5320c6-ed38-4a0c-a9b9-1f824c967666；代码基线：cb37a39"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/v2_panel_cr_checklist.md",
+                "memory_type": "entities",
+                "after": "# 首页V2卡片面板Code Review存量缺陷清单\n苏住房G首页V2聚合卡片门户做整体review时反复出现的五类问题，可直接当检查清单并按CRITICAL/HIGH/MEDIUM分级。\n## 缺陷清单\n- 附件/消息跳转URL未校验：downloadStudy对attachmentUrl直接window.open，openTodoItem把msgUrl直喂router.push，需scheme白名单(仅http/https/同源)且外链走window.open内链走router。\n- 字典与消息列表竞态：initTodoDict异步拉busCodeOptions，created阶段loadTodoPanelList可能先跑完，消息Tab首屏dictFormatter渲染原始busCode，需字典就绪后拉列表或更新后重刷。\n- computed遗留console.log（如CheckDataNav的progressPct）生产刷屏，需清除。\n- :key不稳定：StudyPanel的v-for用pickId可能undefined，需归一化稳定id或id??`${type}-${index}`；KeyDataNav嵌套v-for用bi/ri下标作key需改稳定字段。\n- PublicBenefit的watch仅深度监听data.accountStruct，图表静默更新不重绘，应把data.chart一起纳入。\n## 验证与归属\n- 验证：会话a6d1b5a7 review结论HIGH 2、MEDIUM 5，Verdict: BLOCK。\n- 涉及文件：index-v2.vue、CheckDataNav.vue、KeyDataNav.vue、PublicBenefit.vue、StudyPanel.vue、studyDataMap.js\n- 所属项目：苏住房G；来源会话：a6d1b5a7-1983-49a4-8898-bb4bc9230465；代码基线：315702f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/datepicker_anchor_reset.md",
+                "memory_type": "entities",
+                "after": "# 日期范围disabledDate的anchor跨度逻辑\n苏住房G的companyListQuery.js更新时间选择器共用边界/跨度逻辑驱动三处，校验失败分支必须重置anchor否则过期anchor收窄可选范围。\n## 问题根因\n- 全局上下界、anchor±2年跨度、validateUpdateTimeRange提交校验三者共用边界计算，本身为保证UI与提交一致。\n- 坑在anchor生命周期：用户只点第一日期未完就关掉，校验失败仅报错不清空vm._updateTimePickAnchor，下次打开仍按过期anchor灰掉合法日期。\n- 全量npm run eslint因仓库历史报错失败，不能用于单文件结论。\n## 解决方案\n- 把重置anchor作为校验失败必经动作，与成功提交后重置同源同一方法，保证disabledDate收窄仅存活于一次完整两次点击周期。\n- 改动disabledDate时检查面板取消/关闭路径是否也走重置。\n## 验证与归属\n- 验证：会话6399869b评审结论仅MEDIUM，校验失败不清空anchor，建议失败分支同样重置。\n- 涉及文件：src/utils/companyListQuery.js、src/views/company/companyRegister/index.vue\n- 所属项目：苏住房G；来源会话：6399869b-5fa4-4c30-8a6f-e7e149d77c48；代码基线：3192070"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/zs_advanced_query_operator.md",
+                "memory_type": "entities",
+                "after": "# zs-advanced-query操作符列禁用与默认值成对\n苏住房G公共查询complex的zs-advanced-query中，单操作符字段不能禁用中间框，需在选字段时自动补默认操作符解锁值控件。\n## 问题根因\n- 上一版为让选择类字段只能等值匹配，把仅1个可选操作符的字段整体disabled且不填operator。\n- 值控件按operator已选才放开，导致死锁：中间禁用→operator空→值控件恒禁用。\n## 解决方案\n- 选左侧字段后中间操作符下拉一律可交互，绝不因单操作符而灰掉。\n- 选字段时自动写该字段第一个可用操作符进condition（下拉类即\"等于\"），值控件立即可用。\n- operator_type字典异步返回前不写入，字典到达后补一次默认值避免被空字典覆盖。\n## 验证与归属\n- 验证：会话1427f027用户诉求\"不要禁用啊，你要么给默认等于\"；结论中间操作符不再禁用+自动填默认，字典未加载完等返回补默。\n- 涉及文件：zs-advanced-query.vue、complexFieldConfig.js、publicQuery/complex/index.vue\n- 所属项目：苏住房G；来源会话：1427f027-16a3-4469-870f-96a1841c3b1f；代码基线：e590ffa"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

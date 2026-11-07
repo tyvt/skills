@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793792554202/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T11:52:30.326660+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cert_elcol_fix.md",
+                "memory_type": "entities",
+                "after": "# CertTypeField证书列el-col断点覆盖修复\n苏州市房地产监测V3 项目 zhi2-web-admin 中，项目管理子表证书新增的证书类型列因全局 ElCol 补丁导致单设 span 被覆盖，已在 CertTypeField.vue 修复。\n\n## 问题根因\n- src/utils/element.js:14-19 给全局 ElCol 打补丁，响应式断点默认值改为 xs=24/sm=12/md=12/lg=8/xl=8\n- 所有 <el-col> 即使只写 :span=\"24\"，运行时 DOM 也会带出 el-col-md-12 el-col-lg-8 等类\n- detail-form.scss 中 el-col-md-12 半宽规则排在 el-col-24 整行规则之后、特异性相同，按级联顺序半宽胜出\n\n## 修复方案\n- CertTypeField.vue 显式声明全断点 24：<el-col :xs=\"24\" :sm=\"24\" :md=\"24\" :lg=\"24\" :xl=\"24\">\n- 显式 props 优先于补丁默认值，单设 span 不再被覆盖\n\n## 验证与归属\n- 实测证书类型列 class 变为 el-col-24 el-col-xs-24 el-col-sm-24 el-col-md-24 el-col-lg-24 el-col-xl-24，命中整行规则\n- 涉及文件：src/utils/element.js、detail-form.scss、ProjectCertificateTabs.vue、projectCertificatePanelMixin.js\n- 所属项目：苏州市房地产监测V3；来源会话：5c9bf331-76da-4e83-8468-69dcad25ccef"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/测试模式/company_admin_e2e.md",
+                "memory_type": "entities",
+                "after": "# 企业管理员菜单路由E2E探针\n苏州市房地产监测V3 项目 zhi2-web-admin 新增 2 个 e2e 文件，对开发企业/代理机构管理员菜单路由做可达性探针，未改动既有测试。\n\n## 新增文件\n- e2e/fixtures/company-admin-menu-config.js：管理员菜单清单，导出 4 个 filePath 常量 + getAllCompanyAdminMenus()，沿用 institution-menu-config.js 范式\n- e2e/company/company-admin-routes-probe.spec.js：登录后收集 companyAdmin 路由，逐个 gotoPageByFilePath 跳转（列表无 query、详情带 formMode=view），产出 zsbase-company-admin-routes.json\n\n## 验证结果\n- ESLint 两个文件零告警\n- node 直接 import fixture 验证导出正确（列表 developer/index、agency/index；详情 developer/detail、agency/detail）\n- playwright.config 的 testDir 配置正确\n\n## 验证与归属\n- 涉及文件：company-admin-menu-config.js、institution-menu-config.js、company-admin-routes-probe.spec.js、zsbase-company-admin-routes.js\n- 所属项目：苏州市房地产监测V3；来源会话：fbb5081c-82da-4693-ab42-7a515b32cd7f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zstable_slot_fix.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column slot-scope解构批量修复\n苏州市房地产监测V3 项目 zhi2-web-admin 中 zs-table-column 下 slot-scope=\"scope\" 误用导致行数据取不到，批量修复 20 个文件 25 处同类缺陷。\n\n## 问题根因\n- zs-table-column 下 slot-scope=\"scope\" 应改为 slot-scope=\"{ scope }\"，解构后 scope.row 才是行数据\n- 原生 el-table-column（如 PricingModeTable.vue 操作列）不受影响，一律不动\n\n## 修复清单\n- 合同模块：CommercialHousingTable、MortgageEntitiesTable.vue（操作列 查看/编辑/删除）\n- 楼栋/楼盘表：buildingTable/index.vue（全部单元格）、MoneyInformation.vue\n- 资金监管：RelatedBuildingsTable.vue、AppropriateTable.vue（计划节点日期选择）、ExpenseTable.vue\n- 逐处用标签栈判定外层确为 zs-table-column 才改\n\n## 验证与归属\n- 全量复查通过，共 20 个文件 25 处同类缺陷\n- 所属项目：苏州市房地产监测V3；来源会话：609a8f76-e371-401d-92fa-3592fbd4cbd8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/infocard_tone_fix.md",
+                "memory_type": "entities",
+                "after": "# InfoCardDialog业务状态色调修复\n苏州市房地产监测V3 项目 zhi2-web-admin 中 InfoCardDialog.vue 的 bizStateTone 原只把「有效/正常」判为绿色，字典里「已备案」落到灰色分支，已修复。\n\n## 修复方案\n- 改为先判异常再判正常：/注销|失效|冻结|异常|未备案|未通过|驳回|作废|过期/ → invalid（红）\n- /备案|有效|正常|通过/ → valid（绿）；其余 unknown（灰）\n- 圆点用 currentColor 与文字同步变绿\n\n## 验证结果\n- 实测：已备案/有效/正常 → 绿；未备案/注销/冻结 → 红；审核中 → 灰\n- eslint 通过\n\n## 验证与归属\n- 涉及文件：src/views/institution/agencyPersonnel/components/InfoCardDialog.vue、WorkCardDialog.vue\n- 所属项目：苏州市房地产监测V3；来源会话：b3409b66-bfb0-4aec-941e-ffd48580fe9c"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

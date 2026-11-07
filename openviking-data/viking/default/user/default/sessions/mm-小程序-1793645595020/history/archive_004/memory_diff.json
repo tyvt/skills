@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-小程序-1793645595020/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T18:59:25.124130+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/portal_tab_sync.md",
+                "memory_type": "entities",
+                "after": "# 门户双Tab小区不同步Bug\nwygl小程序首页home与externalWebview双Tab切换时小区/房屋选择不同步，onShow全量拉profile冲掉picker选中项。\n\n## 问题根因\n- 两个Vue页面onShow均跑全量刷新（refreshFromServer/initializePage），互相覆盖门户状态\n- 「我的」页onShow拉profile可能清空houseId再合并ctUserIdentity，无记录默认选第一套\n- clearPortalHouseFields/refreshPortalProfile清houseId但picker选择无独立持久化\n\n## 解决方案\n- 增加独立存储（如__ew_portal_active_house__），picker切换写入houseId/project，恢复时优先\n- Tab切回onShow只做本地快照恢复+轻量同步房屋列表，不跑完整initializePage（首次onLoad再拉）\n- mergeCtUserIdentityHouseIntoPortalUser拉列表后先恢复用户上次选择，无记录再用第一套\n\n## 验证与归属\n- 验证：会话7ebdef37用户反馈两边切换小区不同步；第二轮归纳onShow全量刷新覆盖picker\n- 涉及文件：pages/webview/home.vue、pages/webview/externalWebview.vue、utils/portal-user.js、components/custom-tabbar/custom-tabbar.vue\n- 所属项目：小程序（wygl-wxxcx-dev-slh）；来源会话：7ebdef37-14ee-44a0-8372-b1a08283e34e；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/owner_decision_flow.md",
+                "memory_type": "entities",
+                "after": "# 业主决策portalPostAction消费流程\nwygl小程序业主决策H5打开成功后再消费缓存，普通绑房入口需清残留避免重复触发。\n\n## 问题根因\n- 首页点业主决策→web-view/灵犀选屋→回调个人中心应自动拉表决URL\n- portalPostAction过早清除或残留会导致绑房回调again自动进业主决策或重复调接口\n- 选屋回调页固定跳个人中心，消费逻辑须写在能接回调的页面\n\n## 解决方案\n- tryConsumeOwnerDecisionPortalPostAction在openOwnerDecisionVoteH5成功跳转后再markConsumed\n- 统一清理本地storage、pendingPortalPostAction、URL参数、redirectUrl内同名参数\n- 普通「绑定房屋」未带portalPostAction时先resetOwnerDecisionPendingState\n- 用ownerDecisionPostActionConsuming防止请求中重复执行\n\n## 验证与归属\n- 验证：会话5176f41c用户要求回调在个人中心消费postAction成功后清缓存防普通绑房再触发\n- 涉及文件：pages/webview/home.vue、pages/webview/externalWebview.vue、utils/portal-h5-webview.js、pages/face/bdc.vue、pages/face/verify.vue\n- 所属项目：小程序（wygl-wxxcx-dev-slh）；来源会话：5176f41c-4e0d-4dfb-b229-b0063e7d524b；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/formal_house_card.md",
+                "memory_type": "entities",
+                "after": "# 正式版房屋卡片展示逻辑\nwygl正式版房屋卡片展示用ctUserIdentity，业主决策仍单独校验灵犀绑房houseBoundViaAuth。\n\n## 问题根因\n- 体验版连生产接口能显示卡片，正式版有ctUserIdentity房屋数据却显示「去添加房屋」\n- 正式版曾把「有房屋」与houseBoundViaAuth（灵犀选屋成功）绑死，混用两套口径\n\n## 解决方案\n- hasPortalHouse()：有houseId或houseList即视为有房屋；正式版合并ctUserIdentity不因未灵犀绑定清空\n- 单独hasOwnerDecisionLingXiBinding()仅在openOwnerDecisionVoteH5校验houseBoundViaAuth\n- 恢复快照时勿因「未灵犀绑定」清空已展示房屋；卡片看ctUserIdentity，业主决策强制灵犀选屋\n\n## 验证与归属\n- 验证：会话59b45a58用户问正式版有返回却不显示卡片；结论新增hasPortalHouse等\n- 涉及文件：utils/portal-user.js、pages/webview/home.vue、pages/webview/externalWebview.vue\n- 所属项目：小程序（wygl-wxxcx-dev-slh）；来源会话：59b45a58-ecb6-4c2a-aae6-55308e7e54f5；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/portal_menu_gate.md",
+                "memory_type": "entities",
+                "after": "# 门户菜单门禁分叉规则\nwygl门户菜单维修资金要bound houseId，业主决策每次强制灵犀选屋，门禁与登录恢复不同。\n\n## 规则对比\n- 维修资金：requiresBoundHouseId:true，hasBoundHouseId()（ctUserIdentity的houseId），不走灵犀，跳H5须带complexId+houseId\n- 业主决策：登录+实名即可，ownerDecisionVoteExternal每次二次确认后强制pages/face/bdc重新选屋\n\n## 登录恢复\n- 维修资金须已有houseId才自动进入；业主决策登录后走确认+灵犀不依赖已有绑定\n- 未登录点功能弹窗确认登录后，若满足门禁则自动打开原菜单（维修资金还需houseId）\n\n## 验证与归属\n- 验证：会话bb99cf34用户区分两菜单房屋要求不同并要求登录后自动恢复点击\n- 涉及文件：pages/webview/home.vue、pages/webview/externalWebview.vue、utils/portal-h5-webview.js、utils/portal-user.js、components/portal-gate-modal/portal-gate-modal.vue\n- 所属项目：小程序（wygl-wxxcx-dev-slh）；来源会话：bb99cf34-6840-4cc5-a121-c5b077a88a73；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:39:26.097285+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/图表技术约定/echarts_pie_percent.md",
+                "memory_type": "entities",
+                "after": "# ECharts 饼图占比约定\n数据沙盘饼图 label/tooltip 的占比统一读取 p.percent，不再解析接口 ratio 字段。\n\n## 背景\n- 数据沙盘饼图占比曾在「走接口 ratio 字段」与「走 ECharts 自算 percent」之间切换\n- ECharts 的 p.percent 按 series 内所有数据项的 value 计算占比\n\n## 关键事实\n- 本项目对 count===0 的扇区仍塞占位值 1 参与绘图，假值计入分母，导致 percent 与真实数量占比不一致\n- getDonutSlicePercent 内只 Math.round(p.percent)，占比展示与绘图口径天然一致\n- 排查「饼图百分比对不上」时先查是否有占位 value 混入 series\n\n## 关联\n- 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue\n- 所属项目：园区物管2.0（zhi2-web-admin，基线 6a4835a08）\n- 来源会话：e98b3c2b-020e-45a5-bbab-7177966aefbc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/布局缺陷根因/navbar_dropdown_clip.md",
+                "memory_type": "entities",
+                "after": "# 顶栏下拉被裁切根因\n园区物管2.0 顶导航栏「更多功能」下拉菜单（position:absolute; top:100%）曾整块被裁掉不显示。\n\n## 根因\n- 外层 .top-nav-container 设了 overflow:hidden（为做菜单横向滚动），下拉超出导航栏高度部分被父级裁切\n- 次要问题：TagsView 的 z-index:8 会盖住延伸下来的下拉\n\n## 修复做法\n- 滚动职责下沉：用单独 .nav-items-scroll 包住左侧菜单做 overflow-x:auto（配 width:max-content），外层保持 overflow:visible\n- .navbar 整体加 position:relative; z-index:9 高于 TagsView(8)，下拉展开时自身 z-index 提到 20\n- 「更多」按钮 flex-shrink:0 防被挤没\n\n## 套路\n- 横向滚动容器与悬浮下拉必须是兄弟层级，不能让下拉挂在 overflow 裁切容器内\n\n## 关联\n- 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue、zhi2-web-admin/src/layout/index.vue、zhi2-web-admin/src/layout/components/TagsView/index.vue\n- 所属项目：园区物管2.0\n- 来源会话：5eee9074-4df3-4e60-a122-c6a55131f0d7\n- 代码基线：a63180c9a 时代之前即存在该布局结构"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/架构技术事实/tencent_map_spa.md",
+                "memory_type": "entities",
+                "after": "# 腾讯地图 SPA 请求发起方\n园区物管2.0 大屏/统计地图页用 ZsTencentMap 加载腾讯地图，所有网络请求均由用户浏览器发起。\n\n## 关键事实\n- 动态插入 script 加载 map.qq.com gljs SDK，行政区划边界走腾讯 WebService JSONP（apis.map.qq.com/ws/district/v1/search）\n- 底图瓦片由 SDK 在浏览器内继续拉取，业务数据接口走 $get → VITE_APP_BASE_API\n- 纯 Vue SPA，页面加载后所有请求（业务接口+地图SDK+JSONP+瓦片）全部由用户浏览器发起，前端 Nginx 静态机不代发任何请求\n\n## 部署要点\n- 前端静态服务器禁外网不影响地图\n- 真正前置条件：用户浏览器能访问 map.qq.com、apis.map.qq.com 及后端网关\n- 客户环境纯内网或防火墙拦腾讯域名时地图必然失败，需提前确认网络策略或换内网瓦片方案\n\n## 关联\n- 涉及文件：zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js、src/views/benefit/statisticsMap/components/map.vue\n- 所属项目：园区物管2.0\n- 来源会话：265a0398-04ab-4311-b536-f18b5d57b75e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/图表技术约定/echarts_chart_rules.md",
+                "memory_type": "entities",
+                "after": "# ECharts 图表约定\n园区物管2.0 大屏图表的两项固定交互与布局约定，fundPanorama 与 assetPanorama 等页保持一致。\n\n## Y 轴留白\n- 本项目柱状图 grid 设 containLabel:false，Y 轴 axisLabel 不计入布局\n- 默认 grid.left 偏小会刻度贴边或裁切，必须同时加大 grid.left（约+14px）和 axisLabel.margin（12px）\n- 统一调 chartOptions.js 中的 BAR_Y_AXIS_LABEL（margin:12）与各柱图 grid.left\n\n## 饼图悬停\n- ECharts 默认 emphasis.focus='self' 会把其他扇区淡化为白色，用户明确不要此效果\n- 统一 emphasis.focus='none'（只保留当前扇区放大）\n- 配合自研 bindPieLegendHover 做图例联动高亮\n\n## 关联\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js、src/views/benefit/dataSandbox/pieLegendHover.js\n- 所属项目：园区物管2.0\n- 来源会话：5b0caae3-e374-44ea-8848-04caf6f893c4、caf5eb6c-f488-4efa-acec-cd88dff68378"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

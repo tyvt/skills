@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_086",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T00:43:55.666363+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/change_busid_fix.md",
+                "memory_type": "entities",
+                "after": "# 变更审核中按变更ID查询要件修复\n苏州市房地产监测V3 修复变更处于主管部门审核中时要件 busId 误用备案 ID 的问题，改为使用变更单 ID。\n\n## 问题根因\n- 变更处于主管部门审核中时，要件查询的 busId 原误用备案 ID，导致查不到正确的变更单附件\n\n## 修改内容\n- `companyRecord.js`：`isCompanyRecordChangeUnderAdminReview` 与 E2E 一致，含 `displayStatus === '2'` 视为审核中\n- `companyRecord.js`：`resolveLicenseAppendixBusId` 审核中且有变更 ID 时返回变更 ID，未就绪时返回 `''` 避免回落备案 ID\n- `DeveloperBasicInfoDetail.vue`：新增计算属性 `licenseAppendixBusId` 与模板绑定，`watch` 在 busId 变化时刷新要件\n- `DeveloperBasicInfoDetail.vue`：`loadActiveChange` 先拉变更详情再同时写入 `activeChangeId`/`displayStatus`，避免中间态用备案 ID\n- `AgencyBasicInfoDetail.vue`：同步上述改动\n\n## 涉及文件与归属\n- 涉及：`companyRecord.js`、`DeveloperBasicInfoDetail.vue`、`AgencyBasicInfoDetail.vue`、`company-helpers.js`\n- 所属项目：苏州市房地产监测V3；来源会话：f9b44225-a1eb-42b2-9743-4c23122dfdce\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/personnel_appendix_hide.md",
+                "memory_type": "entities",
+                "after": "# 隐藏开发企业从业人员要件上传模块\n苏州市房地产监测V3 已完成修改，开发企业从业人员详情页的「要件上传」模块已隐藏，经纪机构从业人员不受影响。\n\n## 修改内容\n- 管理端 `staffManagement/components/detail.vue`：新增 `showAppendixSection`，`organType === '01'`（开发企业）时返回 false\n- 管理端模板条件由 `formMode !== 'add'` 改为 `showAppendixSection`，`beforeSaveHook` 隐藏时直接返回跳过校验\n- 企业端 ToB `toB/personnelRecord/components/detail.vue`：同步新增 `showAppendixSection` 及模板条件\n- 企业端 `validateAppendix` 隐藏要件区时返回 true，避免保存被拦截\n\n## 覆盖范围\n- 管理端：从业人员备案 / 变更详情均已生效\n- 企业端 ToB：从业人员备案 / 变更详情均已生效\n- 经纪机构从业人员详情仍保留「要件上传」\n\n## 涉及文件与归属\n- 涉及：`staffManagement/components/detail.vue`、`toB/personnelRecord/components/detail.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：76ab4922-b1d4-4c4f-bf33-36bf0db42b93\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_strip_fix.md",
+                "memory_type": "entities",
+                "after": "# 详情页底部白条与灰色遮挡修复\n苏州市房地产监测V3 修复详情页底部白条、机构入网审核滚动异常及灰色条遮挡内容的问题。\n\n## 问题根因\n- `detail-container` 用 `height: calc(100vh - 120px)`，比实际可用区域多约 16px，底部露出白条\n- 机构入网审核 Headline 直接挂在 `detail-container` 下，缺少 `detail-from-container`，滚动层级错误\n- Headline 内 `el-table` 固定列在详情内滚时外溢，像灰条压在内容上\n\n## 修改内容\n- 全局 `index.scss`：详情页用 `height: 100%` + `app-main` flex 撑满，去掉底部多余 padding\n- 顶栏 `operation-btn-group` 使用 `#f7f7f7` 背景与页面一致\n- 未包 `detail-from-container` 的详情页：整页内滚 + 操作栏吸顶兼容旧页面\n- `institutionRegister/detail.vue` 按上述结构修正滚动层级\n\n## 涉及文件与归属\n- 涉及：`index.scss`、`institutionRegister/detail.vue`、`AppMain.vue`、`styles` 目录\n- 所属项目：苏州市房地产监测V3；来源会话：b69480f5-9aad-43ab-ad88-b4f7ea730209\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/public_ui_align.md",
+                "memory_type": "entities",
+                "after": "# 详情子表改用公共UI写法\n苏州市房地产监测V3 已按项目公共 UI 规范调整详情内嵌子表写法，对齐公共组件结构。\n\n## 结构调整\n- `service-scheme-panel` 改为 `Headline` + `sub-container` 标准结构\n- `ListOperationButtonContainer` 改为 `Headline #right` + `operation-button-container`，按钮放标题右侧\n- 自定义 `row-actions` 改为公共 `zs-operate-column` 操作列组件\n- 自定义 scoped 样式删除，由 `index.scss` 公共 class 提供\n\n## 同步修改\n- `AgencyBranchDetail.vue` 移除外层重复 `<Headline title-text=\"服务方案\">`，由 `ServiceSchemePanel` 自行承载\n- 参照 `certificatesTable.vue`、`VotingItemsTable.vue` 等详情子表写法\n\n## 涉及文件与归属\n- 涉及：`certificatesTable.vue`、`VotingItemsTable.vue`、`index.scss`、`AgencyBranchDetail.vue`、`ServiceSchemePanel.vue`、`AgencyBranchList.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：14b355d4-da15-4251-a812-74d65e4b4438\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

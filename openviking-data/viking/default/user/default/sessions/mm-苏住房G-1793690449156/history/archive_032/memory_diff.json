@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_032",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:31:38.305796+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhufang_subpath_asset.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G 子路径资源地址解析\n苏住房G 前端部署在 /test/ 等子路径时，后端返回的相对资源路径须按当前页面地址解析，禁止写死部署前缀。\n## 问题现象\n- 生产部署在 https://xxx.com/test/#/ 子路径，后端下发 /zhi2/file/abc.jpg 被解析为 https://xxx.com/zhi2/... 导致 404\n- resolvePublicAssetUrl 对以 / 开头的路径直接原样返回，浏览器按站点根解释\n- 用 window.location.origin 拼接同样丢失子路径前缀\n## 解决方案\n- resolvePublicAssetUrl 内部改为委托 resolveServerAssetUrl\n- resolveServerAssetUrl 用 new URL(relative, window.location.href) 以当前页面地址为基准解析，子路径前缀自动继承\n- bulkImportDialog.vue 中 window.location.origin + path 写法同步替换为相对解析\n- hash 路由下取 window.location.href 而非 pathname，才能带上 #/ 前后真实目录段\n## 涉及与来源\n- resolveServerAssetUrl 是图片/文件地址统一收口点（logo、头像、detail-template 图片预览与附件下载均走它）\n- 涉及文件：zhi2-web-admin/src/utils/resolveServerAssetUrl.js、bulkImportDialog.vue、detail-template.vue\n- 所属项目：苏住房G；来源会话：7c122dc2-e6a9-4323-b70f-2d6b9c7beff1；代码基线：e590ffa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhufang_feemode_dual.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G 简易申报导入双链路必填 feeMode\n苏住房G 简易申报批量导入弹窗的「下载模板」与「导入」两条请求链路必须同时带齐 feeMode 等业务参数。\n## 问题背景\n- 批量导入弹窗新增「收费模式」下拉（字典 fee_mode_declaration）\n- 下载模板与导入是两条独立请求各自组 params，只改一条会导致缺参\n- 入参集合含 busCode、complexId、declareYear、feeMode、path，应一次对齐\n## 解决方案\n- 弹窗 form 增加 feeMode，options 走 fee_mode_declaration 字典\n- 下载模板与 excelImport 的 params 都补 feeMode，同源从 this.form / this.bus / $route.meta.busCode 取\n- 请求前统一校验：小区、申报年度、收费模式任一为空则 msgWarning 拦截不发请求\n- 两按钮独立 loading：下载用 templateLoading，导入用 btnLoading + v-loading\n- 弹窗关闭时同时重置两个 loading 标志，避免按钮一直转圈\n- 同页「费用类型」字典误用 fee_type 时按用户指定统一改为 fee_type_declaration\n## 涉及与来源\n- 涉及文件：bulkImportDialog.vue、feeDeclare2/index.vue、feeBindScopeTable.vue\n- 所属项目：苏住房G；来源会话：8f44dfe2-7e91-48e0-b0d2-eb247b076f7b；代码基线：3697a62"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhufang_branch_delivery.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G 同源多分支交付规范\n苏住房G 与惠山等是同源复制多分支，需求只进指定分支，另一分支用 revert 反向剔除，tag 用年月日时分纯数字。\n## 交付规则\n- 先确认需求归属分支再动代码，别在当前分支直接开发完就推\n- 目标分支不该有的功能用 git revert 生成反向提交保留历史痕迹，禁止 git reset --hard 改写历史后强推\n- 另一分支本地落后先 rebase 到远程最新再推\n- 打 tag 按年月日时分纯数字（如 202608051736），git tag + git push origin <tag> 单独推\n## 仓库拓扑\n- zhi2-web-admin 是子模块：子模块提交→父仓库更新指针→两边分别 push，顺序不能反\n- 交付汇报须给出两仓库各自 before→after commit、新 tag 名，并说明已切回哪个分支\n## 涉及与来源\n- 本批示例：suzhufang 推 revert 房屋产权功能并打 tag 202608051736；huishan rebase 后推含 pageHouseProperty\n- 涉及文件：zhi2-web-admin、complex/detail.vue、housePropertyTable.vue\n- 所属项目：苏住房G；来源会话：ff247e73-6d29-4b14-bad2-8846f15f3105；代码基线：b6932ba"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhufang_task_preview.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G 流程节点区块预览渲染守卫\n苏住房G 流程定义配置弹窗中按 taskId 取活动列表的区块须在预览态加显式业务谓词，避免空区块与异常请求。\n## 问题现象\n- nodePanel/task.vue 预览态出现空白活动区，或不该请求时发出 /system/user/ 反查\n- 渲染条件写成「有配置就显示」或直接 <div>，未纳入「是否有效节点」判断\n- 取数逻辑在 mounted/watch 里无条件跑，taskId 为空时打接口拿空数据\n## 解决方案\n- 区块显示条件收敛为显式业务谓词（有效节点 + 有 taskId + 预览态允许展示），模板用 v-if 而非 v-show\n- 取数函数开头加守卫，taskId 为空直接 return，不发 /undefined/... 请求\n- 区分「数据没取到」与「本不该显示」：有请求返空＝数据层问题，地址含 undefined＝id 未就绪，无请求＝条件不成立\n## 涉及与来源\n- 涉及文件：nodePanel/task.vue、tool/definition/detail.vue\n- 所属项目：苏住房G；来源会话：24929f7a-3693-4ae6-b04b-d0abf802ee41；代码基线：cb37a39\n- 本条目为归纳性模式，引用前请核对代码"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

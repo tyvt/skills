@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:41:00.995539+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/required_field_checklist.md",
+                "memory_type": "entities",
+                "after": "# 新增必填字段前置核对表工作流\n在苏住房G项目中，后端新增必填字段并要求前端多页面落地时，须先产出「接口 × 入参/返回值」核对表 md 再动手。\n## 适用场景\n- 后端新增必填字段（如法人-证件 legalPersonIdFile，String、逗号分隔多文件 URL）需前端在多个页面落地\n- 同一字段散落在多条业务链路（登录页机构注册、物业服务企业/开发企业新增编辑详情、机构注册审核、企业变更记录、企业查询详情等）\n## 做法\n- 先按需求产出 md 核对表，逐个接口标注字段是「入参」「返回值」或两者，交后端核对确认契约\n- 确认后按「编辑表单 → 保存载荷 → 查看/只读态展示 → 校验规则 → 变更记录差异比对」五条链路逐页对照改，表中打勾\n- 文件类字段上传约束（≤5MB、png/jpg/jpeg/pdf、最多5个）同时落进上传组件限制与校验提示\n## 验证与归属\n- 验证证据：用户多次要求列出涉及接口及字段作为入参/返回值形成 md 与后端核对，后再按计划实施\n- 涉及文件：companyInfo.vue、companyManagement/detail.vue、companyRegister/detail.vue、table.vue、ImageUpload/index.vue、zs-file-upload.vue 等\n- 所属项目：苏住房G；来源会话：e747dadd-5d94-41a0-aacd-f7ce9b7e6647；代码基线：b0f2039"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_fixed_height.md",
+                "memory_type": "entities",
+                "after": "# 弹窗表格固定高度与分页占位\n苏住房G项目中，巡检程序、设施/范围选择等弹窗表格须固定为 N 条数据高度，分页器隐藏时也要预留占位。\n## 问题现象\n- 筛选后行数变少分页器消失，弹窗高度忽高忽低\n- 若某列写死 width，会被 zs-table-column 判为固定宽度不再自适应，长编号被省略号截断（如 SelectRecordProcedureDialog 巡检程序编号列 width=160）\n## 根因\n- 分页器用 v-show 控制，隐藏时不占流，表底高度归零，弹窗高度随内容收缩\n- zs-table-column 在 explicitWidth != null 时原样透传固定宽度，不参与自适应\n## 解决方案\n- 分页区始终占位（容器给定与单行分页器等高 min-height，或隐藏内容不隐藏盒子），表格可视高度按「N行×行高」定死，不足留白\n- 删掉弹窗内写死的列 width，让其按内容算 min-width\n## 验证与归属\n- 验证证据：用户诉求固定10条高度、分页器隐藏高度塌陷、列展示不全疑全局失效；结论显式宽度导致截断\n- 涉及文件：SelectRecordProcedureDialog.vue、FacilitySelectDialog.vue、ScopeSelectDialog.vue、zs-table.vue\n- 所属项目：苏住房G；来源会话：db287272-e3da-43d4-8c77-915cb66320da；代码基线：d9c2e9f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_route_normalize.md",
+                "memory_type": "entities",
+                "after": "# 侧栏首页路径归一与精确匹配\n苏住房G项目中，侧栏「首页」报错未授权及高亮错乱，需统一首页路径为 /index 且菜单仅精确匹配。\n## 问题现象\n- 点侧栏首页提示「页面未授权或不存在」\n- 修复后首页不高亮，或切到别的菜单首页仍高亮\n## 根因\n- 后端菜单下发首页 path 可能带斜杠或不同写法，路由守卫兜底、侧栏跳转、首页识别函数各自比较字符串导致口径不一致\n## 解决方案\n- 抽公共归一函数 homeRoute，把首页统一成 /index，在一级叶子菜单点击、路由守卫兜底、首页识别三处共用\n- 侧栏高亮比较时对当前路由同样归一\n- 首页菜单只允许精确匹配，避免 /index/xxx 同级菜单误触发高亮\n## 验证与归属\n- 验证覆盖：进入首页高亮、切走后不再高亮\n- 涉及文件：router/index.js、utils/homeRoute.js、utils/permission.js、store\n- 所属项目：苏住房G；来源会话：cb0377ba-165d-4411-88e0-da19021618ab；代码基线：c17e4d8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/house_bizstate_filter.md",
+                "memory_type": "entities",
+                "after": "# 父子两级数据弹窗过滤层级\n苏住房G项目中，benefit/housePart 新增资产部位时，「选择资产」弹窗带出未备案主单数据，需显式传主单维度过滤参数。\n## 问题现象\n- 经营用房主单仍「审核中（未备案）」的房源在弹窗中可选\n- 弹窗默认 bizState:2 只作用在房屋明细层，拦不住主单未备案但明细正常的数据\n## 根因\n- 接口只传 forPart:'1' 做形态区分，未对主单备案态过滤；父单状态须用独立参数 houseBizState\n## 解决方案\n- 请求显式补主单维度 houseBizState:'2'（B端附 projectId）\n- 列表侧未备案行置不可选，确定时二次拦截防脏数据/旧缓存\n- 前端已传参仍返回未备案则转后端（forPart 查询未支持该过滤）\n## 验证与归属\n- 验证证据：会话 ae403e03 用户反馈弹窗带出未备案经营用房，结论补 houseBizState 及二次拦截\n- 涉及文件：benefit/housePart/index.vue、detail.vue、pubHouse/index.vue、assetLeaseApply/components/houseTable.vue\n- 所属项目：苏住房G；来源会话：ae403e03-b7dd-4d19-be74-3b70c0306a26；代码基线：9acfb2a"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

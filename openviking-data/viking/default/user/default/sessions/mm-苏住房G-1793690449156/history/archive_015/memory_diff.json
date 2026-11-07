@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:55:33.261301+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/record_change_buscode.md",
+                "memory_type": "entities",
+                "after": "# 企业备案变更busCode按本地非本地维度收敛\n苏住房G项目企业备案变更接口需按「机构类型×是否本地机构」确定busCode，通过localOrganizationFlow的resolver与mixin开关收敛。\n\n## 问题背景\n- 企业备案变更接口 companyRecordChange/addAndSubmit 需携带 busCode，由「机构类型 × 是否本地机构」共同决定\n- 本地机构编码 qybgxq，非本地编码 QYBGJLXQFBD，散落 if(isLocal) 三元易致「保存能过但提交报流程未维护完成」\n- 同一套 toB 详情组件服务多机构/场景，页面难各自判断\n\n## 解决方案\n- utils/localOrganizationFlow.js 新增常量 COMPANY_RECORD_CHANGE_LOCAL_BUS_CODE='qybgxq' 与 resolveCompanyRecordChangeFlowBusCode\n- resolver 优先级：路由 meta.busCode 优先 → 兜底本地编码 → 按 isLocalOrganization 映射到非本地编码\n- localOrganizationFlowMixin 新增默认 false 的 prop useCompanyRecordChangeFallback，开启时 flowBusCode 走 resolver\n- 消费页 operation-btn-group 绑 :bus-code，getForm() 的 isChange 分支把 busCode 写进请求体\n- toB/change/detail.vue 显式打开该 prop，其他页面行为完全不变\n\n## 验证与归属\n- 验收：无 meta+本地 → qybgxq；非本地 → QYBGJLXQFBD；有 meta 以路由为准，Network 核对请求体\n- 前提：isLocalOrganization 已由 getOwnCompany 等接口回填到 form，否则恒落本地分支\n- 涉及文件：src/utils/localOrganizationFlow.js、src/mixins/localOrganizationFlowMixin.js、src/views/toB/companyRecord/detail.vue、src/views/toB/change/detail.vue\n- 所属项目：苏住房G；来源会话：a7f41aac-d27d-4bbc-95f2-163087036786；代码基线：15e201a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/property_account_locate.md",
+                "memory_type": "entities",
+                "after": "# 近名页面改错位置按请求名定位\n苏住房G项目同业务存在 property/account 与 property/propertyAccount 两个近名页面，参数须改真正发请求的那个页面。\n\n## 问题根因\n- 需求「开户银行弹窗新增参数 isPubRegulatoryAccount=1」先在 property/account/detail.vue 改完，验收截图反馈「没加上，加错位置」\n- 截图请求 queryStartBank 来自 property/propertyAccount/detail.vue 的 showBankDialog()，走 /system/workBank/list 与银行网点接口\n- account 目录页面走另一套接口；两目录名只差 property 前缀、都叫「账户」，靠目录名/标题无法区分\n\n## 解决方案\n- 搜索以请求名 queryStartBank / selectTJgBankBranchList 而非中文为入口，反查调用它的 detail.vue\n- showBankDialog() 中 treeParams 与 filterParams 两参数对象须同步改，否则「树有值、网点列表没有」\n- setBankBranches() 的 filterParams 是第三个独立入口，必须同步\n- 模式参数用 computed（add/openedAdd 返回 {isPubRegulatoryAccount:'1'}、edit 返回 {}），Network 核对 add 与 edit\n- 验证话术：明确告知「编辑模式下该参数不应出现」，否则被当成漏改\n\n## 验证与归属\n- 修复后 queryStartBank 带 isPubRegulatoryAccount=1&isStart=1&sourceModel=property，selectTJgBankBranchList 带该参数，编辑模式不带\n- 涉及文件：property/propertyAccount/detail.vue、property/account/detail.vue、property/account/components/AccountDialog.vue、utils/workBank.js\n- 所属项目：苏住房G；来源会话：4cfcd91c-2679-4f6f-b33f-ee016bf89b9f；代码基线：a700def"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/biz_state_filter.md",
+                "memory_type": "entities",
+                "after": "# 已备案列表默认筛选分清两套值源\n苏住房G项目把行业管理/项目管理/业主自治模块列表默认筛选设为已备案，需分清 BIZ_STATE 常量与全局 biz_state 字典。\n\n## 问题背景\n- 列表页为「薄包装页 + components/index.vue 内核」两级结构，字段名须读内核\n- 路由由后端菜单动态生成，meta.filePath 对应 views 目录，URL 经 getRouterPathByFilePath() 解析\n- 已备案值常量 '2'（0待提交/1审核中/2已备案/9已撤销），源出 src/views/indemnity/components/enums.js 的 BIZ_STATE.RECORDED\n- 列表筛选用全局 biz_state 字典（登录时 store.dispatch('common/saveBizStateOption') 加载）\n\n## 解决方案\n- 默认值写进 data().queryParams，resetQuery() 走 this.$options.data().queryParams 保留默认\n- 筛选字段多数 bizState：物业服务企业、项目经理、企业备案记录等口径一致\n- 项目经理列表有 bizState 列但 formItems 未暴露筛选项，需补 model:'bizState' + options: this.bizStateOptions\n- 同模块别名（propertyManager 只有 jobStatus）非备案列表，勿顺手加\n\n## 验证与归属\n- 已知清单 249 条只说业务状态走全局 biz_state、BIZ_STATE 常量保持原样，本条补默认筛选取哪个值源\n- 涉及文件：company/companyManagement/property/index.vue、components/index.vue、staffManagement/personnelRecord/index.vue、staffManagement/components/index.vue、indemnity/components/enums.js\n- 所属项目：苏住房G；来源会话：01b7d0f8-8018-41e8-9a52-062f491b10ff；代码基线：d109b83"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/list_query_batch.md",
+                "memory_type": "entities",
+                "after": "# 批量改造抽公共工具与分页total冲突\n苏住房G六个行业管理页面统一改造查询区与列表列，去掉默认已备案、加更新时间区间与是否本地机构筛选。\n\n## 问题背景\n- 先按默认筛选已备案做默认值，产品口径变「默认查全部」，需升级为可开关 defaultBizState 且逐页确认\n- 信托公司只需去掉 defaultBizState=\"2\"、不做其他新增\n- 时间区间最多 2 年，须带 disabledDate 且查询前再校验，仅管 disabledDate 可被改系统时间绕过\n\n## 解决方案\n- 时间区间表单项、是否本地机构下拉(1/0)、updateTime 列、人员类型白名单与标签解析抽成 src/utils/companyListQuery.js\n- 人员类页面人员类型下拉只保留物业项目经理/企业管理员/信托公司人员，用 excludePersonnelTypes 排除开发企业项目经理\n- 前端兜底过滤只影响当前页，total 仍是全量，分页会「对不上」，需后端支持该参数才一致\n- dict.js 新增 getDictsIncludeDisabled() 显示停用项中文名；开发企业项目经理 dictValue 从字典接口动态取不硬编码\n- 列宽用 minWidth（信用代码180、企业名称200、行政区域160）改善首屏\n\n## 验证与归属\n- 物业服务企业/企业变更记录 enableAdvancedQuery=true 并去掉默认已备案；联调须写明「若后端未支持，前端兜底过滤但分页 total 可能不准」\n- 涉及文件：utils/companyListQuery.js、utils/dict.js、companyManagement/components/index.vue、companyRegister/index.vue、staffManagement/components/index.vue\n- 所属项目：苏住房G；来源会话：c7bcdd50-859e-48be-b953-435a57e9aa54；代码基线：d5eee56"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-惠山二期H5-1793810038403/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T16:38:26.005205+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/huishan_phase2_tech/c_end_batch_track.md",
+                "memory_type": "entities",
+                "after": "# C端批量埋点上报功能\n惠山二期H5 已完成 C 端批量埋点接入，由 `src/utils/track/` 队列与 `src/api/analytics.js` 接口共同实现。\n\n## 基础设施\n- `src/api/analytics.js` 提供 `POST /appAnalytics/track/events/batch`，设 `noReject: true`\n- `src/utils/track/` 实现队列、防抖（2s）、满 10 条立即 flush、单次最多 50 条，失败 requeue 一次，兼容 `noReject` 返回的 Promise 包装响应\n- `src/App.vue` 的 `onLaunch` 调 `initTrackSession()`，`onHide` 调 `flushTrack()`\n\n## 业务埋点\n- 登录 PV / 登录提交：`pages/login/index.vue`\n- 绑房 PV（H5 灵锡）：`utils/lingxi.js` → `goAddRaw`\n- 绑房提交：`handleLingxiH...`\n\n## 涉及文件\n- src/api/analytics.js\n- src/App.vue\n- pages/login/index.vue\n- utils/lingxi.js\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=惠山二期H5\n- 来源会话ID：d17cb678-ebbf-4f71-be88-1e5cc9646c10；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/huishan_phase2_tech/lingxi_login_migration.md",
+                "memory_type": "entities",
+                "after": "# 灵锡自动登录与H5弹窗修复\n惠山二期H5 修复了灵锡自动登录竞态，并让 H5 端在未登录时不再弹出「请先登录」弹窗。\n\n## 登录竞态修复\n- `lingxi.js` 的 `waitForLingxiLogin` 在 URL 含 `requestCode` 时主动触发 `ensureLingxiLogin`，不再因登录未启动就提前返回\n- 测试版从灵锡打开走 URL 中 `requestCode` 自动登录，不再出现「请先登录」弹窗\n\n## H5弹窗去除\n- 首页 `newHome.vue`：H5 下未登录不再弹窗，改为等待灵锡自动登录，完成后监听 `lingxi-login-complete` 自动刷新数据\n- 小区卡片 `complexCard.vue`：H5 下同样不弹登录窗，`onShow` 时先等待灵锡登录再拉取房屋信息\n- 微信小程序逻辑不变，未登录仍会弹窗\n\n## 涉及文件\n- src/utils/lingxi.js\n- src/pages/index/newHome.vue\n- src/components/complexCard.vue\n- 惠山V1小程序/src/App.vue\n- 惠山V1小程序/src/api/modules/auth.js\n- 惠山V1小程序/src/api/modules/myhouse.js\n- 惠山V1小程序/src/api/modules/external.js\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=惠山二期H5\n- 来源会话ID：605fa942-84e9-4a40-b2f2-1535b9c67767；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/huishan_phase2_tech/lingxi_bindhouse_callback.md",
+                "memory_type": "entities",
+                "after": "# 灵锡绑房回跳修复\n惠山二期H5 修复了第三方灵锡绑定房屋回跳时的地址、authCode 解析与登录态丢失问题。\n\n## 问题原因\n- `backUrl` 用固定 `VITE_BACK_URL`，与微信小程序 webview 实际 H5 地址可能不一致\n- 仅从 `options.query.authCode` 取授权码，H5 回跳时 authCode 常在 URL 的 search 或 hash 里导致未解析到\n- 回跳时 `userStore.clear()` 清掉 token，绑房接口需 token 导致静默失败\n\n## 修改内容\n- `backUrl` 改为当前 webview 实际地址（与跳转前页面一致）\n- 从完整 URL 解析 `authCode`，并在 `onLaunch` + `onShow` 都处理\n- 绑房回跳时保留登录态，不再 `clear()`\n- 绑房成功后 `navigateBack()` 关闭 `externalWebview` 回到原 H5 页面\n- 增加 `[灵锡回调]` / `[灵锡绑房回跳]` 日志方便排查\n\n## 涉及文件\n- src/components/AddHouseDialog/AddHouseDialog.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=惠山二期H5\n- 来源会话ID：b9f46e5c-31b8-4bcb-a8ee-185ec72988e3；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/huishan_phase2_tech/operation_report_pdf_preview.md",
+                "memory_type": "entities",
+                "before": "# 经营报告PDF预览由preview.vue路由承载\n惠山二期H5 中经营报告 PDF 预览由新增 `src/pages_benefit/operationReport/preview.vue` 承载，H5 用 iframe 嵌入，小程序调系统预览。\n\n## 实现方式\n- 新增 `src/pages_benefit/operationReport/preview.vue` 承载 PDF 预览，H5 用 iframe 嵌入，小程序调系统预览\n- `pages.json` 注册路由，`src/utils/operationReport.js` 新增 `navigateToOperationReportPreview()`\n- `newHome.vue` 的 `handleOperationReport` 改调该函数替代 `window.open`\n\n## 涉及文件\n- d:/repository/惠山二期H5/无锡市区/zhi2-mobile-admin-h5-c-unlimited/src/pages/webview/home.vue\n- d:/repository/惠山二期H5/zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/fundPublicity/benefit.vue\n- d:/repository/惠山二期H5/无锡市区/wygl-wxxcx-dev-slh/pages/webview/home.vue\n- d:/repository/惠山二期H5/无锡市区/zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/elevatorPubEngCons/index.vue\n- d:/repository/惠山二期H5/无锡市区/zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/elevatorPubEngCons/detail.vue\n- d:/repository/惠山二期H5/无锡市区/zhi2-mobile-admin-h5-c-unlimited/src/pages.json\n- d:/repository/惠山二期H5/无锡市区/zhi2-mobile-admin-h5-c-unlimited/src/api/benefit.js\n\n## 验证与归属\n- 验证证据：src=惠山二期H5/001.md\n- 来源会话ID：d398aaa2-b1af-439d-a4a4-9dda41fd6e89；代码基线：none",
+                "after": "# 经营报告PDF预览由preview.vue路由承载\n惠山二期H5 中经营报告 PDF 预览由新增 `src/pages_benefit/operationReport/preview.vue` 承载，H5 用 iframe 内嵌预览，小程序调系统预览。\n\n## 实现方式\n- 新增 `src/pages_benefit/operationReport/preview.vue` 承载 PDF 预览\n- H5：全屏 `iframe` 内嵌预览 PDF；小程序：加载后自动调起系统 PDF 预览，页面保留「打开报告」按钮可再次查看\n- 预览页含加载中、失败重试状态\n- `pages.json` 注册路由 `/pages_benefit/operationReport/preview`\n- `src/utils/operationReport.js` 新增 `navigateToOperationReportPreview()`\n- `src/pages/index/newHome.vue` 的 `handleOperationReport` 改调该函数替代 `window.open`\n\n## 交互流程\n- 首页点击「共有资金收支报告」卡片 → 进入「经营报告」预览页 → 加载 PDF → H5 页面内预览\n\n## 涉及文件\n- src/pages_benefit/operationReport/preview.vue\n- pages.json\n- src/utils/operationReport.js\n- src/pages/index/newHome.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=惠山二期H5\n- 来源会话ID：d398aaa2-b1af-439d-a4a4-9dda41fd6e89；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

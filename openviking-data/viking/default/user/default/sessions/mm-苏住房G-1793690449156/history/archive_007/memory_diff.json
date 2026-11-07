@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_007",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:39:02.957165+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/area_cascade_reset.md",
+                "memory_type": "entities",
+                "after": "# 区划街道社区三级联动清空（mixin 基线比较 + shouldReset 双参）\n苏住房G 后台在新增/编辑详情页的「行政区域→所属街道→所属社区」三级联动中，用 area mixin 的基线比较与 shouldReset 双参区分「回显」与「用户切换」。\n\n## 问题根因\n- 切换行政区域后街道框残留上一级选中的编码（如 320507002）。\n- 在 region 的 change 里无条件清空会连「详情接口回填区划」一并触发，编辑页回显被清空。\n- 完全不清空又留脏值。\n\n## 解决方案\n- 在 mixins/area.js 集中实现 resetAreaCascadeOnRegionChange(shouldReset)、resetAreaCascadeOnSubdistrictChange(shouldReset) 与 syncAreaCascadeBaseline()。\n- 用 _lastRegionCode 基线比较，仅当区划值真正变化才清空，重复选同一区划不清空。\n- detailCallback 里以 shouldReset=false + syncAreaCascadeBaseline() 声明「这是回显不是用户操作」。\n- setProject / 手动切换等用户动作保持 shouldReset=true。\n- 字段名通过 areaCascadeFormKeys 供各页覆盖。\n\n## 涉及页面与迁移\n- 批量改造 13 个详情页：complex / complexChange / complexBuildingAuth / complexSearch / building-project / projectChange / census / elevatorApply / elevatorDeclaration / transaction-complex / indemnity-project / partyOrganization / villagePartyOrganization。\n- 批量迁移时必须同步删掉各页与 mixin 重复的 form.region watch，否则两条清空链路互相干扰、回显又被打空。\n\n## 验证与归属\n- 验证证据：会话 f1473127 最终结论在 src/mixins/area.js 集中实现上述方法，主报障页 detailCallback 改 onCascaderChange(false) + syncAreaCascadeBaseline()，并批量改造 13 个详情页、移除重复 form.region watch。\n- 差异点：已知「级联表单上游变更清空下游的清单式清空」是逐页手写清空清单、无法区分回显与交互；本条靠基线快照 + shouldReset 把两种触发源彻底分开，且清空逻辑下沉到 mixin。\n- 涉及文件：zhi2-web-admin/src/mixins/area.js、zhi2-web-admin/src/views/property/complex/detail.vue 等 13 个详情页。\n- 所属项目：苏住房G；来源会话ID：f1473127-27a4-4764-b893-364f1cbcc6ca；代码基线：2a3ef8a。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bterminal_project_context.md",
+                "memory_type": "entities",
+                "after": "# B 端项目上下文清除入口唯一化与「刷新即清空」行为\n苏住房G 后台将 B 端项目上下文（projectId/complexId）的清除入口唯一化到 clearBTerminalProjectContext()，关闭开关后不弹框、不自动选小区、刷新即清空。\n\n## 问题根因\n- B 端登录后是否强制选小区由开关 ENABLE_B_TERMINAL_PROJECT_DIALOG_ON_LOGIN 决定，开关应集中放在 projectContext.js 而非散在页面。\n- 项目上下文有三个写入源：顶部导航栏手动选小区、localStorage 缓存的上次选择、store 里 GetInfo 登录后恢复。\n- 只关掉登录弹窗，GetInfo 仍会从 localStorage 把上次的小区恢复回来，layout/index.vue 还会在「无缓存」时默认选第一个小区，结果「弹窗关了但请求里照样带 projectId」。\n\n## 解决方案\n- 开关关闭时 user.js 的 GetInfo 不再恢复 localStorage。\n- layout/index.vue 把「无缓存时默认选第一个」整段替换为 clearBTerminalProjectContext()，一次性清掉 store 与 localStorage 的 currentProjectId。\n- B 端效果：不弹选择框、不自动选中任何小区、列表与接口请求的 complexId/projectId 为空。\n\n## 长期有效坑点\n- 用户仍可从顶部导航手动选择，但只在当前会话内生效，刷新页面会再次被清空。\n- 任何新增的 B 端页面若依赖「刷新后仍保有上次所选项目」，会拿到空上下文，必须自己实现无项目态（禁用/提示先选项目），不能假设上下文已持久化。\n\n## 验证与归属\n- 验证证据：会话 6ec74cc2 最终结论，开关集中到 projectContext.js；user.js（GetInfo）在 B 端且开关关闭时不再从 localStorage 恢复；layout/index.vue 改为 clearBTerminalProjectContext() 清空 store 与 localStorage 的 currentProjectId；明确「选择后当前会话内生效，但刷新页面后会再次清空」。\n- 涉及文件：zhi2-web-admin/src/layout/index.vue、zhi2-web-admin/src/store、zhi2-web-admin/src/permission.js、zhi2-web-admin/src/router/index.js。\n- 所属项目：苏住房G；来源会话ID：6ec74cc2-fc78-4189-8ef8-6e1b52785377；代码基线：cf49efc。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/import_error_file_url.md",
+                "memory_type": "entities",
+                "after": "# 导入校验失败拿 data 错误文件地址（noReject 双分支 + /zhi2/ 路径拼法）\n苏住房G 后台物业费申报 excelImport 校验失败时，request.js 需在两分支支持 noReject 回传 res.data，且 /zhi2/ 直挂路径不能用 resolveServerAssetUrl 拼。\n\n## 问题根因\n- 物业费申报 excelImport（/v2.0/property/feeDeclare2/excelImport）校验不通过返回 code:500 + msg + data（错误 Excel 相对路径 /zhi2/2026/...xlsx），页面须提示 msg 并自动下载。\n- 实测只弹 msg、没下载，根因三条。\n\n## 解决方案\n- 请求拦截器在 code !== 200 时直接 reject，配置了 noReject 的调用方在 .then 拿不到完整响应；必须在「成功响应的非 200 分支」和「HTTP 错误响应分支」两处都支持 noReject 并回传 res.data。\n- 后端文件路径不能用统一的 resolveServerAssetUrl 解析（会拼成 /sz/property/zhi2/... 错误地址），这类 /zhi2/ 直挂路径改用 window.location.origin + filePath 拼绝对地址。\n- 导入请求同时加 noMessage:true，否则全局弹窗和页面内 msgError 重复提示两次；调用侧先判 data 是否有值，为空就只提示 msg、跳过自动下载。\n\n## 差异与验证\n- 差异点：已知条 1070/289 只说地址收口到 resolveServerAssetUrl 与 noMessage 用法，本条给出「该函数对后端直挂路径是错的」及其替代拼法。\n- 验证证据：会话 1f367792 最终结论确认上述三处修改。\n- 涉及文件：zhi2-web-admin/src/utils/request.js、zhi2-web-admin/src/views/property/feeDeclare2/components/bulkImportDialog.vue、zhi2-web-admin/src/views/property/feeDeclare2/index.vue。\n- 所属项目：苏住房G；来源会话ID：1f367792-daf1-4b22-a41a-28848b798cc5；代码基线：ac184e6。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/document_type_01.md",
+                "memory_type": "entities",
+                "after": "# 身份证格式校验证件类型字典值必须为 document_type 的 '01'\n苏住房G 后台企业注册备案的法人证件类型校验必须统一用 document_type 字典「居民身份证」值 '01'，不能写 30250001 这类长码否则校验永不通过。\n\n## 问题根因\n- 企业注册备案新增「法人证件」上传等字段时，法人证件类型下拉与「是身份证才做身份证格式校验」的分支需同一枚举值。\n- 代码里一度用 30250001，导致身份证格式校验分支恒假、选身份证也不校验（或反之误拦）。\n- 项目存在两套证件类型编码口径，document_type 字典「居民身份证」值是 '01'，30250001 是另一套长码，不能混用。\n\n## 解决方案\n- 字典值统一以 document_type 为准并写常量，跨页面复用（institution/company/index.vue 是既有正确参考实现）。\n- 本次需同改 register/components/companyInfo.vue、company/companyManagement/components/detail.vue、company/companyRegister/detail.vue 三处。\n- 改完用同一判定函数收口，避免各页各写一份码值比较。\n- 核对方式：直接查 document_type 字典确认 dictValue，而不是看截图或猜。\n\n## 验证与归属\n- 验证证据：会话 e747dadd 最终结论确认法人证件号码的身份证格式校验字典值已从 30250001 改为 01（居民身份证），与 document_type 字典及 views/institution/company/index.vue 保持一致。\n- 涉及文件：zhi2-web-admin/src/views/register/components/companyInfo.vue、zhi2-web-admin/src/views/company/companyManagement/components/detail.vue、zhi2-web-admin/src/views/company/companyRegister/detail.vue、zhi2-web-admin/src/views/institution/company/index.vue。\n- 所属项目：苏住房G；来源会话ID：e747dadd-5d94-41a0-aacd-f7ce9b7e6647；代码基线：b0f2039。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

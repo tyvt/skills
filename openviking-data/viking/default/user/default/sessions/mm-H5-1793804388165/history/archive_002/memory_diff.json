@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-H5-1793804388165/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T15:05:16.583464+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/h5_unocss_display.md",
+                "memory_type": "entities",
+                "after": "# H5 项目 UnoCSS 用 display-inline-block 而非 inline-block\nH5 项目的 UnoCSS 由 uno.config.ts 中 display-(block|inline|inline-block|) 规则生成 display-inline-block 类名，不是原生 inline-block。\n\n## 问题根因\n- 项目中 UnoCSS 不识别 inline-block 这种原生类名\n- 误用 inline-block 会导致元素撑满而非按内容自适应宽度\n\n## 解决方案\n- 在 src/pages_owner/decision/index.vue 将该标签的 inline-block 改为 display-inline-block\n- 改造后元素按内容自适应宽度、不再撑满\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=H5\n- 涉及文件：uno.config.ts、src/pages_owner/decision/index.vue\n- 来源会话：f8bfc1e1-de62-4572-bfc7-20b21efe668e；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/h5_zsimage_static_glob.md",
+                "memory_type": "entities",
+                "after": "# H5 zs-image 用 import.meta.glob 静态映射本地图片\nH5 项目修改 zs-image.vue，不再依赖运行时 /static/... 字符串拼接加载本地图片，改用 import.meta.glob 构建静态映射表。\n\n## 问题根因\n- 旧实现依赖运行时字符串拼接 /static/... 加载本地图片，易出错且路径不可靠\n\n## 解决方案\n- 在 src/components/zs-image/zs-image.vue 用 import.meta.glob 对 src/static/** 建立静态映射表 staticUrlMap\n- resolvedSrc 命中映射优先返回构建后的正确 URL\n- 传入 src 为 images/house_szf.png、svg/vote_1.svg 等形式时可直接命中\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=H5\n- 涉及文件：src/components/zs-image/zs-image.vue、src/pages_owner/decision/index.vue\n- 来源会话：3210cab9-2079-4e56-bb7d-c9763b228c00；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/h5_zpaging_virtual_list.md",
+                "memory_type": "entities",
+                "after": "# H5 z-paging 虚拟列表宽度修复\nH5 项目 main.ts 全局开启 z-paging 的 use-virtual-list: true，虚拟列表需测量 cell 宽高、滚动区须占满横向宽度。\n\n## 问题根因\n- main.ts 全局 use-virtual-list: true，虚拟列表测量要求滚动区域占满横向宽度\n- .list-container 上 align-items: center 使子元素水平方向不拉伸，内部 scroll-view 宽度随内容收缩甚至为 0，虚拟列表算高失败，列表不显示\n\n## 解决方案\n- 去掉 .list-container 的 align-items: center（列表项已有 margin: 20rpx auto 0 仍可居中）\n- width: 100vw 改为 width: 100% 并加 min-width: 0，避免 flex 子项被撑破/溢出\n- .list-item 的 94.4vw 改为 94.4%（相对父级全宽）\n- .publicity-title 去掉固定 80vw，改为 max-width: 100%\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=H5\n- 涉及文件：main.ts、src/pages/benefit/index.vue\n- 来源会话：5ddd3520-e931-43a9-9abb-08080d4f075f；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_button_ontap.md",
+                "memory_type": "entities",
+                "before": "# zs-button onTap 统一 emit 事件\n全局检索确认 @click.stop 问题根源仅在 zs-button，其 defineEmits(['click']) 时未带事件，改用 onTap 统一向外 emit('click', …)。\n\n## 问题根因\n- 全局检索确认 @click.stop 问题根源仅在 zs-button 组件\n- zs-button 在 defineEmits(['click']) 时未带事件参数\n\n## 解决方案\n- 修改 zs-button 用 onTap 统一向外 emit('click', …)\n\n## 验证与归属\n- 验证证据：src=H5/001.md\n- 涉及文件：.vue、src/pages_owner/decision/index.vue\n- 来源会话：b22779f7-0591-43f5-b4b9-fd2594f16d79；代码基线：none",
+                "after": "# zs-button onTap 统一 emit 事件\n全局检索确认 @click.stop 问题根源仅在 zs-button，其 defineEmits(['click']) 时未带事件，改用 onTap 统一向外 emit('click', …)。\n\n## 问题根因\n- 全局检索确认 @click.stop 问题根源仅在 zs-button 组件\n- zs-button 在 defineEmits(['click']) 时未带事件参数\n- 全局排查：除 zs-button 自身根节点外，仅 src/pages_owner/decision/index.vue 里 4 处在 <zs-button> 上使用 @click.stop\n- HouseList / NoticeList 的 emit('click-item', item) 首参为业务数据，当前无 @click-item.stop，不受影响\n- zs-image 已是 @tap=\"$emit('tap', $event)\"，无需改动\n\n## 解决方案\n- 修改 zs-button 用 onTap 统一向外 emit('click', …)\n\n## 验证与归属\n- 验证证据：src=H5/001.md；extracted source=cursor project=H5\n- 涉及文件：.vue、src/pages_owner/decision/index.vue\n- 来源会话：b22779f7-0591-43f5-b4b9-fd2594f16d79；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

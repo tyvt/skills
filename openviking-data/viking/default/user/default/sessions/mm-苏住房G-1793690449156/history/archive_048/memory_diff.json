@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_048",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:14:12.570209+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/expenditure_contract_amount_type.md",
+                "memory_type": "entities",
+                "after": "# 支用合同金额类型默认值与判断条件双重不一致\n阳光物业支用合同新增时，合同金额类型下拉显示原始值0且切换后金额框不出现，根因是默认值硬编码与展示/校验比较口径不一致。\n\n## 问题与根因\n- property/expenditureContract/detail.vue 中 contractAmountType 初始数据写死 '0'，但字典 property_contract_amountType 中「固定金额」dictValue 为 '1'，下拉退化显示原始码\n- 显示条件写 == 0（数字宽松比较），校验规则写 == '0'（字符串严格相等），切到固定金额后值 '1' 使 == 0 永假，字段永久隐藏\n\n## 解决方案\n- 新增计算属性 fixedContractAmountType（按 label「固定金额」反查 dictValue）与 isFixedContractAmount（当前值 === fixedContractAmountType）\n- 字典加载完成回调里，新增模式若当前值不在字典值集合内自动重置为「固定金额」\n- 模板显示、校验规则、查看模式三处统一改用 isFixedContractAmount，杜绝 == 0 / == '0' 混写\n- 切换金额类型时对该字段 clearValidate，避免隐藏字段残留必填提示\n\n## 验证与归属\n- 验证证据：会话 4262bed0，用户报新增时类型显示0且切换不回，定位 detail.vue 默认写死 '0' 与比较不一致\n- 涉及文件：zhi2-web-admin/src/views/property/expenditureContract/detail.vue；zhi2-web-admin/src/mixins/detailMixins.js\n- 所属项目：苏住房G；来源会话ID：4262bed0-d061-41ed-8364-ba4f6496d209；代码基线：4fad664"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/代码模式/property_manager_edit_whitelist.md",
+                "memory_type": "entities",
+                "after": "# 物业管家编辑仅开放管理范围与人员姓名\n物业管家编辑态仅允许修改管理范围与物业服务人员姓名，其余字段只读，通过白名单与校验跳过实现。\n\n## 问题与根因\n- 业务要求编辑时只能改管理范围，后追加人员姓名也可改；整表单可编辑会误改派生/归属字段破坏关联\n- 新增态必须全字段可填，不能全局 disabled 一刀切\n\n## 解决方案\n- 以字段白名单实现：formMode === 'edit' 时对白名单外 form-item 加只读态，新增/查看走原逻辑\n- 只读字段若挂在 el-form 上，rules 必须同步跳过，否则禁用必填字段导致整表 validate 失败\n- 切换人员时只更新人员相关字段，管家记录 ID 与管理范围原样保留回写，禁止先清空再重填\n- 保存载荷仍提交全字段，仅前端限制可改项\n\n## 验证与归属\n- 验证证据：会话 32c1cf90，用户诉求编辑仅两字段可改并说明换人保留主键/范围\n- 涉及文件：zhi2-web-admin/src/views/property/propertyManager/detail.vue；propertyManager/index.vue；propertyWorker/detail.vue；zhi2-web-admin/src/mixins/form.js\n- 所属项目：苏住房G；来源会话ID：32c1cf90-d6d4-4f69-88c9-a9a6df3519ff；代码基线：805ea8c"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/submodule_cherry_pick_recover.md",
+                "memory_type": "entities",
+                "after": "# 子模块 cherry-pick 冲突态切回分支恢复\nzhi2-web-admin 子模块卡在 cherry-pick 冲突中间态导致无法 checkout 其他分支，需先 abort 再切回。\n\n## 问题与根因\n- 子模块停留在 feature/qrcode-json-main-v2.1 且处于 cherry-pick afe3b82aa 冲突中间态，Git 禁止 checkout\n- 「切不回去」非分支不存在或权限问题\n\n## 解决方案\n- 子模块内 git status 确认中间态，执行 git cherry-pick --abort 回干净态，再 git checkout develop/v2.6.2-suzhufang\n- 确认工作区干净、提交完整（本例 506b24b94）\n- 主仓库 git status 显示子模块 modified 正常：主仓记录热修指针 afe3b82aa（生产 tag 202608261758）与本地不同，日常可忽略，部署以 tag 为准\n- 若需主仓 develop 指针也回退，单独提交子模块指针更新，绝不移动已打生产 tag\n\n## 验证与归属\n- 验证证据：会话 87c47f0c，用户反馈子模块切不回去，定位冲突中并执行 abort 切回，解释主仓 submodule modified\n- 涉及文件：.gitmodules\n- 所属项目：苏住房G；来源会话ID：87c47f0c-7076-4b87-ac18-7c474fc995b3；代码基线：805ea8c"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/common_kernel_filter_organ.md",
+                "memory_type": "entities",
+                "after": "# 共用内核列表按 organType 差异化筛选项\ncompanyManagement 下多菜单共用列表内核，按 organType 条件替换筛选项，仅影响指定菜单。\n\n## 问题与根因\n- 物业服务企业菜单需将「企业类型」筛选替换为「是否分支机构」，但内核对所有 organType 渲染同份配置\n- 全局替换会连累开发/经纪企业；单页复制列表页会造成漂移实现\n\n## 解决方案\n- 共用内核按 organType 分支返回筛选配置（organType === '02' 用「是否分支机构」，其余保留「企业类型」）\n- 新增筛选项用 sys_yes_no 字典加载（0=否/1=是），不前端写死中文\n- queryParams 同步增加 branch，确认导出走 ...this.queryParams 自动带参\n- 页面入口（property/index.vue）保持薄壳只传 organType，不复制筛选逻辑\n- 切换后检查 listMixins 搜索缓存是否残留已删字段，必要时清理缓存再查\n\n## 验证与归属\n- 验证证据：会话 83f5c572，用户要求物业服务企业菜单新增是否分支机构筛选替换企业类型\n- 涉及文件：zhi2-web-admin/src/views/company/companyManagement/components/index.vue；property/index.vue；develop/index.vue\n- 所属项目：苏住房G；来源会话ID：83f5c572-274a-4ccc-859a-bbd8c2c48f60；代码基线：4fad664"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

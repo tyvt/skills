@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_056",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:34:55.447277+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhou_g_workspace_lock.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G根仓npm workspaces锁文件冲突\n苏州V3仓库根（zhi2-web-admin父仓）为npm workspaces容器，加private:true并新增yarn.lock后导致锁文件并存、install结果取决于包管理器。\n\n## 问题现象\n- 根package.json加\"private\":true并新增根级yarn.lock（3673行），仓库同时有package-lock.json与yarn.lock\n- 谁生效取决于最后谁执行install，易出现本地装A版、CI用另一把锁装B版的差异\n- 子模块node_modules被提升到根目录导致路径级差异\n\n## 根因\n- workspaces容器带private:true时，npm与yarn都将其当不可发布工作区根，各自接管依赖图并写自己的锁文件\n\n## 解决做法\n- 根目录只保留一把锁，跟随团队实际使用的包管理器，另一把不提交\n- private:true只做发布保护，不要顺手切换包管理器\n- 装完依赖核对子模块zhi2-web-admin/node_modules与根node_modules提升情况，构建仍须进入子模块执行\n- 提交时子模块指针与父仓锁文件属两次独立提交，不要混在一起\n\n## 验证与归属\n- 验证：会话580b69ca根package.json新增\"private\":true并新增根级yarn.lock（v1，指向registry.npmmirror.com），仓库本身已是npm workspaces结构\n- 涉及文件：package.json、yarn.lock、zhi2-web-admin/package.json\n- 所属项目：苏住房G；来源会话：580b69ca-8f1a-46c6-b741-7d3f3fe10ff3；代码基线：359acba"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhou_g_handlequery_empty.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G统计页handleQuery空实现导致搜索无请求\nG端后台统计页（如companyProjectStats、feeStandardStats）点搜索完全不发请求，根因是复刻模板时handleQuery写成空方法体。\n\n## 问题现象\n- 点「搜索」按钮Network面板一条请求都没有，但初次进入、点「重置」都能正常出数\n- 控制台干净、不报错不告警，极易误判成接口404、参数被拦截或权限问题\n\n## 根因\n- 页面复刻zs-search-form + listMixins模板，约定查询回调统一叫handleQuery\n- 复刻时handleQuery写成空方法体，按钮点击命中方法但方法内无任何getDetails()/getList()调用\n- 重置走resetQuery→getDetails()另一分支，故重置正常、搜索哑火\n\n## 解决做法\n- 遇到「点了没反应又没报错」先定位按钮绑定事件名，确认约定查询方法名（V3统计页是handleQuery）\n- 修复即把handleQuery写成this.getDetails()（或对应取数方法）\n- 统计类只影响前端展示的筛选项由computed（tableRows按statType过滤）前端过滤，不需传接口\n\n## 差异说明与归属\n- 区别于#1008（重写init导致整页不调接口）、#1078（子组件改prop导致点错接口），本条是第三种根因——查询回调空实现\n- 验证：companyProjectStats/index.vue:196-198原为空方法，改为handleQuery(){this.getDetails()}后搜索请求/company/companyRecord/companyNumStatistics\n- 涉及文件：zhi2-web-admin/src/views/publicQuery/companyProjectStats/index.vue、feeStandardStats/index.vue\n- 所属项目：苏住房G；来源会话：5fd50fdd-c3d0-40b5-af88-9696e44c5d09；代码基线：e590ffa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhou_g_vue2_underscore.md",
+                "memory_type": "entities",
+                "after": "# Vue2下划线前缀data属性不被代理\n物业管理区域页（RegionTreeLayout.vue）一进页报Cannot read properties of undefined (reading 'forEach')，根因是data里以_开头的属性不被Vue2代理到this。\n\n## 问题现象\n- 一进页报[Vue warn] Error in mounted hook: TypeError: Cannot read properties of undefined (reading 'forEach')\n- devtools看不到该属性，data声明处不报错，只有运行期首次访问才炸，易误判成「容器ref没拿到」\n\n## 根因\n- Vue2出于内部命名空间保护，不把data()里以_或$开头的属性代理到组件实例\n- 代码定义_containerHeightTimers等，所有this._containerHeightTimers访问都得到undefined\n\n## 解决做法\n- 计时器/监听器/剪贴板等实例级状态不要命名成_或$前缀，统一去掉前缀（containerHeightTimers等）\n- 同步改mounted、beforeDestroy（clearTimeout）与所有方法里的引用\n- 或显式在created里this.xxx=...赋值（绕过data代理）而非放进data\n\n## 差异说明与归属\n- 区别于#1081（methods用了data未声明状态，根因是压根没声明），本条是「声明了但因下划线前缀被跳过代理」，改法去前缀而非补声明\n- 验证：会话9585b1b4定位RegionTreeLayout.vue的_containerHeightTimers，改名containerHeightTimers等三个属性后修复\n- 涉及文件：zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue、property/complex/index.vue\n- 所属项目：苏住房G；来源会话：9585b1b4-8f7c-4b98-81e1-bf7e7b44659c；代码基线：2a3ef8a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhou_g_region_decouple.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G首页多套区域导航拆独立state\n首页v2（index-v2.vue）有「关键数据」与「检查数据」两个区域Tab，须拆成独立state各自刷新，公共收益/报事报修/学习园地等区块不随区域切接口。\n\n## 问题现象\n- 原只有一个regionCode，两套导航共用导致互相覆盖\n- created时用platformConfig.region覆盖首页区域，一进页就选中区县而非「全市」\n- 三个社区类区块本身是全局维度数据，多传region既改口径又白跑请求\n\n## 解决做法\n- 拆成keyRegionCode/checkRegionCode两个data，初值都给''（对应「全市」），删掉platformConfig.region对首页区域的初始覆盖\n- 只有loadKeyData（用queryParams()）和loadCheckData(checkRegionCode)带区域，onKeyRegionChange只调loadKeyData\n- getBenefitData({})、getRepairData({})、getStudyList({tab:this.studyTab})一律不传region，切换区域不重新拉\n- 待办getTaskCount({})/loadTodoPanelList按用户维度不拼queryParams()，从onKeyRegionChange摘掉loadTodoPanel()\n- Tab选中态用String(a)===String(b)判等，避免数字/字符串编码致「全市」不高亮\n\n## 通用约定\n- 凡同屏两套筛选器都按「各自state+各自loader」拆，并默认停在「全市/全部」\n- 已知清单无此约定，可复用性高\n\n## 验证与归属\n- 验证：会话c67476bc/cf4b4d2c/09f68d49围绕index-v2.vue拆分keyRegionCode与checkRegionCode、去platformConfig.region覆盖、benefit/repair/study改传{}；09f68d49 review确认queryParams()仅被loadKeyData/loadCheckData使用\n- 涉及文件：zhi2-web-admin/src/views/home/index-v2.vue、home/v2/components/RegionTabs.vue、src/api/portal/home.js\n- 所属项目：苏住房G；来源会话：c67476bc-3452-4236-a711-0e3a61e0d8f5等4个；代码基线：15e201a"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

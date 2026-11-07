@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793849788328/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T04:22:34.297514+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/getlist_missing_pagination.md",
+                "memory_type": "entities",
+                "after": "# getList 缺失分页参数\n园区物管2.0 中 getList 原先只拼 projectId 未带分页字段，与 zs-pagination 绑定的 queryParams 不一致导致翻页异常。\n\n## 问题根因\n- getList 仅拼 projectId，漏传 pageNum、pageSize 等分页字段。\n- queryParams 缺少 leaseProjectId 初始字段，与 getQueryParams() 赋值不一致。\n\n## 解决方案\n- getList 改为通过 getQueryParams() 传参，带上 pageNum、pageSize、projectId、leaseProjectId（与同目录 leaseContract.vue 一致）。\n- queryParams 补充 leaseProjectId 初始字段。\n- 翻页或切换每页条数时，@pagination=\"getList\" 会带上正确分页参数请求后端。\n\n## 涉及信息\n- 涉及文件：benefit/statisticsMap/rentIncomeExpense.vue、mixins/subTableMixins.js、leaseContract.vue\n- 所属项目：园区物管2.0；来源会话：29f1c84f-97cf-49da-9e1a-a78cdde386a4；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术缺陷/range_table_clear_sync.md",
+                "memory_type": "entities",
+                "after": "# rangeTable 重置勾选不同步\n园区物管2.0 中外部清空 defaultSelectedRangeList 后，rangeTable.vue 内 el-table 仍残留勾选，出现内外不同步。\n\n## 问题根因\n- 外部清空 defaultSelectedRangeList 时，组件仅置空 selectedRangeList，未清除 el-table 内部 selection。\n- 导致弹窗内表格仍显示旧勾选，与外面已清空状态不一致。\n\n## 解决方案\n- 在 rangeTable.vue 的 defaultSelectedRangeList watcher 补充同步逻辑。\n- 默认值变 [] 时主动调用 this.$refs.rangeTableRef.clearSelection() 清空表格勾选，并清空 delSelectedIds。\n- 默认值非空时先 clearSelection() 再走 setSelectedRange() 回填，避免旧勾选叠加。\n\n## 涉及信息\n- 涉及文件：system/message/components/selectRangeDialog.vue、rangeTable.vue、components/zs-table/zs-table.vue、index.vue\n- 所属项目：园区物管2.0；来源会话：c6be946b-abae-4b93-9a83-f55f6a1bc67a；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术缺陷/chart_value_unit_wan.md",
+                "memory_type": "entities",
+                "after": "# 饼图金额单位误加百分号\n园区物管2.0 fundPanorama 各区收入/支出分布图 tooltip 误把万元金额后加 %，与页面万元单位冲突。\n\n## 问题根因\n- dataHelpers.js 解析 regionAmountRatio 时误将 valueUnit 设为 %。\n- 饼图 tooltip 在 valueUnit === '%' 时写成「数值% (占比%)」，但页面与接口金额均为万元。\n\n## 解决方案\n- dataHelpers.js 去掉 valueUnit: '%'，数值按万元用 toChartWanAmount 处理（与其它金额字段一致）。\n- index.vue 更新饼图数据时不再写入 valueUnit。\n- tooltip 显示为「区名 + 360.43 万元 (50.0%)」格式，前为金额后为占比。\n\n## 涉及信息\n- 涉及文件：benefit/dataSandbox/fundPanorama/index.vue、chartRenderers.js、dataHelpers.js\n- 所属项目：园区物管2.0；来源会话：da8341d1-4c60-4e14-998d-ee6afa53037c；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/allow_custom_three_state.md",
+                "memory_type": "entities",
+                "before": "# 可手输选择组件三态回填\n园区物管2.0 中 zs-like-select 等 allow-custom 选择组件回填表单需分三态处理，缺 companyId 不等于空值。\n\n## 问题根因\n- 组件手输只更新自身 v-model（如 { companyName } 无 companyId），原 watch 在缺 companyId 时清空 form 字段，导致手输名称进不了表单。\n- el-form-item 校验的是 form 上的字段，导致 required 校验误报且下拉列表仅显示默认值。\n\n## 解决方案\n- watch 选中对象分三态：①空对象清空 form 名称与 ID；②有 companyId 照常写名称与 id；③仅有 companyName 写 form.companyName 且 companyId 置 undefined。\n- 后端用「有无 companyId」区分系统内单位与手输名称。\n- 通用结论：选中对象回填表单的监听不能把缺 ID 当无效选择清空，须为手输态保留名称。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/components/zs-select/zs-like-select.vue、zhi2-web-admin/src/views/maintenance/depositNotice/company/components/AddDialog.vue。\n- 所属项目：园区物管2.0；来源会话：3212c3b1-6f35-4233-95e1-8433cc34e122；代码基线：7814a0c2a。",
+                "after": "# 可手输选择组件三态回填\n园区物管2.0 中 zs-like-select 等 allow-custom 选择组件回填表单需分三态处理，缺 companyId 不等于空值。\n\n## 问题根因\n- 组件手输只更新自身 v-model（如 { companyName } 无 companyId），原 watch 在缺 companyId 时清空 form 字段，导致手输名称进不了表单。\n- el-form-item 校验的是 form 上的字段，导致 required 校验误报且下拉列表仅显示默认值。\n\n## 解决方案\n- watch 选中对象分三态：①空对象清空 form 名称与 ID；②有 companyId 照常写名称与 id；③仅有 companyName 写 form.companyName 且 companyId 置 undefined。\n- 后端用「有无 companyId」区分系统内单位与手输名称。\n- 通用结论：选中对象回填表单的监听不能把缺 ID 当无效选择清空，须为手输态保留名称。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/components/zs-select/zs-like-select.vue、zhi2-web-admin/src/views/maintenance/depositNotice/company/components/AddDialog.vue。\n- 所属项目：园区物管2.0；来源会话：3212c3b1-6f35-4233-95e1-8433cc34e122；代码基线：7814a0c2a、041.md。"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/allow_custom_companyid.md",
+                "memory_type": "entities",
+                "deleted_content": "# 手输无 companyId 被清空致表单校验失败\n园区物管2.0 中 allow-custom 手输企业名时，因 watch 监听逻辑不当清空 companyId，导致 el-form required 校验恒失败。\n\n## 问题根因\n- watch 监听 selectedCompany 时，只要无 companyId 就清空 form.companyName 与 form.companyId。\n- allow-custom 手输仅含 companyName（无 companyId），被误清空，致 el-form-item 校验的 form.companyName 恒为空。\n\n## 解决方案\n- 调整监听逻辑：空对象时清空双字段；有 companyId 时正常写入。\n- allow-custom 手输仅含 companyName 时，写 form.companyName 且将 form.companyId 置 undefined，以满足 required 校验。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/components/zs-select/zs-like-select.vue、src/views/maintenance/depositNotice/company/components/AddDialog.vue\n- 所属项目：园区物管2.0；来源会话：3212c3b1-6f35-4233-95e1-8433cc34e122；代码基线：041.md"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_042",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:54:40.096561+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_tree_reuse.md",
+                "memory_type": "entities",
+                "after": "# 区域树列表页统一复用 RegionTreeLayout\n物业域列表页通过 RegionTreeLayout 统一左侧区域树与右侧列表布局，避免各页手写树交互不一致。\n\n## 问题背景\n- 物业域列表页（如报事工单）需「左侧区域树 + 右侧列表」布局，手写树卡片样式与交互各页不一致。\n- RegionTreeLayout 已集成区域树、搜索区、侧栏收起/展开、平铺/树状切换。\n\n## 解决方案\n- 用 region-tree-layout 包裹搜索表单、列表标题、状态 Tab、表格与分页。\n- 查询参数按其约定用 parentDeptId（非 deptId），在 getQueryParams() 映射成接口所需 deptId。\n- init() 里用 shouldDeferListForRegionTree() 延迟列表请求，等树加载完成后再拉数据。\n- 树节点点击统一交给 nodeClick，页面删掉自定义树样式。\n\n## 验证与归属\n- 验证：workOrder/report/index.vue 改用后具备与物业管理区域等页一致的区域树交互。\n- 涉及文件：zhi2-web-admin/src/views/property/workOrder/report/index.vue、zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue。\n- 所属项目：产品2.0；来源会话：56328fda-99be-4f5f-aa76-a885f88f8613；代码基线：42b6033。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_select_dialog.md",
+                "memory_type": "entities",
+                "after": "# zs-select-dialog 默认强制 bizState 与回填机制\n注册类免过滤接口必须显式 :noBizState=\"true\"，且弹窗必须绑 @setData 回填。\n\n## 问题背景\n- 注册表单选择总公司用 zs-select-dialog，曾因打开弹窗点击写在 isFormDisabled 三元里调用不存在方法 gotoCompanyDetail 报错打不开，且输入框 pointer-events:none 吞点击。\n- 勾选后点「确定」无反应，因确定按钮只 $emit('setData')，宿主不监听就无回填。\n- 组件默认给列表请求带 bizState:2 过滤，注册场景 listNoScopeWithCode 不需要该条件，会被错误过滤成空列表。\n\n## 解决方案\n- 打开弹窗收敛成独立 openCompanySelect() 方法，触发区加 cursor:pointer 并去掉 pointer-events:none。\n- 弹窗必须绑 @setData 回填、关闭用 :noBizState=\"true\" 剔除默认 bizState 条件。\n- 排查顺序：「确定没反应」先查漏绑 @setData；「有数据但查不到目标」先查默认 bizState:2 是否适配。\n\n## 验证与归属\n- 验证：accountInfo.vue 增加 @setData=\"setCompany\" 与 :noBizState=\"true\" 后确定回填与列表均正常。\n- 涉及文件：zhi2-web-admin/src/views/register/components/accountInfo.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue。\n- 所属项目：产品2.0；来源会话：3580de6d-3e0c-4db5-820d-6cf7683879f4；代码基线：b78461b。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_approval_path.md",
+                "memory_type": "entities",
+                "after": "# zs-approval 审批请求体必须带 path\n[苏房] 使用 zs-approval / ApprovalProcessDialog 提交审批时请求体必须带 path，且 path 要声明为 prop。\n\n## 问题背景\n- 使用 zs-approval 提交审批时后端接口报错或行为异常，请求体缺少 path 字段。\n- 审批接口契约必须带 path（后端定位流程/来源页面），项目按路由 fullPath 传。\n- 原代码仅「421 重新提交」分支写了 this.path || this.$route.fullPath，主审批 submitForm 漏了 path，且组件未把 path 声明为 prop。\n\n## 解决方案\n- 给 zs-approval 和 ApprovalProcessDialog 增加可选 path prop。\n- 审批请求体统一写 path: this.path || this.$route.fullPath（含 query 完整路由路径），与重新提交分支同取值链。\n- 约定：审批请求体 = path + 通用 approveMessage + 业务 approvalMessage，新增/改造审批接入点逐项核对。\n\n## 验证与归属\n- 验证：会话 5a5032e9 用户报告 ApprovalProcessDialog 审批接口没传 path；修复为新增 path prop + 请求体补 path。\n- 涉及文件：zhi2-web-admin/src/components/zs-approval/ApprovalProcessDialog.vue、zs-approval/index.vue。\n- 所属项目：产品2.0；来源会话：5a5032e9-1eb3-4c40-9529-326bcd83ba44；代码基线：94b86fa–62d5fb9。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_column.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column 自定义插槽列宽度修复\n[苏房] 自定义插槽列被排除出自动测宽，无宽度列吸走剩余空间成大片空白，需组件层修复。\n\n## 问题背景\n- 列表页某列用自定义插槽（如角色管理「状态」列放 el-switch），该列与相邻列出现大片空白，数据列被压窄。\n- 原 zs-table-column 用 !this.$scopedSlots.default 判定自动宽度列，插槽列被排除且没有任何 width/min-width。\n- 在 zs-table fit:false 下，无宽度列吸收剩余空间，其他列固定宽、操作列 fixed=right，中间列撑出空白。\n\n## 解决方案\n- isAutoWidthColumn 只按「未显式设 width/min-width」判定，不再因插槽跳过。\n- 新增 hasCustomSlot + getCustomSlotContentWidth，非文本插槽（switch 等）按类型估固定宽（switch≈60px），文本类插槽仍按行数据测量。\n- 暴露 slotWidth 属性供页面显式指定插槽列宽度，type:'custom' 走估算档；不合适时优先给 slotWidth。\n\n## 验证与归属\n- 验证：会话 fb464655 role/index.vue 状态列（el-switch 插槽）大片空白；修复后约 100px。\n- 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、zhi2-web-admin/src/views/system/role/index.vue。\n- 所属项目：产品2.0；来源会话：fb464655-d812-43a9-9ccc-c27ba5ef2e85；代码基线：76646e6。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793660207561/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T23:13:31.194812+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_container_height.md",
+                "memory_type": "entities",
+                "after": "# zs-table选择弹窗末行裁切与重置停留底部修复\n在ScopeSelectDialog内嵌zs-table时，默认table-tr算高导致末行被裁切，且搜索重置后scrollTop未归零使列表停在底部。\n\n## 问题根因\n- 用默认table-tr算高（行数×48+表头+1+横向滚动条）比外层overflow:hidden容器略高，末行永久被裁切\n- 数据重载（搜索/重置/翻页/勾选楼幢）后el-table内部scrollTop保留，列表停在底部\n\n## 解决方案\n- zs-table新增opt-in containerHeight（>0时el-table高度精确等于容器，默认0不影响其余调用方）\n- 数据重载后调用setScrollTop(0)\n- 弹窗侧用updateContainerHeight()替代仅调table-tr旧逻辑\n- depositNotice/company与accountOpen/owner的ScopeSelectDialog需同款改造\n\n## 验证与归属\n- 验证：用户报「搜索后重置列表滑到底显示不全」；归因table-tr溢出与未归零scrollTop，已修复\n- 涉及文件：src/components/zs-table/zs-table.vue、src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue、src/views/maintenance/depositNotice/company/components/ScopeSelectDialog.vue\n- 所属项目：园区公共收益；来源会话：42fa15c9-0259-40e7-af26-00a4b75a3f00；代码基线：0abcb96"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_operate_column_this.md",
+                "memory_type": "entities",
+                "after": "# zs-operate-column方法引用丢失this导致置灰失效\n在buttons配置里传实例方法引用（如disabled: this.disableButton）时，组件回调this不指向Vue实例，bizState判断恒失效。\n\n## 问题根因\n- buttons配置写disabled: this.disableButton等实例方法引用，回调执行时this丢失\n- bizState等状态判断恒失效，表现为批量禁用但单行删除仍可点\n\n## 解决方案\n- 抽取计算属性canOperate统一口径：bizState == 0 || bizState == '0'（待提交）\n- 批量删除、勾选列、行内编辑与单行按钮共用canOperate\n- 操作列动态项用箭头函数绑定上下文：disabled: () => !this.canOperate、visible: () => this.canOperate\n\n## 验证与归属\n- 验证：非待提交态单行删除应置灰或隐藏；待提交态批量删除需先勾选行\n- 涉及文件：src/views/benefit/assetLeaseApply/components/houseTable.vue、src/components/zs-operate-column/zs-operate-column.vue、src/mixins/subTableMixins.js\n- 所属项目：园区公共收益；来源会话：f1d10e9a-1ce1-4000-b675-9ed44669437d；代码基线：4468dfa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tagsview_dual_affix.md",
+                "memory_type": "entities",
+                "after": "# 首页待办改flowable/todo后TagsView双固定标签\n首页换接口下发flowable/todo且保留静态/index时，affix被叠加三次导致出现两个固定「待办任务」标签。\n\n## 问题根因\n- 静态路由/index的meta.affix: true\n- permission.js给接口路由flowable/todo也设affix: true\n- TagsView对path === 'index'额外固定逻辑\n\n## 解决方案\n- 去掉静态/index的affix\n- filterAffixTags里仅当路径与homeRoutePath一致时为flowable/todo固定一个标签\n- 删除对path === 'index'的特殊分支\n\n## 验证与归属\n- 验证：用户反馈「tag里面有两个固定的待办任务」；改完无论落地/flowable/todo或回退/index只保留一个固定待办\n- 涉及文件：src/router/index.js、src/store/modules/permission.js、src/layout/components/TagsView/index.vue、src/views/flowable/todo.vue\n- 所属项目：园区公共收益；来源会话：3bcff305-97a0-45ac-a995-1878bd7ee92b；代码基线：f783ca2"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/unit_table_primary_key.md",
+                "memory_type": "entities",
+                "after": "# 楼幢详情单元子表误用buildingVId作主键\nbuilding/detail.vue内嵌unitTable做单元增删改与房屋选择时，操作列/删除接口误用楼幢主键buildingVId，与单元实体unitId不一致。\n\n## 问题根因\n- 单元子表操作列/删除接口仍用楼幢侧主键buildingVId\n- 与单元实体unitId不一致，表现为删除命中错误行或房屋范围弹窗带错单元\n\n## 解决方案\n- 单元子表主键统一unitId\n- 从楼幢详情向子表传入projectId、projectCode、buildingNo、地上/地下层数等上下文\n- 复用unit模块的HouseScopeTable / 拆分弹窗时补齐unitId传参\n\n## 验证与归属\n- 验证：会话d800e10d确认「主键改为unitId（原先误用buildingVId）」并同步HouseScopeTable、BuildingTableDialog、UnitSplitDialog增加unitId\n- 涉及文件：src/views/building/building/components/unitTable.vue、src/views/building/building/detail.vue、src/views/building/unit/components/HouseScopeTable.vue\n- 所属项目：园区公共收益；来源会话：d800e10d-b867-4f9c-9ec6-cb08d9304eef；代码基线：f783ca2"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

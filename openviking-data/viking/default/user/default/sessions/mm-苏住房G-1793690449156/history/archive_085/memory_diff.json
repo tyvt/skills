@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_085",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T10:43:26.479442+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/visible_perm_and.md",
+                "memory_type": "entities",
+                "after": "# 操作列 visible 与 permission 必须为 AND 组合\nzs-operate-column 中按钮的 visible(row) 与 permission 需同时命中才渲染，避免业务态可见性旁路权限。\n\n## 问题现象\n- 按钮同时配 visible 与 permission 时，visible 返回 true 即渲染，即使无权限也显示（权限绕过 F01）\n- 组件内部若为「visible 命中就显示，permission 只在无 visible 时生效」的短路结构，业务态控制会顶掉权限门禁\n\n## 解决方案\n- 组件层改为 `show = visible(row) && hasPermission(perm)` 的 AND 组合，而非任一命中即显示\n- 改完必须回归无权限场景：用仅部分权限账号验证按钮不出现，只测有权限账号看不出问题\n- 页面侧 data() 须声明 moduleName/businessName，否则 perm 拼错等价于放行\n- 现有调用方若依赖旧 OR 行为，改 AND 后按钮变少，需逐个核对是正确收敛还是改调用方\n\n## 验证与归属\n- 验证：会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189（基线 c35a24a）交付记录首条确认修复\n- 涉及文件：zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue、zhi2-web-admin/src/views/flood/components/CheckPage.vue\n- 所属项目：zhi2-web-admin（防汛）；来源会话：session-9126d917-b8a3-4db0-b250-80e5b6c5d189；代码基线：c35a24a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/forbid_number_id.md",
+                "memory_type": "entities",
+                "after": "# 主键禁止 Number(id) 避免长 ID 精度丢失\n防汛模块详情页对主键做 Number(id) 转换会静默丢精度，必须原样透传长整型字符串。\n\n## 问题现象\n- JavaScript Number 为 IEEE-754 双精度，仅能精确表示 2^53 以内整数（9007199254740991）\n- 后端雪花/序列 ID 超界后 Number(id) 静默改写末几位，后续请求打到不存在记录，详情空白且难排查\n\n## 解决方案\n- 主键、编码类字段一律原样透传，不做 Number()/parseInt()/+ 等数值化\n- 数值比较或排序用字符串比较（localeCompare/BigInt），不转 Number\n- 前端路由参数、表格 row-key、this.$set 回写均保留字符串形态\n- 审查全局搜 Number( 与 parseInt(，确认作用对象是否为 ID；后端 JSON 已返字符串则前端不转\n\n## 验证与归属\n- 验证：会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189 交付记录「移除主键 Number(id)，保留长 ID；接入 feedbackRescue 反馈接口」\n- 涉及文件：zhi2-web-admin/src/views/flood/components/CheckPage.vue、zhi2-web-admin/src/mixins/listMixins.js\n- 所属项目：zhi2-web-admin（防汛）；来源会话：session-9126d917-b8a3-4db0-b250-80e5b6c5d189；代码基线：c35a24a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_upload_fixes.md",
+                "memory_type": "entities",
+                "after": "# 上传组件四类边界缺陷修复\nzs-upload 需修正 5MB 边界、单对象回显、扩展名大小写、在途计数收敛四处异常路径问题。\n\n## 问题现象\n- 体积校验用 `<` 致正好 5MB 文件被拒\n- 回显按数组处理，接口返单对象时显示不出\n- 扩展名匹配区分大小写，.JPG/.Pdf 判非法\n- 在途上传计数不收敛，失败/并发后计数残留致后续上传被拦\n\n## 解决方案\n- 体积校验写 `size <= 5 * 1024 * 1024` 或统一常量+明确比较符\n- 回显兼容单对象/数组：`const list = Array.isArray(data) ? data : (data ? [data] : [])`\n- 扩展名校验先 toLowerCase() 再比允许列表（jpg/jpeg/png/pdf…）\n- 上传计数必须在 finally 统一递减，失败/超时/取消都走到；禁用按钮基于在途数>0 而非曾发起\n\n## 验证与归属\n- 验证：会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189 交付记录「上传组件：5MB 边界 <=、单对象回显、扩展名大小写匹配、在途上传计数与失败收敛」\n- 涉及文件：zhi2-web-admin/src/components/zs-upload/zs-upload.vue、zhi2-web-admin/src/views/flood/components/CheckPage.vue\n- 所属项目：zhi2-web-admin（防汛）；来源会话：session-9126d917-b8a3-4db0-b250-80e5b6c5d189；代码基线：c35a24a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/gitignore_evidence_json.md",
+                "memory_type": "entities",
+                "after": "# 文档证据链接须可解析：提交 JSON 或改 .gitignore\n报告引用的 *.log 被 .gitignore 排除致仓库内悬空链接，证据产物应提交 JSON 或加例外。\n\n## 问题现象\n- docs/flood-repair-2026-10-29.md 引用 docs/flood-repair-*.log，但 log 被 .gitignore 排除未入库，clone 后链接不可解析\n- 已提交 JSON 证据（build-result/eslint/baseline）可正常访问；本地作者看得到磁盘文件，同事 clone 后看不到\n\n## 解决方案\n- 报告引用证据须同提交策略：改结构化 JSON 入库，或在 .gitignore 加例外规则\n- 提交前用 `git ls-files <路径>` 逐个验文档相对链接是否可解析\n- 纯运行时产物（截图、调试日志）不入库时，报告改写结论+复现命令，不链它\n- 证据 JSON 属交付物，运行时截图属产物，与 E2E/预览产物不入库边界不冲突\n\n## 验证与归属\n- 验证：会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189 交付记录遗留项「主仓库 *.log 被 .gitignore 排除未入库，md 内链接无法解析；JSON 证据在库」\n- 涉及文件：docs/flood-repair-2026-10-29.md、.gitignore\n- 所属项目：zhi2-web-admin（防汛）；来源会话：session-9126d917-b8a3-4db0-b250-80e5b6c5d189；代码基线：c35a24a"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

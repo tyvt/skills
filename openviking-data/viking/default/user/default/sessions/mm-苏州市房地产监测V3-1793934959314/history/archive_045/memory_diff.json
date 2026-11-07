@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793934959314/history/archive_045",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T05:32:16.719194+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/bug/agency_status_fix.md",
+                "memory_type": "entities",
+                "after": "# 机构入网信息变更双状态字段冲突修复\n苏州市房地产监测V3 项目修复机构入网信息变更详情页因 displayStatus 与 bizState 两套状态字段混淆导致工具栏状态计算错误的问题。\n\n## 问题根因\n- 机构入网信息变更存在两套状态字段：`displayStatus`（1/4 待提交、2 审核中）与 `bizState`（0 待提交、1 审核中、2 已备案）\n- `resolveAgencyChangeToolbarBizState` 曾用 `isAgencyChangeDraftDisplayStatus` 同时判断两者\n- `displayStatus === 1` 与 `bizState === '1'` 数值相同，已提交（bizState: \"1\"）时若 displayStatus 仍为 1，工具栏被算成 0（待提交），仍显示「提交」且「审核」不出现\n\n## 修改要点\n- `agencyChangeCoreFields.js`：`bizState` 为 1（及 3）时优先作为工具栏状态，不再对 bizState 使用 `isAgencyChangeDraftDisplayStatus`\n- `bizState === 2` 且变更仍为草稿时仍按 `displayStatus` 显示待提交\n- 管理端 / 企业端变更详情同步调整\n\n## 验证与归属\n- 涉及文件：`agencyChangeCoreFields.js`、管理端/企业端变更详情\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor\n- 来源会话ID：17591b86-beed-478b-9a80-d8fddc6bba57；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/register_field_fix.md",
+                "memory_type": "entities",
+                "after": "# 企业账号注册字段压扁修复\n苏州市房地产监测V3 项目修复「企业账号注册（经纪机构）」中统一社会信用代码、注册地址等字段被压扁、看不清的问题。\n\n## 问题根因\n- `input-with-actions` 使用 `flex-wrap: nowrap`，输入框 `flex: 1 1 19ch` + `min-width: 0`，半列宽度里挤三个按钮，输入框被压成细线\n- 外层 div 未 `width: 100%`，未占满表单项\n- 全局 `.map-append` 使用 `display: inline-table` + `calc(100% - 8px)`，在栅格列里易塌缩（注册地址 GIS）\n- 校验红字叠在控件上多为上述高度/留白异常连带现象，表单项已有 `--form-item-error-slot: 20px` 预留\n\n## 修改要点\n- `InstitutionRegisterSingleForm.vue`：信用代码区改为输入框整行 + 按钮下一行，并 `width: 100%`\n- `Step1BasicInfo.vue`：同上（分步旧版保持一致）\n- `element-ui.scss`：表单项内 `.input-with-` 相关样式调整\n- `index.scss`：同步样式修复\n\n## 验证与归属\n- 涉及文件：`InstitutionRegisterSingleForm.vue`、`Step1BasicInfo.vue`、`element-ui.scss`、`index.scss`\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor\n- 来源会话ID：bbf6612f-a591-4092-88b3-c7a08cf12618；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/personnel_idtype_remove.md",
+                "memory_type": "entities",
+                "after": "# 从业人员详情去掉证件类型字段\n苏州市房地产监测V3 项目从经纪从业人员、租赁从业人员两处详情页移除「证件类型」字段。\n\n## 修改要点\n- 修改文件：`AgencyPersonnelDetail.vue`、`LeasePersonnelDetail.vue`\n- 编辑表单：移除「证件类型」表单项\n- 查看模式：`basicInfoView` 中不再展示该字段\n- 校验：删除 `idType` 必填规则\n- 字典：不再加载 `document_type`（仅用于该字段）\n\n## 接口兼容\n- 表单默认值仍为 `idType: '01'`（居民身份证）\n- 保存 payload 仍会带上 `idType`，后端逻辑不受影响\n- 若需在 toB 人员备案详情（`toB/personnelRecord/components/detail.vue`）或其它页面同步去掉，可补充范围\n\n## 验证与归属\n- 涉及文件：`AgencyPersonnelDetail.vue`、`LeasePersonnelDetail.vue`\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor\n- 来源会话ID：5d103f6d-b346-4d26-8144-3e36ee398668；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/progress_query_bizstate.md",
+                "memory_type": "entities",
+                "after": "# 进度节点变更查询区业务状态替换\n苏州市房地产监测V3 项目根据截图标注，将预售资金监管 → 工程进度 → 进度节点变更列表页查询区第三项由「楼幢号」改为「业务状态」。\n\n## 修改要点\n- 修改文件：`zhi2-web-admin/src/views/supervision/progress/change/index.vue`\n- 查询参数：`buildingNo` → `bizState`，与表格列 `bizState` / 字典 `BIZ_STATE` 一致\n- 表单项：文本输入改为下拉选择（选项来自 `getDicts('BIZ_STATE')`），写法同 `deposit/refund/index.vue`\n- `initDict` 中 `delete` 路由搜索缓存里可能残留的 `buildingNo`，避免界面已无该项却仍带参查询\n- 列表列「变更楼幢」未动，仅调整筛选条件\n\n## 验证建议\n- 打开进度节点变更列表，确认第三个条件为「业务状态」下拉\n- 选择「已备案」「待提交」等状态后点查询，需后端 `/prefund/proChange/page` 支持 `bizState`\n\n## 验证与归属\n- 涉及文件：`zhi2-web-admin/src/views/supervision/progress/change/index.vue`、`deposit/refund/index.vue`\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor\n- 来源会话ID：b65fd427-ad7d-4029-a894-62e845206362；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

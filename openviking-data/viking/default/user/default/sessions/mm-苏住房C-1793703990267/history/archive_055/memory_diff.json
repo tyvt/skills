@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_055",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T13:03:15.830644+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/android_slot_tap_fail.md",
+                "memory_type": "entities",
+                "after": "# 安卓分包卡片slot内view点击无响应\n苏住房C 安卓微信小程序中列表卡片 slot 内的普通 view @tap 经常收不到点击，需统一改用 ZsButton + @click.stop。\n\n## 问题现象\n- pages_vote/decision 列表「参与决策」按钮在安卓微信小程序点击无反应，但点卡片主体可进详情，无报错\n- 根因为卡片 slot 内普通 <view @tap.stop> 在安卓微信小程序常收不到 tap，选举页 elect/index.vue 已用 ZsButton 规避\n\n## 解决方案\n- 操作按钮一律用 ZsButton + @click.stop，禁止裸 <view @tap>\n- 跳转统一收口到 goto() 方法，卡片主体与按钮都走它\n- 按钮区域加 z-index:2 防被遮挡\n- 详情页底部按钮用项目 redirectTo() 工具函数而非 uni.redirectTo 直调\n- 核对跳转目的地语义（参与决策/修改决策直达 needToKnow 页而非先落详情页）\n- 验证须在安卓真机点按钮，模拟器不一定复现\n\n## 验证与归属\n- 验证：会话 365c14a6「我的决策点击参与决策还是没有反应，但是直接点击整个卡片可以进入」\n- 涉及文件：src/pages_vote/decision/index.vue、DecisionList.vue、detail.vue、src/pages_vote/elect/index.vue\n- 所属项目：苏住房C；来源会话ID：365c14a6-d64c-46e7-af26-8a237fa7b8c3；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/uni_icons_vendor_path.md",
+                "memory_type": "entities",
+                "after": "# 分包easycom组件vendor.js路径多算一层\n苏住房C 小程序 easycom 编译进分包的 uni-icons 产物相对 require 引用 common/vendor.js 层数多算，需构建后补丁脚本自动修复。\n\n## 问题现象与根因\n- 页面报 Error: module 'pages_main/common/vendor.js' is not defined, require args 为 '../../../../../common/vendor.js'\n- 根因：uni-icons 被 easycom 编译进分包后产物仍相对引用 common/vendor.js，从分包 node-modules 往上算层数落到分包内错误路径，而 vendor.js 实际在主包\n\n## 解决方案\n- 新增 scripts/relocate-uni-icons.mjs，扫描分包 uni-icons 产物，把 vendor.js 相对引用改为主包正确层数（本次 ../../../../../ → ../../../../../../）\n- 在 vite.config.ts closeBundle 钩子自动执行该脚本，每次构建自动打补丁\n- 脚本先对当前 dist 跑一次修掉 pages_main/pages_owner/pages_owner_extra 三处\n- 同类套路参照 relocate-datetime-picker.mjs、relocate-z-paging.mjs，新增第三方组件打进分包照抄\n- 改完必须停 dev server 重新 npm run dev，微信开发者工具点编译/重新载入，热更新看不到效果\n\n## 验证与归属\n- 验证：会话 829a9465 用户贴出 uni-icons module not defined 报错；已修复三处分包\n- 涉及文件：scripts/relocate-uni-icons.mjs、vite.config.ts、scripts/relocate-datetime-picker.mjs、scripts/relocate-z-paging.mjs\n- 所属项目：苏住房C；来源会话ID：829a9465-5450-4144-a178-49e21c221320；代码基线：b7bf813"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/navigate_back_fix.md",
+                "memory_type": "entities",
+                "after": "# 子页返回写死navigateBack(delta:1)致栈重复\n苏住房C 跳转类页面因入口双事件重复 navigateTo 使页面栈重复，子页返回写死 delta:1 需多次才退干净，应查页面栈一次性回退。\n\n## 问题现象与根因\n- 我的求购→添加求购信息→点搜索框选小区，第一次选完停在搜索页，第2-4次才退回添加页\n- 根因：add.vue 搜索框同时挂外层 div @tap 与 ZsSearch @focus 两跳转事件，一次点击连触两次 navigateTo，栈出现重复搜索页\n- search.vue 选中小区后只 navigateBack({delta:1})，每次只退一层重复页\n\n## 解决方案\n- 入口页只保留单一跳转事件，统一用 @click.native，去掉重复 @tap/@focus\n- 子页返回不假设只入栈一次：用 getCurrentPages() 按路由路径查目标页算出 delta 一次性退回\n- 验证路径：我的求购→添加→点搜索框→选小区，第一次选择直接回添加页并回填\n- 凡「A页→选数据页→回带结果给A页」结构均按此模式写返回逻辑\n\n## 验证与归属\n- 验证：会话 9e111257「搜索到小区然后第一次都不会自动弹到添加求购信息页面，后面的2、3、4次才会」\n- 涉及文件：src/pages_transaction/intention/add.vue、search.vue、src/components/ZsSearch/ZsSearch.vue\n- 所属项目：苏住房C；来源会话ID：9e111257-31c8-47e5-b4c2-c258dbd7cb93；代码基线：d43894b"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/button_disabled_green.md",
+                "memory_type": "entities",
+                "before": "# 苏住房C按钮禁用态变绿\n苏住房C 全站大量按钮 disabled 时背景变微信绿而非主题色，根因为 ZsButton 传 type=primary 且禁用色用了小程序不支持的 rgba(var(...))。\n\n## 问题现象与根因\n- 全站大量按钮 disabled 背景为微信绿 #07c160，不是主题色\n- 根因一：ZsButton 把 type=\"primary\" 传给原生 button，微信 primary 默认绿，样式没压住就露绿底\n- 根因二：禁用背景写 rgba(var(--primary-color-rgb),0.5)，小程序不支持该嵌套写法，声明被丢弃回退绿底\n- 根因三：.zs-button[disabled] 选择器权重过大，连默认/取消按钮也被刷主题色背景\n\n## 解决方案\n- 不再向原生 button 传 type/plain，改由 class（zs-button--primary/zs-button--plain/is-disabled）承担样式\n- 加 hover-class=\"none\" 去掉微信默认点击态；禁用色改用预计算纯色变量 --primary-color-disabled（禁运行时拼 rgba）\n- 配套：styles/index.css 定义变量、uni.scss 重置 disabled 默认透明度、zs-button.scss 补取消/重置灰底 #f0f0f0、App.vue 同步设置\n- 验收：主按钮禁用=半透明主题蓝、plain=半透明主题色边框文字、默认/取消=灰底\n\n## 验证与归属\n- 验证：会话 a82b1c4d「很多按钮禁用状态下的背景色是绿色，全局排查修复」\n- 涉及文件：src/components/ZsButton/ZsButton.vue、src/styles/zs-button.scss、src/styles/index.css、src/uni.scss、src/App.vue、src/pages_main/login/index.vue、src/pages_vote/decision/needToKnow.vue\n- 所属项目：苏住房C；来源会话ID：a82b1c4d-6931-4bc6-bd80-8e4198e22765；代码基线：4d6dba9",
+                "after": "# 苏住房C按钮禁用态变绿\n苏住房C 按钮 disabled 时背景变微信绿而非主题色，根因为 ZsButton 传 type=primary 且禁用色用了小程序不支持的 rgba(var(...)) 或变量在禁用分支失效。\n\n## 问题现象与根因\n- 全站大量按钮 disabled 背景为微信绿 #07c160，不是主题色 #1354be\n- 根因一：ZsButton 把 type=\"primary\" 传给原生 button，微信 primary 默认绿，样式没压住就露绿底\n- 根因二：禁用背景写 rgba(var(--primary-color-rgb),0.5)，小程序不支持该嵌套写法或变量在自定义组件边界未取到值，声明被丢弃回退绿底\n- 根因三：.zs-button[disabled] 选择器权重过大，连默认/取消按钮也被刷主题色背景\n- 具体案例：pages_vote/elect/needToKnow 按钮倒计时禁用期间变绿，因 AgreementPage useCountDown(5) 使 ZsButton :disabled，原生 UA 规则压过半透明背景\n\n## 解决方案\n- 不再向原生 button 传 type/plain，改由 class（zs-button--primary/zs-button--plain/is-disabled）承担样式\n- 加 hover-class=\"none\" 去掉微信默认点击态；禁用色改用预计算纯色变量 --primary-color-disabled（禁运行时拼 rgba）\n- 禁用态用与启用态同等强度声明（明确 background-color + 必要 !important、必要时用字面色值而非依赖 --primary-color-rgb 变量），在授权弹窗等跨组件边界场景复核 CSS 变量是否取到值\n- 配套：styles/index.css 定义变量、uni.scss 重置 disabled 默认透明度、zs-button.scss 补取消/重置灰底 #f0f0f0、App.vue 同步设置\n- 验收：主按钮禁用=半透明主题蓝、plain=半透明主题色边框文字、默认/取消=灰底\n\n## 验证与归属\n- 验证：会话 a82b1c4d「很多按钮禁用状态下的背景色是绿色，全局排查修复」；会话 2a7e26fd「pages_vote/elect/needToKnow 按钮禁用背景色为什么是绿色」\n- 涉及文件：src/components/ZsButton/ZsButton.vue、src/styles/zs-button.scss、src/styles/index.css、src/uni.scss、src/App.vue、src/pages_main/login/index.vue、src/pages_vote/decision/needToKnow.vue、src/pages_vote/elect/needToKnow.vue、src/components/shared/AgreementPage.vue\n- 所属项目：苏住房C；来源会话ID：a82b1c4d-6931-4bc6-bd80-8e4198e22765, 2a7e26fd-2145-4c85-840c-3ea11b150b32；代码基线：4d6dba9, b7bf813"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

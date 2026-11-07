@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_016",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:37:24.694367+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/citizen_menu_layer.md",
+                "memory_type": "entities",
+                "after": "# 市民端菜单三层来源\n苏住房C 市民端菜单由硬编码入口页、路由码映射表、后台配置键三处共同决定，改动时需同步理解各自职责。\n\n## 三层职责\n- 聚合入口页前端写死 menuList：阳光物业 src/pages/property/index.vue，公共收益/共有资金 src/pages/benefit/index.vue，改子菜单跳转直接改每项 url。\n- 后台菜单/外链用路由码，在 src/utils/menuRouteMap.js 的 MENU_ROUTES 映射真实路径（如 3_1_19→/pages/property/index、3_1_18→/pages/benefit/index、1_0_5→/pages_benefit/benefit/index）。\n- 苏住房版首页/慧物业/掌服务 Tab 菜单来自后台配置键 app.suzhufang.config（GET /system/config/getByKey/app.suzhufang.config，本地兜底 src/static/menus.fallback.json），url 填路由码不填完整路径。\n\n## 新增页面步骤\n- 固定两步：pages.json 注册路由 + MENU_ROUTES 增映射。\n- 后台 JSON 可调整入口无需改前端；level 是权限等级 v0（无需登录）→v3（需身份认证），levelCode 是身份要求（owner=业主），isShow=\"1\" 表示暂未开放、点击提示 showMsg。\n\n## 验证与归属\n- 验证证据：会话 618910fc 用户问「阳光物业/公共收益如何配置 URL」，给出三层来源及路由码映射表。\n- 涉及文件：src/pages/property/index.vue、src/pages/benefit/index.vue、src/utils/menuRouteMap.js、src/static/menus.fallback.json、src/pages.json。\n- 所属项目：苏住房C；来源会话ID：618910fc-72c7-406b-887e-dd852e5e6cf5；代码基线：89637fb"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/miniprogram_bg_pagebg.md",
+                "memory_type": "entities",
+                "after": "# 小程序背景图改用 PageBg 组件\n苏住房C 小程序中装饰性背景图禁止手拼内联 :style backgroundImage url(相对/静态资源路径)，应统一使用项目 PageBg 组件。\n\n## 问题根因\n- house/index.vue 与 TypeChoose_Suzhufang.vue 把装饰背景改成内联 :style=\"{ backgroundImage: url(...) }\"，微信端整块背景消失（城市剪影、白色胶囊、蓝色弧形表头），H5 可能正常。\n- 小程序渲染层对 background-image+url() 支持不完整，相对路径不被 Vite 处理，运行时拼成相对路径或丢弃，控制台不一定报错。\n- 非「内联 style 一律不可用」：data:image/svg+xml 水印由工具函数生成可行，禁的是手拼相对/静态资源路径。\n\n## 解决方案\n- 装饰背景统一用 src/components/PageBg/PageBg.vue，传相对资源路径，内部走静态资源解析。\n- 固定尺寸横幅给 PageBg 定高外层，避免 inset:0+cover 被 flex:1 拉满。\n- tenant/index.vue 等兄弟页同批改成同一方案，避免一页两种画法。\n\n## 验证与归属\n- 验证：会话 41740334（2026-08-25，基线 5f0f4dc）用户报「我的房屋缺少样式、表头样式丢失」，修复为三页统一 PageBg；TypeChoose_Suzhufang.vue 还丢 ZsNav 导航栏。\n- 涉及文件：zhi2-mobile-shimin/src/pages_owner/house/index.vue、TypeChoose_Suzhufang.vue、tenant/index.vue、src/components/PageBg/PageBg.vue。\n- 所属项目：苏住房C；来源会话ID：41740334-7cda-42d7-b1c3-97712e6c8e6a；代码基线：5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/elect_recordid_parse.md",
+                "memory_type": "entities",
+                "after": "# 投票选举页 recordId 解析来源\n苏住房C 投票选举页 DecisionResult 取 recordId 不能只从 decisionOptionResponseList[0] 取，选举场景该数组为空导致候选人整块不渲染。\n\n## 问题根因\n- 原逻辑只从 decisionOptionResponseList[0] 读 decisionResponseId 当 recordId，选举场景接口常把记录放 decisionOptionResponseAllList，前者为 null 或元素无响应 ID，致 recordId 空、候选人列表接口未发。\n- 与「decisionPlayerName 缺失」不同根因：本次是主键来源，症状同为页面空白。\n\n## 解决方案\n- recordId 解析改双源合并：先遍历 decisionOptionResponseAllList 取 decisionResponseId（按 decisionResponseId 分组去重汇总），为空再降级 decisionOptionResponseList。\n- 两源都无 recordId 时用 decisionOptionResponseList 选项名直接兜底展示，不留纯空。\n- 改动落到共享工具/构造器（decision/*/DecisionResult 共用），不只补 elect 一处。\n\n## 验证与归属\n- 验证：会话 aa7c3d25（2026-08-27，基线 f1939b0）用户报「最近一次选举没展示，选举人姓名没展示」，根因第1条。\n- 涉及文件：zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue、decision/common/DecisionResult.vue、src/api/autonomy.js。\n- 所属项目：苏住房C；来源会话ID：aa7c3d25-bd1a-4ca4-bb8f-8c55d6730cc6；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/record_name_api.md",
+                "memory_type": "entities",
+                "after": "# 记录详情补姓名接口选择\n苏住房C 选举记录列表补选举人姓名应优先 getAppRecordDetail，而非 getDecisionRecordDetail（可能不返回 decisionPlayerName）。\n\n## 问题根因\n- 选举记录列表左侧姓名空白，接口列表无该字段，需详情接口补。\n- 同类页面有两详情接口：getDecisionRecordDetail 与 getAppRecordDetail（DecisionRecord 一直用后者），选举场景前者可能不返回 decisionPlayerName。\n- 历史反复在 label/value/remark 映射和 record 展开覆盖上改过几轮，次要根因是异步详情对象整体展开覆盖列表已算好的姓名。\n\n## 解决方案\n- 补全统一走 getAppRecordDetail 优先、getDecisionRecordDetail 兜底；姓名多候选兜底（decisionPlayerName/username/realName）。\n- 补全只填缺失字段，不让异步详情整体展开覆盖列表姓名。\n- 新写同类页面直接照抄此链路，避免「列表只有时间」。\n\n## 验证与归属\n- 验证：会话 aa7c3d25（2026-08-27，基线 f1939b0）根因第2条，修改含按 decisionResponseId 合并重复记录、扩展姓名解析字段。\n- 涉及文件：zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue、decision/common/DecisionRecord.vue、src/api/autonomy.js。\n- 所属项目：苏住房C；来源会话ID：aa7c3d25-bd1a-4ca4-bb8f-8c55d6730cc6；代码基线：f1939b0"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

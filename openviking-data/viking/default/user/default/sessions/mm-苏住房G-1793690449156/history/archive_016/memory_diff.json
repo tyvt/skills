@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_016",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:57:29.074133+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_region_readonly.md",
+                "memory_type": "entities",
+                "after": "# zs-region-select 只读页区划编码回显\n苏住房G 中区划由上游页面决定、本页只读时，误用 zs-region-select 会导致输入框回显 6 位编码而非名称。\n\n## 问题根因\n- zs-region-select 选项来自平台 areas 树（当前账号可选范围），非本页携带区划。\n- 当 form.regionCode 不在 regionOptions 时，el-select 拿不到 label 便把原始值当文本显示，组件已挂载但数据源不匹配。\n\n## 解决方案\n- 只读场景改用 zs-select + 即时生成选项数组 regionDisplayOptions = [{ dictValue: regionCode, dictLabel: regionName || 反查 allAreas 名称 }]，配 disabled。\n- 同步补全 regionName，保证保存时编码仍有值。\n- 需用户自选区的表单页才用 zs-region-select（069e9d4 后值语义统一为区划编码）；验收 disabled 应显示「高新区」而非数字。\n\n## 验证与归属\n- 验证：会话 99982c86（基线 f4fae14）用户报 regionCode 无值、回显成数字；改 zs-select + regionDisplayOptions 并补 regionName。\n- 涉及文件：system/regionBankAuth/detail.vue、utils.js、zs-region-select.vue；所属项目：苏住房G。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_scrollbar_global.md",
+                "memory_type": "entities",
+                "after": "# 表格横向滚动条全局常显规则\n苏住房G 中表格横向滚动条需始终显示时，必须落到 styles/index.scss 全局规则且横向单独放宽。\n\n## 问题根因\n- 原样式写在 .el-table__body-wrapper:hover::-webkit-scrollbar-thumb，仅指针真落轨道/滑块附近才算 hover 命中。\n- 指针在表体其它位置或表头/固定列时滑块透明，视觉上只有靠近滚动条才显示。\n\n## 解决方案\n- 在 styles/index.scss 既有 hover 规则后追加：.el-table__body-wrapper 与 .el-table__header-wrapper 横向轨道保持 10px，横向滑块非 hover 也给 rgba(0,0,0,0.2)。\n- 纵向继续沿用原 hover 规则；选择器挂类上，所有 zs-table/el-table 列表一次生效，不逐页加 scoped。\n- 已知边界：:horizontal 仅 Chromium/Edge 生效，Firefox 需另加 scrollbar-color（同时影响纵向，需产品确认）。\n\n## 验证与归属\n- 验证：会话 b7218710（基线 9e5c499）用户要求横向滚动条始终展示；改 index.scss 全局规则并说明纵向保留 hover。\n- 涉及文件：styles/index.scss、system/regionBankAuth/index.vue；所属项目：苏住房G。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/list_dual_api.md",
+                "memory_type": "entities",
+                "after": "# 同名列表双接口分页分流\n苏住房G 公共信息—物业管理区域信息列表因统一切 pageNew 导致每页设 10 条却只显示 1 条，需按高级筛选条件分流。\n\n## 问题根因\n- 为支持高级筛选，所有列表请求改 POST /property/complex/pageNew。\n- pageNew 对普通查询分页不可靠：响应 pageSize=10、total 正常但 list 只回 1 条，前端不报错难排查。\n\n## 解决方案\n- 未用高级筛选时走 GET /property/complex/page（常规分页），仅当 conditionGroups/高级筛选条件非空才走 pageNew。\n- 判定条件显式写在取数方法里，不靠「接口有就都调」顺手全切。\n- 排查「总数对、行数少」先确认是否同一列表挂了两套分页接口，而非怀疑 pageSize 或 zs-pagination。\n\n## 验证与归属\n- 验证：会话 8bdf9717（基线 f78f7e7）用户报每页 10 条只显示 1 条；改回按场景分流。\n- 涉及文件：publicQuery/complex/index.vue、mixins/listMixins.js、property/complex/index.vue；所属项目：苏住房G。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_col_width.md",
+                "memory_type": "entities",
+                "after": "# 弹窗表格列宽比例化\n苏住房G 申报缴费信息弹窗内表格写死像素列宽，弹窗加宽后不拉伸、右侧留白、金额输入框偏窄。\n\n## 问题根因\n- 列宽固定像素（如 140px），容器变宽时列宽不变，多空间堆右侧。\n- 金额输入框用 el-input-group 带「元」后缀，宽度只跟自身列宽走，列不涨就永远窄。\n\n## 解决方案\n- 容器改 width:100%，列定义从固定像素换 minmax(160px, 1fr)（金额列保 160px 下限）均分剩余空间。\n- 补 .el-input-group 宽度规则让带后缀控件占满整列。\n- 顺序：先定容器（弹窗宽度走公共 zs-dialog 的 form-layout 档位），再定列比例，最后修控件宽度。\n\n## 验证与归属\n- 验证：会话 8525228c（基线 e590ffa）用户多次反馈不撑满；改 minmax + 容器 100% + 补样式。\n- 涉及文件：property/feeDeclare2/index.vue、feeBindScopeTable.vue；所属项目：苏住房G。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

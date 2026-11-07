@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793758965904/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T02:54:53.003998+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/broker_nth_reset.md",
+                "memory_type": "entities",
+                "after": "# 门户双栏表单 nth-child 标签宽断点重置\nBrokerPages 等机构信息区用固定两列 grid 配合 nth-child 设置左右列不同标签宽，窄屏单列化时必须统一并覆盖 nth-child 规则。\n\n## 问题根因\n- BrokerPages 等机构信息区用固定两列 grid（如 455px 284px），通过 nth-child(2n)/nth-child(2n+1) 为左右列设置不同 --portal-form-label-width（360px vs 168px）\n- 窄屏（max-width:760px 或 1200px）改为单列堆叠后，奇偶 nth-child 不再对应「左/右列」\n- 导致标签宽 360px 与 168px 交替、值列无法纵向对齐\n\n## 修复方向\n- 窄屏统一 --portal-form-label-width（全宽行 .broker-field-full 可单独加宽）\n- 移除或覆盖窄屏下的 nth-child 变量规则\n- 需说明 DOM 顺序与桌面双栏奇偶对应关系\n\n## 验证与归属\n- 验证证据：会话 03d20bf9 [HIGH] 窄屏单列仍沿用机构 nth-child 标签宽\n- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue\n- 所属项目：门户；来源会话ID：03d20bf9-e86f-46c1-aa96-4b6f60f3e8f1；代码基线：门户 zhi2-web-admin @ e1f8e0b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_label_basis.md",
+                "memory_type": "entities",
+                "after": "# 门户 publicPortal 标签值列对齐用固定 flex-basis\npublicPortal 表单项标签若仅用 min-width 会因长文案变宽导致值列不对齐，需改用固定 flex-basis 与许可弹窗行一致。\n\n## 问题根因\n- publicPortal 表单项用 dt/dd 或 .portal-detail-row 时，标签仅 flex:0 0 auto + min-width: var(--portal-form-label-width)\n- 长文案标签会随内容变宽，dd 起始位置行与行不一致，text-align:left 不能保证「值成列」\n- 标签仅用 min-width 时值列对齐弱于许可弹窗\n\n## 修复方向\n- 与许可弹窗行一致：flex: 0 0 var(--portal-form-label-width) 且 width/max-width 同值\n- 桌面可 nowrap + 定宽，窄屏断点再 white-space:normal\n- Fix 已对齐 PropertyDetailDialog\n\n## 验证与归属\n- 验证证据：会话 03d20bf9 [HIGH] 标签仅用 min-width，值列对齐弱于许可弹窗；Fix 对齐 PropertyDetailDialog\n- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue；zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue\n- 所属项目：门户；来源会话ID：03d20bf9-e86f-46c1-aa96-4b6f60f3e8f1；代码基线：门户 zhi2-web-admin @ e1f8e0b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_secondary_flow.md",
+                "memory_type": "entities",
+                "after": "# 首页次要业务行按 functionCode 加宽\nHomeLayoutAdmin 次要板块行用 nth-child(1/2) 分配 flex 在三列场景会不一致，需统一 flex 并仅对特定 functionCode 加宽类。\n\n## 问题根因\n- HomeLayoutAdmin 次要板块行 secondaryFlows 用 v-for 渲染，仅用 .biz-flow-secondary:nth-child(1/2) 分配 flex 1.8/1\n- 第三个子项仍走默认 flex:0 1 auto，在「存量房+经纪机构+住房租赁」三列时后两列宽度不一致\n\n## 修复方向\n- 所有次要项统一 .biz-flow-secondary { flex: 1 1 0 }\n- 仅 secondHandHouseTrade（或从 homeLayout 导出常量）加 biz-flow-secondary--wide（flex:1.8 1 0）\n- 不依赖 API 返回顺序\n- 姊妹布局 HomeLayoutSidebar 若仍用 nth-child 会复现且不一致，应抽共享 secondaryFlowClass\n\n## 验证与归属\n- 验证证据：会话 62d59697 第三子项等分问题与 functionCode 方案；[MEDIUM] Sidebar 仍用 nth-child\n- 涉及文件：zhi2-web-admin/src/views/home/components/layouts/HomeLayoutAdmin.vue；HomeLayoutSidebar.vue；zhi2-web-admin/src/views/home/config/homeLayout.js\n- 所属项目：门户；来源会话ID：62d59697-f950-4230-8eac-39dd5d3f77ff；代码基线：门户 zhi2-web-admin @ f489349（2026-10-23）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/代码落点/portal_rental_lookup.md",
+                "memory_type": "entities",
+                "after": "# 住房租赁合同备案查询代码落点\n住房租赁合同备案查询仅在 zhi2-web-admin 的 publicPortal（Vue2）实现，排查该功能勿去 React 或其他子工程找页面。\n\n## 代码落点\n- 页面：RentalPages.vue（kind===rental-contract 时 contractResult + portal-rental-result-grid）\n- 弹窗路由：PortalDialogHost.vue（portal=rental-contract）\n- 数据：mock/rental.js（rentalContractFixture、matchRentalContract）\n- 样式：portal.scss；主题：portalTheme.js\n- 菜单：UnifiedLogin portal:rental-contract\n- E2E：public-portal-interactions.spec.ts 断言 .portal-rental-contract-result\n\n## 验证与归属\n- 验证证据：会话 sess_subagent_agent_f8d81def 代码检索结论（Primary page public portal under zhi2-web-admin）\n- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/pages/RentalPages.vue；PortalDialogHost.vue；mock/rental.js；portal.scss\n- 所属项目：门户；来源会话ID：sess_subagent_agent_f8d81def-e267-4e9f-bff8-538fa92004d3；代码基线：门户 zhi2-web-admin @ dfee5a6（2026-10-21）"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

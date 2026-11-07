@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:15:47.203156+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite地图代理路径适配.md",
+                "memory_type": "entities",
+                "after": "# Vite地图代理路径适配\n园区物管2.0 在 Vite base='./' 相对路径部署下，第三方地图区划代理请求的路径适配套路。\n## 问题背景\n- 静态 SVG 地图替换为腾讯行政区划接口（ws/district/v1）后，页面一直停留在「地图数据加载中」，控制台无报错，DOM 占位盒尺寸正常。\n- 根因：base 配置为 './'，代理转发代码把区划请求写死成绝对路径 /map/...，部署子路径时浏览器把 /map 解析到域名根，请求 404，fetch 被静默吞掉。\n- Vite dev proxy key 本身必须以 / 开头，不能因 base 是 './' 就写成相对形式。\n## 解决方案\n- 抽 getDistrictProxyPrefix()，按 BASE_URL 是否为 './' 统一返回 './map'，页面 fetch 用 './map/ws/district/v1/...' 相对路径。\n- vite.config.js 抽出共享 viteBase 常量，代理 key 仍固定 '/map'，rewrite 按 getMapProxyContext(viteBase) 动态剥离前缀。\n- 以后 base 改子路径（如 /admin/）只需同步改 viteBase 一处。\n## 排查要点\n- 遇到「无报错一直加载」，先用 getBoundingClientRect 确认容器有尺寸，再看网络面板里区划请求实际解析到的 URL。\n## 关联信息\n- 涉及文件：tencentDistrictBoundary.js、vite.config.js、mapOverview/index.vue。\n- 所属项目：园区物管2.0（zhi2-web-admin），基线 c97957703。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs-table列宽死循环.md",
+                "memory_type": "entities",
+                "after": "# zs-table列宽自反馈死循环\n园区物管2.0 的 zs-table 自定义列宽分配引擎因读渲染结果反写布局，与 el-table 形成同步死循环。\n## 问题背景\n- 在 pubElevMaintenanceNew 等页面触发同步死循环：表格卡死、列无法自动撑宽；写死 width 绕开分配机制反而不卡。\n- 根因：distributeColumnWidths 用渲染后的 realWidth 反推剩余空间再分给弹性列，分配输入依赖输出，lastDistributeKey 永远稳定不下来，与 el-table 布局、ResizeObserver、watch、:key 重建叠加成死循环。\n## 解决方案\n- 重构为「测量只算内容，分配交给 el-table 原生 fit」：zs-table-column 用纯 computed + canvas 按原始文本测算 contentWidth，仅作为 min-width 喂给 el-table，绝不回读布局。\n- 删除 zs-table 整个分配引擎（约 90 行），只留 flexColumnCount 计数，fit = 有弹性列；zs-operate-column 宽度改纯 computed，删状态化 watch/mounted 调度。\n- 兼容契约：显式 width 原样固定、显式 min-width 取 max(显式,内容)、无宽度列按内容算 min-width 由原生 flex 填满、全固定列 fit:false 不拉伸末列，页面零改动。\n## 经验教训\n- 任何「读渲染结果再反写布局」的列宽算法都会与 el-table 形成反馈环；zs-table 遇列宽抖动/卡死应优先检查自反馈，正确方向是 canvas 测文本 + min-width 委托。\n## 关联信息\n- 涉及文件：zs-table.vue、zs-table-column.vue、zs-operate-column.vue、pubElevMaintenanceNew/index.vue、listMixins.js。\n- 所属项目：园区物管2.0（zhi2-web-admin，与苏房V3同源 zs-* 组件库），会话 6ca7facb（2026-06-11，基线 ccc1e54ea）。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs-table-column列宽清理.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column列宽清理\n园区物管2.0 要求 zs-table-column 不再写死 width/min-width，列宽由组件内部按表头+内容自动计算，全局清理时需注意的漏网写法。\n## 易漏写法\n- 模板直接写 width=\"200\" / min-width，涉及 20+ 文件几十处。\n- 通过 v-bind=\"column\" 把 columns 配置对象（含 width/minWidth 字段）动态传入，模板无 width 字面量，grep 标签属性会漏掉。\n## 清理做法\n- 除扫模板字面量外，还要扫各页面 columns 配置对象里的 width/minWidth 键。\n- 唯一保留例外是 slot-width：zs-table-column 为自定义插槽列设计的专用属性，与 width/min-width 语义不同（插槽内容测不了宽），不能删除。\n- 序号/多选等固定类型列宽度由组件内部分支管理，页面不用管。\n## 关联信息\n- 模板 zs-table-column 22 文件 84 处 + v-bind=\"column\" 列配置 12 文件 15 处均移除；明确保留 slot-width（如 houseTable.vue 拟租金额列）。\n- 涉及文件：assessmentPlan/index.vue、survey/template/index.vue；手动修复 BankTransDetailDialog.vue、feeCustomTypeDialog.vue。\n- 所属项目：园区物管2.0（zhi2-web-admin），会话 70d81b99，基线 c52866fc8。"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/子表拆分粒度.md",
+                "memory_type": "preferences",
+                "after": "- 详情页内嵌子表的表格列配置直接耦合写在子表 vue 文件内部，不单独抽成独立的 xxxColumns.js（避免逻辑散落多文件、阅读来回跳转）。\n- 「弹窗式子表」单独抽成独立组件并配合子表 mixin 使用，接口对接分页接口（如 /benefit/pubReceiptVerificationDetail/page）。\n- 与泰兴小程序「接口逻辑内聚到页面域 JS」方向不同：园区物管2.0 Web 后台遵循「列配置不外抽、弹窗组件要外抽」。\n- 最终交付示例：VerificationReceiptDetailTable.vue 独立弹窗组件 + 列配置内联；涉及 detail.vue、listMixins.js。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

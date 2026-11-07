@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:39:12.145244+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/echarts_donut_label.md",
+                "memory_type": "entities",
+                "after": "# ECharts 环图标签与引导线异常\n园区物管2.0 的 ECharts 环图在单扇区 100% 与 0 值扇区场景下，外侧标签错位、残留引导线，需关闭外侧标签改由图例承担。\n\n## 现象\n- 单扇区占 100% 时，外侧「xx 100%」标签被挤到右下角、引导线拉得很长。\n- 值为 0 的扇区即使隐藏文字，仍画出残留引导线，label 显示奇怪。\n\n## 根因\n- ECharts 默认 labelLine + outer label 在极端占比（100%）和 0 值扇区上产生异常几何。\n- 逐项调 label 位置压不住，需从数据源与渲染开关层面解决。\n\n## 解决方案\n- 关闭环图外侧标签与引导线（labelLine/label 不渲染，悬停仍有 tooltip），详情改由右侧图例承担。\n- 环图只渲染数值 > 0 的扇区，从数据源过滤 0 值项避免异常线条。\n- 图例固定显示全部类别（数量为 0 也列出）。\n- 调尺寸时注意中间总数文字与外圈半径余量，先关标签再看是否需要放大容器。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue、zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js。\n- 所属项目：园区物管2.0；来源会话：98ef0df4-45f3-4381-a79d-760eb1b00c62；代码基线：3965548b6。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zstable_fixed_border.md",
+                "memory_type": "entities",
+                "after": "# zs-table 固定列边框分页条件异常\n园区物管2.0 的 zs-table 固定操作列多余边框只在有分页的页面出现，因修复样式挂在无分页才加的条件 class 上。\n\n## 现象\n- 列表页操作列 fixed=\"right\"，列多出现横向滚动条时，固定操作列下方叠出多余边框。\n- 问题只在「有分页组件」的页面出现（哪怕共 1 条）。\n\n## 根因\n- 隐藏固定列多余边框的修复样式写在 `.zs-table-container--bottom-spacing` 下，该 class 只有没分页时才加，有分页页面样式不生效。\n- zs-table 的 syncFixedColumnOffset 被注释掉，横向滚动条高度未计入固定列，放大视觉偏差。\n\n## 解决方案\n- 把固定列边框修复从条件 class 移到 `.list-card .zs-table-container`（有分页也生效），在全局 styles/index.scss 收敛。\n- 恢复 zs-table 组件内 syncFixedColumnOffset，让固定列高度与横向滚动条对齐。\n- 排查「只在部分列表页出现」的表格样式问题时，先看目标样式挂的容器 class 是否被分页等条件渲染分支决定。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/styles/index.scss、zhi2-web-admin/src/components/zs-table/zs-table.vue。\n- 所属项目：园区物管2.0；来源会话：f85b6a27-7ef0-4292-b55b-eede0e63b03e；代码基线：736a824e7。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sidebar_recursive_menu.md",
+                "memory_type": "entities",
+                "after": "# 侧边栏自定义 RecursiveMenu 缩进\n园区物管2.0 的侧边栏是自定义递归组件 RecursiveMenu，缩进靠 level prop + paddingLeft 实现，与 el-menu 无关。\n\n## 现象\n- 排查侧边栏子菜单缩进/层级问题时，按 RuoYi 经典结构找 el-menu / SidebarItem / el-submenu 必然找不到病灶。\n- 全仓库仅 element-ui 静态 CSS 里还有 el-menu 样式。\n\n## 根因\n- 缩进完全不依赖 el-menu 的 indent/default-openeds，而是 RecursiveMenu.vue 内部实现。\n\n## 解决方案\n- 入口 Sidebar/index.vue 遍历 sidebarRouters，每项从 level=1 起。\n- RecursiveMenu.vue 用 level prop + 内联 paddingLeft：目录节点 paddingLeft = 24 + (level-1)*18，叶子节点 = 父组件的 paddingLeft + 18（用父级 computed，非 24+level*18），子目录递归传 :level=\"level+1\"。\n- 菜单管理页（system/menu）用 zs-table 树表懒加载，缩进走 Element 树表默认机制。\n- 改缩进/层级逻辑只动 RecursiveMenu.vue；菜单 JSON 深嵌套 + ParentView 展平时核对 level 传递是否断链。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/layout/components/Sidebar/index.vue、zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue。\n- 所属项目：园区物管2.0；来源会话：b096fe20-ff70-474d-bf2b-1e39449b1ce9；代码基线：f101dd464。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/chart_amount_format.md",
+                "memory_type": "entities",
+                "after": "# 图表金额格式化误用取整丢失小数\n园区物管2.0 的地图/统计大屏图表误用取整格式化函数，导致 0.几万元显示为 0，数据看似「未展示」。\n\n## 现象\n- 地图/统计大屏的资金余额、资金收支图表里，某区有 0.22 万元小数数据但页面显示为 0（宜兴市 fundBalance=0.22 未展示）。\n- 数据丢失表现为「没展示」而非报错，容易误判为接口或地图区域匹配问题。\n\n## 根因\n- 图表配置（图例总额、柱顶数值标签、Tooltip、Y 轴刻度）多处调用 formatWanIntegerValue 这类「四舍五入取整」函数，0.几万被取整成 0。\n\n## 解决方案\n- 金额/占比类图表格式化一律用保留小数的 formatWanValue（最多两位小数），取整函数只用于确定是整数计数的场景。\n- 四处展示点（图例、标签、tooltip、轴刻度）必须同步换，漏一处会出现同一数值不同显示。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js（buildFundIncomeExpenseOption）。\n- 所属项目：园区物管2.0；来源会话：dd77c94d-98a5-4f59-b393-fb5a4f521aff；代码基线：f101dd464。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 数据地图下钻传参约定（regionCode 恒传 + dimension 分层）见实体「数据地图下钻传参约定」。\n- 腾讯地图区划轮廓接入与 x/y 坐标语义见实体「腾讯地图区划接入」。\n- 区域树侧栏布局收敛为 RegionTreeLayout 公共组件见实体「region_tree_layout」。\n- 地图区域信息框固定左上角轮播偏好见偏好「地图信息框交互偏好」。\n- zs-table 固定列遮挡小计行分隔线解法见实体「zstable_subtotal_divider」。\n- 合并冲突双重自检工作流见实体「merge_conflict_selfcheck」。\n- 表格自定义列配置刷新丢失修复见实体「table_config_refresh」。\n- 环形图全 0 占位渲染策略见实体「donut_zero_placeholder」。\n- terminalType 残留态导致 G 端误弹 B 端弹窗的修复见实体「terminaltype_residual_session」。\n- 弹窗复用详情页容器类样式错乱的双形态约定见实体「dialog_dual_layout」。\n- 多分支修复-确认-串行合并约定见实体「branch_serial_merge」。\n- 地图区划数据生产报错与 JSONP 直连修复见实体「Vite地图代理路径适配」。\n- 空表格底边框多来源叠加收敛见实体「table_border_stack」。\n- zs-input-number 数字不显示内边距适配见实体「zs_number_hide」。\n- 未消费 sprite 生成链路整链清理见实体「unused_sprite_cleanup」。",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 数据地图下钻传参约定（regionCode 恒传 + dimension 分层）见实体「数据地图下钻传参约定」。\n- 腾讯地图区划轮廓接入与 x/y 坐标语义见实体「腾讯地图区划接入」。\n- 区域树侧栏布局收敛为 RegionTreeLayout 公共组件见实体「region_tree_layout」。\n- 地图区域信息框固定左上角轮播偏好见偏好「地图信息框交互偏好」。\n- zs-table 固定列遮挡小计行分隔线解法见实体「zstable_subtotal_divider」。\n- 合并冲突双重自检工作流见实体「merge_conflict_selfcheck」。\n- 表格自定义列配置刷新丢失修复见实体「table_config_refresh」。\n- 环形图全 0 占位渲染策略见实体「donut_zero_placeholder」。\n- terminalType 残留态导致 G 端误弹 B 端弹窗的修复见实体「terminaltype_residual_session」。\n- 弹窗复用详情页容器类样式错乱的双形态约定见实体「dialog_dual_layout」。\n- 多分支修复-确认-串行合并约定见实体「branch_serial_merge」。\n- 地图区划数据生产报错与 JSONP 直连修复见实体「Vite地图代理路径适配」。\n- 空表格底边框多来源叠加收敛见实体「table_border_stack」。\n- zs-input-number 数字不显示内边距适配见实体「zs_number_hide」。\n- 未消费 sprite 生成链路整链清理见实体「unused_sprite_cleanup」。\n- 环图单扇区标签错位与 0 值引导线处理见实体「echarts_donut_label」。\n- zs-table 固定列边框仅分页时出现修复见实体「zstable_fixed_border」。\n- 侧边栏自定义 RecursiveMenu 缩进机制见实体「sidebar_recursive_menu」。\n- 图表金额格式化误用取整丢失小数见实体「chart_amount_format」。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

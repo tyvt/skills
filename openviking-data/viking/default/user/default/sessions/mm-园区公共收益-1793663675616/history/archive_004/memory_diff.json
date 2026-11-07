@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793663675616/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T00:01:12.812673+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bprojectdialog_visible_bug.md",
+                "memory_type": "entities",
+                "after": "# 物管会单区域登录后2秒自动进入失效\n物管会账户绑定单区域时登录后2秒自动进入提示失效，倒计时被反复清除不提交。\n\n## 问题根因\n- bProjectDialog.vue 中 visible 监听器在无 currentProjectId 时强制 emit('update:visible', true)，与 layout/index.vue 的 syncProjectDialogVisibility 抢控制权，弹窗状态反复切换清除定时器\n- 使用 this.$attrs.visible 判断打开在 Vue2 下不稳定，setTimeout 回调可能读 false\n- 区域列表仍在 dataLoading 时就启动倒计时，与 onOpen 异步逻辑冲突\n\n## 解决方案\n- visible 改为显式 prop，用 dialogVisible 绑定 el-dialog\n- 仅用户主动关闭且未选区域时再打开，初始挂载不强制打开\n- !dataLoading 后再启动自动进入，用 generation 令牌丢弃过期定时器，失败可重试\n- 注意同屏「修改密码」弹窗也会挡住流程\n\n## 验证与归属\n- 验证：会话 022cfbb6 用户报 2 秒自动进入未执行，结论列三条根因及 generation 令牌修复\n- 涉及文件：zhi2-web-admin/src/views/home/bProjectDialog.vue、zhi2-web-admin/src/layout/index.vue\n- 所属项目：园区公共收益；来源会话：022cfbb6-b498-4713-a286-66050471cfb5；代码基线：36a9a7e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/decision_detail_route.md",
+                "memory_type": "entities",
+                "after": "# 业主表决情况表详情跳转主键分流\n只读列表 decisionSituation 点查看按 decisionType 分流到不同表决详情路由，MULTIPLE_ISSUES 用 decisionManageId。\n\n## 业务分流\n- NORMAL → autonomy/general/detail，query 用 decisionId\n- OPTION → autonomy/option/detail，decisionId\n- SORT → autonomy/sort/detail，decisionId\n- MULTIPLE_ISSUES → autonomy/multiply/detail，query 用 decisionManageId（多议题管理主键，与另三类不同）\n\n## 实现要点\n- 列表沿用 moduleName: 'autonomy' + businessName: 'decisionSituation' 调 POST page\n- 字典与搜索项对齐 general/index.vue\n- 后台需在 sys_menu 配 component autonomy/decisionSituation/index 及 list/query 权限\n\n## 验证与归属\n- 验证：会话 921980e6 最终结论第4点确认 MULTIPLE_ISSUES 带 decisionManageId，其余带 decisionId\n- 涉及文件：zhi2-web-admin/src/views/autonomy/decisionSituation/index.vue、autonomy/general/index.vue、autonomy/multiply/detail.vue\n- 所属项目：园区公共收益；来源会话：921980e6-6982-4e1b-8876-2014d4e01a3d；代码基线：0abcb96"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/publicity_date_check.md",
+                "memory_type": "entities",
+                "after": "# 公示起止日期不少于7天校验\n自治/公示类详情要求公示期不少于7天，产品约定初始日期不算天数，用 dayjs 日历差实现。\n\n## 业务口径\n- 公示期不少于7天，2026-08-01～2026-08-08 计为7天（日历日差），2026-08-01～2026-08-07 为6天应拦截\n- 边界自测用7/6/1天三组日期在新增/编辑保存前验证\n\n## 实现要点\n- detail.vue 抽 validatePublicityDateRange：dayjs diff('day') >=7，不满足 callback 固定提示\n- publicityBeginDate、publicityEndDate 两条 rules 挂同一 validator，trigger:'change'\n- syncPublicityDays 用 watch 监听起止日期写回 form.publicityDays，结束日期变更时主动 validateField('publicityBeginDate')\n\n## 验证与归属\n- 验证：会话 b11d3681 实现 validator、rules trigger 改 change、watch 同步天数并重校验 begin；边界表 08-01~08-08 通过、08-07 与 08-03~08-04 拦截\n- 涉及文件：zhi2-web-admin/src/views/autonomy/publicity/detail.vue\n- 所属项目：园区公共收益；来源会话：b11d3681-1919-4ab7-bb72-0f3cec392874；代码基线：0abcb96"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/fee_share_table_bug.md",
+                "memory_type": "entities",
+                "after": "# 费用分摊表小计错位到操作列\n决算/预算 feeShareTable 动态列出现后，Element 合计行 colgroup 未随列重建，小计数值显示在固定操作列下。\n\n## 问题根因\n- 不是 z-index 穿透，而是列结构在首渲之后才变化，表格 footer 未随列注册重建\n- 动态列通过 v-if 出现且右侧有固定操作列时，小计 colgroup 仍按旧列对齐\n\n## 解决方案\n- 公共 zs-table.vue 的 updated() 调 refreshColumnOrderKey()，仅列结构变化时 bump key 重建 el-table\n- 业务页 getList().finally() 再调 this.$refs.table?.doLayout?.() 做二次布局同步\n- columnOrderKey 不应每次 render 都变，否则全表频繁重建\n\n## 验证与归属\n- 验证：会话 7f7497f6 用户报小计值显示在操作列；修复 zs-table updated 中 refreshColumnOrderKey，决算/预算 feeShareTable finally 中 doLayout；期望审价费 7.11 落审价费列\n- 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、maintenance/final/components/feeShareTable.vue、maintenance/budget/components/feeShareTable.vue\n- 所属项目：园区公共收益；来源会话：7f7497f6-606f-4b8e-8f81-8aeefa11369c；代码基线：0abcb96"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

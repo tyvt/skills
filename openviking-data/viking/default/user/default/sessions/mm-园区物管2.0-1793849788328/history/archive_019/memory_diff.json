@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793849788328/history/archive_019",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T04:40:38.824849+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_align_ticks.md",
+                "memory_type": "entities",
+                "after": "# ECharts 双轴刻度对齐警告修复\n园区物管2.0 资金收入/支出趋势图因双 Y 轴 alignTicks 导致刻度不可读警告，已通过独立计算轴范围修复。\n\n## 问题根因\n- 资金收入/支出趋势图为双 Y 轴（份数 vs 万元）且开启 alignTicks: true\n- 左右轴 yMax 相差很大（如 2000 与 300）时，ECharts 强行对齐刻度算出难读小数刻度并触发 `[ECharts] The ticks may be not readable` 警告\n\n## 解决方案\n- 去掉两个 Y 轴上的 alignTicks: true\n- 新增 computeTrendAxisScale，分别为左右轴计算整齐的 min/max/interval\n- 左侧份数轴用整数步长，右侧万元轴用 1/2/5/10 等友好步长\n- 单位标签对齐逻辑改用计算后的 countScale.max、fundScale.max\n\n## 验证与归属\n- 典型结果：收入图左轴 0–2000（步长400）右轴 0–300（步长60）；支出图左轴 0–600（步长120）右轴 0–80（步长20）\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、mock.js\n- 所属项目：园区物管2.0；来源会话：7ed0f29d-3da8-4470-918b-f0872f9b6a9f；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/search_mode_map_style.md",
+                "memory_type": "entities",
+                "after": "# 搜索失败地图样式错乱修复\n园区物管2.0 地图搜索因过早设置 isSearchMode 导致失败时无结果样式错乱，已加失败回滚修复。\n\n## 问题根因\n- handleSearch 里过早设置 isSearchMode = true，而 mapMarkerMode 在搜索模式下固定用物业管理区域样式（project）\n- 接口失败或无结果时 isSearchMode 未恢复，地图样式错乱\n\n## 解决方案\n- 只在搜索成功且有数据时才设置 isSearchMode = true\n- 搜索失败/无结果/异常时调用 restoreAreaLayerAfterSearchFail()：重置 isSearchMode = false 并重新加载行政区划图层 loadAreaComplexLayer\n- 失败后回到行政区划气泡样式并重新展示区县级数据\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue\n- 所属项目：园区物管2.0；来源会话：a3789a5a-09f2-4f9a-8236-5d37e21277d1；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/attachments_multi_path.md",
+                "memory_type": "entities",
+                "before": "# attachments 多路径字段拆分处理\n园区物管2.0 资产详情弹窗图片不显示，根因是 attachments 字段为逗号分隔多路径，被整体当单 URL 处理。\n\n## 问题根因\n- 后端 attachments 字段是逗号分隔的多条相对路径串（如 /zhi2-dev/...jpg,/zhi2-dev/...jpg）\n- 前端把它整个当一个 src 传给 resolveServerAssetUrl，拼出无效 URL 必然加载失败\n\n## 解决方案\n- 取值侧按逗号 split 成路径数组并 trim 空白，逐条走 resolveServerAssetUrl 拼域名\n- 展示侧单张用 <img>，多张用 el-carousel 轮播\n- 同模块 ParkingAssetDialog、AdvertiseAssetDialog 等弹窗有同样逻辑要一并排查\n\n## 套路\n- 凡是「多附件存在一个字符串字段」的接口，消费前必须先拆分数组，不能直接当单 URL 用\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/HouseAssetDialog.vue、src/utils/resolveServerAssetUrl.js\n- 所属项目：园区物管2.0；来源会话：14e20239-48ca-49b6-aa6c-ccb4e211568e；代码基线：a63180c9a",
+                "after": "# attachments 多路径字段拆分处理\n园区物管2.0 资产详情弹窗图片不显示，根因是 attachments 字段为逗号分隔多路径，被整体当单 URL 处理。\n\n## 问题根因\n- 后端 attachments 字段是逗号分隔的多条相对路径串（如 /zhi2-dev/...jpg,/zhi2-dev/...jpg）\n- 前端把它整个当一个 src 传给 resolveServerAssetUrl，拼出无效 URL 必然加载失败\n\n## 解决方案\n- 取值侧将 assetImageUrl 改为 assetImageUrls，按逗号 split 成路径数组并 trim 空白，逐条走 resolveServerAssetUrl 拼域名\n- 展示侧单张用 <img>，多张用 el-carousel 轮播，可按接口数据正常显示多张图片（如7张）并左右切换\n- 同模块 ParkingAssetDialog、AdvertiseAssetDialog 等弹窗有同样逻辑要一并排查\n\n## 套路\n- 凡是「多附件存在一个字符串字段」的接口，消费前必须先拆分数组，不能直接当单 URL 用\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/HouseAssetDialog.vue、src/utils/resolveServerAssetUrl.js\n- 所属项目：园区物管2.0；来源会话：14e20239-48ca-49b6-aa6c-ccb4e211568e；代码基线：a63180c9a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/map_bubble_color_data_level.md",
+                "memory_type": "entities",
+                "before": "# 地图气泡配色绑定数据层级\n园区物管2.0 地图下钻/上钻时气泡颜色错乱，根因是配色绑定缩放目标层级而非数据层级。\n\n## 问题根因\n- 层级状态（overviewLayerLevel）在缩放瞬间就变，而气泡数据 markList 要等接口返回才更新，两状态不同步\n- 派生的配色提前于数据，出现「街道气泡变蓝」等颜色错乱\n\n## 解决方案\n- 为数据驱动的外观单独建与数据同源的层级标记 markListLayerLevel，只在 markList 真正更新时同步修改，不绑定缩放目标层级\n- 配色 computed 读它（如 areaDrillStack 有下钻一律 green，否则按 markListLayerLevel 决定 blue/green）\n- 接口返回前保持上一级配色，返回后再切换\n\n## 套路\n- 地图/图表的视觉状态永远跟数据走，不跟触发动作的意图走\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue\n- 所属项目：园区物管2.0；来源会话：7f4f3f1b-a0fd-4692-88cc-921192593ee3；代码基线：49e7729ce",
+                "after": "# 地图气泡配色绑定数据层级\n园区物管2.0 地图下钻/上钻时气泡颜色错乱，根因是配色绑定缩放目标层级而非数据层级。\n\n## 问题根因\n- 层级状态（overviewLayerLevel）在缩放瞬间就变，而气泡数据 markList 要等接口返回才更新，两状态不同步\n- 派生的配色提前于数据，出现「街道气泡变蓝」等颜色错乱\n\n## 解决方案\n- 为数据驱动的外观单独建与数据同源的层级标记 markListLayerLevel，只在 markList 真正更新时同步修改，不绑定缩放目标层级\n- 配色 computed 读它（如 areaDrillStack 有下钻一律 green，否则按 markListLayerLevel 决定 blue/green），例如 mapBubbleTone() { if (this.areaDrillStack.length >= 1) return 'green' return this.markListLayerLevel === 'district' ? 'blue' : 'green' }\n- 接口返回前保持上一级配色，返回后再切换\n\n## 套路\n- 地图/图表的视觉状态永远跟数据走，不跟触发动作的意图走\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue\n- 所属项目：园区物管2.0；来源会话：7f4f3f1b-a0fd-4692-88cc-921192593ee3；代码基线：49e7729ce"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

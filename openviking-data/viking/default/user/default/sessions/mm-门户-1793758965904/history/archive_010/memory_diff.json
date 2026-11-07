@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793758965904/history/archive_010",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T02:47:06.321178+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/门户公开页设计稿e2e对齐.md",
+                "memory_type": "entities",
+                "after": "# 门户公开页设计稿对齐 E2E 与分支约定\nzhi2-web-admin 公开门户（publicPortal）UI 与设计稿对齐时的回归测试与批量改动分支约定。\n\n## E2E 回归\n- 回归命令：npm run test:e2e:public-portal，像素相似度门槛约 95%，弹窗态约 85%\n- 视觉测试规格：public-portal-visual.spec.ts；设计稿 fixtures：public-portal-designs.ts；参考脚本：portal-visual-reference.py\n- 新稿目录文件名与 fixtures 不一致时，先做「混合目录 + 按状态过滤」再跑 public-portal-visual.spec.ts\n\n## 分支与报告\n- 大批量 overnight 改动应先切独立分支并提交快照\n- 对齐报告落在 test-results/portal-design-sync-report.md\n- 分支保留待人工 review，不自动合并\n\n## 验证与归属\n- 验证证据：定时任务说明 14 个可匹配状态、test:e2e:public-portal 95%/弹窗 85%、portal-design-sync 分支与报告路径\n- 涉及文件：zhi2-web-admin/tests/e2e/public-portal-visual.spec.ts、zhi2-web-admin/tests/e2e/fixtures/public-portal-designs.ts、zhi2-web-admin/scripts/portal-visual-reference.py、zhi2-web-admin/src/views/home/publicPortal/README.md\n- 所属项目：门户；代码基线：2785dd9；来源会话：2f4babe0-cf16-41eb-a18d-0455aa70129e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/门户g端admin业务板块为空排查.md",
+                "memory_type": "entities",
+                "after": "# 门户 G 端 admin 首页业务板块为空排查\n门户登录后首页中间业务板块显示「暂无可办理的业务板块」且为对内 admin 布局时的根因与排查约定。\n\n## 根因\n- 根因通常是 POST /portal/menu/listPerms 返回的权限里没有任何 portal:bizSection:{functionCode}\n- homeDataMixin 用 perms.includes('portal:bizSection:'+flow.functionCode) 得到 authorizedSectionCodes；三码为 commodityHouseTrade、secondHandHouseTrade、housingRental\n- resolveHomeLayoutVariant 在 G 端（terminalType A/G）、无 kfqy_/jjjg_/zljg_ 等企业角色时走 admin\n- homeLayout.mergeBusinessFlows 在 admin 下只保留有权限的板块，permitted 为空则 businessFlows=[]\n\n## 排查要点\n- 排查权限配置，勿误查统计/常用功能接口\n- 右侧常用功能、顶部 4 项统计不依赖业务板块权限，有内容属正常\n\n## 验证与归属\n- 验证证据：账号 6001164（相城区）界面为 admin 版，中间三大板块被前端全部过滤；右侧常用功能、顶部统计不依赖业务板块权限\n- 涉及文件：zhi2-web-admin/src/views/home/mixins/homeDataMixin.js、zhi2-web-admin/src/views/home/config/homeLayout.js、zhi2-web-admin/src/views/home/index-new.vue\n- 所属项目：门户；代码基线：8c17ba3；来源会话：954a92a5-1315-448d-9cd7-528b5055b21c"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/苏州道扫码登录弹窗轮询缺陷.md",
+                "memory_type": "entities",
+                "after": "# 苏州道扫码登录弹窗轮询与回调缺陷\nSuzhouDaoQrLoginDialog.vue 在关闭/销毁后仍可能轮询与误触发登录成功的 Code Review 缺陷（代码基线 dfee5a6）。\n\n## CRITICAL 缺陷\n- 缺陷①：getQrLoginParam().then 里无条件 startPolling()，弹窗已关仍会 setInterval；应在 then 内校验 visible 或使用 fetchGeneration，仅仍打开时启动轮询\n- 缺陷②：stopPolling 仅 clearInterval，无法取消已发出的 scanLogin；关闭/销毁后 then 仍可能 $emit('login-success')\n- 应维护 pollSessionId 或递增 generation，stopPolling 时失效旧代次，then 比对通过后再 emit；beforeDestroy 忽略过期回调\n\n## 验证与归属\n- 验证证据：Code review FAIL，2 CRITICAL；其余 Vue2 visible.sync、路由白名单 /suzhou-dao/auth-callback 与 login 链路无 CRITICAL\n- 涉及文件：zhi2-web-admin/src/views/login/SuzhouDaoQrLoginDialog.vue、zhi2-web-admin/src/api/security/suzhouDao.js\n- 所属项目：门户；代码基线：dfee5a6；来源会话：5d004e58-38a3-43c3-95ec-476c6ccbe2d8"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/门户横幅动效与无障碍.md",
+                "memory_type": "entities",
+                "before": "# 门户横幅 SVG 动效与无障碍\nUnifiedLogin 平台横幅将文字与图片拆成多行 SVG 后，需同步桌面/移动端入场动效时序并满足无障碍。\n\n## 动效时序\n- intro 与 badge 的淡入动效要在 @media (max-width: 1200px) 为 platform-banner-desc-enter-mobile 补与桌面一致的 animation-delay（如 0.25s）\n- 避免窄屏两行错开时序不一致\n- 桌面端原 animation-delay 过大（文案 1.6s、角标 2.5s）导致入场偏晚，已下调为文案 0.25s、角标 1.05s\n- 横幅已在视口内时，骨架揭开后立即加 platform-banner--intro，避免依赖 IntersectionObserver 高 threshold 延迟触发\n- 横幅在视口下方时，IntersectionObserver 设 threshold: 0 并 rootMargin: '0px 0px 20% 0px' 提前进入可见区即播；仍晚可 delay 改 0 或加大 rootMargin\n\n## 无障碍\n- 装饰性组合图可加 role=\"img\" 保留 aria-label 满足无障碍\n\n## 涉及文件与归属\n- 涉及文件：zhi2-web-admin/src/views/home/UnifiedLogin.vue、zhi2-web-admin/src/views/home/operationGuide/components/OperationGuideHeroCarousel.vue\n- 所属项目：门户；代码基线：f489349\n- 来源会话：6c10489b-ba36-4666-abdd-3b956862c76b、94bd8556-7b38-4bda-afa8-7a8e6c0768fd",
+                "after": "# 门户横幅 SVG 动效与无障碍\nUnifiedLogin 平台横幅将文字与图片拆成多行静态 SVG 后，需同步桌面/移动端入场动效时序并满足无障碍。\n\n## 双 SVG 拆分与无障碍\n- 装饰文案拆为 line1/line2 两张静态 SVG（unifiedLoginAsset 路径：platform_banner_desc_line1.svg、platform_banner_desc_line2.svg）\n- 子 img 使用 alt=\"\"，整段可读文案由外层 platform-banner-desc-wrap 的 aria-label 承担\n- 建议给外层 wrap 加 role=\"img\" 以明确图像组语义，与 badge 区 aria-hidden 分工一致（MEDIUM 建议）\n- 动效挂在 platform-banner-desc-wrap 上而非单张 desc SVG\n\n## 动效时序\n- intro 与 badge 的淡入动效要在 @media (max-width: 1200px) 为 platform-banner-desc-enter-mobile 补与桌面一致的 animation-delay（如 0.25s）\n- 在 @media 内用 animation 简写覆盖桌面规则时，必须同时重写 animation-delay（简写会把未声明的 delay 重置为 0），否则小屏 intro 与 badge 淡入时序会与桌面不一致\n- 避免窄屏两行错开时序不一致\n- 桌面端原 animation-delay 过大（文案 1.6s、角标 2.5s）导致入场偏晚，已下调为文案 0.25s、角标 1.05s\n- 横幅已在视口内时，骨架揭开后立即加 platform-banner--intro，避免依赖 IntersectionObserver 高 threshold 延迟触发\n- 横幅在视口下方时，IntersectionObserver 设 threshold: 0 并 rootMargin: '0px 0px 20% 0px' 提前进入可见区即播；仍晚可 delay 改 0 或加大 rootMargin\n\n## 涉及文件与归属\n- 涉及文件：zhi2-web-admin/src/views/home/UnifiedLogin.vue、zhi2-web-admin/public/assets/images/UnifiedLogin/platform_banner_desc_line1.svg、zhi2-web-admin/public/assets/images/UnifiedLogin/platform_banner_desc_line2.svg、zhi2-web-admin/src/views/home/operationGuide/components/OperationGuideHeroCarousel.vue\n- 所属项目：门户；代码基线：f489349\n- 来源会话：6c10489b-ba36-4666-abdd-3b956862c76b、94bd8556-7b38-4bda-afa8-7a8e6c0768fd、c20adba9-d1e7-4c37-8293-2bf46bd6e0e4"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

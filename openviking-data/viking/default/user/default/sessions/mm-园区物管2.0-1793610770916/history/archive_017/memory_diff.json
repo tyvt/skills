@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_017",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:54:03.649782+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/search_container_deprecated.md",
+                "memory_type": "entities",
+                "after": "# 旧 search-container 组件已废弃\n园区物管2.0 新列表页因复刻旧模板使用未注册的 <search-container> 而报 Unknown custom element，需统一改用 <zs-search-form>。\n## 现象\n- 新写列表页报 [Vue warn] Unknown custom element: <search-container>，伴随 Property or method not defined 等渲染警告。\n- 旧页面模板直接搬运导致引用了不再注册的组件。\n## 根因\n- 项目已从旧 <search-container> 迁移到 <zs-search-form>（由 listMixins 自动注册），旧组件不再注册。\n- 照抄旧页面模板就会得到未注册组件。\n## 解决方案\n- 新列表页统一写 <zs-search-form> 并提供 formItems 计算属性配置搜索项（小区/年度/状态等），配合 listMixins 使用。\n- 从旧页面复刻代码时先核对组件名是否已被公共件替代，不要直接搬运旧标签。\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/mixins/listMixins.js、zhi2-web-admin/src/views/benefit/pubElevMaintenanceNew/index.vue。\n- 所属项目：园区物管2.0；来源会话：31f93d40-0b1b-4532-9404-1e8c008776f8；代码基线：fc994977f。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/appmain_isolation.md",
+                "memory_type": "entities",
+                "after": "# 内容区层叠上下文隔离防止盖住 Navbar\n园区物管2.0 后台地图类页面因主内容区未建立独立层叠上下文，内部高 z-index 元素盖住 Navbar 顶栏，需给 AppMain 加 isolation。\n## 现象\n- 地图类页面（腾讯地图/带高 z-index 搜索栏）里，Navbar 下拉菜单「能展开但点不到」或完全被盖住。\n- 不是 Navbar 自身坏了，而是被透明层盖住。\n## 根因\n- app-main 主内容区没有建立独立层叠上下文，页面内大 z-index（如 1888）与地图内部高 z-index 子元素直接和 Navbar（z-index:9）同根比较，1888 > 9 导致覆盖。\n## 解决方案\n- 布局层根治：AppMain.vue 加 position:relative; z-index:0; isolation:isolate，把主内容区整体压在 Navbar 之下，全局生效。\n- 页面层自查：搜索栏等浮层 z-index 只需盖过同页地图（如 10），不要写 1888；地图容器用 position:absolute; inset:0 铺满，外层 overflow:hidden 防溢出。\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/layout/components/AppMain.vue、Navbar.vue、views/benefit/statisticsMap/index.vue、components/ZsTencentMap。\n- 所属项目：园区物管2.0；来源会话：afe24635-17e4-4855-b880-847a1c56ae6f；代码基线：c97957703。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_tree_layout.md",
+                "memory_type": "entities",
+                "after": "# 区域树布局默认选中与缓存对齐\n园区物管2.0 的 RegionTreeLayout 需默认选中顶级、只展开两级，并将树选中状态接入 listMixins 的 cachedSearchParams 缓存体系。\n## 现象\n- 区域/部门树布局要求默认选中最高上级、只展开到二级、切走切回保持选中、关标签重开回默认、其他页互不影响、树区可滚动。\n- 若 default-expand-level 设 2 会错误展开到第三级。\n## 根因\n- Element Tree 的 default-expand-level 从 1（根）开始计数，想只展开两级应设 1 而非 2。\n- 列表页筛选状态记忆已有 listMixins + common/cachedSearchParams 按 $route.path 缓存体系，树组件不应另造一套。\n## 解决方案\n- 树加载完默认选中 treeData[0] 并触发 nodeClick 按顶级筛选；缓存命中时通过 cachedParentDeptId 传给 region-tree 的 initial-selected-id 恢复选中且不重复触发 getList。\n- 缓存已清（关标签/其他页首开）自然回顶级；滚动容器设在外层 .type-left-tree（overflow-y:auto），内部树包裹层 height:auto 避免双层滚动。\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue、regionTree.vue。\n- 所属项目：园区物管2.0；来源会话：47c0000a-51d9-4a99-82c5-48d1b26e9c97；代码基线：7fe15a8cb。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/platform_config_race.md",
+                "memory_type": "entities",
+                "after": "# 平台配置异步加载竞态误报\n园区物管2.0 中依赖 platformConfig 的组件在路由切换时因配置未就绪连发「获取行政区域配置失败」误报，需收敛副作用并根治竞态。\n## 现象\n- 依赖 platformConfig（如 region）的组件（zs-region-select、zs-search-form 的 isCityLevel、mixins/area.js）路由切换频繁弹「获取行政区域配置失败」，整页刷新后正常。\n- computed 里直接 msgError 把「未加载完」当「失败」，且会随依赖变化连弹多条。\n## 根因\n- App.vue created 里 getPlatformConfig() 异步不等待，platformConfig.region 初始 undefined；页面先渲染并在 computed 做消息提示副作用。\n- 刷新后配置往往先于子页面渲染完成，掩盖竞态。\n## 解决方案\n- computed/created 禁止做消息提示副作用，配置未就绪返回安全默认值，用 watch 在配置到达后同步；提示收敛到 store 层仅缺 region 时提示一次并请求去重。\n- 根治：router 首次鉴权时与区域树等数据一起 await getPlatformConfig，保证首屏前配置就绪；残留提示需查后端是否真返回 region 字段。\n## 关联信息\n- 涉及文件：zs-region-select.vue、zs-search-form.vue、store/modules/app.js、router/index.js、mixins/area.js。\n- 所属项目：园区物管2.0；来源会话：a4e30d2e-90bf-4fad-ba71-05964bda5d33；代码基线：49e7729ce。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、sidebar_recursive_menu、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）\n- 图表与样式类：echarts_donut_label、chart_amount_format、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、zs_table_summary（zs-table小计合计双来源）",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、sidebar_recursive_menu、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）、search_container_deprecated（旧search-container废弃改zs-search-form）、appmain_isolation（AppMain加isolation隔离层叠上下文）\n- 图表与样式类：echarts_donut_label、chart_amount_format、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、zs_table_summary（zs-table小计合计双来源）、platform_config_race（平台配置异步加载竞态误报）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

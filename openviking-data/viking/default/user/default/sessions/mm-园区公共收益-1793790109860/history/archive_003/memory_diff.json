@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793790109860/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T11:08:20.902219+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/imageviewer_overlay_zindex.md",
+                "memory_type": "entities",
+                "after": "# ImageViewer 预览被附件抽屉遮挡修复\n园区公共收益项目公共设施设备维护详情等页面，从\"附件信息\"抽屉打开的图片预览被抽屉盖住的根因与修复。\n\n## 根因\n- 图片预览用全局 ImageViewer 组件（src/components/ImageViewer/index.vue，由 App.vue 挂载、store 的 preview/openPreview 驱动），底层为 el-dialog，z-index 由 Element 的 PopupManager 从 2000 起自动分配\n- \"附件信息\"抽屉（src/components/OperationBtnGroup/attachmentDraw.vue）CSS 写死 .attachment { z-index: 3000 !important } 且不走 PopupManager\n- 预览弹窗和遮罩永远被压在抽屉下面，右侧 480px 宽抽屉盖住预览图，全局复现\n\n## 修复要点\n- 只改 src/components/ImageViewer/index.vue\n- 新增 raiseAboveOverlay()：预览打开后 nextTick 把弹窗 wrapper 的 z-index 设为 3002、遮罩 .custom-image-viewer-mask 设为 3001\n- 每次打开都重新设置，保证层级高于抽屉\n\n## 涉及文件\n- src/components/ImageViewer/index.vue\n- src/components/OperationBtnGroup/attachmentDraw.vue\n- App.vue\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=园区公共收益\n- 所属项目：园区公共收益；来源会话ID：3c99fd44-d5db-4c60-9901-585c3fe1f2e3；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/publicity_period_type_bug.md",
+                "memory_type": "entities",
+                "after": "# 维修资金支出公示周期年份类型比较修复\n园区公共收益项目维修资金支出公示详情选择\"公示周期\"当前年份时校验失败的根因与修复。\n\n## 根因\n- zhi2-web-admin/src/views/maintenance/mainFundUsePublicity/detail.vue 中公示周期校验存在类型比较 bug\n- zs-date-picker 配置 value-format=\"yyyy\"，form.publicityPeriodYear 为字符串 \"2026\"\n- 校验里 currentYear === year 严格相等，数字 2026 === \"2026\" 恒为 false\n- \"当前年份\"分支永远执行不到，选当前年份任何周期被判无效弹提示；往年可选因走 currentYear > year 宽松比较分支\n- 校验逻辑本身没写反，纯数字与字符串比较的类型问题\n\n## 修复要点\n- 只改 detail.vue 第 174 行（watcher form.publicityPeriod）\n- 改前：const year = this.form.publicityPeriodYear\n- 改后：const year = parseInt(this.form.publicityPeriodYear, 10); if (isNaN(year)) { return } 附带空值保护\n\n## 涉及文件\n- zhi2-web-admin/src/views/maintenance/mainFundUsePublicity/detail.vue\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=园区公共收益\n- 所属项目：园区公共收益；来源会话ID：aeffa2e1-b013-43b5-946d-0c9ceb6f5f63；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

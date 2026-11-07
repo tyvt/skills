@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_010",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:36:58.617557+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_border_stack.md",
+                "memory_type": "entities",
+                "after": "# 空表格底边框叠加收敛\n园区物管2.0 中 el-table 空数据时底边框缺失/偏粗/操作列下多线的根因与收敛方案。\n\n## 问题根因\n- 空表底边由最多 5 处来源叠加：通用 `.el-table { border-bottom }`、空表修复 `.el-table::before`、固定列 `.el-table__fixed-right::before`、合计行 footer 单元格 border-bottom、zs-table.vue 内重复样式。\n- 页面级/外层容器样式覆盖无效，因改不动这些内部来源。\n\n## 解决方案\n- 空表底边只保留 `.el-table::before` 这一条 1px，其余关掉：去空表 border-bottom、隐藏固定列 ::before、去合计行单元格底边、删 zs-table.vue 内重复样式。\n- 修改须落在组件/全局样式层（element-ui.scss、index.scss、zs-table.vue），逐页写样式无效。\n\n## 排查套路\n- 用户怀疑「边框重合」时，先穷举同一视觉位置所有 border/伪元素来源再逐条裁剪，而非继续加样式覆盖。\n- 涉及文件：pubUseMoneyApply/index.vue、zs-table.vue、element-ui.scss、index.scss、zs-operate-column.vue；所属项目：园区物管2.0。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_number_hide.md",
+                "memory_type": "entities",
+                "after": "# zs-input-number 数字不显示修复\n园区物管2.0 弹窗表单中 zs-input-number 数量选择器数字不显示的根因与适配规则。\n\n## 问题根因\n- 组件默认 controls-position=\"right\"（按钮在右），但 padding-left 仍按两侧按钮 56px 写死，覆盖 Element UI 默认内边距，数字区被挤压/遮挡。\n- 页面在 el-form-item__content 加 display:flex 并强制 .el-input width:100%，与单位「个」挤同行时宽度计算异常。\n\n## 解决方案\n- 公共组件层：zs-input-number 按 controls-position 区分内边距（右侧按钮用 15px/50px，两侧按钮保持 56px/56px）；新增 controls-position 形态须同步核对内边距适配。\n- 页面层：不在 el-form-item__content 做全局 flex+width:100% 覆盖，「控件+单位」组合统一用 input-with-unit 类容器包裹（同 input-with-actions 思路）。\n\n## 适用场景\n- 所有被 flex 容器包裹的数值/单位组合控件出现内容不可见的场景。\n- 涉及文件：zs-input-number.vue、parkingManage/subDialog.vue、pubAdvertiseSpace/advertiseDialog.vue、zs-search-form.vue；所属项目：园区物管2.0。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/unused_sprite_cleanup.md",
+                "memory_type": "entities",
+                "after": "# 未消费 sprite 生成链路整链清理\n园区物管2.0 构建自动生成 sprite.svg 反复出现在 git diff 的排查与清理套路。\n\n## 问题根因\n- sprite.svg 由自研 generateSpritePlugin / generate-sprite.cjs 每次构建自动重新生成，而项目图标链路已由 vite-plugin-svg-icons（public/assets/images/svg/ + virtual:svg-icons-register）承担，sprite 链路完全未被消费。\n\n## 解决方案\n- 确认无消费方后整链清理：移除 vite.config.js 的 generateSpritePlugin、删除 scripts/generate-sprite.cjs 与 public/assets/images/sprite.svg（约 1.8MB）、删除父仓库根 generate-sprite.js / svg.sh / icons.js；保留 .gitattributes（源图标行尾 LF 仍有用）。\n- 清理后若本地 dev server 仍在跑，必须先停掉再启动，否则旧进程继续生成 sprite.svg 让人误判清理无效。\n\n## 通用套路\n- 构建插件自动生成的产物反复出现在 git diff 时，先判断产物是否仍被消费，未被消费就整链删除而非加 .gitignore。\n- 涉及文件：vite.config.js、generate-sprite.cjs、sprite.svg、generate-sprite.js；所属项目：园区物管2.0。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite地图代理路径适配.md",
+                "memory_type": "entities",
+                "before": "# Vite地图代理路径适配\n园区物管2.0 在 Vite base='./' 相对路径部署下，第三方地图区划代理请求的路径适配套路。\n## 问题背景\n- 静态 SVG 地图替换为腾讯行政区划接口（ws/district/v1）后，页面一直停留在「地图数据加载中」，控制台无报错，DOM 占位盒尺寸正常。\n- 根因：base 配置为 './'，代理转发代码把区划请求写死成绝对路径 /map/...，部署子路径时浏览器把 /map 解析到域名根，请求 404，fetch 被静默吞掉。\n- Vite dev proxy key 本身必须以 / 开头，不能因 base 是 './' 就写成相对形式。\n## 解决方案\n- 抽 getDistrictProxyPrefix()，按 BASE_URL 是否为 './' 统一返回 './map'，页面 fetch 用 './map/ws/district/v1/...' 相对路径。\n- vite.config.js 抽出共享 viteBase 常量，代理 key 仍固定 '/map'，rewrite 按 getMapProxyContext(viteBase) 动态剥离前缀。\n- 以后 base 改子路径（如 /admin/）只需同步改 viteBase 一处。\n## 排查要点\n- 遇到「无报错一直加载」，先用 getBoundingClientRect 确认容器有尺寸，再看网络面板里区划请求实际解析到的 URL。\n## 关联信息\n- 涉及文件：tencentDistrictBoundary.js、vite.config.js、mapOverview/index.vue。\n- 所属项目：园区物管2.0（zhi2-web-admin），基线 c97957703。",
+                "after": "# Vite地图代理路径适配\n园区物管2.0 地图区划（腾讯行政区划）数据拉取在 Vite 相对路径部署下的适配演进与最终方案。\n\n## 问题背景\n- 早期 base='./' 部署时，代理转发写死绝对路径 /map/... 导致子路径下 404 静默失败，后用 getDistrictProxyPrefix 返回 './map' 相对路径暂解。\n- 后续生产环境报 `Unexpected token '<', \"<!DOCTYPE\"... is not valid JSON`：tencentDistrictBoundary.js 用 `import.meta.env.DEV` 分流，dev 走 fetch('./map/...') 依赖 Vite /map 代理，生产无该代理，请求落 SPA index.html 被 res.json() 解析报错。\n- 更隐蔽：terser 压缩后 DEV 分支被错误保留、JSONP 分支被当死代码删除，生产包实际跑开发分支。\n\n## 解决方案\n- 区划 GeoJSON 等依赖 dev 代理的第三方数据拉取，统一改为 JSONP 直连腾讯行政区划 API（apis.map.qq.com），与 statisticsMap/map.vue 同套路，彻底摆脱本地代理依赖。\n- 修复后重新构建并核对产物 chunk 含 JSONP 调用、不含 fetch('./map')；部署整包替换 dist 并清 CDN/浏览器缓存。\n- 前置确认：后台 platformConfig.region 配 6 位 adcode、腾讯地图 Key 开通 WebServiceAPI（JSONP 必需）。\n\n## 排查要点\n- 生产报 HTML 解析错误先查网络请求是否落到 index.html；用控制台确认腾讯接口具体错误（Key 权限/配额）而非 HTML 解析。\n- 涉及文件：tencentDistrictBoundary.js、mapOverview/index.vue、statisticsMap/components/map.vue；所属项目：园区物管2.0（zhi2-web-admin）。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 数据地图下钻传参约定（regionCode 恒传 + dimension 分层）见实体「数据地图下钻传参约定」。\n- 腾讯地图区划轮廓接入与 x/y 坐标语义见实体「腾讯地图区划接入」。\n- 区域树侧栏布局收敛为 RegionTreeLayout 公共组件见实体「region_tree_layout」。\n- 地图区域信息框固定左上角轮播偏好见偏好「地图信息框交互偏好」。\n- zs-table 固定列遮挡小计行分隔线解法见实体「zstable_subtotal_divider」。\n- 合并冲突双重自检工作流见实体「merge_conflict_selfcheck」。\n- 表格自定义列配置刷新丢失修复见实体「table_config_refresh」。\n- 环形图全 0 占位渲染策略见实体「donut_zero_placeholder」。\n- terminalType 残留态导致 G 端误弹 B 端弹窗的修复见实体「terminaltype_residual_session」。\n- 弹窗复用详情页容器类样式错乱的双形态约定见实体「dialog_dual_layout」。\n- 多分支修复-确认-串行合并约定见实体「branch_serial_merge」。",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 数据地图下钻传参约定（regionCode 恒传 + dimension 分层）见实体「数据地图下钻传参约定」。\n- 腾讯地图区划轮廓接入与 x/y 坐标语义见实体「腾讯地图区划接入」。\n- 区域树侧栏布局收敛为 RegionTreeLayout 公共组件见实体「region_tree_layout」。\n- 地图区域信息框固定左上角轮播偏好见偏好「地图信息框交互偏好」。\n- zs-table 固定列遮挡小计行分隔线解法见实体「zstable_subtotal_divider」。\n- 合并冲突双重自检工作流见实体「merge_conflict_selfcheck」。\n- 表格自定义列配置刷新丢失修复见实体「table_config_refresh」。\n- 环形图全 0 占位渲染策略见实体「donut_zero_placeholder」。\n- terminalType 残留态导致 G 端误弹 B 端弹窗的修复见实体「terminaltype_residual_session」。\n- 弹窗复用详情页容器类样式错乱的双形态约定见实体「dialog_dual_layout」。\n- 多分支修复-确认-串行合并约定见实体「branch_serial_merge」。\n- 地图区划数据生产报错与 JSONP 直连修复见实体「Vite地图代理路径适配」。\n- 空表格底边框多来源叠加收敛见实体「table_border_stack」。\n- zs-input-number 数字不显示内边距适配见实体「zs_number_hide」。\n- 未消费 sprite 生成链路整链清理见实体「unused_sprite_cleanup」。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-昆山市民-1793812170720/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T17:21:33.534550+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/vote_detail_undefined_id_bug.md",
+                "memory_type": "entities",
+                "after": "# 决策详情因 decisionRangeId=undefined 无数据 Bug\n昆山市民「已完成」列表点击「决策详情」进入后页面无数据，根因为 URL 误传 decisionRangeId=undefined 字符串。\n\n## 问题根因\n- 跳转详情页时 URL 拼接 `decisionRangeId=${item.decisionRangeId}`，但列表接口未返回该字段\n- URL 实际变为 `...&decisionRangeId=undefined`，详情页将其当作有效 ID 传给 `getDecisionDetail`\n- 后端查不到数据，页面全空；`DetailTop` 在 `decisionType` 为空时误显示「排序表决」\n\n## 修复内容\n- `votedetail.vue`：过滤 `\"undefined\"`/`\"null\"` 等无效参数，仅合法 `decisionRangeId` 才传给接口\n- `index.vue`：仅当列表项确有 `decisionRangeId` 时才拼到 URL\n- `DetailTop.vue`：修正决策类型展示逻辑，避免无数据时误显示「排序表决」\n\n## 验证与归属\n- 所属项目：昆山市民；代码基线：none\n- 来源会话ID：3942ce22-16bf-4c69-b5d2-a3469d6db4fb\n- 涉及文件：src/pages_vote/vote/votedetail.vue、src/pages_vote/vote/index.vue、src/pages_vote/vote/components/DetailTop.vue、src/pages.json、src/stores/vote.js、src/api/modules/vote.js"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/election_h5_blank_bug.md",
+                "memory_type": "entities",
+                "after": "# 业委会选举 H5 参与页空白 Bug\n昆山市民业委会选举在 H5 中点击参与决策、阅读选举须知后下一页空白，根因为 H5 误走登录逻辑。\n\n## 问题根因\n- `Participate.vue` 在 H5 中也调用 `loginWithWxCode()`，但 H5 不持久化 Token 且内页跳转 URL 不带 `code`\n- `loginWithWxCode()` 因缺 code 失败，`loadElectionDetail` 不执行，`showPage` 一直为 `false`，页面只剩背景图\n- `votedetail.vue` 在 H5 上直接加载数据不走登录，选举页此前未对齐该逻辑\n\n## 修复内容\n- `Participate.vue`：H5 与小程序分开处理，H5 直接 `loadElectionDetail`，小程序先 `loginWithWxCode().then(...)`\n- `wxLogin.js`：H5 防御性修复，URL 缺失 code 时不强制走登录\n\n## 验证与归属\n- 所属项目：昆山市民；代码基线：none\n- 来源会话ID：efd7fd9b-1f86-49c6-8815-9bbd75f57fcb\n- 涉及文件：src/pages_election/election/Participate.vue、src/pages_vote/vote/votedetail.vue、src/utils/wxLogin.js"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/pdfjs_at_polyfill.md",
+                "memory_type": "entities",
+                "before": "# 物业合同PDF预览 Array.at 兼容问题\n微信等移动端 WebView 不支持 ES2022 的 `Array.prototype.at`，导致 pdfjs-dist 打开物业合同 PDF 报错。\n\n## 问题根因\n- 微信内置浏览器等移动端 WebView 不支持 ES2022 的 `Array.prototype.at`。\n- `pdfjs-dist` 内部使用 `.at()`，打开物业合同 PDF 时报 `t.at is not a function`。\n\n## 修复方案\n- 新增 `src/utils/pdfPolyfill.js`，在加载 pdfjs 前为 `Array`/`TypedArray` 补 `.at`。\n- `filePreview.vue` 最先引入 polyfill，并改用 `pdfjs-dist/legacy/build`。\n- 保留 `globalThis.pdfjsWorker` 注册以免 worker 加载失败。\n\n## 验证与归属\n- 验证：会话 d22bb0e1 最终结论，含报错与修复要点。\n- 涉及文件：`src/utils/pdfPolyfill.js`、`src/pages/common/filePreview.vue`、`src/pages_contract/detail.vue`。\n- 所属项目：昆山市民；代码基线：75db5a8；来源会话ID：d22bb0e1-fc61-42cb-bfc2-13d1d148fd21。",
+                "after": "# 物业合同PDF预览 Array.at 兼容问题\n微信等移动端 WebView 不支持 ES2022 的 `Array.prototype.at`，导致 pdfjs-dist 打开物业合同 PDF 报错。\n\n## 问题根因\n- 微信内置浏览器等移动端 WebView 不支持 ES2022 的 `Array.prototype.at`。\n- `pdfjs-dist` 内部使用 `.at()`，打开物业合同 PDF 时报 `t.at is not a function`。\n\n## 修复方案\n- 新增 `src/utils/pdfPolyfill.js`，在加载 pdfjs 前为 `Array`/`TypedArray` 补 `.at`。\n- `filePreview.vue` 最先引入 polyfill，并改用 `pdfjs-dist/legacy/build`。\n- 保留 `globalThis.pdfjsWorker` 注册以免 worker 加载失败。\n\n## 验证与归属\n- 验证：会话 d22bb0e1 最终结论，含报错与修复要点。\n- 涉及文件：`src/utils/pdfPolyfill.js`、`src/pages/common/filePreview.vue`、`src/pages_contract/detail.vue`、`src/utils/index.js`、`package.json`、`vite.config.js`。\n- 所属项目：昆山市民；代码基线：75db5a8；来源会话ID：d22bb0e1-fc61-42cb-bfc2-13d1d148fd21。"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/vote_detail_nan_bug.md",
+                "memory_type": "entities",
+                "deleted_content": "# 已完成决策详情空白与 NaN Bug\n昆山市民「我的决策 → 已完成 → 决策详情」字段全空、面积显示 NaN 的根因与修复套路。\n\n## 问题根因\n- `stores/vote.js` 的 `getVoteDetail` 拉主详情后串行调 `getVoteChart`\n- 排序表决等类型在已完成态下图表接口易失败，未捕获导致整个 action 中断，`voteDetail` 从未写入\n- 页面 `roundUp(undefined, 2)` 等格式化直接出 NaN\n\n## 修复套路\n- `getVoteChart` 失败只记空图表、不 reject 主流程\n- 主详情无数据时回退 `selectDecisionViewById`；户数/面积/权数优先图表聚合字段，否则用详情接口字段\n- 列表跳 `votedetail` 必须带 `decisionRangeId`（列表项有该字段时），详情请求同步传参\n- 展示层对空面积做兜底，禁止裸 `roundUp`\n\n## 验证与归属\n- 所属项目：昆山市民；代码基线：c8c1c24\n- 来源会话ID：b9110830-8233-4a5d-a89c-cf8b384f6805\n- 涉及文件：src/stores/vote.js、src/pages_vote/vote/votedetail.vue、src/pages_vote/vote/index.vue、src/api/modules/vote.js"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793668817929/history/archive_017",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T01:53:55.674144+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_suzhoudao_login.md",
+                "memory_type": "entities",
+                "after": "# 苏周到扫码登录三接口迁移\n门户苏周到扫码登录 API 前缀由 `/security/ctAuth/suzhouDao/*` 迁至 `/portal/login/external/suzhouDao/*`。\n\n## 迁移范围\n- 涉及 `getQrLoginParam`、`scanLogin`、`suzhouDao/login` 三个函数，通常集中在 `src/api/security/suzhouDao.js`\n- 浏览器最终 URL 形如 `/api/v3.0/portal/login/external/suzhouDao/...`\n\n## 请求拦截\n- `request.js` 对以 `/portal/` 开头的 URL 自动切到 `VITE_APP_PORTAL_BASE_URL` 并走 POST，无需手写 `/api/v3.0`\n- vite/nginx 的 `/api/v3.0` 代理一般已存在\n\n## 联调注意\n- `scanLogin` 若后端要求 query 的 `qrCodeId` 而非 JSON body 会 400，可加入 `portalApiRewrite.js` 的 NO_BODY 类处理\n- 扫码弹窗与授权回调页逻辑可不动\n\n## 涉及文件与归属\n- zhi2-web-admin/src/api/security/suzhouDao.js\n- zhi2-web-admin/src/utils/request.js\n- zhi2-web-admin/src/utils/portalApiRewrite.js\n- 所属项目：门户；来源会话 session_1049d6185d5fcfff06cfb94108b48261；代码基线 dfee5a6"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/门户项目包管理工具偏好.md",
+                "memory_type": "preferences",
+                "after": "- 门户 monorepo 安装依赖统一用 `npm install`，不包装 bun install，避免 `bun.lock` 与 `package-lock` 混用导致 node_modules 漂移。\n- 运行分岔：本机有 Bun 的成员用 `bun run dev` 加速开发服，无 Bun 的同事继续用 npm/pm 脚本。\n- `bun run` 直接解析已有 `node_modules`，不要求先 `bun install`；缺失依赖时报找不到 vite，补一次 `npm install` 即可。\n- `bun install` 可选且应 gitignore `bun.lock`；`BUN_RUNTIME=1` 路径（如 `bun --bun run dev`）只依赖 Bun 运行时，与安装方式无关。\n- 策略来源：会话 46380d5c，用户要求 bun 启动但团队可回退 node、仅改开发服。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_v3_sync_e2e.md",
+                "memory_type": "entities",
+                "before": "# 门户V3组件同步与e2e登录适配\n门户 zhi2-web-admin 作为父仓子模块，常从苏州市房地产监测V3同期拷贝公共组件与全局样式，同步后需验证编译并适配e2e登录步骤。\n\n## 同步与验证流程\n- 常从 V3 拷贝 `src/components`、`src/styles/index.scss`、`detailLayout.js` 等公共组件与全局样式\n- 同步后应运行 `npm run build` 验证编译是否通过\n- 子模块提交后需更新父仓「门户」的子模块指针\n\n## e2e登录不一致问题\n- V3 侧 e2e 用例默认按传统 `.login-form` 登录页编写\n- 门户对外入口已是 `UnifiedLogin.vue`，直接跑 V3 迁来的 list-table 等 e2e 可能因选择器不一致而红测\n- 稳定绿测需在 `e2e/fixtures/auth-helpers.js` 增加门户 UnifiedLogin 登录步骤，或单独维护登录 fixture\n- 需在 `e2e/.env.e2e` 配置可访问后端的账号后再跑依赖真实接口的用例\n\n## 涉及文件与归属\n- 涉及 zhi2-web-admin/src/components、src/styles/index.scss、e2e/fixtures/auth-helpers.js、src/views/home/UnifiedLogin.vue、package.json\n- 所属项目：门户；来源会话 f1dec228-6407-422d-9866-035a036d169f；代码基线 b84b4e7",
+                "after": "# 门户V3组件同步与e2e登录适配\n门户 zhi2-web-admin 作为父仓子模块，常从苏州市房地产监测V3同期拷贝公共组件与全局样式，同步后需验证编译并适配e2e登录步骤。\n\n## 同步与验证流程\n- 常从 V3 拷贝 `src/components`、`src/styles/index.scss`、`detailLayout.js` 等公共组件与全局样式\n- 同步后应运行 `npm run build` 验证编译是否通过\n- 子模块提交后需更新父仓「门户」的子模块指针\n- 例：V3 公共组件同步至 `zhi2-web-admin` 子模块指针 `2fab43729` 后 `npm run build` 通过\n\n## e2e登录不一致问题\n- V3 侧 e2e 用例默认按传统 `.login-form` 登录页编写\n- 门户对外入口已是 `UnifiedLogin.vue`，直接跑 V3 迁来的 list-table 等 e2e 可能因选择器不一致而红测\n- 稳定绿测需在 `e2e/fixtures/auth-helpers.js` 增加门户 UnifiedLogin 登录步骤，或单独维护登录 fixture\n- 须于 `e2e/.env.e2e` 配账号后跑 `npm run test:e2e:list-table-column-width` 等依赖真实接口的用例（如 `e2e/list/table-column-width.spec.js`）\n- 需在 `e2e/.env.e2e` 配置可访问后端的账号后再跑依赖真实接口的用例\n\n## 涉及文件与归属\n- 涉及 zhi2-web-admin/src/components、src/styles/index.scss、src/utils/detailLayout.js、e2e/fixtures/auth-helpers.js、e2e/list/table-column-width.spec.js、playwright.config.ts、src/views/home/UnifiedLogin.vue、package.json（含「门户」与「苏州市房地产监测V3」两仓对应路径）\n- 所属项目：门户；来源会话 f1dec228-6407-422d-9866-035a036d169f；代码基线 b84b4e7（对话注 none）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_home_flows.md",
+                "memory_type": "entities",
+                "before": "# 首页存量房业务流程步骤权威来源\n门户登录后首页业务中心底部步骤条以 homeLayout.js 的 DEFAULT_BUSINESS_FLOWS 为权威，接口仅补充跳转字段。\n\n## 修改规则\n- 改步骤条需改 src/views/home/config/homeLayout.js 中的 DEFAULT_BUSINESS_FLOWS（含 functionCode、顺序、文案）\n- 渲染链 mergeBusinessFlows → mergeFlowSteps 以本地 defaults 为步骤结构/顺序/文案权威\n- 接口下发的 businessCenters 仅用于补充跳转类字段，不能指望后端覆盖步骤条结构\n- 即使后端未下发或下发旧数据，本地改 defaults 也会生效\n\n## 验收与兼容\n- 调整菜单后可用模块级脚本打印步骤数与名称链做快速验收（存量房步骤数 5：经纪机构管理 → … → 资金托管）\n- 图标映射表（如 BIZ_ICON_BY_CODE）里未再使用的 code 可保留，避免历史菜单数据仍引用时缺图标\n\n## 涉及文件与归属\n- 涉及 zhi2-web-admin/src/views/home/config/homeLayout.js\n- 所属项目：门户；来源会话 835934a3；代码基线 8c17ba3",
+                "after": "# 门户首页业务中心接口全量驱动\n门户 B 端首页三块业务中心（商品房/存量房/住房租赁）在 `/portal/home/functions` 配置 `data.businessCenters` 时，以接口为唯一展示来源。\n\n## 数据映射规则\n- `fetchFunctions`/`mapFlowsFromApi` 直接映射标题、副标题、步骤名称、数量、图标与顺序\n- 不再走 `mergeBusinessFlows → mergeFlowSteps` 用 `DEFAULT_BUSINESS_FLOWS` 覆盖文案或裁掉非默认步骤\n- 接口空或异常时才回退 `DEFAULT_BUSINESS_FLOWS`\n\n## 显隐与图标\n- 显隐按权限：`listPerms` 的 `portal:bizSection:{functionCode}` 过滤\n- 租赁板块兼容后端 `leaseBusiness` 编码，别名 `leaseBusiness → housingRental` 用于命中租赁橙主题\n- 步骤图标：服务端 `functionIcon` 经 `resolveServerAssetUrl` 解析，缺省回退 `BIZ_ICON_BY_CODE`\n\n## 维护注意\n- 与早期「改 homeLayout 本地 defaults 即生效」方式相反，改菜单应优先改后端配置\n- 验证证据：会话 f4b6f504 用户确认接口读取已配置，移除 merge 强制覆盖\n\n## 涉及文件与归属\n- zhi2-web-admin/src/views/home/mixins/homeDataMixin.js\n- zhi2-web-admin/src/views/home/config/homeLayout.js\n- zhi2-web-admin/src/api/portal/home.js\n- 所属项目：门户；来源会话 f4b6f504-0c81-40e8-a14a-fc8a60a930be；代码基线 fd73e47"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

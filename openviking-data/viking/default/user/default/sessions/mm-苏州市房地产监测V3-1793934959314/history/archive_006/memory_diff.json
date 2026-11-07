@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793934959314/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T03:33:12.154760+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/bug/permit_cancel_fix.md",
+                "memory_type": "entities",
+                "after": "# 预售注销与许可模块栅格偏移修复\n苏州市房地产监测V3 修复预售注销（permitCancel）与预售许可（permitExtend）详情页中「统一社会信用代码」因前一行占满 24 栅格导致换行后从第 1 列排起、无法与上行第 3 列纵向对齐的问题。\n\n## 问题根因\n- 「行政区划 + 项目坐落（占 2 列）」一行占满 24 栅格后，「统一社会信用代码」换到下一行仍从第 1 列开始排，无法与上一行第 3 列（如「项目名称」「总户数」）纵向对齐\n\n## 修复方案\n- 查看态：在 DetailTemplate 增加 gridOffset，注销详情通过 buildCancelBasicInfoView 为「统一社会信用代码」设置 gridOffset: { lg: 16 }，使其落在第 3 列\n- 栅格常量与预售许可模块一致（lg: 8 / lg: 16）\n- 编辑态：补上「预售批次」与查看态同为第一行三列（许可证号 / 批次 / 项目名称）\n- 编辑态第二行：行政区划 + 项目坐落（16）；第三行：大屏下用 lg=16 占位 + 统一社会信用代码（lg=8），对齐第 3 列\n\n## 验证与归属\n- 涉及文件：presale/permitCancel/detail.vue、presale/permitExtend/detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：db3f4214-4b5b-4cbc-b081-3c46c8cde75a；代码基线：none\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/company_change_fix.md",
+                "memory_type": "entities",
+                "after": "# 企业信息变更统一管理列表查看页未授权修复\n苏州市房地产监测V3 修复企业信息变更统一管理列表（companyChangeManage）点击「查看」时报「页面未授权 / 详情页未授权或不存在」的问题。\n\n## 问题根因\n- companyChangeManage 列表只有 index.vue，没有自己的详情页；设计是点「查看」时用接口返回的 row.path（必要时配合 row.busCode）跳到对应业务的原详情页\n- 工作区曾删掉自定义 handleView，点击走 listMixins 默认逻辑，通过 buildDetailNavigation 找不存在的 company/companyChangeManage/detail，导致未授权报错\n\n## 修复方案\n- 在 index.vue 恢复 handleView：有 busCode 时走 navigateToTodoTask（按当前用户菜单解析路由），否则 router.push(row.path)\n- 恢复 BIZ_STATE_OPTIONS：列表/筛选里的业务状态选项（之前误删导致 bizStateOptions 为空）\n- 若一进列表就报错，多为接口权限问题，需账号具备 company:companyChangeManage:list\n\n## 验证与归属\n- 涉及文件：company/companyChangeManage/index.vue、store/modules/permission.js、mixins/listMixins.js\n- 所属项目：苏州市房地产监测V3；来源会话ID：fc9f2f5b-7f58-47f1-be73-e59f5fd42d8b；代码基线：none\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/qualification_echo_fix.md",
+                "memory_type": "entities",
+                "after": "# 企业基本信息资质/要件回显修复\n苏州市房地产监测V3 完成企业基本信息资质/要件回显修复，涉及工具函数与详情组件改造。\n\n## 改动点\n- registerQualification.js：新增 extractQualificationListFromPayload（同时识别 qualificationList 与 qualificationRecordList）；新增 resolvePrimaryQualificationFromPayload（取首条有效资质供只读详情使用）\n- DeveloperBasicInfoDetail.vue：detailCallback 优先从 getOwnCompany 的 data / companyRecord 解析资质；无有效行时再走 pageNoPermissions；licenseBusCode 改为 resolveLicenseAppendixBusCode(this.$route)，去掉错误的 '040100'\n- toB/companyRecord/detail.vue 同步调整\n\n## 验证与归属\n- 涉及文件：utils/registerQualification.js、company/companyManagement/components/DeveloperBasicInfoDetail.vue、toB/companyRecord/detail.vue、register/components/QualificationFormSection.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：2cb9ae76-38aa-472e-8890-53457650d811；代码基线：none\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/default/详情页表单label位置.md",
+                "memory_type": "preferences",
+                "after": "- 变更备案类详情页（toB/companyRecord/detail.vue、toB/agencyRecord/detail.vue 等四个页面）表单 label-position 由 right 改为 left，标签左对齐。\n- zs-form.vue 在 detail-from-container 场景下仅当显式传入 label-position=\"left\" 时透传 left 并保留 labelWidth（默认 auto），其余详情页仍强制 top 并去掉 labelWidth。\n- 全局样式：详情里 label-left 表单项标签左对齐；非 top/left 的表单仍右对齐标签文字；「标签在上」叠放样式仅作用于 .el-form--label-top，避免把 label-left 打成纵向布局。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T20:14:16.285499+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/entry_detail_fix.md",
+                "memory_type": "entities",
+                "after": "# 开发企业入网认证详情请求修复\n苏州市房地产监测V3 中开发企业入网认证页因 formMode 落成 add 导致详情接口未请求，已在 created/activated 调用 getEntryNetworkDetail 修复。\n\n## 问题根因\n- 企业入网菜单路由多为 `/kfqy/companyRecord`（无 `tableid`），全局 `formMode` 落为 **`add`**\n- `detailMixins` 仅在 **`view`** 时调 `init()`，导致 `POST /company/companyRecord/entryNetwork/detail` 未发，页面全显示 `-`\n\n## 修复内容\n- 在 `DeveloperBasicInfoDetail` 的 `created` 及 `keep-alive` 的 `activated` 中，入网认证页调用 `getEntryNetworkDetail()`（企业端不传 `companyRecordId`）\n- 合并并发请求：短时间重复进入/刷新共用同一请求，避免重复调 detail\n- 解析 `EntryNetworkDetailVo`：优先 `data.companyRecord`，否则顶层字段并排除 `qualificationList` 等，避免塞入企业主表\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：前端联调文档-开发企业入网.md、zhi2-web-admin、zhi2-web-admin/src/views/company/institutionRegister/detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：3ec7aa54-6427-4d87-9697-2963bbe64ad2；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/building_icon_fix.md",
+                "memory_type": "entities",
+                "after": "# 楼栋表图标排版修复\n苏州市房地产监测V3 中楼栋表因图标数量与宽度不当导致拥挤，已改为默认 short 图例并恢复 110px 宽度换行。\n\n## 问题根因\n- 旧版苏州图例仅 4 项（可售、合同草签、预备案、合同备案），单元格隐藏部分只留 2 图标\n- V3 用 `short+long`（8 项）画出 6 图标显拥挤\n- 原 `.table-icon` 固定 110px 宽会换行，后改 `width:auto` 致 6 图标挤一行\n\n## 修复内容\n- 默认与旧苏州一致：只用 **short** 图例；单元格用 `cellStateList`（2 图标位）\n- 恢复 **110px** 图标区宽度与换行，室号居中、图标下方居中\n- 需自留/抵押等环境加 `VITE_APP_BUILDING_TABLE_EXTENDED_STATES=true` 开启扩展状态\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：zhi2-web-admin、路由信息.json、zhi2-web-admin/src/views/projectManagement、buildingTable/index.vue\n- 所属项目：苏州市房地产监测V3；来源会话：fab75e74-8bd3-4304-a54e-0fecb4c6f1ab；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/annex_view_fix.md",
+                "memory_type": "entities",
+                "after": "# 从业人员详情附件区查看态修复\n苏州市房地产监测V3 中经纪机构从业人员查看态误渲染可操作附件上传，已改为从审批流取数只读展示。\n\n## 问题根因\n- 查看态仍渲染 `AnnexUpload`，因 `canOperateAppendix` 有 `personnelRecordId` 即为 true\n\n## 修复内容\n- `AgencyPersonnelDetail.vue` 查看态：`AnnexUpload` → `AppendixPackageSection`(`is-view=true`,`operable=false`)→`DetailTemplate` 只读\n- 编辑态：`AppendixPackageSection`(`is-view=false`,`operable=!isFiledReadonly`)，`busCode` 从路由解析，顶部 `:show-attachment=\"false\"`\n- G/B 端从业人员备案：`appendixOperable` 简化为 `!isFormDisabled`，与表单禁用态一致\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：AgencyPersonnelDetail.vue、companyRegister/detail.vue、supervision/agreement/account/detail.vue 等\n- 所属项目：苏州市房地产监测V3；来源会话：e36fc0b7-1ece-4548-a186-f880f79e7879；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/permit_overflow_fix.md",
+                "memory_type": "entities",
+                "after": "# 预售许可新增页要件区溢出修复\n苏州市房地产监测V3 中预售许可新增页因 Headline 组件 overflow 致要件列表撑破容器，已限高修复。\n\n## 问题根因\n- `Headline` 组件 `collapse-content` 默认 `overflow: visible`，要件列表加载后撑破右栏容器\n\n## 修复内容\n- 强制约束要件区域高度：`overflow: hidden !important` + `flex:1; height:0` 内部滚动\n- 右栏双重限高：同步 `height` 与 `maxHeight` 与左栏一致\n- 异步加载后触发 `layout-sync` 重新对齐高度\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：presale/permit、presale/permit/components/detail.vue、presale/permit/detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：80adc70b-981c-4804-9369-1f47d63c1006；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/记忆写入语言偏好.md",
+                "memory_type": "preferences",
+                "after": "- 抽取并写入记忆时要求使用简体中文，不要输出葡萄牙语或其他语言。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

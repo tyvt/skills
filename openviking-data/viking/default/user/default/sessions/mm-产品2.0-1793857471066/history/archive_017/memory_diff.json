@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793857471066/history/archive_017",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T06:42:36.031681+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/events/2026/11/05/整改通知书修复合并.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户完成提交、推送，并将整改通知书分页修复 cherry-pick 合并到 develop/v2.6.2 和 develop/v2.6.2-yulin 分支，更新父仓库子模块指针（develop/v2.6.1 指向 dac8a93e7，develop/v2.6.2 指向 fa00918cc，develop/v2.6.2-yulin 指向 298ed67df）；env/.env 本地代理配置未提交。\n# 2026-11-05 (Thursday) ChatLog:\n**user**: 【记忆类型】preference\n【标题】提交推送代码，并合并到262和262-yulin\n【内容】已完成提交、推送，并合并到 `develop/v2.6.2` 和 `develop/v2.6.2-yulin`。 ### 子模块 `zhi2-web-admin` | 分支 | 提交 | 说明 | |------|------|------| | `develop/v2.6.1` | `dac8a93e7` | fix(整改通知书): 修复整改问题表格分页文案与数据行重叠问题 | | `develop/v2.6.2` | `fa00918cc` | cherry-pick 同上 | | `develop/v2.6.2-yulin` | `298ed67df` | cherry-pick 同上 | ### 父仓库 | 分支 | 提交 | 子模块指针 | |------|------|-----------| | `develop/v2.6.1` | `09519a8` | `dac8a93e7` | | `develop/v2.6.2` | `e4a0034` | `fa00918cc` | | `develop/v2.6.2-yulin` | `d32ba38` | `298ed67df`（已修正子模块指针） | ### 说明 - `env/.env` 的本地代理配置**未提交**（仍为本地修改）。 - `develop/v2.6.2` 与 `develop/v2.6.2-yuli\n【验证证据】extracted source=cursor project=产品2.0\n【涉及文件】涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\evaluation\\rectificationNotice\\components\\ProblemTable.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\evaluation\\rectificationNotice\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-pagination\\zs-pagination.vue\n【所属项目】产品2.0\n【来源会话ID】c7367ebb-f778-4c8b-8bf6-10398d2dbd47\n【代码基线】none\n【语言要求】请用简体中文抽取并写入记忆，不要输出葡萄牙语或其他语言。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/workorder_category_parse.md",
+                "memory_type": "entities",
+                "after": "# 工单分类下拉无数据修复\n产品2.0 的工单上报模块修复了因接口返回结构解析错误导致工单分类下拉为空的问题。\n\n## 问题根因\n- 原代码用 `response.data || response.rows || []` 解析列表\n- 当 `/list` 返回 `{code:200, data:{list:[]}}` 时 `response.data` 为对象，调用 `.map()` 抛错被 catch 吃掉，导致 `categoryOptions` 为空数组\n\n## 修改内容\n- 继续使用 `/property/workOrder/category/list` 接口\n- 按多种结构解析：`rows`、`data.records`、`data.list`、`data.rows` 及 `data` 本身为数组\n- 补充字段映射：`workOrderCategoryId`、`_categoryName` 等\n- 去掉误加的状态过滤和 `/page` 调用\n\n## 涉及文件与来源\n- 文件：`zhi2-web-admin/src/views/property/workOrder/report/index.vue`、`AddOrderDialog.vue` 等\n- 项目：产品2.0；来源会话：1401b92d-0ad2-433b-83f9-aa435e2c7296；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/guarantee_deposit_link.md",
+                "memory_type": "entities",
+                "after": "# 保证金账户明细业务编号跳转\n产品2.0 房屋质量保证金账户详情页为缴存/支用明细的「业务申请编号」列添加了跳转链接。\n\n## 主要变更\n- `AccountDetailTable.vue` 中业务申请编号由 `type:'text'` 改为 `type:'link'`，点击触发 `handleView`\n- 按借贷方向跳转：缴存明细（贷）→ 资金缴存详情；支用明细（借）→ 资金支用详情\n- 统一编号字段映射，兼容 `mSourceCode`、`mSouseCode`、`noticeNo` 等字段\n\n## 验证与涉及\n- 可在账户详情页「缴存明细」「支用明细」两个 Tab 验证跳转是否正常\n- 文件：`guaranteeDepositAccount/components/AccountDetailTable.vue`、`maintenance/accountQuery/detail.vue`、`invoiceDetails/components/invoiceDetailsTable.vue`、`depositNotice/components/index.vue` 等\n- 项目：产品2.0；来源会话：45dc597d-a46d-45bb-99df-b9e6a99ec8b9；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bill_selectable_valid.md",
+                "memory_type": "entities",
+                "before": "# Valid Bill Selection Restricted by Payment Status\nThe `spFeeBill` module's `isSelectable` relied on `isBillPayable`, blocking selection of valid paid bills.\n\n## Problem\n- `spFeeBill` `isSelectable` depended on `isBillPayable` allowing only unpaid/partial paid non-voided bills\n- Valid already-paid bills could not be selected\n\n## Solution\n- Added `isBillValid()` and `validateBillsForDiscount()` in `enums.js`\n- Changed `isSelectable` to `isBillValid(row)` so all valid bills selectable\n- Receipt and discount go through different validations\n\n## Files and Attribution\n- Files: zhi2-web-admin/src/views/property/bill/components/index.vue, declare/components/index.vue, feeDeclare2/index.vue, spFeeBill/components/index.vue, enums.js, discountDialog.vue\n- Project: 产品2.0; source session: 3bad7169-f39b-4cf0-bf68-090703c11dcb; code baseline: none",
+                "after": "# 物业服务费账单勾选逻辑修复\n产品2.0 的 spFeeBill 模块修改了账单勾选逻辑，使所有有效账单均可勾选，便于批量收款、优惠和作废。\n\n## 问题原因\n- 原 `isSelectable` 使用 `isBillPayable`，仅允许「待支付 / 部分支付」且未作废的账单勾选\n- 「有效 + 已支付」账单无法勾选，导致批量收款、优惠、作废操作不便\n\n## 修改内容\n- `enums.js` 新增 `isBillValid()` 判断账单是否有效（未作废）\n- `enums.js` 新增 `validateBillsForDiscount()` 优惠校验（须为有效且待支付）\n- 状态比较改为 `==` 兼容数字/字符串类型\n- `index.vue` 中 `isSelectable` 改为 `isBillValid(row)`，所有有效账单均可勾选\n- `handleDiscount` 增加 `validateBillsForDiscount` 校验\n- 收款仍走原有 `validateBillsForCollect`（仅待支付/部分支付）\n\n## 勾选与操作规则\n- 有效+待支付：可勾选✅ 收款✅ 优惠✅\n- 有效+部分支付：可勾选✅ 收款✅ 优惠❌\n- 有效+已支付：可勾选✅ 收款❌ 优惠❌\n- 作废账单：不可勾选\n\n## 涉及文件与来源\n- 文件：`zhi2-web-admin/src/views/property/bill/components/index.vue`、`declare/components/index.vue`、`feeDeclare2/index.vue`、`spFeeBill/components/index.vue`、`enums.js`、`discountDialog.vue`\n- 项目：产品2.0；来源会话：3bad7169-f39b-4cf0-bf68-090703c11dcb；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

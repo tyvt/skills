@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_031",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:29:47.248976+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/resolve_recordname.md",
+                "memory_type": "entities",
+                "after": "# 变更单名称字段统一回退模式\n在苏住房G项目 complexChange/detail.vue 中，变更单 add 模式下名称字段需通过 resolveRecordName 四级回退统一取值。\n## 问题背景\n- 变更单 recordName 仅在保存/提交后由后端回填，add 模式必然为空\n- 页面展示区、detailCallback、子表 rangeTable 各自直接读 form.recordName，导致整页空白\n- 源数据仅带 complexName（如「财神里小区」），无变更单自身 recordName\n## 解决方案\n- 编写 resolveRecordName 回退链：recordName → complexName → originalObj.recordName → originalObj.complexName\n- 在 add 模式 created 钩子用源数据把 complexName 回填进 recordName\n- 展示区(contentInfo 查看态)、detailCallback、子表 prop 全部改为调用 resolveRecordName(this.form)\n## 验证与归属\n- 验证：会话 81e0c5dc（基线 2a3ef8a）修复前后对比，备案名称正常显示\n- 涉及文件：zhi2-web-admin/src/views/property/complexChange/detail.vue\n- 所属项目：苏住房G；来源会话ID：81e0c5dc-49f5-4db4-8eef-299f62b77144；代码基线：2a3ef8a\n- 与 #941 区别：本条针对变更单 add 模式名称不存在场景，给出带回填时机的四级回退+三处统一调用点"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bpmn_candidate_id.md",
+                "memory_type": "entities",
+                "after": "# BPMN候选组/人员回显ID修复模式\n苏住房G项目 BPMN 流程设计器与 zs-remote-select 组件在回显候选组/人员时显示 ID 而非名称，需补全标签反查。\n## 问题根因\n- BPMN userTask 持久化 candidateGroups/candidateUsers 为标识串(roleId/userId)，而非名称\n- 属性面板 select 渲染为 zs-remote-select，仅输入关键字才请求选项，回显阶段不按已选 ID 预取 label，退化成 value 当 label\n- zs-remote-select 标签只来自当前选项列表或父级 initialOptions，裸数字 ID 不在其中时显示编号\n- views/tool/definition/detail.vue 曾注释「不再预加载人员/角色」，打开时无全量 id→name 映射\n## 解决方案\n- 给 zs-remote-select 增加 resolveDetailUrl(如'/system/role/')与 resolveDataKey prop，新增 resolveMissingLabels() 遍历纯数字无 label 项反查名称合并进 options\n- 用 pendingResolve 去重、失败静默；触发点挂 value 变化、initialOptions 变化、用户选择后\n- XForm.vue 透传 dic.resolveDetailUrl/resolveDataKey；task.vue 的 roleRemoteDic/userRemoteDic 各配一条\n- 非数字表达式(${INITIATOR}、#{approval})必须用数字正则拦截，避免误请求无效地址\n- 备选：打开设计器时预拉角色/用户字典以 dic 传入；保留 allowCreate 语义不静默清空未匹配 ID\n## 验证与归属\n- 验证会话1：1688d337-3c59-4439-8b61-494a949b35cb，结论远程下拉回显未预取 label\n- 验证会话2：24929f7a-3693-4ae6-b04b-d0abf802ee41，修复后短暂显示编号随后自动替换为角色名\n- 涉及文件：components/Process/components/nodePanel/task.vue、common/XForm.vue、PropertyPanel.vue、common/parseElement.js、views/tool/definition/detail.vue、components/zs-remote-select/index.vue\n- 所属项目：苏住房G；代码基线：cb37a39（及 2a3ef8a 部分）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/logout_401_dialog.md",
+                "memory_type": "entities",
+                "after": "# 主动退出登录抑制401过期弹窗\n苏住房G项目退出登录时仍弹「登录状态已过期」，需通过 isLoggingOut 标志区分主动退出与自然过期。\n## 问题根因\n- 退出登录清 token 后跳转，在途或无权限请求落地成 401\n- utils/request.js 的 401 分支只按收到 401 判定，无法区分自然过期与用户主动退出\n- 于是照样调 showAuthDialog() 弹出不需要的提示\n## 解决方案\n- request.js 加模块级 isLoggingOut 并导出 setLoggingOut(bool)；401 拦截仅当 !isLoggingOut 才弹会话过期框\n- store/modules/user.js 的 LogOut 与 FedLogOut 开头先 setLoggingOut(true) 覆盖所有手动退出入口\n- utils/auth.js 的 setToken() 中必须 setLoggingOut(false) 复位，避免重新登录后真过期不提示\n## 验证与归属\n- 验证：会话 ffd2efe4-6853-464a-a9e4-0fe7137a2cf0，用户明确要求退出不提示过期\n- 涉及文件：zhi2-web-admin/src/utils/request.js、store/modules/user.js、utils/auth.js\n- 所属项目：苏住房G；代码基线：2a3ef8a"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

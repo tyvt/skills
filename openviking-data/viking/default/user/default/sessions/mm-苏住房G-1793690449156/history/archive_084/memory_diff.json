@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_084",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T10:41:23.483113+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/rescue_ddl_defect.md",
+                "memory_type": "entities",
+                "after": "# 防汛救援审批 DDL 跨环境缺陷\n防汛救援（rescue）审批接口在 dev 因 T_FLOOD_RESCUE_LOG.OPERATOR_ROLE 字段长度不足报 500，同款建表脚本在 ST/生产未同步修复会复现。\n\n## 问题现象\n- dev 环境 rescue 审批接口报 500，根因是数据库 DDL 字段长度不足，非代码问题\n- dev 上将 OPERATOR_ROLE 改为 VARCHAR(64) 后修复，但仅本地 ALTER，建表脚本未改\n- ST/生产使用同一份建表 SQL 复制，大概率存在同款列长缺陷，rescue 审批会炸同款 500\n\n## 根因\n- 多环境共用同一批建表脚本，某环境 ALTER 修复后未回写脚本，重建或发版时缺陷原样复现\n- 缺陷仅在写满长度数据时触发，空数据 E2E 全绿也会上线炸，故「dev 修好」不等于「缺陷闭环」\n\n## 解决方案\n- dev 修完 DDL 后立刻把 ALTER 补进仓库建表/迁移脚本，台账记「dev 已修+脚本已补」\n- 交付报告显式列出未同步环境（ST/生产）并转后端，不默认代码提交全环境生效\n- 发版前按环境做列长/索引对齐核对清单，E2E 补写入长值用例，按字段反查影响面\n\n## 验证与归属\n- 来源会话 session-14dff73a-8af9-43c4-b1ed-ab3b342321e2（基线 6156653）结论「收官完成」\n- 遗留风险第1条：ST/生产 OPERATOR_ROLE 列长缺陷未同步，建议后端发版前 ALTER\n- 涉及文件：zhi2-web-admin/docs/flood/common-errors.md、delivery-2026-10-29.md、e2e-flood-lib.cjs"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/approval_500_locate.md",
+                "memory_type": "entities",
+                "after": "# 审批接口 500 分支二分定位法\n同一审批接口出现「驳回200/同意500」分支差异时，先二分分支再查字段长度，比复刻环境快10倍。\n\n## 问题现象\n- 同一审批接口驳回返回200、同意返回500，常规复刻环境比对耗时长\n- 同意分支比驳回多写 OPERATOR_ROLE 等角色字段，命中 VARCHAR(64) 长度不足\n\n## 定位方法\n- 先二分分支：列出通与不通两条路径各自新增步骤/字段/表，缩小搜索空间一个量级\n- 只在不通分支查新增写入字段类型/长度/可空/外键，命中后做最小修复并回归两分支\n\n## 沉淀与复用\n- 定位法沉淀进台账 common-errors.md 条目12–15，下次同类现象直接照走\n- 遇同款脚本多环境情况，修完还需同步 DDL 到其他环境\n\n## 验证与归属\n- 来源会话 session-14dff73a（基线6156653）复盘确认「先二分分支再查列长」比复刻快10倍\n- 修复后回归6/6，台账条目12–15已入 common-errors.md\n- 涉及文件：zhi2-web-admin/docs/flood/common-errors.md、e2e-verify-flood.cjs"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/e2e_script_layering.md",
+                "memory_type": "entities",
+                "after": "# 防汛 E2E 脚本分层分批规范\n防汛 E2E 扩到8模块后清理27个临时调试脚本，保留分层主脚本与探针，交付前删净 e2e-debug-*。\n\n## 问题现象\n- 防汛 E2E 从1模块扩到8模块、全类型批跑58/58通过后，工作区堆了27个 e2e-debug-*.cjs 临时脚本\n- 脚本不分层会导致公共逻辑复制多处，调试脚本混主链让交接困难\n\n## 分层方案\n- e2e-flood-lib.cjs 放公共能力（登录、接口调用、断言、录像、fixture装配）\n- batch1/batch2 按菜单分批跑全类型CRUD，-menu/-merge 覆盖菜单与合并，probe-endpoints 只做接口探针\n- 调试脚本一律 e2e-debug-* 前缀，交付前整目录删除不进版本库\n\n## 清理纪律\n- fixture数据、SYS_FLOW_CONFIG、本地se配置由用户决定保留，不替用户删\n- 历史脏单据先评估影响再决定留清，交付报告写清保留/删除及原因\n\n## 验证与归属\n- 来源会话 session-14dff73a（基线6156653）收官：删27个 debug 脚本，保留主脚本与探针\n- 遗留风险第3条：4张历史脏单据保留dev可手工提交无业务影响\n- 涉及文件：e2e-flood-lib.cjs、e2e-verify-flood.cjs、e2e-flood-crud-video.cjs、e2e-probe-endpoints.cjs"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dual_doc_delivery.md",
+                "memory_type": "entities",
+                "after": "# 防汛交付双文档收口规范\n防汛模块联调踩坑用 common-errors.md 台账编号记坑，delivery 报告显式列未验证遗留项，两者职责不同。\n\n## 文档分工\n- common-errors.md 作台账，每条坑编号入账（本次条目12–15），沉淀可复用踩坑知识\n- delivery-2026-10-29.md 作交付报告，逐项写状态/证据/遗留/未验证项，明确本次交付边界\n\n## 关键纪律\n- 未验证项不藏：遗留必须显式列明并注「未验证」而非「已完成」\n- 遗留要归属到人/团队（网关缺陷归网关侧、DDL ALTER归后端发版前），不只写待修复\n\n## 格式要求\n- 台账条目格式：现象→根因→定位法→修法→影响范围→是否跨环境同步（DDL类必标）\n- 交付报告分四块：收官完成表、证据、遗留风险、复盘一句话；台账同类可引用同编号\n\n## 验证与归属\n- 来源会话 session-14dff73a（基线6156653）台账条目12–15入 common-errors.md，交付报告专节列未验证项\n- 遗留含 ST/生产DDL未同步、网关 zs-method:delete 缺陷（台账条目4）、4张历史脏单据\n- 涉及文件：zhi2-web-admin/docs/flood/common-errors.md、delivery-2026-10-29.md"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

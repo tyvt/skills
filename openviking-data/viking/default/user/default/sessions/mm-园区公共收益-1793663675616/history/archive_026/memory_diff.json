@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793663675616/history/archive_026",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T00:48:38.366178+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/esbuild_optional_missing.md",
+                "memory_type": "entities",
+                "after": "# CI 构建报 esbuild 平台二进制缺失\nCI 上 vite build 失败报 The package \"@esbuild/linux-x64\" could not be found，根因是安装时禁用了 optional dependencies 导致平台二进制没装上。\n\n## 问题根因\n- esbuild 把各平台二进制放在 optionalDependencies（@esbuild/linux-x64、@esbuild/win32-x64 等）\n- 安装时用 --no-optional 或 --omit=optional（或 .npmrc 里 omit=optional）时平台包不会装上\n- esbuild 运行时找不到对应平台二进制就抛错，错误发生在加载 vite.config.js 这一步，与代码语法或 vite 配置无关\n\n## 解决方案\n- 判定：看 node_modules/@esbuild/ 下有无当前平台包，以及安装命令/.npmrc 里有无 omit=optional / --no-optional（npm 配置优先级高于命令行）\n- 修复：安装保留 optional dependencies（去掉 --no-optional / --omit=optional，或用 npm ci --include=optional），固化进 scripts/install.mjs\n- CI 前置校验：构建前检查 node_modules/@esbuild/<platform>-x64 存在，缺失明确报「平台二进制未安装」\n- 环境受限下载不到平台包时退路是换 wasm 版本，但先排除 omit=optional 这个最常见根因\n\n## 验证与归属\n- 验证：会话 63992035（基线 358fa9e）用户贴出 runner 完整报错并确认「直接改」，改动落到仓库内 install.mjs、.npmrc、package.json、vite.config.js\n- 涉及文件：zhi2-web-admin/scripts/install.mjs、.npmrc、package.json、vite.config.js\n- 来源会话：session-63992035-0418-48dc-9ade-0a6f2d163f36；代码基线：358fa9e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/account_open_openaccbs.md",
+                "memory_type": "entities",
+                "after": "# 区域开户新增编辑须携带 openAccBS '2'\n原 zhi2-web-admin 区域开户 detail.vue 中 form.openAccBS 默认 undefined 且 getForm() 未返回，致 POST/PUT /maintenance/account 请求体缺参。\n\n## 问题根因\n- detail.vue 中 form.openAccBS 默认值为 undefined\n- getForm() 未返回 openAccBS 字段，导致 addRequest()/editRequest() 调用时请求体缺参\n\n## 解决方案\n- 将 form.openAccBS 默认值置 '2'\n- 在 getForm() 显式返回 openAccBS: '2'，供 form.js 的 addRequest()/editRequest() 调用携带\n\n## 验证与归属\n- 验证：extracted source=cursor session=ff5a7c00-ebe9-4246-8cf1-277a6aafbe76\n- 涉及文件：zhi2-web-admin/src/views/maintenance/accountOpen/complex/detail.vue、index.vue、mixins/detailMixins.js、components/detail.vue、mixins/form.js、accountQuery/type.vue、router/index.js、utils/ruoyi.js\n- 来源会话：ff5a7c00-ebe9-4246-8cf1-277a6aafbe76；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/flow_label_sync.md",
+                "memory_type": "entities",
+                "after": "# 流程名 find 因字典映射报错改 label.sync\nConfigDialog.vue 的 flowOptions 映射为 {dictLabel,dictValue} 字典，onFlowChange 用 e.id 查找返回 undefined 致报错。\n\n## 问题根因\n- flowOptions 映射为 {dictLabel, dictValue} 字典结构\n- onFlowChange 用 e.id 查找流程，但字典无 id 字段，返回 undefined 致报错\n\n## 解决方案\n- 移除 onFlowChange 方法\n- 改用 zs-select 的 :label.sync 自动同步流程名\n\n## 验证与归属\n- 验证：extracted source=cursor session=4659e580-4acf-439b-89b7-52c74726a8d6\n- 涉及文件：zs-select.vue、SingleSelect.vue、ConfigDialog.vue\n- 来源会话：4659e580-4acf-439b-89b7-52c74726a8d6；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/ci 构建问题处理偏好.md",
+                "memory_type": "preferences",
+                "after": "- 处理 CI 构建失败时，反对修改 runner 上的远程 gitlab-ci.yml，要求把改动落在仓库内可控文件（scripts/、.npmrc、package.json）\n- 原因：runner 上的 gitlab-ci.yml 是运维侧远程配置，Agent 本地改不动、改了不进版本库、下次流水线未必生效；仓库内文件随提交走，可评审可回滚、运维可直接从仓库拉取覆盖 runner，交付路径更短更可追溯\n- 排查 CI 问题时在仓库内新增/修改脚本（如 scripts/nodejs-build.sh、scripts/install.mjs）、.npmrc 配置、package.json 的 scripts 段\n- 交付话术把「运维需要做什么」压缩成一条可直接复制的命令（如 curl -o ... && chmod +x），避免让人手贴全文（手贴是上次出错根因）\n- 脚本先在本地做静态校验（行数、引号配对、set -euo pipefail）再交付，并提交纳入版本库方便追溯与运维拉取"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

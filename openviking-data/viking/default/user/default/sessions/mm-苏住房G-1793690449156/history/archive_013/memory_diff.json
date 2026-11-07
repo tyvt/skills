@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_013",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:50:56.229855+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/statisticsmap_tab_blank.md",
+                "memory_type": "entities",
+                "after": "# 共管小区统计地图弹窗Tab空白缺陷\n苏住房G效益统计地图点共管小区marker后，弹窗内7个Tab内容整块空白，但单独页面正常。\n## 根因\n- overviewContent.vue用terminalTypeReady套v-if，terminalType为null时整块不渲染且无重挂时机\n- 各Tab pane复用同一activeContentValue做绑定/key，多pane撞key导致切换串味或不渲染\n- G端传:skip-fetch=\"isGTerminal\"，地图弹窗在G端不发请求，无数据与无请求界面一致\n## 解法\n- 去掉terminalTypeReady的v-if拦截，改watch terminalType并在延迟就绪时bumpTabKey重新挂载\n- Tab绑定按menu.value各自独立，不再共用activeContentValue\n- 取消G端skip-fetch，地图弹窗统一走真实接口\n- 项目主键统一为resolvedProjectId = complexId ?? projectId ?? sourceData.projectId，无主键渲染el-empty「暂无小区数据」\n## 验证与归属\n- 验收看Network是否发出selectOperatingAssetsCategory等standingBook请求\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/overviewContent.vue、operatingAssets.vue、index.vue\n- 所属项目：苏住房G；来源会话：59f13d6d-cf6d-464d-b961-060063675ca1；代码基线：3c282a5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/readonly_bizstate_filter.md",
+                "memory_type": "entities",
+                "after": "# 只读列表页业务状态筛选与查询分离\n苏住房G只读/已备案视图列表页隐藏「业务状态」筛选项，但查询仍固定传bizState='2'。\n## 现象与根因\n- 广告位等列表打开时「业务状态」默认选中「审核中」，列表却是已备案数据\n- 路由isShow标识只读视图，leaseContractMixins的getQueryParams()固定传bizState='2'（已备案）\n- 搜索区下拉默认值来自另一套字典默认项，两者分开维护导致视觉矛盾\n## 解法\n- 在只读列表页按isShow条件把「业务状态」从搜索区formItems过滤掉，不改getQueryParams默认值\n- 查询逻辑不变仍只出已备案数据，表格「业务状态」列保留\n- 可编辑租赁合同备案管理页该筛选项不受影响\n## 验证与归属\n- 通用原则：筛选项默认值不代表真实查询条件时，隐藏控件比改查询更安全\n- 涉及文件：advSpaceLeaseApply/index.vue、assetLeaseApply/index.vue、resourcesLeaseContractFiling/index.vue、leaseContractMixins.js\n- 所属项目：苏住房G；来源会话：1eb3d199-859d-4273-97af-9e57746818af；代码基线：f78f7e7"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/complex_backend_route.md",
+                "memory_type": "entities",
+                "after": "# 物业管理区域备案后端契约前端反推路线\n苏住房G仓库无Java源码，只能通过mixin拼路径与组件链路反推complex保存/权限校验契约。\n## 适用场景\n- 需弄清complex（物业管理区域备案）保存/更新接口的后端权限校验、字段白名单等\n- 仓库根目录仅为submodule容器（仅zhi2-web-admin），后端部署在远端\n## 反推步骤\n- 由详情页拿接口三要素：primaryKey:'complexId'、moduleName:'property'、businessName:'complex'\n- 由mixins/form.js的addApiFull/editApiFull/detailApiFull拼接规则还原真实路径（/${moduleName}/${businessName}${suffix}）\n- 逐层读调用链推断权限：detailMixins.js、form.js、bTerminalProjectMixin.js、OperationBtnGroup、ZsSubmit、utils/flowApi.js、terminalUser.js、projectContext.js、store/getters.js\n- 用「按钮/字段在什么状态下才出现」反推后端允许编辑态\n## 边界与归属\n- 结论只能表述为「前端契约推断」，非后端实现事实；确认需后端开代码或文档\n- 同类需求走此路线，勿在工作区grep找Java文件\n- 涉及文件：property/complex/detail.vue、mixins/form.js、detailMixins.js、OperationBtnGroup/index.vue、terminalUser.js、projectContext.js、.gitmodules、env/.env\n- 所属项目：苏住房G；来源会话：231da5b0-82db-4a83-819f-b9b0376ce290；代码基线：2a3ef8a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_unit_axis.md",
+                "memory_type": "entities",
+                "after": "# ECharts右侧单位不附刻度的孪生Y轴\n苏住房G首页仪表盘图表需求右侧补单位「（件）」而不要第二套刻度，借隐藏刻度标签的孪生Y轴用axis name承载单位。\n## 误做与正解\n- 常见误做再画完整yAxis导致右轴多刻度数字与横线，或把单位拼进左轴name致左边拥挤\n- 正解：造专用放文字的轴，右轴做成不可视数据轴，只用name当单位标签\n## 配置要点\n- 两yAxis：左轴原样含刻度/轴标签/splitLine；右轴name:'（件）'、nameLocation:'end'、nameGap:12，关掉axisLine/axisTick/axisLabel/splitLine（全show:false）\n- 数据系列显式yAxisIndex:0绑左轴\n- grid.right由16调为28承接文字，否则name被画布右缘裁掉\n## 验证与归属\n- 预览环境图表容器高度0会看起来没生效，需在真实数据本地环境核对\n- 与小程序端ECharts经验不同（涉及定制裁剪包/同层渲染），Web端纯配置技巧\n- 涉及文件：home/v2/components/RepairPanel.vue、tests/e2e/home-v2.spec.mjs\n- 所属项目：苏住房G；来源会话：2cbdebe1-6e3a-4685-97c1-159d222e3131；代码基线：9e5c499"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

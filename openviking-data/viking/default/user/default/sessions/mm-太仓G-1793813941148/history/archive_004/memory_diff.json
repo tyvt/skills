@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793813941148/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T17:49:03.146326+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/voterange_dialog_lite_import.md",
+                "memory_type": "entities",
+                "after": "# VoteRangeDialogLite 引用错误路径的 CandidateConfigTable\n太仓G端 `VoteRangeDialogLite.vue` 误引用同目录下不存在的 `./CandidateConfigTable`，实际组件位于 `optionDecision` 模块，导致构建报错。\n\n## 问题根因\n- `VoteRangeDialogLite.vue` 误 import 同目录下 `./CandidateConfigTable`\n- 该组件实际在 `optionDecision` 模块中，与 `optionDecision/components/VoteRangeDialog.vue` 用法一致（`url=\"/estate/optionGroup/list\"`、表决项选择等）\n\n## 修复方案\n- 将 import 路径改为 `@/views/estate/optionDecision/components/CandidateConfigTable`，本地 `npm run test` 构建成功（约 55s）\n\n## 验证与归属\n- 验证证据：会话 a96ffabd 用户报构建报错，修复后通过\n- 涉及文件：`VoteRangeDialogLite.vue`、`optionDecision/components/VoteRangeDialog.vue`、`optionDecision/components/CandidateConfigTable`\n- 所属项目：太仓G；来源会话：a96ffabd-ef31-4e34-998f-48051d851e40；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/offline_vote_remark_field.md",
+                "memory_type": "entities",
+                "after": "# 线下投票弹框误显决策范围remark为表决意见\n太仓G端一般表决详情点「线下投票录入」时，弹框把整行决策范围数据复制进表单，范围记录的 `remark` 字段被误当作「表决意见」显示。\n\n## 问题根因\n- 弹框打开时 `this.form = Object.assign({}, this.dialogForm)` 复制整行决策范围数据\n- 决策范围记录含 `remark` 字段（范围备注），与弹框「表决意见」字段同名\n- 范围行 `remark` 值为 `20240329`，被误显示为表决意见\n\n## 修复方案\n- 调整 `VoteRangeDialog` 打开逻辑：线下录入只带入房屋信息（小区、幢号、单元、面积等）\n- 表决意见、决策人、证件号、手机号、签字等字段保持为空\n\n## 验证与归属\n- 验证证据：会话 7f01db0d 用户反馈线下表决弹框「表决意见」未输入却显示内容\n- 涉及文件：`decisionCommon/components/VoteRangeDialog.vue`、`ownerDecision/components/VoteRangeDialog.vue`、`optionDecision/components/VoteRangeDialog.vue`\n- 所属项目：太仓G；来源会话：7f01db0d-5c85-4ac0-a81f-2cca268fc30d；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/decision_range_dynamic_column.md",
+                "memory_type": "entities",
+                "before": "# 决策范围表格动态增列未重渲染致空\n太仓G端切换「投票信息」标签时 DecisionRangeTable 动态增加列，表格未强制重渲染与调用 doLayout()，导致分页有数但内容空。\n\n## 问题根因\n- 切换「投票信息」标签时 `DecisionRangeTable` 动态增加列\n- 表格未强制重渲染与调用 `doLayout()`，导致分页有数但内容空\n\n## 修复约定\n- 在 `DecisionRangeTable.vue` 增加 `:key` 强制重渲、监听 `showSuccess` 重置筛选、数据加载后 `doLayout()`\n- `ownerDecision/detail.vue` 等同步优化 `handleChange` 延迟 `doLayout()`\n\n## 验证与归属\n- 验证证据：会话 d53534ba 用户报动态增列后内容空\n- 涉及文件：ownerDecision/detail.vue、decisionCommon/components/DecisionRangeTable.vue、api/estate/decisionRange.js、components/zsTable/index.vue、ownerDecision/components/DecisionRangeTable.vue、decisionCommon/components/VoteView.vue、mixins/listMixins.js、generalDecision/detail.vue\n- 所属项目：太仓G；来源会话：d53534ba-0c28-4ea3-96ec-37f34b0b2967；代码基线：none",
+                "after": "# 决策范围表格动态增列未重渲染致空\n太仓G端切换「投票信息」标签时 DecisionRangeTable 动态增加列，表格未强制重渲染与调用 doLayout()，导致分页有数但内容空。\n\n## 问题根因\n- 切换「投票信息」标签时 `DecisionRangeTable` 动态增加列\n- 表格未强制重渲染与调用 `doLayout()`，导致分页有数但内容空\n\n## 修复约定\n- 在 `DecisionRangeTable.vue` 增加 `:key` 强制重渲、监听 `showSuccess` 重置筛选、同步 `decisionId`、数据加载后 `doLayout()`、将行选择逻辑从 computed 改为 method（与选项表决页一致）\n- `ownerDecision/detail.vue` 等同步优化 `handleChange` 延迟 `doLayout()`\n\n## 验证与归属\n- 验证证据：会话 d53534ba 用户报动态增列后内容空\n- 涉及文件：ownerDecision/detail.vue、maintainDecision/detail.vue、decisionCommon/components/DecisionRangeTable.vue、api/estate/decisionRange.js、components/zsTable/index.vue、ownerDecision/components/DecisionRangeTable.vue、decisionCommon/components/VoteView.vue、mixins/listMixins.js、generalDecision/detail.vue\n- 所属项目：太仓G；来源会话：d53534ba-0c28-4ea3-96ec-37f34b0b2967；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

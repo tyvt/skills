@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793668817929/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T01:31:36.740126+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_style_entry.md",
+                "memory_type": "entities",
+                "after": "# 门户全局样式与骨架屏前置约定\n门户 zhi2-web-admin 做骨架屏/动效前需知悉样式入口、主题变量与 anim.scss 未全局注入等工程事实。\n\n## 样式入口与 anim.scss\n- 前端代码在子包 zhi2-web-admin（Vue 2.7 + Vite 5 + Element UI + UnoCSS + Sass，非 TS）\n- 全局样式唯一入口 src/main.js → @/styles/index.scss，其 @use 汇总 variables.css、mixin、element-ui、ruoyi 等\n- anim.scss 未被 index.scss 引用，组件若需用其中 shimmer/wave 须显式 @use \"@/styles/anim.scss\" as *\n- Vite css.preprocessorOptions.scss 无 additionalData，子组件不会自动拿到 mixin\n\n## 主题色与取色\n- variables.css 用 CSS 变量（默认 --primary-color: #1677ff）\n- 运行时 changeThemeColor() 按 platformConfig.buttonDefaultColor 生成 light/dark 阶梯与 --primary-color-rgb\n- 骨架屏应使用 var(--primary-color) / rgba(var(--primary-color-rgb), .1)，不要写死 hex\n- views/home/publicPortal/portalTheme.js 另有一套门户展示色，与后台 --primary-color 并存，公共骨架若同时服务两者需分场景取色\n\n## 加载层约定\n- 全局 NProgress/v-loading 与页面级骨架是两条线\n- 新增「最短展示时间」应在页面/组件层与请求 loading 解耦，避免 axios 拦截器里叠两套遮罩\n\n## 涉及文件与归属\n- 涉及 main.js、index.scss、variables.css、anim.scss、utils/index.js、store/modules/app.js、portalTheme.js、vite.config.js、utils/request.js\n- 所属项目：门户；来源会话 sess_subagent_agent_f65dec14；代码基线 dfee5a6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhou_dao_login.md",
+                "memory_type": "entities",
+                "after": "# 苏周到扫码登录接口与职责拆分\n门户 UnifiedLogin 接入苏周到时后端契约为三个 POST 接口，login 仅在授权回调页调用。\n\n## 接口契约\n- 三个接口均为 POST：getQrLoginParam（返回 qrCodeId、qrUrl，pageUrl 指向前端授权成功链路）\n- scanLogin?qrCodeId=...（PC 端轮询，未扫码时 accessToken 为 null）\n- login（入参 { code, qrCodeId } 换登录态）\n\n## 职责拆分\n- 苏周到 H5 打开 pageUrl 上的授权回调页，在回调页 created → submitAuth() 里调用 login\n- 仅当 code == 200 才 replace 到成功页（如 SuzhouDaoAuthSuccess.vue）\n- 成功页只做展示与「完成」关窗，不得再调 login\n- PC 主流程靠登录页轮询 scanLogin 拿 accessToken，与成功页无关\n\n## 落地注意\n- 扫码 H5 与回调/成功页放在当前 zhi2-web-admin 工程内\n- 核对 nginx/网关前缀与 env 一致\n\n## 涉及文件与归属\n- 涉及 SuzhouDaoAuthCallback.vue、SuzhouDaoAuthSuccess.vue、UnifiedLogin.vue、src/api\n- 所属项目：门户；来源会话 f66860ed；代码基线 dfee5a6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_home_flows.md",
+                "memory_type": "entities",
+                "after": "# 首页存量房业务流程步骤权威来源\n门户登录后首页业务中心底部步骤条以 homeLayout.js 的 DEFAULT_BUSINESS_FLOWS 为权威，接口仅补充跳转字段。\n\n## 修改规则\n- 改步骤条需改 src/views/home/config/homeLayout.js 中的 DEFAULT_BUSINESS_FLOWS（含 functionCode、顺序、文案）\n- 渲染链 mergeBusinessFlows → mergeFlowSteps 以本地 defaults 为步骤结构/顺序/文案权威\n- 接口下发的 businessCenters 仅用于补充跳转类字段，不能指望后端覆盖步骤条结构\n- 即使后端未下发或下发旧数据，本地改 defaults 也会生效\n\n## 验收与兼容\n- 调整菜单后可用模块级脚本打印步骤数与名称链做快速验收（存量房步骤数 5：经纪机构管理 → … → 资金托管）\n- 图标映射表（如 BIZ_ICON_BY_CODE）里未再使用的 code 可保留，避免历史菜单数据仍引用时缺图标\n\n## 涉及文件与归属\n- 涉及 zhi2-web-admin/src/views/home/config/homeLayout.js\n- 所属项目：门户；来源会话 835934a3；代码基线 8c17ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/unified_login_banner.md",
+                "memory_type": "entities",
+                "after": "# UnifiedLogin platform-banner-desc 左对齐规范\n门户 UnifiedLogin 顶部平台区文案图与设计稿一致为左对齐时，应避免固定宽度百分比拉伸。\n\n## 正确做法\n- 推荐 height: 59.15%（按设计稿 97/164 比例）+ width: auto 等比缩放\n- object-position: left top 让两行文案从左侧装饰区之后起排\n- max-width 限制在右侧按钮区左侧，避免与按钮重叠\n- 去掉 width: 33.55% 一类固定宽度百分比把文案块拉成视觉居中\n\n## 验收顺序\n- 用户验收常先改 desc 左对齐，再调标签与按钮\n- 改完用设计稿截图或 unified-login-visual.spec.ts 对比\n\n## 涉及文件与归属\n- 涉及 UnifiedLogin.vue、tests/e2e/unified-login-visual.spec.ts、public/assets/images/UnifiedLogin\n- 所属项目：门户；来源会话 1c06a96f；代码基线 a1e5beb"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793934959314/history/archive_027",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T04:37:35.037307+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/houselimit_dict_fix.md",
+                "memory_type": "entities",
+                "after": "# 业务类型字典回退修复\n苏州市房地产监测V3 的 `houseLimitAudit/index.vue` 修复了「业务类型」列显示原始数字（如 1）而非字典中文的问题。\n\n## 问题根因\n- 「业务类型」列原用 `type: 'tag'` + `options: this.bizTypeOptions`，未配置 `dictUrl`\n- `zs-table-column` 在 `options` 为空时按字段名回退请求 `business_type`，而非正确的 `house_limit_business_type`\n- 码值 `1` 匹配不到字典，只能显示原始数字\n- 「业务状态」列正常，因其用了 `dictUrl: BIZ_STATE_DICT_TYPE` 自行拉字典\n\n## 修改内容\n- 列表列：加上 `dictUrl: HOUSE_LIMIT_BUSINESS_TYPE_DICT`\n- 搜索筛选项：从 `select` + 手动 options 改为 `type: 'dict'` + `dictUrl`\n\n## 验证与归属\n- 刷新页面后业务类型显示中文；若仍显示 `1` 需核对后台字典 `house_limit_business_type` 配置\n- 所属项目：苏州市房地产监测V3；来源会话：a4b95ede-26b5-43a3-8433-7a4a7725ca8c\n- 涉及文件：`src/views/building/houseLimitAudit/index.vue`、`houseLimitConstants.js`"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/appendix_gap_fix.md",
+                "memory_type": "entities",
+                "after": "# 要件上传区块 16px 间距修复\n苏州市房地产监测V3 为「要件上传」相关区块补上 16px 间距，涉及预售许可等页面两处。\n\n## 修改内容\n- 「要件上传」区块标题与宫格：`presale-detail-section-stack` 中 `appendix-section` 内容区加 `padding-top: 16px`\n- 单个要件名称行与缩略图：`AppendixRequirementCard` 缩略图区域上边距由 12px 改为 token `APPENDIX_TITLE_TO_THUMB_GAP = 16`（经 `AppendixRequirementGrid` 注入 CSS 变量）\n\n## 验证与归属\n- 刷新预售许可申请详情查看效果；可要求只改其中一处\n- 所属项目：苏州市房地产监测V3；来源会话：872e66a4-1acc-44d6-ac4e-811259ddf984\n- 涉及文件：`src/components/AnnexUpload/components/AppendixRequirementCard.vue`、`src/components/AnnexUpload/index.vue`"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/refund_bizstate_fix.md",
+                "memory_type": "entities",
+                "after": "# 定金退款列表查询与列对齐修复\n苏州市房地产监测V3 的「定金退款列表」完成两处修改：查询条件改业务状态、缴款通知书号正常左对齐。\n\n## 修改内容\n- 查询条件：「通知书状态」→「业务状态」，文件 `supervision/deposit/refund/index.vue`\n- 查询字段 `refundState`→`bizState`，字典 `NOTICE_STATE`→`BIZ_STATE`；列表仍保留两列，仅查询按业务状态过滤\n- 「缴款通知书号」左对齐根因：列标题含「缴款」被 `tableColumnMeasure.js` 当成金额列格式化为 `0.00` 右对齐\n- 在 `MEASURE_LABEL_EXCLUDE_RE` 增加 `通知书号`，使编号列按普通文本左对齐\n\n## 验证与归属\n- 刷新后应见筛选为业务状态、缴款通知书号不再显示 `0.00` 且左对齐；编号为空需核对接口 `payNoticeNo`\n- 所属项目：苏州市房地产监测V3；来源会话：6f0a6e3a-9141-46e0-84c9-7466c7b18511\n- 涉及文件：`src/views/supervision/deposit/refund/index.vue`、`tableColumnMeasure.js`、`mixins/ListTemplate.js`"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/yhwd_dialog_fix.md",
+                "memory_type": "entities",
+                "after": "# 承办银行网点详情回显修复\n苏州市房地产监测V3 的承办银行网点子表查看/编辑详情回显已修复，涉及 `YhwdDialog.vue` 与 `YhwdTable.vue`。\n\n## 修改内容\n- `YhwdDialog.vue` 新增 `detailApiFull` 动态指向 `/prefund/bankBranch/detail` 或 `/estate/mfBankBranch/detail`\n- 新增 `loadDetail(bankBranchManageId)`：查看/编辑时调详情接口填充表单\n- 新增 `normalizeFormValues()`：将 `isStart`、`isSupervisionBank` 转字符串保证单选框回显\n- 重构 `onOpen()`：新增仅 `resetForm()`+注入银行名；查看/编辑 `resetForm()` 后调 `loadDetail()`，无 ID fallback 列表行数据\n- `YhwdTable.vue` 的 `handleView`/`handleUpdate` 对行数据浅拷贝 `{...row}`，`$nextTick` 后再开弹窗避免 prop 未更新触发 `@open`\n\n## 验证与归属\n- 在银行网点子表分别点查看/编辑，确认网点名称、联行号、地址、联系人等字段回显\n- 所属项目：苏州市房地产监测V3；来源会话：224ebc32-0868-4266-a756-0afa83014b18\n- 涉及文件：`cbyh/components/YhwdDialog.vue`、`cbyh/components/YhwdTable.vue`、`api/jgyh/yhwdgl.js`"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-淮安物管-1793637567584/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T16:42:52.137740+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/搜索表单末行单项宽度.md",
+                "memory_type": "entities",
+                "after": "# zs-search-form 末行单项宽度修复\n淮安物管后台 zs-search-form 在末行只剩一个筛选项时会被默认栅格拉满整行，需显式设置 md:8 对齐其它行。\n\n## 问题现象\n- 列表搜索区筛选项较多（如公共收益「监管账户」约 10 项）时，最后一行若只剩 1 个控件，会被搜索表单布局逻辑撑满整行，与其它行 1/3 宽不一致。\n\n## 根因与修复\n- 根因：zs-search-form 对「行末单项」的默认列宽会占满剩余栅格。\n- 修复：在该筛选项的 formItems 配置里与其它项对齐，显式设置 `md: 8`（三列栅格下占 1/3 行宽），不要依赖默认拉伸。\n- 排查时先数筛选项总数与每行 3 列换行后的末行个数。\n\n## 验证与归属\n- 验证：会话 bef0201e 最终结论：已为「账号是否回传」单独设置列宽 md:8，刷新后不再占满一行。\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/index.vue、zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue\n- 所属项目：淮安物管；来源会话：bef0201e-13de-4441-bc9a-7b012a516a24；代码基线：53c813e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/物业合同变更发起流程.md",
+                "memory_type": "entities",
+                "after": "# 物业合同变更从备案详情发起\n淮安物管物业/前期物业合同变更只能从已备案的备案详情发起，变更列表隐藏「新增」按钮，通过路由参数预填合同。\n\n## 业务要求\n- 合同变更不能在变更列表里点「新增」再手选备案合同，只能从已备案的备案详情发起，与物业管理区域、项目等模块一致。\n\n## 实现要点\n- propertyContract/components/index.vue 在 businessType === CHANGE 时列表工具栏只保留「删除」，隐藏「新增」。\n- propertyContract/components/detail.vue 在备案详情（businessType = ADD 且 bizState === '2' 已备案）展示「变更」，跳转变更新增页并通过路由参数 propertyContractId 带入当前合同。\n- 物业合同走 propertyContractChange/detail，前期物业合同走 propertyContractTemporaryChange/detail。\n- 变更新增页增加 initContractFromRoute：检测到 propertyContractId 时自动调用 setContract 预填，等价于原变更页手动选合同编号。\n\n## 验证与归属\n- 验证：会话 3a4b31d6 变更说明与使用流程四步；用户明确要求去除合同变更中「新增」并与其它功能变更流程保持一致。\n- 涉及文件：propertyContract/components/index.vue、propertyContract/components/detail.vue、propertyContractChange/detail.vue、propertyContractTemporaryChange/detail.vue\n- 所属项目：淮安物管；来源会话：3a4b31d6-e54c-4328-a573-791c837f3ea3；代码基线：22a1d9d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/变更角标空值对比.md",
+                "memory_type": "entities",
+                "after": "# 变更角标空值对比修复\n淮安物管 detail-template 的 hasChangeIndicator 在字段「空→有值」时误判无变更，需重写对比逻辑并同步 originInfo 作基准。\n\n## 问题现象\n- 企业变更详情中字段从空变为有值（如成立日期 originInfo.foundingDate: null → 变更后 2026-06-30）却不显示变更角标。\n\n## 根因与修复\n- 根因一：hasChangeIndicator 在 getChangeBeforeRaw 为 null/undefined 时直接 return false，把「空→有值」误判为无变更。\n- 根因二：changeBeforeObject 只等异步 beforeForm，未在详情加载后立刻合并接口已返回的 form.originInfo，对比基准在请求完成前为空或不完整。\n- 修复：detail-template.vue 重写 hasChangeIndicator——字段在变更前对象中存在即参与对比，null/undefined 按空值与当前值比；formatDateTime 支持纯日期 YYYY-MM-DD。\n- 业务详情（如 companyManagement/components/detail.vue）：changeBeforeObject 同步合并 form.originInfo；setChangeBeforeForm 先写入 originInfo 再异步拉完整备案数据补充。\n\n## 验证与归属\n- 与通用「变更角标」记忆互补，侧重空值与 originInfo 时序。\n- 验证：会话 d95654c9 根因分析与修复后「成立日期」应显示角标、悬停「原值：（空）」。\n- 涉及文件：detail-template.vue、companyManagement/components/detail.vue、companyManagement/change/detail.vue\n- 所属项目：淮安物管；来源会话：d95654c9-dcbe-475e-8a5b-7cc2aa344fe8；代码基线：53c813e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/自治变更单草稿委员管理.md",
+                "memory_type": "entities",
+                "after": "# 自治变更单草稿态委员管理\n淮安物管业委会/物管会变更单在草稿态（bizState=0）放开委员子表增删，并与备案页字段必填口径对齐。\n\n## 业务背景\n- 业委会变更、物管会变更保存后不能新增/删除委员，且联系人、联系电话被设成必填，与「业委会/物管会备案」不一致。\n\n## 实现要点\n- 两个变更详情页向共用子表 MemberInformationTable 传入 :editable=\"form.bizState == '0'\"（草稿态才可增删）、:businessType（物管会 3、业委会 2）、:complexId（新增委员选户室）。\n- 联系人相关字段去掉 required，保留电话格式校验——物管会：secretaryName/secretaryPhone；业委会：contactName/officePhone/secretaryName/secretaryPhone。\n- editable=true 时操作列增加行内「删除」，调用 DELETE /autonomy/ownerCommitteeMember/{id}，顶部保留批量删除。\n- 核对物管会变更页勿误传 businessType='2'。\n\n## 验证与归属\n- 与 #1077（子区块可操作性要 formMode+状态双判）差异：本条是业主自治变更单在草稿态放开委员子表，并与备案页字段必填口径对齐。\n- 验证：会话 6c5825ab（2026-07-08，基线 21ef3c1）用户要求保存后可增删委员、联系人非必填，并确认删除委员接口能力。\n- 涉及文件：autonomy/change/property/detail.vue、autonomy/change/industry/detail.vue、autonomy/record/components/MemberInformationTable.vue\n- 所属项目：淮安物管；来源会话：6c5825ab-1043-4e87-8560-4c096e4cd431；代码基线：21ef3c1"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

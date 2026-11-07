@@ -1,0 +1,23 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-c452a981-b645-4854-a7c5-081406ee3816/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:47:29.485661+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/前端技术笔记/institution_register_docx_blocked.md",
+                "memory_type": "entities",
+                "after": "# 单页机构注册表单Word上传被硬编码拦截\nzhi3-web-admin-h5-g 机构注册单页表单上传委托授权书 Word 时提示「格式不允许」，根因为前端校验硬编码扩展名白名单。\n\n## 问题根因\n- 要件卡片顶部提示按配置推导，正确显示 `.doc,.docx,.png,.jpg,.pdf`（来自 acceptTypeHint）\n- 上传前校验走 `handleRequirementBeforeUpload` → `validateAppendixFile`，使用硬编码 `APPENDIX_ACCEPT_EXTENSIONS = ['png','jpg','pdf']`\n- 展示按配置、校验走全局，口径错位导致 .doc/.docx 被前端拦下\n- 后端字典 `file_type`（`1→doc,docx / 3→pdf / 0→.png,.jpg`）与配置（委托授权书 `fileType=1,0,3`）本就支持 word\n\n## 解决方案\n- `institutionRegisterAppendix.js`：新增 `resolveAllowedExtensions(fileType, fileTypeOptions)`，按要件 `fileType` 命中字典 `remark` 推导允许扩展名\n- `validateAppendixFile` 支持传入按配置推导清单，未命中回落默认常量\n- `InstitutionRegisterSingleForm.vue`：`handleRequirementBeforeUpload(file, item)` 按当前要件 `fileType` 校验\n- `uploadTip` 汇总可见要件配置类型展示，避免顶部与卡片提示再错位\n\n## 验证与归属\n- `npm run build`（vite 8.3.5）通过，`npx eslint` 两文件 0 error\n- 逻辑复刻：`fileType=\"1,0,3\"` 时 doc/docx/png/jpg/pdf 放行，xls/txt 拦截\n- 多步向导 `Step3Appendix`/`InstitutionUploadItem` 本就按配置校验，无需改动\n- 子模块 `zhi2-web-admin` 提交 `8b116ae8c`，父仓库 `7f560d0`，均推 `origin/develop/v3.0.0`；错误台账新增 E-027"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_020",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T05:57:02.095378+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/option_list_api_choice.md",
+                "memory_type": "entities",
+                "after": "# 选项列表接口选型纠偏\n下拉/选项数据为空时，确认 list 接口存在后不要顺手换成 /page 或加本地状态过滤，应固定用 /list 拿全量选项并显式映射字段。\n\n## 问题现象\n- 选项类下拉数据为空时，易顺手把 /xxx/list 改成 /xxx/page 分页接口\n- 或在本地对结果加状态过滤（如只留启用项），导致数据被全滤掉且不报错\n- 真实根因常为响应解析或字段映射问题，顺手改动会掩盖真正原因\n\n## 根因分析\n- 选项类接口与分页列表接口是两种契约：/page 需 pageNum/pageSize 且返回 rows+total\n- V3 里末尾段可能被请求拦截器当成 REST 动作改写，导致 /page 返回空\n- 本地状态过滤在接口本只回有效项时会把数据全滤掉，且静默无报错\n\n## 解决方案\n- 选项类下拉固定用 /list（或已有的 listAll），不加分页参数、不做本地状态过滤\n- 先确认接口路径与响应结构正确，再处理字段映射（如 workOrderCategoryId、_categoryName 显式映射）\n- 改完必须刷新页面复验，仍为空时直接索取接口真实返回 JSON 精确对齐，不继续猜路径\n- 确认真正根因后，误加的状态过滤和 /page 调用必须一起回退\n\n## 验证与归属\n- 会话 1401b92d 结论：继续使用 /list 接口，去掉误加状态过滤和 /page 调用，补字段映射\n- 涉及文件：property/workOrder/report/index.vue、report/components/AddOrderDialog.vue\n- 所属项目：产品2.0；来源会话：1401b92d-0ad2-433b-83f9-aa435e2c7296；代码基线：42b6033"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/input_suffix_height.md",
+                "memory_type": "entities",
+                "after": "# 输入框后缀高度不一致双根因\n带后缀（如面积后缀 ㎡）的输入框组本地 dev 正常、生产后缀高出一截，根因为错误 flex 拉伸策略与 CSS 加载顺序竞态叠加。\n\n## 问题现象\n- 带后缀输入框组本地 dev 正常，部署生产后后缀比输入框高出一截\n- 已部署 input-group-fix.css 仍不生效（commit 5bb6be7 已上线但样式仍不对）\n- 生产域名 https://www.ylzhwy.com:8081/ 验证仍失败\n\n## 根因分析\n- 根因一：上一版用 align-items:stretch + align-self:stretch，表单项容器 min-height:38px 把后缀纵向撑满，输入框固定 36px，高度不一致\n- 根因二：index.html 用 media=\"none\" + onload 异步加载 element-ui.css / input-group-fix.css，生产构建下顺序不稳定，修复样式可能被 element-ui 默认样式覆盖\n- 本地 dev 由 Vite 注入样式顺序稳定所以看不出来\n\n## 解决方案\n- 纵向对齐改 align-items:center 并显式删掉 align-self:stretch，按尺寸给后缀写固定高度（medium:36px）\n- 两个 link 改同步顺序加载（去掉 media=\"none\"+onload 链式触发），element-ui.css 在前、覆盖样式在后\n- 覆盖样式在 element-ui.css 文件末尾追加一份兜底，确保 element-ui 无论何时生效都压得住\n- 部署后强刷缓存再验证\n\n## 验证与归属\n- 会话 6e092b88 结论：双根因确认与修复（element-ui.scss 改 center、移除 stretch、固定高度；index.html 改同步加载）\n- 涉及文件：components/AmountInput/index.vue、components/zs-input/zs-input.vue、styles/element-ui.scss、public/assets/css/element-ui.css、index.html\n- 所属项目：产品2.0；来源会话：6e092b88-7451-45d2-9591-af86334101f0；代码基线：1fa4993"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/pay_poll_order_detail.md",
+                "memory_type": "entities",
+                "after": "# 支付状态轮询改用订单详情\n物业收费/账单收款弹窗轮询支付完成时，禁用不存在的 /queryOrderStatus，改为查订单详情接口取 payState 判定已支付。\n\n## 问题现象\n- 收款弹窗轮询调用 /property/onlinePay/queryOrderStatus?orderNo=xxx，接口 404\n- 支付成功后弹窗永不自动关闭，用户需手动操作\n\n## 根因分析\n- 该查询接口在后端不存在（用户明确指出应直接查订单详情获取支付状态）\n- 订单支付状态的权威来源是订单详情本身，订单详情页一直用 spOrder/detail 获取\n- 前端若只用 queryOrderStatus 会因 404 永远拿不到支付完成信号\n\n## 解决方案\n- 轮询改为 GET /property/spOrder/{orderId}（订单详情），取 payState 字段判定\n- payState === '1' 或 1 即已支付——后端可能返回字符串或数字，两种都判\n- 定时器统一在 startPolling/stopPolling 管理：启动先 stopPolling 防重复；orderId 先 String() 归一后闭包捕获\n- 轮询异常直接吞掉继续下一轮，不弹提示；支付成功分支先 stopPolling 再弹 message 与关弹窗；间隔 3s\n\n## 验证与归属\n- 会话 89a522be 结论：轮询改 GET /property/spOrder/{orderId}，与 OrderDetailDialog/spOrder/detail 用法一致\n- 涉及文件：spFeeBill/components/collectionDialog.vue、bill/components/PaymentDialog.vue、spFeeBill/components/index.vue\n- 所属项目：产品2.0；来源会话：89a522be-d7a1-4f44-b621-919cfb27dfd4；代码基线：6accf9a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/login_pwd_encrypt.md",
+                "memory_type": "entities",
+                "after": "# 登录密码加密恢复约定\n登录页密码加密被整段删除后需恢复，AES-CBC 的 Key/IV/模式必须与历史 bug43754 版本逐字节一致，复用全局 CryptoJS。\n\n## 问题现象\n- 登录页（用户登录 /security/auth/userLogin 与机构登录 /security/auth/companyLogin）密码加密被某次提交整段去掉，密码明文提交\n- 需按历史实现恢复，但不能恢复成另一个版本的参数\n\n## 根因分析\n- 加密参数是前后端私有硬约定：Key=`A-16-Byte-keyValA-16-Byte-keyVal`、IV=`A-16-Byte-String`、AES-CBC + PKCS7，后端只按这套解密\n- 任何改随机 IV / 换 Key 长度都会让登录直接失败\n- 加密依赖 index.html 全局引入的 CryptoJS，另装 crypto-js 或改用 WebCrypto 会引入不一致实现\n\n## 解决方案\n- 新增独立工具 src/utils/passwordEncrypt.js 封装 encryptPassword()（复用全局 CryptoJS）\n- login.vue 在 handleLogin 里对 password 先加密再提交，用户登录与机构登录两条分支都传密文\n- 恢复前先用 git log -S/-L 追到具体提交，确认参数与 bug43754 一致再动手\n- 验证方式：登录页抓包看两接口 password 字段是否为 Base64 密文而非明文\n\n## 验证与归属\n- 会话 c77f4406 结论：新增 passwordEncrypt.js 封装 AES-CBC，login.vue 两分支均传密文，参数与 bug43754 一致\n- 涉及文件：utils/passwordEncrypt.js、views/login.vue、index.html\n- 所属项目：产品2.0；来源会话：c77f4406-8fd7-4cd0-b97f-9bc57e4e5db2；代码基线：dfe69d6"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

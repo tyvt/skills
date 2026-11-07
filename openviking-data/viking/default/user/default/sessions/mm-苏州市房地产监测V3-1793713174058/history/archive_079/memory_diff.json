@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793713174058/history/archive_079",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T16:13:07.742881+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/personnel_appendix_buscode.md",
+                "memory_type": "entities",
+                "after": "# 从业人员详情附件busCode修复\n苏州市房地产监测V3 中三个从业人员详情页附件 busCode 误用备案编码，改为返回 auditBusCode 适配变更。\n\n## 问题根因\n- 三个从业人员详情页 `appendixBusCode` 固定调用 `resolvePersonnelAppendixBusCode` 返回备案编码，导致变更后附件接口仍带备案 busCode\n\n## 修复方案\n- 修改为返回 `this.auditBusCode` 以适配变更编码\n- 涉及 AgencyPersonnelDetail.vue、LeasePersonnelDetail.vue、staffManagement/detail.vue 三文件\n\n## 涉及文件\n- `src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue`\n- `src/views/institution/leasePersonnel/components/LeasePersonnelDetail.vue`\n- `src/views/company/staffManagement/components/detail.vue`\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3/161.md\n- 来源会话ID：01a1631f-8ce8-70c5-a400-766aeafe6174\n- 所属项目：苏州市房地产监测V3；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/branch_appendix_fix.md",
+                "memory_type": "entities",
+                "after": "# 分支页附件预览报错与保存校验修复\n苏州市房地产监测V3 中分支页附件预览因字典匹配错误报错且保存未校验必传附件，已修复。\n\n## 问题根因\n- `ImageGrid.vue` 中 `file_type` 字典未匹配使 `elem` 为 `undefined` 并报错，导致缩略图与预览失效\n- `AgencyBranchDetail` 保存仅校验表单而未查必传附件\n\n## 修复方案\n- `ImageGrid.vue` 以 `dictValue === '0'` 判图片，缩略图取 `fileThumbnailSite`、预览取 `fileSite`，修正索引\n- `FileList.vue` 预览按钮兼容大小写并扩展 gif/webp/bmp\n- 新增 `src/utils/appendix.js` 的 `checkRequiredAppendix`，在 `handleSave` 与 `CancelDialog` 注销前调用校验\n\n## 涉及文件\n- `AnnexUpload/index.vue`\n- `AgencyBranchDetail.vue`\n- `ImageGrid.vue`\n- `AgencyPersonnelDetail.vue`\n- `AgencyBranchList.vue`\n- `resolveServerAssetUrl.js`\n- `FileList.vue`\n- `AgencyPersonnelList.vue`\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3/162.md\n- 来源会话ID：7dc2bf6f-2c30-4f16-b810-f728fa38f9d8\n- 所属项目：苏州市房地产监测V3；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/building_path_fix.md",
+                "memory_type": "entities",
+                "after": "# 楼盘表API旧路径buildinginfo致400修复\n苏州市房地产监测V3 中楼盘表API基础路径未统一致请求400错误，已批量替换路径修复。\n\n## 问题根因\n- 原 `/building/buildinginfo` 基础路径未统一致 `BuildingDialog.vue` 定金缴款等请求400错误\n\n## 修复方案\n- 修改17文件25处URL，将基础路径替换为 `/building/building`\n- 子路径如 `listNofenye`、`buildingChange/*` 与前端目录 `projectManagement/buildinginfo/` 保持不变\n\n## 涉及文件\n- `buildinginfo.js`\n- `unitinfo.js`\n- `BuildingDialog.vue`\n- `路由信息.json`\n- `CashsaleDetail.vue`\n- `.workbuddy/memory/2026-09-11.md`\n- `前端技术信息.md`\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3/162.md\n- 来源会话ID：b46a5433-8dbe-4b79-a009-979887275173\n- 所属项目：苏州市房地产监测V3；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/login_zoom_fix.md",
+                "memory_type": "entities",
+                "before": "# 登录框加载放大修复\n苏州市房地产监测V3 中登录框因 JS 动态计算尺寸加载放大，改为固定尺寸消除问题。\n\n## 问题根因\n- `login.vue` 中 `syncLoginBoxLayout` 及 ResizeObserver 动态计算尺寸导致登录框加载放大\n- 短视口下可能出现溢出\n- ResizeObserver 监听登录盒后基于 `scrollHeight` 动态加大 `minHeight`，形成正反馈使图片区域涨至全屏\n\n## 修复方案\n- 删除动态逻辑，面板固定宽度 520px，图片使用 `object-fit: cover`\n- `.login` 改 `min-height:100%` 消除短视口溢出\n- 移除 ResizeObserver 与 scrollHeight 量测，改用固定 min-height 与图片宽高比计算\n- 于 `zhi2-web-admin/src/views/login.vue` 及门户 `login.vue` 增加视口上限（单栏≤42%屏宽、盒高≤78%屏高），仅用 `resize` 事件重算\n\n## 涉及文件\n- `zhi2-web-admin/src/views/login.vue`\n- 门户 `login.vue`\n- `zhi2-web-admin/index.html`、`src/main.js`、`dist/index.html`、`src/App.vue`\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3-rest/126.md；src=苏州市房地产监测V3/121.md\n- 来源会话ID：68b279ff-7526-4e1e-b55d-551e0e5c8376；57edf49f-b83c-4745-8819-a2d163839b67\n- 所属项目：苏州市房地产监测V3；代码基线：none",
+                "after": "# 登录框加载放大修复\n苏州市房地产监测V3 中登录框因 JS 动态计算尺寸加载放大，改为固定尺寸消除问题。\n\n## 问题根因\n- `login.vue` 中 `syncLoginBoxLayout` 及 ResizeObserver 动态计算尺寸导致登录框加载放大\n- 短视口下可能出现溢出\n- ResizeObserver 监听登录盒后基于 `scrollHeight` 动态加大 `minHeight`，形成正反馈使图片区域涨至全屏\n\n## 修复方案\n- 删除动态逻辑，面板固定宽度 520px，图片使用 `object-fit: cover`\n- `.login` 改 `min-height:100%` 消除短视口溢出\n- 移除 ResizeObserver 与 scrollHeight 量测，改用固定 min-height 与图片宽高比计算\n- 于 `zhi2-web-admin/src/views/login.vue` 及门户 `login.vue` 增加视口上限（单栏≤42%屏宽、盒高≤78%屏高），仅用 `resize` 事件重算\n\n## 涉及文件\n- `zhi2-web-admin/src/views/login.vue`\n- 门户 `login.vue`\n- `zhi2-web-admin/index.html`、`src/main.js`、`dist/index.html`、`src/App.vue`\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3-rest/126.md；src=苏州市房地产监测V3/121.md；src=苏州市房地产监测V3/161.md\n- 来源会话ID：68b279ff-7526-4e1e-b55d-551e0e5c8376；57edf49f-b83c-4745-8819-a2d163839b67\n- 所属项目：苏州市房地产监测V3；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

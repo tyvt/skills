@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-物业手持B端-1793807394657/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T16:08:52.947574+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_message_reddot_fix.md",
+                "memory_type": "entities",
+                "after": "# 首页消息通知未读红点返回不消失\n物业手持B端首页消息通知点击查看详情返回后未读红点仍存在的问题及修复方案。\n\n## 问题根因\n- 首页 `applyMessages` 未读判断与消息列表不一致，且消息详情返回后列表未刷新导致红点残留\n\n## 解决方案\n- `src/pages/message/index.vue` 新增 `markMessageRead`：未读且有 `msgRangeId` 时调用 `updateReadFlag`，成功后本地 `item.unread = false`\n- `openMessage` 改为 `async`，跳转详情或工单页前先执行 `markMessageRead`\n- `onShow` 每次进入页面都会 `loadMessages({ reset: true })`，从详情返回会刷新列表\n- `src/pages/home/index.vue` 的 `applyMessages` 未读判断由 `readFlag !== '1'` 改为 `readFlag === '0'`，与消息列表一致\n\n## 关键文件\n- 首页通知卡片（红点展示）：`src/pages/home/index.vue`\n- 消息列表页：`src/pages/message/index.vue`\n- 消息详情页：`src/pages/message/detail.vue`\n- 消息 API：`src/api/msg.js`\n- 首页消息拉取 API：`src/api/home.js`\n- 路由配置：`src/pages.json`\n- 无关/旧组件：`src/components/NoticeList.vue`（未接入当前首页流程）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=物业手持B端\n- 涉及文件：src/pages/home/index.vue、src/pages/message/index.vue、src/pages/message/detail.vue、src/api/msg.js、src/api/home.js、package.json\n- 来源会话ID：a15deb31-e978-46bc-a0d9-a8b7c5050469；关联调查会话 652779ed-8494-4c1a-86e5-496e1851f191\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/inspection_date_blank_fix.md",
+                "memory_type": "entities",
+                "after": "# 巡检记录日期选择下方留白\n物业手持B端巡检记录添加页巡检日期选择下方留白的问题及修复方案。\n\n## 问题根因\n- 巡检/维保/年检第二步使用 `uni-datetime-picker`，下方存在留白\n\n## 解决方案\n- 扩展 `ZsDatePicker` 单日期模式：新增 `type=\"date\"`，支持 `v-model` / `placeholder`，单行文本触发器，点击弹出底部年月日三列滚轮，popup 与 range 模式共用，单日期使用全量年份范围（当前年 ±20/1）\n- `src/pages_facility/record/add.vue` 巡检/维保/年检第二步的 `uni-datetime-picker` 改为 `ZsDatePicker type=\"date\"`，删除 `onDateChange` 和 `:deep(.uni-calendar__content-mobile)` 补丁，添加表单样式与 `form-row-value` 对齐\n- `src/pages_facility/record/addScrap.vue` 同步替换日期组件\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=物业手持B端\n- 涉及文件：src/components/ZsDatePicker/ZsDatePicker.vue、src/pages_facility/record/add.vue、src/pages_facility/record/addScrap.vue\n- 来源会话ID：348a159a-0e6d-49a3-a318-5c1a3d19e32b\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/inspection_step_reset.md",
+                "memory_type": "entities",
+                "before": "# 巡检步骤增删后新增状态未重置\n物业手持B端巡检记录添加并删除步骤后再次新增存在状态残留的已知问题及修复方案。\n\n## 问题根因\n- 巡检记录添加并删除步骤后再次新增存在状态残留\n\n## 解决方案\n- 在 `src/pages_facility/record/add.vue` 修正步骤状态重置逻辑\n\n## 验证与归属\n- 验证证据：src=物业手持B端/004.md\n- 涉及文件：record/add.vue、ZsUploader.vue、ZsDialog.vue、TransferKnowledgeDialog.vue、CompleteDialog.vue、package.json、workbench/index.vue、record/index.vue\n- 来源会话ID：ce335c8e-5171-4165-8ef8-38b280007b21；代码基线：none",
+                "after": "# 巡检步骤增删后新增状态未重置\n物业手持B端巡检记录添加并删除步骤后再次新增存在状态残留的已知问题及修复方案。\n\n## 问题根因\n- 巡检记录添加并删除步骤后再次新增存在状态残留\n\n## 解决方案\n- `src/pages_facility/record/add.vue` 给 `ZsUploader` 加 `v-if=\"showStepFormPopup\"`：弹窗关闭时销毁上传组件，再次打开时重新挂载，避免 `uni-file-picker` 内部 `files` 残留\n- 统一取消逻辑：新增 `onCancelStepForm`，关闭弹窗并调用 `resetStepForm()`\n\n## 验证与归属\n- 验证证据：src=物业手持B端/004.md\n- 涉及文件：record/add.vue、ZsUploader.vue、ZsDialog.vue、TransferKnowledgeDialog.vue、CompleteDialog.vue、package.json、workbench/index.vue、record/index.vue\n- 来源会话ID：ce335c8e-5171-4165-8ef8-38b280007b21；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

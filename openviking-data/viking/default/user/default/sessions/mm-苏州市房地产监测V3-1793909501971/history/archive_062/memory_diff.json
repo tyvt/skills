@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_062",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T23:21:28.636316+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cashsale_building_fix.md",
+                "memory_type": "entities",
+                "after": "# 现售楼幢删除调后端接口修复\n苏州市房地产监测V3 修复现售楼幢删除不调后端接口问题，新增回调与持久化逻辑。\n\n## 修改内容\n- `PresaleBuildingTable.vue`：新增可选回调 `onRemoveBuilding`、`onBatchRemoveBuildings`；有回调时先 `await` 回调成功再提示「删除成功」，无回调时保持原逻辑 `emit('remove')`（预售许可模块不受影响）；批量删除只触发一次回调避免多次 save\n- `PresaleBuildingSection.vue`：透传上述两个回调 props\n- `CashsaleDetail.vue`：新增 `removeBuildingsPersist` / `removeSingleBuilding`；已保存单据（有 `cashsaleRecordId`）删除后调用 `POST /presale/cashsale/save` 再 `getDetail()` 刷新；新增草稿仅更新本地 `selectedBuildings` 和 `form.houses` 不调接口；至少保留一幢楼幢的校验保留\n\n## 验证方式\n- 打开 `bizState=0` 的已保存现售/转现售单据（编辑态），在「现售楼幢列表」点「删除」并确认，Network 应出现 `POST /presale/cashsale/save`\n\n## 归属\n- 所属项目：苏州市房地产监测V3\n- 来源会话：2ac50d8d-bb50-456a-a40f-2c8538421516"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_lazy_mount.md",
+                "memory_type": "entities",
+                "after": "# 弹窗懒挂载与 @open 不匹配导致列表未加载\n苏州市房地产监测V3 中父页面用 `v-if` + `:visible.sync` 懒创建弹窗，导致 `@open` 生命周期不匹配、`getList()` 首次打开未调用。\n\n## 问题根因\n- 父页面（缴款通知书、其他缴款等详情页）普遍用 `v-if` + `:visible.sync` 懒创建弹窗，点击时 `isProjectDialogVisible=true` 使组件首次挂载时 `visible` 已是 `true`\n- 弹窗组件（ProjectDialog，views/components 与 components/ProjectDialog 两套实现一致）只在 `@open` 里调列表接口\n- `@open` 仅在 `visible` 由 false→true 时触发，挂载即 `true` 故 `@open` 从未触发，`getList()` 从未被调用\n\n## 涉及文件\n- `zhi2-web-admin/src/views/supervision/deposit/other_record/detail.vue`\n- `zhi2-web-admin/src/views/components/ProjectDialog.vue`\n- `zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue`\n\n## 归属\n- 所属项目：苏州市房地产监测V3\n- 来源会话：8741662d-a0ae-43f6-861e-3a3ff5b3e5f4"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/franchise_dialog_refactor.md",
+                "memory_type": "entities",
+                "after": "# 加盟门店弹窗改用公共 SelectDialog 组件\n苏州市房地产监测V3 将 `FranchiseDialog.vue` 内嵌选择弹窗改为公共 `SelectDialog.open()`。\n\n## 修改内容\n- 加盟门店名称输入框：使用 `suffix-icon=\"el-icon-search\"`，去掉手写 `slot=\"suffix\"` 和 `@click.native`；保留 `readonly` + `@focus=\"selectCompany\"`，与监管、信用等页一致\n- 选择门店：删除模板内嵌的 `<zs-select-dialog>` 以及 `companyDialogVisible`、`companySearchItems`；在 `selectCompany()` 中改用 `SelectDialog.open()`（接口、列、关键字搜索与原先相同）；`setCompany` / `close` 不再维护选择弹窗的 visible 状态\n- 其它：仅保留 `DetailTemplate` 的局部 import，`zs-*` 仍走全局注册；Lint 与 Vue review 无阻断问题\n\n## 验证方式\n- 关联 → 聚焦门店名称 → 选择并确认回填；编辑时名称不可选；查看\n\n## 涉及文件\n- `zhi2-web-admin/src/views/company/brand/components/FranchiseDialog.vue`\n\n## 归属\n- 所属项目：苏州市房地产监测V3\n- 来源会话：81b187e2-7713-4d40-9f74-4a9e3293f049"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_apply_contract.md",
+                "memory_type": "entities",
+                "after": "# 企业申请模块前端契约与后端分离\n苏州市房地产监测V3 仓库仅含前端 `zhi2-web-admin`，企业申请相关后端在独立服务仓库。\n\n## 仓库现状\n- 本仓库只有前端（zhi2-web-admin），没有 Java Controller / Service / Entity / Mapper XML 等后端实现\n- `/company/companyApply/page`、`/detail`、`/update` 需在后端独立服务仓库修改\n\n## 前端契约\n- API 定义：`zhi2-web-admin/src/api/company/companyApply.js`\n- 列表 `companyApplyAudit/index.vue`：筛选用 `approvalRegion`，列表列也是 `approvalRegion`\n- 详情 `companyApplyAudit/detail.vue`：已读 `companyApply.administrativeArea`，用 `ECONOMIC_INSTITUTIONS_REGION` 展示\n- `update` 按 mixin 约定为 `POST /company/companyApply/update`，但当前前端未封装、未调用\n\n## 字段差异\n- `administrativeArea`：详情页已用；列表页仍用 `approvalRegion`（formatter 有 `approvalRegion || adm...`）\n\n## 归属\n- 所属项目：苏州市房地产监测V3\n- 来源会话：1ac6ad00-db16-4fd7-aafc-8152e4a58b8c"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

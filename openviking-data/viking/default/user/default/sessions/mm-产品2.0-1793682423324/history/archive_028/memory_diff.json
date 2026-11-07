@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_028",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:19:02.515141+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/代码规范/dialog_mixins_contract.md",
+                "memory_type": "entities",
+                "after": "# dialogMixins 弹窗契约字段补齐规范\n使用 dialogMixins 的弹窗必须声明 primaryKey、moduleName、businessName 三个字段，否则详情保存会打到旧的 V2 REST 接口。\n\n## 问题现象\n- 附件配置弹窗（FjDialog.vue）打开/保存打到 GET /file/appendixConfig/{雪花ID}、PUT /file/appendixConfig 等 V2 风格 REST 地址\n- 列表页已走 POST /page 的 V3 规范，同一模块存在两种接口风格并存\n\n## 根本原因\n- 组件虽 mixins 了 dialogMixins，但页面自定义了 getDetail()/submitForm() 且未声明三个契约字段\n- dialogMixins 标准 CRUD 链路（detail 走 POST /detail、add/update 走 /add 与 /update）未生效，mixin 只贡献弹窗开合\n\n## 修复步骤\n- 补齐 primaryKey、moduleName、businessName 三个字段\n- 将父级 mode 映射成 dialogFormMode，对齐 dialogMixins 的 onOpen/init 流程\n- 删除自定义 getDetail() 和 submitForm()，交给 mixin 发 POST\n- 列表页补 @refresh=\"getList\" 保证保存后刷新\n\n## 排查与范围\n- 参照已迁移的 ArchiveDetailDialog.vue\n- 排查同类问题 grep 弹窗里是否有 `$get('.../append/ + id)` 或 `$put(`\n- 只改本模块 CRUD 范围，附件上传类接口（/file/appendix）不在规范化范围内\n- 涉及文件：zhi2-web-admin/src/views/tool/fjflpz/components/FjDialog.vue、index.vue、mixins/dialogMixins.js、mixins/form.js；来源会话 4d504758，代码基线 5169909"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/list_migration_mapping.md",
+                "memory_type": "entities",
+                "after": "# 列表页迁 ListTemplate/listMixins 映射口径\n将手写 el-table 列表页统一迁到 ListTemplate + listMixins 时，需按 URL 拆 businessName、权限串拆 permsPrefix、自定义流程靠 baseTemplate.replace 注入。\n\n## 映射口径\n- moduleName/businessName 从接口 URL 拆：/prefund/engContract/list 即 moduleName='prefund'、businessName='engContract'，默认 apiSuffix='list'\n- permsPrefix 从原 v-hasPermi 逐条反推，用冒号分段（xmxx:gcht、capital:change、riskmanage:riskregister）\n- primaryKey 逐页人工核对（contractId / proChangeId / realTransactionId / projectDeliveryId / versionId / riskProRegisterId），错一个则查看/删除静默失效\n- 搜索项差异补进 queryParams，否则接口收不到条件\n\n## 保留手段\n- 页面独有弹窗（ProjectDialog/ExtractDialog）、额外按钮、动态列名、disableButton 等自定义逻辑，通过 baseTemplate.replace 注入模板片段或在 mixin 钩子里覆写\n- 有自定义 getList 的页面保留并注明分支接口，不可改回手写表格\n\n## 回归与验证\n- 迁移后按「搜索项—列顺序—行内 link 跳转—删除回调」四项逐页回归\n- 参考会话 0c55b984：6 个 supervision 列表页按 xy/index.vue 批量迁移\n- 涉及文件：mixins/ListTemplate.js、mixins/listMixins.js、views/supervision/agreement/xy/index.vue，代码基线 39e3114"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/branch_merge_recovery.md",
+                "memory_type": "entities",
+                "after": "# 多分支并行合并丢代码的定位与恢复流程\ndevelop/v2.6.2 等目标分支上工单、知识库代码整块消失时，需按目录比对差异文件数，再单提交恢复。\n\n## 定位方法\n- 先确认子模块 zhi2-web-admin 在目标分支是否检出完整，避免稀疏检出误判文件不存在\n- 按业务目录（src/views 下 workOrder、知识库对应目录）统计两分支文件数差集，差集非空即确认丢失\n- 在功能分支上 git log -- <目录> 找到引入功能的提交，确认被哪次合并丢掉\n\n## 恢复方法\n- 在目标分支单独做「恢复合并时丢失的 X 相关代码」提交，只包含差集文件，不混其它改动\n- 恢复体量常见 20+ 文件、数千行，提交前让 pre-commit 的 eslint 跑通\n\n## 父仓与协作注意\n- 产品2.0 是父仓、zhi2-web-admin 是子模块，切错分支时子模块指针挂未提交变更\n- 同步修复须切到同一分支再更新子模块引用并提交，否则父仓记另一条分支 SHA\n- 并行多 AI 会话共用工作区时，提交前 git status 核对自己的文件，别提交别人改动\n- 参考会话 03553771：子模块提交 5af48d12b，23 文件 +5119 行，代码基线 57109f9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/代码模式/is_base_field_readonly.md",
+                "memory_type": "entities",
+                "after": "# 页内编辑态折叠成只红框字段可编辑\n物业服务费账单详情组件通过抽 isBaseFieldReadonly 谓词统一门控只读字段，不在模板逐字段写 disabled。\n\n## 基本做法\n- 新增计算属性 isBaseFieldReadonly（判定 formMode === 'edit'）统一门控，挂在只读字段 disabled 上\n- 新增态该属性恒为 false，新增页字段照常可填，不出现「新增也变灰」回归\n- 可编辑集合通常为「账单归属月、起止时间、金额、备注」加内嵌优惠记录子表\n\n## 为何不逐处改\n- 该详情组件被物业费/公共能耗费/电梯费/垃圾清运费四类账单共用，逐字段改 disabled 会漏\n- 会与 zs-form 整表 disabled 级联冲突（连带禁用区域内按钮），新增账单类型还会再次漂移\n\n## 配套与验证\n- 子表（优惠记录）按同一 formMode 分流：编辑态保留新增/编辑/撤销，查看态只留「查看」并隐藏批量操作\n- 用户给截图圈定范围时，先在组件顶部写死范围清单注释，再落地谓词\n- 参考会话 6d15f625：四类物业账单共用、规则全域生效，涉及 detail.vue 与 service/detail.vue，代码基线 075e6e9"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_009",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T05:27:43.737575+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsform_elrow_bug.md",
+                "memory_type": "entities",
+                "after": "# 弹窗表单 el-row 须置于 zs-form 外部\n在 zs-dialog 弹窗两列表单中，将 el-row 放在 zs-form 内部会导致输入框宽度塌陷、placeholder 显示不全。\n\n## 问题根因\n- 本项目 zs-form 已接管栅格计算（平台级 label 宽度 + 全局满宽规则）\n- 内部再塞 el-row 造成两层栅格叠加，el-col 的 50% 相对于已被收缩的容器计算，宽度塌陷\n- placeholder 长于压窄输入框时被截断，表现为显示不全而非布局错乱\n\n## 解决方案\n- 按已有弹窗（addpopupDialog 等）写法，将 el-row 提到 zs-form 外面：form-box → el-row → detail-from-container → zs-form.form → el-col(50%)\n- 改完后要求用户 Ctrl+F5 强刷，避免 Vite 热更新残留旧样式\n- 与「el-col 必须是 .zs-form 直接子级」「弹窗内禁写 el-row/el-col」两条口径互补：本条针对确实需要栅格时 el-row 放外层\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/maintenance/accRefund/components/AccountRefundTable.vue\n- 所属项目：产品2.0\n- 来源会话ID：d5ae2f3e-c3d7-4c77-8ef2-048ffc7b39f4\n- 代码基线：94b86fa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/formmode_subtable_hide.md",
+                "memory_type": "entities",
+                "after": "# 新增态隐藏配置型子表\n应用管理详情页中，新增态应使用 v-if=\"formMode !== 'add'\" 隐藏集成回调配置子表，并从提交体剔除该字段。\n\n## 问题根因\n- 配置型子表（如 EndpointTable）依赖主表已落库的主键才能挂载关联数据\n- 新增态主键不存在，展示子表只能填无法落库的行，且诱导用户以为可一起提交\n\n## 解决方案\n- 在 detail.vue 给子表加 v-if=\"formMode !== 'add'\"，仅编辑/查看态渲染\n- 提交数据新增分支不再带 endpoints 字段，避免后端收空数组或半成品\n- 产品流程变两步：新增填基本信息 → 保存后进入查看页才出现子表\n- 与「用主键存在性控显隐、不用 formMode」（#1042 后置模块）互补；显隐与提交体必须成对改\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/system/syncLog/index.vue；zhi2-web-admin/src/views/system/menu/index.vue\n- 所属项目：产品2.0\n- 来源会话ID：d9f3c68c-3ec6-4725-adf0-590b032f0388\n- 代码基线：1d563df"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_col_width.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column 内嵌复杂控件列宽修复\n在子表内用 zs-table-column 内嵌 zs-select/zs-input 等复杂控件时，列宽会被压到约 80px，需改用 min-width。\n\n## 问题根因\n- zs-table 默认列宽按纯文本测算 + 剩余宽度均分，对单元格内是表单控件一无所知\n- 复杂控件无文本宽度可测算，结果趋近最小值，被压成窄缝；固定 width 也因参与均分冲突而无效\n\n## 解决方案\n- 将列固定 width 改为 min-width，保证输入所需最小宽度\n- 关键列显式加宽（如回调地址列 260px）\n- 表格整体设 width:100%，使剩余空间分配有意义\n- 查看模式空值统一显示 -；详情加载保证数组字段始终为数组避免渲染异常\n- 列表页纯文本列仍走默认测算，不要照抄 min-width\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/system/syncLog/index.vue\n- 所属项目：产品2.0\n- 来源会话ID：d9f3c68c-3ec6-4725-adf0-590b032f0388\n- 代码基线：1d563df"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_sass_style_bug.md",
+                "memory_type": "entities",
+                "after": "# SFC 漏写 </style> 导致 Vite sass 报错\n在 Vue SFC 中多个 style 块时，前一个漏写 </style> 会导致 Vite 报 [sass] expected selector，实为标签闭合错乱。\n\n## 问题根因\n- 在已有 <style lang=\"scss\" scoped> 后追加非 scoped <style lang=\"scss\">，若前块末尾（常见 :deep 之后）漏 </style>\n- SFC 编译器把两块当同一段 SCSS 解析，后块 <style> 标签被喂进 Sass 报 expected selector\n- 错误信息指向 Sass 而无从提示缺失闭合标签，易误判为语法错\n\n## 解决方案\n- 定位报错文件所有 <style> 开闭数量，确认每个块都有 </style>（尤其以 :deep 结尾的 scoped 块）\n- 补齐后保存，仍报错则重启 npm run dev（HMR 可能缓存坏状态）\n- 属「Vue 标签闭合错乱伪装成工具链错误」家族，优先做标签配对检查而非改语法\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue\n- 所属项目：产品2.0\n- 来源会话ID：91caa295-2c37-448d-8386-139abc7c3402\n- 代码基线：64fa9e2"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

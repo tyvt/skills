@@ -3,7 +3,7 @@
 | 脚本 | 目标目录 | 范围 |
 |------|----------|------|
 | `snapshot-openviking-memory.mjs` | `openviking-memory/` | 仅 `memories/`（历史扁平快照） |
-| `snapshot-openviking-data.mjs` | `openviking-data/` | `memories/` + `peers/*/memories/` + 根摘要（**不含 sessions/vectordb**） |
+| `snapshot-openviking-data.mjs` | `openviking-data/` | **全量质量 data**：`user/default` 整树（含 sessions）+ `vectordb/`（不含 `_system`） |
 
 运行时真源：`%USERPROFILE%\.openviking\data\viking\default\user\default\`。
 

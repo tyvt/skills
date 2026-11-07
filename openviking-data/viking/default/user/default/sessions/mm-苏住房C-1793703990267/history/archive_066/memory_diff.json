@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_066",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T01:03:01.479522+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/module_gap_flex.md",
+                "memory_type": "entities",
+                "after": "# uni-app 自定义组件根节点 margin 不生效改用父级 flex gap\n苏住房C 的 zhi2-mobile-shimin 中，父组件 scoped 样式作用不到自定义组件根节点，模块间距须用父容器 flex + gap 控制。\n\n## 问题根因\n- pages_owner/project/info 顶部小区信息卡片与「小区周边」白卡贴在一起，加 module-gap（margin-top:10px）类无效\n- uni-app 小程序端父组件 scoped 样式作用不到自定义组件根节点，class 挂上样式却不落\n\n## 解决方案\n- 页面根容器（如 .project-page）用 display:flex; flex-direction:column; gap:20rpx 控制子模块间距\n- 删掉无效的 module-gap 类，与社区/街道信息页写法保持一致\n- 间距嫌小调 gap 到 24rpx/32rpx；通用约定：卡片间留缝一律用父级 flex gap，不给子组件根节点写 margin，也不 :deep 到子组件根做间距\n\n## 验证与归属\n- 验证证据：会话 80f4d555（基线 8fc3cc5），pages_owner/project/info/index 间距不生效改 .project-page flex+gap 后修复\n- 涉及文件：pages_owner/project/info/index.vue、components/commonNew/baseCard.vue、pages_owner/community/info/index.vue、pages_owner/subdistrict/info/index.vue\n- 所属项目：苏住房C；来源会话：80f4d555-4b91-4605-a249-4affc7710dfd；代码基线：8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/szffluzm_build_dir.md",
+                "memory_type": "entities",
+                "after": "# zhi2-mobile-shimin 打包产物目录与脚本命名约定\n苏住房C 项目从多品牌同源仓库复制而来，构建配置须改为 szffluzm 产物目录并移除命令中的 suzhufang 品牌后缀。\n\n## 问题根因\n- 多品牌同源仓库复制而来，构建配置保留大量 suzhufang 品牌后缀，产物目录仍是默认 dist\n- 用户要求打包目录改为 szffluzm，命令默认就是 suzhufang 不需写进命令名\n\n## 解决方案\n- vite.config.ts 的 outDir 指向 szffluzm 下对应端产物，并补 dev→development 映射（否则 npm run dev 加载不到 .env.development）\n- package.json 脚本收敛：development:suzhufang→dev、dev:suzhufang:mp-weixin→dev:mp-weixin、test:suzhufang→test:serve、build:suzhufang/build:h5→build、build:suzhufang:test→build:test、build:suzhufang:mp-weixin→build:mp-weixin\n- 同步根仓库 package.json 引用；常用命令固定为 npm run dev / npm run test / npm run build\n- .gitignore 同步排除新产物目录 szffluzm，验证产物看 szffluzm 而非 dist\n\n## 验证与归属\n- 验证证据：会话 5ebd895c（基线 a444c05），用户要求打包目录改 szffluzm 不用 dist、移除命令 suzhufang 字段，脚本完成重命名\n- 涉及文件：zhi2-mobile-shimin/package.json、zhi2-mobile-shimin/vite.config.ts、package.json、.gitignore、zhi2-mobile-shimin/.gitignore\n- 所属项目：苏住房C；来源会话：5ebd895c-0fec-43e6-b281-71292c6137e6；代码基线：a444c05"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/media_url_slash.md",
+                "memory_type": "entities",
+                "after": "# H5 子目录部署媒体相对路径被拼前缀\n苏住房C 的 zhi2-mobile-shimin 在 H5 子目录部署时，resolveMediaUrl 返回不带前导斜杠的相对路径，浏览器按当前页面路径拼接致图片 404。\n\n## 问题根因\n- 部署在 /testh5/pages/index/ 子目录时，utils/index.js 的 resolveMediaUrl 对媒体路径（zhi2-pro、zhi2-dev、zhi2-test、zs-fym 等）返回不带前导 / 的相对路径\n- 浏览器按当前页面路径解析相对 URL，把站点子目录前缀拼进去，实际请求成 .../testh5/pages/index/zhi2-pro/... 而非 .../zhi2-pro/...\n- 易被误判为后端返回路径不对，实际是前端拼 URL 语义问题；根路径部署测试环境看不出，只在子目录部署暴露\n\n## 解决方案\n- 在 resolveMediaUrl 对识别出的媒体资源目录统一补前导 /，强制从站点根解析\n- 改动落在 utils 一处即可覆盖所有用 ZsImage（:local=\"false\"）或直接调 resolveMediaUrl 的图片\n- 新增媒体目录前缀时同步加进白名单，否则新目录会复发同类问题\n\n## 验证与归属\n- 验证证据：会话 288c6ff2，用户给出实际访问地址 .../testh5/pages/index/zhi2-pro/2025/...png 要求改回 .../zhi2-pro/...，结论为补前导 /\n- 涉及文件：zhi2-mobile-shimin/src/utils/index.js、zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue\n- 所属项目：苏住房C；来源会话：288c6ff2-ac59-4b55-b6ee-a561f76eeba1；代码基线：d43894b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/image_uploader_crash.md",
+                "memory_type": "entities",
+                "after": "# 小程序端 ImageUploader 调 uni.chooseFile 必崩\n苏住房C 的 zhi2-mobile-shimin 中，ImageUploader 统一用 uni.chooseFile 选文件，但微信小程序端不存在该 API，运行时报 TypeError 崩溃。\n\n## 问题根因\n- ImageUploader 统一用 uni.chooseFile 选文件，但 uni.chooseFile 只在 H5/App 等平台实现，微信小程序端不存在该 API\n- 小程序（微信开发者工具 lib 3.7.12）点图片上传报 TypeError: common_vendor.index.chooseFile is not a function，栈落在 ImageUploader.js 的 chooseMedia 处\n- H5 与小程序混用的自研上传组件最容易踩，H5 测试通过不代表小程序可用\n\n## 解决方案\n- 组件内按平台与选择类型分派：H5 等支持平台走 uni.chooseFile；需视频用 uni.chooseMedia；只选图片（如 register 页）用 uni.chooseImage\n- 把「校验+上传」抽成独立的 uploadSelectedFile 方法，兼容小程序临时路径无扩展名情况（不能靠文件名后缀推类型）\n- 改完在微信开发者工具真机路径复测整条上传链路，不只 H5 预览\n\n## 验证与归属\n- 验证证据：会话 f62dbdc4（基线 5f0f4dc），用户贴出 TypeError 完整栈，结论为按平台分派 chooseFile/chooseMedia/chooseImage 并抽 uploadSelectedFile\n- 涉及文件：zhi2-mobile-shimin/src/components/ImageUploader/ImageUploader.vue、zhi2-mobile-shimin/src/pages_owner/house/owner/register.vue、zhi2-mobile-shimin/src/api/file.js\n- 所属项目：苏住房C；来源会话：f62dbdc4-5a71-4b38-86cc-ade4a540eb59；代码基线：5f0f4dc"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793967516734/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T12:20:23.613935+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_input_size_fix.md",
+                "memory_type": "entities",
+                "after": "# ZsInput 入参 size 归一化修复\n产品2.0 中 `zhi2-web-admin/src/components/zs-input/zs-input.vue` 对传给 Element Plus `ElInput` 的 `size` 做归一化，避免非法值触发 Vue prop 警告。\n\n## 问题根因\n- Element Plus 的 `ElInput` 的 `size` 仅允许 `large | default | small`（及空字符串）。\n- 项目历史代码可能传入 `mini/medium` 等非法值，导致 `main.js:194 [Vue warn]: Invalid prop \"size\"`。\n\n## 解决方案\n- 在 `zs-input.vue` 统一归一化：`medium → default`、`mini → small`、其它非法值 → `default`。\n- 保证全站使用 `ZsInput`（含登录页）传给 `ElInput` 的 `size` 永远合法。\n- 后续可评估对 `input-number` 的 size 是否同样归一化（非本次必需）。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=2-0\n- 涉及文件：`zhi2-web-admin/src/components/zs-input/zs-input.vue`、`main.js`\n- 所属项目：2-0；来源会话ID：a5963bb7-204d-42a4-88ac-9fc16822e761；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_series_fix.md",
+                "memory_type": "entities",
+                "after": "# ECharts series 为 undefined 导致渲染崩溃修复\n产品2.0 中图表组件存在 `setOption` 传入 `undefined` 的写法，导致 ECharts 渲染时访问 `series.type` 崩溃（`LineView.js:567 Uncaught ... reading 'type'`）。\n\n## 问题根因\n- 图表组件 props 默认值写成 `default: () => {}`，实际返回 `undefined`，随后 `myChart.setOption(undefined)`。\n- ECharts 在渲染某 series 时拿到 `undefined/null` 配置，内部访问 `series.type` 直接报错。\n\n## 解决方案\n- 修正 props 默认值：将 `default: () => {}` / `default: {}` 统一改为 `default: () => ({})`，避免传入 `undefined` 或共享对象。\n- `setOption` 前兜底清洗：对 `option.series` 做 `filter(Boolean)`，并对缺失 `type` 的 series 兜底补 `type: 'line'`。\n- 顺手修复 `LineChart.vue` 中 `addEventListener` 相关明显 bug。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=2-0\n- 涉及文件：`LineView.js`、`LineChart.vue`、`zhi2-web-admin/src/views/home/components/LineChart.vue`、`zhi2-web-admin/src/views/monitor/components/ComponentCharts.vue`\n- 所属项目：2-0；来源会话ID：8dac8daf-d2d6-4f13-a79c-6e0143d0dbce；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_023",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:52:32.166331+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c项目拓扑/dual_exec_env.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C双执行环境\n苏住房C主业务仓库 zhi2-mobile-shimin 同时存在小程序与 H5 两条构建/运行链，共用同一套 src 源码与工具函数。\n\n## 小程序链\n- uni-app + Vue3，`npm run build` 产出 `dist/`，用微信开发者工具导入 `D:/repository/苏住房C/dist` 验证\n- 构建末尾有 `[validate-dist]` 门禁，存在分包（pages_main、pages_benefit、pages_transaction 等）与主包体积限制\n\n## H5链\n- 同一 src 另有 H5 分支（如 suzhou-shiqu-suzhufang-main-v2.1），整站嵌入 APP 中使用\n- 不能调用小程序专有 API（navigateTo、原生拨号、rich-text 组件），必须走 APP 注入能力（如 app.js 的 toService 拨号）\n- H5 分支「点击没反应」类问题先查 APP 桥（toService 等）是否被调用\n\n## 共用与验证\n- `src/utils/index.js` 是两端共用，改跳转/拨号/H5 URL 归一化函数须评估小程序端是否回归\n- 验证口径不同：小程序重新构建核对 dist 产物；H5 至少跑通对应分支构建并确认改动在目标分支（子模块提交 + 父仓库更新指针）\n- 两仓库结构要求「子模块先行提交，父仓库只更新指针」\n- 来源会话：1ee54692、d9082516；代码基线：9a3c8db / a8c9568"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术模式/android_double_jump.md",
+                "memory_type": "entities",
+                "after": "# Android机器人问答页双跳节流方案\n苏住房C 安卓上打开机器人会进入两次问答页面，根因是组件内去重标志无效，须用模块级时间戳节流。\n\n## 问题现象\n- 安卓手机打开机器人时会进入两次问答页面，入口含首页入口与首页悬浮球 HomeRobotFloater\n- Android 同一次 onShow+点击连续触发两次跳转，两次 navigateTo 各压一个页面实例\n\n## 根因\n- 去重标志放组件实例内（data 的 isJumping），各入口实例各持一份互不知晓，节流形同虚设\n- 安卓触摸事件顺序与 iOS 不同，更易重复触发\n\n## 解决方案\n- 跳转逻辑下沉到独立工具 `src/utils/openAutomaticRobot.js`，用模块级变量记录上次跳转时间戳（800ms 窗口），重复调用直接 return\n- 所有入口（pages/index/home.vue、components/HomeRobotFloater/HomeRobotFloater.vue）统一调该工具，不在页面各写跳转\n- 验证须核对 dist 产物（dist/utils/openAutomaticRobot.js 含 800ms 拦截），微信开发者工具「编译」不一定重新打包\n\n## 验证与归属\n- 来源会话：1ee54692；代码基线：9a3c8db；涉及文件：openAutomaticRobot.js、pages/index/home.vue、HomeRobotFloater.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术模式/html_tel_link.md",
+                "memory_type": "entities",
+                "after": "# HTML文本电话号码转tel链接规范\n苏住房C 机器人答案/公告等后端下发 HTML 中的电话须转为可点击 `tel:` 链接，须按通用标签切分只处理纯文本片段。\n\n## 问题现象\n- 原实现按 `<a>` 标签切分后用 `/^</` 跳过整段，结果整段 HTML 以 `<p` 开头，一个号码都转不了且不报错\n\n## 根因\n- 粗粒度「跳过以 < 开头的片段」误伤了正文所在片段\n- 须避免误把标签属性里的数字（src、width、文件名 20240101.png）当成电话号码\n\n## 解决方案\n- 按通用标签切分：`html.split(/(<[^>]*>)/g)`，只对不含标签的纯文本片段做号码识别与替换\n- 维护 inAnchor 状态只跳过 `<a>` 内文本，标签外号码正常转 `tel:`；已是 `tel:` 链接不重复包装\n- 校验：直接跑源码真实实现写用例（5/5 通过），覆盖带转接号、属性含数字文件名+正文手机号、已是 tel: 链接、`<a>` 内文本+标签外号码、纯文本无标签五类\n- 改完须核对 dist 产物（dist/utils/index.js 为新实现）再交付\n\n## 验证与归属\n- 来源会话：1ee54692；代码基线：9a3c8db；涉及文件：src/utils/index.js、pages_main/automaticRobot/index.vue、components/ZsRichText/ZsRichText.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术模式/batch_img_invalid.md",
+                "memory_type": "entities",
+                "after": "# 批量替换图片组件InvalidEndTag修复\n苏住房C 批量把 `<img>` 换成 `<ZsImage>`/`<ImageUploader>` 时出现 Invalid end tag 与畸形静态资源路径，须配对标签并扫畸形路径。\n\n## 问题现象\n- 批量替换出现 `<img /></ZsImage>` 这类开始/结束标签不匹配混写，编译器报 Invalid end tag，构建中断\n- 同批替换留下 `..../../`、`../..../../../../` 等畸形静态资源路径\n\n## 根因\n- 脚本只替换开标签或只替换闭标签，未成对处理；路径因相对路径层级被多次前缀拼接所致\n- 两者是同一批批量替换的次生伤害，易误判成两个不相关问题\n\n## 解决方案\n- 修标签：成对改为自闭合 `<ZsImage />`；ImageUploader 场景拆成正确 `<img />` + `</ImageUploader>` 结构而非一律自闭合\n- 同批扫畸形路径：全量搜 `....`、`../...../` 模式逐个改项目约定静态路径\n- 全局排查而非只修报错首个文件；构建仍失败时优先怀疑缺失静态资源（如不存在 svg），与标签问题无关\n- 结论：批量替换组件脚本须按「配对标签 + 路径前缀」两维度同时校验\n\n## 验证与归属\n- 来源会话：e6b2c88e；代码基线：017efba；共修 7 处标签 + 8 个文件畸形路径\n- 涉及文件：publicNotice/index.vue、pages_guard/index/index.vue、pages_owner/project/info/index.vue、pages_guard/emergencyContact/index.vue、pages_guard/guardApply/components/step1.vue、pages_owner/committee/application/index.vue、pages_owner/decision/components/DecisionList.vue"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-小程序-1793645595020/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T18:56:34.240180+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/externalwebview_authcode_auto_login.md",
+                "memory_type": "entities",
+                "after": "# externalWebview 解析 redirectUrl 含 authCode 时自动跑登录绑房链\nexternalWebview 的 onLoad 解析 redirectUrl 得到含 authCode 的 query 时，会在 initializePage 内自动执行一次完整登录绑房链路并防重复触发。\n\n## 触发条件\n- 存在 redirectUrl 且解析结果包含 authCode（值为字符串 \"0\" 也算存在）\n- 专用于外部 redirect 带授权码进站，与用户手动点登录不同\n\n## 执行链路\n- wx.login\n- 调 wechat/login 拿页面级 pageToken\n- 调 profile 取 userId/phone/realName/certificateNumber\n- 调 selectMyHouseByLingXi（灵犀绑房）\n- 将 token、complexId、houseId 拼入 web-view URL 并展示\n\n## 防重复\n- 维护 autoLoginTriggered（或等价标志）防止 onShow 或重复初始化再次触发自动登录\n\n## 验证与归属\n- 验证证据：「redirectUrl + 解析出 authCode 就自动跑完整链路」「authCode（即使为 0 也算）」「wx.login → wechat/login → profile → selectMyHouseByLingXi → token/complexId/houseId」「加了 autoLoginTriggered 防止 onShow 或重复初始化再次触发」\n- 涉及文件：pages/webview/externalWebview.vue\n- 所属项目：小程序；来源会话ID：0931abc6-673c-4efb-91bc-d74159322efb；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/static_images_deadlink_cleanup.md",
+                "memory_type": "entities",
+                "after": "# static/images 死链清理需路径与文件名双匹配\n清理小程序 static/images 未使用图片时，须同时用完整路径与文件名（含中文/zhishu 间接引用）匹配，零引用才删除。\n\n## 扫描约定\n- 遍历 .vue/.js/.ts/.json/.scss/.css（排除 unpackage、node_modules、dist）\n- 同时匹配 static/images/...、/static/images/...、@/static/... 等路径\n- 源码常见 resolveZhishuAsset(\"xxx.png\") 或 /static/images/zhishu/... 间接引用仅文件名\n\n## 删除规则\n- 仅当工程内零引用时才删除\n- 本会话示例：仅 static/images/location.png 无引用已删，其余 64 个均有引用\n\n## 验证与归属\n- 验证证据：「同时用文件名作为补充匹配，避免误判为未使用」「仅 1 个文件在工程内无任何引用：location.png」「其余 64 个图片文件在源码中均有对应引用（含通过 resolveZhishuAsset 间接引用）」\n- 涉及文件：static/images/ ; static/images/location.png ; pages/webview/externalWebview.vue\n- 所属项目：小程序；来源会话ID：b1d684d7-0aba-4f92-948d-241c1309f18c；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/portal_user_ctuseridentity_array_fix.md",
+                "memory_type": "entities",
+                "after": "# 物业门户 ctUserIdentity 房屋分页顶层数组解析修复\n物业门户小程序拉身份房屋时后端可能返回顶层数组而非 rows/records 分页壳，需扩展解析分支避免 houseList 为空。\n\n## 问题根因\n- utils/portal-user.js 调 GET .../ctUserIdentity/pageByTokenAndIdentityTypeAndIdentityStatus\n- 后端可能直接返回顶层数组 [{...}] 或 data.data 为数组\n- extractPropertyPageRows 只认 rows/records 会解析不到，表现为 profile 成功但 houseList/houseId 空、切换小区无数据\n\n## 修复方案\n- extractPropertyPageRows 增加 res.data 本身为数组、res.data.data 为数组的分支\n- isPropertyApiSuccess 在 res.data 为数组时视为成功\n- 映射结果写入 portalUser.houseList，首条同步 houseId、project；空列表清空 houseList 与 houseId\n\n## 验证与归属\n- 验证：会话 eb625bb1 最终结论：返回体是顶层数组，原 extractPropertyPageRows 只认 rows/records；已扩展数组分支与 isPropertyApiSuccess\n- 涉及文件：d:/repository/小程序/wygl-wxxcx-dev-slh/utils/portal-user.js ; d:/repository/小程序/wygl-wxxcx-dev-slh/pages/user/index/index.vue\n- 所属项目：小程序；来源会话ID：eb625bb1-51ca-49ee-a579-ba01827034bb；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/portal_user_refresh_workflow.md",
+                "memory_type": "entities",
+                "after": "# 物业门户 refreshPortalProfile 须串联 profile 后立刻拉房屋写快照\n门户用户刷新不能只依赖 devRefreshPortalHouseIfEmpty，须在 profile 成功后立即合并房屋并写快照，避免重复打房屋接口。\n\n## 正确顺序\n- profile 接口成功 → applyCtProfileToPortalUser\n- 立刻 await mergeCtUserIdentityHouseIntoPortalUser(merged, token)\n- 再 writePortalSnapshot(merged)\n\n## 入口与去重\n- 任意入口（如「我的」refreshFromServer → refreshPortalProfile）都应走同一链路\n- 页面层不要再二次调用 devRefreshPortalHouseIfEmpty\n- devRefreshPortalHouseIfEmpty 应内部复用 mergeCtUserIdentityHouseIntoPortalUser，勿复制两套解析逻辑\n\n## 验证与归属\n- 验证：会话 eb625bb1：房屋接口原先只在 develop 的 devRefreshPortalHouseIfEmpty；已在 refreshPortalProfile 中 profile 后 await 房屋合并；user/index 去掉二次 devRefresh\n- 涉及文件：d:/repository/小程序/wygl-wxxcx-dev-slh/utils/portal-user.js ; d:/repository/小程序/wygl-wxxcx-dev-slh/pages/user/index/index.vue\n- 所属项目：小程序；来源会话ID：eb625bb1-51ca-49ee-a579-ba01827034bb；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

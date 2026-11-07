@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_070",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T23:47:45.608282+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/build_detail_id_fix.md",
+                "memory_type": "entities",
+                "after": "# 经纪机构管理员详情缺失真实主键修复\n苏州市房地产监测V3 项目中，列表点「查看」进入经纪机构管理员详情时未携带真实业务主键，导致详情页误取模块段为 ID。\n\n## 根因\n- 列表点「查看」走 `buildDetailNavigation`，命名详情路由 `company/companyAdmin/agency/detail` 路径无 `:tableid`\n- 跳转 `query` 仅含 `formMode`、`backUrl`，未带真实主键\n- 详情页 `getDetail()` 用全局 `getId()` 从 URL 路径段推断，误将模块段 `companyAdmin` 当作 `companyAdminId`，请求体变成 `companyAdminId: \"companyAdmin\"`\n\n## 修复方案\n- 在 `buildDetailNavigation` 中，当 `rowId` 为合法业务主键时写入 `query.id`\n- 与 `getId()` 优先读 `query.id` 的约定保持一致\n\n## 涉及文件与归属\n- 涉及文件：`src/utils/ruoyi.js`（463:470）、`src/views/company/companyAdmin/index.vue`、`src/mixins/listMixins.js`\n- 所属项目：苏州市房地产监测V3\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_formatter_unify.md",
+                "memory_type": "entities",
+                "after": "# 行政区划格式化工具统一排查\n苏州市房地产监测V3 项目中，行政区划展示应以 `@/formatters/index.js` 公共能力为准，避免各页面重复拼接。\n\n## 公共能力\n- `fullRegionFormatter`：单个区划编码 → `省/市/区`\n- `provinceFormatter`：编码 → 区级名称（或上级路径）\n- `dictFormatter`（`main.js`）：`region` / `administrativeArea` 字典未命中时回退 `fullRegionFormatter`\n\n## 问题与改动\n- 分支机构原在列表和详情各写一套 `registrationProvince/City/Area` 拼接，与公共能力重复，已统一\n- `companyApplyAudit`、`companyCancel` 等仍保留本地 `formatRegion`，场景不同本次未动\n- `formatters/index.js` 抽出 `resolveFullRegionName` / `resolveProvinceLevelRegionName` 供原有 formatter 复用\n\n## 涉及文件与归属\n- 涉及文件：`@/formatters/index.js`、`dictFormatter`（`main.js`）、`AgencyBranchList.vue`\n- 所属项目：苏州市房地产监测V3\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/login_image_fix.md",
+                "memory_type": "entities",
+                "after": "# 登录页左侧图片展示不全修复\n苏州市房地产监测V3 管理端与门户登录页因 `ResizeObserver` 正反馈导致图片区域涨到接近全屏，已修复。\n\n## 根因\n- `ResizeObserver` 监听登录盒后每次加大 `minHeight`\n- 右侧 `.login-container` 被 `height: 100%` 拉高，`scrollHeight` 跟着变大，再次算出更大宽高，形成正反馈\n\n## 修复方案\n- 去掉对登录盒/表单的 `ResizeObserver`\n- 不再用 `scrollHeight` 量表单，只用各登录模式固定 `min-height`（500/520/560）与图片宽高比计算\n- 增加视口上限：单栏宽约 ≤ 42% 屏宽，盒高约 ≤ 78% 屏高\n- 窗口尺寸变化仅用 `resize` 事件重新算一次，避免自激\n\n## 涉及文件与归属\n- 涉及文件：`zhi2-web-admin/src/views/login.vue`、门户 `login.vue`\n- 所属项目：苏州市房地产监测V3\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/opening_attachment_fix.md",
+                "memory_type": "entities",
+                "after": "# 开业要件包4项附件配置展示\n苏州市房地产监测V3 项目中，租赁入网/经纪机构详情附件区只保留开业 `030310` 的 4 个配置，注册同名项可回显。\n\n## 展示逻辑\n- 始终请求开业要件包（4 项配置），再请求注册要件包 `030300` 按配置名称对齐\n- 开业项已有附件用开业自己的文件；开业项为空且注册同名项有文件则把注册附件填进开业配置格子回显\n- 来自注册的回显在编辑态标记 `fileSource: '2'`，只看不改、不能重复上传/删除\n\n## 提交校验\n- 只校验开业包，并带 `fillFromBusCode: 030300`\n- 营业执照、法人证件若注册已上传即视为开业必填已满足\n\n## 涉及文件与归属\n- 涉及文件：`LeaseEntryNetworkSections.vue`、`entryNetwork.js`、`AgencyEntryNetworkDetail.vue`\n- 所属项目：苏州市房地产监测V3\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

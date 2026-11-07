@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_027",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:01:05.491951+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/jyq_cancellation_empty.md",
+                "memory_type": "entities",
+                "after": "# 注销协议旧键jyq.cancellation返回空白\n苏住房C市民端账户注销页因使用遗留配置键jyq.cancellation查不到配置，协议文本整块空白且不报错。\n\n## 问题现象\n- 我的→设置→账号安全→账户注销页(cancellationWarning.vue)《用户注销协议》内容整块空白\n- 页面不做空态提示，表现为「协议不显示」而非报错\n\n## 根因\n- 该页仍用旧项目遗留配置键 jyq.cancellation 调 getConfigKey\n- 苏住房端其他协议已统一迁到 szf.user.* 前缀(szf.user.protocol、szf.user.policy、szf.user.third)\n- 后端拿旧键查不到配置返回空数据，前端未兼容空态\n\n## 解决方案\n- 配置键改为 szf.user.cancellation，与同组协议保持同一前缀\n- 取值兼容 getConfigKey 三种返回形态：data 字符串直接用、data.configValue 取二级值、否则回退 res.msg\n- 排查同类协议页把 jyq.* 当存量线索全量扫一遍\n- 若改完仍为空，去后台「系统参数配置」确认该键已录入内容\n\n## 验证与归属\n- 验证会话 de821fae：定位 cancellationWarning.vue 使用旧键 jyq.cancellation，改为 szf.user.cancellation 并兼容三种返回格式\n- 涉及文件：src/pages_my/setting/cancellationWarning.vue、src/api/system.js、src/pages/components/AgreementPage.vue、src/pages/about/agreement.vue\n- 所属项目：苏住房C；来源会话ID：de821fae-638a-46f8-93fc-2174c53953d4；代码基线：77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/map_textarea_occlude.md",
+                "memory_type": "entities",
+                "after": "# 地图与文本框原生组件互相遮挡致输入失效\n苏住房C业主端电梯加装页因 map 与 textarea 原生组件同屏遮挡且 uni-forms 纵向压扁，申请说明输入框点不到。\n\n## 问题现象\n- pages_owner_extra/elevator/addAlone.vue「申请说明」多行输入框既输不进字\n- 改成上下排列(标签在上、输入框在下)后反而完全不能输入，用户两轮反馈「还是不能输入」\n\n## 根因\n- 微信小程序 map 和 textarea 都是原生组件，脱离 WebView 渲染层，同屏谁后创建谁盖住谁，地图层叠输入框上方吃掉点击\n- 字段塞进 uni-forms-item 并改纵向 flex 后高度链未撑开，被压扁到触摸热区之外\n\n## 解决方案\n- 「申请说明」移出 uni-forms，单独用 description-section 区块承载(标签在上、输入框在下)\n- 恢复 touchstart.capture 与 @click=\"hideMap\"，点页面任意处即销毁地图原生层\n- 地图默认不显示(showMap=false)，仅选中小区后才创建，避免常驻\n- 任意滚动也隐藏地图防原生层残留；复现时可先点上方表单区让地图消失再点输入框判定遮挡\n\n## 验证与归属\n- 验证会话 be5add1d：用户两轮反馈从标签换行→上下不能输入→还是不能输入，定位原生遮挡+flex压扁，改独立区块+showMap默认false+touchstart.capture\n- 涉及文件：src/pages_owner_extra/elevator/addAlone.vue、add.vue、src/styles/form2.scss、src/components/ZsTextarea/ZsTextarea.vue\n- 所属项目：苏住房C；来源会话ID：be5add1d-7616-4020-9f82-4d25046636fb；代码基线：8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/easycom_filelist_missing.md",
+                "memory_type": "entities",
+                "after": "# 分包迁移后easycom未命中FileList致附件静默不渲染\n苏住房C双晒公示三类详情页因分包迁移后 FileList 组件未显式 import 且 easycom 扫不到，附件整块空白不报错。\n\n## 问题现象\n- 双晒公示下「物业服务计划/公共收益收支/维修资金使用」三个详情页附件全部不显示，main2.1 分支正常\n- 物业服务合同页跳 contracts.vue 故正常；迁移后组件解析失败被静默跳过，不报错不 console\n\n## 根因\n- 分包迁移把 FileList 从主包 src/components/FileList/ 挪到 pages_main/components/FileList/\n- main2.1 里仍主包，easycom 自动扫描命中；迁移后 easycom 扫不到，页面无显式 import 致标签解析失败\n\n## 解决方案\n- ListDetail.vue 与 files.vue 补显式 import FileList from 分包实际路径\n- 组件跨包移动后凡靠 easycom 隐式使用的标签都要补 import(全局搜 `<ComponentName` 排除已 import 文件兜底)\n- 附件拉取改用 watch(noticeId)，因 detail.vue 用 v-if=\"loading\" 延迟挂载子组件使 onShow 错过生命周期\n- 改完必须重新编译小程序(开发者工具点编译不生效)\n\n## 验证与归属\n- 验证会话 63bf69eb：定位 ListDetail.vue 用 <FileList> 未 import、easycom 找不到，改显式 import 并将 onShow 拉附件改 watch(noticeId)\n- 涉及文件：src/pages/publicNotice/detail.vue、ListDetail.vue、files.vue、src/api/notice.js、src/pages.json\n- 所属项目：苏住房C；来源会话ID：63bf69eb-375f-44da-bede-0924286c59be；代码基线：8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/h5_query_encode.md",
+                "memory_type": "entities",
+                "after": "# H5端GET query单键编码致业务参数错位\n苏住房C H5 端 serializeQueryParams 对单 key/value 编码后整体 base64，致服务端拿到百分号串而非明文中文。\n\n## 问题现象\n- 苏住房 H5(zhi2-mobile-admin-h5-c-unlimited/szffluzm) 请求参数先 base64 化，中文值「银行」变 %E9%93%B6%E8%A1%8C 百分号串\n- 用户要求「还原成旧的方式」，base64 解码后应是明文中文而非编码串\n\n## 根因\n- serializeQueryParams 对每个 key/value 单独 encodeURIComponent 后再整体 encodeURIComponent+Base64\n- 传输层编码泄漏进业务参数层，服务端拿编码串使排序、签名、关键字回显错位\n\n## 解决方案\n- serializeQueryParams 只做明文拼接(keyWord=花园)，不对单个 key/value 编码\n- 拼接结果统一交 encodeZsParam 做「整体 encodeURIComponent+Base64」，保证解码即明文\n- 校验口径：keyWord=花园→整体编码 a2V5V29yZD3oirHlm60=→解码回 keyWord=花园\n- 改完重新构建部署 szffluzm，小程序端 v1Instance/gateway 等同源封装一起核对\n\n## 验证与归属\n- 验证会话 94754f00：用户先提单键编码再整体 base64，对照破坏业务参数后要求还原旧方式，最终 serializeQueryParams 只整体编码\n- 涉及文件：src/utils/h5Context.js、src/api/gateway.js、src/api/index.js、src/api/v1Instance.js、szffluzm/index.html\n- 所属项目：苏住房C；来源会话ID：94754f00-83ea-4599-aff3-ea29d1188891；代码基线：d43894b"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

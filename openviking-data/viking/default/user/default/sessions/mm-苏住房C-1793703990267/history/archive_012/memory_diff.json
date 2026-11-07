@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_012",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:30:10.675114+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/auth_icon_subpackage.md",
+                "memory_type": "entities",
+                "after": "# 登录弹窗手机号授权图标须入主包static并登记mainStaticPaths\n苏住房C小程序登录页「手机号授权」弹窗顶部图标在安卓真机不显示（iOS正常），根因是图标原放pages_main分包未打入构建产物且跨分包引用受安卓严格限制。\n\n## 问题现象\n- 登录页「手机号授权」弹窗顶部图标安卓真机空白缺图，iOS完全正常\n- 「我的」页未登录点头像弹出同一弹窗也缺图\n- 原生<image>无加载失败回退，失败即纯空白无占位\n\n## 根因\n- 图标原置于pages_main/static/images/phone-auth-icon.png，微信构建未带入产物\n- pages_tab入口跨分包引用，安卓对跨分包静态资源限制比iOS严格\n- 使用原生image标签，无失败回退\n\n## 解决方案\n- 图标迁至主包src/static/images/\n- 在mainStaticPaths.js显式登记images/phone-auth-icon.png及兜底图images/warn.png\n- 删除分包旧副本，避免双份维护\n- 组件原生<image>换ZsImage获加载失败回退，去掉硬编码分包路径\n- 构建后自证dist/static/images/下存在两文件，安卓真机验两入口\n\n## 验证与归属\n- 验证：会话a1a45147用户报安卓手机号授权页缺默认图iOS无此现象；结论根因分包未打入+跨包加载，修复迁入主包+注册+ZsImage\n- 涉及文件：src/pages/components/PhoneForm.vue、src/pages/login/index.vue、src/static/images/phone-auth-icon.png、src/mainStaticPaths.js\n- 所属项目：苏住房C；来源会话ID：a1a45147-a211-4056-89f4-a6d870d42790；代码基线：6599714"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/empty_state_bug.md",
+                "memory_type": "entities",
+                "after": "# 列表页空态判定挂success标志致接口异常时整页空白\n苏住房C工作动态等列表页无数据时纯灰背景，既不渲染列表也不渲染空态，根因是空态标志仅在请求成功分支置位且用total===0判定不稳。\n\n## 问题现象\n- 工作动态列表页无数据时是纯灰背景，看不到列表也看不到空状态\n- 用户要求加空数据默认图\n- 页面「一片空白且无报错」\n\n## 根因\n- 页面用requested标志控制空态，该标志在请求成功分支才置true\n- 接口失败或异常时requested永远false，列表分支与空态分支同时不成立\n- 用total===0判定空态不稳，接口异常时total可能为undefined\n\n## 解决方案\n- 用try/finally保证请求结束无论成败都进空态判断，loaded类标志在finally置位\n- 空态判定从total===0改为!list.length，list缺失也能落空态\n- 空态统一用ZsEmpty组件指定默认图images/empty.png，无数据「暂无数据」、搜索无结果「未查询到相关数据」\n- 空态区域水平居中、默认图约320rpx并垂直居中\n\n## 验证与归属\n- 验证：会话42343a4e用户诉求加空数据默认图；结论4点改动含try/finally与!list.length\n- 涉及文件：src/pages/property/index.vue、src/pages_owner/company/service/index.vue\n- 所属项目：苏住房C；来源会话ID：42343a4e-0f73-462e-bedb-6499ef092a49；代码基线：89637fb"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/cardcell_isolation.md",
+                "memory_type": "entities",
+                "after": "# 分包页CardCell标签因样式隔离不渲染须改页面内DOM\n苏住房C pages_vote/decision/detail.vue等页因CardCell在分包样式隔离下标签不可见，只剩值与大段空白，须去掉CardCell改页面内DOM并styleIsolation:shared。\n\n## 问题现象\n- 决策详情页编号/业务类型/决策主题等标签全不见，只剩裸文字与大片空白\n- 同一模板复用到DecisionRecord.vue后微信小程序整块「决策信息」全白不渲染\n- 用户两次反馈UI差异巨大\n\n## 根因\n- CardCell组件在pages_vote分包处于样式隔离状态（页面与组件styleIsolation不一致）\n- 组件内部标签行、分割线、左右对齐样式不生效，标签压成不可见\n- 极端时整个组件块不渲染，非数据结构问题\n\n## 解决方案\n- 先排除数据因素：接口有数据但标签不显示时优先怀疑组件样式隔离\n- 决策/选举详情页去掉CardCell，页面内直接写与生产版相同DOM，样式写当前页并让styleIsolation:shared生效\n- 头部渐变信息区与字段区合并成同一张卡片\n- 回退时优先回到已验证cell-item结构局部修，不要顺手换另一组件\n\n## 验证与归属\n- 验证：会话f7c75f86用户报decision/detail UI有问题且差异巨大；结论分包+组件样式隔离，去CardCell+页面内DOM\n- 涉及文件：src/pages_vote/decision/detail.vue、src/pages_vote/decision/components/DetailTopCard.vue、src/styles/cell.scss\n- 所属项目：苏住房C；来源会话ID：f7c75f86-93d3-413f-b2a8-5162c9c21849；代码基线：5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/signature_img_zero.md",
+                "memory_type": "entities",
+                "after": "# 签字图因ZsImage内部width:100%无参照容器高度塌成0须套固定尺寸wrap\n苏住房C选举/决策记录详情签字图不显示，接口有值但页面空白，根因是ZsImage内部.img写死width:100%所在行无确定尺寸致高度塌0。\n\n## 问题现象\n- 选举记录详情与决策记录详情签字图不显示，接口signature字段有值页面空白\n- 改成CardCell行布局后还引发整块区块不渲染次生问题\n- 用户贴完整接口JSON证明数据正常\n\n## 根因\n- 签字图放进CardCell行布局后，ZsImage内部.img width:100%所在行无确定宽高约束\n- 百分比宽度无法解析成具体尺寸，高度随之塌成0，图片视觉不存在\n- 改成CardCell还引发整块不渲染\n\n## 解决方案\n- 给签字图单独套固定尺寸容器（sign-picture-wrap，153×68）让百分比宽高有参照\n- 通过:deep(.img)覆盖ZsImage内部width:100%，改由容器决定尺寸\n- 字段区恢复已可用cell-item布局，不整体换CardCell\n- 仍不显示用vConsole看图片请求是否404区分尺寸塌陷与资源加载失败\n\n## 验证与归属\n- 验证：会话e7007608用户报选举/决策记录签字不显示+JSON；后续空白不展示；结论固定尺寸wrap+ :deep覆盖\n- 涉及文件：src/pages_vote/decision/common/DecisionRecord.vue、src/pages_vote/elect/ResultRecord.vue、src/components/ZsImage/ZsImage.vue\n- 所属项目：苏住房C；来源会话ID：e7007608-941f-47f8-a082-3768ad6aa6e3；代码基线：8fc3cc5"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-淮安物管-1793818314138/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T19:04:27.222837+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/公共页面用户导出修复.md",
+                "memory_type": "entities",
+                "after": "# 公共页面用户导出修复\n淮安物管后台「用户注册查询」公共页面（system/publicPage）导出功能已完成修复并切换至公共导出接口。\n\n## 变更内容\n- 导出接口由 `system/user/export` 改为 `system/user/publicExport`。\n- 新增 `exportLoading` 状态防止重复点击。\n- 统一使用 `params` 传参，并在 `.finally()` 中重置 loading 状态。\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/system/publicPage/index.vue\n- 所属项目：淮安物管；来源会话：1f213572-ce02-4c37-b44f-d1f8f9f8b64c；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/开户申请解约日期置灰.md",
+                "memory_type": "entities",
+                "after": "# 开户申请解约日期字段\n淮安物管公共收益模块「开户申请详情页」（pubRegulatoryAccount/detail.vue）的解约日期字段在所有模式下均置灰且新建时无赋值逻辑。\n\n## 字段行为\n- 模板中写死 `disabled`，联系人、联系电话同样写死，任何模式（新建/编辑/查看）均不可编辑。\n- 查看/编辑已有记录时，值来自 `getPubRegulatoryAccount(accountId)` 后端返回的 `terminationDate`。\n- 新建时初始为 `undefined`，且页面没有任何赋值逻辑。\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue\n- 所属项目：淮安物管；来源会话：75ba0721-e96d-4590-bbf7-51d468632dec；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/管理银行编码赋值修复.md",
+                "memory_type": "entities",
+                "after": "# 管理银行编码赋值修复\n淮安物管开户申请与物业模块选择「管理银行」时，监管银行编码字段错误取了银行网点代码，已修复为取银行编码。\n\n## 问题根因\n- `pubRegulatoryAccount/detail.vue` 的 `showBankDialog` 回调将 `regulatoryBankCode` 错赋为 `row.bankBranchCode`（如 01020000）。\n- 后端期望 `row.bankCode`（如 102 或 313），与 `pubRegAccPropMgmt/detail.vue`、`pubRegAccountChange/detail.vue` 正确写法不一致。\n\n## 修复内容\n- 修改 `zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue` 与 `zhi2-web-admin/src/views/property/propertyAccount/detail.vue`。\n- 两处均将 `regulatoryBankCode` 的赋值由 `row.bankBranchCode` 改为 `row.bankCode`。\n\n## 验证与归属\n- 所属项目：淮安物管；来源会话：e057ae2f-2107-42b9-9657-ffd0a073d835；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/change_record_dialog.md",
+                "memory_type": "entities",
+                "before": "# 淮安物管变更详情变更记录弹窗接入\n多个业务域变更详情页需增加「变更记录」按钮，弹窗展示页面 contentInfo 白名单内且实际变化的字段前后值。\n\n## 背景与原因\n- 各变更单详情实现分散（企业/从业人员/物业区域/合同/业主自治/公共收益/楼盘表等），每页手写对比表格会导致字段口径不一致。\n- 后端返回的变更对象字段名与详情 form 嵌套结构不统一，需公共能力收口。\n\n## 解决方案\n- 抽公共组件 change-record-dialog + 工具 contentInfoChange.js：以详情页 contentInfo（及 contentInfo2/3…）为字段白名单，用 originalObj 与当前 form diff，仅输出有差异且在白名单内的行。\n- 弹窗顶部按需展示变更时间、变更人、变更说明（无值则隐藏说明区）。\n- 各变更 detail 或共用 detail 组件接入按钮与弹窗，按需求清单逐模块挂接（行业管理/物业管理/业主自治/公共收益/项目楼盘表等）。\n- 与「变更前/后单表合并」(#816) 互补：本条是「从详情展示 schema 反推可比字段」的接入套路。\n\n## 验证与归属\n- 验证：会话 e54a78dd（2026-07-06，基线 3e560be）与 95b62123（2026-07-01，基线 22a1d9d）用户给出跨模块变更记录需求清单；实现组件并多页接入。\n- 范围：淮安物管会话一次性接入约 11+ 个变更详情页，合并分支 feature/company-change-record → develop/v2.6.1-huaian。\n- 涉及文件：change-record-dialog.vue、contentInfoChange.js、companyManagement/components/detail.vue、companyManagement/change/detail.vue 等；所属项目：淮安物管；来源会话：e54a78dd-db5f-4130-8a53-38052902a30c, 95b62123-9914-4e98-aca3-4d7acff520aa；代码基线：22a1d9d。\n\n## 企业变更详情页修复实例（会话95b62123）\n- 弹窗尺寸问题：根因 zs-dialog 默认 medium 约1300px，表格列宽仅约660px导致右侧空白；处理改为 zs-size=\"common\"（900px），表格列去固定 min-width 三列均分撑满，内容区与表格设 width:100%。\n- 顶部三个审计字段无值：根因详情接口 createTime、createUser 等在 response.data 顶层，而 detailCallback 只合并 companyRecordChange 未进 form；处理调整 detailCallback 先合并顶层字段再合并 companyRecordChange。\n- 新增 resolveChangeMeta 兼容多字段名：时间（changeDate/updateTime/createTime/recordTime…）、人员（updateUser/createUser/createUserName…）、说明（changeReason/changeDescription/remark…）。\n- 涉及文件补充：companyManagement/change/detail.vue、credit/companyDeclaration/components/checkDialog.vue、companyManagement/components/detail.vue；需刷新页面重新打开变更记录。",
+                "after": "# 淮安物管变更详情变更记录弹窗接入\n多个业务域变更详情页通过公共组件 change-record-dialog + 工具 contentInfoChange.js 增加「变更记录」按钮，展示 contentInfo 白名单内且有变化的字段前后值。\n\n## 背景与原因\n- 各变更单详情实现分散，每页手写对比表导致字段口径不一致；后端返回字段名与 form 嵌套结构不统一，需公共能力收口。\n\n## 解决方案\n- 以详情页 contentInfo（及 contentInfo2/3…）为字段白名单，用 originalObj 与当前 form diff，仅输出有差异且在白名单内的行。\n- 弹窗顶部按需展示变更时间、变更人、变更说明（无值则隐藏说明区）。\n- 各变更 detail 或共用 detail 组件接入按钮与弹窗，按需求清单逐模块挂接（行业管理/物业管理/业主自治/公共收益/项目楼盘表等）。\n- 与「变更前/后单表合并」(#816) 互补：本条是「从详情展示 schema 反推可比字段」的接入套路。\n\n## 验证与归属\n- 会话 e54a78dd（2026-07-06，基线 3e560be）与 95b62123（2026-07-01，基线 22a1d9d）用户给出跨模块变更记录需求清单；实现组件并多页接入。\n- 范围：淮安物管一次性接入约 11+ 个变更详情页，合并分支 feature/company-change-record → develop/v2.6.1-huaian。\n- 涉及文件：change-record-dialog.vue、contentInfoChange.js、companyManagement/components/detail.vue、companyManagement/change/detail.vue 等；来源会话：e54a78dd-db5f-4130-8a53-38052902a30c, 95b62123-9914-4e98-aca3-4d7acff520aa；代码基线：22a1d9d。\n\n## 企业变更详情页修复实例（会话95b62123）\n- 弹窗尺寸：zs-dialog 默认 medium 约1300px 致表格列宽仅约660px 右侧空白；改 zs-size=\"common\"（900px），表格列去固定 min-width 三列均分撑满，内容区与表格 width:100%。\n- 顶部三审计字段无值：详情接口 createTime/createUser 等在 response.data 顶层，detailCallback 只合并 companyRecordChange 未进 form；调整为先合并顶层字段再合并 companyRecordChange。\n- 新增 resolveChangeMeta 兼容多字段名：时间（changeDate/updateTime/createTime/recordTime…）、人员（updateUser/createUser/createUserName…）、说明（changeReason/changeDescription/remark…）。\n- 涉及文件补充：companyManagement/change/detail.vue、credit/companyDeclaration/components/checkDialog.vue、companyManagement/components/detail.vue；需刷新页面重新打开变更记录。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/用户管理导出能力.md",
+                "memory_type": "entities",
+                "before": "# 用户管理导出能力\n淮安物管后台用户管理页（system/user）已对齐公共组件 /export 的导出实现套路。\n\n## 实现要点\n- 新增 exportLoading 状态控制导出按钮 loading，防止重复点击。\n- operationButtons 在「新增」「删除」后增加「导出」，权限标识 system:user:export。\n- handleExport 先用当前 getQueryParams()（含左侧部门树）调 page 预检，有数据则 download('system/user/publicExport', …)。\n- 预检与下载共用同一套 params，保证条件一致。\n\n## 验证与归属\n- 本地用具备 system:user:export 的账号：选部门、设筛选后点「导出」验证文件与条件一致。\n- 涉及文件：zhi2-web-admin/src/views/system/user/index.vue\n- 所属项目：淮安物管；来源会话：b5237c44-2fc2-414b-95f7-dfb35674462c；代码基线：none",
+                "after": "# 用户管理导出能力\n淮安物管后台用户管理页（system/user/index.vue）导出功能对齐公共组件 /export 套路，但代码审查发现高危问题待修复。\n\n## 实现要点\n- operationButtons 在「新增」「删除」后增加「导出」，权限标识 system:user:export，与项目 operationButtons + download 写法一致。\n- handleExport 调 page 预检后 download('system/user/publicExport', …)。\n\n## 审查待修复项（会话 bd0165fe，BLOCK）\n- 预检与下载应共用同一份 getQueryParams()，避免切换部门/筛选后导出条件不一致。\n- 预检阶段就要防重复点击（进入即设 exportLoading，无数据/失败时也要复位）。\n- 确认 page 预检与 publicExport 在数据范围、权限上语义一致（仓库仅前端引用 publicExport，需与后端对齐）。\n- 顺带清理 MEDIUM：未使用的 getToken import、v-for 用 index 作 key 等。\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/system/user/index.vue\n- 所属项目：淮安物管；来源会话：b5237c44-2fc2-414b-95f7-dfb35674462c、bd0165fe-77d2-4973-ae1f-2a40fac12ebc；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

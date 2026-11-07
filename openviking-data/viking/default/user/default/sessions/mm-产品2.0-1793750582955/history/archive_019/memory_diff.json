@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793750582955/history/archive_019",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T00:42:23.920494+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/tecnologia do produto 2.0/getbykey_override.md",
+                "memory_type": "entities",
+                "after": "# Override de getByKey na normalização V3\nO `getByKey` era inferido pela regra `ByKey` como `key`, fazendo com que o mapeamento `ACTION_PATH_PARAM_KEYS` em `apiV3Normalize.js` não funcionasse.\n\n## Problema\n- A função `getByKey` era priorizada pela regra `ByKey` para parâmetro `key`, invalidando mapeamento de `configKey`.\n- Resultava em corpo de requisição errado em vez de `{\"configKey\":\"...\"}` para endpoints como system/config.\n\n## Solução\n- Adicionar `getByKey: 'configKey'` a `ACTION_PARAM_KEY_OVERRIDES` no mesmo arquivo `apiV3Normalize.js` (maior prioridade) para corrigir o parâmetro de corpo.\n- `zhi2-web-admin/src/utils/apiV3Normalize.js` é o local da correção; `system/config.js` e `request.js` relacionados.\n\n## Verificação\n- Evidência src=产品2.0/065.md; sessão 8dceac0c.\n- Arquivos: src/api/system/config.js, src/utils/apiV3Normalize.js, src/api/index.js, src/utils/request.js, src/views/home/privacy.js.\n- Projeto: Produto 2.0."
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/caminho padrão de verificação de versão.md",
+                "memory_type": "preferences",
+                "after": "- Em `zhi2-web-admin/src/utils/version-check.js`, o endereço padrão foi alterado de `/version.json` para caminho relativo `version.json` para evitar hardcoding da raiz.\n- Em `zhi2-web-admin/vite.config.js`, `public/version.json` é caminho de disco em build, não URL de requisição, não precisa modificar.\n- Verificação: evidência 产品2.0/063.md; sessão faf38ec5."
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/validação de id em getdetail.md",
+                "memory_type": "preferences",
+                "after": "- O mixin `form.js` `getDetail()` usa `validateDetailRequiredParams()` que exige `id` por padrão, fazendo com que interfaces sem id (ex.: `platformConfig/detail.vue` reescreveu `detailApiFull`) falhem e pulsem requisição.\n- Para adaptar interfaces sem id, reescrever `getDetailRequiredParams()` em `detail.vue` removendo a obrigatoriedade de `id`.\n- Verificação: evidência 产品2.0/064.md; sessão aac565c5."
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/tecnologia do produto 2.0/register_anon_upload.md",
+                "memory_type": "entities",
+                "before": "# 注册件匿名上传不带 Token\n企业注册上传接口本不需要鉴权，但残留过期 Admin-Token 会导致必然 401，需前端不附带 Authorization 并清理 E2E Token。\n\n## 问题根因\n- 企业注册（/file/appendix/upload，busCode=040100）是匿名流程，上传接口本身不需鉴权\n- sessionStorage 残留过期 Admin-Token 时，uploadAppendixFile 仍带 Authorization 头，后端按「有 Token 必须有效」返回 401\n- 与「机密白名单路径下 $get 发真实 GET 返回 405」是两条不同链路，根因是请求头鉴权语义而非请求方法\n\n## 解决方案\n- companyRegister.js 的 uploadAppendixFile 显式不附带 Authorization\n- E2E 删硬编码 REAL_API_TOKEN，新增 ensureRegisterAnonymousSession()，进注册页前与加载后再各清一次 Admin-Token/Tmp-Token，injectRealApiAuth 标 deprecated\n- E2E 上传步骤改用 setupHybridUploadMock 兜住网关仍校验 Token 的联调环境\n- 直连网关仍 401 说明网关白名单未放行上传路径，非前端问题\n\n## 验证与归属\n- 来源会话 c3f9e4f8：companyRegister.js 不再携带 Authorization、register-helpers.js 新增 ensureRegisterAnonymousSession()、injectRealApiAuth 标记 deprecated\n- 效果对比 Step3 由失败转通过，Step4 因 Mock 未落库仍报「缺少要件」\n- 涉及文件：src/api/companyRegister.js、e2e/fixtures/register-helpers.js、e2e/company/real-api-flow.spec.js、e2e/fixtures/auth-helpers.js\n- 所属项目：产品2.0；代码基线：5169909",
+                "after": "# Upload anônimo de anexos de registro de empresa\nO upload de anexos de registro de empresa é um fluxo anônimo e não requer autenticação; o frontend não deve enviar Authorization e deve limpar tokens E2E.\n\n## Causa raiz\n- A interface de upload de registro empresarial (`/file/appendix/uploadAnonymous`, busCode=040100) é anônima e não precisa de autenticação.\n- Quando há Admin-Token expirado residual no sessionStorage, `uploadAppendixFile` ainda envia cabeçalho Authorization, e o backend retorna 401 (\"token deve ser válido\").\n- Isso é diferente da cadeia de `$get` em caminho whitelist secreto que retorna 405; a causa é semântica de autenticação no cabeçalho, não método de requisição.\n- O upload de licença comercial no backend administrativo usa `/file/file/upload` e não está no escopo desta correção.\n\n## Solução\n- `companyRegister.js` deve modificar `xhr.open` para `/file/appendix/uploadAnonymous` e `uploadAppendixFile` não envia Authorization explicitamente.\n- `Step3` de `RegisterUploadItem` e componentes relacionados (bankTable.vue, dialog.vue, index.vue, ImageUpload/index.vue, Step3Appendix.vue) chamam esta interface; E2E `e2e/fixtures/register-mocks.js` sincronizado.\n- E2E remove token hardcoded REAL_API_TOKEN, adiciona `ensureRegisterAnonymousSession()`, limpa Admin-Token/Tmp-Token antes de entrar e após carregar; `injectRealApiAuth` marcado deprecated.\n- E2E usa `setupHybridUploadMock` para ambientes que ainda validam token no gateway.\n- Se o gateway direto ainda retorna 401, indica que whitelist do gateway não liberou o caminho de upload, não é problema frontend.\n\n## Verificação e origem\n- Sessão c3f9e4f8: companyRegister.js sem Authorization, register-helpers.js com ensureRegisterAnonymousSession(), injectRealApiAuth deprecated.\n- Sessão 70beb6e7: ajuste para endpoint `/file/appendix/uploadAnonymous`, arquivos envolvidos conforme lista.\n- Efeito: Step3 passou de falha a sucesso; Step4 ainda reporta \"faltando requisitos\" por Mock não persistir.\n- Arquivos: src/api/company/companyRegister.js, e2e/fixtures/register-helpers.js, e2e/company/real-api-flow.spec.js, e2e/fixtures/auth-helpers.js, e2e/fixtures/register-mocks.js, views/company/companyRegister/*, views/register/components/*.\n- Projeto: Produto 2.0; baseline de código: 5169909; evidência 产品2.0/062.md."
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

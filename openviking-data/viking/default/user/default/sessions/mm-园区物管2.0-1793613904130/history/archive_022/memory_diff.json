@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_022",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T11:04:01.688606+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/mock_init_decouple.md",
+                "memory_type": "entities",
+                "after": "# mock_init_decouple\n园区物管2.0 数据沙盘/大屏页在 USE_MOCK_DATA=false 时仍因 data() 初始化 cloneMockCards() 导致首屏闪 mock 的修复模式。\n\n## 问题根因\n- 即使 USE_MOCK_DATA=false，data() 里用 cloneMockCards() 初始化卡片/图表数据，首屏先渲染整套 mock 数值，接口返回后被覆盖，用户误以为走 mock 或看到错误数据一闪而过\n- 初始化与开关脱节，mock 数据未抽离骨架\n\n## 解决方案\n- 抽出 createEmptyPanoramaCards() 骨架工厂：保留标题、单位、配色等静态配置，数值置空（summaryValue:0、donutData:[]、barValues 全 0）\n- 初始化写 USE_MOCK_DATA ? cloneMockCards() : createEmptyPanoramaCards()，接口模式先展示空/0，仅 true 时完整 mock\n\n## 验证与归属\n- 验证：会话 0d12bfa5 用户要求「使用接口时默认不要展示 mock」；结论写明虽 USE_MOCK_DATA=false，data() 仍 cloneMockCards() 导致先显示 mock 再更新\n- 涉及文件：assetPanorama/index.vue、assetPanorama/mock.js、fundPanorama/index.vue；所属项目：园区物管2.0；代码基线：6a4835a08"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/switch_handler_missing.md",
+                "memory_type": "entities",
+                "after": "# switch_handler_missing\n园区物管2.0 Vue2 列表页 el-switch 绑 @change 但 methods 未声明 handler 导致功能静默失效的修复模式。\n\n## 问题根因\n- 模板里 el-switch 常用 @change=\"changeType\" 切换「树状/平铺」并控制左侧树面板 v-show\n- 从别的页面复制模板却未带上 methods.changeType，运行时只有 [Vue warn] Property or method \"changeType\" is not defined，功能静默失效\n\n## 解决方案\n- 对齐同业务域已上线页（如 pubHouse/index.vue、assetsLeaseContractFiling）补齐 changeType\n- 批量检查 resourcesLeaseContractFiling、parkingSpaceContractFiling 等同类备案列表是否缺同一方法\n\n## 验证与归属\n- 验证：会话 c5b92557 中 resourcesLeaseContractFiling/index.vue 第 9 行 @change=\"changeType\" 无 methods 定义；按 pubHouse 等同构页补全后警告消失\n- 涉及文件：resourcesLeaseContractFiling/index.vue、pubHouse/index.vue、assetsLeaseContractFiling/index.vue；所属项目：园区物管2.0；代码基线：5a288f142"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_tree_loading.md",
+                "memory_type": "entities",
+                "after": "# region_tree_loading\n园区物管2.0 property/complex 左侧区域树请求中 el-tree 应显示「加载中」而非「暂无数据」的约定。\n\n## 现象\n- 首屏请求未完成时，el-tree 默认 empty-text 显示「暂无数据」，与真实状态不符\n\n## 解决方案\n- 在真正发树的子组件（regionTree.vue，RegionTreeLayout 仅包裹）维护 treeLoading：初始 true；getDeptList 请求前置 true，成功赋值 treeData 后 $nextTick 完成展开/默认选中再 false，失败/异常同样关闭\n- :empty-text 动态为 treeLoading ? '加载中' : '暂无数据'；父级用 treeRenderKey 重挂子树会重新走流程\n- 若需整区遮罩可叠加 v-loading=\"treeBusy || treeLoading\"，文案管树内空态，遮罩管整块不可点\n\n## 验证与归属\n- 验证：会话 190c0ade 用户要求左侧树请求时「暂无数据改为加载中」；实现在 regionTree.vue 的 treeLoading + 动态 empty-text + getDeptList 流程\n- 涉及文件：regionTree.vue、RegionTreeLayout.vue；所属项目：园区物管2.0；代码基线：7fe15a8cb"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_setrow_guard.md",
+                "memory_type": "entities",
+                "after": "# detail_setrow_guard\n园区物管2.0 详情页 mounted 误读 sessionStorage.setRow 仅新增选资产路径写入的修复模式。\n\n## 问题根因\n- benefit/housePart 等页 mounted 里无条件 JSON.parse(sessionStorage.getItem('setRow')) 并访问 row.houseId\n- 从列表点「查看」进入时不会写入 setRow，parse(null) 得 null 再取属性直接报错\n- setRow 只在列表「新增→选择资产」时由 handlePick 写入用于新增预填；查看/编辑应走 detailMixins.init() 拉详情\n\n## 解决方案\n- 仅在 formMode === 'add' 时执行该段；对 setRow 做空值判断并用 row?.houseId\n- 与「sessionStorage 草稿回显」类条目不同：误把新增专用 key 当成所有模式入口\n\n## 验证与归属\n- 验证：会话 ad4fc981 中 housePart/detail.vue mounted 无条件读 setRow 导致列表进详情报错；限定 add + 空值安全访问后恢复\n- 涉及文件：housePart/detail.vue、detailMixins.js；所属项目：园区物管2.0；代码基线：177bc3ce4"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread、tmap_instance_data_reactive\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid、stats_card_flicker、copy_tab_three_sync、zstable_minwidth_elastic、select_func_store、zstable_data_prop、fund_panorama_bottom_whitespace、region_tree_border_height\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal、echarts_pie_downplay、echarts_map_dehighlight、attachments_multi_path、map_bubble_color_data_level、echarts_dual_y_scale、no_double_unit、shared_mock_constants、echarts_axis_mid、bar_axis_scale、sidebar_echarts_resize\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、edit_popup_detail_field_loss、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、amount_input_precision_loss、project_switch_soft_refresh、api_deadcode_judgment、version_base_url、eslint_virtual_import、vue_duplicate_methods、router_guard_navigation_redirected、lease_filing_handlepick_extra\n- 配置与渲染防护类：platform_config_theme、echarts_finished_setoption、response_dialog_dedup、dict_tag_nesting",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread、tmap_instance_data_reactive\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid、stats_card_flicker、copy_tab_three_sync、zstable_minwidth_elastic、select_func_store、zstable_data_prop、fund_panorama_bottom_whitespace、region_tree_border_height、region_tree_loading\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal、echarts_pie_downplay、echarts_map_dehighlight、attachments_multi_path、map_bubble_color_data_level、echarts_dual_y_scale、no_double_unit、shared_mock_constants、mock_init_decouple、echarts_axis_mid、bar_axis_scale、sidebar_echarts_resize\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、edit_popup_detail_field_loss、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、amount_input_precision_loss、project_switch_soft_refresh、api_deadcode_judgment、version_base_url、eslint_virtual_import、vue_duplicate_methods、switch_handler_missing、router_guard_navigation_redirected、lease_filing_handlepick_extra、detail_setrow_guard\n- 配置与渲染防护类：platform_config_theme、echarts_finished_setoption、response_dialog_dedup、dict_tag_nesting"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

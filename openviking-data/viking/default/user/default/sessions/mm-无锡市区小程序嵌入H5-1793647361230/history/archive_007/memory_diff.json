@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793647361230/history/archive_007",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T19:34:11.831112+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/wx全局覆盖修复.md",
+                "memory_type": "entities",
+                "after": "# wx全局覆盖修复\nuni-app 主包覆盖 window.wx 导致微信 web-view 内 H5 的 wx.miniProgram 为空，需用守卫与兜底恢复。\n\n## 问题根因\n- uni-app 主包会覆盖 window.wx，覆盖 jweixin 注入的真实 JSSDK\n- 微信 web-view 内 H5 报 wx.miniProgram.navigateTo 不存在，wx 被写成 {}\n\n## 解决方案\n- 在 index.html 苏服办 JSSDK 之后加内联守卫：监听 jWeixin、用 defineProperty 拦截对 wx 的空对象写入\n- main.ts 启动时再调 restoreWeixinWx() 兜底\n- 重新部署 dist 后在 web-view 控制台验证 typeof wx.miniProgram.navigateTo === 'function'\n- 注意 miniProgram 仅微信小程序 web-view 有效，苏服办原生容器无此 API 属环境限制\n\n## 验证与归属\n- 验证证据：会话 718e1271 用户怀疑框架覆盖 wx；结论采用 index.html 守卫 + restoreWeixinWx.js 两层防护\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/index.html、src/utils/restoreWeixinWx.js、src/main.ts\n- 所属项目：无锡市区小程序嵌入H5；来源会话：718e1271-a4de-433f-9316-5f9d2f58fafe；代码基线：6c9a164"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/门户双入口业主决策链路.md",
+                "memory_type": "entities",
+                "after": "# 门户双入口业主决策链路\n苏服办门户首页「业主决策」外链与「共有资金表决」内嵌页是两条独立链路，勿混淆首页路由。\n\n## 入口区分\n- 苏服办实际首页为 pages/webview/home，勿与 pages/index/home 混淆\n- 快捷菜单「业主决策」ownerDecisionVoteExternal 走灵犀外部投票 H5（usePortal → 选屋 → openOwnerDecisionVoteH5 → webView）\n- 卡片「共有资金表决」handleVote 走内嵌 /pages_owner/decision/index\n\n## 外链流程\n- 登录/实名 → 确认弹窗 → /pages/face/bdc 灵犀选屋 → portalPostAction=ownerDecisionVote → 后端取投票 URL 再 navigateToExternalUrl\n- 内嵌列表走 selectAppDecisionList 等 autonomy 接口，不是同一套入口\n\n## 验证与归属\n- 验证证据：会话 2b377a1c、探索会话 d8000b94 明确门户双入口与 usePortal 编排；006 结论含 mermaid 与 handleMenuClick/openOwnerDecisionVoteH5 代码引用\n- 涉及文件：src/pages/webview/home.vue、src/hooks/usePortal.js、src/pages_owner/decision/index.vue\n- 所属项目：无锡市区小程序嵌入H5；来源会话：2b377a1c-983a-4b59-8b7b-4fecc4297896, d8000b94-8e26-45f3-8f7b-45edf9d77296；代码基线：1cce226"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/苏服办深链topicvoteid处理.md",
+                "memory_type": "entities",
+                "after": "# 苏服办深链topicvoteid处理\n苏服办打开轻应用 URL 会额外带 topicvoteid，需入库并在登录后自动开门主决策，外链追加参数与 backUrl。\n\n## 处理流程\n- 启动时从 query 写入 portalStore\n- 登录/bootstrap 完成后若有该参数，自动走打开业主决策外链逻辑\n- openOwnerDecisionVoteH5 对第三方 URL 追加明文 topicvoteid 与 backUrl（UTF-8 再 Base64，值为门户首页完整 URL，含 #/pages/webview/home）\n- 第三方返回按钮先 decodeURIComponent 再 Base64 解码，用 window.location.href 整页跳回（hash 路由须在进页时保存 backUrl）\n\n## 工具函数\n- 集中在 portal.js：buildPortalHomeBackUrl、buildOwnerDecisionVoteBackUrlParam\n\n## 验证与归属\n- 验证证据：会话 099b07e0 用户给出 ydzt.jszwfw.gov.cn 带 topicvoteid 的示例 URL；结论实现 backUrl/topicvoteid 与第三方对接示例\n- 涉及文件：src/utils/portal.js、src/hooks/usePortal.js、src/store/portal.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话：099b07e0-3f22-4afe-a5e8-451cf8675f31；代码基线：ea242de"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/苏服办换票登录五字段校验.md",
+                "memory_type": "entities",
+                "after": "# 苏服办换票登录五字段校验\n从苏服办 location 进入 H5 换票登录前必须校验五个 query 字段齐全，缺一即 toast 且不请求。\n\n## 校验规则\n- 必须校验 query 字段：token、name、idType、idNumber、phone\n- 任一缺失则 toast 列出缺少项（如「缺少手机号」），不调用登录接口及后续业务接口\n- 不能把 SDK 的 token 误当作业务鉴权 token\n- 无 token 时整站应短路后续 API\n\n## 调试与排查\n- 调试阶段可打印换票接口入参与响应\n- 涉及文件：src/utils/h5Context.js、src/App.vue、src/api/security.js\n\n## 验证与归属\n- 验证证据：会话 2192d7e5 用户要求缺一不可；截图 URL phone 为空；结论明确五字段与 toast 行为\n- 所属项目：无锡市区小程序嵌入H5；来源会话：2192d7e5-983b-4d37-906a-2d50cd01b942；代码基线：06aa6e2"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

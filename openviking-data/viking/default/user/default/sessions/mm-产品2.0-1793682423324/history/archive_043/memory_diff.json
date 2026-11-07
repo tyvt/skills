@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_043",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:56:57.507780+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/navbar_home_active_truthy.md",
+                "memory_type": "entities",
+                "after": "# 顶栏首页高亮方法引用陷阱\n产品2.0 Web 后台 Navbar.vue 中 isHomeActive 方法在模板与方法内部均被当属性引用（漏写括号），导致首页永远高亮、其他模块恒不高亮的布尔判断失效。\n\n## 问题现象\n- 顶栏导航（首页+模块 Tab）无论选中哪个子菜单，首页永远高亮，其他模块永不高亮\n- 改动 isHomeActive 相关逻辑无任何变化，布尔判断「恒真/恒假且怎么改都不变」\n\n## 根因\n- Navbar.vue 模板 `:class=\"{ active: isHomeActive }\"` 漏写调用括号，JS 里函数引用恒为 truthy，首页因此永远 active\n- isActive(path) 内部 `if (this.isHomeActive) return false` 同样没调用方法，被 truthy 短路后各模块 Tab 恒返回 false\n- 两处是同一个笔误的两种表现\n\n## 解决方案\n- 模板上方法必须带调用括号 `isHomeActive()`\n- 方法内部互查也要写成 `this.isHomeActive()`\n- 排查技巧：布尔判断「恒真/恒假且怎么改都不变」时，先 grep 模板里该方法有没有漏写 ()\n\n## 验证与归属\n- 验证证据：会话 2128505f 调查结论，模板第 94 行与 isActive 第 581 行均未加 () 调用\n- 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue\n- 所属项目：产品2.0；来源会话ID：2128505f-8e3c-45e5-8ca0-aa7871402fb0；代码基线：39e3114"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_select_column_reserve.md",
+                "memory_type": "entities",
+                "after": "# 列表跨页保留选中致批量带旧数据\n产品2.0 zs-select-column 默认 reserve-selection:true，翻页后旧页勾选仍留在 this.ids，逐页校验类批量操作会带上已翻页旧数据提交报错。\n\n## 问题现象\n- 列表多选列翻页后，之前页勾选的行仍留在 this.ids 里\n- 批量操作（如权利人同步）带着已不在当前页的数据提交，接口校验报旧错\n- 用户以为只选了当前页，实际选中集合与可见集合不一致\n\n## 根因\n- zs-select-column 默认 reserve-selection:true（el-table 跨页保留选中），翻页不清空勾选\n- 配合列表刷新后 selection 也不同步\n\n## 解决方案\n- 对「按当前页选中做批量操作」的列表，显式传 `:reserve-selection=\"false\"` 关闭跨页保留\n- 加载新数据后清空选中：重写 listMixins 的 listCallback，在翻页/搜索回调里调用 clearSelection()\n- 注意区分：跨页汇总类批量需求才该开 reserve-selection；逐页校验的批量操作必须关掉\n\n## 验证与归属\n- 验证证据：会话 f30c7962，根因是默认 reserve-selection:true，修复为 :reserve-selection=\"false\" + 重写 listCallback 调 clearSelection()\n- 涉及文件：zhi2-web-admin/src/views/property/complex/index.vue、zhi2-web-admin/src/components/zs-select-column/zs-select-column.vue\n- 所属项目：产品2.0；来源会话ID：f30c7962-32af-468a-9d91-311b5e899302；代码基线：2198ce6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/append_manual_input_focus.md",
+                "memory_type": "entities",
+                "after": "# 输入框 append 区按钮点击无反应双层根因\n产品2.0 详情页「付款单位」旁「手工输入」切换按钮点击无反应，需点其他输入框触发重渲染才生效，根因是状态未声明 + append 区 @focus 抢点击。\n\n## 问题现象\n- 详情页「付款单位」旁的「手工输入」切换按钮点击无反应\n- 要点其他输入框触发重渲染后才生效，表现为「点了没反应/延迟生效」\n\n## 根因\n- 切换标志 showManualInput 只在方法里直接赋值、未在 data() 声明，Vue2 对未声明属性不做响应式代理，改了不触发视图更新\n- 按钮放在 zs-input 的 append 区域，点击先触发输入框 @focus，@focus 里打开单位选择弹窗，把手工输入切换掩盖掉\n\n## 解决方案\n- 一切参与模板渲染的状态必须先在 data() 声明（Vue2 直接赋值不响应是此类高频根因）\n- append 区按钮加 `@mousedown.prevent` 阻止默认聚焦行为，让输入框不抢焦点，点击立即执行切换逻辑\n- mousedown.prevent 套路适用于所有「输入框 @focus 打开选择弹窗 + 旁边放可点元素」的组合\n\n## 验证与归属\n- 验证证据：会话 7e50b554，showManualInput 未在 data 声明导致不响应；append 区点击先触发 @focus 打开弹窗掩盖切换，加 @mousedown.prevent 后立即生效\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubRevenueContract/detail.vue\n- 所属项目：产品2.0；来源会话ID：7e50b554-a8ad-43a6-b845-69894b24519f；代码基线：57109f9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/blob_download_json_error.md",
+                "memory_type": "entities",
+                "after": "# Blob 下载接口 JSON 错误兼容\n产品2.0 下载模板类接口设 responseType:'blob' 后，后端报错被封装成二进制，现有 JSON 解析链路失效，需 downloadBlobFileWithCheck + 错误拦截器解析 Blob。\n\n## 问题现象\n- HTTP 4xx/5xx 时 axios 进错误拦截器，但 response.data 是 Blob 读不到 msg，只能提示通用「Request failed with status code 400」\n- HTTP 200 但 body 是 JSON 错误时，会被直接当成 Excel 文件下载成坏文件\n\n## 根因\n- Blob 响应把 JSON 错误体也封装成二进制，项目现有按 JSON 解析 msg 的链路完全失效\n\n## 解决方案\n- 在 src/utils/request.js 错误拦截器里判断 response.data 是 Blob 时，用 FileReader/text() 解析出 JSON 并展示后端 msg\n- 在 src/utils/index.js 新增 downloadBlobFileWithCheck 工具：下载前先检查 Blob 是否为 JSON 错误响应（content-type 或首字节），是错误则弹提示、不是才触发保存\n- 各下载模板调用点统一改用该工具，未关联房屋等业务性报错能显示后端具体文案\n\n## 验证与归属\n- 验证证据：会话 3f404cf2，改 request.js 错误拦截器 + utils/index.js 新增 downloadBlobFileWithCheck + import.vue 的 getTemplate 换用该工具\n- 涉及文件：zhi2-web-admin/src/utils/request.js、zhi2-web-admin/src/utils/index.js、zhi2-web-admin/src/views/property/spFeeBill/components/import.vue\n- 所属项目：产品2.0；来源会话ID：3f404cf2-9522-42c1-aa00-9a2837b4eb10；代码基线：018ae18"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

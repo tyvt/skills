@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:42:10.839903+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/el_input_ime_filter.md",
+                "memory_type": "entities",
+                "after": "# el-input IME 过滤失效\n在园区物管2.0 中，使用 @input.native 监听 el-input 搜索过滤会在中文输入法下失效，需改 @input 并直接使用事件参数。\n\n## 现象\n- 搜索/过滤输入框（如菜单图标选择 IconSelect.vue）英文输入可过滤，切中文输入法输入拼音基本搜不到。\n\n## 根因\n- @input.native 监听原生 DOM input 事件，IME 组字过程中原生事件多次触发但 v-model 尚未更新。\n- 选字确认后 el-input 通过组件 input 事件更新 v-model，原生 input 不一定再触发，过滤函数读到关键词为空或仍是拼音。\n- 英文逐字输入两者时机接近故偶发正常。\n\n## 解决方案\n- 去掉 .native，改用 @input 监听 el-input 组件事件。\n- 过滤函数直接使用事件回调传入的关键词参数，不依赖可能滞后的 this.xxx 值。\n- 凡是「输入触发过滤」场景均适用此规则。\n\n## 验证与归属\n- 验证：会话 0f4d7bcd 用户报「菜单图标，用中文搜索不生效」，修复为 @input.native 改 @input 且 filterIcons 直接用事件参数，刷新后输入「三方」可正确过滤。\n- 涉及文件：src/views/system/menu/IconSelect.vue。\n- 所属项目：园区物管2.0；来源会话：0f4d7bcd-4f58-428d-a808-a25b8e090d3a；代码基线：7f13a8a38。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sign_js_cors_whitelist.md",
+                "memory_type": "entities",
+                "after": "# sign.js 全局加签致外链 CORS 失败\n园区物管2.0 中 sign.js 全局改写 XHR/fetch 加签会把自定义头带到第三方外链，触发 CORS 预检失败，需加同源白名单。\n\n## 现象\n- 引入腾讯地图等第三方 SDK 后控制台报 CORS，外链请求（如 pr.map.qq.com 统计 pingd）预检被拒，提示 nonce 头不在 Access-Control-Allow-Headers。\n\n## 根因\n- public/assets/js/sign.js 全局改写 XMLHttpRequest 和 fetch，只要 sessionStorage 有 Admin-Token 就对每次请求（含第三方外链）附加 nonce/timestamp/sign 自定义头。\n- 第三方域名不允许这些头，OPTIONS 预检必然失败；报错表面像腾讯地图配置问题，真凶在本项目加签脚本。\n\n## 解决方案\n- sign.js 增加 shouldApplySign 白名单：仅对当前站点同源、且路径以约定 API 前缀（SIGN_API_BASE，须与 env 的 VITE_APP_BASE_API 一致，含 /dev-api 等代理前缀变体）开头的请求加签，外链一律不加。\n- 排查第三方 SDK 请求被篡改时先查全局 XHR/fetch wrapper。\n- 顺带修正 fetch 首参为 URL/Request 时取查询串的逻辑。\n\n## 验证与归属\n- 验证：会话 73936be3 CORS 报错定位到 sign.js 全局加签，补 shouldApplySign（同源 + /api/v2.0 前缀）后外链不再加签。\n- 涉及文件：public/assets/js/sign.js、vite.config.js、env/.env。\n- 所属项目：园区物管2.0；来源会话：73936be3-9ab2-412b-8043-33c8c47df458；代码基线：f00310232。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/panorama_height_scroll.md",
+                "memory_type": "entities",
+                "after": "# 全景大屏页横向滚动条被推离可视区\n园区物管2.0 中全景类大屏页根节点同时用 height 与 min-height 的 calc(100vh-…) 会把横向滚动条推出主内容区可视范围。\n\n## 现象\n- 地图/资金全景等超宽大屏页，横向滚动条必须先把纵向滚到最底才出现。\n\n## 根因\n- 根节点写 height: calc(100vh - 84px) 且 min-height 同值；#app-main 为 flex:1，实际高度小于该值（上方还有 Tags 栏、票据条等，84 只是近似值）。\n- 根盒子比可视区更高，横向滚动条画在盒子最底、落在主区可视范围之下。\n\n## 解决方案\n- 去掉强制视口高的 min-height，改加 max-height: 100% 让高度不超父级主内容区，并加 min-height: 0 保证 flex 子项正确参与高度计算。\n- 若个别环境 max-height:100% 不生效，再在 AppMain 的 .app-main 上补 min-height:0。\n- 与「详情页 calc(100vh-120px) 少减像素」是不同的根因与场景。\n\n## 验证与归属\n- 验证：会话 a2b24d85 中 assetPanorama 与 fundPanorama 同步做「去 min-height + max-height:100% + min-height:0」三处修改后，横向滚动条无需先滚到底即可见。\n- 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/fundPanorama/index.vue、src/layout/components/AppMain.vue。\n- 所属项目：园区物管2.0；来源会话：a2b24d85-02d0-461f-afbd-1db973bf08f3；代码基线：f00310232。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_showmethod.md",
+                "memory_type": "entities",
+                "after": "# zs-table 小计列识别失效致 summary 不渲染\n园区物管2.0 中 zs-table 的 showMethod 仅用 column.type==='index' 识别小计列，遇 selection 列或字段差异时 summary 整块不渲染。\n\n## 现象\n- 配置了汇总的 zs-table（如楼盘范围 rangeTable、交付范围表）底部 summary 整块不渲染，接口数据正常。\n\n## 根因\n- 组件 showMethod 识别「小计列」只用 column.type === 'index' 单一条件；有选择列（selection）或列定义差异时匹配不到。\n- 汇总字段取值又只读 column.property 不兼容 column.prop，任一取空则整行汇总为空。\n\n## 解决方案\n- showMethod 列识别做双兜底：先按 type/property 找 index 列，找不到回退到「第一个非 selection 列」。\n- 汇总字段统一兼容 column.property || column.prop。\n- 修法应落在 zs-table 组件层而非各页面自写 summary 方法；与「表底统计统一交给 zs-pagination」是两回事（行小计 vs 总条数）。\n\n## 验证与归属\n- 验证：会话 5c7bbda7 改 rangeTable.vue 的 showMethod 列识别与字段兼容后 summary 正常渲染，涉及 zs-table 组件与多处 rangeTable 消费方。\n- 涉及文件：src/components/zs-table/zs-table.vue、src/views/property/complex/components/rangeTable.vue、src/views/property/handover/components/deliveryRangeTable.vue。\n- 所属项目：园区物管2.0；来源会话：5c7bbda7-0993-453f-a4a2-a1efa119c858；代码基线：7814a0c2a。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

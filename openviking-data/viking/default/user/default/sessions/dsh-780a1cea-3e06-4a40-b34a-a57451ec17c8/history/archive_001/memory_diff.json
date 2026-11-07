@@ -1,0 +1,23 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-780a1cea-3e06-4a40-b34a-a57451ec17c8/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T09:56:58.166701+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷任务/zentao_bug_6180.md",
+                "memory_type": "entities",
+                "after": "# 禅道Bug 6180 预售许可申请编辑页按钮与刷新异常\n房产管理系统zhi2-web-admin预售许可申请编辑页（presale/permit/components/detail.vue）存在三个按钮与刷新异常现象，本记忆为只读调查结果，尚未修复。\n\n## 现象1根因：保存后保存按钮残留\n- 提交6885d79be将editCallback从this.changeFormState('view')改为this.refreshDetailSnapshot()，保存后停在编辑态不切查看态\n- 位置：components/detail.vue:733-736（editCallback）、738-748（refreshDetailSnapshot）\n- 保存按钮渲染于OperationBtnGroup/index.vue:12-17，v-if=\"!isFormDisabled && showSave\"，isFormDisabled=formMode=='view'（308-310）\n- 与bug 6163（bf1dde633）不冲突：6163只改handleSubmit，编辑态保存这段从未被覆盖，是6885d79be的回退\n- 建议：editCallback在refreshDetailSnapshot()成功后调用changeFormState('view', this.form.presalePermitId || this.getId())\n\n## 现象2根因：编辑态出现提交按钮\n- showSubmitButton未按formMode收敛，formMode !== 'add'放行了'edit'（components/detail.vue:416-422）\n- 条件：!nodeType && formMode !== 'add' && bizState==='0' && signState==='2' && presalePermitId\n- showSignButton（409-415）同样用formMode !== 'add'，编辑态也显示电子签\n- OperationBtnGroup内置ZsSubmit已由:show-submit=\"false\"（detail.vue:10）关闭，唯一提交是36-43行自定义按钮\n- 建议：两处改为formMode === 'view'（或至少排除'edit'）\n\n## 现象3根因：提交后页面未刷新\n- handleSubmit（959-977）成功后changeFormState('view', id)（974）；changeFormState（main.js 131-147）拼path后router.push(query.formMode='view')\n- 可能不刷新：id兜底this.form.presalePermitId || this.getId()，若hash路由下getId()解析异常为无效值，main.js:132-135静默return不跳转\n- 另一隐患：提交未成功后直接getDetail()更新bizState，仅靠路由跳转触发re-init；未触发时bizState仍为0\n- 建议：handleSubmit成功后显式await this.getDetail()拿最新bizState=1再changeFormState('view', id)；changeFormState前用isNavigableDataId校验id\n\n## 调查范围与修复建议\n- 实现文件：zhi2-web-admin/src/views/presale/permit/components/detail.vue（1002行）；薄包装detail.vue；操作按钮栏OperationBtnGroup/index.vue\n- 保存链：zhi2-web-admin/src/mixins/form.js；全局formMode/changeFormState：main.js（114-147）；详情watch/init：detailMixins.js（42-68、98-107）\n- 路由：/permitApply/:tableid → presale/permit/detail，URL形如#/permitApply/<id>?formMode=edit|view|add\n- 三现象同源，建议集中在components/detail.vue三处修改（editCallback切view、showSubmitButton/showSignButton收敛到view、handleSubmit显式getDetail+切view）\n- OperationBtnGroup、form.js、detailMixins均无需改动；本记忆为只读调查结论，未修改任何文件、未build、未git操作"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

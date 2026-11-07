@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_055",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:30:18.878784+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/complex_field_key.md",
+                "memory_type": "entities",
+                "after": "# 公共查询动态字段元数据键匹配\n公共查询条件由后端字典 complex_field 动态下发，前端字段元数据 key 必须与后端 dictValue 逐字一致，否则静默降级为文本输入框。\n\n## 问题现象\n- 公共查询（物业管理区域等）部分字段应是下拉选择（物业企业信用等级、行政区域、物业类型），却渲染成文本输入框\n- 本例字典 dictValue 为 propertyCompanyCreditRating，前端 COMPLEX_FIELD_META 的 key 写成 companyCreditLevel，二者不一致\n\n## 根因\n- 前端 mergeFieldOptions 用 item.dictValue 作 key 查 COMPLEX_FIELD_META，查不到则回退 VALUE_TYPE.TEXT\n- 该字典所有字段 remark 均为空，字段类型完全靠前端元数据兜底，并非 remark 覆盖或字典项缺失\n\n## 解决方案\n- 拿到后端完整字典后逐字段核对 dictValue 与 COMPLEX_FIELD_META 的 key，把前端 key 改成与后端完全一致（companyCreditLevel → propertyCompanyCreditRating），保留原 valueType/selectKey\n- selectKey 指向的字典（如 credit_level）决定下拉选项来源；新增动态字段时后端加字典项须同时补前端 meta，否则静默成输入框不报错\n- 排查顺序固定：先在字典 JSON 找该字段 dictValue → grep 前端同名 key → 确认是 key 不一致而非 remark 解析失败\n\n## 验证与归属\n- 验证：会话贴出 complex_field 全量 JSON，确认 dictValue=propertyCompanyCreditRating 与前端 companyCreditLevel 不匹配，修复后走 selectOptionsMap.creditLevel\n- 涉及文件：zhi2-web-admin/src/components/zs-advanced-query/complexFieldConfig.js、zs-advanced-query.vue、src/views/publicQuery/complex/index.vue\n- 所属项目：苏住房G；来源会话：04b34f92-8311-4af3-95f1-c6899f1c1f94；代码基线：5ccda28"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/select_empty_string.md",
+                "memory_type": "entities",
+                "after": "# B端选择框空值统一用空串\nB 端选择类字段的「未选」状态应统一用空字符串 '' 表示，避免 null/undefined 在不同序列化链上引发歧义。\n\n## 问题现象\n- 后台筛选/选择类条件（操作符、查询键等）空值表示有三种写法并存：undefined、null、''\n- null 在某些控件被当成「已选中的空选项」，undefined 不渲染，'' 才稳定显示 placeholder，三者被 JSON.stringify 区别对待（undefined 的 key 被整体丢弃，null 保留）\n\n## 根因\n- 空值语义没有统一，导致「没选却带空条件」「禁用态还显示占位符」「清空后参数 key 消失」互相打架且都不报错\n\n## 解决方案\n- 选择类字段「未选」统一用空字符串 ''，只在提交前做一次显式剔除（不依赖 JSON 自动省略）\n- 禁用态同时清掉 placeholder，避免灰色占位残留成可选项；清空外键/下拉写 '' 而非 undefined，否则字段被请求序列化整体丢掉\n- 与「清空外键写成 undefined 会被 JSON.stringify 省略导致解绑失败」是同一根因在不同组件上的实例，但此处是新建选择框的默认值约定\n\n## 验证与归属\n- 验证：zs-advanced-query 操作符/字段下拉区分「启用且有占位符」与「禁用且无占位符」，多操作符字段默认值从首项改为空交由用户选择\n- 涉及文件：zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue\n- 所属项目：苏住房G；来源会话：429acee0-eca5-4450-8610-60939deb48d6；代码基线：5ccda28"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/query_max_groups.md",
+                "memory_type": "entities",
+                "after": "# zs-advanced-query最大组数上限\nzs-advanced-query 的 max-groups 是「最大组数」硬上限，默认组数由组件内部兜 1，不能用设 1 来表达默认。\n\n## 问题现象\n- 公共查询—物业管理区域查询产品要求「条件组默认 1 个、最多 2 个」，实际点「添加筛选条件组」加不出第二个\n\n## 根因\n- 页面把 :max-groups 传成了 1；组件语义是「最多允许几组」而非「默认几组」，默认值 1 是组件内部自己给的\n- max-groups=1 等于把上限锁死在同值，添加按钮后无空位可加\n\n## 解决方案\n- max-groups 只表达上限，默认展示数不要通过它表达；本例改 :max-groups=\"2\" 即同时满足「默认 1 组」和「最多 2 组」\n- 删除语义天然是「有 2 组时可删、至少保留 1 组」，组间「且/或」下拉随组数出现\n- 凡是 max-xxx 型受控上限 prop（max-groups / max-length / max-count），先确认是否兼任默认值，否则「只能有一个」类反馈往往是上限写死导致\n\n## 验证与归属\n- 验证：会话用户反馈「条件组默认一个，再最多加一个，一共最多两个，现在只有一个了」；结论改 :max-groups=\"2\"，改后行为（默认 1 组、可加 1 组、2 组时可删至 1 组、组间且/或切换）\n- 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/index.vue、src/components/zs-advanced-query/zs-advanced-query.vue\n- 所属项目：苏住房G；来源会话：20e31648-4d28-46f2-81a2-de9c591a691a；代码基线：e590ffa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/map_drill_marks.md",
+                "memory_type": "entities",
+                "after": "# 地图下钻先清空标记再请求\n小区台账地图下钻应在请求前先清空旧标记层，避免慢接口下旧层级名称残留成新层级圆圈。\n\n## 问题现象\n- 小区台账（views/benefit/statisticsMap）按角色权限过滤行政区/街道/物业管理区域，点区县下钻后接口只返回一条街道数据，但地图圆圈仍显示上层「区域名称」，缩放一次才正常\n- 接口慢，期间一直挂着旧标记\n\n## 根因\n- 标记层（markList）与下钻结果渲染是两条时序，点击后不立即清场，在接口返回并走 applyMarkListAfterDrillView 之前旧层级 mark 及「名称+数量」气泡还在\n- 缩放触发地图重绘/聚合重算，表现成「缩放后自愈」——典型的「数据已换、DOM/图层未清」假象，不要误判为名称字段取错\n\n## 解决方案\n- 下钻点击回调里第一件事 this.markList = []（同步清空气泡/标记），再由接口回包走原有渲染逻辑重建新层级\n- 失败分支补回退 restoreParentAreaLayerAfterDrillFail 重新拉上一级标记，避免异常时地图永久空白\n- 适用面：所有「点一个元素 → 请求 → 重绘同一容器」的图表/地图/看板，都应在请求前清空旧数据并把失败回退一并设计，而非只做 loading\n\n## 验证与归属\n- 验证：会话用户诉求「点了区域接口返回一条街道但圆圈仍显示区域名称，缩放后还原正常」+「接口慢能否点了先移除点再渲染」；结论点击时 markList=[]，回包走 applyMarkListAfterDrillView，失败走 restoreParentAreaLayerAfterDrillFail\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue\n- 所属项目：苏住房G；来源会话：7c8a2586-a002-4baf-abaf-c868fa7a8a63；代码基线：ff55f8f"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

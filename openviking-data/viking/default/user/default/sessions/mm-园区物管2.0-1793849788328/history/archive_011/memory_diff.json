@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793849788328/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T04:14:52.279548+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/prompt_double_padding.md",
+                "memory_type": "entities",
+                "after": "# 提示语间距因双重padding变大修复\n园区物管2.0 中提示语因自身 padding-bottom 与表格容器 padding-top 叠加，导致下方间距比上方大一倍，已调整为统一 12px。\n\n## 问题背景\n- 提示语原设置 padding-bottom: 12px，而表格容器本身还有 padding-top: 12px，使下方间距变成 24px，比上方更大\n\n## 解决方案\n- 提示语改为 padding: 12px 12px 0，上下间距均为 12px\n- 上方：标题分隔线到提示语 = 12px\n- 下方：提示语到表格 = 12px（由表格容器上内边距提供）\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubRevenueContract/index.vue、zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/index.vue 等\n- 所属项目：园区物管2.0；来源会话：14b45942-7d90-49e2-9568-f168ec1c668e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/extract_expert_detail_ui.md",
+                "memory_type": "entities",
+                "after": "# 抽取专家详情页面UI调整\n园区物管2.0 按截图要求完成「抽取专家详情」页面 UI 调整，统一备注位置并补充表格记录数。\n\n## 修改要点\n- 基本信息表单：查看模式用 DetailTemplate 蓝色矩形表单，字段顺序为抽取事项→专家总数/抽取人数/屏蔽专家数→备注（最后一行）\n- 编辑模式备注移到专家总数那一行下方\n- 屏蔽专家表（BlockExpertTable.vue）与抽选结果表（ExpertResultTable.vue）底部增加「共 XX 条记录」\n- 同步修复物业模块（property/extract/detail.vue）编辑模式备注位置与查看模式备注移至最后\n\n## 涉及文件\n- credit/extract/detail.vue、BlockExpertTable.vue、ExpertResultTable.vue、property/extract/detail.vue\n\n## 验证与归属\n- 所属项目：园区物管2.0；来源会话：87a99be6-6232-4f70-af80-05cf6659e728"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/street_click_white_screen.md",
+                "memory_type": "entities",
+                "after": "# 点击街道进入物业点白屏修复\n园区物管2.0 统计地图点击街道后进入物业点层级出现白屏，已改为等待接口返回有效经纬度后再移动地图中心。\n\n## 问题背景\n- 点击街道时原逻辑直接用街道气泡经纬度移动地图，易因数据未就绪导致白屏\n\n## 解决方案\n- 点击街道不再立即用街道气泡经纬度移动地图\n- 等 selectOptionalComplexList 返回后，取列表中第一条有有效经纬度的物业点\n- 地图中心移到该点，缩放级别 MAP_ZOOM.SEARCH_SINGLE（16），再更新标记\n- 若接口返回数据均无经纬度，则只更新标记、不移动视野\n\n## 涉及文件\n- zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue\n\n## 验证与归属\n- 所属项目：园区物管2.0；来源会话：b290ab4f-dc47-412c-b6bb-780421a0a4ae"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/chart_amount_double_wan.md",
+                "memory_type": "entities",
+                "before": "# 资金全景分类图金额二次÷10000导致柱形不显示\n园区物管2.0 资金全景页分类金额图因 parseCategoryAmount 对已是万元的接口数据再次 ÷10000，金额被缩小一万倍，柱形几乎不可见。\n\n## 问题根因\n- 数据清洗函数 parseCategoryAmount 对接口已以「万元」返回的 categoryAmount 又执行 yuanToWan（÷10000），二次缩小一万倍\n- 同模块 regionBalance 用 toChartWanAmount 直接按万元取值，故只有余额图正常、分类图异常\n- 同类图表取数路径不一致是典型信号\n\n## 解决方案\n- 同页面多个图表统一走同一金额换算入口 toChartWanAmount，先确认接口返回单位再决定是否换算\n- 禁止在各 parse 函数里单独做 ÷10000\n- 图表 Y 轴上限用 Math.ceil(maxVal * 1.12) 自适应小金额（如最大 0.22 万时上限约 1）\n- 对接新图表接口时先看一条原始返回样例确认单位\n\n## 验证与归属\n- 验证：regionBalance 返回 0.22 正常而 categoryAmount 图为空，根因是 parseCategoryAmount 多做一次 yuanToWan，改用 toChartWanAmount 后修复\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/dataHelpers.js\n- 所属项目：园区物管2.0；代码基线：5a288f142；来源会话：028698e5-6e86-4303-861e-cf865cc0fb59",
+                "after": "# 资金全景分类图金额二次÷10000导致柱形不显示\n园区物管2.0 资金全景页分类金额图因 parseCategoryAmount 对已是万元的接口数据再次 ÷10000，金额被缩小一万倍，柱形几乎不可见。\n\n## 问题根因\n- 数据清洗函数 parseCategoryAmount 对接口已以「万元」返回的 categoryAmount 又执行 yuanToWan（÷10000），二次缩小一万倍\n- 同模块 regionBalance 用 toChartWanAmount 直接按万元取值，故只有余额图正常、分类图异常\n- 同类图表取数路径不一致是典型信号\n\n## 解决方案\n- 同页面多个图表统一走同一金额换算入口 toChartWanAmount，先确认接口返回单位再决定是否换算\n- 禁止在各 parse 函数里单独做 ÷10000\n- 图表 Y 轴上限用 Math.ceil(maxVal * 1.12) 自适应小金额（如最大 0.22 万时上限约 1）\n- 对接新图表接口时先看一条原始返回样例确认单位\n- 顶部「收入金额/资金支出」卡片用的 totalAmount 直接赋值，未做 ÷10000，无需改动\n\n## 验证与归属\n- 验证：regionBalance 返回 0.22 正常而 categoryAmount 图为空，根因是 parseCategoryAmount 多做一次 yuanToWan，改用 toChartWanAmount 后修复\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/dataHelpers.js、index.vue、mock.js\n- 所属项目：园区物管2.0；代码基线：5a288f142；来源会话：028698e5-6e86-4303-861e-cf865cc0fb59"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

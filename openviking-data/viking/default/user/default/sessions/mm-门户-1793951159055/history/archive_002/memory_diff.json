@@ -1,0 +1,44 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793951159055/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T07:55:29.022531+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/preferences/user/待办表格列宽策略.md",
+                "memory_type": "preferences",
+                "after": "- 门户首页待办表（HomeTodoTable.vue）列上不写任何 width / min-width，操作列去掉 :width，交给 zs-operate-column 按按钮文案测算列宽\n- zs-table-column 公共逻辑：按表头+单元格内容 canvas 测算列宽；测算结果 <280px 输出固定 width（如序号、状态、发起人、来源、发起时间）不参与剩余宽度放大，避免右侧空白；较大（上限500）输出 min-width 作为弹性列由 zs-table 的 fit 把剩余宽度分给长文案列\n- 状态、操作列 head-align=\"center\" 且 CSS 保证表头与单元格 text-align:center，去掉操作列 fixed=\"right\" 使表头同行对齐\n- 列宽更新后调用 doLayout() 避免 Element 表格重算错位\n- 涉及文件：zhi2-web-admin/src/views/home/components/HomeTodoTable.vue、src/views/home/index-new.vue、src/components/zs-table/zs-table-column、src/views/home/config/homeLayout.js\n- 验证：cursor 会话提取；来源会话 b4f85522（居中/fixed 修复）、fd264e18（组件测算宽度）"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/用户管理路由根路径配置.md",
+                "memory_type": "preferences",
+                "after": "- 门户后台「用户管理」配在根路径 /user，原 constantRoutes 占用 /user 父路由（只挂个人中心 profile，redirect noredirect）导致动态路由注册失败跳 404\n- router/index.js 不再占用 /user 父级；个人中心改为固定路由 /user/profile（Navbar 入口不变），/user 留给菜单「用户管理」（system/user/index）\n- permission.js：若 listRouters 返回「路径 /user + 直接挂业务组件、未包 Layout」，自动规范为 Layout + 默认子路由，保证列表页正常渲染\n- 涉及文件：src/router/index.js、src/store/modules/permission.js、src/utils/menuVisibility.js、src/api/portal/user.js、src/views/system/user/index.vue、Sidebar/RecursiveMenu.vue、src/utils/portalLayout.js、TagsView/index.vue\n- 验证：cursor 会话提取；来源会话 18610eee；结果：用户管理 /user，个人中心 /user/profile"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/住房租赁人员照片缺省图.md",
+                "memory_type": "preferences",
+                "after": "- 住房租赁 → 从业人员信息公示「基本信息」弹窗，按截图标注「没照片放一张缺省图」，右上角证件照区域补齐\n- RentalDetailDialog.vue：姓名/企业/电话左侧增加 102×128 照片位；优先用记录的 photo/photoUrl/avatar/headPortrait\n- 无 URL 或图片加载失败时显示项目内缺省图 /assets/images/empty.svg（UI 规范「暂未上传图片」）；切换人员或记录变更重置加载失败状态\n- E2E（public-portal-interactions.spec.ts）打开人员「基本信息」后断言照片 src 包含 empty.svg（当前 mock 无真实照片）\n- 本地刷新 portal=rental-staff 点任一行「基本信息」看缺省图；设计稿换专用人像占位图改 DEFAULT_PERSON_PHOTO 常量\n- 涉及文件：src/views/home/publicPortal/components/RentalDetailDialog.vue、public-portal-interactions.spec.ts、BrokerPages.vue\n- 验证：cursor 会话提取；来源会话 44666f5e"
+            }
+        ],
+        "updates": [],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_col_fix.md",
+                "memory_type": "entities",
+                "deleted_content": "# 表格状态操作列错位修复\n门户首页 index-new 表格状态/操作列均分且 fixed 导致内容偏左、表头错位，需固定列宽并移除 fixed 修复。\n\n## Description\n- 现象：状态、操作列均分导致内容靠左不符预期，且操作列 fixed=\"right\" 导致表头拆分错位。\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue；zhi2-web-admin/package.json\n- 来源会话ID：b4f85522-74e4-4fb9-9d6a-789546c1fbdc；代码基线：none；所属项目：门户\n\n## Solution\n- 状态列固定 96px、操作列固定 72px，并移除操作列 fixed=\"right\"。\n- 其余 6 列（业务类型、主题、任务名称、发起人、来源、发起时间）继续均分剩余宽度。\n- 配置 head-align=\"center\" 与 CSS text-align: center 使内容居中。\n- 列宽更新后调用 doLayout() 防止表格重算错位。\n\n## Verification\n- 验证证据：src=门户/016.md 记录该修复方案。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/user_route_fix.md",
+                "memory_type": "entities",
+                "deleted_content": "# 常量路由占父级致动态路由失败修复\n门户 constantRoutes 占用 /user 父路由导致后台用户管理动态路由注册失败跳 404，需释放父级并自动规范 Layout。\n\n## Description\n- 现象：constantRoutes 占用 /user 父路由，致使后台配置根路径 /user 的用户管理动态路由注册失败并跳 404。\n- 涉及文件：zhi2-web-admin/src/router/index.js；src/utils/menuVisibility.js；src/store/modules/permission.js；src/api/portal/user.js；src/views/system/user/index.vue；Sidebar/RecursiveMenu.vue；src/utils/portalLayout.js；TagsView/index.vue\n- 来源会话ID：18610eee-2927-456a-9953-3373bfd46585；代码基线：none；所属项目：门户\n\n## Solution\n- 于 router/index.js 将个人中心改为 /user/profile 释放 /user 父级。\n- permission.js 对 listRouters 返回 /user 未包 Layout 的情况自动规范为 Layout + 默认子路由。\n\n## Verification\n- 验证证据：src=门户/016.md 记录该修复方案。"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 2,
+        "total_skipped": 0
+    }
+}

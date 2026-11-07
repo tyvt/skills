@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_054",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T22:59:02.678910+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/place_dmsp_iframe_migration.md",
+                "memory_type": "entities",
+                "after": "# 地名(dmsp) iframe 页面迁入 V3 与环境变量改造\n已将旧仓库苏州市房地产监测/apps/chanpin中 VUE_APP_Place_URL 相关的地名 iframe 页面迁入 V3，并改为 Vite 环境变量 VITE_APP_Place_URL。\n## 新增文件\n- `zhi2-web-admin/src/utils/placeDmsp.js`：读取 VITE_APP_Place_URL、待办 URL 白名单校验\n- `zhi2-web-admin/src/views/IframePage/index.vue`：`/landName/*` 菜单（地名咨询/审批/检索等）\n- `zhi2-web-admin/src/views/placeManage/index.vue`：调整范围 justificationrange\n- `zhi2-web-admin/src/views/placeApproval/index.vue`：地名审批（智在云换票 dmspgld=1）\n- `zhi2-web-admin/src/views/announcement/index.vue`：通知公告 userTemp\n## 环境变量变更\n- 原环境变量 `VUE_APP_Place_URL` 改为 `VITE_APP_Place_URL`\n- 写在 `env/` 下各环境文件中\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：zhi2-web-admin/src/utils/placeDmsp.js、IframePage/index.vue、placeManage/index.vue、placeApproval/index.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：2babe7dd-0254-4d05-849d-9a99a05365df；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/personnel_certificate_dict_type.md",
+                "memory_type": "entities",
+                "after": "# 经纪机构专业资格证书类型字典接入\n已在经纪机构管理 → 专业资格证书管理列表页为「资格证书类型」列接入字典 company_personnel_certificate_type 转译。\n## 修改说明\n- 修改文件 `personnelCertificate/index.vue`：表格列 `type=\"dict\"`，设置 `dict-url=\"company_personnel_certificate_type\"`，通过 `:options=\"certificateTypeOptions\"` 传入字典项\n- 数据加载：在 `created` 中调用 `initDict()`，用 `getDicts('company_personnel_certificate_type')` 拉取选项，避免列仅按 prop 回退到错误字典显示原始码值\n- 详情页 `detail.vue` 本就用同一字典，列表与详情已对齐\n## 预期效果\n- 刷新列表后，「资格证书类型」显示字典中文标签（如经纪人、经纪人协理等，以环境字典配置为准）\n- 若仍显示 `01`，请在系统管理 → 字典管理中确认 `company_personnel_certificate_type` 配置\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：personnelCertificate/index.vue、detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：2a03d161-8f4b-4db5-aecc-7bd4caa3a15d；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/personnel_change_route_fix.md",
+                "memory_type": "entities",
+                "after": "# 从业人员变更路由 component 路径修正\n根据 listRouters 数据对照 views 下可作为路由入口的文件，修正 PersonalRecordChange 的路由配置以避免 permission 报错或加载错页。\n## 必须修改项\n- 菜单 ID `2112452973678424065` 的 `component` 由 `staffManagement/components/detail` 改为 `company/staffManagement/personnelChange/detail`\n- `path` 建议由 `personalRecordChange` 统一为 `personnelChange` 或 `personnelRecordChange`，与 `detail.vue` 内 `personnelRecordChange`、`getRouterPathByFilePath('…/personnelChange/detail')` 一致\n- 原因：`components/detail` 在路由表中被排除，会触发 `[permission]` 报错\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：permission.js、staffManagement/components/detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：a49a48db-a76b-4bee-a6df-61c890175310；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/agency_branch_field_fix.md",
+                "memory_type": "entities",
+                "after": "# 经纪机构分支前端字段与接口对齐修复\n修复经纪机构分支（注销功能仅主管部门使用）前端字段名与接口不一致导致业务状态不显示、删除按钮缺失、机构类型回显原始值的问题。\n## 问题1修复\n- 接口返回 `bizState`，列表之前误用 `recordState` 导致业务状态列空白、删除按钮判断失效\n- `AgencyBranchList.vue` 全部对齐为 `bizState`（列表列、筛选条件、编辑/删除/注销按钮可见性）\n## 问题2修复\n- 接口字段为 `organType`，前端之前用 `companyType` 并硬编码 `'agency'`，字典未加载完成就赋值导致下拉框无法匹配\n- `AgencyBranchDetail.vue` 表单字段改为 `organType`，从 init 接口读取 `data.organType`\n- 初始化先并行加载 `company_type` 字典再设置表单；机构类型改为只读输入框显示中文标签（如「经纪机构」）；保存提交 `organType`\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：AgencyBranchList.vue、AgencyBranchDetail.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：f6efa03f-122d-4824-bd41-be603cf2e082；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

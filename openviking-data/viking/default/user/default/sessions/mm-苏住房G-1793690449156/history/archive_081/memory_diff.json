@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_081",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T10:33:57.210605+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/advanced_query_max_groups.md",
+                "memory_type": "entities",
+                "after": "# 高级查询条件组数量上限修复\n苏住房G 物业公共查询中 zs-advanced-query 组件因 max-groups 设为 1 导致无法添加第二组条件，调整为 2 后支持默认1个、最多2个条件组。\n\n## 问题现象\n- 物业查询条件组 max-groups=1 时仅允许一个条件组，无法添加第二组\n\n## 根因\n- zs-advanced-query 的 max-groups 属性被限制为 1，不允许新增条件组\n\n## 解决方案\n- 改为 :max-groups=\"2\" 支持默认1个、最多2个条件组\n- 组间可切换且/或关系\n\n## 验证与归属\n- 验证证据：src=苏住房G/094.md\n- 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/index.vue、zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue\n- 所属项目：苏住房G；来源会话ID：20e31648-4d28-46f2-81a2-de9c591a691a；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/vue2_underscore_data.md",
+                "memory_type": "entities",
+                "after": "# Vue2 data 下划线属性未代理修复\n苏住房G 物业复杂视图 RegionTreeLayout.vue 因 Vue2 不代理 data 中以 _ 或 $ 开头的属性，导致 mounted 调用时为 undefined 而报错。\n\n## 问题现象\n- RegionTreeLayout.vue 于 mounted 调用 this._containerHeightTimers 等为 undefined 而报错\n\n## 根因\n- Vue 2 不代理 data 中以 _ 或 $ 开头的属性至组件实例\n\n## 解决方案\n- 重命名 data 属性去除 _ 前缀（如 _containerHeightTimers → containerHeightTimers）\n- 同步更新 mounted、beforeDestroy 及相关方法引用\n\n## 验证与归属\n- 验证证据：src=苏住房G/097.md\n- 涉及文件：zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue、zhi2-web-admin/src/views/property/complex/index.vue\n- 所属项目：苏住房G；来源会话ID：9585b1b4-8f7c-4b98-81e1-bf7e7b44659c；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/慢接口下钻标记处理.md",
+                "memory_type": "preferences",
+                "after": "- 慢接口下钻时旧标记残留致用户无加载感知，须在点击下钻时立即清除标记\n- 点击下钻立即执行 this.markList = [] 清除标记\n- 接口返回后由 applyMarkListAfterDrillView 重渲染标记\n- 接口失败则调用 restoreParentAreaLayerAfterDrillFail 回退重载上级标记\n- 验证证据：src=苏住房G/094.md；涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue；来源会话ID：7c8a2586-a002-4baf-abaf-c868fa7a8a63"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/complex_field_key.md",
+                "memory_type": "entities",
+                "before": "# 公共查询动态字段元数据键匹配\n公共查询条件由后端字典 complex_field 动态下发，前端字段元数据 key 必须与后端 dictValue 逐字一致，否则静默降级为文本输入框。\n\n## 问题现象\n- 公共查询（物业管理区域等）部分字段应是下拉选择（物业企业信用等级、行政区域、物业类型），却渲染成文本输入框\n- 本例字典 dictValue 为 propertyCompanyCreditRating，前端 COMPLEX_FIELD_META 的 key 写成 companyCreditLevel，二者不一致\n\n## 根因\n- 前端 mergeFieldOptions 用 item.dictValue 作 key 查 COMPLEX_FIELD_META，查不到则回退 VALUE_TYPE.TEXT\n- 该字典所有字段 remark 均为空，字段类型完全靠前端元数据兜底，并非 remark 覆盖或字典项缺失\n\n## 解决方案\n- 拿到后端完整字典后逐字段核对 dictValue 与 COMPLEX_FIELD_META 的 key，把前端 key 改成与后端完全一致（companyCreditLevel → propertyCompanyCreditRating），保留原 valueType/selectKey\n- selectKey 指向的字典（如 credit_level）决定下拉选项来源；新增动态字段时后端加字典项须同时补前端 meta，否则静默成输入框不报错\n- 排查顺序固定：先在字典 JSON 找该字段 dictValue → grep 前端同名 key → 确认是 key 不一致而非 remark 解析失败\n\n## 验证与归属\n- 验证：会话贴出 complex_field 全量 JSON，确认 dictValue=propertyCompanyCreditRating 与前端 companyCreditLevel 不匹配，修复后走 selectOptionsMap.creditLevel\n- 涉及文件：zhi2-web-admin/src/components/zs-advanced-query/complexFieldConfig.js、zs-advanced-query.vue、src/views/publicQuery/complex/index.vue\n- 所属项目：苏住房G；来源会话：04b34f92-8311-4af3-95f1-c6899f1c1f94；代码基线：5ccda28",
+                "after": "# 公共查询动态字段元数据键匹配\n公共查询条件由后端字典 complex_field 动态下发，前端字段元数据 key 必须与后端 dictValue 逐字一致，否则静默降级为文本输入框。\n\n## 问题现象\n- 公共查询（物业管理区域等）部分字段应是下拉选择（物业企业信用等级、行政区域、物业类型），却渲染成文本输入框\n- 本例字典 dictValue 为 propertyCompanyCreditRating，前端 COMPLEX_FIELD_META 的 key 写成 companyCreditLevel，二者不一致\n\n## 根因\n- 前端 mergeFieldOptions 用 item.dictValue 作 key 查 COMPLEX_FIELD_META，查不到则回退 VALUE_TYPE.TEXT\n- 该字典所有字段 remark 均为空，字段类型完全靠前端元数据兜底，并非 remark 覆盖或字典项缺失\n\n## 解决方案\n- 拿到后端完整字典后逐字段核对 dictValue 与 COMPLEX_FIELD_META 的 key，把前端 key 改成与后端完全一致（companyCreditLevel → propertyCompanyCreditRating），保留原 valueType/selectKey\n- selectKey 指向的字典（如 credit_level）决定下拉选项来源；新增动态字段时后端加字典项须同时补前端 meta，否则静默成输入框不报错\n- 排查顺序固定：先在字典 JSON 找该字段 dictValue → grep 前端同名 key → 确认是 key 不一致而非 remark 解析失败\n\n## 验证与归属\n- 验证：会话贴出 complex_field 全量 JSON，确认 dictValue=propertyCompanyCreditRating 与前端 companyCreditLevel 不匹配，修复后走 selectOptionsMap.creditLevel\n- 涉及文件：zhi2-web-admin/src/components/zs-advanced-query/complexFieldConfig.js、zs-advanced-query.vue、src/views/publicQuery/complex/index.vue\n- 所属项目：苏住房G；来源会话：04b34f92-8311-4af3-95f1-c6899f1c1f94；代码基线：5ccda28\n- 验证证据：src=苏住房G/093.md"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

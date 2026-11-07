@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793792554202/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T11:49:03.495932+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/lease_qmark_image.md",
+                "memory_type": "entities",
+                "after": "# 租赁合同备案问号提示改造\n苏州市房地产监测V3 中租赁合同备案的「产权证类型」「产权证书编号」两个问号提示，已对齐苏找房 verification 模块换成提示图片，已完成并提交 0bfec58dd。\n\n## 改动内容\n- `PropertyVerifyDialog.vue` 图片相关改动，两个「？」提示文字全部换成苏找房项目提示图片\n- 「产权证类型」问号对应苏找房 tipComponent type=4，tooltip 内两列证书封面图（左列房产证示例：新版红色房屋所有权证+旧版深色封面；右列不动产证示例：红色封面）\n- 「产权证书编号」问号对应苏找房 tipWarrant，按区域×证型动态切换红框标注的登记簿图示\n- 区域口径与苏找房一致：`RD002=工业园区` 出园区专用图示\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=苏州市房地产监测V3\n- 涉及文件：PropertyVerifyDialog.vue、e2e/fixtures/lease-contract-helpers.js、e2e/presale/lease-contract-real-api-flow.spec.js\n- 所属项目：苏州市房地产监测V3；来源会话ID：3112e935-8b6c-4c36-bde1-da3d29bbabd9；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_scale_width.md",
+                "memory_type": "entities",
+                "after": "# 弹窗表格宽度测量坑\n苏州市房地产监测V3 中弹窗表格在开场缩放动画中因宽度量错导致表格未撑满、布局错乱的根因与修复要点。\n\n## 根因\n- `zs-dialog` 开场动画为 CSS `transform: scale()`，`getBoundingClientRect()` 返回变换后的视觉矩形而非布局宽度（clientWidth 从第一帧起即终值）\n- Playwright 采样：t=153ms 时 getBoundingClientRect width=167 而 clientWidth=1240，t=464ms 才一致\n- `extra ≤ 0` 时约定为「基础宽度已超出容器」放弃拉伸，导致误判不撑满\n- `ResizeObserver` 不感知 transform 变化，无第二次修正机会\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=苏州市房地产监测V3\n- 涉及文件：zhi2-web-admin/src/components/zs-select-dialog/SKILL.md、zhi2-web-admin/src/views/commercialHousingSales/presale/exchangeContract/detail.vue\n- 所属项目：苏州市房地产监测V3；来源会话ID：56089445-c88b-4040-b19b-eb28da60279d；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/contract_version_removed.md",
+                "memory_type": "entities",
+                "after": "# 合同范本标签移除\n苏州市房地产监测V3 中 2016 版合同 UI 已移除工具栏「范本：SUZHOU_2016」标识，改动 2 个文件共 -7 行。\n\n## 改动内容\n- `chapters/suzhou2016/components/SzToolbar.vue`：删掉模板中 version span、无用 version prop，样式选择器由 `.s16-toolbar__code, .s16-toolbar__version` 收敛为 `.s16-toolbar__code`\n- `views/contract/index.vue`：去掉 `<sz-toolbar>` 上的 `:version=\"templateVersion\"` 传参；`templateVersion` 计算属性保留（isSuzhou2016 仍依赖其做版本判定）\n- 临时挂静态路由实跑验证：工具栏左侧仅显示「苏州市商品房买卖合同」，`.s16-toolbar__version` 元素已不存在，页面文本无 `SUZHOU_2016`，右侧按钮布局不变无报错\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=苏州市房地产监测V3\n- 涉及文件：chapters/suzhou2016/components/SzToolbar.vue、views/contract/index.vue、src/router/index.js、driver.js\n- 所属项目：苏州市房地产监测V3；来源会话ID：5c1c1534-3904-44fd-ab90-b03d3aab9b9c；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/datetime_field_audit.md",
+                "memory_type": "entities",
+                "after": "# 日期时间字段类型一致性审计\n苏州市房地产监测V3 使用 zsbase/ZS001Aa! 账号密码遍历全量菜单，完成日期与时间字段类型一致性审计。\n\n## 审计结果\n- 遍历 892/892 个菜单节点（zsbase 全量，耗时 1.7 小时，0 报错，结果文件 428KB）\n- 命中「时间/日期」类字段 568 个，采样值 1040 条（datetime 637 / 纯日期 63 / 其他 340 多为占位文本）\n- 去重后仅 1 条高严重度：预售资金监管 / 风险管理·风险项目登记 / 申请时间，声明「时间」实际仅日期（规则C）\n\n## 判定口径\n- 规则A【高】：声明「日期」值含非零时分秒；规则B【低】：声明「日期」值格式为 YYYY-MM-DD 00:00:00；规则C【高】：声明「时间」值仅日期/年月/8位数字\n- 低严重度 0 条（未发现「XX日期」字段值带 00:00:00 零点时间）\n\n## 验证与归属\n- 验证证据：extracted source=workbuddy project=苏州市房地产监测V3\n- 涉及文件：date-type-audit.spec.js、e2e/full-audit/date-type-audit.spec.js、date-type-result.js\n- 所属项目：苏州市房地产监测V3；来源会话ID：6a51b3f1-9847-4394-a457-ee38d5f0a38d；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

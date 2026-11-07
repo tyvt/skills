@@ -1,0 +1,51 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T22:41:16.911227+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/uni_module_gap.md",
+                "memory_type": "entities",
+                "after": "# uni-app 模块间距用父级 flex gap\n在 uni-app 小程序端，给自定义组件根节点加 margin 类不生效，模块间距需用父容器 flex + gap 控制。\n\n## 问题根因\n- pages_owner/project/info 中小区信息卡片与「小区周边」白卡贴在一起，加 module-gap（margin-top:10px）类无效\n- uni-app 小程序端父组件 scoped 样式作用不到自定义组件根节点，class 挂上去了样式却不落\n\n## 解决方案\n- 在页面根容器（如 .project-page）用 display:flex; flex-direction:column; gap:20rpx 控制子模块间距\n- 删掉无效的 module-gap 类，与社区/街道信息页写法保持一致\n- 间距仍嫌小就把 gap 调到 24rpx / 32rpx\n\n## 通用约定\n- 需要「卡片之间留缝」时一律用父级 flex gap，不要给子组件根节点写 margin\n- 不要在父级 scoped 里 :deep 到子组件根上做间距\n\n## 验证与归属\n- 验证证据：会话 80f4d555（基线 8fc3cc5）结论为父组件 scoped 作用不到自定义组件根导致 module-gap 无效，改 flex+gap 后修复\n- 涉及文件：pages_owner/project/info/index.vue、components/commonNew/baseCard.vue、pages_owner/community/info/index.vue、pages_owner/subdistrict/info/index.vue\n- 所属项目：苏住房C；来源会话：80f4d555-4b91-4605-a249-4affc7710dfd；代码基线：8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/szffluzm_build.md",
+                "memory_type": "entities",
+                "after": "# zhi2-mobile-shimin 打包产物与脚本命名约定\n本项目从多品牌同源仓库复制而来，构建配置需去除 suzhufang 品牌后缀，产物目录改为 szffluzm。\n\n## 背景\n- 从多品牌同源仓库复制，构建配置保留大量 suzhufang 品牌后缀，产物目录还是默认 dist\n- 用户要求打包目录改为 szffluzm，命令里默认就是 suzhufang，不需把品牌写进命令名\n\n## 解决方案\n- vite.config.ts 里 outDir 指向 szffluzm 下的对应端产物\n- package.json 脚本收敛：development:suzhufang→dev、dev:suzhufang:mp-weixin→dev:mp-weixin、test:suzhufang→test:serve、build/build:suzhufang→build、build:suzhufang:test→build:test、build:suzhufang:mp-weixin→build:mp-weixin\n- 同步根仓库 package.json 引用；vite.config.ts 必须补 dev→development 映射，否则 npm run dev 加载不到 .env.development\n- 常用命令固定为 npm run dev / npm run test / npm run build\n\n## 注意事项\n- 验证产物要去看 szffluzm 目录而不是 dist\n- .gitignore 也要同步排除新产物目录\n\n## 验证与归属\n- 验证证据：会话 5ebd895c（基线 a444c05）用户要求打包目录改 szffluzm 不用 dist、移除命令 suzhufang 字段，脚本完成重命名\n- 涉及文件：zhi2-mobile-shimin/package.json、zhi2-mobile-shimin/vite.config.ts、package.json、.gitignore、zhi2-mobile-shimin/.gitignore\n- 所属项目：苏住房C；来源会话：5ebd895c-0fec-43e6-b281-71292c6137e6；代码基线：a444c05"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/h5_media_path.md",
+                "memory_type": "entities",
+                "after": "# H5 子目录部署媒体路径被拼前缀\nH5 端部署在子目录时，媒体相对路径会被拼进页面路径前缀，resolveMediaUrl 需统一补前导斜杠。\n\n## 问题现象\n- 访问服务器图片实际请求成 https://域名/testh5/pages/index/zhi2-pro/2025/...，预期是 https://域名/zhi2-pro/2025/...\n- 图片全部 404/裂图\n\n## 问题根因\n- 部署在 /testh5/pages/index/ 子目录时，utils/index.js 的 resolveMediaUrl 对媒体路径（zhi2-pro、zhi2-dev、zhi2-test、zs-fym 等）返回不带前导 / 的相对路径\n- 浏览器按当前页面路径解析相对 URL，把站点子目录前缀一并拼进去\n- 根路径部署的测试环境看不出问题，只在子目录部署暴露；易被误判为后端返回路径不对\n\n## 解决方案\n- 在 resolveMediaUrl 里对识别出的媒体资源目录统一补前导 /，强制从站点根解析\n- 改动落在 utils 一处即可覆盖所有用 ZsImage（:local=\"false\"）或直接调 resolveMediaUrl 的图片\n- 新增媒体目录前缀时要同步加进白名单，否则新目录会复发同类问题\n\n## 验证与归属\n- 验证证据：会话 288c6ff2 用户贴出实际访问地址，结论为 resolveMediaUrl 返回不带前导 / 的相对路径，修复是对媒体目录统一加前导 /\n- 涉及文件：zhi2-mobile-shimin/src/utils/index.js、zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue\n- 所属项目：苏住房C；来源会话：288c6ff2-ac59-4b55-b6ee-a561f76eeba1；代码基线：d43894b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/choosefile_crash.md",
+                "memory_type": "entities",
+                "after": "# 小程序端 ImageUploader 调 uni.chooseFile 必崩\n小程序端 ImageUploader 直接调 uni.chooseFile 会报 chooseFile is not a function，需按平台分派 chooseFile/chooseMedia/chooseImage。\n\n## 问题现象\n- 微信开发者工具（lib 3.7.12）点图片上传报 TypeError: common_vendor.index.chooseFile is not a function\n- 栈落在 ImageUploader.js 的 chooseMedia 处，页面是 pages_owner/house/owner/register\n\n## 问题根因\n- ImageUploader 统一用 uni.chooseFile 选文件，但 uni.chooseFile 只在 H5/App 等平台实现，微信小程序端不存在该 API\n- H5 测试通过不代表小程序可用，H5 与小程序混用的自研上传组件最容易踩\n\n## 解决方案\n- 组件内按平台与选择类型分派：H5 等支持平台走 uni.chooseFile；需要视频用 uni.chooseMedia；只选图片（如 register 页）用 uni.chooseImage\n- 把「校验 + 上传」抽成独立的 uploadSelectedFile 方法\n- 兼容小程序临时路径没有扩展名的情况（不能靠文件名后缀推类型）\n- 改完要在微信开发者工具真机路径复测整条上传链路，而非只在 H5 预览\n\n## 验证与归属\n- 验证证据：会话 f62dbdc4（基线 5f0f4dc）用户贴出 TypeError 完整栈，结论为小程序端不支持该 API，改为按平台分派并抽 uploadSelectedFile\n- 涉及文件：zhi2-mobile-shimin/src/components/ImageUploader/ImageUploader.vue、zhi2-mobile-shimin/src/pages_owner/house/owner/register.vue、zhi2-mobile-shimin/src/api/file.js\n- 所属项目：苏住房C；来源会话：f62dbdc4-5a71-4b38-86cc-ade4a540eb59；代码基线：5f0f4dc"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/land_lic_field_order.md",
+                "memory_type": "entities",
+                "before": "# 不动产权证三页面字段顺序未按标注排列\nProjectStateLandLicPanel.vue 等三页面查看态与表单字段顺序未按图标注排列，需统一调整。\n\n## 问题根因\n- ProjectStateLandLicPanel.vue、stateLandLic/detail.vue 与 stateLandLic/changeDetail.vue 的查看态（contentInfo）字段顺序错乱\n- 编辑/新增表单字段顺序未按图标注排列\n\n## 解决方案\n- 统一调整为：项目名称、不动产权证号、不动产单元号、权利人、共有情况、坐落、规划用途、占地面积、发证单位、发证日期等顺序\n- 变更详情页附图、附件名称及变更原因保留末尾\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3-leftover/100.md\n- 涉及文件：certificate/stateLandLic/detail.vue、customerProject/components/certificate/ProjectStateLandLicPanel.vue、certificate/stateLandLic/changeDetail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：7128e0f4-00dc-4df9-8734-952fe4c706d3；代码基线：none",
+                "after": "# 不动产权证三页面字段顺序未按标注排列\nProjectStateLandLicPanel.vue 等三页面查看态与表单字段顺序未按图标注排列，需统一调整。\n\n## 问题根因\n- ProjectStateLandLicPanel.vue、stateLandLic/detail.vue 与 stateLandLic/changeDetail.vue 的查看态（contentInfo）字段顺序错乱\n- 编辑/新增表单字段顺序未按图标注排列\n\n## 解决方案\n- 统一调整为：项目名称、不动产权证号、不动产单元号、权利人、共有情况、坐落、规划用途、占地面积、发证单位、发证日期等顺序\n- 变更详情页附图、附件名称及变更原因保留末尾\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3-leftover/100.md；另见 src=苏州市房地产监测V3/301.md\n- 涉及文件：certificate/stateLandLic/detail.vue、customerProject/components/certificate/ProjectStateLandLicPanel.vue、certificate/stateLandLic/changeDetail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：7128e0f4-00dc-4df9-8734-952fe4c706d3；代码基线：none"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/technical_pattern/cert_field_order.md",
+                "memory_type": "entities",
+                "deleted_content": "# 不动产权证三视图字段顺序按标注重排\n苏州市房地产监测V3 中依图片标注编号调整不动产权证三视图查看态与编辑表单字段顺序。\n\n## 变更内容\n- 调整 `ProjectStateLandLicPanel.vue`、`stateLandLic/detail.vue` 与 `stateLandLic/changeDetail.vue` 的查看态 `contentInfo` 及编辑表单字段顺序\n- 统一为项目名称至发证日期等序\n- `changeDetail.vue` 附图及变更原因仍置末\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3/301.md\n- 涉及文件：ProjectStateLandLicPanel.vue、stateLandLic/detail.vue、stateLandLic/changeDetail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：7128e0f4-00dc-4df9-8734-952fe4c706d3；代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

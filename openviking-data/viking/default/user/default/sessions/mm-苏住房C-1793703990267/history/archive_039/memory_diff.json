@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_039",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:26:15.079881+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/uni_forms_required_mark.md",
+                "memory_type": "entities",
+                "after": "# uni-forms 必填星号触发规则\nuni-app 的 uni-forms-item 只有自身 required 属性才渲染红色 *，rules 里的 required 只驱动校验不显标记。\n\n## 现象\n- 人工添加房屋页 register.vue 一批业务必填项缺失红色 * 标识\n- 图片上传区块（产证/合同/身份证明图片）无 uni-forms-item 可挂 required\n\n## 根因\n- uni-forms-item 的红色 * 由组件 required 属性控制，与 rules 的 required 分离\n- 与 Web 端 Element 表单项习惯不同，易只配 rules 而漏 required\n- 原「所属社区」name 写成 Name，与 rules、取值键不一致导致不参与校验\n\n## 解决方案\n- 给所属区域/街道/社区/小区/楼幢/室号补 required 属性\n- 修正 name=\"Name\" 为 name=\"community\" 并补对应规则\n- 图片上传区块标题加项目既有 required 样式类显示星号\n- 单元、补充证件信息属非必填保持不标\n\n## 验证与归属\n- 验收：会话 63944abd 逐项对齐截图星号，确认带星号字段空值被拦截\n- 涉及文件：zhi2-mobile-shimin/src/pages_owner/house/owner/register.vue、styles/form2.scss\n- 所属项目：苏住房C；来源会话：63944abd-5398-403d-9293-6bf00fd0e33d；代码基线：b7bf813"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术缺陷/get_msg_num_badge.md",
+                "memory_type": "entities",
+                "after": "# 未读角标不消失问题\n苏住房C「我的」页 getMsgNum 不传参返回消息总数而非未读数，导致角标不消失。\n\n## 现象\n- 消息中心全部已读后返回「我的」页，未读角标数等于历史消息总数不归零\n\n## 根因\n- My_Suzhufang.vue 的 loadUnread 调 getMsgNum() 未传查询参数\n- 消息中心调用带 { readFlag: 0, projectType: 1 }，readFlag=0 只查未读\n- 不传参时后端按默认口径返回消息总数，已读后总数不变\n\n## 解决方案\n- 「我的」页补成 getMsgNum({ readFlag: 0, projectType: 1 })，onShow/返回时重新请求\n- 同一计数接口多处消费时参数必须严格同源，避免 A 页未读 B 页总数分歧\n- 联调用 vConsole 看 /msg/msg/msgNum?readFlag=0&projectType=1 返回体定位\n\n## 验证与归属\n- 验证：会话 318a55ec 全部已读角标不消失，已在 loadUnread 补齐参数\n- 涉及文件：pages_tab/components/My_Suzhufang.vue、pages/index/components/My_Suzhufang.vue、pages/message/index.vue、api/msg.js\n- 所属项目：苏住房C；来源会话：318a55ec-f120-4633-be9b-7750ed534251；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术缺陷/decode_html_entities.md",
+                "memory_type": "entities",
+                "after": "# 富文本解码函数正文空白\n苏住房C 账户注销页 decodeHtmlEntitiesIfNeeded 遇标签与实体混排跳过解码致正文空白。\n\n## 现象\n- 账户注销页 cancellationWarning.vue 协议只剩标题《用户注销协议》，正文整块不显示\n\n## 根因\n- utils/index.js 的 decodeHtmlEntitiesIfNeeded 以「是否含 HTML 标签」判定是否解码\n- 后台下发富文本含真实标签与实体化标签混排时，判定已有标签直接返回原串\n- 实体标签未还原为可渲染节点，ZsRichText 渲染出空内容\n\n## 解决方案\n- 判定条件改为「是否含 HTML 实体」（&xxx; / &#xxx;），含实体即解码，纯 HTML 解码无损\n- 移除 .page-content 的 min-height:50vh，改 flex 按内容自适应\n- ZsImage 块级元素父级用 flex + justify-content/align-items 居中\n- 若布局正常仍只有标题，问题在后台 szf.user.cancellation 未配完整富文本\n\n## 验证与归属\n- 验证：会话 b5ae7e42 注销页 UI 异常，改解码判定并移除 min-height、flex 居中\n- 涉及文件：utils/index.js、pages_my/setting/cancellationWarning.vue、components/ZsRichText/ZsRichText.vue\n- 所属项目：苏住房C；来源会话：b5ae7e42-f2bf-4ced-a0de-6ca8ba5bd6e2；代码基线：77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/sfb_mp_branch_merge.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C 分支合并模型\n苏服办(sfb/main-v2.1) 与微信小程序(mp) 是同一子模块两条并行分支，互合需排除网关文档保留 mp 结构再编译验证。\n\n## 适用场景\n- 苏住房C 仓（superproject + 子模块 zhi2-mobile-shimin）同时维护苏服办端与微信小程序端\n- 需把 main-v2.1 修复合到小程序分支，或小程序样式改动回合 main-v2.1\n\n## 为什么不能直接整分支合并\n- 两分支差异不止业务代码：sfb 带网关逻辑、doc/docx 附件、不同环境 proxy\n- mp 分支有自己目录（pages_main/pages_tab）与 @/ 别名、人脸核验等专属页面\n- 直接 merge 产生上百冲突（实测 118 个）并带入不该进小程序的网关内容\n\n## 做法\n- 先合子模块：git merge 目标分支，按保留 mp 目录结构/@/别名/专属文件逐文件解冲突\n- 再合主仓库：只更新子模块指针，排除苏服办文档，保留通用文档\n- 环境配置保留小程序自己测试环境 proxy，不被对方覆盖\n- 合并后立刻 npm run build:mp-weixin 编译验证，只接受 warning 不接受 error\n- 反向回合同样走子模块提交推送合并再父仓库提交指针推送合并，完成后切回 dev-sfb\n\n## 验证与归属\n- 验证：会话 72fc5cce 解决 118 冲突，子模块 a4811aa0/fa6929e2、主仓库 af36c7c，排除 doc/docx，build 成功；会话 2a28d769 展示双推送完整流程\n- 涉及文件：pages.json、.env.development、package.json、.gitmodules\n- 所属项目：苏住房C；来源会话：72fc5cce-130f-44b1-bd46-0257f06c74e4, 2a28d769-4a41-4a8a-a03f-b7cdd347e192；代码基线：9832ba3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

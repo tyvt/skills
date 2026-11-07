@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_038",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:23:47.532717+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zpaging_popup_maxheight.md",
+                "memory_type": "entities",
+                "after": "# z-paging 放入 uni-popup 弹窗列表空白\n苏住房C 小程序中 z-paging 放入自定义 uni-popup 弹窗时列表空白，接口有数据但不显示。\n\n## 问题现象\n- 附近小区弹窗内 z-paging 列表接口有数据（Network 能拿到 rows），页面不显示且无报错\n- 弹窗容器仅写 max-height 无固定 height，内部 scroll-view 高度撑成 0\n\n## 根因\n- 高度链断裂：z-paging 依赖父级确定高度做内部滚动，父容器只有 max-height 导致内部滚动区高度为 0\n- 加载时机过早：弹窗动画未结束就调 reload()，容器尺寸未稳，分页算错高度且不自动重算\n- 字段名不一致：接口回 projectName，模板读 aroundProjectName，名称空易被误判没数据\n\n## 解决方案\n- 弹窗容器改固定 height: 75vh（不用 max-height），补全 z-paging 内部各层高度样式\n- 打开后延迟约 300ms 再调 reload() 等动画结束\n- 名称字段写多候选映射（projectName / aroundProjectName）\n- 补空数据保护避免 res.result 为空抛错；列表区加 v-if=\"computedList.length\" 与空状态逻辑一致\n\n## 验证与归属\n- 所属项目：苏住房C\n- 来源会话：ad4f1c19-5d85-46dd-94be-7ff09a25a283（2026-07-17）\n- 代码基线：d43894b\n- 涉及文件：popup.vue、add.vue、search.vue、usePaging.js、transaction.js"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/getdictlabel_single_select.md",
+                "memory_type": "entities",
+                "after": "# 单选字段误用 getDictLabel 导致多标签拼接\n苏住房C 小程序年度预算页单选预算科目被错误拼接成多个标签显示。\n\n## 问题现象\n- 后台仅配置一个预算科目「代收代缴收入」，C 端年度预算页显示「代收代缴收入，物业费收入」\n- 同页背景灰底 #f7f7f7 仅设在 content-scroll，页面容器白底 min-height:100%，内容少时底部露白\n\n## 根因\n- 渲染用 getDictLabel(dictType, value)，该函数按英文逗号 split 后逐项匹配字典再 join，为多选设计\n- 单选字段值带逗号或脏数据时静默变成多值拼接，页面像字典串了实际取值函数用错\n- 背景色断层因页面根节点未设底色且 min-height 非 100vh\n\n## 解决方案\n- 优先用接口下发展示名 budgetSubjectName，不前端二次转译（本项目接口给展示字段不再派生口径）\n- 无展示名时只取第一个科目编码精确匹配，禁用 getDictLabel 多值函数\n- 背景解法：page 与页面根节点都设底色并改 min-height:100vh，卡片区背景改透明灰避免白色断层\n\n## 验证与归属\n- 所属项目：苏住房C\n- 来源会话：6222418a-4f22-4b84-9de7-cbcaaf49e929（2026-08-06）\n- 代码基线：8fc39d4\n- 涉及文件：budget/index.vue、utils/index.js"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zsempty_prop_description.md",
+                "memory_type": "entities",
+                "after": "# ZsEmpty 文案 prop 误用 text 及分包 svg 构建 500\n苏住房C 小程序空状态组件 ZsEmpty 的 text 属性无效，且分包 static 下 svg 被构建清除报 500。\n\n## 问题现象\n- ZsEmpty 有 11 个调用点写 text=\"…\"，组件只认 description，文案静默不显示\n- pages_benefit 分包空状态图报 Failed to load local image resource .../empty.svg status 500\n\n## 根因\n- ZsEmpty prop 契约无 text，未声明属性只落 $attrs 不渲染，不报错不提示\n- 分包页面 svg 放分包 static 目录，构建清理流程剔除未登记资产，微信工具请求不存在路径返 500（非 404）\n\n## 解决方案\n- 批量把 pages_benefit 下 11 处 ZsEmpty 的 text 改成 description（balancePublicity、assetsPublicity 等多文件）\n- 公共 svg 放回主包路径（用 mainStaticPaths.js 统一登记），不在分包 static 放 svg\n- 新增公共组件后用 grep 反查调用点 prop 名与声明一致，作为文案不显示首排查项\n\n## 验证与归属\n- 所属项目：苏住房C\n- 来源会话：f33d070f-15e7-4d33-aa9e-f5133dc9ff92（2026-08-24）\n- 代码基线：4630e8e\n- 涉及文件：ZsEmpty.vue、ZsImage.vue、mainStaticPaths.js、balancePublicity/index.vue、fundPublicity/index.vue、PublicityTab.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zsuploader_filepicker_style.md",
+                "memory_type": "entities",
+                "after": "# ZsUploader 基于 uni-file-picker 显示异常\n苏住房C 小程序 FormManual 图片上传区域因封装 uni-file-picker 尺寸档位未复位导致高度错位。\n\n## 问题现象\n- pages_my/verification/FormManual 上传框高度忽高忽低、图标文字错位，手持证件照文字重叠\n- 身份证正反面自定义相机图标插槽渲染在容器外，作用域样式命中不到，图标不居中不显示\n\n## 根因\n- uni-file-picker 靠 .file-picker__box 的 padding-top 撑方形高度，仅 small 写 padding-top:0，middle/large 未复位致框体撑高\n- 卡片标题已描述对象，组件内 tips 又写同样长文案，固定高度框内必然重叠\n- 自定义图标插槽在 photo-uploader-icon__container 之外，样式不生效\n\n## 解决方案\n- 给 middle/large 的 .file-picker__box 补 padding-top:0，.file-picker__box-content 设 height:100%\n- 把 icon 插槽收进 photo-uploader-icon__container 内层保证渲染\n- 业务调用时标题已描述上传对象，tips 只写「点击上传」极短提示不重复\n\n## 验证与归属\n- 所属项目：苏住房C\n- 来源会话：8d858fb8-aeff-42fe-b53b-03cca8718495\n- 代码基线：5f0f4dc\n- 涉及文件：ZsUploader.vue、FormManual.vue"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T05:25:50.481307+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/v3_api_migrate.md",
+                "memory_type": "entities",
+                "after": "# zhi2-web-admin V3 接口规范化批量迁移\n对 zhi2-web-admin 的 src/api 与 views 做 V2 REST → V3 全 POST 动作式的脚本化三轮迁移，并定死边缘场景验收口径。\n\n## 背景与目标\n- 整个 zhi2-web-admin 需从 V2 REST 风格改为 V3 全 POST 动作式，涉及 src/api 与 views 大量手写 $get/$post/$put/$del，逐个人工改不现实\n- 只靠 request.js 拦截器兜底会留边缘写法不可控（拦截器按路径段数推断动作，跨资源/列表动作会误判），须在调用点先批量收敛\n\n## 三轮脚本分治\n- 第一轮（migrate-api-v3.mjs，59/63 文件）：api 文件层 list 的 GET+params → POST+data，CRUD 路径全量改 V3 动作\n- 第二轮（migrate-views-v3.mjs，22 个 vue 文件）：$del 路径删除 → $post …/delete\n- 第三轮补漏（migrate-views-v3-pass2.mjs，28 个 vue 文件）：$put 根路径 → /update、$post 根路径 → /add、带额外参数的详情 → POST /detail\n- 三轮共动约 22+28 个 vue 文件，跨 maintenance/property/building/evaluation/autonomy/benefit 多域\n\n## 验收口径（边缘场景）\n- 约 200 处 `$get(\\`${…}\\`)` 模板拼接属可保留项（跨资源路径如 /property/complex/${id} 或列表动作 /page、/listTree，拦截器按三段路径处理）\n- 白名单（/file/*、附件）保持原协议不迁移；特殊 body（如 dict 字符串体）必须单独手改，不能吃通用规则\n- 脚本改完必须抽查系统管理（菜单/角色/部门/字典）与各域曾报 400 的详情、删除页，Network 逐个确认是 POST\n\n## 验证与归属\n- 来源会话 88e83347：用户先报「接口不符合规范」，追问遗漏，要求按短/中/长期三步修改，最终落地三个迁移脚本并明确三类边缘场景\n- 涉及文件：src/api/index.js、src/utils/request.js、src/views/system/menu/index.vue、src/config/security.js\n- 所属项目：产品2.0；代码基线：adc516a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/zs_input_suffix.md",
+                "memory_type": "entities",
+                "after": "# zs-input 默认 clearable 引发带单位后缀高度异常\n生产环境带「㎡」的 amount-input 后缀框高度与输入框不一致，根因是 zs-input 默认 clearable:true 引入多余 el-input--suffix。\n\n## 现象与判据\n- 生产（ylzhwy.com:8081）带单位后缀的 amount-input 后缀高度与输入框不一致，本地运行正常且打的对应代码，易误判为构建或样式未生效\n- 生产 DevTools 验证判据：选中 .el-input-group__append，Computed 中 display 应为 flex（table-cell 说明 input-group-fix.css 未加载），高度应与 .el-input__inner 一致（约 36px）；Network 确认 input-group-fix.css 返回 200；修复后 DOM 不应再出现 el-input--suffix\n\n## 根因\n- zs-input 的 clearable 默认为 true，Element UI 只要 clearable 为 true 就会给输入框加 el-input--suffix 类并追加 padding-right:30px，即使禁用态不显示清除按钮也会加\n- 叠加在 el-input-group__append 的单位后缀上把后缀高度/内边距顶歪；本地可能因改过 clearable 或缓存而复现不到\n\n## 解决方案\n- AmountInput 这类「数值+固定单位」控件显式设 :clearable=\"false\"，从源头不生成 el-input--suffix\n- zs-input 只在父组件真传了 suffix/prefix slot 时才转发 slot，避免空 slot 也触发后缀渲染\n\n## 验证与归属\n- 来源会话 49ff6642：用户贴图问生产后缀高度不对、本地正常，最终定位 zs-input 默认 clearable 并两处修复\n- 涉及文件：src/components/AmountInput/index.vue、src/components/zs-input/zs-input.vue、src/styles/element-ui.scss、src/views/property/localPropertyBid/detail.vue\n- 所属项目：产品2.0；代码基线：1fa4993"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/e2e_review_reuse.md",
+                "memory_type": "entities",
+                "after": "# 真实接口 E2E 遇「审核中/在途」数据：管理员驳回后复用续跑\n企业信息变更类真实 UI 全流程 E2E 遇目标企业已「审核中」导致流程卡死时，用管理员账号驳回该数据并续跑优于 skip。\n\n## 背景与问题\n- 企业信息变更类 E2E 须走真实 UI 全流程（禁 mock、禁 page.evaluate 改状态），目标企业常已「审核中」导致「变更」按钮不出现、流程卡死\n- 变更类业务一单在途就不允再发起是后端正常约束；原 fixture 排除在途行或 skip 会让用例长期不真正执行，等于无回归（用户原话「反复改了很久了」）\n\n## 解决方案\n- 用例最开始加状态预处理：判断当前企业是否审核中；若是直接用管理员账号从审批端 UI 操作驳回，再以被驳回单据继续跑「编辑→提交→待确认」完整流程\n- 每条跑都会自愈出可用数据，不必依赖人工清理环境\n\n## 配套注意\n- 删掉页面「审核流程查看」按钮后，原靠该按钮的等待与断言必须同步改新基准：断言「变更」按钮隐藏、标题栏显示「待确认」、接口 activeChangeDisplayStatus === '2'，否则删按钮会改红用例\n\n## 验证与归属\n- 来源会话 42560c80：用户要求审核中数据直接管理员驳回续跑，并去掉「审核流程查看」按钮且同步代码与测试改为断言待确认与 activeChangeDisplayStatus==='2'\n- 涉及文件：e2e/company/company-record-change.spec.js、e2e/fixtures/company-helpers.js、src/views/company/companyManagement/components/CompanyBasicInfoDetail.vue、e2e/toB/company-personnel-flow.spec.js\n- 所属项目：产品2.0；代码基线：62d5fb9"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/amountinput_dispatch_change.md",
+                "memory_type": "entities",
+                "before": "# 自封装输入组件校验必填误判\nAmountInput 等自封装 v-model 输入组件需补 el.form.change/blur 派发契约，否则填了仍提示必填。\n\n## 现象\n- AmountInput 用户填了值，el-form 校验仍提示必填。\n\n## 根因\n- ElInput 原生在 v-model 值变化时 dispatch('el.form.change')，使 change 规则随值更新重校验。\n- AmountInput 只在原生 change/清空事件 dispatch，值写回 form.model 路径不触发校验，读到旧值误判空。\n- blur 与父组件更新同帧执行时校验也可能读旧 model。\n\n## 解决方案\n- numberValue watch 里 emit('input') 后 nextTick 中 dispatchToFormItem('el.form.change', value)。\n- handleBlur 先 emit('blur') 再 nextTick dispatch('el.form.blur')；去掉 handleChange 重复 dispatch。\n- listeners 先判存在再调用（兼容 Vue 2.7 listeners 为 undefined）。\n- 凡自封装 v-model 输入组件都要补此 form 事件派发契约。\n\n## 关联信息\n- 涉及文件：src/components/AmountInput/index.vue；所属项目：园区物管2.0；来源会话：8430758d-a3eb-412d-97d4-0ab68ebf0303；代码基线：7814a0c2a。",
+                "after": "# AmountInput 校验事件分发契约\nAmountInput 等自封装 v-model 输入组件需手动向最近 ElFormItem 分发 el.form.blur/change，否则 el-form 校验误判空或静默失效。\n\n## 现象\n- AmountInput 用户填了值，el-form 校验仍提示必填；或触发器（trigger:'blur'）永远不触发、一直红。\n- 将内部 el-input+v-money 换成原生 input+vue-currency-input 后，进入「无法输入/无法校验」反复循环：校验不触发或输入被立刻清空。\n\n## 根因\n- el-input 内部自动把原生事件转发成 el.form.blur/el.form.change 分发给最近 ElFormItem，Element UI 校验完全依赖这条事件链。\n- 自封装/原生 input 断链后，rules 的 trigger 永远收不到事件；值写回 form.model 与 blur/change 同帧时还可能读到旧 model。\n- v-money 是格式化后回写 v-model，vue-currency-input 对非数字/空串处理不同，双向回写空值会让输入被立刻清空，看起来「输不进去」。\n\n## 解决方案\n- handleBlur：先 emit('blur', event)，再手动找到最近 ElFormItem 并 dispatch('el.form.blur')（构建后建议 nextTick/双 nextTick 留父级 model 更新时间）。\n- handleChange / handleClear：同样向最近 ElFormItem dispatch('el.form.change')。\n- numberValue watch 里 emit('input') 后 nextTick 中 dispatch('el.form.change')，覆盖值写回路径。\n- 保留业务侧 listeners.blur/change 的转发，不要用它们替换 Element 的分发。\n- 凡自封装 v-model 输入组件都要补此 form 事件派发契约；修复只落组件内部，不动上层表单（用户要求最最小化改动）。\n\n## 关联信息\n- 涉及文件：src/components/AmountInput/index.vue、src/components/zs-input/zs-input.vue；所属项目：园区物管2.0 / 产品2.0\n- 来源会话：8430758d-a3eb-412d-97d4-0ab68ebf0303（基线 7814a0c2a）、96954bb5-7491-4bdf-854e-917a5232b9e6（基线 bd398ef）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

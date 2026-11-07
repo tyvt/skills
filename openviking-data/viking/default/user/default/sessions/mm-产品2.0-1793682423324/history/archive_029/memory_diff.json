@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_029",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:22:16.235964+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bterminal_login_switch.md",
+                "memory_type": "entities",
+                "after": "# B端登录弹窗显式开关常量\n产品2.0 中 B 端登录后的「选择物业管理区域」弹窗行为，统一由 projectContext.js 的显式常量开关控制，避免散落多处导致回归。\n\n## 问题背景\n- B 端从业人员登录后曾反复出现/消失「选择物业管理区域」弹窗，业务方明确要求 B 端登录不弹窗\n- 该功能历史记录里曾被改回去、又被静默取消，表现为「又出现了」的回归\n- 根因是登录后副作用散落在路由守卫、layout、store 多处，合并/重构时易被改回\n\n## 解决方案\n- 在 src/utils/projectContext.js 维护导出常量 ENABLE_B_TERMINAL_PROJECT_DIALOG_ON_LOGIN（注释写清「企业管理员不走此流程」）\n- 登录流程与布局组件都读此常量，不在守卫或组件里写 if 条件\n- 置 false 后：登录不再自动弹窗；登录时清除本地缓存的 currentProjectId / currentProjectName 避免残留；导航栏保留手动切换入口\n- 业务若后续改为「不弹窗但自动选中第一个区域」，在同一常量下接静默选区逻辑，不新开分支条件\n\n## 验证与归属\n- 验证：会话 8bec5640 用户报「b端又出现了选物业管理区域的弹窗」，明确 B 端登录不弹窗，最终置常量 false 并清缓存、保留手动切换\n- 涉及文件：zhi2-web-admin/src/utils/projectContext.js、zhi2-web-admin/src/mixins/bTerminalProjectMixin.js\n- 所属项目：产品2.0；来源会话：8bec5640-c74a-4675-90e1-b0ea5fffe550；代码基线：50767de"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/apiv3_path_normalize.md",
+                "memory_type": "entities",
+                "after": "# V3接口路径末段参数规范化\n产品2.0 中 apiV3Normalize.js 按路径段数分级处理「路径末段当参数」问题，4 段以上全量迁移至 POST body，末段 /detail 跳过。\n\n## 问题背景\n- V3 后端要求参数放 POST body，前端仍大量写 `$get('/system/config/getByKey/qq.map.key')` 等路径参数接口\n- 旧 normalizeTrailingPathParams 只搬「像数字 ID」的末段，带点号配置键、纯字母编号、多参数全被放过，导致 key 留 URL 上、后端 400\n- 验收方式：刷新页面看 Network，URL 不再带路径参数、参数出现在 POST body\n\n## 解决方案\n- 在 apiV3Normalize.js 按「4 段及以上路径」统一处理，分四类规则\n- ByXxx 类动作（getByKey/getByComplexId）自动推断 body 字段名，不要求数字 ID\n- 已知单参数动作建表映射（readXml→deployId、calculationChart→decisionId、terminate→id）\n- 多参数动作逐个建字段表（listEffective→declarationType+categoryId、listReport→planId+companyId+type）\n- 末段已是 /detail 的 V3 规范路径直接跳过，避免二次改写\n\n## 刻意不改结构\n- 已规范的 /xxx/detail、无 trailing 参数的嵌套资源路径不改\n- 形如 /workOrder/order/{id}/accept 的「ID 在中间、子动作在末尾」结构必须单独加映射规则，硬套通用规则会改坏\n- 之后仍有 400 说明是中间带 ID 的特殊结构，需补一条专属映射\n\n## 验证与归属\n- 验证：会话 06f4b462（2026-08-25）用户指某接口 key 还在 URL 上，要求全局排查，最终扩展为 4 段以上四类规则\n- 涉及文件：zhi2-web-admin/src/utils/apiV3Normalize.js、src/utils/request.js、src/api/index.js\n- 所属项目：产品2.0；来源会话：06f4b462-1a59-4d5f-b258-6f1f46290ddd；代码基线：adc516a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bterminal_list_isolation.md",
+                "memory_type": "entities",
+                "after": "# B端业务列表按小区隔离\n产品2.0 房屋质量保证金模块在 B 端从业人员账号下，统一用 isBTerminalPractitioner 门控 + currentProjectId 传 propertyProjectId 做小区过滤。\n\n## 问题背景\n- 房屋质量保证金模块（保证金管理/协议管理/协议终止/资金缴存/资金支用）在 B 端账号下不做小区过滤，展示全部区域数据，属越权可见\n- 根因是列表查询参数从未带 propertyProjectId，后端拿不到当前小区只能全量返回\n- B 端顶栏小区选择器只是前端上下文（store 的 currentProjectId），不主动下发就不参与查询\n\n## 解决方案\n- 列表页覆写/新增 getQueryParams()，在查询与导出共用层加过滤：isBTerminalPractitioner 为真时 params.propertyProjectId = currentProjectId\n- 必须用 isBTerminalPractitioner 门控，不能无条件传：G 端主管部门同用这些页面，无当前小区，无脑传会变空过滤或出错\n- 改造范围是整个模块所有列表菜单，已有的（资金缴存/支用列表、新增弹窗账户选择）要复查口径一致\n- 验收用 B 端账号切换不同小区确认只返回该小区数据，再用 G 端账号回归没被误过滤\n\n## 验证与归属\n- 验证：会话 dfe1828a（2026-07-23）用户截图指 B 端未做权限过滤，要求传 propertyProjectId，房屋质量保证金相关列表菜单都加\n- 涉及文件：guaranteeDepositAccount/index.vue、guaranteeDepositAgreement/index.vue、guaranteeDepositAgreementEnd/index.vue、guaranteeDeposit/components/index.vue、AddDialog.vue、AccountDetailTable.vue\n- 所属项目：产品2.0；来源会话：dfe1828a-18d8-4f50-bd96-5b846ee22649；代码基线：414029f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/submodule_precommit_fix.md",
+                "memory_type": "entities",
+                "after": "# 子模块合并缺依赖文件补齐\n产品2.0 父仓库合并子模块 zhi2-web-admin 分支时 pre-commit 因缺依赖文件失败，从来源分支补文件纳入提交而非跳过钩子。\n\n## 问题背景\n- 在父仓库对子模块做分支合并（develop/v2.6.1 → develop/v2.6.2）并提交时，pre-commit 失败报缺若干依赖文件\n- 合并只带来引用关系，被引用的一批文件在目标分支缺失，import 链断裂导致静态检查不通过\n- 本次缺失：resolveServerAssetUrl.js、serviceHealth.js、operationReport.js、RegionTreeLayout.vue、regionTree.vue\n\n## 解决方案\n- 不用 --no-verify 跳过钩子，缺文件是真问题，跳过之后构建以更模糊方式炸掉\n- 从来源分支把这批文件补回并一并纳入本次提交（git checkout develop/v2.6.1 -- <file> 后正常 add），让子模块此次提交自身完整\n- 子模块提交完成后再提交父仓库，父仓库只做子模块指针更新，提交信息写 Update subproject commit reference\n- 收尾用两处 git status 确认父子两仓都干净；需推送时两仓都要单独 push\n\n## 验证与归属\n- 验证：会话 fedbf125（2026-06-22）子模块提交 a8cd64707 合并分支，从 develop/v2.6.1 补全 5 文件；父仓库 c1dcce8 更新指针（2d41ae8 → a8cd647），两仓 clean\n- 涉及文件：resolveServerAssetUrl.js、serviceHealth.js、operationReport.js、RegionTreeLayout.vue、regionTree.vue（均在 zhi2-web-admin/src 下）\n- 所属项目：产品2.0；来源会话：fedbf125-9fe3-444d-81e8-d17ffec9216d；代码基线：57109f9"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

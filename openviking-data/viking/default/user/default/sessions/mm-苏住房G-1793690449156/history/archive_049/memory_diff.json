@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_049",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:16:57.948934+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_column_switch.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column switch 列双坑：表头截断与空 tooltip\n[苏房G] zs-table-column 的 type=\"switch\" 列因固定宽 60px 与默认开启 showOverflowTooltip，同时出现表头被截与空黑 tooltip 两处独立问题。\n\n## 现象\n- 工单分类等页面用 zs-table-column type=\"switch\" 渲染「状态」开关列，表头显示成「...」省略号。\n- 鼠标悬停开关时弹出一个空的黑色 tooltip 框。\n\n## 根因\n- switch 类型列被钉死固定宽 60px，表头样式带 text-overflow: ellipsis，中文「状态」两字放不下被截。\n- 所有列默认开启 showOverflowTooltip；switch 列无文本内容，Element UI 仍按溢出判定触发 tooltip，空内容渲染黑框。\n- 两处独立根因都在公共列组件 zs-table-column.vue，不在业务页面。\n\n## 修复方案\n- 组件层把 switch 分支固定宽从 60px 提到 88px（够放「状态」+ 开关）。\n- 对 switch 类型强制 showOverflowTooltip=false。\n- 两处必须一起改，只改宽度会让「...」消失但黑色空框依旧。\n\n## 验证与归属\n- 验证：会话 1cc96294 工单分类状态栏省略号 + 黑色空提示，根因在公共组件非业务页。\n- 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、zhi2-web-admin/src/views/property/workOrder/category/index.vue。\n- 所属项目：苏住房G；来源会话：1cc96294-89aa-419f-a3f0-3c4fbc943d76；代码基线：e590ffa。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_switch_rollback.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column 开关列回滚失败：回调前已写新值\n[苏房G] zs-table-column 的 handleSwitchChange 先把 row.enableStatus 写成新值再回调页面，导致页面取「旧值」实为已改新值，拦截后回滚无效。\n\n## 现象\n- 列表页用 zs-table-column 的 el-switch 列做启用/禁用，前端拦截不满足条件单据（如未备案 bizState !== '2'）。\n- 提示「未备案的不能执行启用或禁用」后开关仍变为禁用，未保持原样。\n\n## 根因\n- 本项目开关列不靠 v-model 双向绑定，而是 zs-table-column 内部 handleSwitchChange 先写 row.enableStatus 新值再回调 handleEnableChange(row)。\n- 页面 const prevStatus = row.enableStatus 取到的是新值（禁用 '0'），.catch 回滚到新值等于无效。\n\n## 修复方案\n- 不要从 row 读旧值，按目标状态反推：const prevStatus = statusStr === '1' ? '0' : '1'。\n- 所有失败分支统一回滚：前端业务拦截、权限校验失败、参数校验失败。\n- 通用教训：凡是被组件在回调前改写过的行字段，都不能当「变更前快照」用。\n\n## 验证与归属\n- 验证：会话 aadf551a 未备案单据启用→禁用提示后仍变禁用，根因 handleSwitchChange 先写新值。\n- 涉及文件：zhi2-web-admin/src/views/system/regionBankAuth/index.vue。\n- 所属项目：苏住房G；来源会话：aadf551a-5fa3-495e-9cfd-2fe0eba45d5b；代码基线：f9f3acf。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/el_select_allow_create.md",
+                "memory_type": "entities",
+                "after": "# el-select 开启 allow-create 把历史脏值预置为下拉第一项\n[苏房G] 账号冻结原因等「预设枚举 + 历史手填」的 el-select 开 allow-create 后，历史自定义值被 Element 自动追加到下拉首项。\n\n## 现象\n- 账号冻结原因预设三项 + 允许管理员手填，历史单据存过自定义文案（如「额度与无业务」）。\n- 再次打开时下拉多出第一项「用户手动输入的原因」，回车即选中该脏值。\n\n## 根因\n- el-select 配 allow-create: true 后，Element UI 把 v-model 中不在 options 内的项自动追加到下拉选项（通常首项）。\n- filterable/default-first-option 放大观感，回车即选中第一项；属 Element 既有行为非数据配置错。\n\n## 修复方案\n- 此类「预设枚举 + 历史脏值」下拉去掉 allow-create、default-first-option、filterable。\n- 只渲染后端字典/本地预设；历史自定义文案仍在输入框只读回显，不再进候选列表。\n- 经验外推：凡是想「受限选择」的下拉都不要顺手加 allow-create。\n\n## 验证与归属\n- 验证：会话 cbb5f1e2 用户澄清下拉多出手动输入原因，结论为 allow-create 自动加首项。\n- 涉及文件：zhi2-web-admin/src/components/AccountFreezeFields/AccountFreezeFields.vue、zhi2-web-admin/src/utils/accountFreeze.js。\n- 所属项目：苏住房G；来源会话：cbb5f1e2-ec0c-4fd3-8323-b22f7cdd9fa6；代码基线：805ea8c。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/api_prefix_field_review.md",
+                "memory_type": "entities",
+                "after": "# 外部接口路径前缀核对与下线必填项全链路审查\n[苏房G] 补外部接口路径前缀前先核对项目 /system 约定；下线必填项要同时审 prop 空壳与 skip-check 连带失效。\n\n## 经验一：外部接口路径前缀不可照抄\n- 文档写 /api/v2.0/streetBankPolicy，本项目后端实际映射 /v2.0/system/streetBankPolicy（/system 属项目约定）。\n- 先在同目录/工具模块找已知正确同族接口当锚点（如 utils/workBank.js 的 QUERY_START_BANK_URL）。\n- 按「路径字面量在几个文件重复」列清单逐个改；共享 utils 已正确的不动；反向给出「无需修改」及理由。\n\n## 经验二：下线必填项不止删 rules\n- 逐条确认五处：rules 是否还有该字段；<el-form-item prop> 是否无对应 rule（确定不校验就去掉 prop）。\n- beforeSaveHook / ZsSubmit before-submit 自定义校验是否还引用；提交走内置还是自定义 ZsSubmit（:show-submit=false 会跳过 getAnnexConfig 要件检查）。\n- 后端是否仍校验（前端仓库无后端源码须找后端约定一致，否则前端可点接口报错）；编辑态 UI 与提交路径要对称。\n\n## 验证与归属\n- 验证：会话 70f1e4be 文档路径与实际映射不符改常量；会话 cc5e8ba6 删 agreementBizId 必填后审查出 prop 无 rule、ZsSubmit skip-check 等。\n- 涉及文件：regionBankAuth/index.vue、StreetAuthDialog.vue、utils/workBank.js、detail.vue、regionBankAuthChange/detail.vue。\n- 所属项目：苏住房G；来源会话：70f1e4be-4f65-4534-a061-8fc1d7eecbb7, cc5e8ba6-a3d7-462f-b22c-bcd15cfb22af；代码基线：c176892。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

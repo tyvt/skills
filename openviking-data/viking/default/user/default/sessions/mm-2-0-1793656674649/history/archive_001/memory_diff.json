@@ -1,0 +1,43 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793656674649/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T21:59:33.023856+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/测试模式/sidebar_leaf_filter.md",
+                "memory_type": "entities",
+                "after": "# 嵌套侧栏E2E叶子过滤\n在 zhi2-web-admin 的 navbar-sidebar-accessibility E2E 用例中，Playwright 的 getByTestId 默认匹配所有后代，导致嵌套目录误点深层叶子。\n\n## 现象\n- 两层目录（如「规约管理 > 管理规约 > 管理规约拟定」）下，父层直接点到深层叶子，或子菜单顺序与页面不符。\n- 街道/社区/小区、物业管理区域等被误判无子菜单；物业管理区域子菜单顺序与页面不符。\n\n## 根因\n- Playwright locator.getByTestId 匹配所有后代而非仅直接子节点。\n- submenu.getByTestId('sidebar-menu-item') 会把更深层目录算进来，递归展开状态错乱。\n\n## 解决方案\n- 叶子只点满足 `leaf.closest('[data-testid=\"sidebar-menu-item\"]') === 当前 menuItem` 的 sidebar-leaf-link。\n- 嵌套目录只递归「其 sidebar-menu-item 祖先链上紧邻父级就是当前目录」的项。\n- 菜单顺序以 DOM 实际出现顺序为准，不做 index/href 跨上下文排序；日志带面包屑便于对照。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js\n- 所属项目：2-0；来源会话：97cb886a-e67c-42b6-8516-f9591fa85219；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/测试模式/leaf_click_timeout.md",
+                "memory_type": "entities",
+                "after": "# 侧栏叶子点击超时遮挡\n登录后批量点 sidebar-leaf-menu 时，Playwright 报 element not stable 或 subtree intercepts pointer events，用例超时。\n\n## 现象\n- 报「项目管理/宗地管理 … subtree intercepts pointer events」，视频里只点了一部分菜单。\n- 折叠面板展开/动画中，同级或其它层级的目录标题覆盖目标 `<a>` 可点击区域。\n\n## 根因\n- 未完全展开或滚动到位时强行 click 会无限重试。\n- Element 折叠面板展开/动画过程中标题覆盖目标链接。\n\n## 解决方案\n- 每个父级目录先显式展开并 waitFor 子菜单链接 visible。\n- 点击前 scrollIntoViewIfNeeded；必要时限定在当前 menu-collapse-wrapper 内或更窄定位，或短暂等待动画结束。\n- 全量遍历按「顶栏切换 → 侧栏父级展开 → 直接子叶子 → 嵌套父级」顺序，不一次性 locator('.sidebar-leaf').first() 扫全局。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js\n- 所属项目：2-0；来源会话：fe1c5dc1-f6ad-4637-84a8-bda2ca44dffb；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/测试模式/e2e_navbar_login.md",
+                "memory_type": "entities",
+                "after": "# 顶栏侧栏E2E登录与默认激活\nnavbar-sidebar-accessibility.spec.js 遍历顶栏与侧栏所有叶子路由前，须确认登录态与 navbar-root，并注意系统默认激活第一个顶栏。\n\n## 现象\n- 登录未成功时 getByTestId('navbar-root') 一直不可见，视频停在登录页。\n- 默认进入后激活第一个顶栏菜单，若未先切换顶栏就遍历侧栏，会出现第一个顶栏目录重复点击或误判 navbar 切换失败（如「项目楼盘」与「物业管理」混在一起）。\n\n## 根因\n- 产品默认进入后激活第一个顶栏菜单，侧栏仍是上一顶栏的菜单。\n- 登录态未校验导致后续断言全部失败。\n\n## 解决方案\n- 登录后 `expect(page).not.toHaveURL(/#\\/login/)` 并等待 navbar-root、sidebar-root。\n- 遍历每个顶栏前先点击对应 navbar 项并等待侧栏树更新；对「更多」里的顶栏目录单独处理。\n- 单叶子失败记入 uiErrorRecords 继续跑；用户要求叶子/目录点击间隔约 1s 便于录屏排查。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js\n- 所属项目：2-0；来源会话：fe1c5dc1-f6ad-4637-84a8-bda2ca44dffb, 5af92aab-06ab-48cb-be81-b133e170a41b；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/测试模式/click_leaf_parent.md",
+                "memory_type": "entities",
+                "after": "# clickLeafMenusUnderParent顺序点击\n按目录批量点子菜单时，用 DOM 计数 + nth 顺序点 sub-menu a，断言失败只记录不中断，是最小可靠版。\n\n## 现象\n- 基于 index/href 的跨上下文数据结构易算错、与展开状态脱节，导致循环空转或跳过子级。\n- 脚本在第一个目录卡住，或展开目录后不再点子菜单。\n\n## 根因\n- 跨上下文复杂结构易与 DOM 实际状态脱节。\n\n## 解决方案\n- DOM 侧只统计当前目录下子菜单 `<a>` 数量；Playwright 侧用 `.locator('.menu-collapse-wrapper .sub-menu a').nth(i)` 按序点击。\n- 每次点击后短等待并 assertMainContentNotBlank，失败写入 uiErrorRecords；每个子菜单 try/catch，异常只打日志。\n- 在修好直接子级过滤后再叠加上去。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js\n- 所属项目：2-0；来源会话：5af92aab-06ab-48cb-be81-b133e170a41b；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/e2e侧栏测试偏好.md",
+                "memory_type": "preferences",
+                "after": "- 遍历侧栏菜单时，叶子/目录点击间隔约 1s 便于录屏排查。\n- 侧栏菜单顺序以 DOM 实际出现顺序为准，不另做 index/href 跨上下文排序（用户强调直接用页面顺序就是 DOM 顺序）。\n- E2E 单叶子断言失败记入 uiErrorRecords 继续跑，不中断全量遍历。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

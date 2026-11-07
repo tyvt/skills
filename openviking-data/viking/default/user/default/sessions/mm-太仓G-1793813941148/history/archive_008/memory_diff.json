@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793813941148/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T18:01:46.390637+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/option_add_button_fix.md",
+                "memory_type": "entities",
+                "after": "# 选项表决新增页底部多余按钮修复\n太仓G端选项表决详情页在新增模式下底部多出业务操作按钮，根因是 v-hasPermi 覆盖 v-show 隐藏效果，已改用 v-if 修复。\n\n## 问题根因\n- `optionDecision/detail.vue` 中 7 个业务操作按钮同时使用了 `v-show` 和 `v-hasPermi`\n- `v-hasPermi` 在权限校验通过时执行 `el.style.display = ''`，覆盖了 `v-show` 设置的 `display: none`\n- 新增模式（`formMode == 'add'`）下这些按钮仍被显示\n\n## 修复方案\n- 将 7 个业务操作按钮的 `v-show` 改为 `v-if`，条件为 false 时元素不渲染\n- 新增页面底部仅保留「保存」按钮\n- 「表决状态更新」「撤销」「延期」等按钮仅在已提交（`bizState == '2'`）的查看模式显示\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：optionDecision/detail.vue、src/components/OperationContainer/index.vue、src/mixins/detailMixins.js\n- 所属项目：太仓G；来源会话：d78da6c5-2f67-48d6-9fd2-d7742debc541"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/option_tab_cardvalue_fix.md",
+                "memory_type": "entities",
+                "after": "# 选项表决详情Tab切换内容消失修复\n太仓G端选项表决详情按基本信息→表决项→投票信息切换后底部无组件渲染，根因是 cardValue 未随 tab 重置，已通过监听 mainCardValue 修复。\n\n## 问题根因\n- 复现路径：基本信息 → 表决项 → 投票信息\n- 切到「投票信息」后子 tab 只剩「决策明细」（`name: 0`），但 `cardValue` 仍停留在 `1`（表决项）\n- 三个 `v-if` 均不满足：`DecisionRangeTable` 需 `cardValue == 0`，`VotingItemsTable` 需 `mainCardValue == 0`\n- 原先仅在 `handleMainTabChange` 重置 `cardValue`，tab 点击切换存在时序问题\n\n## 修复方案\n- 合并两个 `DecisionRangeTable` 为一个，用 `mainCardValue` 动态控制 `show-search`、`show-vote`、`show-icon`\n- 监听 `mainCardValue`，切换顶层 tab 时始终将 `cardValue` 重置为 `0` 并刷新子 tab 数据\n- `showVoteResult` 按钮同样走上述 watch，避免从「表决项」点「表决结果」后复现\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：optionDecision/detail.vue、components/DecisionRangeTable.vue、ownerDecision/detail.vue\n- 所属项目：太仓G；来源会话：f7e76921-282e-489a-956f-276a0ef62028"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/maintain_driver_import_fix.md",
+                "memory_type": "entities",
+                "after": "# 维修资金表决详情驱动未定义报错修复\n太仓G端 `maintainDecision/detail.vue` 报错 `mfcontractguardDriver is not defined`，因重构误删 import，已补回依赖修复。\n\n## 问题根因\n- 最近的重构中，`maintainDecision/detail.vue` 把 `mfcontractguardDriver` 的 import 删掉了\n- 但 `mounted` 里仍用它启动引导（`driverStart`），导致未定义报错\n\n## 修复方案\n- 补回 import：`import mfcontractguardDriver from '@/views/repairFunds/usage/fundUsageKs/driver'`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：maintainDecision/detail.vue、src/directives/formatter/money.js、ownerDecision/detail.vue\n- 所属项目：太仓G；来源会话：8f9057d0-7dbf-4966-9b52-d5d8411e8e4b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/owner_getdetail_override_fix.md",
+                "memory_type": "entities",
+                "after": "# 业主表决详情面积权数未显示修复\n太仓G端业主表决详情页总权数、总户数、总面积显示为空，根因是 `getVoteResult` 空值覆盖了正确数据，已去除覆盖逻辑修复。\n\n## 问题根因\n- `getDetail()` 先从 `getOwnerDecision` 拿到正确的 `totalWeight`、`totalHouseholds`、`totalArea`\n- 接着调用 `getVoteResult`（`/ownerCalculationChart`）覆盖这些字段\n- 表决未开始时该接口无统计数据、返回空值，把已有数据盖掉导致页面显示为空\n\n## 修复方案\n- 去掉 `getVoteResult` 的覆盖逻辑，直接使用 `getOwnerDecision` 返回的数据\n\n## 验证与归属\n- 修复后正常显示：总权数 86、总户数 86、总面积 4902.73 ㎡\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：ownerDecision/detail.vue、api/estate/ownerDecision.js、components/VoteView.vue\n- 所属项目：太仓G；来源会话：5295a51b-35c1-4303-8d3f-09d1c13d31bc"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

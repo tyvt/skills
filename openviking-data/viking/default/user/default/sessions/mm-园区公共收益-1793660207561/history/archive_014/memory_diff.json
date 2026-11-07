@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793660207561/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T23:18:01.253959+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/组织工作人员列表列空白.md",
+                "memory_type": "entities",
+                "after": "# 组织工作人员列表列空白修复\n自治域「组织工作人员」分页接口 `/autonomy/ownerCommitteeWorker/page` 与系统用户列表口径一致：组织类型字段为 `accountType`（字典 `sys_account_type_all`），用户状态为 `userStatus`（字典 `sys_normal_disable`）。\n\n## 问题现象\n- 从其它模块拷贝列表时若仍绑定 `businessType`、`committee_type` 或 `enable`，列与筛选项会整列空白\n\n## 修复要点\n- 组织类型 `businessType`→`accountType`、字典 `committee_type`→`sys_account_type_all`\n- 用户状态 `enable`→`userStatus`\n- 同步改表格列 `prop`、字典 `dict-type` 及 `queryParams`/搜索表单项的 `model`，搜索 `queryParams` 同步\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/autonomy/ownerCommitteeWorker/index.vue\n- 所属项目：园区公共收益；代码基线：635e747；来源会话：b6d6fab6-0ca4-4685-9fa8-8c9df7a6aefd"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/苏住房图片上传组件手工迁移至园区分支.md",
+                "memory_type": "preferences",
+                "after": "- 将 `zhi2-web-admin` 的 `v2.6.2-suzhufang` 分支相关提交合并至 `v2.6.2-yuanqu` 分支，新增 `src/components/ComplexPhotoUpload/index.vue` 与 `src/utils/complexPhoto.js`\n- 因两分支文件差异大，采用手工逐处迁移并保留园区特有字段（如宗地号、项目类型级联）\n- 涉及文件：C:/Users/Administrator/AppData/Local/Temp/suzhufang-complex-detail.vue、D:/repository/园区公共收益/zhi2-web-admin/src/views/property/complex/detail.vue、D:/repository/园区公共收益/zhi2-web-admin/src/views/property/complexChange/detail.vue、D:/repository/园区公共收益/zhi2-web-admin/src/views/publicQuery/complex/detail.vue、D:/repository/园区公共收益/zhi2-web-admin/src/utils/auth.js、C:/Users/Administrator/AppData/Local/Temp/suzhufang-ComplexPhotoUpload.vue、C:/Users/Administrator/AppData/Local/Temp/suzhufang-complexPhoto.js、D:/repository/园区公共收益/zhi2-web-admin/src/utils/complexPhoto.js\n- 验证：src=园区公共收益/005.md；来源会话 05d8ab0e-ab89-4e9c-bffb-a284f36311b6"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/账户拆分功能调整页面字段与弹窗逻辑.md",
+                "memory_type": "preferences",
+                "after": "- 列表页 `index.vue` 与详情页 `detail.vue` 按设计图重排字段、固定 `operatorType: 1` 并精简校验，`setAccountName` 改为按字段 merge 避免覆盖主单 ID\n- `accountNameDialog.vue` 拆分拆出/拆入账户模式，`AccountListTable.vue` 修复 `:form=\"form\"` 传递（原 `$attrs.form` 无效）\n- 涉及文件：c:/Users/Administrator/Downloads/账户拆分-前端接口对接文档.md、d:/repository/园区公共收益/zhi2-web-admin/src/views/maintenance/accountSplit/index.vue、d:/repository/园区公共收益/zhi2-web-admin/src/views/maintenance/accountSplit/detail.vue、d:/repository/园区公共收益/zhi2-web-admin/src/views/maintenance/accountSplit/components/AccountListTable.vue、d:/repository/园区公共收益/zhi2-web-admin/src/views/maintenance/accountSplit/components/AccountListDialog.vue、d:/repository/园区公共收益/zhi2-web-admin/src/views/maintenance/accountSplit/components/accountNameDialog.vue、d:/repository/园区公共收益/zhi2-web-admin/src/views/maintenance/accountOpen/complex/detail.vue、d:/repository/园区公共收益/zhi2-web-admin/src/views/maintenance/accountChange/detail.vue\n- 验证：src=园区公共收益/005.md；来源会话 46eb821e-f488-4bb3-b973-6647aedb4d2b"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/pending_oper_headers.md",
+                "memory_type": "entities",
+                "before": "# 审计头仅挂编辑保存与列表删除\n园区 zhi2-web-admin 用 pendingOperHeaders 标记下一次请求类型，仅编辑保存与列表删除的 PUT/DELETE 附加 menu-name、menu-path、data-id 审计头。\n\n## 问题背景\n- 全量请求拦截器统一加审计头易误伤查询/新增，且中文 meta.title 会触发 XHR setRequestHeader 非 ISO-8859-1 异常（编码侧须走 toAsciiHeaderValue）\n- 移除对 form 的全局 watch 与 zipdownload 上的菜单头\n\n## 实施方案\n- pageRequestContext.js 用 pendingOperHeaders 标记 edit/delete，仅在匹配 PUT/DELETE 消费并附加头\n- 编辑：仅 OperationBtnGroup 在 formMode=edit 点保存调用 enableDetailSaveHeaders(primaryKey, form)，带 menu-name(meta.title)、menu-path(meta.filePath)、data-id(form[primaryKey])；editRequest 提交前刷新主键，validate 失败须 clearPendingOperHeaders() 防残留\n- 删除：仅 mixins/table.js 的 deleteRequest 前 enableListDeleteHeaders()，带菜单头、不带 data-id；自定义删除需自行 enableListDeleteHeaders()\n\n## 验证与归属\n- 验证证据：用户要求仅 OperationBtnGroup 编辑保存与列表删除带请求头；实现 pendingOperHeaders + 拦截器 getOperRequestHeaders\n- 涉及文件：zhi2-web-admin/src/utils/request.js、pageRequestContext.js、components/OperationBtnGroup/index.vue、mixins/table.js、mixins/form.js\n- 所属项目：园区公共收益；来源会话：9bcf52dd-9166-4405-b7fd-19333080453d；代码基线：f783ca2",
+                "after": "# 审计头仅挂编辑保存与列表删除\n园区 zhi2-web-admin 用 pendingOperHeaders 标记下一次请求类型，仅编辑保存与列表删除的 PUT/DELETE 附加 menu-name、menu-path、data-id 审计头。\n\n## 问题背景\n- 全量请求拦截器统一加审计头易误伤查询/新增，且中文 meta.title 会触发 XHR setRequestHeader 非 ISO-8859-1 异常（编码侧须走 toAsciiHeaderValue）\n- 移除对 form 的全局 watch 与 zipdownload 上的菜单头\n\n## 实施方案\n- pageRequestContext.js 用 pendingOperHeaders 标记 edit/delete，仅在匹配 PUT/DELETE 消费并附加头\n- 编辑：仅 OperationBtnGroup 在 formMode=edit 点保存调用 enableDetailSaveHeaders(primaryKey, form)，带 menu-name(meta.title)、menu-path(meta.filePath)、data-id(form[primaryKey])；editRequest 提交前刷新主键，validate 失败须 clearPendingOperHeaders() 防残留\n- 删除：仅 mixins/table.js 的 deleteRequest 前 enableListDeleteHeaders()，带菜单头、不带 data-id；自定义删除需自行 enableListDeleteHeaders()\n\n## 验证与归属\n- 验证证据：用户要求仅 OperationBtnGroup 编辑保存与列表删除带请求头；实现 pendingOperHeaders + 拦截器 getOperRequestHeaders\n- 涉及文件：zhi2-web-admin/src/utils/request.js、pageRequestContext.js、components/OperationBtnGroup/index.vue、mixins/table.js、mixins/form.js、src/router/index.js、src/utils/zipdownload.js、src/store/modules/permission.js、src/utils/index.js、public/assets/js/sign.js、src/api/index.js、src/views/benefit/components/ApprovalProcessDialog.vue\n- 所属项目：园区公共收益；验证证据：src=园区公共收益/005.md；来源会话：9bcf52dd-9166-4405-b7fd-19333080453d；代码基线：f783ca2"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

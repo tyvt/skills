@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_046",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:10:02.578460+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/deep_selector_vite.md",
+                "memory_type": "entities",
+                "after": "# deep_selector_vite\nVue2 私有深度选择器 /deep/ 在 Vite+Dart Sass 下会导致构建硬失败，需全库改写为 :deep()。\n\n## 现象\n- CI 跑 vite build 报 [vite:css][sass] expected selector，定位到 ReportItemsTable.vue:46 `.report-number-input /deep/ .el-input__inner`。\n- 本地可能不报，CI 全量构建必红；残留文件平时跑不起来不报，只在 CI 暴露。\n\n## 根因\n- /deep/ 是 Vue2 私有深度选择器语法，webpack vue-loader 会预处理；Vite 走标准 Dart Sass 编译，/deep/ 非合法选择器，编译阶段抛错。\n- 属构建期硬失败而非样式不生效，与已知 #1045 scoped @import scss 弃用警告（低级别告警）不同。\n\n## 解决方案\n- 统一把 `.parent /deep/ .child` 改写为 `.parent :deep(.child)`，与项目内已有 :deep() 写法一致。\n- 按目录全库扫描清掉所有残留，不要换成 ::v-deep 混存，避免复发。\n- 改完重新跑真实构建验证，而非只看 dev 起来没报错。\n\n## 验证与涉及\n- 验证：会话 1a0cb28a 用户贴 CI 报错 expected selector 指向 ReportItemsTable.vue:46；随后一并改掉共 4 文件 14 处（ReportItemsTable 1、zs-input-number 7、WorkOrderActionDialog 3、BatchReplyDialog 3），全库已无 /deep/。\n- 涉及文件：zhi2-web-admin/src/views/publicQuery/monthlyReport/components/ReportItemsTable.vue、zhi2-web-admin/src/components/zs-input-number/zs-input-number.vue、zhi2-web-admin/src/views/property/workOrder/order/components/WorkOrderActionDialog.vue、zhi2-web-admin/src/views/property/workOrder/order/components/BatchReplyDialog.vue\n- 所属项目：苏住房G；来源会话：1a0cb28a-633d-40bd-a6a4-f109ce7e0d93；代码基线：d5eee56"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/revert_submodule_recover.md",
+                "memory_type": "entities",
+                "after": "# revert_submodule_recover\n苏住房G 父仓为 superproject，真实代码在子模块 zhi2-web-admin；误 revert 子模块改动后需「子模块 revert the revert + 父仓更新指针」恢复。\n\n## 背景与为什么\n- 物业合同列表页 9/3-9/4 字段与展示规则优化被 revert，需恢复子模块最近 revert 的改动。\n- 父仓只拨指针等于丢代码；只改子模块不改指针则父仓指向旧版本，提交链两端不对齐。\n- 已知「子模块先行、父仓只更新指针」规则同样适用于 revert / revert-of-revert 反向操作。\n\n## 恢复步骤\n- ① 子模块对应分支（本例 develop/v2.6.2-suzhufang）执行 git revert <被 revert 的 commit>，生成新提交而非 reset/强推，保留历史。\n- ② 核对 diff 只命中预期文件（本例 propertyContract/components/index.vue）。\n- ③ 父仓提交指针更新（7f09295 → 9d849f1），提交信息写明恢复的是哪次 revert。\n- ④ 按业务清单逐条验收：内联 template 结构（不走 ListTemplate.js）、默认筛选 bizState:'2'、搜索项合同有效期/是否上传备案表、顶部说明文案、按 businessType 区分表单项与列。\n- ⑤ 确认无关修复（ImageUpload 路径）未被连带回滚。\n- ⑥ 两端各自 push，本地领先远程时提醒用户按子模块先、父仓后顺序推。\n\n## 验证与涉及\n- 验证：会话 e6ba29d4 子模块 git revert c444795 生成 9d849f1（仅改 index.vue +228/-87）；父仓 cf4686b 更新指针 7f09295→9d849f1；清单五条全确认，ImageUpload 修复保留。\n- 涉及文件：zhi2-web-admin/src/views/property/propertyContract/components/index.vue、zhi2-web-admin/.gitmodules\n- 所属项目：苏住房G；来源会话：e6ba29d4-cc1a-45ef-b933-282c90f69fcd；代码基线：17d79d3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sidebar_activepath_merge.md",
+                "memory_type": "entities",
+                "after": "# sidebar_activepath_merge\n苏房侧栏高亮归并：activePath 只改「当前路径」不改「菜单路径」，精确/前缀两种匹配语义不能混用。\n\n## 场景与做法\n- 让详情页、按来源拆分的列表页（rectificationNotice detail0/detail1、rectificationNotice1/2 等）在侧栏高亮唯一「整改通知书」菜单。\n- utils/sidebarActivePath.js 导出 getSidebarActivePath(route) 返回归一后菜单路径，由 layout/components/Sidebar/RecursiveMenu.vue 的 activePath computed 消费，经 matchMenuPath 判定。\n\n## 关键约束\n- matchMenuPath 判定为「归一当前路径 === 归一菜单路径」或「当前路径 startsWith(菜单路径 + '/')」双分支，语义不同：等式管本节点，前缀管子路由。\n- 归一函数只能动「当前侧」取值，绝不能把菜单侧/菜单项自身 path 也归一，否则前缀分支误判导致「菜单不亮」。\n- 归一后路径必须返回已注册菜单路径（getCurrentRouterByFilePath 按 meta.filePath 从路由表反查），排除 :tableid 等动态段并去尾部斜杠，统一 canonicalizeHomePath 做首页别名收敛，避免 /index/home 误判。\n- RecursiveMenu 是递归组件，activePath 是顶层 computed，改一处对所有层级生效，勿逐层改。\n\n## 验证与涉及\n- 验证：会话 a19337fd（基线 315702f）审查指出 getSidebarActivePath 导出后全库无消费方；仓库 HEAD ee0d915a7 最终解法：src/utils/sidebarActivePath.js 导出，RecursiveMenu.vue:66 import、:105 activePath 消费，matchMenuPath(:364-390) 双分支，canonicalizeHomePath(isHomeMenuRoute) 首页特判短路。\n- 涉及文件：zhi2-web-admin/src/utils/sidebarActivePath.js、zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue、zhi2-web-admin/src/utils/homeRoute.js、zhi2-web-admin/src/utils/ruoyi.js\n- 所属项目：苏住房G；来源会话：a19337fd-e97d-478d-a10f-deee6d572a15；代码基线：315702f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/route_meta_circular_dep.md",
+                "memory_type": "entities",
+                "after": "# route_meta_circular_dep\n苏房页面标题/返回路径公共逻辑须收进纯函数模块 routeMeta.js，store 与 utils 不得反向依赖 ruoyi（循环依赖 + 静默 undefined）。\n\n## 场景与坑\n- 整改通知书需统一页签标题与返回目标，多处（tagsView store ADD_VISITED_VIEW、ListOperationButtonContainer 列表标题、OperationBtnGroup/main.js goBack）按同一口径判断当前路由是否为列表/详情页。\n- 若把判定写在 utils/sidebarActivePath.js 会引依赖环：它 import @/utils/ruoyi，ruoyi.js 又 import router 与 store；tagsView.js 是 store 模块被 store/index.js 聚合，形成 router→store→tagsView→sidebarActivePath→ruoyi→router/store 环，初始化顺序不对时导出 undefined 或偶发白屏。\n- 无用 import（sidebarActivePath.js 早期 import router 却没用）加重环。\n\n## 解法\n- 拆两层：routeMeta.js 只 import constants，导出 isXxxDetailRoute/isXxxListRoute/getXxxPageTitle 纯函数供 store 与公共组件；sidebarActivePath.js 保留需查路由表的路径解析（getXxxUnifiedListPath/getSidebarActivePath/getBackPathFromRoute），由 layout 与按钮组件按需引用，可 re-export routeMeta 但内部实现必须落在 routeMeta。\n- 判定函数内部克制：列表路由 filePath 用严格相等而非 startsWith，否则未来 index1 同级页误判为列表页，标题/返回/高亮三条逻辑一起错。\n\n## 验证与涉及\n- 验证：会话 a19337fd HIGH 审查结论 tagsView.js 顶层 import sidebarActivePath 导致环；filePath.startsWith 过宽、未用 router 导入加剧依赖。仓库实现：tagsView.js 只引 @/views/evaluation/rectificationNotice/routeMeta，sidebarActivePath.js 保留 ruoyi 依赖并 re-export；routeMeta.js 用 filePath === RECTIFICATION_NOTICE_LIST_FILE_PATH 严格相等 + 路径正则双判定。\n- 涉及文件：zhi2-web-admin/src/views/evaluation/rectificationNotice/routeMeta.js、zhi2-web-admin/src/views/evaluation/rectificationNotice/constants.js、zhi2-web-admin/src/utils/sidebarActivePath.js、zhi2-web-admin/src/store/modules/tagsView.js、zhi2-web-admin/src/components/ListOperationButtonContainer/index.vue\n- 所属项目：苏住房G；来源会话：a19337fd-e97d-478d-a10f-deee6d572a15；代码基线：315702f"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

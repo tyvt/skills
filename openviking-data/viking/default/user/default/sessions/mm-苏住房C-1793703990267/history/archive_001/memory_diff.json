@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:08:05.881050+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/vendor_relocate_enoent.md",
+                "memory_type": "entities",
+                "after": "# vendor依赖被relocate脚本删除引发ENOENT\n苏住房C市民端(H5→微信小程序)构建产物因relocate脚本删除主包依赖导致ENOENT与__route__未定义。\n\n## 问题现象\n- zhi2-mobile-shimin改造为微信小程序后，开发者工具报ENOENT找不到dist/node-modules/z-paging/.../z-paging.wxss、@dcloudio/uni-ui/lib/uni-datetime-picker/...\n- 连带出现__route__ is not defined，看似首页组件出错，实际与业务组件无关\n\n## 根因\n- 构建链上relocate-z-paging/relocate-datetime-picker脚本把z-paging、uni-datetime-picker从主包挪进分包并改引用路径\n- common/vendor.js仍按主包路径引用这两份依赖，删掉主包副本后引用悬空，编译WXSS/WXML阶段抛ENOENT，路由初始化失败冒出__route__未定义\n\n## 解决方案\n- relocate脚本改为只做分包侧复制+路径修正，绝不删除主包里的z-paging/uni-datetime-picker\n- 新增scripts/restore-main-vendor-deps.mjs，构建后检查主包是否缺依赖，缺失则从pages_main恢复\n- 挂到vite.config.ts的closeBundle与npm run build链路，保证每次构建都跑\n- 排查顺序固定为先看prod dist里vendor引用路径是否真实存在，不从业务组件图片/资源入手\n\n## 验证与归属\n- 验证：会话87fe1c13控制台ENOENT指向dist/node-modules/z-paging/...与@dcloudio/uni-ui/lib/uni-datetime-picker/...；结论根因是relocate脚本删主包依赖而vendor仍引用主包路径；修复后z-paging.wxss存在于主包\n- 涉及文件：zhi2-mobile-shimin/vite.config.ts、scripts/restore-main-vendor-deps.mjs、package.json\n- 所属项目：苏住房C；来源会话ID：87fe1c13-6937-4a04-8752-5102a7dffe63；代码基线：8520c36"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/source_size_exceed_limit.md",
+                "memory_type": "entities",
+                "after": "# 微信开发者工具source size超限但自测合规\n苏住房C市民端小程序报source size exceed max limit 2048KB但本地脚本统计合规，因口径不同且4M上限需UI勾选。\n\n## 问题现象\n- 反复报subpackage /pages_owner/ source size 2140KB exceed max limit 2048KB、main package 2207KB exceed max limit 2048KB\n- 本地size-main-package.mjs统计合规，用户反馈“似乎判断标准不一致”\n- 未勾选4M时超限分包令模拟器起不来，Console只显示[object Object]拿不到真错误\n\n## 根因\n- 两套口径不同：自写脚本量构建产物磁盘体积，开发者工具量源码打包后source size含依赖副本、分包占位\n- project.config.json里bigPackageSizeSupport不会自动生效，必须在“详情→本地设置”人工勾选“预览及真机调试时主包、分包体积上限调整为4M”\n\n## 解决方案\n- 体积问题先确认工具UI里4M勾选状态，再看“编译”面板原文，而非“调试器→Console”\n- 分包超限优先把体积挪走（拆页面到新分包/复用scripts/split-pages-vote.mjs），不靠调脚本阈值\n- 复测流程固定为“清缓存→重新导入dist→点编译”\n\n## 验证与归属\n- 验证：会话672f088f连续三条source size exceed报错，用户反馈标准不一致；结论bigPackageSizeSupport仅写配置不够必须UI勾选4M，wx.onLazyLoadError返回undefined正常，Console的[object Object]非完整错误\n- 涉及文件：project.config.json、scripts/size-main-package.mjs、scripts/split-pages-vote.mjs、src/pages.json\n- 所属项目：苏住房C；来源会话ID：672f088f-9a28-4d5f-8510-9425d8259a76；代码基线：5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zpaging_tab_switch_fail.md",
+                "memory_type": "entities",
+                "after": "# uni-load-more迁z-paging后tab切换分页失效\n苏住房C市民端全站uni-load-more+useLoadMore换z-paging后，tab切换分页集体失效，需切tab重置第1页并重发请求。\n\n## 问题现象\n- 用户反馈“我的房源切换功能失效”“所有tab切换分页都失效”“点了没反应”“页面错乱”\n- 同时“z-paging好像没有loading效果”\n- 约15个页面无自定义#empty但仍走ZsPaging默认空态不会白屏\n\n## 根因\n- 旧hook把当前tab类型当分页参数一部分，切tab重置页码重发；z-paging页码由组件内部维护，切tab只改类型字段未让组件回第1页也未reload\n- request回调没正确return/结束，组件拿不到加载态\n\n## 解决方案\n- 每个tab页切换处理显式调用z-paging实例reload（参数变更必须回第一页），不只改数据字段\n- 清掉旧hook残留状态复位逻辑，避免两套分页状态打架错乱\n- request回调必须交出请求Promise并保证结束，否则无loading\n- 迁移后全局巡检：有tab切换的列表页验证“切tab→回第1页→数据与空态都刷新”\n\n## 验证与归属\n- 验证：会话15b35540诉求1要求全站改z-paging移除useLoadMore；诉求2-5连续报切换失效、诉求6报无loading；结论约15页面无#empty但默认空态不白屏\n- 涉及文件：src/hooks/useLoadMore.js、src/components/ListLoading/ListLoading.vue、src/pages/index/components/Project_Suzhufang.vue、src/pages/collect/index.vue、src/pages/news/index.vue、src/pages/publicNotice/publicNotice.vue\n- 所属项目：苏住房C；来源会话ID：15b35540-03c7-44b7-9ef5-69b1b346d1bb；代码基线：83c4136"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/苏住房c市民端ui还原参照.md",
+                "memory_type": "preferences",
+                "after": "- 苏住房C市民端(zhi2-mobile-shimin)页面改造以iOS原生代码为唯一权威参照，要求像素级还原页面UI且逻辑100%一致\n- 素材缺失时去iOS工程取，禁止自绘或找近似图；菜单区按iOS实现方式组织配置(图标+文案+跳转)而非逐张硬贴\n- 交付前按页截图与设计稿逐条比对，用户按页点名验收\n- 清理同源残留：如误显示“家园区”需移除homeland相关全部逻辑而非隐藏入口，并全局复查同源残留模块\n- 验证：会话d07a249b用户诉求参考iOS代码像素级还原、菜单图标参考iOS实现、移除homeland逻辑、电子业主卡图片仍有问题"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793872912374/history/archive_028",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T11:29:18.153174+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/bug/dialog_selectable_fix.md",
+                "memory_type": "entities",
+                "after": "# zs-select-dialog selectable 声明冲突修复\n产品2.0（zhi2-web-admin）中 zs-select-dialog.vue 因同时存在 prop 与 data 的同名 selectable 导致 Vue 警告，已通过替换 mixin 修复。\n\n## 问题原因\n- zs-select-dialog.vue 同时存在两处 selectable 声明：prop（函数类型，控制行是否可选）与 data（来自 @/mixins/table 的布尔值，表示是否显示多选列）。\n- Vue 不允许同名 prop 与 data，因此出现 Vue warn 警告。\n\n## 修复方式\n- 将 mixins: [table] 改为 mixins: [tableComponents]。\n- tableComponents 只注册 zs-table、zs-select-column 等组件，不包含 selectable 等 data；组件自身已实现列表查询、选择逻辑，不需完整 table mixin。\n\n## 验证与归属\n- 验证：刷新页面后打开「新增报事工单」物业管理区域选择弹窗，警告不再出现。\n- 涉及文件：zs-select-dialog.vue、mixins/table.js、views/property/workOrder/report/components/AddOrderDialog.vue 等（路径前缀 d:/repository/产品2.0/zhi2-web-admin/src）。\n- 所属项目：产品2.0；来源会话：09ed34db-94d4-41c6-856b-023f0668f865；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/detail_height_flex.md",
+                "memory_type": "entities",
+                "after": "# 区域变更详情左右高度对齐修复\n产品2.0 中 complexChange/detail.vue 查看模式右侧区域概览卡片与左侧表格高度不一致，已通过补全 flex 样式链修复。\n\n## 问题原因\n- 模板虽使用 flex items-stretch，但缺少让右侧卡片随左侧表格拉伸的完整 flex 样式链。\n- 右侧区域概览卡片未逐级撑满高度，导致底部不对齐。\n\n## 修复方式\n- 为容器和左侧表格增加 basic-info-overview、basic-info-detail 类名。\n- 父容器 align-items: stretch 使两列等高；左侧 DetailTemplate 的 detail-content 使用 flex:1 撑满。\n- 右侧 .area-overview-wrapper 及内部 Headline（.collapse-container、.collapse-content）逐级 flex:1 填满高度。\n\n## 验证与归属\n- 验证：刷新「物业管理区域变更详情」页面后左右底部应对齐。\n- 涉及文件：complexChange/detail.vue、complex/detail.vue、components/Headline/index.vue 等（路径前缀 d:/repository/产品2.0/zhi2-web-admin/src）。\n- 所属项目：产品2.0；来源会话：1e61e3a9-dc70-4426-b664-29e85e61ae8d；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/request_post_body.md",
+                "memory_type": "entities",
+                "after": "# 区域接口 POST 缺少请求体修复\n产品2.0 加密改造后非白名单接口统一改为 POST，无参 GET 请求（如 region/listTree）因缺少 body 报 Required request body is missing，已修复。\n\n## 问题原因\n- 加密改造后非白名单接口统一 POST，但 request('/system/region/listTree') 等原本无参 GET 未携带 body。\n- 后端 @RequestBody 要求必须有请求体，导致 Spring 报错。\n\n## 修复方式\n- 在 request.js 拦截器中，POST 请求若 data 为空则默认补 {}。\n- 覆盖 store/modules/common.js 的 saveAreaInfo、getRegions 及各处 $get('/xxx/listTree') 无参场景。\n\n## 验证与归属\n- 涉及文件：src/utils/request.js、src/store/modules/common.js 等（路径前缀 d:/repository/产品2.0/zhi2-web-admin）。\n- 所属项目：产品2.0；来源会话：fcb686e6-73e3-4f1f-8aff-ccc07305e948；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/dict_param_fix.md",
+                "memory_type": "entities",
+                "after": "# dictData/listByType 传参方式修复\n产品2.0 中 getDicts 原先直接传 dictType 字符串作为 POST body，接口要求 JSON 对象，已修复为传 { dictType }。\n\n## 问题原因\n- getDicts 直接把 dictType 字符串（如 \"company_type\"）当作 POST body，而后端接口要求 JSON 对象 {\"dictType\":\"company_type\"}。\n- 导致字典接口 404 或参数错误。\n\n## 修复方式\n- src/utils/dict.js：改为 POST('/system/dictData/listByType', { dictType })。\n- src/utils/apiV3Normalize.js：补充 V3 路径规范化映射 listByType: 'dictType'。\n- e2e/fixtures/register-mocks.js：Mock 改为解析 JSON body 中的 dictType 字段。\n\n## 验证与归属\n- 影响所有通过 getDicts() 获取字典的页面（含企业注册流程 company_type 等下拉）。\n- 涉及文件：src/utils/dict.js、src/utils/apiV3Normalize.js、e2e/fixtures/register-mocks.js 等（路径前缀 d:/repository/产品2.0/zhi2-web-admin）。\n- 所属项目：产品2.0；来源会话：2565718c-2639-4d49-96b3-c97a40e2cfd2；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

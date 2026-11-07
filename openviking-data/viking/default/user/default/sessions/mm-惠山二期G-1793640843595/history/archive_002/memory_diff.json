@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-惠山二期G-1793640843595/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T17:38:45.224392+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/link_detail_align.md",
+                "memory_type": "entities",
+                "after": "# 列表 link 跳详情三处对齐\n为统计/列表列添加 zs-table-column link 跳转时，除引入 getRouterPathByFilePath 外还需核对主键回退、路由语义与权限合法性三处，否则列可点但报参数异常或 404。\n\n## 关键要点\n- 主键回退：页面 primaryKey 为 complexId 时，点击处理需用 row?.projectId || row?.complexId（或反向），不能只认一个字段名。\n- 路由语义：列展示「物业管理区域/complexName」时跳转目标可能是 property/complex/detail 而非 building/project/detail；两套主键非同一实体时禁止混用。\n- 权限与合法性：getRouterPathByFilePath 无菜单会 msgError 并 throw，router.push 外层要 try/catch；主键用 isNavigableDataId 拦截空串、add 等非法段。\n\n## 实施建议\n- 对照同仓库已落地 pubBankAccountInfo 等页抄模式，不要只改模板不改 id 来源。\n\n## 验证与归属\n- 验证：primaryKey 为 complexId 若列表接口只带 complexId 不带 projectId 点击提示参数异常；列展示 complexName 使用 building/project/detail；getRouterPathByFilePath 无菜单权限时 msgError 并 throw；Fix: isNavigableDataId。\n- 涉及文件：zhi2-web-admin/src/views/property/userStatistics/index.vue、zhi2-web-admin/src/utils/ruoyi.js\n- 所属项目：惠山二期G；来源会话：434fe31b-709a-4ab2-b00a-310a247d5d86；代码基线：289cc30"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/decision_col_center.md",
+                "memory_type": "entities",
+                "after": "# 表决明细建筑面积列固定列宽居中\n业主自治各模块 DecisionRangeTable 中「建筑面积(㎡)」列过宽且被 amountFormatter 默认右对齐，需固定列宽并显式居中覆盖。\n\n## 问题根因\n- 建筑面积列被弹性列宽拉得过宽。\n- amountFormatter 使金额/面积列默认右对齐，仅改 align 无效。\n\n## 解决方案\n- 对该列设固定 width（如 130，表头挤可改 140），并同时设 align 与 headerAlign: 'center'。\n- 一般/议题/多选/维修表决及业委会选举等多份 DecisionRangeTable/DecisionDetailTable 需同步改。\n- 「选择户室」子弹窗内 buildArea 列保持右对齐不动。\n\n## 验证与归属\n- 验证：建筑面积(㎡)列统一固定宽度 130px、表头与单元格居中；width:130 列不再参与弹性拉伸；align/headerAlign:'center' 覆盖 amountFormatter 默认右对齐。\n- 涉及文件：zhi2-web-admin/src/views/autonomy/general/components/DecisionRangeTable.vue 等多处 DecisionRangeTable.vue\n- 所属项目：惠山二期G；来源会话：c7c8aad3-9140-4aaf-b908-9e7f763dc5a3；代码基线：b6d054d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/house_change_num.md",
+                "memory_type": "entities",
+                "after": "# 房屋变更可选字段 houseNum 对接套路\n后端新增可选字符串字段（如不动产房屋编码 houseNum）时，前端需双表单加项、变更对比并靠 rules 白名单控制必填。\n\n## 交付清单\n- form/formOld（变更页）/contentInfo 只读区同步加项；变更详情用与 unitCode 一致的 v-tooltip 对比；列表补列 prop:'houseNum'。\n\n## 校验注意\n- 勿假设「没写 required 就是非必填」：在 houseChange/detail.vue 的 rules 显式核对，仅保留业务必填项（项目/楼幢/单元/房号/物理层/名义层/用途/实测面积等）。\n- 起始层/终止层/结构/规划用途/房屋性质/交付类型/houseNum 等勿误加 required。\n\n## 附加建议\n- 变更页可对绑房风险加 form-tip 文案（灵锡通等），详情编辑态是否同款提示单独确认。\n\n## 验证与归属\n- 验证：新增字段全部可选不传不报错；form/formOld 增加 houseNum 带变更对比 v-tooltip；已核对 rules 未对 floorStart、houseNum 等加 required；方案 B 灰色 form-tip 灵锡通绑房风险提示。\n- 涉及文件：zhi2-web-admin/src/views/building/house/detail.vue、zhi2-web-admin/src/views/building/houseChange/detail.vue、zhi2-web-admin/src/views/building/houseChange/index.vue\n- 所属项目：惠山二期G；来源会话：529b867b-1637-4025-9de4-fa798457ace6；代码基线：adccd7e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/map_layer_fix.md",
+                "memory_type": "entities",
+                "after": "# 小区台账地图街道气泡与小区点混显修复\nbenefit/statisticsMap 缩放或下钻时偶发街道气泡与小区点同时显示或标记残留，需父子组件协同修复异步竞态与重绘。\n\n## 父页 index.vue 修复\n- 用 areaLayerLoadSeq 丢弃过期区域层加载结果。\n- 缩放事件 200ms 防抖，拆 handleMapZoomChange/processMapZoomChange。\n- 层级切换立即清空 markList 并同步 markListLayerLevel；loadAreaComplexLayer 支持 restoreOnFail；下钻前清空 markList；用 resolveOverviewLayerLevel 替代硬编码 'district'。\n\n## 子组件 map.vue 修复\n- markerRenderSig 改为全列表内容签名，列表变化必触发重绘。\n- _overlayLayers 追踪所有图层，clearMarkers 统一 destroy。\n- _markerRedrawSeq：markList 为空时立即清图层避免残留。\n\n## 迁移与回归\n- 从其他分支迁移须保留目标分支已有地图行为修复（如 setProgrammaticView、syncMapView 的 zoomUnchanged+panTo）避免回归。\n- 回归标准：街道↔小区反复缩放不混显；下钻过渡旧气泡消失；快速滚轮无叠加；搜索定位正常。\n\n## 验证与归属\n- 验证：小区台账地图有时显示小区又显示街道，子模块 2.6.2-suzhufang 修复过迁移过来；新增 areaLayerLoadSeq；markerRenderSig 全列表签名；markList 为空立即清图层；保留惠山修复 setProgrammaticView bug3619、syncMapView zoomUnchanged+panTo bug2966。\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue\n- 所属项目：惠山二期G；来源会话：73211399-9c08-4ecc-af7f-b78cecabbc2e；代码基线：341682e"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

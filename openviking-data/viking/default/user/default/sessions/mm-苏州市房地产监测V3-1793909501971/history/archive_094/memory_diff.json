@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_094",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T01:11:20.049126+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/parcel_extract.md",
+                "memory_type": "entities",
+                "after": "# 项目备案详情页宗地信息提取能力\n苏州市房地产监测V3 中项目备案详情页「宗地信息」区块新增「提取」按钮，可从外部地块库拉取并写入宗地数据。\n\n## 实现要点\n- ParcelTable.vue 在「新增」与「删除」间增加「提取」按钮，草稿态（bizState=='0'）与新增同栏显示，权限同「新增」：building:relProjectParcel:add（变更场景 relProjectParcelChange:add）\n- 新建 ParcelExtractDialog.vue，标题「选择地块编号」，关键字搜索字段 landSn（maxlength 256）\n- 列表请求 POST /building/landPlot/pageLandPlotFromExternal，分页参数 current/size；表格列：勾选、序号、地块编号、地址、用途(purpose)、所属区域(regionName)\n- 单选一行确认后 POST /building/landPlot/add，带入 externalId、landSn、address、singleUseArea、landTotalAmount、transferTime、registeredFlag:'1'\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：ParcelTable.vue、ParcelExtractDialog.vue\n- 所属项目：苏州市房地产监测V3；来源会话：83974b85-1d76-494b-8d6a-2f709afa82c4；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/branch_preview_fix.md",
+                "memory_type": "entities",
+                "after": "# 分支机构页面图片预览与必传附件校验修复\n苏州市房地产监测V3 中分支机构页面修复了图片预览失效与保存时未校验必传附件两个问题。\n\n## 图片预览修复\n- 根因 ImageGrid.vue：file_type 字典未匹配时 elem 为 undefined，访问 elem.remark 抛错导致缩略图和预览整体失效\n- 安全匹配字典项，用 dictValue==='0' 判断是否为图片（与项目其他附件组件一致）\n- 缩略图优先使用 fileThumbnailSite，预览使用 fileSite；修正预览索引计算避免混合类型错位\n- FileList.vue 预览按钮支持大小写不敏感，扩展 gif/webp/bmp 等格式\n\n## 必传附件校验\n- 根因 AgencyBranchDetail 保存时只校验表单字段，未检查必传要件\n- 新增 src/utils/appendix.js 的 checkRequiredAppendix 工具函数\n- handleSave 提交前调用，缺少必传附件提示「请上传：xxx」；CancelDialog 注销确认前同步校验\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：ImageGrid.vue、FileList.vue、src/utils/appendix.js、AgencyBranchDetail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：7dc2bf6f-2c30-4f16-b810-f728fa38f9d8；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/permit_cancel_save_fix.md",
+                "memory_type": "entities",
+                "after": "# 预售注销保存后缀被错误改写修复\n苏州市房地产监测V3 中预售注销详情页保存接口因请求拦截器误改写后缀导致 400，已在 REST_ACTIONS 增加 save 修复。\n\n## 问题根因\n- detail.vue（presale/permitCancel）已正确配置 addApiSuffix/editApiSuffix 均返回 '/save'\n- 保存拼出 /presale/permit/cancel/save，但 apiV3Normalize.js 将其解析为动作 cancel + 参数 save\n- 因 cancel 在 REST_ACTIONS 中，最终 URL 变为 /presale/permit/cancel，导致 POST 返回 400\n\n## 修复方案\n- 在 apiV3Normalize.js 的 REST_ACTIONS 中增加 save，使 /save 被识别为标准动作\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：detail.vue、form.js、apiV3Normalize.js\n- 所属项目：苏州市房地产监测V3；来源会话：c054e576-0507-404b-9ea6-e0d5d61ca641；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/buildinginfo_api_migration.md",
+                "memory_type": "entities",
+                "after": "# 楼盘表 API 路径迁移\n苏州市房地产监测V3 中将全部 /building/buildinginfo 基础路径统一替换为 /building/building，共修改 17 个文件 25 处引用。\n\n## 变更摘要\n- API 层：buildinginfo.js（7 处）、unitinfo.js（1 处）\n- 定金缴款（截图 400 报错）：BuildingDialog.vue → /building/building/listNofenye\n- 其他业务组件：监管协议、进度管理、解封保证金、楼幢管理等 13 个 Vue 文件\n- 流程配置：路由信息.json 中 approval/submit API\n\n## 未改动项\n- 子路径名如 listNofenye、buildinginfo1/add、xyBuilding 等\n- 前端目录 projectManagement/buildinginfo/\n- building/buildingChange/* 变更模块\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：buildinginfo.js、unitinfo.js、BuildingDialog.vue、路由信息.json\n- 所属项目：苏州市房地产监测V3；来源会话：b46a5433-8dbe-4b79-a009-979887275173；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

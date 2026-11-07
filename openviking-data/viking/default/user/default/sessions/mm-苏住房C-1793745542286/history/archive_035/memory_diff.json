@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_035",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T23:48:17.322625+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/suzhufang_c_tech/swiper_null_key_bug.md",
+                "memory_type": "entities",
+                "after": "# New house swiper null protection and unstable key crash\nSuZhuFang C new house carousel component lacked null protection and used index as key, causing item undefined error in WeChat mini program after video insertion.\n\n## Symptoms and Root Cause\n- Carousel rendered item.fileSite without null protection; detail.vue pushed items one by one with :key=\"index\" unstable\n- In WeChat mini program, inserting video shifted indices, making item undefined and triggering property access error\n- Pattern shared across swiperComponent.vue, detail.vue and multiple house detail pages\n\n## Solution\n- Use optional chaining item?.fileSite in template to avoid null crashes\n- Change key to item.fileSite || index instead of pure index for stable identity\n- Assign this.allImg = mediaList in one shot in detail.vue to avoid intermediate push states\n\n## Verification and Attribution\n- Verification evidence: src=苏住房C/063.md\n- Involved files: src/components/commonNew/swiperComponent.vue, src/pages_transaction/newHouse/detail.vue, src/pages/commonNew/swiperComponent.vue, src/pages_transaction/stockHouse/detail.vue, src/pages_main/houseMap/components/NewHouse.vue, src/pages_transaction/newHouse/houseTypeDetail.vue, src/pages_transaction/buildingAlbum/index.vue, src/utils/index.js\n- Project: SuZhuFang C; source session: db12bfb7-5b5d-404f-93cd-258941957c3c; code baseline: none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/suzhufang_c_tech/sfb_token_v1_bug.md",
+                "memory_type": "entities",
+                "after": "# SFB login only stored V2 token missing V1 swap\nSuZhuFang C SFB login logic only saved V2 token without swapping for V1 token, causing apiV1 requests depending on V1 token to fail.\n\n## Symptoms and Root Cause\n- After SFB login, interfaces requiring V1 token failed\n- App.vue initSfbUser only saved V2 token, did not call getTokenV1() to obtain V1 token\n- userStore.tokenV1 was not written, apiV1 requests lacked authentication\n\n## Solution\n- Immediately call getTokenV1() after setting V2 token in initSfbUser and write result to userStore.tokenV1\n- Ensure subsequent apiV1 requests carry correct V1 token\n\n## Verification and Attribution\n- Verification evidence: src=苏住房C/064.md\n- Involved files: src/App.vue, src/store/user.js, src/api/maintenance.js, src/api/security.js, src/pages/redirect/index.vue, src/api/index.js, src/api/v1Instance.js, src/pages/login/index.vue\n- Project: SuZhuFang C; source session: cf09ca87-b417-43c0-b05d-5168f3aa3e55; code baseline: none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/repair_onshow_reset.md",
+                "memory_type": "entities",
+                "before": "# 报修提交页onShow重载覆盖已选房屋\n苏住房C市民端报修提交页在onShow中无条件重载房屋列表，导致从子页返回时用户手动选择的房屋被默认逻辑重置，报修挂错房屋。\n\n## 问题现象与根因\n- 报修提交页表单「所在房屋」从A切到B，点「报修设施设备」进入选择页，返回后房屋变回A，后续报修挂到错误房子\n- submit.vue的onShow每次调getHouseList()重新拉列表，按优先级自动纠正选中项（userStore.houseId全局默认→当前小区房屋→列表第一项）\n- 从子页面返回触发onShow，手动选择被默认逻辑覆盖；此类「onShow重载数据+表单默认值推导」组合必现且不明显报错\n\n## 解决方案\n- getHouseList内先判断form.house是否已有值：有则在刷新后列表找到对应项，补齐complexId/complexName/userIdentityId/houseId/position等联动字段后return，跳过默认房屋逻辑\n- 仅用户未选过时才走默认优先级\n- 同类排查：任何onShow/onActivated调用带默认值推导的加载函数都要检查是否覆盖已填内容，从选择类子页返回是最高发触发路径\n\n## 验证与归属\n- 验证：会话f5c3361f用户报切换房屋A→B返回变回A；定位submit.vue的onShow→getHouseList按默认重置；修复为data.house有值时按选中项回填5个字段并return\n- 涉及文件：src/pages_owner_extra/repair/submit.vue、chooseFacility.vue、src/pages_owner/repair/submit.vue、chooseFacility.vue\n- 所属项目：苏住房C；来源会话ID：f5c3361f-ac2a-43fa-8586-7a2d7934e203；代码基线：b7bf813",
+                "after": "# 报修提交页onShow重载覆盖已选房屋\n苏住房C市民端报修提交页在onShow中无条件重载房屋列表，导致从子页返回时用户手动选择的房屋被默认逻辑重置，报修挂错房屋。\n\n## 问题现象与根因\n- 报修提交页表单「所在房屋」从A切到B，点「报修设施设备」进入选择页，返回后房屋变回A，后续报修挂到错误房子\n- submit.vue的onShow每次调getHouseList()重新拉列表，按优先级自动纠正选中项（userStore.houseId全局默认→当前小区房屋→列表第一项）\n- 从子页面返回触发onShow，手动选择被默认逻辑覆盖；此类「onShow重载数据+表单默认值推导」组合必现且不明显报错\n\n## 解决方案\n- getHouseList内先判断form.house是否已有值：有则在刷新后列表找到对应项，补齐complexId/complexName/userIdentityId/houseId/position等联动字段后return，跳过默认房屋逻辑\n- 仅用户未选过时才走默认优先级\n- 同类排查：任何onShow/onActivated调用带默认值推导的加载函数都要检查是否覆盖已填内容，从选择类子页返回是最高发触发路径\n\n## 验证与归属\n- Verification: session f5c3361f user reported house A->B reset to A on return; located submit.vue onShow->getHouseList default reset; fixed by returning 5 fields when data.house has value\n- Verification evidence: src=苏住房C/062.md\n- Involved files: src/pages_owner_extra/repair/submit.vue, chooseFacility.vue, src/pages_owner/repair/submit.vue, chooseFacility.vue, src/pages_owner/repair/add.vue, src/pages_owner_extra/repair/index.vue, src/pages.json\n- 所属项目：苏住房C；来源会话ID：f5c3361f-ac2a-43fa-8586-7a2d7934e203；代码基线：b7bf813"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/tab_vmodel_override.md",
+                "memory_type": "entities",
+                "before": "# uni-app自定义tab同时写v-model与@update致切tab不请求\n苏找房页面切换标签时高亮变化但列表不刷新，因对自定义tab组件同时写v-model与@update:model-value导致监听被覆盖，逻辑未执行。\n\n## 问题现象与根因\n- 苏找房页切「推荐/新房/二手房」tab高亮正常，但列表数据不刷新、不发请求、控制台无报错\n- 模板对ProjectTabBar同时写v-model和@update:model-value=\"tabChange\"；uni-app中v-model编译的update:modelValue监听覆盖同名自定义监听\n- 结果curTab被v-model更新（高亮切换），tabChange从不执行，$refs.paging.reload()不被调，列表接口不重发\n\n## 解决方案\n- 去掉v-model，只保留:model-value + @update:model-value=\"tabChange\"单一数据流\n- tabChange里写入新tab后在$nextTick之后调reload()，保证curIndex更新再触发分页请求\n- 删掉手动this.houseList=[]，列表重置交z-paging的reload()统一负责，避免自动重置与手动清空打架闪烁\n- 修完按tab核对请求：推荐listRecommend、新房pageByKeyWord、二手房houseInfoDisplayList\n\n## 验证与归属\n- 验证：会话6e707628用户报苏找房切换tag没调接口；定位Project_Suzhufang.vue第67行原含v-model；修复为去v-model、$nextTick后reload、删手动清空\n- 涉及文件：src/pages/index/components/Project_Suzhufang.vue、menu/ProjectTabBar.vue、src/pages/index/project.vue、src/components/ZsPaging/ZsPaging.vue\n- 所属项目：苏住房C；来源会话ID：6e707628-a295-466a-98ef-4fff34cf5423；代码基线：9832ba3",
+                "after": "# uni-app自定义tab同时写v-model与@update致切tab不请求\n苏找房页面切换标签时高亮变化但列表不刷新，因对自定义tab组件同时写v-model与@update:model-value导致监听被覆盖，逻辑未执行。\n\n## 问题现象与根因\n- 苏找房页切「推荐/新房/二手房」tab高亮正常，但列表数据不刷新、不发请求、控制台无报错\n- 模板对ProjectTabBar同时写v-model和@update:model-value=\"tabChange\"；uni-app中v-model编译的update:modelValue监听覆盖同名自定义监听\n- 结果curTab被v-model更新（高亮切换），tabChange从不执行，$refs.paging.reload()不被调，列表接口不重发\n\n## 解决方案\n- 去掉v-model，只保留:model-value + @update:model-value=\"tabChange\"单一数据流\n- tabChange里写入新tab后在$nextTick之后调reload()，保证curIndex更新再触发分页请求\n- 删掉手动this.houseList=[]，列表重置交z-paging的reload()统一负责，避免自动重置与手动清空打架闪烁\n- 修完按tab核对请求：推荐listRecommend、新房pageByKeyWord、二手房houseInfoDisplayList\n\n## 验证与归属\n- Verification: session 6e707628 user reported SuZhaoFang tab switch no interface call; located Project_Suzhufang.vue line 67 had v-model; fixed by removing v-model, reload after $nextTick, remove manual clear\n- Verification evidence: src=苏住房C/063.md\n- Involved files: src/pages/index/components/Project_Suzhufang.vue, menu/ProjectTabBar.vue, src/pages/index/project.vue, src/components/ZsPaging/ZsPaging.vue, src/components/commonNew/tabLine.vue, src/hooks/usePaging.js, src/pages.json\n- 所属项目：苏住房C；来源会话ID：6e707628-a295-466a-98ef-4fff34cf5423；代码基线：9832ba3"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

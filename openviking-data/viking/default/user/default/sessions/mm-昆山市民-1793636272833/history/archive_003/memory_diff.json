@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-昆山市民-1793636272833/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T16:22:55.285711+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/h5_subdir_deploy.md",
+                "memory_type": "entities",
+                "after": "# 昆山市民H5子目录部署模式（wyzx）\n昆山市民H5常部署在服务器子目录（如 /wyzx/），通过 hash 路由与 relativeBasePlugin 实现资源正确解析。\n\n## 部署形态\n- 实际访问 URL 为 `https://<domain>/wyzx/index.html#/pages_home/home?code=xxx`，应用内无 `wyzx` 路由名。\n- `manifest.json` 使用 hash 模式、`base: ./`；构建由 `vite.config.js` 的 `relativeBasePlugin` 注入脚本。\n- 插件按 `location.pathname` 动态写 `<base href>`，使 `./assets` 解析到子目录而非域名根。\n- 代码库无 `wyzx` 字符串，判定为 Nginx 子目录转发。\n\n## 参数读取\n- 新增 H5 登录参数（如鹿路通 code）应从当前 URL query 读取，与 hash 路由并存。\n- 避免将 query 参数误当作 hash 路由路径处理。\n\n## 验证与归属\n- 验证：会话 38f18afc 探索结论，含 relativeBasePlugin 片段与访问形态说明。\n- 涉及文件：`src/manifest.json`、`vite.config.js`、`index.html`。\n- 所属项目：昆山市民；代码基线：8307de5；来源会话ID：38f18afc-96e1-4341-aebd-46d880b667ca。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/pdfjs_at_polyfill.md",
+                "memory_type": "entities",
+                "after": "# 物业合同PDF预览 Array.at 兼容问题\n微信等移动端 WebView 不支持 ES2022 的 `Array.prototype.at`，导致 pdfjs-dist 打开物业合同 PDF 报错。\n\n## 问题根因\n- 微信内置浏览器等移动端 WebView 不支持 ES2022 的 `Array.prototype.at`。\n- `pdfjs-dist` 内部使用 `.at()`，打开物业合同 PDF 时报 `t.at is not a function`。\n\n## 修复方案\n- 新增 `src/utils/pdfPolyfill.js`，在加载 pdfjs 前为 `Array`/`TypedArray` 补 `.at`。\n- `filePreview.vue` 最先引入 polyfill，并改用 `pdfjs-dist/legacy/build`。\n- 保留 `globalThis.pdfjsWorker` 注册以免 worker 加载失败。\n\n## 验证与归属\n- 验证：会话 d22bb0e1 最终结论，含报错与修复要点。\n- 涉及文件：`src/utils/pdfPolyfill.js`、`src/pages/common/filePreview.vue`、`src/pages_contract/detail.vue`。\n- 所属项目：昆山市民；代码基线：75db5a8；来源会话ID：d22bb0e1-fc61-42cb-bfc2-13d1d148fd21。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/pdf_canvas_fix.md",
+                "memory_type": "entities",
+                "after": "# H5合同PDF预览 scroll-view与uni canvas不可用\nH5 下 `scroll-view` 与 uni-app `<canvas>` 导致物业合同 PDF 预览失败，需改用原生 canvas + pdfjs。\n\n## 问题根因\n- H5 下用 `scroll-view` 会在子节点未就绪时反复读 `offsetWidth`，控制台大量 `Cannot read properties of null (reading 'offsetWidth')`。\n- 用 `document.getElementById` 绑 uni-app 的 `<canvas>` 拿不到真实绘图节点，pdfjs 无法渲染，最终 catch 显示「文件加载失败」。\n\n## 修复方案\n- 滚动区改为普通 `view` + `overflow-y: auto`。\n- PDF 每页用原生 DOM 动态创建 `canvas` 渲染；`nextTick` 后再挂载。\n- 部署后仍失败时核对附件 URL 是否需带登录 token。\n\n## 验证与归属\n- 验证：会话 a046a6f8 用户反馈物业合同预览报错，结论明确两点根因与 filePreview.vue 改造方案。\n- 涉及文件：`src/pages/common/filePreview.vue`、`src/pages_contract/detail.vue`。\n- 所属项目：昆山市民；代码基线：c8c1c24；来源会话ID：a046a6f8-9e58-45ea-a7be-81dc2f303792。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/llt_download_bridge.md",
+                "memory_type": "entities",
+                "after": "# 鹿路通 web-view 内附件下载桥接\n昆物通嵌入鹿路通后，web-view 内 H5 不能直接下载，需调宿主小程序 navigateTo downloadFile action。\n\n## 实现方式\n- 在 `wx.miniProgram.getEnv` 判断 `miniprogram` 后，`navigateTo` 到 `/pages/action/index?action=downloadFile&data=${encodeURIComponent(JSON.stringify({ url, type }))}`。\n- `type`：1 图片 / 2 视频 / 3 文档；参数语义对齐 `wx.downloadFile`。\n- 实现落在 `src/utils/wxJssdk.js` 与 `src/utils/index.js` 下载入口。\n\n## 发版信息\n- 发版 tag 示例：`suzhou-kunshan-wuguan-v1.40.21`。\n\n## 验证与归属\n- 验证：会话 01a162c8 需求背景与鹿路通文档第六点一致，提交 2236a26 feat 鹿路通 web-view 内附件下载适配。\n- 涉及文件：`src/utils/wxJssdk.js`、`src/utils/index.js`。\n- 所属项目：昆山市民；代码基线：2236a26；来源会话ID：01a162c8-dee7-70c5-a400-75ccd003ebdf。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

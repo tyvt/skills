@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793813941148/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T17:42:00.719833+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/maintain_vote_blank_page.md",
+                "memory_type": "entities",
+                "after": "# 维修资金发起表决空白页\n太仓G 点击「发起表决」后跳转维修资金表决新增页出现空白页，已定位修复路由名称不匹配与页面初始化报错两类问题。\n\n## 问题根因\n- 路由名称写死为 `OwnerDecision/maintain/:tableid`，重构后后台菜单实际为 `MaintainDecision/maintain/:tableid` 或 `estate/maintainDecision/detail`，路由对不上导致跳转失败或加载错误组件\n- 表决详情页 `maintainDecision/detail.vue`、`ownerDecision/detail.vue` 多处直接使用 `$route.name.split('/')`，当路由没有 `name` 时抛异常致页面白屏\n\n## 修复内容\n- 在 `decisionCommon/config.js` 新增 `pushMaintainDecisionDetail()`：按后台菜单自动匹配正确路由（优先 `estate/maintainDecision/detail`），兼容 `MaintainDecision`/`OwnerDecision` 两种历史路由名\n- 新增 `parseMaintainVoteSession()`：安全读取发起表决时预填的会话数据\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：`maintainDecision/detail.vue`、`ownerDecision/detail.vue`、`decisionCommon/config.js`、`fundUsageKs/steps/step4-5.vue`、`home/components/VoteTable.vue`\n- 所属项目：太仓G；来源会话：5ba671bd-1b41-4095-aeb7-c9806fc7b5c2；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_area_hidden.md",
+                "memory_type": "entities",
+                "after": "# 表决明细区域被条件遮挡\n太仓G 一般表决、业委会选举表决、选项表决的下方明细区域曾被 `mainCardValue == 0` 条件挡住，已在明细页补回决策明细区域。\n\n## 问题根因\n- 下方明细区域被 `mainCardValue == 0` 条件遮挡，在「业主决策明细/投票信息」页被隐藏，仅「基本信息」页可见\n\n## 修复内容\n- 一般表决：「业主决策明细」页图表下方增加决策明细区域；基本信息页用 `DecisionRangeTableLite`，明细页用完整版 `DecisionRangeTable`（含楼幢筛选、导出、投票状态）\n- 选项表决：「投票信息」页下方增加决策明细区域；`VoteView` 合并 `getVoteResult` 与 `listOption` 配置数据展示全部已配置表决项（含得票为 0 的项），占比保留 2 位小数\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：`estate/decisionCommon/config.js`、`generalDecision/detail.vue`、`maintainDecision/detail.vue`\n- 所属项目：太仓G；来源会话：e13c8223-12b6-4281-8230-5e3a8484ebd6；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/revote_button_showrevote.md",
+                "memory_type": "entities",
+                "after": "# 重新发起表决按钮状态限制\n太仓G 业委会选举表决详情在未开始状态下误显示「重新发起表决」按钮，已修复为仅在表决结束后才显示。\n\n## 问题根因\n- 「重新发起表决」按钮缺少状态判断，未开始或正在进行时也会显示\n\n## 修复内容\n- 为「重新发起表决」增加 `showRevote` 判断：仅在表决已结束（`decisionState === '3'`）且有表决结果时才显示\n- 修改涉及 4 个详情页：`ownerDecision/detail.vue`（保留 `isMaintainVote` 限制）、`maintainDecision/detail.vue`、`sortDecison/detail.vue`、`generalDecision/detail.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：`ownerDecision/detail.vue`、`maintainDecision/detail.vue`、`sortDecison/detail.vue`、`generalDecision/detail.vue`\n- 所属项目：太仓G；来源会话：01a8eeed-a239-440f-a22a-c0d4d152ab18；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/add_button_draft.md",
+                "memory_type": "entities",
+                "after": "# 新增按钮仅草稿态显示\n太仓G 一般表决、选项表决、业委会选举的「新增」按钮原与昆山逻辑不一致，已改为仅在业务状态为草稿（`bizState == '0'`）时显示，备案后隐藏。\n\n## 问题根因\n- 「新增」按钮条件缺少 `bizState` 判断，备案后（bizState == '2'）仍显示灰色禁用按钮，与昆山行为不一致\n\n## 修复内容\n- `decisionCommon/DecisionRangeTable.vue`：条件由 `v-if=\"showAdd\"` 改为 `v-if=\"showAdd && bizState == '0'\"`，备案后直接隐藏\n- `optionDecision/DecisionRangeTable.vue`：「新增」增加 `v-if=\"bizState == '0'\"`，备案后隐藏\n- `generalDecision/detail.vue`：`:show-add=\"mainCardValue == 0 && form.bizState == '0'\"`\n- `ownerDecision/detail.vue`：`:show-add=\"mainCardValue == 0 && isMaintainVote && form.bizState == '0'\"`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：`decisionCommon/DecisionRangeTable.vue`、`optionDecision/DecisionRangeTable.vue`、`generalDecision/detail.vue`、`ownerDecision/detail.vue`\n- 所属项目：太仓G；来源会话：89bb77f4-3a29-4d39-a60c-9a379a96022d；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

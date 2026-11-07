@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793663675616/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T23:59:58.345802+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/rejected_todo_prefix.md",
+                "memory_type": "entities",
+                "after": "# 园区公共收益待办驳回前缀规范\n园区公共收益项目(zhi2-web-admin)中，被驳回后回到待提交的单据需在待办主题展示层统一加「<驳回>」前缀。\n\n## 识别与抽取\n- 识别驳回单据：comment.type === '3' 或 comment.comment === '驳回'\n- 列表是否收录由后端查询决定，前端仅在展示层加前缀\n- 新增 utils/todoTask.js，导出 isRejectedTodoTask、formatTodoTaskTitle、normalizeTodoTaskRows\n\n## 规范入口\n- flowable/todo.vue 的 listCallback\n- home/index.vue 拉待办后\n- home/components/TodoTable.vue 三处入口须同步规范化，避免首页与工作中心不一致\n\n## 验证与归属\n- 验证：接口返回 comment.type === '3' 或 comment.comment === '驳回'；新增 todoTask.js 并改三处入口\n- 涉及文件：src/utils/todoTask.js、src/views/flowable/todo.vue、src/views/home/index.vue、src/views/home/components/TodoTable.vue\n- 所属项目：园区公共收益；来源会话：35f936a1-c453-4bbf-9d57-01b517ff7164；代码基线：0c9b8c2"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/withdraw_approvalapi_405.md",
+                "memory_type": "entities",
+                "after": "# 我发起的流程撤回405与approvalApi校验收敛\n园区公共收益项目(zhi2-web-admin)中，「我发起的」点撤回报405，根因是流程配置 approvalApi 写成纯数字导致拼成 /api/v2/2。\n\n## 问题根因\n- 工具→工作流→流程配置里 approvalApi 配成 `2` 等不含 `/` 的非法值，与 baseURL 拼接后非真实业务路径，网关返回 Method Not Allowed\n- 旧版 process.vue 撤回常缺当前节点 key，且未校验 approvalApi，错误配置会直接发请求\n\n## 解决方案\n- 在 flowApi.js 收敛 withdrawProcess：approvalApi 必须含 `/`，否则拒绝直调\n- 异常时从业务详情 path 推导（如 /benefit/xxx/123 → /benefit/xxx/approval）\n- 先调 flowViewer 取当前节点 key，再 POST 审批接口\n- process.vue 与详情页撤回统一走该函数；联调时 approvalApi 改成 /benefit/pubAllotNotice/approval\n\n## 验证与归属\n- 验证：会话 b81ac1e2 撤回请求 URL /api/v2/2、POST、405；结论写 approvalApi 错配为 2，新增 withdrawProcess 校验与 key 补齐\n- 涉及文件：src/utils/flowApi.js、src/views/flowable/process.vue、src/views/tool/workflow/components/ConfigDialog.vue\n- 所属项目：园区公共收益；来源会话：b81ac1e2-1917-4945-a8fc-a5c38eb2ae6f；代码基线：0c9b8c2"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/landplotcode_zs_remark.md",
+                "memory_type": "entities",
+                "after": "# landPlotCode自动写入zs-remark请求头\n园区公共收益同源 Web 后台(zhi2-web-admin)约定：请求体或参数带 landPlotCode 时，拦截层自动写入 zs-remark 请求头。\n\n## 映射规则\n- request.js 拦截层读取本次请求 params 或 body 中的 landPlotCode 字段，存在则写入请求头 zs-remark（值来源仍是 landPlotCode，头名不是 landPlotCode）\n- 页面上下文类头统一加 zs- 前缀：data-id → zs-data-id，menu-name → zs-menu-name，menu-path → zs-menu-path\n\n## 删除链路与编码\n- 列表/详情删除走 listMixins 时若已向删除接口传 landPlotCode，无需改调用方，拦截器自动带 zs-remark\n- 本条补「字段名→头名」映射与删除链路覆盖，非字符集问题\n- 头值含中文等非 ASCII 时需经 pageRequestContext 的 toAsciiHeaderValue（与 zs-menu-name 同套），否则 setRequestHeader 在浏览器侧抛错\n\n## 验证与归属\n- 验证：会话 266e6df1 用户要求所有接口按参数 landPlotCode 加请求头，删除 mixin 同步；头名从 landPlotCode 改为 zs-remark，并给 data-id/menu-name/menu-path 加 zs- 前缀\n- 涉及文件：src/utils/request.js、src/utils/pageRequestContext.js、src/mixins/listMixins.js、src/mixins/detailMixins.js\n- 所属项目：园区公共收益；来源会话：266e6df1-f448-4947-a921-472f6e91ee3d；代码基线：635e747"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bank_receipt_mirror.md",
+                "memory_type": "entities",
+                "after": "# 银行回单表动态列与固定操作列镜像错乱\n园区公共收益项目(zhi2-web-admin)中，业务对账页银行回单表用 v-for 动态列 + 右侧固定操作列导致列顺序镜像错乱。\n\n## 问题现象\n- 切换「银行回单数据」模式时，列从左到右与「银行对账单」镜像（如手续费在最左、序号靠近操作列）\n- bankReceiptColumns 数组顺序本身正确；同类问题在对账模块曾复发\n\n## 解决方案\n- 与对账单侧一致改为静态列定义（不用 v-for 拼列）\n- 数据加载后调用表格 doLayout() 重算布局\n- 验收列顺序：序号 → 对方账户名称 → 通知书号 → 交易日期 → 交易金额 → … → 操作\n\n## 验证与归属\n- 验证：会话 31028abc 用户报银行回单字段顺序弄反；结论指 v-for 动态列与固定操作列组合导致错乱，改静态列并 doLayout\n- 涉及文件：src/views/benefit/pubBankDetailDay/index.vue、src/components/zs-table/zs-table.vue\n- 所属项目：园区公共收益；来源会话：31028abc-b8ae-4e20-8edb-702fd8eb1e0c；代码基线：36a9a7e"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区公共收益.md",
+                "memory_type": "entities",
+                "before": "# 园区公共收益\n园区公共收益是用户维护的园区物业管理 Vue 前端项目（代码仓库 zhi2-web-admin），聚焦公共收益模块。\n\n## 描述\n- Vue 前端项目，与园区物管2.0 同源，均基于 zhi2-web-admin\n- 业务含物业管理区域四图位、账户拆分、楼盘表视图、收益类新增页（用款申请、支出合同备案等）\n- 分支命名如 develop/v2.6.2-suzhufang、develop/v2.6.2-yuanqu\n\n## 关联说明\n- 技术模式（ComplexPhoto四槽位、子表form传递、视图切换高度、监管链接初始化等）作为独立「技术模式」实体维护\n- 园区公共收益专项技术模式另有独立实体：资金缴款通知书合同名称跳转、自治公示新增动态路由、提交审批URL迁flowApi（均属「园区公共收益技术」类）\n- 另含弹窗窄栏分页器折行修复、银行明细日对账回单查看分流、弹窗批量提示与表单并排换行修复等技术模式实体\n\n## 验证与归属\n- 所属项目在多处技术模式记忆中提及；来源会话见各技术模式实体",
+                "after": "# 园区公共收益\n园区公共收益是用户维护的园区物业管理 Vue 前端项目（代码仓库 zhi2-web-admin），聚焦公共收益模块。\n\n## 描述\n- Vue 前端项目，与园区物管2.0 同源，均基于 zhi2-web-admin\n- 业务含物业管理区域四图位、账户拆分、楼盘表视图、收益类新增页（用款申请、支出合同备案等）\n- 分支命名如 develop/v2.6.2-suzhufang、develop/v2.6.2-yuanqu\n\n## 关联说明\n- 技术模式（ComplexPhoto四槽位、子表form传递、视图切换高度、监管链接初始化等）作为独立「技术模式」实体维护\n- 园区公共收益专项技术模式另有独立实体：资金缴款通知书合同名称跳转、自治公示新增动态路由、提交审批URL迁flowApi（均属「园区公共收益技术」类）\n- 另含弹窗窄栏分页器折行修复、银行明细日对账回单查看分流、弹窗批量提示与表单并排换行修复等技术模式实体\n- 另含待办驳回前缀规范、撤回approvalApi校验、landPlotCode写zs-remark头、银行回单列镜像错乱等技术模式实体\n\n## 验证与归属\n- 所属项目在多处技术模式记忆中提及；来源会话见各技术模式实体"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

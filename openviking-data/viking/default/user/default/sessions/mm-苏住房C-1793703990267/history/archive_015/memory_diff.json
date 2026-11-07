@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:35:57.025358+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhufangc_vue_router.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C 小程序 vue-router 取参失效致按钮无响应\n苏住房C 市民端因项目已移除 vue-router 依赖，页面用 useRoute() 取参会抛错使条件绑定的按钮渲染但无点击事件。\n\n## 问题现象\n- 添加房屋成功页「查看电子业主卡」点击无反应、控制台无接口请求，按钮看得见点不动\n- 根因：onShow 里用 useRoute().query 读 isOwner，useRoute() 返回 undefined 抛 TypeError，isOwner 恒为 false\n- uni-app 编译产物插槽内容始终渲染、仅点击事件按 isOwner 条件绑定，故按钮渲染但没挂 handler\n\n## 修复做法\n- 小程序页面一律在 onLoad(options) 取参并做布尔归一：isOwner = !(!options || !options.isOwner)\n- 禁用 useRoute/useRouter，grep 全量清查 src 下 vue-router 引用（本批 7 个文件）全部改为 onLoad(options)\n- 重新 build 并到 dist 产物确认已编译成 onLoad(e=>...) 再回归\n\n## 排查思路\n- 优先按「渲染无条件、绑定有条件 → 参数为 undefined → 取参用了不存在的 API」这条链查\n- 编译期不报错、页面不白屏，仅表现为点击无反应\n\n## 归属与验证\n- 所属项目：苏住房C；来源会话：880c55cb-1f23-4014-9929-32b0c295f89a；代码基线：bb6d74a\n- 验证：全局 grep 确认 src 下 vue-router 引用清零 + npm run build 通过 + 核对 dist/pages_owner/house/owner/success.js 产物\n- 涉及文件：src/pages_owner/house/owner/success.vue、house/owner/input.vue、add.vue、pages_owner_extra/elevator/input.vue、addAlone.vue、page-query/managed-property-list.vue、immediate-list.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhufangc_page_height.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C 小程序 page 高度塌陷致列表真机空白\n苏住房C 市民端消息/微聊列表因给 page 设 height:100% 致高度塌陷、ZsPaging 拿不到确定高度而整页空白。\n\n## 问题现象\n- 消息/微聊列表模拟器正常、真机空白；加 page{height:100%} 与包装层后连模拟器也不显示\n- 根因：微信小程序 page 设 height:100% 高度塌陷，flex:1 高度链断裂，ZsPaging 计算成 0 高不渲染\n\n## 修复做法\n- 撤掉 page{height:100%}/overflow:hidden 与包装层，还原原页面结构\n- 改用 height: calc(100vh - var(--nav-height))，index.vue 注入 --nav-height = 状态栏高度 + 44px\n- ZsPaging 外包 .paging-host 并写 :deep(.zs-paging){height:100%} 让内部滚动区继承确定高度\n\n## 验证与归属\n- 改完必须 build:suzhufang:mp-weixin 后真机验证，区分「空白/只显示顶部/显示暂无数据」三种现象\n- 所属项目：苏住房C；来源会话：86040ce3-4045-4591-bad4-02ee7724cc1b；代码基线：b7bf813\n- 涉及文件：src/pages_main/message/index.vue、message.vue、chitchat.vue、src/pages/message/index.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhufangc_list_photo.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C 列表绑定后端 complexPhoto 字段三件套\n苏住房C 列表展示后端相对路径图片字段 complexPhoto 需用 ZsImage 解析、rows.map 显式保留、无图回退占位图。\n\n## 适用场景\n- 决策列表等需显示小区照片时绑定后端实体 complexPhoto 字段\n- 该字段为后端相对路径（如 /zhi2-pro/...），必须走统一 URL 解析而非直接塞给 image\n\n## 修复做法\n- 模板换项目内 ZsImage，:src=\"item.complexPhoto\"、:local=\"false\" 走 resolveMediaUrl 解析\n- index.vue 与 elect/index.vue 的 rows.map 显式保留 complexPhoto，重新组装行对象逐字段列出\n- 无图或加载失败统一回退分包内占位图 images/house_szf.png，避免破图\n\n## 排查与验证\n- 前端改完须到 Network 核对接的 rows[].complexPhoto 是否有值；null/空串则问题在后端 VO 未填充，需后端补数据\n- 所属项目：苏住房C；来源会话：a33c6375-1500-460f-81a1-56831ba1739b；代码基线：8520c36\n- 涉及文件：src/pages_owner/decision/components/DecisionList.vue、decision/index.vue、components/DetailTopCard.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhufangc_phone_input.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C 手机号只读展示用原生 input 与脱敏分离\n苏住房C 市民端手机号只读展示须换原生 input + 全局 .form-plain-input，模板脱敏值与业务完整值分离。\n\n## 问题根因\n- uni-easyinput 在小程序端是独立组件、样式隔离，页面里对内部 input 的样式覆盖进不去\n- 仅在组件层打补丁会反复失败，须换原生控件或走全局类\n\n## 修复做法\n- 换原生 <input disabled>，禁用态样式沉到全局 src/styles/form.scss 新增 .form-plain-input（#999999、透明背景、高度对齐）\n- 展示与业务分离：模板显示 maskedPhone（脱敏值），form.phone 仍保存完整号码，发码/校验逻辑不动\n- 脱敏规则改到公共 formatter（blurPhone/securePhone）中间四位，13812345678 → 138****5678，改一处全部生效\n- 删掉页面里 phoneInputStyles 等 uni-easyinput 覆盖死样式\n\n## 排查与归属\n- 同类「某控件改不动」先判断是否 uni_modules 组件，再决定换原生控件还是走全局类\n- 所属项目：苏住房C；来源会话：82d303e8-ae20-4dc6-8259-63c006b5fcb0；代码基线：9cdf7b8\n- 涉及文件：src/pages_my/setting/cancellationForm.vue、phone.vue、src/styles/form.scss、src/utils/formatter.js"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

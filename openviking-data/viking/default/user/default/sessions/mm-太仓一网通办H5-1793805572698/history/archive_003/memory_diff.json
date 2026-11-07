@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓一网通办H5-1793805572698/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T15:31:21.287544+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vote_flow_sign_face.md",
+                "memory_type": "entities",
+                "after": "# 表决流程签字与人脸识别为必经步骤\n太仓一网通办H5 的参与表决页面定义了四步流程，签字与人脸识别均已接入且为提交前的强制步骤。\n\n## 流程步骤\n- ParticipateIn.vue 定义4步：选择（StepChooseCommon）、确认（StepConfirm）、签字（StepSign）、人脸识别（FaceStep）\n- 四步均实际使用，人脸识别依赖外部小程序\n\n## 提交依赖\n- 最终提交接口仅在人脸识别成功后才会调用\n- 签字步骤为必经环节，与确认步骤共同构成完整表决\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓一网通办H5\n- 涉及文件：src/views/decision/ParticipateIn.vue、src/views/decision/components/StepSign.vue、src/views/decision/components/FaceStep.vue\n- 所属项目：太仓一网通办H5；来源会话：cbc17960-f384-48d7-9b4e-db2e42efe692；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/election_result_zero_weight.md",
+                "memory_type": "entities",
+                "after": "# 业委会选举结果统计候选人得票权数显示0\n太仓一网通办H5 的业委会选举表决结果页因数据来源与字段计算错误，导致候选人得票权数统计显示为0。\n\n## 问题根因\n- GroupResult.vue 数据来源错误：候选人统计取自 selectDecisionResult 的 optionGroupResultList，该接口候选人对象无 weightSocreRatio 字段\n- 字段计算错误：使用 weightActorRatio * 100，但接口返回的 weightActorRatio 已是百分比字符串（如 \"100.00\"），不应再乘100\n\n## 修复内容\n- 改为使用 getCalculationChart 返回的 optionList\n- 占比直接取 weightSocreRatio（Number 转换，不再乘100）\n- 候选人字段示例：weightSocre=\"1\"（得票数）、weightSocreRatio=\"50.00\"（得票权数占比%）、weightActorRatio=\"100.00\"（得票参与比例%）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓一网通办H5\n- 涉及文件：src/views/election/components/GroupResult.vue、src/views/election/ElectionResult.vue、src/views/decision/components/ProgressBar.vue、src/views/owner-decision/components/ResultStatisticsTab.vue\n- 所属项目：太仓一网通办H5；来源会话：fa7fcf41-4dd6-479b-95dc-fc0517ba9715；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/step_confirm_option_blank.md",
+                "memory_type": "entities",
+                "after": "# 选项表决确认页内容空白\n太仓一网通办H5 的选项表决在选择决策项后点击下一步，确认页仅显示「我的决策」标题而内容区域为空。\n\n## 问题根因\n- StepConfirm.vue 仅实现了一般表决（MAINTAIN）展示逻辑，选项表决（OPTION）无对应模板\n\n## 修复内容\n- 新增 selectedOptionItems 计算属性，从 optionGroupList 读取已勾选选项（checked: true）\n- 当 decisionType === 'OPTION' 时展示已选决策项名称\n- 样式与选择页一致（蓝色边框 + 浅蓝背景）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓一网通办H5\n- 涉及文件：src/views/owner-decision/components/StepConfirm.vue、src/views/owner-decision/ParticipateIn.vue、src/views/owner-decision/components/OptionStepChoose.vue、src/views/decision/components/StepConfirm.vue\n- 所属项目：太仓一网通办H5；来源会话：6eb5120c-c134-4e15-a744-163291e6d855；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/optionstep_maxselect_bug.md",
+                "memory_type": "entities",
+                "before": "# OptionStepChoose wrong maxSelect reads decision-level optionNum\nIn 太仓一网通办H5, OptionStepChoose.vue's maxSelect prioritizes decision-level view.optionNum (total option count) instead of group-level currentGroup.optionNum (max selectable count), misjudging the limit as 4 and allowing over-selection.\n\n## Root Cause\n- OptionStepChoose.vue's maxSelect prioritizes decision-level view.optionNum (total option count)\n- Does not use group-level currentGroup.optionNum (max selectable count), so limit misjudged as 4\n\n## Fix\n- Prioritize group-level optionNum and minOptionNum\n- Add second validation on submit\n\n## Verification\n- Evidence: extracted source=cursor session=31fcae87-08be-423a-9da7-ea37db71840b\n- Files: src/views/owner-decision/components/OptionStepChoose.vue, src/store/vote.ts, src/views/decision/components/StepChoose.vue, src/store/vote.js, src/api/modules/decision.ts, src/views/election/ElectionParticipate.vue, src/views/owner-decision/ParticipateIn.vue, src/views/owner-decision/OwnerDecisionDetail.vue\n- Project: 太仓一网通办H5; source session: 31fcae87-08be-423a-9da7-ea37db71840b; code baseline: none",
+                "after": "# OptionStepChoose 选项表决最多选择项数错误\n太仓一网通办H5 的选项表决页面因 maxSelect 优先级错误，导致 C 端可选出超过分组配置上限的选项数。\n\n## 问题根因\n- OptionStepChoose.vue 第79-82行 maxSelect 取值顺序有误：优先使用决策级 view.optionNum（选项总数，本例为4）而非分组级 currentGroup.optionNum（最多可选数，后台配置为3）\n- 代码 `return Number(view.optionNum) || Number(currentGroup.value?.optionNum) || 0` 先读决策级4，使上限被误判为4\n\n## 修复内容\n- 调整上限字段优先级：存在分组时优先使用 currentGroup.optionNum 作为最多可选数\n- 补充下限字段：分组级也支持 minOptionNum\n- 提交时二次校验：点击「下一步」时再次检查是否超过上限\n\n## 验证证据\n- 重新进入选项表决页面（决策 ID 2493）测试：最多应只能选3项，选第4项时提示「最多选择3项」\n- 涉及文件：src/views/owner-decision/components/OptionStepChoose.vue、src/store/vote.ts、src/views/decision/components/StepChoose.vue、src/store/vote.js、src/api/modules/decision.ts、src/views/election/ElectionParticipate.vue、src/views/owner-decision/ParticipateIn.vue、src/views/owner-decision/OwnerDecisionDetail.vue\n- 所属项目：太仓一网通办H5；来源会话：31fcae87-08be-423a-9da7-ea37db71840b；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

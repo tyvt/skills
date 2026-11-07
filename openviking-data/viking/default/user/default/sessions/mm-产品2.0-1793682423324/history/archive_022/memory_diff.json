@@ -1,0 +1,43 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_022",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:02:07.019848+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/detail_template_original_badge.md",
+                "memory_type": "entities",
+                "after": "# 详情模板变更前原值角标\ndetail-template 新增「变更显示」能力，单元格右上角红色三角显示原值，需保证原值与主值走相同 formatter/字典/区划链路。\n\n## 问题根因\n- 原值单独放在详情接口返回的 originalObj，与主对象字段同名，但未走与主值相同的格式化\n- 字典展示有两套键：getDicts/DictTag 用 dictValue/dictLabel，旧函数只查 value/label 导致静默露码（物业类型、所属社区）\n- 所属社区依赖 subdistrict 社区列表，变更前后街道不同时并行请求会竞态覆盖 communityOptions\n- 原值不经 formatter 时日期、金额、字典字段两侧不可比\n\n## 修复方案\n- 字段配置挂「变更前取值」绑定 originalObj 同名 key，渲染走与主值完全相同的 formatter/字典/区划链路后比较，相同则不出三角\n- 字典展示统一优先 dictValue/dictLabel 再回退 value/label\n- 社区选项顺序加载：先拉当前 subdistrict 社区，若 originalObj.subdistrict 存在且不同再拉一次 merge，不做并行\n- formatSelectOptionsDisplay 与 detail-template 的 tag 展示串改 dictValue/dictLabel；所属社区改走 formatCommunityDisplay\n- detailCallback 用 loadCommunityOptionsForDetail 顺序请求并 merge 避免竞态覆盖\n\n## 验证与归属\n- 验证证据：用户诉求 1-6 与最终结论（formatSelectOptionsDisplay、detail-template tag 串改、loadCommunityOptionsForDetail 顺序合并）\n- 涉及文件：detail-template.vue、property/complexChange/detail.vue、detailMixins.js、area.js、dict-tag.vue\n- 所属项目：产品2.0；来源会话：b608284d-b42b-4810-99bd-afe869af0cbd；代码基线：6da8974"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_row_hover_sync.md",
+                "memory_type": "entities",
+                "after": "# 表格行悬停色跨表体同步\nzs-table 等表格需统一行悬停背景色，固定列与操作列因独立 DOM 必须同步 hover-row。\n\n## 问题现象\n- 用户要求所有表格行悬停背景统一为 #f5f7fa，但详情子表、弹窗内表格、带固定操作列表格悬停效果各不相同\n- 固定列与操作列悬停不变色，zs-operate-column 写死白底不跟色\n\n## 根因\n- el-table 固定列渲染在独立 .el-table__fixed-body-wrapper，hover-row 只加在鼠标所在表体块\n- zs-operate-column 单元格背景写死 #ffffff，即使行拿到 hover-row 也不跟色\n\n## 修复方案\n- 不在页面级写 .el-table__body tr:hover 覆盖\n- variables.css 新增全局 token --table-row-hover-background-color: #f5f7fa\n- element-ui.scss 统一 el-table 悬停规则覆盖主表体、固定列、选中行优先级\n- zs-operate-column 去掉写死白底，改为悬停/选中跟随行背景\n- zs-table.vue 悬停时把 hover-row 同步派发到主表体与所有固定列（含反向触发）\n\n## 验证与归属\n- 验证证据：最终结论「问题原因」两条 + 修改内容四点\n- 涉及文件：variables.css、element-ui.scss、zs-table.vue、benefit/pubSubjectInfo/index.vue\n- 所属项目：产品2.0；来源会话：80a5b505-898c-436f-8ccc-b4d6fd8cd107；代码基线：41c6961"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/e2e_clear_session_protocol.md",
+                "memory_type": "entities",
+                "after": "# E2E 清会话前判当前页协议\nPlaywright 跨端用例 clearBrowserSession 在 about:blank 上调 storage 会抛 SecurityError，需先进入真实 origin。\n\n## 问题现象\n- 跨端用例（03 企业端切管理端）调用 clearBrowserSession 报 SecurityError 导致用例失败\n- clearCookies 成功但清 storage 炸，易被误判为登录态或权限问题\n\n## 根因\n- 用例开始时 page 停在 about:blank 无 origin，page.evaluate 访问 localStorage/sessionStorage 被同源策略拒绝\n- clearCookies 走 context 层不依赖 origin，故表现不一致\n\n## 修复方案\n- clearBrowserSession 三段式：先 context().clearCookies()；再用 page.evaluate 探测 protocol 是否为 http/https（try/catch 兜底）；不满足先 goto('/#/') 进入应用；再清 localStorage/sessionStorage\n- 探测本身要有 catch 兜底避免先炸\n- 流程状态文案按用户口径写，不自行推断（如「没有待确认，待提交完了就是审核中」）\n\n## 验证与归属\n- 验证证据：最终结论 clearBrowserSession 在 about:blank 直接清 storage 触发 SecurityError；给出 canClearOnCurrentPage 探测 + goto 后清的修复\n- 涉及文件：e2e/fixtures/company-helpers.js、e2e/company/company-record-change.spec.js\n- 所属项目：产品2.0；来源会话：c24a0b77-252c-498f-8424-de964da60242；代码基线：62d5fb9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/get_custom_config_switch.md",
+                "memory_type": "entities",
+                "after": "# 能力开关走 getCustomConfig 两级取值\n按后台配置决定按钮显示需走 /building/common/getCustomConfig，按「模块名→配置键」两级取值，不用布尔强制转换。\n\n## 问题现象\n- 楼幢页「提取」按钮读 isShowSycBtn，自治模块发布按钮读 isShowPublishButton，误用会恒定 undefined 导致按钮不显示且不报错\n- $get 返回整包 {code,msg,data} 而非 data，直接读 data 会错\n\n## 根因\n- getCustomConfig 返回按模块分组的多层对象，外层 key 是模块名（project/building/preparatoryGroup 等），内层 key 才是配置项\n- 把 data 直接当配置对象或错用别的模块 key 会取到 undefined\n- 使用 !! 强制转换会把字符串 'false' 误判为真\n\n## 修复方案\n- 封装取配置方法参数化「模块名+配置键」，内部按 res?.data?.[模块]?.[配置键] 取值\n- 明确基准 === true 以免 'false' 误判；catch 统一返回安全默认 false（取不到隐藏新功能按钮）\n- 新增配置项先与后端确认外层模块 key，不靠猜写死\n\n## 验证与归属\n- 验证证据：用户诉求 1-3 与最终结论（this.isShowSycBtn = !!res?.data?.project?.isShowSycBtn，catch 置 false；$get 返回整包；自治模块读 data.preparatoryGroup）\n- 涉及文件：src/views/building/building/index.vue\n- 所属项目：产品2.0；来源会话：3299b4fb-13f8-4922-8cd8-6edbcc54302b；代码基线：ff1a3ff"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/流程状态文案描述.md",
+                "memory_type": "preferences",
+                "after": "- 编写流程状态文案时按用户口径写，不自行推断状态名（如用户明确「没有『待确认』，待提交完了就是审核中」）"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

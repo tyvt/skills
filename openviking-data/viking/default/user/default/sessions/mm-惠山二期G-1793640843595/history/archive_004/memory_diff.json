@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-惠山二期G-1793640843595/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T17:42:56.714695+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vote_range_headline_nest.md",
+                "memory_type": "entities",
+                "after": "# VoteRangeDialog 双层 Headline 嵌套修复\n惠山二期G 业主自治线下表决 VoteRangeDialog 与 CandidateConfigTable 双层 Headline 导致「表决项+空框收起」的缺陷与修复约定。\n\n## 现象\n- 线下表决决策维护页面「表决项」区域出现两层带「收起」的框，外层标题「表决项」，内层仅剩「收起」无标题。\n\n## 根因\n- 外层 `VoteRangeDialog` 用 `<Headline title-text=\"表决项\" :show-action=\"false\">` 只包标题。\n- 内层 `CandidateConfigTable.vue` 根节点又是 `<Headline :title-text=\"titleText\">`，调用处未传 `titleText` 致内层标题为空，只剩折叠控件。\n\n## 修复方案\n- `CandidateConfigTable` 去掉根级 Headline，根改为 `.sub-container`，标题/折叠由外层 VoteRangeDialog 单个 Headline 统一提供。\n- 外层 Headline 恢复默认 `show-action`，使「表决项 收起」与下方「弃权」区块单层内联对齐。\n- 删除失效的 `titleText` prop。\n- `election/../decision/CandidateConfigTable.vue` 是独立同名文件，改 option 目录不影响选举模块；`decisionType=='SORT'` 分支单独 `:show-action=\"false\"`。\n\n## 验证与归属\n- 验证：会话 3f7e696d 用户反馈线下表决「收起多了一层框」，定位双层 Headline 并修复。\n- 涉及文件：autonomy/option/components/VoteRangeDialog.vue、autonomy/option/components/CandidateConfigTable.vue、components/Headline/index.vue。\n- 所属项目：惠山二期G；来源会话：3f7e696d-b4d8-436c-98fe-e297ca14cc3e；代码基线：d52a061"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/todo_backurl_router.md",
+                "memory_type": "entities",
+                "after": "# 待办返回 backUrl 合法喂给 Vue Router 3\n惠山二期G zhi2-web-admin 在「flowable 待办→业务详情→返回」场景中，backUrl 字符串如何合法、安全地喂给 Vue Router 3 的约定。\n\n## 背景\n- `utils/ruoyi.js` 的 `navigateToTodoTask` 写入 `query.backUrl`，`main.js`/`OperationBtnGroup` 的 `goBack` 走 `resolveBackNavigationPath` + `router.push({ path, query: { type: 'back' } })`。\n\n## 踩坑与修复\n- 踩坑1（Vue Router 3 解析）：带 `?pageNum=2` 的地址原样塞进 `path` 会解析失败或 404；须按 `?`/`#` 拆分或 `new URL(backUrl, origin)` 再 push，或约定 backUrl 禁止含 query 并在入口校验。\n- 踩坑2（安全）：`query.backUrl`/`options.backUrl` 未校验时 `//evil.com`、带 scheme 的 URL 可能越权跳转；仅接受以单个 `/` 开头的站内 path（拒绝 `//`、`:`、`http`），非法则忽略走路径回退。\n- 踩坑3（状态丢失 MEDIUM）：`navigateToTodoTask` 只记 `current.path` 不含 query，从带筛选/分页列表进详情再返回会丢列表态；需「完整还原」时用 `fullPath` 或序列化 query。\n\n## 验证与归属\n- 验证：会话 26959102 HIGH「backUrl 含查询串时 router.push 用法不兼容」、HIGH「backUrl 未校验即用于编程式导航」、MEDIUM「backUrl 仅记录 path 丢失来源页 query」。\n- 涉及文件：utils/ruoyi.js、main.js、components/OperationBtnGroup/index.vue。\n- 所属项目：惠山二期G；来源会话：26959102-f851-4ffb-b534-01c3957b3e3e；代码基线：adccd7e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/build_detail_path_route.md",
+                "memory_type": "entities",
+                "after": "# buildDetailPathFromRoute 非 tableid 路由拼接缺陷\n惠山二期G zhi2-web-admin 待办按 busCode 解析详情路由时，非 tableid 路径误拼主键导致 push 失败或进错页的缺陷与修复。\n\n## 现象\n- `buildDetailPathFromRoute` 在路径既非 detail `filePath`、又不含 `:tableid` 动态段时，仍可能把 `id` 直接拼在 `basePath` 末尾（无 `/`），生成如 `/benefit/module` + `uuid` → `/benefit/moduleuuid`，致使 `push` 失败或进错页。\n\n## 修复方案\n- 该分支应 `return null`，交给下方 `name` + `params` / `storedPath` 兜底。\n- 若业务确认需「path 末段 + id」，须显式 `${basePath}/${id}` 并与动态路由注册约定对齐。\n\n## 验证与归属\n- 验证：会话 26959102 HIGH「buildDetailPathFromRoute 非 tableid 路由可能错误拼接主键」，文件 ruoyi.js:273-286, 346-351。\n- 涉及文件：zhi2-web-admin/src/utils/ruoyi.js。\n- 所属项目：惠山二期G；来源会话：26959102-f851-4ffb-b534-01c3957b3e3e；代码基线：adccd7e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/decision_range_building_mixin.md",
+                "memory_type": "entities",
+                "after": "# decisionRangeBuildingSelectMixins 户室与全选一致性\n惠山二期G 业主自治「全选楼幢」mixin 中 exist 户室与全选状态三处一致性缺陷与修复约定，适用挂同一 mixin 的多个 RangeTable。\n\n## 提交集合问题\n- `initHouseChecked` 对 `exist==1` 强制 `checked='1'`，而 `setData`/`handlePick` 按 `checked==1/'1'` 收集未排除 `exist`，用户切换过该楼幢后已在范围内户室可能再次进入 `batchAdd`。\n- 修复：收集处加 `if (house.exist == 1) return`；exist 户室不要为「全选语义」写成已选。\n\n## 全选文案问题\n- `isAllBuildingsSelected` 读 `$refs.dialog?.treeData` 及深层 `house.checked`，Vue 2 子组件树变更不一定触发父 computed 重渲染，文案可能滞后。\n- 修复：在 `toggleSelectAllBuildings` 或勾选回调末 `$forceUpdate()`，或 dialog `$emit('selection-change')` 再算，或状态提升到父级 data。\n\n## 无可选户室问题\n- 全部 `exist==1` 或树为空时 computed 返回 false，按钮仍显示「全选楼幢」且点击无效果。\n- 修复：增加 `hasSelectableBuildings`，无可选时 `disabled` 或隐藏。\n\n## 验证与归属\n- 验证：会话 da4d5f02 HIGH「子组件内部状态驱动父级 computed」、HIGH「exist 户室被标为已选且会进入提交集合」、MEDIUM「无可选户室时按钮语义不清」；009.md 亦提 exist 与 $refs.treeData 同类风险。\n- 涉及文件：autonomy/mixins/decisionRangeBuildingSelectMixins.js、zs-select-dialog.vue、autonomy/general/components/DecisionRangeTable.vue、autonomy/multiply/components/DecisionRangeTable.vue、autonomy/election/components/apply/RangeTable.vue、autonomy/preparatoryApply/components/preparatoryRangeTable.vue。\n- 所属项目：惠山二期G；来源会话：da4d5f02-fc36-4e8c-8717-0c4503f50d5e；代码基线：289cc30"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

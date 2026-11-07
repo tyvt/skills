@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T20:17:25.548207+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/agency_register_e2e.md",
+                "memory_type": "entities",
+                "after": "# 经纪机构注册流程E2E自动化\n苏州市房地产监测V3 中经纪机构入网注册端到端自动化流程已重跑并修复多处与页面不一致的问题，整条链路跑通。\n\n## 自动化调整\n- Step2：UI 填管理员信息 + 从 /code 拉真实图片验证码；短信默认填联调码 293858，不点「获取验证码」（与开发企业注册一致，避免 sendVerificationCode 超时）\n- Step3：按「上传」按钮循环上传要件，直到没有待传项\n- Step4：按钮文案改为「新增」（不再是「新增服务方案」），提交用「申请入网」+ 确认框\n- 管理端审批：增加 institutionRegister/approval 响应匹配（原先只认 companyRegister/approval）\n\n## 跑测结果\n- 整条链路已跑通：匿名入网 → 上传要件 → 管理端审批 → USCI 登录 → 打开机构基本信息\n- 备案侧 busCode=030100 要件包里没有文件（与开发企业 040100 同类问题），90s 轮询后失败——说明注册单上有要件，审批后未同步到备案 companyRecordId 的 030100\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：agency-institution-register-flow-helpers.js、e2e/company/register-network-basic-appendix-real-api-flow.spec.js、.gitmodules、路由信息.json、MEMORY.md、institutionRegister/components/Step3Appendix.vue\n- 所属项目：苏州市房地产监测V3；来源会话：6b984501-42f6-4b9b-a56e-364375c13c03；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/presale_appendix_layout.md",
+                "memory_type": "entities",
+                "after": "# 预售域左右布局要件统一\n苏州市房地产监测V3 中预售域备案详情 Tab 内要件上传区样式已修复，使查看态与编辑态左右内边距一致。\n\n## 问题根因\n- 备案详情在 Tab（tabs--card）里，全局样式会把 Tab 内所有 Headline 的 collapse-content 设为 padding-top:0 并去掉部分标题区样式\n- 编辑态不在该 Tab 布局里，所以看起来正常，查看态异常\n\n## 修复内容\n- Tab 内样式不再作用于 .appendix-section（要件上传专用 Headline）\n- 为 Tab 内右栏要件单独恢复 padding: var(--detail-content-padding) !important（与编辑态一致）\n- 许可右栏下覆盖 AnnexUpload 的 height: calc(100% - 50px)，避免查看态列表贴边\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：presale/entrustSale/detail.vue、styles/index.scss、presale/permit/components/PermitAppendixPanel.vue\n- 所属项目：苏州市房地产监测V3；来源会话：51578e2c-0265-49db-bc23-9770861b7789；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/change_id_refactor.md",
+                "memory_type": "entities",
+                "after": "# 变更ID解析最小冗余收口\n苏州市房地产监测V3 中变更单 ID 解析逻辑已按「最小冗余」收口，行为不变，重复实现统一引用 resolveChangeId.js。\n\n## 已删/合并\n- form.js：去掉 coerceIdFieldValue，详情参数交给全局 coerceRequestBodyIds + serializeJsonRequestBody\n- requireChangeIdForRequest：在 getCompanyRecordChangeDetail / submitByLogin 里内联两行 resolveChangeId + 校验\n- Vue 调用：resolveChangeId(res.data, res) → resolveChangeId(res.data)（3 处）\n- E2E：删除 company-helpers 里重复的 resolveChangeId 实现，改为引用 resolveChangeId.js；fetchLastChangeId 只用 body.data\n\n## 保留\n- jsonParseSafeIds.js：响应长整数、coerceRequestBodyIds、serializeJsonRequestBody 仍需要\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：form.js、resolveChangeId.js、jsonParseSafeIds.js\n- 所属项目：苏州市房地产监测V3；来源会话：73b844d6-16b5-409e-b3b2-20d22170917a；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_ghost_scroll.md",
+                "memory_type": "entities",
+                "after": "# 表格幽灵滚动修复\n苏州市房地产监测V3 中 zs-table 修复列多总宽超出容器时被误判为「幽灵滚动」导致右侧列裁切且无法横向滚动的问题。\n\n## 问题根因\n- 旧逻辑在溢出宽度 ≤ 操作列宽度 + 48px 时就隐藏滚动条\n- 品牌管理有 10+ 列，表头很长，内容最小宽度远大于可用区域，本应显示横向滚动条却被错误隐藏\n\n## 修复内容\n- 区分真实溢出与幽灵溢出：仅当「内容最小宽度 ≤ 可分配宽度」且溢出 ≤ 固定操作列宽度时，才隐藏滚动条（幽灵滚动）\n- 宽表强制可滚动：内容超出可用区域时设置 overflow-x: auto\n- 默认样式：表格 body-wrapper 默认 overflow-x: auto\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：zs-table-column.vue、zs-table.vue\n- 所属项目：苏州市房地产监测V3；来源会话：73b1d25a-7ccc-4c27-8b93-e143c1c0945f；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

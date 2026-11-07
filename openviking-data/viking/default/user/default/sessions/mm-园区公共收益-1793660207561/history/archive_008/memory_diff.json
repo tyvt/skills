@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793660207561/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T23:09:30.513237+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/园区公共收益技术/资金缴款通知书合同名称跳转.md",
+                "memory_type": "entities",
+                "after": "# 资金缴款通知书合同名称跳转\n园区公共收益项目资金缴款详情页通知书子表「合同名称」查看态改为链接并跳合同详情的技术约定。\n\n## 实现做法\n- 在 `pubPaymentNotice/detail.vue` 的 `contentInfo2` 将字段 `type` 从 `text` 改为 `link`，点击走 `goToContractDetail`\n- 路由按 `contractType` 分分支：`0`→经营用房租赁合同，`1/2/4`→资源租赁（广告位/场地/其他），`3`→车位租赁合同，其他→通用收入合同\n\n## 数据契约\n- 选合同时持久化 `revenueContractId`、`contractType`\n- 老数据无 ID 时先按 `contractNo` 查询解析出 ID 再跳转，避免历史行无法点开\n\n## 验证与归属\n- 验证会话：b37fb981（资金缴款详情通知书子表合同名称加链接并可查看合同）\n- 涉及文件：pubPaymentNotice/detail.vue、pubTradeDetailTable.vue\n- 所属项目：园区公共收益；代码基线：ba114dc；来源会话：b37fb981-c845-457a-89c6-2a28b9da3593"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/园区公共收益技术/自治公示新增动态路由.md",
+                "memory_type": "entities",
+                "after": "# 自治公示新增动态路由\n园区公共收益项目自治公示模块动态菜单路由注册与从业务页发起公示的预填技术约定。\n\n## 路由机制\n- 路由不在 `router/index.js` 静态表，由后台菜单经 `permission.js` 的 `filterAsyncRouter` + `loadView` 注册\n- 详情/新增共用 `autonomy/publicity/detail.vue`，路由 name 为 `Publicity/:tableid`（新增 `tableid=add`，查看为 publicityId），query 用 `formMode=add|view|edit`\n\n## 发起公示预填\n- 业务页推荐：`sessionStorage.setItem('TMP_PUBLICITY', JSON.stringify(业务行数据))` 后跳 `autonomy/publicity/detail` + 'add'\n- 列表默认新增可用 listMixins：`${$route.path}/add?formMode=add`\n\n## 关键字段\n- `complexName`（同步 complexId/propertyCode/deptId）、`relBusinessCode`（关联 `relBusinessId`）、`publicityType`（字典 `t_mf_publicityType`）\n\n## 验证与归属\n- 验证会话：d3809e4b（检索公示功能并确认两种等价跳转与字段/预填方式）\n- 涉及文件：autonomy/publicity/detail.vue、index.vue、components/StartPublicityBtn.vue、store/modules/permission.js\n- 所属项目：园区公共收益；代码基线：0abcb96；来源会话：d3809e4b-48d7-4e8e-9be4-55a3d5424bac"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/园区公共收益技术/提交审批url迁flowapi.md",
+                "memory_type": "entities",
+                "after": "# 提交审批URL迁flowApi\n园区公共收益 2.0 提交/审批接口从 workflow 配置迁到 flowApi 按 moduleName+businessName 拼接并先查 flowConfig 的约定。\n\n## 接口约定\n- OperationBtnGroup、ZsSubmit、zs-approval 统一走 `utils/flowApi.js`，默认路径 `/${moduleName}/${businessName}/submit` 与 `/${moduleName}/${businessName}/approval`（例：物业管理区备案 `/property/complex/submit`）\n- `route.meta` 仍保留自定义接口最高优先级\n\n## 流程校验\n- 操作前调用 `/flowable/flowConfig/list` 校验当前 `busCode` 是否已配置节点，未配置则拦截提示「审核流程未维护完成，请联系管理员」\n- 能否提交/审核由流程节点决定，未配置不发起业务 submit/approval\n\n## 演进说明\n- 与苏房系「meta → 流程配置表解析 submitApi」旧三级方案不同，属同一产品线接口约定演进，改园区项目勿照搬 resolveFlowSubmitApi\n\n## 验证与归属\n- 验证会话：51f3071e（新增 flowApi.js、操作前 flowConfig 校验；workflow 配置去掉接口字段）\n- 涉及文件：utils/flowApi.js、OperationBtnGroup/index.vue、ZsSubmit/index.vue、zs-approval/index.vue、tool/workflow/index.vue、ConfigDialog.vue\n- 所属项目：园区公共收益；代码基线：479ebe7；来源会话：51f3071e-0992-4ca2-b14d-e0fa6c2d181d"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/维保合同付款比例按钮控制.md",
+                "memory_type": "preferences",
+                "after": "- 维保合同付款比例子表若产品只要求「谁能增删改」，应集中在 `paymentRatioTable.vue` 用单一开关（如 `canManagePaymentRatio`）统一控制四处 UI：顶部新增/删除、搜索区显隐、多选列、行内编辑/删除禁用\n- 启用条件（本仓库约定）：`bizState == '0'`（草稿）且（`costType == '03'` 施工 或 `signType == '1'` 合同签订）\n- 不要在 `paymentRatioDialog.vue` 做付款类型过滤、比例校验等，误加会与「只控按钮」需求冲突，应回滚弹窗逻辑、保留全量下拉\n- 子表权限与弹窗校验分层：权限在表，规则在后台或另开需求\n- 来源会话 2e6edee0：用户明确「不是让你做逻辑校验，而是让你控制新增和删除按钮」"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区公共收益.md",
+                "memory_type": "entities",
+                "before": "# 园区公共收益\n园区公共收益是用户维护的园区物业管理 Vue 前端项目（代码仓库 zhi2-web-admin），聚焦公共收益模块。\n\n## 描述\n- Vue 前端项目，与园区物管2.0 同源，均基于 zhi2-web-admin\n- 业务含物业管理区域四图位、账户拆分、楼盘表视图、收益类新增页（用款申请、支出合同备案等）\n- 分支命名如 develop/v2.6.2-suzhufang、develop/v2.6.2-yuanqu\n\n## 关联说明\n- 技术模式（ComplexPhoto四槽位、子表form传递、视图切换高度、监管链接初始化等）作为独立「技术模式」实体维护\n\n## 验证与归属\n- 所属项目在多处技术模式记忆中提及；来源会话见各技术模式实体",
+                "after": "# 园区公共收益\n园区公共收益是用户维护的园区物业管理 Vue 前端项目（代码仓库 zhi2-web-admin），聚焦公共收益模块。\n\n## 描述\n- Vue 前端项目，与园区物管2.0 同源，均基于 zhi2-web-admin\n- 业务含物业管理区域四图位、账户拆分、楼盘表视图、收益类新增页（用款申请、支出合同备案等）\n- 分支命名如 develop/v2.6.2-suzhufang、develop/v2.6.2-yuanqu\n\n## 关联说明\n- 技术模式（ComplexPhoto四槽位、子表form传递、视图切换高度、监管链接初始化等）作为独立「技术模式」实体维护\n- 园区公共收益专项技术模式另有独立实体：资金缴款通知书合同名称跳转、自治公示新增动态路由、提交审批URL迁flowApi（均属「园区公共收益技术」类）\n\n## 验证与归属\n- 所属项目在多处技术模式记忆中提及；来源会话见各技术模式实体"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_018",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:02:22.192540+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/reserve_selection_stale.md",
+                "memory_type": "entities",
+                "after": "# el-table reserve-selection 行快照滞后致忽略预警误报\n苏住房G 经营用房租赁合同备案页用 el-table 的 reserve-selection 跨页保留勾选，导致选中项字段不随 tableData 刷新而误报「请选择合同」。\n\n## 问题根因\n- reserve-selection 按 row-key 缓存勾选时刻的行对象快照，行数据被重新查询/替换后选中项对象不随 tableData 同步\n- 直接读 selection 里的行取 whetherWarning / 主键，会读到旧值或空值，导致已备案预警合同勾选后点「忽略预警」提示「请选择合同」\n- V3 的 zs-table/el-table 布尔与数字混用，whetherWarning 可能是 1 / '1' / true 三种形态\n\n## 解决方案\n- 统一抽判定函数 isWarningContract(row) 归一 whetherWarning 的 1/'1'/true，禁止多处各写 row.whetherWarning == 1\n- 取数以 tableData 为准：按 primaryKey 在 tableData 里 find 最新行，在最新行上过滤与提交，不用 selection 里的旧对象\n- 选中项无预警合同时把「忽略预警」按钮置 disabled，减少误点\n- isSelectable 与 setRowStyle（橙色预警底）必须共用同一判定函数，否则出现「能勾但不高亮」\n\n## 关键约束\n- 已备案行若因「已备案不可编辑」整行禁用勾选，需区分「可勾选但操作受限」与「不可勾选」两类\n- 用户明确要求预警合同即使已备案也必须能勾选\n\n## 验证与归属\n- 验证证据：会话 7960611d，用户报「经营用房租赁合同：已备案的合同，不能选，选忽略预警时提示请选择合同」\n- 涉及文件：zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/index.vue\n- 所属项目：苏住房G；代码基线：320507d；来源会话：7960611d-0d3b-4ae8-a217-98664ba2c7a2"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_dialog_pagesize.md",
+                "memory_type": "entities",
+                "after": "# zs-select-dialog 左侧列表 pageSize 写死致超量不显示\n苏住房G 公共选择弹窗 zs-select-dialog 左侧列表 pageSize 写死为 10，选项超 10 条不显示且下方留白，多业务页共现。\n\n## 问题现象\n- 资金缴款选「收入类别名称」超 10 条后不再显示，经营资产租赁合同、资产租赁合同备案、停车泊位合同备案、手工记账等页同样现象\n- 左侧列表下方还有一片留白，默认铺满失效\n\n## 根因\n- zs-select-dialog 左侧列表 pageSize 被写死为 10，容器高度足以显示二三十条却只装 10 条\n- 容器未溢出，scroll-view / 滚动事件永不触发，「加载更多」走不到\n- 与 #388（布局宽度/空态）和 #519（v-if 懒挂载不拉数）根因不同：此处确实拉了数据、仅首屏条数写死且无续拉\n\n## 解决方案\n- 首屏 pageSize 由左侧列表容器高度动态计算，不再取常量 10\n- 首次加载后若未铺满且仍有数据，自动续拉下一页直到铺满或取尽\n- 监听滚动接近底部时继续分页加载\n- 首次查询放到弹窗打开后的 $nextTick 中发起，保证算到真实容器高度\n- 必须同时改 zs-select-dialog-func.vue（函数式）与 zs-select-dialog.vue（模板式 #define），否则函数式打开的页仍异常\n\n## 发布与验证\n- 发布须同步 develop/v2.6.2-suzhufang、develop/v2.6.2、develop/v2.6.1，冲突分支手动 cherry-pick 提交号 cb5ef3166\n- 验证证据：会话 5fa377d6（基线 fb3e960），结论为动态分页+自动铺满+滚动加载+$nextTick 首查\n- 涉及文件：zs-select-dialog.vue、zs-select-dialog-func.vue、pubPaymentNotice/detail.vue、businessItemDialog.vue"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhufang_api_env.md",
+                "memory_type": "entities",
+                "after": "# 苏住房G 接口前缀与 env 目录实际位置\n苏住房G 前端接口基址 VITE_APP_BASE_API 定义在父仓库根 env 目录，子模块内无同名 env，拼 URL 需以此为准。\n\n## 关键事实\n- 项目主体在父仓库子模块 zhi2-web-admin（前端纯 SPA），但 VITE_APP_BASE_API 定义在父仓库根 d:\\repository\\苏住房G\\env\\.env，值为 'api/v2.0'\n- 子模块里没有可读的同名 env 文件，页面里 moduleName+businessName 拼出的 /property/complex/page 实际请求为 /api/v2.0/property/complex/page\n- 业务目录 src/api/ 下通常无对应 js 文件（如 src/api/property/ 无 complex.js），接口经 listMixins/table.js 的 moduleName+businessName+apiMethod+apiSuffix 约定拼装\n- 路由不在 router/index.js 静态注册，由后端 /system/menu/listRouters 下发 component，经 loadView() 映射到 src/views/，搜不到静态路由属正常\n\n## 排查做法\n- 核对全路径直接看父仓库 env/.env 的 VITE_APP_BASE_API 再拼模块段\n- 查接口契约看列表 mixin 的约定字段，而非找 api 封装\n- 找环境变量（代理、加密开关、base api）一律先去父仓库 env 目录，子模块内向上一级找\n\n## 验证与归属\n- 验证证据：会话 467ee981（基线 9fb6c2c）探索报告确认前缀、无独立 API 文件、动态路由下发\n- 涉及文件：env/.env、mixins/table.js、mixins/listMixins.js、store/modules/permission.js、views/property/complex/index.vue\n- 所属项目：苏住房G；来源会话：467ee981-9fc0-412b-b2a5-a58b1c9799c9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_tabs_scroll.md",
+                "memory_type": "entities",
+                "after": "# RegionTabs 整卡横滚与标签内横滚分离\n苏住房G 首页 v2 窄屏下「整卡横滚」与「只在标签行内滚」不能统一处理，需 RegionTabs embedInParentScroll 开关加父容器 min-width:0。\n\n## 问题场景\n- 首页 v2（index-v2.vue 及 KeyDataNav、CheckDataNav、SectionCard、RegionTabs）窄屏内容溢出丢失\n- 第一版统一加 body-scroll-x + 内部 min-width:960px 整卡横滚，检查数据卡片被撑极宽、半宽栅格全乱，用户明确否掉\n\n## 根因\n- 整卡 min-width 把 flex/grid 列撑破，卡片不再随栅格列收缩\n- flex 子项默认 min-width:auto，即使父级再窄 Tab 列表也不收缩，永远触发外层溢出，内部滚变整卡撑宽\n\n## 解决方案\n- 关键数据导航=整卡横滚：body-scroll-x + 指标行横滚，RegionTabs 传 embed-in-parent-scroll=true 共用同一条滚动条\n- 检查数据导航=局部横滚：去掉 body-scroll-x 与 cd-inner 的 min-width，RegionTabs 默认 embedInParentScroll=false，只在 .rt__list 上 overflow-x:auto 标签行内横滑\n- SectionCard 的 .sc__bd 补 min-width:0，半宽栅格下 Tab 列表才真正收缩并出现内部滚动\n\n## 判据与验证\n- 判据：想让内容内部滚，从最内层滚动容器到栅格列整条链都不能有 min-width/固定宽，否则溢出向上传递\n- 验证证据：会话 b3c7bed2，用户先要求小屏横向滚动，二次反馈「检查数据导航不要按此方式处理，选择区域超出内部滚动、整区域太宽布局乱」\n- 涉及文件：home/index-v2.vue、v2/components/RegionTabs.vue、SectionCard.vue、KeyDataNav.vue、CheckDataNav.vue\n- 所属项目：苏住房G；代码基线：9e5c499；来源会话：b3c7bed2-97b5-4eae-818f-761a098b5431"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_084",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T16:01:24.251269+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/news_detail_route_fix.md",
+                "memory_type": "entities",
+                "after": "# 新闻详情页路由错误修复\n苏住房C(zhi2-mobile-shimin)小程序首页点击新闻报错 page not found，因新闻详情已迁至 pages_main 分包但首页仍跳旧路径。\n\n## 问题根因\n- 新闻详情页已迁到 pages_main 分包（pages_main/news/detail），但首页点击新闻仍跳转旧路径 /pages/news/detail，该页面在 pages.json 中不存在导致报错\n\n## 修复方案\n- Home_Suzhufang.vue 的 goNewsDetail 改用 route-map.js 中的 PAGES.news.detail() 生成正确路径 /pages_main/news/detail?id=...\n- menuRouteMap.js 同步更新菜单路由：3_1_10 指向 /pages_main/news/index；3_1_16 指向 /pages_main/news/detail?id=...\n\n## 验证与归属\n- 重新编译小程序后首页点击新闻资讯验证；其他菜单若报 page not found 需排查 menuRouteMap.js 中未迁移的旧 /pages/ 路径\n- 所属项目：苏住房C；来源会话：29317b48-dcb1-481b-a230-4459674df2a0\n- 涉及文件：Home_Suzhufang.vue、route-map.js、menuRouteMap.js、pages.json\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/wechat_verify_face_recognition.md",
+                "memory_type": "entities",
+                "after": "# 微信人脸核身后 wechat/verify 调用说明\n苏住房C(zhi2-mobile-shimin)认证流程中 wechat/verify 仅在微信人脸核身成功后才会被调用，模拟器无法完成核身故不会发请求。\n\n## 调用链路\n- 提交认证 → getRepeatByIdTypeAndIdNumber（成功）→ uni.startFacialRecognitionVerify（微信人脸核身）\n- 核身 success → wx.login → wechat/verify（仅此处发请求）\n- 核身 fail → 直接弹「认证失败」，无 wechat/verify 请求\n\n## 模拟器说明\n- 模拟器中 startFacialRecognitionVerify 基本不支持或无法正常完成，会走 fail 回调，故看到「认证失败」且无 /security/ctAuth/wechat/verify 请求\n\n## 验证方式\n- 用真机打开微信小程序（开发者工具 → 预览 → 手机扫码），在 Network 确认人脸核身完成后出现 wechat/verify\n- Console 中人脸核身失败通常有相关报错\n\n## 验证与归属\n- 所属项目：苏住房C；来源会话：13ed1683-e44e-4216-95c3-4499d21022e8\n- 涉及文件：src/api/security.js、src/pages_my/verification/FormLocal.vue、src/pages_my/verification/FormNonLocal.vue\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/uni_scss_import_fix.md",
+                "memory_type": "entities",
+                "after": "# uni.scss 相对路径导入构建失败修复\n苏住房C(zhi2-mobile-shimin)构建失败因 uni.scss 中使用相对路径导入，已被各页面文件错误解析，改为别名路径后构建通过。\n\n## 问题根因\n- uni.scss 中使用相对路径 @import './styles/zs-button.scss'\n- uni.scss 会被注入到每个页面样式中，相对路径按当前页面文件解析（如 pages_tab/benefit/index.vue）而非 src/uni.scss，导致找不到 styles/zs-button.scss\n\n## 修复方案\n- 将导入改为项目统一别名路径：@import '@/styles/zs-button.scss';（与 @import \"@/styles/btn.scss\" 等写法一致）\n- npm run build 已成功通过\n\n## 验证与归属\n- 所属项目：苏住房C；来源会话：8f10f353-5bab-456e-8115-00b593a5bd85\n- 涉及文件：src/uni.scss、pages_tab/benefit/index.vue\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/v1_image_fix.md",
+                "memory_type": "entities",
+                "before": "# 苏住房CV1图片地址拼接修复\nV1 图片（/zs-fym 前缀）地址拼接异常，已按环境分别配置代理与基址修复，V2 图片逻辑不变。\n\n## 问题根因\n- V1 图片（/zs-fym 前缀）地址拼接错误，需要单独指向 V1 代理基址\n\n## 修复方案\n- src/utils/index.js 的 resolveMediaUrl：/zs-fym 开头路径生产环境 H5 用 VITE_APP_IMG_PROXY_V1（https://szfang.szfcweb.cn），其他 V2 路径仍走 VITE_APP_API_PROXY\n- src/components/ZsImage/ZsImage.vue：微信小程序 /zs-fym 用 IMAGE_BASE_V1（https://szfang.szfcweb.cn），其他用 IMAGE_BASE（V2）\n- vite.config.ts：开发代理 /zs-fym 目标从 V2 API 改为 VITE_APP_IMG_PROXY_V1\n- .env.development/.env.production：VITE_APP_IMG_PROXY_V1 改为 https://szfang.szfcweb.cn\n\n## 验证与归属\n- 所属项目：苏住房C；来源会话：3774cb0b-97a2-4a97-9edb-ca41b73ddf3e\n- 涉及文件：src/utils/index.js、src/components/ZsImage/ZsImage.vue、vite.config.ts、src/env/mp.js\n- 代码基线：none",
+                "after": "# 苏住房C /zs-fym 图片地址拼接修复\n苏住房C(zhi2-mobile-shimin)生产环境 H5 的 /zs-fym 前缀图片原先误用 VITE_APP_IMG_PROXY_V1 拼接，导致地址错误加载失败，已修复为统一使用 VITE_APP_API_PROXY。\n\n## 问题根因\n- 生产环境 .env.production 中 VITE_APP_API_PROXY 已配为 https://szfweb.szzfcjj.cn:8887\n- resolveMediaUrl 对 /zs-fym 开头路径误走另一条逻辑，拼 VITE_APP_IMG_PROXY_V1（http://szfang.szfcweb.cn），实际请求 http://szfang.szfcweb.cn/zs-fym/xxx.jpg 而非期望的 https://szfweb.szzfcjj.cn:8887/zs-fym/xxx.jpg\n\n## 修复方案\n- src/utils/index.js：去掉 /zs-fym 特殊分支，生产 H5 下所有相对路径统一用 VITE_APP_API_PROXY 拼接\n- vite.config.ts：本地开发时 /zs-fym 代理也改为指向 VITE_APP_API_PROXY，与生产一致\n- swiperImage.vue：补上 :local 属性绑定\n- 微信小程序侧 ZsImage.vue 的 /zs-fym 仍可用 IMAGE_BASE_V1（https://szfang.szfcweb.cn），其他用 IMAGE_BASE（V2）\n\n## 验证与归属\n- 所属项目：苏住房C；来源会话：bb5ef4f6-787c-49c9-b071-0b62385878d7、3774cb0b-97a2-4a97-9edb-ca41b73ddf3e\n- 涉及文件：src/utils/index.js、src/components/ZsImage/ZsImage.vue、vite.config.ts、swiperImage.vue\n- 代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

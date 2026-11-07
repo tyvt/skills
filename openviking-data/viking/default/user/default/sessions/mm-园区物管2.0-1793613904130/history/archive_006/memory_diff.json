@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:20:36.032697+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_table_double_border.md",
+                "memory_type": "entities",
+                "after": "# 弹窗内表格底部双重边框去重\n园区物管2.0 中弹窗（非 list-card 容器）内 zs-table 底部出现加粗/重合下边框的根因与修复。\n\n## 问题根因\n- 弹窗内表格未包在 list-card 容器，不走列表页边框去重逻辑。\n- Element UI 表格底部同时渲染两层：最后一行单元格 border-bottom 与 .el-table::before 伪元素底边叠加成粗线。\n- 列表页正常因 list-card 全局样式已去重。\n\n## 解决方案\n- 在全局 index.scss 为弹窗表格容器（如 .dialog-box .dialog-right）补去重：隐藏 el-table 的 ::before/::after 伪元素。\n- 由表格外层统一画一条底边，去掉末行单元格 border-bottom。\n- 排查「线变粗」先确认表格容器是否走 list-card 边框体系。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/styles/index.scss、zhi2-web-admin/src/views/maintenance/accountQuery/type.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue。\n- 所属项目：园区物管2.0；来源会话：1eca0e2f-d760-4bdb-bbc2-11cb409dd899；代码基线：d48841f13。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/allow_custom_three_state.md",
+                "memory_type": "entities",
+                "after": "# 可手输选择组件三态回填\n园区物管2.0 中 zs-like-select 等 allow-custom 选择组件回填表单需分三态处理，缺 companyId 不等于空值。\n\n## 问题根因\n- 组件手输只更新自身 v-model（如 { companyName } 无 companyId），原 watch 在缺 companyId 时清空 form 字段，导致手输名称进不了表单。\n- el-form-item 校验的是 form 上的字段，导致 required 校验误报且下拉列表仅显示默认值。\n\n## 解决方案\n- watch 选中对象分三态：①空对象清空 form 名称与 ID；②有 companyId 照常写名称与 id；③仅有 companyName 写 form.companyName 且 companyId 置 undefined。\n- 后端用「有无 companyId」区分系统内单位与手输名称。\n- 通用结论：选中对象回填表单的监听不能把缺 ID 当无效选择清空，须为手输态保留名称。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/components/zs-select/zs-like-select.vue、zhi2-web-admin/src/views/maintenance/depositNotice/company/components/AddDialog.vue。\n- 所属项目：园区物管2.0；来源会话：3212c3b1-6f35-4233-95e1-8433cc34e122；代码基线：7814a0c2a。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/project_switch_soft_refresh.md",
+                "memory_type": "entities",
+                "after": "# 切项目软刷新复用 TagsView\n园区物管2.0 中 Navbar 切换物业管理区域后改用 TagsView 软刷新，避免 window.location.reload() 整页白屏。\n\n## 问题根因\n- 原切换后调用 window.location.reload() 丢失路由上下文、重拉静态资源与登录态，体验差且慢。\n- 项目已有 TagsView 的刷新当前页软刷新机制可复用。\n\n## 解决方案\n- 抽共享工具 src/utils/refreshView.js：refreshView（delCachedView 清缓存→清搜索参数缓存→/redirect 重进当前页重挂载）；refreshAfterProjectSwitch（清所有标签缓存+软刷新当前页）。\n- TagsView 的 refreshSelectedTag 与 bProjectDialog 切区后改调该工具。\n- 效果：保留路由与已开标签，只重挂当前组件，清缓存标签切回按新小区重拉数。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/utils/refreshView.js、zhi2-web-admin/src/layout/components/TagsView/index.vue、Navbar.vue、zhi2-web-admin/src/views/home/bProjectDialog.vue。\n- 所属项目：园区物管2.0；来源会话：cdffd236-f18a-4eb7-a140-2c5914000510；代码基线：49e7729ce。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_table_selection_sync.md",
+                "memory_type": "entities",
+                "after": "# 弹窗表格选中项与外部默认值同步\n园区物管2.0 中弹窗表格（rangeTable.vue）清空外部默认数组不会清掉 el-table 内部勾选，watch 须 clearSelection 再回填。\n\n## 问题根因\n- 外部重置搜索把 defaultSelectedRangeList prop 清为 []，但内部 selectedRangeList 置空不影响 el-table 内部 selection 状态。\n- el-table 勾选是自身内部状态，data 数组变化不自动反写勾选，必须显式调实例方法。\n- 默认值非空时也可能旧勾选叠加。\n\n## 解决方案\n- defaultSelectedRangeList 的 watcher 中：变为 [] 时主动调 this.$refs.xxx.clearSelection() 并清 delSelectedIds 等辅助集合。\n- 非空时先 clearSelection() 再逐行 toggleRowSelection/setSelectedRange 回填，保证先清后设。\n- 任何「外部数据源 ↔ 弹窗表格勾选」组件都走此契约。\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/system/message/components/rangeTable.vue、selectRangeDialog.vue。\n- 所属项目：园区物管2.0；来源会话：c6be946b-abae-4b93-9a83-f55f6a1bc67a；代码基线：7814a0c2a。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配、map_drill_down_order（地图下钻SVG顺序耦合与下钻视野等待）、map_marker_spread（地图打点null过滤与重合点圆环错开）\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze（Element UI树全部展开卡死分批套路）、sidebar_recursive_menu、recursive_menu_icon_indent（RecursiveMenu图标占位缩进）、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）、search_container_deprecated（旧search-container废弃改zs-search-form）、appmain_isolation（AppMain加isolation隔离层叠上下文）、zs_select_single_choice（页面级选择弹窗对齐zs-select-dialog单选契约）、zs_table_summary_border（zs-table合计行下边框缺失）、account_dual_dict（新增可选与全量展示双字典+formMode切换）、region_defer_list（区域树列表首屏闪烁延迟请求）\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan（分类金额图二次÷10000柱形不显示）、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）、echarts_axis_max_ceiling（ECharts轴刻度上限取整）、svg_fill_replace（SVG图标换色只替换path fill）、line_y_axis_adapt（多系列折线图Y轴自适应刻度）、four_module_split（超大页面四件套拆分）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace（移除xcrud依赖本地XForm兼容替换）、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、form_getdetail_param_guard（getDetail必需参数守卫钩子）、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、area_field_code_assignment（街道社区字段统一赋编码移除字典等待）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、platform_config_race（平台配置异步加载竞态误报）、project_dialog_cache_restore（全局选项目弹窗缓存恢复）、amount_input_validate_race（AmountInput打包后el-form校验为空竞态）",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配、map_drill_down_order（地图下钻SVG顺序耦合与下钻视野等待）、map_marker_spread（地图打点null过滤与重合点圆环错开）\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze（Element UI树全部展开卡死分批套路）、sidebar_recursive_menu、recursive_menu_icon_indent（RecursiveMenu图标占位缩进）、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）、search_container_deprecated（旧search-container废弃改zs-search-form）、appmain_isolation（AppMain加isolation隔离层叠上下文）、zs_select_single_choice（页面级选择弹窗对齐zs-select-dialog单选契约）、zs_table_summary_border（zs-table合计行下边框缺失）、account_dual_dict（新增可选与全量展示双字典+formMode切换）、region_defer_list（区域树列表首屏闪烁延迟请求）、dialog_table_double_border（弹窗表格底部双重边框去重）、allow_custom_three_state（可手输选择组件三态回填）、dialog_table_selection_sync（弹窗表格选中项与外部默认值同步）\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan（分类金额图二次÷10000柱形不显示）、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）、echarts_axis_max_ceiling（ECharts轴刻度上限取整）、svg_fill_replace（SVG图标换色只替换path fill）、line_y_axis_adapt（多系列折线图Y轴自适应刻度）、four_module_split（超大页面四件套拆分）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace（移除xcrud依赖本地XForm兼容替换）、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、form_getdetail_param_guard（getDetail必需参数守卫钩子）、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、area_field_code_assignment（街道社区字段统一赋编码移除字典等待）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、platform_config_race（平台配置异步加载竞态误报）、project_dialog_cache_restore（全局选项目弹窗缓存恢复）、amount_input_validate_race（AmountInput打包后el-form校验为空竞态）、project_switch_soft_refresh（切项目软刷新工具）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

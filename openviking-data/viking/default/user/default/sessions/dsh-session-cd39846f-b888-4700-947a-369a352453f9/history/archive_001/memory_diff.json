@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-cd39846f-b888-4700-947a-369a352453f9/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T04:47:55.419539+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷任务/zentao_bug_6057.md",
+                "memory_type": "entities",
+                "after": "# 禅道Bug 6057 楼幢维护缺楼幢类型\n价格备案页「楼幢备案均价/本次批次备案均价」显示暂无数据，根因为上游楼幢维护缺楼幢类型维护入口。\n\n## 根因\n- 李贵勇备注(85521)：价格备案均价需按楼幢类型统计，但系统「楼幢维护」去掉了「楼幢类型」属性维护，需加回\n- 朱楠2026-11-03备注(85859)：「楼幢维护的楼幢类型现需要加上」\n- 代码定位：projectManagement/buildinginfo/detail.vue（楼幢维护详情页，带同步/变更/流程查看按钮）form.buildingType已在data声明，但模板无编辑下拉与查看展示\n- 字典错用BUILDING_TYPE(大写，仅99/2/4三项)；DB核实T_BUILDING.BUILDING_TYPE与T_SA_PRICE_BUILDING.BUILD_TYPE实际取值1/2/3/4/22，对应完整building_type字典(低层/多层/小高层/高层/多联别墅)\n\n## 修复方案\n- detail.vue编辑态新增楼幢类型下拉(prop=buildingType，复用buildTypeOptions)\n- 查看态DetailTemplate新增楼幢类型tag展示\n- 补充buildingType必填校验\n- 字典由BUILDING_TYPE修正为building_type\n- 提交223f51924，rebase到2d0c51f03后fast-forward合并develop/v3.0.0\n\n## 验证与交付\n- ESLint该文件0 error(仅存量el-form-item提示)\n- vue-template-compiler：template 0 error/0 tip；script ESM parse OK\n- 未验证：主工作区有他人未提交改动(343删除e2e/样式等+staged index.scss)，未能跑完整npm run build，需联调环境回归\n\n## 禅道回写\n- DBX事务回写：status=resolved, resolution=fixed, resolvedBuild=trunk, resolvedBy=tiany, assignedTo=zhunan(提交人)\n- action id 85978(861字符备注，含根因/修复/验证)，product=70\n\n## 并行任务安全\n- 独立worktree zhi2-wt-bug6057(分支bug6057-building-type)开发，未触碰并行任务bug6076/bug6079 worktree与主工作区他人WIP\n- 因主工作区有他人staged index.scss，改用rebase+ff-only合并，只并入detail.vue一处变更\n- worktree与临时分支、临时目录已清理"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/项目/zhi2_web_admin.md",
+                "memory_type": "entities",
+                "before": "# zhi2-web-admin 房产管理H5后台\n苏州房产管理系统的前端后台项目，采用git父仓库+子模块结构。\n\n## 基本信息\n- 当前开发分支：develop/v3.0.0，子模块含提交 01861fe87（Navbar返回首页bug#5983修复）、2eadb163c（E2E用例 navbar-back-home.spec.js）、e4515310b（bug#6012宗地弹窗间距修复+回退三列，含合并）、2d0c51f03（bug#6076不动产权号标签修复），父仓库gitlink同步至 67b66f7\n- 构建：npm run build，ESLint存量2 error/14 warning\n- 技术栈：Vue，含detailMixins、ExtractDialog等组件\n\n## 分支与worktree\n- szfc-v3-wt-prefund-new：预售资金新功能worktree，合并至develop/v3.0.0（合并提交588f0c434）后已删除，分支feature/prefund-account-agreement-1413-1415保留（本地+远程）\n- zhi2-web-admin-wt-navbar-home：分支 fix/bug5983-navbar-back-home-portal 的 worktree，已完成 Navbar 返回首页修复并 fast-forward 合并至 develop/v3.0.0 后删除\n- bug#6012 修复两个 worktree（分支 fix/bug6012-detail-gap、fix/bug6012-revert-3col），均已合并至 develop/v3.0.0（HEAD e4515310b）后删除 worktree 与 junction；旧分支 fix/bug6012-parcel-dialog-3col（上次三列方案）已合并保留历史；并行 worktree szfc-v3-wt-bug6070-zhi2 未被触碰\n- bug#6076 修复 worktree（分支 bug6076-cert-label），3处标签文案修改后 fast-forward 合并至 develop/v3.0.0（HEAD 2d0c51f03）后删除 worktree；并行 worktree zhi2-wt-bug6057、zhi2-wt-bug6079 未被触碰\n\n## 后端服务\n- 后端仓库：苏州市房地产检测V3后端仓库\n- 服务：common-gateway(8080网关)、zhi3-prefund(9214预售资金)、zhi3-presale(9213价格备案)、common-flowable(未运行)\n- 前端构建：npm run build，子模块 node_modules 含 vite 8.3.5，根目录 vite 5.4.11；nginx 8098 提供 dist\n\n## 缺陷跟踪\n- 使用禅道(zentao-biz.zhi.com)管理bug，如6023楼幢同步失败、6059价格备案流程记录样式不一致、5983 Navbar返回首页点击无反应（已修复并新增e2e/layout/navbar-back-home.spec.js验证）、6012 宗地信息查看弹窗字段行垂直间距异常（根因：图片行拉伸，.detail-row align-items:stretch 致土地出让合同图片字段~100px撑高整行、相邻文本垂直居中留白，此前误判为列数问题；修复：detail-template.vue 加 .value-area.auto-height 顶部对齐、图片改 width:100px;max-height:100px，ParcelDialog.vue 土地出让合同字段加 fullRow:true 并回退 :dialog-column=\"3\" 恢复默认列数；已推送 develop/v3.0.0 e4515310b，文档 common-errors.md E-026 更新）、6076 不动产权证书列表页「不动产权号」应改「不动产权证号」（根因：StateTable.vue 第61/88/91行标签错写；修复：3处纯文案改为不动产权证号；已推送 develop/v3.0.0 2d0c51f03；本地 lint/build 因 node_modules 不完整未执行）",
+                "after": "# zhi2-web-admin 房产管理H5后台\n苏州房产管理系统的前端后台项目，采用git父仓库+子模块结构。\n\n## 基本信息\n2d0c51f03（bug#6076不动产权号标签修复）、223f51924（bug#6057楼幢维护楼幢类型修复），父仓库gitlink同步至 67b66f7\n- 构建：npm run build，ESLint存量2 error/14 warning\n- 技术栈：Vue，含detailMixins、ExtractDialog等组件\n\n## 分支与worktree\n- szfc-v3-wt-prefund-new：预售资金新功能worktree，合并至develop/v3.0.0（合并提交588f0c434）后已删除，分支feature/prefund-account-agreement-1413-1415保留（本地+远程）\n- zhi2-web-admin-wt-navbar-home：分支 fix/bug5983-navbar-back-home-portal 的 worktree，已完成 Navbar 返回首页修复并 fast-forward 合并至 develop/v3.0.0 后删除\n- bug#6012 修复两个 worktree（分支 fix/bug6012-detail-gap、fix/bug6012-revert-3col），均已合并至 develop/v3.0.0（HEAD e4515310b）后删除 worktree 与 junction；旧分支 fix/bug6012-parcel-dialog-3col（上次三列方案）已合并保留历史；并行 worktree szfc-v3-wt-bug6070-zhi2 未被触碰\n- bug#6076 修复 worktree（分支 bug6076-cert-label），3处标签文案修改后 fast-forward 合并至 develop/v3.0.0（HEAD 2d0c51f03）后删除 worktree；并行 worktree zhi2-wt-bug6057、zhi2-wt-bug6079 未被触碰\n- bug#6057 修复 worktree（zhi2-wt-bug6057，分支 bug6057-building-type）：detail.vue 加楼幢类型字段，rebase 到 2d0c51f03 后 fast-forward 合并 develop/v3.0.0（HEAD 223f51924）后删除 worktree 与分支；主工作区有他人 staged index.scss 故用 rebase+ff-only 避免干扰；并行 worktree zhi2-wt-bug6079（bug6079 价格详情省略号）未被触碰\n\n## 后端服务\n- 后端仓库：苏州市房地产检测V3后端仓库\n- 服务：common-gateway(8080网关)、zhi3-prefund(9214预售资金)、zhi3-presale(9213价格备案)、common-flowable(未运行)\n- 前端构建：npm run build，子模块 node_modules 含 vite 8.3.5，根目录 vite 5.4.11；nginx 8098 提供 dist\n\n## 缺陷跟踪\n- 6076 不动产权证书列表页「不动产权号」应改「不动产权证号」（根因：StateTable.vue 第61/88/91行标签错写；修复：3处纯文案改为不动产权证号；已推送 develop/v3.0.0 2d0c51f03；本地 lint/build 因 node_modules 不完整未执行）\n- 6057 楼幢维护缺楼幢类型致价格备案均价暂无数据（根因：projectManagement/buildinginfo/detail.vue 的 form.buildingType 已声明但模板无编辑下拉与查看展示，且字典错用大写 BUILDING_TYPE 仅3项；DB 核实 T_BUILDING.BUILDING_TYPE 与 T_SA_PRICE_BUILDING.BUILD_TYPE 取值 1/2/3/4/22 对应完整 building_type 字典；修复：detail.vue 编辑态加楼幢类型下拉、查看态加 tag、补必填校验、字典改 building_type；提交 223f51924 ff 合并 develop/v3.0.0；ESLint 0 error；禅道回写 resolved/fixed/trunk/resolvedBy=tiany/assignedTo=zhunan action 85978）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

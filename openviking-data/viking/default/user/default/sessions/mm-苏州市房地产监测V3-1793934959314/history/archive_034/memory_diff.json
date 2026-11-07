@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793934959314/history/archive_034",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T04:55:50.319788+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/bug/regulatory_dialog_data_fix.md",
+                "memory_type": "entities",
+                "after": "# 选择监管标准弹窗列表数据解析修复\n苏州市房地产监测V3 项目修复「选择监管标准」弹窗（`RegulatoryDialog.vue`）接口返回列表但表格显示「暂无数据」的问题。\n\n## 问题根因\n- `zs-select-dialog.vue` 的 `getList` 写死 `this.tableData = res[this.listKey]`，默认 `listKey = 'rows'`\n- 接口实际返回 `{ code: 200, data: [...] }`，顶层无 `rows` 字段，导致 `tableData` 非数组\n- 同目录 `zs-select-dialog-func.vue` 已有 `extractListData` 可回退到 `data` / `data.records`，但普通版未同步\n\n## 修改要点\n- 在 `zs-select-dialog.vue` 中与 func 版对齐，改用 `extractListData` / `extractTotal` 解析\n- `rows` 不存在时自动回退用 `data` 数组赋值 `tableData`\n\n## 验证与归属\n- 需重新打开「选择监管标准」弹窗验证列表；若仍为空需提供完整响应 JSON 顶层字段名\n- 涉及文件：`zs-select-dialog.vue`、`zs-select-dialog-func.vue`、`RegulatoryDialog.vue`\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor\n- 来源会话ID：79196650-1f8f-4250-a924-1f5ed127ab56"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_change_nav_fix.md",
+                "memory_type": "entities",
+                "after": "# 机构变更详情列表跳转逻辑修复\n苏州市房地产监测V3 项目修复经纪/租赁机构变更列表跳转详情页路由错误及从业人员详情页初始化失效问题。\n\n## 问题根因\n- `companyChangeManage/index.vue` 的 `navigateToChangeDetail` 一律先走「基本信息变更」路由，未按 `busCode` / 变更类型区分\n- 导致「从业人员信息」也进入机构基本信息变更页，用变更单 ID 调备案 `detail` 出现 400\n- `AgencyPersonnelDetail` 从变更列表带 `personnelRecordChangeId` 进入时 `init()` 不被 `formMode` 监听，`inPageChangeMode` 未生效，仍用路由 `id` 请求错误接口\n\n## 修改要点\n- `companyChangeManage/index.vue` 新增 `resolveChangeDetailTarget`，先按 `busCode` 解析\n- 仅 `jbxxbg`/`qybgxq` 或文案含「基本信息」走机构基本信息页；从业人员按 `organType` 落到 `jgcyrybg`\n\n## 验证与归属\n- 涉及文件：`companyChangeManage/index.vue`、`AgencyPersonnelDetail.vue`、`LeasePersonnelDetail.vue`\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor\n- 来源会话ID：75a612f1-9c9e-4b32-8b51-9ebc77e6ee9f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/generate_qrcode_cleanup.md",
+                "memory_type": "entities",
+                "after": "# generateQrCode 接口及相关逻辑清理\n苏州市房地产监测V3 项目按计划完成 `generateQrCode` 接口及相关前端逻辑的清理下线。\n\n## 改动摘要\n- `AnnexUpload/index.vue` 移除「扫码上传」弹窗 UI（`el-popover` + `qr-code`）、`qrCode` 组件导入与 `mapState(projectId)`\n- 移除 `code`、`tempToken`、`qrCodeUrl` 及 `showQrCode()` 方法，`created` 仅保留 `getList()`\n- `agency-branch-flow.spec.js` 删除 `/file/appendixConfig/generateQrCode` 的 Mock 拦截\n\n## 验证与归属\n- Mock E2E 全流程 6 条用例全部通过，附件上传、删除、注销校验等流程正常\n- 物业模块 `QrCodeDialog` 使用的本地 `qrCode.vue` 组件未改动，与本次接口下线无关\n- 涉及文件：`AnnexUpload/index.vue`、`agency-branch-flow.spec.js`、`qrCode.vue`\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor\n- 来源会话ID：bee3c0ee-1c52-49fd-aba5-14405edf6707"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/agency_change_area_fix.md",
+                "memory_type": "entities",
+                "after": "# 机构变更行政区域字段保留修复\n苏州市房地产监测V3 项目修复机构变更保存时未保留原 `provinceCityArea`（行政区域）字段值的问题。\n\n## 问题根因\n- 机构变更保存时未回传 `provinceCityArea`，页面上行政区域字段值丢失\n\n## 修改要点\n- `companyBasicInfoContent.js`：`normalizeCompanyBasicForm` 合并 `administrativeArea` 展示值同时保留 `provinceCityArea` 原值；`createCompanyBasicFormDefaults` 补充 `provinceCityArea: undefined`\n- `companyRecordAgency/change/detail.vue`：`getDetail` 加载 `beforeForm` 后若变更单缺 `provinceCityArea`，从原备案数据回填\n- `toB/companyRecord/detail.vue` 同步相关逻辑\n\n## 验证与归属\n- 涉及文件：`companyBasicInfoContent.js`、`companyRecordAgency/change/detail.vue`、`toB/companyRecord/detail.vue`\n- 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor\n- 来源会话ID：b9e75113-bcab-4880-a9ad-aff2106e5082"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

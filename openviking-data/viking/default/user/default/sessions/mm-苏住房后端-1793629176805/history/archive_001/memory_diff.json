@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房后端-1793629176805/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T14:22:03.966370+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/submodule_protocol_mismatch.md",
+                "memory_type": "entities",
+                "after": "# 子模块权限探测协议不一致误判\n批量初始化子模块时，若探测协议与 .gitmodules 中写的协议不一致（如误用 https 而文件全为 http），且对应端口不通，会误判为仓库无权限。\n\n## 问题根因\n- 批量初始化 14 个子模块时，8 个 zhi2-* 仓库 git ls-remote 全部失败，一度判为「仓库权限没开」\n- .gitmodules 里所有子模块地址写的是 http://，本机网络 80 端口通、443 端口断\n- 第一次测权限用 https://，443 不通表现成「没权限」，实际是协议走错\n- 换成 .gitmodules 同样的 http:// 再探，git ls-remote 全部命中目标分支（如 develop/v2.6.2-suzhufang-dev），权限本来就是好的\n\n## 解决方案\n- 判「有没有权限」前，先用 git config -f .gitmodules --get submodule.<name>.url 取出原样协议，不要自作主张换 https\n- 探测权限用 git ls-remote <url> <目标分支>，命中即说明凭据与网络都通\n- 区分两类失败：认证失败（403 / 要求输入凭据）与网络失败（连接超时、443 不通），后者是换协议或换端口的事\n- 批量初始化前先用一个子模块试协议，再放开跑全量，避免 14 个一起报同样错而无法分辨根因\n\n## 验证与归属\n- 验证：会话 2010156f（基线 02900b8）用户诉求初始化所有子模块并启动检查，最终结论写明之前 404 的 8 个 zhi2-* 仓库权限确实开了，坑在自用 https 而 .gitmodules 全 http，443 断，14/14 子模块全部初始化并切到目标分支\n- 涉及文件：.gitmodules\n- 来源会话ID：2010156f-5fb3-49c1-859a-daa3a63a94f2；代码基线：02900b8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/maven_snapshot_lag.md",
+                "memory_type": "entities",
+                "after": "# Maven 缺自家包因 Nexus 快照落后源码\n全量 Maven 构建报缺 com.zhishu.property.api.complex.util，根因是 Nexus 上发布的 SNAPSHOT 构件比分支源码旧，需先本地 install 依赖模块再续建。\n\n## 问题根因\n- 全量 mvn -DskipTests install 时，common-framework / data-property / service-expand 三个模块编译失败，报缺 com.zhishu.property.api.complex.util\n- Nexus 上 zhi2-property-api:2.5-SNAPSHOT（快照停在 20260703.070124-7）里没有该 util 包\n- 分支上钉的 zhi2-property 提交比快照新，新源码依赖了尚未发布的类，Maven 从远端拉到旧快照自然找不到\n\n## 解决方案\n- 遇「某模块缺自己项目里的包」，先比对本地分支 zhi2-property 提交时间与远端快照发布时间，确认是构件落后而非源码写错\n- 把被依赖模块先本地安装（mvn -DskipTests install -pl zhi2-property-api -am，或整条链 install），让下游解析到本地新构件\n- 源码到位后链路打通，全量 reactor 33 个子工程 BUILD SUCCESS\n- 仅为治标，下次别人拉代码同样会缺，除非把 zhi2-property-api 重新 deploy 到 Nexus 并让下游依赖新快照\n\n## 验证与归属\n- 验证：会话 2010156f（基线 02900b8）最终结论全量 reactor BUILD SUCCESS，根因是 Nexus 快照缺 util 包，本地先装 zhi2-property-api 后链路打通\n- 涉及文件：pom.xml ; zhi2-property/pom.xml\n- 来源会话ID：2010156f-5fb3-49c1-859a-daa3a63a94f2；代码基线：02900b8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/maven_file_lock.md",
+                "memory_type": "entities",
+                "after": "# Maven 复制构件失败因本地实例占着 jar\n全量构建中途报 Failed to copy artifact ... 另一个程序正在使用此文件，根因是本地还在跑的实例占着 target/lib 的 jar，停掉后用 -rf 续建。\n\n## 问题根因\n- 全量构建中途 common-flowable-server 报 Failed to copy artifact ... 另一个程序正在使用此文件\n- 本地还在运行的 flowable 实例（java 进程）把 target/lib 下的 jar 句柄占着\n- Windows 上文件被独占，Maven 打包时要复制/替换该文件，导致复制失败\n\n## 解决方案\n- 先确认是不是「上次启动的服务还在跑」——本模块有本地实例时优先怀疑它\n- 停掉占用进程（结束对应 java 进程）再重跑\n- 不用从头重跑，用 mvn -DskipTests install -rf :common-flowable-server 从失败模块续建，省掉前面已成功的 32 个模块\n- 排查顺序固定：报错被占用路径 → 是否 target/lib 下构件 → 找占用进程 → 停 → 续建，不要一上来怀疑 Maven 或依赖版本\n\n## 验证与归属\n- 验证：会话 2010156f（基线 02900b8）最终结论停掉 flowable 实例后 -rf :common-flowable-server 续建即通过\n- 涉及文件：common-flowable/pom.xml\n- 来源会话ID：2010156f-5fb3-49c1-859a-daa3a63a94f2；代码基线：02900b8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/springboot_start_regex.md",
+                "memory_type": "entities",
+                "after": "# Spring Boot 启动检测正则别写死类名\n批量启动后端服务时，脚本因正则要求 Started .+Application in 而 zhi2 系列日志打 Started application in 误报 TIMEOUT，应以端口 LISTEN 为准。\n\n## 问题根因\n- 批量启动 12 个后端服务时，脚本报告多个模块启动超时（TIMEOUT），但实际服务都是好的\n- zhi2-maintenance 实测 17.5s、zhi2-benefit 18.5s，都在 20 秒内\n- 检测正则太严：脚本按 Started .+Application in 匹配（强制要求类名），而 zhi2 系列日志打的是 Started application in（无类名），匹配不上就判超时\n\n## 解决方案\n- 判定服务是否起来以「端口 LISTEN」为准（netstat -ano | findstr :9605），日志正则只作辅助\n- 若一定要用日志，把正则放宽到 Started .* in（允许类名缺失），或按服务族分别配置\n- 报告里区分「真超时」与「检测未命中」，不要把检测器的 bug 写成服务慢\n- 批量启动统一用「端口 LISTEN + 等待窗口」双条件，避免假结论\n- 端口表固定：8080 common-gateway、9211 common-framework、9603 data-property、9604 zhi2-property、9605 zhi2-maintenance、9606 zhi2-autonomy、9608 zhi2-evaluation、9610 service-expand、9616 zhi2-credit、9700 common-flowable、9701 zhi2-external、9803 zhi2-benefit\n\n## 验证与归属\n- 验证：会话 2010156f（基线 02900b8）最终结论 12/12 全部在跑，误报因正则错，端口探测为准\n- 涉及文件：zhi2-maintenance ; zhi2-benefit ; common-gateway\n- 来源会话ID：2010156f-5fb3-49c1-859a-daa3a63a94f2；代码基线：02900b8"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

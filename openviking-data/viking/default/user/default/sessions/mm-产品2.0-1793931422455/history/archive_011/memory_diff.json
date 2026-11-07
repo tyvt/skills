@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793931422455/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T02:45:38.220206+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/main_js_token_double_mount_fix.md",
+                "memory_type": "entities",
+                "after": "# main.js Token 重复挂载修复\n产品2.0 的 zhi2-web-admin 修复 URL 带 token 且非 iframe 时 `createInstance` 重复调用导致双根实例的问题。\n\n## 问题原因\n- `query` 有 `token` 时先 `setToken` 再 `createInstance()`（约208-211行）\n- 当 `VITE_APP_IS_IFRAME != \"1\"` 时，后面 `else` 无条件再调一次 `createInstance()`（约232-233行）\n- iframe 场景父页面 `postMessage` 带 token 也会再调，存在重复挂载风险\n\n## 修复内容\n- 只解析一次 `URLSearchParams`，用 `tokenFromUrl` 判断并 `setToken`\n- 非 iframe 时改为 `else if (!tokenFromUrl)` 再 `createInstance()`，避免重复\n- 在 `createInstance` 开头增加 `if (instance) return` 防护\n\n## 涉及文件与归属\n- 文件：`zhi2-web-admin/src/main.js`\n- 所属项目：产品2.0；来源会话：6da734ba-569d-4721-a801-3c8dd95f3fee；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_index_todo_race_fix.md",
+                "memory_type": "entities",
+                "after": "# home/index.vue 待办消息竞态修复\n产品2.0 的 zhi2-web-admin 修复待办与消息共用 `todos` 因请求乱序返回导致展示与跳转不一致的问题。\n\n## 问题原因\n- 待办和消息共用同一个 `todos`，`getList` 与 `getMessageList` 各自发请求\n- 先发后到的响应会覆盖界面，导致数据过期且 `handleProcess` 按 `currentIndex` 分支跳转不一致\n\n## 修复内容\n- 增加 `todoPanelFetchSeq`，每次发起请求前自增，闭包 `seq` 记录本次序号\n- `.then` 仅当 `seq === this.todoPanelFetchSeq` 才赋值 `todos`\n- `.finally` 同样仅当序号匹配才置 `todoLoading = false`\n- 对 `res.rows` 做 `|| []` 防护避免空数据 `map` 报错\n\n## 涉及文件与归属\n- 文件：`zhi2-web-admin/src/views/home/index.vue`\n- 所属项目：产品2.0；来源会话：17a66e94-0a17-42dc-94f3-4fbe933bf043；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_config_bypass_header_fix.md",
+                "memory_type": "entities",
+                "after": "# vite.config.js bypass 请求头修复\n产品2.0 的 zhi2-web-admin 修复代理 `bypass` 未应用 `rewrite` 导致 header 显示前端路径而非实际转发地址的问题。\n\n## 问题原因\n- `bypass` 里直接用 `req.url` 未走 `rewrite`，`frontend-proxy` header 显示前端请求路径\n\n## 修复内容\n- 先应用 `rewrite` 再拼 header：`const rewrittenUrl = options.rewrite ? options.rewrite(req.url) : req.url; res.setHeader(\"frontend-proxy\", `${options.target}${rewrittenUrl}`);`\n- 例：请求 `/api/v3.0/foo` 显示 `http://xxx/v3.0/foo`（去 `/api` 前缀）\n\n## 涉及文件与归属\n- 文件：`zhi2-web-admin/vite.config.js`\n- 所属项目：产品2.0；来源会话：8199e2bb-60dc-46d6-9a57-47b7757e9d8b；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/platform_config_switch.md",
+                "memory_type": "entities",
+                "before": "# platformConfig 功能开关默认隐藏\n跨页面按钮展示可挂在 Vuex app.platformConfig，用严格等于 true 判定避免后端未下发时误开敏感操作。\n\n## 问题背景\n- 跨页面按钮（如「发布公告」）是否展示需统一控制在 Vuex app.platformConfig\n- 接口 /system/platformConfig/getInfo 对齐，初始对象声明 isShowPublishButton: undefined\n\n## 解决方案\n- 页面用 mapState 取出后，v-if 最前面加 isShowPublishButton === true，再叠原有 bizState/msgId/征集类型/publishState 等业务条件\n- 严格等于 true 时未配置或 undefined/false 一律不显示，避免后端未下发时误开敏感操作\n- 若产品要求「未配置则沿用旧逻辑」，改为 isShowPublishButton !== false 并文档化\n\n## 验证与归属\n- 验证：会话 f61307bd，app.js 增 isShowPublishButton，candidateCollect detail 发布公告按钮仅在 === true 且原条件满足时显示\n- 涉及文件：zhi2-web-admin/src/store/modules/app.js、zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue\n- 所属项目：园区物管2.0；代码基线：7814a0c2a；来源会话：f61307bd-7d75-4fff-ad85-3385c42878ea",
+                "after": "# platformConfig 发布公告按钮获取方式改造\n产品2.0 的 zhi2-web-admin 中 candidateCollect detail.vue 的 `isShowPublishButton` 获取方式从 Vuex platformConfig 改为新接口获取。\n\n## 原方案（已移除）\n- 早期通过 Vuex `app.platformConfig` 的 `isShowPublishButton === true` 控制按钮展示，文件涉及 store/modules/app.js 与 detail.vue\n- 原所属项目记录为园区物管2.0，来源会话 f61307bd-7d75-4fff-ad85-3385c42878ea\n\n## 现方案（当前）\n- 已移除 `computed` 里 `mapState` 映射，改为组件本地 `data` 字段\n- 组件 `created()` 调用 `/autonomy/common/getCustomConfig`，从 `res.data.preparatoryGroup.isShowPublishButton` 赋值\n- 接口异常时默认 `false`，保证按钮不误显示\n- 关键位置：`detail.vue` 约 104-199 行，组件名 `OwnerCandidateCollectDetail`\n\n## 涉及文件与归属\n- 文件：`zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue`\n- 所属项目：产品2.0；来源会话：62402fac-2ae0-4b94-a392-c3ba8b3662d4；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

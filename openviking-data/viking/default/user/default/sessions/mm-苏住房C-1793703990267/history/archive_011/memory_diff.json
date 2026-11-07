@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:28:20.391885+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/banner_menu_composite.md",
+                "memory_type": "entities",
+                "after": "# banner跳转地址复合串致小程序提示功能暂未开放\n苏住房C首页热门活动轮播图因后端下发「菜单码&参数」复合串，小程序/H5整串查菜单表失败兜底提示「功能暂未开放」，APP正常。\n\n## 问题现象\n- 首页「热门活动」中「查看装修补贴企业名单」轮播图在小程序/H5点击提示「功能暂未开放」，同一banner在APP里正常打开\n- 终端用户反馈「APP里是好的、小程序不行」，易误判为菜单配置或权限问题\n\n## 根因\n- 后端下发跳转地址为`3_1_16&richTextId=1989870396182228994`复合串，非纯菜单码\n- APP侧拆成菜单码+参数跳富文本详情页；小程序/H5的navigateMenuItem把整串当菜单码查MENU_ROUTES，查不到触发静态兜底文案\n\n## 解决方案\n- utils/menuNav.js新增parseMenuLink，拆开菜单码与参数，兼容`?`与`&`两种连接格式\n- 跳转时将richTextId等参数传给resolveMenuRoute，由菜单码映射页面后带参（本例落到/pages_main/news/detail?id=...）\n- redirect/index.vue中转页也要走同一解析，否则从中转页进入的同类链接仍提示未开放\n\n## 验证与归属\n- 验证：会话5e3bf5c4后台跳转地址为复合串，navigateMenuItem整串查表触发「功能暂未开放」；修复后menuNav.js支持双格式并同步redirect页\n- 涉及文件：src/utils/menuNav.js、src/utils/menuRouteMap.js、src/pages/redirect/index.vue、src/pages/index/components/Home_Suzhufang.vue\n- 所属项目：苏住房C；来源会话ID：5e3bf5c4-bf75-4a82-9a83-96098fe31155；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/main_tab_placeholder.md",
+                "memory_type": "entities",
+                "after": "# 主包Tab兜底占位图须放主包static否则空白\n苏住房C苏找房「全部」Tab二手房卡片因默认图放分包未预加载而整块空白，非默认图缺失。\n\n## 问题现象\n- 苏找房「全部」Tab二手房卡片图片显示空白，连默认占位图也没出来（用户强调「不是默认图，是整块空白」）\n- H5生产环境图片代理写http://，在HTTPS WebView里属混合内容被拦截\n\n## 根因\n- listRecommend返回的二手房记录thumbnail为null，接口本身不带图片\n- default.png放在pages_transaction分包，苏找房Tab属主包页面，分包未预加载时分包内静态资源路径不可访问\n- 图片字段映射不完整：部分接口返回imageUrl而非thumbnail，原写法imageUrl:e.thumbnail会把已有地址覆盖成undefined\n\n## 解决方案\n- 把default.png复制到主包src/static/images/szf/，并在utils/mainStaticPaths.js注册主包默认图路径\n- houseCard.vue与各列表页图片字段映射统一改成thumbnail ?? imageUrl，不再反向覆盖\n- pages.json进入苏找房Tab时预加载pages_transaction分包（兜底，不替代主包方案）\n- .env.production图片代理改https://szfang.szfcweb.cn\n\n## 验证与归属\n- 验证：会话fa5768fc二手房图片整块空白；listRecommend返回thumbnail均为null；default.png在分包内致主包不可访问；修复后主包复制+映射改thumbnail??imageUrl+预加载+代理改https\n- 另需向上游说明：「全部」Tab缺缩略图属后端数据问题（szfHQuery已有该数据但listRecommend未返回）\n- 涉及文件：src/static/images/szf/default.png、src/utils/mainStaticPaths.js、src/components/commonNew/houseCard.vue、src/pages_tab/components/Project_Suzhufang.vue、src/pages_transaction/stockHouse/index.vue、src/pages.json、.env.production\n- 所属项目：苏住房C；来源会话ID：fa5768fc-b738-4e95-83d7-d7bd81e5939a；代码基线：0cea241"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/submodule_cross_migrate.md",
+                "memory_type": "entities",
+                "after": "# 双分支子模块间功能互迁固定打法\n苏住房C采用superproject+子模块zhi2-mobile-shimin双分支开发，功能互迁须子模块先迁再更新父仓指针。\n\n## 迁移顺序\n- 顺序永远是「子模块先迁+构建验证→父仓只更新子模块指针」，两个仓库分别各提一次，不要只提一侧\n- 迁移后统一跑npm run build:suzhufang验证，再谈推送与打tag\n\n## 迁移清单\n- 按清单成套搬，漏一项就是白屏或跳转失效\n- 清单项：①页面与组件（整目录搬，注意pages/index/components/与pages_tab/components/常有两份同名副本）②pages.json分包注册 ③api模块 ④共享组件与hooks ⑤路由与菜单映射menuRouteMap.js ⑥工具函数 ⑦菜单兜底配置static/menus.fallback.json\n\n## 决策点\n- sfb→主干迁移启用custom-tab-bar自定义TabBar，底部Tab由3个扩到5个（苏找房/慧物业/首页/掌服务/我的，首页中间凸起）\n- pages/benefit/index.vue与pages/property/index.vue保留主干既有「可跳转子页面」实现，不采用sfb的「内测中」占位页\n\n## 验证与归属\n- 验证：会话c50e16d0（sfb一级Tab迁到主干，父子仓分别提交）与34bc5e22（公共收益/阳光物业从主干迁回sfb，子模块sfb@90568e9b+父仓dev-sfb@399aa01）均按子模块先行、父仓更新指针执行并用build验证通过\n- 涉及文件：src/pages.json、src/utils/menuRouteMap.js、src/utils/menuNav.js、src/store/menu.js、src/custom-tab-bar/index.vue、src/utils/index.js\n- 所属项目：苏住房C；来源会话ID：c50e16d0-db17-4bed-8d44-31e68369a6b2, 34bc5e22-4992-4fe8-8f97-cf066ecb6f2e；代码基线：77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/repair_intercept_old.md",
+                "memory_type": "entities",
+                "after": "# 报事报修拦截失效因开发者工具跑dist/dev旧包\n苏住房C电子业主卡报事报修加拦截后仍可点入，根因是微信开发者工具导入的是dist/dev旧产物而非新源码。\n\n## 问题现象\n- 给电子业主卡「报事报修」加入口拦截（点击只Toast「功能暂未开放」、不跳转），用户改完仍反馈「还是可以点进去」\n- 同源泰兴经验只覆盖「tools点编译不生效、以dist/build为准」，此处指向不同：用户/容器默认挂在dist/dev上，dev与build两产物目录混用\n\n## 根因\n- 源码里拦截逻辑确实存在，但微信开发者工具导入的仍是zhi2-mobile-shimin/dist/dev/mp-weixin旧产物，该包里goToOther没有拦截分支\n- 真机/工具验证的是旧包不是新代码，导致「改完还是不行」的误判\n\n## 解决方案\n- 先区分环境再排查代码：确认开发者工具导入dist/dev还是dist/build，或直接问用户在哪端（H5/小程序/App）测的\n- 定位后重新编译（npm run dev或导入刚打出的dist/build），工具里「清缓存→重新编译」\n- 不要因用户说「还是不行」就反复改源码，先核对产物里是否存在该字符串（如grep产物中的「功能暂未开放」）\n- 加固侧把点击事件换成@tap.stop+抽出统一isRepairNav谓词，在入口click与goToOther两处双重拦截\n\n## 验证与归属\n- 验证：会话eac9139c用户轮次4「还是可以点进去啊」；结论明确源码已加拦截但工具跑dist/dev旧包无该逻辑，要求改导dist/build、清缓存重新编译\n- 涉及文件：src/pages_owner_extra/ownerCard/index.vue、src/pages_owner/ownerCard/index.vue\n- 所属项目：苏住房C；来源会话ID：eac9139c-3367-4784-8577-a513c71c95c0；代码基线：48bdb17"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

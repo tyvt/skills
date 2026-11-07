@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_048",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:48:18.556873+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/news_tab_vertical.md",
+                "memory_type": "entities",
+                "after": "# 行业资讯页区域Tab竖排问题\n苏住房C小程序行业资讯页的区域tab因flex子项被压缩且误留word-break导致中文逐字换行竖排。\n\n## 现象与根因\n- pages_main/news/index.vue 区域tab（市住建、张家港市、常熟市等）显示成每字一行竖排\n- tab容器用display:flex，但li未加flex-shrink:0，tab数量多时每个li被压窄\n- 配合word-break:keep-all，中文在窄列下逐字折行成竖排\n- 纯CSS收缩叠加换行策略问题，非数据结构或组件问题\n\n## 解决方案\n- li加flex-shrink:0，保证标签保持内容宽度不被压缩\n- 加white-space:nowrap保证文字横向一行\n- 去掉多余的word-break:keep-all\n- ul重置margin:0\n- 保持容器可横向滑动（tab多时能左右滚）\n\n## 判别口径\n- 小程序「横向列表/标签变竖排」先看flex子项是否被压缩+是否误留word-break类属性\n- 不要先怀疑字体或rpx换算\n\n## 验证与归属\n- 会话9bedfd55：用户报tabUI出问题并附竖排截图，定位修复\n- 涉及文件：pages_main/news/index.vue、ListIndex.vue、tabBtn.vue\n- 所属项目：苏住房C；来源会话ID：9bedfd55-6428-4419-b1a7-8396206c9412；代码基线：9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/wxss_not_unsupported.md",
+                "memory_type": "entities",
+                "after": "# 微信小程序WXSS不支持:not()伪类\n苏住房C（uni-app Vue3）构建时微信开发者工具报wxss编译错误，根因是WXSS不支持:not()伪类。\n\n## 现象与根因\n- zhi2-mobile-shimin自动预览/构建报wxss编译错误ErrorFileCount[3]，error at token ':'\n- 同时命中TypeChoose_Suzhufang.vue、pages_owner/house/index.vue、pages_owner/tenant/index.vue三文件\n- 微信小程序WXSS不支持:not()伪类，编译产物出现即整条报错直接打断构建（不同于min()/max()静默丢弃）\n- 两处来源：页面直系选择> :not(.page-bg)与uni.scss全局.page:not(.page-wrapper)污染所有页面\n\n## 解决方案\n- 把:not()展开成显式选择器清单，如> :not(.page-bg)改为.type-text, .title_card_container等\n- 全局uni.scss里.page:not(.page-wrapper)直接降级为.page\n- 改完构建后dist的wxss里grep :not数量应为0，再回开发者工具编译\n- 新增样式禁用:not()/:has()一类现代伪类\n\n## 验证与归属\n- 会话7482cc2e（2026-08-25，基线5f0f4dc）用户贴wxss编译错误，逐文件替换并改uni.scss，复核:not数量为0\n- 涉及文件：TypeChoose_Suzhufang.vue、house/index.vue、tenant/index.vue、uni.scss\n- 所属项目：苏住房C；来源会话ID：7482cc2e-dca0-4d98-8721-da0bc1b7dffd；代码基线：5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/subpkg_image_path.md",
+                "memory_type": "entities",
+                "after": "# 分包静态图不能手写相对路径\n苏住房C小程序分包内手写原生image相对路径会被解析到主包而404，须统一走ZsImage组件。\n\n## 现象与根因\n- pages_main/message/chitchat.vue（微聊列表）机器人客服头像空白，同页其他联系人头像正常\n- 机器人头像手写原生<image src=\"../static/images/auto-robot.png\">\n- uni-app编译到微信小程序后相对路径被重写为主包绝对路径/static/images/auto-robot.png，实际图在分包pages_main/static/images/，404空白无报错\n- 同页其他头像用ZsImage经resolveStaticUrl按当前分包解析故正常\n- 与「分包间不能跨包引用静态资源」同根因：手写相对路径同样解析错包\n\n## 解决方案\n- 分包内静态图一律用ZsImage，src只写相对images/路径（如src=\"images/auto-robot.png\"）\n- 由组件内部解析所在分包static根\n- 排查「某图不显示而同类图正常」先比对走ZsImage还是裸<image>\n\n## 验证与归属\n- 会话e7bbf5fb（2026-08-24，基线4630e8e）用户报机器人客服头像没出来，改用ZsImage修复\n- 涉及文件：chitchat.vue、ZsImage.vue、utils/index.js\n- 所属项目：苏住房C；来源会话ID：e7bbf5fb-a194-4fdc-9755-8546e1c8585b；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/decision_record_bug.md",
+                "memory_type": "entities",
+                "after": "# 决策记录列表只显示时间\n苏住房C投票决策记录列表因enrich覆盖与CardList槽位错位，只显示时间看不到决策者和选项。\n\n## 现象与根因\n- pages_vote/decision/common/DecisionResult.vue「决策记录」列表只看到时间，看不到决策者姓名和决策选项\n- 两层叠加：CardList固定渲染label/value/remark三槽位，旧代码value写createTime、label留空、选项没落位\n- enrichRecordList额外请求getDecisionRecordDetail再...record展开合并，详情响应同名字段为null时覆盖列表已有值\n\n## 解决方案\n- 直接用接口完整列表decisionOptionResponseAllList构建记录\n- 映射label=decisionPlayerName、value=decisionOptionName、remark=createTime（最终采用label=姓名/value=时间/remark=选项）\n- 记录详情接口降级为姓名兜底，扩展resolvePlayerName候选字段匹配，不回冲权威字段\n- 通用判据：enrich/合并式取数写成「只在目标字段为空时回填」，不能无条件展开覆盖\n\n## 验证与归属\n- 会话84a82111与6fda2373（2026-08-27，基线f1939b0）两次收敛同一问题\n- 涉及文件：decision/common/DecisionResult.vue、elect/DecisionResult.vue、CardList.vue\n- 所属项目：苏住房C；来源会话ID：84a82111-c481-4df3-bfc7-e5397b1d1fed, 6fda2373-f0d5-4e0d-87d7-0f8c4b8cbc61；代码基线：f1939b0"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

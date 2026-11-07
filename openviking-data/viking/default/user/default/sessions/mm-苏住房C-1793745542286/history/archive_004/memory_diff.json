@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T22:47:20.344528+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/v1instance_noreject_bug.md",
+                "memory_type": "entities",
+                "after": "# v1Instance缺失supportNoReject致noReject静默失效\n苏住房C小程序二手房房源核验接口配置noReject:true但因请求实例未开supportNoReject开关而无效，导致业务失败被误报为网络错误。\n## 问题现象\n- 房源发布·房源核验点击核验后统一弹「网络错误，请稍后再试！」\n- 抓包响应外层success:true,code:200,data内嵌业务失败JSON（内层code:500,message:'核验失败...'）\n- 页面已有内层code==500跳失败页分支但从未执行\n## 根因\n- secondVerifyLogVerify接口配置noReject:true，依赖请求实例supportNoReject:true开关\n- src/api/v1Instance.js未开supportNoReject，noReject成无效配置\n- 拦截器把内层code:500当请求失败，且内层用message而非msg，兜底文案落通用「网络错误」\n## 解决方案\n- 在v1Instance.js补supportNoReject:true（与V2 api/index.js一致）使noReject生效\n- 页面跳失败页时对错误原因encodeURIComponent，避免URL截断\n- 排查顺序：外层code是否200→接口是否配noReject→实例是否开supportNoReject→内层错误字段message还是msg\n## 验证与归属\n- 会话df98a5b7（基线77666f8）用户报核验显示网络错误，定位v1Instance.js缺开关，补开关并encodeURIComponent\n- 涉及文件：zhi2-mobile-shimin/src/api/v1Instance.js、httpInstance.js、gateway.js、transaction.js、pages_transaction/publishHouse/verification.vue\n- 所属项目：苏住房C；来源会话ID：df98a5b7-7af2-4775-8bc5-f19612418dfd；代码基线：77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/richtext_img_width_bug.md",
+                "memory_type": "entities",
+                "after": "# 富文本图片超宽需注入内联样式\n苏住房C小程序rich-text组件内部img不受外部CSS控制，需在formatRichTextContent中统一注入内联宽度样式。\n## 问题现象\n- 所有富文本（政策、公告、协议）由ZsRichText渲染，用户要求图片宽度不超屏幕\n- 小程序端图片按原始尺寸溢出屏幕\n## 根因\n- 微信小程序rich-text内部节点不受外部CSS控制（选择器进不去shadow结构）\n- uni.scss中.rich-text img{width:100%}仅在H5条件编译生效，小程序端无兜底\n- 页面逐个加:deep或改容器宽度同样无效\n## 解决方案\n- 在utils/index.js的formatRichTextContent统一改写所有img：删width/height属性、清style宽高、注入内联max-width:100%;width:100%;height:auto;display:block\n- uni.scss将.rich-text的max-width/overflow/word-break提升为全平台；ZsRichText根容器加max-width:100%+overflow:hidden\n- 同类富文本内表格/iframe/长英文字符串也应在字符串层处理\n## 验证与归属\n- 会话0f7f7bd6（2026-08-21，基线9832ba3）截图要求限宽，结论rich-text无法外部CSS控img，改formatRichTextContent注入样式\n- 涉及文件：src/utils/index.js、components/ZsRichText/ZsRichText.vue、uni.scss、pages_transaction/buyHousePolicy/detail.vue\n- 所属项目：苏住房C；来源会话ID：0f7f7bd6-7929-4524-8766-b29fbb4c9405；代码基线：9832ba3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/richtext_phone_linkify_bug.md",
+                "memory_type": "entities",
+                "after": "# 富文本电话正则无边界染蓝长编号\n苏住房C小程序ZsRichText渲染错误信息时，linkifyPhoneNumbersInHtml正则无数字边界，将长记录编号误识别为电话链接。\n## 问题现象\n- 房源核验失败页展示记录编号（如202607220192）被染成蓝色可点击\n- 用户反馈编号不应显示蓝色可点样式\n## 根因\n- formatRichTextContent调用linkifyPhoneNumbersInHtml，正则含\\d{8}无边界分支\n- 任意8位连续数字命中，长数字串（编号、流水号、身份证片段）子串被链接化\n## 解决方案\n- 在utils/index.js电话正则首尾加(?<!\\d)与(?!\\d)数字边界，仅独立数字成链\n- 改完长编号回落灰文本，真实手机号/固话仍可点击\n- 排查同类高亮先定位富文本预处理层，勿用CSS覆盖蓝色；回归验证长编号不链+手机号仍链\n## 验证与归属\n- 会话971ae865（2026-07-22，基线62fd49e）截图指出记录编号蓝链，定位正则无边界，加前后边界\n- 涉及文件：src/utils/index.js、components/ZsRichText/ZsRichText.vue、pages_transaction/publishHouse/verification.vue、榆林小程序/src/utils/index.js\n- 所属项目：苏住房C；来源会话ID：971ae865-b9cb-40f4-b093-4ddfce0be730；代码基线：62fd49e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/zpaging_top_slot_bug.md",
+                "memory_type": "entities",
+                "after": "# z-paging全屏固定层须用#top插槽放页头\n苏住房C小程序z-paging组件全屏固定定位会盖住外部搜索框，页头必须移入其#top具名插槽。\n## 问题现象\n- 首页→视频看房页搜索框被列表盖住，同类易现于存量房等z-paging列表页\n- 搜索框在DOM中但被覆盖，无顶部预留区域\n## 根因\n- z-paging自带position:fixed+撑满视口，ZsSearch写在其外层兄弟位置被压上层\n- 改z-index治标不治本，搜索框不占布局流，滚动时被顶穿\n## 解决方案\n- 将搜索框等常驻页头移入z-paging的#top插槽，由列表统一预留顶部高度\n- 参考同目录goodProject/index.vue结构，不另写fixed容器\n- 改完重编译小程序确认搜索框在列表上方且滚动正常；此类UI消失先查是否漏#top/#bottom插槽\n## 验证与归属\n- 会话4c88e3b6（2026-07-22，基线62fd49e）截图反馈搜索框被覆盖，结论移入#top插槽修复\n- 涉及文件：pages_transaction/houseVideo/index.vue、components/ZsSearch/ZsSearch.vue、pages_transaction/stockHouse/index.vue、pages.json\n- 所属项目：苏住房C；来源会话ID：4c88e3b6-b478-4a11-8f21-8050ecd743a5；代码基线：62fd49e"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

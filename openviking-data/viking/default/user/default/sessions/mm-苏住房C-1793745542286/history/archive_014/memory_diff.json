@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T23:07:36.026991+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/searchbox_banner_overlap.md",
+                "memory_type": "entities",
+                "after": "# 搜索框半压Banner的稳定做法\n首页头部搜索框上下各露一半横跨Banner与白色区域交界，且白色区域紧贴Banner无缝隙，在苏住房C两处同源文件反复返工。\n\n## 问题根因\n- 搜索框用 bottom:-24px 表示下移半个高度，同时 header-wrap 用 padding-bottom:24px 让位，两者语义等价互相抵消，搜索框实际落在Banner下方未叠上。\n- 另一轮 header-wrap 残留 margin-bottom:24px 变成Banner与白色块可见缝隙，用户报「白色背景和Banner之间有间距」。\n\n## 解决方案\n- 搜索框改 bottom:0 + transform:translateY(50%)，以Banner底边为锚点上下各露 h/2，不再用负值。\n- 去掉 header-wrap 的 padding-bottom，让位改为 margin-bottom:h/2，保证下方导航图标不被压住。\n- 若要求白色区域紧贴Banner，则 margin-bottom 归零，改由白色块自身 padding-top 承担让位（如 24px 搜索框下半 + 9px 图标间距 = 33px），白色底仍从Banner底边开始无缝隙。\n- 改完 pages_tab/components/Project_Suzhufang.vue 与 pages/index/components/Project_Suzhufang.vue 两处同源文件都要同步。\n\n## 验证与归属\n- 验证证据：会话 f3ee482c 后经 63ca5f15（基线 8fc3cc5）把 bottom:-24px+padding-bottom:24px 抵消改为 bottom:0+translateY(50%)+margin-bottom:24px；会话 8d4ad7df（基线 8fc3cc5）再去 margin-bottom、白色块 padding-top 改 33px。\n- 涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\Project_Suzhufang.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\Project_Suzhufang.vue\n- 所属项目：苏住房C；来源会话ID：63ca5f15-1cf5-4d52-b386-3205bad2f5ba, 8d4ad7df-77b2-4614-8dcd-322eea0ae772；代码基线：8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/white_block_gap.md",
+                "memory_type": "entities",
+                "after": "# 两个白色区块加10px间距的稳定做法\n移动端表单页提示语与表单间留10px且灰底铺满整屏，在苏住房C多个SFC因结构包裹层与高度未撑满而失效。\n\n## 问题根因\n- 两个 .card 之间夹着 uni-forms 包裹层，.card + .card 相邻兄弟选择器命中不了，写了间距不生效。\n- 页面容器没撑满视口，白色块之外是默认底色而非目标灰底 #f4f5f7，10px 间隙看不到灰。\n- 只给区块加 margin-top 而父级是整块圆角卡片时，会在卡片内部留空白把样式撑错位。\n\n## 解决方案\n- 不依赖兄弟选择器，直接给锚定块（通常是上一个白色块）设 margin-bottom:10px。\n- 非 scoped 样式块写 page{height:100%}，容器 .container 设 min-height:100% 让灰底铺满，与同目录 TypeChoose.vue、FormManual.vue 既有写法一致。\n- 若某字段单独加间距后所在分组变「半截卡片」，就把该字段改成独立圆角卡片避免中间留空错位。\n\n## 验证与归属\n- 验证证据：会话 fa080114（基线 9cdf7b8）FormLocal.vue 因 .card+.card 被 uni-forms 隔开失效，改第一个区块 margin-bottom 并加 page/container 高度撑满；会话 dc600b95（基线 8fc3cc5）intention/add.vue 两处10px并把手机号改独立圆角卡片。\n- 涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\FormLocal.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\TypeChoose.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\intention\\add.vue\n- 所属项目：苏住房C；来源会话ID：fa080114-764a-417c-9755-a4295d80e743, dc600b95-4ec1-4576-a1ed-8a5607eda4a7；代码基线：9cdf7b8 / 8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/init_variable_missing.md",
+                "memory_type": "entities",
+                "after": "# 入口页init阶段报Can't find variable\n苏住房C账户注销原因页因调用API封装函数未import，导致初始化中断、字典选项为空，易被误判后端问题。\n\n## 问题现象\n- 进入「账户注销→请选择注销原因」直接报错、选项为空（pages_my/setting/cancellationReason.vue）。\n- Vue3 setup 未声明标识符在 onLoad/onMounted 抛 ReferenceError: Can't find variable: getDict，整段初始化中断。\n\n## 根因\n- 页面 initDict() 调用 getDict('cancel_reason') 但漏写 import { getDict } from '@/api/common'。\n- 表象像后端字典 cancel_reason 没配，实际是前端缺导入。\n\n## 解决方案\n- 拿到「Can't find variable / xxx is not defined」类报错，先在该SFC搜符号是否既有声明又有使用，缺哪个补哪个，尤其 api/common 工具函数最常漏。\n- 字典类下拉为空排查顺序固定：页面报错 → import 是否齐全 → 再看后端字典是否配置。\n- 新增页面照抄同目录页面时，注意把被调用API函数一并拷进 import。\n\n## 验证与归属\n- 验证证据：会话 8fea7fec（基线 ce9e460）cancellationReason.vue 的 initDict 调 getDict 漏 import，补 import 后修复。\n- 涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\setting\\cancellationReason.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\setting\\cancellationForm.vue\n- 所属项目：苏住房C；来源会话ID：8fea7fec-d5ff-49f3-8b5d-6fe42f3a7694；代码基线：ce9e460"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/api_method_mismatch.md",
+                "memory_type": "entities",
+                "after": "# 移动端接口层请求方法约定\n苏住房C的 src/api/transaction.js 中 listRecommend 原写POST导致列表无数据，需逐接口按实际后端核对方法。\n\n## 问题现象\n- listRecommend（新房推荐列表）原先写成 POST 调用，与同文件其它列表接口不一致，接口拿不到数据。\n- 前端表现列表静默为空，难从现象反推方法写错。\n\n## 根因\n- uni-app 项目 api/*.js 按模块平铺、无接口文档可查，POST/GET 混写不被编译器拦下。\n- 请求拦截器照常发出，后端按方法未匹配返回空/异常数据。\n\n## 解决方案\n- 用户点名某接口是 get 时，直接改成与同文件其它 GET 同构：apiV1.get('/模块/资源/listRecommend', { params })，参数走 query string。\n- 新增接口先在同文件找同类接口（列表GET、详情/提交POST）照抄形态，不要自创。\n- 排查「列表无数据」时把方法、参数名、参数包裹层级（params vs body）一起核对，而非只看字段映射。\n\n## 验证与归属\n- 验证证据：会话 00dded85（基线 e04432d）用户指出 zhi2-mobile-shimin/src/api/transaction.js:247-249 的 listRecommend 应为 GET，改为 apiV1.get 并保持与同文件 GET 写法一致。\n- 涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\transaction.js\n- 所属项目：苏住房C；来源会话ID：00dded85-b3a2-4381-8085-aac881094b86；代码基线：e04432d"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

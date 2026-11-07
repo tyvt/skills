@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793949833573/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T07:33:19.797830+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/element_size_mini.md",
+                "memory_type": "entities",
+                "after": "# Element 全局 size 配置为 mini 导致告警修复\n产品2.0 中全局组件尺寸被配置为 Element UI 时代的 \"mini\"，而 Element Plus 的 size 仅接受 [\"\", \"default\", \"small\", \"large\"]，渲染时触发告警，已改为 \"small\"。\n\n## 问题根因\n- 项目在 `src/main.js` 通过 `app.use(Element, { size: \"mini\" })` 全局配置组件尺寸为 \"mini\"\n- Element Plus 的 `size` 仅接受 [\"\", \"default\", \"small\", \"large\"]，\"mini\" 为 Element UI 旧值，渲染（如 ElPaginationSizes）时触发 Vue 告警\n- `src/views/index.vue` 中直接使用 `<el-select size=\"mini\">` 同样传入非法值\n\n## 解决方案\n- 将 `zhi2-web-admin/src/main.js` 的 `size: \"mini\"` 改为 `size: \"small\"`\n- 将 `zhi2-web-admin/src/views/index.vue` 的 `<el-select ... size=\"mini\">` 改为 `size=\"small\"`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=2-0\n- 涉及文件：zhi2-web-admin/src/main.js、zhi2-web-admin/src/views/index.vue\n- 所属项目：2-0；来源会话ID：3b324ddb-991b-4cfd-8477-ff3457de3576；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue3_von_listeners.md",
+                "memory_type": "entities",
+                "after": "# Vue3 v-on 无参展开绑定告警修复\n产品2.0 中 SearchFormItem/ZsForm 沿用 Vue2 的 `$listeners` 写法，在 Vue3 下 `$listeners` 已不存在，导致 `v-on=\"undefined\"` 触发告警，已改为永远传对象。\n\n## 问题根因\n- Vue3 下 `v-on` 无参展开绑定要求右侧必须是对象\n- `SearchFormItem` 中写 `v-on=\"item.listeners || $listeners\"`，而 `$listeners` 在 Vue3 已不存在（事件在 `$attrs`），当 `item.listeners` 为 undefined 时变成 `v-on=\"undefined\"`\n- 触发 `[Vue warn]: v-on with no argument expects an object value`\n\n## 解决方案\n- 在 `zhi2-web-admin/src/components/zs-search-form/SearchFormItem.vue` 新增 `safeListeners`：仅当 `item.listeners` 为对象时使用，否则用 `{}`\n- 所有 `v-on=\"item.listeners || $listeners\"` 改为 `v-on=\"safeListeners\"`\n- 在 `zhi2-web-admin/src/components/zs-form/zs-form.vue` 将依赖 `$listeners` 的写法改为 Vue3 正确的透传方式\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=2-0\n- 涉及文件：zhi2-web-admin/src/components/zs-search-form/SearchFormItem.vue、zhi2-web-admin/src/components/zs-form/zs-form.vue\n- 所属项目：2-0；来源会话ID：858525f8-3326-418d-8a6b-132a98ff4714；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dicttag_empty_eltag.md",
+                "memory_type": "entities",
+                "before": "# DictTag 空 type 传入 ElTag 导致校验失败\n产品2.0 中 DictTag 在 colorMap 模式会把空字符串传给 Element Plus 的 ElTag，触发 prop 校验告警，已改为传 undefined。\n\n## 问题根因\n- DictTag 在 colorMap 模式下将空字符串 `\"\"` 传给 Element Plus `ElTag` 的 `type` 属性\n- ElTag 的 `type` 合法值不含空串，传空串会触发 Vue 的 prop 校验失败告警\n- DictDataTable 中原本存在将值映射为 `\"\"` 的逻辑，加剧该问题\n\n## 解决方案\n- 在 `zhi2-web-admin/src/components/dict-tag/dict-tag.vue` 改传 `undefined` 替代空串\n- 去除 `DictDataTable` 中映射 `\"\"` 的逻辑，从源头避免空串流入\n\n## 验证与归属\n- 验证证据：src=2-0/017.md\n- 涉及文件：zhi2-web-admin/src/components/dict-tag/dict-tag.vue\n- 所属项目：2-0；来源会话ID：d39becce-af94-4451-b0d2-6ffd7cf94261；代码基线：none",
+                "after": "# DictTag 空/非法 type 传入 ElTag 导致校验告警\n产品2.0 中 DictTag 在 colorMap 模式或字典项无 listClass 时会把空字符串/非法值传给 Element Plus 的 ElTag，触发 prop 校验告警，已改为传 undefined。\n\n## 问题根因\n- DictTag 在 colorMap 模式下将空字符串 `\"\"` 传给 Element Plus `ElTag` 的 `type` 属性\n- ElTag 的 `type` 合法值仅限 primary/success/info/warning/danger 或不传；传空串会触发 Vue 的 prop 校验失败告警\n- DictTag 将字典 listClass（如 \"default\" 或 \"Default\"）直接传给 ElTag 的 type，Element Plus 自定义校验拒绝该枚举\n- DictDataTable 中原本存在将 primary 映射为 `\"\"` 的逻辑（primary 本就是合法值），加剧该问题\n\n## 解决方案\n- 在 `zhi2-web-admin/src/components/dict-tag/dict-tag.vue`：colorMap 开启时改为不传 type（传 undefined）；字典项无 listClass 时返回 undefined 而非 `\"\"`\n- 在 getTagType() 中：default 及空值返回 undefined；其余对 listClass 调用 trim() 与 toLowerCase() 规范化后再判断类型\n- 去除 `zhi2-web-admin/src/views/system/dict/components/DictDataTable.vue` 中把 primary 映射为 `\"\"` 的逻辑（primary 本身是合法值）\n\n## 验证与归属\n- 验证证据：src=2-0/017.md、src=2-0/019.md；会话 d39becce-af94-4451-b0d2-6ffd7cf94261（colorMap 空串、DictDataTable primary 映射）；会话 19b58a9e-4df5-44f1-8286-0667d6776a04（maintenanceProject 页 DictTag 传 listClass=default 致 ElTag type 校验失败）\n- 涉及文件：zhi2-web-admin/src/components/dict-tag/dict-tag.vue、zhi2-web-admin/src/views/system/dict/components/DictDataTable.vue\n- 所属项目：2-0；代码基线：none"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dicttag_empty_type.md",
+                "memory_type": "entities",
+                "deleted_content": "# DictTag passes illegal type to ElTag causing validation failure\nElement Plus ElTag type only allows specific values or undefined. DictTag passing empty string or illegal enum (e.g. listClass=\"default\") to ElTag type triggers Invalid prop type.\n\n## Root Cause\n- ElTag type can only be primary/success/info/warning/danger or omitted.\n- DictTag binds `:type=\"''\"` in colorMap mode or when listClass is empty, causing validation failure.\n- Dict item with listClass \"default\" (including variant \"Default\") is treated as ElTag type; Element Plus rejects this enum, raising `Invalid prop: custom validator check failed for prop \"type\"` (stack in DictTag/ElTag).\n\n## Solution\n- Do not pass type (undefined) when colorMap is enabled.\n- Return undefined instead of empty string when listClass is absent.\n- In dict-tag.vue getTagType(): return undefined (no type) for `default`/empty; otherwise `trim().toLowerCase()` to avoid `Default` variants.\n- DictDataTable must not map primary to empty string.\n\n## Verification & Attribution\n- Evidence: session d39becce, dict-tag.vue and DictDataTable.vue removed empty type passed to ElTag.\n- Evidence: session 19b58a9e, maintenanceProject page DictTag to ElTag type validation failure (listClass=default case).\n- Files: zhi2-web-admin/src/components/dict-tag/dict-tag.vue, zhi2-web-admin/src/views/system/dict/components/DictDataTable.vue\n- Project: 2-0; Source sessions: d39becce-af94-4451-b0d2-6ffd7cf94261, 19b58a9e-4df5-44f1-8286-0667d6776a04; Code baseline: none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dict_tag_type.md",
+                "memory_type": "entities",
+                "deleted_content": "# DictTag 字典 default 致 ElTag type 校验告警\nDictTag 组件将字典 listClass（如 \"default\"）直接传给 ElTag 的 type，触发 Element Plus 自定义校验告警。\n\n## 问题根因\n- DictTag 组件将字典 listClass（如 \"default\"）直接传给 ElTag 的 type 属性\n- Element Plus 对 ElTag type 有自定义校验，default 及空值触发告警\n\n## 解决方案\n- 在 zhi2-web-admin/src/components/dict-tag/dict-tag.vue 的 getTagType() 中，将 default 及空值返回 undefined\n- 统一对 listClass 调用 trim() 与 toLowerCase() 规范化后再判断类型\n\n## 验证与归属\n- 验证证据：src=2-0/019.md\n- 涉及文件：zhi2-web-admin/src/components/dict-tag/dict-tag.vue\n- 所属项目：2-0；来源会话ID：19b58a9e-4df5-44f1-8286-0667d6776a04；代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 2,
+        "total_skipped": 0
+    }
+}

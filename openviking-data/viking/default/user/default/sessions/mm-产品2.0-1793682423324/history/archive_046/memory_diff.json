@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_046",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:02:44.690991+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/subtable_required_rule_from_procedure.md",
+                "memory_type": "entities",
+                "after": "# 子表弹窗必填规则取自程序步骤配置\ndataProperty 巡保记录（recordProcess）步骤子表弹窗中，「说明/照片」是否必填由所挂巡保程序（procedureId）的步骤配置决定，而非本单数据。\n\n## 问题背景\n- 同一程序不同版本下步骤要求不同，写死必填会与程序配置漂移\n- 配置异步拉取，若只在弹窗打开时拉一次，详情接口晚返回时规则会对不上\n\n## 解决方案\n- 详情页透传 :procedure-id=\"form.procedureId\"，子表组件再透传给弹窗\n- 弹窗在 view/edit 态调 GET /dataProperty/procedureProcess/page（procedureId + pageNum:1 + pageSize:500），按 processSerial 匹配取 isExplain/isPicture（'1' 为必填）驱动 dynamicRules\n- 无 procedureId、无步骤编号、请求失败或未匹配到行时，回退用 detailForm 上的 isExplain/isPicture 兜底\n- 重写 detailCallback：合并详情数据后再拉一次配置同步规则，保证详情异步返回后校验仍对齐；弹窗打开先拉配置再 init()\n\n## 验证与归属\n- 验证：会话 4d8f8198 结论 detail.vue 传 :procedure-id，recordProcessStepDialog 新增 procedureId prop、view/edit 调 procedureProcess/page 按 processSerial 匹配取 isExplain/isPicture，detailCallback 重写为详情返回后再拉一次配置，失败兜底 detailForm\n- 涉及文件：zhi2-web-admin/src/views/dataProperty/recordProcess/components/recordProcessStepDialog.vue、recordProcessStepTable.vue、zhi2-web-admin/src/mixins/subTableMixins.js\n- 所属项目：产品2.0；来源会话：4d8f8198-d7b1-458f-891e-5a0c95b1090a；代码基线：76646e6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_select_dialog_mixin_conflict.md",
+                "memory_type": "entities",
+                "after": "# zs-select-dialog 混入 table mixin 与 prop selectable 同名冲突\nzs-select-dialog.vue 同时声明函数型 prop `selectable` 又混入含同名 data 的 table mixin，触发 Vue 同名冲突告警且行为互相踩，应改用轻量 tableComponents mixin。\n\n## 问题现象\n- 控制台报 [Vue warn]: The data property \"selectable\" is already declared as a prop，出现在工单报事等使用选择弹窗的页面\n\n## 根因分析\n- 组件声明函数类型 prop `selectable`（控制行是否可选，传给 zs-select-column）\n- 同时混入 @/mixins/table，其 data 里也有布尔 `selectable`（表示是否显示多选列）\n- Vue 不允许同名 prop 与 data，二者冲突告警且行为互相踩\n\n## 解决方案\n- 把 `mixins: [table]` 换成 `mixins: [tableComponents]`——tableComponents 只注册 zs-table、zs-select-column 等组件、不含 selectable 等 data\n- zs-select-dialog 自身已实现列表查询与选择逻辑，不需要完整 table mixin\n- 经验：给已有同名 data/prop 的公共弹窗组件补 mixin 时，优先选只注册组件的轻量 mixin（tableComponents），完整 table mixin 只给真正跑列表逻辑的页面用\n\n## 验证与归属\n- 验证：会话 09ed34db 报错栈定位 zs-select-dialog.vue，根因为 prop selectable（函数）与 table mixin data selectable（布尔）同名；修复为 mixins 由 table 换成 tableComponents，警告消失\n- 涉及文件：zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue、zhi2-web-admin/src/mixins/table.js、zhi2-web-admin/src/mixins/tableComponents.js\n- 所属项目：产品2.0；来源会话：09ed34db-94d4-41c6-856b-023f0668f865；代码基线：0161609"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/v3_post_migration_request_body.md",
+                "memory_type": "entities",
+                "after": "# 加密/V3 POST 化改造后 GET→POST 迁移请求体坑\n等保加密改造把非白名单 GET 统一改写为 POST 后，出现空 body、路径参数、字典 body 形态三类静默失败。\n\n## 问题现象\n- request('/system/region/listTree') 无参请求没有 body，后端 @RequestBody 报 Required request body is missing\n- 字典接口 /system/dictData/listByType 从 V2 路径参数 GET 改为 POST，body 形态有讲究\n\n## 根因分析\n- V3 规范化层只负责改写方法，不会替调用方补请求体\n- 字典接口后端 @RequestBody 要求 JSON 对象 { dictType: \"biz_state\" }，裸字符串不符合对象契约\n\n## 解决方案\n- request.js 拦截器统一兜底：POST 且 config.data == null 时补 config.data = {}\n- dict.js 统一字典加载函数改为 POST('/system/dictData/listByType', { dictType })\n- apiV3Normalize.js 补 V3 路径规范化映射（如 listByType: 'dictType'），让旧式路径参数自动降级成 body 字段\n- e2e mock fixture 同步改成解析 JSON body 里的 dictType 字段\n\n## 验证与归属\n- 验证：会话 fcb686e6 / 2565718c，request.js 拦截器补 {} 修复报错；dict.js 从裸字符串改为 { dictType } 对象传参，并同步 apiV3Normalize 映射与 register-mocks.js\n- 涉及文件：zhi2-web-admin/src/utils/request.js、dict.js、apiV3Normalize.js、zhi2-web-admin/e2e/fixtures/register-mocks.js\n- 所属项目：产品2.0；来源会话：fcb686e6-73e3-4f1f-8aff-ccc07305e948、2565718c-2639-4d49-96b3-c97a40e2cfd2；代码基线：50767de~54577f2"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/windows_case_insensitive_import.md",
+                "memory_type": "entities",
+                "after": "# Windows 大小写不敏感掩盖 import 路径大小写错误\n本地 Windows 构建通过、提交后 Linux CI 构建因 import 路径大小写与实际文件名不一致而必挂，此类问题本地任何检查都发现不了。\n\n## 问题现象\n- 本地 Windows 构建通过，GitLab Runner（Linux）构建报 Rollup \"Could not resolve ./components/unitTable.vue\"\n\n## 根因分析\n- Windows 文件系统不区分大小写，import 写 `./components/unitTable.vue` 而实际文件名是 `UnitTable.vue` 也能解析\n- Linux 区分大小写，Rollup 精确匹配文件名直接解析失败\n\n## 解决方案\n- import 路径必须与磁盘上真实文件名逐字符一致（含扩展名大小写）\n- 团队约定：新建组件文件统一 PascalCase 命名（UnitTable.vue），import 时也写 PascalCase\n- Windows 开发后可用 `git config core.ignorecase false` + `git ls-files | sort` 或脚本比对 import 路径与 git 索引实际大小写全仓扫描再提交\n- 遇「本地构建过、CI 挂在 resolve import」报错，第一嫌疑就是大小写不一致\n\n## 验证与归属\n- 验证：会话 77670b3d CI 报 Could not resolve \"./components/unitTable.vue\"，本地能构建；根因 Windows 大小写不敏感，修复为与实际文件名 UnitTable.vue 一致后本地 build exit 0\n- 涉及文件：zhi2-web-admin/src/views/projectManagement/buildinginfo/detail.vue\n- 所属项目：产品2.0；来源会话：77670b3d-757c-4c9b-81a1-088b6d675376；代码基线：50767de~54577f2"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

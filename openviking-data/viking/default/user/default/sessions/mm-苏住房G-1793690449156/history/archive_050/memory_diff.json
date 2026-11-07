@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_050",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:18:45.965229+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/代码缺陷/project_checkbox_gate.md",
+                "memory_type": "entities",
+                "after": "# 楼盘项目列表勾选门禁连坐\n在苏住房G项目(zhi2-web-admin)楼盘项目列表(building/project)，通用listMixins/table.js的isSelectable仅放行草稿态，导致已备案行无法勾选执行导出/授权等只读动作。\n## 根因\n- table.js的isSelectable(row){return row.bizState=='0'}为批量删除设计，只放行草稿态\n- 页面勾选语义变为「选中后导出/授权」，已备案行(如恋雪小花园)被禁用，致「设置对外权限」「导出小区房屋」按钮置灰\n- 通用逻辑劫持业务状态门控，与勾选弹窗分母/row-key重复等已知数据传参问题根因不同\n## 解决方案\n- 本页覆写勾选能力，允许任意业务状态行被勾选\n- 批量删除作用域单独收窄为草稿态(删除回调过滤或禁用删除入口)，保证「能选」不等于「能删」\n- 避免误删已备案数据\n## 验证与归属\n- 验证：会话e972de96，用户反馈「选不了下面的数据」；修复为building/project/index.vue覆写勾选、批量删除仅作用草稿\n- 涉及文件：src/views/building/project/index.vue、src/mixins/listMixins.js、src/mixins/table.js\n- 所属项目：苏住房G；来源会话：e972de96-ea86-4046-8a3e-d5e86948f61f；代码基线：3697a62"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/代码缺陷/download_url_splice.md",
+                "memory_type": "entities",
+                "after": "# 资源下载路径拼接丢失部署前缀\n在苏住房G项目(zhi2-web-admin)对账文件(pubRecBankFile)下载，重构后改用window.origin+filePath拼接，多级部署前缀丢失致404。\n## 根因\n- 8月17日重构(f5e7d0f54)将下载地址改为window.origin+filePath\n- 应用部署在子路径(如/zhi2-test前还有部署前缀)时，window.origin仅到域名，拼出地址少部署前缀，请求打到根目录\n- 图片资源正常因一直走统一解析函数resolveServerAssetUrl\n## 解决方案\n- 下载/预览复用resolveServerAssetUrl按当前部署目录还原相对地址\n- 改用fetch(resolveServerAssetUrl(filePath))→blob→URL.createObjectURL生成<a download>，禁手拼window.origin\n- 与已知1070「地址解析统一收口」互补，本条补下载链路消费方\n## 验证与归属\n- 验证：会话684bd892，错误地址https://szf.szzfcjj.cn/zhi2-test/2026/...缺前缀；修复恢复fetch(resolveServerAssetUrl(filePath))\n- 涉及文件：src/views/benefit/pubRecBankFile/index.vue、src/utils/resolveServerAssetUrl.js、src/utils/imgPrfix.js\n- 所属项目：苏住房G；来源会话：684bd892-9f31-405c-be6b-c5c9fdc86eef；代码基线：864b409"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/代码缺陷/tree_table_colspan.md",
+                "memory_type": "entities",
+                "after": "# 月报三级树表占位空列导致合并错乱\n在苏住房G项目(zhi2-web-admin)物业管理信息月报表填报/统计详情，手工渲染3级树表用placeholder空列补位，造成单元格合并错位。\n## 根因\n- 展平树时为凑固定列数给前缀节点补empty-cell，再用rowspan合并非末级\n- 根级节点下深度不一致(有的3级有的2级)时，实际节点数+placeholder数算出不同可见列数，rowspan累积后与表头错位\n- 区别于已知#944(zs-table-column不支持多级表头)，本条是行内单元格列数守恒口径\n## 解决方案\n- 删掉placeholder/empty-cell逻辑，仅遍历真实路径节点\n- 每行末级可见单元格算colspan：1级=3、2级=2、3级=1；模板:colspan=\"cell.colspan||1\"\n- 验证逐行断言各单元格colspan之和===表头列数\n## 验证与归属\n- 验证：会话871272e2，⛵送立案线索数量colspan:2无右侧空列；信托制物业服务项目数colspan:3横跨3列\n- 涉及文件：src/utils/monthlyReport.js、src/views/publicQuery/monthlyReport/components/ReportItemsTable.vue、src/views/publicQuery/monthlyReportStat/detail.vue\n- 所属项目：苏住房G；来源会话：871272e2-4c46-4ece-af72-9c897a51118e；代码基线：8ebcdab"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/todo_panel_decouple.md",
+                "memory_type": "entities",
+                "after": "# 首页待办面板与关键数据区域解耦\n在苏住房G项目(zhi2-web-admin)首页v2，待办面板接口被区域切换耦合请求，需解耦为按用户维度不带regionCode。\n## 规则\n- 待办是「当前登录用户」维度，与浏览哪个关键数据区域无关\n- onKeyRegionChange只刷随区域变化的面板(关键数据/公共收益/报修/学习园地)，删掉loadTodoPanel()\n- loadTaskCount改getTaskCount({})、loadTodoPanelList只传{pageNum:1,pageSize:4}，彻底去regionCode\n## 防护与验证\n- 两处加注释「待办按用户维度、不随关键数据区域变化」防后人接回\n- 触发路径：首次loadAll发taskCount+todoTaskList；区域切换0个待办请求；待办Tab切换只发列表\n- 验证：会话9baedf91，切区域Tab时Network不应再出现taskCount/todoTaskList\n## 验证与归属\n- 涉及文件：src/views/home/index-v2.vue、src/views/home/v2/components/KeyDataNav.vue、src/api/portal/home.js\n- 所属项目：苏住房G；来源会话：9baedf91-d8d6-40c2-8e79-314e529e757a；代码基线：15e201a"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:34:23.451975+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/v2_jpeg_baseline.md",
+                "memory_type": "entities",
+                "after": "# 首页v2像素验收JPEG基线卡点\n苏住房G首页v2按设计稿做e2e像素对比要求95%相似度，实测仅89.4%，瓶颈在基线本身是JPEG截图而非布局。\n\n## 现象与根因\n- 设计稿为JPEG截图，存在重采样模糊、DCT压缩块噪声、字体渲染跨机差异，与布局无关且无法靠改CSS消除\n- 直接调CSS会白改一轮，diff热力图差异弥散在所有面板的字号/间距/图表几何微差上\n\n## 对照实验与解法\n- 把基线自身做一次JPEG往返再与自身比对，看相似度上限；若远低于目标说明目标不可达，应停止改样式\n- 用diff热力图区分「弥散微差」与「集中偏移」，集中偏移才是布局bug\n- 换等价基线：让UI提供设计稿原始PNG，或以评审通过的实现截图作为回归基线（只换baseline.png）\n- 像素对比仅作回归门禁，不作「100%还原设计稿」验收标准；UI还原仍以设计稿逐条目视为准\n\n## 顺带修复\n- import.meta.env在e2e取值不可靠、路由拦截用glob而非字符串匹配、隐藏菜单元素不可点击\n\n## 验证与归属\n- 来源会话f0540a8f（2026-10-16，基线4aafec3）：首页index-v2按设计图重做并接e2e像素对比，产出actual/diff/baseline.png+report.json\n- 涉及文件：zhi2-web-admin/src/views/home/index-v2.vue、tests/e2e/home-v2-mocks.js、views/home/v2/components/TodoPanel.vue\n- 所属项目：苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/filing_menu_config.md",
+                "memory_type": "entities",
+                "after": "# 公共查询备案入口菜单报错\n苏住房G公共查询页四个备案入口报「没有授权相关菜单」，实际是空状态链接复用旧filePath跳转配置导致路径解析失败，并非权限不足。\n\n## 现象与根因\n- 公共查询→物业管理区域查询→详情页，点广告位/停车位/经营用房/公共场地备案四个tab提示「没有授权相关菜单」，但账号确有菜单权限\n- 四个入口空状态链接/右上角备案按钮共用一段跳转配置，指向旧备案页filePath，该路径在当前环境菜单里不存在，buildNavigationByFilePath解析失败统一抛错\n\n## 解法与边界\n- 先区分「权限不足」与「路径解析失败」：看菜单是否在动态路由表、filePath能否resolve到component\n- 按需求只改被点名分支：广告位改调pubRevenueContractAdvSpace/project-statistics-page，详情跳benefit/resourcesLeaseContractFiling/detail并传revenueContractId\n- 其余三个tab（pubParkingSpace/pubHouse/pubVenue）接口与跳转一律不改；文案不要顺手改（用户明确「文案别改」）\n- 清理随之失效的公共配置：删除只服务批量改造的assetLeaseContractConfig.js与assetLeaseOverviewMixins.js（仅留一个消费方即成死代码）\n\n## 验证与归属\n- 来源会话39df3032（2026-07-30，基线e590ffa）：用户贴接口返回体与报错截图，要求改跳广告位租赁合同；两轮约束「文案别改」「只改广告位」\n- 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/index.vue、detail.vue、components/buildingTable.vue、advertiseTable.vue\n- 所属项目：苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_name_match.md",
+                "memory_type": "entities",
+                "after": "# 区域名完整路径与短名称匹配失败\n苏住房G大屏/统计页因接口返回完整行政区划路径而前端用短名称做严格匹配，导致统计卡片被静默过滤成空数组显示「暂无数据」。\n\n## 现象与根因\n- 大屏/统计页（views/property/largeScreen）业委会、物管会等统计卡片突然显示「暂无数据」，接口本身有数据\n- 接口regionName为完整路径（如江苏省/苏州市/吴江区），前端排序列表用短名称（吴江区），transformRegionSort严格===匹配对不上，fourData被过滤为空\n- 属「过滤后为空」而非报错，控制台干净、极难定位\n\n## 解法\n- 在utils.js落三个函数一次性收口：getShortRegionName（取路径末级）、matchRegionName（完整路径与短名称互认比较）、normalizeRegionData（入库前标准化区域名）\n- transformRegionSort改用matchRegionName；区域列表未加载完时直接用标准化接口数据渲染，避免启动瞬间空白\n\n## 验证与归属\n- 来源会话97416c4f（基线eb8213c）：最终结论确认完整路径vs短名称匹配失败致fourData为空；修复增加三函数并支持互认\n- 涉及文件：zhi2-web-admin/src/views/property/largeScreen/utils.js、index.vue、components/componentMap.vue、svgMap.vue\n- 所属项目：苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_context_lift.md",
+                "memory_type": "entities",
+                "after": "# 首页v2区域筛选上下文上提\n苏住房G首页v2将区域筛选从各卡片内部上提为全页统一上下文，用同一parentDeptId扇出到五个区块接口，避免重复渲染与不同步。\n\n## 背景与动机\n- 首页v2原本仅「关键数据导航」「检查数据导航」两张卡片各带区域条，领导要求所有卡片统一按区域生效\n- 区域条放卡片内部＝每张卡片各持一份选中态，重复渲染且易不同步；各卡片是独立请求的兄弟组件，无共享上下文\n\n## 解法\n- 区域条上提到index-v2.vue顶部home-v2__region容器，统一用portalParentDeptId作为选中值\n- 切换区域时父级统一触发刷新，把同一parentDeptId传给关键数据、检查数据、公共收益、报事报修、学习园地五个区块\n- 待办、消息明确不参与区域筛选，继续走原逻辑不改动\n- 删除KeyDataNav.vue/CheckDataNav.vue内卡片区域条，RegionTabs作为唯一区域选择器组件复用，避免两条区域条打架\n\n## 验证与归属\n- 来源会话3716ba06（基线315702f）：用户诉求「首页所有卡片统一生效区域筛选」；最终结论顶部增home-v2__region+RegionTabs\n- 涉及文件：zhi2-web-admin/src/views/home/index-v2.vue、v2/components/RegionTabs.vue、KeyDataNav.vue、CheckDataNav.vue\n- 所属项目：苏住房G"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

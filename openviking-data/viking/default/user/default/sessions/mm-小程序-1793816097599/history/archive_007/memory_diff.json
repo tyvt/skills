@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-小程序-1793816097599/history/archive_007",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T18:39:39.016927+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/picker_click_stop.md",
+                "memory_type": "entities",
+                "after": "# 切换按钮无响应修复\nexternalWebview.vue 与 home.vue 的「切换/切换小区」按钮因 @click.stop 拦截导致 picker 无法弹出。\n## 问题根因\n- 两个页面的「切换」都包在 `<picker mode=\"selector\">` 内，内部按钮写了 `@click.stop` 且未绑定方法\n- 微信小程序中 @click.stop 拦截子节点点击，阻止事件传到 picker，选择器弹不出来，表现为按钮无反应\n## 修复内容\n- externalWebview.vue：去掉房屋卡「切换」上的 `@click.stop`\n- home.vue：去掉「切换小区」上的 `@click.stop`\n- externalWebview 已绑定房屋时 handleHouseAction 会直接 return，去掉 stop 不会误触整卡逻辑\n- home.vue 小区区域无父级点击，本不需要 stop\n## 验证与归属\n- 重新编译后点「切换/切换小区」应弹出房屋列表，选完走 onHousePickerChange 更新当前房屋\n- 仍无反应需确认 portalUser.houseList 是否多于 1 套（仅多套时显示该按钮）\n- 涉及文件：pages/webview/externalWebview.vue、pages/webview/home.vue、utils/portal-user.js\n- 来源会话ID：4cbe7d62-f4dd-4789-afa2-f9344da6e1d1；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/trial_house_sync.md",
+                "memory_type": "entities",
+                "after": "# 体验版房屋首页不可见修复\n体验版（ctUserIdentity）识别到的房屋在「我的」页可见，但首页菜单仍弹「请先添加房屋」。\n## 问题根因\n- externalWebview.vue（「我的」页）体验版支持通过 ctUserIdentity 识别绑定房屋：有 houseId 或 houseList 即视为已绑定，登录后调 maybeLoadTrialHouseList() 拉取，恢复快照不因缺少 houseBoundViaAuth 清空\n- home.vue（首页菜单）沿用正式版逻辑：ensureHouseSelected() 强制要求 houseBoundViaAuth && houseId；restorePortalSnapshotFromPageStorage() 在 !houseBoundViaAuth 时 clearPortalHouseFields 清掉「我的」页已加载房屋；未调用 mergeCtUserIdentityHouseIntoPortalUser，首页不主动拉取体验版房屋\n## 修复内容\n- 在 home.vue 与 externalWebview.vue 对齐体验版逻辑，使首页菜单认可 ctUserIdentity 识别的房屋\n## 验证与归属\n- 涉及文件：pages/webview/externalWebview.vue、pages/webview/home.vue、utils/portal-user.js\n- 来源会话ID：0058f23d-986e-4656-8a58-d2a02848f549；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/appid_missing_fix.md",
+                "memory_type": "entities",
+                "after": "# uni.login appid缺失报错修复\n非微信端执行 uni.login 报 41002 appid missing，已限制仅在微信小程序端执行。\n## 问题根因\n- uni.login 在当前非微信环境拿不到小程序 appid，导致 41002 appid missing 报错\n## 修复内容\n- 仅在微信小程序端（MP-WEIXIN）执行 uni.login\n- 非微信端直接 return，使用基础 webViewUrl，不再报错\n- 保留登录成功后拼接 ?code=xxx 的逻辑\n## 验证与归属\n- 微信开发者工具（小程序编译）打开页面应看到 wx login code\n- H5/其他端打开页面不再触发 login fail 41002，直接加载基础地址\n- 若微信开发者工具仍报 appid missing，属工具项目配置问题，需检查 AppID 设置\n- 涉及文件：pages/home/new/index.vue、pages/home/index/index.vue、README.md、pages/active/active.vue\n- 来源会话ID：d3527192-827d-483c-892e-e53cd0ce6c62；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/owner_decision_entry.md",
+                "memory_type": "entities",
+                "before": "# 业主决策入口完整交互流程\nwygl小程序「业主决策」菜单从点击到进入表决H5的完整交互链路，涵盖登录校验、实名门禁、二次确认与灵犀选屋。\n\n## 交互流程\n- 点击「业主决策」先调 promptPortalRealNameAuth()：未登录→登录门禁；已登录未实名→弹「不动产权限授权」弹窗 showAuthModal；已实名→true\n- 通过实名门禁后才弹二次确认弹窗(uni.showModal，提示实时身份核验与选对房屋)\n- 确认后无论是否已绑定房屋都走第三方选屋流程 pages/face/bdc，不再跳过直接开H5\n- 选屋完成重定向回首页自动 fetchOwnerDecisionVoteH5Url 获取表决H5地址并进入\n\n## 核心机制\n- 回首页自动拉取表决URL沿用 portalPostAction=ownerDecisionVote 机制(tryConsumeOwnerDecisionPortalPostAction→openOwnerDecisionVoteH5)\n- 未实名时不再直接进入确认或跳转实名页，必须先过实名门禁\n- 维修资金等其它功能仍用原 ensureOwnerVerified()(有手机号直跳实名页)，与业主决策入口逻辑区分\n\n## 验证与归属\n- 验证证据：008.md 会话69631682/f16e6ba9、009.md 会话24b99026\n- 涉及文件：pages/webview/externalWebview.vue、pages/webview/home.vue、utils/portal-h5-webview.js\n- 来源会话ID：69631682-9401-4bb4-bd61-d、f16e6ba9-0ef7-4d9a-8278-5ef26eb7c22f、24b99026-d930-474c-94f5-946b2e5b7235；代码基线：none",
+                "after": "# 业主决策入口完整交互流程\nwygl小程序「业主决策」菜单从点击到进入表决H5的完整交互链路，涵盖登录校验、实名门禁、二次确认与灵犀选屋。\n\n## 交互流程\n- 点击「业主决策」先调 promptPortalRealNameAuth()：未登录→登录门禁；已登录未实名→弹「不动产权限授权」弹窗 showAuthModal；已实名→true\n- 通过实名门禁后才弹二次确认弹窗(uni.showModal，提示实时身份核验与选对房屋)\n- 确认后无论是否已绑定房屋都走第三方选屋流程 pages/face/bdc，不再跳过直接开H5\n- 选屋完成重定向回首页自动 fetchOwnerDecisionVoteH5Url 获取表决H5地址并进入\n\n## 核心机制\n- 回首页自动拉取表决URL沿用 portalPostAction=ownerDecisionVote 机制(tryConsumeOwnerDecisionPortalPostAction→openOwnerDecisionVoteH5)\n- 未实名时不再直接进入确认或跳转实名页，必须先过实名门禁\n- 维修资金等其它功能仍用原 ensureOwnerVerified()(有手机号直跳实名页)，与业主决策入口逻辑区分\n\n## 验证与归属\n- 验证证据：008.md 会话69631682/f16e6ba9、009.md 会话24b99026\n- 涉及文件：pages/webview/externalWebview.vue、pages/webview/home.vue、utils/portal-h5-webview.js\n- 来源会话ID：69631682-9401-4bb4-bd61-d、f16e6ba9-0ef7-4d9a-8278-5ef26eb7c22f、24b99026-d930-474c-94f5-946b2e5b7235、6ee1f9e2-e92a-4b85-a26a-c8d8507a5363；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

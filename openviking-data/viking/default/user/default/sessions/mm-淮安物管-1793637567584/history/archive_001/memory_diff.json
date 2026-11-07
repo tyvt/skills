@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-淮安物管-1793637567584/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T16:41:01.501343+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_code_name_sync.md",
+                "memory_type": "entities",
+                "after": "# 淮安物管列表区划筛选同步编码与名称\n列表筛选项改为 regionCode 后，因部分表按名称存区划，需同时传 regionCode 与 regionName 才能保证筛选准确。\n\n## 问题根因\n- 按接口文档统一改列表筛选项为 regionCode 后，后端部分表按名称存区划，仅传编码会导致筛选落空或查不到历史数据。\n- 列表筛选链路中 zs-region-select 默认只把编码写入 queryParams.regionCode，单字段不够覆盖混用 code/name 的表。\n\n## 解决方案\n- 给 zs-region-select 增加 label 属性（或等价机制），选择时把区划名称一并回传。\n- SearchFormItem 支持 labelModel 配置，将名称自动写入 queryParams（如 labelModel: 'regionName'）。\n- 每个列表页在 queryParams 中声明 regionName，筛选项与请求体同时带 regionCode + regionName，由后端按表结构选用。\n- 批量改文档涉及多页时用同一套组件能力收口，避免各页手写 @change 同步名称。\n\n## 验证与归属\n- 验证：会话 ca3135a9（2026-06-30，基线 1b9f773）用户确认筛选用 regionCode 编号，并要求文档涉及接口统一修改；追加 regionName 也得传。\n- 结论：zs-region-select 增加 label、SearchFormItem 支持 labelModel，22 个列表页补 queryParams.regionName 与 labelModel: 'regionName'。\n- 涉及文件：zhi2-web-admin/src/components/zs-region-select/zs-region-select.vue、zs-search-form/SearchFormItem.vue、mixins/area.js；所属项目：淮安物管；来源会话：ca3135a9-da8c-4d3a-b8df-92879d2762b6；代码基线：1b9f773。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/change_record_dialog.md",
+                "memory_type": "entities",
+                "after": "# 淮安物管变更详情变更记录弹窗接入\n多个业务域变更详情页需增加「变更记录」按钮，弹窗展示页面 contentInfo 白名单内且实际变化的字段前后值。\n\n## 背景与原因\n- 各变更单详情实现分散（企业/从业人员/物业区域/合同/业主自治/公共收益/楼盘表等），每页手写对比表格会导致字段口径不一致。\n- 后端返回的变更对象字段名与详情 form 嵌套结构不统一，需公共能力收口。\n\n## 解决方案\n- 抽公共组件 change-record-dialog + 工具 contentInfoChange.js：以详情页 contentInfo（及 contentInfo2/3…）为字段白名单，用 originalObj 与当前 form diff，仅输出有差异且在白名单内的行。\n- 弹窗顶部按需展示变更时间、变更人、变更说明（无值则隐藏说明区）。\n- 各变更 detail 或共用 detail 组件接入按钮与弹窗，按需求清单逐模块挂接（行业管理/物业管理/业主自治/公共收益/项目楼盘表等）。\n- 与「变更前/后单表合并」(#816) 互补：本条是「从详情展示 schema 反推可比字段」的接入套路。\n\n## 验证与归属\n- 验证：会话 e54a78dd（2026-07-06，基线 3e560be）与 95b62123（2026-07-01，基线 22a1d9d）用户给出跨模块变更记录需求清单；实现组件并多页接入。\n- 范围：淮安物管会话一次性接入约 11+ 个变更详情页，合并分支 feature/company-change-record → develop/v2.6.1-huaian。\n- 涉及文件：change-record-dialog.vue、contentInfoChange.js、companyManagement/components/detail.vue、companyManagement/change/detail.vue 等；所属项目：淮安物管；来源会话：e54a78dd-db5f-4130-8a53-38052902a30c, 95b62123-9914-4e98-aca3-4d7acff520aa；代码基线：22a1d9d。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/change_meta_empty_bug.md",
+                "memory_type": "entities",
+                "after": "# 淮安物管变更记录弹窗审计字段为空\n变更记录弹窗顶部「变更时间/变更人/变更说明」显示空，但表格字段对比正常，因 detailCallback 合并遗漏顶层审计字段。\n\n## 问题根因\n- 变更单详情接口常把 createTime、createUser 等审计字段放在 response.data 顶层，业务变更字段放在嵌套对象（如 companyRecordChange）。\n- 若 detailCallback 只 Object.assign(form, data.companyRecordChange)，顶层审计字段进不了 form，弹窗取 meta 时为空。\n- 不同业务变更单说明字段名不一致（changeReason / changeDescription / remark 等）。\n\n## 解决方案\n- 调整 detailCallback 合并顺序：先合并 response.data 顶层通用字段进 form，再合并嵌套变更体（后合并同名键可覆盖业务字段）。\n- 弹窗侧用 resolveChangeMeta（或等价函数）按候选字段名依次取值：时间（changeDate、updateTime、createTime…）、人员（updateUser、createUser…）、说明（changeReason、changeDescription、remark…），有则展示无则隐藏。\n- 若制单信息也为空需后端补审计字段，前端无法凭空生成。\n\n## 验证与归属\n- 验证：会话 95b62123 用户报「右边有大量空白，上面三个字段都没有值」；结论为 detailCallback 先合并顶层再合并嵌套，新增 resolveChangeMeta 兼容多字段名。\n- 与已知差异：#1215 是 contentInfo visible + 只取 data.summary；#1098 是 detailCallback 不 return 导致 loading/残留。\n- 涉及文件：companyManagement/change/detail.vue、change-record-dialog.vue、mixins/detailMixins.js；所属项目：淮安物管；来源会话：95b62123-9914-4e98-aca3-4d7acff520aa；代码基线：22a1d9d。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dynamic_required_validator_bug.md",
+                "memory_type": "entities",
+                "after": "# 淮安物管动态必填漏拦需自定义校验\n弹窗表单动态 required 字段（如经营用房类别）在特定条件下必填，但 Element UI 动态 required 不稳定漏拦，需自定义 validator + 提交前二次校验。\n\n## 问题根因\n- Element UI 对通过表达式切换的 required 规则存在不稳定场景，表单项有时不会在空值时拦截提交。\n- 与已知「条件必填用 rules.required 表达式」（#1437）不同，本条是动态 required 仍漏拦、需加固校验层。\n\n## 解决方案\n- 对关键条件字段改用自定义 validator，在回调里根据当前 form 状态判空并 callback(new Error('…'))。\n- 在 submitForm 内于 validate 通过后增加提交前二次检查（同一套判空逻辑），防止 UI 校验穿透。\n- 枚举/字典值为数字 0 时，判空要同时接受 0 与字符串 '0'（如 houseCategory），避免误报未选。\n\n## 验证与归属\n- 验收：新增时不选「经营用房类别」点确定，应在表单项下出现前端红色提示，而非仅弹后端错误。\n- 验证：会话 f1ee611c（2026-06-25，基线 1664d0f）pubHouseDialog.vue 动态 required 未拦住空值提交；结论为增加自定义 validator、submitForm 二次检查，houseCategory 兼容 0 与 '0'。\n- 涉及文件：zhi2-web-admin/src/views/benefit/pubHouse/components/pubHouseDialog.vue；所属项目：淮安物管；来源会话：f1ee611c-8cd6-4f31-969d-934eec1bceb2；代码基线：1664d0f。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

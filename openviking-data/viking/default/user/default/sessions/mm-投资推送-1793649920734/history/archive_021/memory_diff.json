@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-投资推送-1793649920734/history/archive_021",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T20:36:16.133862+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/alphapurify因子诊断提速缓存渲染去重.md",
+                "memory_type": "entities",
+                "after": "# AlphaPurify 因子诊断提速：进程内缓存与报告渲染去重\n在不改官方 alphapurify 1.0.6、不降级分层/horizon 精度的前提下，瓶颈多在重复加载快照与指标聚合。\n\n## 提速方案\n- alphapurify_bridge/adapters/cache.py 做进程内缓存（冷启动仍慢，三次平均后单因子 10 年可 <5s、六因子批量 <30s）\n- Markdown/HTML 共用一次图表渲染去重\n- verify/compare_perf 脚本落 perf_baseline.json 与 logs/alphapurify_perf.log\n\n## 配置约定\n- 默认与 --full 保持 10 层与完整 horizons\n- 仅 --fast 才 5 层/3 horizons\n- 全历史诊断仍可能 ~80% 时间在指标聚合\n\n## 验证与归属\n- 验证证据：单因子 10.43s→3.08s（70.4%）；六因子 37.57s→12.17s；数值最大误差 0；回归 12/12；峰值内存增量 3.75GB\n- 涉及文件：alphapurify_bridge/adapters/cache.py、alphapurify_bridge/utils/profiler.py、alphapurify_bridge/diagnostics/runner.py\n- 所属项目：投资推送；来源会话ID：rollout-2026-08-26T09-55-01-01a03bc7-20de-7822-91d4-cba7500e47ba"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/实盘报告与回测信号口径分叉.md",
+                "memory_type": "entities",
+                "after": "# 投资推送：实盘报告与回测对同一指数的信号口径刻意分叉\nREADME/配置约定中，报告与回测路径对同一指数采用刻意不同的买卖信号口径，改阈值或卖点前须分清路径。\n\n## 信号口径分叉\n- 创业板指：报告与回测均仅买、无卖点\n- 宽基卖出：报告中仅移动止盈（中证1000 回撤兜底、科创50 分批），去掉估值卖点\n- 红利/美股：报告侧仅买，回测可经智能轮动触发移动止盈（美股回测另有估值卖点）\n\n## 买入与分配\n- 买入默认「位置分配 + 年度预算缩放 + 涨跌缩放」\n- 实盘与回测各有一套分配逻辑，缓存 cache/position_allocation.json\n- backtest_trade_signals 默认走智能轮动（共享资金池 + 轮动门控）\n\n## 验证与归属\n- 验证证据：会话 d293249a 按 config.py/report/backtest 脚本补全 README；红利近1年区间阈值 58% 与 config 对齐\n- 涉及文件：README.md、config.py、buy_amount_allocation.py、rotation_sell.py、market_regime.py、backtest_trade_signals.py\n- 所属项目：投资推送；来源会话ID：d293249a-9042-45c7-bb0f-b5bf6f037589"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/红利多指数未同买pe分位豁免.md",
+                "memory_type": "entities",
+                "after": "# [投资推送] 红利同规则多指数未同买：PE 分位与近1年区间低位豁免\n中证红利低波类指数共用同一套买入门禁时，仍可能因 PE 分位与近1年区间位置联动豁免差异导致「A/B 有信号、C 无信号」。\n\n## 分叉机制\n- 常见分叉点：PE 十年分位上限（例 74%）与「近1年区间位置」联动豁免\n- 近1年区间位置处于极低位（例 ≤20%，规则另有 ≤62% 低位判定门槛）时，PE 分位上限可放宽固定幅度（例 +12 → 86%）\n- 年区间偏上（例 33%）拿不到豁免，PE 持续高于常限会整月无买入\n\n## 排查建议\n- 应逐日对照指标表排查，而非先怀疑数据缺失\n\n## 验证与归属\n- 验证证据：会话 23e57464 中 2024-09 东证红利低波 931446 无买入而 H30269/930955 有信号；9/11 表 PE 81.9%>74% 且近1年位置 33.1% 未触发豁免，另两只 PE 超 74% 但年位置 0–4.2% 触发 +12 放宽\n- 涉及文件：config.py、core.py、dividend_data.py、backtest_buy_signals.py\n- 所属项目：投资推送；来源会话ID：23e57464-5e24-49fd-9a21-08a69230d25d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/环境配置收敛单一push.env.md",
+                "memory_type": "entities",
+                "after": "# [投资推送] 环境配置收敛为单一 push.env\n遗留按指数拆分的 *.env 应删除，配置加载链统一只读 push.env，密钥与覆盖项统一维护在 push.example.env → 本地 push.env。\n\n## 收敛方案\n- 删除遗留按指数拆分的 *.env（如 930955.env、H30269.env）\n- config.py 去掉 LEGACY_CONFIG_FILES，_load_env_files() / load_config() 只读 push.env\n- setup_task.bat 不再从旧 env 自动复制\n\n## 验证与归属\n- 验证证据：会话 13aff9f2 执行项 1：删除 930955.env 并收紧 config/setup_task 加载链\n- 涉及文件：config.py、setup_task.bat、push.example.env\n- 所属项目：投资推送；来源会话ID：13aff9f2-facc-41b5-9ca3-05a17c0ebd7f"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

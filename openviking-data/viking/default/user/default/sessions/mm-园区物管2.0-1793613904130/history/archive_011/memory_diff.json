@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:32:38.922061+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/select_func_store.md",
+                "memory_type": "entities",
+                "after": "# 函数式挂载选择弹窗需注入上下文\n园区物管2.0 中通过 SelectDialog.open() 动态创建 zs-select-dialog-func 实例时，必须注入 parent/store/router，否则混入 table 的 tableConfig getter 崩溃。\n\n## 问题根因\n- 动态创建的根实例未挂 Vuex store，而 zs-select-dialog-func 混入 @/mixins/table，其 tableConfig 计算属性访问 this.$store.getters 导致 $store 为 undefined 崩溃\n- 与已知函数式弹窗坑（propsData 传 visible 被丢、resolve/reject 竞态）是不同的第三个根因\n\n## 解决方案\n- 创建实例时除组件 options 外注入 parent: instance、store: window.__VUE_APP_STORE__ || instance.$store、router: window.__VUE_APP_ROUTER__ || instance.$router\n- 与 main.js 既有设计对齐，新增「函数式挂载组件 + 访问 $store 的 mixin」组合时必须检查此注入，不能只传 propsData\n\n## 验证与归属\n- 验证：会话 7f55cc88 报错栈指向 open() 经 mixins/table.js 的 tableConfig getter；修复代码注入三参数\n- 涉及文件：zs-select-dialog-func.vue、mixins/table.js、autonomy/general/detail.vue；所属项目：园区物管2.0；代码基线：736a824e7"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/no_double_unit.md",
+                "memory_type": "entities",
+                "after": "# 接口已换算单位数据禁止前端二次换算\n园区物管2.0 大屏/图表页接口或 mock 返回已带单位（百个/万元）的数据时，前端展示层不得再套换算函数，否则数值偏小错位。\n\n## 问题根因\n- chartOptions.js 的 buildOperatingAssetsOption 对已是「百个」单位的接口 count 又调用 hundredFromCount 除以100，导致停车泊位 3.83 显示成 0.0383\n- mock 里把已是万元的数再用 wanFromYuan 从元换算，导致资金收入/支出数值偏小\n\n## 解决方案\n- 约定接口/mock 返回什么单位就按什么单位直接渲染，展示层只做数值解析（parseMetric）不做单位换算\n- 新增图表前先确认接口字段真实单位，不「预防性」套换算函数；换算函数只用于确认为原始单位的数据源并命名写清目标单位\n\n## 验证与归属\n- 验证：会话 2aead552 移除 hundredFromCount 二次转换；会话 756a714b 修正 mock 误用 wanFromYuan 为 7208.61/1055.63 万元\n- 涉及文件：chartOptions.js、mock.js、dataHelpers.js；所属项目：园区物管2.0；代码基线：3965548b6 / fc994977f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/shared_mock_constants.md",
+                "memory_type": "entities",
+                "after": "# 多页共享 mock 数据收敛到常量模块\n园区物管2.0 大屏/统计类页面临时用 mock 顶替接口且多页展示同一套指标时，mock 应统一收敛到公共常量模块，页面只做字段映射。\n\n## 问题根因\n- 各页各自写 mock 数组，后续按业务表改数时会漏改某一页，造成两页数字对不上\n\n## 解决方案\n- mock 数据统一收敛在公共常量模块（如 mapOverview/constants.js 的 WARNING_STATISTICS_MOCK），其他页面 import 同一份并在 fetch 里映射字段\n- 页面级图表 mock 放 mapOverview/mock.js 并用 USE_MOCK_DATA 开关控制；接口就绪时只需切回真实请求\n\n## 验证与归属\n- 验证：会话 ed027c4d 中 alert/index.vue 的 fetchStatistics 改为引入 WARNING_STATISTICS_MOCK，constants 调整后 alert 页自动一致\n- 涉及文件：alert/index.vue、mapOverview/constants.js、mapOverview/mock.js；所属项目：园区物管2.0；代码基线：fc994977f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_axis_mid.md",
+                "memory_type": "entities",
+                "after": "# ECharts 双轴图表轴名竖排中段\n园区物管2.0 Web 端 ECharts 线柱混合图左右双 Y 轴显示单位且与图例争位时，用 nameLocation:'middle' 竖排到轴中段避免遮挡。\n\n## 问题根因\n- 默认 nameLocation='end' 把轴名画在轴顶，与 legend 的 top 区域天然重叠；加大 grid.top 浪费图表高度\n\n## 解决方案\n- 左轴 nameLocation:'middle' + nameRotate:90，右轴 nameRotate:-90；顶部只保留图例（legend top:6、left/right:8，grid.top 38）\n- 给 tooltip 加 confine:true 让提示框画在图表区内；竖排文字离图太近时加大 nameGap 或 grid.left/right\n\n## 验证与归属\n- 验证：会话 4e63d96f 给出完整配置（nameLocation middle、grid.top 38、legend top 6、tooltip confine true）\n- 涉及文件：benefit/dataSandbox/fundPanorama/index.vue；所属项目：园区物管2.0；代码基线：f00310232"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid、stats_card_flicker、copy_tab_three_sync、zstable_minwidth_elastic\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal、echarts_pie_downplay、echarts_map_dehighlight、attachments_multi_path、map_bubble_color_data_level、echarts_dual_y_scale\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、edit_popup_detail_field_loss、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、amount_input_precision_loss、project_switch_soft_refresh、api_deadcode_judgment",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid、stats_card_flicker、copy_tab_three_sync、zstable_minwidth_elastic、select_func_store\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal、echarts_pie_downplay、echarts_map_dehighlight、attachments_multi_path、map_bubble_color_data_level、echarts_dual_y_scale、no_double_unit、shared_mock_constants、echarts_axis_mid\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、edit_popup_detail_field_loss、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、amount_input_precision_loss、project_switch_soft_refresh、api_deadcode_judgment"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

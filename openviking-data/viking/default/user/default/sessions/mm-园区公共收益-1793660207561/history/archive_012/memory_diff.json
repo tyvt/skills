@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区公共收益-1793660207561/history/archive_012",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T23:14:53.685212+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/benefit_subtable_bizstate.md",
+                "memory_type": "entities",
+                "after": "# 园区收益租赁类子表仅按 bizState 控操作\n资产租赁/经营资产合同等 benefit 子表，业务方明确要求不要用 formMode（查看/编辑）限制行内操作，仅以主单 bizState 为准。\n\n## 操作规则\n- bizState 为 `0` / `'0'`（待提交）：批量删除、勾选、拟租金额编辑、单行删除均可用。\n- 非待提交：批量能力隐藏，单行删除置灰或隐藏。\n- 与「详情 readOnly 必须同时判 formMode + bizState」的通用套路相反，落地前需确认产品口径。\n\n## 实现要点\n- 集中 `canOperate` 计算属性，避免混用 `disableButton` 与页面 `formMode`。\n- 结论表仅按 bizState，不限制查看/编辑模式。\n\n## 验证与归属\n- 验证证据：用户诉求 2「查看状态也可以操作，只根据bizState判断」。\n- 涉及文件：zhi2-web-admin/src/views/benefit/assetLeaseApply/components/houseTable.vue、zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/detail.vue\n- 所属项目：园区公共收益；来源会话ID：f1d10e9a-1ce1-4000-b675-9ed44669437d；代码基线：4468dfa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_dialog_scroll.md",
+                "memory_type": "entities",
+                "after": "# 系统显示缩放导致弹窗内容截断统一加滚动\nWindows 显示缩放/低分辨率下，登录页、选择弹窗、业务子表弹窗等内容区被裁切且无法滚动，逐页改 height 不可靠。\n\n## 问题背景\n- 缩放/低分辨率下弹窗内容区被裁切，底部按钮点不到。\n- 与「125% 浏览器缩放 + tableTrCount」类表格行高问题互补：本轮重点是弹窗壳层高度链而非单表分页条数。\n\n## 解决方案\n- 在 `zs-dialog`、`zs-select-dialog` 及高频业务弹窗统一约束：弹窗主体 `max-height` + 内容区 `overflow-y: auto`。\n- 必要时配合 `drag.js` 不再锁死可视高度，让缩放后仍能滚动触达 Footer。\n- 涉及登录、注册、统计弹窗等应一并回归。\n\n## 验证与归属\n- 验证证据：会话 911619fe 提交说明「修复弹窗及表单在缩放分辨率下内容被截断无法滚动的问题」，变更含 zs-dialog、zs-select-dialog、login 等 11 个文件。\n- 涉及文件：zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue、zhi2-web-admin/src/directives/dialog/drag.js、zhi2-web-admin/src/views/login.vue\n- 所属项目：园区公共收益；来源会话ID：911619fe-fba8-46b0-96ee-51b12ea1fa17；代码基线：8215c1a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/benefit_subdialog_overflow.md",
+                "memory_type": "entities",
+                "after": "# benefit 明细弹窗去 Headline 嵌套防底部按钮遮挡\n资产租赁申请下的 subAdvertiseDialog / subVenueDialog 等明细弹窗，用 Headline 再包一层会多出边框并与 DetailTemplate 查看态 border 叠加，溢出时盖住 Footer。\n\n## 问题背景\n- 弹窗内用 `Headline` 包裹会多出边框，与 `DetailTemplate` 查看态 `border` 叠加。\n- 内容溢出时会盖住 Footer，出现「取消点不了」。\n\n## 解决方案\n- 移除弹窗内 `Headline` 包裹；查看模式 `DetailTemplate` 设 `:border=\"false\"`。\n- 弹窗根或内容容器设 `overflow: hidden` 并底部按钮右对齐，与全局 `sub-container` 去竖线规范一并验收。\n\n## 验证与归属\n- 验证证据：会话 e326e1ef 中 subAdvertiseDialog 移除 Headline、overflow:hidden 修复取消按钮；subVenueDialog 同步。\n- 涉及文件：zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subAdvertiseDialog.vue、zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subVenueDialog.vue\n- 所属项目：园区公共收益；来源会话ID：e326e1ef-cd40-49fe-b333-beabfaaa0ee3；代码基线：36a9a7e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/building_header_units.md",
+                "memory_type": "entities",
+                "after": "# BuildingTable 表头单元仅取首层导致列空白\n楼盘表视图若用 tableData[0] 推导表头 units，当各层 unitId 集合不一致时，首层没有的单元整列不渲染，表现为「某单元列全空」。\n\n## 问题背景\n- 各名义层拥有的 unitId 集合可能不一致（例如 1 单元只在 2 层及以上出现）。\n- 首层没有的单元整列不渲染，易误判为接口无数据。\n\n## 解决方案\n- 遍历全部楼层按 unitId 去重汇总 units，再按 unitName 排序。\n- 每行按表头顺序用 `getUnitRooms(floor, unitId)` 取户室；列宽按单元独立计算 `getUnitColumns(unitId)`，不假定各层结构相同。\n\n## 验证与归属\n- 验证证据：筹备组征集新增报名选户室时楼盘表视图 1 单元无数据，根因为表头 units 仅来自 tableData[0]。\n- 涉及文件：zhi2-web-admin/src/views/components/BuildingTable.vue、zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue\n- 所属项目：园区公共收益；来源会话ID：473e272c-6e60-4e72-b905-e02eba29cfd7；代码基线：0abcb96"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-昆山G-1793800176598/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T13:52:38.514676+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/maintenance_tabfix.md",
+                "memory_type": "entities",
+                "after": "# 维修项目立项页组织验收单位Tab切换丢失\n昆山G 维修项目立项页（estate/MaintenanceProject/initiation/detail.vue）因 Tab 切换重建表单从 sessionStorage 恢复时未重新请求业委会/物管会信息，导致「业委会」「物管会」选不中。\n\n## 问题根因\n- task762（组织验收单位新增「业委会」「物管会」）遗留问题：首次进入选小区后调 infoByPropertyProject 拉取业委会/物管会信息，可正常选择。\n- 切换 Tab 再回来页面重建，表单从 sessionStorage 恢复，但未重新请求，homeownersassociaInfo 为空。\n- 再选「业委会」或「物管会」时校验失败，提示「当前小区暂无有效的业委会/物管会信息」，表现为选不中。\n\n## 修复内容\n- 恢复 task762 功能：组织验收单位下拉重新加入「业委会」「物管会」。\n- 修复 Tab 切换：在 init() 中，新增页从 sessionStorage 恢复且已有 propertyProjectId 时，重新调用 getHomeownersassociaInfo。\n- 保留原有触发点：选择小区、加载详情时仍会拉取业委会/物管会信息。\n\n## 验证与归属\n- 涉及文件：d:/repository/昆山G、d:/repository/昆山G/src/views/estate/MaintenanceProject/initiation/detail.vue\n- 所属项目：昆山G；来源会话：42c65495-f5cf-48ac-8138-4f4fe0a5e388；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/date_valueformat_fix.md",
+                "memory_type": "entities",
+                "after": "# el-date-picker 非Date对象导致 getHours 报错\n昆山G 多个详情页用 Element UI el-date-picker 时，因 value-format 写错与接口时间格式不匹配，点日历格触发 modifyDate 内 TypeError: date.getHours is not a function。\n\n## 问题根因\n- value-format 写成 `yyyy-MM-dd `（末尾多空格），与接口常见的 `2025-05-12` 不一致，造成解析/回写异常。\n- 详情接口 applyTime 常为 `yyyy-MM-dd HH:mm:ss` 或时间戳，而控件用 type=\"date\" + value-format=\"yyyy-MM-dd\"，不先统一成日期字符串时，点日历格内部仍可能拿到非 Date 对象。\n\n## 修复内容\n- 将 value-format 改为 `yyyy-MM-dd`（去掉末尾空格）。\n- 在 getDetail 赋值 form 后，若有 applyTime，用项目已有 this.parseTime(..., '{y}-{m}-{d}') 转成与 value-format 一致的日期字符串，使 v-model 与 el-date-picker 内部解析一致。\n\n## 验证与归属\n- 涉及文件：d:/repository/昆山G/src/views/increment/useFund/insuranceApply/detail.vue、d:/repository/昆山G/src、d:/repository/昆山G/src/utils/ruoyi.js、d:/repository/昆山G/src/views/estate/accountApart/detail.vue\n- 所属项目：昆山G；来源会话：6de5c545-0115-4b86-8a24-5c8a01bf9d1a；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/权限不足警告去重.md",
+                "memory_type": "entities",
+                "before": "# 权限不足警告去重\n全局权限不足时统一通过 console.warn 打印警告并去重提取按钮名，避免路由切换重复打印。\n\n## 实现做法\n- 在 `src/utils/permission.js` 新增 `warnMissingPermi()` 函数，去重提取按钮名。\n- `v-hasPermi` 指令与 `src/main.js` 的 `checkPermission()` 调用该警告函数。\n- 路由切换前在 `src/permission/index.js` 重置缓存，避免重复打印。\n\n## 涉及文件\n- d:/repository/昆山G/src/directives/permission/hasPermi.js\n- d:/repository/昆山G/src/utils/permission.js\n- d:/repository/昆山G/src/permission/index.js\n- d:/repository/昆山G/src/directives/permission/index.js\n- d:/repository/昆山G/src/main.js\n- d:/repository/昆山G/src/directives/permission/hasRole.js\n\n## 关联信息\n- 验证证据：src=昆山G/002.md\n- 来源会话：a3aaf7c9-cb30-46aa-8552-c39e96f2dfa9\n- 所属项目：昆山G；代码基线：none",
+                "after": "# 权限不足警告去重\n全局权限不足时统一通过 console.warn 打印警告并去重提取按钮名，避免路由切换重复打印。\n\n## 实现做法\n- 在 `src/utils/permission.js` 新增公共方法：`hasPermiMatch()`（统一权限判断）、`warnMissingPermi()`（去重后打印警告）、`getPermiElementLabel()`（从 DOM 提取按钮名称）、`setPermiWarnRoute()`（路由切换时重置去重缓存）。\n- `v-hasPermi` 指令与 `src/main.js` 的 `checkPermission()` 调用该警告函数；`v-hasPermi` 无权限时打印 `[权限不足] 权限字符: system:user:add, 按钮名称: 新增`，`checkPermission()` 的 `v-if` 场景按钮名默认为「未知」。\n- 路由切换前在 `src/permission/index.js` 重置缓存，避免重复打印。\n\n## 控制台输出示例\n- `[权限不足] 权限字符: system:user:add, system:user:edit, 按钮名称: 新增`\n- `[权限不足] 权限字符: estate:maintainDecision:revoke, 按钮名称: 撤回`\n\n## 涉及文件\n- d:/repository/昆山G/src/directives/permission/hasPermi.js\n- d:/repository/昆山G/src/utils/permission.js\n- d:/repository/昆山G/src/permission/index.js\n- d:/repository/昆山G/src/directives/permission/index.js\n- d:/repository/昆山G/src/main.js\n- d:/repository/昆山G/src/directives/permission/hasRole.js\n\n## 关联信息\n- 验证证据：src=昆山G/002.md\n- 来源会话：a3aaf7c9-cb30-46aa-8552-c39e96f2dfa9\n- 所属项目：昆山G；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

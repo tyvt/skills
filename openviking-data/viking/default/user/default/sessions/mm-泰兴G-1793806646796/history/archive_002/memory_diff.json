@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-泰兴G-1793806646796/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T15:43:04.479085+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/contract_table_scroll.md",
+                "memory_type": "entities",
+                "after": "# 维修资金合同明细表格固定列穿屏\n维修资金合同/报价单管理详情页，合同明细表格滚动后操作列穿屏叠加在顶部按钮与付款比例表格之上。\n\n## 问题根因\n- 带「小计」行的表格（show-summary）将固定操作列 z-index 提升至 12，而详情页顶部按钮栏仅 11，操作时操作列叠在按钮之上\n- 列表页 .list-card 对固定列做了 overflow:hidden，详情页 Headline 容器为 overflow:visible，固定列易溢出表格区域\n- contractInfoTable 自定义 getList 后未调用 doLayout()，多行时固定列高度/滚动不同步\n\n## 解决方案\n- zs-table.vue：表格容器增加 isolation:isolate 独立层叠上下文，固定列增加 overflow:hidden 限制操作列在表格内\n- OperationBtnGroup/index.vue：顶部按钮栏 z-index 从 11 调整为 14，始终高于固定列\n- contractInfoTable.vue：数据加载完成后调用 doLayout() 刷新布局\n\n## 验证与归属\n- 所属项目：泰兴G\n- 验证：extracted source=cursor session=987eab2e-2440-4e1e-bd45-6e4bd72a5860\n- 涉及文件：zhi2-web-admin/src/views/maintenance/contractGuard/detail.vue、components/contractInfoTable.vue、zs-table.vue、OperationBtnGroup/index.vue\n- 来源会话：987eab2e-2440-4e1e-bd45-6e4bd72a5860；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/upload_buscode_fix.md",
+                "memory_type": "entities",
+                "after": "# 附件上传导入 busCode 不匹配致失败\n泰兴G 费用申报批量导入时，上传组件使用 route.meta.busCode 作为导入 busCode，导致部分页面匹配不到后端业务配置而失败。\n\n## 问题根因\n- 成功请求 busCode 为 3010（附件体系识别码），失败请求 busCode 为 feeDeclare2Detail\n- 失败请求额外携带 path:/Propertyfees/feeDeclare2，大小写与路径值参与后端校验\n- feeDeclare2/excelImport 接口按 busCode+path 做权限或业务配置匹配，feeDeclare2Detail 匹配不到导致失败\n\n## 解决方案\n- 不要直接用 this.$route.meta.busCode 作为导入 busCode\n- 改为传后端认可的固定业务码（如 3010）\n- path 建议传后端配置标准值（通常全小写，如 /property/feeDeclare2），或先去掉 path 让后端确认是否必填\n- bulkImportDialog.vue 中改为 const params = { busCode: this.bus || '3010', complexId, declareYear }\n\n## 验证与归属\n- 所属项目：泰兴G\n- 验证：extracted source=cursor session=7590eb72-ea98-4d1e-bf6a-32ed8129172e\n- 涉及文件：zhi2-web-admin/src/views/property/feeDeclare2/components/bulkImportDialog.vue、components/AnnexUpload/index.vue、utils/request.js、api/index.js\n- 来源会话：7590eb72-ea98-4d1e-bf6a-32ed8129172e；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/print_tree_hidden.md",
+                "memory_type": "entities",
+                "after": "# 打印配置页左侧树被表格挤压不显示\n泰兴G 打印配置页因 list-card 直接放在 list-container 占满整行，左侧 menu-tree（200px）被挤压消失，附件配置页正常。\n\n## 问题根因\n- 全局样式 .list-card 设置 width:100%\n- 打印页把 list-card 直接放在 list-container 里，与左侧 menu-tree 并排时右侧表格占满整行，把树挤没\n- 附件配置页（fjflpz/index.vue）用 table-container（width:calc(100% - 200px)）包了一层，所以显示正常\n\n## 解决方案\n- 按附件配置页结构，给 list-card 和 PrintDialog 外面加 table-container 包裹层（width:calc(100% - 200px)）\n- 刷新打印配置页后左侧树正常显示\n\n## 验证与归属\n- 所属项目：泰兴G\n- 验证：extracted source=cursor session=e60200f4-3211-4dd2-b804-4418f9454b81\n- 涉及文件：zhi2-web-admin/src/views/tool/print/index.vue、components/MenuTree/index.vue、fjflpz/index.vue\n- 来源会话：e60200f4-3211-4dd2-b804-4418f9454b81；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/facility_region_hidden.md",
+                "memory_type": "entities",
+                "before": "# 物业管理区域选择器受端别限制隐藏\nfacility/index.vue 物业管理区域选择器受 isGTerminalLike 限制隐藏，物业企业管理员无法选择区域维护设备。\n## 问题根因\n- facility/index.vue 区域选择器受 isGTerminalLike 限制隐藏\n- 物业企业管理员无区域选择入口，无法维护设备\n## 解决方案\n- 左侧始终显示区域输入框，区分用户类型\n- 仅 B 端从业人员自动带入区域\n## 验证与归属\n- 验证：extracted source=cursor session=688fb713-99d8-4359-9f09-c52c2f5c589d\n- 涉及文件：zhi2-web-admin/src/views/maintenance/facility/index.vue、facilityChange/index.vue、property/workOrder/order/index.vue、store/getters.js、store/modules/user.js、utils/terminalUser.js、utils/projectContext.js、home/bProjectDialog.vue\n- 来源会话：688fb713-99d8-4359-9f09-c52c2f5c589d；代码基线：none",
+                "after": "# 物业管理区域选择器受端别限制隐藏\nfacility/index.vue 物业管理区域选择器受 isGTerminalLike 限制隐藏，物业企业管理员无法选择区域维护设备。\n## 问题根因\n- facility/index.vue 区域选择器受 isGTerminalLike 限制隐藏\n- 物业企业管理员无区域选择入口，无法维护设备\n## 解决方案\n- 左侧始终显示区域输入框，区分用户类型\n- 仅 B 端从业人员自动带入区域\n## 验证与归属\n- 验证：extracted source=cursor session=688fb713-99d8-4359-9f09-c52c2f5c589d\n- 涉及文件：zhi2-web-admin/src/views/maintenance/facility/index.vue、facilityChange/index.vue、property/workOrder/order/index.vue、store/getters.js、store/modules/user.js、utils/terminalUser.js、utils/projectContext.js、home/bProjectDialog.vue\n- 所属项目：泰兴G\n- 来源会话：688fb713-99d8-4359-9f09-c52c2f5c589d；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

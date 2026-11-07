@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_038",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:43:41.450980+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/axios_timeout_override.md",
+                "memory_type": "entities",
+                "after": "# 单接口超时覆盖套路\n在产品2.0中，针对个别慢接口使用 axios 请求级 timeout 配合 enums 常量覆盖全局100秒默认超时，避免调大全局超时失去保护。\n\n## 问题描述\n- 全局 axios 超时默认为100秒，大文件导入接口（如 /property/spFeeBill/import）处理超时会被掐断\n- 调大全局超时会导致所有接口失去超时保护，不可取\n\n## 解决方案\n- 在 enums.js 定义语义化常量 IMPORT_REQUEST_TIMEOUT = 5 * 60 * 1000（即300000ms）\n- 在调用慢接口的组件（如 importUploadDialog.vue）请求 config 传 `timeout: IMPORT_REQUEST_TIMEOUT`\n- 复用现有「系统接口请求超时」提示逻辑，其他接口不受影响\n- 套路可复用于任何慢接口（导入、批量处理、报表生成）\n\n## 验证与归属\n- 验证证据：已为 import 接口单独设置300000ms超时，enums.js 新增常量，importUploadDialog.vue 传 timeout\n- 涉及文件：src/enums.js、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue\n- 所属项目：产品2.0；来源会话：f95fd685-fb92-457c-98a8-0d5d19ac9f6f；代码基线：62d5fb9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/version_branch_fix.md",
+                "memory_type": "entities",
+                "after": "# 版本分支修复约定\n产品2.0前端并行维护 develop/v2.6.1、develop/v2.6.2、develop/v2.6.2-yulin 三条版本分支，按上游到下游链定位引入点并 cherry-pick 同步修复。\n\n## 背景与规则\n- 三条分支：261、262、262-yulin（榆林定制），下游由上游合并而来\n- 用户指定排查顺序：从261开始，然后262，最后262-yulin；261修完合到262，262修完合到262-yulin\n- bug通常在某一环合并时引入并沿链扩散\n\n## 修复步骤\n- 按上游→下游顺序逐分支比对同一文件定位引入点\n- 在引入分支修复提交，下游分支用 cherry-pick 单点同步（全量合并冲突多时不整合）\n- 父仓库与子模块都要分别提交推送到各对应分支\n- env/.env 本地代理配置不入库；修完切回工作分支\n\n## 验证与归属\n- 验证证据：排查结论表261无问题、262合并261时误保留重复代码、262-yulin同样带入；修复提交5a74eab61/40e8255f0按cherry-pick同步，父仓库三分支分别提交\n- 涉及文件：zhi2-web-admin/src/views/property/workOrder/order/index.vue\n- 所属项目：产品2.0；来源会话：d0f2e7ac-fb62-45da-ad5b-e39f678f486c, 341848bc-8f8a-4f9e-9cf0-21c2a82daa1e；代码基线：62d5fb9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bterminal_redirect_fix.md",
+                "memory_type": "entities",
+                "after": "# 外链型菜单组件规范化\n产品2.0中配置指向https地址的B端SSO跳转菜单组件（sso/bTerminalRedirect/index）必须走 InnerLink 同款外链规范化，否则报「没有授权菜单」。\n\n## 问题根因\n- 动态路由组装时 InnerLink 有专门外链规范化逻辑，但其他跳转外壳组件未走，Vue Router无法注册https开头path\n- 侧边栏用<a target=_blank>打开绕过SSO跳转，触发404守卫报未授权\n\n## 解决方案\n- 在 permission.js 动态路由组装处，把该外壳组件与 InnerLink 一起纳入「外链组件」判定（component字符串匹配），统一做 normalizeExternalLinkRoute\n- 组件内从 meta.link 解析真实跳转地址\n- 菜单配置：组件路径 sso/bTerminalRedirect/index、路由地址填https链接、业务编码填对应clientId；配置后需重新登录刷新动态路由\n\n## 验证与归属\n- 验证证据：permission.js 新增 isBTerminalRedirectComponent + normalizeExternalLinkRoute，将 bTerminalRedirect 纳入与 InnerLink 相同外链路径规范化\n- 涉及文件：zhi2-web-admin/src/store/modules/permission.js、zhi2-web-admin/src/views/sso/bTerminalRedirect/index.vue\n- 所属项目：产品2.0；来源会话：f702fc2e-fea8-44f2-ac57-30fa5c4f7b79；代码基线：62d5fb9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/candidate_identity_flag.md",
+                "memory_type": "entities",
+                "after": "# 业委会筹备组候选人字典\n产品2.0后台业委会与筹备组候选人身份标识使用两套独立字典，非业主可跳过不动产校验，避免流程卡死。\n\n## 业务背景\n- 业委会与筹备组是两条并行业务线，字典编码各配一套，不能互相复用\n- 业委会新增候选人类型必须用 owner_candidate_apply_identity_flag（0=业主，1=非业主），筹备组仍用 candidate_apply_identity_flag\n- V2不少项目未对接不动产接口，原恒按业主处理导致无法校验权利人、流程走不下去\n\n## 实现要点\n- CandidateDialog 里业委会也展示「候选人类型」，按业务线传不同字典编码\n- 选业主(0)显示户室/幢号/单元并带出不可编辑住址；选非业主隐藏并清空户室关联字段、住址可手填\n- 提交前用 normalizeFormForIdentity 清除非业主户室字段，后端按 identityFlag=非业主跳过权利人/业主身份校验\n- 列表新增候选人类型列，非业主行住址列显示为空\n\n## 验证与归属\n- 验证证据：会话 eb8bc9bb（2026-07-27，基线1d563df）改造 CandidateDialog.vue / CandidateTable.vue，明确两套字典使用\n- 涉及文件：zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue、CandidateTable.vue、enums.js\n- 所属项目：产品2.0；来源会话：eb8bc9bb-60c6-44ff-8cdd-d45d8bc2c03d；代码基线：无"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

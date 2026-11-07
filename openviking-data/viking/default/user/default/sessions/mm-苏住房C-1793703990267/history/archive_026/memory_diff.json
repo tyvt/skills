@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_026",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:58:48.999324+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/scss_wxss_leak.md",
+                "memory_type": "entities",
+                "after": "# 主包scss组件注入uni.scss致上传超限\n苏住房C小程序因未加scoped的scss组件把整份uni.scss注入组件wxss，导致主包上传预估超2048KB。\n\n## 问题现象\n- 构建在 size:main 校验失败，主包磁盘1766.6KB未超2048KB，上传预估1766.6×1.17≈2066.9KB超限额约19KB\n- 33个scss组件每个wxss多约7.5KB重复样式，累计约246KB，ZsButton为压垮临界线的最后一根稻草\n\n## 根因\n- 新增ZsButton用`<style lang=\"scss\">`且未scoped，uni-app把整份uni.scss（含@import的zs-button.scss）注入组件wxss，与app.wxss重复\n- 仅看磁盘体积会误判为未超限，实际应按上传预估口径\n\n## 解决方案\n- 新增组件一律写`<style scoped>`且纯CSS，不用scss变量语法，从源头避免注入全局样式\n- 存量项目加 scripts/prune-component-wxss-leak.mjs，构建后裁剪主包components/与uni-icons里泄漏的uni.scss块，接在validate-dist之前\n- 校验收敛到 scripts/size-main-package.mjs 的上传预估口径（×1.17），勿用磁盘体积\n- 修复后主包磁盘1515.5KB、上传预估1773.1KB，余量约275KB，样式仍由app.wxss提供\n\n## 验证与归属\n- 会话 fbb1fcdd 用户贴构建失败 terminals/8.txt:159-176；结论主包磁盘未超、上传预估超约19KB\n- 涉及文件：zhi2-mobile-shimin/src/components/ZsButton/ZsButton.vue、src/styles/zs-button.scss、scripts/size-main-package.mjs、scripts/prune-component-wxss-leak.mjs、scripts/merge-main-leaks.mjs、scripts/relocate-uni-icons.mjs、package.json\n- 所属项目：苏住房C；来源会话ID：fbb1fcdd-721a-4559-b7a4-6771d348fd61；代码基线：4d6dba9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/owner_list_migration.md",
+                "memory_type": "entities",
+                "after": "# 市民端列表页批量迁移usePaging+z-paging套路\n苏住房C的pages_owner下26个列表页混用两套分页实现，需统一为usePaging+z-paging固定套路。\n\n## 背景\n- pages_owner下26个列表页混用老useLoadMore+uni-load-more与新usePaging+z-paging\n- 老实现页面自维护page/pageSize/loading并用arguments透传，存在reload()未定义、空态各写一套\n\n## 迁移规则\n- useLoadMore→usePaging，返回{list,pagingRef,queryList,refresh,reset,auto}\n- 取数函数签名改getList(pageParams)，从入参取值而非arguments\n- 列表区包`<z-paging v-model=\"list\" @query=\"queryList\">`，空态类paging-empty放uni.scss\n- 删除所有uni-load-more；ZsEmpty换z-paging的#empty插槽（ZsImage+paging-empty-text，路径文案原样保留）\n- 散落reload()修正为refresh()（tenant、income等）；building/info两useLoadMore合并为单z-paging按Tab切query\n\n## 验证与归属\n- 会话7024cb11用户给出完整迁移规则，最终列出26个迁移文件并顺带修复reload()→refresh()\n- 涉及文件：src/hooks/usePaging.js、pages_owner/building/info/index.vue、company/service/index.vue、tenant/index.vue、authentication/family/index.vue、uni.scss\n- 所属项目：苏住房C；来源会话ID：7024cb11-2918-467a-b059-55fd7409fdbc；代码基线：83c4136"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/richtext_relative_img.md",
+                "memory_type": "entities",
+                "after": "# 富文本rich-text相对路径图片必空白\n苏住房C小程序rich-text组件直接渲染含相对路径图片的HTML会静默空白，因微信不补全域名。\n\n## 问题现象\n- 「购房政策→苏州市购房政策」详情页标题时间正常，正文空白；接口数据正常，正文仅一张`<img src=\"/zs-fym/2025/05/29/xxx.png\"/>`\n- 跳转链接多打问号detail??id=致取不到id，也是空白第二成因\n\n## 根因\n- 后端下发图片相对路径，rich-text不会做域名补全，相对路径加载失败\n- 项目ZsImage自带补全逻辑故用ZsImage页面正常，直接塞rich-text的正文全静默空白，仅部分页面复现\n\n## 解决方案\n- utils/index.js新增resolveFullMediaUrl（相对路径按平台域名补全）与formatRichTextContent（正则批量转富文本相对src为完整URL）\n- 渲染前对正文转换：落点pages/news/components/ListDetail.vue及threeLowOneWidthEquivalent同类页\n- 修正buyHousePolicy/index.vue、fundPolicy/index.vue的detail??id=多余问号；vConsole Network确认图片200\n\n## 验证与归属\n- 会话5dc51561用户诉求「购房政策为空」；结论正文相对路径rich-text无法加载，修复加两函数并修问号\n- 涉及文件：src/utils/index.js、pages/news/components/ListDetail.vue、pages_transaction/buyHousePolicy/index.vue、detail.vue、pages_my/onlineService/PolicyDetail.vue\n- 所属项目：苏住房C；来源会话ID：5dc51561-f159-4aea-926e-8205773be7f2；代码基线：77666f8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cert_input_layout.md",
+                "memory_type": "entities",
+                "after": "# 小程序年-字-号组合输入框排版约定\n苏住房C不动产权证号输入区反复排版错乱，最终约定放弃flex-wrap改固定两行结构。\n\n## 问题现象\n- 证号输入区（苏+年份+苏州市不动产权第+编号+号）先用flex-wrap致「号」字被挤到下一行\n- 调小字号改placeholder后反馈「还是很大」，再改「排版又乱了」，开发者工具模拟器宽度与真机不一致易漏判\n\n## 根因\n- flex-wrap换行点按剩余宽度动态算，字号或机型宽变化就漂移\n- placeholder字号不跟随输入文字，必须靠placeholder-class给原生input单独下发，改容器字号无效\n\n## 解决方案\n- 此类「固定文案+输入框」证号控件一律显式两行：第一行「苏+年份输入框」，第二行「苏州市不动产权第+编号输入框+号」同排不折行\n- 字号统一rpx（示例placeholder 22rpx）并通过placeholder-class指定，不指望容器透传\n- 改完必须重新编译真机查看\n\n## 验证与归属\n- 会话98b2613a用户四轮反馈（UI错乱→字号小→没生效→排版乱），结论根因flex-wrap，改固定两行布局\n- 涉及文件：pages_owner/house/verify.vue、pages_transaction/publishHouse/verification.vue、styles/form2.scss、pages_transaction/stockHouseSign/apply.vue\n- 所属项目：苏住房C；来源会话ID：98b2613a-ff87-4511-9692-3d6fb3b49725；代码基线：9832ba3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

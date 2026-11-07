@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:36:21.245230+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_stat_nav.md",
+                "memory_type": "entities",
+                "after": "# 首页v2统计数字点击跳列表预置筛选\n苏住房G首页v2关键数据、公共收益等统计项改为可点击入口，跳转后目标列表按该指标业务口径预置筛选，靠独立 homeStatNav 映射表 + saveSearchParams 打通。\n\n## 背景与动机\n- 直接在各卡片写 router.push(path)+query 有两个坑：目标列表页搜索条件不吃 URL query（列表靠 listMixins 搜索缓存恢复），跳过去是全量无筛选\n- 「物业服务企业数」（已备案+本地机构）、「监管账户数」（已备案+备案当月）等业务口径散落各卡片会各处漂移\n\n## 解法\n- 新建 views/home/v2/homeStatNav.js，一个统计项一条：{ 目标路由, 默认查询条件 }，当月类筛选在配置里生成 startRecordTime/endRecordTime，不让卡片自己算日期\n- 跳转统一走 navigateWithSearchParams + saveSearchParams（先写查询条件进目标列表搜索缓存再跳转），卡片只传指标 key\n- 列表侧（pubManagementOrg / pubRegulatoryAccount / pubRegulatoryAgreement）要在 queryParams 显式声明 bizState、备案时间等字段，否则缓存写进也不会被带上\n- 联调注意：benefit 列表若按备案时间没过滤，先确认后端分页是否已支持 startRecordTime/endRecordTime\n\n## 验证与归属\n- 来源会话3716ba06（基线315702f）最终结论第2、4条：新建 homeStatNav.js；三个列表补充 bizState/备案时间字段声明\n- 涉及文件：zhi2-web-admin/src/views/home/v2/homeStatNav.js、benefit/pubManagementOrg/index.vue、pubRegulatoryAccount/index.vue、pubRegulatoryAgreement/index.vue\n- 所属项目：苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/study_tab_sync.md",
+                "memory_type": "entities",
+                "after": "# 学习园地新增页签同步改四处\n苏住房G首页v2学习园地新增「业务通知」页签并置顶，最终顺序：业务通知、政策法规、流程指南、在线课堂、常见问题、经典案例，需同步改 tab 常量 / api 分流 / 跳转映射 / 数据字段映射。\n\n## 背景与动机\n- 学习园地页签是纯前端 tab 索引驱动的一整套映射链，改一处必然漏：tab 值决定请求哪个接口、跳哪个路由、列表项取哪些标题字段\n\n## 解法\n- StudyPanel.vue 里 tab 值 '0' 给业务通知放第一个，但默认选中仍保持政策法规（1），不要顺手把默认改成新页签\n- api/portal/home.js 里 tab === '0' 分流转到 GET /msg/businessNotice/page（pageNum/pageSize 同其他页签）\n- studyNav.js 增加业务通知跳转路由；studyDataMap.js 增加字段映射（noticeId / noticeTitle），否则列表出数据但标题空白、点击无跳转\n- E2E 的 mock（home-v2-mocks.js / home-v2.spec.mjs）补 businessNotice/page 桩，否则首页 e2e 因新接口 404 红掉\n\n## 验证与归属\n- 来源会话3716ba06（基线315702f）最终结论第3、5条：StudyPanel Tab0置顶默认Tab仍1；api分流；studyNav/studyDataMap支持；mock补充\n- 涉及文件：zhi2-web-admin/src/views/home/v2/components/StudyPanel.vue、api/portal/home.js、v2/studyNav.js、v2/studyDataMap.js、tests/e2e/home-v2-mocks.js、home-v2.spec.mjs\n- 所属项目：苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue_rel_redeclare.md",
+                "memory_type": "entities",
+                "after": "# Vue异步组件RELATION重复声明构建失败\n苏住房G新增「添加条件组」多条件查询后，Vue 异步组件报 Identifier 'RELATION' has already been declared，真实错误是构建期 SyntaxError 导致页面整个 chunk 加载失败。\n\n## 现象与根因\n- 控制台出现 [Vue warn]: Failed to resolve async component: () => value()，紧跟 Reason: SyntaxError: Identifier 'RELATION' has already been declared，页面组件渲染不出来\n- Vue warn 只是异步 chunk 加载失败后的二次包装，不要顺着 async component 方向查\n- 同一作用域 RELATION（且/或关系常量）被声明两次：新组件 setup 里又写 const RELATION，而 mixins/table.js 或公共常量已注入/导出同名符号；或脚本改写把 import 合并进结构导致 import { RELATION } 与本地 const RELATION 并存\n\n## 解法\n- 全局搜该符号所有声明（含 import、mixins 注入、const/let），只留一处，从公共常量文件 import 复用\n- 养成批量脚本改文件后立刻 build/启动看控制台的习惯——这类错误 ESLint 未必拦住，Vite 只在模块求值时才抛\n\n## 验证与归属\n- 来源会话63d4baf6（基线d109b83）用户诉求2原文贴出报错；涉及 zs-search-form.vue、mixins/table.js、listMixins.js\n- 涉及文件：zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue、src/mixins/table.js、src/mixins/listMixins.js、src/views/publicQuery/complex/index.vue\n- 所属项目：苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_search_form.md",
+                "memory_type": "entities",
+                "after": "# 列表搜索区交互内聚zs-search-form\n苏住房G列表页新增搜索区交互必须内聚进公共 zs-search-form，唯一例外是多条件组这类「动态行数」场景，此时允许自建搜索区但须显式对齐公共令牌。\n\n## 背景与动机\n- 本后台硬约定所有列表页搜索区都用公共 zs-search-form，页面自己拼 el-form 会和 QueryResetButtons、--search-form-control-height、折叠区样式全部对不上\n- zs-search-form 按固定 formItems 配置渲染，天生不支持用户动态增删一组行\n\n## 解法\n- 分界判定：查询项数量静态 → 一律喂 formItems 给 zs-search-form\n- 查询项行数由用户动态增删（条件组）→ 允许页面内自建搜索区，但须显式对齐：控件高度读 --search-form-control-height，搜索/重置挂 QueryResetButtons，按钮宽度不写死百分比而按内容自适应（用户反馈「按钮过长」），同一行内字段/操作符/值三类控件统一 height 与 line-height 避免「条件框高度不一致」\n\n## 验证与归属\n- 来源会话63d4baf6（基线d109b83）用户诉求1（多条件查询）、4（按钮过长）、5（高度不一致）、6（输入框别太宽）；最终改统一顶部摘要栏+收起展开共用区域\n- 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/index.vue、src/components/zs-search-form/zs-search-form.vue、src/views/property/complex/index.vue\n- 所属项目：苏住房G"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

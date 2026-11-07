@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-昆山市民-1793636272833/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T16:24:16.146307+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/mp_api_bug.md",
+                "memory_type": "entities",
+                "after": "# 小程序 BASE_URL 禁止沿用 H5 相对路径 /api\n昆山市民小程序因 mp.js 误用相对 /api 导致打包后接口地址错误，需按 envVersion 选择完整域名。\n\n## 问题背景\n- 小程序 `src/env/mp.js` 若把 `BASE_URL` 写成 `/api`，开发 H5 可由 Vite 代理转发，但小程序打包无代理，相对路径无法解析到后端。\n- 表现为打包后接口地址不对，根因是 mp.js 重构误用相对 /api。\n\n## 解决方案\n- 应像 `IMAGE_BASE` 一样按 `wx.getAccountInfoSync().miniProgram.envVersion`（develop/trial/release）选择完整域名。\n- 开发/体验走测试域 `.kunshan.suzhou.test.zhishusz.com/prod-api`，正式走 `https://kwt.ksjzaq.com/app/`。\n- 改 env 后需 `npm run build:mp` 重新上传。\n\n## 验证与归属\n- 验证：会话 76e058f1 用户反馈小程序打包接口不对，修复恢复 envVersion 分支表。\n- 涉及文件：src/env/mp.js、src/request/index.js。\n- 所属项目：昆山市民；代码基线：1e46691；来源会话ID：76e058f1-ba17-479b-89f8-7c7af2202d46。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/oauth_token_bug.md",
+                "memory_type": "entities",
+                "after": "# 实名成功后 getOauthInfoByIdNumber 缺 accessToken 会静默清空登录态\n昆山市民小程序实名流程因无条件 setToken 可能将已有 token 写为 undefined，导致后续接口 401。\n\n## 问题背景\n- `src/pages/verifyUser/index.vue` 人脸成功只 `setUserInfo(faceRes.data)`，不写 token。\n- `refreshUserAndHouse()` 在 redirect 之后后台调用 `getOauthInfoByIdNumber` 并无条件 `setToken(userRes.data.accessToken)`。\n- 若 200 但无 `accessToken`，会把 `wx.login`→`getInfoByCode` 已有 token 写成 `undefined`，请求拦截器不再带 Authorization，后续接口 401 而实名流程表面已成功。\n- `initMyHouseInfo` 只校验 `idNumber` 仍会执行。\n\n## 加固建议\n- 仅当 `accessToken` 存在时再 `setToken`。\n- 或失败时保留原 token 并提示刷新。\n\n## 验证与归属\n- 验证：会话 e7a59e5a 用户问接口不返回 token 会怎样，结论梳理调用链与 setToken(undefined) 隐蔽后果。\n- 涉及文件：src/pages/verifyUser/index.vue、src/stores/user.js、src/request/index.js。\n- 所属项目：昆山市民；代码基线：818bf9b；来源会话ID：e7a59e5a-613e-404d-ab23-37e8863e3fcf。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/vote_onunload_pattern.md",
+                "memory_type": "entities",
+                "after": "# 业主表决/业委会选举列表勿在 onUnload 多级 navigateBack\n昆山市民业主决策相关列表页曾在 onUnload 主动多次 navigateBack，导致返回时一次退出多页，应移除该逻辑。\n\n## 问题背景\n- `pages_vote/vote/index.vue`、`pages_election/election/index.vue` 曾在 `onUnload` 里主动多次 `navigateBack`。\n- 从业主决策返回会一次退出多页，破坏导航预期。\n\n## 解决方案\n- 移除 onUnload 中的多级 navigateBack 逻辑，依赖系统导航栏默认单级返回。\n\n## 验证与归属\n- 验证：会话 3731b85d 用户要求改为通用返回，两处列表页一并处理。\n- 涉及文件：src/pages_vote/vote/index.vue、src/pages_election/election/index.vue。\n- 所属项目：昆山市民；代码基线：38d1482；来源会话ID：3731b85d-c4b8-48f3-b25e-7cf1583be2da。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/昆山市民技术/badge_swiper_bug.md",
+                "memory_type": "entities",
+                "after": "# 首页 uni-badge 角标被 swiper overflow 裁切\n昆山市民首页与个人中心菜单 uni-badge 因父级 overflow:hidden 被裁切，需调整包裹与容器样式。\n\n## 问题背景\n- 首页/个人中心菜单 `uni-badge` 使用 `absolute=\"rightTop\"` 时角标上移约 10px，超出图标盒。\n- 父级 `swiper`、`menu-container` 默认 `overflow: hidden` 会裁切角标上半部。\n\n## 解决方案\n- 图标外包 `item-icon-wrap` 预留 `padding-top`/`padding-right`。\n- 相关容器 `overflow: visible`；略增 swiper 顶部内边距（如 20rpx→32rpx）。\n- `pages_home/home.vue` 与 `personal.vue` 需同步修改。\n\n## 验证与归属\n- 验证：会话 2a8a8393 截图「数量图标被遮挡」，结论指向 badge 定位与 swiper 裁切。\n- 涉及文件：src/pages_home/home.vue、src/pages_home/personal.vue。\n- 所属项目：昆山市民；代码基线：38d1482；来源会话ID：2a8a8393-4a19-4102-99ee-abcb1056e854。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_019",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T12:41:35.344110+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/favorite_icon_fix.md",
+                "memory_type": "entities",
+                "after": "# 新房详情页收藏图标不显示修复\n苏住房C小程序新房详情页底部「收藏」图标不显示的问题已修复，根因包含组件未注册与静态资源路径错误。\n\n## 问题根因\n- collectBtn 组件使用了 ZsImage 但未 import 和注册，图标节点无法渲染\n- 未收藏图标 aixin_e.svg 在分包 pages_transaction/static 下，此前按主包 static 解析导致路径错误\n- 微信小程序下 resolveStaticUrl 走了 IMAGE_BASE 远程 URL，本地打包静态图应使用 /static/ 本地路径\n\n## 修复内容\n- collectBtn.vue 显式导入并注册 ZsImage，新增 subpackage 属性按收藏状态选择主包/分包路径，补充图标尺寸样式\n- newHouse/detail.vue 传入 emptyUrl=\"images/szf/aixin_e.svg\" 和 subpackage=\"pages_transaction\"\n- utils/index.js 在微信小程序下将 resolveStaticUrl 改为返回本地路径\n\n## 涉及文件与归属\n- 涉及文件：collectBtn.vue、newHouse/detail.vue、utils/index.js\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：d53574b2-2d92-4663-9c80-ced6a44b903a；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/elect_redirect_fix.md",
+                "memory_type": "entities",
+                "after": "# 选举页参与选举跳转失败修复\n苏住房C小程序分包改造后，选举详情页点击「参与选举」跳转须知页失败，已通过路径解析与失败回调修复。\n\n## 问题根因\n- 分包改造后 elect/detail.vue 调用 redirectTo 使用相对路径 needToKnow?...\n- openPage 原先只补前导 /，最终为 /needToKnow?...，非小程序有效路径（应为 /pages_vote/elect/needToKnow?...）\n- uni.redirectTo 失败时无 fail 回调，表现为按钮可点、无报错、页面不跳转\n\n## 修复内容\n- utils/index.js 保留 resolveRelativePageUrl 解析相对路径为当前分包完整路径，openPage 增加 fail 回调失败时 toast 提示\n- pages_vote/elect/detail.vue 抽取 handleParticipate 使用绝对路径 /pages_vote/elect/needToKnow?...，参与选举增加 !partIn 判断\n\n## 涉及文件与归属\n- 涉及文件：utils/index.js、pages_vote/elect/detail.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：9677076a-944b-42fd-9eba-67e8f0aa54d4；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/option_vote_blank_fix.md",
+                "memory_type": "entities",
+                "after": "# 选项表决我的决策页空白修复\n苏住房C小程序选项表决「我的决策」页因未同步数据补全逻辑显示空白，已参照选举页补齐。\n\n## 问题根因\n- 选项表决（OPTION）走 optional/DecisionResult.vue，原实现较简单\n- 直接用 detail.decisionResponseId 取记录 ID，字段缺失时决策详情链接无效\n- 列表只用 el.decisionPlayerName，接口未返回时仅剩时间戳\n- 未像选举页调用 getAppRecordDetail / getDecisionRecordDetail 补全详情\n\n## 修复内容\n- optional/DecisionResult.vue 增加 pickResponseId、fetchRecordDetail、enrichRecordList，正确解析 recordId 补全决策人、选项摘要，onShow 刷新数据，跳转详情写入缓存\n- optional/DecisionRecord.vue 从缓存+详情接口补全决策人、签字、时间，selectOptdec 无数据时回退 optionList\n\n## 涉及文件与归属\n- 涉及文件：optional/DecisionResult.vue、optional/DecisionRecord.vue、optional/detail.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：2d84eea4-83d0-4cd8-82b5-903f4772c353；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/manual_upload_fix.md",
+                "memory_type": "entities",
+                "after": "# 人工添加页图片上传组件修复\n苏住房C小程序人工添加页面图片上传组件不显示且按钮过窄，已通过布局重写与样式补齐修复。\n\n## 问题根因\n- ImageUploader 加了 h-144，4 列网格下每格约 36rpx 几乎不可见\n- grid-auto-rows 用宽度算行高在小程序常算错，上传格高度为 0\n- 页面用 align-items: center 按钮仅按文字宽度撑开，long 类无对应样式\n\n## 修复内容\n- ImageUploader 改用 aspect-ratio: 1 + min-height: 144rpx 保证可见，去掉 h-144 与宽度测量，register.vue 显式引入 ImageUploader\n- 页面改 align-items: stretch，按钮用 block 属性且 width: 100%，ZsButton 补充 .zs-button--block { width: 100% } 样式\n\n## 涉及文件与归属\n- 涉及文件：ImageUploader 组件、register.vue、FormManual.vue、ZsButton 组件\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：3f889ff2-2daa-476e-86b3-963833ee9ca2；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_063",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:51:21.907433+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术笔记/proposed_account_name.md",
+                "memory_type": "entities",
+                "after": "# 拟开户账户名称按主体类型生成\n苏住房G后台「监管账户详情」页按管理主体类型拼接生成拟开户账户名称，物管会类型可编辑、企业与业委会类型只读。\n\n## 功能描述\n- `pubRegulatoryAccount/detail.vue` 新增 `proposedAccountName` 输入框及必填校验\n- `updateProposedAccountName()` 按管理主体类型拼接生成名称：物管会('2')可编辑，企业('1')与业委会('0')不可编辑\n\n## 触发联动\n- `changeType()` 切换管理主体类型时触发名称更新\n- `showCompanyDialog()` 选择主体名称后触发名称更新\n\n## 验证与归属\n- 验证证据：苏住房G/041.md\n- 涉及文件：pubRegulatoryAccount/detail.vue、pubRegulatoryAccount.js、mobilePreview/pubRegulatoryAccount/index.vue、ZsPrint/index.vue、OperationBtnGroup/index.vue、pubRegulatoryAccount/index.vue、property/account/detail.vue、pubRegAccPropMgmt/detail.vue\n- 所属项目：苏住房G；来源会话：ea26c60b-ee52-4d27-b035-5fdd8146dfa7"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术笔记/branch_query_unfiltered.md",
+                "memory_type": "entities",
+                "after": "# 未选左侧银行时网点查询未拦截\n苏住房G太仓区未授权银行时左侧列表为空，右侧搜索未带 workBankId 查出全部网点，已在通用弹窗组件拦截未选银行时的请求与搜索。\n\n## 问题现象\n- 太仓区未授权银行时左侧银行列表为空\n- 右侧搜索调用 `selectTJgBankBranchList` 未带 `workBankId`，查出全部网点而非空结果\n\n## 解决方案\n- 在 `zs-select-dialog-func.vue` 拦截未选左侧银行时的接口请求与搜索操作并提示\n- 业务页 `benefit/pubRegulatoryAccount` 无需改动\n\n## 验证与归属\n- 验证证据：苏住房G/042.md\n- 涉及文件：vite.config.js、maintenance/accountOpen/components/OpenDetailDialog.vue、property/components/BranchOneDialog.vue、system/workBank/components/pubRegulatoryBranchDialog.vue、maintenance/accountOpen/components/detail.vue、system/workBank/components/BranchOneDialog.vue、benefit/components/BranchOneDialog.vue、property/propertyAccount/index.vue\n- 所属项目：苏住房G；来源会话：e54e19e2-5d01-4169-ace4-1cfb25836888"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术笔记/subtable_delete_refresh.md",
+                "memory_type": "entities",
+                "before": "# [苏房] 删除子表行后本次核销金额不归零\n公共收益-回单核销等详情页删除子表行后，表头汇总「本次核销金额」未随子表刷新而归零，列表与表头不一致。\n\n## 问题现象\n- 公共收益-回单核销 / 物业收入类账单详情页，删除单据后子表列表刷新，但基本信息「本次核销金额」仍是旧值\n- 主线、无锡三资同样存在该问题，造成列表与表头汇总数据不一致\n\n## 根因\n- 详情页 detail.vue 写了 @refresh=\"getDetail\" 期望子表操作后重拉详情\n- 删除走 table.js 混入的公共 handleDelete，成功后只调子表 getList()，未 $emit('refresh') 也未调父页刷新\n- 父页详情接口未被重请求，汇总字段不变\n- 与 #548（OperationBtnGroup emit refresh）不同：本条是「子表行删除」独立链路，根因是通用 handleDelete 与父页 refresh 约定缺挂钩\n\n## 解决方案\n- 子表组件补 deleteSuccessCallback(){ this.$emit('refresh') }，table.js 的 handleDelete 会调用此可选钩子\n- 父页 detail.vue 的 @refresh=\"getDetail\" 不变\n- 物业模块 billDetailSubTable 在 getList()+clearSelection()+msgSuccess 后手动补 this.$emit('refresh')\n- 改动 cherry-pick 到多分支时逐分支确认子表是否都补了钩子\n\n## 验证与归属\n- 验证会话 5bdbdabe（064.md 会话 5bdbdabe）：删除单据后基本信息「本次核销金额」不归零，根因 handleDelete 只调 getList 未触发 refresh\n- 修复为 VerificationReceiptDetailTable.vue 增加 deleteSuccessCallback 发 refresh，billDetailSubTable.vue 补 $emit('refresh')\n- 已 cherry-pick 到 develop/v2.6.1 (a7ed8c1db)、develop/v2.6.2 (bcf3d9fba)、develop/v2.6.2-suzhufang (ed0acf3c0+dcf7a6c80)\n- 涉及文件：benefit/pubVerificationReceipts/detail.vue、VerificationReceiptDetailTable.vue、property/propertyVerificationReceipts/components/billDetailSubTable.vue、mixins/table.js\n- 所属项目：苏住房G；代码基线：fb3e960；来源会话ID：5bdbdabe-84ea-4974-b2f7-6db72c21377d",
+                "after": "# [苏房] 删除子表行后本次核销金额不归零\n公共收益-回单核销等详情页删除子表行后，表头汇总「本次核销金额」未随子表刷新而归零，列表与表头不一致。\n\n## 问题现象\n- 公共收益-回单核销 / 物业收入类账单详情页，删除单据后子表列表刷新，但基本信息「本次核销金额」仍是旧值\n- 主线、无锡三资同样存在该问题，造成列表与表头汇总数据不一致\n\n## 根因\n- 详情页 detail.vue 写了 @refresh=\"getDetail\" 期望子表操作后重拉详情\n- 删除走 table.js 混入的公共 handleDelete，成功后只调子表 getList()，未 $emit('refresh') 也未调父页刷新\n- 父页详情接口未被重请求，汇总字段不变\n- 与 #548（OperationBtnGroup emit refresh）不同：本条是「子表行删除」独立链路，根因是通用 handleDelete 与父页 refresh 约定缺挂钩\n\n## 解决方案\n- 子表组件补 deleteSuccessCallback(){ this.$emit('refresh') }，table.js 的 handleDelete 会调用此可选钩子\n- 父页 detail.vue 的 @refresh=\"getDetail\" 不变\n- 物业模块 billDetailSubTable 在 getList()+clearSelection()+msgSuccess 后手动补 this.$emit('refresh')\n- 改动 cherry-pick 到多分支时逐分支确认子表是否都补了钩子\n\n## 验证与归属\n- 验证会话 5bdbdabe（064.md 会话 5bdbdabe）：删除单据后基本信息「本次核销金额」不归零，根因 handleDelete 只调 getList 未触发 refresh\n- 修复为 VerificationReceiptDetailTable.vue 增加 deleteSuccessCallback 发 refresh，billDetailSubTable.vue 补 $emit('refresh')\n- 已 cherry-pick 到 develop/v2.6.1 (a7ed8c1db)、develop/v2.6.2 (bcf3d9fba)、develop/v2.6.2-suzhufang (ed0acf3c0+dcf7a6c80)、develop/v2.6.2-yulin (7b57d355d 等)\n- 涉及文件：benefit/pubVerificationReceipts/detail.vue、VerificationReceiptDetailTable.vue、property/propertyVerificationReceipts/components/billDetailSubTable.vue、mixins/table.js\n- 所属项目：苏住房G；代码基线：fb3e960；来源会话ID：5bdbdabe-84ea-4974-b2f7-6db72c21377d"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

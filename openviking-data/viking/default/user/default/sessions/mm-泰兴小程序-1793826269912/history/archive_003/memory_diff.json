@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-泰兴小程序-1793826269912/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T21:13:11.861555+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/fee_statistics_display_fix.md",
+                "memory_type": "entities",
+                "after": "# 收费统计颜色与金额显示修复\n泰兴小程序收费统计页金额显示为0、收缴率无主题色的问题已修复，通过新增归一化工具统一接口结构。\n\n## 改动要点\n- 新增 `src/staff/utils/statisticsFee.js`，提供 `normalizeFeeStatistics()`，将接口 `fee` 统一为 `{ house, area, money }` 结构，兼容嵌套对象与顶层扁平字段（如 `receivableAmount`、`houseCollectionRate`）。\n- 更新 `src/pages/staff/statistics/index.vue`：`fee` computed 接入归一化，解决卡片读 `fee.house` 而接口返回扁平字段导致显示 0 的问题。\n- 卡片 UI：`<strong>` 改为 `<text class=\"fee-value\">` / `<text class=\"rate-value rate-value--*\">`，收缴率分别显示橙/蓝/绿主题色。\n- 欠缴分析：`arrearsOption` 改为读取 `fee.money.receivableAmount` / `unpaidAmount`。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=泰兴小程序。\n- 涉及文件：`src/staff/utils/statisticsFee.js`、`src/pages/staff/statistics/index.vue`、`src/staff/api/statistics.js`、`src/staff/utils/formatter.js`、`src/pages_property/chargeSituation/index.vue`。\n- 来源会话ID：1a7fcd5e-e97f-49e6-aa2f-13a3b608f6e4\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/knowledge_view_all_fix.md",
+                "memory_type": "entities",
+                "after": "# 工作台知识库查看全部无响应修复\n泰兴小程序工作台知识库「点击查看全部没有反应」问题已全局修复，新增共享解析工具并改造交互事件。\n\n## 新增共享工具\n- `src/staff/utils/response.js` 新增 `extractArrayData`，统一解析 `data` / `rows` / `data.rows` / `data.list`。\n- `src/staff/utils/knowledgeCategory.js` 新增分类解析工具，含 `resolveCategory` 兜底（树匹配失败时用条目 ID 构造分类对象）。\n- 已在 `src/staff/utils/index.js` 导出上述工具。\n\n## 知识库核心修复\n- `src/staff/pages/knowledge/index.vue`：`viewCategory` 不再静默 `return`，解析失败时 toast 提示。\n- 分组数据保留 `categoryId`，兼容多种分类 ID 字段。\n- 4 处交互由 `<text @click>` 改为 `<view @tap>`（筛选、面包屑、查看全部）。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=泰兴小程序。\n- 涉及文件：`src/staff/utils/response.js`、`src/staff/utils/knowledgeCategory.js`、`src/staff/utils/index.js`、`src/staff/pages/knowledge/index.vue`。\n- 来源会话ID：890a75f9-c359-46c7-a778-43eec2b971b6\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/inspection_image_validation_fix.md",
+                "memory_type": "entities",
+                "after": "# 巡检步骤图片校验误拦修复\n泰兴小程序新增巡检步骤时图片已上传却被校验「未上传成功」的误拦逻辑已移除，与工单完成弹窗等页面逻辑对齐。\n\n## 之前逻辑\n- 界面有图片（`stepFormImages` 不为空）但取不到服务端持久化地址（`rawUrl` / `fileID` 仍是 `wxfile://` 临时路径）时，提示「有图片未上传成功，请删除后重新上传」。\n- 该判断过激进，上传状态同步稍有偏差即误拦。\n\n## 现在逻辑\n- 仅保留步骤名称必填、说明按必填规则校验。\n- 图片仅在规则要求必填（`isPicture === '1'`）且完全没图时，提示「请上传巡检图片」。\n- 保存时直接取 `stepFormImages.map(el => el.rawUrl || el.fileID || el.url).filter(Boolean).join(',')`，不再做临时路径拦截。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=泰兴小程序。\n- 涉及文件：`src/staff/pages_facility/record/add.vue`、`src/staff/components/ZsUploader/ZsUploader.vue`、`src/components/ZsDialog/ZsDialog.vue`。\n- 来源会话ID：1cc3bd97-be24-4f8d-abe0-a7fa7f804986\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/repair_upload_image_fix.md",
+                "memory_type": "entities",
+                "after": "# 报修页上传图片不显示修复\n泰兴小程序报修页 `ZsUploader` 上传状态同步问题已修复，微信小程序构建通过，双端组件已同步。\n\n## 修改内容\n- 修复 `watchEffect` 过激清空：`props.str` 为空时，若 `fileList` 仍有本地临时项或已上传项，不再执行 `fileList = []`，避免通过 `v-model` 把 picker 内预览一并清掉。\n- 重构 `handleUpload`：选中后立即 `syncFileListFromPicker()` 缩略图即时显示；上传成功后按 `uuid` 就地更新 picker 内部文件，不再额外 `push` 造成重复；上传失败或缺少 `fileSite` 时移除对应项并 `showToast`；全部完成后用 `nextTick` 再置 `isUploading = false` 避免竞态。\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=泰兴小程序。\n- 涉及文件：`src/components/ZsUploader/ZsUploader.vue`、`src/staff/components/ZsUploader/ZsUploader.vue`、`src/pages_owner/repair/submit.vue`、`src/components/ImageUploader/ImageUploader.vue`、`src/api/file.js`。\n- 来源会话ID：a04d7ad4-c531-4671-9106-08611d5e5edf\n- 代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

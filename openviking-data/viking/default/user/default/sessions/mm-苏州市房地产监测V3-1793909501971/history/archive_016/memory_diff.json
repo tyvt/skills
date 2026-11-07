@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_016",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T20:59:43.964736+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3/presale_tab_fix.md",
+                "memory_type": "entities",
+                "after": "# 预售方案填空式布局修复\n苏州市房地产监测V3 预售方案 Tab 填空式布局改造已完成，修复价格管理（备案）Tab 重叠问题。\n\n## 问题原因\n- `zs-input` 默认带清除按钮，在 40px 窄框里会和 placeholder、相邻「月」「日」文字叠在一起\n- 行高（约 27px）小于输入框高度（28px），换行时上下行挤在一起\n- 「其它均价」三个字段挤在同一行，换行后更容易遮挡\n\n## 修复内容\n- 月/日输入框：去掉 placeholder，关闭 `clearable`（后面已有「月」「日」文字）\n- 全局叙事输入框：隐藏清除图标，统一 `padding`，控件间距改为 `2px 4px`\n- 行高：`narrative-line` 调整为 `32px`，文字与控件 `vertical-align: middle`\n- 其它均价：拆成 3 行独立展示，避免一行内互相遮挡\n- 数字框：`sm` 宽度略增至 64px，容纳价格数字\n\n## 验证与归属\n- 涉及文件：`src/views/presale/permit/components/PresalePlanFillForm.vue`、`PermitPlanPanel.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：2e82688a-7c17-45fc-82e8-25c79990e1a7；验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3/branch_cancel_dialog.md",
+                "memory_type": "entities",
+                "after": "# 分支机构注销弹窗改造\n苏州市房地产监测V3 已按设计稿完成「分支机构注销」弹窗改造，新增附件上传组件并调整弹窗。\n\n## 新增组件\n- `AppendixPictureUpload.vue`：通过 `listAppendixPackage` 加载要件，卡片式 `picture-card` 上传，仍走 `/file/appendix/upload`\n- 右侧提示：「请上传 大小不超过 5MB 格式为 jpg/png/pdf 的文件」\n- 删除使用 `before-remove`，失败时不从列表移除；`uid` 与并发 `loadSeq` 已处理\n\n## 弹窗更新\n- `CancelDialog.vue`：`form-box` + `label-position=\"right\"`\n- 注销时间 placeholder：**请选择时间**\n- 「注销材料」改为必填 **附件**，接入 `AppendixPictureUpload`\n- 主按钮文案：**确认**；提交逻辑不变：`validate` → 提交\n\n## 验证与归属\n- 涉及文件：`src/views/institution/agencyBranch/components/AppendixPictureUpload.vue`、`CancelDialog.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：485a0b05-80d5-45aa-91a0-e2f3e44801ed；验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3/zhlz_proxy_fix.md",
+                "memory_type": "entities",
+                "after": "# 登记证明地址代理与类型修复\n苏州市房地产监测V3 修复登记证明地址 `/zhlz/...` 前端无法加载 PDF 及附件类型误判问题。\n\n## 问题原因\n- 网关/Nginx 未代理 `/zhlz`，访问返回 200 + `text/html`（SPA index），非 PDF，导致 `el-image`/`<img>` 加载失败出现红色错误块\n- 附件 `fileType` 常为字典码（如 `0`），`getAppendixFileExtension` 优先用 `fileType` 误判 PDF 为图片走 `el-image` 报错\n- 路径在对象存储正确，但浏览器请求前端站点无反代拿到 HTML\n\n## 修复内容\n- `vite.config.js`、`deploy/nginx.conf`：增加 `/zhlz`、`/zhlz-dev`、`/zhlz-test` 静态资源代理（与 `/zhi2*` 一致）\n- `resolveServerAssetUrl.js`：`/zhlz*` 按站点根路径拼 URL，并处理误带后缀\n\n## 验证与归属\n- 涉及文件：`index.html`、`vite.config.js`、`deploy/nginx.conf`、`resolveServerAssetUrl.js`、`appendix.js`\n- 所属项目：苏州市房地产监测V3；来源会话：0f726903-9779-445d-b98b-87b46eb8ece1；验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏州市房地产监测v3/region_district_only.md",
+                "memory_type": "entities",
+                "after": "# 行政区划格式化改为仅区级\n苏州市房地产监测V3 已将表单/详情与列表的行政区划统一为仅显示区级（如「吴江区」），不再显示三级路径。\n\n## 核心调整\n- `formatters/index.js`：`fullRegionFormatter` 改为走 `formatAdministrativeRegion`（区级解析）\n- 保留 `fullRegionPathFormatter` 仅用于仍需三级路径时\n- `formatListRegionCode` 支持历史数据：若为「省/市/区」拼接字符串取最后一段作为区名\n\n## 表单与组件\n- `DeveloperBasicInfoForm`：无自定义 `regionFormatter` 时按编码解析为区级\n- `developerBasicInfoContent.js`：只读「企业信息」行政区划回显逻辑一致\n- `customerProject/detail.vue`：`regionName` 只存级联最后一级（区名），不再用 `/` 拼接三级\n- 操作员/企业授权列表列 formatter 与列表规范对齐；入网注销等使用 `DeveloperBasicInfoForm` + `developerRegionFormatter` → `fullRegion`\n\n## 验证与归属\n- 涉及文件：`formatters/index.js`、`developerBasicInfoContent.js`、`customerProject/detail.vue` 及多处 mixins/listMixins.js\n- 所属项目：苏州市房地产监测V3；来源会话：9cf41a6c-807b-46e2-b193-053a000a8ce2；验证证据：extracted source=cursor project=苏州市房地产监测V3"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

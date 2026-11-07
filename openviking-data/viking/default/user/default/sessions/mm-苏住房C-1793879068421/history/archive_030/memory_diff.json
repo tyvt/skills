@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_030",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T13:15:49.342940+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/newhouse_map_fix.md",
+                "memory_type": "entities",
+                "after": "# 新房详情页周边地图不显示修复\n苏住房C小程序新房详情页「项目周边」地图不显示的问题已修复，根因包含地图高度为0、初始化时机不对和图标路径错误。\n\n## 问题根因\n- manifest.json 中 mergeVirtualHostAttributes: false，写在 ZsMap 上的 height 样式不会传到内部 map，组件内只有 height:100%，父级无高度时地图区域塌缩\n- 整页用 v-show=\"showPage\" 控制显示，地图在隐藏状态下初始化，微信小程序里容易不渲染\n- facilityCategory 使用了 /pages_transaction/static/icon/.. 路径，resolveStaticUrl 解析后变成重复路径，图标加载失败\n\n## 修复内容\n- ZsMap.vue 新增 height prop，用 inheritAttrs: false 把高度直接绑到 map 上\n- detail.vue 显式引入 ZsMap，用 map-container 固定 200px 高度\n- 有经纬度且页面显示后再 v-if 挂载地图\n- 修正 markers 赋值逻辑，经纬度转为 Number\n\n## 涉及文件与归属\n- 涉及文件：manifest.js、ZsMap.vue、detail.vue、transaction.js\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：f0892537-a924-473d-9d3b-16bf6d6ea239；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/aboutus_svg_fix.md",
+                "memory_type": "entities",
+                "after": "# 关于我们页SVG图标加载失败修复\n苏住房C小程序「关于我们」页面电话和地址左侧图标因分包静态资源未登记导致渲染层网络层错误，已修复。\n\n## 问题根因\n- 主包 static/svg/ 中的同名 SVG 文件在构建时被裁剪，运行时无法从主包加载\n- 分包静态资源未登记分包映射，导致图标加载失败、控制台出现 500 错误\n\n## 修复内容\n- 新增分包静态资源 src/pages_main/static/svg/ 下的 headphone.svg 与 location.svg\n- 在 src/utils/index.js 登记分包映射：'svg/headphone.svg': ['pages_main']、'svg/location.svg': ['pages_main']\n\n## 验证与归属\n- npm run build 成功，产物 dist/pages_main/static/svg/ 下两个 SVG 文件均存在\n- 需在微信开发者工具重新导入 dist 目录，打开「关于我们」页面确认图标正常、控制台无 500 错误\n- 涉及文件：utils/index.js、AboutUs.vue、ZsImage.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：e7e357b4-638f-4ace-8ca0-7fa9ff707a43"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/newhouse_sticky_fix.md",
+                "memory_type": "entities",
+                "after": "# 新房详情页web-view内Tab吸顶穿屏修复\n苏住房C苏找房H5嵌在三方小程序 web-view 里运行时，新房详情页Tab吸顶留出空隙导致内容穿屏，已修复。\n\n## 问题根因\n- 苏找房H5嵌在三方小程序 web-view 内，顶部导航栏由宿主小程序提供，H5页面无 uni-page-head\n- 上次修复在找不到导航栏时回退到 top:40px，Tab吸顶与顶部间留空隙，内容从缝隙透出\n\n## 修复内容\n- utils/index.js 新增 isMiniProgramWebView()/getPageHeaderOffset()，识别微信/支付宝小程序 web-view 环境，web-view 内强制 top:0\n- 仅在有可见 uni-page-head 的独立H5页面才使用导航栏高度\n- detail.vue CSS默认 top:0 去掉40px回退，页面加载及 jweixin 注入后各校准一次吸顶偏移\n- Tab锚点滚动偏移同步改为动态计算\n\n## 涉及文件与归属\n- 涉及文件：utils/index.js、detail.vue、ZsNav.vue、tabLine.vue、tabBtn.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：7e811367-b5c4-4dfb-83e7-e8f29ef7909c"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/propose_complexid_fix.md",
+                "memory_type": "entities",
+                "after": "# 业主倡议列表页请求异常修复\n苏住房C小程序「首页-小区管理-业主倡议」打开后提示\"请求异常\"，根因为小区ID未传，已修复。\n\n## 问题根因\n- propose/index.vue 调用的 appSuggestListVoList 接口需要 complexId，但页面只传了 suggestStatusFlag 和 initiatorIdNumber\n- 缺少 complexId，后端校验失败导致\"请求异常\"\n- 同模块 StepPropose.vue 传了 complexId: userStore.project，decision/index.vue、elect/index.vue 从URL读取 complexId\n\n## 修复内容\n- propose/index.vue 补充传入 complexId 参数以通过后端校验\n\n## 涉及文件与归属\n- 涉及文件：propose/index.vue、api/autonomy.js、StepPropose.vue、decision/index.vue、elect/index.vue\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：0b18d994-45da-45ee-a48d-fd532610f70b"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-宿迁苏服办-1793628182852/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T14:05:12.429066+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/docnum_type_validation.md",
+                "memory_type": "entities",
+                "after": "# 证件校验未分类型致统一信用代码失败\naddPersonInfo.vue 证件号码仅按二代身份证正则校验，未区分类型导致统一社会信用代码校验失败。\n\n## 问题根因\n- 证件号码仅按二代身份证正则校验，未区分证件类型\n- 统一社会信用代码（USCI）因未分流校验而失败\n\n## 解决方案\n- 新增 src/utils/documentNumber.js 按字典值 001/002 分流 USCI 正则校验\n- addPersonInfo.vue 校验改用 data.idCardType\n- 保存前 trim 转大写、切换类型重校验\n\n## 验证与归属\n- 验证证据：src=宿迁苏服办/001.md\n- 涉及文件：src/pages/leaseContract/addPersonInfo.vue、src/utils/constant.js、src/pages/publishHouse/verification.vue、src/pages/leaseContract/stepStipulation.vue、src/pages/leaseContract/stepTenantry.vue、src/utils/formatter.js、src/utils/index.js、src/api/common.js\n- 所属项目：宿迁苏服办；来源会话：ef4f394b-9e37-4c4c-ad3e-89cb882a2ea1；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/sfb_interface_unbound.md",
+                "memory_type": "entities",
+                "after": "# 苏服办报相关应用接口未绑定\n苏服办开放平台集成打包后报错「相关应用接口未绑定」，因 interface_id 须与平台给该应用绑定的接口一致，须以线上下载的生产包为基准反查。\n\n## 问题根因\n- 苏服办是「应用+接口」两套 ID 体系：app_id（本项目 fwzlhtba）与 interface_id 须一一绑定\n- 本例生产包取 token 的 interface_id 被手工改成 getSfbToken2https，而 fwzlhtba 绑定的是 szfwzlbasfb2https\n- getSfbToken2https 是平台清单里另一条独立条目，名字相近易误绑\n\n## 解决方案\n- 排查基准是生产在用的包（线上下载的 zip），而非仓库当前分支代码\n- 对照平台接口清单核对每条接口（名称、所属应用、协议、状态、更新时间）\n- 把分支代码改回平台为该应用绑定的 ID（本例 szfwzlbasfb2https）重新打包\n- 核对清单标「故障」的接口（如房源核验 szfwzlbacqhyjkhttps、备案记录列表 szfwzlbazlbalbhttps）属平台侧故障，勿在前端找原因\n- 打包后按优先级验证：苏服办 token → 登录 → 房源核验 → 备案记录列表 → 承租人/代理人新增\n\n## 验证与归属\n- 验证证据：会话 fc5779cf，用户诉求 3 报「相关应用接口未绑定」，诉求 5/6 给出生产包地址「以这个为基准」；最终结论为生产包 interface_id 被改、分支代码已是正确原值重新打包即可\n- 涉及文件：src/api/gateway.js、src/api/config.js、src/api/publishHouse.js、src/pages/leaseContract/addPersonInfo.vue\n- 所属项目：宿迁苏服办；来源会话：fc5779cf-f38b-4d8c-858e-292d91e559a9；代码基线：6996f66"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/uni_build_outdir.md",
+                "memory_type": "entities",
+                "after": "# uni-app 改不了构建输出目录\n这版 uni-cli 在 config() 钩子里强制覆盖 build.outDir 为 dist/{build|dev}/{platform}，只有 CLI 的 --outDir 生效。\n\n## 问题根因\n- vite.config.js 的 build.outDir 无效、环境变量 UNI_OUTPUT_DIR 也无效\n- uni-cli 在 config() 钩子里强制覆盖 build.outDir，发生在用户配置之后\n- 唯一生效的是 CLI 的 --outDir 参数（CLI 层参数，在 config 钩子之后生效）\n\n## 解决方案\n- 只在 npm scripts 里传 --outDir：dev 用 uni --outDir fwzlhtba、build:dev 用 uni build --mode development --outDir fwzlhtba、build:test 用 uni build --mode test --outDir fwzlhtba、build 用 uni build --outDir fwzlhtba\n- dev 脚本不能带 --outDir（只对 build 生效，带上报 Unknown option）\n- .gitignore 忽略根目录 /fwzlhtba\n- vite.config.js 不留任何改 outDir 的死代码（UNI_OUTPUT_DIR、build.outDir 都回退）\n- 验证：npm run build 与 build:test 产物落在 fwzlhtba/，引用 ./assets/、./static/，test 产物含 /api；三环境共用目录会互相覆盖勿同时留两份\n\n## 验证与归属\n- 验证证据：会话 ab0d5322，用户诉求 1「把打包目录名称改为 fwzlhtba」、诉求 4「根目录就是 fwzlhtba」；最终结论 vite.config.js 无改动、尝试方案被覆盖已回退\n- 涉及文件：package.json、vite.config.js、.gitignore\n- 所属项目：宿迁苏服办；来源会话：ab0d5322-c6f5-44d7-b17e-c89a9bd4b966；代码基线：6996f66"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/idcard_display_dict.md",
+                "memory_type": "entities",
+                "after": "# 证件类型已提交但列表卡片仍显示二代居民身份证\n新增承租方选「统一社会信用代码」保存成功，但列表/卡片仍显示「二代居民身份证」——展示层写死文案没走字典翻译，不是保存失败。\n\n## 问题根因\n- addPersonInfo.vue 已把 idCardType 提交到接口，非保存失败\n- 承租方/出租方卡片、代理人卡片、代理人新增/详情页顶部信息区把证件类型写死成「二代居民身份证」\n- 未按接口返回的 idCardType 查字典翻译，后端存对前端也永远显示旧文案\n\n## 解决方案\n- 分清「读」与「写」两条链路：确认提交体字段名与接口一致（idCardType），再看展示端取的是否同一字段\n- 新增统一字典翻译入口 src/utils/dict.js 的 getDictLabel，按字典 transaction_idNumberType 取文案，兼容 001/002 带零填充写法\n- 逐个消费点替换：leaserCard.vue、infoCard.vue、addAgent.vue、detailAgent.vue（既有字段绑错又有写死文案一起改）\n- 若改完仍显示 -，多半是列表接口 lesseeList 没返回 idCardType，需后端在列表项带上该字段\n\n## 验证与归属\n- 验证证据：会话 8eb8b2fc，用户诉求 1「选统一社会信用代码保存完还是显示二代居民身份证」；最终结论原因在展示层写死、非保存失败，列出五处改法\n- 涉及文件：src/utils/dict.js、src/pages/leaseContract/components/leaserCard.vue、infoCard.vue、addAgent.vue、detailAgent.vue、addPersonInfo.vue\n- 所属项目：宿迁苏服办；来源会话：8eb8b2fc-49e0-4dd4-af29-f27328e9f2fc；代码基线：6996f66"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

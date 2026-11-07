@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-8b6b49cb-f26b-439b-8bcd-d03954b496ae/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T04:08:03.866338+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-wuxi-shiqu-benefit-fe-zhi2-web-admin-h5-g-unlimited/memories/events/2026/11/06/用户管理页客测空白浏览器归因.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-06 排查确认：含高度修复的构建（合并提交 cb854ea7b，2026-11-05 19:23 linux 构建）部署到客测环境 10.10.208.25 后，客户 Chrome 109.0.5414.120 仍显示用户管理页右栏空白。本地用 Playwright 加载同一份 dist 并 mock 接口，Chromium（134/153 内核）渲染正常（搜索表单、按钮、表格 2 行、分页均显示，.list-container 780px、.main-box-right 772px）。客户换搜狗浏览器访问即正常，判定为 Chrome 109 内核渲染兼容问题而非代码缺陷；scoped .list-container 高度修复作为兜底保留。可疑 CSS 未最终定位（疑 :has() 或百分比高度/flex 组合）。\n# 2026-11-06 (Friday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-wuxi-shiqu-benefit-fe-zhi2-web-admin-h5-g-unlimited]**: 部署到客测环境还是不行，我可以给你哪些信息排查？\n...\n**user [peer=gitlab.zhi.com-zhi-wuxi-shiqu-benefit-fe-zhi2-web-admin-h5-g-unlimited]**: 版本 109.0.5414.120（正式版本） （64 位）客户的chrome版本\n...\n**user [peer=gitlab.zhi.com-zhi-wuxi-shiqu-benefit-fe-zhi2-web-admin-h5-g-unlimited]**: 我确认了，客户的版本是最新的\n...\n**user [peer=gitlab.zhi.com-zhi-wuxi-shiqu-benefit-fe-zhi2-web-admin-h5-g-unlimited]**: 是浏览器问题，我用搜狗浏览器就可以了\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-shiqu-benefit-fe-zhi2-web-admin-h5-g-unlimited]**: 理解，原来是**浏览器问题**（客户 Chrome 109 内核渲染异常，换搜狗浏览器即正常），不是代码问题。\n\n这也和我本地的结论一致：我用 Playwright 跑同一份构建产物（`dist`，commit cb854ea），页面在 Chromium 下渲染完全正常——搜索表单、新增/删除按钮、表格 2 行数据、分页\"共 2 条记录\"都在，`.list-container` 780px、`.main-box-right` 772px、子节点 2 个。所以代码与部署都没问题，是特定 Chrome 109 浏览器内核的渲染兼容问题。\n\n不过需要说明一点：**此前按「容器高度塌陷」做的修复（scoped `.list-container { height:calc(100vh-120px); overflow:hidden }`）是否要保留值得斟酌**——它本身是有效且无害的（保证本页容器有确定高度、不依赖全局样式），可以留着兜底。如果你希望我进一步：\n\n1. **定位 Chrome 109 具体不兼容的 CSS**（很可能是 `:has()` 或百分比高度/flex 组合在该内核下的表现），做成不依赖浏览器版本的写法，让老 Chrome 也能正常显示；或\n2. 就**保持现状**（代码已推送、tag 已打、禅道已回写 resolved），仅备注「客测环境需用搜狗/新版 Chrome 访问」。\n\n要我做哪个？如果选 1，我可以直接用刚装好的 Chromium 110（接近 Chrome 109 内核）复现并定位到具体那一条 CSS，做兼容改写。\n\n（另外清理一下：本轮排查产生的临时诊断脚本、截图和本地 `dist`/已下载的 chromium-1045 都是临时产物，如需要我一并清掉。）"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/user_list_blank.md",
+                "memory_type": "entities",
+                "before": "# 用户管理列表空白高度塌陷排查\n用户管理页右栏用户列表、搜索表单与操作按钮整体不可见，根因为全局 .list-container 高度被移除导致自定义两栏布局右侧塌陷。\n\n## 根因\n- 本页为自定义「左部门树 + 右用户列表」两栏布局，右侧列靠 .main-box-right { height: 100% } 撑开，依赖 .list-container 有确定高度\n- 提交 2801389aa（列表外框高度随内容收缩）把全局 .list-container 固定高度 calc(100vh - 120px) 去掉，仅对 :has(> .region-tree-layout) 页面保留\n- 本页非标准区域树布局，容器高度塌陷使右侧列 height:100% 解析为约 0，搜索表单、按钮、表格被压扁不可见\n\n## 修复方案\n- 在本页 style scoped 补回容器高度：.list-container { height: calc(100vh - 120px); overflow: hidden; }\n- 该改动最小精准，等价于恢复 2801389aa 之前的状态\n\n## 验证与归属\n- verifier 实测：未修复时 .list-container 高 73px、右列 73px、表格区 21px（空白）；修复后 680px / 684px / 632px 正常渲染\n- vite build 退出码 0，规则已编译进页面 chunk\n- 修复提交 4a3342506 与合并 cb854ea7b 已推送 zhi2-web-admin develop/v2.6.1\n- 涉及文件 src/views/system/user/index.vue；所属项目 无锡市区G；来源会话 2026-11-05",
+                "after": "# 用户管理列表空白高度塌陷排查\n用户管理页右栏用户列表、搜索表单与操作按钮整体不可见，根因为全局 .list-container 高度被移除导致自定义两栏布局右侧塌陷。\n\n## 根因\n- 本页为自定义「左部门树 + 右用户列表」两栏布局，右侧列靠 .main-box-right { height: 100% } 撑开，依赖 .list-container 有确定高度\n- 提交 2801389aa（列表外框高度随内容收缩）把全局 .list-container 固定高度 calc(100vh - 120px) 去掉，仅对 :has(> .region-tree-layout) 页面保留\n- 本页非标准区域树布局，容器高度塌陷使右侧列 height:100% 解析为约 0，搜索表单、按钮、表格被压扁不可见\n\n## 修复方案\n- 在本页 style scoped 补回容器高度：.list-container { height: calc(100vh - 120px); overflow: hidden; }\n- 该改动最小精准，等价于恢复 2801389aa 之前的状态\n\n## 验证与归属\n- verifier 实测：未修复时 .list-container 高 73px、右列 73px、表格区 21px（空白）；修复后 680px / 684px / 632px 正常渲染\n- vite build 退出码 0，规则已编译进页面 chunk\n- 修复提交 4a3342506 与合并 cb854ea7b 已推送 zhi2-web-admin develop/v2.6.1\n- 涉及文件 src/views/system/user/index.vue；所属项目 无锡市区G；来源会话 2026-11-05\n\n## 客测环境Chrome 109兼容问题（2026-11-06）\n- 含高度修复的构建（合并提交 cb854ea7b，linux 构建于 2026-11-05 19:23）部署到客测环境 10.10.208.25 后，客户 Chrome 109.0.5414.120 仍显示右栏空白\n- 排查中曾因部署包 scope 哈希（data-v-7a1f00d2）与本地 Windows 构建（data-v-92c0ed0c）不同而怀疑部署非最新；后经 body 标签 build-info 确认即为 cb854ea7b，哈希差异源于 Windows(CRLF) 与 linux(LF) 换行符不同\n- 本地用 Playwright 加载同一份 dist 并 mock 接口，Chromium（134/153 内核）渲染完全正常：搜索表单、操作按钮、表格 2 行数据、分页均显示，.list-container 780px、.main-box-right 772px、子节点 2 个\n- 客户使用搜狗浏览器（Sogou）访问即正常，判定为 Chrome 109 内核渲染兼容问题，非代码缺陷\n- 可疑点：页面全局样式含 :has() 选择器，或百分比高度/flex 组合在 Chrome 109 下的表现差异；具体 CSS 未最终定位\n- 高度修复（scoped .list-container）经评估有效且无害，作为兜底保留，不回退\n- 处置建议（用户未最终选定）：① 进一步定位并改写不依赖浏览器版本的 CSS；② 保持现状并备注「客测环境需用搜狗/新版 Chrome 访问」\n- 来源会话 2026-11-06；客户 Chrome 版本 109.0.5414.120"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

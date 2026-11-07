@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_052",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:56:32.724902+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/list_jump_analytics.md",
+                "memory_type": "entities",
+                "after": "# uni-list-item 跳转与埋点冲突\n苏住房C 的 houseLoanGuide 页在 uni-list-item 上同时用内置跳转与自定义埋点 click，埋点报错会中断跳转。\n\n## 问题根因\n- pages_transaction/houseLoanGuide/index 点击列表项时埋点接口报错则页面不跳转，根因是 uni-list-item 同时配置 link+:to 与自定义 @click=\"addEvent\"\n- 自定义 click 接管组件内置跳转链路，handler 抛错导致跳转步骤不执行，跳转被埋点「绑架」\n\n## 解决方案\n- 去掉 link/:to，改由 goToDetail 先 eventDataAdd({eventType:'27'}) 再 goto(`/pages/policy/fddydetail?id=${item.bankLogo}`)\n- 埋点必须静默请求（noReject + .catch() 永不抛出），跳转用 goto 独立执行，对齐 buyHousePolicy/index.vue\n- 推广：既要埋点又要跳转的列表项不依赖组件内置跳转；埋点走 api/appAnalytics.js 的 eventDataAdd（内建 noReject+catch），跳转单独一行\n\n## 验证与归属\n- 验证：会话 4cc1a55a，基线 4630e8e；houseLoanGuide/index.vue 去 link/to，goToDetail 内先 eventDataAdd 再 goto\n- 涉及文件：src/pages_transaction/houseLoanGuide/index.vue、src/pages_transaction/buyHousePolicy/index.vue、src/api/appAnalytics.js、src/pages_transaction/taxGuide/index.vue、src/pages_transaction/transactionFlowGuide/index.vue、src/pages_owner/ownerCard/index.vue\n- 所属项目：苏住房C；来源会话ID：4cc1a55a-ca40-4bc8-a6d2-4081c8a09783；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/systeminfo_sync_polyfill.md",
+                "memory_type": "entities",
+                "after": "# getSystemInfoSync 弃用 polyfill\n苏住房C 开发者工具反复警告 wx.getSystemInfoSync is deprecated，需靠 main.ts 首行 polyfill 重定向，仅改业务代码无效。\n\n## 问题根因\n- 警告来自 vendor.js:1438，uni-app 运行时 vendor.js 内部也调用 getSystemInfoSync，改业务代码触达不到框架侧调用\n- 业务侧 src/utils/system-info.js 回退分支仍调 uni.getSystemInfoSync()，两层原因只治一层无效\n\n## 解决方案\n- 重写 utils/system-info.js：小程序端改用 wx.getWindowInfo()/wx.getDeviceInfo()/wx.getAppBaseInfo() 组合取尺寸设备信息，删掉 uni.getSystemInfoSync 回退；H5 用 window 尺寸兜底\n- 新增 src/polyfills/mp-weixin-system-info.js，最早时机把 wx/uni 的 getSystemInfoSync、getSystemInfo 重定向为新 API 合并结果（兼容 screenWidth/windowWidth/windowHeight/pixelRatio/statusBarHeight/SDKVersion 等字段）\n- 在 main.ts 首行引入该 polyfill，必须早于框架代码执行\n- 残留警告多为第三方库（z-paging、@dcloudio/uni-ui）在 polyfill 前调用旧 API 或 @dcloudio/uni-app 版本偏旧，可考虑升级\n\n## 验证与归属\n- 验证：会话 970c1102，基线 4630e8e；警告来自 vendor.js:1438，解法如上\n- 涉及文件：src/utils/system-info.js、src/polyfills/mp-weixin-system-info.js、src/components/ZsNav/ZsNav.vue、src/utils/index.js\n- 所属项目：苏住房C；来源会话ID：970c1102-ef4a-4650-b2b0-7044abd68b9e；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsbutton_block.md",
+                "memory_type": "entities",
+                "after": "# ZsButton 全宽需 block 属性\n苏住房C 的 addHouseContract 页底部「添加」按钮因未设 block 且父级 flex 居中，显示成贴中间的窄条而非整行圆角按钮。\n\n## 问题根因\n- 页面根 .page 用 display:flex; align-items:center，子元素被水平居中并收缩到内容宽度\n- ZsButton 未传 block，组件默认非全宽；模板写的 class=\"long\" 在 SCSS 中无对应样式（项目无 .long），完全不起作用，易被误判为「样式写了没生效」\n\n## 解决方案\n- 给 ZsButton 加 block 属性（组件内置全宽样式），删除无效的 long 类\n- 必要时给所在容器 .button 补 width:100% 对抗父级 flex 居中收缩\n- 推广：本项目按钮全宽一律用 ZsButton 的 block，不自造 long/full/btn-block 之类类名；排查「按钮变窄」先看父容器是否为 flex + align-items:center\n\n## 验证与归属\n- 验证：会话 af4e72e7，基线 b7bf813；addHouseContract「添加」按钮异常，改法为加 block、移除 long、.button 补 width:100%\n- 涉及文件：src/pages_owner/house/owner/addHouseContract.vue、src/components/ZsButton/ZsButton.vue、src/pages_owner/house/owner/addHouse.vue、src/styles/form2.scss\n- 所属项目：苏住房C；来源会话ID：af4e72e7-03c6-4e90-a546-a36ef38a5c56；代码基线：b7bf813"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsimage_subpackage.md",
+                "memory_type": "entities",
+                "after": "# ZsImage subpackage 静默失败\n苏住房C 的 publishHouse/type.vue 问号图标因 ZsImage 的 subpackage 属性指错分包，资源路径解析失败而静默不显示。\n\n## 问题根因\n- 图片走 ZsImage，属性 subpackage=\"pages_transaction\"，但图标资源实际在 pages_owner 分包下\n- 小程序分包之间不能跨包取静态资源，subpackage 指错时编译期不报错，仅资源路径解析失败，属「静默失败」类\n\n## 解决方案\n- subpackage 必须填图片真实所在分包名（本例去掉错误值后从 pages_owner 正确加载）；资源在哪个分包调用方就声明哪个，或把常用图标上提到主包 src/static\n- 排查顺序：图标/图片不显示 → 先确认 ZsImage 的 src 路径与 subpackage 是否同分包 → 再看资源是否真实存在于该分包 static 目录；不要先怀疑样式（宽高/display）\n- 同批纯样式微调（权证类型末项补 border-bottom、下一步按钮 margin-top 改 40px）无复用价值，不单独提炼\n\n## 验证与归属\n- 验证：会话 cf1f68c5，基线 f1939b0；type.vue 问号图标未显示因 subpackage=\"pages_transaction\" 指向错误分包，去掉后从 pages_owner 正确加载\n- 涉及文件：src/pages_transaction/publishHouse/type.vue、src/components/ZsImage/ZsImage.vue、src/utils/index.js\n- 所属项目：苏住房C；来源会话ID：cf1f68c5-695c-43d8-90ef-21ec5979676b；代码基线：f1939b0"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

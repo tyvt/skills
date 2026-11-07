@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_012",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:41:44.747534+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/edit_popup_relbusinesstype.md",
+                "memory_type": "entities",
+                "after": "# 编辑态选择弹窗回写不得覆盖详情接口分类字段\n园区物管2.0 核销回单编辑态下，选择弹窗回写时不得覆盖详情接口已落库的 relBusinessType 字段。\n\n## 问题背景\n- 核销回单（benefit/pubVerificationReceipts）编辑态下，用户从合同选择弹窗回写时，relBusinessType 被合同行 contractType 覆盖，与详情接口返回值不一致。\n- 详情接口 GET /benefit/pubReceiptVerificationDetail/{id} 返回的 relBusinessType 是该单据已落库的权威值。\n\n## 解决方案\n- 回写逻辑按模式分流：新增态用合同行 relBusinessType 或 contractType，编辑态保留详情接口返回的 relBusinessType 不覆盖。\n- 通用套路：凡详情接口已返回的业务分类字段，编辑态回写弹窗数据以 originForm（详情快照）为优先级最高。\n- 提交时收入类显式带 relBusinessType（优先 form、其次 originForm 中的详情值），支出类与后端约定可不传则不传。\n\n## 验证与归属\n- 验证：detailCallback 读详情值写入 form/originForm、fillFromContract 编辑态不覆盖、buildSubmitPayload 收入类显式带 relBusinessType 支出类不传。\n- 涉及文件：detail.vue、VerificationReceiptDetailDialog.vue、VerificationReceiptDetailTable.vue。\n- 所属项目：园区物管2.0；来源会话 0e0a7bb5-9688-4dd7-8f3f-0e1f75dc3d94；代码基线 3965548b6。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_record_id.md",
+                "memory_type": "entities",
+                "after": "# 企业关联 ID 统一 companyRecordId\n园区物管2.0 后台涉及物业/开发商/企业关联的字段一律只认 companyRecordId，提交字段名保留 companyId。\n\n## 问题背景\n- 列表/弹窗选择返回的行里只有 companyRecordId 是稳定主键，companyId 命名在不同接口间含义漂移。\n- 做多候选回退会把错误 ID 带进自动带出逻辑（如选择物业管理区域后物业服务企业信息不回填）。\n\n## 解决方案\n- 选择弹窗赋值方法（setDeveloperCompany/setPropertyCompany）只取 row.companyRecordId。\n- companylist/propertyCompanylist 过滤只按 item.companyRecordId 判断。\n- fillDeveloperInfo/fillPropertyCompanyInfo 从 company.companyRecordId 取值。\n- 删除 getCompanyRecordId 之类回退 companyId 的兼容方法，提交时才把值写进 companyId 字段名。\n\n## 验证与归属\n- 验证：移除 getCompanyRecordId、赋值/过滤/带出五处统一、提交字段名仍为 companyId/propertyCompanyId。\n- 涉及文件：guaranteeDepositAgreement/detail.vue、initiation/detail.vue、apply/detail.vue 等。\n- 所属项目：园区物管2.0；来源会话 0a8622de-8e91-4ab1-bda2-f07280e64814；代码基线 7814a0c2a 等。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tencent_map_key.md",
+                "memory_type": "entities",
+                "after": "# 腾讯地图 Key 禁止硬编码\n园区物管2.0 后台所有腾讯地图 Key 统一经 /system/config/getByKey/qq.map.key 接口获取，禁止硬编码。\n\n## 问题背景\n- 原本硬编码 Key 在前端代码，换 Key 或按环境隔离需逐文件改，且不安全无法按环境切换。\n\n## 解决方案\n- 使用 src/utils/tencentMapKey.js 的 fetchTencentMapKey()，内部 GET 该接口并做内存缓存，未配置抛明确错误。\n- mapLoader.js 未传 ak 时自动走该函数，业务组件一律 await loadMap()/fetchTencentMapKey()，不再传 Key 也不再写死。\n- 前置条件：后台系统配置已设置 qq.map.key，且 Key 同时开通 GL 地图与 WebServiceAPI 权限。\n\n## 验证与归属\n- 验证：新增 tencentMapKey.js 内存缓存，5 个消费文件去硬编码。\n- 涉及文件：tencentMapKey.js、tencentDistrictBoundary.js、ZsTencentMap/mapLoader.js、ZsTencentMap/index.vue 等。\n- 所属项目：园区物管2.0；来源会话 ff82edd2-0b07-45df-bdd1-a77d7b6c0d77；代码基线 7fe15a8cb。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/腾讯gl地图点位不显示.md",
+                "memory_type": "entities",
+                "after": "# 腾讯 GL 地图点位不显示根因与排查\n园区物管2.0 腾讯位置服务 GL 地图（MultiMarker/MultiLabel）点位不显示的四类根因与排查套路。\n\n## 问题背景\n- 点位不显示或部分不显示，控制台报「Map中已存在id为area_bubble_0的图层」或「所传入参数并非TMap.Map实例」。\n\n## 根因与解法\n- 根因1：多个 MultiMarker 几何 id 写死导致冲突；解法：几何/图层 id 按索引唯一化（project_marker_geom_${index}）。\n- 根因2：坐标字段含 mapXCoordinate/mapYCoordinate 未参与解析；解法：归一化函数对经纬度做该兜底。\n- 根因3：下钻后地图仍停街道气泡中心，小区点在视野外；解法：第三层下钻按所有点范围算中心与缩放。\n- 根因4：搜索只传 projectName 后端只认 complexName；解法：搜索参数双传兼容。\n\n## 验证与归属\n- 验证：normalizeProjectList 加字段兜底、applyCommunityLayerView 视野拟合、MultiMarker id 索引化、双参搜索。\n- 涉及文件：benefit/statisticsMap/index.vue、benefit/statisticsMap/components/map.vue。\n- 所属项目：园区物管2.0；来源会话 7936e37a-fa3a-4556-86bf-1afaf2c6a29e；代码基线 f00310232。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 数据地图下钻传参约定（regionCode 恒传 + dimension 分层）见实体「数据地图下钻传参约定」。\n- 腾讯地图区划轮廓接入与 x/y 坐标语义见实体「腾讯地图区划接入」。\n- 区域树侧栏布局收敛为 RegionTreeLayout 公共组件见实体「region_tree_layout」。\n- 地图区域信息框固定左上角轮播偏好见偏好「地图信息框交互偏好」。\n- zs-table 固定列遮挡小计行分隔线解法见实体「zstable_subtotal_divider」。\n- 合并冲突双重自检工作流见实体「merge_conflict_selfcheck」。\n- 表格自定义列配置刷新丢失修复见实体「table_config_refresh」。\n- 环形图全 0 占位渲染策略见实体「donut_zero_placeholder」。\n- terminalType 残留态导致 G 端误弹 B 端弹窗的修复见实体「terminaltype_residual_session」。\n- 弹窗复用详情页容器类样式错乱的双形态约定见实体「dialog_dual_layout」。\n- 多分支修复-确认-串行合并约定见实体「branch_serial_merge」。\n- 地图区划数据生产报错与 JSONP 直连修复见实体「Vite地图代理路径适配」。\n- 空表格底边框多来源叠加收敛见实体「table_border_stack」。\n- zs-input-number 数字不显示内边距适配见实体「zs_number_hide」。\n- 未消费 sprite 生成链路整链清理见实体「unused_sprite_cleanup」。\n- 环图单扇区标签错位与 0 值引导线处理见实体「echarts_donut_label」。\n- zs-table 固定列边框仅分页时出现修复见实体「zstable_fixed_border」。\n- 侧边栏自定义 RecursiveMenu 缩进机制见实体「sidebar_recursive_menu」。\n- 图表金额格式化误用取整丢失小数见实体「chart_amount_format」。",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、sidebar_recursive_menu\n- 图表与样式类：echarts_donut_label、chart_amount_format、unused_sprite_cleanup、dialog_dual_layout\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、企业关联ID统一companyRecordId"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:25:44.898904+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/数据地图下钻传参约定.md",
+                "memory_type": "entities",
+                "after": "# 数据地图下钻传参约定\n园区物管2.0 的 benefit/statisticsMap 数据地图页按行政区划/街道下钻查数据时，接口传参的约定规则。\n## 问题背景\n- 多种交互路径（默认进入、点击区县、滚轮放大到街道层级、点击街道）导致参数规则不明确，容易漏传或多传导致查全量/查空。\n- 原有控制「是否传 regionCode」的 usePlatformRegionScope 开关逻辑易混乱。\n## 传参规则\n- regionCode 始终传递：未点击区县时传 store 的 platformRegionCode，点击区县后传该区县编码，下钻后覆盖并删除 usePlatformRegionScope 开关。\n- subDistrictCode 仅在点击某个街道时才传，滚轮放大到物业管理区域层级只传 regionCode。\n- 区县/街道聚合接口 selectAreaComplexNumList 始终带 regionCode，用 dimension 参数区分层级（1=区县，2=街道），不额外传街道编码。\n## 工程约束\n- 新增地图类下钻页面时按此约定组织参数。\n- 涉及文件：src/views/benefit/statisticsMap/index.vue、src/views/benefit/statisticsMap/components/map.vue。\n- 所属项目：园区物管2.0；来源会话：3b8b0061-bdbb-4225-9dd0-39f6ec21e376；代码基线：6a4835a08。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/腾讯地图区划接入.md",
+                "memory_type": "entities",
+                "after": "# 腾讯地图区划接入\n园区物管2.0 台账地图按行政区划代码画区域边界并支持下钻时，接入腾讯位置服务行政区划接口及坐标字段语义陷阱。\n## 问题背景\n- 本地静态轮廓（YUANQU_AREA 常量）维护成本高且覆盖不了下钻层级。\n- 后端下发 mapXCoordinate/mapYCoordinate 直接喂腾讯地图报「LatLng.lat 取值应在 [-90,90]」——后端 x 实为纬度（31.49）、y 为经度（120.31），与前端惯性相反。\n## 解决方案\n- 行政区划轮廓统一用腾讯 WebService「行政区划」接口（apis.map.qq.com/ws/district/v1/search），keyword 传 6 位 adcode，get_polygon=2 + max_offset=3000 取市/区县三级轮廓（乡镇级 get_polygon=3 需单独申请）。\n- 浏览器直连跨域用 output=jsonp + callback 的 JSONP 拉取，key 与现有 GL 地图共用（需开通 WebServiceAPI）。\n- polygon 返回一维 [lng,lat,...] 数组，转成 'lng,lat;...' 再画 MultiPolygon；坐标字段不能按 x/y 名义当经纬度，需按取值范围判别或与后端确认语义。\n- 图层实例维护 districtLayers，重绘、boundaryAdcode 变化、beforeDestroy 时销毁防泄漏。\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、map.vue。\n- 所属项目：园区物管2.0；来源会话：bb614fab-dac4-49df-a72a-5bf93a949ca8；代码基线：3353ef164 等。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/region_tree_layout.md",
+                "memory_type": "entities",
+                "after": "# RegionTreeLayout 公共组件\n园区物管2.0 将 16 个列表页的「左侧区域树+右侧列表+展开/收起+树状/平铺切换」布局收敛为 RegionTreeLayout 组件。\n## 问题背景\n- 16 个页面各自实现区域树布局，加展开收起动画时逻辑分散、宽度过渡与右侧内容联动脱节（展开卡顿、宽度先变完右侧才联动）。\n- 各页重复拷贝 treeFilterText、treeRenderKey、changeType 及侧边栏样式。\n## 组件设计\n- RegionTreeLayout.vue 内聚左侧区域树面板（搜索框+regionTree）、展开/收起（含动画）、树状/平铺开关、B 端终端类型判断、reset() 方法（清空搜索、重置树选中）。\n- regionTree.vue 仍只负责树数据与交互。\n- 页面用法 <region-tree-layout :flat.sync=\"value\" @node-click=\"nodeClick\" ref=\"regionTreeLayout\"> 包住 zs-search-form + zs-table，handleRangeReset 调 this.$refs.regionTreeLayout?.reset()。\n## 迁移与范式\n- 已迁移 16 个文件（property 4 个 + benefit 12 个），后续新页面直接复用。\n- 这是用户明确要求的「逻辑内聚到组件内部」改造范式。\n- 来源会话：7fe70b14-eb68-49c3-87b6-e00e6b7abf8f；代码基线：7fe15a8cb。"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/地图信息框交互偏好.md",
+                "memory_type": "preferences",
+                "after": "- 地图页区域信息框不用鼠标 hover 交互，固定显示在地图左上角（left:12px; top:12px，类 map-region-tip--carousel）。\n- 按「全市 → 各区（顺序与物业管理区域数量柱状图一致）」循环轮播，间隔 5 秒（常量 MAP_TIP_CAROUSEL_MS = 5000）。\n- 删除全部 hover 相关逻辑，用计算属性 mapCarouselSlides / mapCarouselCurrent 驱动模板，替代 mapTipVisible/mapTipLeft 等散状态。\n- initMap 成功或失败（含无 DOM、SVG 拉取失败）都启动轮播，beforeDestroy 里 clearInterval 防泄漏；「全市」汇总数据放 mock/接口的 mapCityTip。\n- 后续同类大屏地图信息框页面应直接按此模式实现。\n- 所属项目：园区物管2.0；来源会话：b0150d73-4a3f-4e93-94fb-d2c35ff789ac；代码基线：7fe15a8cb。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 数据地图下钻传参约定（regionCode 恒传 + dimension 分层）见实体「数据地图下钻传参约定」。\n- 腾讯地图区划轮廓接入与 x/y 坐标语义见实体「腾讯地图区划接入」。\n- 区域树侧栏布局收敛为 RegionTreeLayout 公共组件见实体「region_tree_layout」。\n- 地图区域信息框固定左上角轮播偏好见偏好「地图信息框交互偏好」。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

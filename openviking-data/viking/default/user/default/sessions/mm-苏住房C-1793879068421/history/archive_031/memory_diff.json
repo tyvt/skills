@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_031",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T13:18:05.140233+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/family_empty_fix.md",
+                "memory_type": "entities",
+                "after": "# 业主端家庭空状态图片与按钮样式修复\n苏住房C小程序family页面因图片缺失、路径错误及按钮宽度问题导致渲染层报错与样式异常，已从Git恢复资源并改用主包路径与固定宽度。\n\n## 问题根因\n- `family-empty.png`与`bg-button.png`在重构中被删，页面仍引用导致渲染层网络层错误\n- `family/index.vue`使用`../static/images/family-empty.png`，微信小程序解析为分包路径无文件触发500\n- 空状态容器未设宽度，`ZsButton`为`width:inherit`导致「前往添加」按钮挤成竖排小方块\n\n## 修复内容\n- 从Git历史恢复`src/static/images/family-empty.png`和`bg-button.png`\n- 空状态改用`ZsImage`，路径改为主包格式`images/family-empty.png`（实际加载`/static/images/family-empty.png`）\n- 列表顶部`PageBg`改为`images/bg-button.png`\n- 空状态容器设`width:100%`，按钮固定`280rpx`宽度\n\n## 涉及文件与归属\n- 涉及文件：`family/index.vue`、`mainStaticPaths.js`、`authentication/family/index.vue`、`ZsImage.vue`\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：4b96617b-0fec-4c96-af40-e0ec9f6a6e13；代码基线none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/stock_badge_fix.md",
+                "memory_type": "entities",
+                "after": "# 苏找房二手房个人中介定位标志缺失修复\n苏住房C苏找房二手房卡片缺少「个人/中介/定位」标志的问题已修复，根因含徽章显示条件、前缀拆分与数据映射缺失。\n\n## 问题根因\n- `houseCard`仅在`type`为空时显示徽章，二手房列表传`type=\"stock\"`致徽章被跳过\n- `Project_Suzhufang`已传`show-type-prefix`，组件未按设计拆分展示「二手 | 📍 区域/中介名」\n- 二手房列表未映射`publishRole`、`agentCompanyName`到卡片字段\n\n## 修复内容\n- `houseCard.vue`：`type=\"stock\"`时也显示发布角色徽章（个人蓝、中介橙），实现`showTypePrefix`底部显示「二手 |」+定位图标+地址，中介优先`agentCompanyName`个人显`regionName`，支持`showHot`热标\n- `Project_Suzhufang.vue`：补充`regionName`、`agentCompanyName`映射\n- `stockHouse/index.vue`：补充`publishUserType`、`agentCompanyName`映射\n\n## 涉及文件与归属\n- 涉及文件：`houseCard.vue`、`Project_Suzhufang.vue`、`stockHouse/index.vue`\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：2259f4fa-0848-4e14-8c96-c105c4a664e3；代码基线none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/decision_color_fix.md",
+                "memory_type": "entities",
+                "after": "# 决策与选举页意见颜色及名称显示修复\n苏住房C投票模块决策页意见颜色丢失与选举页名称显示异常已修复，恢复颜色绑定并规避小程序label冲突。\n\n## 问题根因\n- 决策记录列表右侧意见文字颜色绑定丢失，未区分同意/不同意/弃权\n- 选举页`DecisionResult.vue`未正确处理候选人姓名显示，与原生`label`属性冲突\n\n## 修复内容\n- 决策页意见文字恢复颜色：同意绿、不同意红、弃权橙\n- 选举页`DecisionResult.vue`采用`CardCell`+`#label`插槽显示姓名，弃权显橙色，候选人名默认黑\n- 涉及`DecisionRecord.vue`、`CardList.vue`同步调整\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`pages_vote/elect/DecisionResult.vue`、`pages_vote/decision/common/DecisionResult.vue`、`CardList.vue`、`DecisionRecord.vue`\n- 来源会话ID：656e6a75-7f8b-4804-98e6-133f13d94700；代码基线none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/forget_imgcode_fix.md",
+                "memory_type": "entities",
+                "after": "# 忘记密码页图形验证码失败处理修复\n苏住房C忘记密码页因共享组件`PhoneForm.vue`未处理发送失败回调，导致按钮卡在「发送中…」且未刷新验证码，已对齐其他表单模式修复。\n\n## 问题根因\n- `PhoneForm.vue`的`sendCode`未处理`sendPhoneMessage`失败回调，`sending`一直为`true`\n- 图形验证码校验失败后未刷新验证码、未清空输入框\n- `form`缺失`imageCode`、`udid`初始字段\n\n## 修复内容\n- `PhoneForm.vue`为`ImgCode`增加`ref`，失败调`resetImageCode()`刷新并清空输入\n- `sendCode`对齐`phone.vue`与`cancellationForm.vue`：成功`countDown()`，失败`resetImageCode()+onFail()`，校验失败`onFail()`\n- 补全`form`中`imageCode`、`udid`初始字段\n- `VerifyCode/index.vue`相应调整\n\n## 涉及文件与归属\n- 涉及文件：`PhoneForm.vue`、`phone.vue`、`cancellationForm.vue`、`VerifyCode/index.vue`、`api/security.js`、`pages/login/forget.vue`\n- 所属项目：苏住房C（zhi2-mobile-shimin）\n- 来源会话ID：1b8c2026-4de2-4989-a73b-49a661ba145a；代码基线none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

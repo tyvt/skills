@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:10:34.760047+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/project_dialog_cache_restore.md",
+                "memory_type": "entities",
+                "after": "# 全局选项目弹窗缓存恢复\n首页/布局层选择物业项目弹窗通过 localStorage 缓存与权限校验实现刷新后免重复弹窗的稳定恢复套路。\n\n## 现象与问题\n- 原实现每次刷新都自动弹出选择物业项目（小区）弹窗，体验差\n- 弹窗显隐未与本地缓存联动，刷新后丢失「已选过项目」状态\n\n## 解决方案\n- bProjectDialog.vue 新增 tryRestoreFromCache()：读 localStorage 的 currentProjectId，若在可操作物业区域列表（权限内）则恢复选中、同步写 Vuex、关闭弹窗\n- 用 cacheRestored 标记防止自动恢复被误判为用户手动「切换项目」而误关闭\n- layout/index.vue 初始不再默认弹窗，改为项目列表加载后调 syncProjectDialogVisibility：有有效缓存不弹、无缓存或缓存小区不在权限列表则清缓存并弹出\n- 缓存 key 沿用 currentProjectId/currentProjectName/lastLoginProjectId\n\n## 关键约束\n- 缓存必须用权限列表校验有效性，失效即清除重弹，不能只判断 key 存在\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/home/bProjectDialog.vue、zhi2-web-admin/src/views/home/index-wrapper.vue、zhi2-web-admin/src/layout/index.vue；所属项目：园区物管2.0；来源会话：d3445a30-e077-4745-9bfa-b18a1203606d；代码基线：036.md"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_select_single_choice.md",
+                "memory_type": "entities",
+                "after": "# 页面级选择弹窗单选契约对齐\n维保模块页面级选人弹窗 userDialog 对齐公共 zs-select-dialog 的单选交互契约，统一选择类弹窗语义。\n\n## 现象与问题\n- 维保 zsAssign 的 userDialog 原先单选靠「点姓名链接」直选、无确定按钮，与公共 zs-select-dialog 交互不一致\n- 同一系统存在两套选择语义，需统一\n\n## 解决方案\n- 去掉 zs-select-column 的 v-if=\"!single\"，单选多选都显示勾选列\n- 单选复用 zs-select-dialog 的 handleSelectionChange：勾第二行清空后只保留最后一行\n- zs-dialog 根节点挂 :class=\"{'single-choice': single}\"，靠全局 element-ui scss 隐藏表头全选框并呈现单选外观（视觉单选、语义仍是 checkbox）\n- 底部加取消/确定，未选提示「请至少选择一条数据」，确定触发 singleSubmit/multipleSubmit，姓名列改普通 text 不再用链接触发\n\n## 关键约束\n- 迁移页面级弹窗时按此清单对齐，不要自造第三套交互\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/maintenance/components/userDialog.vue、zsAssign.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue；所属项目：园区物管2.0；来源会话：8ea8b56f-3f64-42d9-9271-30e2972792d5；代码基线：036.md"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/amount_input_validate_race.md",
+                "memory_type": "entities",
+                "after": "# AmountInput 打包后 el-form 校验为空\nAmountInput（vue-currency-input 封装）本地开发正常、打包后字段有值却被 el-form 校验为空的同 tick 竞态问题。\n\n## 现象与问题\n- 本地开发正常，打包后字段看起来有值却被 el-form 校验为空\n- el-form 校验读 form.model + prop 的 fieldValue 而非输入框显示值；最后一位输入后立即失焦时，el.form.blur 校验可能早于父组件把 v-model 写进 model，读到旧值\n- 自定义组件向上找 ElFormItem 用 $options.componentName === 'ElFormItem'，外链/压缩后 element-ui 表现不一致时找不到表单项，dispatch 失效\n\n## 解决方案\n- 显式声明 model: { prop: 'value', event: 'input' } 消除构建链对 v-model 的歧义\n- numberValue 的 watch 加 { flush: 'sync' }，先同步 emit input 再处理 blur\n- emit 改用 instance.proxy.$emit（与 vue-currency-input 内部一致）\n- handleBlur 双 nextTick 后再 dispatch el.form.blur，给父级 model 留更新时间\n- 向上查找表单项同时认 componentName 和 name 为 ElFormItem\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/components/AmountInput/index.vue；所属项目：园区物管2.0；来源会话：65814715-d99f-446d-b239-bd55aaced626；代码基线：7814a0c2a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/zs_table_summary_border.md",
+                "memory_type": "entities",
+                "after": "# zs-table 合计行下边框缺失修复\n带小计（show-summary）的 zs-table 因容器 overflow hidden 裁切 footer-wrapper，需在组件层加 with-summary 类统一补下边框。\n\n## 现象与问题\n- 列表页带小计的表格，小计行下方缺一条下边框线\n- .list-card 表格只设上/左/右边框没有下边框；有分页时不加 zs-table-container--bottom-spacing，不会自动补下边框\n- 小计行在 el-table__footer-wrapper 内，底部边框易被表格容器 overflow: hidden 裁切\n\n## 解决方案\n- 在 zs-table 组件层统一收敛：启用合计行时给容器加 zs-table-container--with-summary 类名\n- 全局 index.scss 对该类补 border-bottom: 1px solid #f0f0f0\n- 页面侧绑定 :border=\"border\" 并设置 bottom-summary-variant=\"table\"，让下方「合计」区域与表格边框衔接\n- 该修复对所有带小计的列表页一次性生效，不要逐页改样式\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、zhi2-web-admin/src/styles/index.scss；所属项目：园区物管2.0；来源会话：9a3daf50-8a49-4516-af4c-070c6201cf9b；代码基线：fc994977f"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、sidebar_recursive_menu、recursive_menu_icon_indent（RecursiveMenu图标占位缩进）、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）、search_container_deprecated（旧search-container废弃改zs-search-form）、appmain_isolation（AppMain加isolation隔离层叠上下文）\n- 图表与样式类：echarts_donut_label、chart_amount_format、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）、echarts_axis_max_ceiling（ECharts轴刻度上限取整）、four_module_split（超大页面四件套拆分）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、area_field_code_assignment（街道社区字段统一赋编码移除字典等待）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、zs_table_summary（zs-table小计合计双来源）、platform_config_race（平台配置异步加载竞态误报）",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、sidebar_recursive_menu、recursive_menu_icon_indent（RecursiveMenu图标占位缩进）、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）、search_container_deprecated（旧search-container废弃改zs-search-form）、appmain_isolation（AppMain加isolation隔离层叠上下文）、zs_select_single_choice（页面级选择弹窗对齐zs-select-dialog单选契约）、zs_table_summary_border（zs-table合计行下边框缺失）\n- 图表与样式类：echarts_donut_label、chart_amount_format、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）、echarts_axis_max_ceiling（ECharts轴刻度上限取整）、four_module_split（超大页面四件套拆分）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、area_field_code_assignment（街道社区字段统一赋编码移除字典等待）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、zs_table_summary（zs-table小计合计双来源）、platform_config_race（平台配置异步加载竞态误报）、project_dialog_cache_restore（全局选项目弹窗缓存恢复）、amount_input_validate_race（AmountInput打包后el-form校验为空竞态）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

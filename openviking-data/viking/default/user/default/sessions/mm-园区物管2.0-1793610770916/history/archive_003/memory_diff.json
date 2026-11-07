@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:21:53.093133+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/double_computed_block.md",
+                "memory_type": "entities",
+                "after": "# 组件重复 computed 块致属性丢失\n在 Vue 组件中写两个 computed: { } 块会导致后者覆盖前者，先写的计算属性静默变 undefined。\n\n## 现象\n- 大屏/地图页组件先后写两个 computed 块（如 districtStatsByName 和 threeAssetsMax 分居两处），悬停地图板块报 Cannot read properties of undefined（读区名），弹窗起不来，无编译期警告。\n- 与 data 和 computed 同名会警告不同，对象字面量重复键连 Vue warn 都不会有。\n\n## 根因\n- 组件选项是普通 JS 对象，重复键遵循后者覆盖前者，第二个 computed 块把第一个整块顶掉，先写的计算属性静默丢失，运行到引用处才暴露。\n\n## 修复做法\n- 每个组件只保留一个 computed: { ... }，多个计算属性在其内并列声明。\n- 审查或复制粘贴拼页面时，grep 组件内 computed: 出现次数，>1 即隐患；同类静默覆盖也适用于 methods/watch 等对象型选项。\n\n## 关联信息\n- 涉及文件：src/views/benefit/mapOverview/index.vue；所属项目：园区物管2.0；来源会话 ID：15514253-88df-4a75-b299-5e0fcb7ba067；代码基线：e75a12737。\n- 验证：index.vue 写两个 computed，后块 threeAssetsMax 顶掉 districtStatsByName 变 undefined，悬停执行 this.districtStatsByName['锡山区'] 报错；修复为合并进同一个 computed。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/listtemplate_nocopy.md",
+                "memory_type": "entities",
+                "after": "# 列表页禁止复制 ListTemplate HTML\n园区物管2.0 列表页改造时不应复制 ListTemplate 的 HTML 写独立模板，缺能力应增强公共层。\n\n## 背景\n- 多个列表页（accountCancel、accountOpen/complex、settlementAccount、accountOpen/components）做主子表样式一致+底部合计行改造时，AI 复制 ListTemplate HTML 成独立 template，与项目惯例不一致。\n- 用户质疑为何改模板，复核确认复制无新增能力。\n\n## 原因\n- ListTemplate.js + listMixins 是后台列表页主流写法，已内置 list-container/list-card 外框、ListOperationButtonContainer 标题栏、border/show-summary 等 props。\n- 复制 HTML 后各页样式来源分叉，全局表格调整无法一处生效。\n\n## 做法\n- 缺能力（如底部合计行）时优先增强公共层：在 ListTemplate.js 补 bottom-summary-items / bottom-summary-variant prop，在 table.js mixin 加默认 summaryItems:[]、bottomSummaryVariant:'table'，页面只用 script 重写并改回 template: template。\n- 仅通用模板覆盖不了的场景（额外业务弹窗、额外导出按钮、列定义不走 displayColumns 配置，如 owner 页）才允许写独立模板。\n- 排查信号：列表页出现整段复制的 ListTemplate HTML 且无新增节点，即应回退。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/maintenance/accountCancel/index.vue 等 4 个页面及 src/mixins/ListTemplate.js；所属项目：园区物管2.0；来源会话 ID：d930377c-63a5-48c1-9276-9e6f283932ed；代码基线：3353ef164 等。\n- 验证：AI 复盘三个页面复制 HTML 无新增能力，修正为增强 ListTemplate.js + mixin 默认值，4 页面改回 template: template 只写 script。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/list_card_struct.md",
+                "memory_type": "entities",
+                "after": "# 列表页 list-container/list-card 标准包裹结构\n园区物管2.0 Web 后台列表页应采用 list-container > zs-search-form + div.list-card 标准结构，弹窗保持在 list-card 外部。\n\n## 背景\n- 历史上大量列表页 index.vue 有 class=\"list-container\" 却缺 <div class=\"list-card\"> 包裹，全局排查后 44 处补齐。\n- list-card 承担卡片边框、内边距与滚动边界，缺失导致样式与同模块页面不一致；但弹窗等浮层包进 list-card 会受卡片布局影响。\n\n## 标准结构\n- 固定为 list-container > zs-search-form + div.list-card（内含 ListOperationButtonContainer、zs-table、zs-pagination），弹窗组件保持在 list-card 外部。\n- 特殊落点：左树右表在 sort-right 内 zs-search-form 之后包 list-card；左树右表单在 sort-right 内包表单内容；组件转发页用 list-card 包内部组件；地图页在搜索表单后主内容区包裹；打印配置页把原 table-container 改成 list-card。\n\n## 做法\n- 新增列表页按此结构直接落地，存量排查以 ListTemplate.js 为参照。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/mixins/ListTemplate.js；所属项目：园区物管2.0；来源会话 ID：d7cb3247-4f21-4218-9399-5bdae428c354；代码基线：f101dd464 / fc994977f。\n- 验证：全局排查 179 个带 list-container 的 index.vue，44 个缺 list-card 包裹已补齐，含特殊布局处理表。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/viewport_clip_bug.md",
+                "memory_type": "entities",
+                "after": "# 数据大屏固定视口布局裁切与滚动三坑\n数据沙箱类大屏页采用固定视口+transform 缩放时，stage 锁高与 overflow:hidden 会裁掉坐标轴并导致留白横跳。\n\n## 现象\n- 大屏/全景仪表盘页（assetPanorama）要常规显示器不纵向滚动，压缩后出现 X 轴看不见、下方留白、横向留白反复横跳。\n\n## 根因\n- ECharts 横向条形图 grid.bottom 仅 4px 且 xAxis.axisLine.show:false，数值轴刻度无空间。\n- stage 用 flex:1 + height:100% + overflow:hidden 锁高，内容撑不出滚动条，设计区写死 height 让 scrollHeight 与可视不一致。\n- 外层 scale-clip 与 .chart-block__canvas 默认 overflow:hidden 裁掉贴边坐标轴。\n\n## 修复做法\n- grid.bottom 给到 32 左右并画浅灰轴线；scale-clip 改 overflow-x:hidden + overflow-y:visible，高度按 effectiveDesignH*scale 取整多留 16px。\n- stage 改 flex:0 0 auto + min-height:100% + height:auto，纵向溢出交最外层 overflow-y:auto 滚动；设计区去掉固定 height 只留 minHeight + transform；图表 canvas 提高选择器优先级改 overflow:visible。\n- 通用原则：大屏自适应布局中固定视口+transform 缩放时，滚动权必须唯一归属最外层容器，中间层一律 visible。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue；所属项目：园区物管2.0；来源会话 ID：d9192f5b-c2bf-4f01-ba6a-ecefdcde18d0；代码基线：f00310232。\n- 验证：会话列出 grid.bottom=4px、stage flex:1+overflow:hidden、scale-clip overflow:hidden 三类根因及逐项修改。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

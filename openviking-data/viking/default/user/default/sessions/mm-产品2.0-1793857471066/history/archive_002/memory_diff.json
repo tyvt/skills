@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793857471066/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T05:52:10.156503+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/测试模式/register_shareholder_e2e.md",
+                "memory_type": "entities",
+                "after": "# 企业注册导航与股东E2E测试\n产品2.0 的 zhi2-web-admin 企业注册全流程 E2E 测试 navigation-shareholder.spec.js 已通过，覆盖步骤回退与股东增删改查。\n\n## 测试覆盖\n- 两项 E2E 测试均通过（约 50s），用例文件 e2e/register/navigation-shareholder.spec.js\n- Step2/3/4 点击上一步：Step1 企业名保留、Step2 法人姓名保留、Step3 要件配置恢复、Step4 可再次前进\n- Step4 股东维护：新增 → 编辑（王五→赵六）→ 行删除 → 批量新增两人 → 批量删除\n\n## 修复要点\n- Step2 返回后再前进需重新填写图片/短信验证码，新增 proceedStep2WithSave helper\n- 股东身份证 320501199001010009 校验位无效，改用 TEST_ID_NUMBER_PRIMARY / TEST_ID_NUMBER_SECONDARY\n- Step3 附件恢复：Step3Appendix.vue 中先 loadConfig 再 loadUploadedList，增强 enrichUploadedList 的 appendixConfigId 匹配\n- 批量删除按钮限定为 .table-action\n\n## 验证与归属\n- 涉及文件：e2e/register/navigation-shareholder.spec.js、Step3Appendix.vue、e2e/fixtures/register-helpers.js\n- 所属项目：产品2.0；来源会话：706c30d3-6c4d-4142-b37e-3c31a05c20b6；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/column_width_fix.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column宽度计算修复\n产品2.0 的 zhi2-web-admin 中 zs-table-column 仅对未写 width 的列按内容计算宽度，修复业务账号列省略号问题。\n\n## 问题根因\n- zs-table-column 仅对未写 width 的列动态计算列宽；写了 width 则原样透传固定宽度，不再按内容算 min-width\n- guaranteeDepositAccount/index.vue 中「业务账号」列原配置 width:180\n- 业务账号为长数字串（如 3205050000000000422），180px 放不下，加 showOverflowTooltip:true 出现 ... 省略\n\n## 已做修改\n- guaranteeDepositAccount/index.vue：去掉「业务账号」列 width:180，改由 zs-table-column 按内容计算宽度\n- guaranteeDeposit/components/index.vue 同步调整\n\n## 验证与归属\n- 涉及文件：guaranteeDepositAccount/index.vue、zs-table-column.vue、guaranteeDeposit/components/index.vue\n- 所属项目：产品2.0；来源会话：c317fddb-86ba-44b7-bf23-24b241e4ba3e；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/测试模式/register_whitelist_test.md",
+                "memory_type": "entities",
+                "after": "# 企业注册真实接口白名单联调\n产品2.0 的 zhi2-web-admin 企业注册全流程已接入白名单真实联调，卡在 Step3 暂无附件配置。\n\n## 联调结果\n- Step1 saveCompanyRegister ✅200；Step2 saveLegalPersonInfo（短信码 293858）✅200\n- Step3 listByBusCode ✅200 但 data 为空；Step3 listAppendixSimplified ✅200（白名单已通）\n- 全流程 Step1→5 ❌ 卡在 Step3「暂无附件配置」\n\n## 本次修复\n- 唯一手机号：避免 13800000000 触发「该手机号已注册」\n- 图形验证码：Step2 加载后从 Vue 状态读取 /code 结果，不再误等已完成的请求\n- Step3 探测用例：新增 real-api.spec.js 中「Step3 附件配置接口探测」\n- 明确报错：无附件配置时直接提示需维护 busCode=8\n\n## 当前阻塞\n- 测试库缺少附件配置：/file/appendixConfig/listByBusCode 传 busCode=8 返回空数组，页面显示「暂无附件配置」\n\n## 验证与归属\n- 涉及文件：real-api.spec.js、security.js、companyRegister.vue、accountInfo.vue\n- 所属项目：产品2.0；来源会话：f750b067-6c90-4a44-8c42-69fa4ec69c0d；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/测试模式/personnel_e2e_opt.md",
+                "memory_type": "entities",
+                "after": "# 从业人员证书CRUD的E2E优化\n产品2.0 的 zhi2-web-admin 从业人员增删改查 E2E 用例（登录账号 913）去除重复网络等待，改为 UI 状态驱动，耗时大幅下降。\n\n## 问题根因\n- 详情接口返回后再次调用 waitForResponse 等已发完的证书列表请求，Playwright 白等满 30 秒再 catch 吞掉\n- 进入详情页后长时间空等\n\n## 改动\n- 去掉重复的 waitForResponse（详情加载完成后不再二次监听网络）\n- 改为 UI 状态等待：waitForDetailLoadingDone（poll .el-loading-mask 消失）、waitForCertificateSectionReady（证书区 loading 结束+表格可见）\n- gotoPersonnelDetail 合并就绪判断：详情接口 200 → loading 消失 → 姓名可见 → 证书区就绪\n\n## 效果\n- 03 证书增删改查：~39s → ~8s；全流程：~53s → ~21s\n- 全程无 waitForTimeout / 固定 sleep，均为接口响应 + DOM 状态驱动\n\n## 验证与归属\n- 可重新跑 npm run test:e2e:personnel-certificate-crud\n- 涉及文件：personnelRecord/index.vue、components/index.vue\n- 所属项目：产品2.0；来源会话：0dc2b982-cbda-4ef5-8a4b-504d7a26d726；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_041",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:57:33.473706+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术笔记/subtable_delete_refresh.md",
+                "memory_type": "entities",
+                "after": "# [苏房] 删除子表行后本次核销金额不归零\n公共收益-回单核销等详情页删除子表行后，表头汇总「本次核销金额」未随子表刷新而归零，列表与表头不一致。\n\n## 问题现象\n- 公共收益-回单核销 / 物业收入类账单详情页，删除单据后子表列表刷新，但基本信息「本次核销金额」仍是旧值\n- 主线、无锡三资同样存在该问题，造成列表与表头汇总数据不一致\n\n## 根因\n- 详情页 detail.vue 写了 @refresh=\"getDetail\" 期望子表操作后重拉详情\n- 删除走 table.js 混入的公共 handleDelete，成功后只调子表 getList()，未 $emit('refresh') 也未调父页刷新\n- 父页详情接口未被重请求，汇总字段不变\n- 与 #548（OperationBtnGroup emit refresh）不同：本条是「子表行删除」独立链路，根因是通用 handleDelete 与父页 refresh 约定缺挂钩\n\n## 解决方案\n- 子表组件补 deleteSuccessCallback(){ this.$emit('refresh') }，table.js 的 handleDelete 会调用此可选钩子\n- 父页 detail.vue 的 @refresh=\"getDetail\" 不变\n- 物业模块 billDetailSubTable 在 getList()+clearSelection()+msgSuccess 后手动补 this.$emit('refresh')\n- 改动 cherry-pick 到多分支时逐分支确认子表是否都补了钩子\n\n## 验证与归属\n- 验证会话 5bdbdabe（064.md 会话 5bdbdabe）：删除单据后基本信息「本次核销金额」不归零，根因 handleDelete 只调 getList 未触发 refresh\n- 修复为 VerificationReceiptDetailTable.vue 增加 deleteSuccessCallback 发 refresh，billDetailSubTable.vue 补 $emit('refresh')\n- 已 cherry-pick 到 develop/v2.6.1 (a7ed8c1db)、develop/v2.6.2 (bcf3d9fba)、develop/v2.6.2-suzhufang (ed0acf3c0+dcf7a6c80)\n- 涉及文件：benefit/pubVerificationReceipts/detail.vue、VerificationReceiptDetailTable.vue、property/propertyVerificationReceipts/components/billDetailSubTable.vue、mixins/table.js\n- 所属项目：苏住房G；代码基线：fb3e960；来源会话ID：5bdbdabe-84ea-4974-b2f7-6db72c21377d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术笔记/zs_dialog_scrollable.md",
+                "memory_type": "entities",
+                "after": "# [苏房] zs-dialog 新增 scrollable 模式致内容溢出不能滚动\nsuzhufang 分支弹窗内容超出高度却无滚动条且滚不动，内容被裁掉，同页面在 develop/v2.6.2 正常。\n\n## 问题现象\n- suzhufang 分支上弹窗内容明显超出高度，既无滚动条也滚不动，内容被直接裁掉\n- 同样页面在 develop/v2.6.2 上正常显示\n\n## 根因\n- 滚动能力被两次提交改坏：4defa2128 引入高度自适应+neutralizeInnerScrollContainers，中和内部滚动容器 overflow\n- 4879d1d31 又引入 zs-dialog--scrollable 模式，最终无任何一层承担 overflow:auto+max-height\n- 旧版 zs-dialog 是 .form-box 用 overflow:auto+max-height 做内部滚动，故 2.6.2 不受影响\n- 这两个提交是从 2.6.2 分出后单独合入 suzhufang 的\n\n## 解决方案\n- 先按分支定位，用 git log -S/zs-dialog--scrollable 确认问题提交是否在当前分支，勿全分支盲改公共弹窗\n- 修复落当前分支的 zs-dialog 滚动链（明确唯一滚动层）\n- 排查所有依赖弹窗内滚动的页面（zs-dialog 是公共组件，改动面全局，不能只验证截图处）\n- 「为什么别的地方没事」类问题先做分支差异比对再动手\n\n## 验证与归属\n- 验证会话 17392583（064.md 会话 17392583）：用户报弹窗内部超出无法滚动，结论仅 develop/v2.6.2-suzhufang 含 4defa2128 与 4879d1d31，develop/v2.6.2 停在 f1b078cb9 仍是旧滚动逻辑\n- 涉及文件：components/zs-dialog/zs-dialog.vue、views/system/menu/index.vue\n- 所属项目：苏住房G；代码基线：69e9d4d；来源会话ID：17392583-56a4-49a0-82fb-430a5f1aadfe"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术笔记/tree_return_root.md",
+                "memory_type": "entities",
+                "after": "# [苏房] 左侧部门树返回后跳回根节点\n行政区域银行授权等「左侧树+右侧列表」页面，从详情返回列表后树回到苏州市根节点，列表不再是之前筛选街道数据。\n\n## 问题现象\n- 行政区域银行授权、物业管理区域等左侧树+右侧列表页面，从详情页返回列表后树自动回「苏州市」根节点\n- 列表也不再是之前筛选的街道数据\n\n## 根因\n- RegionTreeLayout 靠 cachedSearchParams.parentDeptId 恢复树选中，但列表页 queryParams 只缓存 regionCode、没保存 parentDeptId，返回时无处可恢复\n- RegionTreeLayout 里 tree-ready 在 setNodeContext 之后才触发，getList() 执行时 nodeContext 还是默认市级节点，即使选中态恢复数据仍是市级\n\n## 解决方案\n- queryParams 里补 parentDeptId，与搜索条件一起进缓存\n- 点树节点、setNodeContext 时双向同步 parentDeptId\n- handleTreeReady 用 findParentNode 还原街道级节点的父级上下文\n- getQueryParams 里把 parentDeptId 过滤掉，避免当业务参数发后端\n- 调整 tree-ready 顺序：先通知父组件设置上下文，再调 getList()\n- 配套：退出登录必须清缓存（见 vuex_cross_account），否则换账号继承上一账号部门筛选\n\n## 验证与归属\n- 验证会话 5decc0c2（064.md 会话 5decc0c2）：部门树从详情返回后回到苏州市节点，根因未缓存 parentDeptId+tree-ready 顺序错\n- 修复涉及 regionBankAuth/index.vue 与 RegionTreeLayout.vue 的 queryParams、setNodeContext、handleTreeReady、getQueryParams、树节点点击与 tree-ready 顺序\n- 涉及文件：system/regionBankAuth/index.vue、property/complex/components/RegionTreeLayout.vue、property/complex/components/regionTree.vue、mixins/listMixins.js\n- 所属项目：苏住房G；代码基线：864b409；来源会话ID：5decc0c2-1c85-4c33-89ec-7c181923edc0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术笔记/vuex_cross_account.md",
+                "memory_type": "entities",
+                "after": "# [苏房] Vuex cachedSearchParams 跨账号残留\n物管办账号选部门树节点退出，再用物业账号登录同列表，数据仍按物管办 parentDeptId 过滤，像串号。\n\n## 问题现象\n- 物管办账号登录进物业管理区域列表选部门树节点，退出，再用物业账号登录进同一列表，数据仍按物管办 parentDeptId 过滤\n- 分别登录两账号都正常，仅「先登A、退出、再登B」复现\n\n## 根因\n- parentDeptId 写进 Vuex common 模块 cachedSearchParams，user 模块 LogOut/FedLogOut 只清 token 与用户信息，没清列表搜索缓存\n- listMixins 与 RegionTreeLayout 在 mounted 无条件从缓存恢复筛选，把上一账号上下文带进新会话\n\n## 解决方案\n- 在 store/modules/user.js 的 LogOut 与 FedLogOut 两 action 都加 dispatch('common/clearAllSearchParams', null, { root: true })\n- 两个登出入口都要加，只改一个会 FedLogOut 路径残留\n- 加跨 root dispatch 必须显式传 { root: true }\n- 凡为返回保持筛选新增到 cachedSearchParams 的字段，若属账号/机构维度必须进登出清理清单，否则跨账号串味\n\n## 验证与归属\n- 验证会话 c14c5230（064.md 会话 c14c5230）：诊断 parentDeptId 退出未清理，在 LogOut 与 FedLogOut 补 dispatch('common/clearAllSearchParams', null, { root: true }) 清空缓存\n- 涉及文件：store/modules/user.js、store/modules/common.js、mixins/listMixins.js、property/complex/components/RegionTreeLayout.vue\n- 所属项目：苏住房G；代码基线：2a3ef8a；来源会话ID：c14c5230-321b-471a-a40a-e48d33f20dbb"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

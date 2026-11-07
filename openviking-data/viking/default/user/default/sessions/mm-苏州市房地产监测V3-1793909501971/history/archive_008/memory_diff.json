@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T20:36:45.615186+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/add_cert_main_sub.md",
+                "memory_type": "entities",
+                "after": "# 新增证书弹窗主子表接口调用修复\n苏州市房地产监测V3 中项目备案证书新增弹窗改为始终调用主子表接口，避免无楼幢时打到旧单表接口导致空白。\n## 问题根因\n- 原 `addRequest` 仅当草稿楼幢列表 `length > 0` 才调主子表接口 `addConEngConsLicAndBuilding` / `addConEngPlanLicAndBuilding`\n- 否则走旧单表接口 `/presale/consLic/add` 或 `conEngConsLic/add`，建设工程规划许可证无楼幢或草稿未同步时命中旧接口致弹窗空白\n## 修改内容\n- `ProjectConsLicPanel` / `ProjectPlanLicPanel` 新增时始终调用主子表接口，楼幢从 `draft*` 或子表 `ref.tableData` 读取（可空数组）\n- `consLic/detail.vue`、`planLic/detail.vue` 菜单页同样始终走合并接口，与弹窗一致\n- 施工许可证请求体示例：`conEngConsLic` + `consLicBuildList`；规划许可证对应 `conEngPlanLic` + `planLicBuilds`\n## 验证与归属\n- E2E 新增用例「新增建设工程规划许可证保存走主子表接口」，断言 POST 含 `/presale`\n- 所属项目：苏州市房地产监测V3；来源会话ID：a685a691-d9cd-48fb-934f-e93a7a97176d；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端组件/standalone_appendix_field.md",
+                "memory_type": "entities",
+                "after": "# StandaloneAppendixField 全局附件标签能力\n苏州市房地产监测V3 中 `StandaloneAppendixField` 底层组件支持传入 `label` 自动套用预售宫格外壳，实现附件标题统一展示。\n## 功能说明\n- `zs-file-upload` / `FileUpload` 底层传入 `label` 时自动套 `appendix-requirement-grid` + 标题条 + 缩略图左边距\n- 任意页面使用带 `label` 的上传组件即可，无需再包业务组件\n## 全局样式\n- `appendix-requirement-grid.scss` 已在 `index.scss` 引入\n- 表单项使用 class `appendix-labeled-field-form-item`：`label-width=\"0\"`，去除 Element 侧栏标签避免重复\n## 页面用法\n- 统一写法：`<el-form-item prop=\"attachmentUrl\" class=\"appendix-labeled-field-form-item\" label-width=\"0\"> <zs-file-upload v-model=\"form.attachmentUrl\" label=\"建设工程规划许可证\" ...>`\n## 验证与归属\n- 涉及文件：`appendix-requirement-grid.scss`、`index.scss`、`CertificateFixedAppendixField.vue`、`detailAttachmentDisplay.js`\n- 所属项目：苏州市房地产监测V3；来源会话ID：f08e4450-7e4c-4f7a-8514-96638563fc99；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/survey_skip_building.md",
+                "memory_type": "entities",
+                "after": "# 测绘变更选楼幢跳过在途楼幢\n苏州市房地产监测V3 的 E2E 辅助文件 `presale-survey-change-helpers.js` 实现选楼幢弹窗中跳过在途楼幢的逻辑。\n## 行为说明\n- 打开选楼幢弹窗后用详情 `projectId` / `projectName` 调 `/presale/surveyChange/page`（最多500条）\n- 收集 `bizState` 为 `0`（待提交）或 `1`（审核中）的 `buildingId`，与弹窗接口楼幢列表求交集，避免误伤其他项目\n- 排除接口行上 `selectable` / `hasActiveSurveyChange` 等不可用标记\n- 按楼幢号勾选第一个可用行；无可用行则关弹窗返回 `false`（用例 `test.skip('无可选楼幢')`）\n## 验证与归属\n- 本地复跑：`cd zhi2-web-admin && npx playwright test e2e/presale/presale-survey-change-real-api-flow.spec.js`\n- 涉及文件：`e2e/fixtures/presale-survey-change-helpers.js`、`e2e/presale/presale-survey-change-real-api-flow.spec.js`、`src/styles/index.scss`\n- 所属项目：苏州市房地产监测V3；来源会话ID：917bcc72-bb40-4ee4-a078-26ffa623d83b；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端组件/org_type_lease.md",
+                "memory_type": "entities",
+                "after": "# 租赁机构注册入口补全\n苏州市房地产监测V3 登录页「机构注册」弹窗新增「租赁机构注册」入口，跳转 `/leaseInstitutionRegister` 流程。\n## 问题根因\n- 路由 `/leaseInstitutionRegister` 之前已做，但登录页「机构注册」弹窗没接入口，界面仅见「经纪机构注册」\n## 修改内容\n- `OrgTypeDialog.vue` 增加「租赁机构注册」按钮（`data-testid=\"org-type-lease\"`）\n- `login.vue` 选择后跳转 `/#/leaseInstitutionRegister` 刷新登录页，点机构注册后出现租赁机构注册，进入「企业账号注册（租赁机构）」流程\n- 接口带 `organType=lease`、`busCode=030300`\n## 验证与归属\n- 涉及文件：`OrgTypeDialog.vue`、`login.vue`、`路由信息.json`、`company/institutionRegister/index.vue`\n- 所属项目：苏州市房地产监测V3；来源会话ID：e3de2eb4-66cc-4ce0-a162-f78f72c64d0f；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

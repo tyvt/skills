@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793758965904/history/archive_007",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T02:39:29.272360+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_terminaltype_null.md",
+                "memory_type": "entities",
+                "after": "# 门户 GetInfo terminalType 为 null 时推断 B 端选 developer 首页\n门户企业账号登录后首页误走 admin 工作台，因 GetInfo 返回 terminalType null 且未推断端别，修复后在落库前用 inferTerminalType 按 roleKey 前缀判 B 端并写入 store，再按板块权限选 developer 皮肤。\n\n## 问题根因\n- 后端 GetInfo 可能返回 terminalType: null，resolveHomeLayoutVariant 未推断端别直接将非 B 或缺省映射 admin，导致开发企业账号（roleKey kfqy_gly）误显 admin 工作台\n- 已有门户条目强调 bizSectionCodes 只管是否 B 端企业首页、不参与 broker/developer 皮肤，但不能在 terminalType 未就绪时跳过 B 端推断\n\n## 修复方案\n- terminalUser.js + store/modules/user.js：GetInfo 落库前调用 inferTerminalType(user, roles)，按 roleKey 前缀（如 kfqy_）判 B 端，写入 store 的 terminalType（示例 B）\n- homeLayout.js：resolveHomeLayoutVariant 确认 B 端后，结合 listPerms / 板块权限（如仅 portal:bizSection:commodityHouseTrade）落到 developer 而非 admin\n- portalLayout.js、homeDataMixin.js 同步涉及\n\n## 验证与归属\n- 验收：构造 terminalType=null + kfqy_gly + 商品房板块权限，刷新首页应出现 developer 布局与统计条；与「仅超管显示侧栏」「layoutVariant 调试 return」类问题分开排查\n- 验证证据：会话 a3593973，dev 企业登录 terminalType null、listPerms 含 portal:bizSection:commodityHouseTrade、roleKey kfqy_gly 应显示 developer 非 admin；结论 GetInfo 用 inferTerminalType、kfqy_gly 匹配 B 端前缀、resolveHomeLayoutVariant 仅商品房板块 → developer，CRITICAL 0 PASS\n- 涉及文件：zhi2-web-admin/src/utils/terminalUser.js、zhi2-web-admin/src/views/home/config/homeLayout.js、zhi2-web-admin/src/store/modules/user.js、zhi2-web-admin/src/utils/portalLayout.js、zhi2-web-admin/src/views/home/mixins/homeDataMixin.js\n- 所属项目：门户；来源会话：a3593973-ff8d-4958-89a1-8e4f3753ae90；代码基线：ac6513b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_api_verswitch.md",
+                "memory_type": "entities",
+                "after": "# 门户 API 大版本切换三处同改再 npm run test\n门户 monorepo 切换 API 网关版本号需父仓 env 与 nginx 及子模块 vite 代理三处同改，再打包验证，避免 dev 通而 test/生产打旧网关。\n\n## 操作要点\n- 父仓 env/.env（VITE_APP_BASE_API、VITE_APP_PORTAL_BASE_API）与 deploy/nginx.conf 的 location 前缀，和子模块 zhi2-web-admin/vite.config.js 开发代理默认值必须同一版本串（如 /v3.0）\n- 只改子模块或只改父仓会导致 dev 通、test 包或生产 nginx 仍打旧网关\n\n## 执行顺序\n- 全仓 grep 旧前缀（如 /v2.0）确认无残留\n- 同步改上述三处（用户口述 /v.3.0 多为笔误，以项目既有 /v2.0 形态改为 /v3.0）\n- 父仓执行 npm run test 打包\n- dist/ 产物 grep 新前缀并确认无旧串\n\n## 验证与归属\n- 与「portalApiRewrite / sign.js 漏改」条目互补：本次是网关版本号整包升级，不单是某个 listTree 路径\n- 验证证据：会话 6d410c7e，接口 /v2.0 改 /v3.0 并用 test 打包；已改 env/.env、deploy/nginx.conf、vite.config.js，npm run test 成功，产物含 /v3.0 无残留 /v2.0\n- 涉及文件：env/.env、env/.env.test、env/.env.production、deploy/nginx.conf、zhi2-web-admin/vite.config.js、package.json\n- 所属项目：门户；来源会话：6d410c7e-78d3-4e44-82cf-dbbc3851e99f；代码基线：db160a9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_breadcrumb_align.md",
+                "memory_type": "entities",
+                "after": "# 门户 PortalBreadcrumb 行内左排对齐\n对外门户经纪人等详情页面包屑整体靠左，当前级文字与 › 分隔符同一水平中线，不可整行居中。\n\n## 样式规则\n- 容器 display: flex; align-items: center，不要用 justify-content: center 拉整行居中\n- 面包屑按钮用 inline-flex、固定 height 与 line-height 一致（示例 26px），避免文字相对箭头偏上/偏下\n- 分隔符左右间距按稿面单独设（示例 28px / 20px），与共享 PortalBreadcrumb 组件并存时保留 .broker-breadcrumb 等 E2E 类名\n\n## 关联与验证\n- 与「仅层级页展示 PortalBreadcrumb」条目配合：先决定是否展示，再调行内对齐\n- 验证证据：会话 cd7c3e24，用户澄清整体放左侧、文字与中间右箭头对齐；去掉 justify-content:center，align-items:center，按钮 inline-flex height 26px，箭头间距 28px/20px\n- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue、zhi2-web-admin/src/views/home/publicPortal/portal.scss、zhi2-web-admin/src/views/home/publicPortal/components/PortalBreadcrumb.vue\n- 所属项目：门户；来源会话：cd7c3e24-462c-463d-8739-3c5df8d5e314；代码基线：2785dd9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/portal_notice_twoline.md",
+                "memory_type": "entities",
+                "after": "# 门户首页公示公告两行版式\nindex-new 右侧公示公告列表项采用两行结构：第一行圆点+标题，第二行左侧分类标签、右侧日期+箭头，勿用 flex-wrap。\n\n## 结构规则\n- DOM：notice-text 内标题 + notice-footer（标签与 notice-meta 同行左右分布）\n- 圆点用实心色块（如 #2D4B81）而非字符 ·\n- 标签灰底 #f2f4f7、字色 #8a96a8；项间分隔用虚线 dashed\n- 标题 font-weight:500 并加 :title 悬停全文；v-for 用 announcementId 作 key\n\n## 验证与归属\n- 验证证据：会话 3189eeb5，用户反馈通知公告与设计稿不一致；结论 flex-wrap 导致标签跟标题同行，已改为 notice-text/notice-footer 两行结构、实心圆点、虚线分隔与标签色值，并改用 announcementId 作 key\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue\n- 所属项目：门户；来源会话：3189eeb5-f453-4f06-a88b-e017c31ce460；代码基线：04586c4"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_030",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:28:11.658732+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/auth_lock_field.md",
+                "memory_type": "entities",
+                "after": "# 授权绑定类详情页编辑态锁死被授权方主数据字段\n行业管理→用户及授权→企业授权等「把某主体授权给某对象」的详情/编辑页，编辑态须禁用被授权方选择器，新增态才允许选择。\n\n## 问题背景\n- 新增与编辑共用同一份 detail 页，企业选择器只在新增时需要；编辑态允许改等于允许把授权记录悄悄改成指向另一家企业，主数据与已发生授权关系脱节。\n- 用户反馈编辑时「企业名称」还能点开选择框改，与同屏统一社会信用代码、办公地址等只读字段口径不一致。\n\n## 解决方案\n- 编辑态把企业名称控件置为 disabled，与统一社会信用代码、办公地址等只读字段保持一致的视觉与交互口径。\n- 判断依据用页面 formMode/isView 单一谓词（新增可编辑、编辑只读），不要按路由 id 是否存在散落判断。\n- 新增态保持可正常选择企业，不套用同一个禁用开关。\n\n## 验证与归属\n- 验证：会话 e96ee884 用户提出编辑时企业名称应禁止编辑；修改 companyRecordAuth/detail.vue 编辑模式禁用企业名称，新增模式仍可选择。\n- 涉及文件：zhi2-web-admin/src/views/company/userManagement/companyRecordAuth/detail.vue\n- 所属项目：苏住房G；来源会话ID：e96ee884-e80d-4f80-a9e4-966848f80eb3；代码基线：26069c8\n\n## 差异提示\n- 与已知条区别：已知有「查看态不要用整表 disabled 冒充只读」「字段按 organType 隐藏要四处同步」，但无「授权/绑定关系的被授权方在编辑态必须禁改、新增态才可选」这条业务约定。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/stat_field_fallback.md",
+                "memory_type": "entities",
+                "after": "# 统计接口覆盖详情字段致金额清0的三段回退链\n详情页先合并详情接口金额，再调统计接口时若直接用 ?? 明细汇总会覆盖成 0，须按「统计接口值→表单已有值→明细汇总→0」回退。\n\n## 问题背景\n- 场景：property/feeDeclare2/detail.vue 详情接口返回 totalReceivableAmount=5520/totalActualReceivedAmount=5328/totalArrearsAmount=192 并合并进 form，随后调 queryOweFeeStatistic 取统计数据。\n- 错误赋值：this.form.totalXxxAmount = Number(data.totalXxxAmount ?? 明细汇总).toFixed(2)；统计接口未返回时 ?? 落下 oweFeeTypeDetail 汇总值(常为0)，把正确金额覆盖成 ¥0.00，无报错。\n\n## 解决方案\n- 补齐三段回退链：Number(data.totalXxxAmount ?? this.form.totalXxxAmount ?? receivableSum ?? 0).toFixed(2)。\n- 注意 ?? 只兜 null/undefined，0 是有效值；「表单已有值」必须放在派生汇总之前，否则 0 吃掉真实值。\n- 字段映射：累计应收=totalReceivableAmount、累计实收=totalActualReceivedAmount、累计欠缴=totalArrearsAmount。\n\n## 验证与归属\n- 验证：会话 d2629f80 三张卡片显示 ¥0.00 而详情接口已返回 5520/5328/192；补 data.x ?? this.form.x ?? 汇总 ?? 0 后恢复。\n- 涉及文件：zhi2-web-admin/src/views/property/feeDeclare2/detail.vue\n- 所属项目：苏住房G；来源会话ID：d2629f80-2e2a-4b5f-927b-4c00906ffa4d；代码基线：e590ffa\n\n## 差异提示\n- 与已知 #1078（接口已返回的展示文案字段不能被前端派生函数覆盖）区别：本条是新增数据源合并时的可空字段回退顺序，改法在赋值表达式排优先级而非去掉派生函数。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/detail_req_params.md",
+                "memory_type": "entities",
+                "after": "# getDetailRequiredParams 按页收窄必需参数\n企业端公司信息页复用详情组件但不需要路由 id，因公共 mixin 强校验 id 致请求被跳全页空白，须重写该方法只返本页入参。\n\n## 问题背景\n- 场景：企业端「企业管理→企业信息」(#/toB/companyInfo) 整页字段显示 -、无「变更」按钮。\n- 根因：该页复用 toB/companyRecord/detail.vue，取数走 getOwnCompany（不需路由 id）；某次给 mixins/form.js 的 getDetail 加 validateDetailRequiredParams() 默认把 primaryKey(id) 纳入，缺 id 就 console.warn 并 return，getDetail 未发。\n- 连带：form 初始空值→全字段 -，且「变更」按钮依赖 form.bizState==2 也消失。\n\n## 解决方案\n- 在该页重写 getDetailRequiredParams()，只返回本页真正会用的入参（如 { moduleName, businessName }），让不需要 id 的详情接口照常请求。\n- 排查特征：控制台有 `[getDetail] 缺少接口必需参数，已跳过请求：id`，全页 -、无报错、network 查不到详情请求。\n\n## 验证与归属\n- 验证：会话 6b03f817 companyInfo 全字段空白，定位 commit 01a0aa7cf 新增 validateDetailRequiredParams 要求 id；在 companyRecord/detail.vue 重写 getDetailRequiredParams 去掉 id 后恢复。\n- 涉及文件：zhi2-web-admin/src/mixins/form.js；zhi2-web-admin/src/views/toB/companyRecord/detail.vue\n- 所属项目：苏住房G；来源会话ID：6b03f817-799f-459f-9742-e7b1d4894401；代码基线：5ccda28\n\n## 差异提示\n- 与 #912（强塞 primaryKey 导致被跳过）和 #1008（重写 init() 导致不调接口）区别：本条给「按页重写 getDetailRequiredParams 收窄必需参数」具体解法（改页面不改 mixin 默认）并补「按钮同时消失」连带现象。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/export_json_body.md",
+                "memory_type": "entities",
+                "after": "# 复制页导出按钮须对齐正常页 JSON 请求体\n同源复制的物业管理区域导出页把入参按 query 串发送，而同一后端接口实际按 JSON body 取值，须以正常页格式为准收敛到 API 层。\n\n## 问题背景\n- 场景：物业管理区域(property/complex) 导出按钮报入参格式不对，而公共查询(publicQuery/complex) 导出正常，两者同一后端接口。\n- 根因：复制页把导出入参按 query/表单串发送，该导出接口实际按 JSON 请求体取值（正常页即如此），后端读不到参数判格式错误。\n\n## 解决方案\n- 遇到「同一接口一处正常一处不正常」先做请求对比（network/控制台看 payload 结构），以正常页面的 formats 为准。\n- 改造时把请求体格式收敛到 API 层/公共封装一处，页面只传业务参数，避免同一接口两张页面两种请求形态。\n\n## 验证与归属\n- 验证：会话 061bf7eb 用户反馈导出入参格式不对，公共查询正常；提交 c90a9f521 fix(complex): 物业管理区域导出改用 JSON 请求格式。\n- 涉及文件：zhi2-web-admin/src/views/property/complex/index.vue；zhi2-web-admin/src/api/index.js；zhi2-web-admin/src/mixins/table.js；zhi2-web-admin/src/mixins/listMixins.js\n- 所属项目：苏住房G；来源会话ID：061bf7eb-b67b-4c62-8a6a-f376866b9887；代码基线：415629d\n\n## 差异提示\n- 与 #169/#320/#493（删除接口裸数组/{ids}）及 #745（/list→/page 迁移）无关；本条说「导出接口请求体编码形态(JSON body)」需在复制页面对齐，并给请求对比排查法。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

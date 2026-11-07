@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-门户-1793758965904/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T02:56:27.496951+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/property_dialog_nowrap.md",
+                "memory_type": "entities",
+                "after": "# 许可弹窗半栏长文案桌面 nowrap 溢出\n门户 PropertyDetailDialog 许可双栏半栏约 270px 宽时，房屋坐落、售房单位等字段若 white-space:nowrap 且无 text-overflow/换行，桌面端易裁切或撑出横向滚动（仅 max-width:650px 才 normal）。\n\n## 问题根因\n- 许可双栏半栏宽度约 270px，房屋坐落、售房单位等字段设 white-space:nowrap\n- 缺少 text-overflow 与换行兜底，桌面端长文案会被裁切或撑出横向滚动条\n- 仅容器 max-width:650px 以上才恢复 normal 换行，半栏场景仍易溢出\n\n## 修复方向\n- 半栏字段评估使用 text-overflow:ellipsis 省略号或 word-break 换行\n- 或改为全宽行展示长文案字段\n- 单位文案需与设计稿统一（㎡ vs 平方米）一并核对\n\n## 验证与归属\n- 验证证据：会话 5983c99f [MEDIUM] 长文案 + nowrap 溢出；[LOW] 单位文案不一致\n- 涉及文件：zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue\n- 所属项目：门户；来源会话ID：5983c99f-13e3-4b40-9938-495cc42f24ff；代码基线：门户 zhi2-web-admin @ e1f8e0b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/card_body_padding.md",
+                "memory_type": "entities",
+                "after": "# 门户首页 card-body 上 padding 被更具体选择器覆盖\n门户 index-new.vue 只改基础 .card-body 的 padding 常不生效，业务中心、常用功能、待办/公告等子区块用更具体选择器与 !important 把 padding 设回。\n\n## 问题根因\n- 基础 .card-body padding 改动被后续更具体规则覆盖\n- 业务中心 .business-center .card-body 写 padding: 16px 20px\n- 常用功能 .func-grid 带 padding: 20px !important\n- 待办/公告 .todo-body、.notice-body 用 !important 单独设上内边距\n\n## 修复方向\n- 去掉「上 padding」需在子选择器里将 padding-top 改为 0，左右与下保持不变\n- 业务中心内容垂直居中悬空多为 .business-center .card-body 的 justify-content:center，贴顶需改 flex-start\n- 排查 592–602 行基础样式后定位到子选择器与 !important 设回\n\n## 验证与归属\n- 验证证据：用户改 592–602 行基础样式后反馈仍有多余上 padding，改子选择器 top 为 0 后生效\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue\n- 所属项目：门户；来源会话ID：53c81de5-13e7-48d9-a133-ec5ba59583c5；代码基线：04586c4"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/flow_grid_steps.md",
+                "memory_type": "entities",
+                "after": "# 业务中心 flow-grid 空 steps 导致标签错行\n门户首页 index-new.vue 业务流区 .flow-grid 为 grid-template-columns: 176px 1fr，空 steps 板块会让下一板块 label 挤入同行第二列造成错行。\n\n## 问题根因\n- .flow-grid 用 grid-template-columns: 176px 1fr 两列布局\n- 模板先渲染 flow-label，flow-steps 用 v-if=\"flow.steps.length\"\n- 板块显隐由 portal:bizSection:{functionCode} 权限过滤，不保证 children 非空\n- 已授权但 steps 为空的板块仅 1 个 grid 单元，下一板块 label 挤到第二列后错行\n\n## 修复方向\n- 数据层过滤 flow.steps.length > 0 再渲染\n- 或用 display:contents 的 .flow-row 包住 label+steps\n- 或无 steps 时连 label 一并 v-if 隐藏/渲染占位 grid-column: span 2\n\n## 验证与归属\n- 验证证据：Vue 审查 16–22 行 v-for 与 v-if 组合 + 325–326 行仅按权限 filter 未保证 steps\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue\n- 所属项目：门户；来源会话ID：f116a45f-2a58-4f45-b579-f37aae7508dd；代码基线：04586c4"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/flow_step_arrow.md",
+                "memory_type": "entities",
+                "after": "# 业务流步骤箭头绝对定位层叠遮挡\n门户 index-new.vue 业务流步骤区固定列宽与 .flow-arrow 绝对定位组合，存在 display:none 调试残留与伸入邻列被后绘步骤盖住的问题。\n\n## 问题根因\n- --flow-step-col 固定列宽，.flow-arrow 在 .flow-step-group 内 position:absolute; right:0; transform:translateX(50%)\n- 样式末尾保留 display:none（调试残留）时模板仍渲染箭头但界面全无箭头\n- 去掉 display:none 后箭头伸入右侧下一列，后绘制的 .flow-step 可能盖住箭头\n- .flow-step-label 为 nowrap+ellipsis 时长文案在列宽内截断\n\n## 修复方向\n- 提高箭头 z-index 或改为 flex 间隙布局避免遮挡\n- 固定列宽长文案截断需与设计确认或加大 --flow-step-col\n- 清理 display:none 调试残留\n\n## 验证与归属\n- 验证证据：CSS 审查 index-new.vue 约 715 行 .flow-arrow { display: none } 及绝对定位伸入邻列的层叠问题\n- 涉及文件：zhi2-web-admin/src/views/home/index-new.vue\n- 所属项目：门户；来源会话ID：a638af97-69cb-4e16-b733-2ad9b2290077；代码基线：04586c4"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

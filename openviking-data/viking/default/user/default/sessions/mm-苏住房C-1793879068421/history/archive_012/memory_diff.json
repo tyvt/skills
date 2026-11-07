@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_012",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T12:17:49.756540+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/cardcell_isolation_fix.md",
+                "memory_type": "entities",
+                "after": "# 决策详情页CardCell样式隔离致空白修复\n苏住房C 决策详情页 `pages_vote/decision/detail` 因小程序分包 + 组件样式隔离导致标签不渲染，已修复。\n\n## 问题根因\n- 不是数据结构问题，而是小程序分包 + 组件样式隔离\n- `CardCell` 在 `pages_vote` 分包里样式被隔离，标签（编号、业务类型、决策主题…）渲染不出来，页面只剩值，像裸文字加大段空白\n\n## 修复要点\n- 去掉 `CardCell` 组件，在页面内直接写与生产版相同的 DOM 结构\n- 样式写在当前页（`styleIsolation: shared`），确保标签、分割线、左右对齐都生效\n- 合并为一张卡片：渐变头部 + 字段区在同一张白卡内，与生产版一致\n- 保留底部按钮区的留白和全宽按钮样式\n\n## 涉及文件\n- src/pages.json\n- src/pages_vote/decision/detail.vue\n- src/pages_vote/decision/components/DetailTopCard.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：f7c75f86-93d3-413f-b2a8-5162c9c21849；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_picker_fix.md",
+                "memory_type": "entities",
+                "after": "# ZsPicker宽度不足全局修复\n苏住房C 表单 picker 因 `ZsPicker` 组件 `width: 97%` 导致右侧留白，已全局修复。\n\n## 问题根因\n- `ZsPicker` 组件里写了 `width: 97%`，导致表单里的 picker 右侧留白\n\n## 修复要点\n- `ZsPicker.vue`：`width: 97%` → `width: 100%`；使用 `justify-content: space-between`，文字区 `flex: 1`，箭头 `flex-shrink: 0` 贴右；长文本增加省略号避免挤压布局\n- `form2.scss`（所有引用表单的页面）：`:deep(.zs-picker)`、`:deep(.zs-daterange-picker)` 统一 `width: 100%`\n- `uni.scss`（全局）：`.zs-picker`、`.zs-daterange-picker` 统一 `width: 100%`\n- 个别页面需要窄 picker（如物业页 `fit-content`），页面内 `:deep` 覆盖仍生效\n\n## 涉及文件\n- src/components/ZsPicker/ZsPicker.vue\n- src/styles/form2.scss\n- src/uni.scss\n- src/pages_owner/authentication/components/FamilyAdd.vue\n- src/App.vue\n- src/styles/index.css\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：f0787ce5-27a4-4cf2-8c49-60dade6711ac；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/rich_text_fix.md",
+                "memory_type": "entities",
+                "after": "# 富文本字段接口渲染失败统一修复\n苏住房C 大量返回富文本字段的接口无法渲染，已通过 `formatRichTextContent` 增强与 `ZsRichText` 组件统一修复。\n\n## 问题根因\n- 图片相对路径无法加载：接口返回的富文本里图片多为 `/zs-fym/...` 相对路径，`rich-text` 组件（尤其小程序）无法直接加载，页面显示空白\n- 接口返回格式不统一：部分配置类接口（如 `getConfigKey`）返回 `{ configValue: \"...\" }` 对象而非 HTML 字符串，直接传给 `rich-text` 无法渲染\n\n## 修复要点\n- 增强 `formatRichTextContent`（`utils/index.js`）：自动从 `configValue`、`content`、`msgContent` 等字段提取内容；解码 HTML 实体（`&lt;p&gt;` → `<p>`）；将图片和 `background-url` 中的相对路径转为完整 URL\n- 新增 `ZsRichText` 组件：封装 `rich-text`，渲染前自动调用 `formatRichTextContent`，避免各页面重复处理\n- 统一替换：公告、新闻、政策、协议、问卷、公示等约 20 处 `rich-text` 改为 `ZsRichText`\n- 修复配置接口页面\n\n## 涉及文件\n- src/utils/index.js\n- src/api/gateway.js\n- src/pages_owner/decision/detail.vue\n- src/pages/news/components/ListDetail.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：0bc1d7be-3e28-4c25-90a8-6816570ec803；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/decision_cardcell_blank.md",
+                "memory_type": "entities",
+                "before": "# 决策记录无数据时CardCell占位致空白过大\n苏住房C 决策记录页 `CardCell` 无数据时仍渲染占位致空白过大，已在 cursor 会话 3769efc4 修复。\n\n## 问题根因\n- `CardCell` 无数据时始终渲染占高及 `ZsImage` 高度，撑开过大空白\n- 原有布局未做条件渲染与紧凑处理\n\n## 修复要点\n- 改用 `v-if` 条件渲染，采用紧凑 `cell-item` 布局\n- 固定 `sign-picture-wrap` 尺寸为 `153×68px`，下边距缩减至 `8px`\n\n## 涉及文件\n- src/pages_vote/decision/common/DecisionResult.vue\n- src/pages_vote/decision/styles/page.scss\n- src/components/CardCell/CardCell.vue\n- src/components/CardCell/CellFulline.vue\n- src/components/ZsImage/ZsImage.vue\n- src/pages_vote/decision/common/DecisionRecord.vue\n- src/pages_vote/decision/optional/DecisionResult.vue\n- src/pages_vote/decision/sort/DecisionResult.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor session=3769efc4-10f9-4155-b4dd-4bcdbacd77a7\n- 所属项目：苏住房C（zhi2-mobile-shimin）；代码基线：none",
+                "after": "# 决策记录CardCell致空白问题修复\n苏住房C 决策记录页因 `CardCell` 导致空白问题，已在多个 cursor 会话修复。\n\n## 问题根因\n- `CardCell` 无数据时始终渲染占高及 `ZsImage` 高度，撑开过大空白（会话 3769efc4）\n- 改成 `CardCell` 后在微信小程序里整块「决策信息」不渲染，出现完全空白（会话 e7007608）\n- 原有布局未做条件渲染与紧凑处理\n\n## 修复要点\n- 改用 `v-if` 条件渲染，采用紧凑 `cell-item` 布局（会话 3769efc4）\n- 固定 `sign-picture-wrap` 尺寸为 `153×68px`，下边距缩减至 `8px`\n- 恢复 `cell-item` 布局，决策人、决策时间等文字字段正常显示（会话 e7007608）\n- 签字图用固定尺寸 `sign-picture-wrap`（153×68）包裹 `ZsImage`，通过 `:deep(img)` 覆盖组件内部 `width: 100%`，避免图片高度塌成 0（会话 e7007608）\n\n## 涉及文件\n- src/pages_vote/decision/common/DecisionRecord.vue\n- src/pages_vote/decision/common/ResultRecord.vue\n- src/pages_vote/decision/styles/page.scss\n- src/components/CardCell/CardCell.vue\n- src/components/CardCell/CellFulline.vue\n- src/components/ZsImage/ZsImage.vue\n- src/pages_vote/decision/optional/DecisionResult.vue\n- src/pages_vote/decision/sort/DecisionResult.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor session=3769efc4-10f9-4155-b4dd-4bcdbacd77a7、e7007608-941f-47f8-a082-3768ad6aa6e3\n- 所属项目：苏住房C（zhi2-mobile-shimin）；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

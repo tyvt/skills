@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-bugfix-1793803399337/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T14:54:32.918759+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/table_template_fragment.md",
+                "memory_type": "entities",
+                "after": "# zs-button 模板外残留片段致 button 未定义报错\nbookDetailTable.vue 与 businessItemTable.vue 因模板中被多复制一段 `{{ button.label }}` 等片段，在 v-for 作用域外访问 button 导致报错。\n\n## 问题根因\n- bookDetailTable.vue 约 205 行（编译后）报错 `Cannot read properties of undefined (reading 'label')`，因 v-for 外多了 `v-on=\"button.listeners\">`、`{{ button.label }}`、`</zs-button>` 残缺片段\n- businessItemTable.vue 出现 `[Vue warn]: Property or method \"button\" is not defined`，同样因第 9–11 行重复模板片段在循环外访问 button\n- 这些片段不在 v-for 作用域，模板无名为 button 的 data，button 为 undefined；Vue 也会将其视为组件实例属性\n\n## 解决方案\n- 删除各组件第 9–11 行那段重复、无效的 HTML，仅保留 operationButtons 里正确的 v-for 按钮循环\n- operationButtons 由 subTableMixins → table mixin 计算属性提供，无需在组件内声明 button\n- bookDetailTable.vue 顺带修正删除按钮配置：`visible: this.editButton` 改为与基类 table.js 里 deleteButton 一致的正确语义\n\n## 验证与归属\n- bookDetailTable.vue 验证证据：src=bugfix；会话：531f1b9a-0bdd-40d5-b647-610d1853af02；涉及文件：bookDetailTable.vue、table.js\n- businessItemTable.vue 验证证据：src=bugfix；会话：2b55625d-ad3f-426b-89da-994604e35af02；涉及文件：businessItemTable.vue\n- 所属项目：bugfix；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zscolumn_null_guard.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column.vue 表头渲染未防护 row.column 致 label 报错\n公共组件 zs-table-column.vue 在 getHeader/computedWidth 中直接读取 row.column.label，在部分渲染时机 row.column 为 undefined 时抛错。\n\n## 问题根因\n- businessItemTable.vue 堆栈报 `Cannot read properties of undefined (reading 'label')`，真正出错在公共组件 zs-table-column.vue 表头渲染逻辑\n- getHeader / computedWidth 中直接用了 `row.column.label`，在部分渲染时机或 Element 表头 slot 的 scope 下 `row.column` 可能暂时为 undefined\n\n## 解决方案\n- getHeader 改为 `row?.column?.label ?? ''`，避免 column 缺失时抛错\n- computedWidth 先取 `const label = row?.column?.label`，无 label 则直接 return，再按原逻辑算 minWidth/width\n- 该防护对所有使用 zs-table-column 的列表生效，不仅限于 businessItemTable.vue\n\n## 验证与归属\n- 验证证据：src=bugfix；会话：4bab2422-f3d5-47d6-ac5c-bc239d948ba1；涉及文件：businessItemTable.vue、zs-table-column.vue、vue.js\n- 所属项目：bugfix；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

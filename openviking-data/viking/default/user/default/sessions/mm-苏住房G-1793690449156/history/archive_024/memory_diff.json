@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_024",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:17:35.209104+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/advanced_query_operator.md",
+                "memory_type": "entities",
+                "after": "# 高级查询操作符字典化\n苏住房G 公共查询 zs-advanced-query 条件组的操作符须统一走 operator_type 字典取值，禁止页面本地定义。\n\n## 背景与动机\n- 用户明确要求「操作符字典 operator_type，只从字典取值，不要本地定义」\n- 原页面本地定义 TEXT_OPERATORS / SELECT_OPERATORS / NUMBER_DATE_OPERATORS，与字典脱节\n\n## 解决方案\n- 筛选字段读 complex_field 字典，操作符读 operator_type 字典，删掉本地操作符常量，展示文案统一走字典 label\n- zs-advanced-query 新增 operatorOptions 属性由页面传入，组件保持纯展示不自己拉字典\n- 字段级可用操作符优先取 complex_field 的 remark 第 4 段，格式如 select:propertyType::EQ,LIKE\n- 未配置时下拉类字段默认只有「等于」\n- 对「一字段存多个类型组合值」的字段需允许 LIKE，并保留代码侧 EQ+LIKE 兜底，否则查不出组合值\n\n## 验证与归属\n- 落地前须确认后端 operator_type 字典已配置 EQ 与 LIKE，否则下拉空、查询失败无提示\n- 验证证据：会话 7352b93f 用户明确操作符只从字典取值；改动 complexFieldConfig.js 与 zs-advanced-query.vue\n- 涉及文件：zhi2-web-admin/src/views/publicQuery/complex/index.vue、zhi2-web-admin/src/components/zs-advanced-query/complexFieldConfig.js\n- 所属项目：苏住房G；来源会话ID：7352b93f-fe22-4f83-926d-29ade7bd05f8；代码基线：e590ffa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tree_flat_pagination.md",
+                "memory_type": "entities",
+                "after": "# 部门树平铺态分页消失修复\n苏住房G 部门树 RegionTreeLayout 从树形切到「平铺展示」后列表底部翻页组件被裁掉，需三层联动修复。\n\n## 问题根因\n- 平铺态搜索区字段更多、整体高度超出视口，.list-card 用 flex: 0 0 auto 不参与收缩\n- 父级 .type-right 是 overflow: hidden，超出部分（分页）被静默裁掉，属高度链断裂而非分页组件本身问题\n\n## 解决方案\n- RegionTreeLayout.vue 新增 type-right-body 中间容器，搜索区 0 0 auto、列表区 flex:1 + min-height:0 正确分配高度\n- index.scss 让部门树列表页 list-card 占满剩余高度、表格区滚动、分页固定底部\n- 相关页面（complex / complexChange / housePart）的 zs-table 加 fill-height 让表格高度随容器自适应\n- 只改其中一层仍会复发；同构列表页是复制关系时要一并核对\n\n## 验证与归属\n- 验证证据：会话 2f89b7ab 用户反馈平铺展示时列表下缺少翻页；结论为 type-right 的 overflow:hidden 裁掉分页\n- 涉及文件：property/complex/components/RegionTreeLayout.vue、property/complex/index.vue、property/complexChange/index.vue、benefit/housePart/index.vue\n- 所属项目：苏住房G；来源会话ID：2f89b7ab-13d9-4f37-a91e-45c7f05466ed；代码基线：26069c8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/navbar_title_scroll.md",
+                "memory_type": "entities",
+                "after": "# 导航栏系统标题溢出滚动\n苏住房G Navbar 系统标题固定宽展示不全时，需用隐藏探针测宽 + 位移滚动实现完整露出。\n\n## 背景与动机\n- 需求：Navbar 系统标题溢出时来回滚动，用户连续三轮反馈「没彻底滚完」「再冗余一点」\n- 纯靠 CSS animation 位移百分比无法表达「按像素冗余」，必须 JS 测宽\n\n## 解决方案\n- 用隐藏探针节点测标题真实排版宽度；探针测量值与临时去掉 max-width 后的 scrollWidth 取较大值，并补 lineHeight / fontStyle 避免字体度量偏差\n- 滚动距离 = 探针宽 − 视口宽 + TITLE_SCROLL_SLACK 冗余（4px 不够，32px 才稳，用户还嫌少时调到 40~48）\n- 只在内容确实溢出时才启用动画，避免短标题抖动\n- 滚动区间用定时器/requestAnimationFrame 推进位移并在两端停顿，卸载时清理\n\n## 验证与归属\n- 验收口径：末尾文字必须完整露出且有停顿感\n- 验证证据：会话 46385713 用户三轮要求滚动展示全；结论 TITLE_SCROLL_SLACK +32px 及探针测量方案\n- 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue\n- 所属项目：苏住房G；来源会话ID：46385713-ebb6-4dc5-a2cc-fa9ec3b98d10；代码基线：9e5c499"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_district_axis.md",
+                "memory_type": "entities",
+                "after": "# ECharts 横轴区县名清晰显示\n苏住房G 地图/面板类 ECharts 柱图横轴区县名被裁/重叠时，需 containLabel + 动态 grid 底部 + 按数量切倾斜。\n\n## 问题根因\n- grid.containLabel: false 且 bottom 写死 34，坐标轴标签不占布局空间导致被裁/重叠\n\n## 解决方案\n- grid.containLabel: true，底部留白随类目数调整：>6 个时 64、否则 52\n- 类目 >6 时 xAxis.axisLabel 设 rotate 35°、align:'right'、margin:12、fontSize:13，显式 interval: 0 保证全部区县都画\n- 不要用 hideOverlap，它会静默吞掉部分标签造成「少了一个区县」的误解\n- 图表容器加专用类补 padding-bottom（10px），否则倾斜标签贴 panel 内缘\n- 参数写在同目录 chartOptions.js 的 buildXxxOption 里，靠已有 handleResize → chart.resize() 覆盖缩放场景\n\n## 验证与归属\n- 验证证据：会话 725e800e 用户反馈监管账户数量横坐标区域显示不清；改动 chartOptions.js 的 buildDistrictManageOption 与 index.vue 容器 padding\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js、zhi2-web-admin/src/views/benefit/mapOverview/index.vue\n- 所属项目：苏住房G；来源会话ID：725e800e-590a-4121-bcda-f06988a87527；代码基线：db4f82c"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

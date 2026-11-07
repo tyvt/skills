@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793872912374/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T10:15:18.344010+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/price_building_fix.md",
+                "memory_type": "entities",
+                "after": "# 预售价格楼幢列表修复\n产品2.0 预售价格备案楼幢列表（`recordPriceMngSuzhou`）修复 API 路径与防御性处理问题。\n\n## 问题\n- `listRecordPriceBuild` 接口路径曾被错误修改，导致请求异常与 Vue 警告（vue.js:5108 [Vue warn]）\n- `getList` 中直接访问 `response.rows.length`，接口无 `rows` 字段时模板报错\n\n## 修复要点\n- API 路径改回 `POST /presale/priceBuilding/page`\n- `getList` 改为 `response.rows || []` 与 `response.total || 0`，避免无 `rows` 时访问 `.length` 报错\n- 刷新详情页后「楼幢」tab 请求 `POST /presale/priceBuilding/page`，参数含 `pageNum`、`pageSize`、`priceRecordId`\n\n## 涉及文件\n- zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/components/BuildingsTable.vue\n- zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/detail.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：产品2.0\n- 来源会话：08444023-c60e-41b0-9e6e-c49324a5d33b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/range_reset_fix.md",
+                "memory_type": "entities",
+                "after": "# 发布范围筛选重置修复\n产品2.0 消息发布范围筛选弹窗（`selectRangeDialog`）修复左侧行政区树搜索后无法重置的问题。\n\n## 问题\n- 上次用 `@reset` 事件联动父组件，Vue 2 中未稳定触发\n- 左侧树过滤后仅清空关键字不足以恢复节点展示\n\n## 修复要点\n- 采用 `provide/inject`：`selectRangeDialog` 注入 `resetRangeFilter`，`rangeTable` 在 `resetQuery` 直接调用，不依赖事件名\n- 重置顺序：先重置右侧 `queryParams`，再清空左侧行政区筛选（`parentId` 等），最后 `nextTick` 重新请求列表\n- 左侧树：`treeRenderKey` 变更强制重渲染；清空搜索框；`highlight-current` 取消高亮\n- `deptTree`：去掉无效的 `queryData` 监听（会调用不存在的 `getList`）\n\n## 涉及文件\n- zhi2-web-admin/src/views/system/message/components/selectRangeDialog.vue\n- zhi2-web-admin/src/views/system/message/components/rangeTable.vue\n- zhi2-web-admin/src/views/system/message/components/deptTree.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：产品2.0\n- 来源会话：e8e1b511-6b3a-4a1c-a292-a25e3a8b00fd"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/contract_link_fix.md",
+                "memory_type": "entities",
+                "after": "# 前期合同备案链接穿透修复\n产品2.0 物业区域查询详情页「暂无数据」中「合同备案」链接穿透修复，自动带入当前物业管理区域。\n\n## 问题\n- 从 `publicQuery/complex/detail.vue` 点击「暂无数据」里的「合同备案」时，`propertyContractTable.vue` 的 `goFiling` 只传 `formMode` 和 `ifHistory`，未带 `complexId`\n- 进入备案新增页后物业管理区域为空，用户需重新选择，而穿透过来本应自动带入\n\n## 修复要点\n- `propertyContractTable.vue`：跳转时若存在 `complexId`，一并写入路由 query\n- `propertyContract/components/detail.vue`：新增 `initComplexFromRoute`，`mounted` 读取 `query.complexId` 调用已有 `setProject` 自动回填区域信息（含关联中标备案数据）\n\n## 涉及文件\n- zhi2-web-admin/src/views/publicQuery/complex/detail.vue\n- zhi2-web-admin/src/views/publicQuery/complex/components/propertyContractTable.vue\n- zhi2-web-admin/src/views/property/propertyContract/components/detail.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：产品2.0\n- 来源会话：febaf279-d1c5-4fb2-b84c-ebeadd15f05e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/hamburger_fix.md",
+                "memory_type": "entities",
+                "after": "# Hamburger 图标不显示修复\n产品2.0 页签栏汉堡菜单图标（`Hamburger.vue`）因 SVG sprite 注册路径问题不显示，已修复为直接引用静态文件。\n\n## 问题\n- `Hamburger.vue` 通过 `SvgIcon` 引用 `menu-fold`，但 `vite-plugin-svg-icons` 只注册 `public/assets/images/svg/` 下的图标\n- `menu-fold.svg` 实际在 `public/assets/images/menu-fold.svg`，不在 sprite 目录，`<use xlink:href=\"#icon-menu-fold\">` 找不到符号\n- 历史上 commit `430056fd6` 曾改成 `<img>` 引用；页签 UI 改版（`24edf67dd`）又改回 `SvgIcon`，图标再次消失\n\n## 修复要点\n- 恢复直接引用静态 SVG：`<img :class=\"['hamburger', isActive ? 'active' : '']\" src=\"/assets/images/menu-fold.svg\" alt=\"\">`\n- 保留新的外层 `hamburger-svg` 容器与 hover 样式\n\n## 涉及文件\n- zhi2-web-admin/src/layout/components/TagsView/Hamburger.vue\n- zhi2-web-admin/src/components/SvgIcon/index.vue\n- zhi2-web-admin/src/layout/components/TagsView/index.vue\n- zhi2-web-admin/vite.config.js\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：产品2.0\n- 来源会话：b5854166-69ad-4373-b2ce-06fc224fa0a4"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/软件项目/产品2.0.md",
+                "memory_type": "entities",
+                "before": "# 产品2.0\n产品2.0是园区物业管理相关的Vue前端项目，代码位于`d:\\repository\\产品2.0\\zhi2-web-admin`，使用Vite+Vue。\n\n## 模块与功能\n- dataProperty：包含procedure详情、流程表格与弹窗组件\n- autonomy：企业注册真实接口（如regulation/record/detail.vue、home/privacy.js、api/system/config.js）\n- property/serviceItem、building/unit等列表页采用ListTemplate.js规范的list-card结构\n- property/bill 物业费账单（feeBills）管理：含主列表 components/index.vue 及 service/public/lift 等分类型入口，详见 fee_bills_search\n\n## 已知修复\n- scoped样式缺失`</style>`导致编译报错（见vue_missing_style）\n- 企业注册接口getByKey改为configKey并联调通过\n- 批量包裹list-card至137个index.vue\n- 开发企业CRUD管理端e2e测试通过\n- 外网注册 organType 统一改为 01（开发企业），见 register_organ_01\n- 企业注册审核按钮缺失修复（busCode 回退 040100），见 approval_btn_fix\n- 榆林分支 4 个页面 list-card 丢失修复，见 yulin_listcard_fix\n- 支付链路统一使用 createFromBill 返回的订单 ID，见 createfrombill_orderid_flow\n- 企业端 staffManagement detail.vue 对齐 toB 审批流，见 staff_detail_approval_flow\n- 流程配置 ConfigDialog 编辑保存改为 /flowable/flowConfig/update，见 流程配置编辑保存接口修复\n- statisticsMap 抽屉多 Tab 布局修复，见 统计地图抽屉布局修复\n\n## 验证与归属\n- 代码基线：none\n- 来源会话：91caa295-2c37-448d-8386-139abc7c3402, 0acfabb2-4547-45e3-9ab0-7ad98438a646, 2a132670-9deb-4220-9d16-a2853aa45068, 07aabe56-ae35-465d-8251-457e7bfcaa0c, bc67591b-a7e5-4c59-bfbf-ecc997f7c3f3, 784bbb09-19cb-4209-8311-17aa5fdd0e9f, 7ae7d4b9-281a-4316-bf51-824355179604, e57753a2-9e6d-4464-a761-3a7905b9034a",
+                "after": "# 产品2.0\n产品2.0是园区物业管理相关的Vue前端项目，代码位于`d:\\repository\\产品2.0\\zhi2-web-admin`，使用Vite+Vue。\n\n## 模块与功能\n- dataProperty：包含procedure详情、流程表格与弹窗组件\n- autonomy：企业注册真实接口（如regulation/record/detail.vue、home/privacy.js、api/system/config.js）\n- property/serviceItem、building/unit等列表页采用ListTemplate.js规范的list-card结构\n- property/bill 物业费账单（feeBills）管理：含主列表 components/index.vue 及 service/public/lift 等分类型入口，详见 fee_bills_search\n\n## 已知修复\n- scoped样式缺失`</style>`导致编译报错（见vue_missing_style）\n- 企业注册接口getByKey改为configKey并联调通过\n- 批量包裹list-card至137个index.vue\n- 开发企业CRUD管理端e2e测试通过\n- 外网注册 organType 统一改为 01（开发企业），见 register_organ_01\n- 企业注册审核按钮缺失修复（busCode 回退 040100），见 approval_btn_fix\n- 榆林分支 4 个页面 list-card 丢失修复，见 yulin_listcard_fix\n- 支付链路统一使用 createFromBill 返回的订单 ID，见 createfrombill_orderid_flow\n- 企业端 staffManagement detail.vue 对齐 toB 审批流，见 staff_detail_approval_flow\n- 流程配置 ConfigDialog 编辑保存改为 /flowable/flowConfig/update，见 流程配置编辑保存接口修复\n- statisticsMap 抽屉多 Tab 布局修复，见 统计地图抽屉布局修复\n- 预售价格楼幢列表 `listRecordPriceBuild` 改回 `POST /presale/priceBuilding/page` 并加防御性处理，见 price_building_fix\n- 发布范围筛选重置修复（provide/inject 替代 @reset 事件），见 range_reset_fix\n- 前期合同「暂无数据」合同备案链接穿透修复（携带 complexId），见 contract_link_fix\n- Hamburger 图标不显示修复（menu-fold.svg 不在 sprite 目录，改回直接引用），见 hamburger_fix\n\n## 验证与归属\n- 代码基线：none\n- 来源会话：91caa295-2c37-448d-8386-139abc7c3402, 0acfabb2-4547-45e3-9ab0-7ad98438a646, 2a132670-9deb-4220-9d16-a2853aa45068, 07aabe56-ae35-465d-8251-457e7bfcaa0c, bc67591b-a7e5-4c59-bfbf-ecc997f7c3f3, 784bbb09-19cb-4209-8311-17aa5fdd0e9f, 7ae7d4b9-281a-4316-bf51-824355179604, e57753a2-9e6d-4464-a761-3a7905b9034a"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

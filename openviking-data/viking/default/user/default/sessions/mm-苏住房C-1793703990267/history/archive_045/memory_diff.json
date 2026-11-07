@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_045",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:40:31.246570+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/default_image_fallback.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C默认图回退双重失效\n苏住房C苏找房Tab房源卡片图片无法访问时ZsImage兜底图也不出图，根因为默认图分包未加载与未预加载叠加。\n\n## 问题现象与根因\n- 苏找房（主包 pages/index/project）房源卡片图片访问失败显示空白，ZsImage 已配 fallback 却不出默认图\n- 默认图 images/szf/default.png 落在 pages_owner 分包，苏找房 Tab 在主包运行且 pages_owner 未加载，回退图路径不可达\n- 苏找房 Tab 未在 pages.json 预加载 pages_transaction，即便路径正确默认图也可能未下载完成\n- ZsImage 在 src 为 null/空串时未渲染默认图分支，图片直接空白\n\n## 解决方案\n- 将 default.png 从 PAGES_OWNER_SZF_FILES 移出，默认解析到 pages_transaction 分包\n- houseCard 显式指定 subpackage=\"pages_transaction\"，传入前过滤 null、空串等无效 URL\n- ZsImage 加双保险：空/无效 src 直接渲染默认图，加载失败走 @error 回退\n- pages.json 给苏找房 Tab 配 preloadRule 预加载 pages_tab + pages_transaction\n- pages_owner 内确需本地默认图的页面显式写 subpackage=\"pages_owner\"\n\n## 核心原则\n- 默认图必须与使用方同分包或主包，并确认该分包已预加载，否则「回退」是假的\n\n## 验证与归属\n- 验证：会话 2d0beecf「苏找房—部分图片不显示，没法访问的图片回退到默认图」\n- 涉及文件：src/utils/index.js、src/components/ZsImage/ZsImage.vue、src/components/commonNew/houseCard.vue、src/pages_tab/components/Project_Suzhufang.vue、src/pages.json\n- 所属项目：苏住房C；来源会话ID：2d0beecf-aa60-4c38-a236-78238bca1303；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/branch_path_mapping.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C同源项目分支路径适配\n苏住房C 的 zhi2-mobile-shimin 与泰兴小程序、苏州房地产监测V3 同源复制，但 main-v2.1 与 -mp 两分支已分叉出不同路径体系，迁移须按对照表改。\n\n## 问题现象与根因\n- 同源项目内 main-v2.1 与 -mp 两分支在不同时间点从母版剪出，组件目录与分包前缀各自演进\n- 直接照搬另一分支的 import 路径或路由常量会 import 失败 / 跳转 404，且往往不报编译错、运行时静默白屏\n- 典型差异：ZsPaging 在 main-v2.1 是 @/components/ZsPaging，在 mp 是 @/pages_owner/components/ZsPaging\n- 公告详情路由 /pages/announcement/detail vs /pages_main/announcement/detail；业主卡 pages_owner/ownerCard vs pages_owner_extra/ownerCard\n\n## 解决方案\n- 迁移前建「模块→main-v2.1路径/mp分支路径」对照表（组件、页面路由、目录前缀三类各一行），按表逐项替换\n- 迁移完在目标分支全局搜旧路径确认无残留\n- 确认子模块与父仓库各自分支：子模块在 main-v2.1、父仓库在 -mp 时，mp 分支其它改动应 stash 而非混进本次提交\n\n## 验证与归属\n- 验证：会话 c6f5e6b8 社区/街道公告 z-paging 改造 + 业主卡报事报修「暂未开放」迁移到 main-v2.1\n- 涉及文件：src/hooks/useAnnouncementPaging.js、src/pages_owner/community/announcement/index.vue、src/pages_owner/subdistrict/announcement/index.vue、src/pages_owner/ownerCard/index.vue\n- 所属项目：苏住房C；来源会话ID：c6f5e6b8-04ec-4597-8607-ff8f6c062f99；代码基线：4d6dba9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/svg_500_error.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C小程序SVG加载500\n苏住房C 微信小程序 SVG 图标报 500 有两类根因：分包静态白名单指向未复制文件，以及原生 img 相对路径按组件目录解析。\n\n## 问题现象与根因\n- 报错 Failed to load local image resource ...svg，server responded with status 500\n- 根因一：走 ZsImage 的 location.svg 被 SUBPACKAGE_STATIC_IMAGES 白名单重写成 /pages_owner/static/icon/location.svg，但该文件只存在于主包 src/static/icon/，分包无副本 → 请求不存在路径 500\n- 根因二：走原生 img 的 file_szf_pdf.svg 写成 <img src=\"svg/file_szf_pdf.svg\">，小程序按组件目录解析为 /pages_owner/components/FileList/svg/...，真实文件在主包 /static/svg/ 下\n\n## 解决方案\n- 按白名单把缺的资源补进各分包 static（location.svg 复制到 pages_owner/static/icon/ 与 pages_credit/static/icon/）\n- 把 FileList 的 <img> 统一改为 <ZsImage> 交给 resolveStaticUrl 解析，pages_owner/pages_main/pages_vote 三个分包同改\n\n## 验证与归属\n- 复发自查：先查报错路径有无分包前缀（白名单与文件是否对得上），再看是否对 svg/xxx.svg 用了原生 img 没过 ZsImage\n- 验证：会话 be666288 报错 location.svg 与 file_szf_pdf.svg 均 500，定位白名单与文件不一致及原生 img 漏改\n- 涉及文件：src/components/ZsImage/ZsImage.vue、src/utils/index.js、scripts/migrate-main-empty-static.mjs、src/pages_owner/components/FileList/FileList.vue、Type2.vue、Type3.vue\n- 所属项目：苏住房C；来源会话ID：be666288-8d34-4fea-9f67-33d480306f30；代码基线：b7bf813"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/button_disabled_green.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C按钮禁用态变绿\n苏住房C 全站大量按钮 disabled 时背景变微信绿而非主题色，根因为 ZsButton 传 type=primary 且禁用色用了小程序不支持的 rgba(var(...))。\n\n## 问题现象与根因\n- 全站大量按钮 disabled 背景为微信绿 #07c160，不是主题色\n- 根因一：ZsButton 把 type=\"primary\" 传给原生 button，微信 primary 默认绿，样式没压住就露绿底\n- 根因二：禁用背景写 rgba(var(--primary-color-rgb),0.5)，小程序不支持该嵌套写法，声明被丢弃回退绿底\n- 根因三：.zs-button[disabled] 选择器权重过大，连默认/取消按钮也被刷主题色背景\n\n## 解决方案\n- 不再向原生 button 传 type/plain，改由 class（zs-button--primary/zs-button--plain/is-disabled）承担样式\n- 加 hover-class=\"none\" 去掉微信默认点击态；禁用色改用预计算纯色变量 --primary-color-disabled（禁运行时拼 rgba）\n- 配套：styles/index.css 定义变量、uni.scss 重置 disabled 默认透明度、zs-button.scss 补取消/重置灰底 #f0f0f0、App.vue 同步设置\n- 验收：主按钮禁用=半透明主题蓝、plain=半透明主题色边框文字、默认/取消=灰底\n\n## 验证与归属\n- 验证：会话 a82b1c4d「很多按钮禁用状态下的背景色是绿色，全局排查修复」\n- 涉及文件：src/components/ZsButton/ZsButton.vue、src/styles/zs-button.scss、src/styles/index.css、src/uni.scss、src/App.vue、src/pages_main/login/index.vue、src/pages_vote/decision/needToKnow.vue\n- 所属项目：苏住房C；来源会话ID：a82b1c4d-6931-4bc6-bd80-8e4198e22765；代码基线：4d6dba9"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

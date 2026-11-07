@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793896554202/history/archive_014",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T17:24:11.762475+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/property_bank_fix.md",
+                "memory_type": "entities",
+                "after": "# 物业账户开户银行弹窗 isPubRegulatoryAccount 修复（苏住房G）\n苏住房G 项目中物业账户详情页开户银行弹窗新增监管账户查询参数已修复。\n\n## 根因\n- `queryStartBank` 请求来自 `property/propertyAccount/detail.vue` 的 `showBankDialog()`，而非之前误改的 `property/account/detail.vue`（后者走 `/system/workBank/list`）\n\n## 修复内容\n- 在 `property/propertyAccount/detail.vue` 新增 computed `pubRegulatoryAccountQueryParams`：`add`/`openedAdd` 模式返回 `{ isPubRegulatoryAccount: '1' }`，`edit` 返回 `{}`\n- `showBankDialog()` 的 `treeParams` 与 `filterParams` 均 spread 该参数，并补上 `isStart: '1'`\n- `setBankBranches()` 网点相关逻辑同步调整\n\n## 验证与归属\n- 涉及文件：`property/propertyAccount/detail.vue`、`property/account/detail.vue`、`AccountDialog.vue`、`workBank.js`\n- 所属项目：苏住房G；来源会话：4cfcd91c-2679-4f6f-b33f-ee016bf89b9f；验证证据：extracted source=cursor project=苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/industry_query_refactor.md",
+                "memory_type": "entities",
+                "after": "# 行业管理六页查询与列表改造（苏住房G）\n苏住房G 行业管理相关页面完成查询与列表通用改造，新增公共工具并统一多页面筛选与列。\n\n## 新增公共工具\n- `companyListQuery.js`：更新时间区间表单项（最多 2 年，含 `disabledDate` 与查询前校验）、是否本地机构下拉（1/0）、列表 `updateTime` 列构建、人员类型白名单与字典标签解析\n- `dict.js`：新增 `getDictsIncludeDisabled()`，用于展示含停用项的人员类型名称\n\n## 页面改动\n- 物业服务企业：`enableAdvancedQuery=true`，新增筛选与列表列，去掉默认「已备案」\n- 企业变更记录：同上，查询顺序为关键字→行政区域→业务状态→更新时间→是否本地机构→机构类型→企业类型\n- 信托公司：仅去掉 `defaultBizState=\"2\"`，无新增筛选项\n- 机构注册审核：查询重排 + 新筛选项 + `updateTime` 列\n\n## 验证与归属\n- 涉及文件：`companyListQuery.js`、`dict.js`、`companyManagement/components/index.vue`、`companyRegister/index.vue`、`staffManagement/components/index.vue` 等\n- 所属项目：苏住房G；来源会话：c7bcdd50-859e-48be-b953-435a57e9aa54；验证证据：extracted source=cursor project=苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_route_fix.md",
+                "memory_type": "entities",
+                "after": "# 首页路由重复注册与旧版 UI 修复（苏住房G）\n苏住房G 点左侧菜单栏出现旧版首页的问题已修复，统一路由映射并避免动态路由重复注册。\n\n## 修复内容\n- `permission.js`：`home/index`、`home/index-v2` 统一映射为 `home/index-wrapper`（loadView 与动态路由解析均生效）；仅对可注册的 `rewriteRoutes` 执行 `stripDuplicateHomeRoutes`，避免动态路由再注册一套 `/index`；侧栏菜单数据不变仍显示「首页」\n- `index.vue`：改为只渲染 `index-wrapper`，即使菜单仍指向 `home/index` 也不会再出现旧版 UI\n- `index-v2.vue`：去掉 `toggleSideBar`；侧栏已展开时调用 `closeSideBar({ withoutAnimation: false })`，避免再次进入首页时侧栏被误打开\n- E2E：`home-v2-mocks.js` 同步更新\n\n## 验证与归属\n- 涉及文件：`permission.js`、`index.vue`、`index-v2.vue`、`home-v2-mocks.js`\n- 所属项目：苏住房G；来源会话：10a04453-cfe1-4e12-bc8d-4924c1089947；验证证据：extracted source=cursor project=苏住房G"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/industry_bizstate_filter.md",
+                "memory_type": "entities",
+                "after": "# 行业管理模块默认筛选「已备案」设置（苏住房G）\n苏住房G 行业管理多个功能模块已统一设置默认筛选「已备案」（`bizState = '2'`）。\n\n## 设置说明\n- 统一使用业务状态字典 `biz_state`，「已备案」对应值为 `'2'`\n- 进入列表页默认只展示已备案单据，点击「重置」后恢复该默认值\n\n## 涉及模块与文件\n- 物业服务企业：`companyManagement/components/index.vue` + `property/index.vue`（通过 `defaultBizState=\"2\"` 仅作用于物业服务企业）\n- 项目经理 / 项目经理变更：`staffManagement/components/index.vue`（同时补充业务状态筛选项）\n- 企业备案记录：`companyRegister/index.vue`\n- 信用申报（基础/良好/不良）：`creditDeclarationComponents/index.vue`（三模块共用）\n- 信用申诉 `evaluationAppeal/index.vue`、信用修复 `evaluationRepair/index.vue`、整改通知书 `rectificationNotice/index.vue`\n\n## 验证与归属\n- 所属项目：苏住房G；来源会话：d1f455f2-9331-4d8b-a85b-75d98eb12551；验证证据：extracted source=cursor project=苏住房G"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

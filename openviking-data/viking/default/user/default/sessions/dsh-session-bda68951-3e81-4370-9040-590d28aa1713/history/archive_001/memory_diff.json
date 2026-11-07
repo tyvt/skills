@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-bda68951-3e81-4370-9040-590d28aa1713/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T07:20:51.901736+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited/memories/entities/技术模式/getinfo_dept_parentid0.md",
+                "memory_type": "entities",
+                "after": "# GetInfo 部门 parentId 为 0 导致超管误判为企业端\n门户超管登录后首页误走非管理员侧栏布局，因 GetInfo 解析上级部门时 parentId=\"0\" 触发必失败请求拖垮登录态，角色被兜底为 ROLE_DEFAULT。\n\n## 问题根因\n- getPortalUserInfo 取上级部门用 dept?.parentId 真值判断，超管根部门 parentId=\"0\"（字符串为真值）触发请求 dept/detail?deptId=0，后端返回 500「部门不存在」\n- fetchDept 无容错，异常直接 throw 导致整个 GetInfo action reject，路由守卫 catch 设 SET_ROLES(['ROLE_DEFAULT']) 且 permissions 清空\n- 结果 isSuperAdmin=false、authorizedSectionCodes 为空，resolveHomeLayoutVariant 判为 B 端走 HomeLayoutSidebar（非管理员侧栏，恰被 04ff25537 改为 AI 面板），超管看似「被改坏」\n\n## 修复方案\n- 文件 src/api/portal/user.js：新增 isRootDeptId 判断，parentId 为 '0'/0/null 视为根部门不再请求上级\n- fetchDept 对根部门直接返回 null，并加 noMessage + catch 容错，部门接口异常不再拖垮登录态\n- 提交 09cbf13a6（修复）合并 b76b0d771，父仓库 b0b3216 更新子模块指针，均已推送远程\n\n## 验证与归属\n- 真实验证（8092 站点 admin 登录）：roles=['admin']、permsBiz=['*:*:*']、isSuperAdmin=true、走 HomeLayoutAdmin 管理员工作台、不再发 deptId=0 请求\n- 非超管逻辑未动仍走侧栏 + AI 面板；dev 后端 admin 账号 roleKey='admin'、terminalType='G'、listPerms 缺 areaManagement 但不影响（有 *:*:*）\n- 所属项目：门户；来源会话：2026-11-04 超管首页误改排查；代码基线：b76b0d771"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited/memories/entities/项目/zhi2_admin_h5.md",
+                "memory_type": "entities",
+                "before": "# zhi2-admin-h5\nzhi2-admin-h5 是一个房产前端项目（苏州市房地产监管平台后台 H5），包含管理员与非管理员（经纪机构/开发企业皮肤）对内首页。\n\n## 描述\n- 非管理员首页使用 HomeLayoutSidebar.vue 布局，右侧栏结构已改为用户卡 + AI问答助手面板(HomeAiPanel) + 公示公告（原快捷入口 HomeQuickLinks 已移除）\n- 管理员首页已具备 AI 问答助手板块 HomeAiPanel 及问答弹窗 HomeAiChatDialog\n\n## 组件\n- HomeLayoutSidebar.vue：非管理员首页侧栏布局组件\n- HomeQuickLinks：快捷入口组件（仅管理员首页仍使用，非管理员首页已移除）\n- HomeAiPanel：管理员首页 AI 问答助手板块组件\n- HomeAiChatDialog：管理员首页 AI 问答弹窗组件\n\n## 关系\n- 2026-11-04 已完成将非管理员首页快捷入口替换为管理员首页的 AI 问答助手板块，并接入问答弹窗 HomeAiChatDialog；同步更新 e2e 用例 portal-home-visual.spec.ts（developer/broker 断言改为 AI 面板+无快捷入口，新增经纪机构 AI 弹窗用例）。改动提交于子模块 develop/v2.6.2-portal（提交 04ff25537），父仓库门户同步更新子模块指针（提交 879c169）\n- 首页「查看更多数据」按钮（HomeStatsBar 的 more 事件）已由 handleStatsMore 改为跳转至房地产市场运行监测决策大屏（#/market-monitor），详见 market_monitor_dashboard 实体",
+                "after": "# zhi2-admin-h5\nzhi2-admin-h5 是一个房产前端项目（苏州市房地产监管平台后台 H5），包含管理员与非管理员（经纪机构/开发企业皮肤）对内首页。\n\n## 描述\n- 非管理员首页使用 HomeLayoutSidebar.vue 布局，右侧栏结构已改为用户卡 + AI问答助手面板(HomeAiPanel) + 公示公告（原快捷入口 HomeQuickLinks 已移除）\n- 管理员首页已具备 AI 问答助手板块 HomeAiPanel 及问答弹窗 HomeAiChatDialog\n\n## 组件\n- HomeLayoutSidebar.vue：非管理员首页侧栏布局组件\n- HomeQuickLinks：快捷入口组件（仅管理员首页仍使用，非管理员首页已移除）\n- HomeAiPanel：管理员首页 AI 问答助手板块组件\n- HomeAiChatDialog：管理员首页 AI 问答弹窗组件\n\n## 关系\n- 2026-11-04 已完成将非管理员首页快捷入口替换为管理员首页的 AI 问答助手板块，并接入问答弹窗 HomeAiChatDialog；同步更新 e2e 用例 portal-home-visual.spec.ts（developer/broker 断言改为 AI 面板+无快捷入口，新增经纪机构 AI 弹窗用例）。改动提交于子模块 develop/v2.6.2-portal（提交 04ff25537），父仓库门户同步更新子模块指针（提交 879c169）\n- 首页「查看更多数据」按钮（HomeStatsBar 的 more 事件）已由 handleStatsMore 改为跳转至房地产市场运行监测决策大屏（#/market-monitor），详见 market_monitor_dashboard 实体\n- 超管首页看似「被改坏」实为独立 GetInfo 登录态 bug（parentId='0' 触发 dept/detail?deptId=0 必失败拖垮登录态，角色兜底 ROLE_DEFAULT 误走侧栏），详见 getinfo_dept_parentid0 实体；04ff25537 本身未动管理员布局"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

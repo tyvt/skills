@@ -1,0 +1,51 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-小程序-1793816097599/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T18:42:32.720801+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/ct_media_url_splice.md",
+                "memory_type": "entities",
+                "after": "# 轮播图图片地址拼接逻辑\n小程序中 resolveCtMediaUrl 拼接 CT 接口返回的图片地址时需保留 /sz 路径前缀。\n\n## 配置基址\n- develop: process.env.VUE_APP_CT_AUTH_BASE_URL_DEV || 'https://wygl.wxwgzx.com:8989/sz/api'\n- trial: process.env.VUE_APP_CT_AUTH_BASE_URL_TRIAL || 'http://unlimited.c.h5.shimin.mobile.v2.benefit.shiqu.wuxi.test.zhishusz.com/api'\n- release: process.env.VUE_APP_CT_AUTH_BASE_URL_PROD || 'https://wygl.wxwgzx.com:8989/sz/api'\n\n## 问题根因\n- 旧逻辑用正则只取 origin（https://wygl.wxwgzx.com:8989），丢掉了 /sz\n- 接口返回示例：/zhi2/2026/f/u/l/873e02a2-....png\n- 错误拼接：https://wygl.wxwgzx.com:8989/zhi2/... ❌\n- 正确地址：https://wygl.wxwgzx.com:8989/sz/...（需保留 /sz）\n\n## 验证与归属\n- 涉及文件：utils/portal-env-config.js、pages/webview/home.vue、api/common.js、utils/portal-user.js\n- 来源会话ID：b626c0b5-4df0-46de-a16a-ec035ee4e656\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/external_webview_authcode.md",
+                "memory_type": "entities",
+                "after": "# 外部网页 authCode 判断逻辑\nexternalWebview.vue 根据 envVersion 与 authCode 决定是否调用 selectMyHouse 的流程。\n\n## 行为逻辑\n- 获取当前小程序环境 envVersion（develop/trial/release）\n- 当存在 authCode 且 authCode === 0 时：\n  - 开发环境（develop）：视为成功，不调用 selectMyHouseByLingXi，直接继续拼接 webview src\n  - 非开发环境：弹 uni.showToast({ title: \"您未选择房屋\" }) 并 return 终止 selectMyHouse 调用\n- lingXiQueried 仍置为 true 避免重复触发\n\n## 验证与归属\n- 改动已通过该文件 linter 检查（无新增报错）\n- 涉及文件：pages/webview/externalWebview.vue\n- 来源会话ID：591f20d2-2801-494e-9917-cd9943d6d175\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/trial_portal_logging.md",
+                "memory_type": "entities",
+                "after": "# 体验版门户接口与房屋拉取日志\n小程序在体验版（trial）下新增统一门户 API 与房屋拉取业务日志，正式版不打印。\n\n## 日志范围\n- utils/portal-user.js 的 requestCtAuth 中统一打印，仅当 envVersion === 'trial' 生效\n- 覆盖所有门户接口（登录、profile、ctUserIdentity、灵犀选屋等），含请求/响应/失败，token 已脱敏\n- externalWebview.vue 的 maybeLoadTrialHouseList 补充房屋拉取日志：未登录跳过、开始拉取、结果、失败详情\n\n## 查看方式\n- 微信开发者工具 → 体验版 → 打开「我的」页 → 登录或刷新 → Console 搜索 `[体验版][PortalAPI]` 与 `[体验版][房屋]`\n\n## 验证与归属\n- 涉及文件：utils/portal-user.js、pages/webview/externalWebview.vue、utils/portal-env-config.js\n- 来源会话ID：0f172dbf-633a-4df4-a1bc-5adc70d60876\n- 代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/face_fail_retry.md",
+                "memory_type": "entities",
+                "before": "# 人脸识别失败当前页重试\nface.vue 人脸识别失败改为当前页展示失败态并提供重试，而非自动后退。\n\n## 行为变更\n- 移除 goBackAfterFaceFail，改 pageStatus=\"failed\" 当前页展示失败界面\n- 点「重新识别」重置自动重试计数回到 verifying 并再调 startFaceVerify()\n- 参数缺失也展示失败页但不显示重试按钮（canStartVerify 为 false）\n\n## 验证与归属\n- 验证：011.md 会话 da4b6a8b 人脸识别失败后退取消改展示失败页面+重试\n- 涉及文件：pages/face/face.vue\n- 来源会话ID：da4b6a8b-12d3-4758-b4f7-1405bf4f9282\n- 代码基线：none",
+                "after": "# 人脸识别失败当前页重试\nface.vue 人脸识别失败改为当前页展示失败态并提供重试，而非自动后退。\n\n## 行为变更\n- 移除 goBackAfterFaceFail，改 pageStatus=\"failed\" 当前页展示失败界面\n- 点「重新识别」重置自动重试计数回到 verifying 并再调 startFaceVerify()\n- 参数缺失也展示失败页但不显示重试按钮（canStartVerify 为 false）\n\n## 页面状态\n- `verifying`：展示「正在进行人脸识别」提示\n- `failed`：失败图标 + 失败文案 + 「重新识别」按钮\n- 样式与 verify.vue 保持一致（蓝色主按钮、灰色背景）\n\n## 页面上下文\n- 典型页面栈：实名认证(verify) → 不动产授权(bdc) → 人脸识别(face)\n\n## 验证与归属\n- 验证：微信开发者工具进入人脸识别页，故意取消或失败一次确认失败页与重试流程\n- 涉及文件：pages/face/face.vue、pages/face/verify.vue、pages/face/bdc.vue\n- 项目路径：d:\\repository\\小程序\\wygl-wxxcx-dev-slh\n- 来源会话ID：da4b6a8b-12d3-4758-b4f7-1405bf4f9282\n- 代码基线：none"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/face_recognition_fail_return.md",
+                "memory_type": "entities",
+                "deleted_content": "# 人脸识别失败返回上一页\npages/face/face.vue 中，人脸识别失败或参数缺失时，提示约 1.5 秒后返回上一页。\n\n## 实现说明\n- 新增 goBackAfterFaceFail：优先 uni.navigateBack()；页面栈无法返回时（如从 H5 直接打开）reLaunch 到「我的」页 externalWebview\n- 识别失败：startFacialRecognitionVerify 的 fail 回调中，仅 webview not ready 重试，其它失败提示「人脸识别失败」后返回\n- 参数缺失：姓名/身份证号缺失时同样提示后返回上一页\n\n## 典型页面栈\n- 实名认证(verify) → 不动产授权(bdc) → 人脸识别(face)，失败回到 bdc 页\n\n## 验证与归属\n- 涉及文件：pages/face/face.vue、pages/face/verify.vue、pages/webview/externalWebview.vue、pages/face/bdc.vue\n- 所属项目：小程序（wygl-wxxcx-dev-slh）；来源会话：bd4ae7ae-4fdc-458d-b142-9ba6f2c7e325；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/face_verify_fail_nav_back.md",
+                "memory_type": "entities",
+                "deleted_content": "# face 页人脸失败参数缺则提示返回上页\npages/face/face.vue 在人脸识别失败或姓名/身份证缺失时提示约1.5秒返回，优先 navigateBack 否则 reLaunch。\n\n## 行为逻辑\n- `pages/face/face.vue` 在人脸识别失败或姓名/身份证缺失时提示约 1.5 秒返回\n- `goBackAfterFaceFail` 优先 `uni.navigateBack()` 否则 `reLaunch` 至 `externalWebview`\n- `fail` 回调中非 `webview not ready` 均返回\n\n## 验证与归属\n- 验证证据：extracted source=cursor session=bd4ae7ae-4fdc-458d-b142-9ba6f2c7e325\n- 涉及文件：pages/face/face.vue、pages/face/verify.vue、pages/webview/externalWebview.vue、pages/face/bdc.vue、pages.json、pages/webview/h5ExternalWebview.vue、pages/webview/portalH5Webview.vue\n- 来源会话ID：bd4ae7ae-4fdc-458d-b142-9ba6f2c7e325；代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 2,
+        "total_skipped": 0
+    }
+}

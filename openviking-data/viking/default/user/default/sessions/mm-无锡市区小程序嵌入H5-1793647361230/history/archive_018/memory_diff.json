@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793647361230/history/archive_018",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T19:51:21.702932+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/zsmap_markers_accumulate.md",
+                "memory_type": "entities",
+                "after": "# 小区周边地图链路静默返回与markers累加\nH5嵌入小程序时小区周边地图无数据，需避免失败路径静默return[]且onShow重拉须重置markers防重复点。\n\n## 排查路径\n- 控制台过滤`[小区周边]`/`[小区周边/QQMap]`，依次核查宿主是否web-view、Key是否为空、经纬度是否合法\n- 检查JSONP/逆地理/地点搜索失败原因（超时、script错误、status/message）\n- 成功但pickedCount为0则属过滤或POI稀疏，非代码错误\n\n## 代码坑与修复\n- 失败路径若统一`return []`且无日志，无法区分Key/坐标/宿主拦截，应对每段失败打点\n- `onShow`重复拉详情时对`markers.push`会累加重复点，应每次重置为单个marker\n- 涉及文件：pages_owner/project/info/index.vue、utils/index.js、utils/qqMapKey.js、components/ZsMap/ZsMap.vue\n\n## 验证与归属\n- 来源会话：44e9f45b-f8b3-4cdb-b60b-c803993c0d4a\n- 代码基线：ca82c96\n- 验证结论：用户要日志判断宿主能否调通地图并排查代码，列出日志对照表并指出静默return[]与markers.push累加两处问题\n- 所属项目：无锡市区小程序嵌入H5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/houseid_userstore_source.md",
+                "memory_type": "entities",
+                "after": "# 嵌入H5业务houseId以userStore为唯一来源\n小程序web-view嵌入H5时子页须以App.vue解析的userStore.houseId为唯一房屋上下文来源，禁混用本地store或路由参数。\n\n## 问题现象\n- H5被小程序web-view打开，入口URL带houseId及token，但子页（如维修资金）仍从useHouseStore.currentHouse、onLoad options.houseId取参\n- 导致接口houseId为空或与小程序传入不一致，产生隐蔽联调问题\n\n## 根因\n- 嵌入场景房屋上下文在App.vue的initH5Context中从query写入userStore（如applyHouseSelection同步projectName）\n- 子页再读本地选房store或路由参数会与入口URL脱节；payment等页已统一走userStore时其它页混用会出问题\n\n## 修复方案\n- 嵌入H5子页查询类接口统一使用userStore.houseId / userStore.projectName\n- 移除对useHouseStore及仅用于兜底的options.houseId依赖\n- 数据流约定：URL ?houseId=xxx → App.vue initH5Context → userStore → 各业务页；小程序侧需保证web-view入口URL带上houseId与token\n\n## 验证与归属\n- 来源会话：55e004d6-eb3e-4e5c-90c3-0c52cf8d6b5c\n- 代码基线：fb55fa9\n- 涉及文件：App.vue、pages_owner/maintain/index.vue、store/user.js\n- 所属项目：无锡市区小程序嵌入H5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/notice_list_msgtype_drop.md",
+                "memory_type": "entities",
+                "after": "# 公告列表映射丢字段致getDictLabel占位\nNoticeList等子组件用getDictLabel展示类型标签时因父页map漏传msgType而始终显示占位符`-`。\n\n## 问题现象\n- NoticeList用getDictLabel(dict, item.msgType)展示类型标签，界面始终为`-`\n- 同业务另一页用`...el`展开保留字段则正常，属映射层丢字段而非字典未加载\n\n## 根因\n- 父页把接口rows转列表项时手写对象字面量漏传msgType\n- getDictLabel在val为空时返回''，模板`|| '-'`一直落占位\n\n## 修复方案\n- 列表映射显式带上字典展示依赖的原始码值字段（如msgType: el.msgType）\n- 或统一用展开保留未知字段再覆盖展示用别名\n- 改完刷新列表验证标签文案与配色；若仍裁切再查固定宽度样式（如72rpx）\n\n## 验证与归属\n- 来源会话：636ac7f6-e11f-4469-91e7-916792d8743b\n- 代码基线：3c384c1\n- 涉及文件：pages/announcement/index.vue、pages/announcement/components/NoticeList.vue\n- 所属项目：无锡市区小程序嵌入H5"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/sfb_login_cipher.md",
+                "memory_type": "entities",
+                "before": "# 苏服办深链sfbLogin密文前端不解密\n苏服办入口通过 location 传入 AES-ECB+Base64 密文的 name/idType/idNumber/phone，前端原样 POST 给后端，不做解密。\n\n## 接口与约定\n- `performSfbLoginIfNeeded` 从 URL/query 取出四字段原样 POST `/v2.0/security/ctAuth/sfbLogin`（或项目 security 层等价路径）\n- 前端不做 AES 解密，曾误建 sfbCrypto.js 已删除；解密与明文校验一律在后端\n- 联调示例 body 字段值仍为带 `==`/`=` 的 Base64 密文，而非张三/明文证件号\n\n## 鉴权区分\n- URL 上的 `token` 是苏服办侧 token（人脸识别等 SDK 用）\n- 接口返回的 `accessToken` 才是后续业务 API 写在 header 的内部 token\n- 苏服办入口不要把 URL 密文写入 userStore 当展示名，登录成功后走 `refreshProfileFromApi` 拉用户信息\n\n## 验证与归属\n- 验证证据：会话 8a10b942 用户明确「不需要解密啊，都是后端解密，url拿到什么就传什么」\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js、src/api/security.js、src/store/user.js、src/App.vue\n- 所属项目：无锡市区小程序嵌入H5；来源会话：8a10b942-72e3-49f5-b5b6-415b24f7c1ec；代码基线：37bd5a1",
+                "after": "# 苏服办深链sfbLogin密文前端不解密\n苏服办入口通过 location 传入 AES-ECB+Base64 密文的 name/idType/idNumber/phone，前端原样 POST 给后端，不做解密。\n\n## 接口与约定\n- `performSfbLoginIfNeeded` 从 URL/query 取出四字段原样 POST `/v2.0/security/ctAuth/sfbLogin`（或项目 security 层等价路径）\n- 前端不做 AES 解密，曾误建 sfbCrypto.js 已删除；解密与明文校验一律在后端\n- 联调示例 body 字段值仍为带 `==`/`=` 的 Base64 密文，而非张三/明文证件号\n\n## 鉴权区分\n- URL 上的 `token` 是苏服办侧 token（人脸识别等 SDK 用）\n- 接口返回的 `accessToken` 才是后续业务 API 写在 header 的内部 token\n- 苏服办入口不要把 URL 密文写入 userStore 当展示名，登录成功后走 `refreshProfileFromApi` 拉用户信息\n\n## 密文加号解码陷阱\n- `URLSearchParams`（以及按 application/x-www-form-urlencoded 规则解析 query）会把 `+` 当作空格解码\n- 密文如 `phone=A+A7Pil3SsG9LSUe8q8mVw==` 会变成带空格的字符串，后端解密必然失败\n- 上游若未把 + 编码为 `%2B`，问题在 H5 侧必然复现；易被误判为「token 无效」或「接口挂了」\n- 在读取密文参数后统一做空格还原为 `+`（`restoreBase64Plus`：`value.replace(/ /g, '+')`），苏服办登录路径对 name/idType/idNumber/phone 全部应用\n- 规范侧应要求拼 URL 时用 `%2B`；H5 端还原作为兜底，验证用含 + 的真实跳转链接对比还原前后密文长度与解密结果\n\n## 验证与归属\n- 验证证据：会话 8a10b942 用户明确「不需要解密啊，都是后端解密，url拿到什么就传什么」；会话1d789cb5用户给含+的unlimited测试URL，结论为URLSearchParams将+解码为空格破坏Base64，在h5Context.js增加restoreBase64Plus并在performSfbLoginIfNeeded对四个密文字段应用\n- 涉及文件：zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js、src/api/security.js、src/store/user.js、src/App.vue\n- 所属项目：无锡市区小程序嵌入H5；来源会话：8a10b942-72e3-49f5-b5b6-415b24f7c1ec、1d789cb5-e259-4d57-ada7-dfb786d89609；代码基线：37bd5a1、3fb9434"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

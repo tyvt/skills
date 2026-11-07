@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793813941148/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T18:11:55.209436+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/general_advance_end_delay.md",
+                "memory_type": "entities",
+                "after": "# 一般表决延期后提前结束按钮缺失修复\n太仓G端一般表决详情页在表决延期后「提前结束」按钮消失，需将延期状态纳入显示条件。\n\n## 问题根因\n- 一般表决详情页「提前结束」按钮原仅在 decisionState == '2'（选举中）时显示\n- 延期后状态变为 decisionState == '5'（延期），条件不再满足，按钮被隐藏\n\n## 修复方案\n- 与业主决策、选项决策、维修决策页面保持一致，延期状态也允许提前结束\n- 按钮条件改为 `isSubmittedBiz && (form.decisionState == '2' || form.decisionState == '5') && checkPermission(['estate:generalDecision:advanceEnd'])`\n- 需具备 `estate:generalDecision:advanceEnd` 权限，刷新后延期状态可见按钮\n\n## 验证与归属\n- 验证证据：会话 5498a264 用户报延期后无提前结束按钮，修复后正常\n- 涉及文件：zhi1-web-admin/src/views/estate/generalDecision/detail.vue、ownerDecision/detail.vue\n- 所属项目：太仓G；来源会话：5498a264-de28-46af-8525-e64606a2220e；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vote_range_next_validate.md",
+                "memory_type": "entities",
+                "after": "# 表决范围弹框下一步未校验必填修复\n太仓G端业委会选举表决与共用决策组件的「下一步」未校验表单必填项，点击直接进入下一步。\n\n## 问题根因\n- `nextStep` 方法直接执行 `this.active = 1` 进入下一步，未先调用表单校验\n- 表单已配置必填规则（policymaker、idNumber、phone、signature），但点击「下一步」未触发校验\n\n## 修复方案\n- 在 `nextStep` 中先调用 `this.$refs['form'].validate()`，校验通过后再进入第二步\n- 与 `optionDecision` 模块实现保持一致\n- 修复后必填未填时显示校验提示且无法进入「候选人选举」步骤\n\n## 验证与归属\n- 验证证据：会话 81005aa4 用户报没有校验必填就可以点下一步，修复后正常\n- 涉及文件：ownerDecision/components/VoteRangeDialog.vue、decisionCommon/components/VoteRangeDialog.vue\n- 所属项目：太仓G；来源会话：81005aa4-3a6b-4f6a-9054-7ab69341ff3f；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vote_range_tip_close.md",
+                "memory_type": "entities",
+                "after": "# 线下投票成功提示框未关闭修复\n太仓G端一般表决详情线下投票提交成功后，嵌套的「线下票录入信息确认」提示框残留页面。\n\n## 问题根因\n- `finalSubmit` 仅调用 `close()` 关闭主弹框（决策明细维护），嵌套确认框由独立 `tipDialogVisible` 控制\n- `zs-dialog` 挂载到 `body`，父弹框关闭后确认框仍残留页面\n\n## 修复方案\n- 在 `VoteRangeDialog.vue` 的 `finalSubmit` 成功回调中先设 `tipDialogVisible = false` 再关闭主弹框\n- `close()` 方法中统一重置 `tipDialogVisible`，避免取消关闭时确认框残留\n- 修复后投票成功时确认框与主弹框均正常关闭\n\n## 验证与归属\n- 验证证据：会话 161a2f78 用户报线下投票成功后提示框还在，修复后正常\n- 涉及文件：ownerDecision/components/VoteRangeDialog.vue、DecisionRangeTable.vue\n- 所属项目：太仓G；来源会话：161a2f78-6494-4326-934c-d2a31ef3bbc2；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/recursive_tablebody_dicts_dedup.md",
+                "memory_type": "entities",
+                "before": "# 递归附件 TableBody 重复拉字典需模块级 Promise 去重\n太仓G端维修资金要件 AnnexContainer 递归 TableBody 每层 created 重复 getDicts，多实例对话框宜模块级缓存去重。\n\n## 问题描述\n- AnnexContainer 的 TableBody.vue 为递归组件，每层 created 调 getDicts('sys_yes_no') 按树深度倍增请求；yesOrNoOptions 未使用应删除\n- FileListDialog 随递归产生多实例，每个实例 created 拉 FILE_TYPE 同样 N 次\n\n## 修复约定\n- FileListDialog 用模块级 ensureFileTypeOptions（首次请求缓存 + 并发共用同一 Promise），整页只打一次字典\n- 若需全站去重再下沉到 getDicts 封装\n\n## 验证与归属\n- 验证证据：会话 82f1e5be 用户报 sys_yes_no 与 FILE_TYPE 重复调用，结论删无用 sys_yes_no 请求并为 FILE_TYPE 加模块缓存\n- 涉及文件：zhi1-web-admin/src/views/repairFunds/usage/fundUsageKs/components/AnnexContainer/components/TableBody.vue、FileListDialog.vue\n- 所属项目：太仓G；来源会话：82f1e5be-80bb-4d16-827c-0a7d2778a100；代码基线：df87537",
+                "after": "# 递归附件 TableBody 重复拉字典需模块级 Promise 去重\n太仓G端维修资金要件 AnnexContainer 递归 TableBody 每层 created 重复 getDicts，多实例对话框宜模块级缓存去重。\n\n## 问题描述\n- AnnexContainer 的 TableBody.vue 为递归组件，每层 created 调 getDicts('sys_yes_no') 按树深度倍增请求；yesOrNoOptions 未使用应删除\n- FileListDialog 随递归产生多实例，每个实例 created 拉 FILE_TYPE 同样 N 次\n\n## 修复约定\n- FileListDialog 用模块级 ensureFileTypeOptions（首次请求缓存 + 并发共用同一 Promise），整页只打一次字典\n- 若需全站去重再下沉到 getDicts 封装\n\n## 验证与归属\n- 验证证据：会话 82f1e5be 用户报 sys_yes_no 与 FILE_TYPE 重复调用，结论删无用 sys_yes_no 请求并为 FILE_TYPE 加模块缓存\n- 涉及文件：zhi1-web-admin/src/views/repairFunds/usage/fundUsageKs/components/AnnexContainer/components/TableBody.vue、FileListDialog.vue、AnnexContainer/index.vue、api/system/dict/data.js\n- 所属项目：太仓G；来源会话：82f1e5be-80bb-4d16-827c-0a7d2778a100；代码基线：df87537"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

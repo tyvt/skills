@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T05:08:50.906004+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/appendix_type_bug.md",
+                "memory_type": "entities",
+                "after": "# 附件允许类型后端字典码误判\n附件类型不允许报错根因是后端 appendixConfig 逗号串字典码比对，而非前端 accept 或扩展名白名单。\n\n## 问题现象\n- 企业注册/入网等表单上传 png/jpg/pdf 仍统一返回「文件类型不允许」\n- 用户确认已在配置勾选允许类型码 0 和 3，但上传仍被拒\n\n## 根因分析\n- V3 附件允许类型由 appendixConfig 逗号串字典码集合决定，后端按 fileType 字典码逐项比对\n- 常见误判：配置只勾少数码用户以为全覆盖；前后端双真相源不一致；扩展名与字典码口径不一致（0/3 是码，png 是扩展名）\n- 扩展名不能由后端 fileType 反推，方向反过来同样不成立（参见已知 #302）\n\n## 解决方案\n- 报错时先调 appendixConfig/detail 或 listAppendixPackage 打印允许类型码与上传文件 fileType 对照（已知 #286）\n- 确认缺口由配置侧补码，前端仅在配置明确时做展示层过滤\n- 前端禁止另建扩展名白名单作第二真相源；若需按扩展名过滤必须精确相等匹配而非 includes（已知 #1110）\n\n## 验证与归属\n- 来源会话 a48b51e8 用户贴配置接口 curl，最终因环境侧补数据后通过\n- 涉及文件：zhi2-web-admin/src/components/AnnexUpload/index.vue、zhi2-web-admin/src/views/tool/fjflpz/components/FjDialog.vue、zhi2-web-admin/src/views/company/companyRegister/dialog.vue\n- 所属项目：产品2.0；代码基线：5169909"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/discount_field_bug.md",
+                "memory_type": "entities",
+                "after": "# 账单优惠双模式共用输入框缺陷\n账单优惠弹窗按金额与按比例共用同一输入字段，导致选金额无框、选比例填金额。\n\n## 问题现象\n- 优惠方式要求按金额输入减免金额（元，≤应收）或按比例输入 0-100 百分数\n- 首版切换优惠方式只改 label 不改字段，用户连报两轮「输入交互还是不对」\n\n## 根因分析\n- 折扣行本质是一个类型枚举 + 一个数值 + 派生金额，混用字段致旧值被误解释\n- 只有存原始输入值 + 显式 discountType，派生金额才能正反算\n\n## 解决方案\n- 表单放 discountType（金额/比例）+ 原始输入值两字段\n- 控件随类型切换 placeholder、后缀（元/%）与上下限（金额≤应收、比例≤100）\n- 优惠额用 computed 派生不回写输入框；提交按百分数口径回传\n- 优惠总额变化时应收做成可重算展示值（应收=原始应收−优惠总额），不依赖接口刷新\n\n## 验证与归属\n- 来源会话 d093c203 用户指出选择金额无输入框、选择比例输入优惠金额，要求应收实时更新\n- 涉及文件：zhi2-web-admin/src/views/property/spFeeBill/components/discountDialog.vue、discountTable.vue、enums.js、detail.vue\n- 所属项目：产品2.0；代码基线：a5e7e78"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/batch_collect_api.md",
+                "memory_type": "entities",
+                "after": "# 账单批量收款改走创建支付单\n列表页收款从单选升级多选，统一调 spOrder/createFromBill 按账单数组生成支付单。\n\n## 背景与目的\n- 旧 /property/spFeeBill/collect 需下线，多笔收款本质是按账单 ID 数组生成一笔支付单\n- 只有把类型、渠道、抵扣作为订单属性一次性提交，后端才能算实收并生成支付链接\n\n## 解决方案\n- 统一调 POST /property/spOrder/createFromBill（代理自动补 /v2.0 前缀）\n- 请求体：billIds 数组（单笔多笔都传）、useDeduct='1'/'0'、paymentChannelId 仅扫码金额>0 时传\n- payMode 由 channelType 换算（与 PaymentDialog 同套函数）、orderDesc 为备注\n- 响应有 url 弹二维码轮询，无 url 直接提示成功并关弹窗\n\n## 前置校验\n- 所选单据都是待支付或部分支付、都是有效单据、属于同一物业管理区域，任一不满足拦截提示\n\n## 验证与归属\n- 来源会话 d093c203 给出参数映射表并说明旧 collect 已移除，诉求多选收款并校验\n- 涉及文件：zhi2-web-admin/src/views/property/spFeeBill\n- 所属项目：产品2.0；代码基线：a5e7e78"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术/discount_attach_bug.md",
+                "memory_type": "entities",
+                "after": "# 折扣弹窗附件下载失败与回显残留\n新增折扣附件编辑下载不了且再次新增带出上次附件，根因是行内附件走临时 busId 且弹窗复用未重置。\n\n## 问题现象\n- 新增优惠折扣上传附件，保存后编辑页点下载无效\n- 再点新增自动带出上一次上传的附件\n\n## 根因分析\n- 折扣明细是子表行，附件上传到临时/匿名占位分组（busId 占位或空，保存时后端转挂）\n- 编辑页拿到未落库临时路径/空 busId 下载不到\n- 弹窗组件复用（v-if 未重建或未显式重置），上次表单与附件列表留实例里回显\n\n## 解决方案\n- 附件上传按新增态 busId 占位 + 保存后后端转挂统一约定，成功后用返回真实分组/主键回填并重拉列表\n- 弹窗每次打开显式重置表单与附件列表（重置 data 附件数组 + 清 uploader fileList）\n- 编辑态下载走按附件 ID 取地址接口，不用提交前临时地址\n\n## 验证与归属\n- 来源会话 d093c203 诉求新增折扣上传附件后编辑不能下载、再次新增带出上次附件\n- 涉及文件：zhi2-web-admin/src/views/property/spFeeBill/components/discountDialog.vue、discountTable.vue\n- 所属项目：产品2.0；代码基线：a5e7e78"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

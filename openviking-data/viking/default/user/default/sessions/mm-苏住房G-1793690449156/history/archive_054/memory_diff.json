@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_054",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T09:27:49.152803+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/operate_column_contract.md",
+                "memory_type": "entities",
+                "after": "# operate_column_contract\n苏房 zs-operate-column 所在页必须在 data() 声明 moduleName/businessName，否则列表操作列 mixin 契约断裂。\n## 问题现象\n- 系统日志页 views/system/operlog/index.vue 渲染报 Vue warn：Property or method \"moduleName\" is not defined on the instance but referenced during render。\n- 模板使用了 <zs-operate-column :moduleName=\"moduleName\" :businessName=\"businessName\" :buttons=\"buttons\" />，但 data() 未声明这两个字段。\n## 根因与影响\n- listMixins 依赖的 table.js mixin 用 moduleName 拼接口路径与 tableId、用 businessName 拼权限前缀；缺字段导致权限码拼出 undefined，按钮显示/禁用异常，表现像操作列没了/点不动。\n- 同目录 dict/index.vue、user/index.vue 等成熟页面都无条件声明了这两个字段，复刻时应照抄。\n## 解决方案\n- 在 data() 补 moduleName: 'system'、businessName: 'operLog'，取值必须与接口路径 /system/operLog/page 的段一致。\n- 验收以刷新后两条 Vue 警告消失 + 操作列权限码正确为准。\n## 验证与归属\n- 验证：会话 6b87fa8d 定位模板第24行使用未声明字段；listMixins 的 table mixin 需要它们用于 tableId 与权限前缀；修复为补 moduleName:'system'、businessName:'operLog'。\n- 涉及文件：zhi2-web-admin/src/views/system/operlog/index.vue、src/mixins/listMixins.js、src/mixins/table.js、src/components/zs-operate-column/zs-operate-column.vue\n- 所属项目：苏住房G；来源会话：6b87fa8d-f4b1-449c-ad47-3f43156f144d；代码基线：a945fa1\n- 区别：与 OperationBtnGroup 里 prop 与 computed 同名 businessName 互相覆盖不同，本条是两者都不存在导致整条 mixin 契约失效。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_launch_editor.md",
+                "memory_type": "entities",
+                "after": "# vite_launch_editor\n苏房 zhi2-web-admin 自建 launch-editor 中间件受两个 env 开关控制，导致 Vue DevTools「在编辑器中打开」失效。\n## 问题现象\n- 在 Cursor 开发时，Vue DevTools 点击组件→「在编辑器中打开」无反应，控制台无报错。\n- 项目未用 Vite 官方插件，而是 vite.config.js 手写虚拟插件挂载 /__open-in-editor 中间件用 child_process 执行编辑器命令。\n## 根因\n- 中间件被两 env 双重门控：VITE_LAUNCH_EDITOR === 'false' 时整个中间件不注册（常写成字符串 'false'，布尔判断按字符串比）；内部取 VITE_EDITOR || 'cursor'，配成未安装编辑器时命令静默失败。\n- env/.env 是唯一来源，Vite 只在启动时读取，改完必须重启 dev server。\n## 排查与修复\n- 顺序：确认 env 里 VITE_LAUNCH_EDITOR 不是 'false'、VITE_EDITOR 是 'cursor'（cursor --version 确认 PATH）；重启 dev server；仍不行浏览器直连 http://<dev端口>/__open-in-editor?file=<绝对路径> 返回 Editor command executed 说明中间件通，用 VITE_EDITOR_COMMAND='cursor --goto \"{goto}\"' 覆盖默认命令。\n## 验证与归属\n- 验证：会话 31b1bd1f 用户报无法在 cursor 打开文件，定位 env/.env 中 VITE_LAUNCH_EDITOR='false' 禁用中间件、VITE_EDITOR='trae' 指向不存在编辑器；改为 'true'/'cursor' 后修复。\n- 涉及文件：zhi2-web-admin/vite.config.js、env/.env、env/.env.test、env/.env.production\n- 所属项目：苏住房G；来源会话：31b1bd1f-868a-41df-9b2d-8d9b9ada1333；代码基线：fb3e960\n- vite.config.js 316-367 行插件按 env.VITE_LAUNCH_EDITOR !== \"false\" 展开，中间件取 env.VITE_EDITOR || \"cursor\"。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_advanced_query.md",
+                "memory_type": "entities",
+                "after": "# zs_advanced_query\n苏房公共查询高级查询操作符下拉占位符与自动选中第一项规则需按启用/禁用与操作符数量分流。\n## 问题现象\n- 公共查询类页面高级查询条件，字段选「物业企业信用等级」后，操作符下拉无「请选择」占位，直接显示第一个操作符，用户误以为系统已选。\n## 根因\n- zs-advanced-query 在字段变更时无条件把 operatorList[0] 回填进操作符，既有值不显示 placeholder，是既有「省一步」策略。\n## 解决方案\n- 公共组件按「可操作 + 操作符可选数量」分流：仅固定操作符字段（operatorList.length === 1）自动选中；多操作符字段保留空值且 placeholder 设「请选择」；placeholder 仅在启用下拉显示，字段未选/禁用时传空字符串避免灰色提示残留。\n- 改动落公共组件会影响所有高级查询页（如物业管理区域查询），回归原自动带默认操作符体验；业务侧字段顺序/默认值不动，尤勿在用旧默认值做「未选」判定的地方把空值当已选。\n## 验证与归属\n- 验证：用户要求公共查询-物业管理区域查询操作符下拉默认占位「请选择」、禁用时不显示；结论占位按启用/禁用区分，多操作符不再自动选中，仅固定操作符字段自动选中。\n- 涉及文件：zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue、src/views/publicQuery/complex/index.vue\n- 所属项目：苏住房G；来源会话：429acee0-eca5-4450-8610-60939deb48d6；代码基线：5ccda28"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/home_route_normalize.md",
+                "memory_type": "entities",
+                "before": "# 侧栏首页路径归一与精确匹配\n苏住房G项目中，侧栏「首页」报错未授权及高亮错乱，需统一首页路径为 /index 且菜单仅精确匹配。\n## 问题现象\n- 点侧栏首页提示「页面未授权或不存在」\n- 修复后首页不高亮，或切到别的菜单首页仍高亮\n## 根因\n- 后端菜单下发首页 path 可能带斜杠或不同写法，路由守卫兜底、侧栏跳转、首页识别函数各自比较字符串导致口径不一致\n## 解决方案\n- 抽公共归一函数 homeRoute，把首页统一成 /index，在一级叶子菜单点击、路由守卫兜底、首页识别三处共用\n- 侧栏高亮比较时对当前路由同样归一\n- 首页菜单只允许精确匹配，避免 /index/xxx 同级菜单误触发高亮\n## 验证与归属\n- 验证覆盖：进入首页高亮、切走后不再高亮\n- 涉及文件：router/index.js、utils/homeRoute.js、utils/permission.js、store\n- 所属项目：苏住房G；来源会话：cb0377ba-165d-4411-88e0-da19021618ab；代码基线：c17e4d8",
+                "after": "# 侧栏首页路径归一与精确匹配\n苏住房G项目中，侧栏「首页」报错未授权及高亮错乱，需统一首页路径为 /index 且菜单仅精确匹配。\n## 问题现象\n- 点侧栏首页提示「页面未授权或不存在」\n- 修复后首页不高亮，或切到别的菜单首页仍高亮\n## 根因\n- 后端菜单下发首页 path 可能带斜杠或不同写法，路由守卫兜底、侧栏跳转、首页识别函数各自比较字符串导致口径不一致\n- 仅归一「渲染出来的链接地址」不够：getLinkProps 用 canonicalizeHomePath 使 router-link 指向 /index，但 isItemActive/checkActiveByPath/hasActiveRoute 仍用未归一的 fullMenuPath（如 /index/home）与 $route.path（已是 /index）比较，永不相等，首页菜单不高亮（会话 ea05a521）\n- E2E 只断言 Tab 数量，未覆盖侧栏 active 样式，测试全绿也发现不了该问题\n## 解决方案\n- 抽公共归一函数 homeRoute，把首页统一成 /index，在一级叶子菜单点击、路由守卫兜底、首页识别三处共用\n- 侧栏高亮比较时对当前路由同样归一\n- 首页菜单只允许精确匹配，避免 /index/xxx 同级菜单误触发高亮\n- 修复方向：把「当前路径」与「菜单完整路径」都灌进同一个 canonicalizeHomePath 再比较，或在 getSidebarActivePath 里对门户首页路径统一 canonical，且该函数必须与 homeRoute.js 规则同源\n- isHomeMenuRoute 仅按子菜单 path 段判定、不校验父级链，若后端在 /system 下配 path:'index' 会把 /system/index 错误链到 /index；应补「完整路径为 /index、/index/home 或在 /index 树下」约束\n- permission.js 的 rewriteRoutes 过了 stripDuplicateHomeRoutes，而 sidebarRoutes 仍对原始 sdata 过滤，侧栏仍出现两个首页项，两处须用同一份去重\n- 内层叶子菜单 handleClick 直接 $router.push(menuItem.path)，未拼父路径也未 canonical，需补全\n## 验证与归属\n- 验证覆盖：进入首页高亮、切走后不再高亮\n- 涉及文件：router/index.js、utils/homeRoute.js、utils/permission.js、store\n- 所属项目：苏住房G；来源会话：cb0377ba-165d-4411-88e0-da19021618ab；代码基线：c17e4d8\n- 补充验证：会话 ea05a521-a616-40d9-b860-3870b34a52ab（基线 db4f82c）审查指出 getLinkProps 使用 canonicalizeHomePath 使 router-link 指向 /index，但 isItemActive/checkActiveByPath 仍用未归一的 fullMenuPath 导致侧栏首页不高亮；涉及文件新增 zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-投资推送-1793649920734/history/archive_017",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T20:30:03.827697+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/美股创业板增速分离与缓存指纹.md",
+                "memory_type": "entities",
+                "after": "# 美股创业板增速分离与缓存指纹\ncollect_index_states / buy_amount_allocation 中需严格区分美股与创业板增速来源，且磁盘缓存指纹须包含两者以避免错误命中。\n\n## 增速参数规则\n- 美股 snapshot 必须使用 task 的 us_growth（CLI --us-growth），禁止误用 CYB_EXPECTED_GROWTH\n- 创业板使用 cyb_growth（CLI --growth）\n- report.generate_reports 须将 CLI 增速传入额度预计算\n\n## 缓存指纹要求\n- 磁盘缓存 key/指纹必须包含 cyb_growth、us_growth\n- 否则自定义增速会命中错误缓存（如默认增速）\n\n## 验证与归属\n- 验证证据：report 与回测一致性审查第 2 项修正；示例 `python report.py -m us --us-growth 0.15`\n- 涉及文件：buy_amount_allocation.py、report.py\n- 所属项目：投资推送；来源会话ID：a0bac9cb-3ed5-40d8-a564-374e4481e671"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/新指数买入频次约束无解折中阈值.md",
+                "memory_type": "entities",
+                "after": "# 新指数买入频次约束无解折中阈值\n为新宽基对齐年度买入占比时，若估值偏低导致双年频次区间无可行解，阈值搜索须记录无解并采用折中参数。\n\n## 触发场景\n- 新宽基（如中证1000）对齐 A500/创业板年度买入占比\n- 某年历史估值偏低致「双年频次区间」约束无可行解\n\n## 折中方案\n- 阈值搜索应记录无解并采用折中参数（例：利差分位≥68%、PE 分位≤67%、距60日低点涨幅≤5.5%）\n- 折中参数须写回 backtest 与 report 模块\n\n## 验证与归属\n- 验证证据：97f55495 会话：2024≤12% 且 2025 7–12% 下无同时满足组合，故采用折中方案并更新 logs/backtest\n- 涉及文件：backtest_buy_signals.py、compare_broad_indices.py、config.py、a500_data.py\n- 所属项目：投资推送；来源会话ID：97f55495-c511-45b5-a582-99a1ea8bf103"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/duckdb单进程多连接自锁修复.md",
+                "memory_type": "entities",
+                "after": "# DuckDB单进程多连接自锁修复\nDuckDB「被占用」报错常源于单进程内多连接未关闭，读路径须用只读连接且用毕关闭。\n\n## 问题根因\n- 报错「Can't open a connection...」「Unique file handle conflict」不一定是外部进程占用\n- 缓存层 `_conn()` 只读场景仍 `ensure_schema()` 开写连接且不用即 `close()`，导致 report.py 读十几个键堆连接自锁、部分查询回退 CSV\n\n## 修复方案\n- 拆 `_read_connection()`（只读+用毕关闭）与 `_write_connection()`（写入+用毕关闭）\n- 仍异常时用 PowerShell `Get-CimInstance Win32_Process -Filter \"Name='python.exe'\"` 查并发写库进程（如 sync_*、回测）\n\n## 验证与归属\n- 验证证据：会话 7230ae3b：修 duckdb_cache.py 后 `python report.py` 无回退、无 merge 报错\n- 涉及文件：duckdb_cache.py、report.py、sync_market_duckdb.py、sync_stockdb_to_duckdb.py\n- 所属项目：投资推送；来源会话ID：7230ae3b-3ad8-46da-ad7b-da9ceb90867d"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/投资推送报告指标输出规范.md",
+                "memory_type": "preferences",
+                "after": "- 报告多维参考区块仅展示当前 data 层已能拉到的指标（如股债利差阈值、PE 十年分位与信号灯），未接入维度不要占位输出\n- PE 分位等辅助信息不要重复塞进长期/短期买卖建议里的软性劝诫文案，用户会视为噪音\n- 验证：用户两次纠正「暂未接入不要加到输出」「单靠利差…控制加仓节奏这话也不需要」\n- 涉及文件：report.py、config.py、core.py、dividend_data.py；项目：投资推送；来源会话ID：5444d004-5f85-4487-8ca2-6df243ecd24a"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

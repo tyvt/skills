@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:16:15.783885+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/zs_table_summary.md",
+                "memory_type": "entities",
+                "after": "# zs-table 小计合计双来源\nzs-table 的小计与合计是两条独立通道：小计由 summary-method/showMethod 控当前页累加，合计由 bottom-summary-items 传接口全量统计。\n\n## 现象\n- 列表页小计改为分页累加后，表格下方 ZsSummaryText 文字条也同步变成当前页值，小计合计显示完全一致。\n\n## 根因\n- zs-table 底部行为「小计」，由 summary-method/showMethod 控制。\n- ZsSummaryText 文字条默认直接复用小计行数值，无独立数据源，导致一动小计合计就同步变。\n\n## 解决方案\n- 合计不依赖小计，通过 :bottom-summary-items 单独传入接口返回的全量统计（如 totalUnit、totalHouse）。\n- 小计继续由 showMethod 对当前页 data 累加。\n- 约定：小计=当前页前端求和、合计=接口返回全量 summary，两条通道分开传参；翻页时小计变、合计恒定。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/components/zs-table/zs-table.vue、zhi2-web-admin/src/views/property/complex/components/rangeTable.vue、zhi2-web-admin/src/components/ZsSummaryText/index.vue 等。\n- 所属项目：园区物管2.0；来源会话：4d6c0599-62a1-4620-bba9-35eec0a0c116；代码基线：177bc3ce4。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/xcrud_xform_replace.md",
+                "memory_type": "entities",
+                "after": "# 移除 xcrud 依赖本地 XForm 兼容替换\n园区物管2.0 工作流设计器移除 xcrud 依赖，以本地 XForm.vue 按能力子集与同签名兼容替换。\n\n## 背景\n- Process 组件依赖第三方包 xcrud 的 x-form 渲染节点面板表单，需移除该依赖。\n- 外部依赖体积/维护不可控，且项目只用到其中一小部分能力。\n\n## 解决方案\n- 新增本地兼容组件 src/components/Process/common/XForm.vue，只实现实际用到能力子集：input/select/radio/switch/datePicker/slot/tabs(表格行增删改)/operate，dic 同时兼容数组和 {data,label,value}。\n- 保持 v-model 与 this.$refs.xForm.validate() 对外调用签名完全一致，现有页面零改动。\n- mixinXcrud.js / mixinPanel.js 里动态 import('xcrud') 改为静态 import 本地 XForm；package.json 删依赖后 npm install 同步 lock。\n\n## 验收与套路\n- 验收：全局检索无 xcrud 残留引用 + ESLint，人工回归监听器参数表格增删校验、多实例配置按钮、节点面板字段联动。\n- 套路：移除低频小众依赖时，先枚举实际用到能力面，再写签名兼容本地替代组件，调用侧不动。\n\n## 关联信息\n- 涉及文件：src/components/Process/common/XForm.vue、mixinXcrud.js、mixinPanel.js、package.json。\n- 所属项目：园区物管2.0；来源会话：29ff46d9-0d81-4017-a199-d9ef206501c7；代码基线：4b38cdd27。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/svg_fill_replace.md",
+                "memory_type": "entities",
+                "after": "# SVG 图标换色只替换 path fill\n大屏页按色值替换 SVG 图标颜色时，正则只替换第一个 fill 会误改根节点 fill=\"none\"，必须只替换 path 上的十六进制色值。\n\n## 现象\n- 大屏页需按用户给定色值替换 SVG 图标颜色（如图例图标与柱体颜色一致），用正则替换后图例颜色仍不变。\n\n## 根因\n- 很多 SVG 根节点 svg 带 fill=\"none\"，真正颜色写在 path 的 fill=\"#xxx\" 上。\n- 若正则只替换「第一个 fill」，会把根节点 none 误改成目标色，而决定显示颜色的 path 仍是旧色。\n\n## 解决方案\n- 色值替换必须只作用于 path 等绘制节点的十六进制 fill，跳过 fill=\"none\"。\n- 更稳妥做法：按「fill=\"#hex\" 完整匹配带 # 的色值」而非裸匹配 fill 属性。\n- 通用坑：SVG 装饰图标颜色非 CSS 控制，改色要落到 SVG 源码 path 层。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/assets/images/mapOverview/apply.svg、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue。\n- 所属项目：园区物管2.0；来源会话：74cda9bf-bc09-433c-99cf-1a36768b982a；代码基线：6a4835a08。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/line_y_axis_adapt.md",
+                "memory_type": "entities",
+                "after": "# 多系列折线图 Y 轴自适应刻度\n大屏多系列折线图 Y 轴禁止写死 max，需取全系列最大值 ×1.08 后规整到 1/2/3/5/7/10×10ⁿ 自适应。\n\n## 现象\n- 大屏折线图（多系列，如合同金额/入账金额）把 Y 轴 max 写成固定常量，数值一变曲线被压在顶部成直线，看起来怪。\n\n## 根因\n- 固定 max/interval 无法随数据量级伸缩，且任意 max 产生杂乱小数刻度。\n\n## 解决方案\n- 抽公共函数 computeFundLineYAxis(seriesArrays, splitCount=4)：合并多条 series 所有点取最大值 → 乘 1.08 留顶 → 上限规整到 1/2/3/5/7/10×10ⁿ 好看刻度 → interval = max/splitCount（默认 4 段网格）。\n- init 图表时用返回 min/max/interval 配 yAxis；数据源变化无需手改轴常量，调 splitCount 或 1.08 即可调网格或顶边距。\n- 套路：大屏所有数值图表坐标轴一律做「取数据极值 → 留顶系数 → 规整刻度档位」自适应计算，禁止写死 max。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue、chartOptions.js。\n- 所属项目：园区物管2.0；来源会话：9d49e543-6329-4f54-ada3-6194a556fc91；代码基线：3353ef164。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配、map_drill_down_order（地图下钻SVG顺序耦合与下钻视野等待）\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze（Element UI树全部展开卡死分批套路）、sidebar_recursive_menu、recursive_menu_icon_indent（RecursiveMenu图标占位缩进）、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）、search_container_deprecated（旧search-container废弃改zs-search-form）、appmain_isolation（AppMain加isolation隔离层叠上下文）、zs_select_single_choice（页面级选择弹窗对齐zs-select-dialog单选契约）、zs_table_summary_border（zs-table合计行下边框缺失）\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan（分类金额图二次÷10000柱形不显示）、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）、echarts_axis_max_ceiling（ECharts轴刻度上限取整）、four_module_split（超大页面四件套拆分）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、form_getdetail_param_guard（getDetail必需参数守卫钩子）、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、area_field_code_assignment（街道社区字段统一赋编码移除字典等待）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、zs_table_summary（zs-table小计合计双来源）、platform_config_race（平台配置异步加载竞态误报）、project_dialog_cache_restore（全局选项目弹窗缓存恢复）、amount_input_validate_race（AmountInput打包后el-form校验为空竞态）",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配、map_drill_down_order（地图下钻SVG顺序耦合与下钻视野等待）\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze（Element UI树全部展开卡死分批套路）、sidebar_recursive_menu、recursive_menu_icon_indent（RecursiveMenu图标占位缩进）、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）、search_container_deprecated（旧search-container废弃改zs-search-form）、appmain_isolation（AppMain加isolation隔离层叠上下文）、zs_select_single_choice（页面级选择弹窗对齐zs-select-dialog单选契约）、zs_table_summary_border（zs-table合计行下边框缺失）\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan（分类金额图二次÷10000柱形不显示）、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）、echarts_axis_max_ceiling（ECharts轴刻度上限取整）、svg_fill_replace（SVG图标换色只替换path fill）、line_y_axis_adapt（多系列折线图Y轴自适应刻度）、four_module_split（超大页面四件套拆分）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace（移除xcrud依赖本地XForm兼容替换）、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、form_getdetail_param_guard（getDetail必需参数守卫钩子）、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、area_field_code_assignment（街道社区字段统一赋编码移除字典等待）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、platform_config_race（平台配置异步加载竞态误报）、project_dialog_cache_restore（全局选项目弹窗缓存恢复）、amount_input_validate_race（AmountInput打包后el-form校验为空竞态）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

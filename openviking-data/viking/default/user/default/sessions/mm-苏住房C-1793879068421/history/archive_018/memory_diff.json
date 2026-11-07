@@ -1,0 +1,43 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_018",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T12:38:24.793967+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/mortgage_guide_call.md",
+                "memory_type": "entities",
+                "after": "# 房贷导引电话号码点击拨打功能\n苏住房C 房贷导引各银行详情页联系方式已支持点击唤起拨号，并新建本地详情页替代原外部 webView。\n\n## 修复要点\n- `src/utils/sfb.js` 新增 `callPhone` 与 `extractPhoneNumber`：苏服办 H5 优先 `lightAppJssdk.device.call`，其他环境降级 `uni.makePhoneCall`\n- `src/pages/about/AboutUs.vue` 客服电话改为可点击并以主题色高亮\n- `src/pages/policy/fddydetail.vue` 新建本地详情页替代外部 `cc.szfcweb.cn` webView，联系方式电话号码可点击拨打\n- `houseLoanGuide/index.vue` 银行详情跳转改为本地页 `/pages/policy/fddydetail?id=${bankLogo}`\n- `PhoneCall` 组件同步改用 `callPhone`，苏服办中正确唤起拨打\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：fffe887a-3e61-4531-8ddb-6bd2cac507c9\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/empty_house_subpkg.md",
+                "memory_type": "entities",
+                "after": "# empty_house.png 分包迁移致主包路径失效修复\n苏住房C `empty_house.png` 从主包迁移到分包后主包路径失效触发 500 错误，已统一分包解析逻辑。\n\n## 问题根因\n- `empty_house.png` 从主包 `static/images/` 迁至分包 `pages_transaction/static/images/`、`pages_owner/static/images/`，主包路径已不存在\n- 代码引用 `images/empty_house.png`，`resolveStaticUrl` 未解析到分包时回退主包路径触发 500\n- 生产构建 `./dist` 旧版本缺少 `SUBPACKAGE_STATIC_IMAGES` 分包回退逻辑\n\n## 修复要点\n- 统一 `ZsImage` 分包解析：移除组件内重复 `inferImageSubpackage`，全部交由 `resolveStaticUrl` 的 `SUBPACKAGE_STATIC_IMAGES` 处理\n- `ZsEmpty` 支持 `subpackage` 属性并透传 `ZsImage`\n- 交易/业主页面显式指定分包：`pages_transaction/*` 用 `subpackage=\"pages_transaction\"`，`pages_owner/*` 用 `subpackage=\"pages_owner\"`\n\n## 涉及文件\n- `pages_owner/components/house/HouseList.vue`\n- `src/components/ZsEmpty/ZsEmpty.vue`\n- `src/components/ZsImage/ZsImage.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：851aad11-4f50-47bb-a82c-ac1e0de178ab\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/datetime_picker_fix.md",
+                "memory_type": "entities",
+                "after": "# uni-datetime-picker 主包副本删除致 ENOENT 修复\n苏住房C 构建后处理脚本遗漏 JS lazy-load 路径修正，致分包页面加载 `uni-datetime-picker` 报 ENOENT。\n\n## 问题根因\n- 脚本 `relocate-datetime-picker.mjs` 把 `uni-datetime-picker` 从主包复制到各分包并删主包副本以减体积\n- 脚本只修正 `.json` 组件路径，未修正 `.js` 里的 lazy-load 路径\n- 受影响分包 `pages_owner_extra`：`tenant/index`、`committee/application/index` 的 JS 仍指向主包 `node-modules`\n- 微信工具按 JS 路径去主包找 `time-picker.wxss`，主包副本已删，报 ENOENT\n\n## 修复要点\n- 更新 `scripts/relocate-datetime-picker.mjs`，同步修正 `.js` 内 lazy-load 路径到分包\n\n## 涉及文件\n- `scripts/relocate-datetime-picker.mjs`\n- `time-picker.wxss`\n- `pages_owner_extra/tenant/index.js`\n- `pages_owner_extra/committee/application/index.js`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：8f42167b-70b4-4ea9-85ad-c66840f5a3ba\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/formmanual_uploader.md",
+                "memory_type": "entities",
+                "after": "# FormManual 身份证上传图标与 ZsUploader 尺寸修复\n苏住房C 实名认证人工审核页修复身份证上传自定义图标缺失问题，并调整 ZsUploader 尺寸。\n\n## 修复要点\n- `src/pages_my/verification/FormManual.vue`：移除身份证上传自定义 `#icon` 插槽（原引用不存在的 `camera.png`），改用 `ZsUploader` 默认白色「+」图标；删除无用 `icon-uploader` 样式\n- `src/components/ZsUploader/ZsUploader.vue`：`middle` 尺寸高度由 `110` 调整为 `120`，避免图标与文案被挤压\n\n## 验证\n- `npm run build` 通过，产物在 `../dist`\n- 微信开发者工具导入 `dist`，进入 `FormManual?local=true`，身份证正反面上传框显示蓝圈+白色「+」+提示文字\n\n## 涉及文件\n- `src/pages_my/verification/FormManual.vue`\n- `src/components/ZsUploader/ZsUploader.vue`\n- `src/pages_my/verification/FormNonLocal.vue`\n- `src/pages_my/verification/FormLocal.vue`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 来源会话ID：5e291751-65be-4f72-bf6c-bb3eed7c5ba8\n- 代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/苏住房c项目形态.md",
+                "memory_type": "preferences",
+                "after": "- 苏住房C（zhi2-mobile-shimin）是原生微信小程序，不是 web-view 页面"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793813941148/history/archive_009",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T18:05:01.018731+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/maintainresultlite_decimal.md",
+                "memory_type": "entities",
+                "after": "# 选项表决结论维护占比小数位修复\n太仓G 选项表决「表决结论维护」弹窗中参与户数占比、参与面积占比因浮点除法直接赋值而显示过长小数位，已修复为保留两位小数。\n\n## 问题根因\n- MaintainResultDialogLite.vue 的 getChartResult 中，参与户数占比和参与面积占比由浮点除法直接赋值（如 5/17*100 得 29.411764705882353）\n- v-money:2 指令仅在输入框初始化时格式化，异步赋值后不会再次处理，导致长小数位显示\n\n## 修复方案\n- 与 VoteViewLite.vue 保持一致，在赋值时用 .toFixed(2) 保留两位小数\n- partRoomPercent = totalHouseNum ? (voteHouseNum/totalHouseNum*100).toFixed(2) : '0.00'\n- participatePercent = totalWeight ? (voteWeight/totalWeight*100).toFixed(2) : '0.00'\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：zhi1-web-admin/src/views/estate/decisionCommon/components/MaintainResultDialogLite.vue、optionDecision/detail.vue\n- 所属项目：太仓G；来源会话：49431e85-bfc6-4d6e-af77-ea4dad165a1a；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/maintain_result_revert.md",
+                "memory_type": "entities",
+                "after": "# 维修资金结论维护页还原客户环境\n太仓G 维修资金表决在重构后改用了 decisionCommon/MaintainResultDialog.vue 并按昆山版统一，与客户环境不一致，已通过 isMaintainFund 判断还原。\n\n## 问题根因\n- 维修资金表决重构时改用 decisionCommon/MaintainResultDialog.vue，该组件按昆山版统一，与客户环境（图1）存在四项差异\n- 差异包括：多出「参与权数占比」字段、接口由 calculationChart 改为 ownerCalculationChart、下方表格在维修资金场景被隐藏、按钮文案改为「确认并推送APP」\n\n## 修复方案\n- 在 decisionCommon/MaintainResultDialog.vue 增加 isMaintainFund 判断（路由为 maintain 时生效）\n- 恢复户数/面积四个占比字段，去掉权数相关字段和提示图标\n- 恢复调用 calculationChart 接口计算占比\n- 恢复始终显示下方候选人表格区域，按钮文案改回「确认」\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：zhi1-web-admin/src/views/estate/decisionCommon/components/MaintainResultDialog.vue、maintainDecision/detail.vue\n- 所属项目：太仓G；来源会话：f57cbb90-c8af-4874-9961-54eca50f5cb8；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/decisionrange_building_dup.md",
+                "memory_type": "entities",
+                "after": "# 一般表决详情楼幢号下拉重复修复\n太仓G 一般表决详情「决策范围」楼幢号下拉出现大量重复楼幢（如多个「1幢」），已修复为只传 decisionId 获取全部楼幢。\n\n## 问题根因\n- 楼幢号下拉选项由 getSearchCondition() 通过 searchDecisionRange 接口获取\n- 每次查询列表时把完整筛选条件（含 buildingId、unitId）传给接口，选择「1幢」「单元1」后接口返回各户室数据，楼幢号均为「1幢」，导致下拉重复\n\n## 修复方案\n- 获取楼幢下拉选项时只传 decisionId，不再带上楼幢、单元等筛选条件\n- 保证下拉始终显示该表决下的全部楼幢（如「1幢」「测试」）\n- 同步修改 decisionCommon/components/DecisionRangeTable.vue 与 ownerDecision/components/DecisionRangeTable.vue\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：zhi1-web-admin/src/views/estate/decisionCommon/components/DecisionRangeTable.vue、ownerDecision/components/DecisionRangeTable.vue、optionDecision/detail.vue\n- 所属项目：太仓G；来源会话：264b7b99-7e78-4c4b-8e92-4688eeff2060；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/election_candidate_masses.md",
+                "memory_type": "entities",
+                "before": "# 业委会选举候选业主群众隐藏党组织\n太仓G 业委会选举 CandidateDialog 若把所属党组织写死 required，选政治面貌「群众」仍会显示红星并校验失败。\n\n## 问题根因\n- CandidateDialog 把所属党组织写死 required，选政治面貌「群众」仍显示红星并校验失败\n- 园区公共收益有按身份切换附件的类似模式，但本弹窗是党组织字段联动\n\n## 解决方案\n- 用字典项 dictLabel 判定是否群众（兼容不同 dictValue），计算属性 isMassesPoliticsStatus\n- 群众时 v-if 隐藏所属党组织、rules 改为计算属性仅在非群众时必填\n- 切到群众时清空党组织并 clearValidate；党员等其它面貌仍显示且必填\n\n## 验证与归属\n- 验证证据：会话 ed64bbc0 用户选群众仍提示所属党组织必填；结论说明 dictLabel 匹配、条件显示与动态 rules\n- 涉及文件：zhi1-web-admin/src/views/repairFunds/ownerApply/components/CandidateDialog.vue\n- 所属项目：太仓G；来源会话：ed64bbc0-e94c-47ef-8caf-b46b1c3f85c0；代码基线：cf80bc8",
+                "after": "# 业委会选举候选业主群众隐藏党组织\n太仓G 业委会选举 CandidateDialog 若把所属党组织写死 required，选政治面貌「群众」仍会显示红星并校验失败。\n\n## 问题根因\n- CandidateDialog 把所属党组织写死 required，选政治面貌「群众」仍显示红星并校验失败\n- 园区公共收益有按身份切换附件的类似模式，但本弹窗是党组织字段联动\n\n## 解决方案\n- 新增 isMassesPoliticsStatus 计算属性，当政治面貌为「群众」时返回 true（通过字典 dictLabel 匹配，兼容不同 dictValue）\n- 条件显示：政治面貌为「群众」时 v-if 隐藏「所属党组织」字段\n- 动态校验：将 rules 改为计算属性，仅在非「群众」时校验「所属党组织」\n- 切换清理：选择「群众」时自动清空「所属党组织」并清除该字段校验提示；党员等其它面貌仍显示且必填\n\n## 验证与归属\n- 验证证据：会话 ed64bbc0 用户选群众仍提示所属党组织必填；结论说明 dictLabel 匹配、条件显示与动态 rules\n- 涉及文件：zhi1-web-admin/src/views/repairFunds/ownerApply/components/CandidateDialog.vue\n- 所属项目：太仓G；来源会话：ed64bbc0-e94c-47ef-8caf-b46b1c3f85c0；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793849788328/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T04:04:03.662543+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/voting_table_permission.md",
+                "memory_type": "entities",
+                "after": "# 投票项表格权限字符缺失\n园区物管2.0 中 VotingItemsTable 的两个按钮未配置有效权限字符，导致 zs-operate-column 拼接权限时可能无限制。\n\n## 现象与根因\n- VotingItemsTable.vue 中 viewDecisionDetailButton 与 resultButton 均只写 permission: true，未配置 permissionType。\n- zs-operate-column 按规则拼接权限字符，缺少 permissionType 时无法正确校验按钮权限。\n\n## 解决方案\n- 需为两个按钮补充 permissionType 字段以接入权限校验（当前代码未配置）。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/autonomy/multiply/components/VotingItemsTable.vue、zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue、multiply/detail.vue。\n- 所属项目：园区物管2.0；来源会话：7136a5c8-1c00-4f90-aefc-bd46f28f354f；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/amount_input_dispatch.md",
+                "memory_type": "entities",
+                "after": "# AmountInput 校验变更分发对齐\nAmountInput 组件对齐 ElInput 在值变化时通知 ElFormItem 的行为，修复填写后仍为必填校验失败的问题。\n\n## 现象与根因\n- 使用 trigger: 'change' 或依赖值写回 model 再校验时，界面已填仍提示必填。\n- AmountInput 仅在原生 change 及清空时 dispatch el.form.change，与 ElInput 不一致。\n- blur 与父组件更新同帧可能竞态读到旧 model。\n\n## 解决方案\n- 在 numberValue 的 watch 中 emit('input') 之后 nextTick 内 dispatchToFormItem('el.form.change', value)。\n- handleBlur 先 emit('blur')，并将 el.form.blur 放入 nextTick 避免竞态。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/components/AmountInput/index.vue、zhi2-web-admin/package.js。\n- 所属项目：园区物管2.0；来源会话：8430758d-a3eb-412d-97d4-0ab68ebf0303；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/clear_project_logout.md",
+                "memory_type": "entities",
+                "after": "# 退出登录清除小区上下文\n园区物管2.0 在退出登录时新增 clearProjectContext，统一清除 localStorage 与 Vuex 中的小区状态，避免串号显示旧小区。\n\n## 问题现象\n- 退出登录后 Navbar 仍从 localStorage 读到上一个账号的小区名。\n- 刷新后 layout/index.vue 的 syncProjectDialogVisibility 校验清除无效缓存才正常。\n\n## 根因与修改\n- 小区信息存于 localStorage(currentProjectId 等)、Vuex(user.currentProject)、Navbar(localProjectName)。\n- LogOut/FedLogOut 原只清 token 和权限，未清小区数据。\n- user.js 新增 clearProjectContext，在登出时统一清除上述状态。\n\n## 关联信息\n- 涉及文件：src/layout/components/Navbar.vue、src/store/modules/user.js、src/views/home/bProjectDialog.vue 等。\n- 所属项目：园区物管2.0；来源会话：7cc4a853-05fc-4b7d-833f-c45e8ba67283；代码基线：none。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/form_validate_scroll_to_error.md",
+                "memory_type": "entities",
+                "before": "# 表单校验失败滚动定位\nElement UI 校验失败仅标红不滚动，需在自定义滚动容器内新增 scrollFormToFirstError 实现定位聚焦。\n\n## 现象\n- 弹窗表单过长出现内部滚动时，点确定校验失败页面无效果，错误项在可视区外看不到标红。\n\n## 根因\n- Element UI 校验失败只给 el-form-item 加 is-error 类，不滚动定位。\n- 项目滚动发生在自定义容器（.candidate-form-box、.app-main），非 window，通用 scrollIntoView 可能滚错容器。\n\n## 解决方案\n- utils/validate.js 新增 scrollFormToFirstError：查找第一个 .el-form-item.is-error，向上找最近可滚动父容器，平滑滚动并聚焦输入框。\n- 逻辑收口进公共 zs-form 的 validate 失败分支，所有消费 zs-form 的页面/弹窗一次性获得定位+聚焦能力。\n\n## 关联信息\n- 涉及文件：src/utils/validate.js、src/components/zs-form/zs-form.vue、src/views/autonomy/candidateCollect/components/CandidateDialog.vue。\n- 所属项目：园区物管2.0；来源会话：b7798d11-726e-4733-aeb4-7435cb7b009a；代码基线：55cd8653c。",
+                "after": "# 表单校验失败滚动定位\nElement UI 校验失败仅标红不滚动，需在自定义滚动容器内新增 scrollFormToFirstError 实现定位聚焦。\n\n## 现象\n- 弹窗表单过长出现内部滚动时，点确定校验失败页面无效果，错误项在可视区外看不到标红。\n\n## 根因\n- Element UI 校验失败只给 el-form-item 加 is-error 类，不滚动定位。\n- 项目滚动发生在自定义容器（.candidate-form-box、.app-main），非 window，通用 scrollIntoView 可能滚错容器。\n\n## 解决方案\n- utils/validate.js 新增 scrollFormToFirstError：查找第一个 .el-form-item.is-error，向上找最近可滚动父容器，平滑滚动并聚焦输入框。\n- 逻辑收口进公共 zs-form 的 validate 失败分支，所有消费 zs-form 的页面/弹窗一次性获得定位+聚焦能力。\n\n## 关联信息\n- 涉及文件：src/utils/validate.js、src/components/zs-form/zs-form.vue、src/views/autonomy/candidateCollect/components/CandidateDialog.vue、src/mixins/dialogMixins.js、src/mixins/form.js。\n- 所属项目：园区物管2.0；来源会话：b7798d11-726e-4733-aeb4-7435cb7b009a；代码基线：none。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

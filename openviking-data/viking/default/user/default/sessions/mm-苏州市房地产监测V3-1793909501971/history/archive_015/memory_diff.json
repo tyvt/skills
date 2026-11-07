@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T20:56:52.953709+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_async_load.md",
+                "memory_type": "entities",
+                "after": "# 预售弹窗异步加载与监听收敛\n苏州市房地产监测V3 中预售申请相关弹窗统一引入异步加载工具与合并监听机制，解决快速关开导致的请求乱序与父级监听失效问题。\n\n## 核心工具\n- 新增 `src/utils/dialogAsyncLoad.js`，提供 `beginDialogAsyncLoad(vm, seqKey?)` 统一处理弹窗快速关开导致的请求乱序\n- 请求携带 `loadSeq` 以保证顺序正确\n\n## 组件层根因修复\n- `zs-select-dialog` 原 `@opened=\"onOpen\"` 会盖住 `v-on=\"$listeners\"`，父组件 `@opened` 不生效，被迫 `watch visible` 拉数\n- 改为 `mergedDialogListeners`：先跑内置 `onOpen`，再调用父级 `opened` / `open`\n\n## 已改动业务弹窗\n- `PresaleApplyCommitmentDialog` 为预售申请二次确认弹窗（从参数设置接口获取），使用 `@open` + `beginDialogAsyncLoad`，去掉 `watch visible`\n- `PresaleSelectBuildingDialog` / `CashsaleSelectBuildingDialog`：`@opened` 拉楼幢；`watch visible` 仅关窗清 `selection`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`src/utils/dialogAsyncLoad.js`、`zs-select-dialog`、多处业务弹窗\n- 所属项目：苏州市房地产监测V3；来源会话：e1a0c3c1-9712-4aa2-ae67-4d383688e23e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_register_fix.md",
+                "memory_type": "entities",
+                "after": "# 企业入网详情资质与要件显示修复\n苏州市房地产监测V3 中企业注册/变更详情页修复资质信息不显示与要件加载失败问题，统一 companyId 取数逻辑。\n\n## 企业注册审核\n- `companyRegister/detail.vue` 详情归一化兼容 `data.companyRegister` 嵌套\n- `qualificationList` 支持根级数组与 `migrateLegacyQualificationForm` 旧字段\n- `listAppendixPackage` 增加 `companyId: form.companyId || form.companyRegisterId`，与 `AnnexUpload` 一致\n\n## 共用要件组件\n- `AppendixPackageSection/index.vue` 查看态请求补充 `companyId` 回退为 `resolvedBusId`，避免无 `companyId` 时查不到附件\n\n## 企业变更详情\n- `DeveloperBasicInfoForm.vue`、`toB/companyRecord/detail.vue` 与截图布局一致修复要件显示\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`companyRegister/detail.vue`、`AppendixPackageSection/index.vue`、`DeveloperBasicInfoForm.vue`、`toB/companyRecord/detail.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：cf99f29b-21f8-4a83-a521-70a8141c3d1f"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/permit_appendix_fix.md",
+                "memory_type": "entities",
+                "after": "# 预售方案受理详情附件查询修复\n苏州市房地产监测V3 中预售方案受理等详情子路由因 busCode 为空导致附件查不到，新增统一解析与显式传参机制。\n\n## 问题根因\n- 上次加的 `detail` 监听会在 `form` 每次变化时调 `getList()`，有时 `busCode` 未就绪后端报「业务编码为空」\n- 受理等详情子路由的 `meta.busCode` 常为空，仅靠 `AnnexUpload` 从当前路由取码不够\n\n## 修复方案\n- `permitConstants.js` 新增 `resolvePermitAppendixBusCode`，按顺序解析：当前路由 `matched` 链 `meta.busCode` → 同级列表菜单 → 企业申请菜单\n- `detail.vue` 用 `appendixBusCode` 显式传给 `PermitAppendixPanel`，不再依赖子组件猜路由\n- `PermitAppendixPanel` 接收并传入 `bus`，仅 `busId` 和 `bus` 都有值才挂载 `AnnexUpload`；`refreshAppendix` 前校验 `busCode` 非空；`detail` 监听仅在 `projectId`/`presaleP` 变化时触发\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`permitConstants.js`、`detail.vue`、`PermitAppendixPanel.vue`、`PermitPlanPanel.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：e5947e2b-177c-437d-beee-e32448d7d98d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/admin_route_fix.md",
+                "memory_type": "entities",
+                "after": "# 企业管理菜单路由 path 拼接修复\n苏州市房地产监测V3 中菜单详情 path 被拼成 `companyAdmin:/tableid` 导致新增跳转匹配失败，规范路由注册与跳转解析。\n\n## 问题现象\n- 菜单详情 path 被拼成 `companyAdmin:/tableid`，新增跳转到 `/add` 时匹配失败，出现「页面未授权或不存在」\n\n## 修复内容\n- `permission.js`：路由注册时把 `:/tableid` 规范为 `/:tableid`\n- `ruoyi.js`：列表跳转详情/新增时按规范 path 解析并校验可路由性\n\n## 验证与本地操作\n- E2E：`npm run test:e2e:company-admin-add` 已通过（管理端选企业后新增 + 企业端直接新增）\n- 本地需重新登录或清除 `sessionStorage` 的 `routers` 后重试；E2E 默认连 8082，需改 `e2e/.env.e2e` 的 `E2E_BASE_URL` 或本机 8082 起 dev\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`permission.js`、`ruoyi.js`、`companyAdmin/index.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：d698b1b1-35a3-4409-8b54-ec6572857a14"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

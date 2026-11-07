@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793849788328/history/archive_015",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T04:29:39.930396+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/asset_panorama_subcategory.md",
+                "memory_type": "entities",
+                "after": "# 资产全景经营资源子分类拆分与配色\n园区物管2.0 中资产全景页「经营资源统计分析」已适配 operatingResources 接口广告位子分类拆分。\n\n## 数据处理\n- assetPanorama/index.vue 已有 subCategory 解析：当 assetCategories 含 subCategory 时，环形图按子类展示（如「电梯广告」「室外广告」「其他广告」），不再合并为「广告位」。\n- 按样例显示 4 段：电梯广告(8)、临时摊位(1)、其他场地(2)、快递柜/驿站(2)；count 为 0 的子类被过滤。\n\n## 配色修复\n- 原先颜色优先取父级 category，导致广告位、公共场地的子类颜色相同；改为优先按 subCategory 名称取色，父级作兜底。\n- mock.js 已补充广告位与公共场地全部子类的颜色配置，mock 数据改为子分类结构。\n\n## 验证与归属\n- 验证：刷新资产全景页「经营资源统计分析」即可看到按子类拆分的环形图。\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue、src/api/benefit/assetPanorama.js、assetPanorama/mock.js\n- 所属项目：园区物管2.0；来源会话：a6a0fd71-ab08-4e2c-9280-8cd64cf07ee1；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/mapoverview_hundred_decimal.md",
+                "memory_type": "entities",
+                "after": "# 经营资产「百个」单位小数位修复\n园区物管2.0 地图概览页经营资产「百个」单位小数位显示三位，应显示两位，已修复。\n\n## 根因分析\n- 柱状图标签和 tooltip 已限制最多 2 位小数，但 Y 轴刻度未做格式化。\n- 数据较小时（如 0.01～0.02 百个），interval 会算出 0.004 这类值，ECharts 默认显示三位小数。\n\n## 修复内容\n- dataHelpers.js 新增统一 formatHundredValue；formatHundredCount（地图轮播提示中的经营资产）也复用该函数。\n- chartOptions.js 经营资产图表新增 computeHundredCountYAxis，Y 轴刻度间隔最小为 0.01；Y 轴 axisLabel 使用 formatHundredValue 格式化；柱顶标签、tooltip 统一使用同一格式化函数。\n\n## 验证与归属\n- 验证：刷新地图概览页后，Y 轴刻度、柱顶数值和 tooltip 均最多显示两位小数。\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/dataHelpers.js、chartOptions.js、index.vue\n- 所属项目：园区物管2.0；来源会话：cbc563ef-17dc-4a57-9a8a-a924dda959a7；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/mapoverview_axis_config.md",
+                "memory_type": "entities",
+                "after": "# 地图概览图表 xAxis/yAxis 配置混写修复\n园区物管2.0 地图概览页 chartOptions.js 曾误把 yAxis 配置混进 xAxis 且缺少逗号，导致语法错误。\n\n## 根因\n- 上次修改时误把 yAxis 的配置混进了 xAxis，且缺少逗号，导致语法错误，路由无法加载。\n\n## 修复方案\n- 将 xAxis 和 yAxis 恢复为独立配置，刷新页面后路由正常加载。\n\n## 验证与归属\n- 验证：恢复独立配置后路由正常加载。\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js、mock.js、index.vue\n- 所属项目：园区物管2.0；来源会话：54b299a4-635f-450d-90d0-0fb23196a9f4；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/select_dialog_api.md",
+                "memory_type": "entities",
+                "before": "# 业务选择弹窗专用过滤接口模式\n园区物管2.0 中带业务前置条件的选值弹窗必须走业务专用可选列表接口，不能复用通用列表接口在前端筛选。\n\n## 问题根因\n- 房屋质量保证金协议新增页「选择物业管理区域」弹窗调用通用接口 /property/complex/page，列出所有已备案区域，包含尚未开立保证金账户的区域，业务不允许选择。\n- 通用列表接口只承载全部备案数据，业务约束（如已开户）是后端才知道的过滤条件，前端筛选既不可靠也不完整。\n\n## 解决方案\n- 带业务前置条件的选值弹窗优先向后端要/查专用可选列表接口：本项目用 /maintenance/guaranteeDepositAgreement/pageOptionalComplex，只返回已开立账户的物业管理区域。\n- 在 SelectDialog.open 里直接把 url 换成专用接口，筛选参数（bizState: '2'、当前项目 complexId）按接口约定传，表格列配置保持不变。\n- 同类模式：可选项 = 主数据 + 业务状态约束时，一律走 *Optional* / *CanUse* 类专用接口。\n\n## 验证与归属\n- 验证：会话 70fffb2b 用户报「未完成开户的物业管理区域也显示了」，根因是弹窗调了 /property/complex/page，修复把 SelectDialog.open 的 url 改为 /maintenance/guaranteeDepositAgreement/pageOptionalComplex。\n- 涉及文件：zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue；所属项目：园区物管2.0；来源会话：70fffb2b-1949-40f5-a6e2-10d76989883b；代码基线：c52866fc8。",
+                "after": "# 业务选择弹窗专用过滤接口模式\n园区物管2.0 中带业务前置条件的选值弹窗必须走业务专用可选列表接口，不能复用通用列表接口在前端筛选。\n\n## 问题根因\n- 房屋质量保证金协议新增页「选择物业管理区域」弹窗调用通用接口 /property/complex/page，列出所有已备案区域，包含尚未开立保证金账户的区域，业务不允许选择。\n- 通用列表接口只承载全部备案数据，业务约束（如已开户）是后端才知道的过滤条件，前端筛选既不可靠也不完整。\n\n## 解决方案\n- 带业务前置条件的选值弹窗优先向后端要/查专用可选列表接口：本项目用 /maintenance/guaranteeDepositAgreement/pageOptionalComplex，只返回已开立账户的物业管理区域。\n- 在 SelectDialog.open 里直接把 url 换成专用接口（位于 detail.vue 的 showPropertyDialog 方法），筛选参数（bizState: '2'、当前项目 complexId）按接口约定传，表格列配置保持不变。\n- 同类模式：可选项 = 主数据 + 业务状态约束时，一律走 *Optional* / *CanUse* 类专用接口。\n\n## 验证与归属\n- 验证：会话 70fffb2b 用户报「未完成开户的物业管理区域也显示了」，根因是弹窗调了 /property/complex/page，修复把 SelectDialog.open 的 url 改为 /maintenance/guaranteeDepositAgreement/pageOptionalComplex。\n- 涉及文件：zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue；所属项目：园区物管2.0；来源会话：70fffb2b-1949-40f5-a6e2-10d76989883b；代码基线：c52866fc8。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-太仓G-1793948404223/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T07:03:13.621427+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vote_ownerdecision_percent.md",
+                "memory_type": "entities",
+                "after": "# 业委会选举与维修资金结论弹窗占比小数位修复\n太仓G 业委会选举表决与维修资金表决的维护结论弹窗中，参与户数占比、参与面积占比因浮点除法直接赋值而显示过长小数位，已修复为保留两位小数。\n\n## 问题根因\n- decisionCommon/components/MaintainResultDialog.vue 的 getChartResult 方法中，占比字段直接做除法赋值，未格式化为两位小数\n- 原显示示例：参与户数占比 1.1764705882352942 %、参与面积占比 2.102845991765255 %\n\n## 修复方案\n- 业委会选举表决（vote 路由）维护结论弹窗中，参与户数占比、参与面积占比等字段统一用 .toFixed(2) 保留两位小数\n- 与同目录下 MaintainResultDialogLite.vue 的写法保持一致\n- 顺带修复维修资金表决分支及 ownerDecision/components/MaintainResultDialog.vue 中的同类问题\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 修复后显示示例：参与户数占比 1.18 %、参与面积占比 2.10 %\n- 涉及文件：decisionCommon/components/MaintainResultDialog.vue、MaintainResultDialogLite.vue、ownerDecision/components/MaintainResultDialog.vue\n- 所属项目：太仓G；来源会话：c417adbb-668c-4e2f-84da-b9c333bc22dc；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/general_range_cache.md",
+                "memory_type": "entities",
+                "after": "# 一般表决详情决策范围楼幢缓存刷新空下拉修复\n太仓G 一般表决详情页决策范围筛选选择楼幢号搜索后刷新页面，单元号与户室号下拉为空，已修复为根据缓存同步恢复级联数据。\n\n## 问题根因\n- 一般表决详情页决策范围筛选使用 listMixins 缓存搜索条件，选择楼幢号并搜索后 buildingId 写入 Vuex 缓存，刷新时恢复该值\n- 单元号、户室号下拉数据（unitResult、roomResult）仅在手动切换楼幢/单元时通过 handleSelectProjectChange / handleSelectUnitChange 加载，刷新后不会重新请求\n- 导致楼幢号有值而单元号下拉为空\n\n## 修复方案\n- 在 getSearchCondition() 中，根据已缓存的 buildingId、unitId 同步恢复级联下拉数据\n- 通过 searchDecisionRange({ decisionId }) 重新获取 buildingResult 等下拉数据\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 涉及文件：decisionCommon/components/DecisionRangeTable.vue、ownerDecision/detail.vue\n- 所属项目：太仓G；来源会话：fee0d28c-75fe-4a1f-9098-bb41f8526e92；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/range_add_dialog.md",
+                "memory_type": "entities",
+                "after": "# 一般表决详情新增决策范围弹窗错误修复\n太仓G 一般表决详情页点击「新增」误用完整版 DecisionRangeTable 打开表单弹窗并调接口导致异常，已修复为对齐昆山打开「选择户室」弹窗。\n\n## 问题根因\n- 一般表决详情页使用 DecisionRangeTable（完整版），点击「新增」会打开「新增决策范围」表单弹窗并调接口，导致系统异常\n- 昆山正确行为是打开「选择户室」弹窗（RangeHouseDialog），通过批量选择户室来新增决策范围\n\n## 修复方案\n- 在 decisionCommon/components/DecisionRangeTable.vue 中引入 RangeHouseDialog 和 batchAdd 接口\n- 一般表决（decision-policy=\"general\"）点击「新增」时打开「选择户室」弹窗\n- 维修资金表决（maintain）仍走原来的「新增决策范围」表单\n- 选择户室后调用 batchAdd 批量新增并刷新列表\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 备注：若左侧树仍显示「暂无数据」，多为小区 propertyProjectId 或后端树接口数据问题\n- 涉及文件：decisionCommon/components/DecisionRangeTable.vue、generalDecision/detail.vue、decisionCommon/config.js\n- 所属项目：太仓G；来源会话：0a72f656-dc31-41e6-9305-4a7371db4213；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/option_showicon_fix.md",
+                "memory_type": "entities",
+                "after": "# 选项表决详情导出与线下投票按钮缺失修复\n太仓G 选项表决详情页「投票信息」标签页下「导出」与「线下投票录入」按钮因 show-icon 条件错误被隐藏，已修复为双标签页均显示。\n\n## 问题根因\n- 在 optionDecision/detail.vue 中，DecisionRangeTable 的 show-icon 被写成 mainCardValue == 0\n- 切换到「投票信息」标签页时 mainCardValue 为 1，整行操作区被 v-if=\"showIcon\" 隐藏\n- 导致「导出」和「线下投票录入」虽 show-vote 为 true 也不显示\n\n## 修复方案\n- 将 show-icon 改为在「基本信息」和「投票信息」两个标签页都显示操作区\n- 修改代码：:show-icon=\"mainCardValue == 0 || mainCardValue == 1\"\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=太仓G\n- 验证：刷新后在「投票信息」→「决策明细」中应能看到「导出」和「线下投票录入」按钮\n- 涉及文件：optionDecision/detail.vue、optionDecision/components/DecisionRangeTable.vue\n- 所属项目：太仓G；来源会话：35795d81-ec7d-4058-baa4-9e944062ac4e；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

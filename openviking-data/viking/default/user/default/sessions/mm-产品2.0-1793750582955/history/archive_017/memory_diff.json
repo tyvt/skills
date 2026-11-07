@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793750582955/history/archive_017",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T00:38:32.766335+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/product2_tech/detail_template_image_suffix.md",
+                "memory_type": "entities",
+                "after": "# DetailTemplate type:image suffix mismatch blocks extensionless image display\nDetailTemplate's type:'image' only renders <img> when the suffix matches jpg/jpeg/png/gif/bmp/webp/svg; extensionless internal addresses are misjudged as attachment links and not displayed.\n\n## Root Cause\n- Original logic decides whether to render <img> or an attachment link by a file-suffix whitelist (jpg/jpeg/png/gif/bmp/webp/svg)\n- Extensionless internal resource addresses match no suffix and are treated as attachment links, so images fail to display\n\n## Solution\n- Change the type from type:'image' to type:'images'\n- Add a computed property stepPictureUrlList that provides a URL array\n- Let resolveServerAssetUrl directly concatenate <img> for display, no longer relying on suffix matching\n\n## Verification and Attribution\n- Verification: session 321b7eb6 conclusion, src=产品2.0/057.md\n- Involved files: zhi2-web-admin/src/views/dataProperty/scrappedRecord/detail.vue、src/mixins/detailMixins.js、src/views/maintenance/facility/components/FacilitySelectDialog.vue、src/mixins/form.js、src/views/dataProperty/recordProcess/components/detail.vue、src/views/property/complexDeliveryApply/components/facilityDialog.vue、src/views/maintenance/repair/detail.vue、src/views/dataProperty/recordProcess/components/recordProcessStepDialog.vue\n- Project: 产品2.0; source session: 321b7eb6-d1b4-4f6b-865c-11661215d619; code baseline: none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/tech_pattern/submodule_ref_conflict.md",
+                "memory_type": "entities",
+                "after": "# zhi2-web-admin submodule reference inconsistency merge conflict\nThe parent repo's zhi2-web-admin submodule reference locally points to 000c168 while remote points to 60d75dc, causing a merge conflict; keep the integrated submodule and generate a merge commit.\n\n## Background\n- The parent repo's reference to submodule zhi2-web-admin points to 000c168 locally and 60d75dc remotely; the inconsistency triggers a merge conflict\n- This reference-pointer divergence is a common submodule merge conflict source, not a code-content conflict\n\n## Solution\n- Keep the local 000c168 submodule commit that was integrated from remote 60d75dc\n- Generate merge commit 1377d5f to unify the reference and keep the working tree clean\n- After merging, parent and child repo references are consistent, avoiding repeated future conflicts\n\n## Verification and Attribution\n- Verification: session d1128cb7, src=产品2.0/058.md\n- Involved files: zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue、src/views/autonomy/election/components/apply/CandidateDialog.vue、src/views/autonomy/candidateCollect/components/CandidateTable.vue\n- Project: 产品2.0; source session: d1128cb7-0606-40a0-b1b8-83b92090485f; code baseline: none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/product2_tech/spfeebill_import_timeout.md",
+                "memory_type": "entities",
+                "after": "# spFeeBill/import custom 5-minute timeout\nThe global default 100-second timeout cannot satisfy the long-running /property/spFeeBill/import requirement, so the timeout must be overridden per request.\n\n## Background\n- The global request default timeout is 100 seconds, while the spFeeBill batch import interface takes far longer\n- Without overriding the timeout, large imports are interrupted midway\n\n## Solution\n- Add IMPORT_REQUEST_TIMEOUT = 5 * 60 * 1000 (5 minutes) in enums.js\n- Pass timeout in the request config of import.vue and importUploadDialog.vue to override the default\n- Reuse the existing timeout prompt logic; no new error-handling logic needed\n\n## Verification and Attribution\n- Verification: session f95fd685, src=产品2.0/059.md\n- Involved files: zhi2-web-admin/src/utils/request.js、src/api/index.js、vite.config.js、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue、src/views/property/spFeeBill/components/enums.js\n- Project: 产品2.0; source session: f95fd685-fb92-457c-98a8-0d5d19ac9f6f; code baseline: none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/elupload_exceed_pattern.md",
+                "memory_type": "entities",
+                "before": "# el-upload :limit=1 再选文件替换须走 on-exceed\n上传组件设 :limit=\"1\" 后再次选文件走 on-exceed 而非 on-change，替换逻辑必须挂在 on-exceed 上。\n\n## 问题根因\n- Element UI 在文件数已达 limit 时再选文件走 on-exceed 回调，根本不会进入 on-change\n- 挂在 on-change 上的替换/去重逻辑永远收不到新文件，这是 limit 生效后的必然行为而非组件 bug\n\n## 解决方案\n- 新增 handleExceed(files)：取 files[0]，先做与 on-change 相同的 validateFile 校验\n- 然后 this.$refs.upload.clearFiles() 清空组件内部列表并重置 fileList/localFiles\n- 最后手动调用 this.$refs.upload.handleStart(file) 把新文件重新加入上传流程（handleStart 是 el-upload 实例方法，非公开 API 但稳定）\n- 凡「限 1 个文件 + 重新选择即替换」需求都套此模式，不要试图在 on-change 里补救\n\n## 验证与归属\n- 验证：会话 3b0f6cd2 结论明确「设 :limit=1 后再次选择走 on-exceed，不进入 on-change」，给出 handleExceed{ clearFiles + handleStart } 代码\n- 涉及文件：zhi2-web-admin/src/components/FileUpload/index.vue、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue\n- 所属项目：产品2.0\n- 来源会话ID：3b0f6cd2-34d8-446f-830d-2c1d4d5eda2f\n- 代码基线：94b86fa",
+                "after": "# el-upload :limit=1 再选文件替换须走 on-exceed\n上传组件设 :limit=\"1\" 后再次选文件走 on-exceed 而非 on-change，替换逻辑必须挂在 on-exceed 上。\n\n## 问题根因\n- Element UI 在文件数已达 limit 时再选文件走 on-exceed 回调，根本不会进入 on-change\n- 挂在 on-change 上的替换/去重逻辑永远收不到新文件，这是 limit 生效后的必然行为而非组件 bug\n\n## 解决方案\n- 新增 handleExceed(files)：取 files[0]，先做与 on-change 相同的 validateFile 校验\n- 然后 this.$refs.upload.clearFiles() 清空组件内部列表并重置 fileList/localFiles\n- 最后手动调用 this.$refs.upload.handleStart(file) 把新文件重新加入上传流程（handleStart 是 el-upload 实例方法，非公开 API 但稳定）\n- 凡「限 1 个文件 + 重新选择即替换」需求都套此模式，不要试图在 on-change 里补救\n\n## 验证与归属\n- 验证：会话 3b0f6cd2 结论明确「设 :limit=1 后再次选择走 on-exceed，不进入 on-change」，给出 handleExceed{ clearFiles + handleStart } 代码\n- 涉及文件：zhi2-web-admin/src/components/FileUpload/index.vue、src/views/property/spFeeBill/components/import.vue、importUploadDialog.vue、src/components/ImageUpload/index.vue、src/components/zs-import/zs-import.vue、src/components/AnnexUpload/index.vue、src/views/benefit/components/AnnexUploadDialog/index.vue、src/views/property/allotNotice/detail.vue\n- 所属项目：产品2.0\n- 来源会话ID：3b0f6cd2-34d8-446f-830d-2c1d4d5eda2f\n- 代码基线：94b86fa"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

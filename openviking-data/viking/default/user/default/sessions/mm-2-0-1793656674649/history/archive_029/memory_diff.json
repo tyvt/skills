@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793656674649/history/archive_029",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T22:43:04.964974+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsinput_size_compat.md",
+                "memory_type": "entities",
+                "after": "# ElInput size 非法值兼容归一化\nElement Plus ElInput 的 size 仅接受 \"\"|default|small|large，历史传 mini/medium 会告警，需在 ZsInput 封装层做映射。\n\n## 问题根因\n- Element Plus ElInput 的 size prop 不支持 mini/medium，合法值为 \"\"|default|small|large，直写会触发 Vue warn。\n- 项目历史代码向 zs-input 传入 medium/mini 触发 Invalid prop 警告。\n\n## 解决方案\n- 在 zhi2-web-admin/src/components/zs-input/zs-input.vue 封装层映射 medium→default、mini→small、其余→default。\n- 封装组件应归一化传入尺寸以避免 Vue warn。\n\n## 验证与归属\n- 验证证据：src=2-0/018.md；会话 a5963bb7 报 ElInput size 传 mini/medium 告警，经 zs-input.vue 归一化修复。\n- 涉及文件：zhi2-web-admin/src/components/zs-input/zs-input.vue；runtime.ts。\n- 所属项目：2-0；来源会话ID：a5963bb7-204d-42a4-88ac-9fc16822e761 与 76487407-667b-42b3-afef-eb2d2411a5b9；代码基线：none。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_series_normalize.md",
+                "memory_type": "entities",
+                "before": "# ECharts series 归一化防护\n在 setOption 前对 option.series 做假值过滤与缺 type 补默认，避免 LineView 读 undefined.type。\n\n## 问题根因\n- 控制台报 `Cannot read properties of undefined (reading 'type')`（LineView.render），根因是 `option.series` 混入 undefined/null/false 或空洞项。\n- 常见来源：条件拼接 `series: [a && {...}]`，或 `getOption()` 改完再 `setOption` 时 `series[0]` 已清空仍回写。\n\n## 解决方案\n- 在 `setOption` 前统一走 `src/utils/echartsOption.js`：过滤假值项，缺 `type` 的项补默认（如 line/bar/map）。\n- 先在地图、气泡、季度申报等高频入口接入，再考虑全局包一层 `setOption`。\n\n## 验证与归属\n- 验证证据：会话 74a5d328 用户贴 LineView.js:567 stack；结论为 series 空值 + 新增 echartsOption 归一化并接入 pubQuarterlyDeclaration、BubblesChart、map 等。\n- 涉及文件：zhi2-web-admin/src/utils/echartsOption.js；zhi2-web-admin/src/views/benefit/mobilePreview/pubQuarterlyDeclaration/index.vue；zhi2-web-admin/src/views/home/components/BubblesChart.vue；zhi2-web-admin/src/views/transaction/screen/components/map.vue；zhi2-web-admin/src/views/monitor/components/mapChart/index.vue。\n- 所属项目：2-0；来源会话ID：74a5d328-683e-4a0f-84af-32d70a0281e6；代码基线：none。",
+                "after": "# ECharts series 归一化防护\n在 setOption 前对 option.series 做假值过滤与缺 type 补默认，避免 LineView 读 undefined.type。\n\n## 问题根因\n- 控制台报 `Cannot read properties of undefined (reading 'type')`（LineView.render），根因是 `option.series` 混入 undefined/null/false 或空洞项。\n- 常见来源：条件拼接 `series: [a && {...}]`，或 `getOption()` 改完再 `setOption` 时 `series[0]` 已清空仍回写。\n- 另一来源：图表组件 props 默认值 `() => {}` 返回 undefined，使 `option.series` 含 undefined 项。\n\n## 解决方案\n- 在 `setOption` 前统一走 `src/utils/echartsOption.js`：过滤假值项，缺 `type` 的项补默认（如 line/bar/map）。\n- 先在地图、气泡、季度申报等高频入口接入，再考虑全局包一层 `setOption`。\n- 图表组件 props 默认值由 `() => {}` 改为 `() => ({})`，避免 series 为 undefined。\n- 在 `setOption` 前对 series 做 `filter(Boolean)` 并补 `type: 'line'`；同时修正 `LineChart.vue` 的事件监听。\n\n## 验证与归属\n- 验证证据：会话 74a5d328 用户贴 LineView.js:567 stack，结论为 series 空值 + 新增 echartsOption 归一化；会话 8dac8daf 补充 LineView.js:567 报错源于 props 默认 `()=>{}` 返回 undefined，图表组件 props 改默认 `()=>({})`、setOption 前 filter(Boolean) 并补 `type:'line'`、修正 LineChart.vue。\n- 涉及文件：zhi2-web-admin/src/utils/echartsOption.js；zhi2-web-admin/src/views/benefit/mobilePreview/pubQuarterlyDeclaration/index.vue；zhi2-web-admin/src/views/home/components/BubblesChart.vue；zhi2-web-admin/src/views/transaction/screen/components/map.vue；zhi2-web-admin/src/views/monitor/components/mapChart/index.vue；LineView.js；LineChart.vue。\n- 所属项目：2-0；来源会话ID：74a5d328-683e-4a0f-84af-32d70a0281e6 与 8dac8daf-d2d6-4f13-a79c-6e0143d0dbce；代码基线：none。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_009",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T11:24:27.133538+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/pkg_upload_estimate.md",
+                "memory_type": "entities",
+                "after": "# 主包上传预估体积折算规则\n苏住房C小程序主包体积判定须用上传预估（源码体积≈磁盘×1.17），超限后按包下沉第三方依赖。\n\n## 问题现象\n- npm run build 报主包超限，但本地磁盘体积仅1798.4KB(<2048KB)，误判为未超\n- 微信上传体积按源码折算预估约磁盘×1.17，1798.4→2104.1KB，实际超限约56KB\n\n## 根因\n- 上传体积非磁盘体积，而是构建产物源码体积折算，实测系数约1.17\n- 新增 z-paging/ZsPaging 约92KB打入主包 node_modules 导致超出\n\n## 解决方案\n- scripts/size-main-package.mjs 同时输出磁盘体积与上传预估(×1.17)，build门禁只认后者\n- 超限时先将组件下沉到各分包（pages_xxx/components/），用 scripts/relocate-z-paging.mjs 搬运并改引用\n- tab页（如苏找房）不引用重分页组件，改回 scroll-view + uni-load-more 避免依赖回主包\n\n## 验证与归属\n- 会话3562f516：修复后主包磁盘1742.6KB、上传预估2038.9KB通过\n- 涉及文件：scripts/validate-dist.mjs、size-main-package.mjs、relocate-z-paging.mjs、Project_Suzhufang.vue\n- 所属项目：苏住房C；代码基线：5f0f4dc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zsimage_zero_height.md",
+                "memory_type": "entities",
+                "after": "# ZsImage组件默认高度导致图片不显示\n苏住房C的ZsImage封装默认aspectFill+height:100%，父级无高度时图片渲染为0高，需补width prop与widthFix。\n\n## 问题现象\n- 页面插图请求返回200但界面看不到图，误以为资源丢失或路径错\n- 报错Failed to load local image resource ... 500与307重定向到/__pageframe__\n\n## 根因\n- ZsImage默认mode=aspectFill+内部height:100%，父容器无显式高度时盒高压成0\n- 小程序自定义组件默认styleIsolation隔离，父级width:180px进不到组件内部真实节点\n\n## 解决方案\n- 给ZsImage补width prop，内部inline style落到真实节点，支持mode=\"widthFix\"高度自适应\n- 调用侧统一写`<ZsImage mode=\"widthFix\" width=\"180px\" />`\n- 需外部样式生效时组件options改styleIsolation:'shared'并合并外部class，补全空引用imageStyle\n\n## 验证与归属\n- 会话a875a3cf：修改ZsImage.vue补imageStyle、width prop、widthFix、shared隔离，SuccessCard改调用\n- 涉及文件：ZsImage.vue、SuccessCard.vue；所属项目：苏住房C；代码基线：6aca310"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/h5_global_isolation.md",
+                "memory_type": "entities",
+                "after": "# 跨端全局对象隔离规范\n苏住房C小程序与H5共用源码时，window/location/sessionStorage等H5-only对象须收敛到跨端工具，避免setup阶段报错。\n\n## 问题现象\n- 运行报TypeError: Cannot read property 'location' of undefined，堆栈停在公共组件setup\n- 错误指向复用组件AgreementPage.js而非当前页面，易误判\n\n## 根因\n- 共享组件直接使用window.location/document/sessionStorage，mp-weixin运行时不存在\n- 组件挂载即setup抛错，错误堆栈只指公共组件\n\n## 解决方案\n- location.search改hooks/useUrlQueryParam；sessionStorage改utils/form-cache.js封装uni storage\n- document/window.addEventListener用H5条件编译包裹\n- 全仓排查清理window对象使用，验证步骤间切换表单保留\n\n## 验证与归属\n- 会话4b82f232：新增utils/form-cache.js，guardApply三步组件改uni storage，多处加条件编译\n- 涉及文件：AgreementPage.vue、form-cache.js、useUrlQueryParam.js、guardApply/*等；项目：苏住房C；基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/useloadmore_zpaging.md",
+                "memory_type": "entities",
+                "after": "# 自研useLoadMore失败卡加载整改\n苏住房C公告列表Android真机一直加载中，因自研useLoadMore请求失败不回complete，统一改用z-paging。\n\n## 问题现象\n- 社区/街道/小区公告三列表页Android真机一直转圈，iOS与开发者工具正常\n- 表现“加载中”永不结束\n\n## 根因\n- 自研hooks/useLoadMore.js驱动分页，请求失败路径未调用结束/complete回调\n- Android真机网络差异稳定触发失败分支\n\n## 解决方案\n- 列表分页统一迁到z-paging，抽hooks/useAnnouncementPaging.js集中处理并失败显式complete(false)\n- pages.json补z-paging easycom配置，NoticeList加showEmpty开关避免重复空态\n- 回滚还原useLoadMore本身避免其他页面回归\n\n## 验证与归属\n- 会话802b4a4d：用户要求“都改用z-paging吧”，新增useAnnouncementPaging.js，三公告页改z-paging\n- 涉及文件：useLoadMore.js、useAnnouncementPaging.js、pages.json、公告页组件；项目：苏住房C；基线：0cea241"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

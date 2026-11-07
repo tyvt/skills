@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_012",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T05:35:03.100032+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/lease_detail_block_swap.md",
+                "memory_type": "entities",
+                "after": "# 租赁合同详情两栏区块换序规范\n公共收益租赁合同备案详情页调换两栏区块时，编辑态与查看态须同步换序，子表取数回传链路不得随位置变更删除。\n\n## 问题背景\n- 公共收益-租赁管理-租赁合同备案（经营资产/经营资源）要求把「出租房信息」与「公共区域场所」调换位置（出租房在上、场所在下），且编辑详情页同样调换\n- 详情页两块内容有两套独立声明：编辑态靠模板组件顺序，查看态靠 contentInfo/字段构造器顺序\n\n## 风险与根因\n- 只改一处会出现「查看对了、编辑反了」的不一致\n- 某块在查看态不再展示时，有人会顺手删掉其子表组件与取数，导致保存主表时清空历史子表数据\n\n## 修法规范\n- 先定位两栏渲染顺序来源（编辑态模板 + 查看态 contentInfo），两处同序调整，禁用 CSS order 视觉置换\n- 子表（subVenueTable 等）取数与回传链路保留，位置变了不等于数据可删\n- 查看详情的公共区域场所分别支持「新增/编辑」与「纯查看」入口，按钮显隐按 formMode 判定，不复用同一可编辑组件\n- 改完按「编辑态→保存→查看态」走一遍顺序与数据是否都在\n\n## 验证与归属\n- 列表说明文字样式同期对齐（橙色警告图标+深灰正文、仅关键词标橙、内边距8px），三个租赁合同模块一起改\n- 涉及文件：benefit/assetsLeaseContractFiling/detail.vue、benefit/resourcesLeaseContractFiling/detail.vue、assetLeaseApply/components/subVenueTable.vue、pubVenue/components/venueDialog.vue\n- 所属项目：产品2.0；来源会话：710f2232-3ba0-4139-9d99-3fa269331edd；代码基线：41c6961"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_dialog_padding.md",
+                "memory_type": "entities",
+                "after": "# zs-dialog 内 zs-table 水平留白规范\nzs-table 被放入 zs-dialog 的 form-box 后缺失左右 padding，须将水平留白下沉到 zs-table 公共容器规则而非逐弹窗补样式。\n\n## 问题现象\n- 经营用房(pubHouse)详情弹窗「资产部位」子表、公房车位弹窗、房屋部位 assetDialog 中表格紧贴弹窗边缘，左右缺留白\n- 仅部分弹窗缺，其他弹窗正常\n\n## 根因\n- zs-table 水平留白依赖外层容器(.list-card/.sub-container/.form-box)提供\n- 表格放进 zs-dialog 的 .form-box 时无任何一层给左右 padding；改页面级 scoped 样式仅当次生效，同类弹窗会复发\n\n## 修法规范\n- 将水平留白下沉到 zs-table 公共容器规则（与 .list-card、.sub-container 同源），一处改所有弹窗表格生效\n- 改完须截图在多个弹窗（含公房车位、房屋部位）逐个复核左右是否一致\n\n## 验证与归属\n- 改动落在 zs-table.vue 与 styles/index.scss（公共层）后一次对齐，子模块提交后 cherry-pick 到 v2.6.2/v2.6.2-yulin\n- 涉及文件：components/zs-table/zs-table.vue、styles/index.scss、pubHouse/components/pubHouseDialog.vue、pubParkingSpace/components/parkingDialog.vue、housePart/components/assetDialog.vue\n- 所属项目：产品2.0；来源会话：2ee3fa7e-3302-4162-9884-a54bd1cffc7f；代码基线：6accf9a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cherry_pick_multibranch.md",
+                "memory_type": "entities",
+                "after": "# 小范围修复跨版本分支同步规范\n缺陷已在主干修好后需带到多条版本分支时，用 cherry-pick 修复提交而非全量 merge，以降低冲突与评审成本。\n\n## 适用场景\n- 一个缺陷已在 develop/v2.6.1 修好，需同时带到 develop/v2.6.2 与 develop/v2.6.2-yulin\n- 两分支已分叉较远，全量 merge 冲突多且与本次修复无关\n\n## 根因与取舍\n- 全量 merge 带无关改动、冲突面大、评审成本高、回滚困难\n- 缺陷是极小公共样式/组件改动，按提交粒度搬运即可\n\n## 操作流程\n- 先在主干提交推送，记子模块提交号\n- 目标分支 cherry-pick 该子模块提交，各产生新提交号再推送\n- 父仓库仅更新子模块指针，三条分支各提交一次\n- 本地 env/.env 代理配置不入库，提交前 git status 核对排除\n- 完成后切回主干分支，逐分支远程核对提交到位\n\n## 验证与归属\n- 会话 2ee3fa7e 结论：子模块 d87a19724 → v2.6.2 97cb12059 / v2.6.2-yulin f36236202 均为 cherry-pick\n- 父仓库 669d166/c2d4531/90b47f6 更新指针；env/.env 未提交，工作区恢复 develop/v2.6.1\n- 所属项目：产品2.0；来源会话：2ee3fa7e-3302-4162-9884-a54bd1cffc7f；代码基线：6accf9a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_table_border_false.md",
+                "memory_type": "entities",
+                "after": "# zs-table border=false 列竖线规范\nzs-table 设 :border=false 仍显示列竖线，因全局样式无条件给单元格加 border-right，须收窄到 el-table--border 作用域。\n\n## 问题现象\n- 资产租赁申请、资源租赁申请（列表页与详情页同理）将 zs-table 的 :border 设为 false，列竖线仍存在\n\n## 根因\n- zs-table 的 border 只往 el-table 打 el-table--border 类\n- .list-card 全局样式无条件给所有单元格加 border-right，忽略 border 属性开关\n\n## 修法规范\n- 将列竖线规则收窄到 .el-table--border 作用域：border=true→列竖线+行横线；border=false→只留行横线\n- zs-table 补 isBorderEnabled 判定并输出容器类 zs-table-container--border，让两种口径组件层可辨\n- 验收向用户说明：border=false 仍见行间横线是列表页默认样式，非 border 控制的列竖线\n- 公共层改完须回归其他模块列表，属全站表格边框规范一部分\n\n## 验证与归属\n- 会话 49ee8efa 根因明确为 .list-card 全局无条件加 border-right，index.scss 收窄到 el-table--border、zs-table.vue 增 isBorderEnabled/zs-table-container--border\n- 涉及文件：styles/index.scss、components/zs-table/zs-table.vue、benefit/assetLeaseApply/index.vue\n- 所属项目：产品2.0；来源会话：49ee8efa-ceee-4350-9446-1a98b38420eb；代码基线：41c6961"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

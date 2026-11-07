@@ -1,0 +1,50 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793872912374/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T10:09:19.650984+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/screen_drill_filter_clear.md",
+                "memory_type": "entities",
+                "after": "# 大屏穿透默认筛选未清除修复模式\n园区物管2.0 大屏穿透到列表页时，若目标页有默认筛选项且大屏未传该参数，需清除默认筛选，否则列表数量与大屏不一致。\n\n## 问题根因\n- maintenanceProject/index.vue 默认 currentState='00'（当前节点=项目立项），大屏只传 bizState=2（已备案）时 listMixins 只写 URL 参数、未清默认，列表被额外按当前节点过滤，数量与大屏不一致\n\n## 解决方案\n- 目标页重写 applyScreenQuery()，调用原 mixin 后 this.$set(this.queryParams, 'currentState', undefined)，使 from=screen 时清默认\n- 大屏入口：smartPropertyScreen/components/RepairFundRight.vue 的 goMenu('maintenance/maintenanceProject/index', buildScreenQuery({ bizState: 2 }, 'region'))\n\n## 验证与归属\n- 来源会话：2026-11-05 修复 bug 6220；文件 zhi2-web-admin/src/views/maintenance/maintenanceProject/index.vue；分支 develop/v2.6.2-yulin；提交 53a49c076"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/guarantee_deposit_bterminal_filter.md",
+                "memory_type": "entities",
+                "after": "# 房屋质量保证金B端权限过滤模式\n产品2.0 项目为房屋质量保证金模块所有列表菜单补充 B 端权限过滤，按当前选中物业管理区域传入 propertyProjectId。\n\n## 修改文件\n- guaranteeDepositAccount/index.vue：新增 getQueryParams()，B 端查询和导出自动带 propertyProjectId，修复此前未做小区过滤展示所有区域数据的问题\n- guaranteeDepositAgreement/index.vue：仅 isBTerminalPractitioner 为 true 时传 propertyProjectId，避免 G 端误过滤\n- guaranteeDepositAgreementEnd/index.vue：同上，统一 B 端过滤逻辑\n- 已具备过滤无需修改：guaranteeDeposit/components/index.vue（资金缴存/支用列表）、AddDialog.vue（新增缴存/支用弹窗账户选择）\n\n## 验证与归属\n- 所属项目：产品2.0；来源会话：dfe1828a-18d8-4f50-bd96-5b846ee22649；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/apiv3_normalize_path_body.md",
+                "memory_type": "entities",
+                "after": "# API V3路径参数入参体全局增强\n产品2.0 项目在 apiV3Normalize.js 中统一增强，将路径参数移入 body，业务代码无需逐个修改。\n\n## 问题根因\n- 原仅「看起来像数字 ID」的路径参数（isPathId）才移入 body，导致大量接口参数留在 URL，如 getByKey/qq.map.key、getBySecondVerifyLogCode/ABC123、readXml/{deployId}、calculationChart/{id}\n\n## 解决方案\n- 在 normalizeTrailingPathParams 中统一处理 4 段及以上路径：ByXxx 类动作（getByKey 等）自动推断 body 字段名不再要求数字 ID；已知单参数动作（readXml→deployId、calculationChart→decisionId、terminate→id）；多参数动作（listEffective、listReport、batchGenerateVoucher）；已规范 V3 路径（末段 /detail）跳过\n\n## 验证与归属\n- 涉及文件：apiV3Normalize.js、utils/tencentMapKey.js、utils/request.js、api/index.js；所属项目：产品2.0；来源会话：06f4b462-1a59-4d5f-b258-6f1f46290ddd；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/maintenance_acc_refund_feature.md",
+                "memory_type": "entities",
+                "after": "# 维修资金账户退款申请功能\n产品2.0 项目按现有规范新建维修资金退款（账户退款申请）功能，包含列表页、详情页与多个组件。\n\n## 文件结构\n- zhi2-web-admin/src/views/maintenance/accRefund/index.vue：列表页\n- detail.vue：详情/表单页\n- components/AccountRefundTable.vue：账号退款列表（退款明细）\n- components/HistoryRefundNoticeDialog.vue：选择历史退款通知书\n- components/AccountRefundDialog.vue：编辑/查看账户退款\n- components/TradeDetailTable.vue：退款记账明细\n- components/TradeDetailDialog.vue：记账明细查看\n\n## 功能说明\n- 列表页 API：GET /maintenance/accRefund/apply/page，支持关键字、退款申请类型、业务状态查询，导出 POST /maintenance/accRefund/apply/export\n- 详情页：基本信息含物业管理区域、账户类型（业主基本账户/电梯消防资金专户）、出款账号及自动带出字段；退款申请信息含退款类型\n\n## 验证与归属\n- 涉及文件：index.vue、detail.vue、AccountRefundTable.vue、HistoryRefundNoticeDialog.vue；所属项目：产品2.0；来源会话：f23a2459-353c-41d6-93aa-1abf998360f7；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/account_open_dialog_height.md",
+                "memory_type": "entities",
+                "after": "# 业主账户开户弹窗表格高度优化\n产品2.0 项目优化维修资金账户管理业主账户开户弹窗，使表格可视区域占满弹窗可用高度。\n\n## 问题根因\n- 上次修复后虽能滚动，但 flex 父级无明确高度，flex:1 表格区域仅收缩到约 120px 最小高度，每页 10 条只能看到 2～3 行，弹窗下方大量空白未利用\n\n## 解决方案\n- dialog-box 高度设为 var(--zs-dialog-content-max-height)（约 88vh），内容区默认占满可用空间\n- 打通 flex 高度链：el-dialog → el-dialog__body → dialog-box → 表格区域逐级传递高度\n- 通过 ResizeObserver 将表格高度与容器实际高度对齐，避免被 zs-table 固定行高计算覆盖\n\n## 验证与归属\n- 刷新后重新打开弹窗列表区域应显示接近 10 条数据（视屏幕高度），超过可视区域仍可滚动\n- 涉及文件：maintenance/components/OpeningBuildingDialog.vue、accountOpen/owner/components/ScopeSelectDialog.vue、maintenance/components/ScopeSelectDialog.vue；所属项目：产品2.0；来源会话：082a4d1c-6379-4946-a74a-7dab35a3ffd7；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/screen_drill_filter.md",
+                "memory_type": "entities",
+                "before": "# 大屏穿透筛选参数与目标页对齐模式\n园区物管2.0 物业数据大屏左菜单穿透到列表页时，穿透参数必须在目标页有同名筛选项，否则用户看到全量数据。\n\n## 问题根因\n- 大屏穿透参数与列表页筛选参数是两份互不相干的约定，字段名须两端一致。\n- 缺任一环，过滤条件不生效或只作用于进页面瞬间，用户无入口可调。\n- 物管会/业委会页面本无「状态」筛选项，穿透带 committeeState=1 无处可改。\n\n## 解决方案\n- 建「大屏穿透参数 ↔ 目标页 queryParams ↔ 页面筛选项」三方对照表对齐字段名与取值（#8/#9 补 isEffect=1；#10/#11 补 committeeState=1）。\n- 目标页缺筛选项按字典补下拉（autonomy/record/components/index.vue 的 queryParams 加 committeeState，筛选面板新增「物管会/业委会状态」下拉，字典 IS_START，initDict 加载 IS_START）。\n- 页面已有同名字段直接复用（如 #8/#9 复用「执行状态」effect_state），不新增重复项。\n- 后端改统计口径不急换前端接口/字段，只标注「大屏数字会变」并回头检查告警阈值与文案。\n- 交付前用对照表逐项打勾。\n\n## 验证与归属\n- 会话 859e9c31（基线 23d6668）：用户诉求 1「页面无筛选项也要加」、诉求 2「后端改对照文档完善」；#7/#13 属后端改口径前端无需替换（物业服务企业备案数 4→13）。\n- 涉及文件：smartPropertyScreen/components/PropertyManageLeft.vue、autonomy/record/components/index.vue；来源会话：859e9c31-a0be-49d9-8fc3-d4c91555496e；代码基线：23d6668。\n\n## 穿透时目标页默认筛选未清除（Bug 6220 变体）\n- 另一类口径错位：maintenanceProject/index.vue 默认 currentState='00'（当前节点=项目立项），大屏只传 bizState=2（已备案）时 listMixins 只写 URL 参数、未清默认，列表被额外按当前节点过滤，数量与大屏不一致。\n- 期望（禅道 bug 6220）：大屏维修项目穿透只按已备案筛选，不带当前节点默认筛选。\n- 修复：目标页重写 applyScreenQuery()，调用原 mixin 后 this.$set(this.queryParams, 'currentState', undefined)，使 from=screen 时清默认。\n- 大屏入口：smartPropertyScreen/components/RepairFundRight.vue 的 goMenu('maintenance/maintenanceProject/index', buildScreenQuery({ bizState: 2 }, 'region'))。\n- 来源会话：2026-11-05 修复 bug 6220；文件 zhi2-web-admin/src/views/maintenance/maintenanceProject/index.vue；分支 develop/v2.6.2-yulin；提交 53a49c076。",
+                "after": "# 大屏穿透筛选参数与目标页对齐模式\n园区物管2.0 物业数据大屏左菜单穿透到列表页时，穿透参数必须在目标页有同名筛选项，否则用户看到全量数据。\n\n## 问题根因\n- 大屏穿透参数与列表页筛选参数是两份互不相干的约定，字段名须两端一致。\n- 缺任一环，过滤条件不生效或只作用于进页面瞬间，用户无入口可调。\n- 物管会/业委会页面本无「状态」筛选项，穿透带 committeeState=1 无处可改。\n\n## 解决方案\n- 建「大屏穿透参数 ↔ 目标页 queryParams ↔ 页面筛选项」三方对照表对齐字段名与取值（#8/#9 补 isEffect=1；#10/#11 补 committeeState=1）。\n- 目标页缺筛选项按字典补下拉（autonomy/record/components/index.vue 的 queryParams 加 committeeState，筛选面板新增「物管会/业委会状态」下拉，字典 IS_START，initDict 加载 IS_START）。\n- 页面已有同名字段直接复用（如 #8/#9 复用「执行状态」effect_state），不新增重复项。\n- 后端改统计口径不急换前端接口/字段，只标注「大屏数字会变」并回头检查告警阈值与文案。\n- 交付前用对照表逐项打勾。\n\n## 验证与归属\n- 会话 859e9c31（基线 23d6668）：用户诉求 1「页面无筛选项也要加」、诉求 2「后端改对照文档完善」；#7/#13 属后端改口径前端无需替换（物业服务企业备案数 4→13）。\n- 涉及文件：smartPropertyScreen/components/PropertyManageLeft.vue、autonomy/record/components/index.vue；来源会话：859e9c31-a0be-49d9-8fc3-d4c91555496e；代码基线：23d6668。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793750582955/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T00:04:15.680854+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/腾讯地图坐标安全构造.md",
+                "memory_type": "entities",
+                "after": "# 腾讯地图坐标安全构造\n产品2.0 统计地图页需按正确分隔符解析园区多边形坐标，并统一走安全校验函数构造 LatLng，避免脏数据导致地图初始化崩溃。\n\n## 问题现象\n- 统计地图页（benefit/statisticsMap）mounted 阶段抛腾讯地图异常「LatLng 传入参数 (NaN, 120.311972) 非合法数字」。\n- 一条脏数据就让整个地图初始化崩溃。\n\n## 根因\n- 后端返回的园区多边形 path 字符串是「分号 ; 分隔各点、逗号 , 分隔经纬度」，解析函数却按空格 split(' ') 切分，首个点解析成 NaN。\n- 构造 LatLng 前没有任何合法性校验。\n\n## 解决方案\n- 解析函数统一按 ';' 切点、',' 切经纬度，对接字符串型几何数据必须先确认实际分隔符。\n- 封装 createSafeLatLng(lat, lng)，内部 Number 转换 + isFinite 校验，非法值返回 null 并跳过该点。\n- initMap、updateCenter、区域标注 nameLocation 等所有构造坐标入口都走安全构造。\n\n## 验证与涉及\n- 验证证据：根因是园区多边形路径解析错分隔符，新增 createSafeLatLng 统一转数字校验，getBuildingPaths 从 split(' ') 改为按 ';' 切分。\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue、zhi2-web-admin/src/constant/map.js\n- 所属项目：产品2.0\n- 来源会话ID：4ba54bd2-24d5-4b33-92bc-49f3cc906331\n- 代码基线：a53a27c"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/查看态数值单位安全渲染.md",
+                "memory_type": "entities",
+                "after": "# 查看态数值单位安全渲染\n产品2.0 物业合同详情页带单位的数值字段必须走 type:'amount' + unit，禁止在页面侧用模板字符串预拼单位，避免 undefined 穿透判空显示「undefined㎡」。\n\n## 问题现象\n- 物业合同详情页「物业管理区域」占地面积/总建筑面积在数据未维护时显示「undefined㎡」。\n\n## 根因\n- 查看态字段配 type:'text'，展示值手动拼接模板字符串 `${this.form.landArea}㎡`。\n- landArea 为 undefined 时拼出非空字符串「undefined㎡」，DetailTemplate 空值判断被绕过，永远轮不到「-」占位。\n\n## 解决方案\n- 带单位的数值字段查看态一律配 type:'amount' + unit:'㎡'（需小数位再配 dot:2）。\n- 原始数值交给 DetailTemplate 的 getAmountDisplay 处理——值为空自动显示「-」、有值时才拼单位。\n- 禁止在页面侧用模板字符串预拼单位。\n\n## 验证与涉及\n- 验证证据：根因是模板字符串拼接 `${landArea}㎡` 在值为 undefined 时产出非空字符串绕过判空，改为 type:'amount' + unit:'㎡' 交给 getAmountDisplay 统一处理。\n- 涉及文件：zhi2-web-admin/src/views/property/propertyContract/components/detail.vue、zhi2-web-admin/src/components/detail-template/detail-template.vue\n- 所属项目：产品2.0\n- 来源会话ID：f3762574-10fb-4d07-adb1-cfcfca9fd8aa\n- 代码基线：401d884"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

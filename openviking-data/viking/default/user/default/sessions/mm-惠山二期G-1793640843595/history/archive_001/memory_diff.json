@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-惠山二期G-1793640843595/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T17:36:56.132164+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_pwd_plaintext.md",
+                "memory_type": "entities",
+                "after": "# Vite dev 改密仍明文：window.CryptoJS 时序未就绪\n惠山二期G 项目中，Vite 开发模式下改密接口因全局 CryptoJS 未就绪而退化为明文传输的缺陷与修复方案。\n\n## 现象\n- 本地 Vite dev 调 system/profile/updatePwd，Network 中 oldPassword/newPassword 仍为明文，用户误以为未加密\n- 打包或部分环境可能正常，具有时序偶发性\n\n## 根因\n- 改密走 encryptPassword 读全局 window.CryptoJS\n- Vite 开发模式全局脚本与业务模块加载顺序不保证 CryptoJS 已挂载，加密静默失败或退化为明文\n- 与 index.html 漏引 CryptoJS 导致 undefined 是不同根因\n\n## 修复方案\n- 用 npm 包 crypto-js 在模块内 import，不依赖 window\n- api/system/profile.js 增加 updateProfilePwd，API 层统一加密后再发请求\n- 个人中心、顶部改密弹窗、强制改密弹窗等所有入口改调该 API，避免页面各自加密\n\n## 验证与归属\n- 验证：重启 dev 并硬刷新，Network 确认密码字段为密文（如 Base64 形态），不只看能否改成功\n- 涉及文件：zhi2-web-admin/src/api/system/profile.js、views/system/user/profile、views/login.vue、api/index.js\n- 所属项目：惠山二期G；来源会话：c458c0e2-e264-43ca-a51b-78d564dfcdd6；代码基线：bda09e5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/multiple_issue_export.md",
+                "memory_type": "entities",
+                "after": "# 多议题表决决策范围导出为空：导出参数须与 list 同源\n惠山二期G 项目中，autonomy 模块子议题/多议题表决明细导出 Excel 为空或参数不一致的根因与修复套路。\n\n## 现象\n- autonomy/option 子议题「业主决策明细」弹窗或 autonomy/multiply 详情「决策统计」表决明细导出 Excel 为空\n- 导出 Form Data 与列表查询参数不一致\n\n## 根因\n- 子议题弹窗导出误用路由 getId()（主表 decisionManageId），而 listForManage 需子议题 decisionId（form.decisionId）\n- 导出参数手写或抄错，漏掉 getQueryParams() 里的楼幢、单元、户室、表决方式/状态等筛选\n\n## 修复方案\n- 实现 getExportParams()：先 getQueryParams() 去掉 pageNum/pageSize，再按场景覆盖主键\n- 弹窗用 decisionId，统计页签与列表一致用 decisionManageId，字段名须与列表请求一致\n- Network 逐项对照 list 与 export；若列表带 decisionManageId 而 export 文档只认 decisionId，需联调映射后端字段名\n\n## 验证与归属\n- 已知记忆「MULTIPLE_ISSUES 跳转主键」不覆盖导出参数对齐\n- 涉及文件：autonomy/option/components/DecisionRangeTable.vue、autonomy/multiply/components/DecisionRangeTable.vue、mixins/subTableMixins.js、mixins/table.js\n- 所属项目：惠山二期G；来源会话：ff92c2c8-d9c4-4961-9a25-0851d8f75cd1；代码基线：a0d5892"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/c_attachment_json.md",
+                "memory_type": "entities",
+                "after": "# C 端附件 JSON 字符串 \"[]\" 被当有效 URL\n惠山二期G 项目中，后端以 JSON 字符串返回附件致空附件 \"[]\" 被渲染为可点链接的缺陷与统一修复。\n\n## 现象\n- 报修/踏勘等详情无附件却出现蓝色「[]」链接，点击请求 /%22[]%22\n- 后端（尤其 C 端写入）把附件以 JSON 字符串返回，空附件为字面量 \"[]\"\n\n## 根因\n- 页面只做 split(',') 或把非数组当单条 URL，会把 \"[]\"/\"null\" 当成一条有效路径\n\n## 修复方案\n- 抽 utils/attachments.js 的 normalizeAttachmentList，统一兼容 JSON 字符串、逗号分隔串、数组、对象数组（取 url/path 字段），过滤 \"[]\"、\"null\"、空白\n- 无有效项详情展示 -\n- DetailTemplate 的 type:'image' 丢弃无效 URL；type:'images' 先归一化数组再 v-for，否则对字符串按字符迭代出破损缩略图\n- ImageUpload 监听值时解析 JSON 字符串，避免编辑态出现 \"[]\" 假图\n- 与「逗号分隔 attachments + resolveServerAssetUrl」套路互补：先判形态再拆路径\n\n## 验证与归属\n- 边界单测 17/17 通过（\"[]\"、'[\"a.png\"]'、逗号串、对象数组、null 等）\n- 涉及文件：utils/attachments.js、maintenance/repair/detail.vue、repair/components/repairDtlDialog.vue、components/detail-template/detail-template.vue、components/ImageUpload/index.vue\n- 所属项目：惠山二期G；来源会话：2e3e3715-17fd-4cbd-ac98-5ebaa291c503；代码基线：d52a061"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/adspace_popup_detail.md",
+                "memory_type": "entities",
+                "after": "# 小区台账空置广告位弹窗：不跳过备案详情\n惠山二期G 项目中，统计地图/小区台账点空置广告位无图，因无 revenueContractId 误跳过备案详情的修复套路。\n\n## 现象\n- 统计地图/小区台账点空置广告位无图\n- 常见误判：没有 revenueContractId 就不请求备案详情\n\n## 根因\n- 空置条目往往只有台账主键（detailId/resourcesId/advertiseSpaceDetailId），备案附件在 GET /benefit/pubAdvertiseSpaceDetail/{id} 的 attachments 里\n\n## 修复方案\n- 打开弹窗并行拉台账详情与合同详情：台账失败仍可尝试合同；合同未成功时不要整页切租赁字段导致基础信息全为 -\n- 图片侧与经营用房一致：逗号拆 attachments + resolveServerAssetUrl，无附件回退 picUrl 等\n- revenueContractResourcesId 同时从列表行与明细 form 取值\n- 若接口有数据仍无图，核对列表 resourcesId 是否等于后端 advertiseSpaceDetailId（映射问题需接口补字段）\n\n## 验证与归属\n- 验证：去掉无 revenueContractId 就不请求的逻辑；用 detailId/resourcesId 调 getPubAdvertiseSpaceDetail；台账与合同分开请求；仅合同成功才切租赁字段\n- 涉及文件：benefit/statisticsMap/components/AdvertiseAssetDialog.vue、benefit/statisticsMap/operatingAssets.vue\n- 所属项目：惠山二期G；来源会话：5a741fb2-5020-4358-a55c-ed838e2739cc；代码基线：289cc30"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/preferences/user/password_encryption.md",
+                "memory_type": "preferences",
+                "before": "- 修改密码相关接口不可传明文，须使用 AES 加密。\n- 登录页 login.vue 使用 CryptoJS.AES 加密，但 /system/profile/updatePwd 及三处入口（ChangePasswordDialog/index.vue、ResetPwdDialog.vue、resetPwd.vue）此前传明文。\n- 新增 zhi2-web-admin/src/utils/crypto.js 复用 AES-ECB，提交前对 oldPwd、newPwd 执行 encrypt()。",
+                "after": "- 修改密码相关接口不可传明文，必须在 API 层统一加密后再发请求。\n- 禁止依赖全局 window.CryptoJS 加密：Vite dev 下全局脚本与业务模块加载顺序不保证 CryptoJS 已挂载，会静默失败或退化为明文。\n- 正确做法：用 npm 包 crypto-js 在模块内 import；api/system/profile.js 新增 updateProfilePwd，所有改密入口（个人中心、顶部改密弹窗、强制改密弹窗）均改调该 API，避免页面各自加密。\n- 验证标准：重启 dev 并硬刷新，在 Network 确认密码字段为密文（如 Base64 形态），不能只看「能否改成功」。\n- 适用项目：惠山二期G；涉及文件：zhi2-web-admin/src/api/system/profile.js、zhi2-web-admin/src/views/system/user/profile、zhi2-web-admin/src/views/login.vue、zhi2-web-admin/src/api/index.js。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_082",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T00:34:03.290447+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/permit_maintain_nav_fix.md",
+                "memory_type": "entities",
+                "after": "# 预售许可申请页维护按钮跳转修复\n苏州市房地产监测V3 中预售许可申请详情页「维护」按钮改用 `buildPresalePlanPageNavigation`，解决隐藏菜单缺失时无法跳转的问题。\n\n## 问题根因\n- 原 `detail.vue` 的「维护」调用 `openPlanPage`，仅依赖 `buildNavigationByFilePath` 查找隐藏页 `presale/permit/plan/detail`（`busCode: ysfawh`）\n- 环境未配置该隐藏菜单或菜单解析不到可注册路由时，提示「没有授权相关菜单」或 `router.push` 无效，点方案无法跳转\n\n## 修复内容\n- `permitConstants.js` 新增 `buildPresalePlanPageNavigation`：优先走菜单解析；解析不可路由时按当前详情 URL 推导（如 `.../presale/permit/detail/add` → `../presale/permit/plan/detail/add`）\n- `detail.vue` 的「维护」改为使用该函数，路由失败给出明确提示\n- 若仍打不开，需在后台增加与 E2E 配置一致的隐藏菜单\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`permitConstants.js`、`detail.vue`、`PermitPlanPanel.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：1252ba73-a7e5-4f6d-b909-cfd87d0c44ef；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_input_number_step_fix.md",
+                "memory_type": "entities",
+                "after": "# 容积率小数输入修复\n苏州市房地产监测V3 中 `zs-input-number` 组件未传 `step` 时按 `precision` 自动推导，解决容积率等小数字段无法输入问题。\n\n## 问题根因\n- `zs-input-number` 默认 `step-strictly: true` 且 `step=1`，只允许整数倍输入\n- `precision=2` 仅控制显示格式，不能解决步进限制\n\n## 修复内容\n- `zs-input-number.vue`：未传 `step` 时按 `precision` 推导（`precision=2` → `step=0.01`；未设置 → `step=1`；显式传入以调用方为准）\n- `presale-permit-helpers.js` 的 `fillAndSavePlan` 增加容积率 `1.25` 输入与断言防回归\n\n## 影响范围\n- 同页 `landAreaTotal`、`planBuildAreaTotal` 及 `PresalePlanFillForm` 所有 `precision=2` 字段无需逐个改页面\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`zs-input-number.vue`、`presale-permit-helpers.js`、`plan/detail.vue`、`package.json`\n- 所属项目：苏州市房地产监测V3；来源会话：b6064b79-ffff-4208-838f-ab32633f8d33；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_form_spacing_fix.md",
+                "memory_type": "entities",
+                "after": "# 弹窗表单输入框间距修复\n苏州市房地产监测V3 统一全局弹窗 `form-box` 表单项间距，新增 CSS 变量并调整多处弹窗结构。\n\n## 全局规范\n- `zs-dialog.vue` 的 `.dialog-box .form-box` 统一 `margin-bottom: var(--dialog-form-item-gap, 16px)`\n- 最后一项 `margin-bottom: 0`（兼容 `zs-form > el-col` 与 `el-row > el-col`）\n- 单选/多选 `width: auto` 去多余 `min-height`；文本域 `min-height: 0`；单行 `label-left` 标签 `line-height: 36px` 对齐\n\n## CSS 变量\n- `variables.css` 新增 `--dialog-form-item-gap: 16px`\n\n## 涉及弹窗\n- `YhwdDialog.vue`（新增网点）、`NodeDetailsDialog.vue` 等按规范调整结构\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`zs-dialog.vue`、`variables.css`、`YhwdDialog.vue`、`NodeDetailsDialog.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：a8a375c4-1710-4cbd-8b3e-450a43b85dde；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/company_shareholder_fix.md",
+                "memory_type": "entities",
+                "after": "# 企业基本信息股东列表展示修复\n苏州市房地产监测V3 中企业基本信息详情新增从 `/company/companyRecord/detail` 解析并加载股东列表的能力。\n\n## 改动说明\n- `companyBasicInfoShared.js` 新增 `resolveShareholderListFromDetailPayload` 解析 `shareholderList`\n- `DeveloperBasicInfoDetail.vue` 引入 `getCompanyRecordDetail` 与共享函数，新增 `loadShareholderList()`：有 `companyRecordId` 时调用 detail 接口\n- `detailCallback` 先用 `getOwnCompany` 兜底，再调用 `loadShareholderList()` 覆盖；detail 失败保留兜底\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`companyBasicInfoShared.js`、`DeveloperBasicInfoDetail.vue`、`company-helpers.js`、`register-basic-info-appendix.spec.js`\n- 所属项目：苏州市房地产监测V3；来源会话：4d9d7fb3-9c0c-440d-b3de-166a2d7335a9；代码基线：none"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

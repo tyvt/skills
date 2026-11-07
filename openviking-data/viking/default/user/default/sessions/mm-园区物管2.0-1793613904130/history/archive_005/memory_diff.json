@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:18:34.542997+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/map_marker_spread.md",
+                "memory_type": "entities",
+                "after": "# 地图打点两类坐标问题分流\n统计地图按街道打点时，气泡数量少于街道数或点位完全重合，需分两类根因处理。\n\n## 现象与根因\n- 一类是接口返回 xcoordinate/ycoordinate 为 null（如羊尖、鹅湖等镇），null 点渲染异常或聚在原点，须前端逐级过滤。\n- 另一类是接口给多个街道返回完全相同经纬度（数据质量问题，如两组重复坐标 120.4743,31.60915 / 120.53899,31.70204），坐标合法但不能叠加，前端只能视觉错开。\n\n## 解决方案\n- 先按空值过滤掉 null 坐标点。\n- 实现 spreadOverlappingMarkers：相同坐标 marker 按小圆环错开；2 个重合时左右各偏移约 450m（偏移量常数 OVERLAP_SPREAD_RADIUS_DEG≈0.004，嫌挤可调 0.006），3 个及以上均匀分布在圆周。\n- 结论中向用户明确：根本解法是后端为每个街道返回独立中心点坐标，前端错开只是兜底。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue\n- 所属项目：园区物管2.0；来源会话：d5708d08-435c-462f-8076-056d4fde5c7a；代码基线：040.md"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/account_dual_dict.md",
+                "memory_type": "entities",
+                "after": "# 新增可选与全量展示双字典切换\n系统用户管理账号类型字典存在受限与全量两个编码，需用双字典+计算属性切换避免新增越权或历史码显原值。\n\n## 根因\n- 仅用 sys_account_type（新增/编辑可选受限集合）会导致查看历史数据时旧类型因不在受限字典而显示原始码。\n- 仅用 sys_account_type_all（含历史/停用全量集合）会导致新增时能选到不该新增的类型。\n\n## 解决方案\n- data 放两个独立字段：accountTypeSelectOptions=sys_account_type、accountTypeAllOptions=sys_account_type_all；initDict 并行请求分别写入。\n- computed accountTypeOptions 按 formMode 在两者间切换（新增/编辑用受限字典，查看/展示用全量字典），模板绑定不动。\n- 该「双字典+formMode 计算属性切换」结构可复用于同类字段。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/system/user/detail.vue\n- 所属项目：园区物管2.0；来源会话：01127c4b-5175-4404-8a7f-494fd82416c5；代码基线：040.md"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/region_defer_list.md",
+                "memory_type": "entities",
+                "after": "# 区域树列表页首屏闪烁延迟请求\n带 RegionTreeLayout 的列表页因 listMixins 立即请求全量数据、树就绪后再次筛选请求，造成先全量后筛选闪烁。\n\n## 根因\n- listMixins 的 init() 立即调 getList()，此时 parentDeptId 未就绪。\n- 区域树异步加载完成默认选中节点又触发一次带筛选 getList()，两次请求先后返回致闪变。\n\n## 解决方案\n- table.js 增加 shouldDeferListForRegionTree() 判定：平铺模式（value 有值）或 B 端终端（terminalType==='B'）不延迟；否则页面 $options.components 注册了 RegionTreeLayout 就延迟首次列表请求。\n- regionTree 组件树加载完成 emit 'tree-ready'（初始化不再触发 nodeClick 避免重复请求），RegionTreeLayout 监听后设 parentDeptId 再调父页 getList()。\n- 树数据为空也要触发列表加载避免一直 loading；重写过 init() 的页面（如 complexChange）需同步加入延迟逻辑。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/mixins/table.js、listMixins.js、views/property/complex/components/RegionTreeLayout.vue、regionTree.vue、complexChange/index.vue\n- 所属项目：园区物管2.0；来源会话：2a9ee75a-2075-41ab-a461-629ef177b080；代码基线：177bc3ce4"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配、map_drill_down_order（地图下钻SVG顺序耦合与下钻视野等待）\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze（Element UI树全部展开卡死分批套路）、sidebar_recursive_menu、recursive_menu_icon_indent（RecursiveMenu图标占位缩进）、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）、search_container_deprecated（旧search-container废弃改zs-search-form）、appmain_isolation（AppMain加isolation隔离层叠上下文）、zs_select_single_choice（页面级选择弹窗对齐zs-select-dialog单选契约）、zs_table_summary_border（zs-table合计行下边框缺失）\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan（分类金额图二次÷10000柱形不显示）、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）、echarts_axis_max_ceiling（ECharts轴刻度上限取整）、svg_fill_replace（SVG图标换色只替换path fill）、line_y_axis_adapt（多系列折线图Y轴自适应刻度）、four_module_split（超大页面四件套拆分）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace（移除xcrud依赖本地XForm兼容替换）、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、form_getdetail_param_guard（getDetail必需参数守卫钩子）、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、area_field_code_assignment（街道社区字段统一赋编码移除字典等待）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、platform_config_race（平台配置异步加载竞态误报）、project_dialog_cache_restore（全局选项目弹窗缓存恢复）、amount_input_validate_race（AmountInput打包后el-form校验为空竞态）",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 地图与下钻类：数据地图下钻传参约定、腾讯地图区划接入、腾讯地图 Key 禁止硬编码、腾讯 GL 地图点位不显示、Vite地图代理路径适配、map_drill_down_order（地图下钻SVG顺序耦合与下钻视野等待）、map_marker_spread（地图打点null过滤与重合点圆环错开）\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze（Element UI树全部展开卡死分批套路）、sidebar_recursive_menu、recursive_menu_icon_indent（RecursiveMenu图标占位缩进）、opbar_zindex_clip（吸顶操作栏被固定列遮挡与列宽估算）、search_container_deprecated（旧search-container废弃改zs-search-form）、appmain_isolation（AppMain加isolation隔离层叠上下文）、zs_select_single_choice（页面级选择弹窗对齐zs-select-dialog单选契约）、zs_table_summary_border（zs-table合计行下边框缺失）、account_dual_dict（新增可选与全量展示双字典+formMode切换）、region_defer_list（区域树列表首屏闪烁延迟请求）\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan（分类金额图二次÷10000柱形不显示）、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection（JS 注入 CSS 变量解决静态资源 URL）、echarts_legend_sync（图例与series同源过滤）、large_screen_scale（大屏动态设计稿宽度）、echarts_axis_max_ceiling（ECharts轴刻度上限取整）、svg_fill_replace（SVG图标换色只替换path fill）、line_y_axis_adapt（多系列折线图Y轴自适应刻度）、four_module_split（超大页面四件套拆分）\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace（移除xcrud依赖本地XForm兼容替换）、地图信息框交互偏好（偏好）、编辑态选择弹窗回写relBusinessType、form_getdetail_param_guard（getDetail必需参数守卫钩子）、企业关联ID统一companyRecordId、bank_receipt_verification_rule（借贷方向中文枚举+编辑态锁回单流水号）、dialog_bterminal_filter（公共选择弹窗端别过滤逐页注入filterParams）、area_dict_race（B端默认小区反查竞态）、area_field_code_assignment（街道社区字段统一赋编码移除字典等待）、btn_group_props（OperationBtnGroup渲染必传四件套）、driver_top_clip（driver.js引导贴顶元素裁切）、platform_config_race（平台配置异步加载竞态误报）、project_dialog_cache_restore（全局选项目弹窗缓存恢复）、amount_input_validate_race（AmountInput打包后el-form校验为空竞态）"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/多版本分支修复工作流.md",
+                "memory_type": "preferences",
+                "before": "- 修复线上多版本分支并存问题时，从最低版本分支（如 develop/v2.6.1）开始修复，不在当前高版本分支直接改。\n- 修复完成后先把提交号与结果汇报给用户，等用户明确确认「没问题了」后才动手合并。\n- 按版本链路顺序逐级 merge（如 v2.6.1 → v2.6.2 → v2.6.2-yulin），不得跳级或反向。\n- 合并完成后逐个核对所有相关分支本地均已包含该修复提交，最后询问是否推送远程，不自行 push。\n- 总结为用户明确偏好：改低不改高、先确认后合并、合并后全链核对。",
+                "after": "- 修复线上多版本分支并存问题时，从最低版本分支（如 develop/v2.6.1）开始修复，不在当前高版本分支直接改。\n- 修复完成后先把提交号与结果汇报给用户，等用户明确确认「没问题了」后才动手合并。\n- 按版本链路顺序逐级 merge（如 v2.6.1 → v2.6.2 → v2.6.2-yulin），不得跳级或反向。\n- 合并完成后逐个核对所有相关分支本地均已包含该修复提交，最后询问是否推送远程，不自行 push。\n- 总结为用户明确偏好：改低不改高、先确认后合并、合并后全链核对。\n- 若用户确认推送，在子模块 zhi2-web-admin 内用一条命令同时 push 三个分支（如 cd zhi2-web-admin && git push origin develop/v2.6.1 develop/v2.6.2 develop/v2.6.2-yulin），子模块最后停留在最末端分支 develop/v2.6.2-yulin。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

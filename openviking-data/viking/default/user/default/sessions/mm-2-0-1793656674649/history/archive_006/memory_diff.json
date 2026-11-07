@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793656674649/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T22:08:31.861499+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue3_slot_syntax.md",
+                "memory_type": "entities",
+                "after": "# Vue3 表格列插槽语法迁移与 zs-table-column 宽度报错\n产品2.0（zhi2-web-admin）迁移 Vue3 时需将旧插槽语法改为新语法，并修复 zs-table-column 因插槽未挂载导致的宽度计算报错。\n\n## 问题根因\n- 迁移 Vue3 须把 `slot=\"header\"`/`slot-scope` 等旧写法改为 `#header`、`#default`。\n- `zs-table-column` 在插槽未正确挂载时 `computedWidth` 会读 `undefined.column` 抛错（zs-table-column.vue:109）。\n- 表格相关组件含 `zs-operate-column`、下拉 `dropdown` 插槽均受影响。\n\n## 解决方案\n- 优先批量将旧插槽语法改为新语法后再验证编译。\n- 用户要求「插槽新语法全局搜索修复」。\n\n## 验证与归属\n- 验证证据：zs-table-column.vue:109 Cannot read properties of undefined (reading 'column')。\n- 涉及文件：zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue、zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue。\n- 所属项目：2-0（产品2.0）；来源会话：56daed33-b372-4f48-a73c-1d78207c080e；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/route_meta_safe_access.md",
+                "memory_type": "entities",
+                "after": "# OperationBtnGroup 路由 meta 安全访问\n产品2.0 中组件直接读取 router.currentRoute.meta.busCode 在 meta 未就绪时抛错，需改为可选链守卫并全局排查。\n\n## 问题根因\n- `OperationBtnGroup` 等组件直接读 `router.currentRoute.meta.busCode`，meta 未就绪或路由切换瞬间会 `Cannot read properties of undefined (reading 'busCode')`。\n- index.vue:140 报错。\n\n## 解决方案\n- 改为可选链或等价守卫，如 `router.currentRoute?.meta?.busCode`。\n- 对同类 `this.$route.meta.xxx` 做全局排查；用户要求「全局修复类似问题」。\n\n## 验证与归属\n- 验证证据：index.vue:140 报错。\n- 涉及文件：zhi2-web-admin/src/components/OperationBtnGroup/index.vue。\n- 所属项目：2-0（产品2.0）；来源会话：11afbbee-3388-4e8f-8411-f15186e36c48；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zs_date_picker_props.md",
+                "memory_type": "entities",
+                "after": "# zs-date-picker Vue3 v-model 走 props\n产品2.0 搜索表单动态组件 zs-date-picker 在 Vue3 中须显式声明 modelValue prop，否则选中值无法回填。\n\n## 问题根因\n- 搜索表单项用 `<component :is=\"zs-date-picker\" v-model=\"queryParams[...]\">` 时，Vue3 的 `modelValue` 在 props 而非 `$attrs`。\n- 若 `zs-date-picker` 只在 `$attrs` 读写，选中值无法回填且不会 emit `update:modelValue`。\n\n## 解决方案\n- 显式声明 `modelValue`（兼容旧 `value`），getter 优先 `modelValue`，setter 同时 `$emit('update:modelValue')` 与 `update:value`。\n- 范围选择继续用 `update:start`/`update:end`。\n\n## 验证与归属\n- 验证证据：zs-search-form/SearchFormItem 动态组件 v-model 对比示例不生效，改组件 props。\n- 涉及文件：zhi2-web-admin/src/components/zs-date-picker/zs-date-picker.vue、zhi2-web-admin/src/components/zs-search-form/SearchFormItem.vue。\n- 所属项目：2-0（产品2.0）；来源会话：0c3557ae-26cf-42a4-8a27-e0d0002a07b4；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_slot_parse.md",
+                "memory_type": "entities",
+                "after": "# Vite 构建误解析 slot 模板节点\n产品2.0 中 `npm run build` 可能把带 slot 的模板节点误当 JS 模块解析，需改用函数式弹窗与 template 插槽。\n\n## 问题根因\n- `npm run build` 把模板里带 `slot` 的节点（如 `<div slot=\"footer\">`、内嵌 `<zs-select-dialog>` 的 slot 子树）当成独立模块请求并错误当 JS 解析。\n- 原因：slot 节点被错误提取。\n\n## 解决方案\n- 选择弹窗改用 `SelectDialog.open()` + `columns` 配置。\n- footer 用 `<template #footer>`（或 `<template slot=\"footer\">` 包裹）避免裸 div slot。\n- 修正模板内明显语法错误（如 `\"options\": this.[...]`）。\n\n## 验证与归属\n- 验证证据：feeCustomTypeDialog、initiation/detail 等修完后 build exit 0。\n- 涉及文件：zhi2-web-admin/src/views/maintenance/budget/components/feeCustomTypeDialog.vue、zhi2-web-admin/src/views/maintenance/final/components/feeCustomTypeDialog.vue、zhi2-web-admin/src/views/maintenance/initiation/detail.vue。\n- 所属项目：2-0（产品2.0）；来源会话：69747f30-d768-4dea-bd2e-d230f2593e18；代码基线：none。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

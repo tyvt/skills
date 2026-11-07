@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:27:28.049546+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/zstable_subtotal_divider.md",
+                "memory_type": "entities",
+                "after": "# zs-table 固定列遮挡小计行分隔线\n园区物管2.0 的 zs-table 带固定列且有自定义小计行时，固定列白色背景遮挡小计行底部分隔线，需将分隔线 z-index 提到固定列之上。\n\n## 现象\n- 固定操作列（fixed 列 z-index=12）时，小计行内容透过固定列显示。\n- 单独抬高固定列背景后，小计行底部分隔线被盖住或因单元格 overflow:hidden 画不出，固定列区域缺失底边。\n\n## 根因\n- 固定列靠 z-index 叠在普通单元格之上，任何 z-index 低于它的内容（含分隔线细条）被白色固定列背景遮挡。\n- 固定列单元格内部补边框受 overflow 与边框归属影响难以对齐。\n\n## 修复方案\n- 不改固定列自身层级或逐格补边框，将小计行底部分隔线（.zs-table-subtotal-divider）的 z-index 提到 14（>12），让线叠在固定列上方。\n- 左右两侧由同一条线统一绘制底边，保证固定列下方底边与左侧小计行对齐。\n- 复用套路：凡「固定列盖住某条线/元素」类问题，优先检查双方 z-index（基准 12），线条类装饰元素提到 14 层。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/operatingAssets.vue、zhi2-web-admin/src/components/zs-table/zs-table.vue、zhi2-web-admin/src/styles/element-ui.scss。\n- 所属项目：园区物管2.0；来源会话：0e1620c2-4c35-4648-9da8-0d943e149a68；代码基线：55cd8653c。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/merge_conflict_selfcheck.md",
+                "memory_type": "entities",
+                "after": "# 合并冲突双重自检工作流\n园区物管2.0 子模块 zhi2-web-admin 中处理报告的大量合并冲突前，需先双重自检确认是否真有冲突。\n\n## 现象\n- 用户带「还有 789 处合并冲突」结论求助，但实际子模块内 git diff --name-only --diff-filter=U 为 0、全仓 grep <<<<<<< 也为 0。\n- 冲突可能已在别会话/分支解决，或工具面板统计的与 main 整体 diff 被误当冲突，或编辑器未保存缓冲保留旧状态。\n\n## 做法\n- 动手解冲突前双重自检：git status 看 UU 文件列表 + rg \"<<<<<<<\" . --glob '!node_modules' 看残留标记，两者都为 0 就不能再「解冲突」。\n- 确认需重复合并 develop/v2.5.4 时按既定策略批处理：有 ours 改动的条目 git checkout --ours（保留 v2.6.0 的 zs-input、dialogMixins），仅 theirs 新增文件用 --theirs。\n- 对 money.js、AmountInput/index.vue、main.js（主题色+formMode）、vite.config.js、ListTemplate.js 逐文件手工合并，最后 add -A 提交。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/components/AmountInput/index.vue、zhi2-web-admin/src/main.js、zhi2-web-admin/package.json、zhi2-web-admin/utils/money.js。\n- 所属项目：园区物管2.0；来源会话：564b94a9-fe0a-429d-a4fe-0ce4c7447c7b；代码基线：无既有条目覆盖本条排查结论。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/table_config_refresh.md",
+                "memory_type": "entities",
+                "after": "# 表格自定义列配置刷新后丢失修复\n园区物管2.0 的 global-table-config 自定义列后刷新页面列表恢复默认列顺序，而配置弹窗显示已保存顺序，两边不一致。\n\n## 现象\n- 自定义表格列后刷新页面，列表恢复默认列顺序，打开配置弹窗却看到已保存顺序，两边不一致。\n\n## 根因\n- mixin（table.js）里 columns watcher 在刷新时可能早于 columns 计算属性就绪，loadTableConfigFromStore() 未执行或失败。\n- created 里 displayColumns 先写死默认顺序，后续恢复逻辑不触发就一直默认。\n- Vuex 刷新后为空，列配置只存 localStorage，且只在打开弹窗时读入，列表页初始化时 Vuex 还没数据。\n\n## 修复方案\n- store/modules/table.js 模块加载时把所有 table_config_* 从 localStorage 预加载进 Vuex。\n- mixin 新增统一 syncDisplayColumns()，在 created、mounted、activated（覆盖 keep-alive 回流）三处都调用。\n- 用 $watch 监听列签名变化替代不可靠的 columns watcher。\n- 删掉 created 里直接赋值默认 displayColumns 的逻辑，恢复失败时宁可空着等同步。\n\n## 关联信息\n- 验证点：拖拽列序→保存→刷新页面列序保持，且弹窗与列表一致。\n- 涉及文件：zhi2-web-admin/src/mixins/table.js、zhi2-web-admin/src/store/modules/table.js、zhi2-web-admin/src/mixins/tableComponents.js、zhi2-web-admin/src/components/global-table-config/global-table-config.vue。\n- 所属项目：园区物管2.0；来源会话：c786f6f8-75f2-49be-afbd-1827d65ba911；代码基线：551/1049 未涉及此双层同步问题。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/donut_zero_placeholder.md",
+                "memory_type": "entities",
+                "after": "# 环形图接口数据全 0 时的渲染策略\n园区物管2.0 统计看板多列环形图在接口返回全 0 时，需占位值画环且展示真实 0 值，而非显示「暂无数据」。\n\n## 现象\n- 资产分类/车位分类/资源分类/合同分类环形图在接口全 0（count=0、ratio=0）时图表显示「暂无数据」，用户认为分类结构仍应可见。\n\n## 根因\n- 通用取数函数 getDonutSeriesData 过滤 value<=0 的项，全 0 被过滤成空数组触发空态分支。\n- 「全 0」与「无分类数据」是两种业务语义，前者仍有分类结构需要展示。\n\n## 修复方案\n- 空态判定收窄为「分类数组本身为空」才显示「暂无数据」。\n- 全 0 时保留全部分类项，用等分占位值（value:1）绘制环形图保证各色块与图例可见，标签与 tooltip 仍绑定真实 count/ratio（显示 0 和 0.0%）。\n- 分类较多时隐藏扇区标签避免重叠，底部图例保留全部分类；策略对同页所有环形图统一生效。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue。\n- 所属项目：园区物管2.0；来源会话：26ce6808-4e6b-41fc-88d2-b31cbed282bf；代码基线：同源未提炼过此图表层解法。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 数据地图下钻传参约定（regionCode 恒传 + dimension 分层）见实体「数据地图下钻传参约定」。\n- 腾讯地图区划轮廓接入与 x/y 坐标语义见实体「腾讯地图区划接入」。\n- 区域树侧栏布局收敛为 RegionTreeLayout 公共组件见实体「region_tree_layout」。\n- 地图区域信息框固定左上角轮播偏好见偏好「地图信息框交互偏好」。",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式与偏好\n- 数据地图下钻传参约定（regionCode 恒传 + dimension 分层）见实体「数据地图下钻传参约定」。\n- 腾讯地图区划轮廓接入与 x/y 坐标语义见实体「腾讯地图区划接入」。\n- 区域树侧栏布局收敛为 RegionTreeLayout 公共组件见实体「region_tree_layout」。\n- 地图区域信息框固定左上角轮播偏好见偏好「地图信息框交互偏好」。\n- zs-table 固定列遮挡小计行分隔线解法见实体「zstable_subtotal_divider」。\n- 合并冲突双重自检工作流见实体「merge_conflict_selfcheck」。\n- 表格自定义列配置刷新丢失修复见实体「table_config_refresh」。\n- 环形图全 0 占位渲染策略见实体「donut_zero_placeholder」。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

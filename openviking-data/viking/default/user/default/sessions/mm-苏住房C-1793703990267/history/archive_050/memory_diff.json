@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_050",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T12:52:23.150410+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zsdatepicker_text_wrap.md",
+                "memory_type": "entities",
+                "after": "# ZsDatePicker 日期文本折行挤压bug\n苏住房C 小程序筛选弹窗日期区间控件 ZsDatePicker 渲染 2026-08-01 时连字符处断行，01 掉第二行溢出输入框。\n\n## 问题现象\n- 报事报修筛选弹窗「上报日期」、公共收益收支明细、维修资金业务明细等窄容器日期区间框，日期文本在连字符 - 处断行\n- 01 掉到第二行并溢出输入框，仅改一处修不干净\n\n## 根因\n- ZsDatePicker 内部分隔符（至/～）写 flex:1，主动抢占剩余横向空间压窄左右日期框\n- 日期文本未设 white-space:nowrap，浏览器/WXSS 把连字符当合法断行点必然折行\n- 两原因叠加，需同时修复\n\n## 解决方案\n- 公用样式 src/styles/filter.scss 给日期值加 white-space:nowrap + word-break:keep-all\n- 分隔符改 flex:0 0 auto 不再参与宽度分配，左右内边距对称 padding:0 8px 并居中\n- 同步三处 ZsDatePicker 副本（pages_owner_extra、pages_owner、pages_main）分隔符 flex 与不换行样式\n\n## 验证与归属\n- 验证：会话 c59bc687 用户截图「上报日期 UI 问题」，根因列为分隔符 flex:1 与未 nowrap；修复 filter.scss+三处副本\n- 涉及文件：zhi2-mobile-shimin/src/styles/filter.scss、pages_owner_extra/repair/index.vue、pages_owner/income/index.vue、pages_owner/repair/index.vue\n- 所属项目：苏住房C；来源会话ID：c59bc687-6e91-42f1-ba7a-8d423e305220；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/zsempty_pic_collapse.md",
+                "memory_type": "entities",
+                "after": "# ZsEmpty 空状态图塌缩为0\n苏住房C 小程序「我的合同」等页 ZsEmpty 空状态配图整块不显示，根因是 .empty-pic 用 fit-content 与内部 ZsImage 100% 形成循环依赖塌缩为 0×0。\n\n## 问题现象\n- 「我的合同」等页面用 ZsEmpty 做空状态，接口无数据时只显示「暂无数据」文字，配图整块不显示\n- 图片文件本身未缺失，控制台无资源 404，仅剩文字\n\n## 根因\n- ZsEmpty 的 .empty-pic 包裹层写 width/height:fit-content（由子元素撑开）\n- 内部 ZsImage 默认 width/height:100%（由父元素给出），小程序渲染下父子尺寸循环依赖，盒子塌缩 0×0\n- 与图片地址拼错是两类问题，地址类排查在此对不上\n\n## 解决方案\n- 空状态包裹层给固定尺寸（本项目统一 320rpx×320rpx），不用 fit-content/min-content/auto 包百分比组件\n- 同类排查顺序改为先看包裹层是否有确定尺寸，再怀疑图片路径\n- ZsEmpty 位于主包 components 供各分包复用，须显式传 subpackage（如 subpackage=\"pages_main\"）才能正确解析分包静态资源\n\n## 验证与归属\n- 验证：会话 269bb15a 用户反馈 pages_main/my/myContract 空数据图片不显示；修复 .empty-pic 改固定 320rpx×320rpx，myContract.vue 显式传 subpackage=\"pages_main\"\n- 涉及文件：src/components/ZsEmpty/ZsEmpty.vue、src/components/ZsImage/ZsImage.vue、src/pages_main/my/myContract.vue\n- 所属项目：苏住房C；来源会话ID：269bb15a-f2a2-4040-ac11-d7ad84921432；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/szf_image_subpackage_500.md",
+                "memory_type": "entities",
+                "after": "# szf 图片按分包拆分缺失致500\n苏住房C 小程序筛选弹窗重置图标报 Failed to load local image resource .../reset.svg status 500，根因是 images/szf/ 资源按 resolveSzfImageSubpackage 归对应分包，但文件仅放主包。\n\n## 问题现象\n- 筛选弹窗重置图标报 [渲染层网络层错误] Failed to load local image resource /pages_transaction/static/images/szf/reset.svg status 500\n- 报错文案像网络/服务器问题或 ZsImage 路径拼接 bug，实际是构建产物里分包缺少该文件\n\n## 根因\n- conditionScreening.vue 写相对路径 <ZsImage src=\"images/szf/reset.svg\" />\n- ZsImage 经 resolveStaticUrl 按 utils/index.js 的 resolveSzfImageSubpackage 把 images/szf/ 资源归属 pages_transaction 分包，实际请求该分包路径\n- 该目录只放 reset.png，reset.svg 仅存在于主包 src/static/images/szf/，分包缺失故 500\n\n## 解决方案\n- 新增 szf 图片不要只放主包 src/static/，须同时（或按引用页面所在分包）复制到对应分包 src/pages_xxx/static/images/szf/\n- 同名不同扩展名（png vs svg）必须按引用串精确匹配，不能想当然复用\n- 排查同类 500 先核对 src 串与 resolveSzfImageSubpackage 解析出的分包路径，再到 target 分包目录 ls 确认文件存在\n\n## 验证与归属\n- 验证：会话 ffbc909f conditionScreening.vue 第204行引用 reset.svg；修复复制 reset.svg 到 pages_transaction 分包 static/images/szf/\n- 涉及文件：conditionScreening.vue、ZsImage.vue、utils/index.js、pages_transaction/static/images/szf/reset.svg、主包 static/images/szf/reset.svg、scripts/migrate-vote-static.mjs、utils/mainStaticPaths.js\n- 所属项目：苏住房C；来源会话ID：ffbc909f-a8cb-4166-8285-a0ac8381920f；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/list_no_display_generic.md",
+                "memory_type": "entities",
+                "after": "# 列表接口返回但无展示通用排查\n苏住房C 小程序列表页出现「接口正常返回但数据不展示」，根因通常为响应结构硬解、无效 computed 遮蔽、useLoadMore 无 catch 三处叠加。\n\n## 问题现象\n- pages_transaction/stockHouse/index.vue 可能出现接口正常返回但列表不展示、loading 卡死\n- 模板真正用 useLoadMore 的 list，但存在读未写入 store 的同名 computed.list 带偏排查\n\n## 根因\n- getList 用手写 new Promise 包 $.then 并直接 res.result.records.map/.total，结构异常时 then 抛错挂死 Promise，loading 永不完\n- 页面 computed.list 读 houseStore.stockHouseList，本页从未写入该 store，属同名遮蔽型死代码\n- hooks/useLoadMore 里 fn() 无 catch，请求失败 pageNum 已自增白占一页、status 卡 loading，后续下拉不再触发\n\n## 解决方案\n- 改 async/await + res?.result?.records ?? [] / res?.result?.total ?? 0，结构异常按空数组而非 throw，统一 return { ...res, rows, total }\n- 删掉不写入 store 的镜像 computed；useLoadMore 给 fn() 补 .catch（pageNum 回退、status 复位 more）\n- padList/refreshList 用 res.rows || res.data || [] 防 undefined 展开；同类「有返回无展示」优先按这三顺序查\n\n## 验证与归属\n- 验证：会话 c9de4a3c 结论改为 async/await、可选链取值、去掉无效 computed.list、useLoadMore 补 .catch、padList 用 res.rows||res.data||[]\n- 涉及文件：pages_transaction/stockHouse/index.vue、hooks/useLoadMore.js、api/v1Instance.js、utils/ui.js\n- 所属项目：苏住房C；来源会话ID：c9de4a3c-a1a8-45ce-b4b9-2a181a353c95；代码基线：e383380"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793879068421/history/archive_066",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T15:10:44.627306+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/wxss_leak_fix.md",
+                "memory_type": "entities",
+                "after": "# 主包WXSS样式泄漏正则修复\n苏住房C(zhi2-mobile-shimin)因 uni.scss 添加 min-height:100% 导致 prune-component-wxss-leak.mjs 正则匹配失败，主包超限，已修复正则。\n\n## 问题根因\n- 在 `uni.scss` 给 `.page-wrapper`、`.page` 等加 `min-height:100%`，编译后组件 wxss 末尾 marker 变为 `{width:100%;min-height:100%;box-sizing:border-box}`\n- `scripts/prune-component-wxss-leak.mjs` 的 `LEAK_END` 正则仍匹配旧格式 `{width:100%;box-sizing:border-box}`，匹配失败\n- 32 个主包组件各自重复注入约 8KB 全局样式（合计约 258KB），主包上传预估从 1793KB 涨到 2094.8KB，超 2048KB 限制\n\n## 修复内容\n- 更新 `LEAK_END` 正则使 `min-height:100%` 为可选：`{width:100%;(?:min-height:100%;)?box-sizing:border-box}`\n- 构建后主包大小恢复达标\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`uni.scss`、`scripts/prune-component-wxss-leak.mjs`、`scripts/validate-dist.mjs`、`src/pages_my/verification/TypeChoose.vue`、`package.json`、`src/pages.js`\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：fc94b08c-d7f0-4ffe-9070-050d77fd5bb1；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/zpaging_migration.md",
+                "memory_type": "entities",
+                "after": "# src/pages 列表分页迁移至 z-paging\n苏住房C(zhi2-mobile-shimin)将 `src/pages` 下 11 个 Vue 文件从 `useLoadMore`/`uni-load-more` 迁移到 `z-paging` + `usePaging`。\n\n## 迁移内容\n- 涉及 11 个文件：`publicNotice/publicNotice.vue`、`news/index.vue`、`collect/index.vue`、`message/message.vue`、`my/myFootmark.vue`、`my/myContract.vue`、`announcement/index.vue`、`home/policy.vue`、`index/...` 等\n- 统一接入 `usePaging` + `<z-paging>`，使用 `#empty` 空态插槽\n- `collect/index.vue` 搜索回调重命名为 `handleSearch`，`total > 0` 改为 `list.length > 0`\n- `announcement/index.vue` 的 `reload()` 改为 `refresh()`\n- 保留各页原有筛选、搜索与空态文案（如「暂无数据」）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`publicNotice/publicNotice.vue`、`news/index.vue`、`collect/index.vue`、`message/message.vue` 等 11 个\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：201f6b7f-a985-4455-955a-c315abe76d23；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/dispatcher_removed.md",
+                "memory_type": "entities",
+                "after": "# 删除未使用的 dispatcher.js 网络层\n苏住房C(zhi2-mobile-shimin)删除了未接入的 `dispatcher.js`，仅保留 `gateway.js` 作为苏服办网关封装链路。\n\n## 删除原因\n- `dispatcher.js` 项目中无任何 import，属于未接入的备用实现（fetch/uni.request 方案）\n- 与 `gateway.js` 重复实现 `sfbConfig`、SM3 签名、网关 header 组装等逻辑\n\n## 保留链路\n- 实际在跑的链路：`index.js` / `v1Instance.js` → `httpInstance.js` → `gateway.js`（axios + 苏服办网关封装）\n- 后续只需维护 `gateway.js` 与对应环境变量 `VITE_APP_SFB_*`\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏住房C\n- 涉及文件：`dispatcher.js`、`index.js`、`v1Instance.js`、`httpInstance.js`\n- 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：b91754cb-4f69-4526-932a-d2e80e20327e；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/su_housing_c_tech/elevator_map_fix.md",
+                "memory_type": "entities",
+                "before": "# 加梯申请页地图输入框遮挡修复\n苏住房C小程序 `pages_owner_extra/elevator/addAlone.vue` 修复地图原生组件与「申请说明」输入框互相遮挡导致无法输入的问题。\n\n## 问题根因\n- 微信小程序里 `map` 和 `textarea` 都是原生组件，同页会互相遮挡，导致输入框点不到\n- 「申请说明」放在 `uni-forms-item` 里并改纵向 flex 后，输入区域被压扁、触摸失效\n\n## 修复内容\n- 将「申请说明」移出 `uni-forms`，单独用 `description-section` 区块，标签在上、输入框在下\n- 恢复 `touchstart.capture` 和 `@click=\"hideMap\"`，点击时销毁地图原生层\n- 地图默认不显示（`showMap = false`），仅选中小区后显示，滚动或点表单任意处即隐藏\n- 任意滚动即隐藏地图，避免原生层残留\n\n## 验证与归属\n- 若仍不能输入，先点上方表单区域让地图消失，再点「申请说明」输入框\n- 涉及文件：addAlone.vue、form2.scss\n- 所属项目：苏住房C；来源会话ID：be5add1d-7616-4020-9f82-4d25046636fb",
+                "after": "# 加梯申请页地图输入框遮挡修复\n苏住房C小程序 `pages_owner_extra/elevator/addAlone.vue` 修复地图原生组件与「申请说明」输入框互相遮挡导致无法输入的问题。\n\n## 问题根因\n- 微信小程序里 `map` 和 `textarea` 都是原生组件，同页会互相遮挡，导致输入框点不到\n- 「申请说明」放在 `uni-forms-item` 里并改纵向 flex 后，输入区域被压扁、触摸失效\n\n## 修复内容\n- 将「申请说明」移出 `uni-forms`，单独用 `description-section` 区块，标签在上、输入框在下\n- 恢复 `touchstart.capture` 和 `@click=\"hideMap\"`，点击时销毁地图原生层\n- 地图默认不显示（`showMap = false`），仅选中小区后显示，滚动或点表单任意处即隐藏\n- 任意滚动即隐藏地图，避免原生层残留\n\n## 补充修复（会话85a3ba6b）\n- 地图 marker 图片 location-red.png 路径错误：代码用 `@/static/icon/location-red.png` 引用，实际文件在 `pages_main/static/icon/` 下，微信解析为 `/static/icon/location-red.png` 导致 500；修复：改用 `resolveStaticUrl('icon/location-red.png', 'pages_main')`（与 houseMap.vue 同方式）\n- 「申请说明」输入框高度塌陷另一原因：`form2.scss` 表单项默认横向 `flex` 布局，区域缺少高度；修复：在 `addAlone.vue` 显式引入 `ZsTextarea`，参考 `signInfo.vue` 调整 `.description` 样式（固定高度、`flex-direction: column`）\n- 补充涉及文件：houseMap.vue、signInfo.vue；来源会话ID：85a3ba6b-0da3-48e5-b7f4-7ebc9f354ad6\n\n## 验证与归属\n- 若仍不能输入，先点上方表单区域让地图消失，再点「申请说明」输入框\n- 涉及文件：addAlone.vue、form2.scss、houseMap.vue、signInfo.vue\n- 所属项目：苏住房C；来源会话ID：be5add1d-7616-4020-9f82-4d25046636fb（另见补充修复会话85a3ba6b）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793613904130/history/archive_010",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T10:30:39.389144+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_map_dehighlight.md",
+                "memory_type": "entities",
+                "after": "# ECharts 地图去高亮三态禁用\n园区物管2.0 的 ECharts 地图要求鼠标移入和点击都不出现高亮，只保留代码控制的轮播高亮。\n\n## 问题根因\n- ECharts 高亮有两套独立机制：emphasis 是悬停态，select 是点击选中态（selectedMode 控制），此外还有 blur 焦点态\n- 只关 emphasis 不够，点一下地图区域触发 select，关了 emphasis 点击仍会高亮\n\n## 解决方案\n- geo 设 silent:true 彻底不响应鼠标事件，并加 select:{disabled:true}、blur:{disabled:true}\n- map 系列设 selectedMode:false 并同样禁用 emphasis/select/blur 三态\n- 代码驱动的轮播 regions 高亮走 regions 数据控制，与鼠标态无关，不要误伤\n\n## 套路\n- 想「彻底去交互态」时要三态（emphasis/select/blur）一起禁，而不是只盯 emphasis\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue、chartOptions.js\n- 所属项目：园区物管2.0；来源会话：ec2f2919-958c-46a4-9979-f0e697d4c8c7；代码基线：fc994977f→736a824e7"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/attachments_multi_path.md",
+                "memory_type": "entities",
+                "after": "# attachments 多路径字段拆分处理\n园区物管2.0 资产详情弹窗图片不显示，根因是 attachments 字段为逗号分隔多路径，被整体当单 URL 处理。\n\n## 问题根因\n- 后端 attachments 字段是逗号分隔的多条相对路径串（如 /zhi2-dev/...jpg,/zhi2-dev/...jpg）\n- 前端把它整个当一个 src 传给 resolveServerAssetUrl，拼出无效 URL 必然加载失败\n\n## 解决方案\n- 取值侧按逗号 split 成路径数组并 trim 空白，逐条走 resolveServerAssetUrl 拼域名\n- 展示侧单张用 <img>，多张用 el-carousel 轮播\n- 同模块 ParkingAssetDialog、AdvertiseAssetDialog 等弹窗有同样逻辑要一并排查\n\n## 套路\n- 凡是「多附件存在一个字符串字段」的接口，消费前必须先拆分数组，不能直接当单 URL 用\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/components/HouseAssetDialog.vue、src/utils/resolveServerAssetUrl.js\n- 所属项目：园区物管2.0；来源会话：14e20239-48ca-49b6-aa6c-ccb4e211568e；代码基线：a63180c9a"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/map_bubble_color_data_level.md",
+                "memory_type": "entities",
+                "after": "# 地图气泡配色绑定数据层级\n园区物管2.0 地图下钻/上钻时气泡颜色错乱，根因是配色绑定缩放目标层级而非数据层级。\n\n## 问题根因\n- 层级状态（overviewLayerLevel）在缩放瞬间就变，而气泡数据 markList 要等接口返回才更新，两状态不同步\n- 派生的配色提前于数据，出现「街道气泡变蓝」等颜色错乱\n\n## 解决方案\n- 为数据驱动的外观单独建与数据同源的层级标记 markListLayerLevel，只在 markList 真正更新时同步修改，不绑定缩放目标层级\n- 配色 computed 读它（如 areaDrillStack 有下钻一律 green，否则按 markListLayerLevel 决定 blue/green）\n- 接口返回前保持上一级配色，返回后再切换\n\n## 套路\n- 地图/图表的视觉状态永远跟数据走，不跟触发动作的意图走\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue\n- 所属项目：园区物管2.0；来源会话：7f4f3f1b-a0fd-4692-88cc-921192593ee3；代码基线：49e7729ce"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/echarts_dual_y_scale.md",
+                "memory_type": "entities",
+                "after": "# 双 Y 轴量纲悬殊去掉 alignTicks\n园区物管2.0 双 Y 轴趋势图（份数 vs 万元）开启 alignTicks:true 后报刻度不可读警告。\n\n## 问题根因\n- 左右轴量纲相差很大（如 2000 vs 300）时，alignTicks 强行对齐刻度，在手工指定的 min/max 上会算出非整数、不可读的刻度\n- 控制台报 [ECharts] The ticks may be not readable when set min: 0, max: 300 and alignTicks: true\n\n## 解决方案\n- 去掉双轴的 alignTicks:true，改为分别为左右轴计算整齐的 min/max/interval\n- 左轴整数步长，右轴用 1/2/5/10 系友好步长，单位标签对齐逻辑改用计算后的两轴 max\n- 新增 computeTrendAxisScale 分别算两轴 min/max/interval（如左 0–2000 步长400/右 0–300 步长60）\n\n## 套路\n- 双 Y 轴不同量纲时不要依赖 alignTicks 自动对齐，自己按友好步长算刻度既消除警告又保证可读\n\n## 涉及信息\n- 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue\n- 所属项目：园区物管2.0；来源会话：7ed0f29d-3da8-4470-918b-f0872f9b6a9f；代码基线：c97957703"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/园区物管2.0.md",
+                "memory_type": "entities",
+                "before": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid、stats_card_flicker、copy_tab_three_sync、zstable_minwidth_elastic\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal、echarts_pie_downplay\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、edit_popup_detail_field_loss、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、amount_input_precision_loss、project_switch_soft_refresh、api_deadcode_judgment",
+                "after": "# 园区物管2.0\n园区物管2.0 是用户维护的园区物业管理 Vue 前端项目，代码仓库为 zhi2-web-admin。\n\n## 描述\n- 前端基于 Vue，含自研组件 zs-table、zs-table-column 与 ECharts 图表模块\n- 业务模块含资产详情弹窗、运营报告 Tab、统计卡片、函数式选择弹窗等\n- 与苏房V3 为同源仓库，属 DeepSeek Harness 工作区下的实际业务项目\n\n## 代码特征\n- 图表交互需手动配对 ECharts dispatchAction 的 highlight/downplay\n- 表格列宽由 zs-table-column 计算，min-width 弹性列可参与均分撑满容器\n- 多附件字段以逗号分隔多路径存储，消费前需拆分为数组逐张处理\n\n## 关联技术模式\n- 地图与下钻类：data地图下钻传参约定、腾讯地图区划接入、腾讯地图Key禁止硬编码、腾讯GL地图点位不显示、Vite地图代理路径适配、map_drill_down_order、map_marker_spread\n- 表格与布局类：zstable_subtotal_divider、zstable_fixed_border、table_border_stack、zs_number_hide、region_tree_layout、region_tree_expand_freeze、sidebar_recursive_menu、recursive_menu_icon_indent、opbar_zindex_clip、search_container_deprecated、appmain_isolation、zs_select_single_choice、zs_table_summary_border、account_dual_dict、region_defer_list、dialog_table_double_border、allow_custom_three_state、dialog_table_selection_sync、select_dialog_api、navbar_undefined_merge、selectdialog_bterminal_projectid、stats_card_flicker、copy_tab_three_sync、zstable_minwidth_elastic\n- 图表与样式类：echarts_donut_label、chart_amount_format、chart_amount_double_wan、unused_sprite_cleanup、dialog_dual_layout、css_asset_var_injection、echarts_legend_sync、large_screen_scale、echarts_axis_max_ceiling、svg_fill_replace、line_y_axis_adapt、four_module_split、echarts_axis_decimal、echarts_pie_downplay、echarts_map_dehighlight、attachments_multi_path、map_bubble_color_data_level、echarts_dual_y_scale\n- 工作流与其他：merge_conflict_selfcheck、branch_serial_merge、xcrud_xform_replace、地图信息框交互偏好、edit_popup_relbusinesstype、edit_popup_detail_field_loss、form_getdetail_param_guard、企业关联ID统一companyRecordId、bank_receipt_verification_rule、dialog_bterminal_filter、area_dict_race、area_field_code_assignment、btn_group_props、driver_top_clip、platform_config_race、project_dialog_cache_restore、amount_input_validate_race、amount_input_precision_loss、project_switch_soft_refresh、api_deadcode_judgment"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

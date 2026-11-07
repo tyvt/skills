@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793750582955/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-04T00:07:45.992160+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/subtable_form_factory.md",
+                "memory_type": "entities",
+                "after": "# 子表弹窗 form 工厂预定义全字段（产品2.0）\n产品2.0 机构注册银行账户子表弹窗因 Vue2 后加属性非响应式，导致选银行回填不反显，需用工厂函数预定义全字段并配合 $set。\n\n## 问题现象\n- 新增态下先填账户名称/银行账号，再通过 setBank 选开户银行回填 this.form.bankName，输入框不立即反显\n- 需清空其他字段触发重渲染后才显示，静默无报错\n\n## 根因\n- Vue2 无法侦测「在对象上后加的属性」\n- form 初始只声明 companyRegisterId，bankName/bankId/bankNo 均为后加属性、非响应式，赋值后视图不更新\n\n## 解决方案\n- 抽 createDefaultForm() 工厂预定义全部表单字段，handleAdd/handleUpdate 都用它初始化\n- 回填外部选中值（如选银行）时用 this.$set() 赋值，并顺带 clearValidate 清掉 bankName 校验状态\n- 套路泛化：子表弹窗 form 一律用工厂函数声明全字段，不许依赖「后面再加」；回填外部数据一律 $set\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/company/companyRegister/components/bankTable.vue、companyManagement/components/bankTable.vue\n- 所属项目：产品2.0；来源会话：44cfc1d2-8149-4819-b5f1-42bdc46f2173；基线：50767de"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_proxy_rewrite.md",
+                "memory_type": "entities",
+                "after": "# Vite 代理 rewrite 契约：只剥 /api 保留 /v3.0（产品2.0）\n产品2.0 本地 dev 代理 rewrite 只能剥离 /api 前缀、必须保留 /v3.0，经 frontend-proxy 响应头验证实际转发地址。\n\n## 问题现象\n- 本地 dev 代理无 rewrite 时后端收到 /api 前缀导致 404\n- 修时连同 /v3.0 一起剥掉，后端收到 /company/xxx 也 404\n\n## 根因\n- 前端请求统一带 baseURL 前缀 /api/v3.0（VITE_APP_BASE_API=/api/v3.0）\n- /api 是网关外本地标识、/v3.0 是后端真实服务路径前缀，两层语义不同，rewrite 只能剥第一层\n\n## 解决方案\n- vite.config.js 的 createProxyConfig(target, proxyContext) 约定：proxyContext 以 /api 开头时，rewrite 只做 path.replace(/^\\/api/, '')\n- 转发示例：/api/v3.0/company/xxx → http://host:8080/v3.0/company/xxx\n- /zhi2 等不以 /api 开头的代理不受影响\n- bypass 钩子把 rewrite 后 URL 写进 frontend-proxy 响应头便于联调核对\n- 改动后必须重启 dev server（Vite 仅启动时读 env/代理配置）\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/vite.config.js、env/.env\n- 所属项目：产品2.0；来源会话：f8066b62、5038770a；基线：62d5fb9→71e6ed9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cascader_change_backfill.md",
+                "memory_type": "entities",
+                "after": "# 详情回填复用级联 change handler 会清掉下游字段（产品2.0）\n产品2.0 项目变更详情页回填接口数据后复用级联 change handler 把下游字段清空，需 shouldReset 参数区分手动切换与回填。\n\n## 问题现象\n- 项目变更详情页接口返回了 subdistrict/community，进页面后字段却是空的（接口有值但被前端清掉）\n\n## 根因\n- detailCallback 回填完接口数据后顺手调用 onCascaderChange()\n- 该方法为「用户手动切换行政区域」写，无条件执行 this.form.subdistrict = undefined; this.form.community = undefined\n- 级联 change handler 的两种调用语境（用户交互 vs 程序回填）语义不同却复用同一入口\n\n## 解决方案\n- 给 onCascaderChange 加 shouldReset = true 参数：手动切换保持原清空交互；detailCallback 回填传 false，只加载下级（街道）列表数据、不清空已回填值\n- 套路泛化：详情回填后触发下拉/级联加载选项的调用，不能直接复用用户交互 change handler，要么拆参数要么拆方法，回填路径只刷 options 不动 value\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/views/building/projectChange/detail.vue、zhi2-web-admin/src/mixins/area.js\n- 所属项目：产品2.0；来源会话：43814712-13f1-423a-b18d-f6d42c3a291a；基线：183f95"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/url_errormsg_parse.md",
+                "memory_type": "entities",
+                "after": "# 跨系统跳转携带 errorMsg 的解析套路（产品2.0）\n产品2.0 hash 路由下外部系统通过 URL 带回错误文案，需在根实例挂载后用 location.search 优先 + $route.query 兜底解析并弹出。\n\n## 问题现象\n- 外部系统（单点登录、门户跳转）通过 URL 把错误文案带回本系统，进入应用后需自动弹出错误提示\n- 根实例刚挂载时 $route 可能未完成首次解析，直接读会拿到 undefined\n\n## 根因\n- 本项目是 hash 路由，外部拼接地址有两种形态：错误参数在 # 之前（?token=…&errorMsg=…#/…，读 $route.query 拿不到）和在 # 之后（#/login?errorMsg=…）\n- 重复参数在 vue-router 里会解析成数组\n\n## 解决方案\n- 在 main.js 的 createInstance 中、根实例挂载完成后的 $nextTick 里执行 pickErrorMsgFromUrl(vm)\n- 先读 window.location.search 的 errorMsg（覆盖 # 之前形态），再回退 vm.$route.query.errorMsg\n- 若取到数组取第一个；用 instance.$message.error 展示（Element 的 $message 在 Vue.use(Element) 后才挂原型，时序上必须在其之后）\n\n## 验证与归属\n- 涉及文件：zhi2-web-admin/src/main.js\n- 所属项目：产品2.0；来源会话：a70a9913-e202-4f48-9ff9-a75c6d3d3699；基线：183f795 / c420af5"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

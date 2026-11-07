@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_012",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T07:48:55.481111+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/home_legacy_split.md",
+                "memory_type": "entities",
+                "after": "# B端首页恢复旧工作台分流\n苏住房G 后台首页通过 index-wrapper.vue 按 terminalType 分流，B 端渲染旧版 index-legacy.vue，其余走新版 index-v2.vue。\n\n## 问题背景\n- 新版 index-v2.vue 上线后，B 端用户错误看到新版工作台，需求应是旧版图1样式\n- 入口未做端别分流，B 端直接落进新版；terminalType 来自登录后用户信息，首屏常未就绪\n\n## 修复方案\n- index-wrapper.vue 保留为分流壳，由 utils/terminalUser.js 提供 terminalType 判断 B 端\n- 旧工作台原样另存为 index-legacy.vue，不在 index.vue 上叠加条件\n- 渲染前加 terminalType 就绪门闩，未就绪不渲染分支，防止闪跳与误判\n- 同步维护 tests/e2e/home-v2.spec.mjs 的 B 端命中旧工作台断言\n\n## 提交与验证\n- 子模块 zhi2-web-admin 提交 47d6ce19a「fix(home): B 端恢复完整旧工作台首页」\n- 父仓库提交 1a408c2 仅更新子模块指针；env/.env 等 WIP 不提交，推送前 pull --rebase\n- 来源会话 e089d931-94c4-4e19-8df7-c93db12d1e61；基线 db4f82c；所属项目苏住房G\n\n## 经验沉淀\n- 业务单据页可按 terminalType 页面内分流不拆两套，但首页应壳页分流加旧版留档，勿在新版塞满 if"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/home_stat_zero_bug.md",
+                "memory_type": "entities",
+                "after": "# 首页统计卡数字显示0\n苏住房G 门户 G 端首页 index-v2.vue 待办数字卡接口有数据却恒显示 0，根因为计数字段名候选缺项被静默兜 0。\n\n## 问题现象\n- /portal/home 返回 {todoNum:3409,finishedNum:36159,myProcessNum:29822}，但待办卡恒显示 0\n- 已办与我发起正常，因候选数组恰好含 finishedNum/myProcessNum 全名，属运气非约定\n\n## 根因分析\n- loadTaskCounts 用 pickTaskCountField(counts,['todo','todoCount']) 取值，后端键为 todoNum 全未命中\n- 取值空后被 `|| 0` 兜成 0 直接渲染，不报错也无空态提示，表现为接口成功数字为 0\n\n## 修复方案\n- 把真实字段名 'todoNum' 补进候选数组（旧名在前以兼容），不改单字段直取因后端字段名反复变动\n- E2E mock 同步改为后端真实字段名 todoNum，避免 mock 绿线上 0 的假阴性\n\n## 经验沉淀\n- 数字卡有一项对得上另一项恒 0，基本可判定候选字段名缺项而非接口未调用\n- 凡走候选数组取 -Num/-Count/-Total 后缀计数字段处都要一并核对命名漂移\n- 涉及文件 index-v2.vue、src/api/portal/home.js、v2/components/TodoPanel.vue；会话 360057ae；基线 9e5c499"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/region_code_empty_bug.md",
+                "memory_type": "entities",
+                "after": "# 行政区划不能为空根因\n苏住房G 收费标准与物业收费管理保存时报「行政区划不能为空」，根因为选物业管理区域只回填 regionName 未同步 regionCode。\n\n## 问题现象\n- 收费标准 pubParkingRate/detail.vue、ChargeStandardDialog.vue 保存报行政区域/行政区划不能为空\n- 管理主体模块此前同报错（commit 841479510），属同源复发\n\n## 根因分析\n- 选「物业管理区域」只调 getFullRegionNameByRegionCode 写 form.regionName 展示值\n- 未把区划编码写进 form.regionCode，后端校验读 regionCode，请求体该字段为空\n\n## 修复方案\n- 选区域三件套一起写：regionName（展示）、regionCode（提交取 row.region 原始编码）、同步街道社区\n- B 端自动带入当前小区走同一 applyPropertyProjectRow，仅补 regionCode 一处两入口同效\n\n## 经验沉淀\n- 排查「显示已填但后端说为空」先对照 form 里哪个是提交字段哪个仅展示字段\n- 涉及文件 pubParkingRate/detail.vue、ChargeStandardDialog.vue、api/benefit/pubParkingChargeStandard.js；会话 23d3fee1；基线 26069c8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房g技术/range_select_pagination_bug.md",
+                "memory_type": "entities",
+                "after": "# 服务周报区域选择列表不全\n苏住房G 街道账号在服务周报选「物业管理区域」列表不全且无分页，补分页后因手动高度计算末行被裁。\n\n## 问题现象\n- 街道账号服务周报选物业管理区域有 101 条数据，列表未显示全且无分页\n- 补分页后最后一条被挡住半边\n\n## 根因分析\n- 选择弹窗区域列表打开即全量取一次，未带 pageNum/pageSize 也未接 zs-pagination，超出静默截断\n- 首轮修复手动算 tableHeight 传 zs-table，与 flex 纵向布局实际空间偏差，表格偏高被 overflow:hidden 裁行\n\n## 修复方案\n- rangeTable.vue 改用项目内置 fill-height，删全部手动 tableHeight 计算逻辑\n- table-container 改 flex 纵向，表格 flex 占满、zs-pagination 固定底部\n- selectRangeDialog.vue 移除不再需要的高度重算逻辑，避免与 fill-height 抢高度\n\n## 经验沉淀\n- 选择类弹窗大数据集必须服务端分页，表格高度交给 fill-height 不要手算\n- 涉及文件 system/message/components/rangeTable.vue、selectRangeDialog.vue、index.vue、service/index.vue；会话 0b5e17ad；基线 c2a604a"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

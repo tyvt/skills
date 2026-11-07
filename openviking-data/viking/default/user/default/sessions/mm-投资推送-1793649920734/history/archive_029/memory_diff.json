@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-投资推送-1793649920734/history/archive_029",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T20:50:50.531749+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/腾讯实时行情中证定制指数cs前缀映射.md",
+                "memory_type": "entities",
+                "after": "# 腾讯实时行情中证定制指数cs前缀映射\n投资推送项目在 realtime_quote.py 映射腾讯行情时，中证定制指数代码须用 cs 前缀而非 sh/sz。\n\n## 映射规则\n- 红利等中证定制指数（如 H30269）在 `realtime_quote.py` 映射腾讯行情时须用 `cs` 前缀（例 `H30269` → `csH30269`）\n- 不能使用上交所 `sh`/深交所 `sz` 前缀\n\n## 排障要点\n- 映射缺失会导致实时价完全拉不到\n- 与「接口已拉到但 `log_fetch_done` 未拼接实时字段」的展示问题不同，排障时先确认映射表是否含该代码\n\n## 验证与归属\n- 验证证据：会话 e7077452 用户报中证红利无实时数据；增加 cs 映射后报告元信息示例 `实时 11,125.28 -0.42% …`\n- 涉及文件：realtime_quote.py、report.py、index_meta.py\n- 所属项目：投资推送；来源会话ID：e7077452-6663-48f2-ba41-f20b45f24975"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/回测买入信号审计年内高低区间位置.md",
+                "memory_type": "entities",
+                "after": "# 回测买入信号审计年内高低区间位置\n投资推送项目审查回测买入合理性时，可用日历年内价格位置指标筛选高位买入簇。\n\n## 指标定义\n- 使用日历年内位置 `(收盘-年内低)/(年内高-年内低)`（0%=年内最低、100%=年内最高）\n- 该指标与策略里「距低点反弹%」不同，需区分\n\n## 分析发现\n- 全样本约 2.2% 信号 ≥80%（接近年内高点），多集中在 2022 开年小盘/科创50/中证500 与少数 2025 纳指年末\n- 2021 中证500 在 65%–80% 区间长时间密集买入是另一类「牛市中段」问题\n\n## 审计建议\n- 高位簇需回到 `config` 买入阈值（反弹/估值分位等）对照，而非仅调单一参数\n\n## 验证与归属\n- 验证证据：会话 f11f6616 对 2021–2026 共 2695 次买入做结构化分析，列出 ≥80% 次数与典型日期\n- 涉及文件：logs/backtest/2021.md、logs/backtest/2022.md、config.py、backtest_buy_signals.py\n- 所属项目：投资推送；来源会话ID：f11f6616-6051-4ccf-bcf5-a7e6f7c70c6c"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/push_env密钥管理与gitignore约定.md",
+                "memory_type": "entities",
+                "before": "# push_env密钥管理与gitignore约定\n投资推送项目中含 SERVERCHAN_SENDKEY 的 push.env 不得入库，若历史泄露需轮转密钥，并规范 .gitignore 覆盖。\n\n## 密钥管理\n- 含 `SERVERCHAN_SENDKEY` 的 `push.env` 不得进 git（README 亦要求）\n- 若曾在 `init` 等提交中入库，本地 `git rm --cached` 后仍视为密钥已泄露，应在 Server酱 重新生成 SendKey\n\n## gitignore 规范\n- 宜覆盖：`.venv-*/`、`config/push.env`、`config/cache/`、`config/data/`、`*.parquet`、回测输出与 `*.bak`/`*.tmp`\n- 模板保留 `push.example.env`\n\n## 验证与归属\n- 验证证据：会话 9c1154a6 更新 .gitignore 并从索引移除 push.env；指出 da7019c init 曾提交 SendKey，建议远程仓库轮转密钥\n- 涉及文件：.gitignore、push.env、push.example.env、config/env.py、README.md\n- 所属项目：投资推送；来源会话ID：9c1154a6-3e96-4992-aec9-9cc0b44fae86",
+                "after": "# push_env密钥管理与gitignore约定\n投资推送项目中含 SERVERCHAN_SENDKEY 的 push.env 不得入库，若历史泄露需轮转密钥，并规范 .gitignore 覆盖。\n\n## 密钥管理\n- 含 `SERVERCHAN_SENDKEY` 的 `push.env` 不得进 git（README 亦要求）\n- 若曾在 `init` 等提交中入库，本地 `git rm --cached` 后仍视为密钥已泄露，应在 Server酱 重新生成 SendKey\n\n## gitignore 规范\n- 宜覆盖：`.venv-*/`、`config/push.env`、`config/cache/`、`config/data/`、`*.parquet`、回测输出与 `*.bak`/`*.tmp`\n- 本地量化仓另须忽略：`rqalpha_env/`（`scripts/setup_rqalpha_env.bat` 生成）、`.code-review-graph/`（MCP graph.db）、`*.duckdb`、`*.pkl`、`*.log`、`.env`/`.env.*`（保留 `push.example.env`）、`.pytest_cache`/`.mypy_cache`/`.ruff_cache/`\n- 若 `rqalpha_env` 曾被 `git add`，需 `git rm -r --cached rqalpha_env/`；`push.env` 一旦被跟踪，`.gitignore` 不生效，含 Server酱 密钥时应 `git rm --cached push.env`\n- 模板保留 `push.example.env`\n\n## 验证与归属\n- 验证证据：会话 9c1154a6 更新 .gitignore 并从索引移除 push.env；指出 da7019c init 曾提交 SendKey，建议远程仓库轮转密钥\n- 验证证据：会话 628f2f3e 更新 .gitignore 并从索引移除约 9000 个 rqalpha_env 文件；文档说明 push.env 可选后续\n- 涉及文件：.gitignore、push.env、push.example.env、config/env.py、README.md、scripts/setup_rqalpha_env.bat\n- 所属项目：投资推送；来源会话ID：9c1154a6-3e96-4992-aec9-9cc0b44fae86, 628f2f3e-f633-4050-b7b3-9dc33474f216"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/实盘报告与推送信号职责分叉.md",
+                "memory_type": "entities",
+                "before": "# 投资推送：实盘报告与推送信号职责分叉\n`report.py` 为本地统一报告入口（全指数/全模块查看，不推送）；`push.py` 经 Server酱等只推送当日有买卖信号的指数，两者职责刻意分叉。\n\n## 职责分工\n- `report.py`：本地统一报告入口，展示全指数/全模块，不做推送\n- `push.py`：经 Server酱等渠道，仅推送当日有买卖信号的指数\n\n## 阈值与信号来源\n- 阈值与指数列表以 `config.py` 为准，运行时可由 `push.env` 覆盖\n- 各指数信号在 `*_signal.py` + `price_position.py` 等模块实现，勿在回测脚本里硬编码阈值\n\n## 验证与归属\n- 验证证据：会话 b98f272b 项目总览表明确 report/push 职责与 config、push.env 关系\n- 涉及文件：d:/repository/投资推送/report.py、push.py、config.py、push.env\n- 所属项目：投资推送；来源会话ID：b98f272b-bd52-480f-a894-3e7a0d2ab885",
+                "after": "# 投资推送：实盘报告与推送信号职责分叉\n`report.py` 为本地统一报告入口（全指数/全模块查看，不推送）；`push.py` 经 Server酱等只推送当日有买卖信号的指数，两者职责刻意分叉。\n\n## 职责分工\n- `report.py`：本地统一报告入口，展示全指数/全模块，不做推送\n- `push.py`：经 Server酱等渠道，仅推送当日有买卖信号的指数\n- `push.py` 生成报告后经 `signal_format.filter_trade_signal_sections` 过滤，仅当某指数 `signal_short` 为「买入」或「波段卖出」（`section_has_trade_signal`）才走微信推送\n- 全部为「观望」时日志为「今日无买卖信号，跳过推送」并正常退出，不会打完整报告、也不会调微信接口\n\n## 阈值与信号来源\n- 阈值与指数列表以 `config.py` 为准，运行时可由 `push.env` 覆盖\n- 各指数信号在 `*_signal.py` + `price_position.py` 等模块实现，勿在回测脚本里硬编码阈值\n\n## 推送跳过与排障\n- 排查「推送没成功」应先读 `logs/push.log` 该行，再用 `python report.py` 看当日全量估值与达标项\n- 价格上涨突破价格位置买入上限后信号会从买入变观望（例：中证1000 由 7065 涨至约 7475，突破 120 日低点上限与 1 年区间上限）\n- 验证证据：8/4–8/5 日志均为跳过推送；8/3 中证1000 买入时推送成功\n\n## 验证与归属\n- 验证证据：会话 b98f272b 项目总览表明确 report/push 职责与 config、push.env 关系\n- 验证证据：会话 134eaf71 说明 push.py 过滤逻辑、跳过日志与排障步骤，含 8/4–8/5 跳过与 8/3 中证1000 推送成功\n- 涉及文件：d:/repository/投资推送/report.py、push.py、config.py、push.env、signal_format.py、logs/push.log、run_push.bat\n- 所属项目：投资推送；来源会话ID：b98f272b-bd52-480f-a894-3e7a0d2ab885, 134eaf71-0d24-4ed8-97e5-7a27e683e2e7"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

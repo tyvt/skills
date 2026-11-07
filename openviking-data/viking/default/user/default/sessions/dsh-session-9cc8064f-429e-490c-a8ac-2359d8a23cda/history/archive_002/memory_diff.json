@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-9cc8064f-429e-490c-a8ac-2359d8a23cda/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T06:49:24.244565+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/version_check_reload.md",
+                "memory_type": "entities",
+                "after": "# 发版整页刷新非破坏性改造\nzhi2-web-admin 发版后整页 location.reload() 会清空页签，bug 6285 修复为保留自动刷新但加遮罩并存回页签。\n\n## 问题根因\n- version-check.js 覆写 history.pushState/replaceState，任意路由跳转（如点「维护」）都拉 version.json 比对，发版后 buildTime 变化即 forceRefresh() 整页刷新\n- permission.js 的 importWithChunkRetry 在懒加载 chunk 404（旧 chunk 被清理）时静默 location.reload()\n- tagsView 的 visitedViews 不落盘，整页刷新必然清空页签（录屏 72 帧 GIF 中页签 10→1、图标短暂显示方框）\n\n## 修复方案\n- 新增 autoRefresh.js：reloadWithOverlay() 刷新前显示全屏遮罩（检测到新版本/页面资源已更新，正在刷新页面…），并把已打开页签写入 sessionStorage\n- version-check.js 的 forceRefresh() 与 permission.js 的 chunk 兜底改走 reloadWithOverlay()（刷新仍自动，不再无声白屏）\n- TagsView/index.vue：自动刷新后校验路由仍存在再还原页签，普通刷新不受影响\n- 按用户选择保留自动整页刷新语义，不改成弹窗确认\n\n## 验证与落地\n- 验证：eslint 四个改动文件 0 error；npm run build 通过（buildTime 2026/11/6 14:41:28，gitHash a2862e39c）；本地 nginx 8098 Playwright 模拟发版通过；客测环境未复现\n- 落地：子模块 zhi2-web-admin 分支 fix/zentao-6285-version-check-prompt(d2cbc1742) 与 develop/v3.0.0(a2862e39c) 已推送；父仓库 zhi3-web-admin-h5-g-unlimited develop/v3.0.0(08b4012、7a7fa89) 已推送，gitlink 指向 a2862e39c\n- 涉及文件：zhi2-web-admin/src/utils/autoRefresh.js、version-check.js、store/modules/permission.js、layout/components/TagsView/index.vue\n- 台账 common-errors.md 补 E-041；worktree zhi2-web-admin-wt-6285 已删；禅道 6285 回写 resolved/fixed（resolvedBy=tiany，指派回 lichandan）"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/lichandan/发版刷新交互偏好.md",
+                "memory_type": "preferences",
+                "after": "- 在 zhi2-web-admin 修复发版导致的整页刷新问题时，选择保留自动整页刷新语义（加非破坏性遮罩并还原页签），不改为弹窗手动确认。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

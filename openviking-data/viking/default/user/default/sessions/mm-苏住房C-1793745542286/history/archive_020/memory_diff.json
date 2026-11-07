@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793745542286/history/archive_020",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T23:19:02.863650+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/housemap_import_bug.md",
+                "memory_type": "entities",
+                "after": "# houseMap组件缺失路径误引\n`pages_main/houseMap/components/`下的`StockHouse.vue`与`NewHouse.vue`误用已删除相对路径`../../collect/components/collectBtn.vue`引发组件缺失。\n## 问题根因\n- 两个文件引用了已删除的相对路径，导致构建/运行时组件缺失\n## 解决方案\n- 引用路径已更正为`@/components/collectBtn/collectBtn.vue`\n## 验证与归属\n- 验证证据：src=苏住房C/031.md\n- 涉及文件：zhi2-mobile-shimin/src/pages_main/houseMap/components/StockHouse.vue、NewHouse.vue、pages/commonNew/houseCard.vue、pages.json、vite.config.ts、components/commonNew/houseCard.vue、pages_main/collect/components/collectBtn.vue、pages_main/collect/index.vue、components/collectBtn/collectBtn.vue、pages_transaction/stockHouse/commonBuildings.vue\n- 所属项目：苏住房C；来源会话ID：3ae4dee9-19f6-4db4-8759-c97af7318eb7；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/card_layout_fix.md",
+                "memory_type": "entities",
+                "after": "# 双列卡片布局最小宽度溢出修复\n`pages_main/publicNotice`等双列卡片因`flex:0 0 48%`配合标题`white-space:nowrap`与图标，最小宽超容器致双列失效。\n## 问题根因\n- 卡片使用`flex:0 0 48%`固定基宽，标题`white-space:nowrap`不换行且带图标，使内容最小宽超出48%容器\n- 双列flex布局在最小宽超出时塌缩为单列\n## 解决方案\n- `pages_main/publicNotice/index.vue`改用CSS Grid `repeat(2,minmax(0,1fr))`，允许列宽收缩到0\n- 标题去除`nowrap`改`word-break:break-all`，并缩小图标尺寸\n## 验证与归属\n- 验证证据：src=苏住房C/033.md\n- 涉及文件：zhi2-mobile-shimin/src/pages_main/publicNotice/index.vue、publicNotice.vue、components/ZsImage/ZsImage.vue、uni.scss、pages_transaction/newHouseCertification/choose.vue、uno.config.ts、pages_guard/guardApply/components/step1.vue、pages_transaction/stockHouse/detail.vue\n- 所属项目：苏住房C；来源会话ID：9774c8d1-2b21-4a57-a4db-44c6514d4939；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/验证码按钮卡死缺陷.md",
+                "memory_type": "entities",
+                "before": "# 验证码按钮卡死缺陷\n忘记密码页图形码错误后获取验证码按钮永远停在「发送中…」，用户被卡死无法重试。\n## 现象\n- 填错图形验证码点获取验证码，Toast 提示错误，但按钮不倒计时也不恢复\n- 控件内部置 sending=true，复位依赖调用方回调，失败分支未处理致永置 loading\n## 根因\n- VerifyCode/index.vue 点击即置 sending=true，复位依赖传入的成功/失败回调\n- PhoneForm.vue 的 sendCode 只处理成功分支，接口失败不调 onFail 也不刷新图形码\n## 修复做法\n- 控件用 settle 统一收敛成功/失败，保证只结算一次、任何分支都复位\n- 调用方在每条异常路径显式 onFail，最好 try/finally 兜底\n- 图形码失败必须 resetImageCode()（刷新图片+清空输入）\n- 成功回调仅在接口 code 200 后调，本项目无独立图形码校验接口，不要造两段式\n## 涉及文件与归属\n- 涉及：PhoneForm.vue、VerifyCode/index.vue、security.js、forget.vue\n- 所属项目：苏住房C；来源会话：1b8c2026-4de2-4989-a73b-49a661ba145a；代码基线：9cdf7b8",
+                "after": "# 验证码按钮卡死缺陷\n忘记密码页图形码错误后获取验证码按钮永远停在「发送中…」，用户被卡死无法重试。\n## 现象\n- 填错图形验证码点获取验证码，Toast 提示错误，但按钮不倒计时也不恢复\n- 控件内部置 sending=true，复位依赖调用方回调，失败分支未处理致永置 loading\n## 根因\n- VerifyCode/index.vue 点击即置 sending=true，复位依赖传入的成功/失败回调\n- PhoneForm.vue 的 sendCode 只处理成功分支，接口失败不调 onFail 也不刷新图形码\n## 修复做法\n- 控件用 settle 统一收敛成功/失败，保证只结算一次、任何分支都复位\n- 调用方在每条异常路径显式 onFail，最好 try/finally 兜底\n- 图形码失败必须 resetImageCode()（刷新图片+清空输入）\n- 成功回调仅在接口 code 200 后调，本项目无独立图形码校验接口，不要造两段式\n- ImgCode组件增ref，失败时resetImageCode()清空输入；sendCode对齐phone.vue模式，成功countDown()、失败resetImageCode()+onFail()，并补全form的imageCode、udid字段\n## 涉及文件与归属\n- 涉及：PhoneForm.vue、VerifyCode/index.vue、security.js、forget.vue、pages.json、pages_main/login/forget.vue、components/shared/PhoneForm.vue、api/msg.js、pages_my/setting/phone.vue\n- 验证证据：src=苏住房C/031.md\n- 所属项目：苏住房C；来源会话：1b8c2026-4de2-4989-a73b-49a661ba145a；代码基线：9cdf7b8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/login_auth_bug.md",
+                "memory_type": "entities",
+                "before": "# 登录后业主认证态缺失bug\n登录成功进入各tab仍误提示「请先进行业主身份认证」，根因为getUserInfo未await身份列表且登录只存token未刷新认证态。\n\n## 问题根因\n- store/user.js的getUserInfo中identities赋值未await listStatus()，接口未返回就置空数组，goMenu的v3校验读空身份判定未认证。\n- 登录链路只保存token，未拉取身份列表与绑定房屋列表，整个会话生命周期认证态无数据源。\n\n## 解决方案\n- getUserInfo改为串行：先await用户信息/状态接口，拿到结果再写identities。\n- 新增refreshAuthState()，按「用户信息接口→getMyHouseList」顺序拉齐两类状态。\n- 两处身份类型比较统一String()归一，避免数字1与字符串\"1\"比较失败。\n- 登录页两分支跳转前await refreshAuthState；utils/tabBar.js各tab的onShow对已登录用户调一次；App.vue的H5 hash注入token分支同样刷新。\n- 「我的」页删掉自带loadIdentityTypes改由refreshAuthState统一负责。\n\n## 验证与归属\n- 验证：会话db56ec08用户反馈登录后点菜单仍提示认证，根因明确为getUserInfo未await listStatus且登录后未刷新。\n- 涉及文件：zhi2-mobile-shimin/src/store/user.js、pages_main/login/index.vue、utils/tabBar.js、App.vue、My_Suzhufang.vue。\n- 所属项目：苏住房C；代码基线：5f0f4dc；来源会话ID：db56ec08-2aeb-407a-bde0-498f081066b6。",
+                "after": "# 登录后业主认证态缺失bug\n登录成功进入各tab仍误提示「请先进行业主身份认证」，根因为getUserInfo未await身份列表且登录只存token未刷新认证态。\n\n## 问题根因\n- store/user.js的getUserInfo中identities赋值未await listStatus()，接口未返回就置空数组，goMenu的v3校验读空身份判定未认证。\n- 登录链路只保存token，未拉取身份列表与绑定房屋列表，整个会话生命周期认证态无数据源。\n\n## 解决方案\n- getUserInfo改为串行：先await用户信息/状态接口，拿到结果再写identities。\n- 新增refreshAuthState()，按「用户信息接口→getMyHouseList」顺序拉齐两类状态。\n- 两处身份类型比较统一String()归一，避免数字1与字符串\"1\"比较失败。\n- 登录页两分支跳转前await refreshAuthState；utils/tabBar.js各tab的onShow对已登录用户调一次；App.vue的H5 hash注入token分支同样刷新。\n- 「我的」页删掉自带loadIdentityTypes改由refreshAuthState统一负责。\n\n## 验证与归属\n- 验证：会话db56ec08用户反馈登录后点菜单仍提示认证，根因明确为getUserInfo未await listStatus且登录后未刷新。\n- 涉及文件：zhi2-mobile-shimin/src/store/user.js、pages_main/login/index.vue、utils/tabBar.js、App.vue、My_Suzhufang.vue、utils/index.js、api/property.js、pages/login/index.vue、pages_main/login/success.vue、pages_main/login/password.vue。\n- 验证证据：src=苏住房C/033.md\n- 所属项目：苏住房C；代码基线：5f0f4dc；来源会话ID：db56ec08-2aeb-407a-bde0-498f081066b6。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-保障房G-1793946934798/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T06:38:34.398598+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tmap_key_proxy.md",
+                "memory_type": "entities",
+                "before": "# 保障房G Tencent Map Key Loading and Security Proxy\nIn 保障房G (zhi2-web-admin), Tencent Map Keys are uniformly read from system parameters and routed through a security proxy to avoid hardcoding and frontend exposure.\n\n## Problem Background\n- Hardcoding map Keys hurts unified configuration and maintenance, and a directly-connected GL JS Key would be exposed in the frontend page and requests.\n\n## Solution\n- Added src/utils/mapKey.js fetching the Key from /system/config/getByKey/sys.config.map.key, providing cached getMapKey() and loadTencentMapScript().\n- Removed the Tencent Map script tag from index.html; mapLoader.js now calls loadTencentMapScript() to load the SDK.\n- Before loading gljs, set window._TMapSecurityConfig.serviceHost to /_TMapService and strip &key=xxx from the URL.\n- Added getTMapWsUrl() to proxy WebService requests; commuteDialog.vue and markMap.vue switched from mapKey/getMapKey() to getTMapWsUrl().\n- vite.config.js proxies /_TMapService and /_TMapService_ws instead of the original /map proxy.\n\n## Verification and Attribution\n- Evidence: src=保障房G/001.md; source=cursor session=cafeb002-fbae-47a3-861d-f9f0d1ad95f1.\n- Files: src/utils/mapKey.js, vite.config.js, ZsTencentMap/mapLoader.js, ZsTencentMap/index.vue, commuteDialog.vue, markMap.vue, index.html, Map/index.vue, src/main.js, LoginForm.vue.\n- Project: 保障房G (zhi2-web-admin); source sessions: 1a4ee6c3-daea-476a-ba1b-6b0b105cdce0, cafeb002-fbae-47a3-861d-f9f0d1ad95f1; code baseline: none.",
+                "after": "# 保障房G 腾讯地图 Key 加载与安全代理\n在保障房G（zhi2-web-admin）中，腾讯地图 Key 统一从系统参数读取，并通过安全代理转发，避免硬编码与前端点位暴露。\n\n## 问题背景\n- 硬编码地图 Key 不利于统一配置与维护，直连的 GL JS Key 会暴露在前端页面与请求中。\n\n## 解决方案\n- 已按腾讯官方 GL 安全代理文档（https://lbs.qq.com/webApi/javascriptGL/glGuide/glKeyDelegate）完成前端改造。\n- 新增 src/utils/mapKey.js，通过 /system/config/getByKey/sys.config.map.key 获取 Key，提供带缓存的 getMapKey() 与 loadTencentMapScript()，不再从后端拉取 sys.config.map。\n- 移除 index.html 中的腾讯地图 script 标签；mapLoader.js 改为调用 loadTencentMapScript() 加载 SDK；ZsTencentMap/index.vue 组件创建时加载地图脚本。\n- 登录后预加载：router/index.js 中用户登录并获取信息后自动预加载地图脚本。\n- 加载 gljs 之前设置 window._TMapSecurityConfig.serviceHost（默认 /_TMapService），脚本 URL 去掉 &key=xxx。\n- 新增 getTMapWsUrl() 代理 WebService 请求；commuteDialog.vue 与 markMap.vue 移除 mapKey/getMapKey()，axios 请求改为 getTMapWsUrl('geocoder/v1') 等，不再传 key。\n- vite.config.js 本地开发代理用 /_TMapService、/_TMapService_ws 替代原有的 /map；本地需在 env/.env 配置 VITE_APP_TMAP（勿提交仓库）。\n\n## 验证与归属\n- 证据：extracted source=cursor project=保障房G；来源会话 1a4ee6c3-daea-476a-ba1b-6b0b105cdce0、cafeb002-fbae-47a3-861d-f9f0d1ad95f1。\n- 涉及文件：src/utils/mapKey.js、vite.config.js、ZsTencentMap/mapLoader.js、ZsTencentMap/index.vue、commuteDialog.vue、markMap.vue、index.html、Map/index.vue、src/main.js、LoginForm.vue、src/router/index.js 等。\n- 所属项目：保障房G（zhi2-web-admin）；代码基线：none。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tencent_map_key.md",
+                "memory_type": "entities",
+                "before": "# 腾讯地图 Key 禁止硬编码\n园区物管2.0 后台所有腾讯地图 Key 统一经 /system/config/getByKey/qq.map.key 接口获取，禁止硬编码。\n\n## 问题背景\n- 原本硬编码 Key 在前端代码，换 Key 或按环境隔离需逐文件改，且不安全无法按环境切换。\n\n## 解决方案\n- 使用 src/utils/tencentMapKey.js 的 fetchTencentMapKey()，内部 GET 该接口并做内存缓存，未配置抛明确错误。\n- mapLoader.js 未传 ak 时自动走该函数，业务组件一律 await loadMap()/fetchTencentMapKey()，不再传 Key 也不再写死。\n- 前置条件：后台系统配置已设置 qq.map.key，且 Key 同时开通 GL 地图与 WebServiceAPI 权限。\n\n## 验证与归属\n- 验证：新增 tencentMapKey.js 内存缓存，5 个消费文件去硬编码。\n- 涉及文件：tencentMapKey.js、tencentDistrictBoundary.js、ZsTencentMap/mapLoader.js、ZsTencentMap/index.vue 等。\n- 所属项目：园区物管2.0；来源会话 ff82edd2-0b07-45df-bdd1-a77d7b6c0d77；代码基线 7fe15a8cb。",
+                "after": "# 腾讯地图 Key 禁止硬编码（园区物管2.0）\n园区物管2.0 后台所有腾讯地图 Key 统一经 /system/config/getByKey/qq.map.key 接口获取，禁止硬编码。\n\n## 问题背景\n- 原本硬编码 Key 在前端代码，换 Key 或按环境隔离需逐文件改，且不安全无法按环境切换。\n\n## 解决方案\n- 使用 src/utils/tencentMapKey.js 的 fetchTencentMapKey()，内部 GET /system/config/getByKey/qq.map.key 并做内存缓存，未配置抛明确错误。\n- mapLoader.js 未传 ak 时自动走该函数，业务组件一律 await loadMap()/fetchTencentMapKey()，不再传 Key 也不再写死。\n- 前置条件：后台系统配置已设置 qq.map.key，且 Key 同时开通 GL 地图与 WebServiceAPI 权限。\n\n## 改造范围\n- tencentDistrictBoundary.js：行政区划 WebService 请求改为 await fetchTencentMapKey()\n- ZsTencentMap/mapLoader.js：未传 ak 时自动从接口取 Key\n- ZsTencentMap/index.vue：loadMap() 去掉硬编码 Key\n- statisticsMap/components/map.vue：GL 地图与区划边界均走接口 Key\n- mapProperty/index.vue：同上\n- homeInfoDisplay/index.vue：同上（原 OB4BZ-... 也改为统一配置）\n\n## 验证与归属\n- 验证：新增 tencentMapKey.js 内存缓存，多个消费文件去硬编码。\n- 涉及文件：src/utils/tencentMapKey.js、tencentDistrictBoundary.js、ZsTencentMap/mapLoader.js、ZsTencentMap/index.vue、statisticsMap/components/map.vue、mapProperty/index.vue、homeInfoDisplay/index.vue 等。\n- 所属项目：园区物管2.0；来源会话 ff82edd2-0b07-45df-bdd1-a77d7b6c0d77；代码基线 7fe15a8cb。"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/腾讯地图key统一获取.md",
+                "memory_type": "entities",
+                "deleted_content": "# 腾讯地图 Key 统一接口获取\n园区物管2.0 中所有腾讯地图 Key 统一通过 `/system/config/getByKey/qq.map.key` 接口获取，不再硬编码。\n\n## 新增工具\n- `src/utils/tencentMapKey.js` 提供 `fetchTencentMapKey()`\n- 调用 `GET /system/config/getByKey/qq.map.key`\n- 结果内存缓存，避免重复请求\n- 未配置时抛出明确错误\n\n## 改造范围\n- tencentDistrictBoundary.js：行政区划 WebService 请求改为 `await fetchTencentMapKey()`\n- mapLoader.js：未传 `ak` 时自动从接口取 Key\n- ZsTencentMap/index.vue：`loadMap()` 去掉硬编码 Key\n- statisticsMap/components/map.vue：GL 地图与区划边界均走接口 Key\n- mapProperty/index.vue：同上\n- homeInfoDisplay/index.vue：同上（原 `OB4BZ-...` 也改为统一配置）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=园区物管2.0\n- 涉及文件：src/utils/tencentMapKey.js、tencentDistrictBoundary.js、mapLoader.js、ZsTencentMap/index.vue\n- 所属项目：园区物管2.0；来源会话ID：ff82edd2-0b07-45df-bdd1-a77d7b6c0d77；代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 2,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

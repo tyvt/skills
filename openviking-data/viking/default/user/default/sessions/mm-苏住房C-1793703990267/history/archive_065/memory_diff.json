@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房C-1793703990267/history/archive_065",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T13:26:54.624726+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/backbtn_margin_overflow.md",
+                "memory_type": "entities",
+                "after": "# 公共BackBtn自带margin导致固定底栏按钮溢出\n苏住房C小程序投票决策结果页底部「修改决策」按钮偏右、溢出容器、不居中，根因为公共BackBtn组件自带margin:20px叠加底栏padding。\n\n## 问题现象\n- 投票决策结果页底部「修改决策」按钮偏右、溢出容器、不居中\n- 同类问题在泰兴项目表现为「页脚按钮错位」\n- 按钮无 block 属性，宽度按内容收缩，flex 对齐也无法居中\n\n## 根因\n- 公共组件 BackBtn 自身带 margin:20px，放入已设左右内边距的固定底栏后，左 margin 与底栏 padding 叠加，右侧被挤出可视区\n- 按钮没有 block 属性，宽度按内容收缩\n\n## 解决方案\n- 按钮补 block 属性撑满容器宽度，水平居中由容器决定\n- 底栏容器写 padding:18px 16px 且显式 box-sizing:border-box，防止 padding 撑出屏外\n- 用 :deep(.btn-container) 把 BackBtn 自带的 margin 清零（清外部盒模型而非改内部视觉）\n- 底栏配合安全区，避免小屏机型按钮被手势条压住\n\n## 验证与归属\n- 验证会话 55bd76cb（2026-08-28，基线 8fc3cc5）用户报「底部修改决策按钮溢出未居中」\n- 涉及文件：pages_vote/decision/components/BackBtn.vue、DecisionResult.vue、DecisionRecord.vue、styles/page.scss\n- 所属项目：苏住房C；代码基线：8fc3cc5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/webviewnav_h5_guide.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C政策导引类详情走webViewNav+H5\n苏住房C小程序政策/导引类详情一律走 webViewNav + H5，本地 pages.json 没有对应页面，遇 navigateTo page not found 先确认是否注册。\n\n## 问题现象\n- houseLoanGuide 点银行跳 `/pages/policy/fddydetail?id=xx` 控制台报 navigateTo:fail page not found\n- 该页面在 src/pages.json 未注册，属于从其他端复制残留的本地路由\n\n## 根因\n- 本项目政策/导引类内容全部由 H5 站点 cc.szfcweb.cn:9999 承载，无本地对应页\n\n## 解决方案\n- 与「税收导引」「交易流程导引」一致，改为 goto(`/pages_main/common/webViewNav?url=${encodeURIComponent(H5完整地址)}&title=${encodeURIComponent(title)}`)\n- title 用 getDictLabel(item.bankLogo, appStore.getDict('BANK_LOGO_H5')) 取字典中文\n- 新增导引类需求直接按 H5 + webViewNav 实现，不要在分包里新建同名本地页\n- 遇 navigateTo page not found，先 grep pages.json 确认目标路径是否注册，再看同目录兄弟页是否走 webViewNav\n- H5 打不开时不要再改前端，先验 https://cc.szfcweb.cn:9999 服务可用性\n\n## 验证与归属\n- 验证会话 2d03bb3e（基线 4630e8e）：houseLoanGuide 改为 webViewNav 打开 H5 并带字典标题，重编译通过\n- 涉及文件：pages_transaction/houseLoanGuide/index.vue、pages.json、pages_main/common/webViewNav.vue、api/transaction.js\n- 所属项目：苏住房C；代码基线：4630e8e"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/苏住房c技术/h5_subpath_api.md",
+                "memory_type": "entities",
+                "after": "# 苏住房C H5子路径部署接口必须用相对路径\n苏住房C 的 H5 部署在子目录（如 /testh5/）时，.env 的接口前缀必须用 ./ 相对路径而非 /api，否则请求打到域名根全部 404。\n\n## 问题现象\n- H5 部署在 https://szf.szzfcjj.cn/testh5/ 子目录下，.env.production 写 VITE_APP_API_BASE_URL=/api/v2.0 时请求打到 https://szf.szzfcjj.cn/api/v2.0 而非子目录，全部 404\n\n## 根因\n- 绝对路径以站点根为基准，相对路径以当前文档 URL 为基准；子路径部署只能靠相对路径自适应部署目录，换目录也不用重新构建\n\n## 解决方案\n- 生产/测试环境统一写 VITE_APP_API_BASE_URL=./api/v2.0、VITE_APP_API_BASE_URL_V1=./szf\n- .env.development 保持 /api/v2.0 让 Vite devServer 代理照常生效\n- 服务端 Nginx 必须把 /testh5/api/ 反代到真实后端，否则相对路径只是把 404 从根目录挪到子目录\n- 改完需 npm run build / npm run test 重新打包，env 只在构建期读取\n\n## 验证与归属\n- 验证会话 c48b7743（基线 f1939b0）：改 .env.production/.env.test 为 ./api/v2.0 与 ./szf，.env.development 仍 /api/v2.0，提示 Nginx 反代 /testh5/api/\n- 涉及文件：.env.production、src/api/index.js、src/api/v1Instance.js、src/env/mp.js、vite.config.ts\n- 所属项目：苏住房C；代码基线：f1939b0"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/小程序技术/map_blocks_textarea.md",
+                "memory_type": "entities",
+                "after": "# 小程序原生map组件遮挡textarea导致无法输入\n微信小程序原生 map 组件层级最高，紧贴 textarea 时会吞掉点击/聚焦事件导致无法输入，需移开地图或聚焦时隐藏。\n\n## 问题现象\n- pages_owner_extra/elevator/addAlone.vue 的「申请说明」textarea 点不进、无法输入\n- 仅给 textarea 加 min-height 完全没用\n\n## 根因\n- 微信小程序原生 map 组件层级高于所有 WebView 节点，地图紧贴 textarea 下方，点击/聚焦事件被地图层拦截\n- 属原生层遮挡而非样式尺寸问题（加高、调 padding 修不掉）\n\n## 解决方案\n- 把地图移到表单上方，与 add.vue 既有实现对齐，让 textarea 与地图拉开距离\n- 复用项目已有 inputHidden 状态，textarea 聚焦时 v-show=\"!inputHidden\" 把地图整块隐藏\n- 给绝对定位字数统计 .word-limit 加 pointer-events:none，防其盖住输入区\n- 小程序里输入/点击「点了没反应」而样式正常，先看附近有无 map/video/canvas 原生组件，再考虑层级隐藏，勿反复调尺寸\n\n## 验证与归属\n- 验证会话 e052a49f（基线 8fc3cc5）：移地图到表单上方 + inputHidden 隐藏 + word-limit pointer-events:none 后修复\n- 涉及文件：pages_owner_extra/elevator/addAlone.vue、add.vue、components/ZsMap/ZsMap.vue、components/ZsTextarea/ZsTextarea.vue、styles/form2.scss\n- 所属项目：苏住房C；代码基线：8fc3cc5"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

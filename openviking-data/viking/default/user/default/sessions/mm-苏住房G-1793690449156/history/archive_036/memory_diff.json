@@ -1,0 +1,45 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏住房G-1793690449156/history/archive_036",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T08:42:50.583230+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/todo_shell_menu.md",
+                "memory_type": "entities",
+                "after": "# 待办跳转壳菜单组件误判\n苏住房G 待办跳转因 flattenTree 将 Layout 壳组件写入 meta.filePath，导致单菜单时打开空壳而非真实详情页。\n## 问题根因\n- flattenTree 把壳组件名（Layout/ParentView）写进 meta.filePath，getRouteFilePath 将其当有效页面路径返回。\n- 当 busCode 只配一个菜单时，resolveTodoTaskNavigation 走 resolveRegisteredRoute 的 name 解析，用 {name:'Property11/:tableid', params} 打开路由，其 component 为 Layout，导致空壳，storedPath 被忽略。\n- 用户补充判据：菜单项 component 是默认 Layout 也算匹配失败。\n## 解决方案\n- ruoyi.js 新增 SHELL_MENU_COMPONENTS = ['Layout','ParentView','InnerLink','InnerLink/index']，与 store/modules/permission.js 一致。\n- getRouteFilePath 遇到壳组件一律返回 ''，使 hint 匹配与 filePath 查找不再命中 Layout。\n- resolveTodoTaskNavigation 在 resolveRegisteredRoute 前后加 isMenuShellRoute 判定，命中且有 storedPath 则直接 { path: storedPath, query:{ formMode:'view' } }。\n- 边界：仅懒加载函数+无 meta.filePath 的真实详情页仍可走 name 解析；只有壳组件强制回退 storedPath。\n## 验证与归属\n- 验证证据：会话 f1c7af59 用户给出 Property11/:tableid 且 component:\"Layout\" 真实菜单 JSON 并指出「components 是默认的 layout，这种也算匹配失败的」。\n- 涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin\\src\\utils\\ruoyi.js、src\\store\\modules\\permission.js、src\\views\\flowable\\todo.vue、src\\views\\home\\v2\\components\\TodoPanel.vue\n- 所属项目：苏住房G；来源会话ID：f1c7af59-850a-422f-aaa3-9169cf16f750；代码基线：db4f82c"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/jump_align_pattern.md",
+                "memory_type": "entities",
+                "after": "# 跳转对齐类需求改动面\n苏住房G 公共查询楼盘详情中「把 A 跳转改成和 B 一致」类需求需同时改顶部导航、表格空数据链接、目标页 URL 预置默认值。\n## 可复用套路\n- 顶部导航入口：detail.vue 中「停车位备案」改 parkingSpaceContractFiling/detail，「公共场地备案」改 resourcesLeaseContractFiling/detail。\n- 表格空状态链接：zs-table empty 插槽里 parkingTable.vue/venueTable.vue 仍有副本，页面顶部改了表内链接易漏改。\n- 目标页 URL 预置：resourcesLeaseContractFiling/detail.vue 支持从 URL 读 contractType，入口须通过 query 显式带入，不能靠硬编码默认。\n- 统一口径：跳转均携带 existingFlag:'1'（既有合同维护），与广告位保持一致。\n## 判断准则\n- 用户说「改成和 X 一样」时，先全文搜索该页面所有跳转入口（顶部按钮、表格行内链接、空状态链接、弹窗内按钮），再逐一对齐，不要只改截图里一处。\n## 验证与归属\n- 验证证据：会话 f6d71166「这 2 个跳转也改成到租赁合同相关的页面」→ detail.vue 顶部导航 + parkingTable/venueTable 空数据链接三处同改，contractType 通过 URL 传入，统一带 existingFlag:'1'。\n- 涉及文件：publicQuery/complex/detail.vue、property/complex/detail.vue、advertiseTable.vue、parkingTable.vue、venueTable.vue、pubHouseTable.vue 等。\n- 所属项目：苏住房G；来源会话ID：f6d71166-f8ca-4073-85d2-2fff74a3147a；代码基线：5ccda28"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zsprint_panel_sizing.md",
+                "memory_type": "entities",
+                "after": "# 全局打印下拉框尺寸自适应\n苏住房G 全局打印组件 ZsPrint 因 min-height 定高+绝对定位按钮导致多模板选择面板留白失控，改流式+max-content 自适应。\n## 问题根因\n- 面板写 min-height:316px，选项少也强制占高。\n- 底部取消/打印按钮绝对定位脱离文档流，面板高度靠 min-height 兜住，按钮上方留死白。\n- 宽度无约束，长标签换行或撑歪。\n## 解决方案\n- 移除 min-height:316px 让高度随选项数自适应。\n- 底部按钮改流式布局（margin-top:12px; text-align:right）参与高度计算。\n- 宽度改 width:max-content 贴合内容；复选框 min-width:320px 且标签 white-space:nowrap 防长选项换行。\n- 内边距 20px 收紧到 16px 20px。\n## 验证与归属\n- 验证证据：会话 39c03414「调整打印开户通知书下拉框的大小」→ 移除 min-height、页脚流式、width:max-content、复选框 min-width 320px+nowrap、padding 调整，ESLint 通过。\n- 涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin\\src\\components\\ZsPrint\\index.vue\n- 所属项目：苏住房G；来源会话ID：39c03414-b2a2-4561-aea2-41694b1b520b；代码基线：3c282a5"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/bizstate_search_bug.md",
+                "memory_type": "entities",
+                "after": "# 筛选参数 bizState 多值逗号串排查\n苏住房G 筛选参数 bizState 出现多值逗号串而页面单选，根因为 zs-search-form 对 bizState 全局 multiple 改写历史翻转。\n## 问题根因\n- 控制 multiple 的不是页面，而是 zs-search-form 对所有 model==='bizState' 搜索项全局改写，历史翻转三次：2026-03-19 无条件多选→2026-05-06 可开关→2026-05-08 默认单选。\n- 2026-07-27 部分页面 queryParams 显式声明 bizState 为 undefined 默认 '2'。\n- 当前代码不可能产出 \"1,2\"，疑似旧构建或手工改包。\n## 排查口径\n- 凡「筛选参数形态和当前页面代码对不上」，用 git log -S 'multiple' src/components/zs-search-form 查全局默认值翻转历史。\n- 核对测试环境 dist/version.json（构建时间/分支），仓库仅前端，后端取值另查。\n## 验证与归属\n- 验证证据：会话 04c6f559 用户贴截图问 bizState:\"1,2\" 是否刚加；逐提交溯源 a9d72747e→c2ab33f8b→28de6944e→f7e52836e→6dbd17337→9b6b99aeb，结论当前代码不产多值。\n- 涉及文件：companyManagement/components/index.vue、change/index.vue、utils/companyListQuery.js\n- 所属项目：苏住房G；来源会话ID：04c6f559-f726-4199-99cd-5e92be1922e5；代码基线：db4f82c"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/苏住房g.md",
+                "memory_type": "entities",
+                "before": "# 苏住房G\n苏住房G 是用户提及的前端管理后台项目，包含物业管理、企业注册等模块。\n## Description\n- 前端工程为 zhi2-web-admin，涉及物业合同、企业注册、月报、评价等模块。\n- 用户在项目中积累了多项代码排查与改造工作流。\n## Significance\n- 作为多条用户偏好记忆中专项代码工作流的所属项目背景。",
+                "after": "# 苏住房G\n苏住房G 是用户提及的前端管理后台项目，包含物业管理、企业注册等模块。\n## Description\n- 前端工程为 zhi2-web-admin，涉及物业合同、企业注册、月报、评价等模块。\n- 用户在项目中积累了多项代码排查与改造工作流。\n## Significance\n- 作为多条用户偏好记忆中专项代码工作流的所属项目背景。\n## Known Technical Patterns\n- 待办跳转壳菜单组件误判（todo_shell_menu）：单菜单时 Layout 壳被当有效组件。\n- 跳转对齐类需求改动面（jump_align_pattern）：顶部导航+空状态链接+URL 预置三方同改。\n- 全局打印下拉框尺寸自适应（zsprint_panel_sizing）：ZsPrint 去 min-height 改流式。\n- 筛选参数 bizState 多值逗号串排查（bizstate_search_bug）：zs-search-form 全局 multiple 翻转史。\n- 公共查询备案入口菜单报错（filing_menu_config）：空状态链接旧 filePath 解析失败。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

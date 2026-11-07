@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-园区物管2.0-1793610770916/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T09:23:59.574551+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/building_table_tabs.md",
+                "memory_type": "entities",
+                "after": "# 楼盘表选择弹窗统一约定\n所有涉及楼盘表选择的弹窗（14 处）Tab 切换时高度跳动、内容撑破弹窗，需统一公共组件与弹窗属性固定尺寸。\n\n## 现象\n- 楼幢详情、房屋拆分/合并、业主自治表决范围、维修资金缴存范围 ScopeSelectDialog、收益管理等 14 处弹窗切换「列表视图/楼盘表视图」时高度跳动、内容撑破弹窗。\n- 各弹窗各自实现切换，v-if 切换导致面板重建、尺寸随内容浮动。\n\n## 根因\n- 各弹窗独立实现 Tab 切换，缺乏统一尺寸约束。\n\n## 解决方案\n- 抽公共组件 BuildingTableViewTabs.vue：Tab 用 zs-tabs type=\"line\"，文案统一「列表视图 / 楼盘表视图」，两面板用 v-show 切换保留 DOM 防高度跳动。\n- 内容区固定高度，表格/楼盘表超出时在面板内部滚动。\n- zs-select-dialog 新增 building-table-mode 属性：宽度 80%（最大 1300px）、高度固定 720px、左右分栏自适应、内容区不撑开弹窗。\n- owner/company 版 ScopeSelectDialog 的 v-if 改 v-show；新增同类弹窗直接复用，不再各写一套。\n- 与「zs-tabs 重型子面板用 v-if 懒渲染」区分：本约定针对同弹窗内两固定面板尺寸稳定性，优先 v-show。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue、zhi2-web-admin/src/views/building/building/detail.vue、zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue。\n- 所属项目：园区物管2.0；来源会话：929d6385-61c5-4f3f-bea0-a34f4b6d5432；代码基线：d7a305a44。\n- 验证：008.md 会话 929d6385 新增组件与属性，14 处弹窗统一改造，v-show 防跳动、固定 720px 内部滚动。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/svg_icon_currentcolor.md",
+                "memory_type": "entities",
+                "after": "# SVG 图标主题色失效根因\nsvg-icon 图标颜色变成写死 #1990FF 不再跟随主题色，根因为 SVGO convertColors 插件在构建期改写源文件 fill=\"currentColor\"。\n\n## 现象\n- svg-icon 图标颜色突然全部变成写死 #1990FF，不跟随主题色，运行时无报错。\n\n## 根因\n- 构建链 SVGO convertColors 插件在构建期把源 SVG 的 fill=\"currentColor\" 改写成具体色值，可能在 2.6.2 或 2.6.2-yulin 等并行分支引入。\n\n## 解决方案\n- 批量把 SVG 源文件 fill=\"#1990FF\" 恢复为 fill=\"currentColor\"，让颜色由组件属性/父级 color 控制（黑色场景用组件属性显式指定）。\n- 确认 vite.config.js 移除 convertColors 插件。\n- 跨分支扩散：当前分支验证后 cherry-pick 到 develop/v2.6.2，再把 2.6.2 合入 2.6.2-yulin；vite.config.js 冲突时保留 isLowMemory 判断并只删 convertColors。\n- 排查「图标颜色全局失效」先查构建期 SVG 变换，再查分支归属。\n\n## 关联信息\n- 涉及文件：zhi2-web-admin/src/components/SvgIcon/index.vue、zhi2-web-admin/vite.config.js。\n- 所属项目：园区物管2.0；来源会话：5d274116-4347-47db-94d1-391da544e0b4；代码基线：f101dd464。\n- 验证：008.md 会话 5d274116 批量恢复 fill=\"currentColor\" + 移除插件，cherry-pick 94bcd9a8a 到 2.6.2、合入 2.6.2-yulin 保留 isLowMemory。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/zstable_column_slot.md",
+                "memory_type": "entities",
+                "after": "# zs-table-column 误判 v-if 未渲染列为自定义列\n列表页用 v-for + v-if 动态渲染 zs-table-column 时整表列宽塌陷成固定 80px，根因为插槽误判。\n\n## 现象\n- 列表页动态渲染列时整表列宽塌陷成固定窄列（如 80px），自动宽度没生效。\n\n## 根因\n- zs-table-column 检测到 $scopedSlots.default 存在即按自定义插槽列固定列宽；Vue2 在 v-for+v-if 下为每列注册插槽函数，即使 v-if=false 也误判为自定义列。\n\n## 解决方案\n- 修复必须落在公共组件 zs-table-column（不能只改单个业务文件，全项目多处同样问题）。\n- 新增 hasEffectiveCustomSlot 实际执行插槽函数判断真渲染内容，过滤 v-if=false 空插槽。\n- 新增 isMeasurableFlexSlot 区分文本类插槽（弹性 min-width）与复杂组件插槽（固定 width，可用 slot-width 覆盖）。\n- 新增 measureSlotContentWidth 从插槽 vnode 提取文本算列宽；watch isFlexColumn 动态注册/注销弹性列保证 fit 正确。\n- 业务文件恢复原插槽写法，个别复杂插槽列偏窄加 slot-width。\n\n## 关联信息\n- 涉及文件：src/components/zs-table/zs-table-column.vue、src/views/credit/evaluationPlanReport/index.vue。\n- 所属项目：园区物管2.0；来源会话：0c43b56c-d4b3-4a08-9e9f-7c6394b3a716；代码基线：8f4427ecd。\n- 验证：会话 0c43b56c 用户要求改公共组件，最终实现三个函数修复。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/project_id_getter.md",
+                "memory_type": "entities",
+                "after": "# 切换小区刷新后查询参数丢失\nNavbar 切换小区后刷新页面，各业务列表页（67 处）查询条件 complexId/projectId/parentDeptId 全部丢失，需 getter+localStorage 恢复。\n\n## 现象\n- Navbar 切换当前小区后刷新页面，property/benefit/autonomy 等 67 处业务列表页查询参数全部丢失。\n\n## 根因\n- 页面直接读 this.$store.state.user.currentProjectId，刷新后 Vuex 重置，created 阶段发请求时 state 尚未恢复，参数为 undefined。\n\n## 解决方案\n- 新增 utils/projectContext.js 集中处理 localStorage 小区信息读取、清理与兜底解析。\n- store/modules/user.js 应用启动时即从 localStorage 初始化 currentProject/currentProjectId，不等 GetInfo。\n- getters.js 增加全局 getter currentProjectId/currentProject，state 为空回退 localStorage。\n- 全项目 67 处直读 $store.state.user.currentProjectId 批量替换为 $store.getters.currentProjectId（Navbar 用 currentProject，alert/detailB 的 watch 改基于 computed）。\n- 套路：任何存 store 的全局上下文都要有 localStorage 恢复 + getter 兜底，页面禁止直读 state。\n\n## 关联信息\n- 涉及文件：src/utils/projectContext.js、src/store/modules/user.js、src/store/getters.js、src/layout/components/Navbar.vue。\n- 所属项目：园区物管2.0；来源会话：c38a681a-e3b0-4637-8706-f8e910c1b6d0；代码基线：5a288f142。\n- 验证：会话 c38a681a 排查 67 处直读，通过 projectContext.js+user.js 启动恢复+getters 兜底+批量替换修复。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

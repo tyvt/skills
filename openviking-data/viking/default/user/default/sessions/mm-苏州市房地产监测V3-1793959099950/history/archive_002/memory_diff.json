@@ -1,0 +1,51 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793959099950/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T10:03:59.075765+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/bug/company_cancel_detail_attachment_not_show.md",
+                "memory_type": "entities",
+                "after": "# 机构注销详情页附件不显示修复\n苏州市房地产监测V3 项目中机构注销详情页（companyCancel/detail.vue）附件不显示问题已修复。\n\n## 问题根因\n- 附件 busCode 不匹配：页面用 `company_cancel` 查附件，但菜单 meta 常只配流程用的 `busCode: companyCancel`，查不到配置\n- 附件 busId 用错：新增阶段附件挂在 `companyRecordId`，查看时却优先用 `cancelId` 查询，文件对不上\n- 缺少 detail 参数：`AnnexUpload` 查询需 `companyId`，未传 `detail` 时回退逻辑不正确\n- 顶部「附件」按钮 busCode 错误：`OperationBtnGroup` 抽屉用了流程 `companyCancel` 而非附件专用 `cancelBusCode`\n- 查看态展示不清晰：附件藏在「注销信息」里且无独立标题，不易发现\n\n## 修复内容\n- `companyCancel/detail.vue` 中 `cancelBusCode` 回退链：`cancelBusCode` → 路由 `busCode` → `companyCancel`\n- `appendixBusId` 优先使用 `companyRecordId`（与新增上传时一致）\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`companyCancel/detail.vue`、`companyApply/detail.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：adbe12fc-224d-4313-8f62-cd4fd5541532"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cashsale_plan_maintain_ui_fix.md",
+                "memory_type": "entities",
+                "after": "# 现售方案维护页面 UI 修复\n苏州市房地产监测V3 现售方案维护页二次修复已完成，涉及保存按钮、新建填报组件与方案页引用。\n\n## 修复内容\n- `CashsaleDetail.vue`：「维护」改 `openPlanPage(false)` 可编辑，「查看」改 `openPlanPage(true)` 只读，修复保存按钮缺失与输入框全灰\n- 新建 `CashsalePlanFillForm.vue` 现售专用填报组件，含 5 个 Tab：项目基本概况、本期申请现售商品房情况、价格管理、物业服务、售后服务\n- 移除预售专用 Tab：预售资金监管、前期物业服务、物业服务用房/社区用房\n- 切换方案页引用 `cashsale/plan/detail.vue` 同步更新\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`CashsaleDetail.vue`、`CashsalePlanFillForm.vue`、`cashsale/plan/detail.vue`、`cashsale-apply-helpers.js`\n- 所属项目：苏州市房地产监测V3；来源会话：c9033c2c-3a69-4b73-b22e-394f818a3b2b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/house_select_dialog_fix.md",
+                "memory_type": "entities",
+                "after": "# 限制审核新增房屋弹窗楼盘表修复\n苏州市房地产监测V3 修复限制审核「新增房屋」弹窗楼盘表（HouseSelectDialog.vue）多项问题。\n\n## 修复内容\n- 增加计算属性 `buildingSelectTree`，补齐 `treeUrl`/`treeKey`/`treeLabel`，避免开发环境 prop 警告\n- `findHouseList` 请求体固定带 `key: String(projectId)` 与 `buildCode`；无 `buildCode` 时用 `buildingId` 兜底，仍缺失则提示并中止请求\n- 分页截断：当 `total > rows.length` 时提示仅展示前 N 条\n- `parseApiList` 去掉 `Object.values` 启发式，只认数组、`rows`、`list` 及 `data` 下同类字段\n- 常量注释同步 `findHouseList` 的 `key` + `buildCode` 约定\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`HouseSelectDialog.vue`、`houseLimitAudit/index.vue`\n- 所属项目：苏州市房地产监测V3；来源会话：b1e26906-7719-47ec-96f7-a8e3dc7a48fa"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/bug/navbar_leaf_menu_sidebar_bug.md",
+                "memory_type": "entities",
+                "after": "# 顶栏叶子菜单侧栏错误拼接修复\n苏州市房地产监测V3 修复点击顶栏叶子菜单后侧栏被错误拼出无关项的问题。\n\n## 问题根因\n- 点击顶栏叶子菜单后 `TagsView` 在路由变化时仍调用 `resolveSidebarRoutes` 写回 `SET_SIDEBAR_ROUTERS`，手动展开侧栏看到错误项\n- 原先 `childrenMenus` 混入 `constantRoutes`，匹配范围过大易配错兄弟菜单\n\n## 修复内容\n- `ruoyi.js` 增加 `shouldSyncSidebarForTopNav`：顶栏模式下仅当前页归属顶栏目录项（有 `children`）时才自动同步侧栏，叶子顶栏项侧栏为空\n- `TagsView` 按规则同步或清空侧栏，统一用 `collectNavbarChildrenMenus` 构建子菜单（不再拼接 `constantRoutes`）\n- `Navbar` 的 `getChildrenMenus` 与 `TagsView` 使用同一套扁平化逻辑\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 涉及文件：`ruoyi.js`、`Navbar.vue`、`TagsView/index.vue`、`app.js`\n- 所属项目：苏州市房地产监测V3；来源会话：44bfddd2-789d-4e25-bd4a-fae9e73e0efa"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/agency_branch_cancel_attachment_fix.md",
+                "memory_type": "entities",
+                "before": "# 主管部门分支机构注销附件业务编码修复\n苏州市房地产监测V3 中主管部门分支机构注销弹窗附件不显示，已修复 CancelDialog.vue 的业务编码与挂载时机问题。\n\n## 问题根因\n- 业务编码未生效：CancelDialog 通过 getRouteMetaValue(this.$route, 'cancelBusCode') 取附件业务编码，路由 meta 未配置 cancelBusCode 返回空，AnnexUpload 不请求附件列表\n- 组件挂载时机不对：AnnexUpload 只在 created 时拉取附件，弹窗初次挂载时 agencyBranchId 仍为空，后续传入 ID 不会重新加载\n\n## 修复内容\n- CancelDialog.vue 为 cancelBusCode 增加默认值 agency_branch_cancel（与详情页 fzjgba 的 fallback 方式一致）\n- 给 AnnexUpload 加 v-if=\"visible && agencyBranchId\" 和 :key，确保弹窗打开且 ID 就绪后再挂载，每次打开重新拉取附件\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3\n- 所属项目：苏州市房地产监测V3；来源会话：4f553a87-b022-4362-834b-2964f2ec1897\n- 涉及文件：CancelDialog.vue、AnnexUpload/index.vue、utils/appendix.js",
+                "after": "# 主管部门分支机构注销附件业务编码修复\n苏州市房地产监测V3 中主管部门分支机构注销弹窗附件不显示，已修复 CancelDialog.vue 的业务编码与挂载时机问题。\n\n## 问题根因\n- 业务编码未生效：CancelDialog 通过 getRouteMetaValue(this.$route, 'cancelBusCode') 取附件业务编码，路由 meta 未配置 cancelBusCode 返回空，AnnexUpload 不请求附件列表\n- 组件挂载时机不对：AnnexUpload 只在 created 时拉取附件，弹窗初次挂载时 agencyBranchId 仍为空，后续传入 ID 不会重新加载\n\n## 修复内容\n- CancelDialog.vue 为 cancelBusCode 增加默认值 agency_branch_cancel（与详情页 fzjgba 的 fallback 方式一致）\n- 给 AnnexUpload 加 v-if=\"visible && agencyBranchId\" 和 :key，确保弹窗打开且 ID 就绪后再挂载，每次打开重新拉取附件\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=苏州市房地产监测V3；另据 src=苏州市房地产监测V3/273.md\n- 所属项目：苏州市房地产监测V3；来源会话：4f553a87-b022-4362-834b-2964f2ec1897\n- 涉及文件：CancelDialog.vue、AnnexUpload/index.vue、utils/appendix.js、AgencyBranchList.vue、routeMeta.js、StatusAdjustDialog.vue、institution-menu-config.js、AgencyBranchDetail.vue"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/branch_cancel_attachment.md",
+                "memory_type": "entities",
+                "deleted_content": "# 分支注销附件因编码缺失与挂载过早未加载\n苏州市房地产监测V3 中 CancelDialog 取 cancelBusCode 返回空、AnnexUpload 仅 created 拉取且不重载，致注销附件不加载。\n\n## 问题根因\n- CancelDialog 通过 getRouteMetaValue 取 cancelBusCode 时路由 meta 未配置致返回空\n- AnnexUpload 仅在 created 拉取且初始 agencyBranchId 为空不重载\n\n## 解决方案\n- CancelDialog.vue 为 cancelBusCode 设默认值 agency_branch_cancel\n- AnnexUpload 加 v-if=\"visible && agencyBranchId\" 与 :key 按需重挂载\n\n## 验证与归属\n- 验证证据：src=苏州市房地产监测V3/273.md\n- 涉及文件：CancelDialog.vue、AnnexUpload/index.vue、appendix.js、AgencyBranchList.vue、routeMeta.js、StatusAdjustDialog.vue、institution-menu-config.js、AgencyBranchDetail.vue\n- 所属项目：苏州市房地产监测V3；来源会话：4f553a87-b022-4362-834b-2964f2ec1897；代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

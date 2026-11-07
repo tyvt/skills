@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793713174058/history/archive_134",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T18:06:42.306312+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/tmap_heatmap_wrap.md",
+                "memory_type": "entities",
+                "after": "# 腾讯地图点热力封装套路\n在数据看板中封装可复用的腾讯地图点热力组件，优先使用可视化热力图层并在加载失败时优雅降级而非白屏。\n\n## 背景与问题\n- 苏州地图需落地商品房/存量房/租赁三业务热力数据，本地无网络或SDK加载失败时不能白屏。\n- TMap.visualization.Heat 在不同版本/授权下可能不存在；loadMap 异步脚本加载可能失败、超时、无key、离线。\n- 此条补充「热力图层+优雅降级+生命周期清理」完整封装，实例不入data()等已在他条覆盖。\n\n## 解决方案\n- 组件内 import loadMap from '@/components/ZsTencentMap/mapLoader.js'（默认导出返回 Promise<TMap>），必须 await。\n- new TMap.Map(el, {center: new TMap.LatLng(31.30,120.62), zoom:11, viewMode:'2D'})，容器明确高度（本项目热力页统一520px）。\n- 热力优先 TMap.visualization.Heat({radius:40, maxValue, minValue:0, gradientColor}) → addTo(map) → setData({lat,lng,count})；无Heat回退 TMap.MultiMarker 打点。\n- catch 后置 failed=true 渲染 el-alert「腾讯地图加载失败，已切换为区县热力视图」并 $emit('error') 让父级切ECharts区县choropleth，绝不抛未捕获异常。\n- watch points(deep)重新setData，beforeDestroy摘除heat/marker并map.destroy()；地图实例用普通实例变量持有，不入data()响应式。\n\n## 组合形态\n- 区县热力用 ECharts type:'map'+map:'suzhou'（registerMap在created try/catch），visualMap连续色阶 #e8f4ff→#1a5599，右侧配Top榜+区县榜单(da-rank-bar)。\n\n## 验证与归属\n- 验证：会话 session-6c46bea2-2d63-4a2d-b33f-f111655982f2（基线a86bf95）子agent结论写明 TencentHeatMap.vue props(points/unit/height默认520px)、loadMap默认导出、优先Heat回退MultiMarker、catch后el-alert+$emit('error')、watch/beforeDestroy。\n- 涉及文件：zhi2-web-admin/src/views/dataAnalysis/pages/heat/TencentHeatMap.vue、zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js、zhi2-web-admin/src/components/ZsTencentMap/index.vue。\n- 所属项目：zhi2-web-admin；来源会话ID：session-6c46bea2-2d63-4a2d-b33f-f111655982f2；代码基线：a86bf95。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工作流/subagent_shared_convention.md",
+                "memory_type": "entities",
+                "after": "# 多subagent并行开发共享约定清单\n拆分HTML原型给多个subagent并行开发看板页面前，需固化共享约定清单以避免不一致隐患。\n\n## 背景与问题\n- 把HTML原型拆成商品房/存量房/租赁/行业管理/热力等一批Vue菜单页，拆给多个subagent并行，各agent只负责自己1-2个页面，公共mock/图表封装/地图loader由另一agent提供。\n- 各agent看不到彼此实现，易各自造轮子：注册名大小写错误（DaEChart vs DaEchart）、字段名照任务描述写错（heatStock vs实际heatStockList/heatStockDeal）、图表配色硬编码不一致。\n\n## 约定清单\n- 图表组件统一 import DaEchart from '../components/EChart.vue' + components:{DaEchart} + 模板<da-echart>，注册名必须精确DaEchart，禁写DaEChart。\n- 数据一律来自 ../mock/index.js 具名导出，字段名以实际导出为准，先核对再写（本次描述写heatStock实际heatStockList/heatStockDeal）。\n- 图表option配色/字号统一取 theme.js 的 C/PALETTE/base token，禁页面写死色值。\n- 各自只改自己页面文件，公共mock/components/router/mapLoader由专人先落地维护，agent不得越界。\n- 落盘后由Lead统一构建，不让每个agent各跑一次build。\n\n## 验证与归属\n- 验证：会话 session-6c46bea2-2d63-4a2d-b33f-f111655982f2（基线a86bf95）子agent结论反复强调统一DaEchart、数据来自mock、option用theme.js、未跑build。\n- 涉及文件：zhi2-web-admin/src/views/dataAnalysis/pages/NewHouse.vue、StockHouse.vue、Rent.vue、IndustryManage.vue、heat/HeatNewProject.vue、heat/HeatStock.vue、heat/HeatRent.vue。\n- 所属项目：zhi2-web-admin；来源会话ID：session-6c46bea2-2d63-4a2d-b33f-f111655982f2；代码基线：a86bf95。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/icon_placeholder_fallback.md",
+                "memory_type": "entities",
+                "after": "# 菜单顶栏图标占位符白名单回退\n顶栏导航取菜单数据 meta.icon 时，需对占位值做白名单回退以避免空白图标。\n\n## 背景与问题\n- 顶栏导航图标名存在菜单数据 meta.icon 字段，库里很多条目值为占位串（#、example、druid等）或空值，直接丢给<SvgIcon>渲染空白。\n- 图标名是运营/运维手工填的存量数据，前端当可信值直接用，空白图标观感塌陷。属数据归一化问题非组件bug。\n\n## 解决方案\n- 图标名统一只配一张，取 meta.icon。\n- 图标组件外层做占位符保护：命中#/example/druid等占位关键词或空值时自动回退默认图标，不渲染空白。\n- 顶栏与侧栏菜单共用同一套回退规则，不各写一份。\n- 存量菜单数据图标名批量补成有效图标名（本项目一次性写22个顶级菜单ICON）。\n- 状态差异（激活/未激活）只通过颜色表达，不叠加底色/阴影/opacity，用户验收只认可「颜色由浅蓝变纯白」一处。\n\n## 验证与归属\n- 验证：会话 session-ce327d80-e2cb-48ac-8c65-d3740d649940（基线89e5947）用户诉求4/5，最终结论保留改动：顶栏读meta.icon只配一张、占位符保护回退、22顶级菜单ICON写入、激活态差异收敛为颜色变化。\n- 涉及文件：zhi2-web-admin/src/layout/components/Navbar.vue、Sidebar/RecursiveMenu.vue、src/components/SvgIcon/index.vue。\n- 所属项目：zhi2-web-admin；来源会话ID：session-ce327d80-e2cb-48ac-8c65-d3740d649940；代码基线：89e5947。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/building_popup_subtraction.md",
+                "memory_type": "entities",
+                "after": "# 独立页功能不内嵌弹窗减法优先\n已有独立页的功能不在变更/详情页内嵌弹窗副本，楼盘表按钮改按filePath跳独立页并删弹窗模板。\n\n## 背景与问题\n- 楼幢变更记录页需提供楼盘表查看能力，最初用zs-select-dialog弹窗内嵌一份楼盘表，但项目详情页已有独立楼盘表页面。\n- 同一能力两套实现必发散：字段/接口/状态图标口径改两处；弹窗窄容器压扁楼盘表网格（全库反复出现的弹窗坑）。\n\n## 解决方案\n- 先确认目标能力是否已有独立页面；有则复用不再写弹窗副本。\n- 按钮点击从propertyView(弹窗)改为openBuildingTable，按文件路径解析路由跳转独立页（不手写path字符串，避免与菜单component不一致）。\n- 跳转前确认目标页在菜单登记（按filePath跳转依赖菜单路由表，薄入口未登记报「未找到菜单路由」）。\n- 删干净：连带删除53行弹窗模板及依赖state/methods/imports，净变更48 insertions,321 deletions，删比加多才算改干净不留死代码。\n- 验收出成品页面截图给用户看（本地nginx-ui部署e2e截图取证），只给代码不算交付。\n\n## 验证与归属\n- 验证：会话 session-16ca1dd8-a463-4fdb-97df-7a1b83c3b2fb（基线235e6ee）用户诉求1/4/5，最终结论写明按钮改openBuildingTable跳独立页、删53行弹窗、净变更48/321、符合减法优先。\n- 涉及文件：zhi2-web-admin/src/views/projectManagement/buildinginfo/changeDetail.vue、building/buildingChange/detail.vue、projectManagement/buildingTable/index.vue。\n- 所属项目：zhi2-web-admin；来源会话ID：session-16ca1dd8-a463-4fdb-97df-7a1b83c3b2fb；代码基线：235e6ee。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

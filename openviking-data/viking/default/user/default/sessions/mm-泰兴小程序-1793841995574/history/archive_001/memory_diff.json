@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-泰兴小程序-1793841995574/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-05T01:29:17.348827+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/项目事实/taixing_inspection_fix.md",
+                "memory_type": "entities",
+                "after": "# 泰兴小程序巡检步骤弹窗图片残留修复\n泰兴小程序员工端巡检步骤弹窗在重置后上传区仍显示旧图，已通过两步修复解决。\n\n## 问题根因\n- `resetStepForm` 仅清空 `stepFormImages`，未清掉 `ZsUploader` 内部 `fileList` 与 `uni-file-picker` 状态（弹窗关闭后组件仍挂载在 DOM）\n- `ZsUploader` 的 `watchEffect` 在 `modelValue` 为空时故意保留旧图（`if (fileList.value.length > 0) return`）\n\n## 修复方案\n- `resetStepForm` 每次重置时 `stepUploaderKey++`，强制重建上传组件\n- `ZsUploader` 在父组件清空 `modelValue` 时同步调用 `clearPickerFiles()` 清掉 picker 内部文件列表\n\n## 验证与归属\n- 验证方式：重新构建后验证「编辑 → 删除步骤 → 新增」，上传区应为空白\n- 涉及文件：`src/staff/pages_facility/record/add.vue`、`src/components/ZsDialog/ZsDialog.vue`、`src/staff/components/ZsUploader/ZsUploader.vue`\n- 所属项目：泰兴小程序；来源会话ID：78ffd4e2-d969-438b-a172-f36dd0d6fbad"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/项目事实/taixing_zsbutton_fix.md",
+                "memory_type": "entities",
+                "after": "# 泰兴小程序员工端 ZsButton 主题色统一\n泰兴小程序员工端 `ZsButton` 因读不到页面 `--primary-color` 而回退业主端深蓝，已修复为天蓝色 `#1677ff`。\n\n## 问题根因\n- `ZsButton` 是独立自定义组件，读不到页面上的 `--primary-color`，回退到全局 `page` 的业主端深蓝 `#0A3D62`\n- 在页面根节点加 `@include staff-page-theme` 对组件内部无效\n\n## 修复方案\n- 在 `ZsButton` 组件根节点注入员工主题变量\n- 对 `type=\"primary\"` 通过内联 `style` 直接绑定 `#1677ff`（小程序端最可靠）\n- 新增 `src/staff/styles/theme.js`，与 `theme.scss` 保持颜色一致\n\n## 验证与归属\n- 验证方式：重新编译后在小程序打开「修改密码」页，保存按钮应显示天蓝色 `#1677ff`，不对可清缓存\n- 涉及文件：`src/staff/components/ZsButton/ZsButton.vue`、`src/staff/styles/theme.js`、`theme.scss`、`src/staff/pages/profile/change-password.vue`、`src/staff/pages/profile/personal-info.vue`\n- 所属项目：泰兴小程序；来源会话ID：d75b7b33-1f22-4fb0-8e53-852cff55d9e9"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/项目事实/taixing_picker_fix.md",
+                "memory_type": "entities",
+                "after": "# 泰兴小程序 Picker 全局贴底修复\n泰兴小程序新建 `ZsBottomPopup` 组件统一 Picker 弹层贴底，构建通过。\n\n## 核心改动\n- 新建 `ZsBottomPopup` 组件：微信小程序用 `<root-portal>` 渲染到页面根节点，H5 用 `<teleport to=\"body\">`，其他平台回退 `uni-popup`，统一贴底样式与 `z-index: 10001`，暴露 `open`/`close` API\n- 改造 5 个核心 Picker（`ZsDatePicker`、`ZsPicker`、`ZsMonthRangeCalendar`、`ComplexPicker`、`ProjectPicker`），内部 `uni-popup` 替换为 `ZsBottomPopup`，移除 `:deep(.uni-popup)` 定位 hack\n- 迁移 8 个页面级 bottom popup（`NeedToKnowPopup.vue`、`pages_poll/form.vue`、`pages-suggest/create.vue` 等）\n\n## 验证与归属\n- 验证证据：extracted source=cursor，构建通过\n- 涉及文件：`src/components/ZsBottomPopup/ZsBottomPopup.vue` 及多个页面 popup 组件\n- 所属项目：泰兴小程序；来源会话ID：d9dec39a-c73b-4a6d-8ec0-8afcd431fcb6"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/项目事实/taixing_ticket_fix.md",
+                "memory_type": "entities",
+                "after": "# 泰兴小程序员工端工单主题色修复\n泰兴小程序员工端工单页因硬编码色值与未注入主题导致双主色，已统一为 `#1677ff`。\n\n## 问题根因\n- 同一页面出现两种主色：Tab 写死 `#0168F0`，底部按钮走 `var(--primary-color)` 但列表页未注入员工端主题，继承业主端 `#0A3D62`\n\n## 修复方案\n- 沿用 `@include staff-page-theme`（`#1677ff`），将硬编码色值改为 CSS 变量\n- `staff/styles/theme.scss` 增加 `$staff-primary` SCSS 变量\n- `staff/styles/index.css` 补充注释说明不可全局覆盖 `page`\n- `issue/index.vue` 引入 `staff-page-theme`，Tab/ID/待受理状态色改 `var(--primary-color)`\n- `issue/detail.vue` 同步修改\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=泰兴小程序\n- 涉及文件：`staff/styles/theme.scss`、`staff/styles/index.css`、`staff/pages_facility/issue/index.vue`、`staff/pages_facility/issue/detail.vue`\n- 所属项目：泰兴小程序；来源会话ID：2ca2f1e5-7a7d-4825-ba87-50c96508692b"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793909501971/history/archive_074",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T00:01:00.789570+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/limit_edit_subtable_fix.md",
+                "memory_type": "entities",
+                "after": "# 限制审核详情编辑子表消失修复\n苏州市房地产监测V3 修复了「限制审核详情」从查看态切到编辑态后子表显示「暂无数据」的问题。\n\n## 问题原因\n- 查看态子表走 `houseLimitLineData`（分页 API），编辑态走 `selectedHouses`\n- 从查看切到编辑时 `selectedHouses` 仍为空，且 `projectLimit/detail` 通常不返回 `houseList`\n\n## 修复要点\n- `limitFormMixin.js` 新增 `hydrateSelectedHousesForEdit()`，按优先级填充 `selectedHouses`：已有数据跳过、查看态已加载全量复用 `houseLimitLineData`、否则调用 `fetchAllHouseLimitLines()` 拉取全量\n- 抽取 `getHouseLimitLineApiUrl`、`applySelectedHousesFromLines` 等辅助方法，解除限制模式同步填充 `limitRecordsByHouse`\n- `formMode` watcher 在 `view → edit` 时触发 hydrate\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：苏州市房地产监测V3\n- 涉及文件：`limitFormMixin.js`、`house-limit-audit.spec.js`\n- 来源会话：de78bf5d-ff1d-4c2d-b6b5-2faf54f81d39"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/permit_plan_panel_fix.md",
+                "memory_type": "entities",
+                "after": "# 预售方案区块展示逻辑修复\n苏州市房地产监测V3 调整了 `PermitPlanPanel` 未维护且无操作权限时的展示逻辑，避免出现只有缺省图没有维护按钮的情况。\n\n## 问题原因\n- `PermitPlanPanel` 在未维护且 `operable === false` 时渲染 `AppendixEmpty`（缺省图 +「预售方案未维护」）\n- 「维护」按钮仅在 `operable === true` 时显示，导致只有缺省图、没有维护入口\n\n## 修复要点\n- `PermitPlanPanel.vue` 去掉未维护时的缺省图，新增 `showMaintainButton`：非只读且（可编辑或尚未维护）时显示「维护」\n- `detail.vue` 传入 `planPanelReadonly`（主管部门节点/查看态为只读），增加 `canOperatePlan` 使跳转方案页与按钮展示规则一致\n- 企业端编辑且方案未维护时标题右侧显示「维护」+「查看」，下方仅保留说明文案\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：苏州市房地产监测V3\n- 涉及文件：`PermitPlanPanel.vue`、`detail.vue`、`AppendixRequirementCard.vue`、`PermitInfoPanel.vue`\n- 来源会话：5c95c517-e8ad-4225-b0de-55c6271384c8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cashsale_record_no_first.md",
+                "memory_type": "entities",
+                "after": "# 现售备案详情基本信息首位展示修复\n苏州市房地产监测V3 调整了现售备案详情基本信息与顶栏，使「现售备案编号」作为基本信息第一项展示。\n\n## 修复要点\n- `CashsaleInfoPanel.vue` 在 `infoView` 中 `unshift`「现售备案编号」（`form.recordNo || '-'`）作为基本信息第一项；预售转现售用 `splice(1, 0, …)` 把「预售许可证号」放第二项\n- `CashsaleDetail.vue` 从 `headTitleList` 去掉条件展示的「现售备案编号」，顶栏只保留申请编号、业务状态、创建时间\n- E2E `cashsale-apply-helpers.js` 新增 `assertCashsaleBasicInfoRecordNoFirst`（首项标签 + 顶栏不重复）\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：苏州市房地产监测V3\n- 涉及文件：`CashsaleInfoPanel.vue`、`CashsaleDetail.vue`、`cashsale-apply-helpers.js`、`cashsale-apply-real-api-flow.spec.js`\n- 来源会话：88abd213-0e65-43a2-9a47-f93417d5524d"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/login_first_menu_redirect.md",
+                "memory_type": "entities",
+                "after": "# 登录后默认跳转首菜单实现\n苏州市房地产监测V3 实现了登录成功或进入系统首页时按侧栏菜单顺序进入第一个可访问页面的逻辑。\n\n## 实现要点\n- 新增 `utils/landingPath.js`：`resolveFirstMenuPath` 按菜单树深度优先取第一个非 `hidden` 叶子项（跳过 `Layout`/`ParentView`，支持 `InnerLink`）\n- 登录成功后走 `getPostLoginPath`：优先 URL `redirect`，否则到 `/index`，拉取权限并 `GenerateRoutes` 后跳首菜单\n- 根路径 `''` 改为重定向到 `/index`；无可用菜单时回退到 `/todo`（`DEFAULT_LANDING_PATH`）\n- 已同步 `login.vue`、`LoginForm.vue`、`companyLogin.vue` 及标签栏关闭最后一页的首页跳转\n\n## 验证与归属\n- 验证证据：extracted source=cursor；所属项目：苏州市房地产监测V3\n- 涉及文件：`utils/landingPath.js`、`src/router/index.js`、`src/store/modules/permission.js`、`src/utils/ruoyi.js`\n- 来源会话：4f960b97-1c4b-4b74-94fb-4c515763dae7"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

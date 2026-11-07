@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-苏州市房地产监测V3-1793934959314/history/archive_050",
+    "trace_id": null,
+    "extracted_at": "2026-11-06T05:48:45.329253+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/多选列宽度修复.md",
+                "memory_type": "entities",
+                "after": "# 多选列宽度修复\n苏州市房地产监测V3 中 `zs-table-column` 把多选列（`type=\"selection\"`）当成普通可拉伸列，导致无数据右侧留白时多选列被拉宽，已修复。\n\n## 问题原因\n- 表格无数据、右侧留白较多时，多选列被均分拉得很宽，复选框仍靠左，与「序号」列之间像空了一大块\n- `zs-table-column` 将多选列等同于普通可拉伸列参与剩余宽度分配\n\n## 核心修复\n- `zs-table-column.vue`：多选列固定宽度 55px（与 Element UI 默认一致）\n- 多选列与序号列一样不参与剩余宽度均分\n- `limitAdd` / `limitCancel` 编辑态带勾选列的页面一并变好\n\n## 验证与归属\n- 验证：刷新「限制审核列表」详情页「关联房屋详情」表格查看\n- 若序号列仍偏宽，可把 `width=\"60\"` 改为 `80` 或提期望宽度\n- 涉及文件：`zs-table-column.vue`、`houseLimit/detail.vue`、`houseLimit/limitAdd.vue`\n- 所属项目：苏州市房地产监测V3；来源会话ID：8983ad7d-8f26-4431-a6d1-191eab39fdfc"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/测绘变更社会信用代码回填修复.md",
+                "memory_type": "entities",
+                "after": "# 测绘变更社会信用代码回填修复\n苏州市房地产监测V3 中测绘变更选择项目后「统一社会信用代码」未回填的问题已修复。\n\n## 问题原因\n- `/presale/surveyChange/selectProject` 返回字段为 `uniformSocialCreditCode`\n- `handleProjectSelect` 只映射了 `companyCreditCode` 和 `enterpriseCreditCode`，导致选项目后该字段为空\n\n## 核心修复\n- `surveyChangeConstants.js` 新增 `resolveSurveyChangeCreditCode`，兼容多种字段名\n- 新增 `mapSurveyChangeProjectRow` 统一处理选项目回填\n- `detail.vue` 的 `handleProjectSelect` 改用上述映射函数\n\n## 验证与归属\n- 验证：选择项目后「统一社会信用代码」应正常回填，刷新页面重试\n- 涉及文件：`surveyChangeConstants.js`、`presale/surveyChange/detail.vue`\n- 所属项目：苏州市房地产监测V3；来源会话ID：754ddf0b-9295-4421-b9b9-93fc87b9b996"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/listname命名冲突修复.md",
+                "memory_type": "entities",
+                "after": "# listName命名冲突修复\n苏州市房地产监测V3 中因 `listName` 在 mixin 的 `data()` 与组件 prop 中重复声明触发 `[Vue warn]` 的问题已修复。\n\n## 问题原因\n- `table.js` mixin 在 `data()` 里定义 `listName`（用于列表标题显示）\n- `PlanLicRelatedBuildingTable.vue` 又把 `listName` 声明为 prop（用于新增楼幢时 API 请求体字段名）\n- Vue 不允许同一属性同时存在于 `props` 和 `data`，因此出现警告\n\n## 核心修复\n- 将 API 提交字段的 prop 重命名为 `submitDataKey`，避免与 mixin 的 `listName` 冲突\n- `ConsLicBuildTable.vue` 同类问题一并修复\n- `planLic/changeDetail.vue`、`consLic/changeDetail.vue` 的 `list-name` 改为 `submit-data-key`\n\n## 验证与归属\n- 验证：刷新规划许可证详情页后该 Vue warn 应不再出现\n- 涉及文件：`table.js`、`PlanLicRelatedBuildingTable.vue`、`ConsLicBuildTable.vue`、`planLic/changeDetail.vue`、`consLic/changeDetail.vue`\n- 所属项目：苏州市房地产监测V3；来源会话ID：55d7d7d9-e5d7-412b-9318-c88e962e77f3"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/附录网格空回调修复.md",
+                "memory_type": "entities",
+                "after": "# 附录网格空回调修复\n苏州市房地产监测V3 中只读路径下 `AppendixRequirementGrid` 因回调默认 `null` 触发 `[Vue warn]: Invalid prop` 的问题已修复。\n\n## 问题原因\n- 只读路径下 `AppendixPackageSection` 使用 Grid 时不传 `onBeforeUpload` 等回调\n- 原先 Grid 默认 `null` 仍会绑定到 `AppendixRequirementCard`，触发 `Expected Function, got Null`\n\n## 核心修复\n- `AppendixRequirementGrid.vue` 增加 `appendixUploadNoop` 与 `appendixBeforeUploadNoop`（返回 `true`，与 Element Upload 的 `before-upload` 一致）\n- `onBeforeUpload` / `onUploadError` / `onExceed` / `onUploadSuccess` 默认值从 `null` 改为上述 noop\n- 编辑态 `AnnexUpload` 仍传入真实 handler，行为不变\n\n## 验证与归属\n- 验证：打开企业备案详情「要件上传」确认控制台无该 warn\n- 涉及文件：`AppendixRequirementGrid.vue`、`AppendixRequirementCard.vue`、`DeveloperBasicInfoDetail.vue`\n- 所属项目：苏州市房地产监测V3；来源会话ID：fe17d399-463d-45e5-9c19-4d7ebc506fcd"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

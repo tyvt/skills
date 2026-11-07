@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-无锡市区小程序嵌入H5-1793647361230/history/archive_008",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T19:35:36.863673+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/共有资金总览查询约定.md",
+                "memory_type": "entities",
+                "after": "# 共有资金总览查询约定\n共有资金「查询明细」页顶部查询时间与账户余额统一取自 accountStatistics 接口，避免本地冗余状态。\n\n## 数据来源\n- 查询时间取 `/benefit/app/accountStatistics/{projectId}` 返回 `bankAccountUpdateTime`\n- 账户余额取同接口 `bankBalanceAmount`，格式化为 `YYYY.MM.DD HH:mm:ss` 展示\n\n## 实现要点\n- 点击查询明细先调 `getBenefitList` 刷新 `benefitInfo`\n- 去掉本地冗余状态与 `bankReceiptDetail` 兜底，避免与主统计接口不一致\n\n## 验证与归属\n- 验证证据：会话 ff85538f 用户要求查询时间，最终改为完全依赖 accountStatistics 两字段\n- 涉及文件：src/pages_benefit/sharedFunds/components/OverviewTab.vue、src/api/sharedFunds.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话：ff85538f-d398-42e4-ba21-d4efd07edadb；代码基线：6aeee0b"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/accountdisclosure隐藏查询明细.md",
+                "memory_type": "entities",
+                "after": "# accountDisclosure隐藏查询明细\n接口 accountStatistics 新增 `accountDisclosure` 字段，值为字符串 \"0\" 时隐藏共有资金/公示页「查询明细」按钮。\n\n## 字段规则\n- `/v2.0/benefit/app/accountStatistics/{projectId}` 返回 `accountDisclosure`\n- 值为字符串 \"0\" 不展示「查询明细」按钮；非 0 保持原逻辑\n\n## 提交要求\n- 改动需同步 `dev_wuxi-sfb` 与 `dev_shiqu` 分支\n- 子模块提交后更新父仓指针并按规范打 tag（如 `202608131440` / `202608131440-sfb`）\n\n## 验证与归属\n- 验证证据：会话 73e008e0 用户提供接口字段说明与截图，结论完成双分支提交与 tag\n- 涉及文件：src/pages_benefit/fundPublicity/index.vue、src/pages_benefit/sharedFunds/index.vue\n- 所属项目：无锡市区小程序嵌入H5；来源会话：73e008e0-9dd9-46de-b9f7-c3c8d2356bbe；代码基线：86395e1"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/门户灵犀绑房链路.md",
+                "memory_type": "entities",
+                "after": "# 门户灵犀绑房链路\n苏服办门户经不动产授权完成灵犀选屋绑房，调用 selectMyHouse 并同步业主房屋列表，与 H5 自助绑房区分。\n\n## 流程与接口\n- 从 `pages/webview/home` 经小程序 `pages/face/bdc` 回 H5 带 `authCode` 完成选屋\n- `usePortal` → `runLingXiSelectMyHouse` 调用 **POST** `/external/lingXi/selectMyHouse`（`selectMyHouseByLingXi`）\n- 入参含 `userId`、`phone`、`authCode`、`name`、`idNumber`\n- `code==='200'` 合并 `res.data` 到本地房屋并设 `portalStore.houseBoundViaAuth=true`\n- `authCode==='0'` 不调接口只提示\n\n## 同步列表\n- 成功后 **GET** `/property/ctUserIdentity/listByTokenAndIdentityTypeAndIdentityStatus`（`identityType:1`,`identityStatus:2`）同步列表\n\n## 验证与归属\n- H5 自助绑房另走 `addOwnerDirectly` 链路，勿与灵犀混淆\n- 验证证据：会话 2782b86f 用户问绑房与首页业主决策接口，结论列出参数及 portal.js 片段\n- 涉及文件：src/utils/portal.js、src/api/portal.js、src/store/portal.js\n- 所属项目：无锡市区小程序嵌入H5；来源会话：2782b86f-c8ca-4f8c-8d4e-27ba92d8c485；代码基线：38bd192"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/无锡市区小程序嵌入h5技术/uni-app地图key配置.md",
+                "memory_type": "entities",
+                "after": "# uni-app地图key配置\nuni-app H5 地图报 `Map key not configured` 时需写 `__uniConfig.qqMapKey` 而非 `sdkConfigs.maps`。\n\n## 问题根因\n- 接口已返回 `qq.map.key`、周边 JSON 搜索正常，但 `<map>` 仍报错\n- `loadMaps` 读构建写入的 `__uniConfig.qqMapKey`（来自 manifest），只改 `__uniConfig.h5.sdkConfigs.maps.qqmap.key` 无效\n\n## 修复方案\n- `qqMapKey.js` 运行时把接口 key 赋给 `__uniConfig.qqMapKey`\n- `ZsMap.vue` 用 `qqMapRenderKey` 作为组件 key 在 key 就绪后强制重挂 map，避免首次失败缓存\n- 腾讯控制台为该 key 开通 WebService + JavaScript API 并配 H5 域名白名单\n\n## 验证与归属\n- 验证证据：会话 46dc639b 用户强调异步已有 key 仍报错，结论区分 qqMapKey 与 sdkConfigs 字段并双修复\n- 涉及文件：src/utils/qqMapKey.js、src/components/ZsMap/ZsMap.vue\n- 所属项目：无锡市区小程序嵌入H5；来源会话：46dc639b-2c8b-48cf-aa77-f5de1880b71b；代码基线：3c384c1"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

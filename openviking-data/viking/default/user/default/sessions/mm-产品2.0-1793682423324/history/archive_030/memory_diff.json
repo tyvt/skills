@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-产品2.0-1793682423324/history/archive_030",
+    "trace_id": null,
+    "extracted_at": "2026-11-03T06:24:31.643778+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术笔记/product2_bottom_sum.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0 zs-table底部合计条关闭\n产品2.0 的 zs-table 同时存在表内小计行与表底「合计」条两套汇总，需手动关闭避免重复。\n\n## 问题现象\n- 业务页用 showMethod 渲染表内小计行后，表底合计条默认开启，同一数字出现两遍。\n- 合计条来自公共表默认渲染分支，易被误认为样式问题而写 CSS 隐藏。\n\n## 根因\n- 表内小计（showMethod 返回小计行）与表底合计（should-render-bottom-summary 控制）是独立开关，不互斥。\n- 开启小计不会自动关闭底部合计条。\n\n## 解决方案\n- 页面用 showMethod 输出小计行时，同步在 zs-table 加 :should-render-bottom-summary=\"false\"，仅保留表内小计。\n- 若仅需总数不需要行内小计，用 zs-pagination 纯总数形态（:show-pagination=\"false\"），不手写 table-summary。\n\n## 验证与归属\n- 验证会话 199feb40：用户反馈表格标注问题，最终加 should-render-bottom-summary=false 保留小计。\n- 涉及文件：zs-table.vue、benefit/pubParkingRate/index.vue、listMixins.js。\n- 所属项目：产品2.0；代码基线：57109f9。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术笔记/product2_dialog_less6.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0 少字段详情改弹窗\n产品2.0 中字段数少于等于 6 的子维护页改用 zs-dialog 弹窗承载，列表保留操作列。\n\n## 适用场景\n- 计费公式、物业收费标准、收支项目明细等字段很少（≤6）的页面。\n- 字段多的业务（合同、入网、备案等）仍必须整页承载。\n\n## 做法\n- 同目录 components 下新建 XxxDialog.vue：zs-dialog + zs-size=\"mini\"。\n- 新增/编辑走 zs-form 表单，查看态复用 DetailTemplate 展示。\n- 列表页新增/编辑/查看全改打开弹窗，保留搜索、分页、批量删除和操作列。\n\n## 验证与归属\n- 验证会话 25aa8b31：用户要求字段不超过6用弹窗，参考收支分类设置详情。\n- 涉及文件：feeCalculateFormula/index.vue、detail.vue、pubBusinessItem/index.vue、ListTemplate.js、listMixins.js。\n- 所属项目：产品2.0；代码基线：2f68042。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术笔记/product2_filter_reset.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0 筛选条件被默认值重置\n[苏房] 产品2.0 列表页「业务状态」筛选项能选却查不动，因 getQueryParams 硬写默认值每次查询重置。\n\n## 问题现象\n- 下拉显示可选，选中其他状态点查询后结果仍是「已备案」。\n- UI 回显用户选择，但查询 payload 被静默改写。\n\n## 根因\n- 2026-05-07 新建页面时筛选项写入 formItems；2026-05-19 在 getQueryParams 补「无值时默认已备案」且写在校验外，无条件覆盖选中值。\n- 查询参数构造器把默认值写成无条件赋值，而非空值兜底。\n\n## 解决方案\n- 默认值必须写成空值兜底（if (!query.bizState) query.bizState = DEFAULT），不在构造器直接赋值。\n- 遇筛选不生效先打 log 看 getQueryParams/handleQuery 产出 payload。\n- 同一筛选条件不要两处来源（组件初值+构造器初值）。\n- 考古用 git log -S '字段名' -- 文件 定位引入提交（本例 717e0e6f1 / cll）。\n\n## 验证与归属\n- 验证会话 7fcdcc25：用户反馈默认已备案选不了其他，排查为 5-19 改动导致。\n- 涉及文件：resourcesLeaseContractFiling/index.vue、listMixins.js。\n- 所属项目：产品2.0；代码基线：5029af0。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/产品2.0技术笔记/product2_viewer_zindex.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0 ImageViewer常驻致层级失效\n[苏房] 产品2.0 全局 ImageViewer 挂 App 常驻，el-dialog 缓存首次 zIndex，写死 z-index 也压不过后续业务弹窗。\n\n## 问题现象\n- 图片预览组件被后打开的业务弹窗盖住，写死 :z-index=\"9999\" 仍翻车。\n\n## 根因\n- Element el-dialog 首次打开时 PopupManager 分配 zIndex 并缓存实例；ImageViewer 常驻单实例复用旧值。\n- 业务弹窗每次打开拿更大新值，多轮开关后预览被压下面。\n\n## 解决方案\n- 给 el-dialog 加 v-if=\"showViewer\"，关闭卸掉 DOM 再开新建实例，交 PopupManager 自然叠序。\n- 删掉 :z-index 及 ::v-deep 写死 z-index；外层包 image-viewer-host 设 display:contents。\n- 删除 App.vue 全局 .viewer-container { z-index: 9999 }。\n\n## 验证与归属\n- 验证会话 f6b10079：用户附 git diff，结论为实例缓存值增长，采用 v-if 重建。\n- 涉及文件：ImageViewer/index.vue、App.vue、store/modules/preview.js。\n- 所属项目：产品2.0；代码基线：8d416b2。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

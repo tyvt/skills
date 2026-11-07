@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mm-2-0-1793656674649/history/archive_021",
+    "trace_id": null,
+    "extracted_at": "2026-11-02T22:30:55.039861+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/driver_plugin_global.md",
+                "memory_type": "entities",
+                "after": "# driver.js引导封装为插件挂载全局属性\n将 driver.js 引导功能封装为插件以规避未挂载时抛 Uncaught 异常。\n\n## 解决方案\n- 封装为插件 `src/plugins/driver.js`，创建 driver.js 单例\n- 挂载至 `app.config.globalProperties.$driver`\n- 在 `main.js` 通过 `app.use` 注册该插件\n- `App.vue` 调用前判断 `this.$driver` 是否存在，避免插件未挂载时抛出 `Uncaught` 异常\n\n## 验证与归属\n- 验证证据：src=2-0/009.md\n- 涉及文件：driver.js、src/plugins/driver.js、main.js、App.vue\n- 来源会话：a521eb39-d368-4ec1-a02a-4131c89c94c3；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/dialog_mixin_vmodel.md",
+                "memory_type": "entities",
+                "after": "# 弹窗mixin借$attrs透传v-model免声明\nVue 3 中弹窗 mixin 借 `$attrs` 透传 `v-model` 相关属性，父级无需显式绑定。\n\n## 解决方案\n- 未声明的 `modelValue` 与 `visible` 进入 `$attrs`\n- `dialogMixins.js` 移除对应 props 声明，改由 `this.$attrs.modelValue ?? this.$attrs.visible` 读取状态\n- 配合 `<zs-dialog v-bind=\"$attrs\">`，所有引用该 mixin 的弹窗无需在父级显式绑定 `:model-value` 与事件\n\n## 验证与归属\n- 验证证据：src=2-0/009.md\n- 涉及文件：dialogMixins.js\n- 来源会话：42e79baa-7d82-4041-a640-3f06d3408440；代码基线：none"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/precommit_lintstaged_path.md",
+                "memory_type": "entities",
+                "before": "# pre-commit调用lint-staged路径解析\n在 zhi2-web-admin 所在的 monorepo（npm workspaces）中，husky pre-commit 调用 lint-staged 易因路径解析失败报 `MODULE_NOT_FOUND`。\n\n## 现象\n- pre-commit 执行报错 `MODULE_NOT_FOUND`，找不到 lint-staged\n\n## 根因\n- 产品2.0 父仓为 npm workspaces 时，在子目录 zhi2-web-admin 内执行 `npx lint-staged` 会解析成错误路径 `…/node_modules/node_modules/lint-staged`，导致 husky pre-commit 报 MODULE_NOT_FOUND。\n- 另有旧场景：`.husky/pre-commit` 写死调用仓库根目录 `node_modules/lint-staged`，但包实际位于子应用 `node_modules` 也会引发同类报错。\n\n## 解决方案\n- 应在 hook 里先 `cd zhi2-web-admin`，再用 `node \"$REPO_ROOT/node_modules/lint-staged/bin/lint-staged.js\"` 直接执行根目录已安装的 lint-staged，完全绕开 npx 的 monorepo 路径解析。\n- 旧场景可改为优先查找子目录 `node_modules/lint-staged`，再回退根目录查找。\n\n## 关联信息\n- 验证证据（npm workspaces）：会话 855a5094 三次 commit 失败栈均指向 `D:\\repository\\产品2.0\\node_modules\\node_modules\\lint-staged\\bin\\lint-staged.js`；改为 REPO_ROOT + node 直跑后通过。\n- 验证证据（旧场景）：src=G/003.md\n- 涉及文件：.husky/pre-commit、zhi2-web-admin/package.json\n- 来源会话：855a5094-af56-4cd9-aa09-0a5ab6a8ea78、e8dad49f-1052-4158-899c-8a546531700d\n- 代码基线：产品2.0 父仓 + zhi2-web-admin workspace",
+                "after": "# pre-commit调用lint-staged路径解析\n在 zhi2-web-admin 所在的 monorepo（npm workspaces）中，husky pre-commit 调用 lint-staged 易因路径解析失败报 `MODULE_NOT_FOUND`。\n\n## 现象\n- pre-commit 执行报错 `MODULE_NOT_FOUND`，找不到 lint-staged\n\n## 根因\n- 产品2.0 父仓为 npm workspaces 时，在子目录 zhi2-web-admin 内执行 `npx lint-staged` 会解析成错误路径 `…/node_modules/node_modules/lint-staged`，导致 husky pre-commit 报 MODULE_NOT_FOUND。\n- 另有旧场景：`.husky/pre-commit` 写死调用仓库根目录 `node_modules/lint-staged`，但包实际位于子应用 `node_modules` 也会引发同类报错。\n\n## 解决方案\n- 应在 hook 里先 `cd zhi2-web-admin`，再用 `node \"$REPO_ROOT/node_modules/lint-staged/bin/lint-staged.js\"` 直接执行根目录已安装的 lint-staged，完全绕开 npx 的 monorepo 路径解析。\n- 旧场景可改为优先查找子目录 `node_modules/lint-staged`，再回退根目录查找。\n\n## 关联信息\n- 验证证据（npm workspaces）：会话 855a5094 三次 commit 失败栈均指向 `D:\\repository\\产品2.0\\node_modules\\node_modules\\lint-staged\\bin\\lint-staged.js`；改为 REPO_ROOT + node 直跑后通过（src=2-0/008.md）。\n- 验证证据（旧场景）：src=G/003.md\n- 涉及文件：.husky/pre-commit、zhi2-web-admin/package.json\n- 来源会话：855a5094-af56-4cd9-aa09-0a5ab6a8ea78、e8dad49f-1052-4158-899c-8a546531700d\n- 代码基线：产品2.0 父仓 + zhi2-web-admin workspace"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vue3_async_component.md",
+                "memory_type": "entities",
+                "before": "# Vue3 局部异步组件须用 defineAsyncComponent\nVue3 在 `components` 选项里直接写 `() => import(...)` 会把 Promise 当组件渲染，须改用 `defineAsyncComponent` 包裹。\n\n## 问题根因\n- 在 `components` 选项写 `Foo: () => import('...')`，Vue3 会把 Promise 当组件渲染，页面出现 `[object Promise]`（如 Settings、attachmentDraw 等）\n\n## 解决方案\n- `import { defineAsyncComponent } from 'vue'` 并写 `Foo: defineAsyncComponent(() => import('...'))`\n\n## 边界与归属\n- 路由表 `component: () => import(...)` 与 `store/modules/permission.js` 动态路由组件赋值保持原样，由 Vue Router 处理懒加载，不要套 defineAsyncComponent\n- 验证证据：会话 b06efc30 中 Settings 显示 [object Promise]，全局 20 个文件替换且明确未改 router/permission\n- 涉及文件：zhi2-web-admin/src/layout/components/Settings/index.vue、zhi2-web-admin/src/components/OperationBtnGroup/attachmentDraw.vue、zhi2-web-admin/router/index.js、zhi2-web-admin/src/store/modules/permission.js\n- 所属项目：2-0；来源会话：b06efc30-d150-4428-a1c0-f054d8e38798；代码基线：none",
+                "after": "# Vue3 局部异步组件须用 defineAsyncComponent\nVue3 在 `components` 选项里直接写 `() => import(...)` 会把 Promise 当组件渲染，须改用 `defineAsyncComponent` 包裹。\n\n## 问题根因\n- 在 `components` 选项写 `Foo: () => import('...')`，Vue3 会把 Promise 当组件渲染，页面出现 `[object Promise]`（如 Settings、attachmentDraw 等）\n\n## 解决方案\n- `import { defineAsyncComponent } from 'vue'` 并写 `Foo: defineAsyncComponent(() => import('...'))`\n\n## 边界与归属\n- 路由表 `component: () => import(...)` 与 `store/modules/permission.js` 动态路由组件赋值保持原样，由 Vue Router 处理懒加载，不要套 defineAsyncComponent\n- 验证证据：会话 b06efc30 中 Settings 显示 [object Promise]，全局 20 个文件替换且明确未改 router/permission；另会话 d4e317f1 将在 views/home/index.vue、views/system/config/detail.vue 等文件的 components 选项内直接函数导入改写为 defineAsyncComponent 形式（src=2-0/009.md）\n- 涉及文件：zhi2-web-admin/src/layout/components/Settings/index.vue、zhi2-web-admin/src/components/OperationBtnGroup/attachmentDraw.vue、zhi2-web-admin/router/index.js、zhi2-web-admin/src/store/modules/permission.js、zhi2-web-admin/src/views/home/index.vue、zhi2-web-admin/src/views/system/config/detail.vue\n- 所属项目：2-0；来源会话：b06efc30-d150-4428-a1c0-f054d8e38798、d4e317f1-0c0f-4664-a597-3028cba67933；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}
