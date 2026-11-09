@@ -34,26 +34,77 @@ function copyFileRetry(from, to, tries = 8) {
   }
 }
 
+function countFiles(root) {
+  let n = 0;
+  for (const _ of walkFiles(root)) n++;
+  return n;
+}
+
+function lastVectordbBaseline() {
+  try {
+    const meta = JSON.parse(fs.readFileSync(path.join(DST_ROOT, ".snapshot-meta.json"), "utf8"));
+    return Number(meta && meta.bySection && meta.bySection.vectordb && meta.bySection.vectordb.files) || 0;
+  } catch {
+    return 0;
+  }
+}
+
 function mirrorVectordbRobocopy(srcRoot, dstRoot) {
   if (!fs.existsSync(srcRoot)) return { files: 0, bytes: 0, copied: 0, removed: 0, missing: true };
   fs.mkdirSync(dstRoot, { recursive: true });
-  const r = spawnSync(
-    "robocopy",
-    [srcRoot, dstRoot, "/E", "/XO", "/R:3", "/W:2", "/NFL", "/NDL", "/NJH", "/NJS", "/NP"],
-    { encoding: "utf8", windowsHide: true }
-  );
+
+  const srcCount = countFiles(srcRoot);
+  const baseline = lastVectordbBaseline();
+  // /MIR == /E + /PURGE: it deletes anything in dst that src no longer has.
+  // Skip the purge when src looks abnormal (nearly empty, or <50% of last
+  // successful backup), so a transient/broken source can never wipe the backup.
+  const MIN_SRC_FILES = 10;
+  const guardSkipPurge =
+    srcCount < MIN_SRC_FILES || (baseline > 0 && srcCount < baseline * 0.5);
+  const mode = guardSkipPurge ? "copy-only-guard" : "mir";
+  if (guardSkipPurge) {
+    console.warn(
+      `WARN: vectordb guard skipped purge (src=${srcCount}, baseline=${baseline}, min=${MIN_SRC_FILES})`
+    );
+  }
+
+  const common = ["/R:3", "/W:2", "/NFL", "/NDL", "/NJH", "/NJS", "/NP"];
+  const switches = guardSkipPurge ? ["/E", "/XO", ...common] : ["/MIR", ...common];
+  const before = new Set([...walkFiles(dstRoot)].map((p) => path.relative(dstRoot, p)));
+
+  const r = spawnSync("robocopy", [srcRoot, dstRoot, ...switches], {
+    encoding: "utf8",
+    windowsHide: true,
+  });
   const code = r.status ?? 0;
   if (code >= 8) {
     console.error("robocopy vectordb failed", code, r.stderr || r.stdout);
     process.exit(1);
   }
+
   let files = 0;
   let bytes = 0;
+  const after = new Set();
   for (const abs of walkFiles(dstRoot)) {
     files++;
     bytes += fs.statSync(abs).size;
+    after.add(path.relative(dstRoot, abs));
   }
-  return { files, bytes, copied: files, removed: 0, missing: false, robocopyExit: code };
+  let removed = 0;
+  for (const rel of before) if (!after.has(rel)) removed++;
+
+  return {
+    files,
+    bytes,
+    copied: files,
+    removed,
+    missing: false,
+    robocopyExit: code,
+    mirrorMode: mode,
+    srcCount,
+    baseline,
+    guardSkipPurge,
+  };
 }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
