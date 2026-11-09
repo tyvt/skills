@@ -22,25 +22,57 @@ function Write-Log([string]$msg) {
   Write-Host $line
 }
 
+function Wait-PortListening([int]$port, [int]$timeoutSec) {
+  $deadline = (Get-Date).AddSeconds($timeoutSec)
+  while ((Get-Date) -lt $deadline) {
+    $up = netstat -ano 2>$null | Select-String (":{0} " -f $port) | Select-String "LISTENING"
+    if ($up) { return $true }
+    Start-Sleep -Seconds 1
+  }
+  return $false
+}
+
 function Stop-OpenVikingIfRunning {
   $p = Get-Process -Name "openviking-server" -ErrorAction SilentlyContinue
   if (-not $p) { return $false }
   Write-Log "Stopping openviking-server (pid $($p.Id)) for vectordb snapshot"
   Stop-Process -Id $p.Id -Force
-  Start-Sleep -Seconds 5
+  # Wait for the port to free so the LevelDB lock releases cleanly before the copy.
+  if (Wait-PortListening 1933 10) {
+    Write-Log "WARN: port 1933 still listening after stop; proceeding anyway"
+  } else {
+    Write-Log "openviking-server stopped, port 1933 free"
+  }
   return $true
 }
 
+function Ensure-Ollama {
+  $up = netstat -ano 2>$null | Select-String ":11434 " | Select-String "LISTENING"
+  if ($up) { return }
+  $ollama = Join-Path $env:LOCALAPPDATA "Programs\Ollama\ollama.exe"
+  if (-not (Test-Path $ollama)) { Write-Log "WARN: ollama.exe missing, cannot ensure embeddings"; return }
+  Write-Log "Starting Ollama"
+  Start-Process -FilePath $ollama -ArgumentList "serve" -WindowStyle Minimized
+  Start-Sleep -Seconds 6
+}
+
 function Start-OpenVikingIfDown {
-  $listening = netstat -ano 2>$null | Select-String ":1933 " | Select-String "LISTENING"
-  if ($listening) { return }
+  if (Wait-PortListening 1933 3) {
+    Write-Log "openviking-server already listening on 1933"
+    return
+  }
+  Ensure-Ollama
   if (-not (Test-Path $OvServer)) {
     Write-Log "WARN: OV server exe missing, skip start"
     return
   }
   Write-Log "Starting openviking-server"
   Start-Process -FilePath $OvServer -ArgumentList "--config", $OvConf -WindowStyle Minimized
-  Start-Sleep -Seconds 4
+  if (Wait-PortListening 1933 25) {
+    Write-Log "openviking-server is back up on 1933"
+  } else {
+    Write-Log "ERROR: openviking-server did NOT come back up on 1933 (watchdog should recover)"
+  }
 }
 
 # PS 5.1 turns native stderr piped via 2>&1 into ErrorRecord and aborts under Stop.
