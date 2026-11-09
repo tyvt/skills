@@ -1,0 +1,26 @@
+# wt-bug-6326 子模块隐藏未推送提交
+合并 #6326 至主工作区 zhi2-web-admin 子模块前，排查发现 wt-bug-6326 工作树的子模块藏有一条未推送的 #6365 提交，使其本地 develop/v3.0.0 基线与主工作区 origin/develop 不一致。
+
+## 子模块基线状态
+- 主工作区 zhi2-web-admin 子模块 `develop/v3.0.0` 本地与 `origin` 均为 `05a1a44`（2026-11-09 会话确认）
+- `wt-bug-6326` 工作树子模块停在 #6326 修复 `00d915c`，其父链为 `d9c2be7 → 6b48d79(#6324) → 00d915c(#6326)`
+- `05a1a44` 已包含 `6b48d79`，故将 `00d915c` 合入 `develop/v3.0.0` 本应在共同祖先 `6b48d79` 之后做干净合并提交
+
+## 隐藏未推送提交
+- `wt-bug-6326` 子模块还藏有未推送的 #6365 提交 `78f88a59a`（开发企业变更审核流程查看显示空）
+- 其本地 `develop/v3.0.0` 为 `3971283573`，等于主分支 `05a1a44` 加上该 #6365，而非预期的 `05a1a44`
+- 主工作区子模块的 `origin/develop` 仍是 `05a1a44`，父仓库 gitlink 也只指到 `05a1a44`，说明 #6365 从未推送至远程
+
+## 排查与处置
+- 因基线不一致，需先对主子模块 fetch 确认远程真实状态，避免把 #6365 误合入或合错基线
+- 之前看到的 `d9c2be7` 是 `wt-bug-6326` 子模块里过时的 `origin/develop`（未 fetch），并非主工作区真实基线
+
+<!-- MEMORY_FIELDS
+{
+  "category": "技术模式",
+  "name": "submodule_worktree_hidden_commit",
+  "source_extraction_id": "7e888e64dccf4cc5964360d1db0083ba",
+  "version": 1,
+  "memory_type": "entities"
+}
+-->

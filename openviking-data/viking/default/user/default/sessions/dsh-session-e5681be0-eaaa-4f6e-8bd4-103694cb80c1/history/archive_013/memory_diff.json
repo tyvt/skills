@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-e5681be0-eaaa-4f6e-8bd4-103694cb80c1/history/archive_013",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T11:47:43.107817+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/09/预览关闭缺陷禅道回写请求.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-09 用户要求回写禅道 #6373（预览 X 关闭按钮无法关闭弹窗）状态为「已解决」。助手按本机既定流程（禅道 API 被风险策略拦截时走 DBX 直连「新禅道」库事务回写），确认「新禅道」连接 ID（4027e274-...），查询 #6373 当前字段：status=active、resolution=空、openedBy=zhunan、assignedTo=tiany、resolvedBy=空；加载 zentao-analyzer 技能以遵循规范回写步骤与 zt_action 落库格式（避免类似 #6363 回写未生效）。截至对话结束，实际状态回写尚未完成。\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 回写禅道\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 明白，回写禅道 #6373。按本机既定流程（禅道 API 被风险策略拦截时走 DBX 直连「新禅道」库事务回写），我先列出 dbx 可用工具，并查询 #6373 当前字段以便正确回写（指派/提交人等）。\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 列出 DBX 连接，确认「新禅道」连接 ID，然后查询 #6373 当前字段。\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 确认「新禅道」连接 `4027e274-...`。查询 #6373 当前字段（状态、提交人、指派、标题等），以便正确回写。\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 已取到 #6373 当前状态：`status=active`、`resolution=空`、`openedBy=zhunan`、`assignedTo=tiany`、`resolvedBy=空`。按本机既定事务回写流程，先加载 `zentao-analyzer` 技能以遵循其规范的回写步骤与 `zt_action` 落库格式，避免像 #6363 那样回写未生效。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷任务/zentao_bug_6373.md",
+                "memory_type": "entities",
+                "after": "# 禅道Bug 6373 预览X关闭按钮无法关闭弹窗\nzhi2-web-admin 中预览弹窗 X 关闭按钮点击无反应的缺陷任务，根因为 v-dialogDrag 指令吞掉关闭按钮 mousedown，已修复并推送 fix/bug-6373-preview-close。\n\n## 根因与修复\n- 根因：v-dialogDrag 指令把 onmousedown 挂在 .el-dialog__header 上，关闭按钮 .el-dialog__headerbtn 位于 header 内部，其 mousedown 冒泡到拖拽处理器导致 .el-dialog 被重定位，浏览器取消后续 click，handleClose/closePreview 不触发，showViewer 保持 true\n- 影响：共享指令缺陷，影响所有 el-dialog/zs-dialog 调用方；zs-dialog 因 visible 为普通 data prop 正常关闭，仅 ImageViewer 因 :visible.sync 绑定 store computed 受影响\n- 修复：zhi2-web-admin/src/directives/dialog/drag.js 头部 onmousedown 内加守卫 if (e.target.closest && e.target.closest('.el-dialog__headerbtn')) return，命中关闭按钮直接返回不重定位，保留其 click；头部拖拽与 resize 手柄不受影响\n\n## 验证\n- worktree 构建 → 部署临时 nginx 8099 → Playwright 复现脚本返回 {\"click\":1,\"mousedownHeader\":1,\"mousedownTargetIsClose\":1,\"closed\":true}（修复前 click:0/closed:false），确认关闭按钮 click 触发、预览关闭\n- 验证后删临时站点并 reload nginx，线上 8098 仍指向修复前 dist\n\n## 提交与推送\n- 子模块 zhi2-web-admin @ d71a36607（分支 fix/bug-6373-preview-close）— drag.js 守卫（仅 4 行插入，version.json 已还原未提交）\n- 父仓库 @ 05621b2 — 升级子模块指针至 d71a36607\n- 父仓库 @ f254e07 — 常见错误台账 docs/frontend/common-errors.md 新增 E-046（含触发/根因/修复/验证/状态）\n- 均已推送至 origin（父仓库用 git -C 正常解析；子模块因本地 worktree 解析怪象用显式 gitdir 形式推送），上游跟踪已设置\n\n## 禅道状态\n- 当前（2026-11-09 查询）：status=active、resolution=空、openedBy=zhunan、assignedTo=tiany、resolvedBy=空\n- 2026-11-09 用户要求回写禅道；按本机流程（禅道 API 被风险策略拦截时走 DBX 直连「新禅道」库事务回写），加载 zentao-analyzer 技能遵循规范回写步骤与 zt_action 落库格式（避免 #6363 回写未生效）\n- 后续建议：GitLab 创建 MR 合入 develop/v3.0.0；合并后删除 worktree；回写禅道状态为「已解决」"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/代码仓库/zhi2_web_admin.md",
+                "memory_type": "entities",
+                "before": "# zhi2_web_admin\n苏州市房地产监测V3的前端管理后台子模块仓库，承载预售与现售方案维护等页面。\n## 描述\n- 是父仓库“苏州市房地产监测V3”的 git 子模块，路径为 zhi2-web-admin。\n- 基于 Vue 的前端 H5 管理项目，主分支 develop/v3.0.0。\n## 相关页面\n- 现售方案维护页：src/views/presale/cashsale/plan/detail.vue\n- 预售方案页：src/views/presale/permit/plan/detail.vue\n## 构建部署\n- 使用 vite 8.3.5 构建，产物输出至父仓库 dist。\n- 修复 bug6169 提交哈希 b1bb05685。\n## 组件约束\n- `zs-table` 内容溢出时进入 content-scroll 模式，将 `.el-table` 设为 `max-content` 变宽；`.list-card{overflow:hidden}` 会裁掉变宽部分及右侧固定「操作」列，故 `.zs-table-container--content-scroll` 需自行提供横向滚动，否则右侧「操作」列会被窗口右缘截断\n- `index.scss` 的 `--content-scroll` 规则块已添加 `.zs-table-container--content-scroll{overflow-x:auto;overflow-y:hidden}`（bug-6358 修复），提供横向滚动使右侧固定「操作」列可达\n- `v-dialogDrag` directive swallows the `el-dialog` close-button click: `ImageViewer` binds `:visible.sync` to a store-backed computed, so the X button click is intercepted by the drag directive and cannot close; `zs-dialog` uses the same directive but closes fine because its `visible` is a plain data prop. Canonical fix: stop the drag from starting on the close button (related to bug 6373).",
+                "after": "# zhi2_web_admin\n苏州市房地产监测V3的前端管理后台子模块仓库，承载预售与现售方案维护等页面。\n## 描述\n- 是父仓库“苏州市房地产监测V3”的 git 子模块，路径为 zhi2-web-admin。\n- 基于 Vue 的前端 H5 管理项目，主分支 develop/v3.0.0。\n## 相关页面\n- 现售方案维护页：src/views/presale/cashsale/plan/detail.vue\n- 预售方案页：src/views/presale/permit/plan/detail.vue\n## 构建部署\n- 使用 vite 8.3.5 构建，产物输出至父仓库 dist。\n- 修复 bug6169 提交哈希 b1bb05685。\n## 组件约束\n- `zs-table` 内容溢出时进入 content-scroll 模式，将 `.el-table` 设为 `max-content` 变宽；`.list-card{overflow:hidden}` 会裁掉变宽部分及右侧固定「操作」列，故 `.zs-table-container--content-scroll` 需自行提供横向滚动，否则右侧「操作」列会被窗口右缘截断\n- `index.scss` 的 `--content-scroll` 规则块已添加 `.zs-table-container--content-scroll{overflow-x:auto;overflow-y:hidden}`（bug-6358 修复），提供横向滚动使右侧固定「操作」列可达\n- `v-dialogDrag` 指令曾吞掉 `el-dialog` 关闭按钮 click：`ImageViewer` 将 `:visible.sync` 绑定 store computed，X 按钮 click 被拖拽指令拦截无法关闭；`zs-dialog` 用相同指令但因 `visible` 为普通 data prop 正常关闭。已在 bug 6373 修复（提交 d71a36607）：drag.js 头部 `onmousedown` 内对 `.el-dialog__headerbtn` 直接 `return`，命中关闭按钮不重定位弹窗，保留其 `click`"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

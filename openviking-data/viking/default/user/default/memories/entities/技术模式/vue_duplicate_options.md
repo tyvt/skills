@@ -14,13 +14,15 @@
 - 验证证据: extracted source=cursor project=bugfix
 - 会话: e9b82eae-9a23-4947-a2d0-d40f550dbd2c
 - 所属项目: bugfix
+## Current State
+- As of 2026-11-09, package.json declares `eslint-plugin-duplicate-attributes: "file:eslint-rules"` but the `eslint-rules` directory is missing from the main checkout (stale/broken symlink), so the plugin is broken even at baseline and the rule above cannot be loaded or reproduced in the current environment.
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "vue_duplicate_options",
-  "source_extraction_id": "13c17fa23675494eb513637d319d8231",
-  "version": 1,
+  "source_extraction_id": "892db2608ab848d0863337f63c0ec870",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

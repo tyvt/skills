@@ -9,7 +9,7 @@ Vue 2.7 admin frontend submodule under the 门户 (Portal) repo implementing Suz
 ## Key Facts
 - Suzhou Dao (苏周到) QR code login implemented only here, not in root portal
 - API src/api/security/suzhouDao.js: getQrLoginParam, scanLogin(qrCodeId), suzhouDaoLogin all POST /security/ctAuth/suzhouDao/... with { noMessage: true, skipAuthDialog: true }
-- Effective base URL /api/v2.0 from env/.env VITE_APP_BASE_API, injected by vite.config
+- `VITE_APP_BASE_API` is NOT set in any `.env*` file (observed 2026-11-09); in the built bundle `baseURL` resolves to `undefined` and API calls go to relative paths (e.g. `/portal/public/...`), so the `/api/v2.0` base in source reflects dev-only/intended config absent from this build
 - src/api/index.js creates HttpRequest; src/utils/request.js rejects on code != 200; 401 popup skipped when skipAuthDialog true — login-less polling must carry this config
 - Page side: QR display, scanLogin polling, code callback page, token persistence (components per routes/views)
 - Code baseline dfee5a6
@@ -33,8 +33,8 @@ Vue 2.7 admin frontend submodule under the 门户 (Portal) repo implementing Suz
 {
   "category": "portal_submodule",
   "name": "zhi2_web_admin",
-  "source_extraction_id": "78833d4a4a0a498e864cad5a4111eea0",
-  "version": 4,
+  "source_extraction_id": "8595218b1fe14e71800efda5ddaff666",
+  "version": 5,
   "memory_type": "entities"
 }
 -->

@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-7a24077a-0835-45e9-b4e6-ece66423a62a/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T12:31:43.486162+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/09/预售房屋操作列改用公共组件.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-09，预售许可申请→预售房屋列表的 PresaleHouseTable.vue 操作列由手写 `<zs-table-column>`+`<zs-button>` 重构为公共组件 `<zs-operate-column>`。覆写 buttons computed 返回单条删除按钮，保留原 data-testid=\"presale-permit-house-remove-btn\" 与 $emit('remove', row) 语义；operable 显隐与父级 @remove 链路不变。eslint 与 vite-build 均通过。子模块 zhi2-web-admin 提交 f8b288c2b、父仓库提交 8bed143 并推送，分支 fix/presale-house-operate-column，位于父仓库 worktree 苏州市房地产监测V3-wt-house-operate-column（嵌套子模块，规避平铺子模块 worktree 编码缺陷）。\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 这里的操作列没有使用公共组件写法\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 已完成。确认了问题并改为公共组件写法，构建与 lint 均通过，子模块与父仓库已提交推送。\n\n## 范围与依据\n- **页面**：预售许可申请 → 预售房屋列表 → 操作列\n- **依据**：项目标准操作列公共组件 `zs-operate-column`（`ListTemplate.js` / `DetailSubTableTemplate.js` 均用 `<zs-operate-column ... :buttons=\"buttons\" />`，由 `table.js` 的 `buttons` 契约驱动；全站 370+ 处使用）\n\n## 问题\n原 [PresaleHouseTable.vue](<zhi2-web-admin/src/views/presale/permit/components/PresaleHouseTable.vue>) 是**自绘操作列**（手写 `<zs-table-column label=\"操作\">` + 内联 `<zs-button>删除` 直接 `$emit('remove')`），未走公共组件的列宽/样式/权限/多按钮折叠等能力，与全站其余列表不一致——正是你截图圈出的部分。\n\n## 改动\n- 模板：`<zs-table-column v-if=\"operable\" label=\"操作\">…` → `<zs-operate-column v-if=\"operable\" :buttons=\"buttons\" />`\n- 脚本：新增 `buttons` computed，返回单条「删除」按钮配置，保留原 `data-testid=\"presale-permit-house-remove-btn\"` 与 `$emit('remove', row)` 语义；`zs-operate-column` 对「删除」统一补 `danger + plain`。`operable` 显隐逻辑、父级 `@remove` 链路不变。\n\n## 验证\n- `eslint src/views/presale/permit/components/PresaleHouseTable.vue` → 退出码 **0**\n- `node scripts/vite-build.mjs build --logLevel error` → 退出码 **0**（buildTime 2026/11/9 19:55:47，仅存量 Sass `@import` 弃用告警）\n\n## 提交与推送（worktree `fix/presale-house-operate-column`）\n- 子模块 `zhi2-web-admin`：`f8b288c2b`，已推送，本地/远程一致\n- 父仓库：`8bed143`（含 gitlink 指向 f8b288c2b + 台账 E-046），已推送，本地/远程一致\n- 位置：`D:\\repository\\苏州市房地产监测V3-wt-house-operate-column`（父仓库 worktree + 嵌套子模块，规避了平铺子模块 worktree 的编码缺陷）；未触碰其他并行 worktree\n\n## 未验证\n- 未在客测环境用真实账号点测（本机无登录态、不启 dev server），需在部署站点「预售许可申请 → 预售房屋列表」确认删除按钮样式与点击删除联动。..."
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/技术模式/zs_operate_column.md",
+                "memory_type": "entities",
+                "after": "# zs-operate-column 公共操作列组件\nzhi2-web-admin 列表与子表格的标准操作列公共组件，由 table.js 的 buttons 配置驱动，全站 370+ 处使用。\n\n## 用途\n- 统一渲染表格操作列按钮，自动处理列宽、样式、权限与多按钮折叠\n- ListTemplate.js 与 DetailSubTableTemplate.js 均通过 `<zs-operate-column :buttons=\"buttons\" />` 使用\n\n## API 形态\n- 接收 `buttons` 数组，每项含 `label` 与 `function(row, column, index)`\n- 可选字段：`disabled(row)`、`visible(row)`、`attrs`、`permissionType`、`permission`\n- 内部 `getRowButtons`：无 `visible` 且 `!button.permission` 时返回该按钮\n- `attrs` 透传底层 zs-button，可携带 `data-testid` 等测试属性\n\n## 使用约定\n- 使用 listMixins 的自定义子表可覆写 `buttons` computed 替换手写 `<zs-table-column>` + 内联 `<zs-button>`\n- 删除按钮由组件统一补 `danger + plain` 样式\n- 全局注册于 tableComponents.js，经 table.js → listMixins 混入链自动可用\n\n## 关联事实\n- PresaleHouseTable.vue 原自绘操作列，已于 2026-11-09 重构为 zs-operate-column（子模块提交 f8b288c2b）\n- 同类自绘操作列候选（本次未改）：BuildingTableList.vue、LpbHouseList.vue 等"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,31 +1,34 @@
 # 禅道 Bug 6173
-苏州市房地产监测V3 价格备案申请维护户室时页面抖动缺陷，根因为 SingleSelect.vue 自定义定位与 Element UI Popper.js 双定位机制冲突。
+苏州市房地产监测V3 价格备案申请维护户室时页面抖动缺陷，根因为 SingleSelect.vue 自定义定位与 Element UI Popper.js 双定位机制冲突，经三次修复最终解决。
 
-## 根因
-- 旧修复（提交 a2f07fde0）仅在自定义 inline style 层加 1px 去抖，但 SingleSelect.vue 五个定时器 [0,32,80,160,320]ms 仍无条件调用 select.updatePopper()
-- 叠加 window resize/scroll 监听与 getMaxLayerZIndex() 全表 getComputedStyle 强制同步布局，造成主线程 jank
-- 自定义 position:fixed 写入与 Element UI Popper.js 每次 updatePopper() 写回 transform/top/left 互相覆盖，两套定位反复打架
+## 根因（最终确认）
+- SingleSelect.vue 的 applyPopperStyle + getMaxLayerZIndex 在每次下拉打开时经 rAF+$nextTick 触发
+- getMaxLayerZIndex 对 .v-modal/.el-dialog__wrapper/.el-select-dropdown/.el-popper 做 querySelectorAll + getComputedStyle，强制整页同步重排
+- 随后在 Popper.js 定位之后手写 width/minWidth/zIndex，z-index 取"当前最大层 +10"基于自身上一轮值反馈放大，与 Popper.js 单一数据源互相覆盖 → 抖动
 - GIF 逐帧核对显示下拉最终位置稳定（23 帧底部边缘恒为 859px），证实是重排/闪动而非翻位错误
+- 第三次修复确认残留根因：SingleSelect.vue 的 applyPopperStyle 经 rAF+$nextTick 调 getMaxLayerZIndex，z-index 取当前最大层+10 基于自身上次抬高值反馈放大，与 Popper.js 单数据源互相覆盖导致抖动；queuePopperStyle/cancelQueuedPopperStyle/popperFrameId 亦残留未删
+- 旧修复 a2f07fde0 仅加 1px 去抖但五个定时器 [0,32,80,160,320]ms 仍调用 updatePopper()；f5b858bd0 删定时器但保留 applyPopperStyle，根因均残留故测试复开
 
-## 修复
-- 对齐同目录 MultiSelect.vue，把下拉定位交回 Element UI / Popper.js 单一数据源
-- 删除自定义 fixed 定位、定时器链、updatePopper() 调用与 scroll/resize 监听
-- 仅在展开时用一次 rAF 补宽度与层级，值不变不写
-- 教训：与第三方 popper 并存时去抖只挡自写 style 无效，必须消除第二套定位机制
-- 文件 zhi2-web-admin/src/components/zs-select/SingleSelect.vue 由 169 行精简到 112 行（35 增 / 92 删）
+## 修复（第三次，最终）
+- 对齐 MultiSelect.vue，把下拉定位交回 Element UI / Popper.js 单一数据源
+- 删除 applyPopperStyle/getMaxLayerZIndex/queuePopperStyle/cancelQueuedPopperStyle/popperFrameId
+- 仅保留 visible-change 事件透传（flowable 待办/流程/已办三页依赖），7 增 / 53 删
+- 提交子模块 fix/bug-6173-select-jitter=5065633b2 → 合并 develop/v3.0.0=37e25da4d；父仓库 gitlink=2dc46e8，均推送远程
+- 隔离 Playwright harness 验证无抖动；ESLint 0；build 通过；nginx 8098 冒烟正常（网关 8080 下线 502 与改动无关）
 
 ## 验证与状态
-- 单文件 eslint 退出码 0；npm run build 退出码 0；dist 含 queuePopperStyle 且无旧逻辑；nginx 8098 站点返回新代码
-- worktree 分支 fix/bug-6173-select-jitter 合并回 develop/v3.0.0；并行任务 #6285 已推送远程，修复 cherry-pick 叠加其基线：子模块 f5b858bd0、父仓库 d140832
-- 清理 worktree 误清空主工作区 node_modules，已用 npm install --offline 恢复，未影响源码
-- 2026-11-04 由 tiany 标记解决，2026-11-09 被 lichandan 以「此现象仍存在」重开；同日后完成重开修复：对齐 MultiSelect 删除自定义 fixed 定位、定时器链、updatePopper() 调用与 scroll/resize 监听，仅展开时一次 rAF 补宽度与层级；提交子模块 f5b858bd0、父仓库 d140832 至 origin/develop/v3.0.0，nginx 8098 验证新 chunk HTTP 200；禅道 DBX 事务化回写 resolved/fixed/trunk，新增 zt_action 89291
+- 2026-11-04 tiany 标记解决，2026-11-09 lichandan 以「此现象仍存在」重开
+- 同日第三次修复完成：彻底删除 applyPopperStyle 自定义定位，交回 Popper.js 单一数据源
+- 禅道 DBX 事务化回写 resolved/fixed/trunk，resolvedBy=tiany，assignedTo=lichandan，resolvedDate 2026-11-09 19:58:49，zt_action 89715
+- 网关 8080 关闭无法端到端复验；建议确认测试环境 58.210.252.230:9002 用 37e25da4d 重新构建部署（参考 bug 6084 旧缓存包教训）
+- worktree D:\repository\苏州市房地产监测V3-wt-bug-6173 已 git worktree remove --force + prune 清理
 
 <!-- MEMORY_FIELDS
 {
   "category": "禅道缺陷",
   "name": "zentao_bug_6173",
-  "source_extraction_id": "2d9610a6e14742ef900371b50ae9f06d",
-  "version": 2,
+  "source_extraction_id": "17e8f311c35f49688f7ec37d8b0ab647",
+  "version": 4,
   "memory_type": "entities"
 }
 -->

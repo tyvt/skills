@@ -1,0 +1,24 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-911cc737-aa2a-46ee-b8e1-c1a9050a7cad/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T11:35:53.633312+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_6372.md",
+                "memory_type": "entities",
+                "before": "# ZenTao Bug 6372\n禅道缺陷 6372：开发企业管理 → 企业变更管理，主管部门审核通过后详情页仍错误显示「提交」按钮。\n\n## Description\n- 模块：开发企业管理 → 企业变更管理（企业变更详情页 `@/views/toB/companyRecord/detail.vue`）。\n- 现象：主管部门（审核方）审核/批准后，页面仍出现「提交」按钮，按设计不应出现。\n\n## Root Cause\n- 提交按钮可见性 `showSubmitBtn` 依赖 `shouldShowAgencyChangeSubmit(this.form)`，该函数内部用 `resolveAgencyChangeToolbarBizState(form) === '0'`（待提交/草稿）判断。\n- 该函数基于 `displayStatus` 字段；开发方变更数据模型使用 `bizState` 而非 `displayStatus`，且 `displayStatus` 未赋值（undefined）。\n- 函数将 undefined 的 `displayStatus` 回退视为草稿 '0'，导致审核后（`bizState='2'`）仍返回 '0' → 按钮错误显示。\n- 开发页面 `changeBizState` 取 `String(change.bizState ?? '0')`，是开发变更的真正状态，但按钮逻辑未使用它。\n\n## Fix Plan\n- 将 `showSubmitBtn` 与 `showChangeEditBtn` 的显隐条件改为基于 `this.changeBizState === '0'`（待提交）。\n- 移除不再使用的 `resolveAgencyChangeToolbarBizState` / `shouldShowAgencyChangeSubmit` 导入。\n- 按仓库规范在独立 worktree 中修改：创建主仓 worktree + 子模块专用分支（参考已有 bugfix worktree 模式）。\n\n## Progress\n- 已定位根因并确认 `changeBizState` 为响应式 data 属性（line 140 定义，506 赋值）。\n- 已创建 worktree 并初始化子模块至专用分支（截至 2026-11-09 会话）。",
+                "after": "# ZenTao Bug 6372\n禅道缺陷 6372：开发企业管理 → 企业变更管理，主管部门审核通过后详情页仍错误显示「提交」按钮。\n\n## Description\n- 模块：开发企业管理 → 企业变更管理（企业变更详情页 `@/views/toB/companyRecord/detail.vue`）。\n- 现象：主管部门（审核方）审核/批准后，页面仍出现「提交」按钮，按设计不应出现。\n\n## Root Cause\n- 提交按钮可见性 `showSubmitBtn` 依赖 `shouldShowAgencyChangeSubmit(this.form)`，该函数内部用 `resolveAgencyChangeToolbarBizState(form) === '0'`（待提交/草稿）判断。\n- 该函数基于 `displayStatus` 字段；开发方变更数据模型使用 `bizState` 而非 `displayStatus`，且 `displayStatus` 未赋值（undefined）。\n- 函数将 undefined 的 `displayStatus` 回退视为草稿 '0'，导致审核后（`bizState='2'`）仍返回 '0' → 按钮错误显示。\n- 开发页面 `changeBizState` 取 `String(change.bizState ?? '0')`，是开发变更的真正状态，但按钮逻辑未使用它。\n\n## Fix\n- 将 `showSubmitBtn` 与 `showChangeEditBtn` 的显隐条件改为基于 `this.changeBizState === '0'`（待提交）。\n- 移除不再使用的 `resolveAgencyChangeToolbarBizState` / `shouldShowAgencyChangeSubmit` 导入。\n- 在独立 worktree 中修改：主仓 worktree + 子模块专用分支 `fix/bug-6372-developer-change-submit-btn`。\n- 提交：子模块 `c4c8f2e6b`（修复），父仓 gitlink `11ffa3f4d`；均推送至 origin（`-u` 设上游）。\n\n## Resolution Status\n- 代码已提交并推送（截至 2026-11-09 会话）。\n- 禅道缺陷 6372 确认：status=active、product=2、project=200、execution=201、openedBy=lichandan。\n- 计划回写：assignedTo=lichandan、resolvedBy=tiany；DBX 事务化 UPDATE zt_bug + INSERT zt_action 进行中（会话结束前未完成，需 connection_id + session_id 绑定事务）。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

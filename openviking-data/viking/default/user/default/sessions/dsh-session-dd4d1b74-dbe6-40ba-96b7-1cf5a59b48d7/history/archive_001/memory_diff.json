@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-dd4d1b74-dbe6-40ba-96b7-1cf5a59b48d7/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T09:28:01.498813+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited/memories/events/2026/11/09/二级页跳转骨架屏需求.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-09 提出在门户首页跳转到二级页面时增加骨架屏（PortalSkeleton）加载体验的需求，涉及 zhi2-web-admin 子模块 publicPortal 下的 PortalDialogHost.vue 与 PortalSkeleton.vue。\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited]**: 门户首页 二级页面跳转的时候加下骨架屏"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited/memories/events/2026/11/09/骨架屏导航过渡接入.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-09 助手在 zhi2-web-admin 子模块（分支 develop/v2.6.2-portal）创建 worktree fix/portal-secondary-skeleton，将孤儿组件 PortalSkeleton.vue 重新接入 PortalDialogHost.vue：仅在家门→二级页 open() 及二级页内 navigate() 的导航过渡时以 `<portal-skeleton v-if=\"pageLoading\" :variant=\"skeletonVariant\" />` 展示骨架屏（最短 600ms，loadingToken 丢弃机制），直接刷新不触发；17 种 variant 均映射至 PARTS 键；npm run build 通过（exit 0），未触动 zhi2-web-admin-wt-payfund 等其他任务 worktree。\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited]**: 门户首页 二级页面跳转的时候加下骨架屏\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited]**: The `PortalSkeleton` component accepts a `variant` prop (default `'list'`) and maps it to `PARTS` — and this exact `skeletonVariant` mapping was used with it in the original commit, so it's compatible.\n\nNow I'll set up a dedicated worktree (the main repo `zhi2-web-admin` is on `develop/v2.6.2-portal`, clean; the existing `zhi2-web-admin-wt-payfund` is for a different task and must stay untouched). Let me read the exact current template/script head lines, then create the worktree.\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited]**: I have all the exact text I need. Now I'll make the edits in the worktree file: wire `PortalSkeleton` into the secondary-page content area, add the `pageLoading`/`loadingToken` state + `skeletonVariant` mapping + `startPageLoad`/`stopPageLoad` methods, and trigger the skeleton from the homepage→secondary `open()` and the in-secondary `navigate()` transitions. I'm scoping the full-page skeleton to **navigation transitions** (not direct refresh), so the existing acceptance test (which loads via `goto` and asserts no full-page skeleton) stays valid.\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited]**: Junction created (`.bin/eslint` check was just a wrong subpath assumption). Let me kick off the required full build in the background from the worktree and monitor it.\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited]**: Build succeeded (exit code 0). The Sass `@import` deprecation warnings are pre-existing, from unrelated components (`HomeQuickLinks`, etc.), not my change. Let me confirm there are no errors touching my file, and read the README's skeleton section + the e2e test to update their docs accurately (since the skeleton now triggers on **transitions** only, not direct refresh)."
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/skeleton_screen.md",
+                "memory_type": "entities",
+                "before": "# 门户首页二级页骨架屏实现\n门户首页所有二级页接入统一骨架屏组件，直接刷新二级页不再显示首页骨架屏。\n\n## 组件构成\n- PortalSkeleton.vue：按二级页真实版式输出占位结构，共 15 种版式（楼盘/房屋/许可/公告/机构/人员/租赁列表、公告正文、可售房源与即时成交汇总、合同与租赁合同查询、楼幢列表、楼盘表 54 格销控网格、经纪机构/经纪人/分支机构列表、机构/经纪人/分支机构三类基本信息）\n- PortalDialogHost.vue：二级页切换时展示骨架屏，最短展示 600ms（复用 @/utils/loading.js），用 token 丢弃被后一次切换覆盖的等待；叠加详情弹窗不触发骨架屏\n- portalRoutes.js：新增的二级页路由配置文件\n\n## 验证与归属\n- 验证证据：extracted source=zcode project=门户\n- 涉及文件：PortalSkeleton.vue、PortalDialogHost.vue、@/utils/loading.js、portalRoutes.js（均在 zhi2-web-admin/src/views/home/publicPortal 下）\n- 所属项目：门户；来源会话ID：session_8fedec701ebfbbfa2d3c0a93a4c98a27；代码基线：none",
+                "after": "# 门户首页二级页骨架屏实现\n门户首页二级页在导航过渡（首页→二级页 open()、二级页内 navigate()）时展示统一骨架屏组件；直接刷新二级页不触发全页骨架屏（数据 mock/同步，仅数据区异步加载时显示局部骨架）。\n\n## 组件构成\n- PortalSkeleton.vue：按二级页真实版式输出占位结构，skeletonVariant 共 17 种取值（agencies、rental、agency-credit、profile-broker、broker-list、profile-agency、profile-store、broker-sub-list、rental-contract、rental-list 等），均映射至组件内 PARTS 键，覆盖楼盘/房屋/许可/公告/机构/人员/租赁列表、公告正文、可售房源与即时成交汇总、合同与租赁合同查询、楼幢列表、楼盘表 54 格销控网格、经纪机构/经纪人/分支机构列表、机构/经纪人/分支机构三类基本信息；位于 zhi2-web-admin/src/views/home/publicPortal\n- PortalDialogHost.vue：二级页导航过渡时以 `<portal-skeleton v-if=\"pageLoading\" :variant=\"skeletonVariant\" />` 展示骨架屏，最短展示 600ms（复用 @/utils/loading.js 的 waitForMinDuration），用 loadingToken 丢弃被后一次切换覆盖的等待；叠加详情弹窗不触发骨架屏\n- @/utils/loading.js：提供 waitForMinDuration 最小时长与 token 丢弃机制\n- portalRoutes.js：二级页路由配置文件\n\n## 历史与状态\n- 组件由提交 9cb987bd0（feat(portal): new components and loading experience）引入 PortalDialogHost，后被 descope 移除，PortalSkeleton 成为孤儿组件\n- 2026-11-09 在 worktree fix/portal-secondary-skeleton（基于 develop/v2.6.2-portal）重新将 PortalSkeleton 接入 PortalDialogHost，仅作用于导航过渡，npm run build 通过（exit 0）\n\n## 验证与归属\n- 验收测试：tests/e2e/public-portal-skeleton.spec.ts 规定直接 load（goto）时禁止全页骨架屏，仅断言过渡场景\n- 验证证据：extracted source=zcode project=门户\n- 涉及文件：PortalSkeleton.vue、PortalDialogHost.vue、@/utils/loading.js、portalRoutes.js（均在 zhi2-web-admin/src/views/home/publicPortal 下）\n- 所属项目：门户；来源会话ID：session_8fedec701ebfbbfa2d3c0a93a4c98a27 及 2026-11-09 骨架屏接线会话；代码基线：none"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/项目事实/zhi2_web_admin_submodule.md",
+                "memory_type": "entities",
+                "before": "# zhi2-web-admin 子模块与门户部署结构\nzhi2-web-admin 是房产综合服务平台门户（父仓库「门户」）的 git 子模块，承载 Vue2 大屏前端代码，开发分支 develop/v2.6.2-portal。\n\n## 构建与部署\n- 部署目标为 nginx 8092 站点，root 为 D:/repository/门户/dist\n- 在子模块内执行 npm run build，产物直接输出到门户/dist 即部署目录，无需改 nginx 配置或重载\n- 构建产物含 AreaStructurePanel-*.js 等组件包\n- 根目录 market-monitor.standalone.html 为离线备用产物，非部署对象\n\n## 并行任务隔离\n- 主工作区可能存在并行任务的未提交改动（如 TradePanel.vue、BuyerOverviewPanel.vue、vite.config.js、public/version.json），改动时须避免夹带\n- 另有独立 worktree：zhi2-web-admin-wt-payfund/（支付类任务）、zhi2-web-admin-wt-noclicklink/\n- 迭代惯例：默认在主工作区就地修改、保持改动于 working tree（历史会话形成）；用户亦可选择仅提交自己的改动\n\n## 关键组件位置\n- 市场监管大屏「成交面积段结构」面板：src/views/property/marketMonitor/components/AreaStructurePanel.vue\n- 详情弹窗 DetailModalC 仍使用 data.js 的 commercialShare/existingShare 字段\n\n## 验证与归属\n- 所属项目：门户 / zhi2-web-admin\n- 来源会话：2026-11-09 房产大屏改动会话",
+                "after": "# zhi2-web-admin 子模块与门户部署结构\nzhi2-web-admin 是房产综合服务平台门户（父仓库「门户」）的 git 子模块，承载 Vue2 大屏前端代码，开发分支 develop/v2.6.2-portal。\n\n## 构建与部署\n- 部署目标为 nginx 8092 站点，root 为 D:/repository/门户/dist\n- 在子模块内执行 npm run build，产物直接输出到门户/dist 即部署目录，无需改 nginx 配置或重载\n- 构建产物含 AreaStructurePanel-*.js 等组件包\n- 根目录 market-monitor.standalone.html 为离线备用产物，非部署对象\n\n## 并行任务隔离\n- 主工作区可能存在并行任务的未提交改动（如 TradePanel.vue、BuyerOverviewPanel.vue、vite.config.js、public/version.json），改动时须避免夹带\n- 另有独立 worktree：zhi2-web-admin-wt-payfund/（支付类任务）、zhi2-web-admin-wt-noclicklink/、fix/portal-secondary-skeleton（2026-11-09 二级页骨架屏接线任务，基于 develop/v2.6.2-portal，构建通过，未触动其他任务 worktree）\n- 迭代惯例：默认在主工作区就地修改、保持改动于 working tree（历史会话形成）；用户亦可选择仅提交自己的改动\n\n## 关键组件位置\n- 市场监管大屏「成交面积段结构」面板：src/views/property/marketMonitor/components/AreaStructurePanel.vue\n- 详情弹窗 DetailModalC 仍使用 data.js 的 commercialShare/existingShare 字段\n\n## 验证与归属\n- 所属项目：门户 / zhi2-web-admin\n- 来源会话：2026-11-09 房产大屏改动会话"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

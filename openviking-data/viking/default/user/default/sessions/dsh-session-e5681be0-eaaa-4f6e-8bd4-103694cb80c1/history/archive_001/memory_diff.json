@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-e5681be0-eaaa-4f6e-8bd4-103694cb80c1/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T10:38:04.211948+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/zentao_bug/zentao_bug_6373.md",
+                "memory_type": "entities",
+                "after": "# ZenTao Bug 6373\nZenTao defect 6373: the attachment preview dialog on the 开发企业→企业基本信息 page cannot be closed by clicking the X button, under analysis on 2026-11-09.\n\n## Description\n- Module: 开发企业 → 企业基本信息 (same page as already-fixed bug 6363).\n- Symptom: clicking the X close button on the attachment preview dialog fails to close it.\n- Screenshot `关闭.gif` records the failed close attempt; first frame shows the 编辑页面 on 客户测试环境 58.210.252.230:9002; bug has no comments.\n\n## Investigation\n- Preview dialog chain: `DeveloperBasicInfoDetail.vue` → `AppendixPackageSection` → `AnnexUpload` → Vuex `preview` store module → `ImageViewer/index.vue`.\n- `ImageViewer/index.vue` uses a custom `v-dialogDrag` directive that attaches `mousedown` to the header where the X button lives; a buggy drag directive may swallow the X click.\n- Latest commit `a20c15dcc` touching `ImageViewer` added \"图片弹窗可拖动与伸缩\" (draggable/resizable popup) — strong suspect for the regression.\n\n## Status\n- Under analysis on 2026-11-09; root cause not yet confirmed, not yet fixed or resolved."
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷任务/zentao_bug_6358.md",
+                "memory_type": "entities",
+                "before": "# 禅道Bug 6358 菜单管理操作项截断\n房产管理系统zhi2-web-admin中系统管理→菜单管理页面的「操作」列按钮在奇安信(QAX)可信浏览器中被表格右边缘截断，已修复并合入develop/v3.0.0。\n\n## 基本信息与现象\n- Bug ID：6358，链接 http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6358；2026-11-09 会话提出，禅道已 resolved（效果「已实施待联调」，本机仅 Chrome 无法复现奇安信旧内核，需客测环境确认）\n- 页面：系统管理 → 菜单管理；「操作」列按钮（新增/编辑/删除）在表格右边缘被截断\n- 浏览器：奇安信(QAX)可信浏览器（旧 Chromium 内核，字体度量略大→列宽测量值偏大更易触发）\n- 操作列由 `zs-operate-column` 渲染，width 由 `zs-table` JS 计算（stretch/width 逻辑），非固定 CSS；操作列宽 ≈182px 足够 3 按钮，非换行问题\n\n## 根因与修复\n- 根因（机制 B）：`zs-table` 内容滚动模式给容器加 `.zs-table-container--content-scroll` 并把 `.el-table` 设 `width:max-content` 变宽；父级 `.list-card{overflow:hidden}` 裁掉变宽部分，右侧 fixed 操作列被窗口右缘截断且无滚动条；现代浏览器 contentScrollActive 不激活零影响\n- 修复：`zhi2-web-admin/src/components/zs-table/zs-table.vue` 的 `--content-scroll` 规则前新增 `.zs-table-container--content-scroll{overflow-x:auto;overflow-y:hidden}` 与子级 `.el-table{width:max-content;min-width:100%}`，改由容器自身承担横向滚动\n- 提交 `c838c35f2`（fix(zs-table): content-scroll 容器横向滚动，修复奇安信旧内核下操作列被裁断(禅道#6358)），已推送 `origin/fix/bug-6358`\n- `npm run build`（vite 8.3.5）退出码 0；产物 dist/assets/zs-table-Bn60CwI3.css 第 1 行含 `.zs-table-container--content-scroll[data-v-3388c7c3]{overflow-x:auto;overflow-y:hidden}`\n\n## 合入与推送\n- 子模块 zhi2-web-admin：develop/v3.0.0 先 ff 到 `200124782`（含 bug6363），再 merge fix/bug-6358 → merge commit `05a1a4421`，已推送\n- 父仓「苏州市房地产监测V3」（remote 实际 zhi3-web-admin-h5-g-unlimited）：初提交 `224b87d` 推送被拒（non-fast-forward），rebase 后在 `99f511e`/`956cdca` 之上以 `f2ea8cd` 更新 gitlink（指向 05a1a4421）并推送；再 `0245da5` docs 新增常见错误台账 E-045（docs/frontend/common-errors.md）并推送\n- 主工作区无关改动（`M env/.env`、8 个 eslint-rules/* 未提交删除、`.tmp-bug-6324.png`）经 git stash 暂存未触碰；eslint-rules 删除存于 zhi2-web-admin `stash@{0}` 未丢失未进 develop，既有 `stash@{1} temp-6235` 未触碰\n- worktree `zhi2-web-admin-wt-6358` 已删除，node_modules 软链已移除\n\n## 禅道回写与关联\n- zt_bug id=6358：status=resolved、resolution=fixed、resolvedBuild=trunk、resolvedBy=tiany、resolvedDate=2026-11-09 18:03:48、assignedTo=zhunan\n- zt_action id=89610：action=resolved、extra=fixed，备注含根因+修复+验证+提交号；DBX 事务内与提交后双校验落库\n- 关联系统：缺陷跟踪禅道（zentao-biz.zhi.com），数据查询新禅道（DBX）",
+                "after": "# 禅道Bug 6358 菜单管理操作项截断\nzhi2-web-admin 系统管理→菜单管理页「操作」列按钮在奇安信(QAX)可信浏览器被表格右边缘截断，已修复合入 develop/v3.0.0。\n\n## 现象\n- Bug 6358（http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6358），2026-11-09 提出，禅道 resolved（效果「已实施待联调」；本机 Chrome 无法复现奇安信旧内核，需客测确认）\n- 「操作」列（新增/编辑/删除）由 `zs-operate-column` 渲染，width 由 `zs-table` JS 计算（stretch/width），非固定 CSS，列宽≈182px 足够 3 按钮，非换行问题\n- 浏览器：奇安信(QAX)可信浏览器，旧 Chromium 内核，字体度量略大→列宽测量偏大更易触发\n\n## 根因与修复\n- 根因（机制 B）：`zs-table` 内容滚动模式加 `.zs-table-container--content-scroll` 并把 `.el-table` 设 `width:max-content` 变宽；父级 `.list-card{overflow:hidden}` 裁掉变宽部分，右侧 fixed 操作列被窗口右缘截断无滚动条；现代浏览器 contentScrollActive 不激活零影响\n- 修复：`zhi2-web-admin/src/components/zs-table/zs-table.vue` 新增 `.zs-table-container--content-scroll{overflow-x:auto;overflow-y:hidden}` 与子级 `.el-table{width:max-content;min-width:100%}`，容器自身承担横向滚动\n- 提交 `c838c35f2`（fix(zs-table): content-scroll 容器横向滚动，修复奇安信旧内核下操作列被裁断(禅道#6358)），推送 `origin/fix/bug-6358`；`npm run build`（vite 8.3.5）退出码 0，产物 dist/assets/zs-table-Bn60CwI3.css 第 1 行含 `.zs-table-container--content-scroll[data-v-3388c7c3]{overflow-x:auto;overflow-y:hidden}`\n\n## 合入与推送\n- 子模块 zhi2-web-admin：develop/v3.0.0 ff 到 `200124782`（含 bug6363）再 merge fix/bug-6358 → `05a1a4421`，已推送\n- 父仓「苏州市房地产监测V3」（remote 实际 zhi3-web-admin-h5-g-unlimited）：`224b87d` 推送被拒，rebase 后于 `99f511e`/`956cdca` 之上 `f2ea8cd` 更新 gitlink（指向 05a1a4421）；`0245da5` docs 新增台账 E-045（docs/frontend/common-errors.md）\n- 主工作区无关改动（`M env/.env`、8 个 eslint-rules/* 未提交删除、`.tmp-bug-6324.png`）git stash 暂存；eslint-rules 删除存于 zhi2-web-admin `stash@{0}`，既有 `stash@{1} temp-6235` 未触碰\n- worktree `zhi2-web-admin-wt-6358` 已删，node_modules 软链已移除\n\n## 禅道回写与关联\n- zt_bug 6358：status=resolved、resolution=fixed、resolvedBuild=trunk、resolvedBy=tiany、resolvedDate=2026-11-09 18:03:48、assignedTo=zhunan\n- zt_action 89610：action=resolved、extra=fixed，备注含根因+修复+验证+提交号；DBX 事务内与提交后双校验落库\n- 关联：缺陷跟踪禅道（zentao-biz.zhi.com），数据查询新禅道（DBX）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

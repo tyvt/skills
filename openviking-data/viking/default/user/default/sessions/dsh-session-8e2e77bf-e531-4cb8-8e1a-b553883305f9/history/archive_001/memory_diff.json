@@ -1,0 +1,48 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-8e2e77bf-e531-4cb8-8e1a-b553883305f9/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T10:31:50.621170+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/09/MMVP评测任务指派.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-09 要求助手搭建 MMVP 评测环境，并用 vlmeter 逐一测试 magpie 当前暴露的所有模型，最终给出结果清单。\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: ...第 4 步：读取自动生成的对比报告\nvlmeter 会在 results/ 下生成 Markdown 报告，总准确率、分任务准确率、错误样本明细并排列出，同时附有“成本与性能选型权衡表”。你可以直接用报告中的总准确率来横向排序你的一系列模型。\n\n把我准备这个任务需要的环境，然后把magpie目前暴露出来的模型逐一测试，给我一个结果清单"
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/09/magpie模型范围确认.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-09 要求测试 magpie 暴露的模型；助手查询 magpie /v1/models 端点，确认其暴露 13 个模型且全部支持图像输入，确定为本次 MMVP 评测对象。\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: ...第 4 步：读取自动生成的对比报告\nvlmeter 会在 results/ 下生成 Markdown 报告，总准确率、分任务准确率、错误样本明细并排列出，同时附有“成本与性能选型权衡表”。你可以直接用报告中的总准确率来横向排序你的一系列模型。\n\n把我准备这个任务需要的环境，然后把magpie目前暴露出来的模型逐一测试，给我一个结果清单\n...\n**assistant [peer=deepseek-harness-default-workspace]**: The VLM config points to a magpie service at `http://127.0.0.1:3425/v1` (OpenAI-compatible) with model `auto/hy3`. To find all models magpie currently exposes, let me query its `/v1/models` endpoint.\n**assistant [peer=deepseek-harness-default-workspace]**: The output is large. Let me extract a clean list of all model IDs and which ones support image input.\n**assistant [peer=deepseek-harness-default-workspace]**: All 13 magpie-exposed models support image input — those are the ones I'll test. Now let me check whether `vlmeter` is installable and whether HuggingFace is reachable for the MMVP dataset."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/09/全量模型评测启动.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-09 要求评测 magpie 模型；助手在验证流水线（vlmeter 安装、MMVP 经 hf-mirror 下载并转 JSONL、2 模型冒烟测试通过）后，后台启动对 magpie 全部 13 个图像模型逐一跑 MMVP 的评测，单模型并发设为 8 以匹配网关上限。\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: ...第 4 步：读取自动生成的对比报告\nvlmeter 会在 results/ 下生成 Markdown 报告，总准确率、分任务准确率、错误样本明细并排列出，同时附有“成本与性能选型权衡表”。你可以直接用报告中的总准确率来横向排序你的一系列模型。\n\n把我准备这个任务需要的环境，然后把magpie目前暴露出来的模型逐一测试，给我一个结果清单\n...\n**assistant [peer=deepseek-harness-default-workspace]**: End-to-end pipeline works (the trailing \"Event loop is closed\" lines are harmless Windows asyncio teardown warnings). Results are cached. Now let me check the `report` subcommand (to aggregate all 13 models at the end) and bump per-model concurrency to 8 for single-model runs.\n**assistant [peer=deepseek-harness-default-workspace]**: `vlmeter report --data ...` aggregates the cached per-model results — perfect for the final comparison. Before launching the full 13-model run, let me quickly confirm the reasoning/flash models (hy4, glm) actually return content (to avoid 120s timeout retries blowing up the run).\n**assistant [peer=deepseek-harness-default-workspace]**: Both reasoning/flash models return content quickly (~2.6s). The full pipeline is validated. Now let me launch the full 13-model run in the background, one model at a time (so total concurrency to magpie stays ≤8), resuming from the cached smoke-test results."
+            },
+            {
+                "uri": "viking://user/default/memories/entities/程序/vlmeter.md",
+                "memory_type": "entities",
+                "after": "# vlmeter\n\"准确率 × 成本\" VLM 评测流水线工具，支持一套数据同时评多个模型并自动出对比报告。\n\n## 基本信息\n- 版本 0.6.0，可通过 pip 安装\n- 原生支持 classification 任务（选项匹配），MMVP 的 A/B 选择题可直接转换为其数据格式\n- 支持 OpenAI 兼容接口、Anthropic、Google Gemini 以及 Ollama 本地模型，模型接入在 config/models.yaml 配置\n\n## 数据格式\n- 单题 JSONL 需 id、image、question、options、answer 字段\n- classification 评测为选项字母精确匹配，无需 judge\n\n## 命令行\n- 子命令：run（批量运行）、list-models、report（聚合缓存的逐模型结果生成对比报告）\n- run 通过 --models model-a,model-b 同时指定多模型，各模型并行（各自并发信号量）\n- 结果在 results/ 下生成 Markdown 报告：总准确率、分任务准确率、错误样本明细、成本与性能选型权衡表\n\n## 本次使用备注\n- 2026-11-09 用于评测 magpie 暴露的 13 个图像模型在 MMVP 上的配对准确率\n- 默认超时 120s；magpie 网关 max_concurrent=8，故总并发需 ≤8"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/数据集/mmvp.md",
+                "memory_type": "entities",
+                "after": "# MMVP\nMultimodal Visual Patterns benchmark，专探模型是否真\"看见\"细节的 VLM 评测数据集。\n\n## 基本信息\n- 含 300 张图 + Questions.csv 标注，每两题构成一对（第1&2、第3&4……），共 150 对\n- 每对图片在 CLIP 视觉空间高度相似，但存在方向、朝向、开闭、计数等关键差异，正确答案恰好相反\n- Questions.csv 四列：Index、Question、Options、Correct Answer\n- Options 实际格式为 \"(a) Open (b) Closed\"（小写字母括号包裹、行内），非 \"A.\" 行首\n\n## 获取方式\n- HuggingFace 数据集 MMVP/MMVP（https://huggingface.co/datasets/MMVP/MMVP）\n- 本机 HuggingFace 直连 DNS 可解析但 TCP 被阻断/限流，需用镜像 HF_ENDPOINT=https://hf-mirror.com 下载\n\n## 评测要点\n- 可计算更严格的配对准确率（pair_id = Index // 2）；若一系列模型配对准确率普遍偏低，说明视觉编码器存在系统性盲区"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/模型网关/magpie.md",
+                "memory_type": "entities",
+                "after": "# magpie\n本地模型网关（OpenAI 兼容），被 OpenViking 复用为 VLM 抽取与评测的模型代理。\n\n## 基本信息\n- 服务地址 http://127.0.0.1:3425/v1（OpenAI 兼容接口）\n- 在 OpenViking 配置 ~/.openviking/ov.conf 中引用，VLM 模型为 openai/auto/hy3\n- 网关 max_concurrent=8（并发上限）\n\n## 暴露模型\n- 2026-11-09 经 /v1/models 查询确认暴露 13 个模型，且全部支持图像输入（即本次 MMVP 评测对象）"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 6,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}
