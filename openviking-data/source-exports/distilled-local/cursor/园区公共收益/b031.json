@@ -1,0 +1,111 @@
+{
+ "project": "园区公共收益",
+ "batch": "031",
+ "files": [
+  "031.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "筹备组征集新增报名选择户室，列表视图是单选的，切到楼",
+   "type": "preference",
+   "content": "修复已完成，变更如下： ## 修改内容 ### 1. `BuildingTable.vue` - 新增 `singleChoice` prop（默认 `false`，不影响多选场景） - 单选模式下隐藏单元头复选框，避免批量勾选整单元 - 新增 `clearAllChecked()`，单选点选户室时先清除其他选中项 ### 2. `CandidateDialog.vue` - 新增 `enforceSingleChecked()`，同步列表前确保最多只有一条选中 - `syncListSelection()` 开头调用单选兜底 - `onCellClick()` 在列表视图下触发同步 - 统一 `checked` 为 `'1'` / `'0'` 字符串 ## 修复效果 | 场景 | 修复前 | 修复后 | |------|--------|--------| | 楼盘表勾选「1单元」 | 整单元所有户室被选中 | 单元复选框已隐藏，无法批量勾选 | | 楼盘表点选户室 | 可多选 | 互斥单选 | | 切回列表视图 | 多个选中 | 最多一条选中 | 多选场景（如 `DecisionRangeTable`）未传 `singleChoice`，默认 `false`，行为不变。 建议在页面上按以下步骤验证： 1. 列表视图单选 → 切楼盘表 → 点选户室 → 切回列表，确认只有一条 2",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`BuildingTable.vue",
+    "`CandidateDialog.vue",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\components\\BuildingTable.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\candidateCollect\\components\\CandidateDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "52f8bcba-f213-44d2-86e9-611498aa1a67"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "用户管理：新增或修改角色时，只显示如下的角色，没有显",
+   "type": "bug",
+   "content": "**问题原因** 用户管理详情页在加载角色下拉时，调用了 `/system/role/roles` 并传了 `roleType: '1'`，后端因此只返回「管理端」类型角色（社区、街道、区县、市级、管理单位等 5 个），而角色管理页中的 13 个有效角色包含多种 `roleType`，所以下拉列表不完整。 **修改内容** 在 `zhi2-web-admin/src/views/system/user/detail.vue` 中： 1. 新增 `loadRoleOptions()` 方法，调用 `/system/role/roles` 时**不再传** `roleType` 参数，由后端返回全部有效角色。 2. **新增**和**编辑**两种场景统一使用该方法加载角色列表。 请刷新页面后，在用户管理的新增/编辑页打开角色下拉，确认是否已显示角色管理中的全部有效角色。 --- **补充说明：** 若去掉 `roleType` 后接口仍只返回部分角色，则需要后端调整 `/system/role/roles` 接口逻辑（例如在未传 `roleType` 时返回所有 `status = 0` 的角色）。当前仓库只有前端代码，后端需单独排查。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`zhi2-web-admin/src/views/system/user/detail.vue",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\system\\user\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\system\\role\\index.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\system\\role\\detail.vue、d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\api\\flowable\\definition.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2227b821-282f-4858-9970-4b2a43f4aebd"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[Vue warn]: Error in v-on ",
+   "type": "fact",
+   "content": "已修复。 ## 问题原因 点击「物业管理区域名称」时会调用 `showPropertyProjectDialog`。在 **B 端**（`terminalType === 'B'`）下，打开选择弹窗前会同步解析「前往开户」「签署协议」两个跳转链接的路由： ```javascript getRouterPathByFilePath('benefit/pubRegulatoryAccount/detail') getRouterPathByFilePath('benefit/pubRegulatoryAgreement/detail') ``` `getRouterPathByFilePath` 在找不到对应菜单路由时会直接抛出 `Error: 没有找到路由`，导致弹窗还没打开就报错。当前账号很可能没有「监管账户开户」或「监管协议签署」的菜单权限。 ## 修复方案 1. 在 `ruoyi.js` 中新增 `getRouterPathByFilePathOptional`：找不到路由时返回 `null`，不抛错。 2. 在 `pubUseMoneyApply/detail.vue` 中改为：仅当路由存在时才加入 `extraLinks`；没有权限时仍显示提示文案，但不生成无效链接，弹窗可正常打开。 请重新编译/刷新页面后再试。若仍选不到物业管理区域，需要确认该账号下是否已有**已开户且签",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`ruoyi.js",
+    "`pubUseMoneyApply/detail.vue",
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubUseMoneyApply\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\utils\\ruoyi.js、d:\\repository\\园区公共收益\\zhi2-web-admin、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\components\\zs-select-dialog\\zs-select-dialog-func.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5922f357-1df8-46c0-8045-f0e84afd364d"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "支出合同备案新增选择物业管理区域，“街道”和“社区”",
+   "type": "bug",
+   "content": "已修复。 **原因：** 在 `pubExpenditureContract/detail.vue` 的「选择物业管理区域」弹窗里，街道、社区列直接绑定了 `subdistrict`、`community` 字段，接口返回的是编码（如 `320571053`），没有转成名称。 **修复：** 为这两列加上 `area` mixin 提供的格式化器（页面已通过 `detailMixins` 引入），与监管账户、资产租赁申请等模块一致： ```641:650:d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubExpenditureContract\\detail.vue { label: '街道', prop: 'subdistrict', formatter: this.subdistrictFormatter }, { label: '社区', prop: 'community', formatter: this.communityFormatter }, ``` 刷新页面后，新增支出合同备案时选择物业管理区域，街道和社区应显示为名称（如「湖西社工委」「星湖社区」），而不是数字编码。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`pubExpenditureContract/detail.vue",
+    "```641:650:d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubExpenditureContract\\detail.vue",
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubExpenditureContract\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubPaymentNotice\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fad5a385-6cf5-49cb-86a0-1abe38b27af6"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "停车泊位，产权类型选择了“公共车位”，列表字段“车位",
+   "type": "bug",
+   "content": "**问题原因** 列表里「车位类型」列通过全局的 `dictFormatter` 翻译，它会读取 `this.parkingSpaceTypeOptions` 做字典匹配。 选择「产权类型」筛选时，`onParkingSpaceTypeChange` 会把 `parkingSpaceTypeOptions` 改成对应子集字典（如公共车位 → `commonList`）。但表格格式化也依赖这个变量，于是产权车位的 `parkingSpaceType = \"1\"`（人防车位）在公共车位字典里找不到匹配项，就直接显示原始数字 `1`。 **修复方案** 将筛选下拉与表格翻译用的字典分开： - `parkingSpaceTypeOptions`：始终保留完整字典 `benefit_parking_type`，供列表列格式化使用 - `parkingSpaceTypeFilterOptions`：随产权类型变化，仅用于搜索条件下拉框 修改文件：`zhi2-web-admin/src/views/benefit/parkingSpace/index.vue` 刷新页面后，选择「公共车位」筛选时，列表中的「车位类型」应能正常显示「人防车位」等文字，而不会再变成 `1`。 另外，`pubParkingSpaceDetailChange/index.vue`（停车泊位变更）存在相同逻辑，如需一并修复",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "修改文件：`zhi2-web-admin/src/views/benefit/parkingSpace/index.vue",
+    "另外，`pubParkingSpaceDetailChange/index.vue",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\parkingSpace\\index.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubParkingSpace\\components\\parkingTable.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\mixins\\listMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8f234827-4934-41b5-9ea5-1d36dd635cc0"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "筹备组征集，新增保存后，报名信息这块先不用显示，待备",
+   "type": "bug",
+   "content": "已完成实现，修改文件：[`detail.vue`](zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue) **改动说明：** 1. 新增计算属性 `showCandidateTable`： - 新增模式：不显示 - 筹备组征集（`PREPARATORY_GROUP` + `COLLECT`）：仅 `bizState == 2`（已备案）时显示 - 其他场景（业委会征集、筹备组候选人确认等）：保持原逻辑，非新增即显示 2. 模板中将 `CandidateTable` 的 `v-if` 从 `formMode != 'add'` 改为 `showCandidateTable` **效果：** - 选择筹建申请并自动保存后，详情页只显示基本信息，不显示「报名信息」 - 待提交、审核中阶段同样隐藏 - 备案通过后，`getDetail` 刷新后 `bizState` 变为 2，报名信息区块自动出现 - 业委会征集、筹备组候选人确认不受影响 可在页面上按以下路径验证：筹备组征集 → 新增 → 选择筹建申请 → 保存后确认无报名信息 → 备案通过后确认出现。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "已完成实现，修改文件：[`detail.vue`](zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\candidateCollect\\components\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\candidateCollect\\components\\CandidateTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4686b4cc-9df1-4168-a0c5-e5e69fe7b2df"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  }
+ ],
+ "_draft": true
+}

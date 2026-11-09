@@ -1,0 +1,160 @@
+{
+ "project": "苏住房G",
+ "batch": 7,
+ "files": [
+  "025.md",
+  "026.md",
+  "027.md",
+  "028.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "title": "[苏房] zs-region-select 只认平台区划树里的编码，页面自带区划值时 el-select 找不到 label 会直接回显 6 位数字",
+   "type": "bug",
+   "content": "什么情况：机构授权/系统配置类新增页的「行政区域」在列表左侧树里选好区、跳到新增页只读展示，改用 zs-region-select 后输入框里出现 320505 这种 6 位编码，用户连问「regionCode 没值、组件不是 zs-region-select 吗」。\n为什么：zs-region-select 的选项来自平台配置的 areas 树（当前账号能选的范围），不是该页携带的区划。当 form.regionCode=320505 而 regionOptions 里没有这一项时，el-select 拿不到匹配 option 的 label，就把原始值当文本显示——组件确实挂上了，是数据源不匹配，不是绑定写错。\n怎么做：这类「区划由上游页面决定、本页只读」的场景不要用 zs-region-select，改用 zs-select + 按当前数据即时生成的选项数组（regionDisplayOptions = [{ dictValue: regionCode, dictLabel: regionName || 反查 allAreas 得到的名称 }]），配 disabled，同时把 regionName 一并补全，保证保存时编码仍有值。反过来，需要用户自己选区的表单页才用 zs-region-select（069e9d4 后该组件值语义已统一为区划编码）。验收口径：disabled 状态下应显示「高新区」而不是数字。",
+   "evidence": "会话 99982c86-0783-4c2e-a90e-818364f2c016（基线 f4fae14）：用户诉求「dev tool 里面显示 regionCode 没有值，regionName 有值，为什么没值呢，这个组件不是 zs-region-select」「回显成数字了，没用组件？」；最终结论判定组件已挂载但选项源不含该区划，改为 zs-select + regionDisplayOptions 并同步补 regionName。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/system/regionBankAuth/detail.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/system/regionBankAuth/utils.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/components/zs-region-select/zs-region-select.vue"
+   ],
+   "baseline": "f4fae14",
+   "sessionIds": [
+    "99982c86-0783-4c2e-a90e-818364f2c016"
+   ],
+   "bundle": "026.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 「鼠标移入才显示」类滚动条需求必须落到 styles/index.scss 的全局规则，且横向单独放宽：hover 选择器管的是轨道附近而非整表",
+   "type": "bug",
+   "content": "什么情况：用户要求表格横向滚动条始终显示，现状是鼠标移到滚动条附近才出现、移入表头或单元格就不亮。\n为什么：样式写在 .el-table__body-wrapper:hover::-webkit-scrollbar-thumb 这类规则上，Chromium 里只有指针真的落在滚动条轨道/滑块附近才算 hover 命中，指针在表体其它位置（或表头、固定列）时滑块仍是透明，视觉上就是「只有靠近滚动条才显示」。\n怎么做：在 styles/index.scss 既有 hover 滚动条规则之后追加表格专用块：.el-table__body-wrapper 与 .el-table__header-wrapper 的 ::-webkit-scrollbar 横向轨道保持 10px（与全站一致），横向滑块 ::-webkit-scrollbar-thumb:horizontal 在非 hover 态也给 rgba(0,0,0,0.2)，不留 transparent；纵向继续沿用原 hover 规则，避免整页纵向滚动条常显变得嘈杂。因为选择器挂在类上，所有走 zs-table / el-table 的列表一次生效，不要逐页加 scoped 样式。已知边界：:horizontal 伪类只在 Chromium/Edge 生效，Firefox 要横向常显得另加 scrollbar-color，而该属性同时影响纵向，属于需要产品确认的取舍。",
+   "evidence": "会话 b7218710-2b70-418a-9494-7179936aca1c（基线 9e5c499）：用户诉求「现在 table 的横向滚动条要鼠标移入才展示，改为始终展示」；最终结论在 src/styles/index.scss 的全局 hover 规则之后追加表格横向轨道/滑块规则，并说明纵向仍保留 hover 显隐、Firefox 需另行处理。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/styles/index.scss",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/system/regionBankAuth/index.vue"
+   ],
+   "baseline": "9e5c499",
+   "sessionIds": [
+    "b7218710-2b70-418a-9494-7179936aca1c"
+   ],
+   "bundle": "026.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 同名列表两套接口：pageNew 支持高级筛选但分页不全，必须按「有没有高级筛选条件」分流，不能全量切过去",
+   "type": "bug",
+   "content": "什么情况：公共信息—物业管理区域信息列表每页设 10 条却只显示 1 条。\n为什么：为支持高级筛选，把该页所有列表请求统一改成 POST /property/complex/pageNew。该接口对普通查询的分页不可靠——响应里 pageSize 仍是 10、total 也看着正常，但 list 只回 1 条，前端按常规渲染就只出一行，且不会报错，很难从控制台看出问题。\n怎么做：按场景选接口——未使用高级筛选时走 GET /property/complex/page（常规分页），仅当 conditionGroups/高级筛选条件非空时才走 pageNew。判定条件要显式写在取数方法里（读高级筛选面板的已选条件），不要用「接口有就都调」的思路顺手全切。排查同类「总数对、行数少」问题时，先确认是不是同一个列表挂了两套分页接口，而不是先怀疑 pageSize 或 zs-pagination 传参。",
+   "evidence": "会话 8bdf9717-be50-4471-8d56-923d2b2d1c5a（基线 f78f7e7）：用户报「公共信息—物业管理区域信息列表中设置每页 10 条，但一页只显示了一条」；最终结论指出近期改动让所有列表请求都走 pageNew 而其分页异常，改回按场景分流。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/publicQuery/complex/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/mixins/listMixins.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/complex/index.vue"
+   ],
+   "baseline": "f78f7e7",
+   "sessionIds": [
+    "8bdf9717-be50-4471-8d56-923d2b2d1c5a"
+   ],
+   "bundle": "026.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 弹窗内表格写死像素列宽，弹窗加宽后不会跟着拉伸：改 minmax(160px, 1fr) 并把输入组宽度交给列",
+   "type": "bug",
+   "content": "什么情况：申报缴费信息弹窗里字段宽度过大、表头与内容对不齐，加宽弹窗后右侧仍然留白、金额输入框依旧偏窄，用户连问三次「为什么不撑满」。\n为什么：表格列宽写的是固定像素（如 140px），容器变宽时列宽不变，多出来的空间全堆在右侧；同时金额输入框用 el-input-group（带「元」后缀）时宽度只跟自身列宽走，列不涨就永远窄。\n怎么做：表格容器改 width:100%，列定义从固定像素换成比例：最小可用宽度用 minmax(160px, 1fr)（金额列按需保持 160px 下限），让各列随弹窗宽度均分剩余空间；再补 .el-input-group 的宽度规则让带后缀的金额控件也占满整列。顺序上先定容器（弹窗宽度走公共 zs-dialog 的 form-layout 档位），再定列比例，最后修控件宽度，只改控件宽度是压不出空间的。验收：把弹窗拉宽，表头与单元格始终对齐、右侧无留白。",
+   "evidence": "会话 8525228c-2b22-446b-8331-dab8cb3dcb1a（基线 e590ffa）：用户依次反馈「字段宽度太大导致表头和字段没有对齐」「卡片高度再大一些」「宽度大一些，弹窗宽一些」「弹窗用公共组件」「为什么不撑满，金额输入框还是有点窄」；最终把固定 px 列宽改为 minmax + 容器 width:100% + 补 .el-input-group 样式。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/components/feeBindScopeTable.vue"
+   ],
+   "baseline": "e590ffa",
+   "sessionIds": [
+    "8525228c-2b22-446b-8331-dab8cb3dcb1a"
+   ],
+   "bundle": "026.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 列表新增「最近备案结果」类字段：字典只给真实枚举，缺省态（未备案）要用 none 伪值前端追加，且兜底配置缺项要自动补齐",
+   "type": "pattern",
+   "content": "什么情况：物业管理区域列表要新增「管理主体」「收费方式」两列 + 一个筛选。管理主体取共有资金-管理主体，展示最新完成备案的类型，未备案为空；筛选要 4 个枚举（物业服务企业/业委会/物管会/未备案），而后端字典 benefit_management_subject 只有 0/1/2 三个真实值。\n为什么：「未备案」不是备案状态，是人没有记录，字典里天然没有这一项；如果等字典补，同一个字段就会有「字典值 + 空值」两套语义表达，展示层和筛选层的逻辑还会分叉。\n怎么做：① 页面加载 benefit_management_subject 后，判断无 none 就追加 { dictValue:'none', dictLabel:'未备案' }，筛选参数 name=managementSubject、value 取 0|1|2|none；② 高级筛选字段配置（complexFieldConfig.js）新增 managementSubject 单选 + EQ 运算符，并在 DEFAULT_COMPLEX_FIELDS 里加同名兜底项，这样即使后端 complex_field 返回缺项或字典加载失败，筛选项也不会凭空消失；③ 列表列：管理主体直接渲染后端文本 managementSubjectName（未备案为空、不显示占位符），收费方式走全局 dictFormatter + 已有 property_charging_method 选项；④ 新返回字段与筛选字段要写进后端联调说明（pageNew 返回 chargeMethod/managementSubjectName，并支持 field=managementSubject 过滤）。",
+   "evidence": "会话 579a0b70-5ca8-42fa-86cb-0af96a7205d9（基线 ad5bbd9）：用户给出「管理主体取共有资金-管理主体，未备案为空」「管理主体查询包含字典 benefit_management_subject（业委会 0、物业服务企业 1、物管会 2）以及固定添加未备案(none)」；最终结论在页面追加 none 项、advancedSelectOptionsMap 注册、complex_field 缺项自动补「管理主体」，并输出 docs/complex-pageNew-backend-handoff.md。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/publicQuery/complex/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/components/zs-advanced-query/complexFieldConfig.js",
+    "d:/repository/苏住房G/zhi2-web-admin/docs/complex-pageNew-backend-handoff.md"
+   ],
+   "baseline": "ad5bbd9",
+   "sessionIds": [
+    "579a0b70-5ca8-42fa-86cb-0af96a7205d9"
+   ],
+   "bundle": "026.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 统计字段对接后端 VO 时按字段名一一对齐，逐项写兼容旧字段的兜底与本地计算回落",
+   "type": "pattern",
+   "content": "什么情况：物业费申报详情要新增总面积、已缴户数、未缴户数、物业费收缴率四类统计展示，后端直接给了 VO 字段清单（totalHouseholds/paidHouseholds/unpaidHouseholds/collectionRate/totalArea）。\n为什么：早期页面用的是 oweHouseSum 这类旧字段，且收缴率有可能是前端按「实收/应收」自己算的。若直接换成新字段，后端某环境还没升级时统计区会整块变空；若继续读旧字段则拿不到后端已经算好的精确口径。\n怎么做：建一张「显示名称 → 后端字段」对照表，页面只以这张表为准绑定：本次申报户数 = totalHouseholds（缺失时回落旧字段 oweHouseSum）、总面积 = totalArea、已缴/未缴户数 = paidHouseholds/unpaidHouseholds、物业费收缴率 = collectionRate（接口未返回时才用实收金额/应收金额 ×100% 本地兜底）。数据来源固定为两处：详情接口 response.data 合并进表单 + queryOweFeeStatistic 返回时覆盖对应字段，二者顺序不能反，避免统计接口的旧值盖掉详情新值。改完刷新详情页逐项核对数值，不要只验有无。",
+   "evidence": "会话 eaff5bf3-1e81-45b7-9600-20eebd931629（基线 f78f7e7）：用户先提「新增统计字段：总面积、已缴户数、未缴户数、物业费收缴率（实收/应收*100%）」，随后贴出后端 VO 字段定义；最终结论给出显示名与后端字段的对照表及两级兜底。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/detail.vue"
+   ],
+   "baseline": "f78f7e7",
+   "sessionIds": [
+    "eaff5bf3-1e81-45b7-9600-20eebd931629"
+   ],
+   "bundle": "026.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "统计卡片内「指标块 + 数值块」的双层嵌套：块显式写 height:100% 才能等高分栏，指标块用 flex-direction:column 让多个数值横排",
+   "type": "pattern",
+   "content": "场景：详情页顶部一排统计卡片，每张卡要「浅色底 + 细边框 + 圆角」，底部还要横向并列若干个指标子块（标签在上、数值在下，字号加大加粗），且不同卡片的子块高度必须一致。\n\n为什么：这类卡片通常是「卡片 → 子块行（flex，子块 flex:1）→ 子块（padding + 背景 + 圆角）→ 标签/数值（flex 纵向 + 居中）」的四层结构。第三层的块是第二层的 flex 子项，默认 height:auto 只由内容撑开；而第四层又要在块内 flex 纵向居中，一旦块没有确定高度，纵向居中基准就变成内容自身高度——所有块都紧贴自己的内容高度，高度差会直接暴露出来（含边框时更明显，看起来像错位）。\n\n怎么做：① 子块显式声明 height:100%，让块吃到父行的高度；② 子块内部用 display:flex + flex-direction:column + align-items:center + justify-content:center，把「标签 → 数值」纵向居中；③ 多个数值（行/户）并排时在块内再加一层横向 flex，不要写死宽度或 float；④ 整卡与子块用同色系两档深浅（外层浅、内层略深）保证区分度，不要靠加深阴影。这是四层层级本身带来的必然约束，任何统计卡片用同一结构都要先加 height:100%，再调字号与色值，顺序反了会反复出现「看着不像」。",
+   "evidence": "用户三轮反馈：①「参考设计图调整详情页统计卡片」（给出收缴率计算公式与悬浮提示文案）；②「你这做的和设计图差距太大了吧，第一张是现在的效果，第二张是设计图，要求UI100%还原设计稿」；③「如图，卡片内的布局UI差异还是比较大」。最终结论：「底部三个独立子卡片：替换原来的通栏底栏，每项指标为独立圆角块，标签和数值均居中」「指标数值字号加大至 16px、加粗」。会话中改动集中在 views/property/feeDeclare2/detail.vue 与 components/feeBindScopeTable.vue，涉及 z-index 无关的纯布局层级问题。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/detail.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/components/feeBindScopeTable.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/index.vue"
+   ],
+   "baseline": "fb3e960",
+   "sessionIds": [
+    "bdac3433-a0bc-4d7d-95c4-8c729d67f294"
+   ],
+   "bundle": "027.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "详情页统计率类指标的口径：分母取「接口返回的总数聚合字段」而非列表长度，空/0 分母显式回退为 0.00 并禁止除零",
+   "type": "pattern",
+   "content": "场景：物业管理类详情页顶部要展示「户室收缴率 = 已缴户数 / 本次申报总户数 × 100%」「资金收缴率 = 累计实收金额 / 累计应收金额 × 100%」，都要求保留两位小数，并配悬浮提示写明公式。\n\n为什么：这个页面同时挂了收费范围子表（房屋明细）与主表聚合字段。开发时最容易写成分母取子表 tableData.length——子表是有分页/筛选的局部数据，与「本次申报总户数」不是同一口径，一旦页面按条件过滤过房屋，比率就会明显偏大或偏小；金额侧若用列表行金额累加，也会漏掉减免/抵扣行。此外分母为 0（新建单还没绑房屋）时裸做除法会得到 NaN/Infinity，显示成「NaN%」。\n\n怎么做：① 分子分母都取接口下发的聚合字段（已缴户数、总户数、累计实收、累计应收），不要用列表长度或行内累加二次派生；② 统一写一个 rate(numerator, denominator) 纯函数：!denominator 或分母非正数时返回 0，否则 toFixed(2)；③ 悬浮提示文案与公式要和产品给的文字逐字一致，把公式放在 title/提示组件里而不是另起一行小字；④ 比率与金额、户数共用同一批字段时，注意 0 是有效值（已收 0 元也要显示 0.00，不能显示 -）。",
+   "evidence": "用户诉求 1 原文：「参考设计图调整详情页统计卡片。户室收缴率：已缴户数/本次申报总户数× 100%，保留两位小数，悬浮提示\"户室收缴率=已缴户数/本次申报总户数× 100%\"；资金收缴率：累计实收金额/累计应收金额× 100%，保留两位小数，悬浮提示\"累计实收金…」。会话改动落在 feeDeclare2/detail.vue（统计卡片）与 index.vue（列表），基线 fb3e960。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/detail.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/publicQuery/complex/components/regulatoryAccountPanel.vue"
+   ],
+   "baseline": "fb3e960",
+   "sessionIds": [
+    "bdac3433-a0bc-4d7d-95c4-8c729d67f294"
+   ],
+   "bundle": "027.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "行选中能力带反义标识时（reserve-selection）：reserve-selection 会让行对象快照字段滞后的实战坑",
+   "type": "bug",
+   "content": "场景：saas 后台列表（经营用房租赁合同备案）用 el-table 的 reserve-selection 保留跨页勾选，勾选已备案的预警合同后点「忽略预警」提示「请选择合同」。\n为什么：reserve-selection 按 row-key 缓存的是勾选那一行的对象快照，行数据被重新查询/替换后，选中项里那份对象不会随 tableData 同步刷新；直接拿 selection 里的行读 whetherWarning / 主键，会读到旧值或空值。\n怎么做：①统一抽一个判定函数（isWarningContract），把后端可能返回的 1 / '1' / true 三种形态归一，不要再在多处各写 row.whetherWarning == 1（V3 的 zs-table/el-table 布尔与数字混用是常态）；②取数时以 tableData 为准回查：按 primaryKey 在 tableData 里 find 出最新行，再在最新行上做过滤与提交，不要直接用 selection 里的旧对象；③选中项里无预警合同时把「忽略预警」按钮置 disabled，减少误点；④可勾选性判断（isSelectable）与行样式（setRowStyle 的橙色预警底）必须共用同一个判定函数，否则会出现「能勾但不高亮」的不一致。\n补充：已备案行若因为「已备案不可编辑」被整行禁用勾选，需区分「可勾选但操作受限」与「不可勾选」两类，用户明确要求预警合同即使已备案也必须能勾选。",
+   "evidence": "会话 7960611d：用户报「经营用房租赁合同：已备案的合同，不能选，选忽略预警时提示请选择合同」；最终结论新增 isWarningContract(row) 归一 whetherWarning 的 1/'1'/true，isSelectable/setRowStyle 改为调用它，「从 tableData 按 revenueContractId 取最新行再过滤，避免 reserve-selection 导致字段不同步」，无预警时忽略预警按钮 disabled。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/index.vue"
+   ],
+   "baseline": "320507d",
+   "sessionIds": [
+    "7960611d-0d3b-4ae8-a217-98664ba2c7a2"
+   ],
+   "bundle": "028.md",
+   "project": "苏住房G"
+  }
+ ]
+}

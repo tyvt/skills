@@ -1,0 +1,79 @@
+{
+ "project": "产品2.0",
+ "batch": "038",
+ "files": [
+  "038.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "这个接口的入参和响应发一下",
+   "type": "bug",
+   "content": "已修复，4 个用例全部通过。 **改动说明：** 1. 在 `auth-helpers.js` 新增 `buildApiRequestHeaders(page)` - 先从 Cookie 同步 `Admin-Token` 到 `sessionStorage` - 再为 `page.request` 补上 `Authorization: Bearer <token>` 2. 以下调用改为使用该 helper： - `fetchOwnCompanyPendingInfo` - `fetchLastChangeId` - `assertCompanyPortalReady` **原因：** `page.request` 不会自动带上浏览器 `sessionStorage` 里的 Token，导致后端返回「服务器异常」。 **验证结果：** 完整流程 4/4 通过，用例 04 从失败变为 35s 通过。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`auth-helpers.js",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\fixtures\\company-helpers.js、d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\company\\company-record-change.spec.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3111df9a-32f8-4a19-9e72-e8ecba17ca9c"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "1、资产变更模块中，经营用房变更、资产部位变更、停车",
+   "type": "bug",
+   "content": "已统一修复资产变更模块下三个列表页的表格样式问题。 ## 问题原因 截图中的「缺少外边框」是因为表格区域未使用 `list-card` 容器。该容器在全局样式中定义了外边框： ```381:386:d:/repository/产品2.0/zhi2-web-admin/src/styles/index.scss .list-card { border: 1px solid #f0f0f0; border-radius: 8px; padding: 0 8px; overflow: hidden; box-sizing: border-box; ``` 三个页面对比如下： | 页面 | 修复前 | |------|--------| | 经营用房变更 (`pubHouseDetailChange`) | 缺少 `list-card`，表格无外边框 | | 资产部位变更 (`pubHousePartChange`) | 已有 `list-card` | | 停车泊位变更 (`pubParkingSpaceDetailChange`) | 已有 `list-card`，但缺少 `v-loading` | 左侧树节点高度 32px 已在共用的 `RegionTreeLayout` 组件中配置，三个页面均生效，无需单独修改。 ## 修改内容 1. **经营用房变更**：将操作按钮、表格、分页统",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "```381:386:d:/repository/产品2.0/zhi2-web-admin/src/styles/index.scss",
+    "涉及文件：d:/repository/产品2.0/zhi2-web-admin、d:/repository/产品2.0、d:/repository/产品2.0/zhi2-web-admin/src/views/benefit、d:/repository/产品2.0/zhi2-web-admin/src/api/benefit、d:/repository/产品2.0/zhi2-web-admin/src/views/benefit/pubParkingRate/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "97b1025a-9dba-4821-8e14-0be39a728d87"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "按照图片里面的标注修复问题",
+   "type": "fact",
+   "content": "已根据图片标注完成 4 处修复，说明如下： ### 1. 资金缴款列表 — 缺少小计合计 在 `pubPaymentNotice/index.vue` 中开启 `showSummary: true`。页面已有 `showMethod` 合计逻辑，此前因 `showSummary` 默认为 `false` 未显示。表格底部会展示「小计」，并汇总「通知书金额」「已缴款金额」。 ### 2. 资金缴款详情 — 居中对齐 在 `pubPaymentNotice/detail.vue` 中，将「通知书金额」「通知书有效日期」设为 `align: 'center'`、`labelAlign: 'center'`。 在 `DetailTemplate` 中补充 `labelAlign` 支持，并处理带按钮字段居中时的布局。 ### 3. 人工记账列表 — 关键字 placeholder 颜色异常 在 `pubManualBookkeeping/index.vue` 中为关键字搜索项补充 `attrs.placeholder: '请输入关键字'`，与其他搜索项一致，placeholder 显示为正常灰色。 ### 4. 人工记账详情 — 去掉底部多余白块 缴款信息表格底部「合计」行右侧，固定操作列会多出一个 `el-table__fixed-right-patch` 白块。 在 `index.sc",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`pubPaymentNotice/index.vue",
+    "`pubPaymentNotice/detail.vue",
+    "`pubManualBookkeeping/index.vue",
+    "`index.scss"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5ec6511f-7bd3-4005-a984-83b775525513"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "房屋质量保证- 房屋质量保证金协议，详情页协议状态显",
+   "type": "bug",
+   "content": "**问题原因** 详情页加载的字典类型是 `mf_guarantee_agreement_state`，该字典在系统中**没有数据**（接口返回空数组）。找不到对应标签时，`dict-tag` 会直接显示原始值 `0`。 列表页能正常显示，是因为表格列 `agreementState` 会按字段名自动加载 `agreement_state` 字典（`0`→待生效、`1`→已生效、`2`→已终止），与详情页用的不是同一个字典。 **修复内容** 将以下文件中的字典类型统一改为 `agreement_state`： - `guaranteeDepositAgreement/detail.vue`（详情页） - `guaranteeDepositAgreement/index.vue`（列表筛选） - `guaranteeDepositAgreementEnd/detail.vue` - `guaranteeDepositAgreementEnd/index.vue` 刷新页面后，详情页「协议状态」应显示为「待生效」「已生效」等文字标签，而不是数字。 另外，截图里「签订日期」显示为 `2026-07-21T00:00:00.000+08:00`，是因为当前用了 `type: 'text'`。如需格式化为 `2026-07-21`，可以把该字段改为 `type: 'datetime'`。需",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`guaranteeDepositAgreement/detail.vue",
+    "`guaranteeDepositAgreement/index.vue",
+    "`guaranteeDepositAgreementEnd/detail.vue",
+    "`guaranteeDepositAgreementEnd/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "654476f2-c8c2-4687-a36b-cfc42a35337b"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

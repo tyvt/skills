@@ -1,0 +1,117 @@
+{
+ "project": "产品2.0",
+ "batch": "075",
+ "files": [
+  "075.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "构建失败是因为 buildingTable.vue ",
+   "type": "bug",
+   "content": "构建失败是因为 `buildingTable.vue` 的导入路径写错了。 **原因：** `projectManagement/buildland/detail.vue` 引用了不存在的路径： ```164:164:zhi2-web-admin/src/views/projectManagement/buildland/detail.vue import buildingTable from '../project/components/buildingTable.vue' ``` 该路径会解析到 `projectManagement/project/components/buildingTable.vue`，但这里并没有这个文件。实际组件在 `src/views/building/project/components/buildingTable.vue`，且支持 `landPlotId` 属性。 **修复：** 已将导入改为： ```javascript import buildingTable from '@/views/building/project/components/buildingTable.vue' ``` 这个 `buildingTable` 解析错误已消除。重新构建后出现了另一个无关错误：缺少图片资源 `src/assets/images/down.png`",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`buildingTable.vue",
+    "`projectManagement/buildland/detail.vue",
+    "```164:164:zhi2-web-admin/src/views/projectManagement/buildland/detail.vue",
+    "'../project/components/buildingTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a4b83bc3-a943-4439-b513-3c52d63c3302"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "模拟的小区点不显示了@zhi2-web-admin/",
+   "type": "preference",
+   "content": "已把“模拟小区点不显示”这块做了兼容修复，核心是把经纬度字段统一和数值化，避免被过滤掉或打点失败。 改动在这两个文件： - `zhi2-web-admin/src/views/benefit/statisticsMap/index.vue` - `normalizeProjectList` 现在会同时兼容 `latitude/longitude` 和 `lat/lng` - 经纬度统一 `Number(...)`，只保留有效坐标（`Number.isFinite`） - 补了 `projectName` 兜底（`projectName/leaseProjectName/name`），避免标签没文字 - 初始 `mapPosition` 改为数值类型，消除类型不一致问题 - `zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue` - 打点前再次兼容两套字段并转数值 - 非法经纬度直接跳过，避免整次渲染异常 你现在刷新 `statisticsMap` 页面看下，小区模拟点应该会恢复显示。 如果还没出来，我下一步会继续沿着这条链路排查（`mockApi` 返回内容 + 地图 SDK 脚本加载状态）并直接给你补丁。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`zhi2-web-admin/src/views/benefit/statisticsMap/index.vue",
+    "`zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue",
+    "涉及文件：D:/repository/产品2.0/zhi2-web-admin/src/views/benefit/statisticsMap、D:/repository/产品2.0/zhi2-web-admin/src/views/benefit/statisticsMap/mock.js、D:/repository/产品2.0/zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue、D:/repository/产品2.0/zhi2-web-admin/src/views/benefit/statisticsMap/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4e071976-4604-4c8f-972d-87c97674c807"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "引用路径修改",
+   "type": "bug",
+   "content": "已完成你这个位置的引用路径调整。 修改内容： - `zhi2-web-admin/src/views/benefit/leaseApply/detail.vue` - `import subVenueTable from \"@/views/benefit/pubUseMoneyApply/components/subVenueTable.vue\";` - 改为 `import subVenueTable from \"@/views/benefit/leaseApply/components/subVenueTable.vue\";` 这次修改后，之前“找不到模块 subVenueTable”的那条错误会消失。其余剩下的是文件内原有的 TS 类型报错，和这次路径修改无关。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`zhi2-web-admin/src/views/benefit/leaseApply/detail.vue",
+    "\"@/views/benefit/pubUseMoneyApply/components/subVenueTable.vue",
+    "\"@/views/benefit/leaseApply/components/subVenueTable.vue",
+    "涉及文件：D:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\leaseApply\\detail.vue、D:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\leaseApply\\components\\subVenueTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e9d0317f-8909-475d-8300-5760a17efba4"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "改为跳转到设施设备详情，参考其他功能",
+   "type": "bug",
+   "content": "已按维修列表等页面的写法改好了，变更如下。 ### 1. 引入路由工具 ```4:4:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\scrappedRecord\\index.vue import { getRouterPathByFilePath } from '@/utils/ruoyi' ``` ### 2. 「设施设备名称」列改为走设施设备详情 ```67:67:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\scrappedRecord\\index.vue { type: 'link', label: '设施设备名称', prop: 'facilityName', minWidth: 160, function: this.handleViewFacility }, ``` ### 3. 新增 `handleViewFacility` 与 `maintenance/repair/index.vue`、`planBid/components/maintenanceApplyTable.vue` 等一致：用 `row.facilityId` 跳到 `maintenance/facility/detail`，并带 `formMode: 'vie",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "```4:4:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\scrappedRecord\\index.vue",
+    "```67:67:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\scrappedRecord\\index.vue",
+    "`maintenance/repair/index.vue`、`planBid/components/maintenanceApplyTable.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\scrappedRecord\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\listMixins.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\scrappedRecord\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "71a2b0ad-3e39-4680-9567-9bb5c7e84b89"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "[Vue warn]: Property or me",
+   "type": "bug",
+   "content": "问题已修复。 **原因：** `ListTemplate.js` 模板中绑定了 `:row-style=\"tableRowStyle\"`，但 `table.js` mixin 里没有定义 `tableRowStyle`。`parkingTable.vue` 通过 `subTableMixins` → `table` 使用该模板，因此渲染时报错。 **修复：** 在 `table.js` 的 `computed` 中增加默认的 `tableRowStyle`，返回 `null`（`zs-table` 在无自定义行样式时会使用默认样式）。需要自定义行样式的页面可以重写该计算属性。 刷新页面后，`PubParkingSpaceDetail` 的警告应已消失。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`ListTemplate.js",
+    "`table.js",
+    "`tableRowStyle`。`parkingTable.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\components\\parkingTable.vue、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\subTableMixins.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\ListTemplate.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9acb00ce-4277-4a60-97c9-c4001384dfcd"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "移除冗余的变量和函数",
+   "type": "preference",
+   "content": "已在 `detail.vue` 里做完一轮「只删冗余、不改行为」的整理，说明如下。 ### 已移除 / 简化内容 1. **重复混入 `area`** `detailMixins` 里已经 `mixins: [form, area]`，本页再写 `area` 只会重复合并。已去掉 `import area` 与 `mixins: [detailMixins, area]` 中的第二份 `area`，改为只保留 `mixins: [detailMixins]`。 **`currentRegionCode` / `currentSubdistrictCode` 仍保留**：它们覆盖 `area` 里默认的 `regionCode` / `subdistrictCode`，与本页 `form.region`、`form.subdistrict` 一致，不能删。 2. **`data` 里的 `originForm`** `form` mixin（经 `detailMixins`）已声明 `originForm`，本页再写一遍是重复的，已删。 3. **`contentInfo2` / `contentInfo3` 末尾的 `.filter(...)`** 这两项里没有任何 `visible` 字段，过滤恒为「全保留」，已改为直接返回数组。 4. **`form.region` 的 `wa",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`detail.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\building\\project\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\area.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\detailMixins.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\form.js",
+    "@zhi2-web-admin/src/views/building/project/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "61def959-83e3-4215-8e69-6489f5d1ff6f"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

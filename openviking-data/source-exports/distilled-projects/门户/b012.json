@@ -1,0 +1,330 @@
+{
+ "project": "门户",
+ "batch": 12,
+ "files": [
+  "045.md",
+  "046.md",
+  "047.md",
+  "048.md"
+ ],
+ "count": 20,
+ "memories": [
+  {
+   "title": "门户首页 top-row 与 bottom-row 列宽模型不一致导致上下栏不对齐",
+   "type": "pattern",
+   "content": "index-new 业务中心顶栏使用 `grid-template-columns: max-content minmax(359px, 1fr)`，宽度由流程区 intrinsic 决定；底栏仍为 `665fr / 359fr`。左右分界（业务中心↔待办、常用功能↔公告）不再共用同一比例，设计稿 1024 下右侧栏宽也容易与底栏 359 比例不一致。若产品要求上下栏线对齐，需统一两行列宽模型（例如顶栏也采用与底栏一致的 fr 比例，或对业务区 `minmax(0, …)` + 内部滚动），而不是只改 flow-steps 宽度。",
+   "evidence": "会话结论标为 [HIGH]：`top-row` 为 max-content + minmax(359, 1fr)，`bottom-row` 仍为 665fr/359fr，左右边界不再共用同一比例。",
+   "files": [
+    "src/views/home/index-new.vue",
+    "src/layout/index.vue"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "0a743a90-328f-4c94-9f35-0f8b4f911423"
+   ],
+   "bundle": "045.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户首页 width:max-content 流程区依赖 layout 横向滚动，max-width:100% 挡不住 intrinsic 最小宽",
+   "type": "pattern",
+   "content": "`.home-new` / `.top-row` 的 `width: max-content` 叠加 `.flow-steps` 的 `flex-wrap: nowrap`、`flex-shrink: 0` 及 px/vw `min-width` 会撑宽整页，通常依赖 layout 上 `portal-home-layout` 提供横向滚动。`max-width: 100%` 无法压过 intrinsic 最小宽度，步骤不会在卡片内换行或压缩。若路由未挂 `portal-home-layout`，内容可能被 `.card-body { overflow: hidden }` 裁切；业务中心已对 body 设 `overflow: visible`，仍可能顶破卡片视觉边界。改首页流程布局或 E2E 时应显式覆盖窄视口与 overflow 行为。",
+   "evidence": "审查指出窄视口横向溢出为预期但需 `portal-home-layout`；`max-width: 100%` 挡不住 intrinsic 最小宽度。",
+   "files": [
+    "src/views/home/index-new.vue",
+    "src/layout/index.vue",
+    "tests/e2e/portal-home-visual.spec.ts"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "0a743a90-328f-4c94-9f35-0f8b4f911423"
+   ],
+   "bundle": "045.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户 Vite 静态图约定：public 下资源引用为站点根 /assets/images/homeNew",
+   "type": "fact",
+   "content": "门户首页与 publicPortal 背景、头图等应使用 `url('/assets/images/homeNew/…')`，与 `UnifiedLogin.vue`、`HomeHeroBanner.vue` 及 `homeLayout.js` 中 `IMG_BASE = '/assets/images/homeNew'` 一致；`public/` 目录在 Vite 构建后映射为站点根路径 `/assets/...`，不要写成相对 import 或错误前缀。",
+   "evidence": "portal.scss 审查已核对：`url('/assets/images/homeNew/portal_page_bg.jpg')` 与 IMG_BASE 约定一致，Vite public 映射正确。",
+   "files": [
+    "src/views/home/publicPortal/portal.scss",
+    "src/views/home/UnifiedLogin.vue",
+    "src/views/home/components/HomeHeroBanner.vue"
+   ],
+   "baseline": "2785dd9",
+   "sessionIds": [
+    "b65aa587-d24e-4841-9f24-0ea21ddc7bde"
+   ],
+   "bundle": "045.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户 publicPortal 全页背景 JPG 必须与 SCSS 同 PR 提交",
+   "type": "workflow",
+   "content": "`.public-portal` 通过 SCSS 引用 `/assets/images/homeNew/portal_page_bg.jpg` 时，若只提交样式与 README 而未把 JPG 纳入版本库，构建产物缺少文件，页面仅显示回退色（如 `#dfe6ee`）。审查合并前需确认 `public/assets/images/homeNew/portal_page_bg.jpg` 与 `portal.scss` 一并提交。",
+   "evidence": "[MEDIUM] 背景图未跟踪时只提交 SCSS 会导致线上 404，Fix 为与 portal.scss 同 PR 加入 JPG。",
+   "files": [
+    "src/views/home/publicPortal/portal.scss",
+    "public/assets/images/homeNew/portal_page_bg.jpg"
+   ],
+   "baseline": "2785dd9",
+   "sessionIds": [
+    "b65aa587-d24e-4841-9f24-0ea21ddc7bde"
+   ],
+   "bundle": "045.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户房屋详情弹窗用 formatDateOnly 展示纯日期",
+   "type": "pattern",
+   "content": "publicPortal `PropertyDetailDialog` 建成日期、抵押起止等字段只展示日期、不带 `0:00:00`：增加 `formatDateOnly`，去掉字符串中空格后的时间或 ISO `T` 之后部分，便于接口仍返回 datetime 时前端展示统一为 `YYYY/M/D` 形式。与后台表单里「禁用 zs-date-picker 换只读 input」场景不同，这里是只读详情展示层归一。",
+   "evidence": "会话实现：增加 formatDateOnly，houseFacts 日期改为 2011/3/31 等形式，去掉时间后缀。",
+   "files": [
+    "src/views/home/publicPortal/components/PropertyDetailDialog.vue"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "7acc978e-4336-43bb-931b-dc7cea4c454a"
+   ],
+   "bundle": "045.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户经纪人页微信二维码 src 须经 isAllowedPortalImageUrl 白名单校验",
+   "type": "pattern",
+   "content": "BrokerPages 模板中微信二维码为静态 `img`，`:src` 使用已校验的 `wechatQrSrc`（`isAllowedPortalImageUrl`），纯 CSS 改 QR 尺寸不改变该安全约束。改经纪人/门店详情或接真实接口时须保持 URL 白名单校验，避免任意远程图注入。",
+   "evidence": "QR 审查确认：模板仍是静态 img + 已校验的 wechatQrSrc（isAllowedPortalImageUrl），与本次样式无关。",
+   "files": [
+    "src/views/home/publicPortal/pages/BrokerPages.vue"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "383cd659-58a0-4aa4-b56f-de37d32a16e7"
+   ],
+   "bundle": "045.md",
+   "project": "门户"
+  },
+  {
+   "title": "publicPortal 许可详情 mock 与列表行合并时缺字段会静默沿用 mock",
+   "type": "bug",
+   "content": "门户 publicPortal 中 PropertyDetailDialog 用 permitDisplay 合并独立预览用的 mockPermit 与列表行 record。当 propertyPermits（或后续 API 行数据）缺少 expiryDate、supervisionBank、accountNumber、residentialCount 等字段时，合并逻辑会让这些项继续显示 mock 常量（例如套数恒为 64），与当前行的 issueDate、area 等同屏展示不一致。修复方向：列表详情的数据源（propertyPermits / API 层）补齐与独立预览同结构字段；或合并时仅对「行上明确缺失且业务允许兜底」的字段用 mock，行级字段禁止用全局 mock 回填。单独改 notices.js 只影响 permit-detail 独立预览，不能替代列表详情数据。",
+   "evidence": "会话 5983c99f 审查：[HIGH] 列表点开详情时字段与 mock 混用；propertyPermits 无多字段会沿用 mockPermit。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/mock/properties.js",
+    "zhi2-web-admin/src/views/home/publicPortal/mock/notices.js"
+   ],
+   "baseline": "门户 zhi2-web-admin @ e1f8e0b（2026-10-20）",
+   "sessionIds": [
+    "5983c99f-13e3-4b40-9938-495cc42f24ff"
+   ],
+   "bundle": "046.md",
+   "project": "门户"
+  },
+  {
+   "title": "预售许可弹窗「住宅」面积勿绑定预售总建筑面积",
+   "type": "bug",
+   "content": "许可详情双栏配置里若「住宅」用途面积取 permitDisplay.area，与「预售总建筑面积」同源，在非纯住宅项目且接口/mock 仅有 nonResidentialArea、无独立 residentialArea 时，住宅行会展示错误。应增加 residentialArea（或后端等价字段）映射，无值时显示 - 或明确业务规则，而不是复用总面积。",
+   "evidence": "会话 5983c99f：[HIGH] 「住宅」面积绑定总预售面积，mock 仅 nonResidentialArea 时非纯住宅会错。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/mock/notices.js"
+   ],
+   "baseline": "门户 zhi2-web-admin @ e1f8e0b",
+   "sessionIds": [
+    "5983c99f-13e3-4b40-9938-495cc42f24ff"
+   ],
+   "bundle": "046.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户 E2E 单列表单对齐断言不适用于双栏 permit 区",
+   "type": "pattern",
+   "content": "public-portal-visual.spec.ts 中 expectSharedFormDialogLayout 对容器下全部 .portal-detail-row 要求标签/值落在同一绝对列（max-min ≤ 1px）。PropertyDetailDialog 许可区使用 portal-permit-pair 双栏 grid 时，左右列 x 坐标不同，全局单列对齐断言会误报失败。做法：对双栏区域按列 scope 断言、拆成左右子选择器各测一列，或为双栏布局单独写 layout spec，勿用「整页所有 detail-row 同一列」的共享 helper。",
+   "evidence": "会话 5983c99f：[MEDIUM] E2E 与双栏排版假设冲突，index 23 仍调用 expectSharedFormDialogLayout。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/public-portal-visual.spec.ts",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue"
+   ],
+   "baseline": "门户 zhi2-web-admin @ e1f8e0b",
+   "sessionIds": [
+    "5983c99f-13e3-4b40-9938-495cc42f24ff"
+   ],
+   "bundle": "046.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户双栏表单 nth-child 标签宽在断点单列化时必须重置",
+   "type": "pattern",
+   "content": "BrokerPages 等机构信息区用固定两列 grid（如 455px 284px），通过 nth-child(2n) / nth-child(2n+1) 为左右列设置不同 --portal-form-label-width（如 360px vs 168px）。在 @media (max-width: 760px) 或 1200px 将网格改为单列堆叠后，奇偶 nth-child 不再对应「左/右列」，会出现标签宽 360px 与 168px 交替、值列无法纵向对齐。窄屏应统一 --portal-form-label-width（全宽行 .broker-field-full 可单独加宽），并移除或覆盖窄屏下的 nth-child 变量规则。",
+   "evidence": "会话 03d20bf9：[HIGH] 窄屏单列仍沿用机构 nth-child 标签宽；并说明 DOM 顺序与桌面双栏奇偶对应关系。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue"
+   ],
+   "baseline": "门户 zhi2-web-admin @ e1f8e0b",
+   "sessionIds": [
+    "03d20bf9-e86f-46c1-aa96-4b6f60f3e8f1"
+   ],
+   "bundle": "046.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户 publicPortal 标签/值列对齐需固定 flex-basis 而非仅 min-width",
+   "type": "pattern",
+   "content": "publicPortal 表单项用 dt/dd 或 .portal-detail-row 时，若标签仅 flex: 0 0 auto + min-width: var(--portal-form-label-width)，长文案标签会随内容变宽，dd 起始位置行与行不一致，text-align:left 不能保证「值成列」。应与许可弹窗行一致：flex: 0 0 var(--portal-form-label-width) 且 width/max-width 同值；桌面可 nowrap + 定宽，窄屏断点再 white-space:normal。",
+   "evidence": "会话 03d20bf9：[HIGH] 标签仅用 min-width，值列对齐弱于许可弹窗；Fix 对齐 PropertyDetailDialog。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue"
+   ],
+   "baseline": "门户 zhi2-web-admin @ e1f8e0b",
+   "sessionIds": [
+    "03d20bf9-e86f-46c1-aa96-4b6f60f3e8f1"
+   ],
+   "bundle": "046.md",
+   "project": "门户"
+  },
+  {
+   "title": "首页次要业务行 flex 按 functionCode 加宽勿用 nth-child(1/2)",
+   "type": "pattern",
+   "content": "HomeLayoutAdmin 次要板块行 secondaryFlows 用 v-for 渲染时，若仅用 .biz-flow-secondary:nth-child(1/2) 分配 flex 1.8/1，第三个子项仍走默认 flex:0 1 auto，在「存量房+经纪机构+住房租赁」三列时后两列宽度不一致。约定：所有次要项统一 .biz-flow-secondary { flex: 1 1 0 }，仅 secondHandHouseTrade（或从 homeLayout 导出常量）加 biz-flow-secondary--wide（flex:1.8 1 0），不依赖 API 返回顺序。姊妹布局 HomeLayoutSidebar 若仍用 nth-child 会在三列场景复现且与 Admin 不一致，应抽共享 secondaryFlowClass。",
+   "evidence": "会话 62d59697：第三子项等分问题与 functionCode 方案；[MEDIUM] Sidebar 仍用 nth-child。",
+   "files": [
+    "zhi2-web-admin/src/views/home/components/layouts/HomeLayoutAdmin.vue",
+    "zhi2-web-admin/src/views/home/components/layouts/HomeLayoutSidebar.vue",
+    "zhi2-web-admin/src/views/home/config/homeLayout.js"
+   ],
+   "baseline": "门户 zhi2-web-admin @ f489349（2026-10-23）",
+   "sessionIds": [
+    "62d59697-f950-4230-8eac-39dd5d3f77ff"
+   ],
+   "bundle": "046.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户 publicPortal 住房租赁合同备案查询代码落点",
+   "type": "workflow",
+   "content": "住房租赁合同备案查询仅在 zhi2-web-admin 的 publicPortal（Vue2）实现：页面 RentalPages.vue（kind===rental-contract 时 contractResult + portal-rental-result-grid）；弹窗路由 PortalDialogHost.vue（portal=rental-contract）；数据 mock/rental.js（rentalContractFixture、matchRentalContract）；样式 portal.scss；主题 portalTheme.js；菜单 UnifiedLogin portal:rental-contract；E2E public-portal-interactions.spec.ts 断言 .portal-rental-contract-result。排查该功能勿去 React 或其他子工程找页面。",
+   "evidence": "会话 sess_subagent_agent_f8d81def 代码检索结论：Primary page public portal under zhi2-web-admin。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/pages/RentalPages.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/mock/rental.js",
+    "zhi2-web-admin/src/views/home/publicPortal/portal.scss"
+   ],
+   "baseline": "门户 zhi2-web-admin @ dfee5a6（2026-10-21）",
+   "sessionIds": [
+    "sess_subagent_agent_f8d81def-e267-4e9f-bff8-538fa92004d3"
+   ],
+   "bundle": "046.md",
+   "project": "门户"
+  },
+  {
+   "title": "许可双栏半栏长文案桌面 nowrap 易溢出",
+   "type": "pattern",
+   "content": "PropertyDetailDialog 许可双栏半栏约 270px 宽时，房屋坐落、售房单位等字段若 white-space:nowrap 且无 text-overflow/换行，桌面端易裁切或撑出横向滚动（仅 max-width:650px 才 normal）。半栏字段应评估省略号、word-break 或全宽行展示，并与设计稿单位统一（㎡ vs 平方米）一并核对。",
+   "evidence": "会话 5983c99f：[MEDIUM] 长文案 + nowrap 溢出；[LOW] 单位文案不一致。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue"
+   ],
+   "baseline": "门户 zhi2-web-admin @ e1f8e0b",
+   "sessionIds": [
+    "5983c99f-13e3-4b40-9938-495cc42f24ff"
+   ],
+   "bundle": "046.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] index-new 去掉 card-body 上 padding 仍无效：子区块更具体选择器与 !important 覆盖",
+   "type": "pattern",
+   "content": "在 `index-new.vue` 只改基础 `.card-body` 的 padding 常不生效。业务中心 `.business-center .card-body` 会写 `padding: 16px 20px`；常用功能 `.func-grid` 带 `padding: 20px !important`；待办/公告 `.todo-body`、`.notice-body` 用 `!important` 单独设上内边距。要去掉「上 padding」需在这些更具体规则里把 padding-top 改为 0，左右与下保持不变。若业务中心内容仍像垂直居中悬空，多半是 `.business-center .card-body` 的 `justify-content: center`，不是 padding，贴顶需改为 `flex-start`。",
+   "evidence": "用户改 592–602 行基础样式后反馈仍有多余上 padding；排查确认后续选择器与 !important 把 padding 设回，改子选择器 top 为 0 后生效。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "53c81de5-13e7-48d9-a133-ec5ba59583c5"
+   ],
+   "bundle": "047.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 业务中心 flow-grid：空 steps 时 label 单独占格导致两列布局错行",
+   "type": "bug",
+   "content": "首页业务流区 `.flow-grid` 为 `grid-template-columns: 176px 1fr`，模板用 `<template v-for>` 先渲染 `flow-label`，`flow-steps` 用 `v-if=\"flow.steps.length\"`。板块显隐由 `portal:bizSection:{functionCode}` 权限过滤，不保证 `children` 非空。某板块已授权但 steps 为空时 grid 只有 1 个单元，下一板块的 label 会挤到同一行第二列，后续 steps 再换行，出现标签与步骤错行。修复：数据层过滤 `flow.steps.length > 0`；或用 `display:contents` 的 `.flow-row` 包住 label+steps；或无 steps 时连 label 一并 `v-if` 隐藏/渲染占位 `grid-column: span 2`。",
+   "evidence": "Vue 审查：16–22 行 v-for 与 v-if 组合 + 325–326 行仅按权限 filter，未保证 steps。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "f116a45f-2a58-4f45-b579-f37aae7508dd"
+   ],
+   "bundle": "047.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] flow-step 等宽列 + 绝对定位箭头：display:none 与层叠遮挡",
+   "type": "bug",
+   "content": "业务流步骤区使用 `--flow-step-col` 固定列宽与 `.flow-arrow` 在 `.flow-step-group` 内 `position:absolute; right:0; transform:translateX(50%)` 时：若样式末尾保留 `display:none`（调试残留），模板仍渲染箭头但界面全无箭头；去掉后箭头会伸入右侧下一列，后绘制的 `.flow-step` 可能盖住箭头，需提高箭头 `z-index` 或改为 flex 间隙布局。固定列宽且 `.flow-step-label` 为 `nowrap`+`ellipsis` 时，长文案会在列宽内截断，需与设计确认或加大 `--flow-step-col`。",
+   "evidence": "CSS 审查 index-new.vue 约 715 行 `.flow-arrow { display: none }` 及绝对定位伸入邻列的层叠问题。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "a638af97-69cb-4e16-b733-2ad9b2290077"
+   ],
+   "bundle": "047.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] publicPortal 租赁详情证件照失败态：同 record.id 换 URL 不重置",
+   "type": "bug",
+   "content": "RentalDetailDialog 证件照区：多字段回退 URL、`@error` 置 `personPhotoFailed`、默认 `/assets/images/empty.svg` 可避免占位图死循环。若 `watch` 只监听 `record.id`，同一 id 仅更换 `photo`/`photoUrl` 等字段时，先前加载失败会一直显示占位图。应在打开详情时重置 `personPhotoFailed`，或 watch 相关 URL 字段一并清零失败态。",
+   "evidence": "审查结论：id 变化重置合理，同 id 换图字段不重置为 MEDIUM 回归风险。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/components/RentalDetailDialog.vue"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "89c2fd86-be6c-45b3-89d6-1c7e023daba7"
+   ],
+   "bundle": "047.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] UnifiedLogin 菜单静态 PDF：window.open 分支与 public 文件部署",
+   "type": "pattern",
+   "content": "统一登录页菜单项若 path 指向静态 `.pdf`（如合同文本），`handleNavigate` 须在 `portal:`/`http(s)` 之后单独分支，用 `window.open(path, '_blank', 'noopener,noreferrer')`，避免 `$router.push` 把 PDF 当路由。常量指向 `public/assets/files/` 下文件时，合并前须确认仓库或部署包中文件存在，否则新标签 404。",
+   "evidence": "审查 COMMERCIAL_CONTRACT_TEXT_2016_PDF + handleNavigate PDF 分支；仓库内曾未检出对应 pdf 为运维 MEDIUM。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "ab4c5939-b99f-446e-8468-af5cdbe34e30"
+   ],
+   "bundle": "047.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] publicPortal resolvePortalAccent 统一商品房蓝 #3f669c",
+   "type": "pattern",
+   "content": "首页弹窗 PortalDialogHost 与 publicPortal 二级页主题色经 `portalTheme.js` 的 `resolvePortalAccent` 写入 `--portal-accent`。统一返回 `PORTAL_BLUE`（`#3f669c`）可使横幅、按钮、分页、面包屑、详情弹窗等与商品房蓝一致；登录页菜单图标分板块色不在该函数内。",
+   "evidence": "会话 1be5db23：resolvePortalAccent 不再按板块返回存量房绿/租赁橙。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/portalTheme.js",
+    "zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "1be5db23-7deb-4d3c-9d27-0292fc8a2bb8"
+   ],
+   "bundle": "048.md",
+   "project": "门户"
+  }
+ ]
+}

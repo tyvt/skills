@@ -1,0 +1,122 @@
+{
+  "project": "苏住房G",
+  "batch": "104",
+  "files": ["104.md"],
+  "count": 8,
+  "memories": [
+    {
+      "title": "操作列的 visible 与 permission 是 OR 关系会绕过权限：必须改成 AND 组合并回归无权限场景",
+      "type": "bug",
+      "content": "【什么情况】代码审查发现操作列存在权限绕过（编号 F01）：按钮项同时配了 `visible` 与 `permission` 时，只要 `visible` 返回 true，**即使当前用户没有该权限，按钮照样渲染**。\n【为什么】`zs-operate-column` 的按钮契约里 `visible(row)` 与 `permission`/`permissionType`（perm 形如 `${moduleName}:${businessName}:${permissionType}`）是两套独立判定。如果组件内部是「visible 命中就显示，permission 只在无 visible 时才生效」的短路结构，那么「用 visible 做业务态控制」的写法就会把权限门禁顶掉——业务态可见性成了权限的旁路。\n【怎么做】① 在组件层把两个条件改成 **AND 组合**：`show = visible(row) && hasPermission(perm)`，而不是任一命中即显示；② 改完必须**回归无权限场景**（用一个只有部分权限的账号验证按钮不出现），只测有权限账号会看不出问题；③ 现有调用方如果依赖「visible 覆盖 permission」的旧行为，改成 AND 后按钮会变少，逐个核对是正确收敛还是要改调用方；④ 页面侧还要保证 `data()` 声明了 `moduleName`/`businessName`，否则 perm 拼不出正确字符串，等价于放行；⑤ 这类改动属公共组件改动，改前按 AGENTS 约束分析已有调用方，不要为了单页外观改全局权限语义。",
+      "evidence": "会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189（基线 c35a24a）最终结论「本次代码修复交付记录」第一条：「操作列权限绕过 `F01`：visible 改为与 permission 的 AND 组合，回归无权限场景。」",
+      "files": [
+        "zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue",
+        "zhi2-web-admin/src/views/flood/components/CheckPage.vue"
+      ],
+      "baseline": "c35a24a",
+      "sessionIds": ["session-9126d917-b8a3-4db0-b250-80e5b6c5d189"],
+      "bundle": "104.md"
+    },
+    {
+      "title": "主键一律禁止 Number(id)：长 ID 会被转成浮点丢精度，移除后保留原始长整型",
+      "type": "bug",
+      "content": "【什么情况】防汛模块详情页里对主键做了 `Number(id)` 转换。审查结论是这条必须移除：「移除主键 `Number(id)`，保留长 ID」。\n【为什么】JavaScript 的 Number 是 IEEE-754 双精度浮点，只能精确表示 2^53 以内的整数。后端雪花 ID / 序列 ID 一旦超过 9007199254740991，`Number(id)` 会静默丢精度——不报错、不抛异常，只是末几位被改写。后果是后续所有按该 ID 的请求都打到不存在的记录上（查不到、详情空白），而且因为 ID「看起来还是数字」，排查时很难想到是精度问题。\n【怎么做】① 主键、编码类字段一律**原样透传**，不做 `Number()` / `parseInt()` / `+` 等数值化处理；② 需要做数值比较或排序时用字符串比较（`localeCompare` / `BigInt`），不要转 Number；③ 前端路由参数、表格 row-key、`this.$set` 回写都要保留字符串形态；④ 审查时全局搜 `Number(` 与 `parseInt(`，逐个确认作用对象是不是 ID；⑤ 后端接口若返回超长数字，JSON 里已是字符串，前端更不能「好心」转成数字。",
+      "evidence": "会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189（基线 c35a24a）最终结论「本次代码修复交付记录」：「移除主键 `Number(id)`，保留长 ID；接入求援 `feedbackRescue` 反馈接口。」",
+      "files": [
+        "zhi2-web-admin/src/views/flood/components/CheckPage.vue",
+        "zhi2-web-admin/src/mixins/listMixins.js"
+      ],
+      "baseline": "c35a24a",
+      "sessionIds": ["session-9126d917-b8a3-4db0-b250-80e5b6c5d189"],
+      "bundle": "104.md"
+    },
+    {
+      "title": "上传组件三处边界：5MB 用 `<=` 而非 `<`、单对象回显、扩展名匹配忽略大小写、在途上传计数要收敛",
+      "type": "bug",
+      "content": "【什么情况】防汛上传组件存在四个边界缺陷，本次一并修掉：**5MB 边界用了 `<`**，导致正好等于 5MB 的文件被拒；**回显按数组处理**，但接口只返回单个对象时显示不出来；**扩展名匹配区分大小写**，`.JPG`/`.Pdf` 被判为非法类型；**在途上传计数不收敛**，失败或并发上传时计数残留，导致后续上传一直被拦。\n【为什么】这四类都是「恰好落在边界/异常路径」的问题，正常路径的用例测不出来，而它们在真实使用中最容易出现（手机拍的照片就是 `.JPG`，用户会传正好 5MB 的文件）。计数不收敛则是典型的失败分支漏清理——上传失败后 `finally` 没减计数，把一次失败放大成「此后再也不能传」。\n【怎么做】① 体积校验写 `size <= 5 * 1024 * 1024`（含等于），或用统一的常量 + 明确的比较符号，避免各处口径不一；② 回显做**单对象/数组双形态兼容**：`const list = Array.isArray(data) ? data : (data ? [data] : [])`；③ 扩展名校验先 `toLowerCase()` 再比对允许列表（jpg/jpeg/png/pdf…）；④ 上传计数必须在 `finally` 里统一递减，失败、超时、取消都要走到；⑤ 上传中禁用按钮要基于「在途数 > 0」而不是「曾经发起过上传」，否则失败一次后按钮永久灰掉。",
+      "evidence": "会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189（基线 c35a24a）最终结论「本次代码修复交付记录」：「上传组件：5MB 边界 `<=`、单对象回显、扩展名大小写匹配、在途上传计数与失败收敛。」",
+      "files": [
+        "zhi2-web-admin/src/components/zs-upload/zs-upload.vue",
+        "zhi2-web-admin/src/views/flood/components/CheckPage.vue"
+      ],
+      "baseline": "c35a24a",
+      "sessionIds": ["session-9126d917-b8a3-4db0-b250-80e5b6c5d189"],
+      "bundle": "104.md"
+    },
+    {
+      "title": "文档里引用的 *.log 证据被 .gitignore 排除 → 仓库内链接不可解析：证据产物要提交 JSON 或改 .gitignore",
+      "type": "bug",
+      "content": "【什么情况】修复报告 `docs/flood-repair-2026-10-29.md` 里引用了 `docs/flood-repair-*.log`，但这些 log 文件被 `.gitignore` 排除、没入库，导致在仓库里点开链接无法解析。已提交的 JSON 证据（`build-result` / `eslint` / `baseline`）倒是能正常访问。\n【为什么】`.gitignore` 通常是为屏蔽运行时产物（构建输出、截图、临时日志）设计的，但**报告正文里的引用会把被忽略文件变成悬空链接**：本地作者看得到（文件在磁盘上），同事 clone 后看不到，于是「报告里有证据」这件事在交付侧就断了。这类问题在提交后才暴露，改起来要重跑一次产出。\n【怎么做】① 报告引用的证据文件必须与报告同一提交策略：要么把需要的证据**改成结构化 JSON 提交入库**（本次 build-result / eslint / baseline 就是这么做的），要么在 `.gitignore` 里为这几类证据加例外规则；② 提交前自查一遍「文档里的相对链接是否都能在仓库内解析」——用 `git ls-files <被引用路径>` 逐个验；③ 纯运行时产物（截图、调试日志）不入库时，报告里就不要链接它，改成写结论 + 复现命令；④ 这条与「E2E/预览产物不入库」的 gitignore 边界不冲突：证据 JSON 属于交付物，运行时截图属于产物。",
+      "evidence": "会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189（基线 c35a24a）最终结论「两个遗留项（已确认，未擅自处理）」第 1 条：「主仓库 `docs/flood-repair-*.log` 被 `.gitignore` 排除未入库，`repair-2026-10-29.md` 里引用的 `*.log` 链接在仓库内无法解析；已提交的 JSON 证据（`build-result`/`eslint`/`baseline`）在库。若需保留日志证据，可调 `.gitignore` 或改引用已提交的 JSON——这点需你定。」",
+      "files": [
+        "docs/flood-repair-2026-10-29.md",
+        ".gitignore"
+      ],
+      "baseline": "c35a24a",
+      "sessionIds": ["session-9126d917-b8a3-4db0-b250-80e5b6c5d189"],
+      "bundle": "104.md"
+    },
+    {
+      "title": "仓库内的 skill 不会被 AI 工具自动发现：必须在 AGENTS.md 里显式点名路径，且不得宣称已全局安装",
+      "type": "fact",
+      "content": "【什么情况】项目把防汛开发规范做成了仓库内的 skill（`zhi2-web-admin/.agents/skills/flood-page-guard/SKILL.md`），但仅靠「文件放在那」并不会让 AI 工具自动加载它。父仓库 AGENTS.md 因此显式写：「本仓库通过规则显式要求读取本地 skill，不假设所有 AI 工具都会自动发现它。**不得宣称已全局安装或所有同事环境已启用**。」\n【为什么】不同 AI 工具（Cursor / DSH / Claude Code 等）发现本地 skill 的机制完全不同：有的只扫全局 skills 目录，有的认仓库内 `.agents/skills`，有的完全不读。把 skill 放进仓库不等于「规则已生效」——如果工具没自动发现，约束就等于没写，产出的代码照样跑偏。而对外宣称「已全局安装」更危险：同事环境里根本没有，交付时会出现「我这边怎么没生效」。\n【怎么做】① 规则文件里用**相对路径逐个点名**必读文件（本项目：`.agents/skills/flood-page-guard/SKILL.md`、`docs/flood/README.md`、`docs/flood/framework-contract.md`、`docs/flood/review-2026-10-28.md`、`docs/flood/common-errors.md`、以及新人向的 `docs/flood/mixins-guide.md`、`components-guide.md`、`page-recipes.md`）；② 措辞用「进入前端前必须阅读 X」这类可执行指令，而不是「建议参考」；③ 交付说明里只说「规则已写入仓库 AGENTS.md / skill 已入库」，**不要**说「已全局安装」「所有同事已启用」；④ 新增一个 skill 或文档后，同步更新 AGENTS.md 的必读清单，否则等于没接入；⑤ 文件名统一用 `AGENTS.md`，不要再维护第二份内容会冲突的 `agent.md`。",
+      "evidence": "会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189（基线 c35a24a）用户诉求 2 给出的 AGENTS.md「防台防汛任务必读」段落列出 1. 防汛开发 skill `zhi2-web-admin/.agents/skills/flood-page-guard/SKILL.md`、2. 原型映射与文档入口 `zhi2-web-admin/docs/flood/README.md`、3. 框架与页面详细约束 `docs/flood/framework-contract.md`、4. 源码审查报告 `review-2026-10-28.md` 与常见错误台账 `common-errors.md`，并写明「本仓库通过规则显式要求读取本地 skill，不假设所有 AI 工具都会自动发现它。不得宣称已全局安装或所有同事环境已启用」；同时「仓库与改动边界」写「文件名统一为 `AGENTS.md`，避免维护另一份内容冲突的 `agent.md`」。",
+      "files": [
+        "AGENTS.md",
+        "zhi2-web-admin/AGENTS.md",
+        "zhi2-web-admin/.agents/skills/flood-page-guard/SKILL.md",
+        "zhi2-web-admin/docs/flood/README.md"
+      ],
+      "baseline": "c35a24a",
+      "sessionIds": ["session-9126d917-b8a3-4db0-b250-80e5b6c5d189"],
+      "bundle": "104.md"
+    },
+    {
+      "title": "约束文档要同时写「正确写法」和「错误清单」：用户明确要求按纯新人视角说明组件与 mixins 的用法",
+      "type": "preference",
+      "content": "【什么情况】用户诉求 1 要求「对齐现有框架的写法。沉淀 agent.md 和 skill，给后续给他同事做约束……并在修改防汛相关的新页面时总结常见的错误」，随后又追加诉求 3：「**除了发现的问题代码，就正确的部分，也要按照纯新人做细致的约束，说明组件和 mixins 的用法**」。\n【为什么】只写缺陷清单的规范有个致命问题：新人读完知道「不能这么写」，但不知道「那该怎么写」，最后各写各的，框架收敛不了。写清楚正确用法才能让多人产出一致风格的页面；而且正确用法里包含大量**自动行为**（mixins 自动做了什么、组件默认了什么），这些不写下来新人根本不会发现，反而会去「修」掉框架的既有行为。\n【怎么做】① 文档分两层：**通用新人手册**放 `docs/frontend/`（本次通用新人手册迁入 `docs/frontend/`，含 `README.md`），**业务特例**留在业务目录（`docs/flood/`）；② 新人向的三本手册分工要明确：`mixins-guide.md`（混入手册：每个 mixin 做什么、自动行为、扩展点）、`components-guide.md`（组件手册：zs-table / zs-search-form / zs-operate-column 等的正确用法）、`page-recipes.md`（页面接线示例：列表页/详情页从零到一的完整接线）；③ 每个条目都按「什么情况 → 为什么 → 怎么做」写，把**正确写法**的代码骨架直接给出来，而不是只描述现象；④ 缺陷清单单独放 `docs/flood/common-errors.md`，每次改防汛页面必须更新（复用旧条目或加有证据的新条目）；⑤ 规则文件里点名「不只阅读缺陷清单」，把新人手册提到与缺陷台账同级的必读位置。",
+      "evidence": "会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189（基线 c35a24a）用户诉求 1：「在当前项目检查这些需求的代码，对齐现有框架的写法。沉淀agent.md和skill，给后续给他同事做约束。参考其他历史提交的页面规范。给出详细的约束文档，并在修改防汛相关的新页面时总结常见的错误。」；用户诉求 3：「除了发现的问题代码，就正确的部分，也要按照纯新人做细致的约束，说明组件和mixins的用法」；用户诉求 6 的 AGENTS.md 更新段落新增第 5 条：「新人或首次接页还须读混入手册 `docs/flood/mixins-guide.md`、组件手册 `docs/flood/components-guide.md` 和页面接线示例 `docs/flood/page-recipes.md`，先掌握正确用法、自动行为及扩展点，不只阅读缺陷清单。」；最终结论「文档分层：通用新人手册迁入 `docs/frontend/`，错误台账与修复记录更新。」",
+      "files": [
+        "docs/frontend/README.md",
+        "zhi2-web-admin/docs/flood/mixins-guide.md",
+        "zhi2-web-admin/docs/flood/components-guide.md",
+        "zhi2-web-admin/docs/flood/page-recipes.md",
+        "zhi2-web-admin/docs/flood/common-errors.md",
+        "zhi2-web-admin/docs/flood/framework-contract.md"
+      ],
+      "baseline": "c35a24a",
+      "sessionIds": ["session-9126d917-b8a3-4db0-b250-80e5b6c5d189"],
+      "bundle": "104.md"
+    },
+    {
+      "title": "交付报告必须四段分开且逐条列「未纳入提交的内容」及原因，未经执行的项目要写「未执行」",
+      "type": "workflow",
+      "content": "【什么情况】AGENTS.md 的交付要求写死：「交付时**分开报告代码改动、静态检查、方法级验证、真实页面/接口联调**；未经执行的项目必须写『未执行』。」实际交付也照此执行：本次分开报「代码改动」（操作列权限绕过 F01、六个详情页接入 `detailPage.js`、上传组件、检查详情、主键 `Number(id)`、文档分层）与「验证」（范围 ESLint 0/0；源码回归 `scripts/verify-flood.cjs` 10/10；`npm test` 构建通过）。另一条会话则单列「**未纳入提交的内容**」：`env/.env` 的代理地址切换（`szf.szzfcjj.cn/test` ↔ dev 域名）因「与本次工作无关，且不是我改的」而**故意排除**，`tests/e2e/screenshots/loading.png` 因 gitignore 不入库。\n【为什么】把「我改的」「我验证的」「我没验证的」「我没提交的」混在一段话里，读者无法判断交付边界：混写会让人误以为 `.env` 也已经推上去，或误以为 ESLint/回归全量跑过。逐项列出反而是把风险显式化，也避免下一轮接手的人误以为工作区干净。\n【怎么做】① 交付模板固定四段：代码改动（按模块列）/ 静态检查（ESLint 范围与结果数）/ 方法级验证（回归脚本与通过数，如 `scripts/verify-flood.cjs` 10/10）/ 真实页面或接口联调（做了什么、证据是什么）；② 任何没执行的项显式写「未执行」，不要略过；③ 单列「未纳入提交的内容」，每条写清**为什么排除**（与本次无关 / 非我改动 / gitignore 产物），并说明需要时如何补提；④ 提交前跑一遍 pre-commit 钩子（本次 `eslint --fix` 通过）；⑤ 交付记录落盘到文档（如 `docs/frontend/README.md`、`docs/flood/delivery-2026-10-29.md`），不要只留在对话里。",
+      "evidence": "会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189（基线 c35a24a）用户诉求 2/6 给出的 AGENTS.md「交付要求」：「交付时分开报告代码改动、静态检查、方法级验证、真实页面/接口联调；未经执行的项目必须写『未执行』」；最终结论「验证：范围 ESLint 0/0；源码回归 `scripts/verify-flood.cjs` 10/10；`npm test` 构建通过」。会话 session-fc7698aa（基线 f36e340）最终结论单列「## 未纳入提交的内容」：「`env/.env`：里面的代理地址切换（`szf.szzfcjj.cn/test` ↔ dev 域名）与本次骨架屏工作无关，且不是我改的，已**故意排除**」「`tests/e2e/screenshots/loading.png`：`gitignore` 已忽略，不入库（属运行时产物）」。",
+      "files": [
+        "docs/flood/delivery-2026-10-29.md",
+        "docs/frontend/README.md",
+        "env/.env"
+      ],
+      "baseline": "c35a24a",
+      "sessionIds": [
+        "session-9126d917-b8a3-4db0-b250-80e5b6c5d189",
+        "session-fc7698aa-d276-4f13-bf55-99140b2c5432"
+      ],
+      "bundle": "104.md"
+    },
+    {
+      "title": "子模块切回分支后父仓 gitlink 显示「脏」是预期结果，但共享集成分支的合并不许自动做",
+      "type": "pattern",
+      "content": "【什么情况】本次交付的工作提交 `38c4b439b` 在子模块分支 `develop/v2.6.2-suzhufang-li`（已推送 `origin/-li`），主仓库提交 `ae8048e` 记录的 gitlink 正确指向它。按用户要求把子模块**切回** `develop/v2.6.2-suzhufang` 后，本地父仓库显示子模块引用为脏（检出 `2d9918c7d3` ≠ 已记录的 `38c4b439b`）。同时 Agent **没有**把 `-li` 合并进 `suzhufang`，并明确说明「那是对共享集成分支的高风险操作，需要你点头」。\n【为什么】两个现象必须分开看：① 切分支导致的 gitlink「脏」是 checkout 的正常结果——父仓记录的指针是工作提交（已推送、没丢），本地子模块检出的是另一个提交，diff 显示不一致不代表改动丢失；② 而把一条分支合进**共享集成分支**会改变所有人拿到的代码，属于不可逆的协作面操作，不能夹带在「切回分支」这类局部指令里悄悄执行。\n【怎么做】① 切分支前先核对「工作提交到底在哪条分支、远程是否已持有」（用 `git branch --contains <sha>` 与 `git log origin/<branch>` 交叉验证），把「切回」和「合并」当成两件事；② 切回后向用户解释父仓 gitlink 脏的含义，并确认远程父仓 gitlink 仍正确指向工作提交；③ 合并到共享集成分支前**显式征询**，给出具体命令（`git merge develop/v2.6.2-suzhufang-li` 或提 MR）与后续步骤（提交主仓 gitlink 更新并推送）；④ 交付表格要把「已提交已推送的分支」「已切回的检出分支」「待合并的缺口」分行写清，不让「切回」被误读成「已落到目标分支」。",
+      "evidence": "会话 session-9126d917-b8a3-4db0-b250-80e5b6c5d189（基线 c35a24a）最终结论开篇：「子模块已切回 `develop/v2.6.2-suzhufang`，本地父仓库显示子模块引用为脏（检出 `2d9918c7d3` ≠ 已记录的 `38c4b439b`）——这正是『切回』的预期结果，远程父仓库的 gitlink 仍正确指向工作提交，工作没丢。」；「## 必须讲清的一件事（避免误判）」：「工作提交 `38c4b439b` 在 `develop/v2.6.2-suzhufang-li`，并已推送到 `origin/-li`……我**没有**自动把 `-li` 合并进 `suzhufang`——那是对共享集成分支的高风险操作，需要你点头。」",
+      "files": [
+        "zhi2-web-admin",
+        ".gitmodules"
+      ],
+      "baseline": "c35a24a",
+      "sessionIds": ["session-9126d917-b8a3-4db0-b250-80e5b6c5d189"],
+      "bundle": "104.md"
+    }
+  ]
+}

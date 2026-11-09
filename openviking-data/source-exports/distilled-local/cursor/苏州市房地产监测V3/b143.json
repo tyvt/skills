@@ -1,0 +1,93 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "143",
+ "files": [
+  "143.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "新增和删除使用公共的配置方式",
+   "type": "preference",
+   "content": "已按你的要求调整，主要变更如下： ### 新增按钮 - 移除自定义 `addButton`，直接使用 mixin 的 `addButton` - 通过 `extraPerms` 将权限映射为 `company:agencyBranch:edit` - `operationButtons` 仅在 B 端且有 `companyRecordId` 时加入 `addButton` ### 批量删除 - 在 `operationButtons` 中加入 mixin 的 `multiDeleteButton` - 选择列增加 `:selectable=\"isSelectable\"`，仅 `recordState === '0'`（未备案）可选 - `deleteRequest` 支持多条删除（接口为单 ID，批量时并行调用多次） - 行内删除、批量删除共用 mixin 的 `handleDelete` ### 其他 - `showButton` 控制编辑按钮显示（G 端隐藏、已注销隐藏） - 删除重复的 `handleQuery` / `resetQuery`，使用 mixin 默认实现 头部按钮现在为：**新增**（B 端条件显示）+ **删除**（选中未备案记录后可用）。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution\\agencyBranch\\components\\AgencyBranchList.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\property\\workOrder\\order\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\property\\chargeManage\\chargeItem\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b02c7339-410a-4155-9af2-1dd4826ef29d"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "不要定义API文件，改为直接调用接口",
+   "type": "preference",
+   "content": "已完成重构：删除了三个 API 封装文件，各组件改为直接使用 `this.$post` 调用接口。 ## 删除的文件 - `src/api/company/agencyBranch.js` - `src/api/company/agencyPersonnel.js` - `src/api/company/brand.js` ## 修改的组件 **分支机构：** - `AgencyBranchList.vue` — 列表、删除 - `AgencyBranchDetail.vue` — 初始化、详情、保存、品牌列表 - `CancelDialog.vue` — 注销 **从业人员：** - `AgencyPersonnelList.vue` — 列表、删除、提交备案 - `AgencyPersonnelDetail.vue` — 初始化、详情、历史查询、保存 - `StatusAdjustDialog.vue` — 候选人员、状态调整 - `WorkCardDialog.vue` / `InfoCardDialog.vue` — 凭证信息 ## 调用方式示例 与项目中其他页面（如 `chargeItem/index.vue`）保持一致： ```javascript // 列表 const url = this.isManageMode ? '/company/agencyBranch/",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`src/api/company/agencyBranch.js",
+    "`src/api/company/agencyPersonnel.js",
+    "`src/api/company/brand.js",
+    "`AgencyBranchList.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "791532e4-a439-463e-a76e-96fb60f9bc3e"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "主管部门 机构入网信息变更列表接口 /company",
+   "type": "bug",
+   "content": "机构入网信息变更 `administrativeArea` 字段改造已完成，变更如下： ### 1. API 层 [`companyRecord.js`](zhi2-web-admin/src/api/company/companyRecord.js) - 为 `pageCompanyRecordChanges`、`getCompanyRecordChangeDetail`、`updateCompanyRecordChange` 补充 JSDoc - 新增 `addCompanyRecordChange` 接口封装 ### 2. 变更列表页 [`change/index.vue`](zhi2-web-admin/src/views/company/companyRecordAgency/change/index.vue) - 查询参数 `regionCode` → `administrativeArea` - 表格列改用 `type=\"dict\" dict-url=\"ECONOMIC_INSTITUTIONS_REGION\"` - 删除 `formatRegion` 方法 ### 3. 变更详情页 [`change/detail.vue`](zhi2-web-admin/src/views/company/companyRecordAgency/change/detail.vue)",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`companyRecord.js`](zhi2-web-admin/src/api/company/companyRecord.js",
+    "[`change/index.vue`](zhi2-web-admin/src/views/company/companyRecordAgency/change/index.vue",
+    "[`change/detail.vue`](zhi2-web-admin/src/views/company/companyRecordAgency/change/detail.vue",
+    "[`toB/companyRecord/detail.vue`](zhi2-web-admin/src/views/toB/companyRecord/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "81bf5be6-c0ce-46ce-b29f-c26f9c1c7127"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "预售和现售合同签订详情页面，按钮组没有使用公共封装",
+   "type": "preference",
+   "content": "改造已完成，变更集中在 [`contract/index.vue`](zhi2-web-admin/src/views/contract/index.vue)。 ## 改造内容 **合同签订场景（`comeFromMainInfo`）** - 用 `OperationBtnGroup` 替换自定义 `toolbar` - 内置承担：保存、提交（`ZsSubmit`，修复原未注册的 `<Submit>`）、附件 - slot 保留业务按钮：审批、撤销、重签、人工备案、缴款、数据变更、打印 - 编辑、返回走自定义逻辑（`handleEdit` / `goBackToListPage`），避免与全局 `changeFormState` 冲突 - 新增 `contract-info-bar` 展示合同编号与抵押/托管提示 **其它场景（范本/变更）** - 继续用原 `toolbar`，行为不变 **新增 computed** - `showContractEdit` / `showContractSave` / `showContractSubmit` 控制按钮显示 ## 验证 - Linter 无报错 - E2E 因环境登录凭据失败（`用户密码错误`），与本次代码改动无关；配置好企业端账号后可重跑： ```bash npm run test:e2e:contract-sign-pre ",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`contract/index.vue`](zhi2-web-admin/src/views/contract/index.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\OperationBtnGroup\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\contract\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\commercialHousingSales\\presale\\contractRevoke\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "29d17583-217e-40d1-b67e-272fdaa2a94d"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "detail-template 标签列全局左对齐 I",
+   "type": "fact",
+   "content": "已完成 `detail-template` 标签列全局左对齐，仅修改了一个文件： [`zhi2-web-admin/src/components/detail-template/detail-template.vue`](zhi2-web-admin/src/components/detail-template/detail-template.vue) ### 改动内容 1. **JS 默认值** - `getLabelAlignClass`：`labelAlign` 默认由 `'right'` 改为 `'left'` - `getLabelContentStyle`：默认 `'left'`，fallback 由 `flex-end` 改为 `flex-start` 2. **CSS 基础样式** - `.detail-label`：`justify-content: flex-start`，`text-align: left` - `.detail-label-main`：`justify-content: flex-start` ### 验证情况 - 无 linter 报错 - `labelAbove`、`required`、超长标签换行等场景样式仍兼容 - 单项仍可通过 `labelAlign: 'right' | 'center'` 覆盖（当前全项目无此类配置） - 值列逻",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`zhi2-web-admin/src/components/detail-template/detail-template.vue`](zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0e6522ee-5877-4b0d-9156-b0f67a688a71"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

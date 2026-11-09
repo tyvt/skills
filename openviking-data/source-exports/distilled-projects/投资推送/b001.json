@@ -1,0 +1,492 @@
+{
+ "project": "投资推送",
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md"
+ ],
+ "count": 27,
+ "memories": [
+  {
+   "title": "红利 core 依赖丢失的 pyc 导致运行失败",
+   "type": "bug",
+   "content": "投资推送原先 core.py 通过 import 落到 __pycache__/core.cpython-310.pyc；该 pyc 消失后本地报告/推送无法跑通。解法是把红利数据层迁到明文模块 dividend_data.py，core 只保留信号与报告格式，不再依赖编译产物。",
+   "evidence": "会话结论：「原先 core.py 依赖 __pycache__/core.cpython-310.pyc，该文件已不存在。红利数据层已迁移到 dividend_data.py」",
+   "files": [
+    "core.py",
+    "dividend_data.py",
+    "report.py",
+    "push.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "15eaf5dc-a45b-4a40-a904-8d1a5eb1e146"
+   ],
+   "bundle": "001.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "本地 stockdb 成份股加权估算指数股息率",
+   "type": "pattern",
+   "content": "免费且可信的「官方」历史股息率序列难直接用于股债利差类信号（易出现整段日期零触发）。在已有 D:\\repository\\stockdb\\data 成份与行情的前提下，用成份股加权合成指数股息率，会话中目标是把与真实值的误差压在约 0.2% 以内，再接入 dividend/a500 等信号模块。",
+   "evidence": "用户要求用本地历史股票数据目录成份股加权；追问数据源后确认需真实股息率",
+   "files": [
+    "config.py",
+    "core.py",
+    "market_data.py",
+    "dividend_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "15eaf5dc-a45b-4a40-a904-8d1a5eb1e146"
+   ],
+   "bundle": "001.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "report/push 统一入口与三模块推送约定",
+   "type": "workflow",
+   "content": "抽象后本地报告用 python report.py（-m dividend|a500|cyb，默认全模块），微信推送用 python push.py 同样 -m 语义；python core.py 仅兼容旧习惯等同 -m dividend。定时任务 run_push.bat 默认推送全部三模块，若只要红利需显式 python push.py -m dividend。",
+   "evidence": "统一入口表与「定时任务 run_push.bat 无需改动，默认会推送全部三个模块」",
+   "files": [
+    "report.py",
+    "push.py",
+    "core.py",
+    "run_push.bat"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "15eaf5dc-a45b-4a40-a904-8d1a5eb1e146"
+   ],
+   "bundle": "001.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "数据源 URL 集中进 data_sources 配置",
+   "type": "workflow",
+   "content": "宽基回测、行情脚本曾分散引用不同抓取地址。会话要求把「本次用到的获取数据地址」与项目内其它脚本数据源汇总到单一配置文件（data_sources.py / config）并附文字说明，避免 compare_broad_indices 与 market_data 各写一套来源。",
+   "evidence": "用户诉求：「把这次用到的获取数据的地址，和当前其他脚本用的数据源都汇总到一个配置文件里面并作出说明」",
+   "files": [
+    "data_sources.py",
+    "config.py",
+    "compare_broad_indices.py",
+    "market_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "60bb7ce4-2e38-4d46-af4c-7a6f738d7055"
+   ],
+   "bundle": "001.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "日频调仓：daily-monitor 与全日频买卖语义",
+   "type": "pattern",
+   "content": "红利低波回测里 --daily-monitor 表示「每个交易日检查卖点，但买入仍按固定调仓周期」；用户要的日频买卖是卖点触发卖出后同日按排名买入新标的。改语义前后需分别跑日频回测对比 HTML/净值，并先汇报明显计算瓶颈再拉长窗口（如 10 年）。",
+   "evidence": "用户：「--daily-monitor 是每日只卖、定期才买，改为日频买卖。出现卖点了，卖出之后肯定也要买入新的」",
+   "files": [
+    "dividend_lowvol_rotation/backtest.py",
+    "dividend_lowvol_rotation/strategy.py",
+    "dividend_lowvol_rotation/config.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b0893a98-b49c-4906-badb-11b0682d3261"
+   ],
+   "bundle": "001.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "增强因子优化：网格不优于默认、贝叶斯精调有效",
+   "type": "fact",
+   "content": "dividend_lowvol_rotation 因子网格（约 24 组）在 trap/mom/cv 默认邻域内得分与基线相同（全段约 +234.8%、回撤约 -13.86%）；贝叶斯约 30 次试验可抬升 composite 得分（会话例：115.33 vs 102.31），关键区间 yield_spread_trap≈94、profit_momentum_min_qoq=2、max_profit_cv≈0.73。报告写 optimize_enhanced_factors.md，最优可写回 config 再对 H30269 验证。",
+   "evidence": "会话 b0893a98 结果表：网格 24 组与默认相同，贝叶斯 30 次最优",
+   "files": [
+    "dividend_lowvol_rotation/backtest_optimize.py",
+    "dividend_lowvol_rotation/config.py",
+    "dividend_lowvol_rotation/scoring.py",
+    "output/dividend_lowvol/optimize_enhanced_factors.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b0893a98-b49c-4906-badb-11b0682d3261",
+    "e757d674-ed12-4182-acf0-26b665a7296f"
+   ],
+   "bundle": "001.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "market_cap DataFrame 布尔判断导致 report 冒烟失败",
+   "type": "bug",
+   "content": "引入市值过滤（如剔除 100 亿以下）后 market_cap.py 若对 pandas DataFrame 做裸 if df 判断会触发 FutureWarning/逻辑错误，report.py 长跑失败。应改用 df.empty、len(df) 或显式 is None，修复后 report 冒烟约 5 分钟可通过。",
+   "evidence": "「market_cap.py 的 DataFrame 判断修复有效」「report.py 冒烟测试已通过」",
+   "files": [
+    "market_cap.py",
+    "report.py",
+    "dividend_lowvol_rotation/strategy.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a2c7cc90-42ee-4d7e-bdd6-92c635fcfe4b"
+   ],
+   "bundle": "001.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "阈值/选股约束变更后的 79 窗滚动回测约定",
+   "type": "workflow",
+   "content": "红利低波改阈值或硬约束（市值下限、行业权重等）后，不只跑单次 10 年主回测：用 scripts/monthly_rolling_backtest.py 做 79 组滚动窗口对比平均收益、平均最大回撤、年化标准差；并依 .cursor/rules/backtest-after-threshold-change.mdc 重生成 output/dividend_lowvol/backtest.html。市值下限可按每次 +100 亿扫描找最优档。",
+   "evidence": "加 100 亿市值限制后要求 79 次回测；后续「每次增加 100 亿，回测 79 组」寻优",
+   "files": [
+    ".cursor/rules/backtest-after-threshold-change.mdc",
+    "scripts/monthly_rolling_backtest.py",
+    "dividend_lowvol_rotation/config.py",
+    "output/dividend_lowvol/backtest.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a2c7cc90-42ee-4d7e-bdd6-92c635fcfe4b",
+    "e757d674-ed12-4182-acf0-26b665a7296f"
+   ],
+   "bundle": "001.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "纳指估值买入阈值与分位参数联动",
+   "type": "pattern",
+   "content": "宽基/纳指模块用 Forward PE 分位、PEG(Forward)、10Y 利率分位等多门槛联合触发买入；放宽单一阈值会非线性增加持仓天数（例：PE 分位 58%→60%、PEG 1.25→1.28、10Y 分位 86%→88% 使 2025/2026 触发天数上升）。继续放宽会纳入更早月份信号，需在 config 调参后对照回测表而非只看单日 PE 报道。",
+   "evidence": "纳指买入阈值表：2025 5天→9天、2026 8天→31天；仍可能 1 月不触发",
+   "files": [
+    "config.py",
+    "compare_broad_indices.py",
+    "market_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "60bb7ce4-2e38-4d46-af4c-7a6f738d7055"
+   ],
+   "bundle": "001.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "买入回测与完整策略回测必须分脚本，文档须标明是否含卖出",
+   "type": "workflow",
+   "content": "`backtest_buy_signals.py` 验证的是「买入择时 + 假设长期持有」，默认不跑 README 中的移动止盈/估值卖点；`inception_present.md` 里卖出次数为 0 时仍可能显示较高收益率，并不代表完整策略已回测。验证含止盈/估值卖出的完整链路应跑 `backtest_trade_signals.py`，并在报告或 README 明确标注：「仅买入择时」或「含卖出规则」。否则会出现策略文档与回测表格严重冲突（如科创50/中证1000 买入数十次、卖出 0 次却宣称已止盈）。",
+   "evidence": "会话 efd15316：用户指出 inception_present.md 与 README 止盈策略不符，中证1000/科创50/创业板指均为买入多次、卖出 0 次；建议检查是否调用 sell_trailing 或改用 backtest_trade_signals.py 并文档标注。",
+   "files": [
+    "d:/repository/投资推送/backtest_buy_signals.py",
+    "d:/repository/投资推送/backtest_trade_signals.py",
+    "d:/repository/投资推送/output/backtest/inception_present.md",
+    "d:/repository/投资推送/README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "efd15316-7993-488b-8278-c5e62b92d106"
+   ],
+   "bundle": "003.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "美股月度 Forward PE 在回测与实盘须沿用上月末，避免当月未来数据",
+   "type": "pattern",
+   "content": "historyofmarket.com 等来源的 Forward PE 为月度序列，当月完整值通常在月底或下月初才更新。在月中跑回测或生成交易记录时，若直接使用「当月」点位会产生未来函数嫌疑。约定：当月交易日默认沿用**上一月末**已发布的 Forward PE；在 README/回测说明中写清该规则，避免 8 月 4 日仍使用 8 月整月估值的误解。",
+   "evidence": "会话 efd15316：用户质疑 2026-08-04 回测含 1–8 月记录与月度 Forward PE 发布时间矛盾；建议文档补充「当月交易沿用上月末数据」。",
+   "files": [
+    "d:/repository/投资推送/README.md",
+    "d:/repository/投资推送/us_index_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "efd15316-7993-488b-8278-c5e62b92d106"
+   ],
+   "bundle": "003.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "全量回测区间对外用「自各指数基日起」，勿暴露 1990 占位起始日",
+   "type": "bug",
+   "content": "内部曾用 `1990-01-01` 作过滤占位，实际数据仍从各指数基日开始，但该日期会出现在控制台与 HTML 描述中，易被当成真实回测起点。修复口径：全量回测 `start=None` 表示按指数各自基日；对外文案统一为「自基日至最新」，重新跑 `backtest_buy_signals.py` 后控制台、Markdown、HTML 区间一致。",
+   "evidence": "会话 556e68da 最终结论：1990 仅为内部占位；已改为 start=None 与「自基日至最新」文案。",
+   "files": [
+    "d:/repository/投资推送/backtest_buy_signals.py",
+    "d:/repository/投资推送/backtest_trade_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "556e68da-e3b0-4125-9a1d-bf5b435f5a32"
+   ],
+   "bundle": "003.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "红利指数就绪行须与其它模块一致输出实时价字段",
+   "type": "bug",
+   "content": "宽基/创业板/美股在 `log_fetch_done` 就绪行会带「实时 …」，红利模块（如 H30269 / csH30269）曾漏传实时字段，控制台只显示「就绪 | 数据截至 … | 历史 …」，易被误判为接口失败，而正文分析里可能已有实时价。修复：红利就绪行同样拼接实时价与涨跌幅；拉取失败重试 1 次；开头增加「实时行情已获取」或「实时暂无」汇总。",
+   "evidence": "会话 efd15316 最终结论：腾讯 csH30269 可正常拉取，根因是红利 log_fetch_done 未传实时字段；修复后示例 `实时 10,915.98 -2.01% …`。",
+   "files": [
+    "d:/repository/投资推送/dividend_data.py",
+    "d:/repository/投资推送/report.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "efd15316-7993-488b-8278-c5e62b92d106"
+   ],
+   "bundle": "003.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "峰值回撤 10% 一刀切卖出在强势趋势年显著劣于持有",
+   "type": "fact",
+   "content": "对 2025 年 117 笔买入信号模拟：每笔跟踪持仓最高价，收盘从峰值回撤 ≥10% 即全卖，合计收益约 +10.3%，持有至 2026-07-24 约 +46.0%（少约 12,528 元/35100 元投入）。创业板、纳斯达克100 在上涨途中正常回调常超 10%，易被震出后指数继续主升；放宽到 15% 合计约 +26%，20% 约 +33.1%，仍难全面追上持有。若要用移动止盈，至少考虑 15%–20% 或分批减仓，并结合估值卖出信号而非纯价格回撤。",
+   "evidence": "会话 2610cc62 最终结论表格：创业板差额 -62.8%、纳指 -38.4%；典型笔 2025-01-02 买入创业板 10% 回撤卖 -12.3% vs 持有 +68.9%。",
+   "files": [
+    "d:/repository/投资推送/backtest_buy_signals.py",
+    "d:/repository/投资推送/config.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2610cc62-f656-43bd-a61b-6bb14a5dd85f"
+   ],
+   "bundle": "003.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "「相对高点跌幅」买入过滤阈值按指数单独配置",
+   "type": "pattern",
+   "content": "为剔除「大跌后仍不合算」的买入（如中证红利低波 2024-03、创业板 2024-01 密集误买），各指数应维护独立的相对近期高点跌幅百分比阈值（会话中先统一默认 7%，创业板、纳斯达克100 等需单独放宽或收紧）。纳指波动大，同一阈值往往过严；调参后须用该指数历史信号回测验证，勿用单一全局百分比套所有标的。",
+   "evidence": "会话 2610cc62：用户要求剔除 3 月不合算买入、全指数加指标且百分比单独设置默认 7%；并单独反馈创业板 1 月误买多、纳指限制过严。",
+   "files": [
+    "d:/repository/投资推送/config.py",
+    "d:/repository/投资推送/cyb_signal.py",
+    "d:/repository/投资推送/drop_to_buy.py",
+    "d:/repository/投资推送/a500_signal.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2610cc62-f656-43bd-a61b-6bb14a5dd85f"
+   ],
+   "bundle": "003.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "止盈后再买入须等浮盈回落到约定阈值（如 30%）",
+   "type": "preference",
+   "content": "组合再平衡由用户手动执行，不在系统自动再平衡。卖出后允许再次买入的前置条件：该标的浮盈须回落到约定阈值（会话确认为例如 30%）才放开，避免止盈后立刻追高重复建仓。实现或改回测时须与「只买不卖」的买入回测脚本区分，写在完整交易回测与 README 策略约束中。",
+   "evidence": "会话 efd15316 用户诉求 3：「止盈后再买入约束须浮盈回落到某阈值（如 30%）才允许再买；组合再平衡由我手动再平衡」。",
+   "files": [
+    "d:/repository/投资推送/README.md",
+    "d:/repository/投资推送/backtest_trade_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "efd15316-7993-488b-8278-c5e62b92d106"
+   ],
+   "bundle": "003.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "QDII 限购场景应提高买入频率、降低单次金额",
+   "type": "preference",
+   "content": "美股相关策略文档须说明 QDII 基金限购现实：不宜依赖调低 Forward PE 阈值来「攒一笔大买」；应适度**提高买入频率、减少单次买入金额**，使信号在限购下仍可执行。Forward PE 阈值本身按用户确认不必为此单独改动。",
+   "evidence": "会话 efd15316 用户诉求 3：「美股 Forward PE 阈值，否，另外需要描述考虑到 QDII 基金限购的问题，应适度增加 QDII 基金买入频率，减少单次买入金额。」",
+   "files": [
+    "d:/repository/投资推送/README.md",
+    "d:/repository/投资推送/config.py",
+    "d:/repository/投资推送/us_index_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "efd15316-7993-488b-8278-c5e62b92d106"
+   ],
+   "bundle": "003.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "VectorBT 与 RQAlpha 对齐的工程约定",
+   "type": "workflow",
+   "content": "接入 VectorBT 时：使用独立虚拟环境 `.venv-vectorbt`，不改动 `rqalpha_env`；十年基准与报告写入 `output/vectorbt/baselines/` 与 `output/vectorbt/reports/`，不覆盖既有 RQAlpha 结果。数据口径：close/total_mv/is_st 从 `stock_daily` 加载，行业从现有行业缓存加载；因子矩阵保留源数据单位，YAML 策略阈值按需做单位转换。验收目标为与 RQAlpha 完整规则对齐（共同交易日净值、回撤、期末持仓等）。",
+   "evidence": "会话 rollout-2026-08-25：用户四项确认「完整对齐 RQAlpha」「close/total_mv/is_st 从 stock_daily」「新基准单独 baselines/」「独立 .venv-vectorbt」；验收逐日净值差 0.0000、Top10 重合 100%。",
+   "files": [
+    "d:/repository/投资推送/scripts/run_vectorbt_pipeline.py",
+    "d:/repository/投资推送/output/vectorbt/reports/validation_report.md",
+    "d:/repository/投资推送/README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-25T11-24-34-01a036f2-c18a-7a10-adea-524c1f695b32"
+   ],
+   "bundle": "003.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "中证A500(000510)与中证500(000905)是独立模块，回测无行情年份须显式输出行",
+   "type": "fact",
+   "content": "中证A500 代码 000510、报告模块 `a500`；中证500 代码 000905、模块 `zz500`。本地行情自 2024-09-03 起，2021～2023 为 0 交易日。旧回测在「当年无样本」时不写主表行，易被误认为策略删掉 A500。修复：无数据年份仍输出一行并备注「当年无行情（中证A500自2024-09发布，与中证500不同）」；日常用 `python report.py -m a500` / `-m zz500` 区分。",
+   "evidence": "用户在 2021.md 看不到 A500 误以为删除；trade_2021_present 显示 A500 21 次买入（2024-09 后）、中证500 331 次。",
+   "files": [
+    "config.py",
+    "README.md",
+    "report.py",
+    "backtest_buy_signals.py",
+    "index_meta.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6665d60c-2512-4e72-a2c9-bd6d1c41418a",
+    "e4a2efa5-c52d-4fed-b8d8-41863346d9db"
+   ],
+   "bundle": "004.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "A股宽基「PE分位+股债利差分位」联合卖出门槛在十年回测中几乎不触发",
+   "type": "pattern",
+   "content": "2015 至今全模块约 2312 次买入、仅 7 次卖出（≈0.3%）。典型卖条件如沪深300 PE≥85% 且利差分位≤25%：牛市顶部 PE 与利差分位高度同步，但阈值过严或分位窗口滞后会导致 2021-02 等高点未卖；中证500 PE≥92% 在 2021-09 约 85% 未达线，随后 -35% 回撤。诊断回测时须同时看卖出/买入比，不能只看收益率。",
+   "evidence": "用户复盘表：红利 166/0、A股宽基 1508/3、创业板 275/2、美股 362/0；建议核对 2021-02 沪深300 PE/利差分位是否真未触发。",
+   "files": [
+    "config.py",
+    "cn_broad_signal.py",
+    "cyb_signal.py",
+    "backtest_trade_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9710a7b2-e6a8-4439-8e59-1b6bca84d1dc"
+   ],
+   "bundle": "004.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "宽基卖出策略产品决策：仅科创50保留卖点，其余指定指数关闭卖出逻辑",
+   "type": "preference",
+   "content": "在联合估值卖出门槛长期不触发、策略近似「只买不卖」定投后，用户明确要求关闭沪深300、中证500/1000、A500、创业板、恒生科技的卖出逻辑，仅保留科创50 卖出。红利与美股底仓本来就不设卖点。调参或写 README 买卖标准时勿再给已关闭模块加卖出门槛。",
+   "evidence": "用户诉求：「关闭 沪深300、中证500/1000、A500、创业板、恒科的卖出逻辑；保留 科创50 卖出」。",
+   "files": [
+    "config.py",
+    "cn_broad_signal.py",
+    "cyb_signal.py",
+    "hstech_signal.py",
+    "README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9710a7b2-e6a8-4439-8e59-1b6bca84d1dc"
+   ],
+   "bundle": "004.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "移动止盈：按峰值回撤阈值扫描，采纳标准为波段收益较当前提升≥1.5个百分点",
+   "type": "workflow",
+   "content": "对启用移动止盈的指数扫描峰值回撤档位。已验证收紧：沪深300 10%→6%（波段 +3.6pp，卖点前移至 2021-02-24）、中证500 12%→10.5%（+3.2pp）、科创50 14%→12.5%（+8.4pp）。上证50/中证A100 等进一步收紧收益边际不足或变差则保持。改 `config.py` 后需重跑 `inception_present` / `trade_inception_present` 的 md 与 html。",
+   "evidence": "扫描表与合计买卖波段收益 172.7%（10 次卖出）；2021 年 2 月下旬上证50/沪深300/中证A100 均触发卖出。",
+   "files": [
+    "config.py",
+    "sell_trailing.py",
+    "backtest_trade_signals.py",
+    "output/backtest/inception_present.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e4a2efa5-c52d-4fed-b8d8-41863346d9db"
+   ],
+   "bundle": "004.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "红利买入阈值放宽须用 2015 至今全窗口回测，兼顾买入次数与长期收益",
+   "type": "workflow",
+   "content": "示例落地：全局利差门槛 3.4%→3.0%；930955 PE 分位上限 65%→68%；H30269 利差分位 56%→42%、PE 60%→72%。结果 930955 买入 +6、收益 +1.0pp；H30269 买入 +56、+6.7pp。再放宽会在 PE 极高、利差不足时（如 8 月中旬）损害长期收益。优化动作文档中的「股息支付率≥80% 且利率分位>70% 减至目标权重 50%」、PEG 分母用 min(近5年增速,近1年增速) 属策略增强方向，改阈值后同样要全窗口回测。",
+   "evidence": "会话结论写明 2015 至今回测数字；用户表要求红利防价值陷阱与 PEG 保守分母。",
+   "files": [
+    "config.py",
+    "drop_to_buy.py",
+    "README.md",
+    "backtest_buy_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9710a7b2-e6a8-4439-8e59-1b6bca84d1dc",
+    "4cf2331f-e187-4795-852d-e81ba087c405"
+   ],
+   "bundle": "004.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "历史数据本地缓存：回测/脚本读缓存，日报拉数增量写回缓存",
+   "type": "pattern",
+   "content": "用户要求回测所有基金自基日数据并缓存本地；后续回测与脚本优先读缓存；每日 report 增量更新须同步进缓存，避免重复拉取与科创50等指数截止日期停留在旧快照（如报告只到 2021）。报告输出应带统一格式的数据更新日期，拉取日志与输出日志格式一致便于对账。",
+   "evidence": "「科创50 报告截止到 2021」「其他 A 股数据也不太对」「report 加上数据更新日期」等诉求与缓存需求同批出现。",
+   "files": [
+    "data_cache.py",
+    "sync_data_cache.py",
+    "report.py",
+    "market_data.py",
+    "cn_broad_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4cf2331f-e187-4795-852d-e81ba087c405"
+   ],
+   "bundle": "004.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "backtest_html：时间范围筛选、横轴年/月/日（默认月）、指数下拉按收益率降序且须含全部标的",
+   "type": "bug",
+   "content": "HTML 回测折线图需支持起止日期筛选与横轴粒度（年/月/日，默认月）。曾出现指数下拉只能选创业板指：需从 index_meta/回测汇总对齐全部指数 key。下拉排序按收益率从高到低；买入次数列后补充买入金额。全量区间默认 2015 至今。",
+   "evidence": "用户反馈「指数无法下拉筛选，只有一个创业板指数」「HTML 下拉按照收益率从高到底排名」「横轴默认是月」。",
+   "files": [
+    "backtest_html.py",
+    "backtest_trade_signals.py",
+    "index_meta.py",
+    "output/backtest/2015-01-01_present.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4cf2331f-e187-4795-852d-e81ba087c405",
+    "e4a2efa5-c52d-4fed-b8d8-41863346d9db"
+   ],
+   "bundle": "004.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "每日推送仅包含有买卖信号的标的，收益率末四位默认不推荐参与额度分配",
+   "type": "preference",
+   "content": "push/report 侧：当日未触发买或卖的指数不要进推送正文。买卖额度分配：无「组合仓位」概念，按指数独立分配；回测收益率排名末 4 名默认不推荐买卖，其余参与年度额度分配，数据更新后排名随之刷新。",
+   "evidence": "「每日仅推送有买卖信号的数据」「收益率倒数的4个默认不推荐买卖」。",
+   "files": [
+    "push.py",
+    "report.py",
+    "buy_amount_config.py",
+    "signal_format.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e4a2efa5-c52d-4fed-b8d8-41863346d9db"
+   ],
+   "bundle": "004.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "恒生科技卖出不对称修补：卖出需价格高于近1年买入成本+25%",
+   "type": "pattern",
+   "content": "恒科买入偏左侧、卖出仅 1 次等不对称时，在卖出条件中增加「现价高于近一年买入成本 +25%」作为前置，避免过早卖飞或买卖逻辑失衡。买入侧保留「近1年价格位置」作必选/确认条件以控制左侧时间成本。阈值变更后按 2021 至今或全窗口跑 backtest_trade_signals 验证买卖次数与波段收益。",
+   "evidence": "优化表「恒科 卖出时增加价格高于近1年买入成本+25%」；回测示例买入 76、卖出 1、波段 +11.5% vs 仅买 +13.6%。",
+   "files": [
+    "hstech_signal.py",
+    "config.py",
+    "backtest_trade_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9710a7b2-e6a8-4439-8e59-1b6bca84d1dc",
+    "dbe23642-cbfc-4996-b58d-b5210c3eaa1e"
+   ],
+   "bundle": "004.md",
+   "project": "投资推送"
+  }
+ ]
+}

@@ -1,0 +1,78 @@
+{
+ "project": "园区物管2.0",
+ "batch": "057",
+ "files": [
+  "057.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "所传入参数并非TMap.Map的实例！",
+   "type": "preference",
+   "content": "## 原因说明 报错 **「所传入参数并非 TMap.Map 的实例！」** 来自腾讯地图 GL 在创建 `MultiPolygon` / `MultiMarker` / `MultiLabel` 等图层时对传入的 `map` 做 **`instanceof TMap.Map`** 校验。 在本组件里，`map` 写在 **`data()`** 里。Vue 2 会对 `data` 里的对象做 **深度响应式**（递归 `defineReactive`），会把 **`TMap.Map` 这类原生类实例** 改坏，导致它 **不再通过 `instanceof TMap.Map`**，于是图层构造里一传 `map: this.map` 就报错。 ## 修改说明 1. **从 `data()` 中删除 `map`**，在 `created()` 里执行 `this.map = null`，让地图实例挂在组件实例上、**不参与响应式**（并加了注释说明原因）。 2. 地图容器由 **`id=\"map\"` + `getElementById`** 改为 **`ref=\"tmapRoot\"` + `this.$refs.tmapRoot`**，避免页面上多个 `#map` 时取错 DOM；样式由 `#map` 改为 **`.tmap-root`**。 保存后重新跑一下该页，图层应能正常挂到地图上",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\components\\map.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "65d1ff41-2ab2-465d-a45a-6af439cdd397"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "(1-26)",
+   "type": "bug",
+   "content": "**原因：** pre-commit 里 ESLint 的 `import/no-unresolved` 无法解析 Vite 的 `?raw` 导入（会把路径当成 `apply.svg?raw` 这个文件名），不是文件缺失。 **处理：** 在 `fundPanorama/index.vue` 中为该导入加了 `eslint-disable-next-line import/no-unresolved`，并已本地跑过 ESLint，通过。 请重新提交。若 `apply.svg` 还没进暂存区，一并加入： ```bash git add zhi2-web-admin/src/assets/images/mapOverview/apply.svg git add zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue git commit ```",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`fundPanorama/index.vue",
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\.eslintrc.cjs、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\assets\\images\\mapOverview\\apply.svg、d:\\repository\\园区物管2.0\\zhi2-web-admin\\package.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ef34d9ad-7535-4fd3-a353-b17efa7397bf"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "(1-29)",
+   "type": "bug",
+   "content": "已修复 pre-commit 失败原因。 **原因**：`assetLeaseApply/index.vue` 和 `resourcesLeaseContractFiling/index.vue` 在 `methods` 里各定义了两次 `getQueryParams`，后一个会覆盖前一个，触发了 `duplicate-attributes/no-duplicate-vue-options` 规则。 **处理**：把两段逻辑合并为一个 `getQueryParams`： - 保留原有的业务参数逻辑（`applyType` / `contractTypes` 等） - 在同一方法里补充 `parentDeptId = this.$store.state.user.currentProjectId` - 删除重复的第二处定义 已对这两个文件执行 `eslint --fix`，检查通过。可以重新提交。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "**原因**：`assetLeaseApply/index.vue",
+    "`resourcesLeaseContractFiling/index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\assetLeaseApply\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\resourcesLeaseContractFiling\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "38ac27d7-c45f-4497-b949-64781b2d3118"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "(62-117) @zhi2-web-admin/s",
+   "type": "preference",
+   "content": "已按你的要求接好了：接口返回平台配置后，会自动调用主题色变量生成方法。 改动在 `zhi2-web-admin/src/store/modules/app.js`： - 新增引入：`changeThemeColor`（来自 `@/utils/index`） - 在 `getPlatformConfig` 里拿到 `res.data` 后： - 先 `commit('SET_PLATFORM_CONFIG', platformConfig)` - 再读取 `platformConfig.buttonDefaultColor` - 若有值则调用 `changeThemeColor(primaryColor)`，动态设置 `--primary-color` 及其浅/深色变量 - 做了空值保护，避免接口未返回主题色时报错 - 已检查该文件 lint，当前无报错 如果你希望，我还可以继续帮你把 `buttonWarningColor / buttonTextColor` 等也同步接入到对应 CSS 变量。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`zhi2-web-admin/src/store/modules/app.js",
+    "涉及文件：D:/repository/园区物管2.0/zhi2-web-admin/src/store/modules/app.js、D:/repository/园区物管2.0/zhi2-web-admin/src、D:/repository/园区物管2.0/zhi2-web-admin/src/api/index.js",
+    "@index.js",
+    "@zhi2-web-admin/src/store/modules/app.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5a11ca4b-0f0d-4cb0-b4f1-e9e574a65811"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

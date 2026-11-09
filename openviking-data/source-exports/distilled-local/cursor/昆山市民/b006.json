@@ -1,0 +1,110 @@
+{
+ "project": "昆山市民",
+ "batch": "006",
+ "files": [
+  "006.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "物业 合同预览报错",
+   "type": "fact",
+   "content": "## 问题分析 从截图中的报错 `Cannot read properties of null (reading 'offsetWidth')` 和页面提示「文件加载失败，请稍后重试」来看，问题出在 `src/pages/common/filePreview.vue` 的 PDF 预览实现，主要有两点： 1. **`scroll-view` 在 H5 下兼容性问题** uni-app 的 `scroll-view` 在 H5 环境会反复读取 DOM 的 `offsetWidth`，但此时子元素尚未渲染完成，导致大量 `TypeError`。 2. **Canvas 获取方式不正确** 原实现用 `document.getElementById` 查找 uni-app 的 `<canvas>` 组件，H5 下实际渲染的并不是原生 canvas，导致 `pdfjs` 无法渲染，最终进入 catch 显示「文件加载失败」。 ## 修复方案 已修改 `filePreview.vue`： - 将 `scroll-view` 替换为普通 `view` + CSS `overflow-y: auto` 滚动 - PDF 加载完成后，用原生 DOM API 动态创建 `canvas` 并渲染每一页 - 使用 Vue 的 `nextTick` 确保容器 DOM 已挂载后再渲染 ## 验证方式 重新构",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "`src/pages/common/filePreview.vue",
+    "`filePreview.vue",
+    "涉及文件：d:\\repository\\昆山市民\\src\\pages\\common\\filePreview.vue、d:\\repository\\昆山市民\\src\\pages_contract\\detail.vue、d:\\repository\\昆山市民\\src\\utils\\index.js、d:\\repository\\昆山市民\\package.json、d:\\repository\\昆山市民\\src\\utils\\resolveAssetUrl.js、d:\\repository\\昆山市民\\src\\pages.json、d:\\repository\\昆山市民\\src\\env\\mp.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a046a6f8-9e58-45ea-a7be-81dc2f303792"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "数量图标被遮挡",
+   "type": "preference",
+   "content": "已修复首页「业主表决」等菜单项数量角标被遮挡的问题。 **原因：** `uni-badge` 使用 `absolute=\"rightTop\"` 时，角标会向上偏移约 10px，超出图标区域。而 `swiper` 及父容器默认 `overflow: hidden`，会把角标上半部分裁切掉。 **修改：** 1. 为图标增加 `item-icon-wrap` 容器，预留 `padding-top` / `padding-right` 给角标显示空间 2. 将 `swiper`、`menu-container` 等容器的 `overflow` 设为 `visible` 3. 略微增加 `swiper` 顶部内边距（20rpx → 32rpx） 4. 个人中心页采用相同处理，避免同类问题 请重新编译预览，确认「业主表决」右上角红色数量角标是否完整显示。若仍有遮挡，可把角标偏移再调大一点。",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "涉及文件：d:\\repository\\昆山市民、d:\\repository\\昆山市民\\src、d:\\repository\\昆山市民\\src\\pages_home\\home.vue、d:\\repository\\昆山市民\\src\\pages_home\\personal.vue、d:\\repository\\昆山市民\\src\\pages_home、d:\\repository\\昆山市民\\node_modules\\@dcloudio\\uni-ui、d:\\repository\\昆山市民\\src\\pages.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2a8a8393-4a19-4102-99ee-abcb1056e854"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "从业主决策返回会退出多级，改为通用的返回",
+   "type": "pattern",
+   "content": "已一并处理。 `pages_election/election/index.vue` 中同样移除了 `onUnload` 里的多级 `navigateBack` 逻辑。现在业主决策和业委会选举列表页都使用系统默认的单级返回，不会再出现一次返回退出多页的问题。",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "`pages_election/election/index.vue",
+    "涉及文件：d:\\repository\\昆山市民、d:\\repository\\昆山市民\\src\\utils\\wxLogin.js、d:\\repository\\昆山市民\\src\\pages_vote、d:\\repository\\昆山市民\\src、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\index.vue、d:\\repository\\昆山市民\\src\\pages_election\\election\\index.vue、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\votedetail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3731b85d-c4b8-48f3-b25e-7cf1583be2da"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "用小程序打包，接口地址不对了",
+   "type": "fact",
+   "content": "**原因** `src/env/mp.js` 在之前的重构里，把小程序的 `BASE_URL` 改成了相对路径 `/api`。 H5 开发时可以通过 Vite 代理把 `/api` 转发到真实后端，但**小程序打包后没有代理**，相对路径 `/api` 无法解析到正确域名，接口就会失败。 **修复** 已恢复小程序按微信运行环境（`envVersion`）选择完整接口地址的逻辑： | 环境 | 接口地址 | |------|----------| | develop（开发版） | `http://unlimited.g.h5.admin.web.v1.wuguan.kunshan.suzhou.test.zhishusz.com/prod-api` | | trial（体验版） | `http://unlimited.g.h5.admin.web.v1.wuguan.kunshan.suzhou.test.zhishusz.com/prod-api` | | release（正式版） | `https://kwt.ksjzaq.com/app/` | 这与图片地址 `IMAGE_BASE` 的处理方式一致，同一套小程序包会根据当前是开发版、体验版还是正式版，自动请求对应的后端。 **下一步** 重新打包并上传： ```bash npm run build:mp ``` 然后在微信开",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "`src/env/mp.js",
+    "涉及文件：d:\\repository\\昆山市民\\.env.test、d:\\repository\\昆山市民\\.env.development、d:\\repository\\昆山市民\\src\\env\\mp.js、d:\\repository\\昆山市民\\.env.production、d:\\repository\\昆山市民\\package.json、d:\\repository\\昆山市民\\vite.config.js、d:\\repository\\昆山市民\\src\\request\\index.js、d:\\repository\\昆山市民\\src\\manifest.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "76e058f1-ba17-479b-89f8-7c7af2202d46"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "getOauthInfoByIdNumber这个接口",
+   "type": "bug",
+   "content": "根据代码，`getOauthInfoByIdNumber` 只在实名成功后的后台刷新里用到，且**不返回 token 的影响取决于接口是成功还是失败**。 ## 调用时机 该接口仅在 `refreshUserAndHouse()` 中调用，发生在人脸核身已经成功、页面已跳转之后： ```123:128:src/pages/verifyUser/index.vue function refreshUserAndHouse() { return getOauthInfoByIdNumber({ idNumber: useUser.idNumber }).then((userRes) => { useUser.setToken(userRes.data.accessToken) useUser.setUserInfo({ ...userRes.data }) return useUser.initMyHouseInfo() }) } ``` 触发场景有两处（`editUserInfo` 修改实名、首次实名），都是**先 toast + 跳转，再后台调这个接口**： ```226:248:src/pages/verifyUser/index.vue if (currentType === 'editUserInfo') { // ... uni.redirectTo({ url: '/pa",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "```123:128:src/pages/verifyUser/index.vue",
+    "```226:248:src/pages/verifyUser/index.vue",
+    "```203:203:src/pages/verifyUser/index.vue",
+    "`getInfoByCode`（`wxLogin.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e7a59e5a-613e-404d-ab23-37e8863e3fcf"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "图表展示问题",
+   "type": "preference",
+   "content": "已修好，原因和改动如下。 **原因** 1. 柱状图用了 `encode: { x: 'amount', y: 'product' }`，但没有配 `dataset`，坐标轴映射错乱，轴文字叠在一起。 2. `option` 一变就重新 `echarts.init`，旧实例没销毁，canvas 上重复绘制，出现重影乱码。 **改动** 1. `balancePublicity/index.vue`：改为标准横向柱状图（`yAxis.data` + `series.data`），金额标在柱右侧；有数据时用 `v-if` 再挂载图表，避免 `display:none` 下宽高为 0。 2. `echarts-uniapp.vue`：已有实例只 `setOption(..., { notMerge: true })`；卸载时 `dispose`；宽高为 0 时短暂重试。 请重新进「经营性收支公示」，切换收入/支出看图表是否正常。",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "`balancePublicity/index.vue",
+    "`echarts-uniapp.vue",
+    "涉及文件：d:\\repository\\昆山市民\\src\\pages_benefit\\balancePublicity\\index.vue、d:\\repository\\昆山市民\\src\\pages_benefit\\balancePublicity\\echarts-uniapp\\echarts-uniapp.vue、d:\\repository\\昆山市民\\src\\pages_benefit、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\components\\BarOption.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fa8264ba-ca5d-4343-b44e-a4907db958f0"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  }
+ ],
+ "_draft": true
+}

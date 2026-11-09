@@ -1,0 +1,260 @@
+{
+ "project": "园区公共收益",
+ "batch": 6,
+ "files": [
+  "021.md",
+  "022.md",
+  "023.md",
+  "024.md"
+ ],
+ "count": 15,
+ "memories": [
+  {
+   "title": "[园区公共收益] 组织工作人员列表列空白：列表 VO 用 accountType/userStatus，勿沿用 businessType/enable",
+   "type": "bug",
+   "content": "自治域「组织工作人员」分页接口 `/autonomy/ownerCommitteeWorker/page` 与系统用户列表口径一致：组织类型字段为 `accountType`（字典 `sys_account_type_all`），用户状态为 `userStatus`（字典 `sys_normal_disable`）。从其它模块拷贝列表时若仍绑定 `businessType`、`committee_type` 或 `enable`，列与筛选项会整列空白。修复时同步改表格列 `prop`、字典 `dict-type` 及 `queryParams`/搜索表单项的 `model`。",
+   "evidence": "会话结论：组织类型 businessType→accountType、字典 committee_type→sys_account_type_all；用户状态 enable→userStatus；搜索 queryParams 同步。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/ownerCommitteeWorker/index.vue"
+   ],
+   "baseline": "635e747",
+   "sessionIds": [
+    "b6d6fab6-0ca4-4685-9fa8-8c9df7a6aefd"
+   ],
+   "bundle": "021.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 弹窗分栏内 el-pagination「前往 x 页」折行：收窄 layout 并固定 pager-count",
+   "type": "pattern",
+   "content": "楼幢/租赁等「房屋关联」弹窗左侧栏宽度有限时，分页器 `layout` 含 `sizes` 或页码过多会把 `jumper` 挤到下一行。窄栏内推荐 `layout=\"prev, pager, next, jumper\"`（去掉 sizes，每页条数写死或与业务约定一致），并设 `pager-count=\"5\"`（Element UI 允许的最小奇数），让页码折叠为 `1 2 3 … N` 而非铺满。",
+   "evidence": "用户反馈「前往 1 页」跑到下面；修复为去掉条/页下拉、保留 pager-count=5。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/houseTable.vue",
+    "zhi2-web-admin/src/views/building/building/components/houseTable.vue"
+   ],
+   "baseline": "b6bf87d",
+   "sessionIds": [
+    "f087205d-f215-464e-b55c-d86410257745"
+   ],
+   "bundle": "021.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 业务对账银行回单「查看」：已对账判定与核销详情/回单弹窗分流",
+   "type": "workflow",
+   "content": "「公共收益银行明细日」对账列表：「查看」用 `isBankReceiptReconciled(row)` 控制显示，满足任一即视为已对账可查看——查询条件 `reconciliationStatus === '2'`、行上存在 `receiptVerificationId`、或行 `reconciliationStatus === '2'`。点击后：有 `receiptVerificationId` 路由到回单核销详情（PubVerificationReceipts）；仅有 `receiptDetailId` 则开 `BankReceiptDetailDialog`；都没有则提示「暂无回单详情」。未对账行只展示「核销」，已对账隐藏「核销」只保留「查看」。",
+   "evidence": "产品要求已对账回单可查看；实现互斥核销/查看及双跳转路径。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubBankDetailDay/index.vue",
+    "zhi2-web-admin/src/views/benefit/components/BankReceiptDetailDialog.vue"
+   ],
+   "baseline": "4468dfa",
+   "sessionIds": [
+    "8839f2cf-25d9-4d13-b279-55b99bf07d72"
+   ],
+   "bundle": "021.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] zs-dialog 横排 flex 下批量提示与表单并排导致文案换行",
+   "type": "bug",
+   "content": "待办「批量审批」等弹窗：若 `batch-tip` 与表单区同为 `zs-dialog` 内容区直接子节点，dialog 内容常为横向 flex，提示条与 `form-box` 并排挤压，「批量处理 N 条数据」会折行。应将 `batch-tip` 移入 `form-box` 内部置顶，并对提示加 `white-space: nowrap`；条数可用独立 span 高亮。",
+   "evidence": "BatchApprovalDialog：batch-tip 移入 form-box；batch-tip 增加 nowrap。",
+   "files": [
+    "zhi2-web-admin/src/views/flowable/components/BatchApprovalDialog.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "7bba50ec-878d-4ecc-aa51-2d784ce86b6d"
+   ],
+   "bundle": "021.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 平台/用户授权：短信通知与密码模式用本地常量联动，不拉 password_msg 字典",
+   "type": "preference",
+   "content": "「是否发送短信」「密码模式」选项在用户明确要求下用页面本地常量（`PASSWORD_MSG_OPTIONS` / `PASSWORD_TYPE_OPTIONS`，dictLabel/dictValue 与原先字典一致），`initDict` 不再请求 `password_msg`、`password_type`。联动：默认不发短信时密码模式锁定「固定初始密码」，不可选随机密码；选择发短信后才开放固定/随机两种。仅保留仍需接口的字典（如 `login_method`）。",
+   "evidence": "用户要求不要使用接口字典，直接定义在本地；联动逻辑不变。",
+   "files": [
+    "zhi2-web-admin/src/views/system/platformConfig/detail.vue",
+    "zhi2-web-admin/src/views/autonomy/userAuth/detail.vue"
+   ],
+   "baseline": "ba114dc",
+   "sessionIds": [
+    "033f21f8-cf25-4e40-90d3-d259ab6c1fea"
+   ],
+   "bundle": "021.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 附件配置文件大小：后端仍存字节，仅 fjflpz 配置弹窗做 MB 展示与提交换算",
+   "type": "workflow",
+   "content": "与后端约定附件大小字段 API 始终为字节（B）。仅在「工具 → 附件配置」编辑弹窗（FjDialog）做边界换算：getDetail 用 bytesToMb 回显（保留 2 位小数），submitForm 用 mbToBytes 四舍五入为整数再提交。页面单位文案改为 MB，校验去掉原 18 位长度限制，改为非负数且「最大值 ≥ 最小值」。AnnexUpload / AnnexUploadDialog / 业务详情上传校验仍直接消费接口返回的字节阈值，本次不要改消费侧，避免与「接口已是最终单位、禁止二次换算」的其它业务字段规则混用。",
+   "evidence": "会话结论：新增 utils bytesToMb/mbToBytes；FjDialog 改单位与双向换算；「消费侧（未改动）…仍直接使用后端返回的字节值做上传校验」。",
+   "files": [
+    "zhi2-web-admin/src/utils/index.js",
+    "zhi2-web-admin/src/views/tool/fjflpz/components/FjDialog.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/index.vue"
+   ],
+   "baseline": "7458acc",
+   "sessionIds": [
+    "03c9bc97-26cb-4c25-b7ab-4bb2bb9c3a3a"
+   ],
+   "bundle": "022.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] BuildingTableViewTabs 列表视图分页被裁切：子区域 min-height 之和超过父级 min-height",
+   "type": "bug",
+   "content": "「选择户室」弹窗列表视图下，表格滚动区 `.building-table-view-scroll` 等节点写了 min-height:360px/400px，分页栏约 68px，在父 panel 仅 min-height:400px 且 overflow:hidden 时，表格区与分页合计高度超出，分页只露出上半截。修复：flex 链上表格相关容器改为 min-height:0，表格区 flex:1 内滚，分页 flex-shrink:0 并略增 padding-bottom；zs-select-dialog 右侧 `.dialog-right.building-table-right` 补 display:flex; flex-direction:column; flex:1（可保留外层 min-height:400px 保证弹窗高度）。BuildingTableViewTabs 被选项表决/一般表决/维修表决等多处引用，改组件一次全覆盖。",
+   "evidence": "根因说明：「列表视图下，表格区 min-height: 360px 与分页栏（约 68px）合计超过 panel 的 min-height: 400px，在 overflow: hidden 下分页栏被裁切」。",
+   "files": [
+    "zhi2-web-admin/src/views/components/BuildingTableViewTabs.vue",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue",
+    "zhi2-web-admin/src/views/autonomy/option/components/DecisionRangeTable.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "e0c9e026-360f-4210-a247-b1f275759fea"
+   ],
+   "bundle": "022.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 弹窗内 zs-table 未设 table-tr 时默认行高把分页挤出可视区",
+   "type": "bug",
+   "content": "单位代缴等「缴存范围选择」弹窗（ScopeSelectDialog）：zs-table 未传 table-tr 时按约 10 行固定高度渲染，叠加顶部搜索区与底部分页后总高度超过弹窗可视高度，父级 overflow:hidden 导致分页需缩小浏览器比例才看见。已验证方案：表格外包 scope-select-table-wrap，绑定 :table-tr=\"listTableTr\"；用 ResizeObserver 按容器剩余高度动态计算行数，在 onOpen、getTable、tabClick 时刷新；布局上表格区 flex:1; min-height:0，搜索与分页 flex-shrink:0。个人代缴与公司代缴共用组件时一并生效。",
+   "evidence": "「根因：zs-table 未设置 table-tr，默认按约 10 行固定高度渲染…分页被 overflow: hidden 裁切」；修复参照开户模块 ResizeObserver + listTableTr。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/depositNotice/company/components/ScopeSelectDialog.vue",
+    "zhi2-web-admin/src/views/maintenance/components/ScopeSelectDialog.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "773efa7a-31cf-4846-a29c-73b73be85156"
+   ],
+   "bundle": "022.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 公共设施维护「选择房屋」楼盘表在窄弹窗内被 flex 压扁",
+   "type": "bug",
+   "content": "zs-select-dialog 开启 building-table-mode 后，共享 BuildingTable 在弹窗右侧宽度不足时楼层/单元标签与户室格被 flex 压缩：单元名竖排、格子过窄。修复：`.floor-label`、`.unit-label`、`.unit-rooms` 设 flex-shrink:0；`.unit-label` white-space:nowrap；`.room-cell` min-width；表头与 `.floor-row` flex-wrap:nowrap。宿主 RangeTable 侧包 `.building-table-wrapper` 横向滚动、cell-width=\"120\"，避免通过继续压缩格子适配宽表。",
+   "evidence": "用户反馈弹框「就这么点点大的框」；改动 BuildingTable.vue 防压扁 + RangeTable building-table-mode 与横向滚动容器。",
+   "files": [
+    "zhi2-web-admin/src/views/components/BuildingTable.vue",
+    "zhi2-web-admin/src/views/maintenance/facility/components/RangeTable.vue",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "f5c910bd-d8dd-4878-952a-b6286f9f507f"
+   ],
+   "bundle": "022.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 工作中心待办主题前缀「<驳回>」：认 flowable comment.type 与文案双条件",
+   "type": "pattern",
+   "content": "驳回后回到待提交的单据若已在 todoTaskList 返回，前端在主题展示层统一加前缀即可（列表是否收录由后端查询决定）。识别：comment.type === '3' 或 comment.comment === '驳回'。抽 utils/todoTask.js：isRejectedTodoTask、formatTodoTaskTitle、normalizeTodoTaskRows；在三处入口规范化——flowable/todo.vue 的 listCallback、home/index.vue 拉待办后、home/components/TodoTable.vue，避免只改一处导致首页与工作中心不一致。",
+   "evidence": "「根据接口返回…comment.type === '3' 或 comment.comment === '驳回'」；新增 todoTask.js 并改 todo.vue、home/index、TodoTable。",
+   "files": [
+    "zhi2-web-admin/src/utils/todoTask.js",
+    "zhi2-web-admin/src/views/flowable/todo.vue",
+    "zhi2-web-admin/src/views/home/index.vue",
+    "zhi2-web-admin/src/views/home/components/TodoTable.vue"
+   ],
+   "baseline": "0c9b8c2",
+   "sessionIds": [
+    "35f936a1-c453-4bbf-9d57-01b517ff7164"
+   ],
+   "bundle": "022.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "我发起的流程撤回 405：流程配置 approvalApi 写成纯数字会拼成 /api/v2/2",
+   "type": "bug",
+   "content": "现象：「我发起的」点撤回，前端提示 Request failed with status code 405；Network 为 POST `/api/v2/2`。\n根因：工具 → 工作流 → 流程配置里该业务的 **审批接口（approvalApi）** 被配成 `2` 等不含 `/` 的非法值，与 baseURL 拼接后不是真实业务路径，网关返回 Method Not Allowed。旧版 `process.vue` 撤回还常缺当前节点 **key**，且未校验 approvalApi，错误配置会直接发请求。\n做法：在 `flowApi.js` 收敛 `withdrawProcess`——① approvalApi 必须含 `/`，否则拒绝直调；② 异常时从业务详情 `path` 推导（如 `/benefit/xxx/123` → `/benefit/xxx/approval`）；③ 先调 `flowViewer` 取当前节点 key，再 POST 审批接口。`process.vue` 与详情页撤回统一走该函数。联调时到流程配置把 approvalApi 改成类似 `/benefit/pubAllotNotice/approval`，不要留纯数字。",
+   "evidence": "会话 b81ac1e2：撤回请求 URL `/api/v2/2`、POST、405；结论写明 approvalApi 错误配置为 `2`，并新增 withdrawProcess 校验与 key 补齐。",
+   "files": [
+    "zhi2-web-admin/src/utils/flowApi.js",
+    "zhi2-web-admin/src/views/flowable/process.vue",
+    "zhi2-web-admin/src/views/tool/workflow/components/ConfigDialog.vue"
+   ],
+   "baseline": "0c9b8c2",
+   "sessionIds": [
+    "b81ac1e2-1917-4945-a8fc-a5c38eb2ae6f"
+   ],
+   "bundle": "023.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "请求体/参数带 landPlotCode 时自动写入 zs-remark 请求头（删除 mixin 同理）",
+   "type": "pattern",
+   "content": "园区公共收益同源 Web 后台约定：在 `request.js` 拦截层读取本次请求 params 或 body 中的 **landPlotCode** 字段，若存在则写入请求头 **zs-remark**（值来源仍是 landPlotCode，头名不是 landPlotCode）。页面上下文类头统一加 **zs-** 前缀：`data-id` → `zs-data-id`，`menu-name` → `zs-menu-name`，`menu-path` → `zs-menu-path`。\n列表/详情删除走 `listMixins` 时若已向删除接口传 `landPlotCode`，无需改调用方，拦截器会自动带 `zs-remark`。\n注意：头值含中文等非 ASCII 时需经 `pageRequestContext` 的 `toAsciiHeaderValue`（与 zs-menu-name 同套），否则 setRequestHeader 在浏览器侧直接抛错（见既有记忆 x0177）。本条补的是「字段名 → 头名」映射与删除链路覆盖，不是字符集问题。",
+   "evidence": "会话 266e6df1：用户要求所有接口按参数 landPlotCode 加请求头，删除 mixin 同步；后续将头名从 landPlotCode 改为 zs-remark，并给 data-id/menu-name/menu-path 加 zs- 前缀。",
+   "files": [
+    "zhi2-web-admin/src/utils/request.js",
+    "zhi2-web-admin/src/utils/pageRequestContext.js",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "baseline": "635e747",
+   "sessionIds": [
+    "266e6df1-f448-4947-a921-472f6e91ee3d"
+   ],
+   "bundle": "023.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "业务对账银行回单表：el-table 动态列 v-for + 右侧固定操作列会导致列顺序镜像错乱",
+   "type": "bug",
+   "content": "现象：业务对账页切换「银行回单数据」模式时，列从左到右变成与「银行对账单」镜像（如手续费在最左、序号靠近操作列），`bankReceiptColumns` 数组顺序本身正确。\n根因：用 `v-for` 动态渲染 `el-table-column`，再与右侧**固定「操作」列**组合时，Element Table 列实例顺序可能错乱（同类问题在对账模块曾复发）。\n做法：与对账单侧一致改为**静态列定义**（不用 v-for 拼列）；数据加载后调用表格 `doLayout()` 重算布局。验收列顺序：序号 → 对方账户名称 → 通知书号 → 交易日期 → 交易金额 → … → 操作。",
+   "evidence": "会话 31028abc：用户报银行回单字段顺序弄反；结论指 v-for 动态列与固定操作列组合导致错乱，改静态列并 doLayout。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubBankDetailDay/index.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "baseline": "36a9a7e",
+   "sessionIds": [
+    "31028abc-b8ae-4e20-8edb-702fd8eb1e0c"
+   ],
+   "bundle": "023.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "登录后物管会单区域「2 秒自动进入」失效：bProjectDialog visible 与父组件抢状态",
+   "type": "bug",
+   "content": "现象：物管会账户只绑定一个物业管理区域，登录后提示约 2 秒自动进入，但倒计时走不完、不会自动提交。\n根因（`bProjectDialog.vue`）：① 弹窗 `visible` 监听器在无 `currentProjectId` 时强制 `emit('update:visible', true)`，与 `layout/index.vue` 的 `syncProjectDialogVisibility` 抢控制权，弹窗状态反复切换，定时器被反复清除；② 用 `this.$attrs.visible` 判断是否打开在 Vue 2 下不稳定，setTimeout 回调可能读到 false；③ 区域列表仍在 `dataLoading` 时就启动倒计时，与 `onOpen` 异步逻辑冲突。\n做法：`visible` 改为显式 prop，用 `dialogVisible` 绑定 `el-dialog`；仅用户主动关闭且未选区域时再打开，初始挂载不强制打开；`!dataLoading` 后再启动自动进入；用 generation 令牌丢弃过期定时器；自动进入失败可重试。注意同屏「修改密码」弹窗也会挡住流程。",
+   "evidence": "会话 022cfbb6：用户报物管会账户 2 秒自动进入未执行；结论列出 visible 争抢、$attrs.visible、dataLoading 三条根因及 generation 令牌修复。",
+   "files": [
+    "zhi2-web-admin/src/views/home/bProjectDialog.vue",
+    "zhi2-web-admin/src/layout/index.vue"
+   ],
+   "baseline": "36a9a7e",
+   "sessionIds": [
+    "022cfbb6-b498-4713-a286-66050471cfb5"
+   ],
+   "bundle": "023.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "业主表决情况表详情跳转：MULTIPLE_ISSUES 主键是 decisionManageId 不是 decisionId",
+   "type": "workflow",
+   "content": "只读列表 `autonomy/decisionSituation/index` 点「查看」需按 `decisionType` 分流到既有表决详情路由，主键字段因类型不同不能统一传 decisionId：\n- NORMAL → `autonomy/general/detail`，query 用 decisionId\n- OPTION → `autonomy/option/detail`，decisionId\n- SORT → `autonomy/sort/detail`，decisionId\n- MULTIPLE_ISSUES → `autonomy/multiply/detail`，query 用 **decisionManageId**（多议题管理主键，与另三类不同）\n列表实现可沿用 `moduleName: 'autonomy'` + `businessName: 'decisionSituation'` 调 POST page；字典与搜索项对齐 `general/index.vue`。后台需在 sys_menu 配 component `autonomy/decisionSituation/index` 及 list/query 权限。",
+   "evidence": "会话 921980e6 最终结论第 4 点：MULTIPLE_ISSUES 跳转 multiply/detail 且带 decisionManageId，其余类型带 decisionId。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/decisionSituation/index.vue",
+    "zhi2-web-admin/src/views/autonomy/general/index.vue",
+    "zhi2-web-admin/src/views/autonomy/multiply/detail.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "921980e6-6982-4e1b-8876-2014d4e01a3d"
+   ],
+   "bundle": "023.md",
+   "project": "园区公共收益"
+  }
+ ]
+}

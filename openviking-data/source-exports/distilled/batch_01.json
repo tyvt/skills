@@ -1,0 +1,655 @@
+{
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md",
+  "005.md",
+  "006.md"
+ ],
+ "failed": 0,
+ "count": 38,
+ "memories": [
+  {
+   "title": "echarts 定制裁剪包缺 series.line 导致折线图静默空白",
+   "type": "bug",
+   "content": "工单趋势图（折线）在小程序里整块空白，但柱状图/饼图/仪表盘正常。根因不在页面代码，而在图表库：项目内三份 echarts.min.js 副本（src/staff/pages/components/echarts-uniapp/、pages_benefit、pages_owner/decision）是同一个 624KB 定制裁剪包（基于 echarts 5.2.1），grep 注册标记发现 series.bar / series.pie / series.gauge 都在，唯独 series.line 不存在，于是 type:'line' 被 echarts 静默跳过（零报错），legend 无系列、yAxis 停在默认 [0,1]、zrender 里只有 xAxis 元素，全部级联空白。\n\n诊断套路（值得复用）：通过运行时调试桥直接读运行中的 chart 实例——setOption 前后 getModel().getSeries() 是否为空、yAxis 数据范围是否仍是 [0,1]、zrender 元素树里有哪些元素；三者一起看能立刻区分「数据/配置问题」与「图表库没注册该 series」。拿不准时先在同一个 canvas 上叠加一个柱状图做对照实验。\n\n修复与约束：改用官方 echarts 5.2.1 完整版（1MB，setCanvasCreator 兼容），旧定制包备份到 .workbuddy/backups/。echarts 5.4.1 已验证不可用于小程序（zrender 5.4 的环境检测在开发者工具里不走 wxa 分支，init 直接抛错），不要升级。放弃 5.4.1 而选 5.2.1 是硬性结论。\n\n遗留风险：pages_benefit 与 pages_owner/decision 两份副本同样缺 line 系列，若那些页面画折线也会空白；但 pages_owner 分包已 1.65MB，换成 1MB 官方包会超 2MB 分包上限，需要做含 line 的按需定制包，改动前先评估分包体积。\n\n配套习惯：改图表库后要重建干净包并用 grep 核对 series.line 存在、调试探针/构建标记（如 C0911）残留为 0；重建后开发者工具登录态会掉，需要重新登录。",
+   "evidence": "「setOption 前后 getModel().getSeries() 恒为空，yAxis 数据范围停在默认值 [0,1]，zrender 元素树里只有 xAxis 的元素」「唯独 series.line 完全不存在」「echarts 5.4.1 已验证不可用于小程序（zrender 5.4 环境检测在开发者工具里不走 wxa 分支，init 直接抛错）」「pages_owner 分包已 1.65MB，直接换 1MB 官方包会超 2MB 分包上限」",
+   "files": [
+    "src/staff/pages/components/echarts-uniapp/echarts.min.js",
+    "src/staff/pages/components/echarts-uniapp/echarts-uniapp.vue",
+    "src/staff/pages/statistics/index.vue",
+    "src/staff/api/statistics.js"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "d49c732e-8ba3-4835-a555-2cc946440322"
+   ],
+   "bundle": "001.md"
+  },
+  {
+   "title": "小程序弹窗内 ZsUploader 不显示的根因：上传组件自身状态未随父组件清空",
+   "type": "bug",
+   "content": "巡检步骤弹窗里图片上传组件真机不显示（只有一个很小的方框），且修复过程中反复出现「重置后仍显示旧图」。根因有两处，都属组件状态问题而非样式问题：\n\n1. 父页面 resetStepForm 只清了自身的 stepFormImages，但 ZsUploader 内部的 fileList 和 uni-file-picker 状态没清掉——弹窗关闭后组件仍挂在 DOM 上，旧状态一直保留。\n2. ZsUploader 的 watchEffect 在 modelValue 为空时故意保留旧图片（if (fileList.value.length > 0) return），导致父组件清空后子组件仍显示旧图。\n\n可复用套路：\n- 父组件重置表单时给上传组件累加 key（stepUploaderKey++）强制重建，这是清理自定义组件内部不可控状态最稳的手段。\n- 子组件在父组件把 modelValue 清空时，要同步调用 clearPickerFiles() 清掉 picker 内部文件列表；watchEffect 里「空值保留旧值」的写法在下拉/上传类封装里要慎用，它会让父组件的清空操作失效。\n\n关联真机问题：弹窗遮罩下层页面可滚动（滚动穿透/穿屏），解决办法是用页面级 scroll-view 包裹内容并隐藏滚动条，而不是在弹窗上加 touchmove 拦截。",
+   "evidence": "「resetStepForm 只清了 stepFormImages，但 ZsUploader 内部的 fileList 和 uni-file-picker 状态没清掉（弹窗关闭后组件仍挂在 DOM 里）」「ZsUploader 的 watchEffect 在 modelValue 为空时故意保留旧图片（if (fileList.value.length > 0) return）」「每次重置时 stepUploaderKey++，强制重建上传组件」「滚动问题解决了，但是有滚动条需要隐藏」",
+   "files": [
+    "src/staff/pages_facility/record/add.vue",
+    "src/staff/components/ZsUploader/ZsUploader.vue",
+    "src/components/ZsBottomPopup/ZsBottomPopup.vue",
+    "src/components/ZsDialog/ZsDialog.vue",
+    "src/components/ZsTextarea/ZsTextarea.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "78ffd4e2-d969-438b-a172-f36dd0d6fbad"
+   ],
+   "bundle": "001.md"
+  },
+  {
+   "title": "员工端主题色约定：自定义组件读不到页面 CSS 变量，ZsButton primary 需内联 #1677ff",
+   "type": "pattern",
+   "content": "项目是双端（业主端 + 员工端 staff）共用一套组件库，业主端主色为深蓝 #0A3D62，员工端主色为天蓝 #1677ff。用户明确要求：员工端所有按钮一律使用主题色，不允许出现其他颜色（「怎么还有这种颜色的按钮，全局排查，一律用主题色」）。\n\n关键坑：小程序里 ZsButton 是独立自定义组件，读不到页面节点上的 --primary-color，会回退到全局 page 上的业主端深蓝 #0A3D62。因此在页面根节点加 @include staff-page-theme 对组件内部无效——这是「员工端改完还是深蓝」的根因。\n\n可复用做法：\n- 组件根节点自身注入员工主题变量；\n- type=\"primary\" 通过内联 style 直接绑定 #1677ff（小程序端最可靠）；\n- 维护 src/staff/styles/theme.js 与 theme.scss 颜色一致，避免两处色值漂移。\n\n推广规则：任何跨端复用、需要在员工端显示主题色的自定义组件，都不要依赖祖先节点的 CSS 变量继承。",
+   "evidence": "「怎么还有这种颜色的按钮，全局排查，一律用主题色」「小程序里 ZsButton 是独立自定义组件，读不到页面上的 --primary-color，会回退到全局 page 上的业主端深蓝 #0A3D62。之前在页面根节点加 @include staff-page-theme 对组件内部无效」「对 type=\"primary\" 通过内联 style 直接绑定 #1677ff（小程序端最可靠）」「新增 src/staff/styles/theme.js，与 theme.scss 保持颜色一致」",
+   "files": [
+    "src/staff/components/ZsButton/ZsButton.vue",
+    "src/staff/styles/theme.scss",
+    "src/staff/styles/index.css",
+    "src/staff/pages/profile/change-password.vue",
+    "src/staff/components/PageButton/PageButton.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "d75b7b33-1f22-4fb0-8e53-852cff55d9e9"
+   ],
+   "bundle": "001.md"
+  },
+  {
+   "title": "echarts 实例必须 markRaw，避免进入 Vue 响应式",
+   "type": "pattern",
+   "content": "在小程序端使用 echarts 时，chart 实例要用 markRaw 包裹后再持有（不放进响应式 ref/reactive 的深层代理）。该加固在排查折线空白问题的并行会话中被加入并保留，与图表库版本修复互补。\n\n原因：echarts 实例内部持有大量 zrender 对象和自引用结构，被 Vue3 响应式代理后会造成性能问题与不可预期的行为。写法上让实例脱离响应式，只把必要的展示状态（如 loading、空态、数据长度）放在响应式里。",
+   "evidence": "「保留了并行会话加的 markRaw 加固（echarts 实例不进 Vue 响应式，与本次修复互补）」",
+   "files": [
+    "src/staff/pages/statistics/index.vue",
+    "src/staff/pages/components/echarts-uniapp/echarts-uniapp.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "d49c732e-8ba3-4835-a555-2cc946440322"
+   ],
+   "bundle": "001.md"
+  },
+  {
+   "title": "分类树带环对象写入响应式数据会导致 setData 崩溃并静默吞掉后续请求参数（知识库筛选不生效）",
+   "type": "bug",
+   "content": "症状：工作台-知识库点「筛选」选分类后确定，列表仍返回全量，表现为「筛选没反应」，且控制台可能只有一条 `TypeError: Converting circular structure to JSON`。\n\n根因链：`src/staff/utils/knowledgeCategory.js` 的 `normalizeCategory(item, parent, top)` 给每个节点挂了反向指针 `parent`（父子反向链）和 `top`（指向顶级节点，顶层自指），构成**循环引用树**。`src/staff/pages/knowledge/index.vue` 的 `loadCategories` 把这棵环树直接塞进 `topCategories.value`，模板读取后 uni-app 对 setData payload 做 `JSON.stringify` 校验时抛错，**同步截断** `confirmFilter` 中后续的 `await loadKnowledge({ reset: true })`；而 `src/staff/api/index.js` 会静默删除值为 `undefined` 的参数，于是请求里 `categoryId` 恒为 undefined → 接口返回全量。\n\n复现/自证方法：直接摘 `node_modules/@dcloudio/uni-mp-vue/dist/vue.runtime.esm.js` 中 `setResult` / `unwrapper` / `toTypeString` 相关段落，用 node 跑 `JSON.stringify(diff(...))` 即可复现抛错，无需真机。\n\n修复套路（只改页面一个文件，不动共享 util，避免波及同样使用 normalizeCategory 的 `TransferKnowledgeDialog.vue`）：\n1. `stripCircularRefs`：递归把 `parent`/`top` 置 null，只保留 children 单向链；写入 ref 前先 `.map(stripCircularRefs(...))`。\n2. `snapshot`：只取 `{id, name}` 的扁平快照，用于回填 `activeCategory` / `activePath`。\n3. `rebuildTopMap`：构建 `id → 顶级 {id, name}` 的**非响应式 Map**，绝不放入 setup 的响应式 data，`groupedKnowledge` 只查它。\n4. `openFilter` 里用 `findCategory(topCategories, p.id)` 反查重建 draftPath；**不能用 `.slice()`** —— 浅拷贝节点引用不变，照样带环。\n5. `confirmFilter` 不再调依赖 parent 反向链的 `buildPath`；模板字段从 `activeCategory.categoryName` 改为 `activeCategory.name`。\n\n通用教训：任何会进入组件 data/模板的对象树，先在边界处剪掉反向指针；组件内需要查找表就用非响应式闭包变量，不要塞 ref。查找「参数为何丢失」时，先看页面是否在调接口前抛过异常（异常会截断同一 async 函数后续逻辑）。",
+   "evidence": "最终结论（会话 294e988e）：根因为 normalizeCategory 挂反向指针导致环；uni-app setData 走 JSON.stringify 抛 `TypeError: Converting circular structure to JSON`，同步截断 confirmFilter 的 await loadKnowledge；api/index.js 静默删 undefined 参数使 categoryId 恒 undefined。改法为 stripCircularRefs/snapshot/rebuildTopMap 三件套 + 用 findCategory 反查替代 slice + 不再调 buildPath。验证：`CODEBUDDY_SAFE_DELETE_ENABLED=0 npm run build:mp-weixin` 构建通过，产物中 grep 到 stripCircularRefs 已 inline、loadCategories 已剪枝。",
+   "files": [
+    "src/staff/utils/knowledgeCategory.js",
+    "src/staff/pages/knowledge/index.vue",
+    "src/staff/api/index.js"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "294e988e-512b-4041-9a2b-8f790756917a"
+   ],
+   "bundle": "002.md"
+  },
+  {
+   "title": "DsDialog 内嵌套 uni-popup 的 fixed 定位错乱 → 统一 ZsBottomPopup（root-portal 脱离层叠上下文）",
+   "type": "pattern",
+   "content": "症状：底部弹出的 picker / 弹窗没有紧贴屏幕底部，而是悬浮在页面中间或相对父弹层偏上。用户连续两轮反馈「底部弹出下面没有紧贴页面底部，全局修复」「picker 还是没有贴底，全局排查修复」，说明只改单点不管用，必须全局收敛。\n\n根因：picker 被放在 `ZsDialog` 内部，嵌套的 `uni-popup` 使 `position: fixed` 相对**父弹窗**（父层叠上下文）定位，而不是视口底部。\n\n可复用套路（项目约定）：\n- 新建 `src/components/ZsBottomPopup/ZsBottomPopup.vue` 作为唯一底部弹层基座：微信小程序端用 `<root-portal>` 渲染到页面根节点，H5 用 `<teleport to=\"body\">`，其他平台回退普通 `uni-popup`；统一贴底样式、`z-index: 10001`，对外暴露 `open` / `close`。\n- 所有 Picker 类组件（ZsDatePicker、ZsPicker、ZsMonthRangeCalendar、ComplexPicker、ProjectPicker）内部 `uni-popup` 全部替换为 ZsBottomPopup，并**删除各组件内冗余的 `:deep(.uni-popup)` 定位 hack**——那类 hack 是症状而非解法。\n- 页面级 bottom popup 同样迁移（NeedToKnowPopup、pages_poll/form、pages-suggest/create、pages_property/payment/index、PaymentChannelPopup、pages_owner/repair/detail、DescribePopup、staff/pages_facility/issue/detail）。\n- 清理重复文件：`src/staff/components/ZsDatePicker/ZsDatePicker.vue` 为未使用的重复实现，删除；`App.vue` 保留全局贴底兜底样式。\n\n约定的验证方式：`npm run build:mp-weixin` 通过后**仍需在微信开发者工具手动回归**嵌套场景（巡检记录→筛选→点日期）与非嵌套场景（新增页直接点日期 picker）。",
+   "evidence": "会话 d9dec39a：用户「picker还是没有贴底，全局排查修复」；结论明确根因为「ZsDialog 内的嵌套 uni-popup 导致 fixed 相对父弹窗定位；root-portal 已将 picker 弹层脱离父层叠上下文」，并给出新建组件、5 个 Picker 改造、8 个页面迁移、删除重复文件、App.vue 兜底。会话 b2555873 同一天早前用户已提出「底部弹出下面没有紧贴页面底部，全局修复」，印证单点修复无效需全局方案。",
+   "files": [
+    "src/components/ZsBottomPopup/ZsBottomPopup.vue",
+    "src/components/ZsDatePicker/ZsDatePicker.vue",
+    "src/components/ZsPicker/ZsPicker.vue",
+    "src/staff/components/ComplexPicker/ComplexPicker.vue",
+    "src/components/ZsDialog/ZsDialog.vue",
+    "src/App.vue",
+    "src/staff/components/ZsDatePicker/ZsDatePicker.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "d9dec39a-c73b-4a6d-8ec0-8afcd431fcb6",
+    "b2555873-36c4-4214-b13b-56d0c9620e2a"
+   ],
+   "bundle": "002.md"
+  },
+  {
+   "title": "ZsImage.buildStaticUrl 不判断 http(s) 前缀，把远程兜底图拼成 static/https://… 必然加载失败",
+   "type": "bug",
+   "content": "症状：微信小程序业主端大量图片/icon 不显示，报错 URL 形如 `http://127.0.0.1:29043/__pageframe__/static/https://www.ylzhwy.com:8081/zhi2/static-xcx/images/new/no_img.png`。用户困惑「2026-09-09 的版本是好的」。\n\n关键诊断技巧：看报错 URL 的形态。**完整远程 URL 被拼进了本地 `static/` 前缀**，说明是同层拼接逻辑没做协议判断，而不是域名或文件缺失问题（当轮已先修过 szf 域名/本地文件缺失，是另一个独立 bug）。\n\n根因：`src/components/ZsImage/ZsImage.vue` 的 `buildStaticUrl` 负责给本地路径补 `static/`，但不判断 `http(s)://` 开头；同时从 9/1 那批提交起，8 处 `fallBackSrc`（我的页默认头像、首页 news 封面 no_img、ImageGrid、选举/决策系列）被改成完整远程 URL，兜底时就拼成 `static/https://...`。另外 `src/pages_owner/decision/components/multiple/OptionResult.vue` 的 fallback 指向了已被删除的本地 png。\n\n为何「旧版本是好的」：fallback 只在主图加载失败或为空时触发（如 `userStore.avatar` 无值、news 无封面）。09-09 测试账号有图，bug 潜伏；后来测试数据无图才集中暴露——**不是版本回退，bug 从 9/1 就在**。\n\n修复：`buildStaticUrl` 对 `/^https?:\\/\\//` 直接返回不拼前缀，空 src 时递归走 fallback（这一处修复让全部 8 处远程 fallback 同时恢复）；OptionResult 的 fallback 改为远程 `default-avatar.png`。验证：重新构建后在编译产物中 grep 确认包含 `/^https?:\\/\\//` 直通逻辑，并用**无头像账号**进「我的」页回归。\n\n排查优先级建议：遇到「某版本之前是好的」，先判断失败路径（fallback / 空数据 / 异常分支）在该版本是否根本没被触发，而不是先怀疑回归。",
+   "evidence": "会话 9e999a07：用户诉求「调整分包之后原来业主端的很多图片和icon不显示了」「我是微信小程序环境业主端图片不显示，2026-09-09的版本是好的」并贴出 `__pageframe__/static/https://...` 报错；结论定位 ZsImage.buildStaticUrl 双重拼接 + 8 处 fallback 被改成远程 URL + OptionResult 指向已删除本地 png，并解释 09-09 测试时有图所以未触发。同时明确 wxss 的「Some selectors are not allowed in component wxss」警告与本问题无关，可暂不处理。",
+   "files": [
+    "src/components/ZsImage/ZsImage.vue",
+    "src/pages_owner/decision/components/multiple/OptionResult.vue"
+   ],
+   "baseline": "583a55f6",
+   "sessionIds": [
+    "9e999a07-f853-49b6-96db-57e8f64f3141"
+   ],
+   "bundle": "002.md"
+  },
+  {
+   "title": "项目构建/验证约定：构建命令需关闭安全删除并用 PowerShell 后台落盘日志",
+   "type": "workflow",
+   "content": "在本项目（泰兴小程序，uni-app + Vue3，wx 小程序）里验证改动统一按这套习惯走：\n\n1. 构建命令固定为 `CODEBUDDY_SAFE_DELETE_ENABLED=0 npm run build:mp-weixin`。必须显式关掉安全删除（置 0），否则构建中的清理步骤会被拦截。\n2. Windows PowerShell 环境下长构建用后台任务 + 落盘，再取尾部：\n   `$env:CODEBUDDY_SAFE_DELETE_ENABLED='0'; $env:NODE_OPTIONS='--max-old-space-size=4096'; npm.cmd run build:mp-weixin 2>&1 | Out-File -Encoding utf8 _build_log.txt; Get-Content _build_log.txt -Tail 15`\n   大项目需要 `--max-old-space-size=4096`，否则容易 OOM。\n3. **构建通过不等于修好了**：因为 wx 小程序运行时问题（setData 序列化、picker 定位）只在真机/开发者工具暴露，验证要分两层——(a) 构建成功；(b) 在 `dist/build/mp-weixin/**` 产物里 grep 确认目标代码真的被 inline/编译进去了（例如 `stripCircularRefs` 是否出现在 `staff/pages/knowledge/index.js`）；(c) 明确列出需要在微信开发者工具手动回归的场景清单交给用户。\n4. 跑完构建可顺手 `npm run type-check` 做类型校验。\n5. 临时诊断脚本（`_diag.js`、`_scan_refs.js`、`_diag_out.txt`、`_build_log.txt` 等）直接放在仓库根目录做一次性排查，属正常做法，不要当成源码提交。\n6. 构建日志里的 `Some selectors are not allowed in component wxss`（LoginDialog / GlobalAuthDialog / uni-file-picker 中用了标签名/ID 选择器）是历史遗留警告，来自三方库或老样式，与图片/筛选等功能问题无关，不要为此改样式。",
+   "evidence": "会话 9e999a07 中用户直接下发的两轮命令即 `$env:CODEBUDDY_SAFE_DELETE_ENABLED='0'; $env:NODE_OPTIONS='--max-old-space-size=4096'; npm.cmd run build:mp-weixin ... | Out-File -Encoding utf8 _build_log.txt`（均 exit code 0），仓库根目录出现 `_diag.js`/`_diag_out.txt`/`_scan_refs.js` 等诊断文件；会话 294e988e 使用 `CODEBUDDY_SAFE_DELETE_ENABLED=0 npm run build:mp-weixin` 并在 dist 产物中 grep 验证；会话 b2555873 跑 `npm run type-check`；会话 9e999a07 结论明确 wxss 选择器警告与本次问题无关、可暂不处理。",
+   "files": [
+    "dist/build/mp-weixin/staff/pages/knowledge/index.js",
+    "package.json",
+    "vite.config.ts"
+   ],
+   "baseline": "583a55f6",
+   "sessionIds": [
+    "9e999a07-f853-49b6-96db-57e8f64f3141",
+    "294e988e-512b-4041-9a2b-8f790756917a"
+   ],
+   "bundle": "002.md"
+  },
+  {
+   "title": "项目架构约定：业主端 / staff 手持端双端目录结构，工具函数改动要评估跨端复用面",
+   "type": "pattern",
+   "content": "泰兴小程序源码在 `src/`，是**业主端 + staff 手持端双端并存**的单仓库单小程序：\n\n- 业主端页面：`src/pages/**`、`src/pages_owner/**`、`src/pages_property/**`、`src/pages_poll/**`、`src/pages-suggest/**` 等。\n- staff 手持端页面：`src/staff/pages/**`（如 workbench 工作台、knowledge 知识库）、`src/staff/pages_facility/**`（巡检 record、issue 等，含自己的 components 子目录）。\n- 双端各自可能有一份公共组件拷贝，例如 `src/components/ZsDatePicker/` 与 `src/staff/components/ZsDatePicker/`——**后者是未使用的重复实现，已删除**；新增组件一律放 `src/components/`。\n- 公共组件库为自有 `Zs*` 前缀：ZsDialog、ZsPopup、ZsPicker、ZsDatePicker、ZsImage、ZsBottomPopup（底部弹层基座）等，另有 ComplexPicker、ProjectPicker、FilterPopup、PaymentChannelPopup、TransferKnowledgeDialog。\n- 接口层：`src/staff/api/*.js`（knowledge、property 等）+ `src/staff/api/index.js` 聚合层；**聚合层会静默剔除值为 `undefined` 的参数**，所以参数名写错或值为空时接口会「安静地返回全量」，排查时必须先确认请求里参数真的带上去了。\n- 工具函数：`src/staff/utils/*.js`（如 knowledgeCategory.js）。修改这类**被多页面共享**的 util 前先 grep 调用方；若改动会影响其他模块（如 TransferKnowledgeDialog.vue），优先把适配写在单个页面里而不是改公共函数。\n- 静态资源：`src/static/` 由 `ZsImage.buildStaticUrl` 按需补 `static/` 前缀；`static/` 下资源不做自动裁剪，仅用 `scripts/findUnUseImages.mjs` 做未引用扫描；页面路由注册在 `src/pages.json`（调整分包会影响静态资源路径解析）。",
+   "evidence": "各会话涉及文件路径显示双端结构（src/pages/**、src/pages_owner/**、src/pages_property/**、src/staff/pages/**、src/staff/pages_facility/**）；会话 d9dec39a 删除了重复的 `src/staff/components/ZsDatePicker/ZsDatePicker.vue` 并统一到 `src/components/`；会话 294e988e 明确「不动 knowledgeCategory.js，避免影响 TransferKnowledgeDialog.vue 等其他模块」以及 api/index.js 静默删除 undefined 参数；会话 9e999a07 涉及 src/pages.json、scripts/findUnUseImages.mjs、vite.config.ts 与分包后图片不显示。",
+   "files": [
+    "src/pages.json",
+    "src/staff/api/index.js",
+    "src/staff/utils/knowledgeCategory.js",
+    "src/staff/pages_facility/issue/components/TransferKnowledgeDialog.vue",
+    "scripts/findUnUseImages.mjs"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "294e988e-512b-4041-9a2b-8f790756917a",
+    "d9dec39a-c73b-4a6d-8ec0-8afcd431fcb6",
+    "9e999a07-f853-49b6-96db-57e8f64f3141"
+   ],
+   "bundle": "002.md"
+  },
+  {
+   "content": "根因：同一页面出现两种主色，是因为部分元素（Tab、ID、状态色）写死了色值（业主端遗留 `#0168F0`），而其他元素走 `var(--primary-color)`；但列表页没有注入员工端主题，`--primary-color` 于是回落到业主端默认 `#0A3D62`。可复用套路：(1) 员工端页面必须 `@import`/`@include staff-page-theme`（主色 `#1677ff`）以注入 CSS 变量；(2) 所有硬编码色值统一改为 `var(--primary-color)` 等 CSS 变量；(3) 新增的 SCSS 主色变量集中在 `staff/styles/theme.scss`（`$staff-primary`）；(4) 修复后要检查业主端 `src/styles/index.css` 未被污染（仍为 `#0A3D62`），并全局 grep 确认模块内不再有 `#0168F0` / `#0A3D62` 残留。弹窗类组件（Dialog）需要在弹窗根节点自行注入主题，否则拿不到变量。",
+   "evidence": "用户反馈「工作台-报事/报修工单，筛选样式与操作按钮主色不对，主题色问题，排查一下是否全局修复」。最终结论：「同一页面出现两种主色，是因为 Tab 等写死了 #0168F0；底部按钮走 var(--primary-color)，但列表页未注入员工端主题，小程序继承了业主端 #0A3D62」。修复方式：沿用 `@include staff-page-theme`（#1677ff），硬编码色值改 CSS 变量；验证项包括业主端 styles/index.css 仍为 #0A3D62 未被污染。",
+   "files": [
+    "src/staff/styles/theme.scss",
+    "src/staff/styles/index.css",
+    "src/staff/pages_facility/issue/index.vue",
+    "src/staff/pages_facility/issue/detail.vue",
+    "src/staff/pages_facility/repair/submit.vue",
+    "src/uni.scss",
+    "src/App.vue"
+   ],
+   "title": "小程序端弹窗/控件颜色：硬编码色值 vs CSS 变量导致同一页面出现两种主色",
+   "type": "bug",
+   "baseline": "0f049619",
+   "sessionIds": [
+    "2ca2f1e5-7a7d-4825-ba87-50c96508692b"
+   ],
+   "bundle": "003.md"
+  },
+  {
+   "content": "根因：uni-app 编译小程序时会给所有组件注入 `options.addGlobalClass = true`（等价 `styleIsolation: 'apply-shared'`，可在 `dist/build/mp-weixin/common/vendor.js` 中取证：`multipleSlots:!0,addGlobalClass:!0`）。由此带来两条关键规律：① `App.vue` `<style>`（编译为 `app.wxss`）里的 class 规则会真的穿透进所有组件内部，包括第三方组件如 `uni-popup`；② 兄弟组件之间写的 `:deep()` 有作用域限制，压不过 app.wxss 的全局规则。所以「在组件里加 :deep + !important 想覆盖全局样式」往往是死代码，表现为「改过却没用」。警示：排查样式覆盖失效时，第一步应该去看编译产物 `dist/build/mp-weixin/app.wxss` 和相关组件 `*.wxss`，而不是只看源码。",
+   "evidence": "最终结论：「uni-app 编译小程序时会给所有组件注入 options.addGlobalClass = true（≈ styleIsolation: 'apply-shared'）。证据在 dist/build/mp-weixin/common/vendor.js：const a={multipleSlots:!0,addGlobalClass:!0,...}。⇒ app.wxss 里的 class 规则会真的穿透进组件内部（连第三方 uni-popup 也吃得到）；而兄弟组件自己写的 :deep() 进不去」「ZsDialog / ZsBottomPopup 里那两处 :deep(.uni-popup__wrapper){padding-bottom:0!important} 是死代码，永远压不过 app.wxss——这就是『改过却没用』的原因」。",
+   "files": [
+    "src/App.vue",
+    "src/components/ZsDialog/ZsDialog.vue",
+    "src/components/ZsBottomPopup/ZsBottomPopup.vue",
+    "dist/build/mp-weixin/app.wxss",
+    "dist/build/mp-weixin/common/vendor.js"
+   ],
+   "title": "uni-app 编译小程序会注入 addGlobalClass，App.vue 全局样式穿透进组件且组件 :deep 压不过",
+   "type": "bug",
+   "baseline": "0f049619",
+   "sessionIds": [
+    "9c0ae57b-34e1-42e1-a284-87b375e87284"
+   ],
+   "bundle": "003.md"
+  },
+  {
+   "content": "根因：`src/App.vue` 把 `padding-bottom: env(safe-area-inset-bottom)` 打在了弹窗最外层容器 `.uni-popup__wrapper.bottom` 上，而弹窗里不透明内容卡片无法填满这约 34px，于是底部露出遮罩灰（表现为「底部弹窗距页面底部有一段空隙」）。项目统一约定：**弹窗外层容器零 padding（bottom/padding-bottom/margin-bottom 全部 `0 !important`），安全区只由「弹窗底部那块不透明背景的盒子」自己承担**。落地要点：(1) 核心修复只需改 App.vue 一处；(2) 若自定义弹窗原本「误打误撞」靠 app.wxss 拿到了安全区，归零后必须在自有内容节点（如 `.zs-bottom-popup__body`，自带 background，不透明时加 `--safe` → `padding-bottom: env(safe-area-inset-bottom)`）补上，并把 uni-popup 背景改为 transparent，否则使用方会从「有灰色空隙」变成「内容太贴底」；(3) 去重：内容层已有 env() 的地方要删掉多余的一份，避免底部多一段空白；(4) 特殊场景（如 ComplexPicker 使用 `background-color=\"transparent\"`）不套 body 安全区，保留其自身 footer 处理；(5) 列表/筛选类弹层（FilterPopup 的 `.filter-container.bottom`）用 `padding-bottom: calc(24px + env(safe-area-inset-bottom))`。回归风险：历史提交 4635cee 曾把该值改成 `0 !important` 修好，0a68e52 又改回 env() 导致空隙回归——变更此规则前先查 git 历史。",
+   "evidence": "用户反馈「项目中很多底部弹出弹窗距离页面底部有一端空隙，没有紧贴底部」。最终结论：「App.vue 把 padding-bottom: env(safe-area-inset-bottom) 打在了弹窗最外层容器 .uni-popup__wrapper.bottom 上 ⇒ 内容底部那块白卡片填不满这 ~34px，底下就露出遮罩灰」「统一约定：外层容器零 padding，安全区只由『弹窗底部那块不透明背景的盒子』承担」「ZsBottomPopup 原先其实是误打误撞靠 app.wxss 那条规则在提供安全区，归零后必须补上，否则 12 个使用方会从『有灰色空隙』变成『内容太贴底』」「4635cee 曾把它改成 0 !important 修好，0a68e52 又改回 env()，空隙因此回归」。",
+   "files": [
+    "src/App.vue",
+    "src/components/ZsBottomPopup/ZsBottomPopup.vue",
+    "src/components/ZsDialog/ZsDialog.vue",
+    "src/pages/components/FilterPopup.vue",
+    "src/staff/pages_facility/components/FilterPopup.vue"
+   ],
+   "title": "底部弹窗不贴底/底部空隙：安全区 env() 的归属约定（外层零 padding，只有不透明内容盒承担安全区）",
+   "type": "pattern",
+   "baseline": "0f049619",
+   "sessionIds": [
+    "9c0ae57b-34e1-42e1-a284-87b375e87284"
+   ],
+   "bundle": "003.md"
+  },
+  {
+   "content": "可复用套路：当用户只给截图、无法确认当前代码是否已修复时，用 Pillow 对截图做纵向像素采样，得到异常区域的实际颜色（如白盒下方 31px 为 rgb(153,153,153)，即遮罩压白底），再拿截图里能识别的特征色（如按钮主色 #0168F0）比对 git 历史中的色值变更记录，反推出截图属于哪个 commit 之前/之后。由此可判定「这个 bug 历史上修过又回归了」，避免重复排查方向。",
+   "evidence": "最终结论：「用 Pillow 采样截图纵向像素验证过：白盒下方 31px 是 rgb(153,153,153)（= 遮罩压白底），高度约等于 safe-area；再用截图里按钮的主色 #0168F0 比对 git 历史，确认截图属于 commit 4635cee 之前的版本（4635cee 曾把它改成 0 !important 修好，0a68e52 又改回 env()，空隙因此回归）」。",
+   "files": [
+    "src/App.vue"
+   ],
+   "title": "用截图像素采样 + git 历史反推截图对应的代码版本，判定 bug 是否已修过",
+   "type": "workflow",
+   "baseline": "0f049619",
+   "sessionIds": [
+    "9c0ae57b-34e1-42e1-a284-87b375e87284"
+   ],
+   "bundle": "003.md"
+  },
+  {
+   "content": "根因：在小程序里用 CSS `mask-image` 叠加做「可换主题色的图标」不可靠——图标可能只显示色块或完全不显示；双色图标把圆形背景和前景元素放在同一 mask 层时，白色层会盖住前景主题色。可复用方案：新增 `ThemeIcon` 组件，小程序端用 `<image>` 加载本地 SVG 文件（稳定），需要换色时通过 `icons.js` 里的 SVG 字符串动态替换颜色（主题色 `#0A3D62`、白色 `#FFFFFF`）；页面统一改用 ThemeIcon，废弃 mask 叠加方案。另一个警示：手工「简化」SVG path 会导致图标与原版不一致，应始终从 `origin/` 还原完整原始 SVG 再改色，不要重写路径。",
+   "evidence": "用户反馈「参考原版图标，现在处理过后的图标样式和原来有区别，修复一下，保持可以换主题色能力」，之后又说「还是没修复」。最终结论：「上次只改了 SVG 路径，没有解决根本问题」，根本原因包括「CSS mask-image 在小程序里不可靠——图标可能只显示色块或完全不显示」「双色图标分层错误——把圆形背景和扳手/瞳孔放在同一 mask 层，白色层叠在上面，会把前景主题色元素盖住」「SVG 被拆碎——type_4 等图标路径被简化，和原版不一致」；方案为「从 origin/ 还原完整 SVG，新增 ThemeIcon 组件，小程序端用 <image> 加载本地 SVG，需要换色时通过 icons.js 里的 SVG 字符串动态替换颜色」。",
+   "files": [
+    "src/pages_facility/facility.vue",
+    "src/pages_facility/index.vue",
+    "src/pages_facility/origin/type3.svg",
+    "src/pages_facility/origin/tyep4.svg",
+    "src/pages_facility/origin/sssb_5.svg",
+    "src/pages_facility/static/"
+   ],
+   "title": "小程序图标不要用 CSS mask-image，改用 ThemeIcon 组件 + SVG 字符串替换色值",
+   "type": "bug",
+   "baseline": "05fd6b3c",
+   "sessionIds": [
+    "dbdb0fbe-e155-41e3-9463-05450ef8377d"
+   ],
+   "bundle": "003.md"
+  },
+  {
+   "content": "项目架构约定：泰兴小程序与「物业手持B端」共享一套代码，改动需按提交粒度双向同步（如把 B 端 commit 906ac00 合并进泰兴小程序）。同步时必须做的适配：① 组件同时落到 `src/components/` 和 `src/staff/components/` 两份（部分组件如 ZsImage 仅更新 `src/components/`）；② staff 子包页面的 import 改为 `@/staff/api`、`@/staff/store` 等别名，路由统一加 `/staff/` 前缀；③ 首页合并要**选择性**处理，保留泰兴特有逻辑（`StaffCustomTabbar`、`zStatic` 图片路径），只合并 B 端 bug 修复（`@tap` 点击、未读判断 `readFlag === '0'`、跳转 fail 回调、`pointer-events: none` 等）；④ 补充 B 端引用但泰兴缺失的静态资源（`src/static/images/szf/`、`icon_phone.png`、`icon_contact.png`、`icon_add_img.png`、`static/facility/`）；⑤ 两边 `uni.scss` 的 CSS 变量要对齐（如 `--page-button-area-height`）。完成标准：`npm run build:mp-weixin` 编译通过，并在微信开发者工具导入 `dist/build/mp-weixin` 做回归。注意相对路径引用（FilterPopup、ZsImage）在同步后容易失效，需逐个修正。",
+   "evidence": "最终结论：「同步已完成。已将物业手持 B 端提交 906ac00（bug修复）合并到泰兴小程序，并通过 npm run build:mp-weixin 编译验证」，并列出共享组件 5 个要同步到 src/components/ 与 src/staff/components/、staff 子包页面 import 适配为 @/staff/api 等且路由加 /staff/ 前缀、首页「保留 StaffCustomTabbar、zStatic 图片路径等泰兴特有逻辑」、补充 B 端引用但泰兴缺失的静态资源，以及「同步过程中处理了 B 端原有问题：record/index.vue 中 FilterPopup 的 import 路径」等。",
+   "files": [
+    "src/pages/staff/home/index.vue",
+    "src/staff/pages_facility/record/index.vue",
+    "src/components/ZsDatePicker/ZsDatePicker.vue",
+    "src/components/ZsImage/ZsImage.vue",
+    "src/uni.scss"
+   ],
+   "title": "项目约定：泰兴小程序从「物业手持B端」同步改动的方式与适配清单",
+   "type": "pattern",
+   "baseline": "8422c65f",
+   "sessionIds": [
+    "1f8915b7-fae4-4567-901b-3b9f8404445e"
+   ],
+   "bundle": "003.md"
+  },
+  {
+   "title": "小程序端写在自定义组件标签上的 class/style/CSS 变量不会透传到组件内部真实节点",
+   "type": "bug",
+   "content": "微信小程序里，把 class/style（含 --css-var 自定义属性）写在自定义组件标签上（如 <ZsButton class=\"x\" :style=\"...\">），只会落在组件外层包装节点，不会透传到组件内部的真实 <button> 等节点。后果：\n1) PageButton 把背景色转成内联 style 挂在 <ZsButton> 标签上，橙色被内部原生 <button> 默认背景 #f8f8f8 覆盖，文字色又被 .zs-button{color:#333} 压掉，呈现“白底深灰字”。\n2) 之前提交的 `.zs-button.btn-custom{background-color:var(--btn-bg-color)!important}` 因为选择器匹配不到内部节点而永远是死代码——同类写法要先怀疑是否根本不生效。\n同类残留问题：<ZsButton class=\"submit-btn\"> 这种传类名在所有页面都失效。彻底解法是给组件开 options.virtualHost，但会移除包装节点、破坏 `.button-group` 的 1fr 等 grid 分栏，需单独评估。",
+   "evidence": "会话结论原文：“微信小程序里，写在组件标签上的 class/style（含 --css-var）只落在组件外层包装节点，不会透传到组件内部的真实 <button>”；“这条选择器永远匹配不到，是死代码”；遗留项说明 virtualHost 会影响 .button-group 的 1fr 分栏。",
+   "files": [
+    "D:\\repository\\泰兴小程序\\src\\components\\ZsButton\\ZsButton.vue",
+    "D:\\repository\\泰兴小程序\\src\\staff\\components\\ZsButton\\ZsButton.vue",
+    "D:\\repository\\泰兴小程序\\src\\components\\PageButton\\PageButton.vue",
+    "D:\\repository\\泰兴小程序\\src\\staff\\components\\PageButton\\PageButton.vue",
+    "D:\\repository\\泰兴小程序\\src\\staff\\pages_facility\\issue\\detail.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "a6595586-e4f7-4b47-9b7a-2844397b091d"
+   ],
+   "bundle": "004.md"
+  },
+  {
+   "title": "小程序组件颜色定制套路：用 props 下发颜色，组件内部在真实节点上绑内联 style",
+   "type": "workflow",
+   "content": "需要给自定义组件（按钮等）定制颜色时，可靠路径是：组件新增 bgColor/textColor/borderColor 等 prop，用 computed 汇聚成 style 字符串，绑到组件根部的真实节点（如 <button :style=\"btnStyle\">）；调用方只传属性，不要在标签上写 style/class/CSS 变量。本项目 ZsButton 已按此改造，PageButton 相应改为 :bg-color / :text-color / :border-color，getBtnStyle 只保留 width，并删掉失效的 --btn-* 与 btn-custom 规则。同项目的 StatusBar.vue 本来就是这种写法，可作为参照模板。注意 src/components 与 src/staff/components 下存在两份同名组件，改动必须同步，否则两端表现不一致。",
+   "evidence": "改动表：“ZsButton.vue 新增 bgColor/textColor/borderColor 属性，用 computed btnStyle 绑到根 <button :style=\"btnStyle\">”；“改后颜色走属性下发、由组件自己在真实 button 上绑内联样式——这条路径在小程序端一定生效（同项目 StatusBar.vue 就是这个写法）”；“src/staff/components/ZsButton/ZsButton.vue 同上，两份保持同步”。",
+   "files": [
+    "D:\\repository\\泰兴小程序\\src\\components\\ZsButton\\ZsButton.vue",
+    "D:\\repository\\泰兴小程序\\src\\staff\\components\\ZsButton\\ZsButton.vue",
+    "D:\\repository\\泰兴小程序\\src\\components\\PageButton\\PageButton.vue",
+    "D:\\repository\\泰兴小程序\\src\\staff\\components\\PageButton\\PageButton.vue",
+    "D:\\repository\\泰兴小程序\\src\\components\\StatusBar\\StatusBar.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "a6595586-e4f7-4b47-9b7a-2844397b091d"
+   ],
+   "bundle": "004.md"
+  },
+  {
+   "title": "app.mixin(virtualHost) 在小程序端不生效，virtualHost 只能写在组件自身 options",
+   "type": "bug",
+   "content": "src/main.ts 里用 app.mixin(virtualHost) 全局注入 virtualHost 在微信小程序端实际不生效——uni-app 只读取组件自身的 options/本地 mixin。要让 virtualHost 起作用必须逐个组件在自己的 options 中声明。这是排查“类名/样式透传失效”类问题时容易误判的点：不要以为 main.ts 里挂过全局 mixin 就已在全项目生效。",
+   "evidence": "遗留项原文：“src/main.ts 里的 app.mixin(virtualHost) 在小程序端实际不生效（uni-app 只读组件自身的 options/本地 mixi…”（材料中该句被截断，结论明确为不生效）。涉及文件含 src/main.ts、src/utils/virtualHost.js、src/staff/utils/virtualHost.js。",
+   "files": [
+    "D:\\repository\\泰兴小程序\\src\\main.ts",
+    "D:\\repository\\泰兴小程序\\src\\utils\\virtualHost.js",
+    "D:\\repository\\泰兴小程序\\src\\staff\\utils\\virtualHost.js"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "a6595586-e4f7-4b47-9b7a-2844397b091d"
+   ],
+   "bundle": "004.md"
+  },
+  {
+   "title": "WXSS 不支持 min()/max()/clamp()，整条声明被静默丢弃而不报错",
+   "type": "bug",
+   "content": "微信小程序 WXSS 不支持 CSS 函数 min()/max()/clamp()。写了不会构建失败，也不报错，只是该条声明被静默丢弃；同一规则里的其他声明照常生效，于是表现为“样式改了但关键属性没生效”的诡异回退。案例：`:deep(.payment-popup){ width: min(100vw, 750rpx) }` 想让弹层全宽，width 被丢弃后回落到 ZsPopup 默认的 `.popup-container{width:560rpx}` 并被居中，弹层变成窄卡片悬浮，账单明细从旁边漏出、“合计”被挤换行。\n排查手法：先看编译产物 wxss 里那条声明是否还在，用截图量出实际像素换算 rpx 反推落在哪个默认值上（592px 屏 ⇒ 750rpx，实测 450px ≈ 570rpx，正好对上默认 560rpx）。\n结论：小程序端写尺寸用确定值或 100%/max-height 这类受支持写法，不要用 min/max/clamp。",
+   "evidence": "根因原文：“WXSS 不支持 min()/max()/clamp()，这条声明被丢掉，而同规则里的 margin:0 auto、padding:0、圆角照常生效 → 宽度回落到 ZsPopup 默认的 .popup-container{width:560rpx} 并被居中”；“量截图验证过：弹层白卡宽 450px（592px 屏 = 750rpx ⇒ ≈570rpx ≈ 560rpx）”。",
+   "files": [
+    "D:\\repository\\泰兴小程序\\src\\staff\\pages\\cashier\\result.vue",
+    "D:\\repository\\泰兴小程序\\src\\components\\ZsPopup\\ZsPopup.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "54c23926-7b8a-40d1-a6aa-2e3dcc903484"
+   ],
+   "bundle": "004.md"
+  },
+  {
+   "title": "员工端与业主端同名业务接口不可互推，需对齐业主端实现",
+   "type": "pattern",
+   "content": "同一业务场景在员工端和业主端可能调用不同接口且返回结构不同，不能互相替代。案例：支付方式列表，员工端原本调 GET /system/paymentChannel/list，只能拿到“银联支付”；业主端调 POST /system/paymentChannel/listPayablePaymentChannel（src/api/system.js）才是正确的可支付渠道列表。修复方式是把 staff/api/cashier.js 的 getCashierPaymentChannels 改成 POST listPayablePaymentChannel，与业主端保持一致，并让请求 body 也对齐：传 { hasEnable: '1', businessId }（hasEnable 用字符串 '1'），响应解析补“response 本身即数组”的兜底。新增员工端功能时应先读业主端同名页面（如 PaymentChannelPopup.vue）作为对照基准。",
+   "evidence": "根因原文：“员工端调 GET /system/paymentChannel/list，业主端同场景调 POST /system/paymentChannel/listPayablePaymentChannel（src/api/system.js），两个接口返回的不是一套东西”；改动：“loadPaymentChannels body 传 { hasEnable: '1', businessId }（字符串，对齐业主端），响应解析补 response 本身即数组的兜底”。",
+   "files": [
+    "D:\\repository\\泰兴小程序\\src\\staff\\api\\cashier.js",
+    "D:\\repository\\泰兴小程序\\src\\api\\system.js",
+    "D:\\repository\\泰兴小程序\\src\\pages_property\\payment\\components\\PaymentChannelPopup.vue",
+    "D:\\repository\\泰兴小程序\\src\\staff\\pages\\cashier\\result.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "54c23926-7b8a-40d1-a6aa-2e3dcc903484"
+   ],
+   "bundle": "004.md"
+  },
+  {
+   "title": "弹层/弹窗内的页脚不要复用外层固定栏样式",
+   "type": "pattern",
+   "content": "弹层内容里的合计行不要复用外层页面固定底栏（如 .payment-total）的样式类，否则外层布局语义（fixed 栏、横向排布约束）会把弹层内的「合计」挤到换行。做法是给弹层单开一组类（如 .popup-total--column 纵向排布 + .popup-collect-button），并给弹层容器和 .popup-content 补 max-height（如 82vh）使其可滚动。另外：弹层里的金额行应收敛为固定展示（账单金额/优惠金额/账户抵扣去掉 v-if），0 值格式化成 ¥0.00 而不是 -¥0.00；死链（如「查看明细 >」）应在弹窗内展开详情，而不是跳转。",
+   "evidence": "改动原文：“页脚不再复用外层固定栏的 .payment-total（就是它把「合计」挤换行的），改用 .popup-total--column + 「查看明细 >」+ .popup-collect-button；「查看明细 >」从死链改为在弹窗内展开所选账单明细”；“两个弹层 width 改 100%，.collect-detail-popup 补 max-height:82vh；.popup-content 加 max-height 让内容可滚动”；“新增 formatDeductAmount()，0 时输出 ¥0.00，不再出现 -¥0.00”。",
+   "files": [
+    "D:\\repository\\泰兴小程序\\src\\staff\\pages\\cashier\\result.vue",
+    "D:\\repository\\泰兴小程序\\src\\components\\ZsBottomPopup\\ZsBottomPopup.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "54c23926-7b8a-40d1-a6aa-2e3dcc903484"
+   ],
+   "bundle": "004.md"
+  },
+  {
+   "title": "微信 <image> 的 mode 属性优先于 CSS object-fit，ZsImage 内写死 mode 会导致 hero 背景无法铺满",
+   "type": "bug",
+   "content": "uni-app 给所有组件注入 addGlobalClass=true，父组件写在 <ZsImage> 标签上的 class 能进到组件内部，但微信 <image> 组件的 mode 属性优先于 CSS object-fit——所以项目中 4 处 `.hero-background{object-fit: cover !important}` 全是死代码。ZsImage 内部写死 mode=\"aspectFit\"（等价 contain），图片等比内缩居中，hero 顶部出现灰条，灰条高度 =(hero 高 − contain 内缩后髙)/2，各页分别为 12/53/70/95px，形成“含背景的 tab 页顶部留白不一致”。结论：控制图片裁切要在 ZsImage 上加 mode 这类 prop 由组件内部绑定，不能靠外挂 CSS。",
+   "evidence": "根因原文：“微信 <image> 组件的 mode 属性优先于 CSS object-fit，于是 4 处 object-fit: cover 全是死代码。ZsImage 内部写死 mode=\"aspectFit\"（contain）…灰条 = (hero高 − contain内缩后高) / 2，分别对应 12 / 53 / 70 / 95px”。",
+   "files": [
+    "D:\\repository\\泰兴小程序\\src\\components\\ZsImage\\ZsImage.vue",
+    "D:\\repository\\泰兴小程序\\src\\pages\\staff\\home\\index.vue",
+    "D:\\repository\\泰兴小程序\\src\\pages\\staff\\workbench\\index.vue",
+    "D:\\repository\\泰兴小程序\\src\\pages\\staff\\profile\\index.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "46d3f531-42c8-47d5-a99d-50772f08989d"
+   ],
+   "bundle": "004.md"
+  },
+  {
+   "title": "hero 背景图铺满套路：盒子宽高比 = 图片宽高比 + aspectFill + overflow 右对齐裁切",
+   "type": "workflow",
+   "content": "让 hero 背景图铺满又不裁掉关键插画的复用模板：\n1) 给 ZsImage 新增 mode prop（默认仍 aspectFit，保持向后兼容），内部两处 <image mode=\"aspectFit\"> 改为 <image :mode=\"mode\">。\n2) 让 ZsImage 的盒子宽高比等于图片宽高比，此时 aspectFill 下图片恰好填满盒子而不会被裁。\n3) 盒子宽度可超出屏宽，超出部分由 hero{overflow:hidden} 从左侧裁掉（“右对齐裁切”），配合 .hero-...{position:absolute; top:0; right:0; height:100%; width:常量} 保留右侧插画。\n实测比例：首页 815/400 ≈ 图片 1125/552；工作台 1071/460 ≈ 1125/483；我的用 heroH × 2.679 动态；组织架构 1875/400 = 1125/240 但盒子 1875rpx 远超 750rpx 屏宽，左侧 60% 被裁，正解是重切图（按 750×400rpx）。\n动态高度场景用纯 px 计算：hero 高 = uni.upx2px(280) + statusBarHeight，配 heroBgStyle 动态宽度。\n该模板可直接复用到同结构的二级页（如 staff/pages/profile/personal-info.vue、change-password.vue）。",
+   "evidence": "结论原文：“让 ZsImage 的盒子宽高比 = 图片宽高比，aspectFill 模式下图片恰好填满盒子、不会被裁；超出 hero 宽度的部分由 hero{overflow:hidden} 从左侧裁掉（\"右对齐裁切\"，保留右侧插画）”；改动含“profile 高度改纯 px 计算（uni.upx2px(280) + statusBarHeight）”；遗留项点名 personal-info.vue、change-password.vue 可复用该模板。",
+   "files": [
+    "D:\\repository\\泰兴小程序\\src\\components\\ZsImage\\ZsImage.vue",
+    "D:\\repository\\泰兴小程序\\src\\pages\\staff\\home\\index.vue",
+    "D:\\repository\\泰兴小程序\\src\\pages\\staff\\workbench\\index.vue",
+    "D:\\repository\\泰兴小程序\\src\\pages\\staff\\profile\\index.vue",
+    "D:\\repository\\泰兴小程序\\src\\pages\\staff\\organization\\index.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "46d3f531-42c8-47d5-a99d-50772f08989d"
+   ],
+   "bundle": "004.md"
+  },
+  {
+   "title": "项目约定：构建 mp-weixin 用 CODEBUDDY_SAFE_DELETE_ENABLED=0 npm run build:mp-weixin，并核对 dist 产物验证",
+   "type": "workflow",
+   "content": "本项目（泰兴小程序）改完源码后的固定验证套路：\n1) 用 `CODEBUDDY_SAFE_DELETE_ENABLED=0 npm run build:mp-weixin` 构建（约 41s，成功标志 Build complete）。\n2) 不只看构建结果，直接读 dist/build/mp-weixin 下的编译产物核对改动是否真的进入产物：wxml 中的属性/事件绑定是否动态生成、js 中 props 与接口路径是否出现、wxss 中失效类（如 btn-custom、--btn-*）残留计数是否为 0。\n3) CSS 类问题的排查同样要落到产物层：很多“样式写了没生效”在源码层看不出，在 .wxss 产物层可能已被丢弃或匹配不到。\n4) 最终仍需用户在微信开发者工具打开 dist/build/mp-weixin，在真机/工具里逐页确认视觉结果。",
+   "evidence": "多个会话均以此方式收尾，例如：“npm run build:mp-weixin 构建成功，编译产物已核对”；“CODEBUDDY_SAFE_DELETE_ENABLED=0 npm run build:mp-weixin 两次均 Build complete。产物已核对：result.wxss 出现 width:100%…”；“PageButton.wxss / .js 中 btn-custom、--btn-*、background-color 残留均为 0”。",
+   "files": [
+    "D:\\repository\\泰兴小程序\\dist\\build\\mp-weixin",
+    "D:\\repository\\泰兴小程序\\src"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "a6595586-e4f7-4b47-9b7a-2844397b091d",
+    "54c23926-7b8a-40d1-a6aa-2e3dcc903484",
+    "46d3f531-42c8-47d5-a99d-50772f08989d"
+   ],
+   "bundle": "004.md"
+  },
+  {
+   "title": "小程序弹层真机渲染必须用 root-portal 包裹（否则底层透出/内容缺失）",
+   "type": "bug",
+   "content": "根因：ZsDialog 在页面原地渲染 uni-popup，原地渲染的 fixed 弹层在真机上受页面祖先层叠上下文/transform 影响，典型症状是「模拟器正常，真机内容缺失或底层页面内容透过弹窗可见」。项目里真机验证过的 ZsBottomPopup 外层包了 <root-portal>（把弹层挂到页面根节点），这才是真机安全写法。\n\n解决套路：在 MP-WEIXIN 下用 <root-portal> 包裹 uni-popup；App.vue 里对 z-index 的覆盖对 root-portal 内部同样生效，因此改动一次可让全站所有 ZsDialog 使用点同时受益。验收方法：构建后检查 dist/build/mp-weixin 下对应 XxxDialog.wxml 是否含 root-portal 节点。\n\n排查时先排除的方向（可省时间）：小程序 <image> 不受域名白名单限制；证书有效性可以用 curl -sv 直接验证，不要一上来就怀疑证书。",
+   "evidence": "会话 1f1cffd7：用户反馈「模拟器在弹窗里面可以看到巡检图片，真机不行，另外底层页面内容可以透过弹窗看到」；最终结论确认「ZsBottomPopup 外面包了 root-portal，而 ZsDialog（全站 20 处）是原地渲染 uni-popup……原地渲染的 fixed 弹层在真机上受页面祖先层叠上下文/transform 影响，正是『模拟器正常、真机内容缺失/底层页面透出』这类差异的高发区」，并实测 www.ylzhwy.com:19002 证书有效（TrustAsia 泛域名，2027-01 到期，TLS 1.3）。",
+   "files": [
+    "src/components/ZsDialog/ZsDialog.vue",
+    "src/components/ZsBottomPopup/ZsBottomPopup.vue",
+    "src/App.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "1f1cffd7-ca4f-4638-a390-b56e691f9e57"
+   ],
+   "bundle": "005.md"
+  },
+  {
+   "title": "小程序图片不显示的排查顺序：uploadFile 白名单独立于 request 白名单 / 真机拦截 http 图片",
+   "type": "pattern",
+   "content": "图片「选完就没了」或「真机空白」的分支判别法：\n\n1) 上传失败 → 检查小程序管理后台的 uploadFile 合法域名。uploadFile 与 request 是两套独立白名单，request 通了不代表 uploadFile 通（例如 https://www.ylzhwy.com:19002 必须单独加进 uploadFile）。\n2) 图片选得上、编辑回填的已有图空白 → 后端返回的 fileSite 必须是 https://。体验版/正式版真机会拦截 http:// 图片，而微信开发者工具不拦，这是「工具正常真机异常」的常见假象来源。\n3) 其余情况 → 读 console 里 [ZsUploader] 前缀的诊断日志。\n\n配套约定：上传组件上传失败时不要静默移除缩略图，应保留临时预览 + toast「上传失败，请检查网络后重试」+ 保留 console.warn('[ZsUploader] 上传失败…')，生产包保留 warn 以便真机排障。保存前要拦截仍停留在临时路径（http://tmp、blob:、wxfile:）的图片并提示，防止落库丢图。",
+   "evidence": "会话 1f1cffd7 最终结论三处修复：「上传失败不再静默移除缩略图（原来『选完图图片闪一下就没了』的直接来源）」「onSaveStep 拦截停留在临时路径（http://tmp|blob:|wxfile:）的图片并提示，防止落库丢图」；真机复验指引明确「uploadFile 与 request 是两个独立白名单类别，request 通了不代表 uploadFile 通」「体验版/正式版真机会拦截 http:// 图片，开发者工具不拦」。",
+   "files": [
+    "src/staff/components/ZsUploader/ZsUploader.vue",
+    "src/staff/pages_facility/record/add.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "1f1cffd7-ca4f-4638-a390-b56e691f9e57"
+   ],
+   "bundle": "005.md"
+  },
+  {
+   "title": "真机 flex + scroll-view 高度计算偏差：用 flex:1 1 auto; min-height:0 + overflow:hidden 兜底",
+   "type": "pattern",
+   "content": "弹窗内的 scroll-view 在真机上存在 flex 高度计算偏差，表现为内容溢出白面板。可复用的样式兜底：弹窗内的 scroll-view 加 flex: 1 1 auto; min-height: 0，弹窗容器加 overflow: hidden。该组合在真机上稳定收敛滚动区高度，写新的可滚动弹窗时直接照此套用。",
+   "evidence": "会话 1f1cffd7 修复 ③：「弹窗两个 scroll-view 加 flex:1 1 auto; min-height:0、两个弹窗容器加 overflow:hidden，规避真机 flex+scroll-view 高度计算偏差导致内容溢出白面板」。",
+   "files": [
+    "src/staff/pages_facility/record/add.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "1f1cffd7-ca4f-4638-a390-b56e691f9e57"
+   ],
+   "bundle": "005.md"
+  },
+  {
+   "title": "uni-popup 对插槽懒渲染：上传组件必须靠 v-if 强制重挂 + nextTick 后回填",
+   "type": "bug",
+   "content": "根因：uni-popup 对插槽内容懒渲染；ZsUploader 靠 watchEffect 从 v-model 重建列表，若不重新挂载，弹窗内会渲染成空列表（表现为「巡检图片字段没有了」）。\n\n可复用套路（三步缺一不可）：\n1) 给弹窗上的上传/表单区域加 v-if=\"showXxxPopup\"，每次打开弹窗强制重新挂载；\n2) 编辑回填时严格按顺序：先清空表单/图片 → 再打开弹窗 → await nextTick() → 最后回填已有数据；\n3) 直接顺序赋值会被懒渲染吞掉，禁止在弹窗打开前就写 v-model 数据。",
+   "evidence": "会话 a76a97a2 最终结论：「uni-popup 对插槽懒渲染，ZsUploader 靠 watchEffect 从 v-model 重建列表，不重新挂载就会渲染成空。所以保留了弹窗上的 v-if=\"showStepFormPopup\"（每次打开强制重挂），并且编辑时『先清空 → 开弹窗 → await nextTick() → 再回填已有图片』」。",
+   "files": [
+    "src/staff/pages_facility/record/add.vue",
+    "src/staff/components/ZsUploader/ZsUploader.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "a76a97a2-e1d3-41ae-8139-d4a6dd188d85"
+   ],
+   "bundle": "005.md"
+  },
+  {
+   "title": "弹窗形态的步骤表单不应拆成独立页面（用户明确要求，且跨页回传会丢字段）",
+   "type": "preference",
+   "content": "用户明确要求：步骤表单（如「新增巡检步骤」）应是底部弹窗，不应新开页面。\n\n有一条带警示价值的失败重构：commit 0a68e52 曾把 add.vue 内的步骤表单弹窗抽成独立页面 record/editStep.vue，改为 uni.navigateTo 跳页 + uni.setStorageSync('record_step_edit_payload') / uni.$emit('recordStepSaved') 跨页回传，结果既违背了用户偏好（变成新开页面），也让「巡检图片」在上传组件与弹窗生命周期配合上丢失。已回退：恢复 ZsDialog position=\"bottom\" 底部弹窗，删除 editStep.vue 及 pages.json 中 staff/pages_facility/record/editStep 路由，并清理 navigateToEditStep / onRecordStepSaved / RECORD_STEP_EDIT_KEY / uni.$on/$off('recordStepSaved') / onUnload 等残留。\n\n约定：同页内的表单编辑用弹窗，不要为省代码拆页面走 storage/事件跨页回传；校验提示文案用 typeLabel 拼接，使巡检/维保/年检三种类型通用。",
+   "evidence": "会话 a76a97a2 用户诉求：\"新增巡检步骤中 巡检图片字段没有了 且不应该是新开页面\"；最终结论：「commit 0a68e52 做过一次重构，把原本在 add.vue 里的步骤表单弹窗抽成了独立页面 record/editStep.vue……于是『新增步骤』变成了新开页面」，改动为恢复 ZsDialog 底部弹窗并删除 editStep.vue 与路由。",
+   "files": [
+    "src/staff/pages_facility/record/add.vue",
+    "src/pages.json",
+    "src/staff/pages_facility/record/editStep.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "a76a97a2-e1d3-41ae-8139-d4a6dd188d85"
+   ],
+   "bundle": "005.md"
+  },
+  {
+   "title": "沙箱内对项目仓库执行 git rm 曾导致 src/ 637 个文件从工作区消失 —— git 写操作与构建改用非沙箱执行",
+   "type": "bug",
+   "content": "警示项：在一次沙箱内执行 git rm 之后，src/ 整个目录（637 个文件）从工作区消失。恢复方式：git checkout -- src 完整恢复后重新应用全部改动，最终 git status 只有预期条目，无数据丢失。\n\n防治约定：对该仓库执行 git 写操作（rm/rm -r/checkout/reset）与 npm run build:mp-weixin 时改用非沙箱执行；操作后立刻用 git status --short 核对条目数是否与预期一致。若本地有其他工具/IDE 同时看着仓库，注意避免并发写。",
+   "evidence": "会话 a76a97a2 最终结论「⚠️ 需要告知你的一件事」：「一次沙箱内的 git rm 之后 src/ 整个目录（637 个文件）从工作区消失了。我已用 git checkout -- src 完整恢复，并重新应用了全部改动……后续的 git 写操作和构建我改用了非沙箱执行」。",
+   "files": [],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "a76a97a2-e1d3-41ae-8139-d4a6dd188d85"
+   ],
+   "bundle": "005.md"
+  },
+  {
+   "title": "小程序 placeholder 样式对齐：原生 input 的 placeholder-class 与 uni-easyinput 内部类不通，须统一控件类型",
+   "type": "bug",
+   "content": "根因：同一弹窗内若混用原生 input（placeholder-class=\"input-placeholder\"）与 ZsTextarea / uni-easyinput（内部固定使用 uni-easyinput__placeholder-class），小程序里 placeholder 的样式机制不同，导致颜色、字号对不齐，且改 CSS 无效。\n\n解决套路：在需要视觉一致的表单区域内，统一改用原生控件并把 placeholder-class 设为同一个类名（例如把「巡检说明」从 ZsTextarea/uni-easyinput 换成原生 textarea + placeholder-class=\"input-placeholder\"，保留字数统计）。判定而非猜测：用 grep 查该字段实际渲染的组件类型，再决定改哪一侧。",
+   "evidence": "会话 11a4e214 最终结论：「根因是步骤弹窗里『步骤名称』『标准工时』用的是原生 input + placeholder-class=\"input-placeholder\"，而『巡检说明』走的是 ZsTextarea / uni-easyinput，内部固定用 uni-easyinput__placeholder-class，小程序里 placeholder 样式机制不同，所以颜色对不齐」；处理方式为改回原生 textarea 并使用同一 placeholder-class。",
+   "files": [
+    "src/staff/pages_facility/record/add.vue",
+    "src/components/ZsTextarea/ZsTextarea.vue",
+    "src/uni.scss"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "11a4e214-e500-42a0-9c0a-82e53325ad0f"
+   ],
+   "bundle": "005.md"
+  },
+  {
+   "title": "页面跳转统一传 projectNo（不用 projectId），接口字段用多候选映射兜底",
+   "type": "pattern",
+   "content": "路由参数约定：维修项目相关页面跳转（施工管理、竣工验收、决算总费用 → 决算费用明细）统一只传 projectNo，不再使用 projectId；新页面接收参数时写成 projectNo 并兼容旧参数 projectId（params.projectNo || params.projectId），保证老入口不炸。\n\n接口对接约定（Apifox 未展开字段定义时的稳妥做法）：在 maintainProject.js 这类页面聚合层里集中写映射函数（如 mapFinalFeeVoToRow / mapFinalFeeList），每个页面字段列多个候选来源字段按序回退，例如 companyName ← companyName / usccBName / organName / unitName；feeAmount ← feeAmount / amount / finalAmount / amountJ；unitType 额外支持 organ_type 字典回显。同时移除页面里的 Mock 逻辑，改为真实接口（如 GET /maintenance/miniapp/owner/selectFinalFeeList?projectNo=xxx）。拿到完整字段定义后再收敛候选列表。",
+   "evidence": "会话 0f870c8e：用户反馈决算费用明细页无接口请求，提供 GET /v2.0/maintenance/miniapp/owner/selectFinalFeeList（参数 projectNo）；最终结论：「参数改为 projectNo（兼容旧参数 projectId）」「object-detail.vue 的『决算总费用』跳转改为只传 projectNo，与施工管理、竣工验收一致」「字段映射做了多候选兼容（因 Apifox 未展开 FinalFeeVo 明细）」并给出候选字段表。",
+   "files": [
+    "src/pages_maintain_project/maintainProject.js",
+    "src/pages_maintain_project/final-cost-detail.vue",
+    "src/pages_maintain_project/object-detail.vue",
+    "src/api/maintenance.js"
+   ],
+   "baseline": "ef9129b0",
+   "sessionIds": [
+    "0f870c8e-b6a8-4a79-9313-486d33650ad4"
+   ],
+   "bundle": "005.md"
+  },
+  {
+   "title": "接口数据字段结构不稳定：统一用归一化函数适配嵌套/扁平两种返回",
+   "type": "pattern",
+   "content": "泰兴小程序后端接口字段结构在嵌套对象与顶层扁平字段之间不一致，直接读取会显示 0 或丢数据。约定做法：为易变接口写独立的归一化工具函数，不要散落在页面里改字段名。\n- 收费统计：新增 src/staff/utils/statisticsFee.js 的 normalizeFeeStatistics()，把接口 fee 统一为 { house, area, money } 结构，同时兼容嵌套对象与顶层扁平字段（receivableAmount、houseCollectionRate 等）。页面用 fee computed 接入归一化，解决「卡片读 fee.house 但接口返回扁平字段导致显示 0」的问题。\n- 列表/数组：新增 src/staff/utils/response.js 的 extractArrayData()，统一解析 data / rows / data.rows / data.list 四种返回形态，页面与弹窗组件（如 TransferKnowledgeDialog、aiKnowledge）统一调用，不再各页各写一套取值。\n- 工具统一在 src/staff/utils/index.js 导出。\n排查建议：仍显示 0 时，先在 vConsole Network 里看实际返回字段名，再补充到归一化映射中，而不是在页面里硬改。",
+   "evidence": "「fee computed 接入归一化，解决卡片读 fee.house 而接口返回扁平字段导致显示 0 的问题」；「normalizeFeeStatistics()，将接口 fee 统一为 { house, area, money } 结构，同时兼容嵌套对象与顶层扁平字段」；「src/staff/utils/response.js — extractArrayData，统一解析 data / rows / data.rows / data.list」；「已在 src/staff/utils/index.js 导出」；「若仍有字段为 0，请在 vConsole Network 中查看 /property/statistics/overview 的 fee 实际字段名」",
+   "files": [
+    "src/staff/utils/statisticsFee.js",
+    "src/staff/utils/response.js",
+    "src/staff/utils/index.js",
+    "src/pages/staff/statistics/index.vue",
+    "src/staff/pages_facility/issue/components/TransferKnowledgeDialog.vue",
+    "src/staff/pages_facility/issue/aiKnowledge.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "1a7fcd5e-e97f-49e6-aa2f-13a3b608f6e4",
+    "890a75f9-c359-46c7-a778-43eec2b971b6"
+   ],
+   "bundle": "006.md"
+  },
+  {
+   "title": "小程序点击事件统一用 <view @tap>，不要用 <text @click>",
+   "type": "bug",
+   "content": "踩坑：知识库「查看全部」「筛选」「面包屑」等点击无反应，根因是绑在 <text> 上的 @click 在小程序端命中区域过小/不可靠（<text> 是行内元素，点击区域只覆盖文字本身，padding 区不响应）。\n解决套路：交互元素一律用 <view @tap>，并用 CSS 撑开可点击区域；这是全项目层面的约定，不是单页修复。\n该次修复共加固 8 处：knowledge/index.vue 4 处（筛选、面包屑、查看全部）、pages/staff/home/index.vue「更多」、cashier/result.vue「查看明细」「关闭弹窗」×2、cashier/index.vue 错误关闭 ×。\n另一个坑：事件处理函数解析失败时不要静默 return，必须 toast 提示，否则用户只看到「点了没反应」，无法定位问题。",
+   "evidence": "「工作台-知识库，点击查看全部没有反应」；「4 处交互由 <text @click> 改为 <view @tap>（筛选、面包屑、查看全部）」；「viewCategory 不再静默 return，解析失败时 toast 提示」；「staff 端点击加固（共 8 处）」表格",
+   "files": [
+    "src/staff/pages/knowledge/index.vue",
+    "src/staff/pages/staff/home/index.vue",
+    "src/staff/pages_facility/cashier/result.vue",
+    "src/staff/pages_facility/cashier/index.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "890a75f9-c359-46c7-a778-43eec2b971b6"
+   ],
+   "bundle": "006.md"
+  },
+  {
+   "title": "表单图片上传校验要克制：不要拦截「有图但未取到持久化地址」",
+   "type": "bug",
+   "content": "踩坑：巡检步骤新增时图片已上传却反复提示「有图片未上传成功，请删除后重新上传」；删掉步骤再新增，之前的图片还残留。\n原逻辑（过度防御）：界面里有图片（数组非空）但取不到服务端持久化地址（rawUrl / fileID 仍是 wxfile:// 等临时路径）就拦截——本意是防「真机上传失败但界面还显示缩略图、保存时静默丢图」，但上传状态同步稍有偏差就误拦，用户体验极差。\n修正后的约定（与其他页面如工单完成弹窗保持一致）：\n- 只做必填校验：步骤名称必填、说明按规则校验、图片仅当规则要求必填（isPicture === '1'）且完全没图时提示「请上传巡检图片」。\n- 保存时直接取地址，不做临时路径拦截：stepFormImages.map(el => el.rawUrl || el.fileID || el.url).filter(Boolean).join(',')。\n配套问题：步骤被删除后图片数组未正确清理，导致重新新增时带入旧图片，需在删除步骤时重置对应的图片状态。",
+   "evidence": "「新增巡检步骤的时候图片已经传了，还被校验没有上传成功，删了步骤再新增，之前的图片还在」；「实际上这条判断太激进，上传状态同步稍有偏差就会误拦」；「图片仅在规则要求必填（isPicture === '1'）且完全没图时，提示请上传巡检图片」；保存代码 stepFormImages.map(el => el.rawUrl || el.fileID || el.url).filter(Boolean).join(',')",
+   "files": [
+    "src/staff/pages_facility/record/add.vue",
+    "src/staff/pages_facility/record/addScrap.vue",
+    "src/staff/components/ZsUploader/ZsUploader.vue",
+    "src/components/ZsUploader/ZsUploader.vue",
+    "src/staff/api/file.js"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "1cc3bd97-be24-4f8d-abe0-a7fa7f804986"
+   ],
+   "bundle": "006.md"
+  },
+  {
+   "title": "手机号一律微信授权获取，禁止手动输入；且必须有格式校验兜底脏数据",
+   "type": "preference",
+   "content": "用户明确要求（业务方确认小程序主体为政府单位，微信获取手机号接口无需额外付费）：\n1) 所有需要手机号的地方（报事报修、候选人报名、验证码页等）都改为微信授权获取手机号，禁止手动输入，用弹窗按钮引导。\n2) 必须校验格式——线上存在大量错误手机号脏数据，接口返回或本地缓存的号码若不是合法手机号也要当作「未绑定」，重新走授权。\n落地套路（集中在 userStore，不要在页面里各写一套）：\n- src/utils/formatter.js 新增 isValidMobilePhone，复用 mobileNumber 正则（1 开头 11 位）。\n- setPhone 仅校验通过才写入，否则清空 phone / securePhone；setUserInfo 的手机号经 setPhone 过滤；hasPhone 改为基于格式校验而非「有值」；bindWeChatPhone 授权后仍无效则清空并返回空；本地缓存恢复时若格式不对自动清空。\n- 组件 PhoneAuthField 对 userStore.phone 与 modelValue 都做校验，无效则显示「授权获取手机号」；页面提交判断统一用 userStore.hasPhone。",
+   "evidence": "「所有需要输入手机号的地方都改为授权获取手机号，禁止输入。可以用弹窗提示的按钮」；「目前有很多用户的手机号字段是错误的，检测一下，如果接口返回的手机号格式不是手机号，也要重新获取」；「hasPhone：改为基于格式校验，不再只看是否有值」；「本地缓存恢复：启动时若缓存手机号格式不对，自动清空」",
+   "files": [
+    "src/utils/formatter.js",
+    "src/store/user.js",
+    "src/pages_owner/repair/submit.vue",
+    "src/pages_owner/committee/application/index.vue",
+    "src/pages_common/common/sendCode.vue",
+    "src/api/security.js"
+   ],
+   "baseline": "b880b8d3",
+   "sessionIds": [
+    "510728f5-92ac-48f5-9a73-391b5612606d"
+   ],
+   "bundle": "006.md"
+  },
+  {
+   "title": "新建分包的页面开发约定：设计稿还原 + z-paging 分页 + store 内直接调接口",
+   "type": "workflow",
+   "content": "用户在需求中明确规定的页面开发方式（新建分包页面时按此执行）：\n1) 按设计稿实现页面，UI 100% / 像素级还原。图片资源放在该分包自己的 static 目录（如 src/pages_maintain_project/static），用引入地址（image src 绑定）的方式引用。\n2) 列表分页用 z-paging 组件（依赖已在 node_modules 中）。\n3) 数据层：为该页面创建一个新的 store，接口调用直接在 store 中完成，页面只消费 store 里的数据，不在页面里直接调 api。\n4) 新建分包后必须在 src/pages.json 中同时注册分包 root 与页面路径。\n配套踩坑：WXSS 中引用本地资源图片无效（编译报「pages_xxx/index.wxss 中的本地资源图片无法通过 WXSS 获取」），必须改用网络图片、base64 或 <image> 标签。\n等宽布局（如左右两个 action-item）：用 flex: 1 1 0; min-width: 0;，避免文案长的一侧把另一侧撑宽。",
+   "evidence": "「按照设计稿实现页面，用到的图片在 src/pages_maintain_project/static 目录，用引入地址的方式。要求UI，100%还原，用z-paging实现分页，创建一个新的store，接口调用直接在store中完成，页面使用store里面的数据」；「@src/pages.json 注册分包和页面」；「pages_maintain_project/index.wxss 中的本地资源图片无法通过 WXSS 获取，可以使用网络图片，或者 base64，或者使用标签」；「左右两个 action-item 现在会严格等宽…flex: 1 1 0; min-width: 0;」",
+   "files": [
+    "src/pages_maintain_project/index.vue",
+    "src/pages.json"
+   ],
+   "baseline": "445ceca2",
+   "sessionIds": [
+    "05318172-ef0c-4e3c-bc59-b55271e82214"
+   ],
+   "bundle": "006.md"
+  },
+  {
+   "title": "图表文字改用原生叠加层渲染，避免 ECharts graphic 在小程序端不显示",
+   "type": "pattern",
+   "content": "踩坑/套路：ECharts（echarts-uniapp 组件）的 graphic 文本在小程序端渲染不可靠，仪表盘中心的欠缴金额/应收金额曾因此缺失。\n解决套路：移除 ECharts graphic 配置，改用原生 view 叠加层（gauge-overlay）绝对定位盖在图表上，展示红色欠缴金额与灰色应收金额，样式完全可控。\n同时注意：UI 里的数值不要用 HTML 标签 <strong>（小程序无此标签），改用 <text class=\"...\">，并用修饰类（如 rate-value--orange/--blue/--green）表达主题色；数据绑定时要从归一化后的对象取值（如 fee.money.receivableAmount / unpaidAmount），不要在 option 里直接读原始字段。",
+   "evidence": "「arrearsOption 改为读取 fee.money.receivableAmount / unpaidAmount」；「移除 ECharts graphic 文字，改用原生 gauge-overlay 叠加层显示欠缴金额（红）和应收金额（灰）」；「<strong> 改为 <text class=\"fee-value\"> / rate-value--*，收缴率分别显示橙/蓝/绿主题色」",
+   "files": [
+    "src/pages/staff/statistics/index.vue",
+    "src/staff/pages/components/echarts-uniapp/echarts-uniapp.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "1a7fcd5e-e97f-49e6-aa2f-13a3b608f6e4"
+   ],
+   "bundle": "006.md"
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+{
+ "project": "苏住房C",
+ "batch": "032",
+ "files": [
+  "032.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "登录成功后点击菜单还是会提示业主认证，在各个tab页",
+   "type": "preference",
+   "content": "已修复。根因有两点： 1. **`getUserInfo` 存在竞态**：`listStatus` 未 `await`，`identities` 在接口返回前就被设为空数组，导致 `goMenu` 的 v3 校验始终认为未认证。 2. **登录后未刷新状态**：登录只保存了 token，没有拉取身份列表和绑定房屋列表。 ### 修改内容 **`store/user.js`** - 修复 `getUserInfo`：等待 `listStatus` 完成后再写入 `identities` - 新增 `refreshAuthState()`：依次调用用户信息接口 + `getMyHouseList`（已认证业主房屋） - 统一将身份类型转为字符串，避免 `\"1\"` 与 `1` 比较失败 **`pages_main/login/index.vue`** - 验证码/密码登录成功后，跳转前 `await userStore.refreshAuthState()` **`utils/tabBar.js`** - 各 tab 页 `onShow` 时，已登录用户自动调用 `refreshAuthState()` **`App.vue`** - H5 通过 hash 注入 token 时，同样刷新认证状态 **`My_Suzhufang.vue`** - 移除重复的 `loadIdentityTy",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`store/user.js",
+    "**`pages_main/login/index.vue",
+    "**`utils/tabBar.js",
+    "**`App.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "db56ec08-2aeb-407a-bde0-498f081066b6"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "修复双晒公示页 UI 崩坏 Implement th",
+   "type": "preference",
+   "content": "根据你发的最新截图，图标尺寸已经正常了，但 **2 列布局仍然没恢复**。 ## 进一步原因 卡片设置了 `flex: 0 0 48%`，但标题有 `white-space: nowrap`，加上图标和箭头后，**卡片最小宽度约 400rpx，超过了 48% 容器宽度（约 340rpx）**，所以每行只能放 1 张卡，右侧留空。 ## 本次补充修复 在 [`index.vue`](zhi2-mobile-shimin/src/pages_main/publicNotice/index.vue) 中做了这些调整： 1. **Flex 改为 CSS Grid**：`grid-template-columns: repeat(2, minmax(0, 1fr))`，强制两列等宽 2. **标题允许换行**：去掉 `nowrap`，改为 `word-break: break-all` 3. **略微缩小图标**：96×110rpx，并给 `ZsImage` 宿主元素设置固定宽高 4. **卡片加 `overflow: hidden` 和 `min-width: 0`**，避免内容撑破网格 请重新编译后在微信开发者工具里查看，预期效果应为 **2×2 网格，左右对称铺满**。如果还有问题，发一张新截图即可。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "[`index.vue`](zhi2-mobile-shimin/src/pages_main/publicNotice/index.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\publicNotice\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\publicNotice\\publicNotice.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9774c8d1-2b21-4a57-a4db-44c6514d4939"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

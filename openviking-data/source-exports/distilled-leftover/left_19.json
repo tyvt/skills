@@ -1,0 +1,117 @@
+{
+ "batch": 19,
+ "files": [
+  "109.md",
+  "110.md",
+  "111.md",
+  "112.md",
+  "113.md",
+  "114.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "本地改 env/.env 的代理不生效：实际被 env/.env.development.local 覆盖，且 Vite 只在启动时读 env",
+   "type": "bug",
+   "content": "情况：在 zhi2-web-admin 里改了仓库根 env/.env 的 VITE_APP_PROXY_ADDRESS（如改成 http://192.168.1.134:8080/v3.0），重启后接口仍打到旧地址，看起来「代理没生效」。\n\n为什么：vite.config.js 用 loadEnv(mode, rootDir + \"/env\") 且 envDir 也指向仓库根的 env/，因此 Vite 的环境变量合并顺序是 env/.env → env/.env.local → env/.env.development → env/.env.development.local（后者覆盖前者）。本机若存在 env/.env.development.local（该文件是「不提交、仅本机」的覆盖配置，注释里写明与 unlimited dev 网关对齐），它的 VITE_APP_PROXY_ADDRESS 会盖掉 .env 里的值。用 loadEnv('development', ...) 实测最终值仍是 unlimited dev 网关。\n\n怎么做：改本地代理一律改 env/.env.development.local（或先注释掉其中的 VITE_APP_PROXY_ADDRESS），改完必须完全重启 npm run dev，热更新不会重载代理；验证方式是在浏览器 DevTools 里看接口响应头 frontend-proxy（createProxyConfig 会写该头）。排查时别忽略两个旁证：VITE_APP_FILE_PROXY_ADDRESS 与 API 代理是两套（附件/图片 /zhi2、/zhi2-dev 仍走远程），跑 test 模式读的是 env/.env.test 而非 .env；目标为 192.168.* 局域网时代理会剥掉 /api/v3.0 前缀，target 带 /v3.0 需与后端挂载路径一致。",
+   "evidence": "会话 d5d06cba（cursor，基线 99bfdbd）用户问「@env/.env 我修改了代理为什么没有生效」；助手定位到 vite.config.js 的 loadEnv(mode, rootDir+\"/env\") + envDir 配置，指出 env/.env.development.local 优先级最高且实测覆盖了 .env 的 192.168 地址；给出「改 .env.development.local + 完全重启 + 看 frontend-proxy 响应头」的解法。",
+   "files": [
+    "env/.env",
+    "env/.env.development.local",
+    "env/.env.test",
+    "zhi2-web-admin/vite.config.js"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "d5d06cba-323d-42cc-97f2-d132fd10ba5c"
+   ],
+   "bundle": "109.md"
+  },
+  {
+   "title": "zs-table-column type=\"tag\" 会按 prop 推导字典名而丢弃父级传入的 :options，需同步 dict-url 并让组件优先用 options",
+   "type": "bug",
+   "content": "情况：经纪机构从业人员列表的「业务状态」列文案显示错误。列上写的是 type=\"tag\" dict-url=\"personnel_business_status\" :options=\"businessStatusOptions\"，但实际拉的是按 prop 推导出的 business_status 字典。同一模块的分支机构列表正常，是因为它显式写了 dict-url=\"branch_record_state\"。\n\n为什么：zs-table-column 在 type=\"tag\" 分支里会把 prop=\"businessStatus\" 转成字典名 business_status 去拉取，既没用父组件传进来的 dict-url，也没用 :options。也就是说父级 options 在 tag 渲染路径上是被静默忽略的，不会报错，只是标签文案和颜色按错字典走。\n\n怎么做：1）列上凡是走字典/标签的，显式补 dict-url=\"正确字典编码\"（业务状态 personnel_business_status、人员类型 agency_personnel_type），与相邻正常页的写法对齐；2）组件层新增 syncDictOptions()，优先采用父组件传入的 :options，没有 options 时才按 dict-url 或 prop 推断去拉，并 watch options 异步更新（字典晚到时能二次刷新）。改完刷新列表核对「待提交/审核中/已备案/已注销」四个文案与标签颜色是否与字典配置一致。排查同类「某列文案不对但兄弟页正常」时，先 diff 两边的 dict-url 写法，不要先怀疑字典数据缺失。",
+   "evidence": "会话 79cda85c（cursor，基线 130ee05）用户反馈「经纪机构从业人员的列表的业务状态显示不对」；助手定位到 zs-table-column 在 type=\"tag\" 时把 prop 转成 business_status 拉字典、未使用父组件传入的 personnel_business_status，修复为组件新增 syncDictOptions() 优先用 :options 并监听异步更新，同时给业务状态列补 dict-url、人员类型列补 agency_personnel_type。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelList.vue",
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchList.vue"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "79cda85c-f236-4024-bbca-80e15e49274b"
+   ],
+   "bundle": "109.md"
+  },
+  {
+   "title": "ZsButton 的 permission prop 是数组，直接传权限码字符串会 Vue warn 且权限判定失效",
+   "type": "bug",
+   "content": "【什么情况】在 OperationBtnGroup 内部或页面自定义按钮上直接给 zs-button 写 :permission=\"cancelPerms.submit\"（一个字符串，如 \"presale:permitCancel:submit\"），控制台报 [Vue warn] Invalid prop: type check failed for prop \"permission\". Expected Array, got String。\n\n【为什么】ZsButton 把 permission 声明为 Array 类型（用于多权限码「任一/全部命中」判定）。传字符串时 Vue2 只做 props 类型校验告警、不中断渲染，所以按钮能显示，但 v-hasPermi 一类指令拿到的是字符串而不是数组，逐项匹配逻辑静默失配，最终表现为「按钮该显示时不显示 / 该隐藏时显示」，很难从界面反推原因。同一文件里 OperationBtnGroup 自己给它内部按钮写的是 :permission=\"[node.permission]\"，两套写法并存才是真正的坑源。\n\n【怎么做】凡是传权限码的地方一律包成数组：:permission=\"[cancelPerms.submit]\"。排查此类 warn 时不要只看报错的那一个 prop——同一模块下 permitCancel 与 permitExtend 的 detail.vue 都出现了同类问题，正确做法是在模块目录里 grep permission=\"（无方括号）一次性把同类写法全清掉，而不是修一处刷新一次。",
+   "evidence": "会话 c67126a0（基线 0b15dd3）：permitCancel/detail.vue 写 :permission=\"cancelPerms.submit\" 触发 Vue warn，根因是 ZsButton 的 permission prop 类型为 Array；修复为包数组，并同步修了 permitExtend/detail.vue 里 extendPerms.edit / extendPerms.submit 两处同类写法。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/zs-button/zs-button.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permitCancel/detail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permitCancel/permitCancelConstants.js"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "c67126a0-1a20-4b19-8997-5c2898e50ff1"
+   ],
+   "bundle": "110.md"
+  },
+  {
+   "title": "[苏房] 公共 xxx-row 布局改造要按 formMode 加修饰类：默认态对齐兄弟页，只给新增态放开高度",
+   "type": "pattern",
+   "content": "什么情况：委托代售 detail.vue 为支持「新增态要件区高度随内容」,直接在行级类上写了 align-items:flex-start、min-height:auto，并去掉了左列的 flex:1 / overflow-y:auto，同时给添加态加了 --add 类。看似兼容，实际行级样式对所有 formMode 生效，view/edit 也被改掉了。\n为什么：src/styles/index.scss 里 .basic-appendix-row 的默认策略是 align-items:stretch + min-height:380px（<1200px 转 auto），兄弟页 permit/plan/detail.vue 还额外依赖左侧 flex:1 + overflow-y:auto 形成区内滚动。而 view/edit 仍走 AnnexUpload（height:0 / flex:1 1 0 / height:100% + overflow-y:auto）这条「父级给稳定高度、子级内部滚动」的链。父级一旦变成 content-sized，链就断了：要件多时变成整页滚动，或被 overflow:hidden 裁掉，左右列视觉高度也不一致。\n怎么做：默认态保持与同模块兄弟页一致（min-height:380px，不覆盖全局 stretch，保留左列 flex:1 + overflow-y:auto），把所有「放开高度」的覆盖（align-items、min-height:auto、overflow-y:visible、add 态要件高度 auto）全部收进 .basic-appendix-row--add 内。改完要在 >1200px、edit、已保存、多要件的手测组合下验证列表仍能区内滚动、不被裁切。顺带清理被删结构的残留 :deep 规则（如组件已去掉 .footer，页面还留着 :deep(.upload-file > .footer)）。",
+   "evidence": "会话 da87ee47（基线 6b3ac5a）review 未提交变更时给出两条 HIGH：①detail.vue:585-596 行级样式对所有 formMode 生效、与全局 align-items:stretch / min-height:380px 及 permit/plan 兄弟页策略冲突；②detail.vue:598-638 的 .appendix-section 仍靠 height:0/100% + overflow-y:auto 约束折叠区，父级改成 content-sized 后 edit/view 可能整页滚动或被裁切。建议把覆盖仅放 .basic-appendix-row--add 内，并另指出遗留的 :deep(.upload-file > .footer) 死代码。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/entrustSale/detail.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/components/FileList.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/components/ImageGrid.vue",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/views/presale/surveyChange/detail.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "da87ee47-2ea6-426b-bd22-351ab502603b"
+   ],
+   "bundle": "112.md"
+  },
+  {
+   "title": "[苏房] 变更子表与旧字段并存时的三件套：读取取首个非空数组、提交剔除旧字段、合并字段保留子表主键",
+   "type": "bug",
+   "content": "什么情况：后端给「企业记录变更」新增了 qualificationRecordChangeList 子表，前端还要兼容旧的 qualificationList / qualificationRecordList。改造涉及 src/utils/registerQualification.js（normalizeQualificationRow、pickQualificationArray、buildQualificationRecordChangeListPayload、mergeQualificationRow）与 toB/companyRecord/detail.vue 的 getForm。review 发现三处必须成套改的点：\n① pickQualificationArray 用 `Array.isArray(x) ? x : 下一个` 判定，子表返回空数组 [] 时就再也不回退旧字段，而接口常出现「空子表 + 有数据的旧字段」，资质回显会丢。要按「首个非空数组」选取（Array.isArray(x) && x.length）。\n② getForm 只解构掉了 provinceCityArea，`...form` 里仍带 qualificationList，与 qualificationRecordChangeList 一起发出——JSDoc 已声明变更只用后者，最终请求体成了双字段。要连同 qualificationList 一起解构剔除。\n③ normalizeQualificationRow 已产出 qualificationRecordChangeId / qualificationRecordId，但 QUALIFICATION_MERGE_FIELDS 与 mergeQualificationRow 没包含它们，合并路径会把 ID 丢掉，保存时带不上 qualificationRecordChangeId，容易重复创建子表行。要把 ID 加进合并字段，或在 primary 为空时从 fallback 补全。\n为什么：这三处分别落在「读→存→合并」三条链路上，只修其中一处，回显、载荷、主键仍会在别的路径上继续出错，且都是静默失败（不回显、多字段、重复行），控制台无报错。\n怎么做：读侧统一走「首个非空数组」；存侧显式剔除旧字段而不是靠子表构建结果覆盖；合并字段清单必须包含全部主键字段。改完复核 payload 里只有一套字段、详情回显不丢资质、已保存单重进不新增子表。",
+   "evidence": "会话 1366f7fe（基线 6b3ac5a）review 给出 [HIGH] getForm 仍提交 qualificationList（src/views/toB/companyRecord/detail.vue:422-432，verdict=BLOCK）与两条 MEDIUM：pickQualificationArray 空数组阻断回退（src/utils/registerQualification.js:78-83）、合并字段未保留 qualificationRecordChangeId/qualificationRecordId（registerQualification.js:41-51、59-73）。",
+   "files": [
+    "zhi2-web-admin/src/utils/registerQualification.js",
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue",
+    "zhi2-web-admin/src/api/company/companyRecord.js",
+    "zhi2-web-admin/src/views/company/companyManagement/components/companyBasicInfoShared.js"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "1366f7fe-2bc1-4156-bb7d-ba34c7f1820e"
+   ],
+   "bundle": "112.md"
+  },
+  {
+   "title": "[苏房] 单页注册表单在必填校验外多一道「至少一个附件」守卫，导致法人+全非必填要件仍被拦「请上传要件附件」",
+   "type": "bug",
+   "content": "现象：经纪机构注册走单页表单（InstitutionRegisterSingleForm.vue）时，管理员类型选「法人」，配置中心里该类型下所有要件都是非必填（页面上没有一个星标），但提交仍被前端拦下并提示「请上传要件附件」，用户无法提交。\n\n根因：该表单提交时有两层附件校验，两层的语义不一致。第一层 missingRequiredNames 是按 mapAppendixConfigsForAdminType 过滤后、对 isRequired === '1' 的可见配置逐项检查是否已上传，它与界面上 `*` 必填星标完全同源，是正确的。第二层是一句额外的守卫 if (!this.attachmentList.length) → 提示「请上传要件附件」，它不区分必填与否，一律要求至少上传一个附件。当所有要件都非必填时第一层放行、第二层拦死，于是出现「界面全都不必填，却提示请上传要件附件」的矛盾体验。\n\n为什么只有单页表单出问题：多步流程里的 Step3Appendix.vue 只做必填校验，没有「至少一个附件」的限制，所以同一套配置在多步流程里能正常提交，单页表单不能——这类双实现分叉是要优先怀疑的点。\n\n怎么做：删掉 attachmentList.length 这段守卫，提交时只依赖 missingRequiredNames，让前端校验的唯一定义源就是「配置 + isRequired」，与界面星标保持一致。注意若某些编码被映射为必填（如 company_register_license、legal_person_id_card），仍应提示「请上传必填要件：…」。若删掉后后端 saveAndSubmit 仍报错，那是接口侧强制 attachmentList 非空，属于后端规则，不要在前端再加回来。",
+   "evidence": "会话 4b85e9a6-d8c8-452a-86e2-545a995afd8f：用户报「经纪机构注册 管理员类型为 法人，附件配置都是不必填，前端提示请上传要件附件」。定位到 InstitutionRegisterSingleForm.vue 中存在 missingRequiredNames（按 mapAppendixConfigsForAdminType 过滤 + isRequired==='1'）与额外守卫 if (!this.attachmentList.length) 两层校验；对比 Step3Appendix.vue 只做必填校验、行为正确。修复为删除多余的 attachmentList.length 校验，仅保留 missingRequiredNames。",
+   "files": [
+    "zhi2-web-admin/src/views/institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue",
+    "zhi2-web-admin/src/views/institutionRegister/components/Step3Appendix.vue",
+    "zhi2-web-admin/src/utils/registerAppendixAdminType.js",
+    "zhi2-web-admin/src/utils/appendix.js",
+    "zhi2-web-admin/src/views/register/components/single-page/CompanyRegisterSingleForm.vue"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "4b85e9a6-d8c8-452a-86e2-545a995afd8f"
+   ],
+   "bundle": "113.md"
+  }
+ ]
+}

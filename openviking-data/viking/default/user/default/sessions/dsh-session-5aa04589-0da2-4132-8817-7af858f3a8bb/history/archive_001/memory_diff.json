@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-5aa04589-0da2-4132-8817-7af858f3a8bb/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T07:22:30.393670+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/09/git_panel_error.md",
+                "memory_type": "events",
+                "after": "# Summary\nUser deepseek-harness-default-workspace reported a plugin metadata error for @xbzbing/dsh-git-panel: Node ERR_PACKAGE_PATH_NOT_EXPORTED for subpath './locale/de.json' not defined by exports in package.json (C:\\Users\\Administrator\\.dsh\\profiles\\web\\node_modules\\@xbzbing\\dsh-git-panel\\package.json). On 2026-11-09 assistant investigated and found package.json does export the subpath and the file exists; suspected stale DSH host process module cache loaded before package update at 14:31:35 same day, causing transient error.\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: @xbzbing/dsh-git-panel\n\n包元信息错误：Plugin metadata for @xbzbing/dsh-git-panel: Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './locale/de.json' is not defined by \"exports\" in C:\\Users\\Administrator\\.dsh\\profiles\\web\\node_modules\\@xbzbing\\dsh-git-panel\\package.json imported from C:\\Users\\Administrator\\.dsh\\profiles\\web\\node_modules\\@xbzbing\\dsh-git-panel\\package.json\n**assistant [peer=deepseek-harness-default-workspace]**: I'll start by investigating this package metadata error. Let me look at the plugin's package.json and the actual file structure.\n...\n**assistant [peer=deepseek-harness-default-workspace]**: The package.json DOES export `./locale/de.json`, and the file exists. So why does Node report it's not exported? Let me check what's actually resolving the import — likely a stale/duplicate copy or a symlink, and check who's importing it.\n...\n**assistant [peer=deepseek-harness-default-workspace]**: The working dir isn't inside that node_modules, so resolution fails normally. The error is thrown by the DSH host that loads the plugin. The message says `./locale/de.json` \"is not defined by exports\" — but it clearly IS. This suggests the profile loads from a different node_modules copy, OR the exports map Node sees differs. Let me search where the actual error originates and check all copies of this package.\n...\n**assistant [peer=deepseek-harness-default-workspace]**: Only one copy, modified at 14:31:35 — just seconds before the error at 14:31:58. Something modified package.json right before the error. Let me compare with the npm registry/git source and check for a `.orig`/backup or recent changes. Let me also check the actual mtime/contents of locale files and whether exports in the file differ from what Node cached.\n...\n**assistant [peer=deepseek-harness-default-workspace]**: No BOM, files all fresh from 14:31:35. Now let me reproduce the exact error by simulating what the host does — importing `./locale/de.json` via ESM from within the package. Also check how the host loads locale (maybe it hardcodes subpaths that don't match).\n...\n**assistant [peer=deepseek-harness-default-workspace]**: Both resolve fine *now*. So the error is transient/stale — likely node's resolution was against an **older package.json** without the `./locale/de.json` export, and the plugin was just updated at 14:31:35. The running DSH host process loaded the plugin metadata **before** the update, or its module cache holds the old exports map.\n\nLet me check the cordis.patch.yml and how the host consumes locale, plus whether the host process needs a restart. Let me look at the host lib to see the exact import that fails.\n...\n**assistant [peer=deepseek-harness-default-workspace]**: That grepped minified bundle output — bad move. Let me be precise: grep only for the JSON import specifier strings in lib JS files, filtering to short lines.\n...\n**assistant [peer=deepseek-harness-default-workspace]**: No literal `locale/*.json` in lib JS. So the host loads locale files itself based on some manifest. The error text \"Plugin metadata for @xbzbing/dsh-git-panel: ... imported from ...package.json\" is DSH's plugin metadata loader. It builds the export subpath from a locale list. Let me check the DSH core plugin loader code to understand exactly how it constructs `./locale/de.json`."
+            },
+            {
+                "uri": "viking://user/default/memories/entities/plugin/dsh_git_panel.md",
+                "memory_type": "entities",
+                "after": "# @xbzbing/dsh-git-panel\nA DSH (DeepSeek Harness) plugin installed at C:\\Users\\Administrator\\.dsh\\profiles\\web\\node_modules\\@xbzbing\\dsh-git-panel.\n\n## Description\n- DSH plugin providing git panel functionality for the web profile\n- Located in node_modules of the web profile under .dsh\n\n## Key Facts\n- package.json exports map includes subpath `./locale/de.json`\n- Locale file `locale/de.json` exists on disk as of 2026-11-09\n- On 2026-11-09 a metadata load error ERR_PACKAGE_PATH_NOT_EXPORTED was reported for this subpath\n- Assistant suspected stale DSH host process module cache loaded before package update at 14:31:35\n\n## Relations\n- Used by DSH host plugin metadata loader that imports locale subpaths\n- Part of the web profile environment of user deepseek-harness-default-workspace"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

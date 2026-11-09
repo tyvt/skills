@@ -1,0 +1,47 @@
+{
+  "project": "苏州市房地产监测V3",
+  "batch": "341",
+  "files": [
+    "341.md"
+  ],
+  "count": 2,
+  "memories": [
+    {
+      "title": "开发企业注册与入网认证共用要件 busCode 040100（靠复用同一常量保证一致）；经纪 030100/030110、租赁 030300/030310 必须分开",
+      "type": "fact",
+      "content": "【什么情况】用户问「开发企业的注册和入网认证在取附件配置的时候是用的同一个 busCode 还是不同的」——这类问题必须用代码链路回答，不能凭印象。\n【为什么】开发企业注册与入网认证**确实是同一个 busCode**：`040100`。常量定义在 `src/api/company/companyRegister.js`（`const BUS_CODE = '040100'`，注释写「与 editAndSubmit 要件校验一致」），入网侧**直接 import 复用**——`src/api/company/companyRecord.js` 里 `import { BUS_CODE as DEVELOPER_REGISTER_APPENDIX_BUS_CODE } from '@/api/company/companyRegister.js'` 后 `export const ENTRY_NETWORK_APPENDIX_BUS_CODE = DEVELOPER_REGISTER_APPENDIX_BUS_CODE`。两条链路（企业端/管理端入网详情 `DeveloperBasicInfoDetail.vue`、主管部门入网确认 `DeveloperEntryNetworkAdminDetail.vue`）最终都调同一个 `/file/appendix/listAppendixPackage`，**busCode 恒为 `040100`，只是 busId 不同**（注册 `companyRegisterId`，入网 `companyRecordId`）。\n【怎么做】① 同主体同业务链路的注册件与入网件可以共用一个 busCode，但**跨主体绝不能混**：经纪机构注册 `030100`、经纪入网认证/确认/基本信息 `030110`；租赁入网 `030300`、租赁开业/G 端审核 `030310`（见 `src/api/institution/institutionRegister.js`）。② 一致性靠**复用同一个常量**保证，而不是各处各写一个字符串——`companyRecord.js` 复用 `companyRegister.js` 的常量是这个设计的正解。③ 查一个页面的实际 busCode：注册侧看 `RegisterUploadItem.vue` 的 `resolvedBusCode = busCode || BUS_CODE` 兜底；入网侧看 `DeveloperBasicInfoDetail.vue` 的 `displayAppendixBusCode`/`toolbarBusCode`（提交校验也用同一个 `busCode`），最终由 `AppendixPackageSection` 传给 `/file/appendix/listAppendixPackage`。④ 「注册包 vs 入网包」在别的模块是**两个**编码（如产品2.0 的 040900 与 040100），所以不要把本条结论外推到其他主体。",
+      "evidence": "会话 session-f030e21f-90d1-4e58-867a-89aef8b09352（基线 a86bf95）用户诉求 1「开发企业的注册和入网认证在取附件配置的时候是用的同一个busCode还是不同的」；最终结论「**用的同一个 busCode：`040100`**」并给出三段代码依据（`companyRegister.js#L11-L12` 的 `const BUS_CODE = '040100'`、`companyRecord.js#L10-L22` 的 `import { BUS_CODE as DEVELOPER_REGISTER_APPENDIX_BUS_CODE }` 与 `export const ENTRY_NETWORK_APPENDIX_BUS_CODE = DEVELOPER_REGISTER_APPENDIX_BUS_CODE`、`DeveloperBasicInfoDetail.vue#L224-L231` 与 `DeveloperEntryNetworkAdminDetail.vue#L84` 的透传），结论补充「两条链路调的是同一个接口 `/file/appendix/listAppendixPackage`，只是 `busId` 不同（注册是 `companyRecordId`，入网是 `companyRecordId`）…**busCode 恒为 `040100`**」以及「经纪注册 `030100`、入网认证/确认/基本信息 `030110`；租赁入网 `030300`/`030310`」。",
+      "files": [
+        "zhi2-web-admin/src/api/company/companyRegister.js",
+        "zhi2-web-admin/src/api/company/companyRecord.js",
+        "zhi2-web-admin/src/views/company/companyManagement/components/DeveloperBasicInfoDetail.vue",
+        "zhi2-web-admin/src/views/company/companyRegister/DeveloperEntryNetworkAdminDetail.vue",
+        "zhi2-web-admin/src/views/register/components/RegisterUploadItem.vue",
+        "zhi2-web-admin/src/components/AppendixPackageSection/index.vue"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-f030e21f-90d1-4e58-867a-89aef8b09352"
+      ],
+      "bundle": "341.md"
+    },
+    {
+      "title": "从业人员人员类型/人员角色走字典 agency_personnel_type / agency_personnel_role，角色字段仅「专业人员」显示必填，且备案/申请/变更三种详情共用同一组件",
+      "type": "fact",
+      "content": "【什么情况】核对经纪机构从业人员「备案申请详情」「变更详情」里的人员类型（`personnelType`）与人员角色（`personnelRole`）是否已按指定字典实现——结论是不需要改代码，但必须知道字段口径和复用关系，否则后续会重复实现或改错地方。\n【为什么】这两个字段散落在三个页面的语义里（备案详情 / 申请详情 / 变更详情），但实现只在一处；一旦在某个页面单独实现，就会出现「同名字段在不同页面字典不一致」的经典问题。\n【怎么做】① **字典绑定**（数据来源）：`src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue` 中 `this.getDicts('agency_personnel_type')` → `personnelTypeOptions`，`this.getDicts('agency_personnel_role')` → `personnelRoleOptions`；② **查看态翻译**：同文件 `displayValue()` 里 `personnelType` → `dictLabel(value, this.personnelTypeOptions)`，`personnelRole` → `dictLabel(value, this.personnelRoleOptions)`；③ **编辑态下拉**：`AgencyPersonnelBasicInfoFormFields.vue` 中 `personnelType` 用 `personnelTypeOptions`、`personnelRole` 用 `personnelRoleOptions`；④ **业务规则**：`personnelRole` **仅在「专业人员（`personnelType=professional`）且展示角色字段」时才显示且必填**（经纪服务人员不需要角色），判据写在 `agencyPersonnelBasicInfoFields.js` 与 `AgencyPersonnelDetail.vue`；⑤ **复用关系**：备案详情 `agencyPersonnel/detail.vue`、申请详情 `agencyPersonnelApply/detail.vue` 都直接复用 `<AgencyPersonnelDetail />`；变更详情则由 `AgencyPersonnelDetail.vue` 内部通过 `changeActive` 切换走 `personnelRecordChange` 接口，UI 与字典逻辑完全共用——所以改字典或改规则只改共享组件一处，三种详情同步生效；⑥ 注意与「隐藏人员角色并自动推导值」这类口径（已知条目）区分：本模块是「专业人员才显示角色字段」。",
+      "evidence": "会话 session-00c761c3-9e6b-4fba-8dbe-852853f26d1d（基线 d9a1380）最终结论「核对完成。结论：**经纪机构从业人员『备案申请详情』『变更详情』中的 `人员类型(personnelType)` 与 `人员角色(personnelRole)` 已经按你的要求使用指定字典实现，无需改动代码。**」并按文件/行列出依据：第 438/439 行 `getDicts('agency_personnel_type')` / `getDicts('agency_personnel_role')`、第 449/451 行 `dictLabel(value, this.personnelTypeOptions)` / `dictLabel(value, this.personnelRoleOptions)`、`AgencyPersonnelBasicInfoFormFields.vue` 第 48–51/53–56 行、`agencyPersonnelBasicInfoFields.js` 第 53 行 + `AgencyPersonnelDetail.vue` 第 388 行「`personnelRole` 仅在『专业人员（`personnelType=professional`）且展示角色字段』时显示/必填」、以及「申请详情：`agencyPersonnelApply/detail.vue` → `<AgencyPersonnelDetail />`（直接复用）」「变更详情：`AgencyPersonnelDetail.vue` 内通过 `changeActive` 切换走 `personnelRecordChange` 接口」。",
+      "files": [
+        "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue",
+        "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelBasicInfoFormFields.vue",
+        "zhi2-web-admin/src/views/institution/agencyPersonnel/components/agencyPersonnelBasicInfoFields.js",
+        "zhi2-web-admin/src/views/institution/agencyPersonnel/detail.vue",
+        "zhi2-web-admin/src/views/institution/agencyPersonnelApply/detail.vue"
+      ],
+      "baseline": "d9a1380",
+      "sessionIds": [
+        "session-00c761c3-9e6b-4fba-8dbe-852853f26d1d"
+      ],
+      "bundle": "341.md"
+    }
+  ]
+}

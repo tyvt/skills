@@ -1,0 +1,165 @@
+{
+ "project": "园区物管2.0",
+ "batch": 13,
+ "files": [
+  "049.md",
+  "050.md",
+  "051.md",
+  "052.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "baseline": "3965548b6 / fc994977f",
+   "content": "什么情况：大屏/图表页（如经营资产柱状图）渲染数值偏小或错位，例如停车泊位接口返回 3.83（百个）被显示成 0.0383。为什么：图表组装函数（chartOptions.js 的 buildOperatingAssetsOption）在接口数据之上又调用了一次 hundredFromCount（除以100），而 getBusinessAssetDistribution 返回的 count 本身已是「百个」单位；同类坑还有 mock 里把已是万元的数再用 wanFromYuan 从元换算，导致资金收入/支出数值偏小。怎么做：约定接口/mock 返回什么单位就按什么单位直接渲染，展示层只做数值解析（parseMetric）不做单位换算；新增图表前先确认接口字段的真实单位（问后端或对照设计稿数值），不要「预防性」地套换算函数；换算函数只用于确认为原始单位（元/个）的数据源，并在命名上写清目标单位。",
+   "evidence": "会话 2aead552：移除 chartOptions.js 中对接口 count 的 hundredFromCount 二次转换；会话 756a714b：mock 数据此前误用 wanFromYuan 换算导致资金收支数值偏小，修正为 7208.61/1055.63 万元",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js",
+    "zhi2-web-admin/src/views/benefit/mapOverview/mock.js",
+    "zhi2-web-admin/src/views/benefit/mapOverview/dataHelpers.js"
+   ],
+   "sessionIds": [
+    "2aead552-4c20-46bf-8d3c-19b32a0f3556",
+    "756a714b-ac8a-4781-84a1-a60e2b9da822"
+   ],
+   "title": "[园区物管] 接口已换算好单位的数据，前端不得二次换算（百个/万元双坑）",
+   "type": "pattern",
+   "bundle": "049.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "fc994977f",
+   "content": "什么情况：大屏/统计类页面临时用 mock 数据顶替接口（接口未就绪或演示需要），且多个页面要展示同一套指标（如预警统计在 mapOverview 与 alert 页都出现）。为什么：各页各自写 mock 数组，后续按业务表改数时会漏改某一页，造成两页数字对不上。怎么做：mock 数据统一收敛在公共常量模块（如 mapOverview/constants.js 的 WARNING_STATISTICS_MOCK），其他页面 import 同一份常量并在 fetch 函数里映射字段，而不是发真实请求或复制数组；页面级图表 mock 放 mapOverview/mock.js 并用 USE_MOCK_DATA 开关控制。后续接口就绪时只需把各页 fetch 切回真实请求，数据源不用再找。",
+   "evidence": "会话 ed027c4d：alert/index.vue 的 fetchStatistics 改为从 ../mapOverview/constants 引入 WARNING_STATISTICS_MOCK，不再请求 /benefit/warningAnalysis/getStatistics，明确说明 constants 调整后 alert 页自动保持一致",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/alert/index.vue",
+    "zhi2-web-admin/src/views/benefit/mapOverview/constants.js",
+    "zhi2-web-admin/src/views/benefit/mapOverview/mock.js"
+   ],
+   "sessionIds": [
+    "ed027c4d-6a67-49d2-8457-0f7cefb06f17",
+    "756a714b-ac8a-4781-84a1-a60e2b9da822"
+   ],
+   "title": "[园区物管] 多页共享同一份 mock 数据源：mock 收敛到 constants 常量模块，页面只做字段映射",
+   "type": "pattern",
+   "bundle": "049.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232",
+   "content": "情况：Web 端 ECharts 线柱混合图左右两个 Y 轴都要显示单位（如「单位：个」「单位：万元」），同时顶部左右两角各有一组图例，默认 yAxis.name 写在轴顶端会与图例叠在同一区域，用户反馈图例被遮挡。为什么：默认 nameLocation='end' 把轴名画在轴顶，与 legend 的 top 区域天然重叠；单纯加大 grid.top 会浪费图表高度。怎么做：把左右轴名都改到轴线中段竖排——左轴 nameLocation:'middle' + nameRotate:90，右轴 nameRotate:-90；顶部只保留图例（legend top:6、left/right:8，grid.top 收到 38 留一行图例高度）；另给 tooltip 加 confine:true 让提示框画在图表区内，减少遮挡曲线/柱子。若竖排文字离图太近，加大对应轴 nameGap 或 grid.left/right。",
+   "evidence": "会话 4e63d96f-65eb-4f4f-856a-e04211eb5626：结论明确给出 nameLocation:'middle'+nameRotate:90/-90、grid.top 38、legend top 6、tooltip confine:true 的完整配置",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "sessionIds": [
+    "4e63d96f-65eb-4f4f-856a-e04211eb5626"
+   ],
+   "title": "ECharts 双轴图表：Y 轴单位与图例争位时用 nameLocation:'middle' 竖排到轴中段",
+   "type": "pattern",
+   "bundle": "050.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "3353ef164",
+   "content": "情况：后台大屏类页面的「排名/榜单」列表要求超出可视区域时自动无缝滚动展示。为什么：直接对固定条数列表做 marquee 会在数据不满一屏或条数变化后出现空白与跳变。怎么做：①超出才滚——先比较列表实际总高度与可视容器高度，只有总高大于容器时才把数据复制一份渲染，用 translateY(-50%) 做无缝循环动画，动画时长随条数自适应（条数越多越慢，约 14s~48s）；②hover 暂停便于看清某行；③响应尺寸变化——同时监听 window.resize 与列表容器的 ResizeObserver，重新判定是否还需要滚动；④数据更新（watch 列表数据）后先停掉滚动再重新测高，避免条数变化后状态错乱。注意窗口或布局变化后必须重测，否则滚动画与数据条数脱节。",
+   "evidence": "会话 fb674606-0fb0-4f70-a96e-65b06964c556：结论描述「超出才滚 + 复制数据 translateY(-50%) + hover 暂停 + resize/ResizeObserver 重判 + watch 数据后重测」完整实现",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue"
+   ],
+   "sessionIds": [
+    "fb674606-0fb0-4f70-a96e-65b06964c556"
+   ],
+   "title": "列表排名垂直无缝自动滚动的实现套路（超出才滚 + 悬停暂停 + 尺寸/数据变化重判）",
+   "type": "pattern",
+   "bundle": "050.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "fc994977f",
+   "content": "什么情况：Web 后台详情页「所属社区」等经 dictFormatter 转译的字段，查看时偶尔显示编码而非名称。为什么：dictFormatter（main.js）从 this.communityOptions 按 dictValue 找 label，而 communityOptions 来自 area mixin 的异步接口——created 阶段发一次不带 subdistrictCode 的全量请求，详情回调又按当前街道发一次，两个请求返回顺序不确定，后返回者整表覆盖 options；若详情先渲染或列表被无参请求覆盖，就匹配不到。另外 detailMixins 本身已包含 area mixin，页面再显式挂一次会导致 created 里的无参请求执行两次，加重竞态；编码数字/字符串类型或首尾空格不一致也会让 == 匹配失败。怎么做：1）页面不要重复挂 area（detailMixins 已含）；2）详情回调里用专用 loadCommunityOptionsForDetail 只按当前街道拉社区并写入 options；3）查看模式改用带 trim 和统一类型比较的 formatCommunityDisplay，不依赖 dictFormatter 的 options 时序。同类问题可参考 complexChange/detail.vue 的既有处理。",
+   "evidence": "会话 2bea6416：detail.vue 的 dictFormatter 从 communityOptions 找 label；created 无参 getCommunityList 与 detailCallback 带参请求竞态覆盖；mixins:[detailMixins, area] 重复挂载；修复为 formatCommunityDisplay + loadCommunityOptionsForDetail + 去掉重复 area mixin",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/main.js",
+    "zhi2-web-admin/src/mixins/area.js",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "sessionIds": [
+    "2bea6416-3e83-4b54-af77-1e2e56704a2a"
+   ],
+   "title": "详情页 dictFormatter 转译偶发显示编码：异步 options 竞态 + area mixin 重复挂载",
+   "type": "bug",
+   "bundle": "051.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7fe15a8cb",
+   "content": "什么情况：园区物管2.0 的 benefit（公共经营收益）模块里，详情页内的可选资源分页接口（路径以 /pageOptionalComplex 结尾，如广告位/场地/泊位/公房的 detail 页选择列表）必须按当前项目过滤，否则会列出全部项目的资源。为什么：B 端用户登录后通过选项目弹窗（bProjectDialog.vue 的 SET_CURRENT_PROJECT mutation）把所选项目写入 store，接口侧不会自动按上下文过滤，需要前端显式传。怎么做：这些接口的 filterParams 中固定加 complexId: this.$store.state.user.currentProjectId；新增同族页面的选择弹窗/可选资源接口时同样带上，避免漏过滤。",
+   "evidence": "会话 e974a409：pubAdvertiseSpace/pubVenue/pubParkingSpace/pubHouse 四个 detail.vue 的 filterParams 增加 complexId: this.$store.state.user.currentProjectId；currentProjectId 由 bProjectDialog.vue 的 SET_CURRENT_PROJECT 写入",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubAdvertiseSpace/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubVenue/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubParkingSpace/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubHouse/detail.vue",
+    "zhi2-web-admin/src/store/modules/user.js"
+   ],
+   "sessionIds": [
+    "e974a409-a954-44ae-98f7-abed1b7bea16"
+   ],
+   "title": "benefit 模块 pageOptionalComplex 系列接口约定：filterParams 必须带 store 的 currentProjectId",
+   "type": "pattern",
+   "bundle": "051.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "177bc3ce4",
+   "content": "什么情况：列表页带左侧部门/区域树（如 RegionTreeLayout 被物业 complex、assetLeaseApply、assetsLeaseContractFiling 等多个备案列表页共用），在树状/平铺视图切换时列表数据与树状态错乱、表单查询条件被误清。为什么：切换视图时原来直接调父组件的 resetQuery()，会把所有搜索条件连同表单字段一并清空，违反「列表始终跟随查询条件」；且切回树状时树仍停留在旧的子节点选中态，与列表数据不一致。怎么做：1）切平铺：只清 parent.queryParams.parentDeptId 并重置 pageNum 后重新 getList，保留表单条件；2）切树状：用 pendingTreeDefaultReset 标志 + treeRenderKey 自增强制树重挂为默认态（顶级选中、展开二级），树初始化后 nodeClick 设根节点并刷新列表；3）绝不调 resetQuery()。该组件是多列表页共用组件，修一处全域生效，改前要评估共用面。",
+   "evidence": "会话 5caf964c：RegionTreeLayout.vue 原切视图调 parent.resetQuery() 清空全部条件；修复为切平铺仅清 parentDeptId+getList，切树状 pendingTreeDefaultReset+treeRenderKey 重挂默认态；组件被 complex/assetLeaseApply/assetsLeaseContractFiling 等列表页共用",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue",
+    "zhi2-web-admin/src/views/property/complex/index.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "sessionIds": [
+    "5caf964c-1f64-46bd-95e6-c9f4eafe4f5b"
+   ],
+   "title": "树+表联动列表页的树状/平铺切换：只清树过滤字段，绝不能调 resetQuery 清表单条件",
+   "type": "pattern",
+   "bundle": "051.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "fb0e2899f / 3353ef164 等（本批会话记录的代码基线）",
+   "content": "什么情况：地图大屏用 ECharts geo + registerMap 注册 SVG 底图，弹窗里轮播切换到某个区时要求地图对应区域同步高亮，与鼠标 hover 的 emphasis 效果一致。为什么：轮播是程序驱动的状态变化，不是用户交互，dispatchAction hover 类事件在 SVG geo 上不稳且会被下一次交互打断；而 geo.regions 是声明式配置，setOption 增量更新即可稳定生效。怎么做：抽一个与 geo.emphasis.itemStyle 完全相同的常量（如 WUXI_GEO_HIGHLIGHT_ITEM_STYLE）保证高亮色与 hover 一致；写 buildMapGeoCarouselRegions(highlightName) 生成 regions 数组——「全市」时只保留飞地 path 的静默配置、其它区恢复默认底色，轮到某区时给该区追加高亮 regions 项；用 chart.setOption({ geo: { regions } }) 增量更新。三个触发点都要覆盖：watch 轮播索引（$nextTick 里更新）、轮播重置回第 0 张（索引不变时 watch 不触发，需手动同步一次）、initMap 首帧 setOption 后调一次。注意：一个行政区可能对应多个 path（如江阴市主体+飞地），飞地即使不显示标签也要加同样的高亮 itemStyle，否则高亮只盖住主体；「全市」这类汇总幻灯片若改文案，硬编码判断要同步改，更好的做法是用独立字段标记汇总页。",
+   "evidence": "会话 89d6d616-b337-43c4-bc8d-a3268340e46f：mapOverview/index.vue 轮播到某区时 SVG 对应区高亮，最终用 setOption({geo:{regions}}) + 三处触发点 + 飞地同步高亮实现。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue"
+   ],
+   "sessionIds": [
+    "89d6d616-b337-43c4-bc8d-a3268340e46f"
+   ],
+   "title": "ECharts geo+SVG 注册图的轮播高亮套路：setOption geo.regions 而非 dispatchAction，多 path 行政区（飞地）要逐 path 配置",
+   "type": "pattern",
+   "bundle": "052.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "3965548b6（本批会话记录的代码基线）",
+   "content": "什么情况：非表格场景（摘要文案组件如 ZsSummaryText、大屏统计文案等）需要给数字加千分位，且值可能是 undefined/null/空串或混排的非数字文案。为什么：直接 Intl.NumberFormat 或 toLocaleString 会把非数字值变成 NaN 或报错，且各页面自写千分位会造成展示口径不一致。怎么做：统一复用 @/formatters/index.js 的 currencyFormatter（内部 Intl.NumberFormat，与 amountFormatter 同源），先判 undefined/null/'' 直接返回空，再用 @/patterns/index.js 的 patterns.number 正则判定是否数字字符串——非数字原样 return，不格式化、不报错；数字调 currencyFormatter(v, 0, 20, v)，小数上限放宽到 20 以便金额类小数也能保留。若某项必须固定两位小数，给数据项加可选字段（如 decimals: 2）分支调用 currencyFormatter(v, 2, 2)，不要为个别场景改调用方的数据形状。这是与表格列「prop + :formatter」并列的文案级千分位约定，两处都禁止页面内自写正则加逗号。",
+   "evidence": "会话 e7b17454-44cc-4737-a77d-b8aa48d3a424：ZsSummaryText 数字千分位用全局 currencyFormatter + patterns.number 判定，非数字原样返回，避免误伤混排文案。",
+   "files": [
+    "zhi2-web-admin/src/components/ZsSummaryText/index.vue",
+    "zhi2-web-admin/src/formatters/index.js",
+    "zhi2-web-admin/src/patterns/index.js"
+   ],
+   "sessionIds": [
+    "e7b17454-44cc-4737-a77d-b8aa48d3a424"
+   ],
+   "title": "数字千分位的全局统一入口：formatters/currencyFormatter + patterns.number 判定，非数字原样透传",
+   "type": "pattern",
+   "bundle": "052.md",
+   "project": "园区物管2.0"
+  }
+ ]
+}

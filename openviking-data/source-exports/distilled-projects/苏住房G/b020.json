@@ -1,0 +1,211 @@
+{
+ "project": "苏住房G",
+ "batch": 20,
+ "files": [
+  "077.md",
+  "078.md",
+  "079.md",
+  "080.md"
+ ],
+ "count": 12,
+ "memories": [
+  {
+   "title": "[苏房] 苏住房G 子模块专属分支上被误合并的首页改版：用 reset + force-with-lease 回退，并区分「撤销分支包含」与「删除提交」",
+   "type": "workflow",
+   "content": "情况：苏住房G 的同源父仓库 + zhi2-web-admin 子模块拓扑下，子模块分支 develop/v2.6.2-suzhufang 被同事（或 AI）误合入了通用线的「首页改版」提交，用户在冲突处理时明确要求「子模块不需要最新的首页改版」→「子模块处理干净」。\n为什么：同源复制出来的专属分支只应承载该项目的定制改动，把上游通用功能整条合进来会污染专属分支，并让父仓库指针指向一个包含未验收改动的 SHA。已知条目里的「合并冲突只在子模块指针上，选包含对方提交的较新 SHA」不适用于这种「远端分支已含不该要的提交」场景——此时不能选新 SHA，必须回退。\n怎么做（实测有效）：在子模块目录 git fetch origin → git reset --hard ee0d915（回到误合并之前的 tip）→ git push --force-with-lease 到子模块远程；随后父仓库的完成标志是 git submodule status 输出没有 +/- 前缀（指针与远程一致），工作区除本地 env/.env 外干净。验收后还要主动告知同事：若已拉过被撤销的 SHA，需在子模块里 git fetch + git reset --hard origin/<branch> 自愈。\n注意：撤销的是「分支是否包含」而非物理删除提交，上游提交仍保留在原线上可随时再合；force 推送前必须先比对父仓库指针已指向目标 SHA，避免父仓指针悬空。",
+   "evidence": "用户诉求「子模块不需要最新的首页改版啊」「子模块处理干净」；结论表：分支 develop/v2.6.2-suzhufang、本地/远程 tip ee0d915，已撤销 fa906a9 误合并及 719d565 等首页改版提交，操作 git reset --hard ee0d915 + git push --force-with-lease，父仓库提交 1e5b44d 指针已是 ee0d915，git submodule status 无 +/- 漂移。",
+   "files": [
+    "d:/repository/苏住房G/.gitmodules"
+   ],
+   "baseline": "1e5b44d",
+   "sessionIds": [
+    "eadd8db6-4f13-47f9-a598-f2345d025cab"
+   ],
+   "bundle": "077.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 首页大屏 mock 的 $get 直接返回裸数组而不是 {code,msg,data}：区县 Tab 只剩「全市」的静默降级",
+   "type": "bug",
+   "content": "情况：首页 index-v2 新增 fetchCityRegionTabOptions（src/views/property/largeScreen/utils.js）解析区县 Tab，生产路径 fetchRegionSortList 走 (res.data || []).map(...)，因为 axios 拦截器返回的是 HTTP body 整体 {code,msg,data}；而 preview-main.js 的 $get mock 与 tests/e2e/home-v2-mocks.js 的 mockRegionSortList 若直接 resolve 一个数组，区县列表会为空，只剩「全市」一个 Tab。\n为什么：解析函数只读 res.data，对数组取 .data 得到 undefined → 走 `|| []`；不会抛错，只打一条 console.warn，属于典型的「不报错但功能缺失」静默降级，E2E 也不会红。\n怎么做：所有 $get/$post mock（预览 main.js、e2e mocks）统一返回 { code, msg, data } 外壳，data 内才是列表；新增解析函数时先对照 src/api/portal/home.js 注释确认响应形态，并与 publicQuery/complex/index.vue 等既有消费方的 (res.data || []) 写法保持一致；排查「列表空但无报错」时优先怀疑响应体层级而不是接口参数。",
+   "evidence": "审查结论「响应形态（$get vs fetchRegionSortList）」段落：preview-main.js 的 PREVIEW_REGION_SORT_LIST 与 home-v2-mocks.js 结构相同；若 mock 的 $get 直接返回数组会得到空区县列表 + console.warn，最终只剩「全市」——不抛错但静默降级。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/largeScreen/utils.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/home/preview-main.js",
+    "d:/repository/苏住房G/zhi2-web-admin/tests/e2e/home-v2-mocks.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/publicQuery/complex/index.vue"
+   ],
+   "baseline": "15e201a",
+   "sessionIds": [
+    "c02d127a-16d6-4253-8fde-22fe476f9dd2"
+   ],
+   "bundle": "077.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 页面内多个列表各自拉数据时，序号防竞态必须逐个补齐（已补 loadCheckData 却漏 loadRegionOptions / loadStudyList）",
+   "type": "pattern",
+   "content": "情况：index-v2.vue 同一页面里有 loadKeyData、loadCheckData、loadTodoPanelList、loadRegionOptions、loadStudyList 多个异步装载，审查连续两轮都发现「本 PR 只给其中一个加了 xxxFetchSeq」，其余仍然无条件赋值。\n为什么：加序号是一次性改动，很容易只修用户报错的那条链路；而未加序号的列表在慢请求或 Tab 快速切换时，后返回的旧响应会覆盖新结果。更隐蔽的是「闭包读到当前 Tab」：loadStudyList 里 normalizeStudyList(rows, this.studyTab) 用的是此刻的 studyTab，行数据却来自上一次请求的 Tab，导致类型/标题错配，「更多」按错误 Tab 的 total 判断，界面看起来正常但内容错位。组件在请求途中销毁时还会在已销毁实例上写 data（Vue 2 告警）。\n怎么做：统一模式——const tab = this.studyTab; const seq = ++this.studyListFetchSeq; 请求后只把闭包里的 tab 传给归一化函数；在 then/catch/finally 里 if (seq !== this.<x>FetchSeq) return。可选在 beforeDestroy 置 alive=false 或读 this._isDestroyed 跳过赋值。review/自检时用 grep 'FetchSeq' 列出页面全部装载函数，逐个确认对称，别只修报错的那个。",
+   "evidence": "会话 838fa9dd：「loadStudyList 缺少请求序号，Tab 快速切换会竞态」，指出与 loadKeyData/loadCheckData/loadTodoPanelList 不同，且 normalizeStudyList 用当前 Tab 配对旧行数据，给出 studyListFetchSeq + 闭包 tab 的修法，Verdict BLOCK；会话 c02d127a：loadRegionOptions 未与同文件 keyDataFetchSeq/checkDataFetchSeq 对齐，且 loadCheckData 已加 checkDataFetchSeq 而区域列表「未对称处理」。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/home/index-v2.vue"
+   ],
+   "baseline": "15e201a",
+   "sessionIds": [
+    "c02d127a-16d6-4253-8fde-22fe476f9dd2",
+    "838fa9dd-2445-4696-883b-238a725935cf"
+   ],
+   "bundle": "077.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 详情/查看态里给某个值加「旁挂状态标签」：用下划线变体旁挂到值右侧，不要改 labelAbove",
+   "type": "pattern",
+   "content": "情况：资金拨付详情页「用款申请名称」需要按设计稿在字段名右侧补一行「{approvalDeptName}已见证通过」的社区见证说明，查看态与编辑态都要有。\n为什么：第一版用 DetailTemplate 的 labelAbove 把说明塞到标签上方，既挤占纵向空间又与设计稿不符（设计稿是在值区域右侧一个描边的浅蓝标签）。DetailTemplate 走的是普通文本渲染，直接用 disabled 表单控件兜底也不行（已知：只读详情禁掉用 disabled 控件冒充只读）。\n怎么做：查看态复用 DetailTemplate 已有的 descriptionItem 下划线变体匹配行的能力（item.className 传下划线变体 + component 插槽），把 stateText 作为旁挂内容渲染在值右侧；编辑态在同一 el-form-item 的值插槽后面同步放同款标签，保证两态视觉一致。标签是纯展示：不加 cursor:pointer、不加 hover 变色，只在对应字段有值时渲染（无值不占位）。改的是业务页自己的字段配置，不动公共 template 的默认行为，避免影响其他详情页。",
+   "evidence": "用户诉求「资金拨付详情，用款申请字段增加社区见证文字说明按照图1添加」；结论第 1/2/3 条：查看态由 labelAbove 改为值区域右侧蓝色边框标签（复用现有 buttonText 样式），编辑态在输入框右侧同步展示同款见证标签，无点击事件时为静态展示，approvalDeptName 有值才显示。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "baseline": "4fad664",
+   "sessionIds": [
+    "d7849b4e-a735-4341-9865-1af9a942eaba"
+   ],
+   "bundle": "077.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "支用合同新增：合同金额类型默认值与判断条件双重不一致，导致类型显示 0 且金额框切不回来",
+   "type": "bug",
+   "content": "情况：阳光物业「支用合同→新增」时，合同金额类型下拉显示原始值 0 而不是「固定金额」；切到「不固定金额」再切回「固定金额」，合同金额输入框再也不出现。\n\n为什么：property/expenditureContract/detail.vue 里有两处独立错误叠加。① contractAmountType 在表单初始数据中写死 '0'，但字典 property_contract_amountType 中「固定金额」的实际 dictValue 不是 0（为 '1'），于是既没有命中默认项、下拉退化成显示原始码；② 显示条件写 == 0（数字宽松比较），校验规则写 == '0'（字符串严格相等），两者口径不一致；切到固定金额后值是 '1'，== 0 永假，字段被永久隐藏。\n\n怎么做：不要在代码里假设字典值的具体取值。新增计算属性 fixedContractAmountType（从字典中按 label「固定金额」反查 dictValue）与 isFixedContractAmount（当前值 === fixedContractAmountType）；在字典加载完成的回调里，新增模式下若当前值不在字典值集合内，自动重置为「固定金额」；模板显示、校验规则、查看模式三处统一改用 isFixedContractAmount，杜绝 == 0 / == '0' 混写；切换金额类型时对该字段 clearValidate，避免隐藏字段残留上次的红色必填提示。\n\n要点：与已知清单中「字典码与接口枚举数值相同含义不同」「字典项未配置时 find 必崩」不同——本次根因是前端把默认值当成字典值硬编码，以及同一个判断在展示侧和校验侧用了两套比较口径。",
+   "evidence": "会话 4262bed0：用户报「新增时合同金额类型显示为0，切换不固定金额再切回固定金额时合同金额一直不显示」；结论定位到 property/expenditureContract/detail.vue 中 contractAmountType 默认写死 '0' 与显示/校验 == 0 与 == '0' 不一致，新增 fixedContractAmountType / isFixedContractAmount 两个计算属性并统一三处引用。",
+   "files": [
+    "zhi2-web-admin/src/views/property/expenditureContract/detail.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "baseline": "4fad664",
+   "sessionIds": [
+    "4262bed0-d061-41ed-8364-ba4f6496d209"
+   ],
+   "bundle": "078.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "物业管家编辑只开放两个字段的实现约定：白名单控可编辑、禁用字段隔离校验，换人时保留记录 ID 与管理范围",
+   "type": "workflow",
+   "content": "情况：业务要求「物业管家编辑时只能改管理范围，其余业务信息全部只读」，随后追加「物业服务人员姓名也要能改」。\n\n为什么：detail.vue 默认是整表单可编辑，直接全放开会让物业管理区域、企业、性别、职位、入职日期、项目接管日期等派生/归属字段被误改，进而破坏管家与人员、楼幢范围的关联；而新增态又必须全字段可填，所以不能用全局 disabled 一刀切。\n\n怎么做：① 以「字段白名单」实现，而不是黑名单逐个 disabled——只在 formMode === 'edit' 时对白名单之外的 form-item 加只读态（DetailTemplate 只读展示或禁用控件），新增/查看走原逻辑；② 只读字段若仍挂在 el-form 上，其 rules 必须同步跳过，否则被禁用但必填的字段会让整表 validate 永远失败（校验与展示同源）；③ 物业服务人员是可换字段，切换人员时只更新人员相关字段，当前管家记录 ID 与管理范围必须原样保留回写，不要用「先清空再重填」的写法，否则已配置的楼幢范围被静默清空；④ 保存载荷仍提交全字段（后端按整单更新），只是前端限制可改项。\n\n差异化：已知清单有「编辑只放一个字段」（测绘变更）与「按 organType 隐藏字段四周同步」，本条补充的是「白名单 + 只读字段校验跳过 + 换人保留关联主键/范围」这套组合口径。",
+   "evidence": "会话 32c1cf90：用户诉求先为「物业管家 编辑 只能修改管理范围，其他业务信息字段都是只读」，后追加「物业服务人员姓名 字段也可编辑」；结论明确编辑态仅两个字段可编辑，并特别说明更换物业服务人员时保留管家记录 ID 与管理范围、避免误清空已配置数据。",
+   "files": [
+    "zhi2-web-admin/src/views/property/propertyManager/detail.vue",
+    "zhi2-web-admin/src/views/property/propertyManager/index.vue",
+    "zhi2-web-admin/src/views/property/propertyWorker/detail.vue",
+    "zhi2-web-admin/src/mixins/form.js"
+   ],
+   "baseline": "805ea8c",
+   "sessionIds": [
+    "32c1cf90-d6d4-4f69-88c9-a9a6df3519ff"
+   ],
+   "bundle": "078.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "子模块卡在 cherry-pick 冲突态时切不回分支：先 --abort 再 checkout，主仓显示 submodule modified 属正常",
+   "type": "workflow",
+   "content": "情况：需要把二维码那条提交发到生产版本，要求「从主模块最新 tag 切出主子模块对应版本 → cherry-pick → 子模块和主仓分别提交 → 主仓打 tag」，执行中报「子模块切不回去」。\n\n为什么：zhi2-web-admin 停留在 feature/qrcode-json-main-v2.1 且正处于 cherry-pick afe3b82aa 的冲突中间态，Git 在 cherry-pick/merge/rebase 未结束时禁止 checkout 其他分支，所以「切不回去」不是分支不存在也不是权限问题。\n\n怎么做：① 先在子模块里 git status 确认处于 cherry-pick/merge 中间态，执行 git cherry-pick --abort 回到干净态，再 git checkout develop/v2.6.2-suzhufang；② 确认工作区干净、提交为功能完整提交（本例 506b24b94）；③ 主仓库 git status 显示子模块 modified 是正常的——主仓最新提交记录的是热修指针 afe3b82aa（生产 tag 202608261758），与本地 develop 上的 506b24b94 不同，日常开发可忽略，生产部署以 tag 为准；④ 若希望主仓 develop 的指针也回到该提交，单独提交一条子模块指针更新，绝不要为此移动已打好的生产 tag。\n\n要点：打 tag 发版时，子模块的提交必须先行落地，主仓只做指针与新 tag，两者不能混在同一次操作里。",
+   "evidence": "会话 87c47f0c：用户诉求为把二维码提交发到生产版本，随后反馈「子模块切不回去」；结论定位为子模块卡在 feature/qrcode-json-main-v2.1 且 cherry-pick afe3b82aa 冲突中，执行 cherry-pick --abort 后切回 develop/v2.6.2-suzhufang，并解释主仓 submodule modified 是主仓记录热修指针 afe3b82aa（tag 202608261758）所致。",
+   "files": [
+    ".gitmodules"
+   ],
+   "baseline": "805ea8c",
+   "sessionIds": [
+    "87c47f0c-7076-4b87-ac18-7c474fc995b3"
+   ],
+   "bundle": "078.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "共用内核列表按 organType 做差异化筛选项：同页两套 formItems 条件切换，未涉及的菜单保持原样",
+   "type": "pattern",
+   "content": "情况：物业服务企业菜单要求把「企业类型」筛选替换成「是否分支机构」（branch，0 否 / 1 是）；而 companyManagement 下的开发企业、经纪机构等多个菜单共用同一个列表内核组件 index.vue。\n\n为什么：内核对所有 organType 渲染同一份筛选配置，直接全局替换会连开发/经纪企业的「企业类型」一并删掉；单页复制一份列表页又会造出两套漂移实现。\n\n怎么做：① 在共用内核里按 organType 分支返回筛选配置（本例 organType === '02' 用「是否分支机构」，其余仍用「企业类型」），只影响被点名的菜单；② 新增筛选项数据用 sys_yes_no 字典加载（0=否/1=是），不要在前端写死中文；③ queryParams 同步增加 branch，并确认导出走的是 ...this.queryParams，让搜索/重置/导出自动带上新参数；④ 页面入口（property/index.vue）保持薄壳，只负责传 organType，不复制筛选逻辑。\n\n注意：切换筛选配置后要检查 listMixins 的搜索缓存是否会残留已删除字段继续传给后端（已知清单第 1112 / 930 条记录过该坑），必要时清理缓存再查。\n\n差异化：本条补充的是「共用内核 + 条件替换筛选项」这一具体落法，与「按 organType 隐藏字段四周同步」的字段显隐问题不是同一类。",
+   "evidence": "会话 83f5c572：用户要求「物业服务企业菜单新增是否分支机构筛选，替换企业类型」；结论在 company/companyManagement/components/index.vue 中按 organType='02' 显示「是否分支机构」（sys_yes_no 字典），其他企业类型菜单保留「企业类型」，并向接口传 branch。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/index.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/property/index.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/develop/index.vue"
+   ],
+   "baseline": "4fad664",
+   "sessionIds": [
+    "83f5c572-274a-4ccc-859a-bbd8c2c48f60"
+   ],
+   "bundle": "078.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] zs-table-column 的 switch 列同时踩两个坑：表头被 60px 固定宽截成「...」+ 无文本触发黑色空 tooltip",
+   "type": "bug",
+   "content": "什么情况：工单分类等页面用 zs-table-column type=\"switch\" 渲染「状态」开关列，表现为表头显示成「...」，鼠标悬停开关时弹出一个空的黑色 tooltip 框。\n\n为什么（两个独立根因，都在公共列组件 zs-table-column.vue，不在业务页面）：\n1) switch 类型列被钉死固定宽 60px，而表头样式带 text-overflow: ellipsis，中文「状态」两字放不下就被截成省略号——注意这与已知的「宽度不足导致开关画进右侧列」是同一个病根、但表现不同：这次被截的是表头文字，排查时容易误判成列标题配置问题或样式污染。\n2) 所有列默认开启 showOverflowTooltip；switch 列没有文本内容，Element UI 仍按溢出判定触发 tooltip，内容为空就渲染出黑色空框。这是隐藏的第二处，只把宽度改大会让「...」消失但黑色空框依旧。\n\n怎么做：在 zs-table-column 组件层把 switch 分支的固定宽从 60px 提到 88px（够放「状态」+ 开关），并对 switch 类型强制 showOverflowTooltip=false。两处必须一起改。\n\n与已知条目的差异：已知记录的解法是「改 FIXED_TYPE_WIDTH 组件层」且只描述了开关画的错位；本条补出第二条根因（空 tooltip）与验证口径——改完要同时确认表头完整、悬停无空框。",
+   "evidence": "会话 1cc96294「项目管理-工单管理-工单分类，状态滑鼠显示黑色空提示且状态栏有个省略号」；结论明确「根因在公共表格列组件 zs-table-column，不是工单分类页面本身」，修改为 switch 列固定宽 60px→88px + 关闭该类型列的 showOverflowTooltip。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/views/property/workOrder/category/index.vue"
+   ],
+   "baseline": "e590ffa",
+   "sessionIds": [
+    "1cc96294-89aa-419f-a3f0-3c4fbc943d76"
+   ],
+   "bundle": "079.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "zs-table 开关列回滚失败：handleSwitchChange 已先写新值，按 row.enableStatus 取的「旧值」其实是新值",
+   "type": "bug",
+   "content": "场景：列表页用 zs-table-column 的 el-switch 列做启用/禁用，前端对不满足条件的单据拦截（如未备案 bizState !== '2' 不允许启用），需求是「提示后状态保持原样」。\n\n为什么错：本项目开关列不是靠 v-model 双向绑定，而是 zs-table-column 内部的 handleSwitchChange 先把 row.enableStatus 直接写成新值，再回调页面的 handleEnableChange(row)。所以页面里写 const prevStatus = row.enableStatus 想拿「旧值」，拿到的已经是新值（禁用 '0'）。接口报错或前端拦截后 .catch 里回滚到 prevStatus，等于回滚到禁用态，表现为「提示了不能改，但开关还是变过去了」。\n\n怎么做：不要从 row 读旧值，根据本次目标状态反推——const prevStatus = statusStr === '1' ? '0' : '1'，然后在所有失败分支统一回滚：前端业务拦截（bizState !== '2' 提示「未备案的不能执行启用或禁用」）、权限校验失败、参数校验失败。\n\n差异说明：已知条目里 zs-table 的 switch 只有 #895「固定列宽 60px 装不下」，本条是取值时序问题，完全不同根因。通用教训：凡是被组件在回调前改写过的行字段，都不能当「变更前快照」用。",
+   "evidence": "用户现象：针对未备案的单据启用→禁用，提示「未备案的不能执行启用或禁用」，但状态变为了禁用，不应该变。根因定位：zs-table-column 的 handleSwitchChange 先把 row.enableStatus 写成新值再调 handleEnableChange，原代码 const prevStatus = row.enableStatus 取到的是新值 0，catch 里回滚到禁用。修复：prevStatus = statusStr === '1' ? '0' : '1' 反推 + 未备案前端拦截并立即回滚开关。修改位置 regionBankAuth/index.vue 的 handleEnableChange。",
+   "files": [
+    "zhi2-web-admin/src/views/system/regionBankAuth/index.vue"
+   ],
+   "baseline": "f9f3acf",
+   "sessionIds": [
+    "aadf551a-5fa3-495e-9cfd-2fe0eba45d5b"
+   ],
+   "bundle": "080.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "el-select 开了 allow-create 会把历史手动输入值预置为下拉第一项：要去掉 allow-create/default-first-option/filterable",
+   "type": "bug",
+   "content": "场景：账号冻结原因这类「预设三项 + 允许管理员手填」的 el-select，历史单据里存过自定义文案（如「额度与无业务」），再次打开时用户说「下拉里多出一个原因，第一个原因不需要，这个是用户手动输入的原因」。\n\n为什么：el-select 配了 allow-create: true 后，Element UI 会把 v-model 里当前值中不在 options 内的项自动追加到下拉选项列表（通常落在第一项），于是每条历史自定义原因都变成一个新选项。filterable/default-first-option 只会放大这个观感（回车即选中第一项）。这是 Element 的既有行为，不是数据配置错了。\n\n怎么做：这类「预设枚举 + 历史脏值」的下拉直接去掉 allow-create、default-first-option、filterable，只渲染后端字典/本地预设；历史自定义文案仍然会在输入框里正常回显（只读展示不受影响），只是不再进入候选列表，管理员重新选择时只能从预设项里挑。\n\n差异说明：已知条目 #886 讲的是「字典没配置导致 radio 只有标签没有选项」，根因不同；本条是组件特性把脏值反灌成选项。经验外推：凡是想「受限选择」的下拉，都不要顺手加 allow-create。",
+   "evidence": "用户两轮澄清：「下拉里 多出一个原因，第一个原因不需要」「这个是用户手动输入的原因」。结论：el-select 开启 allow-create，当冻结原因是历史手动输入（如「额度与无业务」）且不在预设列表中时，Element UI 会自动加到下拉第一项。修复：AccountFreezeFields.vue 移除 allow-create、default-first-option、filterable，下拉只留预设三项（多次输入错误密码/管理员手动冻结/其他），历史自定义原因仅回显于输入框。",
+   "files": [
+    "zhi2-web-admin/src/components/AccountFreezeFields/AccountFreezeFields.vue",
+    "zhi2-web-admin/src/utils/accountFreeze.js"
+   ],
+   "baseline": "805ea8c",
+   "sessionIds": [
+    "cbb5f1e2-ec0c-4fd3-8323-b22f7cdd9fa6"
+   ],
+   "bundle": "080.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "按外部接口文档补路径前缀前先核对项目自己的 /system 约定；下线必填项要同时审 prop 空壳与 skip-check 的连带失效",
+   "type": "pattern",
+   "content": "本批两条相关经验，都是「改一处、按契约核对全链路」的套路。\n\n一、外部接口文档的路径前缀不可照抄。用户给的前端接口文档里写 /api/v2.0/streetBankPolicy，但本项目后端实际映射是 /v2.0/system/streetBankPolicy（/system 段属项目约定，区级 regionBankAuth 自己就在用 /system/regionBankAuth）。做法：先在同一目录/工具模块里找一个已知正确的同族接口当锚点（如 utils/workBank.js 的 QUERY_START_BANK_URL = '/system/workBank/queryStartBank'），再逐个改业务常量；改动要按「路径字面量在几个文件里重复」列清单（index.vue 与 StreetAuthDialog.vue 各有一份 STREET_BANK_POLICY_API 常量），共享 utils 里已经是正确路径的就别动。审查结论要反过来给出「哪些无需修改」及理由，避免无谓改动。\n\n二、下掉一个字段的必填（协议可选）不只是删 rules。审查时逐条确认五处：rules 里是否还有该字段；表单里 <el-form-item prop=\"agreementBizId\"> 是否还在但已无对应 rule（不触发校验，却会让后来者误以为仍在校验，确定不做前端必填就去掉 prop）；beforeSaveHook / ZsSubmit 的 before-submit 自定义校验是否还引用；提交按钮走的是 operation-btn-group 内置提交还是自定义 ZsSubmit（本项目用 :show-submit=\"false\" + 自定义 ZsSubmit 时，内置的 getAnnexConfig 要件检查会被一并跳过，要确认这是有意的）；后端是否仍校验该字段（前端仓库无后端源码，必须找后端约定一致，否则「前端可点、接口报错」）。同时注意编辑态 UI 与提交路径要对称：若 change/edit 模式仍展示上传控件而 add 模式没有，需产品确认。",
+   "evidence": "会话 70f1e4be：文档写 /api/v2.0/streetBankPolicy，实际映射 /v2.0/system/streetBankPolicy，改 index.vue 与 StreetAuthDialog.vue 的 STREET_BANK_POLICY_API 常量，utils/workBank.js 的 QUERY_START_BANK_URL 已正确无需改。会话 cc5e8ba6：删 agreementBizId 必填后审查出 [MEDIUM] prop 无对应 rule（detail.vue:47 / regionBankAuthChange/detail.vue:45）、ZsSubmit 被 skip-check 跳过 getAnnexConfig、operation-btn-group :show-submit=\"false\" 走自定义 ZsSubmit，并提示后端若仍校验会出现前端可点接口报错。",
+   "files": [
+    "zhi2-web-admin/src/views/system/regionBankAuth/index.vue",
+    "zhi2-web-admin/src/views/system/regionBankAuth/components/StreetAuthDialog.vue",
+    "zhi2-web-admin/src/utils/workBank.js",
+    "zhi2-web-admin/src/views/system/regionBankAuth/detail.vue",
+    "zhi2-web-admin/src/views/system/regionBankAuthChange/detail.vue"
+   ],
+   "baseline": "c176892",
+   "sessionIds": [
+    "70f1e4be-4f65-4534-a061-8fc1d7eecbb7",
+    "cc5e8ba6-a3d7-462f-b22c-bcd15cfb22af"
+   ],
+   "bundle": "080.md",
+   "project": "苏住房G"
+  }
+ ]
+}

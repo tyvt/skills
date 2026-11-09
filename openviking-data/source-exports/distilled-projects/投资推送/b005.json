@@ -1,0 +1,303 @@
+{
+ "project": "投资推送",
+ "batch": 5,
+ "files": [
+  "017.md",
+  "018.md",
+  "019.md",
+  "020.md"
+ ],
+ "count": 16,
+ "memories": [
+  {
+   "title": "[投资推送] Windows schtasks 创建中文计划任务：禁用 /tz，/tn 勿加引号",
+   "type": "bug",
+   "content": "在部分 Windows 上用 `schtasks /Create` 时，`/tz` 不被支持会直接报「无效参数」；若系统已是 `China Standard Time`（UTC+8），应去掉 `/tz`，`/st 14:00` 即上海本地 14:00。任务名含中文时 `/tn` 不能写成 `/tn \"红利指数投资信号\"`，应写成 `/tn 红利指数投资信号`，否则语法错误。`setup_task.bat` 需按此改写后管理员重跑。",
+   "evidence": "会话 4a33133f：用户管理员运行仍失败；根因为 /tz 无效参数 + 中文 /tn 加引号；修复后验证可创建「红利指数投资信号」周一至周五 14:00。",
+   "files": [
+    "d:/repository/投资推送/setup_task.bat",
+    "d:/repository/投资推送/run_push.bat"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4a33133f-ce51-49e2-a37d-804c789adaf3"
+   ],
+   "bundle": "017.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 手工运行 push.py 控制台 GBK 与 Unicode 符号冲突",
+   "type": "bug",
+   "content": "在中文 Windows 默认 GBK 控制台直接运行 `push.py` 时，报告打印含 `✗` 等字符会触发编码错误，导致进程在推送前失败。补发或排障可用 `python push.py --quiet` 跳过控制台打印、仅走微信推送；定时任务 `run_push.bat` 将 stdout 重定向到 `logs/push.log`，通常不受此影响。",
+   "evidence": "会话 2f2e0718：用户未收到推送；补发用 --quiet 后微信返回推送成功，并说明 GBK 无法显示 ✗。",
+   "files": [
+    "d:/repository/投资推送/push.py",
+    "d:/repository/投资推送/run_push.bat",
+    "d:/repository/投资推送/logs/push.log"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2f2e0718-b2a8-41ff-a8e8-c3a997260734"
+   ],
+   "bundle": "017.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 指数信号回测双管线：买入持有 vs 买卖波段",
+   "type": "workflow",
+   "content": "回测分两条并行管线，共用数据面板与买入信号，输出目录 `output/backtest/`（`config.BACKTEST_OUTPUT_DIR`）：① `backtest_buy_signals.py`—信号日买入、持有不卖，默认 `inception_present.md/html`；② `backtest_trade_signals.py`—买入 + `sell_trailing` 移动止盈/估值卖点，默认 `trade_inception_present.md/html`。全量入口 `run_backtest_inception.bat` 依次跑两者。验证完整卖点策略必须看 trade 管线；buy 管线仅测买入择时。",
+   "evidence": "会话 45b1dc47 架构概览表；会话 b98f272b 将 buy/trade 与 sell_trailing、backtest_metrics 分工对应到 report 与 push。",
+   "files": [
+    "d:/repository/投资推送/backtest_buy_signals.py",
+    "d:/repository/投资推送/backtest_trade_signals.py",
+    "d:/repository/投资推送/sell_trailing.py",
+    "d:/repository/投资推送/run_backtest_inception.bat",
+    "d:/repository/投资推送/backtest_metrics.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "45b1dc47-7ca4-4e1e-a56f-925163493407",
+    "b98f272b-bd52-480f-a894-3e7a0d2ab885"
+   ],
+   "bundle": "017.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] report 全量展示 vs push 仅推送有买卖信号的指数",
+   "type": "pattern",
+   "content": "`report.py` 为本地统一报告入口（全指数/全模块查看，不推送）；`push.py` 经 Server酱等只推送当日有买卖信号的指数。阈值与指数列表以 `config.py` 为准，运行时可由 `push.env` 覆盖；各指数信号在 `*_signal.py` + `price_position.py` 等模块实现，勿在回测脚本里硬编码阈值。",
+   "evidence": "会话 b98f272b 项目总览表明确 report/push 职责与 config、push.env 关系。",
+   "files": [
+    "d:/repository/投资推送/report.py",
+    "d:/repository/投资推送/push.py",
+    "d:/repository/投资推送/config.py",
+    "d:/repository/投资推送/push.env"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b98f272b-bd52-480f-a894-3e7a0d2ab885"
+   ],
+   "bundle": "017.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] dividend_lowvol_rotation ablation：大量开关可删，仅保留三项硬约束",
+   "type": "workflow",
+   "content": "子模块 `dividend_lowvol_rotation` 经 ablation 验证：MV_SCORE_PENALTY、MIN_AVG_AMOUNT、SOFT_RISK_SCORING、SOFT_ENHANCED_SCORING、SUSTAINABLE_DIVIDEND、YIELD_SPREAD_PERCENTILE、多项基本面/除息冷却/DYNAMIC_THRESHOLD 等禁用后零影响，可删代码路径。必须保留：MV_TIER_CAP、INDUSTRY_CAP、BETA_BALANCE。清理 MV_SCORE_PENALTY 时不能拆掉 `total_mv` 拉取与 `attach_market_fields`，因 MV_TIER_CAP 仍依赖市值字段。",
+   "evidence": "会话 aa4d8187 逐项列出 config 行号、实现函数及「删 MV_SCORE_PENALTY 后 MV_TIER_CAP 仍要 total_mv」。",
+   "files": [
+    "d:/repository/投资推送/dividend_lowvol_rotation/config.py",
+    "d:/repository/投资推送/dividend_lowvol_rotation/index_portfolio.py",
+    "d:/repository/投资推送/dividend_lowvol_rotation/market_cap.py",
+    "d:/repository/投资推送/dividend_lowvol_rotation/scoring.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "aa4d8187-2a0c-474f-acf1-d64fcd8c1ab3"
+   ],
+   "bundle": "017.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 红利合并推送：强烈买入利差 3.2% 与长短期双轨文案",
+   "type": "fact",
+   "content": "多指数合并推送后，「强烈买入」要求股债利差 > 3.2%（2%～3.2% 为常规买入/加倍定投视估值分区而定）。估值分区示例：黄金坑 PE<7.5 且股息率>5.5%；击球区 PE 7.5–8.5；观察区 PE 8.5–9.5；高估区 PE>9.5 或股息率<4.5%。每条指数同时输出「长期定投」与「短期波段」两行建议；短期卖出含 PE≥10 且股息率<4%、高估区、利差<1% 止盈、<0.5% 强烈卖出等。",
+   "evidence": "会话 b141116a 合并 930955/H30269 推送后用户要求利差>3.2% 才强烈买入并加卖出/短期波段；结论给出分区表与示例块。",
+   "files": [
+    "d:/repository/投资推送/push.py",
+    "d:/repository/投资推送/core.py",
+    "d:/repository/投资推送/config.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b141116a-9e0a-4e9e-bbb5-b4811cd72db5"
+   ],
+   "bundle": "017.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "setup_task.bat 在 if 括号块内 echo 含括号或冒号会解析失败",
+   "type": "bug",
+   "content": "Windows 批处理在 `if (...)` 块内解析 echo 时，文案里的 `(UTC+08:00)` 会被当成块括号，触发 `was unexpected at this time`；块内展开的 `%RUN_TIME%`（如 14:00）和 `%SCRIPT_DIR%`（盘符路径）中的 `:` 也会被误解析，导致部分提示行失败。修复：把时区检查、环境检查、成功/失败提示从 `if (...)` 改为 `goto` 标签分支，避免在括号块内输出含特殊字符的中文与路径。",
+   "evidence": "会话 9a7d457f：用户报 setup_task.bat 运行报错；结论归纳括号与冒号冲突，改 goto 后本地验证「定时任务创建成功」输出正常。",
+   "files": [
+    "setup_task.bat",
+    "run_push.bat"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9a7d457f-29fa-4589-a857-cfae82829cc6"
+   ],
+   "bundle": "018.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "spread_10y_percentile 仅报告展示不参与买卖门控",
+   "type": "fact",
+   "content": "估值面板行字段 `spread_10y_percentile`（近 10 年利差分位）在 `core.py` 等处用于报告展示，**不**作为红利/宽基等模块的买入或卖出条件。调参或对照回测时勿把它与 `spread_percentile`（滚动分位，参与买卖）混用，否则会出现「报告里有指标但改阈值不影响信号」的误判。",
+   "evidence": "会话 e5c67d81 行字段表：`spread_10y_percentile` 标注为「仅报告展示（core.py），不买不卖」。",
+   "files": [
+    "core.py",
+    "config.py",
+    "dividend_data.py",
+    "cn_broad_signal.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e5c67d81-0582-416c-beaf-bfc275c07e8e"
+   ],
+   "bundle": "018.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "年度买入回测按年一份 Markdown 覆盖保存",
+   "type": "workflow",
+   "content": "用户要求每次年度回测结果保留在本地且每年仅一份、重跑覆盖旧结果，且**不要 JSON**。实现约定：`backtest_buy_signals.py` 的 `save_backtest_result()` 写入 `logs/backtest/{年份}.md`（含生成时间、买入统计、均价与可选收益表、各指数买入日期），同年重跑覆盖该 `.md`。",
+   "evidence": "会话 1d3576fa：「每个年度仅保留一份，重新运行后覆盖」「不要 json，要 markdown」；路径示例 logs/backtest/2025.md。",
+   "files": [
+    "backtest_buy_signals.py",
+    "logs/backtest/"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1d3576fa-42d8-4b91-8bf8-4ce494a0830f"
+   ],
+   "bundle": "018.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "回测买卖阈值改 config/push.env 而非 backtest 脚本",
+   "type": "pattern",
+   "content": "买卖门控阈值不在 `backtest_buy_signals.py` / `backtest_trade_signals.py` 硬编码：默认值与环境变量在 `config.py`（经 `push.env` 加载），各指数 `*_signal.py` 与 `dividend_data.py` 等按行评估；卖出侧组合 `sell_trailing.py`（移动止盈/估值）、`rotation_sell.py`（轮动门控）及组合层 `backtest_rotation.py`。行级常用门控含 `year_range_position`、`ma_slope_pct`、`pe_percentile`、`spread`/`spread_percentile`、`recent_signal_buy_avg`/`peak_since_last_buy` 等；单参扫描见 `backtest_optimize.py`，未纳入优化的项仍需直接改 env。",
+   "evidence": "会话 e5c67d81 总览：「回测买卖信号不在 backtest_*.py 里硬编码阈值」及参数表与 optimize 覆盖范围说明。",
+   "files": [
+    "config.py",
+    "push.env",
+    "backtest_buy_signals.py",
+    "backtest_trade_signals.py",
+    "sell_trailing.py",
+    "rotation_sell.py",
+    "backtest_optimize.py",
+    "cn_broad_signal.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e5c67d81-0582-416c-beaf-bfc275c07e8e"
+   ],
+   "bundle": "018.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "红利低波轮动 live 报告：资金优先级与按手建仓",
+   "type": "workflow",
+   "content": "子包 `dividend_lowvol_rotation` 的 `report.py` 输出 Markdown 建仓报告时，初始资金解析顺序为 CLI `--capital` → 环境变量 `DLV_PORTFOLIO_CAPITAL_CNY` → 默认 10 万（与回测一致）。`plan_portfolio_allocation` 按目标权重分配资金，买入股数向下取整到 100 股/手并计入单边佣金；报告需写明初始资金、预估总投入/佣金/剩余现金及每标的「买入股数」「预估金额」。",
+   "evidence": "会话 c8260224：用户要求 md 写明买入股数与初始资金；实现 costs.py 资金解析与 plan_portfolio_allocation 取整手数，示例 80 万资金跑通 live_report.md。",
+   "files": [
+    "dividend_lowvol_rotation/report.py",
+    "dividend_lowvol_rotation/costs.py",
+    "dividend_lowvol_rotation/index_portfolio.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c8260224-aa62-4b8a-89e4-08e1ed7a6dc3"
+   ],
+   "bundle": "018.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 全回测与单年回测同年投入不一致：分档归一化须按自然年",
+   "type": "bug",
+   "content": "在「年度总投入预算 + 分档 scheme（如 range_6_fine）」下，单次买入额 = 按年缩放后的基准 × 分档系数，再按该年所有买入日的平均分档系数归一化，使全年总投入贴近预算。若 `make_annual_amount_fn`（`buy_amount_budget.py`）用**整段回测区间**的买入日计算归一化系数，则 `--from-inception` 与 `--year YYYY` 同年买入次数相同时，**每次金额仍可能不同**（例：NDX 2026 全历史窗口 6792 元 vs 仅 2026 年 8736 元）。修复：分档归一化**按自然年分别统计买入日**；修复后两路径应一致。排查时先对比买入次数，再对比归一化窗口而非信号逻辑。",
+   "evidence": "会话 34739dd9：用户对比 inception_present 与 2026.md 中 NDX 2026 投入；根因为全历史 vs 单年平均分档系数（约 1.028→0.97× vs 0.80→1.25×），已在 buy_amount_budget.py 按自然年修复并验证均为 8736。",
+   "files": [
+    "buy_amount_budget.py",
+    "buy_amount_tiers.py",
+    "backtest_buy_signals.py",
+    "config.py",
+    "output/backtest/inception_present.md",
+    "output/backtest/2026.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "34739dd9-e7ab-4ef2-aa10-91b6f6236812"
+   ],
+   "bundle": "019.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] drop_to_buy.py 是盘中推演，买卖判定在 *_signal.py / dividend_data",
+   "type": "pattern",
+   "content": "`drop_to_buy.py` 基于**昨日估值面板**模拟「再跌/再涨多少会触发买/卖」，供报告展示触发价，**不是**策略的权威买卖信号实现。真实买入（及各模块卖出）逻辑在 `dividend_data.is_buy_signal()`、`cn_broad_signal`、`cyb_signal`、`us_index_signal`、`hstech_signal` 等；阈值集中在 `config.py`。改阈值、对齐回测与 report、或排查「为何某天没买」应读信号层与 config，勿从 drop_to_buy 反推规则。",
+   "evidence": "会话 ee16df79 全面梳理结论首段明确：drop_to_buy 为盘中推演工具，信号在各 *_signal.py。",
+   "files": [
+    "drop_to_buy.py",
+    "config.py",
+    "dividend_data.py",
+    "cn_broad_signal.py",
+    "report.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ee16df79-05f8-4f05-8b64-e1a62d72f32e"
+   ],
+   "bundle": "019.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] config.INDICES 仅红利模块；宽基走 CN_BROAD_INDEX_BY_CODE",
+   "type": "fact",
+   "content": "`config.INDICES` 只供红利策略（`select_indices()`、`backtest_dividend`、`report -m dividend`），**不是**全项目指数注册表。A 股宽基（沪深300/中证1000/A500/拟接入的 000905、000688 等）应在 `cn_broad_data.CN_BROAD_INDEX_BY_CODE` 登记 code，共用 `cn_broad_data`/`cn_broad_signal` 与 `get_cn_broad_signal_config(index_code)`；分指数默认阈值在 `_CN_BROAD_PER_INDEX_DEFAULTS`（键为指数 code）。新增宽基时勿只改 INDICES。",
+   "evidence": "会话 66471137 梳理 config：INDICES 表仅 930955/H30269；宽基为独立常量 dict；cn_broad 白名单在 cn_broad_data。",
+   "files": [
+    "config.py",
+    "cn_broad_data.py",
+    "cn_broad_signal.py",
+    "report.py",
+    "backtest_buy_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "66471137-806e-41aa-b92c-c3ddc7dbd584"
+   ],
+   "bundle": "019.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] cn_broad 分指数阈值环境变量与 CSIndex 指标 URL 约定",
+   "type": "pattern",
+   "content": "宽基信号阈值读取 `get_cn_broad_signal_config(index_code)`：全局 `CN_BROAD_*` + `_CN_BROAD_PER_INDEX_DEFAULTS` 按 code 覆盖。环境变量命名：`CN_BROAD_{指数code}_{SUFFIX}`（如 `CN_BROAD_000300_BUY_SPREAD_PERCENTILE_MIN`），并兼容旧前缀 `A500_*`。中证指数估值历史：`market_data.read_indicator_history(code)` 拉 `{CSINDEX_INDICATOR_BASE_URL}/{code}indicator.xls`；成分权重为 `{code}closeweight.xls`。新指数接入前全库检索 code 是否已存在，再补白名单、config 分指数默认与 report 模块路由。",
+   "evidence": "会话 66471137 给出 URL 拼接规则、env 格式及 cn_broad 数据链（indicator.xls → cn_broad_data → cn_broad_signal → report/push/backtest）。",
+   "files": [
+    "config.py",
+    "market_data.py",
+    "cn_broad_data.py",
+    "report.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "66471137-806e-41aa-b92c-c3ddc7dbd584"
+   ],
+   "bundle": "019.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] push.env 勿跟踪；曾提交历史则轮转 Server酱 SendKey",
+   "type": "workflow",
+   "content": "含 `SERVERCHAN_SENDKEY` 的 `push.env` 不得进 git（README 亦要求）；若曾在 `init` 等提交中入库，本地 `git rm --cached` 后仍视为**密钥已泄露**，应在 Server酱 重新生成 SendKey。`.gitignore` 宜覆盖：`.venv-*/`、`config/push.env`、`config/cache/`、`config/data/`、`*.parquet`、回测输出与 `*.bak`/`*.tmp`；模板保留 `push.example.env`。",
+   "evidence": "会话 9c1154a6：更新 .gitignore 并从索引移除 push.env；指出 da7019c init 曾提交 SendKey，建议远程仓库轮转密钥。",
+   "files": [
+    ".gitignore",
+    "push.env",
+    "push.example.env",
+    "config/env.py",
+    "README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9c1154a6-3e96-4992-aec9-9cc0b44fae86"
+   ],
+   "bundle": "019.md",
+   "project": "投资推送"
+  }
+ ]
+}

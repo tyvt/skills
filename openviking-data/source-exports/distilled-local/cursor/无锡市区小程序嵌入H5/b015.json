@@ -1,0 +1,99 @@
+{
+ "project": "无锡市区小程序嵌入H5",
+ "batch": "015",
+ "files": [
+  "015.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "这里获取小区信息后@zhi2-mobile-admi",
+   "type": "fact",
+   "content": "已修复。根因是 `App.vue` 在 H5 嵌入场景里只写了 `project` / `projectName`，没有通过 `setProjectInfo` 同步完整的小区与房屋信息。 ## 修改说明 ### 1. `App.vue` — 完整初始化小区/房屋信息 新增 `initH5Context`，有 token 时： - 拉取房屋列表（`getMyHouseList`） - 有 `houseId`：匹配房屋后调用 `applyHouseSelection`，写入 `regionName`、`subdistrictName`、`communityName`、`address` 等 - 有 `complexId`：拉取小区列表后调用 `applyProjectSelection`，写入完整小区字段及关联房屋地址 ### 2. `useProjectState.js` — 新增 `applyHouseSelection` 与 `newHome.vue` 中逻辑一致，从房屋数据一次性写入全部 `userStore` 字段。 ### 3. `benefit/index.vue` — 补全同步逻辑 原先只在「找不到当前小区」时才 `setProjectInfo`；现在找到当前小区时也会同步，保证 `projectAddress`（`regionName-subdistrictName-",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "`App.vue",
+    "`useProjectState.js",
+    "`newHome.vue",
+    "`benefit/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ba74b018-bf87-4283-b5cd-cdbfcdac22a7"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "共有资金：点查询明细，页面没有变化，需要滚动条自动滑",
+   "type": "bug",
+   "content": "已修复。原因是点击「查询明细」后，银行流水区域（含账户余额）会在页面下方展开，但外层 `scroll-view` 没有自动滚动，用户仍停留在原位置，看起来像「页面没变化」。 **修改说明：** 1. **`OverviewTab.vue`**：为银行流水区域增加 `id=\"bank-section\"`；查询完成并渲染后，通过 `scroll-to-bank` 事件通知父页面滚动。 2. **`index.vue`**：在 `scroll-view` 上启用 `scroll-into-view` 和 `scroll-with-animation`；收到事件后将滚动目标设为 `bank-section`，并带动画滚到账户余额区域。 再次点击「查询明细」时也会重新滚动到底部（先清空再设置 `scrollIntoView`，保证重复触发有效）。 可在共有资金 → 总览 → 点击「查询明细」验证，页面应自动滑到底部并显示「账户余额（元）」及流水列表。",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "**`OverviewTab.vue",
+    "**`index.vue",
+    "涉及文件：d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_benefit\\sharedFunds\\components\\OverviewTab.vue、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_benefit\\sharedFunds\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fd9f5f4e-e4c8-42f5-a93d-27c3c6883bde"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "projectAddress显示为-",
+   "type": "fact",
+   "content": "**原因：** `projectAddress` 原先只拼接 `userStore` 里的 `regionName`、`subdistrictName`、`communityName`。小程序嵌入 H5 时，`App.vue` 往往只写入 `project` 和 `projectName`，区划字段为空，拼接结果就是空字符串，模板里就显示 `-`。 **修改：** 1. **多级回退显示** - 优先：区-街道-社区 - 其次：`userStore.address` - 最后：从 `houseList` 中取当前小区对应房屋信息 2. **页面 `onShow` 时补全项目信息** - 若上述字段都为空且已登录，则调用房屋/小区接口 - 通过 `applyHouseSelection` / `applyProjectSelection` 写入 userStore（逻辑与 `App.vue` 的 H5 初始化一致） 刷新公共收益页后，地址应能正常显示。若仍为 `-`，说明接口未返回区划或地址数据，需要再核对接口字段。",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "时，`App.vue",
+    "`App.vue",
+    "涉及文件：d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_benefit\\benefit\\index.vue、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\store\\user.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c484b1ef-d8e5-4052-a213-4476498f8145"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "这个H5是作为web-view在小程序里面打开的，我",
+   "type": "fact",
+   "content": "问题已修复，原因和改动如下。 ## 原因分析 1. **localStorage 缓存**：`userStore` 启动时会从 `uni.getStorageSync('user')` 恢复上次的小区/房屋，小程序切换小区后 URL 已更新，但 store 里仍是旧数据。 2. **初始化竞态**：`App.vue` 里 `initH5Context` 要异步拉房屋列表，维修页在 `onLoad` 里立刻读 `userStore`，常在初始化完成前就请求接口，出现「小区名是 A、houseId 是 B」这种错位。 3. **`applyProjectSelection` 覆盖 houseId**：URL 带了 `houseId` 时，若走小区匹配逻辑，会把 `houseId` 改成该小区下第一套房，和 URL 不一致。 ## 修复内容 1. **新增** `src/utils/h5Context.js`： - 进入时**同步**把 URL 里的 `complexId`、`houseId`、`name` 写入 store - 提供 `whenH5ContextReady()`，等异步初始化结束 - 提供 `getH5Selection()`，优先用 URL 参数 2. **`App.vue`**：`onLaunch` 和 `onShow` 都会调用 `refreshH5Context",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "**初始化竞态**：`App.vue",
+    "`src/utils/h5Context.js",
+    "**`App.vue",
+    "**`maintain/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "400a262f-e497-46ec-9234-87e452dc4641"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "腾讯地图的文字可以点击打开腾讯地图，可以禁用吗",
+   "type": "preference",
+   "content": "可以处理，但要看你说的是哪类「文字」，不同情况方案不一样。 你的 `ZsMap.vue` 用的是 uni-app 原生 `<map>` 组件（底层是腾讯地图）： ```2:17:d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\components\\ZsMap\\ZsMap.vue <map v-if=\"qqMapSdkReady\" :key=\"qqMapRenderKey\" :longitude=\"longitude\" :latitude=\"latitude\" :scale=\"scale\" :markers=\"markers\" @markertap=\"onMarkerTap\" @callouttap=\"onCallOutTap\" @regionchange=\"onRegionChange\" @tap=\"onTap\" :enable-zoom=\"zoom\" :enable-scroll=\"scroll\" :show-scale=\"true\" :show-compass=\"true\" ></map> ``` ## 1. 左下角「腾讯地图」Logo / 版权文字（点击会跳转） **官方没有提供「禁用点击」的配置项。** 腾讯地图服务协议要求保留 Logo，不建议用 CSS 隐藏。 如果只是不想让用户误点跳转，常见",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "`ZsMap.vue",
+    "```2:17:d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\components\\ZsMap\\ZsMap.vue",
+    "`project/info/index.vue",
+    "涉及文件：d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\components\\ZsMap\\ZsMap.vue、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\utils\\qqMapKey.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8caf0d1f-dcbc-42e1-947f-e60d56e58eef"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  }
+ ],
+ "_draft": true
+}

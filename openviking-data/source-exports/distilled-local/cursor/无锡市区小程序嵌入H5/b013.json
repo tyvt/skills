@@ -1,0 +1,63 @@
+{
+ "project": "无锡市区小程序嵌入H5",
+ "batch": "013",
+ "files": [
+  "013.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "苏服办的Token不要加到请求头上面",
+   "type": "preference",
+   "content": "已修复：苏服办 URL 中的 `token` 不会再被当作 `Authorization` 请求头发送。 ### 问题原因 苏服办入口 URL 里的 `token` 仅用于 SDK（如人脸识别）和登录换票，但之前若被误写入 `userStore`（含本地缓存），请求拦截器会统一加上 `Authorization: Bearer {token}`，导致苏服办 token 被带到业务接口。 ### 修改内容 1. **`api/index.js`** — 请求拦截器增加判断：若当前 token 与苏服办 URL token 相同，且为苏服办入口，则不添加 `Authorization` 头。 2. **`h5Context.js`** — 新增 `clearSfbTokenIfStored()`，在苏服办登录前清除误存的苏服办 token。 3. **`usePortal.js`** — 苏服办入口初始化时先清除误存 token，并始终走 `sfbLogin` 换取内部 `accessToken`（不再因本地已有 token 而跳过登录）。 4. **`sfbFaceAuth.js`** — 人脸识别只使用 URL 中的苏服办 token，不再回退到 `userStore.token`。 ### 行为说明 - **苏服办 token**：仅用于 SDK / 登录换票，不出现在请求头。 ",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "**`api/index.js",
+    "**`h5Context.js",
+    "**`usePortal.js",
+    "**`sfbFaceAuth.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d5e17de9-b54b-41c7-804d-32a7473aa185"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "然后这个页面，有个字段没显示",
+   "type": "fact",
+   "content": "已定位并修复「所属小区」不显示的问题。 **原因：** 「所属小区」原先只从 URL 参数 `complexName` 或 `userStore.projectName` 读取。小程序嵌入 H5 时通常只传 `houseId`，而余额和「房屋位置」来自外部接口 `/external/maintenanceHouse/getHouseInfo`，所以这两个能正常显示，小区名却为空。 **修改：** 1. **`maintain/index.vue`** — 增加 `resolveCommunityName`，按优先级取值： - URL / store 中的小区名 - 接口返回的 `complexName` / `projectName` / `communityName` - 根据 `houseId` 从房屋列表匹配 `complexName` 2. **`h5Context.js`** — 在 `getH5Selection` 中增加从 `houseList` 按 `houseId` 查找小区名的兜底逻辑。 刷新维修资金页面后，「所属小区」应能显示（例如「海悦花园」）。若仍为空，请确认接口 `getHouseInfo` 是否返回小区名字段，或该房屋是否在用户房屋列表中。",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "**`maintain/index.vue",
+    "**`h5Context.js",
+    "涉及文件：d:\\repository\\无锡市区小程序嵌入H5、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_owner\\maintain\\index.vue、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\store\\repair.js、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\api\\repair.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6c36b4fe-74d0-426f-82e3-e6ed3c6e89a6"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "GET http://unlimited.c.h5.",
+   "type": "preference",
+   "content": "已修复 `detail.vue` 的多个问题，说明如下： ## 问题原因 1. **数据不显示**：使用了 `@virtualListChange` 但未开启虚拟列表（`use-virtual-list`），`list` 始终为空，接口有数据也不会渲染。 2. **切换 tag 无效**：tag 切换逻辑本身没问题，但列表未正确绑定，切换后看不到变化。 3. **样式错乱**：`div` / `view` 混用，且 `z-paging` 未正确绑定数据，布局异常。 4. **未使用主题色**：Tab 激活态、汇总区背景写死了绿色 `#007A39`，未用 `var(--primary-color)`（`#2065DF`）。 ## 修复内容 - 改用 `v-model=\"list\"` 绑定 `z-paging`，与项目内其他列表页（如报修列表）一致 - 统一使用 `view` 标签，布局对齐列表页卡片风格（`#f5f6f8` 背景 + 白色卡片） - Tab 激活态、汇总区背景改用 `var(--primary-color)` 和 `rgba(var(--primary-color-rgb), 0.1)` - 收入/支出金额保留语义色（红/绿），与 `index.vue` 一致 - 增加空状态展示，移除未使用的 `getDict` 相关代码 - 列表项 `key` 改为 `revEx",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "`detail.vue",
+    "`index.vue",
+    "涉及文件：d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_benefit\\elevatorPubEngCons\\detail.vue、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_benefit\\elevatorPubEngCons\\index.vue、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\api\\benefit.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "518350aa-c9b8-4693-b776-97fb2bd8ddb3"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  }
+ ],
+ "_draft": true
+}

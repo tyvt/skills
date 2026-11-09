@@ -1,0 +1,61 @@
+{
+ "project": "园区公共收益",
+ "batch": "028",
+ "files": [
+  "028.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "经营资源租赁合同新增，选择物业管理区域，“街道”和“",
+   "type": "bug",
+   "content": "问题已修复。 **原因：** 选择物业管理区域弹窗里，接口返回的 `subdistrict`、`community` 是区划编码（如 `320571053`），需要格式化成名称。`经营资源租赁合同`（`resourcesLeaseContractFiling/detail.vue`）的表格列未配置 `formatter`，所以直接显示了编码。 **修复：** 为「街道」「社区」列增加与 `资产租赁合同` 等页面一致的格式化器： ```498:507:zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/detail.vue { label: '街道', prop: 'subdistrict', formatter: this.subdistrictFormatter }, { label: '社区', prop: 'community', formatter: this.communityFormatter }, ``` 格式化逻辑来自 `detailMixins` 引入的 `area.js` mixin，会根据街道/社区编码映射为对应名称。 刷新页面后，在「经营资源租赁合同」新增页重新打开选择物业管理区域弹窗，街道和社区应显示为名称而非数字编码。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`320571053`），需要格式化成名称。`经营资源租赁合同`（`resourcesLeaseContractFiling/detail.vue",
+    "```498:507:zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/detail.vue",
+    "`area.js",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\assetsLeaseContractFiling\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6bb1b34b-eb24-4b0a-b69b-69e34156d925"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "编辑状态下，刷新详情页面，没有调用接口@zhi2-w",
+   "type": "bug",
+   "content": "## 问题原因 编辑态详情页依赖 `detailMixins` 的 **sessionStorage 表单缓存**： 1. 进入编辑模式时，若 `sessionStorage` 中有该路由的缓存，会**直接恢复表单并跳过** `getDetail()` 接口调用。 2. `form` 的 deep watch 会在 `form !== originForm` 时写入缓存。 3. 详情接口返回后，**程序化赋值**（如 `getArea()` 计算使用权面积、子组件格式化金额等）会改变 `form`，但 `originForm` 已在 `detailCallback` 里提前同步，导致被误判为「用户已编辑」，写入 `sessionStorage`。 4. 刷新页面后读到这份「假缓存」，就不再请求详情接口。 ## 修复方案 **1. `detailMixins.js`（根因修复）** - 增加 `skipFormCache` 标志，详情加载期间不写入缓存。 - 重写 `getDetail()`，在 `detailCallback` 完成后通过 `syncOriginFormAfterLoad()` 在 `$nextTick` 中再同步 `originForm`，等子组件渲染完成后再解除缓存保护。 - 编辑模式从缓存恢复时，同步设置 `originForm`，并校验缓存中的主键 ID 与",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`detailMixins.js",
+    "`plot/detail.vue",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\building\\plot\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\mixins\\detailMixins.js、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\mixins、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\mixins\\form.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0bafb3e6-385f-404a-b48a-91cebb47c939"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "组织工作人员：修改角色为物管会，保存后显示角色为社区",
+   "type": "preference",
+   "content": "已修复。原因是修改角色时只更新了 `roleIds`，`roleName` 仍保留详情接口返回的旧值，保存时后端收到的角色名称不正确。 **修改内容：** 1. **角色下拉框增加 `:label.sync=\"form.roleName\"`** 选择角色时同步更新 `roleName`（与项目中其他 `zs-select` 用法一致）。 2. **`getForm()` 显式上传 `roleName`** 优先使用 `form.roleName`，若无则从 `roleOptions` 中按 `roleIds` 匹配兜底。 3. **切换组织类型时清空 `roleName`** 与 `roleIds` 一并重置，避免残留旧角色名称。 保存后请求体会同时包含 `roleIds` 和 `roleName`，例如将角色改为「物管会」时两者会一致上传。请重新编辑保存验证一下。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\ownerCommitteeWorker\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\mixins\\detailMixins.js、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\record\\components\\enums.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "64889348-1c95-4eb4-8199-6ee031bb7e1e"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  }
+ ],
+ "_draft": true
+}

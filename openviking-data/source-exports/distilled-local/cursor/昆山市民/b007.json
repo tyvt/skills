@@ -1,0 +1,80 @@
+{
+ "project": "昆山市民",
+ "batch": "007",
+ "files": [
+  "007.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "绑定和解绑的接口参数丢失了，查看历史记录，原本正常的",
+   "type": "fact",
+   "content": "已修复。 **原因**：更改实名的人脸识别完成后，代码用 `uni.navigateTo` 跳转到 `/pages/verifyUser/index?pageType=editUserInfo`。当前页已经在栈里的就是 `verifyUser/index`，小程序不允许 `navigateTo` 到同一路由，跳转静默失败，所以一直停在「人脸识别」页。 解绑和首次实名不受影响，因为它们分别用 `reLaunch` 跳到其他页面。 **修复**：人脸成功后不再跳转，而是在当前页直接切到 `editUserInfo` 模式： - 更新 `pageType`、清空表单 - 刷新导航栏标题为「修改实名信息」 - 提示「人脸认证成功」 请再测一遍更改实名流程： 1. 实名信息页 → 更改实名信息 2. 完成人脸识别 → 页面应切到「修改实名信息」，可填写新姓名/身份证号 3. 再次提交 → 应跳回实名信息页",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "涉及文件：d:\\repository\\昆山市民\\src\\pages\\verifyUser\\index.vue、d:\\repository\\昆山市民\\src\\pages\\common\\useEidVerify.js、d:\\repository\\昆山市民\\src、d:\\repository\\昆山市民\\src\\api、d:\\repository\\昆山市民\\src\\pages\\verifyUser\\info.vue、d:\\repository\\昆山市民\\src\\api\\modules\\estate.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "bc96deeb-f24b-4f60-a14d-059e81f1caf8"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "分析一下新用户首次打开小程序，这个页面报错，可能是哪",
+   "type": "fact",
+   "content": "根据代码分析，截图里的 **「后端接口连接异常」** 是网络层失败，不是业务错误码。 ## 错误来源 该文案在 `src/request/index.js` 的 axios 响应拦截器里，当 `error.message === \"Network Error\"` 时触发： ```61:71:d:\\repository\\昆山市民\\src\\request\\index.js (error) => { let { message, code } = error if (message == \"Network Error\") { message = \"后端接口连接异常\" } else if (message.includes(\"timeout\")) { message = \"系统接口请求超时\" } else if (message.includes(\"Request failed with status code\")) { message = \"系统接口\" + message.substr(message.length - 3) + \"异常\" } showError(message) ``` 含义：请求根本没连上服务端（域名不可达、未配置合法域名、HTTPS 证书、服务宕机等），而不是接口返回了 `code !== 200` 的业务错误。 --- ## 新用户首次打开首页会调哪些接口 首页是",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "`src/request/index.js",
+    "```61:71:d:\\repository\\昆山市民\\src\\request\\index.js",
+    "`App.vue",
+    "`home.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "33ab37e2-0079-458d-a791-5eab0baa4197"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "这是什么问题",
+   "type": "preference",
+   "content": "根据截图和代码，可以这样理解这个问题： ## 问题是什么 这是**微信登录接口请求被中途取消**，不是典型的“接口返回业务错误”。 - 报错：`MiniProgramError: Request aborted` - 对应请求：`GET /estate/wechatOauth/getInfoByCode?code=...` - 作用：用 `wx.login` 拿到的 `code` 去后端换 `accessToken` 和用户信息 ```41:50:d:\\repository\\昆山市民\\src\\utils\\wxLogin.js export function loginWithWxCode() { const useUser = useUserStore() return getWxLoginCode() .then((code) => getInfoByCode({ code })) .then((userRes) => { useUser.setToken(userRes.data.accessToken) useUser.setUserInfo({ ...userRes.data, idNumber: userRes.data.idNumber }) return userRes }) } ``` ## 常见原因（结合你这个项目） **1. 重复触发登录，请求互相打断（最可能）",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "```41:50:d:\\repository\\昆山市民\\src\\utils\\wxLogin.js",
+    "`App.vue",
+    "`home.vue",
+    "```63:75:d:\\repository\\昆山市民\\src\\App.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "abc57820-2b35-4849-8e23-0d665121c69f"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "保险立项审核过后页面好像未刷新，再点审核报：单据已被",
+   "type": "bug",
+   "content": "**问题原因** 1. **页面复用未刷新**：从消息通知再次进入详情页时，若页面仍在导航栈中，只会触发 `onShow` 而不会触发 `onLoad`，详情和按钮状态仍是旧的。 2. **审批成功后未更新按钮**：`operationBtn` 的 watch 只监听 `busCode` / `dataId`，审批后这两个值不变，不会重新调用 `isApprovalAuth` 校验。 3. **审批成功只返回上一页**：`updateBtn` 仅执行 `navigateBack`，没有刷新详情和按钮状态。 **修复内容** 1. **`examineDetail.vue`** - 增加 `onShow`：页面再次显示时重新拉取详情（与列表页 `examineList.vue` 一致）。 - 增加 `refreshKey`：每次 `getDetail` 完成后递增，通知子组件重新校验按钮。 - `getDetail` 改为返回 `Promise`，便于串联刷新逻辑。 2. **`operationBtn.vue`** - watch 增加 `refreshKey`，详情刷新后重新执行 `init()`。 - 审批/指派成功后：先触发 `updateDetail` 刷新详情，再 `await init()` 重新校验权限，最后返回上一页。 **验证步骤** 1. 从消息通知进入保险立项",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "**`examineDetail.vue",
+    "`examineList.vue",
+    "**`operationBtn.vue",
+    "涉及文件：d:\\repository\\昆山市民\\src\\pages_examine\\examineDetail.vue、d:\\repository\\昆山市民\\src\\pages_examine\\components\\operationBtn.vue、d:\\repository\\昆山市民\\src\\api\\modules\\examine.js、d:\\repository\\昆山市民\\src\\pages_examine\\components\\approveDialog.vue、d:\\repository\\昆山市民\\src\\request\\index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "73a8f90b-b76b-4c0a-817c-91bc79c7d47c"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  }
+ ],
+ "_draft": true
+}

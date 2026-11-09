@@ -1,0 +1,175 @@
+{
+ "project": "无锡市区小程序嵌入H5",
+ "batch": 5,
+ "files": [
+  "017.md",
+  "018.md",
+  "019.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "title": "苏服办登录失败：h5Context 集中 showModal 展示入参与完整响应，并配合 noReject 避免拦截器 Toast 冲突",
+   "type": "workflow",
+   "content": "【情况】苏服办 H5 登录失败时用户需要看清接口 msg、实际入参（name/idType/idNumber/phone）与完整响应 JSON，且必须手动点确定关闭。\n\n【做法】在 `utils/h5Context.js` 的 `performSfbLoginIfNeeded` 内统一调用 `showSfbLoginErrorModal`：`uni.showModal` + `showCancel: false`；覆盖业务 code 非 200/0、成功但无 accessToken、网络异常三类失败。`sfbLogin` 请求带 `noReject: true`，并在 `api/index.js` 里对 noReject 分支禁止自动 Toast；`usePortal.js` 去掉重复 `showToast`，避免与调试弹窗叠两层。所有入口（`initH5Context`、`usePortal.bootstrap`、`onGateConfirm`）共用这一套。",
+   "evidence": "会话 e904622f：用户要求「登录失败提示错误信息、返回值、入参，弹窗手动确认」；结论在 h5Context 集中 showSfbLoginErrorModal，usePortal 移除重复 toast，security sfbLogin 支持 config，index noReject 不自动弹 Toast。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/index.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/security.js"
+   ],
+   "baseline": "06aa6e2",
+   "sessionIds": [
+    "e904622f-d610-4edc-99c8-78a4514d766f"
+   ],
+   "bundle": "017.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "H5 嵌入：initQqMapKeys 必须在 await initH5Context 之后，且无 token 不请求 getConfigKey",
+   "type": "bug",
+   "content": "【现象】`getConfigKey`（拉 `qq.map.key`）明明走 `@/api` 拦截器，请求头却没有 `Authorization`。\n\n【根因】小程序 web-view 嵌入 H5 时，URL token 由 `initH5Context` 写入 `userStore`；若 `App.vue` 在 `initQqMapKeys()` 早于 `await initH5Context(getH5Param)` 执行，拦截器里 `userStore.token` 仍为空。\n\n【修复】1) 启动顺序：`await initH5Context` 后再 `initQqMapKeys()`；2) `qqMapKey.js` 无 token 时直接跳过 `getConfigKey`（小程序端从 storage 恢复 token 时一般不受影响）。",
+   "evidence": "会话 ef15cdae：用户要求 qqMapKey 接口携带 token；结论明确 initQqMapKeys 在 setToken 之前发起请求是根因，App.vue 调整顺序并在 qqMapKey 增加 token 校验。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/App.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/qqMapKey.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/index.js"
+   ],
+   "baseline": "2e9862a",
+   "sessionIds": [
+    "ef15cdae-5895-485b-9248-03961a3b0697"
+   ],
+   "bundle": "017.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "H5 文件预览 filePreview：与 ZsImage 一致，根路径转 ./ 相对地址走当前域与 Vite 代理",
+   "type": "pattern",
+   "content": "【情况】`utils/index.js` 的 `filePreview` 用 `IMAGE_BASE` 拼 H5 地址，在子路径部署或 dev 代理下预览 PDF 等文件路径错误。\n\n【做法】新增 `resolveFilePreviewUrl`：H5 下已是 http(s) 等绝对 URL 原样返回；以 `/` 开头的后端路径改为 `./` 相对路径（如 `/api/file` → `./api/file`），与 `ZsImage` 策略一致。微信小程序仍拼 `BASE_URL`。调用方若已传入完整 URL 勿重复拼接。",
+   "evidence": "会话 da88fbd0：用户要求 filePreview 改为相对路径；结论新增 resolveFilePreviewUrl，H5 去 IMAGE_BASE 拼接，小程序逻辑不变。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/index.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/ZsImage/ZsImage.vue"
+   ],
+   "baseline": "0804e57",
+   "sessionIds": [
+    "da88fbd0-10ce-496a-a71f-84d83cffcc43"
+   ],
+   "bundle": "017.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "列表项「前置标签 + 多行标题」：用 float:left 标签让换行从整行左侧起而非与标签列对齐",
+   "type": "pattern",
+   "content": "【现象】flex 左右分栏时，公告等列表标题换行后与标签同一列对齐，标签被挤压变形。\n\n【做法】去掉 flex 分栏；标签 `float: left` 并与标题首行等高（如 52rpx）；标题文本紧跟标签参与自然换行，换行后从容器最左开始（标签下方）。容器用 `max-height` 限制最多两行（如 2×行高）。适用于 `pages_owner/project/announcement` 等同构列表。",
+   "evidence": "会话 ef68441e：用户两轮反馈标题换行挤压标签、希望换行在标签下方开始；结论改为 float 标签 + 自然换行 + max-height 两行。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/announcement/index.vue"
+   ],
+   "baseline": "0804e57",
+   "sessionIds": [
+    "ef68441e-686a-4599-93bd-59b2f361614d"
+   ],
+   "bundle": "017.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "小区周边无数据：地图链路勿静默 return []，onShow 重拉详情须重置 markers 防 push 累加",
+   "type": "workflow",
+   "content": "【排查】控制台过滤 `[小区周边]` / `[小区周边/QQMap]`，依次看：宿主是否 web-view、Key 是否为空、经纬度是否合法、JSONP/逆地理/地点搜索失败原因（超时、script 错误、status/message）、成功但 pickedCount 为 0 则属过滤或 POI 稀疏。\n\n【代码坑】1) 失败路径若统一 `return []` 且无日志，无法区分 Key/坐标/宿主拦截；应对每段失败打点。2) `onShow` 重复拉详情时对 `markers.push` 会累加重复点，应每次重置为单个 marker。",
+   "evidence": "会话 44e9f45b：用户要日志判断宿主能否调通地图并排查代码；结论列出日志对照表，并指出静默 return [] 与 markers.push 累加两处问题。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/index.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/qqMapKey.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/ZsMap/ZsMap.vue"
+   ],
+   "baseline": "ca82c96",
+   "sessionIds": [
+    "44e9f45b-f8b3-4cdb-b60b-c803993c0d4a"
+   ],
+   "bundle": "017.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办跳转 URL 经 URLSearchParams 解析时 Base64 密文中的 + 会被解码为空格导致解密失败",
+   "type": "bug",
+   "content": "什么情况：苏服办（或同类政务 App）打开 H5 时，查询串里携带 Base64 密文参数（name、idType、idNumber、phone 等），登录/解密接口报失败，URL 肉眼可见密文里含 + 号。\n\n为什么：`URLSearchParams`（以及按 application/x-www-form-urlencoded 规则解析 query）会把 `+` 当作空格解码。密文如 `phone=A+A7Pil3SsG9LSUe8q8mVw==` 会变成带空格的字符串，后端解密必然失败。上游若未把 + 编码为 `%2B`，问题在 H5 侧必然复现；易被误判为「token 无效」或「接口挂了」。\n\n怎么做：在读取密文参数后统一做空格还原为 `+`（如 `restoreBase64Plus`：`value.replace(/ /g, '+')`），苏服办登录路径对 name/idType/idNumber/phone 全部应用。规范侧应要求拼 URL 时用 `%2B`；H5 端还原作为兜底。验证用含 + 的真实跳转链接，对比还原前后密文长度与解密结果。",
+   "evidence": "会话 1d789cb5：用户给出 unlimited 测试 URL，phone/idNumber 含 +；结论为 URLSearchParams 将 + 解码为空格破坏 Base64，在 h5Context.js 增加 restoreBase64Plus 并在 performSfbLoginIfNeeded 对四个密文字段应用。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js"
+   ],
+   "baseline": "3fb9434",
+   "sessionIds": [
+    "1d789cb5-e259-4d57-ada7-dfb786d89609"
+   ],
+   "bundle": "018.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "小程序 web-view 嵌入 H5：业务 houseId 以 App 启动解析的 userStore 为唯一来源",
+   "type": "workflow",
+   "content": "什么情况：H5 被小程序 web-view 打开，入口 URL 带 `houseId`（及 token 等），但某子页（如维修资金）仍从 `useHouseStore.currentHouse`、页面 `onLoad options.houseId` 取参，导致接口 houseId 为空或与小程序传入不一致。\n\n为什么：嵌入场景下房屋上下文在 App.vue 的 `initH5Context` 中从 query 写入 `userStore`（如 `applyHouseSelection` 同步 projectName），子页若再读本地选房 store 或路由参数，会与入口 URL 脱节；payment 等页已统一走 userStore 时，其它页混用会产生隐蔽联调问题。\n\n怎么做：嵌入 H5 子页查询类接口统一使用 `userStore.houseId` / `userStore.projectName`；移除对 `useHouseStore` 及仅用于兜底的 `options.houseId` 依赖。数据流约定：`URL ?houseId=xxx → App.vue initH5Context → userStore → 各业务页`。小程序侧需保证 web-view 入口 URL 带上 houseId 与 token。",
+   "evidence": "会话 55e004d6：maintain/index.vue 要求 houseId 从 App.vue query 获取；结论改为只读 userStore.houseId/projectName，与 payment/index.vue 一致，并说明 URL→App→store 数据流。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/App.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/store/user.js"
+   ],
+   "baseline": "fb55fa9",
+   "sessionIds": [
+    "55e004d6-eb3e-4e5c-90c3-0c52cf8d6b5c"
+   ],
+   "bundle": "018.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "公告列表手动 map 丢字段会导致 getDictLabel 永远显示占位符",
+   "type": "bug",
+   "content": "什么情况：NoticeList 等子组件用 `getDictLabel(dict, item.msgType)` 展示类型标签，界面始终为 `-`。\n\n为什么：父页把接口 `rows` 转成列表项时手写对象字面量，漏传 `msgType`；`getDictLabel` 在 val 为空时返回 `''`，模板 `|| '-'` 一直落占位。同业务另一页用 `...el` 展开保留字段则正常，属于「映射层丢字段」而非字典未加载。\n\n怎么做：列表映射时显式带上字典展示依赖的原始码值字段（如 `msgType: el.msgType`）；或统一用展开保留未知字段再覆盖展示用别名。改完刷新列表验证标签文案与配色；若仍裁切再查固定宽度样式（如 72rpx）。",
+   "evidence": "会话 636ac7f6：announcement/index.vue 映射未带 msgType，NoticeList 类型不显示；结论为补 msgType 并修正 getColor 对字典 ref 的读取。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/announcement/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/announcement/components/NoticeList.vue"
+   ],
+   "baseline": "3c384c1",
+   "sessionIds": [
+    "636ac7f6-e11f-4469-91e7-916792d8743b"
+   ],
+   "bundle": "018.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "详情页根容器 height:100% 叠加 App 全局 uni-page-body 100% 会在内容不足时撑出底部灰留白",
+   "type": "bug",
+   "content": "什么情况：小区信息等以卡片堆叠的 H5 页，内容高度小于一屏时，底部出现大面积灰色空白。\n\n为什么：页面根类（如 `.project-page`）设 `height: 100%`，且 `App.vue` 中 `uni-page-body` 也为 `height: 100%`，容器被强制等于视口高度；背景色铺在整页容器上，短内容也会把灰色铺到屏幕底。\n\n怎么做：去掉页面根节点不必要的 `height: 100%`，让高度随内容自适应，保留适度 `padding-bottom` 即可。与「min-height:100% 父级未解析高度」是不同根因，改前先看是固定 height 还是 min-height 链。",
+   "evidence": "会话 14093e7d：project/info/index.vue 底部留白过多；结论为 .project-page 的 height:100% 在 uni-page-body 同为 100% 时撑满视口，去掉 height:100% 后随内容结束。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/App.vue"
+   ],
+   "baseline": "fb55fa9",
+   "sessionIds": [
+    "14093e7d-11b9-40d4-b69d-dba3df14e01c"
+   ],
+   "bundle": "018.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "uni-app Vue3 script setup 使用 onLoad 必须从 @dcloudio/uni-app 显式导入",
+   "type": "pattern",
+   "content": "什么情况：页面 `<script setup>` 里调用 `onLoad`（或配合 `nextTick`）运行时报 `onLoad is not defined`。\n\n为什么：Vue3 组合式 API 不会自动注入 uni-app 页面生命周期，与选项式 API 不同；`nextTick` 也需从 `vue` 导入。H5 与小程序共用页面时漏导入会在该页首次进入即报错。\n\n怎么做：`import { onLoad } from '@dcloudio/uni-app'`，`import { nextTick } from 'vue'`；与同目录已正常页面（如 index.vue）对齐写法。保存后热更新应消除报错，否则重启 dev。",
+   "evidence": "会话 fc168ac2：elevatorPubEngCons/detail.vue 报 onLoad is not defined；结论为补 @dcloudio/uni-app 的 onLoad 与 vue 的 nextTick 导入。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/elevatorPubEngCons/detail.vue"
+   ],
+   "baseline": "0804e57",
+   "sessionIds": [
+    "fc168ac2-165e-49c0-8f11-5e6fff2146b4"
+   ],
+   "bundle": "018.md",
+   "project": "无锡市区小程序嵌入H5"
+  }
+ ]
+}

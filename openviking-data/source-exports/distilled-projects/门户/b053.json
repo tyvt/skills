@@ -1,0 +1,138 @@
+{
+ "project": "门户",
+ "batch": "053",
+ "files": [
+  "053.md"
+ ],
+ "count": 8,
+ "memories": [
+  {
+   "title": "publicPortal 可售房屋 mock 须与详情/项目字段同源生成",
+   "type": "bug",
+   "content": "门户 publicPortal 模块用 mock/properties.js 驱动可售列表与 PropertyDetailDialog 时，常见断点：① houseAddress 写死小区名而 projectName 已是另一项目，列表进详情后坐落语义对不上；② propertyHouses 缺 floor/naturalFloor 时详情仍展示「层次/自然层」，楼盘表路径有值、列表路径为空；③ 全表统一 buildingNumber 与 propertyPermits/propertyBuildings 幢号体系不一致，演示「项目→幢→户」会穿帮；④ PropertyPages.vue 用 buildingNumber || '14' 会在 record 丢失时一律显示 14 幢。修法：坐落、幢号、楼层与 projectName/所选幢行同源生成或从 roomNumber 推导；无 buildingNumber 时不硬编码兜底，改为校验路由/导航 state。",
+   "evidence": "会话 b0e6ea97 数据一致性审查：HIGH 可售列表坐落与项目名不一致、列表进详情缺楼层；MEDIUM 幢号 mock 未关联、PropertyPages 硬编码 '14' 兜底；楼盘表路径内部面积/总价计算自洽。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/mock/properties.js",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/pages/PropertyPages.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/mock/notices.js"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "b0e6ea97-1dd9-4c28-84b9-b7c31ee86ee8"
+   ],
+   "bundle": "053.md",
+   "project": "门户"
+  },
+  {
+   "title": "PropertyDetailDialog 的 house 计算属性合并与面积拆分约定",
+   "type": "pattern",
+   "content": "房屋详情弹窗不要用模板里临时拼数字：统一在 house 计算属性合并行数据与 record。规则：有 sharedArea/indoorArea 时沿用行内分项，否则按总建筑面积走 splitBuiltArea 拆分；已有 totalPrice 时禁止再用 area×unitPrice 重算覆盖；buildingNo 优先 buildingNumber，否则从 houseAddress 中「N幢」正则解析，与列表/楼盘表传入字段一致。预售用途区展示面积时要区分 permitDisplay.area（预售总建筑面积）与户级面积，避免把幢级/预售总面积误标为「住宅」分项。",
+   "evidence": "审查结论：propertyHouses 与 propertyRooms 的 totalPrice=round(area×unitPrice) 与 splitBuiltArea 自洽；house 计算属性逻辑与楼盘表路径一致；MEDIUM 项指出 permitDisplay.area 在用途「住宅」上的语义易误解。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/mock/properties.js"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "b0e6ea97-1dd9-4c28-84b9-b7c31ee86ee8"
+   ],
+   "bundle": "053.md",
+   "project": "门户"
+  },
+  {
+   "title": "操作指引 operationGuideContent 外链走 links + 既有 onAction",
+   "type": "workflow",
+   "content": "门户首页操作指引文案加跳转时，在 operationGuideContent.js 为卡片配置 links（可点击项，触发 $emit('action', link)），不要另写一套路由。portal 类目标跳 /UnifiedLogin?portal=<portalKey>（如 rental-opening、rental-staff）；合同备案查询用 contract-query，由 UnifiedLogin/父级已有 onAction 统一处理。OperationGuideBody.vue 仅补 query 布局样式（多链接同行、蓝色下划线），业务跳转逻辑保持在 onAction。",
+   "evidence": "会话 01a16249：三张 query 卡片改为 links；企业/人员查询映射 rental-opening、rental-staff，备案文案映射 contract-query；结论明确复用 onAction。",
+   "files": [
+    "zhi2-web-admin/src/views/home/operationGuide/config/operationGuideContent.js",
+    "zhi2-web-admin/src/views/home/operationGuide/components/OperationGuideBody.vue"
+   ],
+   "baseline": "fd9ef3e",
+   "sessionIds": [
+    "01a16249-8b21-70c5-a400-74b168ec7d9e"
+   ],
+   "bundle": "053.md",
+   "project": "门户"
+  },
+  {
+   "title": "UnifiedLogin 竖向 el-carousel 公告条叠字需裁切容器",
+   "type": "bug",
+   "content": "UnifiedLogin 新闻/公告区使用竖向 el-carousel（固定高度约 29px）时，若 .el-carousel__container 保持 overflow: visible，多个 notice 项会同时露出导致文字重叠。在 scoped 样式中对 .news-content :deep(.el-carousel__container) 设 overflow: hidden；与 publicPortal 其它页 :deep 穿透 Element 的写法一致。可选加固：对 .el-carousel 再设 height 与模板 height 属性一致，避免主题差异下外层高度漂移。",
+   "evidence": "会话 3717a5bf：竖向轮播多公告同时可见、文字叠乱；修复为 news-content 下 :deep(.el-carousel__container){overflow:hidden}，审查批准。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue"
+   ],
+   "baseline": "2785dd9",
+   "sessionIds": [
+    "3717a5bf-c5a2-43d7-ab4e-129de5141ccc"
+   ],
+   "bundle": "053.md",
+   "project": "门户"
+  },
+  {
+   "title": "管理员首页 index-new 区块标题高度用 --section-tab-height 联动丝带",
+   "type": "pattern",
+   "content": "首页新版（index-new）区块标题栏（业务中心、常用功能等）增高时，须同时改 .card-header 的 --section-tab-height 并依赖该变量拉高左侧 section_tab_ribbon.svg 背景，只改 line-height 或 padding 会导致丝带与文字区错位。典型从 36px 调到 44px 约增加上下各 4px 留白（24px 字号不变）。",
+   "evidence": "会话 d49bceb7：用户要求标题文字区上下边距加大；结论将高度 36px→44px 并通过 --section-tab-height 同步丝带背景。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue",
+    "zhi2-web-admin/public/assets/images/homeNew/section_tab_ribbon.svg"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "d49bceb7-a0ad-4279-ae3e-9701e4912d1d"
+   ],
+   "bundle": "053.md",
+   "project": "门户"
+  },
+  {
+   "title": "UnifiedLogin 四列菜单子项前缀圆点是 ::before 伪元素",
+   "type": "fact",
+   "content": "统一登录页四列菜单（商品房/存量房/经纪机构/住房租赁）子项文字前的圆点不是 <ul>/<li> 列表符号，而是 .menu-sub-item::before 绘制的小圆点。要去掉前缀应删除或隐藏该伪元素规则，而不是改 list-style；清理时一并移除仅服务于伪元素的 .menu-sub-more::before 等冗余规则。",
+   "evidence": "会话 eb3f6c13：用户要求去掉文字前圆点；结论删除 .menu-sub-item::before 及不再需要的 .menu-sub-more::before。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue"
+   ],
+   "baseline": "a1e5beb",
+   "sessionIds": [
+    "eb3f6c13-b556-4a5f-8a57-32d5e3554b44"
+   ],
+   "bundle": "053.md",
+   "project": "门户"
+  },
+  {
+   "title": "HomeStatCard 今日蓝/本月绿应绑子元素类名",
+   "type": "pattern",
+   "content": "门户首页统计条若要求「今日值蓝色、本月值绿色」且同一卡内两种颜色并存，不要在整块 .stat-value 上用动态 :style 设色；在模板给今日/本月数值分别包 span 并挂 .stat-today（如 #2b5ea7）、.stat-month（如 #4fc25d），分隔符单独设色（如 #333）。在 HomeStatsBar 的 v-for 下各卡表现一致，也比按 stat 字段映射颜色更符合产品文案结构。",
+   "evidence": "会话 749e4ed1 审查：移除 stat-value 上 :style，新增 .stat-today/.stat-month；结论 APPROVE，满足全卡今日蓝本月绿。",
+   "files": [
+    "zhi2-web-admin/src/views/home/components/HomeStatCard.vue",
+    "zhi2-web-admin/src/views/home/components/HomeStatsBar.vue"
+   ],
+   "baseline": "ac6513b",
+   "sessionIds": [
+    "749e4ed1-e8ba-46db-8cbc-1a669ab74d3f"
+   ],
+   "bundle": "053.md",
+   "project": "门户"
+  },
+  {
+   "title": "publicPortal 详情弹窗字段标签统一左对齐",
+   "type": "preference",
+   "content": "门户 publicPortal 系列详情弹窗（公司/许可证/房屋等）字段标签默认勿用 text-align: right；用户验收要求标签区左对齐。改 .portal-detail-row 与预售用途行 .portal-permit-purpose 的 text-align 为 left，房屋详情若未单独设对齐则保持默认左对齐即可。",
+   "evidence": "会话 2e658f22：用户要求首页弹窗标签全部左对齐；修改 PropertyDetailDialog.vue 中 portal-detail-row、portal-permit-purpose 由 right 改 left。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "2e658f22-d649-43cf-af46-48701336dcb3"
+   ],
+   "bundle": "053.md",
+   "project": "门户"
+  }
+ ],
+ "_draft": false
+}

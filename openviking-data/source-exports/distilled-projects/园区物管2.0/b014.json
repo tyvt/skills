@@ -1,0 +1,238 @@
+{
+ "project": "园区物管2.0",
+ "batch": 14,
+ "files": [
+  "053.md",
+  "054.md",
+  "055.md",
+  "056.md"
+ ],
+ "count": 14,
+ "memories": [
+  {
+   "baseline": "园区物管2.0 zhi2-web-admin，基线 5a288f142",
+   "content": "什么情况：新增态连续上传多张图后，点击任意缩略图预览总是打开第一张。为什么：公共组件 ImageUpload 的 handlePictureCardPreview 里，预览列表 urlList 存的是 resolveServerAssetUrl() 处理后的完整地址，而当前图索引用 urlList.indexOf(file.fileUrl) 去匹配后端返回的原始相对路径（如 /upload/xxx.jpg）；两套格式不一致时 indexOf 几乎恒为 -1，索引 -1 被兜成第一张。怎么做：索引匹配改为 findIndex 多条件兜底（依次比对 uid、fileUrl、name、url 及解析后的 URL），任一命中即定位；同时在 handleUploadSuccess 中保留 Element UI 传入的 file.uid，保证上传过程中也能精确对应文件。该组件全局共用，修一处全项目受益，排查同类「点哪张都看错」问题时优先怀疑预览列表与匹配键的 URL 格式不一致。",
+   "evidence": "会话 90aa41bd：用户报 housePart/detail.vue:57 新增时传多个图片预览匹配错乱；结论定位到 handlePictureCardPreview 的 indexOf 格式不一致，改 findIndex 多条件匹配 + 保留 uid",
+   "files": [
+    "src/components/ImageUpload/index.vue",
+    "src/utils/resolveServerAssetUrl.js"
+   ],
+   "sessionIds": [
+    "90aa41bd-020e-45a5-bbab-7177966aefbc"
+   ],
+   "title": "ImageUpload 多图预览错位的根因：resolved URL 与原始 fileUrl 格式不一致导致 indexOf 恒为 -1",
+   "type": "bug",
+   "bundle": "053.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "园区物管2.0 zhi2-web-admin，基线 5a57bb20d",
+   "content": "什么情况：顶栏标题设置很长时，右侧昵称被推出屏幕外。为什么：flex 容器的子项默认 min-width:auto（宽度不能小于内容最小宽度），标题又用 white-space:nowrap，整段标题被算成一条超长内容；左侧整块的最小宽度被撑死，中间 flex:1 拿不到空间，flex:1 形同虚设，右侧整组就被挤出视口。嵌套多层 flex 时每一层都要处理。怎么做：给顶栏每一层 flex 容器（.navbar、.top-nav-container 等）加 min-width:0 并配 overflow:hidden 打破最小宽度约束；标题用 flex:1 1 0% + min-width:0 + text-overflow:ellipsis 单行省略；不应收缩的内容（logo、右侧操作区）显式 flex-shrink:0；昵称等可变长文案去掉固定 width，改 max-width: min(240px, 32vw) + 省略。这是所有「flex 长内容把兄弟元素顶飞」问题的通用解法。",
+   "evidence": "会话 93662ada：Navbar.vue 长标题把右侧昵称顶出屏幕；结论为 min-width:auto + nowrap 组合根因，逐层 min-width:0 + ellipsis + flex-shrink 修复",
+   "files": [
+    "src/layout/components/Navbar.vue"
+   ],
+   "sessionIds": [
+    "93662ada-0765-4626-a08c-941236de904d"
+   ],
+   "title": "flex 布局长文本挤掉右侧元素的通用解法：min-width:0 逐层打开 + 省略兜底",
+   "type": "pattern",
+   "bundle": "053.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "园区物管2.0 zhi2-web-admin，基线 6a4835a08",
+   "content": "什么情况：数据沙盘饼图的占比在「走接口 ratio 字段」与「走 ECharts 自算 percent」之间切换。为什么：两者口径有差——ECharts 的 p.percent 是按 series 内所有数据项的 value 算的；本项目对 count===0 的扇区仍塞占位值 1 参与绘图，这些假值也计入分母，导致 ECharts 算出的占比与真实数量占比不一致；接口 ratio 则直接来自后端统计。怎么做：约定饼图 label/tooltip 的占比统一读 p.percent（getDonutSlicePercent 内只 Math.round(p.percent)，不再解析接口 ratio 字段），占比展示与绘图口径天然一致；代价是要知道 0 值占位扇区会让 percent 偏离真实占比，若业务要求与接口一致，要么恢复接口 ratio，要么让 0 值项不进 series。排查「饼图百分比对不上」时先查是否有占位 value 混入 series。",
+   "evidence": "会话 e98b3c2b：用户确认并要求移除接口比例取值改用 ECharts 计算值；结论记录了 count===0 占位值 1 导致 percent 与真实占比不一致的已知偏差",
+   "files": [
+    "src/views/benefit/dataSandbox/assetPanorama/index.vue"
+   ],
+   "sessionIds": [
+    "e98b3c2b-020e-45a5-bbab-7177966aefbc"
+   ],
+   "title": "ECharts 饼图占比取值约定：统一用 p.percent，但 0 值占位扇区会污染分母",
+   "type": "pattern",
+   "bundle": "053.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "a63180c9a 时代之前即存在该布局结构",
+   "content": "什么情况：顶导航栏「更多功能」下拉菜单（position:absolute; top:100%）整块被裁掉不显示。为什么：外层 .top-nav-container 设了 overflow:hidden（为做菜单横向滚动），下拉超出导航栏高度的部分被父级裁切；次要问题是 TagsView 的 z-index:8 会盖住延伸下来的下拉。怎么做：滚动职责下沉——用单独的 .nav-items-scroll 包住左侧菜单做 overflow-x:auto（配 width:max-content 保证整条菜单可滚），外层容器保持 overflow:visible；.navbar 整体加 position:relative; z-index:9 高于 TagsView(8)，下拉展开时自身 z-index 提到 20，「更多」按钮 flex-shrink:0 防被挤没。套路：横向滚动容器与悬浮下拉必须是兄弟层级，不能让下拉挂在 overflow 裁切容器内。",
+   "evidence": "会话 5eee9074-4df3-4e60-a122-c6a55131f0d7：根因分析与修复均落在 Navbar.vue / layout/index.vue / TagsView/index.vue",
+   "files": [
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/layout/components/TagsView/index.vue"
+   ],
+   "sessionIds": [
+    "5eee9074-4df3-4e60-a122-c6a55131f0d7"
+   ],
+   "title": "[园区物管] 顶栏下拉被裁切的根因：overflow:hidden 父容器裁掉 absolute 下拉，滚动职责必须拆到内层子容器",
+   "type": "bug",
+   "bundle": "054.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "新结论，已知清单无 SPA 地图请求发起方/内网部署约束相关条目",
+   "content": "什么情况：大屏/统计地图页用 ZsTencentMap（动态插入 script 加载 map.qq.com gljs SDK），行政区划边界走腾讯 WebService JSONP（apis.map.qq.com/ws/district/v1/search），底图瓦片由 SDK 在浏览器内继续拉取；业务数据接口走 $get → VITE_APP_BASE_API。为什么：这是纯 Vue SPA，页面加载后所有网络请求（业务接口 + 地图 SDK + JSONP + 瓦片）全部由用户浏览器发起，部署前端的 Nginx 静态机不代发任何请求。怎么做：部署评估时按角色区分——前端静态服务器禁外网不影响地图；真正的前置条件是「用户浏览器」能访问 map.qq.com、apis.map.qq.com 及后端网关。客户环境为纯内网/防火墙拦腾讯域名时地图必然失败，需提前确认网络策略或换内网瓦片方案，不要误判为前端服务器问题。",
+   "evidence": "会话 265a0398-04ab-4311-b536-f18b5d57b75e：mapLoader.js 动态 script、map.vue districtSearchJsonp、index.vue 接口调用均指向浏览器直连",
+   "files": [
+    "zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue"
+   ],
+   "sessionIds": [
+    "265a0398-04ab-4311-b536-f18b5d57b75e"
+   ],
+   "title": "[园区物管] 腾讯地图在 SPA 中的请求全部由用户浏览器发起，前端静态服务器禁外网不影响地图",
+   "type": "fact",
+   "bundle": "054.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "已知第 4 条是 markRaw，第 40 条是 2d 渲染，无 containLabel/emphasis 相关条目",
+   "content": "什么情况：①柱状图 Y 轴刻度贴边被裁；②饼图悬停时其余扇区变白色（用户明确不要这种效果）。为什么：①本项目柱状图 grid 设了 containLabel:false，Y 轴 axisLabel 不计入布局，默认 margin/偏小的 grid.left 会刻度贴边或裁切，必须同时加大 grid.left（约 +14px）和 axisLabel.margin（12px）；②ECharts 默认 emphasis.focus='self' 会把其他扇区淡化为白色。怎么做：Y 轴贴边统一调 chartOptions.js 中的 BAR_Y_AXIS_LABEL（margin:12）+ 各柱图 grid.left；饼图交互统一 emphasis.focus='none'（只保留当前扇区放大），配合自研 bindPieLegendHover 做图例联动高亮——这是本项目大屏饼图的固定交互约定，fundPanorama 与 assetPanorama 两页保持一致。",
+   "evidence": "会话 5b0caae3-e374-44ea-8848-04caf6f893c4（Y轴留白，chartOptions.js 统一改）与会话 caf5eb6c-f488-4efa-acec-cd88dff68378（focus self→none，pieLegendHover.js 图例联动）",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js",
+    "zhi2-web-admin/src/views/benefit/dataSandbox/pieLegendHover.js"
+   ],
+   "sessionIds": [
+    "5b0caae3-e374-44ea-8848-04caf6f893c4",
+    "caf5eb6c-f488-4efa-acec-cd88dff68378"
+   ],
+   "title": "[园区物管] ECharts 图表约定：containLabel:false 时 Y 轴留白需手动 grid.left+margin 双调；饼图悬停 focus 用 'none' 不淡化其他扇区",
+   "type": "pattern",
+   "bundle": "054.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7f13a8a38",
+   "content": "什么情况：搜索/过滤输入框（如菜单图标选择 IconSelect.vue）在英文输入时能过滤，切中文输入法输入拼音基本搜不到。为什么：@input.native 监听的是原生 DOM input 事件，IME 组字（拼音）过程中原生事件多次触发但 v-model 绑定值尚未更新；选字确认后 el-input 通过组件 input 事件更新 v-model，原生 input 不一定再触发，导致过滤函数读到的关键词为空或仍是拼音。英文逐字输入两者时机接近所以偶发正常。怎么做：去掉 .native，改用 @input 监听 el-input 的组件事件；过滤函数直接使用事件回调传入的关键词参数，不要依赖可能滞后的 this.xxx 值。凡是「输入触发过滤」的场景都适用此规则。",
+   "evidence": "会话 0f4d7bcd：用户报「菜单图标，用中文搜索不生效」，修复方式为 @input.native 改 @input 并让 filterIcons 直接使用事件参数，刷新后输入「三方」可正确过滤。",
+   "files": [
+    "src/views/system/menu/IconSelect.vue"
+   ],
+   "sessionIds": [
+    "0f4d7bcd-4f58-428d-a808-a25b8e090d3a"
+   ],
+   "title": "el-input 用 @input.native 监听搜索会导致中文 IME 输入法下过滤失效",
+   "type": "bug",
+   "bundle": "055.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232",
+   "content": "什么情况：页面引入腾讯地图等第三方 SDK 后控制台报 CORS：外链请求（如 pr.map.qq.com 统计 pingd）的预检被拒，提示请求头 nonce 不在 Access-Control-Allow-Headers。为什么：项目里 public/assets/js/sign.js 全局改写了 XMLHttpRequest 和 fetch，只要 sessionStorage 有 Admin-Token 就对每一次请求（含第三方外链）附加 nonce/timestamp/sign 自定义头；第三方域名不允许这些头，OPTIONS 预检必然失败。注意报错表面像「腾讯地图配置问题」，真正元凶在本项目的加签脚本。怎么做：sign.js 增加 shouldApplySign 白名单——只对当前站点同源、且路径以约定 API 前缀（SIGN_API_BASE，须与 env 的 VITE_APP_BASE_API 一致，含 /dev-api 等代理前缀变体）开头的请求加签，外链一律不加。排查第三方 SDK 请求被篡改时先查全局 XHR/fetch wrapper。",
+   "evidence": "会话 73936be3：CORS 报错定位到 sign.js 全局加签，补 shouldApplySign（同源 + /api/v2.0 前缀）后外链不再加签；并顺带修正 fetch 首参为 URL/Request 时取查询串的逻辑。",
+   "files": [
+    "public/assets/js/sign.js",
+    "vite.config.js",
+    "env/.env"
+   ],
+   "sessionIds": [
+    "73936be3-9ab2-412b-8043-33c8c47df458"
+   ],
+   "title": "sign.js 全局改写 XHR/fetch 加签会把 nonce 头带到第三方外链，触发 CORS 预检失败",
+   "type": "bug",
+   "bundle": "055.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232",
+   "content": "什么情况：地图/资金全景等超宽大屏页，横向滚动条必须先把纵向滚到最底才出现。为什么：根节点写了 height: calc(100vh - 84px) 且 min-height 也是同一值；布局主内容区 #app-main 是 flex:1，实际高度小于 100vh-84px（上方还有 Tags 栏、票据条等，84 只是近似值），根盒子比可视区更高，横向滚动条画在盒子最底、落在主区可视范围之下。怎么做：去掉强制视口高的 min-height，改加 max-height: 100% 让高度不超过父级主内容区，并加 min-height: 0 保证 flex 子项正确参与高度计算，横向滚动条即始终贴在当前滚动容器底部。若个别环境 max-height:100% 不生效，再在 AppMain 的 .app-main 上补 min-height:0。与「详情页 calc(100vh-120px) 少减像素」是不同的根因与场景。",
+   "evidence": "会话 a2b24d85：assetPanorama 与 fundPanorama 两个页面同步做「去 min-height + max-height:100% + min-height:0」三处修改后，横向滚动条无需先滚到底即可见。",
+   "files": [
+    "src/views/benefit/dataSandbox/assetPanorama/index.vue",
+    "src/views/benefit/dataSandbox/fundPanorama/index.vue",
+    "src/layout/components/AppMain.vue"
+   ],
+   "sessionIds": [
+    "a2b24d85-02d0-461f-afbd-1db973bf08f3"
+   ],
+   "title": "全景类大屏页 height 与 min-height 同用 calc(100vh-…) 会把横向滚动条推出主内容区可视范围",
+   "type": "bug",
+   "bundle": "055.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7814a0c2a",
+   "content": "什么情况：配置了汇总的 zs-table（如楼盘范围 rangeTable、交付范围表）底部 summary 整块不渲染，接口数据正常。为什么：组件 showMethod 里识别「小计列」只用 column.type === 'index' 单一条件；有选择列（selection）或列定义差异时匹配不到，汇总字段取值又只读 column.property 不兼容 column.prop，任一取空则整行汇总为空。怎么做：在 showMethod 的列识别上做双兜底——先按 type/property 找 index 列，找不到回退到「第一个非 selection 列」；汇总字段统一兼容 column.property || column.prop。此修法应落在 zs-table 组件层而不是各页面自写 summary 方法（与「表底统计统一交给 zs-pagination」是两回事：一处是行小计，一处是总条数）。",
+   "evidence": "会话 5c7bbda7：改 rangeTable.vue 的 showMethod 列识别与字段兼容后 summary 正常渲染，涉及 zs-table 组件与多处 rangeTable 消费方。",
+   "files": [
+    "src/components/zs-table/zs-table.vue",
+    "src/views/property/complex/components/rangeTable.vue",
+    "src/views/property/handover/components/deliveryRangeTable.vue"
+   ],
+   "sessionIds": [
+    "5c7bbda7-0993-453f-a4a2-a1efa119c858"
+   ],
+   "title": "zs-table summary 不展示：showMethod 的小计列识别不能只依赖 column.type==='index'",
+   "type": "bug",
+   "bundle": "055.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232",
+   "content": "什么情况：vite.config.js 的 base 为 \"./\"、应用部署在子路径（如 https://example.com/sz/）且路由为 hash 模式时，前端版本检查（version-check.js 轮询 version.json 提示刷新）请求打到站点根 /version.json 而不是部署子路径，检查永远失败或拿到错误文件。为什么：绝对路径 /version.json 不随部署子路径解析；hash 路由下若直接用 location 拼 URL 还会把 #/xxx 当路径拼错。怎么做：默认路径写成 `${import.meta.env.BASE_URL}version.json`，随 base 解析为 ./version.json；fetch 前用 new URL(this.versionUrl, window.location.href) 把相对路径解析成完整 URL，规避 hash 路由拼接问题。所有「public 目录静态文件轮询」类需求（版本检查、配置热更）都应遵循此约定。",
+   "evidence": "会话 6e40a9a4：version-check.js 由 /version.json 改为 BASE_URL 相对路径 + new URL 解析，部署在 /sz/ 子路径时正确请求 /sz/version.json。",
+   "files": [
+    "src/utils/version-check.js",
+    "public/version.json",
+    "src/utils/resolveServerAssetUrl.js",
+    "vite.config.js"
+   ],
+   "sessionIds": [
+    "6e40a9a4-eb3b-4cfb-a7ea-6bff5d4c47a1"
+   ],
+   "title": "子路径部署下 version.json 版本检查必须用 BASE_URL 相对路径，不能用绝对 /version.json",
+   "type": "pattern",
+   "bundle": "055.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232",
+   "content": "什么情况：pre-commit 阶段对暂存的 *.vue 执行 ESLint，提交被 import/no-unresolved 拦截，报无法解析的模块。为什么：代码里有 import 'virtual:svg-icons-register'，这是 Vite 插件在构建期生成的虚拟模块，ESLint 的 import 解析器没有对应的文件路径，必然 unresolved。怎么做：在 .eslintrc.cjs 中给 import/no-unresolved 配置 ignore 列表，跳过 Vite 特有的资源导入语法：'import/no-unresolved': ['error', { ignore: ['^virtual:', '\\\\?raw$'] }]，覆盖 virtual: 模块与 ?raw 原始导入两类。注意该配置文件必须一并 git add 进入暂存区，否则其他同事或后续会话改到含 virtual: 导入的文件时会复现同样的提交拦截。",
+   "evidence": "会话 dc317c9d：SvgIcon/index.vue 的 import 'virtual:svg-icons-register' 触发 pre-commit ESLint 失败，最终以 .eslintrc.cjs 增加 ignore 规则解决并说明必须把配置文件加入暂存区。",
+   "files": [
+    "zhi2-web-admin/.eslintrc.cjs",
+    "zhi2-web-admin/src/components/SvgIcon/index.vue"
+   ],
+   "sessionIds": [
+    "dc317c9d-c4f6-4774-a51c-7bd4fc44cb61"
+   ],
+   "title": "[园区物管] ESLint import/no-unresolved 会拦截 Vite 虚拟模块与 ?raw 导入，需在 eslintrc 配 ignore",
+   "type": "pattern",
+   "bundle": "056.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "736a824e7",
+   "content": "什么情况：zs-table 自适应高度功能失效，数据加载后表格只显示 1 行。为什么：重构时把 data 从透传 attr 改成了显式 prop，但高度计算逻辑没同步——getBaseTableHeight() 仍读 this.$attrs.data?.length；prop 一旦被组件声明，就不会再出现在 $attrs 里，所以恒为 undefined、长度按 0 处理，displayRows 被算成 max(0,1)=1。同时原来监听 $attrs.data 变化时调用的 calculateTableHeight() 也随之失效，改成 watch data prop 后只调了 doLayout()，异步加载数据后高度不再重算。怎么做：凡是从 $attrs 迁移为显式 prop 的字段，必须全量排查组件内所有 this.$attrs.xxx 引用并改为直接访问 prop；数据 prop 的 watcher 中除 doLayout 外要恢复 calculateTableHeight()、observeTableResize()、syncFixedColumnOffset() 等派生动作。这是 Vue prop/attr 边界的通用坑：声明即从 $attrs 消失，静默返回 undefined 不报错。",
+   "evidence": "会话 8733f1c6：zs-table.vue 重构 data 为 prop 后 getBaseTableHeight 用 $attrs.data?.length 得 0，表格只显示 1 行；修复为读 tableData.length 并在 data watcher 恢复三个派生方法。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "sessionIds": [
+    "8733f1c6-2d05-4604-8bc7-32f2d750a5bf"
+   ],
+   "title": "[园区物管] zs-table 把 data 改成 prop 后，$attrs.data 恒为 undefined 导致表格高度只算 1 行",
+   "type": "bug",
+   "bundle": "056.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "fc994977f",
+   "content": "什么情况：数据大屏柱状图 Y 轴上限远超数据峰值（峰值 450 上限被算到 1000），柱体被压矮、顶部大片空白。为什么：原 computeBarAxisMax 只取 1/2/5/10 这类粗刻度，向上取整跨度太大。怎么做：统一收敛到一个 computeBarValueAxisScale 函数，刻度步长集合细化为 1、1.2、1.5、2、2.5、3、4、5、6、8、10，在峰值上方约留 10% 空间（BAR_AXIS_PADDING_RATIO=1.1）再向上取整到合适刻度；所有柱状图共用该函数（computeOperatingAssetsYAxis、computeHundredCountYAxis 等），横向柱状图的固定 max（如 200）也改为按数据动态计算，避免多处独立计算导致上限二次放大。效果：峰值 450→500、330→400、85→100。调整松紧只改 BAR_AXIS_PADDING_RATIO 一个常量。",
+   "evidence": "会话 706dd33e：chartOptions.js 统一 computeBarValueAxisScale，细刻度 + 1.1 倍 padding，五处柱状图 Y/X 轴上限全部动态计算，并给出前后上限对照表。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js"
+   ],
+   "sessionIds": [
+    "706dd33e-a447-4906-bf58-9e9b29036b5d"
+   ],
+   "title": "[园区物管] 柱状图数值轴上限算法：细刻度集合 + 峰值 1.1 倍取整，避免 Y 轴留白过大",
+   "type": "pattern",
+   "bundle": "056.md",
+   "project": "园区物管2.0"
+  }
+ ]
+}

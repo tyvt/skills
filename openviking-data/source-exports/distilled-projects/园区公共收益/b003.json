@@ -1,0 +1,187 @@
+{
+ "project": "园区公共收益",
+ "batch": 3,
+ "files": [
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "title": "[园区公共收益] 操作日志/列表误把路由段当 dataId：用 isNavigableDataId 统一拦截无效关联单据跳转",
+   "type": "bug",
+   "content": "在 zhi2-web-admin 中，列表页（如 building/unit）执行删除时若把路由路径段（unit、building）或占位符 add 写入操作日志的 dataId，操作日志「关联单据」仍会渲染成可点链接，跳转必然失败。\n\n根因：关联跳转只判断 dataId/menuPath 非空，未区分「业务主键」与「路由片段」。\n\n解法：在 `src/utils/ruoyi.js` 抽 `isNavigableDataId`——排除空值、`add`、纯字母模块段；数字主键（如 2071871954305007618）仍视为可跳转。`operlog/index.vue` 模板层与 `handleViewDataDetail` 跳转前双重校验，无效 ID 渲染为普通文本并直接 return。\n\n同类问题排查：先核对日志 dataId 是否来自 `$route.params` 而非行主键字段。",
+   "evidence": "会话 bf7d8178：building/unit 删除日志 data-id 误记为 unit；同步加固 operlog 关联单据跳转。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/views/system/operlog/index.vue",
+    "zhi2-web-admin/src/views/building/unit/index.vue"
+   ],
+   "baseline": "36a9a7e",
+   "sessionIds": [
+    "bf7d8178-91af-4c4d-8226-59e3910a54bd"
+   ],
+   "bundle": "010.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 维保合同付款比例：用户要的是按钮显隐控制，不要在弹窗里堆校验/过滤",
+   "type": "preference",
+   "content": "contractGuard 付款比例子表若产品只要求「谁能增删改」，应集中在 `paymentRatioTable.vue` 用单一开关（如 `canManagePaymentRatio`）统一控制四处 UI：顶部新增/删除、搜索区显隐、多选列、行内编辑/删除禁用。\n\n启用条件（本仓库约定）：`bizState == '0'`（草稿）且（`costType == '03'` 施工 **或** `signType == '1'` 合同签订）。\n\n若误在 `paymentRatioDialog.vue` 做付款类型过滤、比例校验等，会与「只控按钮」需求冲突，应回滚弹窗逻辑、保留全量下拉。子表权限与弹窗校验分层：权限在表，规则在后台或另开需求。",
+   "evidence": "会话 2e6edee0：用户明确「不是让你做逻辑校验，而是让你控制新增和删除按钮」；修订后仅保留 table 侧 canManagePaymentRatio。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/contractGuard/components/paymentRatioTable.vue",
+    "zhi2-web-admin/src/views/maintenance/contractGuard/components/paymentRatioDialog.vue",
+    "zhi2-web-admin/src/views/maintenance/components/enum.js"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "2e6edee0-0314-4540-b60d-b70d0f98d02a"
+   ],
+   "bundle": "010.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 资金缴款通知书子表合同名称：contentInfo link + contractType 分路由，历史数据按 contractNo 反查",
+   "type": "workflow",
+   "content": "资金缴款详情 `pubPaymentNotice/detail.vue` 通知书区「合同名称」查看态需跳合同详情：在 `contentInfo2` 将字段 `type` 从 `text` 改为 `link`，点击走 `goToContractDetail`。\n\n路由分支按 `contractType`：\n- `0` → 经营用房租赁合同详情\n- `1`/`2`/`4` → 资源租赁（广告位/场地/其他）\n- `3` → 车位租赁合同\n- 其他 → 通用收入合同详情\n\n数据契约：选合同时持久化 `revenueContractId`、`contractType`；老数据无 ID 时先按 `contractNo` 查询解析出 ID 再跳转，避免仅有编号的历史行无法点开。",
+   "evidence": "会话 b37fb981：资金管理-资金缴款详情通知书子表合同名称加链接并可查看合同。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubPaymentNotice/components/pubTradeDetailTable.vue"
+   ],
+   "baseline": "ba114dc",
+   "sessionIds": [
+    "b37fb981-c845-457a-89c6-2a28b9da3593"
+   ],
+   "bundle": "010.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 自治公示新增：动态菜单路由 + sessionStorage TMP_PUBLICITY 预填",
+   "type": "workflow",
+   "content": "公示模块路由不在 `router/index.js` 静态表，由后台菜单经 `permission.js` 的 `filterAsyncRouter` + `loadView` 注册。详情/新增共用 `autonomy/publicity/detail.vue`，路由 name 为 `Publicity/:tableid`（新增 `tableid=add`，查看为 publicityId），query 用 `formMode=add|view|edit`。\n\n从业务页「发起公示」推荐写法：\n1. `sessionStorage.setItem('TMP_PUBLICITY', JSON.stringify(业务行数据))`\n2. `path: getRouterPathByFilePath('autonomy/publicity/detail') + 'add'`（或 `name: 'Publicity/:tableid', params: { tableid: 'add' }`）\n3. `query: { formMode: 'add' }`\n\n关键表单字段：`complexName`（同步 complexId/propertyCode/deptId）、`relBusinessCode`（关联 `relBusinessId`）、`publicityType`（字典 `t_mf_publicityType`）。列表默认新增也可用 listMixins：`${$route.path}/add?formMode=add`。",
+   "evidence": "会话 d3809e4b：检索公示功能并确认两种等价跳转与字段/预填方式。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/publicity/detail.vue",
+    "zhi2-web-admin/src/views/autonomy/publicity/index.vue",
+    "zhi2-web-admin/src/views/autonomy/publicity/components/StartPublicityBtn.vue",
+    "zhi2-web-admin/src/store/modules/permission.js"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "d3809e4b-48d7-4e8e-9be4-55a3d5424bac"
+   ],
+   "bundle": "010.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 提交/审批 URL 从流程工具配置迁到 flowApi：按 moduleName+businessName 拼接并先查 flowConfig",
+   "type": "pattern",
+   "content": "园区公共收益 2.0 在 workflow 配置页移除了「提交接口 / 审批接口」字段后，OperationBtnGroup、ZsSubmit、zs-approval 统一走 `utils/flowApi.js`：默认路径为 `/${moduleName}/${businessName}/submit` 与 `/${moduleName}/${businessName}/approval`（例：物业管理区备案 `/property/complex/submit`）；`route.meta` 仍保留自定义接口的最高优先级。真正能否点提交/审核由流程节点决定：操作前调用 `/flowable/flowConfig/list` 校验当前 `busCode` 是否已配置节点，未配置则拦截并提示「审核流程未维护完成，请联系管理员」，不发起业务 submit/approval。这与苏房系「meta → 流程配置表解析 submitApi」的旧三级方案不同，属于同一产品线的接口约定演进，改园区项目时不要照搬 resolveFlowSubmitApi 思路。",
+   "evidence": "会话 51f3071e：新增 flowApi.js、OperationBtnGroup 传 moduleName/businessName、ZsSubmit/zs-approval 操作前 flowConfig 校验；workflow 配置去掉接口字段、流程名称必填、业务编码隐藏。",
+   "files": [
+    "zhi2-web-admin/src/utils/flowApi.js",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/components/ZsSubmit/index.vue",
+    "zhi2-web-admin/src/components/zs-approval/index.vue",
+    "zhi2-web-admin/src/views/tool/workflow/index.vue",
+    "zhi2-web-admin/src/views/tool/workflow/components/ConfigDialog.vue"
+   ],
+   "baseline": "479ebe7",
+   "sessionIds": [
+    "51f3071e-0992-4ca2-b14d-e0fa6c2d181d"
+   ],
+   "bundle": "011.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 配了 company:xxx:approval 仍不调 flowViewer：权限只管按钮壳，挂载前三道闸在 bizState/busCode/dataId",
+   "type": "bug",
+   "content": "企业注册等详情「特定角色无审核按钮、Network 里没有 `/flowable/task/flowViewer`」时，不要先查 v-hasPermi：`company:companyRegister:approval` 只约束 zs-button 是否渲染，不会触发 flowViewer。flowViewer 仅在 zs-approval 已挂载且 `getKey()` 未提前 return 时调用；`OperationBtnGroup` 仅在 `bizState == 1 && showApproval` 时挂载 zs-approval；`getKey()` 在 `!getId() && !id` 或 `!$route.meta.busCode` 时直接 return。超级管理员能调接口而某角色不能，最常见是该角色菜单树里「企业注册」叶子路由未配 `busCode`（来自系统菜单 → 业务编码，经 `/system/menu/listRouters` 按角色生成 meta），或从待办/全量菜单进入与从残缺菜单进入 meta 不一致；次要是该角色看到的 `bizState !== 1` 导致组件未挂载。排查顺序：当前路由 meta.busCode → URL/primaryKey 能否取 dataId → form.bizState → 再对比角色菜单配置。",
+   "evidence": "会话 af6dbc70：用户反馈特定角色未调 flowViewer、超管正常；结论列出 bizState、busCode、dataId 三道拦截及菜单 busCode 按角色下发差异。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-approval/index.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/views/company/companyRegister/detail.vue",
+    "zhi2-web-admin/src/views/system/menu/index.vue"
+   ],
+   "baseline": "b6bf87d",
+   "sessionIds": [
+    "af6dbc70-f0b6-4b96-8516-bdf350b8dbe6"
+   ],
+   "bundle": "011.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 强制改密弹窗刷新被跳过：GetInfo 异步回写覆盖了 isUpdatePwd 门禁状态",
+   "type": "bug",
+   "content": "登录响应 `isUpdatePwd: false`（需强制改密）时，若 layout/permission 在展示 `ResetPwdDialog` 后又被 `GetInfo` 或其它用户信息拉取把 store 里的改密标记冲掉，会出现「刷新页面就跳过强制改密」「isUpdatePwd 为 false 却不弹窗」。修复要点：在 user 模块与路由守卫链路中保证强制改密标记在 GetInfo 之后仍生效（或 GetInfo 合并时保留需改密状态），直到用户完成改密；勿仅用单次 login 响应驱动弹窗而无并发拉取保护。涉及 permission.js、layout、ResetPwdDialog 与 profile/resetPwd 提交后的状态清理。",
+   "evidence": "会话 b3e919f5：用户报强制改密刷新跳过、isUpdatePwd false 无弹窗；子模块提交 fix(user): 修复强制改密弹窗被 GetInfo 覆盖的问题（27cece7ce）。",
+   "files": [
+    "zhi2-web-admin/src/store/modules/user.js",
+    "zhi2-web-admin/src/permission.js",
+    "zhi2-web-admin/src/layout/index.vue",
+    "zhi2-web-admin/src/views/home/ResetPwdDialog.vue"
+   ],
+   "baseline": "bac29bb",
+   "sessionIds": [
+    "b3e919f5-8279-449b-bd26-f23578eddea1"
+   ],
+   "bundle": "011.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 流程配置维护页：无 busCode 禁止开弹窗，须先去菜单管理配业务编码",
+   "type": "workflow",
+   "content": "tool/workflow 与流程配置弹窗联动规则：流程名称改为必填；业务编码字段在 UI 隐藏，实际 busCode 来自菜单。新增/编辑流程配置时若选中菜单数据没有业务编码，不打开 ConfigDialog，直接 `message` 提示「请先前往菜单管理配置菜单业务编码」。避免在流程工具里手填 busCode 与线上路由 meta 双源不一致。",
+   "evidence": "会话 51f3071e 用户诉求 1：业务编码隐藏；无业务编码不弹窗并提示前往菜单管理配置。",
+   "files": [
+    "zhi2-web-admin/src/views/tool/workflow/index.vue",
+    "zhi2-web-admin/src/views/tool/workflow/components/ConfigDialog.vue",
+    "zhi2-web-admin/src/views/tool/workflow/components/ConfigTable.vue"
+   ],
+   "baseline": "479ebe7",
+   "sessionIds": [
+    "51f3071e-0992-4ca2-b14d-e0fa6c2d181d"
+   ],
+   "bundle": "011.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 本仓库仅含 zhi2-web-admin 前端；contractGuard 等 2.0 接口需查独立 BE 或 V0 对照",
+   "type": "fact",
+   "content": "`d:\\repository\\园区公共收益` 内全盘搜索无 Java/MyBatis 后端；前端调用的 `/maintenance/contractGuard` 属于 2.0 独立后端（GitLab BE 或网关 Swagger）。联调 usccBName 模糊查询、已付金额/付款比例等逻辑时，同级旧实现可参考 `d:\\repository\\园区V0\\EstateManagement-Park\\...\\mtpl\\` 下 `MtplContractGuard*` 与 Mapper.xml，但模块与 URL 与 2.0 不是同一套，只能作字段与 SQL 思路对照，不能直接当现网契约。",
+   "evidence": "会话 9a44f1a5：工作区 Java 搜索无结果；发现园区 V0 mtpl 合同守护实现与 2.0 接口分离。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/contractGuard/index.vue",
+    "zhi2-web-admin/src/views/maintenance/contractGuard/detail.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "9a44f1a5-9f37-49c4-994c-c50b9acce0c6"
+   ],
+   "bundle": "011.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 楼幢/单元/房屋链路「项目→宗地号」改造需五处同步",
+   "type": "workflow",
+   "content": "将开发项目/项目名称统一改为宗地号(地号)时，单次需求会横跨 building、unit、house、houseImport 及 buildingChange/unitChange：列表筛选项与列、导出查询参数（如 `landPlotCode`）、新增编辑表单宗地改为 zs-select-dialog 手动选择且必填、详情查看只展示宗地号；变更单详情还要用 `landPlotId` 过滤楼幢选择，并保证 `contentInfo` 字段顺序与编辑表单一致。漏改变更列表或导出参数会导致筛选仍带 projectName、导出列与界面不一致。",
+   "evidence": "会话 3f1080ab：楼幢/单元/房屋备案与信息全模块去项目改宗地；单元变更 detail 宗地必选与 landPlotId 过滤楼幢。",
+   "files": [
+    "zhi2-web-admin/src/views/building/building/index.vue",
+    "zhi2-web-admin/src/views/building/unitChange/detail.vue",
+    "zhi2-web-admin/src/views/building/buildingChange/index.vue"
+   ],
+   "baseline": "f783ca2",
+   "sessionIds": [
+    "3f1080ab-31a3-4bd1-8719-29399ccf04ed"
+   ],
+   "bundle": "011.md",
+   "project": "园区公共收益"
+  }
+ ]
+}

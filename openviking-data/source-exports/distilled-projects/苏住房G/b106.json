@@ -1,0 +1,105 @@
+{
+  "project": "苏住房G",
+  "batch": "106",
+  "files": ["106.md"],
+  "count": 7,
+  "memories": [
+    {
+      "title": "提交报「该业务未配置流程」的三个坑：SYS_FLOW_CONFIG 缺 busCode、getInfoByBusCode 要 deptId、submit 必须带 deptId:1",
+      "type": "bug",
+      "content": "【什么情况】标准化评价的提交接口返回 `{\"code\":500,\"msg\":\"该业务未配置流程\"}`。根因有两层：环境里 `ZHISHU_FLOWABLE.SYS_FLOW_CONFIG` **一条 std_eval_* 都没有**（部署缺口）；补上之后仍有三个必踩的坑。\n【为什么】Flowable 的流程查询按「业务类型 + 部门」双键匹配，参数少一个就静默返回 null，于是 submit 侧判成「没配流程」——错误信息完全指错方向，看起来像环境没配，实际是**请求体少字段**。这类问题如果只按错误文案排查，会反复去补环境数据，永远补不对。\n【怎么做】① 先补流程配置，用**幂等脚本** `e2e/std-evaluation/tools/setup-flow-config.cjs`（只补缺不覆盖），9 个 busCode：`std_eval_service_grade` / `std_eval_grade_change` / `std_eval_self_check_record` / `std_eval_street_check_record` / `std_eval_district_check_record` / `std_eval_city_check_record` / `std_eval_rectification_notice` / `std_eval_report_prepare` / `std_eval_area_report_prepare`（deptId=1，procDefId=`process_68xcwhhq:2:4b7371fc-42ef-11f1-b3bc-ce0221a0fd91`「一审」，即提交后产生 1 个审批节点）；② `getInfoByBusCode` 的 SQL 是 `bus_code=? and dept_id=?` → **请求体必须带 `deptId`**，只传 busCode 永远返回 null；③ submit 的 `SubmitInfoDto` **必须带 `deptId: 1`**，否则照样报「该业务未配置流程」；④ 用例里**不要自建 flowConfig，也不要删它**，直接断言真实的 `0→1→2` 流转；⑤ 排查顺序：先看 `SYS_FLOW_CONFIG` 有没有该 busCode → 再看请求体有没有 `deptId` → 最后才怀疑环境。",
+      "evidence": "会话 d38c482b-a854-4693-99d7-ccd429f31165（基线 05caac8）用户诉求 3「Team message from lead」：「之前 submit 会返回 `{\"code\":500,\"msg\":\"该业务未配置流程\"}` 是因为 `ZHISHU_FLOWABLE.SYS_FLOW_CONFIG` 里 std_eval_* 一条都没有（环境部署缺口）。我已用 `POST /v2.0/flowable/flowConfig/addOrUpdate` 补好 9 个 busCode（deptId=1，procDefId=`process_68xcwhhq:2:4b7371fc-42ef-11f1-b3bc-ce0221a0fd91`「一审」）。脚本：`e2e/std-evaluation/tools/setup-flow-config.cjs`（幂等，只补缺不覆盖）。」并列出「a. `getInfoByBusCode` 的 SQL 是 `bus_code=? and dept_id=?`，请求体必须带 `deptId`（只传 busCode 永远返回 null）。b. submit 的 `SubmitInfoDto` 必须带 `deptId: 1`，否则仍然报「该业务未配置流程」。」",
+      "files": [
+        "e2e/std-evaluation/tools/setup-flow-config.cjs",
+        "e2e/std-evaluation/lib/std-eval-lib.cjs"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["d38c482b-a854-4693-99d7-ccd429f31165"],
+      "bundle": "106.md"
+    },
+    {
+      "title": "审批的 key 不能硬编码：从 flowViewer 响应里取 completed:false 那个节点的 id",
+      "type": "pattern",
+      "content": "【什么情况】做审批动作时，`ApprovalInfoDto` 需要一个 `key`（待办节点 id）。硬编码节点 id 在环境重建或流程版本变更后立刻失效，且失败方式是「审批没反应」或报节点不存在。\n【为什么】Flowable 的流程版本 id（`procDefId` 形如 `process_68xcwhhq:2:4b7371fc-…`）与任务节点 id 都是运行时生成的，环境每次重建都会变。审批 key 必须与**当前实例**的待办节点对应，任何写死的值都只是「这次能用」。\n【怎么做】① 审批前先调 `POST /v2.0/flowable/task/flowViewer {busCode, dataId}` 拿到节点列表；② 从响应中挑 `completed:false` 的那个节点，取它的 id 作为 `key`（不要取第一个、不要取全部里 index 固定的）；③ 组装审批体 `{dataId, busCode, key, approveResults:'1', approveMessage}`（`approveResults:'1'` = 同意）；④ 用例断言真实的 `0→1→2` 流转，不要用 mock 节点 id；⑤ 同一套逻辑封装进公共库，让所有审批动作共用，避免每个用例各写一遍取 key 的脚本。",
+      "evidence": "会话 d38c482b-a854-4693-99d7-ccd429f31165（基线 05caac8）用户诉求 3「Team message from lead」第 c 条：「审批用 `ApprovalInfoDto`：`{dataId, busCode, key, approveResults:'1', approveMessage}`，其中 `key` 取 `POST /v2.0/flowable/task/flowViewer {busCode,dataId}` 里 `completed:false` 那个节点的 id（不要硬编码，从响应里取）。」",
+      "files": [
+        "e2e/std-evaluation/lib/std-eval-lib.cjs",
+        "e2e/std-evaluation/cases/01-standard-crud.cjs"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["d38c482b-a854-4693-99d7-ccd429f31165"],
+      "bundle": "106.md"
+    },
+    {
+      "title": "提交用 id、审批用 dataId：两套 DTO 的主键字段名不同，busCode/key 在仓库里无硬编码要去前端找",
+      "type": "bug",
+      "content": "【什么情况】调提交接口报主键为空。原因是**提交与审批用的主键字段名不一样**：提交用 `id`（`SubmitInfoDto.id`，可能是 id 列表），审批用 `dataId`（`ApprovalInfoDto.dataId`）。混用就会报「xxx不能为空」（1105 类）。另外 `busCode` 与 `key` 这两个字段**仓库内没有任何硬编码**，只能从前端源码里找实际传参。\n【为什么】同一个「提交流程」被拆成两套 DTO 是 Flowable 通用封装的历史设计，字段名不一致但接口路径相同（都走 `/{module}/{business}/submit|approval`），只看路径无法区分 DTO。而 `busCode`/`key` 由页面在运行时拼出来（见 `flowApi.buildBusinessApi` 与 `route.meta.submitApi` 兜底），后端仓库里自然搜不到——只查后端会得出「这个字段不可能有值」的错判。\n【怎么做】① 分清两套 DTO：提交 `{id, deptId, busCode, key, ...}`，审批 `{dataId, busCode, key, approveResults, approveMessage}`；② `busCode`/`key` 找不到时**去前端找**：读 `zhi2-web-admin/src/api/evaluation/*.js` 与对应 views，或读 `src/utils/flowApi.js` 的 `buildBusinessApi(moduleName, businessName, action)`（拼成 `/{module}/{business}/submit|approval`，取 `route.meta.submitApi` 兜底）；③ 本项目页面实际传 `:moduleName='moduleName'` / `:businessName='businessName'`，值定义在页面的 `data()`（如 `moduleName:'evaluation'`、`businessName:'rectification'`）→ 实际路径 `POST /v2.0/evaluation/rectification/submit` 与 `/approval`；④ 报错时先确认是哪个接口（提交还是审批）再对字段名；⑤ 把这套字段映射写进 E2E 公共库，避免每个用例重踩。",
+      "evidence": "会话 d38c482b-a854-4693-99d7-ccd429f31165（基线 05caac8）用户诉求 2「Team message from lead」第 1 条：「**提交/审批入参差异**：提交用 `id`（SubmitInfoDto.id，可能为 id 列表），审批用 `dataId`（ApprovalInfoDto.dataId），别混用。另有 `busCode`/`key` 字段由页面传入、仓库内无硬编码——若只传 id/dataId 报错，请去前端 `zhi2-web-admin/src/api/evaluation/*.js` 或对应 views 里找实际传参。」；用户诉求 4 补充了 `OperationBtnGroup` 与 `flowApi.buildBusinessApi` 的实际路径拼接规则。",
+      "files": [
+        "e2e/std-evaluation/lib/std-eval-lib.cjs",
+        "zhi2-web-admin/src/utils/flowApi.js",
+        "zhi2-web-admin/src/views/evaluation/stdEvaluation/rectification/detail.vue"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["d38c482b-a854-4693-99d7-ccd429f31165"],
+      "bundle": "106.md"
+    },
+    {
+      "title": "别用「api 文件里没有这个方法」判定功能没接线：提交/审批走通用 OperationBtnGroup + flowApi.buildBusinessApi",
+      "type": "pattern",
+      "content": "【什么情况】审计时得出结论 D8「前端未接提交/审批」，依据是 `rectificationApi` 里没有 submit/approval 方法。这个结论**被 lead 逐行核对源码后推翻**。真实链路是：提交/审批**不走各模块自己的 api 封装**，而走通用组件 —— `src/components/OperationBtnGroup/index.vue` 第 16 行 `ZsSubmit :permission=\"[moduleName:businessName:submit]\"`、第 25 行 `zs-approval ... :permission=\"[moduleName:businessName:approval]\"`；路径由 `src/utils/flowApi.js` 的 `buildBusinessApi(moduleName, businessName, action)` 拼成 `/{module}/{business}/submit|approval`（取 `route.meta.submitApi` 兜底）；页面 `src/views/evaluation/stdEvaluation/rectification/detail.vue` L181-182 传 `:moduleName`/`:businessName`，L204-205 定义 `moduleName:'evaluation'`、`businessName:'rectification'` → 实际调用 `POST /v2.0/evaluation/rectification/submit` 与 `/approval`；后端 `StdEvalRectificationController` 也确实有对应 `@PostMapping`。\n【为什么】项目的通用流程能力集中在 `OperationBtnGroup` 这一层，各模块的 api 文件只是「业务数据接口」的封装，风格上本来就不声明 submit/approval（对比 `serviceGradeApi` L99-100、`gradeChangeApi` L121-122、`checkRecordApi` L140-141 都有声明，说明这更像**封装风格不一致**而非缺失）。用「api 文件里没有」反推「功能没接线」，会把风格差异误判成缺陷，并写进不可信的审计结论。\n【怎么做】① 判定「某功能是否接线」要**沿调用链查**：组件（OperationBtnGroup）→ 路径拼接（flowApi.buildBusinessApi / route.meta.submitApi）→ 页面传参（moduleName/businessName）→ 后端 `@PostMapping`，四处对上才算通；② 报告结论要分「**已接线**」与「**封装风格不一致**」两栏写，别混成缺陷；③ 列表页没有提交/审批按钮**不是缺陷**——本项目约定是「详情页做提交审批」；④ 真正的前端缺口清单要单独列（本次是 4 个整改操作 + 1 个生成入口未接线）；⑤ 审计结论被挑战时，逐行核对源码 + controller，改正文档（本次「只改了文档，用例未动未重跑」），并把「我的原结论 / 实际 / 处理」做成对照表留痕。",
+      "evidence": "会话 d38c482b-a854-4693-99d7-ccd429f31165（基线 05caac8）用户诉求 4「Team message from lead」：「**修正 1：D8「前端未接提交/审批」不成立**……本项目的提交/审批**不走各模块自己的 api 封装**，而是走通用组件……所以正确表述是：**整改通知书详情页的提交/审批可用**（走通用 OperationBtnGroup + flowApi 拼接），`rectificationApi` 未显式声明 submit/approval 只是封装风格问题、不影响功能。」最终结论核对表：「D8「前端未接提交/审批」| 提交/审批走 `OperationBtnGroup` + `flowApi.buildBusinessApi` → `/evaluation/rectification/submit|approval`，`detail.vue` L181-182 + L204-205 已接线，后端有对应 `@PostMapping` | 改写为「4 个整改操作 + 1 个生成入口未接线」，级别保持高」，并写明「`rectificationApi`（`stdEvaluation.js:145-161`）**全仓库无人 import**，唯一命中就是定义处 → 9 个方法是死代码；页面实际走 `listMixins`/`detailMixins` 通用封装」。",
+      "files": [
+        "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+        "zhi2-web-admin/src/utils/flowApi.js",
+        "zhi2-web-admin/src/views/evaluation/stdEvaluation/rectification/detail.vue",
+        "docs/std-evaluation/api-map-check.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["d38c482b-a854-4693-99d7-ccd429f31165"],
+      "bundle": "106.md"
+    },
+    {
+      "title": "本项目按钮权限走 zs-button 的 :permission（checkPermission/hasPermission），不是 v-hasPermi；stdEvaluation 后端 @PreAuthorize 实测 0 命中",
+      "type": "fact",
+      "content": "【什么情况】审计时用 `v-hasPermi` 指令去 grep 前端源码，得出「按钮无权限控制」的结论（D9 前端部分），这个推论也被纠正。真实约定是：`zs-button` 的 `:permission` 属性 → `zs-button.vue:2` → `checkPermission` → `hasPermission`；`OperationBtnGroup` 逐按钮校验 `module:business:action`。后端侧则是：`stdEvaluation` 包 15 个 Controller，`@PreAuthorize` **实测 0 命中**。\n【为什么】项目没有用 Vue 指令做权限（Element Plus 生态里常见 `v-hasPermi`），而是走组件 prop + 自研 `checkPermission`。用错误的检测手段去 grep，得到的「0 处命中」只说明检测器选错了，不说明没做权限。反过来，后端 `@PreAuthorize` 0 命中是**真实事实**，但必须准确表述为「接口层无鉴权，仅靠菜单隐藏 + 网关 token」，而不是「整体无权限」。\n【怎么做】① 判断本项目是否有按钮权限，先读 `zs-button` 的 `permission` prop 与 `checkPermission` 实现，再去 grep `permission=` / `:permission`，不要 grep `v-hasPermi`；② 权限串统一为 `moduleName:businessName:action`（如 `evaluation:rectification:submit`）；③ 后端鉴权要单独查（`@PreAuthorize` / `@RequiresPermissions`），本项目 stdEvaluation 这批 Controller **两者都没有**，因此「前端按钮隐藏」不能替代后端鉴权，结论要写成「渲染层已控制，但不能替代后端鉴权」；④ 报告里把「前端有控制」「后端无鉴权」分两节写清，不要合成一句；⑤ 需要提后端补鉴权时，附上 Controller 清单与实测 0 命中的检索证据。",
+      "evidence": "会话 d38c482b-a854-4693-99d7-ccd429f31165（基线 05caac8）最终结论核对表：「D9 前端「0 个 `v-hasPermi` ⇒ 按钮无权限」| 项目约定是 `zs-button` 的 `:permission`（`zs-button.vue:2` → `checkPermission` → `hasPermission`），`OperationBtnGroup` 逐按钮校验 `module:business:action` | 删掉错误推论，改为「渲染层已控制，但不能替代后端鉴权」」「D9 后端无鉴权 | `stdEvaluation` 包 15 个 Controller，`@PreAuthorize` 实测 0 命中 | 保留，表述改为「接口层无鉴权，仅靠菜单隐藏 + 网关 token」」。",
+      "files": [
+        "zhi2-web-admin/src/components/zs-button/zs-button.vue",
+        "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+        "docs/std-evaluation/api-map-check.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["d38c482b-a854-4693-99d7-ccd429f31165"],
+      "bundle": "106.md"
+    },
+    {
+      "title": "E2E 造数据的依赖链是单向的：小区/企业主数据 → 物业服务等级(已备案) → 检查记录 → 审批自动生成整改通知书 → 整改操作",
+      "type": "workflow",
+      "content": "【什么情况】标准化评价的 E2E 要造一整套业务数据，但各实体之间有严格的前置依赖，顺序错了就会「新增失败」或「审批后没反应」。正确链路是：**外部小区/企业主数据 → 物业服务等级（提交 + 审批 = 已备案）→ 检查记录（initItems 取题 → 新增 → 提交 → 审批）→ 整改（reply/confirm/close/supervise）**，且**检查记录只认「已备案」的物业服务等级**；审批通过后**自动生成整改通知书**。主键字段名分别是 `checkRecordId`、`rectificationNoticeId`。\n【为什么】这套依赖是业务规则而非实现细节：等级没走完提交+审批就不是「已备案」，检查记录引用不到合规等级；整改通知书不是手工造出来的，而是检查记录审批通过的副产物——手工造通知书会与检查记录对不上账，测不到「审批自动生成」这条链路。另外检查记录新增的最小集是 `checkType + complexId + 5 类等级 + 2 个签字 + isGenerateNotice + itemList[{contentId, isNotApplicable}]`，缺一项后端会拒。\n【怎么做】① 按链路顺序建数据，每步都先确认上一步已到目标状态（等级必须已备案）；② 检查记录新增体按最小集组装：`checkType`（4 类：自查/街镇/区县/市级，同一套 controller `/evaluation/checkRecord/*`）+ `complexId` + 5 类等级 + 2 个签字 + `isGenerateNotice` + `itemList[{contentId, isNotApplicable}]`；③ 种子标准可直接用 `2120000000000000001`~`…005`（市标一~五级，每份 5 类别/5 项目/15 内容/60 选项），别自己造题库；④ **优先用 H5 接口造检查记录**：H5 端 16 个接口无任何 `@RequiresPermissions`（`/v2.0/evaluation/h5/check/stat|task/page|record/page|complex/page|start|{id}/form|save|{id}/submit|{id}/detail`、`/h5/rectify/{id}|save|submit|{id}/pdf`），比管理端简单得多；⑤ 主键按 `checkRecordId` / `rectificationNoticeId` 取，别用通用的 `id`。",
+      "evidence": "会话 d38c482b-a854-4693-99d7-ccd429f31165（基线 05caac8）用户诉求 2「Team message from lead」第 3/4/5 条：「**H5 端 16 个接口无任何 @RequiresPermissions**（`/v2.0/evaluation/h5/check/stat|task/page|record/page|complex/page|start|{id}/form|save|{id}/submit|{id}/detail`、`/h5/rectify/{id}|save|submit|{id}/pdf`），是造检查记录/整改数据最省事的入口——**强烈建议 05 用 H5 接口造检查记录**」「数据准备链路：外部小区/企业主数据 → 物业服务等级（提交+审批=已备案，检查记录只认已备案等级）→ 检查记录（initItems 取题 → 新增 → 提交 → 审批；**审批通过自动生成整改通知书**）→ 整改（reply/confirm/close/supervise）」「种子标准可直接用：`2120000000000000001`~`…005`（市标一~五级），每份 5 类别/5 项目/15 内容/60 选项」「主键字段名：`checkRecordId`、`rectificationNoticeId`」。",
+      "files": [
+        "e2e/std-evaluation/cases/01-standard-crud.cjs",
+        "e2e/std-evaluation/lib/std-eval-lib.cjs",
+        "D:/evalrun/endpoints.txt"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["d38c482b-a854-4693-99d7-ccd429f31165"],
+      "bundle": "106.md"
+    },
+    {
+      "title": "api 封装文件全仓库无人 import 就是死代码；且 confirm/close 参数放 body 而后端是 @RequestParam → 必报 1105",
+      "type": "bug",
+      "content": "【什么情况】两个容易踩的接线坑：① `rectificationApi`（`stdEvaluation.js:145-161`）里 9 个方法**全仓库无人 import**，唯一命中就是定义处 → 是死代码；页面实际走 `listMixins` / `detailMixins` 通用封装。② `rectificationApi.confirm/close` 把参数放在 **body**，而后端签名是 `@RequestParam` → 按现状接线会直接报 `1105 rectificationNoticeId不能为空`，必须改成 query 参数。\n【为什么】① 死代码不是「无害的多余文件」：它会让人误以为功能是「api 没暴露」，写审计结论时把「封装风格」当「功能缺失」（见同包「不要用 api 文件里没有这个方法判定没接线」）；它还会随接口变更腐烂，最终再接线时按旧签名调必错。② body vs query 是 HTTP 语义差异：Spring 的 `@RequestParam` 只从 query string 取值，放 body 里等于没传——而且**报错文案是「参数不能为空」而不是「参数位置错了」**，指错方向。\n【怎么做】① 判断一个 api 封装是否在用，用 `grep` 全仓库找 **import 它的文件**（不是找方法名的字符串命中）；命中 0 处就标为死代码，在报告里单列「死代码清单」而不是当成功能缺口；② 死代码要么删、要么接线，不要留着误导；③ 接 `@RequestParam` 的接口，参数必须放 query：`api.confirm(url, { rectificationNoticeId })` 走 query 序列化，或显式拼 query string；④ 报错 1105「xxx不能为空」时，除了查字段名，还要查**参数该放 body 还是 query**；⑤ 另外注意 `reply` 没有独立入口但**反馈功能不缺失**——详情页编辑问题项后保存走 `update`，同样置「已解决」；真正无入口的是 `confirm`/`close`/`supervise`。",
+      "evidence": "会话 d38c482b-a854-4693-99d7-ccd429f31165（基线 05caac8）最终结论「另外三条更准的事实」：「1. `rectificationApi`（`stdEvaluation.js:145-161`）**全仓库无人 import**，唯一命中就是定义处 → 9 个方法是死代码；页面实际走 `listMixins`/`detailMixins` 通用封装。」「2. `reply` 无入口但**反馈功能不缺失**——详情页编辑问题项后保存走 `update`，同样置「已解决」；真正无入口的是 `confirm`/`close`/`supervise`。」「3. `rectificationApi.confirm/close` 参数放 body 而后端是 `@RequestParam` → 按现状接线会直接 `1105 rectificationNoticeId不能为空`，需改 query。」",
+      "files": [
+        "zhi2-web-admin/src/api/evaluation/stdEvaluation.js",
+        "e2e/std-evaluation/lib/std-eval-lib.cjs",
+        "docs/std-evaluation/api-map-check.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["d38c482b-a854-4693-99d7-ccd429f31165"],
+      "bundle": "106.md"
+    }
+  ]
+}

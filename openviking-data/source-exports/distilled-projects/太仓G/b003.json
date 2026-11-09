@@ -1,0 +1,180 @@
+{
+ "project": "太仓G",
+ "batch": 3,
+ "files": [
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "title": "选项表决 VoteViewLite 投票表只展示配置表决项，弃权在顶层 waiver 字段",
+   "type": "pattern",
+   "content": "选项表决详情「投票信息」里 `VoteViewLite` 表格数据是 `listOption`（GET /estate/option/list，bizState:1）与 `getVoteResult`（GET /estate/ownerDecision/ownerCalculationChart/{decisionId}）按 optionId 合并；列绑定 optionName、weightSocre、weightSocreRatio、areaSocre、areaSocreRatio。弃权不是表决项配置，投票弹窗里单独勾选，接口不会在 tMfOptionList/optionList 里返回 optionName=弃权 的行，统计在 voteRes.data 顶层 waiver（票数）、waiverArea（面积），饼图 `VoteResultLite` 已用但表格默认不展示。若产品要在表内显示弃权，需在 getDetail 合并后手动 append 一行或单独区块，不能指望 option/list。",
+   "evidence": "会话 aa345530：用户问表决项表缺弃权；结论说明两接口字段来源、弃权与表决项两套逻辑及 waiver 仅饼图使用。",
+   "files": [
+    "zhi1-web-admin/src/views/estate/decisionCommon/components/VoteViewLite.vue",
+    "zhi1-web-admin/src/views/estate/decisionCommon/components/VoteResultLite.vue",
+    "zhi1-web-admin/src/api/estate/option.js",
+    "zhi1-web-admin/src/api/estate/ownerDecision.js"
+   ],
+   "baseline": "e083bd5",
+   "sessionIds": [
+    "aa345530-4486-428c-873f-fdc119c020eb"
+   ],
+   "bundle": "009.md",
+   "project": "太仓G"
+  },
+  {
+   "title": "选项表决详情切到「投票信息」须 watch mainCardValue 重置 cardValue",
+   "type": "bug",
+   "content": "复现路径：基本信息 → 表决项（子 Tab cardValue=1）→ 顶层「投票信息」。此时子 Tab 只剩「决策明细」(name:0)，但 cardValue 仍为 1，导致 DecisionRangeTable（需 cardValue==0）与 VotingItemsTable（需 mainCardValue==0）的 v-if 都不满足，底部区域空白。仅在 handleMainTabChange 里重置 cardValue 有竞态，从表决项切过来易漏。修法：watch mainCardValue，切换顶层 Tab 时强制 cardValue=0 并刷新子表；合并重复的 DecisionRangeTable 实例，用 mainCardValue 控制 show-search/show-vote/show-icon（对齐一般表决详情）；showVoteResult 等入口也应走同一重置逻辑。",
+   "evidence": "会话 f7e76921：用户报选项表决详情切换 Tab 后决策明细不显示；结论定位为 cardValue 滞留与 v-if 全假，并给出 watch 与组件合并方案。",
+   "files": [
+    "zhi1-web-admin/src/views/estate/optionDecision/detail.vue",
+    "zhi1-web-admin/src/views/estate/optionDecision/components/DecisionRangeTable.vue",
+    "zhi1-web-admin/src/components/zsTabs/index.vue"
+   ],
+   "baseline": "cf80bc8",
+   "sessionIds": [
+    "f7e76921-282e-489a-956f-276a0ef62028"
+   ],
+   "bundle": "009.md",
+   "project": "太仓G"
+  },
+  {
+   "title": "维修资金公示「重新公示」新增接口必须带 publicityDays",
+   "type": "bug",
+   "content": "公示详情维护公示结论后出现「重新公示」；点击若报系统异常，常见根因是重新公示走新增接口但请求体未传 publicityDays（公示天数）。须从当前公示单/表单已维护的 publicityDays 带入提交参数，不能依赖后端默认。涉及 publicity 详情、ConclusionDialog、PublicityTable 与 usage/publicity API 封装。",
+   "evidence": "会话 29bd7c7d：用户报重新公示系统异常；诉求 2 明确「重新公示操作新增接口参数 publicityDays 未传值」，修复后提交 tag 202608141220。",
+   "files": [
+    "zhi1-web-admin/src/views/repairFunds/usage/publicity/detail.vue",
+    "zhi1-web-admin/src/views/repairFunds/usage/publicity/components/ConclusionDialog.vue",
+    "zhi1-web-admin/src/api/usage/publicity.js",
+    "zhi1-web-admin/src/views/repairFunds/usage/fundUsageKs/components/PublicityTable.vue"
+   ],
+   "baseline": "bc8f979",
+   "sessionIds": [
+    "29bd7c7d-cc3f-4553-9be2-11c3a7255586"
+   ],
+   "bundle": "009.md",
+   "project": "太仓G"
+  },
+  {
+   "title": "v-money 无绑定值时指令须对 binding.value 做空值守卫",
+   "type": "pattern",
+   "content": "项目大量 `v-money:2` 未传对象绑定，指令 inserted 时 binding.value 为 undefined，若 money.js 直接解构 `const { normal, limit, maxIntLength } = value` 会在 inserted hook 抛 TypeError。约定在 inserted/unbind 使用 `const { normal, limit, maxIntLength } = value || {}`。与 AmountInput 组件选型（zs-input+v-money）是不同层面问题。",
+   "evidence": "会话 8f9057d0：maintainDecision/detail 报 directive money inserted 解构 undefined；结论在 money.js 两处加 value||{}。",
+   "files": [
+    "zhi1-web-admin/src/directives/formatter/money.js",
+    "zhi1-web-admin/src/views/estate/maintainDecision/detail.vue",
+    "zhi1-web-admin/src/components/AmountInput/index.vue"
+   ],
+   "baseline": "9638e2f",
+   "sessionIds": [
+    "8f9057d0-7dbf-4966-9b52-d5d8411e8e4b"
+   ],
+   "bundle": "009.md",
+   "project": "太仓G"
+  },
+  {
+   "title": "业委会选举候选业主：政治面貌「群众」须隐藏并取消「所属党组织」必填",
+   "type": "workflow",
+   "content": "CandidateDialog 若把所属党组织写死 required，选政治面貌「群众」仍会显示红星并校验失败。约定：用字典项 dictLabel 判定是否群众（兼容不同 dictValue），计算属性 isMassesPoliticsStatus；群众时 v-if 隐藏所属党组织、rules 改为计算属性仅在非群众时必填；切到群众时清空党组织并 clearValidate。党员等其它面貌仍显示且必填。园区公共收益有按身份切换附件的类似模式，但本弹窗是党组织字段联动。",
+   "evidence": "会话 ed64bbc0：用户选群众仍提示所属党组织必填；结论说明 dictLabel 匹配、条件显示与动态 rules。",
+   "files": [
+    "zhi1-web-admin/src/views/repairFunds/ownerApply/components/CandidateDialog.vue"
+   ],
+   "baseline": "cf80bc8",
+   "sessionIds": [
+    "ed64bbc0-e94c-47ef-8caf-b46b1c3f85c0"
+   ],
+   "bundle": "009.md",
+   "project": "太仓G"
+  },
+  {
+   "title": "一般表决新增决策范围须按 decision-policy 分流：general 选户室 batchAdd，maintain 走表单",
+   "type": "workflow",
+   "content": "从昆山等源站迁移时，`decisionCommon/components/DecisionRangeTable.vue` 若一律用「新增决策范围」表单弹窗并调单条新增接口，一般表决（`decision-policy=\"general\"`）会与正确产品行为不符并可能触发后端异常。约定：一般表决点击「+ 新增」打开 `RangeHouseDialog`「选择户室」，选中后调 `batchAdd` 批量写入并刷新列表；维修资金表决（`maintain`）仍保留原「新增决策范围」表单链路。左侧户室树「暂无数据」时另查 `propertyProjectId` 与树接口数据。",
+   "evidence": "会话 0a72f656：用户对比昆山截图，太仓一般表决详情新增走错弹窗导致系统异常；结论为引入 RangeHouseDialog + batchAdd，按 general/maintain 分支。",
+   "files": [
+    "zhi1-web-admin/src/views/estate/decisionCommon/components/DecisionRangeTable.vue",
+    "zhi1-web-admin/src/views/estate/generalDecision/detail.vue",
+    "zhi1-web-admin/src/api/estate/decisionRange.js"
+   ],
+   "baseline": "e083bd5",
+   "sessionIds": [
+    "0a72f656-dc31-41e6-9305-4a7371db4213"
+   ],
+   "bundle": "011.md",
+   "project": "太仓G"
+  },
+  {
+   "title": "选项表决「决策明细维护」与「表决项 Tab」是两套接口，勿混用 /estate/option/*",
+   "type": "fact",
+   "content": "线下/线上投票弹窗（`VoteRangeDialog` + `CandidateConfigTable`）加载分组表决项：`GET /estate/optionGroup/list?decisionId=`，返回 `rows`（含 `tMfOptionApplyList`）与 `costMap.waiver`；提交投票 `POST /estate/decisionRecord`（`optionList`）。详情页「表决项」Tab 的配置维护（`VotingItemsTable` / `api/estate/option.js`）才是 `GET/POST/PUT/DELETE /estate/option*`。排查「弹窗里表决项为空」应先看 optionGroup，不是 option/list。",
+   "evidence": "会话 efe5e07f：用户问截图弹窗表决项接口；结论区分 optionGroup/list + decisionRecord 与 option 系列。",
+   "files": [
+    "zhi1-web-admin/src/views/estate/optionDecision/components/VoteRangeDialog.vue",
+    "zhi1-web-admin/src/views/estate/optionDecision/components/CandidateConfigTable.vue",
+    "zhi1-web-admin/src/api/estate/option.js"
+   ],
+   "baseline": "e177dad",
+   "sessionIds": [
+    "efe5e07f-1a8b-4cb4-ba67-c0e514354498"
+   ],
+   "bundle": "011.md",
+   "project": "太仓G"
+  },
+  {
+   "title": "业委会选举「是否已推送在线表决」应请求 onlineDecisionProperty/hasOnlineDecisionPush",
+   "type": "bug",
+   "content": "`ownerDecision.js` 中 `hasOnlineDecisionPush` 若仍写成 `/estate/ownerDecision/hasOnlineDecisionPush`，选择物业小区后 `isDisabled()` 会打错接口。正确路径：`/estate/onlineDecisionProperty/hasOnlineDecisionPush?propertyProjectId=`，用于控制「推送业主在线表决」是否禁用。迁移或复制 API 文件时按模块名核对 onlineDecisionProperty 与 ownerDecision 前缀。",
+   "evidence": "会话 6d3a400f：用户抓包应为 onlineDecisionProperty，代码写成了 ownerDecision；改路径后验证通过。",
+   "files": [
+    "zhi1-web-admin/src/api/estate/ownerDecision.js",
+    "zhi1-web-admin/src/views/estate/ownerDecision/detail.vue"
+   ],
+   "baseline": "e177dad",
+   "sessionIds": [
+    "6d3a400f-8db2-4fad-adb0-25ba9f86e82a"
+   ],
+   "bundle": "011.md",
+   "project": "太仓G"
+  },
+  {
+   "title": "选项表决详情 DecisionRangeTable 的 show-icon 勿只绑基本信息 Tab，否则投票信息 Tab 操作区整行隐藏",
+   "type": "bug",
+   "content": "`optionDecision/detail.vue` 若 `:show-icon=\"mainCardValue == 0\"`，切换到「投票信息」主 Tab（`mainCardValue === 1`）时 `DecisionRangeTable` 顶部操作区被 `v-if=\"showIcon\"` 关掉，「导出」「线下投票录入」等即使 `show-vote` 为 true 也不渲染。修法：操作区在基本信息与投票信息两 Tab 均需要展示时写 `mainCardValue == 0 || mainCardValue == 1`（或抽计算属性表达「决策明细 Tab 可见」）。",
+   "evidence": "会话 35795d81：用户报选项表决详情线下投票和导出按钮不见；根因 show-icon 与 mainCardValue 绑定过窄。",
+   "files": [
+    "zhi1-web-admin/src/views/estate/optionDecision/detail.vue",
+    "zhi1-web-admin/src/views/estate/optionDecision/components/DecisionRangeTable.vue"
+   ],
+   "baseline": "2ded8f9",
+   "sessionIds": [
+    "35795d81-ec7d-4058-baa4-9e944062ac4e"
+   ],
+   "bundle": "011.md",
+   "project": "太仓G"
+  },
+  {
+   "title": "递归附件 TableBody 会在每层 created 重复 getDicts；多实例对话框宜模块级 Promise 去重",
+   "type": "pattern",
+   "content": "维修资金要件 `AnnexContainer` 的 `TableBody.vue` 为递归组件时，每层 `created` 调 `getDicts('sys_yes_no')` 会按树深度倍增请求；若 `yesOrNoOptions` 未使用应直接删除。`FileListDialog` 随递归产生多实例时，每个实例 `created` 拉 `FILE_TYPE` 同样 N 次。局部修法：`FileListDialog` 用模块级 `ensureFileTypeOptions`（首次请求缓存 + 并发共用同一 Promise），整页只打一次字典；若需全站去重再下沉到 `getDicts` 封装。",
+   "evidence": "会话 82f1e5be：用户报 sys_yes_no 与 FILE_TYPE 重复调用；结论删无用 sys_yes_no 请求并为 FILE_TYPE 加模块缓存。",
+   "files": [
+    "zhi1-web-admin/src/views/repairFunds/usage/fundUsageKs/components/AnnexContainer/components/TableBody.vue",
+    "zhi1-web-admin/src/views/repairFunds/usage/fundUsageKs/components/AnnexContainer/components/FileListDialog.vue"
+   ],
+   "baseline": "df87537",
+   "sessionIds": [
+    "82f1e5be-80bb-4d16-827c-0a7d2778a100"
+   ],
+   "bundle": "011.md",
+   "project": "太仓G"
+  }
+ ]
+}

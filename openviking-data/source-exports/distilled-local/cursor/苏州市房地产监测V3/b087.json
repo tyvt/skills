@@ -1,0 +1,63 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "087",
+ "files": [
+  "087.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "修复现售楼幢删除不调后端接口 Implement t",
+   "type": "preference",
+   "content": "已按计划完成修复，变更如下： ### 1. `PresaleBuildingTable.vue` - 新增可选回调 `onRemoveBuilding`、`onBatchRemoveBuildings` - 有回调时：先 `await` 回调成功，再提示「删除成功」 - 无回调时：保持原逻辑（`emit('remove')`），预售许可模块不受影响 - 批量删除只触发一次回调，避免多次 save ### 2. `PresaleBuildingSection.vue` - 透传上述两个回调 props ### 3. `CashsaleDetail.vue` - 新增 `removeBuildingsPersist` / `removeSingleBuilding` - **已保存单据**（有 `cashsaleRecordId`）：删除后调用 `POST /presale/cashsale/save`，再 `getDetail()` 刷新 - **新增草稿**：仅更新本地 `selectedBuildings` 和 `form.houses`，不调接口 - 至少保留一幢楼幢的校验保留 ### 验证方式 1. 打开一条 `bizState=0` 的已保存现售/转现售单据（编辑态） 2. 在「现售楼幢列表」点「删除」并确认 3. Network 应出现 `POST .../presale",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`PresaleBuildingTable.vue",
+    "`PresaleBuildingSection.vue",
+    "`CashsaleDetail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\cashsale\\components\\CashsaleDetail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\cashsale、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permit\\components\\PresaleBuildingSection.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2ac50d8d-bb50-456a-a40f-2c8538421516"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "在 d:\\repository\\苏州市房地产监测V3",
+   "type": "preference",
+   "content": "## 排查结论 问题不是「项目里没有自动加载逻辑」，而是 **懒挂载（`v-if`）与 `@open` 生命周期不匹配**，导致 `getList()` 在首次打开时从未被调用。 --- ## 问题根因（代码层面） ### 1. 父页面普遍使用 `v-if` + `:visible.sync` 懒创建弹窗 典型写法（缴款通知书、其他缴款等详情页）： ```362:364:d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\deposit\\other_record\\detail.vue <ProjectDialog v-if=\"isProjectDialogVisible\" :visible.sync=\"isProjectDialogVisible\" @setData=\"setProject\"/> ``` 点击时 `isProjectDialogVisible = true` → 组件 **首次挂载时 `visible` 已是 `true`**。 ### 2. 弹窗组件只在 `@open` 里调列表接口 `ProjectDialog`（`views/components` 与 `components/ProjectDialog` 两套实现逻辑一致）： ```71:73:d:\\repository\\苏州市房地产监测",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "```362:364:d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\deposit\\other_record\\detail.vue",
+    "```71:73:d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\components\\ProjectDialog.vue",
+    "```47:58:d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-dialog\\zs-dialog.vue",
+    "`views/components/ProjectDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8741662d-a0ae-43f6-861e-3a3ff5b3e5f4"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "加盟门店弹窗改用公共组件 Implement the",
+   "type": "preference",
+   "content": "已按计划改好 [`FranchiseDialog.vue`](zhi2-web-admin/src/views/company/brand/components/FranchiseDialog.vue)，变更如下。 ### 1. 加盟门店名称输入框 - 使用 `suffix-icon=\"el-icon-search\"`，去掉手写 `slot=\"suffix\"` 和 `@click.native`。 - 保留 `readonly` + `@focus=\"selectCompany\"`，与监管、信用等页一致。 ### 2. 选择门店 - 删除模板内嵌的 `<zs-select-dialog>` 以及 `companyDialogVisible`、`companySearchItems`。 - 在 `selectCompany()` 中改用 `SelectDialog.open()`（接口、列、关键字搜索与原先相同）。 - `setCompany` / `close` 不再维护选择弹窗的 visible 状态。 ### 3. 其它 - 仅保留 `DetailTemplate` 的局部 import；`zs-*` 仍走全局注册。 - Lint 与 Vue review 无阻断问题。 请在本地快速走一遍：**关联** → 聚焦门店名称 → 选择并确认回填；**编辑** 时名称不可选；**查看",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`FranchiseDialog.vue`](zhi2-web-admin/src/views/company/brand/components/FranchiseDialog.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\brand、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\brand\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "81b187e2-7713-4d40-9f74-4a9e3293f049"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

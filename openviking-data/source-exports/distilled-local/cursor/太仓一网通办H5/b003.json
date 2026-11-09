@@ -1,0 +1,78 @@
+{
+ "project": "太仓一网通办H5",
+ "batch": "003",
+ "files": [
+  "003.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "选项表决，最多选择项数为3，C端那能选到4个",
+   "type": "bug",
+   "content": "**问题原因** `OptionStepChoose.vue` 中 `maxSelect` 的取值顺序有误： ```79:82:src/views/owner-decision/components/OptionStepChoose.vue // 修复前：优先用了决策级的 optionNum return Number(view.optionNum) || Number(currentGroup.value?.optionNum) || 0 ``` 在选项表决场景下： - **决策级 `optionNum`** = 选项总数（本例为 4） - **分组级 `optionNum`** = 最多可选数（后台配置为 3） 代码先读了决策级的 4，导致上限被当成 4，而不是 3。 **修复内容** 1. **调整上限字段优先级**：存在分组时，优先使用 `currentGroup.optionNum` 作为最多可选数。 2. **补充下限字段**：分组级也支持 `minOptionNum`。 3. **提交时二次校验**：点击「下一步」时再次检查是否超过上限。 请重新进入选项表决页面（决策 ID 2493）测试：最多应只能选 3 项，选第 4 项时会提示「最多选择3项」。",
+   "evidence": "extracted source=cursor project=太仓一网通办H5",
+   "files": [
+    "`OptionStepChoose.vue",
+    "```79:82:src/views/owner-decision/components/OptionStepChoose.vue",
+    "涉及文件：d:\\repository\\太仓一网通办H5\\src\\views\\owner-decision\\components\\OptionStepChoose.vue、d:\\repository\\太仓一网通办H5\\src\\store\\vote.ts、d:\\repository\\太仓一网通办H5\\src\\views\\decision\\components\\StepChoose.vue、d:\\repository\\太仓一网通办H5\\src\\store\\vote.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "31fcae87-08be-423a-9da7-ea37db71840b"
+   ],
+   "_draft": true,
+   "project": "太仓一网通办H5"
+  },
+  {
+   "title": "分析一下该项目表决时是否有签字和人脸识别实际在使用",
+   "type": "fact",
+   "content": "根据代码分析，**表决流程中签字和人脸识别均已接入，且为必经步骤**；但实现方式不同，也存在一些实现缺陷。 ## 表决整体流程 参与表决页面 `ParticipateIn.vue` 定义了 4 步流程： ```41:48:src/views/decision/ParticipateIn.vue const flowList = [ { icon: selectSvg, name: \"选择\", }, { icon: disabledSvg, name: \"确认\" }, { icon: signSvg, name: \"签字\" }, { icon: faceSvg, name: \"人脸识别\" }, ] ``` | 步骤 | active | 组件 | 是否实际使用 | |------|--------|------|-------------| | 选择 | 0 | StepChooseCommon | ✅ | | 确认 | 1 | StepConfirm | ✅ | | 签字 | 2 | StepSign | ✅ | | 人脸识别 | 3 | FaceStep | ✅（依赖外部小程序） | 最终提交接口 **只在人脸识别成功后** 才会调用： ```72:88:src/views/decision/ParticipateIn.vue const submit = () => { api",
+   "evidence": "extracted source=cursor project=太仓一网通办H5",
+   "files": [
+    "`ParticipateIn.vue",
+    "```41:48:src/views/decision/ParticipateIn.vue",
+    "```72:88:src/views/decision/ParticipateIn.vue",
+    "`StepSign.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cbc17960-f384-48d7-9b4e-db2e42efe692"
+   ],
+   "_draft": true,
+   "project": "太仓一网通办H5"
+  },
+  {
+   "title": "业委会选举表决，结果统计，候选人得票权数统计显示了0",
+   "type": "bug",
+   "content": "根据你提供的接口数据，问题原因和修复如下： ## 问题原因 `GroupResult.vue` 里有两处错误： 1. **数据来源错误**：候选人统计取自 `selectDecisionResult` 的 `optionGroupResultList`，该接口候选人对象**没有** `weightSocreRatio` 字段。 2. **字段计算错误**：用了 `weightActorRatio * 100`，而接口返回的 `weightActorRatio` 已是百分比字符串（如 `\"100.00\"`），不应再乘 100。 你提供的 `getCalculationChart` 数据中，候选人字段如下： | 字段 | 怡怡 示例值 | 含义 | |------|------------|------| | `weightSocre` | `\"1\"` | 得票数 | | `weightSocreRatio` | `\"50.00\"` | 得票权数占比（已是 %） | | `weightActorRatio` | `\"100.00\"` | 得票参与比例（已是 %） | ## 修复内容 已改为与业主决策模块一致： - 使用 `getCalculationChart` 返回的 **`optionList`** - 占比取 **`weightSocreRatio`**（直接 `Number`，",
+   "evidence": "extracted source=cursor project=太仓一网通办H5",
+   "files": [
+    "`GroupResult.vue",
+    "涉及文件：d:\\repository\\太仓一网通办H5、d:\\repository\\太仓一网通办H5\\src\\views\\election\\components\\GroupResult.vue、d:\\repository\\太仓一网通办H5\\src\\views\\election\\ElectionResult.vue、d:\\repository\\太仓一网通办H5\\src\\views\\decision\\components\\ProgressBar.vue、d:\\repository\\太仓一网通办H5\\src\\views\\owner-decision\\components\\ResultStatisticsTab.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fa7fcf41-4dd6-479b-95dc-fc0517ba9715"
+   ],
+   "_draft": true,
+   "project": "太仓一网通办H5"
+  },
+  {
+   "title": "选项表决，选择好决策项后，点击下一步，“我的决策”那",
+   "type": "bug",
+   "content": "已修复。 ## 问题原因 确认页组件 `StepConfirm.vue` 只实现了**一般表决**（`MAINTAIN`）的展示逻辑，**选项表决**（`OPTION`）没有对应模板，所以进入第二步后只有「我的决策」标题，内容区域为空。 ## 修复内容 在 `StepConfirm.vue` 中补充了选项表决的展示逻辑： 1. 新增 `selectedOptionItems` 计算属性，从 `optionGroupList` 中读取已勾选的选项（`checked: true`） 2. 当 `decisionType === 'OPTION'` 时，展示已选决策项名称 3. 样式与选择页保持一致（蓝色边框 + 浅蓝背景） 请重新选择决策项并点击「下一步」，确认页应能正常显示如「Y表决」等已选项。若仍有问题，可告诉我。",
+   "evidence": "extracted source=cursor project=太仓一网通办H5",
+   "files": [
+    "`StepConfirm.vue",
+    "涉及文件：d:\\repository\\太仓一网通办H5、d:\\repository\\太仓一网通办H5\\src、d:\\repository\\太仓一网通办H5\\src\\views\\owner-decision\\ParticipateIn.vue、d:\\repository\\太仓一网通办H5\\src\\views\\owner-decision\\components\\OptionStepChoose.vue、d:\\repository\\太仓一网通办H5\\src\\views\\decision\\components\\StepConfirm.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6eb5120c-c134-4e15-a744-163291e6d855"
+   ],
+   "_draft": true,
+   "project": "太仓一网通办H5"
+  }
+ ],
+ "_draft": true
+}

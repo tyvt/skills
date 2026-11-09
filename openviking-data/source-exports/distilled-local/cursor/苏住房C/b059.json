@@ -1,0 +1,110 @@
+{
+ "project": "苏住房C",
+ "batch": "059",
+ "files": [
+  "059.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "[渲染层网络层错误] Failed to load ",
+   "type": "fact",
+   "content": "**问题原因** `FormManual.vue` 里这行写法是对的： ```4:4:zhi2-mobile-shimin/src/pages_my/verification/FormManual.vue <ZsImage class=\"icon-tip\" src=\"icon/tip.png\" subpackage=\"pages_my\" /> ``` `ZsImage` 会通过 `resolveStaticUrl` 解析为 `/pages_my/static/icon/tip.png`。 但 `pages_my` 分包下只有 `static/images/camera.png`，**缺少** `static/icon/tip.png`，所以小程序加载时报 500。 `tip.png` 实际存在于： - `src/static/icon/tip.png`（主包） - `src/pages_owner/static/icon/tip.png`（业主分包） **已修复** 已从 `pages_owner` 复制到缺失位置： `src/pages_my/static/icon/tip.png` 请重新编译/刷新微信开发者工具（必要时清缓存后再编译），图标应能正常显示。若仍报错，告诉我当前编译命令或 dev 终端状态，我可以帮你确认 `dist` 里是否已带上该文件。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`FormManual.vue",
+    "```4:4:zhi2-mobile-shimin/src/pages_my/verification/FormManual.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\FormManual.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\authentication\\components\\FormManual.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6bcdb466-adaa-4603-a19b-9a1f67130e4a"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "图片UI有问题",
+   "type": "fact",
+   "content": "已修复。根因是**图片水印溢出容器**，不是数据问题。 ### 原因 1. **微信小程序**里 `<img>` 的 `object-fit: cover` 基本不生效，服务端带圆形水印的大图会按原始尺寸渲染，水印区域溢出到右侧文字区。 2. **房产超市列表页**缩略图容器缺少 `overflow: hidden` 和固定尺寸，无法裁剪溢出部分。 ### 修改 **1. `ZsImage.vue`** — 增加 `mode=\"aspectFill\"`（与项目其他 `<image>` 用法一致）： ```2:13:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue <img v-if=\"local\" class=\"img\" :src=\"localImageSrc\" mode=\"aspectFill\" @tap=\"previewImage\"/> <img v-else ref=\"img\" class=\"img\" :src=\"serverImageSrc\" mode=\"aspectFill\" loading=\"lazy\" ... /> ``` **2. `houseSupermarket/index.vue`** — 按首页资讯列表同样模式，增加裁剪容器： ```49:62:d:\\reposi",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`ZsImage.vue",
+    "```2:13:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue",
+    "`houseSupermarket/index.vue",
+    "```49:62:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\houseSupermarket\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8c3976ef-34b9-45cd-8872-edd95968dc75"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "图片不显示",
+   "type": "fact",
+   "content": "已修复。 **原因：** 上次重构把图片引用从条件编译的 `background-image`（H5 本地路径 + 微信小程序 CDN）改成了 `import` 静态资源。在微信小程序分包 `pages_my` 里，`import` 生成的路径无法正确访问分包内的静态图片，所以背景图不显示。 **修复：** 改用项目统一的 `resolveStaticUrl`，按分包解析静态资源路径： ```4:5:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\TypeChoose.vue const verificationBg1 = resolveStaticUrl('images/verification-bg-1.png', 'pages_my') const verificationBg2 = resolveStaticUrl('images/verification-bg-2.png', 'pages_my') ``` - H5：`{base}/pages_my/static/images/verification-bg-1.png` - 微信小程序：`/pages_my/static/images/verification-bg-1.png` 图片文件本身在 `src/pages_my/static/i",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "```4:5:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\TypeChoose.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\TypeChoose.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\authentication\\TypeChoose.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "00a9d48a-4fa1-45d7-911c-3c025eccb8fc"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已在 addHouse.vue 中修复两个问题： 1",
+   "type": "preference",
+   "content": "已在 `addHouse.vue` 中修复两个问题： ### 1. 问号图标弹窗不显示 **原因：** 房屋所有权证号的 `?` 图标原先绑定 `instructionsOpen`，会跳转到交易分包页面 `/pages_transaction/publishHouse/errorTipTwo`，跨分包跳转容易失败，表现为「点击没反应」。页面里其实已有 `uni-popup` 说明弹窗，但未使用。 **修复：** - 统一改为 `openInstructions()` → 调用 `popup.open()` 打开页面内说明弹窗 - 用 `@tap.stop` 包裹图标，避免 `ZsImage` 组件吞掉点击事件 - 顺带修复「我已知晓」按钮（原 `$refs.popup.close()` 在 script setup 中无效） ### 2. placeholder 样式不一致 **原因：** 证号输入框原为 `28rpx / #999`，而「请选择区域」使用 `uni-easyinput__placeholder-class`（`32rpx / #CCCCCC`）。 **修复：** - 证号输入框改用 `placeholder-class=\"uni-easyinput__placeholder-class\"` - 补充对应样式，与区域选择器保持一致 请重新编译后在「我的房屋 → 添加",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`addHouse.vue",
+    "涉及文件：d:/repository/苏住房C、d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_owner/house/owner/addHouse.vue、d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_transaction/publishHouse/verification.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7bc1d9ba-8faa-4839-9f70-f4939f0e1403"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已按设计图调整云守护首页 pages_guard/i",
+   "type": "fact",
+   "content": "已按设计图调整云守护首页 `pages_guard/index/index.vue`，主要变更如下： ### 布局结构 - 将用户信息、统计文案、「继续申请云守护」按钮统一放入 **蓝色头部区域**（`header-section`） - 守护对象列表独立放在头部下方白色区域 ### 样式对齐设计图 | 元素 | 调整 | |------|------| | 头部背景 | 浅蓝 `#e5ecf7`，右下角圆角 `48rpx` | | 用户卡片 | 白色圆角卡片（`16rpx`），内边距留白 | | 头像 | 左侧圆形头像，灰色占位背景 | | 统计文案 | 去掉左侧白底 + 右侧装饰图，改为蓝色背景上的纯文字 | | 按钮 | 移入蓝色头部区域内 | ### 修复的问题 现状图中统计条右侧出现错位色块，是因为 `white-bg` + `icon_tip_bg.png` 的组合布局有误；已改为设计图上的简洁文案样式。 请重新编译预览小程序查看效果。若头像仍不显示，请确认分包静态资源 `pages_guard/static/images/default-avatar-gary.png` 是否存在。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`pages_guard/index/index.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_guard\\index\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "20dc5c80-9b0a-48c5-8cb6-1378ef6459c6"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "我的-我的求购，列表显示UI紊乱",
+   "type": "preference",
+   "content": "已修复「我的 → 我的求购」列表 UI 紊乱问题，修改文件为 `pages_transaction/intention/my.vue`。 **原因分析：** 1. **`z-paging` 默认全屏固定定位** 搜索栏、筛选条件和列表都在同一页面，但 `z-paging` 未设置 `:fixed=\"false\"`，列表层会覆盖顶部区域，导致搜索框和「添加」按钮叠在列表卡片之间。 2. **搜索框与「添加」按钮宽度冲突** 搜索框使用了 `w-full`（100% 宽度），又与「添加」按钮在同一行 flex 布局中，导致两者互相挤压、重叠。 **修复内容：** - 为 `z-paging` 添加 `:fixed=\"false\"`，并用 flex 布局让列表在顶部内容下方正常占位滚动 - 页面容器改为 `height: 100vh` 的纵向 flex 布局（与项目中二手房列表等页面一致） - 搜索框在有「添加」按钮时改为 `flex-1 min-w-0`，按钮加 `flex-shrink-0`，避免横向挤压 请重新编译/刷新小程序后查看效果。顶部 banner、搜索栏、筛选条件应固定在列表上方，列表在下方独立滚动，不再出现层叠错乱。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`pages_transaction/intention/my.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\buyHouse\\myBuy.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\intention\\my.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "31d82de8-28b1-42cc-8741-623368194dca"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

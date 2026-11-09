@@ -1,0 +1,83 @@
+{
+ "project": "苏住房C",
+ "batch": "077",
+ "files": [
+  "077.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "页面列表项宽度需要统一，不是根据内容来的",
+   "type": "preference",
+   "content": "已修复。根因是 `ListIndex.vue` 在无预览图时仍使用 `grid-template-columns: auto 1fr`，文字内容落在 `auto` 列，卡片宽度会随标题长短变化。 **修改内容：** 1. **`ListIndex.vue`** — 改为 flex 布局，并固定卡片宽度： - `width: 100%` 让卡片占满容器 - `.right-text` 使用 `flex: 1; min-width: 0`，文字区域自适应剩余空间 - 有预览图时图片用 `flex-shrink: 0` 保持固定尺寸 2. **`onlineService/index.vue`** — 列表容器 `.content` 的 `align-items: center` 改为 `align-items: stretch`，避免子项被居中压缩 重新编译预览后，政策法规列表项应统一为相同宽度。若还有异常，告诉我具体页面路径即可。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`ListIndex.vue",
+    "**`ListIndex.vue",
+    "**`onlineService/index.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\onlineService\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\article\\ListIndex.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\article\\ListDetail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e687f92b-2bae-4027-9337-1e29dfe49948"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "TypeError: Cannot read pro",
+   "type": "fact",
+   "content": "已修复。根因是 `swiperComponent` 在图片列表为空或索引越界时，仍访问 `allList[currentSlide].fileSite`。 ## 问题原因 `pages_transaction/stockHouse/detail` 页面在数据加载前就把 `swiper-component` 挂载了，此时 `allImg` 还是空数组 `[]`。组件模板里有一处： ```36:37:zhi2-mobile-shimin/src/components/commonNew/swiperComponent.vue <video v-if=\"allList[currentSlide]?.fileSite\" :src=\"imgUrl(allList[currentSlide].fileSite)\" ... ``` 原来没有 `v-if` 守卫，`allList[0]` 为 `undefined` 时就会报 `Cannot read property 'fileSite' of undefined`。 另外还有两个隐患： 1. 点击「图集」时 `currentSlide` 被硬编码为 `1`，无视频时第一张图在索引 `0`，会越界 2. `imageUrl` 按逗号拆分可能产生空字符串项 ## 修复内容 **`swiperComponent.vue`** - 视频弹层加 `v-i",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "```36:37:zhi2-mobile-shimin/src/components/commonNew/swiperComponent.vue",
+    "**`swiperComponent.vue",
+    "**`stockHouse/detail.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\commonNew\\swiperComponent.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse\\detail.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\commonNew\\swiperComponent.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "db381270-844e-45c8-899a-a19894dde18f"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "这是 Vue 3 的编译器提示：在 <script ",
+   "type": "pattern",
+   "content": "这是 Vue 3 的编译器提示：在 `<script setup>` 中，`defineProps` 和 `defineEmits` 是**编译器宏**，会自动注入，**不需要**从 `vue` 中 import。 已在 `zhi2-mobile-shimin/src/page-query/components/` 下修复 5 个文件： | 文件 | 修改 | |------|------| | `FilterPopupComponent.vue` | 从 import 中移除 `defineProps`, `defineEmits` | | `NewFilterComponent.vue` | 同上 | | `CompanyItem.vue` | 删除整行 vue import | | `PropertyCard.vue` | 删除整行 vue import | | `PropertyItem.vue` | 删除整行 vue import | 差量编译后，这两条警告已不再出现。终端里若仍能看到，是首次全量编译的旧输出，可忽略。 **正确写法示例：** ```vue <script setup> // 无需 import，直接使用 const props = defineProps({ ... }) const emit = defineEmits(['click']) </scr",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`FilterPopupComponent.vue",
+    "`NewFilterComponent.vue",
+    "`CompanyItem.vue",
+    "`PropertyCard.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b7ff0fc8-8e3a-4961-ab91-06155333fe7b"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "defineAsyncComponent is no",
+   "type": "fact",
+   "content": "问题出在 `ZsPaging.vue`：它用 `defineAsyncComponent` 异步加载 `z-paging`，而 **uni-app 微信小程序不支持 `defineAsyncComponent`**，运行时会报该错误。 已改为静态导入： ```25:28:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsPaging\\ZsPaging.vue <script setup> import ZsImage from '@/components/ZsImage/ZsImage.vue' import ZPagingInner from 'z-paging/components/z-paging/z-paging.vue' import { ref, useSlots, useAttrs, computed, provide } from 'vue' ``` 本地构建已通过编译阶段；若之前用异步加载是为了减小主包体积，需要改用分包（`pages.json` 的 `subPackages`）或 `easycom` 等方式，小程序里不能依赖 Vue 的异步组件 API。 重新编译/预览小程序后，`defineAsyncComponent is not supported` 应已消失。若还有报错，把完整错误信息发我即可。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`ZsPaging.vue",
+    "```25:28:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsPaging\\ZsPaging.vue",
+    "'@/components/ZsImage/ZsImage.vue",
+    "'z-paging/components/z-paging/z-paging.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5aa7d8b1-67f8-4176-87c9-4be5cb616b81"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,79 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "103",
+ "files": [
+  "103.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "问题已定位并修复。 原因 index.vue 里通过",
+   "type": "preference",
+   "content": "问题已定位并修复。 ## 原因 `index.vue` 里通过 `listMixins` 拼出的地址本来就是对的： ```273:276:zhi2-web-admin/src/mixins/table.js getList(queryParams = this.getQueryParams()) { this.loading = true this.tableData = [] this[`$${this.apiMethod}`](`/${this.moduleName}/${this.businessName}/${this.apiSuffix}`, queryParams, { ``` 即 `POST /presale/permit/cancel/page`。 真正的问题在 `apiV3Normalize.js`：请求拦截器会把 `cancel` 当成 REST 动作，把末尾的 `page` 当成 `id` 移进 body，URL 被改成 `/presale/permit/cancel`，于是返回 400。 `permit/extend` 不受影响，是因为 `extend` 不在 `REST_ACTIONS` 里，只有 `cancel` 会触发这个误判。 ## 修复 在 `apiV3Normalize.js` 的 `normalizeTrailingPathParams` 中：",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`index.vue",
+    "```273:276:zhi2-web-admin/src/mixins/table.js",
+    "`apiV3Normalize.js",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permitCancel\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permitExtend\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permitCancel\\permitCancelConstants.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f82e7cc4-5b9a-49e7-9c22-7583b0a8d615"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "Briefly inform the user ab",
+   "type": "pattern",
+   "content": "修复已完成。 **改动**：[`contractRequest.js`](zhi2-web-admin/src/views/contract/utils/contractRequest.js) 中 `getFlowViewer` 和 `isApprovalAuth` 的接口路径已从 `/flowable/definition/*` 改为 `/flowable/task/*`。 重新部署前端后，在合同预售审批页（`/flowable/task/flowViewer`）刷新验证即可。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**改动**：[`contractRequest.js`](zhi2-web-admin/src/views/contract/utils/contractRequest.js",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\路由信息.json、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\vite.config.js、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\api\\flowable\\definition.js、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\api\\flowable\\todo.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "957b5194-9887-4b03-a4b2-f48dde8ed5fa"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "原因 「合同网签备案比例变更」详情路由用的是 防伪码",
+   "type": "bug",
+   "content": "## 原因 「合同网签备案比例变更」详情路由用的是 **防伪码** `antiCounterfeitingCode`（URL 里的 UUID），而附件接口 `listAppendixPackage` 的 `busId` 应传 **业务主键** `specialContractId`（如 `2100487064662843393`）。 `OperationBtnGroup` 里一直用 `getId()`（即路由上的防伪码）作为 `busId`，所以请求里会出现你截图里的 UUID。 ## 修改 1. **`specialcontract/detail.vue`**：给操作栏传入业务主键 `:id=\"form.specialContractId\"` 2. **`OperationBtnGroup`**： - 增加 `id` prop，用 `attachmentBusId` 作为附件/提交的 `busId` - 若页面显式传了 `id`，在 `specialContractId` 尚未从详情接口返回前 **不再** 回退到路由防伪码 - 将 `attachmentBusId` 传给 `ZsSubmit` 和附件抽屉里的 `AnnexUpload` 详情加载完成后，`listAppendixPackage` 的 payload 应为： ```json { \"busCode\": \"07051",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**`specialcontract/detail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\路由信息.json、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\commercialHousingSales\\presale\\specialcontract\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "00603096-ce00-485a-bc85-12cd53fdaa6b"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "这个搜索表单的Padding存在多重嵌套和重叠问题",
+   "type": "preference",
+   "content": "已按计划完成搜索表单 padding 嵌套修复，并处理了折叠区内全局 `el-row` 规则与搜索 gutter 的冲突。 ### [zs-search-form.vue](zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue) - 去掉全局 `:deep(.el-col)` 的 `3px 12px`，改为仅 `.zs-search-form__field-row > .el-col` 保留上下 `3px`，横向间距交给 `gutter=\"8\"`。 - 布局列（`form-content-col` / `button-col` / `multi-line-*`）左右 padding 归零。 - 删除重复的 `id=\"queryForm\"`；内层字段行增加 `class=\"zs-search-form__field-row\"`。 - 容器 `margin-bottom` 改为 `0`；`borderless` 使用 `margin-bottom: 0 !important`。 - 单行布局 `gap: 12px !important`；标签 `padding: 0 4px 0 0`。 ### [index.scss](zhi2-web-admin/src/styles/index.scss) - 搜索区不再套用",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[zs-search-form.vue](zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue",
+    "[index.scss](zhi2-web-admin/src/styles/index.scss",
+    "[detail-form.scss](zhi2-web-admin/src/styles/detail-form.scss",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-search-form\\zs-search-form.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-form\\zs-form.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\styles\\index.scss、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\styles\\detail-form.scss"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7500a99d-b061-4f92-bbbe-0136b9fa86aa"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

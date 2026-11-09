@@ -1,0 +1,97 @@
+{
+ "project": "太仓G",
+ "batch": "010",
+ "files": [
+  "010.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "选项表决，表决结论维护弹框页上，“参与户数占比”和“",
+   "type": "bug",
+   "content": "已修复。 **原因：** 在 `MaintainResultDialogLite.vue` 的 `getChartResult` 中，参与户数占比和参与面积占比由 JavaScript 浮点除法直接赋值（例如 `5/17*100` → `29.411764705882353`），而 `v-money:2` 只在输入框初始化时格式化，异步赋值后不会再次处理，因此出现很长的小数位。 **修复：** 与 `VoteViewLite.vue` 保持一致，在赋值时用 `.toFixed(2)` 保留两位小数： ```242:250:d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon\\components\\MaintainResultDialogLite.vue this.partRoomPercent = percentData.totalHouseNum ? ((percentData.voteHouseNum / percentData.totalHouseNum) * 100).toFixed(2) : '0.00' this.participatePercent = percentData.totalWeight ? ((percentData.voteWeight / percentData.totalW",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "`MaintainResultDialogLite.vue",
+    "`VoteViewLite.vue",
+    "```242:250:d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon\\components\\MaintainResultDialogLite.vue",
+    "涉及文件：d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon\\components\\MaintainResultDialogLite.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "49431e85-bfc6-4d6e-af77-ea4dad165a1a"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "维修资金的结论维护页被改成新的了，图1是客户环境，图",
+   "type": "bug",
+   "content": "已定位并修复问题。 **原因：** 维修资金表决在重构时改用了 `decisionCommon/MaintainResultDialog.vue`，该组件按昆山版做了统一，与客户环境（图1）不一致： | 差异项 | 客户环境（图1） | 改后版本（图2） | |--------|----------------|----------------| | 占比字段 | 参与户数/面积、同意占参与户数/面积 | 多了「参与权数占比」「同意占参与权数占比」 | | 数据接口 | `calculationChart` | `ownerCalculationChart` | | 下方表格 | 始终显示（无数据时显示「暂无数据」） | 维修资金场景下被隐藏 | | 确认按钮 | 「确认」 | 「确认并推送APP」 | **修复：** 在 `decisionCommon/MaintainResultDialog.vue` 中增加 `isMaintainFund` 判断（路由为 `maintain` 时），维修资金表决走客户环境原有逻辑： 1. 恢复 **户数/面积** 四个占比字段，去掉权数相关字段和提示图标 2. 恢复调用 **`calculationChart`** 接口计算占比 3. 恢复始终显示下方的 **候选人表格区域** 4. 按钮文案改回 **「确认」** 一般表决、业主决策等其他模",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "`decisionCommon/MaintainResultDialog.vue",
+    "涉及文件：d:\\repository\\太仓G\\zhi1-web-admin、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\maintainDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon\\components\\MaintainResultDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f57cbb90-c8af-4874-9961-54eca50f5cb8"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "一般表决详情，决策范围那一开始筛选楼幢号只有1幢和测",
+   "type": "bug",
+   "content": "已修复该问题。 ## 问题原因 在「一般表决详情」的决策范围筛选中，楼幢号下拉选项由 `getSearchCondition()` 通过 `searchDecisionRange` 接口获取。 原先每次查询列表时，会把**完整的筛选条件**（含 `buildingId`、`unitId` 等）一并传给该接口： ```519:523:zhi1-web-admin/src/views/estate/decisionCommon/components/DecisionRangeTable.vue getSearchCondition() { searchDecisionRange({ decisionId: this.queryParams.decisionId }).then((response) => { this.buildingResult = response.rows }) }, ``` 选择「1幢」和「单元1」并搜索后，接口返回的是该单元下各户室的数据，每条记录的楼幢号都是「1幢」，于是下拉框里就出现了大量重复的「1幢」。 ## 修复方案 获取楼幢下拉选项时，只传 `decisionId`，不再带上楼幢、单元等筛选条件，保证下拉始终显示该表决下的全部楼幢（如「1幢」「测试」）。 已同步修改： - `decisionCommon/components/DecisionRang",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "```519:523:zhi1-web-admin/src/views/estate/decisionCommon/components/DecisionRangeTable.vue",
+    "`decisionCommon/components/DecisionRangeTable.vue",
+    "`ownerDecision/components/DecisionRangeTable.vue",
+    "涉及文件：d:\\repository\\太仓G、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\components\\DecisionRangeTable.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon\\components\\DecisionRangeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "264b7b99-7e78-4c4b-8e92-4688eeff2060"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "业委会选举表决，维护结论页，“参与户数占比”和“参与",
+   "type": "preference",
+   "content": "已修复。问题出在 `decisionCommon/components/MaintainResultDialog.vue` 的 `getChartResult` 方法：占比是直接做除法赋值，未格式化为两位小数。 **修改内容：** - 业委会选举表决（`vote` 路由）使用的维护结论弹窗中，`参与户数占比`、`参与面积占比` 等字段统一用 `.toFixed(2)` 保留两位小数 - 与同目录下 `MaintainResultDialogLite.vue` 的写法保持一致 - 顺带修复了维修资金表决分支及 `ownerDecision/components/MaintainResultDialog.vue` 中的同类问题 修复后显示示例： - `参与户数占比`：`1.18 %`（原为 `1.1764705882352942 %`） - `参与面积占比`：`2.10 %`（原为 `2.102845991765255 %`） 刷新页面后重新打开「维护结论」弹窗即可看到效果。",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "`decisionCommon/components/MaintainResultDialog.vue",
+    "`MaintainResultDialogLite.vue",
+    "`ownerDecision/components/MaintainResultDialog.vue",
+    "涉及文件：d:\\repository\\太仓G、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\components\\MaintainResultDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c417adbb-668c-4e2f-84da-b9c333bc22dc"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "一般表决详情，决策范围选择楼幢号点击搜索查询后，“一",
+   "type": "bug",
+   "content": "## 问题原因 一般表决详情页的「决策范围」筛选使用了 `listMixins` 缓存搜索条件。选择楼幢号并搜索后，`buildingId` 会写入 Vuex 缓存；刷新页面时会恢复该值。 但单元号、户室号的下拉数据（`unitResult`、`roomResult`）只在用户手动切换楼幢/单元时通过 `handleSelectProjectChange` / `handleSelectUnitChange` 加载，刷新后不会重新请求，导致楼幢号有值而单元号下拉为空。 ## 修复方案 在 `getSearchCondition()` 中，根据已缓存的 `buildingId`、`unitId` 同步恢复级联下拉数据： ```531:550:d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon\\components\\DecisionRangeTable.vue getSearchCondition() { const { decisionId, buildingId, unitId } = this.queryParams searchDecisionRange({ decisionId }).then((response) => { this.buildingResult = response.rows }",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "```531:550:d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon\\components\\DecisionRangeTable.vue",
+    "涉及文件：d:\\repository\\太仓G、d:\\repository\\太仓G\\zhi1-web-admin、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\components\\DecisionRangeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fee0d28c-75fe-4a1f-9098-bb41f8526e92"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  }
+ ],
+ "_draft": true
+}

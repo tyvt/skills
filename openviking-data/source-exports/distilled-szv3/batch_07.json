@@ -1,0 +1,395 @@
+{
+ "batch": 7,
+ "files": [
+  "037.md",
+  "038.md",
+  "039.md",
+  "040.md",
+  "041.md",
+  "042.md"
+ ],
+ "count": 23,
+ "memories": [
+  {
+   "title": "后端文件路径正确但前端加载报错 → 先 curl 验 Content-Type，多为网关未反代文件桶（返回 200 text/html 的 SPA）",
+   "type": "bug",
+   "content": "什么情况：租赁企业「开业信息登记证明」文件在对象存储里确实存在、路径也正确，但前端 el-image/<img> 加载失败，页面出现带路径的红色错误块。\n为什么：登记证明地址形如 /zhlz/2026/0/d/f/xxx.pdf（住房租赁文件桶），而前端站点只代理了 /zhi2*，没有 /zhlz。浏览器实际请求的是前端站点，Nginx 命中 SPA fallback 返回 200 + text/html（index.html），把 HTML 当 PDF/图片加载必然失败——所以「路径对」和「报错」并不矛盾。\n怎么做：1) 判定根因用 curl -sI \"http://host:port/zhlz/xxx.pdf\"，看 Content-Type 是 application/pdf 还是 text/html；是 text/html 就说明网关缺反代，而不是代码路径错。2) 三处同时补齐 /zhlz、/zhlz-dev、/zhlz-test：vite.config.js 的 proxy（走 VITE_APP_FILE_PROXY_ADDRESS，与 /zhi2* 一致）、deploy/nginx.conf、以及部署环境的 Nginx（这条必须运维改，前端打包解决不了）。3) resolveServerAssetUrl.js 里 /zhlz* 按站点根路径拼接，并兼容误带 /api/v3.0/zhlz/... 前缀的情况。\n与已知差异：已知条目只讲「相对路径按平台拼域名、防止重复拼接」，本条是全新的故障层——路径拼接没错而是网关代理缺失，并给出了 curl Content-Type 这个一秒定性手段。",
+   "evidence": "用户：「这个租赁企业的登记证明，文件是存在的，路径也是对的，但是前端报错了」。结论：在 58.210.252.230:9002 上访问该路径返回 200 + text/html（SPA 的 index.html）而非 PDF，故浏览器加载失败；已改 vite.config.js / nginx.conf 增加 /zhlz 代理，并说明部署后需 curl -sI 验证 Content-Type 不再是 text/html。",
+   "files": [
+    "zhi2-web-admin/src/utils/resolveServerAssetUrl.js",
+    "zhi2-web-admin/vite.config.js",
+    "zhi2-web-admin/deploy/nginx.conf"
+   ],
+   "baseline": "2b6e7d05",
+   "sessionIds": [
+    "0f726903-9779-445d-b98b-87b46eb8ece1"
+   ],
+   "bundle": "037.md"
+  },
+  {
+   "title": "附件扩展名不能用后端 fileType（字典码）推断，否则 PDF 被当图片走 el-image 预览而报错",
+   "type": "bug",
+   "content": "什么情况：机构基本信息页附件缩略图/内联展示对 PDF 报错。\n为什么：getAppendixFileExtension 原先优先取接口返回的 fileType 判扩展名，但该字段常是字典码（如 0），不是 pdf/png 这类真实后缀，于是 PDF 被误判成图片，交给 el-image 去加载 .pdf，必然失败。这与上一条的「网关没反代」是叠加的两个独立缺口：即使代理修好，扩展名判错仍会报错。\n怎么做：扩展名推断改为优先用 fileSite / 文件名后缀，fileType 只在拿不到后缀时兜底，且要校验是否形如 pdf/jpg/png 再采信；PDF 一律不做图片缩略图预览，改为可点击链接直接打开（工具栏「下载登记证明」走 getLeaseRegisterCert 接口）。展示层同理：有 leaseRegisterCertSite 时渲染成链接而不是图片。\n排查心法：前端「文件打不开」先分清两条线——URL 能不能拿到正确字节（网关/代理/Content-Type），和前端把它当成什么类型去渲染（扩展名判定/预览组件选择）。两条线要分别验。\n与已知差异：已知清单里没有「fileType 是字典码不能当扩展名用」这条；也与「小程序 downloadFile→openDocument」不同，这是 Web 端 el-image 误判的根因。",
+   "evidence": "会话结论明确指出两处缺口之二：「附件 fileType 常为字典码（如 0），getAppendixFileExtension 原先优先用 fileType，会把 PDF 误判为图片，走 el-image 去加载 .pdf」；修复为 appendix.js 优先用 fileSite/文件名后缀、PDF 不再当图片缩略图，agencyBasicInfoContent.js 中登记证明改为可点击链接。",
+   "files": [
+    "zhi2-web-admin/src/utils/appendix.js",
+    "zhi2-web-admin/src/views/company/companyManagement/components/agencyBasicInfoContent.js"
+   ],
+   "baseline": "2b6e7d05",
+   "sessionIds": [
+    "0f726903-9779-445d-b98b-87b46eb8ece1"
+   ],
+   "bundle": "037.md"
+  },
+  {
+   "title": "行政区划展示统一到区级：改 formatter 而非逐页改，保留三级路径 formatter 并兼容历史拼接串",
+   "type": "preference",
+   "content": "什么情况：用户要求「项目里所有列表行政区划格式化改为只到区级，不需要三级」，随后追加「表单里面也要统一改掉」——即这是全项目级约定，不是单页需求。\n为什么：同一字段在列表用一级 formatter、表单/详情用 fullRegionFormatter（三级「江苏省/苏州市/吴江区」），会出现列表显示「吴江区」、详情显示三级的不一致；且历史数据里存在把「省/市/区」用 / 拼成整串存在单个字段里的脏数据，直接解析会错。\n怎么做：1) 在 formatters/index.js 集中改，不要把逻辑散到页面——fullRegionFormatter 改为与列表一致走 formatAdministrativeRegion（区级解析）；2) 保留 fullRegionPathFormatter，只在确实需要三级路径时显式调用；3) formatListRegionCode 增加历史数据兜底：若值是「省/市/区」拼接串，取最后一段作区名；4) 顺带清理反向写入点——级联组件只存最后一级区名，不再用 / 拼三级（如 customerProject/detail.vue 的 regionName）；5) 以组件为单位的（DeveloperBasicInfoForm / developerBasicInfoContent.js）在无自定义 regionFormatter 时默认按编码解析为区级。\n经验：这类「全项目展示口径统一」需求，正确落点是共享 formatter + 只读回显逻辑，改完要列出所有受影响页面自测。",
+   "evidence": "用户轮次 1「项目里面所有列表行政区划格式化改为只到区级的，不需要三级」，轮次 2「表单里面也要统一改掉」。结论：fullRegionFormatter 改为走 formatAdministrativeRegion，保留 fullRegionPathFormatter，formatListRegionCode 支持历史「省/市/区」拼接串取最后一段。",
+   "files": [
+    "zhi2-web-admin/src/utils/formatters/index.js",
+    "zhi2-web-admin/src/components/DeveloperBasicInfoForm",
+    "zhi2-web-admin/src/views/company/companyManagement/components/developerBasicInfoContent.js",
+    "zhi2-web-admin/src/views/customerProject/detail.vue"
+   ],
+   "baseline": "a861cff3",
+   "sessionIds": [
+    "9cf41a6c-807b-46e2-b193-053a000a8ce2"
+   ],
+   "bundle": "037.md"
+  },
+  {
+   "title": "营业期限结束日期可为 null（长期）时不要用 daterange：拆成开始/结束两个独立日期选择器 + 共享组件",
+   "type": "pattern",
+   "content": "什么情况：企信通提取的营业期限起止日期在注册表单里不回显，用户怀疑是日期范围组件的问题——猜对了。\n为什么：结束日期「长期」时后端/企信通给的是 null，而 Element Plus 的 daterange 需要一个完整数组值才能渲染，null 结尾导致整个日期范围无法回显（连开始日期一起显示为空）。\n怎么做：1) UI 改成两个独立日期选择器：开始日期必填、结束日期可空且 placeholder 写「长期」，彻底绕开 daterange 的数组完整性约束；2) 校验抽成 createBusinessTermRangeRules（registerValidate.js）：开始必填，结束可空，只有两者都有时才校验先后；3) 映射层 mapQxtEntInfo.js 把 null 结束日期转成 ''，避免 null 在表单里继续传播；4) 提交时 businessTermEnd 用 omitEmpty，空即代表长期，不要把 '' 或 null 发出去。\n复用要点：抽取共享组件 src/components/RegisterBusinessTermFields.vue，登录页三种企业注册入口（开发企业 / 经纪机构 / 租赁企业）全部引用同一组件与同一套校验，避免三份实现漂移；E2E 辅助函数（fillInstitutionRegisterSinglePage / fillLeaseInstitutionRegisterSinglePage）同步补上填写营业期限。\n与已知差异：已知清单只有「多步表单用独立编辑页 + storage 传参」，本条是日期字段可空语义导致的控件选型问题，属新增。",
+   "evidence": "用户：「提取的数据有营业期限起止日期，没有回显，截至日期有可能是 Null，是不是因为是日期范围组件的原因？」→ 确认拆分为两个独立日期选择器（结束占位「长期」），校验 createBusinessTermRangeRules，提交 businessTermEnd 用 omitEmpty。轮次 2「三种企业注册都按照这个规则修改」。",
+   "files": [
+    "zhi2-web-admin/src/components/RegisterBusinessTermFields.vue",
+    "zhi2-web-admin/src/utils/registerValidate.js",
+    "zhi2-web-admin/src/utils/mapQxtEntInfo.js",
+    "zhi2-web-admin/src/views/register/components/single-page/CompanyRegisterSingleForm.vue"
+   ],
+   "baseline": "179717af",
+   "sessionIds": [
+    "a4953b9d-852c-46bc-8834-4c71e8adf5c6"
+   ],
+   "bundle": "037.md"
+  },
+  {
+   "title": "路由/菜单占位符 tabUuid 被当成业务主键发到接口 → 统一 isUsableCompanyRecordId 过滤并在 api 层二次校验",
+   "type": "bug",
+   "content": "什么情况：「企业资质信息参数还是不对」，Network 里 getByCompanyRecordId 的请求体 companyRecordId 为字符串 \"tabUuid\"。\n为什么：后台动态菜单路由里的 ID 段是未替换的占位符（tabUuid、tableId 等），页面从 query / :tableid / 路径段取 ID 时没做合法性判断，占位符就被当真实主键发了出去；B 端本企业场景又回落到 getOwnCompany，回落结果同样没校验。表现是接口参数错但不一定报错，很容易被当成后端问题。\n怎么做：1) 新建 src/utils/companyRecordId.js，提供 isUsableCompanyRecordId（排除 tabUuid/tableId 这类占位符）、resolveCompanyRecordIdFromRoute（依次从 query 的 id、:tableid、路径段解析并忽略占位）、shouldResolveCompanyRecordIdFromOwnCompany（只有 B 端本企业用户、且路由无合法 ID 时才回落 getOwnCompany）；2) 页面用该工具解析并校验 getOwnCompany 的结果；3) api 层（qualificationRecord.js）在发请求前再校验一次，杜绝无效 ID 出站；4) 详情页 watch $route.fullPath，切换侧栏菜单时重新拉数，否则复用组件实例会拿旧 ID 显示旧数据。\n排查心法：动态菜单体系里，任何从路由取「业务主键」的地方都要防占位符，且要在 api 层兜底而不是只靠页面。\n与已知差异：已知条目讲请求参数字段归一化与字段改名在 api 层适配，本条是「占位符值冒充主键」这一具体且易复发的坑。",
+   "evidence": "结论：getByCompanyRecordId 请求体出现菜单未替换的占位符 companyRecordId: \"tabUuid\"；新增 src/utils/companyRecordId.js（isUsableCompanyRecordId / resolveCompanyRecordIdFromRoute / shouldResolveCompanyRecordIdFromOwnCompany），detail.vue 监听 $route.fullPath，qualificationRecord.js 发请求前再次校验。",
+   "files": [
+    "zhi2-web-admin/src/utils/companyRecordId.js",
+    "zhi2-web-admin/src/views/toB/qualificationRecord/detail.vue",
+    "zhi2-web-admin/src/api/company/qualificationRecord.js"
+   ],
+   "baseline": "56db6f6f",
+   "sessionIds": [
+    "a02500a7-b2e2-4433-9f71-b3fd7a6ccd98"
+   ],
+   "bundle": "037.md"
+  },
+  {
+   "title": "Element Plus 全局表单项满宽规则：只给块级控件 100%，span 组合字段用 flex+wrap",
+   "type": "bug",
+   "content": "【什么情况】zhi2-web-admin（Vue3 + Element Plus）的全局样式 element-ui.scss 里曾对 `.el-form-item__content > *` 一律设 width:100%，导致「不动产权证号」这类由 label span + 输入框拼成的组合字段每个子节点都被拉满整行，弹窗里出现换行、错位、相互重叠。\n【为什么】通配子选择器不区分节点类型，把行内 span 也当成块级控件处理；而 :deep/全局覆盖一旦收窄又容易漏掉新控件。\n【怎么做】全局规则改为白名单：只对块级控件（.el-input / .el-select / .el-date-editor / .el-input-number / .el-textarea 等）设 width:100%，span 明确保持 width:auto；含 span 的组合字段改用 display:flex + flex-wrap + 小 gap 自行排版。另外弹窗内部若出现裸 el-col（如 ExtractDialog 里的产权类型 + 证号），要在 .form-box .zs-form > .el-col 上补 float:none; clear:both，否则 Element Plus 的浮动栅格在自定义弹窗容器里会叠层。改完必须逐个弹窗目视确认，不要只看一个页面。\n【与已知清单差异】已知清单只有「:deep 覆盖第三方组件需 !important」这类权重经验，没有满宽通配选择器破坏组合字段、以及 el-col 浮动叠层这两条根因。",
+   "evidence": "会话 8f811d4e（基线 4555c0d1）：用户发截图要求「全局处理」，最终结论中修改 element-ui.scss 取消 `.el-form-item__content > *` 统一 width:100%，仅块级控件满宽、span 保持 auto、组合字段用 flex+wrap；并在 zs-dialog.vue 的 `.form-box .zs-form > .el-col` 增加 float:none/clear:both 解决裸 el-col 叠层。",
+   "files": [
+    "zhi2-web-admin/src/styles/element-ui.scss",
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue",
+    "zhi2-web-admin/src/views/stock/contract/components/ExtractDialog.vue"
+   ],
+   "baseline": "4555c0d1",
+   "sessionIds": [
+    "8f811d4e-b703-418d-9f1c-8f677af83306"
+   ],
+   "bundle": "038.md"
+  },
+  {
+   "title": "用户偏好：公共组件改造要「全局处理」，禁止别名注册，直接替换成现有公共组件",
+   "type": "preference",
+   "content": "【用户明确要求】在本项目里遇到「某个旧组件/原生 el-* 表现不对、需要统一改造」时，用户会先发截图说「全局处理」，随后补充「不要别名注册，直接替换成现有公共组件」。即：\n1）不接受在 main.js 里给公共组件起别名（如把 zs-input 别名挂到 el-input）这种迂回方案——会产生两套名字同一实现，后续排查分不清页面到底用了哪个；\n2）要求把页面里散落的 `<el-input>` `<el-button>` `<el-table-column>` `<pagination>` `<Submit>` 等直接改写成项目既有公共组件（zs-input / zs-button / zs-table-column / ZsSubmit / z-paging 等），改造后 main.js 不动；\n3）「全局处理」意味着样式/布局问题要落到 src/styles 下的公共 scss，而不是逐页打补丁；\n4）改完要给出扫描证据（例如 stock/** 下已无原生标签）+ 需要人工目视确认的页面清单。\n【怎么做】先 grep 出目标目录内的原生标签清单，批量替换为公共组件，再跑 ESLint；公共组件里原有的缩进/括号告警不属本次改动，不要顺手重排整文件以免 diff 噪音。",
+   "evidence": "会话 8f811d4e（基线 4555c0d1）：用户诉求 1 只说「全局处理」并附截图，诉求 2 明确「不要别名注册，直接替换成现有公共组件」，最终结论强调「组件替换（未改 main.js）」，并给出 stock/** 已无原生标签的扫描结果。",
+   "files": [
+    "zhi2-web-admin/src/views/components/SelectDialog.vue",
+    "zhi2-web-admin/src/views/components/CompanyDialog.vue",
+    "zhi2-web-admin/src/views/components/RegulatoryAccountDialog.vue",
+    "zhi2-web-admin/src/views/stock/contract/index.vue"
+   ],
+   "baseline": "4555c0d1",
+   "sessionIds": [
+    "8f811d4e-b703-418d-9f1c-8f677af83306"
+   ],
+   "bundle": "038.md"
+  },
+  {
+   "title": "E2E 用例报「路由里找不到页面」多半是测试账号菜单未授权，不是回归失败",
+   "type": "bug",
+   "content": "【什么情况】改完列表页工具栏按钮后跑 `npm run test:e2e:contract-sign-pre`，Playwright 打开 `commercialHousingSales/presale/contractMainInfo/index` 直接失败。看起来像自己改坏了，实际是 E2E 账号没有「预售合同签订」菜单权限：前端路由/菜单是后端按角色下发动态生成的，无权限时目标路由根本不存在。\n【为什么】这类后台的路由表由菜单接口动态注入，缺菜单 ≠ 页面 404 代码 bug；E2E 又常在断言前先跳路由，于是失败点落在跳转而不是断言。\n【怎么做】1）先判断失败点：如果报错发生在 goto/等待路由而非元素断言，优先怀疑账号权限；2）用同一个账号手动登录看左侧菜单里有没有该项；3）结论里要明确写「非代码改动导致」，并给出两条后续路径——给 E2E 账号开通对应菜单后重跑，或改为页面刷新后目视确认；4）不要为了绕过权限去改路由守卫或 mock 菜单，那会掩盖真实权限问题。\n【与已知清单差异】已知清单里没有 Web 端 Playwright/E2E 相关的任何条目，本条是 Web 后台 E2E 的排错入口。",
+   "evidence": "会话 a816325c（基线 6b3ac5a7）：最终结论写明 test:e2e:contract-sign-pre 未通过，原因是 Playwright 账号在路由里找不到 commercialHousingSales/presale/contractMainInfo/index（菜单未授权），并说明不是按钮样式改动导致，建议开通菜单后重跑。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/contractView/index.vue",
+    "路由信息.json"
+   ],
+   "baseline": "6b3ac5a7",
+   "sessionIds": [
+    "a816325c-00a0-41f5-b764-20f675698e98"
+   ],
+   "bundle": "038.md"
+  },
+  {
+   "title": "Playwright getByText 模糊命中多元素触发 strict mode 报错：用容器 scope + 精确类名定位",
+   "type": "bug",
+   "content": "【什么情况】E2E 断言 `getByText('资质信息')` 时失败，报 strict mode violation：同名字样同时出现在区块标题、提示文案、列表项/表格列名里，匹配到多个元素。新增「资质信息」区块后原本能过的断言反而挂了。\n【为什么】getByText 是子串/模糊匹配，业务文案一旦在多处复用（标题 + 说明 + 列名）必然命中多个；Playwright strict mode 遇到多命中直接抛错而不是取第一个。\n【怎么做】1）先用 locator 收敛作用域，例如限定在 `page.locator('[data-testid=register-step-1]')` 或 `#register-step-1` 内再找；2）再叠加精确定位，如 `.section-title`、`[data-testid=...]`，必要时用 `getByText(..., { exact: true })`；3）优先给关键区块补 data-testid，比依赖中文文案稳；4）改断言时不要用 `.first()` 掩盖问题，那会让断言失去校验意义。\n【与已知清单差异】已知清单无 Playwright/选择器相关条目。",
+   "evidence": "会话 2cc4f912（基线 5f4e1614）：测试过程小修复——assertRegisterStep1Ui 中 getByText('资质信息') 匹配到多个元素（标题、提示文案、列表名），改为在 register-step-1 内用 .section-title 精确匹配，避免 strict mode 报错。",
+   "files": [
+    "zhi2-web-admin/e2e/register/company-register.spec.js",
+    "zhi2-web-admin/e2e/fixtures/company-register-admin-helpers.js"
+   ],
+   "baseline": "5f4e1614",
+   "sessionIds": [
+    "2cc4f912-53ec-4229-917e-0977129cd28e"
+   ],
+   "bundle": "038.md"
+  },
+  {
+   "title": "Web 后台详情页头部与子表操作列约定：HeadTitle + 按钮进 zs-tabs 插槽，操作列按状态定宽",
+   "type": "pattern",
+   "content": "【什么情况】监管类详情页（用款撤销、退款、许可注销等）原先各页自己写明细标题和一堆操作按钮，视觉不统一；两张子表（用款明细、用款关联楼幢）的操作列因为同时渲染「查看 / 编辑 / 删除」三枚按钮被撑得极宽。\n【为什么】操作列若不按权限/状态裁剪，只读态还要渲染禁用的编辑删除按钮，宽度和噪音都浪费；明细标题重复 HeadTitle 的功能。\n【怎么做】1）页头统一用公共 `HeadTitle` 组件，不再手写明细标题；2）页面级操作按钮统一放进 `zs-tabs` 的插槽（按钮跟着 Tab 走，而不是浮在标题行），去掉各 Tab 内重复的明细标题；3）子表操作列按业务状态定宽：只读场景（如 bizState != '0'）只渲染「查看」，不渲染灰掉的编辑/删除；只读列宽固定约 80px，可编辑态固定约 172px 容纳查看+编辑+删除；4）宽度用固定值而非自适应，避免不同数据行宽跳动。\n【与已知清单差异】已知清单的 UI 约定是小程序 CardCell 组件族与弹层布局，无 Web 端 HeadTitle / zs-tabs 插槽 / 操作列宽度的约定。",
+   "evidence": "会话 35fb1a3e（基线 179717af）：用户三次诉求依次为「使用 headtitle 组件」「按钮都移动到 zs-tabs 插槽，明细标题都去掉」「这 2 个操作列太宽了」；最终结论说明只读场景（bizState != '0'）只保留查看、只读 80px、可编辑 172px。",
+   "files": [
+    "zhi2-web-admin/src/components/HeadTitle/index.vue",
+    "zhi2-web-admin/src/views/supervision/unblock/usemoneyRevoke/detail.vue",
+    "zhi2-web-admin/src/views/supervision/deposit/refund/detail.vue",
+    "zhi2-web-admin/src/views/presale/permitCancel/detail.vue"
+   ],
+   "baseline": "179717af",
+   "sessionIds": [
+    "35fb1a3e-8fa0-49e0-be63-267e90ff2bf8"
+   ],
+   "bundle": "038.md"
+  },
+  {
+   "title": "Web 后台「页内变更/编辑模式」必须把路由当唯一状态源：模式标志放 data() 不放 created()，否则组件重建后被 immediate watcher 抢先执行",
+   "type": "bug",
+   "content": "【什么情况】zhi2-web-admin（Vue3 + Element Plus）要求管理员变更在备案详情页内完成：router.replace 到同路由 formMode=edit 并带 companyAdminChangeId，不跳新页面；保存走 /company/companyAdminChange/update、提交走 /submit。上线后 bug：点「变更」调完 getLast + 变更单 detail，页面立刻退回 formMode=view，表单从 1 变 0，网络面板 detail/list/version.json 成串重复。\n\n【为什么】AppMain 用 $route.fullPath 做详情组件 key，路由一变组件整个重建。新实例中 formMode 的 watcher 带 immediate:true，执行早于 created()：先 init()→getDetail()，此时 inPageChangeMode 还没在 created() 里置 true，changeActive=false，请求走的是备案详情接口；备案详情返回 bizState='2'（已备案自身状态），随后 created() 把 inPageChangeMode 置真，detailCallback 里 inPageChangeMode && bizState==='2' 成立，触发 exitInPageChangeMode() 退回 view 并重拉备案详情，形成来回跳转。\n\n【怎么做】① inPageChangeMode 从 created() 移到 data()，初始化阶段就按路由 companyAdminChangeId 判定，组件重建后第一次 getDetail 即走正确的变更单接口；② 新增 detailFromChange 标记记录回填数据来源，退出判定加上该前提，避免把备案详情的 bizState=2 误判成「变更单已备案」；③ handleStartChange 中置 detailFromChange=true，保留原有自动退出逻辑。通用教训：immediate watcher 早于 created，凡依赖路由的模式标志必须在 data()/setup 顶层同步算出。验证用 Playwright 连本地 8081 跑真实管理员账号，比对改动前后路由与 .section-form 数量。",
+   "evidence": "会话中用户报「这个变更现在点了不会进入编辑模式了，调完接口直接刷新了」；最终结论给出组件重建 + watcher immediate 早于 created + bizState='2' 误判的三段根因，并给出 inPageChangeMode 移到 data()、新增 detailFromChange 的改法；Playwright 验证改动前路由立刻退回 view 且表单元素由 1 变 0、改动后稳定停留 formMode=edit 且刷新仍在编辑态，e2e/company/company-admin-routes-probe.spec.js 通过",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyAdmin/detail.vue",
+    "zhi2-web-admin/src/api/company/companyAdminChange.js",
+    "zhi2-web-admin/src/utils/resolveChangeId.js",
+    "zhi2-web-admin/e2e/company/company-admin-routes-probe.spec.js"
+   ],
+   "baseline": "114af19b",
+   "sessionIds": [
+    "session_da9b2bda195bdfca7b27e2a181f01d16",
+    "f4b38308-ba3f-46f6-adc4-4bc5ea9dcbbf"
+   ],
+   "bundle": "039.md"
+  },
+  {
+   "title": "Web 详情页只读附件/资质区块：listAppendixPackage 参数必须与上传组件对齐，且要 watch 业务 id 异步回填后重拉",
+   "type": "pattern",
+   "content": "【什么情况】开发企业管理-企业基本信息详情页缺「资质信息」整块，要件（附件）列表也不显示。已知记忆只覆盖「附件统一走 listAppendixPackage，busCode 区分业务、busId 取业务主键」，本条补充 Web 端只读展示组件的更深细节，与之不重复。\n\n【为什么 & 怎么做】\n① 资质信息：在「办公信息」与「要件上传」之间新增区块，用 DetailTemplate + buildQualificationContentInfo 渲染；备案数据加载成功后调 POST /company/qualification/pageNoPermissions 取首条，用 normalizeQualificationRow 归一化（后端字段不规整，不要直接绑原对象）；同时补字典 company_qualification_type、company_qualification_level，用字典转中文而非硬编码。\n② 要件上传：components/AppendixPackageSection/index.vue 的只读模式调 listAppendixPackage 时，参数必须与上传组件 AnnexUpload 完全对齐——只传 busId 不够，还要带 companyId/projectId/buildingId，否则后端按业务维度查不到记录，页面表现为「有附件但空列表」。\n③ 时序坑：企业端 getOwnCompany 回填 detail.companyId 是异步的，onMounted 首拉时 companyId 还是空值，必须 watch(() => detail.companyId) 在回填后再拉一次附件。\n④ e2e 覆盖：企业端「查看本企业信息」断言资质信息可见；有 companyRecordId 时校验 listAppendixPackage 请求同时含 busId 与 companyId。",
+   "evidence": "会话「开发企业管理-企业基本信息，详情页缺少资质信息且要件信息也没显示」最终结论：DeveloperBasicInfoDetail.vue 增加资质区块并调 /company/qualification/pageNoPermissions、补两个字典；AppendixPackageSection/index.vue 只读模式与 AnnexUpload 对齐增加 companyId/projectId/buildingId，并监听 detail.companyId 避免 getOwnCompany 回填后不再拉附件；company-record-flow.spec.js 增加断言",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/DeveloperBasicInfoDetail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/developerBasicInfoContent.js",
+    "zhi2-web-admin/src/components/AppendixPackageSection/index.vue",
+    "zhi2-web-admin/e2e/company/company-record-flow.spec.js"
+   ],
+   "baseline": "5f4e1614",
+   "sessionIds": [
+    "3005c34e-34a1-4ca2-8aba-d990a0327a79"
+   ],
+   "bundle": "039.md"
+  },
+  {
+   "title": "企业/项目附件没有独立接口：全部复用 listAppendixPackage「要件包」，靠 busCode + 多维过滤区分",
+   "type": "pattern",
+   "content": "场景：在苏州房地产监测V3（monorepo 只有前端主仓 + zhi2-web-admin 子模块，仓库内没有任何 Java/Spring 服务，「企业附件/项目附件」的后端契约只能从前端调用点、e2e 打桩和联调记录反推）里找「配置附件」能力时，不要去找 enterpriseAttachment/projectAttachment 之类的接口，它们不存在。\n为什么：企业级与项目级附件共用同一个要件包接口 POST /file/appendix/listAppendixPackage（网关前缀 /api/v3.0），级别由业务编码决定而非由独立 URL 决定。\n怎么做：请求体 = busCode（必传，来自菜单 meta.busCode 或前端常量）+ 可选 busId / companyId / projectId / buildingId / presalePermitId / autoBind。busId 不传只返回配置骨架（用于新增页渲染空要件位）；autoBind:false 表示只读取、不回挂默认业务附件；configOnly 模式下只传 busCode 不传其余过滤字段。真正权威的请求体构造只有 components/AnnexUpload/index.vue 的 buildListAppendixPackageQuery 与 AppendixPackageSection，新页面应复用这两个组件而不是自己拼包。另有两套旁路：/file/appendixConfig/*（附件配置维护，列表页 mixin 自动拼）与旧的 /file/file/*（文件表 CRUD）。\n与已知清单差异：已知条目只写了「busCode 区分业务、busId 取业务主键」，本条的增量是 busId 省略返回骨架、autoBind、configOnly、以及 companyId/projectId/buildingId/presalePermitId 四个过滤维度与权威构造点。",
+   "evidence": "会话问「find the APIs related to attachments configured at ENTERPRISE and PROJECT level」，结论明确写「这个仓库没有后端 Java 代码」「企业附件/项目附件并不存在独立的接口，二者共用同一个「要件包」接口 POST /file/appendix/listAppendixPackage」；zhi2-web-admin/src/api/fwgl/fjgl.js:57-64 的 getShareFile 即该 url；AnnexUpload/index.vue:493-505 构造 {busCode,busId,companyId,projectId,buildingId,...queryData}；ZsSubmit/index.vue:121-124 传 autoBind:false。",
+   "files": [
+    "zhi2-web-admin/src/api/fwgl/fjgl.js",
+    "zhi2-web-admin/src/components/AnnexUpload/index.vue",
+    "zhi2-web-admin/src/components/AppendixPackageSection/index.vue",
+    "zhi2-web-admin/src/components/ZsSubmit/index.vue",
+    "zhi2-web-admin/src/utils/appendix.js"
+   ],
+   "baseline": "114af19b",
+   "sessionIds": [
+    "sess_subagent_agent_9f2817ae-1780-442c-aab4-82716458bd16"
+   ],
+   "bundle": "040.md"
+  },
+  {
+   "title": "后台详情页「基本信息」与 zs-tabs 之间出现巨大空白：.detail-from-container 的 flex:1 撑满剩余高度",
+   "type": "bug",
+   "content": "现象：项目备案详情（customerProject/detail.vue）里「基本信息」表单区和下面的 zs-tabs 之间有一大块空白，改 Tab 卡内的 padding/gap 完全不起作用，用户反复反馈「没变化」。\n根因：detail-container 是一个纵向 flex 容器，而表单区和 zs-tabs 是它的两个并列子节点（不是同一张 tabs--card 里的上下结构）。.detail-from-container 写了 flex:1，会把表单区撑满剩余高度，于是 zs-tabs 被顶到页面很下面，中间空出的就是被撑出来的部分。\n解法：在全局样式 styles/index.scss 里按结构兜底——当 detail-container 直接包含 zs-tabs 时，.detail-from-container 改为 flex:0 0 auto（高度随内容），zs-tabs 改为 flex:1，让表格在 tabs-content 内部滚动。改完必须硬刷新（Ctrl+F5）验证，否则会误判为没生效。\n教训：调间距前先确认两个元素在 DOM 里是否是兄弟节点、父容器是否为 flex，再判断是 margin/gap 还是 flex 撑高造成的；同源复制的其他后台详情页（detail-template 体系）都吃这条全局规则。",
+   "evidence": "用户诉求「这2个间距为什么这么大？」→「竖向，全局处理」→「没变化」→「基本信息和下面的tab之间的间距」。最终结论：「「基本信息」和 zs-tabs 是 detail-container 下的两个并列子节点，并不是同一张 tabs--card 里的上下结构。之前改的 Tab 卡内 padding/gap 碰不到这条 DOM」「真正拉开距离的是 .detail-from-container 写了 flex: 1」；修复即 flex:0 0 auto + zs-tabs flex:1。",
+   "files": [
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/detail.vue",
+    "zhi2-web-admin/src/views/company/companyApplyAudit/detail.vue"
+   ],
+   "baseline": "7f34bd88",
+   "sessionIds": [
+    "9e24bb6d-a477-4e3c-8373-f4b406541525"
+   ],
+   "bundle": "040.md"
+  },
+  {
+   "title": "要件面板同时合并多个 busCode 会导致业务编码错乱 + 接口被重复调用（切换开关时调用次数翻倍）",
+   "type": "bug",
+   "content": "现象：租赁从业人员备案详情里，身份证要件显示的不是附件配置里的名称（应为「身份证原件正反面」），Network 里请求用的是 zljghtsq 而不是本业务编码；并且切换「是否合同操作员」时 listAppendixPackage 被调 4~6 次（选「是」4 次、选「否」2 次），用户逐轮纠正次数。\n根因：为了让「合同操作员」多出授权书类要件，实现里引入了 secondaryBusCode/extraBusCodes，把 zlcyryba 与 zljghtsq 两个业务编码的要件包各拉一次再 merge；同时「是否合同操作员」的 watch 和字段联动各自触发一次拉取，叠加后就成了多次请求。多源 merge 还会让要件名称/排序以错误的那份配置为准。\n解法：一个附件面板只认一个 busCode，单一数据源。身份证与授权书都从 zlcyryba 的配置里按「是否合同操作员」过滤展示（否=仅身份证类，是=身份证+授权书），删掉双 bus 合并、secondaryBusCode/extraBusCodes 参数、常量 LEASE_CONTRACT_OPERATOR_APPENDIX_BUS_CODE，以及保存时的第二套附件字段与校验；编辑/查看只调一次 listAppendixPackage。切换开关时预期恰好 1 次请求，可据此做验收。\n与已知清单差异：已知只约定「附件统一走 listAppendixPackage、busCode 区分业务」，本条补充反模式——不要为差异化展示去合并多个 busCode，差异应在同一份配置内按业务字段过滤。",
+   "evidence": "用户诉求：「这个没从附件配置里面读取？接口返回的是“身份证原件正反面”」→「为什么接口用的是 zljghtsq 这个业务编码，而且调用了很多次」→「我切换是否合同操作员选项时会调用很多次附件接口」→「现在还是会调用6次」→「都不对，选是调了4次，选否调了2次」。最终结论：改为只使用 zlcyryba，「删除双 bus 合并、zljghtsq 相关逻辑」「去掉 secondaryBusCode、extraBusCodes、双包 merge」「编辑/查看只调一次 listAppendixPackage」「切换时每次应只有 1 次 listAppendixPackage」。",
+   "files": [
+    "zhi2-web-admin/src/utils/leasePersonnelAppendix.js",
+    "zhi2-web-admin/src/utils/appendix.js",
+    "zhi2-web-admin/src/components/AppendixPackageSection/index.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/index.vue",
+    "zhi2-web-admin/src/views/institution/leasePersonnel/components/LeasePersonnelDetail.vue",
+    "zhi2-web-admin/src/views/institution/leasePersonnel/components/LeasePersonnelAppendixBlock.vue"
+   ],
+   "baseline": "ed13ca0b",
+   "sessionIds": [
+    "696d149c-eaf2-422f-b219-3b57197f90e0"
+   ],
+   "bundle": "040.md"
+  },
+  {
+   "title": "Web 后台「按钮不显示」先查数据状态条件，不要先怀疑权限",
+   "type": "bug",
+   "content": "现象：资质备案详情页「变更」按钮消失。排查顺序应是：①看按钮绑定的显示条件而非权限配置——`src/views/toB/qualificationRecord/detail.vue:90` 的 `canChange(){ return this.hasQualification && String(this.form.bizState) === '2' }`；②用管理端接口取该条记录的真实字段值；③换一个状态正常的账号（E2E 开发企业账号）打开同一页面做对照，即可排除权限（权限串 company:qualificationRecordChange:change 全库都有配置）。根因：企业主体备案已 bizState=2，但资质子记录 bizState 仍是 0——备案通过时后端没有把状态回写子表。判定是否系统性问题的方法：把 27 条资质记录与所属企业的 bizState 全量对账，发现 8 条不一致且方向一致（企业 2 或 3、资质仍 0），另有 2 条反向（资质 2、企业 3），说明是状态回写遗漏而非单条脏数据。修法：短期前端放宽为「资质 bizState===2 或 所属企业 bizState===2」（代码注释已写明后端 getLast 亦有校验兜底，前端不必卡死），长期要后端在备案/审核通过时回写子表并订正存量。同源项目复用：凡「父表状态驱动子表按钮显隐」的页面都要检查同步遗漏。",
+   "evidence": "会话 session_8a4cdef2d3cc6b0f144806afea15e468 最终结论：canChange 条件 String(bizState)==='2'，截图记录 bizState=0 而企业备案 bizState=2；27 条资质记录对账出 8 条不一致；给出前端放宽 + 后端补同步两条修法。",
+   "files": [
+    "zhi2-web-admin/src/views/toB/qualificationRecord/detail.vue"
+   ],
+   "baseline": "114af19b",
+   "sessionIds": [
+    "session_8a4cdef2d3cc6b0f144806afea15e468"
+   ],
+   "bundle": "041.md"
+  },
+  {
+   "title": "el-form 套进三列 grid 的 section-form 内，会把表单压成 1/3 宽",
+   "type": "bug",
+   "content": "现象：编辑态表单整块偏左、字段挤成一团、经营地址/经营范围被压窄。根因：全局 `.section-form` 是三列 grid 布局，为给 `el-form-item` 补一个 `el-form` 祖先，在 `section-form` 里面又插了一层 `el-form`；这层 `el-form` 在父 grid 里只算一个格子，只能拿到 1/3 宽，其内部再按三列切分，字段就被二次压缩。修法：删掉内层多余的 `el-form`，让 `el-form-item` 直接作为 `section-form` 的 grid 子项，与 AgencyBasicInfoForm.vue、DeveloperBasicInfoForm.vue、LeaseEntryNetworkSections.vue 的结构保持一致；同时删掉当初只为绕开嵌套而加的 `.section-form > .el-form` grid 覆盖样式。注意移除后要确认每处都有 `el-form` 祖先：B 端详情页有 `zs-form`，而主管端 AgencyEntryNetworkAdminDetail.vue 的 Sections 原本没有，只读的「业务范围」会因 inject elForm 失败渲染报错，需补一层 `zs-form`。验证方式：Playwright 登录该页在 1920 宽下量尺寸并截图，编辑态半宽字段回到 508px、整行 1588px。",
+   "evidence": "会话 session_ae7541320d3fcf746bb98572a4423d1b：根因是 10 月 19 日重构 e7126e99a 为补 el-form 祖先在 section-form 内插入一层 el-form，导致只能拿 1/3 宽；修复后 Playwright 量得 508px/1588px。",
+   "files": [
+    "zhi2-web-admin/src/views/.../AgencyEntryNetworkSections.vue",
+    "zhi2-web-admin/src/views/.../AgencyEntryNetworkAdminDetail.vue",
+    "zhi2-web-admin/src/views/.../AgencyBasicInfoForm.vue",
+    "zhi2-web-admin/src/views/.../LeaseEntryNetworkSections.vue"
+   ],
+   "baseline": "114af19b",
+   "sessionIds": [
+    "session_ae7541320d3fcf746bb98572a4423d1b"
+   ],
+   "bundle": "041.md"
+  },
+  {
+   "title": "嵌套 el-form 让 el-form-item 注册到内层，validate() 静默失效且必填从不生效",
+   "type": "bug",
+   "content": "Element Plus 的 `el-form-item` 会注册到最近的 `el-form` provide 上。当页面里为了补祖先而多套一层 `el-form` 时，「业务范围」的 `el-form-item` 注册在内层，而真实提交时 `formRef.validate()` 校验的是外层 form，于是 `businessScenario` 的必填规则从未真正生效——不报错、不拦截，属于静默缺陷，只有读代码或故意留空提交才能发现。判据：某个字段的必填规则看起来配了却从不拦截，先查该 form-item 与 formRef 是否属于同一个 el-form 实例。修法：让 form-item 与 formRef 处在同一层 el-form（删掉中间层包裹）后，规则立即生效。副作用处理：规则生效后，业务范围为空时一进编辑态就飘红，需在 `enterEntryNetworkEdit` 里补一次 `clearValidate()`，进入编辑时干净、点保存照常拦截。若产品更希望「进编辑就提示必填」，则去掉 clearValidate 即可。",
+   "evidence": "同会话指出：原来「业务范围」的 el-form-item 注册在内层 el-form 上，formRef.validate() 校验的是外层，businessScenario 必填规则从未真正生效；修复后在 enterEntryNetworkEdit 补 clearValidate() 避免进编辑即飘红。",
+   "files": [
+    "zhi2-web-admin/src/views/.../AgencyEntryNetworkSections.vue",
+    "zhi2-web-admin/src/views/.../AgencyEntryNetworkDetail.vue"
+   ],
+   "baseline": "114af19b",
+   "sessionIds": [
+    "session_ae7541320d3fcf746bb98572a4423d1b"
+   ],
+   "bundle": "041.md"
+  },
+  {
+   "title": "V3 接口规范：只有 CRUD 接口是四段路径，业务接口一律三段",
+   "type": "pattern",
+   "content": "本项目（苏州市房地产监测V3 / zhi2-web-admin）的接口路径段数规则：只有标准增删改查接口才带动作段构成四段（如 `/prefund/tradeDetail/detail`），其余业务接口一律三段（module + entity/action），不存在四段。批量做「V3 规范改造」时极易误伤：脚本只对 CRUD 接口补了 `/detail`、`/add`，却把非 CRUD 业务接口也一起补上，导致 `/getVendeeListByContractNo/detail`、`/queryBalanceAmount/detail`、`/openAccountRecord/detail`、`/startFlow/detail`、`/beProjectList/add` 这类错误路径。排查/修复套路：①全局扫描 `src/api` 目录里所有 URL 字符串，筛出四段路径；②逐条判断是否真 CRUD，非 CRUD 就删掉末尾的 `/detail` 或 `/add`，保留 module/entity 前缀与 body 参数不动；③与同项目的 `contractRequest.js`、`account.js` 以及页面内 `$post` 直调路径交叉比对，确认同一接口在各处写法一致；④V2 原生四段路径（如 `contractView/list`）与标准三段 CRUD 不要动。该轮一次性修复了 30 个 api 文件共 57 处，最终仅保留 `/system/dict/data/detail`、`/system/dict/type/detail` 两处真 CRUD。不确定的接口要先问用户再改。",
+   "evidence": "会话 d2a25c11：用户指出「只有增删改查接口有调整，剩下的接口都保持原样，不存在4段接口，都是三段的」，最终修复 57 处/30 文件，复检仅剩 dict data/type 两处四段路径。",
+   "files": [
+    "zhi2-web-admin/src/api/presale/contractMainInfo.js",
+    "zhi2-web-admin/src/api/finance/vendee.js",
+    "zhi2-web-admin/src/api/finance/account.js",
+    "zhi2-web-admin/src/views/contract/utils/contractRequest.js",
+    "zhi2-web-admin/src/utils/apiV3Normalize.js",
+    "zhi2-web-admin/src/api/system/dict/data.js"
+   ],
+   "baseline": "1c445c77",
+   "sessionIds": [
+    "d2a25c11-5573-4bb1-8287-710071ae4f2f"
+   ],
+   "bundle": "041.md"
+  },
+  {
+   "title": "V3 删除接口的请求体是裸 ID 数组，不要包成 { xxxIds: [] }",
+   "type": "pattern",
+   "content": "V3 规范要求删除接口直接发送裸 ID 数组，例如 `[26]`，而不是 `{ \"contractIds\": [\"26\"] }`。项目的 `table.js` mixin 默认就按 v1 语义发裸数组，所以只要不在页面里覆盖 `deleteType` / `deleteParamKey` / 自定义 `deleteRequest`，行为就是对的。常见错误来源：早期为兼容 V2 在页面里写了 `deleteType: 'v2'`、`deleteParamKey: 'contractIds'` 和自定义 deleteRequest，做 V3 改造时忘了删，导致请求体格式与规范不符。修法：①`contractMainInfo/index.vue` 移除上述三个 V2 兼容配置，交回 mixin 默认；②`contractRequest.js` 里 `delContractMainInfo` 由 `{ contractIds: [contractId] }` 改为 `[contractId]`；③不要用字符串 ID，数字 ID 数组；④补 E2E 断言 Request Payload 为裸数组（如 `deleteFirstDeletableContract` + `isContractSignDeleteResponse`），并在浏览器 Network 面板人工确认一次。排查时优先搜 api 层与页面里的 deleteType/deleteParamKey 残留，这是 V2→V3 迁移最容易漏的一类。",
+   "evidence": "会话 14897e1d：用户要求「参数格式要按照V3规范来」，修改前后对比为 `{ \"contractIds\": [\"26\"] }` → `[26]`；移除 deleteType:'v2'/deleteParamKey:'contractIds'/自定义 deleteRequest，并在 contract-sign-pre-real-api-flow.spec.js 增加删除断言。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/contractMainInfo/index.vue",
+    "zhi2-web-admin/src/views/contract/utils/contractRequest.js"
+   ],
+   "baseline": "5f4e1614",
+   "sessionIds": [
+    "14897e1d-157a-4ce7-b713-17f06634695c"
+   ],
+   "bundle": "041.md"
+  },
+  {
+   "title": "动态菜单 path 少一个斜杠被规整成同路径，vue-router 先注册者抢占导致详情页打开错误组件",
+   "type": "bug",
+   "content": "什么情况：Web 后台（若依风格动态菜单）「管理员维护」点查看，始终打开的是「管理员变更」详情，页面报「变更单不存在」，但 component 路径本身是对的。为什么：后台菜单里维护详情的 path 写成 companyAdmin:/tableid（冒号前缺斜杠），前端 normalizeRouteTableIdSegment 用 replace(/:\\/tableid/gi, '/:tableid') 把它规整成 companyAdmin/:tableid，与变更菜单的 path 完全一致；vue-router 对相同 path 是「先注册者优先」，排在前的变更菜单就吃掉了跳转。怎么做：①一条菜单 path 对应一个业务实体，冒号前必须有斜杠（维护公司 companyAdmin/:tableid、变更 companyAdminChange/:tableid），不要靠前端规整「猜」；②在 src/utils/ruoyi.js 增加 pathResolvesToFile()：把 path 解析出的路由组件与期望的页面文件比对，不一致就跳过该 path 候选、改走命名路由，这样后台菜单短期没改也不会点错；③变更已无独立列表页（改在备案详情里发起），只配隐藏详情菜单，不要配指向不存在组件的列表菜单。差异：已知清单里没有任何路由/菜单层面的条目，这是本项目新增的根因与解法。",
+   "evidence": "用户诉求「管理员维护进详情应请求 /company/companyAdmin/detail，现在请求了 /company/companyAdminChange/detail」；最终定位为菜单 path 笔误 companyAdmin:/tableid 被 ruoyi.js:258 的 normalizeRouteTableIdSegment 规整成与变更菜单同路径，vue-router 同路径先注册者优先；随即在 src/utils/ruoyi.js 增加 pathResolvesToFile() 兜底。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/views/company/companyAdmin/developer/detail.vue",
+    "zhi2-web-admin/src/views/company/companyAdminChange/developer/detail.vue"
+   ],
+   "baseline": "114af19b",
+   "sessionIds": [
+    "session_da094e74ac55769c94f3fab056fd9453"
+   ],
+   "bundle": "042.md"
+  },
+  {
+   "title": "Web 后台详情页要件统一走 AppendixPackageSection + requirement-grid，表底总条数统一用 zs-pagination 关闭分页器",
+   "type": "pattern",
+   "content": "什么情况：分支机构详情、机构入网备案详情、入网审核详情都要展示「要件材料」和「共 N 条记录」，容易各写一套。约定（本项目 Web 后台，Element Plus）：①要件在查看态必须与编辑态/入网审核保持一致，统一用 AppendixPackageSection + requirement-grid 卡片网格渲染；页面里不要再保留 requirementPackages / appendixContentInfo / loadRequirementPackages 这类自己拉附件包再拼的重复逻辑，详情里只拉一次、交给组件内部处理，避免和编辑态出现两套展示。②表格下方的「共 N 条记录」不要手写 footer 文本，统一写 <zs-pagination :total=\"list.length\" :show-pagination=\"false\" />，查看态详情（AgencyBranchDetail）与编辑态面板（ServiceSchemePanel）都用这一句，保证与列表页的分页条样式、字号、间距同源。③总数传的是前端已加载数组长度，不是接口 total，因为这几处都是一次性全量返回。差异：已知条目 #89 讲的是附件接口 listAppendixPackage（接口层），本条是 Web 端展现层的组件复用约定，两者不重复。",
+   "evidence": "分支结构详情改为 AppendixPackageSection + requirement-grid，并移除 requirementPackages、appendixContentInfo、loadRequirementPackages 及详情里重复拉包逻辑；三处表格下新增仅展示总数的 zs-pagination（:show-pagination=\"false\"）。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchDetail.vue",
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/ServiceSchemePanel.vue",
+    "zhi2-web-admin/src/views/company/companyRecordAgency/detail.vue",
+    "zhi2-web-admin/src/styles/detail-form.scss"
+   ],
+   "baseline": "4555c0d1",
+   "sessionIds": [
+    "f5699df1-2d0b-4ac2-b011-337f320d4b34"
+   ],
+   "bundle": "042.md"
+  },
+  {
+   "title": "Web 后台新增业务模块的 Playwright 真实接口流程 E2E 组织套路（spec + 菜单 fixture + 独立账号缓存）",
+   "type": "workflow",
+   "content": "什么情况：给一个新模块补 E2E，若直接复用别人写死的菜单/账号，用例会互相污染、也无法证明走的是真实接口。本项目（zhi2-web-admin）的固定套路：①用例放 e2e/<模块>/xxx-real-api-flow.spec.js，按端拆流程（企业端 init/page/save 一组断言请求路径与关键字段，主管端 pageManage 一组），不 mock 接口；若某接口版本不支持某字段（如某端无 personnelType/photo），在用例里明确断言「不带该字段」而不是删掉不测。②新增 e2e/fixtures/<模块>-menu-config.js，只声明本模块的菜单项（如 zljg/agencyPersonnel/index），由 fixture 注入路由，避免依赖真实后台菜单是否已配置。③账号走独立环境变量（如 PLAYWRIGHT_LEASE_COMPANY_USERNAME/PASSWORD），同步写进 e2e/.env.e2e.example；登录复用写在 fixtures/auth-helpers.js，固定三个函数：assertXxxCredentials（缺凭据直接失败并提示怎么配）、loginAsXxxOnce（登录态缓存）、resetXxxLoginCache（用例间复位），避免每个 spec 各自登录。④加独立 npm script（如 test:e2e:lease-personnel），开录屏并把多段视频合并成单个 webm 便于回看。运行前需确认后台已挂对应路由与权限。差异：已知清单无 E2E 相关经验。",
+   "evidence": "新增 e2e/zljg/lease-personnel-real-api-flow.spec.js（企业端 init/page/save 校验走 /company/leasePersonnel/**、主管端 pageManage）与 e2e/fixtures/zljg-menu-config.js；账号用 PLAYWRIGHT_LEASE_COMPANY_USERNAME/PASSWORD，auth-helpers.js 提供 assertLeaseCompanyCredentials、loginAsLeaseCompanyOnce、resetLeaseCompanyLoginCache；新增 npm run test:e2e:lease-personnel，录屏合并为 e2e/output/lease-personnel-full.webm。",
+   "files": [
+    "zhi2-web-admin/e2e/zljg/lease-personnel-real-api-flow.spec.js",
+    "zhi2-web-admin/e2e/fixtures/zljg-menu-config.js",
+    "zhi2-web-admin/e2e/fixtures/auth-helpers.js",
+    "zhi2-web-admin/e2e/.env.e2e.example",
+    "zhi2-web-admin/src/views/zljg/README.md"
+   ],
+   "baseline": "6b3ac5a7",
+   "sessionIds": [
+    "eb6a9251-f5a8-4caf-b277-c011cd96ca50"
+   ],
+   "bundle": "042.md"
+  }
+ ]
+}

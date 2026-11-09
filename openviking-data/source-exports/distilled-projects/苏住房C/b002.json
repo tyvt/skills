@@ -1,0 +1,264 @@
+{
+ "project": "苏住房C",
+ "batch": 2,
+ "files": [
+  "005.md",
+  "006.md",
+  "007.md",
+  "008.md"
+ ],
+ "count": 13,
+ "memories": [
+  {
+   "title": "苏服办网关 404 根因：路径段 jpass 与 jpaas 仅差一字母，且生产地址被复制进全部 env",
+   "type": "bug",
+   "content": "什么情况：苏住房 C 微信小程序（zhi2-mobile-shimin）上架苏服办 APP 后，网关接口一律 404。接口在苏服办平台上「已审核通过上架」、平台自带调试工具也能成功，唯独 APP 内失败；用户从 vconsole 复制的 curl 同样复现。\n\n为什么：网关域名 https://ydzt.jszwfw.gov.cn/api-gateway/ 之后的路径段被写成 jpass-jags-server，而平台实际部署的是 jpaas-jags-server（jpaa s vs jpa s，只差一个字母）。平台调试工具用的是后端配置里的真实路径，所以永远成功；前端自己拼的地址永远是错的。这类 404 极易被误判成「接口没上架 / 签名不对 / app_id 没授权」，因为签名是在 404 之后才轮得到的。\n\n怎么做：① 判定顺序固定为「先比对网关路径段逐字符，再查签名」——用户在平台调试成功、在 APP/curl 失败，就是地址问题而非签名问题；② 网关 baseURL 有四处来源，必须一起改：src/api/gateway.js 的默认 baseURL、.env.production / .env.development / .env.test、src/api/dispatcher.js 里的备用默认地址；只改 .env 会在默认值兜底的分支上继续打旧地址；③ 改完必须重新 build 上架（H5 资源打进 APP，热更新不生效）。排查时让用户直接贴 vconsole 的完整请求 URL，比让他描述错误现象快得多。",
+   "evidence": "会话 4df034d6：用户连续 6 轮贴 curl / vconsole 截图报 404，并强调「接口已审核通过上架，平台上调试也能成功」；最终结论为网关路径统一改为 https://ydzt.jszwfw.gov.cn/api-gateway/jpaas-jags-server/interface/gateway.do，修改 gateway.js / dispatcher.js / 三个 .env 文件后重新 build 上架。",
+   "files": [
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/api/gateway.js",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/api/dispatcher.js",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/.env.production",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/.env.development",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/.env.test"
+   ],
+   "baseline": "a444c05",
+   "sessionIds": [
+    "4df034d6-5428-475e-a245-aa9dbd5ba53f"
+   ],
+   "bundle": "005.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "同源分支大合并（main-v2.1 → mp 微信小程序分支）的冲突裁决三层规则与 118 文件落地",
+   "type": "workflow",
+   "content": "什么情况：苏住房 C 的 zhi2-mobile-shimin 是「同源多端复制」项目，main-v2.1（H5/业务主干）与 main-v2.1-mp（微信小程序分支，目录已重构为 pages_main / pages_tab / @/ 别名）需要合并，产生 118 个冲突文件。\n\n为什么：两个分支各自演进了「结构」和「逻辑」——mp 分支动的是目录与导入方式，主干动的是业务能力。若无明确裁决规则，逐文件凭感觉解冲突，必然把 mp 的 pages_main 结构改回老目录，或把主干已删除的历史功能（pdf-viewer、苏服办 sfb 相关内容）重新引入。\n\n怎么做：按三层规则裁决——①结构以本端为准：目录、导入别名、pages.json 结构一律取 mp 分支（pages_main/pages_tab/@/），只从主干取业务逻辑（createHttpClient、menuStore.loadMenu()、usePageLoading、usePaging、setupZPaging）；②配置类文件做加法：.env.* 保留 mp 的测试代理地址并补 VITE_APP_VCONSOLE，package.json 保留 dev:mp-weixin / build:mp-weixin 脚本并合并缺失依赖（axios、vconsole、vue-router、vue3-pdfjs、z-paging，去重），vite.config.ts 用 mp 的 H5-only 插件结构加 z-paging alias；③modify/delete 与已下线功能：主干已删除的文件（pdf-viewer）保持删除，mp 独有的本地区域实现（*_Jiayuanqu.vue、useFaceVerify.js、face.vue）保留 HEAD，pages.json 只追加确实存在的新路由（pages_benefit/* / pages_property/*），不要添加目录里并不存在的 pages/index/home|project|community。合完先跑一次构建验证：根目录无对应构建脚本时必须在子项目 zhi2-mobile-shimin 内执行，构建过程中暴露的 import 路径、MenuCard、ZsPaging 动态 slot、@dcloudio/uni-h5 引用问题属于合并后遗留，要一并修掉再提交。",
+   "evidence": "会话 d4075eb9（基线 9832ba3）：解决 118 个冲突文件并提交 a4811aa0，最终结论记录了逐领域决策表、pages.json 路由取舍、构建需在子项目执行（dist/build/mp-weixin 构建成功）以及合并后未提交的构建修复。",
+   "files": [
+    "d:/repository/苏住房C/zhi2-mobile-shimin/.env.development",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/.env.production",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/.env.test",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/package.json",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/vite.config.ts",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/App.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/main.ts"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "d4075eb9-fc01-4ade-bd2d-2e455874b45c"
+   ],
+   "bundle": "005.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "跨端复刻默认图口径：以 Android 原生工程为权威源，全量排查同名副本并删冗余，不动灰色剪影",
+   "type": "preference",
+   "content": "什么情况：用户要求「参考 D:/repository/suzhufang-android-app 改默认图片」「个人信息里的默认头像也要改」「卡通女性头像这个文件还有哪里在用，全部替换，然后删掉」。\n\n为什么：苏住房 C 同时存在 Android 原生 APP 与微信小程序两端，小程序里的卡通女性默认头像与原生端 ilo 不一致；而小程序是分包结构，同一个 default-avatar.png 在不同分包 static 下各有一份物理副本，只改一处会让部分页面（个人信息、机器人消息、新房详情、业委会申请、自动客服、消息聊天）仍显示旧图。\n\n怎么做：①默认素材的权威源是 Android 原生工程同名资源——先在其 res 里找到目标图（此处为 icon_header.png），以它为基准替换，不要自行找图；②改用 grep 文件内容里的引用路径 + 按 basename 全仓搜索两条线枚举，本次共 5 处：pages_my / pages_owner / pages_owner_extra / pages_transaction 四个分包的 static/images/default-avatar.png 全部替换，再删除主包 src/static/images/default-avatar.png 与 pages_tab 根目录的重复副本；③同步改两处代码：My_Jiayuanqu.vue 改指 images/my/default-avatar.png，utils/index.js 从分包映射里移除已不存在的 pages_tab/default-avatar.png，否则映射表会指向不存在的文件；④近名字资源必须隔离判断：default-avatar-gary.png（灰色剪影，用于未登录/门卫端）不是同一文件，不替换不删除；⑤改完要重新构建，dist 里仍是旧产物，不重建等于没改。这类「改默认图」每次都要顺带做一次冗余副本清理，否则下一次改图还会漏。",
+   "evidence": "会话 c3ed7f35（基线 0cea241）：用户 4 轮依次要求参考 Android 工程改默认图、改个人信息头像、全量替换并删除卡通女性头像；结论列出 4 处替换 + 2 处删除 + 2 处代码调整，并明确 default-avatar-gary.png 保留、需重新 build。",
+   "files": [
+    "D:/repository/suzhufang-android-app/app/src/main/res/layout/fragment_my.xml",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/utils/index.js",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_tab/components/My_Suzhufang.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages/index/my.vue"
+   ],
+   "baseline": "0cea241",
+   "sessionIds": [
+    "c3ed7f35-ce50-47d7-af6b-374b855d274e"
+   ],
+   "bundle": "005.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 真机页面白屏而模拟器正常：公共组件里 getCurrentInstance().ctx.$attrs 在真机上 ctx 为 undefined",
+   "type": "bug",
+   "content": "情况：苏住房C 市民端（zhi2-mobile-shimin）pages_owner_extra/family/memberForm 页在微信真机上整页空白，微信开发者工具模拟器却完全正常；同目录的 family/index 列表页反而能正常打开。\n\n为什么：memberForm 用了两个 ZsPicker，而 ZsPicker 内部有一行未使用却会在初始化阶段执行的代码 `const attrs = ref(getCurrentInstance().ctx.$attrs)`。真机微信小程序运行时里 getCurrentInstance().ctx 常为 undefined，于是取 .$attrs 时抛错，组件 setup 直接崩，连带整页白屏。模拟器环境更宽松，取值不报错，所以问题在开发阶段完全不暴露。列表页没用 ZsPicker，因此不受影响——这正好解释了「只有一个页面白」。\n\n怎么做：① 先按「用了哪些公共组件」缩小范围，把崩溃页与正常页的组件引用做差集，别一上来怀疑页面自己的逻辑；② 跑到公共组件内部找初始化期会执行的 getCurrentInstance / ctx / proxy 取值，这类防御性缺失在真机上必炸；③ 删掉纯未使用的 getCurrentInstance 调用，而不是加 ?. 兜住——它本来就没人消费；④ 顺手把弹层 ref 改成 ref(null)，并确认页面跳转走绝对路径（/pages_owner_extra/family/memberForm）而不是相对路径。\n\n验收口径：模拟器通过不算通过，必须真机（真机调试看 Console）复跑。",
+   "evidence": "会话 82516bfa：用户先说 empty 图真机没展示，再报「真机上进入 pages_owner_extra/family/member/add 页面空白，模拟器是好的」，连提三次仍空白。最终结论定位到 ZsPicker 里未使用的 `const attrs = ref(getCurrentInstance().ctx.$attrs)`，真机 ctx 为 undefined 导致组件初始化抛错整页白屏；删除该行、popup 改 ref(null)、跳转改绝对路径后恢复。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsPicker\\ZsPicker.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\family\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner_extra\\family\\memberForm.vue"
+   ],
+   "baseline": "b7bf813",
+   "sessionIds": [
+    "82516bfa-31ef-44c0-9835-1b565029f672"
+   ],
+   "bundle": "006.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "H5 子目录部署下 static/images/empty.png 等资源 404：绝对路径 /static/... 会请求到域名根，统一用 resolveStaticUrl 转相对路径",
+   "type": "pattern",
+   "content": "情况：苏住房C 市民端 H5 部署在 ydzt.jszwfw.gov.cn 的子目录下（vite 生产 base: './'），线上大量本地静态图 404，最典型的是空态图 `GET https://ydzt.jszwfw.gov.cn/static/images/empty.png`——请求打到了域名根目录而不是应用子路径。\n\n为什么：这些图在代码里写的是绝对路径 `/static/images/...` 或手写的相对路径 `../../static/...`。绝对路径会被浏览器解析到域名根；手写相对路径在嵌套很深的页面里层级也算错。两者在本地 dev（base 为 '/'、页面在根层）都看不出异常，只有部署到子目录才暴露。\n\n怎么做：在 utils/index.js 新增统一工具 `resolveStaticUrl(src, subpackage?)`——H5 生产环境生成 `./static/...` 或 `./page-query/static/...` 形式；同时增强 resolveMediaUrl，让它自动识别 `images/`、`/static/`、`/images/` 这类本地静态资源后走同一套解析。然后全量替换引用点（该次共 24 个文件：Tab 首页/我的/社区/项目、菜单组件、custom-tab-bar、store/menu.js、业务页、业主模块、查询分包），并把 ZsImage、ZsEmpty 这类基础组件的取图入口统一收敛进来。\n\n不需要改的：import 引入的图片、CSS 里的相对 url()、page-query 分包 CSS——这些构建期由 Vite 处理；menus.fallback.json 里的 /static/ 经 MenuImage → resolveMediaUrl 自动转换。\n\n验证：重新打包部署后重点核查空态图、首页顶部图与图标、底部 Tab 图标、在线服务卡片背景、分包内 PDF/图标。",
+   "evidence": "会话 91e19c66：用户报 `GET error: https://ydzt.jszwfw.gov.cn/static/images/empty.png`，再要求「全部排查一遍」。结论定位为 H5 部署在子目录（vite 生产 base: './'）而代码大量使用绝对路径 /static/... 与错误的运行时相对路径，新增 resolveStaticUrl 并增强 resolveMediaUrl，共改 24 个文件。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\index.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsEmpty\\ZsEmpty.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\vite.config.ts",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\.env.production"
+   ],
+   "baseline": "a444c05",
+   "sessionIds": [
+    "91e19c66-ea53-4696-8d39-418b79f76553"
+   ],
+   "bundle": "006.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房] ZsButton 的 width/padding 大面积失效：页面 scoped 样式作用不到自定义组件内部，收敛为全局 zs-button.scss 一套布局规则",
+   "type": "bug",
+   "content": "什么情况：苏住房C 小程序（zhi2-mobile-shimin）里大量页面按钮「宽度/padding/margin 不生效」，登录按钮只剩文字宽、决策详情底部「参与决策」不是长按钮；用户在四轮里连续报「全局排查一下」「还是有问题」「登录页按钮也不对了」，要求一类问题全局修复。为什么：ZsButton 是自定义组件，页面 style scoped 写了 .btn-login{display:block}/width 等规则，按小程序样式隔离根本作用不到组件内部的真实 <button> 节点；而组件自身又写了 width:auto / display 之类默认值，进一步压掉外部意图。逐个页面补 class 永远补不完。怎么做：新增 styles/zs-button.scss 统一维护全部按钮布局规则，在 uni.scss 全局引入（默认非 mini 全宽 width:100%；mini 保持 inline-flex 自适应；.btn-login 全宽+上下间距；.page-button-container/.submit-button-wrapper 内全宽；.button-group/.btn-container 内并排固定 300rpx；.popup-footer 内 220rpx×90rpx；搜索栏 .reset-button/.search-button 固定宽；.btn-block 内 fit-content），同时把 ZsButton 组件里会覆盖全局规则的 width:auto / display 去掉，只保留高度、padding、颜色。后续个别页面不对就往 zs-button.scss 补一条规则，不再改页面。",
+   "evidence": "会话 2a76ac67：用户 4 轮反复报按钮 padding/width 不生效、每次修完又暴露新页面（「问题更多了」「还是有部分按钮有问题，这个应该是个长按钮」「登录页按钮也不对了，可以全局所有按钮都排查一下吗？一类问题全局修复」）。最终结论明确根因是页面 scoped 样式作用不到自定义组件内部的 <button>，方案是新增 styles/zs-button.scss 在 uni.scss 全局引入并删除 ZsButton 里覆盖性的 width:auto/display。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ZsButton/ZsButton.vue",
+    "zhi2-mobile-shimin/src/uni.scss",
+    "zhi2-mobile-shimin/src/styles/btn.scss",
+    "zhi2-mobile-shimin/src/App.vue",
+    "zhi2-mobile-shimin/src/pages_owner/decision/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/decision/components/DecisionList.vue",
+    "zhi2-mobile-shimin/src/pages_owner/decision/styles/btn.css"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "2a76ac67-47ce-4046-a986-f88a0614d57f"
+   ],
+   "bundle": "007.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房] 小程序弹层内的日期选择器点了没反应：H5 下自定义遮罩 z-index:996 把弹层压在下面，改用 uni-popup + ZsDatePicker",
+   "type": "bug",
+   "content": "什么情况：苏住房C 小程序/H5 明细页「日期区间 → 选自定义」后点「开始日期 - 结束日期」区域完全没反应，控制台无报错；同时期还伴随 [Vue warn] Failed to resolve component: uv-datetime-picker。为什么：页面自己手写了一层 period-overlay 自定义遮罩（z-index:996），H5 下它盖在日期选择器弹层之上，点击被遮罩吃掉，看起来就是「点不动」；而日期控件仍沿用 uv-datetime-picker（uv-ui 生态），本项目并未引入该库，组件解析失败又被遮罩问题掩盖。怎么做：①删掉自定义 period-overlay 遮罩；②日期区间弹窗改用 uni-popup（与「类型」选择一致，tenant/index.vue 已验证可与日期组件配合）；③自定义日期统一换成项目封装的 ZsDatePicker type=\"range\"，点击即弹区间选择器。排查提示：小程序/H5 里「点击无响应但无报错」优先查是否有更高 z-index 的自绘遮罩拦截事件，再查控件组件是否真的被解析（uv-* 之类不属于本项目组件库），不要先去查业务逻辑。",
+   "evidence": "会话 c2002207 最终结论：「根因是 H5 下自定义遮罩层（z-index: 996）把日期选择器弹层挡在了下面，所以点击看起来完全没反应」，改动为去 period-overlay、改 uni-popup、自定义日期改 ZsDatePicker type=\"range\"；会话中用户贴出 Failed to resolve component: uv-datetime-picker 并要求「换成当前项目使用的组件库」。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_benefit/tenant/index.vue",
+    "zhi2-mobile-shimin/src/components/ZsDatePicker"
+   ],
+   "baseline": "200c2f3",
+   "sessionIds": [
+    "c2002207-e827-4fb1-95af-8409ac89d1b0"
+   ],
+   "bundle": "007.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房] 苏服办网关调用：GET 接口未上架时用 VITE_APP_SFB_GET_VIA_POST_INTERFACE + zs-method:GET 走 POST 通道；「404 请求接口不存在」是网关层不是业务后端",
+   "type": "workflow",
+   "content": "什么情况：苏住房C 移动端接苏服办（sfb）网关，请求头似乎没带上、日志只打印 content-type；拿请求/响应示例核对后，getConfigKey 仍返回「404 请求接口不存在」。为什么：小程序的请求头 + 业务日志不能靠猜，苏服办要求 interface_id（GET/POST 不同的接口 ID）、zs-path（真实后端路径，如 /system/config/getByKey/app.suzhufang.config）、sign / zs-sign、Content-Type，全部由拦截器统一注入；若把 header 打到 console 时对象带循环引用，会打印成 (Circular Object) 让人误以为头没加。而「404 请求接口不存在」是苏服办开放平台网关返回，说明该 interface_id 未上架或 ID 不符，与前端拼参无关。怎么做：①请求头统一在 httpInstance 注入，日志用可序列化副本打印（含 interface_id / zs-path / zs-method / 是否有 sign），不要直接 console.log 原始 config；②GET 请求 header 固定带 zs-method: GET，让后端能识别真实 HTTP 方法；③新增环境变量 VITE_APP_SFB_GET_VIA_POST_INTERFACE，=1 时 GET 改走 POST 接口 ID（如 szffluzm-whyhxx），=0 时仍用 GET 接口 ID（如 szffluzm-yhcq），production/test 默认 1，GET 接口上架后改回 0；④报「请求接口不存在」先到苏服办开放平台确认该接口是否上架、ID 是否一致，不要改后端路径；⑤同源项目（宿迁苏服办）的调用方式可作为核对基准。",
+   "evidence": "会话 fdcfee4e：用户依次报「苏服办相关的请求头好像没有加上」「打印的请求头里面只有一个 content-type」「这是现在打印的日志，和你描述的不一致」「system.js:4-7 这个好像被判断为POST接口了」，最终结论判定日志中 interface_id/zs-path/sign 均正常、Content-Type 为 x-www-form-urlencoded，响应 404 请求接口不存在是苏服办开放平台层拒绝，并新增 header 的 zs-method:GET 与环境变量 VITE_APP_SFB_GET_VIA_POST_INTERFACE=1 改走 szffluzm-whyhxx。",
+   "files": [
+    "zhi2-mobile-shimin/src/api/httpInstance.js",
+    "zhi2-mobile-shimin/src/api/dispatcher.js",
+    "zhi2-mobile-shimin/src/utils/sfb.js",
+    "zhi2-mobile-shimin/src/utils/sign.js",
+    "zhi2-mobile-shimin/src/utils/app.js",
+    "zhi2-mobile-shimin/src/api/system.js"
+   ],
+   "baseline": "a444c05",
+   "sessionIds": [
+    "fdcfee4e-6023-4d73-9f92-442adf4614ff"
+   ],
+   "bundle": "007.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房] 主包体积卡在临界值时，公告列表这类小公共组件要下放到各分包各自一份，而不是放主包 components/",
+   "type": "bug",
+   "content": "什么情况：苏住房C 小程序把 AnnouncementNoticeList 收进主包 src/components/ 后，上传预估算从 2039.8KB 涨到 2052.9KB 直接超限；同时出现运行期报错 Component is not found in path \"pages_main/announcement/components/NoticeList\"（using by \"pages_owner/subdistrict/announcement/index\"），说明页面引用了不存在（或在别的分包）的组件路径。为什么：主包已经贴着微信 2MB 上限（约 2039.9KB 是安全边界），任何 +10KB 级别的主包新增都会顶破；而且分包页面不能跨包引用别的分包的组件，一旦路径写的不是本包目录就会报 component not found。小体积公共组件「放主包省事」在临界体积下是负收益。怎么做：按使用方把组件下放到各分包内部各存一份——项目/街道公告用 pages_owner/components/AnnouncementNoticeList/，主包公示公告用 pages_main/announcement/components/AnnouncementNoticeList.vue，业委会公告用 pages_owner_extra/components/AnnouncementNoticeList/，并删除主包 src/components/AnnouncementNoticeList/。改完必须重新构建并以产物为准核对：MAIN 上传预估(source size) 回到 2039.9KB ok、[validate-dist] ok、broken component refs: 0，再导入 dist 验证。",
+   "evidence": "会话 7f27cd4d 最终结论明确「主包上传体积超限，是因为上次把 AnnouncementNoticeList 放在了主包 components/ 里（约 +13KB），把上传预估从 2039.8KB 顶到了 2052.9KB」，处理为下放到三个分包目录并删除主包副本，构建输出 MAIN 2039.9KB ok / validate-dist ok / broken component refs: 0；用户侧报错 Component is not found in path \"pages_main/announcement/components/NoticeList\"。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/AnnouncementNoticeList",
+    "zhi2-mobile-shimin/src/pages_owner/components/AnnouncementNoticeList",
+    "zhi2-mobile-shimin/src/pages_main/announcement/components/AnnouncementNoticeList.vue",
+    "zhi2-mobile-shimin/src/pages_owner_extra/components/AnnouncementNoticeList",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "baseline": "0cea241",
+   "sessionIds": [
+    "7f27cd4d-d9ad-49e3-8b39-e70f50b23be2"
+   ],
+   "bundle": "007.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序静态资源按分包归属迁移：脚本盘点 + 主包保留白名单 + 引用语法逐个替换",
+   "type": "workflow",
+   "content": "什么情况：`src/static` 目录堆积了几百张图，主包与分包体积双双吃紧，需要「删未用、迁分包、改引用」。已知结论只说了「分包之间不能跨包引用静态资源」，但没说怎么系统性做这件事。\n\n为什么：纯手工扫引用必然漏。一个图片的归属要看三件事——被谁引用（主包页面/分包页面/公共组件）、是否 tabBar 配置项、是否被多个分包共用；三者任一落在主包就绝不能迁，否则跨包引用在 Android 上首次加载失败。\n\n怎么做：\n1. 用脚本（如 `scripts/analyze-static-images.js` 输出 `static-analysis.json`）全量扫描 src 下对 static 的引用，产出一张「资源 → 引用方 → 所属分包」清单，先看清再动手。\n2. 判定归属：只被单个分包引用 → 迁到该分包的 `static/`（没有则创建）；tabBar 图标、地图定位图标、iconfont、被公共组件（如 houseCard）或跨分包共用的 → 一律留主包 `src/static`。\n3. 改引用：分包内静态图路径由 `ZsImage` 改成相对路径 + 原生 `<img>`（如 `../static/images/szf/home_banner.png`）；PageBg 类组件改走 `url` 属性传相对路径；远程图（头像、房源图）仍用 `ZsImage` + `:local=\"false\"`。\n4. `fallBackSrc` 必须继续指向主包 `images/szf/default.png`，与 ZsImage 内部兜底逻辑保持一致，否则迁完兜底图全裂。\n5. 迁完按分包列变更清单，真机验证各分包入口页（首页 tab、业主认证、二手房、信用等级等）的图片。\n\n注意：资源真不存在时（如 `images/svg/flag-szf.svg` 仓库历史里都没有）不要自造素材，直接报给用户补图或改引用。",
+   "evidence": "会话 5e43e3f8（基线 017efba）：用户要求「删除 src/static 未使用图片，只被分包使用的移到分包 static 并改相对路径，静态图可用 img 不用 ZsImage」。最终结果：删除未使用 15 张、移至各分包 static 约 244 张、主包保留约 104 张（公共组件/tabBar/跨分包共用）。明确约定：静态图改 `<img>` + 相对路径；PageBg 改 url 属性；远程图仍 ZsImage + :local=\"false\"；fallBackSrc 继续用主包 images/szf/default.png；公共组件 houseCard 用 ../../static/ 引主包符合跨包复用场景。",
+   "files": [
+    "zhi2-mobile-shimin/src/static",
+    "zhi2-mobile-shimin/scripts/analyze-static-images.js",
+    "zhi2-mobile-shimin/scripts/static-analysis.json",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "zhi2-mobile-shimin/src/components/commonNew/houseCard.vue",
+    "zhi2-mobile-shimin/src/pages_tab/components/Home_Suzhufang.vue"
+   ],
+   "baseline": "017efba",
+   "sessionIds": [
+    "5e43e3f8-a271-45d0-b84e-b0b9f20ba5d2"
+   ],
+   "bundle": "008.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "用户偏好：新增登录/授权类能力要叠加在原页面，禁止另建中间页或替身登录页",
+   "type": "preference",
+   "content": "什么情况：接入微信手机号授权快捷登录时，按需求文档把「稍后再说」拆成了一个独立页 `pages_main/login/sms.vue`，并把原 `login/index.vue` 的验证码/账号密码登录搬过去，结果被用户连问两次：先是「稍后再说直接进入 sms 页面，怎么新加了一个中间页，不需要」，改了一轮后又问「原来的账号密码登录方式没了？为什么要新写一个页面呢？直接用原来的不行吗?」。\n\n为什么：用户要的是给已有登录页「加一个入口」，不是重做登录体系。新写页面会带来三个必然后果：登录方式被搬迁（原能力在用户感知里消失）、多一层无意义跳转、`pages.json` 多一条路由且历史入口（我的页等）要跟着改。用户对「多绕一层」非常敏感。\n\n怎么做：\n1. 授权弹窗直接挂在原登录页 `login/index.vue` 上，进入页面时弹出，「稍后再说」只关闭弹窗、露出下方原有表单。\n2. 原有验证码登录、账号密码登录、忘记密码一律保留，不做搬迁。\n3. 不新增 `sms.vue` 之类中间页；若已建，删除页面文件并从 `pages.json` 移除路由。\n4. 所有入口（全局跳转、`My_Suzhufang` 的「稍后再说」）统一指回 `/pages_main/login/index`。\n\n同源规律：需求文档里画成「独立页面」的辅助环节（其他方式登录、方式选择页），在本项目默认应实现为原页面内的弹窗或展开区，先问再拆页。",
+   "evidence": "会话 f995f5a8（基线 6aca310）：用户诉求 4「稍后再说直接进入 pages_main/login/sms 页面，怎么新加了一个中间页，不需要」；诉求 6「原来的账号密码登录方式没了？为什么要新写一个页面呢？直接用原来的不行吗?」。最终处置：恢复 login/index.vue 原登录页、删除 login/sms.vue 并从 pages.json 移除路由、授权弹窗挂在原页、入口全部改回 /pages_main/login/index。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages/login/index.vue",
+    "zhi2-mobile-shimin/src/pages/login/password.vue",
+    "zhi2-mobile-shimin/src/pages.json",
+    "zhi2-mobile-shimin/src/pages_tab/components/My_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/api/security.js"
+   ],
+   "baseline": "6aca310",
+   "sessionIds": [
+    "f995f5a8-7580-4d13-8670-86b48dfcaa9d"
+   ],
+   "bundle": "008.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "页面背景色不铺满：min-height:100% 依赖父级已解析高度，改用 uni-page-body 100vh + 根节点 inherit 全局修",
+   "type": "bug",
+   "content": "什么情况：`pages_my/verification/TypeChoose.vue` 灰色背景只铺到内容高度，不满一屏。用户追加要求「所有页面都排查一下，不论是否超过一屏都要背景色铺满，看看能不能全局处理」。\n\n为什么：页面根节点写 `min-height: 100%`，百分比高度依赖父级已有确定高度。小程序/H5 的 `uni-page-body` 高度只等于内容高度时，父级高度 = 内容高度，「100%」就退化成一个无意义值，背景自然只铺到内容底部。这不是某个页面的样式写错，是全局根节点高度链断了，所以逐页加 `min-height: 100vh` 属于重复劳动且会漏。\n\n怎么做（一处改 `src/uni.scss`）：\n1. 非 H5 端给 `uni-page-body` 加 `min-height: 100vh`，建立视口高度基准。\n2. 页面根节点 `uni-page-body > view/div` 的 `min-height` 从 `100%` 改为 `inherit`，继承父级的视口高度。\n3. 公共根类（`.container`、`.container-box`、`.index-page`、`.user-info-box`、`.setting-page` 等）统一改为 `min-height: inherit`。\n\n为什么继承而不是都写 100vh：白底页面根节点没有背景色时，透明区域仍露出白色 `page`，观感不变；有背景色的页则彻底铺满。改完重点验证背景色明显且内容少的页（AuthorizedSuccess、TypeChoose、userInfo、首页）。",
+   "evidence": "会话 f1b859df（基线 6aca310）：用户先报「TypeChoose.vue 灰色背景高度没撑满 100%」，随后要求「所有页面都排查一下……看看能不能全局处理」。最终仅修改 src/uni.scss：uni-page-body 加 min-height:100vh；uni-page-body > view/div 的 min-height 由 100% 改 inherit；.container/.container-box/.index-page/.user-info-box/.setting-page 统一 min-height: inherit。原理解释：min-height:100% 依赖父级已解析高度，内容不足一屏时百分比失效。",
+   "files": [
+    "zhi2-mobile-shimin/src/uni.scss",
+    "zhi2-mobile-shimin/src/pages_my/verification/TypeChoose.vue",
+    "zhi2-mobile-shimin/src/App.vue",
+    "zhi2-mobile-shimin/src/pages_my/setting/index.vue",
+    "zhi2-mobile-shimin/src/pages_my/verification/FormLocal.vue"
+   ],
+   "baseline": "6aca310",
+   "sessionIds": [
+    "f1b859df-a72a-4129-9bea-55d27034119e"
+   ],
+   "bundle": "008.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序分包自身超 2048KB 的瘦身套路：整页迁出 + 禁跨包引用 + 全库核对跳转路径",
+   "type": "workflow",
+   "content": "什么情况：上传报 `subpackage /pages_owner/ source size 2185KB exceed max limit 2048KB`。注意这是**单个分包**超限，与主包超限是两套解法。\n\n为什么：小程序对主包和每个分包分别卡 2048KB（source size，即源码态不是 dist 压缩后）。往分包里「塞」无法解决，只能把成块功能整页搬到另一个更空闲的分包，同时保证迁出的页不再反向引用原分包的静态资源——跨包引用在真机上（尤其 Android 首次加载）会取不到图。\n\n怎么做：\n1. 选迁移目标：把一整套成链路的页面（如收入 `income/index` + 维修资金 `maintain/index|detail|info`）整体迁到空闲分包（这里迁到 `pages_benefit`），而不是把资源零散塞过去。\n2. 迁完扫跨包引用：所有 `subpackage=\"pages_owner\"` 之类指向原来包的静态图（`Bg-szf.png`、`change.png`、`arrow-down.svg` 等）全部改为本分包，并把资源复制进 `<目标分包>/static/`。改完必须 grep 全库确认目标分包下已无原分包路径残留。\n3. 同步路由：`pages.json` 里迁出页必须挂到新分包；分包内页间相对跳转（index→detail、detail→info）可保持相对路径，跨分包入口一律改绝对路径。\n4. 跳转路径全库核对（这一步最易漏）：`utils/menuRouteMap.js` 的业务编码映射（如 `3_1_6`、`2_0_2`、`4_1_4`、`5_0_2`、`7_0_8`）、tab 页组件里的跳转（`Project_Jiayuanqu`、`My_Jiayuanqu`）、以及 `pages_owner_extra` 等外部页的入口，都要逐条改成新路径。\n5. 重新构建并按分包量体积（`scripts/size-owner-package.mjs` / `validate-dist.mjs`），确认落到 2048KB 以下（本次 2037.1KB）。\n6. 注意别误删同名的另一套页面：`menuRouteMap` 里 `1_0_5 → /pages_benefit/benefit/index` 与迁入的 `/pages_benefit/income/index` 是两个不同产品入口，属正常并存。",
+   "evidence": "会话 8626c623（基线 48bdb17）：上传报 pages_owner 分包 2185KB 超 2048KB 限制。用户明确要求「不要进行跨包图片引用，会有加载问题，安卓机型可能首次加载不了图片。另外核对一下所有调整分包的页面在项目里面跳转的路径是否同步修改」。最终把 income/maintain 链迁到 pages_benefit，跨包图改本分包并复制资源，全库核对 menuRouteMap（3_1_6/2_0_2/4_1_4/5_0_2/7_0_8）、Project_Jiayuanqu、My_Jiayuanqu、ownerCard 入口路径，重建后 pages_owner 预估 2037.1KB。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages.json",
+    "zhi2-mobile-shimin/src/utils/menuRouteMap.js",
+    "zhi2-mobile-shimin/src/pages_benefit/income/index.vue",
+    "zhi2-mobile-shimin/src/pages_benefit/maintain/detail.vue",
+    "zhi2-mobile-shimin/src/pages_tab/components/Project_Jiayuanqu.vue",
+    "zhi2-mobile-shimin/src/pages_tab/components/My_Jiayuanqu.vue",
+    "zhi2-mobile-shimin/src/pages_owner_extra/ownerCard/index.vue",
+    "zhi2-mobile-shimin/scripts/size-owner-package.mjs",
+    "zhi2-mobile-shimin/scripts/validate-dist.mjs"
+   ],
+   "baseline": "48bdb17",
+   "sessionIds": [
+    "8626c623-6027-471a-9097-de4cd5ae9686"
+   ],
+   "bundle": "008.md",
+   "project": "苏住房C"
+  }
+ ]
+}

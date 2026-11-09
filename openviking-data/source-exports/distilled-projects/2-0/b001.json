@@ -1,0 +1,106 @@
+{
+ "project": "2-0",
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "嵌套侧栏 E2E：menuItem.getByTestId('sidebar-leaf-link') 会捞到所有后代叶子，必须过滤为直接子级再递归",
+   "type": "bug",
+   "content": "情况：zhi2-web-admin 的 navbar-sidebar-accessibility 用例在两层目录（如「规约管理 > 管理规约 > 管理规约拟定」）下，日志显示在父层就直接点到深层叶子，或子菜单顺序与页面不一致（如「变更记录」排在「备案」前面）。\n为什么：Playwright 的 locator.getByTestId 默认匹配**所有后代**，不是「仅直接子节点」。同理 submenu.getByTestId('sidebar-menu-item') 会把更深层的目录也算进来，递归展开状态错乱，还会误判「当前父级无子菜单」。\n怎么做：叶子只点满足 `leaf.closest('[data-testid=\"sidebar-menu-item\"]') === 当前 menuItem` 的 sidebar-leaf-link；嵌套目录只递归「其 sidebar-menu-item 祖先链上紧邻的父级就是当前目录」的项。菜单顺序以 DOM 中实际出现的顺序为准，不要另做 index/href 跨上下文排序。日志建议带面包屑（如 `规约管理 > 管理规约`）便于对照。",
+   "evidence": "会话 97cb886a 诉求 2–5：街道/社区/小区、物业管理区域等被误判无子菜单；物业管理区域子菜单顺序与页面不符；用户强调「直接用页面上的顺序就是 DOM 顺序」。最终结论说明 getByTestId 后代语义导致在「规约管理」层直接点到「管理规约拟定」。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "97cb886a-e67c-42b6-8516-f9591fa85219"
+   ],
+   "bundle": "001.md",
+   "project": "2-0"
+  },
+  {
+   "title": "侧栏叶子点击超时且报 subtree intercepts pointer events：折叠标题挡住目标链接",
+   "type": "bug",
+   "content": "情况：登录后批量点 sidebar-leaf-menu，Playwright 报 element is not stable 或「项目管理/宗地管理 … subtree intercepts pointer events」，用例超时且视频里只点了一部分菜单。\n为什么：Element 折叠面板展开/动画过程中，同级或其它层级的目录标题仍覆盖在目标 `<a>` 的可点击区域上；在未完全展开或滚动到位时强行 click 会无限重试。\n怎么做：每个父级目录先显式展开并 `waitFor` 子菜单链接 visible；点击前 `scrollIntoViewIfNeeded`；必要时对已知遮挡用更窄的定位（限定在当前 menu-collapse-wrapper 内）或短暂等待动画结束。全量遍历时要按「顶栏切换 → 侧栏父级展开 → 直接子叶子 → 嵌套父级」顺序，不要一次性 locator('.sidebar-leaf').first() 扫全局。",
+   "evidence": "会话 fe1c5dc1 诉求 5 贴完整 call log：`项目管理`/`宗地管理` subtree intercepts pointer events；诉求 6 反馈只点了几个菜单。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fe1c5dc1-f6ad-4637-84a8-bda2ca44dffb"
+   ],
+   "bundle": "001.md",
+   "project": "2-0"
+  },
+  {
+   "title": "顶栏+侧栏全菜单可访问性 E2E：须先确认登录态与 navbar-root，并考虑系统默认激活第一个顶栏",
+   "type": "workflow",
+   "content": "情况：navbar-sidebar-accessibility.spec.js 要登录后遍历顶栏目录与侧栏所有叶子路由，断言主内容区非空白。\n为什么：① 登录未成功时 getByTestId('navbar-root') 一直不可见，视频停在登录页；② 产品默认进入后会激活**第一个顶栏菜单**，若脚本未先显式切换顶栏就遍历侧栏，会出现「第一个顶栏下目录重复点击」或误以为 navbar 切换失败（侧栏仍是上一顶栏的菜单，如「项目楼盘」与「物业管理」混在一起）。\n怎么做：登录后 `expect(page).not.toHaveURL(/#\\/login/)` 并等待 navbar-root、sidebar-root；遍历每个顶栏前先点击对应 navbar 项并等待侧栏树更新；对「更多」里的顶栏目录单独处理。单叶子失败记入 uiErrorRecords 继续跑，避免一条空白页卡死全量。用户曾要求叶子/目录点击间隔约 1s 便于录屏排查。",
+   "evidence": "会话 fe1c5dc1 诉求 3–4：navbar-root 不可见、视频停在登录页；会话 5af92aab 诉求 4 指出默认激活第一个 navbar 导致重复，且怀疑「项目楼盘」navbar 切换失败。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fe1c5dc1-f6ad-4637-84a8-bda2ca44dffb",
+    "5af92aab-06ab-48cb-be81-b133e170a41b"
+   ],
+   "bundle": "001.md",
+   "project": "2-0"
+  },
+  {
+   "title": "clickLeafMenusUnderParent：用 DOM 计数 + nth 顺序点 sub-menu a，断言失败只记录不中断",
+   "type": "pattern",
+   "content": "情况：按目录批量点子菜单时，脚本在第一个目录卡住，或展开目录后不再点子菜单。\n为什么：基于 index/href 的跨上下文数据结构容易算错、与展开状态脱节，导致循环空转或跳过子级。\n怎么做：DOM 侧只统计当前目录下子菜单 `<a>` 数量；Playwright 侧用 `.locator('.menu-collapse-wrapper .sub-menu a').nth(i)` 按序点击；每次点击后短等待并 `assertMainContentNotBlank`，失败写入 uiErrorRecords；每个子菜单 try/catch，异常只打日志。这是「最小可靠版」，在修好直接子级过滤后再叠加上去。",
+   "evidence": "会话 5af92aab 诉求 6–7 与最终结论：去掉 index/href 复杂结构，恢复顺序点击当前目录下所有 a 子菜单。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5af92aab-06ab-48cb-be81-b133e170a41b"
+   ],
+   "bundle": "001.md",
+   "project": "2-0"
+  },
+  {
+   "title": "Playwright 相对路径 page.goto('/#/login') 报 Cannot navigate to invalid URL：缺 baseURL",
+   "type": "bug",
+   "content": "情况：在 zhi2-web-admin 下执行 `npx playwright test login.spec.js --grep OCR`，beforeEach 里 `page.goto('/#/login')` 直接失败。\n为什么：Playwright 把相对 URL 拼到 `use.baseURL`；未配置或为空时，`/#/login` 不是合法绝对地址。\n怎么做：在 playwright.config 或对应 project 配置 `baseURL`（如本地 dev `http://127.0.0.1:端口` 或与 E2E_BASE_URL 一致）；或 goto 写完整 URL。与业务 hash 路由 `/#/login` 无关，是测试配置问题。",
+   "evidence": "会话 44f9e8a5 诉求 2 报错 `page.goto: Protocol error … Cannot navigate to invalid URL`，定位 login.spec.js:15。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/login.spec.js",
+    "zhi2-web-admin/playwright.config.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "44f9e8a5-1336-42c2-9226-9d3dc33ccb9a"
+   ],
+   "bundle": "001.md",
+   "project": "2-0"
+  },
+  {
+   "title": "登录图形验证码 E2E：扭曲算式图用 Tesseract+规则纠错不可靠，测试环境应返回 answer 或降难度",
+   "type": "workflow",
+   "content": "情况：login.spec.js 用 OCR 识别 `/code` 返回的 GIF 算式验证码自动登录，常 skip「OCR 未识别到有效验证码」或识别结果为 yee/CW 等无数字串。\n为什么：验证码为 `data:image/gif;base64,'+res.data` 的纯数字运算图，但扭曲/噪声下 Tesseract 多轮 PSM+sharp 预处理仍常看不出算式；规则映射（O→0、字母转运算符等）对无数字输出无能为力。与「从 Vue 表单状态读验证码」的注册 E2E 不同，登录页若过早识别会在图片未渲染时拿到空图。\n怎么做：测试环境优先让 `/code` 增加 `answer` 字段或专用 `/test/code`，E2E 有 answer 则直填并跳过 OCR；或测试环境换无扭曲简单算式图。OCR 仅作无 answer 时的兜底，并必须 wait 验证码 img/src 就绪后再截屏。稳定自动化登录不要依赖继续堆字母映射。",
+   "evidence": "会话 44f9e8a5 诉求 3–6 与最终结论：三字段未填、识别内容 yee/CW、用户指出图片未出现就识别；结论建议测试环境 answer + 前端预留 res.answer。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/login.spec.js",
+    "assets/views/login.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "44f9e8a5-1336-42c2-9226-9d3dc33ccb9a"
+   ],
+   "bundle": "001.md",
+   "project": "2-0"
+  }
+ ]
+}

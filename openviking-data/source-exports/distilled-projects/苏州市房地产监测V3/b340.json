@@ -1,0 +1,49 @@
+{
+  "project": "苏州市房地产监测V3",
+  "batch": "340",
+  "files": [
+    "340.md"
+  ],
+  "count": 2,
+  "memories": [
+    {
+      "title": "数智分析看板的数据契约在 mock/index.js：字段名以实际导出为准（heatStockList/heatStockDeal、industryComplaintTrend.value、stockAreaSegments 为 [{name,value}]）",
+      "type": "fact",
+      "content": "【什么情况】数智分析（`src/views/dataAnalysis/`）的各个看板页（商品房 / 存量房 / 租赁 / 行业管理 / 热力）数据全部来自 `src/views/dataAnalysis/mock/index.js` 的具名导出，写页面前必须先认准字段名，否则图表空白或取到 undefined。\n【为什么】任务描述里的字段名可能与实际导出不一致——本次就出现三处：描述写 `heatStock`，实际导出是 `heatStockList`（挂牌量）与 `heatStockDeal`（成交量）两个；描述把投诉趋势字段写成 `complaint`，实际 mock 是 `{ months, value }`；`stockAreaSegments` 实际是单序列 `[{name, value}]`（没有 `newVal/stockVal` 两列）。这些都不会报错，只会让图表空或结构错。\n【怎么做】① 动手前把 `mock/index.js` **读全**，以实际导出名为准，不要照抄任务描述；② 已确认的导出清单：商品房 `newKpis`(8)/`newSupplyTrend`/`newDealTrend`/`newInventoryTrend`/`newPriceRanges`/`newProjectRankByArea`/`newProjectRankBySuite`/`newAnnualSupply`；存量房 `stockKpis`(7)/`stockListTrend`/`stockDealTrend`/`stockInventoryTrend`/`stockPriceRanges`/`stockAreaSegments`/`stockRegionRank`/`stockProjectRank`/`stockAnnualTrend`；租赁 `rentKpis`(5)/`rentTrend`(`{months, contract, area, price}`)/`rentRegionRank`/`rentInstitutionRank`/`rentPriceRanges`；行业管理 `industryKpis`(5)/`industryComplaintTrend`(`{months, value}`)/`industryRefundRisk`(`[{name,value}]`)/`industryInstitutionRank`；热力 `heatNewProject`/`heatStockList`/`heatStockDeal`/`heatRent`。③ 地图数据 `mock/suzhou.json` 的 `feature.properties.name` 用的是 10 个短名：新区/吴中/相城/姑苏/吴江/常熟/张家港/昆山/太仓/园区——与页面里的 `districtValues` 短名必须完全一致，不一致则地图着色错位。④ 本阶段不调接口、不造数，数据一律来自 mock；改成真实接口时要保持同一字段契约，页面层就不用改。",
+      "evidence": "会话 99019521-96f2-4316-b309-dc2f6f8cc441（基线 a86bf95）与 d138908d-0c52-4819-961e-a78184f65eb3、20534a15-4562-4579-9c65-7b7deff9eaac 三个子 agent 会话的任务书与结论；结论写明「mock 实际导出为 `heatStockList`/`heatStockDeal`（描述里写 `heatStock`），已按实际字段处理」「已核验 `districtValues` 的 10 个短名与 `suzhou.json` 的 `properties.name` 完全一致」「字段名与任务描述一致；唯一差异：`stockAreaSegments` 实际为单序列 `[{name, value}]`（无 `newVal/stockVal`）」「描述中投诉趋势标为 `industryComplaintTrend`…实测 mock 为 `{ months, value }`（非 complaint/contract），已按 `value` 取数」「`rentTrend` 实测字段与描述一致：`{ months, contract, area, price }`」。",
+      "files": [
+        "zhi2-web-admin/src/views/dataAnalysis/mock/index.js",
+        "zhi2-web-admin/src/views/dataAnalysis/mock/suzhou.json",
+        "zhi2-web-admin/src/views/dataAnalysis/pages/MarketOverview.vue"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "99019521-96f2-4316-b309-dc2f6f8cc441",
+        "d138908d-0c52-4819-961e-a78184f65eb3",
+        "20534a15-4562-4579-9c65-7b7deff9eaac"
+      ],
+      "bundle": "340.md"
+    },
+    {
+      "title": "看板图表四条硬约定：组件注册名 DaEchart、单位不同用双 Y 轴、环形饼图统一 [{name,value}]、面积占比环图去标签只留 tooltip",
+      "type": "pattern",
+      "content": "【什么情况】数智分析看板要新增/调整图表时，必须遵守一批「不遵守就空白或走样」的约定。\n【为什么】这些约定每一条都对应一类静默失败：注册名写错组件不渲染、量纲不处理序列被压平、环形图数据结构不统一饼图裂开、面积占比环图铺满文字后看不清图。\n【怎么做】① **ECharts 封装注册名**：`import DaEchart from '../components/EChart.vue'`（热力子目录用 `'../../components/EChart.vue'`）+ `components: { DaEchart }` + 模板 `<da-echart :option=\"...\" height=\"300px|520px\" />`；**绝对不能注册成 `DaEChart`**——Vue2 局部注册区分大小写，kebab 标签会变成 `da-e-chart` 匹配不上，结果是**图表一片空白且不报错**。② **双 Y 轴**：同一图里量纲差异大的两个序列（如「合同备案（份）」与「备案面积（万㎡）」）必须用双 Y 轴，否则面积序列被压平贴底。③ **环形/饼图数据结构统一 `[{name, value}]`**（如 `industryRefundRisk` 与 `houseNature` 同构），直接可复用饼图写法。④ **面积占比环形图去掉所有文字标签**（含 hover 强调标签），静态呈现干净环形图，统计信息只在鼠标悬停的 tooltip 里展示。⑤ **配色与坐标轴统一取 `theme.js` 的 token**：`C`、`PALETTE`、`baseTooltip`、`baseAxis`、`legendStyle`、`baseGrid`、`areaGradient`，禁止页面里写死色值；区县热力用 `visualMap` 连续色阶 `#e8f4ff → #1a5599`、`type:'map'` + `map:'suzhou'`（`created()` 里 `try/catch registerMap('suzhou', suzhou)`），图表高度统一 520px。⑥ 页面骨架照抄参考实现 `MarketOverview.vue`：根节点 `.da-page`，内部 `.grid`/`.grid-2`/`.grid-32` 分栏。",
+      "evidence": "会话 99019521-96f2-4316-b309-dc2f6f8cc441（基线 a86bf95）任务书「关键约定（务必遵守，否则图表空白）」第 1 条写明「ECharts 封装必须：`import DaEchart from '../../components/EChart.vue'`，`components:{ DaEchart }`，模板 `<da-echart :option=\"xxx\" height=\"520px\"/>`。**绝不注册成 DaEChart**（会匹配不上）」；会话 20534a15-4562-4579-9c65-7b7deff9eaac 结论写明「由于『合同备案（份）』与『备案面积（万㎡）』量纲差异大，采用双 Y 轴展示，避免面积序列被压平」「`industryRefundRisk` 实测为 `[{name,value}]`，与 houseNature 同构，饼图直接可用」「option 复用 theme.js 的 `C, PALETTE, baseTooltip, baseAxis, legendStyle, baseGrid, areaGradient`」「根节点 `.da-page`，`grid/grid-2/grid-32` scoped 样式照抄 MarketOverview」；会话 6c46bea2 的结论补充「HeatBoard.vue：面积占比环形图去掉所有文字标签（含 hover 强调标签），静态为干净环形图，统计信息仅在鼠标悬停 tooltip 展示」。",
+      "files": [
+        "zhi2-web-admin/src/views/dataAnalysis/components/EChart.vue",
+        "zhi2-web-admin/src/views/dataAnalysis/components/theme.js",
+        "zhi2-web-admin/src/views/dataAnalysis/components/ChartCard.vue",
+        "zhi2-web-admin/src/views/dataAnalysis/components/KpiRow.vue",
+        "zhi2-web-admin/src/views/dataAnalysis/components/RankBar.vue",
+        "zhi2-web-admin/src/views/dataAnalysis/pages/MarketOverview.vue"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "99019521-96f2-4316-b309-dc2f6f8cc441",
+        "20534a15-4562-4579-9c65-7b7deff9eaac",
+        "session-6c46bea2-2d63-4a2d-b33f-f111655982f2"
+      ],
+      "bundle": "340.md"
+    }
+  ]
+}

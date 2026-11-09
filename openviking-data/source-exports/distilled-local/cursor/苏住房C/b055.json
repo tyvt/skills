@@ -1,0 +1,77 @@
+{
+ "project": "苏住房C",
+ "batch": "055",
+ "files": [
+  "055.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "已修复 addHouseContract 页面「添加",
+   "type": "bug",
+   "content": "已修复 `addHouseContract` 页面「添加」按钮的 UI 问题。 **原因：** 1. 页面 `.page` 使用了 `display: flex; align-items: center`，子元素会被水平居中并收缩 2. `ZsButton` 未设置 `block`，默认宽度会塌陷成窄条 3. `class=\"long\"` 在项目中没有对应样式，不起作用 **修改：** - 给按钮加上 `block` 属性（组件内置全宽样式） - 移除无效的 `long` 类 - 为 `.button` 补充 `width: 100%` 重新编译预览后，按钮应显示为正常的全宽蓝色圆角按钮。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner\\addHouseContract.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner\\addHouse.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsButton\\ZsButton.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "af4e72e7-03c6-4e90-a546-a36ef38a5c56"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已修复 V1 图片（/zs-fym 前缀）的地址拼接",
+   "type": "fact",
+   "content": "已修复 V1 图片（`/zs-fym` 前缀）的地址拼接问题，V2 图片（`/zhi2-pro`、`/zhi2-dev`、`/zhi2-test`）逻辑保持不变。 ### 修改说明 1. **`src/utils/index.js`** — `resolveMediaUrl` - 路径以 `/zs-fym` 开头时，生产环境 H5 使用 `VITE_APP_IMG_PROXY_V1`（`https://szfang.szfcweb.cn`）拼接 - 其他 V2 路径仍走 `VITE_APP_API_PROXY` 2. **`src/components/ZsImage/ZsImage.vue`** — 微信小程序 - `/zs-fym` 图片使用 `IMAGE_BASE_V1`（`https://szfang.szfcweb.cn`） - 其他图片仍使用 `IMAGE_BASE`（V2） 3. **`vite.config.ts`** — 开发代理 - `/zs-fym` 代理目标从 V2 API 改为 `VITE_APP_IMG_PROXY_V1` 4. **环境配置** - `.env.development` / `.env.production` 中 `VITE_APP_IMG_PROXY_V1` 改为 `https://szfang.szfcweb.cn` - `src/",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`src/utils/index.js",
+    "**`src/components/ZsImage/ZsImage.vue",
+    "**`vite.config.ts",
+    "`src/env/mp.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3774cb0b-97a2-4a97-9edb-ca41b73ddf3e"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "个人中心查消息数量需要加参数readFlag: 0",
+   "type": "preference",
+   "content": "已调整消息列表页，「管理」和「筛选」会随列表一起滚动，不再固定在顶部。 主要改动： 1. **将 `page-top` 移入 `z-paging` 内部**，与消息列表处于同一滚动区域 2. **设置 `:fixed=\"false\"`**，避免 z-paging 使用固定定位 3. **调整布局样式**：`page-center` 使用 `flex: 1`，页面容器改为 `overflow: hidden`，由 z-paging 负责滚动 底部管理操作栏（全选 / 设为已读 / 删除）仍保持固定在底部，方便批量操作。若也需要改为跟随滚动，可以继续说。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\message\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\my.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\My_Suzhufang.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\message\\message.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "bcb98835-f1ec-41eb-9aea-afdbf1871d66"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "添加房屋-人工登记-报错“物业管理区域权限不能为空”",
+   "type": "bug",
+   "content": "已修复。问题出在「人工添加」页面（`register.vue`）提交时，调用 `ctUserIdentityApply` 接口未传 `complexId`，后端因此返回「物业管理区域权限不能为空」。 **修改内容：** 在 `register.vue` 的提交参数中补充 `complexId`，取值与同流程的 `addHouse.vue`、`addHouseContract.vue` 一致，来自 `useHouseStore.complexId`： ```167:172:zhi2-mobile-shimin/src/pages_owner/house/owner/register.vue ctUserIdentityApply({ ...form, complexId: useHouseStore.complexId, identityPhoto: idPhotoList.value.join(','), certificatePhoto: propertyPhotoList.value.join(','), }).then((res) => { ``` `complexId` 会在用户从小区认证页（`project/auth.vue`）进入添加房屋流程时写入 store，人工登记提交时会一并带上。可以重新走一遍「添加房屋 → 人工登记 → 提交人工审核」验证。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "已修复。问题出在「人工添加」页面（`register.vue",
+    "`register.vue",
+    "`addHouse.vue`、`addHouseContract.vue",
+    "```167:172:zhi2-mobile-shimin/src/pages_owner/house/owner/register.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "75b9fd04-a06e-4dd9-a25b-46eb96b4328a"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

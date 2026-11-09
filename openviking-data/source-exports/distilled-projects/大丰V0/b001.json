@@ -1,0 +1,26 @@
+{
+  "project": "大丰V0",
+  "batch": "001",
+  "files": [
+    "001.md"
+  ],
+  "count": 1,
+  "memories": [
+    {
+      "title": "子表删除按钮点了没反应：删除方法里引用了未定义的变量会静默中断，业务校验失败要改成明确提示",
+      "type": "bug",
+      "content": "【什么情况】房屋查封（housingCloSeq）编辑态子表的「删除」按钮点击后没有任何反应——不弹确认框、不发请求、控制台也没有报错。\n【为什么】删除方法 `deleteBatch` 里引用了一个**从未定义的变量** `theClourse`，执行到该行直接抛错中断；方法里还带着后端根本不存在的字段 `disDeleteList` 及其映射。这类错误不会在 UI 上留痕：点击处理里没有 try/catch，异常也没有交给全局 handler，于是表现为「点了没反应」。再叠一层：方法里对「查封中不可删除」的判断走的是一条会静默抛异常的路径，把一个正常的业务校验变成了无反馈的失败。\n【怎么做】① 排查「按钮点了没反应」的顺序：先看点击处理有没有绑定 / 有没有被权限位挡住 → 再逐行检查方法体里有没有**未定义变量**（ESLint 的 no-undef 能兜住，存量代码里常有漏网）→ 最后看是不是业务校验提前 return；② 把业务校验从「静默异常」改成**面向用户的明确提示**，且判定依据要用**本次要删除的那一行**的状态（本例以要删 id 命中行的 seizeStatus 判定，值为 1 表示已查封），不要用全局或首行状态；③ 清理后端不存在的字段与映射（本例 `disDeleteList`），避免脏数据残留；④ 批量删除成功后**清空 idArr**（本例 `deleteBatch` 成功后重置 idArr），否则连续批量删除会复用上一轮的旧 id；⑤ 请求契约保持不变（本例 `POST ZS_Sale/houseclosure/linkHouseClosureDelete {idArr}`）；⑥ 若按钮本身不显示/不触发，那是权限位问题（本例 `optBtns` 缺 `buscode=\"100203\"`），与删除方法无关，要分开排查、分开改动——本例为影响面最小化未动公共组件 `optBtns.vue` / `zsButton.vue`。",
+      "evidence": "会话 session-8f7c60b2-a14a-435f-8ed3-f7cef70a2d17（基线 e4255068，用户诉求「提交推送代码」）提交说明原文：「fix: 修复房屋查封编辑态子表删除按钮无反应 — 移除 theClourse 裸引用（无反应的直接原因）；删除不存在的 disDeleteList 字段及其映射，避免脏数据残留；将『查封中不可删除』由静默异常改为明确提示，并以本次要删除的 id 对应行的 seizeStatus 判定（值为1表示已查封）；删除成功后清空 idArr，避免连续批量删除时复用旧 id」；并披露「如果删除按钮本身不显示/不触发（而非弹出后无请求），那是 optBtns 缺少 buscode 的权限位问题，本次未做改动」。",
+      "files": [
+        "src/views/mortgageSys/sequLim/housingCloSeq/housingCloSeqInfo/housingCloSeqInfo.js",
+        "src/views/mortgageSys/sequLim/housingCloSeq/housingCloSeqInfo/housingCloSeqInfo.vue",
+        "src/components/optBtns/optBtns.vue"
+      ],
+      "baseline": "e4255068",
+      "sessionIds": [
+        "session-8f7c60b2-a14a-435f-8ed3-f7cef70a2d17"
+      ],
+      "bundle": "001.md"
+    }
+  ]
+}

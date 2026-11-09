@@ -1,0 +1,77 @@
+{
+ "project": "i淮安公版",
+ "batch": "001",
+ "files": [
+  "001.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "VITE_APP_API_BASE_URL改为相对路",
+   "type": "fact",
+   "content": "根因是：之前用 **`npm_lifecycle_event` 推断 `runMode` 再 `loadEnv(runMode)`**。在 **`npx uni build`**、**CI 里直接调 `uni build`**、或 **未通过 npm script 跑** 时，`npm_lifecycle_event` 常常是空的，会被当成 **`development`**，结果 **`loadEnv` 读的是 `.env.development`**；若 CI 又没把 `.env.development` 拷进去，**`VITE_APP_H5_PUBLIC_BASE` 为空**，Vite 的 **`base` 就退回默认 `/`**，打包出来的 JS/CSS 就不会带 **`/h5/`**。 ### 已做修改（`vite.config.ts`） 1. **用 Vite 传入的 `mode` 做 `loadEnv(mode, …)`** 与 `uni build`（`production`）、`uni build -m test`（`test`）一致，不再依赖 `npm_lifecycle_event`。 2. **`base` 来源顺序** - 小程序：`process.env.UNI_PLATFORM` 以 `mp-` 开头时固定 **`./`**。 - H5：**`VITE",
+   "evidence": "extracted source=cursor project=i淮安公版",
+   "files": [
+    "已做修改（`vite.config.ts",
+    "**`src/manifest.js",
+    "**`dist/index.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "68fa8b3e-063d-4913-b4bd-a9e072b71884"
+   ],
+   "_draft": true,
+   "project": "i淮安公版"
+  },
+  {
+   "title": "这个页面用到的图片无法正常显示",
+   "type": "preference",
+   "content": "我已经把“点了没反应”这类体验问题直接修掉了，现在至少会有明确反馈，并且每次点击都会重试初始化通信。 已改 `home.vue`： - 给整块用户卡片加了点击：`user-card` 直接触发 `handleUserEntry` （不再只依赖小范围点击区域） - `goLogin()` 每次点击都会先执行： - `detectMiniProgramEnv()` - `initMiniProgramMessageListener()` - 点击后逻辑： - 发送成功：提示 `已请求微信登录` - 未发送成功：提示 `请在小程序 web-view 中打开` / `请稍后重试` - 若检测到 `miniprogram` 但桥未就绪，会在 `WeixinJSBridgeReady` 后再补发一次 `requestLogin` 这样你再点“去登录”不会静默无响应。 如果你愿意，我下一步建议把页面里重复的 toast 精简成一次，避免连续提示干扰调试。",
+   "evidence": "extracted source=cursor project=i淮安公版",
+   "files": [
+    "`home.vue",
+    "涉及文件：d:/repository/i淮安公版/zhi2-mobile-admin-h5-c-unlimited/src/pages/index/home.vue、d:/repository/i淮安公版/zhi2-mobile-admin-h5-c-unlimited/src、d:/repository/i淮安公版/zhi2-mobile-admin-h5-c-unlimited/vite.config.ts"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e7ab2701-0d0c-4c0d-b39d-ab250ce924e8"
+   ],
+   "_draft": true,
+   "project": "i淮安公版"
+  },
+  {
+   "title": "要根据url参数判断，如果url参数里面没有comp",
+   "type": "preference",
+   "content": "已按你的要求改好了，主要改动如下。 ### 行为说明 1. **切换类型**（`onCategoryChange`）：先把 `facilityList` 置空，再 `listLoading = true`，请求结束后再关 loading、写入新列表（避免旧数据闪一下）。 2. **列表区域**：`listLoading` 为 true 时只显示 `<uni-load-more status=\"loading\" />`（与项目里其它列表一致）；加载结束后才显示列表或 `ZsEmpty`。 3. **首次进入**：`onLoad` 里仍调用 `serachPoi(..., { clearBefore: false })`，列表本来就是空的，但同样会走 loading，避免「空白很久」的体验。 ### 其它 - 去掉未使用的 `nextTick`、`onShow` 引用。 若你希望**只有切换分类时**才出现 loading、首次进入不显示 loading，可以说一下我再把 `onLoad` 改成不传 loading 或单独分支即可。",
+   "evidence": "extracted source=cursor project=i淮安公版",
+   "files": [
+    "涉及文件：D:/repository/i淮安公版/zhi2-mobile-admin-h5-c-unlimited/src/App.vue、D:/repository/i淮安公版/zhi2-mobile-admin-h5-c-unlimited/src/pages/index/home.vue、D:/repository/i淮安公版/zhi2-mobile-admin-h5-c-unlimited/src/store/user.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "824be91d-19a0-46ff-aeb8-1585da292e04"
+   ],
+   "_draft": true,
+   "project": "i淮安公版"
+  },
+  {
+   "title": "所有跳转ResultStatistics页面的地方携",
+   "type": "preference",
+   "content": "已完成修改，变更如下： ## 跳转携带 `rangeId`（对应接口字段 `decisionRangeId`） 1. **`decision/index.vue`** - 列表映射增加 `rangeId: el.decisionRangeId` - `onclick` 跳转 common / optional / sort / multipleForm 时追加 `&rangeId=...` 2. **`elect/index.vue`** - 列表映射增加 `rangeId: el.decisionRangeId` - 统计结果跳转：`ResultStatistics?id=...&rangeId=...` 3. **`ViewOptionsList.vue`**（多议题「查看投票结果」） - 优先使用 `item.decisionRangeId` - 否则调用 `listDecisionRangeId` 获取后再跳转 `multiple/ResultStatistics` ## `selectMaintainResult` 入参补充 `decisionRangeId` | 文件 | 状态 | |------|------| | `common/ResultStatistics.vue` | 已补充 `rangeId` 读取与入参 | | `multiple/ResultStati",
+   "evidence": "extracted source=cursor project=i淮安公版",
+   "files": [
+    "**`decision/index.vue",
+    "**`elect/index.vue",
+    "**`ViewOptionsList.vue",
+    "`common/ResultStatistics.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b0e15d5b-76cd-410c-ac70-649129353a28"
+   ],
+   "_draft": true,
+   "project": "i淮安公版"
+  }
+ ],
+ "_draft": true
+}

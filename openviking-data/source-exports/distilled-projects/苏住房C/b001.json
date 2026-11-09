@@ -1,0 +1,255 @@
+{
+ "project": "苏住房C",
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md"
+ ],
+ "count": 13,
+ "memories": [
+  {
+   "title": "苏住房C 市民端(H5→微信小程序)产物 vendor 依赖被 relocate 脚本从主包删除，引发 ENOENT 与 __route__ is not defined",
+   "type": "bug",
+   "content": "情况：zhi2-mobile-shimin 由「嵌入原生 App 的 H5」改造成微信小程序后，构建产物在开发者工具里报一堆 ENOENT（找不到 dist/node-modules/z-paging/.../z-paging.wxss、@dcloudio/uni-ui/lib/uni-datetime-picker/...），并连带出现 __route__ is not defined，看起来像首页组件（机器人图片等）出错，实际与业务组件无关。\n\n为什么：为了压分包体积，构建链上有 relocate-z-paging / relocate-datetime-picker 两个脚本，它们的做法是「把 z-paging、uni-datetime-picker 从主包挪进各分包，并改分包内引用路径」。但 common/vendor.js 仍按主包路径引用这两份依赖 —— 删掉主包副本后 vendor 的引用悬空，dev tools 编译 WXSS/WXML 阶段就抛 ENOENT，后续路由初始化失败才冒出 __route__ is not defined。\n\n怎么做：1) relocate 脚本改成「只做分包侧复制 + 路径修正，绝不删除主包里的 z-paging / uni-datetime-picker」；2) 新增 scripts/restore-main-vendor-deps.mjs，构建后检查主包是否缺这两份依赖，缺失则从 pages_main 恢复；3) 把它同时挂到 vite.config.ts 的 closeBundle 与 npm run build 链路，保证每次构建都跑；4) 排查顺序固定为「先看 prod dist 里 vendor 引用的路径是否真实存在」，不要从业务组件图片/资源入手。",
+   "evidence": "会话 87fe1c13：控制台 ENOENT 指向 dist/node-modules/z-paging/.../z-paging.wxss 与 @dcloudio/uni-ui/lib/uni-datetime-picker/...；结论明确「不是机器人图片本身」，根因是 relocate 脚本把主包里的 z-paging/uni-datetime-picker 删掉，而 common/vendor.js 仍引用主包路径；修复为 relocate 不再删除 + 新增 restore-main-vendor-deps.mjs 并在 closeBundle 与 build 链路执行，恢复后 z-paging.wxss 存在于主包。",
+   "files": [
+    "zhi2-mobile-shimin/vite.config.ts",
+    "zhi2-mobile-shimin/scripts/restore-main-vendor-deps.mjs",
+    "zhi2-mobile-shimin/package.json"
+   ],
+   "baseline": "8520c36",
+   "sessionIds": [
+    "87fe1c13-6937-4a04-8752-5102a7dffe63"
+   ],
+   "bundle": "001.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "微信开发者工具报「source size exceed max limit 2048KB」但自测体积合规：判定口径不同 + 4M 上限必须在工具 UI 勾选",
+   "type": "workflow",
+   "content": "情况：苏住房C 市民端小程序反复报「subpackage /pages_owner/ source size 2140KB exceed max limit 2048KB」「main package source size 2207KB exceed max limit 2048KB」，而本地脚本 size-main-package.mjs 统计出来是合规的，用户自己也说「似乎判断标准不一致」。\n\n为什么：两套口径不同 —— 自写脚本通常量的是构建产物磁盘体积，开发者工具量的是「源码打包后的 source size」且会把依赖副本、分包占位等算进去；同时 project.config.json 里写的 bigPackageSizeSupport 不会自动生效，必须在「详情 → 本地设置」里人工勾选「预览及真机调试时主包、分包体积上限调整为 4M」，未勾选时哪怕配置里有这一项，超限分包（如 pages_transaction ≈2115KB）依旧会让模拟器直接起不来。\n\n怎么做：1) 体积问题先确认工具 UI 里 4M 勾选状态，再看「编译」面板原文，而不是看「调试器 → Console」（模拟器启动失败时 Console 只显示 [object Object]，拿不到真错误）；2) 分包超限优先把体积挪走（拆页面到新分包 / 复用 scripts/split-pages-vote.mjs 这类切分脚本），不要靠调脚本阈值来自我安慰；3) 复测流程固定为「清缓存 → 重新导入 dist → 点编译」。",
+   "evidence": "会话 672f088f：连续三条 source size exceed 报错（pages_owner 2140KB/2100KB、main package 2207KB），用户反馈「似乎判断标准不一致」；结论明确 bigPackageSizeSupport 只写进 project.config.json 不够、必须在开发者工具 UI 勾选 4M，且 wx.onLazyLoadError 返回 undefined 属正常、Console 的 [object Object] 不是完整错误信息，要求改看编译面板。",
+   "files": [
+    "zhi2-mobile-shimin/project.config.json",
+    "zhi2-mobile-shimin/scripts/size-main-package.mjs",
+    "zhi2-mobile-shimin/scripts/split-pages-vote.mjs",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "672f088f-9a28-4d5f-8510-9425d8259a76"
+   ],
+   "bundle": "001.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "uni-load-more/useLoadMore 迁 z-paging 后 tab 切换分页集体失效：切换必须重置到第 1 页并重新发请求",
+   "type": "bug",
+   "content": "情况：把全站 uni-load-more + useLoadMore 的列表统一换成 z-paging（保留原空态图片，不用 zs-empty）之后，用户连续反馈「我的房源切换功能失效」「原来所有有 tab 切换功能的分页都失效了」「点了没有任何反应」「页面错乱」，同时还有「z-paging 好像没有 loading 效果」。\n\n为什么：旧 hook（useLoadMore）把「当前 tab 类型」当作分页参数的一部分，切 tab 时重置页码并重发请求；换成 z-paging 后页码与列表由组件内部维护，切 tab 只在业务层改了类型字段，既没让组件回到第 1 页，也没触发 reload，于是表现成「点了没反应 / 还是旧数据 / 页面上残留上一 tab 的内容」。loading 缺失同理：request 回调里没正确 return/结束，组件拿不到加载态。\n\n怎么做：1) 每个 tab 页在切换处理里显式调用 z-paging 实例的 reload（参数变更后必须回到第一页），不要只改数据字段；2) 清掉旧 hook 残留的状态复位逻辑，避免两套分页状态互相打架导致错乱；3) request 回调必须把请求 Promise 交出并保证结束，否则无 loading；4) 迁移后做一次全局巡检：凡是有 tab 切换的列表页都验证「切 tab → 回到第 1 页 → 数据与空态都刷新」。空态不必逐页自定义，ZsPaging 默认空态（images/empty.png +「暂无数据」）不会白屏，约 15 个页面没有 #empty 属可接受现状。",
+   "evidence": "会话 15b35540：用户诉求 1 要求所有 uni-load-more 页面改 z-paging 并移除 useLoadMore 相关组件与 hook；随后诉求 2-5 连续报「我的房源切换功能失效」「所有 tab 切换的分页都失效」「点了没有任何反应」「页面错乱」，诉求 6 报「z-paging 没有 loading 效果」；结论确认约 15 个页面无自定义 #empty 但仍走 ZsPaging 默认空态，不会白屏。",
+   "files": [
+    "zhi2-mobile-shimin/src/hooks/useLoadMore.js",
+    "zhi2-mobile-shimin/src/components/ListLoading/ListLoading.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/Project_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages/collect/index.vue",
+    "zhi2-mobile-shimin/src/pages/news/index.vue",
+    "zhi2-mobile-shimin/src/pages/publicNotice/publicNotice.vue"
+   ],
+   "baseline": "83c4136",
+   "sessionIds": [
+    "15b35540-03c7-44b7-9ef5-69b1b346d1bb"
+   ],
+   "bundle": "001.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 市民端以 iOS 原生代码为唯一参照做像素级还原：素材/菜单配置从 iOS 提取，用户按页点名验收",
+   "type": "preference",
+   "content": "情况：苏住房C 的 zhi2-mobile-shimin（市民端）页面改造，用户给「图1 现状 + 图2 设计稿」，要求「参考 iOS 代码，像素级还原页面 UI，逻辑也要 100% 一致」，并直接点名缺失的图片素材「都可以在 iOS 代码中找到」、菜单配置图标「很多也不对，参考 iOS 的菜单实现方式」。后续又逐页点名验收（电子业主卡图片仍有问题、聊天背景色与输入框边框、机器人入口缺失）。\n\n为什么：市民端是从 iOS 原生 App 复刻的 H5/小程序，设计稿只是结果，真正的权威来源是 iOS 工程里的素材与菜单配置结构；靠臆造图标或按截图估色值，必然被反复打回。\n\n怎么做：1) 动手前先在 iOS 代码里定位对应页面的素材目录与菜单配置，素材缺失就去 iOS 工程取，禁止自绘/找近似图；2) 菜单区（MenuCard 一类）按 iOS 的实现方式组织配置（图标 + 文案 + 跳转），不要逐张图硬贴；3) 交付前按页截图与设计稿逐条比对，用户是按页点名验收的；4) 清理同源残留：如曾误显示「家园区」，要移除 homeland 相关全部逻辑而不是隐藏入口，并全局复查是否还有别的同源残留模块被带进来。",
+   "evidence": "会话 d07a249b：用户诉求 2「没有还原设计图……确实的图片素材都可以在 iOS 代码中找到，菜单配置图标很多也不对，参考 ios 的菜单实现方式」；诉求 3/4「现在怎么显示家园区了，homeland 相关的逻辑移除掉」；诉求 5「图1是现在的效果，图2是设计稿，参考 ios 代码，像素级还原页面 UI，逻辑也要 100% 一致」；诉求 6「电子业主卡这里的图片还有点问题」。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages/index/components/Home_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/Project_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/MenuCard.vue",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "baseline": "83c4136",
+   "sessionIds": [
+    "d07a249b-d9a2-41e7-a8f1-7018cf24e8c6"
+   ],
+   "bundle": "001.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "83c4136",
+   "content": "【什么情况】苏住房C（zhi2-mobile-shimin）按江苏省「苏服办」接入规范改造接口层：后端只上架 2 个统一转发接口 v2.0/external/interface/getDispatcher（GET）与 postDispatcher（POST），业务接口不再直连，全部由这两个接口转发，并通过 header 携带 interface_id 等路由参数。\n【为什么】苏服办要求请求头带 zs- 前缀参数并做 SM3 签名，且本地开发没有苏服办网关注入，直接套用会全部失败；但生产又必须走网关，否则拿不到免登录凭证。\n【怎么做】1) 用环境变量开关（useDispatcher）决定是否走 dispatcher，开发环境默认关闭、测试/生产默认开启，本地仍按原来的直连方式调试；2) 集中到 api/dispatcher.js 管理苏服办配置、签名与 zs- 请求头组装，index.js / v1Instance.js 只保留 base、token、tag 等差异（约 20 行）；3) 抽 api/httpInstance.js 承载请求/响应拦截、dispatcher 封装、日志、文件上传的公共逻辑，避免两个 instance 各写一份；4) 请求日志要同时打印请求头、请求地址、请求参数与响应体，否则 dispatcher 转发失败时无从定位；5) 参数缺失时先整理成清单找后端补齐（interface_id 等），不要在前端硬编码占位。",
+   "evidence": "会话 b5d791be（基线 83c4136）：用户要求「参考宿迁苏服办项目统一修改接口调用，后端参与 2 个封装接口 getDispatcher/postDispatcher，参数按图片放在请求头并加 zs- 前缀」，随后追加「本地调试按原来的方式调用并打印接口日志」「是否使用苏服办模式改为环境变量配置，开发默认不用、测试生产默认使用」「业务接口后续会有 interface_id，把缺失参数统计出来」。最终把 api/sfbConfig.js、utils/sfbSign.js、api/requestLog.js 三个文件合并进 dispatcher.js / httpInstance.js，index.js 与 v1Instance.js 从约 500 行降到约 40 行。",
+   "files": [
+    "zhi2-mobile-shimin/src/api/dispatcher.js",
+    "zhi2-mobile-shimin/src/api/httpInstance.js",
+    "zhi2-mobile-shimin/src/api/index.js",
+    "zhi2-mobile-shimin/src/api/v1Instance.js",
+    "zhi2-mobile-shimin/src/utils/sfb.js"
+   ],
+   "sessionIds": [
+    "b5d791be-2fb9-40ed-a41e-ead0373b6962"
+   ],
+   "title": "苏服办网关模式：所有接口统一走 getDispatcher/postDispatcher 两个封装接口，环境变量开关控制",
+   "type": "pattern",
+   "bundle": "002.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "83c4136",
+   "content": "【什么情况】接入苏服办后，请求头里同时存在两套签名：本项目原有的业务签名，与苏服办网关要求的 sign/nonce/timestamp。\n【为什么】若把项目原有签名直接改名为苏服办的 sign，业务侧验签会挂；反之若苏服办参数不加前缀，两边 key 互相覆盖，网关取到的是业务签名直接拒绝。\n【怎么做】1) 项目原有签名逻辑保持不变，请求头键名改为 zs-sign；2) nonce、timestamp 也统一加 zs- 前缀（zs-nonce、zs-timestamp），与业务方约定同名不同前缀；3) 苏服办自己的 sign 及配套参数严格按苏服办规范单独计算，走各自的字段名；4) 签名工具函数的拆分别搞混：utils/sign.js 供 uni.request 模块使用，static/js/sign.js 供 H5 侧 XHR 拦截使用，运行环境不同需要保留双份，不要为了「去重」把两份合并——本地直连调试时 XHR 拦截仍需要它。",
+   "evidence": "会话 b5d791be（基线 83c4136），用户诉求 6：「签名本项目原有的保持不变，放在 zs-sign，对应的 nonce 和 timestamp 也加 zs- 前缀。苏服办那边的 sign 和其他参数用苏服办的逻辑」。最终结论中说明 utils/sign.js 与 static/js/sign.js 因运行环境不同（uni.request 模块 vs H5 XHR 拦截）保留双份。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/sign.js",
+    "zhi2-mobile-shimin/src/static/js/sign.js",
+    "zhi2-mobile-shimin/src/api/dispatcher.js"
+   ],
+   "sessionIds": [
+    "b5d791be-2fb9-40ed-a41e-ead0373b6962"
+   ],
+   "title": "苏服办签名与业务签名共存：业务 sign 保留原名放 zs-sign，苏服办侧 sign 用自己逻辑，nonce/timestamp 同样加 zs- 前缀",
+   "type": "pattern",
+   "bundle": "002.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "77666f8",
+   "content": "【什么情况】移动端 H5 被包进苏服办官方小程序（微信端/支付宝端）的 web-view 里打开，点「人脸识别」在苏服办内正常，在微信里报 script error/人脸识别测试失败，在支付宝里点了没反应。\n【为什么】1) 苏服办把扫脸凭证放在页面地址 index.html?token=xxx（hash 之前），这是 certify_token，不是业务 accessToken；而 App.vue 只读 hash 里的 ?token=，导致微信带的凭证从未被识别；2) loginWithSfbTicket 登录后若后端没返回 sfbToken，会用空字符串覆盖 localStorage.tokenjssdk，把 SDK 从 URL 写入的正确值清掉；3) 扫脸凭证取值优先用了登录接口返回的空值，而不是 URL 里的；4) 支付宝端没有 URL token，只能靠 getTicket 换，若 my.onMessage 未绑定就表现为「没反应」。\n【怎么做】启动时 initSfbTokenFromPageUrl() 读页面级 ?token= 并写入 sfbToken + tokenjssdk；凭证获取顺序收敛为 ensureFaceCertifyToken()：URL token → SDK 缓存 → store → ticket 登录；loginWithSfbTicket 禁止用空值覆盖已有苏服办 token；App.vue 明确区分页面 ?token=（苏服办）与 hash ?token=（业务 accessToken）；支付宝端恢复 my.onMessage 桥接。不要按环境分支处理，SDK 本身是兼容的，差异只在凭证来源。",
+   "evidence": "会话 618cde10（基线 77666f8）：用户先要求用苏服办 SDK 拉起人脸识别，随后反馈「在苏服办里是好的，在微信和支付宝里调用 sfbtoken 接口都失败，苏服办 SDK 应该都是兼容的，不要区分环境处理」「微信里点了报错 script error，支付宝里点了没反应」「都是对应平台的小程序打开的 web-view」。最终定位到页面 ?token= 与 hash ?token= 的区别及空值覆盖问题。",
+   "files": [
+    "zhi2-mobile-shimin/src/hooks/useFaceVerify.js",
+    "zhi2-mobile-shimin/src/pages/common/face.vue",
+    "zhi2-mobile-shimin/src/pages/index/my.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/My_Suzhufang.vue"
+   ],
+   "sessionIds": [
+    "618cde10-d52f-49ca-a993-700278308c9e"
+   ],
+   "title": "H5 内拉起苏服办 SDK（扫脸）在微信/支付宝 web-view 里失败的三处根因：页面级 ?token= 未读、空 sfbToken 覆盖 tokenjssdk、扫码凭证优先级错",
+   "type": "bug",
+   "bundle": "002.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "9832ba3",
+   "content": "【什么情况】苏住房C 小程序主包 2204KB，超出 2048KB 上传限制，微信开发者工具报超体积。\n【为什么】主包 static 里堆了大量「只在分包使用」的空状态图（约 300KB），加上 HouseList / PersonList 这类只被某个分包消费的组件也被打进了主包。uni-app 打包时只要资源被主包代码路径引用（包括被 mainStaticPaths 这类白名单显式列入），就会进主包。\n【怎么做】1) 先盘点主包 static 的每张图真实使用方，把 apply-empty.png、empty_house.png、empty.png、auto-robot.png、face-error.png、kefurexian.png 等分别迁到 pages_transaction / pages_feedback / pages_owner / pages_main 等消费分包；2) 同步从 src/utils/mainStaticPaths.js 的白名单里移除这 14 项——白名单是「强制留在主包」的开关，不移除等于白搬；3) 把只被分包使用的组件（HouseList / PersonList）迁入对应分包 components；4) 迁移后必须回到每个引用点修正静态资源路径，以及 ZsEmpty 的默认图与各分包 ZsEmpty 路径，否则会出现图片空白；5) 迁移逻辑要落成脚本（scripts/migrate-main-empty-static.mjs）便于复现，构建后实测主包 1842KB、pages_owner 1.61MB、pages_transaction 1.80MB。",
+   "evidence": "会话 bee1d6dc（基线 9832ba3）：用户连续四轮反馈「小程序包体积超了很多」「还是过大」「还差一点」「分包还是有一个超过 2mb」。最终结论给出主包压到 1842KB 的原因与改动：14 项从 mainStaticPaths 白名单移除、HouseList/PersonList 迁入 pages_owner/components/house/、新增 scripts/migrate-main-empty-static.mjs。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/mainStaticPaths.js",
+    "zhi2-mobile-shimin/scripts/size-main-package.mjs",
+    "zhi2-mobile-shimin/scripts/migrate-main-empty-static.mjs",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "sessionIds": [
+    "bee1d6dc-9e69-4597-9d07-f327a5058b0c"
+   ],
+   "title": "小程序主包瘦身：mainStaticPaths 白名单要同步裁剪，只在分包使用的空状态图移到分包内",
+   "type": "pattern",
+   "bundle": "002.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "f1939b0",
+   "content": "【什么情况】安卓手机从个人中心 → 电子业主卡 → 投票表决 → 参与决策进入后白屏、图片不显示、按钮点不动，且不能 100% 复现（iPhone 正常，安卓复现），最终在报错里看到 Error: 系统错误，错误码：80058，preloadRule source size 2662KB exceed max limit 2MB。\n【为什么】pages.json 里 pages/index/project（苏找房 Tab）的 preloadRule 配置了 packages: [\"pages_tab\", \"pages_transaction\"]，微信对「单条 preloadRule 的 packages 合计体积」限制 2MB（2048KB），而这两个分包编译后合计约 2686KB，超限后该预加载规则整体失效；表现上不是弹明确的配置错误，而是目标分包资源没下发，页面白屏/图片丢失/交互无响应，且只在低端机（安卓冷启动）上明显，因此很容易被误判为「分包路由问题」排查很久。\n【怎么做】1) 看到白屏 + 图片不显示 + 点击无响应且仅安卓复现时，先在开发者工具/日志里搜 80058，不要从页面代码查起；2) 统计每条 preloadRule 里所有 packages 的编译后体积之和，超过 2048KB 的规则直接删除或只保留一个轻量分包；3) 大分包（源码约 2.3MB 的 pages_transaction）不要和其他分包合并预加载，改为首次进入时按需加载，代价只是首次稍慢；4) 已由首页 pages/index/home 预加载过的分包（如 pages_tab）无需重复配置；5) 修复后要复查其他 preloadRule（例如 pages_vote/* 预加载 pages_owner）是否也接近上限。",
+   "evidence": "会话 4a12fc00（基线 f1939b0）：用户先报「从个人中心，电子业主卡，投票表决，点击参与决策，页面无法显示，不能 100% 复现，怀疑还是分包问题」，再补充「iPhone 没问题，安卓不行」「安卓进入后图片不显示，点击参与决策也没反应」，最后贴出 error 80058 preloadRule [pages_owner_extra/ownerCard/index] source size 2662KB exceed max limit 2MB。修复为删除 pages/index/project 的预加载规则。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages.json",
+    "zhi2-mobile-shimin/src/utils/menuNav.js",
+    "zhi2-mobile-shimin/src/pages/redirect/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/ownerCard/index.vue"
+   ],
+   "sessionIds": [
+    "4a12fc00-b2b5-4a2f-9855-3ac716f228d9"
+   ],
+   "title": "微信 80058 preloadRule 超 2MB：单条规则的 packages 合计算体积，多分包合并预加载必踩，删规则优于拆包",
+   "type": "bug",
+   "bundle": "002.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 非 sfb 分支要物理移除苏服办网关逻辑，并在产物层验收",
+   "type": "bug",
+   "content": "情况：zhi2-mobile-shimin 从 sfb（苏服办）同源复制出 suzhou-shiqu-suzhufang-main-v2.1 这类非 sfb 分支后，运行时仍在请求苏服办接口（网关 gateway.do、ydzt.jszwfw.gov.cn）。原因：同源复制保留了苏服办分支的网关封装与 .env.production 的 API base 指向，用户明确「当前分支不是 sfb 分支就必须把苏服办逻辑全部清掉」，而不是靠运行时开关绕开。做法：(1) 先 grep gateway.do / jszwfw 定位网关封装、请求拦截分支与 env 配置，一并删除并恢复直连，API base 回到 /api/v2.0；(2) 验收不能只看代码 diff，必须 npm run build 后对产物目录再 grep 一次同样的关键字，确认网关串在 dist 中不存在；(3) 同源分支裁剪要保留通用逻辑只固化分支差异值，与 V3 的 isSuzhouzhizai/currentEnvironment 分支清理同思路。(4) 默认关闭 VConsole：调试面板只在 devtool 手动开启时才注入，打包产物不带自动调试开关。最后按「子模块提交先行、父仓库只更新指针」提交，子模块打 tag（如 v2.1.0.17）并推送，部署验证用该 tag 对应的 dist。",
+   "evidence": "会话 05aecd01：用户「当前分支不是sfb分支，把苏服办的逻辑都清除掉」→ 移除非 sfb 分支的苏服办网关逻辑，恢复 API 直连；产物检查确认无 gateway.do / ydzt.jszwfw.gov.cn、API base 为 /api/v2.0、VConsole 默认关闭（仅 devtool 手动开启）；子模块 05b4b4f4 + 父仓 0462ba4（含根目录 test 脚本修正），子模块打 tag v2.1.0.17 并推送。",
+   "files": [
+    "zhi2-mobile-shimin/.env.production",
+    "zhi2-mobile-shimin/src/main.ts",
+    "zhi2-mobile-shimin/src/utils/vconsole.ts",
+    "zhi2-mobile-shimin/package.json",
+    "build.sh",
+    "package.json"
+   ],
+   "baseline": "db06361",
+   "sessionIds": [
+    "05aecd01-e33e-4233-a8fc-d63fe7665256"
+   ],
+   "bundle": "003.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 模拟器启动失败/页面路径为空：导入 dev 产物且主包 4MB 超限，不是代码问题",
+   "type": "bug",
+   "content": "情况：微信开发者工具一打开模拟器就失败、页面路径显示为空，同时提示「清除工具及手机授权数据失败 [object Object]」，用户怀疑是代码报错。原因有两层：(1) 生产构建产物 D:\\repository\\苏住房C\\dist 不存在，体积检查脚本（size:main）退而检查了 dev 产物 dist/dev/mp-weixin，其主包约 4095KB，超过 2048KB 上传限制，模拟器启动即失败；(2)「清除工具及手机授权数据失败」是微信开发者工具清缓存的自身缺陷（官方社区有记录），失败时只显示 [object Object]，导致清缓存没真正生效，模拟器继续用旧的错误产物。做法：先 npm run build 生成生产产物（主包 2037.3KB，过 validate-dist），再按目录分工使用——日常开发 npm run dev 导入 zhi2-mobile-shimin/dist/dev/mp-weixin，模拟器稳定运行/上传 npm run build 导入 苏住房C/dist，绝不导入源码目录或 dev 产物。手动清缓存：关闭开发者工具，删除 %APPDATA%\\Tencent\\微信开发者工具\\Default Cache 下所有 Simulator_* 与 BaseLib 文件夹；本地设置勾选「预览及真机调试时主包、分包体积上限调整为 4M」。排查提问固定问「编译面板」的红色报错，而不是 Console。",
+   "evidence": "会话 73fa7d59：用户报模拟器一打开就失败、页面路径为空并附「清除工具及手机授权数据失败」；定位为 dist 被删 → 回退检查 dev 产物 4095KB 超 2048KB 限制；重建后主包 2037.3KB、validate-dist 通过；给出手动清缓存与目录/命令分工表。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_vote/elect/ResultRecord.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision",
+    "zhi2-mobile-shimin/src/pages_transaction/intention"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "73fa7d59-b87a-43f4-8979-be31b7024446"
+   ],
+   "bundle": "003.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C H5「接口没调用」：分页 hook 自动请求早于 onLoad 设参",
+   "type": "bug",
+   "content": "情况：新房列表把参数写在 URL query（如 type=1/2 区分户型集锦、最新楼盘、在售楼盘），进入页面后列表无数据，用户确认「是没调用接口，后台有数据」。原因：页面用的 usePaging 默认 auto: true，在 onLoad 读 type 之前就发了第一次请求，专用参数（如 halfYearAgo）落到默认值 0（在售楼盘口径），而正确值应为 1，所以要么请求参数错、要么看着像没请求。做法：(1) 依赖 onLoad 解析参数的列表页统一设 auto: false，在 onLoad 里完成参数赋值后再显式 refresh()；(2) 页面内跳转不要手工拼 `indexMore?type=1?type=2` 这种二次问号（参数会乱），直接用菜单/卡片配置里的 row.url；(3) 全局排查同类页（户型集锦、最新楼盘、在售楼盘同族）一次改完。联调时要意识到「请求已发出但列表为空」可能是环境数据问题而非 bug：halfYearAgo=1 时接口实测返回 0 条、halfYearAgo=0 有 132 条，需在调试器看 total 并让后端确认筛选口径。",
+   "evidence": "会话 65dd03cf：用户「新房列表页面接口没有正常加载」→「是没调用接口，有数据的」→「户型集锦，最新楼盘，在售楼盘都有这个问题」→「全局排查」→ 修 indexMore 改为 auto: false 并在 onLoad 设好 type 后 refresh()，跳转改用 row.url；实测 halfYearAgo=1 返回 0 条、=0 返回 132 条。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_transaction/newHouse/index.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/newHouse/indexMore.vue",
+    "zhi2-mobile-shimin/src/hooks/usePaging.js",
+    "zhi2-mobile-shimin/src/api/httpInstance.js",
+    "zhi2-mobile-shimin/src/api/transaction.js",
+    "zhi2-mobile-shimin/src/pages_tab/components/Project_Suzhufang.vue"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "65dd03cf-f8dc-4995-a394-050462f88b56"
+   ],
+   "bundle": "003.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "V1/V2 双 token 策略：tokenV1 集中预取而非请求层拦截，且实名状态勿读本地缓存",
+   "type": "pattern",
+   "content": "情况：苏住房C 移动端同时有 V2（主站）与 V1（老端）两套接口。用户已实名但各入口仍 toast「请先进行实名认证」，杀进程重进就好了——根因是各页面各自读本地缓存的实名状态，注销后重新注册 uid 变了、旧缓存在旧 uid 下没被清，与「我的」页实时拉取的「已实名」不一致。同时 V1 接口的 tokenV1 用请求层 requireRealName 硬拦截，未实名时把请求直接掐掉。用户明确的两条策略：(1) getTokenV1 本身需要实名用户，未实名时禁止调用它；依赖 V1 token 的功能要在调用对应接口之前 toast 提示并禁止调用，而不是让拦截器在请求层吞掉；(2) 并非所有 V1 接口都需要 token，没有 token 就不带 Authorization 正常调用即可，但 V2 已登录且已实名时 tokenV1 必须有。做法：删除 httpInstance 里的 requireRealName/assertRealNameForV1 与 async 包装，v1Instance 恢复为纯 V1 客户端；tokenV1 的预取收敛到 store/user.js 的 getUserInfo()——已实名 await ensureTokenV1()，未实名 setTokenV1('')，refreshAuthState 不再重复调用；实名成功后补一次 getTokenV1；注销/退出在 clearUserSession 清空 tokenV1；清理 login、FormLocal、redirect 等页面里的重复调用。后续若个别 V1 接口在已实名场景必须带 token，可按 requireTokenV1 单接口按需拦截。实名状态一律以服务端/store 为单一状态源，注销时清空全部用户缓存，本地与服务端不一致时以服务端为准并静默更新。",
+   "evidence": "会话 29479c88：用户报已实名仍提示「请先进行实名认证」、重进后恢复，怀疑与注销重注册有关；随后两轮策略指令「getTokenV1 需要实名用户，未实名禁止调用对应接口并先 toast」「实名成功后也要补 getTokenV1、没有 token 就不带」；最终删除 httpInstance 的 requireRealName/assertRealNameForV1，tokenV1 预取集中到 store/user.js getUserInfo()。",
+   "files": [
+    "zhi2-mobile-shimin/src/api/httpInstance.js",
+    "zhi2-mobile-shimin/src/api/v1Instance.js",
+    "zhi2-mobile-shimin/src/store/user.js",
+    "zhi2-mobile-shimin/src/pages/index/my.vue",
+    "zhi2-mobile-shimin/src/pages_my/setting/userInfo.vue",
+    "zhi2-mobile-shimin/src/pages_my/verification/FormLocal.vue",
+    "zhi2-mobile-shimin/src/pages_my/setting/cancellationReason.vue",
+    "zhi2-mobile-shimin/src/utils/index.js"
+   ],
+   "baseline": "9cdf7b8",
+   "sessionIds": [
+    "29479c88-88bb-4d9d-b264-a6e91076729b"
+   ],
+   "bundle": "003.md",
+   "project": "苏住房C"
+  }
+ ]
+}

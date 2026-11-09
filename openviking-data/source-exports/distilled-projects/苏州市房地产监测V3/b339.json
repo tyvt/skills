@@ -1,0 +1,92 @@
+{
+  "project": "苏州市房地产监测V3",
+  "batch": "339",
+  "files": [
+    "339.md"
+  ],
+  "count": 5,
+  "memories": [
+    {
+      "title": "「返回首页」跳同站点门户用 window.location.replace 而非 href：同址时浏览器视为同页导航，表现得像后退/无反应，此时改 location.reload()",
+      "type": "bug",
+      "content": "【什么情况】顶栏「返回首页」要跳到门户（门户地址配在系统参数设置里，可直接写库）。功能加上去后用户反馈「没生效」「点了只是浏览器的后退，我需要直接重定向到配置页面」。\n【为什么】原实现用 `window.location.href = url`。当**门户地址与当前访问地址是同一个站点**（本例同为 `unlimited.g.h5.admin.web...`）时，浏览器把它当成同页导航处理：地址栏看似没变、历史记录被压掉，用户感知就是「只后退了一下、什么也没发生」。这不是地址配错，是同站导航的语义差异。\n【怎么做】① 改用 `window.location.replace(target)`——强制整页重定向，且**不留下历史记录**（用户不会再「后退回到管理端」）；② 先**去掉 hash 再比较**目标与当前地址（带 hash 比较会把「同页不同锚点」误判成不同地址）；③ 目标与当前地址相同（去掉 hash 后）时直接 `location.reload()` 强制整页刷新，保证应用能重新初始化，而不是再 assign 一次同样的 URL；④ 取不到配置值时回退到管理端 `/index`，不能让按钮无响应；⑤ 配置项（门户地址）放在系统参数设置里、由后台数据库维护，前端只读——改地址不用发版。⑥ 注意生效范围：`npm run dev` 下即刻生效，dev/test 服务器要**重新构建发布**后才生效，验证要用部署站点。",
+      "evidence": "会话 session-2e06934c-aa3c-4834-aec0-4710dafa1929（基线 c5d74f4）用户诉求 1「这个返回首页能跳转到门户上，参数设置里面加一条数据。配置门户的地址，可以直接数据库加」、诉求 3「没生效啊」、诉求 4「这个逻辑有问题，我现在点了只是浏览器的后退，我需要直接重定向到配置页面」；最终结论写明「**问题原因**：之前用的是 `window.location.href = url`，而你配置的门户地址和当前访问的地址是同一个站点…浏览器视为同页导航，表现就像『后退/无反应』」，修复逻辑为「改用 `window.location.replace(target)`…先去掉 hash 比较目标与当前地址：**相同地址时直接 `location.reload()`** 强制整页刷新…取不到配置值时仍回退到管理端 `/index`」，并注明「本地 `npm run dev` 下点『返回首页』即刻生效；dev/test 服务器需要重新构建发布后生效」。",
+      "files": [
+        "zhi2-web-admin/src/layout/components/Navbar.vue",
+        "zhi2-web-admin/src/api/system/config.js",
+        "zhi2-web-admin/src/views/autonomy/regulation/components/detail.vue",
+        "env/.env.production"
+      ],
+      "baseline": "c5d74f4",
+      "sessionIds": [
+        "session-2e06934c-aa3c-4834-aec0-4710dafa1929"
+      ],
+      "bundle": "339.md"
+    },
+    {
+      "title": "详情页表单在部分分辨率下一直抖动的根因是内滚容器滚动条槽位不稳定：用 scrollbar-gutter: stable 预留槽位",
+      "type": "bug",
+      "content": "【什么情况】项目变更详情页在某些屏幕分辨率下表单会一直抖动（内容反复上下跳动），换一台机器又不复现。\n【为什么】页面有一个内滚动容器，当内容高度跨过「刚好不出现滚动条」的临界点时，滚动条出现/消失会让可用宽度变化，布局重排 → 再跨过临界点 → 滚动条又消失，形成**抖动循环**。这类问题只在特定视口宽度出现，因为「内容高度 ≈ 容器高度」的那一段区间才会命中临界点，所以表现为「某些分辨率必现、其它正常」。\n【怎么做】① 根因是滚动条槽位（scrollbar gutter）不稳定，修复用 `scrollbar-gutter: stable` 给内滚容器**预留**滚动条槽位，内容跨临界点时宽度不再变化，抖动消失；② 改在全局样式层（`src/styles/index.scss`）而不是逐页加，避免同一模板的多个页面各修一遍；③ 排查这类「只在某些分辨率复现」的抖动时，先怀疑滚动条槽位/滚动容器高度，而不是先调间距数值；④ 改动要小而聚焦（本次只改 `src/styles/index.scss` 一个文件 +9 行），并按具体路径暂存，不要夹带构建产物与临时脚本。",
+      "evidence": "会话 session-a760b8e9-9a10-4358-9ae7-6e1c8f2b10a9（基线 c5d74f4）用户诉求 1「项目变更详情页面有些屏幕分辨率上会一直抖动」；最终结论列出子模块提交 `15523eab0 fix(detail): 详情页内滚容器滚动条槽位恒定，修复部分分辨率下表单抖动（仅 `src/styles/index.scss`，+9 行）`，并写明「提交范围纪律：只暂存本次任务的 `src/styles/index.scss`；未夹带 `public/version.json`（构建产物）、`e2e/` 临时脚本、`.tmp-evidence/`、`.pua/`（反馈目录）等无关改动」。",
+      "files": [
+        "zhi2-web-admin/src/styles/index.scss",
+        "zhi2-web-admin/src/views/building/projectChange/detail.vue"
+      ],
+      "baseline": "c5d74f4",
+      "sessionIds": [
+        "session-a760b8e9-9a10-4358-9ae7-6e1c8f2b10a9"
+      ],
+      "bundle": "339.md"
+    },
+    {
+      "title": "push 输出 Everything up-to-date 不代表没推上去：用 git ls-remote 比对远程 ref 与本地 HEAD 才算推送成功",
+      "type": "workflow",
+      "content": "【什么情况】执行推送时两个仓库的 `git push` 都返回 `Everything up-to-date`，看起来像「什么都没推」，但远程其实已经包含了本次提交。\n【为什么】本仓库有 husky/lint-staged 钩子和仓库侧的同步通道，提交在推送动作之前就已被送达远程，git 自己的推送阶段发现远端已有该 ref，就打印 `Everything up-to-date`。若只看 push 的输出，会误判为「推送失败/提交没上去」并重复操作，甚至做出「再提交一次」的蠢事。\n【怎么做】① 判断推送是否成功**不以 push 输出为准**，用远程 ref 与本地 HEAD 比对：子模块 `git ls-remote` 取到 `3343efea3`、主仓 `git ls-remote` 取到 `b44a496d8`，与本地 HEAD 一致才算成；② 父仓的 gitlink 也要核对：`git ls-tree HEAD zhi2-web-admin` 的值必须等于子模块当前 HEAD（本例两边都是 `3343efea3`）；③ 再用 `git status -sb` 看 ahead/behind 为 `0 0`，确认没有遗漏的未推送提交；④ 交付结论里写远程校验的具体命令与哈希值，不要只写「已推送」。",
+      "evidence": "会话 session-1f0a75c8-f454-4cb8-93f2-485ebf92d3b5（基线 a86bf95）用户诉求 1「这是开发企业资质附件的改造」、诉求 2「推送」；最终结论「推送结果」表格给出「`git ls-remote` = `3343efea3`，与本地 HEAD 一致」「`git ls-remote` = `b44a496d8`，与本地 HEAD 一致」，并补充说明「两个仓库的 `push` 都返回 `Everything up-to-date`，但远程引用已包含本次提交…说明本次提交在推送前已由仓库侧的钩子/同步通道送达远程，远程状态与本地一致，无遗漏」以及「主仓库 `git ls-tree HEAD zhi2-web-admin` 记录的 gitlink 为 `3343efea3`，与子模块当前 HEAD 完全一致」。",
+      "files": [
+        "zhi2-web-admin/src/views/register/components/single-page/CompanyRegisterSingleForm.vue",
+        "zhi2-web-admin/src/utils/registerAppendixAdminType.js",
+        "zhi2-web-admin/vite.config.js"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-1f0a75c8-f454-4cb8-93f2-485ebf92d3b5"
+      ],
+      "bundle": "339.md"
+    },
+    {
+      "title": "要件（附件格子）的真相源是附件配置中心不是前端代码：/file/appendixConfig/page 按 busCode 配，页面用 listAppendixPackage 按 busCode+busId 取，必填由 checkRequiredAppendix 校验",
+      "type": "fact",
+      "content": "【什么情况】用户问「证书管理里面的要件是附件配置里配的吗」——页面上「要件上传」区块出现哪些格子、叫什么名、必不必填、允许什么格式/大小，前端代码里根本看不到这些定义。\n【为什么】要件是**配置驱动**的：前端只负责按业务编码把配置取回来渲染，所以「改要件」不需要改代码。这条链路一旦搞错，就会出现「页面没显示要件」或「必填没校验」的困惑，而真正的原因在数据库配置。\n【怎么做】完整链路（按环节）：① **配置维护入口** `src/views/tool/fjflpz/index.vue`（附件配置中心）——左侧 `MenuTree` 选业务编码 `busCode`，右侧列表按 `busCode` 查配置，请求参数 `moduleName:'file'` / `businessName:'appendixConfig'` → `/file/appendixConfig/page`；② **单条要件定义** `src/views/tool/fjflpz/components/FjDialog.vue`——每条要件 = 业务编码 + 配置名称 + 附件配置编码 + 排序 + **是否必填** + 文件类型 + 数量/大小限制 + 档案目录/权限；③ **页面读取** 证书详情页（如 `projectManagement/certificate/conLandLic/detail.vue`）的「要件上传」区块用 `AppendixPackageSection` 组件，传 `:bus-code=\"appendixBusCode\"`，值取自**路由 `meta.busCode`**（前端运行时从 `$route.meta` 读，不在源码里硬编码）；④ **拉取接口** `src/utils/appendix.js` → `/file/appendix/listAppendixPackage`，入参 `{ busCode, busId }`：按 busCode 取该业务配置好的全部要件骨架，再按 busId 回挂已上传文件；⑤ **必填校验** `src/utils/appendix.js` 的 `checkRequiredAppendix` 按配置里 `isRequired==='1'` 的项校验是否已上传。结论：**增减/改名/调整必填都在附件配置中心按对应 busCode 维护，无需改代码**；要确认某个页面用的是哪个 busCode，就查它菜单路由的 `meta.busCode`（后端菜单管理里配的）。",
+      "evidence": "会话 session-142446f5-2a07-4b22-8cc7-74b787304073（基线 235e6ee）用户诉求 1「证书管理里面的要件是附件配置里配的吗」；最终结论以表格摊开五环链路：配置维护入口 `tool/fjflpz/index.vue`（`moduleName:'file'`/`businessName:'appendixConfig'` → `/file/appendixConfig/page`）、单条要件定义 `FjDialog.vue`（业务编码+配置名称+附件配置编码+排序+是否必填+文件类型+数量/大小限制+档案目录/权限）、页面读取 `conLandLic/detail.vue:26-38` 传 `:bus-code=\"appendixBusCode\"`、拉取接口 `utils/appendix.js:466` `/file/appendix/listAppendixPackage` 入参 `{ busCode, busId }`、必填校验 `utils/appendix.js:495-503` `checkRequiredAppendix` 按 `isRequired==='1'`，并总结「不是写死在前端的…而是在附件分类配置（附件配置中心 `tool/fjflpz`）里，按该页面路由的 `busCode` 一条条配好」。",
+      "files": [
+        "zhi2-web-admin/src/views/tool/fjflpz/index.vue",
+        "zhi2-web-admin/src/views/tool/fjflpz/components/FjDialog.vue",
+        "zhi2-web-admin/src/components/AppendixPackageSection/index.vue",
+        "zhi2-web-admin/src/utils/appendix.js",
+        "zhi2-web-admin/src/views/projectManagement/certificate/conLandLic/detail.vue"
+      ],
+      "baseline": "235e6ee",
+      "sessionIds": [
+        "session-142446f5-2a07-4b22-8cc7-74b787304073"
+      ],
+      "bundle": "339.md"
+    },
+    {
+      "title": "文字发糊的根因是只引了 Regular 字体却用 font-weight 600：Windows 浏览器合成假粗体，要么补 Medium 字重文件要么去掉加粗",
+      "type": "bug",
+      "content": "【什么情况】顶栏激活菜单的文字「有点模糊」，白字压在 `#2172E4` 蓝底上更明显。\n【为什么】激活态原本设了 `font-weight: 600`，但全局只引入了 `SourceHanSansCN-Regular` 一个字重，**没有对应的粗体字体文件**。浏览器于是用「合成粗体」（faux bold）——把 Regular 的轮廓做加粗描边而不是换字形，笔画变形、边缘发虚，叠在彩色底上就糊。这跟字号、分辨率、渲染性能都无关。\n【怎么做】① 首选：去掉激活态的加粗，未激活与激活都保持 `font-weight: 400`；② 想要「更醒目但不糊」的正确做法是**引入真正的中等字重**（`SourceHanSansCN-Medium`，需要补 `@font-face`），只用 `font-weight: 500`，而不是靠 600 让浏览器合成；③ 顺手加 `-webkit-font-smoothing: antialiased` / `-moz-osx-font-smoothing: grayscale` 改善抗锯齿（这是辅助手段，不能替代正确的字重）；④ 排查「文字发糊」时先看**页面实际引入了哪些字体文件、字重是否匹配**，不要先怀疑字体大小或阴影；⑤ 同一页面的未激活态基准是 `font-weight: 400; font-size: 16px; color: #C5DEFF`，改动要与之对齐。",
+      "evidence": "会话 session-5cd9c334-f122-4347-ad7a-53e297af0222（基线 d9a1380）用户诉求 2「激活菜单的文字有点模糊」；最终结论写明「**原因：** 激活项用了 `font-weight: 600`，但全局只引入了 `SourceHanSansCN-Regular`，没有对应粗体文件。Windows 上浏览器会**合成假粗体**，白字叠在 `#2172E4` 上就容易发糊」「**已改：** 在 `Navbar.vue` 里去掉激活态加粗，未激活与激活都保持 `font-weight: 400`，并给 `.nav-item__text` 加了 `-webkit-font-smoothing: antialiased` / `-moz-osx-font-smoothing: grayscale`」，并提示若需更醒目可「再加 `SourceHanSansCN-Medium` 只给激活项用 `font-weight: 500`（需补 `@font-face`）」。",
+      "files": [
+        "zhi2-web-admin/src/layout/components/Navbar.vue",
+        "zhi2-web-admin/src/views/home/components/TabBar.vue",
+        "zhi2-web-admin/src/styles"
+      ],
+      "baseline": "d9a1380",
+      "sessionIds": [
+        "session-5cd9c334-f122-4347-ad7a-53e297af0222"
+      ],
+      "bundle": "339.md"
+    }
+  ]
+}

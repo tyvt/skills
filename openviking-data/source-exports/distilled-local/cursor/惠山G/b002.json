@@ -1,0 +1,44 @@
+{
+ "project": "惠山G",
+ "batch": "002",
+ "files": [
+  "002.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "返还明细点击第2个数据后，再点第一个数据，第1个数据",
+   "type": "preference",
+   "content": "已修复。原因和改动如下。 ## 原因 返还明细弹窗（`zs-dialog`）设置了 `modal=\"false\"`，**不挡后面的表格**。因此可以： 1. 点开第 2 条数据的返还明细 2. **不关弹窗**，直接再点第 1 条 此时 `visible` 一直是 `true`，`@open` **不会再次触发**，表单和明细表仍停留在第 2 条的数据。 另外，`onOpen` 里调用 `getList()` 时未等子组件 props 更新，也可能拿到旧的 `maintenanceObjectId`。 ## 修改 1. **`refundDetailTable.vue`** - 给弹窗加 `:key=\"currentMaintenanceObjectId\"`，切换维修对象时强制重建弹窗 - `handleView` 用 `{ ...row }` 拷贝数据，避免引用同一对象 2. **`refundDetailDialog.vue`** - 抽出 `loadDialogData()`，在 `$nextTick` 中更新表单并调用 `getQuery()` 刷新明细 - 监听 `maintenanceObjectId`：弹窗已打开时切换行也会刷新数据 请再试：先点第 2 条，再点第 1 条（不关弹窗也可以），应能正确显示第 1 条的信息。",
+   "evidence": "extracted source=cursor project=惠山G",
+   "files": [
+    "**`refundDetailTable.vue",
+    "**`refundDetailDialog.vue",
+    "涉及文件：d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund\\components\\refundDetailTable.vue、d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund、d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund\\components\\refundDetailDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d4844f59-a2f6-4821-94b4-6f91ed2f0ff7"
+   ],
+   "_draft": true,
+   "project": "惠山G"
+  },
+  {
+   "title": "(6-38) 这里没有数据，重复打开之后又有了",
+   "type": "fact",
+   "content": "**原因** 父组件 `refundDetailTable.vue` 里给弹窗加了 `:key=\"currentMaintenanceObjectId\"`。第一次点「返还明细」时： 1. `currentMaintenanceObjectId` 从 `undefined` 变为具体 ID，弹窗组件被**销毁并重新创建** 2. 新建时 `visible` 已经是 `true` 3. Element UI 的 `el-dialog` 在**挂载时就是打开状态**时，**不会触发** `@open` 事件 4. 所以 `onOpen()` 没执行，`form` 一直是初始空值 第二次打开时，`visible` 从 `false` → `true`，`@open` 会正常触发，数据才显示出来。 **修复** 增加了对 `dialogForm` 的 `watch`（`immediate: true`），组件创建时就会把数据同步到 `form`；`onOpen` 仍保留，用于后续重复打开的场景。同时修正了 `::disabled` 的笔误（应为 `:disabled`）。 请再试一次第一次打开弹窗，表单字段应能正常显示。",
+   "evidence": "extracted source=cursor project=惠山G",
+   "files": [
+    "`refundDetailTable.vue",
+    "涉及文件：d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund\\components\\refundDetailDialog.vue、d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund\\components\\refundDetailTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1261540d-7b00-4143-aefd-bd8ea9034677"
+   ],
+   "_draft": true,
+   "project": "惠山G"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,111 @@
+{
+ "project": "苏住房C",
+ "batch": "014",
+ "files": [
+  "014.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "现在有很多返回data中包含富文本字段的接口都没法正",
+   "type": "preference",
+   "content": "已定位并做了统一修复。根因主要有两类： ## 原因分析 1. **图片相对路径无法加载**：接口返回的富文本里图片多为 `/zs-fym/...` 这类相对路径，而 `rich-text` 组件（尤其小程序）无法直接加载，页面会显示为空白。之前只在少数页面做了处理。 2. **接口返回格式不统一**：部分配置类接口（如 `getConfigKey`）返回的是 `{ configValue: \"...\" }` 对象，而不是 HTML 字符串，直接传给 `rich-text` 会无法渲染。 ## 修复内容 1. **增强 `formatRichTextContent`**（`utils/index.js`）： - 自动从 `configValue`、`content`、`msgContent` 等字段提取内容 - 解码 HTML 实体（`&lt;p&gt;` → `<p>`） - 将图片和 `background-url` 中的相对路径转为完整 URL 2. **新增 `ZsRichText` 组件**：封装 `rich-text`，渲染前自动调用 `formatRichTextContent`，避免各页面重复处理。 3. **统一替换**：公告、新闻、政策、协议、问卷、公示等约 20 处 `rich-text` 已改为 `ZsRichText`。 4. **修复配置接口页面**：用户",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`formatRichTextContent`**（`utils/index.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\decision\\detail.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\index.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\gateway.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\news\\components\\ListDetail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0bc1d7be-3e28-4c25-90a8-6816570ec803"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "慧物业-业主决策，会先显示暂无数据才显示数据",
+   "type": "preference",
+   "content": "已统一处理决策模块相关页面，进入时先显示 loading，**所有接口返回后**再渲染页面内容，避免 if/else 分支闪烁。 ## 方案 新增通用 hook `hooks/usePageLoading.js`： - 进入页面立即 `uni.showLoading` - 用 `Promise.all` 等待全部接口完成 - 完成后 `loaded = true` 并 `uni.hideLoading` - 页面根节点用 `v-if=\"loaded\"` 控制渲染 ## 修改的页面 | 页面 | 等待的接口 | |------|-----------| | `decision/index.vue` | 字典 + 列表 | | `common/DecisionResult.vue` | 决策结果 | | `optional/DecisionResult.vue` | 决策结果 | | `sort/DecisionResult.vue` | 决策结果 | | `common/ResultStatistics.vue` | 字典 + 详情 + 图表 | | `optional/ResultStatistics.vue` | 字典 + 详情 + 图表 | | `sort/ResultStatistics.vue` | 字典 + 详情 + 图表 | | `detail.vue` | 3 个字典",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`hooks/usePageLoading.js",
+    "`decision/index.vue",
+    "`common/DecisionResult.vue",
+    "`optional/DecisionResult.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "36ef278a-92bd-4d36-9fb4-c7e97ddf8d37"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "当前苏服办分支的接口调用逻辑近期是不是合并出问题了？",
+   "type": "fact",
+   "content": "已从 `05b4b4f4` 误删前的版本恢复苏服办相关配置，变更如下： ## 已恢复 | 类别 | 文件 | |---|---| | **环境变量** | `.env.development` / `.env.production` / `.env.test` 中的全部 `VITE_APP_SFB_*` | | **开发代理** | `vite.config.ts` 的 `/sfb-gateway` 代理 | | **网关签名** | `index.html` 中 SM3 签名脚本 + 苏服办 JSSDK | | **登录流程** | `src/utils/sfb.js`、`App.vue`、`security.js`（`loginByTicketSfb`）、`user.js`（`sfbToken`） | | **接口调用** | `api/index.js`（`zsSource: 'v2'`）、`api/v1Instance.js`（`zsSource: 'v1'`） | | **类型声明** | `src/env.d.ts` | | **业务入口** | `My_Suzhufang.vue` 苏服办登录、`goMenu` 登录拦截、`PhoneCall` / `AboutUs` / `ZsRichText` 拨号 | ## 关键配置值 ``` VITE_APP_SFB_APP_",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`vite.config.ts",
+    "`index.html",
+    "`src/utils/sfb.js`、`App.vue`、`security.js`（`loginByTicketSfb`）、`user.js",
+    "`api/index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e8713fef-c64a-4733-b0ee-f3615b219169"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "选择样式没有",
+   "type": "bug",
+   "content": "根因是 `icon-checked.svg` 和 `icon-nocheck.svg` 在之前的重构中被删掉了，但页面仍在引用，所以右侧勾选圆圈一直加载不出来。 ### 已修复 1. **从 git 历史恢复缺失图标**（`icon-checked`、`icon-nocheck`、`icon-contract` 等 8 个 SVG） 2. **在 `TitleCard` 内置 CSS 单选圆圈**，不再依赖图片文件： - 未选中：灰色空心圆 - 选中：蓝色渐变圆 + 白色对勾 3. **简化页面代码**，去掉失效的 `ZsImage` 插槽引用 重新编译运行后，每张卡片右侧应能看到圆圈，选中项会变为蓝色带对勾。若还有问题请告诉我。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner\\authentication.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\components\\TypeChoose_Suzhufang.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7f2654d5-5bab-4165-aa36-1e84ddbdfa13"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏找房：安卓-求购信息为空白， component ",
+   "type": "preference",
+   "content": "已做更彻底的修复。上次只把组件抽到 `components` 目录，但 **`intention/my/list` 这个页面路径仍然存在**，安卓端仍会尝试加载它并报错。 ## 本次改动 1. **删除 `intention/my/list` 页面**（从 `pages.json` 移除，并删除 `my/list.vue`） 2. **合并为单一页面** `intention/list`，通过参数区分： - 求购信息：`/pages_transaction/intention/list`（`4_3_11`） - 我的求购：`/pages_transaction/intention/list?mode=mine`（`4_3_10`） 3. **共享组件移到主包** `@/components/IntentionMyList/IntentionMyList.vue`，避免分包嵌套引用问题 4. **同步更新** `menuRouteMap.js` 和构建脚本 `merge-main-leaks.mjs` ## 请重新编译验证 需要**清理缓存后重新打包**（安卓端可能还在用旧产物）： ```bash cd zhi2-mobile-shimin # 清理 dist / unpackage 等构建产物后重新 build ``` 验证两个入口： - 苏找房 → **求购信息** - 我的 →",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`pages.js",
+    "`my/list.vue",
+    "`@/components/IntentionMyList/IntentionMyList.vue",
+    "`menuRouteMap.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e0538ad3-fc2d-43a5-8b21-e951b74289dd"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "pages/index/project这个页面滚动到",
+   "type": "preference",
+   "content": "底部白条是 **两层底部留白叠在一起** 造成的： 1. **`tab-bar-placeholder`**（56px + 安全区）在列表里又占了一块高度 2. z-paging 在 `fixed` 模式下还会按系统 `windowBottom`（原生 TabBar 高度）再往上缩一截，露出白色页面背景 3. loading 在列表底部，正好被这块白条挡住 ### 已做修改 - **去掉** `tab-bar-placeholder` 和无效的 `bottom-offset` - **用 `paging-style.bottom`** 对齐自定义 `AppTabBar` 高度：`calc(106rpx + env(safe-area-inset-bottom))` - **关闭** `safe-area-inset-bottom`，避免 z-paging 再额外加底部安全区占位 - **背景统一为** `#f5f5f5`，避免露白 请重新编译看下：底部白条应消失，滚到底时 loading 会正常显示在 TabBar 上方。若还有遮挡，发一张新截图我再微调 `bottom` 值。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\project.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\Project_Suzhufang.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "dc3620d1-8787-4997-ad0a-327ea076910f"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

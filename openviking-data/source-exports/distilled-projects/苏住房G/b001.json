@@ -1,0 +1,181 @@
+{
+ "project": "苏住房G",
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "title": "已停用字典项导致历史数据回显空白：新增 organ_type_all 全量字典专供回显，新增/编辑仍用 organ_type",
+   "type": "pattern",
+   "content": "【什么情况】字典字典项被停用后（如 organ_type），列表/详情里历史数据的状态列会显示空白或原始码值——因为前端拿 dict 只拿到「启用中」的项，查不到就降级。用户诉求是「回显用全量字典，新增和编辑用原字典」。\n【为什么】新增/编辑必须只让用户选启用项（下拉候选），而回显必须能翻译任何历史值（含已停用项）。这是两个相反的取值口径，共用一个字典编码必然二选一牺牲。已知清单 #796（配了不存在的字典编码静默降级）和 #1061（字典未配置→显示原始值）只覆盖「字典没配/配错」，本条是不同根因：字典存在但业务上停用了部分字典项。\n【怎么做】① 在后端新建一份纯回显用的全量字典（本批为 organ_type_all），内容与原字典同步但不剔除停用项；② 固定把「回显链路」——列表列 type=\"dict\" / dict-url、详情 DetailTemplate type:'dict' 的 options 来源、以及任何 dictLabel 转换——统一切到全量字典编码；③ 新增/编辑表单的下拉数据源保持原字典编码，一行不改；④ 全局修复时用 grep 找 dict-type=\"organ_type\"/organ_type 的硬编码，逐处判定属于回显还是候选，不要整仓替换。字典编码本身是后端下发的，前端只能靠「显式指定 dict-url」来区分两条链路，不要试图用 formMode 在同一个字典请求里分流。",
+   "evidence": "会话 455456f0（基线 b0f2039）用户诉求 1：「新增字典organ_type_all，原字典organ_type回显时使用新字典，新增和编辑使用原来的。因为原来的字典项可能被停用。全局修复」；结论给出 19 处改动并剔除 3 处既不在全量路由 JSON 也不在 constantRoutes 的条目。",
+   "files": [
+    "zhi2-web-admin/src/utils/dict.js",
+    "zhi2-web-admin/src/views/system/user/detail.vue",
+    "zhi2-web-admin/src/views/company/companyRegister/detail.vue",
+    "zhi2-web-admin/src/views/company/companyRegister/dialog.vue",
+    "zhi2-web-admin/src/views/company/companyRegister/index.vue"
+   ],
+   "baseline": "b0f2039",
+   "sessionIds": [
+    "455456f0-90b2-47a3-b49f-b114ac5d4dbb"
+   ],
+   "bundle": "001.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "字典双口径这类业务特例禁止写进公共组件：zs-table-column / main.js 全局注册层不对具体字典编码开后门",
+   "type": "preference",
+   "content": "【什么情况】为做 organ_type 回显修复，Agent 把「该字典用全量编码」的特例写进了公共组件 zs-table-column.vue 和全局入口 main.js，被用户直接驳回：「不要把这种特殊逻辑写在公共组件里面」。\n【为什么】zs-table-column 与 main.js 的 glob 全局注册层被全站所有列表页共用，任何按具体字典名硬编码的分支都会变成隐性契约：后续新增字典、后端调整编码时这层永远要跟着改，且改错了会静默影响全站列渲染（参见已知 #725：zs-table-column 对 bizState 硬编码全局字典、列级 options 被静默忽略，就是同类后果）。\n【怎么做】公共层只提供「可配置」的通用能力，具体业务取值必须在消费端声明：① 列表列就在 zs-table-column 上显式传 dict-url / :options（按列配置对象下发），不靠组件内部推断；② 详情/表单在页面的 fieldPlan / contentInfo / constants 里声明字典编码；③ main.js 只负责注册组件，不承载任何字典映射；④ 判断标准一句话——「这段逻辑删掉后，别的业务模块会不会少功能」：会，就说明它放错了层。改动后要复扫公共组件 diff，确认没有残留具体业务常量。",
+   "evidence": "会话 455456f0（基线 b0f2039）用户诉求 4：<@zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue @zhi2-web-admin/src/main.js 不要把这种特殊逻辑写在公共组件里面>，直接否掉了把 organ_type 双字典逻辑沉到公共层的做法。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/main.js"
+   ],
+   "baseline": "b0f2039",
+   "sessionIds": [
+    "455456f0-90b2-47a3-b49f-b114ac5d4dbb"
+   ],
+   "bundle": "001.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "新增业务模块不要新建 api 封装文件，按同目录既有页面的方式直接用全局 $get/$post",
+   "type": "preference",
+   "content": "【什么情况】给「物业管理区域查询」加标签管理（/v2.0/property/complexTag，list/add/edit/delete/downloadTemplate/import 六个接口）时，Agent 先建了 api 模块文件，用户立刻纠正：「不要新建api模型，按照其他页面的方式处理」——改为在页面/组件内直接用全局 $get/$post，与 publicQuery 目录下其它页面一致。\n【为什么】这与已知 #364（Web 管理后台新增业务模块：mixins 驱动 CRUD，目录名=接口路径，不写 api 文件）同向，本条是在「单页功能内聚型模块」上的补充：新业务功能优先顺着同目录既有页面的写法走，不要为它单独引入 api 层。api 文件会引出「接口是否被多处消费」的维护成本，而这类页面级接口通常只有一个消费点。另注意本批的删除接口形态是 POST + Header zs-method: delete（逻辑删除），导入是 multipart/form-data 字段名 file，若统一包进 api 层反而要额外处理 header 与 form-data。\n【怎么做】① 动手前先看目标目录里最相近的 2-3 个页面，照它们的取数方式写；② 组件内通过 mapGetters/inject 拿 $get/$post（或用全局 mixins 暴露的请求方法），参数就地组装；③ 只有确实被多个页面消费的接口才考虑下沉；④ 用户点名的 api 文件才删——已知 #788 明确「api/ 封装按模块点名，被点名才删，不要全局推广」，本条是新增时不主动造 api 文件。",
+   "evidence": "会话 58064992（基线 9fb6c2c）用户诉求 2：「不要新建api模型，按照其他页面的方式处理」；诉求 1 的接口文档给出 Base Path /v2.0/property/complexTag 与 list/新增/edit/删除(Header zs-method: delete)/downloadTemplate/import 六接口。",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/complex/index.vue"
+   ],
+   "baseline": "9fb6c2c",
+   "sessionIds": [
+    "58064992-2eec-4abe-b13a-68134cbd67f2"
+   ],
+   "bundle": "001.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "设计稿一致性验收必查「是否复用了公共组件」：表格类区域被点名后要用 zs-table + zs-select-column",
+   "type": "workflow",
+   "content": "【什么情况】标签管理弹窗做完视觉对齐后，用户先发截图说「UI问题」，接着直接点出「表格没有用公共的组件」。也就是说：像素级对齐了，但只要表格是手写 el-table / 自绘列，验收照样不过。\n【为什么】本后台的列宽测算、选中行高亮、空态、固定列、剩余宽度均分都在 zs-table 内部（已知 #191/#486/#841/#965/#965 等都在讲这层），手写表格等于把这些能力全部另起一份，后续动公共表格永远漏这一处。用户的验收顺序实际是「先用公共组件 → 再对齐设计稿」。\n【怎么做】改表格区域时先换成 zs-table + zs-table-column，再补设计稿要求：① 复选框列用 zs-select-column（不手写 type=selection）；② 序号列用 zs-table-column type=\"index\" 并绑 :index=tableIndex；③ 操作列按钮用 plain 边框档（编辑灰框、删除红框，宽度按两按钮文字自适应，参照 #875 不要写死 :width）；④ 批量删除走 mixins 的 multiDeleteButton；⑤ 表底统计统一 zs-pagination（「共 X 条」用 :show-pagination=\"false\" 只留统计，见 #521）。样式微调写在列/组件配置上，不要给 el-table 加页面级覆盖。上一轮报「UI 不对」时，第一反应应是「这块本来有没有公共组件」，而不是先调间距。",
+   "evidence": "会话 58064992（基线 9fb6c2c）用户诉求 5「UI问题」→ 诉求 6「表格没有用公共的组件」；最终结论里改为 zs-select-column 复选框列、序号列蓝色、操作列 plain 边框 160px、表底「共 X 条」。",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/complex/index.vue"
+   ],
+   "baseline": "9fb6c2c",
+   "sessionIds": [
+    "58064992-2eec-4abe-b13a-68134cbd67f2"
+   ],
+   "bundle": "001.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "axios 0.28 下自定义 paramsSerializer 与数组参数会抛 AxiosError: options must be an object（页面 created 直接炸）",
+   "type": "bug",
+   "content": "现象：页面加载即报 `[Vue warn]: Error in created hook: \"AxiosError: options must be an object\"`，堆栈落在列表页 index.vue 的 created，且整条 getList 未发出、列表空白。根因：为让后端收到 `propertyTypes[]=a&propertyTypes[]=b` 形式，在请求封装里传了自定义 `paramsSerializer`（老版本 axios 的函数签名），而项目实际是 axios 0.28——新版把 serializer 当对象处理，传函数或在其中读错参数位置就抛 options must be an object。这与「后端契约错误」「代理 404」都无关，是纯粹的库版本兼容问题。做法：不要为单个页面的数组参数去动 request.js 的 paramsSerializer；把多选数组在 getQueryParams 里手工 join 成逗号串（`propertyTypes=low,multi`），导出的 ID 集合同理（`complexIds=1,2,3`），从此不再出现 `xxx[]` 键。差异点：已知 #338 只界定「改 utils 请求体形态、不动路径」，#740 只讲逗号串回显；本条补的是「数组参数序列化的版本兼容根因」——先确认 axios 版本再用自定义 serializer，否则整个页面的生命周期钩子一起挂掉。",
+   "evidence": "会话 466205e5（基线 4fad664）：用户报 `[Vue warn]: Error in created hook: \"AxiosError: options must be an object\"`，指向 publicQuery/complex/index.vue；结论「根因是 axios 0.28 与自定义 paramsSerializer 不兼容，页面 created 阶段调用 getList 时触发」，修复为移除 paramsSerializer、在 getQueryParams 里把 propertyTypes / complexIds 转逗号串。",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/complex/index.vue"
+   ],
+   "baseline": "4fad664",
+   "sessionIds": [
+    "466205e5-ee7c-4c88-9a01-a864233745f0"
+   ],
+   "bundle": "003.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "同一 meta.filePath 命中多条菜单路由时，find 会挑中带 :tableid 动态段的详情入口，跳转落到详情而非列表",
+   "type": "bug",
+   "content": "现象：首页「检查数据导航」点「正常：N 份 / 逾期：N 份」本该进整改通知列表，却跳到错误页（或侧栏异常/无数据），排查后确认跳转代码本身没问题。根因：后端下发的菜单里，同一个 `meta.filePath` 被注册了不止一条路由——列表入口 path 是静态串，详情入口则带数字动态段（如 `.../:tableid`）。`ruoyi.js` 里 `routes.find(r => r.meta?.filePath === filePath)` 只取第一条命中，顺序上常先命中详情入口，于是拿到一条带参数占位符的 path 直接 push。做法：把 filePath 反查统一改造成「score-and-pick」——先 `filter` 出所有 filePath 相同的路由；多于一条时优先选 path 中**不含数字**（`/\\d/`）的那条；排序为 pareto（静态优先 → 无动态段 → 路径更短），都相同时才退回原来的「取第一条」以保证零行为变化。该规则被 `getCurrentRouterByFilePath`、`getRouterPathByFilePath`、`getRouterPathByFilePathNew`、`resolveRegisteredRoute` 四处共用，改一处即全站收敛。差异点：已知 #504 的根因是「flattenTree 后 filePath 变成 Layout/ParentView」，#703 是「动态段拼写错」，本条是第三个独立根因——filePath 本身合法但一 filePath 多路由，必须靠「静态优先」消歧。",
+   "evidence": "会话 35ea5c25（基线 15e201a）：用户两轮反馈首页「检查数据导航」链接落错页，最终在 @/utils/ruoyi.js 里统一处理「同一 meta.filePath 对应多条路由」，规则为优先选 path 中不含数字(/\\d/)的那条，都不含或都含时取第一条；影响 getCurrentRouterByFilePath / getRouterPathByFilePath / getRouterPathByFilePathNew / resolveRegisteredRoute。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/views/home/v2/components/CheckDataNav.vue"
+   ],
+   "baseline": "15e201a",
+   "sessionIds": [
+    "35ea5c25-1234-41c5-8b15-0f3de8592c07"
+   ],
+   "bundle": "003.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "B 端企业人员按「登录选中小区」做数据隔离：projectId + complexId 双参数 + 区域锁定回填，靠公共 mixin 一次覆盖多模块",
+   "type": "bug",
+   "content": "现象：B 端企业从业人员登录后，物业服务人员、收费标准、物业费账单、年度预算、支用合同、保单管理、用款申请、支取通知书等模块看到的是全量数据（选择物业管理区域弹窗列出全部 2624 条），而不是自己获授权的那一个小区。根因：这些模块的列表与选择弹窗只按机构维度过滤，没有任何「当前项目/小区」上下文；登录时选中的小区只存在 store 里，从未拼进请求。做法：判定入口统一为 `isBTerminalPractitioner`（不能用 terminalType 判空，见已知 #990）；在 `utils/projectContext.js` 抽 `applyBTerminalProjectFilter()`，`mixins/bTerminalProjectMixin.js` 统一做三件事——① 列表 getQueryParams 同时注入 `projectId` 与 `complexId`（值都取登录时选中的小区 ID，多数接口两个都认）；② 选择区域弹窗的 filterParams 带同双参数，避免拉全量；③ 新增页把区域字段自动回填并 regionLocked 禁止改。接入方式是逐模块 `getQueryParams` 调同一个函数，而不是各页自写一份。注意：某接口只认其中一个参数时单独调整，不要为了统一而删掉另一个。差异点：已知清单里没有「B 端多租户数据隔离」这一类条目，#990 只讲端别判定，#102 的 complexId 是另一个项目的字段名语义。",
+   "evidence": "会话 8aa7c044（基线 805ea8c）：用户要求「阳光物业: 物业服务人员、收费标准、物业费账单、年度预算、支用合同、保单管理、用款申请、支取通知书等需要只显示选中的授权物业管理区域。企业人员要加 projectId 参数，complexId 也传，都是登录时选中的小区 ID」。结论：projectContext.js 新增 applyBTerminalProjectFilter()，bTerminalProjectMixin.js 支持双参数过滤/区域锁定/新增页自动回填，覆盖 9 个列表页 + 各详情页与选择弹窗；效果为「选择弹窗不再出现全部 2624 条」。",
+   "files": [
+    "zhi2-web-admin/src/mixins/bTerminalProjectMixin.js",
+    "zhi2-web-admin/src/utils/projectContext.js",
+    "zhi2-web-admin/src/utils/terminalUser.js",
+    "zhi2-web-admin/src/views/property/propertyWorker/index.vue",
+    "zhi2-web-admin/src/views/property/propertyWorker/detail.vue"
+   ],
+   "baseline": "805ea8c",
+   "sessionIds": [
+    "8aa7c044-e925-4a4e-ba97-9a655aee1d58"
+   ],
+   "bundle": "003.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "保存报 For input string: \"\" 的根因：编码类字段（*Code）被填了中文名称，后端 Long.parseLong 炸在提交侧",
+   "type": "bug",
+   "content": "什么情况：Web 后台（阳光物业→协议管理→新增共管协议）点保存直接抛后端异常 `For input string: \"\"`，前端无任何校验提示。根因不在展示层，而在提交侧：`subdistrictCode`、`communityCode`、`regionCode` 这类以 Code 结尾的字段在后端是 Long，前端表单却把它们当成「显示名称」来填，于是把「郭巷街道」「姜庄社区」这类中文串、或空串原样提交，`Long.parseLong` 立刻抛 NumberFormatException。\n为什么容易踩：区划相关的 formatter 改造（展示侧统一到区级、拼接串换字典码）只治理了「读出来怎么显示」，没人管「写回去是什么类型」——同一批字段的展示与提交走的是两条独立链路，展示端做了归一化不等于提交端也做了。\n怎么做：① 提交前对 `*Code` 字段做类型归一化，凡匹配 `/^\\d+$/` 之外的值一律置空或从选择器的 id 取值，宁可空也不要送中文；② 选择器要同时维护 `label`（中文名）与 `value`（数字编码）两份，提交只取 value，禁止两个字段共用一个值；③ 排错时不要只盯前端——请求体看起来「字段都在」也可能全错，先让用户贴后端返回的 `msg`，并能明确指出需要看哪个接口的返回值（本例是协议保存接口的响应体，而不是详情接口）；④ 修复链路是多接口拼接：`getExtendedByComplexId` 补区域/街道/社区编码 → 账号详情取账号信息 → 网点列表反查网点 ID，任何一环缺失都会退化成空串。",
+   "evidence": "用户诉求 1 报「新增共管协议，保存时提示异常」；诉求 3 的请求体里 `communityCode: \"姜庄社区\"`、`subdistrictCode: \"郭巷街道\"`、`regionName: \"江苏省,苏州市,吴中区\"`；诉求 4 修正后变成 `communityCode: \"320506004006\"`、`subdistrictCode: \"320506004\"`、`regionCode: \"320506\"`、`regionName: \"吴中区\"`，并在诉求 6 之后结论明确「之前导致 For input string: \"\" 的空 ID / 中文名称当编码的问题，在这份 payload 里都已消除」。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAgreement\\index.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAgreement\\detail.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\propertyAgreement\\detail.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\agreement\\detail.vue"
+   ],
+   "baseline": "fb3e960",
+   "sessionIds": [
+    "a757e64c-cfe9-466d-8ab1-c7b2a7882f90"
+   ],
+   "bundle": "004.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "协议/开户类表单的网点主键 bankBranchManageId 只能靠网点名称反查：详情接口不返回它，必须走银行网点列表接口二次匹配",
+   "type": "pattern",
+   "content": "什么情况：新增共管协议时提交体需要 `bankBranchManageId`（网点内部主键），但账号详情接口 `propertyAccount` 只回 `openbankName`（如「中国工商银行股份有限公司俄罗斯人民币业务清算行」）、`regulatoryBankName`、`regulatoryBankCode`，完全没有网点 ID。\n为什么：开户/协议表单的银行信息来自两条互不相通的链路——银行账号那条链路只存名称与银行编码，网点维度是另一套字典；而保存接口又按 ID 关联网点，两边没对齐，前端只能自己拼。\n怎么做：① 用详情带出的 `openbankName` 去调银行网点列表接口（本项目是 `selectTJgBankBranchList`，注意它与 `/system/unionBank/page` 的联行号体系、`/prefund/bankBranch/page` 的缴款网点体系不是同一个接口，别互相替换），按名称精确匹配后取 `sysBankBranchId` 回填 `bankBranchManageId`；② 匹配失败要显式提示让用户重选网点，不要静默提交空 ID（否则后端表现为校验报错或关联错网点）；③ 回填后断言 `bankBranchManageName` 与所选网点名称一致，作为匹配成功的自检；④ 提交前的自我核对清单值得固化成一张表：`bankBranchManageId` 是否与网点列表的 `sysBankBranchId` 相等、`regAccountID` 是否非空、三个 Code 字段是否都是数字——这张表比通读代码更快定位问题。",
+   "evidence": "结论「修复链路」明确三步：`getExtendedByComplexId` → 补齐区域/街道/社区编码；`propertyAccount` 详情 → 取账号信息（无网点 ID）；`selectTJgBankBranchList` → 按 `openbankName` 反查 → `bankBranchManageId`。字段核对表里 `bankBranchManageId = 2072989539709247490` 标注「已与网点列表 sysBankBranchId 匹配」。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAgreement\\index.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\agreement\\detail.vue"
+   ],
+   "baseline": "fb3e960",
+   "sessionIds": [
+    "a757e64c-cfe9-466d-8ab1-c7b2a7882f90"
+   ],
+   "bundle": "004.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "替换设计稿切图图标：按「图形语义」映射到指标而不是按切图编号顺序，并统一集中到配置数组 + 语义化文件名",
+   "type": "preference",
+   "content": "什么情况：把首页「报事报修」「关键数据导航」「检查数据导航」「公共收益当月数据」等卡片里的图标按设计稿切图批量替换。用户会先让 agent 直接放切图，看过效果后连续两次提「顺序不对」。\n为什么：设计稿导出的切图名称是「切图 19 / 切图 20 / 切图 24」这类无语义编号，编号顺序与页面上卡片的业务顺序没有任何关系（设计稿里 24→25→26→27 对应的是开户主体数/监管账户数/已签订协议专户数/监管资金数额）。一旦按编号顺次贴图，图标含义就和指标错位——用户看到的「顺序不对」本质是语义不匹配，不是排版问题。\n怎么做：① 先逐张判断切图的图形含义（人员+加号=开户主体数、人员+银行卡=监管账户数、文档+签署=协议专户数、圆形人民币符号=金额），再按含义对到指标，编号只当无关标识；② 粘贴前先重命名成语义化文件名，否则后续没人能判断哪张该放哪；③ 同一模块的多个图标必须收进一个配置数组（如 `MONTH_STAT_ROWS`）统一渲染，四项全部用 `<img>` 引 SVG，不要混用 Element 图标与切图；④ 卡片图标与图表图例是两套资产（金额卡片用切图 27、折线图例仍需切图 14），不要顺手统一——那是设计上的分工，改动前先确认。",
+   "evidence": "用户诉求 1「首页报事报修里面的4个图标替换一下」；诉求 3 提供 `切图 19/20/21.svg` 并要求「文件重命名一下」；诉求 5「检查数据导航里面的图标换一下，一个标准」；诉求 6 只写两个字「顺序不对」。最终结论明确「按图形语义做了对应（**不是**按切图编号 24→25→26→27 依次对应四个卡片）」并给出切图→指标对照表，且注明「图表趋势图例仍用切图 14，与当月卡片的切图 27 分工不同」。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\v2\\components\\PublicBenefit.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\v2\\components\\RepairPanel.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\v2\\components\\KeyDataNav.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\v2\\components\\CheckDataNav.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\v2\\assets\\benefit"
+   ],
+   "baseline": "15e201a",
+   "sessionIds": [
+    "564e55a5-1d17-45de-b61e-a1825be95ab0"
+   ],
+   "bundle": "004.md",
+   "project": "苏住房G"
+  }
+ ]
+}

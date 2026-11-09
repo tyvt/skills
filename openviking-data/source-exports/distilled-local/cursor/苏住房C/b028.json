@@ -1,0 +1,78 @@
+{
+ "project": "苏住房C",
+ "batch": "028",
+ "files": [
+  "028.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "pages/index/community平铺的时候",
+   "type": "bug",
+   "content": "问题已修复。 ## 原因 上次为修复宫格模式滚动，把 `.sidebar-right` 改成了 `height: 0`。但分栏模式是**横向 flex 布局**，`flex: 1` 只控制宽度，高度仍由 `height` 决定。`height: 0` 会让右侧 `scroll-view` 高度塌陷为 0，所以左侧分类正常，右侧菜单图标和文字都不显示。 ## 修改 - `.sidebar-right` 恢复为 `height: 100%` - `.service-sidebar` 补充 `flex-direction: row` 和 `align-items: stretch`，保证左右两栏高度一致 请重新编译后切换到分栏布局验证，右侧应能正常显示菜单图标和名称。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\community.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\Community_Suzhufang.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "59b4aa3c-d6de-4704-af8a-49711c8611b5"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "图片地址还是没法显示",
+   "type": "bug",
+   "content": "问题已定位并修复。 ## 原因 接口/菜单配置里很多图片是**带内网 IP 的完整 URL**，例如： ``` http://218.4.168.198:8887/zhi2-pro/xxx.png ``` 之前的 `resolveMediaUrl` 看到 `http://` 开头会**原样返回**，不会改成线上地址。苏服办 H5 无法访问 `218.4.168.198`，图片就会加载失败。 正确地址应为： ``` https://szfweb.szzfcjj.cn:8887/zhi2-pro/xxx.png ``` ## 修复内容 更新了 `resolveMediaUrl`（`src/utils/index.js`）： 1. 识别 `/zhi2-pro`、`/zhi2-dev`、`/zhi2-test`、`/zs-fym` 等资源路径 2. 从任意域名的完整 URL 中**提取路径** 3. 生产环境拼接 `VITE_APP_API_PROXY`（`https://szfweb.szzfcjj.cn:8887`） 4. 外部图片（如 `https://szjjy1.com/...`）保持不变 | 接口返回 | 修复后 | |---------|--------| | `http://218.4.168.198:8887/zhi2-pro/a.png` | `https://szfw",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`resolveMediaUrl`（`src/utils/index.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2e8372a6-9098-488b-857d-9bb7ec7f209a"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "参考这个项目的代码，把工单相关的菜单功能迁移过来，注",
+   "type": "fact",
+   "content": "已从榆林小程序完成工单（报事报修）功能迁移，主要变更如下： ## 迁移内容 ### 1. API 升级（`property.js`） 接口从旧的 `eventReport` 切换为工单体系： - 列表：`/property/workOrder/app/orders/page` - 详情：`/property/workOrder/app/orders/{id}` - 提交：`/property/workOrder/app/orders` - 撤销：`/property/workOrder/app/orders/withdraw` - 分类：`/property/workOrder/app/categories` - 评价：`/property/workOrder/satisfaction/app/evaluate` - 评价指标：`/property/workOrder/satisfaction/app/metrics/{id}` ### 2. 页面功能（5 个页面 + RepairCard） | 页面 | 主要能力 | |------|----------| | `index` | 报修/报事 Tab 切换、筛选、搜索、底部固定按钮 | | `add` | 分类选择（卡片式 UI） | | `submit` | 表单提交、房屋/设备选择、图片上传、成功弹窗 | | `chooseF",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "升级（`property.js",
+    "`add.vue",
+    "`temp.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\榆林小程序\\src\\pages_owner\\repair\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\repair\\index.vue、d:\\repository\\苏住房C\\榆林小程序\\src\\pages_owner\\repair\\add.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\repair\\add.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fd000b83-ec69-43c3-8313-394ae8ba40c3"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "TypeError: Cannot read pro",
+   "type": "fact",
+   "content": "## 问题原因 错误出在 `zhi2-mobile-shimin/src/utils/tabBar.js`。 在「分包」提交（`17443e68`）中，为了减小主包体积，把 `menuStore` 从**静态导入**改成了**动态 `import()`**： ```javascript // 有问题的写法 const { default: menuStore } = await import('@/store/menu') ``` 但在微信小程序端，动态 `import` 编译后并不会返回模块对象，而是路径字符串。编译产物类似： ```javascript const { default: menuStore } = await \"../store/menu.js\" // menuStore === undefined ``` 因此调用 `menuStore.loadMenu()` 就会报 `Cannot read property 'loadMenu' of undefined`。 `@/store/menu.js` 本身是存在的，问题只在动态导入方式。 ## 修复 已改回静态导入（与分包前一致）： ```1:10:zhi2-mobile-shimin/src/utils/tabBar.js import menuStore from '@/store/menu' import ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`zhi2-mobile-shimin/src/utils/tabBar.js",
+    "\"../store/menu.js",
+    "`@/store/menu.js",
+    "```1:10:zhi2-mobile-shimin/src/utils/tabBar.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "160a40f4-daed-4e76-ae44-e7c0120d9b6f"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

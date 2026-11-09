@@ -1,0 +1,99 @@
+{
+ "project": "repository",
+ "batch": "012",
+ "files": [
+  "012.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "分析一下如果接口异常响应，页面表单是不是会空白@sr",
+   "type": "preference",
+   "content": "### 结论（接口异常时会不会“空白”） - **步骤1（房屋信息 `stepHouseInfo.vue`）**：接口异常时**不会把页面整体渲染成完全空白**，但**会出现字段全部是 `-`/空选中/空输入**这类“看起来空白”的效果；并且在“新增查询”分支里如果 `res.result` 不存在，**还有概率直接抛异常导致页面渲染中断**。 - **步骤4（合同约定 `index.vue`）**：接口异常时 `contractShow` 不会被置为 `true`，组件有 `v-else-if=\"curValue == 4 && contractShow\"`，因此**该步骤会直接不渲染内容（真空白）**。 --- ### 关键原因在哪里 #### 1) `stepHouseInfo.vue` 对 `detailData` 的 watch：默认 `{}` 也会触发，把表单值改成 `undefined` `detailData` 的默认值是一个空对象 `{}`（在父组件接口异常时也很可能仍是 `{}` 或变成 `undefined`），watch 里用 `if (val)` 判断，而 `{}` 在 JS 里是 truthy，所以会把 `otherData` 的几个字段赋值成 `undefined`。 ```99:109:d:\\repository\\宿迁苏服办\\src\\pages\\le",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`stepHouseInfo.vue",
+    "`index.vue",
+    "```99:109:d:\\repository\\宿迁苏服办\\src\\pages\\leaseContract\\stepHouseInfo.vue",
+    "```73:86:d:\\repository\\宿迁苏服办\\src\\pages\\leaseContract\\stepHouseInfo.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f57d7e7f-9439-484d-b703-784cb50ce8c1"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "顶部最右侧添加退出登录功能",
+   "type": "preference",
+   "content": "已在 `property.vue` 顶部头图区域右上角加上「退出登录」，说明如下。 ### 行为 - **仅在有 `token` 时显示**，未登录不出现。 - 点击后用 **`uni.showModal`** 二次确认。 - 确认后调用 **`userStore.logout()`**（与 `src/store/user.js` 一致：请求 `/security/ctAuth/logout`、清空本地用户状态，并 `switchTab` 回当前页）。 ### 样式与交互 - 使用 **`position: absolute`** 固定在 `.page-head` 右上角，`z-index: 2` 保证在背景图之上可点。 - **`@tap.stop`** 避免冒泡触发背景上的 `login`。 若你希望未登录时也显示灰色「退出」或要对接口失败时仍强制本地清空，可以再说一下我帮你改逻辑。 All good. Summarize for the user in Chinese. One note: `logout()` in store navigates to property tab after success - user is already on property page so it will just refresh/switch to same tab - that'",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`property.vue",
+    "`src/store/user.js",
+    "@src/pages/index/property.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2ac982b9-0050-4def-847b-622f257aa9f2"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "能否给这个HTML加一个loading效果，当js文",
+   "type": "fact",
+   "content": "### 已实现的效果（`index.html`） - **默认显示 loading**：页面一打开就全屏覆盖显示“页面加载中...” - **main.js 加载完成自动隐藏**：`/src/main.js` 的 `onload` 触发后隐藏 loading - **main.js 加载失败提示错误**：`onerror` 触发后显示“资源加载失败，请刷新重试” 对应改动在这里（主入口脚本绑定了 `onload/onerror`）： ```104:105:d:\\repository\\惠山小程序\\index.html <div id=\"app\"><!--app-html--></div> <script type=\"module\" src=\"/src/main.js\" onload=\"window.__hidePageLoading && window.__hidePageLoading()\" onerror=\"window.__showPageLoadingError && window.__showPageLoadingError()\"></script> ``` 如果你还想做到“等到 **Vue/React 挂载完成** 再隐藏”（而不是仅 main.js 下载完成），我也可以再帮你把隐藏动作挪到 `main.js` 里在 `createApp(...).mount(...)`",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "已实现的效果（`index.html",
+    "**main.js",
+    "加载完成自动隐藏**：`/src/main.js",
+    "```104:105:d:\\repository\\惠山小程序\\index.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "128b09bc-4bce-4355-8562-746d9dba13c3"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "发到生产环境一直显示页面加载中，本地启动是好的",
+   "type": "bug",
+   "content": "## 原因说明 `index.html` 里原来依赖入口脚本的 **`onload` 里调用 `__hidePageLoading()`** 来关掉「页面加载中」遮罩。 执行 **`uni build` 后**，Vite 会**重新注入**打包后的入口，例如： ```html <script type=\"module\" crossorigin src=\"/assets/index.xxx.js\"></script> ``` 这条注入的脚本**不会带上**你在源码里写的 `onload` / `onerror`，所以生产环境里 **`__hidePageLoading` 从未执行**，遮罩会一直显示。 本地 `npm run dev` 仍按开发时的 `index.html` 处理，**`onload` 还在**，所以本地表现正常。 ## 修改说明 在 **H5** 应用 **`onLaunch`** 一开始调用 `window.__hidePageLoading()`（仅 `window` 存在时），与入口 JS 已执行、应用启动的时机一致，且不依赖构建是否保留 `onload`。 修改位置：`src/App.vue` 的 `onLaunch` 开头。 重新 **`npm run build`** 后，把 **`dist` 整包**部署到生产即可。 --- **补充**：`index",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`index.html",
+    "src=\"/assets/index.xxx.js",
+    "修改位置：`src/App.vue",
+    "**补充**：`index.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0c26f1bc-7368-462a-ba7f-eae1213f73a1"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "对该项目加vconsole插件，并在接口拦截器里面打",
+   "type": "preference",
+   "content": "## 已完成内容 ### 1. 安装 `vconsole` - 已加入依赖：`vconsole@^3.15.1`（安装时使用了 `--legacy-peer-deps`，因与现有 `@dcloudio/types` 的 peer 冲突）。 ### 2. 在 `main.js` 中启用（仅 H5 + 开发环境） - 使用 uni-app 条件编译 `#ifdef H5`，避免小程序/App 等非 H5 端打包进 vconsole。 - 仅在 `import.meta.env.DEV` 为真时初始化，避免**生产构建**里出现调试面板；若需要在测试/正式包也打开，可去掉该判断。 ### 3. 拦截器里统一打印响应 - **`src/request/index.js`**：成功时打印 `[API Response]`（`url`、`method`、`data`）；失败且非取消请求时打印 `[API Response Error]`。 - **`src/api/gateway.js`**：成功时打印 `[API Response]`（`interface_id`、`url`、`data`）；失败时打印 `[API Response Error]`。 项目里有两套 axios 实例（业务网关 + `VITE_BASE_API`），两处都已接上日志。 ### 使用说明 - H5 本地 `npm",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`main.js",
+    "**`src/request/index.js",
+    "**`src/api/gateway.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9314668a-621e-4143-a254-3f09b85eb124"
+   ],
+   "_draft": true,
+   "project": "repository"
+  }
+ ],
+ "_draft": true
+}

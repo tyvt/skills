@@ -1,0 +1,58 @@
+{
+  "project": "园区公共收益",
+  "batch": "045",
+  "files": [
+    "045.md"
+  ],
+  "count": 3,
+  "memories": [
+    {
+      "title": "bash 脚本报 line N 找不到引号：先数非转义双引号个数是否成偶数，正确文件行数与报错行数对不上即说明被粘贴截断",
+      "type": "workflow",
+      "content": "【什么情况】GitLab Runner 上执行构建脚本时 bash 报语法错，指向「第 109 行附近 EOF 前少一个 `\"`」，但仓库里的脚本看着没问题。\n【为什么】bash 的报错行号是**解析器发现 EOF 的位置**，不是出错的那一行。真正的问题往往是脚本末尾多了一段内容、或者粘贴时最后几行不完整，导致某个引号没有闭合；解析器一直读到文件末尾才报错，于是报错行号 ≈ 文件总行数。本例仓库里的正确文件只有 108 行、非转义双引号 128 个（偶数、成对平衡），而 runner 上的文件报 109 行 → runner 上那份多了一行 / 引号被截断，是**拷贝粘贴不完整**造成的，不是脚本逻辑问题。\n【怎么做】① 校验脚本文件：统计**非转义**双引号（跳过 `\\\"` 与单引号串）个数，必须是偶数且成对；② 比对行数——「正确文件行数 < 报错行数」基本可判定为文件被截断或多了行；③ 修正方式优先「从仓库取已校验版本覆盖 runner」而不是让人再粘贴一次（粘贴正是这次出错的根因）：`curl -o /home/gitlab-runner/scripts/nodejs-build.sh <raw 链接>` + `chmod +x`；④ 脚本第 2 行加 `set -euo pipefail`：构建失败或 dist 缺失时立即以非 0 退出，流水线正确标红，不再假成功；⑤ 本次构建其实「Build success in 248 seconds」已经打出来、产物已生成，只是最后的上传步骤没走完——修脚本后重跑即可补上传，不必重做前面的判断。",
+      "evidence": "会话 63992035（基线 358fa9e）用户诉求 1 贴出 runner 的 esbuild 构建失败、诉求 3「不改 gitlab-ci.yml 不行吗？这是远程配置文件」、诉求 6「提交推送代码」；最终结论「校验通过：脚本共 108 行，非转义双引号 128 个（偶数，**成对平衡**），不存在「未闭合引号」。注意——这就解释了你看到的 `line 109` 报错：我这份正确文件只有 **108 行**，而你 runner 上那个坏文件显然**多了一行或引号被截断**」，并说明唯一实质改动是第 2 行加 `set -euo pipefail`，其余逻辑一字未动（含 `tar -zcvf $BUNDLEID.tar.gz dist/*` 保持根目录 dist）。",
+      "files": [
+        "scripts/nodejs-build.sh"
+      ],
+      "baseline": "358fa9e",
+      "sessionIds": [
+        "session-63992035-0418-48dc-9ade-0a6f2d163f36"
+      ],
+      "bundle": "045.md"
+    },
+    {
+      "title": "CI/构建问题优先改仓库内可控文件（scripts/、.npmrc、package.json），不要改 runner 上的远程 gitlab-ci.yml",
+      "type": "preference",
+      "content": "【什么情况】处理 CI 构建失败时，用户明确反对改 runner 上的 `gitlab-ci.yml`：「不改 gitlab-ci.yml 不行吗？这是远程配置文件」。\n【为什么】runner 上的 gitlab-ci.yml 属于运维侧远程配置：Agent 本地改不动、改了也不会进版本库、下次流水线未必还生效；而仓库内的 `scripts/`、`.npmrc`、`package.json` 随提交走，可评审可回滚、可由运维直接从仓库拉取覆盖 runner，交付路径更短也更可追溯。\n【怎么做】① 排查 CI 问题时把改动落在仓库内：新增 `scripts/nodejs-build.sh` / `scripts/install.mjs` 这类脚本、`.npmrc` 配置、package.json 的 scripts 段；② 给出「运维侧只做一件事」的落地指令——从仓库 raw 链接拉取已校验脚本覆盖 runner（`curl -o /home/gitlab-runner/scripts/nodejs-build.sh <raw>` && `chmod +x`），避免让人手贴全文（手贴正是上次出错的根因）；③ 脚本先在本地做静态校验（行数、引号配对、`set -euo pipefail`）再交付；④ 提交时把脚本纳入版本库，方便追溯与运维拉取；⑤ 交付话术要把「运维需要做什么」压缩成一条可直接复制的命令，而不是让对方自己判断。",
+      "evidence": "会话 63992035（基线 358fa9e）用户诉求 3「不改 gitlab-ci.yml 不行吗？这是远程配置文件」；最终结论给出「方案 A（推荐）：直接从仓库取这份已校验的文件覆盖 runner」，并附 `curl -o /home/gitlab-runner/scripts/nodejs-build.sh https://gitlab.zhi.com/.../raw/develop/v.2.6.2/scripts/nodejs-build.sh` + `chmod +x`，同时提示「先把这脚本提交到仓库（方便追溯 + 运维拉取）」。",
+      "files": [
+        "scripts/nodejs-build.sh",
+        "scripts/install.mjs",
+        "zhi2-web-admin/.npmrc",
+        "zhi2-web-admin/package.json"
+      ],
+      "baseline": "358fa9e",
+      "sessionIds": [
+        "session-63992035-0418-48dc-9ade-0a6f2d163f36"
+      ],
+      "bundle": "045.md"
+    },
+    {
+      "title": "CI 构建报 The package \"@esbuild/linux-x64\" could not be found：根因是安装时禁用了 optional dependencies，平台二进制没装上",
+      "type": "bug",
+      "content": "【什么情况】GitLab Runner 上 `vite build` 失败：`failed to load config from .../vite.config.js` → `error during build: Error: The package \"@esbuild/linux-x64\" could not be found, and is needed by esbuild`，堆栈落在 `node_modules/esbuild/lib/main.js` 的 `generateBinPath` / `ensureServiceIsRunning` / `bundleConfigFile`。\n【为什么】esbuild 把各平台二进制放在 **optionalDependencies**（`@esbuild/linux-x64`、`@esbuild/win32-x64`…）。安装时如果用了 `--no-optional` 或 `--omit=optional`（或 npm 配置里 `omit=optional`），平台包就不会被装上；esbuild 主包运行时找不到对应平台的二进制就抛上面这个错。它与「代码语法错误」「vite 配置写错」完全无关——错误发生在**加载配置文件**这一步，还没进业务代码。\n【怎么做】① 判定：看 `node_modules/@esbuild/` 下有没有当前平台的包，以及安装命令/`.npmrc` 里有没有 `omit=optional` / `--no-optional`（npm 配置优先级高于命令行，容易被 CI 模板里的一句话带偏）；② 修复：安装时保留 optional dependencies（去掉 `--no-optional` / `--omit=optional`，或用 `npm ci --include=optional`），并把这步固化进仓库内的安装脚本 `scripts/install.mjs`；③ CI 上加一道前置校验：构建前检查 `node_modules/@esbuild/<platform>-x64` 存在，缺失就明确报「平台二进制未安装」，而不是让 vite 抛一串 esbuild 栈误导排查方向；④ 环境受限（下载不到平台包）时的退路是换 wasm 版本，但先排除 omit=optional 这个最常见根因。",
+      "evidence": "会话 63992035（基线 358fa9e）用户诉求 1 贴出完整 runner 报错「failed to load config from /home/gitlab-runner/builds/.../zhi2-web-admin/vite.config.js / error during build: Error: The package \"@esbuild/linux-x64\" could not be found, and is needed by esbuild. If you are installing esbuild with npm, make sure that you don't specify the \"--no-optional\" or \"--omit=optional\" flags. The \"optionalDependencies\" feature of \"package.json\" is used by esbuild to install the correct binary executable for your current platform.」；诉求 2「直接改」，改动落到仓库内的 `zhi2-web-admin/scripts/install.mjs`、`.npmrc`、`package.json`、`vite.config.js`。",
+      "files": [
+        "zhi2-web-admin/scripts/install.mjs",
+        "zhi2-web-admin/.npmrc",
+        "zhi2-web-admin/package.json",
+        "zhi2-web-admin/vite.config.js"
+      ],
+      "baseline": "358fa9e",
+      "sessionIds": [
+        "session-63992035-0418-48dc-9ade-0a6f2d163f36"
+      ],
+      "bundle": "045.md"
+    }
+  ]
+}

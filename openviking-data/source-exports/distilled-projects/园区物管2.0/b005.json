@@ -1,0 +1,212 @@
+{
+ "project": "园区物管2.0",
+ "batch": 5,
+ "files": [
+  "017.md",
+  "018.md",
+  "019.md",
+  "020.md"
+ ],
+ "count": 12,
+ "memories": [
+  {
+   "baseline": "b2b559778",
+   "content": "什么情况：需要在业务列表/详情上增加跳转到收益（benefit）系统的「查看报告」按钮，且要控制显隐。为什么：报告能力由独立 benefit 服务承载，服务不可用或单据未生效（bizState≠2）时入口必须隐藏，且按钮 visible 是行级函数而非静态布尔。怎么做：在 zs-operate-column 的按钮描述对象里写 visible: (row) => this.showBenefitService && row.bizState == 2（用 == 同时兼容数字 2 与字符串 '2'）；查看报告的接口调用与打开 PDF 逻辑参考已有页面，抽成公共方法并以 serviceName 作为入参，供多个模块复用；按钮对象结构为 { label, permission:false, function, visible, attrs }。",
+   "evidence": "会话 d03ace76/1b92a0cf：property/complex/index.vue 198-206 行可见最终代码 visible: (row) => this.showBenefitService && row.bizState == 2， serviceName 作为入参的公共方法改造",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/index.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/overviewContent.vue"
+   ],
+   "sessionIds": [
+    "1b92a0cf-a249-44ed-8964-a48e6fb7b46f"
+   ],
+   "title": "跨系统「查看报告」按钮的显隐契约与公共化套路",
+   "type": "pattern",
+   "bundle": "017.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "6a4835a08",
+   "content": "什么情况：生产环境路由懒加载报 TypeError: Failed to fetch dynamically imported module（某 module chunk 502）。为什么：根因不是源码或路由代码，而是发版部署不完整——主包已更新但个别 chunk 在 nginx 上 502；且本项目 outDir 在仓库根 dist/（不在 zhi2-web-admin 内），Vite 默认 emptyOutDir=false，多次构建残留大量过期 index-*.js，只挑文件上传极易漏。怎么做：① vite.config.js 给大型页面单独分包（如 module-map-overview-[hash].js）并设 emptyOutDir: true 每次清空 dist；② permission.js 里对 chunk 加载失败（404/502）自动刷新一次，缓解发版后 HTML 与 JS hash 不一致；③ 部署必须整目录全量上传 dist/，逐个传文件必然踩坑；④ 验证用 curl -I 确认 chunk 返回 200 且 Content-Type 为 application/javascript。",
+   "evidence": "会话 d03ace76 最终结论：生产 502 诊断表、vite.config.js emptyOutDir+分包、permission.js 自动刷新、整目录部署清单与 curl 验证步骤",
+   "files": [
+    "zhi2-web-admin/vite.config.js",
+    "zhi2-web-admin/src/permission.js"
+   ],
+   "sessionIds": [
+    "d03ace76-014b-461c-be39-c67bf0e43b19"
+   ],
+   "title": "「Failed to fetch dynamically imported module」在生产上的根因与部署约定",
+   "type": "bug",
+   "bundle": "017.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "d7a305a44",
+   "content": "什么情况：楼盘管理、维修资金（开户/缴存通知）、业主自治（表决/维修/多筹）、收益等模块都要展示二维楼盘表（名义层×单元×户室格子图）。为什么：实现分散且有两套组件、三套 tab 切换写法，改动时若在各页面复制修改必然漂移。怎么做：二维楼盘表的唯一主组件是 src/views/components/BuildingTable.vue（被 14+ 处引用，样式走 SCSS flex + CSS 变量 --cell-width/--columns-per-row，房间格支持选中三角标与自定义 cellStyle）；需要统一调整楼盘表样式/行为时以它为优先入口；另一个 src/views/maintenance/components/BuildingTable.vue 是维修资金侧的另一套副本，改前必须先 grep 全部引用确认两条实现各自影响面；选房弹窗壳复用 zs-select-dialog，弹窗标题「楼盘表」、tab 文案「楼盘表视图」散落在 building/houseSplit、houseMerge、maintenance/*/ScopeSelectDialog 等处，收敛文案需逐处核对。",
+   "evidence": "会话 52226fc7 全仓盘点结论：两套二维组件、一个 zs-select-dialog 壳、14 处引用清单、三套 tab 写法",
+   "files": [
+    "zhi2-web-admin/src/views/components/BuildingTable.vue",
+    "zhi2-web-admin/src/views/maintenance/components/BuildingTable.vue"
+   ],
+   "sessionIds": [
+    "52226fc7-bbb2-4b04-9b57-519e48552f3d"
+   ],
+   "title": "园区物管2.0 楼盘表组件拓扑：统一入口 src/views/components/BuildingTable.vue",
+   "type": "fact",
+   "bundle": "017.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "b2b559778",
+   "content": "什么情况：写公共方法/工具时习惯性通过 this.xxx 或 $xxx 调用挂原型上的方法。为什么：用户明确要求不要依赖 Vue 原型链，原型挂载是隐式全局依赖，跨模块复用与静态检查都不友好。怎么做：凡是可抽成公共方法的逻辑，一律用显式 import 引入函数再调用，不通过 this 或 $ 前缀访问原型方法；抽公共方法时同时把调用方需要差异化的部分（如服务名）做成入参。",
+   "evidence": "会话 1b92a0cf 用户诉求 4 原话：不要使用this或者$来获取原型，全部都是用Import",
+   "files": [],
+   "sessionIds": [
+    "1b92a0cf-a249-44ed-8964-a48e6fb7b46f"
+   ],
+   "title": "用户编码偏好：禁止 this/$ 取原型方法，公共逻辑一律显式 import",
+   "type": "preference",
+   "bundle": "017.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "fb0e2899f",
+   "content": "什么情况：Navbar 内部的「修改密码」「关于系统」等弹窗全部不居中，被强制定位到右上角（top:80px/right:25px），改弹窗自身样式无效。为什么：根因不在弹窗组件，而在 Navbar.vue 底部一段遗留的全局弹窗样式——G/B 端拆分时为「项目选择弹窗」写的 `:deep(.el-dialog) { position: fixed !important; top: 80px !important; right: 25px !important; ... }`。后来项目弹窗已挪到 layout/index.vue，但这段 CSS 没删；写在 Navbar 内部的弹窗会带上 Navbar 的 scoped 样式，被这段 `:deep` + `!important` 强制改定位。怎么做：布局壳（layout/Navbar 等）里禁止留任何面向 `.el-dialog` 这类公共标签的 `:deep` 定位/尺寸覆盖，为特定弹窗定制位置必须给它加专用 class；排查「弹窗位置不对」时先 grep 布局壳组件里的 `:deep(.el-dialog)` 残留，而不是改弹窗本身。",
+   "evidence": "会话最终结论定位到 Navbar.vue 1323-1336 行的 `:deep(.el-dialog) position:fixed top:80px right:25px` 遗留样式，删除后弹窗恢复居中；该样式是 G/B 拆分时为项目选择弹窗所加，弹窗挪走后未清理。",
+   "files": [
+    "d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\layout\\components\\Navbar.vue",
+    "d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\layout\\components\\ChangePasswordDialog\\index.vue",
+    "d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\layout\\components\\AboutSystemDialog\\index.vue"
+   ],
+   "sessionIds": [
+    "4a4ab0a8-16e2-4d5c-af9b-2abc76e9087d"
+   ],
+   "title": "[园区物管] 布局壳里遗留的 :deep(.el-dialog) 定位样式会污染其后代所有弹窗",
+   "type": "bug",
+   "bundle": "018.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7fe15a8cb",
+   "content": "什么情况：G 端登录时（尤其是部署后首次登录、或同一会话先登 B 再登 G）误弹 B 端的「物业管理区域选择」弹窗，弹窗无内容、无关闭按钮，点确定提示请选择物业管理区域，只能刷新浏览器；第二次登录不复现。为什么：两处叠加根因——(1) store 的 GetInfo 只在 B 端写入 terminalType，G 端不更新、登出也不清除，同会话内切换账号时内存残留 terminalType==='B'，误触发 bProjectDialog；(2) 误触发后 G 端用户请求 operableProjectList 返回空列表，且首次登录无 currentProjectId 时弹窗无法关闭。怎么做：terminalType 属于「登录即重取、登出必须清」的会话级状态：user.js 始终写入 terminalType、G 端登录时清项目缓存、登出时重置 terminalType；layout 用 isBTerminal 严格判定（非 B 端强制关弹窗并清数据），Navbar 仅 B 端显示项目切换入口；login/LoginForm 登录成功时重置 roles 与 terminalType 强制重新拉用户信息。所有按 terminalType 分叉的 B/G 逻辑都要防「上一账号残留」这一前提。",
+   "evidence": "会话结论明确：GetInfo 只在 B 端写 terminalType、登出不清除导致残留；修复面覆盖 user.js、layout/index.vue、Navbar.vue、login.vue/LoginForm.vue 五处的状态重置与 isBTerminal 判定。",
+   "files": [
+    "d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\store\\modules\\user.js",
+    "d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\layout\\index.vue",
+    "d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\layout\\components\\Navbar.vue",
+    "d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\home\\bProjectDialog.vue",
+    "d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\permission.js"
+   ],
+   "sessionIds": [
+    "84a73d0e-bafd-4217-bef6-71383e10d880"
+   ],
+   "title": "[园区物管] G 端误弹 B 端项目选择弹窗：terminalType 是残留态，登录/登出必须重置",
+   "type": "bug",
+   "bundle": "018.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "193a9a3b6",
+   "content": "什么情况：把「单元拆分」这类选择/展示型弹窗的表格区直接复用详情页的 sub-container 容器类，弹窗里出现详情页的内边距与表格外框样式，同时 total=0 时仍走表格分支，弹出一个带搜索栏的空表格，数据未返回前先渲染表格结构造成闪烁。为什么：sub-container 是详情页子表的样式契约（边框、padding 按详情容器设计），弹窗环境没有对应的高度链与父容器，样式必然不匹配；表格分支判定只看容器形态不看数据量。怎么做：弹窗按数据量双形态——≤6 条（含无数据）用 form-box + 勾选卡片布局配 mini（616px）档位；>6 条用 dialog-right + 搜索 + 表格 + 分页配 common（900px）档位；无数据显示 el-empty 而不是空表格+搜索栏；打开时先显示 loading 再渲染内容避免布局闪烁；表格加 max-height（如 360）防止弹窗过高。",
+   "evidence": "最终结论列出了布局容器用错 sub-container、total=0 仍走表格模式、medium 尺寸偏大、加载闪烁四类根因及双场景修复表",
+   "files": [
+    "zhi2-web-admin/src/views/building/houseImport/detail.vue",
+    "zhi2-web-admin/src/views/building/houseImport/components/HouseTable.vue"
+   ],
+   "sessionIds": [
+    "5b2911f5-d317-4814-93d2-d063ea72a749"
+   ],
+   "title": "弹窗内复用详情页容器类会导致样式错乱：选择类弹窗按数据量分双形态",
+   "type": "pattern",
+   "bundle": "019.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f101dd464",
+   "content": "什么情况：用户要求优化「通报晾晒」详情的展示样式，AI 把详情页改成了弹窗形式展示。用户随即纠正：「通报晾晒还用原来的详情页面啊，怎么改成弹窗了？」最终回退：列表 index.vue 恢复路由跳转进入 detail.vue，删除弹窗组件，只保留样式优化（HeadTitle 展示创建人/创建时间、字段排序、单列布局、Tab 改 line 样式）。为什么：列表「查看/编辑」默认交互是进路由详情页，改成弹窗属于交互形态的破坏性变更，用户没要求就不要主动做。怎么做：接到「详情展示优化」类需求时，默认保持详情页跳转形态，只调样式与字段排布；只有用户明确说「改成弹窗」才迁移，且迁移时应参照已知约定拆独立 Panel/Dialog 而不是复用路由详情页。",
+   "evidence": "会话第二轮用户质疑后全部回退，结论明确写「不再使用弹窗组件」「恢复为路由跳转」",
+   "files": [
+    "zhi2-web-admin/src/views/company/notificationPublicity/index.vue",
+    "zhi2-web-admin/src/views/company/notificationPublicity/detail.vue"
+   ],
+   "sessionIds": [
+    "f997a13c-776d-4eb8-9927-52f5ca4b8765"
+   ],
+   "title": "用户偏好：详情页不要擅自改成弹窗展示",
+   "type": "preference",
+   "bundle": "019.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "c52866fc8",
+   "content": "什么情况：项目存在多级发布分支（develop/v2.6.1 → develop/v2.6.2 → develop/v2.6.2-yulin 定制分支），修 bug 时必须从最早的 affected 分支修起。为什么：如果直接在下游分支修，上游分支合并时会再次引入或产生冲突，修复无法自然向下传播。怎么做：① 从最早受影响的分支（如 v2.6.1）切出修复并提交；② 修好后向用户确认效果；③ 确认通过后按版本层级串行合并：v2.6.1 → v2.6.2 → v2.6.2-yulin，冲突以下游已确认的修复版本为准（例如删除下游分支上遗留的 knowledge-list-card 固定高度旧样式，统一采用确认过的方案）。注意合并链完成后停在最终定制分支上，推送远程需用户另行确认。",
+   "evidence": "会话结论给出三分支合并表与冲突处理说明：v2.6.1 提交修复、v2.6.2 与 v2.6.2-yulin 逐级合并、冲突按用户确认版本解决",
+   "files": [
+    "zhi2-web-admin/src/views/property/knowledgeBase/index.vue",
+    "zhi2-web-admin/src/styles/index.scss"
+   ],
+   "sessionIds": [
+    "4d3be41b-6a5f-45bb-ae11-8782ac069dd6"
+   ],
+   "title": "多分支修复-确认-串行合并约定：从最早受影响分支修复后逐级向下合并",
+   "type": "workflow",
+   "bundle": "019.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "736a824e7（会话生产报错对应基线 6a4835a08）",
+   "content": "什么情况：生产环境地图总览（mapOverview）报 `Unexpected token '<', \"<!DOCTYPE\"... is not valid JSON`，本地开发却正常。为什么：tencentDistrictBoundary.js 里用 `import.meta.env.DEV` 分流——dev 分支走 `fetch('./map/ws/district/...')` 依赖 Vite 的 /map 代理，生产环境没有该代理，请求落到 SPA 的 index.html，res.json() 解析 HTML 即报错；更隐蔽的是 terser 压缩后 DEV 分支被错误保留、JSONP 分支反被当死代码删除，导致生产包里跑的是开发分支。怎么做：区划 GeoJSON 这类依赖 dev 代理的第三方数据拉取，不要用 import.meta.env.DEV 分流，统一改成 JSONP 直连腾讯行政区划 API（apis.map.qq.com，与 statisticsMap/map.vue 同套路），彻底摆脱本地代理依赖；修复后重新构建并核对产物 chunk 中已包含 JSONP 调用、不含 fetch('./map')；部署要求整包替换 dist（不要只更新 index.html）并清 CDN/浏览器缓存。前置确认：后台 platformConfig.region 配 6 位 adcode、腾讯地图 Key 开通 WebServiceAPI（JSONP 必需）。若仍失败，控制台会显示腾讯接口的具体错误（Key 权限/配额），不再是 HTML 解析错误。",
+   "evidence": "020.md 会话 507339ea：生产报错 DOCTYPE JSON 解析错误；根因 tencentDistrictBoundary.js 生产包仍走 fetch('./map/...') dev 分支（terser 保留 DEV 分支、删掉 JSONP 分支）；修复为统一 JSONP 直连腾讯行政区划 API，并要求整包部署+清缓存。",
+   "files": [
+    "zhi2-web-admin/src/utils/tencentDistrictBoundary.js",
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue"
+   ],
+   "sessionIds": [
+    "507339ea-ef77-48b3-981b-3f1a11ff9959"
+   ],
+   "title": "地图区划数据生产报「Unexpected token '<'」：import.meta.env.DEV 分支在 terser 下被错误保留 + 生产无 /map 代理，统一 JSONP 直连",
+   "type": "bug",
+   "bundle": "020.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "fc994977f",
+   "content": "什么情况：列表页（如 pubUseMoneyApply）表格数据为空时，底边框不显示，同时操作列下方多出边框线，且整体底边看起来偏粗（约 2~3px）。为什么：el-table 空表态的底边由多条来源叠加——通用规则 `.el-table { border-bottom }`、空表修复用的 `.el-table::before`、固定列 `.el-table__fixed-right::before`、合计行 footer 单元格的 border-bottom，以及 zs-table.vue 组件内一套重复样式，叠在一起就显粗；而外层容器/页面级样式改不动这些内部来源（用户反馈「均未生效」）。怎么做：空表底边只保留 `.el-table::before` 这一条 1px，其余全部关掉——去掉空表的 border-bottom、隐藏固定列 ::before、去掉合计行单元格底边、删除 zs-table.vue 内重复样式；修改必须落在组件/全局样式层（element-ui.scss、index.scss、zs-table.vue），逐页写样式无效。排查套路：用户怀疑「边框重合」时，先穷举同一视觉位置的所有 border/伪元素来源再逐条裁剪，而不是继续加样式覆盖。",
+   "evidence": "020.md 会话 2352374e：用户报空表底边框缺失+操作列下多线+偏粗，确认「叠了多层」：el-table border-bottom、::before、fixed-right::before、footer 单元格底边、zs-table.vue 重复样式共 5 处；收敛为只留 .el-table::before 1px。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubUseMoneyApply/index.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/styles/element-ui.scss",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue"
+   ],
+   "sessionIds": [
+    "2352374e-e4c1-4b7f-8295-5892e58f8155"
+   ],
+   "title": "空表格底边框偏粗/错位的根因是 1px 底边多来源叠加（最多 5 处），必须在组件与全局样式层收敛，页面级覆盖无效",
+   "type": "bug",
+   "bundle": "020.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "49e7729ce",
+   "content": "什么情况：弹窗表单（parkingManage/subDialog）里 zs-input-number 数量选择器突然不显示数字。为什么有两个叠加根因：① 组件自身默认 controls-position=\"right\"（按钮在右侧），但 padding-left 仍按两侧按钮的 56px 写死，覆盖了 Element UI 默认内边距，数字显示区被挤压/遮挡；② 页面在 el-form-item__content 上加了 display:flex 并强制 .el-input width:100%，与单位「个」挤同一行时输入框宽度计算异常。怎么做：公共组件层——zs-input-number 按 controls-position 区分内边距（右侧按钮用 15px/50px，两侧按钮保持 56px/56px），新增 controls-position 形态时必须同步核对内边距适配；页面层——不要在 el-form-item__content 上做全局 flex+width:100% 覆盖，「控件+单位」组合统一用 input-with-unit 类容器包裹（与既有 input-with-actions 约定同思路）。这条适用于所有被 flex 容器包裹的数值/单位组合控件出现内容不可见的场景。",
+   "evidence": "020.md 会话 9ffa91df：数量选择器不显示数字，根因 zs-input-number 默认 controls-position=right 但 padding-left 仍 56px，加上 subDialog.vue 在 el-form-item__content 上 flex + .el-input width:100% 挤压；修复为按按钮位置区分内边距 + input-with-unit 容器。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-input-number/zs-input-number.vue",
+    "zhi2-web-admin/src/views/benefit/parkingManage/components/subDialog.vue",
+    "zhi2-web-admin/src/views/benefit/pubAdvertiseSpace/components/advertiseDialog.vue",
+    "zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue"
+   ],
+   "sessionIds": [
+    "9ffa91df-ef35-47a9-9001-d53cb1cca224"
+   ],
+   "title": "zs-input-number 数字不显示：padding-left 未随 controls-position 适配 + 页面 flex 强制 100% 宽挤压输入区",
+   "type": "bug",
+   "bundle": "020.md",
+   "project": "园区物管2.0"
+  }
+ ]
+}

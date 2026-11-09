@@ -1,0 +1,95 @@
+{
+ "project": "苏住房C",
+ "batch": "020",
+ "files": [
+  "020.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "已定位并修复。根因是选项表决的「我的决策」页没有同步",
+   "type": "bug",
+   "content": "已定位并修复。根因是**选项表决**的「我的决策」页没有同步一般表决/选举那套数据补全逻辑，接口列表里常常只有时间，没有 `decisionResponseId`、决策人、选项名称，所以页面显示空白。 ## 问题原因 选项表决（`OPTION`）走 `optional/DecisionResult.vue`，原先实现较简单： - 直接用 `detail.decisionResponseId` 取记录 ID，字段缺失时「决策详情」链接无效 - 列表只用 `el.decisionPlayerName`，接口未返回时只剩时间戳 - 未像选举页那样调用 `getAppRecordDetail` / `getDecisionRecordDetail` 补全详情 ## 修复内容 1. **`optional/DecisionResult.vue`** - 增加 `pickResponseId`、`fetchRecordDetail`、`enrichRecordList`（与选举页一致） - 正确解析 `recordId`，补全决策人、选项摘要 - 使用 `onShow` 刷新数据 - 跳转详情时写入缓存 2. **`optional/DecisionRecord.vue`** - 从缓存 + 详情接口补全决策人、签字、时间 - `selectOptdec` 无数据时，回退到 `optionLi",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`optional/DecisionResult.vue",
+    "**`optional/DecisionResult.vue",
+    "**`optional/DecisionRecord.vue",
+    "**`optional/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2d84eea4-83d0-4cd8-82b5-903f4772c353"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "人工添加页面图片上传组件有问题",
+   "type": "preference",
+   "content": "已修复两个问题： ## 1. 上传组件不显示 **原因：** - 之前给 `ImageUploader` 加了 `h-144`（整个容器只有 144rpx 高），4 列网格下每个格子约 36rpx，几乎看不见 - `grid-auto-rows` 用宽度算行高，在小程序里经常算错，导致上传格高度为 0 **修复：** - 重写 `ImageUploader` 布局：用 `aspect-ratio: 1` + `min-height: 144rpx` 保证格子可见 - 去掉错误的 `h-144` 和宽度测量逻辑 - 在 `register.vue` 中显式引入 `ImageUploader`，避免分包下组件未注册 ## 2. 按钮宽度太窄 **原因：** - 页面用了 `align-items: center`，按钮只按文字宽度撑开 - `long` 类在项目里没有对应样式 **修复：** - 页面改为 `align-items: stretch` - 按钮使用 `block` 属性，并设置 `width: 100%` - 在 `ZsButton` 中补充 `.zs-button--block { width: 100% }` 样式 请重新编译后查看人工添加页，应能看到灰色上传框（带上传图标和四角边框），底部「提交人工审核」按钮也会铺满宽度。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`register.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner\\manual.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\authentication\\components\\FormManual.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3f889ff2-2daa-476e-86b3-963833ee9ca2"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "图形验证码没有贴到右侧",
+   "type": "fact",
+   "content": "已精简，只保留真正起作用的修复： **`form.scss`** - 恢复 `uni-forms-item__content` 的原始样式 - 保留 `.img-code` 下 `display: contents`（解决小程序里 `ImgCode` 组件宿主无法撑满的问题） - 保留 `.img-code .container` 的撑满与底部分割线（`display: contents` 后分割线需挪到 `.container` 上） **`ImgCode/index.vue`** - 恢复 `.container` 命名和原来的 `justify-content: space-between` 布局 **`login/index.vue`** - 去掉临时的 `style=\"width: 100%\"` 请再编译确认一下布局是否仍然正常。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`form.scss",
+    "**`ImgCode/index.vue",
+    "**`login/index.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\login\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ImgCode\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\styles\\form.scss、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\VerifyCode\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f888dab8-e1a9-417b-9761-339cbc03bf70"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已处理。原因是页面默认白色背景，而内容区只有灰色卡片",
+   "type": "bug",
+   "content": "已处理。原因是页面默认白色背景，而内容区只有灰色卡片部分有背景色，下方未覆盖区域就显示成白色空白。 已做调整： - 为 `page` 设置与内容区一致的灰色背景（与 `DecisionResult` 保持一致） - 去掉最后一张卡片的多余下边距 重新编译后，页面下方应统一为灰色背景，不会再出现大块白色空白。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\common\\DecisionRecord.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\autonomy.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\common\\DecisionResult.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "82e653ab-16aa-4131-885b-deca387b3836"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "[渲染层网络层错误] Failed to load ",
+   "type": "fact",
+   "content": "**问题原因** `location-red.png` 已从主包迁到各分包静态目录，构建后 `prune-main-static.mjs` 会删掉主包里的 `/static/icon/location-red.png`。但 `houseMap.vue`（位于 `pages_main` 分包）仍通过 `import` 引用主包路径，运行时请求 `http://127.0.0.1:53374/static/icon/location-red.png` 会返回 500，地图 marker 只能退回默认图标。 **已做修改** 1. 将图标复制到 `src/pages_main/static/icon/location-red.png` 2. 在 `SUBPACKAGE_STATIC_IMAGES` 中为 `pages_main` 增加 `location-red.png` 映射 3. `houseMap.vue` 改为使用分包路径： ```50:51:zhi2-mobile-shimin/src/pages_main/houseMap/houseMap.vue import { resolveStaticUrl } from \"@/utils\"; const markerIcon = resolveStaticUrl(\"icon/location-red.png\", \"pages_mai",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`houseMap.vue",
+    "```50:51:zhi2-mobile-shimin/src/pages_main/houseMap/houseMap.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\houseMap\\houseMap.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "bb55af39-97ad-4deb-943d-2c10c3c7ff61"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

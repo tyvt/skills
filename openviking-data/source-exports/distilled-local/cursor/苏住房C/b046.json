@@ -1,0 +1,80 @@
+{
+ "project": "苏住房C",
+ "batch": "046",
+ "files": [
+  "046.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "VM126 vendor.js:2 Referenc",
+   "type": "fact",
+   "content": "源码已修好，但微信开发者工具还在跑**旧的编译产物**（`vendor.js` 的 hash 没变，说明没重新编译）。 我已重新执行 `npm run build`，新的 `dist/pages/index/components/menu/MenuImage.js` 里**已不再包含** `defineOptions`，而是： ```js const i={inheritAttrs:!1,options:{virtualHost:!0}},r=Object.assign(i,{__name:\"MenuImage\",... ``` 请按下面步骤刷新： 1. **确认微信开发者工具导入的是** `D:\\repository\\苏住房C\\dist` 目录 2. 点击工具栏 **「编译」** 或 **「清缓存 → 全部清除」** 后重新编译 3. 若仍报错，关闭项目后重新导入 `dist` 目录 如果你平时用的是 `npm run dev` 开发模式，需要先**重启 dev 服务**，再在开发者工具里刷新。 刷新后 `defineOptions is not defined` 应该就消失了。若还有问题，把开发者工具里「详情 → 本地设置 → 调试基础库」和项目路径截图发我。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "源码已修好，但微信开发者工具还在跑**旧的编译产物**（`vendor.js",
+    "`dist/pages/index/components/menu/MenuImage.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\menu\\MenuImage.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\package.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\virtualHost.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2f622576-daa0-4a02-9ddc-d01ed2a8da69"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "pages_transaction/newHouse",
+   "type": "preference",
+   "content": "**问题原因** 新房详情页底部是白色底栏，但收藏按钮用了 `imgType=\"dark\"` + `aixin_e.svg`。这个 SVG 带了白色滤镜（`feColorMatrix` 把颜色转成白色），本来是给**深色背景**用的——比如二手房详情里叠在轮播图上的收藏按钮。 白底 + 白图标 = 看不见，只剩「收藏」文字。 **修复内容** 1. **`newHouse/detail.vue`**：去掉 `imgType=\"dark\"` 和 `emptyUrl`，改用默认的 `aixin_g.png`（灰色心形，适合浅色背景）。 2. **`collectBtn.vue`**：简化 `imageSubpackage`，直接返回 `subpackage` prop，避免收藏状态切换时图标路径解析错误。 重新编译预览后，底部应能正常显示灰色收藏图标；已收藏时会显示红色 `aixin_r.png`。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`newHouse/detail.vue",
+    "**`collectBtn.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouse\\detail.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\collectBtn\\collectBtn.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "31b6e9ca-2ea3-4981-827d-9dac98d0e40f"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "[渲染层网络层错误] Failed to load ",
+   "type": "fact",
+   "content": "已修复这两个 SVG 加载 500 错误，原因和改动如下。 ## 原因分析 ### 1. `location.svg` `ZsImage` 通过 `resolveStaticUrl` 将 `icon/location.svg` 解析为分包路径 `/pages_owner/static/icon/location.svg`（见 `SUBPACKAGE_STATIC_IMAGES` 配置），但该文件只存在于主包 `src/static/icon/`，未复制到分包目录。 ### 2. `file_szf_pdf.svg` `FileList` 的 `Type2.vue` / `Type3.vue` 中，PDF 图标使用了原生 `<img src=\"svg/file_szf_pdf.svg\">`。微信小程序会按**组件所在目录**解析相对路径，因此实际请求的是： `/pages_owner/components/FileList/svg/file_szf_pdf.svg` 而正确路径应为 `/static/svg/file_szf_pdf.svg`（主包白名单资源）。同文件的 doc 图标已用 `ZsImage`，只有 pdf 图标写错了。 ## 修复内容 1. **复制缺失资源** - `location.svg` → `pages_owner/static/icon/` - `loca",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`Type2.vue",
+    "`Type3.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "be666288-8d34-4fea-9f67-33d480306f30"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "很多按钮禁用状态下的背景色是绿色，全局排查修复",
+   "type": "preference",
+   "content": "已完成全局排查和修复，原因与改动如下。 ## 问题原因 1. **微信小程序原生行为**：`ZsButton` 原先把 `type=\"primary\"` 传给原生 `<button>`，微信默认主色是**绿色**（`#07c160`）。 2. **禁用态 CSS 失效**：禁用样式用了 `rgba(var(--primary-color-rgb), 0.5)`，小程序不支持这种写法，背景色回退为微信默认绿色。 3. **禁用样式范围过大**：`.zs-button[disabled]` 作用于所有按钮，连默认/取消按钮也会被加上主题色背景。 ## 修复方案 **核心改动在 `ZsButton.vue`：** - 不再向原生 button 传 `type` / `plain`，避免触发微信绿底 - 用 class（`zs-button--primary`、`zs-button--plain`、`is-disabled`）控制样式 - 增加 `hover-class=\"none\"`，去掉微信默认点击态 - 禁用态使用预计算的 `--primary-color-disabled` 变量 **全局配套：** - `styles/index.css`：新增 `--primary-color-disabled` 变量 - `uni.scss`：重置小程序 disabled 默认透明度，避免绿底",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`ZsButton.vue",
+    "`styles/index.css",
+    "`uni.scss",
+    "`zs-button.scss"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a82b1c4d-6931-4bc6-bd80-8e4198e22765"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,61 @@
+{
+ "project": "苏住房C",
+ "batch": "012",
+ "files": [
+  "012.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "授权确认弹窗双按钮样式修复 Implement th",
+   "type": "fact",
+   "content": "## 原因 在 **`ZsButton` 上开启了 `virtualHost: true`**，这是**全局**生效的。小程序里按钮会直接参与父级 flex，再叠加上 `.zs-button { width: 100% }` 等全局规则，列表里的 **`size=\"mini\"`** 操作钮（如「我的房屋」卡片里的完善信息、撤销添加等）会被拉成整行宽，布局就乱了。 ## 处理 1. **已去掉** `ZsButton` 的 `virtualHost: true`，其它页面按钮恢复原来的组件包裹行为。 2. **弹窗仍单独处理**：只在 `ZsPopup` 底栏给 `ZsButton` 加 `:style=\"{ width: '100%', display: 'flex', minWidth: 0 }\"`，配合 `popup-footer__item` + `popup-footer-btn`，不影响列表页。 请重新编译后先看 **「我的房屋」** 卡片按钮是否恢复正常，再打开 **「选择身份 → 授权确认」** 看双钮是否仍等宽。 若弹窗宽度仍不对，把截图发我，再在不动 `virtualHost` 的前提下微调弹窗样式。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\components\\TypeChoose_Suzhufang.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\addTypeChoose.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d365c947-62dc-48ad-abbf-b9814a607332"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "问题原因 点击「热门活动」里「查看装修补贴企业名单」",
+   "type": "fact",
+   "content": "## 问题原因 点击「热门活动」里「查看装修补贴企业名单」轮播图时，后端返回的跳转地址不是纯菜单码，而是： ``` 3_1_16&richTextId=1989870396182228994 ``` APP 会把 `3_1_16` 当作菜单码，并把 `richTextId` 当作参数，跳转到富文本详情页。 小程序/H5 侧在 `navigateMenuItem` 里把整串 `3_1_16&richTextId=...` 当成菜单码去查 `MENU_ROUTES`，查不到就提示「功能暂未开放」。 ## 修复内容 在 `menuNav.js` 中新增 `parseMenuLink`，解析 banner 里嵌入的查询参数（支持 `?` 和 `&` 两种格式），并在跳转时把 `richTextId` 等参数传给 `resolveMenuRoute`。 同时更新了 `redirect/index.vue`，保证通过中转页进入时也能正确解析同类链接。 ## 验证方式 重新编译/刷新后，在首页点击「装修补贴」轮播图，应跳转到： `/pages_main/news/detail?id=1989870396182228994` （装修补贴企业名单富文本页） 如果测试环境 banner 配置与生产一致，修复后应可正常打开，不再出现「功能暂未开放」。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`menuNav.js",
+    "`redirect/index.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\index.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\Home_Suzhufang.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\home.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\Home_Suzhufang.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5e3bf5c4-bf75-4a82-9a83-96098fe31155"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已定位并修复苏找房「全部」Tab 二手房图片空白的问",
+   "type": "bug",
+   "content": "已定位并修复苏找房「全部」Tab 二手房图片空白的问题，原因如下： ## 问题原因 1. **接口数据缺失**：`listRecommend`（全部 Tab）返回的二手房记录 `thumbnail` 均为 `null`，例如「绿聚未来商业中心」「湖居世家」等，接口本身没有图片字段。 2. **默认图加载失败**：默认占位图 `default.png` 放在 `pages_transaction` 分包中，而苏找房 Tab 属于主包页面，该分包未预加载时，占位图路径无法访问，导致显示空白而非默认图。 3. **图片字段映射不完整**：部分接口返回 `imageUrl` 而非 `thumbnail`，原映射 `imageUrl: e.thumbnail` 会覆盖已有图片地址。 4. **H5 生产环境混合内容**：生产配置中图片代理使用 `http://`，在 HTTPS WebView 中可能导致 `/zs-fym/` 图片被拦截（影响二手房 Tab 有图房源）。 ## 修复内容 | 文件 | 修改 | |------|------| | `src/static/images/szf/default.png` | 将默认图复制到主包，确保 Tab 页可直接访问 | | `src/utils/mainStaticPaths.js` | 注册主包默认图路径 | | `src/compon",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`src/utils/mainStaticPaths.js",
+    "`src/components/commonNew/houseCard.vue",
+    "`src/pages_tab/components/Project_Suzhufang.vue",
+    "`src/pages_transaction/stockHouse/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fa5768fc-b738-4e95-83d7-d7bd81e5939a"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

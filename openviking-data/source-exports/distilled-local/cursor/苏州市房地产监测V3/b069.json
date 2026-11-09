@@ -1,0 +1,78 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "069",
+ "files": [
+  "069.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "根据截图「编辑监管范围 → 点 确定 弹窗不消失」，",
+   "type": "fact",
+   "content": "根据截图「**编辑监管范围** → 点 **确定** 弹窗不消失」，问题出在监管项目备案子表弹窗 `SupervisionAddDialog.vue`。 ## 原因说明 1. **隐藏校验项**：`regulatorStandard` 在 `rules` 里必填，但模板里没有对应 `el-form-item`，校验失败时往往没有红字提示，表现为「点了确定没反应」。 2. **行数据字段名不一致**：列表接口可能返回 `regulatoryStandard`，表单用的是 `regulatorStandard`，打开编辑时标准字段为空，同样会卡在校验。 3. **金额输入未失焦**：监管面积等带 `v-money` 的字段若未 `blur` 就点确定，模型值可能未同步，校验/提交异常。 4. **提交覆盖 `priceRecordId`**：原先 `this.form.priceRecordId = this.priceRecordId` 且未声明 prop，容易把行里已有 ID 写成 `undefined`，接口失败时弹窗也不会关。 ## 已做修改 | 文件 | 改动 | |------|------| | `SupervisionAddDialog.vue` | 打开时 `normalizeFormFromRow` 合并默认值并做字段映射；版本校验绑在「版本名称」；提交前 `blu",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`SupervisionAddDialog.vue",
+    "`SupervisionTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e88f9902-f489-41f1-a8b8-9ae1ba2925b4"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "修复银行网点弹窗无法选择 Implement the",
+   "type": "preference",
+   "content": "修复已完成，变更如下： ### 1. [`BranchOneDialog.vue`](zhi2-web-admin/src/views/supervision/agreement/xy/components/BranchOneDialog.vue) - 默认「网点名称」列：`:index=\"handlePick\"` → `type=\"link\" :function=\"handlePick\"` - `onOpen()`：先设置 `defalutStr`，再调用 `getList()`，避免首次加载缺少银行编码 ### 2. [`YhwdDialog.vue`](zhi2-web-admin/src/views/supervision/bank/cbyh/components/YhwdDialog.vue) - 「联行名称」列：`:index=\"setBank\"` → `type=\"link\" :function=\"setBank\"` - 「联行号」列：同样改为可点击链接，扩大可选区域 ### 使用说明 刷新页面后，进入 **详情-承办银行 → 网点列表 → 新增/编辑**，打开「银行网点」弹窗，点击 **联行号** 或 **联行名称**（蓝色链接样式）即可选中并自动回填表单。 注意：序号列仍是蓝色样式但不可点击，请点击联行号或联行名称，不要点序号。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`BranchOneDialog.vue`](zhi2-web-admin/src/views/supervision/agreement/xy/components/BranchOneDialog.vue",
+    "[`YhwdDialog.vue`](zhi2-web-admin/src/views/supervision/bank/cbyh/components/YhwdDialog.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\bank\\cbyh\\components\\YhwdDialog.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\agreement\\xy\\components\\BranchOneDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a2fde687-3089-488b-83f1-704448411d98"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "修复「定金缴款列表」有数据但不显示 Implemen",
+   "type": "bug",
+   "content": "已修复。根因是 V3 接口 `selectDepositNoticeList` 返回的数据在 `data` 字段下，而通用 `listCallback` 只读 `response.rows`，导致表格始终为空。 ## 修改文件 [`zhi2-web-admin/src/views/supervision/deposit/notice/index.vue`](d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/deposit/notice/index.vue) ## 变更说明 1. **响应解析**：新增 `extractListData` / `extractTotal`，兼容 `data`、`data.records`、`data.list`、`data.rows` 及旧版 `rows`。 2. **字段映射**：新增 `normalizeNoticeRow`，补齐接口与表格列的字段差异： - `noticeNo` → `payNoticeNo` - `projectName` → `regulatorProjectName` - `houseNo` → `roomNo` - `buildingNo` → `policeNo` / `constructionNo` - `noticeId` → `id` 兜底",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`zhi2-web-admin/src/views/supervision/deposit/notice/index.vue`](d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/deposit/notice/index.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\路由信息.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "39e4c6b2-6db7-42a7-8dc7-56ade38929bc"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "以下变更均为经纪机构管理相关： 经纪机构入网认证保存",
+   "type": "preference",
+   "content": "已按接口说明完成经纪机构相关前端改造，摘要如下。 ## 业务范围 `businessScenario`（字典 `company_business_scenario`） | 场景 | 改动 | |------|------| | **入网认证保存** | `AgencyEntryNetworkDetail` 保存体增加必填 `businessScenario`（经纪机构多选，逗号拼接） | | **入网编辑** | `AgencyEntryNetworkSections` 增加多选「业务范围」 | | **机构基本信息** | `AgencyBasicInfoDetail` + `agencyBasicInfoContent.js` 展示（经纪/租赁营业执照区均支持） | | **入网/开业详情** | 从 `entryNetwork/detail` 回显；租赁营业执照只读区展示业务范围 | ## 租赁开业 `allowOpeningBusinessFlag` - 在 `AgencyEntryNetworkDetail` 中：`0` 时 **编辑 / 开业（提交）** 按钮 `disabled`，并提示「当前不允许开业，请联系主管部门」 - 租赁场景下主按钮文案为「开业」 ## 从业人员 - **新增/编辑**：人员类型为 `professional` 且身份证号有效时，调用 `PO",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`agencyBasicInfoContent.js",
+    "`companyBasicInfoShared.js`、`agencyBasicInfoContent.js",
+    "`AgencyEntryNetworkDetail.vue`、`AgencyEntryNetworkSections.vue`、`AgencyBasicInfoDetail.vue",
+    "`AgencyPersonnelDetail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b0af49dc-1ee9-4bca-82ad-f1b1f4a01bf0"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

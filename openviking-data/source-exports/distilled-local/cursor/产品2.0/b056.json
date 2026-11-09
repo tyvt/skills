@@ -1,0 +1,79 @@
+{
+ "project": "产品2.0",
+ "batch": "056",
+ "files": [
+  "056.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "流程定义中指定人员，选中后点击空白地方，指定人员会为",
+   "type": "preference",
+   "content": "已定位并修复该问题，原因和改动如下。 ## 问题原因 1. **点击画布空白会销毁属性面板** 取消选中节点时，`PropertyPanel` 会卸载任务配置组件。`el-select` 在卸载时可能触发一次空值 `input`，`assignee` 的 watch 随即把 BPMN 模型里的指定人员清掉。 2. **表单用整对象替换更新** `XForm` 的 `setFieldValue` 原先通过 `{ ...formModel, [name]: value }` 替换整个 `formData`，容易造成人员字段 watch 时序异常，选中值未及时写入模型。 3. **人员 ID 类型不一致** 下拉选项的 `userId` 是字符串，模型里解析出的 `assignee` 可能是其他类型，导致回显为空。 ## 修复内容 | 文件 | 改动 | |------|------| | `task.vue` | 组件销毁时跳过人员字段同步；同时写入标准 `assignee` 和 `flowable:assignee` | | `XForm.vue` | 用 `$set` 就地更新字段，不再替换整个对象 | | `PropertyPanel.vue` | 同一节点重复选中时不销毁面板 | | `parseElement.js` | 将 `assignee` 统一规范为字符串 | | `",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`task.vue",
+    "`XForm.vue",
+    "`PropertyPanel.vue",
+    "`parseElement.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9368bed1-6d47-4b7e-aa8e-585db398488b"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "这里改成只能传单个文件，实际逻辑也同步调整",
+   "type": "bug",
+   "content": "已修复。根因是设置了 `:limit=\"1\"` 后，再次选择文件时 Element UI 会走 `on-exceed`，不会进入 `on-change`，所以之前的替换逻辑不会执行。 ### 修复方式 新增 `handleExceed` 处理：当已有 1 个文件时再上传，先清空旧文件，再用 `handleStart` 添加新文件，从而完成替换。 ```javascript handleExceed(files) { const file = files[0] if (!file || !this.validateFile(file)) return this.$refs.upload.clearFiles() this.fileList = [] this.localFiles = [] this.$refs.upload.handleStart(file) } ``` `import.vue` 和 `importUploadDialog.vue` 都已同步修改。请再试一次：上传第一个文件后，再选另一个文件应会自动替换为新文件。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`import.vue",
+    "`importUploadDialog.vue",
+    "涉及文件：d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\spFeeBill\\components\\import.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\spFeeBill\\components\\importUploadDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3b0f6cd2-34d8-446f-830d-2c1d4d5eda2f"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "已修复价格备案「开发项目」选择弹窗的问题，改动在 z",
+   "type": "fact",
+   "content": "已修复价格备案「开发项目」选择弹窗的问题，改动在 `zhi2-web-admin/src/views/components/ProjectDialog.vue`（`detail.vue` 和 `changeDetail.vue` 都引用它）。 **1. 接口更新** - 默认接口从 `/building/projectinfo/page` 改为 `/building/project/page` - `bizState` 改为数字 `2`，与 `SelectDialog` 保持一致 **2. 表格 UI 修复** - 将 `el-table-column` 改为 `zs-table-column`，修复列宽塌陷、表头竖排的问题 - `row-key` 从 `projectCode` 改为 `projectId` - 项目名称列使用 `type=\"link\"`，单选时可点击选中 - 数据加载后调用 `doLayout()` 重新计算列宽 - 表单/按钮/分页统一为 `zs-*` 组件，与项目其他弹窗一致 刷新页面后，点击「开发项目」应能正常加载项目列表，表格列宽也会正常显示。若仍无数据，请检查接口权限或 `bizState=2` 的筛选条件是否过严。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`zhi2-web-admin/src/views/components/ProjectDialog.vue`（`detail.vue",
+    "`changeDetail.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\commercialHousingSales\\priceFiling\\recordPriceMngSuzhou\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\api\\pricemng\\recordPriceMng.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2968a509-de10-4547-8a3b-9515e436aa52"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "设施设备类别没有回显 @zhi2-web-admin",
+   "type": "preference",
+   "content": "## 原因 `DetailTemplate` 里 **`type: 'image'`** 会先按 URL 取后缀，只有 `jpg/jpeg/png/gif/bmp/webp/svg` 才用 `<img>`；否则走「附件」分支，用 **`detail-link`** 当可点链接（避免把 PDF 等当图加载）。 你们接口里的地址往往是**无后缀**或**路径里不带 `.jpg` 这类后缀**（例如 `/profile/xxx`、带 token 的查询串），就会被当成非图片，于是看起来像「链接」而不是缩略图。 ## 修改 1. 增加计算属性 **`stepPictureUrlList`**：从 `stepImages`（或对象里的 `url` 等字段）统一整理成**字符串 URL 数组**（与 `detailCallback` 里编辑态用的数据一致）。 2. 查看模式改为 **`type: 'images'`**：`DetailTemplate` 对 `images` 是直接用 `resolveServerAssetUrl` 拼 `<img>`，**不做后缀判断**，无后缀的站内图也能正常显示。 3. 没有图片时仍用 **`type: 'text'`** 显示占位，和原来空图时的 `-` 行为一致。 核心片段如下： ```92:108:d:\\repository\\产品2.0\\zhi2-w",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "```92:108:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\recordProcess\\components\\recordProcessStepDialog.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\scrappedRecord\\detail.vue、d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\detailMixins.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\facility\\components\\FacilitySelectDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "321b7eb6-d1b4-4f6b-865c-11661215d619"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

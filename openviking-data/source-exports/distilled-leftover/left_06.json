@@ -1,0 +1,29 @@
+{
+ "batch": 6,
+ "files": [
+  "031.md",
+  "032.md",
+  "033.md",
+  "034.md",
+  "035.md",
+  "036.md"
+ ],
+ "count": 1,
+ "memories": [
+  {
+   "title": "[苏房] 同模块页面上下文不能只按路由路径特征判定：buildNavigationByFilePath 跳到非 Template 路径导致范本内容误调 contractMainInfo/detail 返回 400",
+   "type": "bug",
+   "content": "什么情况：合同范本详情页点「范本内容」进合同编辑器，页内报错、Network 里出现红色 POST /presale/contractMainInfo/detail 400。\n\n为什么：合同编辑器用 comeFromTemplate = path.includes('Template') 判定「我是打开范本还是打开合同」。建湖项目用命名路由 ContractTemplate/:type/:tableid，路径必然含 Template，所以这个判定天然成立；苏州这边跳转走的是公共的 buildNavigationByFilePath，它按菜单 filePath 解析出的是 contract2016 版菜单路由，路径里不含 Template，判定恒为 false，编辑器就当普通合同详情处理，拿范本行的 templateId 去调 detail 接口，后端不认识这个 ID 直接 400。\n\n怎么做：(1) 短期在跳转侧显式带上上下文标记——范本详情 gotoContractTemplate 的 query 增加 from: 'template'，编辑器侧判定改为 path.includes('Template') || $route.query.from === 'template'（保留原判定做兼容）；(2) 范本场景应走 getContractsByContractNo（取范本正文）+ getBaseContractInfo（经销商信息），保存走 saveTemplateContract，接口规范不改，只改分流条件；(3) 通用约定：。凡是从「另一个项目同源代码」搬过来的页面身份判定，只要它依赖命名路由或路径段特征，在本项目（路由一律由后端菜单 filePath 动态生成）都会失效，必须改成显式 query / meta 标记传递。验证方式：点「范本内容」后 Network 应只有两个 200，不再有 detail 400。",
+   "evidence": "会话 37b8afc9（基线 114af19）用户诉求：对比建湖逻辑对齐范本内容按钮调接口，接口规范不要修改。最终结论定位根因为苏州经 buildNavigationByFilePath 解析到 contract2016 版菜单路由、路径不含 Template，使编辑器误判为普通合同详情并以 templateId 调 POST /presale/contractMainInfo/detail 返回 400；修复为 detail.vue:438 跳转 query 增加 from:'template'，index.vue:337 判定扩展为 path.includes('Template') || query.from === 'template'，范本分支改走 getContractsByContractNo + getBaseContractInfo + saveTemplateContract。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/template/detail.vue",
+    "zhi2-web-admin/src/views/contract/index.vue"
+   ],
+   "baseline": "114af19",
+   "sessionIds": [
+    "session_37b8afc9920480ce3aeeb071cc6d15c3"
+   ],
+   "bundle": "031.md"
+  }
+ ]
+}

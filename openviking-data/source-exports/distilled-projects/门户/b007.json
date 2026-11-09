@@ -1,0 +1,274 @@
+{
+ "project": "门户",
+ "batch": 7,
+ "files": [
+  "025.md",
+  "026.md",
+  "027.md",
+  "028.md"
+ ],
+ "count": 15,
+ "memories": [
+  {
+   "title": "[门户] 对内首页业务中心已改为 businessCenters 接口全量驱动（废弃 merge 覆盖本地文案）",
+   "type": "workflow",
+   "content": "当 `/portal/home/functions` 已配置 `data.businessCenters` 时，B 端首页三块业务中心（商品房/存量房/住房租赁）应以接口为唯一展示来源：`fetchFunctions`/`mapFlowsFromApi` 直接映射标题、副标题、步骤名称、数量、图标与顺序；不要再走 `mergeBusinessFlows → mergeFlowSteps` 用 `DEFAULT_BUSINESS_FLOWS` 覆盖文案或裁掉非默认步骤。接口空或异常时才回退 `DEFAULT_BUSINESS_FLOWS`。显隐仍按权限：`listPerms` 的 `portal:bizSection:{functionCode}` 过滤，租赁板块兼容后端 `leaseBusiness` 编码。步骤图标：服务端 `functionIcon` 经 `resolveServerAssetUrl` 解析，缺省回退 `BIZ_ICON_BY_CODE`；板块编码别名 `leaseBusiness → housingRental` 用于命中租赁橙主题。注意：这与早期「改 homeLayout 本地 defaults 即生效」的维护方式相反，改菜单应优先改后端配置。",
+   "evidence": "会话 f4b6f504：用户「对内首页三块菜单从接口读取，已经配置好了」；结论移除 mergeBusinessFlows 强制覆盖，接口有 businessCenters 时全量取自后端，仅空/异常回退 DEFAULT_BUSINESS_FLOWS；并补 functionIcon、leaseBusiness 别名。",
+   "files": [
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+    "zhi2-web-admin/src/views/home/config/homeLayout.js",
+    "zhi2-web-admin/src/api/portal/home.js"
+   ],
+   "baseline": "fd73e47",
+   "sessionIds": [
+    "f4b6f504-0c81-40e8-a14a-fc8a60a930be"
+   ],
+   "bundle": "026.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 苏周到扫码登录三接口迁至 /portal/login/external/suzhouDao（网关仍走 v3.0 portal base）",
+   "type": "pattern",
+   "content": "苏周到扫码登录 API 前缀从 `/security/ctAuth/suzhouDao/*` 改为 `/portal/login/external/suzhouDao/*`（`getQrLoginParam`、`scanLogin`、`suzhouDao/login` 三个函数，通常集中在 `src/api/security/suzhouDao.js`）。浏览器最终 URL 形如 `/api/v3.0/portal/login/external/suzhouDao/...`：无需手写 `/api/v3.0`，`request.js` 拦截器对以 `/portal/` 开头的 URL 自动切到 `VITE_APP_PORTAL_BASE_URL` 并走 POST；vite/nginx 的 `/api/v3.0` 代理一般已存在。扫码弹窗与授权回调页逻辑可不动。联调注意：`scanLogin` 若后端要求 query 的 `qrCodeId` 而非 JSON body，会 400——可把该路径加入 `portalApiRewrite.js` 的 NO_BODY 类处理（与项目现有 portal 重写约定一致）。",
+   "evidence": "会话 session_1049d6185d5fcfff06cfb94108b48261：要求三接口把 `/v2.0/security/ctAuth` 改为 `/v3.0/portal/login/external`；结论仅改 suzhouDao.js 路由前缀，构建产物含三新路径，并说明 scanLogin body 与 query 契约需联调确认。",
+   "files": [
+    "zhi2-web-admin/src/api/security/suzhouDao.js",
+    "zhi2-web-admin/src/utils/request.js",
+    "zhi2-web-admin/src/utils/portalApiRewrite.js"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "session_1049d6185d5fcfff06cfb94108b48261"
+   ],
+   "bundle": "026.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 开发服可选 Bun、安装仍统一 npm（bun 可读 npm 的 node_modules）",
+   "type": "preference",
+   "content": "门户 monorepo 若要让本机有 Bun 的成员加速开发服，同时保证无 Bun 的同事仍用 Node：`bun run` 只解析已有 `node_modules`，不要求先 `bun install`——npm 安装的依赖（含 workspace 提升到根、`.bin` shim）Bun 可直接执行，故策略是「安装单一用 npm install，运行分岔：有 bun 则 `bun run dev`，无则 npm/pm 脚本」；故意不要给 `install` 做 bun 包装，避免 `bun.lock` 与 `package-lock` 混用导致 node_modules 漂移。`BUN_RUNTIME=1` 路径（如 `bun --bun run dev`）只依赖 Bun 运行时，与安装方式无关。`bun install` 可选且应 gitignore `bun.lock`；缺依赖时 `bun run dev` 报找不到 vite，补一次 `npm install` 即可。",
+   "evidence": "会话 46380d5c：用户要求 bun 启动但团队可回退 node、仅改开发服；追问「用 bun 运行必须要用 bun 安装依赖吗」结论为不必须，保持 npm install + 仅 dev 分岔。",
+   "files": [
+    "package.json",
+    "zhi2-web-admin/package.json",
+    "scripts/pm.mjs",
+    "zhi2-web-admin/scripts/vite-build.mjs",
+    ".gitignore"
+   ],
+   "baseline": "fd73e47",
+   "sessionIds": [
+    "46380d5c-0a95-41db-8cf9-6ee63ac106ed"
+   ],
+   "bundle": "026.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 公网门户 mock 展示日期统一 2026 年仅改演示字段，不动证件/法规范本年份",
+   "type": "workflow",
+   "content": "统一登录公网门户（`publicPortal/mock` 及少量页面内联 mock）若需把列表/公示时间「看起来是当前」，应只改用户可见的演示日期（公告时间、信用公示、合同编号前缀、备案日期、建成/抵押展示等）到 2026，并同步 README 说明。不要动非展示语义的年份：预售/证件到期仍可 2027/2028；「2016 版商品房买卖合同」等法规范本 PDF/菜单文案保持原规范年份。接口公告失败时首页会回退 `publicNotices` 等 mock，改 mock 后应确认回退列表时间一致。",
+   "evidence": "会话 5a79e058：用户「首页 mock 数据的日期时间都改为 2026 年」；结论改 notices/rental/brokers、InformationPages、PropertyDetailDialog、README，并明确未改 2017/2018 证件到期与 2016 版合同文案。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/mock/notices.js",
+    "zhi2-web-admin/src/views/home/publicPortal/mock/rental.js",
+    "zhi2-web-admin/src/views/home/publicPortal/mock/brokers.js",
+    "zhi2-web-admin/src/views/home/publicPortal/pages/InformationPages.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/README.md"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "5a79e058-ab01-4651-a329-93cfa63f858d"
+   ],
+   "bundle": "026.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户首页业务板块标签色集中在 homeLayout.js，并支持 functionName 兜底主题",
+   "type": "pattern",
+   "content": "门户 index-new 各业务板块（面积管理、经纪机构等）的标签色与图标区浅底色不要散落在 HomeBizSection 里硬编码。统一在 `src/views/home/config/homeLayout.js` 的 `SECTION_THEMES` 配置主题键，实际色值与 `HomeBizSection` 内 `TAG_COLOR_BY_THEME` 对齐（例如 cyan → #026AD9）。新增板块主题时同步扩展 `TAG_COLOR_BY_THEME` 与图标区样式映射。接口 `functionCode` 与配置键不一致时，在 `mapFlowsFromApi` 用 `SECTION_TITLE_THEMES` 按 `functionName`（如「经纪机构」）兜底套用主题，必要时再补 functionCode 别名。",
+   "evidence": "用户要求面积管理改为 #026AD9、经纪机构改为 #7B00D9；实现为面积管理 theme 改 cyan，经纪机构新增 brokerAgency 主题 #7B00D9，并说明 functionCode 非 brokerAgency 时靠 SECTION_TITLE_THEMES 按名称兜底。",
+   "files": [
+    "zhi2-web-admin/src/views/home/config/homeLayout.js",
+    "zhi2-web-admin/src/views/home/components/HomeBizSection.vue"
+   ],
+   "baseline": "f489349",
+   "sessionIds": [
+    "50a4a697-6901-4e3d-8d06-01bcbaac09ac"
+   ],
+   "bundle": "027.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户 index-new：showTopNav 必须与 shouldHideLayoutChrome 共用同一条件",
+   "type": "bug",
+   "content": "门户首页通过 homeDataMixin 设置 Vuex `app.hideLayoutChrome` 以隐藏页签并启用 portal-home-layout。`layout/index.vue` 用 `hideLayoutChrome && !isSuperAdmin`（shouldHideLayoutChrome）控制页签与门户滚动样式，但若 `Navbar.vue` 的 `showTopNav` 仅判断 `!hideLayoutChrome`，超管进入 index-new 时会出现横向顶栏菜单仍被隐藏、而页签与布局样式已恢复的非门户体验。修复：抽 Vuex getter（或同一 computed）表达 `hideLayoutChrome && !isSuperAdmin`，Navbar 与 layout 两处共用。",
+   "evidence": "Code review 指出 showTopNav 与 shouldHideLayoutChrome 条件不一致，超管 hideLayoutChrome 仍为 true 时顶栏菜单隐藏但页签显示且无门户首页滚动样式。",
+   "files": [
+    "zhi2-web-admin/src/layout/index.vue",
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+    "zhi2-web-admin/src/store/modules/app.js"
+   ],
+   "baseline": "50578e9",
+   "sessionIds": [
+    "1cdf8560-a3f6-464f-957c-55bbfb919fcf"
+   ],
+   "bundle": "027.md",
+   "project": "门户"
+  },
+  {
+   "title": "homeDataMixin 调试 return 会永久短路门户首页 layoutVariant",
+   "type": "bug",
+   "content": "`homeDataMixin.js` 中 `layoutVariant` 若在 `resolveHomeLayoutVariant(...)` 之前存在 `return 'developer'` 等调试早退，index-new 将始终走 developer 的 `home-layout-sidebar` 分支，admin/broker 布局、`fetchStats(variant)` 与权限驱动首页形态全部错误，且与 hideLayoutChrome 无关。合并前必须删除调试 return，恢复 `resolveHomeLayoutVariant` 完整逻辑。",
+   "evidence": "Review 标记 HIGH：layoutVariant 首行 return 'developer' 导致 resolveHomeLayoutVariant 永不执行。",
+   "files": [
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+    "zhi2-web-admin/src/views/home/index-new.vue"
+   ],
+   "baseline": "50578e9",
+   "sessionIds": [
+    "1cdf8560-a3f6-464f-957c-55bbfb919fcf"
+   ],
+   "bundle": "027.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户 listRouters 多段 path:/ 时，父 Layout hidden 须阻断 buildNavbarChildrenMenus 扁平化",
+   "type": "pattern",
+   "content": "门户后端常把菜单拆成多个 `path: \"/\"` 的 Layout 节点。侧栏数据来自 `menuVisibility.js` 的 `buildNavbarChildrenMenus` 对 children 的扁平化。若只用 `isRouteHidden` 判断子节点、忽略父 Layout 的 `hidden: true`，会出现「菜单管理标隐藏、父 Layout hidden，但子路由 `hidden: false`」的详情页（如应用管理详情）仍被推进侧栏且常排在最前。修复：父级路由 hidden 时不再扁平化其 children，与若依「隐藏目录下不进导航」一致。根治还需 listRouters 子节点 `hidden`/`visible` 与 `sys_menu` 一致。",
+   "evidence": "用户贴 listRouters JSON：父 hidden:true、子 application/:tableid hidden:false；侧栏仍展示应用管理详情。已在 buildNavbarChildrenMenus 增加父 hidden 时不扁平化 children。",
+   "files": [
+    "zhi2-web-admin/src/utils/menuVisibility.js",
+    "zhi2-web-admin/src/layout/components/Sidebar/index.vue"
+   ],
+   "baseline": "b84b4e7",
+   "sessionIds": [
+    "92104882-f56a-49cf-931b-814063421ad6",
+    "f244d50e-db76-4027-b64b-fdc47bdf7a0c"
+   ],
+   "bundle": "027.md",
+   "project": "门户"
+  },
+  {
+   "title": "Navbar topMenus 展平根路径菜单须取第一个可见子项",
+   "type": "bug",
+   "content": "顶栏 `topMenus` 在 `menu.path === '/'` 时若直接 `push(menu.children[0])`，未与 `menuVisibility.js` 的 `isRouteHidden` 过滤对齐：第一个子菜单被 hidden/visible/meta.hidden 隐藏时，顶栏会展示错误项或 `item.meta` 异常。应与侧栏一致：`menu.children?.find((c) => !isRouteHidden(c))` 后再 push；无可见子项的目录应跳过。",
+   "evidence": "menuVisibility 审查 HIGH：Navbar 262-264 与 resolveTopNavbarPath 未对齐首个可见子路由。",
+   "files": [
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/utils/menuVisibility.js"
+   ],
+   "baseline": "b84b4e7",
+   "sessionIds": [
+    "f244d50e-db76-4027-b64b-fdc47bdf7a0c"
+   ],
+   "bundle": "027.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户管理侧栏按 G/B 端与超管判定，非仅超级管理员可见",
+   "type": "pattern",
+   "content": "登录后左侧管理侧栏由 layout 的 showLayoutSidebar（getter 指向 shouldShowLayoutSidebar）控制，条件为 outLink!=1 且非 contentFullscreen。shouldShowLayoutSidebar 与 shouldPersistHideLayoutChrome 同源：有 user 时，非门户 B 端企业用户（G 端主管部门等）显示侧栏；isPortalSuperAdmin（roles 含 admin 或 permissions 含 *:*:*）即使被判定为 B 端企业用户也强制显示。B 端企业/经纪/开发企业等 isPortalEnterpriseEndUser===true 且非超管时不显示。排查「其他用户看不到菜单」应先核对 terminalUser.js 的 B 端判定与角色/板块权限，而非假设只有超管有菜单。",
+   "evidence": "会话结论对照 portalLayout.js、terminalUser.js、layout/index.vue 与 getters isSuperAdmin，明确否定「仅超管显示侧栏」。",
+   "files": [
+    "zhi2-web-admin/src/utils/portalLayout.js",
+    "zhi2-web-admin/src/utils/terminalUser.js",
+    "zhi2-web-admin/src/layout/index.vue",
+    "zhi2-web-admin/src/store/getters.js"
+   ],
+   "baseline": "8c17ba3",
+   "sessionIds": [
+    "92954991-a2a3-4de6-bff0-9d78b9e27081"
+   ],
+   "bundle": "028.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户对外首页 UnifiedLogin 与登录后首页 index-wrapper 路由分工",
+   "type": "fact",
+   "content": "zhi2-web-admin 中「门户首页」有两套入口：未登录对外门户走 /UnifiedLogin（UnifiedLogin.vue，含公示公告、platform-banner、publicPortal 宿主）；登录后工作区首页为 ''→/index 的 index-wrapper.vue，默认 index-new.vue（按角色/布局的新首页），localStorage.cwzxt 存在时回退 index-bak（含 FastGuide）。全屏对外业务流在同一路由用 query ?portal=... 驱动 publicPortal/PortalDialogHost 与 pages 下各业务页，API 侧对外公告用 api/portal/externalInfo.js，登录后应用入口用 api/portal/home.js。",
+   "evidence": "子代理只读探索汇总 router、index-wrapper 分流与 publicPortal 目录职责。",
+   "files": [
+    "zhi2-web-admin/src/router/index.js",
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "zhi2-web-admin/src/views/home/index-wrapper.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue",
+    "zhi2-web-admin/src/api/portal/externalInfo.js",
+    "zhi2-web-admin/src/api/portal/home.js"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "sess_subagent_agent_79d2e82d-c4c2-482b-b06e-28d1e124cc15"
+   ],
+   "bundle": "028.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户仓库为 suzhufang 父仓 + zhi2-web-admin 子模块，横幅无 Swiper",
+   "type": "fact",
+   "content": "D:\\repository\\门户 为 npm workspace 单体部署根（nginx→dist），门户 UI 均在 git 子模块 zhi2-web-admin。技术栈 Vue 2.7 + Vue Router 3 + Vuex 3、Vite 5、Sass、UnoCSS、Element UI（@/utils/element.js）、ECharts、Playwright E2E。对外首页横幅为静态图 + CSS 过渡（含新闻条），未引入 Swiper；操作指引用 driver.js（main.js 全局及 bProjectDialog 等）。",
+   "evidence": "探索会话列出的依赖与 UnifiedLogin 横幅实现方式。",
+   "files": [
+    "zhi2-web-admin/package.json",
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "zhi2-web-admin/src/main.js"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "sess_subagent_agent_79d2e82d-c4c2-482b-b06e-28d1e124cc15"
+   ],
+   "bundle": "028.md",
+   "project": "门户"
+  },
+  {
+   "title": "登录后首页用 businessFlows 统一侧栏与 admin 布局，移除 BROKER_SECTION_CODES",
+   "type": "workflow",
+   "content": "首页布局改为单一 businessFlows 驱动 HomeLayoutSidebar、index-new、homeDataMixin 与 homeLayout 配置；删除 BROKER_SECTION_CODES 后，listPerms 同时含商品房与存量房板块时按顺序两行同时展示（修复旧版经纪侧栏只二手/租赁、开发侧栏只商品房的割裂）。合并前需产品确认：resolveHomeLayoutVariant 不再仅凭「仅有二手/租赁板块权限」切 broker 皮肤，broker/developer 主要看 roleKey；若存在「无经纪 roleKey 仅有二手权限仍要经纪统计条」的用户，须补 bizSectionCodes fallback 或书面改口径。",
+   "evidence": "代码审查结论标 HIGH：皮肤判定回归风险，BLOCK 待与产品对齐。",
+   "files": [
+    "zhi2-web-admin/src/views/home/components/layouts/HomeLayoutSidebar.vue",
+    "zhi2-web-admin/src/views/home/index-new.vue",
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+    "zhi2-web-admin/src/views/home/config/homeLayout.js"
+   ],
+   "baseline": "fd73e47",
+   "sessionIds": [
+    "034544ce-33ea-4a3e-a159-062dba42270d"
+   ],
+   "bundle": "028.md",
+   "project": "门户"
+  },
+  {
+   "title": "UnifiedLogin 与 homeNew 切图统一英文文件名并经 unifiedLoginAsset 引用",
+   "type": "workflow",
+   "content": "public/assets/images 下 homeNew 与 UnifiedLogin 的中文切图（如「组 xxx」「切图 xxx」）应改为英文语义名（如 platform_banner_bg/desc/tag_bg/tag_text.svg），页面通过 unifiedLoginAsset('platform_banner_*.svg') 引用。改完后全仓 grep 确认无中文资源名残留；本地仍见旧图时强刷或重启 dev server。",
+   "evidence": "批量重命名会话的映射表与校验步骤。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "zhi2-web-admin/public/assets/images/UnifiedLogin",
+    "zhi2-web-admin/public/assets/images/homeNew"
+   ],
+   "baseline": "b84b4e7",
+   "sessionIds": [
+    "c494bc34-635f-4dce-b0c7-07401303d2ad"
+   ],
+   "bundle": "028.md",
+   "project": "门户"
+  },
+  {
+   "title": "platform-banner 文案区拆分 SVG 时同步桌面/移动端入场 animation-delay",
+   "type": "pattern",
+   "content": "UnifiedLogin 平台横幅将文字与图片拆成多行 SVG 后，intro 与 badge 的淡入动效要在 @media (max-width: 1200px) 为 platform-banner-desc-enter-mobile 补与桌面一致的 animation-delay（如 0.25s），避免窄屏两行错开时序不一致。装饰性组合图可加 role=\"img\" 保留 aria-label 满足无障碍。",
+   "evidence": "横幅改版后续修复项：移动端 delay 与 a11y。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue"
+   ],
+   "baseline": "f489349",
+   "sessionIds": [
+    "6c10489b-ba36-4666-abdd-3b956862c76b"
+   ],
+   "bundle": "028.md",
+   "project": "门户"
+  }
+ ]
+}

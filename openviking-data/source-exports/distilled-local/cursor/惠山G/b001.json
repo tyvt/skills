@@ -1,0 +1,92 @@
+{
+ "project": "惠山G",
+ "batch": "001",
+ "files": [
+  "001.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "当前项目无法通过vue devtool 打开页面对应",
+   "type": "pattern",
+   "content": "Vue DevTools 无法跳转源码的修复已完成，相关配置已写入项目。 请在本机重新执行 `npm run dev`，然后在 Vue DevTools 中选中组件，点击「在编辑器中打开」验证即可。",
+   "evidence": "extracted source=cursor project=惠山G",
+   "files": [
+    "涉及文件：d:\\repository\\惠山G\\zhi1-web-admin\\vite.config.js、d:\\repository\\惠山G、d:\\repository\\惠山G\\zhi1-web-admin\\src\\main.js、d:\\repository\\惠山G\\zhi1-web-admin\\index.html、d:\\repository\\惠山G\\env\\.env、d:\\repository\\惠山G\\package.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c500dd33-22a6-40cf-9da0-977a1fb237b1"
+   ],
+   "_draft": true,
+   "project": "惠山G"
+  },
+  {
+   "title": "移除冗余的代码，不要影响现有功能",
+   "type": "preference",
+   "content": "已完成 `refund` 目录下冗余代码清理，功能逻辑保持不变。主要变更如下： ### `commonTable.vue` - 修正组件名：`RefundDetailDialog` → `CommonTable` - 移除未使用的 `dialogForm` prop、`isFormDisabled` 计算属性、`autoQuery` prop、`dialogFormMode` 状态 - 移除传给 `selectBuildingDialog` 的无效属性（`dialog-form`、`dialog-form-mode`）及无效的 `@getList` 监听 - 合并生命周期：`created` 仅加载字典，`mounted` 统一触发 `getQuery()`（替代原先 `autoQuery` 分支逻辑） - 删除与 `listMixins` 重复的 `total` 定义 - 修正 `setData` 中逗号运算符写法 ### `refundDetailTable.vue` - 移除未使用的 `purposeOptions`、`total` 及 `initDict` 方法（模板中未引用字典） - 移除重复的 `created()` 钩子，改由 `listMixins` 统一调用 `init()` - 移除 `refundDetailDialog` 上无效的 `@getList` 监听",
+   "evidence": "extracted source=cursor project=惠山G",
+   "files": [
+    "`commonTable.vue",
+    "`refundDetailTable.vue",
+    "`refundDetailDialog.vue",
+    "涉及文件：d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund、d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund\\components\\commonTable.vue、d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund\\components\\refundDetailTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "730dd1cd-f8d3-4003-a2f1-4eb7db405ae1"
+   ],
+   "_draft": true,
+   "project": "惠山G"
+  },
+  {
+   "title": "关闭弹窗依旧调了很多次接口",
+   "type": "bug",
+   "content": "打开弹窗时接口重复调用，原因和修改如下。 **原因：** 1. `onOpen` 和 `maintenanceObjectId` 的 `watch` 都会调用 `loadDialogData()` → `getQuery()`，在 `handleView` 同时设置 id 和 `visible` 时可能各触发一次 2. `loadDialogData` 用 `$nextTick` 调 `getQuery`，和 `v-if` 挂载 `commonTable` 的时序叠在一起，容易出现重复请求 **修改：** - 去掉 `maintenanceObjectId` 的 `watch` 和 `loadDialogData` - `onOpen` 只负责填充表单，不再请求接口 - `commonTable` 在 `autoQuery=false` 时于 `mounted` 中调用一次 `getQuery()`；配合 `v-if=\"$attrs.visible\"`，每次打开挂载一次、请求一次 打开弹窗时预期请求： - `getDicts`（字典）1 次 - `getBuilding`、`getUnit`、`listRefundObjShare` 各 1 次 可以再打开弹窗看下网络面板，确认是否还有重复。",
+   "evidence": "extracted source=cursor project=惠山G",
+   "files": [
+    "涉及文件：d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund\\components\\refundDetailDialog.vue、d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund\\components\\refundDetailTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "69fe4877-9065-40ce-b4bb-17b22cfdb965"
+   ],
+   "_draft": true,
+   "project": "惠山G"
+  },
+  {
+   "title": "vue.js:3732 TypeError: Can",
+   "type": "preference",
+   "content": "## 原因 报错来自 `listMixins.js` 的 `created` 钩子： ```43:49:d:\\repository\\惠山G\\zhi1-web-admin\\src\\mixins\\listMixins.js created() { // 列表页搜索条件缓存 if (this.$store.state.common.cachedSearchParams.get(this.$route.path)) { this.query = { ...this.queryParams, ...this.$store.state.common.cachedSearchParams.get(this.$route.path) } } else { this.$store.dispatch('saveSearchParams', { key: this.$route.path, params: this.query }) } ``` `query` 的 setter 会执行 `Object.assign(this.queryParams, val)`，但 `refundDetailTable.vue` 引入了 `listMixins` 却没有定义 `queryParams`，因此 `this.queryParams` 为 `undefined`，触发 `Cannot convert unde",
+   "evidence": "extracted source=cursor project=惠山G",
+   "files": [
+    "`listMixins.js",
+    "```43:49:d:\\repository\\惠山G\\zhi1-web-admin\\src\\mixins\\listMixins.js",
+    "`refundDetailTable.vue",
+    "`refundDetailDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0a343062-5aa6-4690-ac12-8d034bff8777"
+   ],
+   "_draft": true,
+   "project": "惠山G"
+  },
+  {
+   "title": "筛选条件增加业务状态下拉",
+   "type": "preference",
+   "content": "已在资金返还列表页的筛选区增加「业务状态」下拉，改动如下： 1. **筛选表单项**：在「通知书状态」后增加 `bizState` 下拉，选项来自已有字典 `BIZ_STATE`（`bizStateOptions`）。 2. **查询参数**：在 `queryParams` 中增加 `bizState: undefined`，查询时会随其他条件一并传给列表接口。 实现方式与同项目其他列表页（如开户申请）一致。未在 `bizStateOptions` 中追加「全部」项，因为该数组同时用于表格 `dict-tag` 展示，避免影响列表显示；清空筛选可使用「重置」按钮。 刷新页面后，选择业务状态并点击查询即可按状态筛选。",
+   "evidence": "extracted source=cursor project=惠山G",
+   "files": [
+    "涉及文件：d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund\\index.vue、d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\refund\\detail.vue、d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds、d:\\repository\\惠山G\\zhi1-web-admin\\src\\views\\repairFunds\\accountTubereason\\openacc\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f806d7db-8f65-4a74-aef3-7fe7b1fc2de5"
+   ],
+   "_draft": true,
+   "project": "惠山G"
+  }
+ ],
+ "_draft": true
+}

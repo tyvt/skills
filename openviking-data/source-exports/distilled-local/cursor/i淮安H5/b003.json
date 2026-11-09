@@ -1,0 +1,45 @@
+{
+ "project": "i淮安H5",
+ "batch": "003",
+ "files": [
+  "003.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "获取手机号报错了，排查一下这个问题",
+   "type": "preference",
+   "content": "## 问题分析 报错 `40029 invalid code` 表示传给后端 `auth.code2Session` 的 `js_code` **无效、已过期或已被使用**。 问题出在 `src/pages/verifyUser/index.vue` 的手机号授权流程： 1. **页面加载时**弹窗自动打开，会提前调用 `wx.login()` 并把 code 缓存在 `wechatLoginCode` 2. 用户填写姓名、身份证号（可能耗时较久） 3. 点击「同意授权」时，**直接复用缓存的旧 code**，而不是重新获取 4. 后端用这个过期/已用过的 code 换 session → 返回 **40029** 这与截图中的常见原因一致：**前端缓存了旧的 `js_code`，没有在使用前重新调用 `wx.login()`**。 ## 修复方案 已做如下调整： 1. **移除**弹窗打开时预取 `wx.login` code 的逻辑 2. **在用户点击授权后、调用接口前**，实时调用 `getWechatLoginCode()` 获取全新 code 3. 删除不再需要的 `wechatLoginCode` 缓存变量 修改后的关键逻辑： ```260:265:src/pages/verifyUser/index.vue // wx.login 的 code 只能使用一次且有效期",
+   "evidence": "extracted source=cursor project=i淮安H5",
+   "files": [
+    "`src/pages/verifyUser/index.vue",
+    "```260:265:src/pages/verifyUser/index.vue",
+    "涉及文件：d:\\repository\\i淮安H5、d:\\repository\\i淮安H5\\src\\pages\\verifyUser\\index.vue、d:\\repository\\i淮安H5\\src\\api\\security.js、d:\\repository\\i淮安H5\\src、d:\\repository\\i淮安H5\\src\\api\\index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "00e8365d-4895-43a2-b717-a01fd5aa463d"
+   ],
+   "_draft": true,
+   "project": "i淮安H5"
+  },
+  {
+   "title": "从这个页面进入公共收益菜单，街道社区没显示值，@sr",
+   "type": "preference",
+   "content": "## 原因说明 公共收益页顶部的「区-街道-社区」来自 `userStore` 的 `regionName`、`subdistrictName`、`communityName`。 - **小区 tab（property）**：会通过 `syncProjectState` → `listComplexCommunitySubdistrictByToken` 拿到带区划的小区数据，并写入 store。 - **首页（newHome）**：选房后只用 `getMyHouseList` 里的一条房屋数据调用 `setProjectInfo`，接口里往往**没有**完整的街道、社区名称。 - **公共收益页** `getProjectList` 里原先逻辑是：只有当前 `userStore.project` **不在**接口返回列表里时，才用第一条数据 `setProjectInfo`；若已能匹配到当前小区，就**不再**用维表接口补全区划，所以从首页进来时街道、社区会一直空着。 ## 修改说明（`src/pages_benefit/benefit/index.vue`） 1. **`getProjectList`**：在能匹配到当前小区（或回退到列表第一条）时，都执行 **`syncProjectRowFromApi`**：用 `listComplexCommunitySubdistric",
+   "evidence": "extracted source=cursor project=i淮安H5",
+   "files": [
+    "修改说明（`src/pages_benefit/benefit/index.vue",
+    "涉及文件：d:\\repository\\i淮安H5\\src\\pages\\index\\newHome.vue、d:\\repository\\i淮安H5\\src\\pages\\index\\property.vue、d:\\repository\\i淮安H5\\src\\store\\user.js、d:\\repository\\i淮安H5\\src\\pages\\index\\useProjectState.js、d:\\repository\\i淮安H5\\src\\pages_benefit\\benefit\\index.vue",
+    "@src/pages/index/newHome.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "46c27cd4-761e-4410-842c-b18b6e2dfed3"
+   ],
+   "_draft": true,
+   "project": "i淮安H5"
+  }
+ ],
+ "_draft": true
+}

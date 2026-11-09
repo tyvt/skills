@@ -1,0 +1,64 @@
+{
+ "project": "苏住房G",
+ "batch": 21,
+ "files": [
+  "081.md",
+  "082.md",
+  "083.md",
+  "084.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "列表勾选被通用「草稿态才可勾选」规则全局门控：批次字段误用于与删除无关的勾选动作",
+   "type": "bug",
+   "content": "什么情况：楼盘项目列表（building/project）里，「设置对外权限」「导出小区房屋」按钮始终灰着点不了，行复选框根本勾不上。\n为什么：勾选能力沿用了 listMixins/table.js 的通用逻辑——只有草稿态（bizState == '0'）的行允许勾选。这条依赖假设「勾选 = 为批量删除做准备」，一旦页面上勾选的语义变成了「选中后执行导出/授权」等只读动作，已备案/已审核行被禁用就当不成操作对象。\n怎么做：在本页覆写勾选能力，允许任意业务状态的行被勾选；同时把「批量删除」的实际作用域单独收窄为草稿态（在删除回调里过滤或直接禁用删除入口），保证「能选」不等于「能删」，避免误删已备案数据。\n与已知差异：已知清单记录的都是「勾选弹窗分母/row-key 重复导致勾不上」「show-checkbox=false 静默去列」这类数据与传参问题，本条是业务状态门控被通用逻辑劫持，根因在别处。",
+   "evidence": "用户：「这个选不了下面的数据」；结论：「表格勾选沿用了通用逻辑，只有草稿态（bizState == '0'）才能勾选。这条『恋雪小花园』已备案，复选框被禁用，所以『设置对外权限』『导出小区房屋』一直灰着点不了。」改法：「本页允许勾选任意状态的项目；批量删除仍只作用于草稿」。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/building/project/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/mixins/listMixins.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/mixins/table.js"
+   ],
+   "baseline": "3697a62",
+   "sessionIds": [
+    "e972de96-ea86-4046-8a3e-d5e86948f61f"
+   ],
+   "bundle": "083.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "资源下载把相对路径拼成 window.origin + filePath：多级部署前缀丢失，必须走统一地址解析工具",
+   "type": "bug",
+   "content": "什么情况：对账文件（pubRecBankFile）下载由「原本正常」变成 404，用户明确说「下载的路径应该是相对的」。\n为什么：一次重构把下载地址改成了 window.origin + filePath。应用部署在子路径（如 /zhi2-test 前面还有部署前缀）时，window.origin 只到域名，拼出来是 https://<域名>/zhi2-test/2026/...，少了部署前缀，请求打到根目录而非应用目录下。图片资源没坏，是因为它们一直走统一的解析函数。\n怎么做：下载/预览一律复用 resolveServerAssetUrl（与图片资源同一套解析，按当前页面部署目录还原相对地址），fetch(filePath) → res.blob() → URL.createObjectURL 生成 <a download> 下载，不要再手拼 window.origin / location.origin。\n与已知差异：已知 1070 只说了「地址解析统一收口在 resolveServerAssetUrl，改代理要复核」；本条补充的是「下载链路」这一类新增消费方，以及 window.origin 拼接在多级部署前缀下必然出错这个具体根因。",
+   "evidence": "「原因：8月17日重构（f5e7d0f54）时，下载逻辑被改回 window.origin + filePath。应用部署在子路径下时，会拼出错误地址：错误 https://szf.szzfcjj.cn/zhi2-test/2026/...（少了部署前缀）；正确 https://szf.szzfcjj.cn/<部署前缀>/zhi2-test/2026/...」修复：恢复 fetch(resolveServerAssetUrl(filePath)) → blob → createObjectURL。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/benefit/pubRecBankFile/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/utils/resolveServerAssetUrl.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/utils/imgPrfix.js"
+   ],
+   "baseline": "864b409",
+   "sessionIds": [
+    "684bd892-9f31-405c-be6b-c5c9fdc86eef"
+   ],
+   "bundle": "083.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "手工渲染 3 级树表：用 placeholder 空列补位会造成单元格合并错乱，应按层级算末级 colspan",
+   "type": "bug",
+   "content": "什么情况：物业管理信息月报表的填报详情与统计详情，都把 3 级填报项树（工作内容根/子项/叶子 + 本月/本年累计/历史累计）渲染成原生 table 或 tbody 行，而不是 zs-table。用户截图反馈「单元格合并有点问题」，表现为名称列右侧冒出多余空列、根级名称只占 1 列、合并后整行宽度与表头对不齐。\n\n为什么：原实现在展平树时，为了让每行凑够固定列数，给前缀路径的每个节点都补 placeholder 空单元格（empty-cell），再用 rowspan 合并非末级单元格。缺失两级时补 1 个、缺失一级时补 2 个的行为依赖数据深度；一旦某个根级节点下深度不一致（有的到 3 级、有的只到 2 级），每行「实际节点数 + placeholder 数」就会算出不同的可见列数，rowspan 累积后便与表头列数错位。\n\n怎么做：删掉 placeholder/empty-cell 整套逻辑，只遍历真实路径节点；为每行最后一个可见单元格计算占满剩余列的 colspan —— 工作内容共 3 列，则 1 级项 colspan=3、2 级子项 colspan=2、3 级叶子 colspan=1；模板侧写成 :colspan=\"cell.colspan || 1\"。三个层级纵深各自恒等于总列数，不依赖补位。验证时直接打印展平结果，逐行断言「各单元格 colspan 之和 === 表头列数」。\n\n与已知 #944（zs-table-column 不支持多级表头）的差异：那条只说明「分组表头必须改用原生 el-table-column」，不涉及手工渲染后行内单元格的列数守恒；本条是分层树表展平时 colspan 计算的具体口径。",
+   "evidence": "会话 871272e2「修复月报统计/填报单元格合并」：移除 placeholder 空列逻辑，仅遍历实际路径节点，为每行末级可见单元格计算 colspan（1 级=3、2 级=2、3 级=1）；ReportItemsTable.vue 与 monthlyReportStat/detail.vue 层级 td 增加 :colspan=\"cell.colspan || 1\"，移除 placeholder/empty-cell。验证结果：⛵送立案线索数量 colspan:2 不再出现右侧空列；信托制物业服务项目数 colspan:3 名称横跨 3 列；3 级完整路径仍为 3 列、纵向父级合并不受影响。",
+   "files": [
+    "zhi2-web-admin/src/utils/monthlyReport.js",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReport/components/ReportItemsTable.vue",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReportStat/detail.vue"
+   ],
+   "baseline": "8ebcdab",
+   "sessionIds": [
+    "871272e2-4c46-4ece-af72-9c897a51118e"
+   ],
+   "bundle": "084.md",
+   "project": "苏住房G"
+  }
+ ]
+}

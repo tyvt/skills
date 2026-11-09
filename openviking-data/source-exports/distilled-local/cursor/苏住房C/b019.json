@@ -1,0 +1,98 @@
+{
+ "project": "苏住房C",
+ "batch": "019",
+ "files": [
+  "019.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "[渲染层网络层错误] Failed to load ",
+   "type": "fact",
+   "content": "## 问题原因 `empty_house.png` 已从**主包** `static/images/` 迁移到**分包**（`pages_transaction/static/images/`、`pages_owner/static/images/`），主包路径 `/static/images/empty_house.png` 下已不存在该文件。 代码里引用的是 `images/empty_house.png`，`resolveStaticUrl` 若未正确解析到分包，就会回退到主包路径，从而触发 500 错误。 另外，你当前打开的**生产构建** `../dist` 之前是旧版本，缺少 `SUBPACKAGE_STATIC_IMAGES` 分包回退逻辑。 ## 已做修复 1. **统一 `ZsImage` 分包解析**：移除组件内重复的 `inferImageSubpackage`，全部交给 `resolveStaticUrl` 的 `SUBPACKAGE_STATIC_IMAGES` 处理。 2. **`ZsEmpty` 支持 `subpackage` 属性**，并透传给 `ZsImage`。 3. **交易/业主相关页面显式指定分包**： - `pages_transaction/*` → `subpackage=\"pages_transaction\"` - `pages_o",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`pages_owner/components/house/HouseList.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsEmpty\\ZsEmpty.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "851aad11-4f50-47bb-a82c-ac1e0de178ab"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "message：Error: ENOENT: no ",
+   "type": "fact",
+   "content": "## 问题原因 这是构建后处理脚本 `relocate-datetime-picker.mjs` 的遗漏导致的。 该脚本会把 `uni-datetime-picker` 从**主包** `dist/node-modules/` 复制到各分包，然后**删除主包副本**以减小主包体积。但它之前只修正了 `.json` 里的组件路径，**没有修正 `.js` 里的 lazy-load 路径**。 受影响页面（`pages_owner_extra` 分包）： | 文件 | JSON（已正确） | JS（修复前仍指向主包） | |------|----------------|------------------------| | `tenant/index` | `../node-modules/...` | `../../node-modules/...` → 主包 | | `committee/application/index` | `../../node-modules/...` | `../../../node-modules/...` → 主包 | 微信开发者工具加载 `uni-datetime-picker` 时，会按 JS 路径去主包找 `time-picker.wxss`，但主包副本已被删除，因此报 ENOENT。 ## 已做修复 已更新 `scripts/relocat",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`.js",
+    "`time-picker.wxss",
+    "pages_owner_extra/tenant/index.js",
+    "../node-modules/.../uni-datetime-picker.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8f42167b-70b4-4ea9-85ad-c66840f5a3ba"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "这个就是原生小程序，不是web-view",
+   "type": "preference",
+   "content": "已按计划完成修复，变更如下： ## 修改内容 **1. [`FormManual.vue`](d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\FormManual.vue)** - 移除身份证上传的自定义 `#icon` 插槽（原先引用了不存在的 `pages_my/static/images/camera.png`） - 改为与手持证件照一致，使用 `ZsUploader` 默认白色「+」图标 - 删除无用的 `.icon-uploader` 样式 **2. [`ZsUploader.vue`](d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsUploader\\ZsUploader.vue)** - `middle` 尺寸高度由 `110` 调整为 `120`，避免图标与文案被挤压 ## 验证 `npm run build` 已成功通过，产物在 `../dist`。 请在微信开发者工具中导入 `dist`，进入实名认证人工审核页（`FormManual?local=true`），确认身份证正反面两个上传框显示为：**蓝圈 + 白色「+」+ 下方提示文字**，与手持证件照区域风格一致。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "[`FormManual.vue`](d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\FormManual.vue",
+    "[`ZsUploader.vue`](d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsUploader\\ZsUploader.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\FormNonLocal.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\FormManual.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\FormLocal.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5e291751-65be-4f72-bf6c-bb3eed7c5ba8"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "收藏图标不显示",
+   "type": "fact",
+   "content": "已修复新房详情页底部「收藏」图标不显示的问题，原因主要有三点： ### 原因分析 1. **`collectBtn` 未注册 `ZsImage`**：组件里用了 `ZsImage`，但没有 `import` 和注册，图标节点无法正确渲染。 2. **静态资源路径错误**：未收藏图标 `aixin_e.svg` 在分包 `pages_transaction/static` 下，但之前按主包 `static` 解析，路径不对。 3. **小程序静态资源用了远程地址**：`resolveStaticUrl` 在微信小程序里走了 `IMAGE_BASE` 远程 URL，本地打包的静态图应使用 `/static/...` 本地路径。 ### 修改内容 1. **`collectBtn.vue`** - 显式导入并注册 `ZsImage` - 新增 `subpackage` 属性，按收藏状态选择主包/分包路径 - 补充图标尺寸样式 2. **`newHouse/detail.vue`** - 传入 `emptyUrl=\"images/szf/aixin_e.svg\"` 和 `subpackage=\"pages_transaction\"` 3. **`utils/index.js`** - 微信小程序下 `resolveStaticUrl` 改为返回本地路径（如 `/pages_transact",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`collectBtn.vue",
+    "**`newHouse/detail.vue",
+    "**`utils/index.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouse\\detail.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\collectBtn\\collectBtn.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d53574b2-2d92-4663-9c80-ced6a44b903a"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已定位并修复。 原因 分包改造后，elect/det",
+   "type": "preference",
+   "content": "已定位并修复。 ## 原因 分包改造后，`elect/detail.vue` 里点击「参与选举」调用的是： ```js redirectTo(`needToKnow?id=${decisionId}&type=${detailInfo.decisionWay}`) ``` 这是**相对路径**。`openPage` 原先只会补上前导 `/`，最终变成 `/needToKnow?id=...`，不是小程序里的有效页面路径（应为 `/pages_vote/elect/needToKnow?...`）。 `uni.redirectTo` 失败时**没有 fail 回调**，所以表现为：按钮能点、无报错、页面不跳转。 从消息中心（`7_0_21`）用绝对路径进入详情页是正常的，但详情页内再跳须知页就会失败。 ## 修复 1. **`utils/index.js`** - 保留 `resolveRelativePageUrl`，把相对路径解析成当前分包下的完整路径 - `openPage` 增加 `fail` 回调，跳转失败时 toast 提示 2. **`pages_vote/elect/detail.vue`** - 抽取 `handleParticipate`，使用绝对路径 `/pages_vote/elect/needToKnow?...` - 「参与选举」增加 `!partIn` ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "分包改造后，`elect/detail.vue",
+    "**`utils/index.js",
+    "**`pages_vote/elect/detail.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\elect\\detail.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\elect\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9677076a-944b-42fd-9eba-67e8f0aa54d4"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

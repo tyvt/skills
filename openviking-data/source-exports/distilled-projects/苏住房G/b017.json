@@ -1,0 +1,125 @@
+{
+ "project": "苏住房G",
+ "batch": 17,
+ "files": [
+  "065.md",
+  "066.md",
+  "067.md",
+  "068.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "多个菜单菜单共用一个列表组件：入口专属 UI/默认值收敛到「入口判定」，环境差异先归因菜单数据而非代码",
+   "type": "pattern",
+   "content": "【什么情况】「项目管理 → 物业合同」与「前期物业合同」两个菜单共用同一份列表实现 zhi2-web-admin/src/views/property/propertyContract/components/index.vue（各自由同目录 index.vue 薄壳引用）。测试环境两个页面都有橙色说明提示框（#fff7e6）+ 默认已备案筛选，正式环境两条都没有，用户报「测试环境有说明、正式环境没有」。\n\n【为什么】说明提示框、默认 bizState、重置回默认值这三件事都写在共用组件的页面级状态里，而不是每个入口的各一份菜单里。因此：① 只要一个入口缺这些内容，另一个入口也会一起缺失，所以「补回」应改共用组件一处，两个菜单同时生效；② 日志/截图只覆盖测试环境，容易误判为「代码没走到正式」；实际属于一级环境差异是菜单数据问题——动态路由下菜单由 sys_menu 下发（path/component/可见性各环境独立维护），入口缺失、菜单未授权或落到旧版本菜单都会表现为「正式环境没有」。修复顺序应是：先用截图比对两环境同一菜单实际渲染的 DOM，确认组件版本一致，再去翻菜单表，而不是一上来就改代码。\n\n【怎么做】① 需要「只在某个入口出现」的区块，用基于路由/入口的判定（如 isAddListPage）做 v-if，而不是为两个菜单复制组件；② 这类入口级默认值（默认筛选值、重置后的回退值、提示文案与配色）要写在同一处并在注释里标明「两个入口共用」，避免下一个人只在一个入口验证；③ 收尾交付时明确告知：代码已改、build 通过但未提交（未推送 develop 分支），正式环境需要重新部署才会出现该说明——用户看到的「正式环境没有」可能只是尚未发布，而不是新 bug。（与已有「双入口共用列表页标题取 meta.title」「同一业务 B/G 端合并不分流」不同：本条讲的是入口专属 UI 与默认状态的归属，以及环境差异的归因顺序。）",
+   "evidence": "本批会话 325b93f2：用户诉求「项目管理-前期物业合同、物业合同，在测试环境上有这个说明，但是正式环境没有」；最终结论在共用组件 propertyContract/components/index.vue 中恢复 v-if=\"isAddListPage\" 的说明提示框、默认 bizState:'2'、重置回已备案、#fff7e6 背景，并说明「物业合同、前期物业合同两个入口共用此组件，会同时生效」；并注明「尚未提交或推送远程」，需部署 develop/v2.6.2-suzhufang 分支后在正式环境确认。",
+   "files": [
+    "zhi2-web-admin/src/views/property/propertyContract/components/index.vue",
+    "zhi2-web-admin/src/views/property/propertyContract/index.vue",
+    "zhi2-web-admin/src/views/property/propertyContractTemporary/index.vue"
+   ],
+   "baseline": "a700def",
+   "sessionIds": [
+    "325b93f2-5682-453d-a064-b7974bf0dfa4"
+   ],
+   "bundle": "065.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "首页 V2 多数据源并发加载必须逐个加载函数独立持有请求序号，且不能漏掉后加的 tab 加载器",
+   "type": "pattern",
+   "content": "场景：苏住房G 首页 V2（views/home/index-v2.vue）在一个页面里并发加载关键数据、检查数据、公共收益、报修、学习园地、待办等多个面板，每个面板有自己的 tab 切换。\n\n根因：Vue2 里没有通用的「丢弃过期响应」机制，多个加载函数共享同一份状态时只能用「每函数一个 seq」的做法。已知实现里 keyDataFetchSeq / todoPanelFetchSeq 已存在，但后加或独立写的 loadStudyList 没有 seq，用户快速连点「学习园地」tab 时，旧 tab 的慢响应会先返回并把新 tab 的列表覆盖成错误内容——表面看是「点 tab 没反应/数据串了」，没有任何报错。同理 loadBenefitData / loadRepairData 也缺竞态保护。\n\n做法：每个异步加载函数各自声明一个模块内递增计数器（如 studyListFetchSeq++），进入请求前取 const seq = ++xxxSeq，在 then/finally 里先判 if (seq !== xxxSeq) return 再写状态。评审/自查时按「加载函数清单」逐个核对是否有 seq，而不是只看主数据那一个；新增面板时把 seq 当作必写项。",
+   "evidence": "评审指出 index-v2.vue:274-291 的 loadStudyList 未像 loadKeyData/loadTodoPanelList 那样用 seq 丢弃过期响应，快速连点 tab 时旧请求先返回会把 studyList 写成错误 tab 的内容；230-272 的 loadBenefitData/loadRepairData 同样无竞态保护。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-v2.vue"
+   ],
+   "baseline": "9e5c499",
+   "sessionIds": [
+    "22db11e4-4ebb-4504-8a6e-e93aa9791182"
+   ],
+   "bundle": "068.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "占位/演示数据必须与真实数据在视觉上可区分：否则用户会当成业务数据",
+   "type": "bug",
+   "content": "场景：首页 V2 的待办面板（home/v2/components/TodoPanel.vue）在待办条数不足 4 条时，用 DEMO_ROW 假数据把列表补满，行样式、文案与真实待办完全一致。\n\n根因：为了满足设计稿「固定 4 行高度」的视觉，用演示数据填充空位，但没有做任何占位标识。同项目的 StudyPanel 有 is-placeholder 样式区分，TodoPanel 漏了，导致两块面板口径不一致。后果是用户会把假待办误读为真实业务数据，属于会误导业务判断的高危问题。\n\n做法：占位数据必须二选一——(1) 用骨架屏/灰块占位，不渲染真实字段；(2) 保留行结构但加统一的 is-placeholder 类（灰字/虚线边），并把文案改成「暂无待办」类非业务文案。多面板同页时，占位样式收口到一处约定（同一类名），新增面板直接复用，避免再出现「一块有标识一块没有」。",
+   "evidence": "[HIGH] TodoPanel.vue:109-116 待办 tab 下列表不足 4 条时用 DEMO_ROW 补满，文案像真实业务数据；StudyPanel 有 is-placeholder，TodoPanel 无对应区分。",
+   "files": [
+    "zhi2-web-admin/src/views/home/v2/components/TodoPanel.vue",
+    "zhi2-web-admin/src/views/home/v2/components/StudyPanel.vue"
+   ],
+   "baseline": "9e5c499",
+   "sessionIds": [
+    "22db11e4-4ebb-4504-8a6e-e93aa9791182"
+   ],
+   "bundle": "068.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "接口下发的跳转地址不能直接当路由 path：必须做站内路径白名单校验",
+   "type": "bug",
+   "content": "场景：首页消息列表点击打开详情，代码把后端返回的 row.msgUrl 直接赋给 path 再 $router.push。\n\n根因：msgUrl 是服务端/运营配置的字符串，前端默认信任。若数据被写入非预期值，会出现错误跳转，甚至开放重定向（如 //evil.com、http://…、javascript: 伪协议在部分场景下被当作路由处理）。前端路由 push 对非法 path 不一定报错，容易静默跳走。\n\n做法：在跳转前抽一个 isSafeInternalPath(url) 校验：必须以单个 '/' 开头，拒绝 '//' 开头、含协议头（http:/https:/javascript:）以及非站内前缀的地址；不合法时用 msgWarning 提示并 return，不执行跳转。该判定的使用范围不止首页——凡是从接口/字典/配置里读出来的跳转地址（含后端下发的 redirectPath）都应收口到同一个工具函数，避免每个页面各写一份。",
+   "evidence": "[HIGH] index-v2.vue:390-402 消息打开使用未校验的 msgUrl 作为路由 path；Fix 建议仅允许以 / 开头的站内 path，拒绝 //、javascript:、http: 等。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-v2.vue"
+   ],
+   "baseline": "9e5c499",
+   "sessionIds": [
+    "22db11e4-4ebb-4504-8a6e-e93aa9791182"
+   ],
+   "bundle": "068.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "独立预览/E2E 入口的 stub 必须覆盖页面 created 期实际调用的全局方法（getDicts/dictFormatter）",
+   "type": "bug",
+   "content": "场景：首页 V2 有一个独立预览入口 home/preview-main.js，只 stub 了 $get / $store / $router 就挂载 HomeIndexV2。而页面 created 里调用 initTodoDict → this.getDicts（由 main.js 挂到 Vue 原型上的方法），预览环境没有这个原型方法，启动阶段直接 getDicts is not a function 崩掉。\n\n根因：预览/单测/E2E 的 mock 是按「见过的依赖」手写的，而页面能力还在演进（新增字典初始化），stub 清单没有跟着页面一起长。崩溃点在 created，表现为整页白屏，排查时容易误判成预览服务的构建问题。\n\n做法：(1) 预览入口在 Vue.prototype 上补齐本项目所有「页面会直接用」的全局方法的最小实现：getDicts 返回 Promise.resolve({ data: [] })、dictFormatter 返回原值、msgSuccess/msgWarning 给 noop；(2) 更稳的方式是让预览复用项目的全局 mixin/插件，而不是手工列 stub；(3) 加页面时同步 review preview 入口，把「页面 created 里调用了哪些 this.xxx」当作检查项。",
+   "evidence": "[HIGH] preview-main.js:64-66 与 index-v2.vue:102-118：HomeIndexV2 在 created 调 initTodoDict → this.getDicts，预览只 stub 了 $get/$store/$router，走该入口会 getDicts is not a function。",
+   "files": [
+    "zhi2-web-admin/src/views/home/preview-main.js",
+    "zhi2-web-admin/src/views/home/index-v2.vue"
+   ],
+   "baseline": "9e5c499",
+   "sessionIds": [
+    "22db11e4-4ebb-4504-8a6e-e93aa9791182"
+   ],
+   "bundle": "068.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "el-tree 点节点就收起：expand-on-click-node 默认 true，expandPathToNode 只展开祖先",
+   "type": "bug",
+   "content": "场景：苏住房G 各页面共用的物业管理区域树（property/complex/components/regionTree.vue + RegionTreeLayout.vue），点击「社区」这类有下级节点的行后，节点会自己收起来。\n\n根因有两层叠加：(1) Element UI 的 el-tree 默认 expand-on-click-node = true，点带子节点的行会先切换展开态，把用户刚打开的节点关掉；(2) 选中逻辑 selectNode 里调用的 expandPathToNode 只对 path.slice(0, -1) 也就是祖先链做展开，不会保持当前选中节点自身展开，所以即使树没被点击收起，代码也不会把它重新展开。\n\n做法：在 regionTree.vue 里 ① 显式写 :expand-on-click-node=\"false\"，点节点只选中、不切换展开；② selectNode 中若选中节点存在子节点，显式置 expanded = true。因为组件的修复点在共用组件上，改一次会覆盖收费标准、停车泊位、经营资产等所有使用 RegionTreeLayout 的页面——排查这类「树行为异常」时先定位到共用组件，而不是逐个业务页补丁。",
+   "evidence": "会话 48b7aef9：用户报「树状展示列表，点击社区后会出现自动收起的情况」，根因为 el-tree 的 expand-on-click-node 默认 true + expandPathToNode 只展开祖先；修复为 expand-on-click-node=false 并在 selectNode 里显式展开选中节点，按 261→262→yulin 顺序合并（13f00ec7f / ef91f28a7 / c231d4d94）。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/components/regionTree.vue",
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue"
+   ],
+   "baseline": "96eaa55",
+   "sessionIds": [
+    "48b7aef9-23d7-414e-8513-1451a9dedf09"
+   ],
+   "bundle": "068.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "同一页面里的多个展示弹窗会漏改字段 formatter：街道/社区编码没转中文要逐个弹窗核对",
+   "type": "bug",
+   "content": "场景：共有资金 → 开户申请 的详情页 benefit/pubRegulatoryAccount/detail.vue 里有两个选择类弹窗：选择物业管理区域（showPropertyProjectDialog）和管理主体名称（showCompanyDialog）。2.6.2 上已通过 bug42256 给前者的街道、社区列补了 subdistrictFormatter / communityFormatter，但 showCompanyDialog 里仍直接绑 prop: 'subdistrict' / 'community'，弹窗里显示 320505002 这类区划编码而不是「双塔街道」。\n\n根因：这两个弹窗各自维护一份表格列定义（label/prop/formatter 内联写死），不是同一份配置。给其中一个补 formatter 时没有意识到同页还有第二份同构列定义，因此修复「只生效一半」，用户看到的是「有的弹窗正常、有的还是编码」。area 格式化能力本身由 detailMixins 引入的 area mixin 提供，弹窗里可以直接 this.subdistrictFormatter 用，不需要新增依赖。\n\n做法：修复时把两个弹窗的街道/社区列对齐，统一 formatter: this.subdistrictFormatter / this.communityFormatter。改造/排查同类问题时按「本文件内 grep prop: 'subdistrict' 的次数」做全量核对，确保同页所有弹窗口径一致；新建弹窗若也需要展示区划，直接照抄这一对 formatter。",
+   "evidence": "会话 63c29103：排查街道、社区显示问题，确认 showPropertyProjectDialog 已在 2.6.2 通过 bug42256 加了 formatter，showCompanyDialog 漏改，仍显示 320505002 编码；随后在 showCompanyDialog 中补齐相同 formatter（组件经 detailMixins 已引入 area mixin）。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue",
+    "zhi2-web-admin/src/mixins/area.js",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "baseline": "92ce738",
+   "sessionIds": [
+    "63c29103-0eb8-4867-986d-5ca6a0993ecb"
+   ],
+   "bundle": "068.md",
+   "project": "苏住房G"
+  }
+ ]
+}

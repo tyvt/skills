@@ -19,21 +19,21 @@ uni-app Vue3 H5 project for 苏住房 (Suzhou Housing) mobile C-end (owner initi
 
 ## Project Overview
 - Mobile C-end project with second-hand housing, new housing, loan guide, policy and other pages
-- Known technical patterns tracked in tech-pattern entities (e.g. scoped_deep_fix, fddydetail_sections_missing, formmanual_load_check, vote_houseno_missing, decision_result_vote, dual_identity_flows, zspopup_pseudo_empty, z_paging_relocate_fix, api_dispatcher_consol, sfb_token_fix, main_pkg_optimize, list_paging_migrate, richtext_rel_url_fix, cancel_cfg_key_fix, filelist_import_fix, c_announcement_zspaging, realname_skip_idtype, menuimage_defineoptions_fix, ref8443_render_mode, font_pixel_diff, ref8443_native_button, ref8443_header_fix)
+- Known technical patterns tracked in tech-pattern entities (e.g. scoped_deep_fix, fddydetail_sections_missing, formmanual_load_check, vote_houseno_missing, decision_result_vote, dual_identity_flows, zspopup_pseudo_empty, z_paging_relocate_fix, api_dispatcher_consol, sfb_token_fix, url_token_session_fix, main_pkg_optimize, list_paging_migrate, richtext_rel_url_fix, cancel_cfg_key_fix, filelist_import_fix, c_announcement_zspaging, realname_skip_idtype, menuimage_defineoptions_fix, ref8443_render_mode, font_pixel_diff, ref8443_native_button, ref8443_header_fix)
 - Code baseline: none; sourced from multiple cursor session extractions (bug/pattern/fact)
 
 ## 验证与归属
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：fd000b83-ec69-43c3-8313-394ae8ba40c3
-
+- 被苏住房防汛C端H5（GitLab suzhufang-fe/zhi2-mobile-query-h5）参考其前端接口与跳转模式实现首页/我的页（2026-11-09）
 
 <!-- MEMORY_FIELDS
 {
   "category": "project",
   "name": "zhi2_mobile_shimin",
-  "source_extraction_id": "97849f75806a4f60bad9ca0a61714229",
-  "version": 12,
+  "source_extraction_id": "4a45c2f9a945485dbc39ad0e7769ff2d",
+  "version": 14,
   "memory_type": "entities"
 }
 -->

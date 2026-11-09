@@ -1,0 +1,63 @@
+{
+  "project": "苏州市房地产监测V3",
+  "batch": "338",
+  "files": [
+    "338.md"
+  ],
+  "count": 3,
+  "memories": [
+    {
+      "title": "「页面说 5MB、实际提示不能超过 0.48MB」的根因是附件配置表的 FILE_MAX_SIZE 被误配，且页面上传提示取全量要件最大值会掩盖单个要件的错配",
+      "type": "bug",
+      "content": "【什么情况】开发企业注册上传附件时，页面顶部写着「单个文件不超过 5MB」，点上传却报「文件大小超过限制：0MB」，多弹一个提示。测试上传的那张图实际 509,288 字节（≈0.49MB），刚好卡在报错线上。\n【为什么】**这不是代码 bug，是附件配置主数据配错**。开发企业注册（要件 `busCode=040100`）的附件配置里，「受托人身份证件原件」的 `FILE_MAX_SIZE` 被误配成 **504000 字节（≈0.48MB）**、「授权委托书」误配成 5024000（≈4.79MB），两者都应是 5242880（5MB）；营业执照正本、法定代表人身份证原件本来就是 5MB。三个现象同源：① 页面顶部提示取的是**所有要件 `fileMaxSize` 的最大值**（5MB），而真正拦截用的是**该要件自身**的 504000 字节 → 提示与实际不一致；② 「超过限制：0MB」是后端按同一配置把字节换算成整 MB（504000/1024/1024 取整 = 0）回显出来的；③ 「仅支持：Word、img、pdf」是后端按 `file_type` 字典名称回显，与前端提示叠加成双重提示。\n【怎么做】① 先定位真相源再改代码：附件大小/数量/格式上限配在附件配置中心（`COMMON_FRAMEWORK.T_APPENDIX_CONFIG`，按 `busCode` + `APPENDIX_CONFIG_ID` 定位），修配置即可，**本次无需改前端/后端代码**。② 修完要回查同一 `busCode` 下所有要件的口径是否统一（本次把 4 条要件统一为 5MB，页面提示、前端校验、后端校验三者一致才算修好）。③ 隐患要一并记下：页面上传提示用「取最大值」生成是潜在雷——一旦某要件上限被单独调小，页面说明与实际拦截就不一致；建议改为按要件展示或统一口径。④ 「要支持 `.jpeg`」这类诉求的顺序是：先维护字典 img 的 `remark`，再放开前端白名单，不能反。⑤ 判断时用文件真实大小反推上限（509,288 字节 ↔ 0.48MB 上限）是快速定位配置错配的有效手段。",
+      "evidence": "会话 session-6e4a0982-6141-4510-8f0a-ef5f2b44900c（基线 a86bf95）用户诉求 1 禅道 Bug 5945 链接；最终结论「这是『附件配置主数据配错』，不是代码逻辑 bug」并给出配置表 `T_APPENDIX_CONFIG`（busCode=040100）的四条 `FILE_MAX_SIZE` 对照（授权委托书 5024000、受托人身份证件原件 504000 应改 5242880，APPENDIX_CONFIG_ID 2108475306731003905 / 2108475136693919746），写明「页面顶部『单个文件不超过 5MB』取自 `CompanyRegisterSingleForm.uploadTip`（对全部要件 `fileMaxSize` 取**最大值** → 5MB），而真正拦截用的是**该要件自身**的 504000 字节」、『文件大小超过限制：0MB』是后端按同一配置换算成整 MB（504000/1024/1024 取整=0）回显」、测试上传的图 fileID 20854 实际大小 509,288 字节『刚好卡在 0.48MB 上限之上』，并提示「`uploadTip` 用『取最大值』来生成全局提示是潜在隐患」。",
+      "files": [
+        "zhi2-web-admin/src/views/institutionRegister/institutionRegisterAppendix.js",
+        "zhi2-web-admin/src/views/register/components/single-page/CompanyRegisterSingleForm.vue",
+        "zhi2-web-admin/src/views/register/components/RegisterUploadItem.vue",
+        "zhi2-web-admin/e2e/register/institution-register-appendix-formats.spec.js"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-6e4a0982-6141-4510-8f0a-ef5f2b44900c"
+      ],
+      "bundle": "338.md"
+    },
+    {
+      "title": "线/面双态菜单图标：line/filled 两套资源 + SVG sprite 注入 + 标题映射表 + 生成脚本，未选中线性选中面性",
+      "type": "pattern",
+      "content": "【什么情况】要把顶栏菜单和首页「热门应用」的整套图标换掉，新图标集提供的是 **line（线性）/ filled（面性）两态**版本，用于表达未选中/选中。\n【为什么】用 `<img>` 逐个引入 18 组 × 2 套 = 36 次请求，且无法用 CSS 切换选中态；而 SVG sprite 可以一个文件里放全部图标、用 `<use>` 按 id 引用、再用 CSS 控制显隐与尺寸。「两态」也不是简单的颜色差异——线性/面性是**两套不同路径**，必须分别入库。\n【怎么做】① 资源入库到 `zhi2-web-admin/public/assets/images/menu-icons/`，分 `line/`（默认态）与 `filled/`（选中态）两个目录；② 用脚本生成 sprite：`scripts/generate-navbar-menu-icons.mjs` 产出 `src/layout/components/navbarMenuIcons.generated.html`，由 `Navbar.vue` 注入（改动图标集后执行 `node scripts/generate-navbar-menu-icons.mjs` 重新生成，不要手改生成物）；③ 标题 → 图标的映射放在 `src/utils/menuPlatformIcons.js`，**未配置有效 `meta.icon` 时按菜单标题回退**匹配新图标；④ 选中态切换：未选中取 `line/`，选中取 `filled/`；⑤ 首页「热门应用」（`views/home/index.vue`）规则不同：仍**优先用后台下发的 `meta.picture`**，只有在没有图片时才按标题回退到本地 `menu-icons/filled`；⑥ 图标名与菜单标题不一致导致匹配不上时，改映射表里的关键词即可，不要去改图标文件名硬凑。",
+      "evidence": "会话 session-1b69e852-fa02-43ca-8384-0d3cec1fde78（基线 a86bf95）用户诉求 1「C:\\Users\\Administrator\\Downloads\\图标 参考这个目录，把菜单图标换一下」；最终结论写明「已按…中的 **18 组 line/filled 图标** 完成顶栏与首页菜单图标替换」，改动说明含「图标已复制到 `zhi2-web-admin/public/assets/images/menu-icons/`（`line/` 默认态、`filled/` 选中态）」「顶栏用 `navbarMenuIcons.generated.html` 注入 SVG sprite（由脚本生成）。未配置有效 `meta.icon` 时，按菜单标题匹配新图标；**未选中 = 线性，选中 = 面性**」「首页『热门应用』仍优先使用后台 `meta.picture`；无图片时按标题回退到本地 `menu-icons/filled`」「维护脚本 `scripts/generate-navbar-menu-icons.mjs`、`src/utils/menuPlatformIcons.js`（标题 → 图标映射）」。",
+      "files": [
+        "zhi2-web-admin/src/layout/components/Navbar.vue",
+        "zhi2-web-admin/src/layout/components/navbarMenuIcons.generated.html",
+        "zhi2-web-admin/src/utils/menuPlatformIcons.js",
+        "zhi2-web-admin/src/views/home/index.vue",
+        "zhi2-web-admin/scripts/generate-navbar-menu-icons.mjs",
+        "zhi2-web-admin/public/assets/images/menu-icons"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-1b69e852-fa02-43ca-8384-0d3cec1fde78"
+      ],
+      "bundle": "338.md"
+    },
+    {
+      "title": "注册页管理员身份选法人还是受托人决定联系电话是否可改：选法人则只读并取法人电话，选受托人则可改且必须先清空",
+      "type": "pattern",
+      "content": "【什么情况】开发企业/机构注册页里有一个「管理员」区块，管理员可以是法定代表人或受托人。用户诉求：「管理员如果是选法人，联系电话不允许改，就取法人的；如果选择受托人，那么这些就都允许修改，而且要直接清空掉。」\n【为什么】管理员身份与联系电话是联动的业务规则：管理员=法人时，联系电话就是法人的联系电话，是被引用值，不能在这里改（改成别的就与法人信息不一致）；管理员=受托人时，受托人是独立主体，联系电话可自行填写。切换身份时如果只改可编辑性、不清空旧值，就会出现「选了受托人却还显示法人电话」或「之前填的值残留」——所以规则里明确要求**直接清空**而不是保留。\n【怎么做】① 身份切换时同时做两件事：更新该字段的 `disabled`（或 `:readonly`）状态，以及在切换为受托人时**清空**原值；② 选法人时联系电话自动取法定代表人/法人的联系电话，字段只读；③ 这条规则在两个注册页都要实现且保持一致——`src/views/register/components/single-page/CompanyRegisterSingleForm.vue`（开发企业）与 `src/views/institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue`（机构），两边都属同一份注册表单逻辑；④ 联动规则要有 e2e 覆盖（本次同时改了 `e2e/register/company-register-branch.spec.js` 与 `e2e/company/institution-register-flow.spec.js`）；⑤ 清空要清彻底——包括绑定值和已显示的 label，不要只清输入框。",
+      "evidence": "会话 session-472ff013-180f-4f26-9208-d9b4e94c8c55（基线 a86bf95）用户诉求 1「这里有个小优化，管理员如果是选法人，联系电话不允许改，就取法人的，如果选择受托人，那么这些就都允许修改，而且要直接清空掉」；最终结论子模块提交 `d27e1b95d fix(register): 法定代表人口径管理员联系电话跟随法人且不可修改`，变更文件为 `src/views/register/components/single-page/CompanyRegisterSingleForm.vue`、`src/views/institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue`、`e2e/register/company-register-branch.spec.js`、`e2e/company/institution-register-flow.spec.js`。",
+      "files": [
+        "zhi2-web-admin/src/views/register/components/single-page/CompanyRegisterSingleForm.vue",
+        "zhi2-web-admin/src/views/institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue",
+        "zhi2-web-admin/e2e/register/company-register-branch.spec.js",
+        "zhi2-web-admin/e2e/company/institution-register-flow.spec.js"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-472ff013-180f-4f26-9208-d9b4e94c8c55"
+      ],
+      "bundle": "338.md"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+ "project": "苏住房G",
+ "batch": "071",
+ "files": [
+  "071.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "共有资金-资金使用-资金拨付，详情页有两个提交且点击",
+   "type": "bug",
+   "content": "已修复。问题在 `pubAllotNotice/detail.vue`（共有资金 → 资金使用 → 资金拨付详情页）。 **原因：** - `operation-btn-group` 已通过通用组件 `ZsSubmit` 提供标准流程提交按钮（带 ✓ 图标的那个） - 页面又在插槽里额外加了一个自定义「提交」按钮，调用 `audit()` → `auditPubAllotNotice`（专用接口 `/benefit/pubAllotNotice/allotNoticeSubmit/`） - 该 API 函数未导入，且不走通用工作流，点击后容易报「单据不存在」 **修改：** 1. 删除多余的自定义「提交」按钮 2. 删除无效的 `audit()` 方法 现在详情页只保留 `operation-btn-group` 内置的通用提交按钮，与用款申请等其他业务页一致。请刷新页面后验证：应只剩一个「提交」按钮，且能正常走流程。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "`pubAllotNotice/detail.vue",
+    "涉及文件：d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\maintenance\\wxjjBO\\detail.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubAllotNotice\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2a7cb099-1915-4bd0-aa63-59c78d341af4"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "行政区域银行授权：详情页面中公共收益和阳光物业字体颜",
+   "type": "fact",
+   "content": "已修复。 **原因：** 项目全局样式 `element-ui.scss` 里已为 `el-radio` 设置了黑色文字（`#000`），但 `el-checkbox` 仍使用 Element UI 默认的 `#606266`，所以「公共收益」「阳光物业」会比其它表单项文字更淡。 **修改：** 在 `element-ui.scss` 中为 `el-checkbox` 补充与 `el-radio` 一致的样式规则： ```scss .el-checkbox__label, .el-checkbox__input.is-checked + .el-checkbox__label { color: #000000 !important; } .el-checkbox__input.is-disabled + .el-checkbox__label { color: #666666 !important; } ``` 刷新页面后，授权范围复选框文字颜色会与其它表单文字一致。这是全局修复，项目中所有 `el-checkbox` 都会受益。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "`element-ui.scss",
+    "涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth\\detail.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth、d:\\repository\\苏住房G\\zhi2-web-admin\\src、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth\\utils.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "26801714-1ca0-4cc8-9ca1-0768cabd84a4"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "物业管理信息月报表 - 模板配置更新（前端） Imp",
+   "type": "bug",
+   "content": "前端改造已完成，变更如下： ## 变更摘要 ### 1. 公共工具层 [`monthlyReport.js`](zhi2-web-admin/src/utils/monthlyReport.js) - 新增 `getUnitAttrInputProps`、`formatStatMonthCell`、`ensureLeafFields`、`validateTemplateTree` - 填报校验改为按 `xxxEditable/xxxRequired` 动态判断，`unitAttr` 控制精度 - `buildSaveValues` 对不可编辑列强制输出 `null` - 填写说明改为每行直接展示后端解析值，不再做父级合并 - `createTemplateNode` 默认带五字段初始值 ### 2. 模板配置页 - [`TemplateTreeTable.vue`](zhi2-web-admin/src/views/publicQuery/monthlyReportTemplate/components/TemplateTreeTable.vue)：新增单位名称、单位属性、本月/本年/历史累计五列，仅叶子行展示 - [`index.vue`](zhi2-web-admin/src/views/publicQuery/monthlyReportTemplate/index.vue)：",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "[`monthlyReport.js`](zhi2-web-admin/src/utils/monthlyReport.js",
+    "[`TemplateTreeTable.vue`](zhi2-web-admin/src/views/publicQuery/monthlyReportTemplate/components/TemplateTreeTable.vue",
+    "[`index.vue`](zhi2-web-admin/src/views/publicQuery/monthlyReportTemplate/index.vue",
+    "[`ReportItemsTable.vue`](zhi2-web-admin/src/views/publicQuery/monthlyReport/components/ReportItemsTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "98a6eb7e-953e-490a-ae39-942396e69cb2"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "修改说明 原因： 开户申请详情里原先写死了 :sho",
+   "type": "bug",
+   "content": "## 修改说明 **原因：** 开户申请详情里原先写死了 `:showPrint=\"true\"`。公共组件 `OperationBtnGroup` 的打印条件是 `(bizState == '2' || showPrint)`，因此 **待提交（0）** 也会出现打印，和「提交后再打印」的规则冲突。 **修改：** 在 `pubRegulatoryAccount/detail.vue` 中改为仅在 **审核中** 通过 `showPrint` 打开打印： ```222:222:zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue :showPrint=\"form.bizState == 1\" ``` **效果：** | 状态 | bizState | 是否可打印 | |------|----------|------------| | 待提交 | 0 | 否 | | 审核中 | 1 | 是（`showPrint`） | | 已备案 | 2 | 是（组件内 `bizState == '2'`） | 请在测试环境打开一条 **待提交** 的开户申请详情，确认「打印」不再出现；再分别用 **审核中**、**已备案** 各测一次打印下拉是否正常。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "`pubRegulatoryAccount/detail.vue",
+    "```222:222:zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue",
+    "涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAccount\\index.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAccount\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "aa77bf08-b75c-4a44-9c71-0b0c16264336"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "已处理首页「关键数据导航」里第二、第三块图标贴住分隔",
+   "type": "preference",
+   "content": "已处理首页「关键数据导航」里第二、第三块图标贴住分隔线或压到上一块明细区的问题。 ### 原因 - 指标行在宽卡片里被拉开时，中间块（含右侧灰色明细）过宽，会和下一块的起始内容挤在一起。 - 分隔线只是 1px，两侧没有留白；块内还用 `justify-content: center`，图标更容易贴边。 ### 修改（`KeyDataNav.vue`） 1. **去掉独立 `kd__divider`**，在第二、第三块用 `kd__sec--split`：`border-left` + **左侧 40px 内边距**，与第一块距卡片左边的留白一致。 2. **`.kd` 增加 `justify-content: space-between` 与 `gap: 40px`**，保证三块之间至少有固定间距，避免横向挤叠。 3. **块内改为 `justify-content: flex-start`**，图标从分区左侧起排，不再居中贴到邻区。 请刷新首页看绿色、紫色图标与竖线、左侧明细区是否都已拉开。若仍觉得段距偏大或偏小，可以说下期望像素，我再微调 `gap` / `padding-left`。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "修改（`KeyDataNav.vue",
+    "涉及文件：d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\v2\\components\\KeyDataNav.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home、d:\\repository\\苏住房G\\zhi2-web-admin\\preview\\home-v2-preview.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3c4b3800-e2f9-438a-a5f7-4b2f4ba81985"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  }
+ ],
+ "_draft": true
+}

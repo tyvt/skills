@@ -1,0 +1,24 @@
+{
+  "project": "淮安涟水存量房V0",
+  "batch": "002",
+  "files": [
+    "002.md"
+  ],
+  "count": 1,
+  "memories": [
+    {
+      "title": "报表导出 401 的解法不是逐个报表改下载函数：在全局 window.open 拦截器的 needAccessToken 里加一条 URL 匹配即可",
+      "type": "pattern",
+      "content": "【什么情况】多个报表页的导出（Excel）打开新窗口下载时后端返回 401，必须带上 access_token 才行；而各个报表文件里都写着 window.open(\"ZS_UReport/download/\" + url); 这样的裸链接。\n【为什么】如果逐个报表文件改下载函数，等于每加一个报表就要记得改一次，必然漏。关键洞察是：所有报表导出最终都走同一个出口——window.open。所以只要在全局层面接管 window.open，就能一处覆盖所有既有报表与未来新增报表，不需要知道到底有多少个报表文件。\n【怎么做】① 在全局 window.open 拦截器里维护「需要带 token 的 URL 匹配表」needAccessToken，本批新增 ZS_UReport/download 匹配；② 拦截器命中后自动追加 ?access_token=，值取 sessionStorage.token（父页面登录后写入的 token）；③ 命中之后不需要逐个报表文件改 dowloadFile——现有 window.open(\"ZS_UReport/download/\" + url) 的报表页会自动带上 token；④ 验证方式：登录后打开「交易明细查询(按监管协议)」导出 Excel，新窗口地址应带 access_token 且能正常下载 xlsx；若仍 401，先确认父页面已把 token 写入 sessionStorage，再排查匹配串写没写对；⑤ 新增同类下载接口时，只在 needAccessToken 里加一条匹配规则，不要在业务页面散落拼 token。",
+      "evidence": "会话 850d85da（基线 dc211bd7）用户诉求 1「http://zentao-biz.zhi.com/index.php?m=task&f=view&id=2125」、诉求 3「改前端，改完后提交推送代码，修改禅道状态」；最终结论写明「在 src/commonData/tools.js 的 needAccessToken 中增加 ZS_UReport/download 匹配。所有报表页里已有的 window.open(\"ZS_UReport/download/\" + url) 会经全局 window.open 拦截，自动追加 ?access_token=（来自 sessionStorage.token），无需逐个报表文件改 dowloadFile」，提交 dc211bd7（develop/v1.0.0），并给出验证建议「登录后打开「交易明细查询(按监管协议)」导出 Excel，新窗口地址应带 access_token……若仍 401，确认父页面已把 token 写入 sessionStorage」。",
+      "files": [
+        "src/commonData/tools.js"
+      ],
+      "baseline": "dc211bd7",
+      "sessionIds": [
+        "850d85da-5642-43cf-8538-b21be1047a2a"
+      ],
+      "bundle": "002.md"
+    }
+  ]
+}

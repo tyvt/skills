@@ -1,0 +1,42 @@
+{
+ "project": "园区物管2.0",
+ "batch": "027",
+ "files": [
+  "027.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "这里收起侧边菜单的比例处理方式参考@zhi2-web",
+   "type": "bug",
+   "content": "已处理宽度留白，并微调了各区块默认尺寸。 ### 宽度留白原因 内容偏高时，缩放会按**高度**收紧（`scale = vh / 内容高度`），小于按宽度计算的 `vw / 1920`。此时若设计稿仍固定 1920px，实际显示宽度为 `1920 × scale < 视口宽`，右侧就会出现空白。 ### 处理方式 1. **动态设计稿宽度**：在高度受限时，将设计稿宽度设为 `max(1920, ceil(视口宽 / scale))`，保证 `设计稿宽 × scale = 视口宽`，横向铺满。 2. **统一缩放**：`scale = min(按宽比例, 按高比例)`，一屏内完整显示且不变形。 3. **收紧默认高度**（减轻高度约束、提高可用缩放比）： - 柱图/画布：`188px` → `156px` - 饼图区：`276px` → `220px`，画布 `232px` → `196px` - 趋势图：`242px` → `200px`，容器 `200px` → `168px` - 区县柱图：`208px` → `172px` - 指标卡：`72px` → `64px` 侧栏收起/展开后仍会重新计算。请刷新查看：宽度应已贴边铺满；若仍觉得某列偏窄或图表偏小，可说明具体列（左/中/右），再单独调列宽比例。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\assetPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "aedd6cfa-10c2-4204-ace0-2dc1b2eb8a12"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "默认小区缺失街道社区数据",
+   "type": "bug",
+   "content": "## 原因 B 端新增时，`initCurrentProject` 会请求 `/property/complex/{projectId}` 并调用 `applyPropertyProjectRow`。其中街道、社区要通过 `getSubdistrictNameByCode` / `getCommunityNameByCode` 从 `area` mixin 的字典里反查名称。 存在两个问题： 1. **竞态**：`initDict` 里立刻执行 `initCurrentProject`，而街道/社区列表在 `created` 里异步加载，反查时字典常为空，得到 `undefined`。 2. **提前返回**：原先若 `form.projectId` 已有值（例如 session 缓存）就直接 `return`，即使街道、社区仍为空也不会再补全。 ## 修改 在 `pubParkingRate/detail.vue` 中： - 新增 `syncSubdistrictCommunityFromCodes`：字典未就绪时用 `$watch` 等待加载完成后再写入名称。 - 调整 `initCurrentProject`：在缺少街道/社区时，用当前或默认 `projectId` 重新拉取小区并补全数据。 B 端进入新增页、带默认小区时，街道、社区应能正确写入表单并随保存提交。若 `pub",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`pubParkingRate/detail.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubParkingRate\\detail.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\assetLeaseApply\\detail.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\mixins\\area.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6e97f2b9-b0d9-4363-889e-533667c5bbef"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,116 @@
+{
+ "project": "园区公共收益",
+ "batch": 9,
+ "files": [
+  "033.md",
+  "034.md",
+  "035.md",
+  "036.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "回单核销凭证删附件后查看态出现可点击「0」",
+   "type": "bug",
+   "content": "凭证常并存 voucherFileUrl（展示/上传 v-model）与 voucherFileId（提交主键）。删除附件时若 change 回调在文件列表为空时 early return，只清了 URL 而 voucherFileId 仍保留；保存后后端又可能回写 voucherFileId: 0。查看态若用 voucherFileUrl || voucherFileId 兜底，URL 为空时会把 0 当成路径渲染成可下载链接。\n修复要点：删空时同时清空 URL 与 ID；无附件时提交 voucherFileId: null；详情加载后 normalize，把 0/空 ID 视为无附件；查看态只绑 voucherFileUrl，不用 fileId 兜底（与「仅有 fileId 需补 URL」场景区分开，避免脏 0）。",
+   "evidence": "会话结论：handleVoucherFileChange 列表为空直接 return 未清 voucherFileId；保存后 voucherFileId:0 + 查看用 url||id 出现可点击「0」。修复于 pubVerificationReceipts/detail.vue：双字段同步清空、保存显式 null、normalizeVoucherAttachment、查看仅 voucherFileUrl。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubVerificationReceipts/detail.vue",
+    "zhi2-web-admin/src/components/zs-file-upload/zs-file-upload.vue"
+   ],
+   "baseline": "08d3255",
+   "sessionIds": [
+    "19c456b4-3996-489a-b606-804a1309acf5"
+   ],
+   "bundle": "035.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "未授权物业管理区域账号登录后项目选择弹窗无法关闭",
+   "type": "bug",
+   "content": "layout 在登录后会根据 operableProjectList / bProjectData 自动弹出物业管理区域选择框。列表为空时仍置 projectDialogVisible=true，弹窗无有效选项且可能无法关闭，整站被卡住。\n在 syncProjectDialogVisibility 中：projectList 为空则强制 projectDialogVisible=false 并 return。手动「切换项目」走 openProjectDialog：bProjectData 为空时 $message.warning 提示授权问题，不打开弹窗。",
+   "evidence": "用户反馈未关联区域登录弹框关不了；修复仅改 layout/index.vue：syncProjectDialogVisibility 空列表不弹窗；openProjectDialog 空列表 warning 返回。",
+   "files": [
+    "zhi2-web-admin/src/layout/index.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "7c3abcbc-5c9f-492d-b81b-9b709f37b81c"
+   ],
+   "bundle": "035.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "楼幢总层数 getFloor 对 mathjs.add 未兜底 undefined 触发 addScalar",
+   "type": "bug",
+   "content": "地上/地下层数变更触发 getFloor，用 mathjs add 求和。新建或清空输入后 floorNumberAbove/floorNumberUnder 可能为 undefined 或空字符串，add 抛 TypeError: Unexpected type of argument in function addScalar。堆栈常落在 AmountInput 的 @change，根因在页面 getFloor 而非金额组件。\n与 UnitDialog 一致：add(this.form.floorNumberAbove || 0, this.form.floorNumberUnder || 0)。同类页 building/detail、unit/detail、buildingChange/detail、unitChange/detail 需一并排查。",
+   "evidence": "Vue warn 指向 AmountInput，实际为 building/detail.vue getFloor 未对操作数 || 0；修复后四份 building 相关 detail 同步。",
+   "files": [
+    "zhi2-web-admin/src/views/building/building/detail.vue",
+    "zhi2-web-admin/src/views/building/unit/detail.vue",
+    "zhi2-web-admin/src/views/building/buildingChange/detail.vue",
+    "zhi2-web-admin/src/views/building/unitChange/detail.vue",
+    "zhi2-web-admin/src/components/AmountInput/index.vue"
+   ],
+   "baseline": "f783ca2",
+   "sessionIds": [
+    "748fb1f8-e625-4295-9c80-d99233536464"
+   ],
+   "bundle": "035.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "G 端账号顶栏/首页/水印统一展示「姓名（部门）」",
+   "type": "pattern",
+   "content": "terminalType === 'G' 且有 deptName 时，昵称展示应为 `${nickName}（${deptName}）`，其余端别仍只显示姓名。在 store getters 增加 displayNickName 集中判定，Navbar（桌面/移动菜单）、home/index、HelloCard、AppMain 水印共用，避免各页手写拼接。deptName 来自 getInfo 登录写入 store，无需额外请求。",
+   "evidence": "用户需求 G 端展示用户姓名（部门）；实现 getters.js displayNickName，并改 Navbar、HelloCard、home/index、AppMain 水印。",
+   "files": [
+    "zhi2-web-admin/src/store/getters.js",
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/views/home/index.vue",
+    "zhi2-web-admin/src/views/home/components/HelloCard.vue",
+    "zhi2-web-admin/src/layout/components/AppMain.vue"
+   ],
+   "baseline": "f783ca2",
+   "sessionIds": [
+    "d2aa8b01-1642-4b49-aad0-12d6c2d5a94e"
+   ],
+   "bundle": "035.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] zs-select-dialog-func 传 tree 对象会整体替换默认值，缺 treeMethod 导致 this.$undefined 报错",
+   "type": "bug",
+   "content": "打开带左侧银行树的函数式选择弹窗时，若 `visible` 的 immediate watcher 触发 `getTree`，内部执行 `this['$' + treeConfig.treeMethod]`（如 `this.$get`）。Vue2 对 Object 类型 prop 采用**传入对象整体替换** `default`，不会与组件内 `default: () => ({ treeMethod: 'get', ... })` 做深度合并；宿主只写了 `isTree/treeUrl/...` 时 `treeMethod` 为 `undefined`，运行时报 `this[treeConfig.treeMethod] is not a function`。\n**修复**：组件侧抽出 `DEFAULT_TREE_CONFIG`，在 `mergedTreeConfig` 中与 `tree` 合并，保证 `treeMethod` 等必有默认 `'get'`；宿主侧 `showBankDialog` 等仍建议显式写 `treeMethod: 'get'` 与同模块其它银行弹窗对齐。与「仅补 treeUrl/treeKey/treeLabel 消除 prop 校验告警」是不同故障面。",
+   "evidence": "会话 e19f246b：pubExpenditureContract/detail.vue 的 showBankDialog 树配置缺 treeMethod；结论说明 Object prop 不合并默认值，并在 zs-select-dialog-func.vue 增加 DEFAULT_TREE_CONFIG 合并。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue",
+    "zhi2-web-admin/src/views/benefit/pubExpenditureContract/detail.vue"
+   ],
+   "baseline": "08d3255",
+   "sessionIds": [
+    "e19f246b-8b3f-4ed0-b2bc-12291e2e6315"
+   ],
+   "bundle": "036.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 「我发起的流程」列表驳回主题展示应对齐待办：listCallback 内 normalizeTodoTaskRows",
+   "type": "workflow",
+   "content": "flowable 的 `todo.vue`（待办）已对驳回行做主题前缀规范化；`process.vue`（我发起的流程）若只展示原始 `procDefName`/主题，驳回单与待办列表视觉不一致。\n**做法**：从 `@/utils/todoTask` 引入 `normalizeTodoTaskRows`，在 `listMixins` 的 `listCallback` 中对 `response.rows`（或当前列表载荷）规范化后再赋给表格数据。驳回判定与待办一致：`comment.type === '3'` 或 `comment.comment === '驳回'` 时，在主题前加 `<驳回>` 前缀（如 `<驳回>某某申请主题`）。避免在 process 页单独复制一套字符串规则。",
+   "evidence": "会话 1b62db88：用户要求 process.vue 驳回参考 todo.vue；结论为引入 normalizeTodoTaskRows 并重写 listCallback。",
+   "files": [
+    "zhi2-web-admin/src/views/flowable/process.vue",
+    "zhi2-web-admin/src/views/flowable/todo.vue",
+    "zhi2-web-admin/src/utils/todoTask.js",
+    "zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "baseline": "0c9b8c2",
+   "sessionIds": [
+    "1b62db88-88d8-4a66-9497-8fe956659bab"
+   ],
+   "bundle": "036.md",
+   "project": "园区公共收益"
+  }
+ ]
+}

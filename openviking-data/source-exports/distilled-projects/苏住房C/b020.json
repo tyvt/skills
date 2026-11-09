@@ -1,0 +1,256 @@
+{
+ "project": "苏住房C",
+ "batch": 20,
+ "files": [
+  "077.md",
+  "078.md",
+  "079.md",
+  "080.md"
+ ],
+ "count": 14,
+ "memories": [
+  {
+   "title": "redirect 中转页多个接口共用一个 loading：深度计数 + trackApi 包装（含 onUnload 清零）",
+   "type": "pattern",
+   "content": "情况：小程序 pages/redirect/index.vue（扫码/分享入口中转页）里 onLoad 会并发发起多个互不相关的接口（getUserInfo、listComplexCommunitySubdistrictByToken、getTokenV1、埋点 eventDataAdd），用户要求「全页只有一个 loading，不要反复开关」。为什么：uni.showLoading/hideLoading 是全局单例计数，多个接口各自 show/hide 时，先返回的接口会 hideLoading 掉别人还没完成的 loading，界面出现闪烁；而原 lanch() 自带 showLoading，在埋点请求未完成时就 hideLoading，属于同一类误关。怎么做：在页面实例上维护 _apiLoadingDepth，封装 _beginApiLoading/_endApiLoading（0→1 才 showLoading，回到 0 才 hideLoading），再封装 trackApi(promise)：非 Promise 直接 Promise.resolve 透传，否则 begin 后用 .finally(end) 保证成功失败都关；所有接口调用一律包 this.trackApi(...)，埋点再包一层 eventDataAddWithLoading 复用同一计数；onUnload 时循环 end 直到深度归 0，避免离开页面后 loading 残留。该套路可直接搬到任何「一屏多请求」的中转/聚合页，新增接口只需包一层 trackApi 即自动接入。",
+   "evidence": "会话 3446b277（基线 97a1f31）：用户要求「这个页面的所有接口调用都需要加 loading，但是保证一个 loading，不要多次打开和关闭」；最终实现 _apiLoadingDepth + trackApi + onUnload 清零，并修掉 lanch 提前 hideLoading 与埋点未完成就关 loading 的问题。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages/redirect/index.vue",
+    "zhi2-mobile-shimin/src/store/user.js",
+    "zhi2-mobile-shimin/src/api/appAnalytics.js"
+   ],
+   "baseline": "97a1f31",
+   "sessionIds": [
+    "3446b277-c59f-4c0d-8572-2a95877d79e3"
+   ],
+   "bundle": "077.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序 Vue3 <script setup> 里误 import defineProps/defineEmits 会刷「compiler macro」警告",
+   "type": "bug",
+   "content": "情况：苏住房C 小程序（zhi2-mobile-shimin）多个 SFC 在 <script setup> 里写 `import { defineProps, defineEmits } from 'vue'`，编译/差量编译时终端持续刷 Vue 3 编译器提示，提示内容大致是 defineProps/defineEmits 是 compiler macro、无需 import。为什么：这两个是编译器宏，由 <script setup> 编译期注入，显式 import 会被识别为「错误用法」，虽不阻断编译但会污染编译输出，掩盖真正的报错；而首次全量编译的旧输出还会残留在终端里，容易误以为没修好。怎么做：把 defineProps/defineEmits 从 vue 的 import 列表中删掉，只保留真正需要的 ref/computed/onMounted 等；若该文件根本不需要任何 vue 导出（只用到宏），直接整行 import 删除。改完只需差量编译验证，终端里仍出现旧提示属于全量编译的旧输出，可忽略。本次在 page-query/components 下一并修了 5 个文件（FilterPopupComponent、NewFilterComponent、CompanyItem、PropertyCard、PropertyItem）。",
+   "evidence": "会话 b7ff0fc8（基线 5f0f4dc）：用户贴出终端日志，判断为 Vue3 编译器提示，修复 page-query/components 下 5 个文件的 import。",
+   "files": [
+    "zhi2-mobile-shimin/src/page-query/components/FilterPopupComponent.vue",
+    "zhi2-mobile-shimin/src/page-query/components/NewFilterComponent.vue",
+    "zhi2-mobile-shimin/src/page-query/components/CompanyItem.vue",
+    "zhi2-mobile-shimin/src/page-query/components/PropertyCard.vue",
+    "zhi2-mobile-shimin/src/page-query/components/PropertyItem.vue"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "b7ff0fc8-8e3a-4961-ab91-06155333fe7b"
+   ],
+   "bundle": "077.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "uni-app 微信小程序不支持 defineAsyncComponent：异步加载组件必须改静态导入或分包",
+   "type": "bug",
+   "content": "什么情况：苏住房C 的 zhi2-mobile-shimin（uni-app + Vue3 小程序端）某次编译/预览时报 `defineAsyncComponent is not suppprted`（原文拼写如此），页面组件不渲染。根因在 src/components/ZsPaging/ZsPaging.vue —— 它为了减小主包体积，用 `defineAsyncComponent(() => import('z-paging/components/z-paging/z-paging.vue'))` 延迟加载 z-paging。为什么：微信小程序运行时没有 Vue 的动态 import/异步组件能力，`defineAsyncComponent` 在小程序端不被支持，运行时直接抛错；这个 API 只在 Web/SSR 构建下成立，编译阶段不报，所以容易以为是 z-paging 本身的问题。怎么做：把该处改成静态顶部导入 `import ZPagingInner from 'z-paging/components/z-paging/z-paging.vue'`，其余 ref/useSlots/useAttrs/computed/provide 保持不动，编译即通过。若确有主包体积诉求，不要指望异步组件，走 pages.json 的 `subPackages` 分包或 `easycom` 自动引入；同时注意分包不能跨包引用组件与静态资源（已知主包超限的根治套路是迁移组件 + componentPlaceholder）。排查口诀：小程序端任何 `defineAsyncComponent`/`() => import()` 组件加载都要先怀疑不支持，而不是先查路径与依赖。",
+   "evidence": "用户报错原文「defineAsyncComponent is not suppprted」；会话确认问题出在 ZsPaging.vue 用 defineAsyncComponent 异步加载 z-paging；改为静态导入 `import ZPagingInner from 'z-paging/components/z-paging/z-paging.vue'` 后本地构建通过编译阶段；结论中明确 uni-app 微信小程序不支持 defineAsyncComponent，需改用 subPackages 或 easycom 替代。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsPaging\\ZsPaging.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\package.json"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "5aa7d8b1-67f8-4176-87c9-4be5cb616b81"
+   ],
+   "bundle": "078.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 移动端的 UnoCSS 用短横线分段类名（p-x-32 而非 px-32），写错不报错只是静默不生效",
+   "type": "pattern",
+   "content": "什么情况：zhi2-mobile-shimin 里「两智一全」等列表页给列表项写 `px-32` 想左右留 32rpx，实际图片一直贴屏幕左边，而搜索栏区域是正常的。根因：本项目 UnoCSS 的 preset 里水平内边距类名是短横线分段写法 `p-x-32`（见 uno.config.ts），`px-32` 不匹配任何规则，类名被原样留在元素上但没有任何 CSS —— 编译不报错、控制台也不警告，只能靠肉眼看布局异常。为什么容易踩：uni-app 生态与 Tailwind 习惯都是 `px-4` 这种连写形式，从别的项目/网上抄类名必然踩；WXSS 也不会提示「类名未定义」。怎么做：改 `px-32` → `p-x-32` 即恢复左右各 32rpx，与搜索栏对齐。新增或复刻页面时先打开 uno.config.ts 确认 padding/margin 的命名规则（对应地垂直方向应为 `p-y-*`），全项目统一按该规则写；发现「某个间距类完全没效果、但元素结构和其他页一致」时，第一反应是核对类名拼写规则，而不是去加 !important 或改父容器 padding。",
+   "evidence": "用户反馈「两智一全列表展示的图片太贴边了」；结论：列表项用了 px-32，但项目 UnoCSS 里水平内边距类名是 p-x-32（见 uno.config.ts），px-32 不会生效；在 goodProject/index.vue 中把 px-32 改为 p-x-32 后列表左右各留 32rpx，与搜索栏一致。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\uno.config.ts",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\goodProject\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouse\\index.vue"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "f0a63c2c-8cc1-48d5-b969-3d5c734700b9"
+   ],
+   "bundle": "078.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序里禁止用 window.scrollTo 做锚点滚动：改 uni.createSelectorQuery + uni.pageScrollTo",
+   "type": "bug",
+   "content": "【什么情况】苏住房C 市民端（zhi2-mobile-shimin，uni-app）新房详情页 pages_transaction/newHouse/detail.vue 的 setTab 用 window.scrollTo({...}) 做「详情/户型/相册/周边」tab 的锚点滚动，微信开发者工具直接抛 TypeError: Cannot read property 'scrollTo' of undefined（栈顶 setTab，来自点击事件 invoke），H5 预览却正常。\n【为什么】小程序逻辑层没有 window 对象，uni-app 编译到 mp-weixin 后 window 是 undefined，所以 window.scrollTo 必然崩；这类「H5 能跑、小程序崩」的差异是跨端移植最常见的一类 bug，仅凭 H5 预览或静态代码阅读查不出来。\n【怎么做】① 滚动统一改用跨端 API：uni.createSelectorQuery().select('#md0').boundingClientRect() 拿到相对视口的位置，再算目标偏移调 uni.pageScrollTo({ scrollTop: scrollTop + rect.top, duration })，H5 与小程序双端通用；② 锚点定位优先用 class 选择器而不是 ref——原代码只有 ref=\"md0\" 没有 class，选择器查不到节点，必须补 md0 class；③ 锚点 class 名要与 tab 的 value 严格对应（原有 md3 区块对应 tab value \"6\"，已统一改成 md6）。改完必须重新构建 dist 后在微信开发者工具里逐个点击 tab 验证，H5 预览通过不算验证。",
+   "evidence": "会话 41a4e64f（基线 9832ba3）：用户贴 weapp 报错 TypeError: Cannot read property 'scrollTo' of undefined at Proxy.setTab (pages_transaction/newHouse/detail.js:381)。结论：setTab 使用 H5 专用 API window.scrollTo({...})，微信小程序没有 window。修复：改用 uni.createSelectorQuery() 获取元素位置 + uni.pageScrollTo() 滚动；详情区块补上 md0 class（原先只有 ref=\"md0\" 无法用选择器定位），周边区块 md3 改为 md6 与 tab value \"6\" 对应。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouse\\detail.vue"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "41a4e64f-0b65-4969-b0c2-d0d6514d2d0c"
+   ],
+   "bundle": "079.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "flex 横向卡片里长地址把左侧封面图挤压变形：三件套 flex-shrink:0 + min-width:0 + word-break",
+   "type": "pattern",
+   "content": "【什么情况】pages_owner/community/info/index 的辖区小区列表（.detail_item 为 flex 横向排列：左边封面图 .link-icon，右边 .item_bottom 文字区），地址一长，左侧封面图就被横向挤窄变形，用户截图反馈「地址过程挤压了封面图，应保持封面图宽度固定」。\n【为什么】flex 子项默认 flex-shrink:1，且图片/文字的内容宽度会参与收缩计算；只给图片写 width:100px 并不能阻止被压缩。同时右侧文字区没设 min-width:0 时，flex 子项的默认 min-width:auto 会让长串文字「反向撑开」并抢走图片的空间——这两个方向的力叠加才会让图片变窄。\n【怎么做】① 图片侧加 flex-shrink: 0（并显式写死宽高 100px × 76px，以像素为准而不是百分比）；② 文字容器加 flex: 1; min-width: 0，让它老老实实占剩余空间而不是撑开；③ 地址这类长文本加 word-break: break-all，保证长串地址在容器内换行而不是外溢。这是「icon/头像/缩略图 + 可变长文本」横排卡片的通用写法，任何同类布局（消息列表、附件行、成员卡片）都应默认套用这三件套，否则只要有极端长文本就复现。",
+   "evidence": "会话 1db8ec36（基线 4630e8e）：用户发截图反馈「pages_owner/community/info/index 地址过程挤压了封面图，应保持封面图宽度固定」。结论：.detail_item 使用 flex 横向排列但封面图未禁止收缩，长地址会把左侧图片横向挤压变窄。修改：.link-icon 增加 flex-shrink: 0 并固定 100px × 76px；.item_bottom 增加 flex: 1; min-width: 0；.item_address 增加 word-break: break-all。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\community\\info\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\subdistrict\\info\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\company\\info\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\committee\\info\\index.vue"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "1db8ec36-d2b1-4f40-9ca7-140c53112d51"
+   ],
+   "bundle": "079.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "多入口共用同一个详情页时，导航栏标题必须由列表把 label 透传下去，不能靠页面默认值",
+   "type": "pattern",
+   "content": "【什么情况】pages_main/publicNotice/detail 是被「物业服务计划 / 公共收益 / 维修资金 / 双晒内容」等多个列表入口共用的同一个详情页。从「物业服务计划」进入时，导航栏标题仍显示默认的「双晒内容」，用户要求「从物业服务计划进来，就叫物业服务计划」。\n【为什么】列表页 publicNotice.vue 已经把 title 作为 noticeLabel 传给了子列表组件 components/ListIndex.vue，但 ListIndex 在 router/uni 跳转详情时没有继续往下带（丢在了中间层），详情页只能拿到空的 label 就回退到硬编码的默认标题。这类 bug 的迷惑点在于：参数确实「传了」，只是断在中间组件这一跳，只查出入口和详情页两头都看不出问题。\n【怎么做】① ListIndex 组件显式接收 noticeLabel 并把它作为 label 参数拼进详情跳转，保证参数链贯通；② detail.vue 的导航标题改成「有 label 就用 label 原文，不再拼接『内容』后缀」，无 label 时才回退默认文案；③ 每新增一个共用详情页的入口，都要核对这条链路：入口页 → 中间列表组件 → 详情页 query → uni.setNavigationBarTitle，中间任何一层丢参数都会退化成默认标题。",
+   "evidence": "会话 3fa76366（基线 8fc3cc5）：用户要求「pages_main/publicNotice/detail 从物业服务计划进来，就叫物业服务计划」。原因：列表页 publicNotice.vue 虽然传了 noticeLabel，但 ListIndex 跳转详情时没带 label，详情页就用了默认标题「双晒内容」。改动：ListIndex.vue 接收 noticeLabel 并在跳转时带上 label 参数；detail.vue 有 label 时直接用其作为导航栏标题，不再拼接「内容」。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\publicNotice\\detail.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\publicNotice\\components\\ListIndex.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\publicNotice\\publicNotice.vue"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "3fa76366-cf4a-4cdf-87de-dd2b1e81d2e9"
+   ],
+   "bundle": "079.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "getDict 没 import 导致字典列表全空且无任何报错：小程序端「有标题没选项」的固定排查项",
+   "type": "bug",
+   "content": "【什么情况】我的-账号安全-注销页 pages_my/setting/cancellationReason.vue 只显示标题和提交按钮，注销原因单选一个选项都没有。页面没白屏、没明显报错，很像是「后端字典没配数据」。\n【为什么】initDict() 里调用了 getDict('cancel_reason')，但文件顶部从来没 import 过 getDict。onShow 触发时抛 ReferenceError: getDict is not defined，这个异常发生在赋值之前就被吞掉，cancelReasonList 一直是初始空数组，ZsRadio 拿到空列表就什么都不渲染——于是故障表现成「静默的空选项」，而不是崩溃。\n【怎么做】① 先看页面 script 顶部是否真的 import { getDict } from '@/api/common'（本项目字典取值统一从 @/api/common 走）；② 界面表现与「字典未配置」完全一样时，判定顺序应是「先证前端有没有调到字典（断点/日志确认 request 是否发出）→ 再查后端字典类型 cancel_reason 是否有数据」，否则会白跑后端；③ 凡是字典驱动的下拉/单选，都建议在列表为空时打一条可控日志，把「接口没发」和「接口发了但没数据」区分开。注意 ReferenceError 落在 onShow/onLoad 里不会被 Vue 的渲染错误捕获，控制台可能只在切页瞬间一闪而过。",
+   "evidence": "会话 1a7c73a2（基线 0011377）：用户反馈「我的-账号安全-注销，注销原因不显示」。原因：cancellationReason.vue 在 initDict() 中调用 getDict('cancel_reason') 但没有导入 getDict，onShow 时抛 ReferenceError: getDict is not defined，cancelReasonList 一直为空数组，ZsRadio 无可渲染选项。修复：补充 import { getDict } from '@/api/common'；若仍为空再检查后端字典类型 cancel_reason 是否已配置数据。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\setting\\cancellationReason.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\common.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsRadio\\ZsRadio.vue"
+   ],
+   "baseline": "0011377",
+   "sessionIds": [
+    "1a7c73a2-9bb1-429e-a2b6-09950e71add3"
+   ],
+   "bundle": "079.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "navigateTo 报 page is not found：页面 vue 还在但 pages.json 路由被删了",
+   "type": "bug",
+   "content": "【什么情况】多处跳转报 errMsg: 'navigateTo:fail page `/pages/login/index` is not found'，但 src/pages/login/index.vue 文件明明存在、代码也没删。\n【为什么】`pages.json` 里对应的 4 个页面注册被删掉了（统一苏服办登录流程的 commit 61febf6 移除），而项目里仍有大量代码在 navigateTo('/pages/login/index')。uni-app 小程序的路由完全以 pages.json 为准，文件存在与否不影响运行时——这与 H5/vue-router 的「有文件即可访问」直觉相反，所以最容易被误判成「页面被删了」。\n【怎么做】① 判定顺序：报 page is not found 时先 grep pages.json 有没有该路径注册，再去确认 .vue 文件是否存在，不要反过来；② 恢复时要把整条链路一起补回，本次补的是 pages/login/index（登录）、pages/login/forget、pages/login/password、pages/login/success（后三个属忘记密码链路），只补主页面会导致二跳继续报错；③ 删除或重构 pages.json 路由前必须先全仓 grep 该路径字符串，确认无调用方；④ 改完 pages.json 必须重新编译，微信开发者工具热更新不会重载路由表。",
+   "evidence": "会话 17b77da9（基线 db06361）：用户贴 errMsg: 'navigateTo:fail page `/pages/login/index` is not found' 并要求恢复。原因：登录页 Vue 文件还在，但 pages.json 里对应路由被删了（commit 61febf6 为统一苏服办登录流程移除），多处代码仍在 navigateTo('/pages/login/index')。处理：在 pages.json 恢复 pages/login/index、pages/login/forget、pages/login/password、pages/login/success 4 个注册。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\login\\index.vue"
+   ],
+   "baseline": "db06361",
+   "sessionIds": [
+    "17b77da9-0fa5-4835-918b-0363e0ec5bf1"
+   ],
+   "bundle": "079.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "v-show 不阻止模板求值：空数组下标取 .icon 会在首屏渲染直接崩",
+   "type": "bug",
+   "content": "【什么情况】新房详情页 pages_transaction/newHouse/detail.vue 报 TypeError: Cannot read property 'icon' of undefined，栈在 Proxy._sfc_render（渲染函数内），页面打不开。\n【为什么】两个原因叠加：① 模板里写的是 :src=\"facilityCategory[activeCategory]?.icon\"，而 facilityCategory 在 data() 中初始化为空数组、真正的值要等 onLoad 才赋进去，首屏渲染时 facilityCategory[0] 就是 undefined，再取 .icon 必崩；② 页面根节点用的是 v-show=\"showPage\"，v-show 只是 CSS 隐藏，模板表达式照样求值——以为「页面还没显示就不会执行」是错的，v-if 才阻止渲染求值。\n【怎么做】① 用配置类常量作为渲染数据源时，直接在 data() 里用导入的配置初始化（如 facilityCategory: FACILITY_CATEGORY），不要等 onLoad 才赋值，从根上消除「首屏空数据」窗口；② 模板取值统一加可选链 ?.，给边界情况兜底；③ 排查这类「渲染函数里 undefined」时，先定位模板中所有 `xxx[i].yyy` / `xxx.find(...).yyy` 的写法，重点看被索引/查找的数组在首屏是否有值，不要去查接口返回——报错栈指向 _sfc_render 就说明是渲染期数据未就绪，不是请求失败。",
+   "evidence": "会话 7f29f06a（基线 4630e8e）：用户贴 TypeError: Cannot read property 'icon' of undefined at Proxy._sfc_render (pages_transaction/newHouse/detail.js:550)。根因：① v-show 不会阻止模板求值，页面根节点用 v-show=\"showPage\" 即使为 false 模板表达式仍执行；② facilityCategory 初始值为空数组，在 onLoad 里才赋值，首屏渲染 facilityCategory[0] 为 undefined，访问 .icon 报错。修复：在 data() 中直接用导入的配置初始化 facilityCategory，并给模板 .icon 加可选链。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouse\\detail.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\transaction.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse\\detail.vue"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "7f29f06a-70ca-4db2-9199-e681d3284e78"
+   ],
+   "bundle": "079.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏住房C] ZsMap 只合并 object 类型的 attrs.style，字符串 style 被静默忽略 → 地图被压成细线",
+   "type": "bug",
+   "content": "情况：苏住房C 移动端（zhi2-mobile-shimin）小区信息页 pages_owner/project/info/index.vue 的「小区周边」地图只显示一条细缝（只剩腾讯地图 logo）。\n为什么：页面给 <ZsMap> 写了字符串形式的 inline style=\"...height:240rpx\"，但 ZsMap 内部 mapStyle 计算属性只合并 object 类型的 attrs.style（typeof attrs.style === 'object' 才展开），字符串被整体丢弃，高度回退为默认 100%；而父容器又没有固定高度，百分比高度无参照，地图就被压成一条线。同一个组件在 houseMap.vue 里则相反：页面写了内联 height:200px 把高度锁死，导致地图占不满屏幕。\n怎么做：统一改成「外层容器给固定高度、ZsMap 只负责撑满」的写法——用 .map-container 包住 ZsMap 并设置 height: 240rpx（或 400rpx/200px），删除组件上的 inline style，ZsMap 内部 <map> 用 width:100%;height:100%。需要整屏时容器写 height: calc(100vh - 43px - env(safe-area-inset-top))（扣除导航栏高度，与项目其他地图页一致），地图绝对定位铺满、筛选栏浮在上方。不要在 ZsMap 标签上写 style 字符串，也不要写死像素高度。",
+   "evidence": "会话 a8639b2e / fc3995fc：houseMap.vue 移除 style=\"width:100%;height:200px\"，容器改 calc(100vh - 43px - env(safe-area-inset-top))，ZsMap 内 <map> 设 100%；info/index.vue 改参照已正常的 newHouse/detail.vue，用 .map-container{height:240rpx} 包裹，去掉无效 inline style。ZsMap.vue 源码 mapStyle 仅合并 object 型 attrs.style。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsMap\\ZsMap.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\houseMap\\houseMap.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\project\\info\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouse\\detail.vue"
+   ],
+   "baseline": "4630e8e、5f0f4dc",
+   "sessionIds": [
+    "a8639b2e-9ee0-4789-a462-e47f95ce5510",
+    "fc3995fc-3653-441b-9537-8ac6acc697e9"
+   ],
+   "bundle": "080.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏住房C] 小程序地图「鉴权失败」是腾讯位置服务 Key 与 AppID 未绑定，Key 还有 4 处硬编码副本",
+   "type": "bug",
+   "content": "情况：微信开发者工具控制台报「[渲染层错误] 鉴权失败：当前产品鉴权失败，请检查KEY及相关信息是否准确」并伴随「海外图鉴权失败」。\n为什么：这不是业务代码问题，而是腾讯位置服务 Key 侧未与当前小程序 AppID（wx29004322ee722713）正确绑定，或该 Key 未开通「微信小程序」产品（只开了 WebService/JavaScript API）、被停用/超配额；开发者工具 AppID 与 Key 绑定不一致同样会触发。「海外图」那条多为连带报错，主 Key 修好即消失。\n怎么做：先到腾讯位置服务控制台核对 Key 已开通微信小程序产品、绑定 AppID、状态启用；再确认微信公众平台接口设置里地理位置相关接口已开通；然后重新编译并「清缓存→全部清除」后进地图页，最后真机复测（工具里鉴权有时不稳）。若 Key 无法修复需新建：产品类型选微信小程序并绑定同一 AppID，替换到 ZsMap.vue 的 subkey、utils/file.js 的 QQ_MAP_KEY、utils/index.js 中 localSearch 的 key、manifest.json 的 h5.sdkConfigs.maps.qqmap.key 四处——Key 目前是散落硬编码，改 Key 必须四处同步，建议抽成统一常量。",
+   "evidence": "会话 b1546e14：定位为腾讯地图 Key 鉴权问题，列出 ZsMap.vue subkey=\"3SQBZ-QJL66-TV5SJ-ETW3L-LADIS-T6FKA\" 与 manifest.json appid；给出控制台检查、公众平台接口开通、清缓存、真机验证步骤，以及新 Key 需要替换的四个落点（含 utils/file.js、utils/index.js localSearch、manifest h5.sdkConfigs）。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsMap\\ZsMap.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\manifest.json",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\index.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\file.js"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "b1546e14-b5e1-43ee-beef-578fcfc4626f"
+   ],
+   "bundle": "080.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏住房C] 单对象接口返回 data:null 仍被 res.rows=[res.data] 包进列表，模板读字段直接崩",
+   "type": "bug",
+   "content": "情况：进入公告详情报 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'companyName')，堆栈落在 ListContractIndex.vue 首行经 baseCard 插槽渲染时。\n为什么：合同公告接口 getContractNoticeList 在「无合同」时返回 data: null，而 publicNotice.vue 无条件执行 res.rows = [res.data]，把一个 null 塞成列表唯一一行，子组件模板随即访问 detailData.companyName 崩溃。这是「单对象接口被硬塞进分页列表形态」的典型坑，与后端字段无关。\n怎么做：数据侧改成有值才入列表并同步 total——res.rows = res.data ? [res.data] : []，res.total = res.data ? 1 : 0；展示侧再加一道防线，ListContractIndex 根节点加 v-if=\"detailData\"，prop 默认值从 {} 改成工厂函数 () => ({})，避免空态渲染。无合同时正常显示「暂无相关数据」。凡把接口单对象包装成列表的地方都要做同样的空值判定，不能只依赖列表组件容错。",
+   "evidence": "会话 ddfa164f：堆栈 Vue2 renderSlot → baseCard.vue 插槽 → ListContractIndex.vue:4；修复 publicNotice.vue 的 res.rows/res.total 赋值与 ListContractIndex.vue 的 v-if 与默认值。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\publicNotice\\publicNotice.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\publicNotice\\components\\ListContractIndex.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\notice.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\commonNew\\baseCard.vue"
+   ],
+   "baseline": "83c4136",
+   "sessionIds": [
+    "ddfa164f-7797-420b-afa6-c5e85e60b348"
+   ],
+   "bundle": "080.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏住房C] 个人身份信息展示一律走 formatter.js 的 blurName / blurIdNumber，表单仍存原文",
+   "type": "bug",
+   "content": "情况：新房核验「去申请」入口改到新页面后，申请页（newHouseCertification/detail.vue）直接展示 userStore 里的姓名与身份证号原文，未脱敏。\n为什么：新页面复刻时只接了数据源，漏掉项目既有的展示层脱敏约定——用户信息一律从 userStore 原样渲染，没有任何 blur 处理。\n怎么做：按同项目已成熟页面（二手房签约、发布房源核验 verification.vue）的写法，统一调用 src/utils/formatter.js 的脱敏方法：姓名用 blurName（保留首字，其余 * 替换，张三→张*），证件号用 blurIdNumber（保留前 2 位与后 2 位，中间 * 替换）。关键约定是「只脱敏展示」：页面上显示脱敏后的字符串，form 内仍保存完整明文，提交接口不受影响。凡是新建/复刻的申请页、签约页，只要出现姓名或证件号展示，都必须套这一对 formatter，不要各页自写截断逻辑。",
+   "evidence": "会话 ec2c21f5：申请页 detail.vue 直接用 userStore 原始数据；参照 stockHouseSign/apply.vue、publishHouse/verification.vue 改用 utils/formatter.js 的 blurName、blurIdNumber，并说明 form 仍存完整信息、提交不受影响。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouseCertification\\detail.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\formatter.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\publishHouse\\verification.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\store\\user.js"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "ec2c21f5-1d1e-4abb-a5d4-f34c93d6919a"
+   ],
+   "bundle": "080.md",
+   "project": "苏住房C"
+  }
+ ]
+}

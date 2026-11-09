@@ -1,0 +1,93 @@
+{
+ "batch": 7,
+ "files": [
+  "037.md",
+  "038.md",
+  "039.md",
+  "040.md",
+  "041.md",
+  "042.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "[苏房] 附件弹窗不走附件配置时，upload 只传 busId+busCode、查看沿用 listAppendixPackage，按配置ID查的那条接口要一并删掉",
+   "type": "pattern",
+   "content": "情况：苏州 V3 后台某些附件弹窗（如预售许可 PresaleProgressDialog）业务上并没有配置附件包，却照着「标准附件配置」套路实现了 loadProgressConfig() → listAppendixPackage 取 appendixConfigId → 再用 /file/appendix/listByAppendixConfigIdAndBusIdAndBusCode 查已挂接文件，上传时也带 appendixConfigId，并在配置没拿到时弹出「附件配置加载中，请稍后重试」把人拦住，导致工程形象进度这类本该能用的上传流程完全走不通。\n为什么：listByAppendixConfigIdAndBusIdAndBusCode 是「按配置 ID 挂接」的旧模式；只要业务侧没有配置包，这个 ID 永远为空，后续三个接口/校验全部连锁失败。而 V3 的附件包查询 listAppendixPackage 本身允许只传 busId + busCode，不需要配置 ID，所以配置这一层对这类弹窗是完全多余的。\n怎么做：确认业务不走配置附件后，一次性拆干净——删掉 loadProgressConfig() 和按配置 ID 查询的接口调用；上传只传 busId + busCode（如 PRESALE_PROGRESS_FILE）；去掉「附件配置加载中」之类的前置拦截；查看态仍用 listAppendixPackage（busId + busCode）拉已挂接文件。顺带把维护模式语义改对：每次打开弹窗清空已上传状态，要求本次会话内重新上传。\n判断口径：只有当业务真的需要「按配置槽位分配」时才用 appendixConfigId；普通「本单挂几个附件」的场景一律 busId + busCode 两参数就够。",
+   "evidence": "会话中用户先问「如果这个附件不用做附件配置的话，就不需要调 /file/appendix/listByAppendixConfigIdAndBusIdAndBusCode 这个接口了吧」，随后明确「不走配置附件了」；改造后 PresaleProgressDialog 移除 loadProgressConfig()、移除按配置 ID 查询、上传只带 busId + busCode=PRESALE_PROGRESS_FILE、去掉「附件配置加载中，请稍后重试」拦截，查看态仍用 listAppendixPackage。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleProgressDialog.vue"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "57a41f44-6142-402b-90aa-1c8ffc8dc80f"
+   ],
+   "bundle": "039.md"
+  },
+  {
+   "title": "el-upload 用 :http-request 自定义上传时仍必须给 action=\"#\"，否则控制台报 Missing required prop: \"action\"",
+   "type": "bug",
+   "content": "什么情况：Web 后台（Element UI）里用 el-upload 走 :http-request 自定义上传（如 register/components/RegisterUploadItem.vue 包装的上传项），控制台持续报 [Vue warn] Missing required prop: \"action\"，堆栈指向 packages/upload/src/index.vue。\n\n为什么：Element UI 的 el-upload 把 action 声明为 required prop，不管你是否接管实际上传逻辑，prop 校验在渲染期就会执行；只用 :http-request 不传 action 必然告警。这个告警会被埋在业务日志里，掩盖真正的上传问题，也让「上传没反应」的排查方向跑偏。\n\n怎么做：即便完全由 handleCustomUpload 发请求，也统一补 action=\"#\"（占位值，不会真正发出请求，实际仍走 http-request）。注意别改成 action=\"\"，空串会让内部逻辑误判为未配置。项目内多处 el-upload 需一起补齐，否则同一个表单只修一处仍会继续报。\n\n关联经验：这条与「上传组件状态不随父组件清空」「上传迁移到要件组件」是不同层面的问题——那条管显隐与数据同步，这条只管 Element UI 的 prop 契约，两者要分别核对。",
+   "evidence": "会话中用户贴出 Vue 警告堆栈：Missing required prop: \"action\"，found in packages/upload/src/index.vue → RegisterUploadItem.vue → packages/form/src/form.vue → zs-form.vue → CompanyRegisterSingleForm.vue。结论明确指出「Element UI 要求必填 action；使用 :http-request 自定义上传时，惯例是 action=\"#\"，实际请求仍走 handleCustomUpload」，并在修改内容表格中记录「RegisterUploadItem.vue：两处 el-upload 增加 action=\"#\"」，说明该文件内是多处并存、必须逐处补齐。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\register\\components\\RegisterUploadItem.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-form\\zs-form.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\register\\components\\single-page\\CompanyRegisterSingleForm.vue"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "87dc18b1-c6cb-4944-ae78-7dd985b6bc0d"
+   ],
+   "bundle": "041.md"
+  },
+  {
+   "title": "[苏房] 内嵌详情（弹窗复用 detail mixin）必须重写 formMode/getId/init 三处，否则外层路由 ID 会串成证书主键",
+   "type": "pattern",
+   "content": "场景：客户项目详情页里用弹窗（ProjectCertificateDetailDialog → ProjectCertificateTabs）内嵌一份「证书详情」，它复用了全局 detailMixins，但外层路由末段 ID 是项目 ID，且 route.query 里还带着外层 formMode。若照搬整页 detail 的写法，内嵌新增会被误判成 view/edit 而去请求证书详情，getId() 也会拿到项目 ID，附件/提交全部挂错主键。\n\n做法（本次审查确认的三处必要重写）：\n1. formMode：内嵌态只认父组件传入的 embedFormMode，缺失时回落 'add'，绝不读路由 query；OperationBtnGroup 同理用 embedFormModeOverride 下发；\n2. getId()：内嵌 add 返回 null，内嵌 view/edit 只返回父传入的 embedEntityId（trim 后），永不回落到路由 ID；\n3. init()：内嵌 add 提前 return 不发 getDetail；并把 isCache 置 false，避免用外层 $route.path 当 sessionStorage key 恢复外层表单草稿。\n\n遗留同类风险（同源改造时一起查）：全局 getRouteId() 与 OperationBtnGroup 内部的 attachmentBusId 仍走全局 mixin 的 getId()，不认内嵌重写，必须由页面显式传 :id；detailMixins 的 edit 分支在拿不到 id 时候选 sessionStorage 仍以 $route.path 为 key，内嵌场景应改为「无 id 就必 init」。另：弹窗里的「编辑」按钮不要落到全局 changeFormState('edit')，它改的是外层路由 query，弹窗内 formMode 不会变，还会污染外层项目详情页状态——应由父组件切 certDialog.mode 并靠 detailKey 重挂。",
+   "evidence": "会话 fb9105c6（基线 99bfdbd）审查 projectEmbeddedCertificateDetail.js：四项改动在内嵌 add 上修复了「外层项目详情路由末段 ID + getRouteId() 被当成证书主键」；同时指出 OperationBtnGroup attachmentBusId 仍用全局 getId()、弹窗内「查看→编辑」不更新 embedFormMode、edit 模式仍可能读外层路由 sessionStorage 三处 MEDIUM 风险。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/customerProject/mixins/projectEmbeddedCertificateDetail.js",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/ProjectCertificateDetailDialog.vue"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "fb9105c6-8ed0-4124-9390-0e34e4325107"
+   ],
+   "bundle": "042.md"
+  },
+  {
+   "title": "[苏房] 机构入网「按 organType 收窄字段」必须四件套同源：编辑表单、保存载荷、查看态 contentInfo、字典请求",
+   "type": "pattern",
+   "content": "场景：经纪机构入网认证页被租赁机构复用，同一套组件按 isLeaseOrganType(organType) 收窄字段（本次是 companyAlias 机构别名、industryAssociation 行业协会组织、businessAddress 经营地址）。\n\n坑：只在编辑表单和 buildEntryNetworkSavePayload 里加 !isLeaseOrgan 判断，就出现三处不一致——(1) 查看态构造器 buildAgencyBasicContentInfo 对租赁机构仍输出「机构别名」「行业协会组织」，用户会以为可维护，而保存侧根本不写；(2) organType 是详情接口回来后才 hydrate 的，初始 undefined 时 isLeaseOrganType(undefined) 为 false，页面会先按经纪 UI 闪一屏经纪专属字段，若此时 canEditEntryNetwork 为 true 还能进编辑看到错误字段集；(3) AgencyEntryNetworkDetail 的 initDict 无条件拉 INDUSTRY_ASSOCIATION 字典，租赁场景白拉一次。\n\n做法：把「是否租赁」收成一个共享判定（isLeaseOrganType 或 resolvedOrganType 计算属性），四个消费点全部引用它；查看态在 isLeaseOrganType 时从 items 里过滤掉仅经纪可编辑的项（与已过滤的「经营地址」同理），若业务要求仍展示，就在区块标题写明「以下为备案信息，入网不可修改」；organType 未就绪前用 v-if 不渲染可编辑区块或禁用「编辑」按钮，保存侧仍保留 !isLeaseOrgan 作为兜底；字典按需拉取并处理 organType 晚到。另外共享 form 对象经 :model/:form 下发、子组件用 .trim/:value.sync 改嵌套字段是本项目既有写法，整对象 replace 后子组件会跟新引用，不必拆开。",
+   "evidence": "会话 58bdaae2（基线 ed13ca0）审查 AgencyEntryNetworkSections/Detail 与 companyRecord.js：确认保存体仅在 !isLeaseOrgan 写入业务地址/别名/行业协会，同时给出三处 MEDIUM——租赁只读视图仍展示经纪专属字段、organType 未 hydrate 前按经纪 UI 渲染、租赁场景仍拉 INDUSTRY_ASSOCIATION 字典。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyEntryNetworkSections.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyEntryNetworkDetail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/agencyBasicInfoContent.js",
+    "zhi2-web-admin/src/api/company/companyRecord.js"
+   ],
+   "baseline": "ed13ca0",
+   "sessionIds": [
+    "58bdaae2-b6a2-4f1d-b5d1-68532f44da54"
+   ],
+   "bundle": "042.md"
+  },
+  {
+   "title": "[苏房] 顶栏第一个目录显示成子菜单名：根路径菜单的展平要判 alwaysShow，不能在 ruoyi.js 无条件取第一个子菜单",
+   "type": "pattern",
+   "content": "现象：接口返回的第一个菜单是目录「工作中心」（path 为 \"//\"，normalize 后变成 \"/\"）且带 alwaysShow:true，但顶栏显示的是它的第一个子菜单「待办事项」。\n\n根因：若依兼容逻辑里，一级菜单 path 为 \"/\" 且存在子菜单时会「直接用第一个子菜单」作为顶栏项，完全不看 alwaysShow；而 alwaysShow:true 在若依语义里正是「当目录展示、不要展平」。父级 path 写成 \"//\" 也是同一处根因的诱因——它被规范成根路径后命中展平分支。\n\n做法：在 src/utils/ruoyi.js 里把判定抽成 shouldFlattenRootTopNavMenu(node)：仅「根路径」且「未设置 alwaysShow」才展平，collectTopNavMenus 全部改走这一个判定（原来散在多处的展平逻辑要一起收敛）；子菜单的 parentPath 与侧栏解析顺手做路径规范化，避免 \"//\" 生成 \"//todo\"。src/layout/components/Navbar.vue 的 topMenus 也必须改为调用 collectTopNavMenus，别自己算一套，否则工具函数与视图逻辑再次分叉。改完刷新登录，顶栏首项应是「工作中心」，点进去侧栏才是待办/已办/事项管理。若仍不对，先确认前端 navbarRouters 里该节点是否还留着 alwaysShow——路由转换阶段可能把它丢掉，需继续查 permission 生成路由的代码。",
+   "evidence": "会话 95e998b6（基线 77f94ab）：用户贴出菜单 JSON（path \"//\"、meta.title 工作中心、alwaysShow true），修复为 ruoyi.js 新增 shouldFlattenRootTopNavMenu + collectTopNavMenus 统一判定，Navbar.vue 改调该函数。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/layout/components/Navbar.vue"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "95e998b6-1d2c-4372-a159-b6161609fa2a"
+   ],
+   "bundle": "042.md"
+  }
+ ]
+}

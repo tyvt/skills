@@ -1,0 +1,79 @@
+{
+ "project": "产品2.0",
+ "batch": "040",
+ "files": [
+  "040.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "房屋质量保证金- 房屋质量保证金协议终止，缺少上传附",
+   "type": "bug",
+   "content": "已在房屋质量保证金协议终止详情页补充附件上传功能，修改文件：`guaranteeDepositAgreementEnd/detail.vue`。 **主要改动：** 1. **新增/编辑模式**：在「终止原因」下方增加「附件」字段，使用 `zs-file-upload` 组件，字段名为 `attachments`，支持 png、jpg、jpeg、pdf、doc、docx 格式。 2. **查看模式**：在终止信息区域展示已上传的附件。 3. **表单提交**：`getForm()` 中已包含 `attachments` 字段，保存时会一并提交。 附件为选填项，与需求文档中「并支持上传相关附件」的描述一致。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "已在房屋质量保证金协议终止详情页补充附件上传功能，修改文件：`guaranteeDepositAgreementEnd/detail.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDepositAgreementEnd\\index.vue、d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDepositAgreement\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cacd083e-59be-4431-9d3b-dd3a418fa3bd"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "Convert these 6 Vue list p",
+   "type": "pattern",
+   "content": "6 个列表页均已改为 `ListTemplate` + `listMixins`（script-only），参考 `xy/index.vue`。各文件摘要如下： --- ### 1. `progress/gcht/index.vue` - **moduleName**: `prefund` / **businessName**: `engContract` / **permsPrefix**: `xmxx:gcht` - **primaryKey**: `contractId` / **apiSuffix**: `list` - **保留**: `ProjectDialog` + `ExtractDialog`（`baseTemplate.replace` 注入模板） - **保留**: 提取按钮（权限 `xmxx:gcht:extract`）、`setProject` / `setExtract` 自定义新增流程 - **搜索**: 项目名称、合同类别（`CONTRACT_CLASS`） - **列**: 项目名称/合同号（link）、合同名称、合同类别、金额、开始日期、业务状态 ### 2. `progress/change/index.vue` - **moduleName**: `prefund` / **businessName**: `proChange` / **pe",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`xy/index.vue",
+    "`progress/gcht/index.vue",
+    "`progress/change/index.vue",
+    "`progress/bdcdj/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0c55b984-d193-404d-80bd-37db6196ab05"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "用户管理界面也有这个问题，点击新增按钮进入新增用户界",
+   "type": "preference",
+   "content": "## 问题原因 与附件配置页相同：`system/user/detail.vue` 在新增模式下调用了： ```javascript this.$get('/system/user/') ``` 在 V3 接口规范化下，该请求会被转成 `POST /system/user/add`，且 body 为空，因此报错。 ## 修复内容 已删除这个多余请求。分析后发现： 1. 该接口原本用于获取 `posts`（岗位列表），但当前页面模板里**没有岗位选择字段**，`postOptions` 实际未使用。 2. 密码初始化应依赖 `/system/config/getInitialPassword`，已改为在该接口返回后直接设置 `form.password`，避免与 `initPassword` 异步加载的竞态问题。 角色列表仍通过 `/system/role/roles` 正常加载，不受影响。 刷新后从用户管理点「新增」，不应再出现空的 `system/user/add` 请求。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "与附件配置页相同：`system/user/detail.vue",
+    "涉及文件：d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\tool\\fjflpz\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\listMixins.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\tool\\fjflpz\\components\\FjDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4f365506-e3be-4779-92c3-618489cfe3e8"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "http://localhost:8081/api/",
+   "type": "preference",
+   "content": "## 问题原因 `FjDialog.vue` 使用了 `dialogMixins`，但详情和保存仍走旧 REST 风格： | 操作 | 旧接口（错误） | 新规范（`form.js`） | |------|----------------|---------------------| | 详情 | `GET /file/appendixConfig/{id}` | `POST /file/appendixConfig/detail` | | 新增 | `POST /file/appendixConfig` | `POST /file/appendixConfig/add` | | 修改 | `PUT /file/appendixConfig` | `POST /file/appendixConfig/update` | 因此会请求到 `http://localhost:8081/api/v3.0/file/appendixConfig/2093171403265224706` 这类旧地址。 ## 修复内容 已按 `ArchiveDetailDialog.vue` 等已迁移页面的方式改造 `FjDialog.vue`： 1. 补充 `primaryKey`、`moduleName`、`businessName`，复用 mixin 的标准 CRUD 接口 2. 用 `mode` 映射 ",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`FjDialog.vue",
+    "新规范（`form.js",
+    "`ArchiveDetailDialog.vue",
+    "`index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4d504758-e807-4d71-ab92-00820c1154ef"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

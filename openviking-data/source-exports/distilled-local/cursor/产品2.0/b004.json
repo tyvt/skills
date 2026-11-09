@@ -1,0 +1,76 @@
+{
+ "project": "产品2.0",
+ "batch": "004",
+ "files": [
+  "004.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "价格备案所有页面点查看无法进入项目，用自动化测试工具",
+   "type": "bug",
+   "content": "批量扫描详情页按钮顺序的任务在 Windows 环境下因路径解析失败，没有产出有效结果。 不过布局问题已经通过全局样式修复并验证： - **修改文件**：`src/styles/index.scss` - **改动**：`.detail-container` 从 `column-reverse` 改为正常 `column`，并为 `.operation-btn-group` 设置 `order: -1`，保证按钮组始终置顶 - **验证**：价格备案详情页按钮组已在表单上方（按钮 top 128px，表单 top 209px） 刷新页面后，价格备案、项目管理、预售资金等模块的详情页按钮应都回到顶部。若还有个别页面异常，发具体菜单路径即可。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "**修改文件**：`src/styles/index.scss",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\router、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\commercialHousingSales\\priceFiling\\recordPriceMngSuzhou\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\commercialHousingSales\\priceFiling\\priceParameters\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a35cd3c7-4871-474b-b545-b9efc1cadd00"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "参考接口文档，当前企业基本信息页面需要增加变更功能，",
+   "type": "preference",
+   "content": "完整用例已重跑，结果如下： ## 测试结果 | 用例 | 结果 | |------|------| | 01 查看本企业信息 | ✅ 通过 | | 02 变更按钮可见性 | ✅ 通过 | | 03 发起变更并进入表单 | ✅ 通过 | | 04 修改并保存变更 | ❌ 失败 | | 05–07 | 未执行（serial 中断）| **04 失败原因**：点击「保存」后 `POST /company/companyRecordChange/update` 返回 **403**（`没有访问权限，请联系管理员授权`），30 秒内未收到成功响应。 ## 本次顺带修复的前端问题 跑测过程中修了若干阻塞项，01–03 因此能稳定通过： 1. **`getId()`** 优先读取 `route.query.id`，避免 E2E 路由下 `busId` 变成 `__e2e__` 2. **`OperationBtnGroup`** 无效 `busId` 时不再调用 `listAppendixPackage` 3. **变更编辑页** 去掉 `operation-btn-group` 上误传的 `bus-code` 4. **`detail` 403 降级**：`noMessage + noReject` 后回退到 `getOwnCompany` 加载表单 5. **「继续变更」按钮**：`deta",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "涉及文件：c:\\Users\\Administrator\\Documents\\WXWork\\1688857831856144\\Cache\\File\\2026-08\\04_接口文档（前端）.md、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components\\CompanyBasicInfoDetail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\toB\\companyRecord\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4e2633d3-54fb-423b-88ed-c035d9f7d33c"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "company/companyRecord/2094",
+   "type": "preference",
+   "content": "**误改 `/detail` 接口已处理完毕。** 根因是批量脚本把 `publish`、`calculationChart` 等非详情接口也改成了 `.../detail`。已按你确认的规范批量回滚约 93 个文件： - **操作类**：`POST /action` + body（如 `{ msgId }`），不加 `/detail` - **查询类**：`POST` 原路径 + body，不加 `/detail` - **实体详情**：仍保留 `POST /entity/detail` `candidateCollect` 的发布公告已改为： ```javascript this.$post('/system/msg/publish', { msgId: this.form.msgId }) ``` 同时修复了批量替换遗留的语法错误；**`vite build` 现已通过**（约 2m 27s）。 完整误改清单在 `zhi2-web-admin/scripts/audit-wrong-detail-apis.json`。联调时建议重点验证消息发布/撤回、表决图表、大屏统计等接口是否与后端路径一致。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`zhi2-web-admin/scripts/audit-wrong-detail-apis.js",
+    "涉及文件：d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\api、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\api\\company\\companyRecord.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\toB\\companyRecord\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ab733ff8-e8ba-41af-a40c-4a367ebc6c84"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "后端存储的是const relativePath =",
+   "type": "preference",
+   "content": "本轮已把剩余所有在模板里使用 `resolveServerAssetUrl(...)` 但未接入公共方法的页面补全，并完成一次 `zhi2-web-admin` 的 `npm run build`（退出码 0）。 ## 修改说明 1. **Vue2 模板**：在下列文件中增加 `import { resolveServerAssetUrl } from '@/utils/resolveServerAssetUrl.js'` 并在 `methods` 首项加入 `resolveServerAssetUrl`（或仅 `methods: { resolveServerAssetUrl }`），以便模板可直接写 `resolveServerAssetUrl(...)`。 涉及文件包括：`home/index.vue`、`ForgotPassword.vue`、`indemnity` 下 `houseNum.vue` / `cardData.vue`、`dataStatistics/iconDataCardNew.vue`、`credit/home/index.vue`、`credit/components/ZsTree/index.vue`、`autonomy/.../ResponseTable.vue`、`zs-select-dialog.vue` / `zs-select-dialog",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "'@/utils/resolveServerAssetUrl.js",
+    "涉及文件包括：`home/index.vue`、`ForgotPassword.vue",
+    "`houseNum.vue",
+    "`cardData.vue`、`dataStatistics/iconDataCardNew.vue`、`credit/home/index.vue`、`credit/components/ZsTree/index.vue`、`autonomy/.../ResponseTable.vue`、`zs-select-dialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fe6216ac-7cd1-456e-aec9-aa58446ad0ba"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

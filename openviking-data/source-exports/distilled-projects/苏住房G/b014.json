@@ -1,0 +1,238 @@
+{
+ "project": "苏住房G",
+ "batch": 14,
+ "files": [
+  "053.md",
+  "054.md",
+  "055.md",
+  "056.md"
+ ],
+ "count": 13,
+ "memories": [
+  {
+   "title": "[苏房] 子表行内使用 zs-select 的 :value.sync 改不动数据：换 :value + @update:value + this.$set 回写 tableData",
+   "type": "bug",
+   "content": "【什么情况】property/serviceItem/detail.vue（阳光物业服务事项新增页）一行内用 `<zs-select :value.sync=\"scope.row.contentType\">` 做行内下拉，用户切「固定内容 / 文本输入」时看起来没反应，只有部分列跟着变；同期还发现表格上方的「服务内容：xxx」预览区因上一次表格重构被整块删掉，用户报成「切换不生效且顶部预览没了」两个现象。\n\n【为什么】Vue 2 对「插槽作用域对象里的嵌套属性」做 .sync 双向绑定不可靠：zs-select 内部 $emit('update:value') 后，父层 .sync 生成的赋值路径落在 tableData[i] 的二级属性上，若该属性在行对象创建时并未声明，运行时追加不会触发响应式（与「data 未声明状态 → 对 undefined 调 forEach」是同一类根因）。因此切换后数据「看着改过」，渲染却不刷新，下游依赖 contentType 的内容列/操作列联动自然失效。\n\n【怎么做】① 行内控件统一改成单向 `:value`，用显式 `@update:value` 回调处理；② 回调里用 `this.$set(this.tableData, rowIndex, { ...row, contentType: val })`（或 `$set(row,'contentType',val)`）回写，保证响应式；③ 字典加载后写默认值的 `initDefaultContentType` 同样改用 $set。\n\n【附加】表格重构「只留表格」会顺手删掉与表格同源的实时预览计算属性（contentStr），新增态对文本输入类型还要给 `[x]` 占位符——改版要确认被删的派生视图是否有业务方依赖。\n\n【与已知差异】已知条目「行内可编辑子表用 computed setter 当 v-model 会让 zs-table 重算高度时 row 为 undefined」讲的是 computed setter 方案崩，本条讲的是 .sync 在行插槽里不触发响应式，解法明确为 $set 回写，两者根因和修法都不同。",
+   "evidence": "会话 b1211693（2026-07-27，基线 d109b83）：用户反馈「服务事项，新增的时候切换选项不生效，且顶部无预览的内容了」；结论明确「Vue 2 对嵌套属性的双向绑定不稳定，导致切换后数据未正确更新」，修复为「改为 :value + @update:value，通过 handleContentTypeChange 配合 $set 更新 tableData」，并「恢复预览区域 contentStr 计算属性 + initDefaultContentType 改用 $set」。",
+   "files": [
+    "zhi2-web-admin/src/views/property/serviceItem/detail.vue",
+    "zhi2-web-admin/src/views/property/serviceItem/index.vue"
+   ],
+   "baseline": "d109b83",
+   "sessionIds": [
+    "b1211693-d8a4-40e7-8ed4-eaae2280dd79"
+   ],
+   "bundle": "053.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 固定字典换成「本地 '1'/'0' 选项」的改造要同时守住四道口：归一化、colorMap 键、筛选参数、接口真值",
+   "type": "bug",
+   "content": "【什么情况】propertyContract 列表把「是否上传备案表」从 `sys_yes_no`（dictValue `Y`/`N`）改成页面内本地常量选项（dictValue `'1'`/`'0'`），同时删掉了原有的 `normalizeHasFilingForm` 与 `listCallback`。改造后列表列可能整列显示原始值（布尔 true/false 或 'Y'/'N'）并落到默认灰色，搜索下拉的提交值也从 Y/N 变成 1/0。\n\n【为什么】三处隐性依赖被一起切断：\n1) dict-tag 的 rawDictParts 对布尔值走 `String(v)`，得到 `'true'`/`'false'`，既不能 findOption 命中「是/否」，也让 colorMap 查不到键；注意 colorMap['1'] 与数字键 1 在 JS 里等价，问题不在键类型，而在传进来的 raw 值形态；\n2) 被删的 normalize 正是把 `true/false`、`1/0`、`Y/N` 统一收敛到展示口径的唯一入口，删掉后历史行数据（旧接口返回 Y/N 或布尔）直接裸露；\n3) 筛选选项从字典换成常量，改动的是「发给后端的值」（Y/N → 1/0），前端无法自证后端筛选参数是否同步。\n\n【怎么做】① 保留一个 normalize 函数，把布尔 / 数字 / '1' / 'Y' 等全部收敛到新口径，展示侧与提交侧分别只读这一个统一值；② 换成本地选项时同步自检 colorMap / listClass 的键覆盖（用样本值逐个跑一遍，别只看代码）；③ 筛选值的变更必须单独与后端确认，前端只能保留旧值兼容（读取侧兼容、提交侧只传新值）；④ 列表的 listCallback 若原本承担「接口行 → 页面行」字段映射，删除前要先确认没有别的列依赖它。\n\n【与已知差异】已知条目「页面本地静态选项改后端字典：先写 normalize 兼容旧编码」方向相反（本地→字典），本条是字典→本地；已知「状态标签配色先判异常再判正常」讲配色判定顺序，本条补的是布尔值经 String() 后的形态导致 colorMap 全落空这一具体机制，并额外指出筛选参数口径变更这个最易被忽略的后端风险。",
+   "evidence": "会话 bbcf1fcb（2026-09-21，基线 ad5bbd9）的 diff 审查，用户额外要求「Focus on regressions in dict columns and colorMap key types for string \"1\"/\"0\"」；结论标注严重度 high：删除 normalizeHasFilingForm 后布尔/Y/N 行数据无法匹配字典标签，colorMap 按 raw 字符串查找命中不了，且查询参数由 Y/N 变为 1/0「可能与后端筛选参数约定不一致」。",
+   "files": [
+    "zhi2-web-admin/src/views/property/propertyContract/components/index.vue",
+    "zhi2-web-admin/src/components/dict-tag/dict-tag.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "baseline": "ad5bbd9",
+   "sessionIds": [
+    "bbcf1fcb-341d-4924-a4e0-c14ea7c779ce"
+   ],
+   "bundle": "053.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] ECharts 环形图外侧标签被截成「...」：给 label 配 formatter+overflow，并同时放开饼图的居中与左右留白",
+   "type": "bug",
+   "content": "【什么情况】home/v2 首页「报事报修 → 当月数据」环形图，扇区外侧标签在截图上只显示 `...`，看不到「报修」「报事」文字。同页的公共收益饼图显示正常。\n\n【为什么】环形图的圆心与 radius 占满了容器宽度，两侧没有留给 guide label 的横向空间；ECharts series.label 在默认 `overflow: 'truncate'` 且可分配宽度不足时就把文本截断成 `...`。这不是数据或字号问题，而是「饼图几何布局没给 label 留位」+「label 文本宽度策略默认截断」两个默认值叠加。\n\n【怎么做】在 donutOption 里按同页已正常工作的饼图对齐：① 饼图整体左移/右移或缩小 radius，使圆心在容器内居中并显式给出左右留白，为 label 腾出空间；② 显式设置 series.label 的 `formatter: '{b}'`（只显示系列名，不带数值，避免更长文本）与 `overflow: 'none'`（不截断）；③ 如果标签仍偏出边界，再收 labelLine 长度/加 labelLayout，而不是调小字号。\n\n【验证套路】该页有独立 preview 通道：`node preview/serve.mjs 8199` 打开 home-v2-preview.html，切到「报事报修 → 当月数据」目视确认，另可写 preview/probe-donut.mjs 探测。改造同类图表时优先「照抄同页已正常的那张图的 option」，比从默认配置调更快。",
+   "evidence": "会话 1f0561f1（2026-09-22，基线 15e201a）：用户贴图反馈「图表的label展示不清」，随后执行计划；结论为「『报事报修』当月数据环形图外侧标签已从 `...` 恢复为 报修 / 报事」，改动仅在 RepairPanel.vue 的 donutOption，「调整了饼图居中、左右留白，并设置 formatter: '{b}'、overflow: 'none' 等，与同页公共收益饼图一致」。",
+   "files": [
+    "zhi2-web-admin/src/views/home/v2/components/RepairPanel.vue",
+    "zhi2-web-admin/src/views/home/v2/components/PublicBenefit.vue",
+    "zhi2-web-admin/src/views/home/v2/components/EChartsBox.vue",
+    "zhi2-web-admin/preview/probe-donut.mjs",
+    "zhi2-web-admin/vite.preview.config.js"
+   ],
+   "baseline": "15e201a",
+   "sessionIds": [
+    "1f0561f1-d84f-4c28-877d-7a24819a2672"
+   ],
+   "bundle": "053.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "筛选项把「表格格式化用的字典 options」覆盖成子集，导致列回显原始码值",
+   "type": "bug",
+   "content": "什么情况：停车泊位列表（benefit/parkingSpace）选择「产权车位」筛选后，列表「车位类型」列从中文变成数字；停车泊位变更列表（pubParkingSpaceDetailChange）存在同一问题。\n\n为什么：本项目的表格字典列由全局 dictFormatter（main.js）按「列 prop + Options」约定取字典，即 parkingSpaceType 列读 this.parkingSpaceTypeOptions。而 onParkingSpaceTypeChange 在切换产权类型时把 parkingSpaceTypeOptions 直接替换成 propertyList（产权类型联动后的子集字典），格式化时拿到的是被缩小的字典，列表数据里的值来自完整字典 benefit_parking_type，匹配不到就回退显示原始数字。根因是「同一个 XXXOptions 同时承担筛选项数据源和列格式化数据源」两个语义。\n\n怎么做：新增 parkingSpaceTypeFilterOptions 专供筛选项下拉，parkingSpaceTypeOptions 始终保持完整字典供表格列格式化；抽 updateParkingSpaceTypeFilterOptions，在产权类型切换、重置、初始化三处同步筛选项。\n\n与已知 614「同一字典被表格列+筛选项各拉一次」的差异：那条讲重复请求/常量放置，这条是「第二次赋值把格式化字典换成了子集」，是数据被覆盖而非重复拉取，排查时应先怀疑联动 handler 里的赋值。验收：选「产权车位」点搜索，车位类型列显示中文（如「人防车位」）。",
+   "evidence": "会话 78f54f15（2026-07-22）：修复方案为新增 parkingSpaceTypeFilterOptions 专供筛选、parkingSpaceTypeOptions 保持完整字典、抽 updateParkingSpaceTypeFilterOptions；已 cherry-pick 到 develop/v2.6.1(5bd282839)、v2.6.2(1a5e0ff15)、v2.6.2-yulin(e4cd36ceb)。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/parkingSpace/index.vue",
+    "zhi2-web-admin/src/views/benefit/pubParkingSpace/components/parkingTable.vue",
+    "zhi2-web-admin/src/views/benefit/pubParkingSpaceDetailChange/index.vue",
+    "zhi2-web-admin/src/main.js"
+   ],
+   "baseline": "96eaa55",
+   "sessionIds": [
+    "78f54f15-1a3a-45cd-82ca-183abc6df0fb"
+   ],
+   "bundle": "054.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "同一 bug 要在多个开发分支同时修并逐支 cherry-pick 的既有协作流程",
+   "type": "workflow",
+   "content": "什么情况：本项目长期并行维护多条分支（develop/v2.6.1、develop/v2.6.2、develop/v2.6.2-yulin、develop/v2.6.1-yulin），用户在提 bug 时会直接指定路径，如「该问题从261开始排查，按照261-262-262-yulin的顺序，修复之后依次往后合并」。\n\n为什么：yulin 是本地定制分支，主干上的修复必须回灌；若只在一条分支上改，交付验收时另一条分支仍是旧行为。反过来在共用工作区里直接 merge 又常被无关的本地文件变更挡住。\n\n怎么做：1）先在用户指定的第一条分支上改并验证；2）把同一提交 cherry-pick 到后续每条分支，逐条记录分支名 + commit 短哈希，作为交付物一并回报；3）遇到某条分支因本地无关变更无法自动合并（如 v2.6.1-yulin），不要强推，而是明确告知可手动 cherry-pick 哪个 commit；4）推送动作留给用户确认，只给出待执行的 git push 命令。\n\n与已知 744 的差异：744 针对子模块 zhi2-web-admin 的「构建/CI 修复」跨分支同步，本条是业务缺陷的多分支 cherry-pick 顺序与无法合并时的兜底口径。",
+   "evidence": "会话 78f54f15：用户原话「该问题从261开始排查，按照261-262-262-yulin的顺序，修复之后依次往后合并」；结论表列出三条分支提交 5bd282839 / 1a5e0ff15 / e4cd36ceb，并说明 develop/v2.6.1-yulin 因本地无关文件变更未自动合并、需手动 cherry-pick。",
+   "files": [
+    "zhi2-web-admin"
+   ],
+   "baseline": "96eaa55",
+   "sessionIds": [
+    "78f54f15-1a3a-45cd-82ca-183abc6df0fb"
+   ],
+   "bundle": "054.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "字典「编辑子集 vs 展示全集」的 `_all` 双字典模式（本项目唯一范例与通用等价写法）",
+   "type": "pattern",
+   "content": "什么情况：同一字段在表单里只能选「可选子集」，但在查看/回显时需要展示出包含已停用项在内的全集，否则历史数据回显成空或原始码值。\n\n为什么：后端把「可选范围」和「全量语义」拆成两个字典类型，前端只拉一个就会在某个场景丢选项。\n\n怎么做：本项目（苏州 V3 / 苏住房G）的既有范例是 system/user/detail.vue：initDict 里同时拉 sys_account_type（可编辑子集）与 sys_account_type_all（展示全集），再用一个 computed 按场景切换——formMode 为 add，或 edit 且当前已有值为空时，返回子集；其余（view，或已有值）返回全集。等价的非 `_all` 写法是 transaction_region（表单筛选）/ transaction_region_real（展示统计，含已停用项），见 transaction/secondHouse 与 institution/record。\n\n结论性事实（避免重复调研）：全仓库并没有强制的 `_all` 命名约定，只有 sys_account_type(_all) 与 transaction_region(_real) 这两对。新增类似需求时，按这个双 options + computed 切换的形态复用，不要自创第三套命名。\n\n与已知 659「字典选项要剔除『全部』」的差异：那条讲删除下拉里的伪选项，本条讲「编辑子集 + 展示全集」两套字典的并存与切换口径。",
+   "evidence": "会话 b310969f：全仓检索确认 `_all` 后缀仅 system/user/detail.vue 一处（sys_account_type / sys_account_type_all），并给出 computed accountTypeOptions 的切换代码；类似变体为 transaction_region / transaction_region_real。字典基础设施为 utils/dict.js 的 getDicts 走 /system/dictData/listByType/{dictType} 并缓存，main.js 挂到 Vue 原型。",
+   "files": [
+    "zhi2-web-admin/src/views/system/user/detail.vue",
+    "zhi2-web-admin/src/utils/dict.js",
+    "zhi2-web-admin/src/main.js",
+    "zhi2-web-admin/src/views/institution/record/index.vue"
+   ],
+   "baseline": "b0f2039",
+   "sessionIds": [
+    "b310969f-eb74-47fd-bd9f-361fe91d807f"
+   ],
+   "bundle": "054.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "字段级隐藏必须与校验规则/变更页对比视图成组处理（「住宅性质」隐藏实例）",
+   "type": "pattern",
+   "content": "什么情况：用户要求「物业管理区域隐藏住宅性质字段」，范围明确为物业管理区域信息、楼幢授权、变更记录，以及公共查询下的物业管理区域查询，且「涉及新增、详情列表都隐藏」。\n\n为什么：这类字段隐藏在 V3 里从来不是删掉一行为止——编辑表单、必填校验、只读详情（contentInfo 的 visible）、变更页的「变更前/变更后」对比是四份独立声明，漏一处就会出现「列表没了但详情还在」「表单不显示但保存被必填拦住」「变更对比里凭空多一项」。\n\n怎么做：每个相关 detail.vue 三件事一起做——移除新增/编辑表单里的表单项、移除对应的必填校验规则、详情展示项置 visible: false；变更记录页额外处理变更对比展示。publicQuery 下的同名模块只有查看、无编辑表单，只改 visible。后端字段（本例 propertyProjectType）保留不动，仅前端隐藏，避免影响已有数据与提交载荷；列表页若本就无该列则不处理。\n\n与已知 701/1050 的差异：那两条强调「用常量开关而非删模板，避免保存时清空历史数据」；本条补充的是同一次改造里「校验规则」与「变更前后对比」这两处最容易被漏掉的落点，且明确「只隐藏 UI、保留字段」是用户可接受的口径。",
+   "evidence": "会话 4e58a576：4 个文件同改（property/complex、property/complexBuildingAuth、property/complexChange、publicQuery/complex 的 detail.vue），说明中明确「后端数据字段 propertyProjectType 仍保留，仅前端 UI 隐藏」，列表页无该列故未改。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/views/property/complexBuildingAuth/detail.vue",
+    "zhi2-web-admin/src/views/property/complexChange/detail.vue",
+    "zhi2-web-admin/src/views/publicQuery/complex/detail.vue"
+   ],
+   "baseline": "4fad664",
+   "sessionIds": [
+    "4e58a576-9c70-464d-9300-446437e74594"
+   ],
+   "bundle": "054.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "805ea8c",
+   "content": "现象：苏住房G 机构注册第 2 步「完善机构信息」在「法定代表人/负责人」附近被裁切，下方按钮区却留着大片空白，看起来像内容被截断。用户确认「可以点了 但是页面 UI 截断了」。\n\n根因是两层叠加，只改一层无效：1) companyRegister.vue 的 .content-wrap 写了固定高度 height: calc(100% - 180px)，整块白色内容区高度被锁死；2) .form-wrap1 又写了 overflow-y: auto，于是在这个定高父容器内形成内部滚动区。表单内容超出的部分直接不可见，而外层仍按 100% 占位，所以底部空白与中部裁切同时出现。\n\n解法（同页三处一起改）：.register-wrap 改 min-height: 100vh 让页面随内容自然撑开；删掉 .content-wrap 的固定 height；删掉 .form-wrap1 的 overflow-y: auto，改由整页滚动；再给 .content-wrap 补 padding-bottom: 100px，避免底部 fixed 按钮栏压住最后几个字段。\n\n注意与已知清单区分：397/644/693/670 都是详情页 detail-container/detail-from-container 的滚动所有权与 calc(100vh - Npx) 口径问题；本条是注册独立页（不在 app-main 布局内），根因是「定高父 + 内层滚动」而不是 vh 常量算错，裁切伴随底部空白，且必须连带补 padding-bottom 让开固定提交栏。",
+   "evidence": "会话 c7ab501f「可以点击了 但是页面UI截断了」→ 结论：.content-wrap 的 height: calc(100% - 180px) 与 .form-wrap1 的 overflow-y: auto 叠加导致裁切；改为 min-height:100vh + 去定高 + 去内层滚动 + padding-bottom:100px",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\register\\companyRegister.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\register\\components\\companyInfo.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\register\\components\\accountInfo.vue"
+   ],
+   "sessionIds": [
+    "c7ab501f-d841-4b86-85f5-4abc8de685fc"
+   ],
+   "title": "机构注册第二步「页面 UI 截断」：height:calc(100% - 180px) 定高 + 内层 overflow-y:auto 的双重高度锁死",
+   "type": "bug",
+   "bundle": "055.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "864b409",
+   "content": "现象：开户申请详情点「打印」后，生成的 Word 模板打开了错误地址。用户原话「打印的打开路径要改为相对的」。\n\n根因：全局打印组件 ZsPrint/index.vue 用 window.open(`${window.origin}${res.data}`) 直接拼绝对地址。window.origin 只含协议+域名+端口，不含应用部署目录，因此在子路径部署下（如 https://szf.szzfcjj.cn/test/zhi2-test/...）会被削成 https://szf.szzfcjj.cn/zhi2-test/...，丢了 /test/ 这一段，必然 404 或落到错误站点。开发环境常部署在根路径，所以本地永远复现不出来，只有测试/生产子路径环境暴露。\n\n解法：两处都改走项目统一的 resolveServerAssetUrl(res.data) —— 打印方式 printWay == 2 的 Word 模板分支，以及 HTTP 模板地址分支（解析完再拼 token 等查询参数）。这与回单凭证、对账文件等资源下载走同一套相对路径解析，会按当前页面部署目录自动补全前缀。本条是对已知 1070「资源地址解析统一收口在 resolveServerAssetUrl」的补充：新增了一个此前漏收口的消费点，且明确「打印模板地址属于静态资源，禁止用 window.origin/location.origin 手拼」。\n\n副作用提醒：ZsPrint 是全局组件，改它会同时影响所有多模板打印页面（开户通知书、各类申请表），改完需回归非子路径环境的打印。",
+   "evidence": "会话 a423ec75「打印的打开路径要改为相对的」→ window.open(`${window.origin}${res.data}`) 在 /test/ 部署下丢前缀，改为 resolveServerAssetUrl(...)，printWay==2 与 HTTP 模板地址两处同改",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\components\\ZsPrint\\index.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAccount\\detail.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\components\\OperationBtnGroup\\index.vue"
+   ],
+   "sessionIds": [
+    "a423ec75-91b1-4249-9830-1fd5d9f6e665"
+   ],
+   "title": "ZsPrint 用 window.origin 拼模板地址，子路径部署（/test/）必丢部署前缀：改用 resolveServerAssetUrl",
+   "type": "bug",
+   "bundle": "055.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "db4f82c",
+   "content": "现象：某条待办（busCode WYFWQYXQFBD、物业服务企业详情(非本地)）点进去打不开真实详情页。用户补充判据：菜单项 component 是默认的 Layout「这种也算匹配失败的」。\n\n根因比已知的 504（flattenTree 后 meta.filePath 被写成 Layout/ParentView，真实组件路径在 component）更深一层：flattenTree 会把壳组件名也写进 meta.filePath，于是 getRouteFilePath 把 Layout 当成「有效页面路径」返回；当该 busCode 只配了一个菜单时，resolveTodoTaskNavigation 会走 resolveRegisteredRoute 的 name 解析，用 { name: 'Property11/:tableid', params: { tableid } } 打开路由 —— 而这条路由的 component 就是 Layout，结果打开一个空壳，storedPath 被忽略。\n\n解法（ruoyi.js 三处）：1) 新增 SHELL_MENU_COMPONENTS = ['Layout','ParentView','InnerLink','InnerLink/index']，与 store/modules/permission.js 保持一致；2) getRouteFilePath 遇到壳组件一律返回 ''，让 hint 匹配与 filePath 查找都不再命中 Layout；3) resolveTodoTaskNavigation 在 resolveRegisteredRoute 前后都加 isMenuShellRoute(picked/route) 判定，命中且有 storedPath 就直接 { path: storedPath, query: { formMode: 'view' } }。\n\n边界：只有懒加载函数 + 没有 meta.filePath 的真实详情页仍可走 name 解析，只有壳组件才强制回退 storedPath。",
+   "evidence": "会话 f1c7af59 用户给出 Property11/:tableid 且 component:\"Layout\" 的真实菜单 JSON 并指出「它的 components 是默认的 layout，这种也算匹配失败的」→ 新增 SHELL_MENU_COMPONENTS / getRouteFilePath 返回 '' / resolveTodoTaskNavigation 前后 isMenuShellRoute 强制 storedPath",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\utils\\ruoyi.js",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\store\\modules\\permission.js",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\flowable\\todo.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\v2\\components\\TodoPanel.vue"
+   ],
+   "sessionIds": [
+    "f1c7af59-850a-422f-aaa3-9169cf16f750"
+   ],
+   "title": "待办跳转把 component:\"Layout\" 的壳菜单当有效组件：单菜单时会按 name+params 打开 Layout 壳而不是 storedPath",
+   "type": "bug",
+   "bundle": "055.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "5ccda28",
+   "content": "场景：公共查询的楼盘详情里，广告位、停车位备案、公共场地备案三块都有「去备案」入口，用户要求「这 2 个跳转也改成到租赁合同相关的页面」—— 即把停车位/公共场地对齐已经改好的广告位口径。\n\n可复用套路（三点必须同时做，漏一点就是半成品）：\n1) 顶部导航入口：detail.vue 里「停车位备案」→ parkingSpaceContractFiling/detail，「公共场地备案」→ resourcesLeaseContractFiling/detail；\n2) 表格空状态链接：这类入口在 zs-table 的 empty 插槽里还有一份副本（parkingTable.vue / venueTable.vue），页面顶部改了、表内链接还在跳旧页，是本类需求最常见的漏改点；\n3) 目标页 URL 预置：resourcesLeaseContractFiling/detail.vue 支持从 URL 读 contractType，保证从公共场地入口进来时默认选中「公共场地」资源类型——跨业务共用同一个新增页时，入口语义必须通过 query 显式带入，不能靠页面里的硬编码默认值。\n\n统一口径：跳转都携带 existingFlag: '1'（既有合同维护），与广告位保持一致。\n\n判断准则：用户说「改成和 X 一样」时，先全文搜索该页面的所有跳转入口（顶部按钮、表格行内链接、空状态链接、弹窗内按钮），再逐一对齐，不要只改截图里那一处。",
+   "evidence": "会话 f6d71166「这 2 个跳转也改成到租赁合同相关的页面」→ detail.vue 顶部导航 + parkingTable/venueTable 空数据链接三处同改，并把 contractType 通过 URL 传给 resourcesLeaseContractFiling/detail，统一带 existingFlag: '1'",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\detail.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\complex\\detail.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\components\\advertiseTable.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\components\\parkingTable.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\components\\venueTable.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\components\\pubHouseTable.vue"
+   ],
+   "sessionIds": [
+    "f6d71166-f8ca-4073-85d2-2fff74a3147a"
+   ],
+   "title": "「把 A 的跳转改成和 B 一致」类需求的完整改动面：顶部导航 + 表格空数据链接 + 目标页 URL 预置默认值",
+   "type": "pattern",
+   "bundle": "055.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "3c282a5",
+   "content": "场景：开户申请详情点「打印」弹出模板选择框，两个选项（如「开户通知书」与「开户通知书（物管会、业委会）」）却撑出一大块空白，下拉框长度与内容完全不匹配。\n\n根因是三条尺寸来源都很硬：1) 面板写了 min-height: 316px，选项只有两条也强制占 316px；2) 底部「取消/打印」按钮用绝对定位，脱离了文档流，面板高度只能靠 min-height 兜住，于是按钮上方出现大片死白；3) 宽度没约束，长标签（括号补充说明）要么换行、要么把面板撑歪。\n\n解法（都在 ZsPrint/index.vue 内，属全局打印组件，所有多模板打印页同步生效）：移除 min-height: 316px 让高度随选项数自适应；底部按钮由绝对定位改为流式布局（margin-top: 12px; text-align: right）让它重新参与高度计算；宽度改 width: max-content 贴合内容；复选框 min-width 调到 320px 且标签加 white-space: nowrap，避免「开户通知书（物管会、业委会）」这种长选项换行；内边距从 20px 收紧到 16px 20px。\n\n可复用结论：这类「选项数不固定的选择面板」不要用 min-height + 绝对定位页脚，二者叠加必然产生不可控空白；正确做法是流式页脚 + max-content 宽度 + 长标签 nowrap。改完只需静态检查，仍建议真机刷新确认，因为 ZsPrint 是全局组件，影响面覆盖全部打印入口。",
+   "evidence": "会话 39c03414「调整打印开户通知书下拉框的大小，调整到合适长度」→ 移除 min-height:316px、页脚改流式、width:max-content、复选框 min-width 320px + nowrap、padding 20px→16px 20px，ESLint 通过",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\components\\ZsPrint\\index.vue"
+   ],
+   "sessionIds": [
+    "39c03414-b2a2-4561-aea2-41694b1b520b"
+   ],
+   "title": "全局多模板打印下拉框：min-height 定高 + 绝对定位按钮会让面板留白失控，改 max-content 自适应",
+   "type": "pattern",
+   "bundle": "055.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 筛选参数出现多值逗号串而页面是单选：先查 zs-search-form 是否对 bizState 做过全局 multiple 改写",
+   "type": "bug",
+   "content": "现象：companyRecordChange/page 请求里业务状态传 \"1,2\"（多值逗号串），但当前「变更管理」列表页业务状态是单选，最多只该传单值。\n\n根因（与已知条目「业务状态统一走全局 biz_state」是不同问题：那条讲字典键，这条讲控件形态被全局改写）：控制 multiple 的不是页面，而是 zs-search-form 对所有 model==='bizState' 的搜索项做过的全局改写，历史上被翻转过三次——① 2026-03-19 c2ab33f8b「业务状态改为多选」：对 bizState 无条件 multiple:true，多选组件用逗号拼接 → 产生 \"1,2\"；② 2026-05-06 28de6944e 改成可开关（读 attrs.multiple，默认仍多选，仅物业区域备案页显式关）；③ 2026-05-08 f7e52836e 默认值翻转为单选（attrs.multiple ??? false），此后全仓只有 property/complex 显式写 multiple:false，没有任何页面开启 bizState 多选。2026-07-27 6dbd17337 又在部分页面把 queryParams 里 bizState 显式声明为 undefined 并默认 '2'。\n\n排查口径：凡「某筛选参数形态和当前页面代码对不上」，别只看业务页，用 git log -S 'multiple' src/components/zs-search-form 查全局默认值翻转历史，再核对测试环境的 dist/version.json（构建时间/分支）——很可能是环境跑的是翻转前的旧构建，或请求被手工改包。仓库只有前端，后端取值定义要另查。",
+   "evidence": "会话 04c6f559：用户贴截图问 /company/companyRecordChange/page 的 bizState:\"1,2\" 是不是刚加的。逐提交溯源 a9d72747e(2025-11-17 新增业务状态筛选) → c2ab33f8b(2026-03-19 全局改多选) → 28de6944e(2026-05-06 改可开关) → f7e52836e(2026-05-08 默认翻转为单选) → 6dbd17337(2026-07-27 queryParams 显式声明) → 9b6b99aeb(2026-09-17 高级查询，只重排未动 bizState)；结论当前代码不可能产出 \"1,2\"，给出「旧构建」与「改包」两种解释，并建议比对 dist/version.json（当前仓 2.6.1 / 2026-09-23）。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components\\index.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\company\\companyManagement\\change\\index.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\utils\\companyListQuery.js"
+   ],
+   "baseline": "db4f82c",
+   "sessionIds": [
+    "04c6f559-f726-4199-99cd-5e92be1922e5"
+   ],
+   "bundle": "056.md",
+   "project": "苏住房G"
+  }
+ ]
+}

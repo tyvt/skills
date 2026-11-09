@@ -1,0 +1,28 @@
+{
+ "batch": 12,
+ "files": [
+  "067.md",
+  "068.md",
+  "069.md",
+  "070.md",
+  "071.md",
+  "072.md"
+ ],
+ "count": 1,
+ "memories": [
+  {
+   "title": "Vue2 methods 用了 data() 未声明的状态：对 undefined 调用 forEach 报错（穿梭框/弹窗选中态）",
+   "type": "bug",
+   "content": "【什么情况】ChooseHouseDialog（合同签订选房弹窗）点向下箭头时控制台报 `[Vue warn]: Error in v-on handler: TypeError: Cannot read properties of undefined (reading 'forEach')`，堆栈穿过 zs-button → zs-dialog → chooseHouseDialog，看起来像组件或 Element UI 的问题，实际是页面自己的数据声明错位。\n\n【为什么】data() 里声明的是 `selection: { origin: [], target: [] }`，但 methods（handleDown/handleUp）里读的是 `this.selectedOrigin.forEach(...)`。Vue2 不会因为方法里读了未声明的属性而报错，只是拿到 undefined，直到对该值调用数组方法（forEach/map/filter/length）才炸，所以报错位置与实际错误声明位置相距很远。追加原因：这个弹窗的选中态没有在 onClose 里重置，即使补上声明，第二次打开仍会残留上次的选中项。\n\n【怎么做】1）在 data() 里补齐 methods 实际使用的键（这里补 selectedOrigin: [] / selectedTarget: []），并删掉未被消费的旧对象 selection，避免两套状态并存；2）在 onClose 中同步清空这些数组，保证重开弹窗是干净状态；3）在 handleDown/handleUp 入口加空选防护（无选中项直接 return），使操作不依赖调用方是否已勾选；4）排查同类写法：把弹窗里所有 methods 引用的 this.xxx 与 data() 的返回键做一次对照，尤其穿梭框这种「源/目标两个数组」的成对状态。\n\n【验证】新增弹窗不勾选直接点向下箭头，控制台不报错；勾选后上下穿梭正常；关闭再打开选中态已清空。",
+   "evidence": "会话 62a1ffcb：`TypeError: Cannot read properties of undefined (reading 'forEach')` at zs-button → zs-dialog → chooseHouseDialog；最终结论「data() 里声明的是 selection.origin/target，但 methods 使用的是 selectedOrigin / selectedTarget，未初始化时在 handleDown 上对 undefined 调用 forEach 就报错」；修复为补齐 data 状态、onClose 重置、handleDown/handleUp 空选防护。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\commercialHousingSales\\presale\\contractMainInfo\\components\\chooseHouseDialog.vue"
+   ],
+   "baseline": "1c445c7",
+   "sessionIds": [
+    "62a1ffcb-1ad7-433b-9cc8-6f6f5585bd2e"
+   ],
+   "bundle": "069.md"
+  }
+ ]
+}

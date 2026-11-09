@@ -1,0 +1,204 @@
+{
+ "project": "产品2.0",
+ "batch": 21,
+ "files": [
+  "081.md",
+  "082.md",
+  "083.md",
+  "084.md"
+ ],
+ "count": 12,
+ "memories": [
+  {
+   "baseline": "a53a27c",
+   "content": "什么情况：统计地图页（benefit/statisticsMap）在 mounted 阶段抛腾讯地图异常「LatLng 传入参数 (NaN, 120.311972) 非合法数字」。为什么：后端返回的园区多边形 path 字符串是「分号 ; 分隔各点、逗号 , 分隔经纬度」，而解析函数按空格 split(' ') 切分，导致首个点解析成 NaN；且构造 LatLng 前没有任何合法性校验，一条脏数据就让整个地图初始化崩溃。怎么做：① 解析函数统一按 ';' 切点、',' 切经纬度（对接字符串型几何数据时必须先确认实际分隔符，不能想当然）；② 封装 createSafeLatLng(lat, lng)，内部 Number 转换 + isFinite 校验，非法值返回 null 并跳过该点，而不是直接 new LatLng；③ initMap、updateCenter、区域标注 nameLocation 等所有构造坐标的入口都走这个安全构造，保证个别经纬度为空/异常时不炸页面。",
+   "evidence": "会话结论：根因是园区多边形路径解析错了分隔符，新增 createSafeLatLng 统一转数字并校验，getBuildingPaths 从 split(' ') 改为按 ';' 切分，initMap/updateCenter/nameLocation 全部改走安全构造",
+   "files": [
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/constant/map.js"
+   ],
+   "sessionIds": [
+    "4ba54bd2-24d5-4b33-92bc-49f3cc906331"
+   ],
+   "title": "[产品2.0] 腾讯地图多边形坐标串按错误分隔符解析成 NaN，所有 LatLng 构造必须走安全校验函数",
+   "type": "bug",
+   "bundle": "081.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "401d884",
+   "content": "什么情况：物业合同详情页「物业管理区域」的占地面积/总建筑面积在数据未维护时显示「undefined㎡」。为什么：查看态字段配了 type:'text'，展示值在页面里手动拼接模板字符串 `${this.form.landArea}㎡`；landArea 为 undefined 时拼出非空字符串「undefined㎡」，DetailTemplate 的空值判断（非空字符串显示原值）被绕过，永远轮不到「-」占位。怎么做：凡是带单位的数值字段，查看态一律配 type:'amount' + unit:'㎡'（需要小数位再配 dot:2），把原始数值直接交给 DetailTemplate 的 getAmountDisplay 处理——值为空时自动显示「-」、有值时才拼单位；禁止在页面侧用模板字符串预拼单位，那会让 undefined/undefined㎡ 这类脏字符串穿透组件的判空逻辑。",
+   "evidence": "会话结论：根因是模板字符串拼接 `${landArea}㎡` 在值为 undefined 时产出非空字符串绕过 DetailTemplate 判空；修改为 type:'amount' + unit:'㎡' 交给 getAmountDisplay 统一处理",
+   "files": [
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/property/propertyContract/components/detail.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "sessionIds": [
+    "f3762574-10fb-4d07-adb1-cfcfca9fd8aa"
+   ],
+   "title": "[产品2.0] 查看态模板字符串手拼单位会让 undefined 变成「undefined㎡」，数值字段必须走 type:'amount' + unit",
+   "type": "bug",
+   "bundle": "081.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "bd398ef",
+   "content": "什么情况：要改 zs-operate-column 操作列（fixed=\"right\"）的单元格背景/样式，在组件自身 scoped 样式里写选择器怎么都不生效。为什么：固定列的 td/th 单元格是由外层 el-table 渲染的，不在本组件 DOM 子树内，scoped 样式（靠 data-v 属性选择器）选不中这些格子；且固定列默认透明背景，横向滚动时会「透」出下层行内容。怎么做：在 el-table-column 上同时加 class-name 和 label-class-name（表体与表头都要），值为自定义类名如 zs-operate-column-cell，再在组件里写一段不带 scoped 的 <style> 块：.el-table .zs-operate-column-cell { background-color: #fff !important; }。凡是需要命中 el-table 内部渲染的 td/th 的定制（固定列、单元格背景、hover 行配合），都走「列级 class-name + 非 scoped 全局样式」这条通道，不要在页面或组件 scoped 里找选择器。",
+   "evidence": "会话 5c0be161：用户要求操作列背景改白色；结论指出 td 由外层 el-table 画出、不在组件 DOM 里，通过 class-name/label-class-name + 非 scoped 样式实现",
+   "files": [
+    "zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue"
+   ],
+   "sessionIds": [
+    "5c0be161-3528-400f-9c2b-4a3ebdeb2d79"
+   ],
+   "title": "[产品2.0] el-table 固定列单元格样式必须走 class-name + 非 scoped 样式",
+   "type": "pattern",
+   "bundle": "082.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "6b9d9d7",
+   "content": "什么情况：父仓库（superproject）与远端合并时冲突落在 zhi2-web-admin 子模块指针上（gitlink 160000，stage2/stage3 各指向不同 commit）。为什么：两边开发各自推进了子模块并更新指针，父仓合并时无法自动裁决。怎么做：不要盲目重置或重合并——先进入子仓库核对两个 commit 的祖先关系（git merge-base / git log 判断）。若我方指针已是对方指针的祖先提交（即我方已包含对方那批改动），直接保留我方指针，在父仓 git add <submodule> 标记冲突解决即可生成合并提交，无需在子模块里再做一次 merge；反之亦然（对方包含我方则取对方）。这与已知「选较新 SHA」不同：判断依据是包含关系而非时间，能避免选到不含对方改动的假新提交。完成后注意工作区校验与 push 由用户确认网络/权限后自行执行。",
+   "evidence": "会话 329b50fe：冲突为子模块 gitlink；结论核对 b827de55 是 aeb35975 的祖先提交后保留 aeb35975，git add 子模块即解决",
+   "files": [
+    ".gitmodules"
+   ],
+   "sessionIds": [
+    "329b50fe-128b-4e82-b350-dc2a3e01a7f8"
+   ],
+   "title": "[产品2.0] 子模块指针合并冲突：先查祖先关系再决定保留哪边，不重做子仓 merge",
+   "type": "pattern",
+   "bundle": "082.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "0161609",
+   "content": "什么情况：详情页（detailMixins 驱动）里内嵌弹窗复制了独立弹窗子组件的写法，模板引用 dialogMode，控制台报 Vue warn「Property or method dialogMode is not defined」且查看/编辑判断失效。为什么：dialogMode 这类命名是弹窗子组件通过 props 接收的模式标志；而走 detailMixins 的整页详情页统一用 mixin 提供的 formMode（add/edit/view），页面自身根本没定义 dialogMode，渲染期读取 undefined。怎么做：详情页内的弹窗/区块按查看态分流时一律用 formMode == 'view' 走只读（DetailTemplate/contentInfo），新增/编辑走可编辑表单，与页面其他区块保持同一判定字段；复刻弹窗子组件代码到详情页时必须做「模式标志名对齐」检查（dialogMode→formMode），同模块的兄弟详情页（如 facilityChange）有相同写法要一并修。",
+   "evidence": "会话 46f27f37：Vue warn dialogMode not defined；结论是详情走 detailMixins 的 formMode，把第 955 行改为 v-if=\"formMode == 'view'\"，facilityChange 同步修改",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/facility/detail.vue",
+    "zhi2-web-admin/src/views/maintenance/facilityChange/detail.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "sessionIds": [
+    "46f27f37-13c0-41e5-8c63-7986f337f5da"
+   ],
+   "title": "[产品2.0] 详情页模式标志是 detailMixins 的 formMode，不是弹窗子组件的 dialogMode",
+   "type": "bug",
+   "bundle": "082.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "42b6033",
+   "content": "什么情况：弹窗常驻模板（非 v-if）里渲染 KnowledgePreviewDialog，父组件把数据对象初始为 null，弹窗未打开也报「Cannot read properties of null (reading 'title')」渲染错误。为什么：Vue 的 prop 默认值 default: () => ({}) 只在传入值为 undefined 时生效；显式传 null 会绕过默认值机制，子组件模板直接 knowledge.title 就崩。怎么做：两层修复——子组件内加计算属性做 null 归一化（knowledgeData = this.knowledge || {}），模板与派生列表都经计算属性访问；操作类方法（如 handleQuote）对 knowledge 为空直接 return 守卫。约定：常驻挂载的预览/详情弹窗组件，内部一律通过归一化计算属性消费对象型 prop，不要信任 prop 默认值能兜住 null；父组件初始值用 null 表示「无」时尤其要注意。",
+   "evidence": "会话 4041b099：previewKnowledge 初始 null 且弹窗始终挂载；结论指出 default 只对 undefined 生效，新增 knowledgeData 计算属性归一化并加空守卫",
+   "files": [
+    "zhi2-web-admin/src/views/property/workOrder/order/components/KnowledgePreviewDialog.vue",
+    "zhi2-web-admin/src/views/property/workOrder/order/components/WorkOrderActionDialog.vue"
+   ],
+   "sessionIds": [
+    "4041b099-030a-481a-8753-6ecca6c475fd"
+   ],
+   "title": "[产品2.0] 对象 prop 传 null 不会走 default: () => ({})，常驻弹窗渲染期崩溃",
+   "type": "bug",
+   "bundle": "082.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "产品2.0/zhi2-web-admin Vue2 + Vite，基线 50767de",
+   "content": "什么情况：机构注册的银行账户子表弹窗（bankTable.vue），新增态下先填账户名称/银行账号，再通过 setBank 选择开户银行回填 this.form.bankName = row.unionBankName，输入框不立即反显；要清空其他字段触发重渲染后才显示。为什么：Vue2 无法侦测「在对象上后加的属性」。form 初始只声明了 companyRegisterId，bankName/bankId/bankNo 都是后加属性、非响应式，赋值后视图不更新——这是静默的、无报错的。怎么做：参照同项目 companyManagement/components/bankTable.vue 的既有做法——(1) 抽 createDefaultForm() 工厂，预定义全部表单字段，handleAdd/handleUpdate 都用它初始化；(2) 回填外部选中值（如选银行）时用 this.$set() 赋值，并顺带 clearValidate 清掉 bankName 的校验状态。套路泛化：子表弹窗的 form 一律用工厂函数声明全字段，不许依赖「后面再加」，回填外部数据一律 $set。",
+   "evidence": "会话 44cfc1d2 最终结论：新增时 form 只初始化 companyRegisterId，直接赋值后加属性非响应式；修复为 createDefaultForm() + $set，参照 companyManagement 同名组件",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyRegister/components/bankTable.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/bankTable.vue"
+   ],
+   "sessionIds": [
+    "44cfc1d2-8149-4819-b5f1-42bdc46f2173"
+   ],
+   "title": "[产品2.0] 子表弹窗 form 必须用工厂预定义全字段：Vue2 后加属性非响应式导致选银行不反显",
+   "type": "bug",
+   "bundle": "083.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "产品2.0 根目录 env/.env + zhi2-web-admin/vite.config.js，基线 62d5fb9→71e6ed9",
+   "content": "什么情况：本地 dev 代理转发路径不对——先是没有 rewrite 导致后端收到 /api 前缀 404；修的时候又把 /v3.0 一起剥掉，后端收到 /company/xxx 也 404。为什么：前端请求统一带 baseURL 前缀 /api/v3.0（VITE_APP_BASE_API=/api/v3.0），其中 /api 是网关外的本地标识、/v3.0 是后端真实服务路径前缀，两层语义不同，rew rite 只能剥第一层。怎么做：vite.config.js 的 createProxyConfig(target, proxyContext) 统一约定——当 proxyContext 以 /api 开头时，rewrite 只做 path.replace(/^\\/api/, '')，即 /api/v3.0/company/xxx → http://host:8080/v3.0/company/xxx；/zhi2 等不以 /api 开头的代理不受影响。bypass 钩子里把 rewrite 后的 URL 写进 frontend-proxy 响应头，便于联调时核对实际转发地址。改动后必须重启 dev server 才生效（Vite 只在启动时读 env/代理配置）。",
+   "evidence": "会话 f8066b62 补 /api rewrite，会话 5038770a 指出「反代不要 replace /v3.0」，统一为只剥 /api 保留 /v3.0，并给出 createProxyConfig 代码",
+   "files": [
+    "zhi2-web-admin/vite.config.js",
+    "env/.env"
+   ],
+   "sessionIds": [
+    "f8066b62-67af-4b9b-a005-48c4a5ce8926",
+    "5038770a-c5a1-48e8-9bf7-177c06e3f475"
+   ],
+   "title": "[产品2.0] Vite 代理 rewrite 契约：只剥 /api 前缀、保留 /v3.0，经 frontend-proxy 响应头验证",
+   "type": "pattern",
+   "bundle": "083.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "产品2.0/zhi2-web-admin Vue2，基线 183f95",
+   "content": "什么情况：项目变更详情页（projectChange/detail.vue）接口明明返回了 subdistrict/community，进页面后字段却是空的——「接口有值但被前端清掉」。为什么：detailCallback 回填完接口数据后顺手调用了 onCascaderChange()，而该方法是为「用户手动切换行政区域」写的，无条件执行 this.form.subdistrict = undefined; this.form.community = undefined，把刚回填的下游级联值清空了。级联 change handler 有两种调用语境（用户交互 vs 程序回填），语义不同却复用了同一入口。怎么做：给 onCascaderChange 加 shouldReset = true 参数：手动切换时保持原清空交互；detailCallback 回填时传 false，只加载下级（街道）列表数据、不清空已回填值。套路泛化：任何「详情回填后触发下拉/级联加载选项」的调用，都不能直接复用用户交互的 change handler，要么拆参数要么拆方法，回填路径只刷 options 不动 value。",
+   "evidence": "会话 43814712 最终结论：detailCallback 回填后调 onCascaderChange 无条件清空 subdistrict/community；修复为 onCascaderChange(false) + shouldReset 参数",
+   "files": [
+    "zhi2-web-admin/src/views/building/projectChange/detail.vue",
+    "zhi2-web-admin/src/mixins/area.js"
+   ],
+   "sessionIds": [
+    "43814712-13f1-423a-b18d-f6d42c3a291a"
+   ],
+   "title": "[产品2.0] 详情回填复用级联 change handler 会清掉下游字段：shouldReset 参数区分手动切换与回填",
+   "type": "bug",
+   "bundle": "083.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "183f795 / c420af5",
+   "content": "什么情况：外部系统（如单点登录、门户跳转）通过 URL 把错误文案带回本系统，需要进入应用后自动弹出错误提示。为什么：本项目是 hash 路由，外部拼接的地址有两种形态——错误参数在 `#` 之前（`?token=…&errorMsg=…#/…`，此时读 $route.query 拿不到）和在 `#` 之后（`#/login?errorMsg=…`）；且根实例刚挂载时 $route 可能尚未完成首次解析，直接读会拿到 undefined。重复参数（同名 query 出现多次）在 vue-router 里会解析成数组。怎么做：在 main.js 的 createInstance 中、根实例挂载完成后的 $nextTick 里执行 pickErrorMsgFromUrl(vm)：先读 window.location.search 的 errorMsg（覆盖 # 之前形态，与同文件读 token 的方式一致），再回退 vm.$route.query.errorMsg；若取到数组取第一个；用 instance.$message.error 展示（Element 的 $message 在 Vue.use(Element) 后才挂到原型，时序上必须在其之后）。",
+   "evidence": "会话 a70a9913 最终结论：pickErrorMsgFromUrl 先读 location.search 再回退 $route.query，数组取第一个，$nextTick 等路由解析完成",
+   "files": [
+    "zhi2-web-admin/src/main.js"
+   ],
+   "sessionIds": [
+    "a70a9913-e202-4f48-9ff9-a75c6d3d3699"
+   ],
+   "title": "跨系统跳转携带 errorMsg 的解析套路：location.search 优先 + $route.query 兜底",
+   "type": "pattern",
+   "bundle": "084.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "ee952eb",
+   "content": "什么情况：账号类型（accountType）等历史遗留字段在旧数据上为空，产品要求「编辑旧数据时允许补填、已有值则锁定」，且登录名始终不可改。为什么：如果直接用当前 form.accountType 判定是否可编辑，用户一旦选了值，判定立刻翻转、控件被禁用甚至选中值异常；编辑态必须以「进入页面时从详情接口加载的原始值」为判定基准，而不是用户正在编辑的值。怎么做：在 detailCallback（详情回填）里把原始值快照到 originForm.accountType；disabled 计算属性按「新增模式可编辑 / 编辑态 originForm.accountType 为空可编辑 / 有值禁用」三分支判定；同时选项列表要跟着切换——旧数据补填时用与新增一致的完整选项集（accountTypeSelectOptions），已有值时用仅展示的全量集（accountTypeAllOptions）。这类「旧数据补录」门控一律以加载时快照为准。",
+   "evidence": "会话 536f025f 最终结论：核心逻辑依赖 detailCallback 中已保存的 originForm.accountType，以加载时原始值为准，避免用户选择后被误判为已有值",
+   "files": [
+    "zhi2-web-admin/src/views/system/user/detail.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "sessionIds": [
+    "536f025f-ffaf-4424-bbcf-b53ebfb5d0d4"
+   ],
+   "title": "「旧数据允许补填字段」的编辑门控必须以 detailCallback 时的 originForm 快照判定",
+   "type": "pattern",
+   "bundle": "084.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "6d7b8af",
+   "content": "什么情况：ScopeSelectDialog 同时支持两种选房视图——zs-table 列表视图与 BuildingTable 楼盘表视图（按 cardValue 切换），楼盘表里勾选后底部「已选房屋N户」始终显示 0 户，但确定按钮能正常点。为什么：两个视图产出的选择数据形态不同且写入不同状态：列表视图靠 zs-table 的 @selection-change 更新 tableSelection（完整行对象数组）；楼盘表视图靠 @checked → getCheckedData 只更新 selection（houseId 字符串数组）。sumLabel 原先只统计 tableSelection.length，所以楼盘表勾选时恒为 0；而 submitForm 用的是 `selection.length || tableSelection.length`，所以提交正常——这正是「展示与提交不同源」造成的只坏文案不坏功能的典型。怎么做：展示统计与提交取数必须同一套分流逻辑：cardValue（注意 tabs 同步可能把值变成字符串，要用 Number() === 0 判等）为楼盘表时，把 selection 里的 id 逐个去 fullHouseData 里 find 回解析成房屋对象再统计（含用途分布按字典 dictValue 匹配 dictLabel），列表视图仍用 tableSelection。凡是一个弹窗内并存多种选择来源的场景，统计、禁用态、提交三处都要走同一分流函数。",
+   "evidence": "会话 d72ba8af 根因说明：列表走 @selection-change 更新 tableSelection，楼盘表走 @checked 只更新 selection（id 数组），sumLabel 只读 tableSelection 所以恒 0；确定按钮用 selection.length || tableSelection.length 所以能点",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue",
+    "zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/BuildingTable.vue"
+   ],
+   "sessionIds": [
+    "d72ba8af-0d4f-4b21-8c49-8ed7640dbfdb"
+   ],
+   "title": "双视图选择弹窗（列表 + 楼盘表）的选择结果形态不同，统计/提交必须按视图分流",
+   "type": "bug",
+   "bundle": "084.md",
+   "project": "产品2.0"
+  }
+ ]
+}

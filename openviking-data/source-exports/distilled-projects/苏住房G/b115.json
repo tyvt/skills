@@ -1,0 +1,60 @@
+{
+  "project": "苏住房G",
+  "batch": "115",
+  "files": ["115.md"],
+  "count": 4,
+  "memories": [
+    {
+      "title": "同仓双线并行的 gitlink 切换口径：父仓库指针与子模块 checkout 解耦，-li 防汛线留在本地不受主线切换影响",
+      "type": "fact",
+      "content": "【什么情况】本仓同时存在两条业务线：防汛自动化测试跑在主 checkout 的子模块 develop/v2.6.2-suzhufang-li 分支（HEAD 83422e02，带 flood 页面/E2E/env 未提交改动），而主线 develop/v2.6.2-suzhufang 承接 bug 修复（如签约 4 字段移到区块末尾）。用户口径「这个改动同步到主模块提交推送，防汛的留在本地」。\n【为什么】子模块的分支检出状态属于主 checkout 的本地工作区，与父仓库记录的 gitlink 是两个独立维度：父仓库 gitlink 可以指向任一条线的提交，而本地子模块继续停在 -li 分支不受影响。把两者绑在一起理解（「同步=父仓库也要检出主线」）就会动到防汛环境。\n【怎么做】① worktree 里完成主线修复并推送子模块（f7e24ed5d）；② 父仓库只提交推送 gitlink 变更（202bd5b：gitlink 83422e02 → f7e24ed5d），不 checkout 主 checkout 的子模块；③ 向用户显式披露边界：「gitlink 现指向 suzhufang 线，该线不含 -li 上的防汛 E2E 提交（83422e02），这是确认过的口径」——切换指针意味着 -li 的 E2E 提交暂时脱离主线引用，必要时后续把 -li 合回主线；④ 防汛本地未提交改动全程不动、不入库。",
+      "evidence": "会话 session-0dadcc97-f58f-4ed1-9143-4045bee1b962（基线 6156653）用户诉求 3「这个改动同步到主模块提交推送，防汛的留在本地」；最终结论：「父仓库 苏住房G 202bd5b（gitlink 83422e02 → f7e24ed5d）推送 da6f150..202bd5b；防汛相关：主 checkout 子模块仍在 -li 分支（HEAD 83422e02），防汛未提交改动全部留在本地未动；父仓库 gitlink 现指向 suzhufang 线，该线不含 -li 上的防汛 E2E 提交，这是你在选项里确认的口径」。",
+      "files": [
+        "zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-0dadcc97-f58f-4ed1-9143-4045bee1b962"],
+      "bundle": "115.md"
+    },
+    {
+      "title": "禅道 bug 闭环流水线的版本号口径：resolvedBuild 不沿用历史记录，按本次推送目标分支在禅道版本列表现查现填",
+      "type": "workflow",
+      "content": "【什么情况】禅道 bug 修复闭环（分析→修复→提交推送→回写→回验）里，「解决版本」字段不能照抄上一个 bug 的值：bug 5935 填 trunk，bug 5934 填 2，bug 5950 填 5——同一分支 develop/v2.6.2-suzhufang 的版本号会随禅道版本列表维护而变化。\n【为什么】禅道的 resolvedBuild 是版本字典里的条目，数字 id 与分支的对应关系由测试/项目管理维护；回写时沿用历史值可能把 bug 挂到不存在的或错误的版本上，提单人按版本拉代码就找不到修复。\n【怎么做】① 修复推送完成后，在禅道（dbx 的「新禅道」连接）查当前版本列表，找到本次推送目标分支（develop/v2.6.2-suzhufang）对应的版本 id 或 trunk；② 回写 resolved：resolution=fixed、resolvedBuild=查到的值、assignedTo 指回提单人、zt_action 备注「根因/修复/改动文件/提交号」三段式；③ 回验：zt_bug 与 zt_action 双表核对；④ 案例参照：bug 5950（子模块 97a985ef、父仓库 gitlink b6ffc68）回写 resolvedBuild=5、指回 lichandan；⑤ 纯文案类修复（如「当前」→「当月」统计周期文案）同样走完整闭环，不要因为改动小就省略回写。",
+      "evidence": "会话 session-da9b9909-db8c-4868-b889-23f41a4ca51f（基线 b6ffc68，bugID=5950）最终结论：「解决版本：5（develop/v2.6.2-suzhufang）；指派回提单人 lichandan；zt_action 已新增 resolved 记录，备注含根因/修复/改动文件与提交 97a985ef」；对比 113.md 会话 session-5eadc841（bug 5934）resolvedBuild=2、114.md 会话 session-3297273b（bug 5935）resolvedBuild=trunk，证明该值逐单现查。",
+      "files": [
+        "zhi2-web-admin/src/views/home/index-v2.vue"
+      ],
+      "baseline": "b6ffc68",
+      "sessionIds": ["session-da9b9909-db8c-4868-b889-23f41a4ca51f"],
+      "bundle": "115.md"
+    },
+    {
+      "title": "合并冲突向新架构对齐：inspectionStage+subject 的 props 传参取代废弃的 inspectionType+INSPECTION_STAGE 换算",
+      "type": "bug",
+      "content": "【什么情况】在 develop/v2.6.2-suzhufang-li 分支合并远程时，flood 模块 3 个文件出 12 处冲突：一边是旧的 `inspectionType` + `INSPECTION_STAGE` 常量换算，另一边是新的 `inspectionStage` + `subject` props/query 传参。\n【为什么】冲突解法的判据不是「哪边改动多」，而是「哪边是已合并进远端的架构演进方向」：cityPre.vue 等 wrapper 已经用 `inspection-stage=\"2\" subject=\"city\"` 调用，pickers.js 已删掉 INSPECTION_STAGE 换算——保留旧映射会让组件族回到两套口径并存的分裂态。\n【怎么做】① 冲突前先看已被合并的调用方（wrapper 组件）与公共模块（pickers.js）用了哪套 API，统一采用 incoming/远程方案：② zhi2-web-admin/src/views/flood/inspection/detail.vue 用 computed `inspectionStage` / `subject`（取 props 或路由 query）调 API 与组 payload；③ zhi2-web-admin/src/views/flood/components/CheckPage.vue 保持 props 驱动查询与路由 query，顺手去掉无效 import；④ zhi2-web-admin/src/api/flood/index.js 保留 `eventOptions` / `inspectionTemplate` 的 JSDoc；⑤ 全局清掉对废弃 `inspectionType` + `INSPECTION_STAGE` 映射的引用；⑥ 收尾：ESLint 过 3 个文件，提交 `fix(flood): 合并远程分支，统一检查单 stage/subject 传参`（cd2a88198）推送 -li 分支；主仓库未提交的 env/.env 与密钥不纳入提交。",
+      "evidence": "会话 05543377-1a2f-416d-9564-a14b49bf3cdb（来源 cursor，基线 6156653）最终结论：「统一采用 incoming/远程方案：用 inspectionStage + subject（props 或路由 query），与已合并的 cityPre.vue 等 wrapper（inspection-stage=\"2\" subject=\"city\"）及 pickers.js（已去掉 INSPECTION_STAGE 换算）一致；不再使用已废弃的 inspectionType + INSPECTION_STAGE 映射」，提交 cd2a88198 已推送 origin/develop/v2.6.2-suzhufang-li；查重确认 _known.md 无 inspectionStage/INSPECTION_STAGE 相关条目。",
+      "files": [
+        "zhi2-web-admin/src/api/flood/index.js",
+        "zhi2-web-admin/src/views/flood/components/CheckPage.vue",
+        "zhi2-web-admin/src/views/flood/inspection/detail.vue",
+        "zhi2-web-admin/src/views/flood/components/pickers.js",
+        "zhi2-web-admin/src/views/flood/inspection/cityPre.vue"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["05543377-1a2f-416d-9564-a14b49bf3cdb"],
+      "bundle": "115.md"
+    },
+    {
+      "title": "禅道需求正文还原：zt_story 无 desc 列，正文在 zt_storyspec.spec 按 story+version 取最新，任务 desc 全空是常态",
+      "type": "fact",
+      "content": "【什么情况】用禅道数据库还原需求（story）正文做需求分析/任务对照时，发现 `zt_story` 表没有 `desc` 列，`zt_task` 的 `desc` 也常全为空，直接查两张主表拿不到正文。\n【为什么】禅道把需求正文按版本拆存：正文在 `zt_storyspec.spec`，按 `story + version` 一行一版，必须取最新 version；任务表 desc 为空不代表任务无内容，只是描述性正文集中在 story 侧——「查了没有」要显式写成「数据库无此信息」，禁止按推断补。\n【怎么做】① 走 mcp_gateway：`server=\"dbx\"`，`tool=\"dbx_execute_query\"`，`arguments={\"connection_name\":\"新禅道\",\"database\":\"zentao\",\"sql\":\"...\"}`，只用「新禅道」连接，禁用老禅道库；② 正文还原 SQL：`SELECT ... FROM zt_storyspec WHERE story=<id> ORDER BY version DESC LIMIT 1`，spec 列是 HTML，转纯文本时保留字段表格/枚举/状态机/校验规则/按钮权限/列表列；③ `left`/`desc` 等保留字要反引号；④ 盘点任务用 `SELECT id,name,status,assignedTo FROM zt_task WHERE story IN (...) AND deleted='0'`，顺带发现未标注的端（本次 5 个 story 下共 10 条任务：后端 3 条、未标端别 3 条，无 H5，管理端 APP 无后端任务）；⑤ 产出按「story 一节 + task 一节 + 实体×功能矩阵（空项写「未提及」）+ 审批流独立一节」组织，样例交付：docs/std-evaluation/requirements.md（57KB，含 10 条原文疑点如公共时序写法冲突、市级检查编号误写 QXJC、临期短信「前第3天」与示例 2 天矛盾）。",
+      "evidence": "会话 c289a0fe-5933-4792-b13b-4a1c70ebfcf0（基线 05caac8）用户诉求 1 的任务指令明确「zt_story 没有 desc 列，正文在 zt_storyspec.spec（按 story+version 取最新）。zt_task 有 desc。left/desc 等保留字要反引号。只用「新禅道」，禁止用老禅道库」；最终结论：「5 条 story 全文还原（1382/1392/1395/1396/1400）+ 补充 1384；11 实体 × 9 功能矩阵空项一律「未提及」；审批节点/角色/审批人/驳回回退 = 数据库无此信息（全文 LIKE '%审批%' 命中 0 次）」。",
+      "files": [
+        "docs/std-evaluation/requirements.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["c289a0fe-5933-4792-b13b-4a1c70ebfcf0"],
+      "bundle": "115.md"
+    }
+  ]
+}

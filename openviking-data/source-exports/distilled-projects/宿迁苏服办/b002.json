@@ -1,0 +1,62 @@
+{
+  "project": "宿迁苏服办",
+  "batch": "002",
+  "files": [
+    "002.md"
+  ],
+  "count": 3,
+  "memories": [
+    {
+      "title": "苏服办报「相关应用接口未绑定」：interface_id 必须与平台给该应用绑定的接口一致，以线上下载的生产包为基准反查",
+      "type": "bug",
+      "content": "【什么情况】苏服办开放平台集成打包后报错「相关应用接口未绑定，请检查 interface_id 参数值和 app_id 参数值对应的接口和应用是否已绑定」；代码里明明写着一个看起来正常的 interface_id。\n【为什么】苏服办是「应用 + 接口」两套 ID 体系：`app_id`（本项目是 `fwzlhtba`）与每次调用要带的 `interface_id` 必须在平台上**一一绑定**。本例生产包里取 token 的 `interface_id` 被手工改成了 `getSfbToken2https`，而 `fwzlhtba` 这个应用实际绑定的是 `szfwzlbasfb2https` —— ID 差一个字母组，服务端按「应用+接口」查不到绑定关系，只能报「未绑定」，看起来像平台故障。注意 `getSfbToken2https`（获取苏服办token（租赁一件事）3https）在平台清单里是**另一条独立条目**，名字相近最容易误绑。\n【怎么做】① 排查这类报错的正确基准是**生产在用的包**（用户从线上下载下来的 zip），而不是仓库当前分支的代码——本例正是「以生产包为基准」才发现生产包里的 interface_id 被改过；② 对照平台侧的接口清单核对：清单里每个接口一行（名称、所属应用、协议、状态、更新时间），例如 `getSfbToken2https` 与 `szfwzlbasfb2https` 是两条不同条目；③ 确认 token 接口该用哪一条后，把分支代码改回**平台为该应用绑定的那个 ID**（本例 `szfwzlbasfb2https`），重新打包即可消除报错；④ 顺带核对清单里标「故障」的接口（如房源核验 `szfwzlbacqhyjkhttps`、备案记录列表 `szfwzlbazlbalbhttps`），这类是平台侧故障，不要在前端找原因；⑤ 打包后按优先级验证：苏服办 token → 登录（`app_id=fwzlhtba` 整体可用）→ 房源核验 → 备案记录列表 → 承租人/代理人新增。",
+      "evidence": "会话 fc5779cf（基线 6996f66）用户诉求 1 贴出整份平台接口清单、诉求 3「苏服办 token 应该要用平台上配置的，我今天打包发上去报错了，\"相关应用接口未绑定，请检查 interface_id 参数值和 app_id 参数值对应的接口和应用是否已绑定\"」、诉求 5/6 给出「C:\\Users\\Administrator\\Downloads\\fwzlhtba (1)\\fwzlhtba 这个地址是生产上下载下来的，生产在用的包。以这个为基准」；最终结论「关键修复：苏服办 token 的 interface_id 在生产包里被手工改成了 getSfbToken2https，而 fwzlhtba 应用绑定的是 szfwzlbasfb2https。现在分支代码是正确的原值，重新打包即可消除「相关应用接口未绑定」的报错」。",
+      "files": [
+        "src/api/gateway.js",
+        "src/api/config.js",
+        "src/api/publishHouse.js",
+        "src/pages/leaseContract/addPersonInfo.vue"
+      ],
+      "baseline": "6996f66",
+      "sessionIds": [
+        "session-fc5779cf-f38b-4d8c-858e-292d91e559a9"
+      ],
+      "bundle": "002.md"
+    },
+    {
+      "title": "uni-app 改不了构建输出目录：uni-cli 在 config() 钩子里强制把 build.outDir 覆盖成 dist/{build|dev}/{platform}，只有 CLI 的 --outDir 生效",
+      "type": "fact",
+      "content": "【什么情况】想把 H5 打包产物目录从 `dist/` 改成项目约定的 `fwzlhtba/`（平台按目录名识别应用），改 `vite.config.js` 的 `build.outDir` 无效、设环境变量 `UNI_OUTPUT_DIR` 也无效，产物仍然落在 `dist/build/h5`。\n【为什么】这版 uni-cli 在 `config()` 钩子里**强制覆盖** `build.outDir` 为 `dist/{build|dev}/{platform}`，覆盖发生在用户配置之后，所以写在 vite.config.js 或环境变量里的值直接被盖掉，那两条路根本不起作用。唯一能生效的是 CLI 的 `--outDir` 参数（CLI 层参数，在 config 钩子之后生效）。\n【怎么做】① 只在 **npm scripts** 里传 `--outDir`，不要直接敲 `uni build`：`\"dev\": \"uni --outDir fwzlhtba\"`、`\"build:dev\": \"uni build --mode development --outDir fwzlhtba\"`、`\"build:test\": \"uni build --mode test --outDir fwzlhtba\"`、`\"build\": \"uni build --outDir fwzlhtba\"`；② **dev 脚本不能带 `--outDir`**——该 flag 只对 build 生效，dev 带上会报 `Unknown option`（已知清单里已有同源条目：uni CLI 的 --outDir 只对 build 生效）；③ 同步在 `.gitignore` 里忽略根目录 `/fwzlhtba`；④ vite.config.js 里不要留任何试图改 outDir 的死代码（试过的 `UNI_OUTPUT_DIR`、`build.outDir` 都要回退，避免留下误导后人的无用配置）；⑤ 验证：`npm run build` 与 `npm run build:test` 产物都落在 `fwzlhtba/`，文件内引用为 `./assets/`、`./static/`（相对路径，H5 子目录部署友好），且 test 产物里含测试环境接口 `/api` 以确认 `--mode test` 生效；⑥ 注意三个环境共用同一目录，每次构建会清空，测试包与正式包会互相覆盖，别同时留两份产物。",
+      "evidence": "会话 ab0d5322（基线 6996f66）用户诉求 1「可以把打包的目录生产的目录名称直接改为fwzlhtba」、诉求 4「dist这一次也不要，根目录就是fwzlhtba」；最终结论「vite.config.js：没有改动，尝试过的 UNI_OUTPUT_DIR、build.outDir 方案都被 uni 内部逻辑覆盖，已全部回退，没有留下无用代码」，并强调「请使用 npm 脚本构建（如 npm run build），不要直接执行 uni build，因为直接执行 uni build 仍会输出到 dist/build/h5……这个版本的 uni-cli 会在 config() 钩子里强制把 build.outDir 覆盖成 dist/{build|dev}/{platform}……只有 CLI 的 --outDir 参数能生效」。",
+      "files": [
+        "package.json",
+        "vite.config.js",
+        ".gitignore"
+      ],
+      "baseline": "6996f66",
+      "sessionIds": [
+        "session-ab0d5322-c6f5-44d7-b17e-c89a9bd4b966"
+      ],
+      "bundle": "002.md"
+    },
+    {
+      "title": "证件类型已提交但列表/卡片仍显示「二代居民身份证」：展示层写死文案没走字典翻译，不是保存失败",
+      "type": "bug",
+      "content": "【什么情况】新增承租方时证件类型选了「统一社会信用代码」，保存提示成功，但列表/卡片上仍显示「二代居民身份证」。\n【为什么】不是保存失败——`addPersonInfo.vue` 已经把 `idCardType` 提交到接口了。问题在**展示层**：承租方/出租方卡片、代理人卡片、代理人新增/详情页的顶部信息区把证件类型**写死成「二代居民身份证」**，没有按接口返回的 `idCardType` 去查字典翻译。即使后端存对了，前端也永远显示旧文案，用户看到的现象与「没保存成功」一模一样。（与已知条目「证件校验未分类型致统一信用代码失败」不同：那条是**提交前校验层**按证件类型分流，这条是**展示层**不读字典。）\n【怎么做】① 先分清「读」与「写」两条链路：确认提交体里字段名与接口一致（`idCardType`），再看展示端取的是不是同一个字段——写对了但读错字段 / 读写死文案，是这类「保存了没生效」最常见的根因；② 新增统一的字典翻译入口（本例 `src/utils/dict.js` 的 `getDictLabel`），按字典 `transaction_idNumberType` 取展示文案，并兼容 `001` / `002` 这类带零填充的写法；③ 逐个消费点替换：承租方/出租方卡片 `leaserCard.vue`、代理人卡片 `infoCard.vue`、代理人新增/详情顶部信息区 `addAgent.vue` / `detailAgent.vue`——这几个页面原本既有「字段绑错」又有「写死文案」，要一起改；④ 若改完仍显示 `-`，多半是**列表接口 `lesseeList` 没返回 `idCardType`**，需要后端在列表项里带上该字段——先让用户发一条列表接口返回的承租方 JSON 对字段名，再判断是前端映射还是后端缺字段。",
+      "evidence": "会话 8eb8b2fc（基线 6996f66）用户诉求 1「我新增承租方，选的统一社会信用代码，保存完了还是显示二代居民身份证」；最终结论「原因：不是保存失败。addPersonInfo.vue 里已把 idCardType 提交到接口；问题在**列表/卡片展示**把证件类型写死成了「二代居民身份证」，没有按接口返回的 idCardType 走字典翻译」，并列出 dict.js / leaserCard.vue / infoCard.vue / addAgent.vue / detailAgent.vue 五处改法，以及「若仍显示 -，多半是列表接口 lesseeList 未返回 idCardType，需要后端在列表项里带上该字段」。",
+      "files": [
+        "src/utils/dict.js",
+        "src/pages/leaseContract/components/leaserCard.vue",
+        "src/pages/leaseContract/components/infoCard.vue",
+        "src/pages/leaseContract/addAgent.vue",
+        "src/pages/leaseContract/detailAgent.vue",
+        "src/pages/leaseContract/addPersonInfo.vue"
+      ],
+      "baseline": "6996f66",
+      "sessionIds": [
+        "session-8eb8b2fc-49e0-4dd4-af29-f27328e9f2fc"
+      ],
+      "bundle": "002.md"
+    }
+  ]
+}

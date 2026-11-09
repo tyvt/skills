@@ -1,0 +1,92 @@
+{
+ "project": "惠山二期H5",
+ "batch": "002",
+ "files": [
+  "002.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "跳转第三方灵锡绑定房屋，报错获取灵锡通用户失败，参考",
+   "type": "fact",
+   "content": "已修复回跳问题，主要改了 3 处： ## 原因分析 1. **`backUrl` 地址不对**：之前用固定的 `VITE_BACK_URL`，和微信小程序 webview 里实际打开的 H5 地址可能不一致，第三方授权完成后跳不到正确页面。 2. **`authCode` 没解析到**：只从 `options.query.authCode` 取值，H5 回跳时 `authCode` 往往在 URL 的 search 或 hash 里，导致绑房逻辑没执行。 3. **登录态被清空**：回跳时 `userStore.clear()` 把 token 清掉了，绑房接口需要 token，绑定会静默失败。 ## 修改内容 1. **`backUrl` 改为当前 webview 实际地址**（与跳转前页面一致） 2. **从完整 URL 解析 `authCode`**，并在 `onLaunch` + `onShow` 都处理 3. **绑房回跳时保留登录态**，不再 `clear()` 4. **绑房成功后 `navigateBack()`**，关闭 `externalWebview` 回到原来的 H5 页面 5. **增加 `[灵锡回调]` / `[灵锡绑房回跳]` 日志**，方便排查 ## 请再测一遍 授权完成后看控制台是否有： ``` [灵锡回调] { authCode: \"xxx\", ",
+   "evidence": "extracted source=cursor project=惠山二期H5",
+   "files": [
+    "涉及文件：d:\\repository\\惠山二期H5、d:\\repository、d:\\repository\\惠山二期H5\\.gitmodules、d:\\repository\\惠山二期H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\components\\AddHouseDialog\\AddHouseDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b9f46e5c-31b8-4bcb-a8ee-185ec72988e3"
+   ],
+   "_draft": true,
+   "project": "惠山二期H5"
+  },
+  {
+   "title": "C端点击业主决策，然后绑定房屋成功后，没有进入到业主",
+   "type": "preference",
+   "content": "## 原因 绑房流程里一开始就调用了 `uni.showLoading('加载中...')`，而 `uni.hideLoading()` 写在 `finally` 里，要等「授权成功」弹窗点「确定」、整个 `try` 跑完才执行。所以弹窗出现时 loading 还在，看起来就像授权成功和 loading 叠在一起。 ## 修改 在 [`lingxi.js`](zhi2-mobile-admin-h5-c-unlimited/src/utils/lingxi.js) 的 `handleLingxiHouseBind` 中： 1. **`syncHouseInfoAfterLogin` 完成后、弹出「授权成功」之前** 先 `uni.hideLoading()` 2. 弹窗 **success / fail** 里再各调一次 `hideLoading()`，避免 H5 偶发计数未清干净 请再跑一遍：绑房回跳 → 应只看到「授权成功」，不应再挡一层「加载中…」。若点「确定」后仍卡住，说一下是停在首页还是已进决策列表。",
+   "evidence": "extracted source=cursor project=惠山二期H5",
+   "files": [
+    "[`lingxi.js`](zhi2-mobile-admin-h5-c-unlimited/src/utils/lingxi.js",
+    "涉及文件：d:\\repository\\惠山二期H5、d:\\repository\\惠山二期H5\\zhi2-mobile-admin-h5-c-unlimited、d:\\repository\\惠山二期H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages\\index\\property.vue、d:\\repository\\惠山二期H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages\\index\\newHome.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3bff59f9-fd94-464f-9554-03d4c45d556e"
+   ],
+   "_draft": true,
+   "project": "惠山二期H5"
+  },
+  {
+   "title": "http://unlimited.c.h5.shim",
+   "type": "bug",
+   "content": "原因主要有两点： 1. **列表接口**返回的往往是 `decisionRangeId`，而跳转只认 `rangeId`，导致 URL 里没有范围 ID。 2. **「我的决策」页**若路由未带 `rangeId`，请求里 `decisionRangeId` 为空，部分请求层还会直接去掉该字段。 ### 已做修改 1. **`src/utils/decisionRange.js`**（新建） - `pickRangeIdFromRow`：从列表行解析 `rangeId` / `decisionRangeId` / `decisionRangeIds[0]` - `resolveDecisionRangeId`：路由没有时，调用 `listDecisionRangeId`（与提交投票一致） 2. **`decision/index.vue`、`elect/index.vue`** - 列表映射时统一写入 `rangeId` - 点「我的决策」时把 `rangeId` 带到 URL 3. **各 `DecisionResult.vue`（common / optional / sort / elect）** - 请求前先 `resolveDecisionRangeId`，保证 `getMaintainResult` 带上有效的 `decisionRangeId` 请重新编译/刷新后再测",
+   "evidence": "extracted source=cursor project=惠山二期H5",
+   "files": [
+    "**`src/utils/decisionRange.js",
+    "**`decision/index.vue`、`elect/index.vue",
+    "`DecisionResult.vue",
+    "涉及文件：d:\\repository\\惠山二期H5、d:\\repository\\惠山二期H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\api\\autonomy.js、d:\\repository\\惠山二期H5\\zhi2-mobile-admin-h5-c-unlimited、d:\\repository\\惠山二期H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_owner\\decision\\common\\DecisionResult.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b9ce83c8-a16e-4596-bbae-d3dae7830525"
+   ],
+   "_draft": true,
+   "project": "惠山二期H5"
+  },
+  {
+   "title": "该项目嵌入app，不要显示navbar",
+   "type": "preference",
+   "content": "**结果**：已在 `pages.json` 的 `globalStyle` 里用 `// #ifdef H5` 设置 `navigationStyle: \"custom\"`，H5 嵌入 App 时不再显示 uni 顶部系统标题栏；微信小程序不受影响，仍用系统导航栏。 **验证**：本地 H5 开发环境下首页、公示公告页均无 `uni-page-head`，内容顶对齐正常；预处理也确认 MP 不会带上该配置。未改 `App.vue`（本地已无顶栏 DOM）。 真机 WebView 若仍看到顶栏，可再加 `uni-page-head` 的 CSS 兜底。",
+   "evidence": "extracted source=cursor project=惠山二期H5",
+   "files": [
+    "`pages.js",
+    "`App.vue",
+    "涉及文件：d:\\repository\\惠山二期H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ae3e9a2e-1891-46ba-9857-c8b59c4713e9"
+   ],
+   "_draft": true,
+   "project": "惠山二期H5"
+  },
+  {
+   "title": "测试环境开启第三方登录",
+   "type": "bug",
+   "content": "已在测试环境开启第三方登录（灵锡），改动如下： ## 1. 环境变量 在三个环境文件中新增 `VITE_APP_OUT_LOGIN` 开关： | 环境 | 值 | 说明 | |------|-----|------| | `.env.test` | `true` | 测试环境开启第三方登录 | | `.env.development` | `false` | 本地开发仍用账号密码登录 | | `.env.production` | `true` | 生产环境开启第三方登录 | ## 2. 逻辑调整（`src/utils/lingxi.js`） - 新增 `isOutLoginEnabled`，读取 `VITE_APP_OUT_LOGIN` - 调整 `skipLingxiHouseAuthInTest`： - **之前**：测试、开发环境都跳过灵锡房屋授权 - **现在**：仅在「未开启第三方登录」且为开发环境时跳过 测试环境打包后（`npm run test`）将走完整灵锡流程： - 带 `requestCode` 回跳时自动登录（`initLingxiOnLaunch`） - 业主决策等入口会校验灵锡房屋授权 - 添加/绑定房屋会跳转第三方授权页 重新打包测试环境后即可验证。若还需要在测试环境里保留浏览器账号密码登录作为备用，可以说一下，我可以再加兼容逻辑。",
+   "evidence": "extracted source=cursor project=惠山二期H5",
+   "files": [
+    "逻辑调整（`src/utils/lingxi.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0f545aba-3c46-42a6-8e9b-1967f22cd702"
+   ],
+   "_draft": true,
+   "project": "惠山二期H5"
+  }
+ ],
+ "_draft": true
+}

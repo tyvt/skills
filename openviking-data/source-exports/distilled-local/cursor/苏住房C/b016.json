@@ -1,0 +1,113 @@
+{
+ "project": "苏住房C",
+ "batch": "016",
+ "files": [
+  "016.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "用的哪个接口",
+   "type": "preference",
+   "content": "已完成。首页现在也会拉取绑定小区，并在无缓存时默认选中第一个。 ## 改动说明 1. **新增公共 hook** `src/hooks/useBoundProjects.js` - 调用 `listComplexCommunitySubdistrictByToken` 获取业主绑定的小区列表 - 当 `userStore.project` 为空（无缓存）且列表有数据时，自动选中第一个小区 - 慧物业页的小区切换逻辑也一并收进该 hook 2. **首页** `Home_Suzhufang.vue` - 在 `onShow` 中，用户已登录时调用 `loadBoundProjects()` 3. **慧物业页** `Property_Suzhufang.vue` - 改为复用同一 hook，避免两处逻辑不一致 ## 逻辑 ``` 用户已登录 → 请求绑定小区列表 → 有小区 && userStore.project 为空 → 默认第一个小区 → userStore.project 已有值（本地缓存）→ 不覆盖，保留用户上次选择 ``` 这样从首页进入「业主倡议」等功能时，`userStore.project` 会有值，列表接口也能正常带上小区信息。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`src/hooks/useBoundProjects.js",
+    "`Home_Suzhufang.vue",
+    "`Property_Suzhufang.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\propose\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\autonomy.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\menuRouteMap.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "975a7c63-ba48-4d7b-a799-8262cfc26787"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "我的-我的房屋，历史添加记录，缺少样式，前往添加页面",
+   "type": "fact",
+   "content": "已修复「我的房屋」相关页面的样式问题，原因和改动如下。 ## 问题原因 8 月重构时做了两处变更，导致小程序端样式失效： 1. **历史添加记录 / 顶部背景**：`house/index.vue` 把 CSS 背景图改成了内联 `:style` 绑定（`backgroundImage: url(...)`），微信小程序对此支持不好，城市剪影背景和白色胶囊底图无法显示。 2. **前往添加（选择身份）页**：`TypeChoose_Suzhufang.vue` 重构时移除了 `ZsNav` 自定义导航栏，蓝色弧形表头背景也未正确渲染。 ## 修复内容 ### 1. `house/index.vue`（我的房屋列表） - 顶部「前往添加」区域：用 `PageBg` 加载 `Bg-szf.png` 城市背景 - 「历史添加记录」区域：用 `PageBg` 加载 `history-szf.png` 白色胶囊底图 ### 2. `TypeChoose_Suzhufang.vue`（选择身份 / 前往添加） - 恢复 `ZsNav` 透明导航栏，标题「选择身份」，白色文字 - 用 `PageBg` 加载蓝色弧形 `Bg.svg` 表头背景 ### 3. `tenant/index.vue`（租客管理，同步修复） - 与房屋列表页采用相同的 `PageBg` 方案 请重新编译小程序后验证： -",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "顶部背景**：`house/index.vue",
+    "**前往添加（选择身份）页**：`TypeChoose_Suzhufang.vue",
+    "`house/index.vue",
+    "`TypeChoose_Suzhufang.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "41740334-7cda-42d7-b1c3-97712e6c8e6a"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏找房页面的房源图片还是有出现空白的情况",
+   "type": "bug",
+   "content": "主包构建失败是因为**上传预估体积超过 2048KB 限制**（2057.4KB）。 ## 原因 上次为修复图片空白，把 `images/szf/default.png`（约 16KB）加入了主包白名单 `MAIN_STATIC_PATHS`，导致该文件无法被 `prune-main-static.mjs` 裁剪，主包上传预估刚好超限约 9KB。 ## 已做调整 1. **从 `MAIN_STATIC_PATHS` 移除** `default.png`，恢复主包裁剪 2. **删除** `src/static/images/szf/default.png` 主包副本（分包 `pages_transaction` 中仍保留） 3. **恢复 `houseCard` 的 `subpackage=\"pages_transaction\"`**，兜底图从分包加载 4. **保留**之前的图片修复：`ZsImage` 的 `:key` 刷新、thumbnail 字段映射补全 5. **保留** `pages.json` 中苏找房 Tab 预加载 `pages_transaction` 的配置 ## 验证结果 裁剪后主包体积： - 磁盘：**1742.2KB** ✓ - 上传预估：**2038.4KB** ✓（低于 2048KB 限制） 可以重新执行 `npm run build`，构建应能通过",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`pages.js",
+    "涉及文件：D:/repository/苏住房C、d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "dbea5b5a-3444-443d-a782-07bd1b65d66e"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "人工登记弹窗入口修复计划 Implement the",
+   "type": "preference",
+   "content": "人工登记弹窗修复已完成，变更摘要如下： ## 根因与修复 核验失败时，全局 HTTP 拦截器会先弹出 Toast 并 `reject`，页面里的 `showPopup = true` 无法执行，因此看不到「人工登记」弹窗。 ## 主要改动 **1. API 层** - [`httpInstance.js`](zhi2-mobile-shimin/src/api/httpInstance.js)：`noReject` 分支改为直接 `return response`，避免 Promise 嵌套导致响应解析异常 - [`property.js`](zhi2-mobile-shimin/src/api/property.js)：`handleHouseOwner` 默认带上 `noReject: true`，由页面自行处理业务错误 **2. 合同/产证添加页（核心修复）** - [`addHouseContract.vue`](zhi2-mobile-shimin/src/pages_owner/house/owner/addHouseContract.vue)：`ZsPopup` 移到页面根级；抽取 `handleVerifyResult`；增加 `.catch()` 兜底；部分成功场景与 `addHouse.vue` 对齐（走成功提示弹窗）；补充 `z-index: 9999` - ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "[`httpInstance.js`](zhi2-mobile-shimin/src/api/httpInstance.js",
+    "[`property.js`](zhi2-mobile-shimin/src/api/property.js",
+    "[`addHouseContract.vue`](zhi2-mobile-shimin/src/pages_owner/house/owner/addHouseContract.vue",
+    "`addHouse.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0e3de74d-cc4d-4e34-8770-dd23e2757471"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已改好。给 page 设置了灰色背景，并让 .con",
+   "type": "bug",
+   "content": "已改好。给 `page` 设置了灰色背景，并让 `.container` 使用 `min-height: 100vh` 铺满整页，下方空白区域现在会和上方一样是统一的浅灰背景色。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\elect\\ResultRecord.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\common\\DecisionResult.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\common\\DecisionRecord.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2e60e0b3-4f6b-4a34-b5c3-c0b8ef4fd6f8"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "这个功能使用“无锡市区小程序嵌入H5”这个项目里面的",
+   "type": "fact",
+   "content": "已完成提交、推送，并合并到 sfb 相关分支。摘要如下： ### 子模块 `zhi2-mobile-shimin` | 分支 | 提交 | 说明 | |------|------|------| | `suzhou-shiqu-suzhufang-main-v2.1` | `4e9e7465` | feat(benefit): 同步无锡市区版本的小区资产公示页面 | | `sfb` | `fa4a1fe2` | 合并上述更新（保留 sfb 网关相关 `httpInstance.js` / `gateway.js`） | 合并 `sfb` 时 `httpInstance.js` 与 `gateway.js` 有冲突，已按 sfb 分支的网关配置保留。 ### 父仓库 `苏住房C` | 分支 | 提交 | 说明 | |------|------|------| | `suzhou-shiqu-suzhufang-main-v2.1` | `c25c4cf` | 子模块引用更新至 `4e9e7465` | | `dev-sfb` | `0596619` | 合并主分支更新，子模块引用至 `fa4a1fe2`（sfb 合并提交） | 当前工作区已干净，所在分支为 `suzhou-shiqu-suzhufang-main-v2.1`。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`httpInstance.js",
+    "`gateway.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_benefit\\assetsPublicity\\index.vue、d:\\repository、d:\\repository\\无锡市区小程序嵌入H5、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_benefit\\assetsPublicity\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9a5cf993-2e96-4283-bc23-24c947b70b34"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

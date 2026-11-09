@@ -1,0 +1,386 @@
+{
+ "project": "门户",
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md"
+ ],
+ "count": 21,
+ "memories": [
+  {
+   "title": "门户首页卡片丝带标题被裁半：card-header 的 overflow:hidden 与白底 card-body 叠层",
+   "type": "bug",
+   "content": "门户首页（index-new 类卡片）出现标题「贴底、只剩一半字」时，优先查 `.card-header` 是否 `overflow: hidden`：丝带区标题伸出 header 盒外会被裁切，再叠上 `.card-body` 白底会像被内容区盖住。修复套路：`.card-header` 改为 `overflow: visible` 并抬高 `z-index`（如 3）；`.card-header-tab` 用不对称内边距把字收进丝带厚区；`.card-header-text` 可用 `translateY(dw(-3))` 微调垂直位置；`.card-body` 恢复四边 padding 与标题区留白。验收可在 Playwright 断言「标题文字完整落在 header 盒内」。",
+   "evidence": "会话 36da1bfd 最终结论：原因 `.card-header` 用了 `overflow: hidden`，叠上 `card-body` 白底后标题下半截被裁掉；已改 overflow:visible、z-index:3、tab 内边距 4/14/11、translateY(dw(-3))、card-body padding dw(14)；Playwright 加 header 盒内断言 2 passed。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue",
+    "zhi2-web-admin/tests/e2e"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "36da1bfd-d85e-47d1-a0e0-3a2d922f74ca"
+   ],
+   "bundle": "001.md",
+   "project": "门户"
+  },
+  {
+   "title": "Vite 开发环境（hash 路由）用 window.open 打开 public 下 PDF 会落到 index.html",
+   "type": "bug",
+   "content": "门户 UnifiedLogin 等 hash 路由页面里，直接 `window.open('/assets/files/xxx.pdf')` 在 Vite dev（如 8082）常被当成 SPA 导航，回 index.html 并带上 `#/UnifiedLogin?redirect=...`，页面上像「打开了门户而不是 PDF」；同路径 `fetch` 却能拿到 `content-type: application/pdf`。修复：先 `fetch` PDF → `URL.createObjectURL` 在新标签打开；弹窗被拦则在当前页用 blob 打开，不要回退到静态路径导航。E2E 可断言响应为 application/pdf、当前 hash 路由未误开弹层。",
+   "evidence": "会话 b92385ab：用户反馈点击预览仍是页面；根因 Vite 下 window.open 按页面导航处理；fetch 同路径为 application/pdf；改为 fetch+blob URL，unified-login-visual.spec.ts 6/6 通过。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/pages/InformationPages.vue",
+    "zhi2-web-admin/tests/e2e/unified-login-visual.spec.ts"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "b92385ab-4138-464e-904b-5e1850ffa89d"
+   ],
+   "bundle": "001.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户 publicPortal 详情弹窗统一 PortalDetailHeader/Footer 与标签列宽",
+   "type": "pattern",
+   "content": "首页「开业信息公示」等 publicPortal 弹窗不要各写一套 header/footer：抽 `PortalDetailHeader`（标题左对齐、灰底、高 57px）与 `PortalDetailFooter`（按钮居右、80×40、距右 40px）。字段区：长地址等应独占一行；标签列宽按「该列最长标签」定宽，标签与值间距统一 12px（避免第一列标题与值间距过大）。样式收敛在 `portal.scss`，去掉与公共组件重复的标题栏规则，并修正正文 padding 重复叠加。改 DOM 后同步 `public-portal-interactions.spec.ts` 回归。",
+   "evidence": "会话 session_bcf22123：用户要求地址单独一行、标签值间距过大、首页弹窗排查 header/footer；交付 RentalDetailDialog 改布局、新增 PortalDetailHeader/Footer、portal.scss 去重、更多/公告弹窗改用公共 header；e2e 与 build 通过。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/components/RentalDetailDialog.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PortalDetailHeader.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PortalDetailFooter.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/portal.scss",
+    "zhi2-web-admin/tests/e2e/public-portal-interactions.spec.ts"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "session_bcf22123674b5cdf5bb7fdb1484b1568"
+   ],
+   "bundle": "001.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户操作指引页视觉回归：独立 Playwright 配置 + 设计图 fixtures + 区域掩膜",
+   "type": "workflow",
+   "content": "操作指引多页按设计稿验收时：设计 PNG 入库 `tests/e2e/fixtures/operation-guide-designs/`，跑 `npm run test:e2e:operation-guide`（`playwright.operation-guide.config.ts`，视口 1920×1080、DPR 2）。与既有 public-portal 一致：设计图 Lanczos 缩到 CSS 尺寸，截图 ÷2 后 pixelmatch（threshold=0.1、includeAA=false），相似度门槛 95%。Banner 插画未定稿时，顶栏与 Banner 区在设计图与截图两侧同时置白，避免插画差异污染 UI 比对；备案查询页淡蓝插画可按浅蓝规则归一化为白。`heightDelta` 为负常是设计画布底部留白，页面不补该留白。轮播图后续替换 `public/assets/images/operationGuide/banner_*.jpg` 或 `config/operationGuideBanners.js` 追加 `{ src }`。",
+   "evidence": "会话 session_e82fa10a：9 张设计图视觉比对均 ≥95%，16 用例全过；文档写明 Lanczos、pixelmatch 参数、Banner 掩膜、heightDelta 含义及 banner/content 配置入口。",
+   "files": [
+    "zhi2-web-admin/playwright.operation-guide.config.ts",
+    "zhi2-web-admin/tests/e2e/fixtures/operation-guide-designs",
+    "zhi2-web-admin/config/operationGuideBanners.js",
+    "zhi2-web-admin/config/operationGuideContent.js",
+    "zhi2-web-admin/public/assets/images/operationGuide"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "session_e82fa10a2d53a413d9975e6ae6524bd0"
+   ],
+   "bundle": "001.md",
+   "project": "门户"
+  },
+  {
+   "title": "公共门户二级页骨架屏：PortalSkeleton 多版式 + PortalDialogHost 最短展示与竞态丢弃",
+   "type": "pattern",
+   "content": "门户对外首页（UnifiedLogin + publicPortal）为约 24 个二级页提供加载骨架，核心是单组件 `PortalSkeleton.vue` 按真实版式输出占位（会话中落地 15 种版式：列表类、公告正文、汇总、合同查询、楼幢/楼盘表网格、机构/经纪人基本信息等），`PortalDialogHost.vue` 在二级页切换时展示骨架并复用 `@/utils/loading.js` 的最短展示时长（600ms），用递增 token 丢弃被后一次切换覆盖的异步等待，避免闪屏与错乱。叠加打开的详情弹窗不应再次触发二级页骨架。验收时在同一视口（如 1920×1080）逐页比对骨架与真实页总高度，目标误差约 ≤3px，避免揭开时跳版。配套 e2e：`tests/e2e/public-portal-skeleton.spec.ts`（版式归属、直刷二级路由不出现首页骨架、高度一致、下钻切换版式、详情弹窗不重复加载）。",
+   "evidence": "「PortalSkeleton.vue：…共 15 种版式」「最短展示 600ms（复用 @/utils/loading.js），并用 token 丢弃被后一次切换覆盖的等待」「叠加详情弹窗不触发骨架屏」「每个版式的骨架屏高度与真实页面实测高度误差都在 3px 以内」「public-portal-skeleton.spec.ts 4 项用例全部通过」",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/components/PortalSkeleton.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue",
+    "zhi2-web-admin/src/utils/loading.js",
+    "zhi2-web-admin/tests/e2e/public-portal-skeleton.spec.ts"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "session_8fedec701ebfbbfa2d3c0a93a4c98a27"
+   ],
+   "bundle": "002.md",
+   "project": "门户"
+  },
+  {
+   "title": "直刷 ?portal= 二级路由时跳过首页骨架，只展示该页二级骨架",
+   "type": "workflow",
+   "content": "用户直接刷新带门户查询参数的 URL（如 `?portal=projects`）时，不应先闪对外首页骨架再进入二级页。做法：抽出 `portalRoutes.js` 集中二级页标题/路由表，`UnifiedLogin.vue` 在初始路由已指向二级页时跳过首页级骨架，由 `PortalDialogHost` 只展示与该 `portal` 值匹配的二级页骨架版式。改二级页清单或直链入口时须同时核对路由解析与 skeleton 版式映射。",
+   "evidence": "「portalRoutes.js（新文件）+ UnifiedLogin.vue：…首页在路由本身就是二级页时跳过首页骨架屏——直接刷新 ?portal=projects 这类地址现在只会看到该页对应的二级页骨架屏」",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/portalRoutes.js",
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "session_8fedec701ebfbbfa2d3c0a93a4c98a27"
+   ],
+   "bundle": "002.md",
+   "project": "门户"
+  },
+  {
+   "title": "二级页骨架屏只盖住将来走接口的区域，静态搜索区与表头不骨架",
+   "type": "preference",
+   "content": "公共门户二级页骨架屏范围：仅「将来会动态拉数」的区域需要占位（表格 tbody、表单字段值区等）；搜索条件、表头等静态结构不要套骨架，否则噪音大且与产品预期不符。首页级骨架屏策略单独维护，调整二级页骨架时不要误改首页骨架。表格/表单区若接口未接好导致看不到骨架，应检查加载态是否绑在数据区组件上而非整页。",
+   "evidence": "「只有将来需要动态获取数据的位置才需要加骨架屏。首页的骨架屏不需要调整」「表格和表单的数据将来肯定是要从接口获取数据的，这一块加上就行了，搜索条件，表格的表头这些不需要加」「二级页面顶部的图片也要纳入骨架屏，不然页面会有弹跳」",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/components/PortalSkeleton.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PortalTable.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/pages/InformationPages.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/pages/RentalPages.vue"
+   ],
+   "baseline": "fd9ef3e",
+   "sessionIds": [
+    "01a1626e-5d09-70c5-a400-7518fbdd30f5"
+   ],
+   "bundle": "002.md",
+   "project": "门户"
+  },
+  {
+   "title": "banner 骨架被 .portal-skeleton-bar 盖掉 absolute 导致加载后高度差约 22px 弹跳",
+   "type": "bug",
+   "content": "二级页顶部城市 banner 骨架若同时挂 `portal-skeleton-bar` 与 `portal-banner-skeleton`，后者先设 `position: absolute`，但全局 `.portal-skeleton-bar { position: relative; height: 22px }` 会覆盖绝对定位，骨架落入文档流（约 22px 块叠在 165px 图下 → 总高 187px），骨架消失后回到 165px，标题栏上移出现缝隙。修复：在 `portal.scss` 中于 `.portal-skeleton-bar` 规则之后增加更高优先级选择器，例如 `.portal-city-banner-box .portal-banner-skeleton { position: absolute; inset: 0; height: auto; border-radius: 0; }`，使加载前后 banner 区高度一致。",
+   "evidence": "「后者先写了 position: absolute，但后面表格骨架的 .portal-skeleton-bar { position: relative; height: 22px } 把绝对定位盖掉了」「加载时…总高 187px；骨架消失后只剩图 → 165px」「修复前 bannerH 187 → 165；修复后加载中与加载完成一致」",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/portal.scss",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PortalSkeleton.vue"
+   ],
+   "baseline": "fd9ef3e",
+   "sessionIds": [
+    "01a1626e-5d09-70c5-a400-7518fbdd30f5"
+   ],
+   "bundle": "002.md",
+   "project": "门户"
+  },
+  {
+   "title": "对外首页顶部卡片「操作指引」箭头在 UnifiedLogin，勿改 OperationGuideBody",
+   "type": "bug",
+   "content": "用户说的「首页操作指引箭头」指 `UnifiedLogin.vue` 顶部三张卡片行内的指引图标（约第 41 行：`icon_guide_arrow.svg` → `icon_guide_arrow.gif`），不是 `operationGuide` 详情页里的 `OperationGuideBody.vue` 内部箭头。动效资源放 `public/assets/images/UnifiedLogin/`。误改详情页后应 checkout 还原详情组件，避免两套入口图标不一致。",
+   "evidence": "「替换的有问题吧？是替换首页的操作指引箭头」「首页顶部三张卡片的“操作指引”箭头（UnifiedLogin.vue 第 41 行）」「OperationGuideBody.vue 已 git checkout 还原（操作指引详情页内部的箭头保持原来的 svg 不动）」",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "zhi2-web-admin/public/assets/images/UnifiedLogin/icon_guide_arrow.gif",
+    "zhi2-web-admin/src/views/home/operationGuide/components/OperationGuideBody.vue"
+   ],
+   "baseline": "fd9ef3e",
+   "sessionIds": [
+    "01a1620f-ed3c-7393-a93b-aa8f6ad5c94a"
+   ],
+   "bundle": "002.md",
+   "project": "门户"
+  },
+  {
+   "title": "登录后 B 端门户首页三皮肤：resolveHomeLayoutVariant 与 mock e2e 注入态",
+   "type": "fact",
+   "content": "门户仓库 `zhi2-web-admin`（Vue 2.7 + Vite + Element UI，npm workspace 根在 `门户/`）登录后工作台首页（`index-new.vue` + `homeLayout.js`）按 `resolveHomeLayoutVariant({ terminalType, isSuperAdmin, bizSectionCodes })` 切 `admin` / `developer` / `broker` 三套布局；非超管 B 端设计稿无侧栏时配合 `hideLayoutChrome`。门户接口前缀 `/api/v3.0/portal/**`（PORTAL_BASE_URL），响应 `{code:200, msg, data|rows|total}`，HTTP 404 静默 reject，其它错误走 showErrorDialog。Playwright 可绕过登录表单：sessionStorage 注入 `Admin-Token`（utils/auth.js）与 `Portal-UserId`（utils/portalUserContext.js），用 mock 跑 `portal-home-visual.spec.ts` 等。设计稿缺图时只留占位、不要自绘素材。",
+   "evidence": "「三布局变体：admin / developer / broker，由 resolveHomeLayoutVariant 决定」「hideLayoutChrome：非超管 B 端用户隐藏侧边栏」「门户 API 走 /api/v3.0/portal/**」「HTTP 404 静默 reject」「sessionStorage Admin-Token + Portal-UserId」「需要图片素材的部分先空着，不要自己绘制图片」",
+   "files": [
+    "zhi2-web-admin/src/views/home/config/homeLayout.js",
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+    "zhi2-web-admin/src/views/home/index-new.vue",
+    "zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts",
+    "zhi2-web-admin/src/utils/auth.js",
+    "zhi2-web-admin/src/utils/portalUserContext.js"
+   ],
+   "baseline": "a1e5beb",
+   "sessionIds": [
+    "ca2d1b01-7b20-4144-be0e-885935ebf70b"
+   ],
+   "bundle": "002.md",
+   "project": "门户"
+  },
+  {
+   "title": "Playwright 全局 **/api/** 路由会误拦 Vite 的 /src/api/*.js 模块请求",
+   "type": "bug",
+   "content": "在 Vite dev 下为门户首页 e2e 注册 Playwright `page.route` mock 时，catch-all 模式如 `**/api/**` 会匹配并拦截浏览器对 `/src/api/*.js` 源码模块的请求（路径中含 `api` 子串），导致页面白屏或接口层未加载。应收窄 route glob 到真实后端前缀（如 `/api/v3.0/portal/**`），并记住后注册 route 优先生效，避免用过于宽泛的 API 通配。",
+   "evidence": "「Playwright route 匹配为后注册优先；catch-all glob **/api/** 会误杀 Vite dev 的 /src/api/*.js 模块请求」",
+   "files": [
+    "zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts",
+    "zhi2-web-admin/playwright.config.ts"
+   ],
+   "baseline": "a1e5beb",
+   "sessionIds": [
+    "ca2d1b01-7b20-4144-be0e-885935ebf70b"
+   ],
+   "bundle": "002.md",
+   "project": "门户"
+  },
+  {
+   "title": "Element 表格固定列会使 .el-table__row 行数在 e2e 中翻倍",
+   "type": "fact",
+   "content": "门户首页待办等使用 `el-table` 固定列时，DOM 会复制固定列对应的行节点，用 `document.querySelectorAll('.el-table__row')` 计数会得到约 2× 实际数据行数。编写 Playwright 断言行数、斑马纹或可见行时应按业务行数断言（mock 数据条数、tbody 主表行、或 data 属性），不要直接数全局 `.el-table__row`。",
+   "evidence": "「el-table 固定列会复制行（.el-table__row 计数翻倍）」",
+   "files": [
+    "zhi2-web-admin/src/views/home/components/HomeTodoTable.vue",
+    "zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts"
+   ],
+   "baseline": "a1e5beb",
+   "sessionIds": [
+    "ca2d1b01-7b20-4144-be0e-885935ebf70b"
+   ],
+   "bundle": "002.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户非管理端禁止调 operableProjectList 且不展示侧边栏",
+   "type": "workflow",
+   "content": "zhi2-web-admin 登录后按门户/企业类型渲染首页时：除「管理端」外，其它类型（如开发企业）不应请求 operableProjectList，也不应展示左侧业务侧边栏。误调该接口或沿用管理端布局会导致角色判断错误、多余接口与错误 chrome。改角色/布局逻辑时先核对账号类型分支，再决定是否挂载侧边栏与项目列表接口。",
+   "evidence": "用户明确要求「operableProjectList 这个接口不需要调用，除了管理端，其他类型都不需要展示侧边栏」；同会话先用开发企业账号反馈「目前判断的角色不对」。",
+   "files": [
+    "zhi2-web-admin/src/utils/portalLayout.js",
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+    "zhi2-web-admin/src/views/home/config/homeLayout.js",
+    "zhi2-web-admin/src/router/index.js"
+   ],
+   "baseline": "ac6513b",
+   "sessionIds": [
+    "b723bff2-01cd-4334-975a-a2a40778f1a2"
+   ],
+   "bundle": "003.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户首页底栏待办与公告左右底对齐：stretch 行高 + flex:1 卡片",
+   "type": "pattern",
+   "content": "UnifiedLogin/首页底部双栏要对齐左右卡片下沿、又不能把整页撑到过高时：外层行用 align-items: stretch，行高取左右内容较大值（不要用 min-height:100vh 撑满视口）。左侧业务区固定高度，待办区 flex:1 向下拉长且表格 fill-height；右侧用户卡与常用功能保持 height:auto，公告区 flex:1 占剩余高度并在卡片内滚动。避免常用功能块过高把公告挤出视口。",
+   "evidence": "会话结论：底部双栏 align-items: stretch；待办 flex:1、公告 flex:1；常用功能 height:auto；「待办卡片下沿会和公告卡片下沿对齐，一侧更高时另一侧跟着补高」，并修复「高度太高把公告挤下去」「右边下边框看不见」等反馈。",
+   "files": [
+    "zhi2-web-admin/src/utils/portalLayout.js",
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+    "zhi2-web-admin/src/views/home/config/homeLayout.js"
+   ],
+   "baseline": "ac6513b",
+   "sessionIds": [
+    "b723bff2-01cd-4334-975a-a2a40778f1a2"
+   ],
+   "bundle": "003.md",
+   "project": "门户"
+  },
+  {
+   "title": "public-portal 像素回归：npm run test:e2e:public-portal 与 95%/85% 双门槛",
+   "type": "fact",
+   "content": "房产综合服务平台对外门户（src/views/home/publicPortal/）的视觉验收以 npm run test:e2e:public-portal 为准（Playwright + Pillow + pixelmatch）。非弹窗页面态整体相似度门槛 95%；公司/许可等详情弹窗态单独按 modal ≥85% 判定。夹具 tests/e2e/fixtures/public-portal-designs.ts 的 PORTAL_DESIGNS 与设计目录 PNG 按索引一一对应；改 UI 后需同步修正夹具中的几何、grid 类型与显式下限，而非只改页面。",
+   "evidence": "任务说明写明「UI 区域门槛 95%，公司/许可详情弹窗门槛 85%」；run8 结论「13 个非弹窗态 ≥95%、3 个详情弹窗 ≥85%」；改动含 public-portal-designs.ts 与 public-portal-visual.spec.ts。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/fixtures/public-portal-designs.ts",
+    "zhi2-web-admin/tests/e2e/public-portal-visual.spec.ts",
+    "zhi2-web-admin/playwright.public-portal.config.ts",
+    "zhi2-web-admin/scripts/portal-visual-reference.py"
+   ],
+   "baseline": "be0bc4eaa",
+   "sessionIds": [
+    "2bcfc14a-d4b3-4c95-bd2c-a5ae8c791258"
+   ],
+   "bundle": "003.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户视觉比对：设计稿头部 1px 裁切伪影用夹具 masks 屏蔽",
+   "type": "bug",
+   "content": "public-portal 视觉失败若集中在设计 PNG 头部色块最底 1px 白边，而实机渲染为纯色底：先按像素坐标确认是否为切图伪影（多索引同源）。属伪影时在 public-portal-designs.ts 对该行加 masks（比对双方同置白）通过门槛，不要为通过测试去改 UI 色值。本会话索引 12 头部 94.07%→95.58% 即如此修复。",
+   "evidence": "最终结论：「设计稿头部切片在 66px 绿底最底行（全图 y=111）带 1px 白边裁切伪影……在夹具对该 1px 行加 masks 屏蔽（双边同置白，不改 UI）」。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/fixtures/public-portal-designs.ts"
+   ],
+   "baseline": "be0bc4eaa",
+   "sessionIds": [
+    "2bcfc14a-d4b3-4c95-bd2c-a5ae8c791258"
+   ],
+   "bundle": "003.md",
+   "project": "门户"
+  },
+  {
+   "title": "新设计稿 PNG 张数与 PORTAL_DESIGNS 不一致时的对接",
+   "type": "workflow",
+   "content": "仓库视觉底座默认要求设计目录恰好 24 张 PNG、按文件名 Unicode 排序并与 PORTAL_DESIGNS 24 条逐条对应。新版设计仅 20 张时不能只替换下载目录：需通过 portal-visual-reference.py 等生成 hybrid 参考、更新夹具索引/几何，并在报告中记录「忽略的旧变体」；未改 mock、路由与原始下载目录。对齐任务前应快照分支便于回滚。",
+   "evidence": "任务章节「关键：测试底座 24-vs-20 的对接」；交付报告含「忽略的 10 个旧变体」与 portal-visual-reference.py；新版 20 张、旧版 24 张路径并列说明。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/fixtures/public-portal-designs.ts",
+    "zhi2-web-admin/scripts/portal-visual-reference.py",
+    "zhi2-web-admin/test-results/portal-design-sync-report.md"
+   ],
+   "baseline": "2785dd9",
+   "sessionIds": [
+    "2bcfc14a-d4b3-4c95-bd2c-a5ae8c791258"
+   ],
+   "bundle": "003.md",
+   "project": "门户"
+  },
+  {
+   "title": "UnifiedLogin 操作指引卡片：分类名与「操作指引」分两行纵向",
+   "type": "preference",
+   "content": "门户首页 UnifiedLogin 的操作指引卡片与设计一致时应为纵向两行：第一行业务分类名（商品房/存量房/租赁），第二行「操作指引」+ 箭头；去掉中间的 | 分隔符，并略增卡片高度容纳两行。验收可用 Playwright 截图对比，目标约 95% 还原。",
+   "evidence": "最终结论给出布局示意「商品房 / 操作指引 →」、明确去掉 | 与两行结构；用户曾反馈「操作指引和 UI 偏差过大」并要求 Playwright 截图比对 95% 还原。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue"
+   ],
+   "baseline": "a1e5beb",
+   "sessionIds": [
+    "0c7bd4c7-42f6-47d2-ab43-9e762defa8e9"
+   ],
+   "bundle": "003.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户侧栏 hidden 菜单仍显示 + 首页刷新只剩箭头：menuVisibility 过滤链与 TagsView/permission 侧栏写入时序",
+   "type": "bug",
+   "content": "【现象】① 后台菜单 meta 标记为隐藏，侧栏 RecursiveMenu 仍渲染；② 浏览器切回页签后出现不存在的上级目录；③ 硬刷新首页后侧栏只剩一列 `>`（空标题目录节点）；④ 顶栏一级菜单整行空白。\n【根因】不是单点 hidden 判断漏写，而是「菜单可见性归一化 + 侧栏数据源写入时机 + 顶栏取数」三条链路叠加：\n1. `menuVisibility.js` 需统一处理首页归属（首页固定归 `path: '/'`）、`normalizeMenuPath` 剥离 `/redirect` 前缀，且 `buildNavbarChildrenMenus` **禁止原地 mutate Vuex 里的路由树**；目录节点若子项全 hidden 要整棵剔除，否则会留下「无 title、仅有子级」的壳节点（刷新后表现为一列箭头）。\n2. `TagsView` 在首页必须 `SET_SIDEBAR_ROUTERS` 为空；`routesLoaded` 之后要再次 `syncSidebarWithRoute`，否则 `GenerateRoutes` 先把整棵菜单灌进侧栏后，首页未二次清空会被路由加载覆盖。\n3. `permission.js` 初始化侧栏时不要把 `constantRoutes` 拼进侧栏数据源，否则首页/重定向路径会混入幽灵父级。\n4. `Navbar.visibleMenus` 误写 `return []` 会导致桌面顶栏一级菜单全空；`topMenus` 应取第一个**可见**子菜单，而不是第一个子节点。\n【修复要点】集中改 `menuVisibility.js`、`TagsView`、`Navbar.vue`、`permission.js`；hidden 过滤与「空目录剔除」放在构建侧栏 children 的统一入口，不要在 RecursiveMenu 里打补丁。\n【与已知差异】已知 #732/#973/#1301 讲的是顶栏模式侧栏同步边界与 activePath 语义；本条是门户会话里暴露的 **menuVisibility 工具层 + 首页刷新时序 + constantRoutes 污染** 组合根因，含 `visibleMenus` 误返空数组这一独立缺陷。",
+   "evidence": "会话 f1e6a91e（基线 b84b4e7）：用户连续反馈「hidden 菜单仍显示」「切页签出现不存在上级」「刷新后侧栏只有箭头」；最终结论列出 menuVisibility（首页 `/`、strip /redirect、不 mutate Vuex、过滤子项全隐藏目录）、TagsView 首页清空侧栏与 routesLoaded 后 syncSidebarWithRoute、Navbar 修复 visibleMenus/topMenus、permission 侧栏不再拼接 constantRoutes。",
+   "files": [
+    "zhi2-web-admin/src/utils/menuVisibility.js",
+    "zhi2-web-admin/src/layout/components/TagsView/index.vue",
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/layout/components/Sidebar/index.vue",
+    "zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue",
+    "zhi2-web-admin/src/store/modules/permission.js"
+   ],
+   "baseline": "b84b4e7",
+   "sessionIds": [
+    "f1e6a91e-9b3c-44e9-9570-576bc6246461"
+   ],
+   "bundle": "004.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户 v2 网关前缀 /api/v2.0 三处对齐：env、nginx 反代、portalApiRewrite 与 sign/上传页",
+   "type": "pattern",
+   "content": "【现象】部分接口（含 listTree、上传等）请求 URL 缺少 `/api` 前缀或仍走旧网关路径，页面 404 或网关拒收。\n【根因】门户是 monorepo：父仓 `门户` 管 `env/.env` 与 `deploy/nginx.conf`，子模块 `zhi2-web-admin` 内还有 `portalApiRewrite.js`、`public/sign.js` 及若干 vue 里硬编码的 basePath——只改一处会在「开发代理 / 生产 nginx / 前端重写 / 加签脚本」之间漂移。已知 #1793/#1828 只覆盖 portal 菜单路由重写与前导斜杠；已知 #1189/#1823 讲 env 相对路径约定，但未覆盖本次「listTree 等漏改 + 主仓 nginx 与子模块 sign 同步提交」的整包修复。\n【怎么做】① 父仓 `env/.env` 与 `deploy/nginx.conf` 统一对外前缀为 `/api/v2.0`（或项目约定的 gateway 形态）；② 子模块 `portalApiRewrite.js` 全量扫一遍 v2 接口族，懒加载 path 必须带前导 `/` 否则静默漏匹配；③ `sign.js`、FileUpload、登录相关 vue 与 README 中与 API 前缀双写的常量同步改；④ 主仓与子模块各建 `cursor/fix-api-v2-prefix` 分支分别提交，子模块指针再进主仓 commit，避免只推一半。\n【验收】抓 listTree、上传、登录三类请求，确认浏览器里最终 URL 均含同一 gateway 前缀，且 nginx 日志无「strip /api」导致的 upstream 路径错误。",
+   "evidence": "会话 66c9378e（基线 3e8673b）：用户报「/api 前缀缺失」并要求「类似问题一并修复，listTree」；最终子模块 commit 374ecad（portalApiRewrite、sign.js、3 个 vue、README），主仓 commit f10ff03（env/.env、deploy/nginx.conf、子模块指针）。",
+   "files": [
+    "env/.env",
+    "deploy/nginx.conf",
+    "zhi2-web-admin/src/utils/portalApiRewrite.js",
+    "zhi2-web-admin/public/sign.js",
+    "zhi2-web-admin/src/utils/request.js",
+    "zhi2-web-admin/src/components/FileUpload/index.vue",
+    "zhi2-web-admin/src/views/login.vue"
+   ],
+   "baseline": "3e8673b",
+   "sessionIds": [
+    "66c9378e-4cf9-4d89-9040-e0be3ea73d99"
+   ],
+   "bundle": "004.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户 zhi2-web-admin 做骨架屏/动效前：样式入口、主题变量与 anim.scss 未全局注入",
+   "type": "fact",
+   "content": "【仓库结构】根目录 `门户` 仅为 workspace；前端代码在子包 `zhi2-web-admin`（Vue 2.7 + Vite 5 + Element UI + UnoCSS + Sass，非 TS）。\n【全局样式】唯一入口 `src/main.js` → `@/styles/index.scss`，其 `@use` 汇总 variables.css、mixin、element-ui、ruoyi 等；**`anim.scss` 未被 index.scss 引用**，骨架 shimmer/wave 若写在 anim 里，组件需显式 `@use \"@/styles/anim.scss\" as *;`。Vite `css.preprocessorOptions.scss` 无 `additionalData`，子组件不会自动拿到 mixin。\n【主题色】`variables.css` 用 CSS 变量（默认 `--primary-color: #1677ff`），运行时由 `utils/index.js` 的 `changeThemeColor()` 按 `platformConfig.buttonDefaultColor` 生成 light/dark 阶梯与 `--primary-color-rgb`（main.js 与 store/modules/app.js 都会触发）。骨架屏应使用 `var(--primary-color)` / `rgba(var(--primary-color-rgb), .1)`，不要写死 hex。已知 #2028 只泛述 changeThemeColor，未写门户「无 additionalData + anim 未挂入口」。\n【门户首页色板】`views/home/publicPortal/portalTheme.js` 另有一套门户展示色，与后台 `--primary-color` 并存，公共骨架若同时服务后台与门户首页需分场景取色。\n【加载层】排查 request 封装时区分：全局 NProgress/v-loading 与页面级骨架是两条线，新增「最短展示时间」应在页面/组件层与请求 loading 解耦，避免 axios 拦截器里叠两套遮罩。",
+   "evidence": "会话 sess_subagent_agent_f65dec14（基线 dfee5a6）：子任务扫描样式/动效/loading 约定，结论明确 monorepo 路径、index.scss 汇总链、anim.scss 未入入口、无 additionalData、changeThemeColor 与 portalTheme 分工；bundle 正文在 portalTheme 处截断，以上仅提炼已写入结论且未被 _known 单独覆盖的门户工程事实。",
+   "files": [
+    "zhi2-web-admin/src/main.js",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/styles/variables.css",
+    "zhi2-web-admin/src/styles/anim.scss",
+    "zhi2-web-admin/src/utils/index.js",
+    "zhi2-web-admin/src/store/modules/app.js",
+    "zhi2-web-admin/src/views/home/publicPortal/portalTheme.js",
+    "zhi2-web-admin/vite.config.js",
+    "zhi2-web-admin/src/utils/request.js"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "sess_subagent_agent_f65dec14-911c-4127-b45a-a7509a6aab92"
+   ],
+   "bundle": "004.md",
+   "project": "门户"
+  }
+ ]
+}

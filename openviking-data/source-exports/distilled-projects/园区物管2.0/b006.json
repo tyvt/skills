@@ -1,0 +1,178 @@
+{
+ "project": "园区物管2.0",
+ "batch": 6,
+ "files": [
+  "021.md",
+  "022.md",
+  "023.md",
+  "024.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "baseline": "022.md 会话 74503340-f810-4217-9c62-daf2840b2135（代码基线 c52866fc8）",
+   "content": "什么情况：sprite.svg 即使内容没变也会出现在 git 更改里，add 进缓存后又消失。为什么：它是构建期由自研 generateSpritePlugin / generate-sprite.cjs 每次构建自动重新生成的产物，而项目实际图标链路已经由 vite-plugin-svg-icons（public/assets/images/svg/ 源文件 + virtual:svg-icons-register）承担，sprite 生成链路完全未被消费。怎么做：确认无消费方后整链清理——移除 vite.config.js 里的 generateSpritePlugin、删除 scripts/generate-sprite.cjs 与 public/assets/images/sprite.svg（约 1.8MB）、删除父仓库根的 generate-sprite.js / svg.sh / icons.js；保留 .gitattributes（统一 SVG 行尾 LF 对源图标仍有用）。清理后若本地 dev server 还在跑，必须先停掉再启动，否则旧进程会继续重新生成 sprite.svg，让人误以为清理无效。通用套路：构建插件自动生成的产物反复出现在 git diff 时，先判断产物是否仍被消费，未被消费就整链删除而不是加 .gitignore。",
+   "evidence": "最终结论：移除 vite.config.js 的 generateSpritePlugin，删除 generate-sprite.cjs、public/assets/images/sprite.svg(约1.8MB)、父仓库 generate-sprite.js/svg.sh/icons.js；图标仍由 vite-plugin-svg-icons 处理；提示先停 dev server 避免旧进程继续生成 sprite.svg。",
+   "files": [
+    "zhi2-web-admin/vite.config.js",
+    "zhi2-web-admin/scripts/generate-sprite.cjs",
+    "zhi2-web-admin/public/assets/images/sprite.svg",
+    "generate-sprite.js"
+   ],
+   "sessionIds": [
+    "74503340-f810-4217-9c62-daf2840b2135"
+   ],
+   "title": "[园区] sprite.svg 是构建自动生成产物，未消费的 sprite 生成链路要整链清理",
+   "type": "workflow",
+   "bundle": "022.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "022.md 会话 98ef0df4-45f3-4381-a79d-760eb1b00c62（代码基线 3965548b6）",
+   "content": "什么情况：Web 后台环图（饼图）单扇区占 100% 时，外侧「xx 100%」标签被挤到右下角、引导线拉得很长；值为 0 的扇区即使隐藏了文字，仍会画出残留引导线，label 显得很怪。为什么：ECharts 默认 labelLine + outer label 在极端占比（100%）和 0 值扇区上都会产生异常几何，逐项调 label 位置压不住。怎么做：环形图详情改由右侧图例承担——关闭环图外侧标签与引导线（labelLine/label 不渲染，悬停仍有 tooltip）；环图只渲染数值 > 0 的扇区，从数据源过滤 0 值项避免异常线条；但图例固定显示全部类别，数量为 0 也列出。调尺寸时注意中间总数文字与外圈半径的余量，先关标签再看是否真需要放大容器。",
+   "evidence": "最终结论：100% 单扇区标签被挤到右下角、0 值扇区残留引导线；处理为关闭外侧标签与引导线（详情由图例展示）、只渲染 >0 扇区、图例固定显示四类。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue",
+    "zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js"
+   ],
+   "sessionIds": [
+    "98ef0df4-45f3-4381-a79d-760eb1b00c62"
+   ],
+   "title": "[园区] ECharts 环图 100% 单扇区标签错位与 0 值扇区残留引导线的处理",
+   "type": "bug",
+   "bundle": "022.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "022.md 会话 f85b6a27-7ef0-4292-b55b-eede0e63b03e（代码基线 736a824e7）",
+   "content": "什么情况：列表页操作列 fixed=\"right\"，表格列多出现横向滚动条时，固定操作列下方叠出多余边框，且只在「有分页组件」的页面上出现。为什么：隐藏固定列多余边框的修复样式写在 .zs-table-container--bottom-spacing 下，而这个 class 只有没有分页组件时才会被加上，所以有分页（哪怕共 1 条）的页面样式不生效；同时 zs-table 的 syncFixedColumnOffset 被注释掉，横向滚动条高度未计入固定列，进一步放大视觉偏差。怎么做：把固定列边框修复从条件 class 移到 .list-card .zs-table-container（有分页也生效），在全局 styles/index.scss 收敛；恢复 zs-table 组件内 syncFixedColumnOffset，让固定列高度与横向滚动条对齐。排查这类「只在部分列表页出现」的表格样式问题时，先看目标样式挂的容器 class 是否被分页等条件渲染分支决定。",
+   "evidence": "最终结论：问题不在 index.vue，而在 .zs-table-container--bottom-spacing 只有没分页时才加；修改为把边框修复移到 .list-card .zs-table-container（styles/index.scss），并恢复 zs-table.vue 的 syncFixedColumnOffset。",
+   "files": [
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "sessionIds": [
+    "f85b6a27-7ef0-4292-b55b-eede0e63b03e"
+   ],
+   "title": "[园区] zs-table 固定操作列多余边框只在有分页时出现：条件容器 class + syncFixedColumnOffset",
+   "type": "bug",
+   "bundle": "022.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "022.md 会话 b096fe20-ff70-474d-bf2b-1e39449b1ce9（代码基线 f101dd464）",
+   "content": "什么情况：排查侧边栏子菜单缩进/层级问题时，不要按 RuoYi 经典结构找 el-menu / SidebarItem / el-submenu——本项目（zhi2-web-admin）侧边栏是自定义递归组件，全仓库仅 element-ui 静态 CSS 里还有 el-menu 样式。为什么：缩进完全不依赖 el-menu 的 indent/default-openeds，而是 RecursiveMenu.vue 内部实现，按 RuoYi 思路排查必然找不到病灶。怎么做：入口 Sidebar/index.vue 遍历 sidebarRouters，每项从 level=1 起；RecursiveMenu.vue 用 level prop + 内联 paddingLeft：目录节点 paddingLeft = 24 + (level-1)*18，叶子节点 = 父组件的 paddingLeft + 18（注意用的是父级 computed，不是 24+level*18 公式），子目录递归时传 :level=\"level+1\"。菜单管理页（system/menu）用 zs-table 树表懒加载，缩进走 Element 树表默认机制。改缩进/层级逻辑只动 RecursiveMenu.vue；菜单 JSON 深嵌套 + ParentView 展平时要核对 level 传递是否断链。",
+   "evidence": "探索结论：无 SidebarItem/el-menu/el-submenu；Sidebar/index.vue 传 :level=1；RecursiveMenu.vue 第103-105行 paddingLeft() { return 24 + (this.level-1)*18 }，叶子用父级 paddingLeft+18，子目录 :level=\"level+1\"；菜单管理页用 zs-table 懒加载树表。",
+   "files": [
+    "zhi2-web-admin/src/layout/components/Sidebar/index.vue",
+    "zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue"
+   ],
+   "sessionIds": [
+    "b096fe20-ff70-474d-bf2b-1e39449b1ce9"
+   ],
+   "title": "[园区] 侧边栏是自定义 RecursiveMenu，缩进靠 level prop + paddingLeft，与 el-menu 无关",
+   "type": "pattern",
+   "bundle": "022.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f101dd464",
+   "content": "什么情况：地图/统计大屏的资金余额、资金收支图表里，某区有 0.22 万元这类小数数据但页面显示为 0（宜兴市有数据没展示）。为什么：图表配置（图例总额、柱顶数值标签、Tooltip、Y 轴刻度）多处调用了 formatWanIntegerValue 这类「四舍五入取整」格式化函数，0.几万被取整成 0，数据丢失表现为「没展示」而不是报错，容易误判为接口或地图区域匹配问题。怎么做：金额/占比类图表格式化一律用保留小数的 formatWanValue（最多两位小数），取整函数只用于确定是整数计数的场景；且四处展示点（图例、标签、tooltip、轴刻度）必须同步换，漏一处就会出现同一数值不同显示。",
+   "evidence": "会话 dd77c94d：用户反馈宜兴市 fundBalance=0.22 未展示、资金收支 0.几显示为 0；结论为 buildFundIncomeExpenseOption 多处误用 formatWanIntegerValue，统一改为 formatWanValue",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js"
+   ],
+   "sessionIds": [
+    "dd77c94d-98a5-4f59-b393-fb5a4f521aff"
+   ],
+   "title": "图表金额格式化误用取整函数导致 0.几万元显示为 0",
+   "type": "bug",
+   "bundle": "023.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "3965548b6",
+   "content": "什么情况：核销回单（benefit/pubVerificationReceipts）编辑态下，用户从合同选择弹窗回写时，relBusinessType（关联业务类型）被合同行的 contractType 覆盖，与详情接口返回值不一致。为什么：详情接口 GET /benefit/pubReceiptVerificationDetail/{id} 返回的 relBusinessType 才是该单据已落库的权威值；选择弹窗回填函数按「合同行优先」写会破坏编辑态已有的值，新增态无详情值才轮到合同行兜底。怎么做：回写逻辑按模式分流——新增态用合同行的 relBusinessType 或 contractType，编辑态保留详情接口返回的 relBusinessType 不覆盖；提交时收入类显式带 relBusinessType（优先 form、其次 originForm 中的详情值），支出类与后端约定「可不传」就不传。更通用的套路：凡详情接口已返回的业务分类字段，编辑态回写弹窗数据时以 originForm（详情快照）为优先级最高，避免选择器数据反向覆盖。",
+   "evidence": "会话 0e0a7bb5：用户明确要求「回写的时候取详情接口的 relBusinessType 字段」；最终结论记录 detailCallback 读详情值写入 form/originForm、fillFromContract 编辑态不覆盖、buildSubmitPayload 收入类显式带 relBusinessType 支出类不传",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubVerificationReceipts/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailDialog.vue",
+    "zhi2-web-admin/src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue"
+   ],
+   "sessionIds": [
+    "0e0a7bb5-9688-4dd7-8f3f-0e1f75dc3d94"
+   ],
+   "title": "编辑态选择弹窗回写不得覆盖详情接口已落库的分类字段（relBusinessType）",
+   "type": "pattern",
+   "bundle": "023.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7814a0c2a / fc994977f / 7fe15a8cb / f00310232 / c52866fc8",
+   "content": "什么情况：园区物管2.0 后台（zhi2-web-admin）中凡涉及物业/开发商/企业关联的字段，一律只认 companyRecordId，不再兼容 companyId 作为取值来源；但表单提交给后端的字段名仍是 companyId / propertyCompanyId（与后端契约一致），只是值取自 companyRecordId。为什么：列表/弹窗选择返回的行里只有 companyRecordId 是稳定主键，companyId 命名在不同接口间含义漂移，做「多候选回退」反而会把错误 ID 带进自动带出逻辑（如选择物业管理区域后物业服务企业信息不回填）。怎么做：选择弹窗赋值方法（setDeveloperCompany/setPropertyCompany）只取 row.companyRecordId；companylist/propertyCompanylist 过滤只按 item.companyRecordId 判断；fillDeveloperInfo/fillPropertyCompanyInfo 从 company.companyRecordId 取值；删除 getCompanyRecordId 之类回退 companyId 的兼容方法，提交时才把值写进 companyId 字段名。新写企业关联功能时直接按此约定，不要引入双候选兜底。",
+   "evidence": "会话 0a8622de：用户明确「一律使用companyRecordId」；最终结论列出移除 getCompanyRecordId、赋值/过滤/带出五处统一、提交字段名仍为 companyId/propertyCompanyId",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue",
+    "zhi2-web-admin/src/views/maintenance/initiation/detail.vue",
+    "zhi2-web-admin/src/views/maintenance/apply/detail.vue"
+   ],
+   "sessionIds": [
+    "0a8622de-8e91-4ab1-bda2-f07280e64814"
+   ],
+   "title": "[园区物管2.0] 企业关联 ID 统一 companyRecordId，提交字段名保留 companyId",
+   "type": "pattern",
+   "bundle": "024.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7fe15a8cb",
+   "content": "什么情况：后台所有用到腾讯地图 Key 的地方（行政区划 WebService、GL 地图加载、区划边界绘制、首页地图展示）原本硬编码 Key（如 OB4BZ-...），换 Key 或按环境隔离时需要逐文件改。为什么：Key 硬编码在前端代码里既不安全也无法按环境切换；统一从后端系统配置读取后，运维改配置即全局生效。怎么做：用 src/utils/tencentMapKey.js 的 fetchTencentMapKey()，内部 GET /system/config/getByKey/qq.map.key 并做内存缓存避免重复请求，未配置时抛明确错误；mapLoader.js 在未传 ak 时自动走该函数，业务组件（ZsTencentMap、statisticsMap、mapProperty、homeInfoDisplay、tencentDistrictBoundary）一律 await loadMap()/fetchTencentMapKey()，不再传 Key 也不再写死。前置条件：后台系统配置里已设置 qq.map.key，且该 Key 同时开通 GL 地图与 WebServiceAPI 权限。",
+   "evidence": "会话 ff82edd2：最终结论「所有腾讯地图 Key 统一通过 /system/config/getByKey/qq.map.key 获取」，新增 tencentMapKey.js 内存缓存，5 个消费文件去硬编码",
+   "files": [
+    "zhi2-web-admin/src/utils/tencentMapKey.js",
+    "zhi2-web-admin/src/utils/tencentDistrictBoundary.js",
+    "zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js",
+    "zhi2-web-admin/src/components/ZsTencentMap/index.vue"
+   ],
+   "sessionIds": [
+    "ff82edd2-0b07-45df-bdd1-a77d7b6c0d77"
+   ],
+   "title": "[园区物管2.0] 腾讯地图 Key 禁止硬编码，统一经 /system/config/getByKey/qq.map.key 接口获取",
+   "type": "pattern",
+   "bundle": "024.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232",
+   "content": "什么情况：腾讯位置服务 GL 地图（MultiMarker/MultiLabel）页面里小区/项目点位不显示或部分不显示，控制台还报「Map中已存在id为area_bubble_0的图层，无法重复添加」「所传入参数并非TMap.Map的实例」。为什么有四类独立根因：1) 多个 MultiMarker 的几何 id 都写死 'marker'/'label'，部分 GL 版本下多实例 id 冲突导致后续点位不渲染；2) 坐标字段不止 xcoordinate/ycoordinate，台账类接口会带 mapXCoordinate/mapYCoordinate（平台约定 X≈纬度、Y≈经度），不参与解析的点被过滤掉；3) 下钻到街道后地图仍停在「街道气泡」中心，小区点在视野外，看起来像没出来；4) 搜索只传 projectName 而后端只认 complexName。怎么做：几何/图层 id 按索引唯一化（project_marker_geom_${index} 等）；归一化函数里对经纬度做 mapXCoordinate/mapYCoordinate 兜底；第三层下钻列表非空时按所有点范围算中心与缩放（单点用专用 zoom 常量），且后续点击不再用固定中心覆盖拟合结果；搜索参数 projectName 与 complexName 双传兼容。",
+   "evidence": "会话 7936e37a：最终结论四条原因归纳与修改说明（normalizeProjectList 加字段兜底、applyCommunityLayerView 视野拟合、MultiMarker 图层/几何 id 索引化、双参搜索）",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/index.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue"
+   ],
+   "sessionIds": [
+    "7936e37a-fa3a-4556-86bf-1afaf2c6a29e"
+   ],
+   "title": "[园区物管2.0] 腾讯 GL 地图点位「不显示」的四类根因与排查套路",
+   "type": "bug",
+   "bundle": "024.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232",
+   "content": "什么情况：Vite 项目里 <img> :src 和 ECharts rich 图标可以用 import + resolveServerAssetUrl 解析（兼容子路径部署），但 <style> 里的 url(\"@/assets/...\") 无法执行 JS、拿不到解析后的地址，子路径部署时背景图/装饰图会 404。为什么：CSS 是静态产物，编译期 url() 与运行时代理/子路径前缀解析是两条链路。怎么做：图片统一用 import assetXxx from '@/assets/...'（Vite 下比 require 稳），集中构造形如 MAP_OVERVIEW_ASSET_URL 的映射对象，每个字段都过 resolveServerAssetUrl；data 里暴露一份给模板与 initMap 共用；样式需要图的地方，在 mounted 最前面同步执行 injectXxxCssAssetVars()，在页面根元素上 setProperty('--mov-xxx', `url(${JSON.stringify(已解析地址)})`)，样式改写为 var(--mov-...)；注入放 mounted 同步执行、再 $nextTick 初始化图表，可减轻首帧背景变量未设置时的闪烁。函数入参判 el instanceof HTMLElement 以过类型检查。",
+   "evidence": "会话 659b9b99：最终结论第 2 节「样式里无法直接写 JS，所以在根元素上 setProperty('--mov-xxx', url(...))」及 mounted 同步注入说明",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue",
+    "zhi2-web-admin/src/utils/resolveServerAssetUrl.js"
+   ],
+   "sessionIds": [
+    "659b9b99-3806-4640-804a-486f070d2eef"
+   ],
+   "title": "[园区物管2.0] CSS 里的静态资源 URL 用 JS 注入 CSS 变量解决（配合 resolveServerAssetUrl）",
+   "type": "pattern",
+   "bundle": "024.md",
+   "project": "园区物管2.0"
+  }
+ ]
+}

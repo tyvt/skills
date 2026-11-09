@@ -1,0 +1,59 @@
+{
+ "project": "2-0",
+ "batch": "005",
+ "files": [
+  "005.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "参考这个页面，找到所有的<BuildingTable",
+   "type": "bug",
+   "content": "现在切到 list 模式时选中丢失，是因为 Element 的表格在我们同步选中时会触发一次 `selection-change`，之前这次事件会把 `checked` 全部清空。 我已经在 `preparatoryRangeTable.vue` 里做了两点修复： - **新增状态标记**：在 `data` 里增加了 `isSyncingSelection`。 - **同步时加防抖**： - 在 `syncListSelection` 里： - 进入时 `this.isSyncingSelection = true`； - 清空选择并对 `checked == 1` 的行调用 `toggleRowSelection` 勾选； - 同步完成后在 `nextTick` 里把 `isSyncingSelection` 设回 `false`。 - 在 `onListSelectionChange` 里： - 开头增加 `if (this.isSyncingSelection) return`，忽略同步过程里的那次 `selection-change` 事件； - 只有用户真正勾选/取消列表行时，才会把选择结果反写到 `buildingTableData` 的 `house.checked` 上。 这样： - 打开弹窗时，`table` 视图按 `exist` 全部选中； - 切换到 `li",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`preparatoryRangeTable.vue",
+    "@zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue",
+    "zs-table要有@selection-change=\"handleSelectionChange\"逻辑，@zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4fb591cf-2d6a-4db2-9b12-4f4070e5b694"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "property/property/complexC",
+   "type": "preference",
+   "content": "### 先说明一下现状 - 你反馈“这次改完问题更多了”，说明我上一版在 `TagsView` 里用 `getRouterPathByFilePath` 强行算 `childrenMenus` 的逻辑，确实干扰到了你原来的整体路由/菜单行为。 - 我刚刚**已经把 `TagsView/index.vue` 里 `childrenMenus` 相关的改动全部撤回，恢复成你仓库里原始的实现**，也去掉了 `getRouterPathByFilePath` 的 `import`，保证不会再影响其他菜单。 ### 关于 `/property/property/complexChange` 空白的问题 从你提供的信息看： - `/property/property/complex` 是能打开的； - `/property/property/complexChange` 空白； - 而代码中与“变更”相关的跳转，都在用 `getRouterPathByFilePath('property/complexChange/detail')` 这类方式，说明**真正注册在路由里的 path 更可能是 `/property/complexChange/...`，而不是 `/property/property/complexChange/...`**。 - 换句话说，很可能是**后端返回的菜单 path ",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`TagsView/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b3c5e61d-0c1b-42d7-b8c6-0e42c8a88242"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "分页组件切换分页不生效，又弹回第一页",
+   "type": "preference",
+   "content": "### 情况说明 - 现在 **`zs-pagination` 组件本身** 已经改成 `v-model:current-page` / `v-model:page-size`，你刚测试的 `property/complex/index.vue` 页面也已经从 `:page.sync` / `:limit.sync` 改成了 `v-model:page` / `v-model:limit`，翻页正常。 - 仓库里还剩下**大量其它页面**在用 `.sync`，单靠一个个 `ApplyPatch` 挨文件改，数量太大，不现实也容易出漏。 ### 最省事、可真正“全局批量”的做法（建议你直接在 Cursor 里执行） 在 `zhi2-web-admin/src` 目录下，用 **全局正则替换** 一次性完成，规则如下（只会改我们约定需要改的那几种）： #### 1. 分页相关 - 查找（正则）：`:page\\.sync=\"` - 替换为：`v-model:page=\"` - 查找（正则）：`:limit\\.sync=\"` - 替换为：`v-model:limit=\"` #### 2. `zs-select` 相关 - 查找（正则）：`<zs-select([^>]*):value\\.sync=\"` - 替换为：`<zs-select$1v-model:value=\"` #### 3. ",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`property/complex/index.vue",
+    "@zhi2-web-admin/src/components/zs-pagination/zs-pagination.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "73a5ecd2-f9fb-443b-b4b0-8e8521acce74"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  }
+ ],
+ "_draft": true
+}

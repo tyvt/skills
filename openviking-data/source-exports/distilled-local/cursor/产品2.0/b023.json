@@ -1,0 +1,43 @@
+{
+ "project": "产品2.0",
+ "batch": "023",
+ "files": [
+  "023.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "有效账单也要可勾选 做收款和优惠",
+   "type": "bug",
+   "content": "已修改 `spFeeBill`（物业服务费账单）模块的勾选逻辑。 **问题原因** `isSelectable` 之前使用 `isBillPayable`，只允许「待支付 / 部分支付」且未作废的账单勾选。因此「有效 + 已支付」的账单无法勾选，批量收款、优惠、作废都不便操作。 **修改内容** 1. **`enums.js`** - 新增 `isBillValid()`：判断账单是否有效（未作废） - 新增 `validateBillsForDiscount()`：优惠操作校验（须为有效且待支付） - 将状态比较改为 `==`，兼容数字/字符串类型 2. **`index.vue`** - `isSelectable` 改为：`isBillValid(row)`，所有有效账单均可勾选 - `handleDiscount` 增加 `validateBillsForDiscount` 校验 - 收款仍走原有 `validateBillsForCollect`（仅待支付/部分支付） **勾选与操作规则** | 账单状态 | 可勾选 | 收款 | 优惠 | |---------|--------|------|------| | 有效 + 待支付 | ✅ | ✅ | ✅ | | 有效 + 部分支付 | ✅ | ✅ | ❌ | | 有效 + 已支付 | ✅ | ❌ | ❌ | | 作废 |",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "**`enums.js",
+    "**`index.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\bill\\components\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\declare\\components\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3bad7169-f39b-4cf0-bf68-090703c11dcb"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "工单分类选不到数据",
+   "type": "pattern",
+   "content": "已改回 `/property/workOrder/category/list`，并修正了数据解析逻辑。 **真正的问题：** 原代码写的是： ```javascript const list = response.data || response.rows || [] ``` 如果 `/list` 返回的是这种结构： ```json { \"code\": 200, \"data\": { \"list\": [...] } } ``` `response.data` 会是一个**对象**而不是数组，对它调用 `.map()` 会抛错，被 `catch` 吃掉后 `categoryOptions` 就变成空数组，下拉就看不到数据。 **本次修改：** 1. 继续使用 `/list` 接口 2. 按多种常见结构解析列表：`rows`、`data.records`、`data.list`、`data.rows`，以及 `data` 本身为数组的情况 3. 补充字段映射：`workOrderCategoryId`、`_categoryName` 等 4. 去掉之前误加的状态过滤和 `/page` 调用 请刷新页面再试。如果还是空的，把 `/list` 接口实际返回的 JSON 结构发我，我可以再精确对齐字段。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\workOrder\\report、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\workOrder\\report\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\workOrder\\report\\components\\AddOrderDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1401b92d-0ad2-433b-83f9-aa435e2c7296"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,63 @@
+{
+  "project": "家园区1.0安卓端",
+  "batch": "001",
+  "files": [
+    "001.md"
+  ],
+  "count": 3,
+  "memories": [
+    {
+      "title": "拿到 APK 先证明它与仓库是不是同一个应用：包名/版本/Activity 数/DEX 类名/git log -S 四路交叉比对",
+      "type": "workflow",
+      "content": "【什么情况】用户拿一个 APK 来说「点生成报告闪退，分析一下」，而工作区里有一个同名项目的源码仓库；最容易走偏的就是默认「APK 就是这个仓库打出来的」。\n【为什么】两者可能完全是两个应用：APK 是「专家现场考评」端（包名 com.zhishusz.zsevaph，versionName 1.0 / versionCode 10，minSdk21/targetSdk28，14 个 Activity，15 条 ExpertReview* 接口），仓库是「家园区」业主端（包名 com.zhishusz.sipps，2.2.26 / code 246，minSdk19/targetSdk30，108 个 Activity，124 处 version/1 接口）。二者只共享同一套后端基址（`https://sipps.sipac.gov.cn/app-api/`）与同一套自研框架骨架。若不先证伪，很容易拿仓库源码解释 APK 的崩溃，结论全错。\n【怎么做】① 四路交叉比对：包名 + versionName/versionCode（对比 app/build.gradle）、minSdk/targetSdk、Activity/Service/Receiver 数量、DEX 里的类名与接口串；② 再用 git 反查：`git log --all -S zsevaph` / `-S ExpertReview` / `-S Sudoku` 在全部 5 个提交中 0 命中 → 仓库从未有过这份代码；③ DEX 侧 `com/zhishusz/sipps` 类 0 处也印证不同应用；④ 顺手记 APK 画像：7.26 MB / 1123 条目、无 `lib/`（无 native）、无 `assets/`、v1+v2 签名、`largeHeap=true`、`usesCleartextTraffic=true`、13 条 uses-permission（含 1 条误写的硬件特性，READ_PHONE_STATE/定位/CALL_PHONE 声明但零使用）；⑤ 注意反差：仓库 `app/build.gradle` 里 apply 了 360protect.gradle（加固），而 APK 完全无加固特征（无 jiagu 痕迹）——别把「仓库加了壳」当成「APK 有壳」。",
+      "evidence": "会话 039c9e4c（基线 fd5072d，Android APK 静态分析子任务）与主会话 d30f0407 的「Team message from apk-static」；结论首行即「⚠️ 首要问题：该 APK 与 D:\\repository\\家园区1.0安卓端 不是同一个应用」，并给出包名/版本/SDK/Activity/接口五项对照表，以及「DEX 内 com/zhishusz/sipps 类 **0 处**；`git log --all -S zsevaph/ExpertReview/Sudoku` 在全部 5 个提交中 0 命中。APK 是\"专家现场考评\"端，仓库是\"家园区\"业主端，仅共享后端 https://sipps.sipac.gov.cn/app-api/ 与同一套自研框架骨架」。",
+      "files": [
+        "app/build.gradle",
+        "D:/android-work/apk-static-report.md",
+        "D:/android-work/zse_classes.txt",
+        "D:/android-work/api_strings.txt"
+      ],
+      "baseline": "fd5072d",
+      "sessionIds": [
+        "039c9e4c-5e36-422b-a317-e2558d601d0d",
+        "session-d30f0407-ce60-4163-8783-c2931e425078"
+      ],
+      "bundle": "001.md"
+    },
+    {
+      "title": "Android 闪退三查：Gson 解析无 try/catch、API 级别调用无 SDK_INT 守卫、Fragment 回调直接改 View",
+      "type": "pattern",
+      "content": "【什么情况】专家考评 APK 点「生成报告」闪退，需要在没有源码、只拿到 DEX 的情况下定位崩溃原因。\n【为什么】闪退 Top3 都是「缺防护」而不是「逻辑写错」，且都能在 DEX 里用字符串常量本身当证据：① **Gson 全链路无 try/catch**（GsonUtils / AccountStoragePreference / OkHttpCallback），任何格式异常直接崩；② **MainApplication.initSdk 无条件调 registerDefaultNetworkCallback（API 24+）**，而整个 dex 里**不存在 `SDK_INT` 字符串** → Android 5.1/6.0（API 21–23）设备启动即崩；③ **Fragment 网络回调直接改 View**（ReportFragment$9/$10.onResponse），全 dex 无 `isAdded` 字符串 → 已 detach 的 Fragment 触发 NPE 或 `after onSaveInstanceState`；④ PdfLoaderActivity 用 WebView `file://` loadUrl 加载本地文件，无判空、无 try/catch。\n【怎么做】① 判定方法：查 DEX 字符串表里 `SDK_INT`、`isAdded` 是否存在——**常量缺失本身就是证据**（编译器会把这两个 API 名写进常量池），同理逐方法判定有无 try/catch，而不是只看崩溃堆栈第一行；② 修法对应三条：所有 Gson 解析包 try/catch；`registerDefaultNetworkCallback` 等 API 级别受限调用加 `if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)` 守卫；Fragment 网络回调里先判 `isAdded()`（并避免在 `onSaveInstanceState` 之后改 View）；WebView loadUrl 前判 intent extra 非空并 try/catch；③ 没有 jadx/aapt 时的替代路径：用 Python 自写精简 AXML 解析（字符串池 + 资源映射）与 DEX 字符串/类名提取脚本，产出包名/版本/权限/组件清单与接口串，脚本留在 `D:\\android-work\\`（axml.py / dexstr.py / dexparse.py / risk.py / query.py）以便复跑。",
+      "evidence": "会话 039c9e4c（基线 fd5072d）结论「闪退 Top 3（证据为 DEX 指令级调用 + 逐方法 try/catch 判定）：1. Gson 全链路无 try/catch + MainApplication.initSdk 无条件调 registerDefaultNetworkCallback（API 24+），而**整个 dex 不存在 SDK_INT 字符串** → API 21–23 设备启动即崩；2. Fragment 网络回调直接改 View（ReportFragment$9/$10.onResponse），全 dex 无 isAdded 字符串 → NPE / after onSaveInstanceState；3. PdfLoaderActivity.loadPdf：getIntent() 拼串后 loadUrl，无判空无 try/catch，且 initView 全开 setAllowFileAccessFromFileURLs + JS」；并注明「分析全程只读（仓库与 D:\\android-sdk 未改动），产出全部落在 D:\\android-work\\」。",
+      "files": [
+        "D:/android-work/apk-static-report.md",
+        "D:/android-work/dexstr.py",
+        "D:/android-work/dexparse.py",
+        "D:/android-work/risk.py"
+      ],
+      "baseline": "fd5072d",
+      "sessionIds": [
+        "039c9e4c-5e36-422b-a317-e2558d601d0d",
+        "session-d30f0407-ce60-4163-8783-c2931e425078"
+      ],
+      "bundle": "001.md"
+    },
+    {
+      "title": "Windows 下把含中文的 JSON body 内联进 curl 会被本地代码页转码，服务端回「请求数据格式错误」是假象：要 --data-binary @文件 走 stdin",
+      "type": "bug",
+      "content": "【什么情况】把 App 真实抓包得到的报文（body 约 5KB、含真实签名与中文「其他问题」文本）复现成 curl 请求，服务端返回 `{\"result\":\"fail\",\"info\":\"请求数据格式错误\"}`，一度被误判成参数不对。\n【为什么】**这不是真问题**。Windows 上把 body 直接内联进命令行（`--data-binary '{...}'`）时，curl 会按本地代码页转码命令行参数，中文被破坏，服务端解析失败才回「请求数据格式错误」——错误信息指向了数据，而真实原因是编码。用同一份报文走文件/stdin 才能得到真实结果。\n【怎么做】① 不要内联 body：用 `--data-binary @captured_generate_req.json`（文件）或 heredoc 走 stdin，保证字节一致；② 复现服务端问题时优先用 **App 原样抓到的报文**，不要手工拼一份「差不多的」参数——原样报文照样失败，才能把问题定位到服务端（本例 gen → `{\"result\":\"fail\",\"info\":\"生成报告失败\"}`、pre → HTTP 500 `{\"result\":\"fail\",\"info\":\"系统处理请求时发生错误\"}`，结论是「参数没问题，问题在服务端出报告/PDF 环节」）；③ 自包含脚本形式：`bash curl_真实报文.sh gen|pre|both`，body 直接内嵌在脚本文件里而不是命令行；④ 交付给后端时把原始 json + curl 说明一起给（captured_generate_req.json 5320 字节 / captured_preview_req.json 5323 字节 / 真实报文curl.md）。",
+      "evidence": "会话 d30f0407（基线 fd5072d）最终结论「⚠️ 一个坑（避免误判）：别把 body 内联进命令行（`--data-binary '{...}'`）。body 里有中文+约 5KB 签名，Windows 下 curl 会按本地代码页转码，中文被破坏后服务端会回 `{\"result\":\"fail\",\"info\":\"请求数据格式错误\"}`——这是**假象**，不是真问题。所以我特意用 `@文件` / heredoc 走 stdin，保证字节一致」；并给出两条实测 curl 与结论「App 原样报文直放照样失败 → 参数没问题，问题在服务端出报告/PDF 环节」。",
+      "files": [
+        "D:/android-work/captured_generate_req.json",
+        "D:/android-work/captured_preview_req.json",
+        "D:/android-work/真实报文curl.md",
+        "D:/android-work/curl_真实报文.sh"
+      ],
+      "baseline": "fd5072d",
+      "sessionIds": [
+        "session-d30f0407-ce60-4163-8783-c2931e425078"
+      ],
+      "bundle": "001.md"
+    }
+  ]
+}

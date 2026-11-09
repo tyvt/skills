@@ -1,0 +1,335 @@
+{
+ "project": "苏住房C",
+ "batch": 5,
+ "files": [
+  "017.md",
+  "018.md",
+  "019.md",
+  "020.md"
+ ],
+ "count": 17,
+ "memories": [
+  {
+   "title": "苏服办网关接入：环境变量只保留「需申请」的 4 类，固定值下沉代码默认值",
+   "type": "pattern",
+   "content": "什么情况：苏住房C 小程序（zhi2-mobile-shimin）接江苏省苏服办网关，.env.development / .env.test / .env.production 里堆了 9 个 VITE_APP_SFB_* 变量，联调时无法判断哪些是平台申请项、哪些是文档固定值。为什么：网关文档（��网 /jpaas-jags-server/interface/gateway.do + 独立验签接口）规定了 app_id、interface_id、version、charset、biz_content、timestamp、origin、sign 九个入参，其中 version=1.0.0、charset=UTF-8、origin=1 是文档写死的示例常量，每套环境都填一遍纯属噪声；APP_KEY/APP_SECRET 文档根本没要求、代码也没用到，属于历史遗留。怎么做：环境变量只留真正需要到开放平台申请的 4 类——VITE_APP_USE_SFB_DISPATCHER（是否走网关）、VITE_APP_SFB_APP_ID、VITE_APP_SFB_GET_INTERFACE_ID、VITE_APP_SFB_POST_INTERFACE_ID；version/charset/origin 收进 dispatcher.js 的默认值。biz_content 是原接口入参序列化，timestamp 是时间戳，sign 由验签接口返回，三者都是运行时生成不能配。返回体是 data 字段里再套一层原接口 JSON 字符串（含 custom/status），解析时要做二次 JSON.parse。判断原则：一份 env 只用来说明「环境之间会变的」和「需要人工申请的」，协议常量一律代码默认。",
+   "evidence": "用户贴出网关/验签接口参数表后要求「这是接口调用示例，移除不必要的参数」。处理结果：移除 VITE_APP_SFB_APP_KEY、VITE_APP_SFB_APP_SECRET（文档未要求且代码未使用）；VITE_APP_SFB_VERSION / CHARSET / ORIGIN（固定值 1.0.0 / UTF-8 / 1）改为 dispatcher.js 代码默认值；保留 USE_SFB_DISPATCHER 与 APP_ID、GET/POST 两个 INTERFACE_ID。",
+   "files": [
+    "zhi2-mobile-shimin/.env.development",
+    "zhi2-mobile-shimin/.env.production",
+    "zhi2-mobile-shimin/.env.test",
+    "zhi2-mobile-shimin/src/utils/dispatcher.js"
+   ],
+   "baseline": "166ed47",
+   "sessionIds": [
+    "0f1c6af9-9dca-4fad-8282-c48ebf2f048d"
+   ],
+   "bundle": "017.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序 Tab 样式不要自造：统一复用 components/commonNew/tabLine.vue（TabLine）",
+   "type": "workflow",
+   "content": "什么情况：改小程序（zhi2-mobile-shimin）某业务页的 Tab，照设计稿自写一套样式后，用户连续两轮反馈「tab 的 UI 很奇怪」「tab 目前有黑色下划线」，最后直接点名「应该参考 pages_vote/decision/index 页面的 tab」，才定位到问题。为什么：项目里 Tab 有既定公共件 @/components/commonNew/tabLine.vue（TabLine），选中态是「蓝色渐变底纹高亮 + space-around 均分」；自写版本用 background-image / border-bottom 做下划线，在深色渐变或双层伪元素叠加下会残留一条黑色横线，而且越调越和投票表决页不一致。怎么做：新增或改造带 Tab 的页面，先全局搜 `tabLine` / `TabLine` 引用，直接引入公共组件并显式传布局参数（对齐投票表决页用 align=\"space-around\"），不要写自定义 Tab；页面 scoped 样式里也不要再对 tabs 容器做侧边距、下划线、背景的覆盖，需要视觉差异时先看 TabLine 暴露的 props 能不能满足。定位同类问题的最快路径是「找一个用户认可的同类页面，把它的 Tab 实现整段搬过来」，而不是继续在自写样式上加选择器。",
+   "evidence": "用户三轮反馈：「我的-电子业主卡-报事报修，页面缺少报事，报修的分页，样式也需要参考APP」→「tab的UI很奇怪」→「tab目前有黑色下划线」→「还是有黑色下划线，应该参考pages_vote/decision/index页面的tab」。最终改为使用 @/components/commonNew/tabLine.vue，移除自定义 Tab 样式（黑色下划线由此引起），布局参数与投票表决页一致 align=\"space-around\"。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/repair/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/income/index.vue",
+    "zhi2-mobile-shimin/src/components/commonNew/tabLine.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/index.vue",
+    "zhi2-mobile-shimin/src/styles/tab.scss"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "110af5ba-3106-4162-aea0-ab5d7018e8cb"
+   ],
+   "bundle": "017.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 项目拓扑与「同步无锡版本」的复用约定：pages_benefit 等新业务页从无锡市区 H5 项目整目录移植",
+   "type": "fact",
+   "content": "什么情况：苏住房C 主仓下有多个 uni-app 子模块（zhi2-mobile-shimin 市民端为主），而「无锡市区小程序嵌入 H5」是同源的另一套 H5 应用（目录 zhi2-mobile-admin-h5-c-unlimited），两边有同名业务页如 src/pages_benefit/assetsPublicity。为什么：这类政策宣传/公示页是各地各改一版的分叉，苏住房C 这套落后于无锡版本，逐行比对成本高于整包移植；而两个工程目录结构、组件库、请求封装一致，页面 + 同名 api 模块成对搬通常可直接跑。怎么做：用户说「用某项目里的版本」时，按「页面 .vue + src/api 下对应接口模块 + pages.json 路由注册 + 页面目录内的 static/组件子目录」四件套整块复制覆盖，而不是逐段 diff 合并；落地后核对 pages.json 是否缺注册、api 模块名是否与页面 import 一致。分支维度要成对交付：子模块分支（如 suzhou-shiqu-suzhufang-main-v2.1）提交页面改动，再合并进 sfb 等环境分支，最后更新父仓苏住房C 的子模块指针提交。注意 sfb 分支带有独立的网关配置（httpInstance.js / gateway.js），合并时这两个文件的冲突必须保留 sfb 侧，不能取主分支配置。",
+   "evidence": "用户要求「zhi2-mobile-shimin/src/pages_benefit/assetsPublicity/index.vue 这个功能使用无锡市区小程序嵌入H5这个项目里面的版本」，随后「提交推送代码，然后也和到sfb分支」。子模块 suzhou-shiqu-suzhufang-main-v2.1 → 4e9e7465，sfb → fa4a1fe2（合并时 httpInstance.js / gateway.js 冲突按 sfb 网关配置保留）；父仓 苏住房C 主分支 → c25c4cf，dev-sfb → 0596619（子模块引用 fa4a1fe2）。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_benefit/assetsPublicity/index.vue",
+    "zhi2-mobile-shimin/src/api",
+    "zhi2-mobile-shimin/src/pages.json",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/assetsPublicity/index.vue",
+    "zhi2-mobile-shimin/src/utils/httpInstance.js",
+    "zhi2-mobile-shimin/src/utils/gateway.js"
+   ],
+   "baseline": "5438dc6",
+   "sessionIds": [
+    "9a5cf993-2e96-4283-bc23-24c947b70b34"
+   ],
+   "bundle": "017.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏服办 H5 无反向代理导致网络图片全挂：统一 resolveMediaUrl 在构建期拼线上域名",
+   "type": "bug",
+   "content": "【什么情况】zhi2-mobile-shimin 上架苏服办（H5 轻应用）后所有网络图片不显示，接口返回的图片路径是 /zhi2-pro/file/xxx.jpg 这类相对路径。\n【为什么】开发态靠 Vite 反向代理把相对路径转到后端，但苏服办上架环境不允许配置反向代理，相对路径被解析到轻应用自己的静态域，必然 404。这不是组件问题，改 ZsImage 或逐页排查图片都无效——根因在「运行环境没有代理层」这一部署前提。\n【怎么做】新增统一函数 resolveMediaUrl（放 src/utils/index.js），只在生产环境把相对路径拼成完整线上地址：普通资源拼 VITE_APP_API_PROXY（如 https://szfweb.szzfcjj.cn:8887）；/zs-fym 开头的单独走 VITE_APP_IMG_PROXY_V1（后端多套文件服务前缀不同）；已是 http(s):// 或 /static/ 本地资源原样返回，避免重复拼接。开发环境保持相对路径不动，让 Vite 代理继续生效。落地时必须把所有图片来源收敛到这个函数，而不是只改 ZsImage：ZsImage、菜单图标（MenuImage）、热点应用图标（HotAppsHome）、首页轮播与资讯图、swiperComponent/swiperImage 的图集视频、ZsUploader 上传预览、附件缩略图、视频详情页的 videoSite/videoCover、filePreview，一处漏改就表现为「某个页面图片还是白的」。与已知「后端文件路径正确但前端加载报错先验 Content-Type」是不同层：那条查网关有没有反代文件桶（服务端），本条是客户端根本发不出可路由的绝对地址。",
+   "evidence": "会话 2f17a9af：用户「当前H5上架到苏服办不能配置反向代理，导致所有网络图片不显示，请拼接线上地址」。最终结论列出 resolveMediaUrl 的三条分支（普通资源拼 VITE_APP_API_PROXY、/zs-fym 走 VITE_APP_IMG_PROXY_V1、http(s) 与 /static 不处理），以及 12 个消费点清单。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/menu/MenuImage.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/menu/HotAppsHome.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/Home_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages/commonNew/swiperComponent.vue",
+    "zhi2-mobile-shimin/src/pages/commonNew/swiperImage.vue",
+    "zhi2-mobile-shimin/.env.production"
+   ],
+   "baseline": "a444c05",
+   "sessionIds": [
+    "2f17a9af-1ba3-4667-86fa-d55215ed0873"
+   ],
+   "bundle": "018.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "自定义 tabBar 的 Tab 页滚动加载失效：不用页面级 onReachBottom 转发，改 z-paging 内部 scroll-view + disableScroll",
+   "type": "bug",
+   "content": "【什么情况】苏找房页（pages/index/project）z-paging 滚动到底不加载下一页，同项目的首页、社区页却正常。\n【为什么】该页用的是 z-paging 的页面滚动模式（use-page-scroll=true），依赖页面级 onReachBottom 转发触底事件。但这个页是自定义 AppTabBar 的 Tab 页，页面高度与滚动容器结构和普通页不一致，触底事件经常触发不到。根因是「页面滚动模式的触底依赖页面容器」，而自定义 tabBar 改写了容器结构——不是分页参数或接口问题。\n【怎么做】按已知可用的首页/社区页对齐，改三处：1) 页面容器改 height:100% + overflow:hidden 的 flex 布局，去掉页面级 onPageScroll / onReachBottom 转发；2) 列表组件改 use-page-scroll=false，由 z-paging 内部 scroll-view 监听 scrolltolower 自行加载，并补全高度链样式（父级逐层 height:100%/flex:1，否则内部滚动区高度为 0）；3) pages.json 给该页加 disableScroll:true，避免页面与内部列表双重滚动。注意 src/pages/index/components 与 src/pages_tab/components 下 Project_Suzhufang.vue 存在同名副本，改页面滚动模式时要确认到底渲染的是哪一份。改完若仍无新数据，再看接口 total 是否首屏后就被判定为没有更多。",
+   "evidence": "会话 ab547a32：用户「pages/index/project滚动加载更多没生效」。根因判定为自定义 AppTabBar 的 Tab 页高度/滚动容器与首页不一致导致 onReachBottom 触发不到；修复为 height:100%+overflow:hidden、use-page-scroll=false、pages.json 加 disableScroll。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages/index/project.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/Project_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages_tab/components/Project_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/components/ZsPaging/ZsPaging.vue",
+    "zhi2-mobile-shimin/src/hooks/useReachBottom.js"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "ab547a32-fb28-436d-b850-9344b46f646a"
+   ],
+   "bundle": "018.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏服办轻应用内拨打电话必须走 lightAppJssdk.device.call，统一收敛 callPhone/extractPhoneNumber",
+   "type": "bug",
+   "content": "【什么情况】市民端多处电话（房贷导引各银行详情页联系方式、我的-设置-关于我们客服电话、PhoneCall 组件的服务热线）在苏服办里点击无法唤起拨打，uni.makePhoneCall 在轻应用 WebView 内不生效。\n【为什么】苏服办 H5 运行在轻应用容器里，没有直接调起系统拨号的权限，必须通过 JS-SDK 桥 lightAppJssdk.device.call({phone, success, fail}) 转发给宿主 App。直接用 uni.makePhoneCall 只在小程序端有效。\n【怎么做】在 src/utils/sfb.js 收敛两个函数：callPhone(phone) 判断处于苏服办环境时优先 lightAppJssdk.device.call，否则降级 uni.makePhoneCall；extractPhoneNumber(text) 从「吴经理 13771787779」这类混合文案里正则抽出纯号码（后端字段常是姓名+号码拼接，直接整串传给 SDK 会失败）。所有电话展示点都调 callPhone，包括 AboutUs 客服电话、页面内的电话文本，以及已经封装的 PhoneCall 组件（组件内部改一次即可覆盖所有使用它的页面）。附带结论：房贷导引银行详情原先跳外部 webView（cc.szfcweb.cn），要支持点击拨打就得改成站内本地详情页 /pages/policy/fddydetail?id=${bankLogo}，列表跳转同步改，外部 H5 无法注入这个 SDK 调用。",
+   "evidence": "会话 fffe887a：用户要求银行详情页联系方式与关于我们客服电话可唤起拨打，并给出 lightAppJssdk.device.call 调用片段。最终结论：sfb.js 新增 callPhone/extractPhoneNumber（优先 SDK，降级 uni.makePhoneCall），AboutUs、fddydetail.vue（新建本地详情页替代外部 webView）、houseLoanGuide 跳转、PhoneCall 组件同步改造。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/sfb.js",
+    "zhi2-mobile-shimin/src/components/PhoneCall/PhoneCall.vue",
+    "zhi2-mobile-shimin/src/pages/about/AboutUs.vue",
+    "zhi2-mobile-shimin/src/pages/policy/fddydetail.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/houseLoanGuide/index.vue",
+    "zhi2-mobile-shimin/src/pages_my/setting/index.vue"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "fffe887a-3e61-4531-8ddb-6bd2cac507c9"
+   ],
+   "bundle": "018.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "业务代码分支 sfb 与 main-v2.1 互合并时，冲突按「sfb 基础设施留 HEAD / 业务改进取 main」分类决议",
+   "type": "workflow",
+   "content": "【什么情况】苏住房C 在 zhi2-mobile-shimin 子模块上把 main 分支（suzhou-shiqu-suzhufang-main-v2.1）长期改进合回苏服办定制分支 sfb，一批文件冲突，若逐个文件凭直觉选边会反复回退已修好的东西。\n【为什么】两条分支各自演进方向不同：sfb 分支承载苏服办接入的定制基础设施（网关、免登 token、H5 媒体地址、env 结构），main 分支承载通用业务改进（新接口、加载态、UI）。冲突文件往往同时含两类改动，按「文件」判归属会误伤，要按「改动性质」判。\n【怎么做】按文件分三类决议：1) SFB 基础设施一律保留 HEAD——src/utils/sfb.js 全部、src/api/security.js 只留 loginByTicketSfb（不引入 main 的 getSfbUserInfo/getSfbToken）、App.vue 的 initSfbTokenFromPageUrl/initSfbUser/hash token、utils/index.js 的 H5 绝对媒体 URL 与 isMiniProgramWebView、ZsImage 的分端图片 URL 解析；2) 环境与构建合并——.env.development/.production/.test 保留苏服办网关与代理结构、追加 main 新增的变量（如 VITE_APP_API_BASE_URL / _V1），vite.config.ts 保留 HEAD 含 /sfb-gateway 的代理、合并 main 的 sourcemap 配置；3) 纯业务层取 main 改良——页面的 async/await + try/finally 写法、加载态、useLoadMore/新工单 API、新版入口卡片 UI、defineEmits 写法、tabBar SVG 图标路径与页面标题。标签页本身的 onTabPageShow（含 loadBoundProjects）属 sfb 定制，要保留 HEAD；pages.json 里 Tab 标题取 main、navigationStyle:custom 与 SVG tabBar 图标留 HEAD。合并后统一 git add 再 commit，父仓库只更新子模块指针。",
+   "evidence": "会话 457b2e09：用户在 sfb 分支合并 suzhou-shiqu-suzhufang-main-v2.1，给出「SFB 基础设施保留 ours、main 的通用改进尽量合入」的策略。结论按环境配置/SFB 基础设施/构建与 TabBar/页面层/业务页面五类逐文件列出保留方与合并方。",
+   "files": [
+    "zhi2-mobile-shimin/.env.development",
+    "zhi2-mobile-shimin/.env.test",
+    "zhi2-mobile-shimin/.env.production",
+    "zhi2-mobile-shimin/src/App.vue",
+    "zhi2-mobile-shimin/src/api/security.js",
+    "zhi2-mobile-shimin/src/utils/sfb.js",
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/utils/tabBar.js",
+    "zhi2-mobile-shimin/vite.config.ts",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "baseline": "c7d6817",
+   "sessionIds": [
+    "457b2e09-e4db-43a7-b564-7efc00ad070b"
+   ],
+   "bundle": "018.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "市民端空态与加载态统一约定：ZsEmpty「图片+暂无相关数据」，判断无数据用 noReject 抑制 toast",
+   "type": "preference",
+   "content": "【什么情况】多个模块的加载/空数据反馈不统一：年度预算显示「正在加载...」且无数据时弹「该小区没有年度预算信息」toast，工作动态筛选后无数据时直接空白，用户反复要求「图片+文字提示」。\n【为什么】各页各写一套状态：有的直接用 ZsPageLoading 当占位、有的靠接口 reject 弹 toast、有的什么都不渲染。用户对这块有明确的统一口径，且反对用 toast 表达「正常的无数据」——无数据是常态而非异常，弹 toast 会打断操作。\n【怎么做】1) 空态统一用 ZsEmpty（图片 + 文案），文案固定「暂无相关数据」，不要用「正在加载...」之类文案混作空态；2) 不用 ZsPageLoading 长期占位，加载中与无数据是两个状态，不能复用同一个视觉；3) 调接口时传 noReject:true，把「节流取不到数据」的 reject 转成正常空返回，从而不弹 toast，交给 ZsEmpty 展示；4) 筛选/列表为空、筛选后无数据都走同一套空态；5) 顺带一条交互一致性口径：筛选项激活时图标必须与文字同步高亮（灰色/蓝色图标切换），不能只有文字变蓝。菜单名与页面标题要与设计稿一致（如「日常服务」按截图改为「工作动态」）。",
+   "evidence": "会话 c2f6539f：用户提出「正在加载与提示语不一致，应该改为图片+文字提示；文字提示语『暂无相关数据』」「筛选后无数据：图片+文字提示」。结论：年度预算移除 ZsPageLoading、接口用 noReject:true、无数据统一 ZsEmpty；工作动态筛选激活时图标与文字同步高亮。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_benefit/budget/index.vue",
+    "zhi2-mobile-shimin/src/pages_property/rcService/daily.vue",
+    "zhi2-mobile-shimin/src/pages_property/serviceStandard/index.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/MenuCard.vue",
+    "zhi2-mobile-shimin/src/pages/property/index.vue",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "baseline": "89637fb",
+   "sessionIds": [
+    "c2f6539f-dcf0-4349-96de-b20b2a8dbcb0"
+   ],
+   "bundle": "018.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "4630e8e",
+   "content": "什么情况：微信开发者工具报“Failed to load local image resource /static/images/empty_house.png → status 500”，但图片文件在仓库里确实存在。根因：该静态图已从主包 static/images/ 迁到各业务分包（pages_transaction/static/images、pages_owner/static/images），主包路径下已无此文件；resolveStaticUrl 若拿不到分包信息就回退主包路径，开发者工具把“主包文件不存在”报成 500 而不是 404，极易误判为后端/网络问题。为什么：苏住房C（zhi2-mobile-shimin）的分包结构与泰兴不同，静态图按业务域分散存放，路径解析必须知道“当前页面属于哪个分包”。怎么做：①统一由 utils 的 resolveStaticUrl + SUBPACKAGE_STATIC_IMAGES 映射表解析，禁止在 ZsImage 等组件内部再写一份 inferImageSubpackage 之类的私有推断，多份推断必然漂移；②ZsEmpty 增加 subpackage 属性并透传给内部 ZsImage；③页面显式声明分包：pages_transaction/* 传 subpackage=\"pages_transaction\"，pages_owner/components/house/HouseList.vue 传 subpackage=\"pages_owner\"；④改完必须 npm run build 重新生成 dist，再在开发者工具里重新导入 dist 并“清缓存→清除全部缓存”，因为打开旧 dist 时缺 SUBPACKAGE_STATIC_IMAGES 回退逻辑会照样复现。",
+   "evidence": "会话 851aad11（2026-08-24，基线 4630e8e）：ZsEmpty / ZsImage 里各有一份分包推断，resolveStaticUrl 回退主包导致 500；移除重复推断、ZsEmpty 加 subpackage、页面显式传分包并重建 dist 后，路径变为 /pages_transaction/static/images/empty_house.png 与 /pages_owner/static/images/empty_house.png",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "zhi2-mobile-shimin/src/components/ZsEmpty/ZsEmpty.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/newHouse/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/components/house/HouseList.vue"
+   ],
+   "sessionIds": [
+    "851aad11-4f50-47bb-a82c-ac1e0de178ab"
+   ],
+   "title": "苏住房C 小程序静态图 URL 必须走分包感知的 SUBPACKAGE_STATIC_IMAGES 映射，组件内私有推断会漂移",
+   "type": "bug",
+   "bundle": "019.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "8fc3cc5",
+   "content": "什么情况：真机/工具报“Error: ENOENT: no such file or directory, open 'dist/node-modules/@dcloudio/uni-ui/lib/uni-datetime-picker/time-picker.wxss'”。根因：为压主包体积，构建后处理脚本 scripts/relocate-datetime-picker.mjs 把 uni-datetime-picker 从主包 dist/node-modules/ 复制到各分包，然后删除主包副本；但它只 patch 了 .json（usingComponents 路径），没 patch .js 里 lazy-load 段落的组件路径。受影响页面 pages_owner_extra/tenant/index、pages_owner_extra/committee/application/index 的 .js 仍写 ../../node-modules/…，运行时按旧路径去主包找 wxss，文件已被删 → ENOENT。为什么：小程序的组件路径在两个地方各存一份（.json 声明 + .js 懒加载代码），只改一处时工具静态检查发现不了，只有真正加载组件才炸。怎么做：让 patchDatetimePickerRef 同时处理 .json 和 .js，统一指向分包内的副本（如 pages_owner_extra/tenant/index.js → ../node-modules/…/uni-datetime-picker.js）；只跑 npm run dev 再打开 dist 不会执行 relocate 脚本，出现这类 ENOENT 先确认是用 npm run build 构建的，并检查新增页面是否也命中该脚本的路径白名单。",
+   "evidence": "会话 8f42167b（2026-08-28，基线 8fc3cc5）：relocate-datetime-picker.mjs 只修 .json 未修 .js，pages_owner_extra 两个页面 JS 引用仍指向被删的主包副本；改 patchDatetimePickerRef 同时处理 .json/.js 后重新 build 与校验通过",
+   "files": [
+    "zhi2-mobile-shimin/scripts/relocate-datetime-picker.mjs",
+    "zhi2-mobile-shimin/scripts/validate-dist.mjs",
+    "zhi2-mobile-shimin/package.json",
+    "dist/project.config.json"
+   ],
+   "sessionIds": [
+    "8f42167b-70b4-4ea9-85ad-c66840f5a3ba"
+   ],
+   "title": "relocate 后处理脚本删主包副本时必须同时改 .json 与 .js 的组件引用路径，否则运行时 ENOENT",
+   "type": "bug",
+   "bundle": "019.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "b7bf813",
+   "content": "什么情况：分包改造后，pages_vote/elect/detail 点「参与选举」没反应也不报错；从消息中心（7_0_21）用绝对路径进详情页正常，说明只是页内二次跳转坏了。根因：代码调用 redirectTo(`needToKnow?id=…&type=…`) 传的是相对路径，openPage 只补前导 '/'，得到 /needToKnow?id=…，而真实路径是 /pages_vote/elect/needToKnow，小程序判定为无效页面，且 uni.redirectTo 未传 fail 回调，失败被完全吞掉，表现为“按钮能点、无日志、不跳转”。为什么：分包目录迁移后页面路径多加了一层分包前缀，相对路径假设失效；而 uni 跳转失败默认不抛错、不打日志，是典型静默失败源。怎么做：①resolveRelativePageUrl 负责把相对路径解析成“当前分包下的完整路径”，业务代码优先写绝对完整路径 /pages_vote/elect/needToKnow?...；②openPage 统一补 fail 回调，失败时 console 打 [openPage] navigate fail 并 toast「页面跳转失败」，让后续任何跳转问题立刻可见；③抽 handleParticipate，并按与决策详情一致的 partIn 状态做守卫；④底部按钮容器补 z-index，避免被内容层遮挡造成“点了没反应”的假象。",
+   "evidence": "会话 9677076a（2026-08-26，基线 b7bf813）：分包改造后 elect/detail 内 redirectTo 相对路径失效；utils/index.js 保留 resolveRelativePageUrl 并给 openPage 加 fail 回调（toast + [openPage] navigate fail 日志），detail.vue 改绝对路径 + partIn 判断 + 按钮层 z-index:10",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/pages_vote/elect/detail.vue",
+    "zhi2-mobile-shimin/src/pages_owner/elect/detail.vue",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "sessionIds": [
+    "9677076a-944b-42fd-9eba-67e8f0aa54d4"
+   ],
+   "title": "点击无反应无报错：openPage 把相对路径补 '/' 后不是完整页面路径，uni.redirectTo 无 fail 回调就静默吞掉",
+   "type": "bug",
+   "bundle": "019.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "9832ba3",
+   "content": "什么情况：新房详情页底部「收藏」图标不显示。三个独立根因同时存在：①components/collectBtn/collectBtn.vue 模板里用了 ZsImage 却没有 import 并注册，图标节点根本无法渲染；②未收藏图标 aixin_e.svg 实际位于分包 pages_transaction/static 下，组件按主包 static 解析，路径不存在；③resolveStaticUrl 在微信小程序端返回的是 IMAGE_BASE 拼出来的远程 URL，而本地打包进包的静态图应该走 /static/... 本地路径（远程地址在真机还需要下载域名白名单）。为什么：这和泰兴“分包内图标必须放主包 static”的老约定方向相反——苏住房C 的静态图随业务分包走，凡是直接搬泰兴经验的组件都会踩这个方向性错误。怎么做：①collectBtn 显式 import 并注册 ZsImage，新增 subpackage 属性，按收藏状态选主包/分包路径；②调用侧 newHouse/detail.vue 传 emptyUrl=\"images/szf/aixin_e.svg\" 与 subpackage=\"pages_transaction\"；③utils/index.js 里 resolveStaticUrl 在微信小程序分支改为返回本地路径，例如 /pages_transaction/static/images/szf/aixin_e.svg。",
+   "evidence": "会话 d53574b2（2026-08-21，基线 9832ba3）：收藏图标不显示，定位三点根因后改 collectBtn.vue / newHouse/detail.vue / utils/index.js，图标出现在「收藏」文字上方",
+   "files": [
+    "zhi2-mobile-shimin/src/components/collectBtn/collectBtn.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/newHouse/detail.vue",
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue"
+   ],
+   "sessionIds": [
+    "d53574b2-2d92-4663-9c80-ced6a44b903a"
+   ],
+   "title": "collectBtn 图标不显示三连根因：漏注册 ZsImage、subpackage 未传、小程序端 resolveStaticUrl 误走远程 IMAGE_BASE",
+   "type": "bug",
+   "bundle": "019.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "db06361",
+   "content": "什么情况：苏住房C 已在 main-v2.1 / sfb 等分支并行发版，一次交付要“提交 + 推送 + 打 tag”，用户中途指出 main-v2.1 没打 tag，并要求“主分支怎么打包有这个逻辑，该回去”。根因：主分支 zhi2-mobile-shimin/package.json 的 build 脚本被改成了非 dist 的输出目录（疑似沿用 build.sh 的定制逻辑），与“产物必须落在仓库根 dist 供微信开发者工具导入”的既有约定不一致；同时多分支发版时容易只给当前分支打 tag，漏掉同版本的其它分支。为什么：小程序产物目录是外部工具（微信开发者工具导入 dist）与后续 relocate-datetime-picker / validate-dist 等后处理脚本共同的契约，目录一变，整条构建链路和验收方式全错。怎么做：①主分支统一恢复 build 输出为 dist（本次提交 fix(build): 恢复主分支打包输出目录为 dist）；②每个分支发版都核对三件事——build 脚本输出目录、dist 实际产物、该分支是否打过同版本 tag（本次 v2.1.0.16 同时打在子模块与父仓库）；③子模块先提交推送，父仓库再更新指针并单独打 tag，保证父仓与子模块 tag 对应。",
+   "evidence": "会话 830bdf69（2026-08-14，基线 db06361）：子模块提交 b7608ec7「fix(build): 恢复主分支打包输出目录为 dist」+ tag v2.1.0.16，父仓库提交 f88c743 更新子模块指针 + tag v2.1.0.16；用户中途提示 main-v2.1 漏打 tag",
+   "files": [
+    "zhi2-mobile-shimin/package.json",
+    "zhi2-mobile-shimin/vite.config.ts",
+    "build.sh"
+   ],
+   "sessionIds": [
+    "830bdf69-ebf5-4372-8f53-e837a521a019"
+   ],
+   "title": "主分支打包输出目录必须为 dist，发版按分支逐一核对 build 配置、dist 产物与 tag",
+   "type": "workflow",
+   "bundle": "019.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "投票模块「我的决策/决策记录」空白：列表接口只回时间，缺 decisionResponseId/决策人/选项名，须逐条调详情接口补全",
+   "type": "bug",
+   "content": "什么情况：苏住房C 小程序 pages_vote 下，一般表决与选举页已经接过「记录详情」补全逻辑，而选项表决（OPTION）走的是另一套 optional/DecisionResult.vue + optional/DecisionRecord.vue，仍按最初实现直接消费列表行。表现是「我的表决—选项表决—我的决策」页面「最近一次决策」「决策记录」只显示时间戳，决策人与选项名全空；点「决策详情」进入后也空白，因为 detail.decisionResponseId 取不到，跳转链接携带的记录 ID 为空。\n\n为什么：投票类列表接口只保证返回投票时间这类轻字段，决策人、签字、选项摘要、决策记录 ID 都要靠记录详情接口二次取。凡是「列表页直接渲染」而未做详情补全的分支，一旦接口不返回这些字段就整体空白，且不报错。\n\n怎么做：把已成熟页面的补全套路复制到缺失分支，而不是逐个字段兜底。1) 在结果页增加 pickResponseId（按 decisionResponseId → recordId → 行内其它候选字段的顺序解析记录 ID）、fetchRecordDetail、enrichRecordList 三个函数，对列表逐条并发补全并 merge 回行对象；2) 用 onShow 而不是 onLoad 触发刷新，保证从详情返回后数据是最新的；3) 跳详情前把补全后的行数据写入本地缓存，详情页优先读缓存再做接口兜底；4) 详情页里 selectOptdec 为空时回退读 optionList；5) 公共的 common/DecisionResult.vue 中「最近一次决策」同样走详情补全。排查同类「只显示时间/空白」问题时，先比对同模块内已修好的兄弟页面有没有这套 pickResponseId + 详情补全逻辑。",
+   "evidence": "会话 2d84eea4：用户反馈「我的表决—选项表决-我的决策内容看不到，这个一般表决和选举改过」；结论为选项表决未同步一般表决/选举的数据补全逻辑，列表常只有时间、没有 decisionResponseId/决策人/选项名称。修复在 optional/DecisionResult.vue 增加 pickResponseId、fetchRecordDetail、enrichRecordList 并使用 onShow 刷新，optional/DecisionRecord.vue 从缓存+详情接口补全且 selectOptdec 无数据时回退 optionList，optional/detail.vue 增加详情接口回退，common/DecisionResult.vue 最近一次决策也通过详情接口补全。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_vote/decision/optional/DecisionResult.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/optional/DecisionRecord.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/optional/detail.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/common/DecisionResult.vue",
+    "zhi2-mobile-shimin/src/api/autonomy.js"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "2d84eea4-83d0-4cd8-82b5-903f4772c353"
+   ],
+   "bundle": "020.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 小程序静态图按分包各存一份 + prune-main-static 裁主包：跨包 import 主包图标运行时 500，须走 resolveStaticUrl(path, 分包名)",
+   "type": "bug",
+   "content": "什么情况：微信开发者工具报「Failed to load local image resource /static/icon/location-red.png … status 500」并提示「改为用默认 marker」，地图页红色定位图标变成系统默认图标。触发页面是 pages_main/houseMap/houseMap.vue，代码里写的是 import redImage from \"@/static/icon/location-red.png\"（主包绝对路径）。\n\n为什么：本项目为压主包体积，把公共图标拆到各分包自己的 static 目录（src/pages_xxx/static/icon/...），构建后由 scripts/prune-main-static.mjs 主动删除主包里的同名文件。于是任何仍用主包路径引用该图的页面，在构建产物里路径已不存在，请求 500，且小程序不报编译错、只静默退回默认 marker。\n\n怎么做：1) 需要图的页面把图标复制到自己所属分包的 static 目录（如 src/pages_main/static/icon/location-red.png）；2) 在 utils 的 SUBPACKAGE_STATIC_IMAGES 映射表里为该分包补上文件名登记，让解析函数知道它属于哪个包；3) 页面改成 import { resolveStaticUrl } from \"@/utils\" 后 const markerIcon = resolveStaticUrl(\"icon/location-red.png\", \"pages_main\")，得到 /pages_main/static/icon/location-red.png；4) 全仓排查同类写法——凡 import ... from \"@/static/...\" 的地图页（pages_transaction、pages_owner 等）在生产包都可能同样 500，逐处改为带分包名的 resolveStaticUrl。新增静态图时先确认它在主包还是分包，凡是分包用图就登记映射，不要用主包路径 import。",
+   "evidence": "会话 bb55af39（基线 8fc3cc5）：报错 /static/icon/location-red.png 500 与「改为用默认marker」。结论为 location-red.png 已从主包迁到各分包静态目录，构建后 prune-main-static.mjs 会删掉主包里的该文件，而 houseMap.vue 仍通过 import 引用主包路径。修复为复制图标到 src/pages_main/static/icon/、在 SUBPACKAGE_STATIC_IMAGES 为 pages_main 增加映射、页面改用 resolveStaticUrl(\"icon/location-red.png\", \"pages_main\")；并提示 pages_transaction、pages_owner 等仍用 @/static/icon/location-red.png 的页面生产包可能有同样问题。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_main/houseMap/houseMap.vue",
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/pages_main/static/icon/location-red.png",
+    "zhi2-mobile-shimin/scripts/prune-main-static.mjs"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "bb55af39-97ad-4deb-943d-2c10c3c7ff61"
+   ],
+   "bundle": "020.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序上传宫格整块「不显示」：grid-auto-rows 按宽度算行高会算成 0，改用 aspect-ratio:1 + min-height 保底",
+   "type": "bug",
+   "content": "什么情况：人工添加房屋页面（pages_owner/house/owner/manual.vue）的图片上传组件看不到灰色上传框，用户描述「上传组件不显示」。同一组件在别的页面里是正常的。\n\n为什么：两层叠加。1) 容器被加了 h-144（固定 144rpx 高），在四列网格下每格只剩约 36rpx，视觉上等于没显示；2) 组件用 grid-auto-rows 依据宽度反推行高，小程序环境下测量/计算经常失准，行高直接算成 0，格子彻底塌陷不可见。这类「组件不显示」不是组件没注册，而是高度被压成 0。\n\n怎么做：重写 ImageUploader 布局——给每个格子上 aspect-ratio: 1 让它由宽度自带高度，再叠加 min-height: 144rpx 作为保底，同时删掉错误的 h-144 容器高度和基于宽度测量的行高逻辑；另外在 pages_owner/house/owner/register.vue 里显式 import 并注册 ImageUploader，避免分包下组件未注册造成同样的「不显示」。排查顺序建议固定为：① devtools 里量格子实际高度是否为 0 → ② 查容器固定高与 grid-auto-rows/measure 逻辑 → ③ 最后才怀疑分包组件注册。凡是网格内图片/上传格子，都不要用 grid-auto-rows 推高度，用 aspect-ratio + min-height 双保险。",
+   "evidence": "会话 3f889ff2（基线 5f0f4dc）：用户先报「人工添加页面图片上传组件有问题」，再贴图报「上传组件不显示，按钮宽度太窄」。根因为给 ImageUploader 加 h-144 使 4 列网格下每格约 36rpx，且 grid-auto-rows 用宽度算行高在小程序里经常算错导致格子高度为 0。修复为用 aspect-ratio:1 + min-height:144rpx 重写布局、去掉 h-144 与宽度测量逻辑，并在 register.vue 中显式引入 ImageUploader 避免分包下组件未注册。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ImageUploader/ImageUploader.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/manual.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/register.vue"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "3f889ff2-2daa-476e-86b3-963833ee9ca2"
+   ],
+   "bundle": "020.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "ZsButton 的 long / block 类名在项目里没有对应样式：按钮只按文字宽度撑开，需在组件内补 .zs-button--block{width:100%} 且父容器用 align-items:stretch",
+   "type": "bug",
+   "content": "什么情况：人工添加页底部「提交人工审核」按钮宽度只到文字宽度，缩在左边一小截。页面模板写了 long 类、父容器是纵向 flex，但按钮既不铺满也不居中。\n\n为什么：两个独立原因叠加。1) 父容器用了 align-items: center（默认 stretch 被覆盖），flex 交叉轴对齐后子项只按内容宽度撑开，按钮失去横向占满的机会；2) 模板里写的 long 类在项目样式中根本没有定义，属于无效类名，写了也不报错。同类问题还有 ZsButton 的 block 通道：组件内原本没有 .zs-button--block 规则，传 block 属性同样不生效。\n\n怎么做：1) 父容器由 align-items: center 改为 align-items: stretch；2) 按钮改用 ZsButton 的 block 属性，并在 components/ZsButton/ZsButton.vue 内补上 .zs-button--block { width: 100%; } 让类名有真实样式落地，而不是仅在页面里加内联 width；3) 给 ZsButton 传类名/属性前先确认该修饰类在组件样式里确实存在——本项目并非所有设计稿类名都被实现，遇到「样式不生效」优先核对类名是否存在，再怀疑选择器权重。此次修复落在 ZsButton 组件层，因此其他写 block 的按钮会一并生效。",
+   "evidence": "会话 3f889ff2（基线 5f0f4dc）：用户报「按钮宽度太窄」。原因为页面用了 align-items: center 导致按钮只按文字宽度撑开，且 long 类在项目里没有对应样式。修复为页面改 align-items: stretch、按钮使用 block 属性并设置 width: 100%，并在 ZsButton 中补充 .zs-button--block { width: 100% } 样式。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ZsButton/ZsButton.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/manual.vue"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "3f889ff2-2daa-476e-86b3-963833ee9ca2"
+   ],
+   "bundle": "020.md",
+   "project": "苏住房C"
+  }
+ ]
+}

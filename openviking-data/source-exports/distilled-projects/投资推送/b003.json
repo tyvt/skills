@@ -1,0 +1,409 @@
+{
+ "project": "投资推送",
+ "batch": 3,
+ "files": [
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md"
+ ],
+ "count": 22,
+ "memories": [
+  {
+   "title": "[投资推送] report 未触发买卖时不展示参考金额与触发估算",
+   "type": "preference",
+   "content": "宽基/日常 report 的展示层必须与 is_buy / is_sell 硬信号一致：未触发买入时不输出「买入参考」、买入金额、以及「触发估算: 跌至…可达买入标准」；未触发卖出时不输出卖出侧触发估算（即便内部曾算过档位）。观望态只保留信号与条件判定行，避免用户把参考价当成已触发建议。",
+   "evidence": "用户明确要求「没有达到买入或者卖出标准的，不要加买入参考或者卖出参考」；沪深300 观望示例已去掉买入参考几行。",
+   "files": [
+    "report.py",
+    "cn_broad_signal.py",
+    "signal_format.py",
+    "buy_amount_tiers.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2d62b2b1-bb7e-447a-a0ff-43540db1fbea"
+   ],
+   "bundle": "009.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 行情默认走实时，CLI 不分支，无实时再回退",
+   "type": "pattern",
+   "content": "report 买卖点位与金额判断优先用可免费/已接入的指数实时快照；命令行不增加「实时/历史」开关。取数链路：先实时，实时缺失或无效时再走原有历史/缓存逻辑，保证同一套命令在不同时段都能跑通。",
+   "evidence": "用户要求「就用实时的，命令上不要区分，如果实时的没有数据，再用原来的做回退即可」。",
+   "files": [
+    "report.py",
+    "market_data.py",
+    "data_sources.py",
+    "cn_broad_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2d62b2b1-bb7e-447a-a0ff-43540db1fbea"
+   ],
+   "bundle": "009.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] report 慢：开盘前 sync_data_cache 定时预拉",
+   "type": "workflow",
+   "content": "report 耗时主要来自外部行情/指标接口；优化方向是磁盘缓存 + 开盘前批量预拉。约定：每日 09:30（系统时区须为中国标准时间 UTC+8）运行 sync_data_cache.py；Windows 用 run_sync_cache.bat 写 logs/sync_cache.log，setup_sync_task.bat 注册计划任务「投资信号数据预拉取」。手动：python sync_data_cache.py / --force。",
+   "evidence": "会话结论已创建定时任务并说明日志与强制重拉方式。",
+   "files": [
+    "sync_data_cache.py",
+    "data_cache.py",
+    "run_sync_cache.bat",
+    "setup_sync_task.bat",
+    "logs/sync_cache.log"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d5f487d1-05be-43b6-81e4-dad87770966a"
+   ],
+   "bundle": "009.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 红利 report 须与 is_buy_signal 同含近252日高点回撤",
+   "type": "bug",
+   "content": "分红指数报告 build_dividend_signal_eval 若缺少与 is_buy_signal() 一致的「近252日高点回撤」条件，会出现达标项计数与回测硬门槛不一致（例如少 1 项）。修复：使用 effective_drawdown_threshold + make_drawdown_from_high_criterion，未达标须进入「未达标项」摘要。",
+   "evidence": "对齐回测后 H30269 示例新增「✗ 近252日高点」行，达标从 3/6 变为 3/7。",
+   "files": [
+    "core.py",
+    "report.py",
+    "backtest_buy_signals.py",
+    "cn_broad_signal.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a0bac9cb-3ed5-40d8-a564-374e4481e671"
+   ],
+   "bundle": "009.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 额度分配：美股/创业板增速分离且缓存指纹含 growth",
+   "type": "bug",
+   "content": "collect_index_states / buy_amount_allocation 中美股 snapshot 必须用 task 的 us_growth（--us-growth），不能误用 CYB_EXPECTED_GROWTH；创业板用 cyb_growth（--growth）。report.generate_reports 要把 CLI 增速传入额度预计算；磁盘缓存 key/指纹必须包含 cyb_growth、us_growth，否则自定义增速会命中错误缓存。",
+   "evidence": "report 与回测一致性审查第 2 项修正；示例 python report.py -m us --us-growth 0.15。",
+   "files": [
+    "buy_amount_allocation.py",
+    "report.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a0bac9cb-3ed5-40d8-a564-374e4481e671"
+   ],
+   "bundle": "009.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 报告只输出已接入数据源的多维指标",
+   "type": "preference",
+   "content": "【多维参考】区块仅展示当前 data 层已能拉到的指标（如股债利差阈值、PE 十年分位与信号灯）；未接入的维度不要占位输出。PE 分位等辅助信息不要重复塞进长期/短期买卖建议里的软性劝诫文案（用户会视为噪音）。",
+   "evidence": "用户两次纠正：「暂未接入不要加到输出」「单靠利差…控制加仓节奏这话也不需要」。",
+   "files": [
+    "report.py",
+    "config.py",
+    "core.py",
+    "dividend_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5444d004-5f85-4487-8ca2-6df243ecd24a"
+   ],
+   "bundle": "009.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 新指数买入频次约束无解时需显式折中阈值",
+   "type": "pattern",
+   "content": "为新宽基（如中证1000）对齐 A500/创业板年度买入占比时，若某年历史估值偏低会导致「双年频次区间」约束无可行解，阈值搜索应记录无解并采用折中参数（会话例：利差分位≥68%、PE 分位≤67%、距60日低点涨幅≤5.5%），再写回 backtest 与 report 模块。",
+   "evidence": "97f55495 会话：2024≤12% 且 2025 7–12% 下无同时满足组合，故采用折中方案并更新 logs/backtest。",
+   "files": [
+    "backtest_buy_signals.py",
+    "compare_broad_indices.py",
+    "config.py",
+    "a500_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "97f55495-c511-45b5-a582-99a1ea8bf103"
+   ],
+   "bundle": "009.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] DuckDB「被占用」常为单进程多连接：读路径勿开写连接且须自动 close",
+   "type": "bug",
+   "content": "报错「Can't open a connection to same database file with a different configuration」「Unique file handle conflict: Cannot attach market」不一定是外部进程占用。若缓存层 `_conn()` 在只读场景仍 `ensure_schema()` 开写连接、且连接用完不 `close()`，则 `report.py` 一次读十几个键会在进程内堆多个 DuckDB 连接并自锁，部分查询回退 CSV。修复：拆 `_read_connection()`（只读 + 用毕关闭）与 `_write_connection()`（写入 + 用毕关闭）。仍异常时用 PowerShell `Get-CimInstance Win32_Process -Filter \"Name='python.exe'\"` 查是否有 `sync_*`、回测等并发写库。",
+   "evidence": "会话 7230ae3b：修 `duckdb_cache.py` 后 `python report.py` 无回退、无 merge 报错。",
+   "files": [
+    "duckdb_cache.py",
+    "report.py",
+    "sync_market_duckdb.py",
+    "sync_stockdb_to_duckdb.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7230ae3b-3ad8-46da-ad7b-da9ceb90867d"
+   ],
+   "bundle": "010.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] DuckDB 读出的 datetime64[us] 与 CSV 的 [ns] 混用会导致 merge_asof 键不兼容",
+   "type": "bug",
+   "content": "DuckDB `load_wide_frame` 默认 `datetime64[us]`，CSV 缓存常为 `datetime64[ns]`。当 DuckDB 读失败回退 CSV 后在同一面板里 `merge_asof`，会报 `incompatible merge keys M8[ns] vs M8[us]`。应在数据入口统一精度：如 `duckdb_store.load_wide_frame` 与 `data_cache.load_dataframe` 解析日期后一律转为 `datetime64[ns]`，避免多数据源拼接时再踩坑。",
+   "evidence": "会话 7230ae3b：`us_index_data.build_valuation_panel` 在 DuckDB 部分失败后混源 merge 触发；统一 ns 后报告跑通。",
+   "files": [
+    "duckdb_store.py",
+    "data_cache.py",
+    "us_index_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7230ae3b-3ad8-46da-ad7b-da9ceb90867d"
+   ],
+   "bundle": "010.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] StockDB 顶层 `rd.get('*')` 全量扫描易超时，数据源对比应文档+定向探测",
+   "type": "workflow",
+   "content": "对比 StockDB 与 RQAlpha（aqalpha）全量能力时，对 Redis/远程 `rd.get('*')` 做顶层 key 全扫可能因数据量读超时，拿不到完整表清单。报告应改为：官方 SDK 文档列能力边界 + 对日 K/分钟 K/指数等定向 `get_data` 探测字段与样本；并记录本机为空表（如有效*/涨停*/龙虎榜*）是未同步还是不存在。分钟 K 与日 K 字段相同（如 21 列 OHLCV、估值、市值、is_st 等）可作为抽样结论写入对比 MD。",
+   "evidence": "会话 470e994e：全扫超时；1min 与日线字段一致、指数 000001 可读，结论写入 docs/stockdb_vs_rqalpha.md。",
+   "files": [
+    "docs/stockdb_vs_rqalpha.md",
+    "DATA_SOURCES.md",
+    "dividend_lowvol_rotation/prices.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "470e994e-c94f-4fbd-b86a-4d3069e69a94"
+   ],
+   "bundle": "010.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 指数机械复现（Phase 7-A）：只抄官网编制方案，策略变形进待测清单",
+   "type": "workflow",
+   "content": "对齐中证等指数时，复现阶段禁止发明规则（如行业内股息率排名、rank-sum 复合打分、凭记忆的 5% 权重或半年度调样）。官方多为串联漏斗（例：全市场股息率前 75 → 其内低波前 50 → 股息率加权）、单股权重上限与调样频率以现行 PDF 为准并在报告注明「编制方案核对日期」。非官方改进（行业内选样等）只能记入后续阿尔法/7-B 预注册清单做增量评估。分红资格 PIT：按调样日前三个完整自然年、每年均有现金分红，以除权除息日落入自然年计，不用宣告日。综合硬门槛未通过时验证脚本可能 exit 1，需与用例失败区分。",
+   "evidence": "会话 rollout H30269：全市场前 75+低波 50、15% 上限、年度调样；相对 H20269 年化 -0.14pp 三线 ±2pp PASS 但硬门槛不通过未调参；65/65 测试通过仍 exit 1。",
+   "files": [
+    "vbt/strategies/dividend_lowvol_baseline.py",
+    "config/vectorbt/baseline_config.yaml",
+    "output/baseline/baseline_report.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-27T18-04-53-01a042ad-fbe2-7832-8777-897adf18f6f9"
+   ],
+   "bundle": "010.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 死代码/冗余排查：入口+import 链+批处理/README 三向对照",
+   "type": "workflow",
+   "content": "对投资推送类纯 Python 仓库做冗余分析时，先枚举顶层结构（排除 .git/__pycache__/.venv），以 report.py、push.py、sync_data_cache.py、backtest_*.py 等为入口根节点，全仓 grep import/引用，再与 run_*.bat、setup_task.bat、README、push.example.env 对照。被批处理重定向日志调用或 README 写明的模块即使无被其他 .py import，也不应标为「确定可删」，应归入「需确认依赖」并注明 bat/定时任务链路。",
+   "evidence": "会话 48b4edb5：Goals 要求找 orphan 模块，且第 7 点明确 bat/cron/README 依赖的文件不要误标可删；方法为全量枚举 + import grep + README/批处理/配置对照。",
+   "files": [
+    "report.py",
+    "push.py",
+    "sync_data_cache.py",
+    "run_report.bat",
+    "run_push.bat",
+    "run_sync_cache.bat",
+    "run_backtest_inception.bat",
+    "README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "48b4edb5-5fc5-4059-ad4a-9ca0bf0e077e"
+   ],
+   "bundle": "011.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 代码库模块分层与运行时目录约定",
+   "type": "pattern",
+   "content": "投资推送仓库可按职责分层理解：入口（report/push/sync_data_cache/backtest/optimize 脚本）、策略数据（dividend_data、cn_broad_data、cyb_data、hstech_data、us_index_data）、策略信号（core、*_signal）、买入金额（buy_amount_*）、回测与 HTML（backtest_metrics、backtest_html）、共享库（config、data_cache、data_sources、market_data、notify 等）。运行时 cache/ 按市场分子目录（cn/cyb/hstech/us）并含 position_allocation、ranking_allocation；logs/、output/backtest/、push.env 为 gitignore 本地产物。",
+   "evidence": "会话 48b4edb5 分析报告中的项目结构与 34 个 Python 模块分类表、cache/ 子目录说明。",
+   "files": [
+    "config.py",
+    "data_cache.py",
+    "backtest_html.py",
+    "cache/"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "48b4edb5-5fc5-4059-ad4a-9ca0bf0e077e"
+   ],
+   "bundle": "011.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 回测 HTML 图表默认筛选：横轴「日」+ 当年 YTD 区间",
+   "type": "workflow",
+   "content": "backtest_html.py 生成的交互图表应将默认横轴粒度设为「日」（非「月」）；默认日期范围为当年 1 月 1 日至今天，若行情未更新到今天则结束日取最后有数据的交易日。「重置」须恢复上述默认，而不是整个回测区间的起止日。改完后需重新跑回测生成 HTML（如 run_backtest_inception.bat）才生效。",
+   "evidence": "会话 194c1fa9 最终结论：横轴默认日；日期默认当年1/1到当天；重置不再回到全区间。",
+   "files": [
+    "backtest_html.py",
+    "run_backtest_inception.bat"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "194c1fa9-e4a4-4b24-a1b6-32a7114a60a6"
+   ],
+   "bundle": "011.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] Windows 批处理入口：日报与自基日全历史回测",
+   "type": "workflow",
+   "content": "日常 Windows 操作约定：run_report.bat 调用 report.py；run_push.bat 调用 push.py 并写入 logs/push.log；run_sync_cache.bat 调用 sync_data_cache.py；run_backtest_inception.bat 串联 backtest_buy_signals.py 与 backtest_trade_signals.py 做自基日全历史回测。排查「脚本是否在用」时优先查对应 bat 而非仅查 Python 互引。",
+   "evidence": "会话 48b4edb5 批处理表与会话 194c1fa9 用户诉求「增加 windows 脚本：1 执行 report，2 回测自基日全历史」。",
+   "files": [
+    "run_report.bat",
+    "run_push.bat",
+    "run_sync_cache.bat",
+    "run_backtest_inception.bat"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "48b4edb5-5fc5-4059-ad4a-9ca0bf0e077e",
+    "194c1fa9-e4a4-4b24-a1b6-32a7114a60a6"
+   ],
+   "bundle": "011.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 红利策略约束消融：降回撤≠相对市场超额，需区分现金暴露",
+   "type": "fact",
+   "content": "十年消融（Baseline 0/1/2 vs Full）显示：完整硬约束可显著压低最大回撤（如 Full 约 -28% vs Baseline 约 -62%），但 Full 相对市场年化超额可为负；平均持仓仅约 7 只、平均投资比例约 56%，部分年份零持仓，风险改善有相当部分来自现金暴露，不能全部归因于因子选股。写实验结论或调参目标时应同时看年化、回撤、夏普与持仓/投资比例，避免只凭回撤改善认定策略 alpha。",
+   "evidence": "会话 rollout-2026-08-26 最终结论表与「核心结论：完整约束显著降低了回撤，但没有创造相对市场的超额收益…现金暴露」段落。",
+   "files": [
+    "output/ablation/ablation_report.md",
+    "output/ablation/metrics.json"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-26T13-48-50-01a03c9d-33c8-7be0-9185-22d4aae5106c"
+   ],
+   "bundle": "011.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 文档结构：根 README 统一指数定投+红利子策略+Parquet 基建",
+   "type": "workflow",
+   "content": "多 README 易与实现漂移时，将主体（指数定投策略）、子目录业务（红利低波个股）、共享数据基础设施（Parquet/因子集市等）合并为单一根 README，删除分散的子 README，并在合并后做链接、命令、路径、代码围栏与实现一致性核对。",
+   "evidence": "会话 rollout-2026-08-25 用户诉求「将项目里面多个 readme 合并…主体是指数定投策略，子目录有个红利选股策略」及最终结论。",
+   "files": [
+    "README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-25T09-43-58-01a03696-a7e2-72a1-90b8-2aaa05fb347f"
+   ],
+   "bundle": "011.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "月调仓含成本后低波 Band 相对 Top 的优势会被换手侵蚀",
+   "type": "pattern",
+   "content": "红利低波策略里，固定 20 日诊断口径下 Band 筛选往往优于 Top，但换成月调仓并计入交易成本后，Band 的毛利优势会大幅缩窄（例如约 1.5%→0.1% 量级），而 Top 换手率可仅为 Band 的约 40%（如 22% vs 52%）。结论：不能只用短窗诊断选筛选模式；月频实盘/回测应以含成本换手为决策依据，Band 在月调仓下常不如 Top + 缓冲。",
+   "evidence": "会话对比表：固定20日诊断 Band 13.85% vs Top 9.92%；月调仓毛回测 9.69% vs 8.20%；含成本 7.26% vs 7.14%；换手 51.92% vs 22.61%。回滚 Top+Buffer 后年化 16.71%、夏普 0.70、年均单边换手 23.37%。",
+   "files": [
+    "config/vectorbt/strategy_params.yaml",
+    "vbt/strategies/signal_generators.py",
+    "vbt/strategies/dividend_lowvol.py",
+    "vbt/strategies/ablation.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-27T08-48-51-01a040b0-e9b4-7a90-8b73-d9b8e9142ea5"
+   ],
+   "bundle": "012.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "低波 Top + 调仓缓冲：保留池、每期卖上限与买卖互斥",
+   "type": "workflow",
+   "content": "vectorbt 红利低波实现约定：（1）波动率按截面 strict Top10（与股息 Top10 对齐）；（2）缓冲保留要求持仓仍在「波动率 Top30 且股息率 Top30」池内，仍合格则尽量不卖；（3）每期最多卖出 3 只，其余不合格顺延；（4）满仓扩展遵守单股 ≤8%，平均持仓约 13–14 只；（5）验收需保证调仓期买卖集合无重叠（同月卖出又买回为 0）。配置入口 volatility_filter.mode=top、top_n=10，消融与三阶段对比脚本用于验收。",
+   "evidence": "119 次调仓均满足每期最多卖 3 只；买卖重叠 0；缓冲池 Top30+Top30；42/42 测试通过。",
+   "files": [
+    "config/vectorbt/strategy_params.yaml",
+    "config/vectorbt/ablation_config.yaml",
+    "vbt/strategies/signal_generators.py",
+    "vbt/strategies/dividend_lowvol.py",
+    "scripts/run_ablation.py",
+    "scripts/compare_ablation_results.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-27T08-48-51-01a040b0-e9b4-7a90-8b73-d9b8e9142ea5"
+   ],
+   "bundle": "012.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "原生 backtest 与 RQAlpha NAV 不一致但成交一致时，根因在现金与公司行为顺序",
+   "type": "bug",
+   "content": "DLV_BACKTEST_PRICE_SOURCE=rqalpha 且 DLV_EXECUTION_AT_CLOSE=true 时，若调仓成交与 RQAlpha 完全一致但期末 NAV 仍差约 0.7%（例 ~6881 元），市值可对齐、现金不对齐。机制：（1）首日/调仓成交价：原生用约两位小数价，RQ 用 bar 全精度，首日总成本可差 ~1000 元量级；（2）除权日处理顺序：应先送股再派息，顺序反了会在送股标的（如 600188）上累积现金差；（3）佣金差异可忽略。应以 RQAlpha/实盘为真值，改 dividend_lowvol_rotation/backtest.py 的公司行为顺序与调仓成交价来源，用 compare_baseline 收敛到 0.05% 以内。",
+   "evidence": "2025-08-01 原生现金 408656 vs RQ 401774，市值均为 790056；首日成本 993678 vs 994672；全期佣金 370.90 vs 370.96。",
+   "files": [
+    "dividend_lowvol_rotation/backtest.py",
+    "dividend_lowvol_rotation/rqalpha/dividend_lowvol_strategy.py",
+    "dividend_lowvol_rotation/rqalpha/native_cash_ledger.py",
+    "dividend_lowvol_rotation/rqalpha/dividend_tax_sync.py",
+    "dividend_lowvol_rotation/rqalpha/compare_baseline.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cc5e8c6c-5c51-4f79-b39b-f7ed3b7df657"
+   ],
+   "bundle": "012.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "AlphaPurify 因子诊断提速：进程内缓存与报告渲染去重",
+   "type": "pattern",
+   "content": "在不改官方 alphapurify 1.0.6、不降级分层/horizon 精度的前提下，瓶颈多在重复加载快照与指标聚合。套路：alphapurify_bridge/adapters/cache.py 做进程内缓存（冷启动仍慢，三次平均后单因子 10 年可 <5s、六因子批量 <30s）；Markdown/HTML 共用一次图表渲染；verify/compare_perf 脚本落 perf_baseline.json 与 logs/alphapurify_perf.log。默认与 --full 保持 10 层与完整 horizons，仅 --fast 才 5 层/3 horizons。全历史诊断仍可能 ~80% 时间在指标聚合。",
+   "evidence": "单因子 10.43s→3.08s（70.4%）；六因子 37.57s→12.17s；数值最大误差 0；回归 12/12；峰值内存增量 3.75GB。",
+   "files": [
+    "alphapurify_bridge/adapters/cache.py",
+    "alphapurify_bridge/utils/profiler.py",
+    "alphapurify_bridge/diagnostics/runner.py",
+    "scripts/verify_factor_diagnosis.py",
+    "scripts/compare_perf_baselines.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-26T09-55-01-01a03bc7-20de-7822-91d4-cba7500e47ba"
+   ],
+   "bundle": "012.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "投资推送：实盘报告与回测对同一指数的信号口径刻意分叉",
+   "type": "fact",
+   "content": "README/配置约定：创业板指在报告与回测均仅买、无卖点；宽基卖出在报告中仅移动止盈（中证1000 回撤兜底、科创50 分批），去掉估值卖点；红利/美股报告侧仅买，回测可经智能轮动触发移动止盈（美股回测另有估值卖点）。买入默认「位置分配 + 年度预算缩放 + 涨跌缩放」，实盘与回测各有一套分配逻辑，缓存 cache/position_allocation.json。backtest_trade_signals 默认走智能轮动（共享资金池 + 轮动门控）。改阈值或卖点前须分清是 report 路径还是 backtest 路径。",
+   "evidence": "会话 d293249a 按 config.py/report/backtest 脚本补全 README；红利近1年区间阈值 58% 与 config 对齐。",
+   "files": [
+    "README.md",
+    "config.py",
+    "buy_amount_allocation.py",
+    "rotation_sell.py",
+    "market_regime.py",
+    "backtest_trade_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d293249a-9042-45c7-bb0f-b5bf6f037589"
+   ],
+   "bundle": "012.md",
+   "project": "投资推送"
+  }
+ ]
+}

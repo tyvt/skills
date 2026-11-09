@@ -1,0 +1,83 @@
+{
+ "project": "泰兴小程序",
+ "batch": "003",
+ "files": [
+  "003.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "[图片] 模拟器在弹窗里面可以看到巡检图片，真机不行",
+   "type": "fact",
+   "content": "已完成排查与修复，产物已重建并逐处核对。 ## 排查结论 - **排除证书问题**：实测 `www.ylzhwy.com:19002` 证书有效（TrustAsia 泛域名，2027-01 到期，TLS 1.3）；`<image>` 本身也不受小程序域名白名单限制。 - **找到结构性差异**：项目里真机验证过的 `ZsBottomPopup` 外面包了 `root-portal`（弹层挂页面根节点），而 `ZsDialog`（本页弹窗用的，全站 20 处）是原地渲染 `uni-popup`——原地渲染的 fixed 弹层在真机上受页面祖先层叠上下文/transform 影响，正是「模拟器正常、真机内容缺失/底层页面透出」这类差异的高发区。 ## 三处修复（均已进产物，构建 1m06s 成功） 1. **`src/components/ZsDialog/ZsDialog.vue`**：MP-WEIXIN 下加 `<root-portal>` 包裹 `uni-popup`，对齐 ZsBottomPopup 的真机方案；App.vue 的 z-index 覆盖对 root-portal 内部同样生效，全站 20 处 ZsDialog 一并受益。编译产物 `ZsDialog.wxml` 已确认含 root-portal。 2. **`src/staff/components/ZsUplo",
+   "evidence": "extracted source=workbuddy project=泰兴小程序",
+   "files": [
+    "**`src/components/ZsDialog/ZsDialog.vue",
+    "的真机方案；App.vue",
+    "`ZsDialog.wxml",
+    "**`src/staff/components/ZsUploader/ZsUploader.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1f1cffd7-ca4f-4638-a390-b56e691f9e57"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "新增巡检步骤中 巡检图片字段没有了 且不应该是新开页",
+   "type": "preference",
+   "content": "改完了，两个问题都解决了。 ## 根因 commit `0a68e52` 做过一次重构，把原本在 `add.vue` 里的**步骤表单弹窗**抽成了独立页面 `record/editStep.vue`，`add.vue` 改成 `uni.navigateTo` 跳页 + 用 `uni.setStorageSync('record_step_edit_payload')` / `uni.$emit('recordStepSaved')` 跨页回传。于是「新增步骤」变成了新开页面，而「巡检图片」在上传组件与弹窗生命周期的配合上丢了。 ## 改动 **`src/staff/pages_facility/record/add.vue`**（唯一实质性文件，+328/-53） - 恢复 `<ZsDialog v-model:show=\"showStepFormPopup\" position=\"bottom\">` 底部弹窗，字段为 步骤名称 / 标准工时 / 说明 / **巡检图片**（`ZsUploader`，`:limit=\"9\" :max=\"5\" size=\"small\" iconType=\"default\"`，带红色提示语）。 - 恢复 `showStepFormPopup`、`isEditStep`、`editingStep`、`stepForm`、`stepFormImages` ",
+   "evidence": "extracted source=workbuddy project=泰兴小程序",
+   "files": [
+    "`add.vue",
+    "`record/editStep.vue`，`add.vue",
+    "**`src/staff/pages_facility/record/add.vue",
+    "**`editStep.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a76a97a2-e1d3-41ae-8139-d4a6dd188d85"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "[图片] 统计概览-工单统计，显示不对[期望][图片",
+   "type": "preference",
+   "content": "All three fixes are in place and compiled into the dist (build hit an OOM at the very end, but every output file is on disk with current timestamps). Summary: ## 改了什么 | 文件 | 改动 | 修了什么 | | --- | --- | --- | | `src/staff/pages/components/echarts-uniapp/echarts-uniapp.vue` | 旧版 `<canvas canvas-id>` + `ctx.draw()` → `<canvas type=\"2d\">` 同层渲染；节点查询 `fields({node,size})` + dpr 缩放；模块级 Promise 队列串行化 init（多图表并发时不串台）；尺寸重试 20×100ms | 图表穿屏 + 工单趋势空白 | | `src/staff/components/ZsMonthRangeCalendar/ZsMonthRangeCalendar.vue` | `formatMonth` 改用 `dayjs().year(y).month(m-1).date(1).format(...)`（避开 iOS `new Date('2",
+   "evidence": "extracted source=workbuddy project=泰兴小程序",
+   "files": [
+    "`src/staff/pages/components/echarts-uniapp/echarts-uniapp.vue",
+    "`src/staff/components/ZsMonthRangeCalendar/ZsMonthRangeCalendar.vue",
+    "`src/pages/staff/statistics/index.vue",
+    "`staff/pages/components/echarts-uniapp/echarts-uniapp.wxml"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ad70e25f-8d4b-4189-a874-e4ee471ab959"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "[图片] 底部自定义日期弹窗被tabbar遮住 [图",
+   "type": "preference",
+   "content": "已修复并重新出包。 ## 根因 弹窗链路是 `ZsMonthRangeCalendar` → `ZsBottomPopup` → `uni-popup`。问题出在层级： - uni-ui 的 `uni-popup` **没有 z-index 属性**，内部 `.uni-popup` 写死 `position:fixed; z-index:99`； - `ZsBottomPopup` 用 `:style=\"{ zIndex: 10001 }\"` 传的层级，编译后落在 `<uni-popup style=\"{{'z-index:'+d}}\">` 这个**自定义组件节点**上，它不是定位元素 → **z-index 完全不生效**； - 自定义 tabbar 是 `z-index: 999`，999 > 99 ⇒ tabbar 压在弹窗上，把「取消/确定」那一条 footer 全挡住了。 顺带发现：`src/pages/index/newHome.vue` 末尾早就写过一模一样的三条 z-index 覆盖（业主端首页同款坑），但那是**页面级**样式，只对首页生效，统计概览页吃不到——所以这个 bug 才会复现。 ## 改动 | 文件 | 改动 | |---|---| | `src/App.vue` | `<style>` 末尾新增 `.uni-popup{z-index:10000!i",
+   "evidence": "extracted source=workbuddy project=泰兴小程序",
+   "files": [
+    "顺带发现：`src/pages/index/newHome.vue",
+    "`src/App.vue",
+    "`src/pages/index/newHome.vue",
+    "App.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6884f3c7-6d34-4ece-b13b-5f42ff2422e1"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  }
+ ],
+ "_draft": true
+}

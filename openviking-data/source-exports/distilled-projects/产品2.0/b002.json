@@ -1,0 +1,199 @@
+{
+ "project": "产品2.0",
+ "batch": 2,
+ "files": [
+  "005.md",
+  "006.md",
+  "007.md",
+  "008.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "title": "列表页「导入」入口依赖导入子菜单路由：菜单没配就报「没有找到路由」，需探测式跳转 + embedded 内嵌兜底",
+   "type": "pattern",
+   "content": "什么情况：在列表页加「导入」按钮（如 property/spFeeBill 的账单导入），点击即抛 Error: 没有找到路由，栈顶是 ruoyi.js 的 getRouterPathByFilePath，模板链路为 zs-button → ListOperationButtonContainer → 各模块 components/index.vue。\n为什么：getRouterPathByFilePath 的语义是「按 meta.filePath 在后台下发菜单里反查路由，查不到就 throw」。导入页通常只在前端注册了 component（如 property/spFeeBill/service/import），后台菜单里只配了列表菜单、没配导入子菜单，于是反查必然失败。这类报错不是权限问题，也不是组件问题，而是「页面存在但入口菜单不存在」的配置缺口。\n怎么做：① 单一列表页自己判断时，改用 getCurrentRouterByFilePath 拿到路由对象（无命中返回 null 不抛错），有则 router.push 到解析出的 path，没有则不跳转；② 更好的复用做法（本模块 import.vue 被多个账单类型共用）：入口先探测路由，命中则正常跳转到独立导入页，未命中则把同一导入组件以 embedded 模式在列表页内嵌打开，保证功能不受影响；③ 若业务确实需要可收藏、可后退的独立导入页，让运维在后台补隐藏子菜单：component 填 property/spFeeBill/service/import，path 填 import/:tableid，是否隐藏填「是」；④ 判据：跳转类按钮不要用会 throw 的解析函数做前置条件，要么换成非抛错版本，要么 try/catch 后回落内嵌。",
+   "evidence": "会话 69de9222（基线 526c1ff）：用户点「账单导入」报 [Vue warn]: Error in v-on handler: \"Error: 没有找到路由\"，栈顶 getRouterPathByFilePath (ruoyi.js:122) ← handleImport (index.vue:457) ← zs-button ← ListOperationButtonContainer ← views/property/spFeeBill/components/index.vue。修复为改用 getCurrentRouterByFilePath + 有菜单跳转/无菜单以 embedded 模式内嵌组件，并给出后台补 import/:tableid 隐藏子菜单的方案。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/index.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/service/index.vue",
+    "zhi2-web-admin/src/components/ListOperationButtonContainer/index.vue"
+   ],
+   "baseline": "526c1ff",
+   "sessionIds": [
+    "69de9222-9bbc-454a-9a3b-a2baa4720a55"
+   ],
+   "bundle": "006.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "视觉走查基线：对「已部署线上环境」批量截图存 prod 图，本地 dev 截 local 图，靠同名文件配对人工/自动 diff",
+   "type": "workflow",
+   "content": "什么情况：用户反馈「有很多 UI 问题，建议截图部署的线上项目做对比」，随后要求「所有价格备案菜单的列表和详情页都要截图对比」。10 个菜单 × 2（列表+详情）= 20 张图，需要一套可重复执行的基线对比流程。\n为什么：只靠人眼看当前页面无法判断「这里本来就该这么宽/这么长」，必须有一个来自线上（或上一个可接受版本）的参照物；而逐个手点截图不可复现，也无法在修复后复跑。\n怎么做：① 拆成两条 npm script：一条连线上环境产出 *.prod.png 作为基线，一条连本地 dev 产出 *.local.png；两者输出到同一目录（e2e/assets/visual/price-filing/），文件名只差后缀；② 生成 manifest 文件记录「文件名 → 菜单/filePath」的映射，避免靠文件名猜业务；③ 对比时按同名配对（如 county-list.prod.png ↔ county-list.local.png），修复部署后重跑两条命令即可逐菜单复核；④ 该目录与 test-results 一样属于可再生的证据产物，考虑纳入 gitignore，不要提交进仓库；⑤ 需要更严格时可直接上 Playwright toHaveScreenshot 或 pixelmatch 出像素差报告。适用范围：整块 UI 改造（迁移模块、改版）验收，或用户说「和线上不一致」时建立客观判据。",
+   "evidence": "会话 6e92d8f9（基线 5169909）：用户两轮反馈「有很多UI问题，建议截图部署的线上项目做对比」「所有价格备案里面的菜单的列表和详情页都要截图对比一下」。交付为 10 个菜单各 2 张、共 20 张图，目录 e2e/assets/visual/price-filing/，manifest.prod.json 记录文件名与菜单映射；npm run test:e2e:price-filing:visual:prod 采线上基线，npm run test:e2e:price-filing:visual 采本地对比图。",
+   "files": [
+    "zhi2-web-admin/playwright.config.js",
+    "zhi2-web-admin/package.json",
+    "zhi2-web-admin/e2e/assets/visual/price-filing/manifest.prod.json",
+    "zhi2-web-admin/e2e/.env.e2e",
+    "zhi2-web-admin/e2e/fixtures/env-loader.js"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "6e92d8f9-3213-455d-ba5c-fe96f5b76ade"
+   ],
+   "bundle": "006.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "详情页批量迁新框架的机器化清单：五条固定改造项 + 共用操作脚本 + 显式列出未改文件及原因",
+   "type": "workflow",
+   "content": "什么情况：存量迁移模块的 detail.vue 还停留在旧框架，需要一次改掉一二十个文件（progress / riskmanage / unblock / presale / repairFunds / 价格备案等多个业务域），人工逐个改既慢又容易漏项、各页之间口径漂移。\n为什么：旧详情页的写法高度同构，差异只在 moduleName/businessName/permsPrefix 与个别自定义按钮；把它们抽象成固定的替换规则后，就可以用脚本批量落地，再用人工只处理「例外文件」。\n怎么做：① 先定五条统一改造标准，逐条对应可脚本化的文本替换：a) operation-container → operation-btn-group，并补 moduleName / businessName / primaryKey（必须与该目录 index.vue 完全一致，否则权限与提交接口对不上）；b) 查看态改用 DetailTemplate + contentInfo；c) v-hasPermi → zs-button :permission（注意 permission 是数组，见 #1115）；d) 删除独立 <zs-attachment>（附件与流程由 operation-btn-group 内置）；e) 审批由页面私有的 showApproval / showApprovalProcessDialog 改为内置 zs-approval + @/components/zs-approval/ApprovalProcessDialog，但保留区县受理之类自定义审批按钮，流程展示走「流程查看」。② 写一个 scripts/migrate-detail-framework.mjs 固化上述规则，供后续同类批量迁移复用。③ 交付时输出「改动文件数 + 按业务域分组清单 + 未改文件及原因」（如用户点名排除的 superviseBank、以及 verifyRecord 根本没有 detail.vue 只有 index.vue），让「没改」也是可审计的结论而不是遗漏。④ 先跑脚本再人工复核例外，避免直接正则批改误伤 props/watch（见 #204/#815）。",
+   "evidence": "会话 df7ea01a（基线 39e3114）：用户要求改造 supervision/progress、riskmanage、supervision/unblock、presale、repairFunds、价格备案共 6 组 detail.vue，并给出五条改造标准与「不要改 superviseBank/detail.vue」「完成后返回改动文件数和任何未改文件原因」。最终改动 24 个文件，F 项改用了 zs-approval 的 ApprovalProcessDialog，并新增 scripts/migrate-detail-framework.mjs 作为可复用迁移脚本。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/progress/gcht/detail.vue",
+    "zhi2-web-admin/src/views/supervision/unblock/plan/detail.vue",
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/specialcontract/detail.vue",
+    "zhi2-web-admin/src/views/repairFunds/finance/rec/detail.vue",
+    "zhi2-web-admin/src/components/zs-approval/ApprovalProcessDialog.vue",
+    "zhi2-web-admin/scripts/migrate-detail-framework.mjs"
+   ],
+   "baseline": "39e3114",
+   "sessionIds": [
+    "df7ea01a-7050-46fa-a342-71e9dc4e910d"
+   ],
+   "bundle": "006.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "注册件匿名上传不带 Token：过期 Admin-Token 反而 401，E2E 需先清 Token 再进注册页",
+   "type": "bug",
+   "content": "什么情况：企业注册（/file/appendix/upload，busCode=040100）联调/E2E 时上传接口报 401「无效的Token」，或网关侧报「未提供Token」。为什么：注册是匿名流程，上传接口本身不需要鉴权；但只要 sessionStorage 里残留一个过期的 Admin-Token，前端统一封装的 uploadAppendixFile 会照旧带上 Authorization 头，后端/网关按「有 Token 就必须有效」处理，于是必然 401。注意这与已知的「机密白名单路径下 $get 会发真实 GET 返回 405」是两条不同的链路，根因不是请求方法而是请求头的鉴权语义。怎么做：1）companyRegister.js 的 uploadAppendixFile 显式不附带 Authorization；2）E2E 侧删掉硬编码的 REAL_API_TOKEN，新增 ensureRegisterAnonymousSession()，在进入注册页前和 gotoRegister() 加载后再各清一次 Admin-Token/Tmp-Token，把 injectRealApiAuth 标 deprecated 不再默认注入；3）E2E 的上传步骤改用 setupHybridUploadMock 兜住网关仍校验 Token 的联调环境；4）若直连网关仍 401，问题在网关白名单未放行该上传路径，不是前端。需要验证「真实文件落库」的全流程（Step4/Step5 校验营业执照原件）时，必须先让网关允许匿名上传。",
+   "evidence": "007.md 会话 c3f9e4f8：结论明确写出「企业注册是匿名流程，之前若 sessionStorage 里有过期 Admin-Token，反而会返回 401 / 无效的Token」，并列出 companyRegister.js 不再携带 Authorization、register-helpers.js 新增 ensureRegisterAnonymousSession()、injectRealApiAuth 标记 deprecated 三项改动；效果对比表显示 Step3 由失败转为通过，Step4 因 Mock 上传未落库仍报「缺少要件」。",
+   "files": [
+    "zhi2-web-admin/src/api/companyRegister.js",
+    "zhi2-web-admin/e2e/fixtures/register-helpers.js",
+    "zhi2-web-admin/e2e/company/real-api-flow.spec.js",
+    "zhi2-web-admin/e2e/fixtures/auth-helpers.js"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "c3f9e4f8-0f4c-49cd-ab93-f6b6ee988f87"
+   ],
+   "bundle": "007.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "页面白底会盖住挂在 #app-main 上的水印（遮罩）背景：逐层把容器 background 改 transparent",
+   "type": "pattern",
+   "content": "什么情况：用户要求在 app-main 容器上加全站水印（背景 SVG/遮罩），但实测列表页看到、详情页看不到，或局部被白块挡住，反复反馈「还是看不到/还是被挡住了」。为什么：水印是挂在 #app-main 的背景层，凡是中间链路里有不透明的 background:#fff 卡片，就会把它整块盖死。已知「全局水印被页面高层遮挡」是从水印侧解决的（水印层改挂 body + fixed 对齐 app-main，z-index 1990），本条是另一条解法：不动水印，改为逐层打通容器透明度。详情页链路里最容易漏的是公共 detail-template 的根节点白底，其次是小按钮块。怎么做：1）先定位链路：#app-main → 页面容器 → ListTemplate/detail-container → detail-template 根节点，按层用背景色实测，哪层挡就改哪层；2）detail-template 的 .detail-template 把 background:#fff 换成 background-color:transparent，保留 border 与圆角（圆角切割靠边框，不靠底色）；3）.detail-text-button 默认 background-color 同样改 transparent，:hover/:active 保留浅蓝 #ecf5ff 不影响交互；4）标签与值区域不要单独加白底，根节点打通后整段自然透出；5）若仍局部被挡，优先怀疑 v-html 富文本自带的行内 background 或页面另加的 .detail-container 卡片底色，按类名精确改一两处，不要全局 background:none 一刀切。改完要同时验收列表页与详情页两种容器。",
+   "evidence": "007.md 会话 0dd4d311：用户连续 3 轮反馈「还是看不到，我希望整个 app-container 包裹的所有的页面都能看到完整的水印，包括详情页」「还是被挡住了」；结论定位为 detail-template 根节点整块白底把 #app-main 上的 SVG 水印盖住，并给出 .detail-template → transparent（保留边框圆角）、.detail-text-button 默认 → transparent、hover/active 仍 #ecf5ff 的具体改法。",
+   "files": [
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/layout/components/AppMain.vue",
+    "zhi2-web-admin/src/mixins/ListTemplate.js"
+   ],
+   "baseline": "e0dae0d",
+   "sessionIds": [
+    "0dd4d311-11db-44c0-a250-fd9e20eb4dae"
+   ],
+   "bundle": "007.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "登录页改版改错分支：需从暂存区迁移到 262portal 并「基于目标分支逻辑重新整合」，同时保留 portal 专属接口",
+   "type": "workflow",
+   "content": "什么情况：按设计图改造后台登录页（授权登录/账号密码登录、第三方入口、注册链接，去掉二级 Tab 与图形验证码），改完后用户指出「改错分支了，当前所有登录页的改动需要改在 262portal 分支上」。为什么：该项目同时并行多条发布分支（develop/v2.6.2-yulin、develop/v2.6.2-portal 等），各分支的登录逻辑并不等价——portal 分支走的是门户登录接口 /portal/sso/login（字段 userName）并有 setStoredUserId 等专属逻辑。直接 cherry-pick 或整文件套用另一分支的 UI 代码，会把门户登录链路顶掉。怎么做：1）先在源分支把登录页相关改动 stash（登录页 + 注册页共享组件 accountInfo.vue + 新引入的登录图标静态资源）；2）切到 develop/v2.6.2-portal 解决冲突；3）不要直接套用源分支的文件，而是基于 portal 分支原有逻辑重新整合 UI 改动，逐项保留 /portal/sso/login、userName 字段、setStoredUserId；4）新 UI 的验收点：账号密码登录无二级 Tab、无图形验证码，第三方入口与注册链接按设计图；5）zhi2-web-admin 是子模块，父仓库也要一并切到 develop/v2.6.2-portal，源分支工作区必须恢复干净后再交付。改分支前先与用户确认目标分支，避免再改一轮。",
+   "evidence": "007.md 会话 453c62ef：用户第 5 轮明确「改错分支了，当前所有登录页的改动需要改在262portal分支上」；结论记录从 develop/v2.6.2-yulin 暂存改动、切到 develop/v2.6.2-portal 解冲突、基于 portal 分支原有逻辑重新整合（未直接套用 yulin 分支代码），并列出裁剪后保留的门户登录接口 /portal/sso/login（userName）与 setStoredUserId。",
+   "files": [
+    "zhi2-web-admin/src/views/login.vue",
+    "zhi2-web-admin/src/views/LoginForm.vue",
+    "zhi2-web-admin/src/views/home/RegisterLogin.vue",
+    "zhi2-web-admin/src/views/companyLogin.vue",
+    "zhi2-web-admin/src/views/register/components/accountInfo.vue"
+   ],
+   "baseline": "8e16dca",
+   "sessionIds": [
+    "453c62ef-4912-4526-ae16-57cb42408710"
+   ],
+   "bundle": "007.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "行政区划下拉/级联不显示：zs-select 选项键是 dictValue/dictLabel，location-cascader 收单码不收逗号串",
+   "type": "bug",
+   "content": "什么情况：价格备案参数维护（priceParameters）等页面的区域下拉/级联「没有数据项」，刷新也不显示苏州市下各区县；用户点名要求把 /system/divisions/list 换成项目公共行政区划组件。为什么：三个独立根因叠加——1）在 created 里就把区划灌进 areaOptions，此时 Vuex 的 areas 还没加载，拿到空数组；2）选项写成 value/label，而 zs-select 只认 dictValue/dictLabel，键名不对就渲染成空；3）详情页 location-cascader 用了组件不存在的 default-value 属性和 @getValue 事件，且 form.region 存的是 \"320000,320500,320508\" 这种逗号分隔串，组件要的是单个 6 位区划码。怎么做：1）areaOptions 一律写成 computed，从 store 的 areas 派生，不要建快照；2）在 initDict 中预加载区划数据，并 map 成 { dictValue, dictLabel }；3）cascader 用标准的 :region.sync=\"cascaderRegion\"，用 computed 在「逗号串 ↔ 末级区划码」之间双向转换，用 @update 更新 regionName 并刷新片区列表；4）不再调用 /system/divisions/list。验收时列表页与详情页都要打开看一遍，两处问题往往只修了一处。",
+   "evidence": "007.md 会话 04e1ef0f：结论写明 priceParameters 列表页与 recordPriceMngSuzhou 同类问题——created 时 Vuex areas 未加载 + 选项用了 value/label 而 zs-select 需要 dictValue/dictLabel，修复为 computed areaOptions + initDict 预加载并映射；详情页 location-cascader 使用了不存在的 default-value/@getValue，且 form.region 是 \"320000,320500,320508\" 逗号串而组件需要单个 6 位区划码，修复为 :region.sync + computed 转换 + @update 刷新片区列表。",
+   "files": [
+    "zhi2-web-admin/src/views/priceParameters/index.vue",
+    "zhi2-web-admin/src/views/priceParameters/detail.vue",
+    "zhi2-web-admin/src/components/location-cascader/location-cascader.vue",
+    "zhi2-web-admin/src/components/zs-region-select/zs-region-select.vue",
+    "zhi2-web-admin/src/api/system.js"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "04e1ef0f-7b76-47f3-bf80-29a92b396eaf"
+   ],
+   "bundle": "007.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "接口清单文档必须按后端下发的真实菜单路由 JSON 校名，不要沿用户口述的菜单名",
+   "type": "pattern",
+   "content": "什么情况：整理跨模块「涉及接口清单」类 .md 交付物时（例：给公共收益十几个菜单统一新增「行政区域」筛选前的接口盘点），用户口述的菜单名常与系统实际菜单不一致（口述「用款管理」实际菜单是「用款申请」PubUseMoneyApply；口述「资金缴款」实际是 PubPaymentNotice；口述路径写的 wrapper 名与真实组件路径不符，公示管理是 autonomy/publicity/index、业主表决是 autonomy/general/index）。\n为什么：文档的读者是后端与联调方，菜单名、组件路径一旦写错，对方按名字去路由表里找会找不到；而且这类文档会被后续需求当基线，错名会被反复复制。另外口述清单里往往混进不参与本次改造的菜单（如监管协议版本）。\n怎么做：先让用户粘贴后端下发的路由 JSON（含 name/path/component/meta.title），以它作为唯一权威源；表格按路由的一级菜单分组，并显式列出「路由 name / 路由 path / 组件」三列，便于逐条对照；对不参与本次改造的菜单单独一行标注「不涉及本次改造」，而不是给它占一整行表格；删除用户没要求的冗余章节（公共辅助接口、重复的改动文件清单、过长的后端改造说明）把文档压到一页左右。全程只改文档不动代码。",
+   "evidence": "会话 f9cc4363：用户先提「涉及模块包括…用款管理、支取通知书…」并要求整理成 .md，随后贴出完整菜单路由 JSON；最终结论明确「一级菜单名称改为路由中的实际标题」「表格增加路由 name/path/组件三列」「用款管理→菜单实际为用款申请 PubUseMoneyApply」「资金缴款对应 PubPaymentNotice」「监管协议版本单独一行说明不涉及本次改造」「公示管理/业主表决直接写 autonomy/publicity/index、autonomy/general/index，去掉错误的 wrapper 路径」，文档从约 175 行压到约 90 行，且未改动任何代码。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubHouse\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubAdvertiseSpace\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubCommunityBook\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubMerchantNumber\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubBankAccountInfo\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\area.js"
+   ],
+   "baseline": "401d884",
+   "sessionIds": [
+    "f9cc4363-b407-4d06-9b68-1db9634d7833"
+   ],
+   "bundle": "008.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "用户偏好：同一个接口不要拆两个按钮，编辑态只留一个「保存」，由后端在 update 里完成状态流转",
+   "type": "preference",
+   "content": "什么情况：业务编辑/变更页上同时挂了「保存」和「提交审核」两个按钮，但两者调的是同一类保存接口（例：企业变更编辑页同时有 updateCompanyRecordChange 与 submitCompanyRecordChangeByLogin）。用户会直接反问「接口你都用的同一个，干嘛搞 2 个按钮」。\n为什么：重复按钮让操作路径和状态机分叉（一个改数据、一个改状态），用户不知道该按哪个；两个入口还会各自触发一次详情刷新与多余请求，E2E 也要分别维护等待逻辑。用户对按钮收敛的期望是「一个动作一个按钮」。\n怎么做：编辑态只保留一个「保存」，统一走 update 接口，保存成功后刷新详情；删掉提交按钮、其 handler 与重复的提交接口调用，并让按钮由公共 operation-btn-group 内置渲染，不再在页面里自绘第二个。若保存后还需要把单据推进到「待确认」等状态，优先要求后端在 update 内一并处理（前端不新增按钮），确实需要独立流程时先跟用户确认交互再改。改完必须同步 E2E：把原「提交审核」步骤改成点「保存」，并且只等待 update 接口响应，否则用例会挂死。",
+   "evidence": "会话 f7bf284e：用户诉求 2「企业变更应该只有一个变更按钮，点了应该只有一个保存按钮，现在多了很多」；诉求 3「留个保存就行了，接口你都用的同一个，干嘛搞 2 个按钮」；结论移除「提交审核」按钮、保存统一走 updateCompanyRecordChange、去掉重复的 submitCompanyRecordChangeByLogin，并注明「如果保存后还需要单独触发提交流程，需要后端在 update 里一并处理」；E2E company-record-change.spec.js 把「05 提交审核」改为点「保存」且只等待 update 接口。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\toB\\companyRecord\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\company\\company-record-change.spec.js"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "f7bf284e-5e74-49da-969a-742d7d983d0f"
+   ],
+   "bundle": "008.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "首页/看板卡片区内空状态与内容块的撑满约定：空态用 flex:1 + 双向居中，背景图要延伸到容器右缘",
+   "type": "pattern",
+   "content": "什么情况：新首页（views/home/index-new.vue）这类「左标题 + 右图标/内容网格」的看板卡片，做视觉还原时反复被打回四类问题：①卡片下方留白不撑满；②标题文字显示不全（被省略/换行截断）；③业务中心图标组的边框把最左侧标题一起框住，且行内间距太挤导致文字换行；④区块背景图没延伸到容器最右侧；⑤「暂无公告数据」这类空态贴在左上角而不是居中。\n为什么：这类区块都是 flex 纵向嵌套，父层没有确定高度链时空态无法居中；边框与间距若挂在整行而不是只挂图标组，就会连带包住标题；背景图写在内容盒上而不是容器上，宽度只到自己内容区。\n怎么做：①给卡片/内容区补满高度链（AppMain → 中间容器 → 业务中心块逐层撑满），需要压缩中间高度时改该层的高度而非外层；②标题类元素禁换行并保留完整文案，通过拉大图标组行间距而不是缩字号来消化宽度；③边框只包住右侧图标组（标题单独在框外），不要包整行；④背景图挂到容器层并设宽度延伸至右缘（object-fit/width:100% 或不重复平铺）；⑤空状态用「父容器 display:flex; flex-direction:column，空态节点 flex:1 且父级 align-items:center; justify-content:center」实现区内双向居中，这是唯一稳的写法，不要靠 margin/padding 硬顶；⑥左右两栏的上下边距用同一间距变量保证「上下对齐」。",
+   "evidence": "会话 0ae813a4 六轮诉求依次为「页面下面要撑满，业务中心里面垂直居中，加边框」→「中间高度压缩一下，业务中心的边框只需要包住整个右边的icon组，不要包住最左边的标题」→「这里标题文字显示不全」→「这里间距拉大，文字不要换行，完整显示」→「这里背景图要延伸到容器最右侧」→「上下要对齐」；最终结论为「.notice-body 改为 flex 纵向布局占满剩余高度，.empty-tip 使用 flex:1 并配合 align-items/justify-content:center 居中，刷新后『暂无公告数据』显示在区域正中央」。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\home\\index-new.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\home\\index-wrapper.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\layout\\components\\AppMain.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\layout\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue"
+   ],
+   "baseline": "ad1681a",
+   "sessionIds": [
+    "0ae813a4-8369-4c2b-a411-ca813e60468b"
+   ],
+   "bundle": "008.md",
+   "project": "产品2.0"
+  }
+ ]
+}

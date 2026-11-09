@@ -1,0 +1,235 @@
+{
+ "project": "园区物管2.0",
+ "batch": 16,
+ "files": [
+  "061.md",
+  "062.md",
+  "063.md",
+  "064.md"
+ ],
+ "count": 14,
+ "memories": [
+  {
+   "title": "登录后守卫内 next(replace) 触发 NavigationRedirected 控制台误报",
+   "type": "bug",
+   "content": "zhi2-web-admin 登录成功执行 router.push('/') 时，permission 守卫在 roles 为空时会拉用户信息并 GenerateRoutes，随后执行 next({ ...to, replace: true }) 用新路由表重进目标页。Vue Router 3.4+ 将该守卫内重定向记为 NavigationRedirected，push/replace 的 Promise 会 reject。若 router/index.js 只忽略 NavigationDuplicated，控制台会出现 “Redirected when going from \"/login\" to \"/index\" via a navigation guard”，并非登录失败。修复：在全局 push/replace 的 catch 中同时吞掉 NavigationDuplicated 与 NavigationRedirected。",
+   "evidence": "会话 16b980bb：用户贴登录跳转报错；结论指向 router/index.js 第 179 行 next({ ...to, replace: true })，已在 push/replace 增加 NavigationRedirected 忽略。",
+   "files": [
+    "zhi2-web-admin/src/router/index.js",
+    "zhi2-web-admin/src/views/login.vue"
+   ],
+   "baseline": "fb0e2899f",
+   "sessionIds": [
+    "16b980bb-0cbc-469a-a6f7-ab1d9680599d"
+   ],
+   "bundle": "061.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "RegionTreeLayout 左侧树边框随节点变矮的根因与固定高度方案",
+   "type": "pattern",
+   "content": "物业 complex 页左侧树面板若使用 align-self: flex-start，高度会随树节点数量收缩；同时若 .tree-wrap 被覆盖为 height: auto，树区域不会撑满容器，边框看起来「跟着数据变短」。约定：去掉 align-self: flex-start，为 .type-left 设置固定 height/min-height/max-height（如 calc(100vh - 180px)）；.tree-wrap 使用 height: 100% + overflow: auto，节点少时在固定框内滚动，节点多时在 .type-left-tree 内滚动。",
+   "evidence": "会话 bb65a7e2：用户要求树边框高度固定不随数据缩短；结论明确两点 CSS 根因及 RegionTreeLayout.vue 修改方式。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue",
+    "zhi2-web-admin/src/views/property/complex/components/regionTree.vue"
+   ],
+   "baseline": "49e7729ce",
+   "sessionIds": [
+    "bb65a7e2-6e02-4948-ae2d-480611ff86ef"
+   ],
+   "bundle": "061.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "B 端租赁备案选物业管理区域：handlePick 增加 extra 与 extraLinks",
+   "type": "workflow",
+   "content": "资源租赁合同备案 detail 选择「物业管理区域名称」弹窗，应对齐资产租赁备案同场景：在 handlePick 中当 terminalType === \"B\" 时传入 extra 文案（仅可选已开户且已签署公共收益监管协议的区域），并配置 extraLinks 快捷跳转（如「前往开户」「签署协议」，分别指向监管账户、监管协议新增路由）。非 B 端保持原接口与筛选；getRouterPathByFilePath 用于拼跳转路径。",
+   "evidence": "会话 0cfa47f3：用户要求 resourcesLeaseContractFiling/detail.vue 参考 assetsLeaseContractFiling/detail.vue 增加 extra。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/detail.vue",
+    "zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/detail.vue"
+   ],
+   "baseline": "7fe15a8cb",
+   "sessionIds": [
+    "0cfa47f3-cb5a-437f-98b1-f0ce4821fd79"
+   ],
+   "bundle": "061.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "zs-operate-column 按 label 测宽仍截断：只增不减与单元格 padding 补偿",
+   "type": "pattern",
+   "content": "已知条目要求列表操作列勿写死 :width、交给 zs-operate-column 按按钮文案自适应；若仍显示不下，常见原因是各行按钮数量/文案长短不一导致宽度被较小行回写压小，且未计入 el-table 单元格左右 padding。组件内应使用 buttonWidth = Math.max(buttonWidth, currentWidth) 只增不减；增加 cellPaddingWidth（如 24）计入单元格留白；适当提高列最小宽度（如 96）与单按钮估算下限（如 42→56）。",
+   "evidence": "会话 23253f6c：改为按 label 计算宽度后用户反馈仍显示不下；第二版结论给出 Math.max、cellPaddingWidth=24、min 96。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue"
+   ],
+   "baseline": "7814a0c2a",
+   "sessionIds": [
+    "23253f6c-e368-40d0-9e15-aeb08f21a4b6"
+   ],
+   "bundle": "061.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "资金全景 renderCategoryBar 支出柱图需传 uniformBarColor 第三参",
+   "type": "pattern",
+   "content": "dataSandbox/fundPanorama 中「各类支出分布」与收入图共用 renderCategoryBar，但未传第三个参数 uniformBarColor 时会回落 mock.js 里 expenseByCategory.colors 逐柱配色。若设计稿要求整图单色（如 #FFA94D），应在 initCharts 中与收入图一致传入第三参：renderCategoryBar(ref, expenseByCategory, '#FFA94D')；mock 内 colors 可与展示解耦单独维护。",
+   "evidence": "会话 418857f1：用户要求各类支出分布柱体全部 #FFA94D；结论指出未传 uniformBarColor 的根因及 index.vue 修改行。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue",
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/mock.js"
+   ],
+   "baseline": "f00310232",
+   "sessionIds": [
+    "418857f1-8122-4137-97aa-db7576f9cb72"
+   ],
+   "bundle": "061.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "底部饼图图例每行固定 N 项：legend 数组分段 + bottom 错开",
+   "type": "pattern",
+   "content": "ECharts 单个 legend 靠宽度自动换行难以精确控制「每行 4 个」。资金全景 buildDistrictPieLegendOption 在 legendBottom 为真时，应按 districtOrder 切成多段，返回 legend 数组：每段一行、设置不同 bottom 纵向错开。可调常量：PIE_LEGEND_ITEMS_PER_ROW（每行个数）、PIE_LEGEND_ROW_STEP（行间距）。右侧竖排图例（legendBottom 为假）逻辑保持独立。",
+   "evidence": "会话 1262fc8a：用户要求饼图图例一行 4 个再换行；结论描述 legend 数组与 PIE_LEGEND_ITEMS_PER_ROW/ROW_STEP。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "baseline": "f00310232",
+   "sessionIds": [
+    "1262fc8a-c936-4b20-bf86-cc7a75c4f508"
+   ],
+   "bundle": "061.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "大屏指标区 repeat(3,1fr) 导致三项横向间距虚大",
+   "type": "pattern",
+   "content": "左栏 summary 类三列指标若使用 grid-template-columns: repeat(3, 1fr)，在较宽容器内每列占满三分之一且内容居中，数字之间会出现大块空白。收紧做法：repeat(3, auto) 让列宽随内容、justify-content: center 整体居中、减小 gap 与左右 padding（如 gap 4px、padding 6px）。",
+   "evidence": "会话 76615610：mapOverview 物业管理区域三项间距过大；结论指向 .summary-list 的 1fr 三等分根因及四处样式调整。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue"
+   ],
+   "baseline": "f00310232",
+   "sessionIds": [
+    "76615610-2741-4c89-accc-c5cfe6621d05"
+   ],
+   "bundle": "061.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] USE_MOCK_DATA=false 仍先闪 mock：data() 初始化与开关脱节",
+   "type": "bug",
+   "content": "数据沙盘/大屏类页面常同时存在 USE_MOCK_DATA 开关与同目录 mock.js。即使 USE_MOCK_DATA=false，若在 data() 里仍用 cloneMockCards() 初始化卡片/图表数据，首屏会先渲染一整套 mock 数值，接口返回后再被覆盖，用户会误以为仍在走 mock 或看到错误数据一闪而过。修法：抽出 createEmptyPanoramaCards()（或同类骨架工厂）——保留标题、单位、配色等静态配置，数值置空（summaryValue:0、donutData:[]、barValues 全 0）；初始化写 USE_MOCK_DATA ? cloneMockCards() : createEmptyPanoramaCards()。接口模式先展示空/0，仅 true 时完整 mock。",
+   "evidence": "会话 0d12bfa5：用户要求「使用接口时默认不要展示 mock」；结论写明虽 USE_MOCK_DATA=false，data() 仍 cloneMockCards() 导致先显示 mock 再更新。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue",
+    "zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/mock.js",
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "baseline": "6a4835a08",
+   "sessionIds": [
+    "0d12bfa5-5326-44a2-8e2c-d1e5aeef584f"
+   ],
+   "bundle": "062.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] 列表页 el-switch 绑了 @change 但 methods 未声明对应 handler",
+   "type": "bug",
+   "content": "Vue2 列表页模板里 el-switch 常用 @change=\"changeType\" 切换「树状/平铺」并控制左侧树面板 v-show。若从别的页面复制模板却未带上 methods.changeType，运行时只有 [Vue warn] Property or method \"changeType\" is not defined，功能静默失效。修复：对齐同业务域已上线页（如 pubHouse/index.vue、assetsLeaseContractFiling）补齐 changeType；批量检查 resourcesLeaseContractFiling、parkingSpaceContractFiling 等同类备案列表是否缺同一方法。",
+   "evidence": "会话 c5b92557：resourcesLeaseContractFiling/index.vue 第 9 行 @change=\"changeType\" 无 methods 定义；按 pubHouse 等同构页补全后警告消失。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/index.vue",
+    "zhi2-web-admin/src/views/benefit/pubHouse/index.vue",
+    "zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/index.vue"
+   ],
+   "baseline": "5a288f142",
+   "sessionIds": [
+    "c5b92557-6c32-4be4-9a65-a4f661c3b0b9"
+   ],
+   "bundle": "062.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] 区域树接口请求中 el-tree 应显示「加载中」而非「暂无数据」",
+   "type": "workflow",
+   "content": "property/complex 左侧区域树在首屏请求未完成时，el-tree 默认 empty-text 会显示「暂无数据」，与真实状态不符。约定在真正发树的子组件（如 regionTree.vue，RegionTreeLayout 仅包裹）维护 treeLoading：初始 true；getDeptList 请求前置 true，成功赋值 treeData 后在 $nextTick 完成展开/默认选中再 false，失败/异常同样关闭；:empty-text 动态为 treeLoading ? '加载中' : '暂无数据'。父级用 treeRenderKey 重挂子树时会重新走该流程。若需整区遮罩可叠加 v-loading=\"treeBusy || treeLoading\"，与 empty-text 文案分工：文案管树内空态，遮罩管整块不可点。",
+   "evidence": "会话 190c0ade：用户要求左侧树请求时「暂无数据改为加载中」；实现在 regionTree.vue 的 treeLoading + 动态 empty-text + getDeptList 流程。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/components/regionTree.vue",
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue"
+   ],
+   "baseline": "7fe15a8cb",
+   "sessionIds": [
+    "190c0ade-ed4c-451c-a6a0-0d37bcc60607"
+   ],
+   "bundle": "062.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] 详情页 mounted 误读 sessionStorage.setRow：仅新增选资产路径写入",
+   "type": "bug",
+   "content": "benefit/housePart 等页在 mounted 里无条件 JSON.parse(sessionStorage.getItem('setRow')) 并访问 row.houseId，从列表点「查看」进入时不会写入 setRow，parse(null) 得 null 再取属性直接报错。setRow 只在列表「新增→选择资产」时由 handlePick 写入，用于新增预填；查看/编辑应完全走 detailMixins.init() 拉详情。修复：仅在 formMode === 'add' 时执行该段；对 setRow 做空值判断并用 row?.houseId。与「sessionStorage 草稿回显」类条目不同：这是误把新增专用 key 当成所有模式的入口。",
+   "evidence": "会话 ad4fc981：housePart/detail.vue mounted 无条件读 setRow 导致列表进详情报错；限定 add + 空值安全访问后恢复。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/housePart/detail.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "baseline": "177bc3ce4",
+   "sessionIds": [
+    "ad4fc981-1190-4d93-bf99-6701fbd4ed48"
+   ],
+   "bundle": "062.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] mapOverview 轮播「全市」须给全部区县推 geo regions 高亮项",
+   "type": "bug",
+   "content": "无锡地图 SVG 轮播在单区时会对 highlightName 推入带 WUXI_GEO_HIGHLIGHT_ITEM_STYLE 的 regions 项；轮播到「全市」时若把 highlightName 设为 null 并在 buildMapGeoCarouselRegions 里对 !highlightName || highlightName==='全市' 直接 return regions（只保留江阴飞地 silent），则没有任何区县带上高亮 itemStyle，视觉上「全部不亮」。修法：全市分支仍遍历 WUXI_SVG_GROUP_REGIONS（除飞地外）为每个区县推一条与单区轮播相同的高亮样式与 wuxiGeoCarouselHighlightLabel()；飞地 silent 项也要补上与「江阴市」单区时一致的 emphasis/itemStyle，使全市态与单区态视觉一致。",
+   "evidence": "会话 d90e73b5：用户报全市应全部高亮却全部不亮；根因全市分支未设置 WUXI_GEO_HIGHLIGHT_ITEM_STYLE，改遍历区县加 regions 后修复。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue",
+    "zhi2-web-admin/src/views/benefit/mapOverview/mock.js"
+   ],
+   "baseline": "3353ef164",
+   "sessionIds": [
+    "d90e73b5-e60c-4919-b4fa-937e9f6f410d"
+   ],
+   "bundle": "062.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] platformConfig 功能开关用 isShowPublishButton === true 默认隐藏",
+   "type": "pattern",
+   "content": "跨页面按钮是否展示可挂在 Vuex app.platformConfig（接口 /system/platformConfig/getInfo 对齐），在 platformConfig 初始对象里声明 isShowPublishButton: undefined。页面用 mapState 取出后，v-if 最前面加 isShowPublishButton === true，再叠原有 bizState/msgId/征集类型/publishState 等业务条件。严格等于 true 时未配置或 undefined/false 一律不显示，避免后端未下发时误开敏感操作（如「发布公告」）。若产品要求「未配置则沿用旧逻辑」，再改为 isShowPublishButton !== false 并文档化。",
+   "evidence": "会话 f61307bd：app.js 增 isShowPublishButton，candidateCollect detail 发布公告按钮仅在 === true 且原条件满足时显示。",
+   "files": [
+    "zhi2-web-admin/src/store/modules/app.js",
+    "zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue"
+   ],
+   "baseline": "7814a0c2a",
+   "sessionIds": [
+    "f61307bd-7d75-4fff-ad85-3385c42878ea"
+   ],
+   "bundle": "062.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] 线柱混图去掉 series label 保留 tooltip 避免顶部数字拥挤",
+   "type": "pattern",
+   "content": "数据沙盘 fundPanorama 资金趋势等 ECharts 柱+双折线混图若对柱与折线都设 label.show:true、position:'top'，会在图形上方叠满数字。展示型大屏通常只要形态对比，具体数用 tooltip。统一将各 series 改为 label:{ show:false }，并删除仅服务标签的 labelFmtWan/labelFmtCount 等格式化函数，避免死代码。",
+   "evidence": "会话 2f483f91：用户要求线柱混色图上方不显示数值；renderFundTrendMixed 三系列 label 改 false，tooltip 仍可用。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "baseline": "f00310232",
+   "sessionIds": [
+    "2f483f91-4f7f-47c1-9cad-5b1a96c6ab37"
+   ],
+   "bundle": "062.md",
+   "project": "园区物管2.0"
+  }
+ ]
+}

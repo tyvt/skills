@@ -1,0 +1,187 @@
+{
+ "project": "门户",
+ "batch": 9,
+ "files": [
+  "033.md",
+  "034.md",
+  "035.md",
+  "036.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "title": "[门户] el-table 横向滚动条仅在轨道附近悬停才显示：hover 选择器要挂在整张表而非 body-wrapper 的滚动条",
+   "type": "pattern",
+   "content": "什么情况：门户 zhi2-web-admin 里表格底部横向滚动条，鼠标在表头、固定列或单元格上时滑块不出现，只有指针移到滚动条轨道附近才出现。\n\n为什么：全局样式若写成 `.el-table__body-wrapper:hover::-webkit-scrollbar-thumb`，在 Chromium 里「悬停滚动条滑块」不等于「悬停在 body-wrapper 上」；指针在表体数据区时不会命中该规则。\n\n怎么做：在 `src/styles/index.scss` 改为整张表悬停即显示主表体横向滑块，例如：\n- `.el-table:hover > .el-table__body-wrapper::-webkit-scrollbar-thumb`\n- `.zs-table-container:hover .el-table__body-wrapper::-webkit-scrollbar-thumb`\n覆盖原生 el-table 与 zs-table 包裹场景。改后刷新，在首页待办等宽表上移入任意区域应能看到底部横滚条。",
+   "evidence": "「index.scss 里用的是 .el-table__body-wrapper:hover::-webkit-scrollbar-thumb…横向滚动条滑块往往只有指针在滚动条轨道附近时才会按这条规则显示」；改为 `.el-table:hover > .el-table__body-wrapper` 与 `.zs-table-container:hover`。",
+   "files": [
+    "d:/repository/门户/zhi2-web-admin/src/styles/index.scss",
+    "d:/repository/门户/zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "d:/repository/门户/zhi2-web-admin/src/views/home/components/HomeTodoTable.vue"
+   ],
+   "baseline": "b84b4e7",
+   "sessionIds": [
+    "908fa819-e4da-4511-b737-948d86388270"
+   ],
+   "bundle": "033.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 公共门户叠层详情弹窗标题居中：在 portal.scss 统一 portal-detail-header，勿按单页 is-permit 补丁",
+   "type": "pattern",
+   "content": "什么情况：首页二级页（publicPortal）里商品房、租赁等叠层详情弹窗标题左对齐，需全部水平居中。\n\n为什么：标题 h2 若为 `inline-block` 会随内容宽度左排；各弹窗（PropertyDetailDialog 等）各自写 `is-permit` 居中样式会重复且漏覆盖。\n\n怎么做：在 `publicPortal/portal.scss`（PortalDetailHeader 全局样式）将标题改为 `display: block; width: 100%; text-align: center`；关闭按钮保持右上角绝对定位不占标题行宽。删除单页仅针对预售许可的重复居中样式，避免双处维护。所有使用 `portal-detail-header` 的 Rental/Property 类弹窗一次生效。",
+   "evidence": "「将标题 h2 从 inline-block 改为 display: block; width: 100%; text-align: center」「PropertyDetailDialog 删除原先仅针对预售许可弹窗（is-permit）的重复居中样式」。",
+   "files": [
+    "d:/repository/门户/zhi2-web-admin/src/views/home/publicPortal/portal.scss",
+    "d:/repository/门户/zhi2-web-admin/src/views/home/publicPortal/components/PortalDetailHeader.vue",
+    "d:/repository/门户/zhi2-web-admin/src/views/home/publicPortal/components/RentalDetailDialog.vue"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "b0657f58-c3a5-4ffd-a3ba-7e97031b4770"
+   ],
+   "bundle": "033.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 苏周到扫码登录全在 zhi2-web-admin：/security/ctAuth/suzhouDao/* + noMessage/skipAuthDialog",
+   "type": "fact",
+   "content": "什么情况：在「门户」父仓库搜苏周到/ctAuth 二维码登录，根目录无业务源码，需落到子模块。\n\n事实：实现仅在 `D:\\repository\\门户\\zhi2-web-admin`（Vue 2.7 + Vue Router 3 + Element UI + Vite，axios 经 `@/api` 封装）。API 文件 `src/api/security/suzhouDao.js`：`getQrLoginParam`、`scanLogin(qrCodeId)`、`suzhouDaoLogin` 均 `POST('/security/ctAuth/suzhouDao/...', …, { noMessage: true, skipAuthDialog: true })`。实际前缀为 `/api/v2.0`（`env/.env` 的 `VITE_APP_BASE_API`，vite.config 注入）。请求栈：`src/api/index.js` 建 HttpRequest 实例；`src/utils/request.js` 响应拦截在 `code != 200` 时 reject，401 弹窗在 `skipAuthDialog: true` 时跳过——门户免登录轮询必须带该配置。页面侧含二维码展示、轮询 scanLogin、带 code 的回调页与 token 落库（具体组件以仓库内路由与 views 为准）。",
+   "evidence": "「根 portal 项目 source 无 Suzhou Dao 引用，仅 zhi2-web-admin 子模块」「publicRequestConfig = { noMessage: true, skipAuthDialog: true }」「Effective URLs are /api/v2.0/security/ctAuth/suzhouDao/…」「401 handling is skipped when config.skipAuthDialog is true」。",
+   "files": [
+    "d:/repository/门户/zhi2-web-admin/src/api/security/suzhouDao.js",
+    "d:/repository/门户/zhi2-web-admin/src/api/index.js",
+    "d:/repository/门户/zhi2-web-admin/src/utils/request.js",
+    "d:/repository/门户/env/.env"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "sess_subagent_agent_8a7e60b1-abf5-46bd-becb-5f29e90346a7"
+   ],
+   "bundle": "033.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] UnifiedLogin 预售公告列表：接口返回前勿用空列表渲染「暂无」；解析与注销过滤要对齐同页惯例",
+   "type": "bug",
+   "content": "什么情况：接入 `GET /presale/open/notice/list`（openNotice.js，noMessage + skipAuthDialog）后，UnifiedLogin 预售区块在请求未完成就显示「暂无预售许可公告」。\n\n为什么：`presaleList` 初始 `[]` 且无 loading 门闩，空态与真实无数据未区分；列表只读 `res.data` 而同页其它列表用 `extractPageRows`，后端若走 `rows`/`records` 会静默为空；`:key=\"item.applyCode\"` 在缺失或重复时不稳；`cancelFlag !== '1'` 未覆盖数字 `1` 时已注销项仍可能展示。\n\n怎么做：①增加 `loading`（或「未首次加载完成」标志），仅在请求结束且列表仍空时显示暂无；②列表行统一 `extractPageRows(res)` 或同等多字段兜底；③key 用稳定复合键或 id；④注销过滤用宽松相等（`String(cancelFlag) === '1'` 或 `== 1`）。先过滤注销再 `slice(0, PRESALE_LIMIT)` 顺序正确。API 层免登录配置与现有门户公开接口一致。",
+   "evidence": "审查结论：「presaleList 初始为空且没有 loading，接口返回前会先显示暂无预售许可公告」「列表解析只用 res.data，与同页 extractPageRows 不一致」「cancelFlag !== '1' 未覆盖数字 1」。",
+   "files": [
+    "d:/repository/门户/zhi2-web-admin/src/api/presale/openNotice.js",
+    "d:/repository/门户/zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "d:/repository/门户/zhi2-web-admin/src/utils/request.js"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "074a72f3-331b-40b4-8c2f-331816b2d29d"
+   ],
+   "bundle": "033.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 首页平台横幅文案入场偏晚：缩短 animation-delay 并用 IO threshold/rootMargin 或视口内立即挂 intro 类",
+   "type": "pattern",
+   "content": "什么情况：UnifiedLogin/首页平台横幅（platform-banner-desc 等）红框文案动画开始太晚，用户已看到骨架或静态画面很久才滑动入场。\n\n为什么：CSS `animation-delay` 过大（如 1.6s/2.5s）；且依赖 IntersectionObserver 高 threshold 或等滚动比例才加 `platform-banner--intro`，横幅已在视口内时仍延迟触发。\n\n怎么做：①将文案左移 delay 大幅下调（会话中 1.6s→0.25s，角标 2.5s→1.05s，可按观感再调）；②若横幅已在视口：骨架揭开后立即加 `platform-banner--intro`；③若在视口下方：`threshold: 0` 并 `rootMargin: '0px 0px 20% 0px'` 提前进入可见区即播。仍嫌晚可把 delay 改为 0 或加大 rootMargin。",
+   "evidence": "「animation-delay 1.6s → 0.25s」「一网通办角标 2.5s → 1.05s」「横幅已在视口内…立刻加上 platform-banner--intro」「threshold 改为 0，并加 rootMargin: '0px 0px 20% 0px'」。",
+   "files": [
+    "d:/repository/门户/zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "d:/repository/门户/zhi2-web-admin/src/views/home/operationGuide/components/OperationGuideHeroCarousel.vue"
+   ],
+   "baseline": "f489349",
+   "sessionIds": [
+    "94bd8556-7b38-4bda-afa8-7a8e6c0768fd"
+   ],
+   "bundle": "033.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] UnifiedLogin 顶部搜索框彩色旋转光带边框在该页维护，不在 index-new 横幅",
+   "type": "fact",
+   "content": "什么情况：用户要求改首页搜索框环绕渐变色/边框粗细/旋转速度，误打开 `index-new.vue` 找不到对应动画。\n\n事实：彩色 mask 光带边框样式在 `src/views/home/UnifiedLogin.vue` 顶部搜索框；设计稿色阶（透明→#00C8FF→#01FF56→#FFAF36→透明）、描边环宽度由 mask 的 padding（如 2px）、周期由 animation 时长（如 4.5s）控制。若要在 `index-new.vue` 横幅复用同款，需显式拷贝同一套样式而非假设共用。",
+   "evidence": "「彩色环绕边框在该页，不在当前打开的 index-new.vue」「padding: 3px → 2px」「animation: 3s → 4.5s」「刷新 /UnifiedLogin 即可查看」。",
+   "files": [
+    "d:/repository/门户/zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "d:/repository/门户/zhi2-web-admin/src/views/home/index-new.vue"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "16ba347b-80c4-494d-b58c-7ecc0a738758"
+   ],
+   "bundle": "033.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] publicPortal 商品房表格「房屋用途」列：加宽并表头/单元格 nowrap 防换行",
+   "type": "pattern",
+   "content": "什么情况：公共门户 PropertyPages 表格「房屋用途」列表头两字换行、列过窄。\n\n怎么做：在 PortalTable/列配置将该列宽从约 96px 提到约 120px（按实际文案微调），并对该列表头与单元格设置 `white-space: nowrap`（或等效类），保证「房屋用途」单行；序号列可单独收窄，其它列尽量避免 ellipsis 除非设计明确要求。表头带单位等标注需与 mock/接口字段同步改列 title。",
+   "evidence": "「房屋用途列宽从 96px 调整为 120px，并为该列表头与单元格设置了不换行」；同会话另有表头加单位、序号列变窄等标注改法。",
+   "files": [
+    "d:/repository/门户/zhi2-web-admin/src/views/home/publicPortal/components/PortalTable.vue",
+    "d:/repository/门户/zhi2-web-admin/src/views/home/publicPortal/pages/PropertyPages.vue",
+    "d:/repository/门户/zhi2-web-admin/src/views/home/publicPortal/portal.scss"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "73eddf52-d142-466d-8d9c-fda167da60fd"
+   ],
+   "bundle": "033.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] GetInfo 返回 terminalType null 时用 inferTerminalType 推断 B 端，再按板块权限选 developer 首页",
+   "type": "bug",
+   "content": "现象：开发企业账号（如 roleKey `kfqy_gly`）登录后首页误走 admin 工作台，而非 developer 皮肤。\n\n根因链：① 后端 `GetInfo` 可能返回 `terminalType: null`；若 `resolveHomeLayoutVariant` 仍把「非 B」或缺省直接映射 admin，会在未推断端别时错显；② 已有门户条目强调 `bizSectionCodes` 只管是否 B 端企业首页、不参与 broker/developer 皮肤，但**不能**在 `terminalType` 未就绪时跳过 B 端推断。\n\n修复套路（`terminalUser.js` + `store/modules/user.js` + `homeLayout.js`）：\n- `GetInfo` 落库前调用 `inferTerminalType(user, roles)`：按 roleKey 前缀（如 `kfqy_`）判 B 端，写入 store 的 `terminalType`（示例场景为 `B`）。\n- `resolveHomeLayoutVariant` 在确认 B 端后，结合 `listPerms` / 板块权限（如仅有 `portal:bizSection:commodityHouseTrade`）落到 `developer`，而不是 admin。\n\n验收：构造 `terminalType=null` + `kfqy_gly` + 商品房板块权限，刷新首页应出现 developer 布局与统计条；与「仅超管显示侧栏」「layoutVariant 调试 return」类问题分开排查。",
+   "evidence": "会话 a3593973：dev 企业登录 terminalType null、listPerms 含 portal:bizSection:commodityHouseTrade、roleKey kfqy_gly 应显示 developer 非 admin；结论 GetInfo 用 inferTerminalType、kfqy_gly 匹配 B 端前缀、resolveHomeLayoutVariant 仅商品房板块 → developer，CRITICAL 0 PASS。",
+   "files": [
+    "zhi2-web-admin/src/utils/terminalUser.js",
+    "zhi2-web-admin/src/views/home/config/homeLayout.js",
+    "zhi2-web-admin/src/store/modules/user.js",
+    "zhi2-web-admin/src/utils/portalLayout.js",
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js"
+   ],
+   "baseline": "ac6513b",
+   "sessionIds": [
+    "a3593973-ff8d-4958-89a1-8e4f3753ae90"
+   ],
+   "bundle": "035.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 门户 API 大版本切换须父仓 env + nginx 与子模块 vite 代理三处同改再 npm run test",
+   "type": "workflow",
+   "content": "门户是 monorepo：父仓 `门户/env/.env`（`VITE_APP_BASE_API`、`VITE_APP_PORTAL_BASE_API`）与 `deploy/nginx.conf` 的 `location` 前缀，和子模块 `zhi2-web-admin/vite.config.js` 开发代理默认值必须同一版本串（如 `/v3.0`）。只改子模块或只改父仓会导致 dev 通、test 包或生产 nginx 仍打旧网关。\n\n操作顺序：① 全仓 grep 旧前缀（如 `/v2.0`）确认无残留；② 同步改上述三处（注意用户口述 `/v.3.0` 多为笔误，以项目既有 `/v2.0` 形态改为 `/v3.0`）；③ 在父仓执行 `npm run test` 打包；④ 在 `dist/` 产物 grep 新前缀并确认无旧串。\n\n与「portalApiRewrite / sign.js 漏改」条目互补：本次是**网关版本号**整包升级，不单是某个 listTree 路径。",
+   "evidence": "会话 6d410c7e：要求接口 /v2.0 改 /v3.0 并用 test 打包；已改 env/.env、deploy/nginx.conf、vite.config.js，npm run test 成功，产物含 /v3.0 无残留 /v2.0。",
+   "files": [
+    "env/.env",
+    "env/.env.test",
+    "env/.env.production",
+    "deploy/nginx.conf",
+    "zhi2-web-admin/vite.config.js",
+    "package.json"
+   ],
+   "baseline": "db160a9",
+   "sessionIds": [
+    "6d410c7e-78d3-4e44-82cf-dbbc3851e99f"
+   ],
+   "bundle": "035.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] PortalBreadcrumb 行内对齐：整体左排，文字与 › 分隔符同一水平中线",
+   "type": "pattern",
+   "content": "对外门户经纪人等详情页面包屑若被理解成「整行居中」，会与设计稿冲突；常见诉求是**行仍靠左**（如 `padding: 0 4px`），但当前级文字与中间 `›` 箭头在同一水平线上垂直居中。\n\n做法（`portal.scss` / BrokerPages）：\n- 容器 `display: flex; align-items: center`，不要用 `justify-content: center` 拉整行居中。\n- 面包屑按钮用 `inline-flex`、固定 `height` 与 `line-height` 一致（示例 26px），避免文字相对箭头偏上/偏下。\n- 分隔符左右间距按稿面单独设（示例 28px / 20px），与共享 `PortalBreadcrumb` 组件并存时保留 `.broker-breadcrumb` 等 E2E 类名。\n\n与「仅层级页展示 PortalBreadcrumb」条目配合：先决定是否展示，再调行内对齐。",
+   "evidence": "会话 cd7c3e24：用户澄清「整体还是放在左侧，文字和中间的右箭头对齐」；去掉 justify-content:center，align-items:center，按钮 inline-flex height 26px，箭头间距 28px/20px。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/portal.scss",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PortalBreadcrumb.vue"
+   ],
+   "baseline": "2785dd9",
+   "sessionIds": [
+    "cd7c3e24-462c-463d-8739-3c5df8d5e314"
+   ],
+   "bundle": "035.md",
+   "project": "门户"
+  }
+ ]
+}

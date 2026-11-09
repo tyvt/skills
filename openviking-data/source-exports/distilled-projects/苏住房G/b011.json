@@ -1,0 +1,205 @@
+{
+ "project": "苏住房G",
+ "batch": 11,
+ "files": [
+  "041.md",
+  "042.md",
+  "043.md",
+  "044.md"
+ ],
+ "count": 11,
+ "memories": [
+  {
+   "title": "zs-select-dialog 左右联动的选择弹窗必须做「左空不得查右」的前置拦截，不能靠后端过滤",
+   "type": "bug",
+   "content": "【什么情况】`zs-select-dialog` 树+表（左银行/右网点）联动的选择弹窗，左侧是依赖区域授权的列表（`queryStartBank`）。某区未授权任何银行时左侧为空，但右侧表格仍带「搜索」按钮和自动查询。\n\n【为什么】右侧网点接口 `selectTJgBankBranchList` 的 `workBankId` 是可选参数，没选左侧时它被整体省略（Vue2 下 undefined 会被 JSON.stringify 丢掉），后端就按「无过滤」返回全部网点；而该接口又恰好是分页公共接口，看起来「一切正常」，故障被完全掩盖。结果是用户能在无授权银行的情况下选到任意网点并保存成功——属数据合规缺陷，不只是 UI 问题。\n\n【怎么做】在 `zs-select-dialog-func.vue` 组件层统一拦截，不改业务页：①左侧选中值为空时不发右侧请求，表格显式提示「请先选择左侧」，而不是留空表让用户以为没数据；②「搜索」按钮点击时先判空，空则给出 toast「请先选择××」并 return；③左侧选中项变化时清空右侧结果与已选，避免残留。业务页（`benefit/pubRegulatoryAccount` 的 `showBankDialog()`）无需改动即生效——这正是把约束下沉到公共弹窗而不是各页各写一遍的价值。\n\n【差异】已知清单收录的 zs-select-dialog 条目集中在「函数式 open 的具名能力」「treeKey 覆盖筛选参数」「no-auto-query 清空宿主数据」「勾选/确定被关掉」等迁移契约问题；本条是**级联前置依赖缺失导致越权查询**，根因在可选外键被省略，与前述均不重叠。",
+   "evidence": "「太仓区未授权银行时，左侧列表为空，但右侧点『搜索』仍会调用 selectTJgBankBranchList，且未带 workBankId，导致查出全部网点」；修复为「未选左侧银行时右侧不请求接口，表格显示『请先选择左侧银行』；点搜索时提示『请先选择银行』」；页面侧「showBankDialog() 使用的就是这个弹窗，无需再改业务页代码」",
+   "files": [
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue",
+    "zhi2-web-admin/src/views/maintenance/accountOpen/components/OpenDetailDialog.vue",
+    "zhi2-web-admin/src/views/property/components/BranchOneDialog.vue",
+    "zhi2-web-admin/src/views/system/workBank/components/pubRegulatoryBranchDialog.vue"
+   ],
+   "baseline": "acf0b7c",
+   "sessionIds": [
+    "e54e19e2-5d01-4169-ace4-1cfb25836888"
+   ],
+   "bundle": "042.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "同一套「选开户银行」弹窗被多模块复用，业务域靠 sourceModel + 业务标记参数区分，改一处必须全量回扫消费方",
+   "type": "pattern",
+   "content": "【什么情况】开户类页面选银行的公共弹窗，左侧 `queryStartBank` 的授权银行列表按「业务模块」隔离，而多个模块共用同一个弹窗入口。新增的「公共收益/开户申请」（`benefit/pubRegulatoryAccount`、`benefit/pubRegulatoryAgreement`）复用了旧的阳光物业银行选择逻辑，导致选了物业管理区域后，管理银行下不出现已授权的银行。\n\n【为什么】公共弹窗只认一个模块维度（`sourceModel`），默认取阳光物业 `property`；新模块（公共收益 `benefit`）需要它自己的授权数据源，且后端还要求额外的业务标记 `isPubRegulatoryAccount=1`。两者缺一，接口就按默认模块过滤，返回空列表——前端表象是「授权了却不显示」，容易被误判为数据没配。\n\n【怎么做】①先定位弹窗真正调用的取数入口（这里收口在 `src/utils/workBank.js` + `src/api/benefit/pubRegulatoryAccount.js`），确认模块维度是 `sourceModel` 而非页面路径推断；②新模块显式传 `sourceModel=benefit`，并补 `isPubRegulatoryAccount: 1`，`queryStartBank` 与网点列表**两个接口都要带**，不能只带左侧；③改造后按「消费方」而不是按「当前页面」回扫：同一轮里还要覆盖阳光物业侧的 `property/propertyAccount/detail.vue`、`property/account/detail.vue`、`property/account/components/AccountDialog.vue`，统一补业务标记参数，但模块仍保持 `sourceModel=property` 不要跟着一起改。\n\n【差异】已知清单有「同一业务字段在列表与详情绑两套字典码」「接口在传值」类条目，但没有这条「公共弹窗由 sourceModel + 业务标记双参数决定取数域、新模块接入需全量回扫消费方」的接入契约。",
+   "evidence": "「开户申请：新增，选了物业管理区域后，管理银行下不出现授权的银行。请求模块应该是公共收益，现在是阳光物业」；用户追加「接口在传个值 isPubRegulatoryAccount = 1」；后续「这个地方也要加 isPubRegulatoryAccount = 1」，结论「模块仍是阳光物业（sourceModel=property）」并列出三个 property 侧文件同步补参",
+   "files": [
+    "zhi2-web-admin/src/utils/workBank.js",
+    "zhi2-web-admin/src/api/benefit/pubRegulatoryAccount.js",
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue",
+    "zhi2-web-admin/src/views/property/propertyAccount/detail.vue",
+    "zhi2-web-admin/src/views/property/account/detail.vue",
+    "zhi2-web-admin/src/views/property/account/components/AccountDialog.vue"
+   ],
+   "baseline": "9b8845d",
+   "sessionIds": [
+    "a107a608-9c60-40c0-95c7-bcb174732ca2"
+   ],
+   "bundle": "042.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "Web 后台行政区划筛选不许前端写死：由 platformConfig.region 推导 parentCode 走 /system/region/list，并加请求序号防竞态",
+   "type": "pattern",
+   "content": "【什么情况】首页/大屏的区域（区县）Tab 之前直接硬编码苏州各区县名，且另有一条读 `platformConfig.regions` 的旧分支。用户明确要求「不要写死，使用公共的行政区划，动态读配置筛选」。\n\n【为什么】本项目是按地市复制部署的（同名同源项目在不同城市各一份），区县清单属于部署配置而不是代码常量；一旦写死，复制到别的城市就会出现 Tab 与后台配置不一致，还得改代码发版。\n\n【怎么做】①在 `views/property/largeScreen/utils.js` 新增 `fetchCityRegionTabOptions`：用 `getCityRegionCode()` 取市级编码，再调 `/system/region/list` 拉下属区划，映射成 Tab 选项（`mapRegionSortListToTabOptions`），并导出常量 `CITY_WIDE_TAB_OPTION`（「全市」）统一置顶；②页面 `views/home/index-v2.vue` 删掉区县硬编码与 `platformConfig.regions` 分支，改为异步 `loadRegionOptions()`；③**因为改成异步，必须加请求序号守卫**（如 `regionOptionsFetchSeq`，只接受最新一次响应），否则快速切地市/重复触发会让旧响应覆盖新 Tab；④接口失败或返回空时只保留「全市」并 `console.warn`，不能白屏；⑤本地预览要在 `preview-main.js` 补 `platformConfig.region: '320500'` 与 `/system/region/list` 的 mock，E2E 也要在 `tests/e2e/home-v2-mocks.js` 加 `mockRegionSortList` 并在 spec 里拦截该接口，否则用例全挂。\n\n【注意】当前只在 `created` 拉一次；若 `platformConfig.region` 是登录后才写进 store，Tab 会与地市不一致，需补对 `platformConfig.region` 的 watch 重新加载。",
+   "evidence": "用户诉求「不要写死，使用公共的行政区划，动态读配置筛选」；结论中「新增 mapRegionSortListToTabOptions、fetchCityRegionTabOptions（getCityRegionCode + /system/region/list）」「删除苏州区县硬编码与 platformConfig.regions 分支」「用 regionOptionsFetchSeq 防竞态」「接口失败或为空时仅保留『全市』并 console.warn」",
+   "files": [
+    "zhi2-web-admin/src/views/property/largeScreen/utils.js",
+    "zhi2-web-admin/src/views/home/index-v2.vue",
+    "zhi2-web-admin/src/views/home/preview-main.js",
+    "zhi2-web-admin/tests/e2e/home-v2-mocks.js",
+    "zhi2-web-admin/tests/e2e/home-v2.spec.mjs",
+    "zhi2-web-admin/src/views/home/v2/components/RegionTabs.vue"
+   ],
+   "baseline": "15e201a",
+   "sessionIds": [
+    "ce428e8e-b7cf-41be-97cd-31a190c4c9fb"
+   ],
+   "bundle": "042.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "含子模块的版本合并按「逐文件保留一侧语义」处理，并分别提交子模块与父仓指针",
+   "type": "workflow",
+   "content": "【什么情况】`zhi2-web-admin` 子模块做 `develop/v2.6.1` 合并 `develop/v2.6.0`，8 个文件、共 20 处冲突，涉及 utils、详情页、列表页、审批弹窗。\n\n【为什么】冲突块多为「两侧各自演进」：v2.6.1 改了地址解析与角标，v2.6.0 改了表单组件与页面结构。若整块选一侧会静默丢功能，最典型的是同一个工具文件里两个函数各归一侧。\n\n【怎么做】逐文件判断并保留双方语义，而不是整体 ours/theirs：①`resolveServerAssetUrl.js` 保留 v2.6.1 基于 `window.location.origin` 的实现，同时把 v2.6.0 的 `resolvePublicAssetUrl` 一并并入（两个函数并存）；②详情/表单类页面统一采用 v2.6.0 的页面结构与表单组件口径（`zs-form`、`HeadTitle`、`list-container`、弹窗结构），避免新旧表单组件混用；③有「功能角标」与「附件预览/下载」并存的一侧，两者都保留；④`creditCard.vue` 采用 v2.6.0 的 `showCycle` 逻辑，并删掉误合并进来的 detail 方法；⑤`index.vue` 保留 `list-card` 包裹层。\n\n【收尾】子模块先提交（`1624646`），父仓库再提交指针更新（`123fae3`），最后确认工作区干净、只领先远程 1 个提交；推送分两步 `cd zhi2-web-admin && git push` 再回父仓库 `git push`，顺序不能反。\n\n【差异】已知有「合并冲突只在子模块指针上、选较新 SHA」——那是**指针冲突**；本条是子模块内部的**源码冲突**逐文件取舍，处理对象不同。",
+   "evidence": "「在 zhi2-web-admin 子模块（develop/v2.6.1 合并 develop/v2.6.0）中处理了以下文件」及逐文件策略表；提交记录「子模块 1624646」「父仓库 123fae3」，并给出分两步推送的命令",
+   "files": [
+    "zhi2-web-admin/src/utils/resolveServerAssetUrl.js",
+    "zhi2-web-admin/src/views/credit/companyEvaluation/components/detail.vue",
+    "zhi2-web-admin/src/views/credit/companyEvaluation/components/index.vue",
+    "zhi2-web-admin/src/views/evaluation/companyReport/components/creditCard.vue",
+    "zhi2-web-admin/src/views/evaluation/companyReport/components/handle.vue",
+    "zhi2-web-admin/src/views/evaluation/creditDeclarationComponents/ApprovalProcessDialog.vue",
+    "zhi2-web-admin/src/views/evaluation/creditDeclarationComponents/detail.vue"
+   ],
+   "baseline": "22baec7",
+   "sessionIds": [
+    "fa76006a-862d-4f4b-9ae4-06673805a62a"
+   ],
+   "bundle": "042.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "详情页「查看态表格只读、点编辑才可操作」：readOnly 必须同时判 formMode 与 bizState，且别用 showEdit=false 一刀切",
+   "type": "pattern",
+   "content": "【什么情况】物业费申报详情页（`property/feeDeclare2/detail.vue`）草稿态下看不到顶部「编辑」按钮，申报明细子表在查看态还露出了「操作」列与「导入/选择房屋」按钮。\n\n【为什么】两处口径都写窄了：①页面用 `:showEdit=\"false\"` 把 `operation-btn-group` 的编辑能力整个关掉，等于永远进不了编辑态；②子表 `readOnly` 只判 `bizState`，草稿（`bizState=0`）在查看态下被判成「可编辑」，操作列与导入按钮就跟着出来了。\n\n【怎么做】①去掉 `:showEdit=\"false\"`，回到 `operation-btn-group` 默认行为：查看模式且草稿态时顶栏自动出现「编辑」（位于「返回」与「附件」之间）；②子表只读条件改为双判：`:readOnly=\"formMode == 'view' || form.bizState != 0\"`，即「查看态只读」或「已提交/已审核一律只读」，只有「编辑态 + 草稿」才放开行内编辑、删除与导入按钮；③验证时以刷新后的详情页为准，分别覆盖查看草稿、点编辑后、已提交三种态。\n\n【差异】已知 1077 条讲「子区块可操作性要 formMode 与业务状态双重判定」，方向相同但未给出 `showEdit=false` 会连编辑入口一起杀掉、以及「bizState==0 才能编辑」的具体条件写法，本条补的是入口侧的根因与可复制的表达式。",
+   "evidence": "「移除了 :showEdit=\"false\"，使用 operation-btn-group 的默认行为」；「将 readOnly 从仅判断 bizState，改为同时判断 formMode」；代码 `:readOnly=\"formMode == 'view' || form.bizState != 0\"`；效果「查看模式表格只读，不显示操作列及导入/选择房屋按钮；点击编辑进入编辑模式可编辑」",
+   "files": [
+    "zhi2-web-admin/src/views/property/feeDeclare2/detail.vue",
+    "zhi2-web-admin/src/views/property/feeDeclare2/components/feeBindScopeTable.vue"
+   ],
+   "baseline": "e590ffa",
+   "sessionIds": [
+    "2b6910b1-af76-49c6-87c1-e6cbab4a1b46"
+   ],
+   "bundle": "042.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "字典编码大小写错位会让筛选参数与展示完全反序（BIZ_STATE vs biz_state）",
+   "type": "bug",
+   "content": "现象：共有资金-协议签署列表按「单据状态=审核中」查，返回的是已备案数据；按「已备案」查反而返回审核中数据。根因：列表页 initDict 里 getDicts('BIZ_STATE') 取的是大写键，而该字典实际注册名是小写 biz_state；两套字典在系统字典里都存在但 dictValue 与 label 的对应关系不同（或大写键回退到了别的字典），于是下拉框「审核中」绑定的码值与后端 bizState 过滤语义相反，勾选值与列表 dict-tag 展示也来自不同字典源，肉眼看起来像「错位」。做法：搜索区字典键必须与表格列 dict-tag、全局 store 的 biz_state 三者同名同源；发现同类页面（协议签署 / 协议终止）是复制关系时要一并替换。与已有「业务状态统一走 biz_state」条目的差异：那条讲的是替换本地静态数组、保留 BIZ_STATE 常量；本条是搜索下拉与后端过滤语义反序，属于大写字典键残留导致的静默错值，修完必须逐项在 Network 里核对传参与 label 一致。",
+   "evidence": "会话 c376e461 用户诉求：按审核中查返回已备案、按已备案查返回审核中；结论：pubRegulatoryAgreement/index.vue 与 pubRegulatoryStopAgreement/index.vue 的 getDicts('BIZ_STATE') → getDicts('biz_state')，并要求选审核中传 bizState=1、选已备案传 2",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/index.vue",
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryStopAgreement/index.vue"
+   ],
+   "baseline": "9e5c499",
+   "sessionIds": [
+    "c376e461-5508-4c08-8192-16ac1392a65f"
+   ],
+   "bundle": "044.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "字典驱动的高级查询：操作符必须取 operator_type 字典，字段可用操作符配在 complex_field 的 remark 第 4 段",
+   "type": "pattern",
+   "content": "场景：公共查询-物业管理区域等 zs-advanced-query 条件组，用户要求「只从字典取值，不要本地定义」。做法：(1) 筛选字段读 complex_field 字典，操作符读 operator_type 字典，删掉页面里本地定义的 TEXT_OPERATORS / SELECT_OPERATORS / NUMBER_DATE_OPERATORS，操作符展示文案统一走字典 label；(2) zs-advanced-query 新增 operatorOptions 属性由页面传入（组件不自己拉字典，保持纯展示）；(3) 字段级可用操作符优先取 complex_field 的 remark 第 4 段，格式如 select:propertyType::EQ,LIKE；未配置时下拉类字段默认只有「等于」；(4) 对「一字段存多个类型组合值」的字段（物业类型常见「高层住宅、商业」拼接）要允许 LIKE，并保留代码侧 EQ+LIKE 兜底，否则用户永远查不出组合值。落地前须确认后端 operator_type 字典已配置 EQ 与 LIKE 两项，否则下拉空、查询失败无提示。",
+   "evidence": "会话 7352b93f：用户明确「操作符字典 operator_type，只从字典取值，不要本地定义」；结论改动 complexFieldConfig.js 操作符解析、zs-advanced-query.vue 新增 operatorOptions、publicQuery/complex/index.vue 加载并传 operator_type",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/complex/index.vue",
+    "zhi2-web-admin/src/components/zs-advanced-query/complexFieldConfig.js"
+   ],
+   "baseline": "e590ffa",
+   "sessionIds": [
+    "7352b93f-fe22-4f83-926d-29ade7bd05f8"
+   ],
+   "bundle": "044.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "部门树页「平铺展示后分页消失」：flex 高度链断裂，需加中间 body 容器 + zs-table fill-height",
+   "type": "bug",
+   "content": "现象：RegionTreeLayout 从树形切到「平铺展示」后列表底部翻页组件不见，且无报错。根因：平铺态搜索区字段更多、整体高度超出视口，而 .list-card 用的是 flex: 0 0 auto 不参与收缩，父级 .type-right 又是 overflow: hidden，超出部分（分页）被静默裁掉，属于高度链断裂而非分页组件本身问题。做法三层一起改：(1) RegionTreeLayout.vue 新增 type-right-body 中间容器，让搜索区与列表区在 flex 纵向里正确分配高度（搜索区 0 0 auto，列表区 flex:1 + min-height:0）；(2) index.scss 里让部门树列表页的 list-card 占满剩余高度、表格区滚动、分页固定底部；(3) 相关页面（complex / complexChange / housePart）的 zs-table 加 fill-height，让表格高度随容器自适应。只改其中一层仍会复发；同构列表页是复制关系时要一并核对。",
+   "evidence": "会话 2f89b7ab：用户反馈「部门树：平铺展示时列表下缺少翻页」；结论为 type-right 的 overflow:hidden 裁掉分页，改 RegionTreeLayout + index.scss + 三页 zs-table fill-height",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue",
+    "zhi2-web-admin/src/views/property/complex/index.vue",
+    "zhi2-web-admin/src/views/property/complexChange/index.vue",
+    "zhi2-web-admin/src/views/benefit/housePart/index.vue"
+   ],
+   "baseline": "26069c8",
+   "sessionIds": [
+    "2f89b7ab-13d9-4f37-a91e-45c7f05466ed"
+   ],
+   "bundle": "044.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "导航栏系统标题溢出：字宽探针测宽 + 位移滚动，冗余与测宽两处决定「能否滚全」",
+   "type": "pattern",
+   "content": "需求：Navbar 里的系统标题固定宽展示不全，要求溢出时来回滚动（用户连续三轮反馈「没彻底滚完」「再冗余一点」）。可用套路：(1) 用隐藏探针节点测标题真实排版宽度，不能直接用 scrollWidth（父容器有 max-width/ellipsis 时 scrollWidth 会被裁到可视宽）；探针测量值与临时去掉 max-width 后的 scrollWidth 取较大值，并补上 lineHeight / fontStyle，避免字体度量偏差；(2) 滚动距离 = 探针宽 − 视口宽 + TITLE_SCROLL_SLACK 冗余（实践中 4px 明显不够，32px 才稳，用户还嫌少时调到 40~48）；(3) 只在内容确实溢出时才启用动画，避免短标题抖动；(4) 滚动区间用定时器/requestAnimationFrame 推进位移并在两端停顿，卸载时清理。验收口径：末尾文字必须完整露出且有停顿感，纯靠 CSS animation 位移百分比无法表达「按像素冗余」。",
+   "evidence": "会话 46385713：用户三轮要求「溢出时来回滚动」「后面还有文字没展示全」「还是没有展示全，多滚动一些，冗余一点」；结论：TITLE_SCROLL_SLACK +32px，探针测量与去掉 max-width 的 scrollWidth 取大并补 lineHeight/fontStyle",
+   "files": [
+    "zhi2-web-admin/src/layout/components/Navbar.vue"
+   ],
+   "baseline": "9e5c499",
+   "sessionIds": [
+    "46385713-ebb6-4dc5-a2cc-fa9ec3b98d10"
+   ],
+   "bundle": "044.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "地图/面板类 ECharts 横轴区县名显示不清：containLabel + 动态 grid 底部 + 按数量切倾斜策略",
+   "type": "pattern",
+   "content": "现象：数据可视化「监管账户数量」柱图横坐标区县名被裁/重叠看不清。根因是 grid.containLabel: false 且 bottom 写死 34，坐标轴标签不占布局空间。做法（按区县数量分档，不要全局改）：(1) grid.containLabel: true，底部留白随类目数调整，>6 个时 64、否则 52；(2) 类目 >6 时 xAxis.axisLabel 设 rotate 35°、align:'right'、margin:12、fontSize:13，并显式 interval: 0 保证全部区县都画；不要用 hideOverlap，它会静默吞掉部分标签造成「少了一个区县」的误解；(3) 图表容器加专用类补 padding-bottom（10px），否则倾斜标签贴 panel 内缘；(4) 改完靠已有的 handleResize → chart.resize() 覆盖缩放场景，必要时把 gridBottom 再抬到 68 或角度改 40°。放置位置：这类图表参数写在同目录 chartOptions.js 的 buildXxxOption 里，不要散进页面。",
+   "evidence": "会话 725e800e：用户反馈「监管账户数量横坐标区域显示不清」；结论改动 chartOptions.js 的 buildDistrictManageOption 与 index.vue 容器 padding",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js",
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue"
+   ],
+   "baseline": "db4f82c",
+   "sessionIds": [
+    "725e800e-590a-4121-bcda-f06988a87527"
+   ],
+   "bundle": "044.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "DetailTemplate 的 labelAbove：在字段标签上方按条件追加说明文案",
+   "type": "pattern",
+   "content": "需求：资金拨付详情要在「用款申请名称」后补一句「XXX社区已见证通过」，且 XXX 取自关联用款申请里实际审核的社区名，仅在有值时展示。做法：不新造布局块，给公共 DetailTemplate 增加 labelAbove 属性（渲染在字段 label 上方的小字说明），页面侧在 contentInfo 项上写 labelAbove: this.form.approvalDeptName ? `${this.form.approvalDeptName}社区已见证通过` : ''。要点：(1) 字段先加进 form 并确认详情接口返回（本次为 getPubAllotNotice 的 approvalDeptName），前端不做本地兜底名；(2) 空值必须给空串而不是 undefined/null，否则会渲染出空白行占位；(3) 说明文案属于展示层补充，不要拼进 field label 或另起一个 Headline 区块，否则只读/打印/变更对比三处都要再改一遍；(4) 扩展公共 DetailTemplate 时要确认其他使用它的详情页不受影响（属性默认空即不渲染）。",
+   "evidence": "会话 6a520d7b：用户要求「用款申请名称后增加 XXX社区已见证通过」，字段 approvalDeptName 有值才展示、加在标签上面；结论为 DetailTemplate 新增 labelAbove 属性 + pubAllotNotice/detail.vue useMoneyInfo 配置",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue"
+   ],
+   "baseline": "44d6576",
+   "sessionIds": [
+    "6a520d7b-daeb-45ff-b2c6-7701acbb59d1"
+   ],
+   "bundle": "044.md",
+   "project": "苏住房G"
+  }
+ ]
+}

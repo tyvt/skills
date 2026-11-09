@@ -1,0 +1,46 @@
+{
+ "batch": 17,
+ "files": [
+  "097.md",
+  "098.md",
+  "099.md",
+  "100.md",
+  "101.md",
+  "102.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "[苏房] 附件扩展名校验用 includes 子串匹配，配置 doc 会把 docx 误拦（须精确相等）",
+   "type": "bug",
+   "content": "什么情况：fjflpz（附件分类配置）页把附件上传容器从 AnnexUpload 换成文件上传组件、要求放行 Word 后，用户实测 .docx 仍被拦截，且提示语里列的格式不含 word。\n\n为什么有两层：1) 页面侧：FjDialog.vue 模板里还留着旧的 :fileType=\"['png','jpg','jpeg','pdf']\"，或 dev 未热更新/未硬刷新，所以表现仍是「只有四种格式」——先确认模板真的传了新数组，再怀疑组件；2) 组件侧（真 bug）：StandaloneAppendixField/index.vue 的扩展名校验写成 normalized.includes(fileExtension)，即「配置串是否包含文件扩展名」。配置里有 doc 而没有 docx 时，'doc'.includes('docx') 为 false，.docx 必被拦；反过来这种写法在别的组合下还会误放行（如配置 docx 时 doc 也可能命中），是双向不可靠的判定。\n\n怎么做：扩展名白名单一律「归一化后精确相等」判定（fileExtension === normalized，两侧都 toLowerCase 并去掉前导点），不要用 includes；新增类型时页面侧 Array 与组件侧判定规则同时收口。改完必须重启/硬刷新 dev 再验，避免把「旧模板残留」误判成组件没修好。",
+   "evidence": "会话 01a1629f（基线 85a6308）用户第 3 轮「未生效，docx 还是被拦截，提示语也没包含word类型的文件」。结论定位为：FjDialog 仍用旧 :fileType=['png','jpg','jpeg','pdf']；StandaloneAppendixField 用 normalized.includes(fileExtension)，配置只有 doc 时 .docx 被误拦。已改为 templateUploadFileTypes(png,jpg,jpeg,pdf,doc,docx) + 精确匹配 fileExtension === normalized。",
+   "files": [
+    "zhi2-web-admin/src/components/StandaloneAppendixField/index.vue",
+    "zhi2-web-admin/src/views/tool/fjflpz/components/FjDialog.vue",
+    "zhi2-web-admin/src/components/zs-file-upload/zs-file-upload.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/index.vue"
+   ],
+   "baseline": "85a6308",
+   "sessionIds": [
+    "01a1629f-1e1d-70c5-a400-75728aadabaf"
+   ],
+   "bundle": "097.md"
+  },
+  {
+   "title": "[苏房] Vue2 页面 scoped SCSS 用 $--color-primary 等 Element 变量报 Undefined variable：变量只在全局注入处生效",
+   "type": "bug",
+   "content": "现象：Vite dev 下某个页面/弹窗组件（本例 commercialHousingSales/presale/contractMainInfo/components/chooseHouseDialog.vue）编译直接失败，报 `[sass] Undefined variable`，指向 `border: 2px solid $--color-primary;`，同时出现 Pre-transform error 与 Internal server error，页面整块白屏。\n\n根因：项目里的 Element UI 主题变量（`$--color-primary` 等）只在公共样式入口（styles 下的 variables/element 变量文件）通过 `@import` 或 Vite `css.preprocessorOptions.scss.additionalData` 注入，其作用域仅限声明了这行 import 的入口链路；页面 SFC 的 `<style lang=\"scss\" scoped>` 是独立编译单元，不会自动继承全局变量表，所以只要页面自己写 Element 变量就是未定义。\n\n做法：\n1. 页面 SFC 里不要直接写 `$--color-*` / `$--border-*` 这类 Element SCSS 变量；需要主题色时优先用 CSS 变量 `var(--color-primary)`，或项目自己的 SCSS 变量源（且显式 `@import` 该变量文件）。\n2. 若确实要保留 Element 变量写法，必须在该 SFC 的 style 块顶部显式 import 变量文件，参照同目录已能编译的组件的写法（本例修复即对齐该目录 style 块的既有 import 方式）。\n3. 排查顺序：先看报错行是否页面私有样式里的 `$--xxx`，再确认 vite.config.js 中是否配了 additionalData；不要误以为全项目都注入了。",
+   "evidence": "会话 8f0faa1e 用户诉求 1：vite Pre-transform error + Internal server error，`[sass] Undefined variable` 定位到 chooseHouseDialog.vue 第 41 行 `border: 2px solid $--color-primary;`，Plugin: vite:css，lang.scss & scoped=8e7c4efb。后续会话要求「修复 chooseHouseDialog.vue SASS 未定义变量」。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/contractMainInfo/components/chooseHouseDialog.vue",
+    "zhi2-web-admin/vite.config.js"
+   ],
+   "baseline": "1c445c7",
+   "sessionIds": [
+    "8f0faa1e-e8dc-43ba-8ebc-dffa606d5528"
+   ],
+   "bundle": "098.md"
+  }
+ ]
+}

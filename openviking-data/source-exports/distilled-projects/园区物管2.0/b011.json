@@ -1,0 +1,214 @@
+{
+ "project": "园区物管2.0",
+ "batch": 11,
+ "files": [
+  "041.md",
+  "042.md",
+  "043.md",
+  "044.md"
+ ],
+ "count": 12,
+ "memories": [
+  {
+   "baseline": "177bc3ce4",
+   "content": "什么情况：带 RegionTreeLayout 区域树的列表页，进入页面时先展示全量数据、树加载选中默认节点后又刷成按部门筛选的数据，出现闪烁。为什么：listMixins 的 init() 会立即调 getList()，此时 parentDeptId 还没就绪；区域树异步加载完成后默认选中节点又触发一次带筛选的 getList()，两次请求先后返回造成先全量后筛选的闪变。怎么做：在 table.js 增加 shouldDeferListForRegionTree() 判定——平铺模式（value 有值）或 B 端终端（terminalType==='B'）不延迟，否则只要页面 $options.components 里注册了 RegionTreeLayout 就延迟首次列表请求；regionTree 组件树加载完成后 emit 'tree-ready'（初始化时不再触发 nodeClick，避免重复请求），RegionTreeLayout 监听该事件设置 parentDeptId 后再调父页 getList()；树数据为空也要触发列表加载，避免一直 loading。所有使用 RegionTreeLayout 的页面无需单独修改即生效，但重写过 init() 的页面（如 complexChange）需同步加入延迟逻辑。",
+   "evidence": "最终结论明确列出调用顺序根因与四点改动（table.js 延迟判定、tree-ready 事件、RegionTreeLayout 监听、complexChange 同步）",
+   "files": [
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue",
+    "zhi2-web-admin/src/views/property/complex/components/regionTree.vue",
+    "zhi2-web-admin/src/views/property/complexChange/index.vue"
+   ],
+   "sessionIds": [
+    "2a9ee75a-2075-41ab-a461-629ef177b080"
+   ],
+   "title": "区域树列表页首屏闪烁：树模式延迟首次列表请求，等 tree-ready 后带 parentDeptId 拉取",
+   "type": "pattern",
+   "bundle": "041.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "d48841f13",
+   "content": "什么情况：弹窗（如选择物业管理区域）里的 zs-table 底部出现一条加粗/重合的下边框。为什么：弹窗内表格没有包在 list-card 容器里，不走列表页那套边框去重逻辑；Element UI 表格底部同时渲染两层——最后一行单元格的 border-bottom 和 .el-table::before 伪元素底边，两条线叠加成粗线。列表页正常是因为 list-card 的全局样式已做了去重。怎么做：在全局 index.scss 为弹窗内表格容器（如 .dialog-box .dialog-right）补上与列表页一致的处理：隐藏 el-table 的 ::before/::after 伪元素、由表格外层统一画一条底边、去掉末行单元格 border-bottom。排查此类「线变粗」问题时先确认表格所在容器是否走了 list-card 边框体系。",
+   "evidence": "最终结论给出双线叠加根因（::before 伪元素 + 末行 border-bottom）与 index.scss 三点修复",
+   "files": [
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/views/maintenance/accountQuery/type.vue",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue"
+   ],
+   "sessionIds": [
+    "1eca0e2f-d760-4bdb-bbc2-11cb409dd899"
+   ],
+   "title": "弹窗内表格底部双重边框：非 list-card 容器缺少 el-table::before 伪元素去重",
+   "type": "bug",
+   "bundle": "041.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7814a0c2a",
+   "content": "什么情况：zs-like-select 这类「可下拉选也可手输（allow-custom）」的选择组件，用户手输了值后表单 required 校验仍提示必填；且只要有默认值时下拉列表里只剩默认值一条、其他选项不显示。为什么：el-form-item 校验的是 form 上的字段（form.companyName），而手输只会让组件自身 v-model（selectedCompany）变成 { companyName: '…' }（无 companyId）；原 watch 写成「没有 companyId 就把 form.companyName 和 form.companyId 都清掉」，导致手输名称永远进不了 form。怎么做：watch selectedCompany 必须分三态处理——①空对象/无数据：清空 form 的名称与 ID；②有 companyId（下拉选中）：照常写入名称和 id；③仅有 companyName 且有内容（手输）：写入 form.companyName、companyId 置为 undefined。后端提交侧可继续用「有无 companyId」区分系统内单位与手输名称。通用结论：凡是「选中对象回填表单」的监听，不能把『缺 ID』简单当成『无效选择』清空，要为手输态保留名称字段。",
+   "evidence": "最终结论说明 watch 三分支改造及手输校验通过的原理",
+   "files": [
+    "zhi2-web-admin/src/components/zs-select/zs-like-select.vue",
+    "zhi2-web-admin/src/views/maintenance/depositNotice/company/components/AddDialog.vue"
+   ],
+   "sessionIds": [
+    "3212c3b1-6f35-4233-95e1-8433cc34e122"
+   ],
+   "title": "可手输选择组件（allow-custom）回填表单的三态处理：缺 companyId 不等于空值",
+   "type": "pattern",
+   "bundle": "041.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "zhi2-web-admin @ 49e7729ce",
+   "content": "什么情况：Navbar 顶部切换物业管理区域（bProjectDialog.vue）后需要让当前页数据按新小区重新加载，原先用 window.location.reload() 整页白屏刷新。为什么：整页 reload 会丢失路由上下文、重新拉取全部静态资源和登录态初始化，体验差且慢；而项目里 TagsView 的「刷新当前页」已经实现了一套软刷新机制。怎么做：把刷新逻辑抽成共享工具 src/utils/refreshView.js，提供两个入口——refreshView（单页刷新：delCachedView 清该路由 keep-alive 缓存 → 清该页搜索参数缓存 → 通过 /redirect 路由重进当前页触发组件重挂载）和 refreshAfterProjectSwitch（切项目场景：清空所有标签页缓存 + 软刷新当前页）。TagsView 的 refreshSelectedTag 与 bProjectDialog 切区后都改调该工具。效果：保留当前路由与已打开标签，只重挂当前组件；已清缓存的标签切回时也会按新小区重新拉数。",
+   "evidence": "会话 cdffd236：用户问 Navbar 切换能否调用 TagsView 的刷新页面功能而不整页刷新，最终把 window.location.reload() 替换为抽出的 refreshAfterProjectSwitch，刷新原理为清 keep-alive 缓存 + /redirect 重进",
+   "files": [
+    "zhi2-web-admin/src/utils/refreshView.js",
+    "zhi2-web-admin/src/layout/components/TagsView/index.vue",
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/views/home/bProjectDialog.vue"
+   ],
+   "sessionIds": [
+    "cdffd236-f18a-4eb7-a140-2c5914000510"
+   ],
+   "title": "项目切换后不要 window.location.reload()：复用 TagsView 的 delCachedView + /redirect 软刷新",
+   "type": "pattern",
+   "bundle": "042.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "zhi2-web-admin @ 7814a0c2a",
+   "content": "什么情况：选择弹窗表格（rangeTable.vue）通过 defaultSelectedRangeList prop 接收外部默认选中，外部重置搜索条件把该 prop 清成 [] 后，弹窗里数据仍然勾着；反过来有默认值时也可能旧勾选叠加。为什么：把内部 selectedRangeList 数组置空并不影响 el-table 组件内部的 selection 状态——el-table 的勾选是它自己的内部状态，data 数组变化不会自动反写勾选，必须显式调表格实例方法。怎么做：在 defaultSelectedRangeList 的 watcher 里做同步：默认值变为 [] 时主动调 this.$refs.xxx.clearSelection()，并顺带清掉维护的 delSelectedIds 等辅助集合，避免残留影响后续提交；默认值非空时先 clearSelection() 再逐行 toggleRowSelection/setSelectedRange 回填，保证「先清后设」，防止旧勾选叠加。任何「外部数据源 ↔ 弹窗表格勾选」的组件都要走这条契约。",
+   "evidence": "会话 c6be946b：用户连续反馈「重置了搜索条件，选择弹窗里面的数据还是选中的，外面已经清空了」，根因是组件只把 selectedRangeList 置空而 el-table 内部 selection 未清，修复在 watcher 中补 clearSelection + 回填逻辑",
+   "files": [
+    "zhi2-web-admin/src/views/system/message/components/rangeTable.vue",
+    "zhi2-web-admin/src/views/system/message/components/selectRangeDialog.vue"
+   ],
+   "sessionIds": [
+    "c6be946b-abae-4b93-9a83-f55f6a1bc67a"
+   ],
+   "title": "弹窗表格选中项与外部默认值双向同步：清空数组不会清掉 el-table 内部勾选，watch 里必须 clearSelection 再回填",
+   "type": "bug",
+   "bundle": "042.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "zhi2-web-admin @ c52866fc8",
+   "content": "什么情况：房屋质量保证金协议新增页「选择物业管理区域」弹窗调用了通用接口 /property/complex/page，把所有已备案区域都列出来，其中包含尚未开立保证金账户的区域，业务上不允许选择。为什么：通用列表接口只承载「全部备案数据」，业务约束（如已开户）是后端才知道的过滤条件，前端拿通用接口再筛选既不可靠也不完整。怎么做：这类带业务前置条件的选值弹窗，优先向后端要/查专用的可选列表接口——本项目为 /maintenance/guaranteeDepositAgreement/pageOptionalComplex，只返回已开立账户的物业管理区域；在 SelectDialog.open 里直接把 url 换成专用接口，筛选参数（bizState: '2'、当前项目 complexId）按接口约定传，表格列配置保持不变。同类模式：可选项 = 主数据 + 业务状态约束时，一律走 *Optional* / *CanUse* 类专用接口。",
+   "evidence": "会话 70fffb2b：用户报「未完成开户的物业管理区域也显示了」，根因是弹窗调了 /property/complex/page，修复把 SelectDialog.open 的 url 改为 /maintenance/guaranteeDepositAgreement/pageOptionalComplex",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/detail.vue"
+   ],
+   "sessionIds": [
+    "70fffb2b-1949-40f5-a6e2-10d76989883b"
+   ],
+   "title": "业务选择弹窗的数据源要用业务专用过滤接口，不能拿通用列表接口靠前端凑",
+   "type": "pattern",
+   "bundle": "042.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "3965548b6",
+   "content": "什么情况：经营资产图表柱顶标签、tooltip 已限 2 位小数，但 Y 轴刻度仍出现 0.004 这类三位小数。为什么：ECharts 的 interval 由数据范围自动计算，数据很小时（如 0.01~0.02 百个）刻度间隔会算出三位小数；只在 series label 和 tooltip 上做格式化，管不到 axisLabel。怎么做：1) 把数值格式化收敛成统一函数（如 formatHundredValue），Y 轴 axisLabel、柱顶 label、tooltip 三条通道全部复用同一函数，不要各写一份；2) 给 Y 轴刻度间隔设最小值（如 interval 最小 0.01）防止极小数据产生超长小数；3) 多处展示同一指标时（图表 + 地图轮播提示）必须复用同一格式化函数，避免口径漂移。",
+   "evidence": "mapOverview 会话最终结论：新增 computeHundredCountYAxis（Y 轴刻度间隔最小 0.01）、axisLabel 用 formatHundredValue，柱顶标签/tooltip 统一同一函数，formatHundredCount 也复用它。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/dataHelpers.js",
+    "zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js"
+   ],
+   "sessionIds": [
+    "cbc563ef-17dc-4a57-9a8a-a924dda959a7"
+   ],
+   "title": "[园区物管] ECharts Y 轴刻度小数位失控：axisLabel 必须单独格式化并约束最小 interval",
+   "type": "pattern",
+   "bundle": "043.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7fe15a8cb",
+   "content": "什么情况：导航栏切换小区后项目名称显示字符串 \"undefined\"。为什么：选择弹窗用 `{ ...selectedProject, ...this.tempData }` 把列表行与小区详情合并，详情接口里 projectName 是 undefined（真实名称在 complexName），展开合并会用 undefined 覆盖列表行里正确的 projectName；再写入 Vuex / localStorage 时 undefined 被 JSON 序列化成字符串 \"undefined\"，之后读取永远显示 undefined。怎么做：1) 对象合并禁止盲目展开覆盖，业务关键字段要写显式合并函数（mergeProjectWithComplex）：已有值优先、无值才取别名兜底（projectName → complexName）；2) 切换目标后要重新请求新选中项的详情再合并，不能沿用旧项的 tempData；3) 写 localStorage 前对名称做规范化，读取侧（Navbar isLabel 等）对已存的 \"undefined\" 字符串做过滤兜底。",
+   "evidence": "Navbar 切小区会话最终结论列出三处修复：bProjectDialog 合并优先保留 projectName 回退 complexName 且先拉新小区详情；Navbar isLabel 加 complexName 兜底并过滤 localStorage 里的 \"undefined\"；layout 写入前规范化。",
+   "files": [
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/views/home/bProjectDialog.vue",
+    "zhi2-web-admin/src/layout/index.vue"
+   ],
+   "sessionIds": [
+    "420324f6-d038-423b-8496-387e3126ed25"
+   ],
+   "title": "[园区物管] 切换小区后导航栏显示 \"undefined\"：展开合并被详情接口的 undefined 字段覆盖",
+   "type": "bug",
+   "bundle": "043.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "177bc3ce4",
+   "content": "什么情况：需要给 B 端用户的公共收益监管账户选择弹窗加项目隔离（查询条件追加 projectId）。为什么：同一接口 /benefit/pubRegulatoryAccount/page 被多处 SelectDialog 消费，只改一处会出现 B 端部分弹窗能看到全部项目数据的数据越权；B 端当前项目存在全局 store，而 G 端 projectId 来自表单自身。怎么做：1) 以接口为线索全局检索所有 SelectDialog 调用点（本次 5 处）逐处补齐，不能只改提出问题的页面；2) B 端判定用 isBTerminal/terminalType，projectId 一律取 this.$store.getters.currentProjectId（当前所选项目），G 端保持原 form.projectId 不动；3) 两个端别条件并存时注意 B 端取全局上下文、G 端取表单值的分流写法。",
+   "evidence": "pubRegulatoryAgreement 会话最终结论表格列出 5 处 SelectDialog（含 pubBankReceiptApply 的 B/G 分流），统一逻辑为 B 端用 $store.getters.currentProjectId、G 端不变。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryStopAgreement/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubManualBookkeeping/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubBankReceiptApply/detail.vue"
+   ],
+   "sessionIds": [
+    "3f0ee1c5-4542-423d-b899-f75e4c942d75"
+   ],
+   "title": "[园区物管] 同一接口的所有 SelectDialog 要同步补 B 端 projectId 隔离条件",
+   "type": "pattern",
+   "bundle": "043.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "c52866fc8",
+   "content": "什么情况：一个 UI 缺陷同时存在于 2.6.1 / 2.6.2 / 2.6.2-yulin 多个在维护的发布分支。为什么：只改最高分支会让低版本分支继续带着 bug；在每条分支各自重写修复又容易漂移。怎么做：用户明确要求的流程是「从受影响的最低版本分支开始修复 → 修复完成后与用户确认 → 确认后按版本链逐级 merge 向前合并」（develop/v2.6.1 修复提交 → merge 到 develop/v2.6.2 → 再 merge 到 develop/v2.6.2-yulin），并逐分支生成独立 merge 提交；合并完成后留在最终分支，产物默认只落本地，推送远程前先问用户。",
+   "evidence": "feeDeclare2 会话用户诉求「从261分支开始修复，修复好了跟我确认，确认后合并到262，在合并到262-yulin」；结论表列出 08dde4a78→a5ce88865→cd9e95496 三级提交链。",
+   "files": [
+    "zhi2-web-admin/src/views/property/feeDeclare2/components/feeBindScopeTable.vue",
+    "zhi2-web-admin/src/views/property/declare/components/feeBindScopeTable.vue"
+   ],
+   "sessionIds": [
+    "d1f532be-fe27-4d6c-b6a2-0db5848800d1"
+   ],
+   "title": "[园区物管] 发布分支修复约定：最低受影响分支修复 + 确认后沿版本链逐级 merge forward",
+   "type": "workflow",
+   "bundle": "043.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "044.md 提炼前已存在 1118 条已知记忆，本条为新增",
+   "content": "什么情况：金额输入框（AmountInput）失焦时对超大数值（如 125624562315348.15，整数部分接近 15-17 位双精度上限）执行 parseFloat(value).toFixed(2) 重格式化，用户明明改成 .15，失焦后又自动变回 .16，且改不动。为什么：这不是表单校验问题，而是 JS 双精度浮点表示极限——parseFloat('125624562315348.15') 本身就会被舍入成 125624562315348.16，任何走 Number 通道的格式化都必然丢失末位精度。怎么做：失焦格式化改用字符串处理函数（formatFixedDecimal），千分位展示的 currencyFormatter 也一并改成字符串处理，彻底绕开 parseFloat/toFixed；若业务需要更大金额，后端应用字符串或 Decimal 类型存储，前端全程按字符串处理。排查此类「值改完又跳回去」问题时先看数值位数是否超 15 位。",
+   "evidence": "会话 5c77c754：用户报告 125624562315348.15 失焦变 .16；根因定位为 AmountInput 失焦执行 parseFloat().toFixed(2) 的浮点舍入，修改 AmountInput 与 currencyFormatter 均改为字符串格式化后修复",
+   "files": [
+    "src/components/AmountInput/index.vue",
+    "src/formatters/index.js",
+    "src/directives/formatter/money.js"
+   ],
+   "sessionIds": [
+    "5c77c754-4ae9-4947-9275-18a14a38dd9d"
+   ],
+   "title": "金额大数失焦被静默改写：AmountInput/currencyFormatter 禁用 parseFloat().toFixed()，改字符串格式化",
+   "type": "bug",
+   "bundle": "044.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "044.md 提炼前已存在 1118 条已知记忆，本条为新增",
+   "content": "什么情况：子表编辑弹窗打开时会重新请求详情接口，但详情接口并不返回某些字段（如 relBusinessId 关联业务 ID），列表行里明明有值，提交更新接口时该字段却缺失，后端参数校验直接 400。为什么：编辑弹窗的表单数据源从「列表行」切换成了「详情接口返回」，详情接口未携带的字段在重建 payload 时被静默丢掉，属于数据源切换导致字段丢失的典型场景。怎么做：打开编辑弹窗时先把列表行中的该字段预填进表单；详情加载完成后仅在该字段缺失时回退使用列表行数据（不覆盖详情已返回的值）；buildSubmitPayload 中按「当前表单 → 原始表单 → 列表行数据」三级优先级显式带上该字段。同类「编辑弹窗重拉详情」的子表都应检查详情接口字段覆盖面，缺的字段用列表行兜底。",
+   "evidence": "会话 1ee4f9a4：核销明细编辑保存 400，根因是详情接口未返回 relBusinessId；通过 handleUpdate 传行数据、弹窗预填、buildSubmitPayload 三级优先兜底修复",
+   "files": [
+    "src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue",
+    "src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailDialog.vue"
+   ],
+   "sessionIds": [
+    "1ee4f9a4-13b3-4034-ad86-3721cc8340be"
+   ],
+   "title": "编辑弹窗重拉详情丢字段：详情接口不返回的字段要用列表行数据三级兜底回填",
+   "type": "bug",
+   "bundle": "044.md",
+   "project": "园区物管2.0"
+  }
+ ]
+}

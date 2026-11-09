@@ -1,0 +1,332 @@
+{
+ "batch": 101,
+ "files": [
+  "115.md",
+  "116.md",
+  "117.md",
+  "118.md",
+  "119.md",
+  "120.md"
+ ],
+ "count": 20,
+ "memories": [
+  {
+   "title": "楼幢表切幢加载「转圈变空白、表格闪灭」：v-loading 挂在 v-if=\"tableData.length\" 的表格上 + 请求前清空数据",
+   "type": "bug",
+   "content": "楼盘表（buildingTable）左栏切楼幢加载户室表时，同时出现两个症状：loading 基本不生效（切幢过程中是空白而不是转圈），且表格会闪灭。根因是两处叠加：\n1. 表格本身写了 v-if=\"tableData.length\"，而 loading 是加在这张表格上的（v-loading）。所以请求开始时若先把 tableData 置空，表格节点被卸载，v-loading 连同节点一起消失 —— loading 永远看不到；数据没回来之前页面只有空白。\n2. 请求函数开场无条件 `this.tableData = []`（为了不让旧幢数据残留），进一步保证切幢瞬间表格必然被卸载。\n\n正确做法（Vue2）：\n- v-loading 要挂在一个**不随数据卸载**的容器上（表格外壳 div / 卡片容器），或把 v-if 从表格上摘掉、改由 zs-table 自己的空态承载；\n- 切幢时用「保留旧数据 + loading 遮罩」，数据回来后整体替换，或至少先赋值 loading 再清数据，避免「清空 → 空白 → 出现」的三段闪灭；\n- 必须保留请求序号守卫（houseTableRequestSeq 在 data 里自增、在 then/catch/finally 里比对），这个写法本身在 Vue2 里是正确的，能挡住快速切幢的乱序回包，别为了 loading 把它去掉。\n\n附带一条同类审查口径：`currentPosition` 的 watch + getTotal 里 $nextTick 调 getBuildHouse，初始 currentPosition 为 0 时不会漏首次加载——这类「watch 驱动 + 0 值初值」的写法是安全的，排查加载问题不要往这里找。",
+   "evidence": "会话 dcdf7a8b（2026-10-16，基线 2b6e7d0）对 buildingTable/index.vue 的 review：[HIGH] loading 与 v-if 冲突 —— File: index.vue:54-56, 436-441，「请求开始时 tableData = []，而表格是 v-if=\"tableData.length\"，v-loading 会随表格卸载，切幢时多为空白而非转圈（loading 基本无效）」；[MEDIUM] 快速切幢体验 ——「每次请求先清空 tableData，表格会闪灭；序列号能保证最终数据正确，但 UX 退步」。同轮确认 `houseTableRequestSeq` 放 data 自增 + then/catch/finally 比对符合 Vue2 用法。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/projectManagement/buildingTable/index.vue"
+   ],
+   "baseline": "2b6e7d0",
+   "sessionIds": [
+    "dcdf7a8b-9081-4a84-86e3-c6f0b5cdc770"
+   ],
+   "bundle": "115.md"
+  },
+  {
+   "title": "楼盘表换数据接口（selectBuildHouse → listHouseGroupByFloor）后状态图标全灰的风险：映射函数没归一化状态字段，而 classes()/cellStyle 仍死判 == '1'",
+   "type": "bug",
+   "content": "楼盘表户室格子的状态图标（isAvailableSale 等「可售/不可售」标记）由 `classes()` / `cellStyle` 通过 `row[field] == '1'` 判定。把取数接口从 selectBuildHouse 换成 listHouseGroupByFloor 时，新写的映射函数 mapListHouseGroupByFloorToTable 只映射了楼层名、houses→rooms、houseNo→roomNo，**没有把 isAvailableSale 等状态字段归一化成字符串 '1'**。结果：新接口若字段名不同、或值是数字 1 / 布尔 true（后端按新 VO 返回时很常见），所有格子图标都会变灰，而且不报错——属典型的静默回归。\n\n可复用套路：**换数据源接口时，状态位字段必须在映射函数里显式归一化（统一 String(value) === '1' 或统一转布尔），并保留原判定函数的单一入口**；上线前必须拿真实响应核对每个状态字段的名称与取值类型，不能只看结构映射（楼层/户号）对不对。\n\n另一条同类隐患（既有，非本次引入但与新数据更易暴露）：单元格图标渲染取的是 `units[index].rooms[roomIndex]`，而图例筛选高亮的 `cellStyle` 用的是 `(columnIndex-2) % totalUnits` 与 `rooms[columnIndex-2]` 的下标推算；当一幢有多个单元且每单元户数不一致时，高亮背景会错位。列号反推下标只适用于「单元等宽等户数」的假设，凡有不等长分组必须改用扁平化的「列下标 → (单元, 户)」映射表。",
+   "evidence": "会话 dcdf7a8b（2026-10-16，基线 2b6e7d0）对 buildingTable/index.vue 的 review：[HIGH] 状态图标回归风险（接口契约）—— File: index.vue:421-433, 485-497，「mapListHouseGroupByFloorToTable 只映射楼层名、houses→rooms、houseNo→roomNo，未规范化 isAvailableSale 等。classes() / cellStyle 仍要求 row[field] == '1'。新接口若字段名不同或值为 1/true，图标会全灰 —— 需在真实响应上核对」；[MEDIUM] 图标渲染 vs 筛选高亮 —— File: index.vue:509-516，「cellStyle 仍用 (columnIndex-2) % totalUnits 和 rooms[columnIndex-2]，多单元、每单元户数不一致时图例筛选的背景色可能错位」。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/projectManagement/buildingTable/index.vue"
+   ],
+   "baseline": "2b6e7d0",
+   "sessionIds": [
+    "dcdf7a8b-9081-4a84-86e3-c6f0b5cdc770"
+   ],
+   "bundle": "115.md"
+  },
+  {
+   "baseline": "ed13ca0",
+   "content": "开业（入网）页要求「注册要件(030300)只在上方只读注册块回显、不进入开业(030310)上传区」时，做法是给 utils/appendix.js 加 `getAppendixConfigBusCode` + `excludeAppendixPackagesByConfigBusCode` / `excludeAppendixFileListByConfigBusCode` 两个纯函数，再由 `AppendixPackageSection` 新增 `excludeConfigBusCode` prop 透传，并在三条路径上同时生效：①只读要件宫格(filteredRequirementPackages)；②编辑态 AnnexUpload 的 handleConfig；③提交前 checkRequiredAppendix（detail.vue 提交时传同一个 excludeConfigBusCode）。只改其中一条会出现「界面不显示但提交仍报未完善」或反之。\n\n该方案的实际脆弱点（评审时必查）：过滤依据是 appendixConfig.busCode（或展平后的 item.busCode）是否等于被排除编码。若 030310 接口返回的注册类配置**没有带 busCode**，排除逻辑不报错、直接跳过，要件仍出现在开业上传区且提交预检也不排除——与产品目标不符，属静默失效。落地前必须与后端确认字段一定下发，或用 appendixConfigId/编码白名单兜底。\n\n附带两个惯常遗漏：AppendixPackageSection 的 watch 只监听了 busId/busCode/isView，未监听 excludeConfigBusCode，运行中 exclude 变化编辑态 fileList 不会重载（静态 prop 页面风险低）；以及 handleSave 只做表单 validate、未调用 sections.validateOpeningAppendix()，所以「保存」不拦开业必传附件，只有「提交」才拦。本条是通用模式的具件实例，可复用于任何「同一要件面板按来源编码分区展示」的场景。",
+   "evidence": "会话 0be1ddf2-c6a4-4b55-8182-ab2280aed440（baseline ed13ca0）评审结论 APPROVE，MEDIUM 指出过滤依赖配置上的 busCode、exclude 变更未触发 AnnexUpload 重载、保存未走开业要件本地校验；设计侧确认 getAppendixConfigBusCode + 两个 exclude helper 在只读宫格、AnnexUpload handleConfig、checkRequiredAppendix 三条路径一致。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\utils\\appendix.js",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\AppendixPackageSection\\index.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\zljg\\leaseEntryNetwork\\components\\LeaseEntryNetworkSections.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\zljg\\leaseEntryNetwork\\detail.vue"
+   ],
+   "sessionIds": [
+    "0be1ddf2-c6a4-4b55-8182-ab2280aed440"
+   ],
+   "title": "[苏房] 租赁开业页剔除注册要件：以配置所属 busCode 过滤，三条链路必须同源且依赖字段缺省会静默失效",
+   "type": "pattern",
+   "bundle": "117.md"
+  },
+  {
+   "baseline": "d327eb5",
+   "content": "服务方案里「收费标准」的金额单位不是独立字段，而是由收费类型(FEE_TYPE)的**字典标签**派生：标签含「比例」→ 追加 `%`；含「平方米」→ 追加 `元/平方米`；其他 → 追加 `元`。因此正确的展示链路是「先 formatChargeType(row) 把码值转成中文标签，再 formatSchemeChargeStandard(值, 标签) 拼单位」——顺序颠倒或直接拿码值判断都拼不出正确单位。\n\n落地约定：该规则收在 views/company/companyScheme/schemeDetailTemplate.js，导出 chargeUnitFromFeeTypeLabel 与 formatSchemeChargeStandard 两个纯函数，供 institutionRegister/detail.vue、companyRecordAgency/detail.vue 等只读详情页复用，并与 CompanySchemeDialog 的 chargeStandardText 同源，避免同一份数据在不同页面显示不同单位。新增页面不要再本地写一份单位映射。\n\n已知边缘差异（不阻断，但改动时留意）：收费类型为空时 formatChargeType 返回 `-`，chargeUnitFromFeeTypeLabel 视作无标签、不追加单位；而 Step4ServiceScheme.vue 表格的 formatStandard 对空 chargeType 仍会加 `元`。若要求全站统一，应统一为「空类型也始终带 元」并同步改 Step4 表格，而不是各页各写一套。",
+   "evidence": "会话 2fbb768f-1c75-43f0-8eab-10bbd6f99184（baseline d327eb5）评审 PASS：在已解析 FEE_TYPE 标签下，chargeUnitFromFeeTypeLabel 规则与 Step4ServiceScheme.vue 的 chargeUnit 一致（比例→%、平方米→元/平方米、其他→元）；指出空 chargeType 时与 Step4 表格 formatStandard 的差异。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyScheme\\schemeDetailTemplate.js",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institutionRegister\\components\\Step4ServiceScheme.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyScheme\\components\\CompanySchemeDialog.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\institutionRegister\\detail.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyRecordAgency\\detail.vue"
+   ],
+   "sessionIds": [
+    "2fbb768f-1c75-43f0-8eab-10bbd6f99184"
+   ],
+   "title": "[苏房] 服务方案收费标准的单位按 FEE_TYPE 字典标签派生，展示端与 Step4 需共用同一个格式化函数",
+   "type": "pattern",
+   "bundle": "117.md"
+  },
+  {
+   "baseline": "d327eb5",
+   "content": "把详情页胶囊 Tab 视觉搬到弹窗里时，常见写法是给弹窗外壳复制「白底 + 8px 圆角 + 底边线 + 栏高」那套规则，并顺手加 `:deep(.tabs) { overflow: hidden; }` 让圆角裁得干净。后果是 Tab 内容区里所有绝对定位浮层（zs-select 下拉、el-date-picker 日期面板、tooltip 等）都被裁切/不显示——这类问题在打开下拉时才暴露，静态截图看不出来。\n\n约定：`overflow: hidden` 只设到真正需要圆角裁切的视觉外壳子元素（如 tabs-bar / 面板头部），不要挂在 `.tabs` 或 `.tabs-content` 容器上；确需裁切时优先 `overflow: visible` + 单列子项裁切。评审 Tab 相关样式改动时，应把「Tab 内有下拉/日期/浮层」列为必回归项。\n\n同时注意两点反模式：①如果 zs-tabs 把 `.tabs--card` 与 `.tabs--line` 共用同一套 segmented 胶囊样式，全站 `type=\"line\"` 的页面会从下划线变成胶囊，属大范围视觉回归，胶囊样式应只挂 `.tabs--card` 或新增 variant 显式区分；②弹窗里用 :deep 复制 `.detail-container .tabs--card` 的白底/圆角/边框/栏 padding，会形成两套并行维护的设计 token，改一处漏一处，应抽共享 class（如 `tabs--detail-shell`）或 CSS 变量。",
+   "evidence": "会话 680780fd-d336-4cd9-a65f-acfe862bfd35（baseline d327eb5）评审给出 5 条 MEDIUM，其中「pubHouseDialog.vue:483-486 `:deep(.tabs){overflow:hidden}` 可能裁切浮层」「.tabs--card 与 .tabs--line 共用胶囊样式导致全站 line 页签视觉回归」「详情样式与弹窗 deep 重复两套维护」为可复用结论。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-tabs\\zs-tabs.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\styles\\index.scss",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\benefit\\pubHouse\\components\\pubHouseDialog.vue"
+   ],
+   "sessionIds": [
+    "680780fd-d336-4cd9-a65f-acfe862bfd35"
+   ],
+   "title": "[苏房] 弹窗内 Tab 外壳的 :deep(.tabs){overflow:hidden} 会裁掉 Tab 内容区的下拉/日期面板等浮层",
+   "type": "pattern",
+   "bundle": "117.md"
+  },
+  {
+   "baseline": "99bfdbd",
+   "content": "登录页「容器未适应图片高度、左侧插图底部出现白条」的根因是双重的，且不是纯 CSS 问题：①登录卡片高度由右侧表单撑开，卡片被拉高后左侧图片仍用 `object-fit: contain`，按比例缩放后底部自然留白；②布局同步逻辑（JS 计算的侧栏宽度与 minHeight）只按 CSS 最小高度（约 500px）计算，没有把表单真实高度算进去，所以图与卡片的尺寸联动从一开始就错。\n\n修复套路：侧栏图默认改 `object-fit: cover` 铺满左列消除白条（代价是装饰图边缘可能被轻微裁切，可用 object-position 或宽度计算再微调）；量算函数（measureLoginFormHeight）改为读取表单区域的 scrollHeight 参与侧栏宽度与 minHeight 计算；再用 ResizeObserver 同时监听表单区域与 `.login-form`，这样验证码加载、校验错误提示等导致内容变高时会重新布局；组件销毁或关闭侧图时务必断开 Observer 防多余回调。\n\n取舍需与用户确认：「铺满优先（cover）」还是「完整显示优先（contain）」是产品决策，contain 场景下白条要么接受要么靠背景色/外框补位，不要靠调整图片宽高比硬凑。",
+   "evidence": "会话 a07a073a-0076-4874-8c6f-bd2733f06d30（baseline 99bfdbd）针对登录页截图「容器未适应图片高度」定位根因并给出 cover + scrollHeight 量算 + ResizeObserver + 断开监听四步修复。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\login.vue"
+   ],
+   "sessionIds": [
+    "a07a073a-0076-4874-8c6f-bd2733f06d30"
+   ],
+   "title": "[苏房] 登录页左图底部白条：JS 高度量算只按 CSS 最小高度而非表单真实高度，object-fit:contain 留白",
+   "type": "bug",
+   "bundle": "117.md"
+  },
+  {
+   "baseline": "179717a",
+   "content": "用户提「某字段去掉、变更页同步」时的标准动作清单（以项目备案/项目变更去掉「地块编号 landSn」为例）：\n1) 编辑态：移除表单输入项（此处原是从宗地管理弹窗选取，需一并删掉 openParcelDialog / setParcel / parcelSnDisplay / parcelDialogLoading 及 SelectDialogFunc 导入等死代码）；\n2) 查看态：移除展示模板里的该字段，否则详情页仍显示空值异常；\n3) 校验：删除该字段的必填 rules——而且**变更页 changeDetail.vue 与备案页 detail.vue 是两套副本，残留的 rules 一定要同步删**，否则变更单会因一个看不到的字段校验不通过而无法提交；\n4) 后端契约不动：form.landSn / landId 字段与相关页签（ParcelTable / ParcelDialog、宗地信息）保留，避免影响后端数据结构与宗地管理功能。\n\n可复用点：这类「删字段」需求的隐性风险集中在 3) 和 4) 的边界上——校验规则易漏在变更页副本，而数据字段与关联弹窗容易被顺手删光导致其他功能塌陷；执行时按「界面 → 查看态 → 校验（含副本）→ 保数据契约」顺序核对。",
+   "evidence": "会话 c04ec318-6d2f-4c07-9c7c-3d3ba86b4ec7（baseline 179717a）按「项目备案里面的地块编号字段去掉，项目变更同步」完成改动，明确 changeDetail.vue 同步移除残留 landSn 必填校验规则，并保留 form.landSn/landId 与宗地信息页签。",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/projectManagement/customerProject/detail.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/projectManagement/customerProject/changeDetail.vue"
+   ],
+   "sessionIds": [
+    "c04ec318-6d2f-4c07-9c7c-3d3ba86b4ec7"
+   ],
+   "title": "[苏房] 下掉表单字段时连带清理弹窗取值代码 + 查看态字段 + 校验规则，并同步变更页副本",
+   "type": "workflow",
+   "bundle": "117.md"
+  },
+  {
+   "title": "[苏房] 机构类业务字段区「查看不显示 + 编辑不保存」的双根因：organType 兜底判定 + getForm 漏字段",
+   "type": "bug",
+   "content": "苏州V3 管理员维护详情页（company/companyAdmin/detail.vue）出现「编辑态能看到并修改人员类型/住所，但查看态不显示、保存也不生效」的组合故障，根因是两处独立的遗漏而不是同一处：\n\n1. 查看态不显示：查看态与编辑态都用同一个 `isAgency` 判断是否渲染「人员类型 / 住所」这两个机构专属字段，而 `isAgency` 完全依赖 `form.organType`。详情接口没有下发 `organType`（或类型不符）时，判定为 false，即使记录里 personnelType / householdAddress 有值也被整块隐藏。\n2. 编辑态保存无效：`getForm()` 构造提交报文时直接漏掉了 `personnelType`、`householdAddress`（以及 `personnelCode`），表单上改了、报文里没有，保存等于没改，且不会有任何报错。\n\n可复用解法：不要用「单一上下文标志字段」当字段显隐的唯一依据，改成「标志命中 或 记录本身存在这些字段的值」的兜底计算属性。本例新增 `showAgencyFields = isAgency || 记录中存在 personnelType / householdAddress / personnelCode`，然后把三处消费点统一改用它：编辑态表单渲染、查看态 contentInfo 构造、校验 rules。同时 `getForm()` 在 `showAgencyFields` 为真时把这三个字段一并写入报文。\n\n通用启发：业务标志字段（organType / adminType / terminalType）后端不下发是常态，字段显隐判定要有「数据存在即显示」的第二重兜底；而「查看不显示」和「编辑不保存」经常同时出现——两者往往共用同一个判定谓词与同一份字段清单，修的时候要同时检查「渲染条件」和「提交字段清单」两侧，只补一侧会留下另一半静默失效。",
+   "evidence": "会话 1aa60fcd：用户诉求「管理员维护页面：1、编辑管理员，修改人员类型和住所 2、查看，人员类型和住所不显示，应该显示」。最终结论给出根因：「查看态和编辑态都用 isAgency 判断是否渲染，而 isAgency 依赖 form.organType。详情接口未返回 organType 时，即使数据存在也被隐藏」＋「getForm() 提交报文中漏掉了 personnelType、householdAddress（及 personnelCode），编辑后保存等于没改」。改动为新增 showAgencyFields 计算属性作为兜底判断，三处统一改用它，并在 getForm() 补字段。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/companyAdmin/detail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/mixins/companyOrganContext.js",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/constants/companyOrgan.js"
+   ],
+   "baseline": "fc66641",
+   "sessionIds": [
+    "1aa60fcd-fb6c-40ed-85a3-935deaae7e9d"
+   ],
+   "bundle": "118.md"
+  },
+  {
+   "title": "[苏房] 子组件裸用 el-form-item 而整棵组件树没有 el-form 祖先：详情页必现 elForm 未定义警告，且 3 列栅格会错位",
+   "type": "bug",
+   "content": "苏州V3「机构入驻网络」详情（companyRecordAgency/AgencyEntryNetworkAdminDetail.vue → companyManagement/components/AgencyEntryNetworkSections.vue）刷新即报：\n\n```\n[Vue warn]: Property or method \"elForm\" is not defined on the instance but referenced during render.\n--->  at packages/form/src/form-item.vue\n```\n\n根因：区块组件 `AgencyEntryNetworkSections.vue` 里直接写了 `<el-form-item>`，但整棵组件树（含本组件、父级 AgencyEntryNetworkAdminDetail.vue、AgencyEntryNetworkDetail.vue）都没有任何 `<el-form>` 祖先。Element UI 的 el-form-item 通过 `inject: ['elForm']` 取表单上下文，取不到时其 `form` 计算属性会去读 `undefined.$options`，于是抛出这条 warn。为什么偏偏详情页必现：查看态下「业务范围」块的 form-item 不在 `v-else`（编辑态）保护范围内，无论成败都会渲染，所以 view 态必然触发。\n\n修复要点（注意第一点很容易做漏）：\n1. 给每个裸 el-form-item 的外层补 `<el-form :model=\"form\" label-width=\"auto\">`——基本信息编辑态、「业务范围」块各包一层。`label-width=\"auto\"` 与原有设计约 96px 的标签列宽度等价。\n2. 包完包裹层后字段布局会整体错位：原 `.section-form` 是 3 列 grid，插入 el-form 后 grid 作用在了错误的层级。解法是把 grid 从 `.section-form` 移到 `.section-form > .el-form` 上（scoped 样式里改），让包裹层继续承担 3 列栅格。\n\n通用判据：Vue2 + Element UI 项目里看到「Property or method \"elForm\" is not defined」这条 warn，不要去这个组件的 data/computed 里找 elForm，问题一定在「el-form-item 脱离了 el-form 祖先」；反而要警惕它常被 `v-if`/`v-else` 的渲染分支掩盖，只在某一态（尤其只读查看态）暴露出来。",
+   "evidence": "会话 6a44b07c：用户贴出完整 Vue warn 调用栈（含 components/Headline/index.vue、AgencyEntryNetworkSections.vue、AgencyEntryNetworkAdminDetail.vue、companyRecordAgency/detail.vue 层级）。最终结论：「整棵组件树（含父级）没有任何 <el-form> 祖先。Element UI 的 el-form-item 通过 inject: ['elForm'] 获取表单上下文，取不到时 form 计算属性读 undefined.$options，触发报错。详情页（view 态）中\"业务范围\"块的 form-item 不受 v-else 保护，始终渲染，所以查看页必现」。修改：各包一层 el-form + 把 grid 移到 .section-form > .el-form。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/companyManagement/components/AgencyEntryNetworkSections.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/companyRecordAgency/AgencyEntryNetworkAdminDetail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/companyManagement/components/AgencyEntryNetworkDetail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/Headline/index.vue"
+   ],
+   "baseline": "fc66641",
+   "sessionIds": [
+    "6a44b07c-5c77-4c89-bebf-6f7395f38ffe"
+   ],
+   "bundle": "118.md"
+  },
+  {
+   "title": "[苏房] 服务方案「收费类型」下拉无选项：字典键写成了 charge_type，全项目实际是 FEE_TYPE",
+   "type": "bug",
+   "content": "苏州V3 经纪机构分支机构的服务方案（institution/agencyBranch/components/ServiceSchemePanel.vue）新增/编辑时「收费类型」下拉框完全没有选项。\n\n根因：组件里用的字典键是 `charge_type`，而本项目该字段的字典是 `FEE_TYPE`（值形如「按比例 / 按固定金额 / 按平方米」）。字典键写错时前端拿不到枚举，下拉静默为空、不报错——这是本后台字典类问题最常见的伪装形态。\n\n修复面（三处必须一起改，只改弹窗会留下「弹窗能选了但详情还显示码值 / E2E 挂」）：\n1. `ServiceSchemePanel.vue`——新增/编辑弹窗的收费类型改用 `FEE_TYPE`；\n2. `AgencyBranchDetail.vue`——详情页的收费类型展示同步改用 `FEE_TYPE`；\n3. `e2e/institution/agency-branch-flow.spec.js`——E2E 里 mock 的字典键同步更新。\n\n可复用套路：遇到「某下拉没有选项」先别怀疑接口或 options 写法，第一步是把本模块的字典键与同业务的其他模块对齐——本例正确的键直接取自机构注册模块 `institutionRegister/components/Step4ServiceScheme.vue`，同名字段在同项目里通常已经有一处正确用法，直接抄那份常量即可。",
+   "evidence": "会话 35fd1584：用户诉求「服务方案里新增的时候，收费类型没有选项，应该使用字典FEE_TYPE」。最终结论：「原因是服务方案组件使用了错误的字典键 charge_type，而系统实际字典为 FEE_TYPE（与机构注册模块 Step4ServiceScheme.vue 一致），导致下拉无选项」，修改 ServiceSchemePanel.vue、AgencyBranchDetail.vue、agency-branch-flow.spec.js 三处。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyBranch/components/ServiceSchemePanel.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchDetail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institutionRegister/components/Step4ServiceScheme.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/institution/agency-branch-flow.spec.js"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "35fd1584-6f54-4128-979b-a920dbba023c"
+   ],
+   "bundle": "118.md"
+  },
+  {
+   "title": "[苏房] 从业人员详情页「后台关联数据」子表在编辑态也只读：operable=false / disabled + 提交报文剔除，四件套一起改",
+   "type": "pattern",
+   "content": "苏州V3 经纪机构从业人员详情（institution/agencyPersonnel/components/AgencyPersonnelDetail.vue）里，资格证书与从业履历两类子表其实不是用户录入的，而是后台关联数据：资格证书全部由主管部门维护、添加人员时按身份证自动关联；从业履历直接查库。因此新增/编辑界面都不允许增删改，只能查看。\n\n落地清单（四处必须同改，漏任一处都会出现「界面不能点但数据被清空」或「显示是只读但保存时带旧值」）：\n1. 资格证书表（AgencyPersonnelCertificateTable.vue）：传 `:operable=\"false\"` —— 隐藏新增/删除工具栏，行内只保留「查看」。\n2. 从业履历表（CareerList.vue）：传 `disabled` —— 同样禁新增/编辑/删除。\n3. 身份证失焦自动关联：在 `handleIdNumberBlur` 里调 `historyByIdNumber`，返回的 `certificateList` / `careerList` 自动填入两个表格（这就是「添加人员时通过身份证自动关联」的业务规则落地处）。\n4. 保存时报文剔除：从 `buildSavePayload` 里删掉 `certificateList`、`careerList`，避免前端把后台关联数据误当表单数据回传覆盖。\n\n注意例外：同一页的「继续教育」子表是用户可维护的，仍然保留 `canEditSubTable` 控制，不要把整个页面的子表一刀切只读。\n\n可复用判据：判断某个子表该不该可编辑，看的是「数据归属方」而不是「当前 formMode」。后端关联/主管部门维护的数据，即使在新增/编辑态也只读，并且必须从提交载荷里剔除；只做 UI 禁用而不剔除载荷，等于把只读数据的过期副本写回后台。",
+   "evidence": "会话 45a4cfe6：用户诉求「新增和编辑界面资格证书和从业履历应该不允许新增和删除……资格证书不是新增的，是后台关联的，资格证书全部由主管部门维护，添加人员的时候通过身份证自动关联，从业履历也是直接在数据库查，不能增删改的」。最终结论四项改动：证书表 :operable=\"false\"、从业履历 disabled、handleIdNumberBlur 自动关联、buildSavePayload 移除 certificateList/careerList；并明确继续教育子表仍由 canEditSubTable 控制。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelCertificateTable.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyPersonnel/components/CareerList.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyPersonnel/components/EducationTable.vue"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "45a4cfe6-8f0d-48f8-805d-6508450cc820"
+   ],
+   "bundle": "118.md"
+  },
+  {
+   "title": "[苏房] 从业人员新增页「保存基本信息后才出现」的后置模块：统一用主键存在性控制显隐，不要用 formMode",
+   "type": "pattern",
+   "content": "苏州V3 经纪机构从业人员详情页（institution/agencyPersonnel/components/AgencyPersonnelDetail.vue）的「继续教育」模块被要求放到「要件上传」下方，且新增时必须保存基本信息后才显示。\n\n落地方式：加一个计算属性 `showEducationSection() { return !!this.form.personnelRecordId }`，与要件上传用的是同一套逻辑——都以下游模块依赖的主键是否已就绪为开关：\n- 进入新增页：只有「基本信息」+「要件上传」（并提示「请先保存基本信息」）；\n- 基本信息保存成功、主键回填后：自动出现「要件上传」与「继续教育」两块。\n\n可复用约定：本项目的「后置模块」（要件上传、继续教育、各类依赖业务主键的子表）显隐一律用「业务主键是否已存在」（personnelRecordId / companyRecordId 等）判定，不要用 formMode === 'add' 之类的模式判断，也不要额外维护一个本地 hasSaved 标志。原因：保存成功后主键回填这个动作本身就是唯一可靠的状态源，模式判断在「新增保存后原地留在编辑态」这类流程里会直接判错。模块位置调整时，查看态与编辑态两处模板都要一起挪（本例两态都改了）。",
+   "evidence": "会话 2baa8203：用户诉求「继续教育模块放在要件上传下面，新增完成后才显示」。最终结论：位置调整（查看/编辑模式均调整）；新增 showEducationSection 计算属性，`return !!this.form.personnelRecordId`，仅在主键存在时显示，即新增保存基本信息后才出现，与要件上传逻辑一致；并给出新增流程效果（进页只显示基本信息+要件上传并提示「请先保存基本信息」）。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyPersonnel/components/EducationTable.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/institution/agency-personnel-flow.spec.js"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "2baa8203-10b4-42b4-96be-d978a88de664"
+   ],
+   "bundle": "118.md"
+  },
+  {
+   "title": "[苏房] zs-dialog 的 form-layout=\"single\" 会把宽度锁死 500px，带表格的弹窗必须去掉它或显式指定档位",
+   "type": "bug",
+   "content": "现象：`ExtractDialog`（项目备案 → 楼幢导入弹窗）内嵌「测绘楼幢」表格（楼幢名称/坐落/层数/测绘机构/备案号等列较多），右侧列被裁切、看不全。\n\n根因：该弹窗沿用了表单弹窗的写法 `form-layout=\"single\"`，`zs-dialog` 在 single 档位下会把宽度固定为 **500px**；而表格类弹窗需要的是默认 `medium` 档（1300px）。也就是说 `form-layout` 不只是「几列表单」的语义开关，它还隐式接管了弹窗宽度。\n\n解法：去掉 `form-layout=\"single\"`，沿用 `zs-dialog` 默认档位 `medium`（1300px），与同项目其它带表格的选择弹窗（如「选择房屋信息」）保持一致；若仍偏窄，再考虑 `form-layout=\"double\"`（1000px）或显式 `width=\"1300px\"`。\n\n约定：判断一个弹窗该用哪档，先看内容形态——纯二维表单才用 single/double，**凡含表格/多列数据一律用默认 medium**，不要为了「表单窄一点好看」把带表格的弹窗写成 single。",
+   "evidence": "会话 a779e1c7（2026-10-16，基线 2b6e7d0）：用户「这个弹窗大一些，让表格列展示完整」。最终结论明确：`ExtractDialog` 使用 `form-layout=\"single\"`，`zs-dialog` 会把宽度固定为 500px，内嵌测绘楼幢表格列多导致右侧列被裁切；改为去掉 form-layout，沿用默认 medium（1300px），与「选择房屋信息」等带表格的选择弹窗一致。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/projectManagement/buildinginfo/components/ExtractDialog.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/projectManagement/buildinginfo/index.vue"
+   ],
+   "baseline": "2b6e7d0",
+   "sessionIds": [
+    "a779e1c7-9182-4b88-b825-3421668b6d96"
+   ],
+   "bundle": "119.md"
+  },
+  {
+   "title": "[苏房] 要件排序按 appendixConfig.sort 全表排序后 isMenu 分组标记错位：需明确 sort 是全局序号还是组内序号",
+   "type": "bug",
+   "content": "共享 utils/appendix.js 里 sortAppendixPackages 按 `appendixConfig.sort` 做全表排序（稳定的比较器，不 mutate 入参），然后靠「排序后该 menuName 第一次出现」置 isMenu=true 来产出分组标题。若后端 sort 是组内序号（每个 menu 都从 1 开始），全表排序会把不同 menu 的项交错插在同一分组中间，isMenu 只在交错后首次出现的那一项为 true，后续同 menu 项没有标题，要件宫格上看起来像「要件挂错分组」。\n判定与改法：先确认后端 sort 契约。若为全局序号，当前实现正确（只需保证非有限数 fallback：Number('x') 得 NaN 时比较器返回 NaN 会破坏稳定顺序，应统一 `Number.isFinite ? v : 0`）；若为组内序号，必须先按 menuName 分组再在组内 sort。\n另一处坑：排序容易在两处重复做（load 时 sort + mapper mapAppendixPackageToFileList 里又 sort），结果虽一致但会出现双份口径，收口到一处（load 排序、mapper 只映射）。测试要补：null / 缺 appendixConfig / 非法 sort 三个边界，以及多 menu 交错后的 isMenu 断言。",
+   "evidence": "会话 7ed1e170 对 sort 统一改动的 review 结论：全局 sort 与同 menu 分组 MEDIUM、重复排序 MEDIUM（AppendixPackageSection loadRequirementPackages 与 gridFileList 二次排序）、非法 sort 值 NaN 破坏稳定性、测试未直接覆盖 sortAppendixPackages 与交错 isMenu。",
+   "files": [
+    "zhi2-web-admin/src/utils/appendix.js",
+    "zhi2-web-admin/src/components/AppendixPackageSection/index.vue",
+    "zhi2-web-admin/e2e/utils/appendix-requirement-grid.spec.js",
+    "zhi2-web-admin/src/components/AnnexUpload/index.vue"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "7ed1e170-26ff-4efc-9e39-c509a3902192"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "[苏房] Vue2 SFC `<style scoped>` 里 `@import` scss 会触发 Dart Sass 弃用警告，改 `@use` 即可（纯类选择器场景行为不变）",
+   "type": "workflow",
+   "content": "终端里 `[import]` / Deprecation 警告来自组件 `<style scoped lang=\"scss\">` 中的 `@import '@/styles/xxx.scss'`。Dart Sass 已弃用 @import，把这一行改成 `@use '@/styles/xxx.scss';` 即消除警告。\n关键判据：当被引入的 scss 文件里只有普通类选择器（本项目 styles/appendix-requirement-grid.scss 即如此）时，`@use` 仍会正常输出样式，与 @import 视觉行为一致，可以直接换。反之，若被引入文件是变量/混合宏库、或依赖 @import 的「后定义覆盖前定义」顺序、或存在同名变量合并，则不能机械替换，要改 `@use ... as *` 或 `@forward`。\n范围：项目内触发该警告的引用点通常只有一处，不必全仓扫描；若用户要求全项目消警告，再逐文件把 @import 迁成 @use/@forward。保存后 HMR 会更新组件，旧警告残留在终端里属正常，重开页面或重启 dev 确认。",
+   "evidence": "会话 dbd3d598：AppendixRequirementGrid.vue 的 `<style scoped>` 里 @import 触发终端 Sass 弃用提示，改为 @use 后行为一致；仓库内触发点只此一处。",
+   "files": [
+    "zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementGrid.vue",
+    "zhi2-web-admin/src/styles/appendix-requirement-grid.scss"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "dbd3d598-8975-46da-9854-6840b07d7239"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "[苏房] 列表「序号」列空缺（列有值但为空）：根因是把序号列写成 prop=\"billNo\"，必须用 zs-table 的 type=\"index\" + :index=tableIndex",
+   "type": "pattern",
+   "content": "列表页序号列不显示数字，最常见根因是模板把序号列写成普通数据列（`prop=\"billNo\"`、`prop=\"no\"` 等），而接口根本不返回该字段，于是整列为空——看起来像「接口没返回序号」，实际是绑错字段。\n本项目通用写法（机构备案、机构注销、专业资格证书等所有列表统一）：`<zs-table-column type=\"index\" label=\"序号\" width=\"80\" :index=\"tableIndex\" />`，页面提供 `tableIndex(index) { return (this.pageNum - 1) * this.pageSize + index + 1 }` 实现跨页连续编号。\n排查顺序：先确认列是 type=\"index\" 还是 prop；只有确认「后端确实下发了序号字段且产品要求用后端的」时才用 prop。同一模块新增列表页时直接复刻兄弟页的序号写法，别自造。",
+   "evidence": "会话 c7022489：personnelCertificate/index.vue 序号列 prop=\"billNo\" 接口无该字段导致列为空，改为 type=\"index\" + :index=tableIndex（80 宽、跨页连续）后正常，与 companyApplyAudit/companyCancel 一致。",
+   "files": [
+    "zhi2-web-admin/src/views/company/personnelCertificate/index.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/views/company/companyApplyAudit/index.vue",
+    "zhi2-web-admin/src/views/company/companyCancel/index.vue"
+   ],
+   "baseline": "d327eb5",
+   "sessionIds": [
+    "c7022489-2172-47ce-8e1e-dcbd234762d8"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "[苏房] 查看态混入编辑控件：contentInfo 里把开关量配成 DetailTemplate 的 switch 类型会渲染成禁用复选框，应改默认 text 并按字段映射「启用/停用」",
+   "type": "pattern",
+   "content": "详情页 formMode=view 时，某字段显示成一个灰掉的勾选框、与旁边纯文字字段风格不一致，根因是该字段在 `contentInfo` 里被声明为 `{ label, prop, type: 'switch' }`——DetailTemplate 会把 switch 渲染成禁用控件。\n约定：只读详情默认不出现任何编辑控件形态，字段一律用默认 `type: 'text'`（或 'dict'），需要「启用/停用」这类文案就在构造器里用 formatter/computed 把 enableState 映射成中文文本。只有在业务明确要求「查看态也要看开关形态」时才保留 switch。\n同类推广：DetailTemplate 的 type 语义（text/dict/amount/switch）是只读渲染口径，凡看到查看态出现输入框、复选框、下拉，先查 contentInfo 的 type 而不是查 CSS 或 disabled。",
+   "evidence": "会话 245206a1：公司管理员详情「启用状态」配成 DetailTemplate switch 类型，查看态呈现为禁用复选框；改为 text 并按 enableState 显示「启用/停用」后与相邻纯文字字段一致。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyAdmin/detail.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "baseline": "ed13ca0",
+   "sessionIds": [
+    "245206a1-0f07-4e6e-9c61-1b4a9740a686"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "[苏房] 合同「有无」类区块（父母/未成年兄弟姐妹）必须互不级联，且字段误删后用 git log 反查被误清理的提交再原位补回",
+   "type": "pattern",
+   "content": "苏州 2016 版合同 SzPartyBlock 的买受人未成年段约定：父亲/母亲「有/无」同处一行且彼此不级联（各自独立的 template v-if，母亲明细只看 `isYes(form.motherHas)`，不依赖 fatherHas）；未成年兄弟姐妹的「有/无」放在父母 template 之外、始终可见。每个 SzChoice 用各自 groupName（组件内部 `_uid`）保证同行两个单选不串组。\n已知遗留风险（与配偶/未成年子女段一致，非结构 bug）：HAS 切「无」只隐藏 UI、不清空 form 子对象，若提交层不按 isYes 过滤会带上脏数据；需要时在 watcher 或提交前按 isYes 清空。v-for 静态槽位用索引 key 可接受，有稳定 id 再改。\n字段「凭空消失」的定位套路：先在 git log 里查最近的重构类提交（本例水印重构 4a071431e 误删 branchName），恢复时必须四处一起补：查看态 basicInfoView、编辑态输入框（含 maxlength）、rules 必填提示、buildSavePayload 提交字段。只补 UI 不补 payload 会导致编辑保存后值丢失。",
+   "evidence": "会话 4fcbbb50 review 确认三点行为正确并指出「无」不清空数据与索引 key 两条 MEDIUM；会话 f52c96f2 中 AgencyBranchDetail 的 branchName 被 4a071431e 误删，按四件套（查看态/编辑态/校验/payload）原位补回。",
+   "files": [
+    "zhi2-web-admin/src/views/contract/chapters/suzhou2016/components/SzPartyBlock.vue",
+    "zhi2-web-admin/src/views/contract/chapters/suzhou2016/components/SzChoice.vue",
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchDetail.vue"
+   ],
+   "baseline": "ed13ca0 / 5a71ab7",
+   "sessionIds": [
+    "4fcbbb50-3483-4dc3-ba01-bdd8d936dc8c",
+    "f52c96f2-7886-48d7-8a78-1181edd28505"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "[苏房] 仓库根是 superproject + zhi2-web-admin 子模块：合并冲突只在子模块指针上，选「包含对方提交的较新 SHA」，env/.env 不入库",
+   "type": "workflow",
+   "content": "苏州市房地产监测V3 仓库根有 .gitmodules，`zhi2-web-admin` 是 git submodule。常规「处理冲突」需求实际是子模块指针冲突，判断步骤：\n1. 冲突两侧各是该子模块的一个 commit SHA（本地 x / 远端 y）；\n2. 分别在子模块内 `git merge-base --is-ancestor` 判断 —— 若远端 SHA 已是本地 SHA 的祖先，保留本地 SHA 即同时覆盖远端改动，无需在子模块层再造 merge；\n3. 提交信息写清 `Merge origin/xxx; resolve zhi2-web-admin submodule to <sha>`；\n4. 汇报时明确「子模块工作区是否干净、是否与远端一致」「本地领先远端几个提交」。\n固定约束：`env/.env` 存在本地修改时一律不纳入提交（含环境配置/敏感信息），并在结论里告知用户「未纳入、需确认是提交还是还原」，不要静默 stash 或还原。推送同理，只说明命令（git push origin develop/v3.0.0），未经要求不代推。",
+   "evidence": "会话 3ece022c：冲突在 zhi2-web-admin 提交指针（本地 bc48100 vs 远端 0cd8813），确认 0cd8813 是 bc48100 祖先故保留 bc48100，合并提交 4559b5f，env/.env 改动未纳入并显式提示用户。",
+   "files": [
+    "苏州市房地产监测V3/.gitmodules",
+    "苏州市房地产监测V3/.git/MERGE_MSG"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "3ece022c-9c83-4940-b83c-d9a8cb6dfee3"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "[苏房] 从业人员详情隐藏扩展区块：模块常量开关 + computed 短路 + 只加 v-if，禁止删模板或停加载（否则保存清空历史数据）",
+   "type": "pattern",
+   "content": "经纪/租赁从业人员详情（AgencyPersonnelDetail / LeasePersonnelDetail）需要暂时隐藏「继续教育/证书/从业履历」等扩展区块时，标准做法：模块顶部定义常量开关（如 `SHOW_EXTENDED_PERSONNEL_SECTIONS = false`），用 computed 短路出 showCertificateSection / showEducationSection / showCareerSection，模板上给对应 Headline 加 `v-if`。\n必须守住：仍然 loadDetail 拉取列表、buildSavePayload 仍带 educationList 等字段（空列表提交），即「只藏 UI 不改数据链路」。删模板或跳过加载会让全量替换语义的保存接口把已有数据清空。\n两个已知坑：① 常量名要与注释语义一致，租赁页只有「从业履历」一个区块时别复用包含了三区块语义的常量名（后续改开关会误判影响面）；② 经纪页的扩展区块只在非 view 的 zs-form 分支里，view 分支本来就没有——若产品要「编辑隐藏但查看可见」，得在 formMode==='view' 分支补同样 v-if 的 Headline，这是结构问题而非本次 bug。",
+   "evidence": "会话 21586747 review PASS：SHOW_EXTENDED_PERSONNEL_SECTIONS 常量 + 三个 computed && 短路 + v-if 正确；指出租赁页常量命名与注释不符、经纪页 view 分支仍不展示扩展区块两条 MEDIUM；核对确认数据仍加载并随 payload 提交。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue",
+    "zhi2-web-admin/src/views/institution/leasePersonnel/components/LeasePersonnelDetail.vue"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "21586747-39e7-4a0a-b9e3-ff7bdfdb0b23"
+   ],
+   "bundle": "120.md"
+  }
+ ]
+}

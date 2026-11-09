@@ -1,0 +1,40 @@
+{
+  "project": "无锡市区G",
+  "batch": "005",
+  "files": [
+    "005.md"
+  ],
+  "count": 2,
+  "memories": [
+    {
+      "title": "表格底部「合计」恒为 0：分页接口不返回 summary 时组件默认值写死 0 且 {...undefined} 不会覆盖，须回退详情接口取全量合计",
+      "type": "bug",
+      "content": "【什么情况】楼幢范围表格（zhi2-web-admin/src/views/property/complexChange/components/rangeTable.vue）底部「合计」的「单元数」「房屋套数」恒显示 0，而表格内的「小计」行显示正常。禅道 bug #5765。\n【为什么】合计只读分页接口 /property/complexChangeRange/page 返回的 summary，但该接口根本不返回 summary 字段；组件内 summary 默认值写死为 0，于是展开 {...undefined} 时不会覆盖默认值（{...undefined} 得到的是 {}，不是 undefined），合计恒等于默认的 0。而「小计」是前端对当前页数据累加、不依赖接口，所以看起来正常——同一个表里两行数字口径不同，正是判断根因的关键线索（一条是前端算的，一条是接口给的，只有后者恒 0）。\n【怎么做】① 合计改成两级来源：分页接口 summary 优先，缺失时回退变更单详情接口 /property/complexChange/{id} 返回的 totalUnit / totalHouse；② 把组件内 summary 默认值由 0 改成 undefined，避免无数据时伪造 0（0 是合法业务值，拿它当「缺失」标记必然出错）；③ 凡「表格内小计由前端算、表底合计来自接口 summary」的表，都要逐个核对分页接口是否真的返回 summary，不能因为接口路径带 page 就假设它带统计；④ 回退接口要按「表头所属单据」选（这里是变更单详情），不要退到另一个不相干的统计接口。",
+      "evidence": "会话 10c9e5a2（基线 8cd518d）用户诉求 1 直接给禅道 bug 5765 链接，诉求 3「截图文件删除，禅道改状态并填写解决方案(写到skill)」；最终结论写明根因为「楼幢范围表格底部『合计』只读取分页接口 /property/complexChangeRange/page 返回的 summary，而该接口并不返回 summary 字段；组件内 summary 默认值写死为 0，展开 {...undefined} 不会覆盖，导致『单元数』『房屋套数』合计恒为 0」，修复为「合计改为分页接口 summary 优先，缺失时回退变更单详情接口 /property/complexChange/{id} 返回的 totalUnit / totalHouse；summary 默认值由 0 改为 undefined」，改动 rangeTable.vue、detail.vue，提交 05fc4facf（develop/v2.6.1）。",
+      "files": [
+        "zhi2-web-admin/src/views/property/complexChange/components/rangeTable.vue",
+        "zhi2-web-admin/src/views/property/complexChange/detail.vue"
+      ],
+      "baseline": "8cd518d",
+      "sessionIds": [
+        "10c9e5a2-a290-4d2f-903a-f6b3dabeb01a"
+      ],
+      "bundle": "005.md"
+    },
+    {
+      "title": "禅道 Bug 回写必须提交 HTTP 表单并回传 uid/resolvedBuild/resolution 枚举值：直接 SQL UPDATE 会让操作历史空白",
+      "type": "workflow",
+      "content": "【什么情况】要把禅道 bug 从 active 改成 resolved 并填写「解决方案」时，如果直接 UPDATE zt_bug 表，页面状态虽然变了，但「操作历史」一片空白——因为 zt_action 里没有对应记录。\n【为什么】禅道的状态流转与解决方案是「动作」驱动的：状态变更和备注由 zt_action 承载，直接改主表只改结果、不留动作。而 HTTP 表单提交还有三处服务端强校验，缺一不可：① 必须原样回传表单里的 <input name=\"uid\">（从 <form id=\"zin_bug_resolve_{id}_form\"> 里抓），缺了提交后只回显页面、无任何变化；② resolvedBuild 必填（传 trunk），页面不显示红星但服务端强校验，缺了返回 {\"result\":\"fail\",\"message\":{\"resolvedBuild\":[\"『解决版本』不能为空。\"]}}；③ resolution 只认枚举 value——fixed / bydesign / duplicate / external / notrepro / postponed / willnotfix / productized，传中文「已解决」一律校验失败。\n【怎么做】① 表单提交前抓齐 uid / resolvedBuild / resolution 三项，resolution 用枚举 value；② 提交后必须回查两张表——zt_bug（状态）与 zt_action（操作历史），两张都对才算闭环；③ 状态流转边界是 active → resolved → closed，关闭是另一步，别混做；④ 解决方案备注用三段式模板：根因（说清机制）+ 修复（改哪个文件/接口/字段）+ 提交号；⑤ 指派人（assignedTo）按「谁提单谁回归」回指提单人，并在汇报里写明这个选择；⑥ zui-create 组件的 JSON 用正则抽取 → html.unescape → json.loads → 按 name 取 items 解析。",
+      "evidence": "会话 10c9e5a2（基线 8cd518d）用户诉求 3「截图文件删除，禅道改状态并填写解决方案(写到skill)」；最终结论记录三坑表：缺 uid 提交后回显页面无变化、缺 resolvedBuild 服务端强校验报『解决版本』不能为空、resolution 传中文校验失败只认枚举 value；并写明「通过 HTTP 表单提交（不是 SQL UPDATE，否则 zt_action 无记录、页面操作历史空白）」，解决方案备注已写入 zt_action id=81682，新增脚本 zentao_resolve.py 与 SKILL.md「六、回写禅道」章节。",
+      "files": [
+        "C:/Users/Administrator/.dsh/skills/zentao-analyzer/zentao_resolve.py",
+        "C:/Users/Administrator/.dsh/skills/zentao-analyzer/SKILL.md"
+      ],
+      "baseline": "8cd518d",
+      "sessionIds": [
+        "10c9e5a2-a290-4d2f-903a-f6b3dabeb01a"
+      ],
+      "bundle": "005.md"
+    }
+  ]
+}

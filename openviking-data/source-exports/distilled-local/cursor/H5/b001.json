@@ -1,0 +1,141 @@
+{
+ "project": "H5",
+ "batch": "001",
+ "files": [
+  "001.md"
+ ],
+ "count": 8,
+ "memories": [
+  {
+   "title": "基于这个图片混淆和解混淆原理，实现一个chrome插",
+   "type": "bug",
+   "content": "这就定位到了：你这个页面大概率在 `iframe` 里渲染内容，当前脚本只注入主页面，没进子 frame，所以看起来“不生效”。我先给插件加 `all_frames` 注入（含 `about:blank` 子页），这是这类系统里最常见的根因。",
+   "evidence": "extracted source=cursor project=H5",
+   "files": [
+    "@混淆图片.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6ecaed5d-de7a-48b4-9f19-36f8045db884"
+   ],
+   "_draft": true,
+   "project": "H5"
+  },
+  {
+   "title": "mock list数据",
+   "type": "bug",
+   "content": "## 已移除 `mock` 相关代码 已在 `src/pages/benefit/index.vue` 删除： - **`USE_MOCK_LIST`** - **`mockRows`** - **`queryList` 中开发环境直接返回 mock + 失败回退 mock** - **`getDict(\"benefit_quarter\")` 的兜底季度数据**（也属于 mock/兜底逻辑，一并移除） 现在列表数据只会走 `pubQuarterlyDeclaration` 接口，失败时仍是 `paging.value.complete(false)` 的原逻辑。",
+   "evidence": "extracted source=cursor project=H5",
+   "files": [
+    "`src/pages/benefit/index.vue",
+    "@src/pages/benefit/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "66666cff-f4cc-497a-bea8-ef223cd4cb3c"
+   ],
+   "_draft": true,
+   "project": "H5"
+  },
+  {
+   "title": "接口有数据，页面无异常，列表没有显示",
+   "type": "bug",
+   "content": "### 已加 mock（可一键切换） 我在 `src/pages/benefit/index.vue` 里加了 mock 开关： - **开启 mock**：把 `const USE_MOCK = false` 改成 `true`，重新进入页面后会直接显示 12 条模拟数据（不走接口）。 - **关闭 mock**：改回 `false`，恢复走真实接口。 如果 **开启 mock 仍不显示**，说明问题不在接口/字段，而在 `z-paging` 组件渲染/样式层（例如容器高度、slot/滚动区域、组件版本配置）。如果 **mock 能显示而接口不显示**，我再把 `res.rows` 兼容成 `res.data.rows / res.data.list` 等返回结构。",
+   "evidence": "extracted source=cursor project=H5",
+   "files": [
+    "`src/pages/benefit/index.vue",
+    "@src/pages/benefit/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b3b6701e-0df0-4f87-983e-b6c426eb20fc"
+   ],
+   "_draft": true,
+   "project": "H5"
+  },
+  {
+   "title": "{ \"code\": 200, \"msg\": \"操作成",
+   "type": "preference",
+   "content": "是的，就是这个问题。 ## 原因 `getDictLabel` 里对第二个参数调用了 **`.find()`**，它必须是**数组**。 你们字典接口返回的 `data` 很可能是**对象**（常见形态是 `{ rows: [...] }` 或包一层 `list`），赋值给 `stateOptions` / `businessTypeOptions` 后，在模板里执行： `getDictLabel(detailInfo.state, stateOptions)` 此时第二个参数是**普通对象**，没有 `.find`，压缩后就会报：**`t.find is not a function`**（和截图一致）。 这和决策详情里 `decisionBusinessTypeList` 等为 `null` **没有直接关系**；详情页用的是**单独请求的字典接口**，只要那次返回的 `data` 不是数组就会炸。 ## 修改说明 在 `src/utils/index.ts` 中已： 1. 增加 **`normalizeDictList`**：把 `data` 统一成数组（支持直接数组，以及常见字段 `rows` / `data` / `records` / `list`）。 2. **`getDictLabel`** 里先用 `normalizeDictList(options)` 再 `.",
+   "evidence": "extracted source=cursor project=H5",
+   "files": [
+    "`src/utils/index.ts"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ccfe1852-05a9-47a2-add7-5f4e21296652"
+   ],
+   "_draft": true,
+   "project": "H5"
+  },
+  {
+   "title": "参与决策 The following images ",
+   "type": "preference",
+   "content": "## 全局排查结论 在整个仓库里对 `.vue` 做了检索： | 检索项 | 结果 | |--------|------| | `@click.stop` / `@tap.stop`（除 `zs-button` 自身根节点） | **仅** `src/pages_owner/decision/index.vue` 里 4 处，且都在 **`<zs-button>`** 上 | | `defineEmits(['click'])` / 对外 `emit('click'…)` | **仅** `zs-button` | | 其它自定义组件上的 `.stop` / `.prevent` | **无** | 因此，这类 **`emit('click')` 不带事件 + 父级 `@click.stop`** 的问题，**根源只在 `zs-button`**；列表里 `HouseList` / `NoticeList` 的 `emit('click-item', item)` 首参是业务数据，当前没有任何 `@click-item.stop`，不受影响。`zs-image` 已是 `@tap=\"$emit('tap', $event)\"`，无需改。 ## 已做修改（`zs-button`） 在 `zs-button` 里用 **`onTap`** 统一向外 `emit('click', …)`",
+   "evidence": "extracted source=cursor project=H5",
+   "files": [
+    "`.vue",
+    "`src/pages_owner/decision/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b22779f7-0591-43f5-b4b9-fd2594f16d79"
+   ],
+   "_draft": true,
+   "project": "H5"
+  },
+  {
+   "title": "L23: L25: {{ getDictLabel(",
+   "type": "preference",
+   "content": "你说得对：这项目的 UnoCSS 不是 `inline-block` 这种类名，而是用 `display-inline-block`（在 `uno.config.ts` 里由 `display-(block|inline|inline-block|)` 规则生成）。 我已经把 `src/pages_owner/decision/index.vue` 里该标签的 `inline-block` 改成了 `display-inline-block`，这样它就会按内容自适应宽度、不再撑满。并且已确认没有 linter 报错。",
+   "evidence": "extracted source=cursor project=H5",
+   "files": [
+    "`uno.config.ts",
+    "`src/pages_owner/decision/index.vue",
+    "@src/pages_owner/decision/index.vue",
+    "@uno.config.ts"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f8bfc1e1-de62-4572-bfc7-20b21efe668e"
+   ],
+   "_draft": true,
+   "project": "H5"
+  },
+  {
+   "title": "L17: @src/pages_owner/deci",
+   "type": "preference",
+   "content": "已经不是路径拼接那么简单了：我刚再改了一版 `zs-image`，让它**不再依赖运行时 `/static/...` 这种字符串拼接**来加载本地图片。 我现在的修复是：在 `src/components/zs-image/zs-image.vue` 里，对 `src/static/**` 下的图片用 `import.meta.glob` 做了静态映射表。只要你的 `src` 传的是这种形式（例如 `images/house_szf.png`、`svg/vote_1.svg`），组件就会直接拿到构建后的正确 URL 返回渲染。 改动点在这里：`zs-image.vue` 的 `staticUrlMap` + `resolvedSrc` 命中映射优先返回。 你这边需要做： 1. 重新运行/刷新 H5 页面（最好重启一次 `uni` 运行，避免老包缓存）。 2. 再打开 `src/pages_owner/decision/index.vue` 看 `house_szf.png`。 如果还是看不到，把浏览器控制台/Network 里 **house_szf.png 的请求 URL 和状态码(404/403/200)** 发我，我就能继续精确定位是“映射没命中”还是“加载组件尺寸/渲染”问题。 **Finalizing static URL handling** I'm focusing ",
+   "evidence": "extracted source=cursor project=H5",
+   "files": [
+    "`src/components/zs-image/zs-image.vue",
+    "改动点在这里：`zs-image.vue",
+    "`src/pages_owner/decision/index.vue",
+    "@src/pages_owner/decision/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3210cab9-2079-4e56-bb7d-c9763b228c00"
+   ],
+   "_draft": true,
+   "project": "H5"
+  },
+  {
+   "title": "增加list接口mock数据",
+   "type": "preference",
+   "content": "### 原因说明 `main.ts` 里全局开启了 z-paging 的 **`use-virtual-list: true`**。虚拟列表要测量 cell 宽度/高度，滚动区域必须占满横向宽度。 你在 `.list-container` 上写了 **`align-items: center`**。在纵向 flex 里，这会让子元素在**水平方向不拉伸**，内部 `scroll-view` 往往会变成「随内容收缩」的宽度，甚至出现**有效宽度为 0** 的情况，虚拟列表算高失败，看起来就像「列表不出来」。 ### 修改说明 1. **去掉** `.list-container` 的 `align-items: center`（列表项本身已有 `margin: 20rpx auto 0`，仍可居中）。 2. **`width: 100vw` → `width: 100%`**，并加 **`min-width: 0`**，避免在 flex 布局里子项被撑破/溢出。 3. **`.list-item`** 的 `94.4vw` 改为 **`94.4%`**（相对父级全宽，避免与外层宽度叠加产生横向滚动或奇怪布局）。 4. **`.publicity-title`** 去掉固定 `80vw`，改为 **`max-width: 100%`**，避免在窄滚动区内再被 `vw` 拉宽。 5. *",
+   "evidence": "extracted source=cursor project=H5",
+   "files": [
+    "`main.ts",
+    "@src/pages/benefit/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5ddd3520-e931-43a9-9abb-08080d4f075f"
+   ],
+   "_draft": true,
+   "project": "H5"
+  }
+ ],
+ "_draft": true
+}

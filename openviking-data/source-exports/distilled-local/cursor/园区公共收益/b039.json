@@ -1,0 +1,78 @@
+{
+ "project": "园区公共收益",
+ "batch": "039",
+ "files": [
+  "039.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "[Vue warn]: Error in v-on ",
+   "type": "bug",
+   "content": "**原因** 报错来自 `zs-table.vue` 里表格的 `cell-mouse-enter` / `cell-mouse-leave` 处理函数。鼠标移入/移出单元格时会执行： ```427:436:d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue handleCellMouseEnter(row, column, cell, event) { const rowElement = cell?.parentElement ... } ``` 部分场景下 Element UI 传入的 `cell` 为 `undefined`（例如合计行、固定列边缘、表格重绘瞬间），直接访问 `cell.parentElement` 就会触发该错误。房屋列表页使用了 `zs-table`，所以会在该页面暴露。 **修复** 已在上述两个方法中增加空值判断：仅在 `cell?.parentElement` 存在时才添加/移除 `hover-row` 类。 这是全局组件修复，所有使用 `zs-table` 的列表页都会受益。请刷新房屋列表页，在表格上移动鼠标或点击房号链接，确认控制台不再报错。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`zs-table.vue",
+    "```427:436:d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\building\\house\\index.vue、d:\\repository\\园区公共收益\\zhi2-web-admin、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "65ff3dc2-6a51-41e1-8dfa-f8e3a9d71203"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "这个提示语很奇怪，优化一下",
+   "type": "pattern",
+   "content": "已将提示语优化为： **「请将对账方式、对账状态均设置为「未对账」」** 主要调整： 1. **去掉「查询银行回单需」** — 用户已点击「银行回单」按钮，无需重复说明操作场景 2. **「选择未对账」→「设置为「未对账」」** — 明确这是两个筛选项要填的值，而不是让用户去「选择未对账」这个抽象概念 3. **与同页其他提示统一** — 与第 299 行「请选择管理账户和记账日期」一样，采用直接、可执行的句式",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubBankDetailDay\\index.vue",
+    "@zhi2-web-admin/src/views/benefit/pubBankDetailDay/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5ac0a40f-9d17-413b-8527-695560ab5344"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "根据截图，问题已定位并修复。 原因 在 资产租赁申请",
+   "type": "bug",
+   "content": "根据截图，问题已定位并修复。 ## 原因 在 **资产租赁申请详情** 页，B 端用户（物业企业）点击「物业管理区域名称」选择区域时，会打开选择弹窗。弹窗里的辅助链接（「前往开户」「签署协议」）使用了 `getRouterPathByFilePath` 解析路由。 当前账号若没有「监管账户开户」或「监管协议签署」菜单权限，该函数会**直接弹出错误提示**。两个链接各调用一次，所以会出现**两条相同的错误**：「没有授权相关菜单，请联系管理员」。 ## 修复 已按 `pubUseMoneyApply/detail.vue` 的写法，将 `assetLeaseApply/detail.vue` 改为使用 `getRouterPathByFilePathOptional`： - 有权限：正常显示辅助链接 - 无权限：静默跳过该链接，不再弹错，弹窗仍可正常选择物业管理区域 ## 说明 项目中还有多个页面（如 `pubBankReceiptApply`、`pubExpenditureContract` 等）存在同样写法。若需要，我可以一并批量修复。 请刷新页面后，再次点击「物业管理区域名称」验证是否还会报错。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`pubUseMoneyApply/detail.vue",
+    "`assetLeaseApply/detail.vue",
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\utils\\ruoyi.js、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\assetLeaseApply\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubUseMoneyApply\\components\\PublicityTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "82837732-6269-4a38-bb56-614e39f5bbeb"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "停车泊位租赁管理详情，“收费标准名称”那未显示必填*",
+   "type": "fact",
+   "content": "已修复。 **原因：** `el-form-item` 的 `prop` 是 `parkingChargeStandardId`，但校验规则写在 `parkingChargeStandardName` 上。Element UI 只有 `prop` 与 `rules` 的字段名一致时才会显示必填 `*`。 **修改：** 在 `parkingSpaceContractFiling/detail.vue` 中，将校验规则改为与 `prop` 一致： ```396:396:zhi2-web-admin/src/views/benefit/parkingSpaceContractFiling/detail.vue parkingChargeStandardId: [{ required: true, message: '收费标准名称不能为空', trigger: 'change' }], ``` 现在“收费标准名称”会显示必填 `*`，未填写时保存也会在前端提示“收费标准名称不能为空”。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`parkingSpaceContractFiling/detail.vue",
+    "```396:396:zhi2-web-admin/src/views/benefit/parkingSpaceContractFiling/detail.vue",
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\parkingSpaceContractFiling\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7a6ec4bf-c697-4a2c-85ae-f84db3a2a972"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  }
+ ],
+ "_draft": true
+}

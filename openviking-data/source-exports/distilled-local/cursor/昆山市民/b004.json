@@ -1,0 +1,98 @@
+{
+ "project": "昆山市民",
+ "batch": "004",
+ "files": [
+  "004.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "点这个按钮进入详情没有数据",
+   "type": "preference",
+   "content": "已定位并修复该问题。 ## 原因 今天的一次改动在跳转详情页时，URL 里加了 `decisionRangeId=${item.decisionRangeId}`。但列表接口返回的数据里**没有** `decisionRangeId` 字段，于是 URL 实际变成了： ``` ...&decisionRangeId=undefined ``` 详情页读取参数时，`\"undefined\"` 是 truthy 字符串，被当成有效 ID 传给 `getDecisionDetail` 接口，后端查不到数据，页面就全是空的。 页面上只显示「排序表决」，是因为 `DetailTop` 在 `decisionType` 为空时，默认走了「非选项 → 排序表决」的分支，属于误导性的展示。 ## 修复内容 1. **`votedetail.vue`**：过滤 `\"undefined\"` / `\"null\"` 等无效参数，只有合法 `decisionRangeId` 才传给接口 2. **`index.vue`**：仅当列表项确实有 `decisionRangeId` 时才拼到 URL 3. **`DetailTop.vue`**：修正决策类型展示逻辑，避免无数据时误显示「排序表决」 请重新编译后，在「已完成」列表点击「决策详情」验证。若仍无数据，可在 vConsole 的 Network 里看 `g",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "**`votedetail.vue",
+    "**`index.vue",
+    "**`DetailTop.vue",
+    "涉及文件：d:\\repository\\昆山市民、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\index.vue、d:\\repository\\昆山市民\\src\\pages.json、d:\\repository\\昆山市民\\src\\stores\\vote.js、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\votedetail.vue、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\components\\DetailTop.vue、d:\\repository\\昆山市民\\src\\api\\modules\\vote.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3942ce22-16bf-4c69-b5d2-a3469d6db4fb"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "业委会选举，点击参与决策-阅读选举须知后，下一个页面",
+   "type": "fact",
+   "content": "H5 空白的原因已经定位，并做了针对性修复。 ## H5 空白原因 「参与选举」页（`Participate.vue`）在 H5 里也会调用 `loginWithWxCode()`。但 H5 的特点是： 1. **Token 不持久化**（刷新或部分跳转后会话可能丢失） 2. **内页跳转 URL 不带 `code`**（从选举须知 → 参与选举属于 SPA 内跳转） 3. 此时 `loginWithWxCode()` 会因「缺少 code」直接失败，`loadElectionDetail` 不会执行，`showPage` 一直为 `false`，页面只剩背景图 表决详情页 `votedetail.vue` 在 H5 上是**直接加载数据、不走登录**，选举页之前没对齐这个逻辑。 ## 修复内容 **1. `Participate.vue`** — H5 与小程序分开处理（与表决页一致）： ```javascript // H5：直接加载选举数据（复用当前内存中的 token） await loadElectionDetail(decisionId, options) // 小程序：先登录再加载 loginWithWxCode().then(() => loadElectionDetail(...)) ``` **2. `wxLogin.js`** — H5 防御性修复：URL 中",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "「参与选举」页（`Participate.vue",
+    "`votedetail.vue",
+    "`Participate.vue",
+    "`wxLogin.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "efd7fd9b-1f86-49c6-8815-9bbd75f57fcb"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "已完成腾讯云 E 证通接入，并替换了微信小程序原生的",
+   "type": "preference",
+   "content": "已完成腾讯云 E 证通接入，并替换了微信小程序原生的 `uni.startFacialRecognitionVerify` 人脸识别流程。主要变更如下： ## 已完成的改动 ### 1. SDK 配置 - 在 `pages.json` 中注册 E 证通中转页 `mp_ecard_sdk/index/index` - 将原生微信页面（`.wxml/.js`）改为 uni-app 的 `index.vue`，保证项目可正常编译 - 在 `App.vue` 的 `onLaunch` 中调用 `initEid()` 初始化 SDK - 在 `onShow` 中排除从 eID 数字身份小程序（`wx0e2cb0b052a91c92`）返回的场景，避免与 SDK 回调冲突 ### 2. 核身流程封装 新增 `src/pages/common/useEidVerify.js`，统一处理： 1. 向后端获取 `EidToken` 2. 调用 `startEid()` 跳转 eID 数字身份小程序完成核身 3. 核身完成后将 `eidToken` 提交后端校验 ### 3. API 调整 在 `src/api/modules/estate.js` 新增： - `getEidToken` — 获取核身凭证 - `faceRecognition` — 参数由原先的 `key`（微信 `verifyRes",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "`pages.js",
+    "将原生微信页面（`.wxml/.js",
+    "`index.vue",
+    "`App.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "557ceece-0aee-4751-ad10-916eb7fccb30"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "小程序端是存在扫码表决的情况，扫码的业主可能也是未实",
+   "type": "preference",
+   "content": "**不完全是接口慢的问题，但接口慢确实是原因之一。** 更准确地说是：跳转逻辑被接口结果“绑死”了，再叠加 E 证通返回时的竞态，才会出现“有时回不去”。 ## 原因分析 ### 1. 跳转被接口阻塞（主要原因之一） 之前的逻辑是： ``` 人脸认证成功 → 等 getOauthInfoByIdNumber → 等 initMyHouseInfo → 再跳转 ``` 只要 `getOauthInfoByIdNumber` 慢、超时或失败，用户就会一直停在实名页。接口超时配置是 **100 秒**，慢的时候体感就是“卡住了”。 ### 2. `initMyHouseInfo` 本身不返回 Promise ```146:152:src/stores/user.js initMyHouseInfo(payload) { if (!this.idNumber) return; selectMyHouse({ idNumber: this.idNumber }).then((response) => { if (response.code == 200) { this.syncProjectInfoFromHouseList(response.rows) } }) }, ``` 它不会 `return` Promise，房屋查询其实是“发了就算”，并不是可靠的等待点。真正卡住跳转的，主要是前",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "```146:152:src/stores/user.js",
+    "涉及文件：d:\\repository\\昆山市民\\src\\pages\\verifyUser\\index.vue、d:\\repository\\昆山市民\\src\\utils\\wxLogin.js、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\votedetail.vue、d:\\repository\\昆山市民\\src\\pages_home\\home.js、d:\\repository\\昆山市民\\src\\pages_home\\home.vue、d:\\repository\\昆山市民\\src\\pages_myhouse\\myhouse\\add.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b6de93fd-a25c-4ea3-8d51-85b547d8e7ce"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "选项表决有问题",
+   "type": "bug",
+   "content": "已修复选项表决显示 `undefined` 的问题。 **原因：** 页面写死了 `optionGroupList[0].minOptionNum` 和 `mixOptionNum`，但接口实际可能返回 `optionNum`、`mixOptionNum`（在分组或决策详情上），字段名不一致导致显示为 `undefined`。 **修复：** 1. 新增 `src/utils/optionLimit.js`，统一解析最小/最大可选数量，兼容多种字段名： - 最大：`mixOptionNum` → `optionNum`（分组级 → 决策级） - 最小：`minOptionNum`（分组级 → 决策级） 2. 更新 `vote.vue`： - 提示文案改为通过工具函数读取限制数量 - 选择时校验最大可选数 - 下一步时校验最小/最大可选数 重新编译后，应能正确显示类似「最少选择1个，最多选择3个」的提示，而不再是 `undefined`。若仍异常，可在 vConsole 里查看接口返回的 `optionGroupList` 和决策详情字段，确认是否还有其他字段名需要兼容。",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "`src/utils/optionLimit.js",
+    "`vote.vue",
+    "涉及文件：d:\\repository\\昆山市民、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\vote.vue、d:\\repository\\昆山市民\\src\\stores\\vote.js、d:\\repository\\昆山市民\\src\\api\\modules\\vote.js、d:\\repository\\昆山市民\\src\\stores\\election.js、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\components\\optionResult.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ac3abbe6-acb9-4b9f-b696-4801dd2f5e3e"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  }
+ ],
+ "_draft": true
+}

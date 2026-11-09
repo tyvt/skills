@@ -1,0 +1,135 @@
+{
+ "project": "惠山二期G",
+ "batch": 3,
+ "files": [
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "房屋维护/变更：预测建筑面积 predictFloorArea 改非必填须双页同步 rules 并预留后端校验",
+   "type": "workflow",
+   "content": "产品要求「预测建筑面积」可选时，在 `building/house/detail.vue`（房屋维护）与 `building/houseChange/detail.vue`（房屋信息变更）两处 **computed.rules 同步删除** `predictFloorArea` 的 `required: true`；不要只改表单展示或某一页。\n\n仍应保持必填的常规项：项目、楼幢、单元、房号、实测建筑面积、物理层、名义层、房屋用途等（以各页当前 rules 白名单为准，勿误加回 predictFloorArea）。\n\n验收：标签前红色 `*` 消失、清空后前端 `validate` 通过。若保存仍报「预测建筑面积不能为空」，说明后端 DTO/校验未放宽，需后端同步，前端无法单独闭环。\n\n与「可选字段 houseNum 靠 rules 白名单」同一套路，但 predictFloorArea 是**从必填降级**的典型字段名。",
+   "evidence": "会话 925383ae：用户要求预测建筑面积改为非必填；在两文件 computed.rules 删除 predictFloorArea 的 required: true；结论列出其余必填项未动，并提示后端可能仍校验。",
+   "files": [
+    "zhi2-web-admin/src/views/building/house/detail.vue",
+    "zhi2-web-admin/src/views/building/houseChange/detail.vue"
+   ],
+   "baseline": "d13ee4f",
+   "sessionIds": [
+    "925383ae-ed0a-489f-85a3-b976ba1ec9e0"
+   ],
+   "bundle": "009.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "业主自治「全选楼幢」：general 的 DecisionRangeTable.setData 只提交当前楼幢会丢全选",
+   "type": "bug",
+   "content": "在 `decisionRangeBuildingSelectMixins` + `zs-select-dialog` 的「全选楼幢」能力接入后，**各模块 DecisionRangeTable/RangeTable 的 setData（确定回调）实现必须一致**。\n\n已踩坑：`autonomy/general/components/DecisionRangeTable.setData` 在用户点过任一楼幢后 `buildingTableData` 非空，确定时**只汇总当前楼幢**，其它楼幢上通过「全选」勾选的户室会丢失；而 `election` 侧 `setData`、`preparatory` 的 `handlePick` 从完整 `treeData` 汇总，逻辑正确。\n\n合并前自查清单：\n1. 确定提交是否遍历整棵 `treeData`/全部楼幢，而非仅 `buildingTableData` 当前项；\n2. `initHouseChecked` 里 `exist==1` 已入库户室被标 `checked='1'` 时，提交侧是否过滤，避免重复入库；\n3. `isAllBuildingsSelected` 依赖 `$refs.dialog.treeData`，仅改楼盘表未打开弹窗时按钮文案可能不刷新；\n4. 筹建等列表 `checked` 混用数字 `0` 与字符串 `'1'`，比较与提交需统一类型。\n\n优先修 general 的 `setData`，再统一 exist 过滤与 checked 类型。",
+   "evidence": "会话 da4d5f02：审查全选楼幢改动，结论「建议先不要合并」，主因 general DecisionRangeTable.setData 在 buildingTableData 非空后只提交当前楼幢；另列 exist==1、isAllBuildingsSelected 刷新、checked 类型混用。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/general/components/DecisionRangeTable.vue",
+    "zhi2-web-admin/src/views/autonomy/multiply/components/DecisionRangeTable.vue",
+    "zhi2-web-admin/src/views/autonomy/election/components/apply/RangeTable.vue",
+    "zhi2-web-admin/src/views/autonomy/preparatoryApply/components/preparatoryRangeTable.vue",
+    "zhi2-web-admin/src/views/autonomy/mixins/decisionRangeBuildingSelectMixins.js",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue"
+   ],
+   "baseline": "289cc30",
+   "sessionIds": [
+    "da4d5f02-fc36-4e8c-8717-0c4503f50d5e"
+   ],
+   "bundle": "009.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "多议题线下表决 VoteRangeDialog：外层 Headline 包 CandidateConfigTable 会出现「表决项 + 空框收起」双层",
+   "type": "bug",
+   "content": "现象：`autonomy/option/components/VoteRangeDialog.vue`「表决项」区域出现两层带「收起」的框——外层标题「表决项」，内层只有「收起」无标题。\n\n根因：**Headline 嵌套**。外层 `<Headline title-text=\"表决项\" :show-action=\"false\">` 只包标题；内层 `CandidateConfigTable.vue` 根节点又是 `<Headline :title-text=\"titleText\">`，调用处未传 `titleText` → 内层标题为空，只剩折叠控件，形成视觉上的「多一层框」。\n\n修复套路（与园区公共收益「去掉 Headline 嵌套」同类，但本处落点在表决子表）：\n- `CandidateConfigTable` 去掉根级 Headline，根改为 `.sub-container`，标题/折叠由外层 VoteRangeDialog 的单个 Headline 统一提供；\n- 外层 Headline 恢复默认 `show-action`，使「表决项 收起」与下方「弃权」区块单层内联对齐；\n- 删除失效的 `titleText` prop。\n\n注意：`election/.../decision/CandidateConfigTable.vue` 是**独立同名文件**，改 option 目录下组件不会影响选举模块；`decisionType == 'SORT'` 若不应出现收起，需对该分支单独 `:show-action=\"false\"`。",
+   "evidence": "会话 3f7e696d：用户反馈线下表决决策维护「收起多了一层框」；定位为 VoteRangeDialog 与 CandidateConfigTable 双层 Headline；改 CandidateConfigTable 去 Headline、VoteRangeDialog 统一标题行收起。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/option/components/VoteRangeDialog.vue",
+    "zhi2-web-admin/src/views/autonomy/option/components/CandidateConfigTable.vue",
+    "zhi2-web-admin/src/components/Headline/index.vue"
+   ],
+   "baseline": "d52a061",
+   "sessionIds": [
+    "3f7e696d-b4d8-436c-98fe-e297ca14cc3e"
+   ],
+   "bundle": "009.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "待办详情返回：resolveBackNavigationPath 的 backUrl 须拆 path/query，且仅允许站内单斜杠 path",
+   "type": "bug",
+   "content": "惠山 zhi2-web-admin 在「flowable 待办 → 业务详情 → 返回」场景用 `utils/ruoyi.js` 的 `navigateToTodoTask` 写入 `query.backUrl`，`main.js` / `OperationBtnGroup` 的 `goBack` 再走 `resolveBackNavigationPath` + `router.push({ path, query: { type: 'back' } })`。\n\n踩坑 1（Vue Router 3）：若把带 `?pageNum=2` 的地址原样塞进 `path`，`router.push` 会解析失败或 404——须按 `?`/`#` 拆分，或 `new URL(backUrl, origin)`，再 `push({ path, query: { ...parsed, type: 'back' } })`；或约定 backUrl 禁止含 query 并在入口校验。\n\n踩坑 2（安全）：`query.backUrl` / `options.backUrl` 未校验时，`//evil.com`、带 scheme 的 URL 可能越权跳转；仅接受以单个 `/` 开头的站内 path（拒绝 `//`、`:`、`http`），非法则忽略走路径回退。\n\n踩坑 3（状态丢失，MEDIUM）：`navigateToTodoTask` 若只记 `current.path` 不含 query，从带筛选/分页的列表进详情再返回会丢列表态；需要「完整还原」时用 `fullPath` 或序列化 query（与已知「没写 backUrl 会原地刷新」互补，是 backUrl 有值时的扩展面）。\n\n与已知「待办 resolver 三层兜底」「详情返回缺 backUrl」不同：本条强调 **backUrl 字符串如何合法地喂给 Vue Router 3**。",
+   "evidence": "010.md 会话 26959102：审查待办物管会审核返回；HIGH「backUrl 含查询串时 router.push 用法不兼容」；HIGH「backUrl 未校验即用于编程式导航」；MEDIUM「backUrl 仅记录 path，丢失来源页 query」。改动文件 ruoyi.js、main.js、OperationBtnGroup/index.vue。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/main.js",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue"
+   ],
+   "baseline": "adccd7e",
+   "sessionIds": [
+    "26959102-f851-4ffb-b534-01c3957b3e3e"
+   ],
+   "bundle": "010.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "buildDetailPathFromRoute 非 tableid 路由禁止末尾裸拼接主键",
+   "type": "bug",
+   "content": "待办按 `busCode` 解析详情路由时，`buildDetailPathFromRoute` 在路径既不是 detail `filePath`、又不含 `:tableid` 动态段时，仍可能把 `id` 直接拼在 `basePath` 末尾（无 `/`），生成如 `/benefit/module` + `uuid` → `/benefit/moduleuuid`，导致 `push` 失败或进错页。\n\n修复：该分支应 `return null`，交给下方 `name` + `params` / `storedPath` 兜底；若业务确认为「path 末段 + id」，须显式 ``${basePath}/${id}`` 并与动态路由注册约定对齐。\n\n与已知「待办任务跳转 resolver 迁移」「跨模块 buildNavigationByFilePath」不同：本条是 **busCode 兜底拼 path 时的拼接形态** 缺陷。",
+   "evidence": "010.md 会话 26959102：HIGH「buildDetailPathFromRoute 非 tableid 路由可能错误拼接主键」；文件 ruoyi.js:273-286, 346-351。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js"
+   ],
+   "baseline": "adccd7e",
+   "sessionIds": [
+    "26959102-f851-4ffb-b534-01c3957b3e3e"
+   ],
+   "bundle": "010.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "decisionRangeBuildingSelectMixins：exist 户室与全选状态的三处一致性",
+   "type": "bug",
+   "content": "业主自治「全选楼幢」（`zs-select-dialog` 的 `tree-actions` + `decisionRangeBuildingSelectMixins.js`）审查暴露的实现陷阱，与园区「exist==1 已报名不可选」约定一致但惠山 mixin 曾违反：\n\n1. **提交集合**：`initHouseChecked` 对 `exist==1` 强制 `checked='1'`，而 `setData`/`handlePick` 按 `checked == 1/'1'` 收集且未排除 `exist`，用户切换过该楼幢后已在范围内的户室可能再次进入 `batchAdd`（repair 仅 UI `disableCheck` 挡不住提交侧）。收集处应 `if (house.exist == 1) return`；exist 户室不要为「全选语义」写成已选。\n\n2. **全选文案**：`isAllBuildingsSelected` 读 `this.$refs.dialog?.treeData` 及深层 `house.checked`，Vue 2 下子组件树变更不一定触发父 computed 重渲染，「全选/取消全选」文案可能滞后；在 `toggleSelectAllBuildings` 或楼盘表勾选回调末 `$forceUpdate()`，或 dialog `$emit('selection-change')` 再算，或状态提升到父级 data。\n\n3. **无可选户室**：全部 `exist==1` 或树为空时 computed 返回 false，按钮仍显示「全选楼幢」且点击无效果；增加 `hasSelectableBuildings`，无可选时 `disabled` 或隐藏。\n\n适用 election/preparatory/general/multiply 等挂同一 mixin 的 `DecisionRangeTable`/`RangeTable`。",
+   "evidence": "010.md 会话 da4d5f02：HIGH「子组件内部状态驱动父级 computed」；HIGH「exist 户室被标为已选且会进入提交集合」；MEDIUM「无可选户室时按钮语义不清」。009.md 结论亦提到 exist 与 $refs.treeData 同类风险。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/mixins/decisionRangeBuildingSelectMixins.js",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue",
+    "zhi2-web-admin/src/views/autonomy/general/components/DecisionRangeTable.vue",
+    "zhi2-web-admin/src/views/autonomy/multiply/components/DecisionRangeTable.vue",
+    "zhi2-web-admin/src/views/autonomy/election/components/apply/RangeTable.vue",
+    "zhi2-web-admin/src/views/autonomy/preparatoryApply/components/preparatoryRangeTable.vue"
+   ],
+   "baseline": "289cc30",
+   "sessionIds": [
+    "da4d5f02-fc36-4e8c-8717-0c4503f50d5e"
+   ],
+   "bundle": "010.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "B 端 SSO 先开空白窗：window.open 不能带 noopener，否则无法编程式跳转",
+   "type": "bug",
+   "content": "`views/sso/bTerminalRedirect/index.vue` 等「先 `window.open('about:blank')` 再异步换授权 URL」的 B 端单点登录，若在第三个参数写 `noopener,noreferrer`，父页拿不到可操作的新窗口引用（`newWindow` 为 null 或无法设 `location`），空白页会一直停在 `about:blank`；用户手动点链接带 URL 打开则正常。\n\n修复套路：去掉 `noopener,noreferrer` 以保留对子窗口的跳转权；跳转前 `newWindow.opener = null` 断开与原页关联；用 `location.replace(url)` 替代 `href`；等待期间显示「正在跳转」占位文案。\n\n与已知「外链菜单走 InnerLink」「Vite 下 window.open PDF」不同：本条是 **异步赋址的新窗口** 与 noopener 的冲突。",
+   "evidence": "010.md 会话 7ffb3be2：用户「直接打开为空白，手动点击打开正常」；结论明确 noopener 导致无法操作新窗口 location，已改为 opener=null + replace。",
+   "files": [
+    "zhi2-web-admin/src/views/sso/bTerminalRedirect/index.vue",
+    "zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue",
+    "zhi2-web-admin/src/api/security/oauth2.js"
+   ],
+   "baseline": "43b1b40",
+   "sessionIds": [
+    "7ffb3be2-f8de-4608-8768-cc04a3088249"
+   ],
+   "bundle": "010.md",
+   "project": "惠山二期G"
+  }
+ ]
+}

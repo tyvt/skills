@@ -1,0 +1,97 @@
+{
+ "project": "苏住房G",
+ "batch": 22,
+ "files": [
+  "085.md",
+  "086.md",
+  "087.md",
+  "088.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "首页待办面板必须与关键数据区域解耦：待办是用户维度，不能带 regionCode",
+   "type": "pattern",
+   "content": "【什么情况】Web 首页 v2（index-v2.vue）里「关键数据导航」按行政区/区域切换时，待办面板的两个接口（taskCount 计数、todoTaskList 列表）被一并重新请求，切换 Tab 就刷一遍待办。\n【为什么】待办是「当前登录用户」维度的数据，与浏览哪个关键数据区域无关；而 loadTaskCount/loadTodoPanelList 当初复用了区域切换的入参结构，把 regionCode 一起带进了请求，于是区域切换的 onKeyRegionChange 顺手也调了 loadTodoPanel()，形成无意义的耦合与多余请求。\n【怎么做】① onKeyRegionChange 里只刷新真正随区域变化的面板：关键数据、公共收益、报修、学习园地，删掉 loadTodoPanel() 调用；② loadTaskCount 改调 getTaskCount({})、loadTodoPanelList 只传 { pageNum: 1, pageSize: 4 }，彻底去掉 regionCode；③ 在两处加注释写明「待办按用户维度、不随关键数据区域变化」，防止后人「补全参数」时又把它接回去；④ 触发路径自查表：首次 loadAll() 发 taskCount + todoTaskList；区域切换 0 个待办请求；待办 Tab 切换只发列表接口。验证方式是切区域 Tab 时看 Network 里不应再出现 taskCount/todoTaskList。",
+   "evidence": "会话 9baedf91：用户两次诉求「关键数据导航切换不需要更新待办数据接口 / 不刷新待办」；最终结论中的改动说明第 1、2 条与「请求触发路径（静态核对）」表格给出了区域切换后待办相关请求为「无」。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\index-v2.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\v2\\components\\KeyDataNav.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\api\\portal\\home.js"
+   ],
+   "baseline": "15e201a",
+   "sessionIds": [
+    "9baedf91-d8d6-40c2-8e79-314e529e757a"
+   ],
+   "bundle": "086.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "跳新页面后内容停在中部：滚动容器是 #app-main 而非 window，scrollBehavior 对它完全无效",
+   "type": "pattern",
+   "content": "【什么情况】从「物业管理区域查询」详情页（已向下滚动）进入「前期物业合同备案 / 物业合同备案」子页面时，新页面直接从中段开始显示，看起来像「记住了上一页的滚动位置」。用户要求全局修，不止这一个模块。\n【为什么】项目里 router 已配了 scrollBehavior: () => ({x:0, y:0})，但 SPA 的实际滚动发生在布局主内容区——AppMain.vue 里 #app-main 带 overflow-y: auto，window 本身几乎不滚。vue-router 的 scrollBehavior 只处理 window 滚动（以及显式声明的滚动容器），对 #app-main 这种内部滚动容器无效，于是 #app-main 的 scrollTop 跨路由被原样保留。排查要点：先确认「到底是谁在滚」，而不是先怀疑 scrollBehavior 写错。\n【怎么做】在 router/index.js 的 afterEach 守卫里显式重置滚动：定义 resetPageScroll()（getElementById('app-main') 置 scrollTop = 0，同时 window.scrollTo(0,0) 兜底），并包在 Vue.nextTick 里执行——必须等新页面 DOM 渲染完成后再置零，否则设置会被后续渲染顶掉。这样一处改动对所有路由跳转生效。同类布局（#app-main / #app-content 类内部滚动容器）都适用同一套路。",
+   "evidence": "会话 a1789e06：用户反馈「详情中前期物业合同备案和物业合同备案进入显示在页面的中间…应该是跳转新页面时滚动位置的问题…这个需要全局修改」；最终结论给出根因「滚动发生在 #app-main（AppMain.vue 中 overflow-y: auto）而不是 window」及 afterEach + Vue.nextTick 的 resetPageScroll 修复代码。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\router\\index.js",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\layout\\components\\AppMain.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\index.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\components\\propertyContractTable.vue"
+   ],
+   "baseline": "e590ffa",
+   "sessionIds": [
+    "a1789e06-01db-41b3-b240-eb61d9addf8b"
+   ],
+   "bundle": "086.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "物业费申报明细的欠缴金额字段是 arrearsAmount：不要绑 oweAmountSum，也不要改成自动计算禁用",
+   "type": "pattern",
+   "content": "【什么情况】物业费申报详情 → 申报明细点「编辑」，录入应收/实收/欠缴金额后点确定，列表里欠费金额不显示；再次打开编辑，上次填的内容也不回显。用户明确要求「使用 arrearsAmount」。\n【为什么】三处根因叠加，前两处互相掩盖：① 表格列绑定的是 oweAmountSum，而接口实际返回 arrearsAmount，保存成功但列取不到值 → 表现为「不显示」；② 编辑弹窗里的欠缴金额用 calcArrearsAmount() 自动计算且处于禁用态，没绑 item.arrearsAmount，既录不进也不回显 → 表现为「再次编辑看不到上次内容」；③ 保存提交时用的是计算值而不是用户输入的 arrearsAmount，输入被丢弃。\n【怎么做】在 feeBindScopeTable.vue 一次性收敛：列 prop oweAmountSum → arrearsAmount；欠缴金额改为可编辑 v-model=\"item.arrearsAmount\"（去掉 disabled）；保存时直接用 item.arrearsAmount；提交校验增加欠缴金额必填；checkTableDataFields 改为检查 arrearsAmount；删掉已无用的 calcArrearsAmount。教训：表单里「自动计算 + 禁用」的派生字段，一旦接口又有同义落库字段，必须在「绑定的 prop / 是否可编辑 / 提交取值 / 校验字段」四处保持同一字段名，否则会出现「能存不能看、能看不能回显」的假象。",
+   "evidence": "会话 0cbbf182：用户诉求「…输入值后点确定，申报明细中欠费金额不显示，再次点开编辑，不显示上一次的填写内容，应该显示，使用 arrearsAmount」；最终结论明确列出三条根因（列绑 oweAmountSum 而接口回 arrearsAmount、编辑弹窗未绑 item.arrearsAmount 且被 calcArrearsAmount 禁用、保存用了计算值）及六项修改清单。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\detail.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\components\\feeBindScopeTable.vue"
+   ],
+   "baseline": "d109b83",
+   "sessionIds": [
+    "0cbbf182-783b-42fb-ad93-4e0e2a8c76bc"
+   ],
+   "bundle": "086.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "树表「叶子/分支」状态字段与树结构双轨判定：以 children 为唯一真值，状态字段只作派生写出",
+   "type": "bug",
+   "content": "【什么情况】月报模板维护（publicQuery/monthlyReportTemplate）这类「树 + 每行带类型字段」的表格，行上除结论 977/1027 那种「重复请求 / 重复 init」之外还有一类独立故障：树上明明有 subRows，行却按「叶子」渲染出本该只属于叶子行的列（单位、填报口径）。直接原因是 utils/monthlyReport.js 的 isLeafNode(node) 只看节点自己的 leafFlag，而不是看 children.length；而 addBranch()/removeBranch() 又会改写父节点的 leafFlag，于是结构一变、状态字段就落后一次。\n\n【为什么】同一份结构信息存了两份：children 树和 leafFlag 标量。任何一处写漏（addSibling、createTemplateNode 这类没有设置 leafFlag 的新建路径）都会让两份永久不一致，且界面以结构渲染、校验以状态字段判定，于是「显示是分支、校验按叶子」静默错配。\n\n【怎么做】① 判定一律以 children 为准（isLeafNode 只读 children，允许 children 为 [] 或不存在都算叶子），leafFlag 退化成保存前派生写出的冗余字段；② 变更树结构时，父变分支就把叶子专属字段清空并置 leafFlag='0'，删光子节点后按默认值回填并置 '1'，而不是保留加分支前的旧值；③ 状态字段必须保证至少有一条统一出口（normalizeTemplateOrder 之类的递归归一）在保存/提交路径上被调用，否则新建/并列新增的节点仍会缺 leafFlag 或 orderNum。\n\n【与已知的差异】已知条目里「重复 init / 重复请求」「树表懒加载搜索」都没覆盖这一类；本条的独立价值是「结构派生状态字段」的双轨不一致根因，以及 normalize 归一函数的调用闭环（审查时发现它定义了却没被调用，属于必须补上的落点）。",
+   "evidence": "审查 monthlyReport.js：isLeafNode 改为只读 children；新增 clearBranchNodeFields；ensureLeafFields 设 leafFlag；normalizeTemplateOrder 同步 leafFlag 并清分支字段。结论给 MEDIUM：仓库内未见 normalizeTemplateOrder 调用点，addSibling/createTemplateNode 仍不设 leafFlag；并提示「先给叶子填好单位再新增下级会永久清空父节点字段」。",
+   "files": [
+    "zhi2-web-admin/src/utils/monthlyReport.js",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReportTemplate/components/TemplateTreeTable.vue"
+   ],
+   "baseline": "4f7c2c3",
+   "sessionIds": [
+    "65ff5e0a-abf7-48c3-8b4c-301501c73c48"
+   ],
+   "bundle": "087.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "左侧树 + 右侧列表页首屏请求翻倍：init() 直接 getList() 与「树加载后自动选首节点」两条取数路径叠加",
+   "type": "bug",
+   "content": "【什么情况】进入「系统管理 → 用户管理」这类「左部门树 + 右用户列表」页面，Network 里 page 接口调了两次：第一条只有 pageNum/pageSize（不带 deptId），第二条带 deptId/deptName。根因不是组件重复挂载，而是取数入口有两个：init() 里除了 getTreeselect() 还直接调了一次 getList()；而 getTreeselect() 的 then 里在树加载完成后会 handleNodeClick(deptOptions[0])，它自己又会拉一次列表。\n\n【为什么】「默认选中第一个节点」与「无条件拉全量列表」是两个语义冲突的默认值。树一旦自动选中首节点，它就一定会按 deptId 取一次数，入口处的无参 getList() 必然被覆盖成无用请求；更糟的是它先到先渲染，会让人误以为「筛选没生效」。这与已知 977（重写 init 后 created 里再 reloadDetail）的形态相近但触发源不同：那条是生命周期钩子叠加，本条是「异步回调里自动设默认值」的开销。\n\n【怎么做】① 列表首屏只保留一条主路径：有树时去掉 init() 里的 getList()，让「树默认选中首节点」负责首次取数；② 树为空（deptOptions.length === 0）时明确不发列表请求（旧代码第二条本来也依赖树数据，行为一致），不要为了「看起来有数据」再补一条无参兜底；③ 同一份写法在 maintenance/components/userDialog.vue 里也有一份 getTreeselect()+getList()，改成公共取数函数或同源改造，避免下个改这页的人只修了一半。",
+   "evidence": "用户报「点击菜单的时候，用户查询接口调用了2次」。定位到 system/user/index.vue 的 init() 同时调 getTreeselect() 与 getList()，getTreeselect 的 then 里又会 handleNodeClick(deptOptions[0]) 再拉一次；修复为删掉 init() 里多余的 getList()，之后只剩一条带 deptId 的 page 请求。",
+   "files": [
+    "zhi2-web-admin/src/views/system/user/index.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/views/maintenance/components/userDialog.vue"
+   ],
+   "baseline": "315702f",
+   "sessionIds": [
+    "7130b223-ea5d-4df2-a81c-47b905abbd28"
+   ],
+   "bundle": "087.md",
+   "project": "苏住房G"
+  }
+ ]
+}

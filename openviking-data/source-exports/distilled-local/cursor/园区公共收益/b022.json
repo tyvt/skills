@@ -1,0 +1,62 @@
+{
+ "project": "园区公共收益",
+ "batch": "022",
+ "files": [
+  "022.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "被驳回的且回到待提交状态的单据，该单据应该在工作中心",
+   "type": "preference",
+   "content": "已实现驳回单据在待办任务主题前显示 `<驳回>` 标识。 ## 实现说明 根据接口返回的数据结构，驳回单据通过 `comment.type === '3'` 或 `comment.comment === '驳回'` 识别。新增工具函数统一处理主题格式化： **新增** `zhi2-web-admin/src/utils/todoTask.js` - `isRejectedTodoTask()` — 判断是否为驳回单据 - `formatTodoTaskTitle()` — 在主题前追加 `<驳回>` 前缀 - `normalizeTodoTaskRows()` — 批量规范化列表数据 **修改以下 3 处待办列表入口：** 1. **工作中心 - 待办任务**（`flowable/todo.vue`）— 重写 `listCallback`，列表加载后格式化主题 2. **首页待办面板**（`home/index.vue`）— 获取待办数据后格式化 3. **首页待办表格**（`home/components/TodoTable.vue`）— 同上 ## 展示效果 驳回后回到待提交状态的单据，主题将从： `宗地名称：测试` 变为： `<驳回>宗地名称：测试` ## 说明 从你提供的截图看，`todoTaskList` 接口已返回驳回单据（含 `comment.type: \"3\"`、`",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`zhi2-web-admin/src/utils/todoTask.js",
+    "待办任务**（`flowable/todo.vue",
+    "**首页待办面板**（`home/index.vue",
+    "**首页待办表格**（`home/components/TodoTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "35f936a1-c453-4bbf-9d57-01b517ff7164"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "我发起的，点击“撤回”报“Request faile",
+   "type": "preference",
+   "content": "## 问题原因 从 Network 面板可以看到，撤回时请求的是： - **URL**：`/api/v2/2` - **Method**：`POST` - **Status**：`405 Method Not Allowed` 说明流程配置里的 **审批接口（`approvalApi`）被错误配置成了 `2`**，拼接 baseURL 后变成 `/api/v2/2`，这不是合法的业务接口，网关因此返回 405。 另外，原 `process.vue` 的撤回逻辑还有两个问题： 1. **缺少 `key` 参数**（当前节点），与 `approval.js` 中标准撤回不一致 2. **未校验 `approvalApi` 格式**，错误配置会直接发请求 ## 已做修复 1. **`flowApi.js`**：新增撤回工具函数 - 校验 `approvalApi` 必须是含 `/` 的路径（过滤掉 `2` 这类非法值） - 配置异常时，从业务详情 `path` 推导审批接口（如 `/benefit/xxx/123` → `/benefit/xxx/approval`） - 通过 `flowViewer` 获取当前节点 `key`，再调用审批接口 2. **`process.vue`**：撤回改为使用统一的 `withdrawProcess`，与详情页撤回逻辑对齐 ## 建议你再检查 请到",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`process.vue",
+    "`approval.js",
+    "**`flowApi.js",
+    "**`process.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b81ac1e2-1917-4945-a8fc-a5c38eb2ae6f"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "业务对账，银行回单数据那的字段显示顺序是不是弄反了",
+   "type": "fact",
+   "content": "是的，**银行回单数据那一侧的字段显示顺序确实弄反了**。 对比两张截图可以看出： | 模式 | 列顺序 | |------|--------| | 左侧「业务数据」/ 右侧「银行对账单数据」 | 序号 → 通知书号 → 交易日期 → 交易金额 → 手续费 …（正常从左到右） | | 右侧「银行回单数据」 | 手续费 → 交易金额 → 交易日期 → 通知书号 → **序号** → 操作（与左侧镜像相反） | 代码里 `bankReceiptColumns` 的定义顺序本身是对的，问题出在之前用 `v-for` 动态渲染列时，与右侧固定「操作」列组合后，Element Table 列渲染顺序出现了错乱（这个问题之前也出现过）。 **已做修复：** - 将银行回单表格改回与银行对账单一致的**静态列定义** - 数据加载后调用 `doLayout()` 重新布局 修复后，银行回单模式列顺序应为： **序号 → 对方账户名称 → 通知书号 → 交易日期 → 交易金额 → 用途 → 手续费 → 记账金额 → 银行平台流水号 → 结算渠道 → 操作** 请刷新页面后重新点击「银行回单」确认。若仍异常，告诉我当前看到的列顺序。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubBankDetailDay\\index.vue、d:\\repository\\园区公共收益\\zhi2-web-admin、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubBankDetailDay、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\bankDetailDay\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "31028abc-b8ae-4e20-8edb-702fd8eb1e0c"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  }
+ ],
+ "_draft": true
+}

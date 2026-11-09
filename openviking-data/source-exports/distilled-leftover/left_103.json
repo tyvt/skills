@@ -1,0 +1,193 @@
+{
+ "batch": 103,
+ "files": [
+  "127.md",
+  "128.md",
+  "129.md",
+  "130.md",
+  "131.md"
+ ],
+ "count": 12,
+ "memories": [
+  {
+   "title": "[苏房] 接口已返回的展示文案字段不能被前端派生函数无条件覆盖（currentNodeLabel 全列空）",
+   "type": "bug",
+   "content": "现象：预售许可列表「审批节点」列整列为空，但接口响应里明明有 currentNodeLabel（如「发公告」）。\n根因：页面 listCallback 里对每行调用 deriveCurrentNodeLabel(row) 并**直接覆盖**该字段；而 permitConstants.js 里的 derive 逻辑写死了「只有 bizState === '1'（审核中）才从 currentNode / currentNodeCode 查 CURRENT_NODE_LABELS 映射文案」，其余状态（已备案 2、已注销 3）一律返回空串，于是把接口下发的真实文案冲掉。\n解法（取值优先级）：① 优先用接口给的 currentNodeLabel；② 缺失且仍在审核中时，再用 currentNode 或 currentNodeCode 查本地 CURRENT_NODE_LABELS。\n可复用套路：凡是「后端已下发展示文案 label 字段 + 前端又有本地 code→文案映射」的场景，派生函数必须写成「接口值优先、本地映射兜底」的两级取值，而不是无条件覆盖；派生函数里出现「只在某一种业务状态下才出值」的分支时，要显式考虑该状态之外的行会被清空。排查入口：先在列表 listCallback 里找覆盖该字段的赋值，再去看 constants 里的 map 是否有状态前置条件。",
+   "evidence": "会话 3817808d-da0e-4a76-bc71-0399fe3fd202（2026-10-18，基线 a861cff）：用户报「@views/presale/permit/components/index.vue currentNodeLabel返回了，列表没展示」。结论：listCallback 用 deriveCurrentNodeLabel(row) 覆盖了该字段；permitConstants.js 原逻辑规定只有 bizState === '1'（审核中）才从 currentNode 映射文案，截图行多为「已备案 / 已注销」（bizState 2、3），因此被置成空字符串。改为「优先用接口 currentNodeLabel，缺失且仍审核中才用 currentNode / currentNodeCode 查 CURRENT_NODE_LABELS」。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/components/index.vue",
+    "zhi2-web-admin/src/views/presale/permit/permitConstants.js"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "3817808d-da0e-4a76-bc71-0399fe3fd202"
+   ],
+   "bundle": "127.md"
+  },
+  {
+   "title": "[苏房] Headline 区块的「新增」按钮误放默认插槽：必须用 Vue2 具名插槽 slot=\"right\"",
+   "type": "bug",
+   "content": "现象：详情页某个 Headline 区块（如「证书管理」）的「新增」按钮跑到了标题下方正文区，与上方「宗地信息」区块的按钮布局不一致。\n根因：按钮被写进 Headline 的**默认插槽**（外面再套一个普通 div），默认插槽渲染在标题下方正文流里；Headline 组件另有 `right` 具名插槽（src/components/Headline/index.vue），标题行右侧的按钮属于那里。\n解法：把按钮包进 `<template slot=\"right\">`（Vue2 写法，注意不是 v-slot:right），并删除仅为占位而存在的包裹 div 及其 margin-bottom 样式。\n可复用套路：动态发现这类问题的捷径是「找同页已经正确的区块当模板」——同一 detail.vue 里多个 Headline 区块中，只要有一个的按钮位置正确，照抄它的 slot 结构即可；改完要顺手清掉旧包裹容器的样式，否则会留下多余间距。（Headline 的 border-only 会连 #right 一起隐藏，属另一条已知坑。）",
+   "evidence": "会话 c6201de8-0a18-4650-99df-c46d8250f432（2026-10-13，基线 77f94ab）：用户贴图报「这个按钮没有放在headline的插槽里面」。结论：ProjectCertificateTabs.vue 中「证书管理」的「新增」按钮写在 Headline 默认插槽的普通 div 里，渲染到标题下方正文区；Headline 提供 right 具名插槽（components/Headline/index.vue:16），上方「宗地信息」的新增/删除按钮即是该布局。修改：包进 `<template slot=\"right\">`，并删除 .union-cert-toolbar 包裹 div 与 margin-bottom: 12px。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/ProjectCertificateTabs.vue",
+    "zhi2-web-admin/src/components/Headline/index.vue"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "c6201de8-0a18-4650-99df-c46d8250f432"
+   ],
+   "bundle": "127.md"
+  },
+  {
+   "title": "[苏房] zs-search-form 容器 padding 与列间距 gutter 是两件事，改一处会让 borderless 态与有边框态漂移",
+   "type": "pattern",
+   "content": "zs-search-form 的间距有两个独立维度，改视觉时不能只动一个：\n① 列间距：单行/多行 el-row 共用同一个 gutter 常量（本次提出 FIELD_GUTTER = 20 替换原先的 8）；\n② 容器内边距：有边框态改为 `padding: 12px 12px 12px 20px`，左侧 20 是为了与 gutter 对齐；\n③ 无边框态 `.search-form-container--borderless` 仍是 `padding: 0`。\n关键副作用：gutter 是两种态**共用**的常量，所以「borderless 保持不变」的诉求在视觉上并不成立——嵌在页面里的无边框搜索区列间距也会跟着从 8 变成 20，与原本紧凑的嵌入布局不一致。\n正确做法：若 borderless 要维持 8，写成 `:gutter=\"borderless ? 8 : FIELD_GUTTER\"`（或拆成 BORDERLESS_GUTTER / FIELD_GUTTER 两个常量）；若产品确认全局统一 20，则不需要改代码，但要在交付说明里点明这是全局视觉变更而非「仅改有边框态」。评审结论定级 MEDIUM（非阻断，属布局确认项）。",
+   "evidence": "会话 38d42c8d-9ebb-432c-87a0-4fff375d047c（2026-09-21，基线 6b3ac5a）：用户要求 review「FIELD_GUTTER 20 on two el-rows, container padding 12px 12px 12px 20px. borderless unchanged」。给出 [MEDIUM]：.search-form-container--borderless 仍 padding:0，但 el-row 共用 :gutter=\"FIELD_GUTTER\"(20)，相对原先 8，borderless 列间距同样变大；建议 `:gutter=\"borderless ? 8 : FIELD_GUTTER\"` 或拆两个常量，或确认产品预期全局统一 20。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "38d42c8d-9ebb-432c-87a0-4fff375d047c"
+   ],
+   "bundle": "127.md"
+  },
+  {
+   "title": "登录页侧图「表单高度自适应」：ResizeObserver 挂在被拉伸的盒上必然失效，要观测内容节点并用 scrollHeight",
+   "type": "bug",
+   "content": "为登录页（zhi2-web-admin/src/views/login.vue）做侧边图布局时，用 measureLoginFormHeight + ResizeObserver + needsCover 来决定侧图画幅，踩到一组连带缺陷：\n\n1) 高度反馈失真：loginBgInlineStyle 在侧图模式给 .login-bg 同时设 minHeight 与 height，而 .login-container 是 height:100%，此时 form.getBoundingClientRect().height 量到的是父级拉伸后的盒高而非内容固有高度；校验错误、Tab 内动态内容增高时盒高不变，面板不跟着变高 → 裁剪或滚动区异常。测量应改用 scrollHeight/clientHeight，或量不含 height:100% 的内层包裹，或测量前临时摘掉 inline height（需防闪烁）。\n2) RO 覆盖不到「内容溢出但盒尺寸不变」：RO 挂在 .login-container / .login-bg__form-column 上，依赖 border box 变化，与上条固定高度叠加后校验错误提示等溢出根本不改被观测元素尺寸。应观测真正随内容变高的内层节点（如 .login-form），或在表单 validate 后主动调 syncLoginBoxLayout；错误提示的显隐可配合 MutationObserver。\n3) 生命周期泄漏：hasLoginBoxImage=false 或 loginImage 清空时只重置状态、没有 disconnect() _loginFormResizeObserver，回调会空转到 beforeDestroy。抽出 teardownLoginFormResizeObserver()，与 beforeDestroy 共用。\n4) 观察目标不跟随 DOM 切换：loginBoxHeightClass 变化时只 syncLoginBoxLayout 不重新 observe，而 showForgotPassword 会在 .login-container ↔ .login-bg__form-column 之间切 DOM；高度档位改了但没走 showForgotPassword 就会继续观察旧节点。应在 $nextTick 里与 showForgotPassword 一致调用 observeLoginFormResize()。\n\n通用结论：凡是「测量高度 → 设置固定高度 → 再靠 RO 反馈重算」的闭环，必天然自锁；RO 只能观测真实随内容变化的节点，且必须在每个使节点被替换/禁用的分支上重绑或解绑。",
+   "evidence": "会话 43228ff4 对 login.vue 未提交 diff 的审查：给出 2 条 HIGH（固定高度后测量反馈失真、RO 无法覆盖仅内容溢出的场景）+ 3 条 MEDIUM（关闭侧图未 disconnect RO、loginBoxHeightClass 变更未重绑观察目标、needsCover 逻辑）。指出根因是「固定高度 + 观察拉伸盒」形成的闭环，以及 beforeDestroy 之外缺少 teardown。",
+   "files": [
+    "zhi2-web-admin/src/views/login.vue"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "43228ff4-2d10-4be2-b93d-2902ef0bf130"
+   ],
+   "bundle": "128.md"
+  },
+  {
+   "title": "[苏房] ImageUpload 的 file-type 只接受 'image'/'video' 字符串，误传后缀数组会让 allowedTypes 变 undefined 并渲染崩溃",
+   "type": "bug",
+   "content": "ImageUpload（src/components/ImageUpload/index.vue）的 file-type 是「内置类型键」，只接受 'image' / 'video' 字符串，内部用 this[`${this.fileType}Type`] 取后缀列表；allowedTypes() 在该取值命不中时返回 undefined，而模板里直接调 allowedTypes.join('/')，于是整块渲染崩掉，用户看到的是整页/整块上传区空白。\n\n两类触发方式：\n1. 直接把后缀数组写进语义为「类型键」的 prop：`:file-type=\"['png','jpg','jpeg']\"`（数组被 prop 转成字符串后查不到对应键）；\n2. 传了任意非法类型键（如 'pdf'）同样静默得到 undefined。\n\n正确用法：自定义后缀要传 `accept-types`，`file-type` 只留语义键。\n  正确：<ImageUpload v-model=\"form.photo\" :limit=\"1\" :file-size=\"5\" accept-types=\"['png','jpg']\" />（写成 :accept-types=\"['png','jpg','jpeg']\"）\n  默认 file-type=\"image\" 的后缀本身就是 ['png','jpg','jpeg']，多数场景直接不传即可。\n\n识别信号：渲染链报 `TypeError: Cannot read properties of undefined (reading 'join')`，组件栈里出现 ImageUpload → form-item → Headline → zs-form，说明是上传组件的 allowedTypes 为空，而不是图片数据问题。",
+   "evidence": "会话 9449756e：AgencyPersonnelDetail.vue 的证件照区写成 `:file-type=\"['png','jpg','jpeg']\"`，控制台报 `Error in render: TypeError: Cannot read properties of undefined (reading 'join')`，栈为 ImageUpload/index.vue → form-item.vue → Headline → zs-form → AgencyPersonnelDetail → detail.vue；去掉错误的 file-type 传参（组件默认 image 的后缀就是 png/jpg/jpeg）后渲染恢复正常，并说明以后要自定义后缀用 accept-types。",
+   "files": [
+    "zhi2-web-admin/src/components/ImageUpload/index.vue",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "9449756e-c27f-4b6f-8d25-58ca3b632943"
+   ],
+   "bundle": "129.md"
+  },
+  {
+   "title": "[苏房] Windows 仓库里出现名为 nul 的文件（Git Bash 里 `> nul` 的产物），会让 git add 报 fatal: mmap failed: Invalid argument",
+   "type": "workflow",
+   "content": "提交被 `fatal: mmap failed: Invalid argument` 拦下时，先找仓库里有没有名为 `nul` 的文件（可在 zhi2-web-admin 下用 git status 看到未跟踪、体积异常，内容常是被重定向进来的 CSS/日志）。\n\n根因：`nul` 是 Windows 保留设备名，Git 对普通文件 `nul` 做 mmap 必然失败。产生方式：在 Git Bash（而非 cmd）里写 `某命令 > nul` 或 `git ... 2>nul`，Bash 不认该设备名，会真的落一个普通文件 `nul`；随后 `git add -A` 把它一起加入暂存区就炸。\n\n处理：删掉该文件后重新 git add；阶段性的 LF/CRLF 警告在 Windows 上可忽略。\n\n预防约定：\n- 不要在 Git Bash 里用 `>nul` / `2>nul` 丢弃输出，统一用 `> /dev/null 2>&1`；\n- 少用 `git add -A`，改用显式列文件，避免把这类垃圾产物带进提交。",
+   "evidence": "会话 a2ca0448：用户贴 git-error 片段，排查发现 zhi2-web-admin 目录下存在名为 nul 的未跟踪文件（约 305KB，内容是误写入的 CSS），Git 报 `fatal: mmap failed: Invalid argument`；删除 nul 后对 12 个文件重新 git add 成功暂存，并给出「Git Bash 用 /dev/null、cmd 才用 >nul」的注意事项。",
+   "files": [
+    "zhi2-web-admin/nul"
+   ],
+   "baseline": "ed13ca0",
+   "sessionIds": [
+    "a2ca0448-b039-4aa4-bc9e-ec5ffd91218c"
+   ],
+   "bundle": "129.md"
+  },
+  {
+   "title": "V3 图片/文件代理统一走接口代理地址：getFileProxyTarget 不再读 FILE_PROXY_ADDRESS",
+   "type": "fact",
+   "content": "苏州房地产监测V3（zhi2-web-admin）开发服务器的图片/文件代理原先独立配置：vite.config.js 的 getFileProxyTarget 读 VITE_APP_FILE_PROXY_ADDRESS 并剥离 /v3.0 后缀，导致本地图片请求与接口请求打到不同后端。用户明确要求「图片代理和接口代理同一个代理地址」，改法是让 getFileProxyTarget 直接 return VITE_APP_PROXY_ADDRESS，并去掉 /v3.0 剥离逻辑。这样 /zhi2、/zhi2-dev、/zhi2-test 三个前缀的图片/文件代理与 /api 代理指向同一目标。部署侧无需配套改动：deploy/nginx.conf 里 /api/v3.0/ 与 /zhi2*/ 本就都 proxy_pass 到同一个 upstream fdc_api_gateway。改完必须重启 dev server 才生效；env/.env 中的 VITE_APP_FILE_PROXY_ADDRESS 已成为不生效的死变量，可择机清理。",
+   "evidence": "130.md 会话 be25274a：『vite.config.js 中 getFileProxyTarget 现在直接返回 VITE_APP_PROXY_ADDRESS（接口代理地址），不再读取 VITE_APP_FILE_PROXY_ADDRESS，也不再剥离 /v3.0 后缀』『deploy/nginx.conf 中 /api/v3.0/ 与 /zhi2*/ 本就都指向 fdc_api_gateway』『重启 dev server 后生效』",
+   "files": [
+    "zhi2-web-admin/vite.config.js",
+    "deploy/nginx.conf",
+    "zhi2-web-admin/env/.env"
+   ],
+   "baseline": "fc66641",
+   "sessionIds": [
+    "be25274a-6970-4bda-b365-0ac3a21f1320"
+   ],
+   "bundle": "130.md"
+  },
+  {
+   "title": "本后台图片/静态资源地址解析统一收口在 resolveServerAssetUrl，改代理要连同它一起复核",
+   "type": "pattern",
+   "content": "苏州房地产监测V3 的运行时资源地址（后端下发的相对路径图片、附件缩略图等）由 src/utils/resolveServerAssetUrl.js 统一拼出域名/前缀，而不是各页面自己拼字符串。因此「本地图片打不开/打到别的服务」这类问题的排查面是两个：vite.config.js 的代理目标（决定 /zhi2* 前缀转发到哪）与 resolveServerAssetUrl 的拼接规则（决定最终 URL 长得对不对劲）。调整代理目标后，凡是通过该工具生成的地址都会跟着变，不要再去逐页改 image src 或另加域名常量。",
+   "evidence": "130.md 会话 be25274a 的涉及文件同时包含 zhi2-web-admin/vite.config.js 与 zhi2-web-admin/src/utils/resolveServerAssetUrl.js，说明图片地址是「代理层 + 解析工具」两层结构",
+   "files": [
+    "zhi2-web-admin/src/utils/resolveServerAssetUrl.js",
+    "zhi2-web-admin/vite.config.js"
+   ],
+   "baseline": "fc66641",
+   "sessionIds": [
+    "be25274a-6970-4bda-b365-0ac3a21f1320"
+   ],
+   "bundle": "130.md"
+  },
+  {
+   "title": "按「字段清单」调表单顺序只改 fieldPlan 构造器一处，查看态与编辑态自动同源",
+   "type": "pattern",
+   "content": "机构从业人员基本信息这类三态（查看/编辑/变更）表单，本项目把字段顺序收敛在 components 下的 *BasicInfoFields.js 构造器（如 resolveAgencyPersonnelBasicInfoFields）里，返回一份 fieldPlan：查看态由 DetailTemplate 按它渲染，编辑态由对应的 *BasicInfoFormFields.vue 按它渲染。用户给出字段顺序清单时，只改这一个 js 文件即可两端同时生效，不要去 el-form 模板里搬动 el-col、也不要在查看态 contentInfo 里另外排一遍。附带两条实操约定：①字段的显隐条件（如证书管理号仅专业人员显示、人员角色仅「专业人员且非 B 端新增」显示）应在构造器里用 filter 过滤，而不是先 push 再 splice，否则顺序与显隐两个来源会打架；②用户在清单里重复写同一个字段名（如「证书管理号」出现两次）时按出现一次处理，不必追问。",
+   "evidence": "130.md 会话 7f4b5fc6：『查看态（DetailTemplate）和编辑态（AgencyPersonnelBasicInfoFormFields）都按这份 fieldPlan 顺序渲染，一处改动两端生效』『原有显隐逻辑保留…用 filter 实现，不再用 push 拼接』『你列表里“证书管理号”出现了两次，已按出现一次处理』",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/agencyPersonnelBasicInfoFields.js",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelBasicInfoFormFields.vue"
+   ],
+   "baseline": "fc66641",
+   "sessionIds": [
+    "7f4b5fc6-0b12-4d5a-98b7-deebc3bee429"
+   ],
+   "bundle": "130.md"
+  },
+  {
+   "title": "公共 CompanyDialog 复用契约：出参只认分页格式 rows/total，换接口不必改组件",
+   "type": "pattern",
+   "content": "网签合同签订页调「选择企业」时用的是公共组件 src/views/components/CompanyDialog.vue，它把返回值固定读成 res.rows / res.total（V3 分页响应），并把 pageNum/pageSize/companyName/companyTypes/deptId 等查询参数原样带给接口。因此把接口从 /company/company/listNoDataScope 换成 /company/companyRecord/pageNoScope 时，组件本身零改动，只要新接口是标准分页包装即可。另一条经验：同一个页面在 pre / cash / suzhou2016 三套合同范本章节下各有一份 chapter1.vue，它们各自内联引用了 CompanyDialog 并独立传接口，改接口地址必须三个章节一起改（本次共 3 处），否则只在某个范本下正常；而 projectManagement 模块下的同类旧接口属于另一个业务，不要顺手全局替换。",
+   "evidence": "130.md 会话 a80f755f：『共改 3 处（同一“网签合同签订”页面的三个合同模板章节）』『弹窗组件 CompanyDialog.vue 无需改动，取值就是分页格式的 res.rows/res.total，与新接口匹配；查询参数（pageNum/pageSize/companyName/companyTypes/deptId）会原样带上』『projectManagement 下还有 3 处引用旧接口…与本次截图无关，未改动』",
+   "files": [
+    "zhi2-web-admin/src/views/components/CompanyDialog.vue",
+    "zhi2-web-admin/src/views/contract/chapters/pre/chapter1.vue",
+    "zhi2-web-admin/src/views/contract/chapters/cash/chapter1.vue",
+    "zhi2-web-admin/src/views/contract/chapters/suzhou2016/chapter1.vue"
+   ],
+   "baseline": "fc66641",
+   "sessionIds": [
+    "a80f755f-af45-45c3-b783-f0f0071afc8a"
+   ],
+   "bundle": "130.md"
+  },
+  {
+   "title": "合同范本号 contractNo 是前端本地状态而非签约入参：提交 saveContract 时必须剔除",
+   "type": "fact",
+   "content": "预售合同签订页里「合同范本」下拉绑定的字段本身就叫 contractNo（取自范本字典 dict.contractNo），它承担三件事：页面校验「请选择合同范本」、记录用户所选范本、后续跳转与 store 透传。但后端 /presale/contractMainInfo/saveContrac（注意路径里就是 saveContrac，少个 t，不要「修正」）不接受该字段，传了等于把范本编号当成正式合同号写库。正确做法是在 chooseHouseDialog.vue 的 submit() 里构造 saveContract 入参时主动剔除 contractNo，只保留 contractType、projectCode、projectId、projectName、deptId、zoneId；同时不要把这个字段从表单 data 里删掉，否则「请选择合同范本」的校验会失效。判据：一个字段既是「界面上要选的业务字典项」又被后端当作「后端自生成编号」，这类同名字段一律属本地态，提交前剔除。",
+   "evidence": "130.md 会话 session_6a5f30b0：『在 chooseHouseDialog.vue:488 的 submit() 方法中，调用 saveContract 的入参里已去掉 contractNo 字段，其余参数（contractType、projectCode、projectId、projectName、deptId、zoneId）保持不变』『页面上的「合同范本」下拉绑定的字段本身就叫 contractNo…所以只是不再把它传给 saveContract 接口』",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/contractMainInfo/components/chooseHouseDialog.vue"
+   ],
+   "baseline": "114af19",
+   "sessionIds": [
+    "session_6a5f30b00db746eb21de1c7413dd2b80"
+   ],
+   "bundle": "130.md"
+  },
+  {
+   "title": "el-upload 只走 :http-request 自定义上传时仍必须给 action=\"#\"，否则每条附件都刷 Missing required prop",
+   "type": "bug",
+   "content": "机构注册/租赁机构注册页的附件项（InstitutionUploadItem.vue）用 :http-request 完全接管上传，请求实际走 handleUpload / uploadInstitutionAppendix，所以模板里没写 action。但底层 Element UI 的 el-upload 把 action 声明为 required string，于是 initAppendix 每渲染一个附件项就抛一条 [Vue warn]: Missing required prop: \"action\"（调用栈指向 packages/upload/src/index.vue → InstitutionUploadItem.vue → zs-form.vue）。修法是给两处 el-upload 都补 action=\"#\"——它只用来满足组件 prop 校验，不会成为真实上传地址。套用规则：任何自写上传项组件只要用 :http-request 接管，就必须配一个占位 action（本项目已成熟的 RegisterUploadItem.vue 就是这么写的，新组件直接照抄它而不是另立写法）。",
+   "evidence": "130.md 会话 7d2c6ace：『Element UI 的 el-upload 将 action 设为必填字符串。InstitutionUploadItem 只用了 :http-request 自定义上传，未传 action，因此在 initAppendix 渲染附件项时触发警告』『与 RegisterUploadItem.vue 一致，在两处 el-upload 上增加 action=\"#\"…实际请求仍走 handleUpload / uploadInstitutionAppendix，# 仅满足组件校验』",
+   "files": [
+    "zhi2-web-admin/src/views/institutionRegister/components/InstitutionUploadItem.vue",
+    "zhi2-web-admin/src/views/register/components/RegisterUploadItem.vue"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "7d2c6ace-ba93-4a45-988e-36327eaa2c19"
+   ],
+   "bundle": "130.md"
+  }
+ ]
+}

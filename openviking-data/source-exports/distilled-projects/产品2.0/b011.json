@@ -1,0 +1,169 @@
+{
+ "project": "产品2.0",
+ "batch": 11,
+ "files": [
+  "041.md",
+  "042.md",
+  "043.md",
+  "044.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "title": "详情页在新增态误调新增接口：$get 资源根路径被规范化成 POST /xxx/add + 空 body",
+   "type": "bug",
+   "content": "什么情况：产品2.0（与苏房V3同源）里，附件配置页点「新增」、用户管理页点「新增用户」，进入详情页就报错。抓包看是发了一条 body 为空的 POST /system/user/add、/file/appendixConfig/add 之类的「新增接口」。\n为什么：detail.vue 的 created 里残留 this.$get('/system/user/')（或类似「只传资源根路径」的写法）用来顺带拉岗位/字典等前置数据。V3 的请求规范化层会把「GET + 资源根路径」识别成 CRUD 动作，改写成 POST /{module}/{business}/add，而且 method 变了 body 仍是空对象，后端必报参数校验失败。已知记忆 983 只说明「非白名单 GET 会被改写成 POST+body」，这里补的是最典型的表现形态：新增页自动打 add 接口。\n怎么做：详情/新增页的前置数据一律用明确的业务接口（/system/role/roles、/system/config/getInitialPassword），禁止用 $get('/module/business/') 这种「根路径顺带取数」的写法。排查时在 Network 里看是否出现 add/update/detail 这三类动作后缀且 body 为空，命中即改。顺带发现该接口若只是为了取一个模板里根本没用的字段（如岗位 postOptions），直接删掉调用；密码初始化改为等 getInitialPassword 返回后再赋值，避免与 initPassword 的异步竞态。",
+   "evidence": "会话 4f365506/4d504758：附件配置与用户管理新增页均报「传参是空的」，根因是 $get('/system/user/') 被规范化为 POST /system/user/add；删除多余请求并改由 getInitialPassword 回填密码后修复。",
+   "files": [
+    "zhi2-web-admin/src/views/tool/fjflpz/components/FjDialog.vue",
+    "zhi2-web-admin/src/views/system/user/detail.vue"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "4f365506-e3be-4779-92c3-618489cfe3e8",
+    "4d504758-e807-4d71-ab92-00820c1154ef"
+   ],
+   "bundle": "041.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "用 dialogMixins 的弹窗必须补齐 primaryKey/moduleName/businessName，否则详情保存仍打旧 REST 接口",
+   "type": "bug",
+   "content": "什么情况：附件配置弹窗（FjDialog.vue）打开/保存时会打到 GET /file/appendixConfig/{雪花ID}、PUT /file/appendixConfig 这类 V2 风格的 REST 地址，而列表页已经走 POST /page 的 V3 规范，同一个模块两种接口风格并存。\n为什么：组件虽然 mixins 了 dialogMixins，但页面自己写了 getDetail()/submitForm()，且没有声明 primaryKey / moduleName / businessName 三个契约字段。dialogMixins 的标准 CRUD 链路（detail 走 POST /detail + 主键放 body、add/update 走 /add 与 /update）完全没生效，mixin 只贡献了弹窗开合，接口仍由页面的旧方法发出。\n怎么做：迁移时四步走——①补 primaryKey、moduleName、businessName；②把父级的 mode 映射成 dialogFormMode，与 dialogMixins 的 onOpen/init 流程对齐；③删掉自定义的 getDetail() 和 submitForm()，交给 mixin 发 POST；④列表页补 @refresh=\"getList\" 保证保存后刷新。参照已迁移的 ArchiveDetailDialog.vue。排查同类问题直接 grep 弹窗里是否有 `$get('.../append/ + id)` 或 `$put(`，只改本模块的 CRUD 范围，附件上传类接口（/file/appendix）不在规范化范围内。",
+   "evidence": "会话 4d504758：用户给出 http://localhost:8081/api/v3.0/file/appendixConfig/2093171403265224706 的旧接口地址要求全局排查；确认 file 模块仅 FjDialog.vue 一处残留，改造后详情改走 POST /file/appendixConfig/detail。",
+   "files": [
+    "zhi2-web-admin/src/views/tool/fjflpz/components/FjDialog.vue",
+    "zhi2-web-admin/src/views/tool/fjflpz/index.vue",
+    "zhi2-web-admin/src/mixins/dialogMixins.js",
+    "zhi2-web-admin/src/mixins/form.js"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "4d504758-e807-4d71-ab92-00820c1154ef"
+   ],
+   "bundle": "041.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "列表页迁 ListTemplate/listMixins 的映射口径：URL 拆 businessName、权限串拆 permsPrefix、自定义流程靠 baseTemplate.replace",
+   "type": "workflow",
+   "content": "什么情况：需要把一批手写 el-table 的列表页（如 supervision/progress 下 6 个页）统一迁到 ListTemplate + listMixins，脚本层要能机械落地、且迁移后交互一个不能少。\n怎么做（映射口径）：①moduleName/businessName 从接口 URL 拆——/prefund/engContract/list 即 moduleName='prefund'、businessName='engContract'，默认 apiSuffix='list'，只有页面专属端点才例外；②permsPrefix 从原 v-hasPermi 逐条反推，用冒号分段（xmxx:gcht、capital:change、riskmanage:riskregister），不要按目录名猜；③primaryKey 逐页人工核对（contractId / proChangeId / realTransactionId / projectDeliveryId / versionId / riskProRegisterId），错一个则查看/删除全静默失效；④搜索项差异（如楼幢号、登记日期）补进 queryParams，不然接口收不到条件。\n保留手段：页面独有的弹窗（ProjectDialog/ExtractDialog）、额外按钮、动态列名、disableButton 等自定义逻辑，一律通过 baseTemplate.replace 注入模板片段或在 mixin 钩子里覆写，而不是改回手写表格；有自定义 getList 的页面保留并注明分支接口。迁移后按「搜索项—列顺序—行内 link 跳转—删除回调」四项逐页回归。",
+   "evidence": "会话 0c55b984：6 个 supervision 列表页按 xy/index.vue 为参考批量迁移，逐页给出 moduleName/businessName/permsPrefix/primaryKey/apiSuffix 与需保留的自定义逻辑。",
+   "files": [
+    "zhi2-web-admin/src/mixins/ListTemplate.js",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/views/supervision/agreement/xy/index.vue"
+   ],
+   "baseline": "39e3114",
+   "sessionIds": [
+    "0c55b984-d193-404d-80bd-37db6196ab05"
+   ],
+   "bundle": "041.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "多分支并行（v2.6.1/v2.6.2）合并丢代码的定位与恢复流程：按目录比对差异文件数，再单提交恢复",
+   "type": "workflow",
+   "content": "什么情况：develop/v2.6.2 上工单（workOrder）、知识库相关代码整块消失，而 develop/v2.6.1 上是完整的——典型的 cherry-pick/合并把功能分支覆盖掉。\n怎么定位：不要逐文件 diff 全仓（噪音太大）。先确认子模块 zhi2-web-admin 在目标分支上是否检出完整（稀疏检出会误判「文件不存在」）；再按业务目录（src/views 下 workOrder、知识库对应目录）统计两分支的文件数差集，差集非空即确认丢失面；最后在功能分支上 git log -- <目录> 找到引入该功能的提交，确认它是被哪次合并丢掉的。\n怎么恢复：在目标分支上单独做一个「恢复合并时丢失的 X 相关代码」提交，只包含差集文件，不和其它改动混在一起；恢复体量常见在 20+ 文件、数千行量级。提交前让 pre-commit 的 eslint 跑通。\n父仓注意事项：产品2.0 是父仓、zhi2-web-admin 是子模块，切错分支时子模块指针会挂着未提交的变更；要同步修复必须先切到同一分支（如 develop/v2.6.2）再更新子模块引用并提交，否则父仓记的是另一条分支的 SHA。并行多 AI 会话共用工作区时，提交前用 git status 核对自己改的文件，别把别人的改动一起提交。",
+   "evidence": "会话 03553771：用户指出「262分支工单相关的代码合并丢失，develop/v2.6.1 上有，合并到 v2.6.2 丢失了」；最终在子模块提交 5af48d12b，23 个文件 +5119 行，并说明父仓库仍在 v2.6.1、子模块指针变更未提交。",
+   "files": [
+    "d:/repository/产品2.0",
+    "d:/repository/产品2.0/zhi2-web-admin"
+   ],
+   "baseline": "57109f9",
+   "sessionIds": [
+    "03553771-78e5-49bb-8543-63163b535dae"
+   ],
+   "bundle": "041.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "页内编辑态折叠成「只红框字段可编辑」：抽 isBaseFieldReadonly 谓词，不要在模板里逐字段写 disabled",
+   "type": "pattern",
+   "content": "什么情况：物业服务费账单详情组件（spFeeBill/components/detail.vue，被物业费/公共能耗费/电梯费/垃圾清运费四类账单共用）被要求「编辑页只有红框里的字段可编辑，其余只读」。\n基本做法：新增一个计算属性 isBaseFieldReadonly（判定 formMode === 'edit'）统一门控，并把它挂在只读字段的 disabled 上，而不是在模板里逐字段堆条件、也不要按字段名硬写。新增态该属性恒为 false，所以新增页字段照常可填，不出现「新增也变灰」的回归。可编辑集合通常就是「账单归属月、起止时间、金额、备注」加内嵌的优惠记录子表。\n为什么不能逐处改：这类详情组件被多个账单类型共用，逐字段改 disabled 会漏、会和 zs-form 的整表 disabled 级联冲突（zs-form disabled 会连带禁用区域内按钮），后续新增账单类型还会再次漂移。\n配套：子表（优惠记录）也要按同一 formMode 分流——编辑态保留新增/编辑/撤销，查看态只留「查看」并隐藏批量操作与行内按钮。用户给出截图圈定范围时，先在组件顶部写死范围清单注释，再落地谓词，方便验收与后续复用。",
+   "evidence": "会话 6d15f625：用户附截图要求「编辑页只有红框里的字段可编辑 其他字段只读」；最终通过 computed isBaseFieldReadonly（formMode==='edit'）控制 disabled，并明确该组件为四类物业账单共用、规则全域生效。",
+   "files": [
+    "zhi2-web-admin/src/views/property/bill/components/detail.vue",
+    "zhi2-web-admin/src/views/property/bill/service/detail.vue"
+   ],
+   "baseline": "075e6e9",
+   "sessionIds": [
+    "6d15f625-2ebe-4d75-ae02-a17516d72f77"
+   ],
+   "bundle": "041.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "B 端登录强制选物业管理区域这类「登录后行为」，必须做成 projectContext.js 里的显式开关常量",
+   "type": "pattern",
+   "content": "什么情况：B 端从业人员登录后立刻弹出「选择物业管理区域」的弹窗，业务方明确要求 B 端登录不弹窗，但历史记录里该功能反复出现/消失（曾有一次被改回去、又有一次被静默取消）。\n做法：在 src/utils/projectContext.js 里维护一个导出常量 ENABLE_B_TERMINAL_PROJECT_DIALOG_ON_LOGIN（注释写清「企业管理员不走此流程」），登录流程与布局组件都读这个常量，而不是在守卫或组件里写 if 条件。本次置为 false 后：登录不再自动弹窗；登录时清除本地缓存的 currentProjectId / currentProjectName，避免残留上一次的项目上下文；导航栏仍保留手动切换入口。\n为什么：这类「登录后副作用」散落在路由守卫、layout、store 多处时，一次合并/重构就会被改回去，且表现为「又出现了」的回归，排查只能翻提交记录。单点常量让它可 grep、可评审、可快速回滚。业务若后续改为「不弹窗但自动选中第一个区域」，在同一常量下接静默选区逻辑即可，不要新开分支条件。相关记忆 211 提到删除全局项目上下文要全量排查引用，这里是「保留能力、只切开关」的对应做法。",
+   "evidence": "会话 8bec5640：用户先说「b端又出现了选物业管理区域的弹窗，分析一下提交记录」，再明确「业务上仍希望 B 端登录不弹窗」；最终把 projectContext.js 的 ENABLE_B_TERMINAL_PROJECT_DIALOG_ON_LOGIN 置 false，并说明清缓存与手动切换入口保留。",
+   "files": [
+    "zhi2-web-admin/src/utils/projectContext.js",
+    "zhi2-web-admin/src/mixins/bTerminalProjectMixin.js"
+   ],
+   "baseline": "50767de",
+   "sessionIds": [
+    "8bec5640-c74a-4675-90e1-b0ea5fffe550"
+   ],
+   "bundle": "041.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "apiV3Normalize 的「路径末段当参数」规则要按路径段数分级：4 段以上全量迁移，末段 /detail 跳过",
+   "type": "pattern",
+   "content": "情况：V3 后端要求参数放 POST body，前端仍大量写 `$get('/system/config/getByKey/qq.map.key')`、`/flowable/definition/readXml/{deployId}`、`/evaluation/.../listEffective/{type}/{categoryId}` 这类路径参数接口，导致 key 留在 URL 上、后端 400。\n\n为什么旧逻辑漏：原先的 normalizeTrailingPathParams 只把「看起来像数字 ID」的末段（isPathId）搬进 body，带点号的配置键（qq.map.key）、纯字母编号（getBySecondVerifyLogCode/ABC123）、多个并行参数全被放过，只剩少数接口被规范化。\n\n怎么做：在 apiV3Normalize.js 里按「4 段及以上路径」统一处理，分四类规则：①ByXxx 类动作（getByKey/getByComplexId）自动推断 body 字段名，不再要求必须是数字 ID；②已知单参数动作建表映射（readXml→deployId、calculationChart→decisionId、terminate→id）；③多参数动作逐个建字段表（listEffective→declarationType+categoryId、listReport→planId+companyId+type）；④末段已是 /detail 的 V3 规范路径直接跳过，避免二次改写。刻意不改三类：已规范的 /xxx/detail、无 trailing 参数的嵌套资源路径、以及形如 /workOrder/order/{id}/accept 的「ID 在中间、子动作在末尾」结构——后两类必须单独加映射规则，硬套通用规则会改坏。\n\n落地收益：业务侧 `$get` 写法一行不用改，靠 request 拦截器兜底转换；验收方式是刷新页面看 Network，URL 不再带路径参数、参数出现在 POST body。之后仍有 400 就说明是中间带 ID 的特殊结构，需要补一条专属映射。",
+   "evidence": "会话 06f4b462（2026-08-25，基线 adc516a）：用户指出某个接口的 key 还在 URL 上，要求「也把 key 放到 body 里面」，随后「类似的接口全局排查一下」。结论：在 apiV3Normalize.js 统一增强，将 isPathId 单条件扩展为 4 段以上路径的四类规则；列出 getByKey/qq.map.key、getBySecondVerifyLogCode/ABC123、readXml/{deployId}、listEffective、listReport、getByComplexId 等典型接口的规范化前后对照，并明确跳过 /getEffectAgreementByAccountId/detail、/benefit/dataSandbox/assetPanorama/operationalAsset 与 /workOrder/order/{id}/accept。",
+   "files": [
+    "d:/repository/产品2.0/zhi2-web-admin/src/utils/apiV3Normalize.js",
+    "d:/repository/产品2.0/zhi2-web-admin/src/utils/request.js",
+    "d:/repository/产品2.0/zhi2-web-admin/src/api/index.js"
+   ],
+   "baseline": "adc516a",
+   "sessionIds": [
+    "06f4b462-1a59-4d5f-b258-6f1f46290ddd"
+   ],
+   "bundle": "043.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "B 端业务列表按小区隔离数据：统一用 isBTerminalPractitioner 门控 + currentProjectId 传 propertyProjectId",
+   "type": "pattern",
+   "content": "情况：房屋质量保证金模块（保证金管理 / 协议管理 / 协议终止 / 资金缴存 / 资金支用）在 B 端从业人员的账号下不做小区过滤，列表展示了全部物业管理区域的数据，属于越权可见。\n\n为什么：这批列表的查询参数里从来没有带 propertyProjectId，后端拿不到当前小区就只能全量返回；而 B 端顶栏的小区选择器只是前端上下文（store 的 currentProjectId），不主动下发就不会参与查询。\n\n怎么做：\n1. 在列表页覆写/新增 getQueryParams()，把小区过滤加在查询与导出共用的那一层，保证导出和查询同一口径：\n```js\nif (this.$store.getters.isBTerminalPractitioner) {\n  const propertyProjectId = this.$store.getters.currentProjectId\n  if (propertyProjectId) params.propertyProjectId = propertyProjectId\n}\n```\n2. 必须用 isBTerminalPractitioner 门控，不能无条件传：同一批页面（协议管理、协议终止）在 G 端主管部门也在用，G 端没有当前小区，无脑传会变成空过滤甚至过滤出错。\n3. 改造范围是「整个模块的所有列表菜单」而不是截图里那一个页面；已有过滤的（资金缴存/支用列表、新增弹窗内的账户选择）要复查一遍口径是否一致，别只补漏的那几个。\n4. 验收必须用 B 端账号切换不同小区，确认列表只返回该小区数据，再用 G 端账号回归一次没被误过滤。",
+   "evidence": "会话 dfe1828a（2026-07-23，基线 414029f）：用户截图指出「房屋质量保证金，B 端用户查看未做权限过滤」，要求「传小区id，字段：propertyProjectId」，并明确「房屋质量保证金相关的列表菜单都加一下」。结论：guaranteeDepositAccount/index.vue 新增 getQueryParams()（截图问题的主来源，此前未做小区过滤）；guaranteeDepositAgreement/index.vue 与 guaranteeDepositAgreementEnd/index.vue 改为仅在 isBTerminalPractitioner 为 true 时传，避免 G 端误过滤；guaranteeDeposit/components/index.vue 与 AddDialog.vue 本来就有过滤，未改。",
+   "files": [
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/guaranteeDepositAccount/index.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/index.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreementEnd/index.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/guaranteeDeposit/components/index.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/guaranteeDeposit/components/AddDialog.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/guaranteeDepositAccount/components/AccountDetailTable.vue"
+   ],
+   "baseline": "414029f",
+   "sessionIds": [
+    "dfe1828a-18d8-4f50-bd96-5b846ee22649"
+   ],
+   "bundle": "043.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "子模块提交被 pre-commit 拦在「缺依赖文件」：从来源分支补文件纳入提交，而不是跳过钩子",
+   "type": "pattern",
+   "content": "情况：在 产品2.0 父仓库里对子模块 zhi2-web-admin 做分支合并（develop/v2.6.1 → develop/v2.6.2）并提交时，pre-commit 失败，报缺少若干依赖文件，提交被卡住。\n\n为什么：合并只带来了引用关系，被引用的一批文件在目标分支缺失——本次是 src/utils/resolveServerAssetUrl.js、src/utils/serviceHealth.js、src/api/benefit/operationReport.js、src/views/property/complex/components/RegionTreeLayout.vue、src/views/property/complex/components/regionTree.vue。这些文件在来源分支 develop/v2.6.1 上是存在的（此前是工作区/提交没对齐），于是 import 链断裂，钩子的静态检查直接不通过。\n\n怎么做：\n1. 不要用 --no-verify 跳过钩子——缺文件是真问题，跳过之后构建会以更模糊的方式炸掉。\n2. 从来源分支把这批文件补回来并一并纳入本次提交（git checkout develop/v2.6.1 -- <file> 后正常 add），让子模块这一次提交自身就是完整的。\n3. 子模块提交完成后再提交父仓库，父仓库这一提交只做子模块指针更新（本次 2d41ae8 → a8cd647），提交信息写明 Update subproject commit reference。\n4. 收尾用两处 git status 确认父子两个仓库都干净；需要推送时两仓都要单独 push。",
+   "evidence": "会话 fedbf125（2026-06-22，基线 57109f）：最终结论记录子模块提交 a8cd64707（Merge branch 'develop/v2.6.1' into develop/v2.6.2），并明确「pre-commit 曾因缺失依赖文件失败，已从 develop/v2.6.1 补全并纳入提交」，列出补回的 5 个文件；父仓库提交 c1dcce8 为子模块指针更新（2d41ae8 → a8cd647），两仓工作区均为 clean。",
+   "files": [
+    "d:/repository/产品2.0/zhi2-web-admin/src/utils/resolveServerAssetUrl.js",
+    "d:/repository/产品2.0/zhi2-web-admin/src/utils/serviceHealth.js",
+    "d:/repository/产品2.0/zhi2-web-admin/src/api/benefit/operationReport.js",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/property/complex/components/regionTree.vue"
+   ],
+   "baseline": "57109f9",
+   "sessionIds": [
+    "fedbf125-9fe3-444d-81e8-d17ffec9216d"
+   ],
+   "bundle": "043.md",
+   "project": "产品2.0"
+  }
+ ]
+}

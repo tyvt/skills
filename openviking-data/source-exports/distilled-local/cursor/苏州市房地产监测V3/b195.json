@@ -1,0 +1,79 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "195",
+ "files": [
+  "195.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "预售方案历史文本自动解析回填 Implement t",
+   "type": "bug",
+   "content": "已完成「历史文本自动解析回填」改造，改动集中在 [`PresalePlanFillForm.vue`](zhi2-web-admin/src/views/presale/permit/components/PresalePlanFillForm.vue)。 ## 改动说明 1. **`parseFlexibleDate`**：除 `yyyy年M月d日` 外，支持 `yyyy年M月`（无日）→ `yyyy-MM-01`。 2. **新增三个逆向解析函数**： - `parseCompletionPlanLegacy`：解析 `1幢2027年1月13日竣工` - `parseDeliveryPlanLegacy`：解析 `1幢2027年5月13日交付` - `parseProgressPlanLegacy`：解析含「开工 / 基础工程 / 结构封顶 / 竣工交付」的整段文本 3. **改造 `normalizePlanRows`**： - 结构化数组有有效数据 → 直接使用 - 否则尝试解析 `completionPlan` / `deliveryPlan` / `progressPlan` 历史文本 - 解析成功 → 填入上方输入框，不再显示橙色 `legacyText` - 解析失败 → 保留原有橙色提示 ## 验证结果（脚本模拟） | 输入 | 解析结果 | |------|--",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`PresalePlanFillForm.vue`](zhi2-web-admin/src/views/presale/permit/components/PresalePlanFillForm.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permit\\components\\PresalePlanFillForm.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale、d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permit\\plan\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5acc9195-8501-4cfe-9592-46ae040470a2"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "Briefly inform the user ab",
+   "type": "fact",
+   "content": "**任务结果**：已完成对 `jgxm/detail.vue` 中监管项目名称 flex 布局、全角括号与 `regulatorProjectNameDisplay` 的 Vue 专项审查。 **结论**：布局与查看态括号对齐方向正确；建议在 flex 容器内用 `:deep(.el-input)` 保证主/短输入撑满宽度。另有一项既有问题：`prop=\"regulatorProjectNameOriginal\"` 与 `rules.regulatorProjectName` 不一致，required 校验可能绑不上该表单项。 本次为只读审查，未改代码。若需要，我可以直接提交一版 `:deep` 样式与 prop/rules 对齐的补丁。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`jgxm/detail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\agreement\\jgxm\\detail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\utils\\detailLayout.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7f739b97-ea61-46d6-9fa0-e1be2e315211"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "已为解除限制详情页的「关联房屋详情」子表接入分页接口",
+   "type": "preference",
+   "content": "已为解除限制详情页的「关联房屋详情」子表接入分页接口，改动如下。 ## 问题原因 `limitFormMixin.js` 中 `useHouseLimitPageForSubTable` 排除了解除限制（`!this.isCancel`），导致 `limitCancel.vue` 查看态仍用 `projectLimit/detail` 返回的 `houseList` 做前端分页，未调用新接口。 ## 改动说明 1. **`limitFormMixin.js`** - 查看态（`formMode === 'view'`）统一走服务端分页 - 解除限制调用 `POST /building/houseLimit/pageLimitRemoval` - 新增限制仍调用 `POST /building/houseLimit/page` - 请求参数：`projectLimitId` + `pageNum` + `pageSize` - 新增 `normalizeHouseLimitRemovalLineRow`，处理 `limitNumbers` 数组 - 查看态「涉及限制条数」优先读主表 `involveLimitCount` 或接口 `summary.limitQty` 2. **`limitCancel.vue`** - 查看态子表改为 `houseLimitLineData` + 服",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`limitFormMixin.js",
+    "`limitCancel.vue",
+    "**`limitFormMixin.js",
+    "**`limitCancel.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c4ca2aed-d9fc-4952-9a00-b6fc2368c3dc"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "Quick review of AgencyPers",
+   "type": "pattern",
+   "content": "## 逻辑关系（简要） 四段 computed 形成一条清晰链路： | 条件 | `isGTerminalPersonnelMaintainEdit` | `isFormDisabled` | `maintainOtherFieldsDisabled` | |------|-----------------------------------|------------------|-------------------------------| | G + `edit` + `bizState===2` + 未注销 | `true` | `false` | `true`（其余字段禁用） | | 已备案但非上述场景 | `false` | `true` | `false` | `人员角色` 未绑 `:disabled`，在维护模式下仍可编辑；其余字段通过 `maintainOtherFieldsDisabled` 锁定。`handleSave` 在维护模式下跳过要件校验（`!isGTerminalPersonnelMaintainEdit`），与「只改角色」一致。 列表「维护」与详情 `canEditInHeader` 的 G 端分支对齐：`isGTerminal`、`bizState === '2'`、`!isPersonnelCancelled`、`company:agencyP",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue",
+    "`companyAdmin/detail.vue`、`toB/personnelRecord/.../detail.vue",
+    "```332:340:zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue",
+    "`allow-edit-when-recorded`（`companyAdmin/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c622c348-e873-4a4f-9936-9bbb4eab54d2"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

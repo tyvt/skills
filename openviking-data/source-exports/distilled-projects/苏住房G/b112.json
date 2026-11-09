@@ -1,0 +1,38 @@
+{
+  "project": "苏住房G",
+  "batch": "112",
+  "files": ["112.md"],
+  "count": 3,
+  "memories": [
+    {
+      "title": "苏住房G E2E 资产统一收进仓库根 e2e/ 目录：flood/home-v2/legacy/artifacts 四个子目录，test:e2e 脚本指向 ../e2e/，preview/ 像素探针一并清除",
+      "type": "workflow",
+      "content": "【什么情况】E2E 相关文件曾散落三处：仓库根 `e2e-flood/`、子模块 `zhi2-web-admin/tests/e2e/`（13 个文件）、子模块 `preview/`（37 个已跟踪文件：预览 HTML、stub、`probe-*`/`verify.mjs` 像素探针脚本）。最终统一收纳：仓库根 `e2e/` 目录承担全部 E2E 资产——`e2e/flood/`（防汛套件）、`e2e/home-v2/`（首页 V2 回归）、`e2e/legacy/`（归档）、`e2e/artifacts/`（运行产物，被仓库根 .gitignore 忽略）。\n【为什么】E2E 文件散落会让「到底哪些是用例、哪些是临时脚本、产物从哪来」变成考古；运行产物混进版本库会污染 diff。preview/ 的像素探针不属于 E2E，属于历史调研遗留，应清空而非迁移。\n【怎么做】① 新增或临时 e2e 文件一律写 `e2e/` 对应子目录，禁止再散落到仓库根或 zhi2-web-admin/ 根目录；运行产物走 `e2e/artifacts/` + 仓库根 `.gitignore` 统一忽略；② `zhi2-web-admin/package.json` 的 `test:e2e*` 脚本指向 `../e2e/home-v2/...`，不得改回子仓库内路径；③ 收纳时按「删除旧脚本 + 迁移进新目录 + 改 npm 脚本 + .gitignore 清理旧规则 + e2e/README.md 写说明」一次做完；④ 提交口径：子模块提交（`f2585df54` chore(e2e)）+ 推送，父仓库本地提交（`1888c9f`，e2e-flood/→e2e/flood/ 识别为改名）；「仅推子模块」指令下父仓 ahead 1 不推送并说明补推条件；⑤ 像素探针类临时目录（preview/）清空删除而不是迁入 e2e/。",
+      "evidence": "会话 session-cce1e5de-0cf3-4d65-9bb5-78dc960fe736（基线 b6ffc68）用户诉求 1「把e2e相关的文件都收纳到一个目录，将来也都在一个目录里面」、诉求 4「不算入，但是这种文件要清空掉，然后提交推送代码。仅推子模块」；最终结论「删除 zhi2-web-admin/preview/ 整个目录（37 个已跟踪文件……它不属于 E2E，已一并清除）」「package.json 的 test:e2e* 指向 ../e2e/home-v2/」「父仓库……ahead 1（未推送，符合'仅推子模块'）」。",
+      "files": ["e2e/README.md", "e2e/flood/lib/flood-lib.cjs", "zhi2-web-admin/package.json", ".gitignore"],
+      "baseline": "b6ffc68",
+      "sessionIds": ["session-cce1e5de-0cf3-4d65-9bb5-78dc960fe736"],
+      "bundle": "112.md"
+    },
+    {
+      "title": "苏住房G 硬编码 /assets/images/ 静态路径在 /test/ 子目录部署下破图：图标类资源也必须走 resolveServerAssetUrl",
+      "type": "bug",
+      "content": "【什么情况】工单预警页 `zhi2-web-admin/src/views/property/workOrder/alert/index.vue` 有 4 处硬编码 `/assets/images/alert/*` 图标路径。生产子路径部署（如 /test/）下加载 `/assets/images/alert/...` 不带部署前缀，直接 404 破图（bug 5942）。\n【为什么】静态资源地址解析统一收口在 `resolveServerAssetUrl`（已有条目），但修复容易只覆盖图片墙/附件类显眼资源，图标类小路径最常被漏掉——它们平时在根路径开发环境完全正常，只有子路径部署才暴露，属部署形态 bug 而非代码逻辑 bug。\n【怎么做】① 排查前端硬编码静态路径用全局搜 `/assets/images/`，命中即改成 `resolveServerAssetUrl(...)`（本次 4 处）；② 验证不只跑 ESLint，还要 `npm run test`（test 模式构建）确认产物里资源路径已编译为函数调用，并断言 URL 解析：`/test/` 下应得到 `/test/assets/images/alert/...`；③ 无法客测环境回归时（内网不可达），在交付说明里写明「待重新构建部署后由提单人复验无破图」；④ 与既有条目的差异：那条讲图片/附件资源的总收口原则，本条补的是「图标类硬编码是同源问题最高发遗漏点」。",
+      "evidence": "会话 session-3f04c5d8-7af9-419e-9609-2856f77265f6（基线 b6ffc68，bug 5942）最终结论：「4 处硬编码 /assets/images/alert/* 改为 resolveServerAssetUrl(...)，兼容 /test/ 子目录部署」「npm run test（test 模式构建）通过，产物含 9 张预警图标，编译后均走 resolveServerAssetUrl」「URL 解析验证：/test/ 下正确得到 /test/assets/images/alert/...」「未执行：客测环境真实页面回归（内网不可达，需重新构建部署后由 zhunan 复验）」。",
+      "files": ["zhi2-web-admin/src/views/property/workOrder/alert/index.vue", "zhi2-web-admin/src/utils/resolveServerAssetUrl.js", "zhi2-web-admin/vite.config.js"],
+      "baseline": "b6ffc68",
+      "sessionIds": ["session-3f04c5d8-7af9-419e-9609-2856f77265f6"],
+      "bundle": "112.md"
+    },
+    {
+      "title": "禅道提单截图落盘 .tmp_zt/.zt_tmp 属临时产物，验证后即删，删前须确认目录内只有下载图片",
+      "type": "preference",
+      "content": "【什么情况】修禅道 bug 时会把提单人贴的截图下载到仓库根临时目录（`.tmp_zt/`、`.zt_tmp/`，如 zt_20168.png、20161.png）用于看图定位。bug 修完、验证提交推送后，用户明确说「删掉」，两个目录的截图全部清除。\n【为什么】截图是一次性验证物料，留在仓库工作区会混进 git status、诱导被误提交（往共享分支塞二进制是本项目明确避免的），也让收尾时的「未纳入提交」清单变长。\n【怎么做】① 截图统一下载到仓库根 `.tmp_zt/` 或 `.zt_tmp/`（不要散落到子模块 src 附近）；② bug 闭环后主动清理（或用户说删即删）；③ 删除前必须核对「路径位于工作区内、目录只包含下载的图片、没有源码或其他文件」再删；④ 交付说明里注明「当前工作区只剩 env/.env 处于已修改未提交状态；这是你的本地代理配置，属于预期保留」；⑤ E2E 回归截图（tests/e2e/screenshots/）另算：留本地作证据，不提交。",
+      "evidence": "会话 session-8ddfb98d-8e47-4759-86ac-e265852b4203（基线 5d68a74，bug 5762）用户诉求 3「删掉」；最终结论「.tmp_zt/ zt_20168.png（bug #5762 截图，158 KB）✅ 已删除；.zt_tmp/ 20161.png（之前遗留的禅道截图，254 KB）✅ 已删除。删除前已确认两个路径都位于 D:\\repository\\苏住房G\\ 工作区内，且只包含下载的图片，没有源码或其他文件」。",
+      "files": [],
+      "baseline": "5d68a74",
+      "sessionIds": ["session-8ddfb98d-8e47-4759-86ac-e265852b4203"],
+      "bundle": "112.md"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+ "project": "园区物管2.0",
+ "batch": "059",
+ "files": [
+  "059.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "展示错误",
+   "type": "preference",
+   "content": "## 原因说明 1. **非法嵌套（主要原因）** `dict-tag` 组件根节点是 **`<div>`**，而外层用了 **`<span class=\"asset-detail-top__value\">`**。块级 `div` 不能放在 `span` 里，浏览器会 **自动拆标签、重排 DOM**，后面的 flex 里「标签 + 值」不再成对，右侧列（含租赁起止日期）会被挤成极窄一列，再叠加上 `word-break: break-all`，就会出现 **日期竖排、逐字换行**，以及看起来像多出来的字符。 2. **`word-break: break-all`** 在已经很窄的列里会 **任意位置断行**，房屋编号、日期等正常短字符串也会被拆得很碎。 ## 修改说明 - 把 **值区域** 从 `<span>` 改成 **`<div>`**，与 `dict-tag` 的块级根节点合法嵌套，flex 布局恢复正常。 - 网格列改为 **`minmax(0, 1fr)`**，避免 grid 子项按「最小内容宽度」把列撑死。 - 给 **`.asset-detail-top__info-item`** 加上 **`min-width: 0`**，保证在 grid/flex 里可以正常收缩。 - 将值的 **`word-break: break-all`** 改为 **`word-b",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "修改文件：`zhi2-web-admin/src/views/benefit/statisticsMap/components/HouseAssetDialog.vue",
+    "`VenueAssetDialog.vue`、`ParkingAssetDialog.vue`、`AdvertiseAssetDialog.vue",
+    "`HouseAssetDialog.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\components\\HouseAssetDialog.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\components\\AssetLeaseInfoTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f8f12066-4a2e-407f-8919-3b1feebdc139"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "地图里面苏州市的文字似乎有重影",
+   "type": "preference",
+   "content": "## 原因说明 1. **底图与自定义标签叠在一起**：`doMapPolygon` 里用 `TMap.MultiLabel` 在行政区中心画了名称（如「苏州市」/「江苏省苏州市」），矢量底图默认还会画 **POI 文字（`point`）**，市中心往往再画一遍「苏州市」，两套字叠在一起就像重影。 2. **`styleId` 写错**：`styles` 里只定义了键 `label`，但 `geometries` 里用了不存在的 `styleId: 'area_label_style' + uid`，与官方用法不一致，可能带来异常渲染（已一并改为 `styleId: 'label'`）。 ## 修改说明（`map.vue`） - 在 `initMap` 里为矢量底图增加 `baseMap`，**去掉 `point`**，保留 `base`、`road`、`building`、`label`（与 `mapProperty` 那套要素一致，只是不再显示 POI 文字），避免与行政区中心自定义标签重复。 - 修正行政区 `MultiLabel` 的 `styleId` 为 `'label'`。 若你希望仍显示其它 POI 名称、只去掉市级重影，可以再改成只关自定义 `MultiLabel` 或换用个性化地图样式，需要的话可以说一下偏好。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "修改说明（`map.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\components\\map.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\components\\ZsTencentMap\\mapLoader.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f3c5b382-87a4-49cf-9a4e-27efde2b94d2"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "现在侧边菜单的展开收起会等比例放大图标，但是实际上他",
+   "type": "preference",
+   "content": "已按你的场景改好了，原因和做法如下。 **原因：** 上次改成 `scale(sx, 1)` 后，纵向不再缩放，设计稿总高度 `designMeasuredH` 往往大于 `calc(100vh - 84px)` 给出的可视高度，整块就会**竖向溢出**。 **做法：** 拆成两个比例（仍是一套 `transform`）： - **`layoutScaleX`**：和以前一样，只跟**内容区宽度**有关（侧栏主要改这个），横向仍按 1920 基准缩放。 - **`layoutScaleY`**：`min(1, viewportH / designMeasuredH)`，**只有**在「内容比视口高」时才小于 1，把整块压进可视高度；视口够高时恒为 1，**不会跟着侧栏宽度变**。 `stage` 高度恢复为 `h * sy`，与 `scale(sx, sy)` 的视觉高度一致。 这样在**高度够用**时仍是「侧栏主要只影响横向」；在**高度不够**时会自动加一点纵向缩放，避免再超出。若高度紧张时 `sx ≠ sy`，图标会略有非等比变形，这是为塞进视口换来的折中；若你希望那种情况下也严格等比，可以再说，我们改成 `uniform = min(sx, sy)` 的分支策略。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue",
+    "@zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "77a735af-afdd-4ef8-b842-d6aea8630229"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,24 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-263048af-8786-4cd0-a9cf-defbb27d23d9/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T04:53:58.670613+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷任务/zentao_bug_6235.md",
+                "memory_type": "entities",
+                "before": "# 禅道Bug 6235 新增合同户室号分页缺陷\n房产管理系统zhi2-web-admin预售合同签订「新增合同」弹窗中户室号分页缺陷，2026-11-05曾解决表格行数与外层滚动，2026-11-06因翻页仍显示第一页数据被重新激活。\n\n## 根因与定位\n- 页面：预售合同签订「新增合同」弹窗，点「楼幢」时列表走 contractRequest.js 的 queryHousesByBuildCode\n- queryHousesByBuildCode 将 pageNum/pageSize 放在 POST body；后端与旧 api/presale/contractMainInfo.js 一致只认 URL query，分页无效\n- 点「单元」时 getHouseList 已正确 params:{pageNum,pageSize}，故仅楼幢路径复现\n\n## 修复方案\n- contractRequest.js：queryHousesByBuildCode 改为 request({method:'post',params})\n- chooseHouseDialog.vue：分页走即时 fetchOriginList()；翻页后清空待选勾选\n- docs/frontend/common-errors.md 新增 E-040\n\n## 验证与交付\n- npm run build 通过；产物 queryHousesByBuildCode 为 method:\"post\",params:t；http://127.0.0.1:8098/ 返回200\n- 子模块 zhi2-web-admin：fdb331230 → origin/develop/v3.0.0\n- 父仓库：3749533 → origin/develop/v3.0.0（含 E-040 + gitlink）\n- 临时 worktree 苏州市房地产监测V3-wt-6235 已删除\n\n## 禅道回写与未验证\n- bug 6235：status=resolved、resolution=fixed、assignedTo=lichandan、resolvedBy=tiany（库内已复核）\n- 未验证：未用客测账号在弹窗里目视确认翻页，请 lichandan 在「新增合同 → 选楼幢 → 户室>5条翻页」再验一次\n- 未提交：本地 env/.env 仍为个人改动，未进仓库",
+                "after": "# 禅道Bug 6235 新增合同户室号分页缺陷\n房产管理系统zhi2-web-admin预售合同签订「新增合同」弹窗中户室号分页缺陷。2026-11-05曾解决表格行数与外层滚动；2026-11-06因翻页仍显示第一页数据被重新激活（第二次）；2026-11-09 11:47被lichandan第三次激活，反馈仍为「翻页后仍是显示的第一页内容」。\n\n## 根因与定位（2026-11-09订正，E-040已修订）\n- 页面：预售合同签订「新增合同」弹窗，点「楼幢」时列表走 contractRequest.js 的 queryHousesByBuildCode\n- request.js 第194–205行：非白名单接口统一 moveUrlQueryToBody，将 config.params 合并进 config.data 后 delete config.params\n- /presale/houseInfo/queryHousesByBuildCode 不在 security.js 白名单内，故 request({params}) 与 post(url,data) 最终发出的加密请求完全相同 —— 11/06「把分页从body挪到query」未改变请求，系空操作\n- 后端该接口按楼幢一次返回全量户室、忽略 pageNum；unwrapPageResult 用 rows.length 兜底出 total=6；zs-table.vue 的 table-tr 只按 Math.min(tableTr,dataLength) 计算表格高度、不截断数据。6条始终留在表里，翻页只改变内部滚动位置\n- 点「单元」时 findHouseList 后端确实分页，故仅楼幢路径复现\n\n## 修复方案（2026-11-09第三次修复）\n- 新增纯函数 paginateRows（src/views/contract/utils/pageRows.js）：rows.length>pageSize 判为全量结果并按当前页码切片，否则（后端已分页）原样返回，兼容两种后端行为\n- chooseHouseDialog.vue：applyOriginPage() 统一楼幢/单元两条路径，翻页清空跨页勾选\n- contractRequest.js：恢复 post(url,params)，写明真实约束（删除错误注释）\n- scripts/check-page-rows.mjs：回归守卫，已挂进 npm run lint 链（package.json）\n- docs/frontend/common-errors.md：E-040 根因/修复/验证订正\n\n## 验证与交付（2026-11-09，未提交未推送）\n- npm run build 通过（首次因新 worktree 缺 esbuild 失败，补齐后重跑成功），产物 pageRows-ZhUnEmV1.js 含 paginateRows\n- 回归守卫通过：6条全量→第1页5条/第2页1条，后端已分页的单页结果不被二次切片\n- 改动文件 eslint --quiet 零错误；npm run lint 全量基线红（12509条存量，与本次无关）\n- 未验证：本环境无客测账号，未在弹窗目视回归；本地8098站点被另一并行任务12:16构建占用，未覆盖其dist，未做本地站点目视验证。需lichandan在「新增合同→选楼幢→6户室翻页」回归\n\n## 落地与归属\n- 独立 worktree D:\\repository\\苏州市房地产监测V3-wt-bug-6235-v3，分支 fix/bug-6235-house-pagination-v3（子模块同分支）\n- 开工6个worktree、收尾7个，主工作区HEAD由其他任务从0967c67推进到0144a81，其他worktree未被本轮改动\n\n## 当前状态与待办（2026-11-09，确认卡片超时）\n- 确认卡片发出后超时未收到答复，按规则「沉默或超时不视为同意」：未提交、未推送、未回写禅道，worktree与改动均保留\n- 待 lichandan 明确指示：① Git：提交推送fix/bug-6235-house-pagination-v3（子模块+父仓库gitlink，不本地合并）/ 提交推送并fast-forward合回develop/v3.0.0 / 仅本地提交 / 暂不处理；② 禅道：回写resolved/fixed指派回lichandan备注真实根因与待客测回归 / 只补备注保持active等客测通过再置已解决 / 暂不回写（回写只在推送完成后执行）\n\n## 历史回写记录（2026-11-06那次，已被本次订正）\n- 2026-11-06 曾误判根因为「body与query分页参数位置」，并回写禅道 status=resolved、resolution=fixed、assignedTo=lichandan、resolvedBy=tiany；因11/09第三次激活，该结论已作废\n- 2026-11-06 相关提交（子模块 fdb331230、父仓库 3749533 均推 develop/v3.0.0）系空操作修复，仍保留在历史中"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

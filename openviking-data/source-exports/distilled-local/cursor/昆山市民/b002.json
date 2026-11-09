@@ -1,0 +1,93 @@
+{
+ "project": "昆山市民",
+ "batch": "002",
+ "files": [
+  "002.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "补充H5脚本，本项目要做H5兼容改造。将来作为H5嵌",
+   "type": "fact",
+   "content": "已修复。 `swiper-item` 的 `v-for` 写成了 `menu in swiperMenuList`，但 `:key` 用了未定义的 `index`。 已改为 `(menu, pageIndex) in swiperMenuList`，并用 `pageIndex` 作为 key。刷新后该警告会消失。",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "涉及文件：d:\\repository\\昆山市民\\package.json、d:\\repository\\昆山市民、d:\\repository\\昆山市民\\vite.config.js、d:\\repository\\昆山市民\\src\\main.js、d:\\repository\\昆山市民\\src\\request\\index.js、d:\\repository\\昆山市民\\src\\env\\mp.js、d:\\repository\\昆山市民\\src、d:\\repository\\昆山市民\\src\\manifest.js",
+    "@package.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "03eda42a-989a-414d-9b8a-46649f591538"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "1、E证通-获取核身Token 接口 POST /w",
+   "type": "preference",
+   "content": "已定位并修复。接口日志里已有 `code: 200` 的成功响应，但仍提示失败，很可能是 **axios 拦截器在 HTTP `status` 不是严格 `200` 时提前 reject**，而响应日志在此之前已经打印。 ## 修复内容 ### 1. `src/request/index.js` — 响应拦截器 - 兼容 `res.status` / `res.statusCode`，接受 2xx 状态码（不再只认 `200`） - 自动解析字符串类型的 `res.data` - 用 `Number()` 统一处理业务 `code` ### 2. `src/pages/common/useEidVerify.js` — 核身结果处理 - 以 `code === 200` 或 `msg === '操作成功'` 判断成功，不再依赖 `faceRecognition == 1` - 从 E 证通返回后延迟 300ms 再调 `wx.login`，减少偶发失败 - 增加兜底：即使进入 `catch`，若响应体表示成功也会 `resolve` ## 请按以下步骤测试 1. **重新编译**：`npm run build`（或重启 `npm run dev`） 2. **微信开发者工具**：导入 `dist/build/mp-weixin`（开发模式则是 `dist/dev/mp-weixin",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "`src/request/index.js",
+    "`src/pages/common/useEidVerify.js",
+    "涉及文件：d:\\repository\\昆山市民、d:\\repository\\昆山市民\\src\\api\\modules\\estate.js、d:\\repository\\昆山市民\\src\\pages_onlineService\\onlineIndex.vue、d:\\repository\\昆山市民\\src\\pages\\common\\useEidVerify.js、d:\\repository\\昆山市民\\API接口文档.md、d:\\repository\\昆山市民\\src\\pages\\verifyUser\\index.vue、d:\\repository\\昆山市民\\src\\pages\\verifyUser\\info.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ea82ec90-7cc1-4d38-b7d1-2394a7ad3f09"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "多名客户反应说公共收益公示看不到了，并且多说之前都是",
+   "type": "preference",
+   "content": "已将项目中所有 `userStore` 统一为 `useUser` 命名规范。 ## 变更说明 **统一规范：** `const useUser = useUserStore()`，后续统一使用 `useUser.xxx` **修改的文件（共 9 个）：** | 文件 | 变更内容 | |------|----------| | `api/index.js` | `userStore` → `useUser` | | `App.vue` | 各生命周期内的 `userStore` → `useUser` | | `pages_home/home.vue` | 模块级变量重命名 | | `pages_contract/list.vue` | 模块级变量重命名 | | `pages_repair/repair/expenseList.vue` | 模块级变量重命名 | | `pages_vote/vote/votedetail.vue` | 移除回调内重复声明，复用顶层 `useUser` | | `pages_election/election/Participate.vue` | 同上 | | `pages/verifyUser/info.vue` | 同上 | | `pages_activity_vote/detail.vue` | 新增顶层 `useUser`，移除回调内重复声",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "`api/index.js",
+    "`App.vue",
+    "`pages_home/home.vue",
+    "`pages_contract/list.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "437a9bbe-d421-4340-9d73-bb0fec2c1e0b"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "这个决策详情还是不行，不知道咋回事，决策结果是可以看",
+   "type": "fact",
+   "content": "已按你的思路改好了。 **H5**：有 `decisionId` 就直接调 `loadVoteDetail`，不再走 `loginWithWxCode`。token 由首页入口用最新 `code` 换好并缓存，请求拦截器会自动带上 `Authorization`。 **微信小程序**：仍先 `loginWithWxCode()`，再加载详情。 ```122:159:src/pages_vote/vote/votedetail.vue async function loadVoteDetail(decisionId) { if (!decisionId) return // ...实名检查 + getVoteDetail + 授权检查 } onLoad(async (options) => { let decisionId = options.decisionId || ... // #ifdef H5 await loadVoteDetail(decisionId) // #endif // #ifdef MP-WEIXIN loginWithWxCode().then(async () => { await loadVoteDetail(decisionId) }) // #endif }) ``` 实名检查还保留着——`getDecisionDetail` 需要传 `idNum",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "```122:159:src/pages_vote/vote/votedetail.vue",
+    "涉及文件：d:\\repository\\昆山市民、d:\\repository\\昆山市民\\src\\pages.json、d:\\repository\\昆山市民\\src\\pages_vote、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\votedetail.vue、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\components\\DetailTop.vue、d:\\repository\\昆山市民\\src\\stores\\vote.js、d:\\repository\\昆山市民\\src\\api\\modules\\vote.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1d9b7d53-d5cd-4b5c-87e0-c3804303cc41"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "分析总结页面接口调用逻辑，接口地址，参数，",
+   "type": "bug",
+   "content": "根据 Git 历史，这个问题**不是某一天突然出现的单一 bug**，而是页面从开发至今逐步叠加的几类设计缺陷。按时间线说明如下。 --- ## 时间线 | 时间 | 提交 | 状态 | |------|------|------| | **2024-09-07** | `dc138d6` 公共收益页面开发 | 列表接口**完全未对接**：`getList` 是空壳，Promise 不 resolve；`list` 用 8 条假数据占位 | | **2024-09-18** | `a14d084` 公共收益对接 | 接入 `getPubQuarterlyDeclaration`，但 `onShow` **从未调用 `refresh()`** | | **2024-09-24** | `2a6ba01` bug修复 | 补上 `projectId: useUser.project`（此前请求缺关键参数） | | **2024-09 ~ 2026-06** | 中间多次小改 | 一直靠交叉观察器被动加载，**没有在 `projectId` 就绪后主动拉列表** | | **2026-06-26 上午** | `6418fe7` bug1250 | 加 `syncProjectInfoFromHouseList` + `refresh()`，试图修「C 端无法展示」 | | **2026",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "涉及文件：d:\\repository\\昆山市民\\src\\pages_benefit\\benefit\\index.vue、d:\\repository\\昆山市民\\src、d:\\repository\\昆山市民\\src\\api\\modules\\myhouse.js、d:\\repository\\昆山市民\\src\\api、d:\\repository\\昆山市民\\src\\hooks\\useLoadMore.js、d:\\repository\\昆山市民\\src\\api\\modules\\common.js、d:\\repository\\昆山市民\\src\\stores、d:\\repository\\昆山市民\\src\\request\\index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2c38c33c-ca79-4a52-aad9-5b1eb44802bd"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  }
+ ],
+ "_draft": true
+}

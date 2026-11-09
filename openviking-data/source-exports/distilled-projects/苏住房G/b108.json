@@ -1,0 +1,103 @@
+{
+  "project": "苏住房G",
+  "batch": "108",
+  "files": ["108.md"],
+  "count": 7,
+  "memories": [
+    {
+      "title": "提交子模块 gitlink 不能用 git commit -- <path>：它取的是子模块工作区当前 HEAD，会把别的分支指针写进父仓",
+      "type": "bug",
+      "content": "【什么情况】在 worktree 里修完子模块、提交并推送后，更新父仓 gitlink 时用了 `git commit -- <path>`（带路径限定提交）。结果这条父仓提交 `ab8412e` 把子模块指针**误记成了防汛分支的 `83422e02e`**，而不是本次修复所在的 `develop/v2.6.2-suzhufang` 的 `8ba16de62`。后续提交 `d423d12` 才用暂存区值修正回 `8ba16de62`。\n【为什么】`git commit -- <path>` 的语义是「提交工作区里该路径的当前内容」，它会**绕过暂存区**直接取工作区状态。对普通文件这通常无害，但对**子模块**来说「工作区当前状态」= 子模块此刻检出的 HEAD——而子模块此刻可能还停在另一个分支（本次正是防汛分支 `develop/v2.6.2-suzhufang-li`）。于是「我要提交的指针」被换成了「子模块碰巧在的那个提交」。这个坑在多分支并行开发时必现。\n【怎么做】① 提交子模块指针的**正确姿势**：先 `git add <子模块路径>`（把期望的 gitlink 写进暂存区），再 `git commit`（不加路径限定），最后用 `git show --stat` 确认提交里那一个指针的变化；② **永远不要用 `git commit -- <path>` 提交子模块指针**；③ 提交后立刻用 `git ls-tree origin/<branch> <子模块路径>` 核对**远端**树里的指针值，不只看本地；④ 若已推错，不要强推回滚历史，用后续提交修正（本次即如此，远端当前指针正确，无需 force push）；⑤ 交付说明里如实写出这次误记与修正过程（哪条提交记错、哪条修正、远端最终值），不要只报最终状态；⑥ 顺带核对「另一个工作区零触碰」：本次防汛 worktree 仍是 `develop/v2.6.2-suzhufang-li`，11 个已跟踪改动 + 9 个未跟踪文件与开始时一致。",
+      "evidence": "会话 session-57c99e3d-1829-4ba2-81e3-d70296ccc2fe（基线 6156653）最终结论：「有一处需要如实说明：第一条父仓提交 `ab8412e` 因 `git commit -- <path>` 取了子模块当前工作区 HEAD，把指针误记成了防汛分支的 `83422e02e`；随后的 `d423d12` 已用暂存区值修正为 `8ba16de62`。远端当前指针是正确的 `8ba16de62`，无需强推回滚历史」「防汛工作区零触碰：`zhi2-web-admin` 仍是 `develop/v2.6.2-suzhufang-li`，11 个已跟踪改动 + 9 个未跟踪文件（防汛在研内容）与开始时一致」「父仓 `origin/develop/v2.6.2-suzhufang` 的 tree 里 gitlink 已是 `8ba16de62`（已核对远端 `git ls-tree origin/... zhi2-web-admin`）」。",
+      "files": [
+        "zhi2-web-admin",
+        ".gitmodules"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-57c99e3d-1829-4ba2-81e3-d70296ccc2fe"],
+      "bundle": "108.md"
+    },
+    {
+      "title": "「没效果」先定位测试环境构建的是哪条分支：修复只在功能分支、没合入测试分支等于没交付",
+      "type": "pattern",
+      "content": "【什么情况】用户反馈「没效果」，页面截图里请求仍带 `parentDeptId=494439248`，页面 `build-time` 显示 `85116e921`。回查 Git 后确认：**修复代码根本没在测试环境上运行**。分支对照表——`feat/task-2095-workorder-migration` ✅ 含修复（`d12d062de`，但只是功能分支，没有合入测试分支）；`develop/v2.6.2-suzhufang`（测试分支）❌ 原本只有 `a64d58b67`，测试环境构建来源，所以一直没有修复；`feat/task-2146-suggest-signature`（截图构建 `85116e921`）❌ 原本没有，而这才是用户实际运行的分支。\n【为什么】「把修复推到了功能分支」被当成了「完成交付」，但**测试环境构建的是哪条分支决定了修复是否生效**。同一个 bug 分散在功能分支、测试分支、用户实际所在分支三条线上时，只推其中一条 = 用户看到的还是旧代码。这种误判的隐蔽性在于：代码本身没问题、提交也在、CI 也绿，只是没被构建到。\n【怎么做】① 「没效果」类反馈的第一动作是**取版本指纹**：页面上有 `build-time` 就直接读它，它能唯一定位环境跑的是哪个提交/分支（本次 `85116e921` → `feat/task-2146-suggest-signature`）；② 再做**三线对照**：修复所在分支 / 测试环境构建分支 / 用户实际运行分支，缺哪条补哪条；③ 补法用 worktree + cherry-pick：本次在测试分支 cherry-pick 出 `2d9918c7d`（无冲突），并再 cherry-pick 到用户实际所在分支 `85116e922..f62ea4265`；④ **要用户触发一次重新构建**才能生效，并给出验收判据（「`build-time` 不再是 `85116e921`」）；⑤ 别只推代码就宣布完成——「分支没有被测试环境构建，就等于没交付」；⑥ 补完后必须做**真实行为验证**（本次在 worktree 里起 dev server 8182 跑 e2e，输出「bug #5819 回归通过：「非本地」跳转列表请求均未携带 parentDeptId；「本地」跳转仍携带区域条件」），而不是只跑单测。",
+      "evidence": "会话 session-d0dd96df-7bb2-4f65-86b1-3ecd10abac87（基线 c35a24a）用户诉求 6「没效果」；最终结论「『没效果』的真原因」：「你的两张截图证明了两件事：请求里 `parentDeptId=494439248` 仍然存在，页面 `build-time` 为 `85116e921`。我回查 Git 后确认，**修复代码根本没在测试环境上运行**」，并给出分支对照表与「上一轮我把修复推到了功能分支就觉得完成了，但**分支没有被测试环境构建，就等于没交付**。这是我的疏漏。」；本轮动作为「用 worktree 在测试分支执行 cherry-pick → `2d9918c7d`」「在该 worktree 启动 dev server 8182 并运行 e2e，做**真实行为验证**」「推 `develop/v2.6.2-suzhufang` `a64d58b67..2d9918c7d`」「cherry-pick 到截图环境所在分支 `feat/task-2146-suggest-signature` 并推送 `85116e922..f62ea4265`」「父仓 gitlink 更新并推送 `c35a24a`」。",
+      "files": [
+        "zhi2-web-admin/src/views/home/v2/homeStatNav.js",
+        "zhi2-web-admin/src/views/home/index-v2.vue",
+        "zhi2-web-admin/tests/e2e/bug-5819-nonlocal-no-region-param.spec.mjs"
+      ],
+      "baseline": "c35a24a",
+      "sessionIds": ["session-d0dd96df-7bb2-4f65-86b1-3ecd10abac87"],
+      "bundle": "108.md"
+    },
+    {
+      "title": "跨几十个仓库做同类修复要用幂等迁移脚本 + blob hash 一致性体检，别手改 N 份",
+      "type": "workflow",
+      "content": "【什么情况】CI 报错 `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite' imported from .../zhi2-web-admin/scripts/vite-build.mjs`（GitLab Runner 路径 `/home/gitlab-runner/builds/...`）。用户指出「这个问题早上修复过，在其他项目里面，上周末改了很多项目，都有类似的问题，一并处理」。最终覆盖 **36 个仓库**，统一了安装配置与构建脚本。\n【为什么】同一类问题在几十个仓库里手改，必然出现「改了 30 个漏了 6 个」「内容不完全一致」的漂移，而且事后无法证明覆盖完整。CI 的 `ERR_MODULE_NOT_FOUND` 只是表象，真正的修复动作是**统一依赖安装方式 + 统一构建/体检脚本**，而不是逐个改报错的脚本。\n【怎么做】① 把修复固化成**可重复执行、幂等**的迁移脚本（本次 `fix-ci-vite.mjs`），配套一个**一致性体检**脚本（`verify-ci-fix.mjs`）与批量提交/推送脚本（`commit-ci-fix.mjs`、`fix-push.mjs`），脚本统一放 `D:\\repository\\.work\\`；② 统一安装配置（本次提交 `bunfig.toml`，`chore: 提交 bun 安装配置（isolated linker）`），并把 `install.mjs` / `vite-build.mjs` / `ci-doctor.mjs` 三个脚本同步入库；③ **用 blob hash 证明一致性**，而不是逐个人工比对：本次最终状态表为「`ci-doctor.mjs` 已入库 36/36，blob 全部 = `5ac43604`」「`install.mjs` / `vite-build.mjs` blob 全部 = `d00fef0` / `0b4449a`」；④ 体检项还包含「子模块指针全部指向远端已存在的 commit」；⑤ 批量操作前后**核对每个仓库的当前分支**（见同包「并发切分支」那条）；⑥ 无关的本地改动不要顺手带上（本次明确列出 `iHome小程序/src/env/mp.js`、`扬州存量房/vue.config.js`、`昆山市民/.npmrc`+`vite.config.js`、`江阴H5/src/{manifest,pages}.json`、`监测/env/.env`、`监测/login-suzhou.vue`、`靖江物管/.env`、`家园区一网通办/mock-server/` 等一律未碰）。",
+      "evidence": "会话 session-654aca6b-55f0-4a66-99a1-cac31cb91b3b（基线 f36e340）用户诉求 1 贴出 CI 报错「Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite' imported from /home/gitlab-runner/builds/WgnM5oiW/0/zhi/suzhou/shiqu/suzhufang/fe/zhi2-web-admin-h5-g-unlimited/zhi2-web-admin/scripts/vite-build.mjs」；用户诉求 2「这个问题早上修复过，在其他项目里面，上周末改了很多项目，都有类似的问题，一并处理」；最终结论「**15 个仓库的 `bunfig.toml`** 已提交并推送（`chore: 提交 bun 安装配置（isolated linker）`）」「迁移与校验脚本留在 `D:\\repository\\.work\\`（`fix-ci-vite.mjs` 可重复执行、幂等；`verify-ci-fix.mjs` 做一致性体检；`commit-ci-fix.mjs`、`fix-push.mjs` 是这次批量提交/重推用的）」，最终状态表为「仓库数 36 / 与远端同步 **36 / 36** / `ci-doctor.mjs` 已入库 36/36，blob 全部 = `5ac43604` / `install.mjs` / `vite-build.mjs` blob 全部 = `d00fef0` / `0b4449a` / 子模块指针全部指向远端已存在的 commit」。",
+      "files": [
+        "zhi2-web-admin/scripts/vite-build.mjs",
+        "scripts/install.mjs",
+        "scripts/ci-doctor.mjs",
+        "bunfig.toml",
+        "package.json"
+      ],
+      "baseline": "f36e340",
+      "sessionIds": ["session-654aca6b-55f0-4a66-99a1-cac31cb91b3b"],
+      "bundle": "108.md"
+    },
+    {
+      "title": "批量操作多仓库期间工作区可能被并发切到老分支：批量前后必须逐仓库核对当前分支与落后提交数",
+      "type": "fact",
+      "content": "【什么情况】批量修 36 个仓库的过程中，`园区公共收益` 的工作区在操作期间被切到了 `develop/v.2.6.2`（**注意是 `v.2.6.2`，2026-09-20 的老分支，落后 90 个提交**）——可能是并发进程或手动 checkout 造成的。修复本身在 `develop/v2.6.1` 上是提交并推送成功的（`456fa54`），只是工作区停在了老分支。已切回 `develop/v2.6.1`，`scripts/` 三个脚本齐全。\n【为什么】跨仓库批量操作耗时几十秒到几分钟，期间工作区可能被别的进程（另一个 AI 会话、IDE 任务、人手）切分支。如果不核对就会：① 在老分支上提交/推送（等于把改动落到错的地方）；② 误判「修复没推上去」（其实推了，只是工作区跑偏了）；③ 老分支上的文件结构不同，导致脚本找不到文件（本次 `scripts/` 三个脚本在老分支上不齐）。而且 `v.2.6.2` 与 `v2.6.1` 只差一个字符，肉眼极易看错。\n【怎么做】① 批量操作**开始前**记录每个仓库的当前分支与 HEAD（存成表，便于事后比对）；② 批量操作**结束后**再逐仓库核对一次当前分支与「落后/领先多少提交」；③ 发现跑偏时，**先确认修复提交本身在正确的分支上且已推送**（本次 `456fa54` 在 `develop/v2.6.1` 上推送成功），再把工作区切回正确分支，别慌着重做一遍；④ 分支名要看全（`v.2.6.2` vs `v2.6.1` 只差一个字符）；⑤ 分支切换后检查关键文件是否齐全（本次核对 `scripts/` 三个脚本齐全）再继续。",
+      "evidence": "会话 session-654aca6b-55f0-4a66-99a1-cac31cb91b3b（基线 f36e340）最终结论「收尾时发现的问题」：「`园区公共收益` 的工作区在我操作期间被切到了 `develop/v.2.6.2`（注意是 `v.2.6.2`，2026-09-20 的老分支，落后 90 个提交）——可能是并发进程或手动 checkout 造成的。**修复本身在 `develop/v2.6.1` 上是提交并推送成功的**（`456fa54`），只是工作区停在了老分支。已切回 `develop/v2.6.1`，`scripts/` 三个脚本齐全。」",
+      "files": [
+        "scripts/vite-build.mjs",
+        "scripts/install.mjs",
+        "scripts/ci-doctor.mjs"
+      ],
+      "baseline": "f36e340",
+      "sessionIds": ["session-654aca6b-55f0-4a66-99a1-cac31cb91b3b"],
+      "bundle": "108.md"
+    },
+    {
+      "title": "子模块交付前做四方一致性校验：主仓本地 = 主仓远端 = gitlink 记录 = 子模块实际 HEAD",
+      "type": "workflow",
+      "content": "【什么情况】子模块与父仓都推送完成后，必须证明「别人 clone 主仓并执行 `submodule update` 就能拿到正确代码」。本次的校验表是：主仓库本地 = 远端 ✅ 均为 `c27a390`；submodule 指针记录的 commit ✅ `ecf0afcf5`；submodule 实际 HEAD ✅ `ecf0afcf5`；结论「指针与实际 HEAD 完全对齐，因此别人 clone 主仓库并执行 `submodule update` 后，会拿到正确的代码」。\n【为什么】子模块交付最常见的失败形态是「三处值不一致」：主仓本地记录 A、主仓远端记录 B、子模块实际 HEAD C。任意一处不等，别人 clone 下来的代码就不是你交付的那份，而且本地自测完全正常——因为本地用的是工作区 HEAD。少查一处就可能把不一致带到线上。\n【怎么做】① 交付前逐项核对**四个值**：主仓本地 HEAD、主仓远端 HEAD（`git ls-remote` 或 `git log origin/<branch>`）、主仓 tree 里记录的子模块指针（`git ls-tree <branch> <子模块路径>`）、子模块实际 HEAD（子仓 `git rev-parse HEAD`）；② 四个值必须落在**同一个提交**上；③ 远端 tree 要查**远端分支**的 tree（`git ls-tree origin/<branch> <path>`），不要查本地 HEAD 的 tree 就以为远端也一样；④ 推送输出里出现仓库重定向提示（本次：主仓库实际地址带 `.git` 后缀）属服务端正常重定向，**推送已成功**，以 ref 是否更新为准判断，不要被提示语误导；⑤ 校验表随交付一起给出，让人一眼能复核。",
+      "evidence": "会话 session-85f8a862-df80-4607-8c2d-5efd15506dc4（基线 5d68a74）最终结论「一致性校验」表：「主仓库本地 = 远端 | ✅ 均为 `c27a390`」「submodule 指针记录的 commit | ✅ `ecf0afcf5`」「submodule 实际 HEAD | ✅ `ecf0afcf5`」，并写「指针与实际 HEAD 完全对齐，因此别人 clone 主仓库并执行 `submodule update` 后，会拿到正确的代码」；推送结果为 submodule `6a5960bab..ecf0afcf5`、主仓库 `4826471..c27a390`；「另外提一句：主仓库 push 时 git 提示了仓库重定向，实际地址带了 `.git` 后缀。这是服务端配置导致的正常重定向，推送已成功，不影响后续使用。」",
+      "files": [
+        "zhi2-web-admin",
+        ".gitmodules"
+      ],
+      "baseline": "5d68a74",
+      "sessionIds": ["session-85f8a862-df80-4607-8c2d-5efd15506dc4"],
+      "bundle": "108.md"
+    },
+    {
+      "title": "前端交付要附「配置说明」文档：菜单授权与后端发布核对要求写进仓库，不留在聊天里",
+      "type": "workflow",
+      "content": "【什么情况】跨项目（榆林G + 苏住房G）同步修复工单迁移的权限标识后，除了代码与推送，还有一份**配置说明**文档 `zhi2-web-admin/docs/task-2095.md`，里面写明「菜单授权和后端发布核对要求」。\n【为什么】这类需求往往不是纯前端改动：权限标识要在后台菜单里授权、后端要按同一批标识发布，否则前端按钮渲染出来但后端全拒（或反之）。这些动作**不在代码里**，只写在聊天里的口径会随会话消失，交付方照做时无从下手。\n【怎么做】① 凡是「前端改完还需要后台配合」的交付，都要在仓库里放一份配置说明文档（本次 `docs/task-2095.md`），内容至少包含：**菜单授权清单**（模块 / 业务 / 动作 / 权限字符）、**后端发布核对项**、**验证方式**；② 禅道回写时把这份文档的路径一并写进操作历史（本次操作历史写入了提交号、验证结果和发布注意事项）；③ 权限标识类改动要按接口附件**核对大小写**（本次「权限标识已按接口附件修正大小写」），并跑通权限场景矩阵（本次 108 组权限场景）及 ESLint；④ 交付表里把「四个仓库 × 两级（子模块/父仓）」的分支与提交号列全，并注明「子模块任务分支尚未合并到开发分支」，让后续合并的人知道还差哪一步；⑤ 禅道状态回写要按禅道规范带工时（本次 done、指派 huzhihao、消耗 0.5 小时、剩余 0 小时）。",
+      "evidence": "会话 session-ebd327a2-fffc-48f6-97f4-7e6f70574beb（基线 5d68a74）最终结论：「权限标识已按接口附件修正大小写，108 组权限场景及 ESLint 检查通过。」「禅道已核验为 **已完成（done）**，指派给 `huzhihao`，登记消耗 **0.5 小时**、剩余 **0 小时**；操作历史已写入提交号、验证结果和发布注意事项。」「原有环境配置、生成文件及本地临时文件未纳入提交。菜单授权和后端发布核对要求见[配置说明](<zhi2-web-admin/docs/task-2095.md>)。」，并给出四仓库提交表（榆林子模块 `feat/task-2095-workorder-permissions` `cfdd4c55e`、榆林父仓 `develop/v2.6.2-yulin` `bf38de4`、苏住房子模块 `feat/task-2095-workorder-migration` `a0b414d36`、苏住房父仓 `develop/v2.6.2-suzhufang` `5f5d22a`），并注明「子模块任务分支尚未合并到开发分支」。",
+      "files": [
+        "zhi2-web-admin/docs/task-2095.md"
+      ],
+      "baseline": "5d68a74",
+      "sessionIds": ["session-ebd327a2-fffc-48f6-97f4-7e6f70574beb"],
+      "bundle": "108.md"
+    },
+    {
+      "title": "禅道业务问题不要代用户关闭；附件图片取不到要走 DBX 直查数据库，并把稳定做法写回 skill",
+      "type": "preference",
+      "content": "【什么情况】用户诉求 1 追问「为什么还是没有触发禅道的 skill，没有用 DBX 去检索，先修复这个问题」；用户诉求 4 又说「**业务问题不要关了，我自己核对**。这个图片问题要解决，禅道的数据库都完全可以访问，图片还拿不到？」；用户诉求 5「更新 skill，用最稳定的方式」。\n【为什么】① 「业务问题」是用户的验收动作，代为关闭等于替用户下结论、剥夺了他核对的入口，属于越权；② 禅道附件（图片）取不到时，链接类手段（fileID 直读）容易因权限/URL 规则失败，而**禅道数据库本身可访问**，走 DBX 直接查附件记录才是最稳的路径；③ skill 写得不够「最稳定」，会导致每个会话都重新踩一遍同样的坑，所以要改的是 skill 而不是本次的临时做法。\n【怎么做】① **不代用户关闭业务问题**：代码修完把证据（提交号、验证结果、发布注意事项）写进禅道备注，状态留给用户/测试关闭（本次连同工时登记一起按禅道规范写）；② 附件取不到时优先走 **DBX 直查禅道数据库**（`mcp_gateway` 的 `dbx` server）拿附件元数据/内容，而不是只靠 URL；③ 把这条「最稳定的方式」**写回 skill**（本次 `D:\\repository\\skills\\zentao-analyzer\\SKILL.md` 与 `README.md` 都纳入改动），并把触发条件写清楚，确保下次会话能自动触发；④ skill 路径要在会话里显式给出（用户直接贴了 `D:\\repository\\skills\\zentao-analyzer`），避免工具找不到；⑤ 业务代码与 skill 改动分开提交（本次业务代码单独推 `ecf0afcf5`）。",
+      "evidence": "会话 session-85f8a862-df80-4607-8c2d-5efd15506dc4（基线 5d68a74）用户诉求 1「为什么还是没有触发禅道的skill，没有用DBX去检索，先修复这个问题」、用户诉求 2「D:\\repository\\skills\\zentao-analyzer」、用户诉求 4「业务问题不要关了，我自己核对。这个图片问题要解决，禅道的数据库都完全可以访问，图片还拿不到？」、用户诉求 5「更新skill，用最稳定的方式」；涉及文件含 `D:\\repository\\skills\\zentao-analyzer\\SKILL.md`、`D:\\repository\\skills\\zentao-analyzer\\README.md`。",
+      "files": [
+        "D:/repository/skills/zentao-analyzer/SKILL.md",
+        "D:/repository/skills/zentao-analyzer/README.md"
+      ],
+      "baseline": "5d68a74",
+      "sessionIds": ["session-85f8a862-df80-4607-8c2d-5efd15506dc4"],
+      "bundle": "108.md"
+    }
+  ]
+}

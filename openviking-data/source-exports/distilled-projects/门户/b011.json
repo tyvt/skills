@@ -1,0 +1,95 @@
+{
+ "project": "门户",
+ "batch": 11,
+ "files": [
+  "041.md",
+  "042.md",
+  "043.md",
+  "044.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "门户 G 端 admin 首页中间业务板块为空：缺 portal:bizSection 权限",
+   "type": "workflow",
+   "content": "首页显示「暂无可办理的业务板块」且为对内管理员布局（layoutVariant=admin：顶栏 4 项统计、右侧常用功能仍有内容）时，根因通常是 POST /portal/menu/listPerms 返回的权限里没有任何 portal:bizSection:{functionCode}。homeDataMixin 用 perms.includes('portal:bizSection:'+flow.functionCode) 得到 authorizedSectionCodes；三码为 commodityHouseTrade、secondHandHouseTrade、housingRental。resolveHomeLayoutVariant 在 G 端（terminalType A/G）、无 kfqy_/jjjg_/zljg_ 等企业角色时走 admin；homeLayout.mergeBusinessFlows 在 admin 下只保留有权限的板块，permitted 为空则 businessFlows=[]。排查权限配置，勿误查统计/常用功能接口。",
+   "evidence": "会话结论：账号 6001164（相城区）界面为 admin 版，中间三大板块被前端全部过滤；右侧常用功能、顶部统计不依赖业务板块权限。",
+   "files": [
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+    "zhi2-web-admin/src/views/home/config/homeLayout.js",
+    "zhi2-web-admin/src/views/home/index-new.vue"
+   ],
+   "baseline": "8c17ba3",
+   "sessionIds": [
+    "954a92a5-1315-448d-9cd7-528b5055b21c"
+   ],
+   "bundle": "042.md",
+   "project": "门户"
+  },
+  {
+   "title": "苏州道扫码登录：关弹窗后须阻断轮询与在飞 scanLogin 回调",
+   "type": "bug",
+   "content": "SuzhouDaoQrLoginDialog 两处 CRITICAL：① getQrLoginParam().then 里无条件 startPolling()，弹窗已关仍会 setInterval；应在 then 内校验 visible 或使用 fetchGeneration，仅仍打开时启动轮询。② stopPolling 仅 clearInterval，无法取消已发出的 scanLogin；关闭/销毁后 then 仍可能 $emit('login-success')。应维护 pollSessionId 或递增 generation，stopPolling 时失效旧代次，then 比对通过后再 emit；beforeDestroy 忽略过期回调。",
+   "evidence": "Code review FAIL：2 CRITICAL，其余 Vue2 visible.sync、路由白名单 /suzhou-dao/auth-callback 与 login 链路无 CRITICAL。",
+   "files": [
+    "zhi2-web-admin/src/views/login/SuzhouDaoQrLoginDialog.vue",
+    "zhi2-web-admin/src/api/security/suzhouDao.js"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "5d004e58-38a3-43c3-95ec-476c6ccbe2d8"
+   ],
+   "bundle": "042.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户 publicPortal 头部配色：portalSegment + resolvePortalAccent",
+   "type": "pattern",
+   "content": "公开门户弹层主题色集中在 portalTheme.resolvePortalAccent：商品房段恒为 #3f669c；portal=houses 仅在 query.portalSegment=stock（PORTAL_SEGMENT_STOCK）时为 #12AD62，否则为蓝。PortalDialogHost 用 --portal-accent 驱动 portal.scss；UnifiedLogin 在商品房/存量菜单链分别挂 commercial/stock，openPortal 写入 query，open 无 segment 时 delete portalSegment，close 清 segment 防脏 query。深链仅 ?portal=houses 不带 segment 会误显商品房蓝头，外链/书签需带 portalSegment=stock 或产品层增加稳定区分。读取 segment 时须规范化：重复 query 键可能为数组，用 Array.isArray(s)?s[0]:(s||'') 再与常量比较。",
+   "evidence": "审查：商品房强制蓝、存量绿仅 stock；houses 无 segment 与菜单入口不一致为 HIGH；PortalDialogHost portalSegment 数组类型为 MEDIUM。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/portalTheme.js",
+    "zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue",
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "b642c935-7aec-4bc3-b375-5091c39f01f7"
+   ],
+   "bundle": "042.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户租赁/信用详情弹窗：min-width 按场景分级，字段行禁止换行撑宽",
+   "type": "pattern",
+   "content": "publicPortal 信用记录、人员信息等详情弹窗：全局 min-width 880px 会在内容少时过宽。基础弹窗改为 min-width 480px、宽度 fit-content；仅双列企业详情保留 880px。标签与值同一行展示，放不下优先加弹窗宽度而非换行；人员信息去掉空白机构标志占位与居中大标题，改为与信用记录一致的三行左对齐列表（姓名/企业名称/联系电话），标签定宽。",
+   "evidence": "用户反馈弹窗太宽与人员信息 UI 异常；修复均在 RentalDetailDialog.vue，无测试依赖被删占位。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/components/RentalDetailDialog.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "27d93ce3-3f71-4fa6-a0d3-84ff40211b62"
+   ],
+   "bundle": "042.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户二级页 banner 使用超大内嵌位图 SVG 会拖慢首屏",
+   "type": "fact",
+   "content": "将 PortalDialogHost 顶部 banner 从 portal_city_banner.jpg 改为同尺寸 SVG（1920×165）时，若 SVG 内嵌 base64 位图约 6.7MB，二级页首屏加载明显变慢。性能敏感场景应使用同尺寸压缩 jpg/png；保留旧 jpg 便于回退引用。",
+   "evidence": "替换切图 173.svg 后明确提示文件约 6.7MB 与首屏变慢。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue",
+    "zhi2-web-admin/public/assets/images/homeNew/portal_city_banner.svg"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "ecaebeeb-54ff-4c5a-91a6-258101a82b57"
+   ],
+   "bundle": "042.md",
+   "project": "门户"
+  }
+ ]
+}

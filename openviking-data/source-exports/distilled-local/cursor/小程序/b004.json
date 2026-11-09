@@ -1,0 +1,59 @@
+{
+ "project": "小程序",
+ "batch": "004",
+ "files": [
+  "004.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "主包大小超了一些，看看怎么优化一点",
+   "type": "fact",
+   "content": "已全量核对：**分包后业务跳转路径不需要改**，当前代码里的路由写法与 `pages.json` 一致，无需再改一轮。 ## 结论 uni-app / 微信小程序分包只改变**打包位置**，**页面完整路径不变**。 例如 `root: \"pages/face\"` + `path: \"bdc\"` → 实际路径仍是 `pages/face/bdc`，`navigateTo` / `redirectTo` 继续用 `/pages/face/bdc` 即可。 上次优化**没有改**任何跳转 URL，这是正确做法。 ## pages.json 与文件路径对照 | 实际文件 | 分包配置 | 完整路由（跳转用） | |---------|---------|-------------------| | `pages/face/verify.vue` | `pages/face` + `verify` | `pages/face/verify` | | `pages/face/bdc.vue` | `pages/face` + `bdc` | `pages/face/bdc` | | `pages/face/face.vue` | `pages/face` + `face` | `pages/face/face` | | `pages/face/user-agreement.vue` | `p",
+   "evidence": "extracted source=cursor project=小程序",
+   "files": [
+    "`pages.js",
+    "pages.js",
+    "`pages/face/verify.vue",
+    "`pages/face/bdc.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "404cce7e-39c8-4d87-8c7d-0d9d3fe66028"
+   ],
+   "_draft": true,
+   "project": "小程序"
+  },
+  {
+   "title": "这里点击业主决策，跳转web-view之后返回到首页",
+   "type": "preference",
+   "content": "已按你的要求加强缓存清理，主要改动如下： ## 1. 成功打开页面后再清除 `tryConsumeOwnerDecisionPortalPostAction` 不再在调用接口前清缓存，而是等 `openOwnerDecisionVoteH5()` 成功跳转后再执行 `markOwnerDecisionPostActionConsumed()`。 ## 2. 统一清理 `markOwnerDecisionPostActionConsumed()` 会一并清除： - 本地存储 `PAGE_PORTAL_POST_ACTION_KEY` - 内存中的 `pendingPortalPostAction` - URL 参数 `portalPostAction` - 回调 `redirectUrl` 里的 `portalPostAction`（避免页面重建时从 redirectUrl 再次解析出来） ## 3. 普通「绑定房屋」入口主动清残留 个人中心/首页的 `navigateToAddHouse()` 在未携带 `portalPostAction` 时，会先调用 `resetOwnerDecisionPendingState()`，避免之后普通绑定房屋再次触发业主决策逻辑。 ## 4. 防重复执行 增加 `ownerDecisionPostActionConsuming` 标志，接口请求过",
+   "evidence": "extracted source=cursor project=小程序",
+   "files": [
+    "涉及文件：d:\\repository\\小程序\\wygl-wxxcx-dev-slh、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\webview\\home.vue、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\face\\bdc.vue、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\face\\verify.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5176f41c-4e0d-4dfb-b229-b0063e7d524b"
+   ],
+   "_draft": true,
+   "project": "小程序"
+  },
+  {
+   "title": "两边切换的小区没有同步，应该保持一致",
+   "type": "bug",
+   "content": "已做第二轮修复，原因比之前更完整，主要两点： ## 仍不同步的原因 1. **Tab 切页时「我的」每次 `onShow` 都跑 `refreshFromServer`** 会拉 profile、可能清空/重写房屋，再拉 `ctUserIdentity`；若此时 `houseId` 被清掉，会**默认选列表第一套**，覆盖你在另一页选的小区。 2. **首页每次 `onShow` 都跑完整 `initializePage`** 同样会异步拉 profile、灵犀、房屋列表，和 Tab 切换抢状态，容易把刚选中的房屋冲掉。 3. **仅靠门户快照不够** 部分流程（`clearPortalHouseFields`、`refreshPortalProfile`）会清 `houseId`，但用户 picker 的选择没有单独、可靠的存储。 ## 本次改动 1. **独立存储用户选择**（`__ew_portal_active_house__`） - picker 切换时写入 `houseId` / `project` - 读快照、拉房屋列表后都会**优先恢复**该选择 2. **调整 Tab 切换时的刷新** - **首页 `onShow`**：只恢复本地快照 + 轻量同步房屋列表，**不再**跑完整 `initializePage` - **我的 `onShow`**：只恢复快照 + ",
+   "evidence": "extracted source=cursor project=小程序",
+   "files": [
+    "涉及文件：d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\webview、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\utils、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\webview\\home.vue、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\webview\\externalWebview.vue、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\utils\\portal-user.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7ebdef37-14ee-44a0-8372-b1a08283e34e"
+   ],
+   "_draft": true,
+   "project": "小程序"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,268 @@
+{
+ "project": "苏住房C",
+ "batch": 15,
+ "files": [
+  "057.md",
+  "058.md",
+  "059.md",
+  "060.md"
+ ],
+ "count": 14,
+ "memories": [
+  {
+   "title": "苏住房C 小程序 ZsPopup 左右不留白：容器宽度约束写进公共组件（max-width: calc(100vw - 40px) + margin:0 auto）",
+   "type": "pattern",
+   "content": "情况：苏住房C（zhi2-mobile-shimin，uni-app 小程序）认证失败、重复账号、撤销确认等弹窗左右贴边，用户要求左右各留 20px。根因是公共组件 ZsPopup 的 .popup-container 只给了 max-width:360px（大屏档位），没有任何相对视口的宽度约束，小屏（375/390/414）下就贴着屏幕边缘渲染；页面侧又没有覆盖它的宽度。做法：宽度约束一律写进公共组件 ZsPopup 的 .popup-container 一处，不要在业务页面里给每个弹窗单独加 padding，否则会造出「有的弹窗宽有的窄」两套口径。具体三行：width:360px; max-width:calc(100vw - 40px); margin:0 auto;（配合已有的 box-sizing:border-box 与 border-radius）。语义是「最大 360px，但无论屏宽多少左右至少留 20px，并水平居中」，min 的两侧留白由 max-width 承担，360 上限由 width 承担，margin:0 auto 保证小屏和大屏都居中。注意 100vw 在小程序里就是屏宽，不需要减 scrollbar。验证：在微信开发者工具打开 pages_my/verification/FormLocal，触发认证失败弹窗（或临时置 showError=true）量左右留白。",
+   "evidence": "用户「认证失败的提示框左右占满了，需要留白20PX」；结论把约束加在 src/components/ZsPopup/ZsPopup.vue 的 .popup-container：width:360px + max-width:calc(100vw - 40px) + margin:0 auto，并说明「该修改作用于所有使用 ZsPopup 的弹窗，包括认证失败、重复账号提醒、撤销确认等场景」",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ZsPopup/ZsPopup.vue",
+    "zhi2-mobile-shimin/src/pages_my/verification/FormLocal.vue"
+   ],
+   "baseline": "0801b84",
+   "sessionIds": [
+    "2795d7c1-b57e-448c-bc6a-90330c419f2b"
+   ],
+   "bundle": "057.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 微信小程序分包组件不能跨包引用：抽到主包 src/components/<业务域>/ 后统一改引用路径",
+   "type": "pattern",
+   "content": "情况：编译/运行时控制台报 `Component is not found in path \"pages_main/news/components/ListIndex\" (using by \"pages_my/onlineService/index\"), may be missing corresponding \"componentPlaceholder\" option?`。根因是微信小程序不允许一个分包的页面直接引用另一个分包里的组件：pages_my 分包页面引用了 pages_main 分包下的组件，构建期就解析不到；componentPlaceholder 只是异步化加载的补救手段，治不了跨包路径非法。做法：把组件下沉到主包公共目录 src/components/<业务域>/（本例 article/ListIndex.vue、ListDetail.vue），再改掉所有消费方的 import 路径，最后删除分包内的原文件，避免留两份各自漂移。注意这是「连带面」很广的改动：文章/政策列表这类组件往往被多个包共用，本例一次要改 pages_my/onlineService/index.vue、pages_my/onlineService/PolicyDetail.vue、pages_main/news/index.vue、pages_main/news/detail.vue、pages_owner/elevator/guideDetail.vue、pages_transaction/buyHousePolicy/detail.vue。后续再报同类错误，同样按「移到主包 src/components/」处理，不要给每个包各复制一份。",
+   "evidence": "用户贴报错：Component is not found in path \"pages_main/news/components/ListIndex\" (using by \"pages_my/onlineService/index\")…；结论明确这是微信小程序分包组件引用限制，已把 ListIndex/ListDetail 抽到 src/components/article/ 并更新 6 个引用文件",
+   "files": [
+    "zhi2-mobile-shimin/src/components/article/ListIndex.vue",
+    "zhi2-mobile-shimin/src/components/article/ListDetail.vue",
+    "zhi2-mobile-shimin/src/pages_my/onlineService/index.vue",
+    "zhi2-mobile-shimin/src/pages_main/news/index.vue"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "903d152b-dae2-46f3-94af-775912aee86f"
+   ],
+   "bundle": "057.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "ZsButton 禁用态变绿不是主题色问题：原生 button 的 UA 禁用样式压过了 rgba(var(--primary-color-rgb), .5)",
+   "type": "bug",
+   "content": "情况：苏住房C 小程序 pages_vote/elect/needToKnow 的按钮倒计时禁用期间是绿色（约 #07c160，微信原生 button 主色），而启用态是正常的品牌蓝 #1354be，用户直接问「禁用背景色为什么是绿色」。排查链路值得复用：①先确认该页只是包了一层 AgreementPage(api-key=jyq.elect.agreement, :showCount=appStore.isSuzhuFang)，页面自身没有按钮逻辑；②AgreementPage 用 useCountDown(5) 做 5 秒倒计时，isCounting 期间 ZsButton :disabled，所以看到的是禁用态；③ZsButton 本身就是原生 <button>，并把 type 透传下去（:type=\"type\"），type=primary 时微信 UA 会给原生按钮一条默认禁用背景；④ZsButton 的禁用样式写成 background-color: rgba(var(--primary-color-rgb), 0.5)，而全局值定义在 styles/index.css 的 page/:root 上。根因：启用态用 var(--primary-color) 能压过 UA 的主色，禁用态那条半透明背景在原生 UA 规则/变量作用域上没能生效，于是露出微信绿。做法：禁用态要用与启用态同等强度的声明（明确 background-color + 必要 !important、必要时用字面色值而不是依赖 --primary-color-rgb 变量），并在授权弹窗这类经过自定义组件边界的场景复核 CSS 变量是否真的取到了值。同类症状先看「原生按钮 + 变量在禁用分支失效」这两点，不要先去怀疑主题色被改。",
+   "evidence": "用户「pages_vote/elect/needToKnow这个页面按钮禁用背景色为什么是绿色」；定位：AgreementPage useCountDown(5) → ZsButton :disabled；ZsButton 禁用态 rgba(var(--primary-color-rgb), 0.5) 未压过原生 button type=primary 的默认绿 #07c160；主题色全局定义 #1354be/19,84,190",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_vote/elect/needToKnow.vue",
+    "zhi2-mobile-shimin/src/components/shared/AgreementPage.vue",
+    "zhi2-mobile-shimin/src/components/ZsButton/ZsButton.vue",
+    "zhi2-mobile-shimin/src/styles/index.css"
+   ],
+   "baseline": "b7bf813",
+   "sessionIds": [
+    "2a7e26fd-2145-4c85-840c-3ea11b150b32"
+   ],
+   "bundle": "057.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "安卓微信小程序：列表卡片 slot 里的普通 view @tap 收不到点击（点卡片能进、点按钮没反应）→ 统一换 ZsButton",
+   "type": "bug",
+   "content": "情况：pages_vote/decision 列表「参与决策」按钮在安卓微信小程序里点击完全没反应，但点同一张卡片的主体可以正常进详情，控制台无任何报错。根因：按钮是卡片 slot 里的普通 <view @tap.stop>，在安卓微信小程序上这种写法经常收不到 tap（卡片主体的 @tap 不在 slot 里，所以正常），并非业务方法或接口问题。同一模块的选举页 elect/index.vue 早已统一用 ZsButton + @click.stop，决策列表属于「没对齐既有写法」。做法（本项目固定套路，新增列表一律照此）：①操作按钮一律用 ZsButton + @click.stop，不要用裸 <view @tap>；②跳转统一收口到一个 goto() 方法，卡片主体与按钮都走它，避免两套跳转规则；③按钮所在区域加 z-index:2，防止被卡片上的其它层遮住；④详情页底部按钮用项目里的 redirectTo() 工具函数而不是 uni.redirectTo 直调；⑤顺便核对跳转目的地语义（「参与决策/修改决策」应直达 /pages_vote/decision/needToKnow 投票须知页，而不是先落详情页）。验证要在安卓真机上点按钮，模拟器上不一定复现。",
+   "evidence": "用户「我的决策点击参与决策还是没有反应，但是直接点击整个卡片可以进入」；结论：安卓微信小程序里 slot 中的普通 view @tap 经常收不到事件，选举页已用 ZsButton + @click.stop 规避，决策列表未对齐；修复含 goto() 收口、按钮 z-index:2、redirectTo() 工具函数",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_vote/decision/index.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/components/DecisionList.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/detail.vue",
+    "zhi2-mobile-shimin/src/pages_vote/elect/index.vue"
+   ],
+   "baseline": "f1939b0",
+   "sessionIds": [
+    "365c14a6-d64c-46e7-af26-8a237fa7b8c3"
+   ],
+   "bundle": "057.md",
+   "project": "苏住房C"
+  },
+  {
+   "content": "现象：页面报 Error: module 'pages_main/common/vendor.js' is not defined, require args is '../../../../../common/vendor.js'，指向 pages_main/node-modules/@dcloudio/uni-ui/lib/uni-icons/uni-icons.js。根因：uni-icons 被 easycom 编译进分包（pages_main / pages_owner / pages_owner_extra）后，产物里仍是相对 require 引用 common/vendor.js，从分包 node-modules 内部往上算层数会落到 pages_main/common/vendor.js，而 vendor.js 实际在主包 common/vendor.js，因此差一层。做法：①新增 scripts/relocate-uni-icons.mjs，扫描所有分包目录中的 uni-icons 产物，把 vendor.js 的相对引用改为主包的正确层数（本次是把 ../../../../../common/vendor.js 改成 ../../../../../../common/vendor.js）；②在 vite.config.ts 的 closeBundle 钩子中自动执行该脚本，让每次构建都自动打补丁，不要再手工改 dist；③脚本写完先对当前 dist 跑一次，把已编译的三个分包都修掉。这是本项目一以贯之的「构建后产物补丁」套路，relocate-datetime-picker.mjs、relocate-z-paging.mjs 是同样写法，新增同类第三方组件打进分包时照抄。改完必须停 dev server 重新 npm run dev，再在微信开发者工具点「编译/重新载入」，热更新看不到效果。",
+   "evidence": "会话 829a9465-5450-4144-a178-49e21c221320：用户贴出 uni-icons 的 module 'pages_main/common/vendor.js' is not defined 报错；结论说明分包路径解析根因、新增 scripts/relocate-uni-icons.mjs、在 vite.config.ts closeBundle 自动执行、并已修复 pages_main/pages_owner/pages_owner_extra 三处（../../../../../ → ../../../../../../）。",
+   "files": [
+    "zhi2-mobile-shimin/scripts/relocate-uni-icons.mjs",
+    "zhi2-mobile-shimin/vite.config.ts",
+    "zhi2-mobile-shimin/scripts/relocate-datetime-picker.mjs",
+    "zhi2-mobile-shimin/scripts/relocate-z-paging.mjs"
+   ],
+   "baseline": "b7bf813",
+   "sessionIds": [
+    "829a9465-5450-4144-a178-49e21c221320"
+   ],
+   "title": "分包内 easycom 组件（uni-icons）的 vendor.js 相对路径多算一层：构建后补丁脚本 + closeBundle 自动执行",
+   "type": "bug",
+   "bundle": "058.md",
+   "project": "苏住房C"
+  },
+  {
+   "content": "现象：我的求购 → 添加求购信息 → 点搜索框选小区，第一次选完停在搜索页不动，第二、三、四次才「自动跳回」添加页。根因是入口页 add.vue 的搜索框同时挂了外层 div 的 @tap 与 ZsSearch 的 @focus 两个跳转事件，一次点击连续触发两次 navigateTo，页面栈变成「我的求购 → 添加求购信息 → 搜索小区 → 搜索小区」；而 search.vue 选中小区后只执行 navigateBack({ delta: 1 })，每次只退掉一层重复的搜索页，所以表现为要选好几次才回到添加页。做法：①入口页只保留单一跳转事件，统一用项目中其他页面一致的 @click.native，去掉重复的 @tap / @focus；②更关键的是子页（选择器/搜索页）返回时不要假设自己只入栈一次——在 getCurrentPages() 页面栈里用路由路径查找目标页（例：添加求购信息页），算出 delta 后一次性退回到该页，栈异常时也能退干净；③验证路径：我的求购 → 添加 → 点搜索框 → 选小区，第一次选择后应直接回到添加页并回填已选小区。凡「A 页 → 选数据页 → 回带结果给 A 页」的结构都按这个模式写返回逻辑。",
+   "evidence": "会话 9e111257-31c8-47e5-b4c2-c258dbd7cb93：用户诉求「搜索到小区然后第一次都不会自动弹到添加求购信息页面，后面的2、3、4次才会」；结论给出 add.vue 双事件重复 navigateTo 导致页面栈重复、search.vue 只 delta:1 的根因与「去掉 @tap/@focus 改 @click.native + 在页面栈中查目标页一次性回退」的修复。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_transaction/intention/add.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/intention/search.vue",
+    "zhi2-mobile-shimin/src/components/ZsSearch/ZsSearch.vue"
+   ],
+   "baseline": "d43894b",
+   "sessionIds": [
+    "9e111257-31c8-47e5-b4c2-c258dbd7cb93"
+   ],
+   "title": "跳转类页面的子页返回不能写死 navigateBack(delta:1)：入口重复入栈后要点 2～4 次才退干净",
+   "type": "bug",
+   "bundle": "058.md",
+   "project": "苏住房C"
+  },
+  {
+   "content": "现象：人工审核页提交时 checkRepeatRealName 与 manualAuditRealName 请求体为空，后端返回 400 / code 1101「证件类型不能为空」。根因是提交时才从 userStore 读取 idType、idNumber、username、nationality、oldIdNumber，而进入本页到点提交之间，用户会被要求上传身份证照片，返回小程序的瞬间触发 App.onShow → getUserInfo，把 store 里的临时身份数据清空，于是提交时读到的全是空值。做法：①在 FormManual.vue 的 onLoad 里做一次性快照，把上述字段存到本地 verifyInfo；②所有提交请求一律用 verifyInfo.*，不再在提交时读 store；③加快照兜底校验，快照为空就提示「证件信息缺失，请返回上一步重新填写」并阻断提交，避免发出空请求体。两条上游链路都要覆盖：非本地证件走 FormNonLocal → humanReview() 写 store → FormManual；本地身份证走 FormLocal → setTmpUserInfo()（idType='01'）→ FormManual?local=true。凡是「上一步写入 store、下一步跨小程序前后台后提交」的表单，都按 onLoad 快照 + 提交校验的模式处理。",
+   "evidence": "会话 fe7db194-e3eb-4ff2-81a5-4fc5d0da76f3：用户诉求 1 贴出 getRepeatByIdTypeAndIdNumber 返回 code 1101「证件类型不能为空」的完整请求；诉求 2「修复人工审核提交时证件信息丢失」；结论说明 onLoad 快照 verifyInfo、提交改用快照、避免上传照片期间 App.onShow→getUserInfo 清空临时数据，并给出兜底提示。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_my/verification/FormManual.vue",
+    "zhi2-mobile-shimin/src/pages_my/verification/FormLocal.vue",
+    "zhi2-mobile-shimin/src/pages_my/verification/FormNonLocal.vue",
+    "zhi2-mobile-shimin/src/store/user.js"
+   ],
+   "baseline": "6599714",
+   "sessionIds": [
+    "fe7db194-e3eb-4ff2-81a5-4fc5d0da76f3"
+   ],
+   "title": "人工审核实名提交报「证件类型不能为空」：提交时实时读 userStore 会被 App.onShow 的 getUserInfo 清空，必须 onLoad 快照",
+   "type": "bug",
+   "bundle": "058.md",
+   "project": "苏住房C"
+  },
+  {
+   "content": "本项目 V1/V2 接口不是常规 REST 直连，而是网关转发：业务参数必须序列化后放进请求头 zs-param，业务路径放 zs-path，另配 zs-authorization、zs-sign、zs-source。踩过的坑是 V1 的 listRecommendProject 等接口只发了空的 zs-param（\"\"），服务端自然取不到 pageNo/pageSize 等参数。约定的正确形态：V1 示例 {\"zs-path\":\"/transaction/ProjectType/listRecommend\",\"zs-param\":\"{\\\"pageNo\\\":1,\\\"pageSize\\\":10,\\\"t\\\":{}}\",\"zs-authorization\":\"\",\"zs-sign\":\"\",\"zs-source\":\"v1\"}；V2 示例 zs-path=/security/ctAuth/login、zs-param={\"username\":\"...\",\"password\":\"...\"}、zs-source=v2。做法：在拦截器层统一处理——GET 请求把参数拼成 key=value&... 形式塞进 zs-param，POST 请求把业务参数对象 JSON.stringify 后塞进 zs-param（不是放 body），V1、V2 两种 source 都按这套规则；空参数的 V1 接口也必须显式给 {\"t\":{}} 这类骨架，不能留空串。新增 api 方法时只写业务参数与路径，序列化对调用方透明。",
+   "evidence": "会话 23766583-b4b2-4f89-a0e7-86314d84c9ae：用户诉求 1 指出「V1接口的zs-param还是不对」并给出期望的完整 header（含 zs-param 内容），诉求 2「V2的post接口参数也放在zs-param里面」；结论确认所有 POST 接口（V1、V2）都序列化业务参数进 zs-param，GET 用 query string、POST 用 JSON。",
+   "files": [
+    "zhi2-mobile-shimin/src/api/v1Instance.js",
+    "zhi2-mobile-shimin/src/api/httpInstance.js",
+    "zhi2-mobile-shimin/src/api/gateway.js",
+    "zhi2-mobile-shimin/src/api/security.js",
+    "zhi2-mobile-shimin/src/api/transaction.js"
+   ],
+   "baseline": "653505a",
+   "sessionIds": [
+    "23766583-b4b2-4f89-a0e7-86314d84c9ae"
+   ],
+   "title": "V1/V2 网关请求参数统一进 zs-param：GET 走 query string、POST 走 JSON 字符串，zs-path 只放业务路径",
+   "type": "pattern",
+   "bundle": "058.md",
+   "project": "苏住房C"
+  },
+  {
+   "content": "苏住房C 与泰兴小程序同源，跨端复用成熟能力的标准做法是「以泰兴已跑通的页面为模板整体迁移」，本次迁移的是居民身份证实名认证。落地点：①src/api/security.js 新增 weChatVerify，对接 /security/ctAuth/wechat/verify（与泰兴同名同路径）；②FormLocal.vue 参照泰兴 pages_common/verifyUser/index.vue 接入完整人脸流程——温馨提示（收集姓名与身份证号）、用户协议与隐私政策勾选（未勾选不允许提交）、uni.startFacialRecognitionVerify 调起人脸核身、人脸成功后 wx.login 拿 code 再调 weChatVerify 完成实名、成功后 userStore.getUserInfo() 刷新用户信息、跳 AuthorizedSuccess；③保留原有的重复账号提醒（可继续认证或去登录）与人工审核兜底（人脸失败跳 FormManual）；④TypeChoose.vue 不用改，入口仍进 FormLocal。前置条件必须提前确认：人脸核身只能在微信小程序真机环境用，H5 要显式提示「请在微信小程序中进行实名认证」；且需在微信公众平台开通人脸核身能力，否则 startFacialRecognitionVerify 直接失败；非居民身份证（FormNonLocal）仍走人工审核。迁移后必须在真机走完整流程验证，模拟器不具备该能力。",
+   "evidence": "会话 42b7efbf-3412-4580-bb0d-1b92c50a5d89：用户诉求「身份证实名认证参考 D:\\repository\\泰兴小程序 项目里面的实现，迁移对应的功能到本项目」；结论列出新增 weChatVerify 接口、FormLocal 的温馨提示/协议勾选/startFacialRecognitionVerify/后端校验/重复账号提醒/人工审核兜底/getUserInfo 刷新六项，以及 H5 限制与公众平台需开通人脸核身两条注意事项。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_my/verification/FormLocal.vue",
+    "zhi2-mobile-shimin/src/pages_my/verification/TypeChoose.vue",
+    "zhi2-mobile-shimin/src/api/security.js",
+    "泰兴小程序/src/pages_common/verifyUser/index.vue"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "42b7efbf-3412-4580-bb0d-1b92c50a5d89"
+   ],
+   "title": "从泰兴小程序迁移微信人脸核身实名认证：startFacialRecognitionVerify + weChatVerify 的完整链路与三方前置条件",
+   "type": "workflow",
+   "bundle": "058.md",
+   "project": "苏住房C"
+  },
+  {
+   "content": "现象：接口 decisionOptionResponseAllList 里明确返回了 decisionPlayerName:\"李*丹\"，但选举记录列表左侧姓名空白，点进详情后「决策人」也空。两个前端根因：①pages_vote/elect/DecisionResult.vue 的 groupRecordRows 按 decisionResponseId 分组时只保留同组第一条，没有合并其它行的 decisionPlayerName，姓名只要不在第一条上就会丢；②enrichRecordList 对列表项做 ...record 展开，把已从 decisionOptionResponseAllList 取好的姓名又冲掉。做法：①分组/合并时遍历同组所有记录，逐个字段取第一个非空值（至少合并 decisionPlayerName）；②新增 buildRecordList，与决策模块（decision/common/DecisionResult.vue）保持同一取数口径：先从 decisionOptionResponseAllList 取姓名与选项，再交给列表渲染；③enrichRecordList 只负责异步补充选项摘要，禁止再整体展开 record 覆盖已有字段。配套：详情页 ResultRecord.vue 也要像 decision/common/DecisionRecord.vue 一样自己按 ID 拉取决策人姓名，不能依赖列表传参，否则点进去仍是空。选举与决策两个 ResultRecord/DecisionResult 是同构双份，改一处要同步另一处。",
+   "evidence": "会话 35a00989-4b03-4dae-8d47-d5841ef5d71f：用户诉求贴出 detail 接口完整响应（含 decisionPlayerName:\"李*丹\"）；结论归因「分组丢字段（groupRecordRows 只保留第一条）+ 字段被覆盖（enrichRecordList 展开 record）」，修改为新分组合并、新增 buildRecordList 与决策模块一致、ResultRecord.vue 详情页补拉决策人姓名。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/common/DecisionResult.vue",
+    "zhi2-mobile-shimin/src/pages_vote/elect/ResultRecord.vue",
+    "zhi2-mobile-shimin/src/components/CardList/CardList.vue",
+    "zhi2-mobile-shimin/src/api/autonomy.js"
+   ],
+   "baseline": "f1939b0",
+   "sessionIds": [
+    "35a00989-4b03-4dae-8d47-d5841ef5d71f"
+   ],
+   "title": "投票/选举结果记录列表姓名空、详情「决策人」空：分组合并丢 decisionPlayerName + enrich 展开整个 record 覆盖已取字段",
+   "type": "bug",
+   "bundle": "058.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序原生页改 web-view 嵌入：必须保留原生壳页（多入口不能共用同一 URL）+ 域名白名单 + 多分支同步",
+   "type": "workflow",
+   "content": "什么情况：产品要求把已上线的原生页面（本例聊天机器人 pages_my/robot 与 pages_main/automaticRobot）改成「直接 web-view 嵌入第三方 H5」，且项目同时维护多个发布分支（v2.1 / v2.1-mp / sfb）。\n\n为什么要注意：\n1）小程序 web-view 的 URL 只能写死在页面里，而同一个原生页往往被多个入口打开（首页浮层机器人 → automaticRobot，个人中心 → robot），第三方 H5 的登录态/来源参数可能不一致，直接把两处统一成一个 URL 会丢掉入口差异；正确做法是保留两个原生页作为壳，只替换页面内 web-view 的地址。\n2）第三方域名不进小程序后台的「业务域名/合法域名」白名单，开发者工具里看着正常、真机一片空白或拒绝加载——这是改完必然要跟运维/后台一起做的事项，不能只提交前端代码就宣告完成。\n3）多分支项目改同一处配置时，各分支单独提交一条 commit，便于后续 cherry-pick 与回滚；未获授权不要顺手 push。\n\n怎么做：先 git branch -a 列全部分支 → 逐分支修改目标页 → 每分支一条 commit → 回切主干并核对工作树干净 → 输出「分支/commit hash」对照表 → 提醒用户把新域名加进业务域名白名单。",
+   "evidence": "用户诉求：「当前的聊天机器人页面改为 https://chatbot-web.csuat.cmburl.cn/pcLogin?appid=szzjjwy 直接 web-view 嵌入这个页面。v2.1 和 v2.1-mp、sfb 三个分支都要迁移」，随后又要求把地址换成数字人民币钱包 H5 地址。最终结论给出 v2.1=7b60b2a9、v2.1-mp=aa6466dd、sfb=61961cd4 三组 commit，并明确提示「新域名 digital-accumulation-fund-fe.paas.cmbchina.com 需加入小程序后台业务域名/合法域名白名单，否则真机无法加载」「仍未 push，需要推送请告知」。涉及文件含 pages_my/robot/index.vue、pages_main/automaticRobot/index.vue、utils/openAutomaticRobot.js、utils/route-map.js。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_my/robot/index.vue",
+    "zhi2-mobile-shimin/src/pages_main/automaticRobot/index.vue",
+    "zhi2-mobile-shimin/src/utils/openAutomaticRobot.js",
+    "zhi2-mobile-shimin/src/utils/route-map.js",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "baseline": "a8c9568",
+   "sessionIds": [
+    "f15f2eb0-4255-4cba-a3f7-e1e287df3238"
+   ],
+   "bundle": "059.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "WXSS error at token ':' —— 微信小程序整类不支持 :not() 伪类（不是只禁通配符），解法是包 body 容器承接 flex",
+   "type": "bug",
+   "content": "什么情况：微信小程序编译报「[ WXSS 文件编译错误] ./pages_owner/income/index.wxss(200:30): error at token `:`」，报错行看不出任何语法问题。\n\n为什么：微信小程序 WXSS 的选择器支持面比标准 CSS 窄得多，除了已知不支持的 `> *` 通配选择器，`:not()` 这类伪类也同样被整类拒绝；只要任意一个被引入的 scss（uni.scss 全局、页面 scss、被多个组件 @import 的样式）里出现 `:not(...)`，它就会被打进每一份 wxss，造成一连串「不同页面报同一个错」。典型来源是「让 PageBg 背景图之下的内容压在上层」而写的 `.container-main > :not(.page-bg)`，以及 uni.scss 里的 `.page:not(.page-wrapper)`。\n\n怎么做：\n1）搜索全仓 `:not(`（scss/scss 引入链/uni.scss 都要看），把它们改写成显式类名枚举，例如 `> :not(.page-bg)` → 给内容区套一个 `<div class=\"container-body\">` 再写 `.container-body`；`.page:not(.page-wrapper)` → `.page`。\n2）套容器时必须把原有的 `flex: 1`、`min-height: 0` 一起搬到新容器上，否则滚动区域会失效。\n3）改完在页面/组件级扫一遍 `:not` 数量应为 0，重新构建后到微信开发者工具重新编译验证。",
+   "evidence": "两个连续会话：先报 pages_owner/income/index.wxss 与另两处 error at token ':'；结论确认根因是 WXSS 不支持 :not()，逐文件给出替换表（TypeChoose_Suzhufang.vue、house/index.vue、tenant/index.vue、uni.scss），并复核「三个 wxss 中 :not 数量均为 0」。用户随后说「一并修改」，agent 把 pages_owner/maintain/detail.vue 的 `.container-main > :not(.page-bg)` 改为 `.container-body` 包裹 page-head/page-bottom，并明确保留 `flex: 1`、`min-height: 0` 以避免滚动区域失效，构建通过。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/income/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/maintain/detail.vue",
+    "zhi2-mobile-shimin/src/uni.scss",
+    "zhi2-mobile-shimin/src/styles/filter.scss",
+    "zhi2-mobile-shimin/src/components/PageBg/PageBg.vue"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "42b1dbae-331e-42a5-8f4d-a65e0368e56b"
+   ],
+   "bundle": "059.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "分包内静态资源禁止 import：小程序里 import 生成的是按文件物理位置推算的路径，页面在别的分包就必然加载失败",
+   "type": "bug",
+   "content": "什么情况：一次重构把背景图引用从条件编译的 `background-image`（H5 本地路径 + 小程序 CDN）改成了 `import bg from '@/pages_my/static/images/xxx.png'`，之后微信小程序里入口背景图整块不显示、控制台 404/500，而文件确实存在于 `src/pages_my/static/images/`。\n\n为什么：小程序打包时 `import` 静态资源生成的不是「分包根 + static」的运行时路径，而是按源文件与打包后文件的物理相对位置推算出的 URL；页面被编进 pages_my 分包（甚至不同层级目录）后，这个相对路径就不再指向 `pages_my/static/...`，于是分包页面永远取不到图片。这类失败不会报编译错误，只有渲染层网络错误，很容易被误判成「图片没打包」。\n\n怎么做：\n1）小程序端静态资源一律走项目统一的 `resolveStaticUrl(src, subpackage)`，显式传目标分包名：`resolveStaticUrl('images/verification-bg-1.png', 'pages_my')`，它在微信小程序下返回 `/pages_my/static/images/...`，H5 下返回 `{base}/pages_my/static/...`。\n2）模板里用 `ZsImage` 时同样用 `src` + `subpackage` 两个属性，而不是 import 后绑 `:src`。\n3）自查口径：在 `src/pages_*` 目录下 grep `import.*\\\\.(png|svg|jpg)`，命中的基本都要改；改完确认文件本身已在对应 `pages_*/static/` 下（缺文件用同包内已有副本复制过去）。",
+   "evidence": "用户只报「@src/pages_my/verification/TypeChoose.vue 图片不显示」，涉及 pages.json 与 pages_owner/authentication/TypeChoose.vue（同源页面）。结论明确：上次重构把图片引用从条件编译的 background-image 改成了 import 静态资源，微信小程序分包 pages_my 里 import 生成的路径无法正确访问分包内静态图片；修复为 `const verificationBg1 = resolveStaticUrl('images/verification-bg-1.png', 'pages_my')`，并列出 H5 与小程序两种解析结果。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_my/verification/TypeChoose.vue",
+    "zhi2-mobile-shimin/src/pages_my/verification/FormLocal.vue",
+    "zhi2-mobile-shimin/src/pages_owner/authentication/TypeChoose.vue",
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "00a9d48a-4fa1-45d7-911c-3c025eccb8fc"
+   ],
+   "bundle": "059.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "uni.scss 末尾 marker 规则改动会让 prune-component-wxss-leak.mjs 的 LEAK_END 正则失配，主包体积暴涨超限",
+   "type": "bug",
+   "content": "情况：苏住房C 小程序 `npm run build` 报 `MAIN 磁盘 1790.5KB ok` 但 `MAIN 上传预估(source size) 2094.8KB OVER LIMIT`，构建脚本链（prune-main-static → merge-main-leaks → relocate-* → prune-component-wxss-leak → validate-dist）在 validate-dist 处失败退出码 1。\n\n为什么：在 `uni.scss` 里给 `.page-wrapper` / `.page` / `.add-page` 等 marker 规则加了 `min-height: 100%`，uni 编译时会把这段全局样式注入到每个组件 wxss 末尾，并带一条 marker 注释用于后续裁剪。原来末尾形如 `{width:100%;box-sizing:border-box}`，加属性后变成 `{width:100%;min-height:100%;box-sizing:border-box}`。而 `scripts/prune-component-wxss-leak.mjs` 里的 `LEAK_END` 正则是按旧文本写死的，匹配失败 → 裁剪逻辑整体空转，32 个主包组件各自重复注入约 8KB 的 uni.scss 全局样式，合计约 +258KB，把主包从约 1793KB 顶到 2094.8KB 越过 2048KB 上传上限。注意磁盘体积（1790.5KB）是 ok 的，只有「上传预估 / source size」超标，所以只看磁盘统计会误判为正常。\n\n怎么做：把正则里新增属性做成可选段而不是重写整条——`{width:100%;(?:min-height:100%;)?box-sizing:border-box}`。修复后 components 421.1KB→163.1KB、MAIN 磁盘 1532.5KB、上传预估 1793.1KB 通过。长期约定：凡改动 `uni.scss` 末尾的 marker 规则（增删任意属性），必须同步检查 `prune-component-wxss-leak.mjs` 的 `LEAK_END` 是否仍能匹配，并同时看「磁盘」与「上传预估」两个指标。",
+   "evidence": "用户贴出构建日志 `MAIN 磁盘 1790.5KB ok / MAIN 上传预估(source size) 2094.8KB OVER LIMIT / node scripts/validate-dist.mjs` 失败；定位为 uni.scss 新增 min-height:100% 使 LEAK_END 正则失配，32 个组件重复注入 258KB；改为 `{width:100%;(?:min-height:100%;)?box-sizing:border-box}` 后构建完整通过，components 421.1→163.1KB、MAIN 1790.5→1532.5KB、上传预估 2094.8→1793.1KB。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\uni.scss",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\scripts\\prune-component-wxss-leak.mjs",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\scripts\\validate-dist.mjs",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\scripts\\size-main-package.mjs",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\package.json"
+   ],
+   "baseline": "9cdf7b8",
+   "sessionIds": [
+    "fc94b08c-d7f0-4ffe-9070-050d77fd5bb1"
+   ],
+   "bundle": "060.md",
+   "project": "苏住房C"
+  }
+ ]
+}

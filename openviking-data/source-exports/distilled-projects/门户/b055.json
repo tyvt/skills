@@ -1,0 +1,76 @@
+{
+  "project": "门户",
+  "batch": "055",
+  "files": [
+    "055.md"
+  ],
+  "count": 4,
+  "memories": [
+    {
+      "title": "门户跳转管理端带板块名不生效的根因：参数加在后端 SSO 回调 query 上会被 location.replace 丢弃，必须注入 redirect 内嵌的前端地址",
+      "type": "bug",
+      "content": "【什么情况】门户首页菜单跳转到管理端「苏州市房地产监测V3」时，顶栏没出现「（商品房）」这类板块名——之前明明已经加过携带目录名称的逻辑。\n【为什么】之前把板块名加在管理端后端 SSO 回调地址的 query 上：`/api/v3.0/security/auth/portal/callback?ticket=&timestamp=&nonce=&redirect=&portalCategory=商品房`。但后端 `PortalSsoController.callback()` 只认 ticket/timestamp/nonce/redirect 四个参数，成功后返回一段 HTML，执行 `sessionStorage.setItem('Admin-Token', ...)` + `location.replace(successUrl)`，而 `resolveSuccessUrl()` 对有 redirect 时**原样返回** redirect。也就是说浏览器最终落地的地址是按 redirect 重建的，回调 URL 上的其它 query 全被丢弃 → 管理端前端 `location.search` 里根本没有 portalCategory。\n【怎么做】① 先读后端源码确认落地地址由谁决定（`苏州市房地产检测V3后端仓库/common-framework/.../PortalSsoController.java` 的 `resolveSuccessUrl()`），本例确认**不需要改后端**；② 板块名必须在门户发送端「跳转运行时」注入，不写死在功能配置的 `jumpUrl` 字段里：新增 `src/utils/portalCategory.js` 的 `buildPortalCategoryUrl()`；③ 关键点是识别 URL 里的 `redirect` 参数并**递归注入到它内嵌的管理端前端地址**，同时写 query 段与 hash 段里的 query（兼容 hash 路由与 302 只保留 fragment 的情况），ticket/timestamp/nonce 原样保留且幂等不重复追加；④ 补齐原本完全没带板块的三条跳转路径：应用列表 gotoApp、待办 handleProcess（按业务名称匹配板块）、常用功能 handleCommonJump（按 functionId 反查板块标题）；⑤ 落地验证走全链路模拟：真实回调地址 → 后端透传 redirect → 落地 URL → 管理端解析 → 标题（本批落地 `http://.../?portalCategory=商品房#/projectmanage/customerProject?portalCategory=商品房`，解析结果「商品房」，标题「苏州市房地产监测V3（商品房）」）。",
+      "evidence": "会话 session-eb30f683-df51-4286-8b54-7cbdea56c804（基线 65275e9）用户诉求 1「之前加了首页菜单跳转管理端(苏州市房地产监测V3)的时候携带目录名称（商品房）这种的，现在没有生效。这个直接加在跳转的逻辑代码里面，不是配置跳转地址的字段上写死。排查一下」；最终结论给出根因（后端 callback 只认四参数 + location.replace(successUrl) 原样返回 redirect）与门户侧 buildPortalCategoryUrl() 的递归注入改法。",
+      "files": [
+        "zhi2-web-admin/src/utils/portalCategory.js",
+        "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+        "zhi2-web-admin/src/views/home/index.vue"
+      ],
+      "baseline": "65275e9",
+      "sessionIds": [
+        "session-eb30f683-df51-4286-8b54-7cbdea56c804"
+      ],
+      "bundle": "055.md"
+    },
+    {
+      "title": "管理端接收板块名要兼容 hash 路由双来源解析：app.js 在模块 import 期就解析，首屏 URL 必须带参数",
+      "type": "bug",
+      "content": "【什么情况】门户已经把 portalCategory 带到管理端了，管理端却读不到：`resolvePortalCategory()` 得到 null → `app.portalCategory` 为空 → Navbar 只显示平台名，没有「（商品房）」。\n【为什么】三处叠加：① 管理端是 hash 路由（vue-router 3 默认 mode='hash'），参数既可能在 `location.search` 也可能在 hash 的 query 段，只读 search 会漏；② `store/modules/app.js` 在**模块 import 期**就执行 `resolvePortalCategory()`，早于 `main.js` 函数体，因此必须在首屏 URL 里就读到参数，来不及靠后续赋值补；③ 旧规则「URL 带 token 但不带 portalCategory 就 removeItem 清空 sessionStorage」会把已有效的板块上下文冲掉——而统一登录/网关 302 或 `location.replace(origin+pathname)`（丢 search+hash）这类整页跳转后，只能靠 sessionStorage 兜底。\n【怎么做】① 新增 `src/utils/portalCategory.js`：search 与 hash query 双来源解析，显式空值=清除，URL 未携带则沿用上下文，持久化 sessionStorage（+localStorage）；② `app.js` 去掉「带 token 无板块就清空」规则，新增 `SET_PORTAL_CATEGORY` / `setPortalCategory` / `refreshPortalCategory`；③ `main.js` 与 `router/index.js` 的 token 解析都兼容 hash query，跳登录页时带上板块，`afterEach` 按 URL 同步；④ 排查整页刷新丢参的固定清单：Navbar.vue 的 `location.replace(origin+pathname)`、api/index.js 的 `location.href='/login'`（401/登出）、version-check.js 的 reload、permission.js 的 reload——这四处都会丢 URL 参数；全流程没有任何 `sessionStorage.clear()`，所以 sessionStorage 是唯一能跨整页跳转保住板块的位置；⑤ 补 `src/utils/portalCategory.test.mjs` 自测（门户 8 组 / 管理端 7 组断言全绿），并给 Navbar 标题渲染成「平台名称（板块）」。",
+      "evidence": "会话 session-eb30f683-df51-4286-8b54-7cbdea56c804（基线 65275e9）诉求 2 的 v3-audit 审查结论列出「app.js 在模块 import 期执行 resolvePortalCategory()」「整页刷新点：Navbar.vue location.replace(origin+pathname)、api/index.js location.href='/login'、version-check.js reload、permission.js reload 都会丢弃 URL 上的 portalCategory」；诉求 3/5 的子代理结论给出 search+hash 双来源解析、去掉清空规则、afterEach 同步与 7 组自测全绿的落地清单。",
+      "files": [
+        "zhi2-web-admin/src/utils/portalCategory.js",
+        "zhi2-web-admin/src/store/modules/app.js",
+        "zhi2-web-admin/src/router/index.js",
+        "zhi2-web-admin/src/main.js",
+        "zhi2-web-admin/src/layout/components/Navbar.vue"
+      ],
+      "baseline": "65275e9",
+      "sessionIds": [
+        "session-eb30f683-df51-4286-8b54-7cbdea56c804"
+      ],
+      "bundle": "055.md"
+    },
+    {
+      "title": "门户联调取登录态不要靠反复试密码：dev 环境大量门户接口未鉴权，且试错会把账号锁 30 分钟",
+      "type": "workflow",
+      "content": "【什么情况】排查门户跳转管理端时需要门户登录态才能调 `/portal/home/functions`、`/portal/home/function/jump`，直接试了几个账号都返回「账号或密码错误」。\n【为什么】门户与管理端是**两套后端**（门户 `.../web.v2.../api/v3.0/portal/**`，管理端 `.../web.v3.../api/v3.0/**`），两者 token 不通用；而门户 dev 环境大量接口根本没开鉴权（`/portal/user/page`、`/portal/config/page`、`/portal/application/page`、`/portal/function/list`、`/portal/dept/list`、`/portal/platformConfig/getInfo` 等可直接读）。更关键的是**多组密码试错会把 dev 账号临时锁定 30 分钟**，本批还为拿登录态重置过门户 userId=11 的密码——代价远大于收益。\n【怎么做】① 优先用未鉴权接口把链路信息取出来（`/portal/function/list`、`/portal/config/page` 等），需要的字段基本都在里面；② 必须登录时用仓库 e2e 既有凭据：门户账号密码取 `zhi2-web-admin/e2e/.env.e2e` 的 `PLAYWRIGHT_LOGIN_PASSWORD`（门户是**明文比对**），管理端密码要 AES-CBC 加密（`src/utils/passwordEncrypt.js` 的 key，iv `A-16-Byte-String`）并配 `/api/v3.0/code` 明文验证码；③ 不要用「改密码 → 登录 → 再改回去」的方式拿登录态，也不要连续试多组密码；④ 登录态拿到后立刻把真实 redirectUrl、ticket 有效期（60s）、参数落点记录下来，别反复重跑；⑤ 探针脚本放临时目录（如 `%TEMP%\\portal-probe.mjs`），不要留在仓库里。",
+      "evidence": "会话 session-eb30f683-df51-4286-8b54-7cbdea56c804（基线 65275e9）诉求 4 的 runtime-probe 结论列出门户/管理端两套后端与 token 不通用、dev 大量门户接口未鉴权、门户明文密码 vs 管理端 AES 加密；诉求 5 的子代理结论补充「真实 redirectUrl 是一次性 ticket（60s）+ timestamp + nonce + redirect，没有 token」与「副作用提示：为拿登录态重置了门户 userId=11 的密码；多组密码尝试导致若干 dev 账号被临时锁定 30 分钟」。",
+      "files": [
+        "zhi2-web-admin/e2e/.env.e2e",
+        "zhi2-web-admin/src/utils/passwordEncrypt.js",
+        "zhi2-web-admin/src/api/portal/home.js"
+      ],
+      "baseline": "65275e9",
+      "sessionIds": [
+        "session-eb30f683-df51-4286-8b54-7cbdea56c804"
+      ],
+      "bundle": "055.md"
+    },
+    {
+      "title": "长页面滚不到底：全局 body{height:100%} 截断滚动，用页面级类名 + :global 规则局部绕开而不动全局样式",
+      "type": "bug",
+      "content": "【什么情况】操作指引（operationGuide）这类长页面在浏览器里滚不到底，最后一个区块看不到，用户以为内容缺失。\n【为什么】全局样式里有 `body { height: 100% }`，页面内容超出视口时文档本身不产生滚动条，滚动被截断。直接改全局 body 规则能解决，但那会影响所有长页面，属于全量回归范围，不该在一次局部改动里动。\n【怎么做】① 先确认是全局高度链问题而不是内容容器 `overflow` 选错：`body{height:100%}` 会把文档高度锁死，表现与「滚动容器选错了」很像，但根因在 html/body；② 局部绕开：在该页组件 `created` 里给 `<html>` 加页面专属类名（如 `operation-guide-scroll`），`unmounted` 里移除，再用 `:global` 规则解除全局 `height:100%` 对本页的截断；③ 确认只影响本页，其他页面（商品房等）实测未受影响；④ 补 e2e 断言（长页可滚动且末区块可见），并在结论里留一句「全局 body{height:100%} 仍存在，其他长页面若有同样现象根因相同，但那个改动需要全量回归」。",
+      "evidence": "会话 session-8d2fa9f1-0373-431b-8764-c1951d953e12（基线 b6165db）最终结论：「修复长页面不可滚动：`created` 给 `<html>` 加 `operation-guide-scroll` 类，`unmounted` 移除，配合 `:global` 规则解除全局 `body { height: 100% }` 的截断。仅影响本页，商品房等页面实测未受影响」，并遗留「全局 `body { height: 100% }` 仍存在，那个改动需要全量回归」。",
+      "files": [
+        "zhi2-web-admin/src/views/home/operationGuide/OperationGuide.vue",
+        "zhi2-web-admin/src/views/home/operationGuide/components/OperationGuideBody.vue",
+        "zhi2-web-admin/tests/e2e/operation-guide.spec.ts"
+      ],
+      "baseline": "b6165db",
+      "sessionIds": [
+        "session-8d2fa9f1-0373-431b-8764-c1951d953e12"
+      ],
+      "bundle": "055.md"
+    }
+  ]
+}

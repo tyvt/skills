@@ -1,0 +1,637 @@
+{
+ "batch": 3,
+ "files": [
+  "013.md",
+  "014.md",
+  "015.md",
+  "016.md",
+  "017.md",
+  "018.md"
+ ],
+ "failed": 0,
+ "count": 38,
+ "memories": [
+  {
+   "title": "弹层组件使用 root-portal 后必须单独注入 staff 主题变量",
+   "type": "bug",
+   "content": "根因：ZsDialog/ZsBottomPopup 等组件启用 root-portal 后，弹层 DOM 脱离页面根节点（如 .add-record-page），无法继承页面上定义的 --primary-color 等 CSS 变量，表现为选中态边框/角标/确认按钮颜色全部失效，看起来像「之前好好的、突然样式丢了」。\n解决套路：不要靠在页面根节点定义变量来修复，而是在弹窗根 class 上单独 @include staff-page-theme（在 src/staff/styles/theme.scss 中定义，注入 #1677ff），与 MoreDialog、RejectDialog、TransferKnowledgeDialog 等已有弹窗保持一致。涉及页面：record/add.vue、record/addScrap.vue（.procedure-popup，两个选择弹窗共用该样式，改一处即可）、record/detail.vue（.step-form-popup）。\n排查提示：任何「弹层内样式失颜色/失主题」问题都应先检查该弹窗根节点是否注入了主题 mixin。",
+   "evidence": "会话结论原文：根因是 ZsDialog 使用 root-portal 后，弹层 DOM 脱离 .add-record-page，无法继承 --primary-color，导致选中边框、角标和确认按钮样式失效；做法与 MoreDialog、RejectDialog 等已有弹窗一致——在弹窗根节点单独注入主题变量（#1677ff）。",
+   "files": [
+    "src/staff/pages_facility/record/add.vue",
+    "src/staff/pages_facility/record/addScrap.vue",
+    "src/staff/pages_facility/record/detail.vue",
+    "src/components/ZsDialog/ZsDialog.vue",
+    "src/staff/styles/theme.scss",
+    "src/components/ZsBottomPopup/ZsBottomPopup.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "3d76cb6a-e2bc-44af-a9ab-3973a218005a"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "小程序浮层内的确认按钮不要用原生 <button>",
+   "type": "pattern",
+   "content": "在微信小程序自定义弹层/浮层内部，原生 <button> 会出现点击异常（点击不生效或事件被吞）。约定做法：把确定按钮从原生 <button> 改为 <view> 承载点击。\n同一类约定：弹层内的分类行、重置、确定、遮罩统一使用 @tap（而非 @click），保证小程序端事件绑定一致可用。",
+   "evidence": "修复内容：确定按钮由原生 <button> 改为 <view>，避免小程序浮层内点击异常；分类行、重置、确定、遮罩统一为 @tap。",
+   "files": [
+    "src/staff/pages/knowledge/index.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "95a61c6a-dd2f-492d-af4c-e29fff661c43"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "请求拦截器会静默丢弃非约定字段，构造请求参数前需归一化",
+   "type": "bug",
+   "content": "项目中 staff 侧 API 请求拦截器只透传约定字段，构造请求参数时：若分类对象只有 categoryId 字段而拦截器期望的字段名不同，参数会被静默丢弃（无报错、无提示），表现为「筛选不生效 / 请求里没有参数」。\n解决套路：不要把原始对象直接塞进 params，而是通过统一取值函数取 ID，如 loadKnowledge 改为 getItemCategoryId(activeCategory.value)；选中节点的归一化也走 resolveDraftSelection() + resolveCategory()，与「查看全部」逻辑保持一致。\n排查提示：遇到「前端传了参数但接口没收到」，先在 vConsole 抓包确认请求体里到底有没有该字段，怀疑拦截器字段白名单，而不是先怀疑后端。",
+   "evidence": "API 参数：loadKnowledge 改为 getItemCategoryId(activeCategory.value)，避免仅有 categoryId 字段时参数被拦截器静默丢弃；建议用 vConsole 抓包确认请求含 categoryId=xxx。",
+   "files": [
+    "src/staff/pages/knowledge/index.vue",
+    "src/staff/api/index.js",
+    "src/staff/utils/response.js",
+    "src/staff/utils/knowledgeCategory.js"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "95a61c6a-dd2f-492d-af4c-e29fff661c43"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "弹层内状态草稿：下钻回根节点时不要清空已选",
+   "type": "pattern",
+   "content": "多级分类筛选弹层的交互约定：draftSelected（弹层内草稿选中态）应独立于展示层级维护。backToFilterRoot 回到分类根级时不要清空 draftSelected，否则会出现「下钻后点『全部』再确定就失效」。\n配套约定：未选择时点确定要 toast「请选择知识库分类」并且不关闭弹层、不重新加载列表；底部展示当前选中提示（已选：xxx / 未选择）；面包屑需高亮当前选中的分类路径（isDraftPathCrumbActive）。",
+   "evidence": "选中状态：backToFilterRoot 不再清空 draftSelected，下钻后点「全部」再确定仍有效；未选分类时提示「请选择知识库分类」，不关闭弹层、不重新加载。",
+   "files": [
+    "src/staff/pages/knowledge/index.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "95a61c6a-dd2f-492d-af4c-e29fff661c43"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "自定义弹层需补齐 flex 纵向布局并让出页面固定底栏",
+   "type": "pattern",
+   "content": "自研底部弹窗（ZsPopup 一类）容易出现的两类问题与固定做法：\n1）内容横竖错乱：弹窗根 .popup-content 需显式 flex-direction: column; width: 100%；内容区 .payment-popup-body 用 flex: 1; min-height: 0，否则渠道列表与底栏并排、金额被压成竖排。\n2）底栏重叠：打开弹窗时用条件隐藏页面固定底栏（如 v-if 上加 !paymentPopupVisible），不要依赖 z-index。\n3）底栏高度约束：底栏用 min-height 而非固定 height，避免 safe-area 重复计算导致高度异常；金额文本加 white-space: nowrap 防止折行。",
+   "evidence": "支付方式弹窗布局：为 .payment-popup .popup-content 补充 flex-direction: column 和 width: 100%，.payment-popup-body 使用 flex: 1; min-height: 0，解决渠道列表与底栏横向并排、金额竖排的问题；打开支付方式弹窗时隐藏页面固定底栏（!paymentPopupVisible）；底栏高度由固定 height 改为 min-height，避免 safe-area 重复计算。",
+   "files": [
+    "src/staff/pages/cashier/result.vue",
+    "src/components/ZsPopup/ZsPopup.vue",
+    "src/pages_property/payment/components/PaymentChannelPopup.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "22b6bc0a-f16b-4864-aa9f-f51528ea2774"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "小程序静态资源一律走页面级 static 目录绝对路径",
+   "type": "pattern",
+   "content": "项目中图标/图片的引用约定：不使用相对路径，统一使用对应分包页面的 /pages_xxx/static/ 绝对路径，例如 /pages_property/static/ 下的支付图标、安全图标。修改或新增图标资源时按此路径放置与引用，避免打包后小程序端图片不显示。",
+   "evidence": "资源与遮罩：支付图标和安全图标改为 /pages_property/static/ 路径；另有会话专门要求按 @src/pages_facility/static 修改图片引用路径。",
+   "files": [
+    "src/staff/pages/cashier/result.vue",
+    "src/pages_property/payment/bills.vue",
+    "src/pages_facility/facility.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "22b6bc0a-f16b-4864-aa9f-f51528ea2774",
+    "45f9a32c-237c-4d69-8de5-4498f1ae7d8e"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "设计稿中的装饰图片优先复用 tag.scss 伪元素实现",
+   "type": "pattern",
+   "content": "当设计稿里出现「带圆角/倾斜形状的小标签」类装饰图（如 tag-name.png）时，项目约定不切图，而是复用 src/styles/tag.scss 中已有的通用标签样式（如 .tag-parallelogram），用 CSS 实现：::after 伪元素 + skew(-15deg) 做倾斜背景、背景色取 var(--primary-color)、border-radius: 2px，文字白色加粗。页面内只做高度/间距微调（如 20px）。",
+   "evidence": "已用项目现有的 tag-parallelogram 样式替换 tag-name.png：通过 ::after 伪元素 + skew(-15deg) 实现倾斜背景，背景使用 var(--primary-color)，样式复用了 @/styles/tag.scss 中的通用标签组件。",
+   "files": [
+    "src/pages_facility/facility.vue",
+    "src/styles/tag.scss"
+   ],
+   "baseline": "05fd6b3c",
+   "sessionIds": [
+    "45f9a32c-237c-4d69-8de5-4498f1ae7d8e"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "表单页约定：单页全字段布局 + PageButton 固定提交 + ZsPicker hideArrow",
+   "type": "preference",
+   "content": "用户对业务表单页的明确偏好：表单不要拆成两步流程（移除 currentStep 多步），要求所有字段自上而下在一屏内始终可见（如 添加巡检记录：设施设备信息 → 程序选择 → 步骤列表 → 表单字段）。\n配套实现约定：\n- 底部用固定的 <PageButton text=\"提交\" @click=\"onSubmitRecord\" />，不要各页自造提交按钮；\n- 提交前做必选校验并在缺失时 toast（如「请选择巡检程序」）；\n- 行内选择器使用 ZsPicker 并加 hideArrow，右侧自行补 uni-icons type=\"right\" 箭头，保持设计稿一致；\n- 多行文本用 ZsTextarea 并设 maxlength=999（含字数统计）。\n注意：维保、年检等类型的条件字段逻辑保持不变，同样适用单页布局。",
+   "evidence": "改动摘要：移除 currentStep 两步流程，页面自上而下始终可见 5 个表单字段；底部改为固定「提交」按钮（<PageButton text=\"提交\" @click=\"onSubmitRecord\" />）；频次/日期/年检结果行 ZsPicker 加 hideArrow，右侧补 uni-icons type=\"right\"；巡維结果保留独立白卡片 + ZsTextarea maxlength=999。",
+   "files": [
+    "src/staff/pages_facility/record/add.vue",
+    "src/staff/components/PageButton/PageButton.vue",
+    "src/components/ZsPicker/ZsPicker.vue",
+    "src/components/ZsDatePicker/ZsDatePicker.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "57b07baa-330f-4a45-baab-c2722d1ae8db"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "收款明细须展示账户抵扣行（账单-优惠-应付）",
+   "type": "pattern",
+   "content": "收银台金额计算约定：账户抵扣金额 = 账单金额 - 优惠金额 - 应付合计，即 selectedAccountDeductionAmount；该值大于 0 时，「查看明细」弹窗中必须展示「账户抵扣」行，否则用户看到的分项对不上合计。收款明细底栏布局与主底栏保持一致：纵向排列 合计 + 「查看明细 >」 + 收款按钮。",
+   "evidence": "收款明细：新增 selectedAccountDeductionAmount（账单金额 - 优惠金额 - 应付合计），大于 0 时展示「账户抵扣」行；收款明细底栏改为与主底栏一致的纵向布局：合计 + 「查看明细 >」 + 收款按钮。",
+   "files": [
+    "src/staff/pages/cashier/result.vue",
+    "src/staff/api/cashier.js"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "22b6bc0a-f16b-4864-aa9f-f51528ea2774"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "小程序分包内不能靠 import 引 SVG 资源，本地图标必须放主包 src/static 并用 ZsImage",
+   "type": "bug",
+   "content": "在分包页面（如 src/pages_facility/index.vue）里通过 `import xxx.svg` 引入图标，构建后 `image` 的 src 会指向 `/pages_facility/static/type_*.svg`，但该目录在 dist 产物中并不存在，微信小程序端图片即为空白。这类分包内 import 的静态资源不会稳定落到小程序可访问目录。\n\n项目惯例：本地图标统一放主包 `src/static/images/...`，页面用 `ZsImage` 组件 + `images/xxx.svg` 字符串路径引用（与首页一致）。修复时把图标复制到 `src/static/images/facility/`，并把 iconMap 改成字符串路径；同目录下其他页面（如 facility.vue）若有相同写法要一起改，否则同样不显示。\n\n验证方式：编译后在 `dist/dev/mp-weixin/static/images/...` 能看到对应文件。\n\n补充问题：微信端对 SVG 内 `linearGradient` 兼容性不佳，个别图标仍可能显示空白，遇到时改用 PNG。",
+   "evidence": "用户反馈 @src/pages_facility/index.vue:20 图片在微信小程序不显示。根因：(1) import svg 后构建指向 /pages_facility/static/type_*.svg，而 dist/dev/mp-weixin/pages_facility/static/ 下无这些文件；(2) 与项目惯例不一致——首页等页面本地图标放主包 src/static，用 ZsImage 走 /static/images/... 路径。已把 5 个图标复制到 src/static/images/facility/，index.vue 改用 ZsImage，并同步修复 facility.vue 中相同用法。",
+   "files": [
+    "src/pages_facility/index.vue",
+    "src/pages_facility/facility.vue",
+    "src/components/ZsImage/ZsImage.vue",
+    "src/static/images/facility/type_1.svg"
+   ],
+   "baseline": "05fd6b3c",
+   "sessionIds": [
+    "53b40878-aa25-43cb-931e-2a1d70f719c9"
+   ],
+   "bundle": "014.md"
+  },
+  {
+   "title": "SCSS 中 :deep() 必须平铺书写，嵌套进父选择器会生成 chrome53 不支持的 CSS nesting 警告",
+   "type": "bug",
+   "content": "在 uni-app 小程序编译链路里，若把 `:deep(.zs-button)` 写在 `.page-button-container { }` 内部，编译产物会变成 chrome53（小程序 wxss 解析基线）不支持的嵌套 CSS，构建时出现 CSS nesting 警告。\n\n解决套路：改为平铺写法，即 `:deep()` 选择器写在样式块顶层而不是嵌在父选择器里，按钮样式不受影响，警告消失。已在 `src/pages-suggest/list.vue`、`create.vue`、`proposal-item-detail.vue` 三处应用。\n\n排查方式：`npm run build:mp-weixin` 输出中 grep `nesting` 关键字定位。",
+   "evidence": "根因是 3 个页面里把 `:deep(.zs-button)` 写在 `.page-button-container { }` 内部，编译后会变成 chrome53 不支持的嵌套 CSS。已改为平铺写法（list.vue、create.vue、proposal-item-detail.vue），重新构建后该警告不再出现，按钮样式不受影响。",
+   "files": [
+    "src/pages-suggest/list.vue",
+    "src/pages-suggest/create.vue",
+    "src/pages-suggest/proposal-item-detail.vue",
+    "src/components/ZsButton/ZsButton.vue"
+   ],
+   "baseline": "05fd6b3c",
+   "sessionIds": [
+    "27f4bf24-bca2-4fd1-8aad-6b6ad61ac1e1"
+   ],
+   "bundle": "014.md"
+  },
+  {
+   "title": "主题色改造走 staff 主题变量注入，不要在页面里直接写 background 覆盖组件",
+   "type": "pattern",
+   "content": "ZsButton 等组件的背景色由 CSS 变量 `var(--primary-color)`（及半透明态用的 `--primary-color-rgb`）决定，组件样式优先，页面里同权重写的 `background: #xxx` 是死代码、不会生效（这也是登录页残留 `background: #2583f5` 一直没起作用的原因；未注入主题时小程序端会继承全局业主端主色 #0A3D62 深藏青）。\n\n标准做法（与 pages_facility 下 13 处页面一致）：页面样式块写 `scoped lang=\"scss\"`，`@import '@/staff/styles/theme.scss'`，在根节点（如 `.login-page`）`@include staff-page-theme`，让主题变量通过 CSS 变量继承流入子组件。\n\n验证：检查产物 wxss，根节点应出现 `--primary-color:#1677ff;--primary-color-rgb:22,119,255`，旧色值清零。改主题色时顺带确认 disabled/loading 半透明态是否也解析正确。",
+   "evidence": "用户要求物业手持端登录页「立即登录」主色切换为蓝色。根因：按钮是 ZsButton type=\"primary\"，背景由组件内 var(--primary-color) 决定；登录页此前未注入 staff 主题变量，小程序端继承了全局业主端主色 #0A3D62，页面残留的 background: #2583f5 因同权重打不过组件样式是死代码。修改：src/staff/pages/login/index.vue 改为 scoped lang=\"scss\"、引入 @/staff/styles/theme.scss、在 .login-page 上 @include staff-page-theme；删除无效 background；顺带修复 disabled 半透明态。产物 index.wxss 核对 --primary-color:#1677ff 注入正确。",
+   "files": [
+    "src/staff/pages/login/index.vue",
+    "src/staff/styles/theme.scss",
+    "src/staff/components/ZsButton/ZsButton.vue",
+    "src/components/ZsButton/ZsButton.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "6a2c3ba7-f36d-4655-8e1c-0836814c4317"
+   ],
+   "bundle": "014.md"
+  },
+  {
+   "title": "本项目构建命令要用 npm.cmd，且必须设 NODE_OPTIONS 内存上限与 CODEBUDDY_SAFE_DELETE_ENABLED=0",
+   "type": "workflow",
+   "content": "构建微信小程序（`npm run build:mp-weixin`）时，本项目在 Windows 环境下的可稳定执行方式：\n\n- 用 **`npm.cmd`** 而不是 `npm`：bash 通道会被安全策略拦 `wsl.exe`，PowerShell 的 `npm.ps1` 会被执行策略拦截（Exit code 1），`npm.cmd` 才能成功。\n- 需要设置环境变量 `$env:CODEBUDDY_SAFE_DELETE_ENABLED = \"0\"` 与 `$env:NODE_OPTIONS = \"--max-old-space-size=4096\"`，否则构建可能失败/被杀。\n- 一次完整 build 约 1 分钟量级（示例 1m07s）。\n- 验证体积/样式时直接读 `dist/build/mp-weixin` 下的产物文件（如 app.json、index.wxss），不要用 dev 产物。",
+   "evidence": "会话中 bash 通道被安全策略拦 wsl.exe、PowerShell 的 npm.ps1 被执行策略拦截，最终用 npm.cmd run build:mp-weixin 成功（1m07s）。前置条件为 CODEBUDDY_SAFE_DELETE_ENABLED=0 和 NODE_OPTIONS=--max-old-space-size=4096。产物 dist/build/mp-weixin/staff/pages/login/index.wxss 已核对。",
+   "files": [
+    "package.json",
+    "build.sh"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "6a2c3ba7-f36d-4655-8e1c-0836814c4317"
+   ],
+   "bundle": "014.md"
+  },
+  {
+   "title": "主包体积要以 dist/build 产物为准统计，dev 产物含未分包页面会导致误判超限",
+   "type": "bug",
+   "content": "用户报「主包 2051KB 超过 2048KB」时，实际 `dist/build/mp-weixin` 只有 1901.7KB（未超）。误判来源：\n\n1. 用了 **dev 编译产物**或未完整 rebuild：dev 的 `vendor.js` 902KB（build 仅 453KB），dev 的 `static/` 317KB/178 文件（build 仅 91KB/39 文件）。\n2. `dist/dev` 已过期：其 app.json 只有 3 个主包页，而源码 pages.json 已有 9 个。\n3. 未提交改动尚未反映到 dist/build。\n4. 微信 IDE「代码包体积」统计口径与本地逐文件求和略有差异。\n\n排查套路：以 `dist/build/mp-weixin/app.json` 的 pages 数组确定主包页数，按目录（components / common/vendor.js / node-modules / pages / static / staff / api+utils）逐项 du 排序，并结合 pages.json 判断哪些页面/组件落到了主包。",
+   "evidence": "只读调查结论表：dist/build/mp-weixin 主包页数 9（与 src/pages.json 一致），实测 1901.7KB，-146.3KB 未超；dist/dev/mp-weixin 主包页数 3（过期，缺 login + 5 个 staff 页），1876.9KB。解释 2051KB 与 build 的 ~149KB 差距的 4 条原因，其中 dev vendor.js 902KB vs build 453KB、dev static 317KB/178 文件 vs build 91KB/39 文件。",
+   "files": [
+    "pages.json",
+    "src/pages.json",
+    "dist/build/mp-weixin/app.json",
+    "dist/dev/mp-weixin/app.json",
+    "src/static"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "5a1f78af-e1da-490b-b9a5-cb8ff88db9ce"
+   ],
+   "bundle": "014.md"
+  },
+  {
+   "title": "主包超限的标准解法：把 ECharts 组件迁入 staff 分包并配置 componentPlaceholder 异步化",
+   "type": "pattern",
+   "content": "主包体积超限时，本项目已验证的解法是把重依赖组件下沉到分包并做「分包异步化」：\n\n1. 迁移组件：`src/components/echarts-uniapp/` → `src/staff/pages/components/echarts-uniapp/`（echarts.min.js 约 505KB），删除主包中的旧目录。\n2. 更新引用：`src/pages/staff/statistics/index.vue` 改为 `import ... from '@/staff/pages/components/echarts-uniapp/echarts-uniapp.vue'`。\n3. 在 `src/pages.json` 里给 statistics 页加 `componentPlaceholder: { \"echarts-uniapp\": \"view\" }`，让主包不静态依赖该组件。\n4. 清理 `vite.config.ts` 中指向旧 echarts 路径的 `manualChunks` 规则，避免仍被拉进主包。\n\n效果：主包从约 1900–2051KB 降到 **1384KB**（余量约 664KB）。验证点：主包 `components/echarts-uniapp/` 不存在、分包内 echarts.min.js 存在、`pages/staff/statistics/index.json` 的 usingComponents 指向分包路径且含 componentPlaceholder。\n\n排查经验：主包 `components/` 约 700KB 中 echarts 占 ~505KB，是首要优化目标；`src/static/` 会被 uni-app 整包复制进主包。",
+   "evidence": "用户遇到上传报错 main package source size 2051KB exceed max limit 2048KB，要求做 ECharts 分包异步化。完成：迁移 src/components/echarts-uniapp/ 到 src/staff/pages/components/echarts-uniapp/ 并删除旧目录；改 statistics/index.vue 的 import；pages.json 的 statistics 页加 componentPlaceholder: { \"echarts-uniapp\": \"view\" }；移除 vite.config.ts 中指向旧 echarts 路径的 manualChunks。构建验证主包 1384KB，余量约 664KB，index.json usingComponents 指向 ../../../staff/pages/components/echarts-uniapp/echarts-uniapp。",
+   "files": [
+    "src/pages.json",
+    "src/pages/staff/statistics/index.vue",
+    "src/components/echarts-uniapp/echarts-uniapp.vue",
+    "src/staff/pages/components/echarts-uniapp/echarts-uniapp.vue",
+    "vite.config.ts"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "a2920f48-bc1c-43ef-99b0-6a3a3cd17b59"
+   ],
+   "bundle": "014.md"
+  },
+  {
+   "title": "小程序分包之间不能跨包引用静态资源，图片/图标会加载失败显示空白",
+   "type": "bug",
+   "content": "踩坑：员工端收银台页面位于 staff 分包，却引用了 pages_property 分包的静态资源路径（如 /pages_property/static/payment-unionpay.png）。微信小程序分包之间不能跨包访问静态资源，导致图标全部加载失败、页面空白。\n\n根因：uni-app + 微信小程序的分包隔离机制——分包代码只能访问主包与自己分包内的资源，跨分包路径在编译后不会被打包进目标分包。\n\n可复用的解决套路：\n1. 判断资源使用方是否跨分包；跨分包时不要引用对方分包 static 目录。\n2. 把共享静态资源复制到主包 src/static/images/<领域>/ 下（本例：payment-security/alipay/wechat/unionpay.png）。\n3. 把引用路径改为绝对主包路径 /static/images/payment/...。\n4. 用 npm run build:mp-weixin 构建后，检查产物 dist/build/mp-weixin/static/... 下资源是否真实输出，并 grep 编译后的 .wxml 确认路径已改写为 /static/...。\n\n预防：新增分包页面时，图标/图片要么放在本分包 static，要么统一放主包 /static，禁止跨分包引用。",
+   "evidence": "会话最终结论：「员工端收银台在 staff/pages 分包中，却引用了 pages_property 分包的静态资源路径……微信小程序分包之间不能跨包访问静态资源，导致图标加载失败、显示空白」。修复为复制 4 个图标到 src/static/images/payment/ 并改 result.vue 中 4 处路径；验证方式为 npm run build:mp-weixin 后确认 result.wxml 中路径与 dist/build/mp-weixin/static/images/payment/ 产物。",
+   "files": [
+    "src/staff/pages/cashier/result.vue",
+    "src/pages_property/payment/components/PaymentChannelPopup.vue",
+    "src/static/images/payment/",
+    "src/pages.json",
+    "dist/build/mp-weixin/staff/pages/cashier/result.wxml"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "063926e1-81eb-4ec1-8c58-48628b674723"
+   ],
+   "bundle": "015.md"
+  },
+  {
+   "title": "分包新增页面约定：pages.json 注册路径不带分包前缀，页面内跳转必须写完整分包路径",
+   "type": "workflow",
+   "content": "项目约定：src/pages.json 中以 root 声明分包（如 pages_facility），分包内页面 path 只写相对路径（\"facility/detail\"、\"facility/repair\"），不带分包目录前缀；而页面代码里 uni.navigateTo 的 url 必须写完整路径 /pages_facility/xxx。\n\n可复用套路——把整个目录迁入/新建为分包时的改动清单：\n1. 在 pages.json 的对应分包 subPackages[].pages 中按相对路径注册所有页面，并补 navigationBarTitleText。\n2. 全量排查分包内所有 .vue 的跳转地址：页面内互跳改为本分包完整路径；原本为空的 url 要补全（本项目发现 facility.vue 中「报修」的 url 为空）。\n3. 跨分包跳转保持原样（如 /pages_owner/repair/add），不做替换。\n4. 检查入口页（如首页各 complexCard 入口）的 path 是否需要指向新分包首页 /pages_<分包名>/index。\n\n记忆要点：分包注册路径 vs 跳转路径格式不一致是这类改造最容易漏改的点。",
+   "evidence": "用户诉求 1：「将此目录添加到新的分包，注册所有文件为路由」并给出 \"path\": \"facility/index\" 这类不带前缀的注册写法；诉求 2：「调整里面对应的路由跳转地址为新地址」。最终结论列出 index.vue/facility.vue/repair.vue 改为 /pages_facility/...，其中「报修：/pages_facility/repair（原为空的 url，已补全）」，跨分包 /pages_owner/repair/add 未改动，并提示首页 complexCard.vue 入口 path 为空可改为 /pages_facility/index。",
+   "files": [
+    "src/pages.json",
+    "src/pages_facility/index.vue",
+    "src/pages_facility/facility.vue",
+    "src/pages_facility/detail.vue",
+    "src/pages_facility/repair.vue",
+    "src/pages_facility/record.vue",
+    "src/pages/index/property.vue"
+   ],
+   "baseline": "05fd6b3c",
+   "sessionIds": [
+    "c53fece1-0d8d-4440-848b-8c4dbbb9fbe1"
+   ],
+   "bundle": "015.md"
+  },
+  {
+   "title": "状态字段用字典映射，不用硬编码中文（如所处阶段 MF_CURRENT_STATE）",
+   "type": "pattern",
+   "content": "项目约定：后端返回的状态/阶段等枚举字段不做硬编码文案，统一走字典映射。例：维修项目列表的「所处阶段」使用字典 MF_CURRENT_STATE 映射取值。\n\n复用要点：列表页渲染状态类字段时，先确认接口是否返回 code，再通过项目内的字典（字典 key 由后端字典编码决定，如 MF_CURRENT_STATE）转成展示文案，避免在前端写 if/else 硬编码枚举。新增同类页面时沿用该套路。",
+   "evidence": "用户诉求 2 原文仅一句：「所处阶段使用字典映射MF_CURRENT_STATE」，随后被采纳为 project.vue 的实现方式。",
+   "files": [
+    "src/pages_maintain_project/project.vue",
+    "src/pages_maintain_project/maintainProject.js"
+   ],
+   "baseline": "fc30f049",
+   "sessionIds": [
+    "bc34b808-3561-437d-9b34-098a77d7e44d"
+   ],
+   "bundle": "015.md"
+  },
+  {
+   "title": "接口字段有对应值就不要在前端用列表长度二次计算，且 0 也要正常显示",
+   "type": "bug",
+   "content": "踩坑/约定：维修项目列表的「维修申请数量」曾用 houseMaintenanceApplyVoList.length 在前端计算成 applyCount，但接口本身就返回 objectNum 字段，属于重复造数据、可能与后端口径不一致。\n\n修正做法：列表直接渲染 item.objectNum，仅在 null / undefined / 空字符串时显示占位符 '-'，0 必须正常显示为 0（即不能用 falsy 判断，要用显式 null/undefined/'' 检查）；同时删除前端计算的 applyCount，字段随 ...row 展开保留在列表项上。\n\n复用要点：接口已返回的统计字段优先直接用；数字展示统一用显式空值判断，避免 0 被吞成 '-'。另注意文案要与字段含义对齐（objectNum 意为「维修对象数」，若标签写成「维修申请数量」需提示确认）。",
+   "evidence": "用户诉求 3：「这里改成维修申请数量」→ 诉求 4：「用objectNum字段」。最终结论：「该行展示改为 item.objectNum；仅在 null / undefined / 空字符串时显示 -，0 会正常显示为 0」；「maintainProject.js：去掉了用 houseMaintenanceApplyVoList.length 算出来的 applyCount」，并提示 objectNum 含义为「维修对象数」。",
+   "files": [
+    "src/pages_maintain_project/project.vue",
+    "src/pages_maintain_project/maintainProject.js"
+   ],
+   "baseline": "fc30f049",
+   "sessionIds": [
+    "bc34b808-3561-437d-9b34-098a77d7e44d"
+   ],
+   "bundle": "015.md"
+  },
+  {
+   "title": "列表页新建流程约定：页面 + pages.json 注册 + 同目录 mock 接口模块三件套",
+   "type": "workflow",
+   "content": "项目内新增列表/详情页的既定套路（已多次沿用）：\n1. 在对应分包目录下建 .vue 页面（如 src/pages_maintain_project/object-detail.vue）。\n2. 在 src/pages.json 注册路由。\n3. 同目录建同名数据模块（如 src/pages_maintain_project/maintainProject.js）接管该分包的接口调用与 mock，页面不直接散写请求。\n4. 图标等资源放本分包 static/ 目录（如 pages_maintain_project/static/comple.svg、construction.svg），并按设计图还原 UI。\n\n复用要点：分包内的接口封装就近放分包目录同名的 js 模块，保持页面—接口—路由三处位置对应，便于后续接真实接口时整体替换。",
+   "evidence": "用户诉求 1 原文：「在@src/pages_maintain_project 目录创建维修对象详情页面，@src/pages.json 注册路由，@src/pages_maintain_project/maintainProject.js 模拟接口，按照设计图100%换UI页面……用到的图标」。后续会话 bc34b808 中该 maintainProject.js 仍作为该分包的接口层被修改，说明模式延续。",
+   "files": [
+    "src/pages_maintain_project/object-detail.vue",
+    "src/pages_maintain_project/maintainProject.js",
+    "src/pages.json",
+    "src/pages_maintain_project/static/comple.svg",
+    "src/pages_maintain_project/static/construction.svg"
+   ],
+   "baseline": "3f2bc40c",
+   "sessionIds": [
+    "ed6ed731-86ed-4b68-8d06-be214f263b02"
+   ],
+   "bundle": "015.md"
+  },
+  {
+   "title": "密码提交前必须 AES 加密：rawPassword cannot be null 的根因",
+   "type": "bug",
+   "content": "改密码报 `rawPassword cannot be null` 并非后端 bug，而是小程序把明文密码直接提交，后端 decrypt 失败得到 null，再交给 Spring Security 的 BCryptPasswordEncoder 加密就抛该错。服务端与登录接口一致要求密码先经 AES 加密再传输。修复方式：在 src/staff/pages/profile/change-password.vue 提交前对 oldPassword / newPassword 调用 src/staff/utils/passwordEncrypt.js 的 encryptPassword，与 src/staff/pages/login/index.vue 保持一致。可复用套路：任何新增的“密码类”接口（改密、重置、二次验证）都要先走 encryptPassword，不要直接传明文。",
+   "evidence": "报错 `rawPassword cannot be null` 来自 Spring Security 的 BCryptPasswordEncoder：后端在加密新密码时收到了 null。…小程序这边之前少了加密步骤，后端解密失败后就触发了该错误。…已在 src/staff/pages/profile/change-password.vue 中，提交前对原密码和新密码调用 encryptPassword（与登录页逻辑一致）。参照 Web 管理端 泰兴G/zhi2-web-admin 的 resetPwd.vue 同样用 encryptPassword 包裹 oldPassword/newPassword。",
+   "files": [
+    "src/staff/pages/profile/change-password.vue",
+    "src/staff/utils/passwordEncrypt.js",
+    "src/staff/pages/login/index.vue",
+    "src/staff/api/security.js"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "10888bdc-54d2-4048-989f-b70f9519c3dc"
+   ],
+   "bundle": "016.md"
+  },
+  {
+   "title": "知识库接口参数约定：keyWord 大写 W、分类筛选用 categoryId",
+   "type": "fact",
+   "content": "分页接口 `/property/knowledgeBase/page` 的筛选参数是 `keyWord`（注意大写 W）与 `categoryId`，不是 `knowledgeCategoryId`。src/staff/api/knowledge.js 中 getKnowledgePage 默认注入 pageNum/pageSize/publishStatus:1，其余 params 透传，所以调用方直接传 keyWord、categoryId 即可。`knowledgeCategoryId` 只出现在响应体的分类字段里，从未作为请求参数使用。`/property/knowledgeBase/category/tree` 的注释虽写“支持按分类名称或关键字筛选”，但未标明参数名，且仓库内所有调用处均未传参——需要按分类/关键字过滤时不要臆造参数名，应以后端确认为准或复用 page 的 keyWord+categoryId。/property/workOrder/knowledge/search 是工单场景引用知识库的独立搜索接口。",
+   "evidence": "`knowledgeCategoryId` **从未作为请求参数**出现，仅用于解析**响应**中的分类字段。…请求参数：pageNum / pageSize（20）/ publishStatus 固定 1 / `keyWord` 关键字搜索（注意大写 W）/ `categoryId` 分类筛选。…`/property/knowledgeBase/category/tree` 注释写“支持按分类名称或关键字筛选”，但**未写明具体参数名**，且所有调用处均未传参。仓库内**未发现** Swagger/OpenAPI、mock 数据或独立 API 文档文件。",
+   "files": [
+    "src/staff/api/knowledge.js",
+    "src/staff/pages/knowledge/index.vue",
+    "src/staff/utils/knowledgeCategory.js",
+    "src/staff/pages_facility/issue/aiKnowledge.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "c74fca2a-5633-46a1-9691-2063df1d7247"
+   ],
+   "bundle": "016.md"
+  },
+  {
+   "title": "项目无 API 文档，接口参数唯一权威来源是 api 层与调用点",
+   "type": "workflow",
+   "content": "泰兴小程序仓库内没有 Swagger/OpenAPI、mock 数据或独立 API 文档，所有接口定义与参数用法只能从 `src/**/api/*.js` 的封装和各页面实际调用反推。因此接新接口或排查“参数传错/字段为 undefined”时，先读对应 api 模块（如 src/staff/api/knowledge.js、src/api/maintenance.js、src/staff/api/maintenance.js），再看调用处的实参，并注意默认值（如 publishStatus: 1）与 `...params` 透传顺序；必要时用 git log -S \"参数名\" 追溯历史实现。标注为“支持某筛选”但未写参数名的注释不可当作可靠依据。",
+   "evidence": "仓库内**未发现** Swagger/OpenAPI、mock 数据或独立 API 文档文件。知识库相关接口定义与参数用法全部来自 `src/staff/api/knowledge.js` 及各页面的实际调用。…`/property/knowledgeBase/category/tree` 注释写“支持按分类名称或关键字筛选”，但**未写明具体参数名**。该会话通过 `git log -S` 检索 knowledgeCategoryId / getKnowledgePage / knowledgeBase/page / keyWord 等历史痕迹来确认参数变迁。",
+   "files": [
+    "src/staff/api/knowledge.js",
+    "src/staff/api/index.js",
+    "src/api/maintenance.js",
+    "README.md"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "c74fca2a-5633-46a1-9691-2063df1d7247"
+   ],
+   "bundle": "016.md"
+  },
+  {
+   "title": "详情页字段要按业务顺序与新增页对齐，空字段显示 -",
+   "type": "pattern",
+   "content": "用户反馈“巡检结果下面缺少巡检人和联系电话”时，根因往往不是没渲染而是：①字段顺序与新增页不一致，被下方长内容顶出视野；②页面被无关数据撑长。修复约定：详情页展示顺序与新增/编辑页保持一致（本例 程序 → 频次 → 日期 → 巡检结果 → 巡检人 → 联系电话），所有可能缺值的字段统一用 `-` 占位而不是留白。做详情页时先对照对应的 add 页字段顺序，再决定是否补回退取数逻辑。",
+   "evidence": "**字段顺序不对**：详情页里「巡检人」「联系电话」排在「巡检结果」**上面**，往下滚过结果和步骤后，容易以为下面没有这两项。…**字段可能为空**：`app` 详情接口有时不带 `inspectPerson` / `inspectPhone`，页面显示空白。…修复内容：调整顺序，与新增页一致：程序 → 频次 → 日期 → **巡检结果** → **巡检人** → **联系电话** … 空值显示 `-`。",
+   "files": [
+    "src/staff/pages_facility/record/detail.vue",
+    "src/staff/pages_facility/record/add.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "b9405f2a-0ee5-4810-86af-5e99506d88f3"
+   ],
+   "bundle": "016.md"
+  },
+  {
+   "title": "空数据回退取数要选对接口：步骤为空不能回退调记录列表接口",
+   "type": "bug",
+   "content": "记录详情页“页面异常拉长”的根因：步骤数据为空时错误地回退调用 `getRecordPage`（查的是记录列表而非步骤），最多渲染 50 条把页面撑长。修复约定：缺数据回退必须使用语义匹配的接口——人员的补全走 `getRecordDetail`，步骤走步骤接口；不要用列表接口兜底详情字段。同时详情页容器里的可编辑/只读文本区域要设最大高度（本例 ZsTextarea 限 320rpx），避免长文本把下半页关键字段顶出屏幕。",
+   "evidence": "**页面异常拉长**：步骤数据为空时，错误地调用了 `getRecordPage`（查的是**记录列表**，不是步骤），最多渲染 50 条，页面会变得很长。…去掉错误的 `getRecordPage` 回退；缺字段时回退 `getRecordDetail` 补全人员和步骤。…限制「巡检结果」输入框最高 `320rpx`，避免把下方「巡检人」「联系电话」顶到屏幕外。",
+   "files": [
+    "src/staff/pages_facility/record/detail.vue",
+    "src/staff/api/maintenance.js",
+    "src/staff/components/PageButton/PageButton.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "b9405f2a-0ee5-4810-86af-5e99506d88f3"
+   ],
+   "bundle": "016.md"
+  },
+  {
+   "title": "自定义 tabbar 页面顶部留白存在两套体系，新增页需显式选择",
+   "type": "pattern",
+   "content": "pages.json 中配置了 7 个自定义 tab 页（custom: true）：5 个 staff tab 用 StaffCustomTabbar，2 个 owner tab 用 CustomTabbar。顶部留白并无统一的 bg-header 共用组件，主流做法是内联 ``paddingTop = 110/2 + statusBarHeight``（home、workbench 同款公式，statusBarHeight 来自 useStatusBar() / uni.getSystemInfoSync()）；organization 用 ZsNav + hero 绝对定位，profile 用 `<StatusBar />` 占位，owner 侧 newHome 用 CSS 变量 + 绝对定位 title，property 直接走系统导航栏。顶部不使用 env(safe-area-inset-top)，而底部统一 ``padding-bottom: calc(28rpx + env(safe-area-inset-bottom))``。新增或改造 tab 页时应沿用目标分组已有的那套留白方式，不要引入第三种方案。",
+   "evidence": "项目 `pages.json` 中配置了 **7 个 tab 页**（`custom: true`），其中 **5 个 staff tab** 使用 `StaffCustomTabbar`，**2 个 owner tab** 使用 `CustomTabbar`。**未发现** 名为 `bg-header` 的共用组件。…staff 首页/工作台：内联 `paddingTop`，公式 `paddingTop = 55px + statusBarHeight`（110/2 为设计稿导航区高度）… `.home-page { padding-bottom: calc(28rpx + env(safe-area-inset-bottom)) }`…顶部未使用 `env(safe-area-inset-top)`。",
+   "files": [
+    "src/pages.json",
+    "src/pages/staff/home/index.vue",
+    "src/pages/staff/workbench/index.vue",
+    "src/pages/staff/profile/index.vue",
+    "src/staff/components/StaffCustomTabbar/StaffCustomTabbar.vue",
+    "src/staff/components/CustomTabbar/CustomTabbar.vue"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "4eee871d-cc32-4a32-b920-b0ae6ac923bb"
+   ],
+   "bundle": "016.md"
+  },
+  {
+   "title": "维保/巡检记录接口约定：recordType=1 为维保，搜索走 appKeyWord",
+   "type": "fact",
+   "content": "设施设备的记录类数据统一走 `/v2.0/dataProperty/recordProcess/appPage` + 详情接口：分页查询用 getRecordProcessPage，`recordType: '1'` 表示维保（巡检另值）；关键字搜索用 `appKeyWord`（不是 keyWord），另有 `keyWord`、`bizState`、`facilityId`、`facilityDefinitionId`、`inspectStartDate`/`inspectEndDate`。列表页从路由参数 `id` 读取 facilityId（由设施设备页跳转带入），分页统一用 z-paging。详情图片字段不固定（photo / photos / fileList 等），需兼容数组与逗号分隔字符串两种形态。列表描述文本降级优先级：result → inspectExplain → facilityName + procedureName。",
+   "evidence": "`getRecordProcessPage` — 分页查询，`recordType: '1'` 表示维保；`getRecordProcessDetail` — 按 id 查询详情。…搜索框，关键字走 `appKeyWord`；使用 `z-paging` 分页加载；从路由参数 `id` 读取 `facilityId`。…描述优先级：`result` → `inspectExplain` → `facilityName + procedureName`。…**维保图片**：支持 `photo`、`photos`、`fileList` 等常见字段，逗号分隔字符串或数组均可。接口入参含 appKeyWord(关键字)、keyWord、bizState(单据状态)、facilityId、facilityDefinitionId、inspectStartDate/inspectEndDate。",
+   "files": [
+    "src/api/maintenance.js",
+    "src/pages_facility/maintain.vue",
+    "src/pages_facility/maintain-detail.vue"
+   ],
+   "baseline": "05fd6b3c",
+   "sessionIds": [
+    "89ef190e-f844-4ad3-a678-016bfbe59c1c"
+   ],
+   "bundle": "016.md"
+  },
+  {
+   "title": "UnoCSS 类名不能含小数点，否则 WXSS 编译报 unexpected \\",
+   "type": "bug",
+   "content": "微信小程序 WXSS 不支持在选择器里用反斜杠转义字符，所以 UnoCSS 生成的点号类名（如模板里写 `leading-1.4` 生成的 `.leading-1\\.4`）会让 app.wxss 编译直接报 `unexpected \\`。另外旧规则 `/^leading-([.\\d]+)$/` 会把 1.4 当成 1.4rpx 行高，语义也是错的。排查套路：去 dist/build/mp-weixin/app.wxss 里按报错字符位置定位非法选择器，再反查 uno.config.ts 规则和模板类名。修复约定：行高倍数用无单位值，类名写 `leading-1-4` 这类不含 `.` 的命名（在 uno.config.ts 里加静态规则 `leading-1-4 -> line-height: 1.4`）。",
+   "evidence": "报错 `./app.wxss(1:7219): unexpected \\`，定位为 UnoCSS 生成的 `.leading-1\\.4`；最终结论明确“在小程序里用 UnoCSS 时，不要用带小数点的类名（例如 xxx-1.4），否则会再次生成 `\\.`”。",
+   "files": [
+    "d:/repository/泰兴小程序/uno.config.ts",
+    "d:/repository/泰兴小程序/src/pages_owner/decision/components/multiple/OptionCardList.vue",
+    "d:/repository/泰兴小程序/dist/build/mp-weixin/app.wxss"
+   ],
+   "baseline": "1373932a",
+   "sessionIds": [
+    "a0d0009b-0349-4d48-8002-ad825a15e96d"
+   ],
+   "bundle": "017.md"
+  },
+  {
+   "title": "小程序图片路径不存在会被解析到 __pageframe__ 并加载失败；静态图走 CDN 地址",
+   "type": "pattern",
+   "content": "模板里引用了仓库中不存在的本地路径（如 `/static/organization/search.png`）时，微信开发者工具会把它解析成 `http://127.0.0.1:25100/__pageframe__/static/...` 并报「渲染层网络层错误 Failed to load image」。排查第一步是用 curl -I 直接验证目标资源是否存在，确认是缺文件而不是网络问题。项目约定：小程序的图标/静态图统一用 CDN 域名 `https://www.ylzhwy.com:8081/zhi2/static-xcx/...`（与其他页面保持一致），若要本地化则必须把文件真正放进 `src/static/`。",
+   "evidence": "报错 `Failed to load image http://127.0.0.1:25100/__pageframe__/static/organization/search.png`；结论：「原因：/static/organization/search.png 在仓库中不存在，微信开发者工具会将其解析为 127.0.0.1:25100/__pageframe__/... 并加载失败」，修复为改用 CDN 地址，并提示 CDN 未部署时 404 需改用本地 src/static。",
+   "files": [
+    "d:/repository/泰兴小程序/src/staff/pages/complex-select/index.vue",
+    "d:/repository/泰兴小程序/src/pages.json",
+    "d:/repository/泰兴小程序/src/env/mp.js"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "9d087ad1-9371-48e0-a759-a1977d0f33fa"
+   ],
+   "bundle": "017.md"
+  },
+  {
+   "title": "小程序页面底色/分区靠 page 级背景色 + pages.json 的 backgroundColor 双管齐下",
+   "type": "workflow",
+   "content": "白卡片分区不显示、下拉露白这类问题，根因是页面 body 底色没铺。可复用修法（三处一起改）：1) 在页面样式里加**非 scoped** 的 `page { background: #f7f7f7; }`，并与同类页面（如 detailScrap.vue）保持颜色一致；2) 页面容器根类补 `min-height: 100vh` + `background` + `box-sizing: border-box`；3) 在 `src/pages.json` 对应路由加 `\"backgroundColor\": \"#f7f7f7\"`，避免下拉回弹时露白。另注意 `:deep(uni-page-body)` 这类写法在小程序端无效，不要用来改页面底色。项目统一浅灰底色为 #f7f7f7。",
+   "evidence": "结论：新增非 scoped 的 `page { background: #f7f7f7; }`，`.add-record-page` 补 min-height/background/box-sizing，移除无效的 `:deep(uni-page-body)` 写法，pages.json 的 record/detail 路由增加 backgroundColor 避免下拉露白。",
+   "files": [
+    "d:/repository/泰兴小程序/src/staff/pages_facility/record/detail.vue",
+    "d:/repository/泰兴小程序/src/pages.json"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "1c084a78-e3f9-4415-96c7-c73e01f31b78"
+   ],
+   "bundle": "017.md"
+  },
+  {
+   "title": "巡检记录新增采用两步流程：选程序后步骤内联展示，底部按钮不变",
+   "type": "preference",
+   "content": "用户明确要求的交互方案（巡检记录新增页）：第 1 步选巡检程序后，**下方立即内联显示巡检步骤列表（含新增/编辑）**，不要跳转到单独的“程序/步骤”切换页，底部按钮始终保持「返回 + 下一步」（未选程序时下一步置灰）；第 2 步才填写巡检频次、日期、结果等信息并提交，底部变为「返回 + 提交」，返回回到第 1 步。后续改动该页面时不要改成多步 wizard 或额外步骤，也不要在选完程序时改变底部按钮形态。",
+   "evidence": "用户诉求原文：“选择巡检程序后，下方立即显示巡检步骤列表（含新增/编辑），此时底部不需要变化，还是「返回 + 下一步」”；并抱怨“把之前选择巡检程序名称，下面巡检步骤直接出现的逻辑丢了”。",
+   "files": [
+    "d:/repository/泰兴小程序/src/staff/pages_facility/record/add.vue",
+    "d:/repository/泰兴小程序/src/staff/components/PageButton/PageButton.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "ff955254-47e0-44f8-8cb5-4f6fd6774685"
+   ],
+   "bundle": "017.md"
+  },
+  {
+   "title": "UI 页面必须严格 100% 还原设计稿：用户反复验收并要求按设计稿重建",
+   "type": "preference",
+   "content": "用户对设计稿还原度要求很高，多轮会直接差评（“这个和设计稿差太多了吧”“差太多了，100% 还原设计稿，不行就重新做页面”）。可复用做法：新建页面时先按设计图逐项对齐**字号体系**（标题字号/行高、标签字号、金额字号、单位字号整体成套放大，而不是只改单个值），再对齐布局结构（例如“费用 + 单位类型在同一行，标题单独一行”这类明确排版要求）。交付后主动给出“标题大小/金额大小”两个旋钮让用户一句话收口，比反复猜更省轮次。",
+   "evidence": "用户诉求 2/3/4/5/6 连续要求还原：差太多 → 100% 还原，不行就重新做页面 → 右侧费用和单位类型一行、标题单独一行 → 字体大小差距也很大。最终结论按字号体系（28->40rpx、24->28rpx、46->52rpx 等）整体重调。",
+   "files": [
+    "d:/repository/泰兴小程序/src/pages_maintain_project/final-cost-detail.vue",
+    "d:/repository/泰兴小程序/src/pages_maintain_project/maintainProject.js",
+    "d:/repository/泰兴小程序/src/pages.json"
+   ],
+   "baseline": "3f2bc40c",
+   "sessionIds": [
+    "4c90dc3a-eeec-4537-9d3c-3ea81520df95"
+   ],
+   "bundle": "017.md"
+  },
+  {
+   "title": "新建页面标准套路：页面目录 + pages.json 注册路由 + 模块 js 假接口 + 目录 static 图标",
+   "type": "pattern",
+   "content": "该项目新增页面的固定落位约定：业务页放在对应的 `src/pages_xxx_yyy/` 目录下（如 pages_maintain_project、pages_facility、pages_owner），页面专属数据模拟接口写在同目录的模块 js 里（如 maintainProject.js），路由必须在 `src/pages.json` 注册，页面专属图标放在该目录的 `static/` 下（如 鉴定.svg、审计.svg、施工.svg、其他.svg 直接引用）。请求层集中在 `src/api/*.js`（如 property.js）。",
+   "evidence": "用户诉求 1：“在 @src/pages_maintain_project 目录创建决算费用明细页面，@src/pages.json 注册路由，@src/pages_maintain_project/maintainProject.js 模拟接口……用到的图标”；后续会话同样涉及 src/pages_facility、src/pages_owner/repair、src/api/property.js。",
+   "files": [
+    "d:/repository/泰兴小程序/src/pages.json",
+    "d:/repository/泰兴小程序/src/pages_maintain_project/maintainProject.js",
+    "d:/repository/泰兴小程序/src/api/property.js"
+   ],
+   "baseline": "3f2bc40c",
+   "sessionIds": [
+    "4c90dc3a-eeec-4537-9d3c-3ea81520df95",
+    "fe1cae8c-b588-497a-8bc8-15bc06366667"
+   ],
+   "bundle": "017.md"
+  },
+  {
+   "title": "设施设备页报修改为直达提交页，提交页需兼容 URL 直传设备参数",
+   "type": "workflow",
+   "content": "从设施设备列表点「报修」不再经过分类选择页，而是直达 `/pages_owner/repair/submit`，通过 URL 携带 `facilityId`、`facilityName`、`complexId`；submit.vue 需支持从 URL 直接接收设施设备参数并自动填入「报修设施设备」。关键坑：走这条捷径时 `repair_category` 缓存不存在，页面必须兜底——自动拉取报修分类并默认使用「公用设备」（`eventTypeId=15`），否则提交页无法正常展示和提交。新增类似的“跨页直达 + 预填”入口时沿用这套参数 + 缓存兜底约定。",
+   "evidence": "用户诉求 2 要求跳转到 pages_owner/repair/submit 并带设备；结论：“无 repair_category 缓存时（从设施设备直跳），自动拉取报修分类，默认使用「公用设备」（eventTypeId=15），保证提交页可正常展示和提交”。",
+   "files": [
+    "d:/repository/泰兴小程序/src/pages_facility/facility.vue",
+    "d:/repository/泰兴小程序/src/pages_owner/repair/submit.vue",
+    "d:/repository/泰兴小程序/src/pages_owner/repair/add.vue",
+    "d:/repository/泰兴小程序/src/api/property.js"
+   ],
+   "baseline": "05fd6b3c",
+   "sessionIds": [
+    "fe1cae8c-b588-497a-8bc8-15bc06366667"
+   ],
+   "bundle": "017.md"
+  },
+  {
+   "title": "web-view 页面读 url 参数必须写在 onLoad，不能用 onShow",
+   "type": "bug",
+   "content": "pages_common/common/webView.vue 原先在 onShow 里读取 options.url 拿到的是 undefined，导致 navigateTo 带 url 参数跳转到 web-view 页面时白屏（如「三方鉴定」H5 打不开）。根因：uni-app 中 onShow 无法获取页面 query，只有 onLoad(options) 才有。修复方式是把取参逻辑从 onShow 移到 onLoad。凡是需要接收路由参数的页面（web-view、详情页等）都应遵循此约定。",
+   "evidence": "会话 8423032e 最终结论第 5 条：「用 onLoad 读取 url 参数（原先写在 onShow 里拿不到 query），保证『三方鉴定』里 navigateTo 带链接的 web-view 能正常打开」。",
+   "files": [
+    "src/pages_common/common/webView.vue"
+   ],
+   "baseline": "3f2bc40c",
+   "sessionIds": [
+    "8423032e-220a-46e3-bdbb-580197f7af34"
+   ],
+   "bundle": "018.md"
+  },
+  {
+   "title": "字典字段（如频次）统一用 getDict + getDictLabel 转中文，需带兜底",
+   "type": "pattern",
+   "content": "接口返回的字典型字段（例：procedure_frequency 维保频次）不要直接展示原始编码，也不要硬编码映射表。做法：页面加载时调用 getDict('procedure_frequency') 取字典，用计算属性（如 frequencyText）通过 getDictLabel(value) 转成中文标签；字典未匹配时回退显示原始值，值为空时显示 '--'；同时兼容后端字段名差异（procedureFrequency 与 frequency 都读）。这是项目里处理字典字段的通用套路。",
+   "evidence": "会话 a8d2449b 用户诉求 2「procedure_frequency频次使用字典」及最终结论：「页面加载时调用 getDict('procedure_frequency')」「新增 frequencyText 计算属性，用 getDictLabel 转换 procedureFrequency（兼容 frequency 字段）」「字典未匹配时回退显示原始值，无值时显示 --」。",
+   "files": [
+    "src/pages_facility/maintain-detail.vue",
+    "src/api/maintenance.js"
+   ],
+   "baseline": "05fd6b3c",
+   "sessionIds": [
+    "a8d2449b-d164-43b2-85d3-6742b02d3c70"
+   ],
+   "bundle": "018.md"
+  },
+  {
+   "title": "业主身份认证相关接口的项目字段名是 complexId，不是 project",
+   "type": "bug",
+   "content": "身份认证申请类接口（ctUserIdentityApply、ctUserIdentityApplyMatchAdd）的项目标识字段为 complexId（伴随 complexName），不是 project。register.vue 中表单字段 project 需整体改名 complexId（初始值/赋值/清空/提交约 10 处），manualRegister.vue 提交参数由 project: form.complexId 改为 complexId: form.complexId；用 ...form 展开提交时会自动携带。bindProject.vue 原本就是正确写法，可作为参照范例。新增此类接口调用时按 complexId 命名。",
+   "evidence": "会话 8f686549 用户诉求 2「身份认证申请接口 complexId 字段修复」及最终结论：「提交 ctUserIdentityApply 时通过 ...form 自动携带 complexId，不再发送 project」「manualRegister.vue 提交参数由 project: form.complexId 改为 complexId: form.complexId」「bindProject.vue 原本已正确，未改动」，请求体示例为 {\"complexId\": \"...\", \"complexName\": \"...\"}。",
+   "files": [
+    "src/pages_owner/house/owner/register.vue",
+    "src/pages_owner/house/owner/manualRegister.vue",
+    "src/pages_owner/house/owner/bindProject.vue"
+   ],
+   "baseline": "ca35b127",
+   "sessionIds": [
+    "8f686549-ce28-4537-b54d-f713033a7193"
+   ],
+   "bundle": "018.md"
+  },
+  {
+   "title": "多步表单用独立编辑页 + setStorageSync 传参 + $emit 回传结果",
+   "type": "pattern",
+   "content": "staff 端带「维护步骤」的复杂表单（添加巡检/维保/年检记录）采用三步向导：Step1 选程序、Step2 管理步骤列表、Step3 填频次/日期/结果后提交；步骤间数据不丢失，支持上一步；巡检/维保/年检共用同一页面，通过 type 动态切换文案与字段。子步骤的编辑/新增抽成独立页面（record/editStep.vue）而非弹窗：通过 uni.setStorageSync 传参给编辑页，编辑页用 uni.$emit('recordStepSaved') 把结果回传给上级页面。新增这类子页面需在 pages.json 注册路由（如 record/editStep）。",
+   "evidence": "会话 81f4c5db 用户诉求 2「添加巡检记录分步流程改造」及最终结论：add.vue 三步向导（选程序→管理步骤→填写提交）；「editStep.vue 独立页面编辑/新增步骤，通过 uni.setStorageSync 传参，uni.$emit('recordStepSaved') 回传结果」；pages.json 注册路由 record/editStep。",
+   "files": [
+    "src/staff/pages_facility/record/add.vue",
+    "src/staff/pages_facility/record/editStep.vue",
+    "src/pages.json"
+   ],
+   "baseline": "0f049619",
+   "sessionIds": [
+    "81f4c5db-d6ab-4997-8c61-67a131a447db"
+   ],
+   "bundle": "018.md"
+  }
+ ]
+}

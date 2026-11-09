@@ -1,0 +1,214 @@
+{
+ "project": "2-0",
+ "batch": 4,
+ "files": [
+  "013.md",
+  "014.md",
+  "015.md",
+  "016.md"
+ ],
+ "count": 13,
+ "memories": [
+  {
+   "title": "嵌套 zs-dialog 内控件点不动：须抬内层 wrapper/遮罩 z-index，不能只抬 el-select-dropdown",
+   "type": "bug",
+   "content": "「维修项」等内层 zs-dialog 嵌在父 zs-dialog 时，三角/整窗点不动的根因通常是父级全屏 .v-modal 仍盖住内层 .el-dialog__wrapper（Element PopupManager 分配不足），事件被父遮罩吃掉；仅给 el-select 的 popper-class 提高 z-index 无法抬高内层弹窗本身。修复：内层 zs-dialog 设 ref，在 @opened 回调里用 !important 将内层 .el-dialog__wrapper 设为约 5000、相邻 .v-modal（前后兄弟均判断）设为 4999，并在 $nextTick 与 setTimeout(0) 各执行一次以防 Element 回写 inline 样式；下拉面板 popper-class 再设更高（如 5100）保证展开层在内层弹窗之上。",
+   "evidence": "会话 f7fa3bf8：solicitation/maintenanceFeeDtlDialog 嵌套编辑弹窗内 el-select 无法点击，结论为层级在 wrapper/遮罩而非 dropdown。",
+   "files": [
+    "zhi2-web-admin/src/views/solicitation/components/maintenanceFeeDtlDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f7fa3bf8-e11d-41c2-ab82-7f380cbd83c7"
+   ],
+   "bundle": "013.md",
+   "project": "2-0"
+  },
+  {
+   "title": "ref=queryForm 的弹窗 zs-form：去掉 DetailTemplate 与 contentInfo",
+   "type": "workflow",
+   "content": "全局检索「DetailTemplate + v-if dialogMode view/else + 内层 zs-form ref=queryForm」结构时，统一改为模板只保留 <zs-form ref=\"queryForm\"> 及其子项（保留原有 v-show=\"showSearch\" 等），删除 DetailTemplate 包裹与 v-if/v-else；脚本侧删除对应 contentInfo 计算属性（或清空仅含它的 computed）。ref 为 form 的详情/编辑弹窗仍可按原 DetailTemplate 模式，不在此次规则内。",
+   "evidence": "会话 2c30fb51：按 queryForm 规则批量改 14 个 maintenance/benefit/property/evaluation 等弹窗组件。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue",
+    "zhi2-web-admin/src/views/maintenance/components/ScopeSelectDialog.vue",
+    "zhi2-web-admin/src/views/benefit/pubPaymentNotice/components/propertyProjectDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2c30fb51-d231-4c97-b3fd-4b938f11499b"
+   ],
+   "bundle": "013.md",
+   "project": "2-0"
+  },
+  {
+   "title": "HeadTitle 支持 link 类型，契约对齐 detail-template",
+   "type": "pattern",
+   "content": "详情顶栏 HeadTitle 的 headTitleList 项可设 type:'link'：模板用可点击 span（如 value-link）展示 value，@click 走 handleLinkClick；先 $emit('link-click', item)。link 为函数时只执行 item.link()（路由在调用方内，如 goToComplexDetail）；link 为以 / 开头的字符串时 router.push(path) 并支持 item.query；link 为含 path 的对象时 router.push(linkValue)。link 类型不渲染 getIconUrl 图标。样式与 detail-template 的 detail-link 一致（主题色、下划线、pointer）。",
+   "evidence": "会话 ae811080：扩展 HeadTitle/index.vue，propertyBid/detail 将招标计划编号改为 type link + link: goToComplexDetail。",
+   "files": [
+    "zhi2-web-admin/src/components/HeadTitle/index.vue",
+    "zhi2-web-admin/src/views/property/propertyBid/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ae811080-a0ec-4d52-b603-a6fb72f9ca69"
+   ],
+   "bundle": "013.md",
+   "project": "2-0"
+  },
+  {
+   "title": "招标方案详情关联招标备案编号跳转 localPropertyBid",
+   "type": "pattern",
+   "content": "propertyTenderPlan/detail 抬头「关联招标备案编号」：headTitleList 项 type:'link'，link 指向 methods 内 goToLocalPropertyBidDetail；方法内取 form.localPropertyBidId，空则 return，否则 router.push path 为 getRouterPathByFilePath('property/localPropertyBid/detail') + id，query 带 formMode:'view'。与 propertyBid 跳 complex 详情同一套 getRouterPathByFilePath + formMode 约定。",
+   "evidence": "会话 9fc24659：propertyTenderPlan/detail 配置 winCode 展示项为可点链接。",
+   "files": [
+    "zhi2-web-admin/src/views/property/propertyTenderPlan/detail.vue",
+    "zhi2-web-admin/src/views/property/propertyBid/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9fc24659-dae3-4dba-9cc3-f12e07ae4fca"
+   ],
+   "bundle": "013.md",
+   "project": "2-0"
+  },
+  {
+   "title": "Vue Router 4：全局 mixin 须用 currentRoute.value 读 query.formMode",
+   "type": "bug",
+   "content": "zhi2-web-admin 在 Vue Router 4 下 router.currentRoute 是 Ref，直接 router.currentRoute.query.formMode 会得到 undefined 并抛 Cannot read properties of undefined (reading 'formMode')。main.js 全局 mixin 的 computed formMode/currentRoute 及 methods goBack、changeFormState 均应先取 const current = router.currentRoute && router.currentRoute.value，再读 current.query、current.path 等，并对 current 做空值守卫。",
+   "evidence": "会话 b6010e11：main.js:80 formMode 报错，改为 currentRoute.value 后恢复。",
+   "files": [
+    "zhi2-web-admin/src/main.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b6010e11-77ce-4a06-bc26-84bea5793888"
+   ],
+   "bundle": "013.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] TagsView 标签无法跳转：router-link 带 custom 却未用插槽导航",
+   "type": "bug",
+   "content": "情况：zhi2-web-admin 布局 TagsView 中标签点击无反应。\n为什么：Vue Router 4 下给 router-link 加了 custom 后不会自动渲染可点击链接，必须用 v-slot=\"{ navigate }\" 等自定义导航；只写 custom 又不接插槽时表现为「点了没反应」。\n怎么做：若不需要完全自定义 DOM，直接去掉 custom，保留 :to 即可恢复默认跳转；若要坚持 custom，则把点击区域绑到 navigate 上。",
+   "evidence": "会话 90372e07：用户反馈 TagsView 不能点击跳转路由；结论为去掉 router-link 的 custom 属性后恢复正常。",
+   "files": [
+    "zhi2-web-admin/src/layout/components/TagsView/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "90372e07-25eb-4a0f-84f3-f63f39000430"
+   ],
+   "bundle": "015.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] Vue3 + Element Plus 关闭图标：弃用 el-icon-close 字体类，改用 @element-plus/icons-vue",
+   "type": "pattern",
+   "content": "情况：TagsView 等组件关闭叉号不显示。\n为什么：Element UI 时代的 class=\"el-icon-close\" 在 Element Plus 中已无对应字体图标，必须按需引入图标组件。\n怎么做：script 中 `import { Close } from '@element-plus/icons-vue'` 并注册；模板写 `<el-icon class=\"close-icon\" @click.prevent.stop=\"...\"><Close /></el-icon>`；样式选择器从 `.el-icon-close` 改为 `.close-icon` 保留 hover 尺寸。",
+   "evidence": "会话 90372e07：关闭图标不显示；改为 Close 组件 + el-icon 包裹并更新样式类名。",
+   "files": [
+    "zhi2-web-admin/src/layout/components/TagsView/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "90372e07-25eb-4a0f-84f3-f63f39000430"
+   ],
+   "bundle": "015.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] 搜索区 zs-select 高度不齐：Element Plus 的 el-select 内层改为 .el-select__wrapper",
+   "type": "bug",
+   "content": "情况：zs-search-form 搜索区里 zs-select 比 zs-input 矮或高度不一致。\n为什么：老样式只针对 `.el-input__inner` 设 min-height；Element Plus 的 el-select 主容器是 `.el-select__wrapper`，旧选择器命不中。\n怎么做：在 zs-search-form（或统一搜索区样式）用 :deep 为 `.el-form-item__content > .el-select .el-select__wrapper` 补 `min-height`/`height`（如 38px）与 `box-sizing: border-box`，与 input/cascader/date-editor 同一套高度。",
+   "evidence": "会话 5243d3e5：zs-select 尺寸与其他组件不一致；结论在 zs-search-form.vue 为 el-select__wrapper 补高度样式。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5243d3e5-5f28-4d11-a612-08a460e721ca"
+   ],
+   "bundle": "015.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] listMixins.data() 访问 this.$options.props 在 Vue3 部分场景会抛 undefined",
+   "type": "bug",
+   "content": "情况：列表重置（resetQuery / 搜索表单重置）报 Cannot read properties of undefined (reading 'props')，堆栈在 listMixins.js data()。\n为什么：Vue3 与某些 mixin/组合式混用场景下 this.$options 可能为 undefined，直接读 this.$options.props 会炸。\n怎么做：判空链改为 `if (!this.$options || !this.$options.props || !this.$options.props.desensitizeFlag)` 再写默认 desensitizeFlag；凡在 data() 里读 $options 的 mixin 都应同样防护。",
+   "evidence": "会话 9b1d4896：listMixins.js:16 与 zs-search-form 重置触发报错；结论为对 $options 先判空。",
+   "files": [
+    "zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9b1d4896-b6df-43ec-8825-e0a68abff6e2"
+   ],
+   "bundle": "015.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] 无断点 el-col 批量补全：scripts/fix-el-col-breakpoints.mjs",
+   "type": "workflow",
+   "content": "情况：全局要求所有没有任何 xs/sm/md/lg/xl 的 `<el-col>` 统一响应式列宽。\n规则：仅当五个断点属性**全部缺失**时补 `:xs=\"24\" :sm=\"12\" :md=\"12\" :lg=\"8\" :xl=\"8\"`；已有任意一个断点的 col 不改。\n怎么做：在 zhi2-web-admin 根目录执行 `node scripts/fix-el-col-breakpoints.mjs`，扫描 src（及 assets）；新增页面漏补后可重复跑脚本。",
+   "evidence": "会话 48486a6a：用户要求无断点属性则补 xl:8,lg:8,md:12,sm:12,xs:24；脚本 fix-el-col-breakpoints.mjs 更新约 294 个 Vue 文件。",
+   "files": [
+    "zhi2-web-admin/scripts/fix-el-col-breakpoints.mjs"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "48486a6a-ae40-4b6f-b0ae-edefd27a389c"
+   ],
+   "bundle": "015.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] 弃用 ::v-deep 组合符：全局改为 :deep(inner-selector)",
+   "type": "pattern",
+   "content": "情况：构建/样式告警 ::v-deep usage as a combinator has been deprecated。\n为什么：Vue 3 推荐函数式深度选择器，旧写法 `::v-deep .foo` 作为组合符已弃用。\n怎么做：机械替换为 `:deep(.foo)`；若外层还有前缀如 `.text-right ::v-deep input`，写成 `.text-right :deep(input)`；媒体查询内同样处理。",
+   "evidence": "会话 cebc7009：全局修复 ::v-deep；14 个 vue 文件改为 :deep(...) 后项目内无 ::v-deep 残留。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-select/zs-like-select.vue",
+    "zhi2-web-admin/src/views/benefit/bankDetailDay/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cebc7009-c718-45fb-bfb7-d7a640b5b79f"
+   ],
+   "bundle": "015.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] Element Plus 2.x 中文语言包导入：勿用 element-plus/es/locale/lang/zh-cn",
+   "type": "bug",
+   "content": "情况：ESLint import/no-cycle 或运行解析报 ERR_PACKAGE_PATH_NOT_EXPORTED，子路径 `./es/locale/lang/zh-cn` 未在 exports 中定义。\n为什么：EP 2.x 实际语言文件为带扩展名的 dist 产物，无扩展名 deep import 会被 Node 拒绝；报错栈可能落在被引用的页面而非 element.js 本身。\n怎么做：在 utils/element.js 将 `import zhCn from 'element-plus/es/locale/lang/zh-cn'` 改为 `import zhCn from 'element-plus/dist/locale/zh-cn.mjs'`。",
+   "evidence": "会话 e302a5bf：lint zs-select-dialog-func.vue 时触发，根因在 @/utils/element.js 的语言包路径。",
+   "files": [
+    "zhi2-web-admin/src/utils/element.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e302a5bf-385f-4cdb-bcf9-a77ad0d823ac"
+   ],
+   "bundle": "015.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] HeadTitle 模板用 formMode 必须在 props 声明并由父级传入",
+   "type": "bug",
+   "content": "情况：HeadTitle 整块不显示或 v-if=\"formMode != 'add'\" 行为异常。\n为什么：子组件未在 props 声明 formMode 时内部为 undefined，且父级 detail 页 mixin 虽有 formMode 但未 :formMode 下发，条件渲染不可靠。\n怎么做：HeadTitle 增加 `formMode: { type: String, default: '' }`（默认非 add 则显示标题区）；父级 `<HeadTitle :list=\"headTitleList\" :formMode=\"formMode\" />`；其它详情页复用同样传参。",
+   "evidence": "会话 b0a46c27：HeadTitle 内容不显示；结论为补 prop 并在 complex/detail.vue 传入 formMode。",
+   "files": [
+    "zhi2-web-admin/src/components/HeadTitle/index.vue",
+    "zhi2-web-admin/src/views/property/complex/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b0a46c27-17bc-4baf-82e4-aedd0e490a02"
+   ],
+   "bundle": "015.md",
+   "project": "2-0"
+  }
+ ]
+}

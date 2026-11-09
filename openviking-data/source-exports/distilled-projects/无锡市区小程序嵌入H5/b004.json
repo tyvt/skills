@@ -1,0 +1,233 @@
+{
+ "project": "无锡市区小程序嵌入H5",
+ "batch": 4,
+ "files": [
+  "013.md",
+  "014.md",
+  "015.md",
+  "016.md"
+ ],
+ "count": 13,
+ "memories": [
+  {
+   "title": "[无锡H5] 业主决策深链 URL 查询失败也要消费 topicvoteid，否则会反复弹窗/跳转",
+   "type": "bug",
+   "content": "情况：小程序 web-view 嵌入 H5，URL 带 topicvoteid（portal 侧 portal_topic_vote_id）时，usePortal.openOwnerDecisionVoteH5 会先调 getToken + getH5VoteUrl 拉业主决策页地址。\n为什么坑：接口抛错时若只 return false 而不清理 URL/待执行动作，tryAutoStartOwnerDecisionFromTopicVote 与 tryConsumeOwnerDecisionPostAction 每次进首页都会再试，用户被困在重复确认/跳转循环。\n怎么做：fetchOwnerDecisionVoteUrl 异常分支置 failed=true；在 finally 里 hideLoading 后，失败时调用 markOwnerDecisionConsumed()——清 portal_topic_vote_id、portalPostAction、返回路由并标记已消费；补 toast「业主决策页面打开失败，请稍后重试」（可延后 50ms 避免被 hideLoading 吞掉）。成功路径逻辑不变。",
+   "evidence": "会话 02076a8a：「如果业主决策url查询接口异常，也要把url带过来的决策ID清理掉，否则会反复尝试进入业主决策页面」；改 usePortal.js openOwnerDecisionVoteH5，失败 finally 调 markOwnerDecisionConsumed。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/portal.js"
+   ],
+   "baseline": "38bd192",
+   "sessionIds": [
+    "02076a8a-747c-4891-a785-497ddd2c8a97"
+   ],
+   "bundle": "014.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "[无锡H5] 「公共收益」列表与「共有资金」三页签是不同路由，缺公示表先确认是不是 sharedFunds",
+   "type": "fact",
+   "content": "情况：用户反馈公共收益里缺少「公示表」页签，截图往往是总览/明细/公示表 + 共有资金余额/公共收益余额。\n事实：该 UI 对应 pages_benefit/sharedFunds/index（共有资金），不是首页快捷入口的 benefit/index（经营性收支公示列表）。\n变更史：2026-06-18 新建时三页签齐全；2026-08-11 提交 0fa7b58 在 sharedFunds/index.vue 的 tabs 配置里把 publicity「公示表」注释隐藏，PublicityTab.vue 仍在。经营性公示列表仍走 benefit/index。\n恢复：取消 tabs 里 publicity 行注释即可，不必新建页面。",
+   "evidence": "会话 3046796a：git 结论 commit 0fa7b58 注释 `{ key: \"publicity\", label: \"公示表\" }`；明确区分 sharedFunds 与 benefit/index。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/benefit/index.vue"
+   ],
+   "baseline": "86395e1",
+   "sessionIds": [
+    "3046796a-f407-4dcd-ada2-855aada9eac3"
+   ],
+   "bundle": "014.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "[无锡H5] 主仓 -sfb 与子模块 dev_wuxi-sfb 成对同步：双分支提交、推远端、按 YYYYMMDDHHmm 打 tag",
+   "type": "workflow",
+   "content": "情况：无锡市区小程序嵌入 H5 为 superproject + 子模块 zhi2-mobile-admin-h5-c-unlimited；dev-shiqu/main 与 dev_wuxi-sfb/main-sfb 成对关联，功能改动（如移除 appStore 字典缓存：common.js getDict 直请求、app.js 删 dictList/hasDict/setDict）需两边同步。\n怎么做：子模块分别在 dev_wuxi-sfb、dev_shiqu 提交并 push；主仓分别在 main-sfb、main 更新子模块指针并 push。Tag 保持原格式：子模块 `YYYYMMDDHHmm`（如 202608130950），主仓 main 同号、main-sfb 加后缀 `-sfb`（如 202608130950-sfb）。改完确认工作区干净、当前分支回到日常开发分支（如 main-sfb/dev_wuxi-sfb）。移除字典缓存后若文案仍旧，提示清浏览器缓存。",
+   "evidence": "会话 378a4abe：「当前主子模块是关联的，-sfb结尾。dev-shiqu和main分支关联的。同步修改，移除字典缓存逻辑。提交推送代码，分别打tag」；表格列出 ab59965/f06fbf6 与 202608130950 系列 tag。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/common.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/store/app.js",
+    ".gitmodules"
+   ],
+   "baseline": "86395e1",
+   "sessionIds": [
+    "378a4abe-e108-4e8b-bf35-150005792150"
+   ],
+   "bundle": "014.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "[无锡H5] 详情页临时下线一块 UI：布尔开关 + 模板 v-if + 逻辑层跳过对应接口",
+   "type": "pattern",
+   "content": "情况：物业合同详情 contracts.vue 需暂时隐藏附件区，但日后要一键恢复。\n套路：定义 showAttachments=false（注释写明恢复方式）；模板附件区块包 v-if=\"showAttachments\"，避免渲染 FileList；脚本里 getList/拉附件只在 showAttachments 为 true 时调用，避免无意义请求与空态闪烁。其余信息卡片不受影响。\n恢复：改回 true 即可，无需删组件或路由。",
+   "evidence": "会话 db7a9453：「物业合同详情页的附件暂时隐藏」；实现 showAttachments、v-if FileList、条件 getList。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/company/info/contracts.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/FileList/FileList.vue"
+   ],
+   "baseline": "1cce226",
+   "sessionIds": [
+    "db7a9453-11c1-4ef8-8673-2248b9101df6"
+   ],
+   "bundle": "014.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办人脸已成功却报 DOMException code 12：勿用 origin+import.meta.env.BASE_URL 做 hash 跳转",
+   "type": "bug",
+   "content": "现象：控制台先出现苏服办 SDK success（retcode 000000），随后 `location.replace` 抛 `DOMException: The string did not match the expected pattern.`（code 12 / SyntaxError），堆栈在 pages-face-face.js 的 replace。\n\n根因：Vite 配置 `base: './'` 时 `import.meta.env.BASE_URL` 为 `./`，若拼 `window.location.origin + normalizedBase + '#...'` 会得到 `https://host:port./#/...`（origin 与 `./` 直连），属非法 URL。\n\n修复：基于当前页做 hash 路由，例如 `window.location.href.split('#')[0] + '#/pages/face/bdc?...'`；`bdc.vue` 的 `buildBackUrl` 同样按当前路径生成，不要把 `./` 接到 origin 后。改完需重新 build 并部署 H5 再测整段人脸→选屋流程。",
+   "evidence": "会话 a13995cc（基线 7de00b1）：用户贴 success 日志与 DOMException；结论明确认证成功、失败在成功后跳转；非法示例 `https://wygl.wxwgzx.com:8989./#/pages/face/bdc`；修复 face.vue/bdc.vue 改用 split('#')[0] 拼 hash。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/face.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/bdc.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/vite.config.ts"
+   ],
+   "baseline": "7de00b1",
+   "sessionIds": [
+    "a13995cc-4742-462e-9a5d-9454229b15d1"
+   ],
+   "bundle": "015.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "小程序 web-view 内 H5：localStorage 恢复与异步 init 竞态，需 h5Context 同步 URL 并 await whenH5ContextReady",
+   "type": "pattern",
+   "content": "现象：小程序切换小区后 web-view URL 参数已更新，但 H5 页仍显示旧小区名或 houseId 与名称错位（「小区 A、houseId 属 B」）。\n\n根因：① `userStore` 启动从 `uni.getStorageSync('user')` 恢复上次选房；② `App.vue` 的 `initH5Context`/`refreshH5Context` 异步拉房屋列表，子页在 `onLoad` 立即读 store 常在初始化完成前请求；③ URL 已带 `houseId` 时若走 `applyProjectSelection` 可能把 houseId 改成该小区第一套房。\n\n做法：`utils/h5Context.js` 进入时**同步**把 URL 的 `complexId`、`houseId`、`name` 写入 store；提供 `whenH5ContextReady()` 与 `getH5Selection()`（优先 URL）；`App.vue` 的 `onLaunch`/`onShow` 均调 `refreshH5Context()`（切换小区重开 web-view 时重同步）；业务页（如维修资金）在 `onShow` 里 `await whenH5ContextReady()` 后用 `getH5Selection()` 取参，勿单独信任可能过期的 store。",
+   "evidence": "会话 400a262f（基线 fb55fa9）：用户反馈切换小区后 URL 正确但数据相反；结论列出 localStorage、init 竞态、applyProjectSelection 覆盖 houseId 三点及 h5Context/App.vue/maintain 修复。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/App.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/index/useProjectState.js"
+   ],
+   "baseline": "fb55fa9",
+   "sessionIds": [
+    "400a262f-e497-46ec-9234-87e452dc4641"
+   ],
+   "bundle": "015.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "小程序嵌入 H5 只写 project/projectName 时公共收益地址显示 -：须 setProjectInfo 与 projectAddress 多级回退",
+   "type": "pattern",
+   "content": "现象：`pages_benefit/benefit` 的 `projectAddress`（区-街道-社区）或电梯/公共能耗页楼栋信息为空或显示 `-`。\n\n根因：嵌入场景 `App.vue` 曾只写 `project`/`projectName`，未通过 `setProjectInfo`/`applyHouseSelection`/`applyProjectSelection` 同步 `regionName`、`subdistrictName`、`communityName`、`address` 等；`benefit/index` 仅在「找不到当前小区」时才 `setProjectInfo`，找到时未同步导致 `projectAddress` 仍空；部分页误用不存在的 `userStore.constructionNo`/`roomNo`。\n\n做法：① 有 token 时 `initH5Context` 拉 `getMyHouseList`，按 URL 的 `houseId`/`complexId` 调用 `applyHouseSelection` 或 `applyProjectSelection`（逻辑与 `newHome.vue` 一致，可抽到 `useProjectState.js`）；② `projectAddress` 显示优先区划拼接，其次 `userStore.address`，再从 `houseList` 取当前小区房屋；③ 页面 `onShow` 在字段仍空且已登录时重复拉房屋/小区接口补全；④ 楼栋展示用 `userStore.address`（楼栋-单元-房号格式），勿引用未定义 store 字段。",
+   "evidence": "会话 ba74b018（4266043）、c484b1ef（0804e57）：用户报 benefit/elevatorPubEngCons 字段未赋值或 projectAddress 为 -；结论含 initH5Context、applyHouseSelection、benefit 找到小区也同步、elevator 改 address。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/App.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/index/useProjectState.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/benefit/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/elevatorPubEngCons/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/store/user.js"
+   ],
+   "baseline": "0804e57",
+   "sessionIds": [
+    "ba74b018-bf87-4283-b5cd-cdbfcdac22a7",
+    "c484b1ef-d8e5-4052-a213-4476498f8145"
+   ],
+   "bundle": "015.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "共有资金「查询明细」展开下方区域：scroll-view 用 scroll-into-view 带动画滚到 bank-section",
+   "type": "workflow",
+   "content": "现象：总览页点「查询明细」后银行流水与账户余额在下方展开，但外层 `scroll-view` 不滚动，用户仍停在原位置，误以为「页面没变化」。\n\n做法：子组件为展开区设固定 `id`（如 `bank-section`），查询完成并渲染后 `$emit('scroll-to-bank')`；父页 `scroll-view` 开启 `scroll-into-view` 与 `scroll-with-animation`，收到事件后将目标设为该 id。**重复点击**时需先清空 `scrollIntoView` 再赋值，否则同一 id 无法再次触发滚动。",
+   "evidence": "会话 fd9f5f4e（基线 6aeee0b）：用户要求自动滑到底显示账户余额；结论 OverviewTab 增 id 与事件、index.vue 配置 scroll-into-view 及清空再设置以支持重复触发。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/OverviewTab.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/index.vue"
+   ],
+   "baseline": "6aeee0b",
+   "sessionIds": [
+    "fd9f5f4e-e4c8-42f5-a93d-27c3c6883bde"
+   ],
+   "bundle": "015.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "[无锡H5] 业主维修资金首页走 external/maintenanceHouse 双步接口，非 AppMaintain",
+   "type": "fact",
+   "content": "pages_owner/maintain/index.vue（维修资金 / 房屋专属账户 / 历史交易明细）的链路是：① GET /external/maintenanceHouse/getToken 取外部系统 token；② POST /external/maintenanceHouse/getHouseInfo，body 含 token 与 houseId（字符串）。完整前缀为 VITE_APP_API_BASE_URL 或小程序注入的 BASE_URL/api/v2.0。Toast「查询房屋信息失败」等多为后端返回的 msg，经 @/api/index.js 拦截器统一弹出，表示外部维修资金系统按该房屋唯一号查不到数据。项目内另有 /estate/AppMaintain/*（repair.js，如 selectAccount）供其他维修资金列表/明细页使用，勿与当前 H5 首页混查。",
+   "evidence": "会话 a343d1aa：用户截图报错页对应 maintain/index.vue；结论列出 getToken + getHouseInfo 顺序、houseId 示例 H320214000001603，并区分 AppMaintain。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/repair.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/index.js"
+   ],
+   "baseline": "38bd192",
+   "sessionIds": [
+    "a343d1aa-9a2b-44b9-9046-e30e130c5be6"
+   ],
+   "bundle": "016.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "[无锡H5] web-view 嵌入场景的 houseId 由 h5Context.getH5Selection 统一解析",
+   "type": "pattern",
+   "content": "H5 被小程序 web-view 嵌入时，维修资金等页的房屋上下文不要各页散落读 URL：统一用 utils/h5Context.js 的 getH5Selection()，houseId 优先 getH5Param('houseId')，否则回退 userStore.houseId；communityName 等同理。传给 /external/maintenanceHouse/getHouseInfo 的 houseId 须与维修资金侧「房屋唯一号」一致，联调失败先核对小程序入参链路与后端映射，而非先改前端文案。",
+   "evidence": "会话 a343d1aa 引用 getH5Selection 代码段，说明截图中的 H320214000001603 即 getHouseInfo 入参来源。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/index.vue"
+   ],
+   "baseline": "38bd192",
+   "sessionIds": [
+    "a343d1aa-9a2b-44b9-9046-e30e130c5be6"
+   ],
+   "bundle": "016.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "[无锡H5] ZsImage 在 H5 子路径部署下的路径规则（小程序仍用 IMAGE_BASE）",
+   "type": "pattern",
+   "content": "zhi2-mobile-admin-h5-c-unlimited 部署在 /sz/ 等二级路由且 vite.config.ts 为 base: './' 时，ZsImage.vue 在 H5 端应走相对路径、不写死 VITE_* / IMAGE_BASE：local 图用 static/xxx（随当前页解析为 /sz/static/...）；服务端路径若以 / 开头则加 ./ 前缀（如 /api/file/1.jpg → ./api/file/1.jpg）；http(s)/data/blob 原样；失败兜底同样 static/${fallBackSrc}。微信小程序分支仍使用 @/env/mp.js 的 IMAGE_BASE，行为与改前一致。与「全项目相对路径」约定一致，但落地点在 ZsImage 单组件。",
+   "evidence": "会话 c7f8cfb5：用户要求 ZsImage 改为相对路径、不要写死环境变量；结论给出 H5/小程序分支与路径对照表。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/ZsImage/ZsImage.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/vite.config.ts",
+    "zhi2-mobile-admin-h5-c-unlimited/src/env/mp.js"
+   ],
+   "baseline": "7a2a29b",
+   "sessionIds": [
+    "c7f8cfb5-52f7-44a5-a4bf-81cfbf4e58af"
+   ],
+   "bundle": "016.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "[无锡H5] uni-app ZsMap：Logo 误点跳转与 H5 上 enable-poi 的限制",
+   "type": "pattern",
+   "content": "ZsMap 使用 uni-app 原生 <map>（腾讯地图）。左下角「腾讯地图」Logo/版权无官方「禁用点击」配置，协议要求保留 Logo，不宜 CSS 隐藏；防误点可在 map 外包 relative 容器，左下角加绝对定位透明 view（约 120rpx×48rpx，z-index 高于地图）拦截点击。地图 POI 路名/商铺名可试 :enable-poi=\"false\"，但 App 端支持较好、微信小程序部分版本支持，**H5（含嵌入小程序的 web-view）文档未保证生效**。小区周边仅展示、不要跳转时：project/info 可关 zoom/scroll，或改用腾讯静态图 API / 容器 pointer-events:none（仅保留自定义 marker 展示）。",
+   "evidence": "会话 8caf0d1f：用户问腾讯地图文字可否禁用点击；结论区分 Logo、POI、静态展示三场景并给出 map-logo-blocker 示例与平台表。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/ZsMap/ZsMap.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue"
+   ],
+   "baseline": "afae6cd",
+   "sessionIds": [
+    "8caf0d1f-dcbc-42e1-947f-e60d56e58eef"
+   ],
+   "bundle": "016.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "[无锡H5] 小区信息页数据与周边 POI 的接口分工",
+   "type": "workflow",
+   "content": "pages_owner/project/info/index.vue：① 小区详情 GET /property/complex/getExtendedByComplexId/{complexId}（property.js getPropertyDetail），字段含 complexName、address、buildingCount、houseCount、subdistrictName、communityName、deliveryDate、xcoordinate/ycoordinate；展示「交付日期」用 deliveryYear 映射，后端 deliveryDate 为空则显示 -。② 地图 Key：GET /system/config/getByKey/qq.map.key（与园区项目同一配置键约定）。③ 周边配套 localSearch：先调腾讯 geocoder/v1 逆地理取 adcode 拼 boundary，再 place/v1/search，keyword 为分类名，filter 为 facilityCategory（transaction.js）中的 poi 编码，orderby _distance；列表距离来自 _distance。纯展示地图时不要与维修资金接口混淆。",
+   "evidence": "会话 b30d2f3f：用户问小区信息页用的接口；结论列出后端详情、配置 Key、腾讯 WebService 两步及 facilityCategory 表。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/property.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/transaction.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/qqMapKey.js"
+   ],
+   "baseline": "289666e",
+   "sessionIds": [
+    "b30d2f3f-1f15-46f0-9efa-aa95170ed55f"
+   ],
+   "bundle": "016.md",
+   "project": "无锡市区小程序嵌入H5"
+  }
+ ]
+}

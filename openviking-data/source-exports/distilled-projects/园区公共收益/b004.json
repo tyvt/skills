@@ -1,0 +1,272 @@
+{
+ "project": "园区公共收益",
+ "batch": 4,
+ "files": [
+  "013.md",
+  "014.md",
+  "015.md",
+  "016.md"
+ ],
+ "count": 15,
+ "memories": [
+  {
+   "title": "[园区公共收益] 合并冲突 git checkout --theirs 会静默丢掉列表列配置",
+   "type": "bug",
+   "content": "经营资源租赁合同列表 `resourcesLeaseContractFiling/index.vue` 曾加过「位置」列（`prop: 'addr'`，夹在「资源类型」与「合同金额(元)」之间），联调时正常；回归不显示是因为处理合并冲突时对整文件执行了 `git checkout --theirs`，列定义被覆盖而非编译或接口问题。修复是重新补列，并与详情子表 `subVenueTable` / `subAdvertiseTable` 的 `addr` 对齐。该 index 同时服务公共场地、广告位及租赁管理下经营资源合同列表；列空值需核对 `/benefit/pubRevenueContract/page` 列表 VO 是否返回 `addr`。",
+   "evidence": "用户反馈「位置」列曾显示后消失；结论写明合并时 `git checkout --theirs` 覆盖 `resourcesLeaseContractFiling/index.vue` 导致列丢失，已补回 addr 列。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/index.vue",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subVenueTable.vue",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subAdvertiseTable.vue"
+   ],
+   "baseline": "08d3255",
+   "sessionIds": [
+    "4180a40a-e54f-4dce-81bf-474dc67eda03"
+   ],
+   "bundle": "013.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 街道/社区编码全局转中文：登录预加载 + zs-table-column 按 prop 自动 formatter",
+   "type": "pattern",
+   "content": "列表与选择弹窗里街道/社区显示为 `320571053` 等编码时，应在基础设施层统一处理，而不是逐页手写 formatter。做法：① `common` store 增加 `subdistrictList`、`communityList`，在路由守卫里与行政区划一并预加载；② `src/utils/areaFormatter.js` + `formatters/index.js` 提供 `subdistrictFormatter`、`communityFormatter`；③ `zs-table-column` 在列未显式指定 formatter 时，对 `prop` 为 `subdistrict`/`subdistrictCode` 或 `community`/`communityCode` 自动套用对应 formatter（覆盖列表、`SelectDialog` 及 `v-bind=\"column\"` 列）；④ `mixins/area.js` 与 store 同源，避免下拉与表格各拉一套数据。已手动配置 formatter 的列行为不变。",
+   "evidence": "会话「修复街道/社区显示编码的问题，全局处理」：新建 areaFormatter、改 common store/router、formatters、zs-table-column、area mixin，资金缴款「选择物业管理区域」弹窗应显示「娄葑街道」等中文。",
+   "files": [
+    "zhi2-web-admin/src/utils/areaFormatter.js",
+    "zhi2-web-admin/src/store/modules/common.js",
+    "zhi2-web-admin/src/router/index.js",
+    "zhi2-web-admin/src/formatters/index.js",
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/mixins/area.js"
+   ],
+   "baseline": "1ccdb34",
+   "sessionIds": [
+    "a6aae663-eacf-4a1f-bbbd-fbb2ad3323ac"
+   ],
+   "bundle": "013.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] benefit 租赁申请与合同备案共用 assetLeaseApply/components 子表",
+   "type": "pattern",
+   "content": "公共收益模块中「资产/广告位/公共场地」租赁申请与「经营资产/经营资源」合同备案不是各写一套表格，而是复用 `assetLeaseApply/components/`：`houseTable.vue`（资产）、`subAdvertiseTable.vue`（广告位）、`subVenueTable.vue`（公共场地）。页面通过 `applyType` / `contractType`（及 mixin 的 `isRevenueContractFiling`、`isAssetsContractFiling`）切换 API 与主键；`enum.js` 的 `LEASE_TYPE` 约定 RENT=0、ADVERT=1、AREA=2、OTHER=4。合同列表侧例如 `resourcesLeaseContractFiling` 路由 `AdvSpaceLeaseContractFiling` 时 `contractTypes: '1'`。注意 `pubVenue/components/venueTable.vue` 标题同为「公共区域场所」，用于 `pubVenue/detail.vue`，与租赁申请子表不是同一套。",
+   "evidence": "探索会话给出功能与文件对照表：申请与备案详情均指向同一套 components，并区分 pubVenue 独立 venueTable。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/houseTable.vue",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subAdvertiseTable.vue",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subVenueTable.vue",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/enum.js",
+    "zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/index.vue",
+    "zhi2-web-admin/src/views/benefit/pubVenue/components/venueTable.vue"
+   ],
+   "baseline": "36a9a7e",
+   "sessionIds": [
+    "8c34dd29-a37a-42bf-abc9-ce33995ece5a"
+   ],
+   "bundle": "013.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 选择弹窗内 zs-table 末行被裁切与重置后停在底部：opt-in containerHeight + setScrollTop(0)",
+   "type": "bug",
+   "content": "业主开户等 `ScopeSelectDialog` 内嵌 `zs-table` 时，若用默认 `table-tr` 算高（约 `行数×48 + 表头 + 1 + 横向滚动条`），表格总高度会比外层 `overflow:hidden` 容器略高，最后一行永久被裁切；搜索后重置还可能保留 el-table 内部 `scrollTop`，列表停在底部。修复：`zs-table` 新增 opt-in `containerHeight`（>0 时 el-table 高度精确等于容器，默认 0 不影响其余调用方）；数据重载（搜索/重置/翻页/勾选楼幢）后 `setScrollTop(0)`；弹窗侧用 `updateContainerHeight()` 替代仅调 `table-tr` 的旧逻辑。`depositNotice/company` 与 `accountOpen/owner` 的 ScopeSelectDialog 需同款改造。",
+   "evidence": "用户报「搜索后重置列表滑到底显示不全」；结论归因 table-tr 高度溢出容器与未归零 scrollTop，已通过 containerHeight 与 setScrollTop 修复。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue",
+    "zhi2-web-admin/src/views/maintenance/depositNotice/company/components/ScopeSelectDialog.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "42fa15c9-0259-40e7-af26-00a4b75a3f00"
+   ],
+   "bundle": "013.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "zs-operate-column 的 disabled/visible 传实例方法引用会丢 this，导致 bizState 置灰失效",
+   "type": "bug",
+   "content": "在 `buttons` 配置里写 `disabled: this.disableButton`（或同类实例方法引用）时，组件回调执行时 `this` 不再指向 Vue 实例，`bizState` 等状态判断恒失效，表现为批量操作已禁用但单行「删除」仍可点。\n\n**修复**：\n1. 抽计算属性统一口径，如 `canOperate`：`bizState == 0 || bizState == '0'`（待提交）。\n2. 批量删除、勾选列、行内编辑等与单行按钮共用 `canOperate`。\n3. 操作列动态项用箭头函数绑定上下文：`disabled: () => !this.canOperate`、`visible: () => this.canOperate`。\n\n**验证**：非待提交态单行删除应置灰或隐藏；待提交态批量删除仍需先勾选行（未勾选置灰属正常）。",
+   "evidence": "会话结论：「disabled: this.disableButton 作为方法引用传递后，this 上下文丢失，bizState 判断失效」；改用 canOperate + 箭头函数后批量与单行行为一致。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/houseTable.vue",
+    "zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue",
+    "zhi2-web-admin/src/mixins/subTableMixins.js"
+   ],
+   "baseline": "4468dfa",
+   "sessionIds": [
+    "f1d10e9a-1ce1-4000-b675-9ed44669437d"
+   ],
+   "bundle": "014.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "首页待办改 flowable/todo 后 TagsView 出现两个固定「待办任务」标签",
+   "type": "bug",
+   "content": "把首页换成接口下发的 `flowable/todo` 且仍保留静态 `/index` 时，**affix 会被叠加上三次**：\n1. 静态路由 `/index` 的 `meta.affix: true`\n2. `permission.js` 给接口路由 `flowable/todo` 也设了 `affix: true`\n3. `TagsView` 对 `path === 'index'` 的额外固定逻辑\n\n**修复**：去掉静态 `/index` 的 affix；`filterAffixTags` 里仅当路径与 `homeRoutePath` 一致时为 `flowable/todo` 固定一个标签；删除对 `path === 'index'` 的特殊分支。改完后无论落地 `/flowable/todo` 还是回退 `/index`，标签栏只保留一个固定待办。",
+   "evidence": "会话 3bcff305：用户反馈「tag里面有两个固定的待办任务」；根因列为静态 affix + permission affix + TagsView index 特殊处理。",
+   "files": [
+    "zhi2-web-admin/src/router/index.js",
+    "zhi2-web-admin/src/store/modules/permission.js",
+    "zhi2-web-admin/src/layout/components/TagsView/index.vue",
+    "zhi2-web-admin/src/views/flowable/todo.vue"
+   ],
+   "baseline": "f783ca2",
+   "sessionIds": [
+    "3bcff305-97a0-45ac-a995-1878bd7ee92b"
+   ],
+   "bundle": "014.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "楼幢详情单元子表误用 buildingVId 作主键导致删改/房屋选择异常",
+   "type": "bug",
+   "content": "在 `building/detail.vue` 内嵌 `unitTable` 做单元增删改与「房屋选择」时，若操作列/删除接口仍用楼幢侧主键 `buildingVId`，会与单元实体 `unitId` 不一致，表现为删除命中错误行或房屋范围弹窗带错单元。\n\n**约定**：单元子表主键统一 `unitId`；从楼幢详情向子表传入 `projectId`、`projectCode`、`buildingNo`、地上/地下层数等上下文；复用 `unit` 模块的 `HouseScopeTable` / 拆分弹窗时在关联组件补齐 `unitId` 传参，避免只能去独立单元管理页操作。",
+   "evidence": "会话 d800e10d：「主键改为 unitId（原先误用 buildingVId）」；并同步 HouseScopeTable、BuildingTableDialog、UnitSplitDialog 增加 unitId。",
+   "files": [
+    "zhi2-web-admin/src/views/building/building/components/unitTable.vue",
+    "zhi2-web-admin/src/views/building/building/detail.vue",
+    "zhi2-web-admin/src/views/building/unit/components/HouseScopeTable.vue"
+   ],
+   "baseline": "f783ca2",
+   "sessionIds": [
+    "d800e10d-b867-4f9c-9ec6-cb08d9304eef"
+   ],
+   "bundle": "014.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "园区收益租赁类子表：用户要求只按 bizState 控操作，查看态也可改明细",
+   "type": "workflow",
+   "content": "资产租赁/经营资产合同等 benefit 子表，业务方明确要求**不要用 formMode（查看/编辑）限制行内操作**，仅以主单 `bizState` 为准：\n- `0` / `'0'`（待提交）：批量删除、勾选、拟租金额编辑、单行删除均可用；\n- 非待提交：批量能力隐藏，单行删除置灰或隐藏。\n\n这与「详情 readOnly 必须同时判 formMode + bizState」的通用套路相反，落地前需确认产品口径；实现上集中 `canOperate` 计算属性，避免混用 `disableButton` 与页面 `formMode`。",
+   "evidence": "用户诉求 2：「查看状态也可以操作，只根据bizState判断」；结论表仅按 bizState，不限制查看/编辑模式。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/houseTable.vue",
+    "zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/detail.vue"
+   ],
+   "baseline": "4468dfa",
+   "sessionIds": [
+    "f1d10e9a-1ce1-4000-b675-9ed44669437d"
+   ],
+   "bundle": "014.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "系统显示缩放导致 zs-dialog 内容被截断：在公共弹窗层统一加可滚动主体",
+   "type": "pattern",
+   "content": "Windows **显示缩放/低分辨率**下，登录页、选择弹窗、业务子表弹窗等会出现**内容区被裁切且无法滚动**（底部按钮点不到），逐页改 height 不可靠。\n\n**做法**：在 `zs-dialog`、`zs-select-dialog` 及高频业务弹窗上统一约束：弹窗主体 `max-height` + 内容区 `overflow-y: auto`（必要时配合 `drag.js` 不再锁死可视高度），让缩放后仍能通过滚动触达 Footer。涉及登录、注册、统计弹窗等应一并回归。\n\n与「125% 浏览器缩放 + tableTrCount」类表格行高问题互补：本轮重点是**弹窗壳层高度链**而非单表分页条数。",
+   "evidence": "会话 911619fe 提交说明：「修复弹窗及表单在缩放分辨率下内容被截断无法滚动的问题」，变更含 zs-dialog、zs-select-dialog、login 等 11 个文件。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue",
+    "zhi2-web-admin/src/directives/dialog/drag.js",
+    "zhi2-web-admin/src/views/login.vue"
+   ],
+   "baseline": "8215c1a",
+   "sessionIds": [
+    "911619fe-fba8-46b0-96ee-51b12ea1fa17"
+   ],
+   "bundle": "014.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "benefit 广告位/场地明细弹窗：去掉 Headline 嵌套并 overflow:hidden 防底部按钮被挡",
+   "type": "pattern",
+   "content": "资产租赁申请下的 `subAdvertiseDialog` / `subVenueDialog` 等明细弹窗，若用 `Headline` 再包一层会多出边框并与 `DetailTemplate` 查看态 `border` 叠加；内容溢出时还会盖住 Footer，出现「取消点不了」。\n\n**调整**：移除弹窗内 `Headline` 包裹；查看模式 `DetailTemplate` 设 `:border=\"false\"`；弹窗根或内容容器设 `overflow: hidden` 并底部按钮右对齐，与全局 `sub-container` 去竖线规范一并验收。",
+   "evidence": "会话 e326e1ef：subAdvertiseDialog 移除 Headline、overflow:hidden 修复取消按钮；subVenueDialog 同步。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subAdvertiseDialog.vue",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subVenueDialog.vue"
+   ],
+   "baseline": "36a9a7e",
+   "sessionIds": [
+    "e326e1ef-cd40-49fe-b333-beabfaaa0ee3"
+   ],
+   "bundle": "014.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "BuildingTable 表头单元只取首层 floor 导致后续单元列空白",
+   "type": "bug",
+   "content": "楼盘表视图若用 tableData[0] 推导表头 units，当各名义层拥有的 unitId 集合不一致时（例如 1 单元只在 2 层及以上出现），首层没有的单元整列不渲染，表现为「某单元列全空」且易误判为接口无数据。修法：遍历全部楼层按 unitId 去重汇总 units，再按 unitName 排序；每行按表头顺序用 getUnitRooms(floor, unitId) 取户室；列宽按单元独立计算 getUnitColumns(unitId)，不要假定各层结构相同。",
+   "evidence": "筹备组征集新增报名选户室：楼盘表视图 1 单元无数据；根因为表头 units 仅来自 tableData[0]，与楼层单元不一致时列错位/空白。",
+   "files": [
+    "zhi2-web-admin/src/views/components/BuildingTable.vue",
+    "zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "473e272c-6e60-4e72-b905-e02eba29cfd7"
+   ],
+   "bundle": "016.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "级联「项目类型」只选一级时校验绑在隐藏 projectSubType 上会静默失败",
+   "type": "bug",
+   "content": "物业管理区域等项目类型为「一级 + 子类型」级联时，若 el-form rules 只挂在已移除/隐藏的 projectSubType 表单项上，用户只选一级点保存时 Element 不会在可见的「项目类型」输入框下报错，表现为保存无反应、无提示。做法：抽 createProjectTypeRules(getProjectSubType)，在一级、二级规则里分别报「项目类型不能为空」「请至少选择一项项目子类型」，且 triggerProjectTypeValidate 只触发 projectType 字段；子类型数据仍由 ProjectTypeCascadeSelect 写 form.projectSubType，但不必保留独立表单项。",
+   "evidence": "complex/detail 只选住宅一级无法保存且无提示；审查后改为可见字段 projectType 统一校验并通过自测表验证三条场景。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/components/projectTypeRules.js",
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/views/property/complexChange/detail.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "76645e4d-9f4d-4dff-9aa8-1c457e2f7af1"
+   ],
+   "bundle": "016.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "物管会备案详情跳转组织用户授权：预填锁定须与校验失败可重选并存",
+   "type": "workflow",
+   "content": "从物管会备案详情（普备 detail.vue / 直备 directDetail.vue）进「用户授权」：按钮条件与「创建工作人员」对齐——businessType 为物管会、bizState==2、非新增、且有 committeeVersionId；goUserAuth 跳 autonomy/userAuth/detail/add 并带 businessType、committeeVersionId、committeeName、complexId、complexName、backUrl。新增页 applyRoutePrefill 按 query 预填并调 checkUserUnique；进入同路径时清 session 草稿并设 skipFormCache 防误写缓存。organizationPrefilled 仅在「路由带 committeeVersionId 且表单仍保留 committeeVersionId」时为 true（校验失败清空组织后应解除锁定、允许重选），预填成功时组织类型/组织名称不可改，物业管理区域保持只读。与「核验失败须级联清空组织与用户字段」配合使用，避免只锁死或只清空一侧。",
+   "evidence": "用户要求备案详情增加用户授权且组织字段默认带入不可改；审查反馈要求校验失败后仍可重新选择组织。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/record/components/detail.vue",
+    "zhi2-web-admin/src/views/autonomy/record/components/directDetail.vue",
+    "zhi2-web-admin/src/views/autonomy/userAuth/detail.vue"
+   ],
+   "baseline": "ca05ff6",
+   "sessionIds": [
+    "b76adf07-3bf8-4aba-b92c-e654a01213ae"
+   ],
+   "bundle": "016.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "工作人员/授权记录组织名称跳转用 accountType 直映射详情路由",
+   "type": "pattern",
+   "content": "自治域组织类型以 accountType 为准（如 4-1 监委会、4-2 业委会、4-3 物管会），列表/详情展示与跳转不要再用 businessType 二次推断。在 autonomy/record/components/enums.js 维护 ACCOUNT_TYPE_PATH：4-1→autonomy/record/supervisory/detail，4-2→industry/detail，4-3→property/detail；ownerCommitteeWorker/detail 的 goToOrganizationDetail 读 form.accountType 查表跳转。列表侧同步用 accountType 过滤掉非监委会/业委会/物管会条目。",
+   "evidence": "用户要求组织类型用 accountType 过滤，且详情组织名称按类型跳不同备案详情页。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/record/components/enums.js",
+    "zhi2-web-admin/src/views/autonomy/ownerCommitteeWorker/detail.vue",
+    "zhi2-web-admin/src/views/autonomy/ownerCommitteeWorker/index.vue"
+   ],
+   "baseline": "635e747",
+   "sessionIds": [
+    "76841df4-d581-4fbe-b73a-bfa8117127d5"
+   ],
+   "bundle": "016.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "筹备组征集选户室：已报名户室在楼盘表与列表双视图统一不可选",
+   "type": "pattern",
+   "content": "candidateCollect 选户室弹窗中 exist==1 表示已报名：BuildingTable 传 disableCheck，列表 selectable 与 isHouseSelectable 一致置灰；加载楼幢时 checked 初始为字符串 '0'，不要把已报名户室预置选中；checked 统一用 '0'/'1' 字符串，楼盘表点击后同步列表选中，避免双视图状态分叉。",
+   "evidence": "修复楼盘表 1 单元显示时的配套改动：已报名户室灰色不可选且不同步误选。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue",
+    "zhi2-web-admin/src/views/components/BuildingTable.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "473e272c-6e60-4e72-b905-e02eba29cfd7"
+   ],
+   "bundle": "016.md",
+   "project": "园区公共收益"
+  }
+ ]
+}

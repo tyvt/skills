@@ -1,0 +1,142 @@
+{
+ "batch": 15,
+ "files": [
+  "085.md",
+  "086.md",
+  "087.md",
+  "088.md",
+  "089.md",
+  "090.md"
+ ],
+ "count": 8,
+ "memories": [
+  {
+   "title": "[苏房] 公共子组件透传给底层组件的可选回调 prop 默认值必须给 noop 函数，不能是 null",
+   "type": "bug",
+   "content": "什么情况：企业备案详情页（DeveloperBasicInfoDetail → Headline → AppendixPackageSection → AppendixRequirementGrid → AppendixRequirementCard）控制台刷 [Vue warn] Invalid prop: type check failed for prop \"onUploadSuccess\". Expected Function, got Null。\n\n为什么：AppendixRequirementGrid 把 onUploadSuccess/onBeforeUpload/onUploadError/onExceed 这些回调以 props 形式继续往下绑给 AppendixRequirementCard，而 props 的默认值写的是 null。只读查看态下，上层 AppendixPackageSection 使用 Grid 时并不传这些 handler，于是 null 被当作「已提供的值」沿着 props 链传进子组件，子组件声明 type: Function 就必然报警；编辑态 AnnexUpload 会传真实 handler，所以只在只读路径暴露。\n\n怎么做：把可选回调的默认值从 null 改成模块级 noop 函数（新增 appendixUploadNoop、appendixBeforeUploadNoop，后者 return true 以符合 Element Upload 的 before-upload 语义），只在 Grid 的 script 内改，不触碰调用方与编辑态逻辑。通用约定：凡是「父组件可选传入、子组件类型为 Function」的 props，默认值一律用 noop 而不是 null/undefined 显式绑定；若确实需要区分「未传」与「传了空」，用 instanceof Function 判断或干脆不绑定该 attr，而不是给 null。",
+   "evidence": "会话 085 诉求 1/2：用户贴出 Invalid prop: type check failed for prop \"onUploadSuccess\". Expected Function, got Null 的完整组件栈；结论说明只读路径下 AppendixPackageSection 用 Grid 时不传这些回调，Grid 默认 null 仍绑定到 AppendixRequirementCard，故在 Grid 中增加 appendixUploadNoop / appendixBeforeUploadNoop（返回 true）替换 null 默认值，编辑态行为不变。",
+   "files": [
+    "zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementGrid.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementCard.vue",
+    "zhi2-web-admin/src/components/AppendixPackageSection/index.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "fe17d399-463d-45e5-9c19-4d7ebc506fcd"
+   ],
+   "bundle": "085.md"
+  },
+  {
+   "title": "[苏房] 自研选择弹窗多个副本共存时，改搜索区要同步全部副本，且调用方差异靠 outQuery 传递",
+   "type": "bug",
+   "content": "什么情况：开户网点弹窗（BranchOneDialog）搜索区原有省/市两级区域下拉 + 关键字，用户要求「前 2 个字段没展示，去掉吧，关键字就行了」。改完后其他入口（监管协议、物业、权益等模块）的开户网点选择弹窗必须表现一致。\n\n为什么：项目里 views/**/components/BranchOneDialog.vue 存在多份同名副本（supervision/agreement/xy、property、benefit 等目录各一份），并统一由 views/supervision/utils/selectDialog/unionBankBranch.js 的 openUnionBankBranchSelect 入口打开。只改其中一份就会出现「同功能不同搜索栏」；同时区域筛选曾经是写死在弹窗内部的，删掉后如果调用方仍需要默认区域范围，就没有出口了。\n\n怎么做：1) 先 grep 全部 BranchOneDialog.vue 副本 + selectDialog/*.js 引用点，确认改动面；2) 搜索区只保留关键字与搜索/重置，删掉省/市插槽、areas vuex 依赖以及对应的 data/methods/watch；3) 关键点是 mergedFilterParams 仍保留 workBankId、isStart、银行树 bankCode/bankCodes、outQuery、isSupervisionBank 等筛选逻辑不动——区域类默认范围改由调用处在 outQuery 里传，请求参数照样带上；4) 同步更新 unionBankBranch.js 的文件头注释说明入口行为已变。",
+   "evidence": "会话 085（0ddfd428）：用户发截图说「这里前2个字段没展示，去掉吧，关键字就行了」；结论为 BranchOneDialog.vue 搜索区只留关键字、移除省/市插槽与 areas vuex，mergedFilterParams 仍保留 workBankId/isStart/银行树 bankCode/bankCodes/outQuery/isSupervisionBank，并注明「所有通过 openUnionBankBranchSelect 或引用该 BranchOneDialog 的入口都会只显示关键字搜索」「若仍需默认省/市范围，可在调用处通过 outQuery 传入」。涉及文件列表同时列出 supervision/agreement/xy、property、benefit 三份 BranchOneDialog.vue 与 unionBankBranch.js。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/agreement/xy/components/BranchOneDialog.vue",
+    "zhi2-web-admin/src/views/property/components/BranchOneDialog.vue",
+    "zhi2-web-admin/src/views/benefit/components/BranchOneDialog.vue",
+    "zhi2-web-admin/src/views/supervision/utils/selectDialog/unionBankBranch.js",
+    "zhi2-web-admin/src/views/supervision/agreement/account/detail.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "0ddfd428-8dd3-4ee5-abe0-b1ab62edf130"
+   ],
+   "bundle": "085.md"
+  },
+  {
+   "title": "CSS :has() 祖先选择器会给 v-show 隐藏的兄弟面板误判状态：切 Tab 时高度被错误收缩",
+   "type": "bug",
+   "content": "【什么情况】在 BuildingTableViewTabs 这类「列表 + 楼盘表视图」双 Tab 面板里，用父容器 :has() 根据后代表格的修饰类做整体高度策略，例如 styles/index.scss 中 `.building-table-view-tabs:has(.building-table-view-table-wrap .zs-table-container--auto-height) { height: auto }`，同时用 v-show 控制列表/表视图两个 Tab 的显隐。\n\n【为什么】v-show 只是 display:none，DOM 仍留在文档里，`querySelector`/`:has()` 依旧能匹配到隐藏面板内的后代。于是「楼盘表视图」Tab 激活时，只要隐藏的列表面板里存在稀疏态 `--auto-height` 表格，根节点 `.building-table-view-tabs` 仍被判为稀疏态被收成 height:auto，表视图区高度异常（撑不满或塌陷）。同类问题还有选择器方向不一致的 [MEDIUM]：全局规则写直接子选择器 `> .zs-table-container--auto-height`，而组件内 scoped 规则用后代选择器，插槽多包一层 div 时全局规则静默不命中，两处表现不一致。\n\n【怎么做】① 判断 Tab 状态不要靠 :has() 穿透，改为在根节点按激活 Tab 加显式类（如 `building-table-view-tabs--list-active`）再写受限的 :has()，或把非激活面板换成 v-if（需接受组件状态重建的代价）；② 全局收缩规则与组件内规则的组合器层级要统一，要么约定插槽内 zs-table 紧贴 wrap 元素，要么都改后代选择器。审查这类改动时优先查 CSS 组合器与显隐方式是否互相矛盾。",
+   "evidence": "会话 c689a168（基线 5f4e161）review 结论：\"[HIGH] v-show 与祖先级 :has() 冲突；列表面板 v-show 隐藏后 DOM 仍在，:has(.building-table-view-table-wrap … .zs-table-container--auto-height) 仍会命中\"，判定 BLOCK；并列出 [MEDIUM] 全局规则要求表格为直接子节点、组件内 panel 规则为后代选择器，插槽多包一层 div 时全局收缩不生效。",
+   "files": [
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/views/components/BuildingTableViewTabs.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "baseline": "5f4e161",
+   "sessionIds": [
+    "c689a168-f238-4439-a43e-14703fe0998c"
+   ],
+   "bundle": "087.md"
+  },
+  {
+   "title": "[苏房] 系统用户管理页的端别/账号类型字段名是 accountType，没有 terminalType；accountType='4' 时禁止编辑",
+   "type": "fact",
+   "content": "【什么情况】在后台系统用户管理页（zhi2-web-admin/src/views/system/user/detail.vue，371 行，同级有 index.vue、deptDialog.vue、profile/）改字段、加校验或做端别显隐时，容易按其他业务模块的习惯去找 `terminalType`（G 端/B 端那套），结果在模板里根本搜不到。\n\n【为什么】这个页面用的是 `accountType`：模板第 23-25 行 `<el-form-item label=\"账号类型\" prop=\"accountType\">` 配 `zs-select :value.sync=\"form.accountType\" :options=\"accountTypeOptions\"`，第 64-66 行的「角色」用 `zs-select :value.sync=\"form.roleIds\" multiple` 多选。页面底部第 109-110 行用 `<operation-btn-group :moduleName/businessName :form :primaryKey :biz-state=\"0\" :showEdit=\"form.accountType != '4'\" :showSubmit=\"false\">` 控制按钮，即账号类型为 '4' 的账号不可编辑。data 侧字典 options 有 accountTypeSelectOptions / accountTypeAllOptions / deptAuthTypeOptions / treeData 四组。所以「端别」字段在本页叫 accountType，'G' 之类的端别取值是其他模块的 terminalType 语义，两者不能互相套用。\n\n【怎么做】改这一页前先 grep 模板确认字段名（accountType vs terminalType），选项来源走本页 data 里的 accountType*Options（字典 sys_account_type 一类），不要照搬 terminalType 的条件隐藏规则；编辑门控要连带判断 accountType != '4'，别只看权限。",
+   "evidence": "会话 sess_subagent_agent_f3f2695c 只读调查结论：\"template 中不存在 terminalType 字段，端别字段就叫 accountType\"；给出 detail.vue 第 23-25 行账号类型 zs-select(:value.sync=\"form.accountType\")、第 64-66 行角色 zs-select multiple、第 109-110 行 operation-btn-group :showEdit=\"form.accountType != '4'\"。",
+   "files": [
+    "zhi2-web-admin/src/views/system/user/detail.vue"
+   ],
+   "baseline": "114af19",
+   "sessionIds": [
+    "sess_subagent_agent_f3f2695c-f83b-414b-85f2-030b42d4858f"
+   ],
+   "bundle": "087.md"
+  },
+  {
+   "title": "[苏房] 删掉项目级备案价接口后，定价弹窗的项目级上下限校验静默失效（校验器分支永假）",
+   "type": "bug",
+   "content": "情况：contract 模块的 pricingModeDialog.vue 里 `littleThanHouseTotalPrice2` 校验器有三条分支——「项目参数」「全局参数」「不校验」。当 `open()` 中调用 `getRecordPriceControl(this.projectId)` 被删除（`isProjectLimit` / `projectLimit` 只在 data 里初始化为 `false` / `{}`，之后再无赋值）时，第一分支永假，校验静默退化成：全局 `record.isEnable !== 1` 时走 `else` 完全不做比例校验，仅剩必填；全局开启时则一律按全局 `upperRatio` / `lowerRatio` 拦，项目上配置的更严/更宽比例被忽略。\n为什么：这类「用 data 初值当前置条件」的校验器不会报错、不会告警，只会从「明显不合法」变成「全部通过」，测试很容易漏；而它决定的是总价能否越界提交。\n怎么做：接口下线时不能只删 import / call / 白名单三处（本次 diff 改了 dialog 的 import 与 projectId prop、PricingModeTable 的 :project-id、contractRequest.js 的 export、apiV3Normalize.js 的白名单），必须同步处理校验器：要么接回数据源重新赋值 isProjectLimit/projectLimit，要么把第一分支和这两个字段一起删净，并明确「只靠全局 + 后端兜底」。同时清理残留死代码：`moreThanHouseTotalPrice` 未挂到 rules、只被它使用的 housePriceLimit 字典、PricingModeTable 上已不再向下传的 projectId prop。",
+   "evidence": "会话 9fce1938 审查结论 HIGH：『项目级备案价上下限校验失效』——isProjectLimit / projectLimit 仅初始化为 false / {}，删除 getRecordPriceControl 后再无赋值；失败场景表格对比：全局未开启但项目 enable==1 时改前按项目比例拦截、改后走 else 不做比例校验；全局开启时改后始终走全局。同结论还标出 MEDIUM『项目级相关死代码（与删除 API 不一致）』。",
+   "files": [
+    "zhi2-web-admin/src/views/contract/dialogs/pricingModeDialog.vue",
+    "zhi2-web-admin/src/views/contract/components/tables/PricingModeTable.vue",
+    "zhi2-web-admin/src/views/contract/utils/contractRequest.js",
+    "zhi2-web-admin/src/utils/apiV3Normalize.js"
+   ],
+   "baseline": "5f4e161",
+   "sessionIds": [
+    "9fce1938-534f-40ed-8f3d-40300e252e4e"
+   ],
+   "bundle": "088.md"
+  },
+  {
+   "title": "[苏房] 变更单详情：detailCallback 不 return 让 loading 提前结束，复用组件时 qualificationList 残留还会短路兜底请求",
+   "type": "bug",
+   "content": "情况：toB/companyRecord/detail.vue 的 `getDetail` 成功分支写成 `this.detailCallback(response, changeId)` 后直接 `return`（无值），外层的 `.finally(() => { this.loading = false })` 会立刻执行，而 detailCallback 内部链式触发的 `loadChangeQualificationIfNeeded` 仍在异步写资质，用户会在 loading 结束后看到空资质或上一张单的数据；这与 fallback 分支 `return this.loadChangeDetailFromOwnCompany(...)` 的行为不一致。第二个问题是同组件不同 id 复用：`this.form = { ...this.form, ...change }` 而 `change` 通常不含 qualificationList，`applyQualificationFromResponse` 只在有已填资质时赋值、不清空，于是旧的 qualificationList 留下，`loadChangeQualificationIfNeeded` 又因为 `getFilledQualificationRows` 已有数据直接 resolve，`/qualificationRecordChange/page` 与 `pageNoPermissions` 都不会再发。\n为什么：Promise 链里「分支一个 return 一个不 return」是 Vue2 详情页最隐蔽的一类不一致；`.finally` 的时机跟着最外层 Promise 走，而不是跟着业务链走。\n怎么做：成功分支改成 `return this.detailCallback(response, changeId)`，或在 getDetail 内统一 return 包含 loadChangeQualificationIfNeeded 的整条链；同时在 detailCallback / applyQualificationFromResponse 开头把 `this.form.qualificationList` 重置为 `[]`（复用已有键，无需 $set），再应用响应；或让 loadChangeQualificationIfNeeded 按变更单 ID 做版本校验，避免用旧列表短路。",
+   "evidence": "会话 03e6c3c6 两条 HIGH：『getDetail 未等待资质兜底 Promise』（引用 293-310/335-363 行代码，finally 会立刻把 loading 设为 false，与 fallback 路径 return loadChangeDetailFromOwnCompany 不一致）与『切换变更单时 qualificationList 可能残留，阻断兜底拉取』（引用 227-241/243-246/343-347）。",
+   "files": [
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue",
+    "zhi2-web-admin/src/utils/registerQualification.js",
+    "zhi2-web-admin/e2e/company/company-record-change.spec.js"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "03e6c3c6-3abe-4db2-9e9b-ae6e9fc04640"
+   ],
+   "bundle": "088.md"
+  },
+  {
+   "title": "[苏房] zs-table 列宽抖动改造后必须补三处重测触发：字典异步、tableData 同引用、DOM 测宽锁定后忽略内容估算",
+   "type": "bug",
+   "content": "什么情况：为修高分屏下列宽闪烁，把 zs-table-column 的 updated() 全量 DOM 量测 + rAF 合并成「显式触发的按需量测」（rAF debounce + watch zsTable.tableData），并在 zs-table 加拉伸阈值 STRETCH_ALLOCATION_THRESHOLD_PX=2 与 hadStretch 滞回。抖动确实消失，但丢掉 updated() 这个万能兜底后出现三类静默回归。\n\n为什么：①domMeasuredWidth 一旦被 DOM 结果锁定，baseColumnWidth 就不再跟 contentWidth 的文本估算走，列宽只在显式量测时更新；②watch tableData 里 nextData === prevData 直接 return（且 inject 的 'zsTable.tableData' 非 deep），原地改单元格、不换数组引用时根本不会 scheduleDomWidthMeasure；③列配置 type=dict 的异步字典由 syncDictOptions 只更新 this.options，没有对 options 的 watch，字典标签从码值变成中文名后列变宽，列宽却停留在旧值。\n\n怎么做：这类改造的验收清单是「谁还会改变列内容宽度」——字典加载完成后补一次量测（watch options），内容列对 contentWidth 补 scheduleDomWidthMeasure，tableData 用 deep 或约定必须换数组引用。另注意 verifyColumnWidthFromDom 只加宽不缩窄（防闪有意为之），列不会因内容变短而收窄，属可接受取舍。",
+   "evidence": "会话 def729bc（基线 99bfdbd）review 改动时给出 [HIGH] 三条：domMeasuredWidth 锁定后忽略 contentWidth；nextData===prevData 直接 return 导致原地改单元格不触发量测；syncDictOptions 里 getDicts 只更新 this.options 且无 watch，字典标签渲染变宽后列宽长期偏窄直到 resize/doLayout/整表换数据。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "def729bc-c257-4938-8cb6-ebb71b658de9"
+   ],
+   "bundle": "089.md"
+  },
+  {
+   "title": "[苏房] BuildingNodeDialog 靠 watch('$attrs.visible') 驱动弹窗：没声明 visible prop，补 prop 会静默失效",
+   "type": "bug",
+   "content": "什么情况：新增/查看分流改造后，BuildingChangeTable 的 handleAdd 只切到 BuildingNodeDialog（多选批量加楼幢），handleView/handleUpdate 才挂 BuildingChangeDialog（v-if 每次重建，避免旧表单残留，顺序正确）。但新建的 BuildingNodeDialog 用 :visible.sync 传值却没声明 visible prop，靠 inheritAttrs:false + watch '$attrs.visible' 触发 openListSelect。\n\n为什么：$attrs 里的 visible 能收到值，但一旦有人「规范化」补上 props: { visible: Boolean }，该值就不再进 $attrs，watch('$attrs.visible') 永远不触发，弹窗静默打不开，而且没有任何报错。同理这写法与项目其它弹窗不一致，后续接手者极易踩。\n\n怎么做：新建弹窗一律声明 visible: Boolean（与 zs-dialog/Element 的 :visible.sync 契约一致），在 visible === true 时调用 openSelect；确实要透传属性再加 inheritAttrs:false。这次改动的另一个半迁移痕迹是 BuildingChangeDialog 里的 add 模式与内嵌选楼表格已成死路径、父模板上的 @refresh 也无子组件发出（子组件仍 this.$parent.getList()），收尾时应一并清理或统一成 $emit('refresh')。",
+   "evidence": "会话 0a7d2727（基线 6b3ac5a）review 结论：PASS，但列 4 条 MEDIUM，其中「visible 依赖 $attrs 而非显式 prop，File: BuildingNodeDialog.vue:21-26」「BuildingChangeDialog 上的 @refresh 未使用」「add 模式在 BuildingChangeDialog 中成为死路径」。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/progress/change/components/BuildingNodeDialog.vue",
+    "zhi2-web-admin/src/views/supervision/progress/change/components/BuildingChangeTable.vue",
+    "zhi2-web-admin/src/views/supervision/progress/change/components/BuildingChangeDialog.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "0a7d2727-e02b-4b7b-8d0a-e80aa9df65e6"
+   ],
+   "bundle": "089.md"
+  }
+ ]
+}

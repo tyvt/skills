@@ -1,0 +1,82 @@
+{
+ "project": "苏住房C",
+ "batch": "043",
+ "files": [
+  "043.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "Uncaught (in promise) Type",
+   "type": "bug",
+   "content": "问题已修复，原因有两处： ### 1. 小区 ID 未正确读取（主要原因） 慧物业 Tab 进入页面时会通过 `userStore.setProjectInfo` 把当前小区写入 `userStore.project`，但菜单跳转时 `buildMenuRouteContext` 读取的是不存在的 `userStore.projectId` / `userStore.projectInfo`，导致生成的 URL 为： ``` /pages_owner/project/info/index?id= ``` 已改为读取 `userStore.project`。 ### 2. 菜单配置路由码错误（fallback 配置） 在 `menus.fallback.json` 中： - **小区信息** 误配为 `1_1_0`（业委会信息页），已改为 `1_0_0`（小区信息页） - **社区公告** 误配为 `2_0_4`（小区信息页），已改为 `2_0_24`（社区公告页） --- 若线上菜单来自服务端配置（`app.suzhufang.config`），需在后台同步修正「小区信息」的 `url` 为 `1_0_0`。本地 fallback 已改好；`menuRouteMap.js` 的修复对所有菜单跳转都生效。 请重新进入慧物业 Tab，点击「小区信息」验证是否正常加载。若仍无数据，请确认",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`menus.fallback.js",
+    "若线上菜单来自服务端配置（`app.suzhufang.conf",
+    "已改好；`menuRouteMap.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\repair\\submit.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\property.ts、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\property.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\authentication\\owner\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9f4ea5c1-0697-4185-b730-1f8bb8246a06"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "我的-我的房屋，未添加过房屋的用户点击历史添加记录，",
+   "type": "bug",
+   "content": "已修复。 ## 问题原因 接口在无历史记录时返回 `rows: null`（截图中 `total: \"0\"`, `rows: null`），而 `history.vue` 里直接对 `res.rows` 调用了 `.map()`： ```javascript res.rows = res.rows.map((el) => { ... }) ``` `null.map()` 会抛错，外层 Promise 既不会 `resolve` 也不会 `reject`，`z-paging` 的 `completeByTotal` 不会被调用，页面就一直停在「正在加载...」。 ## 修复内容 修改了 `zhi2-mobile-shimin/src/pages_owner/house/history.vue`： 1. 使用可选链和默认空数组：`res.rows?.map(...) || []`，与 `tenant/history.vue` 写法一致 2. 补充 `.catch(reject)`，接口异常时也能正确结束加载 修复后，无数据时会正常结束加载，并由 `ZsPaging` 组件默认展示 **「暂无数据」** 空态。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`history.vue",
+    "`zhi2-mobile-shimin/src/pages_owner/house/history.vue",
+    "`tenant/history.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\history.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d96faf99-8932-4fca-b475-a68344311240"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "宽度不对，应该都是100%，选择框也看不见了",
+   "type": "bug",
+   "content": "已修复，原因和改动如下： **宽度问题** - `authentication.vue` 的 `.page-container` 使用了 `align-items: center`，卡片和按钮被压缩居中 - 按钮使用了 `long` 类（宽度 88%） **选择框不可见** - `TitleCard` 右侧插槽容器没有固定尺寸 - `ZsImage` 内部是 `width/height: 100%`，父容器无尺寸时图标会塌陷为 0 **修改内容** 1. **`TitleCard.vue`** — 为右侧选择图标增加固定尺寸容器 `.icon-slot`（20px） 2. **`authentication.vue`** — 去掉 `align-items: center`，卡片和按钮设为 `width: 100%`，移除按钮的 `long` 类 3. **`addTypeChoose.vue`** — 按钮同步设为 `width: 100%` 刷新页面后，三个选项卡片和「下一步」按钮应铺满内容区宽度，右侧单选圆圈也会正常显示。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`authentication.vue",
+    "**`TitleCard.vue",
+    "**`authentication.vue",
+    "**`addTypeChoose.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b057f782-58f8-4cae-917c-9f6600520843"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "当前小程序登录状态没有缓存，关闭小程序重新打开就退出",
+   "type": "fact",
+   "content": "问题已定位并修复。 ## 原因 `user.js` 里 Pinia 状态的本地持久化被包在 `#ifdef H5` 条件编译里，**只在 H5 生效，微信小程序端不会执行**： ```215:226:zhi2-mobile-shimin/src/store/user.js /* #ifdef H5 */ userStore.$patch(JSON.parse(sessionStorage.getItem('user') || '{}')) // ... /* #endif */ // #ifdef H5 ← 小程序端这段被跳过 userStore.$patch(uni.getStorageSync('user')) userStore.$subscribe(...) // #endif ``` 登录时虽然会调用 `userStore.setToken()`，但 token 只存在内存里；关闭小程序后 Pinia 状态重置，就表现为退出登录。 ## 修复 把 `uni.setStorageSync` / `uni.getStorageSync` 的持久化改为**全平台生效**（含微信小程序），H5 仍保留 `sessionStorage` 逻辑。 ## 验证方式 1. 重新编译并运行小程序 2. 完成登录 3. 完全关闭小程序后重新打开 4. 进入「我的」页，应仍显示已登录状态（昵称",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`user.js",
+    "```215:226:zhi2-mobile-shimin/src/store/user.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\store\\user.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\store\\vote.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\login\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\App.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\store\\owner.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "81967bea-0ba8-4625-a47d-4edeb016e86b"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,415 @@
+{
+ "batch": 18,
+ "files": [
+  "111.md",
+  "112.md",
+  "113.md",
+  "114.md",
+  "115.md",
+  "116.md"
+ ],
+ "count": 24,
+ "memories": [
+  {
+   "title": "同一模块多个列表接口响应包装不一致：写『递归解析分页结果』共享函数，不要让页面各写 res.rows",
+   "type": "bug",
+   "content": "情况：房屋限制管理里两个表格（详情页子表 + 单据子表/选记录弹窗）都显示空白，Network 里接口确实 200 且返回了数据。\n\n为什么：同一模块的接口响应结构并不统一——`/building/project/page` 返回 `{ total, rows, code, msg, summary }`（列表在顶层 rows），而 `/building/houseLimit/page` 与 `/building/houseLimit/pageHouseLimitAll` 返回 `{ code, msg, data }`（列表被包在 data 里，YApi 文档上画的 rows/total 实际在 data 内部）。页面硬取 `res.rows`/`res.total` 只能拿到 undefined，表格自然空白；此前那种『兼容解析』只认顶层和一层 data，也会漏掉更深包装。\n\n怎么做：在模块常量文件（houseLimitConstants.js）里实现一个 `parseHouseLimitPageResult(res)`：按 rows/records/list 依次取数组，最多下探 3 层 data/page/result/pageInfo 包装；total 同样递归取，取不到用行长度兜底；最后兜底取响应里第一个对象数组字段。所有消费方（详情页两个表、单据子表 mixin、LimitRecordSelectDialog）统一走这一个函数，改一处全部生效。排查顺序：接口有返回但表格空白且无报错时，先把 response 原文贴出来核对列表字段的真实层级，不要先怀疑 zs-table 的 row-key / 布局。",
+   "evidence": "会话中实测三个接口响应结构：project/page 顶层 rows，houseLimit/page 与 pageHouseLimitAll 为 {code,msg,data}；两个表格共用同一根因。修复改为共享递归解析函数 parseHouseLimitPageResult，ESLint 通过。本地数据为空（data:null，13 项目全 0 条）无法目视验证有数据渲染。",
+   "files": [
+    "zhi2-web-admin/src/views/building/houseLimit/houseLimitConstants.js",
+    "zhi2-web-admin/src/views/building/houseLimit/detail.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/components/LimitRecordSelectDialog.vue"
+   ],
+   "baseline": "8f0cfa2",
+   "sessionIds": [
+    "a5b234e2-7ed5-4ce3-a362-c4c694f6b33c"
+   ],
+   "bundle": "111.md"
+  },
+  {
+   "title": "守卫竞态：roles 已有值但 addRoutes 为空时直接 next()，动态路由未挂就跳落地页 → 报「页面未授权或不存在」",
+   "type": "bug",
+   "content": "情况：首页改成待办任务页后，部分账号登录提示「页面未授权或不存在」，但菜单权限其实是有的，且时好时坏、网络慢或菜单大的账号更容易中招。\n\n为什么：待办页路由来自 `listRouters` 动态注册，真实 path 可能是 `/flowable/.../todo`，而登录流程里硬编码 `router.push('/todo')`、`DEFAULT_LANDING_PATH='/todo'`。更关键的是路由守卫的判定条件：第一次导航触发 GetInfo 后 `roles` 已经有值，但 `GenerateRoutes` + `addRoute` 还没结束；此时若再次进入守卫（登录后立刻 push），会命中 `roles.length > 0` 分支直接 `next()`，而 `/todo` 尚未注册 → 落到通配符 `*` → /404 → 提示未授权。本质是「先跳落地页、后挂动态路由」。\n\n怎么做：① 守卫改用 `needsDynamicRoutes()` 判定——`roles` 为空 **或** `addRoutes` 为空都要先加载；② 用 `loadDynamicRoutes` 单例 Promise 包住菜单拉取+注册，避免并发重复注册；③ 新增 `utils/defaultLanding.js`，按菜单 component（`home/index`、`flowable/todo` 等候选）解析真实落地页，不再死磕 `/todo`；④ 登出/重新登录派发 `RESET_PERMISSION` 清空 `addRoutes`，否则换账号仍认为路由已加载。",
+   "evidence": "会话结论指出 roles 有值但 GenerateRoutes/addRoute 未完成的守卫竞态，导致 /todo 未注册命中通配符跳 404；修复点为 needsDynamicRoutes + loadDynamicRoutes 单例 + defaultLanding 按 component 解析 + RESET_PERMISSION 清 addRoutes。",
+   "files": [
+    "zhi2-web-admin/src/router/index.js",
+    "zhi2-web-admin/src/store/modules/permission.js",
+    "zhi2-web-admin/src/utils/defaultLanding.js",
+    "zhi2-web-admin/src/views/login.vue"
+   ],
+   "baseline": "d327eb5",
+   "sessionIds": [
+    "5657d5ac-3d67-4095-b7de-c93ba44cfa41"
+   ],
+   "bundle": "111.md"
+  },
+  {
+   "title": "跨模块穿透跳转（注销单→许可详情）必须带 busCode/pathHint + backUrl + query.id，且无主键时别保留 link 样式",
+   "type": "pattern",
+   "content": "情况：预售许可注销列表需要从「预售许可证号」列穿透到预售许可详情，实现为 `buildNavigationByFilePath('presale/permit/detail', { routeId, query: { formMode: 'view' }, preferDetail: true })`。\n\n为什么/怎么改：审查发现三处可复用教训：① 只传 filePath 不够——同一 `presale/permit/detail` 若存在多条菜单路由，`findRouterByFilePath` 可能命中非预期项，必须补 `busCode`（许可申请为 `ysxksq`，来自 permitConstants 常量）与 `pathHint`，与方案页跳转保持一致；② 跨模块跳转要像 `buildDetailNavigation` 那样补 `query.backUrl = this.$route.path`，并在详情靠 query.id 取主键的路由分支上显式带 `id: String(row.presalePermitId)`，否则返回/面包屑回不到来源列表、或打开错误记录；③ 列配置 `type: 'link'` 会始终渲染成可点击，但 handle 里缺 ID 时直接 return，用户看到链接却毫无反馈——无主键时应降级为 `type: 'text'`，或点击时 `msgWarning('暂无关联预售许可，无法查看')`，同时列表接口应保证返回该外键。主键一律转字符串传，避免 Long 精度丢失。",
+   "evidence": "Vue 审查对照 permitExtend/index.vue、listMixins、detail.vue 的 buildNavigationByFilePath 用法，给出三条 MEDIUM：无 presalePermitId 仍为 link、跨模块跳转未带 backUrl/query.id、路由解析未使用 busCode/pathHint。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permitCancel/index.vue",
+    "zhi2-web-admin/src/views/presale/permitExtend/index.vue",
+    "zhi2-web-admin/src/utils/ruoyi.js"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "bd06a422-0327-4773-ae99-6cf07722cbfe"
+   ],
+   "bundle": "111.md"
+  },
+  {
+   "title": "字段区块子组件：查看态统一走 DetailTemplate 文本而非 disabled 控件，且不要只写 el-form-item 依赖祖先 zs-form",
+   "type": "pattern",
+   "content": "情况：经纪机构「业务范围」做成独立区块组件 AgencyBusinessScenarioSection，被基本信息编辑页与只读详情页复用。\n\n为什么有问题：① 查看态混搭——`isView===true` 时基本信息走 DetailTemplate，而业务范围仍渲染禁用态 checkbox group，同一查看页出现「文本详情 + 灰色复选框」两种语义，与独立 Detail 页不一致，无障碍上也该用文本；② 组件内只有 `el-form-item`，自身没有 `zs-form`/`el-form`，完全依赖祖先 provide/inject：在无表单容器处复用会触发 Element「form-item 无 form」类告警，`prop=\"businessScenario\"` 也挂不到父级 rules；③ `v-tooltip` 写在 el-form-item 根上，角标/提示会盖住整行（含 checkbox），悬停区域与「原值」语义不对齐；④ 通过 prop 对象子字段回写（setter 里直接改 `this.form.businessScenario`）破坏单向数据流，父级换引用或做不可变更新时行为难以推理。\n\n怎么做：拆成「只读展示」与「可编辑表单项」两个子组件，查看态用 DetailTemplate 多选文案（复用 formatCommaSeparatedDictLabels）；必须在组件注释里声明需处于 zs-form 内，或让组件自带表单容器；趋势/变更提示挪到字段旁的独立元素而不是 el-form-item 根；子字段变更改 `v-model` 或 `@update:xxx` 交由父级写 form。",
+   "evidence": "对 AgencyBusinessScenarioSection.vue 与 AgencyBasicInfoForm/Detail、toB/agencyRecord/detail、companyRecordAgency/change/detail 的审查：给出 HIGH（prop 子字段回写、查看态展示分裂、el-form-item 无 form 容器）与 MEDIUM（v-tooltip 绑在 form-item、重复 companyTypeOptions prop）。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBusinessScenarioSection.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoForm.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/agencyBasicInfoContent.js"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "cd5ffe4e-880d-461a-a926-5ee7b6d5ffdc"
+   ],
+   "bundle": "111.md"
+  },
+  {
+   "title": "详情页整行字段不存在 zs-form-col，必须用 el-col + FORM_COL_FULL",
+   "type": "bug",
+   "content": "什么情况：把「备注」等长文本字段从独立 el-row 挪进主 el-row、要求整行显示时，写成了 `<zs-form-col full>`，被代码审查判 BLOCK。为什么：全仓库（含 node_modules）根本没有 zs-form-col 定义或注册，未注册标签不会套用 24 列栅格，备注行会变成窄列、label 与同行字段不对齐，且不报错只错位。怎么做：整行字段统一写 `<el-col v-bind=\"FORM_COL_FULL\">`（查看态用 DETAIL_COL_FULL），从 `@/utils/detailLayout` 引入，不需要再单独包一层 el-row；本仓库对应的布局类是 `detail-from-container`，并不存在 detail-form.scss。动手前先 grep 兄弟页（如 priceParameters/detail.vue、人员备案）确认既有写法，zhi2-web-admin 里的 zs-* 组件要核实真实存在，禁止凭名字自创新组件。",
+   "evidence": "会话 1cbe6241 审查 priceFiling/recordPriceMngSuzhou/detail.vue 与 changeDetail.vue 的备注字段改造，判定 BLOCK：<zs-form-col full> 全仓库无注册，应改为 el-col v-bind=FORM_COL_FULL；同项目 priceParameters/detail.vue 即为正确写法。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/detail.vue",
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/changeDetail.vue",
+    "zhi2-web-admin/src/utils/detailLayout.js",
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/priceParameters/detail.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "1cbe6241-80e8-4c52-ba78-47c2663f7950"
+   ],
+   "bundle": "112.md"
+  },
+  {
+   "title": "Headline 的 border-only 会连 #right 操作区一起隐藏（子表工具栏消失）",
+   "type": "bug",
+   "content": "什么情况：子表组件 PayDetailsTable 为去掉区域标题加了 showHeadline prop，内部用 `:border-only=\"!showHeadline\"`。为什么踩坑：Headline 进入 borderOnly 后整个 collapse-header 都不渲染，而「新增/删除」是放在 #right 插槽里的，于是工具栏一并消失；若某非 view 场景（如 bizState == '0'）在 Tab 内仍需维护明细，就会出现「有权限没入口」，且不报错极易漏测。怎么做：把「只读/可编辑」显式拆成独立 prop 分别控制标题与操作区，或参考 PermitInfoPanel 的做法只藏标题、保留操作区；改造前先确认所有调用方是否真的只有查看态。附带一点：详情页无需本地 import/注册 HeadTitle，detailMixins 已全局注册，重复注册只是噪音。",
+   "evidence": "会话 f21581e9 审查 usemoneyRevoke/detail.vue 与 PayDetailsTable.vue 新增 showHeadline/:border-only，MEDIUM 指出 borderOnly 连 #right 插槽都不渲染，子表操作按钮会消失；同时指出 HeadTitle 被本地重复注册。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/unblock/usemoney/components/PayDetailsTable.vue",
+    "zhi2-web-admin/src/components/HeadTitle/index.vue",
+    "zhi2-web-admin/src/views/supervision/unblock/usemoneyRevoke/detail.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "f21581e9-920c-4695-b230-13c7a7ce18d9"
+   ],
+   "bundle": "112.md"
+  },
+  {
+   "title": "查看态仍出现「保存」按钮：头部按钮与只读展示必须共用同一 canEditInHeader 谓词",
+   "type": "bug",
+   "content": "什么情况：分支机构详情在查看状态（已备案、或主管部门端）下仍显示「保存」按钮并被用户直接指出。为什么：头部按钮组只按 formMode 判断，没把业务状态与端类型纳入可编辑判断，而只读展示又是另一套条件，两处不同源。怎么做：抽一个 canEditInHeader 谓词——仅企业端（B 端）且 bizState === '0'（未备案）且未注销时为 true，与列表页「编辑」按钮条件保持完全一致；再由它派生 showSaveButton（新增态，或满足 canEditInHeader 的编辑态）和 isViewDisplay（查看态或 !canEditInHeader 时强制只读）。三态同源可避免「按钮能点但表单只读」或「只读却还能保存」这两类反复出现的回归。",
+   "evidence": "会话 27689708 用户反馈「分支机构详情查看状态还有保存按钮」，修复 AgencyBranchDetail.vue：新增 canEditInHeader/showSaveButton/isViewDisplay 三个派生状态，与列表页编辑条件对齐。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchDetail.vue",
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchList.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "27689708-9f9b-4386-9993-e547142b1ab3"
+   ],
+   "bundle": "112.md"
+  },
+  {
+   "title": "接口路径带斜杠、权限字符用驼峰：用 businessNameForPerms 把两者拆开",
+   "type": "pattern",
+   "content": "什么情况：permitCancel / permitExtend 这类模块，接口路径由 moduleName + businessName 拼成（businessName = 'permit/cancel' → /presale/permit/cancel/...），但后端菜单里的权限字符是驼峰 permitCancel。为什么错：权限也走同一拼接就得到 presale:permit/cancel:edit，与菜单权限永远对不上，按钮不显示且没有报错。怎么做：沿用 permsMixins 已有设计加一层 permissionBusinessName 计算属性（取 businessNameForPerms，缺省回退 businessName），ListTemplate 的操作列权限与 OperationBtnGroup 新增的 permission-business-name prop 都改用它；列表页配 businessNameForPerms: 'permitCancel'，详情页传 permission-business-name=\"permitCancel\"，自定义按钮常量改成 presale:permitCancel:*。接口拼接保持 businessName 原样不动。以后凡是「接口带 /、权限用驼峰」的模块只设 businessNameForPerms 即可，不要去改接口路径。",
+   "evidence": "会话 c63e86e5 用户指出 permitCancel 权限字符与接口拼接冲突，落地为 permsMixins 新增 permissionBusinessName + ListTemplate/OperationBtnGroup 配套改造。",
+   "files": [
+    "zhi2-web-admin/src/mixins/permsMixins.js",
+    "zhi2-web-admin/src/views/presale/permitCancel/permitCancelConstants.js",
+    "zhi2-web-admin/src/views/presale/permitCancel/detail.vue",
+    "zhi2-web-admin/src/views/presale/permitExtend/detail.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "c63e86e5-4a61-4d1b-8029-c50c77de9272"
+   ],
+   "bundle": "112.md"
+  },
+  {
+   "title": "子表新增行缺少后端主键时，二次操作要「先补保存再刷新快照」，而不是提示用户手动保存",
+   "type": "pattern",
+   "content": "情况：预售申请编辑态的预售楼幢列表里，刚添加、尚未保存的楼幢点「维护工程形象进度」会失败——进度弹窗依赖后端生成的 presalePermitBuildingId，新增行只有前端临时对象，没有主键，所以虽然按钮可见却无法维护，只能先保存退出编辑、再点编辑进来。\n为什么：主键由后端在 /save 时下发，前端临时行永远拿不到；而原来的 editCallback 保存后一律切回查看态，导致「新增楼幢 → 维护进度」这条自然操作链被切断。\n怎么做（可复用到任何「子表行需后端 id 才能打开子弹窗」的场景）：\n1) 在打开子弹窗前探测选中行是否缺主键；缺则先弹确认（说明将自动保存），用户确认后调用补保存方法 saveForProgress()——只做校验 + /save，不走跳转查看页；\n2) 补保存成功后必须 refreshDetailSnapshot()（封装成可 await 的详情刷新）把楼幢列表重新拉回，让行对象拿到真实 id，再打开弹窗，否则仍会读到旧行；\n3) 修改 editCallback：编辑态保存后保持编辑态、只刷新快照，不再切成查看态；\n4) 表格按钮 hover 文案要提前告知（「所选楼幢尚未保存，点击后将提示保存」），避免用户以为是禁用；\n5) add 模式（主单尚无主键）仍只能提示先保存主单一次，这是合理边界。E2E 侧让 helper 自动确认该补保存弹窗，并把附件上传的固定 waitForTimeout 换成等待「已上传」状态。",
+   "evidence": "会话 4ad74818：预售楼幢列表工程形象进度即时维护修复，涉及 detail.vue 的 editCallback/refreshDetailSnapshot/saveForProgress/openProgressDialog 与 PresaleBuildingTable 的 handleProgressMaintain；E2E 新增「保存→删楼幢→重选→直接维护进度」场景。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/components/detail.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleBuildingTable.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleProgressDialog.vue",
+    "zhi2-web-admin/e2e/presale-permit-helpers.js",
+    "zhi2-web-admin/e2e/presale-permit-real-api-flow.spec.js"
+   ],
+   "baseline": "1c445c7",
+   "sessionIds": [
+    "4ad74818-9e10-4ec9-a586-ce529fd33e4b"
+   ],
+   "bundle": "113.md"
+  },
+  {
+   "title": "未登录的注册页顶栏品牌信息（系统名称 + LOGO）统一从 platformConfig 读，公共组件内做回退",
+   "type": "pattern",
+   "content": "情况：登录页已能按系统配置显示平台名称/LOGO，但开发企业、经纪机构等注册页顶栏仍是写死的文案和办公楼上图标，改系统配置后注册页不跟随。\n为什么：注册页头部是一个共享的 RegisterPageHeader 组件，它只接受 props 默认值，没有接 Vuex 的 platformConfig；而多个注册页（companyRegister、propertyCompanyRegister、institutionRegister）都复用它，因此只要改组件一处即可覆盖全部注册入口，不需要逐页改。\n怎么做：\n1) 组件内 mapState 读 platformConfig，computed 出 displayPlatformName = platformConfig.platformName，空值回退到 props 默认名称（保证配置缺失/接口未返回时页面不留空）；\n2) LOGO：有 platformConfig.sysLogo 才渲染图片，且必须经 resolveServerAssetUrl 处理路径（后端返回的是相对资源路径，直接塞进 src 会 404）；无配置时保留原图标兜底；\n3) LOGO 高度按顶栏实际高度适配（顶栏 46px 时取 26px），避免改配置后布局塌掉；\n4) 注册页页面本身零改动，只引用组件即可。验证方式：dev server 下在系统配置里改系统名称/LOGO，再访问 /companyRegister 与 /institutionRegister 对照。\n推广：凡是「未登录也能看到」的品牌要素（顶栏、页脚、登录卡片）都应走同一份 platformConfig，禁止各页写死。",
+   "evidence": "会话 b7ae39a7「注册页头部从系统配置读取图标与名称」，只改 RegisterPageHeader/index.vue，companyRegister.vue 与 institutionRegister/index.vue 无需改动。",
+   "files": [
+    "zhi2-web-admin/src/components/RegisterPageHeader/index.vue",
+    "zhi2-web-admin/src/views/register/companyRegister.vue",
+    "zhi2-web-admin/src/views/institutionRegister/index.vue"
+   ],
+   "baseline": "9dba655",
+   "sessionIds": [
+    "b7ae39a7-4a70-4443-afa8-63ba883783a8"
+   ],
+   "bundle": "113.md"
+  },
+  {
+   "title": "vue-qr 默认 margin=20 会让小尺寸二维码白边失控，需 margin=0 + white-margin=false 并固定容器尺寸",
+   "type": "bug",
+   "content": "情况：工作牌/电子信息卡弹窗里的二维码按设计稿压到 50px 后，白色留白占比过大、码图只有中间一小块。\n为什么：vue-qr 默认 margin=20（单位随 size 相对缩放），叠加外层 .work-card__qr-wrap / .info-card__qr-wrap 的 padding: 4px，容器可显示面积被二次压缩；这不是 CSS 没生效，而是组件自身参数。\n怎么做：给 vue-qr 显式传 :size=\"50\"、:margin=\"0\"、:white-margin=\"false\"，让码图铺满；容器去掉 padding、固定宽高 50×50px 并加 overflow: hidden，防止撑开卡片布局。两个弹窗（个人工作牌 WorkCardDialog 与电子信息卡 InfoCardDialog）要同步改，否则同一业务出现两种二维码观感。\n注意：margin=0 会吃掉扫码静区，打印或扫码识别率不达标时把 margin 调到 1；另用户对同类弹窗的微调常以像素指定（字号 18px、码 50px、补「取消」按钮），改前先按参考图核对尺寸而不是沿用旧弹窗默认值。",
+   "evidence": "会话 271fe773：二维码白色边距太大，根因 vue-qr 默认 margin=20 叠加容器 padding 4px，改为 margin=0/white-margin=false 并同步两个弹窗。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/WorkCardDialog.vue",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/InfoCardDialog.vue"
+   ],
+   "baseline": "9dba655",
+   "sessionIds": [
+    "271fe773-92e0-4ead-a113-8889fcea1743"
+   ],
+   "bundle": "113.md"
+  },
+  {
+   "title": "弹窗表单项间距被「弹窗 margin」和「全局 error-slot padding」叠加成双份",
+   "type": "bug",
+   "content": "情况：zs-dialog 内 .form-box .el-form-item 设了 margin-bottom: var(--dialog-form-item-gap, 16px)，同时全局 element-ui.scss 给所有 .el-form-item 加了 padding-bottom: var(--form-item-error-slot)（16px），两个表单项之间实测约 32px，用户反馈「加了两次，保留一个就行」。为什么：行距有两个来源，任一处调值都会翻倍，且只改页面样式压不住组件层规则。怎么做：把弹窗内表单项的 margin-bottom 归 0（顺带覆盖 Element 默认 22px），删除已无意义的 :last-child 清零规则，行距只由全局 error slot 的 padding 承担；改完在有校验的弹窗里触发必填，确认错误文案不会压住下一行。注意 --dialog-form-item-gap 这个变量还被 ParcelDialog 用于行组 margin-top，动手前先搜全部消费方，不要直接删变量。",
+   "evidence": "会话 addeac18：用户贴出两段 CSS 指出间距叠加，最终把 zs-dialog 的 .form-box .el-form-item margin-bottom 改为 0、删 :last-child 规则，行距收敛到约 16px。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue",
+    "zhi2-web-admin/src/styles/element-ui.scss",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/ParcelDialog.vue"
+   ],
+   "baseline": "1f48b53",
+   "sessionIds": [
+    "addeac18-615b-448c-a66e-efdb0eccd210"
+   ],
+   "bundle": "114.md"
+  },
+  {
+   "title": "弹窗内 DetailTemplate 的标签列宽按「同列最长标签」计算：zs-dialog provide 列数 + effectiveColumn",
+   "type": "pattern",
+   "content": "情况：设计稿要求弹窗展示态标签与值对齐，规则是「取同列最长的文字然后固定间距」，而详情页已有一套对齐规则，弹窗不能再各写一份 label-width。做法：zs-dialog 依据 form-layout 值 provide zsDialogDetailColumn（single=1、double=2），内部 DetailTemplate 改用 effectiveColumn：按该列最长标签字数 ×14px/字 + 30px 内边距算出标签区宽度；双列时 span=12 的项参与两列栅格对齐（detail-grid.js 需支持 2 列槽位）。宽度同步收敛为 single=500px / double=1000px，并写进文档与 ESLint 提示。这样弹窗与详情页共用同一套对齐算法，页面只传 form-layout，禁止再写 style 覆盖标题栏/内边距/底栏，否则又回到一个弹窗一套样式。改完要顺带把数据项 layout 改为 sm:12 等双列写法，否则双列弹窗里仍是单列堆叠。",
+   "evidence": "会话 25c7854f：按设计图改 zs-dialog 壳层，provide zsDialogDetailColumn + DetailTemplate effectiveColumn 实现最长标签定宽，宽度改 500/1000，并把机构注册「服务方案详情」改成 form-layout=\"double\"。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/styles/detail-form.scss",
+    "zhi2-web-admin/src/views/company/institutionRegister/detail.vue"
+   ],
+   "baseline": "d327eb5",
+   "sessionIds": [
+    "25c7854f-db7d-4068-812e-18608800f878"
+   ],
+   "bundle": "114.md"
+  },
+  {
+   "title": "机构基本信息查看页要件：busCode 走场景常量 resolver，busId 固定 companyRecordId 不随 formMode 切换",
+   "type": "pattern",
+   "content": "情况：AgencyBasicInfoDetail 同一套要件区被多个场景复用，原先在「变更审核」里会把 busId 切成变更单 id，导致同一面板随 formMode 取到不同附件集、要件对不上。做法：把 busId 固定为 String(companyRecordId)；busCode 由 resolveAgencyBasicInfoAppendixBusCode() 按机构类型返回常量（经纪 jjjgxx、租赁 zljgxx），常量与 resolver 一起收在 api/company/companyRecord.js，页面不写字面量。注册单对比仍用 030100/030300；机构变更编辑态、管理端备案详情保持原 030100/030300 与变更单 busId 逻辑，改动范围要明确划开。E2E 侧在 appendix-package-helpers.js 同步导出这两个常量，spec 断言引用常量而非裸串。依赖提醒：后端必须在管理端配置 jjjgxx/zljgxx 并在审批通过后把入网要件同步过去，否则基本信息页显示空要件、一致性用例必失败。",
+   "evidence": "会话 ecd8f5a4：新增 AGENCY/LEASE_BASIC_INFO_APPENDIX_BUS_CODE 与 resolver，licenseAppendixBusId 改为固定 companyRecordId，并同步两个 e2e spec 与 fixture 常量。",
+   "files": [
+    "zhi2-web-admin/src/api/company/companyRecord.js",
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue",
+    "zhi2-web-admin/e2e/fixtures/appendix-package-helpers.js",
+    "zhi2-web-admin/e2e/company/register-basic-info-appendix.spec.js"
+   ],
+   "baseline": "fe4ab09",
+   "sessionIds": [
+    "ecd8f5a4-0f8d-4a9a-961f-96307805176b"
+   ],
+   "bundle": "114.md"
+  },
+  {
+   "title": "三主体注册流程的目录/busCode 结构，以及「匿名要件上传有 upload 无 delete」的现状",
+   "type": "fact",
+   "content": "结构事实：开发企业走独立目录 views/register/companyRegister.vue，5 步（信息→法人→要件→股东→提交），busCode 040100，单条上传用 register/components/RegisterUploadItem.vue；经纪与租赁共用 views/institutionRegister/ 的 InstitutionRegisterPage.vue + companyOrganContext mixin（4 步，要件在第 3 步），busCode 030100/030300，租赁入口 index.vue 只是薄包装，传 organ-type/register-bus-code/route-base/header-title，两者 API 都走 api/institution/institutionRegister.js。要件上传三端统一 uploadAnonymous（原生 XMLHttpRequest + FormData 带 busCode/busId/appendixConfigId）；全仓库没有 deleteAnonymous，开发企业删除走 DELETE /file/appendix/{appendixId}，经纪/租赁删除实现与它不一致。要补「匿名删除」能力时必须三处一起对齐，只改一个上传组件会造成部分主体删不掉；改前先确认后端是否提供匿名删除接口。",
+   "evidence": "会话 dd1a96b2 的注册链路探索结论：给出三主体文件结构对比表、busCode 取值，并明确「全仓库未发现 deleteAnonymous，仅有 uploadAnonymous」。",
+   "files": [
+    "zhi2-web-admin/src/views/register/companyRegister.vue",
+    "zhi2-web-admin/src/views/institutionRegister/InstitutionRegisterPage.vue",
+    "zhi2-web-admin/src/views/register/components/RegisterUploadItem.vue",
+    "zhi2-web-admin/src/api/company/companyRegister.js",
+    "zhi2-web-admin/src/api/institution/institutionRegister.js",
+    "zhi2-web-admin/src/constants/companyOrgan.js"
+   ],
+   "baseline": "979bee5",
+   "sessionIds": [
+    "dd1a96b2-8912-437c-84fd-fc3b5fcab383"
+   ],
+   "bundle": "114.md"
+  },
+  {
+   "title": "合同章节改 zs-tabs 展示：v-show 保留 DOM + 打印时强制展开全部页签",
+   "type": "pattern",
+   "content": "情况：把纵向堆叠的合同填写块（如买受人信息里的本人/法定代表人、委托代理人、法定代理人一、法定代理人二）改成页签展示，用户指定用 zs-tabs。做法：只动模板结构，createParty() 的数据结构与 SzBlank/SzChoice 填空体系一律不改，父级 chapter1.vue 传参与 SzContent.getFormData() 因此零改动，风险最小。页签必须用 v-show 保留 DOM，不能用 v-if ——否则未激活页签里的字段不参与取数和校验。最关键的坑：合同要打印，必须加 @media print 覆盖，隐藏页签栏并强制展开全部面板，否则打印出来的合同会丢掉委托代理人/法定代理人信息。zs-tabs 在 src/components/zs-tabs 全局注册，直接用不 import。",
+   "evidence": "会话 2f76d8fe：SzPartyBlock.vue 改 zs-tabs(type=card) 拆 4 页签，明确 v-show 保留 DOM 并加打印覆盖强制展开，ESLint 与 vite build --mode test 均通过。",
+   "files": [
+    "zhi2-web-admin/src/views/contract/chapters/suzhou2016/components/SzPartyBlock.vue",
+    "zhi2-web-admin/src/views/contract/chapters/suzhou2016/chapter1.vue",
+    "zhi2-web-admin/src/views/contract/chapters/suzhou2016/mixins/szForm.js",
+    "zhi2-web-admin/src/views/contract/chapters/suzhou2016/styles/sz-contract.scss"
+   ],
+   "baseline": "ed13ca0",
+   "sessionIds": [
+    "2f76d8fe-a175-42fa-9dfc-fd796c3d3844"
+   ],
+   "bundle": "114.md"
+  },
+  {
+   "title": "OperationBtnGroup 的 show-print=\"false\" 关不掉已备案态的内置打印，必须用 custom-print",
+   "type": "bug",
+   "content": "什么情况：在 V3 合同/备案类详情页给 operation-btn-group 传 :show-print=\"false\" 后，已备案单据上仍会冒出内置打印按钮，且与插槽内自定义 zs-print 并存，两者拼的业务参数不一样，打印结果对不上。\n为什么：OperationBtnGroup 内置打印的渲染条件是 (bizState == '2' || showPrint) && !customPrint——show-print 只是「非备案态是否也显示」的开关，关不掉备案态（'2'）的默认打印；真正关闭只能靠 :custom-print=\"true\"（同目录 loanContract/detail.vue 就是这么写的）。\n怎么做：页面自带打印时同时传 :custom-print=\"true\"，只保留插槽里带权限的 zs-print；:biz-state 必须传，否则内置提交/编辑的 bizState == 0 条件不成立、按钮全被隐藏；permission-prefix 默认由路由模块推导（如 stock:contractChange），当菜单权限串是 contractChange:contractChange 时必须显式覆盖，否则权限永远不匹配。另注意 bizState 在同页混用 '0' / 1 / '2' 数字与字符串比，改动时保持 == 宽松比较，不要顺手改成 ===。",
+   "evidence": "会话 990a341c：review 指出 stock/contractChange/detail.vue 传了 :show-print=\"false\" 仍会渲染内置 zs-print（HIGH），修复建议照 loanContract/detail.vue 加 :custom-print=\"true\"；同时确认 permission-prefix 默认值与 v-hasPermi 不一致、bizState 类型混用为既有模式。",
+   "files": [
+    "zhi2-web-admin/src/views/stock/contractChange/detail.vue",
+    "zhi2-web-admin/src/views/stock/contract/detail.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/views/stock/loanContract/detail.vue"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "990a341c-f539-4c94-b4e4-1f5dfc70a433"
+   ],
+   "bundle": "115.md"
+  },
+  {
+   "title": "Unknown custom element Submit 的根因：全局组件按「目录名」注册，模板必须写 ZsSubmit",
+   "type": "bug",
+   "content": "什么情况：详情页把 <Submit> 迁成公共提交组件后控制台报 Unknown custom element: <Submit>，页面按钮不渲染。\n为什么：main.js 用 import.meta.glob('./components/**/*.vue') 做全局异步注册，注册名取的是组件所在目录名（ZsSubmit/index.vue 注册成 ZsSubmit），模板里写 <Submit> 没有任何注册项命中；也不存在名为 Submit 的旧组件，所以不是「局部没注册」的问题。\n怎么做：模板统一写 <ZsSubmit>，props 与监管模块保持一套：permission、module-name、business-name、:bus、:form、@update；不需要在 components 里再局部注册。更省事的做法是不写标签，直接由 operation-btn-group 内置的 ZsSubmit 承担（OperationBtnGroup/index.vue 内已引入）。ZsSubmit 不传 id 时走 mixin 的 getId() 从路由取主键，与 indexFrame 页面一致，不要额外手工塞 id。排查同类报错时先按目录名比对，再看是否用了旧仓库（vue-cli 版本）的组件名。",
+   "evidence": "会话 990a341c：审查 stock/contract/detail.vue 把 Submit 改成 ZsSubmit，确认正确并说明 main.js 的 import.meta.glob 按目录名注册机制，以及 OperationBtnGroup 内置 ZsSubmit、getId() 兜底主键。",
+   "files": [
+    "zhi2-web-admin/src/main.js",
+    "zhi2-web-admin/src/components/ZsSubmit/index.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/components/README.md",
+    "zhi2-web-admin/src/views/stock/contract/detail.vue"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "990a341c-f539-4c94-b4e4-1f5dfc70a433"
+   ],
+   "bundle": "115.md"
+  },
+  {
+   "title": "接口字段 provinceCityArea → administrativeArea 重命名的完整落地清单（含旧字段回退与剔除）",
+   "type": "workflow",
+   "content": "什么情况：后端把机构入网/机构注销等接口的行政区域字段从 provinceCityArea 改为 administrativeArea（字典 ECONOMIC_INSTITUTIONS_REGION），入参与返回同时改，前端只改一半就会出现筛选不生效或旧字段继续透传。\n为什么：这个字段在页面里分散在五处——queryParams、resetQuery、搜索表单项的 model、表格列 prop、以及详情页 getForm() 组装体；漏掉 resetQuery 会残留旧参数，漏掉 getForm 会让 provinceCityArea 继续随保存请求发给后端，而列表展示走 formatRegion 时若只读新字段，历史数据会显示空白。\n怎么做：1) 列表页四处一起换，formatRegion 优先读 row.administrativeArea、回退 row.provinceCityArea 兼容老数据；2) 详情页 getForm() 增加 administrativeArea 并显式剔除 provinceCityArea；3) 「选择机构」弹窗的 outParams 也要补行政区域筛选项，否则选择源接口收不到条件；4) 详情 GET 通常无需改动（透传）；5) 验收方式：抓包确认 /page、/update、/selectCompany 请求体含 administrativeArea、不含 provinceCityArea，再逐条核对列表列与详情展示。",
+   "evidence": "会话 90b0db5f 完成 institutionRegister/page 字段替换（queryParams/resetQuery/model/prop/formatRegion 回退）；会话 7276db84 完成 companyCancel 的 page/detail/update/selectCompany 四接口适配，并给出「列表筛选—列展示—详情展示—保存—选择弹窗」五链路静态验证表。",
+   "files": [
+    "zhi2-web-admin/src/views/company/institutionRegister/index.vue",
+    "zhi2-web-admin/src/api/company/institutionRegister.js",
+    "zhi2-web-admin/src/views/company/companyCancel/index.vue",
+    "zhi2-web-admin/src/views/company/companyCancel/detail.vue",
+    "zhi2-web-admin/src/api/company/companyCancel.js"
+   ],
+   "baseline": "d5cc617",
+   "sessionIds": [
+    "90b0db5f-1875-41f4-8bc9-1e1a01c65775",
+    "7276db84-d2ed-4353-92fe-9dccab6762b1"
+   ],
+   "bundle": "115.md"
+  },
+  {
+   "title": "用户对 api/ 封装文件的态度是「按模块点名」：被点名才删，不要全局推广",
+   "type": "preference",
+   "content": "什么情况：用户直接点名 src/api/company 下三个文件（agencyBranch.js、agencyPersonnel.js、brand.js）并明确说「不要定义 API 文件，改为直接调用接口」。\n为什么：这些模块的封装只是薄薄一层转发，页面里用 this.$post 直接调更便于对照既有页面（如 chargeItem/index.vue）的参数形态；但这不是全项目一律禁 api 层——同项目里其他模块（如 companyCancel）仍按要求新建了 api/company/companyCancel.js。\n怎么做：1) 接到删除指令时，先列出所有消费方组件再逐处替换为 this.$post(url, params)，别只删文件留下 import 报错；2) 保持项目既有调用习惯：列表 this.$post(url, queryParams)，详情 body 传裸 ID 字符串 String(id)，保存 this.$post(url, payload)，路径与后端契约一字不改；3) 不要把「删 api 封装」当作全项目清理任务自动铺开，改动范围以用户当轮点名的文件为界；4) 顺手修要件编码回退值时，回退值必须是真实业务码字面量（如 'fzjgba'），引用一个不存在的常量只会得到 undefined、要件区静默空白。",
+   "evidence": "会话 791532e4：删除三个 api 封装文件，AgencyBranchList/Detail、AgencyPersonnelList/Detail、CancelDialog、StatusAdjustDialog、WorkCardDialog、InfoCardDialog 全部改为 this.$post，并修正 appendixBusCode 回退值；同项目会话 7276db84 则按用户要求新建了 api/company/companyCancel.js，说明该偏好是局部、按点名执行。",
+   "files": [
+    "zhi2-web-admin/src/api/company/agencyBranch.js",
+    "zhi2-web-admin/src/api/company/agencyPersonnel.js",
+    "zhi2-web-admin/src/api/company/brand.js",
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchDetail.vue",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelList.vue"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "791532e4-a439-463e-a76e-96fb60f9bc3e"
+   ],
+   "bundle": "115.md"
+  },
+  {
+   "title": "HeadTitle 空数据仍占位：组件内 v-if 不够，el-card 根节点 padding 还在",
+   "type": "bug",
+   "content": "情况：从业人员详情页查看态看不到状态头部，但元素实际已渲染，间距被撑开，用户连续两轮反馈「这儿元素还是存在」。为什么：HeadTitle 根节点是 el-card，即使内容高度为 0，卡片自身 padding（约 14px）与父级 flex gap 依然占位；在组件内部给内容加 v-if 无法消除外壳。怎么做：两处同时改——① 组件外层换成原生 div，仅在 shouldRender 为真时才输出节点，彻底不产生 DOM；② 该页查看态直接不挂 HeadTitle，基本信息从 Headline 开始。排查要点：遇到「组件没显示」，先用 Elements 面板确认是真没渲染还是渲染了空壳（查 head-title-container 是否存在），只改组件内部条件渲染会原样复现。该组件被多个详情页复用，必须从组件层收敛，不要逐页加 margin/负 margin 补偿。",
+   "evidence": "会话 3cd70bcc：先在 HeadTitle/index.vue 内加 v-if 后用户仍反馈「这儿元素还是存在」，最终把组件根节点改为原生 div 仅在 shouldRender 时输出，并在 AgencyPersonnelDetail.vue 查看态移除该组件。",
+   "files": [
+    "zhi2-web-admin/src/components/HeadTitle/index.vue",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue"
+   ],
+   "baseline": "7f34bd8",
+   "sessionIds": [
+    "3cd70bcc-2760-4661-ad33-cbb70170c717"
+   ],
+   "bundle": "116.md"
+  },
+  {
+   "title": "列表批量删除按钮必须走 mixin 的 multiDeleteButton，自写会同时丢禁用态与主键来源",
+   "type": "pattern",
+   "content": "情况：开发企业端从业人员管理与管理端员工列表，批量删除按钮未勾选时没有置灰，勾选后点击无反应。为什么：两处页面自写了 operationButtons 的删除项，没用 list mixin 提供的 multiDeleteButton——自写版本缺 disabled: this.selection.length === 0，且 click 里直接读行对象上的 personnelRecordId（批量场景根本没有 row），取不到主键就静默失败、不弹确认框也不报错。怎么做：列表批量删除统一取 this.multiDeleteButton，它自带「未选中即置灰」与 listeners: { click: this.handleDelete }，handleDelete 在无 row 时回退到 this.ids；行内单行删除逻辑保持原样不动。可复用结论：凡是依赖选中态的工具栏能力（批量删除/批量提交/批量导出），一律复用 mixin 的统一按钮配置，不要在页面里复制事件与禁用条件，否则禁用态和主键来源两头都会漂移，且失败是静默的。",
+   "evidence": "会话 46f44839：把 toB/personnelRecord/components/index.vue 与 company/staffManagement/components/index.vue 的 operationButtons 改为 this.multiDeleteButton 后，置灰与删除同时恢复。",
+   "files": [
+    "zhi2-web-admin/src/views/toB/personnelRecord/components/index.vue",
+    "zhi2-web-admin/src/views/company/staffManagement/components/index.vue"
+   ],
+   "baseline": "fe4ab09",
+   "sessionIds": [
+    "46f44839-514d-49c6-b6e2-858af0e1b263"
+   ],
+   "bundle": "116.md"
+  },
+  {
+   "title": "只读详情改用 DetailTemplate 的正确切法，以及它把数值 0 渲染成 - 的根因",
+   "type": "pattern",
+   "content": "情况：合同范本详情要改成统一只读展示；同时发现问卷模板详情里 useCount 为 0 时被显示成 `-`。为什么：页面用 el-row 手搭只读区，列宽与通栏各自实现、无法与同模块对齐；而 DetailTemplate 判空用的是 falsy 判断，0 被当成「没值」。怎么做：① 只在 formMode === 'view' 时改用 DetailTemplate，新增/编辑保留原 el-row 表单（v-else），按钮与「范本内容」等既有逻辑不动，本地加 ?formMode=view 即可验证蓝框网格查看态；② contentInfo 列宽统一用 DETAIL_COL_THREE / DETAIL_COL_FULL 常量（与同模块 specialcontract/detail.vue 对齐），备注、描述类字段用 textarea + 整行；③ 修 DetailTemplate 的空值判定，只把 null/undefined/空串视作缺失，保留 0。可复用结论：DetailTemplate 的空值语义是「字段缺失」而非 falsy，纯展示页里 0 与空是两种含义，改造只读页时先核对这一点。",
+   "evidence": "会话 0a2af86f：presale/template/detail.vue 查看态切 DetailTemplate，survey/template/detail.vue 修 useCount === 0 被显示为 `-`，并统一 DETAIL_COL_* 与 textarea 整行。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/template/detail.vue",
+    "zhi2-web-admin/src/views/survey/template/detail.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "0a2af86f-af14-4bf6-9a47-1232bb898f9c"
+   ],
+   "bundle": "116.md"
+  },
+  {
+   "title": "级联表单的「上游变更清空下游」清单式清空 + 选择弹窗回填要合并详情接口与列表行",
+   "type": "pattern",
+   "content": "情况：定金退款详情新增只读「监管项目」，需由选中的缴款通知书带出；换项目后若不处理，会残留上一项目的通知书号与账户金额，形成跨项目脏数据。为什么：① 监管项目字段只在缴款通知书详情接口里全，列表行常常缺 regulatorProject*，只合并行数据会回填空值；② 项目是上游主选择，下游一串字段都依赖它。怎么做：① 选择通知书后 setData 时把 secondNotice 详情接口的 res.data 与选中列表行合并（行缺字段由详情补全），再回填监管项目 id/name/code；② setProject 换项目时把监管项目、缴款通知书号以及通知书带出的账户、金额等一并清空，写成清单式重置，而不是逐个字段漏改；③ 长文本字段查看态用 DETAIL_COL_FULL、编辑态用 FORM_COL_FULL 整行通栏。排查：若监管项目为空，先核对 checkNotice / secondNotice 是否返回监管项目字段，不要先怀疑回填代码。",
+   "evidence": "会话 79b2f3ac：refund/detail.vue 增加 regulatorProject* 字段与 setPaymentNotice 回填、setProject 清空；PaymentNoticeDialog.vue 的 setData 合并 secondNotice 详情与列表行。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/deposit/refund/detail.vue",
+    "zhi2-web-admin/src/views/supervision/deposit/refund/components/PaymentNoticeDialog.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "79b2f3ac-4eb2-4ae2-8e42-9d7ca8c66c0f"
+   ],
+   "bundle": "116.md"
+  }
+ ]
+}

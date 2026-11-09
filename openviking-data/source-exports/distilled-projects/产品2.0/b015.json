@@ -1,0 +1,199 @@
+{
+ "project": "产品2.0",
+ "batch": 15,
+ "files": [
+  "057.md",
+  "058.md",
+  "059.md",
+  "060.md"
+ ],
+ "count": 11,
+ "memories": [
+  {
+   "baseline": "2e3ec05",
+   "content": "什么情况：BPMN 流程设计器（Process 组件族）里给用户任务选了「指定人员」后，点击画布空白或直接保存模型，人员被清空、保存失败。为什么有三层根因：① 取消选中节点时 PropertyPanel 会卸载任务配置组件（task.vue），el-select 在卸载时可能触发一次空值 input，assignee 的 watch 随即把 BPMN 模型里的指定人员抹掉；② XForm.setFieldValue 原先通过 { ...formModel, [name]: value } 整对象替换 formData，触发字段 watch 时序异常，选中值未及时写入模型；③ 下拉选项的 userId 是字符串而模型解析出的 assignee 可能是数字等其他类型，类型不一致导致回显为空。怎么做：① task.vue 在组件销毁（beforeDestroy）时跳过人员字段同步，且同时写标准 assignee 与 flowable:assignee 两个属性；② XForm 用 $set 就地更新字段，禁止整对象替换；③ PropertyPanel 对同一节点重复选中不销毁面板；④ parseElement.js 把 assignee 统一规范为字符串。验证：选人→点空白→重新选中节点应保留，保存模型后用「查看 XML」确认 userTask 节点带 assignee 属性。",
+   "evidence": "会话 9368bed1：最终结论列出三层原因（卸载触发空 input、整对象替换、ID 类型不一致）与五处修复（task.vue/XForm.vue/PropertyPanel.vue/parseElement.js/detail.vue）及 XML 验证方法。",
+   "files": [
+    "zhi2-web-admin/src/components/Process/components/nodePanel/task.vue",
+    "zhi2-web-admin/src/components/Process/common/XForm.vue",
+    "zhi2-web-admin/src/components/Process/PropertyPanel.vue",
+    "zhi2-web-admin/src/components/Process/common/parseElement.js"
+   ],
+   "sessionIds": [
+    "9368bed1-6d47-4b7e-aa8e-585db398488b"
+   ],
+   "title": "[产品2.0] BPMN 流程设计器：点画布空白/保存失败会清空「指定人员」的三层根因与修法",
+   "type": "bug",
+   "bundle": "057.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "94b86fa",
+   "content": "什么情况：上传组件设置 :limit=\"1\" 实现「只能传单个文件」，用户已传一个文件后再选另一个文件，期望替换，但 on-change 不触发、替换逻辑不执行。为什么：Element UI 在文件数已达 limit 时再选文件走的是 on-exceed 回调，根本不会进入 on-change，所以挂在 on-change 上的替换/去重逻辑永远收不到新文件——这是 limit 生效后的必然行为，不是组件 bug。怎么做：新增 handleExceed(files)：取出 files[0]，先做与 on-change 相同的 validateFile 校验，然后 this.$refs.upload.clearFiles() 清空组件内部列表并重置 fileList/localFiles，最后手动调用 this.$refs.upload.handleStart(file) 把新文件重新加入上传流程。注意 handleStart 是 el-upload 实例方法（非公开 API 但稳定），调用后走正常 on-change/上传链路。凡「限 1 个文件 + 重新选择即替换」的需求都套这个模式，不要试图在 on-change 里补救。",
+   "evidence": "会话 3b0f6cd2：结论明确「设置了 :limit=1 后再次选择文件会走 on-exceed，不会进入 on-change」，给出 handleExceed{ clearFiles + handleStart } 代码，import.vue 与 importUploadDialog.vue 同步修改。",
+   "files": [
+    "zhi2-web-admin/src/components/FileUpload/index.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/import.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/importUploadDialog.vue"
+   ],
+   "sessionIds": [
+    "3b0f6cd2-34d8-446f-830d-2c1d4d5eda2f"
+   ],
+   "title": "[产品2.0] el-upload 设 :limit=1 后「再选文件替换」必须走 on-exceed，on-change 根本不触发",
+   "type": "pattern",
+   "bundle": "057.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "64fa9e2",
+   "content": "什么情况：DetailTemplate 查看态配置 type:'image' 的图片字段（如维保记录的步骤图片）显示成可点链接而不是缩略图，明明接口返回了图片地址。为什么：type:'image' 分支会先按 URL 取后缀，只有 jpg/jpeg/png/gif/bmp/webp/svg 才渲染 <img>，否则走「附件」分支用 detail-link 当可点链接（设计初衷是避免把 PDF 等当图加载）。但本项目接口里的图片地址往往无后缀（如 /profile/xxx 或带 token 的查询串），就会被误判为非图片。已知条目只覆盖了 type:'link' 分支只认 item.link 的问题，这是 image 分支的另一个独立坑。怎么做：查看模式改用 type:'images'——images 类型直接用 resolveServerAssetUrl 拼 <img>，不做后缀判断，无后缀站内图也能显示。同时先用计算属性把原始数据统一整理成字符串 URL 数组（兼容数组对象里的 url/fileSite/path/link 多字段、逗号分隔串），与编辑态 detailCallback 用的数据同源；无图时仍回退 type:'text' 显示占位，保持空值「-」行为。其他页面遇到「传了 type:'image' 却变链接」同理改 images + URL 数组，或在 detail-template 层放宽无后缀默认按图展示（需权衡把非图当图加载的风险）。",
+   "evidence": "会话 163b2e12：结论指出 type:'image' 按 URL 后缀判图、无后缀走 detail-link，修复为 stepPictureUrlList 计算属性归一化 URL 数组 + 查看模式改 type:'images'（不做后缀判断）+ 空图回退 type:'text'。",
+   "files": [
+    "zhi2-web-admin/src/views/dataProperty/recordProcess/components/recordProcessStepDialog.vue",
+    "zhi2-web-admin/src/views/dataProperty/scrappedRecord/detail.vue"
+   ],
+   "sessionIds": [
+    "163b2e12-92bf-4951-9a98-c06e20a552e8"
+   ],
+   "title": "[产品2.0] DetailTemplate type:'image' 按 URL 后缀判图，无后缀地址退化成链接；用 type:'images' 绕过",
+   "type": "pattern",
+   "bundle": "057.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "414029f~f59c6be 期间的 zhi2-web-admin",
+   "content": "什么情况：详情页「页头（返回/标题/附件/流程查看等 operation-btn-group）」跑到页面最底部而不是顶部。\n为什么：本项目详情页骨架约定是 detail-container（内部 .detail-container 样式为 flex-direction: column-reverse，所以只要写在该容器内，页头放 DOM 后面也会渲染到顶部）；但若页头被放在外层 list-container 等普通纵向布局容器里，就会按 DOM 顺序被排到表单内容下方。页面有时残留了 list-container 包裹（列表页骨架的写法），页头因此掉到底部。\n怎么做：详情页不要套 list-container，operation-btn-group 必须是 detail-container 的子节点；新增/复刻详情页时对照同模块已正确页面（如 creditDeclarationComponents/detail.vue）核对骨架层级，而不是自行嵌套。排查这类「页头位置错乱」时先看元素落在哪个容器，再判断该容器是否依赖 column-reverse 反转。",
+   "evidence": "creditChangeDeclaration/detail.vue 的页头被放在 detail-container 外的 list-container 中导致显示在底部；移入 detail-container 后恢复正常",
+   "files": [
+    "src/views/evaluation/creditChangeDeclaration/detail.vue",
+    "src/styles/index.scss"
+   ],
+   "sessionIds": [
+    "7f4c692f-1a01-4348-afe9-003fd8ee2a08"
+   ],
+   "title": "详情页骨架依赖 .detail-container 的 column-reverse：页头必须放进 detail-container，套 list-container 会掉到页底",
+   "type": "pattern",
+   "bundle": "058.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "b0ca50b6~f59c6be 期间的 zhi2-web-admin",
+   "content": "什么情况：详情页点击「编辑」后页面上没有任何可编辑字段，点「保存」也无反应、无报错。\n为什么：该详情页只渲染了只读的 DetailTemplate，没有任何 zs-form；点击编辑虽然 formMode 变成 edit，但界面没有对应分支切到编辑表单。保存链路 submitForm → validateForm 依赖 ref=\"form\" 的表单实例，$refs.form 为 undefined 时校验直接失败并被静默拦截，所以「点保存没反应」。\n怎么做：复用 DetailTemplate 的详情页如果业务要求可编辑，必须补 formMode 分支：查看态走 DetailTemplate，编辑态渲染 zs-form（只放开允许编辑的字段，其余字段仍只读展示），并补校验规则；缺 $refs.form 的静默失败可从「保存无反应且无报错」直接联想。排查口诀：编辑页「无字段可改」先查模板里有没有 zs-form 分支，「保存无反应」先查 $refs.form 是否存在。",
+   "evidence": "guaranteeDeposit/components/detail.vue 无编辑分支与 form ref，validateForm 因 $refs.form undefined 静默失败；参照 guaranteeDepositAccount/detail.vue 补 zs-form 编辑态后修复",
+   "files": [
+    "src/views/maintenance/guaranteeDeposit/components/detail.vue",
+    "src/views/maintenance/guaranteeDeposit/deposit/detail.vue",
+    "src/mixins/detailMixins.js"
+   ],
+   "sessionIds": [
+    "b0ca50b6-00f0-4d36-8845-29a8aaad4b5c"
+   ],
+   "title": "详情页只有 DetailTemplate 没有编辑表单时，「编辑/保存无反应」的根因是 $refs.form 不存在被校验静默拦截",
+   "type": "bug",
+   "bundle": "058.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "adc516a 期间的 zhi2-web-admin",
+   "content": "什么情况：浏览器控制台持续出现对 /api/v3.0/secret/key 的 404 请求。\n为什么：public/assets/js/sign.js 是一层「验签」逻辑，与 request.js 里的 SM2/SM4 加解密通信（keyExchange/requestCrypto/responseCrypto）是两套独立机制。sign.js 在页面加载时拦截全局 XMLHttpRequest 和 fetch，请求 /api/v3.0/secret/key 取签名密钥，再为业务接口自动附加 sign、nonce、timestamp 请求头；环境里没有这个接口时就会 404。\n怎么做：移除验签要删三处：public/assets/js/sign.js 文件本身、index.html 里对 sign.js 和 crypto-js.min.js 的 script 引用（crypto-js 仅服务于验签）、vite.config.js 中 viteExternalsPlugin 的 crypto-js external 配置。注意 request.js 的 SM2/SM4 加密链路与此无关，不能连带误删。排查这类「每页都多一个请求」时优先怀疑 index.html 里引的全局拦截脚本。",
+   "evidence": "删除 public/assets/js/sign.js、清理 index.html 引用与 vite.config.js external 后，/api/v3.0/secret/key 404 消失；request.js 加密链路未动",
+   "files": [
+    "src/utils/request.js",
+    "src/utils/crypto/keyExchange.js",
+    "public/assets/js/sign.js",
+    "index.html",
+    "vite.config.js"
+   ],
+   "sessionIds": [
+    "79a525ee-5819-4c89-ac6f-cb0b07af846f"
+   ],
+   "title": "本项目的「验签」与「加解密」是两套独立链路：sign.js 全局拦截 XHR/fetch 取 /api/v3.0/secret/key，移除要删文件+index.html+vite external 三处",
+   "type": "fact",
+   "bundle": "058.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "62d5fb9",
+   "content": "什么情况：全局 axios 超时是 100 秒，但个别大文件导入接口（如 /property/spFeeBill/import）处理时间远超默认值，请求被全局超时掐断。为什么：Axios 的 timeout 是请求级 config，可以在单次请求上覆盖全局默认值，不需要也不应该为此调大全局超时（否则所有接口都失去超时保护）。怎么做：在 enums.js 里定义语义化常量（如 IMPORT_REQUEST_TIMEOUT = 5 * 60 * 1000），在调用该上传接口的组件里给请求传 `timeout: IMPORT_REQUEST_TIMEOUT`，走现有的「系统接口请求超时」提示逻辑；其他接口不受影响。套路可复用于任何慢接口（导入、批量处理、报表生成）。",
+   "evidence": "最终结论：已为 import 接口单独设置 300000ms 超时，enums.js 新增 IMPORT_REQUEST_TIMEOUT，import.vue / importUploadDialog.vue 调用时传 timeout，覆盖全局 100s 默认值",
+   "files": [
+    "src/enums.js",
+    "src/views/property/spFeeBill/components/import.vue",
+    "src/views/property/spFeeBill/components/importUploadDialog.vue"
+   ],
+   "sessionIds": [
+    "f95fd685-fb92-457c-98a8-0d5d19ac9f6f"
+   ],
+   "title": "[产品2.0] 单接口超时覆盖套路：axios 请求级 timeout + enums 常量，不改全局 100s 默认",
+   "type": "pattern",
+   "bundle": "059.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "62d5fb9",
+   "content": "什么情况：产品2.0 前端并行维护 develop/v2.6.1、develop/v2.6.2、develop/v2.6.2-yulin（榆林定制）三条版本分支，用户明确指定排查顺序「从 261 开始，然后 262，最后 262-yulin；如果是 261 修完合到 262，如果是 262 修完合到 262-yulin」。为什么：下游分支由上游合并而来，bug 通常在某一环合并时引入并沿链扩散（本案是 262 合并 261 时误保留了重复的 tabs+表格+分页区块，262-yulin 又从 262 带入）。怎么做：① 按上游→下游顺序逐分支比对同一文件定位引入点；② 在引入分支修复提交，下游分支用 cherry-pick 单点同步（全量合并冲突多时不整合）；③ 父仓库与子模块都要分别提交推送到各对应分支；④ env/.env 本地代理配置不入库；修完切回工作分支。",
+   "evidence": "排查结论表：261 无问题、262 合并 261 时误保留重复代码、262-yulin 同样带入；修复提交 5a74eab61/40e8255f0 按 cherry-pick 同步到下游，父仓库三分支分别提交",
+   "files": [
+    "zhi2-web-admin/src/views/property/workOrder/order/index.vue"
+   ],
+   "sessionIds": [
+    "d0f2e7ac-fb62-45da-ad5b-e39f678f486c",
+    "341848bc-8f8a-4f9e-9cf0-21c2a82daa1e"
+   ],
+   "title": "[产品2.0] 版本分支修复约定：沿 261→262→262-yulin 链定位引入点，上游修完 cherry-pick 到下游",
+   "type": "workflow",
+   "bundle": "059.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "62d5fb9",
+   "content": "什么情况：菜单里配置了一个指向 https:// 地址的路由，组件路径为 sso/bTerminalRedirect/index，打开时提示「页面未授权或不存在」。为什么：动态路由组装时 InnerLink 组件有专门的外链规范化逻辑（https 地址写进 meta.link、path 转成合法内部路由路径），但其他「跳转外壳」组件没有走这套逻辑，Vue Router 无法注册 https:// 开头的 path，导航匹配失败触发 404 守卫，且侧边栏把它当纯外链用 <a target=_blank> 打开绕过了 SSO 跳转。怎么做：在 permission.js 的动态路由组装处，把该外壳组件与 InnerLink 一起纳入「外链组件」判定（component 字符串匹配），统一做 normalizeExternalLinkRoute；组件内从 meta.link 解析真实跳转地址。菜单配置：组件路径 sso/bTerminalRedirect/index、路由地址填 https 链接、业务编码填对应 clientId；配置后需重新登录刷新动态路由。",
+   "evidence": "permission.js 中新增 isBTerminalRedirectComponent + normalizeExternalLinkRoute，将 bTerminalRedirect 纳入与 InnerLink 相同的外链路径规范化处理",
+   "files": [
+    "zhi2-web-admin/src/store/modules/permission.js",
+    "zhi2-web-admin/src/views/sso/bTerminalRedirect/index.vue"
+   ],
+   "sessionIds": [
+    "f702fc2e-fea8-44f2-ac57-30fa5c4f7b79"
+   ],
+   "title": "[产品2.0] 外链型菜单组件（B端SSO跳转）必须走 InnerLink 同款外链规范化，否则报「没有授权菜单」",
+   "type": "bug",
+   "bundle": "059.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "无",
+   "content": "什么情况：产品2.0 后台「业委会候选人征集」改造时发现，候选人身份校验原本只有筹备组有「身份标识」字段（字典 candidate_apply_identity_flag），业委会流程默认隐藏、恒按业主处理，导致未对接不动产接口的项目无法校验权利人、流程卡死。为什么：业委会与筹备组是两条并行业务线，字典编码各配一套，不能互相复用——业委会新增候选人类型必须用 owner_candidate_apply_identity_flag（0=业主，1=非业主），筹备组仍用旧字典。怎么做：① CandidateDialog 里业委会也展示「候选人类型」，按业务线传不同字典编码；② 选业主（0）时显示户室/幢号/单元并带出不可编辑住址，选非业主时隐藏并清空户室关联字段、住址可手填；③ 提交前用 normalizeFormForIdentity 清除非业主的户室字段，后端按 identityFlag=非业主跳过权利人/业主身份校验；④ 列表新增候选人类型列，非业主行的住址列显示为空。教训：同源业务线各自配字典时，加字段必须先确认目标业务线用哪个字典码，不能沿用另一条线的。",
+   "evidence": "会话 eb8bc9bb（2026-07-27，基线 1d563df）：改造 CandidateDialog.vue / CandidateTable.vue，明确「业委会使用字典 owner_candidate_apply_identity_flag，筹备组仍用 candidate_apply_identity_flag」，需求背景写明「V2 不少项目因没有对接不动产接口导致无法校验权利人信息、流程走不下去」",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\autonomy\\candidateCollect\\components\\CandidateDialog.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\autonomy\\candidateCollect\\components\\CandidateTable.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\autonomy\\candidateCollect\\components\\enums.js"
+   ],
+   "sessionIds": [
+    "eb8bc9bb-60c6-44ff-8cdd-d45d8bc2c03d"
+   ],
+   "title": "[产品2.0] 业委会/筹备组候选人身份标识是两套字典，非业主跳过不动产校验",
+   "type": "fact",
+   "bundle": "060.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "已知 #86「密码提交前必须 AES 加密」讲的是加密契约本身；已知 #899「index.html 全局脚本引入 ≠ 挂到 Vue 原型」讲的是 dayjs 未挂原型。本条根因不同：脚本文件存在但 index.html 漏了 <script> 引用，属静态资源引入缺失而非挂载方式问题",
+   "content": "什么情况：产品2.0 后台点登录按钮报错，login.vue 调 encryptPassword() 做 AES 加密，该函数依赖全局 window.CryptoJS，访问 .enc 时报 CryptoJS undefined。为什么：public/assets/js/crypto-js.min.js 文件其实存在，只是 index.html 里漏写了 script 标签——登录链路依赖的全局工具函数靠 index.html 静态脚本注入，不是 npm import，文件在但没引等于不存在。怎么做：① 遇到 XXX is undefined 且怀疑全局脚本时，先核对 index.html 是否有对应 <script> 标签，而不是先查函数实现；② 修复即补 script 引用，并给加密工具函数加上与 responseDecrypt.js 一致的空值检查（CryptoJS 未定义时给出可读报错），便于后续定位；③ 验证需硬刷新（Ctrl+F5）排除缓存。可复用点：本项目 window.* 型全局依赖（CryptoJS、debounce 等）都走 index.html 注入，新增页面若报全局变量未定义，第一步核对静态脚本引入清单。",
+   "evidence": "会话 1bc8fc71（2026-08-26，基线 a357f32）：结论明确「public/assets/js/crypto-js.min.js 文件是存在的，只是漏了 script 标签」，修复为 index.html 补引用 + passwordEncrypt.js 加空值检查",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\login.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\utils\\passwordEncrypt.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\index.html"
+   ],
+   "sessionIds": [
+    "1bc8fc71-bc44-4ec0-8afd-e7a6ff8608f0"
+   ],
+   "title": "[产品2.0] 登录报 CryptoJS undefined：全局加密脚本存在但 index.html 漏引 script 标签",
+   "type": "bug",
+   "bundle": "060.md",
+   "project": "产品2.0"
+  }
+ ]
+}

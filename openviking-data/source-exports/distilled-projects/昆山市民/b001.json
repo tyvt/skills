@@ -1,0 +1,193 @@
+{
+ "project": "昆山市民",
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "title": "昆山市民 H5 子目录部署：后端 /statics 与本地 /static 不能共用同一套相对路径规则",
+   "type": "bug",
+   "content": "uni-app H5 部署在子路径（如 /wyzx/）时，资源 URL 会被运行时再拼一次部署 base。若本地图返回 `/wyzx/static/...` 或 `./static/...`，可能变成 `/wyzx/wyzx/static/...`，Network 拿到 HTML 而非图片。后端资源路径 `/statics/xxx` 可写 `/statics/xxx`（由 uni 自动加一次 base）；本地 `static` 目录在 H5 下应通过 `resolveLocalStaticUrl` 返回**完整 URL**（`origin + 部署前缀 + /static/...`），完整 URL 不会被二次改写。线上课堂封面、菜单图标等需按类型走 `resolveServerAssetUrl` / `resolveLocalStaticUrl`，并在 vConsole 核对只有一个部署前缀且 Content-Type 为 image/*。",
+   "evidence": "会话 8ef2aa73：用户反馈在线课堂封面不显示；根因本地图 `/wyzx/static/...` 被 uni 再加 `/wyzx/`；修复为 H5 本地资源改完整 URL，与视频 `/statics/` 双前缀问题同类但路径段不同。",
+   "files": [
+    "src/utils/resolveAssetUrl.js",
+    "src/components/zs-image/zs-image.vue",
+    "src/pages_onlineService/onlineIndex.vue",
+    "src/pages_onlineService/OnlineCass.vue",
+    "vite.config.js",
+    "src/env/mp.js"
+   ],
+   "baseline": "c8c1c24",
+   "sessionIds": [
+    "8ef2aa73-67f1-4e34-9fc7-6ad739924137"
+   ],
+   "bundle": "001.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "昆山市民 H5 资源与接口：相对前缀、无前导斜杠、小程序仍拼 IMAGE_BASE",
+   "type": "pattern",
+   "content": "H5 嵌入/子目录场景下：接口与媒体地址统一走相对路径（如 `statics/xxx`、`./static/images/...`），**不要**前导 `/`，也**不要**人为加 `/h5` 段，避免请求落到站点根。`src/env/mp.js` 在 H5 将 `IMAGE_BASE` 置空，业务不再用 `VITE_IMAGE_URL` 拼绝对域名；小程序端仍用 `IMAGE_BASE` 拼完整域名。新增 `resolveServerAssetUrl` / `resolveLocalStaticUrl` 按 `#ifdef H5` 分支；`ZsImage` 与附件/头像/富文本图片统一调用。本地图标用 `:src=\"staticUrl('...')\"` 动态绑定，避免编译期写死绝对路径。开发环境 `vite.config.js` 保留 `/statics` 代理到 `VITE_IMAGE_URL` 预览后端静态资源。",
+   "evidence": "会话 c0160254：用户明确要求接口前缀相对路径、H5 用、不带前导 `/`、不加 `/h5`，网络图与本地图都要相对；结论落地 resolveAssetUrl 与 ZsImage。",
+   "files": [
+    "src/utils/resolveAssetUrl.js",
+    "src/env/mp.js",
+    "src/request/index.js",
+    "vite.config.js",
+    ".env.development",
+    ".env.production"
+   ],
+   "baseline": "bf3efcf",
+   "sessionIds": [
+    "c0160254-f57e-4417-b5f5-15ff6a735c30"
+   ],
+   "bundle": "001.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "E证通实名变更：onSuccess 与 onShow 重复消费 pending 导致卡在修改页",
+   "type": "bug",
+   "content": "实名信息变更流程：内部录入页 → E证通（`useEidVerify`，回跳参数 key 取 `eidToken`）→ 回业务页 → 应 `redirectTo` 实名信息页而非停在 `editUserInfo`。根因是 `onSuccess` 与 `onShow` 内 `tryConsumePendingResult` **各处理一次**同一 pending，且 `verifyBeforeChange` 过早重置 `isHandlingResult`，叠加 onShow 多次轮询放大重复跳转。修复：`onSuccess` 后立即 `takePendingVerifyResult()`；用 `resultId` + `HANDLED_RESULT_KEY` 防重；onShow 仅保留一次 600ms 兜底；跳转修改页前写 `ACTIVE_PAGE_TYPE=editUserInfo`；`onLoad` 优先读 URL `pageType`。调试搜 `[EidVerify]`、`[VerifyUser]` 日志。",
+   "evidence": "会话 3178d4d9：faceRecognition 已成功仍停留在修改实名信息页；结论列出重复跳转三点根因与防重修复。",
+   "files": [
+    "src/pages/common/useEidVerify.js",
+    "src/pages/verifyUser/index.vue",
+    "src/pages/verifyUser/info.vue",
+    "src/pages/common/useFaceVerify.js"
+   ],
+   "baseline": "827c0d4",
+   "sessionIds": [
+    "3178d4d9-97a5-4520-8ff8-c7b1235a110f"
+   ],
+   "bundle": "001.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "useLoadMore 入参用 async 函数会触发 regenerator 与外层 ref 压缩名冲突（read-only）",
+   "type": "bug",
+   "content": "小程序编译后，`useLoadMore(async function getList(){...})` 会生成 regenerator 包装，内部临时变量与外层 `const` 的 title/list/status 经压缩后同名，运行时报 `TypeError: \"t\" is read-only`（`_readOnlyError`），表现像接口或赋值问题而非业务逻辑。修复：列表请求改普通函数 + `.then()` 返回新对象（勿 mutate `res`）；易冲突的 ref 改名（如 `type` → `articleType`）。全局排查同类 `useLoadMore` 页面。验证：重编 `dist/build/mp-weixin`，开发者工具清缓存。",
+   "evidence": "会话 e2662fbf：onlineIndex 编译后仍报 read-only；结论明确根因在 async+regenerator 变量冲突而非 res.rows 赋值。",
+   "files": [
+    "src/pages_onlineService/onlineIndex.vue",
+    "src/hooks/useLoadMore.js",
+    "src/pages_home/home.vue"
+   ],
+   "baseline": "2f4bf04",
+   "sessionIds": [
+    "e2662fbf-7e20-4064-8bc6-9c43baa98d56"
+   ],
+   "bundle": "001.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "腾讯慧眼 verify_mpsdk 在 uni-app 小程序的落点与去重",
+   "type": "workflow",
+   "content": "昆山市民（昆物通）接入腾讯云慧眼实名核身时，运行目录应是 `src/wxcomponents/verify_mpsdk/`（非微信原生根目录写法），在 `pages.json` 注册 SDK 活体验证页，在 `App.vue` 的 `onLaunch` 中 `require` 并 `Verify.init()`；业务侧通过 `src/utils/useTencentFaceVerify.js` 封装 `wx.startVerify`，承载页为 `src/pages/verify/index.vue`。集成后若 `src/utils/cloud-faceid-micro-sdk-*/` 仍保留完整 SDK 副本且无任何引用，应删除，避免与 `wxcomponents` 双份共存误导后续维护。官方文档要求 `wx.startVerify` 成功回调里 iOS 需约 500ms `setTimeout` 再执行业务逻辑，否则后续代码可能不跑。",
+   "evidence": "会话 d204db33：用户按官方文档集成慧眼 SDK；最终结论删除 `src/utils/cloud-faceid-micro-sdk-v1.0.37/`（81 文件），保留 `wxcomponents/verify_mpsdk`、`useTencentFaceVerify.js`、`pages/verify/index.vue`；诉求中引用官方 success 回调 500ms 延时说明。",
+   "files": [
+    "src/wxcomponents/verify_mpsdk/",
+    "src/utils/useTencentFaceVerify.js",
+    "src/pages/verify/index.vue",
+    "src/App.vue",
+    "src/pages.json"
+   ],
+   "baseline": "a1b8beb",
+   "sessionIds": [
+    "d204db33-771f-44d5-97bb-400ec850e59f"
+   ],
+   "bundle": "003.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "已完成决策详情空白/NaN：图表接口失败不得阻断主详情",
+   "type": "bug",
+   "content": "「我的决策 → 已完成 → 决策详情」表现为字段全空、面积显示 NaN，表象像布局问题，根因常是 `stores/vote.js` 的 `getVoteDetail` 在拉主详情后又串行调 `getVoteChart`；排序表决等类型在已完成态下图表接口易失败，若未捕获会导致整个 action 中断，`voteDetail` 从未写入，页面 `roundUp(undefined, 2)` 等格式化直接出 NaN。修复套路：`getVoteChart` 失败只记空图表、不 reject 主流程；主详情无数据时回退 `selectDecisionViewById`；户数/面积/权数优先图表聚合字段，否则用详情接口字段；列表跳 `votedetail` 必须带 `decisionRangeId`（列表项有该字段时），详情请求同步传参；展示层对空面积做兜底，禁止裸 `roundUp`。",
+   "evidence": "会话 b9110830 最终结论：根因 getVoteChart 失败中断 getVoteDetail；修复 vote.js 图表失败不阻断、接口回退与字段优先级；votedetail 补 decisionRangeId 与 NaN 兜底；index 跳转带 decisionRangeId。",
+   "files": [
+    "src/stores/vote.js",
+    "src/pages_vote/vote/votedetail.vue",
+    "src/pages_vote/vote/index.vue",
+    "src/api/modules/vote.js"
+   ],
+   "baseline": "c8c1c24",
+   "sessionIds": [
+    "b9110830-8233-4a5d-a89c-cf8b384f6805"
+   ],
+   "bundle": "003.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "鹿路通 H5 登录 code 一次性：wxLogin 去重与 URL 清理",
+   "type": "bug",
+   "content": "昆物通嵌入鹿路通后，H5 入口 URL 形如 `.../wyzx?code=xxx#/`，登录走 `POST /estate/weChatOauth/llt/getInfoByCode?code=`，返回结构与微信登录一致；须 `#ifdef H5` 走鹿路通、`#ifdef MP-WEIXIN` 保留原小程序登录。`code` 只能使用一次，但 `App.vue` 的 `onShow` 与 `home.vue` 的 `onLoad` 等多处会并发调 `loginWithWxCode()`，重复读 URL 会二次请求报错。`src/utils/wxLogin.js` 约定：模块级 `loginPromise` 合并并发；已有持久化 token 则直接返回并 `history.replaceState` 去掉 `code`；成功后将 code 标记已用（本地存储）；拦截已消费 code；登录成功后从地址栏移除 `code` 参数。",
+   "evidence": "会话 438b59b9：用户对接 llt/getInfoByCode、H5/小程序条件编译、报 code 重复调用；最终结论列出 loginPromise、token 跳过、replaceState、已用 code 拦截四类策略及场景表。",
+   "files": [
+    "src/utils/wxLogin.js",
+    "src/App.vue",
+    "src/pages_home/home.vue",
+    "src/api/modules/estate.js",
+    "src/pages_home/personal.vue"
+   ],
+   "baseline": "1e46691",
+   "sessionIds": [
+    "438b59b9-1f57-49a0-a674-06c5f58fdd8f"
+   ],
+   "bundle": "003.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "个人中心修改实名：H5 禁用、小程序保留",
+   "type": "preference",
+   "content": "同源 uni-app 在鹿路通 web-view/H5 与微信小程序双端交付时，「个人中心 → 修改实名」入口须在 H5 侧禁用（不可进入修改实名页），微信小程序保持原能力。实现用 uni-app 条件编译或运行时平台判断，避免 H5 用户绕进仅支持小程序实名链路的页面。",
+   "evidence": "会话 438b59b9 用户诉求 3：「个人中心修改实名的功能在H5的需要禁用，不能进入修改实名页面，微信小程序保留」。",
+   "files": [
+    "src/pages_home/personal.vue"
+   ],
+   "baseline": "1e46691",
+   "sessionIds": [
+    "438b59b9-1f57-49a0-a674-06c5f58fdd8f"
+   ],
+   "bundle": "003.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "H5 部署子目录 wyzx：hash 路由 + relativeBasePlugin",
+   "type": "pattern",
+   "content": "昆山市民 H5 常部署在服务器子目录（如 `/wyzx/`），应用内无 `wyzx` 路由名；实际访问为 `https://<domain>/wyzx/index.html#/pages_home/home?code=xxx`。`manifest.json` 使用 hash 模式、`base: ./`；`vite.config.js` 的 `relativeBasePlugin` 在构建产物 `index.html` 注入脚本，按 `location.pathname` 动态写 `<base href>`，使 `./assets` 等资源解析到子目录而非域名根。新增 H5 登录参数（如鹿路通 code）应从当前 URL query 读取，与 hash 路由并存。",
+   "evidence": "会话 38f18afc 探索结论：manifest hash/base；代码库无 wyzx 字符串、判定为 Nginx 子目录；relativeBasePlugin 片段与访问形态说明。",
+   "files": [
+    "src/manifest.json",
+    "vite.config.js",
+    "index.html"
+   ],
+   "baseline": "8307de5",
+   "sessionIds": [
+    "38f18afc-96e1-4341-aebd-46d880b667ca"
+   ],
+   "bundle": "003.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "H5 物业合同 PDF：pdfjs 依赖 Array.at 需 polyfill + legacy 构建",
+   "type": "bug",
+   "content": "微信内置浏览器等移动端 WebView 不支持 ES2022 的 `Array.prototype.at`，`pdfjs-dist` 内部使用 `.at()` 会在打开物业合同 PDF 时报 `t.at is not a function`。修复：新增 `src/utils/pdfPolyfill.js` 在加载 pdfjs 前为 `Array`/`TypedArray` 补 `.at`；`filePreview.vue` 最先引入 polyfill，并改用 `pdfjs-dist/legacy/build`；保留 `globalThis.pdfjsWorker` 注册以免 worker 加载失败。",
+   "evidence": "会话 d22bb0e1 最终结论：报错 t.at is not a function；修复 pdfPolyfill、legacy build、worker 注册。",
+   "files": [
+    "src/utils/pdfPolyfill.js",
+    "src/pages/common/filePreview.vue",
+    "src/pages_contract/detail.vue"
+   ],
+   "baseline": "75db5a8",
+   "sessionIds": [
+    "d22bb0e1-fc61-42cb-bfc2-13d1d148fd21"
+   ],
+   "bundle": "003.md",
+   "project": "昆山市民"
+  }
+ ]
+}

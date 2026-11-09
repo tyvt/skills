@@ -1,0 +1,132 @@
+{
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md",
+  "005.md",
+  "006.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "[苏房] 详情页 mixin 自动拼出的详情接口不存在：覆盖 init() 停发而不是改 moduleName",
+   "type": "bug",
+   "content": "情况：进入某个详情页时，控制台/网络面板出现一条不存在的接口，如 `/company/institutionRegister/detail`，后端根本没有这个路由；用户明确说「这个接口不需要调用，多余的」。\n\n为什么：页面混入 `detailMixins` 后，只要 formMode 走到 'view'，mixin 的 `init()` 会按 `moduleName` + `businessName` 自动拼出 `${module}/${business}/detail` 并发出请求。当页面真实数据源是另一条接口（本例页面自己在 `created()` 里用 `loadDetail()` 调 `/company/companyRegister/detail`）时，mixin 那条请求就是纯多余，而且路径拼错还会污染报错定位。\n\n怎么做：在 `detail.vue` 里**覆盖 mixin 的 `init()`**，只保留页面自己的 `loadDetail()` 取数，不去改 `moduleName`/`businessName` 硬凑一个看起来对的路径（凑出来依然会重复请求一次）。因为 `zljg/institutionRegister` 等包装页共用同一个核心 `detail.vue`，这一处覆盖会一并生效，不需要逐页改。注意：覆盖 `init()` 是有风险的动作（已知清单另一条记录了「重写 init() 会静默断掉查看/编辑的详情请求」），所以覆盖时必须确认页面已有替代取数链路，覆盖后要回归查看态与编辑态两种进页方式。",
+   "evidence": "用户：「company/institutionRegister/detail这个接口哪里调的，不存在的啊」→「这个接口不需要调用，多余的」。最终结论：在 detail.vue 里覆盖 detailMixins 的 init()，避免进入详情页时自动请求不存在的接口；保留 created() 里的 loadDetail() 正常调 /company/companyRegister/detail；zljg/institutionRegister 等包装页共用同一核心组件一并生效。",
+   "files": [
+    "zhi2-web-admin/src/views/company/institutionRegister/detail.vue",
+    "zhi2-web-admin/src/views/institutionRegister/InstitutionRegisterPage.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/api/company/institutionRegister.js",
+    "zhi2-web-admin/src/api/institution/institutionRegister.js"
+   ],
+   "baseline": "fe4ab09",
+   "sessionIds": [
+    "1412adc3-5a64-46ef-9d42-ab80e4e6c02f"
+   ],
+   "bundle": "001.md"
+  },
+  {
+   "title": "[苏房] 网点新增弹窗宽度：去掉 zs-size=\"common\" 改为 width=\"60%\" 与同类弹窗对齐",
+   "type": "bug",
+   "content": "情况：承办银行详情 → 网点列表 → 新增，弹窗宽度明显偏窄（用户截图反馈「这个宽度太小了」），与同目录 `superviseBank/components/YhwdDialog.vue` 的新增网点弹窗不一致。\n\n为什么：该弹窗用 `zs-size=\"common\"`（约 900px 档）收窄了宽度，而同类弹窗走的是百分比宽度。zs-size 是固定像素档位，在宽屏下显得比同类弹窗窄；已知清单里 zs-dialog 宽度档位（medium/common/mini）的约定针对的是「普遍适用的档位选择」，本例是**同一业务下两个弹窗宽度不一致**，用户直接点名要 `width=\"60%\"`。\n\n怎么做：打开弹窗的代码里删掉 `zs-size=\"common\"`，直接写 `width=\"60%\"`，参照 `superviseBank/components/YhwdDialog.vue` 的做法。改完要**硬刷新**再看（热更新可能仍挂着旧组件的宽度），预期弹窗宽度约为视口的 60%。若后续全局宽度规范变化，这类百分比写法才需要改，固定档位不用。",
+   "evidence": "用户贴图「这个宽度太小了」，随后明确「改为 width=\"60%\"」。最终结论：按 superviseBank/components/YhwdDialog.vue 的方式调整：去掉 zs-size=\"common\"，改为 width=\"60%\"；硬刷新后弹窗宽度应为视口约 60%。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/bank/cbyh/components/YhwdDialog.vue",
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue",
+    "zhi2-web-admin/src/views/supervision/bank/superviseBank"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "17e0bfe4-61ae-4bd7-a0fb-01baf6c69025"
+   ],
+   "bundle": "001.md"
+  },
+  {
+   "title": "[苏房] 选择类只读输入框补放大镜：批量补齐 56 处 + 新增 check:dialog-picker-suffix 脚本门禁",
+   "type": "pattern",
+   "content": "情况：详情页里「点开弹窗选择」的只读输入框（如监管机构名称）右侧没有放大镜 icon，用户判定为「不符合公共写法」，并要求「全局排查，有很多类似问题」——说明这是全库级别的存量偏离，不是单页问题。\n\n为什么：项目约定这类选择控件写成 `zs-input` + `readonly` + `@focus` 打开选择弹窗 + `suffix-icon=\"el-icon-search\"`。历史上大量页面只写了前三个，视觉上看不出「可点开选择」，UX 与公共写法都不一致。\n\n怎么做：1）全局扫描，用一次性脚本批量给缺 icon 的控件补 `suffix-icon=\"el-icon-search\"`（本例补齐 56 处，全库约 58 处，其余为排除项）；2）排除项要写清楚：Dialog 内的「请输入关键字」输入框、GIS/地图类输入框不属于选择控件；3）**删除一次性修复脚本，只保留检查脚本**，落在 `scripts/check-dialog-picker-suffix-icon.mjs`，挂到 `npm run lint` 的 `check:dialog-picker-suffix`，防止后续新增页面再漏；4）存量差异要对齐到最规范的实现（如 `stock/account/detail.vue`：放大镜 + `readonly` + placeholder「请选择…」），免监管协议、监管账户注销两页一并修正。验证：`npm run check:dialog-picker-suffix`。",
+   "evidence": "用户：「不符合公共写法，没有放大镜icon」→「全局排查，有很多类似问题」。最终结论：新增 scripts/check-dialog-picker-suffix-icon.mjs，规则为 zs-input 带 @focus 弹窗选择时必须有 suffix-icon=\"el-icon-search\"（排除 Dialog 内「请输入关键字」、GIS/地图等），挂到 npm run lint → check:dialog-picker-suffix；批量修复 56 处；一次性修复脚本已删除，仅保留检查脚本防回归。",
+   "files": [
+    "zhi2-web-admin/scripts/check-dialog-picker-suffix-icon.mjs",
+    "zhi2-web-admin/src/views/stock/agreementExempt/detail.vue",
+    "zhi2-web-admin/src/views/stock/agreement/detail.vue",
+    "zhi2-web-admin/src/views/stock/account/detail.vue",
+    "zhi2-web-admin/src/styles/detail-form.scss"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "b9e1a88a-1413-48f8-9089-482054877b8a"
+   ],
+   "bundle": "001.md"
+  },
+  {
+   "title": "详情页右侧抽屉（attachmentDraw）改用 el-drawer 遮罩模式，勿再把左栏 flex:1 撑开",
+   "type": "pattern",
+   "content": "情况：苏房V3 后台详情页（如 DeveloperEntryNetworkAdminDetail）的「制单信息 / 附件 / 流程查看」右侧抽屉打开时，被实现成推挤左侧表单（左侧表单被迫收窄重排），用户明确要求抽屉应浮在表单「上一层」即遮罩覆盖，而不是挤压文档流。\n原因：抽屉原先与表单同处一个 flex 容器、靠占位挤压布局；同时为了对齐高度给内部左右栏写 flex:1，导致两栏等分。\n怎么做：1) 抽屉必须走遮罩层（el-drawer overlay / 绝对定位浮层）而不是 flex 兄弟节点，表单容器宽度不随抽屉开合变化；2) 抽屉内容左侧导航栏用固定宽度 flex: 0 0 290px + width/max-width: 290px（与 zs-dialog 默认左栏同宽），右侧内容 flex:1 承担剩余宽度，禁止两侧都 flex:1；3) 若去掉 header 关闭按钮（:with-header=\"false\"），必须在入口按钮上补「再次点击同一入口关闭」的交互，避免用户无路可退；4) 抽屉内边距从 20px 收到 8px 才能贴右缘。\n注：项目里 detailSideDrawerInset.js / detail-side-drawer-inset.scss 就是这条内缩留白的集中约定，新增抽屉优先复用而不是页面里另写 padding。",
+   "evidence": "会话 752ad2e6（基线 a861cff）用户诉求「抽屉打开不要挤压左侧表单，应该在上一层」；会话 f882f9ab（基线 6b3ac5a）用户诉求「左侧太宽了」，根因为上次为对齐高度给 .dialog-left 加 flex:1 与右侧一起拉伸，最终改为 flex: 0 0 290px + width/max-width: 290px，右侧继续 flex:1。",
+   "files": [
+    "zhi2-web-admin/src/components/OperationBtnGroup/attachmentDraw.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/utils/detailSideDrawerInset.js",
+    "zhi2-web-admin/src/styles/detail-side-drawer-inset.scss",
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/contractMainInfo/components/chooseHouseDialog.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "752ad2e6-3cc4-4310-97a6-eb4ee9d77575",
+    "f882f9ab-4b6d-42b0-8cfa-ee45d52f7c6b"
+   ],
+   "bundle": "003.md"
+  },
+  {
+   "title": "已注销从业人员详情：工作牌/电子信息卡/凭证按钮统一收进公共状态 helper，附件编码与提交审批同源",
+   "type": "pattern",
+   "content": "情况：经纪机构管理-从业人员信息里，已注销人员的详情页仍展示「个人工作牌」「电子信息卡」和凭证类按钮，用户要求对这些非有效态隐藏。\n为什么：注销态不是独立 bizState，而是叠加位（cancelStatus），只判 bizState 会漏掉已注销；同一套判断在 List/Detail/按钮组多处复制就会漂移。\n怎么做：1) 状态判定集中在 src/utils/personnelStatus.js，导出 isCancelled(person) 之类的 helper，List、Detail、操作按钮组都引同一份，禁止各页面自己写 cancelStatus === '1'；2) 模板上用 v-if 门控工作牌/电子信息卡区块与凭证按钮，不要用 CSS display:none（数据仍在接口返回里，隐藏不当会被误当可用）；3) 从业人员详情的附件/要件 busCode 必须与提交、审批同源（开发/经纪 cyryba，租赁 zlcyryba，变更 cyrybg），在 OperationBtnGroup 上显式传 :bus-code，不要一边写死 auditBusCode 一边又靠路由 meta 解析附件编码；4) 员工端联调该业务时用 e2e/institution/agency-personnel-real-api-flow.spec.js 做真实接口回归。",
+   "evidence": "会话 26d66712（基线 fe4ab09）用户诉求「已注销的详情隐藏个人工作牌与电子信息卡」「已注销从业人员详情隐藏凭证按钮」，改动落在 AgencyPersonnelDetail.vue / AgencyPersonnelList.vue / utils/personnelStatus.js 并同步 E2E。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelList.vue",
+    "zhi2-web-admin/src/utils/personnelStatus.js",
+    "zhi2-web-admin/e2e/institution/agency-personnel-real-api-flow.spec.js"
+   ],
+   "baseline": "fe4ab09",
+   "sessionIds": [
+    "26d66712-1d42-4e2e-8fc5-f3eff23989d0"
+   ],
+   "bundle": "003.md"
+  },
+  {
+   "title": "父仓库 zhi2-web-admin 是 git 子模块：合并 origin/develop/v3.0.0 的冲突是子模块指针冲突",
+   "type": "workflow",
+   "content": "情况：在 d:\\repository\\苏州市房地产监测V3 里执行合并/拉取时，git 报冲突的文件是 zhi2-web-admin（子模块指针），不是普通源码文件。\n为什么：父仓库只记录子模块的 commit sha，本地跑过一条线（如 01020e5 含「从业人员已注销隐藏凭证按钮」），远程 develop/v3.0.0 上走了另一条线（beed5fe 房屋限制调整），两边指针不同即冲突。\n怎么做：1) 先分别在子模块里确认两个 sha 的祖先关系（git merge-base --is-ancestor），若本地已包含远程所有提交，直接把子模块指针解析为本地 sha，不要盲目 re-point 到远程丢改动；2) 在父仓库 git add 子模块路径把冲突标记为已解决，提交信息写清「merge: 合并 origin/<branch>，子模块指向 <sha>」；3) 合并后核对工作区干净、汇报本地领先远程几个提交，推送需用户确认；4) 子模块内的代码改动要在子模块仓库单独提交，父仓库只提交指针。",
+   "evidence": "会话 26d66712（基线 fe4ab09）用户诉求「处理冲突提交代码」，结论为子模块指针冲突：本地 01020e5（含已注销隐藏凭证按钮）vs 远程 beed5fe（房屋限制调整），因 01020e5 已包含 beed5fe，最终父仓库提交 3d4e27b「merge: 合并 origin/develop/v3.0.0，子模块指向 01020e5」，本地领先 2 个提交。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue"
+   ],
+   "baseline": "fe4ab09",
+   "sessionIds": [
+    "26d66712-1d42-4e2e-8fc5-f3eff23989d0"
+   ],
+   "bundle": "003.md"
+  },
+  {
+   "title": "[苏房] 「必填，提示要和展示一致」的正确改法：rules + prop 走表单校验，删掉 beforeSaveHook 里的 msgWarning",
+   "type": "pattern",
+   "content": "场景：业务单据新增/解除页（如 building/houseLimit 的限制编号）在保存时能弹出 Toast「请输入限制编号」，但表单项旁边没有必填红星，用户要求「必填，提示要和展示一致」。\n\n根因：这类页面的必填校验有两份来源——一份写在 el-form 的 rules 里（触发红星与行内红字），另一份写在外层 mixin 的 beforeSaveHook / 保存前手写校验里（只发 msgWarning Toast）。只加后者时，校验能拦住提交，但 el-form-item 没有 prop 与 required 规则，红星和行内提示都不会出现，于是出现「无红星却 Toast 提示」的不一致；两份都改时又容易先弹 Toast、再标红，体验割裂。\n\n做法：①给目标 input 所在的 el-form-item 补 prop，rules 里加 { required: true, message: '请输入xxx', trigger: 'blur' }，文案与 placeholder、原 Toast 文案保持完全一致；②v-model 用 .trim，避免纯空格通过；③把 mixin beforeSaveHook 里对同一字段的 msgWarning 校验删除，让保存链路统一走 validateForm → beforeSaveHook（关联房屋、要件等 hook 逻辑不动）；④补 data-testid 便于 E2E 定位。\n\n收益：表单项红字提示、红星、placeholder、保存提示四处同源，不再出现「看着非必填、保存被拦」的困惑。改完刷新页面点保存即可验证。\n\n适用边界：只对「确有必填语义、需与界面展示对齐」的字段做；仅一次性的字段新增不在此列。",
+   "evidence": "会话 8d47175f（2026-10-18，基线 a861cff）：用户先发截图后要求「必填吧，提示要和展示一致」。limitAdd.vue 给「限制编号」补 prop=\"limitNumber\" + rules 必填 + v-model.trim + data-testid=\"house-limit-number-input\"；limitCancel.vue 对「解除限制编号」同样处理；limitFormMixin.js 删除 beforeSaveHook 里对 limitNumber / limitExplain 的 msgWarning 校验，形成「不再出现无红星却 Toast 提示」的统一口径。",
+   "files": [
+    "zhi2-web-admin/src/views/building/houseLimit/limitAdd.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/limitCancel.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/limitFormMixin.js"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "8d47175f-a152-4585-b14a-c3d55af67b08"
+   ],
+   "bundle": "006.md"
+  }
+ ]
+}

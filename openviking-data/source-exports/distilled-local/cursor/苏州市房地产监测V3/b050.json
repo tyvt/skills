@@ -1,0 +1,82 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "050",
+ "files": [
+  "050.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "预售许可申请详情按图1设计稿改造 Implement",
+   "type": "bug",
+   "content": "原因已经对上，并已改了一处代码。 ### 原因 页面上有两块都在拉 **同一套申请要件（`ysxksq`）**： 1. **「预售方案」**里原来的「方案要件」用了 `AnnexUpload`，且**没传 `bus`**，会跟当前路由一样用 `ysxksq`，界面是**纵向折叠列表**（营业执照、资质证书等）。 2. **「要件上传」**用的是企业公共组件 `AppendixPackageSection` + **要件网格**，还是同一套配置，只是**横向 Tab**。 所以同一批材料出现了两次，只是展示形式不同。 按图1，申请详情里「预售方案」只应：**状态说明 + 维护/查看 +（可选）方案字段摘要**；方案要件在 **[方案维护独立页](zhi2-web-admin/src/views/presale/permit/plan/detail.vue)** 里维护。 ### 修改 已从 [`PermitPlanPanel.vue`](zhi2-web-admin/src/views/presale/permit/components/PermitPlanPanel.vue) 去掉内嵌的「方案要件」`AnnexUpload`，保留方案摘要 `DetailTemplate` 和顶栏「维护 / 查看」。 刷新详情页后，下面应只剩一块 **「要件上传」** 网格。若仍异常，说明一下是查看",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**[方案维护独立页](zhi2-web-admin/src/views/presale/permit/plan/detail.vue",
+    "[`PermitPlanPanel.vue`](zhi2-web-admin/src/views/presale/permit/components/PermitPlanPanel.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\institutionRegister\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4544dadc-80b6-40ef-8002-3d6ab970a0b4"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "原因说明 截图里右侧挡住「基本信息 / 申报信息」第",
+   "type": "fact",
+   "content": "## 原因说明 截图里右侧挡住「基本信息 / 申报信息」第三列的，是 **无遮罩右侧抽屉**（`modal=false`）： - 顶部 **「流程查看 / 制单信息 / 附件」** 来自 `OperationBtnGroup` 的 `attachmentDraw`（审核流程时间线） - **「查看备案记录」** 在价格备案详情里还有本地 `el-drawer`，同样是 `modal=false` 抽屉浮在页面上，主区域宽度不变，就会把最右一列表单盖住。 ## 修复方式 1. 新增 `detailSideDrawerInset.js`：按 **来源 ID** 登记多个抽屉，取最大宽度给 `.detail-container` 加 `padding-right`（关闭一个不会误伤另一个仍打开的抽屉）。 2. `attachmentDraw.vue`：抽屉打开/变宽/关闭时同步 inset。 3. `recordPriceMngSuzhou/detail.vue` 与 `changeDetail.vue`：本地备案记录抽屉同样处理。 4. 全局样式 `styles/detail-side-drawer-inset.scss`（在 `index.scss` 引入）。 请刷新页面后再次打开 **流程查看** 或 **查看备案记录**：主表单应整体左移，第三列不再被挡。若仍异常，说明是哪种按钮",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`detailSideDrawerInset.js",
+    "`attachmentDraw.vue",
+    "`recordPriceMngSuzhou/detail.vue",
+    "`changeDetail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6e015a9d-77e6-4012-9871-981bdb55899e"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "原因 控制台报错 Cannot read prope",
+   "type": "bug",
+   "content": "## 原因 控制台报错 `Cannot read properties of undefined (reading 'pageSize')` 出在 **用款明细** 子表 `PayDetailsTable.vue`：分页绑定了 `queryParams.pageNum` / `queryParams.pageSize`，但在详情页内嵌场景下，`listMixins` 会按**当前详情路由**读写搜索缓存；若 `queryParams` 未就绪或缓存合并异常，渲染时就会访问到 `undefined.pageSize`，整块 Tab 白屏。 ## 修改 1. **`listMixins.js`**：在 `created` 里保证 `queryParams` 存在；支持 `skipSearchParamsCache`（详情子表不写/不读路由缓存）；`query` 的 get/set 更稳妥；带 `skipSearchParamsCache` 时不再把子表分页写入 store。 2. **`PayDetailsTable.vue`**：设置 `skipSearchParamsCache: true`；表格增加 `:page-size=\"queryParams.pageSize\"`；去掉重复的 `created`（由 mixin 统一 `init`）；`queryParams` 中声明 `u",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`PayDetailsTable.vue",
+    "**`listMixins.js",
+    "**`PayDetailsTable.vue",
+    "**`usemoney/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ad7a580b-3a8f-4044-8329-77ea3f59363a"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "列表页查询区与列表卡片间距（全局） Implemen",
+   "type": "pattern",
+   "content": "已按计划完成全局列表间距调整，变更如下。 ### 1. [variables.css](zhi2-web-admin/src/styles/variables.css) - 新增 `--list-section-gap: 12px`（与 `--detail-block-gap` 同档） ### 2. [index.scss](zhi2-web-admin/src/styles/index.scss) - `.list-container` 增加 `gap: var(--list-section-gap)`，查询区与 `list-card`（及中间概览块）之间统一 12px - `.list-container .region-tree-layout .type-right-body` 增加相同 `gap`（区域树右侧槽位） - `.lease-contract-list` 去掉重复的 `gap: 12px`，仅保留 `search-form-container { margin-bottom: 0 }` ### 结构核对 - **企业入网变更备案**：`companyManagement/change` → `ListTemplate`（`list-container` + 查询 + `list-card`）会吃到全局 gap - **区域树列表**：`property/compl",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[variables.css](zhi2-web-admin/src/styles/variables.css",
+    "[index.scss](zhi2-web-admin/src/styles/index.scss",
+    "**区域树列表**：`property/complex/index.vue",
+    "`e2e/company/company-record-change.spec.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "750c5f05-27fa-429e-89fd-82d7adcd5bc9"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

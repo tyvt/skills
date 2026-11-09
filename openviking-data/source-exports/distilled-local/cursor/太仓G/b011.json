@@ -1,0 +1,78 @@
+{
+ "project": "太仓G",
+ "batch": "011",
+ "files": [
+  "011.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "图1迁移的还是不对，图2是昆山的",
+   "type": "bug",
+   "content": "问题已修复。 **原因：** 一般表决详情页用的是 `DecisionRangeTable`（完整版），点击「新增」会打开「新增决策范围」表单弹窗并调接口，所以出现系统异常。昆山正确行为是打开「选择户室」弹窗（`RangeHouseDialog`），通过批量选择户室来新增决策范围。 **修改：** 在 `decisionCommon/components/DecisionRangeTable.vue` 中： 1. 引入 `RangeHouseDialog` 和 `batchAdd` 接口 2. 一般表决（`decision-policy=\"general\"`）点击「新增」时打开「选择户室」弹窗 3. 维修资金表决（`maintain`）仍走原来的「新增决策范围」表单 4. 选择户室后调用 `batchAdd` 批量新增，并刷新列表 请刷新页面后，在一般表决详情页再次点击「+ 新增」，应弹出与昆山一致的「选择户室」弹窗。若左侧树仍显示「暂无数据」，多半是小区 `propertyProjectId` 或后端树接口数据问题，可以再排查。",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "`decisionCommon/components/DecisionRangeTable.vue",
+    "涉及文件：d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\generalDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon\\config.js、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon\\components\\DecisionRangeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0a72f656-dc31-41e6-9305-4a7371db4213"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "选项表决详情，线下投票和导出按钮不见了",
+   "type": "bug",
+   "content": "已修复。 **原因：** 在 `optionDecision/detail.vue` 中，`DecisionRangeTable` 的 `show-icon` 被写成了 `mainCardValue == 0`。切换到「投票信息」标签页时 `mainCardValue` 为 `1`，整行操作区被 `v-if=\"showIcon\"` 隐藏，所以「导出」和「线下投票录入」虽然 `show-vote` 为 `true`，也不会显示。 **修改：** 将 `show-icon` 改为在「基本信息」和「投票信息」两个标签页都显示操作区： ```263:263:zhi1-web-admin/src/views/estate/optionDecision/detail.vue :show-icon=\"mainCardValue == 0 || mainCardValue == 1\" ``` 刷新页面后，在「投票信息」→「决策明细」中应能看到「导出」和「线下投票录入」按钮。",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "`optionDecision/detail.vue",
+    "```263:263:zhi1-web-admin/src/views/estate/optionDecision/detail.vue",
+    "涉及文件：d:\\repository\\太仓G、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\components\\DecisionRangeTable.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "35795d81-ec7d-4058-baa4-9e944062ac4e"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "原因说明 1. sys_yes_no：TableBo",
+   "type": "bug",
+   "content": "## 原因说明 1. **`sys_yes_no`**：`TableBody` 是**递归组件**，每一层都会在 `created` 里调 `getDicts('sys_yes_no')`，树有多深就会请求多少次。而 `yesOrNoOptions` 在模板和逻辑里**从未使用**，属于无效请求。 2. **`FILE_TYPE`**：每个 `TableBody` 里都挂了一个 `FileListDialog`，递归后会有**多个对话框实例**，每个在 `created` 里都会请求一次 `FILE_TYPE`。 ## 修改说明 1. **`TableBody.vue`**：删除 `yesOrNoOptions`、`created` 中的 `initDict()` 以及 `initDict` 方法，去掉对 `sys_yes_no` 的重复请求。 2. **`FileListDialog.vue`**：增加模块级 `ensureFileTypeOptions`：首次请求后缓存结果，并发时共用同一个 `Promise`，这样无论有多少个 `FileListDialog` 实例，**整页只会打一次** `/system/dict/data/type/FILE_TYPE`。 若你希望字典在整站只请求一次、离开页面也不丢缓存，可以再考虑把缓存挪到 `getDicts`（`api/system",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "**`TableBody.vue",
+    "**`FileListDialog.vue",
+    "`getDicts`（`api/system/dict/data.js",
+    "涉及文件：d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\repairFunds\\usage\\fundUsageKs\\components\\AnnexContainer\\components\\TableBody.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\repairFunds\\usage\\fundUsageKs\\components\\AnnexContainer\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "82f1e5be-80bb-4d16-827c-0a7d2778a100"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "没延期之前还有 提前结束 按钮的，延期后就没有 提前",
+   "type": "fact",
+   "content": "问题已修复。 **原因：** 一般表决详情页里，“提前结束”按钮原先只在表决状态为 **选举中（`decisionState == '2'`）** 时显示。延期后状态会变为 **延期（`decisionState == '5'`）**，条件不再满足，按钮就被隐藏了。 **修复：** 与业主决策、选项决策、维修决策等页面保持一致，延期状态下也允许提前结束： ```15:15:zhi1-web-admin/src/views/estate/generalDecision/detail.vue <el-button v-if=\"isSubmittedBiz && (form.decisionState == '2' || form.decisionState == '5') && checkPermission(['estate:generalDecision:advanceEnd'])\" type=\"primary\" icon=\"el-icon-edit\" @click=\"advanceEnd\">提前结束</el-button> ``` 刷新页面后，表决状态为“延期”时也应能看到“提前结束”按钮（需具备 `estate:generalDecision:advanceEnd` 权限）。",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "```15:15:zhi1-web-admin/src/views/estate/generalDecision/detail.vue",
+    "涉及文件：d:\\repository\\太仓G、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\generalDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\generalDecision、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5498a264-de28-46af-8525-e64606a2220e"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  }
+ ],
+ "_draft": true
+}

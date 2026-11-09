@@ -1,0 +1,80 @@
+{
+ "project": "园区物管2.0",
+ "batch": "029",
+ "files": [
+  "029.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "企业信用评级规则新建/查看/编辑详情： 列表缺少复选",
+   "type": "preference",
+   "content": "已修复企业信用评级规则详情页的相关问题，修改如下： ### 1. 等级信息列表补充复选框 `table.vue` 中复选框列原先仅在 `bizState == '0'` 时显示，但父页面未传入 `bizState`，导致列始终隐藏。现已调整为：未传入 `bizState` 时也显示复选框，并正确绑定 `isSelectable`。 ### 2. 详情页基本信息查看样式 `detail.vue` 查看模式下，基本信息改用 `DetailTemplate` 蓝色矩形表单展示；编辑/新增模式保持原表单。同时将「基本信息」置于上方、「等级信息」置于下方。 ### 3. 新增等级信息弹窗优化 `dialog.vue` 改动： - **查看模式**：使用 `DetailTemplate` 蓝色矩形表单 - **弹窗标题**：按模式显示「新增/编辑/查看等级信息」 - **弹窗宽度**：设为 `mini`，避免过宽 - **分值区间输入框**：两个输入框等宽对齐 - **查看展示**：分值区间显示为 `> X <= Y` 格式 刷新页面后即可验证效果。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`table.vue",
+    "`detail.vue",
+    "`dialog.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\evaluation\\ratingRule\\detail.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\evaluation\\ratingRule\\table.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\evaluation\\ratingRule\\dialog.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\mixins\\subTableMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "15e3f1e2-9505-4347-bf12-82cca18b71ec"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "增加小计功能，参考其他页面实现方式，使用table的",
+   "type": "preference",
+   "content": "原因有两层： 1. **`shouldRenderBottomSummary` 原先不是 prop** 在 `zs-table` 里它只是一个**计算属性**（有 `resolvedBottomSummaryItems` 就为 `true`）。父组件写的 `:shouldRenderBottomSummary=\"false\"` 会进 **`$attrs`**，再被 `v-bind=\"attrs\"` 传给 **`el-table`**，`zs-table` 自己根本不会按这个值隐藏底部区域。 2. **你看到的「合计」来自 `ZsSummaryText`** 表格里 `getSummaries` 首列已是「小计」，但表格下方还会自动挂一块 `ZsSummaryText`，里面写死了标题 **「合计：」**（见 `ZsSummaryText/index.vue` 第 3 行），所以和「只要小计」冲突。 已在 `zs-table.vue` 里改为： - 增加 **prop** `shouldRenderBottomSummary`，默认 `true`（其它页面行为不变）。 - 用 **`effectiveBottomSummaryVisible`**（`shouldRenderBottomSummary && hasBottomSummaryContent`）控制是否渲染 `ZsSumm",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`ZsSummaryText/index.vue",
+    "`zs-table.vue",
+    "`pubBankAccountBalance/index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubBankAccountBalance\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubAccountBalance\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "442d7a82-5af6-497e-bb37-b6b32de6979b"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "精简代码，保持功能不变",
+   "type": "fact",
+   "content": "已修复。 **原因**：Vue 2 在 `v-for` 里使用 `:ref=\"block.ref\"` 时，`this.$refs.trendIncomeMixedRef` 会是 **DOM 数组** `[div]`，而不是单个元素。`echarts.init` 收到数组后内部调用 `getContext` 就会报错。 **修改**： 1. `chartRenderers.js` 增加 `asChartDom()`，在 `echarts.init` 前统一解包数组 / 组件实例。 2. `index.vue` 增加 `resolveRef(name)`，所有图表 ref 都通过它读取。 请刷新页面再试，7 个图表应能正常初始化。若仍有问题，把新的报错栈发我即可。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`chartRenderers.js",
+    "`index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\assetPanorama\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d6bc9dfb-c8b6-4de2-ad34-79103343d6dd"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "全局排查el-input组件，根据具体情况改成zs-",
+   "type": "fact",
+   "content": "判断结果：这些 input 上的 `width: 100%` 在你这个项目里基本是冗余的，可以删。 依据是全局样式已经兜底了宽度： - `src/styles/element-ui.scss` 里 `.el-form .el-input/.el-input-number/... { width: 100%; }` - 同文件里 `.el-form-item__content > * { width: 100%; max-width: 100%; }` 我已完成全项目清理（`zhi2-web-admin/src`）： - 仅针对 `zs-input`、`amount-input` - 删除了这两类属性（仅当它们是“纯 100% 宽度”时）： - `:style=\"{ width: '100%' }\"` / `:style=\"{ width: \\\"100%\\\" }\"` - `style=\"width: 100%\"`（含可选分号） - 实际变更文件：140 个 - 清理后复查：上述冗余写法已为 0 - lint 复查：无新增错误 如果你希望，我可以再继续把 `zs-select`、`el-select`、`el-date-picker` 等组件上同类 `width: 100%` 也按同规则统一清掉。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`src/styles/element-ui.scss",
+    "涉及文件：D:/repository/园区物管2.0/zhi2-web-admin、D:/repository/园区物管2.0/zhi2-web-admin/src/views/benefit/components/AutoReconciliationDialog.vue、D:/repository/园区物管2.0/zhi2-web-admin/src/components/zs-input/zs-input.vue、D:/repository/园区物管2.0/zhi2-web-admin/src、D:/repository/园区物管2.0/zhi2-web-admin/src/main.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "06f932da-3393-48a6-bff2-4f09b55cb82b"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,302 @@
+{
+ "project": "苏住房C",
+ "batch": 16,
+ "files": [
+  "061.md",
+  "062.md",
+  "063.md",
+  "064.md"
+ ],
+ "count": 16,
+ "memories": [
+  {
+   "title": "苏住房C 市民端分包静态资源 500：ZsImage 默认解析主包路径，需按当前路由自动推断分包",
+   "type": "bug",
+   "content": "现象：新房详情页在真机/开发者工具报 `Failed to load local image resource /static/images/szf/dianhua.svg … 500 (Internal Server Error)`，dianhua.svg、building_banner.png、dunpai.png 三张图整块空白，同屏还有「鉴权失败：当前产品鉴权失败」「海外图鉴权失败」两条腾讯地图报错干扰判断。\n\n根因：这三个文件实际位于分包 `pages_transaction/static/images/szf/`，而 ZsImage 未指定 subpackage 时 `resolveStaticUrl` 一律按主包前缀拼成 `/static/images/szf/...`；主包里根本没有该文件，微信侧对不存在的本地静态资源不报 404 而是回 500，所以看日志完全看不出是「路径错了」。注意这与已知的「分包不能跨包引用资源」同源，但这里是从组件内部默认行为触发的，页面上看不出任何异常写法。\n\n做法：在 `utils/index.js` 的 `resolveStaticUrl` 里加 `inferSubpackageFromRoute()`：`getCurrentPages()` 取栈顶 `route` 的首段，命中 `pages_` 前缀或 `page-query` 即视为分包根目录，用它替换主包前缀；主包页面若确实要引用分包图片，显式调用 `resolveStaticUrl('images/szf/building_banner.png', 'pages_transaction')` 传第二参。改完必须重新编译小程序再看，H5/热更新不覆盖真机路径解析。\n\n注意：同一批报错里的「鉴权失败」与图片无关——是 ZsMap 的腾讯位置服务 Key 未在该小程序 AppID 下绑定/未启用「微信小程序」产品，属控制台平台配置，代码无法修；若 Key 过期或属于他项目，需在 ZsMap.vue、manifest.json 中同步换新 Key。别把两类报错混成一个问题处理。",
+   "evidence": "会话 e3873d64：用户贴出三张图片 500 报错与两条地图鉴权失败；结论指出 dianhua.svg / building_banner.png / dunpai.png 实为 pages_transaction/static/images/szf/ 下文件，ZsImage 未指定 subpackage 时 resolveStaticUrl 解析成主包路径；给出 utils/index.js 中 inferSubpackageFromRoute 的实现，并在主包页 Project_Suzhufang.vue 对 building_banner.png 显式指定分包；地图鉴权需到腾讯位置服务控制台为 Key 勾选「微信小程序」并填 AppID。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\index.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouse\\detail.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouse\\components\\disclaimer.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsMap\\ZsMap.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\manifest.json"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "e3873d64-6106-455a-aff6-e426cf0638d1"
+   ],
+   "bundle": "061.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "z-paging 默认 fixed 定位，放进弹窗会与底部按钮重叠：必须关 fixed 并做三段式 flex 布局",
+   "type": "pattern",
+   "content": "现象：求购「附近小区」弹窗里列表区域又小又难滑，且直接压在弹窗底部「取消」「保存」按钮上，两者视觉重叠、点不到。\n\n根因两条叠加：\n1. z-paging 默认 `fixed: true`（全屏固定定位渲染），放进弹窗后它按整个视口定位，完全无视弹窗容器，于是盖住弹窗内的底部操作区；\n2. 原实现把「标题 + 列表 + 按钮」全塞进同一个 `overflow-y: auto` 容器，滚动容器是整体而非列表，列表可视高度被按钮挤掉，滑动体验极差。\n\n做法（弹窗内任何 z-paging 都适用）：\n1. 弹窗内容改成 flex 纵向三段：标题区 → 可滚动列表区 → 固定底部按钮区，三者兄弟节点分离，不再套统一滚动容器；\n2. z-paging 传 `:fixed=\"false\"` + `:use-page-scroll=\"false\"`，让它按父容器高度渲染；\n3. 列表区给 `min-height: 500rpx` 保底可视高度，弹窗整体 `max-height: 75vh` 限高；\n4. 底部按钮区 `flex-shrink: 0` 并补安全区适配，保证任何时候都不被列表挤压或遮挡。\n\n排查提示：弹窗内列表「位置乱飞 / 挡按钮 / 高度不受控」，第一反应查分页组件是否是 fixed 全屏模式，而不是先调 padding 和 z-index。",
+   "evidence": "会话 451f9781：「我的求购」点击附近小区弹出列表太小不易滑动且与「取消」「保存」按钮重叠；结论指出 z-paging 默认 fixed:true 在弹窗内按全屏固定定位渲染导致重叠，且原先把按钮和列表放在同一 overflow-y:auto 容器里；修复为 flex 三段布局 + :fixed=\"false\" + :use-page-scroll=\"false\" + 列表 min-height:500rpx + 弹窗 max-height:75vh + 底部按钮 flex-shrink:0 与安全区。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\intention\\popup.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\intention\\add.vue"
+   ],
+   "baseline": "d43894b",
+   "sessionIds": [
+    "451f9781-7f9a-465f-90a9-7f258714b1cc"
+   ],
+   "bundle": "061.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 市民端无引用的双份网关实现：sfbConfig/SM3 签名重复两文件，按「只留实际在跑的链路」清理",
+   "type": "pattern",
+   "content": "现象：`src/api/gateway.js` 与 `src/api/dispatcher.js` 都各写了一套苏服办网关配置（sfbConfig）、SM3 签名与网关 header 组装逻辑，看起来像同一功能的两种实现，维护时不知道改哪个。\n\n判定与做法（先证伪再用，不要凭命名猜）：\n1. 全仓 grep `dispatcher`，确认项目内没有任何 import —— 它是未接入的备用实现（fetch / uni.request 方案），与 gateway.js 功能重复；\n2. 查询顶部展开两条真实调用链：`index.js` / `v1Instance.js` → `httpInstance.js` → `gateway.js`（axios + 苏服办网关封装）；\n3. 用户明确要求「用实际用的，移除冗余的」，因此删除 dispatcher.js，后续只维护 gateway.js 及其环境变量 `VITE_APP_SFB_*`。\n\n复用到其它模块的原则：一个能力出现两份实现时，先画调用链定唯一事实来源，再删死代码；删除前必须确认零引用，删除后环境变量清单同步收敛，避免后续有人照着残留配置去配一套永远不生效的变量。",
+   "evidence": "会话 b91754cb：用户问 gateway.js 与 dispatcher.js 为什么配置在两个文件，随后要求「用实际用的，移除冗余的」；结论保留 index.js/v1Instance.js → httpInstance.js → gateway.js 链路，删除无任何 import 且重复实现 sfbConfig/SM3 签名/网关 header 的 dispatcher.js，并说明后续只需维护 gateway.js 与 VITE_APP_SFB_* 环境变量。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\gateway.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\dispatcher.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\index.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\httpInstance.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\v1Instance.js"
+   ],
+   "baseline": "a444c05",
+   "sessionIds": [
+    "b91754cb-4f69-4526-932a-d2e80e20327e"
+   ],
+   "bundle": "061.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "构建后裁剪脚本的 LEAK_END 正则与 uni.scss 全局类强耦合：uni.scss 一改，主包上传预估就超限",
+   "type": "bug",
+   "content": "什么情况：zhi2-mobile-shimin 执行 npm run build 时 size:main 报「MAIN 上传预估 2110.8KB OVER LIMIT（限制 2048KB）」，但磁盘体积只有 1804.1KB 是正常的。\n为什么：uni-app 编译小程序时会把 uni.scss 里的全局样式注入每个组件 wxss。项目靠构建后脚本 scripts/prune-component-wxss-leak.mjs 把这些重复注入的全局样式裁掉，脚本内部用 LEAK_END 正则去精确定位要删的片段。本次 uni.scss 新增了页面容器类（.container、.success-page 等）并把 min-height:100% 改成 min-height:inherit，正则没匹配上，裁剪整块失效，32 个组件各泄漏约 8.3KB，合计 267KB。注意「磁盘 1804KB ok、上传预估 2110KB OVER」这个组合本身就是泄漏信号：两者差值约 300KB 就是未裁剪的全局样式。\n怎么做：改 uni.scss 的全局类名/属性值时，必须同步检查 prune-component-wxss-leak.mjs 的正则；修法是让正则兼容新增类名与 min-height 的两种取值。修复后 components 从 431.6KB 降到 164.6KB，上传预估降到 1798.4KB。日常可单独跑 npm run size:main 快速验体积（validate-dist 末尾会自动跑）。",
+   "evidence": "会话 ec247072：构建报 MAIN 上传预估 2110.8KB OVER LIMIT；定位为 prune-component-wxss-leak.mjs 的 LEAK_END 正则仍是旧规则，匹配失败导致 32 个组件各泄漏约 8.3KB（合计 267KB）；更新正则兼容 .container/.success-page 与 min-height:inherit 后，components 431.6KB→164.6KB、MAIN 磁盘 1804.1KB→1537.1KB、上传预估→1798.4KB ok",
+   "files": [
+    "zhi2-mobile-shimin/scripts/prune-component-wxss-leak.mjs",
+    "zhi2-mobile-shimin/src/uni.scss",
+    "zhi2-mobile-shimin/scripts/size-main-package.mjs",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "baseline": "6aca310",
+   "sessionIds": [
+    "ec247072-d32c-44f5-838a-cfbdfe935169"
+   ],
+   "bundle": "062.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序/H5 双端构建告警的清理清单：sourcemap 重复键要按平台判断、CSS 嵌套必须展开、本地缺失 SVG 统一改 CDN",
+   "type": "workflow",
+   "content": "什么情况：zhi2-mobile-shimin 构建时刷出大量告警，需要区分「该修」与「可忽略」。\n为什么/怎么做，按四类处理：\n1. sourcemap 重复键：vite.config.ts 里不要按环境各写一个 sourcemap 字段（后一个会覆盖前一个并报警），改成按平台统一判断——sourcemap: process.env.UNI_PLATFORM === 'h5' ? mode !== 'production' : false。小程序端不需要 sourcemap。\n2. CSS 嵌套不兼容 chrome53：SFC 里用 & 或 SCSS 嵌套生成的 CSS nesting，uni 的 chrome53 目标不支持。要展开成完整选择器：.property-card ~ .property-card、.info-row ~ .info-row、.count-block .total-count。（此条与「SCSS :deep() 嵌套」是两个不同触发来源。）\n3. 本地静态资源路径无法解析（如 flag-szf.svg）：文件在仓库里不存在时，不要硬留本地相对路径，H5 与小程序统一改成 CDN 绝对地址。\n4. Browserslist 数据过期：执行 npx update-browserslist-db@latest。\n可忽略的三类：index.html 里的国密/签名脚本无法打包（必须全局加载，不能改 module）；vconsole/pdfjs 内部 eval；uni-app 版本升级提示（按需 npx @dcloudio/uvm@latest）。",
+   "evidence": "会话 5ca7c165：按终端日志逐项修复——vite.config.ts sourcemap 改为按 UNI_PLATFORM 判断；PropertyCard/property-detail/company-detail/data-analysis 的 CSS 嵌套展开为完整选择器；flag-szf.svg 本地不存在改为 CDN（ResultStatistics.vue、StepConfirm.vue）；执行 npx update-browserslist-db@latest；构建 DONE Build complete，剩余三条告警判定为可忽略",
+   "files": [
+    "zhi2-mobile-shimin/vite.config.ts",
+    "zhi2-mobile-shimin/src/page-query/components/PropertyCard.vue",
+    "zhi2-mobile-shimin/src/page-query/property-detail.vue",
+    "zhi2-mobile-shimin/src/page-query/company-detail.vue",
+    "zhi2-mobile-shimin/src/page-query/data-analysis.vue"
+   ],
+   "baseline": "a444c05",
+   "sessionIds": [
+    "5ca7c165-a429-40a7-a5eb-a5c94b398242"
+   ],
+   "bundle": "062.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏服办 H5 里图片不显示：内联 :style 的相对路径绕过 Vite 构建，必须改用 resolveStaticUrl",
+   "type": "bug",
+   "content": "什么情况：同一套代码在微信小程序里图标正常，部署到苏服办 H5 后页面图标整块不显示（如 pages_owner/repair/add.vue 的报修/报事分类背景图标）。\n为什么：图标是通过内联 :style 拼背景图写的相对路径 url('../../static/images/icon-repair-xxx.png')，有两个叠加问题——(1) 内联样式里的字符串不经过 Vite 的 CSS 资源处理，相对路径不会被改写成带 hash/正确前缀的产物地址；(2) H5 生产构建的 base 是 './'，页面 URL 与文件系统层级不一致，'../../static/...' 在 WebView 里会被解析到错误位置。小程序端因为同一套相对目录结构恰好能对上，所以问题只在 H5 暴露，很容易被误判成「苏服办没加载资源」。\n怎么做：任何用 JS 拼静态资源 URL 的地方（内联 style、:src、背景图）都不要写相对路径，统一走项目已有的 resolveStaticUrl，它按 import.meta.env.BASE_URL 生成正确地址（首页菜单、随手拍列表等页面已在用）。排查时在浏览器开发者工具看图片请求 URL 是否变成 ./static/images/icon-xxx.png 这种路径即可确认。",
+   "evidence": "会话 80e004b0：用户报「这个页面的图片在苏服办里面没法正常显示」；定位 add.vue 用内联 :style 写死 url('../../static/images/...')，内联样式不走 Vite 构建 + H5 base 为 './' 导致 WebView 解析错位；改用 resolveStaticUrl(`images/icon-${prefix}-${icon}.png`) 后重新打包部署正常",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/repair/add.vue",
+    "zhi2-mobile-shimin/vite.config.ts",
+    "zhi2-mobile-shimin/src/utils/index.js"
+   ],
+   "baseline": "e04432d",
+   "sessionIds": [
+    "80e004b0-7fee-4cde-af50-62f07a822d3a"
+   ],
+   "bundle": "062.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "z-paging 默认 fixed 全屏定位会盖住页面顶部的搜索/筛选/操作区",
+   "type": "bug",
+   "content": "什么情况：列表页（如 pages_owner/repair/index.vue 报事报修列表）顶部的搜索框、筛选、「前往报事报修」按钮被列表内容盖住，截图上看就是顶部操作区被吃掉。\n为什么：z-paging 默认是 fixed 全屏定位，自己脱离文档流并铺满视口，列表层叠在页面顶部正常流元素之上。页面按普通流写了搜索/筛选区，就必然被压住——这不是 z-index 调数值能解决的，因为整个列表容器已经脱离了页面布局。\n怎么做：这类「顶部固定操作区 + 下方列表」的页面，列表要关掉固定定位——给 z-paging 加 :fixed=\"false\"，让它参与正常文档流；然后页面根容器用 flex 纵向布局，顶部操作区加 flex-shrink: 0 防止被压缩，列表区用 flex: 1 + min-height: 0 占满剩余高度并支持滚动（min-height:0 是让内部滚动生效的关键）。\n注意与「列表分页统一用 z-paging」的约定并不冲突：仍是 z-paging，只是非全屏列表页要显式关掉 fixed。",
+   "evidence": "会话 adb68ad1：用户贴图报「电子业主卡-报事报修，页面显示把顶部前往报事报修筛选等操作盖住了」；定位 z-paging 默认 fixed 全屏定位，列表层叠在顶部搜索/筛选/按钮之上；修复为 :fixed=\"false\" + .repair-page flex 纵向 + 顶部 flex-shrink:0 + .page-body flex:1/min-height:0",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/repair/index.vue",
+    "zhi2-mobile-shimin/src/hooks/usePaging.js",
+    "zhi2-mobile-shimin/src/pages_owner/propose/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/tenant/index.vue"
+   ],
+   "baseline": "d43894b",
+   "sessionIds": [
+    "adb68ad1-d25d-4cff-8fc2-1aef22ec90cb"
+   ],
+   "bundle": "062.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "页面整体迁到分包后必须全量替换旧路由路径：登录页 pages/login → pages_main/login 残留导致 page not found",
+   "type": "bug",
+   "content": "什么情况：小程序报 navigateTo:fail page \"pages/login/index\" is not found，触发点是「未登录时访问任意需要登录的页面」。\n为什么：登录页在分包迁移时已经从 pages/login 移到 pages_main/login，pages.json 注册的也是 pages_main/login/index，但登录跳转逻辑散落在 utils 和一堆业务组件里，仍写着旧路径 /pages/login/index。路由注册改了、调用点没改，就必然报 page not found，而且报错只在具体某个入口触发，不容易一次发现全部遗漏。\n怎么做：页面迁移（尤其是登录页、tab 页这类被到处跳的页面）完成后，必须全仓搜索旧路径字符串并逐处替换。本项目的实际漏点清单：src/utils/index.js（未登录跳转）、pages/index/components/My_Suzhufang.vue（我的页登录入口）、components/collectBtn/collectBtn.vue（收藏按钮）、pages_my/verification/FormLocal.vue 与 FormNonLocal.vue（实名认证）、pages_my/onlineService/ClassDetail.vue 与 OnlineCass.vue（在线服务）、pages_transaction/stockHouse/detail.vue（二手房详情，2 处）。\n长期做法：跳转路径统一引用集中常量（如 src/utils 里的 PAGES.login / route-map.js），禁止在各页面写字面量路径，迁移时只改常量一处。",
+   "evidence": "会话 73f5531d：报错 MiniProgramError navigateTo:fail page \"pages/login/index\" is not found；定位登录页已迁到 pages_main/login/index 但多处代码仍跳旧路径，逐文件替换（utils/index.js 改用 PAGES.login，另 6 个组件/页面共 9 处）",
+   "files": [
+    "zhi2-mobile-shimin/src/pages.json",
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/utils/route-map.js",
+    "zhi2-mobile-shimin/src/pages_main/login/index.vue",
+    "zhi2-mobile-shimin/scripts/migrate-pages-tab.mjs"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "73f5531d-ca8f-4227-9e76-d2fa4b5c98a1"
+   ],
+   "bundle": "062.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "onShow 无条件重载列表会重置用户的表单选择：重载时必须保留已选值（选完子页返回选择被冲掉）",
+   "type": "bug",
+   "content": "什么情况：报修提交页的表单里，「所在房屋」从 A 手动切到 B，点「报修设施设备」进入选择页，选完返回后房屋又变回 A，后续报修挂到了错误的房子上。\n为什么：submit.vue 在 onShow 里每次都调 getHouseList() 重新拉房屋列表，然后按优先级自动「纠正」选中项（userStore.houseId 全局默认房屋 → 当前小区下的房屋 → 列表第一项）。从子页面返回会触发 onShow，于是用户的手动选择被这套默认逻辑覆盖。这类问题在「页面 onShow 重载数据 + 表单有默认值推导」的组合里必然出现，且不会报错，表现为「选择不生效」。\n怎么做：重载列表的函数里先判断表单是否已有用户选择——若 form.house 已有值，在刷新后的列表中找到对应项，把 complexId/complexName/userIdentityId/houseId/position 等联动字段按该项补齐后 return，跳过默认房屋逻辑；只有用户还没选过时才走默认优先级。\n同类排查口径：任何 onShow/onActivated 里调用「带默认值推导的加载函数」的页面，都要检查它是否会覆盖用户已填内容；从选择类子页返回是最高发的触发路径。",
+   "evidence": "会话 f5c3361f：用户报「切换房屋由 A 切换到 B，选择报修设施设备上房屋变回 A」；定位 submit.vue 的 onShow→getHouseList() 按 userStore.houseId→当前小区→列表首项重置房屋；修复为 getHouseList 内 data.house 已有值时按选中项回填联动的 5 个字段并 return（pages_owner_extra/repair/submit.vue）",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner_extra/repair/submit.vue",
+    "zhi2-mobile-shimin/src/pages_owner_extra/repair/chooseFacility.vue",
+    "zhi2-mobile-shimin/src/pages_owner/repair/submit.vue",
+    "zhi2-mobile-shimin/src/pages_owner/repair/chooseFacility.vue"
+   ],
+   "baseline": "b7bf813",
+   "sessionIds": [
+    "f5c3361f-ac2a-43fa-8586-7a2d7934e203"
+   ],
+   "bundle": "062.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏服办网关上传参数必须传 { file }，传 { files: [...] } 会静默退化成普通 POST 网关",
+   "type": "bug",
+   "content": "情况：苏住房C 市民端（zhi2-mobile-shimin）在苏服办 H5 内上传签字图片时报「请求异常」，没有任何字段级错误提示。抓网关日志发现请求走的是 POST 业务接口 szffluzm-whyhxx、version=2.1、header 里带着 zs-sign / zs-param，而且 FormData 里根本没有 file 字段。\n\n为什么：api/gateway.js 是靠 config.file 的真假来判定「这是不是一次文件上传」的——有 config.file 才切到上传专用 interface_id（szffluzm-wjsc）+ 精简 header（只留 zs-authorization / zs-path / zs-source）+ version 写成 v2.1；而 httpInstance.js 的 file() 只读 data.file 或 data.filePath。调用方写 fileUpload({ files: [{ file, name: 'file' }] }) 时 files 不是约定字段，config.file 就是 undefined，于是整条链路静默按普通 POST 发出去，签名图片被丢弃，且不抛任何错误。\n\n怎么做：H5 上传一律传扁平对象 fileUpload({ file })，与 ImageUploader、ZsUploader 等组件保持一致；只有需要换表单字段名时才用 name。修完的验收标准是日志里出现 interface_id=szffluzm-wjsc、version=v2.1、header 中不再有 zs-sign / zs-param。凡是新写上传调用点，都要按这四条特征自查，而不是只看有没有报错。",
+   "evidence": "会话 79a544a0：用户贴出网关日志，对比「参与决策→签字→提交」的请求 interface_id=szffluzm-whyhxx/version=2.1/header 含 zs-sign 与 zs-param、无 file 字段；定位到 gateway.js 第 222-232 行 isFileUpload = !!config.file，httpInstance.js 第 214-223 行 file: data.file || data.filePath；根因 SignBoard.vue 写成 fileUpload({ files: [{ file, name: 'file' }] })。修复后改为 fileUpload({ file })，与 ImageUploader、ZsUploader 一致。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/SignBoard.vue",
+    "zhi2-mobile-shimin/src/api/gateway.js",
+    "zhi2-mobile-shimin/src/api/httpInstance.js",
+    "zhi2-mobile-shimin/src/api/file.js"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "79a544a0-5a29-4c3d-acb1-c80b3b9dfa2c"
+   ],
+   "bundle": "063.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "uni-app 自定义 tab 组件同时写 v-model 与 @update:model-value，监听被覆盖导致切 tab 不请求接口",
+   "type": "bug",
+   "content": "情况：苏找房页面（pages/index/components/Project_Suzhufang.vue）切换「推荐 / 新房 / 二手房」标签时 tab 高亮正常变化，但列表数据不刷新，也不发任何请求，控制台无报错，非常像「点了但没生效」。\n\n为什么：模板里对 ProjectTabBar 同时写了 v-model 和 @update:model-value=\"tabChange\"。uni-app 里 v-model 本身就会编译成 update:modelValue 监听并覆盖同名自定义监听，结果是 curTab 被 v-model 更新（所以高亮切换了）、tabChange 却从不执行，$refs.paging.reload() 自然也不会被调到，列表接口根本不重发。这类「UI 有反应、逻辑没跑」的现象不要先去怀疑接口或 z-paging。\n\n怎么做：去掉 v-model，只保留 :model-value + @update:model-value=\"tabChange\" 单一数据流；在 tabChange 里把新 tab 写入后才在 $nextTick 之后调 reload()，保证 curIndex 已更新再触发分页请求；同时删掉手动的 this.houseList = []，列表重置交给 z-paging 的 reload() 统一负责，避免自动重置与手动清空互相打架造成闪烁。修完应按 tab 分别核对请求：推荐 listRecommend、新房 pageByKeyWord、二手房 houseInfoDisplayList。",
+   "evidence": "会话 6e707628：用户报「苏找房页面切换tag没有调用接口」；定位到 Project_Suzhufang.vue 第 67 行 <ProjectTabBar :model-value=\"curTab\" :tabs=\"tabList\" @update:model-value=\"tabChange\" />（原含 v-model）；修复为去掉 v-model、$nextTick 后 reload()、删除手动 this.houseList = []。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages/index/components/Project_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/menu/ProjectTabBar.vue",
+    "zhi2-mobile-shimin/src/pages/index/project.vue",
+    "zhi2-mobile-shimin/src/components/ZsPaging/ZsPaging.vue"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "6e707628-a295-466a-98ef-4fff34cf5423"
+   ],
+   "bundle": "063.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序列表逐条 push 数据 + :key=index，渲染时 item 变 undefined 报 fileSite of undefined",
+   "type": "bug",
+   "content": "情况：苏住房C 小程序新房详情页（pages_transaction/newHouse/detail）报 TypeError: Cannot read property 'fileSite' of undefined，堆栈落在 components/commonNew/swiperComponent.js 的 _sfc_render 里，也就是轮播组件渲染阶段，而不是接口请求阶段。\n\n为什么：两点叠加。一是详情页在接口返回后逐条 push 图片到 allImg，视频还插到 allList 最前面，每次 push 都触发一次重算和重渲染，微信小程序会真实渲染出中间的半成品状态；二是轮播用 :key=\"index\"，头部插入视频后索引整体后移，复用了上一帧的 key，渲染时就可能取到一个 undefined 的 item，再去读 item.fileSite 直接崩。这类崩溃的排查入口应是「数据是否一次性赋值 + key 是否稳定」，而不是先去查接口字段结构。\n\n怎么做：数据侧改成一次性赋值 this.allImg = mediaList，彻底消除中间态；swiperComponent 模板改用可选链 item?.fileSite，allList 加 filter 过滤无效项，:key 改成 item.fileSite || index 这种跟业务值绑定的稳定键；顺带把 tabChange 切到「图集」时的 currentSlide 越界、getVideoType 的入参空值一起兜住。父组件还要记得显式传 :detailData=\"detailData\"，否则组件内部读不到数据源。同一套改动要同步 pages/commonNew/swiperComponent.vue 与 pages_transaction 下两份副本。",
+   "evidence": "会话 db12bfb7：用户贴出 weapp:///components/commonNew/swiperComponent.js:212:61 处的 TypeError: Cannot read property 'fileSite' of undefined 完整堆栈；结论指出 detail.vue 逐条 push 图片、视频插到最前使索引偏移，叠加 :key=\"index\" 导致渲染时 item 为 undefined；修复为 allImg 一次性赋值、item?.fileSite、filter 无效项、:key=\"item.fileSite || index\"、currentSlide 越界与 getVideoType 空判。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/commonNew/swiperComponent.vue",
+    "zhi2-mobile-shimin/src/pages/commonNew/swiperComponent.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/newHouse/detail.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/stockHouse/detail.vue"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "db12bfb7-5b5d-404f-93cd-258941957c3c"
+   ],
+   "bundle": "063.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏服办登录漏调 V2→V1 token 换取接口：所有登录入口必须走同一套 token 双写",
+   "type": "bug",
+   "content": "现象：苏服办（ticket 换 token 免登）登录成功后，依赖 apiV1 的功能（文件上传、交易等）全部不可用，而普通登录页、扫码 redirect 页一切正常。\n\n根因：本项目有 V2（主接口 szf.szzfcjj.cn，/api）与 V1（http://szfang.szfcweb.cn，/prod-api）两套 token。普通登录页与 redirect/index.vue 在拿到 accessToken 后都会再调 getTokenV1() 换取 V1 token 写入 userStore.tokenV1；苏服办逻辑独立写在 App.vue 的 initSfbUser 里（ticket 换 token），只写了 V2 token，漏了这一步，是一条并行的第三套登录链路。\n\n怎么做：在 initSfbUser 里设置完 V2 token 后立即 await getTokenV1()，按 data.code == 200 把 data.msg 存进 userStore.setTokenV1，失败也要显式 setTokenV1('')，保持与其它登录入口一致。\n\n可复用套路：新增任何登录/免登入口时，把「存 V2 token + 换 V1 token」收敛成一个共用函数，三个入口都调它，避免再次漏写。",
+   "evidence": "会话 cf09ca87：用户指出「苏服办登录成功后需要立刻调用V2换V1token的接口，目前好像没有调用」；定位到 App.vue 的 initSfbUser 只保存了 accessToken，登录页与 redirect 页都调了 getTokenV1；修复为设置 V2 token 后 await getTokenV1() 并按 code==200 写入 tokenV1，失败置空。",
+   "files": [
+    "zhi2-mobile-shimin/src/App.vue",
+    "zhi2-mobile-shimin/src/store/user.js",
+    "zhi2-mobile-shimin/src/pages/redirect/index.vue",
+    "zhi2-mobile-shimin/src/api/index.js"
+   ],
+   "baseline": "0d96de2",
+   "sessionIds": [
+    "cf09ca87-b417-43c0-b05d-5168f3aa3e55"
+   ],
+   "bundle": "064.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "uni.previewImage 预览问号占位图：ZsImage 内部的相对路径解析不能绕过，预览前必须自行 resolveMediaUrl",
+   "type": "bug",
+   "content": "现象：楼盘相册列表的缩略图正常显示，点开预览却是问号占位图；在苏服办 H5 等「没有反向代理把 /zs-fym/ 转发到文件服务」的环境必现。\n\n根因：本项目的 ZsImage 组件内部会先用 resolveMediaUrl 把接口返回的相对路径（如 /zs-fym/xxx.jpg）转成完整可访问 URL 再赋给 image src，所以缩略图没问题；但点击预览的方法 enlargePicture 直接把原始相对路径数组传给 uni.previewImage，绕过了这层解析，浏览器按当前站点根域去拼，自然 404。\n\n怎么做：调用 uni.previewImage 之前对 urls 做一次 map(resolveMediaUrl) 并 filter(Boolean)，同时保留原下标作为 current，空数组直接 return。\n\n推广：凡是把后端相对路径交给「不受 ZsImage 管」的原生能力——uni.previewImage、uni.setNavigationBarImage、downloadFile、web-view url、分享封面——都必须先经 resolveMediaUrl，路径解析不能只依赖渲染组件。",
+   "evidence": "会话 b5c173dc：首页→我要买房→地图找房→小区详情→楼盘相册，预览无法显示。定位为 buildingAlbum/index.vue 的 enlargePicture 直接把原始相对路径传给 uni.previewImage，而缩略图由 ZsImage 内部解析所以正常；修复为 urls = arr.map(resolveMediaUrl).filter(Boolean)。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_transaction/buildingAlbum/index.vue",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "zhi2-mobile-shimin/src/utils"
+   ],
+   "baseline": "62fd49e",
+   "sessionIds": [
+    "b5c173dc-ea32-4e53-9c29-1ef11624641c"
+   ],
+   "bundle": "064.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "uni-app 列表滑动时图片穿透底部固定栏：z-index + translateZ(0) + 底栏移出滚动容器",
+   "type": "bug",
+   "content": "现象：新房详情页上下滑动时，「户型介绍」等下方内容与图片会盖到固定的「购房咨询」底部栏上（穿屏）；滑到「项目周边」地图区域时更明显。\n\n根因三层叠加：①底部栏 z-index: 998 太低，低于页面里部分浮层/图片的层级；②底部栏组件被放在滚动内容容器内部，形成层叠上下文后跟着内容一起被后续节点覆盖；③未处理底部安全区，底栏与内容留白都不足。\n\n怎么做：\n1. 全局底部栏组件 bottomBtn.vue：z-index 提到 9999，加 transform: translateZ(0) 强制独立合成层（避免 iOS/微信内核的图片合成层穿透），补 env(safe-area-inset-bottom)。\n2. 页面侧：把 <bottom-btn> 移出滚动内容容器（与已正常的 houseTypeDetail.vue 保持一致）；内容底部留白改 calc(120px + env(safe-area-inset-bottom))；内容根节点加 position: relative; z-index: 1 明确层级。\n\n注意：小程序原生 map 组件永远在最顶层，属于已知限制，无法靠 z-index 解决，需单独降级方案。",
+   "evidence": "会话 fb9e853d：用户报「新房详情，滑动的过程中会出现穿屏」。定位三条根因（z-index 998 偏低、底部按钮在内容容器内部受父级层叠上下文影响、未处理安全区），修改 bottomBtn.vue 与 newHouse/detail.vue；结论中明确提示 map 组件穿透是小程序已知限制。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages/commonNew/bottomBtn.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/newHouse/detail.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/newHouse/components/houseTypeDetail.vue",
+    "zhi2-mobile-shimin/src/components/ZsRichText/ZsRichText.vue"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "fb9e853d-85c6-4d97-a6e2-4ca11832d84c"
+   ],
+   "bundle": "064.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "项目存在两套后端域名，API 前缀必须按域名分别配置：szfcweb.cn 用 /prod-api，主接口用 /api",
+   "type": "pattern",
+   "content": "本项目前端同时对接两套后端：主接口（szf.szzfcjj.cn，V2 + V1 业务）与苏州市区房产交易网上服务平台（http://szfang.szfcweb.cn）。两者的路径前缀约定不同——szfcweb.cn 必须是 /prod-api，主接口是 /api；写成 /api 会因为网关没配该前缀而 404/502。\n\n怎么做：\n- 小程序端（mp）：API 基地址集中在 src/env/mp.js，V1 实例在 src/api/v1Instance.js 里拼，BASE = `${BASE_URL_V1}/prod-api/v2.0`。改前缀只改这一处，不要散落到各个 api 文件。\n- H5 端：走环境变量代理，VITE_APP_API_PROXY_V1 已经指向 http://szfang.szfcweb.cn/prod-api，无需改代码。\n- 主接口（szf.szzfcjj.cn）仍保持 /api/v2.0，切换前缀时务必确认没有误伤它。\n\n判定口径：需求说「xx 域名开头的接口」时，先按域名分组再动前缀，不要全局替换 /api → /prod-api。",
+   "evidence": "会话 bfce31c8：用户两次强调「http://szfang.szfcweb.cn 开头的接口，不要用/api，要用/prod-api」。最终只改 zhi2-mobile-shimin/src/api/v1Instance.js 的 BASE 为 /prod-api/v2.0，H5 端因 VITE_APP_API_PROXY_V1 已配置无需改动，主接口 szf.szzfcjj.cn 的 /api/v2.0 保持不变。",
+   "files": [
+    "zhi2-mobile-shimin/src/api/v1Instance.js",
+    "zhi2-mobile-shimin/src/env/mp.js",
+    "zhi2-mobile-shimin/src/api/index.js",
+    "zhi2-mobile-shimin/vite.config.ts"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "bfce31c8-56d9-4651-9b08-e0255e772254"
+   ],
+   "bundle": "064.md",
+   "project": "苏住房C"
+  }
+ ]
+}

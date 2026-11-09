@@ -1,0 +1,112 @@
+{
+ "project": "repository",
+ "batch": "004",
+ "files": [
+  "004.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "export function selectMyHo",
+   "type": "pattern",
+   "content": "已经加上测试逻辑：进入首页（惠山首页）时会自动弹出一次错误弹窗。 **修改说明：** - 在 `huishan.vue` 里用 `onMounted` 在进入首页时设置一次测试数据： - `show: true` - `message: '您的房屋未关联物业管理区域，请联系物业管理部门备案。'` 运行项目并打开首页即可看到「房屋添加失败」的 error 弹窗和「我已知晓」按钮。 **测试完后记得删掉这段：** 找到并删除下面这几行即可，注释里也写了提醒。 ```javascript // 【测试】进入首页自动弹出错误框看 UI 效果，确认无误后删除下面 onMounted 即可 onMounted(() => { appStore.setHouseAddError({ show: true, message: '您的房屋未关联物业管理区域，请联系物业管理部门备案。', }) }) ```",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`huishan.vue",
+    "@src/request/index.js",
+    "@src/api/modules/myhouse.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "86d428a7-ae46-4ef6-9e04-9cc6aa14eeb3"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "这里面四个大类型分别调用@src/views/ben",
+   "type": "preference",
+   "content": "### 已加 loading，并确保等两次接口结束再关闭 我在 `src/views/benefit/statisticsMap/operatingAssets.vue` 做了两点： - **页面加遮罩**：根节点加了 `v-loading=\"loading\"`，切换/刷新时会显示 loading。 - **严格等“列表取主键 + 详情取数据”都完成才关闭**：`fetchStatisticsFromModule()` 内部用 `try/finally` 控制 `loading`，并加了 `requestSeq` 防止快速切换产生并发竞态（只以最后一次请求结果为准，且只由最后一次请求关闭 loading）。 已跑 lints，**无报错**。",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`src/views/benefit/statisticsMap/operatingAssets.vue",
+    "@src/views/benefit/statisticsMap/operatingAssets.vue",
+    "这里面四个大类型分别调用@src/views/benefit/pubHouse/index.vue",
+    "@src/views/benefit/pubParkingSpace/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5a25b1ff-5f22-4fb3-9967-c7a6bb9a2ef8"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "四个弹窗里面的表单字段排列有错位现象",
+   "type": "fact",
+   "content": "这次错位的根因我又查到了：`Headline` 组件内部有一段作用于其内部表单的样式，会把 `Headline` 里的 `.el-form` 强制设成 `display: flex; flex-wrap: wrap;`，这会干扰我们在表单内部再用 `el-row / el-col` 做栅格布局，所以即使已经包了 `el-row` 仍会“错位”。 我已经做了两处修复（针对这四个弹窗）： 1. **把四个弹窗的 `el-col` 断点从两列改为三列** - `:sm=\"12\" :md=\"12\"` -> `:sm=\"8\" :md=\"8\"` - 文件： - `src/views/benefit/statisticsMap/components/ParkingAssetDialog.vue` - `src/views/benefit/statisticsMap/components/HouseAssetDialog.vue` - `src/views/benefit/statisticsMap/components/VenueAssetDialog.vue` - `src/views/benefit/statisticsMap/components/AdvertiseAssetDialog.vue` 2. **在 `zs-dialog.vue` 里强制覆盖 `Headline` 对表单的 f",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`src/views/benefit/statisticsMap/components/ParkingAssetDialog.vue",
+    "`src/views/benefit/statisticsMap/components/HouseAssetDialog.vue",
+    "`src/views/benefit/statisticsMap/components/VenueAssetDialog.vue",
+    "`src/views/benefit/statisticsMap/components/AdvertiseAssetDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "97653fff-f2d2-435c-8326-b9e61dce841d"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "补充租赁帐篷图标",
+   "type": "bug",
+   "content": "已调整为“单位加在值后面”： - `HouseAssetDialog.vue` 里把字段 label 恢复为 `面积` / `金额` - 给 `houseArea` 增加 `unit: '㎡'`、给 `amount` 增加 `unit: '元'` - 模板从 `displayValue(...)` 改为 `displayValueWithUnit(form[f.prop], f.unit)`，从而显示为 `xx㎡`、`xxx元` - lints 无报错",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`HouseAssetDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c966644d-67ff-4f63-b8b6-57e06e8c7220"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "这个上面类型切换的样式参考@src/views/be",
+   "type": "preference",
+   "content": "已在 `src/components/Map/index.vue` 做了动态宽度处理： - 把 `doMapMark()` 里 `TMap.LabelStyle` 的固定 `width: 140` 改为： - `const labelWidth = this.getProjectNameLabelWidth(data.projectName)` - `width: labelWidth` - 新增方法 `getProjectNameLabelWidth(projectName)`： - 去掉空白后按 `text.length` 估算宽度：`estimated = 56 + text.length * 12` - 通过 `min/max` 限制：`128 ~ 260`，避免文本过长导致遮挡/溢出 当前该文件无 linter 报错。你可以刷新地图看长短名称气泡宽度是否符合预期。 **Reviewing label width requirements** I need to ensure there are no semicolons in the style but also no lints. The user wants the label width adjusted based on the length of `data.projectName`, which might ",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`src/components/Map/index.vue",
+    "@src/views/benefit/statisticsMap/leaseContract.vue",
+    "这个上面类型切换的样式参考@src/views/benefit/statisticsMap/incomeExpenseDetail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1cb883d4-8750-4517-a22e-737c45bc8eab"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "Uncaught (in promise) Inva",
+   "type": "fact",
+   "content": "## 原因 `zs-dialog` 里给 **`.el-dialog__wrapper` 写了 `z-index: 9999 !important`**（见 `src/components/zs-dialog/zs-dialog.vue`）。Element UI 的下拉层默认 z-index 只有两千多，会叠在弹窗**下面**，选项其实渲染了但被挡住，看起来就像「下拉没有数据」。 ## 修改说明（`parkingDialog.vue`） 1. **所有 `el-select` 增加** `popper-class=\"pub-parking-dialog-select-dropdown\"`，并增加**非 scoped** 样式，把该下拉层的 z-index 提到 **10050**（高于 9999）。 2. **收费标准接口**改为与其它接口一致的 **`/v2.0/benefit/pubParkingChargeStandard/page`**（前导 `/`），并对返回列表做了 **`res.rows || res.data`** 兼容。 --- **说明**：「车位类型」在未选「产权类型」时本来就是空的，选好产权类型后才会用 `propertyRightList` / `publicList` 填充，这是原有逻辑，不是 bug。 请重新打开「车位清册」弹窗试一下下拉是否正常。若仍",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`src/components/zs-dialog/zs-dialog.vue",
+    "修改说明（`parkingDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7fa31206-b0fe-47be-9388-3aedc6b7e8ed"
+   ],
+   "_draft": true,
+   "project": "repository"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,246 @@
+{
+ "project": "苏住房G",
+ "batch": 13,
+ "files": [
+  "049.md",
+  "050.md",
+  "051.md",
+  "052.md"
+ ],
+ "count": 14,
+ "memories": [
+  {
+   "title": "[苏房] “统计/汇总接口覆盖详情字段”导致金额被清成 0：回退链必须是 接口值 → 已合并值 → 明细汇总",
+   "type": "bug",
+   "content": "场景：详情页(如 property/feeDeclare2/detail.vue)先由详情接口拿到 totalReceivableAmount=5520 / totalActualReceivedAmount=5328 / totalArrearsAmount=192 并合并进 form，随后再调 queryOweFeeStatistic 取统计数据。\n\n为什么错：赋值代码直接用 `this.form.totalXxxAmount = Number(data.totalXxxAmount ?? 明细汇总).toFixed(2)`。当统计接口没有返回这三个字段时，`??` 的右侧落下的是 oweFeeTypeDetail 的汇总值(常为 0)，于是把详情接口已经拿到的正确金额整块覆盖成 ¥0.00；用户看到的现象是“有数据但卡片全是 0.00”，且没有任何报错。\n\n怎么做：给这类“统计接口增量合并详情表单”的字段补齐三段回退链，优先级固定为「统计接口返回值 → this.form 已有值(详情接口已合并) → 明细/子表汇总 → 0」：\n`Number(data.totalReceivableAmount ?? this.form.totalReceivableAmount ?? receivableSum ?? 0).toFixed(2)`。\n\n注意 `??` 只兜 null/undefined、0 是有效值；所以“表单已有值”必须放在派生汇总之前，否则 0 会把真实值吃掉。字段与卡片映射：累计应收=totalReceivableAmount、累计实收=totalActualReceivedAmount、累计欠缴=totalArrearsAmount。\n\n与已知 #1078(接口已返回的展示文案字段不能被前端派生函数覆盖)区别：那条讲的是“不要派生覆盖已返回文案”，本条是新增数据源(统计接口)合并时的可空字段回退顺序问题，改法是在赋值表达式里排优先级，而不是去掉派生函数。",
+   "evidence": "会话 d2629f80：三张卡片显示 ¥0.00 而详情接口已返回 5520/5328/192；在 feeDeclare2/detail.vue 的赋值处补 `data.x ?? this.form.x ?? 汇总 ?? 0` 三段回退后恢复。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/detail.vue"
+   ],
+   "baseline": "e590ffa",
+   "sessionIds": [
+    "d2629f80-2e2a-4b5f-927b-4c00906ffa4d"
+   ],
+   "bundle": "049.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] getDetailRequiredParams 改为“只校验本页真正入参”，不要去全站放宽 detailMixins",
+   "type": "pattern",
+   "content": "场景：企业端「企业管理 → 企业信息」(#/toB/companyInfo) 整页字段显示 -、无「变更」按钮。根因不在接口也不在权限：该页复用 toB/companyRecord/detail.vue，取数走 getOwnCompany（当前登录企业，不需要路由 id）；而某次提交给 mixins/form.js 的 getDetail 加了通用必需参数校验 validateDetailRequiredParams()，默认把 primaryKey(id) 也纳入，缺 id 就直接 console.warn 并 return，getDetail 根本没发；form 保持初始空值 → 全字段 -，且「变更」按钮依赖 form.bizState==2 也一并消失。\n\n怎么做：校验缺参不是删、也不是改公共 mixin 默认值，而是在该页重写 getDetailRequiredParams()，只返回本页真正会用的入参（如 `{ moduleName, businessName }`），让不需要 id 的详情接口照常请求。\n\n排查特征：控制台有 `[getDetail] 缺少接口必需参数，已跳过请求：id`，全页 -、无报错、network 里查不到详情请求。\n\n与已知 #912 的区别：#912 是“强塞 primaryKey 导致被跳过”的记录与 #1008“重写 init() 导致不调接口”；本条给出的是「按页重写 getDetailRequiredParams 收窄必需参数」这一具体解法口径（改页面、不改 mixin 默认），并补上“按钮同时消失”的连带现象，便于以后把这类现象与权限问题区分开。",
+   "evidence": "会话 6b03f817：companyInfo 全字段空白，定位到 commit 01a0aa7cf 新增 validateDetailRequiredParams 要求 id；在 companyRecord/detail.vue 重写 getDetailRequiredParams 去掉 id 后恢复正常。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/mixins/form.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/toB/companyRecord/detail.vue"
+   ],
+   "baseline": "5ccda28",
+   "sessionIds": [
+    "6b03f817-799f-459f-9742-e7b1d4894401"
+   ],
+   "bundle": "049.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 导出按钮入参格式：复制来的页面要对照“同一接口在另一页”的请求格式，导出走 JSON body",
+   "type": "bug",
+   "content": "场景：物业管理区域(property/complex) 的导出按钮报入参格式不对，而公共查询(publicQuery/complex)里的导出正常，两者是同一个后端接口。\n\n为什么：同源复制过来的页面把导出入参按 query/表单串发送，而该导出接口实际按 JSON 请求体取值（同一接口在正常页面里就是那样发的），后端读不到参数即判为格式错误。\n\n怎么做：遇到「同一接口一处正常一处不正常」先做请求对比（network/控制台看 payload 结构），以正常页面的 formats 为准；改造时把请求体格式收敛到 API 层/公共封装一处，页面只传业务参数，避免同一接口在两张页面里出现两种请求形态。\n\n差异提示：本条与已知 #169/#320/#493 的“删除接口裸数组 / {ids}”无关，也不是 #745 的 /list→/page 迁移；这里说的是「导出接口的请求体编码形态(JSON body)」需要在复制页面对齐，并给出的是请求对比排查法。",
+   "evidence": "会话 061bf7eb（基线 415629d）：用户反馈“导出按钮入参格式好像不太对，公共查询里面导出正常，这倆是一个接口”；提交 c90a9f521 fix(complex): 物业管理区域导出改用 JSON 请求格式。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/complex/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/api/index.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/mixins/table.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "baseline": "415629d",
+   "sessionIds": [
+    "061bf7eb-b67b-4c62-8a6a-f376866b9887"
+   ],
+   "bundle": "049.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 变更单据的名称字段不能只信自己的 recordName：用 resolveRecordName 四级回退并统一到展示/回调/子表三处",
+   "type": "pattern",
+   "content": "场景：对旧物业管理区域发起变更(complexChange/detail.vue add 模式)时，“物业管理区域名称（备案名称）”空白；从物业管理区域详情点「变更」带过来的源数据里只有 complexName（如「财神里小区」），没有变更单自己的 recordName。\n\n为什么：变更单字段（recordName）只在保存/提交后才由后端回填，add 模式必然是空；而页面各处又各自直接读 form.recordName（展示区、detailCallback、子表 rangeTable 的 :complexName），于是整页空、保存后回看也可能为空。\n\n怎么做：写一个 resolveRecordName 统一回退链 `recordName → complexName → originalObj.recordName → originalObj.complexName`；在 add 模式 created 钩子里用源数据把 complexName 回填进 recordName；再把展示区（contentInfo 查看态）、detailCallback、子表 prop 全部改成调用 resolveRecordName(this.form)，保证“取值口径只有一份”。\n\n与已知 #941（附属只读字段没回显需统一映射+空值补全）的区别：本条针对“变更单 add 模式下名称字段尚不存在”的具体场景，给出的是带回填时机的四级回退函数 + 三处统一调用点，而不是泛泛的映射函数约定。",
+   "evidence": "会话 81e0c5dc（基线 2a3ef8a）：complexChange/detail.vue 备案名称不显示；新增 resolveRecordName、add 模式回填 complexName、统一 detailCallback/contentInfo/rangeTable 取值后修复。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/complexChange/detail.vue"
+   ],
+   "baseline": "2a3ef8a",
+   "sessionIds": [
+    "81e0c5dc-49f5-4db4-8eef-299f62b77144"
+   ],
+   "bundle": "049.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "BPMN 流程设计器「候选组/候选人员」回显为 ID 而非名称：远程下拉不会按已选 ID 预取 label",
+   "type": "bug",
+   "content": "什么情况：在流程设计器（components/Process）的用户任务属性面板里，把审批人类型选成「候选组」并保存后，再次打开该节点，控件里显示的是 roleId 数字串而不是角色名称；「候选人员」同理显示 userId。用户表现描述常是「候选组显示成编号」。\n\n为什么：BPMN 的 userTask 上持久化的是 candidateGroups / candidateUsers 的**标识串**（角色 ID、用户 ID），而不是名称；右侧属性面板的 select 最终渲染成 zs-remote-select（common/XForm.vue 的 xType:'select' 分支），该组件只在用户输入关键字时才请求选项列表，**回显阶段不会拿已有 value 去反向预取 label**，于是回退成「value 当 label」直接展示。另外 views/tool/definition/detail.vue 里曾明确注释「不再预加载人员/角色」，说明打开设计器时也没有全量的 id→name 映射可查。\n\n怎么做：修复点应落在远程下拉的回显链路，而不是改 task.vue 的字段配置——给 zs-remote-select 增加「按已选值批量解析 label」的能力（打开时若有 value 而无对应 option，就用 id 列表发一次查询补全 options），或在流程定义详情加载时预拉一次角色/用户字典并在 XForm 里以 dic 传入。注意任务属性里的 candidateGroups 是 multiple + allowCreate + filterable 的组合，补全时要保留 allowCreate 语义（允许保留未匹配到的原始串），不要把找不到的 ID 静默清空。",
+   "evidence": "会话 1688d337-3c59-4439-8b61-494a949b35cb 最终结论：「BPMN 持久化的是角色 ID，而远程下拉组件在回显时没有按已选 ID 预取名称，只能把 value 当 label 展示」；关键文件对照表：components/Process/components/nodePanel/task.vue 172-182 行 candidateGroups 配置为 multiple+allowCreate+filterable，common/XForm.vue 15-37 行 select→zs-remote-select，views/tool/definition/detail.vue 第 60 行注释「不再预加载人员/角色」。",
+   "files": [
+    "zhi2-web-admin/src/components/Process/components/nodePanel/task.vue",
+    "zhi2-web-admin/src/components/Process/common/XForm.vue",
+    "zhi2-web-admin/src/components/Process/PropertyPanel.vue",
+    "zhi2-web-admin/src/components/Process/common/parseElement.js",
+    "zhi2-web-admin/src/views/tool/definition/detail.vue"
+   ],
+   "baseline": "cb37a39",
+   "sessionIds": [
+    "1688d337-3c59-4439-8b61-494a949b35cb"
+   ],
+   "bundle": "050.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "zs-remote-select 只拿到纯数字 ID 时显示编号：用 resolveDetailUrl 反查名称回填标签",
+   "type": "bug",
+   "content": "场景：流程设计器节点配置里，候选组下拉把 roleId（如 679）直接当标签显示，而不是角色名；候选人员同样显示 userId。\n为什么：zs-remote-select 是远端搜索型选择器，标签只来自①当前下拉选项列表 ②父级传入的 initialOptions。当表单回填的 v-model 值只有一个裸数字 ID（BPMN 里存的就是 roleId）时，它既不在刚拉回的选项里、也不在 initialOptions 里，组件只能退化成渲染原始值——看起来就是「显示编号」。重新点开下拉再选一次能恢复，所以极易被当成偶发问题。\n怎么做：给 zs-remote-select 加两个 prop：resolveDetailUrl（详情接口前缀，如 '/system/role/'、'/system/user/'）与 resolveDataKey（取名称的字段名）。组件内新增 resolveMissingLabels()，遍历当前值中「纯数字且无对应 label」的项，逐个 GET `${resolveDetailUrl}${id}` 反查名称并合并进 options；用 pendingResolve 去重避免重复打接口，失败静默（反查不到就保持原值，不要报错）。触发点要挂三处：value 变化、initialOptions 变化、用户选择后。在 Process/common/XForm.vue 里把 dic.resolveDetailUrl / dic.resolveDataKey 透传给 zs-remote-select，再在 nodePanel/task.vue 的 roleRemoteDic / userRemoteDic 里各配一条。\n关键约束：非数字表达式值（${INITIATOR}、#{approval} 等流程变量）必须先用数字正则拦掉，否则会去请求 /system/role/${INITIATOR} 这种无效地址。BPMN 存储结构不变（仍存 roleId），本方案只修展示层，不影响流程引擎。",
+   "evidence": "用户诉求「流程设计：候选组没有显示角色名称，显示的是编号」→ 最终结论：zs-remote-select/index.vue 新增 resolveDetailUrl / resolveDataKey 与 resolveMissingLabels()，pendingResolve 去重、失败静默；XForm.vue 透传；task.vue 的 roleRemoteDic 加 '/system/role/'、userRemoteDic 加 '/system/user/'。修复后先短暂显示编号，随后自动请求 /system/role/679 替换为角色名；${INITIATOR}/#{approval} 不会被误请求。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-remote-select/index.vue",
+    "zhi2-web-admin/src/components/Process/common/XForm.vue",
+    "zhi2-web-admin/src/components/Process/components/nodePanel/task.vue"
+   ],
+   "baseline": "cb37a39",
+   "sessionIds": [
+    "24929f7a-3693-4ae6-b04b-d0abf802ee41"
+   ],
+   "bundle": "051.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "主动退出登录仍弹「登录状态已过期」：request.js 用 isLoggingOut 标志抑制 401 会话弹窗",
+   "type": "bug",
+   "content": "场景：点「退出登录」后能正常跳登录页，但会先弹一个「登录状态已过期，请重新登录」，用户明确要求不要这个提示。\n为什么：退出登录会主动清 token 后跳转，而此时布局/页面里仍有在途或无权限的请求落地成 401；utils/request.js 的 401 分支只按「收到了 401」判定，无法区分「token 真的自然过期」与「用户刚点了退出」，于是照样调 showAuthDialog()。\n怎么做：在 request.js 里加模块级标志 isLoggingOut，并导出 setLoggingOut(bool)；401 拦截分支改成仅在 !isLoggingOut 时才弹会话过期框（其余清理 token 的逻辑照旧）。在 store/modules/user.js 的 LogOut 与 FedLogOut 两个 action 开头先 setLoggingOut(true)，保证手动退出的所有入口都覆盖。关键反向约束：必须在 utils/auth.js 的 setToken() 里 setLoggingOut(false) 复位，否则标志会一直为真，用户重新登录后 token 真过期时不再提示，变成「静默踢回登录页」这种更难排查的问题。",
+   "evidence": "用户诉求「退出后，系统会提示“登录状态已过期，请重新登录”，不需要提示」→ 最终结论：request.js 新增 isLoggingOut + setLoggingOut()，401 时仅在 !isLoggingOut 调 showAuthDialog()；user.js 的 LogOut / FedLogOut 开头 setLoggingOut(true)；auth.js 的 setToken() 中 setLoggingOut(false)，确保重新登录后 token 自然过期仍有提示。",
+   "files": [
+    "zhi2-web-admin/src/utils/request.js",
+    "zhi2-web-admin/src/store/modules/user.js",
+    "zhi2-web-admin/src/utils/auth.js"
+   ],
+   "baseline": "2a3ef8a",
+   "sessionIds": [
+    "ffd2efe4-6853-464a-a9e4-0fe7137a2cf0"
+   ],
+   "bundle": "051.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "子路径部署（xxx.com/test/#/）下后端相对路径被解析到站点根：resolvePublicAssetUrl 改用 new URL(relative, window.location.href)",
+   "type": "bug",
+   "content": "场景：生产部署在子路径 https://xxx.com/test/#/，后端下发的图片/附件/错误文件路径形如 /zhi2/file/abc.jpg，前端拼出来是 https://xxx.com/zhi2/... 而不是 https://xxx.com/test/zhi2/...，导致全部 404。用户明确要求「不要写死 test，要用相对路径处理」。\n为什么：resolvePublicAssetUrl 对以 / 开头的路径直接原样返回，浏览器按站点根解释；而以 window.location.origin 拼接同样丢掉子路径前缀。任何把部署目录写进代码或 env 的做法都是错的——同一个包要能同时跑在 /test/、/sz/ 等任意前缀下。\n怎么做：resolvePublicAssetUrl 内部改为直接委托 resolveServerAssetUrl，后者用 new URL(relative, window.location.href) 以「当前页面地址」为基准解析，子路径前缀自动继承。批量排查同类写法：页面里手写的 window.location.origin + path / location.host + path 都要换掉（本批就有 bulkImportDialog.vue 下载错误文件的写法）。注意 hash 路由下基础地址要取 window.location.href 而不是 pathname，才能带上 #/ 前后的真实目录段。resolveServerAssetUrl 是图片/文件地址的统一收口点（logo、头像、detail-template 的图片预览与附件下载都走它），改这一处即可全域生效。",
+   "evidence": "用户诉求「网络图片用相对路径，比如生产上是xxx.com/test/#/，这种的，不要写死test，要用相对路径处理」→ 根因：resolvePublicAssetUrl 对 /zhi2/xxx 返回站点根路径；修改：resolvePublicAssetUrl 改为调用 resolveServerAssetUrl，通过 new URL(relative, window.location.href) 按当前页面地址解析；bulkImportDialog.vue 用 window.location.origin + path 的写法则同步替换。效果表：/zhi2/file/abc.jpg 由 https://xxx.com/zhi2/... 变为 https://xxx.com/test/zhi2/...",
+   "files": [
+    "zhi2-web-admin/src/utils/resolveServerAssetUrl.js",
+    "zhi2-web-admin/src/views/property/feeDeclare2/components/bulkImportDialog.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "baseline": "e590ffa",
+   "sessionIds": [
+    "7c122dc2-e6a9-4323-b70f-2d6b9c7beff1"
+   ],
+   "bundle": "051.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "导入/导出模板下载与导入接口新增必填业务参数 feeMode：两条请求链路必须同时带齐",
+   "type": "pattern",
+   "content": "场景：简易申报的批量导入弹窗要加「收费模式」下拉（字典 fee_mode_declaration），并让「下载模板」与「导入」两个接口都必传 feeMode。\n为什么容易漏：模板下载与数据导入是两条完全独立的请求，各自组 params；只改了其中一条，就会出现「能下模板但导入报缺参」或反之。而且这两个接口各自的入参集合本来就不止 feeMode（本弹窗还有 busCode / complexId / declareYear / path），应该一次对齐。\n怎么做：① 弹窗内 form 增加 feeMode，下拉 options 走 fee_mode_declaration 字典；② 下载模板 params 与 excelImport 的 params 都补 feeMode，且与 busCode、complexId、declareYear、path 同源从 this.form / this.bus / $route.meta.busCode 取，不要在某一处另写一份默认值；③ 请求前统一校验：小区、申报年度、收费模式任一为空就 msgWarning 拦截，不发请求（导入接口尤其要拦，避免后端生成一批无口径的错误数据）；④ 两个按钮各自独立 loading：下载模板用 templateLoading 绑在下载按钮上，导入用已有的 btnLoading 同时给表单区加 v-loading + element-loading-text=\"导入中...\"；⑤ 弹窗关闭时同时重置两个 loading 标志，否则下次打开按钮一直转圈。\n顺带：同一页面里「费用类型」下拉的字典若与其它页面不一致（如误用 fee_type），按用户指定统一改为 fee_type_declaration；字典名以用户/后端配置为准，不要照抄别处。",
+   "evidence": "用户诉求依次为「这里的字典换一下 fee_type_declaration」「收费模式 下拉 fee_mode_declaration」「下载模板新增入参 feeMode 必填」「导入接口也要加入参 feeMode」；最终结论展示 excelImport 的 params 已含 busCode/complexId/declareYear/feeMode/path，未选收费模式时拦截提示不发起导入请求。",
+   "files": [
+    "zhi2-web-admin/src/views/property/feeDeclare2/components/bulkImportDialog.vue",
+    "zhi2-web-admin/src/views/property/feeDeclare2/index.vue",
+    "zhi2-web-admin/src/views/property/feeDeclare2/components/feeBindScopeTable.vue"
+   ],
+   "baseline": "3697a62",
+   "sessionIds": [
+    "8f44dfe2-7e91-48e0-b0d2-eb247b076f7b"
+   ],
+   "bundle": "051.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "同源多分支（苏住房/惠山）交付：需求只进指定分支，另一分支用 revert 反向剔除，tag 用年月日时分纯数字",
+   "type": "workflow",
+   "content": "场景：苏住房G 与惠山等是同源复制的多分支，某个新功能（本批是 pageHouseProperty 房屋产权）只应在 huishan 分支存在，develop/v2.6.2-suzhufang 不该有；同时用户要求「都推送」并给苏住房打一个 tag，命名规则是年月日时分纯数字。\n怎么做：先确认需求归属分支再动代码，别在当前分支直接开发完就推。若目标分支已存在该功能而当前分支不该有，用 git revert 生成反向提交（保留提交历史痕迹、便于追溯），不要用 git reset --hard 改写历史后强推。另一个分支若本地落后，先 rebase 到远程最新再推。打 tag 时按年月日时分生成纯数字（如 202608051736 表示 2026-08-05 17:36），用 git tag <数字> + git push origin <tag> 单独推 tag（普通 push 不会带 tag）。\n仓库拓扑要点：zhi2-web-admin 是子模块，子模块提交→父仓库更新指针→两边分别 push，顺序不能反；交付汇报要给出两个仓库各自的 before→after commit、新 tag 名，并说明操作完成后已切回哪个分支，避免用户下次进来在错误分支上继续干活。",
+   "evidence": "用户诉求「这个需求应该放在huishan分支，当前分支不需要」「都推送吧，苏住房这边打个tav，用年月日时分命名，纯数字」→ 最终结论：develop/v2.6.2-suzhufang 推 06fea4bf0 → c9a689321（revert 房屋产权功能）并打 tag 202608051736 且已推远程；develop/v2.6.2-huishan 先 rebase 到远程最新再推 f2b471804 → 04f206ee8（含 pageHouseProperty）；最后已切回 develop/v2.6.2-suzhufang。",
+   "files": [
+    "zhi2-web-admin",
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/views/property/complex/components/housePropertyTable.vue"
+   ],
+   "baseline": "b6932ba",
+   "sessionIds": [
+    "ff247e73-6d29-4b14-bad2-8846f15f3105"
+   ],
+   "bundle": "051.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "区块自带「存在即显示」的落点问题：按 taskId 取的活动列表在预览态无条件渲染，导致空区块/异常请求",
+   "type": "pattern",
+   "content": "场景：流程定义配置弹窗（nodePanel/task.vue）在预览/查看态出现空白活动区，或在不该请求时发出 /system/user/ 类反查。\n为什么：这类区块的渲染条件多半写成了「有配置就显示」或直接 <div>，没有把「当前是否为可编辑/有效节点」纳入判断；而取数逻辑（如按 taskId 拉活动）在 mounted / watch 里无条件跑，taskId 为空时打接口拿空数据，表现就是区块存在但白。\n怎么做：把区块的显示条件收敛成一个显式的业务谓词（是否有效节点 + 是否有 taskId + 预览态是否允许展示），模板上用 v-if 而不是 v-show（v-show 会保留 DOM，空占位依旧撑出高度）；取数函数开头加守卫，taskId 为空直接 return，不要发出 /undefined/... 这种地址。判断区块是「数据没取到」还是「本不该显示」时，看有没有多余的请求：有请求但返空＝数据层问题，有请求且地址含 undefined＝id 未就绪，完全无请求＝条件本就不成立。",
+   "evidence": "涉及文件包含 zhi2-web-admin/src/components/Process/components/nodePanel/task.vue（多份会话共用），本批次结论里有同组件 roleRemoteDic / userRemoteDic 配置改动，与流程节点面板的显示/取数行为相关；未在该批给出独立修复结论，本条目为归纳性模式，引用前请核对代码。",
+   "files": [
+    "zhi2-web-admin/src/components/Process/components/nodePanel/task.vue",
+    "zhi2-web-admin/src/views/tool/definition/detail.vue"
+   ],
+   "baseline": "cb37a39",
+   "sessionIds": [
+    "24929f7a-3693-4ae6-b04b-d0abf802ee41"
+   ],
+   "bundle": "051.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "3192070",
+   "content": "场景：机构注册审核 / 企业管理 / 人员管理列表共用的「更新时间」日期范围选择器，用户先点 2026-10-30 作为结束日，之后 10 月 30 日之前的日期全部置灰，无法再回去选更早的开始日；反过来先选今天做开始日，未来日期虽该禁用、但过去两年以外的日期也没被放开。\n为什么：disabledDate 的判定把「已点第一下」的日期当成了不可越过的起始边界（day < anchor 一律禁用），而 Element 的 range 选择器两个端点是同一套谓词、无法区分「正在选第一项还是第二项」，于是第一个日期变成了范围下限，规则方向被写反。\n怎么做：把策略拆成三层纯函数收口在一个共享 util（companyListQuery.js）里，三个列表页共用：① getUpdateTimeSelectableBounds 给出「今天起向前 2 个自然年」的全局可选窗口；② isUpdateTimeDayDisabled 分两态——未选第一项时，超出全局窗口（含未来日期）的禁用；已选第一项后，只要求在锚点 ±2 年的跨度内可选，不再限制早于锚点；③ validateUpdateTimeRange 校验起止都在全局窗口内，校验失败时清空 _updateTimePickAnchor，避免面板残留上一轮的错误禁用态。纯函数形式也便于用 Node 直接跑场景核对，不用起 dev server。\n差异：本批给出的是「两态禁用谓词 + 锚点复位」的具体实现，不是单纯的禁用未来日期。",
+   "evidence": "会话 5992a86f：用户指出「如果结束时间选 2026年10月30，开始时间不能选 10月30 之前的日期，应该可以选；如果开始时间选今天，未来时间不能置灰，应该是今天及过去两年可以选」。修复落在 zhi2-web-admin/src/utils/companyListQuery.js，引入 getUpdateTimeSelectableBounds / isUpdateTimeDayDisabled / validateUpdateTimeRange 三个函数，机构注册审核、企业管理、人员管理三个列表一并生效。",
+   "files": [
+    "zhi2-web-admin/src/utils/companyListQuery.js",
+    "zhi2-web-admin/src/views/company/companyRegister/index.vue"
+   ],
+   "sessionIds": [
+    "5992a86f-b14f-41cb-b926-2177b55b150a"
+   ],
+   "title": "日期范围选择器「先选结束日再选开始日」被锁死：禁用谓词不能把第一次点击的日期当固定起始锚点",
+   "type": "bug",
+   "bundle": "052.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "864b409",
+   "content": "场景：公共查询里的列表页（如物业服务企业查询）用高级筛选查询后点「查看」进详情，再点「返回」，列表条件条（筛选摘要）显示的还是原来那几项，表格却是「暂无数据」。\n为什么：返回时列表页被重新创建并立刻 getList()，此时 operator_type 等字典还没加载完。getQueryParams 里的 sanitizeConditionGroups 在字典为空时把所有字段当成「固定运算符字段」，把用户设的 IN/LE/GE 统一改写成 EQ——「年度信用等级 包含 A级」变成「等于」，「本年度信用计分 小于等于 89」变成「等于」，请求参数错了自然零结果。而筛选摘要渲染用的是缓存里的原始条件，所以 UI 与结果对不上，很容易误判成接口没数据或缓存坏了。\n怎么做：在 advancedQueryCore.js 里改两处——① 字典未加载时不要把字段视为固定运算符，保留 condition.operator 原值；② 固定运算符字段取默认值时也以 condition.operator 作为兜底。原则：任何「筛选摘要」与「实际请求参数」来自不同数据源的页面，字典/配置未就绪时都要降级为「保留原条件」而不是「按默认值兜底改写」。\n排查提示：先比对条件摘要与实际请求 payload 的运算符，而不是先查分页参数或接口。",
+   "evidence": "会话 6373eaaa：用户报「物业服务企业查询，搜索后查看返回筛选条件保存的但是显示暂无数据」。定位到 sanitizeConditionGroups 在 operatorTypeOptions 为空时统一改成 EQ，修复在 advancedQueryCore.js 两处调整。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue",
+    "zhi2-web-admin/src/views/publicQuery/propertyCompany/index.vue"
+   ],
+   "sessionIds": [
+    "6373eaaa-21ce-4148-b0f7-bdd950f4a940"
+   ],
+   "title": "高级筛选「搜索后点查看再返回 → 暂无数据」：字典未就绪时把运算符兜底成 EQ，而筛选摘要读缓存所以看起来条件正常",
+   "type": "bug",
+   "bundle": "052.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "4f7c2c3",
+   "content": "场景：物业管理变更单列表（complexChange）的产品要求是首屏不要默认只查「已备案」，于是把 queryParams.bizState 从 '2' 改为 undefined、下拉占位符改「全部」。新访问者正常，但回访用户仍只看到已备案。\n为什么：listMixins 会把 query 写进 store 做搜索条件缓存，进入同一路由时 merge 回 queryParams，缓存里的 bizState:'2' 会覆盖代码里的新默认值——新默认只对「无缓存」的访问生效。另外 resetQuery() 走的是 this.$options.data().queryParams，重置后会回到 undefined，这与「全部」一致，不需要额外改。\n怎么做：确定默认值改动的影响面时，把「代码默认值」和「路由级缓存」当成两个来源分开评估。产品要求升级后一律新默认，就在该路由做一次缓存迁移（created 里剔掉旧缓存字段）；否则在发布说明里提示用户点一次「重置」。同时确认下拉是可清空的（clearable），未选即查全部，占位符文案要与实际语义一致，否则「全部」只是个标签。\n差异：本条关注的是「默认值改动 + mixin 条件缓存」的治理口径，不是单个字段的取值。",
+   "evidence": "会话 5fa69af7：复核 complexChange/index.vue 把 queryParams.bizState 由 '2' 改成 undefined、占位符改「全部」的改动，结论为改动自洽（Verdict APPROVE），但提出两条 MEDIUM：listMixins.js 的搜索条件缓存可能覆盖新默认；首屏列表范围从「仅已备案」扩到「全部」属产品行为变化。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complexChange/index.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/mixins/table.js"
+   ],
+   "sessionIds": [
+    "5fa69af7-6f0a-4415-a70f-a9535a58bf54"
+   ],
+   "title": "列表默认查询值从常量改成 undefined 做「查全部」时，search 条件缓存会让老用户仍看到旧默认",
+   "type": "pattern",
+   "bundle": "052.md",
+   "project": "苏住房G"
+  }
+ ]
+}

@@ -1,0 +1,132 @@
+{
+ "project": "昆山市民",
+ "batch": "005",
+ "files": [
+  "005.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "物业合同的附件打不开，显示空白页，原来是微信小程序，",
+   "type": "fact",
+   "content": "已完成 H5 附件预览修复，主要改动如下： ## 问题原因 物业合同详情页（`detail.vue`）直接调用了 `uni.openDocument`，这是**微信小程序专用 API**，在 H5 环境会跳转到空白页，无法正常预览 PDF。 ## 解决方案 引入 **pdfjs-dist**（Mozilla PDF.js），并统一走公共预览逻辑： 1. **新增预览页** `src/pages/common/filePreview.vue` - 使用 pdf.js 将 PDF 逐页渲染到 canvas - 支持相对路径、绝对路径 - 自动携带登录 Token（如需鉴权） 2. **更新 `filePreview` 工具函数**（`src/utils/index.js`） - H5 下 PDF：跳转到预览页，不再调用 `uni.openDocument` - 微信小程序：保持原有 `uni.openDocument` 逻辑不变 - 图片：继续用 `uni.previewImage` - 其他文件：触发下载 3. **修改物业合同详情页**（`detail.vue`） - 点击附件改为调用统一的 `filePreview` 方法 ## 影响范围 以下模块原本已使用 `filePreview`，也会一并受益： - 决策相关材料 - 维修资金附件 - 选举材料 ## 验证方式 重新构建并部",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "物业合同详情页（`detail.vue",
+    "PDF.js",
+    "`src/pages/common/filePreview.vue",
+    "pdf.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "80b2d970-e79a-47cf-80f8-ee0a0c415a96"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "还有个很奇怪的地方，我一开始还以为是等数据加载，物业",
+   "type": "preference",
+   "content": "对，就是你截图里那个页面。 小程序里和「物业合同」相关的页面是这样分的： | 页面 | 标题 | 作用 | |------|------|------| | `pages_contract/list` | **物业合同** | 首页点进来看到的列表（有「请输入小区名称」搜索框） | | `pages_contract/detail` | 物业合同内容 | 点某条合同后的详情 | | `pages/common/filePreview` | 文件预览 | 点合同附件后的 PDF 预览 | 你截图里是第一个——标题「物业合同」、带搜索框、显示「暂无数据」的那个。业务上可能叫「预览」，代码里对应的是 **列表页** `list.vue`。 上次的修复就是针对这个页面： 1. **`useLoadMore`**：进入页面立即请求第一页，不再等滑动到底部才加载 2. **`list.vue`**：加载中显示「加载中...」，避免先闪「暂无数据」 如果你说的是 **点附件后的 PDF 文件预览** 也空白、要滑动才出来，那是另一个页面，说一下具体路径我再改。 重新编译后进「物业合同」页，数据应会自动加载，不用滑动。",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "`list.vue",
+    "**`list.vue",
+    "涉及文件：d:\\repository\\昆山市民、d:\\repository\\昆山市民\\src\\pages_contract\\list.vue、d:\\repository\\昆山市民\\src\\pages_home\\home.vue、d:\\repository\\昆山市民\\src\\api\\modules\\contract.js、d:\\repository\\昆山市民\\src\\hooks\\useLoadMore.js、d:\\repository\\昆山市民\\src、d:\\repository\\昆山市民\\src\\pages_benefit\\benefit\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "36463f59-a953-4d01-8c85-f8ed807c8d73"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "刷新小程序上审核详情页，报“节点key不能为空” @",
+   "type": "preference",
+   "content": "已修复。刷新审核详情页报「节点key不能为空」，主要有以下几处原因： ## 原因分析 1. **刷新后 `dataId` 丢失** `getDetail` 只把接口返回的 `res.data` 赋给 `examineData`，没有合并 URL 里的 `dataId`。刷新后若详情接口未返回 `dataId`，`init` 会用不完整参数调 `getFlowViewer` / `isApprovalAuth`，后端校验失败并返回「节点key不能为空」。 2. **初始化时序问题** 原先 `onMounted` 与 `watch` 可能重复触发 `init`，存在竞态：`keyNode` 尚未就绪就调用了 `isApprovalAuth`。 3. **错误被全局拦截器弹出** 权限校验类接口失败时，响应拦截器仍会 `showError`，用户会看到报错提示。 ## 修改内容 **`examineDetail.vue`** - 详情数据合并 URL 中的 `dataId`、`busCode`，保证刷新后参数完整 - 操作按钮区域增加 `dataId` 判断，数据就绪后再渲染 **`operationBtn.vue`** - 用单一 `watch`（`immediate: true`）替代 `onMounted` + `watch`，避免重复初始化 - 增加 `initRequestI",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "**`examineDetail.vue",
+    "**`operationBtn.vue",
+    "**`examine.js",
+    "`request/index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "dd9f56a9-de5b-41cb-b05a-a959b8092576"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "排查一下，H5环境下是不是有复用缓存的token？每",
+   "type": "preference",
+   "content": "## 排查结论 **是的，H5 之前会复用缓存的 token**，主要有三处原因： ### 1. Pinia 持久化了 token `user` store 开启了 `persist`，`token` 会写入 `uni.setStorageSync`。页面刷新后 Pinia 初始化时就会把旧 token 恢复回来。 ### 2. `loginWithWxCode` 有短路逻辑 ```116:120:src/utils/wxLogin.js // 旧逻辑（已修复） if (useUser.accessToken) { removeCodeFromUrl() return Promise.resolve(buildLoginResult(useUser)) } ``` 只要内存里有 token，就直接返回，**不会调用** `/estate/weChatOauth/llt/getInfoByCode` 换新的。 ### 3. 业务请求可能在登录完成前就发出 请求拦截器只要有 token 就自动带上 `Authorization`。像 `myhouse/index.vue`、`benefit/index.vue` 等在 `onLoad`/`onShow` 里直接调接口，没有等 `loginWithWxCode()`，会带着旧 token 抢先请求。 --- ## 已做的修复 | 文件 |",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "```116:120:src/utils/wxLogin.js",
+    "`myhouse/index.vue`、`benefit/index.vue",
+    "`stores/user.js",
+    "`utils/wxLogin.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5879f04f-c762-41db-942c-5ca6acb2e3ce"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "鹿路通-小程序三方 H5 对接文档 本文档面向接入鹿",
+   "type": "preference",
+   "content": "已修复「平安报事通」在鹿路通小程序 web-view 中点击提示「请在微信小程序中打开」的问题。 ## 问题原因 1. **未引入微信 JSSDK**：`index.html` 中没有加载 `jweixin-1.6.0.js`，`window.wx.miniProgram` 不存在。 2. **错误的 wx 占位**：`main.js` 在 JSSDK 未加载时执行了 `window.wx = {}`，导致环境检测始终失败。 3. **跳转方式不符合文档**：原先用 `navigateTo` 直接打开目标路径，应按鹿路通文档通过 `JumpMiniProgram` action 跳转。 ## 修改内容 1. **`index.html`** — 引入微信 JSSDK 2. **`src/utils/wxJssdk.js`**（新建）— 封装： - `initWxJssdk()`：调用鹿路通签名接口完成 `wx.config` 初始化 - `isInMiniProgram()`：通过 `wx.miniProgram.getEnv` 判断是否在 web-view 环境 - `jumpToMiniProgram()`：按文档 §4 跳转其他小程序 3. **`src/main.js`** — 移除空的 `window.wx = {}`，应用启动时初始化 JSSDK 4. **`src/p",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "JSSDK**：`index.html",
+    "`jweixin-1.6.0.js",
+    "占位**：`main.js",
+    "**`index.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9727f7d9-56fd-48f1-b779-7c22335440a7"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "切换tab和进入页面没有调用接口",
+   "type": "preference",
+   "content": "已修复，原因和改动如下。 ## 问题原因 1. **`tabDisabled` 阻止了 tab 切换** 上次为修复「切换 tab 时数据闪烁」加了 `tabDisabled`，请求进行中会直接 `return`，导致切换 tab 时不会执行 `search()` / `refresh()`，接口也就不会重新请求。 2. **`getList` 定义顺序问题** `useLoadMore(getList)` 写在 `getList` 之前，在部分场景下 `getList` 可能尚未就绪，导致列表加载失败。 3. **进入页面依赖不够稳** 原先只在 `onShow` 里调用 `refresh()`，首次进入时若生命周期触发异常，可能不会请求数据。 ## 修复内容 - 移除 `tabDisabled` 拦截逻辑，切换 tab 时始终调用 `refresh()` - 将 `getList` 提前定义，再传给 `useLoadMore` - 在 `onLoad` 中增加 `refresh()`，保证进入页面即加载 - 在 `getList` 内记录请求时的 `tab`，避免旧请求返回后覆盖新 tab 数据 - 清空搜索框后自动重新搜索 请重新进入「项目审核」页面，并切换「待处理 / 已处理」tab，确认列表接口是否正常请求。",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "涉及文件：d:\\repository\\昆山市民\\src\\pages_examine\\examineList.vue、d:\\repository\\昆山市民\\src、d:\\repository\\昆山市民\\src\\hooks\\useLoadMore.js、d:\\repository\\昆山市民\\src\\pages_examine、d:\\repository\\昆山市民\\src\\pages_contract\\list.vue、d:\\repository\\昆山市民\\src\\pages_benefit\\benefit\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5d15f726-65f1-4f6a-b8a9-728d78cb3933"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  },
+  {
+   "title": "已完成的业委会选举列表的默认图没显示",
+   "type": "bug",
+   "content": "已修复。 **原因：** 1. 选举列表用了 `<zs-image :src=\"item.headUrl\" :local=\"false\" />`，把本地默认图当成服务端图片去解析。 2. Store 里 `headUrl` 写的是 `\"../../static/images/svg/default.svg\"`，且写在 `...item` 前面，接口若返回空的 `headUrl` 会覆盖默认值。 3. 加载失败时的兜底图 `images/szf/default.png` 在项目中不存在。 **修改：** - `election/index.vue`：与决策列表一致，改为 `<zs-image class=\"pic\" src=\"images/svg/default.svg\" />`，直接加载本地默认图。 - `election.js`：删除已无用的 `headUrl` 字段。 刷新「已完成」列表后，左侧应能正常显示默认图。",
+   "evidence": "extracted source=cursor project=昆山市民",
+   "files": [
+    "`election/index.vue",
+    "`election.js",
+    "涉及文件：d:\\repository\\昆山市民\\src\\pages_election\\election\\index.vue、d:\\repository\\昆山市民\\src\\pages_election\\election\\listStyle.scss、d:\\repository\\昆山市民\\src\\pages_vote\\vote\\index.vue、d:\\repository\\昆山市民\\src\\components\\zs-image\\zs-image.vue、d:\\repository\\昆山市民\\src\\stores\\election.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1ffc6a54-b6d6-4dcc-ba0b-74ef9650cccc"
+   ],
+   "_draft": true,
+   "project": "昆山市民"
+  }
+ ],
+ "_draft": true
+}

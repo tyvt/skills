@@ -1,0 +1,292 @@
+{
+ "project": "产品2.0",
+ "batch": 6,
+ "files": [
+  "021.md",
+  "022.md",
+  "023.md",
+  "024.md"
+ ],
+ "count": 16,
+ "memories": [
+  {
+   "title": "[苏房] 带小计行的横向滚动表：右侧固定操作列被小计数据穿透，遮罩伪元素的 bottom 必须留 1px",
+   "type": "bug",
+   "content": "现象：表格有合计/小计行且横向滚动时，右侧固定操作列下方能看到小计行的数据「穿透」上来（z-index 观感错乱）；同时操作列小计单元格右侧多出一条竖线、底边横线又缺失。\n为什么：固定列（fixed-right）的表体与小计行是不同层叠上下文，小计行单元格没有表体的 class（zs-table-column 的 class-name 只作用于表体，小计/合计行命中不到），所以针对 `zs-operate-column-cell` 的选择器完全没生效；而列与列之间的 1px 右边框是由列本身画的，会穿过固定层露出来。\n怎么做：① 选择器改用 `td:last-child`（命中操作列小计单元格），不要靠 class-name；② 保留/恢复 `fixed-footer-wrapper::after` 这类白色伪元素遮罩来盖住右侧 1px 竖线，并把 `bottom` 刻意留 1px —— 留白就是用来保留操作列底边横线的，整块 `inset:0` 会把底边一起盖掉；③ 有合计行时把固定右列的容器设为 `overflow: visible`，否则伪元素遮罩被裁切等于白写。\n取舍：这是「伪类遮罩」而非改边框，改动点在 zs-table 公共组件，页面级 CSS 无法修。",
+   "evidence": "会话 8e29a239：用户反馈「有横滚+小计，操作列显示了底部数据，期望操作列底下是白色」；第一次改法失败，最终结论写明「小计行的固定列单元格没有 zs-operate-column-cell 类（class-name 只作用于表体），样式实际没生效」「误删了伪元素遮罩 fixed-footer-wrapper::after，它用白色块盖住右侧 1px 竖线并刻意留 bottom:1px 保留底边」「恢复 ::after（right:-1px, bottom:1px），有合计行时 fixed-right 设 overflow:visible 避免遮罩被裁切」",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\styles\\index.scss",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\receiptin\\index.vue"
+   ],
+   "baseline": "49a7aa3",
+   "sessionIds": [
+    "8e29a239-a740-473b-921d-cd75f2915a3e"
+   ],
+   "bundle": "021.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "[苏房] zs-select-dialog 的 rowKey 误用不存在的字段会让所有行 key 全为 undefined，选中后整表高亮",
+   "type": "bug",
+   "content": "现象：在「选择物业管理区域」这类 zs-select-dialog 里点选一行，整张表的每一行都被加上选中高亮；删除/回填等按 key 的操作也一起错乱。\n为什么：页面把 rowKey 写成了 `complexId`，而接口返回的候选列表里根本没有这个字段 —— 所有行的 rowKey 都是 undefined，Element 内部按 key 建立的映射瞬间塌成一条，选中状态被广播到全表。同模块其他页面一直用的是 `projectId`。\n怎么做：① 页面侧 rowKey 一律对齐同模块已经跑通的页面用同一个业务主键字段（此处 projectId），不要按业务语义「想当然」取名；② 组件侧在 zs-table 的 rowClassName 里加空值过滤，遇到 undefined/null 的 row key 直接跳过，不在公共组件层再把坏的 key 放大成整表高亮（组件兜底只能防止扩散，不能替代把字段改对）。\n排查提示：凡是「选中态莫名扩散/全选」类现象，第一步就把 rowKey 与接口返回字段逐字对一遍，而不是查 zs-select-dialog 的选中逻辑。",
+   "evidence": "会话 5af5c221 结论 1：「原因：pubBankReceiptApply/detail.vue 中 rowKey 误设为 complexId，接口返回数据无此字段，导致所有行的 key 均为 undefined，选中后整表高亮。修复：rowKey 改为 projectId（与同模块其他页面一致），并在 zs-table.vue 的 rowClassName 中增加空值过滤，避免无效 key 误匹配」",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubBankReceiptApply\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-select-dialog\\zs-select-dialog.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue"
+   ],
+   "baseline": "41c6961",
+   "sessionIds": [
+    "5af5c221-8134-4622-ae26-0886a69a35ed"
+   ],
+   "bundle": "021.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "[苏房] 文件凭证类字段的正确承载方式：查看态走 DetailTemplate 的 type:'image'，编辑态用 ImageUpload，底部不再单挂缩略图；后端只给 fileId 时前端要补 URL",
+   "type": "pattern",
+   "content": "适用场景：表单里出现「凭证预览 / 附件图片」这类文件字段，且该表单已经被 DetailTemplate 封装成只读详情。用户原话：「凭证预览也是一个表单字段，用 imageupload 组件，详情状态需要使用 detail-template 封装」。\n怎么做：① 查看态不再渲染编辑表单，改为 `<DetailTemplate :data=\"xxxDetailItems\" />`，items 与表单字段一一对应，文件字段作为最后一项 `{ type: 'image', value: voucherFileUrl }`（DetailTemplate 的 link 分支只认 item.link，附件/图片必须走 image 类型）；② 编辑/新增态在同一表单里加一个整行 `el-form-item`，控件用 ImageUpload，`v-model` 绑逗号分隔的地址字符串，`limit=\"1\"`，并把 `isFormDisabled` 透传下去保证只读时上传区禁用、tip 区隐藏；③ 弹窗底部不要再放一张独立缩略图去「顺带展示凭证」，凭证展示统一收敛到 DetailTemplate 或表单项，避免同一份数据两个入口两种样式。\n数据契约：ImageUpload 的 v-model 是逗号分隔的图片 URL 串。后端若只存 voucherFileId 而非可访问地址，必须在接口层补全 URL、或在打开详情时把可访问地址写进 voucherFileUrl，否则 DetailTemplate 的图片列恒为空且不报错。",
+   "evidence": "会话 c26c8f38：用户诉求 3「凭证预览也是一个表单字段，用 imageupload 组件，详情状态需要使用 detail-template 封装」；结论写明 simplifiedLayout && dialogFormMode==='view' 时改渲染 DetailTemplate，最后一项凭证预览 type:'image' 用 voucherFileUrl、无则回退 voucherFileId，编辑态在 BankReceiptFormContent 的 simplified 区块末尾加 ImageUpload(limit=1)，弹窗底部去掉左侧缩略图只留关闭/确认/下载凭证",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\components\\BankReceiptDetailDialog.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\HeadTitle\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubBankReceiptApply\\detail.vue"
+   ],
+   "baseline": "6b9d9d7",
+   "sessionIds": [
+    "c26c8f38-d604-41d2-b12e-edbdfd3c8e06"
+   ],
+   "bundle": "021.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "[苏房] 子表列与弹窗/表单字段必须共用同一份字段定义：分别维护必然漂移，且列 prop 易错填成相邻字段",
+   "type": "pattern",
+   "content": "现象：用户两次指出「子表的表格字段，和弹窗里面的字段没有按照设计图修改，要求字段完全一致」；同时子表某一列的 prop 写成了 `channelInstitution`（相邻的另一字段），实际应为接口字段 `loanDirction`，导致该列展示错数据——而且是静默的，不报错。\n为什么：子表列配置、查看弹窗的 contentInfo、编辑表单三者各写一套字段清单，设计稿改一次要改三处，漏一处就出现「弹窗里是新字段、表格里还是旧字段」。列 prop 错填同理，字段名多半来自相邻字段的手误复制。\n怎么做：① 把该业务的字段清单收敛成一份常量/构造器，子表 columns、DetailTemplate items、表单 fieldPlan 都从它派生（本项目的既有惯例是 build*ContentInfo 构造器 + constants），列只补宽度/对齐这类纯展示属性；② 改字段名时列只改 label 与取值映射，prop 必须与接口字段逐字核对，别凭「意思对」填；③ 验收时用「同一张单据在列表子表 / 详情弹窗 / 编辑表单三处的字段序列逐个比对」的方式自检，而不是只看设计稿截图。",
+   "evidence": "会话 c26c8f38 用户诉求 2：「@detailTable.vue 子表的表格字段，和弹窗里面的字段没有按照设计图修改，要求字段完全一致」；结论第 4 条：「借贷方向列的 prop 已从误用的 channelInstitution 改为 loanDirction（与接口字段一致）」",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubBankReceiptApply\\components\\detailTable.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\components\\BankReceiptDetailDialog.vue"
+   ],
+   "baseline": "6b9d9d7",
+   "sessionIds": [
+    "c26c8f38-d604-41d2-b12e-edbdfd3c8e06"
+   ],
+   "bundle": "021.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "[苏房] 后台列表页块间间距与操作栏对齐统一写进全局 index.scss（lease-contract-list / list-card-header），页面不各写一套",
+   "type": "pattern",
+   "content": "现象：经营资产租赁合同、经营资源租赁合同、停车泊位租赁管理三个同构列表页出现「搜索区与表格卡片上下间距不均」「标题、按钮行与预警说明文字高度不齐、不垂直居中」。\n怎么做：不逐页调 margin，而是给列表容器统一加语义类 `lease-contract-list`（搜索区与表格卡片间距固定 12px），把标题/按钮行与预警说明合并进 `list-card-header`（min-height: 48px + padding: 12px，内容垂直居中，说明文字同用 12px 上下内边距），规则写进 `src/styles/index.scss` 一处。三个模块只挂类名，不再写页面级间距。\n配套的两个同批修正：子表金额/面积列缺千分位时用 `amountFormatter`（1000 → 1,000.00），不要在页面里手写 formatter；子表底部边距不足的根因往往是没套 `sub-container`（详情页子表容器的既有约定），补上容器包裹即与其他子表一致，而不是给表格加 margin-bottom。\n边界：这是「多个同构页面共享的列表骨架样式」，与「单个页面的分块间距写进组件 scoped」的偏好并不冲突——单页特性仍留在 scoped，跨页复用的骨架才进 index.scss。",
+   "evidence": "会话 e48b01c6：三个 index.vue 统一调整「上下间距一致：为列表容器增加 lease-contract-list 类，搜索区与表格卡片之间统一 12px」「操作栏 min-height:48px + padding:12px 垂直居中」「说明文字纳入表头区域，上下内边距均为 12px」「全局样式已写入 src/styles/index.scss」；顺带修复 houseTable.vue 面积列改用 amountFormatter、subAdvertiseTable.vue 增加 sub-container 包裹",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\styles\\index.scss",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\assetsLeaseContractFiling\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\resourcesLeaseContractFiling\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\parkingSpaceContractFiling\\index.vue"
+   ],
+   "baseline": "49a7aa3",
+   "sessionIds": [
+    "e48b01c6-3065-4048-9afa-2de4be8dac2a"
+   ],
+   "bundle": "021.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "产品2.0 分支拓扑与改动落点：261/262 选主干、262-yulin 为在用环境分支",
+   "type": "fact",
+   "content": "情况：产品2.0 仓库（d:\\repository\\产品2.0，前端子模块 zhi2-web-admin）并行维护 develop/v2.6.1、develop/v2.6.2、develop/v2.6.2-yulin 等分支，其中 v2.6.2-yulin 是实际在用的环境分支，v2.6.1/v2.6.2 是对外发布的版本分支。为什么：用户对分支有明确口径——「如果 2.6.1 分支没有该描述，则不加，直接在 262-yulin 上修改；确认 262 分支也没有这个描述才能放行；如果 261/262 已有该描述，则先在 262 上改再合并到 262-yulin」。也就是说改动落点由「目标分支里是否已存在该文案/功能」决定，而不是见到分支就同步。怎么做：动手前先 grep 目标文件在 261 与 262 上的实际内容确认该文案/功能是否存在；仅 262-yulin 独有就直接在 262-yulin 改；261/262 已有的先在 262 改、再合并或 cherry-pick 到 262-yulin。涉及跨分支改动时优先用 cherry-pick 并回报「分支 → 新提交 SHA → 状态」表格，推送前先问是否 push，不要默认推到远程。",
+   "evidence": "会话 d67ed19e：用户明确「如果261分支没有该描述，则不加，直接在262-yulin上面修改，确定262分支也没有这个描述，如果有则先在262修改再合并到262-yulin」；会话 e1ad93b0：用户要求「这个修复需要pick到2.6.1和2.6.2分支」，最终产物是分支/新提交 0e8e5ad22、02155506c 的对照表 + 建议的 git push 命令，并主动询问是否执行推送。",
+   "files": [
+    "d:\\repository\\产品2.0",
+    "d:\\repository\\产品2.0\\zhi2-web-admin"
+   ],
+   "baseline": "075e6e9",
+   "sessionIds": [
+    "d67ed19e-3867-4b95-a599-b0a4a6101d66",
+    "e1ad93b0-6622-47db-907c-870e43850734"
+   ],
+   "bundle": "022.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "可搜索下拉（远端 keyWord）失焦必须回全量：用 el-select 的 visible-change 复位并清防抖",
+   "type": "pattern",
+   "content": "情况：把筛选项从固定下拉改成「可搜索下拉」并给接口加 keyWord 参数后，用户只输入关键字、不点选项直接点外面失焦，下拉里只剩被 keyWord 过滤后的残缺列表，界面看起来「选项少了」。为什么：远端搜索型 el-select 的选项列表是被上一次 keyWord 请求覆盖的，失焦只是关闭浮层，不会自动重新取数；同时如果输入时挂了防抖请求，失焦后那次定时器仍会晚一步把列表再刷成过滤结果。怎么做：在 el-select 上监听 @visible-change，visible === false（失焦/收起）时先 clearTimeout 取消未执行的防抖请求，再调一次不带 keyWord 的取数函数重新拉全量；若已有选中值，用 sticky option 把当前值合并回列表，避免「回显值不在选项里」显示成裸编码。注意单选封装组件（如 SingleSelect）内部已有 @visible-change 做浮层同步，与 v-on=\"$listeners\" 并存时一般会一起触发，若父级监听不到需在封装里显式 $emit('visible-change')。同一模块的多个同类页面（todo/finished/process 这类流程页）要一起改，口径保持一致。",
+   "evidence": "会话 4a5b9010：todo.vue 业务类型下拉改为可搜索 + 接口加 keyword 字段，随后用户两次补充「如何没选，应该恢复全量的下拉」「我属于一个关键字后直接失焦，也应该恢复为全量数据」；最终在 todo/finished/process 三页加 handleBusCodeSelectVisible(visible)，visible===false 时取消防抖定时器并调 fetchBusCodeMenu() 重拉不带 keyWord 的全量列表，选中值靠 busCodeStickyOption 合并。",
+   "files": [
+    "zhi2-web-admin/src/views/flowable/todo.vue",
+    "zhi2-web-admin/src/views/flowable/finished.vue",
+    "zhi2-web-admin/src/views/flowable/process.vue",
+    "zhi2-web-admin/src/components/zs-select/SingleSelect.vue"
+   ],
+   "baseline": "6da8974",
+   "sessionIds": [
+    "4a5b9010-52ef-4ec0-87b3-3334f8586fb8"
+   ],
+   "bundle": "022.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "本地正常、生产布局错乱的弹窗提示语：vite build 产物会改变 scoped 作用域属性，本地 dev 验证不可信",
+   "type": "pattern",
+   "content": "情况：survey 模板的 TopicDialog.vue 里题目分组提示语（.topic-group-tip）本地开发怎么看都正常，生产环境（www.ylzhwy.com:8081，vite build 产物）却排版错乱。为什么：本地 dev 与 build 产物的 scoped 样式编译、CSS 合并顺序不同，写死宽度/依赖父级 flex 行布局的提示语在生产侧会被挤成窄条或错行，这类问题在 dev 环境下复现不出来。怎么做：靠开发环境肉眼验证等于没验证，涉及布局的生产问题一律以 build 产物为准核对；修复时把提示语块显式撑满整行（width: 100% + flex-basis: 100%），并通过 :deep(.el-form-item__content) 把外层表单项内容改成纵向 flex，让提示语稳定落在控件下方而不是和 label 抢同一行。注意 :deep() 必须是 scoped 块里可编译的写法，且生产验证要说明「需重新构建部署后生效」。改完这类定位过的样式，要按仓库分支口径 cherry-pick 到对应版本分支，而不是只留在开发分支。",
+   "evidence": "会话 e1ad93b0：用户给出生产地址并说明「这个弹窗里面的提示语，本地是正常的，生产上不行」，修复内容为 .topic-group-tip 的 width:100%/flex-basis:100% + .topic-group-item :deep(.el-form-item__content) 纵向 flex，随后 cherry-pick 到 develop/v2.6.2（0e8e5ad22）与 develop/v2.6.1（02155506c），并提示推送后需在各环境重新构建部署才生效。",
+   "files": [
+    "zhi2-web-admin/src/views/survey/template/components/TopicDialog.vue",
+    "zhi2-web-admin/src/styles/element-ui.scss",
+    "zhi2-web-admin/src/styles/index.scss"
+   ],
+   "baseline": "71e6ed9",
+   "sessionIds": [
+    "e1ad93b0-6622-47db-907c-870e43850734"
+   ],
+   "bundle": "022.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "详情页加「终止」按钮带数据跳转：新建页走列表路由+/add，并按来源主键主动取数",
+   "type": "pattern",
+   "content": "情况：把「房屋质量保证金协议终止」的新增入口从终止列表页移到协议详情页，做成「详情页点终止 → 打开终止新建页并自动带出物业管理区域、开发企业、物业服务企业、建设单位及协议信息」。踩了两个坑：一是终止新建页字段全空，因为走的是 add 模式，detailMixins 在 add 模式下不会调用 init()，页面里写的 loadAgreementById 从未执行；二是跳转把 detail 路由直接拼 add，生成形如 ...Endadd 的错误路径，触发详情接口报「请求参数格式错误或类型不匹配」。为什么：detailMixins 的取数只挂在 view/edit 模式下，add 模式要带数据必须自己显式加载；而路由拼接必须用列表路由 + /add 的约定路径，不能拿详情路由当基底。怎么做：终止列表页去掉「新增」按钮；协议详情页的终止按钮跳到 guaranteeDepositAgreementEnd/index + /add，并把 agreementId 带过去；终止新建页在 created 中按 agreementId 主动加载源协议数据，同时清掉 sessionStorage 里的旧缓存防止覆盖；从协议带过来的区域/企业等字段以只读方式展示，而不是显示「点击选择协议」。",
+   "evidence": "会话 c2c05a52：用户先要求「房屋质量保证金协议终止，期望去除新增按钮在协议详情页增加终止按钮」，再要求「点了终止把数据带过来」；最终结论列出两点根因（add 模式下 detailMixins 不调 init、路由 detail 拼 add 生成 ...Endadd 导致详情接口参数错误）与三项修复（created 按 agreementId 自动加载并清 sessionStorage 缓存、跳转改列表路由 + /add、带过来的字段改只读展示）。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreementEnd/index.vue",
+    "zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreementEnd/detail.vue",
+    "zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/index.vue",
+    "zhi2-web-admin/src/views/property/propertyAgreement/detail.vue"
+   ],
+   "baseline": "414029f",
+   "sessionIds": [
+    "c2c05a52-f049-49d4-a534-d9c5df814673"
+   ],
+   "bundle": "022.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "左树+右内容两栏页的左栏高度必须锁成视口剩余高度，靠 flex 拉伸 + min-height:0 + 内部分区滚动",
+   "type": "pattern",
+   "content": "什么情况：维护类模块（设施设备 facility/index.vue、标准维修项目 standardItem、设施定义 facilityDefinition）是「左侧分类树 + 右侧列表」的两栏布局。左栏默认随树节点数量增高，节点一多就把整页撑长、右侧列表被顶到视口外，出现两条独立滚动条。\n为什么：左栏是内容驱动的块级高度，既不读视口也不参与父容器的高度约束；树区没有独立的滚动出口，overflow 落在整页上。\n怎么做：页面容器统一 `height: calc(100vh - 120px)`（与同模块既有页面保持一致，不要各写一个减法常量）；左栏在 flex 布局里用 `align-self: stretch` + `min-height: 0` 撑满剩余高度而不是撑内容；树放在 `sort-left-body` 这类内层盒里滚动，顶部「物业管理区域」选择与搜索框留在滚动区外保持固定。这样左栏高度恒等于视口剩余高度，树节点再多也只在内层滚动。改动前先搜同模块已有的左栏高度写法，对齐后再动，避免同一模块出现两个减法基准。",
+   "evidence": "会话 7c1acafc（基线 2f68042）用户诉求「@zhi2-web-admin/src/views/maintenance/facility/index.vue 左侧高度固定，和屏幕剩余高度一致」，最终把 list-container 设为 calc(100vh - 120px)、左栏 align-self: stretch + min-height: 0、树在 sort-left-body 内滚动，并明确对齐同模块「标准维修项目设置」。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\facility\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\facilityDefinition\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\standardItem\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\styles\\index.scss"
+   ],
+   "baseline": "2f68042",
+   "sessionIds": [
+    "7c1acafc-7c01-47e5-b2e6-f66543e21e10"
+   ],
+   "bundle": "023.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "详情页子表按「未就绪的主键」发请求：路由复用残留旧 id + detailCallback 浅合并不覆盖，导致查到别人的数据",
+   "type": "bug",
+   "content": "什么情况：房屋质量保证金-账户明细页，缴存明细/支用明细没有按所属物业管理区域过滤，余额 1856.53 却出现 266.62 的记录——子表查到的是其他账户的数据。用户判断「判断条件没加账号、接口异步导致子表没拿到过滤条件」基本正确。\n为什么三层叠加：(1) 同一个详情路由复用进另一条记录时，form 上保留着上一次的 accountId；(2) subTableMixins 在 created 就自动调 getList()，早于详情接口返回，于是用旧 accountId 发请求；(3) detailCallback 用 `{ ...this.form, ...data }` 合并，接口若没返回 accountId，旧值不会被覆盖，错误状态被固化。此外子表只传了 accountId/account，压根没传 propertyProjectId。\n怎么做：子表在 `!loading` 且 `resolvedAccountId`（`form.accountId || 路由 id`）就绪后再用 v-if 渲染；detailCallback 改为「先重置 form 再合并」，并用路由 id 兜底 accountId；子表组件新增 propertyProjectId 参数且 accountId 与 account 同时传（不要二选一），覆盖 init() 阻止 mixin 提前请求，在 mounted 且过滤参数就绪后再拉数，再用 filterSignature 统一 watch 过滤条件变化。同类「重置后立刻查询」的列表（资金缴存/账户列表）也要等区域树就绪再刷新，否则 parentDeptId 丢失。",
+   "evidence": "会话 a2b93bb4（基线 414029f）用户诉求「缴存/账户明细没有根据所属物业管理区域过滤，是不是判断条件没有加账号，接口异步导致子表接口没有拿到过滤条件」；修复覆盖 guaranteeDepositAccount/detail.vue 与 AccountDetailTable.vue（新增 propertyProjectId、覆盖 init、filterSignature）。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDepositAccount\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDepositAccount\\components\\AccountDetailTable.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDeposit\\components\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDeposit\\deposit\\index.vue"
+   ],
+   "baseline": "414029f",
+   "sessionIds": [
+    "a2b93bb4-760d-4bb3-93a2-a4c0506cfb2f"
+   ],
+   "bundle": "023.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "B 端项目上下文（complexId）的注入口径：列表在 getQueryParams 按 terminalType 注入，详情新增态只在缺值时从 store 兜底",
+   "type": "pattern",
+   "content": "什么情况：物业合同（property/propertyContract/page）等 B 端业务列表要求带上全局当前项目 complexId，否则跨项目数据混查。\n为什么：项目选择存在全局 store 的 currentProjectId getter（由 B 端项目选择弹窗写入），接口本身不收路由上下文；列表查询参数与详情表单是两处独立构造，只在其中一处补会漏。\n怎么做：(1) 列表侧在 getQueryParams 里判 `this.$store.state.user.terminalType === 'B'` 才注入 `result.complexId = this.$store.getters.currentProjectId`，G 端一律不传；因为这套组件常被多个菜单共用（物业服务合同备案/前期物业服务合同备案/合同变更/解聘），改一处即全域生效，要提前评估这层放大。(2) 详情侧新增态（formMode==='add' 且 form.complexId 为空）按 `路由 query.complexId || (B 端 ? currentProjectId : null)` 兜底回填，取不到就直接 return 不做处理，保证保存时 complexId 有值。写法与 benefit/alert、property/complex 等页面保持一致，不要另造一套项目上下文来源。",
+   "evidence": "会话 35c4f338（基线 401d884）用户诉求「property/propertyContract/propertyContract 这个接口加 complexId 参数，从全局 store 获取 B 端的选择项目」；落地为 components/index.vue 的 getQueryParams 与 components/detail.vue 的 initComplexFromRoute。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\propertyContract\\components\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\propertyContract\\components\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\utils\\projectContext.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\listMixins.js"
+   ],
+   "baseline": "401d884",
+   "sessionIds": [
+    "35c4f338-b3f4-4660-b726-f1bf15f29ea7"
+   ],
+   "bundle": "023.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "批量操作表格的「可勾选」与「能否执行某操作」必须拆成两层判定，否则已支付账单永远选不中",
+   "type": "bug",
+   "content": "什么情况：物业服务费账单列表里「有效 + 已支付」的账单勾不上，导致做收款、优惠、作废时无法先选中行。\n为什么：isSelectable 直接复用了 isBillPayable（只允许「待支付/部分支付且未作废」），把「这行能不能被选中」和「这行能不能被收款」合成一个判定。勾选是表格的通用选择能力，收款/优惠是每个动作各自的准入条件，二者层级不同，合并后必然出现「行有效但选不中」。\n怎么做：在 enums.js 里把判定拆成两个纯函数——isBillValid（有效=未作废）用于 isSelectable，让所有有效账单可勾选；validateBillsForCollect / validateBillsForDiscount 保留在各自动作入口做准入校验，优惠要求「有效且待支付」，收款仍只认待支付/部分支付。用户勾了不符合条件的行点按钮时给明确提示，而不是把行锁死。另注意状态比较全部改成 `==`，兼容后端返回数字或字符串两种形态，否则严格相等会把整行判成不可选。",
+   "evidence": "会话 3bad7169（基线 c98afb0）用户诉求「有效账单也要可勾选 做收款和优惠」；修改 spFeeBill 模块 enums.js（新增 isBillValid / validateBillsForDiscount、状态比较改 ==）与 index.vue 的 isSelectable，形成「有效即勾选、动作各自校验」的矩阵。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\bill\\components\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\declare\\components\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\index.vue"
+   ],
+   "baseline": "c98afb0",
+   "sessionIds": [
+    "3bad7169-f39b-4cf0-bf68-20903c11dcb"
+   ],
+   "bundle": "023.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "城市/项目专属的视觉素材不能进代码仓库：抽成 platformConfig 配置项，后端下发、未配置则不渲染",
+   "type": "pattern",
+   "content": "什么情况：数据可视化-行政划分页硬编码了「无锡智能体-水蜜桃形象」的 logo.gif，本项目是泰兴，形象与城市不符；该功能还要部署到其他项目，同一张图必然错。\n为什么：把带地域语义的素材写死在源码/静态资源里，复制部署时不会随之改变，属于同源复制项目的典型污染源；而且图体积大（约 2.8MB）会直接进构建产物。\n怎么做：(1) 在系统管理-基础配置的基本配置区块末尾加「智能体形象」字段，非必填，仅支持 png/jpg/jpeg/gif、单张 10MB 以内，对应后端 agentLogo；(2) 去掉代码与常量里的 logo.gif 引用并删除该静态资源（同时清 constants.js 里的引用）；(3) 展示端改为读 platformConfig.agentLogo，有配置才渲染、没有就不渲染（不要留占位图或默认形象）；(4) store/modules/app.js 补 agentLogo 默认字段，ImageUpload 增加 acceptTypes 属性以支持 gif 等自定义格式；(5) 交付时提示后端 /system/platformConfig/getInfo 与保存接口需支持该字段。推广口径：凡带城市/项目语义的图片、文案、默认值，一律走平台配置而不是写进代码。",
+   "evidence": "会话 d5195af1（基线 94b86fa）用户诉求「数智分析-数据可视化增加了无锡智能体-水蜜桃形象，部署到其他项目时与城市不符，需单独配置；删除本项目中的 gif 图片，使用配置的图片展示」；落地为 platformConfig/detail.vue 新增字段、benefit/mapOverview 改读 platformConfig.agentLogo、删除 assets/images/mapOverview/logo.gif 与 constants.js 引用。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\system\\platformConfig\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\largeScreen\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\largeScreen\\components\\componentMap.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\largeScreen\\components\\svgMap.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\store\\modules\\app.js"
+   ],
+   "baseline": "94b86fa",
+   "sessionIds": [
+    "d5195af1-3732-4c62-8c98-deedb2a38fa9"
+   ],
+   "bundle": "023.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "下拉/选项列表「静默为空」的根因：`response.data || response.rows` 在 data 为对象时短路取到对象，.map() 抛错被空 catch 吞掉",
+   "type": "bug",
+   "content": "什么情况：页面用 `const list = response.data || response.rows || []` 取选项列表（本项目实例是工单分类下拉 `categoryOptions` 恒为空、选不到数据），接口本身正常、list 路径也存在。\n\n为什么：接口返回的是 `{code:200, data:{list:[...]}}`，此时 `response.data` 是一个**对象而非数组**，`||` 短路优先取到对象，`response.rows` 的回退根本不会执行；随后对该对象调用 `.map()` 直接抛 TypeError。外层 try/catch 又把异常吞掉（或只 console），`categoryOptions` 就被赋成空数组 —— 表现为「接口有数据、下拉无选项、控制台无明显报错」，排查时极易误判成接口路径错、状态过滤错、权限或字典问题。\n\n怎么做：禁止用 `||` 直接从响应里挑列表。写一个统一的列表提取函数，**先判类型再逐层回退**：`if (Array.isArray(res)) return res;` → 依次尝试 `res.rows` / `res.data.records` / `res.data.list` / `res.data.rows` / `res.data`，每一步都 `Array.isArray` 校验后才返回，全不命中才返回 `[]` 并给出可观测日志。同时把 catch 里的静默吞错改成显式报错，避免同类问题再次隐形。",
+   "evidence": "会话 1401b92d：用户反馈「工单分类选不到数据」，随后补充「list 接口是存在的」。会话结论定位原代码 `const list = response.data || response.rows || []` 在 `/list` 返回 `{\"code\":200,\"data\":{\"list\":[...]}}` 时 `response.data` 是对象、`.map()` 抛错被 catch 吃掉，`categoryOptions` 变空数组；修复为按 rows / data.records / data.list / data.rows / data 本身多结构解析，并补充 workOrderCategoryId、_categoryName 字段映射，去掉误加的状态过滤与 /page 调用。",
+   "files": [
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/property/workOrder/report/index.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/property/workOrder/report/components/AddOrderDialog.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/components/zs-select/zs-select.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "baseline": "42b6033",
+   "sessionIds": [
+    "1401b92d-0ad2-433b-83f9-aa435e2c7296"
+   ],
+   "bundle": "024.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "选项列表接口选型的纠偏：确认 list 接口存在后不要顺手换成 /page 或加本地状态过滤",
+   "type": "pattern",
+   "content": "什么情况：下拉/选项数据为空时，容易顺手做两件事——把 `/xxx/list` 改成 `/xxx/page` 分页接口，或在本地对结果加一道状态过滤（如只留启用项）。本项目的实例是：定位到真正原因是响应解析问题之后，前面的这两处「顺手改动」必须一起回退。\n\n为什么：选项类接口与分页列表接口是两种契约，`/page` 需要 pageNum/pageSize 且返回 rows+total，用 `/list` 拿全量选项才是原设计意图；擅自换接口会让参数缺失或被请求拦截器改写（V3 里末尾段可能被当成 REST 动作）而返回空。本地状态过滤则会在接口本来只回有效项时把数据全滤掉，且这类过滤不会报错，进一步掩盖真实根因。\n\n怎么做：选项类下拉固定用 `/list`（或已有的 listAll），不加分页参数、不做本地状态过滤；先确认接口路径与响应结构正确，再考虑字段映射（如 `workOrderCategoryId`、`_categoryName` 这类列表项与选项值字段不一致的情况要显式映射）。改完必须刷新页面复验，仍为空时直接索取接口真实返回 JSON 精确对齐，而不是继续猜路径。",
+   "evidence": "会话 1401b92d 结论明确记录两件事：一是「继续使用 /list 接口」，二是「去掉之前误加的状态过滤和 /page 调用」，同时补充 workOrderCategoryId、_categoryName 等字段映射。",
+   "files": [
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/property/workOrder/report/index.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/property/workOrder/report/components/AddOrderDialog.vue"
+   ],
+   "baseline": "42b6033",
+   "sessionIds": [
+    "1401b92d-0ad2-433b-83f9-aa435e2c7296"
+   ],
+   "bundle": "024.md",
+   "project": "产品2.0"
+  }
+ ]
+}

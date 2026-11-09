@@ -1,0 +1,109 @@
+{
+  "project": "苏住房G",
+  "batch": "107",
+  "files": ["107.md"],
+  "count": 8,
+  "memories": [
+    {
+      "title": "跨服务字段缺失的根因链要锁定到行号：ComplexVo 没有 companyId，批量接口只回填企业名，导致企业列表恒空",
+      "type": "pattern",
+      "content": "【什么情况】报告编制接口返回的 `companyCount` 恒为 0、`companyList` 恒为空。用**有生效物业合同**的小区实测过（complexId 667579428045292 等 5 个，合同 bizState=2），仍然为 0——说明不是数据没配。\n【为什么】根因是跨服务 DTO 契约缺口，链路是：`StdEvalReportPrepareServiceImpl.deriveCompanies` 依赖 `ComplexDto.getCompanyId()`；但物业侧 `ComplexApiImpl.listByIdList`（`POST /api/property/complex/listByIds`）走 `ComplexServiceImpl.listByComplexIds`，该方法只做 `Complex → ComplexVo` 的 BeanUtil 拷贝，而 **ComplexVo 根本没有 companyId 字段**；`ComplexApiImpl` 也只回填了 companyName / 联系电话 / 负责人，**没回填 companyId**。于是过滤条件全空、派生结果为空、最后在 `StdEvalReportPrepareServiceImpl:315` 抛错。对照组是单小区详情接口（`ComplexServiceImpl:2302`）——只有它才有 `setCompanyId(contract.getCompanyRecordId())`。\n【怎么做】① 遇到「字段拿不到」类缺陷，先定位**字段从哪个 DTO 来**，再看该 DTO 有没有这个属性——BeanUtil 拷贝不会凭空造字段；② 批量接口与单条接口**逐字段对比**：单条有、批量没有，就是批量侧的映射漏了（本次即 `ComplexVo` 缺 companyId + `ComplexApiImpl:239` 只回填企业名）；③ 把根因链**逐行记下来**（`ComplexServiceImpl.java:782` → `ComplexVo` 无 `companyId` → `ComplexApiImpl.java:239` 只回填企业名 → `StdEvalReportPrepareServiceImpl.java:421/:438` 过滤全空 → `:315` 抛错），并注明对照组行号（`ComplexServiceImpl.java:2302`），这样责任方能直接定位；④ 对方服务不在本地部署时，**明确写「当前环境无法验证修复」**，不要假装已修；⑤ 修复方向是让批量接口也回填 companyId（或在 DTO 上加字段），而不是在消费侧兜底造值。",
+      "evidence": "会话 b1c0919f-1d59-4d84-b098-af6f3b182d48（基线 05caac8）用户诉求 4「Team message from lead」：「`companyCount` 恒为 0，`companyList` 恒为空 —— 我用**有生效物业合同**的小区（complexId 667579428045292 等 5 个，合同 bizState=2）实测，仍然 `companyCount=0`。根因链（我已核对源码）：`StdEvalReportPrepareServiceImpl.deriveCompanies` 依赖 `ComplexDto.getCompanyId()`；但物业侧 `ComplexApiImpl.listByIdList`（`POST /api/property/complex/listByIds`）走 `ComplexServiceImpl.listByComplexIds`，该方法只做 `Complex → ComplexVo` 的 BeanUtil 拷贝，**ComplexVo 根本没有 companyId 字段**，`ComplexApiImpl` 也只回填了 companyName/联系电话/负责人，没回填 companyId。」最终结论：「**D7 根因锁定到行号**：`ComplexServiceImpl.java:782` → `ComplexVo` 无 `companyId` → `ComplexApiImpl.java:239` 只回填企业名 → `StdEvalReportPrepareServiceImpl.java:421/:438` 过滤全空 → `:315` 抛错；对照 `ComplexServiceImpl.java:2302` 才有 `setCompanyId(contract.getCompanyRecordId())`。物业侧不在本地部署，故当前环境无法验证修复。」",
+      "files": [
+        "zhi2-web-admin/src/views/evaluation/stdEvaluation/report/detail.vue",
+        "docs/std-evaluation/api-map-report.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["b1c0919f-1d59-4d84-b098-af6f3b182d48"],
+      "bundle": "107.md"
+    },
+    {
+      "title": "实体继承 BaseApprovalDO 但建表 SQL 漏了三列 → 报「无效的列名[APPROVE_STATE]」，需补 changelog ALTER",
+      "type": "bug",
+      "content": "【什么情况】报告编制接口报 `无效的列名[APPROVE_STATE]`。根因：实体 `StdEvalReportPrepare` / `StdEvalReport` 继承了 `BaseApprovalDO`（带 `APPROVE_STATE` / `RECORD_USER` / `RECORD_TIME` 三列），但**建表脚本 `V2.6.2-20261027-004.sql` 漏建了这三列**——而区域维度那张表（areaReport 对应的表）是**对的**。另外 `StdEvalReportPrepare.complexIds` 缺 `@TableField(exist = false)`，导致 MyBatis 报 `Type handler was null`（该字段是 transient 的，不落库）。\n【为什么】实体继承基类自动带来字段，**DDL 不会自动跟着继承**——新建表脚本时只写了业务字段，忘了基类的三列。同一批表里「区域维度那张表是对的」更能说明这是**逐表手工写脚本**的漏写，不是设计如此。`complexIds` 则是另一个方向：非持久化字段没标注，MyBatis 会去找 type handler，找不到就抛 `Type handler was null`。\n【怎么做】① 补 changelog：新增 `V2.6.2-20261031-001.sql`，把缺失的 `APPROVE_STATE` / `RECORD_USER` / `RECORD_TIME` 三列以 ALTER 形式补上（本次 12 条 ALTER 全成功）并**应用到测试库**，而不是只改实体；② 实体里的非持久化字段一律加 `@TableField(exist = false)` 并补 import（本次是 `report/domain/StdEvalReportPrepare.java`），**与 reportArea 版本对齐**——同族实现互相校对最省事；③ 修完用 `mvn -pl zhi2-evaluation/zhi2-evaluation-server -am compile` 验证（本次 exit 0）；④ **同族表要横向核对 DDL 一致性**（普通维度 vs 区域维度、编制表 vs 报告表），漏列往往只出现在其中几张；⑤ 结果验证：修完 `POST /v2.0/evaluation/reportPrepare` 返回 `{\"code\":200,\"data\":...}` 且 detail 可查。",
+      "evidence": "会话 b1c0919f-1d59-4d84-b098-af6f3b182d48（基线 05caac8）用户诉求 3/4「Team message from lead」：「已在 `report/domain/StdEvalReportPrepare.java` 给 `complexIds` 加 `@TableField(exist = false)`（并补 import），与 reportArea 版本对齐。」「补丁后暴露第二层问题：`T_STD_EVAL_REPORT_PREPARE` 与 `T_STD_EVAL_REPORT` 两张表都**缺** `APPROVE_STATE / RECORD_USER / RECORD_TIME` 三列（实体 extends BaseApprovalDO，但 V2.6.2-20261027-004.sql 建表漏了；区域维度那张表是对的）→ 报 `无效的列名[APPROVE_STATE]`。我已新增 changelog `V2.6.2-20261031-001.sql` 并应用到测试库（12 条 ALTER 全成功）。」「结果：`POST /v2.0/evaluation/reportPrepare` 现在返回 `{\"code\":200,\"data\":...}`，detail 可查。」",
+      "files": [
+        "zhi2-web-admin/src/views/evaluation/stdEvaluation/report/detail.vue",
+        "docs/std-evaluation/api-map-report.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["b1c0919f-1d59-4d84-b098-af6f3b182d48"],
+      "bundle": "107.md"
+    },
+    {
+      "title": "接口入参数量以源码签名为准：areaReport 的 publish 有第二个参数，凭直觉调用会缺参",
+      "type": "bug",
+      "content": "【什么情况】区域报告链路（`areaReportPrepare`：`complex/page` 取小区 → add → submit → approval → generate → publish → `/areaReport` 查询）里，`publish` 接口**可能带额外参数**——源码里 areaReport 的 publish 就有第二个参数。只按接口文档或第一个链路的用法调用会缺参。\n【为什么】同一族业务（普通报告 vs 区域报告）虽然路径相似（`/v2.0/evaluation/...`），但**方法签名不一定对称**：区域维度多一个维度参数（区域编码之类）。按「另一个链路的 publish 长什么样」去调，必然缺参；而缺参的表现往往不是签名不匹配，而是后端按「未指定区域」处理、数据落到错误分区或直接报参数为空。\n【怎么做】① 凡是调用 publish / generate / submit 这类**有副作用的接口**，先读后端 controller 方法签名确认参数个数与类型，不要凭接口文档或姊妹链路推断；② 对照源码逐个列参数（本次：`publish/{reportPrepareId}` 之外的第二个参数必须按 `StdEvalReportPrepareController` / 区域版 controller 的签名传）；③ 主键字段名分清：编制是 `reportPrepareId`，报告是 `reportId`，**区域编制同样是 `reportPrepareId`**；④ 调用后必须回查列表/详情确认数据落在预期维度，不只看接口返回 200；⑤ 把每个接口的签名差异记进 `docs/std-evaluation/api-map.md` 的「不符清单」，供后续用例复用。",
+      "evidence": "会话 b1c0919f-1d59-4d84-b098-af6f3b182d48（基线 05caac8）用户诉求 2「Team message from lead」第 3/4/5 条：「数据链路：外部小区/企业主数据 → 物业服务等级（提交+审批=已备案）→ 检查记录（提交+审批；审批通过自动生成整改通知书）→ 报告编制（按小区推导参与企业 → 提交 → 审批 → `generate/{reportPrepareId}` 生成企业报告 → `publish/{reportPrepareId}`）→ `/report` 查询；区域分支：`areaReportPrepare`（`complex/page` 取小区 → add → submit → approval → generate → publish）→ `/areaReport` 查询。」「主键字段名：`reportPrepareId`（编制）、`reportId`（报告）；区域编制同样是 `reportPrepareId`。」「`publish` 接口可能带额外参数（源码里 areaReport 的 publish 有第二个参数），务必按源码签名传。」",
+      "files": [
+        "e2e/std-evaluation/cases/06-report-prepare-flow.cjs",
+        "e2e/std-evaluation/cases/07-area-report-flow.cjs",
+        "docs/std-evaluation/api-map-report.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["b1c0919f-1d59-4d84-b098-af6f3b182d48"],
+      "bundle": "107.md"
+    },
+    {
+      "title": "后端缺陷阻塞用例时改用「不写库的断言」：断言错误码+文案+数据量不变，而不是造数据硬闯",
+      "type": "workflow",
+      "content": "【什么情况】报告编制的 `generate` 步骤因为后端缺陷 D7（企业列表恒空）走不通，报「尚未关联参与评价企业」。此时没有去伪造企业数据绕过去，而是把这一步改成**受阻断言**：断言 `code != 200` 且 msg 含「尚未关联参与评价企业」，再断言**报告总数前后不变**——全程未写库造数据。\n【为什么】为了让用例通过而造数据绕过后端缺陷，等于把真缺陷掩盖成「用例绿了」，后面的人以为这条链路可用。但直接跳过又丢失信息。正确做法是把它表达为**一条明确的负向断言**：既记录了当前真实行为（错误码 + 文案），又记录了「没有产生副作用」（数据量不变），还把缺陷用文档编号（D7）挂出去。\n【怎么做】① 用例分段设计：可跑通的段写「A 段」（全绿断言），被阻塞的段写「B 段」（受阻断言）；② 受阻断言三件套：**错误码不等 200** + **错误文案包含关键短语** + **副作用指标前后不变**（本次用「报告总数前后不变」）；③ 受阻段不写库、不造数据；④ 缺陷用编号（D7/R-01~R-04）写进 `docs/std-evaluation/api-map-report.md`，并说明「当前环境无法验证修复」；⑤ 用例整体仍要 exit 0（受阻断言本身是预期内通过），但**报告里必须列出受阻段与缺陷编号**，不能只报「17 步全绿」；⑥ 阻塞期间**不要发起会写库的用例**（本次后端重启窗口 20–40s，期间请求会失败），等明确通知再继续。",
+      "evidence": "会话 b1c0919f-1d59-4d84-b098-af6f3b182d48（基线 05caac8）最终结论「06 的关键设计（按 Lead 的 A/B 口径）」：「**A 段 15 步全绿**：flowConfig 只读校验 → 新增 → 详情（`companyCount=0` 显式断言并 note D7）→ 四条件分页 → 改名改周期 → 带 `complexIds` 修改 → submit(`deptId:1`) → flowViewer 取待办 `key` → approval → 已备案不可删（500 +「不允许删除」）→ 已备案可编辑 → 删除待提交单据 → 负向校验（缺名 `1101`）。**B 段 2 步受阻断言**：`generate` 断言 `code!=200` 且 msg 含「尚未关联参与评价企业」，再断言报告总数前后不变——未写库造数据。」并记录交付物 `06-report-prepare-flow.cjs` **PASS 17 步 / 0 失败 / 8.2s / exit 0**、`07-area-report-flow.cjs` **PASS 18 步 / 0 失败 / 8.8s / exit 0**；用户诉求 3 还写明「请在我下一条消息（『后端已重启』）之前不要发起会写库的用例……重启窗口约 20–40s」。",
+      "files": [
+        "e2e/std-evaluation/cases/06-report-prepare-flow.cjs",
+        "e2e/std-evaluation/cases/07-area-report-flow.cjs",
+        "docs/std-evaluation/api-map-report.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["b1c0919f-1d59-4d84-b098-af6f3b182d48"],
+      "bundle": "107.md"
+    },
+    {
+      "title": "E2E 造的数据统一加业务前缀命名，已备案删不掉的用 DB 按前缀批量清理",
+      "type": "workflow",
+      "content": "【什么情况】跑完报告编制/区域报告 E2E 后，库里留下两条**接口删不掉**的已备案数据（业务状态已备案的记录不允许删）：`报告编制E2E1031104628改`（主键 2116361154115497985）、`区域报告E2E1031104816`（主键 2116361603476451330），都带 `E2E` 前缀待 DB 清理。\n【为什么】已备案单据在业务上不可删除（本次 E2E 断言过「已备案不可删 → 500 +『不允许删除』」），所以**接口层的清理路径对它们无效**。如果造数据时用随机名/真实业务名，后续既认不出是测试数据、又不敢删，库里会持续积累脏数据。统一前缀 + 记录主键，是唯一能让清理可执行的做法。\n【怎么做】① 造数据时**强制加统一前缀**（如 `E2E` + 时间戳 + 模块名，如 `报告编制E2E1031104628改`），让所有测试数据一眼可辨、可按前缀批量筛；② 交付时列出**残留数据的名称 + 主键 + 原因**（本次列出两个 id），不能只说「有残留」；③ 清理走 DB 直删（mcp_gateway 的 dbx 工具），因为接口删不掉；④ 用例结束前把**可删的待提交数据**在用例里删干净（本次就断言了「删除待提交单据」），只把业务上不可删的留待人工/DB 清理；⑤ 临时探针脚本（如 `tools/probe-local-backend.cjs`）用完即删，不要留在仓库里当噪声。",
+      "evidence": "会话 b1c0919f-1d59-4d84-b098-af6f3b182d48（基线 05caac8）最终结论：「残留已备案数据（接口不可删）：`报告编制E2E1031104628改`(2116361154115497985)、`区域报告E2E1031104816`(2116361603476451330)，均带 E2E 前缀待 DB 清理。」「产物 `report.json`：06 `ok=true pass=17 fail=0`，07 `ok=true pass=18 fail=0`。临时探针 `tools/probe-local-backend.cjs` 已删除。」；A 段断言中含「已备案不可删（500 +「不允许删除」）→ 已备案可编辑 → 删除待提交单据」。",
+      "files": [
+        "e2e/std-evaluation/cases/06-report-prepare-flow.cjs",
+        "e2e/std-evaluation/cases/07-area-report-flow.cjs"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["b1c0919f-1d59-4d84-b098-af6f3b182d48"],
+      "bundle": "107.md"
+    },
+    {
+      "title": "禅道 biz 版 task 的 pri/deadline 不在 edit 表单里：用 f=edit 补字段会把它们冲成空/0/NULL",
+      "type": "bug",
+      "content": "【什么情况】对禅道任务 #2146 执行 `start` 动作时，因为**没传 `assignedTo`**，指派人被清空，于是想用 `f=edit` 表单把指派人补回去。结果 `f=edit` 表单**对 `pri` / `deadline` / `status` 是丢失式渲染**（表单里根本没有 pri/deadline 控件），POST 之后把这三项冲成了空/0/NULL；`desc` 本就为空、name 未受损。最终用 `dbx_execute_batch` 精准 UPDATE 复原（#2146 恢复 doing / pri=2 / deadline；#1976 补 tiany），逐字段核对与未受损的 #1976 基线一致。\n【为什么】禅道的 `f=edit` 是**表单渲染型**接口：它只渲染表单里存在的控件，提交时也就只带这些控件，缺控件的字段被当成「没传」→ 写成空值。所以「用 edit 表单修一个字段」实际是「用 edit 表单重写整条记录」。这与 REST 式的 PATCH 语义完全不同。\n【怎么做】① **绝不把 `f=edit` 当 PATCH 用**——修单个字段一律走 DB 精准 UPDATE（`dbx_execute_batch`）或禅道对应的专用接口；② 用 edit 前先确认目标字段**在表单里存在**，不在就别用；③ `start` 动作**必须带 `assignedTo`**，否则会清空指派人；④ 改完逐字段核对（status / pri / deadline / assignedTo / name / desc），并与未受损的另一条记录基线对照；⑤ 状态回写优先走标准动作接口（如 `start`），这样 `zt_action` 里会留 `started` 审计记录（本次 #2146 & #1976 均置 `doing`，assignedTo=tiany，pri=2，deadline=2026-10-30，audit `started` records present）。",
+      "evidence": "会话 session-4208fc64-80b9-409d-8aad-a50126748229（基线 c35a24a）最终结论「过程中的坑 & 根因（RCA）」：「禅道 `start` 动作因我未传 `assignedTo`，清空了指派人 → 触发我去用 `f=edit` 表单补指派人；而 `f=edit` 表单**对 `pri`/`deadline`/`status` 是丢失式渲染**（表单里根本没有 pri/deadline 控件），POST 后把 #2146 的这三项冲成了空/0/NULL。`desc` 本就为空、name 未损。最终用 `dbx_execute_batch` 精准 UPDATE 复原（#2146 恢复 doing/pri=2/deadline；#1976 补 tiany），逐字段核对与未受损的 #1976 基线一致。**教训：Zentao biz 版 task 的 pri/deadline 不在 edit 表单，绝不应用 edit 表单做字段修补。**」",
+      "files": [],
+      "baseline": "c35a24a",
+      "sessionIds": ["session-4208fc64-80b9-409d-8aad-a50126748229"],
+      "bundle": "107.md"
+    },
+    {
+      "title": "PowerShell 里 git push 显示 exit code 1 可能是 stderr 被当成错误：以 ahead=0/behind=0 与远端 ref 更新为准",
+      "type": "fact",
+      "content": "【什么情况】两次 `git push` 都显示 `exit code: 1`，第一反应是推送失败。实际推送均成功——**PowerShell 把 git 写入 stderr 的进度信息 / redirect 提示当成了错误**（例如远端做了 redirect 时 git 会输出提示信息到 stderr）。最终证据是 `ahead=0 behind=0` 与远端 ref 更新记录。\n【为什么】在 PowerShell / CI 里，外部命令只要往 stderr 写任何内容（进度条、提示、警告），包装层就可能把它计成非零退出码。git 的正常输出（尤其是 `Receiving objects` / `remote: redirecting to …`）恰好走 stderr，于是「成功」被误报为「失败」。反过来，真正的失败（比如认证失败）也会写 stderr——所以**不能只信退出码，也不能只信 stderr 有没有内容**。\n【怎么做】① 判定 push 是否成功，用**仓库状态**而不是退出码：`git status -sb` 看 `ahead=0 behind=0`，或 `git log origin/<branch>..HEAD` 为空；② 辅助证据：远端 ref 更新记录（`f6de19ef5..6a5960bab` 这样的区间表示远端已前进）；③ 看到 exit code 1 先看 stderr 内容是不是「进度/redirect 提示」，是则按成功处理；④ 真失败仍会表现为 ref 未更新，两者结合判断；⑤ 交付说明里把这层口径写清，避免下一个执行者重复踩坑误报。",
+      "evidence": "会话 session-a80585ad-f4f6-47a5-982d-91ec43234a02（基线 5d68a74）最终结论「两点说明」第 2 条：「**命令显示 `[exit code: 1]`**：两次 `git push` 都显示 exit code 1，这是 PowerShell 把 git 写入 stderr 的进度/redirect 提示当成了错误，实际推送均成功 —— 上方 `ahead=0 behind=0` 与远端 ref 更新记录可佐证。」；同段还记录「父仓库 → `5ea5402..4826471` → `zhi2-web-admin-h5-g-unlimited`（远端做了 redirect，git 已自动跟随）」。",
+      "files": [],
+      "baseline": "5d68a74",
+      "sessionIds": ["session-a80585ad-f4f6-47a5-982d-91ec43234a02"],
+      "bundle": "107.md"
+    },
+    {
+      "title": "后端字段尚未契约化时前端做多别名容错：signatureUrl 主用，signUrl/promoterSign/initiatorSignature 兜底",
+      "type": "pattern",
+      "content": "【什么情况】C 端「业主倡议签字环节」要往提交体里带签名，但后端字段名**还没定**（后端任务 #2145 / #1977 仍 wait）。前端采取的做法是：主用 `signatureUrl`，同时兼容 `signUrl` / `promoterSign` / `initiatorSignature` 多个别名，并把这条「后端定字段后可能需要收敛」写成明确遗留风险。\n【为什么】后端未就绪时，前端要么等（阻塞联调）要么硬编码一个猜的字段名（猜错就是静默丢签名）。多别名容错让**当前链路先跑通**，同时把不确定性显式记录，避免将来无人记得要收敛、越堆越乱。\n【怎么做】① 明确**主字段名**（`signatureUrl`）作为首选，其余是兜底别名，读取时按优先级依次尝试；② 别名列表只放在一处常量里，不要散落在多个页面各写一遍；③ 提交侧用主字段，回显侧用同一套取值函数；④ **必须写明遗留风险**：「待后端定字段后可能需要收敛」，并关联后端任务号（#2145/#1977）；⑤ 后端定稿后回头删掉多余别名，别让兼容层永久留存；⑥ 同一需求若要覆盖多个分支（本次 C 端三支：main-v2.1-mp / sfb(父 dev-sfb) / main-v2.1），改动形态要一致：每支的 `propose/form.vue` 的 `submit()` 补 `signatureUrl: voteStore.signUrl` 携带签名，`propose/detail.vue` 新增「发起人签字」卡片回显，并**分别提交子模块与父仓 gitlink**。",
+      "evidence": "会话 session-4208fc64-80b9-409d-8aad-a50126748229（基线 c35a24a）最终结论「剩余风险（明示）」：「C端签字后端字段名尚未契约化（后端 #2145/#1977 仍 `wait`），前端已做多别名容错（`signatureUrl` 主 / `signUrl` / `promoterSign` / `initiatorSignature`），待后端定字段后可能需要收敛。」；并在「C端 #1976 三个分支全补全『签字环节』完整功能」中列出每支的 `propose/form.vue` 的 `submit()` 补 `signatureUrl: voteStore.signUrl` 携带签名、`propose/detail.vue` 新增「发起人签字」卡片回显，及三分支两级提交号（main-v2.1-mp 子 `7b6c2017`/父 `eef287f`；sfb 父 dev-sfb 子 `7a302eb8`/父 `e6e6d31`；main-v2.1 子 `8adcc4ff`/父 `190dd38`）。",
+      "files": [
+        "zhi2-web-admin/src/views/autonomy/suggest/components/ResponseTable.vue",
+        "zhi2-web-admin/src/views/autonomy/suggest/components/ResponseDialog.vue",
+        "zhi2-web-admin/src/views/autonomy/suggest/detail.vue"
+      ],
+      "baseline": "c35a24a",
+      "sessionIds": ["session-4208fc64-80b9-409d-8aad-a50126748229"],
+      "bundle": "107.md"
+    }
+  ]
+}

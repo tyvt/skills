@@ -1,0 +1,148 @@
+{
+ "project": "惠山二期G",
+ "batch": 2,
+ "files": [
+  "005.md",
+  "006.md",
+  "007.md",
+  "008.md"
+ ],
+ "count": 8,
+ "memories": [
+  {
+   "title": "C 端附件 JSON 字符串 \"[]\" 被当有效 URL 显示为可点链接",
+   "type": "bug",
+   "content": "报修/踏勘等详情里无附件却出现蓝色「[]」链接、点击请求 `/%22[]%22` 的根因：后端（尤其 C 端写入）把附件以 **JSON 字符串**返回，空附件为字面量 `\"[]\"`。页面若只做 `split(',')` 或把非数组当单条 URL，会把 `\"[]\"`/`\"null\"` 当成一条有效路径。\n\n可复用修复：抽 `utils/attachments.js` 的 `normalizeAttachmentList`，统一兼容 JSON 字符串、逗号分隔串、数组、对象数组（取 url/path 字段），并过滤 `\"[]\"`、`\"null\"`、空白；无有效项时详情展示 `-`。\n\n连带加固：`DetailTemplate` 的 `type:'image'` 要丢弃无效 URL；`type:'images'` 必须先归一化成数组再 `v-for`，否则对字符串迭代会按**字符**吐出破损缩略图；`ImageUpload` 监听值时也要解析 JSON 字符串，避免编辑态出现 `\"[]\"` 假图。\n\n与「逗号分隔 attachments + resolveServerAssetUrl」套路互补：先判形态再拆路径，不要默认只有一种序列化格式。",
+   "evidence": "「无附件时是 `\"[]\"`。normalizeAttachments 只按逗号分割，`\"[]\"` 被当成一个文件名/URL 为 `\"[]\"` 的附件」「type:'images' 改为归一化后渲染（原先对字符串 v-for 会按字符逐出破损图）」「边界单测：17/17 通过（`\"[]\"`、`'[\"a.png\"]'`、逗号串、对象数组、null 等）」",
+   "files": [
+    "zhi2-web-admin/src/utils/attachments.js",
+    "zhi2-web-admin/src/views/maintenance/repair/detail.vue",
+    "zhi2-web-admin/src/views/maintenance/repair/components/repairDtlDialog.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/components/ImageUpload/index.vue"
+   ],
+   "baseline": "d52a061",
+   "sessionIds": [
+    "2e3e3715-17fd-4cbd-ac98-5ebaa291c503"
+   ],
+   "bundle": "005.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "小区台账空置广告位弹窗：不能因无 revenueContractId 跳过备案详情",
+   "type": "bug",
+   "content": "统计地图/小区台账点空置广告位无图，常见误判是「没有 `revenueContractId` 就不请求」。空置条目往往只有台账主键（`detailId` / `resourcesId` / `advertiseSpaceDetailId`），备案附件在 `GET /benefit/pubAdvertiseSpaceDetail/{id}` 的 `attachments` 里。\n\n套路：打开弹窗**并行**拉台账详情与合同详情——台账失败仍可尝试合同；合同未成功时不要整页切租赁字段导致基础信息全是 `-`。图片侧与经营用房一致：逗号拆 `attachments` + `resolveServerAssetUrl`，无附件再回退 `picUrl` 等；`revenueContractResourcesId` 同时从列表行与明细 `form` 取值。\n\n若接口有数据仍无图，核对列表 `resourcesId` 是否等于后端 `advertiseSpaceDetailId`（映射问题需接口补字段）。",
+   "evidence": "「去掉无 revenueContractId 就不请求的逻辑」「打开弹窗时用 detailId / resourcesId 调用 getPubAdvertiseSpaceDetail」「台账与合同接口分开请求，台账失败仍可尝试拉合同」「仅合同接口成功后才切换为租赁字段」",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/components/AdvertiseAssetDialog.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/operatingAssets.vue"
+   ],
+   "baseline": "289cc30",
+   "sessionIds": [
+    "5a741fb2-5020-4358-a55c-ed838e2739cc"
+   ],
+   "bundle": "005.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "列表 link 跳详情：主键字段、路由语义与 getRouterPathByFilePath 要三处对齐",
+   "type": "workflow",
+   "content": "给统计/列表列加 `zs-table-column` link 跳转时，除引入 `getRouterPathByFilePath` 外还要核对三件事，否则列可点但恒报「参数异常」或 404：\n\n1. **主键回退**：页面 `primaryKey` 若是 `complexId`，点击处理要用 `row?.projectId || row?.complexId`（或反向），不能只认一个字段名。\n2. **路由语义**：列展示「物业管理区域/complexName」时，跳转目标可能是 `property/complex/detail` 而非 `building/project/detail`；两套主键不是同一实体时禁止混用。\n3. **权限与合法性**：`getRouterPathByFilePath` 无菜单会 `msgError` 并 `throw`，`router.push` 外层要 try/catch；主键用 `isNavigableDataId` 拦截空串、`add` 等非法段。\n\n对照同仓库已落地的 `pubBankAccountInfo` 等页抄模式，不要只改模板不改 id 来源。",
+   "evidence": "「primaryKey 为 complexId，若列表接口只带 complexId 不带 projectId，点击只会提示参数异常」「列展示 complexName，使用 building/project/detail」「getRouterPathByFilePath 在无菜单权限时会 msgError 并 throw」「Fix: isNavigableDataId」",
+   "files": [
+    "zhi2-web-admin/src/views/property/userStatistics/index.vue",
+    "zhi2-web-admin/src/utils/ruoyi.js"
+   ],
+   "baseline": "289cc30",
+   "sessionIds": [
+    "434fe31b-709a-4ab2-b00a-310a247d5d86"
+   ],
+   "bundle": "005.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "表决明细建筑面积列：固定列宽并显式居中以压过 amountFormatter 右对齐",
+   "type": "pattern",
+   "content": "业主自治各模块 `DecisionRangeTable` 里「建筑面积(㎡)」被拉得过宽，且 `amountFormatter` 会让金额/面积列默认右对齐。需要表头与单元格居中时，不能只改 `align` 一处或指望弹性列宽：对该列设 **固定 `width`（如 130，表头挤可改 140）**，并同时设 `align` 与 `headerAlign: 'center'`。\n\n一般/议题/多选/维修表决及业委会选举等多份 `DecisionRangeTable`/`DecisionDetailTable` 需同步改；「选择户室」子弹窗内的 `buildArea` 列可保持右对齐不动。",
+   "evidence": "「建筑面积(㎡)」列统一为固定宽度 130px、表头与单元格居中」「width: 130：列不再参与弹性拉伸」「align / headerAlign: 'center'：覆盖 amountFormatter 带来的默认右对齐」",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/general/components/DecisionRangeTable.vue",
+    "zhi2-web-admin/src/views/autonomy/option/components/DecisionRangeTable.vue",
+    "zhi2-web-admin/src/views/autonomy/multiply/components/DecisionRangeTable.vue",
+    "zhi2-web-admin/src/views/autonomy/repair/components/DecisionRangeTable.vue"
+   ],
+   "baseline": "b6d054d",
+   "sessionIds": [
+    "c7c8aad3-9140-4aaf-b908-9e7f763dc5a3"
+   ],
+   "bundle": "005.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "房屋变更对接可选新字段 houseNum：双表单 + 变更对比，非必填靠 rules 白名单",
+   "type": "workflow",
+   "content": "后端新增**可选**字符串字段（如不动产房屋编码 `houseNum`，复用库列 `HOUSE_NUM`）时，前端交付 checklist：`form`/`formOld`（变更页）/`contentInfo` 只读区同步加项；变更详情用与 `unitCode` 一致的 `v-tooltip` 对比；列表补列 `prop: 'houseNum'`。\n\n同步放宽校验时，不要假设「没写 required 就是非必填」——在 `houseChange/detail.vue` 的 `rules` 里**显式核对**仅保留业务仍必填项（项目/楼幢/单元/房号/物理层/名义层/用途/实测面积等），起始层/终止层/结构/规划用途/房屋性质/交付类型/`houseNum` 等勿误加 `required`。变更页可对绑房风险加 `form-tip` 文案（灵锡通等），详情编辑态是否需要同款提示单独确认。",
+   "evidence": "「新增字段全部可选，不传不报错」「form / formOld 增加 houseNum，表单项带变更对比 v-tooltip」「已核对 rules：未对 floorStart、houseNum 等加 required」「方案 B：灰色 form-tip 灵锡通绑房风险提示」",
+   "files": [
+    "zhi2-web-admin/src/views/building/house/detail.vue",
+    "zhi2-web-admin/src/views/building/houseChange/detail.vue",
+    "zhi2-web-admin/src/views/building/houseChange/index.vue"
+   ],
+   "baseline": "adccd7e",
+   "sessionIds": [
+    "529b867b-1637-4025-9de4-fa798457ace6"
+   ],
+   "bundle": "005.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "小区台账 statisticsMap 街道气泡与小区点混显的完整修复套路",
+   "type": "bug",
+   "content": "benefit/statisticsMap（小区台账地图）在缩放或下钻时偶发「街道气泡」与「小区点」同时显示，或快速滚轮后标记叠加残留。根因是异步层级切换竞态 + 地图组件未追踪全部 overlay + 标记签名过粗导致未重绘。\n\n父页 index.vue 侧：\n- 用 areaLayerLoadSeq（或同类请求序号）丢弃过期的区域层加载结果。\n- 缩放事件 200ms 防抖，拆 handleMapZoomChange / processMapZoomChange。\n- 层级切换时立即清空 markList，并同步 markListLayerLevel，与「先清空再请求」约定一致（慢接口下避免旧层级名称画在新层级圆圈里）。\n- loadAreaComplexLayer 支持 restoreOnFail，失败回退父级视野。\n- 下钻前清空 markList；用 resolveOverviewLayerLevel 替代硬编码 'district'。\n\n子组件 map.vue 侧：\n- markerRenderSig 改为全列表内容签名，列表变化必触发重绘。\n- _overlayLayers 追踪所有图层，clearMarkers 统一 destroy。\n- _markerRedrawSeq：markList 为空时立即清图层，避免残留。\n\n从其他分支（如 2.6.2-suzhufang）迁移时，须保留目标分支已有地图行为修复（如 setProgrammaticView 同 zoom 微调、搜索后 $nextTick 再设 markList、syncMapView 的 zoomUnchanged + panTo），避免回归。\n\n回归：街道↔小区反复缩放不混显；下钻过渡旧气泡消失；快速滚轮无叠加；搜索定位仍正常。",
+   "evidence": "「小区台账，地图有时候即显示了小区又显示了街道。这个问题子模块2.6.2-suzhufang分支修复过，迁移过来」「新增 areaLayerLoadSeq，防止异步请求竞态」「markerRenderSig 改为全列表签名」「markList 为空时立即清图层，避免残留」「已保留的惠山修复 setProgrammaticView…bug 3619」「syncMapView 的 zoomUnchanged + panTo（bug 2966）」",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/index.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue"
+   ],
+   "baseline": "341682e",
+   "sessionIds": [
+    "73211399-9c08-4ecc-af7f-b78cecabbc2e"
+   ],
+   "bundle": "007.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "一般表决列表「业务类型」空白：列表字典过滤与详情页不一致",
+   "type": "bug",
+   "content": "业主自治 → 一般表决：详情可选 decisionBusinessType='0'（维修资金使用表决），列表同一列却显示空白，而「其他表决」正常。\n\n根因：列表页 initDict 把 dictValue '0'（及原逻辑里的 '2'）从 decisionBusinessTypeOptions 过滤掉，自定义 formatter 只能在过滤后的 options 里找 label，找不到就空；详情页未排除 '0'，数据合法但列表展示断层。\n\n修复：\n- 列表列改为与同模块一致的 type: 'dict'，字典码 decision_business_type，走完整字典而非过滤后的 options。\n- 搜索区 initDict 过滤条件与详情对齐（本会话：仅排除 '2'，保留 '0' 可筛）。\n\n推广：任意「详情可选、列表 formatter 依赖局部 options」的字典字段，都要核对列表/搜索/详情三处字典子集一致；列表优先 type:'dict'，避免手写 formatter + 局部 options 组合。",
+   "evidence": "「一般表决，详情页选择了业务类型，但列表页不展示」「详情页允许选择 decisionBusinessType='0'…列表页原先把 '0' 从字典选项中过滤掉了，导致 formatter 找不到对应 label」「将列从自定义 formatter 改为 type: 'dict'…decision_business_type」「initDict 过滤条件从排除 ['0','2'] 改为仅排除 ['2']」",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/general/index.vue",
+    "zhi2-web-admin/src/views/autonomy/general/detail.vue"
+   ],
+   "baseline": "bda09e5",
+   "sessionIds": [
+    "24864aca-3eff-4a2b-8d94-e4ce7b40b21d"
+   ],
+   "bundle": "007.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "DetailTemplate 字段标签说明 labelTooltip 与可选金额校验",
+   "type": "pattern",
+   "content": "维保竣工等详情页新增带说明的可选金额字段时的标准做法（Vue2 + Element UI + detailMixins）：\n\n1. 公共组件 detail-template.vue 增加 labelTooltip：有文案时在标签旁渲染问号图标（建议 tabindex=\"0\" 以改善键盘可达性）。\n\n2. 编辑态：el-form-item 的 slot=\"label\" 内用 el-tooltip 包图标，文案放 content（勿 v-html）。\n\n3. 查看态：contentInfo 对应项配置 labelTooltip（可与编辑态共用 computed 文案），type:'amount' + unit:'元'，与表单顺序一致；若编辑态某字段有说明而查看态没有，属于产品一致性缺口，按需补 labelTooltip。\n\n4. 可选金额校验：rules 用自定义 validator，空值直接 callback()；非空用 this.patterns.moneyValidator（Vue.prototype.patterns），value 用 String() 适配数字型 v-model；trigger 可 blur，validateForm 仍会全表校验。\n\n5. 数据流：form 初始字段、setProjectItem 回填、getForm() 提交、detailCallback 全量合并均需覆盖新字段，避免详情有值提交丢失。\n\n与既有规范一致：金额单位写在值侧（type:'amount'），字典列用 type:'dict' 而非 computed dictLabel。",
+   "evidence": "「added offlineCheckFeeAmount field with el-tooltip on label, contentInfo with labelTooltip」「detail-template.vue - added labelTooltip support」「空值放行；非空用 this.patterns.moneyValidator」「form 初始字段、setProjectItem 回填、getForm() 提交、detailCallback 合并详情均覆盖 offlineCheckFeeAmount」",
+   "files": [
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/views/maintenance/completion/detail.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "baseline": "adccd7e",
+   "sessionIds": [
+    "97600e84-221e-42da-9b58-296b41c98b5f"
+   ],
+   "bundle": "007.md",
+   "project": "惠山二期G"
+  }
+ ]
+}

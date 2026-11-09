@@ -1,0 +1,98 @@
+{
+ "project": "bugfix",
+ "batch": "003",
+ "files": [
+  "003.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "vue.js:3732 TypeError: Can",
+   "type": "preference",
+   "content": "## 原因说明 报错 **`Cannot read properties of undefined (reading 'label')`** 来自对 **`undefined` 访问 `.label`**。 堆栈里指向 `businessItemTable.vue`，是因为表格列是在该页面里用的；真正出错的是公共组件 **`zs-table-column.vue`** 里表头渲染逻辑：在 `getHeader` / `computedWidth` 中直接用了 `row.column.label`。在部分渲染时机或 Element 表头 slot 的 `scope` 下，**`row.column` 可能暂时为 `undefined`**，就会触发上述错误。 ## 修改说明 在 **`zs-table-column.vue`** 中做了防护： 1. **`getHeader`**：改为 `row?.column?.label ?? ''`，避免在 `column` 缺失时抛错。 2. **`computedWidth`**：先取 `const label = row?.column?.label`，没有 `label` 则直接 `return`，再按原逻辑算 `minWidth` / `width`。 这样在所有使用 `zs-table-column` 的列表里都会更稳，不仅限于 `",
+   "evidence": "extracted source=cursor project=bugfix",
+   "files": [
+    "`businessItemTable.vue",
+    "**`zs-table-column.vue",
+    "vue.js",
+    "(businessItemTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4bab2422-f3d5-47d6-ac5c-bc239d948ba1"
+   ],
+   "_draft": true,
+   "project": "bugfix"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Pr",
+   "type": "fact",
+   "content": "## 原因 `detail.vue` 里 `zs-table` 绑定了 `:summary-method=\"showMethod\"` 和 `:show-summary=\"showSummary\"`，这和列表页写法一致；列表页通过 **`listMixins` → `table.js`** 提供了这两个成员（`showSummary: false`、空的 `showMethod`），而 **`PlanDetail` 只用了 `detailMixins`，没有这些定义**，渲染时就会报未定义。 ## 修改 在 `data` 里增加 `showSummary: false`（本页套餐事项表不需要合计行），在 `methods` 里增加与 `table.js` 相同的空实现 `showMethod({ columns, data }) {}`。 这样警告会消失；若以后要在查看模式显示表格合计，把 `showSummary` 改为 `true` 并实现 `showMethod` 的汇总逻辑即可。 Good. Summarize for the user in Chinese.",
+   "evidence": "extracted source=cursor project=bugfix",
+   "files": [
+    "`detail.vue",
+    "`table.js",
+    "vue.js",
+    "https://v2.vuejs.org/v2/guide/reactivity.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f6fa84f3-a7b5-454e-a756-e51303a42d72"
+   ],
+   "_draft": true,
+   "project": "bugfix"
+  },
+  {
+   "title": "TypeError: Cannot read pro",
+   "type": "preference",
+   "content": "## 原因 `threeData` 初始值是空数组 `[]`，接口返回前 `threeData[0]` / `threeData[1]` 都是 `undefined`。模板里写了 `threeData[threeDataIndex].companyNames`，会在 `undefined` 上读 `companyNames`，从而报错。 堆栈里的 `index.vue:789` 多半是编译后行号，对应的是模板里这段对 `companyNames` 的访问。 ## 修改 1. **`v-if`**：改为 `threeData[threeDataIndex]?.companyNames?.length`，在元素不存在时安全短路，不抛错。 2. **`:dataList`**：改为 `threeData[threeDataIndex]?.companyNames || []`，避免在未就绪时把 `undefined` 传给子组件。 这样在数据未加载或只有部分项时，会显示 `el-empty`，而不会再出现 `Cannot read properties of undefined (reading 'companyNames')`。 No new errors from our change - those are pre-existing. The fix is complete. I'",
+   "evidence": "extracted source=cursor project=bugfix",
+   "files": [
+    "`index.vue",
+    "(index.vue",
+    "(vue.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "57ee5fc8-b902-4632-8d17-f084cf9e6c5d"
+   ],
+   "_draft": true,
+   "project": "bugfix"
+  },
+  {
+   "title": "[Vue warn]: Invalid prop: ",
+   "type": "bug",
+   "content": "原因已经对上：在模板里写 `stroke-width=\"10\"` 时，Vue 会把属性当成**字符串** `\"10\"` 传给组件，而 `ElProgress` 的 `strokeWidth` 要求的是 **Number**。 **修改：** 改成动态绑定数字： ```vue :stroke-width=\"10\" ``` 这样会传入数值 `10`，警告就会消失。 --- 顺带一提：`num` 的 `default: '7'` 也是字符串，若该 prop 声明为 `Number`，以后也可能触发类型告警；需要的话可以改成 `default: 7`。本次只按你的报错修了 `stroke-width`。 Good. The fix is complete. I'll summarize for the user in Chinese.",
+   "evidence": "extracted source=cursor project=bugfix",
+   "files": [
+    "packages/progress/src/progress.vue",
+    "D:/repository/bugfix/zhi2-web-admin/src/views/property/largeScreen/components/componentRanking.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "393829c3-3762-46f2-b7fa-330b64408e2a"
+   ],
+   "_draft": true,
+   "project": "bugfix"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Er",
+   "type": "bug",
+   "content": "## 原因 `DictTag` 里用 `this.options.find(...)` 解析字典标签（见 `getLabel` / `getTagType`）。 在 `ArchiveDetailDialog.vue` 的 `contentInfo` 里，“状态”这一项写的是 **`this.dirStateOptions`**，而 `data` 里实际只有 **`fileDirStateOptions`**，没有 `dirStateOptions`。 因此 `options` 一直是 `undefined`，一进入详情视图模式就会触发 `Cannot read properties of undefined (reading 'find')`。 ## 修改 把“状态”的 `options` 改成与 `data` 一致： ```172:173:d:\\repository\\bugfix\\zhi2-web-admin\\src\\views\\tool\\archives\\components\\ArchiveDetailDialog.vue type: 'tag', options: this.fileDirStateOptions ``` 这样在 `initDict()` 里通过 `getDicts('IS_START')` 赋给 `fileDirStateOptions` 后，详情里的状态标",
+   "evidence": "extracted source=cursor project=bugfix",
+   "files": [
+    "`ArchiveDetailDialog.vue",
+    "```172:173:d:\\repository\\bugfix\\zhi2-web-admin\\src\\views\\tool\\archives\\components\\ArchiveDetailDialog.vue",
+    "`dict-tag.vue",
+    "vue.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c7437440-9b9d-4339-9758-66a24e4c7ff7"
+   ],
+   "_draft": true,
+   "project": "bugfix"
+  }
+ ],
+ "_draft": true
+}

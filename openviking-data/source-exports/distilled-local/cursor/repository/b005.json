@@ -1,0 +1,123 @@
+{
+ "project": "repository",
+ "batch": "005",
+ "files": [
+  "005.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "按照这个配比调整",
+   "type": "bug",
+   "content": "已移除 `豆粕ETF(159985)`，并且是“彻底移除”： - 从 `savedTargetAllocation` 删除 `159985` - 从 `allEtfCodes` 删除 `159985` - 从 `etfNameMap` 删除 `159985: 豆粕ETF` - 从 `DEVIATION_THRESHOLD_MAP` 删除 `159985` 阈值配置 这样页面后续不会再拉取它的行情、也不会在持仓/再平衡里显示。 已检查 `index.html`，无 linter 报错。",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`index.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7df4151d-0bd9-481e-9050-c6497d096212"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "加两笔交易流水",
+   "type": "bug",
+   "content": "已新增 1 笔流水到 `index.html`： - `id: 24` - 日期：`2026-03-04` - 代码/名称：`513880` `日经225` - 方向：`买入` - 数量：`6000` - 价格：`1.806` - 金额：`10836.00` - 手续费：`5` 并且检查过，没有引入新的 linter 报错。",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`index.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5e61bba2-5a53-4c49-8fd0-fc5535c622d1"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "新增一笔交易流水",
+   "type": "preference",
+   "content": "已完成：仅移除了“有色ETF大成（`159980`）”的配置，交易流水完全保留。 本次改动在 `index.html`： - 从 `savedTargetAllocation` 删除了 `159980` - 从 `allEtfCodes` 删除了 `159980` - 从 `etfNameMap` 删除了 `159980: 有色ETF大成` - 从 `DEVIATION_THRESHOLD_MAP` 删除了 `159980` 我也检查了，`savedTransactions` 里所有 `159980` 交易记录（含你新增的卖出 4800）都还在。 并且当前文件无 linter 报错。",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`index.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "651e7d06-ffe4-4db5-aa88-cd6aae30725e"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "是否可以新增一个登录页面，页面仅显示登录中，拿到To",
+   "type": "preference",
+   "content": "可以，已经按你的思路落地了一版，并且把登录时序收敛了，避免“先发业务请求、后拿 token”的竞态。 ### 这次改动 - 新增登录中转页 `src/pages/login/index.vue` - 页面只显示“登录中...” - 自动执行登录流程（H5 走灵犀 `requestCode` / `ls.userAuth`，微信小程序走 `wx.login + getInfoByCode`） - 登录成功后写入 `token` 和用户信息，再初始化默认房屋/项目 - 最后 `reLaunch` 到首页 `pages_home/huishan` - 支持 `authCode` 场景：拿到 token 后再调用 `selectMyHouseByLingXi` - 修改 `src/pages.json` - 把 `pages/login/index` 加为首个页面，启动先进入“登录中”页 - 改造 `src/request/index.js`（拦截器） - **请求拦截器**：无 token 且不在白名单时，直接跳转登录页并取消请求 - **响应拦截器**：业务码 `401` 或 HTTP `401` 时，清理登录态并跳转登录页 - 增加了免鉴权白名单（目前有登录和初始化相关接口） - 修改 `src/stores/user.js` - 新增 `clearAuthState()`，用于 4",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`src/pages/login/index.vue",
+    "`src/pages.js",
+    "`src/request/index.js",
+    "`src/stores/user.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7c65fac1-ba07-4f50-b52b-e836826ca320"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "L21: const requestCode = g",
+   "type": "pattern",
+   "content": "已加上了，`linxiLogin` 现在会显示全屏 loading： - 位置：`src/App.vue` 的 `ensureLingxiLogin()` 里 - 行为： - 开始登录前执行： - `uni.showLoading({ title: '登录中...', mask: true })` - 登录流程结束（无论成功/失败）都会执行： - `uni.hideLoading()` 这样可以保证登录时有全屏遮罩，且不会出现 loading 不关闭的问题。",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "位置：`src/App.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a0023e6f-7ad1-4479-b1e4-5e94668b6a76"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "申请查看明细 SmParameterList({ f",
+   "type": "pattern",
+   "content": "已按真实接口结构改好了解析逻辑，变更如下： 1. **取第一条数据** 从接口返回的数组（`res.SmParameterList` 或 `res.list`）里取第一条。 2. **解析 `value`** 第一条的 `value` 是 JSON 字符串，例如： `\"{\\\"projectName\\\":[\\\"东湖大郡一期\\\",\\\"东湖大郡花园\\\"]}\"` 用 `JSON.parse(first.value)` 解析。 3. **得到项目名称列表** 从解析结果里取 `projectName` 数组，并过滤掉空值后赋给 `depositDetailApplyProjectNames`。 4. **长度为 0 则始终显示** - 没有第一条、没有 `value` 或解析失败时，会把 `depositDetailApplyProjectNames` 设为 `[]`。 - 解析出的 `projectName` 为空数组时，同样保持为 `[]`。 - 在现有逻辑里，`depositDetailApplyProjectNames` 为空数组时，`shouldShowDetailBtn` 会直接返回 `true`，即**始终显示**“申请查看明细”按钮。 因此： - `projectName` 有内容（如 `[\"东湖大郡一期\",\"东湖大郡花园\"]`）时，仅当列表项的 `item.name` 在该",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "@src/pages/maintain.vue",
+    "@src/pages-my/components/add.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ae398bf0-45c5-45bc-99b3-dd66530e6bd9"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "增加一个删除个人基本信息功能，点了提示删除成功@sr",
+   "type": "bug",
+   "content": "已修复多语言显示问题，原因是语言包里没有配置 `common.delete` 的翻译。 **修改说明：** 在四个语言包的 `common` 中增加了 `delete` 的翻译： | 语言文件 | 键 | 翻译文案 | |---------|---|----------| | `src/locale/rent/zh-Hans.json` | `common.delete` | 删除 | | `src/locale/rent/en.json` | `common.delete` | Delete | | `src/locale/rent/tc.json` | `common.delete` | 刪除 | | `src/locale/rent/jpn.json` | `common.delete` | 削除 | 个人中心基本信息旁的删除按钮会按当前语言显示对应文案（简体中文下为「删除」），不会再出现 `common.delete` 键名。刷新页面即可看到效果。",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`src/locale/rent/zh-Hans.js",
+    "`src/locale/rent/en.js",
+    "`src/locale/rent/tc.js",
+    "`src/locale/rent/jpn.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "62bfabbe-4fa1-4f07-b690-2b4142ac21e3"
+   ],
+   "_draft": true,
+   "project": "repository"
+  }
+ ],
+ "_draft": true
+}

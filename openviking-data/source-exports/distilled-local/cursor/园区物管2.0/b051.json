@@ -1,0 +1,45 @@
+{
+ "project": "园区物管2.0",
+ "batch": "051",
+ "files": [
+  "051.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "所属社区有时候不能转译成功，是不是有异步问题？",
+   "type": "bug",
+   "content": "是的，**本质上是异步竞态问题**，不是单纯的字典配置缺失。 ## 原因分析 查看模式下「所属社区」通过 `contentInfo` 里的 `dictFormatter` 转译： ```532:535:zhi2-web-admin/src/views/property/complex/detail.vue label: '所属社区', value: this.formatCommunityDisplay(this.form.community), ``` `dictFormatter`（`main.js`）会从 `this.communityOptions` 里按 `dictValue` 找名称： ```118:130:zhi2-web-admin/src/main.js dictFormatter(row, column, cellValue, index) { if (!cellValue) return \"\" const dictOptions = this[column.property + \"Options\"] // ... const option = dictOptions.find(e => e.dictValue == value) return option?.dictLabel || value }, ``` 而 `communityOptions` 来自 `",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "```532:535:zhi2-web-admin/src/views/property/complex/detail.vue",
+    "`dictFormatter`（`main.js",
+    "```118:130:zhi2-web-admin/src/main.js",
+    "`complexChange/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2bea6416-3e83-4b54-af77-1e2e56704a2a"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "车位类型筛选不生效，应该为纯前端过滤",
+   "type": "bug",
+   "content": "已修复车位类型筛选，改为**纯前端过滤**。 ## 原因 原先在 `parkingFilter` 变化时会调用 `getParkingSpaceList()`，并通过 `buildParkingListQueryParams()` 把筛选条件传给接口。接口侧筛选不可靠或与前端选项不一致，导致筛选看起来“不生效”。 ## 修改 1. **列表只拉全量**：`getParkingSpaceList()` 不再传筛选参数，始终获取完整泊位列表。 2. **去掉服务端筛选逻辑**：删除 `buildParkingListQueryParams`、`parkingListServerFiltered` 及 `parkingFilter` 的 watcher（不再因筛选变更重新请求）。 3. **前端过滤**：在 `buildParkingCategoryTableRows()` 中通过 `matchParkingRowFilter()` 过滤；`tableRows` 计算属性显式依赖 `parkingFilter`，切换选项会立即重算表格。 4. **匹配规则增强**：字典未加载时使用默认编码兜底（产权 `1`、公共 `2` 等），并同时支持字典编码与标签文本匹配。 切换「车位类型」下拉框时，表格会在本地即时过滤，无需再发请求。可在停车泊位明细页切换各类型选项验证效果。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\operatingAssets.vue",
+    "@zhi2-web-admin/src/views/benefit/statisticsMap/operatingAssets.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c1dae8a0-fd64-44e9-b546-e8a29c03a844"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

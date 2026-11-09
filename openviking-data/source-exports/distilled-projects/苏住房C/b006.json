@@ -1,0 +1,228 @@
+{
+ "project": "苏住房C",
+ "batch": 6,
+ "files": [
+  "021.md",
+  "022.md",
+  "023.md",
+  "024.md"
+ ],
+ "count": 12,
+ "memories": [
+  {
+   "baseline": "8b5f883",
+   "content": "接入苏服办（江苏省政务服务开放平台，ydzt.jszwfw.gov.cn/jpaas-jags-server/interface/gateway.do）时，宿迁同源项目的旧做法是「每个业务接口上架一个 interface_id」，苏住房C 没有把这套配置迁移过来，导致文档要求调用的 gateway.do 在项目里根本不存在。用户拍板的方案：开放平台只上架 2 个 interface_id（GET 类 / POST 类），前端所有请求统一 POST 到 gateway.do，真实业务路径放在 formData 的 header.zs-path 里，后端在这两个 gateway 接口中解析 header.zs-path + biz_content 再内部转发到真实业务接口；业务代码一行不改（仍是 api.get('/company/companyRecordAuth/page', { params })）。落地要点：开启 VITE_APP_USE_SFB_DISPATCHER=1 后 dispatcher.js 构建 formData{app_id, interface_id, biz_content(业务参数 JSON), header(Authorization + zs-path + zs-sign + zs-timestamp + zs-nonce), sign(SM3 网关签名), timestamp, charset, origin, version}；httpInstance.js 网关模式直连网关地址并解析网关响应；sign.js 必须跳过对 gateway.do 的重复签名；.env.* 新增 VITE_APP_SFB_GATEWAY_URL 与两个 INTERFACE_ID；vite.config.ts 加 /sfb-gateway 代理绕 CORS。这样新增业务接口无需再逐条上架。",
+   "evidence": "用户诉求 2/3 明确「所有接口改为两类，后端实际上架 2 个接口，后端内部自己转发，这样就不用所有接口都上架」；最终结论列出 dispatcher.js/httpInstance.js/sign.js/.env/vite.config.ts 五处改动与 header 字段约定。",
+   "files": [
+    "zhi2-mobile-shimin/src/api/dispatcher.js",
+    "zhi2-mobile-shimin/src/api/httpInstance.js",
+    "zhi2-mobile-shimin/src/utils/sign.js",
+    "zhi2-mobile-shimin/vite.config.ts"
+   ],
+   "sessionIds": [
+    "87362be2-5517-4bea-9e71-248ff12f95d1"
+   ],
+   "title": "苏服办开放平台接入收敛为「2 个 gateway 接口 + header 里的 zs-path」网关转发模式",
+   "type": "pattern",
+   "bundle": "022.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "77666f8",
+   "content": "住房类小程序里「系统自动获取」的姓名/手机号/身份证号必须脱敏，且规则由用户明确指定，不允许各页面自行决定：①中文姓名保留第 1 位，其余用 *（朱楠→朱*，李小明→李**）；②身份证号保留前 2 位和后 2 位（32**************34）；③手机号保留第 1 位和后 2 位（18360916552→1********52）。实现约定：三个函数（新增 blurIdNumber）统一收在 src/utils/formatter.js 维护，页面只引 userStore.secureUsername / securePhone / secureIdNumber；这三个字段必须是 getter 由原始数据实时计算，不能是 state 缓存值——旧 session 缓存会让新规则不生效，改完要提示用户重新登录刷新用户信息。适用口径是「展示层脱敏，提交仍用原始值」，加装电梯（add/addAlone/input）、业代报名、房源网签、房源核验、电子业主卡、个人信息、我要买房等自动填充场景一并覆盖。",
+   "evidence": "用户诉求 1 指出加装电梯联系人姓名与联系电话未脱敏，并给出三条规则与示例；最终结论说明改 formatter.js、把 secure* 改为 getter、覆盖 6 类模块。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/formatter.js",
+    "zhi2-mobile-shimin/src/store/user.js",
+    "zhi2-mobile-shimin/src/pages_owner/elevator/addAlone.vue",
+    "zhi2-mobile-shimin/src/pages_owner/elevator/add.vue",
+    "zhi2-mobile-shimin/src/pages_owner/elevator/input.vue"
+   ],
+   "sessionIds": [
+    "2f8d30cf-a249-4fbe-8c17-0429bc7bc7e6"
+   ],
+   "title": "脱敏工具按用户给定规则统一收口，user store 的 secure* 必须改 getter 避免旧缓存",
+   "type": "preference",
+   "bundle": "022.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "77666f8",
+   "content": "在苏服办生态点电话报错，根因是两个运行环境拨号机制不同：苏服办 App 走 jmportal.communication.callPhone（可用）；微信环境走 lightAppJssdk.device.call，内部依赖 wx.miniProgram.navigateTo，而页面不在苏服办小程序的 webview 里时 window.wx.miniProgram 根本不存在，SDK 同步抛错且没有降级，表现为「点了电话就报错/无反应」。做法：封装统一拨号函数——先动态加载 jweixin 并等待就绪，尝试苏服办 SDK；SDK 不可用或调用抛错时自动降级为 tel: 协议拨号；调用点外层包 try-catch 捕获 navigateTo 的同步异常，避免整页崩掉。苏服办 App 内仍只走官方 SDK，不要为它加降级分支。排查时先问清是「微信内置浏览器」还是「某小程序里的 webview」，两者限制不同；改完必须重新构建部署，dev 热更新看不到效果。",
+   "evidence": "用户诉求 1「点击电话报错」→ 诉求 2「使用苏服办的拨打电话SDK」→ 诉求 3「苏服办里面确实可以用，微信里面还是不能拨打」；结论给出两环境对照表与「SDK 优先 + tel: 降级 + try-catch」方案。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/sfb.js",
+    "zhi2-mobile-shimin/src/pages/policy/fddydetail.vue"
+   ],
+   "sessionIds": [
+    "11c71496-2c86-4af0-8987-a08453f769f0"
+   ],
+   "title": "苏服办 SDK 拨号在微信内必然失败：必须「SDK 优先 + tel: 协议降级」双通道",
+   "type": "bug",
+   "bundle": "022.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "0cea241",
+   "content": "苏住房C 同一类详情页的空页面存在两种样式：一种渲染出空的信息模块和字段，另一种显示缺省图 +「暂无数据」，用户要求全部统一成后者。可复用套路：页面外层套 flex flex-column justify-center h-full bg-fff，内容区用 v-if=\"detailInfo.name\"（或该页真正的「主字段有值」作判据）包住原信息模块，v-else 直接放 <ZsEmpty />，不要另造空态组件；以已做对的页（业委会信息 committee/info）为模板复制结构。跨分支合并（mainv2.1-mp → mainv2.1）时只挑逻辑改动，保留目标分支自己的引用路径（baseCard 用 @/pages/commonNew/baseCard.vue，不要跟着 mp 分支改成 @/components/commonNew），否则会在目标分支引入不存在的模块。落地后按「子模块先提交 + 父仓库只更新子模块指针」两步走，并核对本地领先远程的提交数。配套待统一的还有：小区/项目信息（project/info）、企业信息（company/info）、街道信息（subdistrict/info）、社区信息（community/info）。",
+   "evidence": "用户诉求 1 描述两种空页面样式并要求统一；诉求 2 要求把 mainv2.1-mp 中社区/街道的 ZsEmpty v-else 改动合并到 mainv2.1；结论给出核心结构、两条提交记录，并说明未引入 mp 分支的路径变更。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/community/info/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/subdistrict/info/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/committee/info/index.vue",
+    "zhi2-mobile-shimin/src/components/ZsEmpty/ZsEmpty.vue"
+   ],
+   "sessionIds": [
+    "6999b799-ff93-412c-a39e-adb539ade5ab"
+   ],
+   "title": "同源副本空状态统一：判据用主字段 + v-else ZsEmpty，跨分支合并保留目标分支引用路径",
+   "type": "workflow",
+   "bundle": "022.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 双执行环境：小程序（uni-app+Vue3）与 H5 内嵌 APP（Vue2）共用一套源码与工具函数",
+   "type": "fact",
+   "content": "## 什么情况\n苏住房C 主业务仓库是 zhi2-mobile-shimin，同时存在两条构建/运行链：\n1. 小程序链：uni-app + Vue3，`npm run build` 产出 `dist/`，用微信开发者工具导入 `D:/repository/苏住房C/dist` 验证，构建末尾有 `[validate-dist]` 门禁；有分包（pages_main、pages_benefit、pages_transaction…）与主包体积限制。\n2. H5 链：同一个 src 另有一条 H5 分支（如 suzhou-shiqu-suzhufang-main-v2.1），整站嵌入 APP 中使用，不能调用小程序专有 API（navigateTo/原生拨号/rich-text 组件），必须走 APP 注入的能力（如 `app.js` 里的 `toService` 拨号）。\n\n## 为什么\n用户会直接说明「当前是 H5 分支，嵌入 APP 中使用的」并点名要用的方法。若在 H5 分支按小程序写法修（uni.navigateTo、`<rich-text>`），本地看不出问题，线上 APP 里点击完全无反应。\n\n## 怎么做\n- 确定问题属于哪条链：看当前分支名与用户说明；H5 分支的「点击没反应」类问题先查 APP 桥（toService 等）是否被调用。\n- `src/utils/index.js` 是两端共用的：改这里的跳转/拨号/H5 URL 归一化函数，必须评估小程序端是否回归。\n- 验证口径不同：小程序要重新构建并核对 dist 产物；H5 至少要跑通对应分支的构建并确认改动在目标分支上（子模块提交 + 主仓库更新指针）。\n- 两仓库结构要求「子模块先行提交，父仓库只更新指针」。",
+   "evidence": "会话 1ee54692（小程序 9a3c8db，改 3 文件后 npm run build + [validate-dist] ok、要求重新导入 dist 验证）；会话 d9082516（a8c9568，「当前是H5分支，嵌入APP中使用的」「使用app.js里面的toService方法」，最终提交 747b428 把子模块指针更新到 0683334a 并推送 origin/suzhou-shiqu-suzhufang-main-v2.1）",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/pages_transaction/stockHouse/detail.vue",
+    "zhi2-mobile-shimin/package.json"
+   ],
+   "baseline": "9a3c8db / a8c9568",
+   "sessionIds": [
+    "1ee54692-8a12-4edb-825c-181f617f22db",
+    "d9082516-b2c3-487a-81c8-6cb6fcbf92ed"
+   ],
+   "bundle": "023.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "Android 上进入机器人问答页两次：模块级「上次跳转时间」节流，别用组件内标志",
+   "type": "bug",
+   "content": "## 什么情况\n用户反馈「安卓手机打开机器人时会进入两次问答页面」。打开机器人的入口不止一个（首页入口 + 首页悬浮球 HomeRobotFloater），机器人状态分散在多个组件里；Android 上同一手势/同一次 onShow+点击会连续触发两次跳转，两次 navigateTo 各自压一个页面实例。\n\n## 为什么\n去重标志若放在组件实例内（data 里的 isJumping），每个入口实例各持一份，互相不知道对方刚跳转过，节流形同虚设；且安卓的触摸事件顺序与 iOS 不同，更容易重复触发。\n\n## 怎么做\n- 跳转逻辑下沉到独立工具 `src/utils/openAutomaticRobot.js`，用模块级变量记录上次跳转时间戳（本次实现 800ms 窗口），重复调用直接 return。\n- 所有入口（`pages/index/home.vue`、`components/HomeRobotFloater/HomeRobotFloater.vue`）统一调该工具，不在页面里各写一份跳转。\n- 验证要核对 dist 产物（`dist/utils/openAutomaticRobot.js` 含 800ms 拦截），因为微信开发者工具点「编译」不一定重新打包。",
+   "evidence": "会话 1ee54692 用户诉求「机器人的样式放大了，安卓手机打开机器人时会进入两次问答页面」；改动文件含 openAutomaticRobot.js、pages/index/home.vue、components/HomeRobotFloater/HomeRobotFloater.vue；产物 dist/utils/openAutomaticRobot.js 含 800ms 重复跳转拦截",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/openAutomaticRobot.js",
+    "zhi2-mobile-shimin/src/pages/index/home.vue",
+    "zhi2-mobile-shimin/src/components/HomeRobotFloater/HomeRobotFloater.vue"
+   ],
+   "baseline": "9a3c8db",
+   "sessionIds": [
+    "1ee54692-8a12-4edb-825c-181f617f22db"
+   ],
+   "bundle": "023.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "把富文本/接口文本里的电话号码转 tel: 链接：必须按通用标签切分、只处理纯文本片段",
+   "type": "bug",
+   "content": "## 什么情况\n机器人的答案、公告等内容是后端下发的 HTML 字符串，其中的电话需要变成可点击的 `tel:` 链接。原实现「按 `<a>` 标签切分后，用 `/^</` 跳过整段」，结果整段 HTML 以 `<p` 开头，**一个号码都转不了**，且不报错、看不出异常。\n\n## 为什么\n要避免误把标签属性里的数字（`src`、`width`、文件名 `20240101.png`）当成电话号码；原解法用「跳过以 < 开头的片段」这种粗粒度判断，误伤了正文所在片段。\n\n## 怎么做\n- 按通用标签切分：`html.split(/(<[^>]*>)/g)`，只对「不含标签的纯文本片段」做号码识别与替换。\n- 只跳过落在 `<a>` 内的文本（需要维护一个 inAnchor 状态），标签外的号码正常转 `tel:`；已是 `tel:` 链接的不重复包装。\n- 校验口径：直接跑源码真实实现写用例（本次 5/5 通过），覆盖「带转接号 0512-67422386转812」「属性含 8 位数字的文件名 + 正文手机号」「已是 tel: 链接」「`<a>` 内文本 + 标签外号码」「纯文本无标签」五类。\n- 改完必须核对 dist 产物（`dist/utils/index.js` 为新实现）再交付。",
+   "evidence": "会话 1ee54692「utils/index.js → linkifyPhoneNumbersInHtml」原逻辑被整段跳过导致一个号码都转不了；新逻辑按 /(<[^>]*>)/g 切分；5 条用例全 PASS；产物 dist/utils/index.js 已更新",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/pages_main/automaticRobot/index.vue",
+    "zhi2-mobile-shimin/src/components/ZsRichText/ZsRichText.vue"
+   ],
+   "baseline": "9a3c8db",
+   "sessionIds": [
+    "1ee54692-8a12-4edb-825c-181f617f22db"
+   ],
+   "bundle": "023.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "批量替换图片组件后出现 Invalid end tag：根因是 <img /> 与 </ZsImage> 混写，且会连带产生畸形静态资源路径",
+   "type": "bug",
+   "content": "## 什么情况\n批量把 `<img>` 换成 `<ZsImage>` / `<ImageUploader>` 时，出现了 `<img /></ZsImage>` 这类「开始标签与结束标签不匹配」的混写，编译器报 Invalid end tag，构建中断；同一批替换还留下 `..../../`、`../..../../../../` 这类畸形静态资源路径。\n\n## 为什么\n脚本只替换了开标签或只替换了闭标签，没有成对处理；路径部分则是相对路径层级被多次前缀拼接所致。两者是同一批批量替换的次生伤害，容易被误判成两个不相关的问题。\n\n## 怎么做\n- 修标签：成对改为自闭合 `<ZsImage />`；`ImageUploader` 场景要拆成正确的 `<img />` + `</ImageUploader>` 结构，而不是一律自闭合。\n- 同一批还要顺手扫畸形路径：批量替换后全量搜 `....`、`../...../` 这类模式，逐个改成项目约定的静态路径。\n- 这类错误要全局排查而不是只修报错的第一个文件；修完以「构建通过」为准，构建仍失败时优先怀疑缺失静态资源（如不存在的 svg），与标签问题无关。\n- 结论：批量替换组件的脚本必须按「配对标签 + 路径前缀」两个维度同时校验。",
+   "evidence": "会话 e6b2c88e（017efba，用户贴终端报错并要求「全局修复类似错误」）：共修 7 处，涉及 publicNotice/index.vue、pages_guard/index/index.vue、pages_owner/project/info/index.vue、pages_guard/emergencyContact/index.vue、pages_guard/guardApply/components/step1.vue、pages_owner/committee/application/index.vue；另修正 8 个文件的畸形静态资源路径",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_main/publicNotice/index.vue",
+    "zhi2-mobile-shimin/src/pages_guard/index/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/committee/application/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/decision/components/DecisionList.vue"
+   ],
+   "baseline": "017efba",
+   "sessionIds": [
+    "e6b2c88e-db79-4d03-ada4-c17e191d6830"
+   ],
+   "bundle": "023.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "后端下发的 msgUrl 仍指向页面迁移前的旧主包路径：在跳转层做 normalizeLegacyPageUrl 兜底，不要改后端配置",
+   "type": "bug",
+   "content": "## 什么情况\n消息中心点击公告消息报 `navigateTo:fail page \"pages/announcement/detail?...\" is not found`。首页已迁到 pages_main 分包，实际注册路径是 `pages_main/announcement/detail`，但消息中心的跳转地址来自后端返回的 msgUrl，仍是旧的 `pages/announcement/...`。\n\n## 为什么\n页面从主包迁到分包后，pages.json 注册路径变了，但历史消息记录里存的 msgUrl 是落库时写死的旧前缀；后端不会为存量数据回刷，所以这类报错会在任意「消息/推送/收藏」入口反复出现，而且不是前端路由拼错。\n\n## 怎么做\n- 在 `src/utils/route-map.js` 增加 `normalizeLegacyPageUrl`，维护「旧前缀 → 新分包前缀」映射表，按目录前缀整体映射（不是逐页硬编码）。\n- 在 `src/utils/index.js` 的 `goto` / `openPage` 里统一、自动地对跳转地址做一次归一化，让所有调用方受益；消息列表 `pages_main/message/message.vue` 对 msgUrl 显式调用同一函数。\n- 映射示例：`pages/announcement/detail?msgId=...&msgType=4` → `/pages_main/announcement/detail?msgId=...&msgType=4`，query 原样保留。\n- 覆盖所有从主包迁到 pages_main 的目录前缀（news、message 等），避免同类报错逐个复现。\n- 验证：`cd zhi2-mobile-shimin && npm run build`，然后微信开发者工具重新导入 dist，从消息中心点该消息进入详情。",
+   "evidence": "会话 01893cc7（b7bf813）用户贴 MiniProgramError navigateTo:fail pages/announcement/detail；修复方案新增 utils/route-map.js 的 normalizeLegacyPageUrl、utils/index.js 统一修正、message.vue 复用；映射示例与构建验证步骤见结论",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/route-map.js",
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/pages_main/message/message.vue",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "baseline": "b7bf813",
+   "sessionIds": [
+    "01893cc7-e8de-4690-b98f-18f412beec9e"
+   ],
+   "bundle": "023.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "主包上传预估体积超限（磁盘未超但 source size 超）：先查 mainStaticPaths 白名单里被误加回的大图",
+   "type": "bug",
+   "content": "## 什么情况\n小程序构建失败，主包「磁盘体积 1790.9KB（限制 2048KB）看着没超」，但「上传预估（source size）2095.4KB」超限约 47KB。超出的量正好等于最近被加进主包白名单的两张图：`images/empty.png`（19KB）与 `images/bg_szf.png`（28KB）。\n\n## 为什么\n这两张图本应留在各分包 static 里（已有 `migrate-main-empty-static.mjs` 迁移逻辑），却被误加回 `mainStaticPaths.js`，于是 `prune-main-static.mjs` 在构建时把它们继续保留在主包。判定口径是「上传预估体积」，不是磁盘体积，所以只看磁盘会误以为没超。\n\n## 怎么做\n1. 从 `mainStaticPaths.js` 移除这两项；\n2. 把 `bg_szf.png` 迁到 `pages_vote/static/images/`；\n3. 在 `utils/index.js` 的 `SUBPACKAGE_STATIC_IMAGES` 里注册该图，让它按分包路径解析；\n4. 删除 `src/static/images/` 下的主包副本；\n5. 重新构建，核对两条体积行都 ok。\n\n结论：主包余量只有约 7KB，后续往主包白名单加大图前，优先放分包 static 并走 `SUBPACKAGE_STATIC_IMAGES` 路由。体积统计要用 `scripts/size-main-package.mjs` 看「磁盘 + 上传预估」两个数。",
+   "evidence": "会话 60972d80（b7bf813）构建日志：磁盘 1790.9KB/2048KB、上传预估 2095.4KB/2048KB；修复后 MAIN 磁盘 1744.4KB ok、上传预估 2040.9KB ok、[validate-dist] ok",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/mainStaticPaths.js",
+    "zhi2-mobile-shimin/scripts/prune-main-static.mjs",
+    "zhi2-mobile-shimin/scripts/size-main-package.mjs",
+    "zhi2-mobile-shimin/src/utils/index.js"
+   ],
+   "baseline": "b7bf813",
+   "sessionIds": [
+    "60972d80-2ade-40e7-a35c-5daa665ecffd"
+   ],
+   "bundle": "023.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "uni-app 小程序分包内 node-modules 组件 require 指向分包 common/vendor.js → 模块未定义（relocate 脚本缺 vendor 路径修正，且 dev 不跑后处理）",
+   "type": "bug",
+   "content": "现象：微信小程序分包 pages_main 里加载 uni-datetime-picker（经 ZsDatePicker 引入）时报 `module 'pages_main/common/vendor.js' is not defined, require args is '../../../../../common/vendor.js'`，页面直接白屏/报错。\n\n根因：uni-app 编译小程序时会把分包用到的 node-modules 组件复制到分包的 `pages_main/node-modules/...`，但复制后其 require 的相对路径仍按「自己所在层级」推算，指向分包自己的 `pages_main/common/vendor.js`；实际 vendor.js 由主包产出在 `dist/common/vendor.js`，分包目录下不存在该文件，于是 require 失败。\n\n为什么之前没暴露：项目已有 `scripts/relocate-z-paging.mjs` 做了 vendor 路径修正，但没有覆盖 uni-datetime-picker；`scripts/relocate-datetime-picker.mjs` 当时只搬文件、没改 require。另外这些后处理脚本不在 `npm run dev` 链路里，所以开发态构建产物永远是错的，只有跑过脚本的手工产物才对。\n\n怎么做：\n1. 在 `relocate-datetime-picker.mjs` 里补 `patchVendorRequiresInDir`，把所有 `require(\"...common/vendor.js\")` 的相对层级改到主包（多退一级，变成 `../../../../../../common/vendor.js`）；该函数做成通用工具，任何会被复制到分包的 node-modules 组件都能复用。\n2. 在 `vite.config.ts` 里加插件，在 `closeBundle` 阶段自动跑这些 patch 脚本，让 dev 与 build 都生效，而不是靠人工记得执行。\n3. `relocate-z-paging.mjs` 补上 `dist/dev/mp-weixin` 输出路径（原来只覆盖 build 产物）。\n4. 已生成的 dist 要就地执行一次修复；微信开发者工具需「清缓存 → 重新编译」，必要时重启 dev。\n\n排查启发：这类报错指向的路径是「分包/common/vendor.js」时，不要去找源码引用，直接查 dist 产物里被复制的组件的 require 层级。",
+   "evidence": "会话 283d2149：用户贴 [App.onError] MiniProgramError，require args '../../../../../common/vendor.js'，堆栈落在 pages_main/node-modules/@dcloudio/uni-ui/lib/uni-datetime-picker/uni-datetime-picker.js；最终结论确认 relocate-datetime-picker.mjs 缺 vendor 路径修正、relocate-z-paging.mjs 有该逻辑但缺 dev 输出路径、npm run dev 不执行后处理，并新增 closeBundle 自动 patch。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\scripts\\relocate-datetime-picker.mjs",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\scripts\\relocate-z-paging.mjs",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\vite.config.ts",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsPicker\\ZsPicker.vue"
+   ],
+   "baseline": "b7bf813",
+   "sessionIds": [
+    "283d2149-aad6-4b95-83d3-698be7a1f675"
+   ],
+   "bundle": "024.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "慢接口拆「预验证 + 提交」两步的客户端约定：串行全程 loading、第一次失败静默重试一次、第二次才统一解析错误文案",
+   "type": "pattern",
+   "content": "场景：业主身份认证原 `POST /addOwnerByToken` 因第三方（苏服办）HTTP 校验耗时超过 5 秒，后端拆成 `/preVerifyOwnerByToken`（慢，3-5s，返回 5 分钟有效的 verifyToken + complexVo）与 `/submitOwnerByToken`（快，<1s），请求体除 verifyToken 外与原接口一致，旧接口保留不动。\n\n后端补充说明：预验证查询过一次后会缓存，所以「失败重试一次」的收益很高。\n\n用户对交互的明确要求（关键，不是可选项）：\n1. **整个串行过程都显示 loading**，第一次预验证、重试、提交阶段之间不能中途 hideLoading，否则用户会看到页面卡住无反馈；\n2. **第一次失败一律静默**，不弹任何提示，自动重试一次；\n3. **第二次仍失败才提示**，且要能区分苏服办网关错误和我们自己的服务端错误。\n\n实现要点：把它收成一个封装函数 `verifyAndSubmitOwnerByToken(data, { loadingTitle, manageLoading })` 放在 api 层（property.js）：内部 try 预验证 → catch 静默重试一次 → 仍失败则用 `resolveOwnerAuthErrorMessage` 统一解析（苏服办网关取 `Error.message`，业务侧取 `msg`/`message`/`sub_msg`）后抛出；提交阶段失败同样正常提示，不要用 `noReject` 静默返回。页面（addHouse.vue / addHouseContract.vue）删掉自己的 showLoading/hideLoading 与重复 showToast，只调用该函数；页面若已有 loading 传 `manageLoading: false` 自行控制。\n\n遗留注意：超时阈值要大于后端 5 秒，否则重试也没机会成功。",
+   "evidence": "会话 894fc213：用户先给出两步接口变更说明（预验证 3-5s 返回 verifyToken、提交 <1s、旧接口保留），第二轮明确要求「第一个接口响应还是会慢…整个串行过程中都要显示查询中的 loading，目前第一个接口如果超时，苏服办的异常没有提示。后续第一次失败不要提示，如果第二次还失败需要正常提示错误信息」；最终结论落到 verifyAndSubmitOwnerByToken + resolveOwnerAuthErrorMessage，页面去掉本地 loading/toast。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\property.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\authentication\\components\\PropertyAdd.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\authentication\\owner\\add.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\authentication\\components\\HouseAdd.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner\\bindProject.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\verify.vue"
+   ],
+   "baseline": "5438dc6",
+   "sessionIds": [
+    "894fc213-ccb6-4c5b-912d-82f922d8f7fb"
+   ],
+   "bundle": "024.md",
+   "project": "苏住房C"
+  }
+ ]
+}

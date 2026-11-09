@@ -1,0 +1,93 @@
+{
+ "project": "苏住房C",
+ "batch": "038",
+ "files": [
+  "038.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "我的-一手房交易，各区域点击“去申请”，无反应",
+   "type": "fact",
+   "content": "**问题原因** 「一手房交易」列表页（`newHouseCertification/index.vue`）里，顶部 Banner 和「去申请」按钮写在 `z-paging` **外面**。 `z-paging` 默认 `fixed: true`，会全屏铺满并盖住外部元素，导致点击被拦截，看起来就像按钮没反应。各区域都会出现，因为页面结构相同。 **修复方案** 按 z-paging 官方建议，把顶部内容放进 `#top` 插槽，让 Banner 和「去申请」在组件内部渲染，不再被遮挡： 1. 将 Banner +「去申请」移入 `<template #top>` 2. 新增 `goApply()` 方法处理跳转 3. 列表区域保留在默认插槽中 请重新编译小程序后验证：进入「我的 → 一手房交易 → 选择区域」，点击「去申请」应能正常跳转到申请详情页。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "「一手房交易」列表页（`newHouseCertification/index.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouseCertification\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouseCertification\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1cc8c845-4c5d-4565-a1fd-23d08d025e11"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "empty组件UI有问题",
+   "type": "fact",
+   "content": "已修复「视频看房」及其他使用 `z-paging` 空态的页面。 **问题原因：** 1. `.paging-empty`、`.paging-empty-pic`、`.paging-empty-text` 在全局没有样式，文字默认靠左显示 2. `ZsImage` 的图片是 `width: 100%; height: 100%`，父容器 `.paging-empty-pic` 无尺寸时图片宽高为 0，空态图不显示 **修改内容：** 1. 在 `uni.scss` 补充 `paging-empty` 全局样式（居中布局、320rpx 空态图、灰色提示文字） 2. 修正 `houseVideo/index.vue` 的 `#empty` 插槽结构，去掉无效的 `mt-300` 偏移 3. 在 `ZsPaging.vue` 增加对应 scoped 样式，保证通过封装组件使用时也正常 重新编译后，空态应居中显示空态图和「暂无相关数据！」文字。若仍异常，告诉我具体页面和环境（H5 / 微信小程序）。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`uni.scss",
+    "`houseVideo/index.vue",
+    "`ZsPaging.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\houseVideo\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsEmpty\\ZsEmpty.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsPaging\\ZsPaging.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "52f0bdb1-df2c-4df1-9f42-40b6d23d7382"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "小区信息排版错乱",
+   "type": "preference",
+   "content": "已处理总面积 `m²` 换行问题。 **原因：** 统计区用了三列等宽 `grid`，第三列被限制在约 1/3 宽度内，`435,872.00 m²` 放不下就被拆成两行。 **修改：** 1. **统计行** 改为 `flex + space-between`，三列按内容自然宽度分布，不再强制等分 2. **StatisticCard** 数值加 `white-space: nowrap`，并开启 `virtualHost` 避免组件外层挤压宽度 3. 去掉面积字符串里多余的空格 现在应显示为单行：`435,872.00 m²`。请重新编译预览确认。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\project\\info\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\project\\info\\components\\infoCard.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\page-query\\property-detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2bd50aeb-5d2b-4b29-b38e-f1aa4ae7ac4c"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "[渲染层网络层错误] Failed to load ",
+   "type": "preference",
+   "content": "## 原因 错误路径 `/pages_vote/static/images/house_szf.png` 说明静态资源被解析到了 **投票分包 `pages_vote`**，但 `house_szf.png` 实际在 **`pages_owner/static/images/`** 下。 问题出在 `DecisionList.vue`：`ZsImage` 未指定 `subpackage`，`resolveStaticUrl` 会按当前页面路由推断分包，在投票页就会去找 `pages_vote` 下的图片，文件不存在，微信开发者工具返回 500。 ## 已修复 1. **`DecisionList.vue`**：为 `ZsImage` 增加 `subpackage=\"pages_owner\"`，明确从业主分包加载图片。 2. **`utils/index.js`**：在 `SUBPACKAGE_STATIC_IMAGES` 中登记 `house.png` / `house_szf.png` → `pages_owner`，避免其他页面遗漏 `subpackage` 时再次走错路径。 `pages.json` 里已有预加载规则（进入 `pages_vote/decision/index` 时会预加载 `pages_owner`），跨分包引用图片是可行的。 ## 验证 重新编译并运行微信",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`DecisionList.vue",
+    "**`DecisionList.vue",
+    "**`utils/index.js",
+    "`pages.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "939b9f86-bba1-485a-8ec9-d84e2983f4b2"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已修复。圆角效果由右侧装饰图 icon_tip_bg",
+   "type": "pattern",
+   "content": "已修复。圆角效果由右侧装饰图 `icon_tip_bg.png` 与左侧白底区域共同构成，之前 `ZsImage` 在 flex 布局里用了默认 `width: 100%`，父容器无固定宽度导致图片未正确渲染，圆角过渡消失。 **修改点：** 1. 为装饰图设置固定尺寸 `88rpx × 96rpx`（对应原图 44×48 的 2 倍） 2. 白底区域增加 `border-bottom-left-radius: 16rpx` 3. 调整 `tip-text-box` 为 `align-items: flex-end`，使装饰图与横幅底部对齐 请重新编译预览，「您共申请守护对象 X 人」右侧应出现 S 形圆角过渡，不再显示直角白块。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_guard\\index\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "092955df-f394-4c02-825f-866e02e9454a"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

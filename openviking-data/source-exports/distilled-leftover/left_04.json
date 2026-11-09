@@ -1,0 +1,129 @@
+{
+ "batch": 4,
+ "files": [
+  "019.md",
+  "020.md",
+  "021.md",
+  "022.md",
+  "023.md",
+  "024.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "[苏房] Web 附件上传格：el-upload 的 disabled 会连带禁用删除，不能拿「已满数量」去禁用整个组件",
+   "type": "bug",
+   "content": "场景：分支机构注销弹窗（CancelDialog / AppendixPictureUpload，及公共 AnnexUpload/AppendixPackageSection）用户反馈「上传了不能删除」，且上传成功后列表有明显弹跳动画和右上角绿色对勾。\n\n根因：页面把 :disabled=\"!canUpload\" 绑到 el-upload 上，而 canUpload 在「已达上传数量上限」时为 false，Element UI 的 disabled 是整个组件的总开关——它不仅拦住新增，还把每张卡片上的删除按钮/预览操作一起禁用，所以表现为「上传成功后再也删不掉」。第二条：提交成功后会走 loadPackage() 重新拉配置与附件列表，受控 :file-list 整表替换会触发 Element 列表的 enter/leave 过渡动画，并重新渲染 .el-upload-list__item-status-label（绿色成功角标），视觉上是弹跳 + 对勾闪烁。\n\n做法：1) el-upload 的 disabled 只表达「组件不可用」——仅在配置未就绪或加载中时禁用：:disabled=\"!activeConfig || loading\"；「还能不能再传」由隐藏「+」触发区（hideUploadTrigger）与 before-upload 里比对数量来控制，不要用 disabled 表达业务上限。2) 刷新列表时去动画与角标，与项目内 ImageUpload 的既有做法保持一致：把 el-upload 列表 enter/leave 动画时长设为 0，并隐藏 .el-upload-list__item-status-label；优先复用全局/公共组件里的这套覆盖样式，不要每个页面各写一份。\n\n验证：上传满数量后悬停缩略图应能出现并点到删除；删除后 Network 里应发出 POST .../file/appendix/delete 且返回成功；刷新列表不应有弹跳与对勾。",
+   "evidence": "会话 01a16795（基线 b28a878）用户诉求「上传了不能删除，而且有弹跳动画，去掉」；结论指出 :disabled=\"!canUpload\" 在已满上传数量时禁用整个 el-upload，改为 :disabled=\"!activeConfig || loading\"，并由 hideUploadTrigger/before-upload 控数量；动画与 .el-upload-list__item-status-label 按 ImageUpload 的做法清零时长并隐藏。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/CancelDialog.vue",
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/AppendixPictureUpload.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/index.vue",
+    "zhi2-web-admin/src/components/AppendixPackageSection/index.vue",
+    "zhi2-web-admin/src/components/ImageUpload/index.vue"
+   ],
+   "baseline": "b28a878",
+   "sessionIds": [
+    "01a16795-c57c-764e-99b7-4234d397a95f"
+   ],
+   "bundle": "019.md"
+  },
+  {
+   "title": "zs-table 列宽「先渲染再拉伸」闪动的两个异步根因：rAF+setTimeout(16) 滞后均分 与 DOM 二次测量回写",
+   "type": "bug",
+   "content": "情况：股东列表等页面在 tableData 返回后会先按「纯内容宽」画出一版列，约一帧后再被拉满，用户看到列宽闪动。\n\n为什么：zs-table 里有两条异步改宽链路叠加——(1) `scheduleDistributeRemainingWidth` 在 requestAnimationFrame 之后又追加 `setTimeout(16)`，数据到达时子列 contentWidth 已算好，但 `columnStretchExtra` 要晚一帧才写入；(2) 复杂自定义插槽列的 `scheduleDomWidthMeasure` 用 rAF 推迟测量，可能落在首帧绘制之后才写 `domMeasuredWidth`，再触发一次改宽。\n\n怎么做：① 新增「数据变化后排一次均分」的入口，在 `tableData` 变化后的 `$nextTick` 里执行 distributeRemainingWidth，并再补一次 nextTick 覆盖字典 options 异步就绪；② `scheduleDistributeRemainingWidth` 改为 rAF + `$nextTick`，去掉 16ms 延迟，并监听 `tableData`（immediate）数据一到就排队；③ 需 DOM 测量的列在数据变化时 `resetDomMeasuredWidth` + `scheduleDomWidthMeasure(false)`（不走 rAF，与渲染同轮）；④ DOM 量到的宽度若不超过 contentWidth 估算（±2px）就不要回写，避免无意义二次布局。\n\n遗留：若仍有轻微跳动，通常是字典 options 异步到达后文本从码值变文案导致的一次正常调整。",
+   "evidence": "会话 533e9595：用户反馈 zs-table-column 数据返回后先渲染再调整宽度导致列闪动；结论定位到 scheduleDistributeRemainingWidth 的 rAF + setTimeout(16) 与 scheduleDomWidthMeasure 的 rAF 二次测量，给出 queueDistributeAfterColumnsUpdated 等四处修改。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/views/company/shareholder/index.vue"
+   ],
+   "baseline": "fc66641",
+   "sessionIds": [
+    "533e9595-631f-446e-8081-9e0ce442a190"
+   ],
+   "bundle": "021.md"
+  },
+  {
+   "title": "el-form 的 :model 用 computed 合并分离的 codeForm（验证码）是可行的，但需配 validateField/clearValidate 才不留双轨提示",
+   "type": "pattern",
+   "content": "情况：注册页（企业端 CompanyRegisterSingleForm / 机构端 InstitutionRegisterSingleForm）把图形验证码与短信验证码存在独立的 `codeForm` 对象里，与主表单 `this.form` 分离，却希望用 el-form 的统一校验展示红框并定位首个错误。\n\n为什么可行：el-form 的 `:model` 在每次校验时按 `prop` 路径读取，`formModel` 作为 computed 依赖 `codeForm.code/smsCode`，与之保持同步；`validate()` 内部对表单项调用 `validate('')`，Element UI 在 trigger 为空串时不按 trigger 过滤，因此 `trigger: ['blur']` 的 required 规则在提交时同样会校验。只要 `createRegisterForm()` 本身不含 `code/smsCode`，`{...this.form, code, smsCode}` 的覆盖不会与原有路径冲突。\n\n配套约定（不做就会双轨）：① 提交前整表 `validate()` 之外，`sendCode` 发短信前也要用 `validateField('code')` 而不是手写 `if (!code) msgError()`，否则 toast 与红框两套提示并存且错误滚动定位不到该字段；② 刷新图形验证码清空 `codeForm.code` 后要 `$nextTick(() => clearValidate(['code']))`，否则旧的 is-error 残留到用户再次 blur；③ 提交态 rules 与最终 payload 的字段要一致（企业端 payload 只带 smsCode 却把 code 设为必填，属于产品/后端口径不一致，应择一取舍）。",
+   "evidence": "会话 022a69f3：review computed formModel + 分离 v-model 配 el-form validate 的改动，结论为可正常工作（validate('') 不过滤 trigger），并指出 sendCode 手动判空、刷新验证码未 clearValidate、表单必填与提交 payload 字段不一致三处问题。",
+   "files": [
+    "zhi2-web-admin/src/views/register/components/single-page/CompanyRegisterSingleForm.vue",
+    "zhi2-web-admin/src/views/institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue",
+    "zhi2-web-admin/src/utils/registerValidate.js",
+    "zhi2-web-admin/src/utils/registerFormContext.js"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "022a69f3-9841-423f-b378-ec7448b32510"
+   ],
+   "bundle": "021.md"
+  },
+  {
+   "title": "「非目录顶栏菜单应收起侧栏」改造的三个漏点：/redirect 分支、移动端抽屉、侧栏路由未清空",
+   "type": "bug",
+   "content": "情况：Navbar 的 handleMenuClick 按顶栏菜单类型分流——http 外链走 window.open 且不动 activeRoutes；目录菜单写 activeRoutes 并按需 toggleSideBar；非目录叶子菜单改为 closeSideBar + router.push，不再误调 activeRoutes（原先会残留上一模块的子菜单）。\n\n为什么容易回归：① 含 `/redirect` 的顶栏项走的是独立分支，仍然只 router.push，不进入非目录的 closeSideBar，侧栏会保持展开并停留在上一模块路由；② 小屏（<640px）顶栏被隐藏，抽屉里用的是 `router-link`，完全绕开这套分流逻辑，目录项可能直接 push 父 path 失败、行为与桌面端不一致；③ closeSideBar 只改展开状态，没有 `SET_SIDEBAR_ROUTERS` 清空，再次展开侧栏可能仍显示旧的子菜单。\n\n怎么做：redirect 分支对非目录同样 closeSideBar（或 redirect 一律收起）；抽屉项改为 `@click.prevent` + handleMenuClick 并顺手关抽屉，复用同一套判定；非目录跳转时按产品约定清空侧栏路由。另注意目录判定目前只看 `children.length > 0`，需与 navbarRouters 的扁平规则对齐。",
+   "evidence": "会话 20fe0ded：review Navbar.vue handleMenuClick 的改动，指出 /redirect 分支未收侧栏（HIGH）、移动端抽屉未复用 handleMenuClick（HIGH）、收起侧栏未清空 SET_SIDEBAR_ROUTERS 等 4 个 MEDIUM，verdict BLOCK。",
+   "files": [
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/store/modules/app.js"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "20fe0ded-6589-490d-9a14-ec5959a6d18d"
+   ],
+   "bundle": "021.md"
+  },
+  {
+   "title": "证书类外键（规划许可证/施工许可证）入表单的约定：ID 与证号成对维护，clear 与切项目都要清 ID",
+   "type": "pattern",
+   "content": "情况：楼幢更新接口 /v3.0/building/building/update 新增 `conEngPlanLicId`、`conEngConsLicId` 两个 Long 外键（建设工程规划许可证 ID、建筑工程施工许可证 ID），前端详情页需要把所选证书的主键一并提交。\n\n为什么不能只存证号：保存走 detailMixins 的 getForm() → POST /building/building/update，表单里有什么就提交什么；若只回显证号字符串，用户编辑时未重新选证，请求里就没有 FK 字段，后端无法建立/保留关联。\n\n怎么做：① form 中同时放 `conEngPlanLicId` + `constructionPlanningPermitCode`、`conEngConsLicId` + `constructionPermitCode` 两组字段，成对赋值；② 输入框 `@clear` 时同步清空 ID 与证号，避免出现「证号空、ID 残留」；③ `projectId` 变化时清空已选两类证书，防止把其他项目的证书主键带过来；④ 同步要求后端 `/building/building/detail` 回显这两个 ID（否则编辑态无法保留原关联），Add 接口也建议一起加。本仓库只有前端，后端 DTO 需在对应 Java 仓库另行修改。",
+   "evidence": "会话 abcebb80：按用户给出的新增入参 conEngPlanLicId / conEngConsLicId 在楼幢详情页对接，结论列出成对字段、@clear 清空、切项目清空，并提示 detail 接口需回显这两个 ID。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/detail.vue",
+    "zhi2-web-admin/src/api/lpgl/buildinginfo.js",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "abcebb80-c164-4351-8695-59f285f1b9bf"
+   ],
+   "bundle": "021.md"
+  },
+  {
+   "title": "[苏房] 加密链路调试：解密后响应日志要挂在 request.js 的两处解密分支，靠 CRYPTO_ENABLED 开关且依赖构建期 esbuild.drop 清除",
+   "type": "workflow",
+   "content": "情况：等保三级改造后前端全站加密（SM4 + expand.encrypt），联调时 Request/SQL 抓包只能看到密文，无法判断「后端到底返了什么/解密是否成功」，排查接口字段问题非常低效。\n\n为什么：解密发生在响应拦截器内部，解密后的明文对象只存在于闭包中，业务层拿到的已经是归一化后的数据；若在业务页加 log 会遗漏「解密失败/解出空壳」这一层根因。\n\n怎么做：在 src/utils/request.js 里新增统一的 logDecryptedResponse 函数，只在 CRYPTO_ENABLED 为 true 时输出 `[crypto:来源] METHOD URL` + 解密后的响应体；来源参数区分两条解密分支——SM4 分支（JSON.parse(plain) 成功之后）传 'sm4'，expand.encrypt 分支（decryptExpandResponse 成功之后）传 'expand'。两个分支都要埋点，只埋一条会漏掉另一条链路上的接口。\n\n运维要点：日志靠 env/.env 的 VITE_CRYPTO_ENABLED 开关控制，生产构建由 vite.config.js 的 esbuild.drop 自动移除 console，因此不需要额外做 __DEV__ 判断，也不会把明文响应带入线上。验证方式：开着开关起 dev server，访问任意加密接口，控制台应出现 `[crypto:sm4] POST /xxx { code: 200, data: ... }`。",
+   "evidence": "会话 7fa142c1（基线 ffafea1）最终结论：在 zhi2-web-admin/src/utils/request.js 新增 logDecryptedResponse，「仅在 CRYPTO_ENABLED 为 true 时用 console.log 输出 [crypto:来源] METHOD URL 及解密后的响应体」；SM4 解密后 JSON.parse(plain) 成功即调用 logDecryptedResponse(res.config, res.data, 'sm4')，expand.encrypt 的 decryptExpandResponse 成功后调用 logDecryptedResponse(..., 'expand')；验证时保持 env/.env 的 VITE_CRYPTO_ENABLED='true'，并明确「生产构建会通过 esbuild.drop 自动移除 console」。",
+   "files": [
+    "zhi2-web-admin/src/utils/request.js",
+    "env/.env",
+    "zhi2-web-admin/vite.config.js",
+    "zhi2-web-admin/src/config/security.js"
+   ],
+   "baseline": "ffafea1",
+   "sessionIds": [
+    "7fa142c1-7af7-4e5d-b2c7-f7acd4668272"
+   ],
+   "bundle": "022.md"
+  },
+  {
+   "title": "[苏房] 表格「关 tooltip + 换行完整展示」不要在页面里整表覆盖 cell 样式，要收窄到列级 class",
+   "type": "pattern",
+   "content": "什么情况：某个列表页（如 system/menu/index.vue）要求长文本列不要省略号 + 不要 overflow tooltip，而是换行完整显示。常见错误做法是在页面里写非 scoped 的 `th.el-table__cell > .cell` / `td.el-table__cell > .cell` 并配 `white-space: normal; overflow: visible;` + `!important`。\n\n为什么不行：这个选择器命中整张表所有单元格，会连带改掉字典列（dict-tag 依赖 overflowVisible 语义）、bizState 专用渲染列，以及右侧 fixed 的 zs-operate-column 的排版，与其它列表页不一致；树表里行高因换行变高后，固定区与主表体行高还可能对不齐。另外这层覆盖和 zs-table-column 内建的 `overflow:hidden; text-overflow:ellipsis` 打架，后续改全局表格样式时会再次冲突。\n\n怎么做：\n- 实现「不弹 tooltip」只需在模板上进 `$attrs`：`:show-overflow-tooltip=\"false\"`，zs-table-column 里的 `Object.assign({ showOverflowTooltip: true }, this.$attrs)` 会正确覆盖默认值，不需要动 CSS；\n- 实现「换行」要给目标列单独加 `class-name`（经 zs-table-column 透传到 el-table-column），SCSS 只写在该 class 下，绝不要命中 `.zs-operate-column-cell`；\n- 注意列宽仍由 zs-table-column 按 nowrap 测算，窄屏/横滚时超长无断点字符串仍可能顶到邻列，需配合该列 min-width 或只放开长字段列，而不是整表放弃 ellipsis 保护；\n- 长期方案是给 zs-table-column 增加列级 overflow-visible 开关，减少页面级 `!important`。",
+   "evidence": "审查 system/menu/index.vue 关闭 show-overflow-tooltip 并用非 scoped SCSS 覆盖整表 cell 时就地指出：选择器会作用到所有列（含 visible/status 字典列与右侧固定 zs-operate-column），与全局 index.scss 中 `.zs-table-column--auto-width` 的 nowrap+ellipsis 测算列策略冲突，建议改用列级 class-name；同时确认 `:show-overflow-tooltip=\"false\"` 经 $attrs 覆盖组件默认值的写法是对的。",
+   "files": [
+    "zhi2-web-admin/src/views/system/menu/index.vue",
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/styles/index.scss"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "7560fe97-dc41-4c82-af6d-c9967eccba51"
+   ],
+   "bundle": "024.md"
+  }
+ ]
+}

@@ -1,0 +1,115 @@
+{
+ "project": "苏住房C",
+ "batch": "050",
+ "files": [
+  "050.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "线上这些脚本提示没法加载，苏服办里面是好的，用支付宝",
+   "type": "fact",
+   "content": "**问题原因** `index.html` 里原来用的是相对路径 `./static/js/...`。这类路径会按**当前页面 URL** 解析，而不是按站点部署目录。 微信、支付宝里常见入口是： ``` https://域名/szffluzm ← 没有尾部斜杠 ``` 此时 `./static/js/hex.js` 会被解析成： ``` https://域名/static/js/hex.js ← 404，少了 /szffluzm ``` 苏服办 App 的 WebView 通常用带 `index.html` 或带尾部斜杠的地址，例如 `/szffluzm/` 或 `/szffluzm/index.html`，所以 `./static` 能正确解析，看起来“只有苏服办正常”。 **已做修改** 在 `index.html` 中改为根据 `location.pathname` 计算资源根路径，再用绝对路径加载脚本： | 访问地址 | 脚本实际加载路径 | |---------|----------------| | `/szffluzm` | `/szffluzm/static/js/hex.js` | | `/szffluzm/` | `/szffluzm/static/js/hex.js` | | `/szffluzm/index.html` | `/szffluzm/stati",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`index.html",
+    "`./static/js/hex.js",
+    "https://域名/static/js/hex.js",
+    "`/szffluzm/index.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "43c2d24d-9340-4131-a043-2b0f220ba0b9"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "UI紊乱",
+   "type": "fact",
+   "content": "已修复「关于我们」页面的 UI 紊乱问题。 **原因**：`ZsImage` 组件内部对图片设置了 `width: 100%; height: 100%`，会把图片撑满父容器。页面上把 `class=\"logo\"`（80×80px）直接写在 `ZsImage` 上时，组件内部样式优先级更高，logo 被拉满整屏宽度，出现你截图里那种巨大蓝色图形。 **修复**：参考项目中 `cancellationWarning` 等页面的写法，用固定尺寸的容器包裹 `ZsImage`： - Logo：80×80px 容器 - 电话/地址图标：16×16px 容器（与 SVG 原始尺寸一致） 请重新编译并在微信开发者工具中预览「关于我们」页面，logo 应正常显示为 80px，底部联系信息也会正常排列。若其他页面有类似图标过大问题，可用同样方式处理。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\about\\AboutUs.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\about\\AboutUs.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cf3f235e-357f-45ef-a9c7-36f63007668f"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "message：自动预览 Error: wxss 编",
+   "type": "fact",
+   "content": "已修复。根因是**微信小程序 WXSS 不支持 `:not()` 伪类选择器**，编译后样式里出现了这类写法，导致 `error at token ':'`。 ## 问题原因 三个报错文件都含有 WXSS 不支持的 CSS 选择器： 1. **`> :not(.page-bg)`** — 用于让 PageBg 背景图下方的内容保持在上层 2. **`.page:not(.page-wrapper)`** — 来自 `uni.scss` 的全局样式，被各页面打包进 wxss ## 修复内容 | 文件 | 修改 | |------|------| | `TypeChoose_Suzhufang.vue` | `> :not(.page-bg)` → 显式选择 `.type-text, .title_card_container` | | `house/index.vue` | `> :not(.page-bg)` → `.top-empty .button` | | `tenant/index.vue` | `> :not(.page-bg)` → `.top-empty .search-container, .project, .button` | | `uni.scss` | `.page:not(.page-wrapper)` → `.page` | 重新构建后，这三个 wxss",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`uni.scss",
+    "`TypeChoose_Suzhufang.vue",
+    "`house/index.vue",
+    "`tenant/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7482cc2e-dca0-4d98-8721-da0bc1b7dffd"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已修复「报事报修」筛选弹窗中「上报日期」的换行显示问",
+   "type": "fact",
+   "content": "已修复「报事报修」筛选弹窗中「上报日期」的换行显示问题。 ## 问题原因 日期 `2026-08-01` 会在连字符 `-` 处断行，导致 `01` 掉到第二行并超出输入框。主要有两点： 1. **`ZsDatePicker` 中间分隔符 `flex: 1`**，占用了过多横向空间，两侧日期框变窄 2. **未设置 `white-space: nowrap`**，日期文本在窄容器内自动换行 ## 修复内容 **1. `filter.scss`（筛选弹窗通用样式）** - 日期值增加 `white-space: nowrap`、`word-break: keep-all`，防止断行 - 分隔符改为 `flex: 0 0 auto`，不再挤压日期框宽度 - 左右内边距改为对称 `padding: 0 8px`，并居中显示 **2. 三处 `ZsDatePicker` 组件**（`pages_owner_extra`、`pages_owner`、`pages_main`） - 同步修复分隔符 flex 布局 - 日期文本增加不换行样式 涉及页面包括： - 报事报修列表（`pages_owner_extra/repair/index.vue`） - 公共收益收支明细 - 维修资金业务明细 重新编译小程序后，上报日期应能在一行内完整显示为 `2026-08-01`。如仍有问题，可发一张新截图",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`filter.scss",
+    "报事报修列表（`pages_owner_extra/repair/index.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\styles\\filter.scss、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\repair\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c59bc687-6e91-42f1-ba7a-8d423e305220"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "文件上传的接口content-type是multip",
+   "type": "preference",
+   "content": "已按你的要求调整文件上传逻辑，主要改动如下： ### 1. `gateway.js` — 文件以 multipart 直传 - **去掉 base64**：删除 `blobToBase64`，文件不再写入 `biz_content` - **文件单独作为表单字段**：通过 `formData.append(fileField, fileBlob, fileName)` 以二进制上传 - **`biz_content` 只含业务参数**：如 `type`、`busCode` 等 JSON 字段 - **精简上传网关 header**：新增 `buildUploadGatewayHeader`，仅保留 `zs-authorization`、`zs-path`、`zs-source`，去掉 `zs-sign`、`zs-param`、`zs-method` 等冗余头 - **移除错误的 Content-Type 默认值**：不再手动设置 `multipart/form-data`（需由浏览器自动带上 boundary） ### 2. `httpInstance.js` — 上传请求 - 不再向网关透传多余的 HTTP headers（如 `Authorization`） - 附件上传优先使用 `formData.token` 作为鉴权 token ### 3. `file.js` — 附件",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`gateway.js",
+    "`httpInstance.js",
+    "`file.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\repair\\add.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\gateway.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0b56ec32-ad5b-4d9a-918c-7580d24e744d"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序：校验失败时，缺少人工添加的功能 我的-我的房",
+   "type": "preference",
+   "content": "## 问题原因 按合同 / 不动产权证 / 房屋所有权证添加房屋时，调用 `handleHouseOwner` 若返回非 200，HTTP 拦截器会自动 `showToast` 并 `reject`，页面没有 `.catch` 处理，因此错误提示一闪而过，也不会出现设计稿里的「人工登记」弹窗。 ## 修复内容 1. **`property.js`**：新增 `verifyHouseOwner`，使用 `noReject: true`，由页面自行处理失败逻辑，避免全局 toast。 2. **`addHouse.vue`**（不动产权证 / 房屋所有权证）： - 改用 `verifyHouseOwner` - **核验失败**：展示「核验失败」弹窗，提供「人工登记」和「重试」 - **未查到房屋 / 未关联小区**：继续用原有成功类弹窗引导人工登记 3. **`addHouseContract.vue`**（按合同添加）： - 与上面逻辑对齐 - 原先未查到房屋会直接跳转登记页，现改为先弹窗再选人工登记 - 按钮文案由「手动维护」改为「人工登记」 ## 修复后交互 | 场景 | 弹窗 | 操作 | |------|------|------| | 核验失败（接口报错） | 核验失败 | 人工登记 → `register` 页 / 重试 | | 未查到房屋 | 核验成功但未登记 | 人",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`property.js",
+    "**`addHouse.vue",
+    "**`addHouseContract.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner\\addHouse.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner\\addHouseContract.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\components\\TypeChoose_Suzhufang.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2bea3534-bd43-456f-baef-32b59c649b85"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

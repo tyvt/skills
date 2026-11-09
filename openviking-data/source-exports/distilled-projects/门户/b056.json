@@ -1,0 +1,73 @@
+{
+  "project": "门户",
+  "batch": "056",
+  "files": [
+    "056.md"
+  ],
+  "count": 4,
+  "memories": [
+    {
+      "title": "CI 报 404 '--no-fund@*' is not in this registry：install.mjs 把 npm 配置参数当包名，vite 找不到是它的连带现象",
+      "type": "bug",
+      "content": "【什么情况】GitLab CI 里 `scripts/vite-build.mjs` 抛 `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite' imported from .../zhi2-web-admin/scripts/vite-build.mjs`；改用仓库自己的安装脚本后仍报 `npm error code E404 404 Not Found - GET https://registry.npmjs.org/--no-fund`、`'--no-fund@*' is not in this registry`。\n【为什么】门户是 **npm workspaces 单仓**（父仓 `zhi2-web-admin-h5-g-unlimited` + 子模块 `zhi2-web-admin`），依赖会被提升到仓库根目录的 `node_modules`；而父仓 `scripts/install.mjs` 在转发参数时把 `--no-audit`、`--no-fund` 这类 **npm 配置参数当成包名**拼进了 install 命令，npm 就去 registry 找名为 `--no-fund` 的包 → E404 → 安装失败 → 子模块目录里没有 `node_modules/vite` → 构建脚本 import 失败。两条报错是同一条因果链，不是两个独立问题。\n【怎么做】① 先修参数解析：`install.mjs` 把 `--` 开头的配置参数与包名分开，只把包名传给 npm（父仓提交 `23a20f3`）；② 依赖必须在**仓库根目录**安装（`node scripts/install.mjs` 或 `PM=npm node scripts/install.mjs`），子模块目录里不会有完整 node_modules；③ vite 属 devDependencies，禁止 `npm install --omit=dev` / `--production`，否则 vite 必缺；④ 构建脚本改成「先在项目内找 vite，找不到再自动安装」（子模块提交 `e7df5c80e`），并用 `node scripts/ci-doctor.mjs` 做依赖就绪自检；⑤ 复现验证要在**干净工作区**（无 node_modules）里按 CI 的真实顺序跑三步：`npm run install-dependencies --no-audit --no-fund` → `npm run test` → `node scripts/ci-doctor.mjs`，全部 EXIT=0 才算修好（本批 added 841 packages，关键版本 vite 5.4.11 / @vitejs/plugin-vue2 2.3.1 / sass 1.96.0 / unocss 66.5.10 / rollup 4.46.2）。",
+      "evidence": "会话 session-caa8ca81-1878-4f17-b818-2b2fb0210af9（基线 b6165db）用户诉求 1 贴出 CI 原文 `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite'`；诉求 6 贴出 `npm error code E404 / 404 Not Found - GET https://registry.npmjs.org/--no-fund / '--no-fund@*' is not in this registry`；最终结论给出验证表（install-dependencies EXIT=0 added 841 packages、npm run test EXIT=0、ci-doctor EXIT=0）与两条修复提交（install.mjs 参数解析 23a20f3、子模块 vite 自动安装 e7df5c80e）。",
+      "files": [
+        "scripts/install.mjs",
+        "scripts/ci-doctor.mjs",
+        "zhi2-web-admin/scripts/vite-build.mjs",
+        "package.json"
+      ],
+      "baseline": "b6165db",
+      "sessionIds": [
+        "session-caa8ca81-1878-4f17-b818-2b2fb0210af9"
+      ],
+      "bundle": "056.md"
+    },
+    {
+      "title": "public/version.json 是构建副产物：每次 build 都会被改写，提交它会让版本信息失真，提交前一律还原",
+      "type": "preference",
+      "content": "【什么情况】构建完成后工作区里总会出现 `public/version.json` 的改动（门户父仓与子模块各一份），diff 内容是一个指向旧哈希的时间戳文件；多次会话都遇到「这个文件到底要不要提交」。\n【为什么】该文件由构建脚本在每次 `npm run build` / `scripts/vite-build.mjs build` 时自动改写（写构建时间戳与 commit 哈希），不是人工维护的源码；提交进去会让仓库里的版本号与实际构建产物脱节，下一次构建又被改写，形成无意义噪音 diff 与版本信息失真。\n【怎么做】① 每次 build 后 `git status` 里出现 `public/version.json` 一律 `git checkout -- public/version.json` 还原，不纳入本次提交；② 同类还有根目录临时文件（`.build-log.txt`、`.tmp-zentao-5959-20908.png`、`.tmp-zentao-5959-resolve.html`），用具体路径暂存，绝不 `git add .`；③ 只暂存本次真正改动的文件，工作区里可能有别的会话正在改的文件；④ 汇报时明确写一句「构建产生的 public/version.json 已还原，未夹带提交」，避免下游 CI/发版误取旧哈希。",
+      "evidence": "会话 session-caa8ca81-1878-4f17-b818-2b2fb0210af9（基线 b6165db）最终结论「关于 version.json」段：「这个文件在验证过程中被构建脚本改写，指向了旧哈希……提交它反而会让版本信息失真，所以我还原了它，没有提交」；同一约定在本批 session-2d1bdfb2、session-52b41294、session-0614d888 与 057 的 session-abb4dea8 中反复出现（「构建过程重写的 public/version.json 已还原，未夹带进提交」）。",
+      "files": [
+        "zhi2-web-admin/public/version.json",
+        "public/version.json"
+      ],
+      "baseline": "b6165db",
+      "sessionIds": [
+        "session-caa8ca81-1878-4f17-b818-2b2fb0210af9"
+      ],
+      "bundle": "056.md"
+    },
+    {
+      "title": "下划线式 tab 视觉错位的根因是 align-self:stretch 把按钮拉满工具栏高度，不是字号或下划线粗细",
+      "type": "bug",
+      "content": "【什么情况】门户经纪机构页表格工具栏里嵌的「交易记录 / 信用记录」tab 被判定「样式不对，参考项目里面的其他 tab」，用户连说两次不对。\n【为什么】原实现 `.broker-record-tabs { display:flex; align-self:stretch; gap:32px; }` + `button { border-bottom: 3px solid transparent }`：`align-self: stretch` 让按钮这个 flex item 被拉满 60px 工具栏高度，文字垂直居中在约 30px 处，而 3px 下划线贴在**工具栏最底边**（y≈57–60），于是视觉上是「一行字 + 一条离得很远的粗线」。20px 字号与 3px 线宽只是放大了这个错位，不是病灶。\n【怎么做】① 先调研项目里已有的 tab 写法再动手（门户里 `zs-tabs` 被 39 处业务页使用，激活态 = `::after` 2px 下划线 + `font-weight:500`，bar 高 40px、字号 14px、`margin-right:32px`；另有 OperationGuideTabs 的 `#2a5faa` 蓝底白字块、components/TabBar.vue 的白底主色字、index.vue 的描边小方块等）；② 对齐项目通用样式：按钮固定 40px 高、在 60px 工具栏内垂直居中（顶部留白 10px），下划线改由按钮自身 `::after` 绘制（2px、贴住文字底部），不再依赖按钮高度；③ 激活态用 `--portal-accent`(#3f669c) + `font-weight:500`，未激活 #333，间距 32px，字号 20px 与工具栏标题同级；④ 保留无障碍属性 `role=\"tab\"`/`aria-selected`/`tabindex`/左右方向键，类名由 `.broker-record-tabs` 改为 `.portal-tabs`/`.portal-tab`；⑤ 改完补 e2e 结构断言把「间距 32px / 高 40px / 字号 20px / 激活色与字重 / ::after 高 2px 且贴按钮底边 / 顶部留白 10px」锁死，防止下划线又贴回工具栏底边。",
+      "evidence": "会话 session-2a8f309e-c78b-4fa1-a092-4b9460fcf9bf（基线 d8addc3）用户诉求 1「tab标签样式不对，参考项目里面的其他tab，然后把指标分类去掉」；子代理只读调研结论 0 节指出「关键病灶不是字号，而是 align-self: stretch……3px 下划线贴在工具栏最底边（y≈57–60）」并给出 5 套候选 tab 的对照表（zs-tabs 用 39 处）；最终结论落地为固定 40px 高 + ::after 2px 下划线 + 激活态 #3f669c/500，并补 e2e 断言。",
+      "files": [
+        "zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue",
+        "zhi2-web-admin/tests/e2e/public-portal-interactions.spec.ts",
+        "zhi2-web-admin/src/components/zs-tabs/zs-tabs.vue"
+      ],
+      "baseline": "d8addc3",
+      "sessionIds": [
+        "session-2a8f309e-c78b-4fa1-a092-4b9460fcf9bf"
+      ],
+      "bundle": "056.md"
+    },
+    {
+      "title": "装饰箭头对齐卡片中心线：让箭头盒与菜单卡片同高同顶再 flex 居中，别用 top 偏移推算",
+      "type": "pattern",
+      "content": "【什么情况】门户首页板块菜单（商品房 / 存量房 / 面积管理 / 住房租赁）的箭头被要求「和图标垂直居中」「箭头和菜单容器要垂直居中」。\n【为什么】原实现把箭头用 `top` 偏移硬编码（例如 `top: 29px`）去「推」到大致位置，这种对齐依赖父容器的 padding、字号、行高和菜单数量，任何一处变化（板块菜单增删、字号调整）都会重新错位；肉眼看「差不多」也不算数。\n【怎么做】① 在菜单容器上定一个统一高度变量（如 `--biz-item-height: 93px`），菜单卡片 `height: var(--biz-item-height)` + `box-sizing: border-box`，让卡片高度确定；② 箭头盒与卡片**同高同顶**（同一行 flex、同样高度），盒内用 flex 居中 → 箭头中心必然等于卡片中心线，不再依赖 padding/字号推算；③ 验证用几何量而不是肉眼：取真实矩形比较「卡片中心 Y」与「箭头盒中心 Y」，本批实测商品房/存量房偏差均为 0px，连 svg 图形本身偏差也是 0px（面积管理与住房租赁走 `showStepArrows:false` 无箭头）；④ 附带收益是四个板块菜单卡片高度统一为 93px（原来靠 padding 自然撑开，各板块可能差零点几像素），文字底部留白 12.75px 无裁切。",
+      "evidence": "会话 session-26583b70-9311-4669-81de-5a735c71d2ca（基线 65275e9）用户诉求 4「商品房和存量房的箭头都和图标垂直居中」、诉求 5「箭头和菜单容器要垂直居中」；最终结论给出改法（`--biz-item-height: 93px` + 箭头盒与卡片同高同顶 + 盒内 flex 居中）与实测表（商品房 93/399.5/399.5/偏差 0/svg 偏差 0）。",
+      "files": [
+        "zhi2-web-admin/src/views/home/components/HomeBizSection.vue",
+        "zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts"
+      ],
+      "baseline": "65275e9",
+      "sessionIds": [
+        "session-26583b70-9311-4669-81de-5a735c71d2ca"
+      ],
+      "bundle": "056.md"
+    }
+  ]
+}

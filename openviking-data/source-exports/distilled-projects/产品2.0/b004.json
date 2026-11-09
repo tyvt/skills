@@ -1,0 +1,319 @@
+{
+ "project": "产品2.0",
+ "batch": 4,
+ "files": [
+  "013.md",
+  "014.md",
+  "015.md",
+  "016.md"
+ ],
+ "count": 18,
+ "memories": [
+  {
+   "title": "增删改入口用弹窗还是整页，按「字段总数」定档（<6 字段用弹窗新增），且不要把详情也改成弹窗",
+   "type": "preference",
+   "content": "情况：产品2.0 后台里同一批基础数据页（如公共收益-标准账套 benefit/pubStandardAccountSet）同时存在 index.vue（列表）、detail.vue（整页详情）和弹窗新增三套入口，开发容易顺手把详情也改成弹窗，或在列表内嵌一个样式不同的新增表单。\n\n结论（用户明确要求）：用户的原话是「标准账套不要加详情弹窗，是新增改为弹窗，对于详情页少于6个字段的，新增改为弹窗」。可提炼为两条硬约定：\n1. 「查看详情」入口保持整页 detail.vue + 路由跳转，不要额外弹一个详情弹窗（否则同一份数据有两套展示口径，字段/校验/样式会各自漂移）。\n2. 「新增」是否用弹窗，取决于该业务字段总数：少于 6 个字段的业务一律弹窗内完成新增；字段多、需要分区块或带子表的才保留整页新增页。\n\n为什么：字段少的表单走整页会留下大片空白且多一次路由跳转，用户体验差；字段多的塞进弹窗则会出现双列栅格挤爆、label 截断、纵向滚动。用「字段数」做分界，是最容易在评审和代码层面统一判定的口径。\n\n怎么做：改这类页面时先数一遍 detail.vue 里 contentInfo/formItems 的字段条数，再决定新增形态；弹窗新增复用同模块已有的 zs-dialog 宽度档位与 form-layout，列表页只保留 index.vue 的列表职责，不再复制一份详情展示。",
+   "evidence": "会话 cb4c54d1 用户诉求 2：「标准账套不要加详情弹窗，是新增改为弹窗，对于详情页少于6个字段的，新增改为弹窗」；代码基线 2e3ec05，涉及 benefit/pubStandardAccountSet/index.vue、detail.vue。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubStandardAccountSet\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubStandardAccountSet\\detail.vue"
+   ],
+   "baseline": "2e3ec05",
+   "sessionIds": [
+    "cb4c54d1-6484-46f7-ad63-c3eb98b8f094"
+   ],
+   "bundle": "013.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "zs-tabs 要下划线 Tab 时用新增的 type=\"line\" 变体，不要改默认 card 或逐页 :deep 覆盖",
+   "type": "pattern",
+   "content": "情况：部分页面（标准账套-财务科目子表、凭证模板/科目明细的「选择会计科目」弹窗、财务科目列表）的 Tab 需要设计稿的下划线样式，而其余页面是多页签卡片样式。\n\n为什么不能在页面里改：项目 Tab 统一走公共 zs-tabs，如果在某个页面写 :deep(.tabs-tab) 覆盖成下划线，会与其它页形成两套相反口径；而直接改默认态又会波及全站所有页签。\n\n做法：给 zs-tabs 增加显式的 type 变体，页面按设计稿按需开启。type=\"line\" 的具体规格：\n- 默认项：深灰文字 rgba(0,0,0,0.88)、14px；\n- 选中项：主题蓝文字 + font-weight 500 + 底部 2px 蓝色下划线；\n- Tab 栏：底部 1px #f0f0f0 分隔线，项与项间距 32px；\n- 内容区：无边框、无卡片包裹，顶部间距 12px。\n原有 type=\"card\"（默认值）保持不变，零回归。\n\n落地要点：切换时只改模板上的 type 属性，删掉页面级对 .tabs/.tabs-tab 的 scoped 覆盖；子表（如 financialSubjectsTable.vue）和弹窗内表格（如 treeTable.vue）同样走这个变体，保证同一业务内 Tab 观感一致。凡是「Tab 要 100% 对齐某个设计稿」的需求，先看公共组件是否已有对应 type，没有就新增变体而不是页面覆盖。",
+   "evidence": "会话 cb4c54d1 用户诉求 3「tab改为这个UI，要100%一致」及其最终结论：zs-tabs 新增 type=\"line\"，并切换 financialSubjectsTable.vue、treeTable.vue、pubFinanceAccount/index.vue。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubStandardAccountSet\\components\\financialSubjectsTable.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubVoucherTemplate\\components\\treeTable.vue"
+   ],
+   "baseline": "2e3ec05",
+   "sessionIds": [
+    "cb4c54d1-6484-46f7-ad63-c3eb98b8f094"
+   ],
+   "bundle": "013.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "详情页 Tab 内的子表工具栏：按钮放 Headline 的 #right 插槽，同时去掉 position:absolute 与操作列 fixed:right",
+   "type": "pattern",
+   "content": "情况：详情页 Tab 里的表决项表格（autonomy/multiply/components/VotingItemsTable.vue）表现出两个症状：表格列之间出现空白、操作按钮被挤掉或错位。\n\n根因是三条独立写法叠加：\n1. 工具栏按钮用 position: absolute 定位在表格上，脱离文档流后既压住数据列，又不参与父容器高度计算；\n2. 操作列同时写了 fixed: right，固定列与数据列之间会留出一段空隙；\n3. 用的是原生 el-table-column 而不是 zs-table-column，列宽测算走两套口径，空白进一步放大。\n\n做法（对齐同模块「单议题表决」的既有实现）：\n- 按钮改放公共 Headline 组件的 #right 具名插槽，删掉 absolute；\n- 操作列取消 fixed: right；\n- 列声明统一换成 zs-table-column，交给组件统一算宽；\n- 表格开 auto-height 按内容自适应，避免末尾多出空白行。\n同一页的另一块（决策范围 DecisionRangeTable.vue）同理：在 zs-search-form 里用 #actions 插槽把「新增/删除」放进右侧按钮栏、位于「查询/重置」正下方，组件自带 Headline 标题，表格也开 auto-height。\n\n另一个配套坑：详情页外层不要再包一层 Headline 去套已有标题的组件，否则出现双层标题并引发布局冲突——子组件自带标题时，外层直接放组件即可。",
+   "evidence": "会话 7a62e9a6 用户诉求 2/3/4（「页面出现空白」「表格列出现空白」「两个都不行」）及最终结论：去 absolute、改 Headline #right、取 fixed:right、换 zs-table-column、开 auto-height、zs-search-form 新增 #actions 插槽。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\autonomy\\multiply\\components\\VotingItemsTable.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\autonomy\\multiply\\components\\DecisionRangeTable.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\autonomy\\multiply\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\autonomy\\option\\components\\DecisionRangeTable.vue"
+   ],
+   "baseline": "6accf9a",
+   "sessionIds": [
+    "7a62e9a6-5f35-46c3-b3af-b44bad9ba866"
+   ],
+   "bundle": "013.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "子表操作列的「操作」两字被裁/错位：改公共 zs-operate-column 的列宽兜底，不在各业务表上调 width",
+   "type": "bug",
+   "content": "情况：维护-开户（maintenance/accountOpen/owner）与自治-表决等页面的子表操作列，表头「操作」文字显示不全或按钮被裁，且各页表现不一致。\n\n为什么不能逐页改：操作列由公共组件 zs-operate-column 统一渲染，页面侧要么不传 :width 让它按按钮文字自适应，要么不同页面各传一个固定宽度；一旦某个页面写死宽度（例如 60/80），「操作」两个中文加内边距就装不下而被省略号或裁切。逐个页面调 width 会造出多套口径，且新增按钮时又复发。\n\n做法：把列宽兜底下沉到 zs-operate-column 组件内部（按按钮文本测算并给最小值），业务页面只声明按钮，不再传固定 :width；已经写死的页面逐个删掉 width 而不是改成更大的数字。改完后按「同列不同页面」横比一遍表头是否完整、按钮是否等距。\n\n附带约定：操作列同时不要写 fixed: right，固定列与数据列之间会留出空白块（同类空白还可由原生 el-table-column 与 zs-table-column 混用引起）。",
+   "evidence": "会话 7a62e9a6 涉及文件含 src/components/zs-operate-column/zs-operate-column.vue 与 maintenance/accountOpen/owner/components/OpenDetailTable.vue，用户反馈「表格列出现空白」「两个都不行」，最终结论改用 zs-table-column、取消 fixed: right。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-operate-column\\zs-operate-column.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\accountOpen\\owner\\components\\OpenDetailTable.vue"
+   ],
+   "baseline": "6accf9a",
+   "sessionIds": [
+    "7a62e9a6-5f35-46c3-b3af-b44bad9ba866"
+   ],
+   "bundle": "013.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "三个租赁合同备案模块的列表说明文字：统一成「橙色警告图标 + 深灰正文、只有关键词标橙」，并内边距 8px",
+   "type": "pattern",
+   "content": "情况：公共收益-租赁合同备案下三个模块（经营资产 assetsLeaseContractFiling、经营资源 resourcesLeaseContractFiling、停车泊位 parkingSpaceContractFiling）的列表页顶部说明文字各写一份样式，整段橙色、上下内边距 15px、无图标，与同模块的房源表（pubHouseTable）风格不一致。\n\n根因：说明文案是各页手写的 div + scoped 样式，没有对齐已成熟的 operation-hint 样式。\n\n做法（以 pubHouseTable 的 operation-hint 为基准）：\n- 左侧带橙色警告图标，文案左对齐；\n- 正文颜色 #333，只有需要强调的关键词用橙色，不要整段染色；\n- 上下内边距 8px（原来是 15px），纵向更紧凑；\n- 三个模块三处一起改，顺带修掉经营资产、停车泊位表格标签上多余的 `>` 字符。\n\n同类改造注意：一旦第 4 个模块也要这个提示，就把 operation-hint 抽成公共组件/公共类，而不是继续复制第四份 scoped 样式。\n\n详情页侧的配套约定（同一批租赁合同详情）：Headline 必须显式传 titleText=\"基本信息\"，否则区块标题是空的；查看态的 basicInfoList / payeeInfoList 要补两列布局配置（lg/xl: 12），默认三列会让「收款方」这类字段被拆得过窄。",
+   "evidence": "会话 8331b045 用户诉求：「租赁合同备案中 经营资产租赁合同、经营资源租赁合同、停车泊位租赁管理中均存在以下问题：参考样式第二张图」，最终结论给出说明文字样式对齐 pubHouseTable operation-hint 的改法。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubHouse\\components\\pubHouseTable.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\assetLeaseApply\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\assetLeaseApply\\detail.vue"
+   ],
+   "baseline": "41c6961",
+   "sessionIds": [
+    "8331b045-2515-4a08-946d-7d95ffaf7dd5"
+   ],
+   "bundle": "013.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "跨角色全流程 E2E 录屏为空：企业端发起与管理端审核必须拆双账号登录，缺账号要在 beforeAll 直接报错而不是 skip",
+   "type": "bug",
+   "content": "情况：跑 npm run test:e2e:company-record-change 后 test-results/company-record-change-full.webm 是空视频（约 0.04 秒的空壳）。\n\n根因：该 spec 的 01–07 用例里全都写了依赖条件的 test.skip，而运行环境默认用的是管理端账号（PLAYWRIGHT_LOGIN_TYPE=account），企业端发起的用例条件不成立被集体跳过。Playwright 的 video 是「用例级」录屏，全部跳过时只产出一个几乎没帧的 webm，后续 8 段合并出的成片自然也是空的。所以「录屏为空」不是合并脚本的锅，是源用例根本没跑。\n\n做法：按「发起方 / 审核方」两个角色拆账号，对齐已成熟的 personnel-record 08 用例：\n- 01–07 走 loginAsCompany()，企业账号完成发起、保存、提交、查看；\n- 08 走 loginAsAdmin()，管理端进入变更详情并点「审核」；\n- 账号从 e2e/.env.e2e 读：PLAYWRIGHT_COMPANY_USERNAME / PLAYWRIGHT_COMPANY_PASSWORD / PLAYWRIGHT_ADMIN_USER / PLAYWRIGHT_ADMIN_PASSWORD；\n- beforeAll 里显式校验这几个变量，缺失直接抛错，让 CI 红在「没配账号」而不是静默产出空视频；\n- 合并脚本保留「单段录屏 < 10KB 即中止合并」的守卫做最后一道保险。\n\n排查口诀：录屏是空壳时先数跑了几个用例，而不是先怀疑 video 配置或 ffmpeg 合并。",
+   "evidence": "会话 f8ffbc1c 用户诉求 1「@zhi2-web-admin/test-results/company-record-change-full.webm 视频空的」与诉求 2「企业信息变更发起是用企业账号，审核使用管理员账号」，最终结论给出双账号 + beforeAll 校验 + 合并脚本体积守卫。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\company\\company-record-change.spec.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\scripts\\merge-company-record-change-video.mjs"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "f8ffbc1c-7b40-482d-bf84-4868214af266"
+   ],
+   "bundle": "013.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "租赁合同的路由判定标志别塞进 main.js 全局 mixin，独立成 leaseContractMixins 由子表/弹窗按需继承",
+   "type": "preference",
+   "content": "情况：租赁合同备案要按当前路由区分「经营资产租赁合同 / 经营资源租赁合同」（isAssetsContractFiling / isRevenueContractFiling），初版实现直接挂进了 main.js 的全局 mixin。\n\n为什么不能放全局 mixin：main.js 的 mixin 会注入全站每个组件实例，两个租赁专属 computed 对其它所有模块都是死代码，还会和其它页面同名变量撞车（Vue2 里 data 优先于 computed、同名会告警并互相覆盖）；而且路由判定逻辑一旦要调整，影响面无法评估。\n\n做法（用户明确要求「不要加在全局里面，单独写mixin」）：\n1. 从 main.js 全局 mixin 中删除这两个 flag；\n2. 新建 src/mixins/leaseContractMixins.js，只放租赁合同的路由判定；\n3. 按需引入：子表侧由 subTableMixins.js 统一继承（houseTable、subVenueTable、subAdvertiseTable、subOtherTable 随之获得），弹窗侧各组件自己写 mixins: [dialogMixins, leaseContractMixins]（subVenueDialog、subAdvertiseDialog、subOtherDialog）。\n\n效果：判定逻辑与路由行为不变，作用范围从「全站」收窄到「租赁相关子表与弹窗」。推广口径：任何只服务单一业务域的路由/环境判断，都走独立 mixin + 按需引入，不要图省事挂 main.js；需要跨多个子表复用时套一层 subTableMixins 继承，避免每个子表重复引入。",
+   "evidence": "会话 710f2232 用户诉求 2「@zhi2-web-admin/src/main.js 不要加在全局里面，单独写mixin」，最终结论：新增 src/mixins/leaseContractMixins.js，subTableMixins.js 与各弹窗按需引入。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\subTableMixins.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\assetLeaseApply\\components\\subVenueTable.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\assetLeaseApply\\components\\houseTable.vue"
+   ],
+   "baseline": "41c6961",
+   "sessionIds": [
+    "710f2232-3ba0-4139-9d99-3fa269331edd"
+   ],
+   "bundle": "013.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "详情页两栏区块换顺序：编辑与查看两套声明必须同步换，子表数据加载与回传不能跟着删",
+   "type": "pattern",
+   "content": "情况：公共收益-租赁管理-租赁合同备案（经营资产 / 经营资源）要求把「出租房信息」和「公共区域场所」调换位置（出租房在上、场所在下），而且是「编辑详情页同样调换」。\n\n为什么容易做错：详情页的这两块内容有两套独立声明——编辑态靠模板里的组件顺序，查看态靠 contentInfo/字段构造器的顺序；只改一处就会出现「查看对了、编辑反了」。更危险的是，一旦某块在查看态不再展示，有人会顺手把它的子表组件和取数一起删掉，导致保存主表时把历史子表数据清空。\n\n做法：\n1. 先定位两栏的渲染顺序来源（编辑态模板 + 查看态 contentInfo），两处同序调整，不要用 CSS order 之类的视觉置换；\n2. 子表（subVenueTable 等）的取数与回传链路保留，位置变了不等于数据可以不要；\n3. 「查看详情」里的公共区域场所要分别支持「新增/编辑」与「纯查看」两种入口，按钮显隐按当前 formMode 判定，不要复用同一个可编辑组件；\n4. 改完按「编辑态 → 保存 → 查看态」走一遍顺序与数据是否都在。\n\n同批页面的列表说明文字样式也一并对齐（橙色警告图标 + 深灰正文、只有关键词标橙、内边距 8px），三个租赁合同模块一起改。",
+   "evidence": "会话 710f2232 用户诉求 1：「出租房信息和公共区域场所调换位置（住租房信息在上 公共区域场所在下） 编辑详情页同样调换位置；查看详情-新增/编辑公共区域场所；查看详情-查看公共区域场所」，涉及 assetsLeaseContractFiling/detail.vue、resourcesLeaseContractFiling/detail.vue、subVenueTable.vue。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\assetsLeaseContractFiling\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\resourcesLeaseContractFiling\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\assetLeaseApply\\components\\subVenueTable.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubVenue\\components\\venueDialog.vue"
+   ],
+   "baseline": "41c6961",
+   "sessionIds": [
+    "710f2232-3ba0-4139-9d99-3fa269331edd"
+   ],
+   "bundle": "013.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "zs-dialog 内 zs-table 左右缺 padding：不能逐弹窗补页面样式，须在 zs-table 组件层公共容器加水平内边距",
+   "type": "bug",
+   "content": "【什么情况】经营用房（pubHouse）详情弹窗里的「资产部位」子表、公房车位弹窗、房屋部位 assetDialog 中的表格都紧贴弹窗边缘、左右各少一截留白；只有部分弹窗缺，其他弹窗正常。用户只报「表格左右缺失 padding」。\n【为什么】zs-table 自身只有一份 .zs-table-container 布局，水平留白完全依赖外层容器（.list-card / .sub-container / .form-box 等）提供；一旦表格被放进 zs-dialog 的 .form-box 里，就没有任何一层给左右 padding，于是「有的弹窗有、有的没有」。改页面级 scoped 样式只能在当次弹窗生效，同类弹窗还会复发。\n【怎么做】把水平留白下沉到 zs-table 的公共容器规则（与 .list-card、.sub-container 那套拓扑同源），一处改所有弹窗内的表格都生效；改完必须用截图在多个弹窗（含公房车位、房屋部位）逐个复核左右是否一致，确认不再出现「改了某个弹窗仍没生效」。修完通过子模块提交，再 cherry-pick 到 v2.6.2 / v2.6.2-yulin 分支。",
+   "evidence": "会话 2ee3fa7e：用户先后发两张截图报「表格左右缺失padding」，并在指出 pubHouseDialog.vue 改后「没生效」；改动落在 zs-table.vue 与 styles/index.scss（公共层）后一次对齐，公房车位/房屋部位弹窗复用同一规则全部恢复。最终子模块 d87a19724 → cherry-pick 97cb12059 / f36236202。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\styles\\index.scss",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubHouse\\components\\pubHouseDialog.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubParkingSpace\\components\\parkingDialog.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\housePart\\components\\assetDialog.vue"
+   ],
+   "baseline": "6accf9a",
+   "sessionIds": [
+    "2ee3fa7e-3302-4162-9884-a54bd1cffc7f"
+   ],
+   "bundle": "014.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "小范围修复要同步到多条版本分支时，用 cherry-pick 修复提交而不是全量 merge",
+   "type": "workflow",
+   "content": "【什么情况】一个缺陷已在 develop/v2.6.1 修好，需要同时带到 develop/v2.6.2 与 develop/v2.6.2-yulin；直接全量 merge v2.6.1 → v2.6.2 时两个分支已分叉较远，冲突非常多，绝大多数与本次修复无关。\n【为什么】全量 merge 会把主干上无关的改动一起带过去，冲突面大、评审成本高，且回滚困难；而缺陷恰恰是极小的一块公共样式/组件改动，按提交粒度搬运即可。\n【怎么做】(1) 先在主干提交并推送，记下子模块提交号；(2) 在目标分支上 cherry-pick 该子模块提交，各自产生一个新提交号，再推送；(3) 父仓库（superproject）只更新子模块指针，同样在三条分支各提交一次指向对应子模块提交；(4) 本地环境文件（env/.env 的代理配置）不入库，提交前核对 git status 排除；(5) 完成后把工作区切回主干分支，并逐分支远程核对提交是否到位。",
+   "evidence": "会话 2ee3fa7e 最终结论：子模块 develop/v2.6.1 d87a19724 → v2.6.2 97cb12059 / v2.6.2-yulin f36236202 均为 cherry-pick；父仓库 669d166 / c2d4531 / 90b47f6 对应更新指针；明确记录「全量 merge v2.6.1 → v2.6.2 冲突较多，因此改为 cherry-pick 本次修复提交」；env/.env 未提交，工作区恢复到 develop/v2.6.1。",
+   "files": [],
+   "baseline": "6accf9a",
+   "sessionIds": [
+    "2ee3fa7e-3302-4162-9884-a54bd1cffc7f"
+   ],
+   "bundle": "014.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "表格 border=false 仍显示列竖线：全局样式无条件给单元格加 border-right，压过了 el-table 的 border 开关",
+   "type": "bug",
+   "content": "【什么情况】资产租赁申请、资源租赁申请（列表页与详情页同理）把 zs-table 的 :border 设为 false，列竖线仍然存在。\n【为什么】zs-table 的 border 只负责往 el-table 上打 el-table--border 类；而 .list-card 里的全局样式**无条件**给所有单元格加 border-right，等于把 border 属性完全忽略——开关写了但没人读。\n【怎么做】把「列竖线」规则收窄到 .el-table--border 作用域：border=true → 列竖线 + 行横线；border=false → 只留行横线，没有列竖线。同时在 zs-table 上补 isBorderEnabled 判定并输出容器类 zs-table-container--border，让「列竖线/行横线」两种口径在组件层可辨。验收时要向用户说明：border=false 仍会看到行间横线，那是列表页默认样式，不是 border 控制的列竖线。注意这属于全站表格边框规范的一部分，公共层改完要回归其他模块列表。",
+   "evidence": "会话 49ee8efa：用户先报资产租赁申请/资源租赁申请列表与详情同问题，再指名「border设置为false还是显示边框线」；结论明确根因是 .list-card 全局无条件加 border-right，并在 index.scss 收窄到 el-table--border、zs-table.vue 增加 isBorderEnabled/zs-table-container--border。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\styles\\index.scss",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\assetLeaseApply\\index.vue"
+   ],
+   "baseline": "41c6961",
+   "sessionIds": [
+    "49ee8efa-ceee-4350-9446-1a98b38420eb"
+   ],
+   "bundle": "014.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "门户(p/portal)接口族与后台接口族混淆导致 1400「HTTP请求方法不支持」：路由重写与请求方法同时核对",
+   "type": "bug",
+   "content": "【什么情况】登录后请求 /v2.0/portal/user/getInfo 返回 code:1400、msg「HTTP请求方法不支持」，data 为 null，登录停留在原页。\n【为什么】门户接口与后台接口是两套约定：门户 getInfo 走 GET + 特定的前缀/重写规则，前端若通过 portalApiRewrite 拼出的路径落进后台拦截器（或反过来方法被改写成 POST），服务端就不认这个组合，回报 1400 而不是 401/404，容易被误判成「token 失效」。\n【怎么做】先在 utils/portalApiRewrite.js 核对该路径的重写结果（实际发出去的 URL 与方法），再对照 request.js 的请求方法改写/加解密白名单，确认 portal 前缀的接口既没有被改写路径、也没有被统一改成 POST；必要时给 portal 接口单独划出分支，不要和登录后的业务请求共用同一套改写规则。改完在浏览器 console 网络面板确认最终 method 与 URL，再刷新登录验证；同步自查 store/modules/user.js、api/index.js 里对该接口的调用点。",
+   "evidence": "会话 2caa4ea9 用户诉求 1 给出 {code:1400, msg:\"HTTP请求方法不支持\"/v2.0/portal/user/getInfo\"}；涉及文件 portalApiRewrite.js、store/modules/user.js、api/index.js、utils/request.js、views/login.vue、env/.env。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\utils\\portalApiRewrite.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\store\\modules\\user.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\api\\index.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\utils\\request.js"
+   ],
+   "baseline": "1d563df",
+   "sessionIds": [
+    "2caa4ea9-415d-4bd1-9439-0264ee8f6342"
+   ],
+   "bundle": "014.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "迁移苏州原代码的审批流组件到 V3：$--color-primary 等 SCSS 变量未注入直接编译失败，详情页整页进不去",
+   "type": "bug",
+   "content": "【什么情况】从原仓库（苏州市房地产监测原始代码 apps/chanpin 等）整块迁移 showApproval / showApprovalHeader 等审批流组件后，本地 dev 直接编译报错，业务详情页打不开。\n【为什么】原工程的 SCSS 变量（$--color-primary）在 V3 里并不存在同名注入——V3 主题色是 CSS 变量 --primary-color / --primary-color-rgb；SCSS 变量未定义是编译期错误，整块样式编译失败会把整个页面带崩，表现成「详情页进不去」而不是「颜色不对」。另外旧组件里依赖的相对图片路径在 Vite 下也可能解析失败。\n【怎么做】迁移任何老仓库组件时先做一遍「变量与资源替换」：(1) $--color-primary → var(--primary-color)；(2) rgba($--color-primary, .4) → rgba(var(--primary-color-rgb), .4)；(3) 图片等静态资源统一改到 /assets/images/... 这类 Vite 可解析的路径。改完必须本地跑一次构建确认编译通过，再进详情页验证，而不是只看样式是否接近设计稿。",
+   "evidence": "会话 0e3dadb0：用户指认 detail.vue:905-912 查的还是通用审批流并给出原始代码路径，第二轮要求「也迁移一下，保持一致」，第三轮「sass变量报错，进不去详情页面了」；最终修复 showApprovalHeader.vue 用 var(--primary-color)、showApproval.vue 用 rgba(var(--primary-color-rgb), .4)、图片改 /assets/images/icon-flow.png，构建通过。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\commercialHousingSales\\priceFiling\\recordPriceMngSuzhou\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-approval\\ApprovalProcessDialog.vue"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "0e3dadb0-95af-45c8-ad5c-3b978035c651"
+   ],
+   "bundle": "014.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "变更详情「form 只放变更单、beforeForm 只放对比字段」的双数据源契约（产品2.0 版）",
+   "type": "pattern",
+   "content": "触发场景：企业基本信息变更详情（views/company/companyManagement/change/detail.vue）要看「变更前/变更后」对比，于是页面同时请求 companyRecordChange/detail 与 companyRecord/detail（备案单），结果把备案单的整表合并进 form，变更单自己的 bizState 被备案单的「已备案(2)」覆盖。\n\n为什么错：产品2.0 没有 displayStatus（那是苏州市房地产监测V3 的口径），变更单状态唯一来源就是 companyRecordChange/detail 返回的 bizState（例：在途 = 1）。任何把备案数据 merge 进 form 的写法都会污染这个判定，而按钮组/编辑门控全部读 form.bizState，表现为「状态对了但按钮不对」或「该显示审批按钮却不显示」。\n\n怎么做：定死两条互不越界的通道——1) form 只来自 companyRecordChange/detail；2) beforeForm 只存对比用的业务字段，由 pickChangeBeforeForm 从 originInfo 或 companyRecord/detail 里白名单挑（企业名称、地址、法人等），显式不含 bizState、approveState。loadChangeBeforeForm 负责拉备案数据，结果只写 beforeForm，查看态与编辑态都加载。新增（formMode=add）预填走 mergeChangeRecordIntoForm，同样显式排除 bizState、companyRecordChangeId，防止把备案单状态与主键带进新变更单。",
+   "evidence": "会话 88acb085：「变更详情，没有显示提交按钮」→ 用户指出「不需要 displayStatus 啊，根据 bizState=2 就应该显示审批按钮」与「变更详情为什么要调用 /company/companyRecord/detail 接口，company/companyRecordChange/detail 里面返回的 bizState 就是 1」，最终定原则「form 只来自 companyRecordChange/detail，beforeForm 只存变更前对比字段」，对比保留但数据不污染。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/change/detail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/detail.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "88acb085-eda3-448f-892d-0b062cf5f142"
+   ],
+   "bundle": "015.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "变更详情不该重复调备案 detail：同一单据被两次取数时先问「谁的状态说了算」",
+   "type": "bug",
+   "content": "触发场景：变更详情页要展示对比，顺手加了 companyRecord/detail 请求，并且把返回整表 Object.assign 进 form。表象有三种：审批/提交按钮不显示、编辑态被误锁、控制台看不出报错。\n\n根因不是按钮权限也不是样式，而是「一次页面里对同一业务对象有两份取数结果」，后到的覆盖先到的。变更单与备案单是两张表、两套状态机：备案单已备案(2)、变更单在途(1)，谁后合并谁的 bizState 生效。真需要备案字段做对比时，正确顺序是先取变更单（唯一状态源），再用备案数据只补齐缺的展示字段；对比需求本身不该成为往 form 里灌数据理由。\n\n排查套路：1) 在 Network 里确认有哪些 xxx/detail 被打；2) 搜 form.bizState 的所有赋值点，尤其是 load* 回调里的合并；3) 判断该请求是否只为对比/只读展示，若是则改写入独立的 beforeForm 之类的兄弟对象；4) 用接口原文（变更单 bizState=1）与页面实际渲染值对账，而不是先怀疑 OperationBtnGroup 的权限或 show-* 开关。产品2.0 尤其不能拿 V3 的 displayStatus 兜底，2.0 没有这个字段。",
+   "evidence": "会话 88acb085 用户诉求 3 直接质疑「变更详情为什么要调用 /company/companyRecord/detail 接口，company/companyRecordChange/detail 里面返回的 bizState 就是 1」；诉求 2 明确否定 displayStatus 方案；最终结论确认备案数据「不会合并进 form」。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/change/detail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/CompanyBasicInfoDetail.vue",
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "88acb085-eda3-448f-892d-0b062cf5f142"
+   ],
+   "bundle": "015.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "产品2.0 企业侧 busCode 编码族实测表：审核页 040900 与注册要件 040100 是两个编码",
+   "type": "fact",
+   "content": "需要用产品2.0（zhi2-web-admin）的企业/机构 busCode 时，不要在苏州市房地产监测V3 的常量里找，也不要以仓库里旧版「路由信息.json」为准——它是旧 cyjg/* 路径快照，不含 company/companyManagement/* 与 company/companyRegister/* 的新菜单树，真实值以登录后 GET /system/menu/listRouters 返回的 meta.busCode 为准（控制台 $router.currentRoute.meta.busCode 即可读）。\n\n实测对应关系：①「企业入网审核」≈ 代码里的外网注册，busCode=040900、menuId=60000001，列表 company/companyRegister/index、详情 company/companyRegister/detail，审批 /company/info/approval、提交 /company/info/submit；②外网注册 Step3 的要件上传在 companyRegister.js 里用的是 040100（开发企业注册要件），与审核页路由的 040900 不是同一个编码，配附件要件时必须分开配，否则「配了但传了看不到」；③企业信息详情按机构类型分：可审批的备案详情 040100（开发企业详情，带 approvalApi/submitApi），只读查看详情 0401000（详情-开发企业，无审批接口）；④企业端 toB/companyRecord/detail 的执照附件是 8（companyRecord.js 的 LICENSE_BUS_CODE），与管理端 040100 无关。机构类型编码：监理 040200、施工 040300、经纪 040500、物业 040600、设计 040700、招投标 041000、审价 041100、鉴定 041200、维修 041300、工程 041400、供应商 041500、金融 041700。",
+   "evidence": "会话 7a5455ee：用户问「企业入网审核、企业信息详情对应的菜单代码是哪个」，结论给出 040900 / 040100 / 0401000 三条分离编码及 12 个机构类型 busCode，并特别标注 Step3 要件用 040100 与审核页 040900 不同、路由信息.json 是旧快照。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/record/index.vue",
+    "zhi2-web-admin/e2e/fixtures/company-menu-config.js",
+    "产品2.0/路由信息.json",
+    "产品2.0/前端技术信息.md"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "7a5455ee-29e1-4d23-aa4a-13219e5bf678"
+   ],
+   "bundle": "015.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "跨账号（企业提交 → 管理员审批 → 企业回验）全流程 E2E 的四步串行写法",
+   "type": "workflow",
+   "content": "要回归「企业变更备案」这类必须两端角色才能闭环的功能，单角色用例只能覆盖一半，必须把同一个 spec 写成默认串行的 4 步，用账号切换把真实操作链走完：01 企业账号登录，确认单据已备案(bizState=2)且能发起变更；02 企业账号点「变更」→ 改字段 → 保存 → 提交 → 回企业信息页断言「审核流程查看」可见；03 loginAsAdmin 重新登录 → 进企业变更列表 → 按统一社会信用代码/企业名搜索 → 点进详情 → 审批通过；04 loginAsCompany 登回企业账号，断言字段已更新、变更按钮恢复、无在途审核。\n\n三条硬约束：①管理端不要拼 URL 直进详情，必须走「列表搜索→进入详情→审批」的真实路径，否则导航/权限被绕过、测出来的绿是假绿；②两端切换靠 fixtures（auth-helpers / company-helpers 的 loginAsCompany、loginAsAdmin），不要手写登录表单；③前置数据不满足（企业处于「审核中」bizState=1 而非已备案 2）时整组按预期 skip 并在报告里写明原因，不要改断言硬凑通过。",
+   "evidence": "会话 2125e6db：用户诉求 4 明确要求「把这个串成完整的流程，企业账号变更保存提交，然后切成管理员账号，登录，到企业入网变更备案列表，搜索这条数据，然后进入详情审批通过，然后再登录企业账号看企业信息是否变更成功」，最终重构为 4 步串行，用例因 bizState=1 skip。",
+   "files": [
+    "zhi2-web-admin/e2e/company/company-record-change.spec.js",
+    "zhi2-web-admin/e2e/fixtures/company-helpers.js",
+    "zhi2-web-admin/e2e/fixtures/auth-helpers.js",
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "2125e6db-9443-44e1-bf8a-7abe3fae34e2"
+   ],
+   "bundle": "015.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "产品2.0 的 npm test 不是单测，是 vite build --mode test；项目无任何单测框架",
+   "type": "fact",
+   "content": "情况：在 产品2.0 / zhi2-web-admin 里被要求「跑测试」或想用测试验证改动时，直觉会执行 npm test。为什么：该仓库没有任何单元测试框架——无 Jest / Vitest / Mocha 配置，也没有 *.test.* / *.spec.* 文件；package.json 里的 npm test 实际被映射成 vite build --mode test（测试环境构建），根目录 npm test 经 npm workspace 转发到 zhi2-web-admin 的同名脚本。跑了它看到「通过」只是构建成功，不会验证任何行为；反过来它失败时也应先怀疑是构建/环境问题而不是断言失败。唯一真实的自动化测试是 Playwright E2E：配置 zhi2-web-admin/playwright.config.js，用例在 e2e/ 目录，npm run test:e2e 会自动拉起 dev server(:8081)，另有 test:e2e:ui / test:e2e:flow / test:e2e:real-api / test:e2e:tob 等分场景脚本；运行前需按 e2e/.env.e2e.example 建出 e2e/.env.e2e，配好 PLAYWRIGHT_LOGIN_USER / PLAYWRIGHT_LOGIN_PASSWORD。怎么做：需要单点验证时优先改跑对应用例或指定 spec，不要用 npm test 冒充回归；新增纯逻辑校验想写脚本时也别塞进 scripts/*.test.mjs（同类写法在既有记忆里已被证明是假绿）。",
+   "evidence": "会话 cc3b50fc（2026-08-29，6-22 探索结论）：表格明确列出「单元测试：无，未发现 Jest/Vitest/Mocha 配置或 *.test.* / *.spec.* 文件」「npm test：非单元测试，实际是 vite build --mode test」，技术栈 Vue 2.7.16 + Vue Router 3.6.5 + Vuex 3.6.2 + Element UI 2.15.13 + Vite 5.4.11，E2E 为 @playwright/test ^1.51.0，需 e2e/.env.e2e。已知清单已覆盖 E2E 目录/配置/运行方式（第 839 条），但从未记录「npm test = 构建、无单测框架」这一命令语义。",
+   "files": [
+    "d:/repository/产品2.0/package.json",
+    "d:/repository/产品2.0/zhi2-web-admin/package.json",
+    "d:/repository/产品2.0/zhi2-web-admin/playwright.config.js",
+    "d:/repository/产品2.0/zhi2-web-admin/e2e/.env.e2e.example"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "cc3b50fc-7729-46c3-81ce-aef6abf57db2"
+   ],
+   "bundle": "016.md",
+   "project": "产品2.0"
+  }
+ ]
+}

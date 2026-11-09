@@ -1,0 +1,268 @@
+{
+ "project": "无锡市区小程序嵌入H5",
+ "batch": 3,
+ "files": [
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md"
+ ],
+ "count": 15,
+ "memories": [
+  {
+   "title": "苏服办深链 sfbLogin：name/idType/idNumber/phone 密文前端不解密，URL 原样 POST 给后端",
+   "type": "pattern",
+   "content": "情况：苏服办线上通过 location 传入 AES-ECB+Base64 的 name、idType、idNumber、phone（密钥由后端掌握），需换内部登录态。\n\n约定：前端**不做 AES 解密**（曾误建 sfbCrypto.js 已删除）。`performSfbLoginIfNeeded` 从 URL/query 取出四字段**原样** POST `/v2.0/security/ctAuth/sfbLogin`（或项目 security 层等价路径），解密与明文校验一律在后端。\n\n鉴权区分：URL 上的 `token` 仍是苏服办侧 token（人脸识别等 SDK 用）；接口返回的 `accessToken` 才是后续业务 API 写在 header 的内部 token。苏服办入口不要把 URL 密文写入 userStore 当展示名，登录成功后走 `refreshProfileFromApi` 拉用户信息。\n\n联调示例 body 字段值应仍为带 `==`/`=` 的 Base64 密文，而非张三/明文证件号。",
+   "evidence": "会话 8a10b942：用户先给出 AES 算法说明，随后明确「不需要解密啊，都是后端解密，url拿到什么就传什么」；最终结论删除 sfbCrypto、performSfbLoginIfNeeded 原样 POST、用户信息改 refreshProfileFromApi。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/security.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/store/user.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/App.vue"
+   ],
+   "baseline": "37bd5a1",
+   "sessionIds": [
+    "8a10b942-72e3-49f5-b5b6-415b24f7c1ec"
+   ],
+   "bundle": "009.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办门户首页轮播：pages/webview/home 用原生 swiper，banner 当前仅本地图不调接口",
+   "type": "fact",
+   "content": "应用入口与 Tab「首页」对应 `pages/webview/home`（pages.json 首项、custom-tabbar 指向该路径），轮播为页面内原生 `<swiper>`，**未**引用全项目零引用的 `components/ZsSwiper/ZsSwiper.vue`。\n\n数据流：`banners` 默认 `resolveZhishuAsset('background@2x.jpg')`，`onLoad` 调 `usePortal` 的 `loadBanners(banners)`，其实现为 `banners.value = getPortalLocalBanners()`，**当前不请求后端 banner 接口**。`pages/index/home.vue`、`newHome.vue` 不是线上 Tab 首页轮播承载页。\n\n若要接动态轮播，应在 webview/home 或 usePortal.loadBanners 接 API，勿误以为 ZsSwiper 或 index/home 已在用。",
+   "evidence": "会话 57231176 调查报告：明确 webview/home 为实际首页轮播、ZsSwiper 无引用、loadBanners→getPortalLocalBanners、当前首页轮播不调用任何 API。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/webview/home.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/ZsSwiper/ZsSwiper.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages.json"
+   ],
+   "baseline": "6c9a164",
+   "sessionIds": [
+    "57231176-a6b7-4b43-9f0e-efd6c6a682f6"
+   ],
+   "bundle": "009.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "维修资金房屋历史交易明细：鹏业对接后增加「温馨提示」弹窗（固定合规文案）",
+   "type": "pattern",
+   "content": "客户在对接鹏业维修资金明细后，要求在「房屋历史交易明细」区块增加可点击的「温馨提示」，弹窗展示完整说明（含：手机端仅 2021-01-01 起数据、单日多笔流水余额展示顺序免责、2020-12-31 前须窗口查询及电话 0510-82752979 等）。\n\n实现落在业主端维修资金模块（如 maintain/detail 与 TransactionTable 区域），交互为标题旁入口 + 弹窗只读文案，非接口字段。交付时按项目惯例同步 `dev_wuxi-sfb` 与 `dev_shiqu`（cherry-pick/合并后推送），父仓更新子模块指针。",
+   "evidence": "会话 38fc3a21：用户给出完整温馨提示正文与截图需求「房屋历史交易明细部分增加温馨提示点击弹窗」；提交说明 feat(maintain): 维修资金明细增加温馨提示弹窗，cherry-pick 至 dev_shiqu。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/detail.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/components/TransactionTable.vue"
+   ],
+   "baseline": "9eda33f",
+   "sessionIds": [
+    "38fc3a21-3d77-4897-a319-5240c361e84e"
+   ],
+   "bundle": "009.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "小区信息/物业合同 UI 精简合 main 时：main 版 project/info 无地图模块需单独改",
+   "type": "workflow",
+   "content": "市区交付要求：小区信息页去掉地址、交付日期、周边分类，「小区周边」文案改为「小区位置」；物业合同列表/详情隐藏公司地址。\n\n子模块 `dev_shiqu` / `dev_wuxi-sfb` / `main` 均需推送时，注意 **`main` 上 `pages_owner/project/info/index.vue` 结构与功能分支不一致（main 无地图模块）**：不能机械 cherry-pick 整块 diff，应在 main 仅做等价删减（去地址、交付年等）并同步物业合同改动，避免引入不存在的地图区块或漏改。\n\n父仓 `main-sfb` 与 `main` 分别更新子模块 commit 指针。",
+   "evidence": "会话 b0a11efb 最终结论表格：main 已推送 f2e0885，并注明「main 的 index.vue 结构不同（无地图模块），已单独处理」。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/company/info/contracts.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/house/components/ProjectDetail.vue"
+   ],
+   "baseline": "4883b08",
+   "sessionIds": [
+    "b0a11efb-9a8c-4770-9303-ab19345a937d"
+   ],
+   "bundle": "009.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "凸起自定义 TabBar 与底部苏服办落款避让",
+   "type": "pattern",
+   "content": "首页/个人中心等 Tab 页底部固定「苏服办」落款时，须按中间凸起按钮的真实占位计算 `bottom`，不能沿用普通 tabBar 的 ~120rpx。本项目凸起按钮顶边约在 160rpx（底边距 30rpx + 高度 130rpx），落款 `bottom` 需提到约 188rpx 才能完整露在按钮上方；同时增大页面可滚动区 `padding-bottom`（如 340rpx），避免内容被落款或 tab 遮挡。仅加 footer 而不改 bottom/内边距会导致「空白很多却要滚到底才看见落款」或被中间 tab 挡住。",
+   "evidence": "会话 d3dd4f2b：用户反馈个人中心加 footer 后需下滚才见落款，且被中间 tab 挡住；结论将落款 bottom 从 120rpx 调至 188rpx，padding-bottom 调至 340rpx。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/index/my.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/webview/home.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/custom-tabbar/custom-tabbar.vue"
+   ],
+   "baseline": "33f7ad1",
+   "sessionIds": [
+    "d3dd4f2b-151a-408d-b8b8-52be5b51c6dd"
+   ],
+   "bundle": "010.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "第三方人脸跳转 backUrl 用 Base64 而非裸 URL/仅 encodeURIComponent",
+   "type": "pattern",
+   "content": "生产 H5 为 hash 路由（如 `https://wygl.wxwgzx.com:8989/szh5/sfb/#/pages/webview/home?...`）。将完整回跳地址作为外层 query 的 `backUrl` 时，`#`、`?`、`&` 会使参数被截断或拆成多个 query 段。`encodeURIComponent` 虽可转义，但对接方若按 Base64（`atob`）解析 `backUrl`，仅做 URI 编码会导致重定向失败。约定：`backUrlFull` → Base64 → 作为单个 query 值传递（外层再做标准 query 转义）；联调前与第三方确认解码方式。",
+   "evidence": "会话 2adff739：尝试去掉 Base64、仅 encodeURIComponent 后用户担心解析失败；结论说明 hash 路由风险并改回 Base64，并给出完整第三方 URL 示例。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/portal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/face.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/bdc.vue"
+   ],
+   "baseline": "7de00b1",
+   "sessionIds": [
+    "2adff739-19f3-452a-bfc9-ae1b4ad9efc9"
+   ],
+   "bundle": "010.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "web-view 内嵌 H5 的 PDF 预览需 postMessage 交给小程序",
+   "type": "workflow",
+   "content": "H5 运行在微信小程序 `web-view` 内时，H5 侧直接预览 PDF 往往不可用。采用：H5 `wx.miniProgram.postMessage` 把文件 URL/元数据发给小程序 → 小程序页 `bindmessage` 接收 → `wx.downloadFile` + `wx.openDocument`。小程序为 uni-app 时需新增或扩展原生壳页承载 `<web-view>` 的 `@message` 逻辑；`filePreview` 类预览页必须在 `pages.json` 注册。若已有等价 web-view 容器，可只合并 message 处理而不重复注册 `pages/common/webView`。",
+   "evidence": "会话 78182e2b：用户问嵌入小程序时 PDF 能否预览，选定 postMessage 方案并要求生成小程序侧页面；结论说明 webView.vue 已在 H5 子模块 pages.json 注册，复制到小程序项目时按是否已有容器决定是否注册。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/index.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/common/webView.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages.json"
+   ],
+   "baseline": "0804e57",
+   "sessionIds": [
+    "78182e2b-9fbc-480c-ac57-e8389e0b26c0"
+   ],
+   "bundle": "010.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "无锡市区嵌入 H5 双仓与 dev_wuxi-sfb / dev_shiqu 提交流程",
+   "type": "workflow",
+   "content": "仓库结构为父仓 `main-sfb` + Git 子模块 `zhi2-mobile-admin-h5-c-unlimited`。功能修复通常在子模块 `dev_wuxi-sfb` 提交，再 cherry-pick 或 merge 到 `dev_shiqu`，父仓提交更新子模块指针。用户要求「市区/苏服办两边都要提交」时须两条分支都落地，不能只改单一分支。",
+   "evidence": "会话 365fb309、 b06c94d8 最终结论：子模块两分支各一提交，父仓 chore 更新 submodule；用户明确要求 dev-shiqu 也要提交/合并。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited",
+    "无锡市区小程序嵌入H5"
+   ],
+   "baseline": "06aa6e2",
+   "sessionIds": [
+    "365fb309-40ef-4c0c-9312-c60fde4230b6",
+    "b06c94d8-8cb8-4f4c-8390-dfa9fb3028aa"
+   ],
+   "bundle": "010.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "dev_shiqu 合并维修资金冲突时保留 wuxi-sfb 交易详情实现",
+   "type": "workflow",
+   "content": "子模块 `dev_shiqu` 合并 `dev_wuxi-sfb` 时，`pages_owner/maintain/index.vue`、`utils.js` 等常冲突。维修资金交易详情/列表链路应以 `dev_wuxi-sfb` 侧较完整实现为准（如 `getAccountTransInfos`、`setTransDetailPayload` 及相关排版改动），避免回退到 shiqu 旧逻辑导致详情字段缺失或展示不全。",
+   "evidence": "会话 b06c94d8：合并 dev_shiqu 时 index.vue、utils.js 冲突，结论采用 dev_wuxi-sfb 较完整实现解决。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/info.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/transaction.js"
+   ],
+   "baseline": "4883b08",
+   "sessionIds": [
+    "b06c94d8-8cb8-4f4c-8390-dfa9fb3028aa"
+   ],
+   "bundle": "010.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "共有资金明细类型「全部」重复：筛选项只信字典 benefit_app_account_fund_type，禁止再手拼一项",
+   "type": "bug",
+   "content": "【情况】共有资金-明细 Tab 的类型下拉里「全部共有资金」出现两次。【根因】字典 `benefit_app_account_fund_type` 已配置「全部共有资金」，前端又在 `loadTypeOptions` 里硬编码 `ALL_FUND_TYPE_OPTION` 或过滤后再 prepend，造成重复。【做法】`typeOptions` 直接赋字典返回值；默认选中第一项即可；删掉所有手动拼接/去重逻辑。用户明确偏好「直接使用字典就可以了」。",
+   "evidence": "会话 c3697b27：用户反馈类型「全部共有资金」重复仍存在 → 结论改为 loadTypeOptions 直接赋值 dict，移除 ALL_FUND_TYPE_OPTION。",
+   "files": [
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/DetailsTab.vue"
+   ],
+   "baseline": "a951bf3",
+   "sessionIds": [
+    "c3697b27-3a83-450d-a4a0-5c2a22ae4a0e"
+   ],
+   "bundle": "012.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "共有资金概览「监管银行」误绑 openbankName：应显示 regulatoryBankName，开户支行单独一行",
+   "type": "bug",
+   "content": "【情况】`/v2.0/benefit/app/accountStatistics/{projectId}` 增加 `regulatoryBankName`（管理银行）后，前端仍把「监管银行」绑到 `openbankName`，界面显示成开户支行（如「无锡滨湖支行」）。【做法】OverviewTab：监管银行 ← `benefitInfo.regulatoryBankName`；其下新增一行「开户支行」← `openbankName`。数据经 `getBenefitList` 写入 `benefitInfo`，一般无需改 API 封装，但要确认后端已返回新字段。",
+   "evidence": "会话 8f524774：用户要求监管银行改正确字段并在下方增加开户支行 → 修改 OverviewTab.vue 字段绑定。",
+   "files": [
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/OverviewTab.vue",
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/api/repair.js"
+   ],
+   "baseline": "7993464",
+   "sessionIds": [
+    "8f524774-dcb8-476a-93c6-dcf4a5936cd2"
+   ],
+   "bundle": "012.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办人脸「免重复识别」默认 5 分钟：bdc 页须同时校验 URL 与时间戳，防 verifyResult 残留绕过",
+   "type": "pattern",
+   "content": "【机制】`sfbFaceAuth.js` 中 `markSfbFaceVerified()` 把时间写入持久化键 `sfb_face_verify_session`（localStorage + sessionStorage）；`isSfbFaceRecentlyVerified(maxAgeMs = 5 * 60 * 1000)` 判断是否在 5 分钟内。【生效点】`pages/face/bdc.vue` 进入不动产授权时：`verifyResult === 'true'` 且 `isSfbFaceRecentlyVerified()` 才放行，否则 `redirectToFaceVerify`。【维护】`App.vue` 启动时 `clearStaleSfbFaceState()` 清理过期记录；改免识别时长需同步改默认 maxAge 与清理阈值。支付宝扫脸中断另有约 10 分钟 pending 恢复，与免识别不是同一机制。",
+   "evidence": "会话 73f3f1d7：用户问人脸识别成功后多久不用再识别 → 结论默认 5 分钟，并引用 bdc.vue 双条件校验逻辑。",
+   "files": [
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js",
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/pages/face/bdc.vue",
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/App.vue"
+   ],
+   "baseline": "f984859",
+   "sessionIds": [
+    "73f3f1d7-7462-4c83-b96d-76e5037e1532"
+   ],
+   "bundle": "012.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "无锡苏服办 H5 人脸集成落点：官方 jssdk + sfbFaceAuth/h5Context，入口 token 不得当业务 Authorization",
+   "type": "fact",
+   "content": "【文件链】`index.html` 加载 `https://www.jszwfw.gov.cn/jmopen/jssdk/index.js`；`utils/sfbFaceAuth.js` 封装 `callSfbLivenessFaceAuth()`；`utils/h5Context.js` 读缓存 URL 上的 `token`、`appId`；`pages/face/face.vue` 业务页并对「webview not ready」做重试；`pages/face/bdc.vue` 人脸成功后跳不动产。【环境】须从苏服办/对应容器入口带 `token`+`appId` 打开；官方 SDK 按 UA 路由 hanweb（jmportal+deviceready）、harmony、wechat、alipay 等子 SDK。【鉴权分离】苏服办入口 `token` 仅供人脸识别 SDK；后端 `Authorization` 须用 `sfbEncryptionLogin`（`/security/ctAuth/sfbEncryptionLogin`）换取的内部 token（见 api 层注释）。与已知「web-view 扫脸失败三处根因」互补：本仓具体实现集中在上述文件。",
+   "evidence": "会话 29e8fb63 全库检索结论：核心文件表、SDK 容器检测、token 仅用于人脸不可作 Authorization。",
+   "files": [
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/index.html",
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js",
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js",
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/pages/face/face.vue",
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/api/security.js"
+   ],
+   "baseline": "7993464",
+   "sessionIds": [
+    "29e8fb63-fada-4c3c-a4c3-485a533bae2f"
+   ],
+   "bundle": "012.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "无锡三资监管演示门禁：无 Token 仅允许 newHome，移除 TabBar 后 401 也 reLaunch 到 newHome",
+   "type": "workflow",
+   "content": "【场景】小程序嵌入 H5 需对外展示极简门户、未登录不能进业务页。【实现】`App.vue` 全局路由拦截：无 Token 时只允许 `/pages/index/newHome`，否则 `uni.reLaunch` 回首页；有 Token 时保留正常嵌入访问。`newHome.vue` 仅居中展示「无锡三资监管」文案，去掉轮播/菜单/接口。`pages.json` 将 newHome 设为启动页并去掉 TabBar。`api/index.js` 401 处理改为 reLaunch 到 newHome（因已无 TabBar）。若需「无论有无 Token 都只能看首页」需再收紧拦截逻辑。",
+   "evidence": "会话 092e322c：用户要求无 Token 回首页且首页只显示无锡三资监管文字 → App.vue/pages.json/newHome/401 四处联动修改。",
+   "files": [
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/App.vue",
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/pages/index/newHome.vue",
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/pages.json"
+   ],
+   "baseline": "2e9862a",
+   "sessionIds": [
+    "092e322c-b977-4c98-acfd-3459f57a3abb"
+   ],
+   "bundle": "012.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "无锡市区 H5 发版：子模块 dev_wuxi-sfb 提交推送后，主仓 main-sfb 更新子模块指针并打时间 tag",
+   "type": "workflow",
+   "content": "【拓扑】主仓 `无锡市区小程序嵌入H5`（分支如 `main-sfb`）通过 git submodule 引用 `zhi2-mobile-admin-h5-c-unlimited`（分支如 `dev_wuxi-sfb`）。【流程】先在子模块 commit+push 功能修复；再在主仓 `chore: 更新子模块引用` 提交并 push；最后在主仓打 tag（示例 `202608282148` 与 `202608282148-sfb`）并推送。避免只推子模块导致线上主仓仍指向旧 commit。",
+   "evidence": "会话 5e649194：隐藏小区信息周边配套后用户要求提交推送并主模块打 tag → 子模块 e3ccee2、主仓 05f9a28、双 tag 已推远程。",
+   "files": [
+    "d:/repository/无锡市区小程序嵌入H5/.gitmodules",
+    "d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited"
+   ],
+   "baseline": "05f9a28",
+   "sessionIds": [
+    "5e649194-e4f2-40db-bdc7-51c0016d5541"
+   ],
+   "bundle": "012.md",
+   "project": "无锡市区小程序嵌入H5"
+  }
+ ]
+}

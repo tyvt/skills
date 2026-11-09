@@ -1,0 +1,243 @@
+{
+ "batch": 9,
+ "files": [
+  "049.md",
+  "050.md",
+  "051.md",
+  "052.md",
+  "053.md",
+  "054.md"
+ ],
+ "count": 14,
+ "memories": [
+  {
+   "title": "机构基本信息页「不调接口」的根因是重写了 detailMixins 的 init()，且机构类页要主动拉数不要依赖 formMode=view",
+   "type": "bug",
+   "content": "现象：苏州 V3 Web 后台「企业/机构基本信息」详情页（companyBasicInfo/detail.vue → DeveloperBasicInfoDetail / AgencyBasicInfoDetail）打开后完全不发详情请求，页面全空、控制台无任何报错。\n\n根因：detailMixins 只在 formMode === 'view' 时才调 init() 拉详情，而 formMode 由路由 tableid / 页面形态推导。开发企业基本信息页重写了 mixin 的 init()，请求因此被串到 formMode 判定与 primaryKey 上：一旦进入 add 形态（无 tableid）或缺 primaryKey，mixin 的 init() 直接静默 return，请求根本发不出去。\n\n对照结论（可作为「机构/企业基本信息类页面」的正确写法）：AgencyBasicInfoDetail 不重写 init()、也不配 primaryKey，而是在 created() 里无条件 this.loadDicts(); this.loadDetail()，B 端走 getOwnCompany 这类「本企业」接口，不依赖任何路由形态。因此在 formMode === 'add'、路由无 tableid 时仍能正常取数。\n\n规则：① 这类「本主体」详情页（getOwnCompany / getEntryNetworkDetail）一律在 created 里主动拉数，不要挂在 detailMixins 的 view 形态上；② 确实要重写 init() 时必须自查 formMode 与 primaryKey 两个前置条件，缺一个就是静默不请求；③ 若页面会被 keep-alive，再补 activated + _skipActivatedReload 做回页刷新；④ 用户报「没调接口」时先看 Network 面板是否真的没发出，再区分是「没发」还是「发了但失败/无权限」。",
+   "evidence": "会话 e15a1da6（基线 99bfdbd，用户诉求「现在企业基本信息页面没有调用数据接口」）：修复 DeveloperBasicInfoDetail 后，按要求排查经纪机构侧，确认 AgencyBasicInfoDetail 在 created 里无条件调用 loadDetail()、不重写 init()、无 primaryKey，因此无同类问题；入网页与 G 端审核页也均正常。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/DeveloperBasicInfoDetail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/companyBasicInfo/detail.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/mixins/form.js",
+    "zhi2-web-admin/src/api/company/companyRecord.js"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "e15a1da6-99f2-4436-b12d-c0e94bfb9658"
+   ],
+   "bundle": "050.md"
+  },
+  {
+   "title": "删掉页面私有组件前必须全仓 grep 同名引用：changeDetail 与 detail 共用组件时会漏改",
+   "type": "bug",
+   "content": "现象：把楼幢详情页 views/projectManagement/buildinginfo/detail.vue 的证件区从私有组件 BuildingCertificateDisplayGrid 换成公共 DetailTemplate，并删除了该组件文件；detail.vue 本身审查通过，但同目录的 changeDetail.vue 在模板（约 134/336 行）与 components 注册（约 272 行）里仍在引用，运行/打包即报模块找不到，楼幢变更详情查看态直接打不开。\n\n根因：本后台的「详情页 + 变更详情页」是成对存在的同构文件（detail.vue / changeDetail.vue、变更单、双入口壳页），私有展示组件常被两边同时引用。删除文件时只核对了当次改动的那一个页面。\n\n做法（可作为此类替换的固定流程）：\n① 替换私有展示组件前先 grep 组件名，列出全部引用文件（含 components 注册块，不只是模板）；\n② 每个引用点按同一方式改写：`<DetailTemplate v-if=\"formMode == 'view'\" :data=\"contentInfoN\" />`；\n③ contentInfo 数组项契约：{ label, value, layout, span: 12, type: 'text' }，与同页既有 contentInfo 保持同一构造方式；\n④ DetailTemplate 已由 detailMixins 全局注册，页面无需再 import/注册；\n⑤ 若两边工作量差异大，宁可保留共享组件文件，也不要只改一侧。",
+   "evidence": "会话 2321b48f（基线 77f94ab）代码审查：detail.vue 的替换与 contentInfo1 结构均无问题，唯一 HIGH 问题是已删除的 BuildingCertificateDisplayGrid 仍被 changeDetail.vue 引用。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/detail.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/changeDetail.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/main.js"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "2321b48f-6893-4106-9ce7-8a6d6aefe172"
+   ],
+   "bundle": "050.md"
+  },
+  {
+   "title": "别把通用详情页套进 presale-detail-section-stack：间距修好了但连带继承预售页整块皮肤",
+   "type": "bug",
+   "content": "现象：为消除详情页 Headline 之间多余的 16px 缝，把 el-row(:gutter=24) 改成 div.detail-from-container，并把各 Headline 包进 presale-detail-section-stack（index.scss 约 646–765 行）。间距确实只剩一层 gap，但非预售页（机构基本信息）的 Headline 被动套上了预售页样式：边框、圆角 8px、header/content 的 !important 内边距，属于视觉与内边距层面的回归风险。\n\n附带问题：新增的 .detail-from-container > .presale-detail-section-stack（约 328–338 行）与既有的 .detail-container .presale-detail-section-stack 重复声明 display/flex-direction/gap/width/min-width，同优先级时后者 gap:16px 会压过前者的 var(--detail-section-gap)（当前数值相同，暂无肉眼差异，但日后改 token 必然不一致）。\n\n做法：① 只需要「统一块间距」时用中性类（如 detail-section-stack）承载 gap，预售专属皮肤规则继续只挂在 presale 类上；或把规则收窄成 .agency-basic-info-detail .presale-detail-section-stack；② 栈布局只在 index.scss 一处定义，直连子级规则负责 agency-*/developer-*，presale 块继承它而不是复制；③ 改 el-row 为 div 本身是对的（去掉 gutter/clearfix 干扰），保留；④ 此类改动要在非预售页目视确认 Headline 的边框与内边距。",
+   "evidence": "会话 df5671c9（基线 77f94ab）对 AgencyBasicInfoDetail.vue + index.scss 的审查：CRITICAL/HIGH 为 0，输出 2 条 MEDIUM 即上述连带换肤与规则重复，结论 Warning。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/components/Headline/index.vue"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "df5671c9-0010-40d0-8d79-1527ba8d88dc"
+   ],
+   "bundle": "050.md"
+  },
+  {
+   "title": "注册页验证码字段走 el-form rules 必须先进 formModel：codeForm 子对象里的 prop 校验永远命中不到",
+   "type": "bug",
+   "content": "现象：企业/机构一步注册单页（CompanyRegisterSingleForm.vue、InstitutionRegisterSingleForm.vue）里，「图片验证码」「短信验证码」两个字段即使加了 rules 也不会出现红框提示；企业端模板上还写了一个错误的 prop=\"smsCodeField\"，与实际数据字段 smsCode 对不上，校验等于失效。\n\n根因：这两项数据挂在验证码组件用的独立子对象 codeForm 下（codeForm.code / codeForm.smsCode），而 el-form 的 rules 是按 formModel 的顶层 prop 去取值的，子对象路径不在 model 里，rule 永远命中不到。此外提交时另有一处 msgError 手工判空，与 validate 流程并行，两套提示风格不一致。\n\n做法：\n① formModel 计算属性里把 codeForm.code、codeForm.smsCode 并入顶层（浅拷贝合并即可），让 el-form 能按 prop 校验；\n② 表单项 prop 写成 code / smsCode，与 formModel 的 key 一一对应（顺手修掉 smsCodeField 这类错名）；\n③ rules 用与其它必填项一致的写法（如「图片验证码不能为空」「短信验证码不能为空」）；\n④ 提交里删掉重复的 msgError 判空，统一交给 validate()，这样才有红框提示 + 自动滚动到首个错误项；\n⑤ 若希望刷新图片验证码后不残留红框，可在刷新回调里 clearValidate('code')。",
+   "evidence": "会话 25fff776（基线 99bfdbd，用户发截图要求「这2个字段必填」）：改动为 formModel 并入 codeForm.code/smsCode、表单项 prop 改 code/smsCode（企业端原 smsCodeField 错误已修正）、补两条 rules、提交去掉 msgError 判空统一走 validate()。",
+   "files": [
+    "zhi2-web-admin/src/views/register/components/single-page/CompanyRegisterSingleForm.vue",
+    "zhi2-web-admin/src/views/institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue",
+    "zhi2-web-admin/src/utils/registerValidate.js",
+    "zhi2-web-admin/src/utils/registerFormContext.js"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "25fff776-d3eb-4133-ab57-71b7cce1e3fd"
+   ],
+   "bundle": "050.md"
+  },
+  {
+   "title": "[苏房] DetailTemplate 配 type:'link' 展示附件点击打不开：link 分支只认 item.link，附件 URL 字段必须用 type:'image'",
+   "type": "bug",
+   "content": "【什么情况】Web 后台详情页用公共 DetailTemplate 展示附件/合同扫描件时，把 contentInfo 项写成 type:'link'，页面上能看到文件名，但点击不打开也不下载；换成 type:'image' 后缩略图与 PDF 链接都正常。\n\n【为什么】detail-template.vue 里 link 分支展示的是 item.value，但点击处理 handleLinkClick 读的是 item.link，业务侧只给了 value 没配 link，点击就是空操作，且无任何报错提示（静默失效）。而 type:'image' 分支走独立的附件解析链路：getAttachmentFiles 把字符串按逗号拆开并转成 {name,url}（name 取 URL 最后一段）；shouldRenderSingleImage 判断只有一张且扩展名在白名单 ['jpg','jpeg','png','gif','bmp','webp','svg'] 时渲染缩略图并接 preview/openPreview；扩展名不在白名单（如 pdf）则降级为 attachment-link，点击 handleAttachmentFileClick 走 window.open(..., '_blank', 'noopener,noreferrer')；空值回落 placeholder（默认 '-'）。\n\n【怎么做】附件/扫描件字段统一配 type:'image'，不要用 link；单值字符串、逗号串、对象数组它都能吃。只要上传组件的 file-type 覆盖 jpg/jpeg/png/pdf（如 zs-file-upload + limit:1），明细页与变更页保持同一种写法，就能同时得到 png 缩略图和 pdf 新窗打开。历史上该字段散落在 CustomerProject detail、ProjectPlanLicPanel、ProjectConsLicPanel、ProjectStateLandLicPanel 等多处，改造时要一并核对是否仍是 link。",
+   "evidence": "会话 d6fee7de（基线 179717a）：审查把 attachmentUrl 从 type:'link' 改为 type:'image' 的 4 处改动。结论指出『type:'link' 展示 item.value，但 handleLinkClick 依赖 item.link，未配置时点击不会打开资源』，并逐条列出 image 分支对字符串 URL / 单张 png / pdf / 空值的处理（detail-template.vue getAttachmentFiles、shouldRenderSingleImage、handleAttachmentFileClick 约 515-598 行）。",
+   "files": [
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/detail.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/certificate/ProjectPlanLicPanel.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/certificate/ProjectStateLandLicPanel.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/ProjectCertificateTabs.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "d6fee7de-0a9a-4936-8aca-96468ac9e2e8"
+   ],
+   "bundle": "051.md"
+  },
+  {
+   "title": "[苏房] 详情表单只读字段 v-show 写在 el-form-item 上会留下空列：栅格占位在 el-col，必须把 v-show 移到 el-col",
+   "type": "bug",
+   "content": "【什么情况】合同退款新增/编辑页的三列表单里，只挂 v-show=\"isFormDisabled\" 的仅查看态字段（通知书打印标识/次数、凭证打印标识/次数）在新增态看不见，但第三列仍空着 1/3 宽度，导致后面的落地行（收款账户名、通知书有效日期、退款说明）整体错位，截图表现为第三列空缺 + 与下一行衔接错乱。\n\n【为什么】表格布局的占位单元是 el-col 而不是里面的 el-form-item。v-show 加在 el-form-item 上只把内容藏了，外层 el-col 依然参与 el-row 的三列栅格计算，等于留了一个空列。\n\n【怎么做】把 v-show=\"isFormDisabled\" 从 el-form-item 上移到对应的 el-col（也可以用 v-if 直接不渲染，效果等价）。新增/编辑态这些列彻底不占位，底部字段自然补齐三列。迁移到其它详情页时同理：只要是『只在某种状态下出现』的栅格项，显隐控制必须写在 el-col 这一层；同页面若还有苏州定制版 detail.vue 要同步检查。",
+   "evidence": "会话 1adcc8b9（基线 179717a，带截图）：用户反馈退款详情页字段错位，最终结论定位为 el-form-item 上的 v-show 而 el-col 仍参与三列栅格，将 4 个字段的 v-show 移到对应 el-col 后恢复，并强调『只读字段务必在 el-col 上隐藏，不要只藏在 el-form-item 里』。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/deposit/refund/detail.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "1adcc8b9-6699-41f9-bf0d-ae4e72071c78"
+   ],
+   "bundle": "051.md"
+  },
+  {
+   "title": "[苏房] zs-table-column 猜测式判定金额列（列名含「金额/缴款」）误伤文本列：金额对齐只认显式 formatter",
+   "type": "bug",
+   "content": "【什么情况】给 zs-table-column 加过一轮全局对齐治理后，「缴款通知书补录」列表里「缴款通知书类型」这类文本列被右对齐甚至套上金额格式化，影响面远超预期，用户要求『只对 amountFormatter 生效』。\n\n【为什么】isAmountColumn 除了显式 formatter: amountFormatter，还接了 isTableMeasureColumn——按列名里含「缴款」「金额」等关键词就判成金额列。「缴款通知书类型」命中关键词被误判；同时这一轮还给所有列默认写了 align:'left' / headerAlign:'left'，把 Element 原有对齐也一并覆盖，两处叠加导致大规模错位。\n\n【怎么做】改回白名单思路：去掉 isTableMeasureColumn 关键词判定，只有 auto-amount 或已识别的金额类 formatter（amountFormatter、nullableAmountFormatter 等）才当金额列；去掉全局默认左对齐，恢复 Element 列原有对齐，只在金额列未显式指定时设右对齐。tableColumnMeasure.js 保留但不再全局生效，由页面显式引用。翻查历史时注意：不要按列名做语义猜测式样式规则（与第 694 条『金额列别写死 align'left'』是同一组件上先后两次翻车），能显式声明就不要猜。",
+   "evidence": "会话 85c1bd5d（基线 179717a）：用户『这个对齐的还是仅对amountFormatter生效吧，改错的太多了』；结论说明 isAmountColumn 走 isTableMeasureColumn 按列名含「缴款」「金额」命中导致误伤，并给出收窄方案（去关键词判定、去全局默认左对齐、仅金额列右对齐）。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/utils/tableColumnMeasure.js",
+    "zhi2-web-admin/src/views/supervision/deposit/other_record/index.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "85c1bd5d-b004-4f47-8bcc-11ef7ca26d87"
+   ],
+   "bundle": "051.md"
+  },
+  {
+   "title": "[苏房] zs-table-column 的 statusScheme 分支必须在 bizState 硬编码分支之前，自定义列属性要从 $attrs 剥离",
+   "type": "bug",
+   "content": "【什么情况】给人员/分支列表加 status-scheme 状态渲染（注销、冻结、自定义 bizStatusName）后，只要列配置里同时写了 prop=\"bizState\" 和 status-scheme，就退回原始 bizState 字典渲染，人员/分支的状态逻辑全部失效。\n\n【为什么】zs-table-column 默认插槽是 v-if/v-else-if 互斥链，顺序是：prop == 'bizState' 的 GlobalDictTag → hasStatusScheme → 通用 type == 'tag'。bizState 分支在最前面，命中后就不再走 scheme 分支。\n\n【怎么做】做两件事：① 把 hasStatusScheme 判断提到 bizState 分支之前，或给 bizState 分支加 && !hasStatusScheme；② 在 el-table-column 的 attrs 计算属性里像 remoteSort 那样 delete 掉只给 zs-table-column 消费的字段（statusScheme / status-scheme / dict-url / dictUrl），否则会向 Element 传未知 attr，出现控制台警告和多余 DOM 属性。另外 scheme 读取要同时兼容 this.$attrs.statusScheme 与 this.$attrs['status-scheme']（组件 inheritAttrs:false），ListTemplate 的 v-bind=\"column\" 传 camelCase、模板里写 kebab-case，两种都要吃。注意：type=\"tag\" 与 statusScheme 不会双渲染——scheme 分支排在通用 tag 之前，这条已核对。",
+   "evidence": "会话 1ea789d2（基线 2b6e7d0）：审查 status-scheme/branchStatus 改动。双渲染与 camelCase 接线通过；标记两条 MEDIUM——bizState 硬编码分支优先于 statusScheme（同日 prop 同时存在时状态逻辑失效）、$attrs 未剥离自定义属性透传到 el-table-column。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/utils/branchStatus.js",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelList.vue",
+    "zhi2-web-admin/src/views/institution/leasePersonnel/components/LeasePersonnelList.vue",
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchList.vue"
+   ],
+   "baseline": "2b6e7d0",
+   "sessionIds": [
+    "1ea789d2-1eb6-42d0-879d-09cbb0db2313"
+   ],
+   "bundle": "051.md"
+  },
+  {
+   "title": "[苏房] 要件区「有的显示有的不显示」的根因是 adminType 受托人专属过滤，且配置端只配受托人要件时整块必空白",
+   "type": "bug",
+   "content": "现象：企业/管理员详情页的附件要件区，同一页面有的记录正常显示要件、有的直接显示「暂无附件」，但放大看 listAppendixPackage 的返回确实有配置数据（例如只有一条 appendixConfigName=\"授权委托书\"、busCode=\"glygly\"、isRequired=\"1\"、appendices=null），因此第一反应会误判成渲染 Bug。\n\n根因：显示与否不取决于接口，而取决于前端按「管理员类型(adminType)」做的过滤。详情页把 :admin-type=\"normalizedAdminType\" 传给 AppendixPackageSection，组件内部只在 adminType==='1'（受托人）时才展示全部要件；非受托人（法人 adminType='0' 等）会调用 src/utils/registerAppendixAdminType.js 的 isTrusteeOnlyAppendixConfig，把名称匹配 `授权委托书|授权书|受托人.*身份证` 的要件全部剔除。如果某个 busCode 下只配置了「授权委托书」这一条，过滤后 fileList 为空 → 显示「暂无附件」；配置了身份证、营业执照等非受托人要件的页面则不受影响，于是出现「有的显示有的不显示」。\n\n怎么做：先按 adminType 分支核对返回条数，再决定是配置问题还是产品意图问题——法人场景确实不该传委托书时，应在附件配置中心给该 busCode 补法人要件（如管理员身份证）；若委托书对法人也要显示，则移除详情页模板传给 AppendixPackageSection 的 :admin-type（或放宽 registerAppendixAdminType.js 的匹配正则），不要改动附录/渲染链路。",
+   "evidence": "会话 5be31fea 结论：listAppendixPackage 返回只有 glygly/授权委托书一条，adminType='0' 时被附录过滤为空；adminType='1' 与服务配置了非受托人要件的页面均正常。定位到 src/utils/registerAppendixAdminType.js:16-19 与 companyAdmin/detail.vue 第 49/154 行。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagementAdmin/companyAdmin/detail.vue",
+    "zhi2-web-admin/src/components/AppendixPackageSection/index.vue",
+    "zhi2-web-admin/src/utils/registerAppendixAdminType.js"
+   ],
+   "baseline": "fc66641",
+   "sessionIds": [
+    "5be31fea-c6b7-4f9d-b928-c2eb49a504a0"
+   ],
+   "bundle": "052.md"
+  },
+  {
+   "title": "[苏房] 广域列宽清理要产出「残留复扫 + 裸变量引用」两份报告，并顺手把脚本泛化成可传标签名",
+   "type": "workflow",
+   "content": "背景：项目要做「所有 zs-table-column / zs-operate-column 列配置上的 width 与 min-width 一律删除，仅序号列保留」的全库清理，涉及 170+ 文件、500 多处属性。已知坑是正则替换会伤到标签结构，因此流程要比「删完就交」多两步。\n\n关键做法：\n1. 脚本从写死 zs-table-column 泛化成接受标签名参数（scripts/strip_col_width.py，`python scripts/strip_col_width.py zs-select-column --apply`），每个标签一轮独立跑，不要写成一个巨大的混合正则，否则出问题无法定位到具体组件。\n2. 每轮结束做残留复扫，把「剩余带宽度的标签数」按组件类型列成表（zs-table-column 3835 出现 / 445 带宽度；zs-operate-column 487 / 73；zs-select-column 463 / 1），复扫为 0 才算该组件收口。\n3. 边界：序号列不能删；同类的 zs-select-column、branch-business-status-column、personnel-business-status-column 要不要删属于产品决策，不要顺手一起删。\n4. 删除 :width 绑定后，配套的宽度变量会变成死代码（operateColumnWidth computed、operateWidth: 220 data），必须单独列清单请用户确认后再清，不要在同一次脚本里连带删除。\n5. 操作列没有序号列的概念，全部删除；slot-width 等非列宽属性不能动。",
+   "evidence": "会话 da4f3fca：zs-operate-column 一轮改 70 个文件、删 73 处（含 :width=\"operateColumnWidth\" 与 :width=\"type == 1 ? 200 : 180\"），复扫残留 0；全局统计表给出五个 zs 列组件的出现次数与带宽度标签数；结尾列出 1 处 zs-select-column 待确认与 7 处死宽度变量（6 个 operateColumnWidth + 1 个 operateWidth: 220）。",
+   "files": [
+    "苏州市房地产监测V3/scripts/strip_col_width.py",
+    "zhi2-web-admin/src/views/solicitation/components/maintenanceApplyTable.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "da4f3fca-c76a-4d06-8455-42d229e5426f"
+   ],
+   "bundle": "052.md"
+  },
+  {
+   "title": "[苏房] 要件宫格把分组首项错当纯标题 v-if 掉，隐藏了第一条可上传要件",
+   "type": "bug",
+   "content": "情况：AnnexUpload 折叠模式里，mapAppendixPackageToFileList 会给每个 menuName 的第一条记录打上 isMenu: true，但这条记录本身仍是完整要件配置（含 appendixConfigName、appendices 等），分组标题只是用 v-show 叠在上面显示。新写的宫格组件 AppendixRequirementGrid 把 isMenu 当成互斥分支，用 v-if/v-else 渲染：true 渲染分组标题，false 渲染卡片，结果分组内第一个要件的卡片整块消失。\n\n为什么危险：用户既看不到也上传不了这个要件；若它是必传项，保存时 checkRequiredAppendix 会一直拦截，而界面上没有任何入口补传，业务闭环直接卡死。这类“渲染分支把数据项吞掉”的 bug 在审查时最容易被当成样式问题漏过。\n\n怎么做：任何把「标记字段」用于条件渲染的组件，先确认该标记所在的行是否同时承载真实数据。isMenu 这种叠加标记只能用 v-show 或额外渲染一个标题节点，绝不能和业务卡片做成 v-if/v-else 互斥。改宫格/网格化要件展示时，逐组核对“组标题 + 组内每条要件”数量是否与原折叠列表一一对应。",
+   "evidence": "会话 78be61d9（基线 4555c0d）的 diff 审查结论：AppendixRequirementGrid.vue 第 4-14 行对 item.isMenu 用 v-if/v-else；AnnexUpload 折叠模式对每条记录都渲染 el-collapse-item，标题仅 v-show=\"item.isMenu\" 叠加；该项若为必传，checkRequiredAppendix 持续失败。",
+   "files": [
+    "zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementGrid.vue",
+    "zhi2-web-admin/src/utils/appendix.js",
+    "zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementCard.vue"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "78be61d9-503f-436e-949f-d69c1fbbe676"
+   ],
+   "bundle": "053.md"
+  },
+  {
+   "title": "[苏房] 注册页凭空出现的附件是其他人/E2E 的匿名上传被按 busCode 捞回",
+   "type": "bug",
+   "content": "情况：开发企业注册页首次打开就带着一个 sample.png，看起来像写死默认值，其实 src 里没有任何 sample.png 逻辑。真实链路是：单页注册走 uploadAnonymous 匿名上传，未绑定注册单时不传 busId，只带 busCode（如 '040100'）调 listAppendixPackage；后端在「只传 busCode、无 busId」的查询里仍会返回历史上匿名上传的 appendices，于是页面一初始化就回显。仓库里唯一引用 sample.png 的是 e2e/assets/test-files/sample.png 及 company-register.spec.js / register-helpers.js 的上传动作，也就是说这份数据是共用同一套文件服务时 E2E 跑出来的残留。\n\n为什么容易误判：前端只在 initAppendix 里传 busCode，看不出「别人的数据被捞回来」，容易被当成组件默认值。\n\n怎么做：排查时先看开发者工具里 listAppendixPackage 响应，确认 fileName 是否已在 appendices 中。治本靠环境隔离（E2E 用独立库或跑完清理匿名附件），或后端约定「无 busId 只返配置、appendices 必须为空」。前端兜底是在无 companyRegisterId 时忽略 res.packages 的 appendices，需产品认可。",
+   "evidence": "会话 b223bece（基线 99bfdbd）两次追问「开发企业注册的时候附件怎么有默认值？」「有个sample.png」，结论定位为 E2E 匿名上传残留，非前端默认图。",
+   "files": [
+    "zhi2-web-admin/src/views/register/components/single-page/CompanyRegisterSingleForm.vue",
+    "zhi2-web-admin/e2e/assets/test-files/sample.png"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "b223bece-b917-46c7-a279-8dc171afcbd4"
+   ],
+   "bundle": "053.md"
+  },
+  {
+   "title": "弹窗表单排版铁律：不为换行去拉长字段宽度，用独立 el-row 起新行",
+   "type": "bug",
+   "content": "情况：合同当事人 PartyDialog 由单列改双列时反复返工三轮：先去掉毕业院校/婚姻状态必填并改双列；再要求营业执照占 2 列、身份证正反面同一行；然后给出租方/承租方两种身份都要正反面同行；最后一轮明确否定「把联系电话拉长占整行来制造换行」。另有一次改模板后接口直接报 Internal server error: v-else used on element without corresponding v-if，说明分行改动用 v-if/v-else 配对时引入了不成对的兄弟分支。\n\n判别：为了「让后面的字段换到下一行」而放大某个无关字段的 span，是错解——它会破坏同排字段宽度一致性，用户一眼就能看出并明确反对。\n\n怎么做：需要强制换行时，把需要成组的字段（身份证正反面）单独包进一个 el-row :gutter=\"24\"，让它自然从新行开始并两列并排；其余字段保持统一半宽。所有分行分支都用成对的 v-if/v-else 或改为 v-show，避免出现孤立 v-else 导致模板编译错误。",
+   "evidence": "会话 cac42e8b（基线 5a71ab7）5 轮往返，最终结论明确「联系电话恢复半宽，不再拉长占整行；身份证正反面两者包在单独的 <el-row :gutter=24> 中」。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/leaseContract/components/PartyDialog.vue",
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue"
+   ],
+   "baseline": "5a71ab7",
+   "sessionIds": [
+    "cac42e8b-fec3-4964-aaad-e8dd27c3d4eb"
+   ],
+   "bundle": "053.md"
+  },
+  {
+   "title": "详情 Tab 子表只用到查看按钮时，混入整套 listMixins 会重复 init 并留下死代码",
+   "type": "bug",
+   "content": "情况：详情页 Tab 内的 ExpenseTable 把自绘操作列换成 zs-operate-column + 覆盖 buttons 为 [this.viewButton]，并把 handleView 重写成打开弹窗。这层替换本身正确（不走 primaryKey 路由详情、permission:false 时无需 moduleName）。但审查发现三个遗留隐患：① 组件 created() 里自己调了 this.init()，而 listMixins 的 created 在存在 init 时也会再调一次，挂载时 getDicts/getList 各跑两遍，出现请求翻倍与闪烁；② 子表没有 moduleName/primaryKey，却整块混入了 listMixins（query 缓存、table.js 的 created/mounted、table-config-saved 监听等副作用）；③ handleDelete 仍用 disburseId，与 mixin 的 primaryKey 模型不一致，属于死代码。\n\n怎么做：子表只用按钮时，删掉组件自己的 created() 让 mixin 独占初始化；长期把子表收敛到 table.js 或轻量子表 mixin，别整块混完整列表 mixin；顺手确认 handleDelete 是否还有调用方。另注意换成 zs-operate-column 后交互从「圆形图标 + 查看」变成右侧固定 primary 迷你按钮，需要保持旧视觉时传 :fixed=\"false\" 或配 plain/icon。",
+   "evidence": "会话 90daf0d5（基线 179717a）对 ExpenseTable.vue 操作列替换的审查：CRITICAL/HIGH 无，MEDIUM 列出 init 重复调用、子表混入 listMixins、handleDelete 死代码三条。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/progress/gcht/components/ExpenseTable.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "90daf0d5-202d-4ac5-9efb-abc15061f216"
+   ],
+   "bundle": "053.md"
+  }
+ ]
+}

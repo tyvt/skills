@@ -1,0 +1,349 @@
+{
+ "project": "苏住房G",
+ "batch": 12,
+ "files": [
+  "045.md",
+  "046.md",
+  "047.md",
+  "048.md"
+ ],
+ "count": 20,
+ "memories": [
+  {
+   "title": "zs-import 成功提示与页面成果提示同屏重叠：给组件加 silentSuccess + auto-close 分工",
+   "type": "bug",
+   "content": "情况：公共导入组件 zs-import 自己会在导入成功后 msgSuccess，而宿主弹窗/详情页在「校验通过、导入成功后」还要再提示一次「导入成功，请确认数据后保存」。两条 toast 同屏叠加，且全局 msgSuccess 默认 offset:300，提示块正好压在页面上部字段区（物业管理信息月报表的填报月份被遮）。\n为什么之前逐页调样式无效：重叠不是样式问题，是「谁负责成功提示 + 谁负责关弹窗」的职责重叠，成功回调里既有组件内提示又有页面提示。\n怎么做：① 给 zs-import 新增 silentSuccess prop（默认 false）——成功时跳过组件内 msgSuccess，不影响其它导入页；② 导入弹窗（ReportImportDialog）传 :silent-success=\"true\" 并改 auto-close=false，由页面 handleImportSuccess 在确认后手动关闭，避免「先关弹窗再提示」的时序问题；③ 页面侧改用 this.$message({ offset: 80 })，把提示落到顶栏下方，不再遮挡首个信息区块。校验失败仍走 msgError、无数据仍走 msgWarning。\n与已知条目 348/780 的区别：那两条讲的是「间距/padding 双来源」，本条是 toast 提示层的重复与偏移量职责分配。",
+   "evidence": "会话 6d8979fc（基线 320507d）：公共查询-物业管理信息月报表详情（编辑态）上传 Excel 后提示重叠。改动 zs-import.vue 新增 silentSuccess，ReportImportDialog.vue 传 :silent-success 与 :auto-close=false，detail.vue 改 $message({offset:80})。修复后：成功只一条「导入成功，请确认数据后保存」，位于页面顶部；校验失败/无有效数据分支不变。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-import/zs-import.vue",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReport/components/ReportImportDialog.vue",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReport/detail.vue",
+    "zhi2-web-admin/src/utils/index.js"
+   ],
+   "baseline": "320507d",
+   "sessionIds": [
+    "6d8979fc-de82-4dd7-a47a-65cec5d98ae6"
+   ],
+   "bundle": "045.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "ZsPrint 多模板打印只出一份 PDF：三条生成分支要统一 await + 点击时预开窗口 + 勾选存 printConfigId",
+   "type": "bug",
+   "content": "情况：开户申请详情页打印，先选「开户通知书（物业服务企业）」打印正常；再同时勾选「物业服务企业」+「物管会、业委会」两个模板点打印，仍只弹出第一份 PDF，第二份丢失。\n根因是三层叠加：① ZsPrint 的 getPdfUrl 有 http 直链 / Word 模板 / 积木报表三条分支，积木报表分支没有 await 就返回地址，拿到的是未完成的 Promise 或空值，后面按数组取 url 时全部落到第一个可用值；② 连续两次 window.open 被浏览器弹窗拦截，表现成「只出一份」；③ 勾选项若只存行下标或模板名，两个模板映射回配置时会取到同一条。\n怎么做：① 三条分支统一改为 await 完成后再返回 PDF 地址；② 勾选 2 个及以上时，在用户点击那一刻同步预开空白标签页，PDF 生成后依次给 targetWindow.location.href 赋值；③ openPdf 统一打开逻辑，预开窗口不可用时降级 window.open → <a target=\"_blank\"> 点击；④ checkedList 存稳定主键 printConfigId，用 getCheckedPrintItems() 映射回打印配置。\n排查提示：两张 PDF 内容仍相同，去「系统工具 → 打印配置」核对两个模板的 printTemplateId 是否真的不同。",
+   "evidence": "会话 c1889335（基线 3c282a5）修复开户申请多选打印只出一份 PDF，改动集中在 src/components/ZsPrint/index.vue；涉及打印配置、benefit/pubVoucherTemplate、maintenance/drawMoney/PrintDialog 等复用方。验收用例 KH26090700011：单选各出 1 份、两个都选出 2 个标签页且内容不同。",
+   "files": [
+    "zhi2-web-admin/src/components/ZsPrint/index.vue",
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/views/benefit/pubVoucherTemplate/detail.vue"
+   ],
+   "baseline": "3c282a5",
+   "sessionIds": [
+    "c1889335-cc50-4595-9ba6-bc2ca4d3dbe9"
+   ],
+   "bundle": "045.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "el-link 文件名压住「删除」：icon 与文件名必须拆节点 + flex:1/min-width:0 + 按钮 flex-shrink:0",
+   "type": "bug",
+   "content": "情况：上传后的文件列表里，长文件名（如 cd6dd466-ce5e-...）会把右侧「删除」按钮整块压住，用户描述为「样式错乱」「最下面这个文件列表太宽」「文件名有点遮挡」。\n根因两点：① el-link 渲染出来是 inline 元素，作为 flex 容器本身不参与宽度收缩，长文本直接把外层撑开、溢出到相邻按钮上；② 图标 <i class=\"el-icon-document\"> 和文件名原本塞在同一个 span 里，文本溢出只在那个 span 内发生，省略号生效不了，也无法给「图标固定、文字收缩」分配宽度。\n怎么做：把图标与文件名拆成两个节点（<i class=\"el-icon-document\" /> + <span class=\"file-name-text\">）；el-link 内部改成 flex 布局，文件名区设 flex:1; min-width:0 并挂单行省略（overflow:hidden; text-overflow:ellipsis; white-space:nowrap）；「删除」按钮设 flex-shrink:0 保证永远完整，必要时再给它加 margin-left。min-width:0 是关键，缺了它 flex 子项不会收缩到内容宽度以下。\n适用面：凡「图标 + 长文本 + 尾部操作按钮」的单行卡片（文件列表、附件项、标签行）都按这个骨架写。",
+   "evidence": "会话 614f10e0（基线 864b409）：区域银行授权详情页与 pubRegulatoryAccount 详情页出现样式错乱，逐轮缩小到「文件列表太宽」「文件名遮挡删除按钮」。产物改动位于 src/components/FileUpload/index.vue；修复后长文件名显示为 cd6dd466-ce5e-4f71-b8da-af243... 不再遮挡「删除」。",
+   "files": [
+    "zhi2-web-admin/src/components/FileUpload/index.vue",
+    "zhi2-web-admin/src/views/system/regionBankAuth/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue"
+   ],
+   "baseline": "864b409",
+   "sessionIds": [
+    "614f10e0-c3d4-4701-9abf-9cf9b6f48dc6"
+   ],
+   "bundle": "045.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "长名称下拉框被截断：宽度用 flex:1+min/max 区间 + el-tooltip 兜底 + :deep 让内层 select 撑满",
+   "type": "bug",
+   "content": "情况：行业管理-物业服务项目检查-分析报表的「扣分指标占比分析」，切换检查表时下拉里选中的检查表名称被截断显示不全。\n根因是下拉框写了固定 width:220px，长名称必然溢出被省略；同时 zs-select/el-select 内层输入区不会自动跟随外层宽度变化，只放宽外层盒子仍显示不全。\n怎么做三件套：① 把固定 220px 改成 flex:1; min-width:220px; max-width:480px，让它占用标题栏右侧剩余空间但不无限增长；② 新增 selectedAssessmentLabel 计算属性，用 el-tooltip 包裹 zs-select，悬停看全称（截断场景的通用兜底，不要只靠宽度）；③ 给 .minus-assessment-input 设 width:100%，再补 :deep 样式让内部 el-select 跟随外层宽度。\n注意：该文件改完后 linter 无报错，但构建因环境内存中断，未做产物级验证——这类纯样式改动至少要人工在多档考评标准下切换确认名称与表格数据都正常。\n适用面：任何「标题栏/工具栏右侧放一个承载长文本的下拉」，都按「弹性宽度 + tooltip + 内层撑满」写，不要给死宽度。",
+   "evidence": "会话 33479cb9（基线 a700def）：行业管理-物业服务项目检查-分析报表-扣分指标占比分析，切换检查表时名称截断。改动集中在 src/views/credit/assessment/components/minusScorePercentage.vue（selectedAssessmentLabel + el-tooltip + .minus-assessment-input 与 :deep 宽度）。",
+   "files": [
+    "zhi2-web-admin/src/views/credit/assessment/components/minusScorePercentage.vue",
+    "zhi2-web-admin/src/views/credit/assessment/analysisReport.vue",
+    "zhi2-web-admin/src/views/credit/assessment/components/averageScoreAnalysis.vue"
+   ],
+   "baseline": "a700def",
+   "sessionIds": [
+    "33479cb9-240b-4448-8a64-d699334a5f9c"
+   ],
+   "bundle": "045.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "「一键申报」进详情后保存按钮仍然显示：show-save 只认 formMode，页内 active 下标不得参与",
+   "type": "pattern",
+   "content": "情况：产品要求物业费申报页点「一键申报」进入申报详情后去掉「保存」按钮。原写法 showSave = formMode != 'view' && (formMode == 'edit' || active == 0)，因为一键申报进来是 formMode=add 且 active=0，条件恒真，保存按钮一直显示。\n为什么不能靠 active 兜：active 是页内步骤/页签下标，与业务形态无关，新增入口一旦落在第 0 步就必然放行，是「把视图状态当业务权限」的典型误用。\n怎么做：showSave 收敛成 formMode == 'edit' 单一条件——新增（一键申报）只留「返回」「下一步」，编辑态显示保存，查看态不显示。新增的落库继续由第一步的「下一步」调用 submitForm() 完成，保存链路不动。\n验收口径：列表 → 一键申报 → 确认无「保存」；再进编辑确认「保存」仍可用。\n通用约定：详情页顶栏按钮显隐（保存/提交/打印）一律只由 formMode + 业务状态决定，页内 active/step 等 UI 下标不得参与按钮可见性判定（同类已有条目也指出按钮显隐要共用同一谓词）。",
+   "evidence": "会话 a1f996bc（基线 ad5bbd9）：产品提出物业费申报一键申报进详情需去掉保存按钮。改 zhi2-web-admin/src/views/property/feeDeclare2/detail.vue 的 operation-btn-group showSave，由 \"formMode != 'view' && (formMode == 'edit' || active == 0)\" 改为 \"formMode == 'edit'\"；行为：add 不显示、edit 显示、view 不显示。",
+   "files": [
+    "zhi2-web-admin/src/views/property/feeDeclare2/detail.vue",
+    "zhi2-web-admin/src/views/property/feeDeclare2/index.vue"
+   ],
+   "baseline": "ad5bbd9",
+   "sessionIds": [
+    "a1f996bc-685b-423d-a130-f23d676a6962"
+   ],
+   "bundle": "045.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "zs-table-column 插槽根节点用 div 会被判成「复杂列」定宽 80px，表头被省略号截断",
+   "type": "bug",
+   "content": "综合查询页动态考评列的列表头显示成「物业...」，排查不是 CSS 省略也不是列宽不足：zs-table-column 判断是否「复杂列」看的是插槽内容的根节点，用 <div> 包裹即进入复杂列分支，列宽被固定成约 80px，表头自然被截。解法是插槽内换成 <span> 渲染，并按表头文字长度设 minWidth（至少 100），不要写死 width。同页还有第二个问题：动态列在 mounted 里异步追加、列表数据却先渲染，造成表头与 tbody 列错位。改为先加载完列配置再发列表请求，表格加 :key=\"tableColumnsKey\" 让列集合变化时整表重建，数据回填后再调 doLayout()。与已知「窄屏列宽被省略 / 内容最宽优先」不同：那类根因在宽度测算算法，本条根因是列类型判定把插槽列降级成定宽复杂列；与「列宽抖动补三处重测触发」也不同——本条是列集合异步变更必须早于数据加载，靠 :key 重建而非重测。另：考评周期这类短文本列用 minWidth 100 而非固定 width 220，固定宽会挤占剩余均分空间。",
+   "evidence": "会话 6c3d92d7：用户反馈「表头不要省略，表格与表头错位，考评周期列宽窄一点」；结论指出动态考评列原先用 <div> 自定义插槽，zs-table-column 视为复杂列、宽度固定约 80px，表头截成「物业...」，改 <span> + minWidth≥100；动态列 mounted 异步加载晚于列表渲染导致错位，改为先加载列再请求数据 + :key=tableColumnsKey + doLayout()；考评周期 width:220 → minWidth:100。",
+   "files": [
+    "zhi2-web-admin/src/views/credit/assessment/search.vue"
+   ],
+   "baseline": "864b409",
+   "sessionIds": [
+    "6c3d92d7-7d4f-47a5-a873-d3825a9cd6b4"
+   ],
+   "bundle": "046.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "listMixins 切 POST 接口：apiMethod:'post' 之外，导出/打印前的数据校验必须同源切请求方法",
+   "type": "pattern",
+   "content": "综合查询的多条件混合搜索接口换成 v2.0/property/complex/pageNew 且只支持 POST。正解是页面声明 apiMethod:'post'，listMixins 的 getList 会用 this[`$${this.apiMethod}`] 自动走 $post，页面不必另写请求。坑在于页面里「导出 / 打印前先查一次数据做校验」那一小段通常是自己写的 this.$get(...)，只改列表就会留下 GET 打 POST 接口的死路（405 或空数据），而且导出打印入口不常点，问题往往到验收末尾才暴露。必须把这类旁路请求统一写成 this[`$${this.apiMethod}`]，与列表共用同一个请求方法来源。与已知 /list→/page 路径改造不同：那类是换路径、换取值字段（rows vs data），本条是同一路径下「请求方法」的切换，风险点不在列表而在导出、打印、统计等旁路调用。另：pageNew 这类多条件混合搜索接口的参数结构与旧接口不同，pageNum/pageSize 与条件字段要一起核对，不能只改 apiMethod。",
+   "evidence": "会话 80913079：用户要求「综合查询多条件混合搜索的接口替换为 v2.0/property/complex/pageNew」，追问「接口是POST」；结论为在 publicQuery/complex/index.vue 增加 apiMethod: 'post' 让 getList 走 $post，并把导出、打印前的数据校验改为 this[`$${this.apiMethod}`] 与列表请求方式保持一致，实际请求 POST api/v2.0/property/complex/pageNew。",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/complex/index.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/mixins/table.js"
+   ],
+   "baseline": "26069c8",
+   "sessionIds": [
+    "80913079-78af-4fe5-b215-9a8e1583a91f"
+   ],
+   "bundle": "046.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "zs-date-picker 没有 monthrange 分支：月份区间要用两个单月选择器，别用 attrs 硬覆盖 type",
+   "type": "bug",
+   "content": "把对账文件列表（/v2.0/benefit/pubRecBankFile/page，参数 reconciliationMonthBegin / reconciliationMonthEnd）按框架规范改造时，需求是月份区间。zs-date-picker 在 range:true 时只会拼成 daterange / datetimerange，源码里没有 monthrange 分支；而原生 el-date-picker 支持 monthrange，照原生写法搬过来就会以为它同样支持。虽然可通过 attrs 把 type:'monthrange' 透传覆盖默认值、理论上能生效，但项目里没有任何这种用法，唯一验证过的月份用法是单月 type:'month'。正确做法是拆成两个单月选择器（开始月份 / 结束月份），查询参数仍保持后端约定的 xxxBegin / xxxEnd 成对字段，不要为了省一个控件裸用原生 el-date-picker 绕开 zs-* 规范。判断口径：改日期区间控件前先读 zs-date-picker 的 type 计算表达式确认支持的类型组合，凡组件没声明的类型一律拆成单值控件，比透传 attrs 更可控。与已知「营业期限结束可为 null 时不用 daterange」不同：那条是可空值语义问题，本条是组件能力缺类型。",
+   "evidence": "会话 16e73830：用户要求按框架规范改 pubRecBankFile 列表，追问「monthrange现在组件支持这个类型吗？」；结论给出 zs-date-picker 在 range:true 时 type 只在 daterange/datetimerange 间切换，无 monthrange 分支，attrs 透传理论可行但项目无此用法、已验证的只有单月 type:'month'，最终改为两个单月选择器（开始/结束月份），参数仍为 reconciliationMonthBegin/End。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubRecBankFile/index.vue",
+    "zhi2-web-admin/src/components/zs-date-picker/zs-date-picker.vue"
+   ],
+   "baseline": "e590ffa",
+   "sessionIds": [
+    "16e73830-99fb-4000-928d-063072072d4d"
+   ],
+   "bundle": "046.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "el-select 多选长标签把下拉箭头挤出可视区：给 suffix 预留空间 + 弹窗加宽 + label 置顶",
+   "type": "bug",
+   "content": "「新增银行授权」弹窗里银行名称是多选，选中几个长名称（含「区级已失效」这类后缀）后标签把输入框区域挤满，右侧下拉箭头被遮挡、点不开下拉。根因是多选标签容器没有给 suffix 图标预留宽度，520px 弹窗内一行放不下时也不会换行，标签直接覆盖到箭头位置；组件内部靠 $children 反向调 resetInputHeight 调整高度，在 v-if / 多层嵌套下也不稳。做法：弹窗宽 520→720；表单改 label-position=\"top\" 让多选独占整行；标签区 max-width: calc(100% - 40px) 显式给箭头留位并允许 flex-wrap 换行；输入框 min-height:40px 让高度随多行标签自然增高，不再依赖 $children 去调内部方法。判断口径：el-select / zs-select 多选 + 选项文本长 + 容器窄三者同时成立即可能复现，验收要选最长那个选项截图确认箭头可见且能展开。与已知「弹窗过窄 / 宽度档位」不同：那些是弹窗整体宽度规范，本条是控件内部标签与 suffix 的宽度竞争。",
+   "evidence": "会话 25f90065：用户反馈「新增银行授权时，银行名称的区域太小，下拉按钮被遮挡了，需要拉长拉宽」；结论定位 StreetAuthDialog.vue，520px 宽 + 标签区默认 max-width 挤占右侧使箭头被挡，改为 720px、label-position=\"top\"、标签区 max-width: calc(100% - 40px) + flex-wrap、输入框 min-height 40px，并明确不再用脆弱的 $children 调 resetInputHeight。",
+   "files": [
+    "zhi2-web-admin/src/views/system/regionBankAuth/components/StreetAuthDialog.vue"
+   ],
+   "baseline": "315702f",
+   "sessionIds": [
+    "25f90065-5711-4fcc-a0ab-c949d750a651"
+   ],
+   "bundle": "046.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "列表「操作人/姓名」列渲染成一长串数字：绑到了 ID 字段，先横向比对同模块兄弟页再改 prop",
+   "type": "bug",
+   "content": "信用管理-检查记录列表的「操作人」列显示成 1977638713400360960 这类 19 位数字。这不是脱敏失效也不是雪花 ID 精度丢失，而是列 prop 绑了 evaluator——该字段存的是用户 ID；同模块「综合查询」页同一语义用的是 recordUser（姓名）。定位法：列表列渲染出雪花 ID 形态的纯数字串时，先判定它是「ID 被当文本展示」而非「精度丢失」（后者末位会变成 0），然后在同模块其他页面找同语义列的正确字段名做横向比对。改法只动列 prop，不动接口、不在前端加 evaluator || recordUser 这种映射兜底——能确定语义时兜底反而会把 ID 继续显示出来。与已知「字段名不确定要多候选回退」正相反：联调阶段才用多候选，字段语义明确后必须收敛到唯一正确字段；与「新列整列为 -」「雪花 ID 精度丢失」也不同，那两类是空值与末位归零，本条是字段选错但渲染完全正常，只有看内容形态才能发现。",
+   "evidence": "会话 d199a1b4：用户截图指出「行业管理：信用管理-检查记录，不应该显示流水号」；结论为操作人列误用 evaluator（存用户 ID），同模块「综合查询」页用 recordUser 才是操作人姓名，将 credit/record/index.vue 的列 prop 从 evaluator 改回 recordUser，并按用户要求 261 直接提交、262 与 262-suzhufang 各 cherry-pick 一次。",
+   "files": [
+    "zhi2-web-admin/src/views/credit/record/index.vue",
+    "zhi2-web-admin/src/views/publicQuery/assessment/index.vue"
+   ],
+   "baseline": "d109b83",
+   "sessionIds": [
+    "d199a1b4-ccfd-4bfe-a151-d44cceb9f4c9"
+   ],
+   "bundle": "046.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "子模块 .gitignore 的收录边界：E2E/预览产物不入库，本地 AI 会话记忆要入库",
+   "type": "pattern",
+   "content": "子模块工作区里 report.html、public/version.json、preview 下的 PNG 与 report*.json、E2E 的 actual.png / diff.png / report.json / probe* 每跑一次就变，持续污染 git status。做法：这些加进子模块 .gitignore，已经入库过的（report.html、public/version.json）用 git rm --cached 停止跟踪、保留磁盘文件，并与 .gitignore 的改动放在同一个 commit。用户明确的边界：.workbuddy/memory 这类本地 AI / Workbuddy 会话记忆必须能被跟踪（不要 ignore），所以规则要写「具体产物目录 + 具体产物文件名」，不要图省事整目录 ignore，否则脚本、HTML 模板、记忆文档会一起被排除；preview/verify.mjs 这类模板脚本也要保持可提交。改完必须用 git check-ignore -v 逐条验证：产物命中 ignore、脚本与记忆未命中，再提交。与已知「提交时显式排除 env/.env」不同：那条讲暂存阶段的排除，本条讲 ignore 规则本身要按「产物 / 源码脚本 / 记忆文档」三分类书写，避免目录级一刀切。",
+   "evidence": "会话 dce1075f：用户要求「分析一下子模块工作区哪些文件不需要git跟踪，加入ignore文件」，并明确「本地 AI / Workbuddy 会话记忆可以跟踪」；执行后 .gitignore 新增 report.html、public/version.json、preview/**/*.png、preview/**/report*.json 与 E2E 的 actual.png/diff.png/report.json/probe*，已入库两项用 git rm --cached 停止跟踪，验证 preview/verify.mjs 与 .workbuddy/memory/2026-09-20.md 均未被 ignore。",
+   "files": [
+    "zhi2-web-admin/.gitignore",
+    "zhi2-web-admin/preview/verify.mjs",
+    "zhi2-web-admin/tests/e2e/home-v2.spec.mjs"
+   ],
+   "baseline": "3192070",
+   "sessionIds": [
+    "dce1075f-dcad-4d5b-978b-b09c8f0c73ab"
+   ],
+   "bundle": "046.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] CI 报 Cannot find module @rollup/rollup-linux-x64-gnu 的真实根因是 Runner 的 glibc 过低，解法是 CI 下切 @rollup/wasm-node",
+   "type": "bug",
+   "content": "什么情况：GitLab Runner 上 Vite 构建（Rollup 4）直接抛 `Cannot find module @rollup/rollup-linux-x64-gnu`，并在末尾附「npm 可选依赖 bug，删 package-lock.json 和 node_modules 重装」的官方提示。为什么：报错文案会把人带去「重装依赖」这条死路，实际是 Runner 系统 glibc 版本太低（Ubuntu 18.04 / CentOS 7 常见），而 Rollup 4.x 的原生二进制要求 glibc ≥ 2.32，加载失败被原生命令层包装成了「模块找不到」。另一层常见诱因是把 Windows 上装的 node_modules 缓存/挂载进 Linux 构建环境，平台原生包必然不匹配。怎么做：①判断阶段别真去删 lock 文件，先确认 Runner 镜像的 glibc（`ldd --version`）；②落地解法是加 `@rollup/wasm-node` 依赖，并在构建脚本（本项目 `zhi2-web-admin/scripts/vite-build.mjs`）里检测 `CI` 环境变量，CI 下把原生 Rollup 替换为 WASM 版，本地开发仍用原生（更快）；③CI 里必须在 Runner 容器内自己 `npm install`，不要复用宿主机的 node_modules；④根治方案是把 Runner 镜像升到 Ubuntu 22.04+（glibc 2.35）。注意本仓库是多项目同源，报错路径若指向 h5-g-unlimited 等独立项目，需把同一份改动同步过去才生效。与已知 #743（CI heap OOM 是构建脚本写死小堆上限）不是同一类问题：那条是内存参数，本条是原生二进制的 libc 依赖。",
+   "evidence": "用户贴出 Rollup native.js 报错，AI 判定 `GLIBC_2.32 not found (required by @rollup/rollup-linux-x64-gnu)`，在 zhi2-web-admin/package.json 加 @rollup/wasm-node 并在 scripts/vite-build.mjs 里于 CI 环境自动替换；本地 `CI=true npm run test` 构建通过",
+   "files": [
+    "zhi2-web-admin/package.json",
+    "zhi2-web-admin/scripts/vite-build.mjs",
+    "package.json",
+    "package-lock.json",
+    ".gitignore"
+   ],
+   "baseline": "d109b83",
+   "sessionIds": [
+    "f6d6c62a-14d0-412a-9d68-6e36fe00948f"
+   ],
+   "bundle": "047.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 依赖别的字段重算的「派生汇总字段」必须用 watch 而非 @change，否则复制粘贴/程序化赋值不触发",
+   "type": "bug",
+   "content": "什么情况：物业管理区域编辑页里，总建筑面积由「地上总建筑面积 + 地下总建筑面积」相加得出，用户从别处复制数据粘进两个面积输入框后，总建筑面积仍是旧值，只有逐字手动输入才会重算。为什么：原实现把重算挂在两个子字段的 `@change` 上。`@change` 语义是「用户交互引发的值变化」，鼠标右键粘贴、拖拽填充、上游回填、程序化赋值都只改 model 不派发 change，监听自然不触发；而总建筑面积又是只读展示/参与保存的字段，于是静默存成脏数据。怎么做：把重算逻辑改成 `watch` 监听 `form.aboveFloorArea` 与 `form.underFloorArea`（可带 `immediate: true`，保证详情回填后立刻算一遍），`handleChangeFloorArea` 只留纯计算体、不再绑在模板的 change 事件上。三处同构页面必须一次改齐：`property/complex/detail.vue`（编辑）、`property/complexChange/detail.vue`（变更）、`building/complexSearch/detail.vue`（查询），只改一处另外两处照样复现。另外先 grep 同名方法：`complexBuildingAuth/detail.vue` 里有同名 handleChangeFloorArea 但模板没有对应面积输入框，属死代码，不要跟着改。推论：凡是「只读派生字段」（合计、面积、里程、比例）都由 watch 驱动，不要依赖交互事件。",
+   "evidence": "用户反馈粘贴地上/地下总建筑面积后总建筑面积不重算；修复为移除面积字段上的 @change、新增 watch 监听 aboveFloorArea/underFloorArea，并同步到 complex、complexChange、complexSearch 三个 detail.vue",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/views/property/complexChange/detail.vue",
+    "zhi2-web-admin/src/views/building/complexSearch/detail.vue"
+   ],
+   "baseline": "320507d",
+   "sessionIds": [
+    "0c58b1c2-0dda-4b30-a6fc-15ae19f0f03b"
+   ],
+   "bundle": "047.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 原生 table + colgroup 的统计表右侧留白：把 width 改成 minWidth 让内容少时也铺满，样式表恢复 width:100%",
+   "type": "bug",
+   "content": "什么情况：公共查询-物业管理信息月报统计详情页，调整第一列宽度后表格右侧出现一条留白，内容没铺满容器。为什么：该页不是 zs-table，而是原生 `<table class=\"stat-table\">` + `<colgroup>` 写死各列 `width`。列宽改成固定值后，所有列宽之和小于容器宽度时，table 不会自动把剩余空间分配掉，右边就空出来；而样式表里 `.stat-table` 的 `width:100%` 被内联/局部覆盖后连兜底也没了。怎么做：①`colgroup`/列上的 `width` 改 `minWidth`（列宽语义从「定宽」变「下限」），内容总宽不足一屏时浏览器把余量分给各列，超出则触发容器的横向滚动；②`.stat-table` 回收 `width: 100%`，与同模块其它统计页保持同一口径；③外层 `.stat-table-wrap` 保留 `overflow: auto` 承载窄屏横向滚动。验证要分宽屏/窄屏两态：宽屏看是否铺满且第一列不被异常拉伸，窄屏看是否出现横滚而不是压缩换行。这类「原生表格 + colgroup」页与 zs-table 的列宽算法无关，别去改公共 zs-table（会误伤全站列表）。",
+   "evidence": "用户反馈月报统计调整第一列宽度后页面留白；修复为 detail.vue 里 width→minWidth、.stat-table 恢复 width:100%，依赖 .stat-table-wrap 的 overflow:auto 处理窄屏",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/monthlyReportStat/detail.vue",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReportStat/index.vue"
+   ],
+   "baseline": "a724727",
+   "sessionIds": [
+    "89bf3d7d-179a-4d0a-8a4f-3157bdf4d110"
+   ],
+   "bundle": "047.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 查询结果与筛选条件反着来：查询区用了另一套 BIZ_STATE 常量，而列表展示走全局 biz_state（1=审核中，2=已备案）",
+   "type": "bug",
+   "content": "什么情况：整改通知书列表，业务状态筛「已备案」查出来全是审核中，筛「审核中」查出来全是已备案，接口入参的码值整体错位。为什么：同一页面并存两套字典来源——查询条件下拉用的是页面/模块里本地定义的 `BIZ_STATE` 常量（其中这两个值的码与后端约定相反），列表展示则走全局 `biz_state` 字典（1=审核中、2=已备案）。两套口径的码值不是简单对调，而是语义错位，所以筛选项发出去的 `status` 与展示列对不上。怎么做：把查询区字典统一改为全局 `biz_state`，参数名同时从 `status` 收敛成 `bizState`，与同模块的申诉、修复等页面保持一致；改完按「选已备案→传 bizState=2」「选审核中→传 bizState=1」两条逐一验证，并同步检查重置逻辑。排查顺序：先确认「列表展示用的是哪个字典」，再找查询区用的是哪一份常量，两者不一致就是根因，不要先去怀疑后端。与已知 #249（业务状态统一走全局 biz_state，但只替换本地静态数组、BIZ_STATE 常量保持原样）的区别在于：那条讲的是「别误改常量」的改动边界，本条给出的是**直接症状**——筛选项与列表结果互为反面时，第一嫌疑就是查询区引用了非 biz_state 的那份常量。",
+   "evidence": "rectificationNotice/index.vue 查询区 BIZ_STATE 与列表 biz_state 码值不一致；修复为统一 biz_state、参数改 bizState，验证两个状态互不串",
+   "files": [
+    "zhi2-web-admin/src/views/evaluation/rectificationNotice/index.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/mixins/table.js"
+   ],
+   "baseline": "d109b83",
+   "sessionIds": [
+    "d13d65c9-9c9c-46c7-a385-c74d24a4cbbb"
+   ],
+   "bundle": "047.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 查询条件选项过多难以选中：给 zs-search-form 增加 search-select 类型（可输入可搜索），而不是逐页换 select",
+   "type": "pattern",
+   "content": "什么情况：物业费简易申报页的「所属街道」「社区」两个查询条件下拉有上百项，滚动找不着，用户要求「输入框需要优化为可输入可选择」。为什么：zs-search-form 是配置化渲染（formItems 里写 type），原生 el-select 不加 filterable 就是纯滚动选择；而页面又不能自己换控件——配置化搜索表单只认已注册的 type，写一个不存在的 type 会按已知 #287 的规律静默退化成空输入框。怎么做：在 `src/components/zs-search-form/SearchFormItem.vue` 里新增 `search-select` 类型分支（内部即 el-select + filterable，可再配「无匹配时保留输入的关键字」），页面侧只把街道/社区的 `type` 改成 `search-select`，查询参数名不变。收益是一次扩展全站可用，后续同类「选项太多」的查询条件都复用它，不用每个页面各写一套。验证与交付：只改两个文件（SearchFormItem.vue + feeDeclare2/index.vue），提交到 `develop/v2.6.2-suzhufang` 分支。注意这是对本项目「公共组件扩展而非页面特化」约定的延伸：扩 type 时务必同步检查漏配 type 时的降级表现。",
+   "evidence": "用户诉求「所属街道选择项太多，输入框需要优化为可输入可选择」；改动 SearchFormItem.vue 新增 search-select 支持 + feeDeclare2/index.vue 两项改为可搜索选择，提交 00e5996c1",
+   "files": [
+    "zhi2-web-admin/src/components/zs-search-form/SearchFormItem.vue",
+    "zhi2-web-admin/src/views/property/feeDeclare2/index.vue"
+   ],
+   "baseline": "415629d",
+   "sessionIds": [
+    "b746e4da-a1d3-44df-b018-770aec64031f"
+   ],
+   "bundle": "047.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 跨分支合并（v2.6.2 → suzhufang）的冲突处置口径：业务逻辑保我方、Bug 修复取对方、公共样式逐 hunk 拼合而非整文件二选一",
+   "type": "pattern",
+   "content": "什么情况：子模块 `zhi2-web-admin` 要把上游 `develop/v2.6.2` 合进本项目分支 `develop/v2.6.2-suzhufang`，产生 20 个冲突文件。用户给的口径是「业务逻辑冲突以 suzhufang 分支为准；如果对方是修 bug，以修复为准」。为什么：本项目是苏住房分叉版，业务字段/流程已被本地化改造，直接吃掉上游版本会把本地业务改回去；但上游的 bug 修复往往与本仓库同源、且不涉及业务语义，丢掉就等于把已修好的坑重新踩一遍。怎么做：按类型分三档处理——①**纯业务逻辑**（高级查询组件 complexFieldConfig.js / zs-advanced-query.vue、公共查询模块 complex、companyProjectStats、dualPublicityStats、buildingTable、渠道管理 paymentChannel、划拨通知/账单/用款申请/银行回单详情页、优惠弹窗字段配置等 15 个文件）：整体保 HEAD；②**纯 bug 修复**（如 serviceItem/detail.vue 的服务内容表格展示）：取上游版本；③**两边都有实质改动**（index.scss、property/complex/index.vue、spFeeBill/index.vue、platformConfig/detail.vue）：逐 hunk 拼合而不是整文件二选一，例如 index.scss = 保留苏住房布局选择器 + 采纳表格高度修复，complex/index.vue = 采纳 `:table-tr` 修复 + 保留 downloadJson 导出，spFeeBill/index.vue = 保留减免/优惠分类逻辑 + 加入账单校验，platformConfig/detail.vue = 同时保留「银行授权」与「网页标题」两项配置。约 40+ 个无冲突文件的通用修复（搜索框箭头、列表滚动、整改通知书、业主开户分页）自动并入。收尾：子模块提交（本例 c828f7ebf）后再单独更新父仓库子模块指针。",
+   "evidence": "子模块完成 develop/v2.6.2 → develop/v2.6.2-suzhufang 合并，提交 c828f7ebf，20 个冲突文件按「业务保 HEAD / bug 修复取上游 / 4 个逐处合并」处理",
+   "files": [
+    "zhi2-web-admin/src/components/zs-advanced-query/complexFieldConfig.js",
+    "zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/views/property/complex/index.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/index.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/discountDialog.vue",
+    "zhi2-web-admin/src/views/property/bill/components/detail.vue"
+   ],
+   "baseline": "f4fae14",
+   "sessionIds": [
+    "fb857748-af92-4775-bcff-a46d38cd48d4"
+   ],
+   "bundle": "047.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "zs-table 里标签「用 +N 省略」而不是 overflow 截断，Tooltip 必须挂 body 才能逃出 fixed 列遮挡",
+   "type": "pattern",
+   "content": "什么情况：列表列里要展示多个 el-tag（标签/要件名/事项名），标签数超过单元格宽度时被 fixed=\"right\" 的操作列压住、或被拦腰截断，用户看不到也点不到。\n为什么：三个独立根因叠加——① 列 min-width 只有 200px，且 zs-table-column 对含 el-tag 的自定义插槽会转成固定 width，按内容测宽失效；② 标签容器写了 overflow:hidden，截断的是单个标签文字，看起来像「乱码」；③ 标签列紧邻 fixed 右列，内容溢出区延伸到固定列下方被覆盖。\n怎么做：抽一个 LabelTags 公共组件；超限时只渲染前 N 个并追加一个 +N 计数项（如 5 个标签显示 2 个 + +3），hover 由 el-tooltip 展示全量——el-tooltip 必须 append-to-body 且 z-index 提到 3000 以上，否则仍被 fixed 列压住；容器不要 overflow:hidden，紧凑模式允许换行（flex-wrap）以免撑宽表格；表格场景用 compact 模式把展示上限压到 2 个，列 min-width 给到 260px 并挂 class-name 把溢出锁在单元格内。\n与已知条的差异：已知条只讲了 zs-table-column 插槽作用域、列宽均分、金额对齐等，没有「多标签 +N 省略 + Tooltip 挂 body 逃 fixed 列」这条渲染范式，也没有「不要 overflow:hidden 截断标签」的结论。",
+   "evidence": "会话 cd131f8a：用户两次反馈标签粘连、标签列被固定操作列遮挡；最终结论逐条列出根因（min-width 200px、.label-tags__content overflow:hidden、紧邻 fixed right）并给出 LabelTags 的 +N / append-to-body / z-index 3000 / compact 方案。",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/complex/index.vue",
+    "zhi2-web-admin/src/views/property/complex/index.vue"
+   ],
+   "baseline": "2a3ef8a",
+   "sessionIds": [
+    "cd131f8a-851c-4400-9f82-ea7bc72a8626"
+   ],
+   "bundle": "048.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "本后台路由不静态注册：公共查询/月报等页面由后端菜单 listRouters 动态下发，静态搜 router 目录必然扑空",
+   "type": "fact",
+   "content": "什么情况：需要在仓库里定位某个业务页面的路由或 URL（如「物业管理信息月报表」publicQuery/monthlyReport），但 router/index.js 里搜不到任何 month/report/public 相关静态路由，容易误判「功能没实现」。\n为什么：路由来自登录后动态下发——store/modules/permission.js 的 GenerateRoutes 调 GET('/system/menu/listRouters', { subSysCode })，用 flattenTree 存原表，再经 dealWithRouter 注册；组件靠菜单的 component 字段（如 publicQuery/monthlyReport/index）在 loadView 里遍历 import.meta.glob 的 views 模块做目录名匹配（匹配不到返回 undefined），并包一层 importWithChunkRetry。\n怎么做：定位页面的正确姿势是「按 views 目录反查」——先按业务关键词在 src/views 下找目录，再按 component/filePath 推定 URL；代码里出现的硬编码 push({ path: '/publicQuery/monthlyReportTemplate' }）这类跳转才是前端唯一能确认的路径来源。验证某个页面到底挂没挂上，只能登录后看菜单或抓 listRouters 响应，不能靠翻 router 目录。\n与已知条的差异：已知条记录过「登录后进不去待办页先查动态路由是否注册」「菜单 filePath 与 views 目录一一对应」「loadView/component 匹配」等碎片，但没有把「路由 100% 由 listRouters 下发、静态路由搜索为空是正常现象」这条仓库事实与定位手法写清楚。",
+   "evidence": "会话 829c0dea：用户要求在仓库中查找月报/公共查询的路由与页面；结论给出 permission.js 的 GenerateRoutes(listRouters) 与 loadView 的 import.meta.glob 匹配代码（含行号），并明确 router/index.js 无静态注册、只能靠 component 字段映射。",
+   "files": [
+    "zhi2-web-admin/src/store/modules/permission.js",
+    "zhi2-web-admin/src/router/index.js",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReport/index.vue"
+   ],
+   "baseline": "320507d",
+   "sessionIds": [
+    "829c0dea-831a-4a9a-86a4-94c027b1004d"
+   ],
+   "bundle": "048.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "授权绑定类详情页：编辑态要锁死「被授权方」这类主数据字段，新增态才允许选择",
+   "type": "pattern",
+   "content": "什么情况：行业管理 → 用户及授权 → 企业授权这类「把某主体授权给某对象」的详情/编辑页，用户反馈编辑时「企业名称」还能点开选择框改。\n为什么：新增与编辑共用同一份 detail 页，企业选择器只在新增时需要；编辑态允许改就等于允许把一条授权记录悄悄改成指向另一家企业，主数据与已发生的授权关系脱节。\n怎么做：在编辑态把企业名称控件置为 disabled，与同屏的统一社会信用代码、办公地址等只读字段保持一致的视觉与交互口径；判断依据用页面的 formMode/isView 之类的单一谓词（新增可编辑、编辑只读），不要按路由 id 是否存在散落判断。新增态保持可正常选择企业，别顺手套用同一个禁用开关。\n与已知条的区别：已知条有「查看态不要用整表 disabled 冒充只读」「字段按 organType 隐藏要四处同步」，但没有「授权/绑定关系的被授权方在编辑态必须禁改、新增态才可选」这条业务约定。",
+   "evidence": "会话 e96ee884：用户提出「企业授权，编辑的时候企业名称应该禁止编辑」；最终修改 companyRecordAuth/detail.vue，编辑模式下企业名称禁用，与统一社会信用代码、办公地址一致，新增模式仍可选择。",
+   "files": [
+    "zhi2-web-admin/src/views/company/userManagement/companyRecordAuth/detail.vue"
+   ],
+   "baseline": "26069c8",
+   "sessionIds": [
+    "e96ee884-e80d-4f80-a9e4-966848f80eb3"
+   ],
+   "bundle": "048.md",
+   "project": "苏住房G"
+  }
+ ]
+}

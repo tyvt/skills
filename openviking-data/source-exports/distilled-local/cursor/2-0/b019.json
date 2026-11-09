@@ -1,0 +1,144 @@
+{
+ "project": "2-0",
+ "batch": "019",
+ "files": [
+  "019.md"
+ ],
+ "count": 8,
+ "memories": [
+  {
+   "title": "Uncaught TypeError: Cannot",
+   "type": "preference",
+   "content": "### 报错原因（为什么会读到 `undefined.type`） 这个报错是 **ECharts 在渲染时遍历 `option.series`**，拿到的某一项是 **`undefined/null/false`**，于是内部代码执行到 `seriesItem.type` 就直接抛了： - 常见触发方式：`series` 用了条件拼接/回写 option 时，数组里混进了空值或“空洞” - 例如：`series: [a && {...}, b && {...}]`（当 a/b 为假时会产生 `false`） - 或者：`const opt = chart.getOption(); opt.series[0] ...; chart.setOption(opt)`（`opt.series[0]` 不存在/被清空时容易把 `undefined` 带回去） ### 我做的修复（兜底避免白屏） 我加了一个通用的 option 归一化工具：`zhi2-web-admin/src/utils/echartsOption.js` - **功能**：在 `setOption` 前对 `option.series` 做 - **过滤**：移除 `undefined/null/false` - **补齐**：若某个 series 对象缺少 `type`，自动补默认值（默认 `'line'`，也可指定 ",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "归一化工具：`zhi2-web-admin/src/utils/echartsOption.js",
+    "`zhi2-web-admin/src/views/benefit/mobilePreview/pubQuarterlyDeclaration/index.vue",
+    "`zhi2-web-admin/src/views/home/components/BubblesChart.vue",
+    "`zhi2-web-admin/src/views/transaction/screen/components/map.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "74a5d328-683e-4a0f-84af-32d70a0281e6"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "[Vue Router warn]: No matc",
+   "type": "bug",
+   "content": "这个 warn 的本质是：**你在访问 `/system/config` 的那一刻，路由表里还没把它加进去**（你们是权限动态路由，`beforeEach` 里 `GenerateRoutes` 后才 `router.addRoute`）。 所以 Vue Router 4 会先提示一次 **`No match found`**；随后守卫把动态路由补上并 `replace` 回目标路径，于是页面又能正常打开——看起来就是“报错但不影响”。 我这边在 `zhi2-web-admin/src/router/index.js` 给 `constantRoutes` 加了一个**兜底路由**： - `path: '/:pathMatch(.*)*'` 直接渲染 404 组件 这样首次进入动态路由时也能先匹配到一条路由，**不会再打印这个 warn**，但权限路由加载完成后依然会按你们原逻辑 `replace` 到真实的 `/system/config`。",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`zhi2-web-admin/src/router/index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e69bf570-f1df-461a-a4e3-2caf768354d7"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "zs-table-column.vue:1 [Vue",
+   "type": "preference",
+   "content": "### 已处理内容 - **在 `ZsTableColumn` 增加卸载保护**：给组件加了 `_zsUnmounted` 标记，并在 `created()` 的字典异步回写、以及 `computedWidth/getHeader` 里做了保护，避免**组件/表格开始卸载后仍然触发状态更新**，从而引发 `ElTableColumn` 的 `beforeUnmount` 阶段异常。 - **兼容 Vue2/Vue3 生命周期**：同时实现了 `beforeDestroy` 和 `beforeUnmount`，确保你当前迁移阶段两边都生效。 对应修改文件：`zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue` ### 你接下来怎么验证 - 重新进入触发该页面，**切换路由离开**（触发卸载），看控制台是否还出现 `Unhandled error during execution of beforeUnmount hook`。 - 如果仍有报错，请把**紧跟在这条 warn 后面的具体 error stack**（红色报错那段）也贴出来；那样我可以精确定位是 Element Plus 的哪段卸载逻辑在被什么数据/prop 搞坏。",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "对应修改文件：`zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zs-table-column.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "03d38e43-915e-4d67-8a3b-63c1ee8a02cf"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "ElementPlusError: [props] ",
+   "type": "fact",
+   "content": "### 原因 这是 Element Plus 的弃用提示：`ElButton` 的 `type=\"text\"` 在 3.0 将废弃，官方推荐改用 **`link`** 按钮样式。 ### 我做的修复 - **把项目里直接写的** `<el-button type=\"text\">` **改成** `<el-button link>`（共 4 处）。 - **在公共组件 `zs-button` 做了兼容**：如果有人还传 `type=\"text\"`（很多页面/操作列是通过配置或 `zs-button` 传参生成按钮的），会自动转换成 `link`，从根上消除告警。 关键兼容逻辑在 `zhi2-web-admin/src/components/zs-button/zs-button.vue`：当 `rest.type === 'text'` 时删除 `type` 并设置 `rest.link = true`。 ### 你接下来怎么验证 - 重新启动/刷新页面后，这条 `ElementPlusError: ... type.text ... deprecated ...` **应该不再出现**。 - 如果仍出现，基本就是还有地方绕过了 `zs-button` 直接给 `ElButton` 传了 `type: 'text'`（渲染函数/动态组件），我可以再继续帮你把剩余入口也兜住。 **Se",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`zhi2-web-admin/src/components/zs-button/zs-button.vue",
+    "https://element-plus.org/en-US/component/button.html",
+    "(error.ts",
+    "(index.ts"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "00b18628-52c8-4770-87e2-b9abc61e87b6"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "5:8081/#/index/todo:1 Unca",
+   "type": "preference",
+   "content": "### 根因与修复点 这个报错通常是 **组件更新时又触发自身再次更新** 导致的递归。你项目里最直接的触发点在 `zhi2-web-admin/src/components/zs-select/MultiSelect.vue`：之前在 `updated()` 钩子里无条件调用 `this.$refs.elSelect.resetInputHeight()`，而 `resetInputHeight()` 会引发 `ElSelectDropdown` 内部状态更新，从而形成 **update → updated → resetInputHeight → update** 的死循环，最终抛出 `Maximum recursive updates exceeded in <ElSelectDropdown>`。 我已修改为： - **移除 `updated()` 里的强制调用** - 改为只在 **`$attrs.value` / `$attrs.options` 变化时** 调用一次，并做 **去重 + 定时器合并**，避免反复触发 修改文件：`zhi2-web-admin/src/components/zs-select/MultiSelect.vue` ### 当前验证状态 - **该文件无新增 linter 错误** - 本地开发服务可正常启动（端口占用导致自动切到 `8084`",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`zhi2-web-admin/src/components/zs-select/MultiSelect.vue",
+    "修改文件：`zhi2-web-admin/src/components/zs-select/MultiSelect.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "533423a8-81bd-4094-9c97-d30615178fc1"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "[Vue warn]: Invalid prop: ",
+   "type": "preference",
+   "content": "已定位到告警来源是 `DictTag` 组件把字典里的 `listClass` 直接传给了 `ElTag` 的 `type`，当 `listClass === \"default\"` 时，Element Plus 的 `ElTag.type` 自定义校验不通过就会报： - 修复文件：`zhi2-web-admin/src/components/dict-tag/dict-tag.vue` - 修复点：`getTagType()` 对 `listClass` 做了规范化处理 - **遇到 `\"default\"`（以及空值）时返回 `undefined`，等价于不传 `type`，使用默认样式** - 同时把字符串统一 `trim().toLowerCase()`，避免 `\"Default\"/\"DEFAULT\"` 之类的变体 这样 `ElTag` 就不会再收到非法的 `type=\"default\"`，对应的 Vue warn 会消失。",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "修复文件：`zhi2-web-admin/src/components/dict-tag/dict-tag.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "19b58a9e-4df5-44f1-8286-0667d6776a04"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "index.ts:11 [Vue warn]: In",
+   "type": "bug",
+   "content": "### 问题原因 `<zs-table-column v-bind=\"column\" />` 这种写法里，很多页面的列配置写的是 `formatter: 'amountFormatter'`（**字符串**）。`zs-table-column` 之前会把这个字符串通过 `v-bind=\"attrs\"` **原样透传**给 `ElTableColumn`，导致 Element 的 `formatter` prop 做类型校验时报： - **Expected Function, got String with value \"amountFormatter\"** 即使同时又写了 `:formatter=\"formatters[attrs.formatter]\"`，这个“字符串透传”也会先触发告警。 ### 已修复（全局兼容，不用逐页改） 在 `zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue` 做了两点调整： - **不再把字符串 `formatter` 透传给 `ElTableColumn`**（从 `v-bind` 的 `attrs` 里剔除） - 新增 **`resolvedFormatter`**：始终从原始 `$attrs.formatter` 取值，若是函数就直接用；若是字符串就映射到 `@/f",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "`@/formatters/index.js",
+    "index.ts"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ce31747c-5502-4d03-83c2-364130d7d52d"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "communityStatistics.vue:35",
+   "type": "preference",
+   "content": "已修复你日志里的 ECharts 告警 **`There is a chart instance already initialized on the dom`**（同一 DOM 被重复 `echarts.init()`）。 ### 根因 这些组件在 `mounted` + `watch(dataList)`（以及部分 `watch(setOption)`）里都会触发 `drawCharts()`，但 `drawCharts()` 每次都： - 直接 `eCharts.init(dom)`（不复用已有实例） - 反复 `window.addEventListener('resize', () => ...)`（匿名函数无法移除，越绑越多） ### 我做的改动（统一修复方式） - **改为复用实例**：`eCharts.getInstanceByDom(dom) || eCharts.init(dom)` - **resize 监听只绑定一次**：用组件字段保存 handler - **组件销毁时清理**：`removeEventListener` + `chart.dispose()` - **watch 里用 `$nextTick`**：避免 DOM 未渲染就初始化 ### 已修复文件 - `zhi2-web-admin/src/views/benefit/dataStatist",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`zhi2-web-admin/src/views/benefit/dataStatistics/components/communityStatistics.vue",
+    "`zhi2-web-admin/src/views/benefit/dataStatistics/components/paymentsStatistics.vue",
+    "`zhi2-web-admin/src/views/benefit/dataStatistics/components/quarterPaymentsStatistics.vue",
+    "`zhi2-web-admin/src/views/benefit/dataStatistics/components/managementTypeStatistics.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2a9f420a-f2ff-426a-a5c2-7881713c1a52"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  }
+ ],
+ "_draft": true
+}

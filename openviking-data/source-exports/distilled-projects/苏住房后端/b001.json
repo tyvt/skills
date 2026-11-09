@@ -1,0 +1,86 @@
+{
+  "project": "苏住房后端",
+  "batch": "001",
+  "files": [
+    "001.md"
+  ],
+  "count": 5,
+  "memories": [
+    {
+      "title": "子模块权限探测必须用 .gitmodules 里同样的协议：https 探不通而 .gitmodules 全是 http://，443 不通会被误判成没权限",
+      "type": "bug",
+      "content": "【什么情况】批量初始化 14 个子模块时，8 个 zhi2-* 仓库 git ls-remote 全部失败，一度判为「仓库权限没开」；用户把权限开好之后仍然失败。\n【为什么】协议不一致导致误判：.gitmodules 里所有子模块地址写的都是 http://，而本机网络 80 端口通、443 端口断。第一次测权限用的是 https://，443 不通 → 表现成「没权限」，实际是协议走错了。换成 .gitmodules 里同样的 http:// 再探，git ls-remote 全部命中目标分支（如 develop/v2.6.2-suzhufang-dev），权限本来就是好的。\n【怎么做】① 判「有没有权限」之前，先把 .gitmodules 里的协议原样取出来用（git config -f .gitmodules --get submodule.<name>.url），不要自作主张换成 https；② 探测权限用 git ls-remote <url> <目标分支>，命中即说明凭据与网络都通；③ 区分两类失败：认证失败（403 / 要求输入凭据）与网络失败（连接超时、443 不通）——后者是换协议或换端口的事，不是权限问题；④ 批量初始化前先用一个子模块试协议，再放开跑全量，避免 14 个一起报同样的错而无法分辨根因。",
+      "evidence": "会话 2010156f（基线 02900b8）用户诉求 1「初始化所有子模块，都使用v2.6.2-suzhufang-dev分支，然后启动每个模块服务检查……启动好了之后检查网关/code接口captcha怎么开启返回」、诉求 3「权限开好了，继续」、诉求 4「其他仓库权限也开了」；最终结论写明「之前 404 的 8 个 zhi2-* 仓库权限确实开了（git ls-remote 全部命中 develop/v2.6.2-suzhufang-dev）。坑在我自己：第一次测权限我用的是 https://，而 .gitmodules 里全是 http://，这个网络 443 端口是断的（80 通、443 不通），所以误判成没权限」，14/14 子模块全部初始化并切到目标分支。",
+      "files": [
+        ".gitmodules"
+      ],
+      "baseline": "02900b8",
+      "sessionIds": [
+        "2010156f-5fb3-49c1-859a-daa3a63a94f2"
+      ],
+      "bundle": "001.md"
+    },
+    {
+      "title": "Maven 报找不到 com.zhishu.property.api.complex.util：Nexus 上的 SNAPSHOT 发布包落后于分支源码，先本地 install 依赖模块再续建",
+      "type": "bug",
+      "content": "【什么情况】全量 mvn -DskipTests install 时，common-framework / data-property / service-expand 三个模块编译失败，报缺 com.zhishu.property.api.complex.util。\n【为什么】不是代码缺类，而是「仓库里的构件比源码旧」：Nexus 上发布的 zhi2-property-api:2.5-SNAPSHOT（快照停在 20260703.070124-7）里没有这个 util 包，而分支上钉的 zhi2-property 提交比它新——新源码依赖了尚未发布的类，Maven 从远端拉到的还是旧快照，自然找不到。\n【怎么做】① 遇到「某模块缺某个自己项目里的包」，先比对本地分支的 zhi2-property 提交时间与远端快照发布时间，确认是构件落后而不是源码写错；② 把被依赖的模块先在本地装进本地仓库（mvn -DskipTests install -pl zhi2-property-api -am，或整条链 install），让下游编译解析到本地新构件；③ 源码到位后链路自然打通，全量 reactor 33 个子工程 BUILD SUCCESS；④ 注意这只是治标——下次别人拉代码同样会缺，除非把 zhi2-property-api 重新 deploy 到 Nexus 并让下游依赖该新快照。",
+      "evidence": "会话 2010156f（基线 02900b8）用户诉求 1 要求初始化所有子模块并启动检查、诉求 2/3/4/5「继续」；最终结论「二、构建：全量 reactor BUILD SUCCESS」写明「之前那三个模块（common-framework / data-property / service-expand）编译失败，根因就是缺 com.zhishu.property.api.complex.util —— Nexus 上的 zhi2-property-api:2.5-SNAPSHOT 发布包（停在 20260703.070124-7）里没有这个 util 包，而分支上钉的 zhi2-property 提交比它新。源码到位后本地先装 zhi2-property-api，链路自然打通。全量 mvn -DskipTests install 33 个子工程全部 SUCCESS」。",
+      "files": [
+        "pom.xml",
+        "zhi2-property/pom.xml"
+      ],
+      "baseline": "02900b8",
+      "sessionIds": [
+        "2010156f-5fb3-49c1-859a-daa3a63a94f2"
+      ],
+      "bundle": "001.md"
+    },
+    {
+      "title": "Maven 报 Failed to copy artifact … 另一个程序正在使用此文件：是本地还在跑的实例占着 target/lib 的 jar，停掉后用 -rf 续建",
+      "type": "bug",
+      "content": "【什么情况】全量构建中途 common-flowable-server 报 Failed to copy artifact ... 另一个程序正在使用此文件。\n【为什么】不是依赖冲突、也不是权限问题，是文件占用：本地那个还在运行的 flowable 实例（java 进程）把 target/lib 下的 jar 句柄占着，Maven 打包时要复制/替换该文件，Windows 上文件被独占 → 复制失败。\n【怎么做】① 先确认是不是「上次启动的服务还在跑」——本模块有本地实例时优先怀疑它；② 停掉占用进程（结束对应 java 进程）再重跑；③ 不用从头重跑，用 mvn -DskipTests install -rf :common-flowable-server 从失败模块续建即可，省掉前面已成功的 32 个模块；④ 排查顺序固定为：先看报错里被占用的具体路径 → 判断是不是 target/lib 下的构件 → 找占用进程 → 停 → 续建，不要一上来就怀疑 Maven 或依赖版本。",
+      "evidence": "会话 2010156f（基线 02900b8）用户诉求 1「初始化所有子模块……然后启动每个模块服务检查」；最终结论「二、构建」写明「中途 common-flowable-server 报过一次 Failed to copy artifact ... 另一个程序正在使用此文件——是我本地那个还在跑的 flowable 实例占着 target/lib 里的 jar，停掉后 -rf :common-flowable-server 续建即通过」。",
+      "files": [
+        "common-flowable/pom.xml"
+      ],
+      "baseline": "02900b8",
+      "sessionIds": [
+        "2010156f-5fb3-49c1-859a-daa3a63a94f2"
+      ],
+      "bundle": "001.md"
+    },
+    {
+      "title": "Spring Boot 启动检测正则别写死类名：zhi2 系列打的是 Started application in，正则要求 Started .+Application in 会把正常启动误报成 TIMEOUT",
+      "type": "bug",
+      "content": "【什么情况】批量启动 12 个后端服务时，脚本报告多个模块启动超时（TIMEOUT），但实际服务都是好的——zhi2-maintenance 实测 17.5s、zhi2-benefit 18.5s，都在 20 秒内。\n【为什么】误报来自检测正则太严：脚本按 Started .+Application in 匹配日志（强制要求中间有类名），而 zhi2 系列日志打的是 Started application in（无类名），正则匹配不上就判超时。服务其实没慢，是检测器骗人——这类误报会让人把时间浪费在查 JVM 参数、加内存上。\n【怎么做】① 判定服务是否起来以「端口 LISTEN」为准（netstat -ano | findstr :9605），日志正则只作辅助；② 若一定要用日志，把正则放宽到 Started .* in（允许类名缺失），或按服务族分别配置；③ 报告里区分「真超时」与「检测未命中」，不要把检测器的 bug 写成服务慢；④ 批量启动统一用「端口 LISTEN + 等待窗口」双条件，避免出现「启动失败」的假结论去追不存在的问题；⑤ 端口表固定下来便于复核：8080 common-gateway、9211 common-framework、9603 data-property、9604 zhi2-property、9605 zhi2-maintenance、9606 zhi2-autonomy、9608 zhi2-evaluation、9610 service-expand、9616 zhi2-credit、9700 common-flowable、9701 zhi2-external、9803 zhi2-benefit。",
+      "evidence": "会话 2010156f（基线 02900b8）用户诉求 1 要求「初始化所有子模块……然后启动每个模块服务检查」；最终结论「三、服务：12/12 全部在跑」写明「关于『为什么慢』：它们没慢，是我的检测正则错了。zhi2 系列日志打的是 Started application in，我脚本里写的是 Started .+Application in（强制要求类名），匹配不上就误报 TIMEOUT。实测 zhi2-maintenance 17.5s、zhi2-benefit 18.5s，都在 20 秒内。端口探测为准，12 个全 LISTEN」。",
+      "files": [
+        "zhi2-maintenance",
+        "zhi2-benefit",
+        "common-gateway"
+      ],
+      "baseline": "02900b8",
+      "sessionIds": [
+        "2010156f-5fb3-49c1-859a-daa3a63a94f2"
+      ],
+      "bundle": "001.md"
+    },
+    {
+      "title": "本地同时起 12 个后端服务必须加 spring.cloud.nacos.discovery.register-enabled=false：否则会注册到团队共用命名空间污染环境里的同名服务",
+      "type": "pattern",
+      "content": "【什么情况】本地一次性启动 common-gateway(8080)、common-framework(9211)、data-property(9603)、zhi2-property(9604)、zhi2-maintenance(9605)、zhi2-autonomy(9606)、zhi2-credit(9616)、zhi2-external(9701)、zhi2-benefit(9803)、zhi2-evaluation(9608)、service-expand(9610)、common-flowable(9700) 共 12 个实例时，如果不加参数，它们会把自己注册进 Nacos。\n【为什么】这些服务连的是团队共用的命名空间（如 suzhou-shiqu-suzhufang-v2），环境里已经跑着 172.10.1.1 上的同名服务。本地实例一旦注册上去，同名服务列表里就多出本机地址，网关按负载均衡随机转发，请求会打到本地机器上——表现为「同事的环境莫名跑着我的代码」，且极难定位。\n【怎么做】① 本地启动统一带 spring.cloud.nacos.discovery.register-enabled=false，只注册不发现的问题一并规避；② 端口规划固定成表（8080 网关 + 9603~9803 业务服务），一次起 12 个也不冲突；③ 启动后逐个核对端口 LISTEN（12 个全在）再谈「服务可用」；④ 这条纪律要在联调前跟同组人打招呼，避免别人的环境被本地实例污染；⑤ 启动参数要留档（哪几个模块、哪些端口、关了注册），方便下次复现同一套本地环境。",
+      "evidence": "会话 2010156f（基线 02900b8）用户诉求 1「初始化所有子模块，都使用v2.6.2-suzhufang-dev分支，然后启动每个模块服务检查」；最终结论「三、服务：12/12 全部在跑」后紧接「一个主动决策：这 12 个实例启动时带了 spring.cloud.nacos.discovery.register-enabled=false。因为 suzhou-shiqu-suzhufang-v2 命名空间是团队共用的，环境里已经跑着 172.10.1.1 上的同名服…」，并给出 12 个端口与服务的对应表。",
+      "files": [
+        "common-gateway",
+        "common-framework",
+        "data-property",
+        "service-expand"
+      ],
+      "baseline": "02900b8",
+      "sessionIds": [
+        "2010156f-5fb3-49c1-859a-daa3a63a94f2"
+      ],
+      "bundle": "001.md"
+    }
+  ]
+}

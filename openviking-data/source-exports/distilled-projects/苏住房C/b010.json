@@ -1,0 +1,297 @@
+{
+ "project": "苏住房C",
+ "batch": 10,
+ "files": [
+  "037.md",
+  "038.md",
+  "039.md",
+  "040.md"
+ ],
+ "count": 16,
+ "memories": [
+  {
+   "title": "政策/流程指南正文白屏且控制台只有 Parse Error：CMS 正文里的尖括号被 rich-text 当成非法 HTML 标签",
+   "type": "bug",
+   "content": "情况：苏住房C 市民端「在线服务 → 流程指南 / 政策法规 / 公告」这类 CMS 富文本页，进入某一条时标题能显示、正文整块白屏，控制台只有 `Parse Error`。根因：正文 HTML 由页面 → ZsRichText → formatRichTextContent → `<rich-text>` 渲染，而 CMS 录入时把书名号误写成尖括号，例如「关于印发<业主大会议事规则>等示范文本的通知」，`<业主大会>` 会被当作 HTML 标签，解析失败后 `<rich-text>` 整块不渲染（表现为白屏而非报错弹窗）。为什么难查：页面无 JS 异常，只有一条 Parse Error，容易先怀疑富文本组件、接口或样式，而问题在数据。怎么做：在 formatRichTextContent 内统一加 escapeInvalidHtmlAngleBrackets（`String(html).replace(/<(?!\\/?[a-zA-Z!])/g, '&lt;')`），把非合法标签的 `<` 转义成 `&lt;`，一处修复即覆盖所有 ZsRichText 消费页；同时通知后台 CMS 把原文改回《业主大会议事规则》从源头修数据。验收：首页 → 在线服务 → 流程指南 → 物业服务 → 第二篇指南，正文应正常显示。",
+   "evidence": "会话 3a1c5d68：用户贴出截图正文与 Parse Error；定位正文中 `<业主大会>` 覆盖书名号，改 utils/index.js 的 formatRichTextContent 加 escapeInvalidHtmlAngleBrackets 后恢复。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\index.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsRichText\\ZsRichText.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\onlineService\\PolicyDetail.vue"
+   ],
+   "baseline": "d43894b",
+   "sessionIds": [
+    "3a1c5d68-e7a3-441a-a399-b1778fbaea6f"
+   ],
+   "bundle": "037.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "登录页 clickCheckTask err: Cannot read property '0' of null + undefined is not iterable：基础库 3.8.6+ 与 2023 版 uni-app 编译器的多 input 兼容问题",
+   "type": "bug",
+   "content": "情况：苏住房C 市民端登录页（pages_main/login/index，同页有手机号、图形验证码 ImgCode、短信验证码/密码多个 input，uni-easyinput 内部也是 input）在微信开发者工具里报 `clickCheckTask err: TypeError: Cannot read property '0' of null`，并伴随渲染层 `undefined is not iterable (cannot read property Symbol(Symbol.iterator))` / webviewScriptError。为什么：这不是登录业务逻辑写错，而是微信基础库 3.8.6+ 与旧版 uni-app 编译器（项目是 3.0.0-3080720230703001，2023 年版本）的已知兼容问题；社区结论是基础库 3.8.0 以上必现、3.8.0 以下不报。怎么做：① 微信开发者工具 详情 → 本地设置 → 调试基础库 降到 3.8.0 或 3.7.x（如 3.7.12），这是当前最可靠的消噪方式；② manifest.json 设 libVersion=3.7.12、mergeVirtualHostAttributes=false，移除全局 virtualHost:true（保留 styleIsolation:'shared'），并在 login/index.vue、ImgCode、VerifyCode 上显式 `virtualHost: false`；③ 长期根治需升级 uni-app 依赖（新版编译器已修同类问题）。注意该报错多数情况只是控制台噪音、不影响登录功能，排查时先确认功能是否真的异常再动依赖。",
+   "evidence": "会话 2a7afd34：用户贴出两条报错栈（含 lib: 3.16.2）；比对 DCloud 社区案例，确认 uni-app 3.0.0-3080720230703001 与基础库 3.16.2 的组合触发，给出降基础库 + manifest virtualHost 配置方案。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\login\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\VerifyCode\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ImgCode\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\App.vue"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "2a7afd34-614f-40f8-8140-36dc5cc4cbe3"
+   ],
+   "bundle": "037.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "地图页底部 textarea「怎么点都输不进字」：原生 map 层级最高，v-show 不销毁原生层，只加 min-height/z-index 无效",
+   "type": "bug",
+   "content": "情况：苏住房C 市民端加梯申请页 pages_owner_extra/elevator/addAlone 顶部是 map、底部是「申请说明」textarea，输入框点不进去、打不出字。上一轮只给输入区加了 min-height，问题依旧。根因：微信小程序里 map 与聚焦态 textarea 都是原生组件，原生组件层级最高且浮在 WebView 之上；页面用 v-show 隐藏地图时只隐藏视觉、不销毁原生层，地图仍拦截下方点击，所以申请说明拿不到焦点。只调 z-index / min-height 对原生组件无效。怎么做：① 地图改用 v-if 真正销毁原生 map，不再用 v-show；② 在多个时机主动销毁地图——页面滚动超过 120px、点击表单任意区域、触摸或聚焦申请说明输入框；③ 给 description 区域补 z-index 兜底；④ 检查 props 绑定，ZsTextarea 里 `adjust-position=\"false\"` 是字符串恒真，必须写成 `:adjust-position=\"false\"`。验收：滚到申请说明点击应弹键盘，字数统计随输入更新（如 5/120）。若仍不能输入，先分清「完全点不进去」还是「能聚焦但打不出字」，后者多半是底部 ZsPicker 弹层遮挡。",
+   "evidence": "会话 12995d5b：用户二次反馈「addAlone 申请说明还是无法输入」，确认上次只加样式无效，改为 v-if 销毁原生 map + 多时机销毁 + 修正 adjust-position 布尔绑定。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner_extra\\elevator\\addAlone.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsTextarea\\ZsTextarea.vue"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "12995d5b-1f0e-4084-87fa-bb16ee2b7b73"
+   ],
+   "bundle": "037.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "ZsImage 头像/图片不显示的两个叠加根因：父级尺寸透不进组件 + 资源放在分包 static 而非主包",
+   "type": "bug",
+   "content": "情况：市民端 pages_guard/index/index 左侧默认头像不显示，照 main-v2.1 分支抄了写法仍不显示。根因两处叠加：① 新版 ZsImage 内部用 width:100%/height:100%，而尺寸类（如 header-img 的 132rpx）写在组件标签上；微信小程序自定义组件有样式隔离，父级 class 透不进组件内部真实节点，图片被渲染成 0 宽高，视觉即「没有图」；② main-v2.1 的默认头像在主包 src/static/images/default-avatar-gary.png，当前分支只把它放在分包 pages_guard/static 下，而页面引用的是主包绝对路径 /static/images/...，路径访问不到。怎么做：外层用带尺寸的 div.header-img 包裹 ZsImage（尺寸落在 div 上），再把头像文件复制回主包 static/images 并把该路径登记进 MAIN_STATIC_PATHS，与 v2.1 保持一致。排查顺序建议：先确认容器有实际宽高（devtools 里选中看盒模型），再确认图片 URL 能返回 200，两个都过了才怀疑组件。",
+   "evidence": "会话 0c646bb9：用户两次反馈「还是没显示头像」，定位为 ZsImage 内部 100% 宽高 + 组件样式隔离 + 分包 static 路径不可达，改 div 包裹 + 复制主包 + MAIN_STATIC_PATHS。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_guard\\index\\components\\guard-info-card.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\index.js"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "0c646bb9-d1fa-4e8d-a2e1-e84fc34f6838"
+   ],
+   "bundle": "037.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "SFB（苏服办）分支定期合并 main-v2.1 的裁决口径：按「SFB 特有逻辑 vs 业务展示」二分，组件与 tabBar 单独判定",
+   "type": "workflow",
+   "content": "情况：苏住房C 市民端 zhi2-mobile-shimin 有长期分叉分支 sfb（苏服办渠道接入），需要周期性 merge main（如 suzhou-shiqu-suzhufang-main-v2.1）并手工解冲突。why：两个分支在首页/我的/tabBar 上改动方向天然冲突（main 改业务展示与菜单入口，sfb 改渠道登录与 tab 生命周期钩子），用「全取 theirs」或「全取 ours」都会丢功能且不会报错。怎么做：① 二分口径——业务逻辑与页面展示一律取 INCOMING/main；带 sfb 语义的代码（sfb、苏服办、gateway、token、ticket、boundProjects、tabBar 的 sfb 专用分支）以 HEAD/ours 为准保留；② 典型判定：五个 tab 页（home/my/community/project/property）保留 HEAD 的 onTabPageShow（内部已含 loadMenu + 有 token 才 loadBoundProjects），不要采用 main 的 setTabBarIndex + 单独 loadMenu；custom-tab-bar 保留 HEAD 的 .png 图标（不取 main 的 .svg）；Home_Suzhufang 取 main 的扫一扫入口与「请使用APP扫一扫」提示；My_Suzhufang 混合——文案与 promptSfbLogin 取 HEAD、getMsgNum() 无参与 mySections 写法取 main；MenuSection 取 main 的 defineEmits(['switch-project'])；redirect/index.vue 取 main 的空 url 提前返回、project 传入 resolveMenuRoute、trackApi 与 lanch 分离；③ 冲突解决后必须连带检查依赖工具 src/utils/tabBar.js（onTabPageShow 要保留 setTabBarIndex + menuStore.loadMenu() + token 校验），否则 tab 切换时菜单与绑定小区不刷新；④ 以 git status 显示 All conflicts fixed 为准再 commit，并继续核对 App.vue、sfb.js 等未列入清单的文件。",
+   "evidence": "会话 6df0f95a：合并 suzhou-shiqu-suzhufang-main-v2.1 到 sfb，10 个冲突文件逐一裁决，另修复 src/utils/tabBar.js 支持 onTabPageShow。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\home.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\my.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\Home_Suzhufang.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\My_Suzhufang.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\custom-tab-bar\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\tabBar.js"
+   ],
+   "baseline": "c7d6817",
+   "sessionIds": [
+    "6df0f95a-e9e0-4390-b68f-3f9ad28a017d"
+   ],
+   "bundle": "037.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "z-paging 默认 fixed 铺满全屏，页面顶部 Banner/「去申请」按钮写在组件外会被挡住点击（表现为按钮无反应）",
+   "type": "bug",
+   "content": "现象：苏住房C（uni-app 小程序，zhi2-mobile-shimin）「我的-一手房交易」列表页各区域点「去申请」都无反应、也不报错。\n\n根因：页面顶部 Banner 和「去申请」按钮写在 z-paging 组件标签外面。z-paging 默认 fixed: true，会以 fixed 方式铺满全屏并压在外部兄弟元素之上，点击事件被 z-paging 的容器吃掉，看起来像按钮失效。因为各区域共用同一套页面结构，所以「每个区域都点不动」。\n\n做法：按 z-paging 官方约定把顶部内容放进它的 #top 插槽（<template #top> Banner + 按钮 </template>），列表部分保留在默认插槽，按钮的 goApply() 逻辑照旧。这样顶部内容在组件内部渲染，层级与滚动都属于 z-paging 自己管理，不再被遮挡。\n\n排查口径：小程序里「同一页面所有按钮都点不动 / 只有列表区能滚动」优先怀疑 z-paging、scroll-view 这类自带 fixed 或全屏容器的包裹问题，而不是事件绑定或权限；改完必须重新编译小程序再验证。",
+   "evidence": "会话 1cc8c845（基线 77666f8）：「我的-一手房交易，各区域点击“去申请”，无反应」；结论明确 z-paging 默认 fixed: true 全屏铺满盖住外部元素导致点击被拦截，修复为把 Banner + 「去申请」移入 <template #top> 并新增 goApply()。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_transaction/newHouseCertification/index.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/newHouseCertification/detail.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/newHouseCertification/choose.vue"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "1cc8c845-4c5d-4565-a1fd-23d08d025e11"
+   ],
+   "bundle": "038.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "z-paging 空态（#empty 插槽）自己不提供样式：.paging-empty* 未定义 + ZsImage 在无尺寸父盒里变成 0×0，必须补 uni.scss 全局空态样式",
+   "type": "pattern",
+   "content": "现象：苏住房C「视频看房」等所有用 z-paging 的页面，空态文字靠左、空态图完全不显示。\n\n根因两条叠加：\n1) .paging-empty / .paging-empty-pic / .paging-empty-text 这组类在项目全局样式里根本没有定义，放到 #empty 插槽里就是无样式的裸元素，所以文字左对齐、不居中；\n2) ZsImage 内部是 width:100%; height:100%，而 .paging-empty-pic 没有显式尺寸，父容器为 0 时图片宽高也都是 0，表现为「空态图不显示」且无报错。\n\n做法：在 uni.scss 补一组全局 .paging-empty 样式（居中布局、空态图定宽高约 320rpx、灰色提示文案），这会让所有 z-paging 页面的空态一次性正常；同时在封装的 ZsPaging.vue 里补对应 scoped 样式，保证走封装组件时同样生效；页面 #empty 插槽里去掉 mt-300 之类的无效偏移，结构交给全局样式控制。\n\n复用要点：ZsImage 必须放在有确定尺寸的父盒里，凡是「图片没显示但网络无报错」，先量父容器宽高是否为 0。",
+   "evidence": "会话 52f0bdb1（基线 9832ba3）：「empty组件UI有问题」；结论为 paging-empty 系列类全局无样式导致文字靠左、ZsImage 父容器无尺寸导致图片 0 宽高不显示；修复为 uni.scss 补全局空态样式 + 修正 houseVideo/index.vue 的 #empty 结构 + ZsPaging.vue 增加 scoped 样式。",
+   "files": [
+    "zhi2-mobile-shimin/src/uni.scss",
+    "zhi2-mobile-shimin/src/components/ZsPaging/ZsPaging.vue",
+    "zhi2-mobile-shimin/src/components/ZsEmpty/ZsEmpty.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/houseVideo/index.vue"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "52f0bdb1-df2c-4df1-9f42-40b6d23d7382"
+   ],
+   "bundle": "038.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏服办网关请求：GET/POST 靠不同 interface_id 分流，且不要自己带 zs-method",
+   "type": "fact",
+   "content": "情况：苏住房C（zhi2-mobile-shimin）所有接口经苏服办网关 https://ydzt.jszwfw.gov.cn/api-gateway/jpass-jags-server/interface/gateway.do 转发，用户报「原来是 GET，就用上架的 GET 接口请求」。为什么：网关对外只有 POST 一个 HTTP 入口，业务方法由 interface_id + zs-path 两个字段表达，不是由请求头 zs-method 表达。原先走的是「GET 也塞进 POST 通道」的开关方案（VITE_APP_SFB_GET_VIA_POST_INTERFACE=1，interface_id 统一用 szffluzm-whyhxx），与平台实际下发的上架接口不一致，导致 GET 类请求（如 /system/config/getByKey/app.suzhufang.config）打不通。怎么做：① 按方法选择 interface_id —— GET 用 szffluzm-yhcq，POST 仍用 szffluzm-whyhxx；② .env.production / .env.test 删掉 VITE_APP_SFB_GET_VIA_POST_INTERFACE 开关，.env.development 本来没开无需改；③ dispatcher.js 里普通 GET/POST 不要再自动附加 zs-method，header 只保留 zs-sign / zs-authorization / zs-param / zs-path 四项，与平台调试器抓到的包一致；PUT/DELETE 等仍可用 zs-method 指定。排查排序：若仍 404，先确认出口 IP 是否已加入苏服办白名单，签名逻辑此前已验证无误，不要重复怀疑签名。",
+   "evidence": "会话 c478c634（2026-07-01，基线 a444c05）：用户截图对比给出的网关报文后要求「原来是get，就用上架的get接口请求」；最终结论列出 interface_id szffluzm-yhcq（GET）/ szffluzm-whyhxx（POST）、移除 VITE_APP_SFB_GET_VIA_POST_INTERFACE、dispatcher 不再自动带 zs-method，并提示 404 优先查出口 IP 白名单。",
+   "files": [
+    "zhi2-mobile-shimin/src/api/dispatcher.js",
+    "zhi2-mobile-shimin/src/api/httpInstance.js",
+    "zhi2-mobile-shimin/src/utils/sign.js",
+    "zhi2-mobile-shimin/.env.production",
+    "zhi2-mobile-shimin/.env.test",
+    "zhi2-mobile-shimin/vite.config.ts"
+   ],
+   "baseline": "a444c05",
+   "sessionIds": [
+    "c478c634-ab88-4869-acb4-0397beaaa2f4"
+   ],
+   "bundle": "039.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "z-paging 放进自己实现的 uni-popup 弹窗里列表空白：父容器只有 max-height、没有确定高度",
+   "type": "bug",
+   "content": "情况：附近小区弹窗内 z-paging 列表接口有数据（Network 里能拿到 rows），页面却什么都不显示，也没有报错。为什么：三层原因叠加。① 高度链断裂——弹窗容器只写了 max-height 没有固定 height，z-paging 内部的 scroll-view 拿不到可用高度，撑成 0，DOM 渲染了但可视区域为 0；z-paging 依赖父级确定高度做内部滚动，这一点与普通 div 不同。② 加载时机过早——弹窗动画还没结束就调 reload()，此时容器尺寸尚未稳定，分页组件算出的高度是错的，之后也不会自动重算。③ 字段名不一致——接口回的是 projectName，模板在读 aroundProjectName，即使列表渲染出来名称也是空的，容易被误判成「没数据」。怎么做：弹窗容器改成固定 height: 75vh（不要用 max-height），并把 z-paging 内部各层高度样式一并补全；打开后延迟约 300ms 再调 reload() 等动画结束；名称类字段写多候选映射（projectName / aroundProjectName）；补空数据保护避免 res.result 为空时抛错；列表区加 v-if=\"computedList.length\"，与 z-paging 自带空状态逻辑保持一致，避免双重空态互相覆盖。",
+   "evidence": "会话 ad4f1c19（2026-07-17，基线 d43894b）：用户反馈「附近小区没有展示，有数据的」；结论明确三点原因（父容器只有 max-height 导致内部滚动区高度为 0、弹窗动画未完成就 reload、接口字段 projectName 与模板 aroundProjectName 不一致），修复为固定 75vh + 延迟 300ms + 字段多候选映射 + 空数据保护。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_transaction/intention/popup.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/intention/add.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/intention/search.vue",
+    "zhi2-mobile-shimin/src/hooks/usePaging.js",
+    "zhi2-mobile-shimin/src/api/transaction.js"
+   ],
+   "baseline": "d43894b",
+   "sessionIds": [
+    "ad4f1c19-5d85-46dd-94be-7ff09a25a283"
+   ],
+   "bundle": "039.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "单选字段误用 getDictLabel：该函数会按英文逗号拆分编码再拼接多标签",
+   "type": "bug",
+   "content": "情况：后台只配置了一个预算科目「代收代缴收入」，C 端年度预算页却显示「代收代缴收入，物业费收入」。为什么：渲染时用了 getDictLabel(dictType, value)，这个函数是为多选/逗号串字段设计的——它会把入参 value 按英文逗号 split 后逐项匹配字典再 join 回显。单选字段的值虽然当前只有一个编码，但一旦值里带上逗号（或历史脏数据、接口拼装），就会静默变成多值拼接，页面上看起来像「字典串了」，实际是取值函数用错。怎么做：① 优先直接用接口下发的展示名 budgetSubjectName（后端已拼好就不要在前端二次转译，这也是本项目一贯的「接口给了展示字段就别再派生」口径）；② 没有展示名时，只取第一个科目编码做精确匹配，禁用 getDictLabel 这类会拼接的多值函数；③ 排查同类问题的方法：看到「多个中文用逗号连在一起」先怀疑是不是调了多值转换函数，而不是去查字典配置。附带说明：同页还有一个背景问题——灰色 #f7f7f7 只设在 content-scroll 上、页面容器是 min-height:100% + 白底，内容少时底部露白；解法是 page 与页面根节点都设底色并改 min-height:100vh，让滚动区占满剩余视口，卡片区背景改透明灰避免白色断层。",
+   "evidence": "会话 6222418a（2026-08-06，基线 8fc39d4）：用户报「后台建的数据：预算科目为代收代缴收入，C端显示代收代缴收入、物业费收入？页面背景色撑满全屏」；结论指出 getDictLabel 会按英文逗号拆分匹配多项并拼接（单选字段不应走多选逻辑），改为优先 budgetSubjectName、否则只取第一个编码精确匹配。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_benefit/budget/index.vue",
+    "zhi2-mobile-shimin/src/utils/index.js"
+   ],
+   "baseline": "8fc39d4",
+   "sessionIds": [
+    "6222418a-4f22-4b84-9de7-cbcaaf49e929"
+   ],
+   "bundle": "039.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "ZsEmpty 的文案 prop 是 description 不是 text；分包 static 下的 svg 会被构建清掉报 500",
+   "type": "bug",
+   "content": "情况：苏住房C 小程序空状态组件 ZsEmpty 有 11 个调用点写了 text=\"…\"，组件实际只认 description，文案静默不显示；同时 pages_benefit 分包的空状态图报「Failed to load local image resource /pages_benefit/static/svg/empty.svg，status 500」。为什么：① ZsEmpty 的 prop 契约里没有 text，未声明的属性只落到 $attrs，组件内部不会渲染，不报错也不提示，所以这类错误能一直藏着；② 分包页面引用的 svg 放在分包 static 目录下，构建/清理流程会把未登记的资产剔除，微信开发者工具请求到不存在的路径时返回 500（不是 404，容易被误判成服务端问题）。怎么做：① 批量把 pages_benefit 下所有 ZsEmpty 的 text 改成 description（balancePublicity、assetsPublicity/parkingLeaseSituation、collectionPayment、fundPublicity 的 index/detail/detail2/benefit/benefitDetail、sharedFunds 的 PublicityTab/OverviewTab/DetailsTab 共 11 处）；② 空状态图这类公共资产放回主包路径（本项目已有 mainStaticPaths.js 统一登记），不要在分包 static 里放 svg；③ 新增公共组件后，用 grep 反查调用点的 prop 名与组件声明是否一致，作为「文案不显示」类问题的第一排查项，而不是先怀疑样式。",
+   "evidence": "会话 f33d070f（2026-08-24，基线 4630e8e）：用户先贴出 /pages_benefit/static/svg/empty.svg 的 500 报错，随后要求「批量修复」；最终把 pages_benefit 分包 11 处 ZsEmpty 的 text 属性全部改为 description（列出全部文件与文案），并说明结合上次恢复的 empty.svg 空状态图与文案才都正常。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ZsEmpty/ZsEmpty.vue",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "zhi2-mobile-shimin/src/utils/mainStaticPaths.js",
+    "zhi2-mobile-shimin/src/pages_benefit/balancePublicity/index.vue",
+    "zhi2-mobile-shimin/src/pages_benefit/fundPublicity/index.vue",
+    "zhi2-mobile-shimin/src/pages_benefit/sharedFunds/components/PublicityTab.vue"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "f33d070f-15e7-4d33-aa9e-f5133dc9ff92"
+   ],
+   "bundle": "039.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C（uni-app 小程序）zs-uploader 基于 uni-file-picker 时的显示异常根因与修法：尺寸档位 padding-top 未复位 + tips 与卡片标题重复",
+   "type": "bug",
+   "content": "现象：pages_my/verification/FormManual 的图片上传区域显示异常——上传框高度忽高忽低、图标与文字错位，手持证件照那块文字直接重叠。\n\n根因（三处叠加，均在 ZsUploader 内部）：\n1. uni-file-picker 的默认样式是靠 .file-picker__box 的 padding-top 撑出方形高度，组件只给 small 档位写了 padding-top: 0，middle / large 两档没有复位，于是中/大尺寸档下框体被撑高，出现空白带与错位。\n2. 卡片标题已经是「上传手持证件照图片」，组件内 tips 又写了同样的长文案，在固定高度框里必然重叠。\n3. 身份证正反面的自定义相机图标插槽渲染在 photo-uploader-icon__container 之外，作用域样式命中不到，图标不居中也不显示。\n\n怎么做：给 middle / large 的 .file-picker__box 补 padding-top: 0，给 .file-picker__box-content 设 height: 100%（让内容盒吃满框高而非靠 padding 撑高）；把 icon 插槽收进 photo-uploader-icon__container 内层，保证自定义图标正常渲染。业务侧调用时，标题已描述过上传对象，tips 就只写「点击上传」这类极短提示，不要在标题与 tips 里重复同一句话。\n\n排查顺序：凡是 uni-file-picker 封装的上传组件出现高度/居中问题，先查其尺寸档位是否漏写 reset，再查 tips 文案长度。",
+   "evidence": "会话 8d858fb8：「FormManual图片上传组件显示有问题」，结论为 middle/large 的 .file-picker__box 缺 padding-top: 0、.file-picker__box-content 需 height: 100%、icon 插槽需放入 photo-uploader-icon__container；FormManual 的手持证件照 tips 改为「点击上传」避免与标题重复。涉及 ZsUploader.vue、pages_my/verification/FormManual.vue。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ZsUploader/ZsUploader.vue",
+    "zhi2-mobile-shimin/src/pages_my/verification/FormManual.vue"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "8d858fb8-aeff-42fe-b53b-03cca8718495"
+   ],
+   "bundle": "040.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C：uni-forms 红色必填星号的触发条件是 uni-forms-item 的 required 属性，rules 里的 required 只校验不显标记；图片上传区块的必填星号只能靠样式类补",
+   "type": "pattern",
+   "content": "现象：人工添加房屋页（pages_owner/house/owner/register.vue）里一批业务必填项没有红色 * 标识，用户按截图逐项指出缺失。\n\n为什么：uni-app 的 uni-forms-item 只有在自身写了 required 属性时才渲染红色 *。rules 对象里的 { required: true } 只驱动校验逻辑，完全不影响星号显示——两套开关是分开的，这一点和 Web 端 Element 的表单项习惯不同，容易下意识只配 rules。\n\n怎么做：\n1. 逐个给业务必填的 uni-forms-item 补 required：所属区域、所属街道、所属社区、小区、楼幢、室号。\n2. 顺带发现「所属社区」的 name 写成了 Name，与 rules、取值的键不一致，导致该字段原先根本不参与校验；改成 name=\"community\" 并补齐对应规则。\n3. 图片上传这类非表单项的区块（产证/合同相关图片、身份证明相关图片）没有 uni-forms-item 可挂 required，改为给区块标题加项目里既有的 required 样式类来显示星号。\n4. 与设计稿一致的字段保持不标：单元、补充证件信息属于非必填，不要顺手加上。\n\n验收口径：星号位置与截图逐项对齐，同时确认每个带星号的字段提交空值确实被拦截（避免只补了 required 而 rules 缺失）。",
+   "evidence": "会话 63944abd：「人工添加，框起来的必填项标识缺失」，结论为 uni-forms-item 只有设置 required 才显示红色 *，rules 的 required: true 只负责校验；给所属区域/街道/社区/小区/楼幢/室号补 required，修正 name=\"Name\"→\"community\" 并补规则，图片上传区块标题加 required 样式类，单元与补充证件信息不标。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/register.vue",
+    "zhi2-mobile-shimin/src/styles/form2.scss"
+   ],
+   "baseline": "b7bf813",
+   "sessionIds": [
+    "63944abd-5398-403d-9293-6bf00fd0e33d"
+   ],
+   "bundle": "040.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C：未读角标不消失——getMsgNum 不传 readFlag/projectType 时返回的是消息总数而非未读数，同一项目内多处调用必须参数同源",
+   "type": "bug",
+   "content": "现象：消息中心全部已读后返回「我的」页，未读角标依然存在（角标数等于历史消息总数）。\n\n根因：「我的」页 pages_tab/components/My_Suzhufang.vue 的 loadUnread 调 getMsgNum() 时没有传查询参数；消息中心 message/index.vue 调用时带的是 { readFlag: 0, projectType: 1 }（readFlag=0 只查未读，projectType=1 与消息列表同业务类型）。不传参时后端按默认口径返回消息总数，总数不会因「已读」而下降，角标自然不消失。\n\n怎么做：把「我的」页的调用补成与消息中心完全一致的参数 getMsgNum({ readFlag: 0, projectType: 1 })，并在页面 onShow 或返回时重新请求，保证读完消息回到「我的」角标归 0。\n\n更一般的约定：同一计数接口在项目里被多处消费（我的页角标、消息中心、其它入口）时，参数必须严格同源，否则会出现「同一数字在 A 页面是未读、在 B 页面是总数」的分歧；联调时直接在 vConsole 里看 /msg/msg/msgNum?readFlag=0&projectType=1 的返回体来定位是哪一侧参数缺失。",
+   "evidence": "会话 318a55ec：「消息全部已读，但未读数据没有消失」，结论为 My_Suzhufang.vue 的 getMsgNum 未传 { readFlag: 0, projectType: 1 }，未传参时接口返回消息总数，全部已读后总数不变；已在 loadUnread 中补齐参数。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_tab/components/My_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/My_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages/message/index.vue",
+    "zhi2-mobile-shimin/src/api/msg.js"
+   ],
+   "baseline": "f1939b0",
+   "sessionIds": [
+    "318a55ec-f120-4633-be9b-7750ed534251"
+   ],
+   "bundle": "040.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C：富文本解码函数遇到「HTML 标签 + 实体编码混排」会跳过解码导致正文空白——decodeHtmlEntitiesIfNeeded 必须改为内容含实体即解码",
+   "type": "bug",
+   "content": "现象：账户注销页（pages_my/setting/cancellationWarning.vue）协议正文只剩标题「《用户注销协议》」，正文整块不显示。\n\n根因：ZsRichText 走的工具函数 utils/index.js 的 decodeHtmlEntitiesIfNeeded 采用「内容里是否已有 HTML 标签」来判定要不要解码。当后台下发的富文本同时包含真实标签和实体化标签（如正文前半段是 &lt;p&gt;…&lt;/p&gt; 这类被二次转义的片段）时，函数判定「已有标签，无需解码」直接返回原串，实体标签不会被还原成可渲染节点，富文本组件于是渲染出空内容。\n\n怎么做：判定条件从「是否含 HTML 标签」改成「是否含 HTML 实体」（匹配 &amp;xxx; / &#xxx; 形态），只要存在实体就走解码；已经是纯 HTML 的字符串解码后不变，无损。修完正文即可完整展示。\n\n附带两处同页修复，均属通用套路：一是 .page-content 上的 min-height: 50vh 会在内容少时强行撑出半屏空白，改为 flex 布局按内容自适应；二是 ZsImage 渲染为块级元素，父级只写 text-align: center 无法居中，需要父级 flex + justify-content/align-items 居中。若布局正常但协议仍只有标题，则问题在后台「系统参数配置」里 szf.user.cancellation 未配完整富文本，不是前端。",
+   "evidence": "会话 b5ae7e42：「账户注销页面UI有异常」，结论含 utils/index.js 的 decodeHtmlEntitiesIfNeeded 在「HTML 标签与实体编码混排」时跳过解码导致正文丢失，改为只要含 HTML 实体就解码；并移除 .page-content 的 min-height: 50vh、改用 flex 居中警告图标、res.data 为空回退 res.msg。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/pages_my/setting/cancellationWarning.vue",
+    "zhi2-mobile-shimin/src/components/ZsRichText/ZsRichText.vue"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "b5ae7e42-f2bf-4ced-a0de-6ca8ba5bd6e2"
+   ],
+   "bundle": "040.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 分支模型：苏服办(sfb/main-v2.1) 与微信小程序(mp) 是同一子模块的两条并行分支，互合时必须「排除苏服办网关与文档、保留 mp 目录结构、保留小程序专属能力」再编译验证",
+   "type": "workflow",
+   "content": "适用场景：苏住房C 仓（superproject + 子模块 zhi2-mobile-shimin）同时维护苏服办端与微信小程序端，需要把 suzhou-shiqu-suzhufang-main-v2.1 的修复与新功能合到小程序分支 suzhou-shiqu-suzhufang-main-v2.1-mp，或把小程序的样式改动回合到 main-v2.1。\n\n为什么不能直接整分支合并：两条分支的差异不止业务代码——苏服办分支带 sfb 网关逻辑、苏服办相关 doc/docx 附件与不同的环境 proxy；小程序分支有自己的目录（pages_main / pages_tab）与 @/ 别名、人脸核验等专属页面。直接 merge 会产生上百个冲突文件（实测 118 个）并且把不该进小程序的网关内容带进来。\n\n做法（实测顺序）：\n1. 先合子模块：git merge 目标分支到当前分支，按「保留 mp 分支的目录结构、@/ 别名、小程序专属文件（useFaceVerify.js、face.vue、区域组件）」逐文件解冲突。\n2. 再合主仓库：只更新子模块指针，同时排除苏服办相关文档（不入库），保留《小程序报错问题汇总.md》这类通用文档。\n3. 环境配置保留小程序自己的测试环境 proxy 地址，不要被对方覆盖。\n4. 合并后立刻 npm run build:mp-weixin 编译验证，产物在 dist/build/mp-weixin；只接受 warning（如页面里用了小程序不支持的 td 标签选择器），不接受 error。\n5. 反向回合（小程序改动要进 main-v2.1）时同样走「子模块提交→推送→合并→推送，再父仓库提交指针→推送→合并→推送」，完成后把工作分支切回原分支 dev-sfb，确认工作区干净。",
+   "evidence": "会话 72fc5cce：「把main-2.1分支合并到当前分支，主子模块，苏服办相关的内容不需要，当前这个分支是微信小程序。合并完编译验证一下」，实测解决 118 个冲突文件，子模块提交 a4811aa0/fa6929e2、主仓库 af36c7c，排除苏服办 doc/docx，build:mp-weixin 成功；会话 2a28d769 展示了子模块+父仓库双推送、再合并到 suzhou-shiqu-suzhufang-main-v2.1 并切回 dev-sfb 的完整流程。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages.json",
+    "zhi2-mobile-shimin/.env.development",
+    "package.json",
+    ".gitmodules"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "72fc5cce-130f-44b1-bd46-0257f06c74e4",
+    "2a28d769-4a41-4a8a-a03f-b7cdd347e192"
+   ],
+   "bundle": "040.md",
+   "project": "苏住房C"
+  }
+ ]
+}

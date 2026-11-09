@@ -1,0 +1,227 @@
+{
+ "project": "园区公共收益",
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md"
+ ],
+ "count": 13,
+ "memories": [
+  {
+   "title": "登录鉴权必须用 accessToken 写请求头，不能用登录返回里的 token 字段",
+   "type": "bug",
+   "content": "园区公共收益 Web 后台（zhi2-web-admin）登录成功后接口仍 401/鉴权失败，根因是请求拦截器仍把 `UserLoginInfo.token`（临时令牌）塞进 Authorization，而网关校验的是 `accessToken`。约定：`/v2.0/security/auth/login`、`loginWithCode` 等登录响应里同时可能有 `token` 与 `accessToken`，持久化与 `getToken()` 只认 `accessToken`；`request.js` 组装请求头时统一 `Authorization: Bearer ${accessToken}`。改登录页或 `store/modules/user.js` 时顺带核对 `auth.js` 的读写键名，避免只修了 store 未改拦截器。",
+   "evidence": "用户诉求 1「登录成功后请求头加的 Token 有问题，应该用 accessToken」；会话涉及 request.js、auth.js、user.js、login.vue。",
+   "files": [
+    "zhi2-web-admin/src/utils/request.js",
+    "zhi2-web-admin/src/utils/auth.js",
+    "zhi2-web-admin/src/store/modules/user.js",
+    "zhi2-web-admin/src/views/login.vue"
+   ],
+   "baseline": "bd275b5",
+   "sessionIds": [
+    "a6727568-bde2-4da6-a70a-31bf732716a4"
+   ],
+   "bundle": "001.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "platformConfig.loginMethod 驱动登录页三种形态（含 loginWithCode）",
+   "type": "pattern",
+   "content": "平台配置里原布尔开关改为字符串字段 `loginMethod`（字典 `login_method`）：`1` 用户名+密码、`2` 手机+短信验证码、`3` 用户名+密码+短信验证码。系统配置页用下拉维护该字段；`login.vue` 按配置动态展示字段与校验规则。方式 3 调 `POST /v2.0/security/auth/loginWithCode`，body 为 `{ username, password, smsCode }`，响应结构与另两种一致（含 `accessToken`）。后端暂未单独提供方式 3 时，前端仍按同一字段名预留 UI 与接口封装，避免日后改字段名。",
+   "evidence": "用户诉求 2–3、6 给出 loginMethod 字典取值、下拉配置及 loginWithCode 契约；涉及 platformConfig/detail.vue、login.vue、api。",
+   "files": [
+    "zhi2-web-admin/src/views/system/platformConfig/detail.vue",
+    "zhi2-web-admin/src/views/login.vue",
+    "zhi2-web-admin/src/api/index.js"
+   ],
+   "baseline": "bd275b5",
+   "sessionIds": [
+    "a6727568-bde2-4da6-a70a-31bf732716a4"
+   ],
+   "bundle": "001.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "登录页多字段模式：固定预留校验区高度，错误提示 absolute 不撑布局",
+   "type": "pattern",
+   "content": "登录方式 3 字段多、容器高度固定时，若校验错误随显隐撑开 `el-form-item`，会导致按钮和字段整体跳动。做法：定义 CSS 变量 `--login-error-h`（默认 18px，方式 3 可 16px）；每个 `el-form-item__content` 固定 `padding-bottom` 预留错误区；错误文案用 `position: absolute` 落在预留区内。校验通过/失败切换时字段与登录按钮位置不变，错误也不遮挡下一项。短信验证码按钮放在输入框后缀插槽（append slot），不要用表单项外独立文字按钮。",
+   "evidence": "用户诉求 4–5 要求方式 3 高度不变、验证码用插槽后缀按钮；最终结论写明 `--login-error-h` + padding-bottom + absolute 错误区。",
+   "files": [
+    "zhi2-web-admin/src/views/login.vue"
+   ],
+   "baseline": "bd275b5",
+   "sessionIds": [
+    "a6727568-bde2-4da6-a70a-31bf732716a4"
+   ],
+   "bundle": "001.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "zs-table 小计数字落到固定「操作」列：element-ui 2.15.13 colgroup 同步闩锁 + resyncTableLayout",
+   "type": "bug",
+   "content": "综合查询等「小计行 + fixed 操作列 + 弹性 min-width 列」列表，初次渲染小计金额偶发显示在「操作」列，横向滚动后又正常——不是业务汇总算错，而是 element-ui 2.15.13 的列宽同步时序问题：表头/表体/合计行（含固定列副本）依赖 layout observer 写 `colgroup`，内部 `__updated__` 闩锁只在 mounted 与首次 updated 同步列宽；数据到达后弹性列重测、横向滚动条出现、固定列激活，合计行重渲染后若未再 `notifyObservers('columns')` 会停在过期布局。页面 `listCallback` 里单次 `doLayout()` 可能被后续渲染绕过；仅 1 条数据时 zs-table 自动高度分支历史上甚至不调 doLayout。组件层修复：在 `zs-table.vue` 增加去抖 `resyncTableLayout()`（nextTick 后 `table.doLayout()` + `table.layout.notifyObservers('columns')` + 滚动条偏移同步），并在 data 变化、containerHeight 变化、滚动条显隐、有小计时的 updated、自动高度分支数据变化等时机调用。该修复覆盖所有带小计+固定操作列的列表，与仅调 CSS 遮罩「穿透」的修法不同。",
+   "evidence": "会话 8cf85830 最终结论给出 element-ui 闩锁机制、maintenance/query 场景、zs-table.vue +31/-4 行及 Playwright 复现验证；797b8ce9 会话继续修小计行滚动条与操作列宽对齐。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/views/maintenance/query/index.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "8cf85830-9fc8-4151-9f52-885208388c12",
+    "797b8ce9-32a7-41fc-8031-23d0a604bf9a"
+   ],
+   "bundle": "001.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "项目类型二级多选：仅备案/变更页改造，二级值硬编码 projectTypeConstants",
+   "type": "workflow",
+   "content": "物业项目「项目类型 + 二级多选」需求：一级 `projectType` 仍从字典 `complex_project_type` 加载（住宅/非住宅），二级按字典项 `remark` 分组；提交字段 `projectSubType`（多选）。用户明确要求范围只改备案 `property/complex/detail.vue` 与变更 `property/complexChange/detail.vue`，其余 complex 相关查询页保持原 `zs-select` 单选。二级选项不依赖 `complex_project_sub_type` 字典，统一硬编码在 `property/complex/components/projectTypeConstants.js`：普通住宅=1、非普通住宅=2、办公=3、商业=4、其他=5。避免把局部业务枚举写进公共组件或误改 publicQuery 等只读页。",
+   "evidence": "d9d55de8 诉求 1–2 定义 UI 与 projectSubType；最终结论「只改备案和变更」及五级硬编码表。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/views/property/complexChange/detail.vue",
+    "zhi2-web-admin/src/views/property/complex/components/projectTypeConstants.js"
+   ],
+   "baseline": "7458acc",
+   "sessionIds": [
+    "d9d55de8-ed79-48f5-8bf7-19bf90a396e9"
+   ],
+   "bundle": "001.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "详情页字典下拉显示数字 0：detailCallback 把 status 等字典字段转成字符串",
+   "type": "bug",
+   "content": "组织工作人员详情「当前状态」显示裸数字 `0` 而非字典文案，常见原因是接口返回 number/混型，而 `el-select`/字典 options 的 value 是字符串，`===` 匹配失败回退显示原值。在 `detailCallback` 入库前将 `status`、`jobType`、`sex` 等字典绑定字段 `String()` 归一；`statusOptions` 等异步字典列表用 `|| []` 兜底，避免 undefined 时选项未加载加剧错显。组织跳转若字段口径未与后端确认（如 businessType vs accountType），应先回退错误改动，只保留字典展示修复，避免误链 committeeVersionId 等未落地字段。",
+   "evidence": "dd85a874 诉求 4「当前状态显示了数字0」、诉求 5–6 要求回退 BusinessType 相关改动；最终结论保留 detailCallback 字符串化与 statusOptions 兜底。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/ownerCommitteeWorker/detail.vue"
+   ],
+   "baseline": "635e747",
+   "sessionIds": [
+    "dd85a874-0175-478e-81cc-c4afa02d3b86"
+   ],
+   "bundle": "001.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 政治面貌「党员」字典值为 dictValue=0，勿用其它项目常见的 01",
+   "type": "bug",
+   "content": "业主自治模块（筹备组成员报名、候选人报名等）里「党员证明」附件的显示/必填条件必须按本环境政治面貌字典取值：党员对应 `dictValue === '0'`（建议 `String(politicsStatus) === '0'`），不能沿用苏住房等产品线里常见的 `'01'` 或中文码。切换政治面貌为非党员时要同步清空已上传的党员证明并移除该校验项，避免隐藏字段仍拦截提交。",
+   "evidence": "用户纠正「dict Value0是党员」后，将 showPartyCertificate 从 politicsStatus == '01' 改为 String(politicsStatus) === '0'，并更新政治面貌变更监听与后端契约说明。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue",
+    "zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue"
+   ],
+   "baseline": "191094f",
+   "sessionIds": [
+    "9188dc08-2eb6-4f25-a62a-99cd041edbf7"
+   ],
+   "bundle": "003.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 筹备组征集：报名子表增删门禁 = 主表 bizState=2 + 征集起止日期内",
+   "type": "workflow",
+   "content": "筹备组征集详情里「报名信息」子表不能只看子表自身状态：需从主表拿到 `bizState === 2`（已备案）后，再判断当前时间是否落在征集起止日期范围内，才开放新增/删除（含行内删除与区块右上角按钮）。备案未通过或不在征集期内，前端禁用/隐藏操作并在后端增删接口做同样校验，避免子表单独可写而主单不满足业务条件。",
+   "evidence": "迁移业主自治后用户补充：「报名信息需要从主表拿到 bizState=2 才能操作报名信息子表」；需求原文要求备案成功且征集期内可维护报名。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateTable.vue",
+    "zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue"
+   ],
+   "baseline": "191094f",
+   "sessionIds": [
+    "9188dc08-2eb6-4f25-a62a-99cd041edbf7"
+   ],
+   "bundle": "003.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 筹备组/候选人报名：按身份与政治面貌切换附件项及必填",
+   "type": "pattern",
+   "content": "园区差异化报名表单在「其他材料」上方增加条件附件：身份标识为「业主」时显示并必填「物业费结清证明」；政治面貌为党员（dictValue=0）时显示并必填「党员证明」。实现上监听身份标识、政治面貌变更，动态 v-if 上传块并切换 rules；字段隐藏时清空 model 与校验状态。大小/格式限制与其它材料一致（如 100MB、jpg/png/pdf）。",
+   "evidence": "业主自治迁移验收清单要求两类条件附件；会话中先后落实主表 bizState 门禁、党员证明及 dictValue=0 修正。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue"
+   ],
+   "baseline": "191094f",
+   "sessionIds": [
+    "9188dc08-2eb6-4f25-a62a-99cd041edbf7"
+   ],
+   "bundle": "003.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 筹建申请筹建范围：默认全小区房屋且禁止增删（园区差异化）",
+   "type": "fact",
+   "content": "园区版筹建申请详情隐藏筹建范围「新增」「删除」，后端查询直接加载该物业管理区域下全部房屋，不提供筛选增删；如有编辑入口需屏蔽筹建范围编辑能力。迁移时勿保留产品 2.0 可维护范围交互。",
+   "evidence": "业主自治迁移差异化需求第 2 条：隐藏增删、默认全量房屋、接口不再依赖筛选新增逻辑。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/preparatoryApply/detail.vue",
+    "zhi2-web-admin/src/views/autonomy/preparatoryApply/components/preparatoryRangeTable.vue"
+   ],
+   "baseline": "191094f",
+   "sessionIds": [
+    "9188dc08-2eb6-4f25-a62a-99cd041edbf7"
+   ],
+   "bundle": "003.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 管理规约/议事规则/工作规则：文件内容由富文本改为附件且兼容历史",
+   "type": "pattern",
+   "content": "三份备案详情将「文件内容」从富文本改为附件上传，并隐藏「是否启用富文本编辑」开关。后端保留原富文本字段供历史数据只读；新数据走附件字段。列表/详情展示改为附件下载或预览，避免只读页仍挂载富文本编辑器。",
+   "evidence": "业主自治迁移产品级修改第 6 条及验收项：富文本改附件、隐藏开关、历史兼容。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy"
+   ],
+   "baseline": "191094f",
+   "sessionIds": [
+    "9188dc08-2eb6-4f25-a62a-99cd041edbf7"
+   ],
+   "bundle": "003.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 物业管理区域备案/变更：projectType 与苏住房字段对齐及变更对比映射",
+   "type": "pattern",
+   "content": "园区小区备案将「住宅性质」改为「项目类型」`projectType`，字典 `complex_project_type`（1=住宅，2=非住宅）；新增备案名称、推广名称、法定名称、宗地号 `landPlotCode`、备案说明 `remark` 等，开发建设单位/联系人/电话与备案说明设为必填。变更单 `complexChange/detail` 字段顺序与校验与备案页一致，`contentInfo` 带 `field` 映射以支持变更前后高亮；从备案发起变更时兼容旧字段 `complexPromotionName` → `promotionName`。关联只读页（授权、公示查询等）需同步展示项。",
+   "evidence": "用户要求新加六字段及备案表对齐；补充「物业管理区域变更也要加对应字段」后完成备案/变更/关联页改造并列后端联调待办。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/views/property/complexChange/detail.vue",
+    "zhi2-web-admin/src/views/property/complexBuildingAuth/detail.vue",
+    "zhi2-web-admin/src/views/building/complexSearch/detail.vue",
+    "zhi2-web-admin/src/views/publicQuery/complex/detail.vue",
+    "zhi2-web-admin/src/views/property/complex/components/enums.js"
+   ],
+   "baseline": "191094f",
+   "sessionIds": [
+    "7729383f-55e8-4db5-9f02-f68fec1e625f"
+   ],
+   "bundle": "003.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] develop/v2.6.1-yuanqu cherry-pick 上游样式时保留本地 sub-container 与 padding 约定",
+   "type": "workflow",
+   "content": "子模块 `zhi2-web-admin` 从 develop/v2.6.1 批量 cherry-pick 到 `develop/v2.6.1-yuanqu` 时，全局样式冲突在 `src/styles/index.scss`：保留 yuanqu 分支已有的 `padding: 0`、`sub-container` 等布局选择器，再合并上游表格/列表样式优化。表格相关冲突在 `zs-table.vue` 合并悬停同步逻辑时保留空值安全检查。merge commit 若 pick 结果为空（内容已存在）应跳过而非强合。",
+   "evidence": "会话记录 fcad00cd→0d94fd1b 区间 pick 19/20 成功，冲突处理要点列出 index.scss、pubHouseTable、zs-table 与空 merge 跳过。",
+   "files": [
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/views/benefit/pubHouse/components/pubHouseTable.vue"
+   ],
+   "baseline": "ba114dc",
+   "sessionIds": [
+    "dde203fa-45f2-4bba-bbf3-cb24d4c6547c"
+   ],
+   "bundle": "003.md",
+   "project": "园区公共收益"
+  }
+ ]
+}

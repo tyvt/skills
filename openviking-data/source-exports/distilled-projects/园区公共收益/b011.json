@@ -1,0 +1,109 @@
+{
+ "project": "园区公共收益",
+ "batch": 11,
+ "files": [
+  "041.md",
+  "042.md",
+  "043.md",
+  "044.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "选择弹窗辅助链接无菜单权限时用 getRouterPathByFilePathOptional",
+   "type": "bug",
+   "content": "benefit 等业务里「物业管理区域」等选择弹窗常在选项旁挂「前往开户」「签署协议」等辅助链接，若用 getRouterPathByFilePath 解析目标路由，当前账号缺少对应菜单时会每次调用都弹出「没有授权相关菜单，请联系管理员」；多个链接会连弹多条相同错误，且区域选择本身仍应可用。应参照 pubUseMoneyApply/detail.vue：辅助链接一律走 getRouterPathByFilePathOptional——有权限则渲染链接，无权限则静默跳过，不向用户报错。assetLeaseApply、pubBankReceiptApply 等同写法页面需批量排查。",
+   "evidence": "会话结论：无「监管账户开户/监管协议签署」菜单时 getRouterPathByFilePath 连弹两条相同授权错误；改为 Optional 后弹窗可正常选区域。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubUseMoneyApply/detail.vue"
+   ],
+   "baseline": "36a9a7e",
+   "sessionIds": [
+    "82837732-6269-4a38-bb56-614e39f5bbeb"
+   ],
+   "bundle": "041.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "Element UI 必填红星要求 el-form-item 的 prop 与 rules 键名一致",
+   "type": "pattern",
+   "content": "zhi2-web-admin 详情页用 el-form 时，el-form-item 的 prop 绑定的是提交字段（如 parkingChargeStandardId），而 rules 若写在展示名字段（parkingChargeStandardName）上：保存时自定义/异步校验仍可能报「xxx不能为空」，但标签前不会出现红色必填 *，用户以为非必填。修复方式是把 rules 的键改成与 prop 完全一致，message 仍用业务文案（如「收费标准名称不能为空」）。新增表单项时先对齐 prop 再写 rules，不要按 label 起名。",
+   "evidence": "停车泊位租赁详情：prop 为 parkingChargeStandardId、rules 写在 parkingChargeStandardName，导致无必填星号；改 rules 键为 parkingChargeStandardId 后星号与前端提示一致。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/parkingSpaceContractFiling/detail.vue"
+   ],
+   "baseline": "08d3255",
+   "sessionIds": [
+    "7a6ec4bf-c697-4a2c-85ae-f84db3a2a972"
+   ],
+   "bundle": "041.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "联动显隐字段的条件必填用 rules.required 表达式而非自定义 validator",
+   "type": "pattern",
+   "content": "开户等表单里「是否结息」为是时才展示并校验「结息类型」。若结息类型仅用自定义 validator，校验能触发但 Element UI 不会在标签前显示必填 *（与全局约定「红星只认 rules.required」一致）。应写成 rules 项：required: this.form.ifSettlement == '1'，message 与 trigger 与同模块其他字段一致；字段 v-if 隐藏时继续依赖 handleIfSettlementChange 等逻辑清空并跳过校验。不要为要星号单独 hack CSS。",
+   "evidence": "物业管理区域开户 complex/detail：结息类型有校验提示无必填星号；改为 required: this.form.ifSettlement == '1' 后与「是否结息=是」联动显示红星。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/accountOpen/complex/detail.vue",
+    "zhi2-web-admin/src/views/maintenance/accountOpen/components/detail.vue"
+   ],
+   "baseline": "7458acc",
+   "sessionIds": [
+    "60384e27-d5c5-4139-80d6-c344a20e3167"
+   ],
+   "bundle": "041.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "银行对账页「银行回单」双模式切换与空态提示",
+   "type": "workflow",
+   "content": "pubBankDetailDay 类页面在对账单与银行回单两种数据源间切换时：进入回单模式应隐藏「手工核销」「自动对账」（回单行内已有核销入口，避免按钮消失后用户找不到退出路径）；「银行回单」按钮需支持再次点击退出回单模式并恢复对账单列表与左右联动加载；当前模式用按钮 plain/激活样式区分。回单接口无数据时右侧表格展示「暂无银行回单数据」空状态，必要时在加载完成后用 msg 提示一次，避免用户以为按钮无响应。",
+   "evidence": "用户反馈点银行回单后自动核销消失、再点无反应、回单为空无提示；实现为模式切换 + 隐藏全局核销 + 空态文案。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubBankDetailDay/index.vue",
+    "zhi2-web-admin/src/views/benefit/pubBankDetailDay/detail.vue"
+   ],
+   "baseline": "36a9a7e",
+   "sessionIds": [
+    "e77c4a66-d59c-4814-96ed-5e80c60960d1"
+   ],
+   "bundle": "041.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "腾讯地图脚本被 CSP 拦截时 TMap is not defined 要先查部署层 script-src 白名单",
+   "type": "bug",
+   "content": "园区公共收益 Web 后台 `ZsTencentMap` 从 `https://map.qq.com/api/js` 动态加载 SDK。若浏览器控制台报 `Refused to load the script ... map.qq.com ... violates Content Security Policy` 且随后 `TMap is not defined`，根因通常是 Nginx/网关返回的 `Content-Security-Policy` 仅允许 `script-src 'self' 'unsafe-eval' 'unsafe-inline'`，未放行腾讯地图域名——与前端业务代码无关。排查：Network 里看 HTML 响应头的 `Content-Security-Policy`；修复时在现有策略上增补（勿重复叠多条 CSP），至少包含 `script-src` 的 `https://map.qq.com`、`connect-src` 的 `https://apis.map.qq.com`，以及瓦片/图标所需的 `img-src` 腾讯域名。",
+   "evidence": "会话 e06cd774：用户问是否 nginx 配置问题；结论为部署层 CSP 拦截外部脚本，项目内未找到 CSP 配置，给出 nginx add_header 示例与 Response Headers 确认步骤。",
+   "files": [
+    "zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js"
+   ],
+   "baseline": "4236087",
+   "sessionIds": [
+    "e06cd774-da4c-488e-81ae-850c6386e4e3"
+   ],
+   "bundle": "044.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "zs-table-column type=link 未传 :function 会运行时抛 attrs.function is not a function",
+   "type": "bug",
+   "content": "`zs-table-column` 在 `type=\"link\"` 时，单元格点击会执行 `attrs.function(scope.row)`。列只写了 `type=\"link\"` 却未绑定 `:function=\"handleXxx\"` 时，点击即报 `TypeError: _vm.attrs.function is not a function`（例如公共房屋详情弹窗内 `assetPositionSubTable` 的「部位名称」列）。修复：为该链接列补上与跳转/打开详情一致的处理函数；同页其他 `type=\"link\"` 列（如 `contractSubTable` 合同编号）应一并排查。",
+   "evidence": "会话 adc2aa19：Vue warn 栈指向 zs-table-column 与 assetPositionSubTable；根因列为 link 无 function，已补 :function=\"handleView\"；并提示 contractSubTable 同类隐患。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/views/benefit/pubHouse/components/assetPositionSubTable.vue",
+    "zhi2-web-admin/src/views/benefit/pubHouse/components/contractSubTable.vue"
+   ],
+   "baseline": "b6bf87d",
+   "sessionIds": [
+    "adc2aa19-54f7-4bcc-83c5-ec89dea6bc7a"
+   ],
+   "bundle": "044.md",
+   "project": "园区公共收益"
+  }
+ ]
+}

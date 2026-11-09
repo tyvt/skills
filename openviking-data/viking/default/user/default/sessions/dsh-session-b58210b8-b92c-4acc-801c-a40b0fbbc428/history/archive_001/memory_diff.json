@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-b58210b8-b92c-4acc-801c-a40b0fbbc428/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T08:40:07.622651+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/09/三源记忆导入完整性审计修正.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-09 经实际重跑导入流程，修正早前仅凭 done 标记得出的误报：cursor（99 项目 / 2771 条记忆，2026-11-07 状态文件记 title gaps=0）、workbuddy（22 项目）、opencode（2 项目）三源可提炼记忆均已入库。7 个被误判缺失的 workbuddy 项目中，6 个（量化选股、无锡锡山业主决策H5、江阴公共收益、太仓物管、淮安存量房、昆山G）在蒸馏阶段 kept:0 无可提取记忆被正确跳过，第 7 个苏住房C 早在 2026-11-06 已导入约 11 条记忆仅缺 done 标记。\"导入\"指记忆抽取而非原始对话原文整段存储。\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: 所有cursor，workbuddy，openCode里面的对话记录是不是都已经导入openviking里面了？\n...\n**assistant [peer=deepseek-harness-default-workspace]**: 已停止该后台任务。下面是修正后的结论。\n\n## 修正结论：三个来源的「可导入记忆」实际上都已进 OpenViking —— 我上一条说的 workbuddy 不完整是误报\n\n我重新跑了一遍实际导入流程，发现之前用 `done-ov-*.json` 落盘标记当“是否导入”的判据是**不可靠的**：\n\n| 来源 | 磁盘项目 | 真实状态 |\n|---|---|---|\n| **cursor** | 99 | ✅ 2771 条记忆，状态文件记 `title gaps=0 视为导入完成`（2026-11-07） |\n| **opencode (zcode)** | 2 | ✅ 2 个项目都跑过（苏州市房地产监测V3、门户） |\n| **workbuddy** | 22 | ✅ **全部可导入记忆都已在库** |\n\n**为什么之前说 workbuddy 缺 7 个项目是错的：**\n- 那 7 个“缺标记”项目里，有 **6 个（量化选股、无锡锡山业主决策H5、江阴公共收益、太仓物管、淮安存量房、昆山G）在蒸馏阶段 `kept:0`** —— 这些会话极短（平均 1–2 轮、几个工具调用），抽不出任何可复用记忆，按设计就被跳过，本来就没东西可导入。\n- 第 7 个 **苏住房C 其实早在 2026-11-06 就已经导入过（旧日志 `import-苏住房C.json` 显示 5 批全部 completed、写入约 11 条记忆）**，只是它的 `done` 标记文件丢失了，所以被我误判成“缺失”。刚才的重跑只是在做一遍冗余回填。\n\n重新跑时，那 15 个已有标记的项目全部显示 `本次待导入 0 条`（无缺口需回填），也印证了它们本身就是完整的。\n\n## 两点说明\n1. **“导入”指的是记忆抽取导入，不是原始对话原文**：这套流程只把会话里能提炼出的记忆写进 OpenViking（符合你 11-02 定的“把历史会话记忆导入”方案），并非把每条原始 transcript 整段存进去。所以“全部导入”= 三个来源所有**可提炼记忆**都已入库。\n2. **脚本有个 bug（与你这次无关）**：`import-local-sources.mjs` 第 119 行 `ex.stdout.trim()` 在**不带 `--skip-extract`** 运行时会崩（因为子进程 `stdio:\"inherit\"`，`ex.stdout` 恒为 null）。之前能成功是因为都带 `--skip-extract`。我已用 `--skip-extract` 重跑绕过了它。若你想让我顺手修掉这个 bug（需走 worktree 提交），或想对 zcode 也做一遍“无缺口确认”重跑，告诉我即可。\n\n我刚才杀掉的后台任务只是在做苏住房C 的冗余回填（其数据已在库），不影响任何已导入内容。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/程序/import_local_sources.md",
+                "memory_type": "entities",
+                "before": "# import_local_sources\nOpenViking 历史会话本地导入脚本，按源与项目把本地会话导入记忆系统。\n\n## 描述\n- 支持命令行参数控制导入范围，如 `--skip-extract`、`--sources=cursor`、`--from-project=产品2.0`、`--skip-distill-if-ready`\n- 续跑日志写入 `%TEMP%\\import-local-sources-resume.log`，段首标记 `======== CURSOR RESUME <时间> ========`\n- 进度写入 import-local-sources-state.json，记录各源（如 Cursor）的 imported/memories 字段、已完成项目数与 finishedAt 时间\n- 串行调用 import-to-ov.mjs 完成每批 preflight 与 commit\n\n## 关系\n- 属于 OpenViking 记忆导入工具链，与 import-to-ov.mjs、snapshot-openviking-memory.mjs、ov-cancel-stuck-commit-tasks.mjs 配合\n- import-to-ov.mjs 已加 stripBom 读取 JSON，避免 BOM 导致 JSON.parse 失败",
+                "after": "# import_local_sources\nOpenViking 历史会话本地导入脚本，按源与项目把本地会话导入记忆系统。\n\n## 描述\n- 支持命令行参数控制导入范围，如 `--skip-extract`、`--sources=cursor`、`--from-project=产品2.0`、`--skip-distill-if-ready`\n- 续跑日志写入 `%TEMP%\\import-local-sources-resume.log`，段首标记 `======== CURSOR RESUME <时间> ========`\n- 进度写入 import-local-sources-state.json，记录各源（如 Cursor）的 imported/memories 字段、已完成项目数与 finishedAt 时间\n- 串行调用 import-to-ov.mjs 完成每批 preflight 与 commit\n- 每跑一个项目在 `%TEMP%/done-ov-{源}-{项目}.json` 写落盘标记，仅记录成功写入的记忆；重跑经 `--skip=doneFile` 跳过已完成的标题实现断点续跑与回填\n- 会话总目录 `memory-migration/out/sessions.jsonl` 收录全部会话（2026-11-09 审计共 6292 条）并标注 source+project，用作完整性核对分母\n- 蒸馏阶段 `kept: 0` 表示会话极短无可提取记忆，按设计跳过，非数据丢失\n\n## 已知缺陷\n- 第119行 `ex.stdout.trim()` 在不带 `--skip-extract` 运行时会崩溃：子进程 `run()` 用 `stdio: \"inherit\"`，捕获的 `ex.stdout` 恒为 null；历史成功运行均带 `--skip-extract`\n\n## 关系\n- 属于 OpenViking 记忆导入工具链，与 import-to-ov.mjs、snapshot-openviking-memory.mjs、ov-cancel-stuck-commit-tasks.mjs 配合\n- import-to-ov.mjs 已加 stripBom 读取 JSON，避免 BOM 导致 JSON.parse 失败"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

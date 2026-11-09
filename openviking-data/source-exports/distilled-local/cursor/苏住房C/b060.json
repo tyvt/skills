@@ -1,0 +1,113 @@
+{
+ "project": "苏住房C",
+ "batch": "060",
+ "files": [
+  "060.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "下面UI错乱了",
+   "type": "bug",
+   "content": "已修复底部「联系业主」区域 UI 错乱。 **原因：** 1. 头像用了 `ZsImage`，组件内图片为 `width/height: inherit` 2. 父组件 scoped 样式 `.header-img { 40px }` 无法穿透到子组件 3. 图片高度被异常拉伸，底部栏被撑高，并遮挡上方房源详情 **修改：** 1. **`detail.vue`**：头像外包一层固定 `40px` 圆形容器，用 `:deep(.img)` 约束图片尺寸；机构图标补上缺失的 `company-icon` 样式（原 `w-24` 类不存在） 2. **`ZsImage.vue`**：将 `inherit` 改为 `100%`，由父容器控制尺寸 请重新编译预览，底部应恢复正常：头像 40px 圆形，「联系业主」按钮与业主信息同一行，上方详情字段不再被遮挡。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`detail.vue",
+    "**`ZsImage.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse\\detail.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse\\agentDetail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3c86796a-b65f-466f-a1d2-266feae580a5"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "这里应该还是有图标UI问题，背景很奇怪",
+   "type": "fact",
+   "content": "问题已定位并修复。 **原因：** 超市 logo 在小程序里用了 HTML 的 `<img>`，`mode=\"aspectFill\"` 不生效，大图按原始尺寸溢出，在卡片背景上形成那些灰色圆环水印。 **修改内容：** 1. **`ZsImage` 组件** — 小程序端改用 `<image mode=\"aspectFill\">` 正确裁剪；H5 仍用 `<img>` + `object-fit: cover` 2. **房产超市列表页** — 卡片加 `overflow: hidden`；定位图标改为固定尺寸的 `ZsImage` 请重新编译小程序后查看效果，图标应只显示在左侧 120rpx 区域内，背景水印会消失。若还有异常，告诉我具体表现。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\houseSupermarket\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\service\\bankList.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9576e757-ad86-4348-8122-af82c2ba31b7"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已修复两个问题： 1. 地图 marker 图片加载",
+   "type": "preference",
+   "content": "已修复两个问题： ### 1. 地图 marker 图片加载失败 **原因**：`location-red.png` 实际在 `pages_main/static/icon/` 下，但代码用 `@/static/icon/location-red.png` 引用。在微信小程序里会解析成 `/static/icon/location-red.png`，文件不存在，所以报 500。 **修复**：改用与 `houseMap.vue` 相同的方式： ```javascript const redImage = resolveStaticUrl('icon/location-red.png', 'pages_main') ``` 这样会正确指向 `/pages_main/static/icon/location-red.png`。 ### 2. 申请说明无法显示/输入 **原因**：`ZsTextarea` 已渲染（能看到 `0/120` 计数），但输入框高度塌陷为 0。`form2.scss` 里表单项默认是横向 `flex` 布局，申请说明区域缺少足够高度，输入框被压扁看不见。 **修复**： - 在 `addAlone.vue` 中显式引入 `ZsTextarea`，并参考 `signInfo.vue` 调整 `.description` 区域样式（固定高度、`flex-direct",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`houseMap.vue",
+    "0。`form2.scss",
+    "`addAlone.vue",
+    "`signInfo.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "85a3ba6b-0da3-48e5-b7f4-7ebc9f354ad6"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "MAIN 磁盘 1790.5KB ok MAIN 上",
+   "type": "bug",
+   "content": "**问题已修复，构建通过。** ## 原因 你在 `uni.scss` 里给 `.page-wrapper`、`.page` 等加了 `min-height: 100%`，编译后各组件 wxss 末尾的 marker 从： ```css {width:100%;box-sizing:border-box} ``` 变成了： ```css {width:100%;min-height:100%;box-sizing:border-box} ``` 而 `scripts/prune-component-wxss-leak.mjs` 里的 `LEAK_END` 正则还是旧格式，**匹配失败**，导致 32 个主包组件各自重复注入约 8KB 的 `uni.scss` 全局样式（合计约 **258KB**），主包上传预估从约 1793KB 涨到 **2094.8KB**，超过 2048KB 限制。 ## 修复 更新了 `LEAK_END` 正则，使 `min-height:100%` 为可选： ```javascript {width:100%;(?:min-height:100%;)?box-sizing:border-box} ``` ## 结果 | 指标 | 修复前 | 修复后 | |------|--------|--------| | components | 421.1KB | ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`uni.scss",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\scripts\\validate-dist.mjs、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\TypeChoose.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\package.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fc94b08c-d7f0-4ffe-9070-050d77fd5bb1"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "Migrate all Vue files in d",
+   "type": "preference",
+   "content": "已将 `src/pages` 下 11 个文件从 `useLoadMore` / `uni-load-more` 迁移至 `z-paging` + `usePaging`。 ## 已修改文件（11 个） | 文件 | 主要变更 | |------|----------| | `publicNotice/publicNotice.vue` | 接入 `usePaging` + `<z-paging>`，空态 `#empty` 插槽 | | `news/index.vue` | 同上，保留区域筛选与 `refresh()` | | `collect/index.vue` | 同上；搜索回调重命名为 `handleSearch`（避免与 `queryList` 冲突）；`total > 0` 改为 `list.length > 0` | | `message/message.vue` | 同上，空态文案「暂无数据」 | | `my/myFootmark.vue` | 同上，保留原足迹空态图片与文案 | | `my/myContract.vue` | 同上，空态文案「暂无数据」 | | `announcement/index.vue` | 同上；`reload()` → `refresh()` | | `home/policy.vue` | 接入分页，无自定义空态 | | `index/c",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`publicNotice/publicNotice.vue",
+    "`news/index.vue",
+    "`collect/index.vue",
+    "`message/message.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "201f6b7f-a985-4455-955a-c315abe76d23"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "为什么配置在2个文件都有",
+   "type": "bug",
+   "content": "已删除未使用的 `dispatcher.js`。 **保留的链路（实际在跑）：** ``` index.js / v1Instance.js → httpInstance.js → gateway.js（axios + 苏服办网关封装） ``` **删除原因：** - `dispatcher.js` 在项目中没有任何 import - 与 `gateway.js` 重复实现了同一套 `sfbConfig`、SM3 签名、网关 header 组装等逻辑 - 属于未接入的备用实现（fetch / uni.request 方案） 后续只需维护 `gateway.js` 和对应的环境变量（`VITE_APP_SFB_*`）即可。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`dispatcher.js",
+    "index.js",
+    "v1Instance.js",
+    "httpInstance.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b91754cb-4f69-4526-932a-d2e80e20327e"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

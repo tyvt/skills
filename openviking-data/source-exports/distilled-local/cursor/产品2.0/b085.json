@@ -1,0 +1,146 @@
+{
+ "project": "产品2.0",
+ "batch": "085",
+ "files": [
+  "085.md"
+ ],
+ "count": 8,
+ "memories": [
+  {
+   "title": "这里存在接口加载慢导致待办事项的数据展示到消息中心列",
+   "type": "preference",
+   "content": "## 原因说明 待办和消息共用同一个 `todos`，`getList` 与 `getMessageList` 各自发请求。若 **先发出的请求后返回**，后返回的 `.then` 仍会执行，就会把 **已过期的列表** 写进 `todos`。此时界面可能停在「消息中心」，但数据仍是待办（或反过来），`handleProcess` 又按 `currentIndex` 分支跳转，就会出现 **展示与跳转不一致**。 ## 修改说明 增加 `todoPanelFetchSeq`：每次发起待办或消息请求前 **自增**，并把本次序号记在闭包 `seq` 里。 - 在 `.then` 里：仅当 `seq === this.todoPanelFetchSeq` 时才赋值 `todos`（表示这是 **最近一次** 发起的列表请求）。 - 在 `.finally` 里：同样仅在序号仍匹配时才 `todoLoading = false`，避免旧请求关掉新请求的 loading。 这样只有「当前最后一次」请求的响应会更新列表和结束 loading，慢请求乱序返回会被直接忽略。 顺带对 `res.rows` 做了 `|| []` 防护，避免空数据时 `map` 报错。 --- 说明：文件中 `dayjs` 未导入的 Lint 提示是原有问题，与本次修改无关。若你希望一并修掉，可以说一下项目里 `da",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\home\\index.vue",
+    "@zhi2-web-admin/src/views/home/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "17a66e94-0a17-42dc-94f3-4fbe933bf043"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "如果有rewrite，这个的header要使用实际访",
+   "type": "fact",
+   "content": "已修复。`bypass` 里原先直接用 `req.url`，没有走 `rewrite`，所以 header 显示的是前端请求路径，而不是实际转发到后端的地址。 现在会先应用 `rewrite` 再拼 header，与文件中注释掉的 `full-url` 写法一致： ```41:44:d:\\repository\\产品2.0\\zhi2-web-admin\\vite.config.js bypass(req, res, options) { const rewrittenUrl = options.rewrite ? options.rewrite(req.url) : req.url; res.setHeader(\"frontend-proxy\", `${options.target}${rewrittenUrl}`); }, ``` 例如请求 `/api/v3.0/foo` 时，`frontend-proxy` 会显示 `http://xxx/v3.0/foo`（去掉 `/api` 前缀后的实际地址），而不是 `http://xxx/api/v3.0/foo`。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "```41:44:d:\\repository\\产品2.0\\zhi2-web-admin\\vite.config.js",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\vite.config.js",
+    "@zhi2-web-admin/vite.config.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8199e2bb-60dc-46d6-9a57-47b7757e9d8b"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "此按钮需要在businessType为CANDIDA",
+   "type": "bug",
+   "content": "已按你的要求改好了按钮显示逻辑，在 `detail.vue` 中把条件改为： - **通用条件始终判断**：`bizState/msgId/candidateCollectType/publishState` - **仅当 `businessType` 为 `PREPARATORY_GROUP` 时**，才额外要求 `isShowPublishButton` 为 `true` - 其他 `businessType` 不受 `isShowPublishButton` 影响 修改后的核心判断是： `(businessType != CANDIDATE_COLLECT_BUSINESS_TYPE.PREPARATORY_GROUP || isShowPublishButton)` 这样就精准满足了“筹备组看 `isShowPublishButton`，其他类型走通用条件”的需求。 另外我检查了该文件 lint，现有报错是文件里本来就有的 TS 插件报错，与这次改动无关。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`detail.vue",
+    "涉及文件：D:/repository/产品2.0/zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue",
+    "@zhi2-web-admin/src/views/autonomy/candidateCollect/components/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e756305d-8e7b-4296-8933-69ec5779f62d"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "单个按钮也改成左对齐，目前似乎居中了，3个按钮没问题",
+   "type": "pattern",
+   "content": "已按你的要求改好了：把 `@zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue` 里的按钮容器从居中改为左对齐。 修改点： - `justify-content: center;` -> `justify-content: flex-start;` - 位置：` .operate-column-button-container ` 样式块 这样单个按钮会和 3 个按钮场景保持一致，都是左对齐显示。 我也看了下诊断，当前这个文件有一批现存的 Vue 模板类型提示（和这次样式改动无关），本次改动没有引入新的功能性问题。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`@zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue",
+    "涉及文件：D:/repository/产品2.0/zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "10245f13-6519-46f8-a323-cd84d8946449"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "buildingNo的数据里面可能包含project",
+   "type": "preference",
+   "content": "已按你的要求修改完成：`rangeTable.vue` 里“房屋坐落”的拼接逻辑现在会先去重。 修改点在 `zhi2-web-admin/src/views/property/complex/components/rangeTable.vue` 的 `address` formatter： - 先取 `projectName` 和 `buildingNo`（空值兜底） - 如果 `buildingNo` 中包含 `projectName`，先 `replace` 掉这一段 - 再拼接 `projectName + buildingNo + unitName + houseNo` 这样可避免类似 `项目A项目A1幢...` 的重复展示。 另外我检查了该文件 lint，报出的 11 个错误是该文件里原有的类型提示问题，本次改动没有新增新的 lint 报错。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "已按你的要求修改完成：`rangeTable.vue",
+    "`zhi2-web-admin/src/views/property/complex/components/rangeTable.vue",
+    "涉及文件：D:/repository/产品2.0/zhi2-web-admin/src/views/property/complex/components/rangeTable.vue",
+    "@zhi2-web-admin/src/views/property/complex/components/rangeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "82637904-0381-4770-bd0e-d8b2748c371c"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "contentInfo增加remark，在最后，独占",
+   "type": "bug",
+   "content": "已按你的要求改好了： - 在 `zhi2-web-admin/src/views/autonomy/change/property/detail.vue` 的 `contentInfo` 最后追加了 `remark`（显示名为“变更内容”）。 - 并将它的 `layout` 设置为 `xs/sm/md/lg/xl` 全部 `24`，确保独占一行显示。 另外我检查了该文件的 lint，当前有一些原本就存在的 TS 报错（`never` 相关），这次修改没有新增这类问题。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`zhi2-web-admin/src/views/autonomy/change/property/detail.vue",
+    "涉及文件：D:/repository/产品2.0/zhi2-web-admin/src/views/autonomy/change/property/detail.vue",
+    "@zhi2-web-admin/src/views/autonomy/change/property/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "667f57c4-46bf-4026-b4cf-866c7a9cab67"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "图标和文字标签没有对齐",
+   "type": "preference",
+   "content": "已在 `zhi2-web-admin/src/components/HeadTitle/index.vue` 调整样式，修复图标和文字标签的对齐问题： - 给 `.label` 增加了 `line-height: 20px;`，统一文字行高 - 给 `.icon` 增加了 `display: block;` 和 `flex-shrink: 0;`，避免图片基线导致的视觉偏移和压缩 这样图标会和标签文字在同一水平线上更稳定对齐。 如果你希望我再顺手把“值文本”的垂直位置也微调到和标签完全齐平，我可以再帮你做一版。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`zhi2-web-admin/src/components/HeadTitle/index.vue",
+    "涉及文件：D:/repository/产品2.0/zhi2-web-admin/src/components/HeadTitle/index.vue",
+    "@zhi2-web-admin/src/components/HeadTitle/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b810c464-f479-4d14-a4e6-aad193747c95"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "这里如果没有传递multiple属性，默认成多选了，",
+   "type": "bug",
+   "content": "已按你的要求改好了。 **修改说明：** 针对 `type === 'select'` 且 `model === 'bizState'` 的表单项，当 `attrs` 里**没有**显式写 `multiple` 时，原先用 `true`（多选），已改为 `false`（单选）。若某页需要多选业务状态，在对应 `formItems` 里写上 `attrs: { ..., multiple: true }` 即可。 ```126:126:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-search-form\\zs-search-form.vue const isMultiple = Object.prototype.hasOwnProperty.call(attrs, 'multiple') ? attrs.multiple : false ``` **兼容性提示：** 若列表查询里 `bizState` 之前依赖多选（值为数组），改成默认单选后，未配 `multiple: true` 的页面会变成标量；若接口仍要数组，需要在对应页面显式加 `multiple: true`，或在请求参数里把单值转成数组。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "```126:126:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-search-form\\zs-search-form.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-search-form\\zs-search-form.vue",
+    "@zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0bc574c1-233a-406d-9cc5-678ea3dabed5"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

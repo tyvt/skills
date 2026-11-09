@@ -1,0 +1,112 @@
+{
+ "batch": 11,
+ "files": [
+  "061.md",
+  "062.md",
+  "063.md",
+  "064.md",
+  "065.md",
+  "066.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "scripts/*.test.mjs 里复制了一份生产逻辑做断言：跑通是假绿，新增分支等于没有回归",
+   "type": "bug",
+   "content": "什么情况：对 web 后台公共路由工具（utils/ruoyi.js 的 resolveListRoutePathHint / buildTableIdNavigation）做扩展，新增 general/special/emphasis/usemoney 分支后，scripts/resolve-list-route-path-hint.test.mjs 全部通过。\n\n为什么：该脚本没有 import 生产函数，而是在脚本内 6-18 行「复制了一份精简版 resolveListRoutePathHint」，既丢了 additional/correction 的 slice(-2) 处理，也没有覆盖新加的 usemoney 组合。于是脚本验证的是自己那份副本，改 ruoyi.js 改错了它也照样绿；新增的三类路径解析缺少任何自动化回归。\n\n怎么做：公共 utils 里被脚本测到的函数必须 export（或抽到独立可 import 的模块），测试文件改为 import 真实实现，然后补三类互斥用例，例如 { name:'General/usemoney', path:'/…/general/usemoney' } => 'general/usemoney'。审查这类独立 .mjs 脚本时，第一件事就是 grep 它有没有 import 被测文件——没有就是完全无效的用例，不要当作「已覆盖」签字。",
+   "evidence": "会话 061 第 1 段审查（基线 179717a）MEDIUM 项：测试脚本与生产实现脱节，脚本内复制精简版 resolveListRoutePathHint，未含 additional/correction 的 slice(-2) 逻辑，也未覆盖 general/special/emphasis + usemoney，CI/本地通过不能证明 ruoyi.js 新分支正确。",
+   "files": [
+    "zhi2-web-admin/scripts/resolve-list-route-path-hint.test.mjs",
+    "zhi2-web-admin/src/utils/ruoyi.js"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "91bdff1a-8f1f-473a-a0fb-4e4255a1fbd9"
+   ],
+   "bundle": "061.md"
+  },
+  {
+   "title": "同一详情组件同时承载备案与变更时，getForm 的字段白名单会把变更单主键 personnelRecordChangeId 一起过滤掉",
+   "type": "bug",
+   "content": "什么情况：从业人员变更详情页复用 components/detail.vue，用 isChange=true 区分变更态，保存走 /company/personnelRecordChange/update。按对接文档逐条核对时发现 2.3 要求 update 必须携带 personnelRecordChangeId，而代码没传。\n\n为什么：getForm() 是「白名单式」组装载荷，只回传表单里显式列出的业务字段。变更单 ID 是上下文主键、不是用户可编辑字段，表单里不存它，于是被白名单静默丢掉——保存时后端拿不到变更单主键，无法定位要更新的单据。这类漏洞不会报错，只表现为「保存没生效」。\n\n怎么做：变更态分支显式补主键，而非依赖白名单自然带上：if (this.isChange && this.form.personnelRecordChangeId) payload.personnelRecordChangeId = this.form.personnelRecordChangeId。凡是被多态复用的详情组件（isChange / formMode / organType 开关），都要把「主键与外键」列为 getForm 的必查项。\n\n配套约定：文档写提交 busCode 固定 qycyrybg，而代码常量是 cyrybg，因 ensureFlowConfigured 依赖同一 busCode 做流程配置查询，不要单方面改常量去迁就文档，先找后端确认流程引擎实际配置，确认后改常量并同步菜单配置。",
+   "evidence": "会话 061 第 3 段（基线 56db6f6）：按《企业从业人员变更-前端对接文档》核对，2.3「update 必须携带 personnelRecordChangeId」为唯一不符项，修复为在 getForm() 中条件补 payload.personnelRecordChangeId；同时标注 busCode 文档 qycyrybg 与代码 PERSONNEL_CHANGE_BUS_CODE=cyrybg 的差异需后端确认，未擅自改动。",
+   "files": [
+    "zhi2-web-admin/src/views/company/staffManagement/components/detail.vue",
+    "zhi2-web-admin/src/views/company/staffManagement/personnelChange/detail.vue",
+    "zhi2-web-admin/src/api/company/personnelRecord.js"
+   ],
+   "baseline": "56db6f6",
+   "sessionIds": [
+    "1f77392c-bb7c-4811-9034-aba84953e2f6"
+   ],
+   "bundle": "061.md"
+  },
+  {
+   "title": "[苏房] 详情页子区块（子表/要件区）的「可操作」必须由 formMode 与业务状态双重判定，不能只靠父页 editable",
+   "type": "pattern",
+   "content": "情况：苏房 V3 Web 后台详情页普遍拆成「详情壳（ProjectDeliveryDetail 等）+ 子区块组件（DeliveryScopeSection、AreaSection、AnnexUpload 之类）」。壳组件从路由 meta 拿 formMode（add/view/edit），子区块却常常只收到一个父级算好的 editable，于是新增态（formMode=add）下父级认为「可编辑」，子表的「绑定/新增楼幢」按钮照常显示；或者反过来，编辑态但单据已提交（审核中/已备案）时仍允许改子表。\n\n为什么：editable 是一个布尔结论，丢失了 formMode 这一维，也丢失了 bizState 这一维。新增态其实没有业务主键，子表根本无从绑定；已流转的单据后端也会拒绝，前端却先给了入口，用户点了才报错。\n\n怎么做：让子区块自己持有 formMode prop（父级 :form-mode=\"formMode\" 传下去），可操作性统一写成 formMode === 'edit' && isProjectDeliveryEditable(bizState) 这一种表达式，不要在两处各自推导。最终期望矩阵是：add 隐藏、view 隐藏、edit+待提交显示、edit+审核中/已备案隐藏。同时注意新增保存成功后会 replace 成 formMode=edit，用户需要刷新或依赖路由同步才能看到子表按钮 —— 改完务必按这个矩阵逐态验证，而不是只在编辑态点一次。\n\n同源问题可参考 AnnexUpload 系列：AppendixRequirementGrid 的 operable 已经写成 operable && !readonly，但 AnnexUpload/index.vue 没往下传 readonly，导致 readonly 形同虚设，查看态只能靠 operable=false 兜住。凡是在组件里预留了模式开关，就必须在同一改动里核实父级真的传了它。",
+   "evidence": "会话 ce95f17a：用户报「新增状态不要显示子表按钮」，最终把 ProjectDeliveryDetail 的 formMode 下传给 DeliveryScopeSection，editable 改为 formMode === 'edit' && isProjectDeliveryEditable(bizState)，并在结论里给出 add/view/edit+bizState 四态显示矩阵；同批会话 d8190125 审查 AnnexUpload 时也发现 AppendixRequirementGrid 的 readonly 在主路径未接线（AnnexUpload/index.vue:39,456-468）。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/projectDelivery/components/ProjectDeliveryDetail.vue",
+    "zhi2-web-admin/src/views/supervision/projectDelivery/components/DeliveryScopeSection.vue",
+    "zhi2-web-admin/src/views/supervision/projectDelivery/projectDeliveryConstants.js",
+    "zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementGrid.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/index.vue"
+   ],
+   "baseline": "9dba655",
+   "sessionIds": [
+    "ce95f17a-36e7-4e8f-835f-9403e13a41ca",
+    "d8190125-12fe-4c14-b79d-30bd993248c2"
+   ],
+   "bundle": "062.md"
+  },
+  {
+   "title": "[苏房] 弹窗子组件直接给 prop visible 赋值：父状态不归位导致「点搜索却调弹窗接口」",
+   "type": "bug",
+   "content": "情况：Vue2 后台用 `<el-dialog :visible.sync=\"visible\">` 且 visible 是子组件 prop（由父组件 `showXxxDialog` 通过 `:visible.sync` 下发）。子组件内部写 `this.visible = false` 关闭弹窗。\n\n为什么：`this.visible = false` 只改了子组件本地的 prop 值，没有触发 `update:visible`，父组件的 `showXxxDialog` 仍是 true。父组件下一次 re-render（比如点搜索触发 `handleQuery` → `getList` → loading 变化）就会把这个 prop 重新重置回 true，弹窗被「顶开」重新打开，其 `watch visible` 再次触发 `getList()`，于是调用了弹窗内的接口。表现为：关掉「选择录入数据」弹窗后点页面搜索按钮，却发出了弹窗里的 `selectableEntryPage` 请求。\n\n怎么做：改成 computed 代理（本项目 `PropertyVerifyDialog.vue` 的既有约定）：新增 `dialogVisible`，`get` 返回 `this.visible`、`set` 发 `this.$emit('update:visible', val)`；模板改 `:visible.sync=\"dialogVisible\"`，关闭逻辑改 `this.dialogVisible = false`。父组件已用 `:visible.sync` 即可正确收口。改造后用 grep 扫描同目录是否还有 `this.visible = ` 这类 prop 直改残留。",
+   "evidence": "会话 c5c2d0c8 用户反馈「点击选择录入数据后再次点击搜索按钮，会调选择弹窗里面的接口」；根因确认为 SelectEntryDialog.vue 内 handlePick 直接 `this.visible = false` 改 prop，父组件 showSelectEntryDialog 未归位，re-render 时 prop 被重置回 true 使弹窗重开并二次请求 selectableEntryPage；修复为 dialogVisible computed 代理，与 PropertyVerifyDialog.vue 既有约定一致。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/leaseContract/components/SelectEntryDialog.vue",
+    "zhi2-web-admin/src/views/presale/leaseContract/index.vue"
+   ],
+   "baseline": "5a71ab7",
+   "sessionIds": [
+    "c5c2d0c8-f7eb-434b-9656-71388be8c06d"
+   ],
+   "bundle": "063.md"
+  },
+  {
+   "title": "[苏房] 顶栏显示子菜单标题而非父目录：单子根菜单展平必须以 alwaysShow 为开关",
+   "type": "bug",
+   "content": "情况：后台菜单接口返回一个只有单个子菜单的根目录（如「工作中心」下只有「待办事项」），顶栏却显示成子级「待办事项」而不是父级「工作中心」。\n\n为什么：若依式顶栏收集逻辑对「只有一个可见子项」的根菜单习惯性做展平（用 children[0] 顶替父项），这个展平没有区分后台是否显式设了 `alwaysShow: true`。当后端配置 alwaysShow:true 时，业务语义就是「即使只有一个子项也要保留父目录层」，此时仍展平就会把父级标题丢掉。另外展平时直接用 `children[0]` 而不先做可见性过滤，首个子项恰好 hidden 时顶栏标题也会不对。\n\n怎么做：抽 `shouldFlattenRootTopNavMenu`，仅在 `alwaysShow !== true` 时才允许展平；展平时取 `filterVisibleMenus(menu.children)[0]`。`collectTopNavMenus`、Navbar 的 `topMenus`、`findActiveTopNavMenu` 必须共用同一个收集函数，否则顶栏文本与高亮判定会各用一套规则而互相矛盾。同时 `collectNavbarChildrenMenus` 要把 `parentPath === '/'` 的子 path 归一成 `/index`、`/todo` 这种绝对路径，与 `resolveSidebarRoutes` 的 `normalizeMenuPath` 对齐，否则子页时顶栏父目录不高亮。",
+   "evidence": "会话 bcda231f 用户诉求为修复「顶栏显示第一个子项标题（待办事项）而非父级（工作中心），接口返回的根菜单带 alwaysShow:true」；审查结论 PASS，确认 shouldFlattenRootTopNavMenu 在 alwaysShow===true 时不展平，并指出展平仍取 children[0] 未过滤 hidden、findActiveTopNavMenu 对 `/` 父级不匹配子页导致不高亮两项 MEDIUM。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/layout/components/Navbar.vue"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "bcda231f-6e03-4b92-b224-6afe41f24f85"
+   ],
+   "bundle": "063.md"
+  },
+  {
+   "title": "[苏房] 注册表单行「输入框 + 查询/提取/重置」按钮把输入框压成细线：flex-wrap:nowrap 与 GIS map-append inline-table 的根因及整行化解法",
+   "type": "bug",
+   "content": "场景：企业账号注册（经纪机构）详情/分步表单里，「统一社会信用代码 + 查询/提取/重置 三个按钮」以及「注册地址（GIS）」两个字段被压扁成细线、文字看不清，连带校验红字看起来像叠在控件上。\n\n为什么：\n1. `.input-with-actions` 是 `display:flex; flex-wrap:nowrap`，输入框是 `flex: 1 1 19ch; min-width:0`。表单项本身只占半列宽（如 el-col span=12），半列里再塞三个按钮，`min-width:0` 让输入框可以无下限收缩，直接被压成一条竖线；同时外层 div 没有 `width:100%`，没能占满表单项内容区。\n2. 全局 `.map-append` 用 `display:inline-table` + `calc(100% - 8px)` 承载 GIS 地图/按钮，inline-table 在栅格列里没有确定宽度约束，会随内容塌缩，表现与信用代码一致。\n3. 上述高度/留白异常会连带把 `--form-item-error-slot` 预留的 20px 校验位挤乱，所以「红字叠控件」往往是二级现象，不要先去动校验样式。\n\n怎么做：把「输入框 + 右侧按钮组」改成**输入框整行占满 + 按钮换到下一行**，外层补 `width:100%`；在 `element-ui.scss` 里让表单项内的 `.input-with-actions` 默认占满内容区；`index.scss` 里把全站 `map-append` 从 inline-table 改成 flex 满宽，按钮间距用 `margin-left` 给。注意：这与「单行内联 input-with-actions、按钮挂右侧」的既有约定相反——只有在字段落在半列且按钮 ≥2 个时才必须整行化，单按钮/整行字段仍走内联。",
+   "evidence": "会话 bbf6612f：用户截图指出「UI样式问题，字段显示不清」；最终结论定位 `.input-with-actions` 的 `flex-wrap: nowrap` + `flex: 1 1 19ch` + `min-width: 0` 与 `.map-append` 的 `display: inline-table` + `calc(100% - 8px)` 两处根因，改动落在 InstitutionRegisterSingleForm.vue / Step1BasicInfo.vue（两处同步保持一致）、element-ui.scss（表单项内 input-with-actions 满宽）、index.scss（map-append 改 flex 满宽）。",
+   "files": [
+    "zhi2-web-admin/src/views/institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue",
+    "zhi2-web-admin/src/views/institutionRegister/components/Step1BasicInfo.vue",
+    "zhi2-web-admin/src/styles/element-ui.scss",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/components/zs-input/zs-input.vue"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "bbf6612f-a591-4092-88b3-c7a08cf12618"
+   ],
+   "bundle": "066.md"
+  }
+ ]
+}

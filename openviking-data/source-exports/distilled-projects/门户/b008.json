@@ -1,0 +1,223 @@
+{
+ "project": "门户",
+ "batch": 8,
+ "files": [
+  "029.md",
+  "030.md",
+  "031.md",
+  "032.md"
+ ],
+ "count": 13,
+ "memories": [
+  {
+   "title": "[门户] 苏周到扫码弹窗：240px 二维码不能用 zs-size=\"mini\"，改 width=\"320px\"",
+   "type": "pattern",
+   "content": "情况：SuzhouDaoQrLoginDialog 内二维码约 240px 宽，却套了 zs-size=\"mini\"（616px），两侧留白过大。\n\n为什么：全站约定 zs-dialog 用 zs-size 选档（mini≈616px），但那是表单/详情类弹窗；**内容宽度远小于 mini 档**时，档位仍按固定像素撑开，不会随二维码收缩。此时在根上写 width 不是「随便写死宽度」，而是让壳层贴合内容。\n\n怎么做：去掉 zs-size=\"mini\"，根节点设 width=\"320px\"，必要时配合 ::v-deep .el-dialog { width: 320px } 压过 Element 默认宽；登录轮询、关闭逻辑不动。改完目视确认 240px 码区左右对称即可。与苏房通用条目「优先 zs-size、禁止随意 width」的关系：**窄展示型弹窗（扫码、纯图）可显式像素宽，表单类仍走档位或 form-layout。**",
+   "evidence": "会话 2b16ec8a：审查结论通过——去掉 mini(616px) 改 320px + ::v-deep .el-dialog 可消除 240px 二维码两侧留白，轮询与关闭未改。",
+   "files": [
+    "zhi2-web-admin/src/views/login/SuzhouDaoQrLoginDialog.vue"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "2b16ec8a-8acf-4c77-a414-b61a81601259"
+   ],
+   "bundle": "029.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] index-new 装饰箭头：禁用固定 px 字符 ›，用 dw() 描边箭头对齐 1024 设计稿",
+   "type": "pattern",
+   "content": "情况：首页「公示公告」等列表右侧「更多」箭头用字符 `›` 且 font-size: 16px，未走 index-new 的 `dw()`（$design-w: 1024）缩放，字形细、视觉上像小点，与 design_reference 不一致。\n\n为什么：Unicode 箭头字号是固定 CSS 像素，和卡片、丝带等同页的响应式基准脱节；换更大字号仍难对齐设计稿线宽与色值。\n\n怎么做：改为纯 CSS 描边箭头（border + rotate），尺寸与线宽用 dw()（示例：约 dw(7)×dw(7)、线宽 dw(2)、色 #c5c5c5）；装饰性图标加 aria-hidden=\"true\"。验收对照 design_reference.png 或 portal-home-visual E2E。",
+   "evidence": "会话 4a686bf4：根因字符 › 16px 未 dw 缩放；已改为 dw 描边箭头并 aria-hidden，刷新公示公告区对比设计稿。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue",
+    "zhi2-web-admin/public/assets/images/homeNew/design_reference.png",
+    "zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "4a686bf4-5dee-44d8-905f-7025c81f52cd"
+   ],
+   "bundle": "029.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 业务中心流程条：图标中心等距（--flow-step-col），文案列宽随字数不等分",
+   "type": "pattern",
+   "content": "情况：index-new 业务中心两行流程步骤，标签字数不一（如「开发企业入网认证」），若按整列等分网格，视觉上图标间距随文字宽度漂移，用户要求「图标间距等分、文字不要等分」。\n\n为什么：等分列宽会把短标题列拉宽、长标题列挤窄，图标锚点跟着列边界走，看起来不齐；应让**图标落在固定列距网格上**，文字在列内自然换行/省略。\n\n怎么做：用 CSS 变量控制图标中心间距（如 --flow-step-col，会话中从 132px 收紧到 116px 并微调 flow-steps 左右 padding 4px）；每步图标占固定列宽、文案在列内左对齐。调参时以 8 个 14px 汉字不互抢为参考，出现省略号可回调 118–120px，仍嫌松再试 112px。",
+   "evidence": "会话 6744307c：用户明确「图标等分、文字不等分」并追问更密；最终 --flow-step-col 116px、flow-steps 左右 padding 4px。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "6744307c-7a3f-44d9-bc86-ea0a5e03757f"
+   ],
+   "bundle": "029.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 双行 flow-steps 绿色/灰色外框同宽：flow-grid 列宽取 max-content，行内 stretch",
+   "type": "pattern",
+   "content": "情况：商品房 9 步与另一业务 6 步上下两行 `.flow-steps`，各行 `width: max-content` 时外框宽度随步数变化，下行绿框比上行灰框窄，用户要求两容器宽度一致。\n\n为什么：两行同在 `.flow-grid` 第二列，若每行按自身内容收缩，列宽不会统一到较宽那一行。\n\n怎么做：`.flow-grid` 第二列改为 `max-content`（由更宽的 9 步行决定列宽），整体 `width: max-content` 与业务中心内容对齐；`.flow-steps` 去掉 `width: max-content`，用 `justify-self: stretch` 占满该列——短行步骤仍左对齐、右侧留白，但边框与上行同宽。若要在短行内均匀拉开步骤，再单独加 justify-content: space-between（需产品确认）。",
+   "evidence": "会话 54a9fc23：用户反馈下行遮挡/两行容器宽度不一致；按 flow-grid max-content + flow-steps stretch 两行边框对齐。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "54a9fc23-a8db-44c1-8738-3c76fa2599ba"
+   ],
+   "bundle": "029.md",
+   "project": "门户"
+  },
+  {
+   "title": "首页 authorizedSectionCodes 由本地板块码表+权限计算",
+   "type": "pattern",
+   "content": "zhi2-web-admin 首页 homeDataMixin.fetchFunctions 用 ADMIN_SECTION_CODES 配合 hasBizSectionPerm 得到 authorizedSectionCodes，不再依赖接口 businessCenters 是否返回某板块。双板块（如商品房 commodityHouseTrade + 存量房 secondHandHouseTrade）只要权限同时具备即可进入后续合并逻辑。",
+   "evidence": "会话 034544ce 审查结论：数据链路与布局一致，在同时拥有两个板块权限时可以同时展示；相对旧逻辑不再因接口缺字段而丢板块。",
+   "files": [
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+    "zhi2-web-admin/src/views/home/config/homeLayout.js"
+   ],
+   "baseline": "fd73e47",
+   "sessionIds": [
+    "034544ce-33ea-4a3e-a159-062dba42270d"
+   ],
+   "bundle": "031.md",
+   "project": "门户"
+  },
+  {
+   "title": "mergeBusinessFlows 固定顺序驱动 Sidebar/Admin 双行布局",
+   "type": "pattern",
+   "content": "mergeBusinessFlows 按固定顺序 commodityHouseTrade → secondHandHouseTrade → housingRental 过滤合并；非超管仅保留 permittedCodes 中的板块。HomeLayoutSidebar 与 HomeLayoutAdmin 共用：primaryFlows = businessFlows.slice(0,1)、secondaryFlows = businessFlows.slice(1)，:key 用 flow.functionCode。统一 businessFlows 后移除 BROKER_SECTION_CODES / 仅商品房 developerCommodityFlow 分叉，同一套权限列表驱动两套布局。",
+   "evidence": "示例 authorizedSectionCodes = ['commodityHouseTrade','secondHandHouseTrade'] → businessFlows 长度 2 → 首行商品房、次行存量房。",
+   "files": [
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+    "zhi2-web-admin/src/views/home/components/layouts/HomeLayoutSidebar.vue",
+    "zhi2-web-admin/src/views/home/components/layouts/HomeLayoutAdmin.vue",
+    "zhi2-web-admin/src/views/home/index-new.vue"
+   ],
+   "baseline": "fd73e47",
+   "sessionIds": [
+    "034544ce-33ea-4a3e-a159-062dba42270d"
+   ],
+   "bundle": "031.md",
+   "project": "门户"
+  },
+  {
+   "title": "首页 layoutVariant 皮肤不再按板块权限推断 broker",
+   "type": "fact",
+   "content": "homeLayout.js 中 resolveHomeLayoutVariant 重构后删除了「仅有 secondHandHouseTrade / housingRental 板块权限 → layoutVariant broker」「仅商品房 → developer」的 bizSectionCodes fallback；broker/developer 统计区与皮肤（如 HomeStatsBar vs HomeDeveloperStatsRow）现主要由 roleKey 决定。若产品仍要求「无经纪 roleKey 但有二手/租赁板块即经纪皮肤」，需在 roleKey 判断后显式补回 fallback 并单测边界。",
+   "evidence": "审查标为 HIGH：B 端用户仅有存量房/租赁板块、无 jjjg/zljg roleKey 时，旧逻辑为 broker 皮肤，新逻辑会落到默认 developer。",
+   "files": [
+    "zhi2-web-admin/src/views/home/config/homeLayout.js"
+   ],
+   "baseline": "fd73e47",
+   "sessionIds": [
+    "034544ce-33ea-4a3e-a159-062dba42270d"
+   ],
+   "bundle": "031.md",
+   "project": "门户"
+  },
+  {
+   "title": "layoutVariant 变更拉统计须等 permsLoaded",
+   "type": "workflow",
+   "content": "homeDataMixin 对 layoutVariant 的 watch 去掉 immediate，仅在 permsLoaded 为 true 时调用 fetchStats；首次统计在 fetchFunctions 末尾显式触发。避免 authorizedSectionCodes / variant 未就绪时用错误 layoutVariant 拉首页统计数据。",
+   "evidence": "会话 034544ce MEDIUM：属合理修正；与权限加载时序强相关，后续若 variant 在 perms 之后仍会变化需保证 watch 仍能覆盖。",
+   "files": [
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js"
+   ],
+   "baseline": "fd73e47",
+   "sessionIds": [
+    "034544ce-33ea-4a3e-a159-062dba42270d"
+   ],
+   "bundle": "031.md",
+   "project": "门户"
+  },
+  {
+   "title": "PortalDetailHeader 样式挂在 .public-portal 全局 SCSS",
+   "type": "pattern",
+   "content": "publicPortal 统一详情头 PortalDetailHeader.vue 本身无 <style>，头部样式在 portal.scss（选择器如 .public-portal .portal-detail-backdrop .portal-detail-header），且由 PortalDialogHost 引入 portal.scss。在 .public-portal 外复用该组件会几乎无样式；新增门户弹窗应挂在 PortalDialogHost 树下并保持 aria-labelledby 与 title-id 配对。",
+   "evidence": "会话 a8453950 审查：DOM 与选择器一致、可访问性保持；MEDIUM 指出组件与全局 SCSS 强耦合。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/components/PortalDetailHeader.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/portal.scss",
+    "zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "a8453950-74d6-4a0a-9b84-7e8797aa1443",
+    "8088d086-ac9e-4292-b17b-9ffd0590a85f"
+   ],
+   "bundle": "031.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户详情弹窗正文内边距统一规则与例外",
+   "type": "pattern",
+   "content": "portal.scss 对 .portal-detail-dialog 正文区统一：上下 24px、左右 40px（与 form-box 一致）；窄屏 max-width 650px 时左右 16px。例外：房屋详情 portal-house-body、租赁人员 rental-person-body（右侧照片留白）保持各自布局。PropertyDetailDialog / RentalDetailDialog 应去掉正文重复的 margin 与垂直 padding，避免与全局规则叠两层。",
+   "evidence": "会话 8088d086 按「首页所有弹窗」统一内边距；租赁企业/信用弹窗由 32px 改为走全局 40px。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/portal.scss",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/components/RentalDetailDialog.vue",
+    "zhi2-web-admin/src/views/home/components/UnifiedLoginMenuMoreDialog.vue"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "8088d086-ac9e-4292-b17b-9ffd0590a85f"
+   ],
+   "bundle": "031.md",
+   "project": "门户"
+  },
+  {
+   "title": "zhi2-web-admin 门户无仓库级 TypeScript 校验",
+   "type": "fact",
+   "content": "门户前端 zhi2-web-admin 以 Vue 2 + JS 为主；仓库无 tsconfig、package.json 无 typecheck 脚本。审查/回归 publicPortal 的 .vue 组件不能依赖 tsc；E2E 为 .ts 文件但属 Playwright 侧，与业务 SFC 类型检查分离。可用 eslint 对具体 Vue 文件做静态检查。",
+   "evidence": "会话 a8453950：明确未执行 tsc，PortalDetailHeader/PropertyDetailDialog eslint 通过。",
+   "files": [
+    "zhi2-web-admin/package.json",
+    "zhi2-web-admin/src/views/home/publicPortal/"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "a8453950-74d6-4a0a-9b84-7e8797aa1443"
+   ],
+   "bundle": "031.md",
+   "project": "门户"
+  },
+  {
+   "title": "经纪分支机构详情页不展示交易记录",
+   "type": "preference",
+   "content": "publicPortal 经纪「分支机构基本信息」store-detail 场景按产品要求不展示下方交易记录表格；字段与布局对齐设计图，负责人电话在分店详情保持完整号码（与经纪人详情脱敏策略不同）。列表 mock 进入详情时带 parentAgency；书签直达 store-detail 若缺 parentAgency 未做路由兜底。",
+   "evidence": "会话 fbcede5c 用户明确要求去掉交易记录；审查确认仅从列表进入的正常路径已满足。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/mock/brokers.js",
+    "zhi2-web-admin/src/views/home/publicPortal/portal.scss"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "fbcede5c-3408-4b17-a700-fe4ca4fd9b05"
+   ],
+   "bundle": "031.md",
+   "project": "门户"
+  },
+  {
+   "title": "首页统计卡今日橙本月蓝",
+   "type": "preference",
+   "content": "HomeStatCard 指标配色约定：「今日」使用橙色 #F5A623（与首页住房租赁板块主题色一致），「本月」使用蓝色 #2B5EA7。调整统计卡或首页主题色时需保持二者区分，避免与用户已确认的橙/蓝语义冲突。",
+   "evidence": "会话 0aa11988 用户先提蓝/绿再改为「今日橙色、本月蓝色」并已写入 HomeStatCard.vue。",
+   "files": [
+    "zhi2-web-admin/src/views/home/components/HomeStatCard.vue"
+   ],
+   "baseline": "ac6513b",
+   "sessionIds": [
+    "0aa11988-ce1f-4e89-9c19-4e0a6ad2e936"
+   ],
+   "bundle": "031.md",
+   "project": "门户"
+  }
+ ]
+}

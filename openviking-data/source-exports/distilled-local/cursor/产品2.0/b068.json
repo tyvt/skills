@@ -1,0 +1,130 @@
+{
+ "project": "产品2.0",
+ "batch": "068",
+ "files": [
+  "068.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "这个下载模板接口可能会返回json报错，兼容一下",
+   "type": "bug",
+   "content": "已兼容下载模板接口返回 JSON 报错的情况，改动如下： ### 问题原因 `importTemplate` 使用了 `responseType: 'blob'`。接口报错时返回的是 JSON，但被当作 Blob 处理： - **HTTP 4xx/5xx**：axios 进入错误拦截器，但 `response.data` 是 Blob，读不到 `msg`，只能显示 `Request failed with status code 400` - **HTTP 200 但 body 为 JSON 错误**：会误当成 Excel 文件下载 ### 修改内容 1. **`src/utils/request.js`** — 错误拦截器支持解析 Blob 中的 JSON，正确展示 `msg` 2. **`src/utils/index.js`** — 新增 `downloadBlobFileWithCheck`：下载前判断是否为 JSON 错误响应 3. **`spFeeBill/components/import.vue`** — `getTemplate` 改用 `downloadBlobFileWithCheck` 再次点击「下载账单模板」时，若收费标准未关联房屋，会显示后端返回的具体提示，例如： > 当前收费标准尚未关联任何房屋，请先前往收费标准详情绑定或通过房屋管理... 而不再是通",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "**`src/utils/request.js",
+    "**`src/utils/index.js",
+    "**`spFeeBill/components/import.vue",
+    "涉及文件：d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\bill\\components\\import.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\spFeeBill\\components\\import.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3f404cf2-9522-42c1-aa00-9a2837b4eb10"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: In",
+   "type": "bug",
+   "content": "**原因：** `certificatesTable.vue` 的 `operationButtons` 在 `attrs` 里写了 `permission: false`，通过 `v-bind=\"button.attrs\"` 传给了 `ZsButton`。该组件的 `permission` 类型是 `Array`，布尔值会触发 Vue 的类型校验警告。 **修复：** 从「新增」「删除」按钮的 `attrs` 中移除 `permission: false`。不传 `permission` 时，`checkPermission` 会视为无权限限制并显示按钮（与原先 `false` 的意图一致）。 **说明：** `buttons` 配置里保留的 `permission: false` 是给 `zs-operate-column` 用的，该组件用 `if (!button.permission) return true` 处理，不会传给 `ZsButton`，无需改动。 刷新从业人员详情页的证书区域后，控制台不应再出现该警告。若证书按钮需要走权限控制，可改为传入权限数组，例如 `permission: ['company:personnelRecord:add']`。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`certificatesTable.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-button\\zs-button.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\company\\staffManagement\\components\\certificatesTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "238293ef-3bd5-4396-98d5-3034f011a25c"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "已修复。删除接口 /presale/recordPr",
+   "type": "pattern",
+   "content": "已修复。删除接口 `/presale/recordPriceHouse/delete` 之前直接把 ID 数组作为请求体发送，后端需要的是 `priceRecordIds` 参数名。 修改了两个 API 文件中的 `delRecordPriceHouse`： ```29:35:zhi2-web-admin/src/api/pricehouse/recordPriceHouse.js export function delRecordPriceHouse(priceRecordId) { const ids = Array.isArray(priceRecordId) ? priceRecordId : [priceRecordId] return request({ url: '/presale/recordPriceHouse/delete', method: 'post', data: { priceRecordIds: ids } }) } ``` 现在删除请求体会是： ```json { \"priceRecordIds\": [123] } ``` `PriceTable.vue` 里的删除按钮无需改动，它会继续调用 `delRecordPriceHouse(ids)`。刷新页面后再试一次删除即可。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "```29:35:zhi2-web-admin/src/api/pricehouse/recordPriceHouse.js",
+    "`PriceTable.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\commercialHousingSales\\priceFiling\\recordPriceMngSuzhou、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\api\\presale\\recordPriceHouse.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\api\\pricehouse\\recordPriceHouse.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "be8bd962-663e-4c4a-8a14-79f95779a579"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "按照这个对照方式修改接口，代码里面可能是module",
+   "type": "preference",
+   "content": "已按你给的对照表完成**全局排查并替换**，两种调用方式都处理了： - 直接写死字符串接口（如 `'/maintenance/facility...'`）已改为 `'/dataProperty/facility...'` - `moduleName + businessName` 拼接方式中，若 `businessName` 属于这 9 个目标接口，`moduleName` 已从 `maintenance` 改为 `dataProperty` - 共修改了 `zhi2-web-admin/src` 下 **49 个文件** - 全局复查结果：这 9 个接口对应的旧路径 `maintenance/...` 已无残留 另外我发现并修正了一个误改点（已处理完）： - 3 处 `import '@/views/maintenance/...'` 被误替换为 `@/views/dataProperty/...`，已恢复为 `maintenance` 页面路径，避免编译报错 对应映射已按你图中的 9 条执行： - `facility` - `facilityChange` - `facilityDefinition` - `facilityFieldDefinition` - `facilityFundAllot` - `facilityFundAllotRange` - `facilityF",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "涉及文件：D:/repository/产品2.0、D:/repository/产品2.0/zhi2-web-admin/src、D:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/facility/index.vue、D:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/facility/components/RangeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2a1a3c5d-9f69-436a-93ed-f2b987edfc4a"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "系统工具-打印配置，维护打印参数保存报错打印配置ID",
+   "type": "bug",
+   "content": "## 问题原因 保存打印参数时，请求体里只有 `paramKey` 和 `paramValue`，缺少 `printConfigId`，后端因此返回「打印配置ID不能为空」。 根因在 `ParamsDialog.vue` 的 `confirm` 方法： ```106:106:zhi2-web-admin/src/views/tool/print/components/ParamsDialog.vue this.form.printConfigId = this.id ``` 原先写的是 `this.$attrs.id`，但 `ParamsDialog` 混入了 `dialogMixins`，其中已将 `id` 声明为 **prop**： ```10:15:zhi2-web-admin/src/mixins/dialogMixins.js props: { // 当前数据的主键ID id: { type: [String, Number], default: '' }, ``` 在 Vue 中，已声明为 prop 的属性不会出现在 `$attrs` 里，所以 `this.$attrs.id` 始终为 `undefined`，`printConfigId` 也就不会随请求发出。 数据流本身是通的：`PrintDialog` → `PrintParamsTable`（`:id=\"form",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`ParamsDialog.vue",
+    "```106:106:zhi2-web-admin/src/views/tool/print/components/ParamsDialog.vue",
+    "```10:15:zhi2-web-admin/src/mixins/dialogMixins.js",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\tool\\print\\components\\ParamsDialog.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\tool\\print\\components\\PrintParamsTable.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\tool\\print\\components\\PrintDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6fdd2549-8d41-469b-94b8-8cd8fe8a1f20"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "根据截图标注，已按 垂直居中 + 横向左对齐 处理。",
+   "type": "preference",
+   "content": "根据截图标注，已按 **垂直居中 + 横向左对齐** 处理。 ## 设计结论 详情页 `DetailTemplate` 的对齐规范应为： | 方向 | 对齐方式 | |------|----------| | **垂直** | 居中（标签与值在同一行内垂直居中） | | **横向** | 左对齐（标签、文本、金额等均左对齐；带「延期」按钮时，文字在左、按钮在右） | 「通知书金额」「通知书有效日期」不应单独居中，否则会和同行其他字段（如「是否有合同」标签、「缴款单位」）不一致。 ## 已做修改 **1. `pubPaymentNotice/detail.vue`** - 移除「通知书金额」「通知书有效日期」的 `align: 'center'`、`labelAlign: 'center'` - 金额字段改为 `align: 'left'`，与 `pubAllotNotice` 等页面一致 **2. `detail-template.vue`（全局组件）** - 行内单元格使用 `align-items: stretch`，保证同行等高 - 标签区、值区使用 `display: flex` + `align-items: center`，实现垂直居中 - 字典标签（如「否」）在值区域内垂直居中 刷新「资金缴款详情」查看模式后，「通知书金额」「通知书有效日期」应与同行字段垂直对齐，文字",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`pubPaymentNotice/detail.vue",
+    "`detail-template.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubPaymentNotice\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\detail-template\\detail-template.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b7d66167-3cc1-4c06-a65e-79b9682fb8f3"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "已修复「资产租赁申请详情」中「资产列表」表格的样式问",
+   "type": "bug",
+   "content": "已修复「资产租赁申请详情」中「资产列表」表格的样式问题。 ## 问题原因 1. **缺少竖线**：全局样式（`index.scss`）中，表格竖线仅在 `.sub-container` 容器内、且开启 `border` 时生效。`houseTable.vue` 未使用 `sub-container` 包裹，与同模块的 `subVenueTable`、`subOtherTable` 不一致。 2. **列间距不足**：序号列固定 `width=\"120\"`，其余列未设置 `min-width`，空数据时列宽过窄，「编号」与「名称」显得挤在一起。 ## 修改内容 在 `houseTable.vue` 中： 1. 用 `<div class=\"sub-container\">` 包裹表格区域，与项目内其他详情子表保持一致。 2. 序号列改为默认宽度（80px）。 3. 为各数据列设置合理 `min-width`（编号 120、名称 150、面积 120、位置 150、拟租金额 140）。 4. 为「拟租金额」列增加 `slot-width=\"120\"`，保证输入框列宽计算正确。 刷新页面后，表格应显示列间竖线，且各列间距正常。该组件也用于合同备案等页面，这些场景会一并受益。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "**缺少竖线**：全局样式（`index.scss",
+    "时生效。`houseTable.vue",
+    "`houseTable.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\assetLeaseApply\\components\\houseTable.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\styles\\index.scss"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "598aac99-dabd-44cd-9cf8-08c0eb4260e3"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,63 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-921060a8-573a-413d-858f-c07c8e7b2d5d/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T02:02:38.454237+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/09/持仓面板对齐核查.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-09 核查发现，持仓面板（config.js、holding.sqlite）与「打新底仓_最终8只组合_v2.csv」的 8 只目标加 w=0 的 000429.SZ 完全对齐（9 类字段零差异，校验 19/19 PASS）；但面板基准日停在 2026-11-04，与数据湖 2026-11-06 最新筛选未对齐：深市筛选结果 11-06 重跑后价格更新（格力 38.7 / 平安 11.64 / 粤高速 13.58 vs 面板 38.96 / 11.74 / 13.51），沪市一致；screen_sh.py/screen_sz.py 有未提交 PIT 防未来函数修正；configs/panel_extra_targets.json 未纳入版本库；main 领先远程 28 提交未推送。\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 持仓面板和筛选的最终结果对齐了吗\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 我先摸清当前工作区里\"持仓面板\"和\"筛选结果\"的实际文件，再核对是否对齐。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 关键发现：面板运行时**以 `holding.sqlite` 内的配置为准**，`config.js` 只是首次导入/手动同步源。我需要核对库内配置是否与最新产物一致。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 库内配置与 config.js 完全一致。但我注意到筛选链路上游有未提交改动，需要确认\"最终结果\"是否还是最新一轮。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 核查完了，结论要分两层说：**面板和「8 只最终组合」完全对齐，但和「最新一轮筛选产出」没有对齐。**\n\n## ✅ 对齐的部分\n\n| 核对项 | 结果 |\n|---|---|\n| [config.js](<分析产出/持仓面板/config.js>) 的 9 只 targets | = [打新底仓_最终8只组合_v2.csv](<分析产出/打新底仓_最终8只组合_v2.csv>) 的 8 只目标（w>0）+ `000429.SZ 粤高速A`（w=0、held=true，手工持仓） |\n| 8 只逐值比对 | `w / yld / pay / ocfd / vwap60 / ref_px / vol / payout2y / ocfd2y` 共 9 类字段**零差异** |\n| [holding.sqlite](<分析产出/持仓面板/holding.sqlite>) 的 `setting.cfg` | 与 config.js **完全一致**（9 只、margin.targetYld=4.8、generated=2026-11-06 20:54）——面板运行时以库内配置为准，已同步，不会触发\"config.js 已更新\"横幅 |\n| [校验结果.txt](<分析产出/校验结果.txt>) | 19/19 PASS，含「执行权重与 CSV 逐项一致」「沪市持仓全部通过 11 条 / ⑫⑬⑭」 |\n\n## ⚠️ 没对齐的部分\n\n1. **基准日停在 11-04**：面板 `meta.base`、成员权重、最终组合都是 `2026-11-04`；而数据湖已处理到 `2026-11-06`（[last_run.json](<logs/selection_update/last_run.json>)，status=warning、fundamentals 因东财熔断 `usable_result=false`）。\n2. **深市筛选结果已重跑、面板没跟上**：[深市专用标准_筛选结果.csv](<分析产出/深市专用标准_筛选结果.csv>) 11-06 18:22 被改（23 只名单不变，价格/波动/股息率全刷新）——格力 `38.7`、平安 `11.64`、粤高速 `13.58`，而面板 `ref_px` 是 `38.96 / 11.74 / 13.51`，**3 只对不上**；反观 [沪市主池_筛选结果.csv](<分析产出/沪市主池_筛选结果.csv>) 5 只价格与面板全一致 → 筛选结果本身沪深就不同步。\n3. **筛选脚本有未提交的口径修正**：[screen_sh.py](<分析产出/screen_sh.py>) / [screen_sz.py](<分析产出/screen_sz.py>) 各加了 2 行 PIT 防未来函数（年报 OCF 仅取公告日 ≤ 基准日），但改完没跑 `reselect_portfolio.py`，组合与面板没吸收这个修正。\n4. **panel_extra 数据源没进仓库**：[configs/panel_extra_targets.json](<configs/panel_extra_targets.json>) 是 `??` 未跟踪文件，`3c0b5f2c` 只提交了 `final_portfolio_v3.py` + `config.js` 两个文件 → 换环境 clone 后重跑，面板会丢掉 `000429`。\n5. **28 个提交未推送**：`main` 领先 `origin/main` 28 个提交（11-06 那次 push 超时），远程没有这些对齐成果；校验 19/19 里还有 3 项 `[SKIP]`（旧文档权重、替补席、组合波动同源比对）。\n\n一句话：**8 只名单和权重是齐的，但\"最终结果\"若指最新一轮筛选，还差一环重跑，且有一处配置文件漏进版本库。**"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/09/维持面板现状决定.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-09 经核查后决定保持现状，本次未改动任何文件、未执行 git 操作；组合与面板继续维持 2026-11-04 基准的 8 只名单/权重，等 11-06 数据源恢复（东财熔断、fundamentals 降级）后再考虑重跑。后续重跑顺序为 screen_sh.py / screen_sz.py → reselect_portfolio.py → final_portfolio_v3.py，跑完需重新校验 19 项并同步库内配置。\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 持仓面板和筛选的最终结果对齐了吗\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 已按选择保持现状，**本次未改动任何文件、未执行 git 操作**。\n\n- 组合与面板继续维持 `2026-11-04` 基准的 8 只名单/权重，等 11-06 数据源恢复（东财熔断、fundamentals 降级）后再考虑重跑。\n- 差异清单就留在上面这份核查里，另外两个已知缺口先记着：`configs/panel_extra_targets.json` 未纳入版本库（换环境重跑会丢 `000429`）、`main` 领先远程 28 个提交未推送。\n- 核查用的临时脚本已清理，无后台任务残留。\n\n后续若要重跑，顺序仍是 `screen_sh.py` / `screen_sz.py` → `reselect_portfolio.py` → `final_portfolio_v3.py`，跑完需重新对 `校验结果.txt` 的 19 项并确认库内配置已同步。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/python分析脚本/screen_sh.py.md",
+                "memory_type": "entities",
+                "after": "# screen_sh.py\n数据湖项目中用于沪市筛选的分析脚本（文件名暗示市场）。\n## 功能\n- 执行沪市标的筛选，输出沪市主池_筛选结果.csv\n- 2026-11-06 前加入 2 行 PIT 防未来函数修正（年报 OCF 仅取公告日 ≤ 基准日），但改完未跑 reselect_portfolio.py，组合与面板未吸收修正\n## 关系\n- 与 screen_sz.py 同为筛选链路脚本\n- 上游被 reselect_portfolio.py 调用以生成组合"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/python分析脚本/screen_sz.py.md",
+                "memory_type": "entities",
+                "after": "# screen_sz.py\n数据湖项目中用于深市筛选的分析脚本（文件名暗示市场）。\n## 功能\n- 执行深市标的筛选，输出深市专用标准_筛选结果.csv（2026-11-06 18:22 改，23 只名单不变，价格/波动/股息率全刷新）\n- 2026-11-06 前加入 2 行 PIT 防未来函数修正（年报 OCF 仅取公告日 ≤ 基准日），但改完未跑 reselect_portfolio.py，组合与面板未吸收修正\n## 关系\n- 与 screen_sh.py 同为筛选链路脚本\n- 上游被 reselect_portfolio.py 调用以生成组合"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/配置文件/config.js.md",
+                "memory_type": "entities",
+                "before": "# config.js\n持仓面板的配置文件，由 final_portfolio_v3.py 导出生成。\n## 内容\n- 包含 port 数组，每只标的含 payout2y、ocfd2y 字段\n- targets[] 含 governance、rules、margin 等配置\n## 关系\n- 由 final_portfolio_v3.py 写入\n- 被持仓面板前端 HTML 使用",
+                "after": "# config.js\n持仓面板的配置文件，由 final_portfolio_v3.py 导出生成。\n## 内容\n- 包含 port 数组，每只标的含 payout2y、ocfd2y 字段\n- targets[] 含 governance、rules、margin 等配置\n- 2026-11-06 20:54 生成，含 9 只标的：8 只来自「打新底仓_最终8只组合_v2.csv」(w>0) + `000429.SZ 粤高速A`(w=0、held=true 手工持仓)\n- margin.targetYld 固定为 4.8%\n## 关系\n- 由 final_portfolio_v3.py 写入\n- 被持仓面板前端 HTML 使用\n- 与 holding.sqlite 的 setting.cfg 完全一致（面板运行时以库内配置为准）"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/数据湖项目/持仓面板.md",
+                "memory_type": "entities",
+                "before": "# 持仓面板\n数据湖项目「分析产出/持仓面板」下的静态 HTML 持仓监控面板，用于红利底仓的买入推荐与风险预警。\n\n## 功能定位\n- 展示持仓/待建仓标的的买入推荐、占比、风险预警\n- 原买入逻辑基于 vwap60（60 日均价）折溢价与 skip_premium 过滤\n- 2026-11-06 升级后新增三列安全边际指标，vwap60 降级为无指标时的兜底\n\n## 文件结构\n- index.html：面板主页面与买入推荐表渲染（9 列）\n- config.js：面板配置，含 margin 参数块\n- _selftest.js：自测脚本，13 项指标单测 exit 0 通过\n- panel_margin_metrics.js / .json：数据脚本生成的指标\n- README.md：使用说明\n\n## 数据关联\n- 生成脚本：分析产出/panel_margin_metrics.py\n- 数据源：数据湖 duckdb 的 daily_bars_adj、corporate_actions\n\n## 配置要点\n- config.js 的 margin 参数块中固定股息率阈值 `targetYld`/`targetYldFixed`/`targetYldFloor` 与华润三九 `targetYldRef` 均为 4.8%\n- index.html 无 `margin.targetYld` 时回退默认 4.8；安全边际 localStorage 缓存键为 `panel_margin_v3`",
+                "after": "# 持仓面板\n数据湖项目「分析产出/持仓面板」下的静态 HTML 持仓监控面板，用于红利底仓的买入推荐与风险预警。\n\n## 功能定位\n- 展示持仓/待建仓标的的买入推荐、占比、风险预警\n- 原买入逻辑基于 vwap60（60 日均价）折溢价与 skip_premium 过滤\n- 2026-11-06 升级后新增三列安全边际指标，vwap60 降级为无指标时的兜底\n\n## 文件结构\n- index.html：面板主页面与买入推荐表渲染（9 列）\n- config.js：面板配置，含 margin 参数块\n- _selftest.js：自测脚本，13 项指标单测 exit 0 通过\n- panel_margin_metrics.js / .json：数据脚本生成的指标\n- README.md：使用说明\n\n## 数据关联\n- 生成脚本：分析产出/panel_margin_metrics.py\n- 数据源：数据湖 duckdb 的 daily_bars_adj、corporate_actions\n\n## 配置要点\n- config.js 的 margin 参数块中固定股息率阈值 `targetYld`/`targetYldFixed`/`targetYldFloor` 与华润三九 `targetYldRef` 均为 4.8%\n- index.html 无 `margin.targetYld` 时回退默认 4.8；安全边际 localStorage 缓存键为 `panel_margin_v3`\n- 截至2026-11-09，面板基准日停在2026-11-04，与数据湖2026-11-06最新筛选结果未对齐（深市价格差异）"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/python分析脚本/final_portfolio_v3.py.md",
+                "memory_type": "entities",
+                "before": "# final_portfolio_v3.py\n数据湖项目中用于生成持仓面板配置的分析脚本。\n## 功能\n- 按财年合并净利/OCF/分红，计算最近两个完整财年的 payout2y、ocfd2y\n- 为每个 targets[] 增加 governance 字段（由实控人核查.csv 的 owner_type 映射）\n- 补齐 PANEL_CONFIG 的 rules（含 max_buys/min_ticket 等）与 margin 块（生成的 config.js 中 margin.targetYld 为 4.8%，与主仓先前约定一致）\n- 包含 panel_extra 块（main 未提交改动，2026-11-06 合并时通过 stash 保留恢复）\n- 导出 config.js 及 CSV 新增 payout2y/ocfd2y 列\n## 关系\n- 属于数据湖选股模块分析产出脚本\n- 与 qa_checks.py 配合校验输出",
+                "after": "# final_portfolio_v3.py\n数据湖项目中用于生成持仓面板配置的分析脚本。\n## 功能\n- 按财年合并净利/OCF/分红，计算最近两个完整财年的 payout2y、ocfd2y\n- 为每个 targets[] 增加 governance 字段（由实控人核查.csv 的 owner_type 映射）\n- 补齐 PANEL_CONFIG 的 rules（含 max_buys/min_ticket 等）与 margin 块（生成的 config.js 中 margin.targetYld 为 4.8%，与主仓先前约定一致）\n- 包含 panel_extra 块（依赖 configs/panel_extra_targets.json，该文件未纳入版本库，换环境重跑会丢 000429.SZ；main 未提交改动，2026-11-06 合并时通过 stash 保留恢复）\n- 导出 config.js 及 CSV 新增 payout2y/ocfd2y 列\n## 关系\n- 属于数据湖选股模块分析产出脚本\n- 与 qa_checks.py 配合校验输出"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/profile.md",
+                "memory_type": "profile",
+                "before": "# github.com-tyvt-financial-data-lake\n- 正在维护个人持仓面板项目（单页 HTML + holding.sqlite）(as of 2026-11-06)\n- 正在维护数据湖选股模块（final_portfolio_v3.py、annual_review.py 等分析产出脚本）(as of 2026-11-06)",
+                "after": "# github.com-tyvt-financial-data-lake\n- 正在维护个人持仓面板项目（单页 HTML + holding.sqlite）(as of 2026-11-09)\n- 正在维护数据湖选股模块（final_portfolio_v3.py、annual_review.py 等分析产出脚本）(as of 2026-11-09)"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 4,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,76 @@
+{
+ "project": "园区物管2.0",
+ "batch": "009",
+ "files": [
+  "009.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "信用报告核定界面优化",
+   "type": "fact",
+   "content": "已在公共组件 `zs-table-column` 中修复，所有使用该组件的列表页都会受益，无需逐个改业务文件。 ### 问题根因 `zs-table-column` 原先只要检测到 `$scopedSlots.default` 存在，就把列宽固定为 **80px**。 但在 `v-for` + `v-if` 场景下，Vue 2 会为**每一列**都注册插槽函数，即使 `v-if` 为 false 不渲染内容，也会被误判为「自定义列」，导致整表列宽塌陷。 ### 公共组件修复（`zs-table-column.vue`） 1. **`hasEffectiveCustomSlot`**：实际执行插槽函数，判断是否真的渲染了内容（过滤 `v-if=false` 的空插槽）。 2. **`isMeasurableFlexSlot`**：区分两类列 - 文本类插槽（`span`、纯文本）→ 走弹性 `min-width` - 复杂组件插槽（`el-switch`、图片等）→ 仍用固定 `width`，可通过 `slot-width` 覆盖 3. **`measureSlotContentWidth`**：从插槽 vnode 提取文本，按实际展示内容计算列宽。 4. **弹性列注册**：用 `watch isFlexColumn` 动态注册/注销，保证表格 `fit` 正确开启。 ### 业务",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "公共组件修复（`zs-table-column.vue",
+    "`evaluationPlanReport/index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\credit\\evaluationPlanReport\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\credit\\evaluationPlanReport\\detail.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\credit\\evaluationPlanReport\\components\\CompanyTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0c43b56c-d4b3-4a08-9e9f-7c6394b3a716"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "切换车位类型，下面数据没有筛选",
+   "type": "bug",
+   "content": "后台代码检索已完成：在 `d:/repository` 下按 `*StandingBook*`、`*ParkingSpace*List*` 搜索约 5 分钟，**未找到相关 Java/后端文件**（当前仓库主要是前端 `zhi2-web-admin`）。 因此人防车位筛选仍以前端方案为准：用字典解析 + 标签匹配 + 切换筛选时带查询参数重新请求列表。若筛选仍异常，需要对照真实接口 `selectParkingSpaceList` 的返回字段，或到独立的后端项目里查 `StandingBook` 实现。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\operatingAssets.vue、d:\\repository\\园区物管2.0、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubParkingSpace\\components\\parkingDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a9ba015b-6bbe-4dd8-aec5-80470e748ad2"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "这两个页面的自适应改为，默认1920*1080的设计",
+   "type": "preference",
+   "content": "已按你的要求改在 **`renderCategoryBar`**（各类收入/支出分布柱图）里： ## X 轴不倾斜 - `axisLabel.rotate` 从 `22` 改回 **`0`**，类目横排显示。 ## 整体左移、吃掉左侧留白 - `grid.left` 从 `40` 改为 **`2`**（在 **`containLabel: true`** 下，左侧仍会按 Y 轴刻度与「万元」自动留足空间，只是去掉原先多出来的固定空白）。 - `grid.top` 略减为 **`6`**。 - X 轴不再倾斜后，`grid.bottom` 从 `42` 改为 **`32`**。 - Y 轴名称 `nameTextStyle.padding` 左侧从 `8` 改为 **`2`**，少占一点左边距。 若仍觉得左侧偏空，多半是 Y 轴数字位数较宽，`containLabel` 会按实际宽度留边；可以把 **`yAxis.axisLabel.fontSize`** 略调小（例如 `10`）再挤一点，需要的话我可以帮你改一版。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\assetPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\package.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "22e0765c-90e6-46b3-bfc1-bac3f4a724a4"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "切换小区后刷新页面",
+   "type": "preference",
+   "content": "已完成全局排查与修复，采用三层保障机制，避免切换小区刷新后查询参数丢失。 ## 问题根因 全项目共有 **67 处** 通过 `this.$store.state.user.currentProjectId` 获取当前小区 ID（用于 `complexId`、`projectId`、`parentDeptId` 等）。刷新后 Vuex 会重置，而列表页在 `created` 阶段就会发起请求，导致参数为空。 ## 修复方案 ### 1. 新增统一工具 `utils/projectContext.js` 集中处理 `localStorage` 中小区信息的读取、清理与兜底解析。 ### 2. Store 启动时即恢复（`user.js`） 应用加载时即从 `localStorage` 初始化 `currentProject` / `currentProjectId`，不等待 `GetInfo` 或弹窗逻辑。 ### 3. 新增全局 Getter（`getters.js`） - `currentProjectId`：state 为空时回退到 `localStorage` - `currentProject`：同上，含 `projectName` ### 4. 批量替换 67 处引用 将所有 `$store.state.user.currentProjectId` 改为 `$store.",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`utils/projectContext.js",
+    "启动时即恢复（`user.js",
+    "Getter（`getters.js",
+    "`Navbar.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c38a681a-e3b0-4637-8706-f8e910c1b6d0"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

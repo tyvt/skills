@@ -1,0 +1,78 @@
+{
+ "project": "无锡市区小程序嵌入H5",
+ "batch": "018",
+ "files": [
+  "018.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "(6-12) 这里的类型文字没有展示",
+   "type": "fact",
+   "content": "## 原因 `NoticeList.vue` 里苏住房样式用 `item.msgType` 配合 `getDictLabel` 显示类型，但父页面 `announcement/index.vue` 在把接口数据转成列表项时**没有带上 `msgType`**： ```80:88:d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages\\announcement\\index.vue res.rows = res.rows.map((el) => { return { id: el.msgId, typeName: el.displayLocation, msgType: el.msgType, // 已补充 date: el.publishTime, summary: el.msgTitle, publisher: el.publishUnit, } }) ``` `getDictLabel` 在 `val` 为空时直接返回 `''`，模板里就会落到 `|| \"-\"`，所以类型标签一直显示为 `-`。 对比小区公告页 `project/announcement/index.vue` 使用了 `...el` 展开，会保留 `msgType`，所以那边可能正常。 ## 修改 1. **`index.vue`*",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "`NoticeList.vue",
+    "`announcement/index.vue",
+    "```80:88:d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages\\announcement\\index.vue",
+    "`project/announcement/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "636ac7f6-e11f-4469-91e7-916792d8743b"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "小区信息页面下面留白太多",
+   "type": "bug",
+   "content": "**原因：** `.project-page` 设置了 `height: 100%`，在 `App.vue` 里 `uni-page-body` 也是 `height: 100%` 的情况下，页面容器会被强制撑满整个视口。内容不够高时，灰色背景就会一直延伸到屏幕底部，形成大片留白。 **修改：** 1. 去掉 `.project-page` 的 `height: 100%`，让页面高度随内容自适应 2. 保留 `padding-bottom: 32rpx`，底部留一点合理间距 刷新页面后，底部灰色留白应会消失，页面会在「小区周边」卡片下方自然结束。若还需要再收紧或放宽底部间距，可以说一下期望效果。",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "`App.vue",
+    "涉及文件：d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_owner\\project\\info\\index.vue、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\App.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "14093e7d-11b9-40d4-b69d-dba3df14e01c"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "onLoad is not defined",
+   "type": "fact",
+   "content": "原因是 `<script setup>` 里用了 `onLoad` 和 `nextTick`，但没有导入。 已按同目录 `index.vue` 的写法补上： - `onLoad` 从 `@dcloudio/uni-app` 导入（uni-app 页面生命周期） - `nextTick` 从 `vue` 导入 保存后热更新应能消除该报错。若仍有问题，可刷新页面或重启 dev 服务再试。",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "`index.vue",
+    "涉及文件：d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_benefit\\elevatorPubEngCons\\detail.vue、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_benefit\\elevatorPubEngCons\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fc168ac2-165e-49c0-8f11-5e6fff2146b4"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "这里的取值参考 @zhi2-mobile-admin",
+   "type": "pattern",
+   "content": "已按 `benefit/index.vue` 的方式调整地址取值，主要变更如下： 1. **模板**：将原来的 `[userStore.projectName, userStore.address].filter(Boolean).join(\"-\")` 改为 `{{ projectAddress || \"-\" }}`。 2. **逻辑**：新增与 benefit 页一致的 `buildRegionAddress` 和 `projectAddress` 计算属性——从 `userStore.houseList` 中按当前项目匹配房屋，优先拼接 `regionName-subdistrictName-communityName`，否则回退到 `house.address`。 3. **数据加载**：在 `onLoad` 中调用 `ensureProjectInfo()`，确保进入页面时房屋/项目信息已就绪，地址能正确显示。",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "`benefit/index.vue",
+    "涉及文件：d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_benefit\\benefit\\index.vue、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_benefit\\elevatorPubEngCons\\index.vue",
+    "@zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/elevatorPubEngCons/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "07179d96-198e-473a-9756-27bdde80b66b"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  }
+ ],
+ "_draft": true
+}

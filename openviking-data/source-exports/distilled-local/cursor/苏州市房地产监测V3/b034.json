@@ -1,0 +1,95 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "034",
+ "files": [
+  "034.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "修复预售许可详情历史表格不显示 Implement ",
+   "type": "preference",
+   "content": "已按计划修改 [`PermitHistoryPanel.vue`](zhi2-web-admin/src/views/presale/permit/components/PermitHistoryPanel.vue)，主要变更如下： ### 修复内容 1. **唯一行键** 新增 `normalizeHistoryRows()`，为每行生成 `_rowKey`（`presalePermitId` → `id` → `applyCode` → `history-${index}`），表格 `row-key` 改为 `_rowKey`，避免空值或重复 `presalePermitId` 导致 tbody 不渲染。 2. **表格布局** 增加 `ref=\"historyTable\"`、`auto-height`、`:show-summary=\"false\"`，数据加载后调用 `doLayout()`，解决 Tab 懒加载时高度计算异常。 3. **列展示与交互** - 自定义 slot 统一为 `{ scope }` + `scope.row` - 新增 `formatPermitNo()`：无 `permitNo` 时显示 `applyCode`（草稿场景） - 无 `presalePermitId` 时禁用「查看」按钮 ### 验证 - ESLint 已通过 - 请在浏览器中打开已",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`PermitHistoryPanel.vue`](zhi2-web-admin/src/views/presale/permit/components/PermitHistoryPanel.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permit\\components\\PermitHistoryPanel.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permit\\components\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8800fd20-adfa-49a7-b6f1-4d05b99a2454"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "注册 Stepper 图标样式修复 Implemen",
+   "type": "bug",
+   "content": "**原因**：`step-info-complete.png` 仍是「空心圆环 + 蓝色实心文档」，和第二步起各步完成态（**实心蓝圆 + 白色图标**）不一致，成功页第一步就会显得不对。 **修改**：完成态改为与法人/上传/股东相同——使用备份里原设计稿（旧 `step-info-current` 那版 **蓝底 + 白文档**）作为 `step-info-complete.png`；进行中的第一步仍是空心线框的 `step-info-current`。已重新执行 `generate-register-step-icons.py` 并更新 Stepper 视觉快照。 请 **Ctrl+F5** 强刷后再看提交成功页；Network 里确认 `step-info-complete.png` 已重新加载（可对比文件大小约 2.5KB、含大量白色像素）。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\institutionRegister\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "29f674a7-87a5-4f91-a9f2-46496ec2f4be"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "机构入网审核详情「服务方案」不显示修复计划 Impl",
+   "type": "bug",
+   "content": "## 修复说明 **原因**：机构入网审核详情在拉取 `/company/companyRegister/detail` 后，服务方案只走了 `/company/companyScheme/page`；审核中的方案在详情里的 `schemeList` / `companySchemeList`，分页接口常为空的，表格就显示「暂无数据」。 **改动**（[`zhi2-web-admin/src/views/company/institutionRegister/detail.vue`](zhi2-web-admin/src/views/company/institutionRegister/detail.vue)）： - 优先使用详情内嵌列表（取**第一个非空数组**：`companySchemeList` 或 `schemeList`） - 内嵌有数据时做前端分页 `slice`，**不再**请求 `pageCompanySchemes` - 内嵌为空时仍走原分页接口兜底 - 每次 `loadDetail` 将 `schemeQueryParams.pageNum` 重置为 1 经纪 / 租赁入网审核详情共用该页，改一处即可。 ## E2E 新增 [`zhi2-web-admin/e2e/company/institution-register-audit-scheme.spec.",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**改动**（[`zhi2-web-admin/src/views/company/institutionRegister/detail.vue`](zhi2-web-admin/src/views/company/institutionRegister/detail.vue",
+    "[`zhi2-web-admin/e2e/company/institution-register-audit-scheme.spec.js`](zhi2-web-admin/e2e/company/institution-register-audit-scheme.spec.js",
+    "`headline-spacing.spec.js",
+    "e2e/company/institution-register-audit-scheme.spec.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f93aa12c-1cdd-411f-adfa-0e6cc96d1075"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "表单和表格的数据填入时能不能加入动画效果，尽量不要太",
+   "type": "preference",
+   "content": "可以。已在 `zs-table` 里做成 **loading 只盖住表体，表头始终可见**。 ## 行为说明 1. **推荐写法**：`:loading=\"loading\"`（不再在 `zs-table` 上用 `v-loading`） - 在表体区域放一个定位层，遮罩只覆盖 `.el-table__body-wrapper`。 2. **兼容旧写法**：仍保留 `v-loading=\"xxx\"` 的页面（约 180 个） - 通过 `MutationObserver` + 布局同步，把 Element 插在根节点上的 `.el-loading-mask` **挪到与表体同宽同高**，表头不被遮住。 3. **布局变化**（窗口缩放、列宽均分、`doLayout` 等）时会重新对齐遮罩。 ## 已改文件 - `zs-table.vue`：`loading` prop、表体 loading 层、`syncExternalLoadingMask` 等 - `ListTemplate.js`、`shareholder/index.vue`：`v-loading` → `:loading` ## 使用注意 - 同一表格不要同时写 `v-loading` 和 `:loading`，否则可能出现两个 spinner。 - 新页面或顺手改旧页时，请统一为： ```vue <zs-table re",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`zs-table.vue",
+    "`ListTemplate.js`、`shareholder/index.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\shareholder\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-table-column\\zs-table-column.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a1b4be67-7417-433c-8ef3-ef6ce0abfd0d"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "修复子表操作按钮布局错乱 Implement the",
+   "type": "preference",
+   "content": "修复已完成，变更如下： ## 修复内容 ### 1. 批量替换子表工具栏结构（27 个文件） 将 `el-row.action-container` + `el-col` 嵌套写法，统一改为项目标准的 `div.operation-button-container`： - 承办银行 `YhwdTable.vue`（网点列表） - 监管协议、定金、解封、进度等 supervision 子表（约 22 个） - 商品房销售、维修资金对账等（3 个） **未修改的 2 个文件**（`SatisfactionTable.vue`）：其中的 `action-container` 是说明文字区域，不是按钮工具栏。 **手动处理**：`AppropriateTable.vue` 的按钮带 `v-if`，已单独迁移。 ### 2. 全局样式补充（`index.scss`） - 为 `.app-container .operation-button-container` 增加间距样式 - 为遗留的 `.action-container` 增加兜底样式，避免后续新增文件再出现布局问题 ### 3. 验证结果 - 已无 `el-row.action-container` 工具栏用法 - 关键文件 ESLint 检查通过 - `v-if` 等条件逻辑已保留（如 `AgreementDetailsTable",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`YhwdTable.vue",
+    "个文件**（`SatisfactionTable.vue",
+    "**手动处理**：`AppropriateTable.vue",
+    "全局样式补充（`index.scss"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "950b36b6-9125-4a56-b3cc-b120e966c656"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,100 @@
+{
+  "project": "苏住房G",
+  "batch": "105",
+  "files": ["105.md"],
+  "count": 7,
+  "memories": [
+    {
+      "title": "Windows 本机首次构建 Java 后端的两个拦路虎：空 .m2 解析不到父 POM、商业包被 mirrorOf=* 与 Maven 3.9 HTTP blocker 双重拦",
+      "type": "bug",
+      "content": "【什么情况】在从没本地构建过的 Windows 机器上跑 `mvn -B compile` 会连着撞两个坑：① 本地 `.m2` 是空的，父 POM `zhi2-be-parent` 解析不到，构建直接失败；② `com.aspose:aspose-words` 这类商业依赖**只存在于公司 Nexus（http 协议）**，被「`mirrorOf=*` 全量镜像」+「Maven 3.9 默认 HTTP blocker 拒绝非 https 仓库」双重拦截，同样拉不下来。工具链本身也缺：没装 JDK、没装 Maven。\n【为什么】这两个坑都不是业务代码问题，而是**本地构建环境从未初始化**导致的连锁失败：`mirrorOf=*` 把所有仓库（含公司私有 Nexus）都重定向到 central，私有包自然找不到；Maven 3.9 又新增了默认 HTTP blocker（`maven-default-http-blocker`），http 协议的 Nexus 直接被拒。若不先解决这两点，后面每次编译失败都会被误判成代码/依赖问题，反复空转。\n【怎么做】① 工具链装到独立目录（如 `D:\\tools`：Temurin JDK 8 + Maven 3.9.16），用 `mvn -v` / `javac -v` 验证；② 空 `.m2` 下先在父 POM 目录跑 **`mvn -N install`**（`-N` = 非递归，只装根 POM），把 `zhi2-be-parent` 装进本地库，再编子模块；③ 改 `settings.xml`：`mirrorOf` 从 `*` 改为**只代理 `central`**（如 `<mirrorOf>central</mirrorOf>`），让公司 Nexus 直连；同时**禁用 HTTP blocker**（`<blocked>false</blocked>` 或把仓库 id 排除出 mirror 匹配）；④ 验证顺序：先 `mvn -B compile` 全量通过，再 `clean package -DskipTests` 出 jar，最后才重启服务——**先验证再停机，避免白停**；⑤ 复盘结论要写清「根因是这台机器从没本地构建过」，而不是「依赖有冲突」。",
+      "evidence": "会话 session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6（基线 6156653）最终结论「排查掉两个真·构建拦路虎（这两次是实打实的失败，不是命令红绿噪声）」：「1. 空 `.m2` 下父 POM `zhi2-be-parent` 解析不到 → 先 `mvn -N install` 把根 POM 装进本地库。2. `com.aspose:aspose-words` 商业包只在公司 Nexus(http)，被我 `mirrorOf=*` + Maven 3.9 HTTP blocker 双重拦 → 禁用 blocker、镜像只代理 `central`、Nexus 直连，才 BUILD SUCCESS。」并给出「工具链 | 装 Maven 3.9.16 + Temurin JDK 8（`D:\\tools`）| `mvn -v` / `javac 1.8.0_504`」与复盘「根因是『这台机器从没本地构建过』——`.m2` 空、无 JDK、无 Maven，jar 都是别处来的」。",
+      "files": [
+        "pom.xml",
+        "settings.xml"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6"],
+      "bundle": "105.md"
+    },
+    {
+      "title": "「更新后端并重启」的标准 SOP：先全量 compile 通过再停机，原参数重启，健康判定=进程存活+端口监听+网关可连",
+      "type": "workflow",
+      "content": "【什么情况】需求是「更新代码 + 全量构建 + 重启」本地四个后端服务。正确顺序是：更新代码（`666c38f → ce348a3`，+8 提交，子模块同步到记录提交，全部 clean / ahead-0，fast-forward 无覆盖）→ `mvn -B compile`（14 模块 BUILD SUCCESS）→ `clean package -DskipTests`（BUILD SUCCESS，4 个 jar 重建）→ **才**停旧服务、用原参数启新服务。\n【为什么】先编译后停机能避免「停完才发现编译不过，白停一轮」；用**原参数**重启保证端口、Nacos 注册、配置一致；健康判定只做到「进程存活 + 端口监听 + 网关可连」而不做「逐接口冒烟」，是需要在交付里显式声明的**未验证项**——不声明就会让「服务起来了」被当成「业务可用」。\n【怎么做】① 依次验证 `mvn -v` / `javac -v` → `mvn -B compile` → `mvn clean package -DskipTests`，每步记 BUILD SUCCESS 与 jar mtime；② 重启四个服务并记新 PID/端口：common-gateway 33864/8080、service-expand-server 24192/9610、common-framework-server 15264/9211、common-flowable-server 16176/9700；③ 敏感配置（Nacos 密码等）**内存内复用，不落盘、不打印**；④ 交付时如实写「服务健康以『进程存活 + 端口监听 + 网关可连』判定；**未逐一跑业务接口/看启动日志**（重启时未重定向 stdout，日志未留存）」并主动提出可补接口冒烟；⑤ 工具链装在 `D:\\tools` 的，注明**未写入系统环境变量**，换终端构建需重新指定 PATH。",
+      "evidence": "会话 session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6（基线 6156653）最终结论「后端（更新代码 + 全量构建 + 重启）」表：更新代码 `666c38f → ce348a3`(+8 提交)、编译「14 模块 `mvn -B compile` → **BUILD SUCCESS** | 先验证再停机，避免白停」、打包「`clean package -DskipTests` → **BUILD SUCCESS**，4 个 jar 重建」、重启「4 服务原参数重启（nacos 密码内存内复用，未落盘未打印）」，并附服务表（common-gateway 33864/8080 ALIVE HTTP 连通、service-expand-server 24192/9610、common-framework-server 15264/9211、common-flowable-server 16176/9700）；「未覆盖/剩余风险（如实披露）」段写明服务健康判定口径与「Maven/JDK 装在 `D:\\tools`，**未写入系统环境变量**（仅本次会话 PATH 生效）」。",
+      "files": [
+        "pom.xml",
+        "settings.xml"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6"],
+      "bundle": "105.md"
+    },
+    {
+      "title": "给测试人员用的 E2E 要独立成 npm 包目录：不依赖前端代码、不改动前端文件，元素统一加 testid",
+      "type": "workflow",
+      "content": "【什么情况】用户诉求：「苏住房G项目的防汛相关的测试用例要独立出来给测试人员使用，**代码要内聚到一个目录，不要依赖前端代码**。给所有元素加 testid 并调整脚本回归。」最终在仓库根新建了 `D:\\repository\\苏住房G\\e2e-flood\\` 独立目录，**未改动前端任何文件**。\n【为什么】测试人员不是前端开发者：他们要能单独跑、单独看懂、单独改用例，而不是先读懂 Vue 源码 + 框架 mixin。如果用例散落在前端仓库里、依赖前端构建产物或源码常量，就等于把测试绑死在开发环境上；而靠 CSS 类名或文本定位元素，页面一改样式就全红。加 `testid` 正是把「定位契约」从视觉层独立出来。\n【怎么做】① 独立包结构：`e2e-flood/package.json`（`name=e2e-flood`、`private: true`、`playwright ^1.63.0`）+ `README.md` + `.env.example` + `.gitignore` + `run-all.cjs`（批量入口）+ `lib/flood-lib.cjs`（公共库）+ `cases/*.cjs`（用例）+ `e2e-fixtures/`（固定附件，如 `plan.pdf` 上传占位）；② 每个 `.cjs` 用 `node --check` 过语法，README 写清怎么跑；③ 元素定位统一走 `data-testid`，**优先给公共组件加 testid**（一次加多处生效），再用它改写所有脚本的选择器并重跑回归；④ 公共库设为只读契约——派发任务时明确「**禁止修改本文件**」，新增能力走新文件；⑤ 用例自包含：不引用前端源码路径、不依赖前端构建产物，只打部署后的站点。",
+      "evidence": "会话 session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6（基线 6156653）用户诉求 1：「苏住房G项目的防汛相关的测试用例要独立出来给测试人员使用，代码要内聚到一个目录，不要依赖前端代码。给所有元素加testid并调整脚本回归」；用户诉求 6 的 subagent 交付清单：「## 一、交付文件清单（新建于 `D:\\repository\\苏住房G\\e2e-flood\\`，**未改动前端任何文件**）」，含 package.json（name=e2e-flood/private/playwright ^1.63.0）、README.md、.env.example、.gitignore、run-all.cjs、lib/flood-lib.cjs(474 行)、e2e-fixtures/plan.pdf、cases/verify-flood.cjs、cases/flood-crud.cjs、cases/flood-crud-video.cjs、cases/flood-crud-batch1-video.cjs、cases/flood-crud-batch2-video.cjs、cases/flood-menus-video.cjs，均 `node --check` 通过。",
+      "files": [
+        "e2e-flood/package.json",
+        "e2e-flood/run-all.cjs",
+        "e2e-flood/lib/flood-lib.cjs",
+        "e2e-flood/README.md",
+        "e2e-flood/.env.example",
+        "e2e-flood/e2e-fixtures/plan.pdf"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6"],
+      "bundle": "105.md"
+    },
+    {
+      "title": "前端字段名以数据库表结构为准：达梦 all_tab_columns 核实后一次性砍掉自造的 id/code 参数",
+      "type": "pattern",
+      "content": "【什么情况】禅道 2162 要求「按后端给的字段修复」。前端当时用的是 `supervisionBankName`，还自造了 `supervisionBankId` / `supervisionBankCode` 两个状态与提交参数。核实达梦测试库后的事实是：`SYS_BANK_BRANCH` 与 `PUB_REGULATORY_AGREEMENT` **只有 `SUPERVISION_BANK_BRANCH_NAME` 一列，没有 ID/CODE 列**。\n【为什么】前端自造的 id/code 会**提交脏数据**给后端：后端根本不认这两列，但前端把它们塞进 body，接口可能静默忽略，也可能落进 JSON 扩展字段。更麻烦的是，为了让自造的 id/code 自洽，前端会写「按名称反查 ID」的兜底逻辑，徒增分支与出错面。字段名的真值来源只有后端表结构，禅道备注里的口头描述不算。\n【怎么做】① 先查库拿铁证：`SELECT column_name FROM all_tab_columns WHERE table_name = '...'`（达梦），确认**实际有哪些列**，而不是按命名习惯推断；② 字段改名做**全量替换**（本次 `supervisionBankName` → `supervisionBankBranchName`，3 个文件：协议页 `benefit/pubRegulatoryAgreement/detail.vue`、网点详情 `system/sysBankBranch/detail.vue`、网点弹窗 `system/workBank/components/pubRegulatoryBranchDialog.vue`）；③ **顺手删掉前端自造的 id/code 状态与提交参数**，只提交 name；④ 必须保留的历史兼容要写明兜底（如开户行账户兜底兼容旧 `row.supervisionBankName`）；⑤ 改完按四层核对一致性：`prop` / `rules` / `v-model` / `getForm` 键名，本次 grep 核对 9 处全对齐；⑥ 再加一道 node 语法检查（3 个 `<script>` 块全过）与 lint-staged `eslint --fix`。",
+      "evidence": "会话 session-07a67f50-976b-4f8b-9852-d834ed53c453（基线 6156653）用户诉求 5「按后端给的字段啊」、用户诉求 6「按后端给的字段修复，使用worktree修改和提交，不要切本地的分支，正在做其他需求」；最终结论「字段对齐交付」表：「后端事实（达梦测试库核实）| `SYS_BANK_BRANCH` / `PUB_REGULATORY_AGREEMENT` 仅有 `SUPERVISION_BANK_BRANCH_NAME` 一列，无 ID/CODE 列」「改名 | `supervisionBankName` → `supervisionBankBranchName`（3 文件，全量替换）」「清理 | 删除前端自造的 `supervisionBankId/Code` 状态与提交参数，避免脏数据；开户行账户兜底兼容旧 `row.supervisionBankName`」「验证 | …prop/rules/v-model/getForm 键名一致性 grep 核对 9 处全对齐」；并自注「先用达梦库 `all_tab_columns` 拿到铁证（只有 NAME 列），顺势把自造的 id/code 全部砍掉」。",
+      "files": [
+        "zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue",
+        "zhi2-web-admin/src/views/system/sysBankBranch/detail.vue",
+        "zhi2-web-admin/src/views/system/workBank/components/pubRegulatoryBranchDialog.vue"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-07a67f50-976b-4f8b-9852-d834ed53c453"],
+      "bundle": "105.md"
+    },
+    {
+      "title": "本地 checkout 有进行中的需求时用 git worktree 隔离改代码：临时 worktree 提交，用完即删，主分支原样不动",
+      "type": "workflow",
+      "content": "【什么情况】用户诉求：「按后端给的字段修复，**使用 worktree 修改和提交，不要切本地的分支，正在做其他需求**」。本地 `develop/v2.6.2-suzhufang-li` checkout 上还有未提交的 `vite.config.js`、`env/.env` 改动，切分支会把这些搞丢或被迫 stash。\n【为什么】在脏工作区上切分支是典型的高风险动作：未提交改动要么被带走、要么 checkout 失败、要么 stash 后忘记恢复。而「切到别的分支改代码再切回来」在有并发需求时几乎必然出错——用户正在另一个需求上工作，主 checkout 的状态必须**逐字节保持**。worktree 提供了第二个独立工作目录，同一个仓库的另一个分支可以在那里检出、提交、推送，主 checkout 完全不受影响。\n【怎么做】① 新建临时 worktree：`git worktree add D:\\repository\\zhi2-wt<任务号> <目标分支>`（本次目录名用任务号 `zhi2-wt2162`）；② 在 worktree 里完成修改、提交、rebase、推送；③ **用完即删**：`git worktree remove <路径>`（本次已删除）；④ 交付时明确核验「你当前的 checkout 和未提交的 `vite.config.js`、`env/.env` 改动**原样未动**（已核验）」；⑤ 父仓 gitlink 的差异要说明属预期（父仓在别的分支且用户有进行中需求，gitlink 指向旧提交属正常，等合并或回主线时再统一升级，不要替用户动）；⑥ 提交后仍要做校验（本次：`ea95e825d` → rebase 后 `f78fdd58a`，基于他人 `dbd161219` task 2104 之上无冲突，推送 `dbd161219..f78fdd58a`）。",
+      "evidence": "会话 session-07a67f50-976b-4f8b-9852-d834ed53c453（基线 6156653）用户诉求 6：「按后端给的字段修复，使用worktree修改和提交，不要切本地的分支，正在做其他需求」；最终结论「边界说明」：「**全程 worktree 隔离**：改动在 `D:\\repository\\zhi2-wt2162` 临时 worktree 完成，用完即删；你当前的 `develop/v2.6.2-suzhufang-li` checkout 和未提交的 `vite.config.js`、`env/.env` 改动**原样未动**（已核验）。」「父仓库 gitlink 未提交：父仓库现在在 li 分支且你有进行中的需求，gitlink 指向旧提交 `3cae35b7e` 属预期差异——等你合并 li 分支或回到主线时再统一升级到 `f78fdd58a`，我没有替你动。」",
+      "files": [
+        "zhi2-web-admin",
+        ".gitmodules"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-07a67f50-976b-4f8b-9852-d834ed53c453"],
+      "bundle": "105.md"
+    },
+    {
+      "title": "禅道工单的重复备注要合并成一条：保留首个解决备注、清空其余内容，操作历史保留不动",
+      "type": "workflow",
+      "content": "【什么情况】禅道 bug 5767 因为多次「提交推送 + 改状态」被写入了多条重复备注（#81705、#81710）。收口做法是：保留 **#81705** 的解决备注，**清空重复记录 #81710 的备注内容**，但**操作历史保留**。单据已由测试关闭，继续保持 `closed / fixed`。\n【为什么】禅道上的重复备注会让验收方看到多条互相重复、措辞还不一致的记录，分不清哪条是最终结论；直接删记录会连同操作历史一起丢失，审计链断掉。正确做法是「内容去重、历史保留」——内容只留一份权威表述，历史仍然完整可查。\n【怎么做】① 先看工单当前状态与已有备注，确认单据是测试关闭还是自己关闭；② 选一条作为**权威解决备注**（通常是最后一次提交对应的），其余重复记录清空备注正文、**保留操作历史**；③ 状态保持 `closed / fixed`（若已由测试关闭，不要改成别的状态）；④ 同步核对代码侧已推送且与远端一致（本次：子模块 `a64d58b67`、主仓库 `390d903`，与远端 `develop/v2.6.2-suzhufang` 均同步，**无需重复提交**）；⑤ 明确写出「未纳入本次提交」的内容（本次：当前工单迁移分支的未提交改动及本地环境配置），不要让工单备注与实际提交范围不一致。",
+      "evidence": "会话 session-9fe48a1a-a202-4601-9727-72ecfa8bcf2a（基线 5d68a74）用户诉求 4「提交推送，禅道改为一条备注」；最终结论：「**代码已提交并推送**：子模块 `a64d58b67`，主仓库 `390d903`；与远端 `develop/v2.6.2-suzhufang` 均同步，无需重复提交。」「**禅道 [5767](http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=5767) 已整理为一条解决备注**：保留 #81705，清空重复记录 #81710 的备注内容，操作历史保留。」「单据已由测试关闭，继续保持 **closed / fixed**。」「当前工单迁移分支的未提交改动及本地环境配置未纳入本次提交。」",
+      "files": [],
+      "baseline": "5d68a74",
+      "sessionIds": ["session-9fe48a1a-a202-4601-9727-72ecfa8bcf2a"],
+      "bundle": "105.md"
+    },
+    {
+      "title": "E2E 登录凭据写进仓库内 skill 供下次自动登录，且截图/图片必须识别完才算读全（口令本身不入记忆库）",
+      "type": "preference",
+      "content": "【什么情况】用户诉求 1：「tiany 的密码是 Field123456，写到 skill 里面，下次自动登录，**有图片的一定要识别完图片才算了解完整**。」\n【为什么】两点都是对「读上下文」和「省人工」的明确要求：① 测试账号口令固化到仓库内 skill，下一轮跑 E2E 可以直接自动登录，不必每次问人；② 「有图片一定要识别完」——只读图片旁边的文字而不读图片内容，等于漏掉了截图里真正的信息（往往错误信息、报错堆栈、验收标注都在图里），会导致基于不完整上下文下结论。\n【怎么做】① 把测试账号与登录入口写进**仓库内的 skill/规则文件**（与本地 `.agents/skills/...` 同一套约定），让后续会话自动读取并登录；② 口令属敏感信息：**写在仓库内的受限配置/skill 里由团队共享即可，不要复制进对外的记忆库、交付报告或聊天摘要**；③ 读需求文档时，凡附图必须逐张识别并把图里的关键信息（报错文案、期望效果、红框位置）写进结论；④ 读完图片再下结论，并在产出里注明「已识别 N 张图」，便于对方确认没有漏读。",
+      "evidence": "会话 session-9fe48a1a-a202-4601-9727-72ecfa8bcf2a（基线 5d68a74）用户诉求 1：「tiany的密码是Field123456，写到skill里面，下次自动登录，有图片的一定要识别完图片才算了解完整。」（按安全惯例，本条记忆只保留「口令写入仓库内 skill + 图片必须识别完」的约定，不复制口令明文）",
+      "files": [
+        "zhi2-web-admin/.agents/skills/flood-page-guard/SKILL.md"
+      ],
+      "baseline": "5d68a74",
+      "sessionIds": ["session-9fe48a1a-a202-4601-9727-72ecfa8bcf2a"],
+      "bundle": "105.md"
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+ "project": "园区物管2.0",
+ "batch": "058",
+ "files": [
+  "058.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "最后一个连接先穿过点了，两点直接的连接线上下留点空",
+   "type": "bug",
+   "content": "已处理。 ### 原因 左侧 `.step-axis` 用了 `padding-top: 10px`，圆点贴在轴列**上方**；右侧 `.step-body` 里是 `align-items: center`，文字在整行里**垂直居中**。行高由右侧撑开后，圆点就会显得比文字**偏上**。 ### 修改 1. **`.step-axis`**：去掉 `padding-top`，加上 `align-items: center`，让圆点在左侧这一列里与行高对齐、**与右侧文字同一中线**（行仍是 `stretch`，左列拉满高度后居中圆点即可）。 2. **连接线 `::after`**：圆点不再固定在距顶 `10px`，改为相对行高用 `top: calc(50% + 半径 + 间距)`，高度改为 `calc(100% + 行间距 - 圆点直径 - 2×线隙)`，在圆点仍上下留空的前提下与新的圆心位置一致。 刷新页面后，圆点应与标签文字垂直对齐。若某一行因换行变高（当前标签是 `nowrap`，一般不会），再微调即可。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\maintenance\\query\\components\\sideBar.vue",
+    "@zhi2-web-admin/src/views/maintenance/query/components/sideBar.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "09b1a4c9-aac5-4969-af5d-8a1c524b2f0e"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "参考这些页面修改@zhi2-web-admin/sr",
+   "type": "bug",
+   "content": "已按你参考的页面把 `zhi2-web-admin/src/views/property/complexChange/detail.vue` 的“区域概览”样式对齐完成，主要改动如下： - 视图结构改为和 `complex/detail.vue` 一致：`DetailTemplate` + `area-overview-wrapper` 并排布局。 - 统计区从原来的 `stat-row` 三行布局，改为 `stat-column` 三列布局（每列两项），与参考页一致。 - 同步了关键样式参数： - `area-info-container`/`area-overview-wrapper` 宽度统一为 `560px` - 图片改为 `max-width: 340px`、`height: 180px`、`object-fit: cover` - 统计区改为 `display: flex` + `gap: 12px`，列内 `gap: 15px` - 增加 `:deep(.collapse-container)` 高度适配 - 样式块切换为 `scoped lang=\"scss\"`，与参考页保持一致。 另外我已检查该文件的 lints，当前无新增报错。 如果你希望“区域概览”在窄屏下也能自适应（比如自动换行成 2 列或 1 列），我可以再补一版响应式样式。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`zhi2-web-admin/src/views/property/complexChange/detail.vue",
+    "`complex/detail.vue",
+    "涉及文件：D:/repository/园区物管2.0/zhi2-web-admin/src/views/property/complex/detail.vue、D:/repository/园区物管2.0/zhi2-web-admin/src/views/property/complexChange/detail.vue",
+    "参考这些页面修改@zhi2-web-admin/src/views/property/complexChange/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0133feff-e930-40ca-a2a9-5764a587a20a"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "饼图和柱状图右上角缺少单位展示",
+   "type": "preference",
+   "content": "已处理。原因是柱状图、饼图此前只在坐标轴上用 `name: '万元'` 等表示单位，容易看不清或不在卡片标题行的右上角。 ### 修改说明 1. **模板** 为下列图表增加标题行容器 `chart-wrap__header`：左侧标题、右侧 **`单位：万元`** - 各区账户余额分布图（横向柱图） - 各类收入 / 支出分布图（纵向柱图） - 各区收入 / 支出分布图（饼图） 2. **样式** 新增 `.chart-wrap__header`、`.chart-wrap__unit`，用 flex 把「单位：万元」固定在标题行右侧，字号与灰色与现有轴标签风格一致。 3. **ECharts** - `renderAccountBalanceBar`：去掉横轴上的 `name: '万元'`，避免与标题行单位重复。 - `renderCategoryBar`：去掉纵轴上的 `name: '万元'`，同样避免重复。 趋势图仍用左右 Y 轴上的「单位：个 / 单位：万元」，未改。 若以后某块图不是万元（例如改成元），可把对应卡片里的文案改成绑定字段，例如 `{{ someUnitText }}`。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "94419466-19b6-4c9f-a1f3-1926eccfdd49"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "index.vue:767 [ECharts] `s",
+   "type": "preference",
+   "content": "已修复。原因是 `renderFundTrendMixed` 在 ECharts 的 `finished` 事件里**同步**调用了 `chart.setOption`（约第 767 行），而 ECharts 不允许在主渲染流程中再次 `setOption`，因此会打出该警告。 **修改说明：** 1. 用 `requestAnimationFrame` 将 `setOption` 推迟到下一帧，脱离主渲染流程。 2. 用 `lastTrendUnitPos` 缓存位置，位置未变时不再更新，避免 `finished` → `setOption` → `finished` 循环。 3. 为仅更新 `graphic` 的 `setOption` 增加 `{ replaceMerge: ['graphic'] }`，合并更明确。 刷新资金全景页后，控制台不应再出现 `[ECharts] setOption should not be called during main process`；左右「单位：份 / 万元」的对齐逻辑不变。若仍有告警，把完整堆栈发我即可。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a395cc5d-72f9-4306-9d72-5b93ee55101d"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "已根据新接口结构更新 assetPanorama/i",
+   "type": "bug",
+   "content": "已根据新接口结构更新 `assetPanorama/index.vue` 中的解析逻辑。 ## 变更说明 `operatingResources` 的 `assetCategories` 现为**扁平列表**：同一 `category`（如「公共场地」）下有多条带 `subCategory` 的记录；`subCategory` 为 `null` 时表示大类本身（如「广告位」）。 在 `parseAssetCategories` 中做了适配： 1. **自动识别**：若列表中存在非空 `subCategory`，则按子类展示。 2. **展示名称**：有 `subCategory` 用子类名（如「快递柜/驿站」「其他场地」）；否则用 `category`（如「广告位」）。 3. **配色**：仍按父级 `category` 取色（`operatingResourceCategoryColors` 中的「广告位」「公共场地」），子类与父类同色。 4. **其它字段**：`count`、`ratio`、`regionAsset` 逻辑不变，区域条形图仍按区名读取。 按你提供的示例数据，环形图会显示 `count > 0` 的 4 项：**广告位(4)**、**快递柜/驿站(1)**、**其他场地(2)**、**临时摊位(1)**，合计 8，与 `data.count` 一致；`count",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`assetPanorama/index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\api\\benefit\\assetPanorama.js、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\assetPanorama\\mock.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c124ec6d-cfdd-4039-bf13-b501e1b22a3a"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "入账金额的提示放在表头上",
+   "type": "pattern",
+   "content": "已将「入账金额」的提示从每行单元格移到表头。 具体改动： - 在 `incomeAmount` 列增加 `slot=\"header\"`，表头显示「入账金额」和 info 图标，悬停展示说明 - 单元格只保留金额数值，不再重复显示提示图标 刷新页面后，在收入类单据列表的「入账金额」表头即可看到提示图标。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubVerificationReceipts\\components\\VerificationReceiptDetailTable.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\components\\zs-table-column\\zs-table-column.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7627d6c0-682a-4b8c-b64a-18af71eaae7a"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

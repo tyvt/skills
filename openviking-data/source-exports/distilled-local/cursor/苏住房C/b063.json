@@ -1,0 +1,96 @@
+{
+ "project": "苏住房C",
+ "batch": "063",
+ "files": [
+  "063.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "{\"请求地址\": \"https://ydzt.jsz",
+   "type": "preference",
+   "content": "是的，你的判断正确。这次「参与决策 → 签字 → 提交」的上传**没有走通用的苏服办图片上传通道**，根因在 `SignBoard.vue`。 ## 问题分析 从日志可以对比出，当前请求走的是**普通 POST 网关**，而不是**文件上传网关**： | 字段 | 当前错误请求 | 正确的苏服办上传 | |------|-------------|-----------------| | `interface_id` | `szffluzm-whyhxx`（POST 接口） | `szffluzm-wjsc`（上传专用接口） | | `version` | `2.1` | `v2.1` | | `header` | 含 `zs-sign`、`zs-param` 等 | 仅 `zs-authorization`、`zs-path`、`zs-source` | | 文件 | 未附带 | FormData 中应有 `file` 字段 | `gateway.js` 里通过 `config.file` 判断是否走上传逻辑： ```222:232:zhi2-mobile-shimin/src/api/gateway.js const isFileUpload = !!config.file const fileField = config.fileField || 'file' // ... ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`SignBoard.vue",
+    "`gateway.js",
+    "```222:232:zhi2-mobile-shimin/src/api/gateway.js",
+    "`httpInstance.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "79a544a0-5a29-4c3d-acb1-c80b3b9dfa2c"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏找房页面切换tag没有调用接口",
+   "type": "fact",
+   "content": "已修复苏找房页切换 tab 不请求接口的问题。 ## 原因 `Project_Suzhufang.vue` 里 `ProjectTabBar` 同时写了 `v-model` 和 `@update:model-value`： ```67:67:zhi2-mobile-shimin/src/pages/index/components/Project_Suzhufang.vue <ProjectTabBar :model-value=\"curTab\" :tabs=\"tabList\" @update:model-value=\"tabChange\" /> ``` 在 uni-app 中，`v-model` 会绑定 `update:modelValue`，可能覆盖自定义的 `@update:model-value`。结果是： - tab 高亮会切换（`curTab` 被 v-model 更新） - `tabChange` 不会执行 - `this.$refs.paging?.reload()` 不会被调用 - 列表接口不会重新请求 ## 修复 1. 去掉 `v-model`，改为 `:model-value` + `@update:model-value=\"tabChange\"` 2. 在 `$nextTick` 后再调用 `reload()`，确保 `curIndex` 更新后再触发分页请",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`Project_Suzhufang.vue",
+    "```67:67:zhi2-mobile-shimin/src/pages/index/components/Project_Suzhufang.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\Project_Suzhufang.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\Project_Suzhufang.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\project.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6e707628-a295-466a-98ef-4fff34cf5423"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "sticky位置不对",
+   "type": "bug",
+   "content": "已修复二手房列表页筛选栏吸顶位置问题。 **原因：** `.sticky-box` 使用了 `top: 40px`，滚动吸顶时会在导航栏下方留出约 40px 空隙，上方 banner 等内容会从缝隙中露出来。 **修改：** 1. 将 `tab-line`（全部/个人房源/中介房源）移入 `sticky-box`，与筛选栏一起吸顶 2. 将 `top: 40px` 改为 `top: 0`，紧贴页面内容区顶部（导航栏下方） 滚动后，Tab 和筛选栏会整体固定在导航栏下方，不再出现空隙。请刷新页面验证效果。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\commonNew\\conditionScreening.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9ab5f462-ee46-4fde-9e2b-8231f0fab02d"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "pages_transaction/newHouse",
+   "type": "preference",
+   "content": "已修复该报错，原因和改动如下。 ## 问题原因 报错 `Cannot read property 'fileSite' of undefined` 出在 `swiperComponent` 渲染轮播时，对 `item.fileSite` 的访问未做空值保护。 主要有两点： 1. **`detail.vue` 逐条 `push` 图片数据**：接口返回后图片是一条条加入 `allImg` 的，视频加入时还会改变 `allList` 顺序（视频排在最前），触发多次重算和重渲染。 2. **`:key=\"index\"` 不稳定**：列表头部插入视频后索引整体偏移，微信小程序下容易出现渲染时 `item` 为 `undefined` 的情况。 ## 修复内容 **`swiperComponent.vue`** - 模板中改为 `item?.fileSite`，避免空值报错 - `allList` 增加 `filter`，过滤无效项 - `:key` 改为 `item.fileSite || index` - `tabChange` 修正切换到「图集」时 `currentSlide` 越界 - `getVideoType` 增加空值判断 **`detail.vue`** - 图片/视频数据改为一次性赋值 `this.allImg = mediaList`，避免多次 `push` 引发中间态 ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`detail.vue",
+    "**`swiperComponent.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\commonNew\\swiperComponent.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouse\\detail.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\commonNew\\swiperComponent.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "db12bfb7-5b5d-404f-93cd-258941957c3c"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏服办登录成功后需要立刻调用V2换V1token的接",
+   "type": "bug",
+   "content": "问题已定位并修复。 **原因：** 苏服办登录逻辑在 `App.vue` 的 `initSfbUser` 中，ticket 换 token 成功后只保存了 V2 token（`accessToken`），没有调用 `getTokenV1()` 换取 V1 token。普通登录页（`login/index.vue`）和 redirect 页在登录后都会调用该接口，苏服办流程漏掉了这一步。 **修改：** 在 `initSfbUser` 中，设置 V2 token 后立即调用 `getTokenV1()`，并将结果写入 `userStore.tokenV1`： ```45:50:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\App.vue const v1Res = await getTokenV1() if (v1Res?.data?.code == 200) { userStore.setTokenV1(v1Res.data.msg) } else { userStore.setTokenV1('') } ``` 这样苏服办登录后会与普通登录保持一致，依赖 V1 token 的接口（文件上传、交易等 `apiV1` 请求）才能正常工作。可在苏服办 H5 环境重新进入应用验证登录后 V1 接口是否正常。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`App.vue",
+    "token。普通登录页（`login/index.vue",
+    "```45:50:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\App.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\maintenance.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\security.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\redirect\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\store\\user.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cf09ca87-b417-43c0-b05d-5168f3aa3e55"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

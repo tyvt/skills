@@ -1,0 +1,123 @@
+{
+ "project": "淮安物管",
+ "batch": 4,
+ "files": [
+  "013.md",
+  "014.md",
+  "015.md",
+  "016.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "开户申请详情隐藏账户公开并固定传 accountDisclosure=1",
+   "type": "workflow",
+   "content": "淮安物管「收益监管 → 开户申请」详情页（`benefit/pubRegulatoryAccount/detail.vue`）业务要求账户始终公开：移除操作栏「设置账户公开」按钮及 `accountDisclosureDialog` 相关逻辑；表单初始值设 `accountDisclosure: '1'`；在 `submitForm` 提交前统一 `this.form.accountDisclosure = '1'`，新增与修改均固定传公开，用户不可在页面上改此字段。",
+   "evidence": "会话 10ceac4a：用户通过截图/ diff 提出开户申请页改造；结论明确三步（隐藏按钮、默认公开、保存固定传值）。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue"
+   ],
+   "baseline": "53c813e",
+   "sessionIds": [
+    "10ceac4a-2a59-4904-83fb-1575abd77e6f"
+   ],
+   "bundle": "013.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "列表导出 zs-button 须配置 permission 否则无权限用户仍可见",
+   "type": "pattern",
+   "content": "淮安物管列表页若导出用 `zs-button` 且未写 `permission`，按钮会一直显示；`zs-button` 仅在配置了 `permission` 时通过 `checkPermission` 控制显隐，无权限用户点击后才由接口提示无权限。开户申请列表（`pubRegulatoryAccount/index.vue`）应对齐项目管理等页：导出按钮增加 `permission: [this.perms.export]`，权限标识如 `benefit:pubRegulatoryAccount:export`。",
+   "evidence": "会话 1e81a46d：用户要求无导出权限时不显示导出按钮；结论归因于缺少 permission 字段。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/index.vue",
+    "zhi2-web-admin/src/components/zs-button/zs-button.vue"
+   ],
+   "baseline": "1b9f773",
+   "sessionIds": [
+    "1e81a46d-d7d6-4b7a-9e41-93e0635341db"
+   ],
+   "bundle": "013.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "Headline 收起后仍占位导致内嵌 Tab 露出",
+   "type": "bug",
+   "content": "【现象】公共查询等详情里，Headline 点「收起」后区块标题藏了，但内嵌 zs-tabs/表格仍露在页面上。【根因】① Headline `.hide` 只设 `height:0`，未清 `padding`，且 `height` 从 `auto` 过渡到 `0` 不可靠，折叠动画期间内容仍占位；② 外层包裹（如 `.benefit-asset-section`）在收起态仍保留 `padding-bottom`。【做法】① Headline `.hide` 补 `padding:0`、`overflow:hidden`；② 区块 padding 只绑展开态（`:not(.hide)`），收起态 `padding:0`；③ 与折叠强绑定的 Tab/表格用 `v-show` 跟 Headline 的展开状态同步，避免只靠 CSS 高度折叠。",
+   "evidence": "会话 ecf792d3：经营资产信息收起后 tab 仍可见；修 detail.vue + Headline/index.vue。",
+   "files": [
+    "zhi2-web-admin/src/components/Headline/index.vue",
+    "zhi2-web-admin/src/views/publicQuery/complex/detail.vue"
+   ],
+   "baseline": "dc21427",
+   "sessionIds": [
+    "ecf792d3-a14e-431a-bd1e-dd28a0cdae7b"
+   ],
+   "bundle": "015.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "zs-operate-column 非 scoped 白底勿命中表头 th",
+   "type": "bug",
+   "content": "【现象】列表「操作」列表头背景发白或与 #fafafa 表头不一致，固定右列叠层时像表头背景缺失。【根因】组件内非 scoped 规则 `.el-table .zs-operate-column-cell { background:#fff !important }` 同时命中 `label-class-name`/`class-name` 上的 th 与 td，`!important` 压过 ZsTable `header-cell-style` 的 #fafafa。【做法】白底只限定表体：`.el-table__body-wrapper .zs-operate-column-cell` 与 `.el-table__fixed-body-wrapper .zs-operate-column-cell`；表头跟随 ZsTable 表头样式。未用 ZsTable 的页面需自行设 `header-cell-style` 或全局表头色。",
+   "evidence": "会话 90849550：dataStatistics 等页操作列表头背景异常，收窄选择器后表头恢复 #fafafa。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue"
+   ],
+   "baseline": "0e429b0",
+   "sessionIds": [
+    "90849550-cbec-4e10-ad4a-35a4b2cf03ba"
+   ],
+   "bundle": "015.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "TagsView「更多」下拉 z-index 勿高于弹窗遮罩",
+   "type": "bug",
+   "content": "【现象】打开带遮罩的 Dialog 时，TagsView 右侧「更多」区域左侧 border 浮在遮罩上。【根因】`.more-btn-wrapper`、`.dropdown-menu` 使用 `z-index:3000`，高于 Element UI 遮罩常见 2000 段。【做法】`.tags-view-container` 设 `position:relative` + `z-index:8`（整体低于弹窗层、仍能盖住主内容下拉）；`.more-btn-wrapper` 用 21、`.dropdown-menu` 用 22，仅在标签栏内部叠在滚动按钮（10～20）之上。微调容器 z-index 保持在 8～1999，勿再接近弹窗默认段。",
+   "evidence": "会话 a7d237af：遮罩打开时 more 按钮左边线明显压在遮罩上。",
+   "files": [
+    "zhi2-web-admin/src/layout/components/TagsView/index.vue"
+   ],
+   "baseline": "0e429b0",
+   "sessionIds": [
+    "a7d237af-56e5-49f4-a9d3-51c02c04b0cb"
+   ],
+   "bundle": "015.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "公共查询小区详情备案入口始终展示",
+   "type": "workflow",
+   "content": "【约定】`publicQuery/complex/detail` 下业委会/物管会、管理主体、开户申请等子块：无论表格是否已有数据，右上角「××备案》」入口始终显示（与 propertyContractTable、buildingTable 一致）。【反模式】勿用 `v-if=\"!hasData\"` 或按 `hasIndustryData/hasPropertyData` 隐藏备案按钮；有数据时仍展示表格/详情，备案仅作跳转入口。",
+   "evidence": "会话 4a4ea16a：用户要求有数据时仍显示前往备案按钮；改 committeeTable、managementOrgPanel、regulatoryAccountPanel。",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/complex/components/committeeTable.vue",
+    "zhi2-web-admin/src/views/publicQuery/complex/components/managementOrgPanel.vue",
+    "zhi2-web-admin/src/views/publicQuery/complex/components/regulatoryAccountPanel.vue"
+   ],
+   "baseline": "dc21427",
+   "sessionIds": [
+    "4a4ea16a-5909-4259-b187-a74d02887a92"
+   ],
+   "bundle": "015.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "淮安物管本地联调 building 接口的 Vite 代理模板",
+   "type": "pattern",
+   "content": "【场景】`zhi2-web-admin` 本地把 `/api/2.0/building` 指到联调机。【写法】对齐 maintenance 代理：`target` + `rewrite`（`/api/2.0/building` → `/2.0/building`）+ `changeOrigin: true` + `bypass` 里写 `req.headers['zhi-project-id']='homeland'` 并 `res.setHeader('full-url', target+rewrittenUrl)`。【注意】上游若要求保留 `/api` 前缀则不要 strip `/api`，按后端真实路径改 rewrite；target IP/端口随环境替换。",
+   "evidence": "会话 05e9d9be：用户要求 /api/2.0/building 代理 192.168.1.158:9603 并参考 maintenance 配置。",
+   "files": [
+    "zhi2-web-admin/vite.config.js",
+    "env/.env"
+   ],
+   "baseline": "a87b1e9",
+   "sessionIds": [
+    "05e9d9be-749c-4320-b671-df76d21301bb"
+   ],
+   "bundle": "015.md",
+   "project": "淮安物管"
+  }
+ ]
+}

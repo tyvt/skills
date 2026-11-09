@@ -1,0 +1,107 @@
+{
+ "project": "园区物管2.0",
+ "batch": "047",
+ "files": [
+  "047.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "地图鼠标移入不要高亮",
+   "type": "preference",
+   "content": "已处理。点击高亮来自 ECharts 的 **选中态（`select`）**，与之前禁用的悬停态（`emphasis`）是两套机制。 **本次修改：** 1. **`geo`**：`silent: true`（不响应鼠标事件），并增加 `select: { disabled: true }`、`blur: { disabled: true }` 2. **轮播高亮 `regions`**：同样禁用 `select`、`blur`，避免点击轮播区域时出现选中样式 3. **`map` 系列**：`selectedMode: false`，并禁用 `emphasis` / `select` / `blur` 轮播切换时的黄色高亮仍由 `updateMapGeoCarouselHighlight` 通过 `regions` 控制，不受影响。 请刷新页面后再试：鼠标移入、点击地图区域都不应再出现高亮。若仍有个别区域异常，告诉我具体是哪个区/市。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\chartOptions.js、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\constants.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ec2f2919-958c-46a4-9979-f0e697d4c8c7"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "{ \"code\": 200, \"msg\": \"操作成",
+   "type": "fact",
+   "content": "**原因**：接口返回的 `attachments` 是逗号分隔的多条路径（如 `/zhi2-dev/...jpg,/zhi2-dev/...jpg`），但原先 `assetImageUrl` 把整个字符串当作一个 `src` 传给 `resolveServerAssetUrl`，浏览器无法加载这种无效 URL。 **修改**： 1. 将 `assetImageUrl` 改为 `assetImageUrls`，按逗号拆成路径数组并去除空白。 2. 单张图仍用 `<img>`；多张图用 `el-carousel` 轮播展示，每张图单独调用 `resolveServerAssetUrl`。 按你提供的接口数据，现在应能正常显示 7 张图片并可左右切换。`ParkingAssetDialog.vue`、`AdvertiseAssetDialog.vue` 等组件若也有同样逻辑，需要的话我可以一并改。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "张图片并可左右切换。`ParkingAssetDialog.vue`、`AdvertiseAssetDialog.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\components\\HouseAssetDialog.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\utils\\resolveServerAssetUrl.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "14e20239-48ca-49b6-aa6c-ccb4e211568e"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "滚动时从街道到小区级别时，街道气泡颜色从绿色变成蓝色",
+   "type": "bug",
+   "content": "**原因** 上次修的是「街道 → 小区」方向：缩放后 `overviewLayerLevel` 会立刻变，但 `markList` 要等接口返回才更新，所以颜色会跟实际气泡数据不同步。 「街道 → 区域」也是同一类问题：缩到区域级时 `overviewLayerLevel` 马上变成 `district`，气泡配色立刻变蓝，但地图上仍是街道数据，应继续显示绿色。 **修复** 新增 `markListLayerLevel`，只在 `markList` 真正更新时同步修改，不再跟缩放目标层级 `overviewLayerLevel` 绑定： - 接口返回前：保持上一级的配色（街道仍为绿色） - 接口返回后：再按新数据切换（区域蓝色 / 街道绿色） ```107:110:zhi2-web-admin/src/views/benefit/statisticsMap/index.vue mapBubbleTone() { if (this.areaDrillStack.length >= 1) return 'green' return this.markListLayerLevel === 'district' ? 'blue' : 'green' } ``` 这样无论放大还是缩小，在数据加载期间气泡颜色都会与当前展示内容一致，不会出现颜色提前切换的情况。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "```107:110:zhi2-web-admin/src/views/benefit/statisticsMap/index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\components\\map.vue",
+    "@zhi2-web-admin/src/views/benefit/statisticsMap/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7f4f3f1b-a0fd-4692-88cc-921192593ee3"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[ECharts] The ticks may be",
+   "type": "bug",
+   "content": "已处理该 ECharts 控制台警告。 **原因：** 资金收入/支出趋势图为双 Y 轴（份数 vs 万元），且开启了 `alignTicks: true`。左右轴 `yMax` 相差很大（例如 2000 与 300）时，ECharts 会强行对齐刻度，在 `min: 0, max: 300` 这类配置上容易算出难读的小数刻度，从而触发警告。 **修改：** 1. 去掉两个 Y 轴上的 `alignTicks: true` 2. 新增 `computeTrendAxisScale`，分别为左右轴计算整齐的 `min / max / interval` - 左侧份数轴：整数步长 - 右侧万元轴：1/2/5/10 等友好步长 3. 单位标签对齐逻辑改为使用计算后的 `countScale.max`、`fundScale.max` 典型结果示例： - 收入图：左轴 0–2000（步长 400），右轴 0–300（步长 60） - 支出图：左轴 0–600（步长 120），右轴 0–80（步长 20） 刷新页面后，该 `[ECharts] The ticks may be not readable...` 警告应不再出现，刻度也会更易读。若仍看到，请说明是收入还是支出那张趋势图。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox、d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\mock.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7ed0f29d-3da8-4470-918b-f0872f9b6a9f"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "页面代码精简，保持逻辑不变",
+   "type": "bug",
+   "content": "问题出在 `handleSearch` 里过早设置了 `isSearchMode = true`，而 `mapMarkerMode` 在搜索模式下会固定用物业管理区域样式（`project`）。接口失败或无结果时，`isSearchMode` 没有恢复，地图样式就错乱了。 ### 修复方式 1. **只在搜索成功且有数据时** 才设置 `isSearchMode = true` 2. **搜索失败 / 无结果 / 异常时**，调用 `restoreAreaLayerAfterSearchFail()`： - 重置 `isSearchMode = false` - 重新加载行政区划图层（`loadAreaComplexLayer`） 这样搜索失败后会回到行政区划气泡样式，并重新展示区县级数据。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\index.vue",
+    "@zhi2-web-admin/src/views/benefit/statisticsMap/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a3789a5a-09f2-4f9a-8236-5d37e21277d1"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "精简代码，保持功能不变",
+   "type": "pattern",
+   "content": "已完成对 `assetPanorama/index.vue` 的精简，**约 863 行 → 808 行**，功能保持不变。主要改动如下： ### 模板 - 环形图 / 条形图两块重复结构合并为 `v-for=\"block in CHART_BLOCKS\"`，标题、ref、样式由配置驱动。 ### 脚本结构 - **纯函数上提**：`formatThousands`、`parseAssetCategories`、`parseRegionAsset`、`extractPanoramaStatPayload`、`getDonutSlicePercent` 等移到模块级，减少 `methods` 体积。 - **接口加载合并**：四个几乎相同的 `loadXxxData` 合并为 `PANORAMA_API_LOADERS` 配置 + `Promise.all`。 - **图表更新统一**：`initCharts` 与 `refreshCardCharts` 共用 `upsertChart`，按 `cardIndex * 2` / `+1` 固定槽位（与原先 `refreshCardCharts` 逻辑一致）。 - **删除冗余**：`layoutScale`（仅转发 `layoutWidthScale`）、`createMockDataState` / `applyMockData`、",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`assetPanorama/index.vue",
+    "`chartOptions.js",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\assetPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\assetPanorama\\mock.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c9fce210-f5e5-4591-b857-e112b3ac6150"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

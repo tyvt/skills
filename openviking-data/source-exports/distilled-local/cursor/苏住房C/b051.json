@@ -1,0 +1,99 @@
+{
+ "project": "苏住房C",
+ "batch": "051",
+ "files": [
+  "051.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "已按设计稿完成以下 UI 调整： 1. 参与决策 ·",
+   "type": "fact",
+   "content": "已按设计稿完成以下 UI 调整： ### 1. 参与决策 · 一般表决（选项颜色与位置） **问题原因**：`RadioGroup` 用列表顺序（`item-1/2/3`）绑定颜色，接口返回顺序不固定时，会出现「弃权显示绿色」等错位。 **修复**：改为按选项文字映射颜色，并与「我的决策」页统一： - 同意 → 绿色 `rgba(123, 190, 19, 1)` - 不同意 → 红色 `#e40a0a` - 弃权 → 橙色 `#eb7d12` ### 2. 顶部卡片渐变色变浅 `DetailTopCard` 渐变起始色由 100% 主色改为 **15% 透明度**： ```scss rgba(var(--primary-color-rgb), 0.15) ``` ### 3. 决策成功弹窗按钮圆角 `form.vue` 中「我已知晓」按钮增加 **`border-radius: 8px`**。 ### 4. 我的决策 · 最近一次决策下方间距 `DecisionResult.vue` 中决策结果（如「弃权」）与下方「签字」之间的间距调整为 **20px**（去掉多余 `margin` / `padding`）。 --- 修改文件： - `pages_vote/decision/components/RadioGroup.vue` - `pages_vote/decision/co",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`form.vue",
+    "`DecisionResult.vue",
+    "`pages_vote/decision/components/RadioGroup.vue",
+    "`pages_vote/decision/components/DetailTopCard.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a8484b7a-a33d-4ba0-b1e1-1102d7ae0a91"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "Component is not found in ",
+   "type": "fact",
+   "content": "## 问题原因 这是**微信小程序分包组件引用限制**导致的： - `Home_Jiayuanqu` 位于分包 `pages_tab` - `NoticeList` 原先在分包 `pages_main/announcement/components/` - 分包 A 中的组件不能直接引用分包 B 中的组件，因此报错并提示可配置 `componentPlaceholder` 主包页面 `pages/index/temp` 已对 `home-jiayuanqu` 做了占位，但内部的 `NoticeList` 仍是跨分包引用，仍会失败。 ## 修复方案 已将 `NoticeList` 移到**主包公共组件目录** `src/components/NoticeList/NoticeList.vue`，并更新了所有引用： | 文件 | |------| | `pages_tab/components/Home_Jiayuanqu.vue` | | `pages_main/announcement/index.vue` | | `pages_owner` 下 5 个公告相关页面 | 导入路径统一为： ```js import NoticeList from '@/components/NoticeList/NoticeList.vue' ``` 已删除原路径 `pages_main/annou",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`src/components/NoticeList/NoticeList.vue",
+    "`pages_tab/components/Home_Jiayuanqu.vue",
+    "`pages_main/announcement/index.vue",
+    "'@/components/NoticeList/NoticeList.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "454c97fd-ca5c-4c7f-a2dd-54da7553d258"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "问题已修复，原因有两点： 1. 路径多写了一级 ..",
+   "type": "bug",
+   "content": "问题已修复，原因有两点： **1. 路径多写了一级 `../`** `ResultStatistics.vue` 位于 `pages_owner/decision/sort/`，`StepConfirm.vue` 位于 `pages_owner/decision/components/`。资源实际在 `pages_owner/static/images/svg/flag-szf.svg`，应使用 `../../static/...`，而不是 `../../../static/...`（后者会指向不存在的 `src/static/...`）。 **2. SVG 文件为空** `flag-szf.svg` 是 0 字节，已补充苏住房主题色（`#5583D0` → `#1354BE`）的排序旗帜图标。 请重新运行开发构建确认错误已消失。若设计稿有指定切图，可将 `pages_owner/static/images/svg/flag-szf.svg` 替换为正式资源。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`ResultStatistics.vue",
+    "`pages_owner/decision/sort/`，`StepConfirm.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\decision\\sort\\ResultStatistics.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "860e18b1-7843-41e3-a393-6d3279b805da"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已修复构建错误，构建现已通过。 原因 authent",
+   "type": "preference",
+   "content": "已修复构建错误，构建现已通过。 ## 原因 `authentication.vue` 位于 `pages_owner/house/owner/`，模板里用了： ```text ../../../static/images/szf/icon-checked.svg ``` 该路径会解析到 **`src/static`**，而 `icon-checked.svg` 实际在 **`pages_owner/static/images/szf/`**，Vite 在打包时找不到文件就会报错。 同目录下的 `addTypeChoose.vue` 已改用 `ZsImage` + `/images/szf/...`，与项目约定一致。 ## 修改 1. **`authentication.vue`**：将勾选图标的 `<img>` 改为 `ZsImage`，与 `addTypeChoose.vue` 一致。 2. **`publishHouse/index.vue`**（构建继续报错时顺带修复）：`warn.png` 在 `src/static/images/`，将 `../static` 改为 `../../static`。 `yiwen.png` 仍在 `src/static`，继续使用 `../../../static` 即可。 本地已执行 `npm run build:suzhufang`，*",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`authentication.vue",
+    "`addTypeChoose.vue",
+    "**`authentication.vue",
+    "**`publishHouse/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4f2dff10-9967-4330-9845-304bfa354448"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "埋点相关的接口报错不要提示",
+   "type": "preference",
+   "content": "已处理。埋点接口（`/appAnalytics/*`）本身已配置 `noReject: true`，业务错误码不会弹 toast，但网络异常或网关失败时，`httpInstance.js` 的 `.catch` 里仍会调用 `showToast` 提示用户。 **修改内容：** 在 `httpInstance.js` 中，当请求带有 `noReject: true` 时，网络层错误也不再弹出提示。 埋点相关接口（`eventDataAdd`、`projectDataAdd`、`stockDataAdd`、`smartDataAdd`）失败后将静默处理，不再打扰用户。错误仍会写入控制台日志，便于开发排查。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "toast，但网络异常或网关失败时，`httpInstance.js",
+    "`httpInstance.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\redirect\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\appAnalytics.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cc6f6b5a-0108-4cad-9087-5dce18827d62"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

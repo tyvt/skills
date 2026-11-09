@@ -1,0 +1,96 @@
+{
+ "project": "苏住房C",
+ "batch": "069",
+ "files": [
+  "069.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "物业服务企业「合同信息」项目负责人姓名和电话需要显示",
+   "type": "bug",
+   "content": "已修复「物业合同」页面合同信息中项目负责人姓名和电话不显示的问题。 **原因：** `contracts.vue` 通过 `getLastContractDetail` 获取合同详情，但模板绑定了 `companyLeaderName` / `companyLeaderPhone`。该接口实际返回的字段是 `projectManager` / `managerPhone`（与 `property-detail.vue` 一致），因此一直显示为 `-`。 **修改内容（`contracts.vue`）：** - 项目经理：改为绑定 `detailInfo.projectManager` - 联系电话：改为绑定 `detailInfo.managerPhone`，并使用 `PhoneCall` 组件支持点击拨打（与物业服务企业详情页一致） 刷新「物业合同」页面后，应能正常显示如「张静」「17751215965」等项目负责人信息。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`contracts.vue",
+    "`property-detail.vue",
+    "**修改内容（`contracts.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\company\\info\\contracts.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\company\\info\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\page-query\\property-detail.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\property.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d0c4c430-2836-4d0f-89fe-307fffe632fd"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "个人房源没有这个图标，没有经纪人",
+   "type": "fact",
+   "content": "已修复。个人房源（`publishRole == 0`）不应显示底部的公司/经纪人图标。 **修改内容**（`pages_transaction/stockHouse/detail.vue`）： 1. **公司图标**：仅在中介房源（`publishRole == 1`）且存在机构名称时显示，个人房源完全不渲染该区块。 2. **标签文案**：由「个人-房东」改为「个人房源」，与设计稿一致。 ```48:58:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse\\detail.vue <div class=\"user-type\"> {{ `${detailData.publishRole == 1 ? \"机构-经纪人\" : \"个人房源\"}` }} </div> </div> </div> <div v-if=\"detailData.publishRole == 1 && detailData.agentCompanyName\" class=\"company-continaer\"> <img class=\"company-icon\" :src=\"companyIcon\" alt=\"\" /> <span class=\"company-name\">{{ detailData.agentCompanyN",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**修改内容**（`pages_transaction/stockHouse/detail.vue",
+    "```48:58:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse\\detail.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse\\detail.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\houseMap\\components\\StockHouse.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cdb00ca8-ca47-462a-8aa6-e2db4d35b371"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "[渲染层网络层错误] pages_owner/hou",
+   "type": "fact",
+   "content": "已将 `pages_owner/house/index.vue` 中 `.top-empty` 的背景图改为与项目其他页面一致的条件编译写法： - **H5**：本地 `../../static/images/szf/Bg-szf.png` - **微信小程序**：CDN `https://szf.szzfcjj.cn:8888/static/images/szf/Bg-szf.png` 该页面两处本地 WXSS 背景图（`.top-empty` 和 `.history-container`）都已处理完毕，重新编译后应不再出现此类报错。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`pages_owner/house/index.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\tenant\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5fbd3e35-025c-45df-996f-22495a68d907"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "TypeError: common_vendor.i",
+   "type": "fact",
+   "content": "**问题原因：** `ImageUploader` 直接调用了 `uni.chooseFile`，该 API 在微信小程序端不支持（仅 H5/App 等可用），因此在 `register` 页点击上传时会报错。 **修复方案：** 在 `ImageUploader.vue` 中按平台选择 API： 1. **H5 等支持的平台** → 继续使用 `uni.chooseFile` 2. **需要视频时** → 使用 `uni.chooseMedia` 3. **仅图片（如 register 页）** → 使用 `uni.chooseImage` 同时把校验和上传逻辑抽成 `uploadSelectedFile`，兼容小程序临时路径没有文件扩展名的情况。 请重新编译并在微信开发者工具中测试 `pages_owner/house/owner/register` 页的图片上传。若还有问题，把新的报错信息发我即可。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`ImageUploader.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ImageUploader\\ImageUploader.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner\\register.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\file.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f62dbdc4-5a71-4b38-86cc-ade4a540eb59"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "参与决策（选项表决）页面的样式已按图 2 调整，修改",
+   "type": "bug",
+   "content": "参与决策（选项表决）页面的样式已按图 2 调整，修改在 `optional/StepChoose.vue`： ### 1. 选中背景色 `#1354BE` 8% ```220:223:zhi2-mobile-shimin/src/pages_vote/decision/optional/StepChoose.vue :deep(.checkbox-item.active) { background-color: rgba(19, 84, 190, 0.08); color: var(--primary-color); } ``` 选中项背景为 `rgba(19, 84, 190, 0.08)`，文字颜色沿用主题色 `#1354BE`。 ### 2. 决策项底部间距改为 16px ```168:174:zhi2-mobile-shimin/src/pages_vote/decision/optional/StepChoose.vue .top-card { background-color: var(--white-color); border-radius: $uni-border-radius-base; padding: 30rpx 32rpx 16px; margin-top: 12px; overflow: hidden; } ``` 原先底部 `padding` 为 `2",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`optional/StepChoose.vue",
+    "```220:223:zhi2-mobile-shimin/src/pages_vote/decision/optional/StepChoose.vue",
+    "```168:174:zhi2-mobile-shimin/src/pages_vote/decision/optional/StepChoose.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\components\\RadioGroup.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\optional\\StepChoose.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "dc5fd0f1-3aee-4d8e-bd02-8a8f3bf31cb2"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

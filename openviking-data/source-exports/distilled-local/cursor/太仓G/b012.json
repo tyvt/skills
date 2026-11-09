@@ -1,0 +1,94 @@
+{
+ "project": "太仓G",
+ "batch": "012",
+ "files": [
+  "012.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "没有校验必填就可以点下一步",
+   "type": "bug",
+   "content": "问题已修复。 **原因：** `nextStep` 方法直接执行 `this.active = 1` 进入下一步，没有先校验表单。虽然表单已配置了必填规则（`policymaker`、`idNumber`、`phone`、`signature`），但点击「下一步」时并未触发校验。 **修复：** 在 `nextStep` 中先调用 `this.$refs['form'].validate()`，校验通过后再进入第二步，与 `optionDecision` 模块的实现保持一致。 修改文件： - `ownerDecision/components/VoteRangeDialog.vue`（业委会选举表决） - `decisionCommon/components/VoteRangeDialog.vue`（维修决策、一般决策等共用组件） 现在必填项未填写时，点击「下一步」会显示校验提示，且无法进入「候选人选举」步骤。",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "`ownerDecision/components/VoteRangeDialog.vue",
+    "`decisionCommon/components/VoteRangeDialog.vue",
+    "涉及文件：d:\\repository\\太仓G、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon\\components\\VoteRangeDialog.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\components\\VoteRangeDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "81005aa4-3a6b-4f6a-9054-7ab69341ff3f"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "一般表决详情，线下投票成功后，提示弹框还在，能够消失",
+   "type": "preference",
+   "content": "已修复。 **原因：** 线下投票提交成功后，`finalSubmit` 只调用了 `close()` 关闭主弹框（决策明细维护），但嵌套的「线下票录入信息确认」弹框由独立的 `tipDialogVisible` 控制。`zs-dialog` 会挂载到 `body`，父弹框关闭后，确认弹框仍会留在页面上。 **修改：** 在 `VoteRangeDialog.vue` 中： 1. `finalSubmit` 成功回调里，先设置 `tipDialogVisible = false` 再关闭主弹框 2. `close()` 方法里统一重置 `tipDialogVisible`，避免通过取消等方式关闭时确认弹框残留 投票成功后，确认弹框和主弹框都会正常关闭。",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "`VoteRangeDialog.vue",
+    "涉及文件：d:\\repository\\太仓G、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\components\\VoteRangeDialog.vue、d:\\repository\\太仓G\\zhi1-web-admin、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\components\\DecisionRangeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "161a2f78-6494-4326-934c-d2a31ef3bbc2"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "选项表决详情，待提交状态下，表决项“操作”删除，点不",
+   "type": "bug",
+   "content": "已修复。 **原因：** `VotingItemsTable.vue` 操作列里的删除按钮写死了 `disabled`，一直处于禁用状态；而同列的编辑按钮用的是 `:disabled=\"bizState != '0'\"`，待提交（`bizState == '0'`）时是可点的。 **修改：** 将删除按钮改为与编辑按钮一致： ```vue :disabled=\"bizState != '0'\" ``` 待提交状态下，操作列的删除按钮现在应可正常点击；顶部的「批量删除」逻辑未改，本来就能用。 请刷新页面后再试一次删除。",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "`VotingItemsTable.vue",
+    "涉及文件：d:\\repository\\太仓G、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\components\\VotingItemsTable.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\components\\VotingItemsTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "92a52a39-5ec2-4b9b-afa1-fb9772a75eae"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "业委会选举申请详情，选择户室，勾选左侧的楼幢，报系统",
+   "type": "bug",
+   "content": "问题已定位并修复。 **原因：** 在业委会选举申请的「选择户室」弹窗中，勾选左侧楼幢时，`buildingIds` 被错误地写成了字符串： ```283:283:zhi1-web-admin/src/views/repairFunds/ownerApply/components/RangeHouseDialog.vue // 修复前 buildingIds: this.checkList.join(',') // 发送 \"14587\" ``` 后端期望的是数组格式，因此会报「系统异常，请联系管理员」。 **修复：** 与决策管理里同名的 `RangeHouseDialog` 保持一致，直接传数组： ```283:283:zhi1-web-admin/src/views/repairFunds/ownerApply/components/RangeHouseDialog.vue buildingIds: this.checkList // 发送 [\"14587\"] ``` 请重新编译/刷新页面后，再勾选左侧楼幢验证。请求负载应变为 `buildingIds: [\"14587\"]`，列表可正常加载。",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "```283:283:zhi1-web-admin/src/views/repairFunds/ownerApply/components/RangeHouseDialog.vue",
+    "涉及文件：d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\repairFunds\\ownerApply\\components\\RangeHouseDialog.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\components\\RangeHouseDialog.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\repairFunds\\ownerApply\\components\\HouseholdDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "285d96e1-2ba9-47f3-bae6-7acc747ce441"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "buildingIds应该是个数组，因该是个老bug",
+   "type": "bug",
+   "content": "问题在 `RangeHouseDialog.vue` 的 `getRightList` 方法里。 **原因：** 请求参数里把 `buildingIds` 用 `this.checkList.join(',')` 拼成了字符串（如 `\"14587,20950\"`），而后端期望的是数组。 **修复：** 改为直接传 `this.checkList`： ```283:283:zhi1-web-admin/src/views/estate/optionDecision/components/RangeHouseDialog.vue data: { houseIds: this.selectArr, buildingIds: this.checkList, ...this.selectQueryParams, ...this.queryParams, decisionId: this.getId() } ``` 刷新页面后，在决策管理的「选择户室」弹窗里多选楼栋，请求体应变为 `buildingIds: [\"14587\", \"20950\"]`，接口应能正常返回户室列表。 另外，`repairFunds/ownerApply/components/RangeHouseDialog.vue` 里也有同样的 `join(',')` 写法，如果那边也报错，可以一并改。",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "`RangeHouseDialog.vue",
+    "```283:283:zhi1-web-admin/src/views/estate/optionDecision/components/RangeHouseDialog.vue",
+    "另外，`repairFunds/ownerApply/components/RangeHouseDialog.vue",
+    "涉及文件：d:\\repository\\太仓G、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\components\\RangeHouseDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ed5871e8-b674-4437-be6c-e81ab129b3ce"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  }
+ ],
+ "_draft": true
+}

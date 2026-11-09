@@ -1,0 +1,67 @@
+{
+ "project": "repository",
+ "batch": "012",
+ "files": [
+  "012.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "H5 index.html 的 onload 会被 Vite 构建注入脚本覆盖",
+   "type": "bug",
+   "content": "index.html 里给入口 module 脚本绑 onload 隐藏 loading，但 uni build 后 Vite 重新注入 /assets/index.xxx.js 且不带原 onload，生产环境 __hidePageLoading 永不执行→一直显示加载中(本地 dev 正常)。修复：在 App.vue onLaunch 开头调用 window.__hidePageLoading()(仅 window 存在时)，不依赖构建保留 onload；隐藏时机改为应用启动而非仅 main.js 下载完。",
+   "evidence": "012.md 会话 0c26f1bc/128b09bc：生产一直 loading，根因 Vite 注入覆盖 onload，移到 onLaunch",
+   "files": [
+    "index.html",
+    "src/App.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0c26f1bc-7368-462a-ba7f-eae1213f73a1",
+    "128b09bc-4bce-4355-8562-746d9dba13c3"
+   ]
+  },
+  {
+   "title": "vconsole 仅 H5+开发环境启用并统一打印接口响应",
+   "type": "pattern",
+   "content": "接 vconsole 用 uni-app 条件编译 #ifdef H5 且仅 import.meta.env.DEV 时初始化，避免非 H5 端打包和生产出现调试面板；两套 axios 实例(业务网关 + VITE_BASE_API)的拦截器都统一打印 [API Response](url/method/data) 与 [API Response Error](非取消请求)。",
+   "evidence": "012.md 会话 9314668a：加 vconsole，H5+DEV 启用，拦截器打印响应",
+   "files": [
+    "src/main.js",
+    "src/request/index.js",
+    "src/api/gateway.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9314668a-621e-4143-a254-3f09b85eb124"
+   ]
+  },
+  {
+   "title": "退出登录用 uni.showModal 二次确认并 @tap.stop 防冒泡",
+   "type": "pattern",
+   "content": "顶栏退出登录仅在有 token 时显示；点击 uni.showModal 二次确认，确认后调 userStore.logout()(请求 /security/ctAuth/logout、清空本地、switchTab)；按钮用 position:absolute 固定右上角 z-index:2，并用 @tap.stop 避免冒泡触发背景的 login。",
+   "evidence": "012.md 会话 2ac982b9：property.vue 顶部退出登录，@tap.stop 防冒泡",
+   "files": [
+    "src/pages/index/property.vue",
+    "src/store/user.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2ac982b9-0050-4def-847b-622f257aa9f2"
+   ]
+  },
+  {
+   "title": "watch detailData 默认 {} 为 truthy 会把表单字段置 undefined",
+   "type": "bug",
+   "content": "页面用 watch:{ detailData:{ handler(val){ if(val){ ...赋值 } } } }，而 detailData 默认值是 {} (truthy)，接口异常返回 {} 或 undefined 时仍会进入分支把 otherData.xxx 赋值成 undefined，导致 checkbox/input 显示异常(看似空白)。应区分「真正有数据」与「空对象」，并对字段做空值保护而非直接覆盖。",
+   "evidence": "012.md 会话 f57d7e7f：stepHouseInfo watch detailData 默认 {} 触发把表单值改 undefined",
+   "files": [
+    "src/pages/leaseContract/stepHouseInfo.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f57d7e7f-9439-484d-b703-784cb50ce8c1"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,404 @@
+{
+ "batch": 2,
+ "files": [
+  "007.md",
+  "008.md",
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md"
+ ],
+ "count": 22,
+ "memories": [
+  {
+   "title": "后端雪花 ID 精度丢失：19 位变更单 ID 传到前端变成 …390000",
+   "type": "bug",
+   "content": "情况：`/company/companyRecordChange/getLastByLogin` 返回 `{\"data\":\"2101947477218390017\"}`（字符串），但 `companyRecordChange/detail` 实际发出去的 id 是 `2101947477218390000`，末位被抹平，详情查不到或查错单。根因：19 位雪花 ID 超出 JS `Number.MAX_SAFE_INTEGER`，任何 `Number()`/`parseInt`/隐式转数字，以及 `JSON.parse` 对裸数字的解析都会丢精度；ID 还会经响应式变量、E2E helper、请求体多处传递，任一处转数字就坏。解法：ID 全程按字符串处理 —— 响应侧用 `jsonParseSafeIds`（正则把超长整数字面量包成带引号字符串）避免 parse 阶段就丢；请求侧统一走 `coerceRequestBodyIds` + `serializeJsonRequestBody`，把请求体里的 ID 字段序列化成带引号字符串再发；ID 解析收敛到单源 `src/utils/resolveChangeId.js`（公司与机构变更单共用），api 层只 re-export，调用方写 `resolveChangeId(res.data)`。用户明确要求「ID 不需要转 number」「这类接口的传参改为字符串」。差异：已知清单没有此条，是 Web 后台独有的大整数精度坑。",
+   "evidence": "用户诉求1：「这个接口的返回，现在拿的ID不对」，附返回 body `\"data\":\"2101947477218390017\"`；用户诉求3：「company/companyRecordChange/detail还是在使用2101947477218390000」；用户诉求4：「ID不需要转number啊」；用户诉求6：「company/personnelRecord/detail这类接口的传参改为字符串」；最终结论：「`jsonParseSafeIds.js`：响应长整数、`coerceRequestBodyIds`、`serializeJsonRequestBody`（personnelRecord 标量引号靠后者）」「`resolveChangeId.js`（新）：变更单 ID 解析单源」。",
+   "files": [
+    "zhi2-web-admin/src/utils/resolveChangeId.js",
+    "zhi2-web-admin/src/api/company/companyRecord.js",
+    "zhi2-web-admin/src/utils/jsonParseSafeIds.js",
+    "zhi2-web-admin/e2e/fixtures/company-helpers.js",
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue"
+   ],
+   "baseline": "6b3ac5a7",
+   "sessionIds": [
+    "73b844d6-16b5-409e-b3b2-20d22170917a"
+   ],
+   "bundle": "007.md"
+  },
+  {
+   "title": "zs-table 列宽算法：取表头与内容的最大宽度，剩余空间均分给非序号列",
+   "type": "pattern",
+   "content": "情况：zs-table 自适应列宽反复验收不过 —— 先是列宽比最长内容还宽、留着大片空白，改窄后「又有省略号了」，企业名称列仍然超宽。用户口径很明确：列宽取「表头文案宽度」与「该列内容最长值宽度」两者的较大值，做到既不换行也不省略；容器若有多余宽度，等分到每一列，序号列不参与均分。做法：测量时同时量 `th` 与每个 `td` 的真实文本宽度（用 scrollWidth 或 canvas measureText），取 max 作为该列最小宽度；表头带排序/筛选图标时把图标宽算进去；剩余空间按列数均分（序号列跳过），用百分比/flex 分配而非写死 px，避免二次溢出。踩坑：只在首渲染量一次会失效——数据异步回填、字体加载完成后都要 `nextTick` 重量；纯 CSS `min-width:max-content` 只能保证内容不被压缩，解决不了「不省略 + 均分剩余」两个要求。自检方式：用 Playwright 打开真实页面，量表头 scrollWidth 与会话列 `getBoundingClientRect`，对照截图判断是否仍有富余宽度或省略号。",
+   "evidence": "用户诉求1：「表格宽度超过内容最长的一项，应该取表头和内容2者最长值，保证不换行不省略」；用户诉求2：「还是有多余的宽度」；用户诉求3：「又有省略号了」；用户诉求4：「企业名称列还是超宽，你使用playwright自己检查一下」；用户诉求6：「如果有多余宽度，等分到每一列，除了序号列」。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "baseline": "0c2da15f",
+   "sessionIds": [
+    "73b1d25a-7ccc-4c27-8b93-e143c1c0945f"
+   ],
+   "bundle": "007.md"
+  },
+  {
+   "title": "宽表被误判为「幽灵滚动」而 overflow-x:hidden，导致右侧列被裁切且不能横滚",
+   "type": "bug",
+   "content": "情况：品牌管理页 10+ 列、表头很长，右侧「操作」列看不全，底部又没有横向滚动条，用户只能看到被裁切的一半表格。根因：zs-table 里为了消除「只多出几十像素的假滚动条」，写了一个单向阈值启发式 —— 只要溢出宽度 ≤ 操作列宽 + 48px 就把 `overflow-x` 设成 hidden；该判定没有同时校验「内容最小宽度是否已超过可分配宽度」，于是真正需要横滚的宽表也被判为幽灵溢出、滚动条被隐藏。解法：(1) 先计算内容最小宽度（每列 max(表头,内容) 之和）并与可分配宽度比较；(2) 仅当「内容最小宽度 ≤ 可分配宽度」且「溢出 ≤ 固定操作列宽度」时才认定为幽灵溢出并 hidden，否则一律 `overflow-x: auto`；(3) 表格 `body-wrapper` 默认 `overflow-x: auto` 兜底。经验：用单一阈值猜意图的样式规则必须再挂一个正负判定条件，否则列数一变就翻车；列数少的页面残留约 30px 轻微横滚属于正常的真实溢出，不要再去压。",
+   "evidence": "最终结论：「旧逻辑在溢出宽度 ≤ 操作列宽度 + 48px 时就隐藏滚动条」「品牌管理有 10+ 列…却被错误隐藏，出现『有遮挡、不能滚动』」「仅当『内容最小宽度 ≤ 可分配宽度』且溢出 ≤ 固定操作列宽度时，才隐藏滚动条」「表格 `body-wrapper` 默认 `overflow-x: auto`」「列数较少的列表…可能仍会有约 30px 的轻微横向滚动，这是内容宽度略大于可用区域所致，属于正常情况」。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/views/company/companyManagement/components/index.vue"
+   ],
+   "baseline": "0c2da15f",
+   "sessionIds": [
+    "73b1d25a-7ccc-4c27-8b93-e143c1c0945f"
+   ],
+   "bundle": "007.md"
+  },
+  {
+   "title": "「挪区块」需求按最小改动执行：只动点名的面板，要件区抽公共组件复用",
+   "type": "preference",
+   "content": "情况：预售许可详情页只要求把「预售方案」「要件」移到基本信息下方，我按设计稿把整页重排，被退回：「原来是这样的，现在就是把预售方案和要件放到下面了，其他的不需要改」。后续又依次指出「分块不对，预售方案细节 UI 不一致」「这个基本信息不需要，上面 tab 里面有了」。可复用结论：(1) 这类「把某块挪个位置」的调整按最小范围改 —— 保序原有分块结构、字段顺序与样式，只移动指定面板，不顺手重构其余区域；改动前先确认「哪些不能动」；(2) 附件/要件这类跨模块重复的能力抽成公共组件（企业模块的 `AppendixPackageSection` + `requirement-grid`），预售许可延期、注销、现售统一引用，不要各页各写一遍；(3) 多页一致的纵向栈布局（全宽白卡片、16px 纵向间距）提到 `src/styles/index.scss` 共用类（如 `.presale-detail-section-stack`），不在每页复制 SCSS；(4) 详情页 Tab 已展示的字段不要在正文重复罗列。差异：已知清单第 81 条只要求「100% 还原设计稿」；本条补的是反向约束——设计稿之外的既有实现也不要动，以及抽公共组件的边界。",
+   "evidence": "用户诉求2：「原来是这样的，现在就是把预售方案和要件放到下面了，其他的不需要改」；用户诉求4：「要件改为和企业模块公共的组件」；用户诉求5：「分块不对，预售方案细节UI不一致」；用户诉求6：「这个基本信息不需要，上面tab里面有了」；最终结论：「新增 `.presale-detail-section-stack`（与 `.permit-apply-stack` 共用规则）：纵向 16px 间距、全宽白卡片」「申请态要件改为 `AppendixPackageSection`」。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/components/PermitPlanPanel.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/PermitAppendixPanel.vue",
+    "zhi2-web-admin/src/views/presale/permitExtend/detail.vue",
+    "zhi2-web-admin/src/views/presale/permitCancel/detail.vue",
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleDetail.vue",
+    "zhi2-web-admin/src/styles/index.scss"
+   ],
+   "baseline": "99bfdbd7",
+   "sessionIds": [
+    "f15440ff-b1d6-4187-a410-c3fab19d05fe"
+   ],
+   "bundle": "007.md"
+  },
+  {
+   "title": "Vite 报「Install @vitejs/plugin-vue to handle .vue files」多半不是缺插件，而是该 .vue 标签闭合错乱",
+   "type": "bug",
+   "content": "【什么情况】苏州市房地产监测V3 的 zhi2-web-admin（Vue2 + vite:vue2）dev server 报：Failed to parse source for import analysis because the content contains invalid JS syntax. Install @vitejs/plugin-vue to handle .vue files，位置指向编译产物中的 _sfc_render / __component__ = __normalizer(...) 一行。这行是插件已经正常编译出的产物，说明插件没缺，是该 .vue 自身的模板/脚本有语法错误（标签未闭合、<el-row> 与 <template> 错配、script 中 const cols = [{...}) 少括号、push/map/forEach 误写 }] 、slot=\"append\"/#append 多行被截断、ZsTencentMap/index.vue 缺 </style>），编译产物整体不可解析后 Vite 退回到按纯 JS 解析才抛出这条误导性的缺插件提示。【为什么】报错文案是 Vite 的兜底话术，不代表真实根因；直接按提示装插件不会有任何改善。【怎么做】先跑批量扫描脚本 scripts/scan-vue-template.mjs 全量扫 template/script，过滤 <img> 自闭合误报（26 处）后定位真正 blocking 项，再用 scripts/fix-vue-template.mjs 修复。修复算法必须「栈解析为主、正则为辅」：早期纯正则版本重复执行会振荡（问题数 61 → 153，修完又破坏别处）；栈解析版本幂等可重复执行。最终 blocking 152 → 0，vite build 通过。已封装 npm scripts：scan:vue-template / fix:vue-template / verify:vue-template（fix+scan+build）。不要再运行一次性的 scripts/fix-detail-form-layout.mjs，它会重新制造闭合错误。",
+   "evidence": "用户诉求 1 贴出原始报错「Failed to parse source for import analysis ... Install @vitejs/plugin-vue to handle .vue files. File: .../commercialHousingSales/presale/contractView/index.vue:226:15」；用户诉求 5 接着又报「tag has no matching end tag. Plugin: vite:vue2, File: zs-search-form.vue」；最终结论：「早期正则修复会在重复执行时产生振荡（问题数从 61 → 153）。最终改为栈解析为主、正则为辅，可重复执行且不再互相破坏」「Blocking 问题 ~152 → 0；vite build 失败 → 通过」「注意：不要再次运行 fix-detail-form-layout.mjs」。",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/scripts/scan-vue-template.mjs",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/scripts/fix-vue-template.mjs",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/commercialHousingSales/presale/contractView/index.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/vite.config.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/package.json"
+   ],
+   "baseline": "ffafea18",
+   "sessionIds": [
+    "22208c57-3107-418d-bb7d-e6601b03c458"
+   ],
+   "bundle": "008.md"
+  },
+  {
+   "title": "PC 后台响应式断点：同权重 @media 必须写在基础规则之后，否则宽度被压窄、高度不变，出现畸形比例",
+   "type": "bug",
+   "content": "【什么情况】把经纪机构/租赁机构从业人员详情页的证件照双框放大（单框 147×222 → 180×270，双框+间距 334 → 400，保持 2:3 证件照比例）后，实测 1080 宽窗口时右侧两列字段被压到 127px/列已不可用，于是补了三档断点：≥1440 单框 180×270、1200–1439 用 140×210、<1200 用 120×180，对应字段列宽 307 / 275 / 195。【为什么踩坑】.ppf-box 的 @media 断点规则一开始写在基础规则之前，CSS 层叠按源码顺序、同权重后者胜，媒体查询本身不带更高优先级，结果基础规则覆盖了断点，宽被 flex 压到 120 而高仍是 270，渲染出 120×270 的畸形比例且控制台无任何报错。【怎么做】把断点块统一移到样式表末尾（或改用容器查询/显式提高权重并在注释里写明原因），然后在 1080/1280/1440 三个视口各实测一遍，确认两列不塌陷、宽高比不变。验收方式：Playwright 截图与设计稿做像素相似度对比（npm run test:e2e:personnel-basic-info-visual），编辑态双框 98.64%、整块基本信息 96.91%、查看态结构断言 93.98%。注意放大后参考图会被等比重采样，相似度从 99.10% 略降到 98.64% 属预期，e2e 断言里的期望尺寸要同步改成 180×270。同类断点收敛应作为该详情页的固定约定：默认大屏尺寸 + 两档降级，不要只放大不降级。",
+   "evidence": "最终结论：「直接放大后实测 1080 宽窗口时右侧两列字段被压到 127px/列，已经不可用。所以补了断点，放大的尺寸只在大屏生效」；「踩到一个坑记录一下：.ppf-box 的断点规则一开始写在基础规则之前，同权重下被后面的基础规则覆盖，结果只有宽被 flex 压窄、高还是 270，出现 120×270 的畸形比例。已把断点移到样式表末尾」；「npm run test:e2e:personnel-basic-info-visual → 3 passed / 1 skipped」。",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/leasePersonnel/components/LeasePersonnelDetail.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/zljg/components/PersonnelCertificatePlaceholder.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/utils/detailLayout.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "baseline": "5a71ab74",
+   "sessionIds": [
+    "915ed5ff-cf9a-4851-90fa-8106f68627f3"
+   ],
+   "bundle": "008.md"
+  },
+  {
+   "title": "用户偏好：排查/改造阶段不要启动 dev server，只改代码 + ESLint 静态检查；核对端口要覆盖自增后的成对端口",
+   "type": "preference",
+   "content": "【用户偏好】在本项目（苏州市房地产监测V3 后台 zhi2-web-admin）做联调核对、批量改造这类任务时，用户明确要求「不需要你启动五福，停了吧」，随后约定后续只改代码 + 跑 ESLint 静态检查，不再启动项目 dev server；交付物要在改造全部完成后再一次性给出，并且只要用户点名的那一份（例如「只发菜单就行了」），不要额外堆报告。【坑】后台任务启动 Vite 时若 8081 已被占用，Vite 会静默自增到 8082，于是按 8081 查监听会误判「服务已停」，实际进程还在跑并继续占资源；收尾时只杀掉自己记得的那个 job 也不够。【怎么做】核对服务状态必须同时查 8081 与 8082（或直接列本项目所有监听端口，如 netstat -ano / Get-NetTCPConnection 过滤 node 进程），按实际端口和 job id 结束所有历史后台任务，再回显「无监听进程」确认干净。判断是否真的需要起服务：纯静态改造（模板结构、样式、接口文档对照、菜单配置）用 ESLint + 扫描脚本就能验证，不必起 dev server；只有当需要真实渲染/交互验证（如 e2e 视觉回归）时才起，并在结束会话前显式关闭。",
+   "evidence": "用户诉求 5：「不需要你启动五福，停了吧，然后告诉我菜单怎么配置……你检查一下是不是这样的」；用户诉求 6：「先改造，改造完毕之后再把菜单配置发给我，只发菜单就行了」；最终结论：「刚收到的这条失败通知是一个更早遗留的 dev server 后台任务（本轮对话开始前启动的，当时 8081 被占用后自动切到了 8082 端口，所以之前查 8081 时没发现它）……已再次核实：8081、8082 均无监听进程……后续只改代码 + ESLint 静态检查，不再启动项目。」",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/playwright.config.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/main.js",
+    "D:/repository/苏州市房地产监测V3/package.json"
+   ],
+   "baseline": "0b15dd3e",
+   "sessionIds": [
+    "71671db1-512d-4d06-a04b-0ee4f5005999"
+   ],
+   "bundle": "008.md"
+  },
+  {
+   "title": "Tab 子表工具栏统一：SubTableToolbar 通过 inject('zsTabsToolbar') 注册到标题栏，弹窗内自动 fallback",
+   "type": "pattern",
+   "content": "情况：Web 管理后台里各 Tab 页子表（楼幢/房屋/地块/变更详情等）的操作按钮位置长期不统一——有的塞在 Headline 的 #right 槽，有的浮在内容区，标题栏里还会出现第二套 margin/padding。做法：把 zs-tabs.vue 的 tabs-bar 拆成 tabs-bar-main + tabs-header-action 两段，并向子孙组件 expose register/unregister；新增 SubTableToolbar 组件，Tab 内通过 inject('zsTabsToolbar') 把按钮注册进 Tab 标题栏；组件自身检测祖先是否为 ZsDialog/ElDialog，是则自动 fallback 成内容区 inline 渲染（弹窗里没有 tabs 标题栏，硬注册会丢按钮）。配套约定：Tab 内子表用 <SubTableToolbar :visible=\"bizState == '0'\" :buttons=\"operationButtons\" />；非 Tab 的 Headline 子表仍用 #right 槽 + operation-button-container；表格必须外包一层 sub-container 才有边框。踩坑：①全局样式要补在 index.scss 的 .tabs-header-action 上，并单独取消「标题栏内工具栏」的内容区 margin/padding，否则间距双份；②页面 scoped 里重复的同名样式会压过全局，必须删净；③用正则批量改模板极易产出 divdivdiv 这类结构损坏，批改后必须逐文件做结构检查而非只看编译通过。与已知清单的差异：已知条目全是 uni-app/小程序侧的弹层层级与样式穿透，本条是 Web 后台 zs-tabs + inject 的组件注册架构，根因和解法都不同。",
+   "evidence": "会话 339a9982 用户诉求：「子表 没有边框 沿用设计规范修改，全局修改」→ 澄清「是子表全局改为有边框，现在有很多tab子表没有使用sub-container吧？」→「确认，开始执行」→「Tab 子表边框全局排查修复」。最终结论记录了 zs-tabs.vue 的 tabs-bar 拆分与 register/unregister API、SubTableToolbar 的 inject 与 dialog fallback、RuleTable/EntrustBuildingTable/superviseBank detail/VoteTable 的 Headline Outlier 修正、notificationPublicity 删除 scoped 重复样式、RecordCodeTable 修复批量脚本残留的 divdivdiv。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/components/UnitTable.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/bankTable.vue",
+    "zhi2-web-admin/src/views/supervision/projectDelivery/components/DeliveryScopeSection.vue",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/styles/element-ui.scss"
+   ],
+   "baseline": "9dba6559",
+   "sessionIds": [
+    "339a9982-4656-4f14-a440-fc13873927d9"
+   ],
+   "bundle": "009.md"
+  },
+  {
+   "title": "详情页返回按钮用「截断路径回列表页」而非 go(-1)；「没有授权相关菜单」报错根因在 utils/ruoyi.js 菜单查找层",
+   "type": "bug",
+   "content": "情况：详情页返回偶发报「没有授权相关菜单，请联系管理员」，容易误判成返回按钮的 bug。根因：返回按钮本身不做任何菜单查找。真正实现是 src/components/OperationBtnGroup/index.vue 的 goBack：先 sessionStorage.removeItem(this.$route.path) 清掉草稿，若有 $listeners.back 就只 $emit('back')，否则取 $route.query.backUrl 或把当前 path 截掉最后一段作为父路径，dispatch('tagsView/delView') 后 router.push({ path, query: { type: 'back' } })——刻意不用 $router.go(-1)，否则新增保存后返回会退回新增页。main.js 里还有 Vue.mixin 的全局 goBack 作为兜底（供自己渲染返回按钮的页面调用）。报错来自 src/utils/ruoyi.js 的菜单/路由 filePath 查找 helper：列表→详情跳转和部分返回逻辑都会调它，菜单未授权时它 ElMessage 报错并 throw。排查顺序：先看 ruoyi.js 的菜单解析与路由 filePath 匹配（校验 path 与后端菜单是否一致），再怀疑返回按钮；改返回按钮无效。与已知清单差异：已知 navigation 类条目均为小程序 switchTab/reLaunch/onLoad，这里是 Web 后台 tagsView + 菜单权限查找，根因和解法全新。",
+   "evidence": "会话 sess_subagent_agent_736ec972 的任务是定位「详情页返回按钮」以及返回时找不到菜单的逻辑，最终结论给出 OperationBtnGroup/index.vue 第 5 行按钮、第 403-415 行 goBack 实现与注释「回到列表页（父路径），避免新增保存后 go(-1) 回到新增页」、main.js 第 123-129 行 Vue.mixin 全局 goBack，并明确指出报错不在返回处理器，而在 src/utils/ruoyi.js 的菜单/route filePath 查找层（报「没有授权相关菜单，请联系管理员」并 throw）。该结论由提交 024ab679be「bug1105 用户管理：返回时需要直接返回到用户管理列表页面」引入，替代了旧的 $router.go(-1)。",
+   "files": [
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/main.js",
+    "zhi2-web-admin/src/utils/ruoyi.js"
+   ],
+   "baseline": "114af19b",
+   "sessionIds": [
+    "sess_subagent_agent_736ec972-1eca-4472-a8f1-ba493bca5994"
+   ],
+   "bundle": "009.md"
+  },
+  {
+   "title": "苏州房地产监测 V3 工程结构事实：源码在 zhi2-web-admin 子目录（npm workspace），技术栈是 Vue2 + 自研 zs-* 组件而非 Element Plus",
+   "type": "fact",
+   "content": "情况：在 d:\\repository\\苏州市房地产监测V3 下做全局检索或改代码时，容易在根目录找不到 src 而误判仓库不完整。事实：根目录 package.json 只是 npm workspace，根下没有 src；真正的前端应用在 zhi2-web-admin 子目录（这就是为什么所有涉及文件路径都带 zhi2-web-admin 前缀，检索、构建、grep 都必须指向该子目录）。技术栈是 Vue 2 管理后台 + 自研 zs-* 组件族（zs-button / zs-table / zs-tabs / ZsDialog，搭配 element-ui 风格），并不是 Vue3 + Element Plus，所以框架级 API（v-model 语法、Teleport、defineExpose、组合式函数）与小程序项目的约定都不能照搬。样式统一收口在 src/styles/index.scss 与 src/styles/element-ui.scss，公共组件在 src/components（如 zs-table、OperationBtnGroup）。做改造前先确认目标是子目录、确认组件是自研 zs-* 还是 element 原始组件，再决定用 :deep 覆盖还是改组件源码。",
+   "evidence": "会话 sess_subagent_agent_736ec972 的结论明确写「The repo is a Vue 2 admin app at D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin (npm workspace of the root package.json; the root itself has no src)」，并在代码片段中给出 zs-button、el-page-header 之外的 zs-* 组件；会话 339a9982 的全部涉及文件与改动也都位于 zhi2-web-admin\\src 下的 styles、components\\zs-table、views。",
+   "files": [
+    "zhi2-web-admin/package.json",
+    "zhi2-web-admin/src/main.js",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "baseline": "114af19b",
+   "sessionIds": [
+    "sess_subagent_agent_736ec972-1eca-4472-a8f1-ba493bca5994",
+    "339a9982-4656-4f14-a440-fc13873927d9"
+   ],
+   "bundle": "009.md"
+  },
+  {
+   "title": "苏州V3审批流页面拆分约定：按节点目录 + nodeType/currentNode 一节点一页",
+   "type": "pattern",
+   "content": "什么情况：苏州V3（zhi2-web-admin，Vue3+Element Plus+Vite）要做跟预售许可同构的审批流模块（如现售备案），用户要求「按审批流程拆分页面组件，参考预售的」。为什么：一个列表页塞所有节点会导致按钮/角色/过滤条件互相污染，拆成一节点一薄壳页最省事。怎么做：每个审批节点一个目录 src/views/presale/cashsale/{node}/，内含 index.vue（列表）+ detail.vue（详情），列表按 currentNode=nodeType 过滤；nodeType 取值约定：受理 taskAccept、初审 taskFirstAudit、复审 taskReview（一审/二审共用）、预公告 taskNoticeResult、终审 taskFinalAudit，企业端申请页（直报）不传 nodeType。预公告节点的特殊规则（与预售一致）：列表按 taskNoticeResult 过滤，详情展示公示期倒计时，公示期未结束前「公告结果维护」按钮禁用。后台菜单 SQL 的 filePath 必须与页面真实路径逐条对齐；路径变动时只改薄壳页和 E2E 的 menu-config，不动机页。未拆分模块（如预售转现售 sourceType=2 企业申请+主管终审）允许单页承载。差异说明：已知清单是小程序语境（状态字典映射、projectNo 传参），没有这条 Web 后台审批节点页面结构模式，故独立成条。",
+   "evidence": "会话中先实现现售备案与预售转现售前端+E2E，随后用户发图要求「现售也按照这个审批流程拆分页面组件，参考预售的」，最终结论输出了 6 个现售节点菜单的 filePath/nodeType/角色对照表，以及预公告节点「列表按 currentNode=taskNoticeResult 过滤、公示期未结束禁用公告结果维护」的规则，并明确「后端菜单 SQL 的 filePath 需与上表一致；若实际路径不同，只改薄壳页和 E2E menu-config 即可」。",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permit/permitConstants.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permit/components/detail.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/presale/presale-permit-real-api-flow.spec.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/fixtures/presale-permit-helpers.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/presale/presale-extend-real-api-flow.spec.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/fixtures/presale-extend-helpers.js"
+   ],
+   "baseline": "1c445c77",
+   "sessionIds": [
+    "3cf8e48f-ba36-49e4-945e-5febab989038"
+   ],
+   "bundle": "010.md"
+  },
+  {
+   "title": "详情页间距不要双来源：父容器 flex/grid gap 与共享组件自带 margin 叠加会翻倍",
+   "type": "bug",
+   "content": "什么情况：苏州V3详情页出现「区块间距过大」（约 40px），全局排查后用户又反馈「原有的间距都没有了」，即修复过头造成回归。为什么：页面上同时存在两套间距规则——一类详情页是 .detail-container 直接挂 Headline 组件、容器已有 gap:24px，而 Headline 自身又写了 margin-bottom:16px；另一类是 .detail-from-container 内表单已有 row-gap:16px，子级又加了 margin-top/bottom:16px。两条规则都生效，间距被叠加到 32–40px。怎么做：确立「单一间距来源」约定——容器用 gap/row-gap 时，子级（尤其是 Headline 这类共享区块标题、AgencyBasicInfoForm 这类表单片段）一律不再写 margin；容器无 gap 时才由子级 margin 负责。全局改间距必须先摸清每个页面已有的 spacing 来源（容器 gap / 子级 margin），否则调大再调小必然反复回归。验证方式：用 E2E 断言相邻区块间距落在 16–24/16–28px 区间，比人眼看截图可靠；改完提示用户硬刷新（Ctrl+Shift+R）排除缓存。差异说明：已知清单无间距体系条目，且此条的核心不是调数值，而是共享组件与父容器间距归属冲突。",
+   "evidence": "用户先报「缺少间距，全局排查修复」，改完再报「原有的间距都没有了」，最终结论明确「之前间距确实叠了两层」并给出对照表（detail-container gap:24px + Headline margin-bottom:16px ≈ 40px；detail-from-container row-gap:16px + 子级 margin 16px ≈ 32px），修复为统一单一间距来源，并用两条 E2E 断言间距区间通过验证。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/Headline/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/AppendixPackageSection/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/AppendixEmpty/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchDetail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/companyApplyAudit/detail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/institutionRegister/detail.vue"
+   ],
+   "baseline": "9dba6559",
+   "sessionIds": [
+    "7d944204-556e-42c4-aea2-49cfa70bd1db"
+   ],
+   "bundle": "010.md"
+  },
+  {
+   "title": "从 vue-cli 老仓库（建湖G）迁模块到 Vite V3：遗留组件/指令必须换成 V3 公共件并 build 验证",
+   "type": "workflow",
+   "content": "什么情况：从另一个仓库（建湖G，vue-cli 脚手架）整体迁移存量房等菜单到苏州V3（Vite + Vue3 + Element Plus），要求「符合当前代码仓库的规范、接口规范、UI规范，使用公共组件/mixins/zs-xxx 组件」。为什么：直接复制会把老仓库的私有封装一起带进来，与 V3 已有能力重复，且 vue-cli 时代的全局 XHR 劫持在 Vite+axios 下维护成本高。怎么做：迁移后逐个清理旧遗留物并替换为 V3 对应实现——OperationContainer（详情顶栏返回/保存/提交/更多按钮组）→ operation-btn-group；SearchContainer（折叠更多筛选 + 内联 el-form 搜索区）→ zs-search-form + ListTemplate（formItems/columns 配置式）；v-waiting 指令（全局劫持 XMLHttpRequest 按 URL 给表格/按钮盖 Loading）→ v-loading=\"loading\" + listMixins 的 getList loading，并删除指令文件及 directives/index.js 里的注册。列表页筛选区统一 zs-search-form，有条件复杂的（如监管账号用 slot）走 ListTemplate。清理完必须 npm run build 编译验证 vue-cli→vite 的兼容问题，并顺带核对表格列等易被误删的模板片段。差异说明：已知清单的构建条目只讲 safe-delete 与 dist 产物校验，没有跨仓库迁移的组件映射与遗留物清理清单。",
+   "evidence": "用户诉求「从这个仓库迁移存量房相关的所有菜单…使用公共组件，mixins，zs-xxx组件…移除冗余代码」，随后指出「当前项目有封装的 zs-xxx 组件没有替换，另外需要 build 编译验证没有兼容问题。原来是 vue-cli 的脚手架现在是 vite 的」；最终结论列出 OperationContainer/SearchContainer/v-waiting 三项遗留物及其 V3 替换方式，说明已删除组件与指令注册、contract/business 改 zs-search-form、accountCancellation 改 ListTemplate、contract 列表恢复被误删的表格列，并注明 npm run build 已通过。",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/agreement/jgxm/components/SupervisionAddDialog.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/mixins/listMixins.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/package.json",
+    "D:/repository/建湖G/package.json"
+   ],
+   "baseline": "4555c0d1",
+   "sessionIds": [
+    "005ca51a-2e96-4282-b80d-8c9843005a56"
+   ],
+   "bundle": "010.md"
+  },
+  {
+   "title": "详情弹窗字段列数约定：字段数 < 8 用单列、≥ 8 用两列，严禁在页面写死列配置",
+   "type": "preference",
+   "content": "什么情况：本 Web 后台（zhi2-web-admin）大量页面用 zs-dialog + detail-template 渲染「详情查看弹窗」，此前各页面各自写死列数，出现「一行三列」把长文本字段挤成竖排的情况，用户反复打回（「还是不对」「完全没改」）。\n为什么：字段数和文案长度因业务而异，写死列数必然在某个页面翻车；统一规则才能一次改完不复发。\n怎么做：全局规则是「字段数量 < 8 → 单列；其余（≥ 8）→ 两列」，把页面里写死的列配置（columns/span/label-width 之类）一律移除，让 detail-template 按字段总数自动算列数。改动必须全局排查而非只改被点名的那一个弹窗——用户点名「解款节点管理详情子表弹窗完全没改」说明存在同类遗漏，收尾时要搜所有引用 detail-template / DetailDialog 的页面做一遍扫描，并用一次 npm run build 兜底。",
+   "evidence": "会话 c9cf03c0 用户诉求 1 明确提出「目前还有详情弹窗是一行三列的，全局排查一下都严格按照字段数量，小于8个单列，其余的2列。把写死的列配置都移除了」，后续诉求 3/4/5 连续打回「明细详情查看弹窗还是不对」「解款节点管理详情子表的弹窗完全没改」「全局排查还有类似没修复的吗」。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-dialog\\zs-dialog.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\detail-template\\detail-template.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\institutionRegister\\detail.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\property\\publicBenefit\\components\\DetailDialog.vue"
+   ],
+   "baseline": "d327eb54",
+   "sessionIds": [
+    "c9cf03c0-26f2-4824-930b-cef3b4dedcda"
+   ],
+   "bundle": "011.md"
+  },
+  {
+   "title": "踩坑：用正则批量给 Vue 文件补字段会误伤 props/watch 里的同名 key，造成 `visible: {,` 与缺逗号，构建直接失败",
+   "type": "bug",
+   "content": "什么情况：为若干个页面的 contentInfo 批量补 visible 字段时，用正则扫全仓替换，结果改坏了不该动的代码，npm run build 报语法错误。\n为什么：正则无法区分上下文。`visible` 在 Vue 文件里至少三种身份——① 组件 props 定义 `visible: { type: Boolean }`、② watch 里的 `visible: {`、③ contentInfo 数组项里的表达式 `visible: xxx`。批量脚本把 `visible: {` 一律替换成 `visible: {,`（约 55 处，散布在 OrgTypeDialog.vue、MobileSimulator/index.vue 等），同时给 contentInfo 的 visible 行补逗号时误判导致后续 `dot:` / `type:` 前缺逗号。\n怎么做：批量改 React/Vue 模板字段这类「同一 key 多义」的场景，避免裸正则全仓替换；退一步也要先 `grep -n` 列出全部命中人工过一遍上下文再动手。修复时按身份分治：把 `visible: {,` 改回 `visible: {`；只在「表达式形式」的 visible 与其后续属性之间补逗号，绝不动 `visible: { type: ... }` 这种 prop 定义。收尾必须跑一次 npm run build 确认（Sass @import 的 deprecation 是既有告警，与本问题无关，不要误判为本次引入）。",
+   "evidence": "会话 c9cf03c0 最终结论明确记录「之前为 contentInfo 批量补 visible 时，正则改动了不该动的代码：props/watch 里的 visible: { 被写成 visible: {,（约 55 处）；contentInfo 里 visible 行末尾缺逗号」，并给出分治修复方案，修复后 npm run build 通过。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\scripts\\migrate-dialog-form-layout.mjs",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\e2e"
+   ],
+   "baseline": "d327eb54",
+   "sessionIds": [
+    "c9cf03c0-26f2-4824-930b-cef3b4dedcda"
+   ],
+   "bundle": "011.md"
+  },
+  {
+   "title": "Element Plus el-tooltip 的提示内容挂在 body 下，样式必须写在非 scoped 块，scoped 一定不生效",
+   "type": "pattern",
+   "content": "什么情况：本后台用 el-tooltip 做「？」图文提示，样式写在 <style scoped> 里，提示气泡完全没有样式（图片尺寸错乱、两列排不开）。\n为什么：el-tooltip 的 content 通过 teleport 挂到 body 上，已脱离当前组件的 DOM 子树，scoped 编译出的 `[data-v-xxx]` 属性选择器匹配不到这些节点，所以规则被完全丢弃且不报错。这与「:deep 权重打平」不是同一个问题——:deep 也救不了，因为节点根本不在组件根内。\n怎么做：tooltip / popover / dropdown / el-select 下拉这类挂 body 的浮层，其内容样式统一写在组件文件里额外的**非 scoped** style 块（可以就近同文件加一个不带 scoped 的 <style>），并给浮层内容加专属类名做命名空间，避免污染全局。本项目的苏找房对齐实现里 PropertyVerifyDialog.vue 就是这么处理的。",
+   "evidence": "会话 3112e935 改动说明：「tooltip 样式放非 scoped 块（el-tooltip 内容挂 body 下，scoped 不生效）」；同一文件的图片 import + computed 分组模板改动后探针截图确认渲染正确。",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/leaseContract/PropertyVerifyDialog.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/fixtures/lease-contract-helpers.js"
+   ],
+   "baseline": "ed13ca0b",
+   "sessionIds": [
+    "3112e935-8b6c-4c36-bde1-da3d29bbabd9"
+   ],
+   "bundle": "011.md"
+  },
+  {
+   "title": "一对多单据的 batchSave 返回 boolean 无主键 → 保存后必须回来源列表，不能跳详情；分组靠 projectLimitId 外键",
+   "type": "pattern",
+   "content": "什么情况：房屋限制这类「一张单据 + 多户室明细」的业务，保存走 /building/houseLimit/batchSave，把单据级字段（projectId/projectName/limitNumber/limitExplain/involveCourt）和逐户字段（buildingId/buildingNo/houseId/houseNo/unifiedBuildingCode/position/actualFloorArea/purpose/hasLimit/houseProperty/sealUpRecord）拍平进 houseLimitSaveList 一起提交。\n为什么：批量接口返回 boolean 而不是新主键，前端拿不到新单据 ID，自然无法 navigateTo 到详情页；若强行拼详情路由会带出空 id。\n怎么做：① 保存成功后统一走 handleOperationBack 返回来源列表（列表页/审核列表都可能发起，来源由进入参数决定），由列表刷新承担结果展示；② 分组外键 projectLimitId 在编辑态由后端详情带入、新增态留空交给后端生成，切不可前端伪造；③ 解除限制场景每项明细额外带 limitIds。接口契约若与代码现状不一致（代码仍挂在 projectLimit/*、契约只有 houseLimit/*），先停下来把「列表主键取 houseLimitId 还是 projectLimitId、有无 projectLimit/detail、审批在工作流哪一端、hasLimit 字典取值」这几个口径问清楚再动手，避免半改。",
+   "evidence": "会话 85c68620 最终结论：getForm() 改为组装 houseLimitSaveList；「batchSave 返回 boolean 无 ID → 保存后回来源列表（handleOperationBack）」；projectLimitId 作分组外键编辑态带入新增态空；并列出 4 条待后端确认的契约问题。",
+   "files": [
+    "D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permitExtend\\index.vue",
+    "D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permitExtend\\detail.vue",
+    "D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permitExtend\\permitExtendConstants.js",
+    "D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\mixins\\approval.js",
+    "D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permitExtend\\components\\ApprovalDialog.vue"
+   ],
+   "baseline": "ffce65cd",
+   "sessionIds": [
+    "85c68620-05dd-4cb3-9c93-95a90ec395b2"
+   ],
+   "bundle": "011.md"
+  },
+  {
+   "title": "用户硬性约束：新模块必须复用公共组件/mixins 与既有字典，自绘楼盘表或自写选房弹窗会被直接打回",
+   "type": "preference",
+   "content": "什么情况：新建业务模块时，把表格、弹窗、楼盘表、选择房屋等交互自己写了一套，验收时被逐条指出「楼盘表没有使用公共组件」「选择房屋弹窗没有使用公共组件」「位置错乱」「按钮文字和位置不符合项目规范」。\n为什么：本后台的 listMixins / detailMixins / subTableMixins / ListTemplate / table.js / approval.js 已经把分页、搜索、审批流、子表、按钮区做成了标准件；自写实现不仅样式和交互跑偏，后续统一改造（如详情弹窗列数规则）也会漏掉它。\n怎么做：接新需求时先 grep 同目录最相近的已完成页面，按「listMixins + ListTemplate 列表 → detailMixins 详情 → 公共 zs-dialog/zs-* 组件 → approval.js 审批」的骨架搭；楼盘表、选择房屋、附件、打印等业务交互一律先找公共组件，找不到再问，不要先自己实现。字典统一取既有字典（getDict/dictLabel），不新造枚举。用户明确要求「尽量不要写新的变量或者方法」，这意味着新代码应优先落在 mixin 的既有钩子和配置项里。",
+   "evidence": "会话 85c68620 用户诉求 5/6：「按钮文字和位置不符合项目规范」「位置错乱」「楼盘表没有使用公共组件」「选择房屋弹窗没有使用公共组件」；会话 3112e935 需求原文硬性约束：「复用公共组件、mixins，尽量不要写新的变量或者方法；打印直接用公共组件，不需要前端处理；下拉复用项目里面已有的字典」。",
+   "files": [
+    "D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\mixins\\ListTemplate.js",
+    "D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\mixins\\listMixins.js",
+    "D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\mixins\\table.js",
+    "D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\mixins\\detailMixins.js",
+    "D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\mixins\\subTableMixins.js"
+   ],
+   "baseline": "ffce65cd",
+   "sessionIds": [
+    "85c68620-05dd-4cb3-9c93-95a90ec395b2",
+    "3112e935-8b6c-4c36-bde1-da3d29bbabd9"
+   ],
+   "bundle": "011.md"
+  },
+  {
+   "title": "本后台的 e2e 套路：真实接口流 + fixtures 登录助手 + 断言图片 naturalWidth，而不是 mock",
+   "type": "workflow",
+   "content": "什么情况：新模块（租赁合同备案）要求「生成 e2e 用例并自测通过」，交付范围选的是「页面 + e2e 闭环」，本地起 dev server（8081）+ 后端真实接口跑 Playwright。\n为什么：后台表单强依赖字典、审批流、附件等真实数据，mock 出来的用例跑得通但接不上真环境；而图片类资源在 jsdom/mock 下恒为未加载，必须打真接口才有意义。\n怎么做：① 每个业务模块一对文件——e2e/<模块>/xxx-real-api-flow.spec.js + e2e/fixtures/xxx-helpers.js，登录态与请求准备统一放 helpers（auth-helpers.js 已有先例），spec 只写场景；② 图片/证书示例这类渲染断言用 `naturalWidth > 0` 判定真实加载成功，再叠加图注文案断言，比断言 src 串更可靠；③ 断言要按业务分支写全（如区域 × 证型四种组合），组件行为与参考项目一致时不要凭想象补文案断言——本次就出现过 spec 预期错误需按实际行为修正；④ 收尾跑全量 spec + ESLint exit 0 + lint-staged，确认工作区干净再报完成。",
+   "evidence": "会话 3112e935：交付范围选择「页面+e2e闭环」与「本地dev server跑通」；结论记录 e2e 全量 8 条全绿（53.4s）、ESLint exit 0、lint-staged 通过；fixtures 中 assertPropertyCertSampleTips 改为断言 3 张封面图 naturalWidth > 0 + 图注文字，并新增 assertWarrantCardTip；期间修正一处 spec 预期错误（「不以年份开头」文案仅园区场景出现）。",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/README.md",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/fixtures/auth-helpers.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/presale/lease-contract-real-api-flow.spec.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/fixtures/lease-contract-helpers.js"
+   ],
+   "baseline": "ed13ca0b",
+   "sessionIds": [
+    "3112e935-8b6c-4c36-bde1-da3d29bbabd9"
+   ],
+   "bundle": "011.md"
+  },
+  {
+   "title": "Web 端详情/编辑页三列布局规范与 DetailTemplate 反模式（含批量修复脚本）",
+   "type": "pattern",
+   "content": "zhi2-web-admin（Vue3 + Element Plus）的详情/编辑页有固定布局骨架：一个详情页由若干 Headline 分组块组成，每块内「只读态」用 DetailTemplate，「新增/编辑态」用 el-row :gutter=\"24\" + el-col :span=\"8\" 组成一行三列；zs-form 必须包裹 Headline，不能反过来。由此产生一类高频 UI 紊乱，根因全是结构嵌套反了：①<DetailTemplate v-if> 之后用 <template v-else> 承载表单 → 必须改成 <el-row v-else :gutter=\"24\">，否则 v-else 无真实元素可渲染，整段塌陷；②Headline 内嵌 zs-form（表单被塞进标题行）→ 提升为 zs-form 包裹 Headline；③Headline 内直接放 el-col → 必须补一层 el-row；④el-col :span=\"24\" 再包 Headline → 去掉多余包裹层；⑤el-row v-else 内又嵌 el-col :span=\"24\" → 展开内层 el-col，否则单列满宽破坏三列。这类问题在 2317 个 .vue 里成批存在（累计 350+ 文件），手工排查不现实，正确做法是写脚本 zhi2-web-admin/scripts/fix-detail-form-layout.mjs 做正则/AST 级批量改写，并把五条反模式做成语料检查，修完再跑一遍验证 Updated: 0 才算稳定。关键细节：脚本对 zs-form-item 特殊结构会产生「改过去又改回来」的振荡，所以脚本必须内置标签平衡校验，遇到结构无法安全推断的文件（如 company/brand/detail.vue）就跳过并列入手工清单，按标准结构人工重建，绝不写入半损坏文件。",
+   "evidence": "会话 ffafea18：用户报 specialcontract/detail.vue UI 紊乱，修复后要求「类似问题全局排查修复」，又发现 exchangeContract/detail.vue 仍有问题；最终扩展脚本扫描 2317 个 vue 文件，累计修复 350+，五类反模式清零，二次运行 Updated: 0；company/brand/detail.vue 因振荡改人工重建并给脚本加了 zs-form 标签平衡校验。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/scripts/fix-detail-form-layout.mjs",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/commercialHousingSales/presale/specialcontract/detail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/commercialHousingSales/presale/exchangeContract/detail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/utils/detailLayout.js",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/mixins/detailMixins.js",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/brand/detail.vue"
+   ],
+   "baseline": "ffafea18",
+   "sessionIds": [
+    "9cef6548-281c-458c-8b71-7f1779b265a0"
+   ],
+   "bundle": "012.md"
+  },
+  {
+   "title": "同一业务 B 端/G 端不要拆两套页面，合并成一个菜单按 terminalType 在页面内分流",
+   "type": "preference",
+   "content": "需求方（用户）在本项目的明确偏好：同一业务（如经纪机构分支机构备案）的主管端与企业端功能，不要做成两个菜单、两套页面，而是合并成一个菜单入口，用登录态里的 terminalType 在页面内部区分逻辑。落地方式：①菜单只注册一条路由，列表接口按端选择 /page（企业端）与 /pageManage（主管端），而不是复制两个 index.vue；②行内操作按钮的显隐用「权限码 && 业务状态」双条件组合，主管端独有的「注销」按钮由 terminalType + 权限码共同控制；③差异只在数据源、按钮、字段可编辑性上分支，布局骨架、筛选区、分页、表单复用同一份代码。这样后续改字段只改一处，避免两套页面漂移。注意与同源模板的既有约定区分：泰兴小程序那套「员工端与业主端同名业务接口不可互推、各自对齐」是接口层面的独立实现问题，与本条「同一端内用 terminalType 分流但页面只写一份」不冲突，不要混用。判断端的工具函数沿用项目已有的 terminalType / isBTerminalPractitioner / isGTerminalLike，不要新造。",
+   "evidence": "会话 130ee055 第 4 轮用户明确要求「合并成一个菜单，通过 terminalType 来区分 B 端和 G 端的用户，在页面里面区分逻辑」；第 5 轮追加「新增和编辑是一行三列，详情页使用 detail-template」。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/record/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/record/detail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institutionRegister/components/Step4ServiceScheme.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/fixtures/company-menu-config.js"
+   ],
+   "baseline": "130ee055",
+   "sessionIds": [
+    "e878bcab-6ff1-431b-8fab-530533fdf8df"
+   ],
+   "bundle": "012.md"
+  },
+  {
+   "title": "删除全局项目上下文（store state/getter）必须全量排查引用，否则降级为静默 undefined",
+   "type": "bug",
+   "content": "移除「登录后选项目/小区」能力（operableProjectList）时，只删 layout/index.vue 里的请求、Navbar 入口、bProjectDialog.vue、projectContext.js，以及 store/modules/user.js 的 state/mutation 和 store/getters.js 的 getter 是不够的：其他模块通过 mapGetters 或 getters.currentProjectId 引用已删除的 getter 时不会报错，只会拿到 undefined，表现是筛选条件悄悄消失、接口按「全部项目」返回数据，属于典型的静默降级，只有逐页比对数据才发现。正确顺序：①先全局搜索 currentProject / currentProjectId / projectContext / bProjectDialog 的所有引用点，列出清单；②再删源头；③对每个残留引用明确处理——要么改成页面内自选区域，要么删掉该筛选逻辑，并在交付说明里点名还剩哪些模块（本次 benefit 模块就遗留了）。另外删除时同步清理历史 localStorage 键，否则老用户本地缓存里的旧项目 id 会被新逻辑误读；依赖全局项目实现「B 端字段锁定」的 mixin（bTerminalProjectMixin.js）只保留字段锁定判断，不要再去注入 currentProjectId。全局项目移除后，原本靠右上角所选区域自动带出的新增表单（如 property/complex/detail.vue）必须补上页面内区域选择。",
+   "evidence": "会话 130ee055 最终结论：移除 operableProjectList 后，明确说明「benefit 模块中仍有部分页面引用已移除的 currentProjectId getter，现在会得到 undefined，不再自动按全局项目过滤，需在页面内自行选择区域」。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/layout/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/layout/components/Navbar.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/store/modules/user.js",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/store/getters.js",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/mixins/bTerminalProjectMixin.js",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/property/complex/detail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/home/bProjectDialog.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/utils/projectContext.js"
+   ],
+   "baseline": "130ee055",
+   "sessionIds": [
+    "e878bcab-6ff1-431b-8fab-530533fdf8df"
+   ],
+   "bundle": "012.md"
+  }
+ ]
+}

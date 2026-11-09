@@ -1,0 +1,172 @@
+{
+ "batch": 8,
+ "files": [
+  "043.md",
+  "044.md",
+  "045.md",
+  "046.md",
+  "047.md",
+  "048.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "title": "[苏房] 查看态要件卡片的红色必填星号要靠 operable 门控，不能靠改 DetailTemplate",
+   "type": "pattern",
+   "content": "情况：用户反馈「详情/查看页里要件上传还显示红色必填星号」，要全局隐藏而不影响编辑/登记态。\n\n为什么：这些详情页与编辑页用的是同一个 AppendixPackageSection / AnnexUpload 要件宫格，星号若只按「配置里 isRequired === '1'」渲染，则只读页也会出现必填标记，与「查看态无任何可填项」的语义冲突；而反过来直接在公共 DetailTemplate 或全局样式层去掉星号，会把编辑态的必填提示一并抹掉。\n\n怎么做：在 AnnexUpload/components/AppendixRequirementCard.vue 里加计算属性 showRequiredMark，条件为「operable === true && isRequired === '1'」才渲染 `*`。这样调用方语义天然分流：\n- 详情/查看：AppendixPackageSection 传 operable=false（即 requirement-grid 只读模式）→ 不显示星号；\n- 编辑/登记：AnnexUpload 传 operable=true → 必填要件仍显示星号。\n\n关键点：只改展示，不动校验函数 checkRequiredAppendix，各业务 detail.vue 无需逐页调整；验收时要同时打开一个只读详情页和一个可编辑页对比星号是否只在后者出现。",
+   "evidence": "会话 b4676408：用户先问「查看详情页中要件上传没有红色必填」，随后澄清「详情页要件上传隐藏红色必填星号」。最终在 AppendixRequirementCard.vue 增加 showRequiredMark（operable===true && isRequired==='1'），说明「AppendixPackageSection 传 operable=false → 不显示星号；AnnexUpload 传 operable=true → 必填要件仍显示星号」，并强调 checkRequiredAppendix 未改动、各业务 detail.vue 无需调整。",
+   "files": [
+    "zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementCard.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementGrid.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/index.vue",
+    "zhi2-web-admin/src/components/AppendixPackageSection/index.vue"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "b4676408-39dd-4ce7-bd44-3126514f23d0"
+   ],
+   "bundle": "045.md"
+  },
+  {
+   "baseline": "99bfdbd",
+   "content": "场景：预售许可申请 → 预售楼幢列表 →「选择楼幢」弹窗，用户反馈可选楼幢「闪现一下就消失、无法选择」。\n\n根因：宿主组件 PresaleSelectBuildingDialog 自己请求 /presale/permit/building/available，并把结果直接写进 zs-select-dialog 的 tableData；而 zs-select-dialog 在弹窗 opened（打开动画结束）时会默认执行 getList()，getList() 第一步就是 this.tableData = []。宿主既没传 url（组件不会再发请求），于是时序变成：visible=true → 宿主接口很快返回 → 列表短暂出现 → opened 触发 getList → 列表被清空 → 永久「暂无数据」。本质是「打开时机自动取数」与「宿主预取」两套逻辑打架，且后者的清空是静默的。\n\n解法：凡是由宿主自己加载数据的选择弹窗，在 zs-select-dialog 上显式加 :no-auto-query=\"true\"，关闭打开时自动查询；同类页面（现售选楼幢 CashsaleSelectBuildingDialog）要一起修，避免同源缺陷。\n\n排查提示：出现「列表闪一下变空」而不是「一直空」时，优先怀疑弹窗组件的 opened/onOpen 钩子内部重置了数据源，而不是接口未返回；若仍为空，再去查是否已选项目、projectId 是否传入。\n\n注意：已知清单里 no-auto-query 只记录为「树+表二级联动」用法，未记录「宿主预加载被 opened 清空」这个根因与「闪现后消失」的判别特征，故单列。",
+   "evidence": "会话 df800cf7：结论明确写出 zs-select-dialog 在 opened 时默认 getList() 且 getList 一开始 tableData = []，修复为 PresaleSelectBuildingDialog 与 CashsaleSelectBuildingDialog 增加 :no-auto-query=\"true\"。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permit\\components\\PresaleSelectBuildingDialog.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permit\\components\\PresaleBuildingSection.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-select-dialog\\zs-select-dialog.vue"
+   ],
+   "sessionIds": [
+    "df800cf7-e2ef-4b89-a4a7-01dba797550d"
+   ],
+   "title": "[苏房] zs-select-dialog 自带查询会把宿主预加载的 tableData 清空：自定义取数弹窗必须传 no-auto-query",
+   "type": "bug",
+   "bundle": "046.md"
+  },
+  {
+   "baseline": "d327eb5",
+   "content": "场景：zs-table 的 fill-height（把 el-table 的 height 设为卡片剩余空间、表体在视口内滚动）在「当前页条数 == pageSize」的区域树列表上失效，表格贴不满右侧 list-card，依赖 :has(> .zs-table-container--fill-height) 的布局规则也随之失效。\n\n根因：syncFillHeight 里有一个兜底分支——当 contentHeight < height 时无条件把 resolvedFillHeight 置为 false 并走 calculateTableHeight。但在每页 10 条等常见配置下，行高合计本来就小于卡片高度，「内容高度小于布局高度」是满页撑高的正常状态而非稀疏页误判，于是每次同步都会触发兜底、反复取消撑高，与「shouldSparseAutoHeight 仅在末页收缩」的设计直接冲突。\n\n解法/约定：fill-height 的关闭条件只能有一个权威来源。取消撑高的兜底必须加 shouldSparseAutoHeight 为真、或 tableData.length < resolvedPageSize 之类的稀疏判定，不能只看 contentHeight 与 height 的大小关系。写这类「内容 vs 容器」自适应逻辑时，先明确「谁是权威判定函数」，其他分支只能引用它，禁止平行再写一套阈值。\n\n审查提示：改 zs-table 高度相关代码，必须用「恰好满页」「末页不足一页」「空数据」三种数据量回归，只看末页很容易漏。",
+   "evidence": "会话 bbc25659：code review 定位 zs-table.vue 约 503-510 行，判为 high 级 LOGIC_BUG，指出满页也会进入 shouldAutoFillHeight 且 contentHeight < height 必然成立。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue"
+   ],
+   "sessionIds": [
+    "bbc25659-fa7f-425f-941d-acf8d81387e8"
+   ],
+   "title": "[苏房] zs-table fill-height 的 syncFillHeight 兜底会误关满页撑高：判定必须与 shouldSparseAutoHeight 同源",
+   "type": "bug",
+   "bundle": "046.md"
+  },
+  {
+   "baseline": "d327eb5",
+   "content": "场景：一批 zs-dialog 规范化改造——header 改 #E8EBF0、padding 32/48、页脚居中、宽度收敛两档（500/1000）、provide zsDialogDetailColumn 供 DetailTemplate 用，同时改了 variables.css 的弹窗 token。\n\n根因：把 `.zs-dialog .el-dialog .el-dialog__footer` 与内层 `.dialog-footer` 统一改成 justify-content: center，选择器特异性约 (0,4,1)，高于页面 scoped 的 `.dialog-footer { justify-content: flex-end }`（约 (0,2,1)）以及 `:deep(.el-dialog__footer .dialog-footer)` 写法。结果所有依赖页脚右对齐的老弹窗（如 DepositTypeDialog、subDialog 等）全被改成居中，只有写内联 style 的能压回来。\n\n约定/解法：新规范样式只能作用在变体类上（如 .zs-dialog--form-single / .zs-dialog--form-double），或提供 footer-align prop 让页面显式选择，禁止在公共组件里对未加变体类的弹窗做全局覆盖；合并前对「确定/取消成对按钮」「左右分栏底栏」两类老弹窗做冒烟。\n\n同类提醒：同批把 form-box 的 max-height 设成 none 会拿掉壳内滚动上限（长表单可能超出视口），并把 --list-section-gap 从 24px 改成 16px 影响全部列表页——公共样式文件的小改动要单独列出并做全局抽检。",
+   "evidence": "会话 5b7711a1：变更说明为新 header/页脚居中/宽度档位/provide zsDialogDetailColumn，审查报告 HIGH 级为「全局页脚居中压过业务侧右对齐」，并建议收进 --form-single/--form-double 作用域或加 footer-align prop。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-dialog\\zs-dialog.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\styles\\element-ui.scss",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\styles\\variables.css",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\detail-template\\detail-template.vue"
+   ],
+   "sessionIds": [
+    "5b7711a1-320a-4029-b558-e03f39302412"
+   ],
+   "title": "[苏房] zs-dialog 页脚居中改全局会压过业务侧右对齐：新规范样式必须收进 form-layout 变体作用域",
+   "type": "pattern",
+   "bundle": "046.md"
+  },
+  {
+   "title": "弹窗提交前把「未声明的 prop / 只读 computed」写回 form，静默覆盖行数据，表现像「点确定没反应」",
+   "type": "bug",
+   "content": "情况：SupervisionAddDialog 提交前执行 `this.form.priceRecordId = this.priceRecordId`，但弹窗从未声明 priceRecordId 这个 prop，父表格组件也没往下传，值恒为 undefined，把 normalizeFormFromRow 从行数据带进来的值整体抹掉 —— 接口失败或业务字段丢失，弹窗不关，用户体感就是「点确定没反应」。同一文件里还有第二处：setRegulatory 直接给只有 getter 的 initRegulatorAmount（computed）赋值，Vue2 下无效或告警；且按面积分支（type=1）的公式与 computed（标准×系数×面积）不同源，初始监管额度算错。为什么：这两处都把「页面派生值」当成表单字段反向写回，而真正的数据源（props / computed）根本没接上，Vue 不报错，属于纯静默污染。怎么做：① 弹窗需要的入参必须显式声明 props 并由宿主组件传全，review 时逐个核对 `this.form.x = this.x` 右侧的 x 是否真的定义在 props/data/computed 里；② 只读 computed 只能靠其依赖反向驱动，禁止赋值；③ 同一个业务公式只保留一份（computed 或纯函数），编辑态复用；④ 提交 promise 必须补 .catch，并把「校验失败 / 业务 code≠200 / 网络异常」三类分开提示，否则失败不关窗会被误判成关窗逻辑坏了。",
+   "evidence": "会话 210c9226 对 SupervisionAddDialog.vue / SupervisionTable.vue 的 review：runSubmit 清空 priceRecordId（约 347 行）、setRegulatory 对只读 computed 赋值（约 324/328 行）与 initRegulatorAmount（202–206 行）公式不同源、request(this.form).then 无 catch（350–359 行）；结论判定为 HIGH，建议合并前补 priceRecordId 透传。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\agreement\\jgxm\\components\\SupervisionAddDialog.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\agreement\\jgxm\\components\\SupervisionTable.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "210c9226-eae6-453c-a5ce-287209ef9caa"
+   ],
+   "bundle": "047.md"
+  },
+  {
+   "title": "弹窗提交前先 blur 当前控件再 $nextTick 里校验，修复「焦点还在输入框时必填校验读到旧值」",
+   "type": "pattern",
+   "content": "情况：弹窗「确定」按钮的校验偶尔放行空值或拦截刚填好的值，尤其是用户输完直接点确定、焦点仍在最后一个输入框时。为什么：Element 表单的 blur 触发规则在点击按钮的 mousedown→click 之间执行，校验拿到的还是失焦前的 model，且同一 tick 内 DOM/model 尚未刷新。怎么做：确定按钮的 click 处理里，先 `document.activeElement.blur()`（或对当前输入框派发 blur），再 `this.$nextTick(() => this.$refs.form.validate(...))`，让校验在模型与 DOM 同步后执行；校验通过后再提交，失败时保持弹窗打开并聚焦第一处错误。这是本项目缓解「焦点在输入框时校验未刷新」老问题的既有做法，改动关窗链路时不要顺手删掉这两步。",
+   "evidence": "会话 210c9226 review 结论第五条：「确定前 blur + $nextTick 再校验（约 363–369 行）能缓解焦点在输入框时校验未刷新的老问题」，并确认关窗链路（close() emit update:visible + :visible.sync）本身正确，不要再回退这层。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\agreement\\jgxm\\components\\SupervisionAddDialog.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "210c9226-eae6-453c-a5ce-287209ef9caa"
+   ],
+   "bundle": "047.md"
+  },
+  {
+   "title": "「地址类字段一律占 2 列」是全站约定：复用 FORM_COL_WIDE / DETAIL_COL_WIDE / .section-field--wide，编辑与查看两处同改",
+   "type": "preference",
+   "content": "情况：用户要求「所有表单字段里带『xx 地址』的字段都改为占 2 列，编辑和查看都要改」，一次改动涉及 55 个文件（登记注册、备案、物业/项目、合同、保障/维修资金、系统配置全覆盖）。为什么：地址类文本普遍长，半宽或三列栅格里会被截断/换行；项目里若每页各写 span，改一次就要全站重扫，且在地址字段较多的注册/入驻页会明显挤。怎么做：不要再写裸 span，直接复用项目已有的宽度档——编辑态 el-col 用常量 FORM_COL_WIDE（md/lg/xl=16，小屏仍 24 独占一行）或类 .section-field--wide；查看态 DetailTemplate 的地址项 layout 写 `xs/sm:24, md/lg/xl:16` 或 DETAIL_COL_WIDE。排查口径：按 label 文案扫「注册地址/办公地址/经营地址/通讯地址/户籍地址/建设地址/楼盘地址/网点地址/服务地址/办理地址/活动地址/诉求地址/图片地址/访问地址」等，且「编辑表单 + contentInfo 查看构造器」必须成对改——只改一处会出现编辑态两列、查看态一列的不一致。",
+   "evidence": "会话 36c3d038：全局排查后修改 55 个文件，统一规则为编辑表单 el-col 改 md/lg/xl=16 或加 section-field--wide，查看页 DetailTemplate 的地址项 layout 改 xs/sm:24, md/lg/xl:16，并明确「复用了项目已有的 FORM_COL_WIDE / DETAIL_COL_WIDE 常量和 .section-field--wide 类」；清单覆盖 companyRegister、companyApplyAudit、propertyCompany、consLic、vendeeTab/agentTab、maintenance/bank、platformConfig 等。",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/zljg/leaseEntryNetwork/components/LeaseEntryNetworkSections.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/publicQuery/propertyCompany/detail.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "baseline": "fc66641",
+   "sessionIds": [
+    "36c3d038-8244-4aac-b939-54fe76395622"
+   ],
+   "bundle": "047.md"
+  },
+  {
+   "title": "共享布局组件里的兜底列宽规则会压扁 span24 整行字段：加标记类豁免，而不是改全局断点",
+   "type": "bug",
+   "content": "情况：从业人员基本信息里「户籍地址」编辑态已经是 FORM_COL_FULL（span 24，整行），实际却只占半宽，后面的「联系电话」被挤到同一行。为什么：根因不在栅格常量，而在 PersonnelBasicInfoLayout.vue 的兜底样式——它把块内所有 `.el-row > .el-col` 强制收敛为两列宽（本意是把三列栅格压成「证件照 + 两列」布局），只豁免了 textarea，于是整行字段也被压成半宽。这类「布局组件兜底选择器」是与全局 ElCol 断点补丁、section-form 规则并列的第三类列宽来源，几者会互相覆盖。怎么做：给需要整行的字段列加标记类（如 el-col--full-row），在布局组件里新增对应的豁免规则保持 100% 宽；该布局组件被机构备案人员等多个页面共享，没有标记类的列行为不变，风险可控。以后遇到「明明写了 span 24 却只占半宽」，先按「组件兜底选择器 → 全局断点补丁 → 页面 span」三层依次排查，不要直接改全局栅格。",
+   "evidence": "会话 699a0458（3 轮，用户先贴图问「这个对齐有问题？根因是什么」，再指出「编辑态没有占 2 列」）：根因为 PersonnelBasicInfoLayout.vue 兜底样式把 .el-row > .el-col 强制两列宽、仅豁免 textarea；修法是 AgencyPersonnelBasicInfoFormFields.vue 给 field.wide 列加 el-col--full-row，布局组件新增豁免规则。",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/companyApplyAudit/index.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/autonomy/regulation/record/detail.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "baseline": "fc66641",
+   "sessionIds": [
+    "699a0458-d744-41d2-99d1-4aedce0e8486"
+   ],
+   "bundle": "047.md"
+  },
+  {
+   "title": "变更单跳详情的 resolver 判定顺序：精确 busCode 查表 → 编码对称映射 → 文案模糊兜底（兜底必须最后且最窄）",
+   "type": "pattern",
+   "content": "情况：companyChangeManage 的 resolveChangeDetailTarget 需要把不同类型的变更行分流到不同详情页（基本信息/管理员/从业人员）。主体逻辑是对的：jgcyrybg/zlcyrybg 命中 CHANGE_DETAIL_TARGET_BY_BUS_CODE，cyrybg 在非开发企业列表上经 PERSONNEL_CHANGE_BUS_CODE_BY_ORGAN_TYPE 重映射，只有 jbxxbg/qybgxq 或标题含「基本信息」才走 BASIC_CHANGE_TARGET_BY_ORGAN_TYPE。为什么容易被改坏：一是 `changeTypeLabel.includes('基本信息')` 被放在 busCode 查表之前，从业人员变更单一旦出现「…基本信息…」这类复合文案就会误进机构基本信息变更页；二是映射是单向的——管理员有 ADMIN_CHANGE_BUS_CODE_MAP（jgglygl→jgglybg），从业人员却缺 jgcyryba→jgcyrybg 这类对称映射，后端若仍下发备案编码且文案不含「从业人员」，解析直接失败回退 redirectPath/待办，又落到错误详情。怎么做：判定顺序固定为「精确编码 → 机构类型维度的对称映射 → 文案兜底」，文案兜底只作为最后一道且条件写窄（精确相等或排除词表，不要 includes 泛匹配）；同时给每个主体补全「备案编码 → 变更编码」双向映射表，新增业务时同步登记。",
+   "evidence": "会话 96e5815b review：确认 resolveChangeDetailTarget 分流正确，但指出「文案兜底抢在 busCode 前面」会让含「基本信息」的从业人员变更误分流，「行上仍是备案 busCode 时无对称映射」会解析失败回退，另有详情页 query 语义（变更单 ID vs personnelRecordId）与 formMode watch 覆盖 mixin init() 的问题。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyChangeManage\\index.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyChangeManage\\agency\\index.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution\\agencyPersonnel\\components\\AgencyPersonnelDetail.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\api\\company\\companyChangeManage.js"
+   ],
+   "baseline": "85a6308",
+   "sessionIds": [
+    "96e5815b-f1fa-4cb4-b547-50a588d10e67"
+   ],
+   "bundle": "047.md"
+  },
+  {
+   "title": "[苏房] 子表数据组件 value/innerList 双向 watch 会形成 $emit('input') 回环，点击新增直接卡死页面",
+   "type": "bug",
+   "content": "现象：分支机构新增/编辑页点「服务方案 → 新增」，弹窗打不开，整个页面冻结（浏览器无报错，只是卡死）。\n\n根因有两处，主因是双向 watch 回环：ServiceSchemePanel 同时监听 props value 与内部 innerList —— innerList 变化 → $emit('input') → 父组件更新 schemeList → schemeList 变化让 value 变化 → value 的 watch 再次给 innerList 赋值 → 无限往复（同步递归更新的典型表现就是主线程被占满、页面毫无响应）。次因是服务方案弹窗里的 zs-form 被嵌在详情页父级 zs-form 内部，在表单域内再开表单/弹窗会放大异常行为。\n\n解法：\n1. 去掉子组件对 innerList 的 deep watch，不再让本地副本与父值互相驱动；只在「新增 / 编辑 / 删除」等真实交互动作里调一次 emitChange() 把结果同步给父组件（对齐同目录 EducationTable 的既有做法）。\n2. 把 ServiceSchemePanel 移到父级 zs-form 外面，避免表单嵌套。\n\n排查提示：以后遇到「点新增/打开弹窗就卡死、无报错」，先找子组件里是否同时 watch 了 props 与本地数组并互相 emit，其次查是否把子表/弹窗组件放进了 zs-form 内部（同类约束见 zs-form 会级联禁用整块子表）。",
+   "evidence": "会话 98c0fa61（基线 130ee05）用户诉求「新增服务方案点了直接卡死页面了」。结论：`ServiceSchemePanel.vue` 中 `value` 与 `innerList` 互相监听形成循环（innerList→$emit('input')→父 schemeList→value watch→再赋值 innerList），页面卡死；另一处是弹窗内 zs-form 嵌套在详情页父级 zs-form 内。修复：①去掉 innerList 的 deep watch，仅在新增/编辑/删除时通过 emitChange() 同步（对齐 EducationTable 做法）；②在 AgencyBranchDetail.vue 把 ServiceSchemePanel 移到父级 zs-form 外面。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/ServiceSchemePanel.vue",
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchDetail.vue",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/EducationTable.vue"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "98c0fa61-1285-419f-a294-44b52af2945d"
+   ],
+   "bundle": "048.md"
+  }
+ ]
+}

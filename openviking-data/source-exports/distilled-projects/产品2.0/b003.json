@@ -1,0 +1,165 @@
+{
+ "project": "产品2.0",
+ "batch": 3,
+ "files": [
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "title": "V3 接口规范化的脚本化批量迁移：三轮脚本的边界与残留写法口径",
+   "type": "workflow",
+   "content": "情况：要对整个 zhi2-web-admin 做「V2 REST 风格 → V3 全 POST 动作式」的接口规范化，涉及 src/api 与 views 里大量手写 $get/$post/$put/$del，逐个人工改不现实。\n为什么：只靠 request.js 拦截器兜底会留大量边缘写法不可控（拦截器按路径段数推断动作，跨资源路径和列表动作会误判），必须在调用点先批量收敛。\n怎么做：按三轮脚本分治，每轮只解决一类替换、跑完 grep 复核：①api 文件层 list 的 GET+params → POST+data，CRUD 路径全量改 V3 动作（实际覆盖 59/63 个文件）；②views 里 $del 路径删除 → $post …/delete；③补漏轮：$put 根路径 → /update、$post 根路径 → /add、带额外参数的详情 → POST /detail。三轮共动了约 22 + 28 个 vue 文件，跨 maintenance/property/building/evaluation/autonomy/benefit 多域。\n验收口径要提前定死：约 200 处 `$get(`${…}`)` 模板拼接属可保留项——它们是跨资源路径（如 /property/complex/${id}）或列表动作（/page、/listTree），拦截器按三段路径处理即可；白名单（/file/*、附件）保持原协议不迁移；特殊 body（如 dict 的字符串体）必须单独手改，不能吃通用规则。脚本改完必须抽查系统管理（菜单/角色/部门/字典）与各域曾报 400 的详情、删除页，并在 Network 里逐个确认是 POST。",
+   "evidence": "会话 88e83347：用户先报「接口不符合规范」，追问「还有没有其他遗漏的」，再要求「按照短期，中期，长期，三步都修改一下」。最终落地 scripts/migrate-api-v3.mjs（59/63）、migrate-views-v3.mjs（22）、migrate-views-v3-pass2.mjs（28），并明确约 200 处模板拼接、白名单、特殊 body 三类边缘场景。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\api\\index.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\utils\\request.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\system\\menu\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\config\\security.js"
+   ],
+   "baseline": "adc516a",
+   "sessionIds": [
+    "88e83347-13dd-462f-a082-5dceb7d8e40e"
+   ],
+   "bundle": "009.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "AmountInput 去掉 el-input 换原生 input 后必填/离焦校验静默失效：需手动向 ElFormItem 分发 el.form.blur",
+   "type": "bug",
+   "content": "情况：把 AmountInput 内部的 el-input + v-money 换成原生 input + vue-currency-input 后，原来 el-form rules 里 trigger:'blur' 的校验立刻进入「输入框无法输入/无法校验」的反复调试循环，用户连续三轮反馈「还是无法输入/还是不能输入」。\n为什么：el-input 内部会自动把原生事件转发成 el.form.blur / el.form.change 分发给最近的 ElFormItem，Element UI 的校验完全依赖这条事件链；换成原生 input 后这条链断了，规则里的 trigger 永远收不到事件，表现为校验不触发（或一直红）。同时 v-money 是「格式化后回写 v-model」，而 vue-currency-input 对非数字/空串的处理不同，双向回写空值会让输入被立刻清空，看起来就是「输不进去」。\n怎么做：①在组件内加 @blur=\"handleBlur\"，在 handleBlur 里先 emit('blur', event)，再手动找到最近的 ElFormItem 并 dispatch 'el.form.blur'；②handleChange / handleClear 里同样分发 'el.form.change'；③保留原有业务侧 listeners.blur/change 的转发，不要用它们替换 Element 的分发。改完必须实际点一次失焦验证提示出现，而不是只看代码。用户明确要求「最最小化改动」，所以修复只落在 AmountInput 内部，不动上层表单。",
+   "evidence": "会话 96954bb5：用户诉求 1~5 连续「输入框无法输入 → 还是无法输入 → 还是不能输入 → 现在可以输入了，请分析原因，最小化改动」。最终定位为原生 input 缺少 el-input 的 ElFormItem 事件分发链，修复方式为在 AmountInput 内 @blur 手动 dispatch el.form.blur / el.form.change。",
+   "files": [
+    "D:/repository/产品2.0/zhi2-web-admin/src/components/AmountInput/index.vue",
+    "D:/repository/产品2.0/zhi2-web-admin/src/components/zs-input/zs-input.vue"
+   ],
+   "baseline": "bd398ef",
+   "sessionIds": [
+    "96954bb5-7491-4bdf-854e-917a5232b9e6"
+   ],
+   "bundle": "009.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "带单位后缀的金额输入框高度异常：zs-input 默认 clearable 产生的 el-input--suffix",
+   "type": "bug",
+   "content": "情况：生产环境（ylzhwy.com:8081）上带「㎡」的 amount-input，其后缀框高度与输入框不一致；本地运行是好的，打的也是对应代码，用户因此怀疑构建或样式没生效。\n为什么：不是构建问题。zs-input 的 clearable 默认为 true，Element UI 只要 clearable 为 true 就会给输入框加 el-input--suffix 类并追加 padding-right: 30px，即使禁用态并不显示清除按钮也会加。叠加在 el-input-group__append 的单位后缀上，就把后缀高度/内边距顶歪了；本地可能因为改过 clearable 或缓存而复现不到。\n怎么做：①AmountInput 这类「数值 + 固定单位」的控件显式设 :clearable=\"false\"，从源头不生成 el-input--suffix；②zs-input 只在父组件真的传了 suffix / prefix slot 时才转发 slot，避免空 slot 也触发后缀渲染。\n排查该类「本地好、生产不对」时的判据（写进验证清单）：在生产 DevTools 里选中 .el-input-group__append，Computed 中 display 应为 flex（若是 table-cell 说明 input-group-fix.css 没加载），高度应与 .el-input__inner 一致（约 36px）；Network 里确认 input-group-fix.css 返回 200；修复后 DOM 上不应再出现 el-input--suffix。",
+   "evidence": "会话 49ff6642：用户贴图问「为什么生产上这个输入框后缀的高度还是不对？我看本地是好的，打包的也是对应的代码」。最终结论定位为 zs-input 默认 clearable:true 引入的多余 el-input--suffix，并通过 AmountInput 设 :clearable=\"false\" 与 zs-input 按需转发 slot 两处修复，同时给出生产 DevTools 的验证判据。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\AmountInput\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-input\\zs-input.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\styles\\element-ui.scss",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\localPropertyBid\\detail.vue"
+   ],
+   "baseline": "1fa4993",
+   "sessionIds": [
+    "49ff6642-e504-475e-9982-4f88a028a3b9"
+   ],
+   "bundle": "009.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "真实接口 E2E 遇「审核中/在途」数据：用管理员账号驳回后复用该数据续跑，优于 skip",
+   "type": "pattern",
+   "content": "情况：企业信息变更这类要靠真实接口跑全流程的 E2E，用例开始时目标企业常常已经是「审核中」状态，导致「变更」按钮不出现、流程卡死，且这条用例反复红了很久（用户原话「反复改了很久了」）。\n为什么：变更类业务一单在途就不允许再发起，这是后端的正常业务约束；而 E2E 又必须走真实 UI 全流程（禁止 mock、禁止 page.evaluate 改状态）。已知做法「在 fixture 里排除在途行、无可用数据就 skip」会让用例长期不真正执行，等于没有回归。\n怎么做：在用例最开始加一段状态预处理——先判断当前企业是否处于审核中；若是，直接用管理员账号从审批端把它驳回（走 UI 操作），再以被驳回的单据继续跑完整的「编辑 → 提交 → 待确认」流程。这样每条跑都会自愈出可用数据，不必依赖人工清理环境。\n配套注意：一旦删掉了页面上的「审核流程查看」按钮，原用例里靠该按钮做的等待与断言必须同步改成新基准——断言「变更」按钮隐藏、标题栏显示业务状态「待确认」、且接口 activeChangeDisplayStatus === '2'，否则删按钮会直接把用例改红。",
+   "evidence": "会话 42560c80：用户诉求 4「如果是审核中数据，直接使用管理员账号驳回该数据然后继续走完整用例即可，在用例最开始判断一下」；诉求 5、6 又要求去掉「审核流程查看」按钮并同步从代码与测试中移除，提交后改为断言待确认状态与 activeChangeDisplayStatus === '2'。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\company\\company-record-change.spec.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\fixtures\\company-helpers.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components\\CompanyBasicInfoDetail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\toB\\company-personnel-flow.spec.js"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "42560c80-6846-477f-b521-e79b1c4b8e28"
+   ],
+   "bundle": "009.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "弹窗表单里 el-row 必须包在 zs-form 外面，套在 zs-form 内部会把输入框压窄、placeholder 显示不全",
+   "type": "bug",
+   "content": "什么情况：在 zs-dialog 弹窗里做两列表单（如维护/退款计算弹窗），按常规写法把 el-row 放在 zs-form 内部包住两个 el-col，结果输入框宽度被压得很窄，用户连续反馈「UI 还是有问题」「宽度占满，placeholder 显示不全」。\n为什么：本项目 zs-form 自身已经接管了栅格计算（平台级 label 宽度 + 全局满宽规则），再在它内部塞一层 el-row，两层栅格系统叠加，el-col 的 50% 是相对于一个已被 zs-form 收缩过的容器计算的，宽度塌陷；而 placeholder 一旦长于被压窄的输入框宽度就被截断，所以最直观的表现是「placeholder 显示不全」而不是「布局错乱」。\n怎么做：按项目已有弹窗（addpopupDialog 等）的通用写法，把 el-row 提到 zs-form 外面：form-box → el-row.detail-from-container → zs-form.form → el-col(50%) 各占一半，后面再跟按钮和结果表格。改完要求用户 Ctrl+F5 强刷，因为 Vite 热更新常留旧样式，用户看到的可能是改前版本。\n注意与「el-col 必须是 .zs-form 直接子级」「弹窗内禁写 el-row/el-col」两条既有口径不冲突：那是「不用 el-row 的弹窗」，本条是「确实需要栅格时 el-row 放外层」。",
+   "evidence": "会话 d5ae2f3e-c3d7-4c77-8ef2-048ffc7b39f4，代码基线 94b86fa，用户 5 轮反馈，最终结论：「根本原因：el-row 放在了 zs-form 里面，和本项目其他页面不一致，导致栅格宽度计算错误，输入框被压得很窄」，正确结构为 form-box → el-row.detail-from-container → zs-form.form → el-col(50%)",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/accRefund/components/AccountRefundTable.vue"
+   ],
+   "baseline": "94b86fa",
+   "sessionIds": [
+    "d5ae2f3e-c3d7-4c77-8ef2-048ffc7b39f4"
+   ],
+   "bundle": "011.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "新增态隐藏配置型子表：用 v-if=\"formMode !== 'add'\" 控显隐，同时从提交体剔除该字段",
+   "type": "pattern",
+   "content": "什么情况：应用管理详情页里的「集成回调配置」子表（EndpointTable），用户明确指出「新增的时候不需要显示子表吧？」。\n为什么：这类子表依赖主表已落库的主键才能挂载关联数据（回调端点是挂在应用 ID 下的从属记录），新增态主键尚不存在，展示出来只能填一堆没法落库的行，且会诱导用户以为可以一起提交。\n怎么做：在 detail.vue 里给子表加 v-if=\"formMode !== 'add'\"，只在编辑/查看态渲染；对应的提交数据里，新增分支不再带 endpoints 字段，避免后端收到空数组或半成品行。产品流程变成两步：新增只填基本信息 → 保存成功后自动进入查看页，此时才出现「集成回调配置」子表可维护（另有独立的「应用集成配置」菜单可单独维护）。\n与已知「用主键存在性控显隐、不要用 formMode」（#1042，后置模块场景）互补：后置模块看主键存在，而明确只在编辑态出现、且新增不该提交的配置子表，用 formMode 判定更直白，关键是显隐与提交体必须成对改，只加 v-if 不改 payload 会留下脏字段。",
+   "evidence": "会话 d9f3c68c-3ec6-4725-adf0-590b032f0388，代码基线 1d563df，最终结论：「在 detail.vue 中，集成回调配置仅在编辑/查看时展示 <EndpointTable v-if=\"formMode !== 'add'\" />，提交时新增接口也不再传 endpoints 字段」",
+   "files": [
+    "zhi2-web-admin/src/views/system/syncLog/index.vue",
+    "zhi2-web-admin/src/views/system/menu/index.vue"
+   ],
+   "baseline": "1d563df",
+   "sessionIds": [
+    "d9f3c68c-3ec6-4725-adf0-590b032f0388"
+   ],
+   "bundle": "011.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "zs-table-column 内嵌 zs-select/zs-input 等复杂控件时列宽被压到约 80px，表头与单元格全截断，改用 min-width",
+   "type": "bug",
+   "content": "什么情况：子表（如应用管理的回调配置）里每列都要直接编辑，用了 zs-table-column 内嵌 zs-select、zs-input 等组件，结果列宽被压到大约 80px，「场景…」「超时…」表头被截断，单元格内容几乎看不见。\n为什么：zs-table 的默认列宽策略是按纯文本内容测算 + 剩余宽度均分（这是列表页卡顿改造的前提），它对「单元格里是表单控件」这件事一无所知。复杂控件没有可用于测算的文本宽度，测算结果趋近最小值，于是被压成固定的一条窄缝；用固定 width 也救不回来，因为定宽列还会参与剩余宽度均分并和内容冲突。\n怎么做：①把列的固定 width 改为 min-width，让列至少保住输入所需宽度；②按业务语义给关键列显式加宽（回调地址列给到 260px）；③表格整体设 width: 100%，让剩余空间分配有意义；④查看模式下空值统一显示 -；⑤详情加载回调里保证该数组字段始终是数组，避免子表拿到 undefined 渲染异常。这套组合是「表格内嵌编辑控件」的通用解，列表页的纯文本列则不要照抄 min-width，仍要走默认测算。",
+   "evidence": "会话 d9f3c68c-3ec6-4725-adf0-590b032f0388，代码基线 1d563df，最终结论：「根因是 zs-table-column 内含 zs-select、zs-input 等复杂组件时，列宽会被压到约 80px，表头被截断…修复方式：将固定 width 改为 min-width，回调地址列加宽到 260px，表格设为 width: 100%」",
+   "files": [
+    "zhi2-web-admin/src/views/system/syncLog/index.vue"
+   ],
+   "baseline": "1d563df",
+   "sessionIds": [
+    "d9f3c68c-3ec6-4725-adf0-590b032f0388"
+   ],
+   "bundle": "011.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "Vite 报 [sass] expected selector 先查 SFC 里多个 style 块前一个是否漏写 </style>",
+   "type": "bug",
+   "content": "什么情况：给一个页面/弹窗补全局样式，在已有 <style lang=\"scss\" scoped> 之后再追加一个非 scoped 的 <style lang=\"scss\">，保存后 Vite dev 直接 Internal Server Error，报 [sass] expected selector，且报错行号指向一个有 </style> 之类花括号的位置（如「119 │ }」），看起来像 SCSS 语法错。\n为什么：前一个 style 块末尾（常见于最后一段 :deep(...) 之后）漏掉了 </style>，SFC 编译器把两个 style 块当成同一段 SCSS 解析，于是后一个块的 <style> 起始标签连同模板式内容被喂进 Sass，必然报 expected selector。错误信息完全指向 Sass 而无从提示真正的缺失闭合标签，容易误判成 :deep 写法或选择器写错。\n怎么做：定位报错文件里所有 <style> 开闭数量，逐个确认每个块都有 </style>（尤其是以 :deep 结尾的 scoped 块）；补齐后保存，Vite 即可编译，仍报错则重启一次 npm run dev（HMR 可能已缓存坏状态）。这是「Vue 标签闭合错乱伪装成工具链错误」家族的一员，与本项目已知的 .vue 标签未闭合导致 plugin-vue 报错、批量脚本导致 tag has no matching end tag 属同类，排查时优先做标签配对检查而不是改语法。",
+   "evidence": "会话 91caa295-2c37-448d-8386-139abc7c3402，代码基线 64fa9e2，用户贴出 `[sass] expected selector ... src\\views\\dataProperty\\recordProcess\\components\\SelectRecordProcedureDialog.vue 119:2`，最终结论：「第一个 <style lang=\"scss\" scoped> 在最后一段 :deep(...) 之后没有写 </style>，后面的 <style lang=\"scss\"> 被当成同一段 SCSS 解析」",
+   "files": [
+    "zhi2-web-admin/src/views/dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue"
+   ],
+   "baseline": "64fa9e2",
+   "sessionIds": [
+    "91caa295-2c37-448d-8386-139abc7c3402"
+   ],
+   "bundle": "011.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "V3 后台真实接口 E2E 跑开发企业 CRUD：新手引导遮罩未被自动关闭 + describe.serial 让一条 skip 阻断后续用例",
+   "type": "bug",
+   "content": "场景：在「产品2.0」zhi2-web-admin 跑开发企业增删改查 E2E（npm run test:e2e:company:admin -- --workers=1，管理端账号 zsbase），大量用例表现为「元素点不到」和「后面的用例整段不执行」，但退出码仍为 0，容易被当成通过。\n\n根因一（遮罩）：登录后会新挂出「新手操作指引」引导弹窗/遮罩层，它盖住列表页的操作区，Playwright 的点击被遮罩拦下或命中失败；而这条遮罩是登录态派生的，不在菜单 fixture 的控制范围内。解法：在登录 helper 写 storageState/localStorage 时一并写入 driverList、driverDetail 两个键（等价于「已看过指引」），并在 gotoMenuPage 之后主动关闭可能残留的指引弹窗，双保险。\n\n根因二（serial 阻断）：用例包在 describe.serial 里时，任意一条用例走了 test.skip（例如列表暂无数据、账号无该菜单授权），Jasmine/Playwright 会把整组标记为跳过，于是排在后面的 04–06 根本不执行，日志看起来像「莫名不跑」。解法：改为普通 describe，让用例之间彼此独立，skip 只影响自己。\n\n配套口径（同源坑，注意别顺手改断言）：开发企业列表接口是 /company/companyRecord/page（不是 pageNoScope），统一用 isCompanyRecordListResponse() 判断；先判空再 waitForResponse，否则空列表时监听会一直挂到超时；点「新增」要等 .button-groups .el-button 出现并先过 waitForPageLoading。无数据/无权限导致的 skip 要单独统计成「跳过」栏，不能计入失败，也不能为此放宽断言。",
+   "evidence": "会话 07aabe56：「测试结果（管理端 zsbase）npm run test:e2e:company:admin -- --workers=1 → 通过（exit 0）」，通过 5 / 跳过 21 / 失败 0。排查并修复的问题第 4 条「新手操作指引遮罩：登录时写入 localStorage（driverList / driverDetail），并在 gotoMenuPage 后关闭指引弹窗」；第 5 条「describe.serial 阻断后续用例：任一用例 skip 会导致 04–06 不执行，已改为普通 describe」；第 1–3 条为 companyRecord/page、先判空再监听、.button-groups .el-button + waitForPageLoading。",
+   "files": [
+    "d:/repository/产品2.0/zhi2-web-admin/e2e/fixtures/auth-helpers.js",
+    "d:/repository/产品2.0/zhi2-web-admin/e2e/fixtures/crud-helpers.js",
+    "d:/repository/产品2.0/zhi2-web-admin/e2e/toB/company-personnel-flow.spec.js",
+    "d:/repository/产品2.0/zhi2-web-admin/e2e/modules/project-modules-crud.spec.js",
+    "d:/repository/产品2.0/zhi2-web-admin/e2e/fixtures/menu-config.js",
+    "d:/repository/产品2.0/zhi2-web-admin/playwright.config.js",
+    "d:/repository/产品2.0/zhi2-web-admin/package.json"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "07aabe56-ae35-465d-8251-457e7bfcaa0c"
+   ],
+   "bundle": "012.md",
+   "project": "产品2.0"
+  }
+ ]
+}

@@ -1,0 +1,166 @@
+{
+ "project": "2-0",
+ "batch": "018",
+ "files": [
+  "018.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "title": "[Vue warn]: Invalid prop: ",
+   "type": "fact",
+   "content": "## 问题原因 你现在用的是 **Element Plus**，它的组件 `size` 只接受 `[\"\", \"default\", \"small\", \"large\"]`。但项目里把全局组件尺寸配置成了 **`\"mini\"`**（这是 Element UI 时代的值），所以在渲染 `ElPaginationSizes` 时就会出现你看到的告警。 ## 我做了什么修改 - 把 `src/main.js` 里 `app.use(Element, { size: \"mini\" })` 改成了 **`size: \"small\"`** - 把 `src/views/index.vue` 里直接使用的 `<el-select size=\"mini\">` 改成了 **`size=\"small\"`** ## 修改位置 - `zhi2-web-admin/src/main.js`：`size: \"mini\"` → `size: \"small\"` - `zhi2-web-admin/src/views/index.vue`：`<el-select ... size=\"mini\">` → `size=\"small\"` 改完后，分页的 `size` 不会再传入 `\"mini\"`，该告警会消失。",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`src/main.js",
+    "`src/views/index.vue",
+    "`zhi2-web-admin/src/main.js",
+    "`zhi2-web-admin/src/views/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3b324ddb-991b-4cfd-8477-ff3457de3576"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "[Vue warn]: v-on with no a",
+   "type": "preference",
+   "content": "这个告警的根因是 **Vue3 下 `v-on`“无参展开绑定”要求右侧必须是对象**，但你在 `SearchFormItem` 里写了： - `v-on=\"item.listeners || $listeners\"` 其中 **`$listeners` 在 Vue3 已经不存在**（事件都在 `$attrs` 里），当 `item.listeners` 又刚好是 `undefined` / 非对象时，就会变成 `v-on=\"undefined\"`，从而触发： > `[Vue warn]: v-on with no argument expects an object value` 我已经在代码里把它修成“永远只传对象”： - **文件**：`zhi2-web-admin/src/components/zs-search-form/SearchFormItem.vue` - 新增 `safeListeners`（只在 `item.listeners` 是对象时使用，否则用 `{}`） - 所有 `v-on=\"item.listeners || $listeners\"` 改为 `v-on=\"safeListeners\"` 同时把 `ZsForm` 里依赖 `$listeners` 的写法改成 Vue3 正确的透传方式： - **文件**：`zhi2-web-admin/src/com",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "**文件**：`zhi2-web-admin/src/components/zs-search-form/SearchFormItem.vue",
+    "**文件**：`zhi2-web-admin/src/components/zs-form/zs-form.vue",
+    "`SearchFormItem.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "858525f8-3326-418d-8a6b-132a98ff4714"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "zs-form.vue:47 [Vue warn]:",
+   "type": "fact",
+   "content": "### 原因与修复 这个警告是 **Vue3 不再提供 `$listeners`**（Vue2 才有），事件监听统一合并到了 **`$attrs` 的 `onXxx`** 里；组件里一旦访问 `$listeners`/`this.$listeners` 就会在渲染时报你看到的 warn。 我已经在代码里把相关组件改成 **从 `$attrs` 提取事件监听并透传**，不再访问 `$listeners`： - ✅ `zhi2-web-admin/src/components/zs-form/zs-form.vue` - 增加 `inheritAttrs: false` - `attrs` 里过滤掉 `onXxx` - 新增 `listeners` computed：从 `$attrs` 提取 `onXxx`，并在 `<el-form ... v-on=\"listeners\">` 透传 - ✅ `zhi2-web-admin/src/components/zs-input/zs-input.vue` - 同样改为从 `$attrs` 提取事件；并保留原有 input/change trim 逻辑 目前在 `src/` 下已经 **没有任何 `$listeners` 的实际访问** 了（只剩 `zs-dialog.vue` 里的一句注释）。 ### 你接下来怎么验证 - **刷新页面**",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`zhi2-web-admin/src/components/zs-form/zs-form.vue",
+    "`zhi2-web-admin/src/components/zs-input/zs-input.vue",
+    "`zs-dialog.vue",
+    "zs-form.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4bbb06e3-bf1a-42cc-9d14-5ef16c055799"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "[Vue warn]: Property \"extr",
+   "type": "bug",
+   "content": "根因已经明确：`listMixins -> table.js -> permsMixins.js` 这条链路里，`permsMixins` 的 `perms` 计算属性会展开 `...this.extraPerms`，但像你堆栈里的 `AnnouncementMsg`（服务周报/项目信息那套列表）并没有实现 `extraPerms`，所以渲染期访问了一个不存在的字段而报警。 我会直接在 `permsMixins.js` 里补一个**默认的 `extraPerms(){ return {} }`**，让所有未覆盖的页面都不再报，并且不影响那些已经自定义 `extraPerms` 的页面（组件的 computed 会覆盖 mixin 的同名字段）。",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "table.js",
+    "permsMixins.js",
+    "`permsMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2f8cc0e9-9cb1-43cb-af76-79b01f8f468f"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "main.js:194 [Vue warn]: In",
+   "type": "bug",
+   "content": "这个警告的原因是：**Element Plus 的 `ElInput` 的 `size` 只允许 `large | default | small`（以及空字符串）**，但你们项目里历史上可能会传 `mini/medium`，导致 `Invalid prop ... prop \"size\"`。 我已经在 `zhi2-web-admin/src/components/zs-input/zs-input.vue` 里做了**统一归一化**，保证传给 `ElInput` 的 `size` 永远合法： - **`medium` → `default`** - **`mini` → `small`** - **其它非法值 → `default`** 这样登录页里（以及全站使用 `ZsInput` 的地方）就不会再出现这个 warn 了。 **Adjusting input size** I'm thinking about how the input-number size can support 'large/default/small', but the warning is specific to ElInput. Maybe I should consider adjusting the input-number too, even if it wasn't requested — ",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`zhi2-web-admin/src/components/zs-input/zs-input.vue",
+    "main.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a5963bb7-204d-42a4-88ac-9fc16822e761"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "[Vue warn]: Invalid prop: ",
+   "type": "preference",
+   "content": "这个告警的根因通常是：**父组件透传给 `ZsForm` 的 `size` 实际值是 `undefined` / `''` / 旧值（如 `medium`、`mini`）**，在 `ZsForm` 里 `Object.assign(..., attrs)` 会让这些值**覆盖掉默认的 `'default'`**，最终传到 `ElForm` 触发 Element(Plus) 对 `size` 的自定义校验失败。 我已在 `ZsForm` 里把 `size` 做了**兜底 + 旧值映射**，保证传给 `ElForm` 的永远是合法值（`'large' | 'default' | 'small'`）： ```36:54:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-form\\zs-form.vue attrs: function () { const attrs = {} for (const key of Object.keys(this.$attrs || {})) { const val = this.$attrs[key] if (key.startsWith('on') && typeof val === 'function') continue attrs[key] = val } const merged = Ob",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "```36:54:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-form\\zs-form.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7fcbaa3b-c65e-436a-b509-af93a4b6be04"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "runtime.ts:26 [Vue warn]: ",
+   "type": "preference",
+   "content": "### 原因 你这个警告来自 **Element Plus 的 `ElInput` 不支持 `size=\"medium\"`**（只允许 `\"\" | \"default\" | \"small\" | \"large\"`）。而你们的封装组件 `ZsInput` 里把默认 `size` 写死成了 `\"medium\"`，导致登录页渲染时透传给了 `ElInput`，从而报： - `Invalid prop ... got value \"medium\"` ### 我已做的修复（已落地到代码） - **`ZsInput` 兼容修复**：默认改为 `default`，并把传入/透传的 `medium` 自动转换为 `default` - 文件：`zhi2-web-admin/src/components/zs-input/zs-input.vue` - **全局 size 存储兼容**：`sessionStorage` 里如果历史存了 `medium`，启动时自动转成 `default`；`setSize` 时也会把 `medium` 归一化 - 文件：`zhi2-web-admin/src/store/modules/app.js` - **其它封装默认值修复**：`ZsForm`、`ZsDatePicker` 默认不再使用 `medium`，并做了同样的兼容映射 - 文件：`zhi2-web-adm",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "文件：`zhi2-web-admin/src/components/zs-input/zs-input.vue",
+    "文件：`zhi2-web-admin/src/store/modules/app.js",
+    "文件：`zhi2-web-admin/src/components/zs-form/zs-form.vue",
+    "文件：`zhi2-web-admin/src/components/zs-date-picker/zs-date-picker.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "76487407-667b-42b3-afef-eb2d2411a5b9"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "LineView.js:567 Uncaught (",
+   "type": "preference",
+   "content": "### 问题原因（对应 `LineView.js:567 ... reading 'type'`） 这个报错基本就是 **ECharts 在渲染某个 series 时拿到的 series 配置项是 `undefined/null`**，于是内部访问 `series.type` 直接炸了。你项目里确实存在会把 `setOption` 传成 `undefined` 的写法（例如 props 默认值写成 `default: () => {}`，实际返回 `undefined`，然后 `myChart.setOption(undefined)`）。 ### 我已做的修复（已落到代码里） - **修正 props 默认值**：把图表组件里 `default: () => {}` / `default: {}` 统一改成 **`default: () => ({})`**，避免传入 `undefined` / 共享对象。 - **`setOption` 前兜底清洗**：对 `option.series` 做 `filter(Boolean)`，并对缺失 `type` 的 series 兜底补成 `type: 'line'`，防止 `undefined` 再次进入 ECharts 渲染链。 - **额外顺手修了一个明显 bug**：`LineChart.vue` 里 `addEventListe",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`LineView.js",
+    "bug**：`LineChart.vue",
+    "`zhi2-web-admin/src/views/home/components/LineChart.vue",
+    "`zhi2-web-admin/src/views/monitor/components/ComponentCharts.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8dac8daf-d2d6-4f13-a79c-6e0143d0dbce"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "[Vue warn]: Invalid prop: ",
+   "type": "preference",
+   "content": "### 问题原因 `Element Plus` 的 `ElButton` 不支持 `type=\"cancel\"`（它只接受如 `primary/success/warning/danger/info/text/default` 等），而你们的 `ZsButton` 之前把 `type` 原样透传给了 `ElButton`，所以出现： - `[Vue warn]: Invalid prop: custom validator check failed for prop \"type\".` 触发点在这些页面（示例）里使用了 `type=\"cancel\"`： - `src/views/register/components/accountInfo.vue` - `src/views/register/components/companyInfo.vue` - `src/views/register/companyRegister.vue` ### 已修复（兼容不改业务页面） 我在 `ZsButton` 内做了兼容映射：**遇到 `type=\"cancel\"` 自动转成 `type=\"default\"`**，从根源消除 warn。 ```114:125:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-button\\zs-button.",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`src/views/register/components/accountInfo.vue",
+    "`src/views/register/components/companyInfo.vue",
+    "`src/views/register/companyRegister.vue",
+    "```114:125:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-button\\zs-button.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0f7a61e1-c656-416f-950e-b97496882719"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,106 @@
+{
+  "project": "苏住房G",
+  "batch": "102",
+  "files": ["102.md"],
+  "count": 7,
+  "memories": [
+    {
+      "title": "苏住房G 的 E2E 契约：仓库根 hoist 的 Playwright + createSuite 黑盒打 nginx 站点 8101，验证码固定 1234，退出码 0=PASS/1=FAIL",
+      "type": "workflow",
+      "content": "【什么情况】苏住房G 的自动化验收不是单元测试，而是黑盒 E2E：Playwright 装在 **仓库根** `D:\\repository\\苏住房G\\node_modules\\playwright`（hoisted，不在子模块 `zhi2-web-admin` 内），只允许打 **nginx 部署后的站点** `http://127.0.0.1:8101`，绝不起 dev server；用例文件只能放仓库根 `e2e/` 目录（`e2e/flood/`、`e2e/home-v2/`、`e2e/legacy/`）；每个套件用同一套库契约：`createSuite({name, task, dir})` → `suite.run(async (ctx) => {...})`，ctx 上提供 `ctx.api.get/post`（直连接口做断言）、`ctx.page()`（拿 Playwright page）、`suite.step(...)`（打步骤日志）、`ctx.ui.login(...)`（登录）。脚本退出码约定 **0=PASS、1=FAIL**，CI 直接看退出码。\n【为什么】这套契约把「验证口径」从各人自写脚本收敛成同一形状：黑盒打部署站点才能验证真实构建产物 + nginx 路由 + 真实后端；而把 `ctx.api` 与 `ctx.page` 并列暴露，使一条用例既能做接口断言又能做 UI 操作，避免「只调接口就算过了」的假绿。登录依赖验证码，固定 `1234` 才能无人值守。\n【怎么做】① 在仓库根 `npm i -D playwright`（或用已 hoist 的 `node_modules/playwright`，require 时按仓库根路径解析）；② 新建 `e2e/<模块>/<主题>.spec.mjs` 或 `.cjs`，`const { createSuite } = require('<根>/e2e/lib')` 之类按现有 `e2e/legacy/e2e-login-keys.cjs`、`e2e/home-v2/bug-5897-signing-bank-label.spec.mjs` 的写法抄；③ 断言流程统一成 `suite.step('建单', async () => { await ctx.api.post('/xxx', body); })` + `ctx.page()` 里点按钮；④ 跑之前先确认 8101 站点 root 指向本次 `npm test`（或 `npm run build`）产出的 `dist`；⑤ 登录失败先查 `ctx.ui.login` 用的账号密码与验证码是否仍是 `1234`；⑥ 要录像就另存 `*-video.cjs`（见同包「所有测试生成录像」那条），不要在主脚本里硬塞。",
+      "evidence": "会话 session-c3716c15（基线 05caac8）用户诉求 1「使用e2e测试完成所有业务的增删改查提交审批测试。测试用例规范和前端规范参考2.6.2-suzhufang-li分支」；最终结论 Key Technical Concepts 明确给出：Playwright hoisted at `D:\\repository\\苏住房G\\node_modules\\playwright`、black-box against nginx site `http://127.0.0.1:8101`、exit 0=PASS/1=FAIL、captcha `1234`、`createSuite({name,task,dir})` → `suite.run(async (ctx)=>{})` 含 `ctx.api.get/post`/`ctx.page()`/`suite.step`/`ctx.ui.login`，并规定「never start a frontend dev server，E2E files only under repo-root `e2e/`」。",
+      "files": [
+        "zhi2-web-admin/e2e-flood-crud.cjs",
+        "e2e/legacy/e2e-login-keys.cjs",
+        "e2e/home-v2/bug-5897-signing-bank-label.spec.mjs",
+        "e2e/flood/README.md",
+        "env/.env.test"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["session-c3716c15-86e3-4f8d-b0c4-02738de657f7"],
+      "bundle": "102.md"
+    },
+    {
+      "title": "页面代码写全但交付不可用：zs-button 依赖 checkPermission 且无超管旁路，菜单未在 SYS_MENU 注册时按钮直接不渲染",
+      "type": "bug",
+      "content": "【什么情况】评价报告模块的 4 个页面代码基本写全（等级变更/报告编制/评价报告/区域编制/区域报告），但交付环境里「等级变更」「发布」「导出报告」这些按钮**根本不出现**，页面等同不可达。根因不在前端代码，而在菜单表：这几个页面在 `COMMON_FRAMEWORK.SYS_MENU` 和 `SERVICE_EXPAND` **两张菜单表里都查不到记录**；而 `zs-button` 的可见性由 `checkPermission` 决定，**没有超管旁路**，所以权限字符缺失 = 按钮静默不渲染（不是禁用、不是灰、就是不渲染）。\n【为什么】前端把按钮显隐完全交给后端下发的菜单 + 权限字符，自身不做兜底；因此「菜单/权限数据缺失」这一类后端配置问题，会在前端表现为「功能好像没做」，极易被误判成前端漏开发而让前端反复补代码。同批次另一类缺口是**反向**的：整改通知书的 `reply/confirm/close/supervise/generate` 五个 API 全仓库零调用、详情页无按钮，但菜单里 `evaluation:rectification:reply/confirm/close` 权限**已经配好**——那才是真正的前端接线缺口。两者必须分开判定。\n【怎么做】① 拿到「页面做了但按钮不显示」类反馈，先查按钮的 `permission` 字符串与 `moduleName`/`businessName` 是否能拼出后端实际下发值，再查 `COMMON_FRAMEWORK.SYS_MENU` 与 `SERVICE_EXPAND` 有没有该菜单记录；② 菜单未注册 → 归为**配置缺口/不可标完成**，别在前端硬写 `v-if` 绕过后端权限（会破坏超管/多角色的权限模型）；③ 菜单与权限都已存在、而 API 零调用 → 才是前端接线缺口，按「权限已配，只差接线」记录；④ 补注册时后端按 `sys_menu` 表补 `perms` 字符与菜单项，前端只需保证 `zs-operate-column` 的 `permission`+`permissionType`（perm 形如 `${moduleName}:${businessName}:${permissionType}`）与之一致；⑤ 页面若用 `zs-operate-column`，记得在 `data()` 声明 `moduleName`/`businessName`，否则整条 mixin 契约断裂、按钮全没。",
+      "evidence": "会话 session-c3716c15（基线 05caac8）用户诉求 5「Team message from frontend-auditor」与用户诉求 6「Background subagent … finished」给出审计结论：「评价报告（2197）不可标完成……5 组菜单在 SYS_MENU 完全未注册，按钮权限字符缺失导致发布/导出按钮不渲染；区域报告缺发布入口（`areaReportApi.publish` 是死代码）」「整改通知书（2194）不可标完成：`reply/confirm/close/supervise/generate` 5 个 API 全仓库零调用，详情页无反馈/确认/关闭/督办按钮；但菜单里 `evaluation:rectification:reply/confirm/close` 权限已配好 → 只差接线」「关键证据：`COMMON_FRAMEWORK.SYS_MENU` 只有 7 个业务菜单+7 个详情菜单，5 个页面无记录；`zs-button` 依赖 `checkPermission`，无超管旁路」。",
+      "files": [
+        "zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue",
+        "zhi2-web-admin/src/views/evaluation/stdEvaluation/standard/index.vue",
+        "zhi2-web-admin/src/api/evaluation/stdEvaluation.js"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["session-c3716c15-86e3-4f8d-b0c4-02738de657f7"],
+      "bundle": "102.md"
+    },
+    {
+      "title": "判定禅道任务「已完成/未完成」必须四步走：story 正文还原 → 前端代码审计 → 菜单表核查 → 权限字符核查，代码写全不等于可交付",
+      "type": "workflow",
+      "content": "【什么情况】用户丢来 4 个禅道任务链接（评价标准 2084 / 检查记录 2192 / 整改通知书 2194 / 评价报告 2197），只说「这些任务应该有些完成了，有些没完成，完整对照一些需求」。需求正文在数据库 `zt_story` 里**没有 desc 列**，任务 `desc` 又全是空，只能靠 story 反推。最终结论是：9 个模块里只有「检查记录」够格标完成，另外三个分别是「缺 6 项需求字段」「API 零调用只差接线」「菜单未注册不可达」。\n【为什么】只按「有没有对应文件/接口调用」判断，会把「代码写全但菜单未注册」「菜单权限已配但页面没接线」这两类都误判成完成或误判成前端没写。需求侧还有反直觉项：正文里**从未出现「审批」二字**，只有「提交审核/审核通过/已备案」，所以审批节点、审批角色、审批人、驳回回退这些信息**数据库无此信息**——查了没有就是没有，不能靠推断补。\n【怎么做】① 先把 story 正文从 `zt_storyspec` 最新版还原（5 条 story：1382 评价标准 / 1392 检查记录 / 1395 管理端 APP / 1396 整改通知书 / 1400 评价报告 v2，另补 1384 物业服务等级），把「正文未提及」显式标出来而不是留空；② 建「实体 × 功能」矩阵，实体 11 个、功能 9 个，空项标「未提及」；③ 前端审计逐模块给结论（可标完成 / 部分完成 / 不可达）并列出缺口清单，常见缺口形态是「缺需求字段」「API 零调用」「菜单未注册」；④ 查库核对菜单：同时查 `COMMON_FRAMEWORK.SYS_MENU` 与 `SERVICE_EXPAND` 两张表（只查一张会漏）；⑤ 核按钮权限字符是否与 `moduleName:businessName:permissionType` 对得上；⑥ 结论里把「数据库无此信息」与「未提及」区分写清，避免后续按虚构的审批流排期；⑦ 把需求还原文档与审计文档分别落盘（如 `docs/std-evaluation/requirements.md`、`docs/std-evaluation/audit-frontend.md`），并给出「下一步可先做哪部分」的答复（例：「有哪些前端问题可以现在推进吗?还是都依赖后端」）。",
+      "evidence": "会话 session-c3716c15（基线 05caac8）用户诉求 1「这些任务应该有些完成了，有些没完成，完整对照一些需求，后端核心功能代码 都在 com.zhishu.evaluation.stdEvaluation包下」；最终结论 Primary Request 复述 4 个禅道任务链接与「完整对照一些需求」，Latest user request「有哪些前端问题可以现在推进吗?还是都依赖后端，如果前端可以做的，先做起来」；用户诉求 3/4 的 req-analyst 结论给出「正文从未出现「审批」二字，只有「提交审核/审核通过/已备案」，审批节点、审批角色、审批人、驳回回退均数据库无此信息」与「5 条 story 全文还原 + 11 实体 × 9 功能矩阵 + 10 条原文疑点」。",
+      "files": [
+        "zhi2-web-admin/src/api/evaluation/stdEvaluation.js",
+        "zhi2-web-admin/src/views/evaluation/stdEvaluation/standard/index.vue"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["session-c3716c15-86e3-4f8d-b0c4-02738de657f7"],
+      "bundle": "102.md"
+    },
+    {
+      "title": "网关 method tunneling 删除缺陷：POST + zs-method:delete 经网关返回 400/1400，直连 DELETE 返回 200，用「直连对照实验」定位到网关层",
+      "type": "bug",
+      "content": "【什么情况】本项目约定所有写操作走 method tunneling——**修改 = `POST` + 请求头 `zs-method: put`，删除 = `POST` + 请求头 `zs-method: delete`**。防汛模块 E2E 跑到删除步骤时，接口返回 **400 / 1400**，删除不生效。\n【为什么】这不是前端参数错、也不是后端业务校验：做**直连对照实验**——同样的 URL 直接发 `DELETE` 返回 **200**，而经网关发 `POST + zs-method: delete` 返回 400/1400。差异只可能出现在网关对 `zs-method` 头的改写/转发路径上，即网关把 `POST` 转成 `DELETE` 的那一步没做对。所以结论是「网关 zs-method:delete 缺陷待后端」，E2E 里对删除类接口只能先记为遗留，不能算前端 bug。\n【怎么做】① 遇到 tunneled 删除失败，先做对照实验：同一路径分别发 `POST`+`zs-method: delete`、原生 `DELETE`、以及直连后端端口（绕过网关）三种，比对状态码；② 三者结果不同即可判定层级：直连后端 200 + 过网关 400 → 网关缺陷，登记为后端遗留，不要在前端加 `try/catch` 假装成功；③ 原生 `DELETE` 能通说明后端接口本身支持，改法是等网关修好（或临时在直连场景用原生 DELETE）而不是改业务语义；④ 每条 E2E 失败都要区分「前端实现错」「后端未就绪」「网关缺陷」三类，遗留项写进 `zhi2-web-admin/docs/flood/common-errors.md` 台账；⑤ 同类排查对 `zs-method: put` 同样适用。",
+      "evidence": "会话 session-42ca405e-529e-4af3-98b5-81e2b92083de（基线 6156653）最终结论交付记录：证据栏写明「`POST+zs-method:delete`→400/1400 vs 直接 `DELETE`→200」，遗留栏写「网关 zs-method:delete 缺陷待后端」，并带 `[PUA生效 🔥] 网关 delete 改写直连对照实验`；同一记录列出方法隧道约定「修改 = `POST` + header `zs-method: put`；删除 = `POST` + header `zs-method: delete`」（见同包会话 session-c3716c15 的 Key Technical Concepts）。",
+      "files": [
+        "zhi2-web-admin/e2e-flood-crud.cjs",
+        "zhi2-web-admin/docs/flood/common-errors.md",
+        "zhi2-web-admin/src/utils/request.js"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-42ca405e-529e-4af3-98b5-81e2b92083de"],
+      "bundle": "102.md"
+    },
+    {
+      "title": "E2E 登录无人值守：让本地后端 /code 直接返回 captcha 答案，比做图片识别更稳",
+      "type": "workflow",
+      "content": "【什么情况】跑防汛自动化测试流程时卡在登录：验证码要图片识别，而本地后端和数据库都在本机（DBX 已连），完全没必要让脚本去做 OCR。用户诉求直接给方案：「不要走图片识别，让/code接口返回capcha答案，启动本地苏住房后端服务，代理过去」，并在后续提供测试账号密码走完整联调。\n【为什么】图片识别验证码在 CI/无人值守场景下天然不稳定（字体、噪声、刷新失效），会让 E2E 偶发红且掩盖真实缺陷。本地联调环境的后端代码可控，让 `/code` 直接回传答案，把验证码从「图像识别问题」降级为「读一个字段」，E2E 稳定性直接提升。\n【怎么做】① 本地起后端网关与业务服务，让 `/code` 响应体里带上 captcha 答案（测试环境专用分支/开关，不要带到生产）；② E2E 侧登录流程读该答案直接填入验证码框，配合 `ctx.ui.login`；③ 代理链路：前端 dev 站点的接口代理指向本地启动的后端（`env/.env` 里的代理/后端地址），nginx 站点同理；④ 测试账号用联调专用账号（如 `zsbase`）而非真实业务账号，避免污染生产数据；⑤ 验收后清掉本地跑出来的历史测试数据（本次交付记录里就列了「历史测试数据未清理」这条遗留）。",
+      "evidence": "会话 session-42ca405e-529e-4af3-98b5-81e2b92083de（基线 6156653）用户诉求 1「切回防汛分支，跑防汛完整自动化测试流程，接口代理到本机启动的后端服务，/code已经返回catpcha，数据库本地DBX也连接了，后端代码也在本地」；用户诉求 4「账号:zsbase密码：Zs@2026Aa! 走完整联调」；用户诉求 6「不要走图片识别，让/code接口返回capcha答案，启动本地苏住房后端服务，代理过去」。",
+      "files": [
+        "env/.env",
+        "env/.env.test",
+        "zhi2-web-admin/src/views/login.vue",
+        "zhi2-web-admin/e2e-flood-crud.cjs"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-42ca405e-529e-4af3-98b5-81e2b92083de"],
+      "bundle": "102.md"
+    },
+    {
+      "title": "Windows 上后台进程的 exit 1 有两种语义：被终止的 dev server 也会 exit 1，判定必须看日志而不是看退出码",
+      "type": "fact",
+      "content": "【什么情况】收尾时发现前台 dev server（8082）的后台任务「exit 1」，很容易被当成启动失败上报。实际日志显示 HMR 一直正常工作到 14:56，是任务被**终止**（interrupt/kill）后进程退出，而不是启动失败。\n【为什么】在 Windows 上，被强制结束的进程会以**裸 exit 1** 结束（没有信号标记），和真正的命令失败在退出码上无法区分。同一份日志里还夹着 14:36–14:39 一批防汛文件 HMR 变更（rescue/plan/event/eventChange/inspection detail），进一步说明进程当时是活着的。所以「退出码」这一项不能独立作为失败证据。\n【怎么做】① 判定顺序固定为：**先看日志尾部**（有没有成功编译/监听地址/HMR 输出）→ 再看退出码；② 日志里有正常的监听/编译记录且最后停在某个时间点 → 判为「被终止」，在交付记录里写明「exit 1 是终止语义，不是启动失败」；③ 日志里出现启动异常（端口占用、依赖缺失、编译错误）→ 才是真失败；④ 交付记录把这两件事分行写（口径不能混）；⑤ 收尾前若还要复用该 dev server，按原命令重启即可，不要因为 exit 1 就去改配置。",
+      "evidence": "会话 session-42ca405e-529e-4af3-98b5-81e2b92083de（基线 6156653）最终结论附注：「dev server（8082）任务显示 exit 1——日志看是被终止（HMR 正常工作到 14:56），不是启动失败。下次联调前按原命令重启即可；14:36–14:39 有一批防汛文件 HMR 变更（rescue/plan/event/eventChange/inspection detail），下轮扩展 E2E 时先核对这部分改动是否已进基线」，并自注「主动核对了后台任务的退出语义，没有把\"exit 1\"当失败上报——判定归判定，观察归观察，口径不能混」。",
+      "files": [
+        "zhi2-web-admin/vite.config.js",
+        "zhi2-web-admin/docs/flood/delivery-2026-10-29.md"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-42ca405e-529e-4af3-98b5-81e2b92083de"],
+      "bundle": "102.md"
+    },
+    {
+      "title": "monorepo 仓库根直接跑 vite 必 404：应用在 workspaces 子目录里，必须以子 workspace 为 cwd 才能起",
+      "type": "fact",
+      "content": "【什么情况】起前端时在仓库根目录直接执行 vite，访问得到 **404**。原因是这些仓库（门户等）是 monorepo，`package.json` 里声明了 `workspaces:[\"zhi2-web-admin\"]`，真正的 Vite 应用在子 workspace 里，仓库根既没有 index.html 也没有正确的中间件/插件配置。\n【为什么】Vite 的 root 默认为 cwd，仓库根既无入口 HTML，也解析不到子模块的 `vite.config.js`（含 `base`、proxy、env 加载），于是返回 404。子 workspace 目录下才有完整配置，改 cwd 后立刻 200（HTTP 200 / text/html，VITE v5.4.11）。\n【怎么做】① 定位应用目录：看仓库根 `package.json` 的 `workspaces` 字段，Vite 应用通常就是 `<workspace>/zhi2-web-admin`；② 一律以该子目录为 cwd 启动（`workdir` 参数），不要在仓库根跑；③ 端口要选**该仓库实际约定**的端口，本次门户是 8082（原 8081 已被另一个 vite 实例占用且属非本项目口径，应废弃不用），苏住房G 的 nginx 站点是 8101；④ 启动后用 HTTP 状态码 + `text/html` 校验，确认不是 404 空响应；⑤ 顺带核对后端服务端口别被顶掉（本次：8080 网关、9603 data-property、9610 service-expand、9211/8720 common-framework）。",
+      "evidence": "会话 feishu-8464c72c-f8a9-4d8a-ba49-fb88c20e2f6b（基线 6156653）最终结论「前端已启动」段：「之前 8081 是**另一个 vite 实例**（pid 16764，非本项目口径），已不采用；8082 是原门户端口，现按正确 workspace 起来了」，并写明「起跑过程踩了个坑：一开始在 `门户` 仓库根直接跑 vite 是 404——因为它是 monorepo（`workspaces:[\"zhi2-web-admin\"]`），应用在子 workspace 里。改到 `门户\\zhi2-web-admin` 作 cwd 后 200 正常」。",
+      "files": [
+        "zhi2-web-admin/vite.config.js",
+        "zhi2-web-admin/package.json"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["feishu-8464c72c-f8a9-4d8a-ba49-fb88c20e2f6b"],
+      "bundle": "102.md"
+    }
+  ]
+}

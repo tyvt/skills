@@ -1,0 +1,164 @@
+{
+ "batch": 10,
+ "files": [
+  "055.md",
+  "056.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "title": "Web 后台详情页统一骨架：detail-container → detail-from-container → zs-form → Headline/DetailTemplate（且全局无间距变量）",
+   "type": "pattern",
+   "content": "苏州市房地产监测V3 的 Web 管理后台（zhi2-web-admin，Vue3 + Element Plus）所有详情页共用一套骨架：根容器 .detail-container 承担 padding 与 flex gap；其下 .detail-from-container（el-row）包住表单区；表单用 zs-form/el-form，由 form 的 row-gap 控制多个区块之间的间距；每个区块标题用 Headline 组件（内部渲染 .collapse-container）；区块内容在只读 view 模式用 DetailTemplate，在 edit 模式用 el-row/el-col 栅格；子表用 zs-tabs(type=\"card\")；底部操作按钮用 operation-btn-group，靠 CSS order:-1 置顶。Headline 与 DetailTemplate 由 src/mixins/detailMixins.js 统一注入，页面里不要重复局部注册。排查纵向间距前要先确认间距来自 detail-container 的 gap、zs-form 的 row-gap，还是 .collapse-container 的内边距；src/styles/variables.css 只有颜色与侧栏宽度、没有任何间距变量，所以不存在「改一个变量全站生效」的入口，新建详情页应对齐这套结构而不是自造。全库也没有 zs-detail / page-container 这两个类名，按这两个名字搜索会误判为「页面不存在」。",
+   "evidence": "会话 627757ad 探索结论：standard detail page 嵌套为 .detail-container → .detail-from-container(el-row) → zs-form/el-form（row-gap 控制 Headline 间距）→ Headline（.collapse-container）→ DetailTemplate / el-row+el-col，另有 zs-tabs(type=\"card\") 与 operation-btn-group(order:-1)；「关键依赖：detailMixins 全局注册 Headline、DetailTemplate」「全局变量（src/styles/variables.css）仅颜色/侧栏宽度，无间距变量」「未找到的类名：全库无 zs-detail、page-container 用法」。",
+   "files": [
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/components/Headline/index.vue",
+    "zhi2-web-admin/src/components/zs-form/zs-form.vue",
+    "zhi2-web-admin/src/styles/variables.css",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/detail.vue"
+   ],
+   "baseline": "9dba6559",
+   "sessionIds": [
+    "627757ad-cd3b-4a55-8c90-7f0f04c54b15"
+   ],
+   "bundle": "055.md"
+  },
+  {
+   "title": "后台路由 component 字符串与 views 目录精确匹配：目录名不一致即页面加载失败，跳转用的 getRouterPathByFilePath 必须同步",
+   "type": "bug",
+   "content": "Web 后台的页面路由由 src/store/modules/permission.js 的 loadView 解析：把后端返回的 component 字符串（如 projectManagement/project/customerProjectinfo/detail）拼成 views 下的模块路径后 import，属于精确匹配，没有别名、没有模糊查找。只要磁盘目录与其不一致就会整页加载失败/白屏，且不会给出指向真正原因的报错。本次真实案例：路由信息.json 里配的是 project/customerProjectinfo/detail，磁盘实际只有 src/views/projectManagement/customerProject/detail.vue（没有 project/ 子目录），同时 buildinginfo/detail.vue 里的跳转仍硬编码 getRouterPathByFilePath('projectManagement/project/customerProjectinfo/detail')。做法：以磁盘目录为准，同时改 component 配置与所有 getRouterPathByFilePath 调用点（脚本里 grep 整个旧路径字符串，逐一核对）；若后端菜单不能及时改，就在 views 下保留旧目录做转发壳。排查此类白屏的路径是：先从路由信息.json 或后端菜单接口拿到 component 字符串，再到 src/views 下逐段核对目录与文件名是否存在。",
+   "evidence": "会话 627757ad：「路径不一致（重要）：后端路由/菜单配置写的是 project/customerProjectinfo/...，但磁盘上的目录是 customerProject/（无 project/ 子目录）。loadView（src/store/modules/permission.js）按 component 字符串与 views/ 下路径精确匹配，因此若线上路由未同步改路径，该页可能加载失败」；并附 buildinginfo/detail.vue 第 750 行仍用旧路径的代码。",
+   "files": [
+    "zhi2-web-admin/src/store/modules/permission.js",
+    "路由信息.json",
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/detail.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/detail.vue"
+   ],
+   "baseline": "9dba6559",
+   "sessionIds": [
+    "627757ad-cd3b-4a55-8c90-7f0f04c54b15"
+   ],
+   "bundle": "055.md"
+  },
+  {
+   "title": "后台提交接口的业务编码(busCode)必须取路由 meta，并把它与表单逻辑一并收进 constants + mixin 复用",
+   "type": "bug",
+   "content": "Web 后台的提交、附件等接口都要求携带业务编码 busCode。房屋限制审核详情页出现「点提交就报错」，根因是页面里的 busCode 写死或漏传，正确来源是当前路由的 meta（route.meta.busCode，随菜单/路由配置下发），应当在页面内从路由读取而不是硬编码常量。可复用套路：同一业务的一组页面（限制详情 detail.vue、新增 limitAdd.vue、选房楼盘表、楼层选择等）把 busCode 与字段枚举收敛到 houseLimitConstants.js，把提交打包、回填、校验收进 limitFormMixin.js 之类的 mixin 供各页面共用，这样新增页复制时不会漏掉 busCode，也便于以后后端换编码只改一处。排查「提交按钮报错」的顺序：先打印 route.meta 与最终请求体，确认是 busCode 为空、还是取了别的页面的编码（同一 mixin 被多个路由复用时尤其容易串），再确认接口是否还要求与路由一致的按钮权限编码。",
+   "evidence": "会话 65eb8f0e 用户连续两轮贴图并明确要求「提交按钮报错，应该取路由里面的业务编码」，对应计划名「修复限制审核详情『提交』缺少业务编码」；涉及文件同时出现 detail.vue、limitAdd.vue、limitFormMixin.js、houseLimitConstants.js，说明按 mixin+constants 收敛实现。",
+   "files": [
+    "zhi2-web-admin/src/views/building/houseLimit/detail.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/limitFormMixin.js",
+    "zhi2-web-admin/src/views/building/houseLimit/houseLimitConstants.js",
+    "zhi2-web-admin/src/views/building/houseLimit/limitAdd.vue"
+   ],
+   "baseline": "8f0cfa28",
+   "sessionIds": [
+    "65eb8f0e-2a9a-4383-8c02-fed88a86ecb6"
+   ],
+   "bundle": "055.md"
+  },
+  {
+   "title": "把「选填→必填」改造收敛成规则工厂 + strict 开关，并保证保存 payload 始终带数组字段",
+   "type": "pattern",
+   "content": "把某一组表单字段（本次是注册与信息变更里的资质信息）从选填改为必填时，不要在各页面各写一套 rules。做法是抽 buildQualificationFormRules() 规则工厂并提供 strict 开关：strict:true 时资质列表至少一条且内部必填项齐全，strict:false 保留历史选填语义，供旧页面或兼容场景复用；页面在下一步/提交前统一调 validateQualificationList(list, { strict: true })，失败时 scrollToFirstError 滚到首个错误项，避免长表单报错不可见。关键坑是「校验通过 ≠ payload 正确」：保存接口的 buildSubmitPayload/getForm 都必须始终带上 qualificationList（哪怕空数组），否则后端把缺字段当成「不修改」；resetExtracted 之类清空动作之后要重新调 ensureSingleQualification 保证至少有一行可编辑，否则用户进不去下一步。前端放开必填后需与后端对齐是否强制，否则前后端口径不一致。E2E 侧给 fillStep1 增加 { skipQualification: true } 选项，并补一条「未填资质无法进入下一步」的用例才算闭环。",
+   "evidence": "会话 4f3a68c6：用户诉求「注册流程中资质信息均变为必填，涉及流程注册、信息变更」；结论列出 Step1CompanyInfo 合并 buildQualificationFormRules、strict:true 校验、保存始终带 qualificationList、resetExtracted 后 ensureSingleQualification、失败 scrollToFirstError；Step4Shareholders 与 toB/companyRecord/detail.vue 同法处理；测试侧 fillStep1 支持 { skipQualification: true } 并新增拦截用例，同时备注「若后端对无资质 saveCompanyRegister 尚未强制，需后端与前端一起对齐」。",
+   "files": [
+    "zhi2-web-admin/src/utils/registerValidate.js",
+    "zhi2-web-admin/src/views/register/components/Step1CompanyInfo.vue",
+    "zhi2-web-admin/src/views/register/components/QualificationFormSection.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/DeveloperBasicInfoForm.vue"
+   ],
+   "baseline": "ffce65cd",
+   "sessionIds": [
+    "4f3a68c6-eb9a-47ec-b71f-f48c51e25be6"
+   ],
+   "bundle": "055.md"
+  },
+  {
+   "title": "Vue2 中直接调用 this.$options.data() 未绑定实例，导致 mixin/data 里 this.xxx 全是 undefined",
+   "type": "bug",
+   "content": "现象：点击列表「重置」或开关弹窗时控制台报 `TypeError: this.getId is not a function`、`Property or method \"elForm\" is not defined on the instance`，并沿 zs-dialog → 业务弹窗 → zs-tabs 链路层层打断渲染。\n\n根因：代码用 `this.$options.data()` 取默认值做重置。`$options.data` 是未经 Vue 包装的原始函数，裸调用时 `this` 不是组件实例，data() 内存活的 `this.getId()`、`this.patterns`、`this.$route` 等全部取到 undefined，于是生成一份残缺的 form/queryParams，后续模板与事件就报未定义。\n\n做法：\n1. 全部改为 `this.$options.data.call(this)`，集中在 `mixins/table.js` 的 resetQuery() 与 `mixins/dialogMixins.js` 的 reset()，一次修好所有继承这两个 mixin 的列表/弹窗；另有 11 处业务文件直接调用需逐一改。\n2. data() 内不要调用 methods 取实例值，例如 `workBankId: this.getId()` 应移除，改为在 onOpen/onClose 里通过 getDefaultForm()/resetForm() 赋值。\n3. 当 rules 依赖 data() 里的字段（如 this.patterns）时，把 rules 移到 computed，否则每次重置重跑 data() 都可能让校验规则失效。\n\n注意：全库仍有 90+ 处 `$options.data()`，多为纯字面量 data（不引用 this），属低风险，可按需再批量替换。",
+   "evidence": "会话中用户先后贴出 `elForm is not defined` 与 `this.getId is not a function` 两条 Vue warn，随后要求「这次修复的问题全局排查一下，都要修复」。最终把 mixins/table.js 的 resetQuery() 与 mixins/dialogMixins.js 的 reset() 改为 `this.$options.data.call(this)`，并改掉 11 个直接调用点；YhwdDialog 移除 data() 中的 `workBankId: this.getId()`、新增 getDefaultForm()/resetForm()、rules 移入 computed。",
+   "files": [
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/mixins/dialogMixins.js",
+    "zhi2-web-admin/src/views/supervision/bank/superviseBank/components/YhwdDialog.vue",
+    "zhi2-web-admin/src/views/supervision/bank/cbyh/components/YhwdDialog.vue",
+    "zhi2-web-admin/src/views/company/staffManagement/components/certificatesDialog.vue"
+   ],
+   "baseline": "d5cc6174",
+   "sessionIds": [
+    "4c019747-1395-4046-9803-28a9f73b6493"
+   ],
+   "bundle": "056.md"
+  },
+  {
+   "title": "同一内核页被多机构/多上下文复用：busCode 按「菜单 meta 优先 + 机构类型回退」查表解析",
+   "type": "pattern",
+   "content": "场景：开发企业/经纪机构/租赁机构的「管理员维护」与「变更单」共用同一套 companyAdmin 页面内核（detail.vue、index.vue 各机构只是薄入口），但后端要求流程与要件的 busCode 不同：维护 qyglygl/jgglygl/zlglygl，变更 qyglybg/jgglybg/zlglybg。\n\n问题：若直接把 busCode 写成常量或只读菜单 meta，则后端菜单只登记了 `zlglygl` 一个时，进入租赁变更单上下文会错用维护编码，导致流程图与附件列表取错。\n\n做法：\n1. 在 `src/constants/companyOrgan.js` 建立两张查表常量 COMPANY_ADMIN_BUS_CODE_BY_ORGAN_TYPE / COMPANY_ADMIN_CHANGE_BUS_CODE_BY_ORGAN_TYPE，用 resolveCompanyAdminBusCode / resolveCompanyAdminChangeBusCode 取值，禁止散落硬编码。\n2. 新增 resolveCompanyAdminContextBusCode(route, organType, isChange)：菜单 meta.busCode 与当前上下文匹配才采信菜单值，不匹配（或为空）就按机构类型+是否变更回退。这样运维只登记一个菜单也不会串上下文。\n3. 页面里把 flowBusCode 与 appendixBusCode 统一指向同一个 contextBusCode，保证「提交流程」与「要件上传」同源。\n4. 机构类型推断要多路兜底：filePath（companyAdmin/lease、companyAdminChange/lease）、路由路径前缀（/leaseOpen、/jjjg、/kfqy）、以及 busCode 反查（含变更编码）。\n5. 多个机构共用同一路由段会让变更单跳错页面，需在变更管理页给目标加 pathHint（如 zlglybg → leaseOpen）消除歧义。",
+   "evidence": "用户明确给出映射：「管理员详情 busCode 用 qyglygl、jgglygl、zlglygl；变更详情 busCode 用 qyglybg、jgglybg、zlglybg」。实现中新增两组查表常量与 resolveCompanyAdminContextBusCode，并说明「即使菜单只登记 zlglygl，进入变更单上下文也会正确切成 zlglybg」；同时给 zlglybg 加 pathHint:'leaseOpen' 避免落到重复的 /companyAdmin 路由。",
+   "files": [
+    "zhi2-web-admin/src/constants/companyOrgan.js",
+    "zhi2-web-admin/src/views/company/companyAdmin/detail.vue",
+    "zhi2-web-admin/src/views/company/companyChangeManage/index.vue",
+    "zhi2-web-admin/src/views/company/companyAdmin/lease/detail.vue",
+    "zhi2-web-admin/e2e/fixtures/company-admin-menu-config.js"
+   ],
+   "baseline": "85a6308d",
+   "sessionIds": [
+    "01a16369-4747-70c5-a400-767aa0acad0a"
+   ],
+   "bundle": "056.md"
+  },
+  {
+   "title": "审批按钮权限与提交 key 必须从 flowable 动态取，不能拿后端展示用的 currentNode 硬编码",
+   "type": "pattern",
+   "content": "现象：现售备案「预公告」节点列表不显示审批节点，详情页也没有「维护预公告」按钮（及审批按钮），用户直接指出「key 应该从 flowable 接口获取吧，不是写死的吧」。\n\n根因：审批按钮的可见性判断与提交时的 nodeKey 用了后端返回的 currentNode 再映射成本地常量（APPLY_CURRENT_NODE_LABELS），而 currentNode 只是给列表/详情做文案展示的，节点名称与 flowable 的 key 并非一一对应，流程走到下一节点后前端常量就失效，按钮不出现。\n\n正确做法（沿用项目 zs-approval 通用模式）：\n1. 详情加载后调 `/flowable/task/flowViewer`（busCode + dataId），取第一个 `completed === false` 节点的 key 存为 flowKeyNode。\n2. 再调 `/flowable/task/isApprovalAuth`（busCode + dataId + targetKey: flowKeyNode）判断当前用户是否有审批权限，结果存 approvalAllowed。\n3. 按钮展示条件 = approvalAllowed && flowKeyNode 都有值；审批提交 `/presale/cashsale/approval` 的 payload.key 直接用 flowKeyNode。\n4. 职责分离：展示文案仍用后端 currentNode + 本地标签映射；权限与提交 key 一律走 flowable。\n5. 例外：受理节点仍走 /accept 接口，不传 key。\n\n排查手法：按钮不出现时先在 Network 看 flowViewer 返回的未完成节点 key 与 isApprovalAuth 是否为 true，再怀疑前端条件。",
+   "evidence": "用户两次追问（截图指出列表无审批节点、详情无维护按钮；再问 key 是否写死），最终结论明确改造：flowViewer 取未完成节点 key → isApprovalAuth 判权 → 提交 payload.key 用 flowKeyNode，并给出「列表/详情展示文案用 currentNode、按钮显隐用 isApprovalAuth、提交 key 用 flowViewer」的职责划分表。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleDetail.vue",
+    "zhi2-web-admin/src/views/presale/cashsale/cashsaleConstants.js",
+    "zhi2-web-admin/e2e/fixtures/cashsale-apply-helpers.js"
+   ],
+   "baseline": "1c445c77",
+   "sessionIds": [
+    "cf9372b9-cea3-4138-bba8-a10ef28dbf3f"
+   ],
+   "bundle": "056.md"
+  },
+  {
+   "title": "新增独立业务模块的交付物清单：供运维录入的菜单路由 JSON + 双端只读差异 + 权限串",
+   "type": "workflow",
+   "content": "本项目菜单由后台「菜单管理」录入，代码侧新增模块不会自动出现入口。因此新增一个独立业务模块（如开发企业股东信息）时，交付物必须包含一份可直接照抄的菜单路由清单，否则用户看不到入口。\n\n标准交付物：\n1. `scripts/<module>-menu-routes.json`：列出主管部门端与企业端两套路由（如 /kfqy/shareholder 与 /shareholder），各配一个隐藏的详情路由（`/:tableid`），并标出 component 路径（`company/shareholder/index`、`company/shareholder/detail`）与权限串（`company:shareholder:list|query|add|edit|remove`）。\n2. 页面按端区分能力：企业端走 `POST /company/shareholder/page` 可增删改；主管部门端用 `pageNoPermissions` 且必须填企业备案 ID 才能查，纯只读。\n3. 删除等批量操作复用 mixin 的 `POST /xxx/delete` + 裸 ID 数组，不要另写一套。\n4. 列表合计只展示接口返回的当页合计，前端不要把当页数据再 sum 一遍（与「有字段值就不要前端二次计算」同源，这里针对合计而非条数）。\n5. 明确告知用户后续动作：在菜单管理按 JSON 增菜单、挂权限、重新登录。\n\n价值：把「前端做完但用户觉得没交付」的常见断点前置解决，同一套做法可复用到任意新模块。",
+   "evidence": "用户诉求是「单独加一个开发企业股东信息菜单，原来有菜单功能，找一个，把路由信息发给我」；最终交付里专门有 scripts/shareholder-menu-routes.json，并单列「你需要做的：在系统菜单管理中按该 JSON 增加菜单并挂权限后重新登录」。同时说明企业端可增删改、主管部门端 pageNoPermissions 只读需填备案 ID、合计只取接口当页合计。",
+   "files": [
+    "zhi2-web-admin/scripts/shareholder-menu-routes.json",
+    "zhi2-web-admin/src/views/company/shareholder/index.vue",
+    "zhi2-web-admin/src/views/company/shareholder/detail.vue",
+    "zhi2-web-admin/src/api/company/shareholder.js"
+   ],
+   "baseline": "a861cff3",
+   "sessionIds": [
+    "70b8d98f-1146-40b6-9474-670a8d856ced"
+   ],
+   "bundle": "056.md"
+  },
+  {
+   "title": "股东/成员类明细表的一致性校验：保存前全量拉取再算比例与法人唯一",
+   "type": "pattern",
+   "content": "场景：开发企业股东信息是可增删改的子表（列表可编辑若干股东），业务规则要求所有股东持股比例合计 100%、且法人只能有一个。\n\n坑：如果只拿当前页/当前编辑行做校验，删改后的合计与唯一性都算不准——接口分页返回，前端手里往往只有当页数据；后端也不做跨行校验。\n\n做法：\n1. 在 detail.vue 提交前先全量拉取该企业的股东列表（不分页/取足量），基于全量集合计算比例合计与法人唯一性，再决定是否放行保存。\n2. 校验逻辑抽成独立工具 `src/utils/shareholderValidate.js`，页面只调用；同时对外提供 `validateShareholderChangeList` / `buildShareholderChangeListPayload`，供「企业变更单（toB）」复用同一套规则，避免维护/变更两条链路口径不一致。\n3. 证件号为脱敏值时（列表/详情展示脱敏），编辑只允许提交用户本次新输入的号码，未改动项不要回传脱敏串，否则会把真实值覆盖成星号。\n\n适用面：凡「子表有跨行合计/唯一性约束 + 主表提交」的模块都可照此模式，校验放 utils、提交前全量取数。",
+   "evidence": "最终交付说明：detail.vue「保存前全量拉取股东做比例/法人校验」，校验逻辑集中在 src/utils/shareholderValidate.js，并导出 validateShareholderChangeList / buildShareholderChangeListPayload 供变更单使用；同时注明「证件号列表/详情为脱敏值，编辑时仅能改用户新输入的号码」。",
+   "files": [
+    "zhi2-web-admin/src/utils/shareholderValidate.js",
+    "zhi2-web-admin/src/views/company/shareholder/detail.vue",
+    "zhi2-web-admin/src/api/company/shareholder.js"
+   ],
+   "baseline": "a861cff3",
+   "sessionIds": [
+    "70b8d98f-1146-40b6-9474-670a8d856ced"
+   ],
+   "bundle": "056.md"
+  }
+ ]
+}

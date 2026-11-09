@@ -1,0 +1,343 @@
+{
+ "project": "苏住房C",
+ "batch": 17,
+ "files": [
+  "065.md",
+  "066.md",
+  "067.md",
+  "068.md"
+ ],
+ "count": 18,
+ "memories": [
+  {
+   "title": "小程序 downloadFile 报 invalid url：拼域名时用 replace(/\\/\\//g,'/') 把 https:// 也压成 https:/",
+   "type": "bug",
+   "content": "场景：合同/收入等页面点击附件下载，微信小程序抛 `downloadFile:fail createDownloadTask:fail invalid url`，而后端返回的是相对路径（如 `/zhi2-pro/xxx/file.pdf`）。\n\n为什么：`filePreview` 的小程序分支把域名拼接与路径去重写成了 `${BASE_URL}${url}`.replace(/\\/\\//g, \"/\")。该正则会把「所有」双斜杠都替换成单斜杠，连协议头 `https://` 也一起吃掉，最终得到 `https:/szf.szzfcjj.cn/...` —— 微信侧校验协议失败，直接判为非法 URL，不是网络或白名单问题。\n\n怎么做：不要自己写「拼域名 + 去重斜杠」的字符串处理，统一走项目已有的 `resolveMediaUrl`（位于 src/utils/index.js），它按路径前缀正确选择 `IMAGE_BASE` / `IMAGE_BASE_V1` 域名、只处理路径段的重复斜杠，不触碰协议头。修改点收在 `filePreview` 这一处，所有调用方（FileList / Type2 / contracts 附件、收入信息等）自动生效。判定信号：报错文案是 `invalid url` 而不是超时或 `downloadFile:fail url not in domain list`，基本可以锁定 URL 被拼坏。排查时先把最终 URL 打出来肉眼核对协议头，比反复检查 request 域名白名单快得多。",
+   "evidence": "会话 114830fb：contracts.vue 附件点击报 `downloadFile:fail createDownloadTask:fail invalid url`，根因是 filePreview 里 `${BASE_URL}${url}`.replace(/\\/\\//g, \"/\") 把 https:// 压成 https:/，改用 resolveMediaUrl 修复。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/pages_owner/company/info/contracts.vue",
+    "zhi2-mobile-shimin/src/pages_owner/components/FileList/FileList.vue",
+    "zhi2-mobile-shimin/src/pages_owner/components/FileList/Type2.vue",
+    "zhi2-mobile-shimin/src/api/common.js"
+   ],
+   "baseline": "b7bf813",
+   "sessionIds": [
+    "114830fb-d6f5-4964-849d-72fac1151285"
+   ],
+   "bundle": "065.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "ZsButton 不声明 disabled 也不绑定到原生 button：`:disabled` 只变灰不拦截点击，倒计时/同意须知页可提前通过",
+   "type": "bug",
+   "content": "场景：`pages_transaction/stockHouseSign/needToKnow` 须知页要求「阅读满 5 秒才能点确定」，但倒计时期间按钮显示为灰色却仍可点击跳转，用户连提四次同一问题。\n\n为什么：`AgreementPage` 传了 `:disabled=\"isCounting\"`，但 `ZsButton` 组件既没有声明 `disabled` 这个 prop，也没有把它透传到内部的 `<button>`。属性被当成普通 attr 丢弃，只有视觉禁用态生效、点击事件照常触发 —— 属于典型的「自研按钮组件少了禁用契约」，同类组件还有 `loading` 期间不禁用的隐患。\n\n怎么做：一是在 `ZsButton` 里补齐 `disabled` prop 并真正绑定到原生 `<button>` 的 `disabled`，同时让 `loading=true` 时也视为禁用；二是在 `AgreementPage` 的点击处理里加 `if (isCounting) return` 的第二道守卫。两处都要做：组件层修的是「所有用 ZsButton 的页面」，业务层守的是「将来有人换回原生按钮或改样式」的回归。今后凡是要靠倒计时/状态锁住按钮，先确认该按钮组件是否真的声明并下发了 `disabled`，不要只看到灰底就认为已禁用。",
+   "evidence": "会话 c9900767：needToKnow 满 5 秒前可点，根因 ZsButton 无 disabled 属性/未绑定原生 button；修复为 ZsButton 增加 disabled（loading 也禁用）+ AgreementPage 点击前判断 isCounting。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ZsButton/ZsButton.vue",
+    "zhi2-mobile-shimin/src/components/shared/AgreementPage.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/stockHouseSign/needToKnow.vue",
+    "zhi2-mobile-shimin/src/hooks/useCountDown.js"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "c9900767-72b2-4323-9462-1cd68d147b99"
+   ],
+   "bundle": "065.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "微信小程序 canvas/echarts 图表放进 scroll-view 必空白：原生组件不支持滚动容器内渲染",
+   "type": "bug",
+   "content": "场景：慧物业→阳光物业→年度预算页，收入/支出图表整块空白，而页面下方预算卡片数据正常（Bug #3479）。\n\n为什么：`EchartsUniapp` 底层是 `<canvas>`，在微信小程序里属原生组件，官方限制原生组件不能在 `scroll-view` 内正常渲染，于是 canvas 拿不到正确的位置与层级，图表静默不绘制。表现极具迷惑性：同一 scroll-view 内的 DOM 卡片正常，只有 canvas 区域空白，且往往没有报错。\n\n怎么做：把图表移出 `scroll-view`，让图表固定在顶部、只有下方列表可滚动（页面骨架改成「固定图表 + 滚动列表」两段式）。同时补齐三件配套改造：① 数据更新改成整对象替换 `chartOption`（与经营性收支公示页一致），不要逐字段 mutate，否则组件 watcher 可能感知不到；② 切换年份/Tab 时用动态 `canvasId` + `key` 强制重建图表实例，避免切完状态错乱；③ 金额先 `Number()` 转数值再喂 ECharts，字符串会导致 series 不渲染。若确实必须让图表跟着滚动，只能改用同层渲染方案，不能直接在 scroll-view 里硬塞 canvas。",
+   "evidence": "会话 9446951a：Bug #3479「年度预算图表不显示」，定位为 EchartsUniapp 的 canvas 被放在 scroll-view 内；修复为图表移出 scroll-view、整对象替换 chartOption、动态 canvasId/key 重建、budgetAmount 走 Number()。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_benefit/budget/index.vue",
+    "zhi2-mobile-shimin/src/pages_benefit/components/echarts-uniapp/echarts-uniapp.vue",
+    "zhi2-mobile-shimin/src/pages_benefit/balancePublicity/index.vue",
+    "zhi2-mobile-shimin/src/api/benefit.js"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "9446951a-feff-46d8-9660-d4cca2cd85fd"
+   ],
+   "bundle": "065.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "ZsButton 的 width:inherit 使 flex + space-between 按钮组被撑满挤压：两个 success 按钮文字重叠",
+   "type": "bug",
+   "content": "场景：`pages_owner/house/owner/success` 页 UI 紊乱，「返回」「继续添加」两个按钮文字重叠、变形；同类问题会出现在所有复用 `SuccessCard` 的家庭成员、租客、实名认证 success 页。\n\n为什么：`SuccessCard` 的按钮区是 `display:flex + justify-content:space-between`，但 `ZsButton` 内部设了 `width: inherit`，两个按钮都继承了父容器 100% 宽度。在 flex 容器里两个各占 100% 的按钮互相挤压，文字区域重叠。属自研按钮的默认宽度契约与「并排两个按钮」布局冲突。\n\n怎么做：不要改 `ZsButton` 的默认 `width: inherit`（会影响全站单个按钮铺满的既有页面），改为在按钮组上收窄子项：`.btn-group :deep(.zs-button) { flex: 0 0 300rpx; width: 300rpx; margin: 0; }`，用固定 flex-basis + 显式宽度压住继承宽度。改在共享的 `SuccessCard` 组件层，五个 success 页一次修好。顺带把该页不对称的 `padding: 0 64rpx 0 66rpx` 收敛到与其他 success 页一致，避免各页微调后再次漂移。定位信号：按钮文字重叠/被压扁且页面用了 flex 排布按钮，先怀疑按钮组件自带 `width: inherit` / `width:100%`。",
+   "evidence": "会话 500973f3：successUI 紊乱，根因为 SuccessCard 按钮区 flex+space-between 与 ZsButton 的 width:inherit 叠加；修复为 .btn-group :deep(.zs-button) 固定 300rpx 并统一 padding/背景色。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/shared/SuccessCard.vue",
+    "zhi2-mobile-shimin/src/components/ZsButton/ZsButton.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/success.vue",
+    "zhi2-mobile-shimin/src/pages_owner/family/success.vue",
+    "zhi2-mobile-shimin/src/uni.scss"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "500973f3-9d75-48cf-8744-7385f4f59190"
+   ],
+   "bundle": "065.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "第三方便民功能的 web-view 入口全部硬编码在 cc.szfcweb.cn:9999：新增同类页面先复用这些既有地址",
+   "type": "pattern",
+   "content": "场景：需要在小程序里提供存量房交易税收测算、交易流程导引、合同示范文本、资金托管协议、常见问题、楼盘地图等「政策/工具类」页面时，不要另建页面。\n\n事实：本项目所有第三方 web-view 能力集中在三个承载页——`pages_main/common/webView.vue`（通用容器）、`pages_main/common/webViewNav.vue`（带导航栏偏移）、`pages_transaction/thirdMap/index.vue`（直接内嵌 web-view）。硬编码地址共 8 个，其中 7 个在 `https://cc.szfcweb.cn:9999/pages/policy/*` 下（zzsscs 住宅税收测算、fzzsscc 非住宅税收测算、zjcj 中介成交流程、zxcj 自行成交流程、contractPDF 买卖合同范本、xieyiPDF 资金托管协议、verifyHouse/errorTip 常见问题），1 个是 `https://szdt.xzspj.suzhou.gov.cn:18087/#/housebuilder?hallType=2&qttype=252_5` 行政审批局楼盘地图。\n\n怎么做：凡是「点进去看政策说明/测算工具/第三方地图」的需求，先按上表找现有 URL，用 webView/webViewNav 带 title 跳转，不要在业务页里重写地址或自造 H5。另有一类地址不由前端硬编码而是动态下发：资讯、公示详情的 `detail.urlSite`（importType==2 时整页跳转），以及富文本里的 `<a href>` 外链（article/ListDetail、announcement/detail、publicNotice、owner/company/service 的 ListDetail），这些统一由 web-view 承载页接管，不要在富文本渲染层私自拦截改写。需要新增第三方地址时，把常量集中登记并注明入口文件，避免散落在各业务页里。",
+   "evidence": "会话 c5d58c85：梳理 zhi2-mobile-shimin 全部 web-view 地址，得出 3 个承载页 + 8 个硬编码第三方地址（cc.szfcweb.cn:9999 的 7 个 policy 路径、szdt.xzspj.suzhou.gov.cn 楼盘地图）+ 动态下发来源清单。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_main/common/webView.vue",
+    "zhi2-mobile-shimin/src/pages_main/common/webViewNav.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/thirdMap/index.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/taxGuide/index.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/transactionFlowGuide/index.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/contractDemo/index.vue"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "c5d58c85-6292-401f-b7fb-abc1ca9f514c"
+   ],
+   "bundle": "065.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "埋点类 fire-and-forget 请求必须配 noReject + skipToken，否则 401 会触发登出并打断后续跳转",
+   "type": "pattern",
+   "content": "情况：苏住房C 小程序（zhi2-mobile-shimin）的埋点接口 https://szf.szzfcjj.cn/api/v2.0/appAnalytics/eventData/add 返回 401，导致页面跳转、菜单点击等后续逻辑被中断——redirect 页的 trackMenuEvent → lanch(path) 流程在埋点 reject 时直接断掉，最坏还会被 httpInstance 的 401 分支拉去登出/跳登录页。\n为什么：项目把 HTTP 实例全局错误处理写成了「任何 401 都清 userStore + appLogin()」，没有区分「业务请求」与「旁路埋点」；埋点本身又是 fire-and-forget，调用方没有 await/catch，失败就变成一个拒绝态 Promise 悬在那里。\n怎么做：① 在 api 层为埋点类接口统一封装 silentPost，携带 noReject: true + skipToken: true，外层再 .catch(() => null)，保证 Promise 永远 resolve；② 在 httpInstance 响应拦截器里让 noReject 请求在最前面提前返回，跳过 clear()/appLogin() 等登出逻辑；③ 网络 fail 分支对 noReject 请求改为 resolve(null) 而不是 reject；④ 新增 skipToken 配置项，埋点这类非鉴权请求不带 Authorization，从源头避免用过期 token 换回 401。\n判断标准：任何「失败也不该影响主流程」的请求（埋点、日志上报、曝光统计）都应该走这条通道，而不是在调用点各自 try/catch。",
+   "evidence": "会话 f8d2218a（2026-08-21，基线 9832ba3）用户反馈「/appAnalytics/eventData/add 401 这个接口异常不要影响后续逻辑」；最终改为 appAnalytics.js 统一 silentPost（noReject + skipToken + .catch(()=>null)），httpInstance.js 让 noReject 请求在响应拦截中提前返回、跳过 userStore.clear()/appLogin()，网络 fail 时 resolve(null)，并新增 skipToken 配置。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\appAnalytics.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\httpInstance.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\redirect\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\index.js"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "f8d2218a-2bef-4ce0-99ff-25ccbca24f30"
+   ],
+   "bundle": "067.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "同一小程序内多套后端基础路径：szfang.szfcweb.cn 的 prod-api 不拼 /v2.0，主接口 szzfcjj.cn 才保留",
+   "type": "fact",
+   "content": "情况：苏住房C 小程序同时对接两套后端——主接口 http://szf.szzfcjj.cn/api/v2.0（带 /v2.0）与 v1 实例 http://szfang.szfcweb.cn/prod-api（不带 /v2.0）。用户明确指出后者「不需要加 /v2.0」。此前 v1Instance.js 的 base 写成 .../prod-api/v2.0，articleV1.js 里也把路径写成 /v2.0/article/richText/page 这类前缀，导致 404。\n为什么：两套服务是不同网关命名习惯，/v2.0 是主接口的版本段而非全局约定；把 base 与具体路径都当成可统一处理的量，就会出现「base 已含 /v2.0、路径里又拼一次」或「本该没有却拼上」的双错。\n怎么做：① 把 /v2.0 从 v1 实例的 base 与所有 api 模块路径里同时去掉，base 止于 /prod-api，路径从业务段起写（/article/richText/page、/transaction/house/favorite/page）；② 每个 api 文件只依赖自己实例的 base，不在路径里重复版本段；③ 三处环境变量/常量要成组更新——v1Instance.js（小程序端 base）、src/env/mp.js（develop/trial 的 BASE_URL_V1 / IMAGE_BASE_V1）、.env.* 的 VITE_APP_API_PROXY_V1 / VITE_APP_IMG_PROXY_V1；④ H5 走 /szf 前缀由 vite 代理转发，本身不加 /v2.0；⑤ 改 .env 后必须重启开发服务才生效。新增/迁移服务时先确认「该服务的 base 是否自带版本段」，再决定路径写法。",
+   "evidence": "会话 41cb8c35（2026-08-21，基线 9832ba3）用户指出「http://szfang.szfcweb.cn/prod-api 的接口不需要加/v2.0」；修改 v1Instance.js 的 base（szfang.szfcweb.cn/prod-api/v2.0 → /prod-api）与 articleV1.js 路径（/v2.0/article/richText/page → /article/richText/page），并说明主接口 szzfcjj.cn 的 api/v2.0 仍保留 /v2.0。另见会话 41a97e7e 将 v1 实例整体切到 unlimited.c.h5.shimin...test.zhishusz.com/prod-api，需同步 .env.development/.env.test/src/env/mp.js，且 H5 经 /szf 前缀走 vite 代理、改 .env 后要重启开发服务。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\v1Instance.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\articleV1.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\env\\mp.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\.env.development",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\.env.test",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\vite.config.ts"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "41cb8c35-518b-4989-80ca-690e568b72c9",
+    "41a97e7e-f4b1-47ec-b087-f85ba74fa510"
+   ],
+   "bundle": "067.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "横向图标导航不要用 scroll-view + calc 页宽：改 swiper 整页切换，flex 均分列宽",
+   "type": "pattern",
+   "content": "情况：苏住房C 小程序「苏找房」页顶部图标导航横向分页左右滑动时 UI 错位——第 6 个图标被裁切露出一角，底部分页指示器也错位。\n为什么：用 scroll-view 做「按页滑动」，每页宽度却写成 calc(100vw - 44px)，而 scroll-view 容器是全屏宽。两者宽度不一致 → 右侧会提前露出下一页内容；同时 scrollLeft 按错误的页宽换算页码，指示器必然对不上。\n怎么做：① 分页式横向导航改用 swiper，天然按容器宽度整页切换，页码直接绑 swiper 的 @change 事件 current，不再自己用 scrollLeft 推算；② 每页内部用 flex 均分列宽而不是写死像素，5 列时用 flex: 0 0 calc((100% - 32px) / 5)（32px 为 4 个间距之和），保证任意屏宽下每页正好 5 个且不露出下一个；③ 图标数不整除时补齐占位，避免最后一页被拉伸；④ 若确实需要「连续滚动而非翻页」，才用 scroll-view，此时页宽必须与容器宽度严格同源（都用 100%），不要混用 100vw 与扣减后的宽度。",
+   "evidence": "会话 1d4644c7（2026-08-21，基线 9832ba3）用户报「上面这个分页左右滑动组件UI有问题」；定位 Project_Suzhufang.vue 横向导航用 scroll-view 而每页宽度设为 calc(100vw - 44px)，容器为全屏宽；改为 swiper + flex: 0 0 calc((100% - 32px) / 5) + 指示器跟随 swiper current。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\Project_Suzhufang.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\Project_Suzhufang.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\project.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\menu\\MidModuleGrid.vue"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "1d4644c7-b4d9-4f0e-ae82-7cbe27b40a19"
+   ],
+   "bundle": "067.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "Vue3 下 @tap.native 静默失效：搜索框点击无反应，改在外层容器绑 @tap + @focus 双通道跳转",
+   "type": "bug",
+   "content": "情况：苏住房C 小程序「我的 → 我的求购 → 添加求购」页点击搜索框没有任何反应，进不去搜索小区页。\n为什么：add.vue 里写的是 @tap.native。Vue 3 已移除 .native 修饰符语义（它曾用于给子组件根节点挂原生事件），在 uni-app 的 Vue3 编译产物里这个监听不会被挂上，也不报错——表现为点击完全静默失效。\n怎么做：① 不要在组件上写 @tap.native，把 @tap 绑到一个包裹它的 view 容器上，点击区域更稳定；② 同时在该搜索控件上补 @focus 事件走同一条跳转逻辑，用户「点进输入框开始输入」也能进入搜索页，避免点中边缘空隙时仍旧无响应；③ 排查同类问题时全仓 grep `.native`，Vue3 项目里剩下的基本都是死代码；④ 判定「点击没反应也没报错」时，优先怀疑事件监听根本没绑上（.native / 拼错事件名 / 被上层遮罩挡住），而不是先查跳转函数。",
+   "evidence": "会话 1bbaff8b（2026-07-16，基线 77666f8）用户报「添加求购，搜索小区点击没反应」；根因为 add.vue 使用 @tap.native 在 Vue3 中已失效，改为外层容器绑 @tap 并在 @focus 时跳转搜索页。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\intention\\add.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\intention\\search.vue"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "1bbaff8b-e027-4764-86e9-41dd7092d234"
+   ],
+   "bundle": "067.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "z-paging 默认 fixed 全屏覆盖会盖住顶部搜索栏：搜索页必须 :fixed=\"false\" + autoFocus",
+   "type": "bug",
+   "content": "情况：苏住房C 小程序「搜索小区」页里顶部搜索框点不动、无法输入，看起来像搜索栏坏了。\n为什么：z-paging 默认 fixed 为 true，会把列表渲染成全屏固定定位并叠在页面其他内容之上，把同样位于顶部的搜索栏压在下层，点击全被列表容器吃掉。\n怎么做：① 搜索栏与列表同屏的页面显式传 :fixed=\"false\"，让 z-paging 回到普通文档流，配合外层 flex 纵向布局让列表吃剩余高度；② 搜索栏在 flex 中设 flex-shrink: 0，避免被列表挤压；③ 配 :autoFocus=\"true\"，进入页面即聚焦输入法，减少一次点击；④ 顺带补齐空状态文案——z-paging 的缺省图只给图不给字，必须在空状态插槽里补「暂无数据」，并与项目其他列表页样式保持一致。\n判定顺序：z-paging 页面里出现「某块区域点不动/被盖住」，先查 fixed，再查 z-index。",
+   "evidence": "会话 1bbaff8b（2026-07-16，基线 77666f8）用户报「搜索小区页」搜索框无法点击并缺「暂无数据」提示；根因为 z-paging 默认 fixed 全屏固定盖住搜索栏，改为 :fixed=\"false\" + 调整 flex 布局 + autoFocus，并在空状态模板补「暂无数据」文案。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\intention\\search.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsSearch\\ZsSearch.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\common\\searchPage.vue"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "1bbaff8b-e027-4764-86e9-41dd7092d234"
+   ],
+   "bundle": "067.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "自定义组件的内边距/圆角必须写在组件内部：父页 :deep 穿不透小程序样式隔离（ZsCheckbox highlight 模式）",
+   "type": "pattern",
+   "content": "情况：苏住房C 小程序投票决策表单 form.vue 的 StepChoose 步骤选择里，选中项（ZsCheckbox 的 highlight 模式）蓝色高亮背景完全贴边，与设计稿要求的「背景内有内边距」不符。父页写了 :deep(.checkbox-item) 设 padding，怎么调都没反应。\n为什么：微信小程序自定义组件默认样式隔离，父页面的 :deep() 无法穿透进 ZsCheckbox 内部真实节点——这条规则被静默丢弃，不留任何告警。这与「组件标签上的 class/style 不透传」「WXSS 编译不报错但整条声明丢失」是同一类根因。\n怎么做：① 把 padding: 24rpx 28rpx、border-radius: 12rpx、box-sizing: border-box 这些视觉契约写进 ZsCheckbox.vue 中 .highlight .checkbox-item 自己身上，选中态 .highlight .checkbox-item.active 只负责背景色（rgba(19,84,190,.08)）与文字色 var(--primary-color)；② 相邻项间距也放组件内（.highlight.v .checkbox-item + .checkbox-item { margin-top: 24rpx }）；③ 删掉父页那段无效的 :deep(.checkbox-item)，避免两处维护、误以为改父页就能生效。\n推广：凡「组件自带的视觉形态（高亮、卡片、选中态）」一律组件内闭环；父页只应通过 props 控制形态开关，而不是试图用 CSS 覆盖内部节点。",
+   "evidence": "会话 fee54f55（2026-08-28，基线 8fc3cc5）用户反馈「选中还是没有内边距」，根因为微信小程序组件样式隔离使父页 StepChoose.vue 的 :deep(.checkbox-item) 无法生效；修复为在 ZsCheckbox.vue 的 .highlight .checkbox-item 内写入 padding/圆角/box-sizing，并移除父页无效样式。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsCheckbox\\ZsCheckbox.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\optional\\StepChoose.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\common\\StepChoose.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\form.vue"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "fee54f55-f0e6-4815-a66f-9e7605482cf9"
+   ],
+   "bundle": "067.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "签字图不显示 + 下方大片空白：ZsImage 要给固定尺寸容器 + aspectFit，并兼容 signature/sign 双字段",
+   "type": "pattern",
+   "content": "情况：苏住房C 小程序投票决策结果页 DecisionResult 的「最近一次决策」下方出现大片空白，本该有的签字图也没显示出来。\n为什么（三条叠加）：① 签字用 CardCell 包 ZsImage，图片容器没有固定尺寸，内部 height:100% 在 flex 测量链里拿不到确定高度，图片退化成 0 高——视觉上就是一块空白；② 取值只读了 signature，后端在另一种返回结构里给的是 sign，字段不匹配时同样只剩空白；③ 「决策详情」被做成整行 CardCell，本身还额外贡献了一段行高。\n怎么做：① 签字区不用 CardCell，改用 cell-item + 专用 sign-picture-wrap，容器给固定 153×68px，图片 mode=\"aspectFit\" 保证不拉伸；② 取值做多候选回退：recordDetail.signature || recordDetail.sign || detail.signature || detail.sign；③ 「决策详情」从整行卡片降级为决策内容下方的紧凑链接行；④ 同一业务的几份复制页面（optional/ 与 common/ 下的同名文件）要互相对齐，改一份就把另一份同步，避免只修好一个入口。\n推广：小程序里任何图片（签字、证照、缩略图）都必须由外部容器定尺寸，不要依赖 height:100% 自行撑开。",
+   "evidence": "会话 55bd76cb（2026-08-28，基线 8fc3cc5）用户报「optional/DecisionResult 最近一次决策下面有大量空白，也可能是签字没展示」；根因为 CardCell 内 ZsImage 容器无固定尺寸使 height:100% 无法撑开、且只取 signature 未兼容 sign；修复为 cell-item + sign-picture-wrap 固定 153×68 + aspectFit、取值四重兜底、决策详情改紧凑链接行。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\optional\\DecisionResult.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\common\\DecisionResult.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\styles\\page.scss"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "55bd76cb-6679-4d29-9b33-6cebc5d1203e"
+   ],
+   "bundle": "067.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "公共 BackBtn 自带 margin 会把固定底栏按钮顶偏溢出：容器清 margin + 按钮补 block",
+   "type": "pattern",
+   "content": "情况：苏住房C 小程序投票决策结果页底部「修改决策」按钮偏右、溢出容器、不居中。\n为什么：公共组件 BackBtn 自身带 margin: 20px，放进已经设了左右内边距的固定底栏后，左 margin 与底栏 padding 叠加，右侧又被挤出可视区；同时按钮没有 block 属性，宽度按内容收缩，flex 对齐也无从居中。\n怎么做：① 按钮补 block 属性，让它撑满容器宽度，水平居中由容器决定；② 底栏容器写 padding: 18px 16px 且显式 box-sizing: border-box，防止 padding 把容器撑出屏外；③ 用 :deep(.btn-container) 把 BackBtn 自带的 margin 清零（这是父页可控的合法边界，因为是清外部盒模型而非改内部视觉）；④ 底栏配合安全区，避免小屏机型按钮被手势条压住。\n推广：复用带默认 margin 的公共按钮组件进固定底栏/弹层页脚时，先检查它的 margin 是否与容器 padding 双重叠加——同类问题在泰兴项目也表现为「页脚按钮错位」。",
+   "evidence": "会话 55bd76cb（2026-08-28，基线 8fc3cc5）用户报「底部修改决策按钮溢出未居中」；根因为 BackBtn 自带 margin:20px 叠加固定底栏 + 缺 block 属性；修复为加 block、底栏 padding:18px 16px + box-sizing:border-box、:deep(.btn-container) 清 margin。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\components\\BackBtn.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\optional\\DecisionResult.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\optional\\DecisionRecord.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\styles\\page.scss"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "55bd76cb-6679-4d29-9b33-6cebc5d1203e"
+   ],
+   "bundle": "067.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 小程序导航约定：政策/导引类详情一律走 webViewNav + H5，本地没有对应页面",
+   "type": "fact",
+   "content": "情况：zhi2-mobile-shimin 的「房贷导引」(pages_transaction/houseLoanGuide) 点银行跳 `/pages/policy/fddydetail?id=xx`，控制台报 navigateTo:fail page \"pages/policy/fddydetail\" is not found。原因：该页面在 src/pages.json 里根本没有注册，属于从其他端复制残留的本地路由；本项目的政策/导引类内容全部由 H5 站点 cc.szfcweb.cn:9999 承载。做法：与同项目的「税收导引」「交易流程导引」保持一致，改为 goto(`/pages_main/common/webViewNav?url=${encodeURIComponent(H5完整地址)}&title=${encodeURIComponent(title)}`)，title 用 getDictLabel(item.bankLogo, appStore.getDict('BANK_LOGO_H5')) 取字典中文。排查约定：遇到 navigateTo page not found，先在 pages.json 里 grep 目标路径确认是否注册，再看同目录兄弟页是不是走 webViewNav；H5 打不开时不要再改前端，先验 https://cc.szfcweb.cn:9999 服务可用性。新增导引类需求直接按 H5 + webViewNav 实现，不要在分包里新建同名本地页。",
+   "evidence": "会话 2d03bb3e（基线 4630e8e）：houseLoanGuide/index.vue 原用 goto(`/pages/policy/fddydetail?id=${item.bankLogo}`) 跳本地未注册页，改为 webViewNav 打开 https://cc.szfcweb.cn:9999/pages/policy/fddydetail?id=${item.bankLogo} 并带字典标题，重编译后通过。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_transaction/houseLoanGuide/index.vue",
+    "zhi2-mobile-shimin/src/pages.json",
+    "zhi2-mobile-shimin/src/pages_main/common/webViewNav.vue",
+    "zhi2-mobile-shimin/src/api/transaction.js"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "2d03bb3e-84c4-4246-ae8a-bea874fd391d"
+   ],
+   "bundle": "068.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C H5 部署在子路径（/testh5/）时接口前缀必须用 ./ 相对路径，而非 /api",
+   "type": "pattern",
+   "content": "情况：H5 生产/测试部署在 https://szf.szzfcjj.cn/testh5/ 这种子目录下，而非域名根。若 .env.production 里写 VITE_APP_API_BASE_URL=/api/v2.0，开头的 / 会被解析到域名根，请求打到 https://szf.szzfcjj.cn/api/v2.0 而不是 https://szf.szzfcjj.cn/testh5/api/v2.0，全部 404。原因：绝对路径以站点根为基准，相对路径以当前文档 URL 为基准，子路径部署只能靠后者自适应部署目录，换目录也不用重新构建。做法：生产/测试环境统一写 VITE_APP_API_BASE_URL = ./api/v2.0、VITE_APP_API_BASE_URL_V1 = ./szf；.env.development 保持 /api/v2.0 让 Vite devServer 代理照常生效。服务端 Nginx 必须把 /testh5/api/ 反代到真实后端，否则相对路径只是把 404 从根目录挪到子目录。改完需 npm run build / npm run test 重新打包，env 只在构建期读取。",
+   "evidence": "会话 c48b7743（基线 f1939b0）：用户提出部署在 https://szf.szzfcjj.cn/testh5/ 时接口应为 .../testh5/api，改成相对路径；.env.production/.env.test 改为 ./api/v2.0 与 ./szf，.env.development 仍用 /api/v2.0，并提示 Nginx 需反代 /testh5/api/。",
+   "files": [
+    "zhi2-mobile-shimin/.env.production",
+    "zhi2-mobile-shimin/src/api/index.js",
+    "zhi2-mobile-shimin/src/api/v1Instance.js",
+    "zhi2-mobile-shimin/src/env/mp.js",
+    "zhi2-mobile-shimin/vite.config.ts"
+   ],
+   "baseline": "f1939b0",
+   "sessionIds": [
+    "c48b7743-542e-406d-b66e-16524691d8a8"
+   ],
+   "bundle": "068.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序原生 map 组件层级最高，紧贴 textarea 时会吞掉点击导致「不能输入」",
+   "type": "bug",
+   "content": "情况：pages_owner_extra/elevator/addAlone.vue 的「申请说明」textarea 点不进、无法输入；上一轮只给它加 min-height 完全没用。原因：微信小程序里原生 map 组件层级高于所有 WebView 节点，地图就紧贴在 textarea 下方，点击/聚焦事件被地图层拦截，属于原生层遮挡而不是样式尺寸问题（加高、调 padding 都修不掉）。做法（三条一起改）：1) 把地图移到表单上方，与 add.vue 的既有实现对齐，让 textarea 与地图在页面上拉开距离；2) 复用项目已有的 inputHidden 状态，textarea 聚焦时 `v-show=\"!inputHidden\"` 把地图整块隐藏，避免键盘弹出时与地图交互冲突；3) 给绝对定位的字数统计 `.word-limit` 加 pointer-events: none，防止它盖住输入区域。排查口诀：小程序里输入/点击「点了没反应」而样式看起来正常，先看附近有没有 map/video/canvas 原生组件，再考虑层级隐藏，不要反复调尺寸。",
+   "evidence": "会话 e052a49f（基线 8fc3cc5）：用户贴图反馈 addAlone 申请说明仍不能输入，结论为原生 map 层级最高拦截 textarea 点击，上次仅加 min-height 不够；本次移地图到表单上方 + inputHidden 隐藏 + word-limit pointer-events:none 后修复。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner_extra/elevator/addAlone.vue",
+    "zhi2-mobile-shimin/src/pages_owner_extra/elevator/add.vue",
+    "zhi2-mobile-shimin/src/components/ZsMap/ZsMap.vue",
+    "zhi2-mobile-shimin/src/components/ZsTextarea/ZsTextarea.vue",
+    "zhi2-mobile-shimin/src/styles/form2.scss"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "e052a49f-6b89-46d9-8914-0630e3aa30fb"
+   ],
+   "bundle": "068.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "给自定义组件根节点加 margin 类在 uni-app 里不生效，模块间距要用父容器 flex + gap",
+   "type": "pattern",
+   "content": "情况：pages_owner/project/info 里顶部小区信息卡片与「小区周边」两张白卡贴在一起，用户连续反馈「间距还是没有」。根因：上一轮是给 base-card 组件加了 module-gap（margin-top: 10px）类，但 uni-app 小程序端父组件的 scoped 样式作用不到自定义组件的根节点，class 挂上去了样式却不落，看起来像没写。做法：在页面根容器（如 .project-page）上用 display:flex; flex-direction:column; gap:20rpx 控制子模块间距，并删掉无效的 module-gap 类，与社区/街道信息页的写法保持一致；间距仍嫌小就把 gap 调到 24rpx / 32rpx。通用约定：需要「卡片之间留缝」时一律用父级 flex gap，不要给子组件根节点写 margin，也不要在父级 scoped 里 :deep 到子组件根上做间距——这是同一批信息页反复踩的点。",
+   "evidence": "会话 80f4d555（基线 8fc3cc5）：pages_owner/project/info/index 间距不生效，结论为父组件 scoped 样式作用不到自定义组件根节点导致 module-gap 无效，改为 .project-page flex + gap:20rpx 并与 community/subdistrict info 页对齐后修复。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/project/info/index.vue",
+    "zhi2-mobile-shimin/src/components/commonNew/baseCard.vue",
+    "zhi2-mobile-shimin/src/pages_owner/community/info/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/subdistrict/info/index.vue"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "80f4d555-4b91-4605-a249-4affc7710dfd"
+   ],
+   "bundle": "068.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "zhi2-mobile-shimin 打包产物目录与 npm script 命名约定（szffluzm，命令不再带 suzhufang）",
+   "type": "workflow",
+   "content": "情况：本项目是从多品牌同源仓库复制而来，构建配置里保留了大量 suzhufang 品牌后缀，产物目录还是默认 dist。用户明确要求：打包目录改为 szffluzm（即产物根下按品牌分目录，根目录/子目录都不能再出现 dist 兜底），并且命令里默认就是 suzhufang，不需要再把品牌写进命令名。做法：vite.config.ts 里 outDir 指向 szffluzm 下的对应端产物；package.json 脚本收敛为 development:suzhufang→dev、dev:suzhufang:mp-weixin→dev:mp-weixin、test:suzhufang→test:serve、build:h5/build:suzhufang 合并为 build、build:suzhufang:test→build:test、build:suzhufang:mp-weixin→build:mp-weixin，并同步根仓库 package.json 的引用；改名后 vite.config.ts 必须补 dev→development 的映射，否则 npm run dev 加载不到 .env.development。常用命令固定为 npm run dev / npm run test / npm run build。注意：验证产物要去看 szffluzm 目录而不是 dist，.gitignore 也要同步排除新产物目录。",
+   "evidence": "会话 5ebd895c（基线 a444c05）：用户要求打包目录改 szffluzm 不用 dist、并移除命令中的 suzhufang 字段；package.json 脚本完成上表重命名、根目录 package.json 同步、vite.config.ts 增加 dev→development 环境映射。",
+   "files": [
+    "zhi2-mobile-shimin/package.json",
+    "zhi2-mobile-shimin/vite.config.ts",
+    "package.json",
+    ".gitignore",
+    "zhi2-mobile-shimin/.gitignore"
+   ],
+   "baseline": "a444c05",
+   "sessionIds": [
+    "5ebd895c-0fec-43e6-b281-71292c6137e6"
+   ],
+   "bundle": "068.md",
+   "project": "苏住房C"
+  }
+ ]
+}

@@ -1,0 +1,76 @@
+{
+ "project": "园区物管2.0",
+ "batch": "052",
+ "files": [
+  "052.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "数字增加千分位展示，用全局通用的方法",
+   "type": "preference",
+   "content": "已按你的要求改好了，说明如下。 ## 实现说明 1. **全局千分位**：与表格合计、大屏统计等一致，使用 `@/formatters/index.js` 里的 **`currencyFormatter`**（内部用 `Intl.NumberFormat`，与 `amountFormatter` 同源）。 2. **`displayValue(item)`** - `undefined` / `null` / `''` → 仍显示空 - 用 **`patterns.number`**（与 `currencyFormatter` 一致）判断是否为数字字符串 - 非数字（例如混排文案）→ **原样** `return v`，避免误伤 - 数字 → `currencyFormatter(v, 0, 20, v)`：千分位，小数最多保留到合理精度（与纯整数 `0,0` 相比，金额类小数也能保留） 当前核心片段如下： ```9:53:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\components\\ZsSummaryText\\index.vue <span class=\"zs-summary-number\">{{ displayValue(item) }}</span> ... import patterns from '@/patterns/index",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`@/formatters/index.js",
+    "```9:53:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\components\\ZsSummaryText\\index.vue",
+    "'@/patterns/index.js",
+    "'@/formatters/index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e7b17454-44cc-4737-a77d-b8aa48d3a424"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "地图弹窗轮播的时候，到某个区了，SVG需要高亮对应的",
+   "type": "preference",
+   "content": "## 实现说明 地图用的是 ECharts 的 `geo` + SVG 注册图，各区名称来自 `injectWuxiSvgRegionNames` 里给 path 打的 `name`。轮播当前项在 `mapCarouselCurrent` 里，名称与 SVG 区名一致（如 `惠山区`、`江阴市`）。 本次改动要点： 1. **`WUXI_GEO_HIGHLIGHT_ITEM_STYLE`** 与原先 `geo.emphasis.itemStyle` 相同，保证轮播高亮和鼠标悬停强调色一致。 2. **`buildMapGeoCarouselRegions(highlightName)`** - 轮播为 **「全市」** 时：只保留江阴飞地 `__wuxi_jiangyin_b` 的静默配置，其它区恢复默认底色。 - 轮播为 **某一区** 时：对该区追加 `regions` 项，用上述高亮色 + 加粗标签。 - **江阴市** 有两块 path（主体 + 飞地），飞地仍不显示标签，但会给飞地 `regions` 项同样加上高亮 `itemStyle`，与主体一致。 3. **`updateMapGeoCarouselHighlight()`** 通过 `chart.setOption({ geo: { regions: ... } })` 更新高亮（ECharts 5 对 `geo",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\mock.js、d:\\repository\\园区物管2.0\\zhi2-web-admin\\node_modules\\echarts、d:\\repository\\园区物管2.0\\zhi2-web-admin\\package.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "89d6d616-b337-43c4-bc8d-a3268340e46f"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "区域和街道的圆圈小一些",
+   "type": "pattern",
+   "content": "已将区县级、街道级聚合气泡从 **96px** 调整为 **72px**（约缩小 25%），并同步缩小了字号与内边距。 修改在 [`zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue`](zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue)： - 新增常量 `AREA_BUBBLE_SIZE_PX = 72` - DOM 气泡圆：宽高 96px → 72px，字号 16px → 14px - LabelStyle 兜底方案使用同一尺寸 物业管理区域点标记（`project` 模式）未改动。若还想再小或再大一点，可把 `AREA_BUBBLE_SIZE_PX` 改成例如 `64` 或 `80`。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "[`zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue`](zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\components\\map.vue",
+    "@zhi2-web-admin/src/views/benefit/statisticsMap/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "51ebab0c-4c70-4bdf-8d6d-a662e11c2615"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "这个取字段 hasVerifiedAmount",
+   "type": "bug",
+   "content": "已将合同/通知书选择弹窗中的「核销金额」列改为直接读取 `hasVerifiedAmount` 字段： 1. **合同选择表格**（`contractSelectColumns`）：`prop: 'hasVerifiedAmount'`，使用 `amountFormatter` 格式化 2. **通知书选择表格**（`noticeSelectColumns`）：同上 3. **选中回填**（`pickVerifiedAmount`）：只取 `row.hasVerifiedAmount`，不再兼容 `verifiedAmount`、`writeOffAmount` 等旧字段 若接口 `/benefit/pubRevenueContract/pageReceiptRevenueContract` 返回的数据里包含 `hasVerifiedAmount`，选择弹窗和表单回填都会正确显示。若仍为空，需要确认后端该接口是否已返回该字段。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubVerificationReceipts\\components\\VerificationReceiptDetailDialog.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubVerificationReceipts\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5e7474f2-650a-42f0-8f20-80148c8c43d8"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

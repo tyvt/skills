@@ -1,0 +1,78 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "219",
+ "files": [
+  "219.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "原因 价格备案的备案列表与变更列表共用 record",
+   "type": "preference",
+   "content": "## 原因 价格备案的**备案列表**与**变更列表**共用 `recordPriceMngSuzhou/index.vue`，列表点「查看」走公共方法 `buildDetailNavigation`。 变更菜单（如 `countychange`、`citychange`）的详情组件是 `changeDetail`，但导航仍按 `detail` 去匹配路由。`pathHint` 对不上任意 `detail` 路由时，会误命中**第一个**备案 `detail` 路由，于是从「价格备案变更(区县)」进了备案详情。 ## 修复 在 `zhi2-web-admin/src/utils/ruoyi.js` 的 `buildDetailNavigation` 中： 1. 当列表路由的 `pathHint` 含 `change`（含 `countychange`、`citychange`、`filingschange`）时，解析 **`changeDetail`** 而非 `detail`。 2. 若解析到的路由 path/name **不包含**当前 `pathHint`，视为无效，回退为 ``列表路径/${id}``（例如 `.../countychange/{priceRecordId}`），避免再跳到错误的备案详情。 普通「价格备案(区县/市级)」「价格备案申请」等菜单逻辑不变。 请在",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`recordPriceMngSuzhou/index.vue",
+    "`zhi2-web-admin/src/utils/ruoyi.js",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\commercialHousingSales\\priceFiling、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\commercialHousingSales\\priceFiling\\recordPriceMngSuzhou\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "dbc55dba-6010-4384-9d71-56be65335631"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "现在企业基本信息页面没有调用数据接口",
+   "type": "pattern",
+   "content": "## 排查结论：经纪机构侧**没有**与开发企业相同的问题 我对经纪/租赁机构相关的「机构基本信息」「入网申请」等页面做了对照，结论如下。 ### 机构基本信息（`AgencyBasicInfoDetail`） 入口：`toB/agencyRecord/detail.vue`（租赁 `zljg/companyRecord/detail` 复用同一页）。 在 `created` 里**无条件**调用 `loadDetail()`，内部 B 端走 `getOwnCompany`，不依赖 `detailMixins` 的 `formMode === 'view'` 才 `init()`： ```247:250:zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue created() { this.loadDicts() this.loadDetail() }, ``` 与开发企业的差异： | 点 | 开发企业 `DeveloperBasicInfoDetail`（修前） | 经纪 `AgencyBasicInfoDetail` | |----|---------------------------------------------|-----------------",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "入口：`toB/agencyRecord/detail.vue",
+    "```247:250:zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components\\DeveloperBasicInfoDetail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyManagement\\companyBasicInfo\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e15a1da6-99f2-4436-b12d-c0e94bfb9658"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "已为 机构注册（InstitutionRegiste",
+   "type": "pattern",
+   "content": "已为 **机构注册**（`InstitutionRegisterSingleForm.vue`，与你截图中的「管理人员信息」一致）和 **企业注册**（`CompanyRegisterSingleForm.vue`）补上与其它字段一致的必填校验。 ### 改动说明 1. **`formModel` 计算属性**：把 `codeForm.code`、`codeForm.smsCode` 并入表单 model，便于 Element UI 校验。 2. **表单项**：`图片验证码` → `prop=\"code\"`，`验证码` → `prop=\"smsCode\"`（企业端原先错误的 `smsCodeField` 已修正）。 3. **校验规则**：`图片验证码不能为空`、`短信验证码不能为空`。 4. **提交**：去掉提交里重复的 `msgError` 判空，统一走 `validate()`，并会红框提示、滚动到首个错误。 点击「注册申请」且这两项未填时，会与其它必填项一样显示红色校验提示。若需要，我可以再顺带在刷新图片验证码后 `clearValidate('code')`，或让「获取验证码」也走同一套表单项校验。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**机构注册**（`InstitutionRegisterSingleForm.vue",
+    "**企业注册**（`CompanyRegisterSingleForm.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\register\\components\\single-page\\CompanyRegisterSingleForm.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institutionRegister\\components\\single-page\\InstitutionRegisterSingleForm.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\utils\\registerValidate.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "25fff776-d3eb-4133-ab57-71b7cce1e3fd"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "已按你的要求调整 企业入网认证 页面（AgencyE",
+   "type": "preference",
+   "content": "已按你的要求调整 **企业入网认证** 页面（`AgencyEntryNetworkSections.vue`），主要如下： ### 改动说明 1. **独立信息块** 在「基本信息」与「机构管理员信息」之间增加 **「业务范围」** `Headline` 区块（仅经纪机构，`!isLeaseOrgan`）。 2. **Checkbox 展示** - **编辑**：`el-checkbox-group` 多选，选项来自字典 `company_business_scenario`（与原先 `zs-select` 多选同一数据源）。 - **详情**：同一组 checkbox，`disabled`（父级表单禁用 + `:disabled=\"isView\"`），已选项仍勾选展示。 3. **避免重复** 查看态「基本信息」里不再显示业务范围文案，通过 `buildAgencyBasicContentInfo` 的 `omitBusinessScenario: true` 过滤。 4. **提示文案** 编辑态在选项下方保留：「选择住房租赁中介，需要有住房租赁企业开业菜单」。 字段仍为 `businessScenario`（逗号分隔），校验与提交逻辑未改。刷新企业入网认证页即可看到新布局。若字典里五个选项文案与原型不一致，需在后台维护 `company_business_scenario`",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "页面（`AgencyEntryNetworkSections.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components\\AgencyEntryNetworkSections.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components\\agencyBasicInfoContent.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ef795d90-6f54-4f25-af97-f78da87e2817"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,76 @@
+{
+ "project": "园区公共收益",
+ "batch": "020",
+ "files": [
+  "020.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "回单核消详情，删除单据数据后，“基本信息”那的本次核",
+   "type": "bug",
+   "content": "已修复。262 分支上的改动是在 `VerificationReceiptDetailTable.vue` 里增加 `deleteSuccessCallback`，删除单据成功后向父组件发出 `refresh` 事件。 **问题原因：** - 删除单据时，`table.js` 的 `handleDelete` 只会刷新子表列表，不会通知父页面 - 详情页 `detail.vue` 已通过 `@refresh=\"getDetail\"` 绑定刷新，但删除操作从未触发该事件 - 因此「基本信息」里的「本次核销金额」仍显示旧值 **修复内容：** ```249:252:zhi2-web-admin/src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue deleteSuccessCallback() { this.$emit('refresh') } ``` 删除单据成功后，会重新调用详情接口，同步更新「本次核销金额」。若列表已清空，该字段会变为 0 或空。 可在回单核销详情页删除单据后，确认「基本信息」中的「本次核销金额」是否已同步更新。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`VerificationReceiptDetailTable.vue",
+    "删除单据时，`table.js",
+    "`detail.vue",
+    "```249:252:zhi2-web-admin/src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "dca7c647-3133-4108-a280-c82a7ee0abb4"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "组织工作人员列表，“组织类型”、“角色”、“用户状态",
+   "type": "bug",
+   "content": "已核对并修复组织工作人员列表页的字段映射问题。 ### 问题原因 列表接口返回的字段与前端绑定不一致： | 列名 | 原绑定字段 | 接口实际字段 | |------|-----------|-------------| | 组织类型 | `businessType` | `accountType` | | 角色 | `roleName` | `roleName`（已正确） | | 用户状态 | `enable` | `userStatus` | ### 修改内容 在 `index.vue` 中做了以下调整： 1. **组织类型**：`businessType` → `accountType`，字典由 `committee_type` 改为 `sys_account_type_all`（与系统用户 `accountType` 一致） 2. **用户状态**：`enable` → `userStatus`，仍使用 `sys_normal_disable` 字典展示 3. **搜索条件**：同步更新 `queryParams` 和筛选项的 `model` 字段 4. **角色**：`roleName` 映射本身正确，无需修改 刷新列表页后，「组织类型」和「用户状态」应能正常显示。若「角色」仍为空，请检查接口 `/autonomy/ownerCommitteeWorker/page` 的",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`index.vue",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\ownerCommitteeWorker、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\ownerCommitteeWorker\\index.vue、d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\mixins\\listMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b6d6fab6-0ca4-4685-9fa8-8c9df7a6aefd"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "楼幢信息详情，房屋关联弹框“前往 1 页”跑下面来了",
+   "type": "bug",
+   "content": "已压缩房屋关联弹框左侧分页器： 1. **去掉「条/页」下拉** — `layout` 从 `sizes, prev, pager, next, jumper` 改为 `prev, pager, next, jumper`，减少占用宽度 2. **保留 `pager-count=\"5\"`** — Element UI 允许的最小奇数值；总页数超过 5 时会折叠为 `1 2 3 ... 6` 这类形式，不再一次性展示全部页码 每页仍固定 10 条，可通过「上一页 / 下一页」和「前往 x 页」跳转。 如果还想更精简（只保留上一页、下一页和跳转，不显示页码数字），可以说一声，我再改一版。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\assetLeaseApply\\components\\houseTable.vue、d:\\repository\\园区公共收益\\zhi2-web-admin、d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\building\\building\\components\\houseTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f087205d-f215-464e-b55c-d86410257745"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "待办任务批量审批弹窗样式修复 Implement t",
+   "type": "preference",
+   "content": "已按计划完成批量审批弹窗样式修复，修改文件：[`zhi2-web-admin/src/views/flowable/components/BatchApprovalDialog.vue`](zhi2-web-admin/src/views/flowable/components/BatchApprovalDialog.vue) **改动说明：** 1. **结构调整**：将 `batch-tip` 移入 `form-box` 内部，避免与表单在 `zs-dialog` 横向 flex 布局中并排挤压导致换行。 2. **文案展示**：条数用 `<span class=\"batch-count\">` 包裹，并设置橙色 `#f6a240` 高亮。 3. **样式补充**：为 `.batch-tip` 增加 `white-space: nowrap`，确保「批量处理 X 条数据」始终单行显示。 可在「待办任务」页勾选数据后点击「批量处理」，确认弹窗顶部提示文案已正常单行展示。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "已按计划完成批量审批弹窗样式修复，修改文件：[`zhi2-web-admin/src/views/flowable/components/BatchApprovalDialog.vue`](zhi2-web-admin/src/views/flowable/components/BatchApprovalDialog.vue",
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin、d:\\repository\\园区公共收益\\zhi2-web-admin\\src、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\components、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\components\\AuditDialog\\index.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\components\\zs-approval\\ApprovalProcessDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7bba50ec-878d-4ecc-aa51-2d784ce86b6d"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  }
+ ],
+ "_draft": true
+}

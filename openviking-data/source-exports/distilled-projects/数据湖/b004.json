@@ -1,0 +1,42 @@
+{
+  "project": "数据湖",
+  "batch": "004",
+  "files": [
+    "004.md"
+  ],
+  "count": 2,
+  "memories": [
+    {
+      "title": "File System Access 未授权时 flush() 直接 return：内存改动既不写文件也不写 IndexedDB，刷新即丢",
+      "type": "bug",
+      "content": "【什么情况】浏览器里用 File System Access API 保存的持仓面板，新增一笔交易后提示「已保存 · 买入 青岛港 500 股」，一刷新这笔就没了。\n【为什么】数据有三层存放位置：内存（页面里，刷新丢失）、浏览器缓存 IndexedDB（保留）、`holding.sqlite` 文件（保留）。每次改动先进内存，450 毫秒防抖后由 `flush()` 保存。而 `flush()` 里对 `dbStale`（刷新后浏览器要求重新授权文件，此时为 true）这个分支的处理是**直接 return** —— 既不写文件，也不写浏览器缓存。于是「新增一笔 → 提示已保存 → 刷新」变成：记录只在内存里，刷新即蒸发，UI 却一直报保存成功。\n【怎么做】① `dbStale` 分支不能再直接 return：此时仍把内存快照写进浏览器缓存（只是不碰文件），刷新后数据能从缓存恢复；② `dirty`（有未保存改动）标记必须**持久化**到缓存并在启动时恢复——以前它只在内存里，刷新后丢失，`reconcile()` 会误以为「本地是干净的」，拿磁盘旧库覆盖掉刚录入还没写盘的交易；③ `reconcile()` 拿到授权后如果有未保存改动，立刻补写文件，不用等用户再改一次；④ 横幅要区分两种状态：有未保存改动时给「授权写入」（写文件），没有改动时才给「授权并同步」（读文件），避免用旧数据覆盖新数据；⑤ 兜底：监听 `pagehide` / `beforeunload` / 切后台，把 450ms 防抖窗口内还没保存的改动立即推进缓存；⑥ 验证要覆盖完整路径（`node _selftest.js`）：待授权状态下新增一笔 → 缓存里 2 笔 → 刷新后两笔都还在 → 点「授权写入」后文件里 2 笔、横幅消失。",
+      "evidence": "会话 12c5a5c9（基线 none）用户诉求 1「我新增一笔交易，为什么刷新页面又没了」；最终结论「不是浏览器的问题，是面板自身的保存逻辑有一个漏洞……每次改动都会先进入内存，450 毫秒后由 flush() 保存。问题在于：**刷新后浏览器要求重新授权文件，此时 dbStale = true，而 flush() 一进入这个分支就直接 return 了** —— 既不写文件，也不写浏览器缓存」，并给出 5 项修复（dbStale 分支不直接返回、dirty 标记持久化、reconcile() 补写、横幅区分两种状态、pagehide/beforeunload 兜底）与修复前后实测对比（修复前刷新后 601298 还在吗 = 0；修复后 = 1，601000 = 1，点授权写入后文件里 2 笔）。",
+      "files": [
+        "分析产出/持仓面板/index.html",
+        "分析产出/持仓面板/config.js",
+        "分析产出/持仓面板/portfolio.js",
+        "分析产出/持仓面板/_selftest.js"
+      ],
+      "baseline": "none",
+      "sessionIds": [
+        "session-12c5a5c9-6a1b-48dd-a554-1fba34f5640e"
+      ],
+      "bundle": "004.md"
+    },
+    {
+      "title": "PowerShell 5.1 重写 UTF-8 文件会按 GBK 读取把整份中文写成乱码：改用 edit 工具打补丁，并校验无 BOM、乱码计数为 0",
+      "type": "bug",
+      "content": "【什么情况】用 PowerShell 5.1 脚本重写一个 UTF-8 的 HTML 文件后，文件里所有中文都变成乱码。\n【为什么】Windows PowerShell 5.1 的默认编码是系统 ANSI 代码页（简体中文机器上是 GBK），`Get-Content` / `Set-Content` / `Out-File` 不带 `-Encoding UTF8` 时按 GBK 解码 UTF-8 字节；写回时又按 GBK 编码，于是所有多字节中文被二次转码成乱码。文件一旦被这样重写，损坏是**整份**的，不是局部几个字；更糟的是在乱码基础上继续改会二次污染。\n【怎么做】① 不要用 PowerShell 5.1 整文件重写 UTF-8 源码/HTML：改用编辑工具（`edit`）做定点补丁；若非要用 PowerShell，显式 `Get-Content -Encoding UTF8` + `Set-Content -Encoding UTF8`（注意 PS5.1 的 `-Encoding UTF8` 会带 BOM，源文件无 BOM 时还要去掉）；② 已经改坏时的恢复路径是「用改动前的完整副本还原，再只用 edit 打补丁」——不要试图逐个字符修乱码；③ 改完必须做编码体检：文件无 BOM、UTF-8 可正常解码、关键中文词计数正确（本例 `常量` / `买入` / `授权写入`）、**乱码特征串计数为 0**（本例 `甯搁噺`）；④ 养成习惯：改中文文件前先 `Get-Content -Encoding UTF8` 确认内容读对了再动手。",
+      "evidence": "会话 12c5a5c9（基线 none）最终结论「一个提醒：改动过程中我犯了个错：用 PowerShell 5.1 重写 `index.html` 时，它按 GBK 读取 UTF-8，把整个文件的中文写成了乱码。我已用改动前的完整副本还原，并重新只用 `edit` 工具打补丁。现在校验过：无 BOM、UTF-8 正常、`常量`/`买入`/`授权写入` 等中文计数正确、`甯搁噺` 乱码计数为 0」，并顺带在 README.md 补了「数据到底存在哪」一节说明三个存放位置与刷新行为。",
+      "files": [
+        "分析产出/持仓面板/index.html",
+        "分析产出/持仓面板/README.md"
+      ],
+      "baseline": "none",
+      "sessionIds": [
+        "session-12c5a5c9-6a1b-48dd-a554-1fba34f5640e"
+      ],
+      "bundle": "004.md"
+    }
+  ]
+}

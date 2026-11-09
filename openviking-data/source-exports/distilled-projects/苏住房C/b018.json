@@ -1,0 +1,210 @@
+{
+ "project": "苏住房C",
+ "batch": 18,
+ "files": [
+  "069.md",
+  "070.md",
+  "071.md",
+  "072.md"
+ ],
+ "count": 11,
+ "memories": [
+  {
+   "baseline": "d43894b",
+   "content": "什么情况：H5 端（苏住房C 的 zhi2-mobile-shimin）访问服务器图片，实际请求成了 https://域名/testh5/pages/index/zhi2-pro/2025/... ，而预期是 https://域名/zhi2-pro/2025/... ，图片全部 404/裂图。\n\n为什么：部署在 /testh5/pages/index/ 这类子目录时，utils/index.js 的 resolveMediaUrl 对后端下发的媒体路径（zhi2-pro、zhi2-dev、zhi2-test、zs-fym 等）返回的是「不带前导 / 的相对路径」。浏览器按当前页面路径解析相对 URL，于是把站点子目录前缀一并拼了进去。这类 bug 容易被误判为「后端返回路径不对」，实际是前端拼 URL 的语义问题；同一份代码在根路径部署的测试环境看不出问题，只在子目录部署暴露。\n\n怎么做：在 resolveMediaUrl 里对识别出的媒体资源目录统一补前导 /，强制从站点根解析；改动落在 utils 一处即可覆盖所有用 ZsImage（:local=\"false\"）或直接调 resolveMediaUrl 的图片。新增媒体目录前缀时要同步加进这个白名单，否则新目录会复发同类问题。验证方式：部署到子目录环境后查看真实请求 URL，而不是只看本地 dev。",
+   "evidence": "会话 288c6ff2：用户给出实际访问地址 .../testh5/pages/index/zhi2-pro/2025/p/s/p/0ab9675c-....png，要求改回 .../zhi2-pro/2025/p/s/p/0ab9675c-....png；结论为 resolveMediaUrl 返回不带前导 / 的相对路径，浏览器按当前页面路径解析成子目录拼接，修复是对 zhi2-pro/zhi2-dev/zhi2-test/zs-fym 等路径统一加前导 /。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue"
+   ],
+   "sessionIds": [
+    "288c6ff2-ac59-4b55-b6ee-a561f76eeba1"
+   ],
+   "title": "H5 部署子目录时媒体相对路径被拼进 pages/index 前缀：resolveMediaUrl 需统一补前导斜杠",
+   "type": "bug",
+   "bundle": "069.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "5f0f4dc",
+   "content": "什么情况：在小程序（微信开发者工具，lib 3.7.12）里点图片上传报 TypeError: common_vendor.index.chooseFile is not a function，栈落在 ImageUploader.js 的 chooseMedia 处，页面是 pages_owner/house/owner/register。\n\n为什么：ImageUploader 统一用 uni.chooseFile 选文件，但 uni.chooseFile 只在 H5/App 等平台实现，微信小程序端不存在该 API，运行时直接是 undefined 调用。H5 与小程序混用的自研上传组件最容易踩，H5 测试通过不代表小程序可用。\n\n怎么做：组件内按平台与选择类型分派：H5 等支持平台仍走 uni.chooseFile；需要视频时用 uni.chooseMedia；只选图片（如 register 页）用 uni.chooseImage。同时把「校验 + 上传」抽成独立的 uploadSelectedFile 方法，并兼容小程序临时路径没有扩展名的情况（不能靠文件名后缀推类型）。改完要在微信开发者工具真机路径复测整条上传链路，而不是只在 H5 预览。",
+   "evidence": "会话 f62dbdc4：用户贴出 TypeError: common_vendor.index.chooseFile is not a function 完整栈（ImageUploader.js? [sm]:114 → chooseMedia），基线 5f0f4dc；结论为该 API 小程序端不支持，改为按平台分派 chooseFile/chooseMedia/chooseImage 并把校验上传抽成 uploadSelectedFile。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ImageUploader/ImageUploader.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/register.vue",
+    "zhi2-mobile-shimin/src/api/file.js"
+   ],
+   "sessionIds": [
+    "f62dbdc4-5a71-4b38-86cc-ade4a540eb59"
+   ],
+   "title": "小程序端 ImageUploader 直接调 uni.chooseFile 必崩：按平台分派 chooseFile / chooseMedia / chooseImage",
+   "type": "bug",
+   "bundle": "069.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "9832ba3",
+   "content": "什么情况：编译小程序报「渲染层网络层错误：pages_owner/house/index.wxss 中的本地资源图片无法通过 WXSS 获取」，指向 background: url(\"../../static/images/history-szf.png\") 这一行。同类隐患是整个 pages_owner 目录里用相对路径写背景图的地方。\n\n为什么：WXSS 不支持本地资源图片引用（官方限制），小程序里 CSS 的 url() 只能是网络图片、base64 或改用 <image> 标签。H5 端本地相对路径完全正常，所以这类问题只在编译小程序时暴露，且往往一次只报一处、其余同样写法的行会在后面陆续报。\n\n怎么做：页面背景图统一写条件编译——H5 用本地路径（如 ../../static/images/szf/Bg-szf.png），小程序用 CDN 绝对地址（如 https://szf.szzfcjj.cn:8888/static/images/szf/Bg-szf.png）。改动时要把该页所有 WXSS 背景图一次改完（示例页同时处理了 .top-empty 与 .history-container），不要等到逐条报错再补。验收标准是重新编译小程序后控制台无该类错误，且两端背景都真实显示。",
+   "evidence": "会话 5fbd3e35：用户贴出 [渲染层网络层错误] pages_owner/house/index.wxss 本地资源图片无法通过 WXSS 获取（第 251 行 background: url(\"../../static/images/history-szf.png\")），环境 Windows/mp 2.01.2510260 lib 3.16.2；结论为改为条件编译：H5 本地 Bg-szf.png、小程序 CDN https://szf.szzfcjj.cn:8888/static/images/szf/Bg-szf.png，并一次处理 .top-empty 与 .history-container 两处。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/house/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/components/TypeChoose_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue"
+   ],
+   "sessionIds": [
+    "5fbd3e35-025c-45df-996f-22495a68d907"
+   ],
+   "title": "小程序 WXSS 里 url() 引用本地图片必然失败：背景图必须条件编译（H5 本地 / 小程序 CDN）",
+   "type": "bug",
+   "bundle": "069.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序以 / 开头的图片地址会被当包内资源加载（500），相对路径服务端图必须经 resolveFullMediaUrl 补全域名",
+   "type": "bug",
+   "content": "什么情况：用户上传头像后，「我的」页报 `[渲染层网络层错误] Failed to load local image resource /zhi2-pro/2026/v/w/0/xxx.png the server responded with a status of 500`，而个人信息页（userInfo.vue）同一头像正常。\n\n为什么：接口返回的头像字段是文件服务的相对路径（以 `/` 开头，如 `/zhi2-pro/...`）。微信小程序把「以 / 开头的 src」优先解释为「小程序包内本地资源」，不走网络请求，于是渲染层去打本地文件、返回 500；而 userInfo.vue 用的是 `<ZsImage :local=\"false\">`，组件内部会拼 IMAGE_BASE 输出完整 https 地址，所以正常。注意这与「静态资源按分包推断」是两类不同问题：前者 src 是服务端相对路径却漏了域名，后者是本地 static 包路径推断错（见 resolveStaticUrl 相关记忆）。\n\n怎么做：凡绑定接口返回的图片字段（头像、房源图、证件照）一律先过 `resolveFullMediaUrl()`/`resolveMediaUrl()` 转成完整 URL 再用，或统一改用 `<ZsImage :local=\"false\">`；不要在模板里把接口字段直接塞进原生 `<image>`。排查口径：看到 `Failed to load local image resource` + 路径形如服务端目录（`/zhi2-pro`、`/zs-fym`）即可判定为漏拼域名。补完域名后仍不显示，再检查微信开发者工具的 downloadFile 合法域名是否包含该图片域名。",
+   "evidence": "会话 785096f4：用户贴出 Failed to load local image resource /zhi2-pro/...500 并说明「上传头像之后还被当做本地图片」；结论给出 My_Suzhufang.vue 原生 <image> 直接绑 userStore.avatar 是错误写法，userInfo.vue 因 ZsImage :local=\"false\" 正确；修复为改用 resolveFullMediaUrl() 解析，失败时再查 downloadFile 合法域名。",
+   "files": [
+    "D:/repository/苏住房C/zhi2-mobile-shimin/src/pages/index/components/My_Suzhufang.vue",
+    "D:/repository/苏住房C/zhi2-mobile-shimin/src/pages_my/setting/userInfo.vue",
+    "D:/repository/苏住房C/zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "D:/repository/苏住房C/zhi2-mobile-shimin/src/utils/index.js",
+    "D:/repository/苏住房C/zhi2-mobile-shimin/src/env/mp.js"
+   ],
+   "baseline": "4d6dba9",
+   "sessionIds": [
+    "785096f4-4ab9-4c30-b361-cd9f73a774e6"
+   ],
+   "bundle": "070.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 小程序子包组件内用相对路径写静态图必 500：统一走 ZsImage/resolveStaticUrl 的分包感知解析",
+   "type": "bug",
+   "content": "现象：pages_my/verification/AuthorizedSuccess 页面 UI 损坏，控制台报「Failed to load local image resource /components/shared/images/authorized.png  status 500」。根因：components/shared/SuccessCard.vue 的 success 分支用了原生 <img src=\"images/authorized.png\">，微信小程序里组件内的相对路径按「组件所在目录」解析，于是拼成 /components/shared/images/authorized.png 这个不存在的路径；同组件 fail/warning 分支用的是 ZsImage，走 resolveStaticUrl 正常解析到 /static/images/authorized.png，所以只有 success 态坏。更深的机制：utils/index.js 的 resolveStaticUrl 会按 MAIN_STATIC_PATHS（utils/mainStaticPaths.js）判断是否主包，否则查 SUBPACKAGE_STATIC_IMAGES 映射（images/authorized.png → ['pages_my','pages_owner']）并用 inferSubpackageFromRoute() 从 getCurrentPages() 栈顶 route 首段推断分包，最终拼成 /<分包>/static/<path>；原生 <img> 完全没有这层逻辑。做法：小程序内所有本地图一律用 ZsImage（或直接调 resolveStaticUrl），禁止原生 <img> + 相对路径；公共卡片的多个状态分支要统一控件类型，避免只改到其中一支。该组件被 pages_owner 下多个成功页复用，改一处即全域生效。",
+   "evidence": "会话 1b2ede19：用户报 AuthorizedSuccess 页面 UI 损坏并贴出 500 错误日志；结论确认 SuccessCard.vue 的 success 分支用原生 <img> 导致相对路径按组件目录解析。核对当前代码：components/shared/SuccessCard.vue 四个分支均已改为 ZsImage；utils/index.js:330 resolveStaticUrl、:298 resolveSubpackageForStatic、:316 inferSubpackageFromRoute、:209 'images/authorized.png' 分包映射、utils/mainStaticPaths.js 的 MAIN_STATIC_PATHS 均与描述一致。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/shared/SuccessCard.vue",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/utils/mainStaticPaths.js",
+    "zhi2-mobile-shimin/src/pages_my/verification/AuthorizedSuccess.vue"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "1b2ede19-fcac-48a1-8f1a-9548ba379034"
+   ],
+   "bundle": "071.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏服办渠道下未适配的小程序原生能力入口（扫一扫）要整块下线，不能留「请使用APP扫一扫」提示",
+   "type": "preference",
+   "content": "适用场景：本小程序同时跑在微信原生环境与苏服办（政务 App 内嵌）渠道，苏服办容器里没有对应的原生能力（扫码）可直接调用，用户点了只能弹提示。用户明确要求：这类入口在苏服办环境下不要出现，也不要保留「请使用APP扫一扫」之类引导——留一个点了没用的按钮比藏起来更糟。做法：从首页顶部快捷入口数组里把该项移除，并连带删掉它的图标映射项、点击分支与 openScanCode import，不要只把 handler 改成 return。注意点：入口是由 names 数组 + 图标字典表 + 点击 if 分支三处拼起来的，改名/删项时三处要同步，漏掉任何一处会渲染出没图的空位或死点击区。经验证，本次修改并未真正落到当前代码：pages_tab/components/Home_Suzhufang.vue 里仍保留 openScanCode 与「扫一扫」（约 101/128/135/240 行），会话中被记作已完成但代码漂移或回滚了——后续再接到同类需求要先核对现状，别默认已下线。",
+   "evidence": "会话 b26d8936：用户「移除这个扫一扫功能，苏服办这边没法使用」，结论为从 pages/index/components/Home_Suzhufang.vue 顶部快捷入口移除「扫一扫」并删掉「请使用APP扫一扫」提示逻辑。核对当前代码：文件已迁到 pages_tab/components/Home_Suzhufang.vue，且 openScanCode、'扫一扫' 图标项、names 数组、点击分支仍全部存在，说明改动未持久化。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_tab/components/Home_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages/index/home.vue"
+   ],
+   "baseline": "12ef89c",
+   "sessionIds": [
+    "b26d8936-cd88-4231-82aa-b1cde82229eb"
+   ],
+   "bundle": "071.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序 ECharts 5.3+ 初始化报 el.addEventListener is not a function：WxCanvas 缺 DOM 事件接口，补空实现即可",
+   "type": "bug",
+   "content": "【什么情况】uni-app 小程序里用 `pages_benefit/components/echarts-uniapp` 渲染图表（如「资金公示」balancePublicity 页），控制台报 `initChart error: TypeError: el.addEventListener is not a function`，调用栈从 ZRender → HandlerDomProxy → mountLocalDOMEventListeners → mountSingleDOMEventListener 一路抛上来，图表整块空白。注意堆栈全在 vendor.js 里，看不出项目代码，很容易误判成「echarts 包被裁剪坏了」而去折腾构建配置。\n\n【为什么】项目用的 ECharts 5.4.1 属 5.3+ 版本，ZRender 在初始化 canvas 时会直接在容器元素上 `addEventListener` / `removeEventListener` 绑定 DOM 事件。但 echarts-uniapp 通过自定义的 `WxCanvas`（`wx-canvas.js`）做 canvas 适配，这个类只实现了旧的 `attachEvent` / `detachEvent`，没有 `addEventListener`，于是 ZRender 构造 HandlerDomProxy 时必然抛错。之前用低版本 ECharts 时不会暴露，升级后才成必然失败。\n\n【怎么做】在 `wx-canvas.js` 的 `WxCanvas` 类里补两个空实现：`addEventListener() {}` 与 `removeEventListener() {}`，注释写明「ECharts 5.3+ 需要，小程序 canvas 无真实 DOM 事件」。触摸交互不依赖这条链路，仍由组件模板上的 `@touchstart/@touchmove/@touchend` 手动转发给 ECharts，所以空实现不影响缩放/提示等交互。\n\n【排查提示】小程序端 echarts 报错优先核对「ECharts 版本要求 vs WxCanvas 适配层实现了哪些方法」，而不是先怀疑裁剪包 series 缺失（那是另一类根因，表现为静默空白无报错）。",
+   "evidence": "会话 8cedd4de（基线 5f0f4dc，cursor-agent）：用户贴出 `echarts-uniapp.js? [sm]:113 initChart error: TypeError: el.addEventListener is not a function` 完整堆栈，定位到 WxCanvas 只实现了 attachEvent/detachEvent，补 addEventListener/removeEventListener 空实现后图表恢复渲染。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_benefit/components/echarts-uniapp/wx-canvas.js",
+    "zhi2-mobile-shimin/src/pages_benefit/components/echarts-uniapp/echarts-uniapp.vue",
+    "zhi2-mobile-shimin/src/pages_benefit/components/echarts-uniapp/echarts-instance.js",
+    "zhi2-mobile-shimin/src/pages_benefit/balancePublicity/index.vue"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "8cedd4de-3840-43fc-828d-12511bc40dc9"
+   ],
+   "bundle": "072.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序端父组件 :deep 穿不进子组件内部态样式：自定义组件要自带高亮能力（ZsCheckbox 加 highlight prop）",
+   "type": "bug",
+   "content": "【什么情况】业主表决「选项表决」页里，`optional/StepChoose.vue` 用 `:deep(.checkbox-item.active)` 给选中的 `ZsCheckbox` 设置浅蓝背景 + 主题色文字，结果勾选图标正常、选中背景色完全不出现，同页其它区域却有背景，视觉不一致。仅靠「样式不起作用」这个表象很容易误以为是权重问题，然后不断加 !important。\n\n【为什么】微信小程序端父组件的 `:deep()` 无法穿透到自定义子组件内部节点——这与「写在组件标签上的 class/style/CSS 变量不透传」是同一类限制。`:deep` 的有效范围只到子组件根节点，内部渲染出来的 `.checkbox-item` 压根不是 `StepChoose` 的样式作用域后代，所以规则根本没命中。加 `!important` 同样无效，因为选择器不匹配，而不是被覆盖。\n\n【怎么做】把「选中高亮」变成组件自身能力：① 在 `ZsCheckbox.vue` 新增 `highlight` prop，组件内部按选中态给真实节点绑背景色与文字色（`rgba(19, 84, 190, 0.08)` + 主题色）；② 调用方改写成 `<ZsCheckbox highlight ...>`，并删掉那段无效的 `:deep(.checkbox-item.active)`，避免留下误导后人的死样式。\n\n【判断口径】凡是要改自定义组件「内部元素」的样式（选中态、内部图标、内部间距），在小程序端都应走「组件加 prop / 内部内联 style」，而不是父组件 :deep；只有子组件根节点上的间距类调整才可用 :deep（如 base-card 的 margin-top）。",
+   "evidence": "会话 6c34628f（基线 8fc3cc5）：用户反馈「选项表决选择还是没有背景色，UI不一致 pages_vote/decision/form」，定位为 `:deep(.checkbox-item.active)` 在小程序端无法穿透 ZsCheckbox，改为 ZsCheckbox 新增 highlight prop 内部实现选中背景。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ZsCheckbox/ZsCheckbox.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/optional/StepChoose.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/components/RadioGroup.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/form.vue"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "6c34628f-3890-4a06-bd38-781e0d7ab64e"
+   ],
+   "bundle": "072.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序表决详情页内容为空：跳转前必须写缓存 + 详情页三级数据回退（接口选项 → 记录 optionList → 缓存 value 拆分）",
+   "type": "pattern",
+   "content": "【什么情况】业主表决「选项表决 · 我的决策」页，点「决策详情 >」进入的 `optional/detail.vue` 是空白页：列表上明明显示了决策摘要，详情却什么都取不到，也没有报错。\n\n【为什么】列表页跳详情时没有把决策摘要/签字/时间等写入缓存与 voteStore，而详情页单纯依赖接口，一旦接口返回的选项列表为空（部分决策来自本地记录或旧接口），页面就没有任何数据源可就位，表现为静默空白。\n\n【怎么做（三级回退套路）】① 跳转侧（`DecisionResult.vue` 的 `goLatestDetail`）：跳转前把摘要、签字、决策时间等写入 `voteStore` 与本地缓存，让详情页无论如何都有一份数据可用。② 详情侧（`detail.vue`）按优先级取数：1) `selectOptdec` 接口返回的选项列表；2) `getAppRecordDetail` / `getDecisionRecordDetail` 返回的 `optionList`；3) 缓存里的 `value` 摘要，按「、」拆分成多条展示。③ 补齐「决策信息」卡片（决策人、签字、决策时间），字段与 `DecisionRecord.vue` 对齐。④ `DecisionRecord.vue` 同步同一套缓存回退逻辑，避免两个入口对同一份记录展示不一致。\n\n【可复用性】凡「列表有摘要、详情页可能取不到同一份数据」的移动端场景，都按「跳转侧预写缓存 + 详情侧多源逐级回退 + 摘要可反解析成列表项」三件套处理，不要把详情页写成纯接口驱动。",
+   "evidence": "会话 30045e67（基线 8fc3cc5）：用户报「业主表决-选项表决：我的决策内容（决策记录内容）」详情为空，修复为 goLatestDetail 跳转前写 voteStore + 缓存，detail.vue 实现 selectOptdec → getAppRecordDetail/getDecisionRecordDetail 的 optionList → 缓存 value 按「、」拆分 三级回退，并补「决策信息」卡片。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_vote/decision/optional/DecisionResult.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/optional/detail.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/optional/DecisionRecord.vue"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "30045e67-bafd-468a-a56a-1f3d2ed7b2fe"
+   ],
+   "bundle": "072.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 小程序调试器用 vConsole 而非 eruda：封装 initVConsole + 环境变量开关 + 连点 10 次开启",
+   "type": "preference",
+   "content": "【情况与偏好】用户明确要求把项目里的 eruda 换成 vConsole 作为移动端调试面板。落地方式（后续新增页面应沿用同一套）：\n\n【怎么做】① 新增 `src/utils/vconsole.ts` 封装 `initVConsole()`，内部判重避免重复创建实例（多处入口调用也只会有一个面板）。② `src/main.ts` 中在 H5 环境下根据环境变量或 localStorage 的 devtool 标记初始化 vConsole。③ 调试开关按环境分档：development 默认关闭（`VITE_APP_VCONSOLE = 0`），test / production 默认开启（= 1）。④ 保留隐藏入口：二手房详情页（`pages_transaction/stockHouse/detail.vue`）连续点击 10 次触发 `initVConsole()`，方便线上临时调试。⑤ 依赖上 `eruda` 换成 `vconsole@3.15.1`；环境变量从 `VITE_APP_ERUDA` 重命名为 `VITE_APP_VCONSOLE`，各 `.env`（development / test / production）必须同步改名，漏改会导致开关静默失效。\n\n【为什么记】这是「用户指定工具 + 已跑通的接入结构」，新增 H5/小程序页面或接入新的调试能力时应复用 `initVConsole` 单例与同一套环境变量命名，不要再引入第二个调试库或另写一套开关逻辑。",
+   "evidence": "会话 dbee42c1（基线 a444c05）：用户指令「移除eruda，使用vconsole」，落地 utils/vconsole.ts + main.ts 环境开关 + detail.vue 连点 10 次 + package.json 依赖替换 + VITE_APP_ERUDA→VITE_APP_VCONSOLE 全 .env 同步。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/vconsole.ts",
+    "zhi2-mobile-shimin/src/main.ts",
+    "zhi2-mobile-shimin/src/pages_transaction/stockHouse/detail.vue",
+    "zhi2-mobile-shimin/package.json",
+    "zhi2-mobile-shimin/.env.development",
+    "zhi2-mobile-shimin/.env.test",
+    "zhi2-mobile-shimin/.env.production"
+   ],
+   "baseline": "a444c05",
+   "sessionIds": [
+    "dbee42c1-663f-489c-8490-450ec35dc498"
+   ],
+   "bundle": "072.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "接口报「网络错误，请稍后再试」但报文其实是业务失败：noReject 需实例级 supportNoReject:true 才生效",
+   "type": "bug",
+   "content": "【什么情况】二手房「房源发布 · 房源核验」点核验后统一弹「网络错误，请稍后再试！」，而抓到的响应明显是成功的：外层 `{ success: true, code: 200, msg: '请求成功', data: '{...}' }`，只是 `data` 里内嵌了业务失败 JSON（内层 `code: 500`、`message: '核验失败。原因：未查到不动产登记信息…记录编号：xxx'`）。页面里其实早就写好了对内层 `code == 500` 的分支（跳核验失败页并展示原因），但从未被执行到。\n\n【为什么】`secondVerifyLogVerify` 接口配置了 `noReject: true`，意图是「不要 reject，交给页面自己处理业务错误」，但该配置依赖请求实例上的 `supportNoReject: true` 开关；`src/api/v1Instance.js` 没开这个开关，`noReject` 就成了无效配置。于是拦截器把内层 `code: 500` 当请求失败处理，又因为内层响应用的是 `message` 而不是约定的 `msg` 字段，`data.msg || '网络错误，请稍后再试'` 只能落到通用兜底文案。\n\n【怎么做与排查口径】① 在 `v1Instance.js` 补 `supportNoReject: true`（与 V2 的 `api/index.js` 保持一致），让 noReject 生效，页面才能拿到原始响应自行判业务码。② 页面跳转失败页时对错误原因做 `encodeURIComponent`，否则带引号/斜杠/中文的原文会在 URL 里被截断。③ 以后遇到「接口实际成功却提示网络错误」，按此顺序查：外层 code 是否 200 → 该接口是否配了 noReject → **对应请求实例是否开了 supportNoReject** → 内层错误字段是 message 还是 msg。\n\n【同类风险】项目里存在 v1 / v2 两套请求实例（httpInstance / v1Instance / api/index.js），实例级开关不统一时，同名 noReject 配置会在一个实例上生效、另一个上静默失效，新增接口前要先确认它走的是哪个实例。",
+   "evidence": "会话 df98a5b7（基线 77666f8）：用户报房源核验显示「网络错误，请稍后再试！」并给出外层 code 200 + 内层 code 500 的报文；定位为 v1Instance.js 缺 supportNoReject:true 导致 noReject:true 失效，补开关并对 errText 做 encodeURIComponent。",
+   "files": [
+    "zhi2-mobile-shimin/src/api/v1Instance.js",
+    "zhi2-mobile-shimin/src/api/httpInstance.js",
+    "zhi2-mobile-shimin/src/api/gateway.js",
+    "zhi2-mobile-shimin/src/api/transaction.js",
+    "zhi2-mobile-shimin/src/pages_transaction/publishHouse/verification.vue"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "df98a5b7-7af2-4775-8bc5-f19612418dfd"
+   ],
+   "bundle": "072.md",
+   "project": "苏住房C"
+  }
+ ]
+}

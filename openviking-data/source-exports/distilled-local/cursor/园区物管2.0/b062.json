@@ -1,0 +1,93 @@
+{
+ "project": "园区物管2.0",
+ "batch": "062",
+ "files": [
+  "062.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "如果使用接口的情况下，默认不要展示mock数据",
+   "type": "preference",
+   "content": "**已实现：** 接口模式下默认不再展示 mock 数据。 **原因：** 虽然 `USE_MOCK_DATA = false`，但 `data()` 里仍用 `cloneMockCards()` 初始化，页面会先显示 mock 数值，等接口返回后再更新。 **改动：** 1. 新增 `createEmptyPanoramaCards()`：保留标题、单位、配色等静态配置，数值置空（`summaryValue: 0`、`donutData: []`、`barValues` 全为 0）。 2. 初始化改为：`USE_MOCK_DATA ? cloneMockCards() : createEmptyPanoramaCards()`。 接口模式下会先显示空数据/0，接口返回后再填充真实数据；`USE_MOCK_DATA = true` 时行为不变，仍用 mock。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\assetPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0d12bfa5-5326-44a2-8e2c-d1e5aeef584f"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Pr",
+   "type": "fact",
+   "content": "**原因：** 模板第 9 行的 `el-switch` 绑定了 `@change=\"changeType\"`，但 `methods` 里没有定义 `changeType`，渲染时就会触发 Vue 警告。 **修复：** 已按 `pubHouse/index.vue` 等同类列表页的实现，在 `resourcesLeaseContractFiling/index.vue` 中补充 `changeType` 方法，用于在「树状展示 / 平铺展示」切换时控制左侧树面板的显示。 刷新页面后，该警告应消失。若 `assetsLeaseContractFiling`、`parkingSpaceContractFiling` 等页面也出现相同提示，可用同样方式补上 `changeType`。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`pubHouse/index.vue",
+    "`resourcesLeaseContractFiling/index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\resourcesLeaseContractFiling\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c5b92557-6c32-4be4-9a65-a4f661c3b0b9"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "左侧树请求接口时，暂无数据改为加载中，等到数据渲染后",
+   "type": "preference",
+   "content": "已在子组件 `regionTree.vue` 中处理（`RegionTreeLayout` 只是包裹该树，接口请求在子组件里）。 ### 改动说明 1. **新增 `treeLoading` 状态** 初始为 `true`，避免首屏在数据未返回时显示「暂无数据」。 2. **`el-tree` 动态 `empty-text`** 请求中显示「加载中」，加载结束且无数据时显示「暂无数据」。 3. **`getDeptList` 流程** - 请求前：`treeLoading = true` - 成功：赋值 `treeData` 后，在 `$nextTick` 中完成展开/默认选中，再 `treeLoading = false` - 失败或异常：同样关闭 loading `RegionTreeLayout` 里通过 `treeRenderKey` 重置树时会重新挂载 `region-tree`，会再次走上述加载逻辑。 若还需要整棵树区域的遮罩 loading（而不只是空状态文案），可以把 `v-loading` 改为 `treeBusy || treeLoading`。需要的话我可以再补上。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`regionTree.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\complex\\components\\RegionTreeLayout.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\complex\\components\\regionTree.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "190c0ade-ed4c-451c-a6a0-0d37bcc60607"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "增加isShowPublishButton字段， @",
+   "type": "bug",
+   "content": "改动已按你的要求做完，说明如下。 ### 1. `app.js` — `platformConfig` 增加字段 在 `serviceHotline` 后增加了 `isShowPublishButton: undefined`，与接口 `/system/platformConfig/getInfo` 返回的数据对齐；后端在配置里带上 `isShowPublishButton: true/false` 即可。 ### 2. `detail.vue` — 按钮显示条件 - 用 `mapState` 从 `state.app.platformConfig` 映射 `isShowPublishButton`。 - 「发布公告」按钮的 `v-if` 在最前面增加 **`isShowPublishButton === true`**，其余条件（`bizState`、`msgId`、征集类型、`publishState`）不变。 因此：**仅当** `isShowPublishButton === true` **且**原有业务条件都满足时才会显示；`false` 或 `undefined` 都不会显示。 > 说明：使用严格等于 `=== true`，若接口未返回该字段或为 `undefined`，按钮默认不显示。若需要「未配置时仍按原逻辑显示」，可以说一下，再改成例如 `isShowPubli",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`app.js",
+    "`detail.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\store\\modules\\app.js、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\autonomy\\candidateCollect\\components\\detail.vue",
+    "@zhi2-web-admin/src/store/modules/app.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f61307bd-7d75-4fff-ad85-3385c42878ea"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "这个地图展示全市的时候，应该所有区域全部高亮，但是目",
+   "type": "bug",
+   "content": "## 原因 轮播到「全市」时，`updateMapGeoCarouselHighlight` 会把 `highlightName` 设为 `null`，`buildMapGeoCarouselRegions` 里原先对 `!highlightName || highlightName === '全市'` 直接 `return regions`，只保留了江阴飞地 `__wuxi_jiangyin_b` 的静默配置，**没有给任何区县设置** `WUXI_GEO_HIGHLIGHT_ITEM_STYLE`（`#4EEDFF` 那套高亮），所以视觉上等于「没有一块在轮播高亮状态」，和单区轮播时的亮区不一致。 ## 修改 在「全市」分支里： 1. 给飞地 `silent` 加上与「江阴市」单区时相同的高亮 `itemStyle` / `emphasis.itemStyle`（江阴两块地一起亮）。 2. 遍历 `WUXI_SVG_GROUP_REGIONS` 里除飞地外的每个区县名，各推一条带高亮样式和 `wuxiGeoCarouselHighlightLabel()` 的 `regions` 项，与单区轮播时单块高亮的配置一致。 这样轮播到全市时，无锡各板块会全部呈现与选中某一区时相同的高亮填充与标签强调。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:/repository/园区物管2.0/zhi2-web-admin/src/views/benefit/mapOverview/index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\mock.js",
+    "@zhi2-web-admin/src/views/benefit/mapOverview/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d90e73b5-e60c-4919-b4fa-937e9f6f410d"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

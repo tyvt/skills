@@ -1,0 +1,264 @@
+{
+ "project": "园区物管2.0",
+ "batch": 17,
+ "files": [
+  "065.md",
+  "066.md",
+  "067.md"
+ ],
+ "count": 16,
+ "memories": [
+  {
+   "title": "zs-select-dialog 默认勾选列未传 row-key 时 ElTable 在 data 变化时报警告",
+   "type": "bug",
+   "content": "现象：打开 zs-select-dialog（如「选择物业管理区域」）时控制台出现 Element UI ElTable 要求设置 row-key 的警告，多在表格 data 刷新时出现。\n根因：组件内部默认 showCheckbox: true，会渲染选择列；宿主未传 row-key 时组件 rowKey 默认为空字符串，有选择列的 ElTable 在 data 变化时必须提供有效 row-key（与已知「row-key 为空导致 tbody 不渲染」同属一类契约，本条补充的是「有勾选列 + 默认空 rowKey → 警告」的触发链）。\n修复：在弹窗上显式传入与选中回填字段一致的主键，例如物业管理区域用 row-key=\"complexId\"，与同模块 handlePick/setProject 使用的 row.complexId 对齐；其他业务对照列表主键字段（houseId、projectId 等）。",
+   "evidence": "会话 300657ce：accountQuery/type.vue 选择弹窗未传 row-key，zs-select-dialog 默认 showCheckbox true、rowKey 空串；补 row-key=\"complexId\" 后警告消失。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/accountQuery/type.vue",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue"
+   ],
+   "baseline": "177bc3ce4",
+   "sessionIds": [
+    "300657ce-6fc5-408d-932e-3dc812b1084d"
+   ],
+   "bundle": "065.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "操作列 buttons 用 .filter(visible) 时行级显示须拆到 rowVisible",
+   "type": "pattern",
+   "content": "将 zs-table / zs-operate-column 的 buttons 从 if-push 改为「数组 + .filter((item) => item.visible === undefined || item.visible)」时，不要把行级条件继续写在 visible: (row) => ... 上——visible 会被数组级 filter 当成布尔开关，与函数语义冲突。\n约定：数组级用布尔 visible（如 visible: !this.isQuery）；行级用 rowVisible: (row) => ...。isOperateButtonVisible 内先判 rowVisible，再判原 visible 函数，最后 checkPermission，行为与改造前一致。",
+   "evidence": "会话 7ac74063：feeCustomTypeTable.vue 对齐 candidateCollect 的 filter 写法；编辑按钮 rowVisible 控制 contractBizState/bizState，查询态用 visible: !this.isQuery 从数组剔除。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/budget/components/feeCustomTypeTable.vue",
+    "zhi2-web-admin/src/views/autonomy/candidateCollect/components/index.vue"
+   ],
+   "baseline": "7814a0c2a",
+   "sessionIds": [
+    "7ac74063-2500-4985-8cbb-650d6052d19f"
+   ],
+   "bundle": "065.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "树+表选择弹窗：树节点字段用 onTreeClick 缓存，勿只信右侧表格行",
+   "type": "workflow",
+   "content": "SelectDialog.open / zs-select-dialog-func 左侧树 + 右侧明细表场景下，确认回填的主数据（如 businessItemId/Code/Name）应以左侧树当前选中节点为准：在 open 前声明 selectedTreeRow，onTreeClick 实时写入；then 里用 selectedTreeRow 赋值，不要假设右侧 row 带全量 businessItem*。\n原因：右侧分页行常缺树级字段或字段不完整，只读 row 会导致回填空值或错值；组件打开后默认树节点点击可让未手动点树时仍有初始选中。",
+   "evidence": "会话 1aa18ac2：pubPaymentNotice/detail.vue showBusinessItemDialog 改为 onTreeClick 缓存 + selectedTreeRow 回填 businessItem*。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue"
+   ],
+   "baseline": "7814a0c2a",
+   "sessionIds": [
+    "1aa18ac2-4320-4a6b-abb4-c64bc4cfcd68"
+   ],
+   "bundle": "065.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "排名列表表头与数据行分列 grid 且含 auto 列会导致列宽不一致",
+   "type": "bug",
+   "content": "大屏自定义排名块（表头 .xxx__head 与每行 .xxx__row 各自 display:grid）若第三列用 auto，每行按本行内容算宽，表头「余额（元）」与下方数字左缘会对不齐。\n修复：在公共父级（如 .balance-rank）定义 CSS 变量统一列模板，例如 --balance-rank-grid-cols: 28px minmax(48px, 1fr) 72px，表头与数据行 grid-template-columns 均引用该变量；金额列用固定宽度（如 72px）并 text-align:left，超长金额再调大固定宽。",
+   "evidence": "会话 2aa6472f：mapOverview/index.vue 物业管理区域账户余额排名表头与数据左对齐问题。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue"
+   ],
+   "baseline": "f00310232",
+   "sessionIds": [
+    "2aa6472f-742a-4bc7-bb9f-76eedbe8d7a9"
+   ],
+   "bundle": "065.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] Vite 开发代理 HTTPS 连 IP 报 ERR_TLS_CERT_ALTNAME_INVALID",
+   "type": "bug",
+   "content": "根因：VITE_APP_PROXY_ADDRESS 配成 https://IP:端口 时，上游证书 SAN 只含域名不含该 IP，Node TLS 握手拒绝（ERR_TLS_CERT_ALTNAME_INVALID），/api 代理请求失败。\n解法优先级：① 改回证书对应域名（本机 hosts 指到 IP）；② 仅本地开发在 vite.config.js 的 createProxyConfig 对目标代理加 secure: false 跳过证书校验；③ 若后端支持可改 http://IP 避开 TLS。secure: false 只影响 dev server proxy，不影响 build 产物。改 env 后需重启 dev；若仍不生效再查是否被 env/.env.development.local 覆盖（见已知 #1113）。",
+   "evidence": "会话 ee9a14e8：env/.env 使用 https://222.184.31.232:15777 触发证书校验失败，在 createProxyConfig 增加 secure: false 后本地代理恢复。",
+   "files": [
+    "env/.env",
+    "zhi2-web-admin/vite.config.js"
+   ],
+   "baseline": "7814a0c2a",
+   "sessionIds": [
+    "ee9a14e8-3ae5-42f3-9d6a-f8fb0fad0e5c"
+   ],
+   "bundle": "066.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] 用户详情「授权范围」树勾选必填：beforeSaveHook + getForm 空树保护",
+   "type": "workflow",
+   "content": "授权范围是 el-tree 勾选，不是带 prop 的 el-form-item，无法单靠 rules 表达「至少勾选一个节点」。在 system/user/detail.vue 重写 beforeSaveHook：表单 rules 通过后、发保存请求前读取树勾选 keys，为空则 msgWarning「授权范围不能为空」并 return 阻止提交。\n与已知 #958 的关系：普通文本/选择项必填仍优先 rules+prop；树/自定义控件无 prop 时用 beforeSaveHook 补校验。\ngetForm() 取勾选值时对 tree ref 做存在性判断，避免树未渲染时 getCheckedKeys 空引用报错。",
+   "evidence": "会话 b62c693b：保存时要求授权范围非空，实现 beforeSaveHook 拦截未勾选并加固 getForm。",
+   "files": [
+    "zhi2-web-admin/src/views/system/user/detail.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/mixins/form.js"
+   ],
+   "baseline": "7814a0c2a",
+   "sessionIds": [
+    "b62c693b-964b-4ea2-85e8-10ced80ddbfd"
+   ],
+   "bundle": "066.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] 自治用户授权：组织名称核验失败须级联清空组织与用户字段",
+   "type": "workflow",
+   "content": "onOrganizationSelected 调 checkUserUnique 核验组织后，.catch 中不能只 toast：须调用 clearOrganizationFields() 统一清空组织名称、组织版本 ID、物业管理区域、登录名，并复用 clearMemberFields 清空姓名/性别/手机号等从属字段。handleBusinessTypeChange 切换业务类型时也应走同一清空方法，避免残留无效数据。\n根因：接口失败时表单仍保留上一轮选择/回填，用户会误以为已核验通过。",
+   "evidence": "会话 04c36a87：核验失败与换组织失败均需在 catch 中清空组织及关联用户字段。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/userAuth/detail.vue"
+   ],
+   "baseline": "5a288f142",
+   "sessionIds": [
+    "04c36a87-d4a7-48a6-bd8d-6bdcfbe29f08"
+   ],
+   "bundle": "066.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] B 端物业管理区域 SelectDialog：extra + extraLinks 提示开户与签协议",
+   "type": "pattern",
+   "content": "复刻 assetLeaseApply 到 assetsLeaseContractFiling 等区域选择时，B 端（terminalType === 'B'）在 SelectDialog.open 增加：extra 文案说明仅可选已开户且已签署公共收益监管协议的物业管理区域；extraLinks 提供「前往开户」「签署协议」跳转。非 B 端不传 extra，行为与原先一致。\n与已知 SelectDialog.open 收口（#251/#284）配合：业务差异用 open 参数表达，不要各页再嵌一套弹窗模板。",
+   "evidence": "会话 48461073：合同备案页区域弹窗按租赁申请页补齐 B 端 extra/extraLinks。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/detail.vue",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/detail.vue"
+   ],
+   "baseline": "7fe15a8cb",
+   "sessionIds": [
+    "48461073-b842-4049-8c74-3522cec9ab5b"
+   ],
+   "bundle": "066.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] 模板绑定 :border=\"border\" 须在 data 定义 border，否则 Vue 运行时警告",
+   "type": "bug",
+   "content": "el-table 等使用 :border=\"border\" 时，若 data() 未声明 border，渲染期报 Property or method \"border\" is not defined。项目内 OpenDetailTable、OwnerAddDialog 约定 data 里 border: true；模板不要同时写静态 border 与 :border 重复。\nScopeSelectDialog 漏定义即触发此类警告，属复制表格片段时常见遗漏。",
+   "evidence": "会话 024ea5fe：ScopeSelectDialog.vue 第 18 行 :border=\"border\" 无 data.border，补 border: true 并去掉重复静态 border。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue"
+   ],
+   "baseline": "177bc3ce4",
+   "sessionIds": [
+    "024ea5fe-fd81-439f-8f02-a139f7fd07d3"
+   ],
+   "bundle": "066.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] 资金全景 fundPanorama 区县饼图 label 在 chartRenderers.js 而非 index.vue",
+   "type": "pattern",
+   "content": "benefit/dataSandbox/fundPanorama 收入/支出区县饼图外侧标签由 chartRenderers.js 的 formatPieSliceLabel 格式化，index.vue 经 renderDistrictPie 调用。改「类别与数值间距、去单位、百分号格式」等须改 chartRenderers，只改 index.vue 的 ECharts option 可能不生效。\n标题/tooltip 可仍在各自 init 里保留「单位：万元」，与扇区 label 文案可分离（例如 label 去掉「万」而标题仍标万元）。",
+   "evidence": "会话 d397b538、8988d239：formatPieSliceLabel 加空格；renderDistrictPie formatter 去掉标签「万」。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/chartRenderers.js",
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "baseline": "f00310232",
+   "sessionIds": [
+    "d397b538-5bfd-4885-b681-4805d291c008",
+    "8988d239-72d3-4f37-83bb-9ad26f14a007"
+   ],
+   "bundle": "066.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[苏房] mapOverview 隐藏季度筛选 UI 时接口仍带默认季度参数",
+   "type": "fact",
+   "content": "移除左上角季度下拉仅改展示时，selectedQuarter 仍默认 getCurrentOverviewQuarterLabel()，统计/大屏接口请求行为不变。若产品要求「只按年」或固定季度，需额外改请求参数组装逻辑，不能只删模板控件。\n隐藏筛选后用户无法手改季度，容易误以为后端也只按年度聚合。",
+   "evidence": "会话 f756151c：去掉季度下拉后说明数据仍用当前默认季度调接口。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue"
+   ],
+   "baseline": "3965548b6",
+   "sessionIds": [
+    "f756151c-6410-4c3f-8746-f4c70b8ba6bf"
+   ],
+   "bundle": "066.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[园区物管2.0] 数据看板多列 CSS Grid 子板块高度未撑满：align-items:start 阻断默认 stretch",
+   "type": "bug",
+   "content": "现象：同一行左侧列最高，中/右列「资金收入」「资金支出」等 section 只按内容高度顶对齐，下方大片留白，饼图区域没有随容器变高。根因：父级 `.panorama-top`（或同类多列网格）显式写了 `align-items: start`；网格行高仍由最高列决定，但非 stretch 对齐的列子项不会拉满该行高度。修法：改回 `align-items: stretch`（或删掉 start 让网格默认 stretch），并确认列内链条已把剩余高度交给图表区——例如 `.composition-stack { flex: 1 }`、`.chart-wrap--stack-pie { flex: 1 1 auto }`，配合 ECharts `resize`。与已知「详情页双来源间距」不同，本条针对看板横向多列等高布局。",
+   "evidence": "会话 47b47b3c：用户报资金收入/支出板块高度未占满容器；结论将 align-items:start 改为 stretch，中右列 panorama-block 拉满行高后饼图区 flex:1 吃掉垂直空间。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "baseline": "f00310232",
+   "sessionIds": [
+    "47b47b3c-2c00-4ffa-a15f-e111501a134b"
+   ],
+   "bundle": "067.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[园区物管2.0] zs-operate-column 仅一个「查看」时按钮贴左：动态列宽下需容器 justify-content:center",
+   "type": "bug",
+   "content": "现象：列表操作列只剩一个按钮时，按钮在较宽的列里靠左，视觉不居中。根因：组件按按钮文字动态算列宽后，`.operate-column-button-container` 仍是默认 flex 主轴起点对齐；列宽大于内容宽度时，单按钮会贴在左侧。修法：给按钮容器补 `justify-content: center`。注意：已知清单已有「不要传固定 :width、交给组件自适应」，本条是自适应列宽场景下的对齐补充，不是再传 width。",
+   "evidence": "会话 eb429bff：用户截图单按钮不居中；在 operate-column-button-container 增加 justify-content:center 后单「查看」在操作列居中。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue"
+   ],
+   "baseline": "7814a0c2a",
+   "sessionIds": [
+    "eb429bff-03b8-43b5-9e7a-77b8f20a182a"
+   ],
+   "bundle": "067.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[园区物管2.0] 全局 request 拦截器：HTTP 404 不弹 MessageBox，仅 reject 交给调用方",
+   "type": "workflow",
+   "content": "需求：部分接口 404 表示「无资源/未配置」，不希望全局错误框打扰用户。做法：在 axios 响应错误拦截器里判断 `response?.status === 404` 时直接 `return Promise.reject(error)`，跳过原有 MessageBox/统一提示。调用方仍可在 `.catch` 里按无数据处理。边界：若后端是 HTTP 200 且 body 内 `code: 404`，仍走成功拦截器里的业务错误提示，需单独加分支才能静默；与已知「拦截器丢弃字段」「路径末段改写」是不同维度。",
+   "evidence": "会话 1b81754e：用户要求接口返回 404 不提示错误；在 request.js 错误处理增加 status===404 早退 reject，并说明 body code 404 另议。",
+   "files": [
+    "zhi2-web-admin/src/utils/request.js"
+   ],
+   "baseline": "3856ff194",
+   "sessionIds": [
+    "1b81754e-c698-4c11-af77-68d2d777a757"
+   ],
+   "bundle": "067.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[园区物管2.0] public/sign.js 密钥地址子路径部署：resolveSecretKeyUrl 用无前导斜杠的相对路径",
+   "type": "pattern",
+   "content": "现象：站点挂在子路径（如 `/admin/`）时，签名相关请求若写死 `/api/v2.0/secret/key` 会从站点根解析，与 axios `baseURL` 行为不一致。做法：`resolveSecretKeyUrl` 返回 `api/v2.0/secret/key`（无前导 `/`），相对当前页面 URL 解析为 `/admin/api/v2.0/secret/key`。`shouldApplySign` 里用于路径匹配的逻辑仍可按绝对路径规则判断，不必与 URL 拼接方式混为一处。",
+   "evidence": "会话 8efadfc0：将 resolveSecretKeyUrl 从 `/api/v2.0/secret/key` 改为相对路径 api/v2.0/secret/key，说明子路径部署下与 baseURL 一致。",
+   "files": [
+    "zhi2-web-admin/public/assets/js/sign.js"
+   ],
+   "baseline": "c97957703",
+   "sessionIds": [
+    "8efadfc0-83f6-47ff-88d7-fb9b46407263"
+   ],
+   "bundle": "067.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "[园区物管2.0] 数据沙盘 ECharts 饼图外侧标签：label.formatter 单独控制展示名/数值/单位",
+   "type": "pattern",
+   "content": "产品常要求扇区外侧只显示维度名（区县名），金额与占比放 tooltip。根因：series.label.formatter 若写成 `Number(p.value).toFixed(2)` 或拼接 `card.donutUnit`，标签就只显示数值或「1,234个 (12.3%)」。做法：名称类标签用 `(p) => p.name` 或自定义一行格式如 ``${valueText} (${percent}%)``（百分比放括号内、与数值同一行）；单位若已在卡片标题「单位：个」展示，formatter 里可不再拼单位。数值细节统一在 tooltip.formatter 维护，避免 label 与 tooltip 重复改两处不一致。",
+   "evidence": "会话 d0dd6cf9：fundPanorama renderDistrictPie 将 formatter 从 toFixed(value) 改为 p.name；会话 343f11cc：同一函数改为单行「数值 (百分比%)」；会话 a281575d（assetPanorama）：去掉 label 上的 donutUnit「个」。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue",
+    "zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue"
+   ],
+   "baseline": "f00310232",
+   "sessionIds": [
+    "d0dd6cf9-d65d-4e4b-b5cc-cf2bd98cd879",
+    "343f11cc-909d-4634-8fc1-daffbd6a86a1",
+    "a281575d-c847-4a84-babf-b692fa9b404a"
+   ],
+   "bundle": "067.md",
+   "project": "园区物管2.0"
+  }
+ ]
+}

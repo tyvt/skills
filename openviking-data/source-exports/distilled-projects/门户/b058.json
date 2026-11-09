@@ -1,0 +1,61 @@
+{
+  "project": "门户",
+  "batch": "058",
+  "files": [
+    "058.md"
+  ],
+  "count": 3,
+  "memories": [
+    {
+      "title": "Vite 5 升 Vite 8 的硬阻塞与首屏优化：@vitejs/plugin-vue2 换 vite-ng-plugin-vue2，require() 引用静态图必炸",
+      "type": "workflow",
+      "content": "【什么情况】把「苏州市房地产监测V3」的 Vite 升级迁到门户项目：vite 5.4.11 → 8.3.5、unocss 66.5.10 → 66.12.0，构建在 `cardData.vue` 上卡住。\n【为什么】Vite 8 不再支持 `@vitejs/plugin-vue2`；且对资源引用方式更严格——`cardData.vue` 里 `require('down.png')` / `require('up.png')` 这种 CommonJS 式引用静态图，在 Vite 8 下是**构建硬阻塞点**（文件已删 + 引用方式不支持），不是警告。另外 `vite.config.js` 里 Vite 8 已移除 `maxParallelFileOps`，保留会直接报错。\n【怎么做】① 插件换成 `vite-ng-plugin-vue2` 1.0.0，移除 `@vitejs/plugin-vue2`；② 静态图改用 `el-icon` 趋势图标，去掉对已删除 png 的 require（`src/views/indemnity/homePage/components/cardData.vue`）；③ `vite.config.js` 删除 `maxParallelFileOps`；④ `manualChunks` 置空，交给 Rollup 按动态 import 自动分包；⑤ 标注插件（report/analyze）改为仅 `report`/`REPORT=1` 启用，避免默认跑；⑥ 首屏体积：`virtual:svg-icons-register` 改成动态 `import()` 异步 chunk——`src/main.js` 改动态加载、`src/components/SvgIcon/index.vue` 移除重复静态引入，入口 `index-*.js` 降到约 0.89MB，svg 注册块独立成 1.72MB 异步 chunk 不进首屏；⑦ 父仓 `package.json` 要补 `@unocss/core` 66.12.0 并 `npm install` 重算 `package-lock.json`（根 `vite@5.4.11` 只保留给 `vite-plugin-externals` 的 peer）；⑧ 迁别的项目要逐条核对环境差异：本批 V3 有 `env/.env.production` 关闭 `VITE_CRYPTO_ENABLED`，门户无此变量，不适用则跳过；锁文件不要强改（`bun.lock` 未随动，避免与 bun 的 hoisting 冲突）；⑨ 构建后仍要还原 `public/version.json`。",
+      "evidence": "会话 session-6a38945c-e285-4f83-a76e-70731f47427f（基线 d8addc3）用户诉求 1「迁移苏州市房地产监测V3的vite升级到本项目」；最终结论列出子模块改动（vite 8.3.5、unocss 66.12.0、vite-ng-plugin-vue2、删除 maxParallelFileOps、manualChunks 置空、virtual:svg-icons-register 改动态 import、cardData.vue 改 el-icon 移除 require 的 down.png/up.png）与父仓改动（@unocss/core 66.12.0、package-lock 重算），并给出首屏 0.89MB / 异步 chunk 1.72MB 的实测。",
+      "files": [
+        "zhi2-web-admin/package.json",
+        "zhi2-web-admin/vite.config.js",
+        "zhi2-web-admin/src/main.js",
+        "zhi2-web-admin/src/components/SvgIcon/index.vue",
+        "zhi2-web-admin/src/views/indemnity/homePage/components/cardData.vue",
+        "package.json"
+      ],
+      "baseline": "d8addc3",
+      "sessionIds": [
+        "session-6a38945c-e285-4f83-a76e-70731f47427f"
+      ],
+      "bundle": "058.md"
+    },
+    {
+      "title": "视觉回归基线与设计稿不一致时：覆盖同名 fixture 图并标注「当前实现截图」，原设计稿留在 git 历史",
+      "type": "workflow",
+      "content": "【什么情况】字号/间距调整后，操作指引三个住房租赁界面的相似度掉到 98.7% / 98.5%（原本 100% / 99.3%），需要判断是「样式退化」还是「基线过期」。\n【为什么】基线图有两种来源：原始设计稿（交付物）与「当前实现截图」（回归基准）。当实现已经偏离原设计稿时，两者混在一套 fixture 里就无法解释相似度下降是回归还是基线过期，后人还会把基线图误当设计交付物。\n【怎么做】① 先归因：对比页面高度与基线图高度是否错位——本批页面高度从 1864 变成 1911，确认是基线过期而非样式退化；② 重拍基线时**覆盖同名 fixture 文件**而不是新增文件——`tests/e2e/fixtures/operation-guide-designs.ts` 里 index 4/5/6 的 `maskBanner`、`normalizeIllustration` 归一化逻辑是按原文件路径设计的，保留路径即可原样复用参考图管线，不用改 fixture 代码；③ 拍摄参数要固定（1920×1080、DPR 2、`fullPage`、`animations: disabled`）；④ 在 `src/views/home/operationGuide/README.md` 里标注这三张是「当前实现截图」、商品房的四张仍是原始设计稿，避免误当设计交付物；⑤ 原设计稿保留在 git 历史里，随时可 `git checkout` 取回；⑥ 临时采集脚本删掉，不留在仓库里。",
+      "evidence": "会话 session-eb7cae1d-c1b7-4d63-a83b-4f50c9385846（基线 b6165db）最终结论第 2 节「视觉用例：用新截图重新生成三条参考图」：覆盖 `住房租赁(3).png`(企业)/`住房租赁(2).png`(经纪机构)/`住房租赁.png`(个人)，并说明「选择覆盖而不是新增文件的原因：operation-guide-designs.ts 里 index 4/5/6 的 maskBanner、normalizeIllustration 归一化逻辑按原文件设计，即保留文件路径就能原样复用参考图管线」；同批 session-8d2fa9f1 给出相似度下降的归因（页面高度 1864 → 1911 与旧基线错位）。",
+      "files": [
+        "zhi2-web-admin/tests/e2e/fixtures/operation-guide-designs.ts",
+        "zhi2-web-admin/src/views/home/operationGuide/README.md",
+        "zhi2-web-admin/tests/e2e/operation-guide-visual.spec.ts"
+      ],
+      "baseline": "b6165db",
+      "sessionIds": [
+        "session-eb7cae1d-c1b7-4d63-a83b-4f50c9385846"
+      ],
+      "bundle": "058.md"
+    },
+    {
+      "title": "门户域名 unlimited.g.h5...v3 是部署环境槽位不是代码分支：排查前先确认远端分支，别往旧分叉打补丁",
+      "type": "fact",
+      "content": "【什么情况】用户贴出 `http://unlimited.g.h5.admin.web.v3.fangdichan.shiqu.suzhou.dev.zhi.com/?portalCategory=存量房#/...`，怀疑「是不是还有一套 v3 的代码分支要一起改」。\n【为什么】该域名对应的是本工作区的门户父仓（远程 `zhi2-web-admin-h5-g-unlimited`），它**只有 `develop/v2.6.2-portal` 一个远端分支**；域名里的 `v3` 是**部署环境槽位 / 网关版本**（`.env` 里 API 前缀也是 `/api/v3.0`），不是另一套代码分支。子模块里另有 `2.6.2-portal-v3`（落后当前 120 个提交的旧分叉）和 `develop/v3.0.0`（无对应父仓库分支），都不是该环境的来源。\n【怎么做】① 排查环境问题时先把「域名 → 父仓远程 → 分支」对齐：`git remote -v` + `git branch -r` 看清父仓到底有哪些远端分支；② 确认没有对应父仓分支的子模块分支（如 `develop/v3.0.0`）不是该环境的来源，不要往那里打补丁；③ 结论落到「只需把 `develop/v2.6.2-portal` 部署到 v3 环境槽位即可生效」，远程主机发布走 CI/发布流水线；④ 改完后要求对目标环境强制刷新（静态资源带 hash，index 不缓存）；⑤ 提交时注意同一分支上可能有别人并发生成的提交——本批父仓指针最终指向包含自己修复的较新提交 `c1791b7ae`，其中已包含 `cf0005ff7`。",
+      "evidence": "会话 session-d381026e-1539-4fb2-8133-316742038b5b（基线 d8addc3）用户诉求 1「点击跳转菜单的时候名称还是没有显示。http://unlimited.g.h5...v3...?portalCategory=存量房... 现在是这样」；最终结论第五节「关于 v3 环境的确认」：「你贴的域名对应的父仓库就是本工作区门户……只有 develop/v2.6.2-portal 一个远端分支，没有独立的 v3 分支/检出。域名里的 v3 是部署环境槽位/网关版本……无需再往别的分支打补丁」。",
+      "files": [
+        "zhi2-web-admin/src/router/index.js",
+        "zhi2-web-admin/src/utils/portalCategory.js",
+        "zhi2-web-admin/src/layout/components/Navbar.vue"
+      ],
+      "baseline": "d8addc3",
+      "sessionIds": [
+        "session-d381026e-1539-4fb2-8133-316742038b5b"
+      ],
+      "bundle": "058.md"
+    }
+  ]
+}

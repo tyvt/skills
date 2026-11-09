@@ -1,0 +1,48 @@
+{
+    "archive_uri": "viking://user/default/sessions/mcp-store-aed79da2c960/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T04:55:35.912341+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/events/2026/11/09/预售合同户室翻页重开.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-09 lichandan 第三次激活禅道 bug 6235（苏州市房地产监测V3 / zhi2-web-admin 预售合同签订「新增合同」弹窗户室号翻页），反馈「翻页后仍是显示的第一页内容」；此前 11/5、11/6 两次修复均无效。\n# 2026-11-09 (Monday) ChatLog:\n**user**: 禅道 bug 6235（苏州市房地产监测V3 / zhi2-web-admin 预售合同签订「新增合同」弹窗户室号翻页）的真实根因订正：11/5、11/6 两次修复后，2026-11-09 被 lichandan 第三次激活，均反馈「翻页后仍是显示的第一页内容」。..."
+            },
+            {
+                "uri": "viking://user/default/memories/events/2026/11/09/预售合同户室翻页根因订正.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户订正 11/6 关于 queryHousesByBuildCode 分页参数须放 URL query 的结论为错误。真实根因为该接口按楼幢一次返回全量户室、忽略 pageNum；src/utils/request.js 第194–205行对非白名单接口执行 moveUrlQueryToBody，将 config.params 合并进 config.data 后 delete config.params，使 request({params}) 与 post(url,data) 加密请求相同，11/6 改动为空操作。\n# 2026-11-09 (Monday) ChatLog:\n**user**: ...11/6 记录的「queryHousesByBuildCode 分页参数必须放 URL query、放 body 后端忽略」结论是错的——src/utils/request.js 第194–205行对非白名单接口执行 moveUrlQueryToBody 并把 config.params 合并进 config.data 后 delete config.params；/presale/houseInfo/queryHousesByBuildCode 不在 src/config/security.js 白名单内，所以 request({params}) 与 post(url,data) 最终发出的加密请求完全相同，11/6 的改动是空操作。真实根因：该接口按楼幢一次返回全量户室、忽略 pageNum；unwrapPageResult 以 rows.length 兜底 total；zs-table 的 table-tr 只按 Math.min(tableTr,dataLength) 计算表格高度、不截断数据，翻页只改变内部滚动位置。..."
+            },
+            {
+                "uri": "viking://user/default/memories/events/2026/11/09/预售合同户室翻页前端修复.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户实施前端修复：新增 src/views/contract/utils/pageRows.js 的 paginateRows(rows,total,pageNum,pageSize)（rows.length>pageSize 判全量切片，否则原样返回）、chooseHouseDialog.vue 新增 applyOriginPage() 统一楼幢/单元路径并清空跨页勾选、contractRequest.js 恢复 post(url,params) 并写明真实约束、scripts/check-page-rows.mjs 挂入 npm run lint 作回归守卫、docs/frontend/common-errors.md 的 E-040 订正。验证 npm run build 通过且产物含 pageRows-*.js，回归守卫通过，改动文件 eslint --quiet 零错误；npm run lint 全量基线 12509 条存量问题。未验证：无客测账号目视回归，本地 8098 站点被并行任务构建占用未覆盖。\n# 2026-11-09 (Monday) ChatLog:\n**user**: ...修复：新增 src/views/contract/utils/pageRows.js 的 paginateRows(rows,total,pageNum,pageSize)（rows.length>pageSize 判为全量并切片，否则原样返回，兼容后端已分页）；chooseHouseDialog.vue 新增 applyOriginPage() 统一楼幢/单元路径并清空跨页勾选；contractRequest.js 的 queryHousesByBuildCode 恢复 post(url,params) 并写明真实约束；新增 scripts/check-page-rows.mjs 挂进 npm run lint 作回归守卫；docs/frontend/common-errors.md 的 E-040 已订正。验证：npm run build 通过且产物含 pageRows-*...."
+            },
+            {
+                "uri": "viking://user/default/memories/events/2026/11/09/预售合同户室翻页修复未提交.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户在独立 worktree 苏州市房地产监测V3-wt-bug-6235-v3 / 分支 fix/bug-6235-house-pagination-v3 落地修复，但因用户确认卡片超时未提交、未推送、未回写禅道（截至 2026-11-09）。教训：本项目所有非白名单接口分页参数都会进加密 body，排查翻页失效先查后端是否真的分页。\n# 2026-11-09 (Monday) ChatLog:\n**user**: ...js，回归守卫通过，改动文件 eslint --quiet 零错误；npm run lint 全量基线本就 12509 条存量问题。未验证：无客测账号目视回归，本地 8098 站点当时被并行任务构建占用未覆盖。..."
+            },
+            {
+                "uri": "viking://user/default/memories/entities/禅道缺陷/zentao_bug_6235.md",
+                "memory_type": "entities",
+                "after": "# 禅道 Bug 6235\n苏州市房地产监测V3 / zhi2-web-admin 预售合同签订「新增合同」弹窗户室号翻页失效缺陷，真实根因为后端按楼幢一次返回全量户室并忽略 pageNum。\n\n## 根因\n- 接口 /presale/houseInfo/queryHousesByBuildCode 按楼幢一次返回全量户室、忽略 pageNum\n- 前端 unwrapPageResult 以 rows.length 兜底 total\n- zs-table 的 table-tr 只按 Math.min(tableTr,dataLength) 计算表格高度、不截断数据，翻页仅改变内部滚动位置\n- 11/6 结论「分页参数必须放 URL query、放 body 后端忽略」错误：request.js 第194–205行对非白名单接口执行 moveUrlQueryToBody，将 config.params 合并进 config.data 后 delete config.params\n- 该接口不在 src/config/security.js 白名单，request({params}) 与 post(url,data) 最终加密请求完全相同，11/6 改动为空操作\n\n## 修复\n- 新增 src/views/contract/utils/pageRows.js 的 paginateRows(rows,total,pageNum,pageSize)（rows.length>pageSize 判全量切片，否则原样返回，兼容后端已分页）\n- chooseHouseDialog.vue 新增 applyOriginPage() 统一楼幢/单元路径并清空跨页勾选\n- contractRequest.js 的 queryHousesByBuildCode 恢复 post(url,params) 并写明真实约束\n- 新增 scripts/check-page-rows.mjs 挂入 npm run lint 作回归守卫\n- docs/frontend/common-errors.md 的 E-040 已订正\n\n## 验证与状态\n- 验证：npm run build 通过且产物含 pageRows-*.js，回归守卫通过，改动文件 eslint --quiet 零错误；npm run lint 全量基线 12509 条存量问题\n- 未验证：无客测账号目视回归，本地 8098 站点被并行任务构建占用未覆盖\n- 落地：独立 worktree 苏州市房地产监测V3-wt-bug-6235-v3 / 分支 fix/bug-6235-house-pagination-v3\n- 因用户确认卡片超时，未提交、未推送、未回写禅道（截至 2026-11-09）\n- 2026-11-09 被 lichandan 第三次激活，均反馈「翻页后仍是显示的第一页内容」；此前 11/5、11/6 两次修复均无效"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/request_params_encrypt.md",
+                "memory_type": "entities",
+                "after": "# request.js 非白名单接口分页参数进加密 body\n苏州市房地产监测V3 / zhi2-web-admin 前端请求层对非白名单接口将 params 并入加密 body，翻页失效排查应先确认后端是否真分页。\n\n## 机制\n- src/utils/request.js 第194–205行对非白名单接口执行 moveUrlQueryToBody，将 config.params 合并进 config.data 后 delete config.params\n- 白名单在 src/config/security.js 维护；不在白名单内的接口 request({params}) 与 post(url,data) 最终发出的加密请求完全相同\n\n## 排查原则\n- 翻页失效不要把「params vs body」当根因\n- 应先查后端接口是否真的按 pageNum 分页，还是一次返回全量户室并忽略分页参数\n- 实例：禅道 bug 6235 的 queryHousesByBuildCode 因不在白名单，使 11/6 的「分页参数放 URL query」改动为空操作\n\n## 关联缺陷\n- 禅道 bug 6235（户室翻页失效）依此原则订正根因"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 6,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

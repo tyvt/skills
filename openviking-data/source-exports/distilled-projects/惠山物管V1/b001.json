@@ -1,0 +1,26 @@
+{
+  "project": "惠山物管V1",
+  "batch": "001",
+  "files": [
+    "001.md"
+  ],
+  "count": 1,
+  "memories": [
+    {
+      "title": "本地验证 Web 后台改动的闭环：构建 → 核对 dist 产物含新文案 → nginx-ui 新增站点(junction 指向 dist) → nginx -t → reload → 访问 127.0.0.1:8100 验证",
+      "type": "workflow",
+      "content": "【什么情况】改完 Web 后台页面后需要一个「本机就能打开、能证明改动生效」的验证环境，而不是只看代码或只看构建通过。\n【为什么】构建成功 ≠ 改动进了产物 ≠ 页面真的能访问。这条链上每一步都可能悄悄失败：产物没带上改动（改的是被 tree-shake 的分支/写错组件）、站点指到了旧目录（junction 没更新）、nginx 配置没 reload。所以「构建 → 部署 → 访问」必须每一步都有可观测证据。\n【怎么做】① **构建**：`npm install -f` + `npm run build`，产出 `dist`；② **核对产物**：直接在 `dist/assets/js/<组件名>.js` 里搜新文案（本例 `assets/js/TableBody.js` 含「请勿上传pdf，注意控制图片大小！」），搜不到就说明改动没进产物，别急着往下走；③ **建站**：通过本地 nginx-ui 站点目录新增站点，命名带端口与项目简称（本例 `site-8100-huishan-wuguan`），把站点登记进 nginx-ui 的 DB，并让站点根目录用 **junction 指向本项目的 `dist`**（junction 指向的好处：重新构建后不用改站点配置）；④ **重载**：先 `nginx -t` 通过再 reload；⑤ **验证**：访问 `http://127.0.0.1:8100/`，确认返回 200 且 index.html 字节数符合预期（本例 3972 字节）；⑥ 页面若需登录测试环境后端才能看到数据，要把这个前提写在交付说明里，别让对方以为功能没实现；⑦ 顺带把「两处需求截图其实复用同一个底层组件（AnnexContainer → TableBody）」这件事查清楚——复用时只改最深层共享组件一处即可同时覆盖两处截图，避免改两遍或漏改一处。",
+      "evidence": "会话 739dc114（基线 f15bf71，禅道任务 #2189「【无锡惠山维修资金】附件上传，增加提示语」）结论原文：「构建与部署 —— `npm install -f` + `npm run build` 成功，产出 `dist`；已确认打包产物 `assets/js/TableBody.js` 含该提示文案。—— 通过本地 nginx-ui 站点目录新增站点 `site-8100-huishan-wuguan`（登记进 nginx-ui DB，junction 指向本项目 `dist`），`nginx -t` 通过并 reload。—— 访问 http://127.0.0.1:8100/ 返回 200（index.html 3972 字节），已生效（页面内需登录测试环境后端方可看到附件数据）」；并说明「两个页面（step11 附件汇总 / AnnexDialog 附件及其他）都复用同一个 AnnexContainer → TableBody 组件，因此只改一处即可同时覆盖两张截图」。",
+      "files": [
+        "zhi1-web-admin/src/views/repairFunds/usage/fundUsageKs/components/AnnexContainer/components/TableBody.vue",
+        "zhi1-web-admin/src/views/repairFunds/usage/fundUsageKs/components/AnnexContainer/index.vue",
+        "zhi1-web-admin/src/views/repairFunds/usage/fundUsageKs/components/AnnexDialog/index.vue"
+      ],
+      "baseline": "f15bf71",
+      "sessionIds": [
+        "session-739dc114-7393-41fb-9a0f-18c4d8cab24a"
+      ],
+      "bundle": "001.md"
+    }
+  ]
+}

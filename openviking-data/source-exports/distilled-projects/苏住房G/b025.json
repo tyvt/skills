@@ -1,0 +1,171 @@
+{
+ "project": "苏住房G",
+ "batch": 25,
+ "files": [
+  "097.md",
+  "098.md",
+  "099.md",
+  "100.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "title": "Vue2 的 data 属性以 _ / $ 开头不会被代理到 this：mounted 里 this._xxx.forEach 报 Cannot read properties of undefined",
+   "type": "bug",
+   "content": "什么情况：物业管理区域页（RegionTreeLayout.vue，被 property/complex/index.vue 引用）一进页就报 [Vue warn] Error in mounted hook: TypeError: Cannot read properties of undefined (reading 'forEach')。\n\n为什么：Vue 2 出于内部命名空间保护，不会把 data() 里以 _ 或 $ 开头的属性代理到组件实例上。代码里定义了 _containerHeightTimers（以及 _listContainerEl、_syncContainerHeightHandler），模板/setup 之外的所有 this._containerHeightTimers 访问都得到 undefined，.forEach 立刻抛错。这类属性在 devtools 里看不到，也不会在 data 声明处报错，只有运行期首次访问才炸，所以极易误判成「容器 ref 没拿到」。\n\n怎么做：不要把计时器/监听器/剪贴板等实例级状态命名成 _ 或 $ 前缀，统一去掉前缀（containerHeightTimers / syncContainerHeightHandler / listContainerEl），并同步改 mounted、beforeDestroy（要 clearTimeout）与所有方法里的引用。若确实想避免，需要显式在 created 里 this.xxx = ... 赋值（绕过 data 代理）而不是放进 data。\n\n与已知清单 #1081（methods 用了 data() 未声明的状态）根因不同：#1081 是压根没声明，#1082 类这条是「声明了但因为下划线前缀被 Vue 跳过代理」，改法是去掉前缀而不是补声明。",
+   "evidence": "会话 9585b1b4：用户贴出 mounted hook 的 Cannot read properties of undefined (reading 'forEach') 堆栈，定位到 RegionTreeLayout.vue 的 _containerHeightTimers；改名为 containerHeightTimers 等三个属性后修复。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\complex\\components\\RegionTreeLayout.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\complex\\index.vue"
+   ],
+   "baseline": "2a3ef8a",
+   "sessionIds": [
+    "9585b1b4-8f7c-4b98-81e1-bf7e7b44659c"
+   ],
+   "bundle": "097.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "同一首页多套区域导航必须拆成独立 state：切关键数据区域只刷关键数据，benefit/repair/study 与待办固定不带 region",
+   "type": "pattern",
+   "content": "什么情况：首页 v2（views/home/index-v2.vue）有「关键数据」与「检查数据」两个区域 Tab，用户明确要求：默认都选中「全市」、两个导航可独立切换、不要共用；且公共收益 / 报事报修 / 学习园地这三个区块「接口不需要区域参数，切换区域时也不要调接口」。\n\n为什么：原先只有一个 regionCode，两套导航共用导致互相覆盖；同时 created 时会用 platformConfig.region 覆盖首页区域，导致一进页就选中某个区县而不是「全市」。三个社区类区块本身是全局维度数据，多传 region 既改变口径又白跑一次请求。\n\n怎么做：\n1) 拆成 keyRegionCode / checkRegionCode 两个 data，初值都给 ''（对应「全市」选项），并删掉 platformConfig.region 对首页区域的初始覆盖；\n2) 只有 loadKeyData（用 queryParams()）和 loadCheckData(checkRegionCode) 带区域，onKeyRegionChange 只调 loadKeyData；\n3) getBenefitData({})、getRepairData({})、getStudyList({ tab: this.studyTab }) 一律不传 region，切换区域不重新拉；\n4) 待办同理，getTaskCount({}) / loadTodoPanelList 按用户维度、不拼 queryParams()，从 onKeyRegionChange 里摘掉 loadTodoPanel()；\n5) Tab 组件判选中态用 String(a) === String(b)，避免编码是数字/字符串时「全市」不高亮。\n\n已知清单里没有「首页多导航区域解耦」这个约定，可复用性高：凡同屏两套筛选器都要按「各自 state + 各自 loader」拆，并默认停在「全市/全部」。",
+   "evidence": "三个连续会话（c67476bc / cf4b4d2c / 09f68d49）都围绕同一份 index-v2.vue 改动：拆分 keyRegionCode 与 checkRegionCode、去掉 platformConfig.region 覆盖、benefit/repair/study 改传 {}；09f68d49 的 review 确认 queryParams() 仅被 loadKeyData / loadCheckData 使用。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\index-v2.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\v2\\components\\RegionTabs.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\api\\portal\\home.js"
+   ],
+   "baseline": "15e201a",
+   "sessionIds": [
+    "c67476bc-3452-4236-a711-0e3a61e0d8f5",
+    "9ef34f8d-f17d-4b89-a24d-ebae3b536c87",
+    "09f68d49-e0e2-4532-a353-63216c15a186",
+    "cf4b4d2c-049e-4d16-94c2-d40c58652603"
+   ],
+   "bundle": "097.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "同页多个独立取数只给「按区域的主数据」加 fetchSeq 防竞态是半边工程：Tab 切换类列表同样要序号守卫",
+   "type": "pattern",
+   "content": "什么情况：index-v2.vue 里 loadKeyData / loadCheckData 已有 fetchSeq 丢弃过期响应的模式，但 loadBenefitData / loadRepairData / loadStudyList 没有。用户在「不要区域参数」的改造里指出这一点后，review 结论是合格但留了一条 MEDIUM：快速切学习园地 Tab 时，慢的旧请求可能覆盖新 Tab 结果。\n\n为什么：Vue2 页面里多个并发请求共用一个列表 state，响应到达顺序不等于发出顺序。区域切换类请求有人管（seq 递增 + 比对后丢弃），Tab 切换类请求同样存在「旧响应后到」的可能，尤其是首屏 loadAll() 与用户手动切 Tab 同时发生时。\n\n怎么做：凡是「同一 state + 用户可快速切换的筛选条件（Tab / 区域 / 搜索词）」产生的请求，都要走同一个 seq 守卫：发请求前 const seq = ++this.xxxSeq，回调里 if (seq !== this.xxxSeq) return; 再写 state。首屏只加载一次、之后不随交互重拉的（benefit / repair）可以放宽，但要在代码注释里写明「只在 created 加载一次，故不加 seq」，避免下一个人误判成漏写。\n\n已知清单 #450 讲的是「按字段值触发远端校验」的单字段场景，本条补充的是「同一页面多模块取数时 seq 守卫的覆盖边界与注释约定」，两者互补不重复。",
+   "evidence": "会话 09f68d49 的 review 明确指出 loadBenefitData / loadRepairData / loadStudyList（index-v2.vue:266-327）缺少与 loadKeyData/loadCheckData 一致的 fetchSeq，建议至少给 loadStudyList 补 seq 模式；用户侧需求本身也强调「切换区域时不要调这些接口」。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\index-v2.vue"
+   ],
+   "baseline": "15e201a",
+   "sessionIds": [
+    "09f68d49-e0e2-4532-a353-63216c15a186"
+   ],
+   "bundle": "097.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "同名统计字段跨接口兜底会静默覆盖主接口值：总户数被 oweHouseSum 顶掉，收缴率跟着算错",
+   "type": "bug",
+   "content": "什么情况：物业费申报详情页（property/feeDeclare2/detail.vue）detailCallback 先拿到详情接口的正确 totalHouseholds=3，随后又请求统计接口 queryOweFeeStatistic，用 `this.form.totalHouseholds = data.totalHouseholds ?? data.oweHouseSum ?? this.form.totalHouseholds` 二次赋值。统计接口没有 totalHouseholds、只有 oweHouseSum=2（欠费户数），于是「本次申报总户数」从 3 被改成 2，「户室收缴率」按 2/2 算成 100%，实际应为 66.67%。\n\n为什么：`??` 链把两个语义不同的字段（总户数 vs 欠费户数）当成同一字段的候选名合并，一旦前一个缺失就跨语义取值，而且写入的是同一个 form 键，前值被静默覆盖，页面不报错。\n\n怎么做：① 同一个 form 字段只允许同名兜底，禁止把「子集/分量」字段（欠费户数、已收金额）当作「总量」字段的 fallback；② 统计接口缺字段时保留详情接口原值，而不是回退到近似字段；③ 比率类指标（收缴率）优先直接用接口返回的 collectionRate，与资金收缴率、面积收缴率保持同一口径，不要在本地用分子/分母重算——本地重算会把上游的量纲错误放大成百分比错误。\n\n与已知 #1063（接口已返回的展示文案字段不能被前端派生函数无条件覆盖）的差异：那条是「派生计算覆盖展示文案」；本条是「A 接口缺字段时用 B 接口的异义字段兜底」，根因在同名字段跨接口混用，且错误是通过比率二次计算放大暴露的。",
+   "evidence": "会话 4da73cea（基线 5ccda28）：详情接口返回 totalHouseholds: 3，detailCallback 中 `/property/feeDeclare2/queryOweFeeStatistic` 返回 oweHouseSum: 2 后覆盖为 2，导致本次申报总户数显示 2、户室收缴率算成 100%（应 66.67%）；修复为 totalHouseholds 只取统计接口的同名字段、取不到则保留详情原值，收缴率改用接口 collectionRate。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\detail.vue"
+   ],
+   "baseline": "5ccda28",
+   "sessionIds": [
+    "4da73cea-1332-41ff-a953-da6a317d328b"
+   ],
+   "bundle": "098.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "只控制 el-tree 某一层级「隐藏展开图标」时，去掉图标的盒子会让该层文字左移一格",
+   "type": "pattern",
+   "content": "场景：左侧行政区划树（如 `views/system/regionBankAuth` 的 `.type-left-tree`）要求「街道节点再往右缩进一格」。原因是街道是最末级、没有子节点，模板里用 `display: none` 把 `.el-tree-node__expand-icon` 整块去掉，Element el-tree 的层级缩进正是靠这个图标盒子占位，去掉后该层文字直接左移，末级与上级在视觉上变成同一缩进，层级感消失。\n\n正确做法是保留占位、只隐藏图标内容：对该层级的 `.el-tree-node__content > .el-tree-node__expand-icon` 写 `display: inline-block !important; visibility: hidden !important;`，宽度仍由图标盒子提供，文字自然比区级多缩进一格，不需要再补 padding（补 `padding-left` 会把箭头列一起挤歪，只在实测仍不够时才加）。\n\n排查口径：遇到 el-tree「某一层对齐/缩进不对」，先确认该层节点是否真的没有 children；末级节点才需要这条「visibility 代替 display」的处理，带子节点的层正常用 display:none 不会错位。",
+   "evidence": "会话 042a2ba8（baseline 864b409）：用户「这个可以往右缩进一格吗」；结论指出原因是街道为最末级、用 display:none 隐藏展开箭头后「箭头占位被去掉，文字会向左靠，层级不明显」，改为保留箭头占位、仅隐藏图标（display:inline-block + visibility:hidden）。",
+   "files": [
+    "zhi2-web-admin/src/views/system/regionBankAuth/index.vue"
+   ],
+   "baseline": "864b409",
+   "sessionIds": [
+    "042a2ba8-8758-4813-bbd4-08a792c81b3c"
+   ],
+   "bundle": "099.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "字典配置不可靠的「启用状态/单据状态」列：字典列 + 遗留自定义插槽会静默覆盖字典渲染",
+   "type": "bug",
+   "content": "场景：`views/system/regionBankAuth/index.vue` 要求把「启用状态」列改成字典 `is_enable`（与下方「单据状态」列的 `biz_state` 写法一致）。改法是把列配置改成 `{ type: 'dict', label: '启用状态', prop: 'enableStatus', dictUrl: 'is_enable' }`——这是版本基线 864b409 时代的成功路径，不适用 later 版本（那版字典列还要求显式 `:options` 与 dict-url 三件套；但本机苏住房G 后端字典只下发 `is_enable`/`biz_state`，前端拿不到 options 时，不要按 later 版本的口径强加 options，改为先在页面把真实值映射好再交给列）。\n\n真正容易被漏掉的是覆盖：模板里原有的 `prop=\"enableStatus\"` 自定义插槽（区级显示开关、其他层级显示「可用/不可用」）优先级高于字典默认渲染，只改列配置界面上看起来毫无变化。所以要改字典化时必须同步决定插槽去留：要么删掉/收窄插槽，要么只在插槽内部用 `dictUrl` 的 `getDictLabel` 兜底，不能两套渲染并存。\n\n验收：改完后检查每一层级（区/街道）的值是否都由字典渲染，出现「部分行是中文、部分行是开关」即为插槽残留。",
+   "evidence": "会话 14522f3a（baseline 864b409）：用户「@regionBankAuth/index.vue:139 改为字典,is_enable」；结论改为 `{ type:'dict', dictUrl:'is_enable' }` 并明确提示「模板第 34–43 行仍有 enableStatus 的自定义插槽，会覆盖字典默认渲染」。",
+   "files": [
+    "zhi2-web-admin/src/views/system/regionBankAuth/index.vue"
+   ],
+   "baseline": "864b409",
+   "sessionIds": [
+    "14522f3a-416f-4f4d-a0c3-855236d61188"
+   ],
+   "bundle": "099.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "「预设下拉 + 手工输入」组件里给特殊项（其他）写自动切换逻辑，会让该选项无法被选中",
+   "type": "bug",
+   "content": "场景：`components/AccountFreezeFields/AccountFreezeFields.vue` 的冻结原因下拉，用户反馈「其他选择不了，点击其他直接变成手动输入框」。根因在选中回调 `onFreezeReasonSelect`：对 `val === '其他'` 做了特殊处理——立刻 `showManualInput = true` 并 `$emit('update:freezeReason', undefined)` 清空已选值，于是「其他」永远存不进去、下拉值被清空、界面直接跳到输入态。\n\n解法是把「选项」与「录入方式」彻底解耦：「其他」与「管理员手动冻结」等预设项一样只是一条普通选项，选中即写入表单值；只有用户显式点击右侧「手工输入」按钮才切到文本框。同一个组件历史上有过反向需求（用户曾要求去掉 `allow-create`/`filterable` 只留预设三项），说明这里的正确设计是「预设项不再做语义特判」，任何特判都会制造出「点了没反应/变成了别的控件」的观感。\n\n排查口径：遇到「下拉点某项后控件形态突变」，先搜该组件里有没有基于选中值的 setState（`showManualInput` 之类的旁路状态），而不是先怀疑 zs-select 的受控更新。",
+   "evidence": "会话 d80e5a47（baseline 805ea8c）：用户「这个其他选择不了，点击其他直接变成了手动输入框」；结论指出 onFreezeReasonSelect 对「其他」做了特殊处理并清空值，修复方式是去掉这段逻辑，「其他」作为下拉预设选项正常选中，只在点击右侧「手工输入」时才切换到文本输入框。",
+   "files": [
+    "zhi2-web-admin/src/components/AccountFreezeFields/AccountFreezeFields.vue",
+    "zhi2-web-admin/src/utils/accountFreeze.js"
+   ],
+   "baseline": "805ea8c",
+   "sessionIds": [
+    "d80e5a47-d726-4c05-bb4a-d5ce5d209b4b"
+   ],
+   "bundle": "099.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "必填提示文案必须与表单项 label 完全一致：「就职日期」vs「入职日期」这类近义词会让用户以为校验对错了字段",
+   "type": "pattern",
+   "content": "场景：物业管家新增表单，employmentDate 的必填提示写成「就职日期不能为空」，而表单项标签是「入职日期」，用户要求提示改成「入职日期不能为空」。\n\n约定：rules 里的 `message` 不是自由文案，必须是该字段 label 的**逐字复用**。落地写发是在 `views/property/propertyManager/detail.vue` 的 data 里按 label 原样填：\n```\nemploymentDate: [{ required: true, message: '入职日期不能为空', trigger: ['blur'] }]\n```\n\n防止复发：同一业务域里「就职/入职」「缴款/缴纳」「备案/登记」这类近义词对很多，新增字段时先按 label 文案复制粘贴再改字段名；改字段中文名时必须同步改 rules 的 message（与全链路同步清单里的「校验提示」同一类改动），否则会出现「字段已改名、提示还是旧名」的残留。\n\n本条的判断标准与通用改动不同：不需要动校验逻辑、不需要动 trigger，只要求文案与 label 同源。",
+   "evidence": "会话 a4130aa3（baseline 805ea8c）：用户「物业管家，新增，必填提示能显示为『入职日期不能为空』」；结论指出 employmentDate 的 message 写成「就职日期不能为空」与表单项标签「入职日期」不一致，已改为「入职日期不能为空」。",
+   "files": [
+    "zhi2-web-admin/src/views/property/propertyManager/detail.vue"
+   ],
+   "baseline": "805ea8c",
+   "sessionIds": [
+    "a4130aa3-2533-4320-b64f-86af85ae97c6"
+   ],
+   "bundle": "099.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "首页区域 Tab 的展示顺序要落在「兜底清单 + 接口结果排序」两处，否则后端返回什么顺序就显示什么顺序",
+   "type": "bug",
+   "content": "场景：`views/home/index-v2.vue` 的区域 Tab，用户要求顺序改为 张家港→常熟→太仓→昆山→吴江→吴中→相城→姑苏→园区→新区。\n\n关键点在于同一个顺序有两个消费方：`DEFAULT_REGIONS`（无平台配置时的兜底，改的是文案与数组顺序，区划代码不变）和 `initRegion()`（从 `platformConfig.regions` 拉列表）。后者如果用接口原顺序渲染，后端调整顺序或返回无序时界面就跟着变，所以必须在 `initRegion()` 里用同一套区划代码序列对接口结果排序。`regionOptions` 被关键数据与检查数据两条区域条共用，改一处两处同步生效。\n\n注意与同源历史改动的边界：该页此前有过「不要写死、改走 /system/region/list 动态行政区划」的改造，动态取数后「前端固定排序」是新增的一层，不要顺手把接口取数改回硬编码数组；反过来，只改 DEFAULT_REGIONS 而不给接口结果排序，线上仍然不会按新顺序。",
+   "evidence": "会话 c09eef71（baseline 15e201a）：用户「首页的区域顺序，改为：张家港、常熟、太仓、昆山、吴江、吴中、相城、姑苏、园区、新区」；结论为 DEFAULT_REGIONS 与 initRegion 两处同步，「用同一套区划代码顺序排序，避免后端返回顺序不一致」，regionOptions 供关键/检查数据共用。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-v2.vue",
+    "zhi2-web-admin/src/views/home/v2/components/RegionTabs.vue"
+   ],
+   "baseline": "15e201a",
+   "sessionIds": [
+    "c09eef71-ed5e-4ee0-afac-90e1a65e8696"
+   ],
+   "bundle": "099.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "柱线混合趋势图自算 Y 轴刻度：Math.max(0, ...数组) 遇到 null 立刻整轴 NaN",
+   "type": "bug",
+   "content": "场景：首页 `RepairPanel.vue` 的趋势图新增 `buildTrendYScale(maxVal)`（先定步长、再 `max = ceil(maxVal/interval)*interval`、固定 `min: 0`），并在 `trendOption` 里用 `Math.max(0, ...bar, ...doneLine, ...undoneLine)` 驱动刻度。\n\n根因：spread 进 `Math.max` 后只要有一个 `null`/`undefined`/非数字，结果就是 `NaN`；一旦 NaN 传进显式写了 `min`/`max`/`interval` 的 yAxis，整条轴（刻度、网格线、柱子高度）一起失效。而显式 min/max 恰恰让这个问题从「偶发脏点」变成「整图崩」，因为之前 ECharts 还能自己忽略非法值。接口或映射偶发空值、非法数值时必现。\n\n解法：先过滤再取最大值——`reduce` 里对 `Number(v)` 做 `Number.isFinite` 判断，或 `[...].map(Number).filter(Number.isFinite)` 后再 `Math.max(0, ...)`；同时保留 `maxVal <= 0` 时回落到 `0–10 / interval 2` 的兜底，避免全零数据时 max===min。\n\n另两点：`grid.left: 8` 很紧，全靠 `containLabel: true` 撑出标签区，五位数金额或字体放大时左侧仍可能被裁，改完要在目标分辨率下截图确认。`buildTrendYScale` 放在 `<script>` 模块顶层、在 `computed.trendOption` 里调用是对的，不要挪进 data。",
+   "evidence": "会话 2caad9cb（baseline 9e5c499）：审查 RepairPanel.vue 的 buildTrendYScale / grid.left 8 / yAxis min/margin 改动；判出两条 MEDIUM——`Math.max(0, ...bar, ...doneLine, ...undoneLine)` 在含 null/非数字时得到 NaN 导致整轴失效，以及 grid.left:8 依赖 containLabel、大数值仍可能裁切；并确认 maxVal<=0 回落 0–10 / interval 2 的兜底合理。",
+   "files": [
+    "zhi2-web-admin/src/views/home/v2/components/RepairPanel.vue"
+   ],
+   "baseline": "9e5c499",
+   "sessionIds": [
+    "2caad9cb-0616-4022-a3ba-01eadd581393"
+   ],
+   "bundle": "099.md",
+   "project": "苏住房G"
+  }
+ ]
+}

@@ -1,0 +1,390 @@
+{
+ "batch": 11,
+ "files": [
+  "069.md",
+  "070.md",
+  "071.md",
+  "072.md",
+  "073.md",
+  "074.md"
+ ],
+ "count": 23,
+ "memories": [
+  {
+   "title": "[苏房] 请求拦截器把路径末段当 REST 动作：/presale/permit/cancel/page 被改写成 /presale/permit/cancel 导致 400",
+   "type": "bug",
+   "content": "什么情况：V3 后台某些列表页请求 400、列表空白，而同类页面正常。为什么：问题不在页面拼的地址。apiV3Normalize.js 的 normalizeTrailingPathParams 会把路径倒数第二段当 REST 动作、末段当 id 移进请求体，于是 listMixins 拼出的 `POST /presale/permit/cancel/page` 被改写成 `/presale/permit/cancel` + body{id:'page'}，后端返回 400。permit/extend 不受影响，只因 extend 不在 REST_ACTIONS 名单里，只有 cancel 这类动作词命中，所以第一眼很容易误判成列表页 moduleName/apiMethod 拼错或权限问题。怎么做：在 normalizeTrailingPathParams 里加两道判断——末段已是标准动作（page/detail/list/save 等）时直接返回不清洗；「参数段」本身是 REST 动作名时不按路径参数处理。改完要回归两类 URL：`/presale/permit/cancel/page` 保持原样，`/flowable/process/cancel/12345` 仍规范成 cancel + id。排查此类问题先打印拦截器改写后的真实请求 URL，而不是页面里写的字面量。",
+   "evidence": "会话 f82e7cc4：用户指出「这个接口少了/page@zhi2-web-admin/src/views/presale/permitCancel/index.vue」；定位结论「index.vue 里通过 listMixins 拼出的地址本来就是对的：POST /presale/permit/cancel/page。真正的问题在 apiV3Normalize.js：请求拦截器会把 cancel 当成 REST 动作，把末尾的 page 当成 id 移进 body」；修复后「/presale/permit/cancel/page → 保持不变，/flowable/process/cancel/12345 → 仍会正确规范为 cancel + id」。",
+   "files": [
+    "zhi2-web-admin/src/utils/apiV3Normalize.js",
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/views/presale/permitCancel/index.vue",
+    "zhi2-web-admin/src/views/presale/permitExtend/index.vue"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "f82e7cc4-5b9a-49e7-9c22-7583b0a8d615"
+   ],
+   "bundle": "069.md"
+  },
+  {
+   "title": "[苏房] 详情页片区/区域下拉无值：api 模块引错 + 缺分页参数 + 响应字段不匹配三件事",
+   "type": "bug",
+   "content": "什么情况：监管标准等详情页「所属区域」下拉点开为空，而列表页同字段能正常显示。为什么：三个原因叠加。① detail.vue 引的是 `@/api/zone/zone.js`，而列表页 index.vue 与全站统一用 `@/api/system/zone`，两套封装方法/路径不同；② listZone 调用没传分页参数，这类 page 型接口在缺 pageNum/pageSize 时直接返回空集合；③ 响应结构可能是 rows，也可能嵌在 data.records，只读一种就得到空数组。怎么做：先把 api 引用对齐列表页（统一 @/api/system/zone），再补 `{ pageSize: 9999, pageNum: 1 }` 一次取全量给下拉用，解析写成 `response.rows || response.data?.records || []`。验证时打开 DevTools 看 `system/zone/list` 请求体是否带分页参数、Response 里有没有数据；仍空就把 Response 贴出来再判字段。经验：详情页下拉无值应优先比对「列表页同字段」的 api 引用和请求参数，不要先怀疑字典编码或权限。",
+   "evidence": "会话 ff916423：用户给截图说「用的就是片区，现在下拉没有值」；最终结论「@/api/zone/zone.js → @/api/system/zone（与列表页 index.vue 一致）；为 listZone 补充分页参数 { pageSize: 9999, pageNum: 1 }；增强响应解析 response.rows || response.data?.records || []」，并提示在 DevTools 中确认请求体包含 pageSize/pageNum。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/agreement/version/detail.vue",
+    "zhi2-web-admin/src/api/system/zone.js",
+    "zhi2-web-admin/src/api/zone/zone.js",
+    "zhi2-web-admin/src/views/property/propertyAccount/detail.vue",
+    "zhi2-web-admin/src/views/presale/entrustSale/detail.vue"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "ff916423-d72a-4b4e-b8d0-925acbfa29d1"
+   ],
+   "bundle": "069.md"
+  },
+  {
+   "title": "[苏房] 子步骤保存后要能立刻看到结果：保存接口必须回传展示态字段（PDF 地址）并用 sessionStorage 桥接",
+   "type": "bug",
+   "content": "什么情况：在预售申请页里保存「预售方案」后点查看，跳的是方案维护页而不是直接打开 PDF；只有整张申请保存过、再从详情接口进来才打开 PDF。为什么：PDF 地址 planDocSite 只由预售申请详情接口 detail 下发，申请页保存方案后并不会再调 detail，前端拿不到地址就退化到维护页。做法：让 `POST /presale/permit/plan/save` 直接返回 `{ presalePlanId, planDocSite }`，前端不要用通用的 `resolveResponseId(res, 'planId')` 取 id（读不到 presalePlanId），改用 extractPlanId 兼容 presalePlanId/planId；用 buildPlanPageResult 把结果写进 sessionStorage，进入页面时 applyPlanPageResult 合并到 form.plan / form.planUrl，点查看直接 `window.open(planDocSite)`。planDocSite 为 null（PDF 生成失败）时仍回退只读维护页，保存不受影响。E2E 同步补 extractPlanIdFromSaveResponse，别再从详情接口取方案 ID。通用经验：前端展示态若只依赖「详情接口」，凡是不经过详情页的保存链路都要让保存接口回传该字段，否则功能会静默降级。",
+   "evidence": "会话 77643a80：用户判断「pdf 文件地址是在预售申请详情接口 detail 带过来的，申请界面保存预售方案后不调 detail，退化到了进入维护界面，这里在保存预售方案接口里返回这个 pdf 地址能行吗？」；结论「plan/detail.vue 保存成功后用 extractPlanId(res.data) 解析 presalePlanId（原先 resolveResponseId(res,'planId') 读不到该字段）；新增 extractPlanIdFromSaveResponse；数据流 save → {presalePlanId, planDocSite} → sessionStorage → 点查看 window.open(planDocSite)」。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/plan/detail.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/detail.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/PermitPlanPanel.vue",
+    "zhi2-web-admin/src/views/presale/permit/permitConstants.js"
+   ],
+   "baseline": "1c445c7",
+   "sessionIds": [
+    "77643a80-744f-419d-abfc-21a4685e8d9f"
+   ],
+   "bundle": "069.md"
+  },
+  {
+   "title": "[苏房] el-tree 选中/高亮不生效：node-key 类型与 setCurrentKey 入参类型不一致",
+   "type": "bug",
+   "content": "什么情况：「选择房屋信息」弹窗左侧楼幢树用了 `highlight-current`，代码里也调了 setCurrentKey(buildingId)，但树节点始终不高亮、也不滚动到当前楼幢。为什么：el-tree 内部按 node-key 做严格类型匹配（===），后端返回的数字 id 与页面某处转换出的字符串 id 类型不同就匹配不到，方法调用不报错，只是静默失效。做法：在数据入口把 buildingId 统一归一化成字符串（默认选中值、树节点 key、点击回调三处用同一类型），再调 setCurrentKey。附带约定：这类「选择 XX」弹窗的左侧树不要自造卡片列表，直接对齐既有的 contractMainInfo/components/chooseHouseDialog.vue（新增合同）——顶部输入框走 append 插槽 + 蓝色搜索按钮、下方白底 `.tree-box` 包 el-tree 打开关键字过滤，左栏约 290px、灰底 #fafafa、圆角边框；数据仍用 findBuildingList / listByProjectId，点节点调原有 selectBuilding，保证两个入口交互一致。若要项目→楼幢→单元三级懒加载，需另外改接口与懒加载逻辑。",
+   "evidence": "会话 728ca04c：用户贴两张参考图要求「左侧树参考图2这个组件的UI」；结论记录「左侧结构：请输入关键字 + 右侧蓝色搜索按钮（append 插槽），下方白底 tree-box + el-tree，支持关键字过滤、highlight-current 高亮当前楼幢」「buildingId 统一为字符串，保证 setCurrentKey 高亮正常」「与 contractMainInfo/components/chooseHouseDialog.vue 的 .dialog-left / .tree-box 一致」。",
+   "files": [
+    "zhi2-web-admin/src/views/building/houseLimit/components/HouseSelectDialog.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/limitAdd.vue",
+    "zhi2-web-admin/src/views/contract/contractMainInfo/components/chooseHouseDialog.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "728ca04c-64fc-44d6-aea0-f348c97035ef"
+   ],
+   "bundle": "069.md"
+  },
+  {
+   "title": "[苏房] 同一要件面板同时承载「外部带出的只读要件 + 本单可上传要件」：靠 busCode 逐项判定可操作性，不要合并成一个可编辑列表",
+   "type": "pattern",
+   "content": "场景：预售转现售详情页要同时展示两类要件——预售许可证带出的 ysxksq 要件（只能看）和本单新配置的 yszxs 要件（要能上传/删除）。\n为什么：两类要件来自不同 busCode，若塞进同一个 AnnexUpload 列表，只读项也会出现删除/上传入口；若把多个 busCode 直接合并进一次配置请求，则会出现业务编码错乱与接口被重复调用（切换开关时调用次数翻倍）。\n怎么做：\n1) 拆出独立面板组件（CashsaleTransferAppendixPanel），选证后先用来源 busCode + 来源业务主键（ysxksq + presalePermitId）调一次 listAppendixPackage，映射成只读列表单独渲染；\n2) 再用 AnnexUpload 的 handleConfig 叠加本单 busCode 的附件配置，可操作性由 handleConfig/getOperableByBus 按 busCode 判定，只对本单编码放开上传/删除；\n3) 面板对外暴露 validateRequired()，只校验本单编码的必填项，来源只读要件不参与校验；\n4) 详情页按业务形态切换面板（直报现售用 permit-appendix-panel，转现售用 transfer 面板），并在选证完成/详情回填后主动触发面板重拉。\n该拆分方式适用于任何「沿用上游单据附件 + 本单补件」的链路。",
+   "evidence": "会话 b682e5d0：用户要求「这个要件应该是带出预售的，然后再拼接一个新的 yszxs 带出来的附件，预售带出来只能查看，新配置的这个要能上传删除」。最终实现新增 TRANSFER_APPENDIX_BUS_CODE='yszxs'、mapAppendixPackageList、CashsaleTransferAppendixPanel.vue，用 getOperableByBus 让 ysxksq 只读、yszxs 可上传删除，validateRequired() 仅校验 yszxs。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/cashsale/cashsaleConstants.js",
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleTransferAppendixPanel.vue",
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleDetail.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/index.vue"
+   ],
+   "baseline": "9dba655",
+   "sessionIds": [
+    "b682e5d0-7ff0-4125-961e-04c9a7ebb147"
+   ],
+   "bundle": "070.md"
+  },
+  {
+   "title": "[苏房] 新增态「先传附件后保存」：用临时附件分组 busId + 保存时传 applyAttachGroupId 由后端转挂",
+   "type": "pattern",
+   "content": "场景：转现售新增时业务主键还不存在，但用户必须先上传本单要件才能保存（附件区不能是空的或不可用）。\n为什么：附件上传接口必须带 busId，而新增态没有正式业务主键；如果直接不传 busId，AnnexUpload 在新增态会整体不渲染或上传失败。\n怎么做：\n1) 详情页维护一个 transferAppendixBusId：新增态用临时分组 id，编辑/已保存态直接用业务主键（cashsaleRecordId）；\n2) 面板把这个 id 作为 busId 传给 AnnexUpload，先落到临时分组；\n3) 保存时把该分组 id 作为 applyAttachGroupId 随表单提交，由后端（sourceType=2）把临时分组转挂到正式业务主键；编辑态已有主键则不传 applyAttachGroupId；\n4) E2E 要区分两种断言：新增保存请求体必须带 applyAttachGroupId，编辑保存必须不带，且选证后要先断言要件区已渲染再传文件。\n注意这是与「新增态不传 busId、走 attachmentList 随表单提交」并列的另一种解法：需要用户在保存前看到并操作已上传列表时选本方案。",
+   "evidence": "会话 b682e5d0 最终结论第 3、4 节：新增 transferAppendixBusId（新增用临时分组，已保存用 cashsaleRecordId），转现售保存传 applyAttachGroupId，保存前校验 yszxs 必填；E2E helper 新增「保存应传 applyAttachGroupId，编辑保存不传」断言。后端依赖：保存接口需支持 applyAttachGroupId（sourceType=2）。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleDetail.vue",
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleTransferAppendixPanel.vue",
+    "zhi2-web-admin/e2e/fixtures/cashsale-transfer-helpers.js",
+    "zhi2-web-admin/e2e/presale/cashsale-transfer-real-api-flow.spec.js"
+   ],
+   "baseline": "9dba655",
+   "sessionIds": [
+    "b682e5d0-7ff0-4125-961e-04c9a7ebb147"
+   ],
+   "bundle": "070.md"
+  },
+  {
+   "title": "[苏房] 路由主键是防伪码（UUID）时，附件/提交的 busId 必须由页面显式传业务主键，且详情返回前不得回退路由参数",
+   "type": "pattern",
+   "content": "场景：「合同网签备案比例变更」详情路由上带的是防伪码 antiCounterfeitingCode（UUID），而 OperationBtnGroup 内部统一用 getId() 从路由取 id 当附件 busId，导致 listAppendixPackage 的 busId 变成 UUID，查不到附件/提交失败。\n为什么：路由参数承担的是「可分享的对外标识」，不等于业务主键；附件、审批提交这类接口只认业务主键（specialContractId，如 2100487064662843393）。\n怎么做：\n1) 页面把业务主键显式传给操作栏：<OperationBtnGroup :id=\"form.specialContractId\">；\n2) OperationBtnGroup 新增 id prop，内部生成 attachmentBusId 并同时透传给 ZsSubmit 与附件抽屉里的 AnnexUpload，不要再各处各自调 getId()；\n3) 关键兜底：页面显式传了 id 时，在详情接口尚未返回、form.specialContractId 仍为空的那段时间**不要**回退到路由参数，宁可让请求延后，否则首屏仍会发出一次带 UUID 的错误请求；\n4) 列表跳转与详情查询继续使用防伪码，不受影响，不要顺手把路由参数也改成主键。\n验收方式：刷新详情页后在 Network 里确认 listAppendixPackage 的 body 为 {busCode, busId: 业务主键}。",
+   "evidence": "会话 00603096：用户截图指出 busId 取错成 UUID。结论为路由用 antiCounterfeitingCode、附件接口 busId 应传 specialContractId；修改 specialcontract/detail.vue 传 :id=\"form.specialContractId\"，OperationBtnGroup 增加 id prop 用 attachmentBusId，并在业务主键未返回前不再回退路由防伪码。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/specialcontract/detail.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue"
+   ],
+   "baseline": "5f4e161",
+   "sessionIds": [
+    "00603096-ce00-485a-bc85-12cd53fdaa6b"
+   ],
+   "bundle": "070.md"
+  },
+  {
+   "title": "[苏房] 多机构薄封装（zljg 复用 jjjg 内核页）：Provider 注入上下文必须被核心页消费，生成脚本目标路径与草稿 key 都要按机构维度校验",
+   "type": "pattern",
+   "content": "场景：租赁机构（zljg）复用经纪机构（jjjg）的一整套内核页，做法是 CompanyOrganProvider 注入 organType + companyOrganContext mixin + constants/companyOrgan.js 的 resolveOrganType / resolvedRegisterBusCode，wrapper 页由生成脚本产出。\n为什么容易翻车：这套「注入式」复用有四类静默失效——\n1) 生成脚本写死的 CorePage 目标文件在仓库里不存在（如 zljg 的 companyRecordAgency/detail.vue），访问该详情路由时构建/懒加载直接失败，且不会在列表页暴露；改造后必须逐个核对 wrapper 的 import 目标真实存在，并同步修脚本里的路径映射。\n2) 共用组件里 sessionStorage 草稿 key 是固定常量，未按 organType/routeBase 拆分，用户先在一侧暂存再到另一侧继续会误恢复另一业务线的表单内容。\n3) resolveOrganType 若「meta 优先、inject 兜底」，误配的 meta.organType 会覆盖 Provider 注入值且 inject 无法兜底，请求维度与菜单意图相反；需明确约定 zljg 不配冲突 meta，或让非空 inject 优先于 meta。\n4) 只包了 Provider 但核心页没 mixin 上下文，请求里根本没有 organType/busCode 维度，Provider 是空壳。\n回归基线：未包 Provider 且无 meta 时应落到 agency / 030100。",
+   "evidence": "会话 6d178bd5 的 review 结论：CRITICAL 为 zljg/companyRecordAgency/detail.vue 的 CorePage 指向不存在的文件（建议同时改 generate-zljg-wrappers.mjs）；HIGH 为 Step1BasicInfo 的 INSTITUTION_REGISTER_STEP_1_DRAFT 未区分 organType；HIGH 为 constants/companyOrgan.js 的 resolveOrganType 让 meta 优先于 inject；MEDIUM 为 companyScheme/brand 等薄封装未 mixin companyOrganContext；并确认 /jjjg 在无 Provider 无 meta 时回落 agency/030100。",
+   "files": [
+    "zhi2-web-admin/src/components/CompanyOrganProvider/index.vue",
+    "zhi2-web-admin/src/mixins/companyOrganContext.js",
+    "zhi2-web-admin/src/constants/companyOrgan.js",
+    "zhi2-web-admin/src/views/institutionRegister/components/Step1BasicInfo.vue",
+    "zhi2-web-admin/src/views/zljg/companyRecordAgency/detail.vue"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "6d178bd5-b019-4be9-bae5-40b926d20124"
+   ],
+   "bundle": "070.md"
+  },
+  {
+   "title": "zs-table-column 插槽必须写 #default=\"{ scope }\" 并用 scope.row，写 { row } 会 undefined",
+   "type": "bug",
+   "content": "情况：房屋选择弹窗（HouseSelectDialog）右侧房屋列表接口明明有数据却不出表，控制台报 TypeError: Cannot read properties of undefined (reading 'buildingNo')。根因：本项目自研 zs-table-column 的默认插槽只向外抛一个对象 { scope }，行数据挂在 scope.row 上，不会像 el-table-column 那样把 row 摊平；沿用 Element 习惯写 #default=\"{ row }\" 时 row 恒为 undefined，模板里 row.buildingNo 直接炸，整表渲染中断。做法：所有 zs-table-column 统一写 #default=\"{ scope }\"，字段一律 scope.row.xxx；从 Element 迁过来的列模板必须逐列改。排查口径：表格「有数据但空白 + 控制台读某字段 undefined」优先怀疑插槽解构而不是接口。同一弹窗里楼栋编号还有第二层坑：后端字段不固定，需在 normalizeBuilding 里做链式兜底 buildCode→buildingCode→buildingNo→buildNo，展示名优先 buildNo，并同步 currentBuildNo 供房屋行回写，否则左右两栏字段对不上。",
+   "evidence": "会话 09f6b31e：用户反馈「右边接口有数据，但是没展示出来，应该是页面报错了 vue.js:3732 TypeError: Cannot read properties of undefined (reading 'buildingNo')」；结论将楼幢号/建筑面积/房屋当前状态三列改为 #default=\"{ scope }\" 并用 scope.row，重新出表无报错。",
+   "files": [
+    "zhi2-web-admin/src/views/building/houseLimit/components/HouseSelectDialog.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/houseLimitConstants.js"
+   ],
+   "baseline": "ffce65c",
+   "sessionIds": [
+    "09f6b31e-b744-41e8-aa52-b2310e44a3a9"
+   ],
+   "bundle": "071.md"
+  },
+  {
+   "title": "列表行可编辑判断与详情头部可编辑判断必须共用同一判定函数，否则能进页不能提交",
+   "type": "pattern",
+   "content": "情况：企业管理员（companyAdmin）列表的 canEditRow 在 bizState === '2' 时仍返回 true，而详情页 canEditInHeader 对企业端非经纪且 adminType !== '0'（非法人）返回 false。结果列表能点进编辑页，头部按钮与业务规则却拦住提交，用户看到的是「能进不能交」。根因：同一条业务规则（谁能编辑）在列表与详情各写了一份。做法：抽出单一判定 canEditCompanyAdmin(row, { terminal, organType })，列表与详情共用，参数显式带终端身份与机构类型，不在各处自行补条件。同类分叉还有「保存后要件挂不上」：detail 的 handleSave 在 add 模式只调 addRequest 而没实现 addCallback，form.companyAdminId 永远为空，依赖 formMode==='edit' && companyAdminId 的要件区就不会出现，与「保存后可上传」文案矛盾；修法是 addCallback 里 msgSuccess + resolveResponseId 回填主键后再 getDetail。经验：审查这类页面先交叉比对「列表动作条件 / 详情头部条件 / 保存回调」，三处不一致必出隐形 bug。",
+   "evidence": "会话 84e68fff 代码审查，HIGH 项：「列表『编辑』与详情编辑权限不一致（开发企业 B 端已备案）」建议抽 canEditCompanyAdmin 共用；「新增保存后未回填主键，要件区无法挂载」指出缺 addCallback 导致 companyAdminId 不写入。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyAdmin/index.vue",
+    "zhi2-web-admin/src/views/company/companyAdmin/detail.vue",
+    "zhi2-web-admin/src/constants/companyOrgan.js"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "84e68fff-1b60-40d6-81fc-d6ccfb308eb4"
+   ],
+   "bundle": "071.md"
+  },
+  {
+   "title": "zs-tabs 统一改造的边界：登录页与右侧抽屉（attachmentDraw）保留 el-tabs 经典页签",
+   "type": "preference",
+   "content": "情况：项目在把页签统一到公共组件 zs-tabs，但用户截了预售许可详情右侧抽屉（OperationBtnGroup/attachmentDraw.vue，含制单信息 / 审核流程 / 附件信息）的下划线分段样式，要求「这个 tab 还原一下，不要用这个 UI」。做法：把该抽屉改回 Element 的 el-tabs / el-tab-pane 经典页签（底部分割线 + 主题色激活条），保留原有按 Tab 懒加载和抽屉宽度逻辑，并调整页签栏位置避免与右上角关闭按钮重叠。约定：zs-tabs 统一覆盖的是页面主体区域与详情子表；登录页 el-tabs 和右侧流程/附件抽屉属于明确例外，不要顺手一起改。操作要点：改前先确认用户说的是「页签样式」还是「整个面板」，并主动询问详情主区 zs-tabs 是否也要一起回退范围，不要擅自扩大；「还原」类需求只改点名的那个容器。",
+   "evidence": "会话 2798bd69 用户诉求「这个tab还原一下，不要用这个UI」，结论将右侧抽屉从 zs-tabs type=\"line\" 改回 el-tabs 经典页签，并说明若需详情主区域一起改需另行确认范围。",
+   "files": [
+    "zhi2-web-admin/src/components/OperationBtnGroup/attachmentDraw.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/detail.vue"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "2798bd69-b0de-4770-97b4-34e3b938a0da"
+   ],
+   "bundle": "071.md"
+  },
+  {
+   "title": "「所有页面按这个字段顺序」类需求收敛到共享 Panel 的 constants 构造器，一处改全局生效",
+   "type": "workflow",
+   "content": "情况：用户要求「预售许可里面的页面都按照这个字段顺序修改」，涉及申请、受理、初审、复审、公告、终审等共用同一详情面板的多个页面。做法：不逐页调 el-col，而是在 permitConstants.js 里新增顺序常量 PERMIT_BASIC_INFO_COL_LAYOUT 与构造器 buildPermitBasicInfoView，把查看态顺序一次性定义（证号→项目→批次→信用代码→企业→负责人/电话→区域/坐落→交付日期→预售面积→审批节点→备案时间→有效期→预售描述整行），PermitInfoPanel 的 infoView 直接调用；所有复用该 Panel 的详情页自动生效。要点：查看态与编辑态的 el-col 要分别对齐语义，不能只改一边；用户点名要删的字段（如查看态去掉「电子签状态」）只动查看态，顶部电子签按钮逻辑仍留在 detail.vue 不动。验证：至少各开一个查看页（如复审）和一个编辑页（如申请）核对布局，ESLint 只允许保留既有 warning。",
+   "evidence": "会话 60fa3b90 用户诉求「预售许可里面的页面都按照这个字段顺序修改」；结论在 permitConstants.js 新增 PERMIT_BASIC_INFO_COL_LAYOUT 与 buildPermitBasicInfoView，PermitInfoPanel 的 infoView 改为调用它，共用面板的各审批节点页自动生效。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/permitConstants.js",
+    "zhi2-web-admin/src/views/presale/permit/components/PermitInfoPanel.vue"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "60fa3b90-dec7-45e1-baf4-06d1b472e52e"
+   ],
+   "bundle": "071.md"
+  },
+  {
+   "baseline": "56db6f6",
+   "content": "什么情况：菜单管理这类树形表格把列设成 white-space: nowrap 后，深层子节点仍被挤到折行、长名称列明显偏窄。为什么：zs-table-column 的列宽布局审计只量了文字宽度，没把树形行的层级缩进和展开图标宽度算进去；而且懒加载/展开子节点是异步追加行，宽度不会自动重算。怎么做：布局审计里把「缩进(层级×缩进步长) + 展开图标 + 文案」一并计入内容宽度；页面监听 @expand-change，在子节点 load / getList 完成后主动调 requestColumnLayoutAudit + doLayout 重算。验收方式：刷新菜单管理页展开「从业人员备案申请」等深层节点，名称应单行显示且列宽随层级加深变宽。注意不要用改列宽固定值来绕过，否则子节点文案变长又会折行。",
+   "evidence": "会话 225fbccf：用户两次截图反馈「箭头错了」「不要换行，展开后重新调整列宽」，最终在 menu/index.vue 去掉各列换行改 nowrap，并在 @expand-change 后触发 requestColumnLayoutAudit + doLayout；zs-table-column.vue 的审计逻辑补上缩进+展开图标+文案的宽度。",
+   "files": [
+    "zhi2-web-admin/src/views/system/menu/index.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "sessionIds": [
+    "225fbccf-7f93-48f9-a8c5-0c24449b54fe"
+   ],
+   "title": "zs-table 树形表格列宽审计需计入缩进与展开图标，异步展开后必须重算",
+   "type": "bug",
+   "bundle": "072.md"
+  },
+  {
+   "baseline": "6b3ac5a",
+   "content": "什么情况：委托代售选楼后循环逐条 POST /presale/entrustSaleBuilding/add，某条返回非 200 时只 break 并弹错误，循环结束后仍无条件调用 msgSuccess('楼幢添加成功')，用户会同时看到错误和成功两条 Toast。为什么：逐条提交既没有 return 也没有成功标志位，外层把「循环跑完」当成「全部成功」；部分楼幢其实已入库，提示会让人误以为全部关联成功，与真实数据不一致。怎么做：批量逐条提交要么在失败分支直接 return（并提示已成功条数），要么维护 successCount / failedList，全部成功才弹成功，部分失败提示「成功 x 条、失败 y 条」并保留失败明细。审查任何循环逐个调接口的新增/关联逻辑时，先看循环外那句成功提示有没有被失败分支短路。",
+   "evidence": "会话 19988e31 的 diff 审查报告：EntrustBuildingTable.vue handleAddBuildings 第 166-173 行，失败分支只 break + 弹错，循环外仍 msgSuccess，被评为 high 级 LOGIC_BUG。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/entrustSale/components/EntrustBuildingTable.vue"
+   ],
+   "sessionIds": [
+    "19988e31-ee30-4377-bf1a-971fdfe9ef96"
+   ],
+   "title": "逐条 POST 的批量提交：循环 break 后仍无条件弹成功提示",
+   "type": "bug",
+   "bundle": "072.md"
+  },
+  {
+   "baseline": "6b3ac5a",
+   "content": "什么情况：委托代售选楼弹窗列展示的是 floorNumber（总层数），提交新增楼幢时把整个值写入 aboveGroundFloors 并把 undergroundFloors 固定为 0。为什么：本项目楼幢模型里总层数 = 地上层数 + 地下层数，列表页也是分「地上总层数 / 地下总层数」两列展示；SelectDialog 配置里 floorNumber 明确标注为总层数，直接搬进分项字段会让含地下层的楼幢层数被持久化成错误数据，且列表长期显示不符。怎么做：选楼回填时按口径拆分——后端只给总层数就只写总层数字段；要写地上/地下就必须让 detail 接口补上这两个字段分别赋值，禁止把合计值塞进其中一个分项、另一个填 0。做跨模块数据流（选楼 → 新增楼幢/房屋）时，先逐个核对层数、面积这类可加合字段的口径再映射。",
+   "evidence": "会话 19988e31 审查报告：EntrustBuildingTable.vue 第 161-162 行，entrustSaleConstants 中 SelectDialog 绑定 floorNumber 为「总层数」，而提交 payload 把它全算作 aboveGroundFloors、undergroundFloors 恒 0。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/entrustSale/components/EntrustBuildingTable.vue",
+    "zhi2-web-admin/src/views/presale/entrustSale/entrustSaleConstants.js"
+   ],
+   "sessionIds": [
+    "19988e31-ee30-4377-bf1a-971fdfe9ef96"
+   ],
+   "title": "选楼弹窗的 floorNumber 是「总层数」，不能直接写进 aboveGroundFloors",
+   "type": "bug",
+   "bundle": "072.md"
+  },
+  {
+   "baseline": "6b3ac5a",
+   "content": "什么情况：BuildingChangeDialog 改成表内选楼后，onOpen 只在 dialogForm 有值时才赋值，add 模式不把 form 重置为空态，只依赖关闭时的 resetFields。为什么：Element UI 的 resetFields 是恢复到「表单首次渲染时的初始值」，一旦曾用 Object.assign 把整行详情灌进 form，这个初始值并不等于空白新增态；于是先查看/编辑再点「新增」时，buildingNo、buildingId、changeNodeName 会残留并通过校验，用户没重新选楼也会带着旧 buildingId 调 addBuild，导致关联错误或重复。怎么做：onOpen 按模式分支，add 模式用工厂函数把 form 重建为初始空对象，同时清掉已选行、已选楼幢等派生状态，resetFields 只作兜底。凡是用 Object.assign 回填过详情的弹窗，都要单独验证「编辑后切新增」这一路径。",
+   "evidence": "会话 19988e31 审查报告：BuildingChangeDialog.vue 第 215-234 行，add 模式未初始化 form，仅依赖 onClose resetFields，被评为 high 级 LOGIC_BUG。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/progress/change/components/BuildingChangeDialog.vue"
+   ],
+   "sessionIds": [
+    "19988e31-ee30-4377-bf1a-971fdfe9ef96"
+   ],
+   "title": "弹窗新增态必须显式重置表单，只靠 onClose 的 resetFields 不可靠",
+   "type": "bug",
+   "bundle": "072.md"
+  },
+  {
+   "baseline": "85a6308",
+   "content": "什么情况：页面上给业务状态加了筛选，表格列用 type:'dict' + dictUrl（由 zs-table-column 在 created 里 syncDictOptions 自加载），筛选项用 type:'dict'（由 SearchFormDictSelect 自加载），同一页对 getDicts('biz_state') 请求了两次。为什么：两个组件各自独立取数，页面没有给共享数据源，字典一多请求数会成倍放大。怎么做：initDict 里拉一次写进 bizStateOptions，列传 :options、筛选用 select 类型共用同一份数据；确实不需要字典就删掉空的 initDict 桩（listMixins 用 this.initDict && this.initDict() 判空，留个空桩会让后来人以为漏加载字典）。另外 biz_state 是 building 级公共字典，常量 BIZ_STATE_DICT_TYPE 不应从 houseLimit 模块常量文件 import，要放到公共层；值是小写 'biz_state'，不是 presale 用的 'BIZ_STATE'。",
+   "evidence": "会话 7efb4ea3 的 Vue 代码审查：auxiliaryProject/index.vue 三条 MEDIUM——BIZ_STATE_DICT_TYPE 从 houseLimitConstants 引入造成语义耦合、列与筛选项同页两次 getDicts('biz_state')、initDict(){} 为空桩。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/auxiliaryProject/index.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/houseLimitConstants.js",
+    "zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "sessionIds": [
+    "7efb4ea3-5d7d-403c-8985-81365d9081cd"
+   ],
+   "title": "同一字典被「表格列 + 筛选项」各拉一次；字典类型常量不要跨模块 import",
+   "type": "bug",
+   "bundle": "072.md"
+  },
+  {
+   "baseline": "77f94ab",
+   "content": "什么情况：机构注销管理的「注销材料」原本用通用 FileUpload，要被换成机构模块统一的 AppendixPackageSection（AnnexUpload 要件网格，按要件配置分组 + 必传校验）。为什么：同一模块不同入口附件形态不一致会被验收打回，而且要求件上传必须参与必传校验。怎么做：按三态适配——新增无单据 ID 走 config-only 只传 busCode，上传回传 appendixId 列表随 attachmentList 提交，保存前做必传 + 「请上传注销材料」校验；编辑态 busId=单据 ID 即时挂接、attachmentList 原样保留；查看态用 requirement-grid 只读网格。busCode 优先取菜单 meta.busCode，缺失用模块常量兜底（如 COMPANY_CANCEL_APPENDIX_BUS_CODE='jgzx'），并确认后端 save 支持接收 appendixId 列表自动绑定 busId。旧数据 attachmentList 存的是文件 URL，要件接口无数据时要回退成旧文件列表 + 预览，避免历史单附件丢失。E2E 选择器同步改为 .appendix-requirement-grid、接口改 /file/appendix/upload。经纪/租赁（zljg）与开发企业注销共用同一核心页，改一处三入口全部生效。",
+   "evidence": "会话 c91195ed：用户两次贴图要求把注销材料上传组件换成机构其他模块用的要件组件，最终 companyCancel/detail.vue 换 AppendixPackageSection，新增 appendixId 随 attachmentList 提交、busCode 兜底 'jgzx'、旧 URL 数据回退展示，e2e 用例同步改选择器与上传接口。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyCancel/detail.vue",
+    "zhi2-web-admin/src/components/AppendixPackageSection/index.vue",
+    "zhi2-web-admin/src/api/company/companyCancel.js",
+    "zhi2-web-admin/e2e/company/developer-company-cancel-real-api-flow.spec.js"
+   ],
+   "sessionIds": [
+    "c91195ed-7ae8-483d-a56e-a2eb8c8b730b"
+   ],
+   "title": "通用 FileUpload 迁到要件组件 AppendixPackageSection：三态适配 + 旧数据 URL 回退",
+   "type": "pattern",
+   "bundle": "072.md"
+  },
+  {
+   "title": "区块「空态缺省图 + 操作按钮」条件互斥：未维护时应显示维护按钮，不要渲染缺省图",
+   "type": "pattern",
+   "content": "什么情况：预售方案这类「附属方案区块」被抽象成一个 Panel（PermitPlanPanel），内部同时管三件事——已维护内容、未维护时的空态缺省图（AppendixEmpty）、右上角操作按钮。现象是企业端在方案未维护时只看到「预售方案未维护」缺省图和一行说明，却没有任何可点的按钮，用户无法进入维护流程，只能反馈「这里不该是缺省图，应该给我维护按钮」。\n\n为什么：缺省图与按钮各自的显示条件没有对齐——缺省图条件是「未维护」，维护按钮条件是 operable===true，而 operable 来自「有数据/已维护」这类状态，于是未维护时两者恰好互补成「只有图、没有入口」的死角。本质是把「没有数据」直接等同于「展示空态」，忽略了空态往往正是需要操作入口的时刻。\n\n怎么做：1) 未维护时不再渲染 AppendixEmpty 缺省图，只保留说明文案；2) 抽出 showMaintainButton = 非只读 && (可编辑 || 尚未维护)，让「未维护」本身成为显示维护按钮的理由；3) 只读态由父级显式下发（detail.vue 传 planPanelReadonly，主管部门节点/查看态为 true），并且跳转方案页用的 canOperatePlan 必须与按钮显示规则同源，避免出现「按钮能点但跳转被拦」或反之。结果：企业端未维护时是「维护 + 查看」，主管部门永远是「查看」且无缺省图。",
+   "evidence": "会话 5c95c517：用户「这里预售方案不需要缺省图，没有维护应该要显示维护按钮」；结论指出 PermitPlanPanel 在未维护且 operable===false 时渲染 AppendixEmpty 而维护只在 operable===true 显示，改为新增 showMaintainButton + detail.vue 传 planPanelReadonly/canOperatePlan。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/components/PermitPlanPanel.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/detail.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementCard.vue"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "5c95c517-e8ad-4225-b0de-55c6271384c8"
+   ],
+   "bundle": "073.md"
+  },
+  {
+   "title": "提交接口地址从流程配置接口动态解析（resolveFlowSubmitApi + 常量兜底），不要前端硬编码",
+   "type": "pattern",
+   "content": "什么情况：企业基本信息详情（开发企业变更）、经纪机构变更这类「提交走审批流」的页面，保存/提交的 URL 被写死成 /company/companyRecordChange/submit 之类。一旦运维在工作流管理里给某个 busCode 配了不同的提交接口，页面仍然打旧地址，配置形同虚设，且同一份提交逻辑在开发企业、经纪机构两处各写一遍。\n\n为什么：busCode 与提交接口的绑定关系属于流程配置数据，天然是后端可配的；硬编码把可配置项冻结在代码里，配置层和调用层就脱钩了。\n\n怎么做：在 utils/flowApi.js 增加 resolveFlowSubmitApi(vm, busCode, fallbackApi)——按 busCode 调 /flowable/flowConfig/list，取 rows[0].submitApi；未配置、值为空、请求异常一律回退到传入的默认路径，保证「没配 = 行为与改造前完全一致」。把默认路径提成 api 层的导出常量（如 COMPANY_RECORD_CHANGE_SUBMIT_API / …_BY_LOGIN_API），提交函数增加可选 submitApi 参数，不传时保持旧行为，避免影响其他调用方。页面侧在 ensureFlowConfigured 通过后再解析并提交，busCode 走已有的 changeFlowBusCode（回退 qybgxq）与 AGENCY_CHANGE_FLOW_BUS_CODE。这样 e2e 里对提交 URL 的宽松匹配（/submit(ByLogin)?）也不受影响。",
+   "evidence": "会话 session_c496b8ea：用户「提交 /company/companyRecordChange/submit 应从配置接口读取，现在可能硬编码了」；改动 flowApi.js 新增 resolveFlowSubmitApi、companyRecord.js 提常量、toB/companyRecord/detail.vue 与 toB/agencyRecord/detail.vue 改为按 busCode 解析。",
+   "files": [
+    "zhi2-web-admin/src/utils/flowApi.js",
+    "zhi2-web-admin/src/api/company/companyRecord.js",
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue",
+    "zhi2-web-admin/src/views/toB/agencyRecord/detail.vue"
+   ],
+   "baseline": "114af19",
+   "sessionIds": [
+    "session_c496b8ea06a79d9cc65e71922c0fafc4"
+   ],
+   "bundle": "073.md"
+  },
+  {
+   "title": "Vue2 本地 data 与 mixin 的 computed 同名：computed property is already defined in data 警告与重命名解法",
+   "type": "pattern",
+   "content": "什么情况：机构入网信息变更详情/编辑页控制台报 [Vue warn]: The computed property \"regionOptions\" is already defined in data。页面的行政区域下拉因此拿不到字典数据或不稳定。\n\n为什么：detailMixins 引了 area mixin，area 里已经用 computed 提供 regionOptions（行政区划选项）。页面为了调 /system/dict 之类接口又在本页 data 里声明了同名 regionOptions，再在 initDict() 里赋值。Vue2 合并选项时 data 与 computed 同名是冲突的：computed 被 data 顶掉（或被警告后静默），赋值时序一变，模板/子组件拿到的就是空数组。同类高危名字还有各种字典数组（area/region/dict 系列），只要被 mixin 占用了就不能在本页 data 复名。\n\n怎么做：1) 先查 mixin 链（如 detailMixins → area.js）里已声明的 computed/data 名字，再决定本地字段名；2) 本地字典数组改名为 administrativeAreaOptions，data 声明、initDict() 赋值（含 catch 分支）、模板绑定三处一起改；3) 子组件 CompanyBasicInfoForm 的 prop 名保持 regionOptions 不动，父组件用 :region-options=\"administrativeAreaOptions\" 传值，避免扩散改动。修复此类警告一律用「改本地名」，不要用改 mixin 或加 $delete 绕过——否则其他消费方跟着变。",
+   "evidence": "会话 8173eb01：用户贴出 regionOptions 重复定义警告并要求修复；结论把 companyRecordAgency/change/detail.vue 与 toB/companyRecord/detail.vue 的本地 data 重命名为 administrativeAreaOptions，模板改为 :region-options 传值，子组件 prop 不变。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyRecordAgency/change/detail.vue",
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue",
+    "zhi2-web-admin/src/mixins/area.js",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "baseline": "d5cc617",
+   "sessionIds": [
+    "8173eb01-8b73-474d-a30a-4662d6fb521e"
+   ],
+   "bundle": "073.md"
+  },
+  {
+   "title": "楼幢号：展示层用 buildingNo，提交层保留 buildingCode，且要跨多文件同步替换",
+   "type": "pattern",
+   "content": "预售许可/现售备案的「楼幢号」原先直接展示 buildingCode（形如 B320571… 的系统编码），用户要看到的是业务楼幢号「4幢」。可复用结论：把「展示值」和「内部标识」分开——展示统一取 buildingNo，缺失回退 buildingCode，再兜底 '-'；而接口提交仍用 buildingCode，不动后端契约。难点是同名字段散落在很多文件里，只改一处会出现「弹窗已显示 4幢、子表还是编码」的不一致：需要一并覆盖 选择楼幢弹窗（列/展开区标题/房屋勾选文案）、楼幢表格列与删除确认文案、房屋明细表列、进度弹窗的下拉与附件标题与提示文案、constants 里的 flattenPresaleHouses / flattenCashsaleHouses 映射函数，以及详情页选完楼幢后本地补存的对象字段。做法是先 grep buildingCode 把所有出现点列全，逐个判定「这是展示还是提交」，只替换展示点，并让预售与现售两套模块同步对齐。",
+   "evidence": "会话 762f7645：用户诉求「楼幢号用 buildingNo」。最终结论列出了预售 6 个文件 + 现售 3 个文件的改动，展示统一 buildingNo || buildingCode || '-'，提交仍保留 buildingCode，并同步修改 permitConstants.js / cashsaleConstants.js 的 flatten 映射。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleSelectBuildingDialog.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleBuildingTable.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleHouseTable.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleProgressDialog.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/detail.vue",
+    "zhi2-web-admin/src/views/presale/permit/permitConstants.js",
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleSelectBuildingDialog.vue",
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleDetail.vue"
+   ],
+   "baseline": "5f4e161",
+   "sessionIds": [
+    "762f7645-68ac-43ea-9ab7-f47dca205482"
+   ],
+   "bundle": "074.md"
+  },
+  {
+   "title": "子表弹窗按 isViewMode 分流：查看用 DetailTemplate，编辑仍用 zs-form，表底统一 zs-pagination 统计",
+   "type": "pattern",
+   "content": "从业人员详情里的「资格证书」「从业履历」两个子表，原先点「查看」弹出的也是可编辑表单，且表格底部没有条数统计，与项目里其他子表（certificatesDialog、Step4ServiceScheme）观感不一致，用户要求「两个表格当中的详情都是这样改」。可复用套路：同一个子表弹窗组件内部按 isViewMode 分流——查看态渲染公共 DetailTemplate（蓝色标签只读表格样式），新增/编辑态仍走 zs-form，两套分支独立，表单校验与提交逻辑完全不动；同时表格底部统一挂 zs-pagination，只传 :total=\"innerList.length\" 并 :show-pagination=\"false\"，得到「共 N 条记录」的统计栏而不出现翻页器。这样既满足只读展示的一致性，又避免为查看单独再造一套只读组件。改这类需求时要把同一业务里成对的子表一起改掉，否则页面里两种弹窗风格并存，会被再提一次。",
+   "evidence": "会话 8da8f490：用户诉求「两个表格当中的详情都是这样修改，缺少分页器，查看用detail-template」。最终结论：AgencyPersonnelCertificateTable.vue 与 CareerList.vue 均加 <zs-pagination :total=\"innerList.length\" :show-pagination=\"false\" />，isViewMode 时用 DetailTemplate 展示，新增/编辑仍用 zs-form 且逻辑未改。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelCertificateTable.vue",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/CareerList.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/components/zs-pagination/zs-pagination.vue"
+   ],
+   "baseline": "9dba655",
+   "sessionIds": [
+    "8da8f490-e777-4451-8e6a-45c4e50cedd0"
+   ],
+   "bundle": "074.md"
+  }
+ ]
+}

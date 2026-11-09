@@ -1,0 +1,99 @@
+{
+ "project": "2-0",
+ "batch": "020",
+ "files": [
+  "020.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "[Vue warn]: Invalid prop: ",
+   "type": "preference",
+   "content": "已处理这个告警的根因：**`ElTableColumn` 的 `formatter` 只接受 Function，但你们有些动态列配置会把 `formatter` 以字符串（如 `\"amountFormatter\"`）传入**，从而触发 Vue 的 prop 类型校验告警。 ### 我做的修复 - **在 `ZsTableColumn` 内做兼容兜底**：如果接收到的 `formatter` 是字符串，就自动从 `@/formatters/index.js` 里取同名函数，再传给 `ElTableColumn`；并且**确保字符串 `formatter` 不会通过 `v-bind=\"attrs\"` 透传给 `ElTableColumn`**，彻底消除告警源。 - 修改文件：`zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue` - **顺手修正了一处明确的字符串用法**：把 `formatter: 'amountFormatter'` 改为函数引用 `this.formatters.amountFormatter`（避免继续产生“字符串 formatter”数据）。 - 修改文件：`zhi2-web-admin/src/views/building/plot/index.vue` 如果你这边在 **`Ma",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`@/formatters/index.js",
+    "修改文件：`zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "修改文件：`zhi2-web-admin/src/views/building/plot/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "667b9605-d636-4fd0-9033-f298688576f0"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "[Vue warn]: Failed to reso",
+   "type": "fact",
+   "content": "已修复：`/toB/companyInfo` 对应的 `src/views/toB/companyRecord/detail.vue` 里使用了 `<propertyContractTable>`，但**没有 import + components 注册**，所以运行时提示 `Failed to resolve component: propertyContractTable`。 我已在该文件中补上： - `import propertyContractTable from '@/views/company/companyManagement/components/propertyContractTable.vue'` - 在 `components` 中注册 `propertyContractTable` 你现在在页面刷新一下（Vite 已 HMR 更新 `detail.vue`），这条组件解析警告就会消失。 **Updating details for resolution** I'm noting that HMR updated detail.vue, so the warning should disappear upon refresh. I should also provide a final response in Chinese to ensure clarit",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`src/views/toB/companyRecord/detail.vue",
+    "'@/views/company/companyManagement/components/propertyContractTable.vue",
+    "`detail.vue",
+    "detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1dad72c5-73f0-43c2-8c13-cda8490370ba"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "error.ts:14 ElementPlusErr",
+   "type": "fact",
+   "content": "这个报错是 **Element Plus 的弃用告警**：`el-radio` / `el-radio-button` 里把 `label` 当“选中值”用的写法，**在 3.0 将废弃**，需要改成用 `value`。 你项目里典型写法（会触发告警）： - `<el-radio label=\"1\">是</el-radio>` - `<el-radio :label=\"dict.dictValue\">{{ dict.dictLabel }}</el-radio>` - `<el-radio-button label=\"table\">二维</el-radio-button>` - `<el-radio-button :label=\"item.id\">...</el-radio-button>` 应改为： - `<el-radio value=\"1\">是</el-radio>` - `<el-radio :value=\"dict.dictValue\">{{ dict.dictLabel }}</el-radio>` - `<el-radio-button value=\"table\">二维</el-radio-button>` - `<el-radio-button :value=\"item.id\">...</el-radio-button>` 我已经在你 `zhi2-web-admin",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`flowable/index.vue`、`system/menu/index.vue`、`system/paymentChannel/detail.vue`、`maintenance/facility/detail.vue",
+    "error.ts",
+    "https://element-plus.org/en-US/component/radio.html",
+    "(error.ts"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ed53b5d6-854c-4ba8-8358-b4d73be5bd8b"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Er",
+   "type": "bug",
+   "content": "## 原因说明 报错出在计算属性 `bizStateName` 和 `stateName` 里：`Array.prototype.find()` 找不到匹配项时会返回 `undefined`，代码却直接写了 `.dictLabel`，于是出现 **Cannot read properties of undefined (reading 'dictLabel')**。 常见触发情况包括： - `dictValue` 与 `form.bizState` / `form.depApplicationState` **类型不一致**（例如一个是字符串 `\"1\"`，一个是数字 `1`），严格相等 `===` 匹配不到。 - 后端新增了状态值，但字典数据里还没有对应项。 ## 修改说明 1. 先把 `find` 的结果赋给变量，再用 **可选链** `row?.dictLabel`，找不到匹配时安全返回 `undefined`，不再抛错。 2. 将比较改为 `==`，减少字符串/数字不一致导致的匹配失败（若你希望严格只认一种类型，可以改回 `===`，但务必保留对 `find` 结果为空的判断）。 ```373:386:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\maintenance\\depositNotice\\company\\compone",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "```373:386:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\maintenance\\depositNotice\\company\\components\\detail.vue",
+    "vue.js",
+    "D:/repository/园区物管2.0/zhi2-web-admin/src/views/maintenance/depositNotice/company/components/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4642db27-d773-418d-b3f6-c2109f85a0e4"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "[Vue warn]: Duplicate keys",
+   "type": "bug",
+   "content": "## 原因 `accountCancel/index.vue` 里表格列配置里有两列都写了 **`prop: 'acctypeName'`**（「业务账户分类名称」和「账户类型」），而 `ListTemplate.js` 里对列循环用的是 **`:key=\"column.prop\"`**，两列 key 相同，Vue 就会报 `Duplicate keys`。 ## 修改 在 `ListTemplate.js` 里把列的 key 改成 **`prop + label` 组合**，同一表格里一般同一 `prop` 会对应不同 `label`，这样就能区分这两列，又不影响 `v-bind=\"column\"` 传给 `zs-table-column` 的行为。 ```8:8:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\mixins\\ListTemplate.js <zs-table-column v-for=\"column in displayColumns\" :key=\"(column.prop || '') + '-' + (column.label || '')\" v-bind=\"column\" /> ``` 刷新页面后，这条警告应会消失。 **说明**：若以后出现「同一 `prop` 且同一 `label`」的两列，仍可能重复，那时需要给列配置",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`accountCancel/index.vue",
+    "`ListTemplate.js",
+    "```8:8:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\mixins\\ListTemplate.js",
+    "D:/repository/园区物管2.0/zhi2-web-admin/src/views/maintenance/accountCancel/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3c906608-3287-4fa5-8f92-5704230e2aad"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  }
+ ],
+ "_draft": true
+}

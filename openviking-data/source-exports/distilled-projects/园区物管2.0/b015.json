@@ -1,0 +1,216 @@
+{
+ "project": "园区物管2.0",
+ "batch": 15,
+ "files": [
+  "057.md",
+  "058.md",
+  "059.md",
+  "060.md"
+ ],
+ "count": 13,
+ "memories": [
+  {
+   "baseline": "园区物管2.0 @ 177bc3ce4..fc994977f（会话时间 2026-04~07）",
+   "content": "什么情况：数据沙箱/资产全景等 ECharts 页面，侧边栏展开/收起后图表不铺满容器、饼图不居中。为什么：侧边栏开合只是布局/CSS 变量变化，不触发 window 的 resize 事件，页面若只监听 window.resize，ECharts 仍按旧容器尺寸绘制。怎么做：与项目里 LineChart.vue、ComponentCharts.vue 的既有做法一致——mapGetters(['sidebar']) 后 watch 'sidebar.opened'，在回调里 $nextTick(() => setTimeout(() => this.handleResize(), 300))，等侧栏过渡动画大致完成再对全部实例 chart.resize()；动画偏慢可调到 350ms。这是本项目带侧栏大屏页处理容器宽度变化的既定套路，新增图表页应直接复用。",
+   "evidence": "会话 6e8fda3d：fundPanorama/index.vue 与 assetPanorama/index.vue 增加 watch sidebar.opened + $nextTick + setTimeout(handleResize,300)，明确说明 window resize 不触发、与首页图表 setTimeout(...,300) 节奏一致。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue",
+    "zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue",
+    "zhi2-web-admin/src/views/home/components/LineChart.vue"
+   ],
+   "sessionIds": [
+    "6e8fda3d-c999-4ae3-aeaf-20421ded45c3"
+   ],
+   "title": "侧边栏展开收起不会触发 window.resize，ECharts 必须 watch sidebar.opened 延时重绘",
+   "type": "pattern",
+   "bundle": "057.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "园区物管2.0 @ f00310232",
+   "content": "什么情况：腾讯地图 GL 组件创建 MultiPolygon/MultiMarker/MultiLabel 等图层时报「所传入参数并非 TMap.Map 的实例！」。为什么：TMap 内部对传入 map 做 instanceof TMap.Map 校验，而 map 实例写进了 Vue2 的 data()，被深度响应式化（递归 defineReactive）后原生类实例被改坏，instanceof 判定必然失败——这是 echarts 要 markRaw 的同类问题，但根因是「深度观测破坏原生类实例的 instanceof」，比单纯性能问题更致命。怎么做：地图实例不放 data()，改在 created() 里 this.map = null 挂到组件实例上（非响应式字段），并加注释说明原因；同理 TMap.MultiMarker 等图层实例也不能放进会被深度观测的 data 结构。顺带把容器从 id=getElementById 改为 ref 引用，避免多实例时取错 DOM。",
+   "evidence": "会话 65d1ff41：报错来自 TMap 图层构造的 instanceof TMap.Map 校验；修复为删除 data 中的 map、created 里 this.map=null 非响应式挂载 + ref=\"tmapRoot\" 替代 #map。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue"
+   ],
+   "sessionIds": [
+    "65d1ff41-2ab2-465d-a45a-6af439cdd397"
+   ],
+   "title": "TMap.Map 等原生类实例放进 data() 会被深度响应式改坏导致 instanceof 失败",
+   "type": "bug",
+   "bundle": "057.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "园区物管2.0 @ 6a4835a08",
+   "content": "什么情况：git commit 被 pre-commit 钩子拦下，ESLint import/no-unresolved 报错，但文件实际存在。为什么：ESLint 的 import 插件解析器不理解 Vite 的 ?raw 后缀导入（如 import svg from './apply.svg?raw'），会把「apply.svg?raw」整体当文件名去解析，必然找不到——不是文件缺失。怎么做：在该导入上一行加 eslint-disable-next-line import/no-unresolved 局部豁免，然后正常 git add 相关文件（含新资产本身）重新提交。这是 Vite 仓库接 ESLint import 校验的通用坑：所有 ?raw / ?url 等查询后缀导入都会触发，遇到同类 pre-commit 失败先怀疑后缀导入而非路径写错。",
+   "evidence": "会话 ef34d9ad：结论明确「pre-commit 里 ESLint 的 import/no-unresolved 无法解析 Vite 的 ?raw 导入」，解法为 eslint-disable-next-line 局部禁用并补 git add。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "sessionIds": [
+    "ef34d9ad-7535-4fd3-a353-b17efa7397bf"
+   ],
+   "title": "Vite 的 ?raw 导入会被 ESLint import/no-unresolved 拦下 pre-commit",
+   "type": "bug",
+   "bundle": "057.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "园区物管2.0 @ 49e7729ce",
+   "content": "什么情况：pre-commit ESLint 报 no-duplicate-vue-options（duplicate-attributes）规则。为什么：Vue 组件 methods 里同名方法定义两次不会报运行时错误，后一个定义静默覆盖前一个——两个页面各写了两遍 getQueryParams，合并改动时第二处只补了 parentDeptId，第一处的业务参数逻辑（applyType/contractTypes 等）实际早已被覆盖，属于静默丢逻辑。怎么做：把两段逻辑合并成一个方法（保留业务参数 + 在同一方法里补 $store.state.user.currentProjectId），删掉重复定义后 eslint --fix。预防：项目已有 no-duplicate-vue-options 规则兜底，提交被拦时按「后定义覆盖前定义」理解报错，合并逻辑而不是简单删一份。",
+   "evidence": "会话 38ac27d7：assetLeaseApply 与 resourcesLeaseContractFiling 两页 methods 里各两次定义 getQueryParams，触发 no-duplicate-vue-options；解法为合并为一个方法并补 parentDeptId。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/index.vue",
+    "zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/index.vue"
+   ],
+   "sessionIds": [
+    "38ac27d7-c45f-4497-b949-64781b2d3118"
+   ],
+   "title": "Vue 选项重复定义（同名 methods 两处）静默覆盖，靠 no-duplicate-vue-options 门禁拦截",
+   "type": "bug",
+   "bundle": "057.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "园区物管2.0 @ 7814a0c2a",
+   "content": "什么情况：后台需要支持每个项目/平台的主题色不同，主色不能写死。为什么：主题色不是前端常量，而是平台配置接口（getPlatformConfig）下发的，页面加载时机晚于样式初始化，必须在拿到配置后动态生成 CSS 变量。怎么做：约定链路是 store/modules/app.js 的 getPlatformConfig 拿到 res.data 后，先 commit('SET_PLATFORM_CONFIG')，再读 platformConfig.buttonDefaultColor，有值则调用 utils 的 changeThemeColor(primaryColor) 动态设置 --primary-color 及其浅/深衍生变量；必须做空值保护，接口未返回主题色时不能报错。后续 buttonWarningColor/buttonTextColor 等也按同一模式接入对应 CSS 变量。新增主题相关样式一律消费这些 CSS 变量，不写死色值。",
+   "evidence": "会话 5a11ca4b：app.js getPlatformConfig 中接入 changeThemeColor，按 buttonDefaultColor 动态设置 --primary-color 及浅/深变量并做空值保护。",
+   "files": [
+    "zhi2-web-admin/src/store/modules/app.js",
+    "zhi2-web-admin/src/api/index.js"
+   ],
+   "sessionIds": [
+    "5a11ca4b-0f0d-4cb0-b4f1-e9e574a65811"
+   ],
+   "title": "平台配置接口下发主题色：getPlatformConfig 后调 changeThemeColor 动态生成 CSS 变量",
+   "type": "pattern",
+   "bundle": "057.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7814a0c2a…f00310232（园区物管2.0 zhi2-web-admin）",
+   "content": "什么情况：在 ECharts 的 finished 事件回调里同步调用 chart.setOption（典型场景：渲染完成后用 graphic 定位左右 Y 轴的「单位：份/万元」文案），控制台持续告警 `[ECharts] setOption should not be called during main process`，且存在 finished→setOption→finished 的自激循环风险。为什么：setOption 在 finished 触发时仍处于主渲染流程内，ECharts 禁止在渲染流程中再次触发渲染；不防护时每次 finished 都会重复 setOption。怎么做：1) 用 requestAnimationFrame 把 finished 里的 setOption 推迟到下一帧，脱离主渲染流程；2) 缓存上次定位结果（如 lastTrendUnitPos），位置未变化时直接跳过 setOption，切断循环；3) 仅更新 graphic 时给 setOption 加 `{ replaceMerge: ['graphic'] }`，让合并语义明确、避免残留。这是 Web 端 ECharts 中通用套路，与小程序端的 2d 同层渲染问题相互独立。",
+   "evidence": "会话 94419466（fundPanorama/index.vue）：根因为 renderFundTrendMixed 在 finished 事件里同步 setOption（约 767 行）；修复为 rAF 推迟 + lastTrendUnitPos 缓存 + replaceMerge:['graphic']，刷新后告警消失且单位对齐逻辑不变。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "sessionIds": [
+    "94419466-19b6-4c9f-a1f3-1926eccfdd49"
+   ],
+   "title": "ECharts finished 事件里同步 setOption 报主流程告警：rAF 推迟 + 位置缓存 + replaceMerge",
+   "type": "pattern",
+   "bundle": "058.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "177bc3ce4",
+   "content": "什么情况：页面并发发出多个请求，后端异常或 token 过期时，每个失败请求的响应拦截器都各自弹一遍错误提示/登录过期弹窗，页面瞬间叠出多个 Message 弹窗。为什么：request.js 的响应拦截器是每请求独立执行，弹窗动作没有共享状态。怎么做：在 utils/request.js 里加模块级标志位（如 isMessageDialogOpen），业务错误（code != 200）、网络/超时异常、401 登录过期共用同一个标志位——并发失败时只有最先触发的那条弹窗，其余静默；用户关闭弹窗后标志位重置，之后单独失败的请求仍能正常提示。注意各请求的 Promise.reject 逻辑保持不变，业务侧 .catch 照常执行，noMessage: true 的请求依旧不弹。",
+   "evidence": "会话 d6766dd1：用户要求修复多接口同时报错时弹窗叠加；最终在 request.js 响应拦截器加 showErrorDialog/showAuthDialog + isMessageDialogOpen 标志位，401 与其他错误共用标志位。",
+   "files": [
+    "zhi2-web-admin/src/utils/request.js"
+   ],
+   "sessionIds": [
+    "822d60cc-da58-4db7-aca0-ca17f03131f2"
+   ],
+   "title": "响应拦截器并发失败弹窗去重：模块级标志位只弹第一个错误",
+   "type": "pattern",
+   "bundle": "059.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7814a0c2a",
+   "content": "什么情况：详情弹窗里「标签+值」的键值格中，值容器用 <span> 包 <dict-tag>，页面出现日期竖排逐字换行、右侧列被挤成极窄一条。为什么：dict-tag 组件根节点是 <div>，块级元素放进 <span> 是非法嵌套，浏览器解析时自动拆标签、重排 DOM，后面的 flex「标签+值」不再成对；再叠加 word-break: break-all，短字符串也会被任意位置拆碎。怎么做：值容器改用 <div>；网格列写 minmax(0, 1fr) 防止子项按最小内容宽度撑死列；info-item 加 min-width:0 允许收缩；word-break 用 normal + overflow-wrap: break-word 替代 break-all；仅含字典标签时外层包一层 inline-block 避免标签占满整格。同模式的页面（VenueAssetDialog 等 span+dict-tag 组合）应按同套路排查。",
+   "evidence": "会话 f8f12066：HouseAssetDialog 展示错误，根因为 span 内嵌块级 dict-tag 被 HTML 解析器拆标签 + break-all 断词，修复为 div 容器 + minmax(0,1fr) + min-width:0 + overflow-wrap。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/components/HouseAssetDialog.vue",
+    "zhi2-web-admin/src/components/dict-tag/dict-tag.vue"
+   ],
+   "sessionIds": [
+    "f8f12066-4a2e-407f-8919-3b1feebdc139"
+   ],
+   "title": "dict-tag 根节点是块级 div，套进 span 值容器会被浏览器拆标签重排 DOM 导致布局错乱",
+   "type": "bug",
+   "bundle": "059.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232",
+   "content": "什么情况：地图上「苏州市」等行政区名称出现重影/叠字。为什么：用 TMap.MultiLabel 在行政区中心画名称标签时，腾讯矢量底图默认还会渲染 POI 文字（point 要素），市中心 POI 名称与自定义标签叠在一起即成重影；另 MultiLabel 的 styleId 必须与 styles 配置里定义的键一致，引用不存在的 styleId（如 'area_label_style'+uid）会异常渲染。怎么做：initMap 时显式配置 baseMap 要素列表为 ['base','road','building','label']，去掉 point，保留道路/楼块/文字但不再显示 POI 名称；MultiLabel 的 geometry styleId 统一改成 styles 里实际定义的键（如 'label'）。若产品要求保留其他 POI 名称，则反向改为去掉自定义 MultiLabel 或换个性化地图样式。",
+   "evidence": "会话 f3c5b382：statisticsMap 地图苏州市文字重影，根因为底图 point 要素与 MultiLabel 叠加 + styleId 引用不存在的键，修改 map.vue 的 initMap baseMap 配置与 doMapPolygon styleId。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue",
+    "zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js"
+   ],
+   "sessionIds": [
+    "f3c5b382-87a4-49cf-9a4e-27efde2b94d2"
+   ],
+   "title": "腾讯地图行政区名称重影：矢量底图 POI 文字(point)与自定义 MultiLabel 叠加，baseMap 要素要排除 point",
+   "type": "bug",
+   "bundle": "059.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232",
+   "content": "什么情况：数据沙盒类页面（fundPanorama/assetPanorama）按 1920 设计稿用 transform: scale 适配视口，侧边栏展开收起改变内容区宽度时，若整块等比缩放，图标会随侧栏一起放大缩小，不符合「侧栏只影响宽度」的预期；但改成 scale(sx, 1) 只缩横向后，设计稿量算高度 designMeasuredH 大于 calc(100vh - 顶栏) 的可视高度时会纵向溢出。为什么：单一 scale 无法同时满足「横向跟宽度、纵向跟视口高度」两个独立约束。怎么做：拆成两个比例仍用一套 transform——layoutScaleX 只跟内容区宽度（侧栏主要改这个），layoutScaleY = min(1, viewportH / designMeasuredH)，只有内容比视口高时才小于 1，视口够高时恒为 1；stage 高度同步写成 h*sy 与 scale(sx,sy) 视觉一致。折中：高度紧张时 sx≠sy 图标会略有非等比变形，若不可接受需切 min(sx,sy) 等比分支。",
+   "evidence": "会话 77a735af：用户反馈侧边菜单展开收起会等比放大图标、随后高度溢出；最终在 fundPanorama 拆 layoutScaleX/layoutScaleY 双比例解决。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "sessionIds": [
+    "77a735af-afdd-4ef8-b842-d6aea8630229"
+   ],
+   "title": "大屏数据沙盒页 transform 缩放：只缩 X 会导致纵向溢出，需拆 layoutScaleX/Y 且 Y=min(1, 视口/设计高)",
+   "type": "pattern",
+   "bundle": "059.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "fc994977f / 3965548b6 等（园区物管2.0 zhi2-web-admin）",
+   "content": "什么情况：Web 后台详情页的 OperationBtnGroup（position:sticky 操作栏）设了 z-index:10，顶栏 Navbar 根节点是 z-index:9，顶栏里的用户菜单/更多功能下拉虽写了 z-index:1000 却被整块操作栏盖住、点不到。为什么：顶栏根节点的 z-index:9 创建了独立层叠上下文，下拉的 z-index:1000 只在该上下文内部比较；操作栏与顶栏是不同分支的兄弟层叠关系，只比根节点值 10>9，下拉内部的 1000 救不了。怎么做：层叠被挡时不要调下拉自身的 z-index，先找两边各自层叠上下文的根节点值再比大小。本项目约定 OperationBtnGroup 用 z-index:1（仍能在 app-main 滚动时盖住普通内容），必须始终小于顶栏的 9；TagsView 基准是 8，若与之重叠可调到 7 但仍须 <9。",
+   "evidence": "会话 2c210045：Navbar 下拉被挡，根因为顶栏 z-index:9 的层叠上下文与 OperationBtnGroup z-index:10 兄弟比较，改为 1 后正常。",
+   "files": [
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/layout/components/Navbar.vue"
+   ],
+   "sessionIds": [
+    "2c210045-05e2-4f43-9233-fc8c952365a9"
+   ],
+   "title": "[园区物管2.0] sticky 操作栏压住顶栏下拉的根因：兄弟层叠上下文只比根节点 z-index",
+   "type": "bug",
+   "bundle": "060.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "3965548b6（园区物管2.0 zhi2-web-admin）",
+   "content": "什么情况：GIS 地图从街道层级点击下钻到物业管理区域时，接口参数和数据不对——正确的项目点位请求发出后又被聚合气泡数据覆盖。为什么：两处叠加根因——(1) loadAreaComplexLayer 在正确请求 selectOptionalComplexList 并写 markList 后，遗留代码又无条件调了一次 selectAreaComplexNumList（dimension:1 行政区聚合），把项目点位覆盖成聚合气泡；(2) 下钻会程序化改 zoom，地图 zoom_changed 事件进入 handleMapZoomChange，动画过程中 zoom 短暂低于阈值（OVERVIEW_STREET_MIN 11.1）会误触发「退回概览」，把刚压入的下钻栈 areaDrillStack 弹掉，导致后续请求参数错乱。怎么做：排查地图下钻接口错乱时先 grep 加载函数里是否有重复/遗留的第二次请求；程序化改 zoom 必须加 drillInProgress 标志（下钻点击期间忽略 zoom 回退逻辑），且 programmaticViewGuard 时长要覆盖 zoom 动画（本项目从 450ms 延长到 900ms），否则守护窗口短于动画时长就会误触发回退。",
+   "evidence": "会话 ae57812c：删除重复调用 AREA_COMPLEX_NUM_API 的遗留代码并加 drillInProgress + 900ms 守护后，下钻只发一次正确请求。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/index.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue"
+   ],
+   "sessionIds": [
+    "ae57812c-b3cb-4223-9f82-106d7065e69c"
+   ],
+   "title": "[园区物管2.0] 地图下钻接口错乱的两类根因：遗留重复请求 + zoom 动画误触发回退",
+   "type": "bug",
+   "bundle": "060.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232（园区物管2.0 zhi2-web-admin）",
+   "content": "什么情况：fundPanorama 数据大屏页面内容不多时纵向底部出现大片留白。为什么：设计区被两处强行垫到至少 1080px——样式上 .fund-panorama__design 的 min-height:1080px，逻辑上 updateLayoutMetrics/layoutScale/stageWrapStyle 里都用了 Math.max(1080, 实测高度) 做缩放计算，舞台高度与真实内容高度脱节，内容不足 1080 时底部整段空出。怎么做：「设计稿舞台 + 按内容缩放」类页面，高度一律以真实 scrollHeight 实测值为准，不要夹固定像素下限；防御只保留 Math.max(1, h) 防止 0/除零。去掉 min-height 并把 designMeasuredH 改为 Math.max(1, design.scrollHeight) 后留白消失。注意首帧测量前仍会用初始值过渡，需在 initCharts/mounted 里 nextTick 后立即用真实 scrollHeight 复测一次，避免闪动。",
+   "evidence": "会话 e29dc036：去掉 min-height:1080px 并把三处 Math.max(1080,…) 改为 Math.max(1, 实测高度) 后底部留白消失。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "sessionIds": [
+    "e29dc036-f65f-4ad0-8174-ae9a94728599"
+   ],
+   "title": "[园区物管2.0] 缩放舞台页底部大留白的根因：min-height/Math.max 固定下限与真实内容高度脱节",
+   "type": "pattern",
+   "bundle": "060.md",
+   "project": "园区物管2.0"
+  }
+ ]
+}

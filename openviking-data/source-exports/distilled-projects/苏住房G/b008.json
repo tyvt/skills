@@ -1,0 +1,103 @@
+{
+ "project": "苏住房G",
+ "batch": 8,
+ "files": [
+  "029.md",
+  "030.md",
+  "031.md",
+  "032.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "[苏房] zs-select-dialog 左侧列表「超过 N 条不显示」的根因是固定 pageSize=10，需改成按容器高度算首屏 + 未铺满自动续拉 + 滚动加载",
+   "type": "bug",
+   "content": "什么情况：资金缴款（pubPaymentNotice）选「收入类别名称」时，选项超过 10 条就不再显示，经营资产租赁合同、资产租赁合同备案、停车泊位合同备案、手工记账等页同样现象；左侧列表下方还有一片留白。\n\n为什么：根因是公共选择弹窗 zs-select-dialog 左侧列表的 pageSize 被写死为 10。列表容器高度足以显示二三十条，但只装了 10 条——容器没有产生溢出，scroll-view / 滚动事件永远不触发，于是「加载更多」这条路走不到；同时行数不足容器高度，「默认铺满、底部不留白」也就直接失效。这跟已知清单里 #388「无搜索栏时表格只占左半边、下方留白」不是同一个根因（那条是布局宽度/空态），也和 #519「v-if 懒挂载导致打开不拉数」不同：这里是确实拉了数据、只是首屏条数被写死且没有续拉机制。\n\n怎么做：①首屏 pageSize 由左侧列表容器高度动态计算，不再取常量 10；②首次加载完成后，若列表尚未铺满容器且仍有剩余数据，自动继续拉下一页，直到铺满或取尽；③监听滚动，接近底部时继续分页加载；④首次查询放到弹窗打开后的 $nextTick 中发起，保证能算到真实的容器高度。必须同时改 zs-select-dialog-func.vue（SelectDialog.open 函数式）与 zs-select-dialog.vue（模板式 <zs-select-dialog>，即 #define 方案）两份副本，否则构造函数式打开的业务页仍然异常。修复后所有通过该组件选收入类别的页面自动生效，无需逐页改。\n\n发布注意：此类公共组件修复要同步到所有在维护分支（本批涉及 develop/v2.6.2-suzhufang、develop/v2.6.2 主线、develop/v2.6.1），存在冲突的分支手动 cherry-pick 提交号，不要只提一条分支就宣布完成。",
+   "evidence": "029.md 会话 5fa377d6（基线 fb3e960）：「资金缴款：收入类别名称超过10条后不显示，其它页面的收入类别名称选选有同样的现象，统一改为滚动加载更多，默认要数据能铺满，下面不要留白」→ 结论「问题出在公共选择弹窗组件 zs-select-dialog 的左侧树列表：默认只请求 10 条数据，内容未铺满时无法滚动，因此也无法触发加载更多」，改动含动态分页、自动铺满、滚动加载、$nextTick 首查，并分别提交 develop/v2.6.2-suzhufang、develop/v2.6.2、develop/v2.6.1，其余分支需手动 cherry-pick cb5ef3166。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue",
+    "zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubBusinessItem/components/businessItemDialog.vue"
+   ],
+   "baseline": "fb3e960",
+   "sessionIds": [
+    "5fa377d6-2df6-4c0c-ad32-c4ab7cac395a"
+   ],
+   "bundle": "029.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 仓库 API 前缀与 env 目录的实际位置：VITE_APP_BASE_API='api/v2.0'，env 文件在父仓库根而非子模块内",
+   "type": "fact",
+   "content": "什么情况：在苏住房G 里定位某个业务页对应的真实请求地址时，容易按「子模块内一定有 .env」「路径就是业务名」去猜，导致拼出的 URL 与抓包对不上（例如以为 /property/complex/page 就是全路径）。\n\n为什么 / 事实：项目主体在父仓库的子模块 zhi2-web-admin（前端纯 SPA），但接口基址常量 VITE_APP_BASE_API 定义在父仓库根的 env 目录下（d:\\repository\\苏住房G\\env\\.env），值为 'api/v2.0'；子模块里没有同名 env 文件可读。所以页面里写的 moduleName+businessName 拼出来的 `/property/complex/page`，实际请求是 `/api/v2.0/property/complex/page`。注意业务目录里的 api/ 层通常不存在对应 js 文件（如 src/api/property/ 下没有 complex.js），接口是通过 listMixins/table.js 的 moduleName + businessName + apiMethod + apiSuffix 约定拼装的，找接口不要先去 api/ 目录翻文件。\n\n怎么做：①核对接口全路径时直接看父仓库 env/.env 的 VITE_APP_BASE_API，再把页面里的模块段拼上去；②查接口契约看列表 mixin 的约定字段（moduleName/businessName/apiMethod/apiSuffix），而不是找 api 封装；③找环境变量（代理、加密开关、base api）一律先去父仓库 env 目录，子模块内向上一级找；④路由也不在 router/index.js 静态注册，由后端 /system/menu/listRouters 下发 component（如 property/complex/index），经 loadView() 映射到 src/views/，所以某页面搜不到静态路由属正常现象。",
+   "evidence": "029.md 会话 467ee981（基线 9fb6c2c）探索报告：「API 前缀为 api/v2.0（d:\\repository\\苏住房G\\env\\.env 中 VITE_APP_BASE_API = 'api/v2.0'），前端调用路径如 /property/complex/page 实际请求为 /api/v2.0/property/complex/page」「无独立 API 文件：src/api/property/ 下没有 complex.js，接口通过 moduleName + businessName 约定拼接」「无静态 property/complex 路由条目，路由由 /system/menu/listRouters 动态下发，loadView() 映射」。",
+   "files": [
+    "env/.env",
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/store/modules/permission.js",
+    "zhi2-web-admin/src/views/property/complex/index.vue"
+   ],
+   "baseline": "9fb6c2c",
+   "sessionIds": [
+    "467ee981-9fc0-412b-b2a5-a58b1c9799c9"
+   ],
+   "bundle": "029.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 同一页面内「整卡横滚」与「只在标签行内滚」不能统一处理：RegionTabs 需 embedInParentScroll 开关 + 父容器 min-width:0",
+   "type": "pattern",
+   "content": "场景：首页 v2（index-v2.vue / v2/components/KeyDataNav、CheckDataNav、SectionCard、RegionTabs）在窄屏下的「内容溢出丢失」问题。第一版给所有卡片统一加 body-scroll-x + 内部容器 min-width:960px 整卡横滚，结果检查数据卡片被撑得极宽、半宽栅格布局全乱，用户明确否掉（「选择区域不要按照这个方式处理」）。\n\n根因有两层：① 整卡 min-width 会把 flex/grid 列撑破，卡片不再随栅格列收缩；② flex 子项默认 min-width:auto，即使父级再窄，Tab 列表也不会收缩，永远触发外层溢出，于是「想让它内部滚」变成「它把整卡撑宽」。\n\n做法（两种横滚语义分开）：\n1. 关键数据导航 = 整卡横滚：body-scroll-x + 指标行横滚，RegionTabs 传 embed-in-parent-scroll=true，让区域 Tab 与指标共用同一条滚动条。\n2. 检查数据导航 = 局部横滚：去掉 body-scroll-x 与 cd-inner 的 min-width，指标行/整改卡片恢复 flex:1 随栅格列走；RegionTabs 默认 embedInParentScroll=false，只在 .rt__list 上 overflow-x:auto，标签超出时在 Tab 行内横滑，不拉宽卡片。\n3. SectionCard 的 .sc__bd 补 min-width:0，半宽栅格下 Tab 列表才能真正收缩并出现内部滚动。\n\n判据：想让某块内容内部滚，必须从「最内层滚动容器」到「栅格列」整条链都不能有 min-width/固定宽，否则溢出会向上传递。",
+   "evidence": "会话 b3c7bed2：用户先要求「小屏幕需要内容区域横向滚动，现在压缩间距还溢出丢失了内容」，实现后第二次反馈「检查数据导航不要按照这个方式处理，选择区域超出内部滚动，整个区域现在太宽了，布局乱了」；最终结论：去掉 body-scroll-x/cd-inner 最小宽度，RegionTabs 新增 embedInParentScroll（检查数据 false、关键数据 true），SectionCard 的 .sc__bd 加 min-width:0。已知 192/325 讲宽表幽灵滚动与 zs-table 列宽，578 只在详情表单里局部提过 min-width:0，均未涉及「整卡横滚 vs 容器内横滑」的选择与这组组件契约。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-v2.vue",
+    "zhi2-web-admin/src/views/home/v2/components/RegionTabs.vue",
+    "zhi2-web-admin/src/views/home/v2/components/SectionCard.vue",
+    "zhi2-web-admin/src/views/home/v2/components/KeyDataNav.vue",
+    "zhi2-web-admin/src/views/home/v2/components/CheckDataNav.vue"
+   ],
+   "baseline": "9e5c499",
+   "sessionIds": [
+    "b3c7bed2-97b5-4eae-818f-761a098b5431"
+   ],
+   "bundle": "032.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] B 端「字段置灰」不能一律用 isBTerminalPractitioner：企业管理员与从业人员必须分开判，且自动带入只对从业人员生效",
+   "type": "bug",
+   "content": "场景：物业管理区域（property/complex/detail.vue）新增时，「物业管理区域名称 / 坐落 / 行政区域」等必填项对企业管理员也置灰，导致 B 端企业管理员根本无法新增。\n\n根因：isDisabled() 直接返回 this.$store.getters.isBTerminalPractitioner，把「B 端企业管理员」和「B 端从业人员」当成一类。这两类用户的字段归属完全不同：从业人员的关键字段应由其绑定的物业管理区域带入并锁定；企业管理员是从零新增，必须可填。\n\n做法：\n1. isDisabled 改为按用户类型分档：G 端用户、B 端企业管理员 → 关键字段可编辑；B 端从业人员 → 仅在其已绑定物业管理区域（currentProject 存在，与 bTerminalProjectMixin 口径一致）时禁用。\n2. currentProject 自动填充逻辑同步加限定，只对从业人员生效，否则会把当前项目写进企业管理员正在新建的空表单，造成新增即错数据。\n3. terminalUser.js / user.js 里 isCompanyAdmin 的判定要兼容 1 与 '1'（后端数字/字符串不定），避免企业管理员被判成从业人员。\n\n延伸约定：凡「按端别决定是否禁用/隐藏字段」的地方，端别之后还要再判角色；与已知 210（B/G 端合并成一个页面按 terminalType 分流）互补——terminalType 只解决 端 这一层，角色分层是第二层。",
+   "evidence": "会话 698964df：用户反馈「物业管理区域、坐落、行政区域置灰不可选无法新增[期望] 正常可选，允许新增」；最终结论指出 isDisabled 返回 isBTerminalPractitioner 把所有 B 端用户一律禁用，修复为 G 端/企业管理员可编辑、从业人员仅在已绑定区域时禁用，currentProject 自动填充只对从业人员生效，并让 isCompanyAdmin 兼容 1 与 '1'。已知清单只有 210/428/511/990/1057 讲 terminalType 端别分流，没有「B 端内部角色分层」这条。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/utils/terminalUser.js",
+    "zhi2-web-admin/src/utils/projectContext.js",
+    "zhi2-web-admin/src/store/modules/user.js"
+   ],
+   "baseline": "a945fa1",
+   "sessionIds": [
+    "698964df-6489-4740-854b-971c66107f5f"
+   ],
+   "bundle": "032.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 详情页编码类字段回显成数字：全局 dictFormatter 依赖异步选项，且 Vue2 计算属性依赖收集不稳定 → 改用本地 formatter 并显式触碰选项源",
+   "type": "bug",
+   "content": "场景：物业管理区域备案新增时选「常熟市-琴川街道-迎春社区」，保存后详情页「所属社区」显示 320581003009，列表页却正常。\n\n根因：详情页 contentInfo 计算属性里用全局 dictFormatter 回显社区，而社区选项是异步加载的：① 选项未就绪时字典匹配必然落空，退回原始编码；② Vue2 对「计算属性内部读取的响应式数组是否已在首次求值时被收集」很不稳定，communityOptions 晚到后计算属性不重算，就永久停在编码。列表页用的是 communityFormatter 且选项全量加载，所以看不出来。\n\n做法（对齐 complexChange/detail.vue 的既有实现）：\n1. 新增页面本地 formatCommunityDisplay(code)：在 communityOptions 里按编码匹配名称，比较时对两边做 trim + String() 归一（后端可能给数字也可能给字符串）。\n2. contentInfo 开头加 void this.communityOptions，强制把选项数组纳入依赖收集，确保异步加载完成后重算。\n3. 多页共用时把 formatter 提到同模块公共处并统一命名，避免只修详情页、变更单再犯一次。\n\n判据：凡「表格列正常、详情页显示编码」的差异，先看详情是否走全局 dictFormatter + 异步选项；已知 855 讲的是行政区域字段有字典值/区划代码双形态时 dictFormatter 未命中要回退区划全称，本条是异步时序 + 依赖收集导致的未命中，解法不同。",
+   "evidence": "会话 1d1dcbd1：用户报告「新增物业管理区域所属社区…保存后详情里社区显示数字，列表里正常」；最终结论：contentInfo 加 void this.communityOptions 保证选项异步加载后重算，「所属社区」由 dictFormatter 改为 formatCommunityDisplay(this.form.community)，并与 complexChange/detail.vue 保持一致；原因说明明确写「在社区选项异步加载完成前会先显示编码，且 Vue2 计算属性对 communityOptions 的依赖收集不稳定」。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/views/property/complexChange/detail.vue"
+   ],
+   "baseline": "d5eee56",
+   "sessionIds": [
+    "1d1dcbd1-daa8-4961-bfb9-d16249fa1d19"
+   ],
+   "bundle": "032.md",
+   "project": "苏住房G"
+  }
+ ]
+}

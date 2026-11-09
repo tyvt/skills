@@ -1,0 +1,276 @@
+{
+ "project": "无锡市区小程序嵌入H5",
+ "batch": 2,
+ "files": [
+  "005.md",
+  "006.md",
+  "007.md",
+  "008.md"
+ ],
+ "count": 16,
+ "memories": [
+  {
+   "title": "灵犀投票 wxzj.wxwgzx.com：VITE_WEBVIEW_ALLOW_HOSTS 配域名并重启；小程序 web-view 还需配置业务域名",
+   "type": "bug",
+   "content": "情况：业主决策外链（灵犀 H5Vote，含 Base64 query）在 H5 内打开时报「该链接不在允许访问的域名范围内」。\n\n为什么：`webViewUrl.js` 的 `isHostInWebViewWhitelist` 校验主机名；`wxzj.wxwgzx.com` 未写入 `VITE_WEBVIEW_ALLOW_HOSTS` 且各环境变量为空时，所有外链都会被拦。\n\n怎么做：1) 在 `.env.development` / `.env.production` / `.env.test` 加入 `wxzj.wxwgzx.com`；2) 改 env 后必须重启 dev server；3) 若走小程序原生 `h5ExternalWebview`，还需在微信公众平台配置该业务域名。本条报错来自本方白名单，与灵犀服务器响应头无关。",
+   "evidence": "会话 406654b6：用户投票 URL 被拦截；结论指向 webViewUrl.js 白名单与空的 VITE_WEBVIEW_ALLOW_HOSTS，已在多环境 env 加入 wxzj.wxwgzx.com。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/webViewUrl.js",
+    "zhi2-mobile-admin-h5-c-unlimited/.env.production"
+   ],
+   "baseline": "7de00b1",
+   "sessionIds": [
+    "406654b6-603a-41e0-9bc2-ae70c13fbcbd"
+   ],
+   "bundle": "005.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办内嵌灵犀 H5Vote 报 ERR_BLOCKED_BY_RESPONSE：灵犀 CSP frame-ancestors，需对方放宽或顶层/系统浏览器打开",
+   "type": "bug",
+   "content": "情况：苏服办轻应用 WebView 直接打开 `https://wxzj.wxwgzx.com/lxapptp/H5Vote/...` 失败，控制台 `net::ERR_BLOCKED_BY_RESPONSE`。\n\n为什么：灵犀站点返回 `X-Frame-Options: SAMEORIGIN` 与 `Content-Security-Policy: frame-ancestors 'self'`，跨域嵌入会被浏览器拦截；本方 `VITE_WEBVIEW_ALLOW_HOSTS` 只能放行己方 H5 内的 web-view 跳转，无法改写灵犀响应头。\n\n怎么做：1) 优先联系灵犀运维在 H5Vote 路径放宽 `frame-ancestors`（含 `*.jszwfw.gov.cn` 等苏服办域）；2) 苏服办侧用 JSSDK `openUrl` + `showMode: 'outer'` 或先进 `/szh5/` 再 `window.location.href` 顶层跳转，勿 iframe/web-view 嵌套；3) 排查时区分「白名单拦截」与「frame-ancestors 拦截」两种报错。",
+   "evidence": "会话 c2d03879：苏服办打开业主自治三方页失败；结论对 wxzj.wxwgzx.com 响应头检查并给出灵犀改 nginx、苏服办 outer 打开、H5 顶层跳转三方案。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/.env.production",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/webViewUrl.js"
+   ],
+   "baseline": "7de00b1",
+   "sessionIds": [
+    "c2d03879-fbdf-4092-8416-a9b7a9d79600"
+   ],
+   "bundle": "008.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办 livenessFaceAuth：默认勿 getTicket/forceFresh，arg1 用 URL 用户 token、arg2 为 '1'",
+   "type": "bug",
+   "content": "情况：加 `forceFresh` + `getTicket` 后苏服办/支付宝均报「用户扫脸核验令牌已失效」，清理缓存后更严重。\n\n为什么：SDK 要求 arg1 为苏服办用户 token、arg2 为 `'1'`（用户 token 类型）；默认换票会把 tokenType 改成 `'0'`，与 SDK 预期不符。\n\n怎么做：1) `sfbFaceAuth.js` 默认不走 `getTicket`，仅显式 `forceFresh: true` 时才尝试；2) `face.vue` 去掉强刷票据；3) 勿在每次调起前清 `faceAppid` 缓存；4) 仍失效时让用户完全退出苏服办从入口重进以拿新 URL token，并对照 `[苏服办人脸识别]` 日志。",
+   "evidence": "会话 2a5dc010：用户反馈支付宝与苏服办均令牌失效；结论指向 forceFresh/getTicket 与 tokenType 0/1 误用，已恢复直接传用户 token。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/face.vue"
+   ],
+   "baseline": "afd47ed",
+   "sessionIds": [
+    "2a5dc010-d890-4a11-a627-83db6d26d2b6"
+   ],
+   "bundle": "006.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办人脸 SDK success 可能返回 JSON 字符串，需 normalize 后再判 retcode/msg",
+   "type": "bug",
+   "content": "情况：控制台打印苏服办返回成功 JSON，业务仍判失败。\n\n为什么：`livenessFaceAuth` 的 success 有时给 **字符串**（如 retcode 为 000000 的 JSON 字符串），直接读 `data.retcode` 为 undefined。\n\n怎么做：在 `sfbFaceAuth.js` 增加 `normalizeSfbFaceResponse`（字符串先 `JSON.parse`），`isSfbFaceSuccess` 兼容 `retcode === '000000'` 或 `msg === '认证成功'`；不动产授权回跳在 `goBdc()` 拼接 `verifyResult=true`。生产人脸入口基址为 `https://wygl.wxwgzx.com:8989/szh5`，对方跳转不带 token 时用己方已解析的苏服办登录态。",
+   "evidence": "会话 9641a1de：截图显示 SDK 成功 JSON 被误判；结论修改 normalizeSfbFaceResponse/isSfbFaceSuccess 与 verifyResult 回跳；并说明生产 szh5 地址与 token 由己方持有。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/face.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/bdc.vue"
+   ],
+   "baseline": "3fb9434",
+   "sessionIds": [
+    "9641a1de-5bbe-4afe-a7ab-487324afb826"
+   ],
+   "bundle": "005.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "uni-app H5 覆盖全局 wx 导致 wx.miniProgram 为空：index.html 守卫 + restoreWeixinWx",
+   "type": "bug",
+   "content": "情况：微信 web-view 内 H5 报 `wx.miniProgram.navigateTo` 不存在，`wx` 被写成 `{}`。\n\n为什么：uni-app 主包会覆盖 `window.wx`，覆盖 jweixin 注入的真实 JSSDK。\n\n怎么做：1) 在 `index.html` 苏服办 JSSDK 之后加内联守卫：监听 `jWeixin`、用 `defineProperty` 拦截对 `wx` 的空对象写入；2) `main.ts` 启动时再调 `restoreWeixinWx()` 兜底；3) 重新部署 dist 后在 web-view 控制台验证 `typeof wx.miniProgram.navigateTo === 'function'`。注意 `miniProgram` 仅微信小程序 web-view 有效，苏服办原生容器无此 API 属环境限制。",
+   "evidence": "会话 718e1271：用户怀疑框架覆盖 wx；结论采用 index.html 守卫 + restoreWeixinWx.js 两层防护。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/index.html",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/restoreWeixinWx.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/main.ts"
+   ],
+   "baseline": "6c9a164",
+   "sessionIds": [
+    "718e1271-a4de-433f-9316-5f9d2f58fafe"
+   ],
+   "bundle": "005.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "门户首页「业主决策」外链与「共有资金表决」内嵌页是两条链路",
+   "type": "workflow",
+   "content": "苏服办实际首页为 `pages/webview/home`，勿与 `pages/index/home` 混淆。\n\n| 入口 | 目标 |\n|------|------|\n| 快捷菜单「业主决策」`ownerDecisionVoteExternal` | 灵犀外部投票 H5（`usePortal` → 选屋 → `openOwnerDecisionVoteH5` → webView） |\n| 卡片「共有资金表决」`handleVote` | 内嵌 `/pages_owner/decision/index` |\n\n外链流程：登录/实名 → 确认弹窗 → `/pages/face/bdc` 灵犀选屋 → `portalPostAction=ownerDecisionVote` → 后端取投票 URL 再 `navigateToExternalUrl`。内嵌列表走 `selectAppDecisionList` 等 autonomy 接口，不是同一套入口。",
+   "evidence": "会话 2b377a1c、探索会话 d8000b94：明确门户双入口与 usePortal 编排；006 结论含 mermaid 与 handleMenuClick/openOwnerDecisionVoteH5 代码引用。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/webview/home.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/decision/index.vue"
+   ],
+   "baseline": "1cce226",
+   "sessionIds": [
+    "2b377a1c-983a-4b59-8b7b-4fecc4297896",
+    "d8000b94-8e26-45f3-8f7b-45edf9d77296"
+   ],
+   "bundle": "006.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办深链 topicvoteid：入库后登录完成自动开门主决策，外链追加 topicvoteid 与 Base64 backUrl",
+   "type": "workflow",
+   "content": "情况：苏服办打开轻应用 URL 会额外带 `topicvoteid=xxxx`。\n\n怎么做：1) 启动时从 query 写入 `portalStore`；2) 登录/bootstrap 完成后若有该参数，自动走打开业主决策外链逻辑；3) `openOwnerDecisionVoteH5` 对第三方 URL 追加明文 `topicvoteid` 与 `backUrl`（UTF-8 再 Base64，值为门户首页完整 URL，含 `#/pages/webview/home`）；4) 第三方返回按钮先 `decodeURIComponent` 再 Base64 解码，用 `window.location.href` 整页跳回（hash 路由须在进页时保存 backUrl）。工具函数集中在 `portal.js`：`buildPortalHomeBackUrl`、`buildOwnerDecisionVoteBackUrlParam`。",
+   "evidence": "会话 099b07e0：用户给出 ydzt.jszwfw.gov.cn 带 topicvoteid 的示例 URL；结论实现 backUrl/topicvoteid 与第三方对接示例。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/portal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/store/portal.js"
+   ],
+   "baseline": "ea242de",
+   "sessionIds": [
+    "099b07e0-3f22-4afe-a5e8-451cf8675f31"
+   ],
+   "bundle": "006.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办 URL 换票登录：token/name/idType/idNumber/phone 五字段缺一即 toast 且不请求",
+   "type": "pattern",
+   "content": "从苏服办 location 进入 H5 时，在调用 `sfbLogin` 换内部 `accessToken` 之前必须校验五个 query 字段齐全：`token`、`name`、`idType`、`idNumber`、`phone`。任一缺失则 toast 列出缺少项（如「缺少手机号」），**不调用**登录接口及后续业务接口；且不能把 SDK 的 token 误当作业务鉴权 token。调试阶段可打印换票接口入参与响应；无 token 时整站应短路后续 API。",
+   "evidence": "会话 2192d7e5：用户要求缺一不可；截图 URL phone 为空；结论明确五字段与 toast 行为。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/App.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/security.js"
+   ],
+   "baseline": "06aa6e2",
+   "sessionIds": [
+    "2192d7e5-983b-4d37-906a-2d50cd01b942"
+   ],
+   "bundle": "006.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "共有资金总览查询时间与余额统一取自 accountStatistics",
+   "type": "pattern",
+   "content": "共有资金「查询明细」页顶部的查询时间与账户余额应直接读 `/benefit/app/accountStatistics/{projectId}` 返回的 `bankAccountUpdateTime`、`bankBalanceAmount`，格式化为 `YYYY.MM.DD HH:mm:ss` 展示；点击查询明细时先调 `getBenefitList` 刷新 `benefitInfo`，去掉本地冗余状态与 `bankReceiptDetail` 兜底，避免与主统计接口不一致。",
+   "evidence": "会话 ff85538f：用户要求查询时间；最终改为完全依赖 accountStatistics 两字段。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/OverviewTab.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/sharedFunds.js"
+   ],
+   "baseline": "6aeee0b",
+   "sessionIds": [
+    "ff85538f-d398-42e4-ba21-d4efd07edadb"
+   ],
+   "bundle": "005.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "accountStatistics.accountDisclosure 为 0 时隐藏「查询明细」",
+   "type": "pattern",
+   "content": "接口 `/v2.0/benefit/app/accountStatistics/{projectId}` 新增 `accountDisclosure`：值为字符串 0 时不展示共有资金/公示页的「查询明细」按钮；非 0 保持原逻辑。改动需同步 `dev_wuxi-sfb` 与 `dev_shiqu`，子模块提交后更新父仓指针并按规范打 tag（如 `202608131440` / `202608131440-sfb`）。",
+   "evidence": "会话 73e008e0：用户提供接口字段说明与截图；结论完成双分支提交与 tag。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/fundPublicity/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/index.vue"
+   ],
+   "baseline": "86395e1",
+   "sessionIds": [
+    "73e008e0-9dd9-46de-b9f7-c3c8d2356bbe"
+   ],
+   "bundle": "007.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "门户灵犀绑房：POST /external/lingXi/selectMyHouse 后同步业主房屋列表",
+   "type": "workflow",
+   "content": "苏服办门户从 `pages/webview/home` 经不动产授权（小程序 `pages/face/bdc` 回 H5 带 `authCode`）完成选屋时，`usePortal` → `runLingXiSelectMyHouse` 调用 **POST** `/external/lingXi/selectMyHouse`（`selectMyHouseByLingXi`），入参含 `userId`、`phone`、`authCode`、`name`、`idNumber`。`code==='200'` 时合并 `res.data` 到本地房屋并设 `portalStore.houseBoundViaAuth=true`（业主决策外链依赖）；`authCode==='0'` 不调接口只提示。成功后 **GET** `/property/ctUserIdentity/listByTokenAndIdentityTypeAndIdentityStatus`（`identityType:1`,`identityStatus:2`）同步列表。H5 自助绑房另走 `addOwnerDirectly` 链路，勿与灵犀混淆。",
+   "evidence": "会话 2782b86f：用户问绑房与首页业主决策接口；结论列出灵犀 selectMyHouse 与 listByToken 参数及 portal.js 片段。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/portal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/portal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/store/portal.js"
+   ],
+   "baseline": "38bd192",
+   "sessionIds": [
+    "2782b86f-c8ca-4f8c-8d4e-27ba92d8c485"
+   ],
+   "bundle": "007.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "uni-app H5 地图报 Map key not configured：写 __uniConfig.qqMapKey 而非 sdkConfigs.maps",
+   "type": "bug",
+   "content": "情况：接口已返回 `qq.map.key`、周边 JSON 搜索正常，但 `<map>` 仍报 `Map key not configured`。\n\n为什么：`loadMaps` 读的是构建写入的 `__uniConfig.qqMapKey`（来自 manifest），只改 `__uniConfig.h5.sdkConfigs.maps.qqmap.key` 无效。\n\n怎么做：1) `qqMapKey.js` 在运行时把接口 key 赋给 `__uniConfig.qqMapKey`；2) ZsMap.vue 用 qqMapRenderKey 作为组件 key 在 key 就绪后强制重挂 map，避免首次失败缓存；3) 腾讯控制台为该 key 开通 WebService + JavaScript API 并配 H5 域名白名单。",
+   "evidence": "会话 46dc639b：用户强调异步已有 key 仍报错；结论区分 qqMapKey 与 sdkConfigs 字段并双修复。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/qqMapKey.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/ZsMap/ZsMap.vue"
+   ],
+   "baseline": "3c384c1",
+   "sessionIds": [
+    "46dc639b-2c8b-48cf-aa77-f5de1880b71b"
+   ],
+   "bundle": "007.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "小区周边列表 district 取自腾讯 ad_info.district，禁止硬编码行政区",
+   "type": "bug",
+   "content": "无锡项目周边 POI 应展示接口返回的 `ad_info.district`（如滨湖区、梁溪区），不要在 UI 写死「姑苏区」等其它城市区县。在 `mapPlaceSearchRows` 映射 `district` 字段，项目详情与「全部周边配套」展示为 `{{ item.district }} | {{ item.address }}`；去掉未使用的地址解析试探与调试 log。",
+   "evidence": "会话 d1940235：用户反馈无锡项目出现姑苏区；结论保留 ad_info.district 映射并移除硬编码与冗余工具函数。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/index.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/facility/index.vue"
+   ],
+   "baseline": "afae6cd",
+   "sessionIds": [
+    "d1940235-a770-4bdf-9633-338e20518be0"
+   ],
+   "bundle": "007.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "H5 部署在 /h5/ 子路径时 Tab 图标须 resolveStaticIcon，禁止 /static 根路径",
+   "type": "bug",
+   "content": "中间 Tab 使用 `/static/icon/icon_tab_middle.jpg` 会在 base `/h5/` 下请求到站点根 `/static/...` 导致 404；首页/我的若已用 `resolveZhishuAsset`，中间凸起按钮与问答页头像也需同样处理。在 `zhishuAsset.js` 增加 `resolveStaticIcon()`（Vite `import.meta.url` 解析 `static/icon`），`custom-tabbar.vue` 中间按钮绑定 middleIcon 作为 src。",
+   "evidence": "会话 f82a50f9：迁移 tab 问答后中间图不显示；结论说明 /h5/ 子路径与 resolveStaticIcon 修复。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/zhishuAsset.js",
+    "wygl-wxxcx-dev-slh/components/custom-tabbar/custom-tabbar.vue"
+   ],
+   "baseline": "7de00b1",
+   "sessionIds": [
+    "f82a50f9-f635-4d0d-8382-d57ff27fd4c7"
+   ],
+   "bundle": "006.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "共有资金明细接口路径含 statistics 段",
+   "type": "fact",
+   "content": "`getAccountFundDetail` 请求路径为 **POST** `/benefit/app/accountStatistics/statistics/accountFundDetail`（旧路径少 `/statistics` 会 404）。明细页「类型」条件字典 `benefit_app_account_fund_type`；总览块仍用 `/benefit/app/accountStatistics/{projectId}` 与 `bankReceiptDetail` 等字段约定。",
+   "evidence": "会话 2ef3a945：用户要求变更 accountFundDetail 路径；结论已改 sharedFunds.js。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/sharedFunds.js"
+   ],
+   "baseline": "ffd97b8",
+   "sessionIds": [
+    "2ef3a945-8783-45dc-882c-71a6f4dc772e"
+   ],
+   "bundle": "008.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "业主决策确认弹窗需红字标注适用区（梁溪/滨湖/新吴）；发布 tag 仅在父仓打",
+   "type": "workflow",
+   "content": "小程序/H5 点击业主决策前的确认弹窗在原文案上方空一行增加：**业主决策功能适用范围：梁溪区、滨湖区、新吴区。**（红字加粗）。交付时子模块 `dev_wuxi-sfb` 提交后，父仓 `zhi2-mobile-shimin-h5-c-unlimited` 更新子模块指针；**tag 只打在父仓**（如 `202610231020` 指向含子模块提交的父提交），子模块可不打 tag。",
+   "evidence": "会话 01a16680：用户要求适用范围文案与父仓 tag 202610231020；子模块 587b800 无 tag。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/owner-decision-confirm-modal/owner-decision-confirm-modal.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js"
+   ],
+   "baseline": "290ba16",
+   "sessionIds": [
+    "01a16680-39de-70c5-a400-76a50aec295e"
+   ],
+   "bundle": "008.md",
+   "project": "无锡市区小程序嵌入H5"
+  }
+ ]
+}

@@ -1,0 +1,192 @@
+{
+ "project": "门户",
+ "batch": 10,
+ "files": [
+  "037.md",
+  "038.md",
+  "039.md",
+  "040.md"
+ ],
+ "count": 11,
+ "memories": [
+  {
+   "title": "门户首页公示公告两行版式：标题行与标签/日期行分离，勿用 flex-wrap",
+   "type": "pattern",
+   "content": "index-new 右侧「公示公告」与设计稿对齐时，列表项应是两行结构：第一行圆点+标题，第二行左侧分类标签、右侧日期+箭头。若在 `.notice-content` 用 `flex-wrap` 会把标签挤到标题同一行、日期顶在右上，与设计不一致。推荐 DOM：`notice-text` 内标题 + `notice-footer`（标签与 `notice-meta` 同行左右分布）；圆点用实心色块（如 #2D4B81）而非字符 `·`；标签灰底 #f2f4f7、字色 #8a96a8；项间分隔用虚线 `dashed`；标题 `font-weight:500` 并加 `:title` 悬停全文；`v-for` 用 `announcementId` 作 key。",
+   "evidence": "会话 3189eeb5：用户反馈通知公告与设计稿不一致；结论指出 flex-wrap 导致标签跟标题同行，已改为 notice-text/notice-footer 两行结构、实心圆点、虚线分隔与标签色值，并改用 announcementId 作 key。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "3189eeb5-f453-4f06-a88b-e017c31ce460"
+   ],
+   "bundle": "037.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户首页 fetchAnnouncements：稳定 key、分类字段映射、失败清空与可访问列表项",
+   "type": "workflow",
+   "content": "公示公告区块代码审查约定：① `v-for` 禁止 `:key=\"i\"`，用 `item.announcementId`（缺失再降级索引）；② 可点击 `.notice-item` 需键盘/读屏支持（`button` 或 `role=\"button\"`+`tabindex`+Enter/Space），列表语义用 `ul/li` 或 `role=\"list\"`；③ 展示用 `tag` 只映射分类字段（如 `categoryName`/`typeName`），不要把 `moduleName`/`appName`/`sourceSystem` 混作分类标签；④ `fetchAnnouncements` 与 `fetchTodos` 一致加 `.catch`，失败时清空 `announcements` 或统一提示，避免继续展示旧数据；⑤ 空态加 `role=\"status\"` 或 `aria-live=\"polite\"`；⑥ 覆盖 `.card-body` padding 优先提高选择器特异性，避免 scoped 里 `!important`；⑦ `AnnouncementDialog` 的 `v-html` 须确认后端消毒策略。",
+   "evidence": "会话 53fcb75c 审查 index-new 公示公告模板/CSS 与 fetchAnnouncements：HIGH 为索引 key 与可点击行无 ARIA；MEDIUM 为 tag 回退链、无 catch、!important、空态无 live region；并提示 AnnounceDialog v-html 风险。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue",
+    "zhi2-web-admin/src/views/home/components/AnnouncementDialog.vue"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "53fcb75c-07f9-43f3-9aa5-b62e310541a4"
+   ],
+   "bundle": "037.md",
+   "project": "门户"
+  },
+  {
+   "title": "门户首页业务步骤默认图标：homeNewSliceIcon + BIZ_ICON_BY_CODE，接口 functionIcon 优先",
+   "type": "pattern",
+   "content": "在 `/portal/home/functions` 尚未提供步骤图标或需设计稿占位时，zhi2-web-admin 首页业务中心可在 `homeLayout.js` 用 `public/assets/images/homeNew/切图 xxx.svg` 经 `homeNewSliceIcon` 写入 `BIZ_ICON_BY_CODE` 与 `DEFAULT_BUSINESS_FLOWS`（商品房 136–145、存量房 158–163、住房租赁 164–165 等）。同一 `functionCode` 可共用切图（如 `devEnterpriseAuth` 与「开发企业管理」共用 136）。运行时仍遵循：接口返回 `functionIcon` 时优先 `resolveServerAssetUrl`，本地切图仅为缺省回退；注释标明「后续改接口读取」便于替换。",
+   "evidence": "会话 51f607f4：用户要求商品房/存量房/住房租赁步骤暂用 homeNew 切图 SVG；结论同步更新 BIZ_ICON_BY_CODE 与 DEFAULT_BUSINESS_FLOWS，并说明接口有 functionIcon 时仍优先接口图标。",
+   "files": [
+    "zhi2-web-admin/src/views/home/config/homeLayout.js",
+    "zhi2-web-admin/public/assets/images/homeNew"
+   ],
+   "baseline": "b84b4e7",
+   "sessionIds": [
+    "51f607f4-3111-43b3-b27a-2e6b89288149"
+   ],
+   "bundle": "037.md",
+   "project": "门户"
+  },
+  {
+   "title": "经纪机构账号首页误判：企业 roleKey 优先于接口 terminalType，jjjg/zljg 强制 broker 布局",
+   "type": "bug",
+   "content": "经纪机构账号（如 `jjjg_*` 企业角色）登录后若落到管理端三栏或开发企业单商品房流程，常见根因：① `inferTerminalType` 过度信任用户详情里的 `terminalType`（G/A），忽略 `kfqy`/`jjjg`/`zljg` 等企业 roleKey；② `resolveHomeLayoutVariant` 只看 `portal:bizSection:*` 板块权限，无板块时 B 端默认 developer 而非 broker。修复套路：`terminalUser.js` 让企业角色前缀优先推断 B 端，并暴露 `hasBrokerHomeRole`（`jjjg`、`zljg`）；`homeLayout.js` 解析布局时传入 `store.user.roles` 的 `roleKey`，**jjjg/zljg 优先于「仅商品房」权限**，无板块权限的经纪类角色仍用 `broker` 皮肤；`homeDataMixin.js` 把 roles 传入上述逻辑。验收：经纪机构账号应见侧栏版（存量房+住房租赁、经纪统计条），而非 admin/developer 错皮。",
+   "evidence": "会话 78e839c9：用户提供经纪机构测试账号并反馈首页判断不对；结论两点根因（terminalType 误判、仅板块权限选布局），已改 terminalUser/homeLayout/homeDataMixin 使 jjjg/zljg 优先 broker 布局。",
+   "files": [
+    "zhi2-web-admin/src/utils/terminalUser.js",
+    "zhi2-web-admin/src/views/home/config/homeLayout.js",
+    "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+    "zhi2-web-admin/src/store/modules/user.js"
+   ],
+   "baseline": "ac6513b",
+   "sessionIds": [
+    "78e839c9-bf59-41e5-bc24-89a6b50ab45b"
+   ],
+   "bundle": "037.md",
+   "project": "门户"
+  },
+  {
+   "title": "Vue Router 3 菜单相对 path：toRouterAbsolutePath 统一前导斜杠，激活态须同规则",
+   "type": "bug",
+   "content": "若依式菜单在 Vue Router 3 中，`router-link`/`router.push` 对不以 `/` 开头的 `to` 会相对**当前路由**解析（如在 `/system/...` 下 `system/user` 会变成 `/system/system/user`）。门户修复：在 `menuVisibility.js` 新增 `toRouterAbsolutePath`（补前导 `/`、折叠重复斜杠；整串 `http(s)://` 原样返回），`buildNavbarChildrenMenus` 与 `RecursiveMenu.vue` 的 `handleClick`/`getLinkProps` 在拼接后统一调用；HTTP 外链分支仍走 `href`/`target`，`isHttpUrl` 为真时不改写 path。遗留坑：若 `isActive` 仍用原始 `menuItem.path` 比较而未做同样绝对化，会出现「能跳到 `/system/user` 但菜单不高亮」——无子菜单叶子项的激活判断须与跳转共用 `toRouterAbsolutePath`。",
+   "evidence": "会话 0b648e95：审查 menuVisibility.js 与 RecursiveMenu.vue 的 toRouterAbsolutePath 修复；确认扁平路径 system/user 与顶栏拼接正确、外链不误加斜杠；MEDIUM 发现 isActive 未同步绝对路径导致激活态与跳转不一致。",
+   "files": [
+    "zhi2-web-admin/src/utils/menuVisibility.js",
+    "zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue"
+   ],
+   "baseline": "ac6513b",
+   "sessionIds": [
+    "0b648e95-ebc1-4042-9f42-3def8cb4501f"
+   ],
+   "bundle": "037.md",
+   "project": "门户"
+  },
+  {
+   "title": "业务中心 flow-step 标签挤入下一格：min-width max(min-content) + flex-shrink:0",
+   "type": "pattern",
+   "content": "index-new 业务中心横向步骤条若标签与下一格图标重叠，可在 `.flow-step-cell`/`.flow-step`/`.flow-step-label` 对标签列使用 `min-width: max(..., min-content)` 并 `flex-shrink: 0`，让文字在本格内撑开而不压入相邻步骤。合并前留意：箭头宽度若写死 `12px` 而间距用 `dw(14)` 可能在窄屏错位；整行或横向溢出需单独验收；模板步骤 `:key` 宜用稳定业务键而非索引 `si`。全仓 `npm run lint` 不能单独证明本次 CSS 无问题（历史风格告警过多）。",
+   "evidence": "会话 d6e2d37c：审查 flow-step 相关 CSS，结论 Warning 可合并，认可 min-width max + flex-shrink:0 方向，并提示箭头/dw 不一致、窄屏溢出与 :key 建议。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue",
+    "zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "d6e2d37c-78bf-4548-8cba-1179801832f4"
+   ],
+   "bundle": "037.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 侧栏收展不触发 window.resize 时 zs-table 须监听容器并完整重算布局",
+   "type": "bug",
+   "content": "首页待办等 zs-table 在侧边栏折叠变宽后列间出现空隙，根因是内容区宽度变化不触发 window.resize，仅 syncFixedColumnOffset 不够。应在 observeTableResize 中 observe 表格容器（$el），回调走与 handleWindowResize 相同的 handleTableResize 分支（syncFillHeight / calculateTableHeight / doLayout）。注意：同一 RO 同时 observe container、bodyWrapper、bodyTable 会在一次尺寸变化里连触 2～3 次 doLayout；fill-height 模式下 observeFillHeight 与 observeTableResize 还可能重复 observe $el。优化方向是对 handleTableResize 做 rAF 合并，或宽度问题只 observe 容器。",
+   "evidence": "会话审查结论：修复思路正确（容器级 RO + 完整布局），并列出未合并 RO 导致重复 doLayout 的 MEDIUM 风险。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "baseline": "ac6513b",
+   "sessionIds": [
+    "188f5624-936a-4a00-b89b-99684b5bec13"
+   ],
+   "bundle": "039.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 开发环境放开账号密码登录 Tab 的标准写法",
+   "type": "workflow",
+   "content": "本地 npm run dev 需要直接看到「账号密码登录」时，在 login.vue 的 showPasswordLogin 计算属性中增加 import.meta.env.DEV 为 true 则始终展示，与项目内 App.vue 等处的 DEV 判断保持一致。生产/测试构建行为不变：仍依赖 IP 白名单接口校验通过后才显示账号密码 Tab。",
+   "evidence": "用户要求开发环境放开账号密码登录；实现为 showPasswordLogin 增加 DEV 判断，并说明生产仍走白名单。",
+   "files": [
+    "zhi2-web-admin/src/views/login.vue",
+    "zhi2-web-admin/src/App.vue"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "5236cf21-0cd9-483b-99dd-26c7a89bddb3"
+   ],
+   "bundle": "039.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 首页 index-new 去 card-body 顶距须同步左右栏 flex 对齐策略",
+   "type": "bug",
+   "content": "top-row 两卡 stretch 等高时，若全局或业务中心 .card-body 去掉 top padding 仍 justify-content: center，而常用功能 .func-grid 改为 align-content: start 且 padding 由 22px 改为 0 20px 20px，右侧栏视觉重心会上移、与左侧流程区垂直居中不对齐，形成明显布局回归。待办/公告区 padding-top:0 叠加 todo-body/notice-body 顶距削减还会让表头贴丝带标题。修复原则：去顶距时成对改为 justify-content: flex-start（或恢复网格垂直居中），并在标题与内容间保留固定间距；用 portal-home-visual.spec.ts（如 1024 截图）做对比。",
+   "evidence": "布局审查 HIGH：顶栏两列垂直对齐不一致；MEDIUM：业务中心 flex 内边距不对称、待办/公告更贴标题、func-grid 整体上行。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-new.vue",
+    "zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts"
+   ],
+   "baseline": "04586c4",
+   "sessionIds": [
+    "fe95f322-13c9-4f4f-9871-824196102f03"
+   ],
+   "bundle": "039.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 统一登录页装饰文案拆双 SVG 的无障碍与动效约定",
+   "type": "pattern",
+   "content": "平台横幅描述拆成 line1/line2 两张静态 SVG（unifiedLoginAsset 路径）时：子 img 使用 alt=\"\"，整段可读文案由外层 .platform-banner-desc-wrap 的 aria-label 承担，并建议加 role=\"img\" 以明确图像组语义；与 badge 区 aria-hidden 分工一致。动效挂在 wrap 上而非单张 desc。在 @media 内用 animation 简写覆盖桌面规则时，必须同时重写 animation-delay（简写会把未声明的 delay 重置为 0），否则小屏 intro 与 badge 淡入时序会与桌面不一致。",
+   "evidence": "UnifiedLogin 审查：双图 alt 空 + 外层文案；MEDIUM 建议 role=img；移动端 animation 未带 0.25s delay。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "zhi2-web-admin/public/assets/images/UnifiedLogin/platform_banner_desc_line1.svg",
+    "zhi2-web-admin/public/assets/images/UnifiedLogin/platform_banner_desc_line2.svg"
+   ],
+   "baseline": "f489349",
+   "sessionIds": [
+    "c20adba9-d1e7-4c37-8293-2bf46bd6e0e4"
+   ],
+   "bundle": "039.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 公开门户页批量对齐设计稿的 E2E 与分支约定",
+   "type": "workflow",
+   "content": "zhi2-web-admin 公开门户（publicPortal）UI 与设计稿对齐时，回归用 npm run test:e2e:public-portal（像素相似度门槛约 95%，弹窗态约 85%）；大批量 overnight 改动应先切独立分支并提交快照，报告落在 test-results/portal-design-sync-report.md，分支保留待人工 review 不自动合并。新稿目录文件名与 fixtures 不一致时需先做「混合目录 + 按状态过滤」再跑 public-portal-visual.spec.ts。",
+   "evidence": "定时任务说明：14 个可匹配状态、test:e2e:public-portal 95%/弹窗 85%、portal-design-sync 分支与报告路径。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/public-portal-visual.spec.ts",
+    "zhi2-web-admin/tests/e2e/fixtures/public-portal-designs.ts",
+    "zhi2-web-admin/scripts/portal-visual-reference.py",
+    "zhi2-web-admin/src/views/home/publicPortal/README.md"
+   ],
+   "baseline": "2785dd9",
+   "sessionIds": [
+    "2f4babe0-cf16-41eb-a18d-0455aa70129e"
+   ],
+   "bundle": "039.md",
+   "project": "门户"
+  }
+ ]
+}

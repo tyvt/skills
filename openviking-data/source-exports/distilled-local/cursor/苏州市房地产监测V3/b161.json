@@ -1,0 +1,111 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "161",
+ "files": [
+  "161.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "原因说明 管理员列表通过 listOrganType",
+   "type": "bug",
+   "content": "## 原因说明 管理员列表通过 `listOrganType` 拼进分页请求（`organType`）。双入口设计是： - `company/companyAdmin/developer/index` → 固定 `01` - `company/companyAdmin/agency/index` → 固定 `agency` 若菜单仍指向旧内核页 `company/companyAdmin/index`，没有 `CompanyOrganProvider` 注入，原先 `resolveOrganType` 会**默认成 `agency`**，就会出现你在「开发企业管理」下却请求 `organType: \"agency\"`、列表展示「管理员等级」等问题。 ## 修改内容 在 `companyOrgan.js` 中增加 `resolveOrganTypeFromFilePath`，并在 `resolveOrganType` 里根据路由 `meta.filePath` 推断： | 菜单 filePath | organType | |---|---| | 含 `companyAdmin/agency` | `agency` | | 含 `companyAdmin/developer` | `01` | | 旧页 `company/companyAdmin/index`（及对应 detail）",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`companyOrgan.js",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyAdmin\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\e2e\\fixtures\\company-admin-menu-config.js、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\mixins\\companyOrganContext.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ffdc5b21-cec5-4d42-a465-057d2d68d9d7"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "改一下，用公共组件写法",
+   "type": "preference",
+   "content": "已按项目内子表（如 `ParcelTable`）的写法改好了。 ### 变更说明（`ProjectCertificateTabs.vue`） 1. **操作列**：去掉手写 `zs-table-column` + `fixed=\"right\"` + `el-button`，改为 `<zs-operate-column :buttons=\"buttons\" />`，沿用固定列白底样式，避免发证日期从操作列透出来。 2. **`buttons` 计算属性**：与 `table.js` 里 `viewButton` / `editButton` 一致（`type: 'primary'` / `plain: true`），`permission: false`，行为与原先无权限校验一致。 3. **表格**：增加 `:table-tr=\"certList.length\"`，与同页其他子表列宽计算方式对齐。 刷新项目备案详情页的「证书管理」即可验证：操作列应不再与「发证日」叠字，「查看」「编辑」样式也会与其他列表操作列一致。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "变更说明（`ProjectCertificateTabs.vue",
+    "`table.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b081600e-462b-4da2-8ff3-9d75f6a6908b"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "根据截图，「单元拆分」弹窗主要有两类问题，已在 Un",
+   "type": "fact",
+   "content": "根据截图，「单元拆分」弹窗主要有两类问题，已在 `UnitSplitDialog.vue`（`projectManagement/unitinfo` 与 `building/unit` 两处同步）处理。 ## 问题与原因 1. **全选显示 `(0/2)` 但下面有 3 个户室** - 原先是否走「勾选表单」模式用的是接口的 `res.total`，全选分母用的是 `selectList.length`，和实际 `rows`、重复 `houseId` 时容易不一致。 - `el-checkbox-group` 里若 `houseId` 重复，会出现多个勾选项但可选值更少，计数也会对不上。 2. **布局** - `106px` 网格过窄，「房号 +（单元名）」挤在一行，弹窗下半截显得空。 ## 修改说明 - 表单模式：用 **`rows.length <= 6`** 决定是否走勾选 UI，不再单独信 `total`。 - 增加 **`formRoomList`**：按 `houseId` 去重，列表、全选、计数 `(已选/总数)` 都基于同一数据源。 - 户室列表改为 **纵向排列**，单行完整展示房号与单元名，弹窗内容更紧凑。 请重新打开「单元拆分」弹窗验证：全选应为 `(0/3)`（3 条可拆户室时），且三项纵向排列。若仍不对，把接口 `splitUnitHouseList` ",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`UnitSplitDialog.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\projectManagement\\unitinfo\\components\\UnitSplitDialog.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\building\\unit\\components\\UnitSplitDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c25170fe-e1f9-496c-b733-e6745dc10d5b"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "修改说明 经纪机构「机构基本信息」与企业入网认证对齐",
+   "type": "pattern",
+   "content": "## 修改说明 经纪机构「机构基本信息」与企业入网认证对齐：用独立 **「业务范围」** 区块展示/编辑 `companyRecord.businessScenario`（字典 `company_business_scenario`，逗号分隔多选），数据仍来自 `getOwnCompany` → `companyRecord`（详情页原有加载逻辑未改）。 ### 1. 新增 `AgencyBusinessScenarioSection.vue` - 与企业入网认证相同的复选框组 - 查看态禁用勾选；变更编辑态可改，并支持变更前后对比 tooltip ### 2. `AgencyBasicInfoDetail.vue`（机构基本信息查看） - 在「基本信息」与「机构管理员信息」之间增加业务范围区块 - 基本信息网格中去掉重复的「业务范围」列（`omitBusinessScenario: true`） ### 3. `AgencyBasicInfoForm.vue`（变更页表单） - 非租赁机构增加业务范围区块（编辑可勾选） - 查看态用禁用复选框展示（与入网认证一致） - 补充 `companyTypeOptions` 透传，保证查看态「机构类型」标签正常 ### 4. 变更页加载字典 - `toB/agencyRecord/detail.vue` - `company/compan",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`AgencyBusinessScenarioSection.vue",
+    "`AgencyBasicInfoDetail.vue",
+    "`AgencyBasicInfoForm.vue",
+    "`toB/agencyRecord/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "01583486-18a2-4643-9c5f-acafceadae49"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "已在 银行网点管理 详情页（supervision/",
+   "type": "preference",
+   "content": "已在 **银行网点管理** 详情页（`supervision/bank/jgwd/detail.vue`）按项目惯例接入 `HeadTitle`： ### 改动说明 1. **顶部状态条**：查看模式下在「基本信息」区块上方展示 `HeadTitle`，包含 **操作人**、**操作时间**（排在银行名称等字段之前）。 2. **基本信息**：从 `DetailTemplate` 的 `contentInfo` 中移除底部的操作人、操作时间，避免重复展示。 3. **组件注册**：引入并注册 `@/components/HeadTitle/index.vue`，写法与预售等业务详情页一致。 查看详情时，操作人/操作时间会出现在浅蓝背景的 `HeadTitle` 区域，其下才是「基本信息」里的银行名称等字段。若监管银行弹窗（`superviseBank/components/YhwdDialog.vue`）也需要同样调整，可以说一下我一起改。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "详情页（`supervision/bank/jgwd/detail.vue",
+    "`@/components/HeadTitle/index.vue",
+    "区域，其下才是「基本信息」里的银行名称等字段。若监管银行弹窗（`superviseBank/components/YhwdDialog.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\bank\\jgwd\\detail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\HeadTitle\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "abcd2ddd-f06a-43ce-b7fd-b84b6f04e622"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "重点用款申请、监管资金申请点击详情跳到了非监管资金申",
+   "type": "bug",
+   "content": "## 原因说明 「非监管 / 重点 / 监管」三类用款**共用** `supervision/unblock/usemoney/detail`，但路由分别是： - `general/usemoney` - `emphasis/usemoney` - `special/usemoney` 列表点「详情」走 `buildDetailNavigation` 时： 1. **`resolveListRoutePathHint`** 只取了 path 最后一段 `usemoney`，无法区分三种菜单，`pickDetailRouteForList` 容易先命中 **非监管**（`General/usemoney/:tableid`）。 2. **`buildTableIdNavigation`** 注释写的是「优先当前列表 path + id」，实现却**先**用误匹配到的 `general/usemoney/{id}`，且该路径能正常 resolve，所以会直接跳到非监管详情。 ## 修改说明（`zhi2-web-admin/src/utils/ruoyi.js`） 1. 对 `General|Special|Emphasis/usemoney` 的列表/详情，pathHint 改为 `general/usemoney`、`special/usemoney`、`emphasis/usemo",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "修改说明（`zhi2-web-admin/src/utils/ruoyi.js",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\unblock\\usemoney\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\unblock\\guarantee\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "41805f07-b6a7-46c0-90b9-f28d770d61ab"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

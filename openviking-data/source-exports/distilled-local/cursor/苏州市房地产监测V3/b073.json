@@ -1,0 +1,97 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "073",
+ "files": [
+  "073.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "委托代售详情中楼幢列表操作删除按钮点击无效 @zhi",
+   "type": "bug",
+   "content": "已修复委托代售楼幢列表行内删除按钮无效的问题。 ## 根因 `zs-table-column` 通过 `:scope=\"scope\"` 透传插槽参数，父组件应使用 `slot-scope=\"{ scope }\"` 解构。原先写成 `slot-scope=\"scope\"` 后直接访问 `scope.row`，实际得到的是 `undefined`，确认删除后因 `row.id` 报错被 `.catch(() => {})` 静默吞掉。 ## 修改内容 **[`EntrustBuildingTable.vue`](zhi2-web-admin/src/views/presale/entrustSale/components/EntrustBuildingTable.vue)** - 操作列插槽改为 `slot-scope=\"{ scope }\"` - 为删除按钮增加 `data-testid=\"entrust-sale-building-delete-btn\"` - `handleDelete` / `handleBatchDelete` 增加 `id` 校验、`res.code` 检查，取消确认时不再吞掉其他错误 **E2E** - 新增 `deleteBuildingByRowButton` 辅助函数 - 全流程用例中覆盖行内删除与批量删除两种路径 ## 验证建议 在委托代售详情（草",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**[`EntrustBuildingTable.vue`](zhi2-web-admin/src/views/presale/entrustSale/components/EntrustBuildingTable.vue",
+    "e2e/presale/entrust-sale-real-api-flow.spec.js",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\entrustSale\\components\\EntrustBuildingTable.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\entrustSale\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ad31939a-64bd-4cd1-bc4c-21c4d54679cd"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "改为公共的跳转方式，getrouterbyfilep",
+   "type": "bug",
+   "content": "已进一步修复，核心问题在这里： ## 真正原因 控制台能匹配到，是因为你用的是： ```javascript (r.meta?.filePath || r.component) === 'presale/permit/plan/detail' ``` 而 `getRouterPathByFilePath` 内部原先只用 `meta.filePath === filePath` 判断。 菜单节点经过 `flattenTree` 后，`meta.filePath` 可能被写成 `Layout` / `ParentView`，真正的组件路径在 `component` 字段里，导致**控制台有匹配，但工具函数找不到**。 另外，方案页路由名是 `PermitPlan/:tableid`，用 path 拼接在 `ParentView` 嵌套下也容易跳错。 ## 本次修改 1. **`routeMatchesFilePath`**：与控制台一致，`meta.filePath` 或 `component`（字符串）任一命中即可。 2. **`collectRoutesByFilePath`**：优先直接扫描 `originalRoutes` 扁平数组（与你控制台验证方式一致）。 3. **新增 `buildNavigationByFilePath`**：优先用命名路由 `{ name: 'Per",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**`detail.vue",
+    "`ruoyi.js",
+    "import('/src/utils/ruoyi.js",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permit\\components\\detail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\utils\\ruoyi.js、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\property\\spFeeBill\\components\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "91b53615-9131-4fec-94ff-01cc463a59ef"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "这边提交审核之后，页面不会自动刷新",
+   "type": "preference",
+   "content": "已完成统一修复，变更如下： ## 1. `OperationBtnGroup` 统一事件 在 [`OperationBtnGroup/index.vue`](zhi2-web-admin/src/components/OperationBtnGroup/index.vue) 新增 `emitStateChange()`，提交、审核、取消提交/取消审核成功后都会触发 `refresh` + `update`： ```272:281:zhi2-web-admin/src/components/OperationBtnGroup/index.vue emitStateChange() { this.$emit('refresh') this.$emit('update') }, handleApproval() { this.emitStateChange() }, handleSubmit() { this.emitStateChange() this.$emit('after-submit') }, ``` `jgxm/detail.vue` 等 33 个只绑了 `@refresh=\"init\"` 的页面，提交后会自动刷新，无需逐页修改。 ## 2. 清理重复绑定 为避免提交时 `getDetail` 被调用两次，已从 **99 个** `operation-btn-group` 标",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`OperationBtnGroup/index.vue`](zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "```272:281:zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "`jgxm/detail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\agreement\\jgxm\\detail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\agreement\\jgxm、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\OperationBtnGroup\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "30be24cb-105f-4bdc-aa08-3b0e6ab11f36"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "预售方案「查看」打开 PDF Implement t",
+   "type": "fact",
+   "content": "问题已定位并修复。 **原因**：接口返回的 PDF 路径在 `data.plan.planDocSite`（如 `/zhi2-dev/2026/c/q/2/xxx.pdf`），而之前代码只读了不存在的 `planUrl`，因此会回退到跳转方案页。 **修复**： 1. 在 `permitConstants.js` 新增 `resolvePlanDocUrl()`，按顺序读取 `planDocSite` / `planUrl`（含 `plan` 嵌套） 2. `handleQueryPlan()` 和 `canQueryPlan` 均改为使用该函数 刷新页面后再点「查看」，应会在新标签页打开 PDF。若本地仍 404，确认 `vite.config.js` 中 `/zhi2-dev` 静态资源代理已配置（你这份数据用的是 `/zhi2-dev/...` 路径）。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`permitConstants.js",
+    "`vite.config.js",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permit\\components\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6976122d-456e-461d-a9a7-8ac465dc9b76"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "{ label: '所属区域', value: th",
+   "type": "bug",
+   "content": "已修复。「所属区域」`region` 存的是行政区划编码（如 `320505`），详情视图直接展示编码，未转成可读名称。 已新增 `regionLabel` 计算属性，使用项目统一的 `formatters.provinceFormatter` 做转换（与 `building/project` 等模块一致），并在详情视图和编辑表单中统一使用： ```103:114:d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\projectDelivery\\components\\ProjectDeliveryInfoPanel.vue computed: { regionLabel() { const raw = this.form.region if (!raw) return '-' const formatted = this.formatters.provinceFormatter(null, null, raw) return formatted || raw || '-' }, infoView() { return [ ... { label: '所属区域', value: this.regionLabel, layout: { xs: 24, sm: 12, md: 12, lg: 12, xl: 12 ",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "```103:114:d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\projectDelivery\\components\\ProjectDeliveryInfoPanel.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\projectDelivery\\components\\ProjectDeliveryInfoPanel.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\projectDelivery\\projectDeliveryConstants.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "189a9e5a-b1d3-44f4-a6ab-16d07c1529ef"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

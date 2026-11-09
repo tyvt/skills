@@ -1,0 +1,99 @@
+{
+ "project": "苏住房C",
+ "batch": "042",
+ "files": [
+  "042.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "已定位并修复该问题。 原因分析 页面路径：authe",
+   "type": "bug",
+   "content": "已定位并修复该问题。 ## 原因分析 页面路径：`authentication.vue` → `errorTipOne.vue`（如何区分不动产权证和房产证） 问题出在 **CSS 样式**，不是图片资源缺失： 1. `ZsImage` 组件内部设置了 `height: 100%` 2. 外层 `.img-box` 没有固定高度 3. 页面里的 `.img-box .img` 是 **scoped 样式**，无法穿透到 `ZsImage` 子组件内部的 `<img>` 4. 结果：图片实际高度为 **0**，只能看到灰色占位框和下方文字 图片文件本身存在于 `pages_transaction/static/images/szf/fcz_1~3.png`。 ## 修复内容 修改了以下 3 个文件： - `errorTipOne.vue`（你遇到的页面） - `errorTip.vue` - `errorTipTwo.vue` 具体改动： 1. 使用 `:deep(.img)` 穿透子组件，设置 `height: auto`，让图片按原始比例显示 2. 为 `ZsImage` 显式添加 `subpackage=\"pages_transaction\"`，确保静态资源路径解析正确（与同项目 `addHouse.vue` 的做法一致） 请重新编译/刷新后，按原路径验证：**我的房屋 → 前",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "页面路径：`authentication.vue",
+    "`errorTipOne.vue",
+    "`errorTip.vue",
+    "`errorTipTwo.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "293e9168-99d3-401f-9f8a-68fd6f4853a1"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "当前分支是嵌入到APP里面的H5，现在会有页面后退回",
+   "type": "pattern",
+   "content": "已实现 APP 内嵌 H5 场景下的 tab 页拦截，任何回到 H5 tab 的行为都会调用原生 `backInfo` 返回 APP。 ## 问题 在 APP WebView 中，用户后退时可能落到 H5 的 tab 页（首页、苏找房、慧物业、掌服务、我的），但这些 tab 应由原生实现，不应在 H5 中展示。 ## 方案 新增 `utils/appNavigation.js`，在检测到原生 APP 环境（`webkit` / `android` / `harmony`，排除 `SZDJSBridge`）时统一拦截： | 拦截点 | 行为 | |--------|------| | `uni.navigateBack` | 若目标为 tab 页或栈中只剩一页 → 调用 `backInfo()` | | `uni.switchTab` | 直接调用 `backInfo()` | | `uni.reLaunch` / `redirectTo` 到 tab 页 | 调用 `backInfo()` | | tab 页 `onShow`（`tabBar.js` 兜底） | 展示 tab 时调用 `backInfo()` | ## 修改文件 1. **`src/utils/appNavigation.js`**（新建）— 核心拦截逻辑 2. **`src/utils/tabBar.js`** ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`utils/appNavigation.js",
+    "`onShow`（`tabBar.js",
+    "**`src/utils/appNavigation.js",
+    "**`src/utils/tabBar.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "34bbb144-2648-4883-b2f5-4039faa3aa6e"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "我的页面，进入电子业主卡，里面的图标不显示，",
+   "type": "fact",
+   "content": "已修复。原因是**微信小程序分包限制**： 电子业主卡页面在 `pages_owner_extra` 分包，但图标却从 `pages_owner` 分包加载（投票选举、投票表决、报事报修、我要出售等导航图标，以及箭头、背景图）。**分包页面不能引用其他分包的静态资源**，所以图标加载失败。 ### 修复内容 1. **将图标资源复制到当前分包** `pages_owner_extra/static/`： - `images/owner_nav_1.png`、`owner_nav_2.png`、`owner_nav_3.png` - `images/jiantou.png` - `icon/question-dark.svg` - `images/szf/Bg.svg` 2. **更新** `pages_owner_extra/ownerCard/index.vue`： - `subpackage` 从 `pages_owner` 改为 `pages_owner_extra` - 背景图、问号图标的 `resolveStaticUrl` 同步调整 - 用 `:deep()` 修复图标尺寸样式（scoped 样式无法穿透 `ZsImage` 子组件） 请重新编译并在微信开发者工具中预览，进入「我的 → 电子业主卡」，四个功能入口图标和箭头应能正常显示。若仍有问题，请告知是 H5 还是微",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`pages_owner_extra/ownerCard/index.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\ownerCard\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9b333521-93bd-4e07-8e91-b6a53dcd962f"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "我的-消息-微聊-机器 客服，发送显示不清",
+   "type": "preference",
+   "content": "已修复「在线咨询」页（`我的 → 消息 → 微聊 → 机器客服`）发送按钮文字显示不全的问题。 ## 原因 问题出在 `pages_main/automaticRobot/index.vue` 底部发送区域： 1. **按钮宽度被压缩**：`min-width: auto` 在小程序 WebView 里会让按钮宽度不足，「发送」两字可能换行显示 2. **文字被裁切**：原生 `button` 默认 `line-height` / `padding` 与固定高度 `80rpx` 冲突，导致只露出字符上下边缘 ## 修改内容 1. **`ZsButton` 组件**（全局）：增加 `padding: 0`、`line-height: 1`、`white-space: nowrap`，避免文字换行和溢出裁切 2. **`automaticRobot/index.vue`**：发送按钮固定 `128rpx` 宽，去掉 `min-width: auto` 3. **`chitchatDetail.vue`**（微聊页）：同步做了相同样式加固，避免同类问题 请重新编译/预览小程序，进入「在线咨询」页，确认右下角「发送」按钮文字是否完整清晰。若仍有问题，发一张新截图我继续排查。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`pages_main/automaticRobot/index.vue",
+    "**`automaticRobot/index.vue",
+    "**`chitchatDetail.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\robot\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\robot\\chitchatDetail.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\robot\\chitchat.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "139110b4-03df-4c4d-bf70-e95f95be8853"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "页面【pages_transaction/node-",
+   "type": "fact",
+   "content": "## 问题原因 这是**分包体积优化脚本**的遗留问题。 构建时 `relocate-z-paging.mjs` 会把 `z-paging` 从主包复制到 `pages_transaction` 等分包，但复制后 **`z-paging.js` 里的 `require('../../../../common/vendor.js')` 没有更新**。 在分包内，这个路径会错误解析为： ``` pages_transaction/common/vendor.js ❌（不存在） ``` 而实际应指向主包的： ``` common/vendor.js ✅ ``` ## 修复内容 已更新 `scripts/relocate-z-paging.mjs`： 1. 复制到分包后，遍历分包内所有 `z-paging` 的 `.js` 文件 2. 将 `common/vendor.js` 的 `require` 路径动态修正为主包路径 3. 支持对已构建产物重新执行修补（主包 `z-paging` 已删除时也能跑） 当前 `dist` 目录已执行修补，`pages_transaction`、`pages_main`、`pages_owner_extra` 三个分包均已修正。 ## 你需要做的 1. **在微信开发者工具中重新编译/刷新**当前 `dist` 目录 2. 若仍报错，先清缓存再编译（工具 ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`z-paging.js",
+    "`require('../../../../common/vendor.js",
+    "pages_transaction/common/vendor.js",
+    "common/vendor.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "498170bd-f084-43ab-8e01-034612613ebd"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

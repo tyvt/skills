@@ -1,0 +1,115 @@
+{
+ "project": "苏住房G",
+ "batch": 9,
+ "files": [
+  "033.md",
+  "034.md",
+  "035.md",
+  "036.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "patterns/index.js 里 IDCardNumber 是回调式 validator 不是正则，对它调 .test() 必抛 TypeError",
+   "type": "bug",
+   "content": "什么情况：苏州V3 表单校验报「IDCardNumber.test is not a function」时，容易误以为 patterns 里所有导出都是正则、可以统一 patterns.xxx.test(value)。\n\n为什么：patterns/index.js 导出的成员是两种形态混放的——绝大多数是正则字面量（mobileNumber、emailAddress、moneyValidator、numeral、number、picture 等），唯独 IDCardNumber 是 Element 回调式校验器 (rule, value, callback) => {...}（内部按 15/18 位分支，18 位还走 checkIdNumber 的加权校验码）。函数没有 .test 方法，因此任何 `this.patterns.IDCardNumber.test(x)` 都会在渲染/校验期抛 TypeError，且 .test() 返回布尔值时校验也完全不生效。正确写法是把它直接当 validator 传给 rules：`{ validator: this.patterns.IDCardNumber, trigger: ['blur'] }`，由 Element 注入 callback。\n\n怎么做：新增校验前先确认目标是正则还是 validator 函数；只有正则才用 .test(value) 或直接塞进 pattern 字段。\n\n与已知 #681「patterns.xxx 被引用但 index.js 从未定义」不同：那一条是「不存在」，本条是「存在但形态不符」——全库扫描「有无该 key」查不出这类问题，必须按「是否函数」区分。",
+   "evidence": "会话 c04c21a5：用户报「修复法人证件号码校验 TypeError」，修复 4 处 IDCardNumber.test 误用；随后用户追问「还有类似的问题吗」，全库扫描确认 patterns/index.js 中只有 IDCardNumber 是校验函数，其余 mobileNumber/emailAddress/moneyValidator/numeral/picture/number 均为正则，AmountInput、verifyRecord、depositRegister、HistoryRecord、formatters 里的 .test() 用法正常无需改。已核对 patterns/index.js：IDCardNumber 在第 26 行定义为 (rule, value, callback) => {...}，其余 18 个成员为正则。",
+   "files": [
+    "zhi2-web-admin/src/patterns/index.js",
+    "zhi2-web-admin/src/views/register/components/companyInfo.vue",
+    "zhi2-web-admin/src/views/institution/record/components/StaffForm.vue"
+   ],
+   "baseline": "b0f2039",
+   "sessionIds": [
+    "c04c21a5-56cc-45fa-9f36-152f64faba9d"
+   ],
+   "bundle": "033.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "身份证校验规则把「证件号码」与证件类型字典值 '01' 比较，校验器恒假、身份证格式校验形同虚设",
+   "type": "bug",
+   "content": "什么情况：从业人员/法人信息表单里，证件号码填了明显非法的值（不是 18 位、校验码错）也能保存通过，身份证格式校验看起来「配了但没生效」。\n\n为什么：rules 里写成 `{ validator: this.form.legalPersonIdNumber == '01' && this.patterns.IDCardNumber, message: '请输入正确的身份证号码' }`。这里 `'01'` 是**证件类型**（居民身份证）的字典值，却拿去和**证件号码**字段比较；只有当号码字面等于 '01' 时表达式才为真，于是 validator 恒为 false，Element 收到 falsy 的 validator 直接跳过校验。\n\n怎么做：比较对象必须是证件类型字段 `this.form.legalPersonIdType == '01'`，再与 validator 短路；同时确认短路时不会把 validator 降级成 false（更稳妥的写法是在 validator 内部判断类型，非身份证号直接 callback() 放行）。此类「条件性校验」的字段配对错误不会报错、也不会出现在任何 lint 或控制台里，只能靠人工核对字典含义与字段名是否同源。\n\n注意：本条与下一条同类问题不是一回事——TypeError 是「调用形态错」当场崩，本条是「条件表达式错」静默放行，后者更危险。",
+   "evidence": "会话 c04c21a5 收尾自查时发现：「发现一个相关逻辑 bug（不会报错，但校验失效）」，StaffForm.vue 第 108 行把 legalPersonIdNumber 与 '01' 比较，而 '01' 是 legalPersonIdType（居民身份证）的字典值，应改为 legalPersonIdType == '01'，否则身份证格式校验几乎永远不会触发。已核对当前代码 StaffForm.vue 第 106-108 行仍是 `this.form.legalPersonIdNumber == '01' && this.patterns.IDCardNumber`，而第 104 行同一表单的 legalPersonIdType 规则确认为独立必填项。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/record/components/StaffForm.vue"
+   ],
+   "baseline": "b0f2039",
+   "sessionIds": [
+    "c04c21a5-56cc-45fa-9f36-152f64faba9d"
+   ],
+   "bundle": "033.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "同一列表挂多个详情菜单时，返回按钮「截断路径」会落到未注册的兄弟路径 → 报页面未授权或不存在",
+   "type": "bug",
+   "content": "什么情况：业务详情页（如 信用管理-整改通知书）点「返回」报「页面未授权或不存在」，从待办打开时尤其必现。\n\n为什么：#198 记的「用截断路径回列表页而非 go(-1)」本身没错，但当同一列表按字典拆出多个详情菜单时（整改通知书按 source_dept 拆成 detailA / detail0 / detail1 / detail2 四个组件路径、四个菜单），详情路由的 path 中间段也随之分化，单纯截掉末段的业务主键得到的是 `.../detail1` 之类的**兄弟详情路径**，它没有对应菜单或未被注册，router 落到 catch-all 就报未授权。此时 meta.activeMenu 也可能缺失，截断结果无从纠正。\n\n怎么做：在统一的 getBackPathFromRoute 里按「权威优先」分层兜底——① 先按业务判据（routeMeta 的详情识别）用「列表菜单的 filePath」经 getCurrentRouterByFilePath 反查真实列表 path，并把 :tableid 占位符去掉；② 再试 query.backUrl；③ 再试 meta.activeMenu；④ 最后才截断路径，且截断后必须用 isRegisteredRoutePath 复核，未注册则按 meta.filePath 把 /detail 换成 /index 再反查一次。\n\n差异说明：本条根因是「多详情菜单共享一个列表」，不是 #198 的「截断路径本身取错」；解法要点是引入「按 filePath 反查路由」的正向权威来源，而非在路径字符串上打补丁。",
+   "evidence": "会话 35fa87f5：用户报「信用管理-整改通知书，查看详情后点击返回报页面未授权或不存在」，修复提交 6f33429af（fix(rectificationNotice): 修复整改通知书详情页返回跳转错误）。已核对当前实现：utils/sidebarActivePath.js 的 getBackPathFromRoute 先走 getRectificationNoticeUnifiedListPath()，再 backUrl / activeMenu / 截断，末段对未注册路径用 meta.filePath 的 /detail → /index 反查兜底；constants.js 定义 RECTIFICATION_NOTICE_DETAIL_PATH_SEGMENT = 'detail(?:A|[012])'，SOURCE_DEPT_DETAIL_PATH 将 source_dept 映射到 detailA/detail0/detail1/detail2 四个组件路径。",
+   "files": [
+    "zhi2-web-admin/src/utils/sidebarActivePath.js",
+    "zhi2-web-admin/src/views/evaluation/rectificationNotice/constants.js",
+    "zhi2-web-admin/src/views/evaluation/rectificationNotice/routeMeta.js",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue"
+   ],
+   "baseline": "415629d",
+   "sessionIds": [
+    "35fa87f5-0f58-43f9-9a0d-3a366bb1b707"
+   ],
+   "bundle": "033.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房G] 接口 200 但抽屉全 0/暂无数据：台账类接口的 ID 主键优先级被改成 complexId 优先",
+   "type": "bug",
+   "content": "【什么情况】统计地图 / 小区台账 → 点物业管理区域 marker 打开抽屉，Network 里 XHR 全部 200，页面却显示全 0 和「暂无数据」。Network 面板里两个「数字 ID」请求名其实是 selectOperatingAssetsCategory/{id} 和 selectOperatingAssetsCategoryHouseList/{id}（DevTools 只截取 URL 最后一段显示），另外两个 list 是地图层 selectOptionalComplexList（下钻到小区层级加载 marker）——所以「看起来 4 个 XHR」并不等于漏调接口，要按 URL 末段反查真实接口名。\n【为什么】某次提交把 resolvedProjectId 的取值优先级改成 complexId 优先，而 standingBook 台账路径上的参数历来是 projectId || leaseProjectId（与 incomeAndExpenditure 等 query 接口一致）。当 marker 上 complexId 与 leaseProjectId 不是同一个值时，用复杂区 ID 去查台账，后端查不到数据但按业务契约返回 200 + 空 data，前端于是渲染全 0。\n【怎么做】1）台账/合同类接口统一按 projectId → leaseProjectId → complexId 逐级兜底，complexId 只用于地图/GIS 维度（如运营报告 PDF 的 reportComplexId）。2）同一页面上两套主键要拆成两个变量（markerProjectId / reportComplexId），子组件按用途分别传 complex-id / project-id / lease-project-id，避免一个变量到处复用被优化时误改优先级。3）loadPageData 补 skipFetch 判断，与 G 端详情页行为一致。4）地图抽屉与小区台账详情页两处入口都要对齐同一套传参。\n【差异】已知清单里「跳转页 projectId 多来源互相覆盖」讲的是路由/缓存三来源优先级，本条是「200 + 空 data」的 ID 语义错配（GIS 主键 vs 台账主键），且给出「Network 请求名只显示 URL 末段」的误判排除法与双变量拆分做法。",
+   "evidence": "会话 5aabb73b：用户「物业管理区域点进来帮看下是不是有接口没调，这是正式环境调的」；排查结论「不是漏调接口…接口已返回 200，但 data 为空，所以页面显示全 0 和「暂无数据」」；根因「commit 5d50941f2 把 ID 优先级改成了 complexId 优先，而 standingBook 路径参数历史上用的是 projectId || leaseProjectId」；修复「resolvedProjectId 改回 projectId → leaseProjectId → complexId；overviewContent 拆分 markerProjectId 与 reportComplexId」。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/operatingAssets.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/overviewContent.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/index.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMapDetail/index.vue"
+   ],
+   "baseline": "3c282a5",
+   "sessionIds": [
+    "5aabb73b-5e1d-4042-9c52-01a66874380d"
+   ],
+   "bundle": "034.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房G] 按项目裁剪业务菜单时，小区台账「租赁申请」Tab 要在三处入口同步移除，组件文件保留",
+   "type": "workflow",
+   "content": "【什么情况】苏住房项目已隐藏「租赁申请」相关菜单，但统计地图 / 小区台账里仍能看到对应 Tab，点进去必然报错或无意义。\n【为什么】台账的 Tab 不是单一配置，而是「地图抽屉 + 台账详情页 + 本地组件块」三处各自维护：源菜单列表 sourceMenuList 定义 value，详情页 index.vue 复制了一份 Tab 配置，地图抽屉 overviewContent.vue 还按 value === '4' 单独 v-if 渲染组件。只改一处会出现「Tab 消失但组件还挂/或组件区空白」的半残状态。\n【怎么做】按项目隐藏某个台账 Tab 的标准动作：1）statisticsMap/index.vue 的 sourceMenuList 里移除 { label: '租赁申请', value: '4' }；2）statisticsMapDetail/index.vue 同步移除 Tab 配置，并删除对应组件块与 import；3）overviewContent.vue 删除 value === '4' 的渲染块与 import；4）底部组件文件 assetLease.vue 保留不删，便于后续恢复。改完核对剩余 Tab 顺序连续、默认 Tab（经营资产）仍可正常渲染和切换。\n【差异】已知清单讲的是「隐藏字段/栏目的开关式做法（379/701/1050）」，本条针对的是「同源项目的 Tab 配置三副本 + 按 value 分支渲染」这一具体结构，重点是「三处同改、组件文件留档」，而非用常量开关控制字段。",
+   "evidence": "会话 8f867382：用户「因苏住房项目，将『租赁申请』相关菜单隐藏了，需同步隐藏『小区台账-租赁申请』tab」；结论「共修改 3 个文件：sourceMenuList 中移除 { label: '租赁申请', value: '4' }；statisticsMapDetail/index.vue 同步移除 Tab 配置并删除 asset-lease 组件块及引用；overviewContent.vue 删除 value === '4' 的渲染块；assetLease.vue 保留未删，便于后续恢复」。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/index.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMapDetail/index.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/overviewContent.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/assetLease.vue"
+   ],
+   "baseline": "3c282a5",
+   "sessionIds": [
+    "8f867382-b86e-4021-9eaf-e433513e6c87"
+   ],
+   "bundle": "034.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 重写 getDetailRequiredParams 只能放行请求，接口路径与回调还得各改一处：无 id 详情接口失效的三点落地清单",
+   "type": "bug",
+   "content": "什么情况：详情页接口有返回，但页面只显示表单默认值（如 platformConfig 基础配置走 /system/platformConfig/getInfo，不依赖路由 id）。为什么：mixins/form.js 的 getDetail() 先过 validateDetailRequiredParams()/getDetailRequiredParams()，默认三要素 moduleName+businessName+id 缺任一即 console.warn 并 return，请求根本没发。已知结论 #912 只点到这一层，本批补三点：① 正确做法是页面内重写 getDetailRequiredParams() 只返回 moduleName+businessName（与 companyRecord 的 getOwnCompany 模式对齐），不要改公共 mixin；② detailApiFull 也要一并重写（默认是 /${moduleName}/${businessName}/${detailApiSuffix}/${id}，会渲染出 .../getInfo/undefined），本仓 platformConfig 就是覆盖成 /getInfo 放在 computed；③ detailCallback 必须兼容两种结构 response?.data ?? response，因为无 id 接口有的直接返回数据。排查时在控制台搜「[getDetail] 缺少接口必需参数」即可确认。",
+   "evidence": "会话 beb84a33：用户「接口有返回，修改详情接口逻辑」；结论指出 form.js 的 getDetail 校验路由 id 导致请求被跳过。基线核验 form.js L51-77（getDetailRequiredParams 默认含 id、warn 后 return）、platformConfig/detail.vue L317-340（重写 detailApiFull 为 /getInfo + 重写 getDetailRequiredParams 去掉 id）、L349-351（detailCallback 用 response?.data ?? response）。",
+   "files": [
+    "zhi2-web-admin/src/mixins/form.js",
+    "zhi2-web-admin/src/views/system/platformConfig/detail.vue"
+   ],
+   "baseline": "b6932ba",
+   "sessionIds": [
+    "beb84a33-dfcd-4bad-a0cd-f26b74eb1d33"
+   ],
+   "bundle": "036.md",
+   "project": "苏住房G"
+  }
+ ]
+}

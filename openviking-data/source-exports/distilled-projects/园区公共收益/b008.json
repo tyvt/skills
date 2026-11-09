@@ -1,0 +1,95 @@
+{
+ "project": "园区公共收益",
+ "batch": 8,
+ "files": [
+  "029.md",
+  "030.md",
+  "031.md",
+  "032.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "[园区公共收益] 编辑态 F5 不拉详情：detailMixins 把程序化改 form 误判为用户编辑写入 sessionStorage",
+   "type": "bug",
+   "content": "编辑态详情依赖 detailMixins 的 sessionStorage 表单缓存：有缓存则恢复表单并跳过 getDetail()。form 的 deep watch 在 form !== originForm 时写缓存。详情返回后若在 detailCallback 里过早同步 originForm，而 getArea()、子组件金额格式化等仍会改 form，会被当成「已编辑」写入缓存；刷新后读到假缓存就不再请求详情。\n\n修复要点：加载期 skipFormCache 禁止写缓存；重写 getDetail，在 detailCallback 后用 syncOriginFormAfterLoad() 于 $nextTick 再对齐 originForm（等子组件渲染完再解除保护）；从缓存恢复时同步 originForm 并校验缓存主键与路由 id 一致。页面侧在同步 originForm 前完成 getArea() 等派生赋值，勿再手写 originForm。",
+   "evidence": "地块编辑页未改任何字段直接 F5，因 sessionStorage 假缓存跳过 getDetail；结论明确程序化赋值与 originForm 时序是根因。",
+   "files": [
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/views/building/plot/detail.vue"
+   ],
+   "baseline": "86a4227",
+   "sessionIds": [
+    "0bafb3e6-385f-404a-b48a-91cebb47c939"
+   ],
+   "bundle": "029.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 改角色只传 roleIds 保存后名称错乱：zs-select 须 :label.sync 并在 getForm 带 roleName",
+   "type": "bug",
+   "content": "组织工作人员等详情改角色时若只更新 roleIds、roleName 仍保留详情接口旧值，保存请求体会把错误角色名（如仍显示「社区」）提交后端，界面与物管会等选项不一致。\n\n约定：角色下拉使用 zs-select 的 :label.sync=\"form.roleName\" 与 id 同步；getForm() 显式提交 roleName，缺省时从 roleOptions 按 roleIds 兜底；切换组织类型时与 roleIds 一并清空 roleName。",
+   "evidence": "修改角色为物管会保存后仍显示社区；根因是只传 roleIds、roleName 未随选择更新。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/ownerCommitteeWorker/detail.vue"
+   ],
+   "baseline": "b6bf87d",
+   "sessionIds": [
+    "64889348-1c95-4eb4-8199-6ee031bb7e1e"
+   ],
+   "bundle": "029.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 物业管理区域「楼幢范围」展示字段与授权弹窗对齐：projectName 改为 landPlotCode/landPlotName",
+   "type": "pattern",
+   "content": "园区公共收益域内楼幢范围相关表格（complex 详情/变更、综合查询 buildingTable 等）列展示从「项目名称 projectName」改为宗地号 landPlotCode、地块名称 landPlotName，列顺序与新增楼幢授权弹窗一致。rangeTable、rangeTableInfo、房屋清单与变更记录弹窗列配置需同源同步改。\n\n若列表仍空列，需后端在 /property/complexRange/page（或等价分页接口）补充返回 landPlotCode、landPlotName。",
+   "evidence": "用户要求去除项目字段改为宗地相关字段；多份 rangeTable 与 buildingTable 已统一字段名。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/components/rangeTable.vue",
+    "zhi2-web-admin/src/views/property/complexChange/components/rangeTable.vue",
+    "zhi2-web-admin/src/views/property/complex/components/rangeTableInfo.vue",
+    "zhi2-web-admin/src/views/building/complexSearch/components/buildingTable.vue"
+   ],
+   "baseline": "94b839a",
+   "sessionIds": [
+    "794bbcb3-914e-4103-a620-307568d14ce0"
+   ],
+   "bundle": "029.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] DetailTemplate type:image 混排附件：PDF 与图片同用缩略图卡片，图标走 resolveServerAssetUrl('/assets/images/file/3.png')",
+   "type": "workflow",
+   "content": "管理规约等使用 DetailTemplate 且字段 type:'image' 时，PNG 与 PDF 混排列表里 PDF 不要再用 attachment-item-file 整行文字链；改为与图片一致的 100×100 卡片，PDF 图标通过 getPdfAttachmentIconUrl() → resolveServerAssetUrl('/assets/images/file/3.png')。点击 PDF 卡片仍走 handleAttachmentFileClick 新窗打开；其他文档类型保持文字链接。\n\n改动集中在 detail-template.vue，所有复用该模板且 image 类型混排的详情页一并生效。",
+   "evidence": "PDF 混合附件静态图标展示计划；PNG 与 PDF 混排时 PDF 显示红色 Pdf 图标卡片。",
+   "files": [
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/utils/resolveServerAssetUrl.js"
+   ],
+   "baseline": "191094f",
+   "sessionIds": [
+    "7f300c14-221b-42ca-8513-b582bd83da6c"
+   ],
+   "bundle": "029.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 子表传 zs-operate-column 固定 120px 会裁切三按钮：删除 width 走组件按文案估宽",
+   "type": "workflow",
+   "content": "竣工验收等子表里非查询态「查看/编辑/删除」三个 mini 按钮，若给 zs-operate-column 绑定 :width=\"operateColumnWidth\"（如 120），会绕过组件内置按可见按钮文字估宽（约 182px），fixed 右列只露出删除按钮一条边。查询态仅「查看」时会自动收窄。\n\n处理：删除 width 绑定与 operateColumnWidth 计算，与 #875 同一契约；仅两按钮且 120 够用的表可保留固定宽。",
+   "evidence": "ownerAcceptanceTable 固定 120 装不下三按钮；去掉 width 后约 182px 显示完整。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/completion/components/ownerAcceptanceTable.vue",
+    "zhi2-web-admin/src/views/maintenance/completion/components/otherAcceptanceTable.vue",
+    "zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "4d45f0a4-0b7c-4a2c-a4e5-cff61b2ec75a"
+   ],
+   "bundle": "029.md",
+   "project": "园区公共收益"
+  }
+ ]
+}

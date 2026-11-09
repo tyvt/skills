@@ -1,0 +1,111 @@
+{
+ "project": "苏住房C",
+ "batch": "048",
+ "files": [
+  "048.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "缺少key的全局排查补全",
+   "type": "fact",
+   "content": "全局排查已完成。对 `zhi2-mobile-shimin/src` 下全部 `.vue` 模板做了扫描（兼容多行标签，并正确处理属性内的 `=>`），共发现并修复 **8 处** 缺少 `:key` 的 `v-for`： | 文件 | 修复说明 | |------|----------| | `components/ZsPicker/ZsPicker.vue` | 选择器列表 `:key=\"index\"` | | `pages_guard/guardApply/components/step3.vue` | 套餐内容列表 `:key=\"index\"` | | `pages_guard/packagingService/index.vue` | 守护事项列表 `:key=\"index\"` | | `pages_main/publicNotice/publicNotice.vue` | `<template v-for>` 补 `:key=\"index\"` | | `pages_main/readPage/commissionIndex.vue` | 文章列表 `:key=\"item.richTextId \\|\\| index\"` | | `pages_main/readPage/transactionIndex.vue` | 同上 | | `pages_my/robot/index",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`.vue",
+    "`components/ZsPicker/ZsPicker.vue",
+    "`pages_guard/guardApply/components/step3.vue",
+    "`pages_guard/packagingService/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "82ba9b4f-a6c5-499b-9c0c-8585ce86cdc9"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏找房推荐图片中缺少新房，二手房的标志",
+   "type": "bug",
+   "content": "已修复。原因是 `Project_Suzhufang.vue` 已传入 `show-type-prefix`，但 `houseCard.vue` 未实现该属性。 **修改内容**（`houseCard.vue`）： 1. 新增 `showTypePrefix` 属性 2. 新增 `addressText` 计算属性：开启时在区域名前显示类型标识 3. 合并重复的 `data()` 定义（顺带修复图标资源被覆盖的问题） 效果：推荐列表房源图片底部会显示： - `新房 | 高新区` - `二手房 | 吴中区` 与预期设计一致。刷新页面后即可看到效果。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`Project_Suzhufang.vue",
+    "`houseCard.vue",
+    "**修改内容**（`houseCard.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\Project_Suzhufang.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\commonNew\\houseCard.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3c2a5b09-905e-403b-807e-7f2d390cd0a7"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已修复「电子业主卡」页面切换按钮无响应的问题。 原因",
+   "type": "preference",
+   "content": "已修复「电子业主卡」页面切换按钮无响应的问题。 ## 原因分析 切换按钮由 **图标 + ZsPicker** 组成，但： 1. **外层 `switch-btn` 没有绑定点击事件**，点图标区域不会触发任何操作 2. **只有 ZsPicker 内部很小的文字区域**绑定了 `@click`，可点击范围过小 3. 最近 `ZsPicker` 加了 `virtualHost` 后，在绝对定位的 flex 布局里，内部点击更容易失效 另外还发现一个逻辑问题：恢复上次选中房屋时用了 `findIndex(...) > 0`，导致列表第一项（index 为 0）时无法正确恢复。 ## 修复内容 1. **`ownerCard/index.vue`**：给整个切换按钮绑定 `@tap=\"openHousePicker\"`，点击图标或文字都能弹出选择器 2. **`ZsPicker.vue`**：通过 `defineExpose` 暴露 `show` 方法，供父组件调用 3. **样式**：切换按钮内的 picker 设置 `pointer-events: none`，避免事件被内部元素拦截 4. **逻辑**：将 `> 0` 改为 `>= 0`，正确恢复上次选中的房屋 请重新编译小程序后验证：进入 **我的 → 电子业主卡**，点击右上角「切换」应能弹出房屋选择列表。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`ownerCard/index.vue",
+    "**`ZsPicker.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner_extra\\ownerCard\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\menu\\MenuSection.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsPicker\\ZsPicker.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "16685517-eda4-4fc5-8357-db2568f09adb"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "[渲染层网络层错误] Failed to load ",
+   "type": "fact",
+   "content": "**原因：** 图片实际在 `pages_owner/static/images/`（`owner_nav_1.png`、`owner_nav_2.png`、`owner_nav_3.png`、`jiantou.png`），但电子业主卡页面在 `pages_owner_extra` 分包。 `ZsImage` 默认 `local=true`，会通过 `resolveStaticUrl` 按**当前页面路由**推断分包，于是请求路径变成： `/pages_owner_extra/static/images/owner_nav_1.png` 该目录下没有这些文件，微信开发者工具返回 500。 同页里的 `questionIcon`、`cardBgUrl` 已正确指定 `pages_owner` 分包，导航图标和箭头漏掉了。 **修复：** 为相关 `ZsImage` 增加 `subpackage=\"pages_owner\"`： ```52:55:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner_extra\\ownerCard\\index.vue <ZsImage class=\"nav-icon\" :src=\"item.icon\" subpackage=\"pages_owner\" /> <div class=\"base-tit\">",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "```52:55:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner_extra\\ownerCard\\index.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner_extra\\ownerCard\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5c003f25-6041-4bd4-854d-61f76247907c"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "未生效",
+   "type": "preference",
+   "content": "已改用更稳妥的方式处理。 **原因：** 在微信小程序里，写在 `ZsButton` 这类自定义组件上的 `margin`（包括 UnoCSS 的 `mt-80`）往往不会作用到实际按钮上，所以之前调整看起来没效果。 **本次修改：** 1. 用原生 `view` 包裹「下一步」按钮 2. 在包裹层 `.next-step-btn` 上设置 `margin-top: 80rpx` 3. 给 `.publish-type-box` 加上 `flex` 纵向布局，避免外边距折叠 请重新编译后再预览。如果间距仍不对，告诉我你希望的大致距离（比如「再大一点」），我可以继续调。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\publishHouse\\type.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\publishHouse\\verification.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner\\authentication.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a2751523-b238-42d9-b41f-5da721879c3a"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "tabUI出问题",
+   "type": "preference",
+   "content": "已修复「行业资讯」页 tab 竖排显示的问题。 **原因：** `pages_main/news/index.vue` 里的区域 tab 用了 `display: flex`，但 `li` 没有禁止收缩。tab 较多时会被压窄，中文在 `word-break: keep-all` 下逐字换行，就出现了竖排效果。 **修改：** - 给 `li` 加上 `flex-shrink: 0`，避免被压缩 - 加上 `white-space: nowrap`，保证文字横向一行显示 - 去掉多余的 `word-break: keep-all` - 给 `ul` 重置 `margin: 0` 重新编译小程序后，tab 应正常显示为「市住建」「张家港市」「常熟市」等横向标签，并可左右滑动。若还有异常，告诉我具体页面或发截图即可。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`pages_main/news/index.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\news\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\news\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_main\\news\\components\\ListIndex.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9bedfd55-6428-4419-b1a7-8396206c9412"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

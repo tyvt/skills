@@ -1,0 +1,63 @@
+{
+ "project": "淮安物管",
+ "batch": 2,
+ "files": [
+  "005.md",
+  "006.md",
+  "007.md",
+  "008.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "[淮安物管] 业委会/物管会变更单：草稿 bizState=0 可增删委员，businessType 物管会=3/业委会=2",
+   "type": "workflow",
+   "content": "【什么情况】业委会变更、物管会变更保存后不能新增/删除委员，且联系人、联系电话被设成必填，与「业委会/物管会备案」不一致。\n\n【怎么做】① 两个变更详情页向共用子表 `MemberInformationTable` 传入 `:editable=\"form.bizState == '0'\"`（草稿态才可增删）、`:businessType`（物管会 `3`、业委会 `2`）、`:complexId`（新增委员选户室）；② 联系人相关字段去掉 `required`，保留电话格式校验——物管会：`secretaryName`/`secretaryPhone`；业委会：`contactName`/`officePhone`/`secretaryName`/`secretaryPhone`；③ `editable=true` 时操作列增加行内「删除」，调用 `DELETE /autonomy/ownerCommitteeMember/{id}`，顶部保留批量删除；④ 核对物管会变更页勿误传 `businessType='2'`。\n\n【与已知差异】#1077 强调子区块可操作性要 formMode+状态双判；本条是业主自治变更单在草稿态放开委员子表，并与备案页字段必填口径对齐。",
+   "evidence": "会话 6c5825ab（2026-07-08，基线 21ef3c1）：用户要求保存后可增删委员、联系人非必填，并确认删除委员接口能力；结论为两变更 detail 接 MemberInformationTable 三 prop、调整校验、行内删除与 businessType 修正。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/change/property/detail.vue",
+    "zhi2-web-admin/src/views/autonomy/change/industry/detail.vue",
+    "zhi2-web-admin/src/views/autonomy/record/components/MemberInformationTable.vue"
+   ],
+   "baseline": "21ef3c1",
+   "sessionIds": [
+    "6c5825ab-1043-4e87-8560-4c096e4cd431"
+   ],
+   "bundle": "005.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] 企业变更审核通过后变更角标不显示：变更前禁止读已更新的 companyRecord 主档",
+   "type": "bug",
+   "content": "【什么情况】企业变更单审核通过后再打开变更详情，字段对比角标（红色三角、悬停原值）全部消失，但变更记录弹窗或字段对比逻辑仍期望有「变更前」。\n\n【为什么】审核通过后企业主档 `companyRecord` 已是变更后数据；详情若仍从该接口或当前主档取「变更前」，前后值相同，diff 失效。与 b001 已收录的「空→有值 hasChangeIndicator」不同，本条是**数据源选错**。\n\n【怎么做】① 在 `companyManagement/components/detail.vue` 增加 `setChangeBeforeForm`：优先用变更单详情返回的 `originInfo` / `originalObj`（审核时快照）；若无再回退查当前备案（适用于审核中）；② `detailCallback` 加载变更详情后调用该方法；③ `changeBeforeObject` 计算属性增加对 `form.originInfo` / `form.originalObj` 的回退；④ 同步修复 `toB/companyRecord/detail.vue` 等同逻辑。若仍无角标，核对 `/company/companyRecordChange/{id}` 是否在审核通过时持久化快照字段。\n\n【验收】审核后查看企业变更详情，已改字段应显示角标，悬停可见「原值：xxx」，与物业管理区域备案变更表现一致。",
+   "evidence": "会话 de0cc397（2026-06-26，基线 202a641）：根因定为审核后主档已更新仍用其作变更前；结论为 setChangeBeforeForm + detailCallback + changeBeforeObject 回退 originInfo/originalObj。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/detail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/change/detail.vue",
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue"
+   ],
+   "baseline": "202a641",
+   "sessionIds": [
+    "de0cc397-b971-4de6-bb83-d5a9cf64baab"
+   ],
+   "bundle": "005.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] 物业全域管理台账 pubLedger：/property/pubLedger/page 与多业务态单元格展示口径",
+   "type": "pattern",
+   "content": "【业务】列表汇总物业管理区域在企业授权、物业合同录入、公共收益管理主体备案、公共收益开户等链路上的状态，支持按街道/社区/物业管理区域筛选与导出。\n\n【接口】分页 `GET /property/pubLedger/page`，查询字段含 `subdistrictName`、`communityName`、`complexName`、`pageNum`、`pageSize`。\n\n【列展示约定（前端拼文案）】① 企业授权：已授权——有企业关联该区域，括号展示物业企业名称；未授权——无关联企业；② 合同录入 / 公共收益管理主体备案 / 公共收益开户：待提交、已备案按业务 `bizState`；无备案记录显示「未录入」；审核中按状态并在括号展示当前待办审核节点；③ 楼幢授权数量：展示该区域关联楼幢数；④ 公共收益开户账户回传状态：作为开户情况关联字段，区分未回传/已回传（审批中是否已回传账户）。\n\n【实现落点】`property/pubLedger/index.vue`；导出需 `exportLoading` + 按钮 `loading` + `download` 的 `finally` 复位（与同仓其它列表一致，不单独记通用套路）。",
+   "evidence": "会话 968e6aef（2026-06-30，基线 1b9f773）：用户给出台账模板与 Apifox 契约，要求建表统计与导出；追加「导出没有 Loading」后补 exportLoading。",
+   "files": [
+    "zhi2-web-admin/src/views/property/pubLedger/index.vue",
+    "zhi2-web-admin/src/api/index.js"
+   ],
+   "baseline": "1b9f773",
+   "sessionIds": [
+    "968e6aef-a864-48b6-8689-93f6af2352ef"
+   ],
+   "bundle": "005.md",
+   "project": "淮安物管"
+  }
+ ]
+}

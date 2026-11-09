@@ -1,0 +1,75 @@
+{
+ "project": "园区物管2.0",
+ "batch": "030",
+ "files": [
+  "030.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "增加标签，并且判断如果没有值则不显示，注意竖线",
+   "type": "fact",
+   "content": "### 原因 `.login.login--form-only` 使用了 `align-items: flex-end`。底栏 `el-login-footer` 仍是 flex 子节点，在 **`position: fixed` 且 `left` / `right` 为默认 `auto`** 时，水平位置会按 flex 的「静态位置」来算，结果整块底栏跟着被摆到靠左，看起来就像文字不居中。 ### 修改 给 `.el-login-footer` 加上 **`left: 0; right: 0;`**，并加上 **`box-sizing: border-box`**，让固定定位相对视口左右贴齐，再靠内部的 `text-align: center` 居中文字。 刷新后底栏应重新在屏幕水平居中。若仍异常，再检查外层布局是否对 `.login` 使用了 `transform`（会把 `fixed` 改成相对该层定位）。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\login.vue",
+    "@zhi2-web-admin/src/views/login.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4b4a9576-d928-45cc-bdb7-cc109ec7c990"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "第一次打开弹窗会闪烁",
+   "type": "preference",
+   "content": "已修复首次打开弹窗闪烁问题，原因和改动如下。 ## 原因 1. **重复挂载**：`layout/index.vue` 和 `Navbar.vue` 各有一个 `bProjectDialog`，两个 `el-dialog` 同时挂在 body 上，首次打开时容易出现遮罩层闪烁。 2. **数据未就绪就打开**：`layout` 的 watcher 在 `bProjectData` 请求完成前就把 `projectDialogVisible` 设为 `true`，弹窗会先显示「暂无可用物业区域」，数据到了再切换成列表，造成闪烁。 3. **打开时重复初始化**：`onOpen` 里再次调用 `initRegionList()`，会重建列表并触发重渲染。 ## 修改 1. **Navbar**：移除重复的 `bProjectDialog`，点击项目名称时通过 `open-project-dialog` 事件通知父组件打开弹窗。 2. **layout**：统一管理弹窗状态；等项目列表接口返回后再决定是否自动弹出；新增 `openProjectDialog` 供 Navbar 调用。 3. **bProjectDialog**： - 新增 `dataLoading`，加载中显示 loading，不显示空状态 - `onOpen` 不再重复调用 `initRegionList` - 仅在弹",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "**重复挂载**：`layout/index.vue",
+    "`Navbar.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\layout\\components\\Navbar.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\home\\bProjectDialog.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\mixins\\dialogMixins.js、d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\layout\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "99e0bdb9-a041-402c-9293-6e332ef231d4"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Pr",
+   "type": "fact",
+   "content": "已修复。 **原因：** 页面使用了旧组件 `<search-container>`，但项目里已不再注册该组件；同类列表页（如 `pubElevMaintenance/index.vue`）已统一改为 `<zs-search-form>`，并通过 `listMixins` 自动注册。 **修改：** 1. 将 `<search-container>` 替换为 `<zs-search-form>` 2. 新增 `formItems` 计算属性，配置小区名称、年度、是否对外发布、业务状态四个搜索项 刷新页面后，这条警告应会消失，搜索表单功能与原先一致。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`pubElevMaintenance/index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubElevMaintenanceNew\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubCheckoutManage\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\mixins\\listMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "31f93d40-0b1b-4532-9404-1e8c008776f8"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "抽取成功弹窗：",
+   "type": "bug",
+   "content": "已调整。根本原因是 `body` 高度与内容一致（约 100px），`align-items: center` 没有实际效果，内容会紧贴顶部。 本次修改： 1. **给 `body` 设置 `min-height: 148px`**，让图标和文字在内容区垂直居中 2. **收紧顶部 header**，减少关闭按钮上方的空白 3. **去掉 `success-content` 的上下 padding**，由 `body` 统一控制垂直居中 刷新后，成功提示会在关闭按钮和底部按钮之间更居中。若仍偏上或偏下，可继续微调 `min-height`。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0、d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\extract\\detail.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\extract\\components\\SelectJudgesDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b185be66-bd45-4dfc-803b-68a0ab11cd87"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,44 @@
+{
+ "project": "靖江物管G",
+ "batch": "001",
+ "files": [
+  "001.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "这里打印aesKeyBase64值为null",
+   "type": "bug",
+   "content": "这次我又补了一个关键修正，专门针对“看起来是同一把钥匙但一直解不出来”的场景： - 在 `normalizeCipherText()` 里增加了： - `decodeURIComponent`（处理 `%2B` 这类编码） - 把空白还原成 `+`（表单传输里 `+` 常被转成空格） - URL-safe Base64 转标准 Base64（`-/_ -> +/`） - 自动补齐 `=` 到 4 的倍数 这一步很常见，密文只要丢了几个 `+`，`decrypt()` 就一定返回 `null`。 你现在再试一次请求。 如果**还是 null**，基本就只剩两类原因： 1. 后端不是用这把私钥对应的公钥加密（密钥对不一致） 2. 后端使用了 `RSA-OAEP`，而 `JSEncrypt` 只支持 `PKCS1 v1.5`，也会一直 `null` 如果你愿意，我下一步可以直接给你加一段“前端自检日志”（打印 `key` 长度、是否含空格、归一化前后摘要），你把控制台结果贴我，我可以 1 轮内判断是“密文损坏”还是“填充模式不匹配”。",
+   "evidence": "extracted source=cursor project=靖江物管G",
+   "files": [
+    "涉及文件：d:\\repository\\靖江物管G\\src\\request\\index.js、d:\\repository\\靖江物管G\\src\\utils\\request.js",
+    "@src/request/index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6b27025b-cc03-4bb5-ab31-083c121c2826"
+   ],
+   "_draft": true,
+   "project": "靖江物管G"
+  },
+  {
+   "title": "[Vue warn]: Error in callb",
+   "type": "preference",
+   "content": "已修复这个报错，根因就是 `ZsTable` 里对 `$attrs.data` 的 watcher 没有做空值保护。 我在 `src/components/zsTable/index.vue` 做了两个安全兜底： - watcher 中先把 `newValue` 规范成数组： - `const list = Array.isArray(newValue) ? newValue : []` - 再判断 `list.length === 0`，避免 `undefined.length` 报错 - `handleSelect` 里同样加了数组保护，防止 `row` 非数组时报错 这样即使父组件在异步切换或清空数据时传了 `undefined/null`，也不会再触发 `TypeError: Cannot read properties of undefined (reading 'length')`。 另外我已检查该文件 lint，当前无新增告警。",
+   "evidence": "extracted source=cursor project=靖江物管G",
+   "files": [
+    "`src/components/zsTable/index.vue",
+    "涉及文件：D:/repository/靖江物管G/src/components/zsTable/index.vue",
+    "D:/repository/靖江物管G/src/components/zsTable/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5ef01991-e3ff-4f8a-b74e-945baa6f1ef6"
+   ],
+   "_draft": true,
+   "project": "靖江物管G"
+  }
+ ],
+ "_draft": true
+}

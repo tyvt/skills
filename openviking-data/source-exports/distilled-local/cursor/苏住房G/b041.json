@@ -1,0 +1,43 @@
+{
+ "project": "苏住房G",
+ "batch": "041",
+ "files": [
+  "041.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "重现步骤 [步骤] 1、银行授权，太仓区没有授权银行",
+   "type": "bug",
+   "content": "就是这个页面。你截图里的 **开户申请**（`benefit/pubRegulatoryAccount`）点击「管理银行」时，走的是公共选择弹窗 `SelectDialog`，左侧银行列表来自 `queryStartBank`（按区域授权过滤），右侧是网点列表。 ## 问题原因 太仓区未授权银行时，左侧列表为空，但右侧点「搜索」仍会调用 `selectTJgBankBranchList`，且未带 `workBankId`，导致查出全部网点。 ## 已做修复 在 `zs-select-dialog-func.vue` 中增加了拦截： 1. **未选左侧银行时**，右侧列表不请求接口，表格显示「请先选择左侧银行」 2. **点搜索时**，提示「请先选择银行」 该页面 `showBankDialog()` 使用的就是这个弹窗，**无需再改业务页代码**。 ## 修复后预期行为（对应你的复现步骤） | 步骤 | 修复前 | 修复后 | |------|--------|--------| | 1. 太仓区无授权银行 | 左侧为空 | 左侧仍为空 | | 2. 点管理银行 → 不选银行 → 点搜索 | 出现网点列表 | 提示「请先选择银行」，不出现网点 | | 3. 选网点并保存 | 可保存 | 无法选到网点，无法保存 | 请重新编译/刷新前端后按原步骤验证。若还有问题，把弹窗截图发我即可。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "`zs-select-dialog-func.vue",
+    "涉及文件：d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\.gitmodules、d:\\repository\\苏住房G\\zhi2-web-admin\\vite.config.js、d:\\repository\\苏住房G\\zhi2-web-admin\\src、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\maintenance\\accountOpen\\components\\OpenDetailDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e54e19e2-5d01-4169-ace4-1cfb25836888"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "编辑按钮补充",
+   "type": "bug",
+   "content": "已补充物业费申报详情页的编辑按钮，修改如下： ### 1. 恢复顶部「编辑」按钮 移除了 `:showEdit=\"false\"`，使用 `operation-btn-group` 的默认行为。在**查看模式**且**制单状态为草稿（bizState = 0）**时，顶部会显示「编辑」按钮（位于「返回」与「附件」之间）。 ### 2. 调整申报明细表格只读逻辑 将 `readOnly` 从仅判断 `bizState`，改为同时判断 `formMode`： ```130:130:zhi2-web-admin/src/views/property/feeDeclare2/detail.vue :readOnly=\"formMode == 'view' || form.bizState != 0\" ``` 效果： - **查看模式**：表格只读，不显示「操作」列及「导入/选择房屋」按钮 - **点击「编辑」进入编辑模式**：可编辑户室明细（行内「编辑」「删除」及顶部导入按钮） - **已提交/已审核**（bizState ≠ 0）：始终只读 刷新详情页后，草稿状态的记录应能看到顶部「编辑」按钮。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "```130:130:zhi2-web-admin/src/views/property/feeDeclare2/detail.vue",
+    "涉及文件：d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin\\src、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\detail.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\components\\feeBindScopeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2b6910b1-af76-49c6-87c1-e6cbab4a1b46"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,313 @@
+{
+ "project": "产品2.0",
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md"
+ ],
+ "count": 18,
+ "memories": [
+  {
+   "title": "[苏房] 附件「允许类型」是后端配置的逗号串字典码，报「文件类型不允许」先查配置回填而不是改前端 accept",
+   "type": "bug",
+   "content": "什么情况：企业注册/入网等匿名或登录态的表单里，用户明明上传的是 png/jpg/pdf，接口仍统一返回「文件类型不允许」；用户还在界面上确认过「允许的附件类型里我已经勾了 0 和 3」。\n\n为什么：V3 的附件允许类型不是前端 accept 或扩展名白名单说了算，而是附件配置（appendixConfig）里一个用逗号串起来的字典码集合，后端按 fileType 字典码逐项比对。三类误判最常见：①配置里只勾了少数几个码，用户以为「勾了就是全覆盖」；②前端把上传组件 accept 或本地 file-type 白名单与后端配置当成两个真相源，改一边另一边没动，前端放行、后端拒绝；③码值口径不一致——0/3 是 fileType 字典码，而 png/jpg/pdf 只是扩展名，用扩展名去反推码值必然对不上（参见已知 #302：扩展名不能由后端 fileType 反推，方向反过来同样成立）。\n\n怎么做：报类型不允许时第一时间调 appendixConfig/detail（或 listAppendixPackage，见已知 #286）把该 busCode 下的允许类型码打印出来，与实际上传文件的 fileType 逐项对照，而不是先动上传组件的 accept；确认缺口后由配置侧补码，前端只在「配置已明确」的前提下做展示层过滤，禁止在前端另建一套扩展名白名单当第二真相源；前端若确需按扩展名过滤，必须精确相等匹配而不能 includes（参见已知 #1110 的 doc/docx 误拦）。",
+   "evidence": "会话 a48b51e8 用户诉求 1 贴附录配置接口 curl，诉求 2/3/4「你帮我测试，模拟上传，跑通流程」「加白名单了，再试试」「再试下，改了」，诉求 5「上传参数给我一下」，诉求 6 明确「附件配置里我选的允许的附件类型确实是0和3，现在是传png/jpg/pdf文件也报这个错吗？」；最终结论记录该链路最终是因用户在环境侧补数据后 Step1 才通过。",
+   "files": [
+    "zhi2-web-admin/src/components/AnnexUpload/index.vue",
+    "zhi2-web-admin/src/views/tool/fjflpz/components/FjDialog.vue",
+    "zhi2-web-admin/src/views/company/companyRegister/dialog.vue"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "a48b51e8-5524-4296-ac1b-f971accfcfcb"
+   ],
+   "bundle": "001.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "账单优惠新增/编辑：优惠方式双模式共用同一个输入字段导致「选金额没框、选比例填的是金额」",
+   "type": "bug",
+   "content": "情况：账单优惠弹窗要求「按金额」输入减免金额（元，≤当前应收）、「按比例」输入 0-100 的百分数，系统按 应收金额×比例 算优惠额。首版把优惠值塞进同一个金额输入框，切换优惠方式只改 label 不改字段，于是选金额时看不到输入框、选比例时填进去的是金额，用户连报两轮「输入交互还是不对」。\n为什么：折扣行本质是「一个类型枚举 + 一个数值 + 一个由数值派生的金额」，只有存原始输入值（比例或金额）+ 显式 discountType，派生金额才能正反算；把两者混成一个字段，切换类型时旧值会被当前类型误解释。\n怎么做：表单里放 discountType（金额/比例）+ 原始输入值两个字段，输入控件随类型切换 placeholder、后缀（元 / %）与上下限（金额≤应收、比例≤100）；优惠额用 computed 派生而不是反向回写输入框；提交仍按百分数口径回传。优惠总额变化时把「应收」也做成可重算的展示值（应收 = 原始应收 − 优惠总额），不要依赖接口二次刷新。",
+   "evidence": "会话 d093c203 诉求 1-3：先按「比例输入 0-100」，随后用户指出「选择金额时没有输入框，选择比例时输入的是优惠金额，没对应上」，最后要求「优惠总金额变化时应收金额也要实时更新」。",
+   "files": [
+    "zhi2-web-admin/src/views/property/spFeeBill/components/discountDialog.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/discountTable.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/enums.js",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/detail.vue"
+   ],
+   "baseline": "a5e7e78",
+   "sessionIds": [
+    "d093c203-50a8-4319-afc6-3afd9aa02583"
+   ],
+   "bundle": "002.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "账单批量收款改走 spOrder/createFromBill：billIds 统一数组 + useDeduct + 按 channelType 推 payMode，返回 url 决定扫码还是直接成功",
+   "type": "pattern",
+   "content": "情况：列表页「收款」从单选升级为多选收款，并要把优惠抵扣、支付渠道一起带上；旧的 /property/spFeeBill/collect 需下线。\n为什么：多笔收款本质是「按账单 ID 数组生成一笔支付单」，与单笔收款不是同一个后端动作；只有把类型、渠道、抵扣作为订单属性一次性提交，后端才能算实收并生成支付链接。\n怎么做：新增/改造收款入口统一调 POST /property/spOrder/createFromBill（项目内相对路径，代理自动补 /v2.0 前缀），请求体：billIds=所选账单 ID 数组（单笔多笔都传数组）、useDeduct='1'/'0'、paymentChannelId 仅在扫码金额>0 时传、payMode 由渠道 channelType 换算（与 PaymentDialog 同一套换算函数）、orderDesc 为备注。提交后按响应分流：有 url 就弹二维码并轮询订单状态，无 url 直接提示「收款成功」并关弹窗。多选的前置校验必须同时满足三条：所选单据都是待支付或部分支付、都是有效单据、属于同一物业管理区域，任一不满足就拦截并提示。",
+   "evidence": "会话 d093c203 最终结论给出参数映射表并说明「原先调用的 /property/spFeeBill/collect 已移除」；诉求 6 要求多选收款并校验状态/有效性/同一物业管理区域。",
+   "files": [
+    "zhi2-web-admin/src/views/property/spFeeBill"
+   ],
+   "baseline": "a5e7e78",
+   "sessionIds": [
+    "d093c203-50a8-4319-afc6-3afd9aa02583"
+   ],
+   "bundle": "002.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "折扣弹窗附件「编辑下载不了 + 再次新增带出上次附件」的双根因：行内附件走临时 busId，弹窗复用未重置",
+   "type": "bug",
+   "content": "情况：新增优惠折扣时上传附件，保存后在编辑页点下载无效；再点「新增」时又自动带出上一次上传的附件。两个现象同源。\n为什么：折扣明细是子表行，附件在弹窗内上传到的是「临时/匿名占位」分组（busId 用占位值或为空，等保存时由后端转挂），所以：① 编辑页拿到的是尚未落库的临时路径/空 busId，自然下载不到；② 弹窗组件被复用（v-if 未重建或未显式重置），上一次的表单与附件列表留在实例里，新增时原样回显。\n怎么做：附件上传按「新增态 busId 占位 + 保存后由后端转挂」统一约定，保存成功后必须用接口返回的真实分组/主键回填并重新拉取一次列表（不要在本地拼 URL 展示）；弹窗每次打开都显式重置表单与附件列表（重置 data 中的附件数组 + 清 uploader 的 fileList），不要只依赖关闭时的 resetFields；编辑态下载统一走「按附件 ID 取地址」的接口，不要直接用提交前拿到的临时地址。",
+   "evidence": "会话 d093c203 诉求 4：「新增优惠折扣 上传附件后 编辑页不能正常下载；切再次新增折扣时 附件带出上次新增上传的附件」。",
+   "files": [
+    "zhi2-web-admin/src/views/property/spFeeBill/components/discountDialog.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/discountTable.vue"
+   ],
+   "baseline": "a5e7e78",
+   "sessionIds": [
+    "d093c203-50a8-4319-afc6-3afd9aa02583"
+   ],
+   "bundle": "002.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "折扣明细「查看」应直接展示主表应收金额，不要在前端再减一次优惠（同一金额只算一次）",
+   "type": "pattern",
+   "content": "情况：账单详情 → 折扣明细 → 点「查看」，弹出的优惠信息里应收金额显示的值与主表不一致，因为查看面板又把主表的应收金额减了一次优惠金额。\n为什么：账单主表的「应收金额」在生成账单时已是净额（已扣减优惠），前端在查看态再减就是二次扣减；而「优惠前金额」「优惠金额」「应收金额」三者是后端下发的并列字段，展示层不应做任何再计算。\n怎么做：凡是从列表/详情进入的只读查看面板，金额一律直接取接口返回的对应字段，派生计算只允许出现在「尚未保存的新增/编辑」场景；不要把编辑态的「应收 = 原应收 − 优惠」公式复用到查看组件里，需要区分就用 formMode/readOnly 分开，查看态走纯展示分支。同类「汇总字段查看态被再算一次」的问题可以按「先确认接口是否已给净额」一步定位。",
+   "evidence": "会话 d093c203 诉求 5：「账单的折扣明细 点查看时 直接显示主表的应收金额即可 不用再减优惠金额」。",
+   "files": [
+    "zhi2-web-admin/src/views/property/spFeeBill/components/detail.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/discountTable.vue"
+   ],
+   "baseline": "a5e7e78",
+   "sessionIds": [
+    "d093c203-50a8-4319-afc6-3afd9aa02583"
+   ],
+   "bundle": "002.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "侧栏收起后表格右侧留白/列宽不均：修法必须是「重新触发宽度计算并均分剩余列」，不是调 fit",
+   "type": "workflow",
+   "content": "情况：左侧菜单收起后，列表页（如房屋质量保证金协议）表格右侧出现空白、列宽不跟随容器变化，其他菜单同样复现；在 Chrome 141 上改 :fit 反复无效，用户两轮「还是不行」。\n为什么：表格列宽是首次渲染时按当时容器宽度算好并写死的，侧栏收起只改变外层容器宽度，DOM 宽度变化不一定触发组件内部的列宽重算；:fit 只影响列宽策略，不负责「重新测量容器」。\n怎么做：容器尺寸变化（侧栏折叠、窗口 resize、Tab 切换）时显式触发一次「重置基准列宽 + 重新测量 + 剩余宽度均分」的重算流程，并做防抖合并；重算不要挂在 mounted 与 data watch 上重复执行（首次布局交给 data 的 immediate watch 即可）。用户明确认可的方案就是「重新触发宽度计算，平均分给每一列」，而不是靠 fit / min-width 让位。",
+   "evidence": "会话 ed54ca3b：用户依次反馈「左边菜单栏收起页面展示不对」「还是不行」「收起后出现空白，其他菜单也有」「还是不行，chrome141.0.7390.54」；诉求 6 直接给出期望方案「重新触发宽度的计算，平均分给每一列」。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/guaranteeDepositAgreement/index.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/layout/index.vue"
+   ],
+   "baseline": "414029f",
+   "sessionIds": [
+    "ed54ca3b-8927-46de-b31e-4658f9f285d7"
+   ],
+   "bundle": "002.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "Web E2E 稳定性约定：按元素可见性等待、股东弹窗用主行/操作行分别定位、地图下拉被向上弹出时改选点",
+   "type": "preference",
+   "content": "情况：注册全流程 E2E 反复超时——股东新增弹窗打开要等很久、第二次选地图时地址下拉因为空间不足向上弹出导致点不到，用例只能回退到点地图选点，耗时被拉长。\n为什么：固定 sleep 既慢又不稳；el-table 的固定列会把同一行的「主数据单元格」与「操作列按钮」渲染成两套 DOM，按文本全局定位必然命中多份或命中错误那份。\n怎么做：① 一律用可见性/状态断言等待（waitForSelector visible、expect(...).toBeVisible()），禁止固定等待时长，用户明确要求「按照元素可见性判断，不要固定等待时间」；② 表格行内操作按「主行行集」与「操作列行集」两个辅助函数分别取（如 getXxxMainRows / getXxxActionRow），批量删除等工具栏按钮限定在 .table-actions 容器内，避免与行内同名按钮冲突；③ 下拉被向上弹出属于窗口空间问题，优先扩大视口或滚动到合适位置后再操作，不要默认降级成地图选点（选点路径慢且易漂移）；④ 跨步骤返回后需要重新通过的步骤（如验证码）封装成独立 helper（proceedStep2WithSave）。",
+   "evidence": "会话 706c30d3 诉求 4「打开股东新增弹窗等待太久，按照元素可见性判断，不要固定等待时间」、诉求 5「下拉因为窗口问题向上弹窗，导致用例选不到，只能回退到选点，进而占用很长时间」；最终结论列出 getShareholderMainRows/getShareholderActionRow 与 .table-actions 限定。",
+   "files": [
+    "zhi2-web-admin/e2e/register/navigation-shareholder.spec.js",
+    "zhi2-web-admin/e2e/fixtures/register-helpers.js",
+    "zhi2-web-admin/playwright.config.js"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "706c30d3-6c4d-4142-b37e-3c31a05c20b6"
+   ],
+   "bundle": "002.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "注册步骤返回/再前进：要件恢复必须先 loadConfig 再 loadUploadedList，并核对 appendixConfigId 匹配",
+   "type": "bug",
+   "content": "情况：注册流程从 Step3/Step4 点「上一步」再前进时，已上传的要件列表变空或不再回显，E2E 因此无法继续。\n为什么：要件回显依赖两个数据源——要件配置（决定有哪些格子）与已上传列表（决定每格填什么），如果先拉上传列表再拉配置，配置还没就绪时无法把文件归到对应格子；回填时靠 appendixConfigId 关联，后端返回的 id 类型/字段不一致（字符串 vs 数字、缺字段）就会全部匹配失败而静默为空。\n怎么做：恢复顺序固定为 loadConfig → loadUploadedList；enrichUploadedList 里对 appendixConfigId 做宽松比对（同时兼容字符串/数字，必要时按名称+业务编码二次匹配）；步骤返回不要清空已填数据，重进步骤时以接口回显覆盖本地但保留住主键。E2E 侧同步为「返回后再前进」提供带保存的 helper，避免依赖上一步的内存态。",
+   "evidence": "会话 706c30d3 修复要点 3：「Step3Appendix.vue 中先 loadConfig 再 loadUploadedList，并增强 enrichUploadedList 的 appendixConfigId 匹配」；诉求为「测一下注册全流程」。",
+   "files": [
+    "zhi2-web-admin/src/views/register/components/Step3Appendix.vue",
+    "zhi2-web-admin/src/views/company/companyRegister/index.vue"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "706c30d3-6c4d-4142-b37e-3c31a05c20b6"
+   ],
+   "bundle": "002.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "spec 里用的测试身份证号必须校验位合法，否则股东新增被拦且报错指向业务而非用例",
+   "type": "bug",
+   "content": "情况：E2E 维护股东信息时，新增股东一直失败，查下来是用的身份证号 320501199001010009 校验位不合法（中国居民身份证第 18 位是前 17 位的模 11 校验码），前端/@后端校验直接拒绝。\n为什么：身份证号不是任意 18 位数字，最后一位由 ISO 7064 MOD 11-2 算出；手写或凭感觉拼的号码看着像真的，但校验位几乎必错，表现为「表单填了却保存不了」。\n怎么做：E2E fixtures 里统一维护一组校验位合法的测试证件号（如 TEST_ID_NUMBER_PRIMARY / TEST_ID_NUMBER_SECONDARY），所有需要身份证的用例从这里取，不要在用例里手写号码；批量新增场景要保证两条记录的证件号不重复（后端会查重）。",
+   "evidence": "会话 706c30d3 修复要点 2：「股东身份证 320501199001010009 校验位无效，改用 TEST_ID_NUMBER_PRIMARY / TEST_ID_NUMBER_SECONDARY」。",
+   "files": [
+    "zhi2-web-admin/e2e/fixtures/register-helpers.js",
+    "zhi2-web-admin/e2e/register/navigation-shareholder.spec.js"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "706c30d3-6c4d-4142-b37e-3c31a05c20b6"
+   ],
+   "bundle": "002.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "账目查询模块新增/编辑落地：列表页直接用 ListTemplate、导出按钮走配置、子表组件自己声明全部模板变量",
+   "type": "pattern",
+   "content": "情况：账目查询模块要补新增/编辑表单与只读详情，列表页已有 ListTemplate 能力但导出按钮原本写死。\n为什么：本项目列表页是「ListTemplate 字符串 + 配置对象」生成式架构，自绘一套表单/列表会与模块内其他页面的样式、分页、权限漂移；导出是否可用属于运营配置项，不该固化在页面里。\n怎么做：列表页直接复用 ListTemplate（不要手抄一份模板），导出按钮通过配置开关控制而不是在模板里硬删；新增/编辑用表单弹窗或独立表单页，只读详情把表格类区块抽成独立子表组件（如 AccountDetailTable）并只接收 props，不自己发请求——抽组件时注意：子组件模板里引用的每一个变量（含 queryParams 这类查询态）都必须在子组件自己的 data/computed 中声明，否则 Vue2 只会给出一条 warnNonPresent 警告，页面看似能渲染但相关交互静默失效。",
+   "evidence": "会话 c317fddb 诉求 2「需要有新增和编辑功能的表单，另外列表页可以直接使用template，导出按钮可以配置」；诉求 6 贴出 AccountDetailTable.vue 的 `Property or method \"queryParams\" is not defined` 渲染警告。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/accountQuery/index.vue",
+    "zhi2-web-admin/src/views/maintenance/accountQuery/detail.vue",
+    "zhi2-web-admin/src/views/maintenance/guaranteeDepositAccount/components/AccountDetailTable.vue",
+    "zhi2-web-admin/src/mixins/ListTemplate.js"
+   ],
+   "baseline": "effe72a",
+   "sessionIds": [
+    "c317fddb-86ba-44b7-bf23-24b241e4ba3e"
+   ],
+   "bundle": "002.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "同一表单/字段的「必填与禁用」判定要按业务确认，别按模块惯例一把锁死",
+   "type": "preference",
+   "content": "情况：保证金相关表单里，某企业字段被前端按本模块惯例设成必填禁用，用户直接指出「放开禁用，那边企业不是必填的」。\n为什么：同源复制项目里字段约束常被整块照搬，而实际业务在某个入口允许为空；前端硬加 disabled + required 会变成「用户想填也填不了」，比缺校验更难解释。\n怎么做：字段是否必填/禁用以业务口径为准，入口之间的差异用 organType/formMode/来源页显式判断，而不是复制同一套 rules；放开禁用时同步把 rules 里对应的 required 去掉，并复查看态与提交载荷是否仍能兼容空值（空值分支要有明确展示与后端约定）。同类情况如果拿不准，先问一句再动手，比事后回滚便宜。",
+   "evidence": "会话 c317fddb 诉求 4：「放开禁用，那边企业不是必填的」。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/guaranteeDepositAccount/detail.vue"
+   ],
+   "baseline": "effe72a",
+   "sessionIds": [
+    "c317fddb-86ba-44b7-bf23-24b241e4ba3e"
+   ],
+   "bundle": "002.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "Playwright 别在接口已返回后再 waitForResponse 等同一请求：白等满超时才被 catch 吞掉",
+   "type": "bug",
+   "content": "详情页「进入后长时间空等」的实测根因：详情接口已 resolve 并渲染完成后，用例仍去 page.waitForResponse(证书列表接口) 等一个已经发完的请求，Playwright 只能等满默认 30 秒超时，随后被 .catch(()=>{}) 静默吞掉，表现为「能用但慢 30 秒」，不报任何错。为什么难发现：超时异常被 catch 吞了，日志里只有耗时异常，没有失败态。怎么做：① 一个用例里每个请求只监听一次，监听必须写在触发动作之前；② 后续就绪判断一律改 UI 状态驱动——expect.poll 等 .el-loading-mask 消失、等区块标题与表格可见；③ 把「接口 200 → loading 消失 → 关键字段可见 → 子区块就绪」合并成一个 gotoXxxDetail 就绪函数。效果：证书增删改查用例 39s→8s，全流程 53s→21s，全程无 waitForTimeout / 固定 sleep。",
+   "evidence": "会话 0dc2b982 最终结论：去除重复的 waitForResponse 后改为 waitForDetailLoadingDone（expect.poll 等 .el-loading-mask 消失）与 waitForCertificateSectionReady；用例 03 从 ~39s 降到 ~8s，全流程从 ~53s 降到 ~21s；原文「Playwright 会白等满 30 秒再 .catch() 吞掉」",
+   "files": [
+    "e2e/real-api.spec.js",
+    "e2e/fixtures"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "0dc2b982-cbda-4ef5-8a4b-504d7a26d726"
+   ],
+   "bundle": "003.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "注册类全流程真实接口 E2E 的三处必改：唯一手机号、验证码从 Vue 状态读、附件配置缺失要显式报阻塞",
+   "type": "workflow",
+   "content": "用真实接口跑注册全链路（saveCompanyRegister → saveLegalPersonInfo → 附件配置 → 上传 → 提交）时，有三条每次都要处理：1）手机号必须每次唯一（时间戳/序号拼接），写死 13800000000 第二次就撞「该手机号已注册」，用例变成假失败；2）图形验证码要等页面加载完后从 Vue 状态里读 /code 的答案再填，不要在提交前再 waitForResponse 等 /code——请求早已完成，只会在超时后被 catch；3）附件区依赖后端「附件分类配置」(fjflpz) 按 busCode 下发的配置，listByBusCode 返回空数组时页面显示「暂无附件配置」、「下一步」永远不可点——这是数据阻塞不是代码 bug，正确做法是加一条接口探测用例单独断言返回非空，并把缺失的 busCode 与需要的配置编码清单明确报给用户，不要改前端绕过。配套：白名单按链路顺次补齐（本链路 saveDraft / editAndSubmit / /file/appendix/upload）。",
+   "evidence": "会话 f750b067 最终结论：本次修复列出「唯一手机号：避免 13800000000 触发该手机号已注册」「图形验证码：Step2 加载后从 Vue 状态读取 /code 结果，不再误等已完成的请求」「Step3 新增附件配置接口探测用例」；阻塞为 /file/appendixConfig/listByBusCode 传 busCode=8 返回空数组，需在 fjflpz 维护 company_register_license / company_register_id_card",
+   "files": [
+    "src/views/register/companyRegister.vue",
+    "e2e/real-api.spec.js",
+    "src/components/AnnexUpload/index.vue"
+   ],
+   "baseline": "39e3114",
+   "sessionIds": [
+    "f750b067-6c90-4a44-8c42-69fa4ec69c0d"
+   ],
+   "bundle": "003.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "同一份 ToB E2E 用 PLAYWRIGHT_LOGIN_TYPE 切管理端/企业端，做不到的用例 test.skip 并单列跳过原因",
+   "type": "pattern",
+   "content": "一套 ToB 用例要同时覆盖「管理端(zsbase)」与「企业端真实账号」时，不要在用例内部写 if 分支，而是用 e2e/.env.e2e 里的 PLAYWRIGHT_LOGIN_TYPE（account / company）切换登录夹具，同一份 spec 出两套结果。因账号权限差异只能一端执行的用例（企业端的变更保存、审核流程、新增成功后的编辑/查看/删除）在管理端模式下 test.skip，并在报告里单列「跳过原因」，passed 与 skipped 必须分开报，不能算进通过。好处：一套脚本两种用途（冒烟 / 全流程），不会因为换账号就整批变红。实测管理端模式结果为 4 passed / 5 skipped（21.6s）。",
+   "evidence": "会话 f5a65df2 最终结论：模式由 e2e/.env.e2e 的 PLAYWRIGHT_LOGIN_TYPE 控制，account 为管理端测试（当前默认 zsbase）、company 为企业端全流程；并给出 01~09 用例的通过/跳过矩阵与「4 passed, 5 skipped（21.6s）」",
+   "files": [
+    "e2e/.env.e2e",
+    "e2e/fixtures"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "f5a65df2-88e0-4327-a25b-1c2c674a8be7"
+   ],
+   "bundle": "003.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "详情页按钮组跑到表单下方：.detail-container 用 column-reverse 会把所有「尾部」子节点顶到最上面",
+   "type": "fact",
+   "content": "情况：价格备案、项目管理、预售资金等多个模块的详情页，操作按钮组（.operation-btn-group）跑到表单下面，用户以为是这些页面各自写坏了。\n为什么：全局样式 src/styles/index.scss 里 .detail-container 用了 flex-direction: column-reverse。column-reverse 不只是反转视觉顺序，它是把 DOM 里的「最后一个子节点显示在最上面」。很多详情页为了 DOM 语义顺手把 operation-btn-group 写在模板末尾（或由混入统一追加在末尾），一旦容器反向，它就被顶到顶部——此前之所以没暴露，是因为这些页面按钮组本来就在 DOM 开头，「看起来」是对的。所以改这个容器方向会同时波及所有详情页，属于典型的全局副作用。\n怎么做：1) 不要把 column-reverse 当作「把某个块挪到顶部」的手段，需要置顶就显式改 DOM 顺序或用 order；2) 若历史页面已依赖 reverse 的既有视觉，优先把它改成正常 column + 给需要置顶的块设 order: -1，而不是逐页调顺序；3) 改完按下标量一遍：工具条 top 应小于表单 top（本次实测按钮组 top=128px、表单 top=209px），刷新后抽查 2 个以上模块的详情页；4) 该文件是全站公共 scss，改动同步到同源项目。",
+   "evidence": "会话 a35cd3c7：多模块详情页按钮位置异常，最终把 .detail-container 从 column-reverse 改为 column，并给 .operation-btn-group 设 order: -1，验证按钮 top 128px 在表单 top 209px 之上。",
+   "files": [
+    "zhi2-web-admin/src/styles/index.scss"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "a35cd3c7-4871-474b-b545-b9efc1cadd00"
+   ],
+   "bundle": "004.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "企业端「变更」要按登录态设计：仅接 -/detail、-/update 会被权限码挡住 403，getLastByLogin 才是企业端合法入口",
+   "type": "pattern",
+   "content": "情况：给企业基本信息页加「变更」功能（点按钮复用表单填写后提交，变更未审批前隐藏按钮）。走通后跑 E2E，第 04 步「修改并保存变更」稳定 403：POST /company/companyRecordChange/update 返回「没有访问权限，请联系管理员授权」；同一变更单的 detail 也是 403，而 getLastByLogin 是 200。\n为什么：企业端与主管端是两套权限码。企业端账号没有 company:companyRecordChange:query / :edit，只有按登录态取数的接口（getLastByLogin）被放行；同时那张变更单在后端已是「已提交/已备案」，submitByLogin 返回 500「单据已提交或已备案，无法提交」，前端却按草稿态展示，状态口径两端不一致。\n怎么做：1) 企业端「当前变更单」只走 getLastByLogin 这类登录态接口，不要去拼业务 ID 调通用 detail/update；2) 这两个接口确实无权限时，用 noMessage + noReject 降级，回退到 getOwnCompany 加载表单，并允许「继续变更」以编辑草稿而不是直接报错退出；3) 按钮显隐用「进行中变更单存在且未审批」判断，因此需要 getOwnCompany 补返回 activeChangeId / activeChangeDisplayStatus；4) E2E 遇到此类 403 要按「后端权限或数据状态未就绪」上报给后端，不要改断言或加重试来掩盖。",
+   "evidence": "会话 4e2633d3：企业基本信息变更功能的完整用例 01-03 通过，04 因 update 403 失败；列出 getLastByLogin 200 / detail 403 / update 403 / submitByLogin 500 的现状，并给出 detail 403 降级到 getOwnCompany、无权限时允许继续编辑草稿的修复。",
+   "files": [
+    "zhi2-web-admin/src/api/company/companyRecord.js",
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue",
+    "zhi2-web-admin/src/views/toB/change/detail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/CompanyBasicInfoDetail.vue",
+    "zhi2-web-admin/e2e/company/company-record-flow.spec.js"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "4e2633d3-54fb-423b-88ed-c035d9f7d33c"
+   ],
+   "bundle": "004.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "批量把接口改成 /detail 会误伤动作类与统计类接口：改造前必须按「实体详情 / 查询 / 动作」三类分词",
+   "type": "bug",
+   "content": "情况：按「V3 接口规范」批量把 URL 拼主键的接口改成 POST …/detail 之后，消息发布、表决图表、大屏统计等接口全部路径错乱，前端报 invalid JS syntax、layout/index.vue 模块加载失败，页面直接白屏，最终回滚约 93 个文件。\n为什么：脚本按 URL 形态匹配，把 publish、calculationChart 这类非详情接口也改成了 …/detail；真正的规范应按语义分三类而不是按「有没有 ID」分：实体详情才拼 /detail，纯查询保持原路径 + body，动作接口是「原路径 + body」，绝不能加 /detail。\n怎么做：1) 改造前先产出「接口 → 类别」清单并人工过一遍，动作类（publish/pass/cancel/submit 等）与统计图表类一律排除；2) 逐个改完跑一次 vite build 兜底语法与引用错误（本次恢复后 build 约 2m27s 通过），不要只看 dev 热更；3) 把误改清单落盘成 scripts/audit-wrong-detail-apis.json 供联调比对；4) 联调回归重点覆盖消息发布/撤回、表决图表、大屏统计这三类被误伤的接口。",
+   "evidence": "会话 ab733ff8：用户要求把拼 ID 接口全部改掉并全局排查，批量脚本误改 publish、calculationChart 等；最终按「操作类 action + body、查询类原路径 + body、实体详情保留 /detail」回滚约 93 个文件，列出误改清单 JSON。",
+   "files": [
+    "zhi2-web-admin/src/api",
+    "zhi2-web-admin/scripts/audit-wrong-detail-apis.json"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "ab733ff8-e8ba-41af-a40c-4a367ebc6c84"
+   ],
+   "bundle": "004.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "产品化前端不要用环境变量配域名：后端相对路径资源统一用 resolveServerAssetUrl 按当前浏览器地址解析，且用 import 而非挂 Vue 原型",
+   "type": "preference",
+   "content": "情况：后端存储的是 /uploads/20251103/xxx.jpg 这种相对路径；项目是产品化交付，每个部署域名都不同。用户明确要求：不要为每个线上域名配环境变量，不要同事用这种方式配，并进一步要求 main.js 不要挂到 Vue 实例上，改成引入公共方法。\n怎么做：1) 统一走 src/utils/resolveServerAssetUrl.js，以浏览器当前地址（location）为基准拼接，不用 env 变量；2) 回显附件的 <img>、FileUpload / AnnexUpload 的 FileList、登录页配图等所有图片与文件绑定处全部收敛到这一个函数，不留手写拼串；3) Vue2 模板要用它时，在页面里 import 并在 methods 首项挂上（或 methods: { resolveServerAssetUrl }），模板直接调用；4) 不要挂 Vue.prototype.$resolveServerAssetUrl——全库应无该引用；5) assets/views/login.vue 这类独立入口如果和 admin 的 @ 别名不一致，用相对路径引同一个工具文件；6) 收尾跑 npm run build（本次退出码 0）并全库 grep 残留的 img 直接拼域名写法。",
+   "evidence": "会话 fe6216ac：用户要求产品化项目不配生产域名环境变量，全部改为相对路径解析；最终补全所有模板处导入、main.js 不再挂实例、npm run build 退出码 0。",
+   "files": [
+    "zhi2-web-admin/src/utils/resolveServerAssetUrl.js",
+    "zhi2-web-admin/src/main.js",
+    "zhi2-web-admin/src/components/FileUpload/index.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/components/FileList.vue",
+    "assets/views/login.vue"
+   ],
+   "baseline": "5a86102",
+   "sessionIds": [
+    "fe6216ac-7cd1-456e-aec9-aa58446ad0ba"
+   ],
+   "bundle": "004.md",
+   "project": "产品2.0"
+  }
+ ]
+}

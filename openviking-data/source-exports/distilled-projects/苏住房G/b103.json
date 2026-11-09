@@ -1,0 +1,65 @@
+{
+  "project": "苏住房G",
+  "batch": "103",
+  "files": ["103.md"],
+  "count": 4,
+  "memories": [
+    {
+      "title": "同款建表脚本的 DDL 缺陷会跨环境复现：dev 改了 VARCHAR(64) 而 ST/生产没 ALTER，审批流程直接 500",
+      "type": "bug",
+      "content": "【什么情况】防汛救援（rescue）审批接口在 dev 上报 500。根因在数据库 DDL，不在代码：`T_FLOOD_RESCUE_LOG.OPERATOR_ROLE` 字段长度不足（dev 上经拍板改为 `OPERATOR_ROLE VARCHAR(64)` 才修好）。更关键的是**同款建表脚本在 ST/生产大概率同病**——因为它们是同一份建表 SQL 复制过去的，dev 的修复只是本地 ALTER，脚本本身没改。\n【为什么】本项目的多环境（dev / ST / 生产）共用同一批建表脚本，脚本一旦在某个环境被 ALTER 修过而没回写进脚本，下一次在别的环境重建或发版时缺陷原样复现；而且这类缺陷只在**写满长度的数据**时才触发，空数据跑 E2E 全绿也照样上线炸。所以「dev 修好了」不等于「缺陷闭环」。\n【怎么做】① dev 上修完 DDL 后，立刻把 ALTER 语句补进仓库里的建表/迁移脚本，并在台账里记下「dev 已修 + 脚本已补」；② 交付报告里**显式列出未同步环境**（本次写的是「ST/生产的 `T_FLOOD_RESCUE_LOG.OPERATOR_ROLE` 列长缺陷未同步——同款建表脚本大概率同病，rescue 审批在 ST 会炸同款 500，建议后端下次发版前 ALTER」），并转给后端，不要默认「代码一提交就全环境生效」；③ 发版前按环境做一次列长/索引对齐核对清单（表名 + 字段名 + 类型 + 长度）；④ E2E 侧补一条**写入长值**的用例，避免只用短数据让缺陷潜伏；⑤ 判断影响面时按「哪些表/流程写这个字段」反查，而不是只看当前报错的那张表。",
+      "evidence": "会话 session-14dff73a-8af9-43c4-b1ed-ab3b342321e2（基线 6156653）最终结论「收官完成」表：「rescue 审批 500 根因 | 已修复（dev DDL `OPERATOR_ROLE VARCHAR(64)`，经你拍板）+ 回归 6/6」；「遗留风险（已写入报告未验证项，不藏）」第 1 条：「**ST/生产的 `T_FLOOD_RESCUE_LOG.OPERATOR_ROLE` 列长缺陷未同步**——同款建表脚本大概率同病，rescue 审批在 ST 会炸同款 500，建议后端下次发版前 ALTER」。",
+      "files": [
+        "zhi2-web-admin/docs/flood/common-errors.md",
+        "zhi2-web-admin/docs/flood/delivery-2026-10-29.md",
+        "zhi2-web-admin/e2e-flood-lib.cjs"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-14dff73a-8af9-43c4-b1ed-ab3b342321e2"],
+      "bundle": "103.md"
+    },
+    {
+      "title": "审批接口 500 的定位法：先二分分支（同意 200 vs 驳回 500）再查字段长度，比复刻环境快 10 倍",
+      "type": "pattern",
+      "content": "【什么情况】同一个审批接口出现「驳回返回 200、同意返回 500」的分支差异。常规做法是复刻环境、比对日志、逐字段试，耗时长。实际定位路径是：**先二分分支**——既然驳回能通、同意不通，差异必然落在「同意分支独有的那几步写入/字段」上，范围立刻缩小一个量级；再**查列长**——同意分支会比驳回多写 `OPERATOR_ROLE` 这类角色字段，最终命中 VARCHAR(64) 长度不足。\n【为什么】当同一路由出现分支级差异时，差异点就是搜索空间边界。复刻环境是在扩大搜索空间（重跑全流程找差异），而二分分支是在收缩它；先确定「只有失败分支才执行的代码/数据」，再去查那一小段的字段与约束，比逐个怀疑快一个数量级。\n【怎么做】① 同一接口先按业务分支跑一遍最小用例，列出「通」与「不通」两条路径各自新增的步骤/字段/表；② 只在不通分支上继续定位，查新增写入的字段类型/长度/是否可空/是否有外键；③ 命中后做**最小修复**（改 DDL 或改写入值）并立即**回归该分支 + 另一分支**（本次修完回归 6/6）；④ 把这条定位法沉淀进台账（本次写进 `common-errors.md` 条目 12–15），下次同类现象直接照走；⑤ 遇到「同款脚本多环境」的情况，修完还要同步 DDL 到其他环境（见同包「跨环境复现」那条）。",
+      "evidence": "会话 session-14dff73a-8af9-43c4-b1ed-ab3b342321e2（基线 6156653）最终结论复盘：「根因藏在「驳回 200/同意 500」这一行差异里——**先二分分支，再查列长**，比复刻环境快 10 倍。此法已沉淀入台账。」同时「台账 | 条目 12–15 已入 common-errors.md」与「rescue 审批 500 根因 | 已修复（dev DDL `OPERATOR_ROLE VARCHAR(64)`）+ 回归 6/6」。",
+      "files": [
+        "zhi2-web-admin/docs/flood/common-errors.md",
+        "zhi2-web-admin/e2e-verify-flood.cjs"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-14dff73a-8af9-43c4-b1ed-ab3b342321e2"],
+      "bundle": "103.md"
+    },
+    {
+      "title": "E2E 脚本要分层并分批：lib + batch1/batch2 + menu + merge + fixture 探针，交付前删净 e2e-debug-*.cjs",
+      "type": "workflow",
+      "content": "【什么情况】防汛 E2E 从 1 个模块扩到 8 个模块、全类型批跑 58/58 通过后，工作区里堆了 27 个 `e2e-debug-*.cjs` 临时脚本。收官时按「调试脚本清空、主链脚本保全」清理：删掉 27 个 `e2e-debug-*.cjs`，保留主脚本——**batch1 / batch2 / lib / menu / merge** 与 fixture 探针（`e2e-probe-endpoints.cjs`）；fixture 数据、`SYS_FLOW_CONFIG`、本地 se 配置按用户选择保留。\n【为什么】E2E 脚本如果不分层，公共逻辑（登录、取数、断言、录像）会被复制到每个脚本里，改一处要改 N 处；调试脚本混在主链里还会让「跑哪个、哪些是正式的」无法自解释，交付给同事时等于丢了一堆垃圾。分层 + 明确命名是让 E2E 可交接的前提。\n【怎么做】① 按职责分文件：`e2e-flood-lib.cjs` 放公共能力（登录、接口调用、断言、录像、fixture 装配），`e2e-flood-crud-batch1*.cjs` / `batch2*` 按菜单分批跑全类型 CRUD，`-menu` / `-merge` 覆盖菜单与合并场景，`e2e-probe-endpoints.cjs` 只做接口探针；② 调试脚本一律用 `e2e-debug-*` 前缀，交付前整目录删除，不进版本库（子模块 `.gitignore` 边界：E2E/预览产物不入库）；③ fixture 数据与本地 se 配置这类「环境态」由用户决定保留还是清理，不要替用户删；④ 跑测产生的历史脏单据（本次 4 张审批 500 时代的脏单据）先评估影响（流程已结束、可手工提交、无业务影响）再决定留或清；⑤ 交付报告里把「保留了什么、删了什么、为什么留」写清楚，避免下一轮不知道基线。",
+      "evidence": "会话 session-14dff73a-8af9-43c4-b1ed-ab3b342321e2（基线 6156653）用户诉求 1「继续e2e测试防汛后续的菜单」；最终结论「✅ 收官完成」表：「E2E 全类型批跑 | **58/58 通过**（8 模块）」「清理 | 27 个 `e2e-debug-*.cjs` 已删；保留主脚本（batch1/batch2/lib/menu/merge）与 fixture 探针；fixture 数据、SYS_FLOW_CONFIG、本地 se 配置按你选择保留」，并在遗留风险第 3 条列出「4 张历史脏单据（审批 500 时代产生，biz=1/appr=1 流程已结束）保留在 dev，可手工提交无业务影响」；涉及文件含 e2e-flood-lib.cjs / e2e-verify-flood.cjs / e2e-flood-crud-video.cjs / e2e-flood-crud-batch1-video.cjs / e2e-probe-endpoints.cjs。",
+      "files": [
+        "zhi2-web-admin/e2e-flood-lib.cjs",
+        "zhi2-web-admin/e2e-verify-flood.cjs",
+        "zhi2-web-admin/e2e-flood-crud-video.cjs",
+        "zhi2-web-admin/e2e-flood-crud-batch1-video.cjs",
+        "zhi2-web-admin/e2e-probe-endpoints.cjs",
+        "zhi2-web-admin/e2e-run-plan.log"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-14dff73a-8af9-43c4-b1ed-ab3b342321e2"],
+      "bundle": "103.md"
+    },
+    {
+      "title": "防汛交付用「台账 + 交付报告」双文档收口：common-errors.md 编号记坑，delivery 报告显式列未验证遗留项",
+      "type": "workflow",
+      "content": "【什么情况】防汛模块联调期间踩的坑不能只留在聊天里。最终收口方式是两份文档：`zhi2-web-admin/docs/flood/common-errors.md` 作**台账**，每条坑编号入账（本次为条目 12–15）；`zhi2-web-admin/docs/flood/delivery-2026-10-29.md` 作**交付报告**，逐项写「状态 / 证据 / 遗留 / 未验证项」。\n【为什么】台账沉淀的是「可复用的踩坑知识」，让下一个模块（防汛还有很多菜单）不再重复踩；交付报告沉淀的是「本次交付到什么程度、还有什么没验证」。两者职责不同：只写台账，后人不知道这次交付边界；只写报告，坑的根因还是会丢。关键纪律是**未验证项不藏**——遗留必须显式列出来并注明是「未验证」而不是「已完成」。\n【怎么做】① 台账条目格式：现象 → 根因 → 定位方法 → 修法 → 影响范围 → 是否跨环境同步（DDL 类必须标）；② 交付报告分四块：收官完成表（事项 / 状态）、证据（可复现的命令与状态码，如「`POST+zs-method:delete`→400/1400 vs 直接 `DELETE`→200」）、遗留风险（逐条写影响 + 建议归属 + 是否未同步环境）、复盘一句话（本次为「先二分分支，再查列长」）；③ 遗留要归属到人/团队（网关缺陷等网关侧、DDL ALTER 等后端发版前），不要只写「待修复」；④ 台账里同类问题可引用同一条目（如「网关 `zs-method: delete` 缺陷（台账条目 4）」），保持编号稳定、可被引用；⑤ 报告落盘后把口径结论（如「Git 未提交未推送，按规则等明确指令」）一并写进去，避免后续歧义。",
+      "evidence": "会话 session-14dff73a-8af9-43c4-b1ed-ab3b342321e2（基线 6156653）最终结论：「台账 | 条目 12–15 已入 common-errors.md」「交付报告 | delivery-2026-10-29.md」，并设专节「**遗留风险（已写入报告未验证项，不藏）**」列出 1) ST/生产 DDL 未同步、2) 网关 `zs-method: delete` 缺陷（台账条目 4）未修复等网关侧、3) 4 张历史脏单据保留在 dev。",
+      "files": [
+        "zhi2-web-admin/docs/flood/common-errors.md",
+        "zhi2-web-admin/docs/flood/delivery-2026-10-29.md"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-14dff73a-8af9-43c4-b1ed-ab3b342321e2"],
+      "bundle": "103.md"
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "002",
+ "files": [
+  "002.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "表单UI乱了",
+   "type": "pattern",
+   "content": "有一点需要你确认：必填校验修好后，业务范围为空时进入编辑态会立刻飘红。我在 `enterEntryNetworkEdit` 里补了一次 `clearValidate()`，进入编辑时是干净的，点保存时照常拦截。如果你更希望\"进编辑就显示必填提示\"，把那三行去掉即可。",
+   "evidence": "extracted source=zcode project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：`AgencyEntryNetworkSections.vue、`AgencyBasicInfoForm.vue、`AgencyEntryNetworkAdminDetail.vue、`AgencyBasicInfoForm.vue`、`DeveloperBasicInfoForm.vue`、`LeaseEntryNetworkSections.vue、`AgencyEntryNetworkDetail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "session_ae7541320d3fcf746bb98572a4423d1b"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "点击楼盘表打不开了",
+   "type": "bug",
+   "content": "工作区里 `buildingTable/index.vue` 和 `projectForm.vue` 有大量未提交改动，很可能就是这次改动引入的报错。我直接用浏览器实测一下。",
+   "evidence": "extracted source=zcode project=苏州市房地产监测V3",
+   "files": [
+    "`buildingTable/index.vue",
+    "`projectForm.vue",
+    "涉及文件：`buildingTable/index.vue、`projectForm.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "session_e64e901a585d9aa7b9a5f9bc3547a5f7"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "授权委托书改为始终显示，不过滤",
+   "type": "bug",
+   "content": "两点需要你知道： - 这个 spec 文件里另外 3 个用例（多图回显、要件删除、注册全流程）目前是失败的，我用 `git stash` 在改动前的代码上跑过，同样全失败，所以是既有的基线问题，不是这次改动引起的。原因是用例还在用 `institution-appendix-*` 测试 id 和 `.file-row`、`上传` 这类旧选择器，而单页表单实际渲染的是 `appendix-requirement-*` 和图片式上传占位。这几个要修需要单独一轮，已经超出「授权委托书」的范围，我没动。 - `eslint` 对 `registerAppendixAdminType.js` 报了一个 `import/no-cycle`（它 import `api/company/companyRegister.js`，后者又 import `utils/appendix.js`，而 `appendix.js` import 回本文件）。这是改动前就存在的循环，我沿用了同样的 `normalizeAppendixConfig` 导入方式，没有引入新的循环。",
+   "evidence": "extracted source=zcode project=苏州市房地产监测V3",
+   "files": [
+    "`registerAppendixAdminType.js",
+    "`api/company/companyRegister.js",
+    "`utils/appendix.js",
+    "`appendix.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "session_de8fcbd46f273208201b79f1dca6500e"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "参考设计图修改楼盘表UI",
+   "type": "bug",
+   "content": "楼盘表页面已按两张设计图改完，图表视图和列表视图都在本地用真实组件配合假数据渲染验证过，渲染结果与设计图一致。 ## 改了什么 **`src/views/projectManagement/buildingTable/index.vue`（重写）** - 页面拆成两张卡片：上面是「项目信息」，下面是「楼盘表」；原先的项目/楼幢内嵌 Tab 和顶部楼幢标签行去掉，改为按设计图在楼盘表卡片右上角放「图表视图 / 列表视图」的分段切换按钮。 - 图表视图：楼幢用横向标签（1幢、2幢…），下面是「楼盘状态：」图例行（可售、合同草签、备案申请、合同备案、自留、抵押、限制）加右侧「状态统计」弹出层，再下面是楼层×单元网格。 - 列表视图：左侧是竖排楼幢侧栏（选中项蓝底高亮），右侧是户室表格（序号、户室号、预测建筑面积、实测建筑面积、所属层、房屋用途、状态、操作·查看），底部带分页。 **新增 `components/buildingTableStatus.js`** - 状态定义统一收口：名称、判定字段（`isAvailableSale` / `isInitial` / `isPreRecord` / `isRecord` / `retention` / `mortgage` / `limited`）、图标与配色、可售徽标，以及楼层排序和面积取值兜底（兼容 `predictFloorArea`",
+   "evidence": "extracted source=zcode project=苏州市房地产监测V3",
+   "files": [
+    "**`src/views/projectManagement/buildingTable/index.vue",
+    "`components/buildingTableStatus.js",
+    "`components/BuildingTableGrid.vue",
+    "`components/BuildingTableList.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "session_d78560c48c308d3ff1ae8629726ae3a4"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "地名的域名配置改为从参数设置里面读取，land.do",
+   "type": "bug",
+   "content": "两点需要你确认：后端参数库里需要有 `land.domain` 这条配置（键值即完整根地址，如 `https://fdc.szzfcjj.cn/dmsp`，末尾斜杠会被自动去掉），否则这些页面会空白并在 `placeApproval` 给出提示。另外各环境原来的地址不同（test 是 `http://58.240.192.148:9996`），现在统一由参数配置决定，切环境时要在对应环境后台各配一次。",
+   "evidence": "extracted source=zcode project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：`src/utils/placeDmsp.js、`public/version.js、`src/api/system/config.js",
+    "`public/version.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "session_f915ba6c510a5289dbc91c768090573a"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "maxBatchNo预售许可批次号字段是这个，核对一",
+   "type": "bug",
+   "content": "几个说明： - **取数路径**：`/presale/permit/project/list` 返回项挂在 `projectOptions[].raw` 上，`handleProjectChange` 已经从这里带出项目名称、行政区划等字段，`maxBatchNo` 同样从这里取。 - **容错**：`maxBatchNo` 为 null/空字符串（例如该项目还没有历史批次）时 `batchNo` 置为 undefined，输入框显示“系统自动生成”占位符，不会显示 `NaN`。 - **类型**：用 `String(Number(raw.maxBatchNo) + 1)` 处理了后端可能返回字符串或数字两种情况。 - **原有链路未动**：`getForm()` 提交 payload 仍是白名单字段、不包含 `batchNo`；详情/审批态由 `/presale/permit/detail` 接口回填 `batchNo` 并覆盖该值（`detailCallback` 里 `...data` 在后），所以查看态展示不受影响。",
+   "evidence": "extracted source=zcode project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：`batchNumber`（`src/views/property/bill/components/declarationRecord.vue:88`、`src/views/property/declare/components/declarationRecord.vue、界面语义上目前是“预售批次”，不是“预售许可批次号”。`permitConstants.js、在前端是**只读、系统自动生成**的：`PermitInfoPanel.vue、`permitExtend/detail.vue、`maxBatchNo`，需要改动的地方是：`permitConstants.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "session_738a2a4d2ad93a91c77adf4b7c511d52"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "从业人员备案 企业端缺少发起变更按钮",
+   "type": "bug",
+   "content": "后端会自行校验备案单是否已备案，未备案时直接 toast 后端错误消息，与 G 端行为一致。ESLint 检查通过（0 错误，仅原有的 zs-form-item 风格警告）。如果后端菜单还没有给企业端角色分配 `company:personnelRecordChange:change` 权限字符，上线后需要在菜单权限里补上，否则按钮不显示。",
+   "evidence": "extracted source=zcode project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：改动只涉及一个文件：[toB/personnelRecord/components/detail.vue](D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\toB\\personnelRecord\\components\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "session_5860efb84bbcb109aba35f9f7a52caad"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

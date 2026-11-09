@@ -1,0 +1,79 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "012",
+ "files": [
+  "012.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "住房租赁合同备案详情缺打印按钮。取详情接口中的 re",
+   "type": "preference",
+   "content": "改动完成。问题根因与修复： ## 根因 `OperationBtnGroup` 默认走公共 `ZsPrint` 组件，按钮是否渲染取决于 `/print/config/printList`（按 `busCode=zlhtba`）是否返回打印模板。该菜单未配置模板 → `printList` 为空 → ZsPrint 内部 `v-if` 全部不成立 → **整个按钮不渲染**，所以「打印备案证明」看不到。 后端详情接口已直接返回成品 PDF `recordCertSite`，无需再走打印模板配置。 ## 改动 | 文件 | 变更 | |---|---| | `src/views/presale/leaseContract/detail.vue` | ① `createForm()` 增字段 `recordCertSite`；② 接 `custom-print` + `print-test-id=\"lease-contract-print-cert-btn\"` + `@print=\"handlePrintRecordCert\"`；③ 新增 `canPrintRecordCert` 计算属性；④ 新增 `handlePrintRecordCert()`：`window.open(resolveServerAssetUrl(form.recordCertSite), '_blank')`，",
+   "evidence": "extracted source=workbuddy project=苏州市房地产监测V3",
+   "files": [
+    "`src/views/presale/leaseContract/detail.vue",
+    "`src/components/OperationBtnGroup/index.vue",
+    "`e2e/presale/lease-contract-real-api-flow.spec.js",
+    "`leaseContractEntry/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1366cb94-51af-4636-844f-b762c95373e7"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "[图片] 使用headtitle组件 [图片]",
+   "type": "fact",
+   "content": "修复完成。 **根因**：编辑态 `户籍地址` 本身已经是 `FORM_COL_FULL`（span 24，整行），问题出在 `PersonnelBasicInfoLayout.vue` 的兜底样式——它把块内所有 `.el-row > .el-col` 强制收敛为两列宽（本意是把三列栅格压成「证件照 + 两列」布局），只豁免了 textarea，导致整行字段也被压成半宽，后面的「联系电话」挤到了同一行。 **修改（2 处）**： - `AgencyPersonnelBasicInfoFormFields.vue`：`field.wide` 的 el-col 加标记类 `el-col--full-row` - `PersonnelBasicInfoLayout.vue`：新增豁免规则，带该标记的列保持 100% 宽 该布局组件是共享的（机构备案人员等其他页面也用），没有标记类的列行为不变，不影响其他页面。刷新后编辑态「户籍地址」将独占一行。",
+   "evidence": "extracted source=workbuddy project=苏州市房地产监测V3",
+   "files": [
+    "`PersonnelBasicInfoLayout.vue",
+    "`AgencyPersonnelBasicInfoFormFields.vue",
+    "涉及文件：D:/repository/苏州市房地产监测V3/zhi2-web-admin/src、D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/HeadTitle/index.vue、D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/company/companyApplyAudit/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "699a0458-d744-41d2-99d1-4aedce0e8486"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "所有使用zs-table-column的列配置，上面",
+   "type": "preference",
+   "content": "**zs-operate-column 处理完成** - 修改 70 个文件，删除 73 处列宽属性（含 `width` 与 `:width` 绑定，如 `:width=\"operateColumnWidth\"`、`:width=\"type == 1 ? 200 : 180\"`） - 复扫残留：0 - 操作列没有序号列逻辑，全部删除；`slot-width` 等非列宽属性未动 **全局排查结果（`src` 下全部 zs 列组件）** | 组件 | 出现次数 | 带宽度的标签 | 处理 | |---|---|---|---| | zs-table-column | 3835 | 445（序号列除外） | 已删（上一轮） | | zs-operate-column | 487 | 73 | 已删 | | zs-select-column | 463 | 1 | 未动 | | branch-business-status-column、personnel-business-status-column | 各少量 | 0 | 无需处理 | 累计 diff：176 文件，+719 / −602。仍在 `zhi2-web-admin` 工作区未提交。 **两处待你决定** 1. `src/views/solicitation/components/maintenanceApplyTable.v",
+   "evidence": "extracted source=workbuddy project=苏州市房地产监测V3",
+   "files": [
+    "`src/views/solicitation/components/maintenanceApplyTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "da4f3fca-c76a-4d06-8455-42d229e5426f"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "[图片] 没有显示配置附件，有的显示，有的不显示，配",
+   "type": "bug",
+   "content": "## 结论：不是渲染 Bug，是前端按「管理员类型」过滤掉了要件 **接口返回内容（放大截图确认）**：`listAppendixPackage` 返回的配置里只有一条要件： - `appendixConfigName: \"授权委托书\"`，`busCode: \"glygly\"`，`isRequired: \"1\"`，`appendices: null` **过滤逻辑链路**： 1. 管理员维护详情页 `companyAdmin/detail.vue` 给 `AppendixPackageSection` 传了 `:admin-type=\"normalizedAdminType\"`，该记录「管理员类型 = 法人」→ `adminType = '0'` 2. `AppendixPackageSection/index.vue` 的 `appendixHandleConfig` 中：adminType ≠ '1'（非受托人）时，会用 `isTrusteeOnlyAppendixConfig` 过滤掉「受托人专属要件」（`src/utils/registerAppendixAdminType.js:16-19`：名称匹配 `授权委托书|授权书|受托人.*身份证` 的都会被过滤） 3. 该 busCode 下**只配置了「授权委托书」这一条**，被过滤后 `fileList` 为空 → 显示「",
+   "evidence": "extracted source=workbuddy project=苏州市房地产监测V3",
+   "files": [
+    "`companyAdmin/detail.vue",
+    "`AppendixPackageSection/index.vue",
+    "过滤掉「受托人专属要件」（`src/utils/registerAppendixAdminType.js",
+    "`registerAppendixAdminType.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5be31fea-c6b7-4f9d-b928-c2eb49a504a0"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

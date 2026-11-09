@@ -1,0 +1,347 @@
+{
+ "project": "无锡市区小程序嵌入H5",
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md"
+ ],
+ "count": 20,
+ "memories": [
+  {
+   "title": "苏服办/支付宝 H5 扫脸拉不起：相同 URL+token 清缓存失败、重登容器成功，说明缺的是容器内人脸上下文而非 token 失效",
+   "type": "bug",
+   "content": "情况：无锡市区 H5（zhi2-mobile-admin-h5-c-unlimited）嵌在苏服办/支付宝 WebView，宿主也是 H5，经 window.location 带 token、appId 等跳入；用户反馈生产未改代码也突然无法拉起人脸识别，且相同 token 在「重新登录容器」后又能识别。\n\n为什么：业务 token 仍可复用，URL 参数与 H5 Storage 不是根因；支付宝/苏服办在登录时除下发 token 外，还会在容器内部建立人脸识别所需的认证上下文，该状态不出现在 URL 里。清缓存会销毁它，重新登录会重建。因此不能把失败统一提示成「token 失效」。\n\n怎么做：1) 用「相同 URL+相同 token → 清缓存失败 / 重登成功」向业务方证明问题在宿主容器会话，而非本方 H5 改坏；2) 分别验证「只重登苏服办」「只重登支付宝」「仅杀进程不重登」以定位层级；3) 用户提示改为「人脸识别环境未就绪，请重新登录苏服办后从业务入口进入」；4) 与支付宝/苏服办扫脸成功返回值不一致的兼容逻辑单独回归，避免把容器状态问题误判为业务代码回归。",
+   "evidence": "会话 e195dccb：用户称宿主 H5 location 跳转、此前可扫脸且做过支付宝与苏服办返回值兼容；生产未改也不行；最终结论「相同 token 重新登录后还能识别」→ token 可复用，变化的是容器内部会话或人脸能力初始化；清缓存后失败、重登后成功。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/face.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js"
+   ],
+   "baseline": "7993464",
+   "sessionIds": [
+    "e195dccb-9f1b-45aa-92cf-65961851f833"
+   ],
+   "bundle": "001.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "外跳投票/第三方页：h5ExternalWebview 对 URL 二次 decodeURIComponent 会把 Base64 token 里的 +/= 弄坏",
+   "type": "bug",
+   "content": "情况：业主决策等外跳投票页 URL 的 query 里 token、certificateNum 等为 Base64 形态（含 %2B/%2F/%3D），经 h5ExternalWebview 进入后投票页鉴权失败。\n\n为什么：路由或中间层已对 query 做过一次解码，页面再对整个 URL 做 decodeURIComponent 会把仍带百分号编码的片段二次解码成 +、/、=，破坏密文参数。\n\n怎么做：1) 长 URL 或含敏感 query 的外跳优先用 uni.setStorageSync（或项目约定的 storage key）传完整 URL，目标页只读 storage、不再对整串 URL 二次 decode；2) 若必须走 query，只解码一次且避免对「已解码的 token 子串」再 decode；3) 用带 %3D 的真实投票链接做联调验收。",
+   "evidence": "会话 9b0c382d：用户定位「h5ExternalWebview 对 URL 做了二次 decodeURIComponent，会把 %2B、%2F、%3D 解码成 +、/、=，导致投票页 token 参数损坏」；修复方向为 storage 传递并修正解码逻辑；示例 URL 含 token=…%3D。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/common/webView.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/hooks/useUrlQueryParam.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages.json"
+   ],
+   "baseline": "3fb9434",
+   "sessionIds": [
+    "9b0c382d-6f57-4324-ab6b-ebafaf8e1362"
+   ],
+   "bundle": "001.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "H5 嵌小程序改源码仍弹「业主表决」确认框：实际跑的是 dist 里旧的 usePortal 编译产物",
+   "type": "workflow",
+   "content": "情况：已删除 showOwnerDecisionConfirmModal、改为直接进 WebView，真机/预览仍出现登录校验→实名校验→uni.showModal 二次确认。\n\n为什么：小程序或宿主加载的是历史 npm run build 的 dist/assets，其中 usePortal 等 chunk 未更新；改 src 不会自动反映到已部署的 dist。\n\n怎么做：1) 改交互后必须重新 build，并在产物里 grep 确认弹窗文案已消失；2) 微信开发者工具/宿主侧清缓存并确认 web-view 指向新 dist；3) H5 与 wygl-wxxcx 小程序两侧若都有业主决策入口，需同步删 modal 逻辑避免一侧仍弹窗。",
+   "evidence": "会话 9b0c382d 最终结论：「实际跑的是 dist 目录里的旧编译产物，usePortal 仍会走登录校验→实名校验→uni.showModal」；已删 showOwnerDecisionConfirmModal 并 npm run build 更新 usePortal.be15442a.js。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/dist"
+   ],
+   "baseline": "3fb9434",
+   "sessionIds": [
+    "9b0c382d-6f57-4324-ab6b-ebafaf8e1362"
+   ],
+   "bundle": "001.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "无锡市区嵌入 H5 通用 webView：仅允许 https 且域名白名单，拒绝 javascript:/data: 与任意外链",
+   "type": "pattern",
+   "content": "情况：安全审计要求堵住 WebView 开放重定向（任意 URL 加载）。\n\n怎么做：在 common/webView（及同类入口）加载前校验协议必须为 https，主机名命中项目维护的白名单；显式拒绝 javascript:、data: 与非白名单域。清理历史无用域名配置（如已不再使用的 szf.szzfcjj.cn、txzhwy.cn）。配合生产环境去掉会打印 Authorization/token 的 console，并移除废弃的 ihaAuth 整条链路避免死代码与误用。",
+   "evidence": "会话 bbb5f32c：诉求含移除 ihaAuth、生产去除 console 防 Token 泄露、WebView 仅 https+白名单；用户确认部分域名用不到。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/common/webView.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/App.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/index.js"
+   ],
+   "baseline": "0804e57",
+   "sessionIds": [
+    "bbb5f32c-e6eb-4a34-80f6-4ee2c2629c62"
+   ],
+   "bundle": "001.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "智能问答改三方 OAuth：对齐无锡市区 G 的 security/oauth2/authorize，原页保留口令「进入新页面」才走新链",
+   "type": "workflow",
+   "content": "情况：将 Tab 内智能问答替换为三方页面，需与无锡市区 G 项目一致调用 security/oauth2/authorize 取跳转地址，路由换成当前 H5 工程路径。\n\n怎么做：1) 封装 qaOAuth（或同等工具）拉授权 URL；2) 默认保留原问答 UI/逻辑，仅当用户在原页输入隐藏口令「进入新页面」时走 OAuth 打开三方（如 znws 域名）；3) 调试口令「打开控制台」可初始化 eruda；4) complexId 等附加 query 与 G 项目对齐，若三方暂不需要可显式关闭拼接（qaOAuth 直接返回接口 URL），避免未文档化的参数导致三方拒登。",
+   "evidence": "会话 f4aa86cd：参考无锡市区 G 替换智能问答为 OAuth2 页面；用户要求保留原逻辑、输入「进入新页面」才调新逻辑、输入「打开控制台」初始化 eruda；最终暂关闭 complexId 拼接。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/qaOAuth.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/api/security.js"
+   ],
+   "baseline": "df08cea",
+   "sessionIds": [
+    "f4aa86cd-c715-4ff0-ada8-5790054a7607"
+   ],
+   "bundle": "001.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "从小程序 wygl-wxxcx 迁入门户 webview 页后本地图 404：禁止按当前路由拼 static，用 resolveZhishuAsset + import.meta.url",
+   "type": "bug",
+   "content": "情况：把小程序 pages/webview、pages/face 等迁入 H5 后，控制台请求变成 /h5/pages/webview/static/images/zhishu/… 全部 404。\n\n为什么：模板或脚本按「当前页面路径」拼接 /static 或 ./static，在 Vite 路由 base 为 /h5/ 时会把静态资源解析到错误目录；接口返回的 /zhi2/… 远程轮播在未代理环境也会 404。\n\n怎么做：1) 与 home.vue 一致，用 resolveZhishuAsset（new URL(..., import.meta.url)）引用 src/static/images/zhishu/，由 Vite 打包出正确 URL；2) 门户轮播可固定本地 背景@2x.jpg、banner.jpg，菜单图标走同一解析函数；3) 迁移时检查 getH5Param 等工具勿重复声明导致整页 async 组件加载失败。",
+   "evidence": "会话 ddd4e8f5：迁移后图片 404 路径含 /h5/pages/webview/static/…；结论改用 resolveZhishuAsset + import.meta.url，轮播改纯本地图；另报 getH5Param 重复声明 SyntaxError。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/zhishuAsset.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/webview/home.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/index/home.vue"
+   ],
+   "baseline": "9267b1a",
+   "sessionIds": [
+    "ddd4e8f5-1767-467c-8d93-f66c079e9dca"
+   ],
+   "bundle": "001.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "H5 下 uni-icons 勿用 @tap.stop",
+   "type": "bug",
+   "content": "uni-app 编译到 H5 时，uni-icons 触发的事件对象不是标准 DOM Event。模板写 @tap.stop 时 Vue 仍会调用 event.stopPropagation()，但 handler 收到的 event 为 undefined，控制台报错且点击逻辑中断（例如共有资金明细里查询时间旁的提示图标）。与同页其他 uni-icons 保持一致，改用 @tap；若必须阻止冒泡，在方法内先判断 event 再 stopPropagation，或把点击绑在外层 view 上处理。",
+   "evidence": "会话 26ca4c09：修复后结论写明「uni-icons 在 H5 下触发的不是标准 DOM 事件，@tap.stop 时 event 为 undefined 因此报错」，改为 @tap 与同页余额提示图标一致。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/DetailsTab.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/ZsDateRangePicker/ZsDateRangePicker.vue"
+   ],
+   "baseline": "a951bf3",
+   "sessionIds": [
+    "26ca4c09-5707-4402-a54f-9c9491ec3455"
+   ],
+   "bundle": "002.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "ZsDateRangePicker：快捷区间须确认、查询手动触发",
+   "type": "pattern",
+   "content": "共有资金等页的 ZsDateRangePicker：点「当季/当年/自定义」等快捷项只更新内部预选区间，不能立刻关弹层并当作已提交；必须等用户点「确定」再关闭遮罩并回传区间。切换快捷项或自定义日期后，在父组件显式调用列表查询，不要用 watch 监听区间对象自动拉数（用户明确要求「不用 watch，在需要调用的地方手动调用」），避免第一次选快捷项不刷新、遮罩残留或子日期面板 z-index 被父层挡住。自定义模式下嵌套日期面板要抬高层级或收紧父弹层 overflow。",
+   "evidence": "同会话多轮：当季一点就关窗、遮罩不关；选当季/当年/自定义首次不显示结果需再选一次；用户要求去掉 watch、手动调用；自定义时间日期框被遮挡。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/ZsDateRangePicker/ZsDateRangePicker.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/DetailsTab.vue"
+   ],
+   "baseline": "a951bf3",
+   "sessionIds": [
+    "26ca4c09-5707-4402-a54f-9c9491ec3455"
+   ],
+   "bundle": "002.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "日期下限静默 clamp 要改成禁选或可见提示",
+   "type": "bug",
+   "content": "业务只允许查近 N 年（如三年）明细时，若日期组件把早于下限的选项静默滚回边界年（如自动回到 2023），用户会以为系统故障。应在 ZsDatePicker/ZsDateRangePicker 层用 minDate（或等价）让超限日期置灰不可选，或明确文案说明不可选范围，而不是无反馈地改显示年份。",
+   "evidence": "用户反馈：自定义时间选 3 年以前会自动回到 2023，不知是不让选还是 bug，要求不显示或禁选。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/ZsDateRangePicker/ZsDateRangePicker.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/ZsDatePicker/ZsDatePicker.vue"
+   ],
+   "baseline": "a951bf3",
+   "sessionIds": [
+    "26ca4c09-5707-4402-a54f-9c9491ec3455"
+   ],
+   "bundle": "002.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "嵌入宿主 H5 的 ReturnAppBtn 与 backToApp 回退链",
+   "type": "workflow",
+   "content": "zhi2-mobile-admin-h5-c-unlimited 作为苏服办/微信小程序 web-view 内嵌 H5 时，列表页底部可提供 ReturnAppBtn（固定底栏、页面 padding-bottom 留白）。点击走 utils/backToApp.js：优先苏服办 lightAppJssdk.navigation.close/goBack，其次 wx.miniProgram.navigateBack，再回落门户配置的返回路由或首页。组件仅在检测到嵌入环境时展示，避免纯浏览器 H5 出现无效按钮。",
+   "evidence": "会话 bcab9206 在业主决策 index 引入 ReturnAppBtn.vue 与 backToApp.js，说明三端回退顺序与仅嵌入环境显示。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/components/ReturnAppBtn/ReturnAppBtn.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/backToApp.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/decision/index.vue"
+   ],
+   "baseline": "f86ed66",
+   "sessionIds": [
+    "bcab9206-8b7b-478a-a355-2173f531fd74"
+   ],
+   "bundle": "002.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办包裹页 appId 与人脸 API appId 不可混用",
+   "type": "fact",
+   "content": "无锡智慧物业苏服办链路里有两个 appId：包裹页/轻应用跳转用 wxzhwyypbjl（getTicket、打开 H5）；lightAppJssdk.face.livenessFaceAuth 文档 5.1.12 要求 arg0 为 jisnzjk。把人脸 arg0 改成业务包裹标识会导致支付宝等容器间歇性拉不起扫脸。成功以 retcode===000000 为准；支付宝经 my.postMessage 回传时可能无标准 retcode，需额外兼容 result/msg 字段。排查日志关注 tokenFromUrl（入口新 token）与 tokenStale（需重新从苏服办进入）。",
+   "evidence": "会话 3fc0470b 对照官方 5.1.12 与包裹页 URL，明确两 appId 分工；曾误用 wxzhwyypbjl 作人脸 arg0；间歇失败归因 token 过期或宿主无回调。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/face.vue"
+   ],
+   "baseline": "7993464",
+   "sessionIds": [
+    "3fc0470b-aa98-4e6c-91de-c95f0603e8d3"
+   ],
+   "bundle": "002.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "小程序 web-view 拦截第三方 backUrl 回自家首页",
+   "type": "pattern",
+   "content": "pages/common/webView（或 H5 外链容器）加载带返回按钮的第三方页时，若对方 backUrl/重定向命中自家门户首页 hash（如 szh5/sfb/#/），必须在小程序侧 redirectTo/reLaunch 到原生首页路由，禁止在 web-view/iframe 内再打开一层首页。Android 上第二次进投票页点返回可能无反应：首次 redirectTo 成功后栈变化导致 iframe load 不再触发，须并行依赖 iframe 内 postMessage 与 URL 匹配（inspectPortalHomeReturnUrl）。排查用统一前缀 [WebViewReturn] 日志：page:onLoad、iframe:load（matched/reason/hash）、iframe:message、return:trigger、exit:redirectTo:ok|fail。",
+   "evidence": "会话 3418c5a2：实现 backUrl 拦截计划；用户报安卓第二次返回按钮无效、系统返回仍有效，iOS 正常；结论增加 logWebViewReturn 与 inspectPortalHomeReturnUrl。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/common/webView.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/webViewUrl.js"
+   ],
+   "baseline": "1cce226",
+   "sessionIds": [
+    "3418c5a2-4fda-48cf-98cf-7a8c6d1ea069"
+   ],
+   "bundle": "002.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办投票 H5 扫脸成功后勿再调 handleFaceSuccess",
+   "type": "bug",
+   "content": "【现象】苏服办 App 内业主从首页再次进入投票 H5（Android 更明显）时，表现为「人脸识别失败」或二次进入跳过扫脸却误入不动产/投票后续页；扫脸成功后还可能 toast「是否存在重复实名账号信息不能为空」。\n\n【根因】`face.vue` 在 SDK 扫脸成功后又调用 `syncFaceSuccessToBackend` → POST `/security/ctUserRealName/handleFaceSuccess`，该接口在已实名/重复校验场景下失败，打断后续跳转；与绑定房屋多次扫脸无冲突，是因为绑定链路未走这步多余同步。\n\n【修复】删除 `syncFaceSuccessToBackend` 及对 `handleFaceSuccess` 的调用；`completeFaceVerifySuccess` 仅提示「人脸认证成功，请选择房屋」并在约 1s 后跳转 `bdc`，不再请求后端 handleFaceSuccess。\n\n【验证】Android 苏服办实机：扫脸后只出现成功提示、无重复实名 toast、可正常进入 bdc/不动产/投票。",
+   "evidence": "会话 a6aaabb6（基线 a6dcdb1）：测试反馈 iPhone 正常、Android 二次进投票 H5 失败；第二次无人脸直进不动产页；最终改动删除 syncFaceSuccessToBackend/handleFaceSuccess 调用并恢复 completeFaceVerifySuccess 跳转 bdc。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/face.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/bdc.vue"
+   ],
+   "baseline": "a6dcdb1",
+   "sessionIds": [
+    "a6aaabb6-4559-4143-b37a-e11a1ba37fed"
+   ],
+   "bundle": "003.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "无锡 H5 维修资金页房屋历史交易明细：accountTransInfos 与 proDeal 展示约定",
+   "type": "workflow",
+   "content": "无锡客户要求在小程序/H5 维修资金页底部展示**当前房屋**历史交易明细，原主接口不变，明细取自返回体 `accountTransInfos`。\n\n【列表字段映射】`transDateTime`→交易日期；`direction`：0=支、1=收→交易类型；`transMoney`→交易金额；`balance`→余额；右箭头进详情。\n\n【详情页】交易明细区：交易日期、类型、金额、余额、摘要；项目信息区：项目名称、使用方式、预算金额、结算总额——**仅当 `proDeal` 有值**时展示项目数据，为空则整块项目信息不出现（不是前端 mock 缺数据）。\n\n【交付】`TransactionTable.vue` + `transDetail.vue` + `utils.js` 处理 proDeal + `pages.json` 注册路由；联调通过后移除 mock。",
+   "evidence": "会话 9626bae5（基线 1ea39f1）：需求明确 accountTransInfos 字段与 proDeal 条件展示；合并到 dev_shiqu 的文件清单含 TransactionTable、transDetail、utils、index、pages.json。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/components/TransactionTable.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/transDetail.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/maintain/utils.js"
+   ],
+   "baseline": "1ea39f1",
+   "sessionIds": [
+    "9626bae5-9774-468d-8608-444c5c9cb360"
+   ],
+   "bundle": "003.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "无锡 H5 子模块 dev_wuxi-sfb 与 dev_shiqu 的功能同步方式",
+   "type": "workflow",
+   "content": "仓库 `无锡市区小程序嵌入H5` 的业务代码在子模块 `zhi2-mobile-admin-h5-c-unlimited` 内，至少两条并行分支：`dev_wuxi-sfb`（苏服办/嵌入场景）与 `dev_shiqu`（市区交付）。市区需求在 sfb 分支开发后，同步到 shiqu 常用两种方式：① 整分支 `git merge dev_wuxi-sfb`（可能带入同期苏服办、人脸等改动）；② 单功能 `cherry-pick` 指定提交到 `dev_shiqu` 再 `git push`。\n\n父仓若在 `main-sfb`，**不会自动更新**子模块指针；仅子模块远程 `dev_shiqu` 更新时，需另行在父仓提交子模块引用才算父仓同步。",
+   "evidence": "会话 9626bae5、73334c2d：维修资金与物业公司功能均通过 merge 或 cherry-pick 到 dev_shiqu 并推送；说明合并 dev_wuxi-sfb 含非单一需求的同期改动，父仓 main-sfb 未含 dev_shiqu 指针。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited"
+   ],
+   "baseline": "289666e",
+   "sessionIds": [
+    "9626bae5-9774-468d-8608-444c5c9cb360",
+    "73334c2d-8d67-4f00-8197-643417601177"
+   ],
+   "bundle": "003.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "小区/项目信息页物业公司：业委会与物管会主体取不到则显示 -",
+   "type": "pattern",
+   "content": "在 `pages_owner/project/info`（及同类小区信息页）展示「物业公司」时，字段取接口 `companyName`。当物业主体为**业委会**或**物管会**时，后端往往无法给出物业公司名称，前端应显示 `-`，不要留空或误展示主体名称。\n\n实现上在拉取小区/项目详情后按主体类型判断能否展示物业公司，再绑定 `companyName`。",
+   "evidence": "会话 73334c2d（基线 289666e）：用户要求增加物业公司显示，业委会/物管会无法获取物业公司时显示 -；cherry-pick 02959e5→dev_shiqu 修改 project/info/index.vue。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue"
+   ],
+   "baseline": "289666e",
+   "sessionIds": [
+    "73334c2d-8d67-4f00-8197-643417601177"
+   ],
+   "bundle": "003.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "报事报修列表 z-paging：#top 插槽 + height 100% 防列表盖住顶部操作区",
+   "type": "bug",
+   "content": "「我的-电子业主卡-报事报修」列表页顶部「前往报事报修」蓝色条与搜索/筛选被列表滚动层盖住。根因是 z-paging 在页面 flex 布局下未占满高度，列表内容区 `position: absolute` 叠到 `#top` 之上。\n\n【修复套路】① 「前往报事报修」与搜索筛选一并放进 `#top`；② `z-paging` 设 `height: 100%` + flex 纵向布局；③ 顶部区 `z-index: 10`，列表 `content-z-index: 1`；④ `page` 高度相关样式用**非 scoped** 保证高度链贯通。\n\n注：库内另有「fixed 全屏盖住顶栏」场景需 `:fixed=\"false\"`，本页是 fixed 布局下的高度/z-index 问题，两套解法不要混用。",
+   "evidence": "会话 35c311a0（基线 6c9a164）：最终结论写明 z-paging 未 height 100%、顶部缺层级、按钮未进 #top；修改 repair/index.vue 与 pages.json 标题。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/repair/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages.json"
+   ],
+   "baseline": "6c9a164",
+   "sessionIds": [
+    "35c311a0-d465-4e73-b3b7-f836ef5c6b40"
+   ],
+   "bundle": "003.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "小程序 web-view 内腾讯地点搜索 JSONP 报 105：直链正常时需同源 /qqmap 代理 + JSON 请求",
+   "type": "bug",
+   "content": "现象：小区周边/设施在浏览器用 apis.map.qq.com 直链 nearby(...) 返回 status:0，但 H5 被微信小程序 web-view 打开时走 JSONP 会稳定 105；旧代码 nearby 失败后又降级 region(adcode)，region 同样 105，表现为「Key/额度/域名都配了仍无周边」。根因：web-view 里 JSONP 鉴权链路与浏览器直链不等价，不能拿直链成功反证前端 Key 配置无误。修复套路：(1) 去掉 region 降级，边界策略与联调通过的 nearby 保持一致；(2) H5 改请求同源路径 /qqmap/...，用 uni.request + output=json（开发 vite 配 proxy，生产 nginx location /qqmap/ { proxy_pass https://apis.map.qq.com/; proxy_set_header Host apis.map.qq.com; }）；(3) 部署后用 https://{H5域名}/qqmap/ws/place/v1/search?... 自测 status:0，再在 web-view 强刷验证日志不再出现 region(adcode) 与 JSONP 降级。",
+   "evidence": "会话 ba685907：用户验证 nearby 直链 Success；web-view 内 JSONP 105；结论写明 nearby 失败→region(320513) 二次 105，修复为固定 nearby + /qqmap 代理 + uni.request JSON。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/index.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/qqMapKey.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages_owner/project/info/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/vite.config.ts"
+   ],
+   "baseline": "5241320",
+   "sessionIds": [
+    "ba685907-d68a-4e81-8abb-1388fb268339"
+   ],
+   "bundle": "004.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "苏服办人脸支付宝 success 返回 result:\"true\"/msg:\"成功\" 却被判失败",
+   "type": "bug",
+   "content": "现象：支付宝容器内扫脸 SDK 已回调 success（日志含 result:\"true\", msg:\"成功\"），业务页仍显示人脸识别失败，失败文案甚至是「成功」；从支付宝返回后还可能无法再次唤起。根因：成功判断只认 retcode===\"000000\" 或 msg===\"认证成功\"，未兼容支付宝返回的 result 字符串 \"true\" 与 msg \"成功\"，会 reject(new Error(msg))。配套约束：支付宝场景不要用 getTicket 换票，须用原始苏服办 token（tokenType=1）；SDK success 时先把结果写入 sessionStorage，在 onShow/visibilitychange 读取暂存完成后续跳转，避免跨应用返回导致 Promise 链断裂。调试时在 success 日志打印 accepted: true/false。",
+   "evidence": "会话 d303f251：用户提供 success 日志 {\"result\":\"true\",\"appId\":\"jisnzjk\",\"msg\":\"成功\"}；结论对照表说明旧版未判断 result/msg 导致 reject(Error(\"成功\"))，并补充 sessionStorage 与支付宝 token 策略。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/sfbFaceAuth.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/face/face.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/verifyUser/index.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/store/user.js"
+   ],
+   "baseline": "afd47ed",
+   "sessionIds": [
+    "d303f251-dbaf-4d2c-8f51-16248a0b7e3d"
+   ],
+   "bundle": "004.md",
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "嵌 web-view 的 H5 轮播/静态资源：接口相对路径须拼发布前缀绝对路径，禁止 ./ 相对当前路由",
+   "type": "pattern",
+   "content": "现象：banner 接口返回 pictureUrl 如 /zhi2/2026/.../xxx.jpg，前端拼成 ./sfb/zhi2/... 或裸相对路径后，在 /szh5/pages/webview/home 等页面会被解析为 /szh5/pages/webview/sfb/zhi2/...（路由污染），图片 404。根因：SPA 内相对 URL 相对的是当前 pathname，不是静态资源根。做法：用 VITE_APP_H5_PUBLIC_BASE（与 manifest h5.router.base 一致，如 /szh5）得到 getH5PublicBase()，媒体路径统一为绝对路径：raw 以 /sfb/ 开头则保留，否则 `/sfb${raw}`，再 `${getH5PublicBase()}${mediaPath}`，最终形如 https://host/szh5/sfb/zhi2/...。不要用「仅相对站点」的 ./sfb 指望在所有路由下正确。",
+   "evidence": "会话 47414239：用户反馈图片 URL 含 pages/webview 路由段；结论说明 ./sfb 相对当前页解析错误，改为 getH5PublicBase() + /sfb 前缀绝对路径。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/utils/zhishuAsset.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/.env.production",
+    "zhi2-mobile-admin-h5-c-unlimited/src/manifest.json"
+   ],
+   "baseline": "6c9a164",
+   "sessionIds": [
+    "47414239-c758-44c5-b55e-6c30c3687109"
+   ],
+   "bundle": "004.md",
+   "project": "无锡市区小程序嵌入H5"
+  }
+ ]
+}

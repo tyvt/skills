@@ -1,0 +1,96 @@
+{
+ "project": "园区公共收益",
+ "batch": "019",
+ "files": [
+  "019.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "这个问题没改好",
+   "type": "bug",
+   "content": "这次已落实修复，上次改动有两处没真正挡住删除： **问题原因** 1. **操作列点击未校验禁用状态**：`zs-operate-column` 在按钮 `disabled` 时仍可能触发 `@click.native`，导致置灰按钮仍可删。 2. **单行删除缺少兜底**：`handleDelete` 未在方法内再次判断 `canOperate`。 3. **`visible` 逻辑不当**：非待提交时直接隐藏删除按钮，与「置灰不可删」的需求不一致，也未与批量删除行为对齐。 4. **`bizState` 默认值有误**：默认 `0` 会在数据未加载时误判为「待提交」。 **本次修改** 1. **`zs-operate-column.vue`**：新增 `isButtonDisabled` / `onButtonClick`，禁用状态下不执行删除。 2. **`houseTable.vue`**： - 去掉删除按钮的 `visible`，非待提交时**显示但置灰**（与广告位等子表一致） - `handleDelete` 开头增加 `canOperate` 校验 - `bizState` 默认值改为 `undefined` **效果**（仅按 `bizState`，查看/编辑模式均可操作） | `bizState` | 批量删除 / 新增 | 单行删除 | |---|---|-",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "**`zs-operate-column.vue",
+    "**`houseTable.vue",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\assetsLeaseContractFiling、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\assetsLeaseContractFiling\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4901c51b-48fd-4552-a991-5fc17b4c1409"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "日志管理里有的“操作模块”未显示的 应该是有些菜单新",
+   "type": "bug",
+   "content": "你的判断是对的。操作日志里的「操作模块」来自后端记录的 `title` 字段，而前端是通过请求头 `zs-menu-name`（菜单名称）和 `zs-menu-path`（菜单路径）传给后端的。 ## 原因分析 所有接口在 `request.js` 拦截器里都会调用 `getPageRequestHeaders()` 附加这些请求头： ```13:27:zhi2-web-admin/src/utils/pageRequestContext.js /** 所有请求默认附加：zs-menu-name、zs-menu-path；有 ID 时附加 zs-data-id */ export function getPageRequestHeaders() { const meta = resolveRouteMeta() // ... } ``` 原先只从 `router.currentRoute.meta` 读取，在以下场景会拿不到菜单名： 1. **新增页**（路径以 `/add` 结尾）：当前匹配路由往往没有配置 `meta.title` 2. **新菜单**：只配了列表页，详情页 hidden 路由未配 `title` / `filePath` 3. **子路由**：叶子路由 meta 为空，但父级路由有配置 截图里「新增」操作的「操作模块」为空，而「修改」「删除」「审批」有值，正是",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`request.js",
+    "```13:27:zhi2-web-admin/src/utils/pageRequestContext.js",
+    "`pageRequestContext.js",
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\system\\operlog\\index.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\utils\\request.js、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\utils\\pageRequestContext.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "020b4402-aa87-4f14-bc0e-617da146dbe4"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "所有接口都要加请求头，menu-path,menu-",
+   "type": "preference",
+   "content": "已完成修改：所有通过 axios 拦截器发出的接口请求，都会自动附加以下请求头。 ### 改动说明 **1. `pageRequestContext.js`** — 新增 `getPageRequestHeaders()`： - `zs-menu-name`：取自当前路由 `meta.title` - `zs-menu-path`：取自当前路由 `meta.filePath` - `zs-data-id`：通过 `getId()` 从当前路由 URL 解析；若解析不到则不传 **2. `request.js`** — 在请求拦截器中对**所有请求**调用 `getPageRequestHeaders()`，替代原先仅在保存/新增/删除时附加的逻辑。 ### 行为变化 | 之前 | 现在 | |------|------| | 仅在点击保存、新增、删除时附加请求头 | 所有接口请求都附加 | | `data-id` 来自表单主键 | `data-id` 来自 `getId()` 解析路由 ID | | 需手动调用 `enableDetailSaveHeaders` 等 | 无需手动触发，自动附加 | 原有的 `enableDetailSaveHeaders`、`enableListDeleteHeaders` 等函数保留为空实现，避免影响现有引用，后续可逐步清理。 ### 示例 - ",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`pageRequestContext.js",
+    "`request.js",
+    "涉及文件：d:/repository/园区公共收益/zhi2-web-admin、d:/repository/园区公共收益、d:/repository/园区公共收益/zhi2-web-admin/src/utils/pageRequestContext.js、d:/repository/园区公共收益/zhi2-web-admin/src/utils/request.js、d:/repository/园区公共收益/zhi2-web-admin/src、d:/repository/园区公共收益/zhi2-web-admin/src/main.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ff4a3fa0-96f2-4d49-b056-026882c79105"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "修复「新增开户明细」弹框表格底部被遮挡 Implem",
+   "type": "preference",
+   "content": "已修复「新增开户明细」弹框表格底部被遮挡的问题，修改文件： [`zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue`](zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue) ### 主要改动 1. **底部表单独立固定** 将 `scope-select-footer`（缴存模式/缴存标准、已选统计）从 `zs-tabs` 内移到 `dialog-right` 下，作为 tabs 下方的固定区域，不再与表格争抢高度。 2. **表格区域弹性布局** 用 `scope-select-table-wrap` 包裹 `zs-table`，设置 `flex: 1; min-height: 0`，让表格占据剩余空间并在内部滚动。 3. **动态表格行数** 通过 `ResizeObserver` 监听容器高度，动态计算 `listTableTr`，表格在可视区域内显示并通过表体内滚动查看全部数据。 4. **样式优化** 底部区域增加顶部分隔线和背景色，搜索区设为 `flex-shrink: 0`，避免被压缩。 ### 预期效果 弹框右侧布局为：*",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "[`zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue`](zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue",
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\maintenance\\accountOpen\\owner\\components\\ScopeSelectDialog.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\maintenance\\accountOpen\\owner\\components\\OpenDetailTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a30ff912-d925-46fa-ad4b-9657898fd082"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "公共收益缴存，新增，选择结算账户，“是否启用子账户”",
+   "type": "bug",
+   "content": "修复已完成。 ## 原因 全局 `dictFormatter` 会按列 `prop` 查找 `{prop}Options` 字典。`hasSubAccount` 列需要 `hasSubAccountOptions`，但页面只加载了 `yesOrNoOptions`，导致该列显示为空。 ## 修改内容 1. [`depositNotice/components/detail.vue`](zhi2-web-admin/src/views/maintenance/depositNotice/components/detail.vue)（公共收益缴存复用此组件） - `data` 中增加 `hasSubAccountOptions: []` - `initDict()` 加载 `sys_yes_no` 时同步赋值给 `hasSubAccountOptions` 2. [`depositNotice/company/components/detail.vue`](zhi2-web-admin/src/views/maintenance/depositNotice/company/components/detail.vue)（同类问题一并修复） - 同上修改 ## 验证 代码层面已确认：`prop=\"hasSubAccount\"` + `dictFormatter` 会正确读取 `hasSub",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "[`depositNotice/components/detail.vue`](zhi2-web-admin/src/views/maintenance/depositNotice/components/detail.vue",
+    "[`depositNotice/company/components/detail.vue`](zhi2-web-admin/src/views/maintenance/depositNotice/company/components/detail.vue",
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\maintenance\\depositNotice、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\maintenance\\depositNotice\\components\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\maintenance\\settlementAccount\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7e4c18c0-5ce0-41ce-b4dd-d28988df5d00"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  }
+ ],
+ "_draft": true
+}

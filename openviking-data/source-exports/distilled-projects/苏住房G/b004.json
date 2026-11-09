@@ -1,0 +1,107 @@
+{
+ "project": "苏住房G",
+ "batch": 4,
+ "files": [
+  "013.md",
+  "014.md",
+  "015.md",
+  "016.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "高级查询（zs-advanced-query）字段配置必须前端本地定义，不要读后端字典 remark 下发类型",
+   "type": "preference",
+   "content": "场景：给「物业管理区域查询」「物业企业查询」等列表加自定义筛选条件，字段清单存后端字典（complex_field / company_refer_field），remark 里带了查询控件类型与源模型。踩坑：一开始按 remark 解析出控件类型，出现「注册区域」被渲染成纯文本输入框、数值字段没有大于/小于运算符、物业类型只能单选。用户明确要求两条：①「改用字典，不要单独覆盖」——控件类型走项目字典体系统一配置，不在页面里写特例；②「complex_field 和 company_refer_field 的类型都在本地代码定义，不要用 remark」——字段中文名→dictValue→控件类型的映射放进前端本地配置文件（complexFieldConfig.js），后端字典只负责 dictValue 这一列。做法：本地配置表作为唯一权威，字段名必须和字典截图的 dictValue 逐字对齐（registerRegion / isHeadquarters / creditYear / managedComplexCount / managedEarlyComplexCount / managedComplexRegion / managedComplexTotalArea 这几个最容易按语义猜错），别名映射用完即删，不要留 provincCityArea→registerRegion 之类的兜底。差异说明：已知清单里只有「字段更名迁移清单」「type:'dict' 搜索项」等条目，本条补充的是「控件类型元数据该放前端还是后端字典 remark」这条架构归属，以及用户对此的明确否决。",
+   "evidence": "会话 bea4b5cf 用户诉求 3「改用字典，不要单独覆盖」、诉求 4「物业管理区域的complex_field和物业服务企业的company_refer_field类型都在本地代码定义，不要用remark」、诉求 5「注册区域还是输入」。最终结论给出 17 个字段的 dictValue 对照表并移除别名映射。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\components\\zs-advanced-query\\complexFieldConfig.js",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\components\\zs-advanced-query\\zs-advanced-query.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\index.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\propertyCompany\\index.vue"
+   ],
+   "baseline": "864b409",
+   "sessionIds": [
+    "bea4b5cf-53a3-487a-b0bc-1d5b2234e049"
+   ],
+   "bundle": "014.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "银行账户状态要统一到银行侧字典 ACCOUNT_STATUS（含销户=6），不要用平台侧 benefit_account_status",
+   "type": "bug",
+   "content": "场景：开户申请详情、监管账户变更/属性维护、物业账户等多个页面的「银行账户状态」字段显示成裸编码 6，用户报「字典缺少银行状态是销户的编码」。根因：同一个业务字段在不同页面绑了两套字典——开户申请详情用的是平台侧 benefit_account_status，而「银行账户查询」子表用的是银行侧 ACCOUNT_STATUS。benefit_account_status 里根本没有「销户」这一项，银行/接口销户后回传 accountStatus=6 就无法回显，dict-tag 静默降级成原始码。做法：把所有「银行账户状态」相关页面统一切到 ACCOUNT_STATUS，与 BankAccountTable 保持一致；标准编码为 1 正常 / 2 冻结 / 3 查封 / 4 限制 / 5 账号不存在 / 6 销户。同时注意前端修不了字典缺失——若目标环境字典管理里没有配「6-销户」，仍会显示 6，必须在系统管理→字典管理中补一条，所以排查这类「显示原始码」问题要分两步：先确认前端引用的字典类型对了，再确认该环境的字典项配全了。差异说明：已知清单里有「字典码与接口枚举数值相同含义不同要建映射层」（#256）和「字典未配置导致显示码值」（#1061/#796），本条给出的是更具体的一类：同一字段在多页面绑了不同字典类型，以及 ACCOUNT_STATUS 的完整编码表。",
+   "evidence": "会话 011d6472 用户诉求「开户申请：字典缺少，银行状态是\"销户\"的编码，字典使用ACCOUNT_STATUS」；最终结论列出两套字典对比表与 6 个标准编码，并给出 6 个待改文件清单。",
+   "files": [
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAccount\\detail.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAccount\\components\\BankAccountTable.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegAccountChange\\detail.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegAccPropMgmt\\detail.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\propertyAccount\\detail.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\account\\detail.vue",
+    "d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubBankAccountBalance\\index.vue"
+   ],
+   "baseline": "315702f",
+   "sessionIds": [
+    "011d6472-82b1-4b34-b862-5f88d5e951ce"
+   ],
+   "bundle": "014.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "Vue2 里把 `a && b` 的短路结果直接绑到布尔 prop，会因返回字符串/ID 触发 prop 类型警告（disabled 灰不掉）",
+   "type": "bug",
+   "content": "什么情况：B 端页面按「端别 + 已选项目」控制控件禁用，写成 `:disabled=\"isBTerminal() && currentProjectId\"` 或 computed 里 `return terminalType === 'B' && this.$store.getters.currentProjectId`。当前端是 B 端且已选项目时，`&&` 短路求值返回的是右侧操作数本身——一个 19 位雪花 ID 字符串（如 \"667570210075104\"），而不是 true。现象：控制台报 `Invalid prop: type check failed for prop \"disabled\". Expected Boolean, got String`，报错栈指向 zs-input→el-input→el-form-item→zs-form→zs-dialog→业务弹窗（bulkImportDialog.vue），但控件仍可能显示为可编辑，容易被误读成「禁用没生效」。\n为什么：JS 的 `&&` 不是布尔转换器，只保证返回某一侧操作数；而 Vue2/Element 的 Boolean prop 会做类型校验，遇到非 true 的字符串既不报错退出也不当 false，语义就此分叉。同类写法在 `v-if`、`:class`、纯 JS 分支里都无害，只有「绑给声明为 Boolean 的 prop」时才暴露，所以一改再改都容易漏。\n怎么做：凡是传给 Boolean prop 的表达式，末段一律加 `!!` 归一：`return this.$store.state.user.terminalType === 'B' && !!this.$store.getters.currentProjectId`。多个同类禁用条件（详情表单、批量导入弹窗等）一起改，避免只修报错那一处；改后刷新页面确认警告消失，并确认禁用态视觉真正生效（这才是原需求本身）。",
+   "evidence": "会话 6628d00f 用户直接贴出 `Invalid prop: type check failed for prop \"disabled\". Expected Boolean, got String with value \"667570210075104\"`，助手定位 `terminalType === 'B' && currentProjectId` 在两边为真时返回字符串，已在 bulkImportDialog.vue 与 detail.vue 改为 `&& !!this.$store.getters.currentProjectId`。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/components/bulkImportDialog.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/detail.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/feeDeclare2/index.vue"
+   ],
+   "baseline": "69e9d4d",
+   "sessionIds": [
+    "6628d00f-987f-45b2-80c7-d0bedcc72598"
+   ],
+   "bundle": "015.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "街道银行授权的下拉选项来自「上级区有效授权」接口，已失效的历史值要补回下拉并 disabled，保存走 {subdistrictCode} + rowVersion",
+   "type": "pattern",
+   "content": "什么情况：区级下的街道银行授权弹窗（views/system/regionBankAuth）要编辑某街道可授权的银行。旧实现是 `/system/bank/list` 全量银行 + 父组件下发的 `policy.districtAvailableBankIds` 在前端过滤，属于「前端猜口径」，一旦区级授权变化就出现「下拉里出现了不该有的银行 / 该有的没有」。\n为什么：可选范围本质是后端基于上级区当前有效授权算出来的结果集，前端再按 ID 数组筛一遍既重复又不同步；同时已保存的街道授权里可能残留区级已失效的银行，直接按新接口渲染会把历史值显示成空白，看起来像丢数据。\n怎么做：① 下拉数据源换成 `GET /streetBankPolicy/{subdistrictCode}/authorizedBanks`，删除前端 bankIds 过滤逻辑；② 弹窗打开时并行发两个请求——`GET /streetBankPolicy/{subdistrictCode}` 回显 `bankIds` 与 `rowVersion`，`authorizedBanks` 提供下拉选项，两者在本地合并；③ 详情里有、下拉里没有的银行，从详情补进选项列表并标注「区级已失效」且置 `disabled`，保证历史数据可见但不可新增选择；④ 保存路径统一为 `/streetBankPolicy/{subdistrictCode}`，首次保存不传 rowVersion，编辑时带上详情返回的版本号（乐观锁）；⑤ 保存成功后用 `GET /streetBankPolicy/page` 刷新街道列表。注意街道编码不能从列表行对象上想当然取，本次曾出现 `subdistrictCode` 为空，需从树上/上级节点解析出真实编码再传。",
+   "evidence": "会话 dc798ac5 中用户先给接口联调文档与街道银行授权前端接口文档，中途反馈 `console.log('subdistrictCode', subdistrictCode)` 是空值并追问能否从 index.vue:214-218 取街道编码；最终结论列明下拉源由 `/system/bank/list` + districtAvailableBankIds 过滤改为 `/streetBankPolicy/{subdistrictCode}/authorizedBanks`，并行请求详情与可选银行、失效银行补进下拉并 disabled、保存带 rowVersion。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/system/regionBankAuth/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/system/regionBankAuth/components/StreetAuthDialog.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/system/regionBankAuth/utils.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue"
+   ],
+   "baseline": "92ce738",
+   "sessionIds": [
+    "dc798ac5-5460-4582-83cb-9f9c7bf0266f"
+   ],
+   "bundle": "015.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "按机构类型联动的角色下拉：organType 写死默认值导致跨机构返回错误角色集",
+   "type": "bug",
+   "content": "情况：人员管理「新增/编辑人员」页的角色下拉，在所属企业为信托公司时仍显示物业企业的角色列表。请求 enterprise/app/listRolePage（或 /system/role/roles）时没有带企业类型参数，或带的是写死的值。\n\n根因：组件里 `form.organType` 的默认值被硬编码为 '02'（物业企业），所以无论实际所属企业是什么类型，角色接口始终按 '02' 过滤；编辑历史人员时同样沿用这个默认值，不是按人员所属企业取类型。\n\n做法（已在 toB/personnelRecord/components/detail.vue 落地）：\n1) 把 `form.organType` 默认值从 '02' 改为 undefined，禁止用某个机构类型兜底。\n2) 抽出 `loadRoleOptions(organType)`：organType 为空时直接清空选项，不发请求，绝不「无参兜底请求」。\n3) 抽出 `resolveAndLoadRoles()`：优先用 form.organType；缺失时用 companyRecordId（表单值或登录态）查企业详情取 organType，再加载。\n4) 切换所属企业（setCompany）时先清空 roleIds 再重拉，避免旧角色 ID 残留在新机构的选项集外。\n5) 变更场景（isChange）加载源人员后，用源人员的 organType 加载角色。\n6) 角色加载放在 detailCallback 里而不是 initDict 里并行发，防止详情回填覆盖前的 organType 还没到就先把错的角色集拉回来。\n\n与已知 990/1057 的差异：那两条讲「端别 terminalType 空值按谁处理」的判定口径；本条是「二级联动下拉的数据源参数被写死 + 回填时序早于参数就绪」，属于筛选维度参数缺失，不是端别判定。",
+   "evidence": "会话 4d653d37 用户报 Bug：「人员管理 - 角色下拉框数据源错误……当所属企业类型为信托公司时，角色选择框错误地显示了物业企业的角色列表」，并给出定位线索「请求 listRolePage 时未传入（或传错）企业类型参数」。最终结论：form.organType 默认值由 '02' 改为 undefined，新增 loadRoleOptions(organType) 与 resolveAndLoadRoles()，organType 缺失时经 companyRecordId 查企业详情补齐；setCompany(row) 切换企业时清空 roleIds 并重拉；detailCallback 里补调 loadRoleOptions(this.form.organType)，避免与 initDict 并行导致时序错误；isChange 场景按源人员 res.data.organType 加载。自测口径：信托公司新增人员请求 organType=30，物业企业仍为 02。",
+   "files": [
+    "zhi2-web-admin/src/views/toB/personnelRecord/components/detail.vue",
+    "zhi2-web-admin/src/views/institution/personnel/detail.vue",
+    "zhi2-web-admin/src/views/company/staffManagement/components/detail.vue",
+    "zhi2-web-admin/src/views/register/components/accountInfo.vue",
+    "zhi2-web-admin/src/views/company/userManagement/operator/detail.vue",
+    "zhi2-web-admin/src/views/toB/adminOperator/detail.vue"
+   ],
+   "baseline": "b8ae114",
+   "sessionIds": [
+    "4d653d37-aa8a-4614-b734-2b2e40476bec"
+   ],
+   "bundle": "016.md",
+   "project": "苏住房G"
+  }
+ ]
+}

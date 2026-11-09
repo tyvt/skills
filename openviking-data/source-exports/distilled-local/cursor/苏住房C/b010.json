@@ -1,0 +1,115 @@
+{
+ "project": "苏住房C",
+ "batch": "010",
+ "files": [
+  "010.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "构建失败的原因是主包上传预估体积超限，不是磁盘体积本",
+   "type": "preference",
+   "content": "构建失败的原因是**主包上传预估体积超限**，不是磁盘体积本身。 ## 问题诊断 | 指标 | 数值 | 状态 | |------|------|------| | 主包磁盘体积 | 1798.4 KB | 通过（上限 2048 KB） | | 上传预估 (×1.17) | **2104.1 KB** | **超限**（上限 2048 KB） | 新增 `z-paging` / `ZsPaging` 后，约 **92KB** 的 `z-paging` 被打进主包 `node-modules`，导致上传预估超出约 **56KB**。 ## 已做修复 1. **`Project_Suzhufang.vue`（苏找房 tab 页）** 改回 `scroll-view` + `uni-load-more`，避免 tab 主包引用 `ZsPaging`。 2. **`ZsPaging` 组件下沉到分包** 从 `src/components/` 移到： - `pages_transaction/components/ZsPaging/` - `pages_main/components/ZsPaging/` - `pages_owner_extra/components/ZsPaging/` 3. **新增 `scripts/relocate-z-paging.mjs`** 构建后把 `z-",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`Project_Suzhufang.vue",
+    "`.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\scripts\\validate-dist.mjs、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\package.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3562f516-f5b6-4ae3-b575-1ef94fe84955"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "[渲染层网络层错误] Failed to load ",
+   "type": "bug",
+   "content": "已继续修复，根因是两点叠加： ### 1. 高度为 0（主因） `ZsImage` 默认 `aspectFill` + `height: 100%`，父级无高度时图片区域高度为 0。请求成功但看不见。 ### 2. 宽度样式进不了 shadow-root `SuccessCard` 里的 `width: 180px` 无法穿透到 `ZsImage` 内部。 ### 修改内容 **`ZsImage.vue`** - 补全缺失的 `imageStyle`（之前模板引用了但未定义） - 新增 `width` prop，通过 inline style 在组件内部设宽 - `mode=\"widthFix\"` 时高度随宽度自适应 - 设置 `styleIsolation: 'shared'`，合并外部 `class` **`SuccessCard.vue`** - 所有插图改为 `mode=\"widthFix\" width=\"180px\"` 请清缓存并重新编译。图片应能正常显示；Network 里仍是 `/pages_my/static/images/authorized.png` 即可。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`ZsImage.vue",
+    "**`SuccessCard.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\AuthorizedSuccess.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\shared\\SuccessCard.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a875a3cf-aa63-4197-994e-ac8f0d49cb8c"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "TypeError: Cannot read pro",
+   "type": "preference",
+   "content": "已处理小程序端此前排查出的问题，修改如下： ## 1. 云守护申请 `guardApply` — `sessionStorage` 替换 新增 `utils/form-cache.js`，用 `uni.getStorageSync` / `setStorageSync` / `removeStorageSync` 做跨端暂存。 已更新文件： - `pages_guard/guardApply/index.vue` - `pages_guard/guardApply/components/step1.vue` - `pages_guard/guardApply/components/step2.vue` 步骤间表单缓存（`step2Form`、`previousStep2Form`）在小程序中可正常使用。 ## 2. 收支统计 `StatisticsCard` — 图表适配小程序 - **H5**：继续用 `div` + `echarts.init` - **微信小程序**：改用 `canvas type=\"2d\"` + `createSelectorQuery` 初始化 - 图表初始化改为 `async/await`，避免数据先于图表加载导致 `setOption` 无效 ## 3. 此前已修复（上一轮） - `page-query/data-analysis.vue` — `wi",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`utils/form-cache.js",
+    "`pages_guard/guardApply/index.vue",
+    "`pages_guard/guardApply/components/step1.vue",
+    "`pages_guard/guardApply/components/step2.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4b82f232-7ddb-41e7-b369-187d3bfea551"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "【慧物业】社区公告、街道公告一直加载中，Androi",
+   "type": "preference",
+   "content": "三个公告页已全部改为 `z-paging`，改动如下： ## 改动说明 ### 1. 新增共享 hook：`hooks/useAnnouncementPaging.js` 统一处理： - 分页请求（`pageNum` / `pageSize`） - 公告数据映射 - 社区/街道 `code` 自动补全 - 失败时调用 `complete(false)`，避免一直 loading ### 2. 三个公告页改用 `z-paging` - `community/announcement/index.vue`（社区公告） - `subdistrict/announcement/index.vue`（街道公告） - `project/announcement/index.vue`（小区公告） 结构统一为：顶部搜索栏 + `NoticeList` 列表，支持下拉刷新和上拉加载。 ### 3. 其他调整 - `pages.json`：补充 `z-paging` 的 easycom 配置 - `NoticeList.vue`：新增 `showEmpty` 属性，避免与 `z-paging` 空状态重复展示 - `useLoadMore.js`：已还原，不影响其他仍使用该 hook 的页面 ## 验证建议 在 Android 真机上回归： 1. 慧物业 → 社区公告 / 街道公告 2. 小区公告页 ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "hook：`hooks/useAnnouncementPaging.js",
+    "`community/announcement/index.vue",
+    "`subdistrict/announcement/index.vue",
+    "`project/announcement/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "802b4a4d-97e9-4dbb-a0fe-201215024044"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "推荐的房屋显示排列需要和APP保持 一致",
+   "type": "fact",
+   "content": "你的判断是对的，根因就是**查询参数结构不一致**。 ## 问题分析 苏找房三个 Tab 的接口参数格式并不相同： | Tab | 接口 | 方法 | 参数格式 | |-----|------|------|----------| | **推荐** | `listRecommend` | **GET** | 扁平：`pageNo, pageSize, xcoordinate, ycoordinate` | | 新房 | `pageByKeyWord` | POST | 嵌套：`{ pageNo, pageSize, t: { reviewState, shelfState, ... } }` | | 二手房 | `houseInfoDisplayList` | POST | 嵌套：`{ pageNo, pageSize, t: { accessSource, ... } }` | 推荐 Tab 之前错误地套用了新房/二手房的 POST 嵌套 `t` 结构： ```javascript // ❌ 错误：GET 接口用了 POST 风格的嵌套 t listRecommend({ pageNo, pageSize, t: { xcoordinate, ycoordinate } }) ``` `listRecommend` 是 **GET** 接口（POST 会返回 500），小程序 G",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "```257:264:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\Project_Suzhufang.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\Home_Suzhufang.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\buyHouse\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\Community_Suzhufang.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "65d67b1c-b2d4-4547-b8ef-f723249dbd4e"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "这两个接口处理的有问题，第一个是GET接口，但是被识",
+   "type": "pattern",
+   "content": "已全面核对项目中的接口调用，结论如下。 ## 核对结论 所有请求均通过 `createHttpClient`（`api` / `apiV1`）发出，没有绕过网关的直接 `axios` 或 `uni.request` 调用。 ### 传输层判断逻辑（已加固） 在 `httpInstance` 调用 `api.get/post/put/file` 时即确定： | 调用方式 | `backendMethod` | `gatewayInterfaceMethod` | `interface_id` | |---------|----------------|--------------------------|----------------| | `api.get` | GET | **GET** | `szffluzm-yhcq` | | `api.post` | POST | **POST** | `szffluzm-whyhxx` | | `api.put` | PUT | **POST** | `szffluzm-whyhxx` | | `api.post` + `zs-method: put/delete` | POST | **POST** | `szffluzm-whyhxx` | | `api.file` | POST | POST（`isFileUpload` 优先） ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`property.js`、`autonomy.js`、`chat.js`、`msg.js`、`transaction.js`、`bindProject.vue`、`deviceInfo/bind.vue",
+    "**文件上传**（`file.js",
+    "**`file.js",
+    "**`articleV1.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3863efc7-4edd-492d-93be-201508d84835"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

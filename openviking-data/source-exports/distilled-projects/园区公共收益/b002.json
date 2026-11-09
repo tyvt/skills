@@ -1,0 +1,258 @@
+{
+ "project": "园区公共收益",
+ "batch": 2,
+ "files": [
+  "005.md",
+  "006.md",
+  "007.md",
+  "008.md"
+ ],
+ "count": 14,
+ "memories": [
+  {
+   "title": "导航栏「姓名（组织类型）」只显示姓名：展示依赖 accountTypeName 而非 accountType 原值",
+   "type": "bug",
+   "content": "zhi2-web-admin 顶栏 `Navbar` 在 `nickName` 后追加组织类型时，判断的是解析后的 `accountTypeName`，不是 `getInfo` 里的 `accountType`。常见链路：用 `sys_account_type_all` 把编码转中文，仅当 `accountTypeName` 非空才渲染 `姓名（组织类型）`，否则只显示 `nickName`。园区等场景会出现 `accountType: \"B\"` 等值不在字典（多为 `1`/`2`/`4`）内 → 字典匹配失败 → 用户误以为接口已加字段但前端「没显示」。修复优先级：① 接口直接返回 `accountTypeName`；② 依次尝试 `sys_account_type_all`、`sys_account_type`；③ 仍无匹配时用 `deptName` 作兜底展示。要显示真实「组织类型」语义需后端补 `accountTypeName` 或确认 `B` 对应字典类型。",
+   "evidence": "会话结论：accountType \"B\" 不在 sys_account_type_all，accountTypeName 为空，导航栏仅显示「卢司」；修复后预期「卢司（严严物业）」",
+   "files": [
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/store/modules/user.js",
+    "zhi2-web-admin/src/store/getters.js",
+    "zhi2-web-admin/src/views/system/user/detail.vue"
+   ],
+   "baseline": "bd275b5",
+   "sessionIds": [
+    "51ce30f1-9974-4744-a846-7c5a5c12cf6d"
+   ],
+   "bundle": "005.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "menu-name/menu-path/data-id 须用 pendingOperHeaders 仅挂在编辑保存与列表删除",
+   "type": "workflow",
+   "content": "全量请求拦截器统一加审计头易误伤查询/新增，且中文 `meta.title` 会触发 XHR `setRequestHeader` 非 ISO-8859-1 异常（编码侧须走 `toAsciiHeaderValue`，见同源记忆）。园区收紧方案：`pageRequestContext.js` 用 `pendingOperHeaders` 标记下一次请求类型（`edit` / `delete`），仅在匹配的 PUT / DELETE 上消费并附加头。编辑：仅 `OperationBtnGroup` 在 `formMode=edit` 点保存时调用 `enableDetailSaveHeaders(primaryKey, form)`，带 `menu-name`（路由 `meta.title`）、`menu-path`（`meta.filePath`）、`data-id`（`form[primaryKey]`）；`mixins/form.js` 的 `editRequest` 提交前刷新主键，`validate` 失败须 `clearPendingOperHeaders()` 防残留。删除：仅 `mixins/table.js` 的 `deleteRequest` 前 `enableListDeleteHeaders()`，带菜单头、**不带** `data-id`。新增保存、详情查询、自定义删除未走 `deleteRequest` 的路径均默认无这些头，自定义删除需自行 `enableListDeleteHeaders()`。移除对 `form` 的全局 watch 与 `zipdownload` 上的菜单头。",
+   "evidence": "用户要求仅 OperationBtnGroup 编辑保存与列表删除带请求头；实现 pendingOperHeaders + 拦截器 getOperRequestHeaders",
+   "files": [
+    "zhi2-web-admin/src/utils/request.js",
+    "zhi2-web-admin/src/utils/pageRequestContext.js",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/mixins/form.js"
+   ],
+   "baseline": "f783ca2",
+   "sessionIds": [
+    "9bcf52dd-9166-4405-b7fd-19333080453d"
+   ],
+   "bundle": "005.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "表决详情「发起公示」：decisionPublicity.js 统一公示类型 16 与多议题结果校验",
+   "type": "pattern",
+   "content": "四种表决详情在维护结果后接公示：抽 `views/autonomy/components/decisionPublicity.js`，常量 `DECISION_RESULT_PUBLICITY_TYPE = '16'`（与字典 `t_mf_publicityType` 表决结果公示一致，值不同只改常量）。`startDecisionPublicity` / `viewDecisionPublicity` 负责跳转新增公示页并预填区域名、表决编号、公示类型；`getDecisionDetailPath` 供公示详情反向跳回。按钮显隐：一般/选项/排序表决在 `bizState=='2'` 且 `form.result` 有值；多议题须 `checkAllTopicsHaveResult()` 全部子议题有结果。无 `publicityId` 显示「发起公示」，有则「查看公示」（详情接口须返回 `publicityId`）。`publicity/detail.vue` 的 `goToRelBusinessDetail` 对 `publicityType == '16'` 按 `relBusinessType` 映射回对应表决详情。",
+   "evidence": "表决发起公示计划落地摘要与后端配合事项（字典 16、publicityId）",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/components/decisionPublicity.js",
+    "zhi2-web-admin/src/views/autonomy/publicity/detail.vue",
+    "zhi2-web-admin/src/views/autonomy/general/detail.vue",
+    "zhi2-web-admin/src/views/autonomy/multiply/detail.vue",
+    "zhi2-web-admin/src/views/autonomy/publicity/components/StartPublicityBtn.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "9232c3f8-e145-49c4-a229-423452a543fb"
+   ],
+   "bundle": "005.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "物业管理区域四图位：complexPhoto 逗号串槽位与 ComplexPhotoUpload 迁移要点",
+   "type": "pattern",
+   "content": "苏住房分支 `develop/v2.6.2-suzhufang` 迁园区 `develop/v2.6.2-yuanqu` 时，物业区域图从单图 `ImageUpload :limit=1` 改为四槽：`ComplexPhotoUpload`（大门必填、鸟瞰/服务中心/特色可选，png/jpg/jpeg ≤5MB，非 ASCII 文件名上传前自动改名）+ `utils/complexPhoto.js` 维护槽位配置与 `complexPhoto` 逗号分隔串的 parse/serialize。解析时过滤历史 `empty.svg` 占位；保存时缺位补默认图。详情「区域概览」按固定顺序展示，未上传位用默认缩略图；`complexChange`、`publicQuery/complex` 只读页同步展示规则。两分支 `detail.vue` 差异大时应手工逐处迁移保留园区字段（宗地号、项目类型级联等），勿整文件覆盖。组件目录名即全局标签名（main.js glob 注册），无需手动 import。",
+   "evidence": "苏住房三提交合并迁入园区；5 文件 eslint 0、vite build 通过",
+   "files": [
+    "zhi2-web-admin/src/components/ComplexPhotoUpload/index.vue",
+    "zhi2-web-admin/src/utils/complexPhoto.js",
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/views/property/complexChange/detail.vue",
+    "zhi2-web-admin/src/views/publicQuery/complex/detail.vue"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "05d8ab0e-ab89-4e9c-bffb-a284f36311b6"
+   ],
+   "bundle": "005.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "子表组件传主单 form：写 :form=\"form\" 勿用 $attrs.form",
+   "type": "bug",
+   "content": "账户拆分等详情子表（如 `AccountListTable.vue`）需要主单 `form` 做校验或合计时，模板应显式 `:form=\"form\"`（或 props 声明后传入）。在 Vue2 子组件里绑定 `:form=\"$attrs.form\"` 往往拿不到父级 form（attrs 未透传或键名不一致），表现为子表校验/合计静默失效。`setAccountName` 类回写应用字段级 merge，避免整对象覆盖冲掉主单主键字段。",
+   "evidence": "账户拆分会话：修复 AccountListTable `:form=\"form\"`（原 `$attrs.form` 无效）；setAccountName 改为 merge",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/accountSplit/components/AccountListTable.vue",
+    "zhi2-web-admin/src/views/maintenance/accountSplit/detail.vue"
+   ],
+   "baseline": "7458acc",
+   "sessionIds": [
+    "46eb821e-f488-4bb3-b973-6647aedb4d2b"
+   ],
+   "bundle": "005.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] BuildingTableViewTabs 在 v-show 切回列表时弹窗高度塌陷",
+   "type": "bug",
+   "content": "楼盘表/列表双视图用 v-show 切换时，切回列表会按当前表格行数重算 zs-table 高度，连带 zs-select-dialog 整体缩小（与 :has() 误判是不同根因）。修复：`.tabs-content` 与列表面板设 `min-height: 400px`；列表侧对 zs-table 传 `:table-tr=\"pageSize\"` 固定每页行数占位；BuildingTableViewTabs 切换时 emit `view-change`，宿主在回到列表时 `doLayout()` 并重算弹窗高度。弹窗内为稳定布局可固定 pageSize 行高的 table-tr，与列表页空表用「实际行数」紧凑空态的约定相反，按场景选用。",
+   "evidence": "会话 0c03606c：用户反馈「切换回列表视图高度太小」；结论归纳 Tab+v-show 重算高度与表格随行数变化两因，并给出 min-height、table-tr、view-change+doLayout 改动。",
+   "files": [
+    "zhi2-web-admin/src/views/components/BuildingTableViewTabs.vue",
+    "zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue"
+   ],
+   "baseline": "7458acc",
+   "sessionIds": [
+    "0c03606c-2172-4607-9beb-eb92aee5b6d4"
+   ],
+   "bundle": "006.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] B 端收益类新增页初始化监管提示链接触发「没有授权相关菜单」",
+   "type": "bug",
+   "content": "用款申请、支出合同备案等 benefit 模块新增页进入时会自动弹出「选择物业管理区域」；构建「前往开户/签署协议」链接若在初始化阶段调用 `getRouterPathByFilePath`，B 端用户常无财务管理下开户/协议菜单，会在打开页面即抛「没有授权相关菜单」。应改用 `getBTerminalRegulatoryDialogConfig`（内部 `getRouterPathByFilePathOptional`，无路由则静默不展示链接）；监管协议页可 `withAgreement: false` 仅保留开户。用户主动点击的跨模块跳转仍用严格 `getRouterPathByFilePath`，无权限提示属预期。",
+   "evidence": "会话 b2ceb96d：全局排查 10 个 benefit/detail.vue，根因定为新增页自动弹窗 + 初始化链接触发菜单查找抛错；ruoyi.js 新增 getBTerminalRegulatoryDialogConfig。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/views/benefit/pubUseMoneyApply/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubExpenditureContract/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue",
+    "zhi2-web-admin/src/views/benefit/parkingSpaceContractFiling/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue"
+   ],
+   "baseline": "08d3255",
+   "sessionIds": [
+    "b2ceb96d-3372-48d3-9c13-5aed7776c612"
+   ],
+   "bundle": "006.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 业委会工作人员「当前状态」与「状态」是两套字段与字典",
+   "type": "pattern",
+   "content": "`status` 表示任职状态，字典 `job_status`（在职/离职等）；`enable` 表示账号启停，字典 `sys_normal_disable`。列表与详情须各展示一列/一项，禁止把两字典都改成同一套、禁止 watcher 把 `form.status` 同步到 `form.enable`、禁止 `getForm` 把 `enable` 强制设为 `status`。`detailCallback` 应对 `status`、`enable` 分别转字符串。误合并后可用 git 历史（如 eb20ab954、8788d7923）对照恢复。",
+   "evidence": "会话 e8eb992e：用户要求当前状态与状态分开、两字典不同；结论按历史提交拆字段并移除 status→enable 同步。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/ownerCommitteeWorker/detail.vue",
+    "zhi2-web-admin/src/views/autonomy/ownerCommitteeWorker/index.vue"
+   ],
+   "baseline": "b6bf87d",
+   "sessionIds": [
+    "e8eb992e-b033-444d-91a4-62bcf1e15f8d"
+   ],
+   "bundle": "006.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 操作人员详情行内授权写入用户授权模块",
+   "type": "workflow",
+   "content": "从业主体→操作人员详情子表操作栏可增加「授权」（权限 `company:operatorAuth:edit`）。弹窗选物业管理区域：数据源与用户授权一致 `/company/operatorAuthRange/bindSource/page`，多选名称与编号。确认后 `POST /company/operatorAuth/authorize`，提交 `operatorId`、`companyRecordId`、`operatorAuthRangeList`，后端创建/更新用户授权及范围，结果出现在「用户授权」列表。",
+   "evidence": "会话 8fad698f：胜浦试点同一页完成新增操作人员与授权；结论描述按钮、弹窗与 authorize 接口载荷。",
+   "files": [
+    "zhi2-web-admin/src/views/company/userManagement/operator/operatorTable.vue"
+   ],
+   "baseline": "bd275b5",
+   "sessionIds": [
+    "8fad698f-5f49-4e9c-a532-d96b53a28885"
+   ],
+   "bundle": "006.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 四类业主表决页面与 decisionType、主键约定",
+   "type": "fact",
+   "content": "视图在 `src/views/autonomy/`：一般 NORMAL→general、选项 OPTION→option、排序 SORT→sort、多议题 MULTIPLE_ISSUES→multiply。列表/详情 component 即菜单 filePath（flattenTree 写入 meta）；URL 由后台菜单动态生成，跨模块用 `getRouterPathByFilePath('autonomy/general/detail')` 等解析。主键：前三类详情路由用 `decisionId`，多议题用 `decisionManageId`。全库无 decisionSituation 模块；「表决情况」类展示走 `calculationChart` + VoteView/VoteResult。",
+   "evidence": "会话 63cee22f：探索业主表决相关路由与 API 的结论表与 decisionSituation 排查结果。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/general/index.vue",
+    "zhi2-web-admin/src/views/autonomy/option/index.vue",
+    "zhi2-web-admin/src/views/autonomy/sort/index.vue",
+    "zhi2-web-admin/src/views/autonomy/multiply/index.vue",
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/utils/index.js"
+   ],
+   "baseline": "0abcb96",
+   "sessionIds": [
+    "63cee22f-37b6-4816-8ebd-42acce2d69f4"
+   ],
+   "bundle": "006.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 双表穿梭弹窗中间箭头偏下：勿相对「标题+表+分页」整块居中，改用 CSS Grid 三行",
+   "type": "pattern",
+   "content": "楼幢「关联房屋」类左右双表 + 中间穿梭箭头弹窗，若中间按钮列用 flex 相对左侧整块（标题、表格、分页）垂直居中，箭头会明显偏下且左右表列宽易失衡。\n\n推荐布局：外层 CSS Grid 固定三行——第 1 行左右标题；第 2 行 `1fr | 48px | 1fr` 放左右表格与箭头（箭头只在这一行内居中）；第 3 行左侧分页、右侧等宽占位保持对称。左右表格列用 `1fr` 均分，中间按钮列固定约 48px。",
+   "evidence": "会话结论：「先前箭头按钮是相对『标题 + 表格 + 分页』整块区域居中，视觉上会偏下」；已改为 CSS Grid 三行布局，第 2 行仅在表格行内垂直居中，列宽 1fr/48px/1fr。",
+   "files": [
+    "zhi2-web-admin/src/views/building/building/components/HouseScopeDialog.vue"
+   ],
+   "baseline": "94b839a",
+   "sessionIds": [
+    "e54269de-ce26-42b2-bcb9-313019738471"
+   ],
+   "bundle": "007.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 详情页为对齐子表宽度在 zs-form 外再包 el-col，会把整页挤到左侧约四成",
+   "type": "bug",
+   "content": "支取通知书等详情页若为了让内嵌子表与上方表格同宽，在已有 `el-row` 下给整块 `zs-form` 再套一层 `el-col`，会触发 Element 横向 flex：`el-col` 只占默认栅格宽度，表单区被压到左侧、右侧大面积留白。\n\n修复：去掉外层包裹用的 `el-col`，保持与同模块详情页一致——`zs-form` 直接作为 `el-row` 子节点占满整行；子表宽度用表单内块级 `width:100%` 或子表容器样式微调，不要用额外 `el-col` 包整表。",
+   "evidence": "会话结论：「页面被挤到左侧，是上次为对齐表格宽度在外层加的 el-col 引起的」「el-row 是横向 flex 布局，再包一层 el-col 后，表单没有占满整行，内容就被压到左侧约 40%」；修复为去掉外层 el-col。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "baseline": "7cc1625",
+   "sessionIds": [
+    "f53fddf6-9d9b-42a6-9a58-e51a3a7f7298"
+   ],
+   "bundle": "007.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 同一弹窗组件多业务线上传口径：用场景标志切换 ImageUpload 与 zs-file-upload，勿先改全局上传组件",
+   "type": "workflow",
+   "content": "租赁/经营资源里 `subVenueDialog` 等弹窗会同时服务「经营资源租赁合同详情」与「租赁申请」等入口，附件口径可能不同（仅图片 vs doc/pdf 等文档）。\n\n正确顺序：在弹窗内用场景 prop（如 `isRevenueContractFiling`）分支——合同备案详情走 `ImageUpload`（png/jpg/jpeg），其他场景保留 `zs-file-upload`；不要为单一路径改 `zs-file-upload`/`FileUpload` 全局 accept 或提示文案，否则租赁申请等仍要文档的页面会被误伤。客户后续要求全站仅图片时，再单独推进 ImageUpload 默认化，与本次局部分流无关。",
+   "evidence": "用户：「不是这样修改，是改为经营资源租赁合同详情，新增公共场地弹框上只能上传图片」；结论：在 subVenueDialog 按 isRevenueContractFiling 使用 ImageUpload，租赁申请等仍用 zs-file-upload，并撤销对全局上传组件的修改。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subVenueDialog.vue",
+    "zhi2-web-admin/src/components/zs-file-upload/zs-file-upload.vue",
+    "zhi2-web-admin/src/components/ImageUpload/index.vue"
+   ],
+   "baseline": "4468dfa",
+   "sessionIds": [
+    "64ba5321-fee1-4c2c-b025-17c5b576d64a"
+   ],
+   "bundle": "007.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 全站图片 10MB：改 ImageUpload 组件默认 fileSize，业务弹窗显式 :file-size，保留页面级特例",
+   "type": "fact",
+   "content": "客户要求附件统一仅图片且上限 10MB 时：将 `ImageUpload` 默认 `fileSize` 从 5 调整为 10（未传 file-size 的页面一并生效）；租赁申请/公共场地等关键弹窗再显式 `:file-size=\"10\"` 避免遗漏。\n\n已单独配置更小上限的页面（如平台 Logo 1MB、注册页 5MB）保持原 props 不变。提示文案随组件默认显示「大小不超过 10MB，格式为 png/jpg/jpeg」。全站切换前若曾按场景分流文档上传，需与客户确认是否所有入口都改为 ImageUpload。",
+   "evidence": "用户诉求：「可以都改为 imageupload」「图片限制都改为10MB」；结论：ImageUpload 默认 fileSize 5→10，租赁相关弹窗显式 :file-size=\"10\"，单独配置大小的页面不受影响。",
+   "files": [
+    "zhi2-web-admin/src/components/ImageUpload/index.vue",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subVenueDialog.vue",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/subAdvertiseDialog.vue",
+    "zhi2-web-admin/src/views/benefit/pubVenue/components/venueDialog.vue"
+   ],
+   "baseline": "fc47501",
+   "sessionIds": [
+    "6d0d4a75-b40f-4a8d-835d-d20d317c84ca"
+   ],
+   "bundle": "008.md",
+   "project": "园区公共收益"
+  }
+ ]
+}

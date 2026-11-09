@@ -1,0 +1,62 @@
+{
+ "project": "苏住房G",
+ "batch": "067",
+ "files": [
+  "067.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "排查一下街道，社区显示问题，2.6.2分支应该改过",
+   "type": "bug",
+   "content": "## 排查结论 问题出在 **开户申请 → 管理主体名称** 弹窗（`showCompanyDialog`），街道、社区列直接绑定了 `subdistrict` / `community` 编码字段，没有走名称格式化。 同文件里的 **选择物业管理区域** 弹窗（`showPropertyProjectDialog`）在 2.6.2 已通过 bug42256 修复，加了 `subdistrictFormatter` / `communityFormatter`： ```950:961:d:/repository/苏住房G/zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue { label: '街道', prop: 'subdistrict', type: 'text', formatter: this.subdistrictFormatter }, { label: '社区', prop: 'community', type: 'text', formatter: this.communityFormatter }, ``` 但 **管理主体名称** 弹窗漏改了，所以仍显示 `320505002` 这类编码： ```1025:1032:d:/repository/苏住房G/zhi2-web-admin/s",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "```950:961:d:/repository/苏住房G/zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue",
+    "```1025:1032:d:/repository/苏住房G/zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue",
+    "`zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue",
+    "涉及文件：d:/repository/苏住房G/zhi2-web-admin、d:/repository/苏住房G/zhi2-web-admin/src、d:/repository/苏住房G/zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/components/PubManagementTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "63c29103-0eb8-4867-986d-5ca6a0993ecb"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "已修复。原因是 areaCodeTree 接口返回的",
+   "type": "bug",
+   "content": "已修复。原因是 `areaCodeTree` 接口返回的是 `areaCode`，但合并区划编码时只读了 `region` 字段，导致区级节点的 `regionCode` 一直是空的，请求里只剩 `RegionTreeLayout` 自动带的 `parentDeptId`。 ### 修改说明 **1. `utils.js` — 正确映射 `areaCode` → `regionCode`** - 区级节点：`regionCode = areaNode.region || areaNode.areaCode` - 新增 `resolveDistrictRegionCode`，在树节点匹配失败时按 `deptId` 从 `areaCodeTree` 兜底查找 **2. `index.vue` — 确保请求带上 `regionCode`** - `setNodeContext`：选中区级节点时写入 `queryParams.regionCode` - `getList`：区级列表请求前再次确认 `params.regionCode` 有值 - `refreshCurrentNodeContext`：`areaCodeTree` 异步加载完成后，若当前是区级节点且已解析出 `regionCode`，自动补发列表请求 ### 效果 选中区级节点后，请求 `/v2.0/system/regio",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "`utils.js",
+    "`index.vue",
+    "涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth\\index.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth\\utils.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "47d60d2a-587e-4806-bba5-e7aa15aae607"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "点街道时，列表中没有启用状态，需要有@zhi2-we",
+   "type": "bug",
+   "content": "已在街道层级列表中补充「启用状态」列。 **问题原因：** 街道节点（`level === 'street'`）的 `columns` 只配置了「区级可用」「街道授权」，没有「启用状态」列；区级、市级则有该列。 **修改内容：** 在街道层级列配置中增加启用状态列，使用 `is_enable` 字典展示，与市级一致： ```119:126:d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth\\index.vue if (this.nodeContext.level === 'street') { return [ ...base, { type: 'dict', label: '启用状态', prop: 'enableStatus', dictUrl: 'is_enable' }, { type: 'text', label: '区级可用', prop: 'regionName' }, { type: 'text', label: '街道授权', prop: 'subdistrictName' } ] } ``` 街道数据来自 `/system/streetBankPolicy/page`，`listCallback` 已统一将 `enableStatus` 转为字符串，字典列可直接渲染。 刷新页面后，点",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "```119:126:d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth\\index.vue",
+    "涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth\\index.vue、d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth\\components\\StreetAuthDialog.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth\\utils.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a1374881-763d-4840-b3aa-3eaf7ccde1c3"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  }
+ ],
+ "_draft": true
+}

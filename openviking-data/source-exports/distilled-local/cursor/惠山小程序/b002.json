@@ -1,0 +1,44 @@
+{
+ "project": "惠山小程序",
+ "batch": "002",
+ "files": [
+  "002.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "Failed to load module scri",
+   "type": "preference",
+   "content": "你说得非常对，核心风险就是最终产物仍可能是 `.mjs`。 我已经改成了**不依赖服务器返回 worker 文件 MIME**的方案： - 在 `src/pages/common/pdfPreview.vue` 里： - 用 `?raw` 读取 `pdfjs` 的 worker 源码字符串 `import pdfjsWorkerCode from \"pdfjs-dist/build/pdf.worker.min.mjs?raw\"` - 把源码包装成 `Blob(type: \"text/javascript\")` - 通过 `URL.createObjectURL(blob)` 生成 `blob:` URL - `pdfjsLib.GlobalWorkerOptions.workerSrc = blobUrl` 这样浏览器加载的是 `blob:` 地址，不会请求你服务器的 `.mjs` 文件，自然就不会再触发 `application/octet-stream` 的 MIME 问题。 另外我也补了清理逻辑：页面卸载时 `URL.revokeObjectURL(...)`，避免泄漏。 你现在直接重新构建部署再测即可。 如果你线上有严格 CSP（禁 `blob:`），我再给你改成“内联 fake worker + 主线程兜底”的无 `blob` 版本。",
+   "evidence": "extracted source=cursor project=惠山小程序",
+   "files": [
+    "`src/pages/common/pdfPreview.vue",
+    "涉及文件：D:/repository/惠山小程序、D:/repository/惠山小程序/src/pages/common/pdfPreview.vue、D:/repository/惠山小程序/vite.config.js、D:/repository/惠山小程序/package.json、D:/repository/惠山小程序/src/workers/pdf.worker.entry.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "427fdc69-ed6e-4b9c-811d-7f88c8d2f375"
+   ],
+   "_draft": true,
+   "project": "惠山小程序"
+  },
+  {
+   "title": "修复选项表决「参与决策」页面报错 Implement",
+   "type": "preference",
+   "content": "修复已完成，改动如下： ### 1. [`vote.vue`](src/pages_vote/vote/vote.vue) - 新增 `optionApplyList` computed，安全读取 `optionGroupList?.[0]?.tMfOptionApplyList ?? []` - 模板 `v-for` 改为使用 `optionApplyList`，避免空数组时访问 `[0]` 崩溃 - `selectList` 复用 `optionApplyList`，逻辑更统一 - `onLoad` 中增加校验：选项表决（`OPTION`）且无选项时，提示「暂无表决选项，请联系管理员」并返回上一页 ### 2. [`stores/vote.js`](src/stores/vote.js) - `selectOption` 中为 `optionGroupList` 和每项的 `tMfOptionApplyList` 增加 `?? []` 兜底 **说明**：若 decisionId `161118` 的接口确实返回空 `optionGroupList`，页面不会再白屏，但会提示无选项。这通常需要后端检查该决策的选项配置是否完整。 建议在真机或模拟器上验证： 1. 用 decisionId `161118` 进入，确认不再报错 2. 选一个选项数据正常的表决，确认选择、下一步流程正",
+   "evidence": "extracted source=cursor project=惠山小程序",
+   "files": [
+    "[`vote.vue`](src/pages_vote/vote/vote.vue",
+    "[`stores/vote.js`](src/stores/vote.js",
+    "涉及文件：d:\\repository\\惠山小程序、d:\\repository\\惠山小程序\\src\\pages_vote\\vote\\vote.vue、d:\\repository\\惠山小程序\\src\\stores\\vote.js、d:\\repository\\惠山小程序\\src\\pages.json、d:\\repository\\惠山小程序\\src\\pages_vote\\vote\\participate.vue、d:\\repository\\惠山小程序\\src、d:\\repository\\惠山小程序\\src\\pages_vote\\vote\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "afda119d-96d6-4114-922d-328d363e131d"
+   ],
+   "_draft": true,
+   "project": "惠山小程序"
+  }
+ ],
+ "_draft": true
+}

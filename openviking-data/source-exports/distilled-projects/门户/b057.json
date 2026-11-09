@@ -1,0 +1,44 @@
+{
+  "project": "门户",
+  "batch": "057",
+  "files": [
+    "057.md"
+  ],
+  "count": 2,
+  "memories": [
+    {
+      "title": "CI 报 Cannot find native binding：Node 版本不达标 + npm 静默跳过平台 optionalDependencies，install.mjs 要扫描补装",
+      "type": "bug",
+      "content": "【什么情况】CI 上先报 `You are using Node.js 22.3.0. Vite requires Node.js version 20.19+ or 22.12+. Please upgrade your Node.js version.`，改完又报 `Error: Cannot find native binding ... Cause: Cannot find module '@oxc-parser/binding-wasm32-wasip1'`，堆栈落在 `node_modules/oxc-parser/src-js/bindings.js`（经 jiti 加载 `@unocss/vite` 时触发）；换成自愈式安装后又出现 rolldown 版同类报错。\n【为什么】这是**同一个根因换了个中招者**：`rolldown`、`oxc-parser` 这类包用 `optionalDependencies` 分发各平台/架构的原生二进制（`@rolldown/binding-*`、`@oxc-parser/binding-*`），engines 同样是 `^20.19.0 || >=22.12.0`。CI runner 的 Node v22.3.0 不满足 engines → npm 静默跳过这些可选依赖 → 运行时报缺 native binding。逐个给单个包打补丁是脆弱的：修好 rolldown 后构建才走到更深处的 oxc-parser 又炸。\n【怎么做】① 治本是把 CI runner 的 Node 升到 **≥22.12.0**（宿主机 `/home/gitlab-runner/scripts/nodejs-build.sh`），升级后下面的自愈逻辑自动变成空操作；② 在 `scripts/install.mjs` 里把自愈**泛化**：安装成功后扫描整个 `node_modules`，找出所有带平台 optionalDependencies 的 host 包（rolldown、oxc-parser、rollup、esbuild、lightningcss、@parcel/watcher 全覆盖，未来新增同类包也自动覆盖）；③ 当前平台 binding 全缺失的，按各 host 自己声明的版本**一次批量点名补装**；npm 按锁文件重建依赖树可能剪掉 `--no-save` 装的包，所以要循环「扫描→补装」最多 3 轮直至补齐；④ 匹配要考虑平台/架构/libc（glibc/musl），Windows/macOS/Linux 的 x64+arm64 都适用；⑤ 提供 `INSTALL_SKIP_BINDING_HEAL=1` 开关跳过自愈；⑥ 验证方式：node v18.18.0 仿真全新安装（检测出缺失 → 批量补装 `@rolldown/binding-win32-x64-msvc@1.2.16` + `@oxc-parser/binding-win32-x64-msvc@0.153.0` → 复扫确认补齐），再用 node v22.23.2 真跑 `npm run test`（exit 0、version.json 生成）。",
+      "evidence": "会话 session-6534e790-727a-4437-bfd6-314164ee1939（基线 d8addc3）用户诉求 5「我把runner里面的node改为22.12.0是不是就不会报错了？」、诉求 6 贴出 `You are using Node.js 22.3.0. Vite requires Node.js version 20.19+ or 22.12+.` 与 `Cannot find native binding ... Cannot find module '@oxc-parser/binding-wasm32-wasip1'`；最终结论「新报错的性质……同一个根因，换了个中招者」并给出扫描整个 node_modules 的自愈泛化方案与补装清单。",
+      "files": [
+        "scripts/install.mjs",
+        "scripts/ci-doctor.mjs",
+        "zhi2-web-admin/package.json"
+      ],
+      "baseline": "d8addc3",
+      "sessionIds": [
+        "session-6534e790-727a-4437-bfd6-314164ee1939"
+      ],
+      "bundle": "057.md"
+    },
+    {
+      "title": "后端接口不存在时前端要连 mock、组件、配置、布局引用与 e2e fixture 一起拆，grep 确认无悬挂引用",
+      "type": "workflow",
+      "content": "【什么情况】用户问 `/v3.0/portal/home/stats` 这个接口干嘛的、是不是不存在，确认后要求「这个接口不存在，移除」。\n【为什么】这个接口是前端为首页统计卡自造的：api 层有 `getHomeStats`，失败时回退 mock（`homeLayout.js` 的 `normalizeStatsFromApi`），页面层还有三个专属组件。只删 api 函数会留下「组件还在、数据永远来自 mock」的假实现，统计卡显示的是编出来的数字。\n【怎么做】按链路逐层拆干净（本批实际改动 11 个文件，+5/-508）：① `src/api/portal/home.js` 删除 `getHomeStats`；② `src/views/home/mixins/homeDataMixin.js` 清掉 stats 的 data/computed/watch/method；③ `src/views/home/config/homeLayout.js` 移除 mock 归一化函数（保留 `img` 等其它工具）；④ `src/views/home/index-new.vue` 去掉 stats 绑定与 `handleStatsMore`；⑤ 布局壳 `HomeLayoutAdmin.vue` / `HomeLayoutSidebar.vue` 移除组件引用与 props；⑥ 删除三个专属组件文件 `HomeStatsBar` / `HomeStatCard` / `HomeDeveloperStatsRow`；⑦ `tests/e2e/fixtures/portalHomeMock.ts` 同步去掉对应 mock 数据；⑧ 全仓搜索确认无残留引用，pre-commit 的 lint-staged/eslint 通过等于第三方再验一遍无悬挂引用；⑨ 提交时子模块先提、父仓再更新 gitlink 指针，两层都要与远程 0/0 同步。",
+      "evidence": "会话 session-abb4dea8-9a5a-453d-9ffc-6bfb4ac5327a（基线 65275e9）用户诉求 1「/v3.0/portal/home/stats排查一下这个接口干嘛的，是不是不存在」、诉求 2「说错了，后端代码本地没有」、诉求 3「这个接口不存在，移除」；最终结论列出子模块提交 11 个文件（8 改 + 3 删 HomeStatsBar/HomeStatCard/HomeDeveloperStatsRow，+5/-508）与逐文件改动清单，并说明 pre-commit 的 lint-staged/eslint 通过。",
+      "files": [
+        "zhi2-web-admin/src/api/portal/home.js",
+        "zhi2-web-admin/src/views/home/mixins/homeDataMixin.js",
+        "zhi2-web-admin/src/views/home/config/homeLayout.js",
+        "zhi2-web-admin/src/views/home/index-new.vue",
+        "zhi2-web-admin/tests/e2e/fixtures/portalHomeMock.ts"
+      ],
+      "baseline": "65275e9",
+      "sessionIds": [
+        "session-abb4dea8-9a5a-453d-9ffc-6bfb4ac5327a"
+      ],
+      "bundle": "057.md"
+    }
+  ]
+}

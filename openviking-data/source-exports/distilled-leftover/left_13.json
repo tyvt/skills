@@ -1,0 +1,136 @@
+{
+ "batch": 13,
+ "files": [
+  "073.md",
+  "074.md",
+  "075.md",
+  "076.md",
+  "077.md",
+  "078.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "[苏房] zs-table-column 的多选列必须和序号列一样走「固定类型列宽」分支，否则会被内容测宽+剩余宽度均分撑坏",
+   "type": "pattern",
+   "content": "场景：V3 后台 zs-table-column 的列宽分配策略里，只对序号列（isIndexColumn）做了特殊处理——FIXED_TYPE_WIDTH 里画一个固定宽（index=80）、isStretchableColumn 返回 false 不参与剩余宽度均分、attrs 里写死 width 且跳过 applyContentMeasuredWidth / columnStretchExtra 两条动态测宽逻辑。\n\n为什么是坑：type=\"selection\" 的勾选列当时没进这套分支，于是它既会被 DOM 内容测宽，又会拿到 MIN_COLUMN_WIDTH(80) 的下限，还参与剩余宽度均分。表现出来就是子表/弹窗里勾选列宽到 50→80px 不等、当前页只有 0~1 行数据时还会独占一段宽度、zs-select-dialog 类弹窗打开后所有列宽一起卡在 80px；同时也把选择列误当成「可测算列」去取 prop/label，而选择列这两个值都是空的。\n\n怎么做：给 selection 补齐与序号列完全对称的三件事——FIXED_TYPE_WIDTH.selection = 55、新增 isSelectionColumn 并让 isStretchableColumn 对 selection 返回 false、attrs 的 fixedTypeWidth 分支里对 isSelectionColumn 与 index 同样写死 width（显式 width 取 max(explicit, 55)，与序号列的 max(explicit, 80) 同模式）。55px 与 Element 默认选择列一致。\n\n回归面：仓库里 type=\"selection\" 只有 5 处且都没配 width/min-width，无配置冲突；裸 el-table + zs-table-column（合同 chapter 买受人表）没有 zsTable 注入、拉伸本来就是 0，改后会从约 80 收到 55，属预期收窄。已知遗留限制：只写 min-width 不写 width 仍会被强制成 55 并删掉 min-width，将来若要加宽选择列必须显式 width ≥55；改完顺手把 fixedTypeWidth / resolvedColumnWidth 旁边只写「序号」的注释改成「序号/多选列」，避免后人误判 selection 仍参与拉伸。",
+   "evidence": "会话 7ef31120：用户要求 review zs-table-column.vue 的最小改动（新增 FIXED_TYPE_WIDTH.selection=55 / isSelectionColumn / 从拉伸中排除 / 像序号列一样固定宽）是否引入回归。结论指该改动与 isIndexColumn 分支对称、响应式链（$attrs.type → computed → attrs）在 Vue2 Options API 下正确，无 CRITICAL/HIGH；5 处 type=\"selection\"（limitAdd.vue / limitCancel.vue 等）均未配 width，无冲突；isContentWidthColumn 对选择列返回 false 不会触发 DOM 测宽；遗留 2 条 MEDIUM：注释仍只写「序号」、仅有 min-width 时无法加宽到 55 以上。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/building/houseLimit/limitAdd.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/contract/chapters/pre/chapter1.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "7ef31120-4bdb-4c19-bab9-3e4ff1cd29a5"
+   ],
+   "bundle": "073.md"
+  },
+  {
+   "title": "[苏房] 主管部门弹窗内的附件不显示：AnnexUpload 只在 created 拉一次 + 附件业务编码兜底为空，须 v-if+key 等 ID 就绪后再挂载",
+   "type": "bug",
+   "content": "场景：主管部门端「分支机构注销」弹窗（agencyBranch/CancelDialog.vue）里的注销材料附件区空白，业务编码应当用的是 agency_branch_cancel。\n\n两个同时成立的根因：\n1）业务编码没生效——弹窗通过 getRouteMetaValue(this.$route, 'cancelBusCode') 取附件 busCode，路由 meta 里根本没配 cancelBusCode，拿到空字符串，AnnexUpload 因此直接不请求附件列表，也不报错；\n2）挂载时机不对——AnnexUpload 只在 created 生命周期拉一次附件，而弹窗初次挂载时 agencyBranchId 还是空，之后 visible 变 true、ID 传进来都不会重新拉，附件区就永远停在空态。\n\n怎么做：给 busCode 补默认值 agency_branch_cancel（与详情页 fzjgba 的 fallback 写法保持一致）；给 AnnexUpload 包上 v-if=\"visible && agencyBranchId\" 并配 :key，让「弹窗打开 + 业务 ID 就绪」两个条件同时满足才挂载，每次打开都重新走 created 重新拉取。\n\n可复用口径：任何弹窗内挂 AnnexUpload 都要问两句——busCode 是不是只会从路由 meta 取（弹窗常没有专属 meta，必须给常量兜底）；业务主键是不是晚于组件挂载（是就必须 v-if + :key 控制挂载，不要指望 watcher）。排查同类「弹窗里附件空白」时先直接打印 busCode 与 id，两者任一为空都表现为静默空列表。",
+   "evidence": "会话 4f553a87：用户报「主管部门的分支机构注销里附件的业务编码 agency_branch_cancel，注销弹窗里面的附件没显示」。排查后给出两点根因（getRouteMetaValue 取 cancelBusCode 得空串 → AnnexUpload 不请求；AnnexUpload 仅 created 拉取、弹窗挂载时 agencyBranchId 为空），修复为补默认 busCode + 给 AnnexUpload 加 v-if=\"visible && agencyBranchId\" 与 :key，指与详情页 fzjgba 的 fallback 方式一致。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyBranch/components/CancelDialog.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchList.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/AnnexUpload/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/utils/routeMeta.js"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "4f553a87-b022-4362-834b-2964f2ec1897"
+   ],
+   "bundle": "073.md"
+  },
+  {
+   "title": "[苏房] zs-search-form 审查口径：内层 #queryForm>el-row 会被折叠区全局 el-row/el-col 规则劫持，且 id 多实例重复",
+   "type": "bug",
+   "content": "场景：审查/改造 zs-search-form 的样式时（改动 src/components/zs-search-form/zs-search-form.vue 或 styles/index.scss 的 search-form 段）。\n\n为什么容易踩：① #queryForm 是写在 <zs-form> 标签上的，zs-form 用 Object.assign(base, this.$attrs) 把 id 落到根节点 el-form.zs-form，所以 `.search-form-container #queryForm > .el-row` 这类选择器本身是对的，问题不在选择器路径；② 真正的冲突在全局折叠区规则：`.collapse-content:not(.hide) .el-row > .el-col { padding-left/right: 0 !important }` 与 `.collapse-content:not(.hide) .el-row { display:flex; column-gap:24px }` + `.el-col-lg-8 { width: calc((100% - 48px)/3) }` 是无差别命中的，会连带把搜索条内依赖 gutter=\"8\" 的列 padding 清零、把搜索列按详情三栏排版；③ 同一页有多个 ZsSearchForm 时都输出 id=\"queryForm\"，HTML 非法，#queryForm 全局/组件内选择器行为不可预期。\n\n怎么做：搜索条全局规则一律用 :not() 排除（如 .collapse-content:not(.hide) .el-row:not(.search-form-container .zs-form > .el-row) > .el-col），或给内层 el-row 加专用 class；同时避免用 index.scss 现有的「按父链排除」补丁，因为已知它对 Headline/zs-form 也会误伤。id 改成 class 或 :id prop 生成唯一值，全局规则同步改 class。验证：view/edit × 有/无折叠容器 × 单/多搜索条 三种组合各看一眼间距。",
+   "evidence": "会话 86fa447c：审查 zs-search-form.vue + index.scss 435-490 折叠区 el-row/el-col 规则 + detail-form.scss 89-106，报出两条 HIGH（gutter 被 !important 清零、Headline 布局规则误作用于搜索内层行）与一条 HIGH（id=\"queryForm\" 多实例重复），并确认 zs-form 通过 $attrs 把 id 落根节点。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/styles/detail-form.scss",
+    "zhi2-web-admin/src/components/zs-form/zs-form.vue"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "86fa447c-7472-4c47-9bc9-14725360a2d1"
+   ],
+   "bundle": "074.md"
+  },
+  {
+   "title": "[苏房] Panel 类子组件切查看/编辑态的契约：isView 必须是 prop，写 formMode 会导致恒 false 静默退化成编辑表单",
+   "type": "bug",
+   "content": "场景：详情页把字段区拆成 xxxInfoPanel 子组件（如 presale/permit/PermitInfoPanel、presale/cashsale/CashsaleInfoPanel），在 detail.vue 里传 hide-headline 复用到 Tab 内。\n\n为什么踩：formMode 是 detailMixins 的作用域，只有混入 mixin 的整页组件才有；Panel 组件如果照抄 `isView() { return this.formMode === 'view' }`，formMode 恒为 undefined → isView 恒 false。后果是静默的、不报错的：外层 `v-if=\"isView && hideHeadline\"` 永不成立，Headline 内的 <DetailTemplate v-if=\"isView\"> 也不渲染，已备案 Tab 本该只读却整块显示成可编辑 el-row 表单（若再加上 disabled 缺失就是真的能改）。同目录另一个 Panel 往往是对的（CashsaleInfoPanel 声明了 isView: {type: Boolean, default: false}），所以“看起来一样”的代码其实不同源。\n\n怎么做：Panel 组件一律声明 isView prop，computed 直接 return this.isView；父组件每一处 <xxx-info-panel> 都显式传 :is-view=\"formMode === 'view'\"（预售和现售两条父链分别核对，别只改一条）。验收做 view/edit × hideHeadline 四组合冒烟：view+hide → 裸 DetailTemplate；view+!hide → Headline+DetailTemplate；edit → Headline(border-only)+表单。同类隐患：Panel 的 <el-table ref=\"historyTable\"> 在 v-if/v-else 两分支各写一份同名 ref，也建议合并成一份 markup 避免 ref 被覆盖。",
+   "evidence": "会话 f0179437：审查预售详情 Panel 时发现 PermitInfoPanel.vue:137-139 的 isView 引用未声明的 formMode，报 HIGH；对照 CashsaleInfoPanel.vue:138 的正确 prop 契约，指出 permit/components/detail.vue:70-76 未接线；另报 PermitHistoryPanel 双分支重复整表 markup + 同名 ref。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/components/PermitInfoPanel.vue",
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleInfoPanel.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/PermitHistoryPanel.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/detail.vue",
+    "zhi2-web-admin/src/styles/index.scss"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "f0179437-0fbb-4cf5-a622-0cc37aba172d"
+   ],
+   "bundle": "074.md"
+  },
+  {
+   "title": "[苏房] DetailTemplate 的 amount/textarea 展示口径：表单规范里的 amount-input+unit 字段，查看态必须配 type:'amount', unit, dot:2，长文本必须 type:'textarea'",
+   "type": "pattern",
+   "content": "场景：详情页同时有编辑态（zs-form / amount-input）和查看态 contentInfo（DetailTemplate），要保证两态展示一致。\n\n原理：DetailTemplate 对 type:'amount' 的处理是 getAmountDisplay → currencyFormatter(item.value, item.dot, item.dot, '')，再拼 item.unit；即单位由 item.unit 提供、小数位由 item.dot 决定，空值 fallback 为 ''，再由模板统一显示为 -。所以只有「编辑态写了 `amount-input + unit=\"㎡\"`、查看态却用裸 value」时两态才会文案/精度不一致（同域 permitExtend 等页面就是这个半吊子状态，容易被当成“面积显示不对”去查接口）。\n\n怎么做：① 面积/金额字段在 contentInfo 里写 { prop, label, type:'amount', unit:'㎡', dot:2 }，与 amount-input 的 :dot 对齐；② 可能超长的自由文本（变更原因 ≤500 字、经营范围类）必须配 type:'textarea'，否则默认 text 走 ellipsis-single 单行省略，看起来像“字段被截断/接口少返回”；③ 布局用 @/utils/detailLayout.js 的 DETAIL_COL_HALF / DETAIL_COL_FULL，不要手写 col/full；④ 同一字段在编辑态 label 与查看态 contentInfo label 必须同名（曾出现「变更后总面积」vs「变更后测绘总建筑面积」）。另注：detailMixins 已局部注册 DetailTemplate，页面无需再 import，模板按 formMode==='view' 切 :data=\"xxxView\"，contentInfo 做成 computed 让详情回调后自动刷新。",
+   "evidence": "会话 d6921dca：审查 surveyChange/detail.vue 的 baseInfoView/changeInfoView 配置，对照 detail-template.vue 约 339-341 行 getAmountDisplay 实现确认 type:'amount'/unit/dot 契约正确，并指出同域页面查看态仍用裸 value、changeReason 缺 type:'textarea'、布局常量未复用 detailLayout.js、编辑/查看 label 文案不一致四处问题。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/surveyChange/detail.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/utils/detailLayout.js",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/formatters/index.js"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "d6921dca-6987-44a5-9fb8-15ae4c8a131d"
+   ],
+   "bundle": "074.md"
+  },
+  {
+   "title": "[苏房] 行内可编辑子表用 computed setter 当 v-model：zs-table 重算高度时 row 为 undefined 报 trainYear 渲染错误",
+   "type": "bug",
+   "content": "【什么情况】从业人员详情页（agencyPersonnel）的「继续教育」EducationTable 等行内可编辑子表，用 computed 的 get/set 直接给 zs-table 的 v-model 做双向绑定：getter 返回父组件传入的 value，setter 里 $emit('input', 新数组)。点「新增」push 一行时，zs-table 会先按旧的 value 重渲染并同步重算高度，这个中间态里插槽的 row 是 undefined，模板访问 row.trainYear 立刻抛 TypeError: Cannot read properties of undefined (reading 'trainYear')，并且是从 packages/table/src/table.vue → zs-table.vue → EducationTable.vue 一路冒出的 Vue render 错误。\n\n【为什么】computed 做 v-model 属于「读旧值、写新值」的异步闭环：emit 之后父组件 data 更新、prop 回灌都发生在下一个 tick，而 zs-table 的行数/高度计算是同步的，于是产生「列已渲染、行还没到位」的一帧。此外每次 setter 都整体替换数组引用，会让 zs-table 认为整表重建，进一步放大时序问题。\n\n【怎么做】对齐同模块 ServiceSchemePanel 的成熟模式：①用 data.innerList 代替 computed，watch value 从父组件同步（并注意避免回环）；②新增/删除用 push/splice 就地修改 innerList 后再 emit，不要整体替换数组；③显式传 :table-tr=\"innerList.length || 1\"，让 zs-table 按真实行数算高度，不落进空表分支；④各列模板加 v-if=\"row\" 做防御性渲染，即使重算中间态也不会崩。",
+   "evidence": "会话 3893ccfd（基线 130ee05）用户直接贴出 `[Vue warn]: Error in render: \"TypeError: Cannot read properties of undefined (reading 'trainYear')\"` 及完整组件栈（table.vue → zs-table.vue → EducationTable.vue → Headline → zs-form → AgencyPersonnelDetail.vue）。结论明确根因是 EducationTable 用 computed 做 v-model、setter 里 emit 后表格仍按旧 value 渲染，zs-table 同时重算高度导致 row 为 undefined；修复方案为 innerList + watch + push/splice + :table-tr=\"innerList.length || 1\" + 列模板 v-if=\"row\"，并注明对齐 ServiceSchemePanel.vue 的既有模式。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/EducationTable.vue",
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/ServiceSchemePanel.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table-column.vue",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "3893ccfd-88f3-46aa-bc62-e0f4d3d00ac6"
+   ],
+   "bundle": "077.md"
+  },
+  {
+   "title": "[苏房] 详情页 textarea「整行」有两条独立链路，改一条会漏另一条且会打乱既有半宽 layout",
+   "type": "pattern",
+   "content": "情况：把详情模板里的文本域改成「默认占整行」时，同时动了编辑态（detail-form.scss 的 :has(.el-textarea/.zs-textarea) + zs-textarea 外层 div）和展示态（detail-template.vue 的 getItemSpan），结果两条链路各有一处不生效或误伤。\n\n为什么：\n1) 展示态 getItemSpan 在读取 item.layout 之前就对 type === 'textarea' 直接 return 24（除非 keepSpan === true），这是「强制覆盖」而非「默认值」；凡是原先显式写了 layout: 12 的半宽文本域（如 complexBuildingAuth 的物业管理区域坐落）会突然独占一行、打乱与邻字段的并排关系。想保留半宽只能给该 item 补 keepSpan: true，或在产品确认后改数据。\n2) 编辑态走 Headline 内 el-row + span=8/12 的老表单时，:has() 的整行规则若写在 @media (min-width: 768px) 之前，会被媒体查询内更靠后的 .el-col-8 / .el-col-12 列宽规则压掉（特异性相近时后者胜），桌面端仍是 1/3 或 1/2 宽；section-form 栅格路径不受影响。修复：把 :has() 整行规则在媒体查询末尾再写一遍，或让其与 el-col-24 同级并置于所有 el-col-N 之后。\n3) zs-textarea 把原生 el-textarea 包进 div.zs-textarea 后，element-ui.scss 里 > .el-textarea { width: 100% } 这类直接子选择器不再命中，只能靠组件内 .zs-textarea { width: 100% } 兜底；未走 detail-form 的页面可能出现控件不撑满。\n\n怎么做：改 textarea 整行前先确认该页走的是 section-form 还是老 el-row 表单；展示态优先用「仅 layout 为空或已为 24 时才整行」，保留 keepSpan 逃生口；:has() 规则统一追加到媒体查询末尾；给 element-ui.scss 补 > .zs-textarea 宽度规则。",
+   "evidence": "会话 4bda9dfe（基线 6b3ac5a）审查 textarea 整行布局改动，结论：HIGH×2（折叠区 :has 整行规则被媒体查询内 el-col-8/12 覆盖；getItemSpan 强制 span=24 打乱既有 layout:12 的半宽字段）、MEDIUM×2（SCSS 注释承诺的 keepSpan 对 section-form 无开关；zs-textarea 外包 div 使 el-form-item__content 直接子选择器失效）。",
+   "files": [
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/styles/detail-form.scss",
+    "zhi2-web-admin/src/components/zs-textarea/zs-textarea.vue",
+    "zhi2-web-admin/src/components/zs-input/zs-input.vue",
+    "zhi2-web-admin/src/styles/element-ui.scss"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "4bda9dfe-4b63-4a90-a92e-834ef00be5af"
+   ],
+   "bundle": "078.md"
+  }
+ ]
+}

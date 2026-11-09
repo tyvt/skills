@@ -1,0 +1,89 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "282",
+ "files": [
+  "282.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "已调整「导入楼幢信息」弹窗宽度。 原因： Extra",
+   "type": "bug",
+   "content": "已调整「导入楼幢信息」弹窗宽度。 **原因：** `ExtractDialog` 使用了 `form-layout=\"single\"`，`zs-dialog` 会把宽度固定为 **500px**，内嵌「测绘楼幢」表格列较多（楼幢名称、坐落、层数、测绘机构、备案号等），右侧列会被裁切。 **修改：** 去掉 `form-layout=\"single\"`，沿用 `zs-dialog` 默认档位 `medium`（**1300px**），与同项目里带表格的选择弹窗（如「选择房屋信息」）一致。 请刷新页面后再次打开「导入楼幢信息」确认列是否完整显示。若仍觉得紧，可以再改成 `form-layout=\"double\"`（1000px）或显式 `width=\"1300px\"`，但一般默认 `medium` 已足够。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\projectManagement\\buildinginfo\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\projectManagement\\buildinginfo\\components\\ExtractDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a779e1c7-9182-4b88-b825-3421668b6d96"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "这个显示为数字了",
+   "type": "bug",
+   "content": "问题已修复。 **原因**：`headTitleList` 里用 `bizStateOptions.find(...)` 把数字转成字典文案，但 `initDict()` 没有加载 `personnel_business_status` 字典，所以 `bizStateOptions` 一直是空数组，匹配失败后回退显示 `this.form.bizState` 的原始数字（如 `0`、`1`、`2`）。 **修复**：参照 `AgencyBranchDetail.vue` 的做法，在 `initDict()` 中补充字典加载： ```javascript this.getDicts('personnel_business_status').then((res) => { this.bizStateOptions = res.data || [] }) ``` 刷新详情页后，头部「业务状态」应显示为「草稿」「待审核」「已备案」等文案，而不是数字。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`AgencyBranchDetail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution\\agencyPersonnel\\components\\AgencyPersonnelDetail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution\\agencyPersonnel、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution\\agencyPersonnel\\components\\AgencyPersonnelList.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "37c0530f-0b9f-46de-af87-2a8cb6d6a890"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Th",
+   "type": "preference",
+   "content": "**原因** `AgencyBasicInfoDetail` 混入了 `detailMixins` → `area` mixin，其中已将 `regionOptions` 定义为 **computed**（基于平台行政区划树）。 组件自身又在 `data` 里定义了同名 `regionOptions` 用于加载 `ECONOMIC_INSTITUTIONS_REGION` 字典，两者冲突触发 Vue 警告。 **修复** 将 `data` 中的字典字段重命名为 `administrativeRegionOptions`，避免与 mixin 的 computed 同名： - `data`：`regionOptions` → `administrativeRegionOptions` - `loadDicts` 配置同步更新 - `basicInfo` 计算属性中仍向 `buildAgencyBasicContentInfo` 传入 `regionOptions: this.administrativeRegionOptions` 刷新页面后该警告应消失，行政区域展示仍使用 `ECONOMIC_INSTITUTIONS_REGION` 字典数据。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components\\AgencyBasicInfoDetail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\mixins\\detailMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3dd2b09c-ad3e-42a8-b87c-2fba58a2576a"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "专业资格证书管理列表序号列没有显示值，用通用写法",
+   "type": "bug",
+   "content": "**原因**：专业资格证书列表（`personnelCertificate/index.vue`）把「序号」列绑成了 `prop=\"billNo\"`，接口里没有该字段，所以列为空。 **修改**（与机构备案、机构注销等列表一致）： 1. 使用 `type=\"index\"` 的序号列，宽度 80，并传入 `:index=\"tableIndex\"`。 2. 增加 `tableIndex`，按当前页码与每页条数计算连续序号：`(pageNum - 1) * pageSize + index + 1`。 刷新证书列表后，序号应显示为 1、2、3…，翻页后会接着上一页编号。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**原因**：专业资格证书列表（`personnelCertificate/index.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\personnelCertificate\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyApplyAudit\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c7022489-2172-47ce-8e1e-dcbd234762d8"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "已改好。 原因： 查看态里 contentInfo ",
+   "type": "preference",
+   "content": "已改好。 **原因：** 查看态里 `contentInfo` 把「启用状态」设成了 `DetailTemplate` 的 `switch` 类型，会渲染成禁用的复选框，和旁边的「人员角色」「管理员等级」等纯文字不一致。 **修改：** 在 `detail.vue` 的 `contentInfo` 中改为默认的 `text` 类型，按 `enableState` 显示 **「启用」** 或 **「停用」**。 刷新管理员详情页（`formMode=view`）即可看到文字展示。若希望用「是/否」等文案，可以说一下我帮你统一。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`detail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyAdmin\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyAdmin\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "245206a1-0f07-4e6e-9c61-1b4a9740a686"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

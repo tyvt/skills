@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/mcp-store-7e0bc60e0ea8/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T01:28:50.889678+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/events/2026/11/09/测试环境关闭mock数据.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-09，苏住房防汛C端将 .env.test 由 VITE_DATA_MODE=demo 且 VITE_FLOOD_MOCK/VITE_EVALUATION_MOCK=true 且 VITE_API_BASE_URL 为空，改为 VITE_DATA_MODE=remote 且两个 mock 开关显式 false 且 VITE_API_BASE_URL=/api（保留 VITE_UI_REF8443，其为 UI 像素对齐开关而非 mock）。提交 fd05a55 并推送 origin/dev；npm run test 21/21 通过且构建完成，nginx UI 站点 8095 确认 VITE_FLOOD_MOCK:\"false\"、VITE_DATA_MODE:\"remote\"、无 demo 种子。\n# 2026-11-09 (Monday) ChatLog:\n**user**: 关闭测试环境打包的mock数据（苏住房防汛C端）\n**assistant**: 苏住房防汛C端修复：.env.test 由 VITE_DATA_MODE=demo + VITE_FLOOD_MOCK/VITE_EVALUATION_MOCK=true + 空 VITE_API_BASE_URL，改为 remote + 两个 mock 开关显式 false + VITE_API_BASE_URL=/api（保留 VITE_UI_REF8443，它是 UI 像素对齐开关不是 mock）。两条可复用根因：1) 关闭 Vite env 开关不能只删掉变量，必须显式写 false；删掉时 import.meta.env.VITE_* 不是编译期常量，esbuild 无法常量折叠，演示种子数据（floodSeed/evaluationSeed）仍会被打进 dist，显式 false 后构建产物里 demo 内容全部消失。2) 单测 harness（tools/testing/vitest.config.ts 的 test.env）需固定 VITE_DATA_MODE=demo，否则单测隐式继承 .env.test 的数据模式，改成 remote 后 flood.test.ts 的 searchComplex 会走真实接口调 uni.request 报 ReferenceError: uni is not defined，导致 npm run test 的 && 链中断、打包不产出。验证：npm run test 21/21 通过并 DONE Build complete；产物与 nginx UI 站点 8095 均确认 VITE_FLOOD_MOCK:\"false\"、VITE_DATA_MODE:\"remote\"、无 demo 种子。已提交 fd05a55 并推送 origin/dev。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_mock_off.md",
+                "memory_type": "entities",
+                "after": "# Vite构建关闭mock开关模式\n苏住房防汛C端在 2026-11-09 关闭测试环境打包的 mock 数据时沉淀出的两条可复用根因。\n\n## 环境变量显式false\n- 关闭 Vite env 开关不能只删掉变量，必须显式写 `false`\n- 删掉变量时 `import.meta.env.VITE_*` 不是编译期常量，esbuild 无法常量折叠\n- 演示种子数据（floodSeed/evaluationSeed）仍会被打进 dist\n- 显式写 `false` 后，构建产物里 demo 内容全部消失\n\n## 单测harness固定数据模式\n- 单测 harness（`tools/testing/vitest.config.ts` 的 `test.env`）需固定 `VITE_DATA_MODE=demo`\n- 否则单测隐式继承 `.env.test` 的数据模式\n- 改成 `remote` 后 `flood.test.ts` 的 `searchComplex` 走真实接口调 `uni.request`\n- 报 `ReferenceError: uni is not defined`，导致 `npm run test` 的 `&&` 链中断、打包不产出"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zhi2_flood_mock.md",
+                "memory_type": "entities",
+                "before": "# 苏住房防汛C端防台防汛mock配置\n苏住房防汛C端H5(zhi2-mobile-query-h5-c-unlimited)按 Lead 要求先做防台防汛 mock；物业自查(evaluation)模块 mock 详见 zhi2_evaluation_mock。\n\n## 环境变量\n- `VITE_FLOOD_MOCK=true` 时注入完整演示数据并启动写演示 token；`isFloodMockEnabled()` 仅认此值\n- test 构建(`uni build -m test`)读 `.env.test`：`VITE_DATA_MODE=demo`(防汛走本地 store)、`VITE_FLOOD_MOCK=true`、`VITE_API_BASE_URL` 为空\n- 本地 dev 未设 `VITE_FLOOD_MOCK`：空数据 + 手动登录；demo 登录任意账号密码不调真实接口\n\n## 演示数据\n- 种子文件 `src/mock/floodSeed.ts`，首次进入带 mock 构建写入 `flood-demo-v1`(seedVersion 2)\n- 汛前 11 条已提交+1 条草稿；汛中 3 条巡检+2 条求援；汛后 3 条已提交+1 条草稿\n- 求援页 `src/stores/flood.ts` 本地搜「永林/苏锦…」；项目检查仍走 `src/stores/evaluation.ts` 真实接口\n\n## 关键改动文件\n- `src/utils/dataMode.ts`：`isFloodMockEnabled()` 仅认 `VITE_FLOOD_MOCK=true`\n- `src/stores/flood.ts`：种子注入、demo 登录、小区搜索\n- `src/App.vue`：mock 下自动 token 并进首页\n- `tools/testing/vitest.config.ts`：单测清空 `VITE_FLOOD_MOCK`，避免误读 `.env.test` 污染普通 demo 单测\n\n## 验证与归属\n- 2026-11-06 提交并推送到 origin/dev(commit 47af55e)；主仓库 `npm test` 通过(含 test 模式 dist 构建)\n- 用 nginx UI 把站点 root 指到 `dist/`(test 构建产物)刷新打开；浏览器旧 remote 数据可清存储或删 `flood-demo-v1` 重注入",
+                "after": "# 苏住房防汛C端防台防汛mock配置\n苏住房防汛C端H5(zhi2-mobile-query-h5-c-unlimited)按 Lead 要求先做防台防汛 mock；物业自查(evaluation)模块 mock 详见 zhi2_evaluation_mock。\n\n## 环境变量\n- `VITE_FLOOD_MOCK=true` 时注入完整演示数据并启动写演示 token；`isFloodMockEnabled()` 仅认此值\n- test 构建(`uni build -m test`)读 `.env.test`：2026-11-09 起改为 `VITE_DATA_MODE=remote`、`VITE_FLOOD_MOCK=false`(显式)、`VITE_API_BASE_URL=/api`；保留 `VITE_UI_REF8443`(UI像素对齐开关非mock)。原配置为 `demo`+`true`+空 base\n- 本地 dev 未设 `VITE_FLOOD_MOCK`：空数据 + 手动登录；demo 登录任意账号密码不调真实接口\n\n## 演示数据\n- 种子文件 `src/mock/floodSeed.ts`，首次进入带 mock 构建写入 `flood-demo-v1`(seedVersion 2)\n- 汛前 11 条已提交+1 条草稿；汛中 3 条巡检+2 条求援；汛后 3 条已提交+1 条草稿\n- 求援页 `src/stores/flood.ts` 本地搜「永林/苏锦…」；项目检查仍走 `src/stores/evaluation.ts` 真实接口\n\n## 关键改动文件\n- `src/utils/dataMode.ts`：`isFloodMockEnabled()` 仅认 `VITE_FLOOD_MOCK=true`\n- `src/stores/flood.ts`：种子注入、demo 登录、小区搜索\n- `src/App.vue`：mock 下自动 token 并进首页\n- `tools/testing/vitest.config.ts`：单测清空 `VITE_FLOOD_MOCK`，避免误读 `.env.test` 污染普通 demo 单测\n\n## 验证与归属\n- 2026-11-06 提交并推送到 origin/dev(commit 47af55e)；主仓库 `npm test` 通过(含 test 模式 dist 构建)\n- 用 nginx UI 把站点 root 指到 `dist/`(test 构建产物)刷新打开；浏览器旧 remote 数据可清存储或删 `flood-demo-v1` 重注入"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zhi2_evaluation_mock.md",
+                "memory_type": "entities",
+                "before": "# 苏住房防汛C端物业自查mock配置\n苏住房防汛C端H5(zhi2-mobile-query-h5-c-unlimited)的物业自查(project-check)模块演示数据，按 Lead 要求于 2026-11-06 新增。\n\n## 环境变量与开关\n- `VITE_EVALUATION_MOCK=true` 时注入物业自查演示数据；`isEvaluationMockEnabled()` 仅认此值\n- test 构建(`uni build -m test`)读 `.env.test` 额外开启 `VITE_EVALUATION_MOCK=true`；`.env.example` 增补说明\n- 生产 `.env`(`VITE_DATA_MODE=remote`)未设此 flag，联调真实接口不受影响\n\n## 演示数据\n- 种子文件 `src/mock/evaluationSeed.ts`(446行)：统计(128/76/34/9)、待办2条、已完成4条、物业管理区域5个、五类服务检查表单、检查详情与整改详情\n- `src/stores/evaluation.ts` 所有读接口在 `isEvaluationMockEnabled()` 为真时返回 mock，其余行为不变\n- `src/utils/dataMode.ts` 新增 `isEvaluationMockEnabled()`\n\n## 验证与归属\n- 2026-11-06 提交 ae35a7d 并推送 origin/dev(83bddfa..ae35a7d)\n- nginx 8095 站点部署 test 构建 dist，Playwright 探针 19/19 全通过(列表/发起/填写/详情/整改)\n- worktree 开发后 rebase 到 dev 合并，临时分支清理",
+                "after": "# 苏住房防汛C端物业自查mock配置\n苏住房防汛C端H5(zhi2-mobile-query-h5-c-unlimited)的物业自查(project-check)模块演示数据，按 Lead 要求于 2026-11-06 新增。\n\n## 环境变量与开关\n- `VITE_EVALUATION_MOCK=true` 时注入物业自查演示数据；`isEvaluationMockEnabled()` 仅认此值\n- test 构建(`uni build -m test`)读 `.env.test`：2026-11-09 起 `VITE_EVALUATION_MOCK` 改为显式 `false`(原 `true`)；`.env.example` 增补说明\n- 生产 `.env`(`VITE_DATA_MODE=remote`)未设此 flag，联调真实接口不受影响\n\n## 演示数据\n- 种子文件 `src/mock/evaluationSeed.ts`(446行)：统计(128/76/34/9)、待办2条、已完成4条、物业管理区域5个、五类服务检查表单、检查详情与整改详情\n- `src/stores/evaluation.ts` 所有读接口在 `isEvaluationMockEnabled()` 为真时返回 mock，其余行为不变\n- `src/utils/dataMode.ts` 新增 `isEvaluationMockEnabled()`\n\n## 验证与归属\n- 2026-11-06 提交 ae35a7d 并推送 origin/dev(83bddfa..ae35a7d)\n- nginx 8095 站点部署 test 构建 dist，Playwright 探针 19/19 全通过(列表/发起/填写/详情/整改)\n- worktree 开发后 rebase 到 dev 合并，临时分支清理"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

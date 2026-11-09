@@ -1,0 +1,318 @@
+{
+ "project": "苏住房C",
+ "batch": 14,
+ "files": [
+  "053.md",
+  "054.md",
+  "055.md",
+  "056.md"
+ ],
+ "count": 16,
+ "memories": [
+  {
+   "title": "苏住房C 小程序 szf 图片按分包拆分：主包有文件不代表分包能加载，缺失表现为 Failed to load local image resource（HTTP 500）",
+   "type": "bug",
+   "content": "情况：苏住房C 小程序（zhi2-mobile-shimin，uni-app + 微信小程序）筛选弹窗的重置图标报 [渲染层网络层错误] Failed to load local image resource /pages_transaction/static/images/szf/reset.svg，the server responded with a status of 500。为什么：src/components/commonNew/conditionScreening.vue 里写的是相对路径 <ZsImage src=\"images/szf/reset.svg\" />，ZsImage 经 resolveStaticUrl 解析时按 utils/index.js 的 resolveSzfImageSubpackage 规则把 images/szf/ 下的资源归属到 pages_transaction 分包，实际请求的是 /pages_transaction/static/images/szf/reset.svg；而该目录下只放了 reset.png，reset.svg 只在主包 src/static/images/szf/ 里。注意报错文案是「Failed to load local image resource」+ 500，很容易被误当成网络/服务器问题或 ZsImage 路径拼接 bug，实际是构建产物里分包缺少该文件。怎么做：新增 szf 图片时不要只放主包 src/static/，要同时（或按引用页面所在分包）复制到对应分包的 src/pages_xxx/static/images/szf/；已有同名不同扩展名的图（png vs svg）必须按引用串精确匹配，不能想当然复用；排查同类 500 先核对 src 串与 resolveSzfImageSubpackage 解析出的分包路径，再到 target 分包目录 ls 确认文件是否存在。",
+   "evidence": "会话 ffbc909f：`conditionScreening.vue` 第 204 行 `<ZsImage class=\"img\" src=\"images/szf/reset.svg\" />`；ZsImage 经 resolveStaticUrl 解析成 `/pages_transaction/static/images/szf/reset.svg`；「该文件只存在于主包 src/static/images/szf/reset.svg，分包目录里只有 reset.png，没有 reset.svg，所以小程序加载时报 500」；修复为复制 reset.svg 到 src/pages_transaction/static/images/szf/reset.svg；说明「images/szf/ 资源按分包拆分存放（见 utils/index.js 中的 resolveSzfImageSubpackage），新增 szf 图片时需放到对应分包的 static/images/szf/ 下，而不是只放在主包 src/static/」。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/commonNew/conditionScreening.vue",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/pages_transaction/static/images/szf/reset.svg",
+    "zhi2-mobile-shimin/src/static/images/szf/reset.svg",
+    "zhi2-mobile-shimin/scripts/migrate-vote-static.mjs",
+    "zhi2-mobile-shimin/src/utils/mainStaticPaths.js"
+   ],
+   "baseline": "f1939b0",
+   "sessionIds": [
+    "ffbc909f-a8cb-4166-8285-a0ac8381920f"
+   ],
+   "bundle": "054.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 列表页「接口正常返回但列表不展示」的通用排查点：响应结构硬解、无效 computed 遮蔽、useLoadMore 无 catch",
+   "type": "bug",
+   "content": "情况：用户问 pages_transaction/stockHouse/index.vue 是否会出现「接口正常返回但数据不展示」。为什么：三处叠加——(1) getList 用手写 new Promise 包 $.then，且直接 res.result.records.map / .total，一旦 result 缺失或结构变化，then 里抛错会把 Promise 挂死，loading 永远不结束，页面表现为空列表且无有效报错；(2) 页面里有一个 computed.list 读 houseStore.stockHouseList，但本页从未写入该 store（其他页面才调 refreshStockHouseList），模板真正用的是 <script setup> 中 useLoadMore 返回的 list，属于同名遮蔽型死代码，排查时会把「数据到底来自哪」带偏；(3) hooks/useLoadMore 里 fn() 没有 catch，请求失败时 pageNum 已自增（白占一页）、status 卡在 loading，后续下拉不再触发。怎么做：改为 async/await + res?.result?.records ?? [] / res?.result?.total ?? 0，结构异常按空数组处理而不是 throw，并统一 return { ...res, rows, total } 给 useLoadMore；删掉不写入 store 的镜像 computed；useLoadMore 里给 fn() 补 .catch（pageNum 回退、status 复位 more），padList/refreshList 用 res.rows || res.data || [] 防 undefined 展开。同类「有返回无展示」优先按这三条顺序查，不要先去怀疑服务端或网络。",
+   "evidence": "会话 c9de4a3c 最终结论：「改为 async/await，不再用手写 new Promise（避免 .then 里抛错导致 Promise 挂死）」「使用 res?.result?.records ?? []、res?.result?.total ?? 0」「去掉无效的 computed.list：该计算属性读 houseStore.stockHouseList，本页从未写入 store，且模板实际用的是 useLoadMore 的 list」「hooks/useLoadMore.js 为 fn() 增加 .catch：请求失败时把 pageNum 减回（避免白占一页），并把 status 置回 'more'」「padList / refreshList 使用 res.rows || res.data || []，避免 undefined 展开报错」。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_transaction/stockHouse/index.vue",
+    "zhi2-mobile-shimin/src/hooks/useLoadMore.js",
+    "zhi2-mobile-shimin/src/api/v1Instance.js",
+    "zhi2-mobile-shimin/src/utils/ui.js"
+   ],
+   "baseline": "e383380",
+   "sessionIds": [
+    "c9de4a3c-a1a8-45ce-b4b9-2a181a353c95"
+   ],
+   "bundle": "054.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 小程序自定义组件上的 @click 在小程序端不触发，@tap 才行；公共卡片组件需在根节点同时 emit click/tap",
+   "type": "bug",
+   "content": "情况：pages_main/publicNotice 的列表项「点击没反应」，页面看着能点但跳转逻辑没执行，控制台无报错。为什么：微信小程序里事件是 @tap（bindtap），把 @click 绑在自定义组件（如 commonNew/baseCard.vue）的标签上不会触发；组件内部也没有把点击事件 emit 出来，于是事件在组件边界处静默丢失。这个坑的位置很隐蔽——单选按钮、view 上的 @click 有时因为编译器兼容而侥幸生效，但自定义组件标签上的 @click 最不稳，且失败时既不报错也不冒泡。怎么做：小程序端点击一律写 @tap；公共卡片组件 baseCard 在根节点绑 @tap 并同时 emit('click') 与 emit('tap')，让历史写成 @click 的调用方也不至于完全失效；业务列表（ListIndex.vue / ListContractIndex.vue）统一改成 @tap，与 bankList.vue、HalfCard.vue 等既有写法对齐。排查「点击无反应」时先确认事件绑定在原生节点还是自定义组件标签上，再看组件是否 emit，不要先怀疑路由或权限。",
+   "evidence": "会话 3aa806fa 最终结论：「原因是 微信小程序里 @click 绑在自定义组件 baseCard 上不会触发，列表项虽然看起来可点，但事件没有传到跳转逻辑」；修复为「baseCard.vue — 在根节点绑定 @tap，并 emit('click') / emit('tap')」「ListContractIndex.vue / ListIndex.vue — 将 @click 改为 @tap（与项目里 bankList.vue、HalfCard.vue 等写法一致）」。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/commonNew/baseCard.vue",
+    "zhi2-mobile-shimin/src/pages_main/publicNotice/components/ListIndex.vue",
+    "zhi2-mobile-shimin/src/pages_main/publicNotice/components/ListContractIndex.vue",
+    "zhi2-mobile-shimin/src/pages_main/publicNotice/publicNotice.vue",
+    "zhi2-mobile-shimin/src/pages/publicNotice/components/ListContractIndex.vue"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "3aa806fa-2f71-4575-9cb6-ed1ea81e5795"
+   ],
+   "bundle": "054.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "PageBg 背景图「变成全屏」的根因：absolute+inset:0+object-fit:cover 撑满 flex:1 的容器，需固定高度包裹盒（380rpx=190px）",
+   "type": "bug",
+   "content": "情况：pages_owner/house/TypeChoose 页面顶部蓝色背景图变成铺满整屏，下面的卡片区域被整块盖住。为什么：szf/各端通用的 Bg.svg 本身只是 375×190px 的顶部横幅，而 PageBg.vue 默认用 position:absolute + inset:0 + object-fit:cover 铺满父容器；该页的 .type-container 写了 flex:1，会把父容器撑到整屏高，背景图随之被拉伸成整屏。这不是图片尺寸问题、也不是 cache，改 bg 尺寸或调 object-fit 都没用。怎么做：参照 house/index.vue 里 .top-empty 的做法，用一个固定高度的包裹盒（.type-bg，height:380rpx 即 190px）包住 PageBg，让背景只占顶部条带，下方回落到 $uni-bg-color 白底；高度需要微调时改包裹盒 height 而不是改组件内的定位。判断口径：任何「背景图溢出/变全屏」先看父容器是否 flex:1 / 100vh，再看 PageBg 绝对定位是否缺少高度约束的包裹层。",
+   "evidence": "会话 1d447664 最终结论：「Bg.svg 本身是 375×190px 的顶部横幅，但 PageBg 组件默认用 position: absolute; inset: 0; object-fit: cover 铺满整个父容器。而 .type-container 设置了 flex: 1，会占满整屏，所以蓝色背景被拉成全屏」；「修复：参考 house/index.vue 里 .top-empty 的做法，用固定高度的 .type-bg（380rpx，即 190px）包裹 PageBg」。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/house/TypeChoose.vue",
+    "zhi2-mobile-shimin/src/components/PageBg/PageBg.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/components/TypeChoose_Suzhufang.vue"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "1d447664-822a-4688-ab03-ac7488c5ab2d"
+   ],
+   "bundle": "054.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "注销/退出登录后「消息」未读角标不消失：三层防护（onShow 清零 + 展示层登录取值 + 请求前后 token 双检）",
+   "type": "bug",
+   "content": "情况：用户在「我的」页注销账号后，顶部功能区的消息图标仍显示未读数字角标（如 4），未登录状态不应展示任何未读数。为什么：unreadCount 是页面局部 ref，只在登录态拉取后写入，注销流程既没重置它，也没有在渲染层拦截登录态；更隐蔽的是注销瞬间仍在途的 getMsgNum 请求返回后会无条件写回 unreadCount，造成「清了又冒出来」的竞态复发。怎么做（三层，缺一层都会复发）：(1) 状态层——onShow 的 else（未登录）分支里 unreadCount.value = 0；(2) 展示层——模板绑 computed messageBadge = unlogin ? 0 : unreadCount，让角标渲染本身带登录态兜底，而不是指望各清零点齐全；(3) 请求层——loadUnread 进入前若无 token 直接清零 return，await 返回后再判一次 token，销毁期间返回的旧响应直接丢弃，catch 里也置 0。验收按四步：登录有未读→显示角标；注销/退出→角标立即消失；重新登录→按最新未读数恢复；注销时请求在途→不复发。",
+   "evidence": "会话 a54442c4：「1. 未登录时主动清零（onShow else 分支）unreadCount.value = 0」「2. 展示层登录态兜底 const messageBadge = computed(() => (unlogin.value ? 0 : unreadCount.value))，模板已改为 :badge-num=\"messageBadge\"」「3. API 竞态防护（loadUnread 前后校验 token）：if (!userStore.token) return 在 await getMsgNum 前后各一次」；验收四条：登录显示→注销消失→重登恢复→快速注销（未读请求进行中）不复发。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_tab/components/My_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/store/user.js",
+    "zhi2-mobile-shimin/src/pages_tab/components/menu/MenuSection.vue",
+    "zhi2-mobile-shimin/src/pages_tab/components/menu/HaveBgItem.vue",
+    "zhi2-mobile-shimin/src/pages_my/setting/cancellationReason.vue"
+   ],
+   "baseline": "9cdf7b8",
+   "sessionIds": [
+    "a54442c4-8431-4207-b588-fa848d7bf178"
+   ],
+   "bundle": "054.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] 小程序图片地址统一走 resolveMediaUrl：ZsImage 再手动拼 IMAGE_BASE 会拼出 /ttp:// 非法串（500 且被当本地资源）",
+   "type": "bug",
+   "content": "现象：微信小程序渲染层报 Failed to load local image resource /ttp://218.4.168.198:8887/zhi2-pro/...png，status 500。注意开头的 /ttp 少了一个 h——这是被当成「相对路径」后截错的标志。\n\n根因（两层叠加）：1) 接口可能直接返回完整内网地址 http://218.4.168.198:8887/zhi2-pro/...，而 ZsImage 在小程序端无条件执行 `${IMAGE_BASE}${props.src}`，拼出 https://szf.szzfcjj.cn + http://... 这种非法 URL，微信判定非法后按本地资源解析，于是出现 /ttp:// 前缀；2) utils 里的 resolveMediaUrl 在小程序端原本只返回 /zhi2-pro/... 相对路径、没拼 IMAGE_BASE，<image> 同样加载不出来。\n\n做法：把「地址怎么拼」收敛到唯一出口 resolveMediaUrl，ZsImage 一律通过它处理 src，禁止在组件内手写 IMAGE_BASE + src。resolveMediaUrl 需满足：小程序端拼出完整 HTTPS；已带 http(s):// 的绝对地址原样透传；兼容 /http://... 这种误加前导斜杠的形式（先剥斜杠再判前缀）。\n\n排查顺序：先看 URL 是否被重复拼接（打印最终 src），再看微信后台 downloadFile 合法域名是否包含域名，最后确认文件在服务器上真实存在。",
+   "evidence": "会话 d56ce156，基线 9832ba3。报错 `/ttp://218.4.168.198:8887/zhi2-pro/2025/f/h/s/284e8631-...png` 500；接口实际返回完整内网 http 地址，ZsImage 拼 `${IMAGE_BASE}${props.src}` 生成非法 URL；resolveMediaUrl 小程序端此前只返回相对路径未拼 IMAGE_BASE。修复：utils/index.js 的 resolveMediaUrl 拼 IMAGE_BASE 并兼容 /http://，ZsImage 改调用 resolveMediaUrl。",
+   "files": [
+    "src/utils/index.js",
+    "src/components/ZsImage/ZsImage.vue",
+    "src/env/mp.js",
+    "vite.config.ts",
+    "src/page-query/components/PropertyCard.vue",
+    "src/pages/index/components/menu/MenuImage.vue"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "d56ce156-0a63-4298-b177-fd3d0430fcf2"
+   ],
+   "bundle": "055.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] uni-list-item 的 link+:to 内置跳转不能与自定义 @click 共存：埋点接口报错会连坐页面跳不出去",
+   "type": "bug",
+   "content": "现象：pages_transaction/houseLoanGuide/index 点击列表项时，埋点接口一报错页面就不跳转。\n\n根因：该页在 uni-list-item 上同时用了组件内置跳转（link + :to）和自定义 @click=\"addEvent\"（埋点）。自定义 click 会接管/干扰组件内置的跳转处理链路，一旦 handler 内部抛错，跳转那一步就不会被执行——跳转被埋点绑架了。\n\n做法（与已稳定的 pages_transaction/buyHousePolicy/index.vue 对齐）：去掉 link / :to，改由业务函数自己控制，两件事顺序执行但互不依赖：\nconst goToDetail = (item) => { eventDataAdd({ eventType: '27' }); goto(`/pages/policy/fddydetail?id=${item.bankLogo}`); };\n并保证埋点调用是「静默请求」（noReject + .catch()），让它永不抛出；跳转用 goto 独立执行。\n\n推广约定：凡是既要埋点又要跳转的列表项，都不要依赖组件内置跳转属性；埋点一律走静默请求封装（api/appAnalytics.js 的 eventDataAdd 已内建 noReject + catch），跳转单独一行，避免埋点故障拖垮主流程。",
+   "evidence": "会话 4cc1a55a，基线 4630e8e。houseLoanGuide/index.vue 在 uni-list-item 上同时使用 link+:to 与 @click=addEvent，埋点接口报错后点击处理被中断无法跳转；改为去 link/to + goToDetail 内先 eventDataAdd（noReject+catch）再 goto，与 buyHousePolicy/index.vue 保持一致。",
+   "files": [
+    "src/pages_transaction/houseLoanGuide/index.vue",
+    "src/pages_transaction/buyHousePolicy/index.vue",
+    "src/api/appAnalytics.js",
+    "src/pages_transaction/taxGuide/index.vue",
+    "src/pages_transaction/transactionFlowGuide/index.vue",
+    "src/pages_owner/ownerCard/index.vue"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "4cc1a55a-ca40-4bc8-a6d2-4081c8a09783"
+   ],
+   "bundle": "055.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] wx.getSystemInfoSync 弃用警告：框架 vendor.js 内部调用必须靠 main.ts 首行 polyfill 重定向，只改业务代码无效",
+   "type": "bug",
+   "content": "现象：开发者工具反复警告 wx.getSystemInfoSync is deprecated，提示改用 getSystemSetting/getAppAuthorizeSetting/getDeviceInfo/getWindowInfo/getAppBaseInfo。这是弃用警告不是报错。\n\n根因有两层，只治第一层无效：1) 业务代码 src/utils/system-info.js 的回退分支仍在调 uni.getSystemInfoSync()；2) uni-app 运行时 vendor.js 内部自己也调这个 API——改业务代码根本触达不到它，所以警告照旧。\n\n做法：a) 重写 utils/system-info.js：小程序端改用 wx.getWindowInfo() / wx.getDeviceInfo() / wx.getAppBaseInfo() 组合取尺寸与设备信息，删掉 uni.getSystemInfoSync 回退；H5 用 window 尺寸兜底。b) 新增 src/polyfills/mp-weixin-system-info.js，在最早时机把 wx / uni 上的 getSystemInfoSync、getSystemInfo 重定向为「新 API 合并结果」（返回结构要与旧 API 字段兼容，至少 screenWidth/windowWidth/windowHeight/pixelRatio/statusBarHeight/SDKVersion 等）。c) 在 main.ts 首行引入该 polyfill，必须早于框架代码执行。\n\n残留：若仍有警告，多半是某个第三方库（z-paging、@dcloudio/uni-ui）在 polyfill 之前就调用了旧 API，或 @dcloudio/uni-app 版本偏旧，可考虑升级。",
+   "evidence": "会话 970c1102，基线 4630e8e。警告来自 vendor.js:1438；业务侧 system-info.js 回退仍用 uni.getSystemInfoSync，框架侧 vendor.js 也调用。解法：utils/system-info.js 改用 wx.getWindowInfo/getDeviceInfo/getAppBaseInfo，新增 src/polyfills/mp-weixin-system-info.js 重定向 wx/uni 旧 API，并在 main.ts 首行引入。",
+   "files": [
+    "src/utils/system-info.js",
+    "src/polyfills/mp-weixin-system-info.js",
+    "src/components/ZsNav/ZsNav.vue",
+    "src/utils/index.js"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "970c1102-ef4a-4650-b2b0-7044abd68b9e"
+   ],
+   "bundle": "055.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] ZsButton 全宽要靠 block 属性（没有 long 类），且父级 .page 的 flex 居中会让按钮塌成窄条",
+   "type": "bug",
+   "content": "现象：addHouseContract 页底部「添加」按钮显示成一条贴着中间的窄按钮，而不是设计稿里的整行蓝色圆角按钮。\n\n三个叠加原因：1) 页面根 .page 用了 display:flex; align-items:center，子元素会被水平居中并收缩到内容宽度；2) ZsButton 未传 block，组件默认不是全宽；3) 模板上写的 class=\"long\" 在项目里根本没有对应样式（SCSS 里不存在 .long），完全不起作用——这是最容易误判的一项，看着像「样式写了没生效」。\n\n做法：给 ZsButton 加 block 属性（组件内置全宽样式），删除无效的 long 类；必要时给所在容器 .button 补 width:100% 以对抗父级 flex 居中的收缩。\n\n推广：本项目按钮全宽一律用 ZsButton 的 block，不要再自造 long/full/btn-block 之类类名；排查「按钮变窄」先看父容器是不是 flex + align-items:center。",
+   "evidence": "会话 af4e72e7，基线 b7bf813。addHouseContract「添加」按钮异常；原因：.page 的 display:flex+align-items:center、ZsButton 未设 block、class=\"long\" 无对应样式。改法：加 block、移除 long、.button 补 width:100%。",
+   "files": [
+    "src/pages_owner/house/owner/addHouseContract.vue",
+    "src/components/ZsButton/ZsButton.vue",
+    "src/pages_owner/house/owner/addHouse.vue",
+    "src/styles/form2.scss"
+   ],
+   "baseline": "b7bf813",
+   "sessionIds": [
+    "af4e72e7-03c6-4e90-a546-a36ef38a5c56"
+   ],
+   "bundle": "055.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] ZsImage 的 subpackage 属性传错分包会让图标静默不显示；分包页面必须指向图片实际所在的分包",
+   "type": "bug",
+   "content": "现象：pages_transaction/publishHouse/type.vue 里的问号图标不显示，微信报本地图片资源加载失败。\n\n根因：图片走 ZsImage，属性 subpackage=\"pages_transaction\"，但该图标资源实际在 pages_owner 分包下。小程序分包之间不能跨包取静态资源，subpackage 指错时编译期不报错，只是资源路径解析失败——属于「静默失败」类问题。\n\n做法：subpackage 必须填写图片真实所在的分包名（本例去掉错误值后从 pages_owner 正确加载）。资源放在哪个分包，调用方就只能声明那个分包，或者把常用图标上提到主包 src/static。\n\n排查顺序：图标/图片不显示 → 先确认 ZsImage 的 src 路径与 subpackage 是否属于同一个分包 → 再看资源是否真的存在于该分包 static 目录。不要先怀疑样式（宽高/display）。\n\n同批还做了两处纯样式微调（权证类型最后一项补 border-bottom；下一步按钮 margin-top 改 40px），无复用价值，不单独提炼。",
+   "evidence": "会话 cf1f68c5，基线 f1939b0。type.vue 的问号图标未显示，原因是 subpackage=\"pages_transaction\" 指向错误分包路径，去掉该属性后从 pages_owner 分包正确加载。",
+   "files": [
+    "src/pages_transaction/publishHouse/type.vue",
+    "src/components/ZsImage/ZsImage.vue",
+    "src/utils/index.js"
+   ],
+   "baseline": "f1939b0",
+   "sessionIds": [
+    "cf1f68c5-695c-43d8-90ef-21ec5979676b"
+   ],
+   "bundle": "055.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] 小程序全量补 loading 防重复提交：useSubmitLock + ZsButton loading + VerifyCode 的 (countDown, onFail) 三段契约",
+   "type": "pattern",
+   "content": "需求场景：zhi2-mobile-shimin 里所有会打接口的按钮都要有 loading 防重复提交，且是跨 6 个分包目录（pages、pages_my、pages_owner、pages_guard、pages_transaction、pages_feedback）的批量治理，必须靠统一基础设施而不是各页各写。\n\n基础设施三件套：1) src/hooks/useSubmitLock.js 提供 { loading, runSubmit }，runSubmit 包裹异步操作并自动置位/释放；2) ZsButton 支持 :loading 与 :disabled；3) VerifyCode 组件的 sendCode 回调签名统一为 (countDown, onFail) => {}。\n\n页面写法：\nconst { loading, runSubmit } = useSubmitLock();\nconst submit = () => formRef.value.validate().then(() => { runSubmit(async () => { await someApi(...); /* 导航等 */ }); });\n模板给 ZsButton 绑定 :loading=\"loading\"。\n\n验收口径（哪些要改）：只处理「会调接口的提交按钮」；纯导航、弹窗关闭、筛选本地数据不加 loading。已有手写 const loading = ref(false) 的页面，统一换 useSubmitLock，或至少把 :loading 补到 ZsButton 上。onSubmit 用 debounce 的，优先改 runSubmit（可移除 debounce）。\n\nsendCode 关键点：失败路径必须回调 onFail?.()，否则倒计时状态会卡死：api().then(() => countDown()).catch(() => onFail?.())；表单 validate 失败也要调 onFail?.()。",
+   "evidence": "会话 19803421，基线 4d6dba9。用户要求为所有调用接口的按钮加 loading 防重复提交；已建 src/hooks/useSubmitLock.js（{loading, runSubmit}）、ZsButton 支持 :loading/:disabled、VerifyCode 的 sendCode 改为 (countDown, onFail)，并给出 runSubmit 包裹与 .catch(() => onFail?.()) 的修复模式，范围限 6 个分包目录且排除纯导航/弹窗关闭/本地筛选。",
+   "files": [
+    "src/hooks/useSubmitLock.js",
+    "src/components/ZsButton/ZsButton.vue",
+    "src/components/VerifyCode/index.vue",
+    "src/pages_my/",
+    "src/pages_owner/",
+    "src/pages_guard/",
+    "src/pages_transaction/",
+    "src/pages_feedback/"
+   ],
+   "baseline": "4d6dba9",
+   "sessionIds": [
+    "19803421-0080-4e9c-9cda-f1e93d27b0a7"
+   ],
+   "bundle": "055.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] 明细字段按错日期字段取值会导致整块无数据：先核对接口返回里到底有哪几个日期",
+   "type": "bug",
+   "content": "现象：pages_benefit/fundPublicity/detail.vue（物业服务企业账户明细）真实接口有返回数据，但页面整块不显示。\n\n根因：字段映射用错了日期字段——代码按 bookkeepingDate 取值/分组，而该接口明细里实际的日期口径是别的字段，取到 undefined 后整个明细无法渲染成行，表现像「接口没数据」。这类问题很容易被误判成接口问题或分页问题。\n\n做法：拿到真实接口返回报文，逐字段核对明细行的日期/金额字段名，把模板与映射函数里的 bookkeepingDate 换成接口实际下发的那个日期字段；改完用真实数据回放验证「有行、有值」。\n\n排查口径（可复用）：页面显示「数据没显示/整块空白」但接口 200 且非空时，第一动作是把接口原始报文贴出来，对比模板里绑定的字段名与报文 key，而不是先查 loading、分页、字典。日期类字段尤其容易错，因为同一业务常见 bookkeepingDate / accountDate / bizDate 多套命名。\n\n交付流程（含子模块）：改动提交命名 fix(fundPublicity): 修复物业服务企业账户明细字段映射错误导致无数据，子模块推 origin/sfb 并合并到 suzhou-shiqu-suzhufang-main-v2.1，父仓库只更新子模块指针（dev-sfb → 同名 main 分支），合并冲突按「子模块指针取包含本次提交的较新 SHA」解决。",
+   "evidence": "会话 4a5e4ed3，基线 c34c2b8。用户指出 fundPublicity/detail.vue:154-170 数据不显示，真实接口有数据但用的 bookkeepingDate 不对。后续提交 67bfb6c2（子模块 sfb）→ 合并 25ce1de4；父仓 83f31bc → 合并 d007291，子模块指针冲突按 main-v2.1 上 25ce1de4 解决。",
+   "files": [
+    "src/pages_benefit/fundPublicity/detail.vue",
+    "src/api/benefit.js",
+    "src/pages_benefit/fundPublicity/benefitDetail.vue",
+    "src/pages_benefit/fundPublicity/detail2.vue"
+   ],
+   "baseline": "c34c2b8",
+   "sessionIds": [
+    "4a5e4ed3-506f-4508-ab7a-666541b7f2c3"
+   ],
+   "bundle": "055.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 图片地址两套 CDN 前缀分流：/zs-fym 走 V1（szfang.szfcweb.cn），其余走 V2，四处必须成对同改",
+   "type": "pattern",
+   "content": "什么情况：苏住房C 小程序（zhi2-mobile-shimin）接口返回的媒体路径有两种世代前缀——V1 是 /zs-fym/...（如 /zs-fym/2023/05/19/xxx.jpg），V2 是 /zhi2-pro、/zhi2-dev、/zhi2-test 等。若统一用 V2 的 API 域名拼接，V1 图片全部加载失败（域名不同，V2 域名下没有 /zs-fym 资源）。\n\n为什么：两代文件服务是两套独立域名，前端只有一份 resolveMediaUrl，靠路径前缀判别落哪套 base，任何一处只用单 base 就会静默裂开。\n\n怎么做：①utils/index.js 里维护 MEDIA_PATH_PREFIXES 全量前缀表 + V1_MEDIA_PREFIX 常量 + isV1MediaPath() 判定，H5 生产走 VITE_APP_IMG_PROXY_V1，小程序走 env/mp.js 的 IMAGE_BASE_V1，其余回落 V2 的 VITE_APP_API_PROXY / IMAGE_BASE；②新增/修改 CDN 域名时四处必须成对同改：.env.development、.env.production 的 VITE_APP_IMG_PROXY_V1、src/env/mp.js 的 IMAGE_BASE_V1、vite.config.ts 里 /zs-fym 的 proxy target（本次该 proxy 原指向 V2 API，是漏改点）；③协议必须 https（曾写成 http，真机会被拦截）；④改动只影响 V1 分支，不要顺手改 V2 的拼接逻辑。",
+   "evidence": "会话 3774cb0b：用户指出 /zs-fym 前缀的图片应用 https://szfang.szfcweb.cn/ 拼接，完整地址应为 https://szfang.szfcweb.cn/zs-fym/2023/05/19/1e3e7351-969a-4b5d-b9f2-64bb54242a4c.jpg，且明确「V2 的图片不需要修改，现在是正确的」。最终改 resolveMediaUrl、ZsImage、vite.config.ts 代理与两个 env 文件、src/env/mp.js。当前代码核实：utils/index.js:76-83 维护 MEDIA_PATH_PREFIXES 与 isV1MediaPath，143-155 buildH5AbsoluteMediaUrl 分流 V1/V2，389/416 小程序端按 isV1MediaPath 选 IMAGE_BASE_V1/IMAGE_BASE；env/mp.js:11,17,23 三个环境 IMAGE_BASE_V1 均为 https；vite.config.ts:140-141 /zs-fym 代理 target 取 VITE_APP_IMG_PROXY_V1。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "zhi2-mobile-shimin/src/env/mp.js",
+    "zhi2-mobile-shimin/vite.config.ts",
+    "zhi2-mobile-shimin/.env.production",
+    "zhi2-mobile-shimin/.env.development"
+   ],
+   "baseline": "653505a",
+   "sessionIds": [
+    "3774cb0b-97a2-4a97-9edb-ca41b73ddf3e"
+   ],
+   "bundle": "056.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序 static 路径解析不能只按「当前页面路由」推断分包：images/szf 散落在 5+ 个分包，须按文件名映射",
+   "type": "bug",
+   "content": "什么情况：map 找房页调 resolveStaticUrl 解析 images/szf/default.png 时，小程序报 [渲染层网络层错误] Failed to load local image resource /pages_main/static/images/szf/default.png，HTTP 500；但该文件实际在 pages_transaction/static/images/szf/ 下。\n\n为什么：resolveSubpackageForStatic 的兜底是 inferSubpackageFromRoute（取 getCurrentPages 最后一页路由首段当分包根）。images/szf/ 下的资源分散存放——pages_main 8 个、pages_owner 22 个、pages_vote 2 个、pages_transaction 67 个，所以同一张图在不同页面会被推断到不同分包；页面一旦跨分包引用就必然指到不存在路径，小程序对本地静态资源不存在返回 500 而不是 404，容易误判成服务端问题。\n\n怎么做：对「多分包共存」的图片目录用显式文件名 → 分包映射表打底，而不是靠路由猜：utils/index.js 中 PAGES_MAIN_SZF_FILES / PAGES_VOTE_SZF_FILES / PAGES_OWNER_SZF_FILES 三个 Set + resolveSzfImageSubpackage()，未命中默认落 pages_transaction；MAIN_STATIC_PATHS 收口主包专属路径。新增图片时先确认它落在哪个分包目录，再决定是否补进映射表；组件侧（如 collectBtn）未显式传 subpackage 时的默认值也要与映射表一致。",
+   "evidence": "会话 7f47849c：报错 Failed to load local image resource /pages_main/static/images/szf/aixin_g.png 与 default.png，状态 500，而文件实际在 pages_transaction/static/images/szf/。修复为按文件名映射分包，不再依赖当前路由；同时修正 collectBtn 的 imageSubpackage 默认值。当前代码核实：utils/index.js:250-296 三个 Set + resolveSzfImageSubpackage，298-313 resolveSubpackageForStatic 优先查表、最后才 inferSubpackageFromRoute；实测各分包 static 文件数 pages_transaction 148、pages_tab 136、pages_owner 103、pages_owner_extra 45。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/utils/mainStaticPaths.js",
+    "zhi2-mobile-shimin/src/pages_main/houseMap/houseMap.vue",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "zhi2-mobile-shimin/src/components/collectBtn/collectBtn.vue"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "7f47849c-ba9e-4b0a-8c84-2445f8137134"
+   ],
+   "bundle": "056.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "同一业务流程的多个提交页漏带 store 参数：接口报「物业管理区域权限不能为空」的根因是只补了一个页面",
+   "type": "bug",
+   "content": "什么情况：业主端「添加房屋 → 人工登记 → 提交人工审核」报「物业管理区域权限不能为空」。人工登记页 register.vue 调 ctUserIdentityApply 时没带 complexId，而同流程的 addHouse.vue、addHouseContract.vue 都带了。\n\n为什么：complexId 不是表单字段，而是用户从小区认证页（project/auth.vue）进入流程时写进 useHouseStore 的上下文参数。它不参与表单校验，模板上也看不到，所以新写/改造的提交页很容易漏；漏了前端毫无提示，只能等后端报「权限不能为空」，且报错文案指向「权限」会把排查引向鉴权方向。\n\n怎么做：同一流程内凡是要打提交接口的页面，提交参数统一从 useHouseStore 补齐业务上下文（complexId 与 identityPhoto / certificatePhoto 等拼接字段一起），并以同流程已跑通的页面为基准逐字段比对；新增提交页时先 grep 同目录其他提交页的 payload 字段清单再写。排查「xx 不能为空」类报错时，先确认该参数是表单字段还是 store 上下文参数，不要先去查权限。",
+   "evidence": "会话 75b9fd04：用户截图报「添加房屋-人工登记-报错\"物业管理区域权限不能为空\"」，并指出复杂小区参数即可。结论为 register.vue 调 ctUserIdentityApply 未传 complexId，取值应与同流程 addHouse.vue / addHouseContract.vue 一致来自 useHouseStore.complexId（该值在从 project/auth.vue 进入添加房屋流程时写入）。当前代码核实：pages_owner/house/owner/register.vue:173-176 提交参数已含 complexId: useHouseStore.complexId。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/register.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/addHouse.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/bindProject.vue",
+    "zhi2-mobile-shimin/src/store/house.js",
+    "zhi2-mobile-shimin/src/api/property.js"
+   ],
+   "baseline": "0011377",
+   "sessionIds": [
+    "75b9fd04-a06e-4dd9-a25b-46eb96b4328a"
+   ],
+   "bundle": "056.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序消息页：未读数统计必须带 readFlag:0，顶部管理/筛选要跟随列表滚动就移进 z-paging 内并关掉 fixed",
+   "type": "workflow",
+   "content": "什么情况：两件事反复踩。①个人中心/消息角标调 getMsgNum / unReadMsgNum 时若不带参数，拿到的是全部消息数而非未读数，角标永远不为 0；②消息列表页把「管理」「筛选」放在 page-top 固定在顶部，用户觉得占位且与列表割裂，要求跟随滚动。\n\n为什么：未读数是「过滤后的总数」，由 readFlag:0 决定，不传就是全量统计；而 z-paging 默认把整个页面容器当滚动区并对其中的固定元素做 fixed 处理，头部区块只要留在 z-paging 外层就必然固定，放进去才在同一滚动流里。\n\n怎么做：①统计未读数统一 readFlag: 0（getMsgNum 另带 projectType: 1），列表页筛选参数 readFlag 空串表示「全部」；②要跟滚动的头部：把 page-top 移入 z-paging 内部，z-paging 显式 :fixed=\"false\"，页面容器改 overflow: hidden，内容区 flex: 1，滚动职责全部交给 z-paging；③底部批量操作栏（全选/设为已读/删除）保持固定，批操作时列表滚动位置丢失很难用。",
+   "evidence": "会话 bcb98835：诉求一「个人中心查消息数量需要加参数 readFlag: 0」；诉求二「消息列表页，管理和筛选 UI 有些问题，先不要固定了，跟随列表滚动吧」。落地为 page-top 移入 z-paging、:fixed=\"false\"、page-center flex:1、容器 overflow:hidden，底部管理操作栏仍固定。当前代码核实：pages_main/message/index.vue:56,62 调 getMsgNum/unReadMsgNum 均带 readFlag: 0；pages_tab/components/My_Suzhufang.vue:114 getMsgNum({ readFlag: 0, projectType: 1 })；pages_main/message/message.vue 中 readFlag 作为筛选 key（''=全部）。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_main/message/index.vue",
+    "zhi2-mobile-shimin/src/pages_main/message/message.vue",
+    "zhi2-mobile-shimin/src/pages_main/my.vue",
+    "zhi2-mobile-shimin/src/pages_tab/components/My_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/hooks/usePaging.js"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "bcb98835-f1ec-41eb-9aea-afdbf1871d66"
+   ],
+   "bundle": "056.md",
+   "project": "苏住房C"
+  }
+ ]
+}

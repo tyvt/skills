@@ -1,0 +1,436 @@
+{
+ "project": "苏住房C",
+ "batch": 4,
+ "files": [
+  "013.md",
+  "014.md",
+  "015.md",
+  "016.md"
+ ],
+ "count": 24,
+ "memories": [
+  {
+   "title": "报事报修拦截「已加但还是能点进去」：微信开发者工具跑的是 dist/dev 旧包，源码改动未进产物",
+   "type": "bug",
+   "content": "情况：给电子业主卡「报事报修」加入口拦截（点击只 Toast「功能暂未开放」、不跳转），用户改完仍反馈「还是可以点进去」。\n为什么：源码里拦截逻辑确实存在，但微信开发者工具导入的仍是 zhi2-mobile-shimin/dist/dev/mp-weixin 旧产物，该包里的 goToOther 没有拦截分支；真机/工具验证的是旧包，不是新代码。同源的泰兴经验只覆盖「tools 点编译不生效、要以 dist/build 为准」，这里的指向不同：用户/容器默认挂在 dist/dev 上，dev 与 build 两个产物目录混用。\n怎么做：1) 先区分环境再排查代码——确认开发者工具导入的是 dist/dev 还是 dist/build，或直接问用户在哪端（H5/小程序/App）测的；2) 定位后重新编译（npm run dev 或导入刚打出的 dist/build），并在工具里「清缓存 → 重新编译」；3) 不要因为用户说「还是不行」就反复改源码或加更多守卫，先核对产物里是否存在该字符串（如 grep 产物中的「功能暂未开放」）；4) 加固侧可把点击事件换成 @tap.stop + 抽出统一的 isRepairNav 谓词，在入口 click 与 goToOther 两处双重拦截，这样即使某条路径漏了也能兜住。",
+   "evidence": "会话 eac9139c：用户轮次 4「还是可以点进去啊」；最终结论明确「源码里其实已经加了拦截，但你微信开发者工具里跑的 dist/dev/mp-weixin 还是旧包——里面的 goToOther 没有「功能暂未开放」逻辑」，并要求改导 dist/build、清缓存重新编译。代码基线 48bdb17。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner_extra/ownerCard/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/ownerCard/index.vue"
+   ],
+   "baseline": "48bdb17",
+   "sessionIds": [
+    "eac9139c-3367-4784-8577-a513c71c95c0"
+   ],
+   "bundle": "013.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 小程序静态图标必须进主包 static 并登记 mainStaticPaths，否则安卓端弹窗缺图、iOS 正常",
+   "type": "bug",
+   "content": "情况：登录页「手机号授权」弹窗顶部图标在安卓真机上不显示（空白缺图），iOS 完全正常；「我的」页未登录点头像弹出的同一个弹窗同样缺图。\n为什么：该图标原先放在 pages_main 分包目录下（pages_main/static/images/phone-auth-icon.png），微信构建时没有被带进产物；而 pages_tab 入口跨分包引用它，安卓端对跨分包静态资源的限制比 iOS 严格，所以只有安卓缺图。原生 <image> 没有加载失败回退，失败就是纯空白，连占位都没有。\n怎么做：1) 把图标迁到主包 src/static/images/；2) 在 mainStaticPaths.js 里显式登记 images/phone-auth-icon.png，并顺带登记兜底图 images/warn.png；3) 删除分包里的旧副本，避免两份维护；4) 组件里把原生 <image> 换成 ZsImage 以获得加载失败回退，并去掉硬编码的 pages_main 分包路径；5) 构建后用产物自证：确认 dist/static/images/ 下确实存在这两个文件，再导入 dist 用安卓真机验证两个入口。判别要点：iOS 正常、安卓缺图基本就是跨分包静态资源问题，不是路径写错。",
+   "evidence": "会话 a1a45147：用户诉求「小程序：安卓手机-手机号授权页面，缺少默认图片，IOS没有这个现象」；结论「根因是图标原先放在 pages_main 分包，且未打入构建产物；在 pages_tab 入口还会跨分包加载，安卓端比 iOS 更严格」，修复为迁入主包 + mainStaticPaths.js 注册 + ZsImage 回退。代码基线 6599714。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages/components/PhoneForm.vue",
+    "zhi2-mobile-shimin/src/pages/login/index.vue",
+    "zhi2-mobile-shimin/src/static/images/phone-auth-icon.png",
+    "zhi2-mobile-shimin/src/mainStaticPaths.js"
+   ],
+   "baseline": "6599714",
+   "sessionIds": [
+    "a1a45147-a211-4056-89f4-a6d870d42790"
+   ],
+   "bundle": "013.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "列表页空数据默认图不显示：空态判定挂在 requested 上，接口异常时既不渲染列表也不渲染空态",
+   "type": "bug",
+   "content": "情况：工作动态列表页无数据时是纯灰背景、既看不到列表也看不到空状态，用户要求「加空数据默认图」。\n为什么：页面用 requested 标志控制空态是否展示，而该标志在请求成功分支里才置 true；接口失败或异常时 requested 永远是 false，于是列表分支（list 为空）与空态分支（requested 为 true）同时不成立，整页空白。另外用 total === 0 判定空态也不稳——接口异常时 total 可能是 undefined。\n怎么做：1) 用 try/finally 保证请求结束后无论成败都进入空态判断，loaded 类标志在 finally 里置位；2) 空态判定从 total === 0 改为 !list.length，list 缺失时也能正确落到空态；3) 空态统一用 ZsEmpty 组件并指定默认图 images/empty.png，无数据展示「暂无数据」、搜索无结果展示「未查询到相关数据」；4) 空态区域水平居中、默认图约 320rpx 并垂直居中。判据：页面「一片空白且无报错」多因两个分支互斥都没命中，优先查控制空态的标志位是否只在成功路径置位。",
+   "evidence": "会话 42343a4e：用户诉求「加空数据默认图」；结论列出 4 点改动，其中「接口失败时 requested 未置为 true，导致既不显示列表也不显示空状态。现用 try/finally 保证请求结束后一定会进入空状态判断」「由 total === 0 改为 !list.length」。代码基线 89637fb。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages/property/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/company/service/index.vue"
+   ],
+   "baseline": "89637fb",
+   "sessionIds": [
+    "42343a4e-0f73-462e-bedb-6499ef092a49"
+   ],
+   "bundle": "013.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序分包页里 CardCell 标签渲染不出来导致「只剩值 + 大段空白」：styleIsolation 隔离下改回页面内 DOM",
+   "type": "bug",
+   "content": "情况：pages_vote/decision/detail.vue 与生产环境差异巨大——编号/业务类型/决策主题等标签全不见，只剩「一般表决 / 测试」两行裸文字和大量空白；用户两次反馈「UI 有问题」「差异仍然巨大」。同一模板被直接复用到 DecisionRecord.vue 后，微信小程序里整块「决策信息」完全不渲染（全白）。\n为什么：CardCell 组件在 pages_vote 分包里处于样式隔离状态（页面 styleIsolation 与组件自身不一致），组件内部标签行、分割线、左右对齐的样式不生效，标签被压成不可见；更极端时整个组件块不渲染。根因是分包 + 组件样式隔离，不是数据结构问题，所以对着接口数据怎么查都查不出。\n怎么做：1) 先排除数据因素——接口有数据但标签不显示、只剩值时，优先怀疑组件样式隔离；2) 决策/选举详情这类要与生产版像素级对齐的页面，去掉 CardCell，在页面内直接写与生产版相同的 DOM 结构，样式写在当前页并让 styleIsolation: shared 生效；3) 头部渐变信息区与字段区合并成同一张卡片；4) 回退时不要顺手改成另一个组件（改成 CardCell 反而导致整块空白），优先回到已验证可用的 cell-item 结构再局部修。",
+   "evidence": "会话 f7c75f86：用户「pages_vote/decision/detailUI有问题」「这是现在的UI和生产UI对比」「差异任然巨大」；结论「不是数据结构问题，而是小程序分包 + 组件样式隔离。CardCell 在 pages_vote 分包里样式被隔离，标签渲染不出来」，做法为去掉 CardCell + 页面内 DOM + styleIsolation: shared。代码基线 5f0f4dc。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_vote/decision/detail.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/components/DetailTopCard.vue",
+    "zhi2-mobile-shimin/src/styles/cell.scss"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "f7c75f86-93d3-413f-b2a8-5162c9c21849"
+   ],
+   "bundle": "013.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "签名图片不显示：ZsImage 内部 .img 为 width:100%，无确定尺寸容器时高度塌成 0；套固定尺寸 wrap + :deep 覆盖",
+   "type": "bug",
+   "content": "情况：选举记录详情与决策记录详情（ResultRecord.vue / DecisionRecord.vue）里的签字图不显示，接口 signature 字段有值（用户贴了完整响应体），页面却是空白。\n为什么：把签字图放进 CardCell 行布局后，ZsImage 组件内部对 .img 写死 width: 100%，而所在行没有确定宽度/高度约束，百分比宽度无法解析成具体尺寸，高度随之塌成 0，图片视觉上等于不存在；同时改成 CardCell 后还引发整块区块不渲染的次生问题。\n怎么做：1) 给签字图单独套一个固定尺寸的容器（如 sign-picture-wrap，153×68），让内部百分比宽高有参照；2) 通过 :deep(.img) 覆盖 ZsImage 内部的 width: 100%，改由容器决定尺寸；3) 字段区恢复已可用的 cell-item 布局，不要为了行式布局整体换成 CardCell；4) 若仍不显示，用 vConsole 看该图片请求是否 404，区分「尺寸塌陷」与「资源加载失败」。这是对既有 ZsImage 样式覆盖类经验的更深一层：不只是样式优先级问题，而是百分比宽度缺参照导致的零尺寸。",
+   "evidence": "会话 e7007608：用户「选举记录详情中签字不显示@DecisionRecord.vue 决策记录也是一样」+ 完整接口 JSON；后续「空白不展示了」；结论「用固定尺寸的 sign-picture-wrap（153×68）包裹 ZsImage，并通过 :deep(.img) 覆盖组件内部的 width: 100%，避免图片高度塌成 0」，并恢复 cell-item 布局。代码基线 8fc3cc5。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_vote/decision/common/DecisionRecord.vue",
+    "zhi2-mobile-shimin/src/pages_vote/elect/ResultRecord.vue",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "e7007608-941f-47f8-a082-3768ad6aa6e3"
+   ],
+   "bundle": "013.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "ZsPicker 组件内写死 width: 97% 导致全站表单选择器右侧留白：组件层改 100% + 全局统一，页面级覆盖仍生效",
+   "type": "bug",
+   "content": "情况：业主端家庭成员新增等表单里，「证件类型」「和本人关系」等 picker 没有撑满表单项右侧区域，右边留一条白带；用户连续两次要求「全局排查」「pickers 没有撑满，全局修改」。\n为什么：根因不在页面样式，而在 ZsPicker 组件自身写了 width: 97%，所有使用该组件的页面统一少 3% 宽度；由于是组件内部硬编码，逐页加 :deep 修补既漏又多。\n怎么做：1) 组件层把 ZsPicker.vue 的 width: 97% 改为 100%，内部布局改用 justify-content: space-between，文字区 flex: 1、箭头 flex-shrink: 0 贴右，长文本加省略号防止挤压；2) form2.scss 里对 :deep(.zs-picker)、:deep(.zs-daterange-picker) 统一 width: 100%，覆盖所有引用表单的页面；3) uni.scss 全局同步 .zs-picker / .zs-daterange-picker 的 width: 100%；4) 个别需要窄 picker 的页面（如物业页 fit-content）保留页面内 :deep 覆盖，优先级仍会生效。判据：多个页面的同类控件同时缺同一方向留白，一定先去组件里搜百分比/固定宽度，不要逐页打补丁。",
+   "evidence": "会话 f0787ce5：用户「没有撑满宽度，全局排查一下」「picker没有撑满，全局修改」；结论「根因在 ZsPicker 组件里写了 width: 97%」，修改为 97%→100% + form2.scss + uni.scss 三处统一。代码基线 9832ba3。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ZsPicker/ZsPicker.vue",
+    "zhi2-mobile-shimin/src/styles/form2.scss",
+    "zhi2-mobile-shimin/src/uni.scss"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "f0787ce5-27a4-4cf2-8c49-60dade6711ac"
+   ],
+   "bundle": "013.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "77666f8",
+   "content": "苏住房C（zhi2-mobile-shimin）大量接口返回富文本，直接丢给 <rich-text> 必然显示空白。根因有三类：①正文里的图片是 `/zs-fym/...` 相对路径，小程序 rich-text 不解析相对路径；②配置类接口（getConfigKey）返回 `{ configValue: '...' }` 对象而不是 HTML 字符串，rich-text 收到对象直接不渲染；③后端返回的是转义后的 HTML 实体（`&lt;p&gt;`），或干脆是带 \\n 的纯文本。\n\n约定做法：所有富文本一律走 `src/components/ZsRichText/ZsRichText.vue`，它只在渲染前调用 `utils/index.js` 的 `formatRichTextContent`，页面不再各自处理。该函数按固定流水线：normalizeRichTextInput（按 configValue/content/msgContent/noticeContent/value 多候选字段取串）→ decodeHtmlEntitiesIfNeeded（仅检测到 &lt; 等实体才解码，最多 3 轮）→ plainTextToRichHtml（无标签时把 \\n 转 br）→ escapeInvalidHtmlAngleBrackets（把非标签的 `<` 转义，避免书名号等把整段解析成标签导致白屏）→ replaceRichTextMediaUrls（img src 与 CSS url() 里的相对路径转为完整地址）→ constrainRichTextImages（剥掉 width/height，内联 max-width:100%）→ linkifyPhoneNumbersInHtml（跳过标签属性与 a 标签内部，把手机号/座机转 tel: 链接，交给 ZsRichText 的 @itemclick 调 callPhone）。\n\n踩坑要点：给 rich-text 做字符串替换时不能整段跳过「以 < 开头的片段」，否则一段拼好的 HTML 里一个号码都转不出来；图片尺寸必须写成内联 style，小程序不认外部 class。新增富文本页面时先确认是不是直接用 {{ }} 或 v-html 输出（如 CardCell 的 remark），要改成 ZsRichText。",
+   "evidence": "会话 0bc1d7be：用户反馈「很多返回 data 中包含富文本字段的接口都没法正常显示富文本数据了」，最终定位图片相对路径 + 配置接口返回对象两类根因，增强 formatRichTextContent、新增 ZsRichText 组件，并把公告/新闻/政策/协议/问卷/公示约 20 处 rich-text 统一替换；代码核实 utils/index.js:397-579 与 components/ZsRichText/ZsRichText.vue 与上述流水线一致。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ZsRichText/ZsRichText.vue",
+    "zhi2-mobile-shimin/src/utils/index.js"
+   ],
+   "sessionIds": [
+    "0bc1d7be-3e28-4c25-90a8-6816570ec803"
+   ],
+   "title": "富文本接口统一渲染套路：ZsRichText 组件 + formatRichTextContent 五段式归一化",
+   "type": "pattern",
+   "bundle": "014.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "d43894b",
+   "content": "用户明确要求（原话「建议进来直接 loading，接口完成关闭」「等待所有接口响应之后再显示页面，针对所有页面上有 if else 逻辑的」）：凡是渲染依赖多个接口、且模板里有 if/else 分支的页面，不能边拿数据边渲染——否则会先闪一下「暂无数据」空态再出数据，或底部按钮/区块先按假分支渲染再跳变。\n\n落地方式是统一 hook `src/hooks/usePageLoading.js`，返回 `{ loaded, runWithLoading }`：\n- `runWithLoading(task)` 里先把 `loaded.value = false`，调 `uni.showLoading({ title:'加载中', mask:true })`，用 `Promise.resolve(task()).finally()` 保证无论成功失败都置 `loaded.value = true` 并 hideLoading；\n- 页面根节点写 `v-if=\"loaded\"`，所有 if/else 内容在数据就绪后才挂载；\n- hook 内部用 onHide/onUnload 兜底 hideLoading，避免页面切走时 loading 常驻；\n- 多个接口必须用 `Promise.all([initDict(), fetchDetail(), fetchChart()])` 一起交给 runWithLoading，不能只 await 主接口，否则字典/图表晚到会再次触发跳变。\n\n已在决策模块 13 个页面落地（decision/index.vue、三类 DecisionResult/ResultStatistics/DecisionRecord、detail.vue、optional/detail.vue）。注意这只解决「首屏跳变」，与列表分页的 z-paging loading 是两套东西，不要混用。",
+   "evidence": "会话 36ef278a：用户先报「慧物业-业主决策，会先显示暂无数据才显示数据」，第二次反馈「没改好，建议进来直接 loading，接口完成关闭」，第三次要求「决策结果页面也有类似的问题…针对所有页面上有 if else 逻辑的」，最终新增 hooks/usePageLoading.js 并在 13 个页面接入；代码核实 src/hooks/usePageLoading.js 实现与 25 处引用与结论一致。",
+   "files": [
+    "zhi2-mobile-shimin/src/hooks/usePageLoading.js",
+    "zhi2-mobile-shimin/src/pages_vote/decision/index.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/detail.vue"
+   ],
+   "sessionIds": [
+    "36ef278a-92bd-4d36-9fb4-c7e97ddf8d37"
+   ],
+   "title": "用户偏好：带 if/else 分支的页面必须「进页面即 loading，全部接口返回后再渲染」",
+   "type": "preference",
+   "bundle": "014.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "5438dc6",
+   "content": "苏住房C 是「苏服办轻应用」形态，业务接口不直连后端，而是全部经苏服办网关转发，这决定了改任何接口前都要先确认没破坏这套链路。\n\n关键结构：登录页 pages/login/index.vue（验证码/账号密码）之外还有苏服办免登路径——App.vue 在 H5 启动时检测苏服办环境做静默 SSO，src/utils/sfb.js 封装 hasLightAppJssdk / ensureSfbTicket / closeSfbWindow，api/security.js 提供 loginByTicketSfb（ticket 换 token），store/user.js 存 sfbToken；httpInstance.js 负责 401 清 token 跳首页。所有业务 API 经 api/gateway.js 转发并做 SM3 签名，index.html 引入苏服办 JSSDK + 苏周到 JSBridge + SM3 签名脚本。\n\n必须在三套 .env（development/production/test）里同时存在的四件套：VITE_APP_SFB_APP_ID、VITE_APP_SFB_GET_INTERFACE_ID、VITE_APP_SFB_POST_INTERFACE_ID、VITE_APP_SFB_UPLOAD_INTERFACE_ID。开发环境网关走 vite.config.ts 的本地代理，生产/测试走 https://ydzt.jszwfw.gov.cn/...（对应 api/index.js 的 zsSource:'v2'、v1Instance.js 的 'v1'）。\n\n踩坑：一次分支合并把这些配置整块删掉（用户反馈「VITE_APP_SFB_APP_ID 什么的没了」），排查方式是 git diff 比对误删前的提交（05b4b4f4）逐项恢复——环境变量、vite 代理、index.html 签名脚本、sfb.js/App.vue/security.js/user.js、api 的 zsSource、env.d.ts、以及 My_Suzhufang 的登录入口与 goMenu 登录拦截。恢复后必须重启 dev server，环境变量不会热更新。核实：当前工作区的 .env.* 里已无 SFB 变量、vite.config.ts 也无 sfb 代理，说明该恢复未落在当前检出，改接口前先核对。",
+   "evidence": "会话 bfab7492 给出完整登录链路盘点（含 sfb.js 当时缺失）；会话 e8713fef 用户报「苏服办分支的接口调用逻辑近期是不是合并出问题了」「VITE_APP_SFB_APP_ID 什么的没了」，最终从 05b4b4f4 恢复全部 SFB 配置并列出关键配置值。工作区核实：.env.development 无 VITE_APP_SFB_*、vite.config.ts 无 /sfb-gateway 代理。",
+   "files": [
+    "zhi2-mobile-shimin/src/App.vue",
+    "zhi2-mobile-shimin/src/utils/sfb.js",
+    "zhi2-mobile-shimin/src/api/gateway.js",
+    "zhi2-mobile-shimin/src/api/security.js",
+    "zhi2-mobile-shimin/vite.config.ts",
+    "zhi2-mobile-shimin/.env.development"
+   ],
+   "sessionIds": [
+    "bfab7492-002f-4ee1-9cec-7adbfb1f06a9",
+    "e8713fef-c64a-4733-b0ee-f3615b219169"
+   ],
+   "title": "苏服办（SFB）接入的结构化事实：网关签名 + ticket SSO + VITE_APP_SFB_* 四件套，且极易在合并中被整块误删",
+   "type": "fact",
+   "bundle": "014.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "9832ba3",
+   "content": "现象：卡片右侧的勾选圆圈整块不显示，页面却没有任何报错。根因不是样式写错，而是 icon-checked.svg、icon-nocheck.svg 等图标文件在之前的一次重构里被删掉了，但模板仍在通过 ZsImage 引用，图片 404 后就是一个透明占位——小程序里 SVG 加载失败不会抛错，所以只能靠肉眼发现。\n\n排查顺序：先看页面上是否只有「图标类元素」缺失而文字正常 → 去 src/static 对应目录确认文件是否存在 → 不存在就去 git log/git 历史里找被删的提交并恢复（本例一次性恢复了 icon-checked、icon-nocheck、icon-contract 等 8 个 SVG）。\n\n更稳的做法（本例最终采纳）：对这种「表达选中态、状态由数据决定」的小图标，不要依赖图片文件，直接在组件里用 CSS 画——未选中为灰色空心圆（border + border-radius:50% + 透明底），选中为蓝色渐变圆 + 白色对勾（可用伪元素旋转出勾或内联 SVG data-uri）。好处是主题色能跟着改、不再受资源目录与分包路径约束，也不会因为别人重构删文件而静默失效。\n\n落地在 TitleCard 组件内，同时把页面里失效的 ZsImage 插槽引用一并删掉，避免留死代码。判断标准：装饰性大图仍走 static 资源；状态指示类小图标优先内置 CSS/SVG 字符串。",
+   "evidence": "会话 7f2654d5：用户先报「选择样式没有」，再报「勾选中的圆圈没有」，最终确认 icon-checked.svg / icon-nocheck.svg 在之前重构中被删除但页面仍引用，从 git 历史恢复 8 个 SVG，并在 TitleCard 内置 CSS 单选圆圈、去掉失效的 ZsImage 插槽引用。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/house/components/TitleCard.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/authentication.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/components/TypeChoose_Suzhufang.vue"
+   ],
+   "sessionIds": [
+    "7f2654d5-5bab-4165-aa36-1e84ddbdfa13"
+   ],
+   "title": "SVG 矢量图标在重构中被误删 → 交付型图标（单选圆圈等）改用组件内置 CSS 绘制",
+   "type": "pattern",
+   "bundle": "014.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "f1939b0",
+   "content": "现象：苏找房「求购信息」在安卓端整页空白，控制台报 `Component is not found in path pages_transaction/intention/my/list`；同一入口在 iOS/开发者工具上可能正常，所以容易被当成偶发。\n\n根因有两层：①`intention/my/list` 是在分包 pages_transaction 的 intention 目录下又建了一层 my 子目录放页面，这种「分包内二级目录即页面」的路径在安卓端产物里解析不到（分包根路径推导 + 构建产物 chunk 位置对不上）；②第一次修复只把共享组件抽到 components 目录，旧的页面路径仍然注册在 pages.json 里，安卓端启动时依旧按旧路径加载，报错照旧——这是最容易踩的「改了还没好」。\n\n正确处理（三件套一起做，缺一不可）：\n1. 删除旧页面：从 pages.json 移除 `intention/my/list` 注册，并删掉 `my/list.vue` 实体文件，彻底不留可解析的旧路径；\n2. 合并成单一页面 `intention/list`，用 query 区分业务：求购信息 `/pages_transaction/intention/list`（菜单码 4_3_11）、我的求购 `/pages_transaction/intention/list?mode=mine`（4_3_10），页面内按 `options.mode === 'mine'` 分流渲染共享组件 IntentionMyList；\n3. 共享组件放在分包自己的 components 下（本例为 pages_transaction/intention/components/IntentionMyList.vue），不能让两个入口各自引用一份；同时同步更新 menuRouteMap.js 与构建脚本 scripts/merge-main-leaks.mjs 里的 stub 路径（该脚本用 process.cwd() + '../dist' 定位产物，映射项是 `list.js → pages_transaction/intention/list.js`，改路径必须同步）。\n\n验证：必须清理 dist/unpackage 旧产物后重新打包再看安卓端，热更新不生效。若仍报错，还要排查后端下发的菜单路径是否仍指向旧地址——菜单配置不在前端仓库里。",
+   "evidence": "会话 e0538ad3：用户两次报同一报错（第二次「还是报错」），最终结论指出「上次只把组件抽到 components 目录，但 intention/my/list 这个页面路径仍然存在，安卓端仍会尝试加载它」，删除页面 + 合并为 intention/list?mode=mine + 组件放分包 components + 同步 menuRouteMap.js 与 merge-main-leaks.mjs。工作区核实 pages.json:2119 只剩 intention/list，组件位于 pages_transaction/intention/components/IntentionMyList.vue，merge-main-leaks.mjs:14 映射为 list.js → pages_transaction/intention/list.js。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages.json",
+    "zhi2-mobile-shimin/src/pages_transaction/intention/list.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/intention/components/IntentionMyList.vue",
+    "zhi2-mobile-shimin/src/utils/menuNav.js",
+    "zhi2-mobile-shimin/scripts/merge-main-leaks.mjs"
+   ],
+   "sessionIds": [
+    "e0538ad3-fc2d-43a5-8b21-e951b74289dd"
+   ],
+   "title": "分包内再套子目录的页面路径（intention/my/list）在安卓端报 Component is not found，解法是删页合并 + 组件上提",
+   "type": "bug",
+   "bundle": "014.md",
+   "project": "苏住房C"
+  },
+  {
+   "baseline": "4630e8e",
+   "content": "现象：列表页滚到底部不会自动加载更多，修完后「页面直接空白」，再修后底部出现一条白色区域把 loading 挡住。用户原话「页面最底下为什么有白色的，把 loading 也挡住了」。\n\n根因是底部留白有三个来源叠加，而不是单一样式写错：\n1. 模板里放了 `tab-bar-placeholder`（56px + 安全区），在自定义 TabBar 场景下这块占位本身就在占高度；\n2. z-paging 在 fixed 模式下还会按系统 `windowBottom`（原生 TabBar 高度）再往上缩一截，而本项目的 TabBar 是自定义组件 AppTabBar，两者高度不一致，于是露出页面背景——白条就出现在这里；\n3. loading（load-more）渲染在列表末尾，正好被这块白条盖住，看起来像「不加载了」。\n\n正确的对齐方式（不要靠反复微调像素）：\n- 删掉 `tab-bar-placeholder` 和无效的 `bottom-offset`（后者对不生效的场景是死参数）；\n- 用 z-paging 的 `paging-style.bottom` 直接对齐自定义 TabBar 的真实高度：`calc(106rpx + env(safe-area-inset-bottom))`；\n- 关掉 safe-area-inset-bottom，否则 z-paging 会再额外加一次底部安全区占位，又变成双层；\n- 页面背景统一成 `#f5f5f5` 与卡片底色一致，万一对不齐也不会出现刺眼的白色块。\n\n适用判断：只要项目用自定义 TabBar（不是原生 tabBar），fixed 模式的 z-paging 就必须显式接管 bottom，不能沿用默认；同理「滚到底不加载」也要先确认是不是余量被白条吃掉。注意 ZsPaging 在本项目有 4 份副本（pages_main / pages_owner / pages_owner_extra / pages_transaction 各一份），改组件层要评估是否四份同步。",
+   "evidence": "会话 dc3620d1 三轮：用户先报「pages/index/project 这个页面滚动到底部还是不会自动加载更多」，再报「页面直接空白了」，最后报底部白条挡住 loading。结论明确为 tab-bar-placeholder + z-paging fixed 模式 windowBottom + loading 位置三因叠加，改为 paging-style.bottom = calc(106rpx + env(safe-area-inset-bottom))、关闭 safe-area-inset-bottom、背景统一 #f5f5f5。工作区核实 ZsPaging 存在 pages_main/pages_owner/pages_owner_extra/pages_transaction 四份副本。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages/index/project.vue",
+    "zhi2-mobile-shimin/src/pages_main/components/ZsPaging/ZsPaging.vue",
+    "zhi2-mobile-shimin/src/pages_main/index/project.vue"
+   ],
+   "sessionIds": [
+    "dc3620d1-8787-4997-ad0a-327ea076910f"
+   ],
+   "title": "z-paging 底部白条遮挡 loading：fixed 模式按原生 TabBar 高度二次上缩，与 tab-bar-placeholder 叠加成双层留白",
+   "type": "bug",
+   "bundle": "014.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "微信小程序 uni-data-checkbox 有样式隔离，页面 :deep 改不动；选项间距必须换项目内 ZsRadio",
+   "type": "bug",
+   "content": "情况：苏住房C 市民端（zhi2-mobile-shimin，uni-app 编译到 mp-weixin）在 guardApply 表单里给「是否有电梯」的选项加间距，按普通 CSS 思路在页面样式里写 u-checkbox / .checklist-box / 单选圆圈与文字的间距，改了三轮都「没生效」——图片上传组件的间距改了，单选始终不行。\n为什么：uni-data-checkbox 在小程序端被编译成独立自定义组件，微信小程序的样式隔离使页面 scoped 样式和 :deep 都无法穿透到组件内部节点；能生效的只有全局 uni.scss 里那条 .checklist-box{margin-right:0!important}，所以看起来「怎么改都没反应」，而同一页面里自研组件的间距改动却立刻生效——这正是判断「是否跨了组件边界」的分水岭。\n怎么做：需要精确控制单选/复选样式的地方，不要跟 u-* 组件死磕，直接换成本项目自研的 ZsRadio（产证认证等页已在用），它默认圆圈与文字 10px、选项之间 1em，样式由项目自己掌控；个别页面要加大间距时在页面里传 props 或加包裹类调，而不是去覆盖 u-* 内部类。以后再遇到「改了样式但只有某个控件不变」，先断定它是不是 uni_modules 组件，再决定换组件还是走全局样式。",
+   "evidence": "会话 2d5e45dc（guardApply/index.vue 是否有电梯选项间距）：用户三轮反馈「均未修复」「单选还是不行，运行环境是微信小程序」，最终结论为 uni-data-checkbox 独立组件有样式隔离，页面 :deep 覆盖进不去，仅全局 uni.scss 的 .checklist-box 生效，改为替换成 ZsRadio（圆圈/文字 10px、选项间 1em）。",
+   "files": [
+    "src/pages_guard/guardApply/index.vue",
+    "src/pages_guard/guardApply/components/step1.vue",
+    "src/pages_guard/guardApply/components/step2.vue"
+   ],
+   "baseline": "6aca310",
+   "sessionIds": [
+    "2d5e45dc-c7a7-4161-9f6d-ee9bee35d68d"
+   ],
+   "bundle": "015.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "项目早已移除 vue-router：小程序取路由参数必须 onLoad(options)，useRoute() 返回 undefined 会让按钮「看得见点不动」",
+   "type": "bug",
+   "content": "情况：苏住房C 市民端添加房屋成功页（pages_owner/house/owner/success.vue）点「查看电子业主卡」完全没反应。排查发现该页在 onShow 里用 vue-router 的 useRoute().query 读 isOwner，而项目已移除 vue-router 依赖，小程序端 useRoute() 返回 undefined，读 .query 直接抛 TypeError，isOwner 恒为 false；又因 uni-app 编译产物中插槽内容始终渲染、只有点击事件按 isOwner 条件绑定，于是按钮渲染出来但没挂 handler。\n为什么：老代码从别的端/旧版本残留了 vue-router 取参写法，编译期不报错（运行时才炸），页面也不白屏，只表现为「点了没反应、控制台无接口请求」。\n怎么做：小程序页面一律在 onLoad(options) 里取参并做布尔归一（isOwner = !(!options || !options.isOwner)），不要用 useRoute/useRouter；修复时按 grep 全量清查 src 下 vue-router 引用（本批共 7 个文件：success.vue、house/owner/input.vue、add.vue、pages_owner_extra/elevator/input.vue、addAlone.vue、page-query/managed-property-list.vue、immediate-list.vue），全部改成 onLoad(options)，然后重新 build 并到 dist 产物中确认已编译成 onLoad(e=>...) 再回归。判断「按钮点不动」优先按「渲染无条件、绑定有条件 → 参数为 undefined → 取参用了不存在的 API」这条链查。",
+   "evidence": "会话 880c55cb（添加房屋成功后点查看电子业主卡无效）：根因为 onShow + useRoute().query 在无 vue-router 的项目里抛 TypeError 使 isOwner 恒 false，共改 7 个文件改为 onLoad；验证方式为全局 grep 确认 src 下 vue-router 引用清零 + npm run build 通过 + 核对 dist/pages_owner/house/owner/success.js 产物。",
+   "files": [
+    "src/pages_owner/house/owner/success.vue",
+    "src/pages_owner/authentication/owner/houseSuccess.vue",
+    "src/pages_owner/house/owner/input.vue",
+    "src/pages_owner/house/owner/add.vue",
+    "src/pages_owner_extra/elevator/input.vue",
+    "src/page-query/managed-property-list.vue",
+    "src/pages.json"
+   ],
+   "baseline": "bb6d74a",
+   "sessionIds": [
+    "880c55cb-1f23-4014-9929-32b0c295f89a"
+   ],
+   "bundle": "015.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "消息/微聊列表真机不显示：page{height:100%} 在微信小程序里高度塌陷，改用 calc(100vh - nav-height) 给 ZsPaging 确定高度",
+   "type": "bug",
+   "content": "情况：苏住房C 市民端消息/微聊列表（pages_main/message）模拟器正常、真机空白；按「布局 + 分页」思路加 page{height:100%} 与 message-panel-wrap 后，连模拟器也不显示了。\n为什么：微信小程序里给 page 设 height:100% 会让高度塌陷（页面根节点无确定高度锚点），整条 flex:1 高度链随之断掉；ZsPaging 拿不到确定高度，列表区计算成 0 高，既不报错也不渲染数据，表现为整页空白。\n怎么做：不要在小程序里依赖 page{height:100%} 或 overflow:hidden 撑布局，撤掉包装层还原原页面结构；改用显式算式 height: calc(100vh - var(--nav-height))，在页面 index.vue 里注入 CSS 变量 --nav-height = 状态栏高度 + 44px（自定义导航栏高度）；再把 ZsPaging 包一层 .paging-host 容器并写 :deep(.zs-paging){height:100%}，让分页组件内部滚动区继承到确定高度。改完必须 build:suzhufang:mp-weixin 后在真机验证，并区分「空白 / 只显示顶部 / 显示暂无数据」三种现象再继续定位，不要只看模拟器结论。",
+   "evidence": "会话 86040ce3（pages_main/message/index 真机不显示数据）：用户反馈模拟器可、真机不可，按布局/分页改 page{height:100%} 后双端都空白；结论为 page height:100% 在小程序里高度塌陷断裂 flex 链，改为 calc(100vh - var(--nav-height)) + 注入 --nav-height = 状态栏 + 44px + .paging-host 包 ZsPaging 并 :deep(.zs-paging){height:100%}。",
+   "files": [
+    "src/pages_main/message/index.vue",
+    "src/pages_main/message/message.vue",
+    "src/pages_main/message/chitchat.vue",
+    "src/pages/message/index.vue"
+   ],
+   "baseline": "b7bf813",
+   "sessionIds": [
+    "86040ce3-4045-4591-bad4-02ee7724cc1b"
+   ],
+   "bundle": "015.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "列表图片绑定后端字段（complexPhoto）三件套：ZsImage 远程解析 + rows.map 显式保留 + 后端未填充即回退占位图",
+   "type": "pattern",
+   "content": "情况：决策列表（pages_owner/decision）不显示小区照片，用户要求绑定后端实体里的 complexPhoto 字段。\n为什么：列表页此前写死占位 <image>，且 index.vue 在 rows.map 里重新组装行对象时只挑了部分字段，即使模板绑了 complexPhoto 也拿不到值；而该字段是后端相对路径（/zhi2-pro/...），必须走统一 URL 解析而不是直接塞给 image。\n怎么做：① 模板换成项目内 ZsImage，:src=\"item.complexPhoto\"、:local=\"false\" 让组件走 resolveMediaUrl 解析远程/相对路径；② 在 index.vue 与 elect/index.vue 的 rows.map 中显式保留 complexPhoto，凡重新组装行对象都要逐字段列出，不要依赖自动展开；③ 无图或加载失败统一回退到分包内占位图（images/house_szf.png），保证不出现破图；④ 前端改完必须到 Network 里核对接的 rows[].complexPhoto 是否有值——若为 null/空串，问题在后端 VO 未填充该字段，需要后端补数据而不是继续改前端。",
+   "evidence": "会话 a33c6375（决策列表绑定 complexPhoto 显示项目图片）：DecisionList.vue 由固定占位 image 改为 ZsImage + :src=item.complexPhoto + :local=false 走 resolveMediaUrl，无图回退 pages_vote 分包 images/house_szf.png；decision/index.vue 与 elect/index.vue 的 rows.map 显式保留 complexPhoto；验证含 build 通过与 Network 核对字段是否为空。",
+   "files": [
+    "src/pages_owner/decision/components/DecisionList.vue",
+    "src/pages_owner/decision/index.vue",
+    "src/pages_owner/decision/components/DetailTopCard.vue"
+   ],
+   "baseline": "8520c36",
+   "sessionIds": [
+    "a33c6375-1500-460f-81a1-56831ba1739b"
+   ],
+   "bundle": "015.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "市民端手机号只读展示用原生 input + 公共 .form-plain-input，展示脱敏值与业务完整值分离",
+   "type": "pattern",
+   "content": "情况：注销申请表与改绑手机号页要把手机号字段改为不可编辑展示，要求禁用态字色 #999999；先在 uni-easyinput 上覆盖样式，用户反馈「覆盖没有生效」。\n为什么：uni-easyinput 在小程序端是独立组件、样式隔离，页面里对内部 input 的覆盖进不去；继续在组件层面上打补丁只会反复失败。\n怎么做：① 换原生 <input disabled>，并把禁用态样式沉到全局 src/styles/form.scss 新增 .form-plain-input（#999999、透明背景、高度与 uni-easyinput 对齐），全项目复用一处维护；② 展示与业务分离——模板显示 maskedPhone（脱敏值），form.phone 仍保存完整号码，发码/校验逻辑完全不动；③ 脱敏规则改到公共 formatter（blurPhone/securePhone）里做中间四位，13812345678 → 138****5678，改一处所有使用方同步生效；④ 顺手删掉页面里 phoneInputStyles 等 uni-easyinput 相关覆盖，避免留下死样式。同类「某控件改不动」先判断是否 uni_modules 组件，再决定换原生控件还是走全局类。",
+   "evidence": "会话 82d303e8（cancellationForm.vue / phone.vue 手机号）：用户反馈 uni-easyinput 样式覆盖未生效，最终改为原生 <input disabled> + form.scss 新增 .form-plain-input（#999999/透明背景/高度对齐），formatter.js 的 blurPhone 改为中间 4 位脱敏，展示 maskedPhone、业务仍用 form.phone。",
+   "files": [
+    "src/pages_my/setting/cancellationForm.vue",
+    "src/pages_my/setting/phone.vue",
+    "src/styles/form.scss",
+    "src/utils/formatter.js"
+   ],
+   "baseline": "9cdf7b8",
+   "sessionIds": [
+    "82d303e8-ae20-4dc6-8259-63c006b5fcb0"
+   ],
+   "bundle": "015.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 市民端菜单三层来源：入口页写死 menuList + menuRouteMap 路由码 + 后台 app.suzhufang.config",
+   "type": "fact",
+   "content": "情况：被问「阳光物业 / 公共收益如何配置 URL」，答案不是改某一处，而是三处各有职责。\n为什么：项目同时存在硬编码聚合入口页、后台可配置菜单两套入口；后台菜单下发的是「路由码」而非路径，必须经映射表转成真实页面路径，否则新增页面无从被后台菜单命中。\n怎么做：① 聚合入口页前端写死 menuList（阳光物业 src/pages/property/index.vue，公共收益/共有资金 src/pages/benefit/index.vue），改子菜单跳转直接改每项 url；② 后台菜单/外链用路由码，在 src/utils/menuRouteMap.js 的 MENU_ROUTES 里映射到实际路径（如 3_1_19→/pages/property/index、3_1_18→/pages/benefit/index、1_0_5→/pages_benefit/benefit/index）；新增页面固定两步：pages.json 注册路由 + MENU_ROUTES 增映射；③ 苏住房版首页/慧物业/掌服务 Tab 的菜单来自后台配置键 app.suzhufang.config（GET /system/config/getByKey/app.suzhufang.config，本地兜底 src/static/menus.fallback.json）：url 填路由码不填完整路径，level 是权限等级 v0（无需登录）→v3（需身份认证），levelCode 是身份要求（owner=业主），isShow=\"1\" 表示暂未开放、点击提示 showMsg；改后台 JSON 即可调整入口，无需改前端。",
+   "evidence": "会话 618910fc（阳光物业和公共收益如何配置URL）：给出三层来源——pages/property/index.vue 与 pages/benefit/index.vue 的写死 menuList、src/utils/menuRouteMap.js 的 MENU_ROUTES 路由码映射表（3_1_19/3_1_18/1_0_5/3_1_20/3_1_21），以及后台配置键 app.suzhufang.config 与 static/menus.fallback.json 兜底及 level/levelCode/isShow 语义。",
+   "files": [
+    "src/pages/property/index.vue",
+    "src/pages/benefit/index.vue",
+    "src/utils/menuRouteMap.js",
+    "src/static/menus.fallback.json",
+    "src/pages.json"
+   ],
+   "baseline": "89637fb",
+   "sessionIds": [
+    "618910fc-72c7-406b-887e-dd852e5e6cf5"
+   ],
+   "bundle": "015.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序 CSS 背景图不能用内联 :style 绑定 backgroundImage 拼 url()，改用 PageBg 组件",
+   "type": "pattern",
+   "content": "情况：8 月重构「我的房屋」时，house/index.vue 与 TypeChoose_Suzhufang.vue 把设计稿里的装饰背景图从样式类改成了内联 :style=\"{ backgroundImage: `url(${...})` }\" 绑定，微信开发者端整块背景消失（城市剪影底图、白色胶囊底图、蓝色弧形表头都不出来），H5 侧看起来却可能正常。为什么：小程序渲染层的元素 style 绑定对 background-image + url() 支持不完整，且相对路径不会被 Vite 处理，运行时被拼成页面相对路径或直接丢弃，控制台不一定报错，表现为「样式突然没了」。注意这不是「内联 style 一律不可用」——53/062 两个会话里内联 backgroundImage 承载 data:image/svg+xml 水印是可行的修复，区别在于它由项目工具函数生成、不依赖相对资源路径；真正要禁的是「手拼 url(相对/静态资源路径)」。怎么做：装饰性背景统一改用项目已有的 PageBg 组件（src/components/PageBg/PageBg.vue，传相对资源路径，内部走静态资源解析），固定尺寸的横幅要给它一个定高外层（同类坑见「PageBg 默认 inset:0 + cover 被 flex:1 容器拉满」）；tenant/index.vue 等兄弟页同批改成同一方案，避免一个页面两种画法。",
+   "evidence": "会话 41740334（2026-08-25，基线 5f0f4dc）用户报「我的-我的房屋，历史添加记录，缺少样式，前往添加页面缺少表头样式」，结论明确：house/index.vue 把 CSS 背景图改成内联 :style 绑定（backgroundImage: url(...)），「微信小程序对此支持不好，城市剪影背景和白色胶囊底图无法显示」；TypeChoose_Suzhufang.vue 重构时还顺带丢了 ZsNav 导航栏。修复为三页统一 PageBg。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/house/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/components/TypeChoose_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages_owner/tenant/index.vue",
+    "zhi2-mobile-shimin/src/components/PageBg/PageBg.vue"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "41740334-7cda-42d7-b1c3-97712e6c8e6a"
+   ],
+   "bundle": "016.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "投票选举页 recordId 只从 decisionOptionResponseList[0] 取：选举场景该数组为空，候选人整块不渲染",
+   "type": "pattern",
+   "content": "情况：pages_vote/elect/DecisionResult 的「最近一次选举」空白。为什么：取数逻辑只从 decisionOptionResponseList[0] 读 decisionResponseId 当 recordId，而选举场景下接口常把记录放在 decisionOptionResponseAllList，decisionOptionResponseList 为 null 或元素不带响应 ID，于是 recordId 为空、候选人列表接口压根没发。与已提炼的「decisionPlayerName 缺失」是不同根因：那些修的是姓名/分组，这次是主键来源，症状同为页面空白。怎么做：recordId 解析改为双源合并——先遍历 decisionOptionResponseAllList 取 decisionResponseId（同时顺便汇总去重，合并重复记录时按 decisionResponseId 分组），为空再降级 decisionOptionResponseList；两者都拿不到 recordId 时不要把候选人区域留成纯空，用 decisionOptionResponseList 里的选项名直接兜底展示。同模块的 decision/*/DecisionResult 共用这套解析，改动应落到共享的工具/构造器而不是只补 elect 一处，否则下一类表决又会复发。",
+   "evidence": "会话 aa7c3d25（2026-08-27，基线 f1939b0）用户报「最近一次选举没展示，选举记录里面选举人姓名没展示」，根因第 1 条：只从 decisionOptionResponseList[0] 取 decisionResponseId，选举场景该列表可能为空或没有响应 ID，而 decisionOptionResponseAllList 里才有记录，导致 recordId 为空、候选人列表无法加载；修复含 allList 汇总 decisionResponseId、无 recordId 时用 decisionOptionResponseList 兜底。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/common/DecisionResult.vue",
+    "zhi2-mobile-shimin/src/api/autonomy.js"
+   ],
+   "baseline": "f1939b0",
+   "sessionIds": [
+    "aa7c3d25-bd1a-4ca4-bb8f-8c55d6730cc6"
+   ],
+   "bundle": "016.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "记录详情补姓名要选对接口：getDecisionRecordDetail 不返回 decisionPlayerName，应优先 getAppRecordDetail",
+   "type": "pattern",
+   "content": "情况：选举记录列表左侧选举人姓名一直空白，接口列表里也没有该字段，只能靠详情接口补。为什么：同类页面里存在两个记录详情接口——getDecisionRecordDetail 与 getAppRecordDetail（决策模块的 DecisionRecord 一直在用后者），选举场景下前者可能不返回 decisionPlayerName，单纯切接口就能解决，而不是继续在列表层堆字段映射（历史上已反复在 label/value/remark 映射和 ...record 展开覆盖上改过几轮）。怎么做：记录列表的补全统一走 getAppRecordDetail 优先、getDecisionRecordDetail 兜底；姓名取值写多候选兜底（decisionPlayerName / username / realName 等），因为脱敏与命名字段在两端返回里不统一；补全时只填缺失字段，不要让异步详情对象整体展开覆盖列表已算好的姓名（这是之前反复复发的那个次要根因）。新写同类页面时直接照抄这条链路，避免又一次「列表只有时间」。",
+   "evidence": "会话 aa7c3d25（2026-08-27，基线 f1939b0）根因第 2 条：列表只用 getDecisionRecordDetail 拉详情，该接口可能不返回 decisionPlayerName，应优先用 getAppRecordDetail（与 DecisionRecord 一致），同时从 allList 汇总 decisionResponseId；修改含按 decisionResponseId 合并重复记录、扩展姓名解析字段（username、realName 等）。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/common/DecisionRecord.vue",
+    "zhi2-mobile-shimin/src/api/autonomy.js"
+   ],
+   "baseline": "f1939b0",
+   "sessionIds": [
+    "aa7c3d25-bd1a-4ca4-bb8f-8c55d6730cc6"
+   ],
+   "bundle": "016.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "选举详情「非分组」分支取错字段：selects.rows 应为 selectOptions",
+   "type": "pattern",
+   "content": "情况：修完「最近一次选举」空白后，顺带发现非分组选举的详情页（ResultDetail.vue / ResultRecord.vue）候选人也整块不显示，且没有任何报错。为什么：详情组件按「是否分组」走两套数据，分组分支读的是 selects.rows（列表接口包装），非分组分支却沿用了同一写法，而该分支的数据实际在 selectOptions 上，取到一个 undefined 数组后 v-for 渲染为零条，页面表现就是「什么都没有」。这类「同组件两条分支、其中一条是复制来的」是投票/选举模块的重复踩点。怎么做：改前先确认当前走的是哪条分支（decisionType 分组与否），把非分组分支的取数统一改成 selectOptions 并给空值兜底；改完两条分支都要各自验证一遍，不要只测出问题的那一种；同类 DecisionResult/ResultDetail/ResultRecord 副本一并复核，避免残留。",
+   "evidence": "会话 aa7c3d25（2026-08-27，基线 f1939b0）修改内容第 2 组：「ResultDetail.vue / ResultRecord.vue —— 非分组选举时，将错误的 selects.rows 改为 selectOptions（否则非分组选举详情候选人也不显示）」。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_vote/elect/ResultRecord.vue",
+    "zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue"
+   ],
+   "baseline": "f1939b0",
+   "sessionIds": [
+    "aa7c3d25-bd1a-4ca4-bb8f-8c55d6730cc6"
+   ],
+   "bundle": "016.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "页面自己弹业务弹窗时，核验类接口必须让 API 层带 noReject，拦截器会抢先弹 toast + reject 吞掉页面逻辑",
+   "type": "pattern",
+   "content": "情况：添加房屋（按合同/产权证）核验失败时，设计稿要求弹出的「添加失败 → 人工登记 / 重试」弹窗始终不出现，用户只看到底部 toast 一闪而过，于是「人工登记入口不见了」。为什么：全局 HTTP 拦截器对 code!=200 的响应会统一 showToast 并 reject，页面的 .then 里的 showPopup = true 永远执行不到；页面也没写 .catch，连错误分支都进不去。与「noReject 返回结构解析」不是同一层问题：这里是拦截器抢先处理导致 UI 分支不可达。怎么做：凡是「失败也要走页面自定义 UI」的接口，在 api 层默认带 noReject: true（如 handleHouseOwner），页面拿到 normalized 响应后自己判 code；所有调用方都要补 code 判断与 .catch() 兜底，不能继续假设 then 只收到成功；业务弹窗组件（ZsPopup）移到页面根级、补 z-index，并用 immediate watch + nextTick 打开以兼容 H5/政务容器。新增同类核验接口时先问一句「失败要不要弹窗」，要就默认 noReject。",
+   "evidence": "会话 0e3de74d（2026-09-28，基线 2c4e3d9）用户报「我的房屋-添加房屋，人工登记的弹窗入口不显示」，根因结论：核验失败时全局 HTTP 拦截器先弹 Toast 并 reject，页面里 showPopup = true 无法执行。修复含 httpInstance.js 的 noReject 分支直接 return response、property.js 的 handleHouseOwner 默认 noReject、多个调用方补 code 判断与 showToast。",
+   "files": [
+    "zhi2-mobile-shimin/src/api/httpInstance.js",
+    "zhi2-mobile-shimin/src/api/property.js",
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/addHouseContract.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/owner/addHouse.vue",
+    "zhi2-mobile-shimin/src/components/ZsPopup/ZsPopup.vue"
+   ],
+   "baseline": "2c4e3d9",
+   "sessionIds": [
+    "0e3de74d-cc4d-4e34-8770-dd23e2757471"
+   ],
+   "bundle": "016.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "主包上传预估贴边时，先查 MAIN_STATIC_PATHS 里多余的兜底图，分包有的图不要进主包白名单",
+   "type": "pattern",
+   "content": "情况：修完苏找房房源图空白后重新构建，主包构建失败，上传预估 2057.4KB 超 2048KB 上限约 9KB。为什么：为修图片空白把 images/szf/default.png（约 16KB）加进了主包白名单 src/utils/mainStaticPaths.js，而该白名单会让 scripts/prune-main-static.mjs 跳过裁剪、文件常驻主包；可它只是 pages_transaction 场景的兜底图，分包里本来就有一份，两份等于白占 16KB。注意这与已知的「主包体积要按 dist/build 产物统计」「白名单让资源走主包路径」是不同性质的踩点：这次是白名单反过来吃掉体积预算。怎么做：定位到具体文件后把该项从 MAIN_STATIC_PATHS 移除并删主包副本、恢复 houseCard 的 subpackage=\"pages_transaction\" 让兜底图从分包加载（配合 pages.json 里苏找房 Tab 预加载该分包，不再有 500）；改完必须重跑 size 脚本核对磁盘体积（1742.2KB）与上传预估（2038.4KB×1.17）。经验：主包预算紧张时，凡是分包里已有的兜底/占位图一律不进白名单，宁可让它走 subpackage 预加载。",
+   "evidence": "会话 dbea5b5a（2026-08-31，基线 0cea241）结论：主包构建失败是因为上传预估体积超过 2048KB 限制（2057.4KB）；原因是上次把 images/szf/default.png（约 16KB）加入 MAIN_STATIC_PATHS，导致该文件无法被 prune-main-static.mjs 裁剪；调整后磁盘 1742.2KB、上传预估 2038.4KB。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/mainStaticPaths.js",
+    "zhi2-mobile-shimin/scripts/prune-main-static.mjs",
+    "zhi2-mobile-shimin/src/components/commonNew/houseCard.vue",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "baseline": "0cea241",
+   "sessionIds": [
+    "dbea5b5a-3444-443d-a782-07bd1b65d66e"
+   ],
+   "bundle": "016.md",
+   "project": "苏住房C"
+  }
+ ]
+}

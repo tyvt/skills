@@ -1,0 +1,129 @@
+{
+ "project": "淮安物管",
+ "batch": 3,
+ "files": [
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "[淮安物管] DictTag 只认 dictValue/dictLabel 时出现「有底色无文字」空标签：与 detail-template 对齐 value/label",
+   "type": "bug",
+   "content": "【什么情况】详情里 type=tag 的字段（如物业合同「物业类型」）出现只有 `el-tag` 底色、没有文字；`detail-template` 的 `getItemValueDisplayString` 已能识别有值，但页面上仍是空标签。\n\n【为什么】业务下拉/字典接口常返回 `value`/`label`（如 `propertyTypeOptions` 来自 `response.data`），而 `dict-tag.vue` 原先只在 `findOption` 里读 `dictValue`/`dictLabel`。对不上时 `getLabel` 为空却仍渲染 `el-tag`；父级 `hasTagRenderableValue` 与 `detail-template` 已支持双口径，问题集中在 `DictTag`。\n\n【怎么做】在 `dict-tag.vue` 统一与 `detail-template`：① `optVal`/`optLabel`/`findOption` 同时支持 `dictValue`/`dictLabel` 与 `value`/`label`；② `rawDictParts` 解析空串、`[]`、逗号分隔、数组，避免 `String([])` 生成伪空项；③ `tagDisplayList` 只渲染有展示文案的项，`resolveDisplayText` 未命中字典时用原始码兜底，禁止空内容标签。根因在公共组件，勿在单个 `propertyContract/components/detail.vue` 打补丁。\n\n【验收】合同详情物业类型等走接口 options 的 tag 字段应显示中文标签；字典项为空时应显示 `-` 或不渲染空 tag（与产品约定一致）。",
+   "evidence": "会话 0063c43c（2026-05-13，基线 6374366）：用户反馈 detail-template 空 tag 应展示 `-`，且 propertyContract 物业类型仍显示空 tag 颜色；结论为 dict-tag 与 detail-template 双口径不一致，在 dict-tag.vue 完成上述三处改造。",
+   "files": [
+    "zhi2-web-admin/src/components/dict-tag/dict-tag.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/views/property/propertyContract/components/detail.vue"
+   ],
+   "baseline": "6374366",
+   "sessionIds": [
+    "0063c43c-fc2e-49bb-afad-13adaef1e7f5"
+   ],
+   "bundle": "011.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] 监管账户开户申请详情：查看模式应始终展示银行账号字段（勿被 accountOpenType 隐藏）",
+   "type": "bug",
+   "content": "【什么情况】公共收益「开户申请」通过普通新增创建后，详情页「管理银行」区块看不到「银行账号」「银行账户名称」，但列表/编辑预期应能查看（尚未回传时可为空）。\n\n【为什么】`benefit/pubRegulatoryAccount/detail.vue` 用 `showRegulatoryAccountFields` 控制展示：查看模式下原先仅在已填账号或 `accountOpenType === '1'`（已开户备案）时显示。新增单 `accountOpenType` 为 `'0'` 且无账号时，查看页把两字段整块隐藏，易被误判为接口未返回。\n\n【怎么做】区分模式：`formMode === 'view'` 时始终渲染银行账号、银行账户名称（位于「网点联系电话」与「备注」之间）；编辑/新增仍按原 `showRegulatoryAccountFields` 业务条件控制是否可编辑/是否展示输入项。勿在查看态用「有无账号」反推整块隐藏。\n\n【验收】刷新后打开新增开户申请详情，应固定出现银行账号相关行；有值则展示，无值留空而非整块缺失。",
+   "evidence": "会话 4d35ab61（2026-07-01，基线 22a1d9d）：用户报开户申请详情无银行账号和账户名称；结论为 showRegulatoryAccountFields 在 accountOpenType=0 时误藏查看态字段，改为 view 模式始终显示。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/detail.vue"
+   ],
+   "baseline": "22a1d9d",
+   "sessionIds": [
+    "4d35ab61-aca0-48ea-856a-b970e5251900"
+   ],
+   "bundle": "011.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] 公共查询楼幢表与物业管理楼幢范围表列对齐：同接口补 houseObligeeNums、userIdentityNums",
+   "type": "workflow",
+   "content": "【什么情况】公共查询→楼盘/楼幢信息与物业管理模块楼幢范围表字段不一致，设计稿或物业侧已有「权利人数」「业主认证数」，公共查询缺列。\n\n【为什么】两模块共用 `property/complexRange`（或同源 range 接口），后端已返回 `houseObligeeNums`、`userIdentityNums`，物业管理 `houseTable.vue`/`rangeTable.vue` 已展示，公共查询 `publicQuery/complex/components/buildingTable.vue` 未补列导致「有数据不显示」。\n\n【怎么做】① 对照物业管理模块列顺序，在公共查询楼幢主表「房屋套数」后增加「权利人数」「业主认证数」；② 楼幢下「房屋清单」弹窗表同步补列；③ 列名与物业模块保持一致（本项目为「业主认证数」，非口语「业主房屋数」），避免同一字段两套文案。改列即可，无需新接口。\n\n【验收】公共查询楼幢列表与弹窗与物业模块同字段可见；接口响应含上述 key 时单元格有数。",
+   "evidence": "会话 174955b1（2026-06-22，基线 f125763）：用户贴图对比物业与公共查询楼幢表；结论在 buildingTable.vue 主表与房屋清单弹窗补两列，说明与物业共用接口且命名按现有代码「业主认证数」。",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/complex/components/buildingTable.vue",
+    "zhi2-web-admin/src/views/property/complex/components/houseTable.vue",
+    "zhi2-web-admin/src/views/property/complex/components/rangeTable.vue"
+   ],
+   "baseline": "f125763",
+   "sessionIds": [
+    "174955b1-df1e-4c56-a062-2ea74962d90d"
+   ],
+   "bundle": "011.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] 企业变更详情变更角标：contentInfo 补 field，行政区域用 changeCompareValue 按展示名对比",
+   "type": "workflow",
+   "content": "【什么情况】行业管理→企业变更详情查看页需要与「物业管理区域备案变更」一致的字段级变更角标（红三角 + 悬停「原值：xxx」），而非仅弹窗变更记录。\n\n【为什么】`DetailTemplate` 依赖 `change-before-object` 与每项 `field` 与 `beforeForm` 对齐；企业变更 `contentInfo` 若缺 `field` 无法 diff；行政区域若比编码与比展示文案不一致会误报/漏报。与 b001/b002 已收录的「变更记录弹窗」「审核后数据源」「空→有值 hasChangeIndicator」互补，本条是查看态接入与特殊字段对比口径。\n\n【怎么做】① `companyManagement/components/detail.vue` 查看模式给 `DetailTemplate` 传 `:change-before-object=\"changeBeforeObject\"`（变更单 `beforeForm`/原备案）；② 为 `contentInfo`、`contentInfo2` 各展示项补 `field` 与 `beforeForm` 键一致；③ 行政区域项配置 `changeCompareValue` + `formatDisplay`，按区划名称对比，避免代码与中文名不一致；④ 开户行 `bankTable` 等子表区块若产品未要求可暂不接入角标。编辑模式原有 `v-tooltip` 标注保持不变。\n\n【验收】企业变更查看页有改动的普通字段出现角标；行政区域仅名称变化时也能标出；交互与 complexChange 详情一致。",
+   "evidence": "会话 f45bc30e（2026-06-23，基线 57275a6）：用户要求企业变更详情查看模式接入与物业区域备案变更一致的变更标注；结论修改 companyManagement/components/detail.vue，说明 field 映射、changeCompareValue 行政区域及 bankTable 暂不标注。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/detail.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/views/property/complexChange/detail.vue"
+   ],
+   "baseline": "57275a6",
+   "sessionIds": [
+    "f45bc30e-eb05-440a-9547-d0e8fa741293"
+   ],
+   "bundle": "011.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] 公共查询物业管理区域详情：收益等能力前置健康检查走 checkServiceHealth 工具",
+   "type": "pattern",
+   "content": "【什么情况】公共查询「物业管理区域」详情（`publicQuery/complex/detail.vue`）在进入收益相关能力前需要确认后端 `benefit` 等服务可用；页面内联 `$get('/services/health')` + `console.log` 会在 cherry-pick/合并时与新版 `DetailTemplate`、区域概览 UI 冲突。\n\n【怎么做】① 抽 `src/utils/serviceHealth.js`，封装 `checkServiceHealth(serviceKey)`（如 `'benefit'`），统一请求路径与成功/失败处理；② 详情页只调用工具函数，不在页面散落健康检查与调试日志；③ 合并冲突时保留新版详情骨架（`DetailTemplate`、区域概览），健康检查逻辑以工具为准接入。\n\n【与已知差异】子模块 cherry-pick 流程见苏房/产品2.0 多条已知；本条是淮安公共查询详情上「按服务 key 前置探活」的落点文件与调用约定。",
+   "evidence": "会话 4044f12f（2026-06-15，基线 21fdd30）：子模块 cherry-pick 冲突于 publicQuery/complex/detail.vue；结论保留 DetailTemplate 新版 UI，新增 serviceHealth.js，页面改用 checkServiceHealth('benefit') 并去掉内联 API 与 console.log。",
+   "files": [
+    "zhi2-web-admin/src/utils/serviceHealth.js",
+    "zhi2-web-admin/src/views/publicQuery/complex/detail.vue"
+   ],
+   "baseline": "21fdd30",
+   "sessionIds": [
+    "4044f12f-3d1d-4702-ab5c-7bcb36518e2d"
+   ],
+   "bundle": "012.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] 物业数据大屏全屏后排名区留白：列表勿写死高度，沿卡片 flex 链撑满并用 ResizeObserver 算可见行",
+   "type": "bug",
+   "content": "【什么情况】物业管理大屏（`property/dashboard`）全屏后，左侧「项目负责人技能等级排名」等卡片变高，但列表底部仍大片空白。\n\n【为什么】`rankingList.vue` 的 `.ranking-list-box` 写死 `height: 160px`（约 5 行）；父级 grid 已用 `grid-template-rows: 1fr` 拉高卡片，列表高度不跟涨。滚动动画若固定用「行数 > 5」判断，全屏后可见行数变大仍会误判。\n\n【怎么做】① `baseCard.vue`：卡片 `height: 100%` + 纵向 flex，内容区 `flex: 1`；② `rankingList.vue`：列表区 `flex: 1` + `min-height: 160px`（非全屏保底），`ResizeObserver` 按容器实际高度算可见行数，仅当数据行数超过可见行才开滚动动画；③ `dashboard/index.vue`：排名卡片加 `ranking-card`，`content-box` 设 `min-height: 0` 让 grid 子项高度向下传递。大屏/数据看板同类组件（如 `largeScreen` 下 rankingList）改法一致。\n\n【与已知差异】#1619（园区物管2.0）是 grid 子项 `align-items:start` 未 stretch；#1566 是排名无缝滚动套路。本条是「子列表写死像素高 + 固定行数阈值」在全屏 grid 下的组合根因。",
+   "evidence": "会话 fe8e0d01（2026-06-29，基线 53c813e）：用户截图反馈全屏后技能等级排名未填满；结论定位 160px 固定高，改 baseCard/rankingList/index 的 flex 链与 ResizeObserver 行数判断。",
+   "files": [
+    "zhi2-web-admin/src/views/property/dashboard/index.vue",
+    "zhi2-web-admin/src/views/property/dashboard/components/baseCard.vue",
+    "zhi2-web-admin/src/views/property/dashboard/components/rankingList.vue",
+    "zhi2-web-admin/src/views/property/largeScreen/components/rankingList.vue",
+    "zhi2-web-admin/src/views/property/largeScreen/index.vue"
+   ],
+   "baseline": "53c813e",
+   "sessionIds": [
+    "fe8e0d01-94c7-4681-a866-26e1177ed9e4"
+   ],
+   "bundle": "012.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] 产品约定：审批流无撤回，「我发起的」列表仅保留详情入口",
+   "type": "preference",
+   "content": "【约定】与产品确认后，本系统审批流不提供撤回能力；工作中心「我发起的」流程列表操作列只保留「详情」，不得再展示红色「撤回」按钮或恢复 `withdraw` 方法、确认弹窗及对应接口调用。\n\n【落点】`zhi2-web-admin/src/views/flowable/process.vue`：移除撤回按钮与 `withdraw` 逻辑，清理仅撤回使用的 `approvalApi` 字段与 `request` 引用。若后端仍暴露撤回接口，前端也不接入。\n\n【与已知差异】已知 #1398（园区公共收益）是撤回接口 405 与 approvalApi 拼路径错误；本条是淮安产品线明确去掉撤回 UI 与交互，非接口修复。",
+   "evidence": "会话 be4bab56（2026-07-06，基线 3e560be）：用户要求去掉首页-我发起的-详情后的撤回功能；结论在 process.vue 删除撤回按钮、withdraw 及相关依赖。",
+   "files": [
+    "zhi2-web-admin/src/views/flowable/process.vue"
+   ],
+   "baseline": "3e560be",
+   "sessionIds": [
+    "be4bab56-9079-4992-8e5c-bae30f830c62"
+   ],
+   "bundle": "012.md",
+   "project": "淮安物管"
+  }
+ ]
+}

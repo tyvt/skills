@@ -1,0 +1,77 @@
+{
+ "project": "苏住房C",
+ "batch": "007",
+ "files": [
+  "007.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "全局排查一下按钮问题，padding和width很多",
+   "type": "fact",
+   "content": "这次做了**一类问题的全局修复**，不再逐页打补丁。 ## 根因 小程序里 `ZsButton` 是自定义组件，页面 **scoped 样式**（如 `.btn-login { display: block }`）作用不到组件内部的 `<button>`，所以 width/padding/margin 大量失效。登录按钮只剩文字宽度，就是典型表现。 ## 全局方案 新增 [`styles/zs-button.scss`](d:/repository/苏住房C/zhi2-mobile-shimin/src/styles/zs-button.scss)，在 `uni.scss` 中全局引入，统一维护所有按钮布局规则： | 场景 | 规则 | |------|------| | **默认尺寸**（非 mini） | 自动 `width: 100%`，覆盖登录、提交等主按钮 | | **mini** | 保持 `inline-flex` + 自适应宽度，用于列表操作 | | **`.btn-login`** | 全宽 + 上下间距 | | **底部固定栏** | `.page-button-container` / `.submit-button-wrapper` 内全宽 | | **并排双按钮** | `.button-group` / `.btn-container` 内固定 `300",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "[`styles/zs-button.scss`](d:/repository/苏住房C/zhi2-mobile-shimin/src/styles/zs-button.scss",
+    "`uni.scss",
+    "`zs-button.scss",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsButton\\ZsButton.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\uni.scss、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\styles\\btn.scss、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\App.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2a76ac67-47ce-4046-a986-f88a0614d57f"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "这里为什么要单独整理一份，我现在@zhi2-mobi",
+   "type": "fact",
+   "content": "已修复，根因是 **H5 下自定义遮罩层（`z-index: 996`）把日期选择器弹层挡在了下面**，所以点击看起来完全没反应。 **本次改动：** 1. 去掉自定义 `period-overlay` 遮罩 2. 日期区间弹窗改用 `uni-popup`（与「类型」选择一致，`tenant/index.vue` 里已验证可与日期组件配合） 3. 自定义日期改用项目封装的 `ZsDatePicker`（`type=\"range\"`），点击即可弹出日期区间选择器 **操作路径：** 明细 → 日期区间 → 选「自定义」→ 点击「开始日期 - 结束日期」区域 请刷新页面后再试。如果仍无反应，告诉我具体是「日期区间」弹窗打不开，还是选了「自定义」后日期选择器打不开。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`uni-popup`（与「类型」选择一致，`tenant/index.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\menuRouteMap.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\menuNav.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\redirect\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c2002207-e827-4fb1-95af-8409ac89d1b0"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "没有做防抖，登录可以连续点击，所有调用接口的按钮都做",
+   "type": "bug",
+   "content": "已修复。`input.vue` 里 `useSubmitLock` 被重复 import 了两次（第 61 行和第 71 行），同时还混在变量声明中间。 我已去掉重复 import，并把 import 语句整理到文件顶部。重新编译后这个报错应会消失。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "已修复。`input.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\login\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsButton\\ZsButton.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "90f801fd-16cc-4974-98c1-c375232f80c4"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏服办相关的请求头好像没有加上",
+   "type": "fact",
+   "content": "从你贴的日志看，**请求组装是正确的**，问题不在前端代码逻辑。 ## 日志分析 | 项 | 你的值 | 状态 | |----|--------|------| | `interface_id` | `szffluzm-yhcq` | GET 接口 ✓ | | `zs-path` | `/system/config/getByKey/app.suzhufang.config` | 路径正确 ✓ | | `sign` / `zs-sign` | 均有值 | 签名正常 ✓ | | `Content-Type` | `x-www-form-urlencoded` | 格式正确 ✓ | | 响应 | `404 请求接口不存在` | **苏服办平台层拒绝** | `404 请求接口不存在` 是**苏服办开放平台**返回的，表示网关找不到 `szffluzm-yhcq` 这个 GET 接口（未上架或 ID 不对），不是业务后端的路径错误。 ## 已做修改 1. **`header` 增加 `zs-method: GET`**，让后端在走 POST 接口时能识别真实 HTTP 方法 2. **新增环境变量** `VITE_APP_SFB_GET_VIA_POST_INTERFACE = 1`（已在 production/test 开启） - GET 请求改走 `szffluzm-whyhxx`（",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`/system/config/getByKey/app.suzhufang.conf",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\app.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\httpInstance.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\dispatcher.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\sfb.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fdcfee4e-6023-4d73-9f92-442adf4614ff"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,250 @@
+{
+ "project": "2-0",
+ "batch": 3,
+ "files": [
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md"
+ ],
+ "count": 15,
+ "memories": [
+  {
+   "title": "BuildingTable 弹窗打开时单元表头全选不回显",
+   "type": "bug",
+   "content": "[产品2.0] 楼盘表 BuildingTable 单元表头 el-checkbox 若只用 `:value` 绑定 `isUnitChecked`，弹窗带入已勾选 `tableData` 时表头不会刷新。应改为 `v-model` 绑定独立响应式对象 `unitCheckState[unit.unitId]`，并用 `watch tableData`（deep + immediate）调用 `syncUnitCheckState()` 按 `isUnitChecked` 写回；房屋 `checked` 需同时认可 `=== 1` 与 `== '1'`，半选仍走 `indeterminate`。",
+   "evidence": "会话结论：「Element UI 的 el-checkbox 在单独使用时，主要靠 v-model 更新显示，仅用 :value 可能不会刷新视图」；弹窗打开场景用户二次反馈未生效后按 data+watch 修复。",
+   "files": [
+    "zhi2-web-admin/src/views/components/BuildingTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c16817a9-7cdf-427a-b135-24efd6fe2d95"
+   ],
+   "bundle": "011.md",
+   "project": "2-0"
+  },
+  {
+   "title": "zs-dialog 内多段内容被 flex 横排拆列",
+   "type": "pattern",
+   "content": "[产品2.0] `zs-dialog` 内部 `.dialog-box` 默认 `display:flex`（row）。图例、户室网格等若作为多个直接子节点，会横向并排且格子被拆成多列，表现为竖排数字与图例叠在一起。修法：用一层 `div.form-box`（如 `building-table-dialog__body`）包住全部内容，并设 `display:block; width:100%; box-sizing:border-box`，使 `.dialog-box` 仅有一个 flex 子项。",
+   "evidence": "BuildingTableDialog 改版后用户反馈「排列样式混乱」；根因定位为 dialog-box 横向 flex。",
+   "files": [
+    "zhi2-web-admin/src/views/building/unit/components/BuildingTableDialog.vue",
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cfe6a302-a8b9-458e-87b5-0eebd38dbcd3"
+   ],
+   "bundle": "011.md",
+   "project": "2-0"
+  },
+  {
+   "title": "Vue3 迁移：全局禁用 this.$set",
+   "type": "workflow",
+   "content": "[产品2.0] 升级到 Vue 3 后选项式组件里调用 `this.$set` 会报 `this.$set is not a function`（如 RecursiveMenu.updateMenuState）。应对全仓库批量改为对已有响应式对象/数组的直接赋值或替换，侧边栏菜单、表格、多级表单、弹窗等需一并扫净。",
+   "evidence": "RecursiveMenu.vue:173 堆栈；用户要求「全局修改」。",
+   "files": [
+    "zhi2-web-admin/src/layout/components/RecursiveMenu.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "493b9fee-985b-412b-b70e-0415a8d267a2"
+   ],
+   "bundle": "011.md",
+   "project": "2-0"
+  },
+  {
+   "title": "Vue3 表格列插槽语法与 zs-table-column 宽度计算",
+   "type": "bug",
+   "content": "[产品2.0] 迁移 Vue 3 时须把 `slot=\"header\"`/`slot-scope` 等旧写法改为 `#header`、`#default`；`zs-table-column` 在插槽未正确挂载时 `computedWidth` 会读 `undefined.column` 抛错。表格相关组件（含 `zs-operate-column`、下拉 `dropdown` 插槽）应优先批量改语法后再验编译。",
+   "evidence": "zs-table-column.vue:109 Cannot read properties of undefined (reading 'column')；用户要求「插槽新语法全局搜索修复」。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/components/zs-operate-column/zs-operate-column.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "56daed33-b372-4f48-a73c-1d78207c080e"
+   ],
+   "bundle": "011.md",
+   "project": "2-0"
+  },
+  {
+   "title": "OperationBtnGroup 读取路由 meta.busCode 须安全访问",
+   "type": "bug",
+   "content": "[产品2.0] `OperationBtnGroup` 等组件若直接读 `router.currentRoute.meta.busCode`，在 meta 未就绪或路由切换瞬间会 `Cannot read properties of undefined (reading 'busCode')`。应改为可选链或等价守卫（如 `router.currentRoute?.meta?.busCode`），并对同类 `this.$route.meta.xxx` 做全局排查。",
+   "evidence": "index.vue:140 报错；用户要求「全局修复类似问题」。",
+   "files": [
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "11afbbee-3388-4e8f-8411-f15186e36c48"
+   ],
+   "bundle": "011.md",
+   "project": "2-0"
+  },
+  {
+   "title": "zs-date-picker Vue3 v-model 必须走 props 而非 $attrs",
+   "type": "bug",
+   "content": "[产品2.0] 搜索表单项用 `<component :is=\"zs-date-picker\" v-model=\"queryParams[...]\">` 时，Vue 3 的 `modelValue` 在 props 上而不在 `$attrs`。若 `zs-date-picker` 只在 `$attrs` 读写，选中值无法回填且不会 emit `update:modelValue`。应显式声明 `modelValue`（并兼容旧 `value`），计算属性 getter 优先 `modelValue`，setter 同时 `$emit('update:modelValue')` 与 `update:value`；范围选择继续用 `update:start`/`update:end`。",
+   "evidence": "zs-search-form/SearchFormItem 动态组件 v-model；对比 SearchFormItem 示例仍不生效后改组件 props。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-date-picker/zs-date-picker.vue",
+    "zhi2-web-admin/src/components/zs-search-form/SearchFormItem.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0c3557ae-26cf-42a4-8a27-e0d0002a07b4"
+   ],
+   "bundle": "011.md",
+   "project": "2-0"
+  },
+  {
+   "title": "Vite 构建误解析带 slot 的模板节点",
+   "type": "bug",
+   "content": "[产品2.0] `npm run build` 可能把模板里带 `slot` 的节点（如 `<div slot=\"footer\">`、模板内嵌 `<zs-select-dialog>` 的 slot 子树）当成独立模块请求并错误当 JS 解析。修法：选择弹窗改用 `SelectDialog.open()` + `columns` 配置；footer 用 `<template #footer>`（或 `<template slot=\"footer\">` 包裹）避免裸 div slot；并修正模板内明显语法错误（如 `\"options\": this.[...]`）。",
+   "evidence": "feeCustomTypeDialog、initiation/detail 等修完后 build exit 0；原因说明为 slot 节点被错误提取。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/budget/components/feeCustomTypeDialog.vue",
+    "zhi2-web-admin/src/views/maintenance/final/components/feeCustomTypeDialog.vue",
+    "zhi2-web-admin/src/views/maintenance/initiation/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "69747f30-d768-4dea-bd2e-d230f2593e18"
+   ],
+   "bundle": "011.md",
+   "project": "2-0"
+  },
+  {
+   "title": "产品2.0 弹窗显隐统一 v-model 与 modelValue",
+   "type": "pattern",
+   "content": "[产品2.0] 业务弹窗统一父组件写法 `v-model=\"xxxVisible\"`，不再使用 `v-model:visible`。`zs-dialog` 增加 `modelValue`，内部 `dialogVisible = modelValue ?? $attrs.visible`（迁移期可短暂兼容），关闭 emit `update:modelValue`；子弹窗、`dialogMixins`、`zs-select-dialog`、`zs-sort-dialog` 等同步 `modelValue`/`update:modelValue`，批量把 `update:visible` 改为 `update:modelValue`。用户明确要求制单/流程类抽屉「不要兼容 visible」时，组件只保留 `modelValue` 单通道。",
+   "evidence": "Navbar 改密弹窗打不开后全局改 v-model；attachmentDraw 去掉 visible 兼容。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue",
+    "zhi2-web-admin/src/mixins/dialogMixins.js",
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/attachmentDraw.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9385abcc-fd97-45d9-bf1e-ac59ebef7392",
+    "fd343572-63de-4aa9-8903-f1792cb37580"
+   ],
+   "bundle": "011.md",
+   "project": "2-0"
+  },
+  {
+   "title": "Playwright PC 三浏览器全量 E2E：video 全开、Windows 不配 WebKit、404 白名单与未登录断言",
+   "type": "workflow",
+   "content": "情况：产品 2.0（zhi2-web-admin）要求主流 PC 浏览器跑全量 E2E，且每个用例无论成败都保留录像。\n怎么做：playwright.config 的 use 设 `video: 'on'`，outputDir 为 `test-results`；projects 配 Chromium（Desktop Chrome）、Firefox、Desktop Edge 三个桌面项目，移动端不测。Windows 上 WebKit 录像常因写入路径问题失败，PC 验收以 Chrome/Edge/Firefox 为主时可先不配 WebKit。webServer 用 `reuseExistingServer: true` 避免端口占用重复起 dev。未登录场景测 404 时把 `/#/404` 加入路由白名单；断言「返回首页」要接受未登录被重定向到登录页，而不是假定进入 dashboard。\n验证：用例数 × 3 浏览器全部 passed，每个 test-results 子目录下有 video.webm。",
+   "evidence": "会话 d648e339：用户要求覆盖主流 PC 浏览器、成功失败都录屏；结论 36 passed（12×3）、video.webm 落盘、配置 chromium/firefox/edge 与 video:'on'。",
+   "files": [
+    "zhi2-web-admin/playwright.config.js",
+    "zhi2-web-admin/tests/e2e"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d648e339-2291-4af1-9452-f7df11d80f3b"
+   ],
+   "bundle": "012.md",
+   "project": "2-0"
+  },
+  {
+   "title": "侧栏目录型菜单 E2E：必须遍历全部直接子叶子，同 URL 用 main-content 文本变化判定跳转成功",
+   "type": "pattern",
+   "content": "情况：navbar-sidebar-accessibility 用例在「目录 + 多个子菜单」下只点了最后一个叶子，或父级目录下还有菜单未覆盖。\n怎么做：递归侧栏时只处理「直接子级」的 sidebar-leaf-link（避免 getByTestId 捞到更深层后代，与 b001 已提炼的 DOM 顺序规则一致）。每次点击前记录 beforeUrl 与 `[data-testid=\"main-content\"]` 的 innerText；点击后优先 `waitForURL` 与 beforeUrl 不同；若 URL 未变（同路由换内容），用 `page.waitForFunction` 比较 main-content 文本相对 beforeMainText 已变化，超时约 4s，再记为成功。这样「依次点击」目录下每一个叶子，而不是只点最后一个。\n注意：不要仅靠全局最后一个 sidebar-leaf；目录展开、滚动与 pointer 遮挡问题仍按侧栏专项用例里的展开/scrollIntoView 处理。",
+   "evidence": "会话 97cb886a 诉求 2：用户指出目录类型 sidebar 只点了最后一个菜单；结论在 clickVisibleSidebarLeafMenus 中增加 beforeMainText 与 URL 不变时的内容变化等待。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "97cb886a-e67c-42b6-8516-f9591fa85219"
+   ],
+   "bundle": "012.md",
+   "project": "2-0"
+  },
+  {
+   "title": "Vite+Vue3 模板里写 require() 会在运行时报 ReferenceError: require is not defined",
+   "type": "bug",
+   "content": "情况：Vue SFC 的 `<template>` 或渲染路径里用 `require('@/assets/...')` 取静态图，dev 编译可能过，但页面运行时报 `ReferenceError: require is not defined`。\n根因：Vite 面向 ESM，浏览器 bundle 不提供 Node 的 require；模板表达式按运行时 JS 执行。\n怎么做：静态资源改为 `<script>` 顶部 `import iconX from '@/assets/...'` 再在模板绑定，或用 `new URL('./x.png', import.meta.url).href`。改完刷新对应路由确认控制台无 require 报错。\n关联：若同时出现 `.el-input-group__append clear` 等非标准标签解析错误，先检查是否有多余 `</div>` 导致模板 HTML 结构损坏，再查资源引用方式。",
+   "evidence": "会话 7f3a94cb：控制台 `require is not defined`；结论将 require 改为 import。会话 c2d6f7c9：transferDiscount 多一个 </div> 导致 Invalid end tag，与结构错误同类排查。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/DeveloperBasicInfoForm.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/transferDiscount.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7f3a94cb-8b2a-4c1e-9d3e-4f8a1b2c3d4e",
+    "c2d6f7c9-0a1b-2c3d-4e5f-6a7b8c9d0e1f"
+   ],
+   "bundle": "012.md",
+   "project": "2-0"
+  },
+  {
+   "title": "el-drawer 内表格：全局 element-ui.scss 取消表体内部滚动并加大单元格 padding",
+   "type": "pattern",
+   "content": "情况：抽屉里嵌 el-table 时表体出现独立滚动条、单元格过挤，与设计稿不一致。\n怎么做：在全局 element-ui.scss 对 `.el-drawer__body .el-table` 设 `.el-table__body-wrapper { overflow: visible !important; }`，把纵向滚动交给 drawer 容器；同时提高 drawer 内 `.el-table td` 的 padding 与行高（如 padding 12px 16px、line-height 22px）。改的是全局抽屉表格样式，所有 drawer 内表格一致生效。\n验证：打开含抽屉表格的业务页，表体不再出现内层滚动条，单元格留白与设计一致。",
+   "evidence": "会话 7f3a94cb 诉求 2：用户要求 drawer 内表格样式按设计调整；结论写明 body-wrapper overflow visible 与 td padding/line-height。",
+   "files": [
+    "zhi2-web-admin/src/styles/element-ui.scss"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7f3a94cb-8b2a-4c1e-9d3e-4f8a1b2c3d4e"
+   ],
+   "bundle": "012.md",
+   "project": "2-0"
+  },
+  {
+   "title": "嵌套 zs-dialog footer 溢出：calculateHeight 应设 height:auto 而非测量像素高度",
+   "type": "bug",
+   "content": "情况：弹窗内再开 zs-dialog（如选择楼幢）时，内层 footer 被裁切或跑出可视区域。\n根因：zs-dialog 的 calculateHeight 把 `dialogElement.style.height` 设为 `offsetHeight` 像素值，嵌套或绝对定位拖拽时 flex 布局无法随内容伸缩，footer 脱离预期流。\n怎么做：calculateHeight 末尾改为 `dialogElement.style.height = 'auto'`，由 flex 自然分配 header/body/footer；保留 minHeight 等其它逻辑。改后复测「弹窗里再开选择弹窗」场景 footer 完整可见。\n注意：与「zs-dialog 传 header=\"\" 留空标题条」等不同问题，这里是嵌套高度计算。",
+   "evidence": "会话 7f3a94cb 诉求 3：用户反馈嵌套弹窗 footer 溢出；结论 calculateHeight 改为 height auto。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-dialog/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7f3a94cb-8b2a-4c1e-9d3e-4f8a1b2c3d4e"
+   ],
+   "bundle": "012.md",
+   "project": "2-0"
+  },
+  {
+   "title": "zs-like-select 在可滚动 dialog 内：下拉改 position:fixed 并随滚动/resize 同步坐标",
+   "type": "bug",
+   "content": "情况：dialog body 设 overflow:auto 时，zs-like-select 的下拉列表被父级裁剪或定位错位。\n怎么做：下拉层使用 `position: fixed` + 较高 z-index；打开时用 trigger 的 getBoundingClientRect 计算 left/top/width；监听所属 dialog 的 scroll 与 window resize，在滚动时重算位置。避免依赖 absolute 相对于被 overflow 裁剪的祖先。\n验证：在长表单 dialog 内打开 like-select，滚动 dialog 后下拉仍贴齐输入框且不被裁切。",
+   "evidence": "会话 7f3a94cb 诉求 4：用户要求 like 组件下拉不被 dialog overflow 裁剪；结论 fixed 定位 + scroll/resize 同步。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-like-select/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7f3a94cb-8b2a-4c1e-9d3e-4f8a1b2c3d4e"
+   ],
+   "bundle": "012.md",
+   "project": "2-0"
+  },
+  {
+   "title": "element-ui 走 CDN 时禁止 SFC import element-ui/packages/*，ImageViewer 需自研预览层",
+   "type": "pattern",
+   "content": "情况：工程通过 CDN 引入 element-ui，但组件仍 `import element-ui/packages/image/src/image-viewer.vue`，Vite 报 could not be resolved。\n根因：CDN 模式不把 element-ui 打进 node_modules 解析链，源码级 deep import 与全量 external 策略冲突（与「禁止页面直接 import element-ui」同类，这里是 packages 子路径）。\n怎么做：不要从 element-ui/packages 拉内部 Vue 文件；需要图片预览等功能时用本地遮罩层自实现（如 ImageViewer 纯组件），或改用已在全局注册的 el- 组件 API。CDN 与 bun 缺 lodash.merge/zrender 等是另一条依赖链，勿与 CDN 混为一谈。\n验证：dev 不再报 image-viewer.vue resolve 失败，预览功能仍可用。",
+   "evidence": "会话 78e2d6bf：用户说明 element-ui 是 CDN 引入；结论 ImageViewer 改为纯本地实现，不再依赖 element-ui/packages。",
+   "files": [
+    "zhi2-web-admin/src/components/ImageViewer/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "78e2d6bf-b094-40ec-ad1a-12067cd6e020"
+   ],
+   "bundle": "012.md",
+   "project": "2-0"
+  }
+ ]
+}

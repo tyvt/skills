@@ -1,0 +1,80 @@
+{
+ "project": "兴化物管",
+ "batch": "001",
+ "files": [
+  "001.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "如果外面传入了经纬度和坐落，打开时要默认到对应位置",
+   "type": "preference",
+   "content": "已检查并修复项目中所有 `LocationDialog` 的经纬度传参，结论如下。 ## 坐标约定（与表单数据一致） 项目中 `xcoor` 实际存的是**纬度**，`ycoor` 存的是**经度**（例如 `xcoor: 33.44`、`ycoor: 119.78`），传给地图组件应为： ```vue :lat=\"form.xcoor\" :lng=\"form.ycoor\" :address=\"form.address\" ``` ## 修复项 | 文件 | 问题 | 处理 | |------|------|------| | `customerProjectinfo/BaseProjectForm.vue` | 使用了无效的 `:xcoor` `:ycoor` | 改为 `:lat` `:lng`，并统一引用 `projectinfo` 的组件 | | `customerProjectinfo/changeDetail.vue` | 同上 | 同上 | | `propertyProject/detail.vue` | 未传经纬度与地址 | 补充 `:address` `:lat` `:lng` | | `propertychange/detail.vue` | 同上 | 同上 | | `buildland/detail.vue` | 未传地址 | 补充 `:address`（该表单",
+   "evidence": "extracted source=cursor project=兴化物管",
+   "files": [
+    "`customerProjectinfo/BaseProjectForm.vue",
+    "`customerProjectinfo/changeDetail.vue",
+    "`propertyProject/detail.vue",
+    "`propertychange/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cf03dbe2-8cf3-4034-82c6-701e2880736c"
+   ],
+   "_draft": true,
+   "project": "兴化物管"
+  },
+  {
+   "title": "物业区域变更详情，建造年份都没变更，还显示了变更角标",
+   "type": "pattern",
+   "content": "已改为全局处理，所有使用 `isShowModify` 的变更详情页都会自动受益。 **新增** `src/utils/changeCompare.js`，统一处理： | 场景 | 处理方式 | |------|----------| | 数字 vs 字符串（如 `2020` vs `\"2020\"`） | 字符串比较 | | `Date` vs 年份值 | 按年份比较 | | 完整日期 vs `Date` | 格式化为 `YYYY-MM-DD` 后比较 | | 对象 / 数组 | 仍用 `lodash.isEqual` | **`main.js`** 中的 `isShowModify` 已改为调用 `isChangeValueEqual`，所有变更页（`propertychange`、`buildingchange`、`projectchange` 等）无需再单独写比较逻辑。 **`propertychange/detail.vue`** 已回退建造年份的专项代码，恢复为通用的 `isShowModify('buildYear')`，仅保留 `parseBeforeChangeData` 用于解析后端 JSON 字符串格式的 `beforeChangeData`。 之后各变更页继续用原来的写法即可： ```html v-tooltip=\"isShowModify('buildYea",
+   "evidence": "extracted source=cursor project=兴化物管",
+   "files": [
+    "`src/utils/changeCompare.js",
+    "**`main.js",
+    "**`propertychange/detail.vue",
+    "涉及文件：d:\\repository\\兴化物管\\zhi1-web-admin\\src\\views\\property\\propertychange\\detail.vue、d:\\repository\\兴化物管\\zhi1-web-admin\\src\\views\\property\\propertychange、d:\\repository\\兴化物管\\zhi1-web-admin\\src、d:\\repository\\兴化物管\\zhi1-web-admin\\src\\mixins\\detailMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "efb19730-94e6-49b0-b515-a5225a01129c"
+   ],
+   "_draft": true,
+   "project": "兴化物管"
+  },
+  {
+   "title": "debounce.js:1 Uncaught Syn",
+   "type": "preference",
+   "content": "## 原因 与之前的 `debounce.js` 是同一类问题。 `index.html` 通过普通 `<script>` 加载全局 UMD 脚本 `/assets/js/dayjs.min.js`，但新增的 `hisfeeFees` 模块里直接写了 `import dayjs from \"dayjs\"`： - `PaymentNotice.vue` - `OwnerNotice.vue` - `CommercialNotice.vue` - `feeDocFormatters.js` 构建时 Rollup 把这些导入打成 ESM 分包，文件名同样是 `assets/js/dayjs.min.js`，**覆盖了** `public` 里正确的 UMD 全局脚本，导致线上报错。 ## 修复 已移除上述 4 个文件中的 `import dayjs from \"dayjs\"`，改为使用项目已有的全局实例 `this.dayjs`（在 `main.js` 中通过 `Vue.prototype.dayjs` 挂载）。 重新构建后： - `dist/assets/js/dayjs.min.js` 已恢复为 UMD 格式（以 `!function(t,e){...` 开头） - 不再有 ESM 分包引用该文件 ## 下一步 重新部署即可。以后新增页面请避免直接 `import dayjs fro",
+   "evidence": "extracted source=cursor project=兴化物管",
+   "files": [
+    "`debounce.js",
+    "`index.html",
+    "`/assets/js/dayjs.min.js",
+    "`PaymentNotice.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "fa9f0313-f1bb-4e21-b127-9653c5bcdced"
+   ],
+   "_draft": true,
+   "project": "兴化物管"
+  },
+  {
+   "title": "{ \"msg\": \"导入失败，共发现 16 处错误：",
+   "type": "preference",
+   "content": "已修复。 **原因**：导入失败时把 `zs-size` 改成了 `small`，而 `zsDialog` 只定义了 `mini`（616px × 60% 视口高）和 `medium` 两种尺寸，没有 `small`。弹窗因此失去宽高限制，再叠加上 `flex: 1` 的 body 布局，就容易被撑满屏幕。 **修改**： 1. 始终使用 `zs-size=\"mini\"`，保持 616px 宽度。 2. 失败时通过 `custom-class=\"zs-import-error-dialog\"` 将高度改为按内容自适应（`height: auto`，最高 70vh），不再占满 60% 视口高度。 3. 错误列表区域仍限制在 `max-height: 320px` 内滚动。 请再试一次导入失败场景，弹窗应恢复为与上传时相近的小尺寸。",
+   "evidence": "extracted source=cursor project=兴化物管",
+   "files": [
+    "涉及文件：d:\\repository\\兴化物管\\zhi1-web-admin\\src\\components\\zsImport\\index.vue、d:\\repository\\兴化物管\\zhi1-web-admin\\src、d:\\repository\\兴化物管\\zhi1-web-admin\\src\\views\\projectManagement\\project\\projectinfo\\components\\table.vue、d:\\repository\\兴化物管\\zhi1-web-admin\\src\\utils\\index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9d52f4b7-89a2-4fd9-a013-65731f1b3cf7"
+   ],
+   "_draft": true,
+   "project": "兴化物管"
+  }
+ ],
+ "_draft": true
+}

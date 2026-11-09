@@ -1,0 +1,164 @@
+{
+ "project": "产品2.0",
+ "batch": 10,
+ "files": [
+  "037.md",
+  "038.md",
+  "039.md",
+  "040.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "title": "Vite 代理失效的第二类根因：代理 context 缺前导斜杠会永远匹配不上",
+   "type": "bug",
+   "content": "【什么情况】产品2.0 后端接口全部 404/返回前端首页，看起来像「代理失效」，改目标地址、重启都无效。\n【为什么】Vite 判定代理是否命中用的是 doesProxyContextMatchUrl → req.url.startsWith(context)。浏览器发出的 req.url 一定以 / 开头，而 env 里 VITE_APP_BASE_API 写成 api/v2.0（无前导 /）时，代理 key 就是 'api/v2.0'，'/api/v2.0/xxx'.startsWith('api/v2.0') 恒为 false，规则永远不命中，请求被当成前端静态资源处理。\n【怎么做】在 vite.config.js 的 loadEnv 之后加 normalizeProxyContext(baseApi)：trim、去掉尾部 /、若不以 / 开头则补上，再拿结果作为代理 key 注册；baseApi 为空时回退 /api/v2.0。改完必须重启 npm run dev（Vite 只在启动时读配置）。\n【另一条同类坑】VITE_APP_PROXY_ADDRESS 不带端口时走 80 端口，后端在 :8080/:9605 等端口会静默连错，必须写完整 host:port。\n【与已知的边界】已知条目只覆盖「env 被 .env.development.local 覆盖」这一根因，本条是 baseApi 形态导致的匹配失败，两者要分别排查。",
+   "evidence": "会话 317d62ff：用户「接口代理失效了」，定位为 VITE_APP_BASE_API=api/v2.0 无前导斜杠，新增 normalizeProxyContext 后恢复；并指出 PROXY_ADDRESS 无端口默认 80。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\vite.config.js",
+    "d:\\repository\\产品2.0\\env\\.env"
+   ],
+   "baseline": "5a86102",
+   "sessionIds": [
+    "317d62ff-fec1-4cf3-a02d-1ac604d82396"
+   ],
+   "bundle": "037.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "同一业务拆「报事/报修」两个菜单：共享 index/detail + orderType prop 的薄包装套路",
+   "type": "workflow",
+   "content": "【什么情况】工单列表只有 order/index.vue 与 detail.vue 一套，需要拆出「报事」(orderType=1) 与「报修」(orderType=2) 两个独立菜单页面，两套页面逻辑几乎一致。\n【为什么】复制两份会立刻漂移；本项目已有 article 模块的成熟做法（父组件 type prop + 子目录薄包装引用），用户明确点名「参考 article 的用法」。\n【怎么做】1) 在 order/components/enums.js 定义 ORDER_TYPE.REPORT='1' / REPAIR='2'，禁止页面写字面量；2) 共享 index.vue / detail.vue 增加 orderType prop，在 getQueryParams() 里注入（等价于 article 的 type: this.richTextType），并按类型切换列表标题、列名、权限前缀、分类接口的 categoryType；3) report/index.vue、repair/index.vue、report/detail.vue、repair/detail.vue 只做薄包装，import 共享组件并钉死 orderType；4) AddOrderDialog 加 orderType prop，弹窗标题/表单标签随类型变化，提交体带 orderType。\n【配套约束】路由必须指向 report/index 与 repair/index，不能指向 order/index —— 否则 listMixins 的默认 handleView 会跳到 order 自己的详情页而不是对应模块详情。原有 handleView 里的「待开发」提示要一并删掉，交还给 listMixins。",
+   "evidence": "会话 d004f28a：改造 report/repair 引用 order 的 index/detail，区分 1=报事 2=报修，新增 page 接口查询参数，用户指参考 article 用法；结论给出 enums + orderType prop + 四张薄包装页 + AddOrderDialog。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\workOrder\\order\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\workOrder\\order\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\workOrder\\report\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\workOrder\\repair\\index.vue"
+   ],
+   "baseline": "42b6033",
+   "sessionIds": [
+    "d004f28a-5899-46e7-af27-f1b3531c2289"
+   ],
+   "bundle": "037.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "列表/弹窗自动带出区域账户要分角色：管理员不该继承左侧区域树，B 端才自动带",
+   "type": "bug",
+   "content": "【什么情况】房屋质量保证金新增弹窗里，「账户名称」被自动填成「wjg测试物业管理区域」对应的账户。用户以管理员身份验收，指出「当前是管理员账号，应该不存在物业管理区域」。\n【为什么】新增逻辑无条件按左侧区域树取第一个账户预填，把「B 端从业人员的便利默认」错用到了管理员身上；管理员跨区域、无归属，预填等于伪造上下文，还会导致后续保存挂错区域。\n【怎么做】自动带出必须按角色分叉：B 端从业人员保留自动查询并填充当前物业管理区域对应账户；管理员打开弹窗时账户字段留空，改由点击「账户名称」弹出账户选择弹窗手动选。选择弹窗支持按当前已选区域树筛选（未选区域时不做区域过滤），选中后同时回填账户名称与业务账户两个字段。\n【判定口径】「有没有物业管理区域」是角色属性而不是页面属性，凡是从区域树派生默认值的表单都要先问一句：当前账号是否真的归属某个区域。",
+   "evidence": "会话 8cce6e5f：用户反馈「新增带了固定的…当前是管理员账号，应该不存在物业管理区域」，修复为管理员不自动带出、B 端仍带，账户改为手动弹窗选择。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDeposit\\components\\AddDialog.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDeposit\\components\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDepositAccount\\index.vue"
+   ],
+   "baseline": "effe72a",
+   "sessionIds": [
+    "8cce6e5f-7212-46e4-b856-ac58b146cde8"
+   ],
+   "bundle": "037.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "「弹窗少字段就改单列」不是 8 字段阈值，而是用户点名的小字段弹窗不要铺双列",
+   "type": "preference",
+   "content": "【什么情况】用户对新增弹窗提出「新增弹窗少于6个字段应该单列排布」。已知约定里有一条「详情弹窗字段数 < 8 用单列、≥ 8 用两列」，本次给出的阈值是 6，且针对的是新增/编辑弹窗而不是详情弹窗。\n【为什么】双列在字段只有 5~6 个时会让右侧一列空缺、视觉上像漏了字段；用户对弹窗表单的密度敏感，宁可长一点也不排空列。\n【怎么做】小字段量（约 6 个以内）的新增/编辑弹窗一律单列纵向排列；按项目现有写法用 el-row + 每个字段的 el-col 全档位设满（:xs/:sm/:md/:lg/:xl=\"24\"），而不是删掉 el-col 或改全局栅格。字段数明显变多时再回到双列，且要遵守项目既有的弹窗表单规范（zs-dialog 的 form-layout 档位）。\n【注意】这与「弹窗宽度按 form-layout single/double 分两档」是并行的两条约定：列数决定 form-layout，宽度由 form-layout 决定，不要在页面里手写 width。",
+   "evidence": "会话 8cce6e5f：用户要求「少于6个字段应该单列排布」，实现为各 el-col 全档位 24 纵向单列，并注明符合项目内弹窗规范。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDeposit\\components\\AddDialog.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-form\\zs-form.vue"
+   ],
+   "baseline": "effe72a",
+   "sessionIds": [
+    "8cce6e5f-7212-46e4-b856-ac58b146cde8"
+   ],
+   "bundle": "037.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "zs-select-dialog 嵌套分页不生效：自定义插槽内的分页组件脱离弹窗分页上下文",
+   "type": "bug",
+   "content": "【什么情况】房屋质量保证金协议里「选择物业管理区域」用的 zs-select-dialog，列表能出来但切换第 2 页无效（页码不动或数据不变）。\n【为什么】zs-select-dialog 自带一套分页状态与请求回调，页面在自定义插槽里另放了一个分页控件时，点击事件走的是插槽自己的 handler，没有回到弹窗内部那条「改页码 → 重建查询参数 → 重新请求」的链路；弹窗也不会因为插槽内页码变化自动重查。同时该组件打开时会把查询参数赋一次就不再更新（已知：每次请求前必须重建 payload，否则上下文字段丢失），分页链路尤其容易踩。\n【怎么做】优先不要自定义分页：把列表交给 zs-select-dialog 内置分页（配 no-auto-query / 自定义取数时，自己在 bus 上接管分页回调并显式调用重查），确保页码变化后有且仅有一次请求、且每次请求前重建 { pageNum, pageSize, ...筛选条件 }。修完要覆盖验证：不选区域直接翻页、选区域后翻页、翻页后换筛选条件回到第 1 页。\n【顺带】本会话还暴露出父仓库子模块指针冲突（本地 a091abbe8 含本次修复 vs 远程 352c29c9f 含登录页 LOGO 调整），解决方式是选「同时包含两方改动」的较新子模块 SHA 再在父仓库合并提交。",
+   "evidence": "会话 cc4bf104：用户报「房屋质量保证金协议，选择物业管理区域弹窗切换分页不生效」，随后要求「处理冲突并提交代码」，父仓库子模块指针冲突选 a091abbe8 并生成合并提交 c8638fa。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-select-dialog\\zs-select-dialog.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\api\\finance\\guarantee_building.js"
+   ],
+   "baseline": "075e6e9",
+   "sessionIds": [
+    "cc4bf104-5c49-4450-aeac-1aef06f34c8d"
+   ],
+   "bundle": "037.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "只改「提示语布局」的 UI 需求要按白名单执行：其余改动全部回退",
+   "type": "preference",
+   "content": "【什么情况】用户要求「业务对账界面优化参考界面图2」，Agent 顺手把按钮文案、表格列配置、搜索条件顺序、整体布局（list-card / verification-content）以及外层包裹都给改了。用户随即要求「仅调整提示语布局UI，回退其他修改」。\n【为什么】带参考图的「界面优化」需求，用户真正想要的往往只是图里被圈出的那一处；顺手改结构化内容（列、搜索条件、文案）会引入额外验收与回归成本，且容易与其它分支冲突。\n【怎么做】1) 先按参考图定位「差异的最小单元」，把改动范围写成一句话白名单（本次＝BankReconciliation.vue 里提示语的结构与样式：<p> 改为带图标的 div.tip-text，加成黄色背景/边框/圆角/flex 对齐，文案一字不改）；2) 白名单之外的既有结构、按钮文案、列配置、搜索项顺序一律不动；3) 若中途已超范围修改，用 git diff 逐文件回退到基线再重做最小改动，并在结论里显式列出「保留了什么 / 回退了什么」两项清单，方便用户核对。\n【通用判断】用户在 UI 类需求里说「优化/参考这个图」不等于授权重构布局。",
+   "evidence": "会话 f1a206e1：诉求1 业务对账界面优化参考图2；诉求2「仅调整提示语布局UI，回退其他修改」，最终保留 tip-text 结构+黄色提示样式，回退按钮文案/列配置/搜索顺序/整体布局。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\components\\BankReconciliation.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\bankDetailDay\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubBankDetailDay\\index.vue"
+   ],
+   "baseline": "2f68042",
+   "sessionIds": [
+    "f1a206e1-be4e-4eb5-a9b0-578ecda15418"
+   ],
+   "bundle": "037.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "多分支修复的交付形态：全量 merge 冲突多时改 cherry-pick，且父仓库与子模块逐分支成对更新",
+   "type": "workflow",
+   "content": "【什么情况】同一处修复（区域树列表页数据少时表格底部大面积空白）需要同时上 develop/v2.6.1、v2.6.2、v2.6.2-yulin 三条线，父仓库 产品2.0 下挂 zhi2-web-admin 子模块。\n【为什么】全量合并 v2.6.1 → v2.6.2 因分支间积压改动过多而冲突密集，逐条解冲突风险高；而只取本次修复提交可以最小化冲突面。子模块指针又必须逐分支单独提交，父仓库才会真正指向新代码。\n【怎么做】1) 在源分支（v2.6.1）完成并验证修复，作为唯一原始提交；2) 其余分支对该提交 cherry-pick（本次为 666278cd7 / 199b0430b），冲突按「只保留本次修复片段」解决；3) 每条分支分别在子模块提交、再回父仓库提交指针（本次父仓 2280a01 / 5a095a5 / 13a77a4），两边成对、顺序一致；4) 本地 env/.env 的代理地址等开发配置不纳入提交；5) 收尾把工作区切回主干 develop/v2.6.1，避免下次误在临时分支继续开发。\n【边界】cherry-pick 必须人工确认没有把「只属于源分支的必填校验/参数改动」带走或丢下（已知同类教训：漏恢复必填校验）。",
+   "evidence": "会话 23fa39f4：用户要求「提交推送代码，并合并到262和262-yulin」，实际改为 cherry-pick，列出子模块 c53a802ff/666278cd7/199b0430b 与父仓 2280a01/5a095a5/13a77a4，env/.env 未提交，收尾切回 develop/v2.6.1。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\styles\\index.scss",
+    "d:\\repository\\产品2.0\\env\\.env"
+   ],
+   "baseline": "6accf9a",
+   "sessionIds": [
+    "23fa39f4-c905-4fc1-b62e-36ce2d716c82"
+   ],
+   "bundle": "037.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "DetailTemplate 附件字段必须配 type:'image'：type:'text' 只渲染路径字符串，点不开也无法预览",
+   "type": "bug",
+   "content": "【什么情况】房屋质量保证金-资金缴存详情页的附件区只显示一串路径文本，无法预览。\n【为什么】字段在 DetailTemplate 的 contentInfo 里被配成 type: 'text'，走的是纯文本分支，不会做 URL 拼接、也不会渲染缩略图或可点击文件名。\n【怎么做】把附件字段改成 type: 'image'。DetailTemplate 据此会：对 png/jpg 等图片渲染缩略图并支持点击放大；对 PDF 等非图片渲染可点击的文件名链接；并自动拼成完整访问地址（如 /zhl2/2026/9/0/q/xxx.png）。改在共享的 components/detail.vue 里一处生效，资金缴存与资金支用两个详情页同时修好，无需逐页改。\n【与已知的边界】已知条目记录的是「type:'link' 只认 item.link，附件 URL 必须用 type:'image'」；本条补充的是另一条更常见的错配——配成 type:'text' 时既不拼地址也不给预览入口，表现是「只有路径字符串」，两者排查时容易混淆。",
+   "evidence": "会话 151c21b4：用户报「资金缴存详情页附件不能预览」，根因为 DetailTemplate 中附件字段 type:'text'，改为 type:'image' 后两处详情同时生效。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDeposit\\components\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDeposit\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDeposit\\deposit\\detail.vue"
+   ],
+   "baseline": "414029f",
+   "sessionIds": [
+    "151c21b4-932f-40b4-a857-68f078ae0b56"
+   ],
+   "bundle": "037.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "E2E 里用 page.request 直连业务接口必须显式补 Authorization：不会自动带 sessionStorage 里的 Token",
+   "type": "bug",
+   "content": "什么情况：Playwright 用例在 fixture/helper 里用 page.request.get/post 调业务接口（如 fetchOwnCompanyPendingInfo、fetchLastChangeId、assertCompanyPortalReady）时，登录态是正常的（storageState 已注入、Cookie 里有 Admin-Token、UI 操作也通过），但接口返回「服务器异常」，用例表现为某一步骤莫名失败，看起来像后端数据问题或功能回归。为什么：本项目 Token 的权威存储是 sessionStorage 的 Admin-Token（登录后由前端写入），而 page.request 是独立的 HTTP 上下文，只继承 storageState/Cookie，不会执行页面 JS，也就读不到 sessionStorage；请求头缺 Authorization: Bearer <token>，网关鉴权失败被后端统一包装成「服务器异常」，于是错误信息与真实原因（未鉴权）完全脱节。怎么做：在 e2e/fixtures/auth-helpers.js 里收口一个 buildApiRequestHeaders(page)，先 page.evaluate 从 sessionStorage 读 Admin-Token（必要时先从 Cookie 同步一份到 sessionStorage 再读），拼成 { Authorization: `Bearer ${token}` } 返回；所有 page.request.* 调用统一传入该 header（含 options.headers 合并），不要各页各写一份。改造后完整流程 4/4 通过、原失败用例转为通过。排查口诀：E2E 走接口拿到「服务器异常」而同一账号在 UI 里操作正常 → 先核对请求头有没有 Token，而不是先去翻业务数据或报工单。",
+   "evidence": "会话 3111df9a-32f8-4a19-9e72-e8ecba17ca9c：用户反馈某接口返回异常，修改后在 auth-helpers.js 新增 buildApiRequestHeaders(page)（先从 Cookie 同步 Admin-Token 到 sessionStorage，再为 page.request 补 Authorization: Bearer <token>），并让 fetchOwnCompanyPendingInfo / fetchLastChangeId / assertCompanyPortalReady 统一使用；结论写明「page.request 不会自动带上浏览器 sessionStorage 里的 Token，导致后端返回服务器异常」，修复后完整流程 4/4 通过，用例 04 从失败变为 35s 通过。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\fixtures\\auth-helpers.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\fixtures\\company-helpers.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\company\\company-record-change.spec.js"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "3111df9a-32f8-4a19-9e72-e8ecba17ca9c"
+   ],
+   "bundle": "039.md",
+   "project": "产品2.0"
+  }
+ ]
+}

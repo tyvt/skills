@@ -1,0 +1,94 @@
+{
+ "project": "无锡市区小程序嵌入H5",
+ "batch": "017",
+ "files": [
+  "017.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "小区信息里面的小区周边没有数据，加点日志判断一下宿主",
+   "type": "fact",
+   "content": "已加上排查日志，并修了一处页面侧问题。打开「小区信息」后在控制台过滤 **`[小区周边]`** 或 **`[小区周边/QQMap]`** 即可。 ### 日志会帮你判断什么 1. **宿主**：H5 / 是否在小程序 web-view（`wx.miniProgram.getEnv`） 2. **Key**：`qq.map.key` 是否取到（脱敏） 3. **坐标**：详情接口的经纬度是否存在、是否合法 4. **接口链路**：逆地理 JSONP/`wx.request` → boundary → 地点搜索；失败会区分超时、script 报错、业务 `status/message` ### 已发现的代码问题 - **失败路径原先全部静默 `return []`**，无数据时看不出是 Key、坐标、逆地理还是搜索挂了（现已打点）。 - **`onShow` 重复拉详情时 `markers.push` 会累加**，已改为每次重置为单个 marker（不直接影响列表为空，但是 bug）。 ### 看日志时怎么对号入座 | 日志关键字 | 含义 | |---|---| | `地图 Key 为空` | 配置/登录问题，请求根本没发出 | | `小区未配置经纬度` | 业务数据问题，未调地图 | | `JSONP 超时` / `script.onerror` | 宿主/网络拦了 `apis.m",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "涉及文件：d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_owner\\project\\info\\index.vue、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\utils\\index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "44e9f45b-f8b3-4cdb-b60b-c803993c0d4a"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "这里文件预览的路径改为相对路径",
+   "type": "fact",
+   "content": "已将 `filePreview` 的地址解析改为与 `ZsImage` 一致的策略。 ### 改动说明 新增 `resolveFilePreviewUrl`，按平台处理路径： | 平台 | 行为 | |------|------| | **H5** | 已是 `http(s)://` 等绝对地址则原样使用；以 `/` 开头则转为相对路径（如 `/api/file` → `./api/file`），走当前域名与 Vite 代理 | | **微信小程序** | 仍拼接 `BASE_URL`，逻辑不变 | `filePreview` 不再使用 `IMAGE_BASE` 拼接 H5 地址，已移除对应 import。 ### 示例 - 接口返回 `/zhi2-dev/xxx/file.pdf` - H5：`./zhi2-dev/xxx/file.pdf`（相对当前页面，经代理访问） - 小程序：`http://218.90.239.146:8888/zhi2-dev/xxx/file.pdf` 若 `DescribePopup.vue` 等在调用前已手动拼接 `IMAGE_BASE`，H5 下 `IMAGE_BASE` 为空不受影响；小程序传入完整 URL 时会被识别为绝对地址，不会重复拼接。",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "`DescribePopup.vue",
+    "涉及文件：d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\utils\\index.js、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\env\\mp.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "da88fbd0-10ce-496a-a71f-84d83cffcc43"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "确保这个接口携带token，请求头 @zhi2-mo",
+   "type": "fact",
+   "content": "已处理。根因是 H5 嵌入场景下，`initQqMapKeys()` 在 URL 里的 token 写入 `userStore` **之前**就发起了请求，虽然 `getConfigKey` 走的是 `@/api` 拦截器，但那时还没有 token，请求头里自然没有 `Authorization`。 ### 改动说明 **1. `App.vue` — 调整启动顺序** 将 `initQqMapKeys()` 移到 H5 的 `await initH5Context(getH5Param)` **之后**，确保先执行 `userStore.setToken(token)`，再拉取地图 Key。 **2. `qqMapKey.js` — 无 token 时不请求** 增加 token 校验，只有存在 token 时才调用 `getConfigKey`。该接口经 `@/api/index.js` 的拦截器会自动带上： ```34:36:zhi2-mobile-admin-h5-c-unlimited/src/api/index.js if (userStore.token) { config.headers = config.headers || {} config.headers['Authorization'] = 'Bearer ' + userStore.token ``` 小程",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "`App.vue",
+    "`qqMapKey.js",
+    "`@/api/index.js",
+    "```34:36:zhi2-mobile-admin-h5-c-unlimited/src/api/index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ef15cdae-5895-485b-9248-03961a3b0697"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "共有资金-明细-类型“全部共有资金”重复",
+   "type": "bug",
+   "content": "**问题原因** `DetailsTab.vue` 的 `loadTypeOptions` 在加载字典 `benefit_app_account_fund_type` 时，手动在列表头部插入了「全部共有资金」；而字典本身已包含该项（`value` 为空），因此选择器里出现了两条相同选项。 **修复方式** 在合并字典数据前，先过滤掉 `value` 为空（表示「全部」）的项，只保留手动添加的那一条「全部共有资金」： ```290:305:zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/DetailsTab.vue const loadTypeOptions = async () => { try { const dict = await getDict(\"benefit_app_account_fund_type\"); const dictOptions = dict .filter((item) => item.value !== \"\" && item.value != null) .map((item) => ({ label: item.label, value: item.value, })); typeOptions.value = [ { label: \"全部共有资金\",",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "`DetailsTab.vue",
+    "```290:305:zhi2-mobile-admin-h5-c-unlimited/src/pages_benefit/sharedFunds/components/DetailsTab.vue",
+    "涉及文件：d:\\repository\\无锡市区小程序嵌入H5、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\pages_benefit\\sharedFunds\\index.vue、d:\\repository\\无锡市区小程序嵌入H5\\zhi2-mobile-admin-h5-c-unlimited\\src\\api\\sharedFunds.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0d2c6516-1930-4d19-b020-1182a8c885bb"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  },
+  {
+   "title": "问题原因 这是 URL 查询参数的编码问题。 苏服办",
+   "type": "preference",
+   "content": "## 问题原因 这是 URL 查询参数的编码问题。 苏服办跳转 URL 里： - `phone=A+A7Pil3SsG9LSUe8q8mVw==` - `idNumber=dlYJVM20F92xisrd+lp4BArkEh0lmdACWpnBd36TAWI=` H5 用 `URLSearchParams` 解析时，会按 `application/x-www-form-urlencoded` 规则把 **`+` 当成空格** 解码，于是变成： - `phone`: `\"A A7Pil3SsG9LSUe8q8mVw==\"` - `idNumber`: `\"dlYJVM20F92xisrd lp4BArkEh0lmdACWpnBd36TAWI=\"` Base64 密文里的 `+` 被替换成空格后，后端解密就会失败。 ## 修复方案 已在 `h5Context.js` 的苏服办登录逻辑中，读取密文参数后将空格还原为 `+`： ```29:33:d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js /** URLSearchParams 按 x-www-form-urlencoded 规则将 '+' 解码为空格，Base64 密文需还原 */ export const restor",
+   "evidence": "extracted source=cursor project=无锡市区小程序嵌入H5",
+   "files": [
+    "`h5Context.js",
+    "```29:33:d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js",
+    "涉及文件：d:/repository/无锡市区小程序嵌入H5、d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited、d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/utils/h5Context.js、d:/repository/无锡市区小程序嵌入H5/zhi2-mobile-admin-h5-c-unlimited/src/utils/portal.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1d789cb5-e259-4d57-ada7-dfb786d89609"
+   ],
+   "_draft": true,
+   "project": "无锡市区小程序嵌入H5"
+  }
+ ],
+ "_draft": true
+}

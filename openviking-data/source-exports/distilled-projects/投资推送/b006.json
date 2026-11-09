@@ -1,0 +1,291 @@
+{
+ "project": "投资推送",
+ "batch": 6,
+ "files": [
+  "021.md",
+  "022.md",
+  "023.md",
+  "024.md"
+ ],
+ "count": 16,
+ "memories": [
+  {
+   "title": "[投资推送] merge_dataframes_by_date 将日期转成 python date 导致 merge_asof 间歇失败",
+   "type": "bug",
+   "content": "`data_cache.merge_dataframes_by_date` 若用 `combined['_merge_dt'].dt.date` 写回日期列，会得到 object dtype。当天 CSV 缓存读入多为 datetime64[ns] 时 report 正常；缓存过期并发刷新（创业板 PE/PB、美股等）后内存与 `cyb_data`/`us_index_data` 的 `merge_asof` 混用 datetime64 与 object，会报 `Incompatible merge dtype, dtype('O') and dtype('O')`（易被误判为 akshare 网络问题）。修复：日期列保留 `datetime64[ns]`，例如 `combined[date_col] = combined['_merge_dt']`。仍失败可删 `data/cache/cyb/`、`data/cache/us/` 强制重拉。",
+   "evidence": "会话 4ffab379：报错出现在 akshare tqdm 刷新缓存时；改保留 datetime64 后 merge_asof 与 `python report.py` 验证通过。",
+   "files": [
+    "data_cache.py",
+    "cyb_data.py",
+    "us_index_data.py",
+    "report.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4ffab379-d597-4f7b-b836-4964bddd5105"
+   ],
+   "bundle": "021.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 波动率分位诊断「固定20日」年化不可当作月度调仓策略预期",
+   "type": "pattern",
+   "content": "对 volatility_60d 分位分组做 Band 有效性验证时，须区分持有口径：「固定持有 20 个交易日」的诊断年化（会话中 Q3 约 13.85%）与「月度调仓、持有至下次调仓」的可执行回测不一致。后者 Q3 毛年化约 9.69%，仍略高于 Q1（约 8.20%）但优势很弱（配对月收益 t≈1.01）；Q3 单边换手约为 Q1 两倍，计入佣金/滑点/印花税后净优势更小。结论：Band 方向仅弱支持，IC/诊断强度应下调，并单独检查策略约束与 Band 的兼容性。实现见 `scripts/backtest_volatility_quantiles.py`。",
+   "evidence": "会话 rollout-2026-08-27T08-23-54：用户要求无约束分位回测验证 13.85%；结论表对比固定20日 vs 月调仓毛/含成本年化与换手。",
+   "files": [
+    "scripts/backtest_volatility_quantiles.py",
+    "tests/test_volatility_quantile_backtest.py",
+    "output/volatility_quantile_backtest/summary.csv"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-27T08-23-54-01a0409a-1524-7612-bd45-47273e00dc7b"
+   ],
+   "bundle": "021.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] .gitignore 须覆盖 rqalpha_env 与已跟踪的 push.env",
+   "type": "workflow",
+   "content": "本地 Python 量化仓除 cache/data/output/logs 外，还应忽略：`rqalpha_env/`（`scripts/setup_rqalpha_env.bat` 生成）、`.code-review-graph/`（MCP graph.db）、`*.duckdb`、`*.pkl`、`*.log`、`.env`/`.env.*`（保留 `push.example.env`）、`.pytest_cache`/`.mypy_cache`/`.ruff_cache/`。若 `rqalpha_env` 曾被 `git add`，需 `git rm -r --cached rqalpha_env/`。`push.env` 一旦被跟踪，`.gitignore` 不生效；含 Server酱 密钥时应 `git rm --cached push.env`。",
+   "evidence": "会话 628f2f3e：更新 .gitignore 并从索引移除约 9000 个 rqalpha_env 文件；文档说明 push.env 可选后续。",
+   "files": [
+    ".gitignore",
+    "scripts/setup_rqalpha_env.bat",
+    "push.env",
+    "push.example.env"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "628f2f3e-f633-4050-b7b3-9dc33474f216"
+   ],
+   "bundle": "021.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 腾讯实时行情：中证定制指数代码用 cs 前缀",
+   "type": "pattern",
+   "content": "红利等中证定制指数（如 H30269）在 `realtime_quote.py` 映射腾讯行情时须用 `cs` 前缀（例 `H30269` → `csH30269`），不能用上交所 `sh`/深交所 `sz`。映射缺失会导致实时价完全拉不到；这与「接口已拉到但 `log_fetch_done` 未拼接实时字段」的展示问题不同，排障时先确认映射表是否含该代码。",
+   "evidence": "会话 e7077452：用户报中证红利无实时数据；增加 cs 映射后报告元信息示例 `实时 11,125.28 -0.42% …`。",
+   "files": [
+    "realtime_quote.py",
+    "report.py",
+    "index_meta.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e7077452-6663-48f2-ba41-f20b45f24975"
+   ],
+   "bundle": "021.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 回测买入信号审计：用年内高低区间位置筛高位买入簇",
+   "type": "workflow",
+   "content": "审查 `logs/backtest/20xx.md` 买入是否合理时，用日历年内位置 `(收盘-年内低)/(年内高-年内低)`（0%=年内最低、100%=年内最高）。会话全样本约 2.2% 信号 ≥80%（接近年内高点），多集中在 2022 开年小盘/科创50/中证500 与少数 2025 纳指年末；2021 中证500 在 65%–80% 区间长时间密集买入是另一类「牛市中段」问题。该指标与策略里「距低点反弹%」不同，高位簇需回到 `config` 买入阈值（反弹/估值分位等）对照，而非仅调单一参数。",
+   "evidence": "会话 f11f6616：对 2021–2026 共 2695 次买入做结构化分析，列出 ≥80% 次数与典型日期。",
+   "files": [
+    "logs/backtest/2021.md",
+    "logs/backtest/2022.md",
+    "config.py",
+    "backtest_buy_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f11f6616-6051-4ccf-bcf5-a7e6f7c70c6c"
+   ],
+   "bundle": "021.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "定时推送无消息是「无买卖信号跳过」而非接口失败",
+   "type": "workflow",
+   "content": "投资推送：`push.py` 在生成报告后经 `signal_format.filter_trade_signal_sections` 过滤，仅当某指数 `signal_short` 为「买入」或「波段卖出」（`section_has_trade_signal`）才走 Server酱 微信推送；全部为「观望」时日志为「今日无买卖信号，跳过推送」并正常退出，不会打完整报告、也不会调微信接口。排查「推送没成功」应先读 `logs/push.log` 该行，再用 `python report.py` 看当日全量估值与达标项。",
+   "evidence": "8/4–8/5 日志均为跳过推送；8/3 中证1000 买入时推送成功。价格上涨突破价格位置买入上限后信号会从买入变观望（例：中证1000 由 7065 涨至约 7475，突破 120 日低点上限与 1 年区间上限）。",
+   "files": [
+    "push.py",
+    "signal_format.py",
+    "report.py",
+    "logs/push.log",
+    "run_push.bat"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "134eaf71-0d24-4ed8-97e5-7a27e683e2e7"
+   ],
+   "bundle": "022.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "红利类回测：全收益指数 ≠ 价格指数 + 现金分红",
+   "type": "pattern",
+   "content": "项目红利回测在 `dividend_data.attach_total_return_close` 合并 `total_return_close`，`_simulate_dca_returns` 买卖与估值均用该列，等价于**分红自动再投**。若改用价格指数 `close` 会严重低估长期收益（例：930955 十年价格约 +27% vs 全收益约 +85%）。基金 A 类「NAV 涨跌 + 现金分红不复投」也不等于全收益指数（021550/020602 实测与全收益仍有数个百分点差）。要贴近现金分红持有体验需单独建模分红现金；要贴近再投假设应继续用全收益指数。",
+   "evidence": "akshare 可拉 021550、020602 历次分红每份金额；业绩比较基准为价格指数×95%+活期，非全收益。用户问「价格收益+分红金额是否与再投一样」结论为否。",
+   "files": [
+    "dividend_data.py",
+    "backtest_buy_signals.py",
+    "config.py",
+    "market_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3200971f-eca9-40ab-9bff-7d222c281889"
+   ],
+   "bundle": "022.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "Parquet 离线库：manifest 缺口、残留键与多 part 重复行",
+   "type": "pattern",
+   "content": "`data/parquet`：`stock_daily_qfq` 的 manifest 存在历史遗留记账缺口，**不影响 DuckDB 查询**，就绪判断应单独统计 `qfq_ok` 并注明缺口。`daily` manifest 中约数百只「曾 ok 但已不在当前 stock_codes」的残留键会累积，宜后续提供 `--prune-manifest`。同一 `year` 下多个 `part_*` 增量追加时，若同一 symbol 出现在旧 part 与新 part，`read_parquet` 会返回重复行；当前 `--resume` 按 symbol 整只跳过不会产生重复，若未来按 year 粒度重导需显式去重。",
+   "evidence": "维护者四类文档严谨性修订：就绪代码块补 qfq 输出行、分区节补重复行说明、残留键清理建议。",
+   "files": [
+    "data/parquet/README.md",
+    "data/parquet_constants.py",
+    "scripts/export_to_parquet.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f26e414b-5ffc-41af-87fb-2940b83bf8da"
+   ],
+   "bundle": "022.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "index_daily 分区 symbol 为 6 位指数代码，非 RQAlpha 后缀格式",
+   "type": "fact",
+   "content": "导出到 `index_daily` 分区时 `symbol` 列写入 **6 位指数代码**（如 000300、000001），与 `stock_daily` 列宽一致但语义为指数；从 RQAlpha bundle 拉数使用 `INDEX_ORDER_BOOK_IDS`（如 `000001.XSHG`），**勿**误以为分区内存 RQAlpha 格式或对指数错误调用 `to_rqalpha_id` 再写入。",
+   "evidence": "实查分区样例 `['000300', '000001']`；导出逻辑用 `DEFAULT_INDEX_SYMBOLS` 写 symbol。",
+   "files": [
+    "data/parquet/README.md",
+    "scripts/export_to_parquet.py",
+    "data/parquet_constants.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f26e414b-5ffc-41af-87fb-2940b83bf8da"
+   ],
+   "bundle": "022.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "买卖回测与定投回测脚本职责分离",
+   "type": "workflow",
+   "content": "买入信号统计与定投收益：`backtest_buy_signals.py`（输出 `output/backtest/{年}.md`，`--from-inception` / `run_backtest_inception.bat`）。买卖波段 vs 持有对比：`backtest_trade_signals.py`（默认 2015 至今按日模拟）。宽基沪深300/科创50 等信号在 `cn_broad_signal.py`，创业板在 `cyb_signal.py`，价格位置卖点在 `price_position.py`；阈值与卖出开关集中在 `config.py`。优化与卖出诊断另有 `optimize_strategy_backtest.py`、`diagnose_sell_issues.py`。",
+   "evidence": "代码库梳理会话归纳的文件职责表与 CLI 示例。",
+   "files": [
+    "backtest_buy_signals.py",
+    "backtest_trade_signals.py",
+    "cn_broad_signal.py",
+    "cyb_signal.py",
+    "price_position.py",
+    "config.py",
+    "run_backtest_inception.bat"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1e911ebe-1c72-41b9-be9e-bf723aae8386"
+   ],
+   "bundle": "022.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 场外 QDII 申购：按 T 日净值成交，主体为已公开的美股前收盘",
+   "type": "fact",
+   "content": "跟踪美股的场外 QDII：在某一中国交易日 15:00 前申购，按**该日（T 日）基金净值**确认份额，不是按「前一净值日标签」口头理解成交。T 日净值的主体通常是**上一美股交易日指数收盘**（中国周二白天申购时，周一美股收盘已公开），但下单时正式净值多未公布；最终数还受基金**估值汇率规则**（未必等于即期汇率）、现金/费率/跟踪误差影响。因此是「主要价格成分半已知」，不是指数点位精确成交，更不是完全盲买。实操：周二 15:00 前买吃到周一美股收盘对应估值，周二美股涨跌要进入后续净值日才体现。",
+   "evidence": "会话 dc3d8ce8：用户质疑「周二 15:00 前买是否等于已知周一夜间美股收盘价」；结论更正为 T 日净值日 + 周一收盘为输入、净值事后确认。",
+   "files": [
+    "us_index_data.py",
+    "README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "dc3d8ce8-9302-47f4-bced-31c524bd9f46"
+   ],
+   "bundle": "023.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 单次买入金额：战略权重 + 位置×就绪度，凯利仅作上限参考",
+   "type": "preference",
+   "content": "多指数信号买入不宜用全凯利 f*=μ/σ² 直接定单次金额：μ/σ 难估、全凯利回撤大、指数间相关会重复押注，且与「低位/接近买入」信号逻辑双重加码。推荐分层：战略层定各指数目标权重与年度预算份额；战术层用 `buy_amount_allocation.compute_allocation_weight`（年度区间位置越低、signal 就绪度越高、可选历史收益因子 → 权重越大），再配合跌多买多与频率校正。若借鉴凯利，只取 1/4～1/2 凯利作**仓位上限**参考。`buy_amount_ranking` 按历史收益排名分配带未来函数，README 标明仅作对比，不作实盘主路径。",
+   "evidence": "会话 cbcad84b：用户问凯利是否可用于不同指数单次投入；结论明确不照搬，并对比现有 allocation 与 ranking 设计。",
+   "files": [
+    "buy_amount_allocation.py",
+    "buy_amount_ranking.py",
+    "README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cbcad84b-027f-4276-b111-9dd3432b318e"
+   ],
+   "bundle": "023.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 年际买入频率解读：A 股卡 PE 分位，美股另卡 10Y 利率分位",
+   "type": "pattern",
+   "content": "对比 logs/backtest 分年表时，2022–2023 高买入占比与 2025–2026 A 股宽基近零，优先解释**各指数 PE（及红利类股息利差）是否高于 config 分位上限**，而非怀疑阈值写错或策略失效。同一时期美股可能仍频繁触发（如纳指在调整段占比高），但若 10 年期美债利率处于历史极高分位（策略常要求如 ≤92% 而当前可达 ~99%），会在 PE 不贵时仍阻断买入——解释「今年少买」须**分市场、分约束维度**，不能统一说成「都在高位」。",
+   "evidence": "会话 573f590b：用户问 2022–2024 买入多、今年少是否因高位；结论区分 A 股 PE 分位卡点与纳指美债分位卡点，并纠正「2024 已开始降频」时间线。",
+   "files": [
+    "logs/backtest/2022.md",
+    "logs/backtest/2026.md",
+    "config.py",
+    "us_index_data.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "573f590b-5218-455b-bf77-02dc6bab7443"
+   ],
+   "bundle": "023.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 下线指数：改 INDICES 并清理旧 Windows 计划任务名",
+   "type": "workflow",
+   "content": "从策略池移除某指数（如上证红利低波 H50040）时，除 `config.py` 的 `INDICES` 外，同步更新 `core.py` 的 `--index` 帮助示例与 `.cursor/rules/no-test-push.mdc` 中的调试命令，避免文档/规则仍指向已删代码。`setup_task.bat` 可保留对**旧任务显示名**的 `schtasks /Delete`（如 `H50040投资信号`），用于清理历史上单机创建的单独定时任务，与当前合并推送任务并存不冲突。",
+   "evidence": "会话 45699c72：移除 H50040 后改 config/core/规则，并说明 setup_task 保留旧任务名清理。",
+   "files": [
+    "config.py",
+    "core.py",
+    "setup_task.bat",
+    ".cursor/rules/no-test-push.mdc"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "45699c72-aebd-4dc1-b587-df72dd8aabad"
+   ],
+   "bundle": "023.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "roe_volatility 与 roe_volatility_ratio 回看窗口不同",
+   "type": "fact",
+   "content": "因子集市里的 `roe_volatility`：取最近 **8 个年度** ROE，算**样本标准差**，且必须刚好有 8 条年度观测（不足则为 NULL）。风控排雷里的 `roe_volatility_ratio` 是**另一套指标**，默认最近 **5 年** ROE 波动，可用环境变量 `DLV_RISK_LOOKBACK_YEARS` 覆盖。问「用了几年 ROE」时要先分清是 `scripts/factor_builder.py` 因子定义还是 `dividend_lowvol_rotation/risk_screening.py` 风控逻辑。",
+   "evidence": "会话 rollout-2026-08-26T11-20-14：用户问 roe_volatility 几年标准差；助手 rg 代码后给出 8 年因子 vs 5 年风控 ratio 及 DLV_RISK_LOOKBACK_YEARS。",
+   "files": [
+    "scripts/factor_builder.py",
+    "dividend_lowvol_rotation/risk_screening.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-26T11-20-14-01a03c15-2861-78e3-a5c0-1d8a29f75765"
+   ],
+   "bundle": "024.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "回测表现与诊断 IC 不一致时的三类修正口径",
+   "type": "workflow",
+   "content": "用户归纳的三类根因及应对：（1）**频率错配**——实盘/回测改为月末调仓、持有约 20 日，与诊断 IC 口径严格对齐；（2）**交集过窄**——ROE、负债率改为全市场**排名分位**筛选（如 ROE 剔除后 20%、负债率剔除前 20%），不再用绝对阈值压候选池；（3）**现金假象**——强制满仓且最少 10 只持仓，不足 10 只时放宽到 Top 100 再分配权重。该表在会话中仅作为待落地需求，助手要求先确认要改的仓库文件/提示词路径。",
+   "evidence": "会话 rollout-2026-08-26T15-00-29：用户贴根因/修正措施/提示词对照表并写「有疑问先和我确认」；助手回复请指明文件名或授权在仓库内查找。",
+   "files": [],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-26T15-00-29-01a03cde-cb2b-70f1-b104-fe84df789b0c"
+   ],
+   "bundle": "024.md",
+   "project": "投资推送"
+  }
+ ]
+}

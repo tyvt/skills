@@ -1,0 +1,95 @@
+{
+ "project": "门户",
+ "batch": "021",
+ "files": [
+  "021.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "原因： 上次给所有 HomeBizSection 加",
+   "type": "bug",
+   "content": "**原因：** 上次给所有 `HomeBizSection` 加了 `height: 100%` 和 `flex: 1`，「商品房」在左侧整列被拉满，下面的存量房 / 住房租赁被挤到看不见（或高度为 0）。 **已调整：** 1. **`stretch` 属性**：只有次要行（存量房、住房租赁）开启等高拉伸；商品房仍按内容高度显示。 2. **`biz-center`**：有次要板块时用 `grid`（`auto` + `1fr`），商品房占第一行，第二行留给并排板块；没有次要板块时仍用普通纵向 flex。 3. **经纪端侧栏**并排板块同样加上 `stretch`。 请刷新页面确认：商品房下方应重新出现存量房、住房租赁和右侧常用功能，且后两者底边仍尽量对齐。若还有异常，说一下浏览器和窗口宽度。",
+   "evidence": "extracted source=cursor project=门户",
+   "files": [
+    "涉及文件：d:\\repository\\门户\\zhi2-web-admin\\src\\views\\home\\components\\layouts\\HomeLayoutSidebar.vue、d:\\repository\\门户\\zhi2-web-admin\\src\\views\\home\\config\\homeLayout.js、d:\\repository\\门户\\zhi2-web-admin\\src\\views\\home、d:\\repository\\门户\\zhi2-web-admin\\src\\views\\home\\components\\layouts\\HomeLayoutAdmin.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "94cb407a-5b39-4218-8e57-162fde013753"
+   ],
+   "_draft": true,
+   "project": "门户"
+  },
+  {
+   "title": "现在开发企业用户的还是旧的",
+   "type": "bug",
+   "content": "**原因**：开发企业首页仍用 `HomeDeveloperIconRow`，右上角有 1–10 序号，步骤之间没有箭头；管理员/经纪端用的是 `HomeBizSection`（「商品房」标签 + 步骤间双箭头）。 **已做修改**： 1. **`HomeLayoutSidebar.vue`**：开发企业改为渲染 `HomeBizSection`，样式与管理员商品房流程一致。 2. **`homeDataMixin.js`**：用 `developerCommodityFlow` 传入完整商品房板块（含 `theme`、`title`、`steps`），不再只传步骤数组。 3. **`index-new.vue`**：绑定 `:developer-flow=\"developerCommodityFlow\"`。 4. 删除已无引用的 **`HomeDeveloperIconRow.vue`**。 请用开发企业账号刷新首页：应看到左侧「商品房」色条、步骤间箭头，且不再有右上角数字角标。若仍像旧版，可强刷或清缓存后再看。",
+   "evidence": "extracted source=cursor project=门户",
+   "files": [
+    "**`HomeLayoutSidebar.vue",
+    "**`homeDataMixin.js",
+    "**`index-new.vue",
+    "**`HomeDeveloperIconRow.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "439693b0-982f-4355-a0e8-3210cd7a2d24"
+   ],
+   "_draft": true,
+   "project": "门户"
+  },
+  {
+   "title": "已为登录页机构注册跳转增加默认回退地址 http:/",
+   "type": "preference",
+   "content": "已为**登录页机构注册跳转**增加默认回退地址 `http://58.210.252.230:9002`，在平台配置读不到或为空时自动使用。 ### 改动说明 1. **`src/store/modules/app.js`** - 新增常量 `DEFAULT_REGISTER_URL`。 - 在 `normalizePlatformConfig` 中：若 `registerUrl` 为空或未配置，写入默认地址。 - `getPlatformConfig` 请求失败时仍会 `SET_PLATFORM_CONFIG({})`，经归一化后同样落到默认地址。 2. **`src/views/login.vue`** - `registerUrl` 在配置尚未加载或为空时使用 `DEFAULT_REGISTER_URL`。 - 移除「未配置注册链接域名」的拦截，避免有默认地址时仍无法跳转。 行为：后台「基本配置」里配置了 `registerUrl` 则优先使用；接口失败、字段缺失或为空时，注册链接会拼在 `http://58.210.252.230:9002` 上（例如 `http://58.210.252.230:9002/#/companyRegister?step=1`）。",
+   "evidence": "extracted source=cursor project=门户",
+   "files": [
+    "**`src/store/modules/app.js",
+    "**`src/views/login.vue",
+    "涉及文件：d:\\repository\\门户、d:\\repository\\门户\\zhi2-web-admin\\src\\views\\property\\culturalTourism\\index.vue、d:\\repository\\门户\\zhi2-web-admin\\src\\api\\property\\cultourPlatform.js、d:\\repository\\门户\\zhi2-web-admin、d:\\repository\\门户\\zhi2-web-admin\\src\\views\\home、d:\\repository\\门户\\zhi2-web-admin\\src\\views\\login.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3afb8aa3-9bf0-4ba2-89fb-792f225e0b5a"
+   ],
+   "_draft": true,
+   "project": "门户"
+  },
+  {
+   "title": "表格的横向滚动条需要在鼠标移入表格任意区域就显示，现",
+   "type": "fact",
+   "content": "已调整全局滚动条样式，原因和改法如下。 **原因** `index.scss` 里用的是 `.el-table__body-wrapper:hover::-webkit-scrollbar-thumb`。在 Chromium 里，横向滚动条滑块往往只有指针在**滚动条轨道附近**时才会按这条规则显示；鼠标在表头、固定列或单元格上时，不会算作「悬停在 body-wrapper 的滚动条上」。 **修改** 在 `zhi2-web-admin/src/styles/index.scss` 中改为：只要鼠标在整张表上，就显示主表体区域的横向滚动条滑块： - `.el-table:hover > .el-table__body-wrapper::-webkit-scrollbar-thumb` - `.zs-table-container:hover .el-table__body-wrapper::-webkit-scrollbar-thumb` 这样悬停表头、右侧固定列或数据区时，底部横向滚动条都会显示（与 `zs-table` / 首页待办表一致）。 请刷新页面后把鼠标移入待办表格任意区域验证一下。若仍有个别表格不对，说明一下页面或组件名，可以再补选择器。",
+   "evidence": "extracted source=cursor project=门户",
+   "files": [
+    "`index.scss",
+    "`zhi2-web-admin/src/styles/index.scss",
+    "涉及文件：d:\\repository\\门户\\zhi2-web-admin\\src\\views\\home\\components\\HomeTodoTable.vue、d:\\repository\\门户、d:\\repository\\门户\\.gitmodules、d:\\repository\\门户\\package.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "908fa819-e4da-4511-b737-948d86388270"
+   ],
+   "_draft": true,
+   "project": "门户"
+  },
+  {
+   "title": "首页所有二级页面的弹窗标题水平居中",
+   "type": "pattern",
+   "content": "已在公共门户样式里统一处理叠层详情弹窗标题居中。 ### 修改说明 1. **`portal.scss`**（`PortalDetailHeader` 的全局样式） - 将标题 `h2` 从 `inline-block`（左对齐）改为 `display: block; width: 100%; text-align: center` - 覆盖商品房、租赁等所有使用 `portal-detail-header` 的叠层弹窗（公司/房屋/预售许可、租赁企业/人员/信用等） 2. **`PropertyDetailDialog.vue`** - 删除原先仅针对预售许可弹窗（`is-permit`）的重复居中样式，逻辑已并入全局样式。 关闭按钮仍为右上角绝对定位，不占标题行宽度，标题在弹窗内水平居中。刷新门户二级页后打开任意详情弹窗即可核对效果。",
+   "evidence": "extracted source=cursor project=门户",
+   "files": [
+    "**`portal.scss",
+    "**`PropertyDetailDialog.vue",
+    "涉及文件：d:\\repository\\门户\\zhi2-web-admin\\src\\views\\home\\publicPortal\\portal.scss、d:\\repository\\门户\\zhi2-web-admin、d:\\repository\\门户\\zhi2-web-admin\\src\\views\\home\\publicPortal\\pages\\InformationPages.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b0657f58-c3a5-4ffd-a3ba-7e97031b4770"
+   ],
+   "_draft": true,
+   "project": "门户"
+  }
+ ],
+ "_draft": true
+}

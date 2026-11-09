@@ -1,0 +1,79 @@
+{
+ "project": "苏住房C",
+ "batch": "006",
+ "files": [
+  "006.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "我的决策页面不显示了",
+   "type": "preference",
+   "content": "已修复。 **原因：** `getMaintainResult` 返回的 `decisionOptionResponseAllList` 里，选项记录通常不带 `decisionPlayerName`，决策人姓名在决策记录详情接口里。 **修改：** 1. **`DecisionResult.vue`（决策记录列表）** - 按 `decisionResponseId` 调用 `getDecisionRecordDetail` 补全决策人姓名 - 列表改为只显示「姓名 + 时间」（与选项表决一致） - 点击记录时写入 `voteStore`，供详情页使用 2. **`DecisionRecord.vue`（决策记录详情）** - 合并 `voteStore` 缓存与接口数据 - 支持 `decisionPlayerName` / `policymaker` 等字段回退 - `getAppRecordDetail` 失败时回退到 `getDecisionRecordDetail` 3. **`autonomy.js`** - 记录详情接口增加 `zs-desensitize-flag: 0`，避免姓名被脱敏 请重新编译后查看「我的决策 → 决策记录」，应能看到决策人姓名。若仍为空，请提供该条记录的接口返回 JSON，我再补字段映射。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`DecisionResult.vue",
+    "**`DecisionRecord.vue",
+    "**`autonomy.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\decision\\components\\DecisionList.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\decision\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\decision\\needToKnow.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6e6436fe-112d-4645-b690-9d9bb72bae0c"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "原因是微信小程序分包不能跨包引用组件，pages_v",
+   "type": "fact",
+   "content": "原因是微信小程序**分包不能跨包引用组件**，`pages_vote` 不能直接 import `pages_main` 下的 `FileList`。 已按项目惯例（与 `pages_owner/components/FileList` 相同）处理： 1. 将 `FileList` 组件复制到 `pages_vote/components/FileList/` 2. 修改 `detail.vue` 引用路径为 `@/pages_vote/components/FileList/FileList.vue` 重新编译后，相关材料区域应能正常渲染，空列表时也会显示默认空态图。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`detail.vue",
+    "`@/pages_vote/components/FileList/FileList.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\elect\\detail.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\components\\BackBtn.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8542b614-0e61-4726-828c-c9829d260de1"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "真机上进入pages_owner_extra/fam",
+   "type": "fact",
+   "content": "已定位并修复。 **根因：** `memberForm` 页面用了两个 `ZsPicker`。`ZsPicker` 里有一行未使用的代码： ```js const attrs = ref(getCurrentInstance().ctx.$attrs) ``` 在真机微信小程序里，`getCurrentInstance().ctx` 常为 `undefined`，组件初始化会直接抛错，整页白屏。模拟器环境更宽松，所以之前没暴露。 列表页 `family/index` 不用 `ZsPicker`，所以能正常显示。 **修改：** 1. 删除 `ZsPicker` 中这行无效且会崩溃的 `getCurrentInstance` 调用 2. 将 `popup` ref 改为 `ref(null)`（修正弹层引用） 3. 「前往添加」改为绝对路径 `/pages_owner_extra/family/memberForm` 4. 保存后跳转详情也改为绝对路径 请重新编译后在真机再试「前往添加」。若仍有问题，可在微信开发者工具真机调试里看 Console 是否还有报错。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\family\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsEmpty\\ZsEmpty.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "82516bfa-31ef-44c0-9835-1b565029f672"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "GET error: https://ydzt.js",
+   "type": "fact",
+   "content": "已完成全面排查与修复，摘要如下。 ## 根因 苏服办 H5 部署在 `ydzt.jszwfw.gov.cn` 的**子目录**下（`vite` 生产环境 `base: './'`），但大量代码使用了**绝对路径** `/static/...` 或错误的**运行时相对路径** `../../static/...`，浏览器会请求到域名根目录，导致 404。 ## 核心方案 在 `utils/index.js` 新增统一工具函数 `resolveStaticUrl(src, subpackage?)`： - H5 生产环境：生成 `./static/...` 或 `./page-query/static/...` 等相对路径 - 同时增强 `resolveMediaUrl`，自动识别 `images/`、`/static/`、`/images/` 等本地静态资源 ## 修改文件（共 24 个） | 类别 | 文件 | |------|------| | 工具层 | `utils/index.js`、`components/ZsImage/ZsImage.vue` | | 首页 Tab | `Home_Suzhufang.vue`、`My_Suzhufang.vue`、`Community_Suzhufang.vue`、`Project_Suzhufang.vue` | | 菜单组件 | ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`ydzt.js",
+    "`utils/index.js",
+    "`utils/index.js`、`components/ZsImage/ZsImage.vue",
+    "`Home_Suzhufang.vue`、`My_Suzhufang.vue`、`Community_Suzhufang.vue`、`Project_Suzhufang.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "91e19c66-ea53-4696-8d39-418b79f76553"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

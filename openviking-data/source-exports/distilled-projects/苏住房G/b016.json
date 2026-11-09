@@ -1,0 +1,266 @@
+{
+ "project": "苏住房G",
+ "batch": 16,
+ "files": [
+  "061.md",
+  "062.md",
+  "063.md",
+  "064.md"
+ ],
+ "count": 14,
+ "memories": [
+  {
+   "title": "同一业务按「本地机构/非本地机构」二态走两套流程时：isLocalOrganization 三值判定必须区分 undefined，不能塌缩成布尔",
+   "type": "pattern",
+   "content": "【什么情况】苏州V3 同一批公司/人员详情页要同时服务本地机构与市住建等非本地机构，两类主体在流程配置里有各自的 busCode（本地码 → *XQFBD 非本地码）；新增 localOrganizationFlow.js（映射表 NON_LOCAL_TO_LOCAL / LOCAL_TO_NON_LOCAL_BUS_CODE + 归一化函数）与 localOrganizationFlowMixin（暴露 flowBusCode），页面 :bus-code=\"flowBusCode\" 注入 OperationBtnGroup，再透传给 ZsSubmit / zs-approval / ApprovalProcessDialog。\n【为什么】isLocalOrganization 是「是 / 否 / 还没拿到」三态，若把 undefined 和 false 合并处理（例如写成 if (!isLocalOrganization) return localBusCode），详情接口未返回该字段时会被永久锁在本码，非本地单据提交时流程配置校验失败或走错流程；反过来也不能把 undefined 当成「非本地」。另外详情异步返回前的这段窗口里，用默认码发起提交/审批同样会打错流程。\n【怎么做】1) mapper 里三个分支显式分开：true → localBusCode，false → LOCAL_TO_NON_LOCAL_BUS_CODE[localBusCode] || localBusCode，undefined/null/'' → 优先保留 route.meta.busCode（若它已是映射表里的非本地键），否则才回退 localBusCode；2) 与后端约定详情 DTO 必返 isLocalOrganization（'0'|'1'），data() 或 detailCallback 里显式保留，不能让 getForm 白名单/归一化把它过滤掉，否则动态切换永远不生效；3) 详情 loading 结束前禁用 OperationBtnGroup 内的提交/审批（v-if=\"!loading\"），消除错误编码窗口；4) busCode 变化后靠 :key 重建审批状态。\n【与已知差异】已知 #295/#404/#445/#857/#939 只讲「要件 busCode 与流程 busCode 同源、按 formMode/业务态 resolve」，本条补的是主体维度的二态分流 + 三值判定 + 异步窗口封锁。",
+   "evidence": "会话 9c8f0d10 审查报告：HIGH「isLocalOrganization 为 undefined 时强制走「本地」码，忽略非本地路由 meta」——localOrganizationFlow.js:40-45 空值分支固定返回归一化本地码，从市住建菜单（meta=WYFWQYXQFBD）进入且详情未返回时会用 wyfwqy 等本地码；HIGH「详情 form 侧未见 isLocalOrganization 契约，动态切换可能永远不生效」——仅读 this.form?.isLocalOrganization，仓库内除列表高级查询外无该字段赋值；HIGH「详情加载前存在错误 busCode 的操作窗口」——OperationBtnGroup 的 watch busCode（immediate）与 zs-approval 抢占。传播链整理：mixin.flowBusCode → 三个详情页 :bus-code → OperationBtnGroup busCode prop → ZsSubmit/zs-approval/附件/流程查看，zs-approval 用 effectiveBusCode = bus || $route.meta.busCode，OperationBtnGroup 用 :key=`approval-${busCode}`。",
+   "files": [
+    "zhi2-web-admin/src/utils/localOrganizationFlow.js",
+    "zhi2-web-admin/src/mixins/localOrganizationFlowMixin.js",
+    "zhi2-web-admin/src/mixins/approval.js",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/components/zs-approval/index.vue",
+    "zhi2-web-admin/src/components/zs-approval/ApprovalProcessDialog.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/detail.vue",
+    "zhi2-web-admin/src/views/company/companyRegister/detail.vue",
+    "zhi2-web-admin/src/views/company/staffManagement/components/detail.vue"
+   ],
+   "baseline": "3192070",
+   "sessionIds": [
+    "9c8f0d10-8555-4605-9555-1d8641db8e16"
+   ],
+   "bundle": "061.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "变更列表改为复用新增列表 schema 后：请求侧白名单过滤不够，必须同时 bump tableId 做缓存击穿",
+   "type": "bug",
+   "content": "【什么情况】把 propertyContractChange（变更列表）从专用 isAddListPage 逻辑扩展成与新增（合同信息）列表共用同一份 contract info schema（isContractInfoSchema 统一控制 formItems / columns / initDict / listCallback），筛选字段由旧的 contractStatus + recordTimeStart/End 换成 hasFilingForm 等新字段。\n【为什么】listMixins 在 created 里会按「路由 path」把 cachedSearchParams 合并回 queryParams，而 getQueryParams() 会把整个 queryParams（含残留的 contractType / contractStatus / recordTimeStart / recordTimeEnd）原样发给接口。于是 UI 已经换成新筛选项，请求里却仍带着旧参数做隐性过滤，表现为「列表结果莫名变少/不对」且极难排查 —— 控制台和页面上都看不出问题。\n【怎么做】1) getQueryParams()（或合并缓存之后）按当前 schema 白名单过滤，contract info schema 下显式剔除 contractStatus、recordTimeStart、recordTimeEnd；2) 给变更列表的 tableId 升版（本批用 property_propertyContract…_v2，仅 BUSINESS_TYPE.CHANGE 使用），等于换一份缓存空间，让旧缓存在切换时自然失效 —— 只做①不做②仍可能被旧的 UI 状态（列宽/展开等）带偏；3) 上线时顺手清理对应 route 的 cachedSearchParams。\n另：ADD 与 CHANGE 共用 schema 时两者语义要分开——ADD 的 buildQueryParams 默认 bizState:'2'（已备案），CHANGE 不能默认；CHANGE 旧版表格有「业务状态」列而 contract info schema 没有，若产品要在变更列表看业务状态，需在 contract info 的 columns 分支补 bizState 并确认 ADD 是否同步。\n【与已知差异】已知 #930 只记「listMixins 搜索缓存会残留已删除字段继续传给后端」，本条给出根因更完整的一层（缓存按路由 path 合并 + getQueryParams 全量发送）与 tableId 版本号这条第二道解法。",
+   "evidence": "会话 4dc38163 审查：HIGH「变更列表路由的搜索缓存会带上旧 schema 查询字段」——index.vue:315-316 及 listMixins created 缓存合并；用户曾在变更列表使用旧表单（contractStatus、recordTimeStart/recordTimeEnd）时缓存会被 Object.assign 回 queryParams，getQueryParams() 又把全部 queryParams（含 contractType）发给接口，出现「UI 已是新筛选项、请求仍带旧参数」。修复建议三选一：getQueryParams 按 schema 白名单剔除、发布时清理 route 的 cachedSearchParams、schema 切换时对 CHANGE 的 tableId/route 做一次性 cache bust。聚焦项结论表确认：tableId _v2 仅 BUSINESS_TYPE.CHANGE 使用；CHANGE 不默认 bizState:'2' 且包含 hasFilingForm；MEDIUM「合同信息 schema 表格无「业务状态」列」为功能回退非实现错误。",
+   "files": [
+    "zhi2-web-admin/src/views/property/propertyContract/components/index.vue",
+    "zhi2-web-admin/src/views/property/propertyContract/components/enums.js",
+    "zhi2-web-admin/src/mixins/listMixins"
+   ],
+   "baseline": "3192070",
+   "sessionIds": [
+    "4dc38163-ebfe-4eb0-bebf-f3851a071ec1"
+   ],
+   "bundle": "061.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "一个列表组件被多套同类规则共用时，按钮文案要从类型枚举派生中文名，不能在组件里写成某一套的名字",
+   "type": "pattern",
+   "content": "【什么情况】业主自治-规约管理下 管理规约 / 议事规则 / 工作规则 三套规则共用同一个列表组件（src/views/autonomy/regulation/components/index.vue），靠路由传入的 regulationType 区分。列表顶部的「已备案XX」按钮文案被写死成「已备案管理规约」，导致议事规则/工作规则页也显示「已备案管理规约」。\n【为什么】这类同构页只有 regulationType 一个维度不同，任何写死的中文名都会被错误地套到另外两套上；而项目里中文名本来就已经集中放在 enums.js（VERSION_TYPE / REGULATION_TYPE / REGULATION_NAME），组件另写一份字面量必然会漂移。\n【怎么做】1) 从 enums.js 引 REGULATION_TYPE、REGULATION_NAME，用项目既有工具 getKeyByValue(REGULATION_TYPE, this.regulationType) 取枚举 key，再查 REGULATION_NAME 得中文名，兜底返回「规约」；2) 包成 computed（如 regulationName），按钮用模板字符串 label: `已备案${this.regulationName}`；3) 只改文案，权限标识与跳转逻辑一律不动（同类页面如备案详情、变更页本就按 regulationType 动态生成，无需跟改）。\n【排查指引】遇到「A 菜单的名字出现在 B 菜单上」先确认这几套页面是否共用一个组件，再 grep 组件里的中文字面量，通常只有一处需要改。\n【与已知差异】已知 #856/#734 只讲「列表页标题/文案从路由 meta.title 读取」；这里标题类信息不在路由上，而在业务枚举里，需要 getKeyByValue + 名称枚举查表。",
+   "evidence": "会话 ba726002：用户反馈「议事规则备案，将列表页“已备案管理规约”按钮名称更改为“已备案议事规则”，工作规则备案页面也是一样的问题，当前按钮名称全部用的管理规约列表页的名称，应该根据具体菜单名称修改按钮名称」。修复落在唯一一处硬编码：regulation/components/index.vue 引入 VERSION_TYPE/REGULATION_TYPE/REGULATION_NAME 与 getKeyByValue，新增 regulationName computed = (key && REGULATION_NAME[key]) || '规约'，按钮 label 改为 `已备案${this.regulationName}`；效果上三套规则分别显示 已备案管理规约 / 已备案议事规则 / 已备案工作规则，权限标识与跳转逻辑均不变。验证：node --check 通过；本地完整构建因 generate-version 插件 spawnSync EBUSY 未跑通（与本次改动无关，发生在 rollup 编译之前）。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/regulation/components/index.vue",
+    "zhi2-web-admin/src/views/autonomy/regulation/components/enums.js",
+    "zhi2-web-admin/src/views/autonomy/discuss/final/index.vue",
+    "zhi2-web-admin/src/views/autonomy/work/final/index.vue",
+    "zhi2-web-admin/src/views/autonomy/regulation/final/index.vue"
+   ],
+   "baseline": "9e5c499",
+   "sessionIds": [
+    "ba726002-0b18-413d-9066-a944320c62c9"
+   ],
+   "bundle": "061.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "44d6576",
+   "content": "场景：用户管理新增「账号类型」后，因该字段关联用户编码自动生成而设为「编辑态禁用」，但历史数据该字段为空，编辑用户时字段既禁用又必填，导致整张表单无法保存。根因不是权限也不是表单 disabled 写错，而是「禁用条件」与「必填规则」各看了一份数据：禁用条件用的是当前表单值，必填校验是规则常量，两者对「空」的判定不同源。正解（zhi2-web-admin/src/views/system/user/detail.vue）：① 禁用判定改成「仅当原始数据已有值才禁用」——编辑模式下按 this.originForm.accountType 是否为空决定禁用，add 模式永不禁用；② 下拉选项同时分档：add 或「编辑且原始值为空」时用可选项字典（sys_account_type），有值时才切到只读展示用的全集字典（sys_account_type_all）；③ 抽一个 isAccountTypeEmpty 同时判 null / undefined / 空串 / 纯空格，避免「一个空格」绕过判定；④ 关键顺序：detailCallback 里把 originForm 的赋值移到所有表单字段处理完成之后，否则禁用门控会先读到空 originForm。比已知条目「accountType='4' 禁止编辑」更深一层：那条只讲取值，这条讲的是空值历史数据下的可编辑性门控。",
+   "evidence": "用户报「部分历史数据账号类型取值为空，若需编辑用户信息则无法保存」；改为 isAccountTypeDisabled 按 originForm 判空、accountTypeOptions 按是否为空切换 sys_account_type / sys_account_type_all，并把 originForm 赋值移到字段处理之后。",
+   "files": [
+    "zhi2-web-admin/src/views/system/user/detail.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "sessionIds": [
+    "08df6a66-6dbe-4a03-8d68-a6fa9506abe6"
+   ],
+   "title": "「自动生成所以禁止编辑」的字段遇到历史空值会死锁：门控要读 originForm 而不是 form",
+   "type": "bug",
+   "bundle": "062.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "db4f82c",
+   "content": "场景：首页被做成 index-wrapper.vue，用 computed 三分支（cwzxt→index-bak / B 端→index-legacy / 其余→index-v2）。首帧时 Vuex 的 terminalType 仍是 null，isBTerminalUser 把 null 判成非 B，于是 B 端用户先挂载 index-v2，等 GetInfo 回写类型后再切到 legacy：两个子首页的 created 都会执行（loadAll、toggleSideBar 各跑一遍），出现闪屏、重复请求、错误首页，类型迟迟不写入时会永久停在 v2。正解：与 statisticsMapDetail/index.vue 的 terminalTypeReady 写法对齐——先判 terminalType != null 再渲染分叉，此前显示占位/骨架；v-if 分支另加 :key 让切换时子树完整重建；两个非当前分支改 () => import() 异步组件，避免三个首页变体打进同一同步依赖链。另一坑：useFinanceHome 的 computed 只读 localStorage.getItem('cwzxt')，没有任何响应源，同会话后续写入不会触发切换，要么改读 Vuex，要么在写入处重进路由。注意区分已知条目「terminalType == null 被当成 B 端」：那条是判定方向反了，这条是时序未就绪。",
+   "evidence": "审查 index-wrapper.vue 时给出 CRITICAL/HIGH/MEDIUM：useBLegacyHome 在 terminalType === null 时为 false，B 端先 mount index-v2 再销毁切 legacy，两个 created 各跑一遍；建议对齐 terminalTypeReady 门闩 + 异步组件。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-wrapper.vue",
+    "zhi2-web-admin/src/views/home/index-legacy.vue",
+    "zhi2-web-admin/src/utils/terminalUser.js",
+    "zhi2-web-admin/src/store/modules/user.js",
+    "zhi2-web-admin/src/views/benefit/statisticsMapDetail/index.vue"
+   ],
+   "sessionIds": [
+    "0ed5cf4a-e8c4-45ba-9edf-cda9a2f0dd54"
+   ],
+   "title": "B 端首页在 terminalType 就绪前就已挂载：v-if 分叉必须先过「类型就绪」门闩",
+   "type": "bug",
+   "bundle": "062.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "d5eee56",
+   "content": "场景：月报统计详情页把「单位」做成独立一列，用户要求与月报一致——单位随叶子节点名称合并显示（如「有编制(名)」），不单独成列。做法分两步且必须成对改：① 数据层 src/utils/monthlyReport.js——buildStatTableRows 改回默认的 buildHierarchyCells(paths)，单位自然并入叶子名；同时把返回对象里只服务于独立列的 unitName 字段删掉，否则后续会有人又拿它渲染出一列；② 视图层 monthlyReportStat/detail.vue——同步删 <colgroup> 的单位列、表头「单位」列、tbody 里 row.unitName 的单元格、以及 .unit-col 样式；③ 列宽同样必须同步：buildStatColumnWidths 里删掉 unit 列宽计算，tableWidth 不再含单位列，否则整表列宽按多一列分配而漂移，表头与单元格错位。验收口径：本地脚本比对统计页与月报页叶子节点名称一致、columnWidths 中已无 unit 字段。边界必须提前告知用户：页面展示已对齐但「导出」走的仍是后端 /property/monthlyReportStat/export，Excel 里若还有独立单位列，前端改不动，需后端同步。",
+   "evidence": "用户要求「月报统计的单位想和月报一样，不需要单独拆一列」；改 monthlyReport.js 的 buildStatTableRows/buildStatColumnWidths 与 detail.vue 四处单位相关代码，并说明导出需后端调整。",
+   "files": [
+    "zhi2-web-admin/src/utils/monthlyReport.js",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReportStat/detail.vue",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReport/components/ReportItemsTable.vue"
+   ],
+   "sessionIds": [
+    "c17a549c-5505-45c7-a569-8186d32c2167"
+   ],
+   "title": "同族统计页对齐报表的列口径：结构对齐只改前端，导出链路与列宽计算要一起收敛",
+   "type": "pattern",
+   "bundle": "062.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "月报模板树表「新增下级」后父级填报列仍显示且仍拦截保存：isLeafNode 不能优先看 leafFlag",
+   "type": "bug",
+   "content": "情况：公共查询-物业管理区域月报的模板配置（TemplateTreeTable）里，对一个已有叶子行点「新增下级」后，父级的 单位 / 单位属性 / 本月数据 / 本年累计 / 历史累计 五列仍然渲染，并且保存时父级还会被「单位名称不能为空」拦下。\n为什么：判断叶子节点的函数 isLeafNode 原先优先读后端字段 leafFlag === '1'，只要该行历史上被标成叶子，push 子节点之后它依然是「叶子」，五列继续展示并参与 validateTemplateTree 必填校验。leafFlag 是结果字段，不是判定依据。\n怎么做（monthlyReport.js）：① isLeafNode 只按 children.length 判断，彻底不读 leafFlag；② 新增 clearBranchNodeFields，清空分支节点的单位/填报字段并显式置 leafFlag='0'；③ 新增 ensureLeafFields，叶子节点置 leafFlag='1' 并补默认值；④ normalizeTemplateOrder 在保存前统一同步 leafFlag（分支清字段、叶子补默认），与 index.vue 的 handleSave 调用一致；⑤ TemplateTreeTable 的 addChild 要在 push 子节点之前调用 clearBranchNodeFields(row.node)，之后才递归重算展示与校验。\n注意：删光子级后 ensureLeafFields 只恢复默认空值，不会还原加下级前的填写内容——这是产品确认过的预期行为，不要试图做快照回滚。",
+   "evidence": "会话 78a75b10（2026-09-18，基线 4f7c2c3）用户报「编辑已有的新增下级的时候，单位/单位属性/本月数据/本年累计/历史累计 仍然显示了[期望] 当存在下级的时候，上一级的…自动清空且无需校验必填」。最终结论：根因是 isLeafNode 原先优先看 leafFlag==='1'，在已有叶子项上新增下级后父节点仍被当成叶子；改为仅按 children.length 判断，并新增 clearBranchNodeFields/ensureLeafFields、addChild 先清父级、normalizeTemplateOrder 保存前同步 leafFlag。本地脚本验证：带 leafFlag:'1' 的父节点 push 子节点后 isLeafNode 为 false，validateTemplateTree 不再报父级单位名称不能为空，删光子节点后能恢复默认值与 leafFlag:'1'。",
+   "files": [
+    "zhi2-web-admin/src/utils/monthlyReport.js",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReportTemplate/components/TemplateTreeTable.vue",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReportTemplate/index.vue"
+   ],
+   "baseline": "4f7c2c3",
+   "sessionIds": [
+    "78a75b10-f6bb-48e1-ade4-51abaa4d72e3"
+   ],
+   "bundle": "063.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "行业管理 6 个列表统一「更新时间最多跨 2 天」：限制必须内聚到共享工具，不要逐页改 zs-advanced-query",
+   "type": "workflow",
+   "content": "情况：产品要求 物业服务企业 / 开发企业 / 信托公司 / 机构变更 / 机构注册审核 / 人员管理 这些行业管理列表的「更新时间」筛选，前后跨度最多 2 天（原实现按年，常量名为 TWO_YEARS_MS）。\n为什么：这 6 个页面的高级查询（enableAdvancedQuery + zs-search-form/zs-advanced-query）共用同一套日期区间解析，若逐页改 formItems 或改公共 zs-advanced-query，前者会造成 6 份口径漂移，后者会波及全后台其它模块的日期筛选。\n怎么做：只改 src/utils/companyListQuery.js 一处——① 常量 TWO_YEARS_MS 改名并改值成 TWO_DAYS_MS（2 天毫秒数）；② 选日限制：首个选中日作为锚点，与锚点相差超过 2 天的日期置灰不可选；③ 搜索校验：跨度超限时提示「更新时间跨度最多可选择2天」并阻断查询。6 个页面通过共用工具自动生效，不改页面代码。\n验收：9/9→9/11 允许，9/9→9/12 拦截（9/12 置灰）。注意 trust/index.vue 当前未开 enableAdvancedQuery、页面暂无「更新时间」项，属于未受影响项，不要因为验收看不到而误判改造失败；后续其开启高级查询会自动继承该限制。",
+   "evidence": "会话 84fe40ac（2026-09-17，基线 d5eee56）用户点名校验 6 个页面「跨度限制两天」。最终结论写明「仅修改了 zhi2-web-admin/src/utils/companyListQuery.js，6 个 Vue 页面通过共用工具自动生效」：常量 TWO_YEARS_MS → TWO_DAYS_MS、首个选中日为锚点后超过 2 天的日期置灰、搜索跨度超限提示「更新时间跨度最多可选择2天」；并说明信托企业页当前未开启 enableAdvancedQuery 暂无该筛选项。",
+   "files": [
+    "zhi2-web-admin/src/utils/companyListQuery.js",
+    "zhi2-web-admin/src/views/company/companyManagement/property/index.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/change/index.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/index.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/trust/index.vue",
+    "zhi2-web-admin/src/views/company/companyRegister/index.vue",
+    "zhi2-web-admin/src/views/company/staffManagement/components/index.vue"
+   ],
+   "baseline": "d5eee56",
+   "sessionIds": [
+    "84fe40ac-f546-41bc-9d7e-76bd876f4594"
+   ],
+   "bundle": "063.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 删除子表行后「本次核销金额」不归零：handleDelete 成功后没触发父页 refresh",
+   "type": "bug",
+   "content": "情况：公共收益-回单核销 / 物业收入类账单详情页，删除一张单据后子表列表刷新了，但基本信息里的「本次核销金额」仍是旧值，造成列表与表头汇总数据不一致（主线、无锡三资同样有此问题）。\n为什么：详情页 detail.vue 早已写了 @refresh=\"getDetail\"，期望子表操作后重拉详情；但删除走的是 table.js 混入的公共 handleDelete，它成功后只调用子表自己的 getList()，既不 $emit('refresh') 也不调用父页刷新，于是父页的详情接口根本没被重新请求，汇总字段自然不会变。\n怎么做：在子表组件里补 deleteSuccessCallback(){ this.$emit('refresh') }（本仓 table.js 的 handleDelete 会调用这个可选钩子），父页 detail.vue 的 @refresh=\"getDetail\" 不变。物业模块的 billDetailSubTable 则是在 getList() + clearSelection() + msgSuccess 之后手动补 this.$emit('refresh')。\n与已知 #548（OperationBtnGroup emit refresh）的区别：那条解决的是提交/审核后详情不刷新，本条是「子表行删除」这条独立链路，根因是通用 handleDelete 与父页 refresh 约定之间缺挂钩。改动需要 cherry-pick 到多个分支时，逐分支确认子表是否都补了钩子。",
+   "evidence": "064.md 会话 5bdbdabe：删除单据后基本信息「本次核销金额」不归零；根因为删除走 table.js 的 handleDelete 只调 getList()、未触发 refresh；修复为 VerificationReceiptDetailTable.vue 增加 deleteSuccessCallback 发 refresh，billDetailSubTable.vue 补 $emit('refresh')；已 cherry-pick 到 develop/v2.6.1 (a7ed8c1db)、develop/v2.6.2 (bcf3d9fba)、develop/v2.6.2-suzhufang (ed0acf3c0+dcf7a6c80)",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubVerificationReceipts/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue",
+    "zhi2-web-admin/src/views/property/propertyVerificationReceipts/components/billDetailSubTable.vue",
+    "zhi2-web-admin/src/mixins/table.js"
+   ],
+   "baseline": "fb3e960",
+   "sessionIds": [
+    "5bdbdabe-84ea-4974-b2f7-6db72c21377d"
+   ],
+   "bundle": "064.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] zs-dialog 新增 zs-dialog--scrollable 模式导致「内容溢出却完全不能滚动」，且只存在于单分支",
+   "type": "bug",
+   "content": "情况：suzhufang 分支上弹窗内容明显超出高度，但既看不到滚动条也滚不动，内容被直接裁掉。同样的页面在 develop/v2.6.2 上正常。\n为什么：滚动能力被两次提交改坏了——4defa2128 引入「高度自适应 + neutralizeInnerScrollContainers」，把内部滚动容器的 overflow 中和掉；4879d1d31 又引入 zs-dialog--scrollable 模式，最终没有任何一层承担 overflow:auto + max-height。旧版 zs-dialog 是 .form-box 用 overflow:auto + max-height 做内部滚动，所以 2.6.2 不受影响；这两个提交是从 2.6.2 分出后单独合入 suzhufang 的。\n怎么做：先按分支定位，用 git log -S/zs-dialog--scrollable 确认问题提交是否在当前分支，不要在全分支盲改公共弹窗；修复落在当前分支的 zs-dialog 滚动链（明确唯一滚动层），同时排查所有依赖弹窗内滚动的页面（zs-dialog 是公共组件，改动面是全局的，不能只验证截图那一处）。同理，「为什么别的地方没事」这类问题先做分支差异比对再动手。",
+   "evidence": "064.md 会话 17392583：用户报「弹窗内部内容超出但无法滚动」，要求分析是哪个改动影响的、还有哪些弹窗受影响；结论为仅 develop/v2.6.2-suzhufang 含 4defa2128（高度自适应+neutralizeInnerScrollContainers）与 4879d1d31（zs-dialog--scrollable），develop/v2.6.2 停在 f1b078cb9 仍是旧滚动逻辑",
+   "files": [
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue",
+    "zhi2-web-admin/src/views/system/menu/index.vue"
+   ],
+   "baseline": "69e9d4d",
+   "sessionIds": [
+    "17392583-56a4-49a0-82fb-430a5f1aadfe"
+   ],
+   "bundle": "064.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 左侧部门/区域树返回后跳回根节点：parentDeptId 没进搜索缓存 + tree-ready 早于 setNodeContext",
+   "type": "bug",
+   "content": "情况：行政区域银行授权、物业管理区域等「左侧树 + 右侧列表」页面，从详情页返回列表后，树自动回到了「苏州市」根节点，列表也不再是之前筛选的街道数据。\n为什么两个叠加原因：一是 RegionTreeLayout 靠 cachedSearchParams.parentDeptId 恢复树选中，但列表页的 queryParams 只缓存了 regionCode、没保存 parentDeptId，返回时无处可恢复；二是 RegionTreeLayout 里 tree-ready 在 setNodeContext 之后才触发，导致 getList() 执行时 nodeContext 还是默认市级节点，即使选中态恢复了数据也仍是市级的。\n怎么做：①queryParams 里补 parentDeptId，与搜索条件一起进缓存；②点树节点、setNodeContext 时双向同步 parentDeptId；③handleTreeReady 用 findParentNode 还原街道级节点的父级上下文；④getQueryParams 里把 parentDeptId 过滤掉，避免当作业务参数发给后端；⑤调整 tree-ready 顺序——先通知父组件设置上下文，再调 getList()。配套再加一条：退出登录必须清缓存（见下一条），否则换账号会继承上一账号的部门筛选。",
+   "evidence": "064.md 会话 5decc0c2：部门树从详情返回后回到苏州市节点；根因是未缓存 parentDeptId + tree-ready 触发顺序错误；修复涉及 regionBankAuth/index.vue 与 RegionTreeLayout.vue 的 queryParams、setNodeContext、handleTreeReady、getQueryParams、树节点点击与 tree-ready 顺序",
+   "files": [
+    "zhi2-web-admin/src/views/system/regionBankAuth/index.vue",
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue",
+    "zhi2-web-admin/src/views/property/complex/components/regionTree.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "baseline": "864b409",
+   "sessionIds": [
+    "5decc0c2-1c85-4c33-89ec-7c181923edc0"
+   ],
+   "bundle": "064.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] Vuex cachedSearchParams 跨账号残留：换账号后仍带着上一账号的部门筛选（LogOut 未清理）",
+   "type": "bug",
+   "content": "情况：物管办账号登录后进入物业管理区域列表并选了部门树节点，退出登录，再用物业账号登录进入同一列表，数据仍按物管办的 parentDeptId 过滤，看起来像「信息还是物管办的」。直接分别登录两个账号都正常，只有「先登 A、退出、再登 B」才复现。\n为什么：parentDeptId 被写进了 Vuex common 模块的 cachedSearchParams，而 user 模块的 LogOut / FedLogOut 只清了 token 与用户信息，没清这份列表搜索缓存。listMixins 与 RegionTreeLayout 在 mounted 时无条件从缓存恢复筛选，于是把上一账号的上下文带进了新会话。\n怎么做：在 store/modules/user.js 的 LogOut 与 FedLogOut 两个 action 里都加 dispatch('common/clearAllSearchParams', null, { root: true })。要点：①两个「登出」入口都要加，只改一个会出现 FedLogOut 路径残留；②加跨 root 的 dispatch 必须显式传 { root: true }；③凡是「为了返回后保持筛选」而新增到 cachedSearchParams 的字段，都要评估它是否属于账号/机构维度，属于就必须进登出清理清单，否则会演变成跨账号数据串味。",
+   "evidence": "064.md 会话 c14c5230：用户诊断为「parentDeptId 退出登录的时候没有清理」；在 store/modules/user.js 的 LogOut 与 FedLogOut 中补 dispatch('common/clearAllSearchParams', null, { root: true })，清空 cachedSearchParams（含 parentDeptId）",
+   "files": [
+    "zhi2-web-admin/src/store/modules/user.js",
+    "zhi2-web-admin/src/store/modules/common.js",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue"
+   ],
+   "baseline": "2a3ef8a",
+   "sessionIds": [
+    "c14c5230-321b-471a-a40a-e48d33f20dbb"
+   ],
+   "bundle": "064.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 树层级切换时同一列在「文字/开关」间错乱：v-for 的 key 只取 prop，列组件被跨层级复用",
+   "type": "bug",
+   "content": "情况：行政区域银行授权页左侧树在市/区/街道间反复点击，「启用状态」列有时显示字典文字、有时显示开关，越点越乱；静止操作时正常。\n为什么两层叠加：①表格列的 :key 只写了 column.prop || column.label，而市级的 enableStatus 列 type=dict、区级是 type=switch，prop 相同导致 Vue 复用同一个列组件实例，只更新 props、内部渲染器不重建，于是残留上一种渲染形态；②快速切换时多个 getList 并发，后发先回会用旧层级的响应覆盖新层级的数据，进一步放大错乱。\n怎么做：①给表格加层级 key（:key=\"tableViewKey\"，值取 city/district/street）强制重建；②列 key 带上层级与类型：`${tableViewKey}-${column.prop}-${column.type}`；③加请求序号保护（listRequestId），响应回来时序号不匹配就丢弃。排查提示：用户说「有时候 A 有时候 B」且与操作速度相关时，优先怀疑「同 prop 不同 type 的列复用 + 异步竞态」，而不是业务状态字段或权限。",
+   "evidence": "064.md 会话 ecdea30a：用户纠正「不是设计问题，而是反复点击市级区级街道会错乱」；根因为列 key 仅用 column.prop 导致同 prop 不同 type 的列组件被复用、以及快速切换 getList 响应互相覆盖；修复为 tableViewKey 整表重建、列 key 含层级与类型、listRequestId 丢弃过期响应",
+   "files": [
+    "zhi2-web-admin/src/views/system/regionBankAuth/index.vue",
+    "zhi2-web-admin/src/views/system/regionBankAuth/utils.js",
+    "zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "baseline": "864b409",
+   "sessionIds": [
+    "ecdea30a-99b2-441c-917e-7cbad52000ed"
+   ],
+   "bundle": "064.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] ImageUpload 的 picture-card 把 PDF 地址当 img.src 显示破图：缩略图与预览要按扩展名分流",
+   "type": "bug",
+   "content": "情况：项目经理-劳动合同等字段允许上传 png/jpg/jpeg/pdf，上传 PDF 后缩略图显示破图，点击预览也不正常。\n为什么：该字段用的是通用 ImageUpload 组件，内部 el-upload 的 picture-card 模式直接把文件 URL 塞进 <img src>。PDF 不是可渲染图片，必然破图。注意这与已知的「附件扩展名不能用后端 fileType 字典码推断」是同源问题，但落点不同：那条讲的是详情页附件区的展示分组，本条是通用上传组件内部的缩略图/预览。\n怎么做：在组件内部按扩展名分流，且要组件级修复（所有用 ImageUpload 传 PDF 的场景一起受益，不要在某个详情页单独打补丁）：\n1) 抽 getFileExtension(url)：先 String(url).split('?')[0] 去掉查询串再取最后一段，避免签名 URL 干扰；\n2) isImageFile(url) 判断是否在 imageType（png/jpg/jpeg…）白名单内；\n3) getThumbnail(url)：是图片走 resolveServerAssetUrl(url)，否则统一返回 resolveServerAssetUrl('/assets/images/file.png') 文件图标；\n4) 预览分流：PDF 用新窗口打开，不要走 v-viewer/el-image 的图片预览器。\n详情页查看态本身已区分 PDF 与图片，无需改动。",
+   "evidence": "064.md 会话 b316e20e：「项目经理：劳动合同上传PDF时为破图」；根因是 ImageUpload 用 picture-card 把 PDF 地址当图片预览；修复为 ImageUpload/index.vue 增加 getFileExtension / isImageFile / getThumbnail，非图片显示 /assets/images/file.png 并在新窗口打开预览",
+   "files": [
+    "zhi2-web-admin/src/components/ImageUpload/index.vue",
+    "zhi2-web-admin/src/views/company/staffManagement/components/detail.vue",
+    "zhi2-web-admin/src/views/institution/personnel/detail.vue"
+   ],
+   "baseline": "b8ae114",
+   "sessionIds": [
+    "b316e20e-0ccc-42dd-a146-455063df0ac0"
+   ],
+   "bundle": "064.md",
+   "project": "苏住房G"
+  }
+ ]
+}

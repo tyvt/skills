@@ -1,0 +1,110 @@
+{
+ "project": "园区物管2.0",
+ "batch": "037",
+ "files": [
+  "037.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "我本地运行是可以的，打包之后还是被el-form校验",
+   "type": "preference",
+   "content": "## 原因说明 `el-form` 校验时，`ElFormItem` 的 `fieldValue` 是直接从 **`form.model` + `prop`** 里取的，不依赖你在输入框里“看起来有没有字”。 开发能过、**打包后**才像“空值”，常见有两类原因： 1. **同一事件循环里的顺序**：最后一位输入后立刻失焦时，`el.form.blur` 触发的校验若早于父组件把 `v-model` 写进 `model`，读到的仍是旧值（生产用 `vue.min.js`、批处理更紧时更容易暴露）。 2. **自定义组件向上找 `ElFormItem`**：用 `$options.componentName === 'ElFormItem'` 时，若外链/压缩后的 `element-ui` 表现不一致，可能找不到表单项（你原来给 `change` 做的 `dispatch` 会失效；整表 `validate()` 仍主要看 model，但 blur/change 触发会乱）。 ## 已做修改（`AmountInput/index.vue`） 1. **显式 `model: { prop: 'value', event: 'input' }`**，避免构建链对 v-model 的歧义。 2. **`numberValue` 的 watch 增加 `{ flush: 'sync' }`*",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`vue.min.js",
+    "已做修改（`AmountInput/index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\components\\AmountInput\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\package.json、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\components\\feeBindScopeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "65814715-d99f-446d-b239-bd55aaced626"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "文件改为英文名",
+   "type": "bug",
+   "content": "已修复。pre-commit 报错是因为 `@/assets/images/benefit/` 下的停车位图标已改为英文名，但 import 仍指向旧的中文路径。 已更新为： | 原路径 | 新路径 | |--------|--------| | `停车位总数.png` | `parking-space-total.png` | | `产权车位数.png` | `parking-space-property.png` | | `公共车位数.png` | `parking-space-public.png` | `import/no-unresolved` 错误已消除，可以重新提交。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\operatingAssets.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0599d819-a6e3-4454-9b2f-cd11e82c7dc5"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "有小计的表格缺失下边框线",
+   "type": "fact",
+   "content": "已修复小计行缺失下边框的问题。 **原因：** - 列表页 `.list-card` 里的表格只设置了上/左/右边框，没有下边框 - 有分页时不会加上 `zs-table-container--bottom-spacing`，因此不会自动补下边框 - 小计行在 `el-table__footer-wrapper` 内，底部边框容易被 `overflow: hidden` 裁切，视觉上就像缺线 **修改：** 1. **`zs-table.vue`** — 启用合计行时增加 `zs-table-container--with-summary` 类名 2. **`index.scss`** — 对有合计行的表格补上 `border-bottom: 1px solid #f0f0f0` 3. **`resourcesLeaseContractFiling/index.vue`** — 与项目其他合计表格保持一致： - 绑定 `:border=\"border\"` - 设置 `bottom-summary-variant=\"table\"`，让下方「合计」区域与表格边框衔接 刷新页面后，小计行下方应能看到完整边框，下方「合计」区域也会与表格对齐。该样式修复对所有带小计的列表页都生效。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "**`zs-table.vue",
+    "**`index.scss",
+    "**`resourcesLeaseContractFiling/index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\resourcesLeaseContractFiling\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\components\\ZsSummaryText\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9a3daf50-8a49-4516-af4c-070c6201cf9b"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "{ \"code\": 200, \"msg\": \"操作成",
+   "type": "pattern",
+   "content": "已处理。各类收入/支出分布图与账户余额图是同一类问题：`parseCategoryAmount` 把接口已是「万元」的 `categoryAmount` 又做了一次 `yuanToWan`（÷10000），柱形几乎看不见。 **修改**（`dataHelpers.js`）： - `parseCategoryAmount` 改为使用 `toChartWanAmount`，与 `regionBalance` 一致，按万元直接用于图表。 - Y 轴上限仍由 `Math.ceil(maxVal * 1.12)` 计算，小金额会自动适配（例如最大值 0.22 万时，Y 轴上限约为 1）。 顶部「收入金额 / 资金支出」卡片用的 `totalAmount` 本来就是直接赋值，未做 ÷10000，无需改动。 刷新页面后，各类收入/支出分布图应能正常显示柱条。若仍不对，发一下对应接口的 `categoryAmount` 返回示例即可。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "**修改**（`dataHelpers.js",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\mock.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "028698e5-6e86-4303-861e-cf865cc0fb59"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "按照图修改提示语位置",
+   "type": "bug",
+   "content": "已调整。原因是提示语原先设置了 `padding-bottom: 12px`，而表格容器本身还有 `padding-top: 12px`，导致下方间距变成 24px，比上方更大。 现在改为 `padding: 12px 12px 0`，上下间距均为 12px： - **上方**：标题分隔线到提示语 = 12px - **下方**：提示语到表格 = 12px（由表格容器上内边距提供） 刷新页面即可看到效果。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubRevenueContract\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\assetsLeaseContractFiling\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "14b45942-7d90-49e2-9568-f168ec1c668e"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "抽取专家详情",
+   "type": "pattern",
+   "content": "已按截图要求完成「抽取专家详情」页面的 UI 调整，修改如下： ### 1. 基本信息表单布局（`credit/extract/detail.vue`） - **查看模式**：使用 `DetailTemplate` 蓝色矩形表单展示 - **字段顺序**：抽取事项 → 专家总数 / 抽取人数 / 屏蔽专家数 → **备注（最后一行）** - **编辑模式**：备注同样移到专家总数那一行下方 ### 2. 表格底部记录数 - **屏蔽专家**（`BlockExpertTable.vue`）：增加 `共 XX 条记录` - **抽选结果**（`ExpertResultTable.vue`）：增加 `共 XX 条记录` ### 3. 同步修复物业模块（`property/extract/detail.vue`） - 编辑模式备注位置调整 - 查看模式 `contentInfo` 中备注移到最后 刷新页面后即可看到效果。如需进一步调整样式或字段布局，告诉我即可。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "基本信息表单布局（`credit/extract/detail.vue",
+    "**屏蔽专家**（`BlockExpertTable.vue",
+    "**抽选结果**（`ExpertResultTable.vue",
+    "同步修复物业模块（`property/extract/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "87a99be6-6232-4f70-af80-05cf6659e728"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

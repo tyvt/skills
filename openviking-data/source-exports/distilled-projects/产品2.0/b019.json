@@ -1,0 +1,143 @@
+{
+ "project": "产品2.0",
+ "batch": 19,
+ "files": [
+  "073.md",
+  "074.md",
+  "075.md",
+  "076.md"
+ ],
+ "count": 8,
+ "memories": [
+  {
+   "baseline": "50767de~54577f2",
+   "content": "什么情况：等保加密改造把非白名单 GET 统一改写为 POST 后，两类静默失败集中出现：① request('/system/region/listTree') 这类原本无参的请求没有 body，后端 @RequestBody 直接报 Required request body is missing；② 字典接口 /system/dictData/listByType 从 V2 的路径参数 GET（/listByType/biz_state）改为 POST，且 body 形态有讲究。为什么：V3 规范化层只负责改写方法，不会替调用方补请求体；而字典接口后端 @RequestBody 要求 JSON 对象 { dictType: \"biz_state\" }，直接把裸字符串当 body（加密层 stringify 成 \"biz_state\"）虽然能过一次联调，但与对象契约不符。怎么做：1) 在 request.js 拦截器里统一兜底：POST 且 config.data == null 时补 config.data = {}，一处覆盖所有无参 listTree/list 调用；2) dict.js 统一字典加载函数改为 POST('/system/dictData/listByType', { dictType })；3) 在 apiV3Normalize.js 里补 V3 路径规范化映射（如 listByType: 'dictType'），让旧式路径参数写法自动降级成 body 字段；4) e2e mock fixture 同步改成解析 JSON body 里的 dictType 字段，否则真实环境修好了 mock 环境仍 404。",
+   "evidence": "会话 fcb686e6 / 2565718c：request.js 拦截器补 {} 修复 Required request body is missing；dict.js 从裸字符串改为 { dictType } 对象传参，并同步 apiV3Normalize 映射与 register-mocks.js",
+   "files": [
+    "zhi2-web-admin/src/utils/request.js",
+    "zhi2-web-admin/src/utils/dict.js",
+    "zhi2-web-admin/src/utils/apiV3Normalize.js",
+    "zhi2-web-admin/e2e/fixtures/register-mocks.js"
+   ],
+   "sessionIds": [
+    "fcb686e6-73e3-4f1f-8aff-ccc07305e948",
+    "2565718c-2639-4d49-96b3-c97a40e2cfd2"
+   ],
+   "title": "加密/V3 POST 化改造后 GET→POST 迁移的三类请求体坑（空 body、路径参数、字典 body 形态）",
+   "type": "bug",
+   "bundle": "073.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "50767de~54577f2",
+   "content": "什么情况：本地 Windows 构建通过、提交后 GitLab Runner（Linux）构建报 Rollup \"Could not resolve ./components/unitTable.vue\"。为什么：Windows 文件系统不区分大小写，import 路径写 `./components/unitTable.vue` 而实际文件名是 `UnitTable.vue` 也能解析成功；Linux 区分大小写，Rollup 精确匹配文件名，直接解析失败。这类问题本地任何构建/静态检查都发现不了，只在 CI 爆。怎么做：import 路径必须与磁盘上真实文件名逐字符一致（含扩展名大小写）。团队约定：新建组件文件统一 PascalCase 命名（UnitTable.vue），import 时也写 PascalCase；在 Windows 上开发后若担心存量混用，可用 `git config core.ignorecase false` + `git ls-files | sort` 或脚本比对 import 路径与 git 索引中的实际大小写来全仓扫描一遍，再提交。遇到「本地构建过、CI 挂在 resolve import」的报错，第一嫌疑就是大小写不一致。",
+   "evidence": "会话 77670b3d：CI 报 Could not resolve \"./components/unitTable.vue\"，本地能构建；根因是 Windows 大小写不敏感，修复为与实际文件名 UnitTable.vue 一致后本地 build exit 0",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/detail.vue"
+   ],
+   "sessionIds": [
+    "77670b3d-757c-4c9b-81a1-088b6d675376"
+   ],
+   "title": "Windows 大小写不敏感掩盖 import 路径大小写错误，Linux CI 构建必挂",
+   "type": "bug",
+   "bundle": "073.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "a357f32（StatisticsDialog.vue / zs-dialog 数据驱动的自动高度弹窗）",
+   "content": "什么情况：详情页内打开承载多个数据区块（如综合查询弹窗同时展示开发企业、物业企业、物管会、业委会）的弹窗时，数据一多弹窗就超出视口，标题栏和关闭按钮被顶出屏幕外，导致弹窗无法关闭。为什么：zs-dialog 的默认行为是按内容自动计算高度、不设上限，内容高度不受视口约束；这类「数据量不可控」的弹窗必须自己兜底。怎么做：在弹窗组件层加整体 max-height（如 88vh），并给内容区（.dialog-box）设 overflow-y:auto，让超长内容在弹窗内滚动；标题栏保持固定在顶部，关闭按钮始终可见。注意要改在弹窗组件自身的样式里，而不是调用方 detail.vue 里。",
+   "evidence": "会话 fe6a9c71：物业管理区域备案详情页点综合查询弹窗过长无法关闭；修复为 StatisticsDialog.vue 中弹窗 max-height:88vh + .dialog-box overflow-y:auto + 标题栏固定。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/components/StatisticsDialog.vue",
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue"
+   ],
+   "sessionIds": [
+    "fe6a9c71-d8dc-4321-9d4d-34e4729e5e46"
+   ],
+   "title": "数据量不可控的 zs-dialog 弹窗必须显式 max-height + 内容区滚动，否则关闭按钮被顶出视口",
+   "type": "pattern",
+   "bundle": "074.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "6b9d9d7（@/utils/request.js 拦截器 + 弹窗内 submitForm 直接调 request）",
+   "content": "什么情况：审查弹窗「点确定后关不掉」时（如开户选楼 OpeningBuildingDialog），发现 close() 写在 request().then(res => res.code==200) 分支里。为什么：全局 request 封装下，业务码非 200、网络错误、HTTP 异常都会走拦截器 Promise.reject，根本进不了 then，close() 不会执行且没有 catch/finally 兜底；另外 then 里再判 res.code == 200 属于双重判断，遇到成功体缺 code 字段（undefined == 200）也会假失败。怎么做：分析此类「确定后不关」问题先看三点：①close 是否只在 then 内；②全局拦截器对失败的reject 行为（本项目失败不会 resolve，所以主因是 reject 不进 then）；③then 内的 code 判断是否与拦截器重复。修复方向是提交请求加 catch/finally 或成功后无条件关弹窗，并补上提交前缺漏的表单 validate（手动输入金额为空也会导致 reject 不关）；同时注意成功分支里 close() 自身抛错（如 $refs 已卸载）会造成「半关」观感。",
+   "evidence": "会话 427d58f8：对 ScopeSelectDialog 与 OpeningBuildingDialog 的 submitForm 分析，close() 仅在 then + res.code==200 内，无 catch/finally，且提交前未做表单校验。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/components/OpeningBuildingDialog.vue",
+    "zhi2-web-admin/src/utils/request.js"
+   ],
+   "sessionIds": [
+    "427d58f8-75b8-425c-af42-6fe424dbe22b"
+   ],
+   "title": "弹窗提交的 close() 只放 then+code==200 分支时，接口 reject 会静默导致「确定后关不掉」",
+   "type": "pattern",
+   "bundle": "074.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "64fa9e2 ~ 94b86fa 期间（2026-05~07）",
+   "content": "什么情况：在 V3 后台列表页给筛选栏新增「行政区域」筛选时，不应手写下拉。为什么：项目已把区划能力沉淀在公共 mixins/area.js（regionOptions、region-select 控件），手写会造出第二套区划数据源与口径。怎么做：① 引入 @/mixins/area.js；② queryParams 增加 regionCode 参数随列表请求传后端；③ 筛选项配 type: 'region-select'，与 building/plot 等既有列表页写法一致。若后续要把「街道/社区」从文本框升级为按编码联动下拉，参考 autonomy/preparatoryApply/index.vue：重写 currentRegionCode 并改用 subdistrictCode / communityCode 编码字段。注意与已知条目 #595 的区别：那条例的是页面同名 regionOptions 与 mixin computed 撞车，本条是该能力的标准接入方式。",
+   "evidence": "会话 56dbde32：在 pubManagementOrg/index.vue 筛选栏加行政区域筛选，采用 area mixin + region-select + regionCode 的三件套写法，并指出街道/社区升级路径在 autonomy/preparatoryApply",
+   "files": [
+    "zhi2-web-admin/src/mixins/area.js",
+    "zhi2-web-admin/src/views/benefit/pubManagementOrg/index.vue"
+   ],
+   "sessionIds": [
+    "56dbde32-7046-4d21-81d3-05ad6a8e4261"
+   ],
+   "title": "列表页行政区域筛选的标准接入：area mixin + region-select 搜索项类型",
+   "type": "pattern",
+   "bundle": "075.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "0161609 ~ 94b86fa 期间（2026-07）",
+   "content": "什么情况：需求是某角色（如企业管理员 isCompanyAdmin）在详情页子表上「新增/删除」按钮可见但必须置灰。为什么：只改「新增」按钮的 disabled 不够——「删除」走的是 listMixins/table mixin 的默认 multiDeleteButton，页面不重写就仍是可点的；且前端置灰可被绕过，需要在方法层兜底。怎么做：① 在子表组件重写 multiDeleteButton，把角色条件并入 disabled（disabled: isCompanyAdmin || selection.length===0），保持 permission/multi 等其余契约不变；② 在 handleDelete 开头加同条件拦截，即使绕过 UI 也不执行删除；③ 角色标志由详情页把接口字段 :isCompanyAdmin=\"form.isCompanyAdmin\" 传给子表，详情页本身不用改。这与已知 #823（复用 multiDeleteButton 不要自造按钮）互补：本条补充了「按角色置灰需重写 + 方法层双保险」的做法。",
+   "evidence": "会话 01e7eed0：operatorAuthRangeTable.vue 重写 multiDeleteButton 使企业管理员删除按钮置灰，并在 handleDelete 中拦截，新增按 isCompanyAdmin 置灰但删除漏控的根因",
+   "files": [
+    "zhi2-web-admin/src/views/company/userManagement/operatorAuth/operatorAuthRangeTable.vue"
+   ],
+   "sessionIds": [
+    "01e7eed0-b3c3-4b15-9fda-320771899793"
+   ],
+   "title": "子表按角色禁用操作按钮：重写 multiDeleteButton + handleDelete 双层拦截",
+   "type": "pattern",
+   "bundle": "075.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "5169909",
+   "content": "什么情况：企业注册 Step1 打开 ZsTencentMap 地图弹窗时报 `ReferenceError: TMap is not defined`（Vue nextTick 错误栈指向地图组件）。为什么：组件在 created() 里调 loadMap() 加载腾讯地图 SDK 脚本但不等待完成；弹窗 onOpen() 在 $nextTick 里直接 init()，此时 SDK 脚本尚未加载完，全局 TMap 还不存在。怎么做：地图组件的初始化必须串接在 loadMap() 的 Promise 之后——onOpen() 改为 `loadMap().then(() => this.$nextTick(() => this.init())).catch(() => msgError('腾讯地图加载失败，请检查系统配置'))`；created() 里的 loadMap() 保留作预加载，loadMap 内部复用同一个 Promise，不会重复注入脚本。根因是「脚本动态加载是异步的，任何依赖全局 SDK 的 init 都必须 await」，这一套路适用于所有以 <script> 注入方式加载的第三方地图/图表 SDK。若仍失败需检查系统配置的腾讯地图 Key（qq.map.key）。",
+   "evidence": "会话 c02c94c0：报错栈在 ZsTencentMap/index.vue；修复代码 onOpen() { loadMap().then(() => this.$nextTick(() => this.init())).catch(...) }，并说明 created() 保留预加载、复用同一 Promise 不重复加载。",
+   "files": [
+    "zhi2-web-admin/src/components/ZsTencentMap/index.vue",
+    "zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js"
+   ],
+   "sessionIds": [
+    "c02c94c0-4ea3-4558-a2c3-49dd740548de"
+   ],
+   "title": "ZsTencentMap 弹窗报 TMap is not defined：SDK 异步加载未等待，onOpen 必须 await loadMap()",
+   "type": "bug",
+   "bundle": "076.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "76646e6",
+   "content": "什么情况：publicQuery/complex 的停车子表（parkingTable.vue）渲染报 `Property or method \"tableRowStyle\" is not defined`。为什么：ListTemplate.js 模板里绑定了 `:row-style=\"tableRowStyle\"`，但该方法应由 table.js mixin 提供；subTableMixins → table 链路里 mixin 并没有定义 tableRowStyle，于是任何通过该链路使用 ListTemplate 的子表在渲染时都会命中这个未定义绑定。这与「页面自己写错选项位置」不同，是模板与 mixin 之间的契约缺口：ListTemplate 模板引用的每个方法/计算属性都必须在 table mixin 里有默认实现。怎么做：在 table.js 的 computed 中补默认 `tableRowStyle` 返回 null（zs-table 无自定义行样式时用默认样式）；需要行样式的页面在各自组件里重写该计算属性。排查类似问题时，凡 ListTemplate 模板出现的绑定在页面报未定义，优先怀疑 mixin 缺默认实现，而不是页面代码。",
+   "evidence": "会话 9acb00ce：报错组件 parkingTable.vue（经 zs-tabs/Headline/detail.vue 链路）；结论写明 ListTemplate.js 模板绑定 :row-style=\"tableRowStyle\" 而 table.js mixin 未定义，修复为在 table.js computed 增加返回 null 的默认 tableRowStyle，页面可重写。",
+   "files": [
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/mixins/ListTemplate.js",
+    "zhi2-web-admin/src/mixins/subTableMixins.js"
+   ],
+   "sessionIds": [
+    "9acb00ce-4277-4a60-97c9-c4001384dfcd"
+   ],
+   "title": "ListTemplate 模板绑定 tableRowStyle 但 table.js mixin 未定义：模板引用的绑定必须在 mixin 有默认实现",
+   "type": "bug",
+   "bundle": "076.md",
+   "project": "产品2.0"
+  }
+ ]
+}

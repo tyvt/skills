@@ -1,0 +1,58 @@
+{
+  "project": "苏住房G",
+  "batch": "111",
+  "files": ["111.md"],
+  "count": 5,
+  "memories": [
+    {
+      "title": "苏住房G bug 单修复的标准闭环动作序列：worktree 修复 → 提交推送 → 禅道 DB 回写（zt_bug 主表 + zt_action 流水）→ 指派回提单人、不代关 closed",
+      "type": "workflow",
+      "content": "【什么情况】本项目修禅道 bug（如 #5897 监管银行标签、#5939 坐标轴刻度、#5767 学习园地默认 Tab、#5942 图标路径）的固定节奏：git worktree 在目标分支修复 → 提交推送子模块（必要时父仓库更新 gitlink）→ 回写禅道 → 指派回提单人等回归。禅道回写的落地形态是数据库可复核的：zt_bug 主表 status=resolved、resolution=fixed、resolvedBuild（trunk 或具体解决版本 id）、resolvedBy=tiany、resolvedDate、assignedTo=提单人；zt_action 新增一条 resolved 流水，备注按「根因/修复/验证/改动文件+提交号」三或四段写入——走 ZP 表单提交而非直接 UPDATE。\n【为什么】「提交推送完成」不等于「交付完成」：提单人只看禅道状态收到通知；而备注里写清根因/修复/提交号，测试回归时才有核对依据。resolvedBy 必须是实际修复人账号，assignedTo 指派回提单人是流程约定——只有提单人/测试验证通过才能置 closed，修复方代关会被打回。\n【怎么做】① 推送后先 DB 回查 zt_bug 与 zt_action 确认写入，再报「禅道已回写」，不接受口头声明；② resolvedBuild 按团队习惯填 trunk 或解决版本 id（5 = develop/v2.6.2-suzhufang 的口径出现过）；③ 备注四段式：根因（一句话说透）/ 修复（改了什么）/ 验证（ESLint、构建、E2E/像素基线结果）/ 改动文件+sha；④ 未做 closed 要显式说明「等提单人回归后自行关闭」；⑤ 收尾附带环境隔离复核表：进行中的 dev server 未动、env/.env 未动、其他并行改动文件一行未碰、父仓 gitlink 是否需要更新逐项说明。",
+      "evidence": "会话 session-f0522c8a（bug 5897）「禅道：已回写（DB 复核，不是口头声明）」表格 status=resolved/resolution=fixed/resolvedBuild=trunk/resolvedBy=tiany/assignedTo=lichandan；会话 session-9f194916（bug 5767）「未做：closed。按流程只有提单人/测试验证通过才能关闭，需要等 zhunan 在测试环境回归后自行关闭」且走 ZP 表单提交、zt_action id 81705；会话 session-8c2884b4（bug 5939）zt_action 新增 resolved 记录、备注三段式。",
+      "files": ["zhi2-web-admin/src/views/system/sysBankBranch/detail.vue", "zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue"],
+      "baseline": "6156653",
+      "sessionIds": ["session-f0522c8a-fe9e-46ea-a79d-2dbab85718a9", "session-9f194916-a360-411d-a883-676d1e1d0797", "session-8c2884b4-6724-4e37-a534-183bc6eb69c7"],
+      "bundle": "111.md"
+    },
+    {
+      "title": "苏住房G 验证链路三连坑先探再写用例：Playwright 浏览器版本不匹配、验证码接口返回图片而非文本、列表接口测试环境 500",
+      "type": "bug",
+      "content": "【什么情况】bug 5897 修复本身只改 18 处文案，但验证环节连踩三坑：① Playwright 浏览器版本与已安装依赖不匹配，用例起不来；② 验证码接口返回的是图片而不是文本答案，自动化登录被卡；③ 待验证页面的列表接口在测试环境直接 500。最后复盘结论：「这次绕的弯路全在验证链路而不是修复本身」。\n【为什么】文案类小修复的成本几乎全在「验证环境能不能跑通」：三坑任何一个都会让写好的用例变成救火现场——浏览器版本不对要重装、验证码拿不到要换登录策略（本地后端 /code 返回 captcha 答案，见同库另一条）、接口 500 则 UI 用例根本无从断言。先探环境后写用例，能把返工砍掉一半。\n【怎么做】① 接到「用 e2e 验证某 bug」类任务，写用例前先过三探：node_modules 里 playwright 版本 vs 浏览器二进制（npx playwright install 可对齐）；登录用的验证码接口当前返回形态（图片还是文本）；目标页面依赖的列表/详情接口在目标环境是否 200；② 三探全绿再写断言；③ 任一探针红，先在交付说明里写明验证受限与替代证据（截图/构建产物/静态检查），不要硬写注定跑不通的用例；④ 用例跑不通的救火顺序：先修环境（版本/代理/账号），再怀疑用例本身；⑤ 验证截图留在本地（tests/e2e/screenshots/）作证据即可，不往共享分支塞二进制。",
+      "evidence": "会话 session-f0522c8a-fe9e-46ea-a79d-2dbab85718a9（基线 6156653，bug 5897）最终结论复盘一句话：「这次绕的弯路全在验证链路而不是修复本身——Playwright 浏览器版本不匹配、验证码接口返回图片而非文本、列表接口测试环境 500。下次这类前端文案单，先确认『验证环境能不能跑通』再写用例，比写完用例再救火省一半时间。」",
+      "files": ["zhi2-web-admin/tests/e2e/bug-5897-signing-bank-label.spec.mjs"],
+      "baseline": "6156653",
+      "sessionIds": ["session-f0522c8a-fe9e-46ea-a79d-2dbab85718a9"],
+      "bundle": "111.md"
+    },
+    {
+      "title": "苏住房G 多分支并行时基于最新 tip 的修复分支 fast-forward 合回主线，必然把 tip 上他人提交一并带进 gitlink diff，要主动解释而非事后补救",
+      "type": "fact",
+      "content": "【什么情况】bug 5874 用 worktree 修在 fix/bug5874-transfer-perm，完成后合回 develop/v2.6.2-suzhufang 并更新父仓库 gitlink。合入时 gitlink 从 3cae35b 直接跳到 174febc46，diff 里一并带上了别的提交（fix(bank) 监管银行对齐）——因为修复分支是基于 develop/v2.6.2-suzhufang 最新 tip 拉的，ff 合入后该 tip 就是别人那条提交。\n【为什么】多分支并行时（防汛 -li 分支、监管银行修复、工单迁移同时在飞），任何一条基于最新 tip 的修复分支合回主线，都会把 tip 上所有提交一起带进来。这不是夹带，是 fast-forward 合入的数学必然；但如果交付说明不主动解释，看起来就像「提交了不属于本次任务的东西」。\n【怎么做】① 交付说明里明确写「gitlink 从 X 跳到 Y 一并带上了 Z 提交——因为修复基于 develop/v2.6.2-suzhufang 最新 tip，这是合入的必然结果，log 已在 commit diff 中可见」；② 想避免带别人提交，拉修复分支时就要接受「基于旧 tip 需 rebase」或「合入时必然带 tip」的取舍，二选一，不要事后强推改历史；③ 更新 gitlink 前确认子模块目标提交已推到对应远程分支（防悬空引用）；④ 父仓 gitlink 与子模块分支的对应关系逐条列进收尾表：哪条提交在哪个分支、父仓跟踪的是哪条、是否需要更新。",
+      "evidence": "会话 session-5fbdd6a2（bug 5874）最终结论「说明：gitlink 从 3cae35b 跳到 174febc46 一并带上了 fix(bank) 监管银行对齐提交——因为修复基于 develop/v2.6.2-suzhufang 最新 tip，这是合入的必然结果，log 已在 commit diff 中可见」；合入记录：fix/bug5874-transfer-perm fast-forward 合入 develop/v2.6.2-suzhufang（f78fdd58a → 174febc46），父仓提交 79886bd 已推。",
+      "files": ["zhi2-web-admin/src/views/property/workOrder/order/detail.vue", "zhi2-web-admin/src/utils/permission.js"],
+      "baseline": "6156653",
+      "sessionIds": ["session-5fbdd6a2-5175-4559-bcef-9785eca4dea3"],
+      "bundle": "111.md"
+    },
+    {
+      "title": "苏住房G 提交边界三态：本次修复文件、他人/并行任务的既有 modified 文件、本地环境文件各归各位，问一句而不是顺手提",
+      "type": "preference",
+      "content": "【什么情况】苏住房G 子模块工作区常态是「多件工作并行」：修 bug 5758 时工作区里躺着 PublicBenefit.vue 和 RepairPanel.vue 两个既有 modified 文件（内容是另一件工作 bug 5762 的环形图自适应）；修 bug 5942 时旁边有 chartRenderers.js 的并行改动（bug 5939）；env/.env 永远是本地代理配置。同时用户会给出明确的推送范围限定，如「仅推子模块」。\n【为什么】git add . 会把别人的半成品和本地配置一起卷进提交；但反过来把用户明确要求的推送范围做小（要求推父仓而不推）也是漏交付。边界判断错了两个方向都出错：夹带 = 污染共享分支；漏推 = 部署侧拿不到完整成果。\n【怎么做】① 提交前逐文件 triage：本次任务的文件 → 暂存；会话开始前就 modified 的他人改动 → 保留工作区不提交，并在交付说明里点名（「PublicBenefit.vue/RepairPanel.vue 内容是 bug 5762 的工作，我留在工作区未提交」）；env/.env、worktrees/、.tmp-zt/ → 永不纳入；② 并行改动如果是同一用户同批要的（如 5762 的两个文件），结尾主动问「需要我把 X 也单独提一个 commit 推上去吗」，不擅自代做；③ 推送范围完全按用户指令：「仅推子模块」时父仓只本地提交不推送，并说明 ahead 1 与补推条件；④ 临时产物也要清：dev server 跑完留的 vite.config.js.timestamp-*.mjs、.tmp_zt/zt_*.png 截图，用户说删就删（删前确认路径在工作区内且只含下载图片）。",
+      "evidence": "会话 session-3ea2c2af（bug 5758）最终结论「另外两个文件没有提交：PublicBenefit.vue 和 RepairPanel.vue 在本次会话前就是 modified 状态，内容是另一件工作（环形图自适应，注释里标着 bug#5762），跟 5758 无关，我留在了工作区未提交。需要我把 5762 那两个文件也单独提一个 commit 推上去吗？」；会话 session-3f04c5d8（bug 5942）「仅提交本次改动，未夹带 chartRenderers.js（并行改动）与 env/.env（既有改动）」；会话 session-cce1e5de（112.md）用户诉求 4「仅推子模块」→ 父仓库仅本地提交 ahead 1；会话 session-8ddfb98d 删除 .tmp_zt/ 与 .zt_tmp/ 截图前确认「都位于 D:\\repository\\苏住房G\\ 工作区内，且只包含下载的图片」。",
+      "files": ["env/.env", "zhi2-web-admin/src/views/home/v2/components/PublicBenefit.vue"],
+      "baseline": "5d68a74",
+      "sessionIds": ["session-3ea2c2af-879d-4fde-8c4a-9a6e4340f7fa", "session-3f04c5d8-7af9-419e-9609-2856f77265f6"],
+      "bundle": "111.md"
+    },
+    {
+      "title": "PowerShell 下 git 的 stderr 进度信息会被当报错显示，exit code 1 可能是误报，提交推送结果要按 git 状态核实而不是看表象",
+      "type": "fact",
+      "content": "【什么情况】在 PowerShell 里执行 git commit/push（经 husky/lint-staged 钩子时更明显），git 把进度信息写到 stderr，PowerShell 将其标红当报错显示，甚至出现 exit code: 1 标记；但提交和推送本身实际成功。\n【为什么】git 习惯用 stderr 输出进度与提示（progress、hint），这不代表失败；PowerShell 工具层把 stderr 有内容 + 非零退出码直接呈现为错误，模型若只看表象就会误判「提交失败」而重试，造成重复提交或混乱。\n【怎么做】① 看到 git 命令报 stderr 红字或 exit 1，先验证事实再下结论：git log -1 看提交是否生成、git status 看工作区是否干净、git rev-parse HEAD 与 origin/分支 比对（或 git log origin/分支..HEAD）看推送是否到位；② 事实成立就按成功收尾，并在交付说明里注明「PowerShell 把 git 输出到 stderr 的进度信息当报错显示，exit code 1 是误报，提交和推送本身都成功了」；③ 不要因为表象报错就重复 commit/push——重复提交会产生空提交，重复推送无意义；④ lint-staged 的 eslint --fix 钩子正常跑完也会输出到 stderr，属同类干扰。",
+      "evidence": "会话 session-3ea2c2af-879d-4fde-8c4a-9a6e4340f7fa（基线 5d68a74，bug 5758）最终结论执行说明：「提交时 husky/lint-staged 自动跑了 eslint --fix，通过后完成提交；PowerShell 把 git 输出到 stderr 的进度信息当报错显示，那个 exit code: 1 是误报，提交和推送本身都成功了。」",
+      "files": [],
+      "baseline": "5d68a74",
+      "sessionIds": ["session-3ea2c2af-879d-4fde-8c4a-9a6e4340f7fa"],
+      "bundle": "111.md"
+    }
+  ]
+}

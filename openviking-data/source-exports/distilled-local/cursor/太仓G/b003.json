@@ -1,0 +1,77 @@
+{
+ "project": "太仓G",
+ "batch": "003",
+ "files": [
+  "003.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "维修资金表决很多按钮看不到了，按钮权限也给了，菜单按",
+   "type": "pattern",
+   "content": "## 维修资金表决 — 完整权限清单 以下按**功能位置**整理。修复后，代码会同时识别两套前缀： - **菜单推荐标识（旧）**：`estate:ownerDecision:*` - **代码新标识**：`estate:maintainDecision:*` 角色里配置其中任意一套即可。 --- ### 一、列表页（维修资金表决列表） | 菜单名称 | 权限标识 | 控制功能 | 菜单中是否已有 | |---------|---------|---------|--------------| | 搜索 | `estate:ownerDecision:query` | 列表查询/筛选 | ✅ 已有 | | 新增 | `estate:ownerDecision:add` | 列表「新增」按钮 | ✅ 已有 | | 修改 | `estate:ownerDecision:edit` | 列表操作「编辑」（仅草稿 `bizState=0`） | ✅ 已有 | | 删除 | `estate:ownerDecision:remove` | 列表「删除」及行内删除 | ✅ 已有 | | 查看 | `estate:ownerDecision:list` | 菜单访问及进入详情 | ✅ 已有（页面级） | --- ### 二、详情页 — 通用操作栏（`operation-container`） | ",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "涉及文件：d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\main.js、d:\\repository\\太仓G\\zhi1-web-admin\\src\\components\\OperationContainer\\index.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0a42918d-d7b1-492b-8365-de6556f0a811"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "voteSource对应字典vote_source一",
+   "type": "pattern",
+   "content": "是的，**业委会选举表决**这个页面也已经一并修复了。 它和一般表决详情用的是同一个公共组件： ```683:683:zhi1-web-admin/src/views/estate/ownerDecision/detail.vue import DecisionRangeTable from '@/views/estate/decisionCommon/components/DecisionRangeTable' ``` 业委会选举表决（路由 `vote`）传入的是 `decision-policy=\"general\"`，表格里的「投票来源」列同样走 `voteSource` + `dictFormatter`，依赖 `vote_source` 字典映射到 `voteSourceOptions`。 上次修改就是在 `decisionCommon/components/DecisionRangeTable.vue` 里补上了这部分逻辑，所以这两个页面都会生效： - 一般表决详情（`generalDecision`） - 业委会选举表决详情（`ownerDecision` / `vote`） 重新编译部署后刷新页面即可。如果仍为空，再检查系统字典 `vote_source` 里是否有值为 `\"1\"` 的项。",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "```683:683:zhi1-web-admin/src/views/estate/ownerDecision/detail.vue",
+    "`decisionCommon/components/DecisionRangeTable.vue",
+    "涉及文件：d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\components\\DecisionRangeTable.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\components\\DecisionRangeTable.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b44fb3cc-ab35-40cd-83f7-88fb4078ce58"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "1、一般表决的线下表决后弹框还是在，2、选项表决切换",
+   "type": "preference",
+   "content": "本次定位到更具体的根因，并已修复。 ## 根因 切换到「投票信息」Tab 时，`showSearch` 变为 `true`，表格会**动态新增**带 `fixed=\"right\"` 的操作列。这是 Element UI 表格的已知问题：动态插入固定列后，表体可能不渲染，表现为分页显示「共 86 条」，但表格内容为空。 另外，`isRowSelectable` 原先返回布尔值，而 `selectable` 需要函数，也可能影响表格渲染。 ## 修复内容 **`optionDecision/components/DecisionRangeTable.vue`** - 移除操作列的 `fixed=\"right\"` - 将 `isRowSelectable` 改为方法 `rowSelectable(row)`，正确传给选择列 - `showSearch` 切换时清除 `voteWay` / `voteState` 筛选，避免残留条件 - 缩短 `getList` 防抖时间，数据加载后执行 `doLayout` **`optionDecision/detail.vue`** - Tab 切换后在数据请求完成后再执行 `doLayout`（延迟 400ms） - 「表决结果」按钮跳转时同步刷新表格 请重新编译部署后验证：在选项表决详情页，从「基本信息」切换到「投票信息」，决策明细表格应能正常显",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "**`optionDecision/components/DecisionRangeTable.vue",
+    "**`optionDecision/detail.vue",
+    "涉及文件：d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\decisionCommon\\components\\VoteRangeDialog.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\components\\VoteRangeDialog.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c17819e8-f61e-40ed-99cc-c04ba5efd9a5"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "一般表决详情，没有显示 提前结束 等 按钮",
+   "type": "preference",
+   "content": "已修复一般表决详情页操作按钮不显示的问题，主要改动如下。 ### 原因分析 1. **权限判断方式**：bug2436 将按钮从 `v-hasPermi` 改成了 `hasPerm()` + `v-if`，与维修资金表决（`ownerDecision`）等页面不一致，在部分环境下会导致按钮不渲染。 2. **状态类型不一致**：`decisionState`、`bizState` 可能是数字，而 `showRevoke` 用了 `['1','2','5'].includes(this.form.decisionState)`，数字 `5` 时 `includes` 会失败。 3. **`v-hasPermi` 指令缺陷**：原先只有 `update` 钩子，首次挂载时不校验权限，且无权限时隐藏后不会恢复 `display`。 ### 修改内容 **`optionDecision/detail.vue`** - 操作按钮改回 `v-show` + `v-hasPermi`（与 `ownerDecision` 一致） - 权限同时支持 `estate:optionDecision:*` 和 `estate:ownerDecision:*` - 用 `decisionStateValue`、`isSubmittedBiz` 等计算属性统一状态判断 - **延期（状态 5）** 时也会显示",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "**`optionDecision/detail.vue",
+    "**`hasPermi.js",
+    "涉及文件：d:\\repository\\太仓G、d:\\repository\\太仓G\\zhi1-web-admin、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\mixins、d:\\repository\\太仓G\\zhi1-web-admin\\src\\router、d:\\repository\\太仓G\\zhi1-web-admin\\src\\mixins\\detailMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6bb25673-a3f0-4f17-9c69-8943d17f4cb8"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  }
+ ],
+ "_draft": true
+}

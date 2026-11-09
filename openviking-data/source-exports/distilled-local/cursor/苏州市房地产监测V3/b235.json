@@ -1,0 +1,61 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "235",
+ "files": [
+  "235.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "失败原因：Step2 表单 label 右对齐 存在",
+   "type": "fact",
+   "content": "**失败原因**：`Step2 表单 label 右对齐` 存在竞态。 `register-step-2` 容器在 `v-if=\"registerStep === 2\"` 时就会变为可见，但内部的 `Step2LegalPerson` 表单可能还没挂载完成。测试只等了容器可见，就立刻查找 `.el-form-item__label`，此时 `count` 为 0。 失败截图里表单已经渲染出来，是因为 Playwright 在断言失败后才抓的快照，页面那时已经加载完了。 **修复**（两处）： 1. **`assertRegisterFormLabelRightAligned`**：改为等待第一个 label 可见，而不是立刻检查数量 2. **Step2 用例**：额外等待「法定代表人姓名」输入框可见，确保表单已挂载 已连跑 3 轮全部 9 个 register 用例，均通过。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\e2e\\register\\company-register-visual.spec.js、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\e2e\\fixtures\\register-helpers.js、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\register\\components\\Step2LegalPerson.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a2d69268-dd50-4d1d-ad28-dc9e24e9c0e9"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Pr",
+   "type": "preference",
+   "content": "已修复。原因是编辑模式模板里用了 `:bus=\"appendixBusCode\"`，但组件里没有定义这个属性。 **修改内容：** 1. 新增计算属性 `appendixBusCode`，优先从路由 `meta.busCode` 读取，否则回退到 `AGENCY_BRANCH_APPENDIX_BUS`（`fzjgba`）： ```261:263:d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution\\agencyBranch\\components\\AgencyBranchDetail.vue appendixBusCode() { return getRouteMetaValue(this.$route, 'busCode') || AGENCY_BRANCH_APPENDIX_BUS }, ``` 2. 查看模式下的 `AnnexUpload` 也补上 `:bus=\"appendixBusCode\"`，与编辑模式一致，避免菜单未配置 `busCode` 时附件无法加载。 这与 `CancelDialog.vue` 中 `cancelBusCode` 的写法一致，也符合文档说明：本业务菜单不配置审批用 `busCode`，备案要件固定使用 `fzjgba`。 刷新页面后，该 Vue 警告应已消失。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "```261:263:d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution\\agencyBranch\\components\\AgencyBranchDetail.vue",
+    "`CancelDialog.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution\\agencyBranch\\components\\AgencyBranchDetail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\AnnexUpload\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f9505d8d-b469-4811-976f-799ef8de543a"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "[Vue warn]: Error in rende",
+   "type": "bug",
+   "content": "已修复，根因和改动如下。 ## 根因 `zs-table-column` 自定义列插槽传入的是 `{ scope }`，不是 `{ row }`： ```24:26:d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-table-column\\zs-table-column.vue <template slot-scope=\"scope\"> <slot :scope=\"scope\"> ``` 证书表和履历表写成了 `#default=\"{ row }\"`，导致 `row` 为 `undefined`，访问 `row.invalid` 时渲染报错，整张表无法显示。 ## 修复内容 1. **AgencyPersonnelCertificateTable.vue** — 状态列改为 `#default=\"{ scope }\"`，使用 `scope.row.invalid` 2. **CareerList.vue** — 状态列同样改为 `scope.row.active` 3. **AgencyPersonnelDetail.vue** — 加载详情时映射接口字段： - `certificateCode` → `certificateNo` - `certificateName` → `certificateType` -",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "```24:26:d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-table-column\\zs-table-column.vue",
+    "**AgencyPersonnelCertificateTable.vue",
+    "**CareerList.vue",
+    "**AgencyPersonnelDetail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7d5eb0e5-f2e8-44f4-b898-9b22ccb064a5"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

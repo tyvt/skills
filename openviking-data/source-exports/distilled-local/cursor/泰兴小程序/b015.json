@@ -1,0 +1,128 @@
+{
+ "project": "泰兴小程序",
+ "batch": "015",
+ "files": [
+  "015.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "UI按照设计图调整",
+   "type": "pattern",
+   "content": "已按设计图调整 `detail.vue`，主要变更如下： **布局与样式** - 页面背景灰底 + 白色圆角卡片，与 `record-detail.vue` 等页面保持一致 - 列表项左侧灰色标签、右侧黑色内容，行间距与分割线沿用 `CardCell` 组件 - 底部 2×2 网格：标签小号灰色居中，数值常规黑色居中，列间竖线分隔 **交互细节** - 维保联系电话使用 `PhoneCall` 组件，金色图标 + 号码右对齐，可点击拨号 - 空值统一显示 `--` - 维保日期、年检日期格式化为 `YYYY年M月`（如 `2025年12月`） **结构** - 顶部 10 项为左右键值列表 - 底部 4 项为「上一次维保日期 / 维保周期」「年检日期 / 巡检周期」网格展示 导航栏标题「设施设备详情」已在 `pages.json` 中配置，无需改动。若某字段接口返回格式与预期不一致，可告知我进一步调整。",
+   "evidence": "extracted source=cursor project=泰兴小程序",
+   "files": [
+    "`detail.vue",
+    "`record-detail.vue",
+    "`pages.js",
+    "涉及文件：d:\\repository\\泰兴小程序\\src\\pages_facility\\detail.vue、d:\\repository\\泰兴小程序\\src\\pages_facility\\maintain-detail.vue、d:\\repository\\泰兴小程序\\src\\styles\\cell.scss、d:\\repository\\泰兴小程序\\src\\components\\PhoneCall\\PhoneCall.vue、d:\\repository\\泰兴小程序\\src\\pages.json、d:\\repository\\泰兴小程序\\src\\components\\CardCell\\CardCell.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5531a4dc-3cc8-4183-a246-1f80afd6cbf4"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "unitList@src/pages_facilit",
+   "type": "fact",
+   "content": "问题已修复。 **原因：** `changeBuilding` 里用的是 `currentBuilding.value`，但 `ZsPicker` 在确认选择时会先触发 `update:modelValue`，再触发 `change`。在 uni-app 里，父组件的 `v-model` 有时还没同步完成，`change` 回调执行时 `currentBuilding` 仍可能是空字符串，于是走了 `unitList.value = []` 分支，`getUnits`（单元接口）不会被调用。 **修复：** 改为使用 `@change` 事件参数里的 `value`（即当前选中的楼幢 ID），不依赖 `v-model` 是否已更新： ```181:191:d:\\repository\\泰兴小程序\\src\\pages_facility\\facility.vue const changeBuilding = ({ value } = {}) => { currentUnit.value = '' if (value) { getUnits({ buildingId: value, }) } else { unitList.value = [] } reload() } ``` 选择楼幢后应会正常请求 `/property/unit/listByBuildingIdAndUnitName`",
+   "evidence": "extracted source=cursor project=泰兴小程序",
+   "files": [
+    "```181:191:d:\\repository\\泰兴小程序\\src\\pages_facility\\facility.vue",
+    "涉及文件：d:\\repository\\泰兴小程序\\src\\pages_facility\\facility.vue、d:\\repository\\泰兴小程序\\src\\hooks\\useAreaDict.js、d:\\repository\\泰兴小程序\\src、d:\\repository\\泰兴小程序\\src\\pages_owner\\repair\\chooseFacility.vue、d:\\repository\\泰兴小程序\\src\\components\\ZsPicker\\ZsPicker.vue、d:\\repository\\泰兴小程序\\src\\pages_owner\\house\\verify.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6a37a278-9845-42f7-b74d-370fb350d16a"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "添加巡检记录标准工时输入0.0.5 非法格式保存后显",
+   "type": "bug",
+   "content": "已修复。原因是标准工时直接用 `Number()` 转换，像 `0.0.5` 这类非法格式会得到 `NaN` 并被保存。 **修复内容：** 1. **`add.vue` — 保存前校验** - 新增 `parseStandardHour`，只允许 `数字` 或 `数字.数字`（如 `0.5`、`1.25`） - 输入 `0.0.5` 等非法格式时，提示「标准工时格式不正确」，阻止保存 - 步骤列表、提交接口统一走解析函数，不再出现 `NaN` - 再次编辑时，已存的非法值不会回填为 `NaN` 2. **`detail.vue` — 展示兜底** - 历史脏数据（如后端返回的 `NaN`）统一显示为 `-`，不再展示 `NaN` **预期行为：** - 输入 `0.0.5` → 点确认 → 提示格式错误，不保存 - 输入 `0.5` → 正常保存并显示 `0.5h` - 留空 → 视为未填写，允许保存",
+   "evidence": "extracted source=cursor project=泰兴小程序",
+   "files": [
+    "**`add.vue",
+    "**`detail.vue",
+    "涉及文件：d:\\repository\\泰兴小程序、d:\\repository\\泰兴小程序\\src、d:\\repository\\泰兴小程序\\src\\staff\\pages_facility\\record\\add.vue、d:\\repository\\泰兴小程序\\src\\staff\\pages_facility、d:\\repository\\泰兴小程序\\src\\staff、d:\\repository\\泰兴小程序\\src\\staff\\pages_facility\\record\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "407faa95-0a72-4db7-b335-97797a083932"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "没调用详情接口，页面空白，没报错",
+   "type": "bug",
+   "content": "已修复。详情页空白是因为脚本在运行时就挂了，接口根本没机会发出去。 **原因 1：`ref` 未导入** 第 70 行用了 `const id = ref('')`，但只从 `vue` 引入了 `reactive`，没有 `ref`。运行时会报 `ReferenceError: ref is not defined`，`<script setup>` 整段失效，页面空白且不一定有明显报错。 **原因 2：变量遮蔽** `getDetail` 里写了： ```javascript const id = id.value // 内层 id 遮蔽外层 ref，访问 id.value 时在 TDZ 内 ``` 内层 `const id` 把外层的 `ref` 盖住了，`id.value` 在初始化前被访问，同样会让 `getDetail` 执行失败，接口不会调用。 **修改** 1. 补充 `import { reactive, ref } from 'vue'` 2. 改为 `getFacilityDetail(id.value)`，并加上 `if (!id.value) return` 防护 3. 删除无用的 `initDict` 保存后重新编译，从列表点「详情」进入，应能正常请求 `/dataProperty/facility/getDetailByFacilityId/{id}` ",
+   "evidence": "extracted source=cursor project=泰兴小程序",
+   "files": [
+    "涉及文件：d:\\repository\\泰兴小程序\\src\\pages_facility\\detail.vue、d:\\repository\\泰兴小程序\\src\\api\\maintenance.js、d:\\repository\\泰兴小程序、d:\\repository\\泰兴小程序\\src\\pages_facility\\facility.vue、d:\\repository\\泰兴小程序\\src、d:\\repository\\泰兴小程序\\src\\pages_owner\\house\\detail.vue、d:\\repository\\泰兴小程序\\src\\pages_facility、d:\\repository\\泰兴小程序\\vite.conf"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0a04f62e-e6c7-4bef-bca2-b9f4f2de70ec"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "processPictureList: [\"/zhi",
+   "type": "preference",
+   "content": "已修复。`processPictureList` 返回的是 `/zhi2/...` 这类相对路径，之前直接传给 `ImageGrid` 时没有拼域名，H5 环境下图片无法加载。 **改动说明：** 1. **`maintain-detail.vue`** — 参考 `daily.vue` 的做法，按平台取图片域名并拼接： - H5：`VITE_APP_API_BASE_URL` - 微信小程序：`IMAGE_BASE` 相对路径如 `/zhi2/2026/2/k/f/xxx.png` 会拼成完整 URL 后再传给 `ImageGrid`。 2. **`ZsImage.vue`** — 若传入的已是 `http(s)://` 完整地址，不再重复拼接 `base`，避免域名被加两次。 刷新维保详情页后，维保图片应能正常显示和预览。",
+   "evidence": "extracted source=cursor project=泰兴小程序",
+   "files": [
+    "**`maintain-detail.vue",
+    "`daily.vue",
+    "**`ZsImage.vue",
+    "涉及文件：d:\\repository\\泰兴小程序\\src\\pages_facility\\maintain-detail.vue、d:\\repository\\泰兴小程序\\src、d:\\repository\\泰兴小程序\\src\\pages_facility\\record-detail.vue、d:\\repository\\泰兴小程序\\src\\components\\ImageGrid\\ImageGrid.vue、d:\\repository\\泰兴小程序\\src\\components\\ZsImage\\ZsImage.vue、d:\\repository\\泰兴小程序\\src\\pages_owner\\repair\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5e4b840b-e829-4269-ac04-0e7b59b6a428"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "选完之后的决策项不显示，提交时无数据",
+   "type": "fact",
+   "content": "## 原因说明 1. **`ViewOptionsList` 里用了 `onLoad`** 在 uni-app 里，`onLoad` 属于**页面**生命周期，写在**子组件**里往往不会执行。因此 `uni.getStorageSync('decisionInfoList')` 从未跑过，`decisionInfoList` 一直是 `[]`，界面上「我的选择」为空，提交时 `map` 出来的也是空数据。 2. **`下一步` 用了 `goto`（内部是 `navigateTo`）** 从 `multipleForm`（无 `mode`）再跳到 `multipleForm?mode=view` 属于**同一路由**。微信小程序等平台会限制：**不能对当前页路径再 `navigateTo`**，确认页可能根本打不开或表现异常。改成 **`redirectTo`** 会关掉当前页再打开带 `mode=view` 的实例，行为符合「确认页」预期。 ## 修改说明 - **`ViewOptionsList.vue`**：去掉子组件里的 `onLoad`，在 **`onMounted`** 里（且 `!isVotedOrResult` 时）读取 `decisionInfoList` 缓存，并校验为**非空数组**再赋值。 - **`OptionCardList.vue`**：`下一步` 改",
+   "evidence": "extracted source=cursor project=泰兴小程序",
+   "files": [
+    "**`ViewOptionsList.vue",
+    "**`OptionCardList.vue",
+    "涉及文件：d:\\repository\\泰兴小程序\\src\\pages_owner\\decision\\multipleForm.vue、d:\\repository\\泰兴小程序\\src\\pages_owner\\decision\\components\\multiple\\ViewOptionsList.vue、d:\\repository\\泰兴小程序\\src\\store\\vote.js、d:\\repository\\泰兴小程序\\src\\pages_owner\\decision\\components\\multiple\\OptionCardList.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "929fd106-a6ce-450a-b1b3-7746d49574d5"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "改为z-paging分页",
+   "type": "fact",
+   "content": "已将 `facility.vue` 改为使用 `z-paging` 分页，主要变更如下： 1. **移除** `useLoadMore`、`uni-load-more`、`ZsEmpty` 2. **接入** `z-paging`，与维修项目等页面保持一致 3. **搜索/筛选** 放在 `#top` 插槽，滚动时固定在顶部 4. **`queryList`** 负责分页请求，成功调用 `complete(rows)`，失败调用 `complete(false)` 5. **搜索、切换楼幢/单元** 时调用 `reload()` 重新加载（同时修复了原代码中 `reload` 未定义的问题） 下拉刷新、上拉加载更多、空状态展示均由 `z-paging` 自动处理。可在微信开发者工具中进入设施设备列表页验证分页与筛选是否正常。",
+   "evidence": "extracted source=cursor project=泰兴小程序",
+   "files": [
+    "`facility.vue",
+    "涉及文件：d:\\repository\\泰兴小程序\\src\\pages_facility\\facility.vue、d:\\repository\\泰兴小程序\\src\\api\\maintenance.js、d:\\repository\\泰兴小程序\\src\\pages_maintain_project\\index.vue、d:\\repository\\泰兴小程序\\src\\hooks\\useLoadMore.js、d:\\repository\\泰兴小程序\\src\\pages_facility\\index.vue、d:\\repository\\泰兴小程序\\src\\pages_maintain_project\\project.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "77ea70f5-2c1b-4d8c-9f54-46a209a8a7d4"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  }
+ ],
+ "_draft": true
+}

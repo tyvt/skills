@@ -1,0 +1,211 @@
+{
+ "project": "苏住房G",
+ "batch": 3,
+ "files": [
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md"
+ ],
+ "count": 11,
+ "memories": [
+  {
+   "title": "区划→街道→社区级联清空：mixin 基线比较 + shouldReset 双参，区分「回显」与「用户切换」",
+   "type": "bug",
+   "content": "情况：新增/编辑详情的「行政区域→所属街道→所属社区」三级联动，切换行政区域后街道框仍残留上一级下选的编码（如 320507002）。为什么难修：在 region 的 change 里无条件清空，会连「详情接口回填区划」一并触发，编辑页回显被清空；完全不清空又留脏值。做法：在 mixins/area.js 集中实现 resetAreaCascadeOnRegionChange(shouldReset)、resetAreaCascadeOnSubdistrictChange(shouldReset) 与 syncAreaCascadeBaseline()；用 _lastRegionCode 基线比较，仅当区划值真正变化才清空，重复选同一区划不清空；detailCallback 里以 shouldReset=false + syncAreaCascadeBaseline() 声明「这是回显不是用户操作」，而 setProject / 手动切换等用户动作保持 shouldReset=true。字段名通过 areaCascadeFormKeys 供各页覆盖，于是 complex / complexChange / complexBuildingAuth / complexSearch / building-project / projectChange / census / elevatorApply / elevatorDeclaration / transaction-complex / indemnity-project / partyOrganization / villagePartyOrganization 这批页面一处改全域生效。批量迁移时必须同步删掉各页与 mixin 重复的 form.region watch，否则两条清空链路互相干扰、回显又被打空。与已知「级联表单上游变更清空下游的清单式清空」的差异：那条是逐页手写清空清单、无法区分回显与交互；本条靠基线快照 + shouldReset 两个机制把两种触发源彻底分开，且清空逻辑下沉到 mixin 而不散落在页面。",
+   "evidence": "会话 f1473127 最终结论：在 src/mixins/area.js 集中实现 resetAreaCascadeOnRegionChange / resetAreaCascadeOnSubdistrictChange / syncAreaCascadeBaseline / areaCascadeFormKeys，主报障页 detailCallback 改 onCascaderChange(false) + syncAreaCascadeBaseline()，并批量改造 13 个详情页、移除与 mixin 重复的 form.region watch；用户诉求中点明第 5 点是 agent 最易踩的边界（回显也会触发 change 导致编辑页回显失败）",
+   "files": [
+    "zhi2-web-admin/src/mixins/area.js",
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/views/property/complexChange/detail.vue",
+    "zhi2-web-admin/src/views/building/project/detail.vue",
+    "zhi2-web-admin/src/views/building/projectChange/detail.vue"
+   ],
+   "baseline": "2a3ef8a",
+   "sessionIds": [
+    "f1473127-27a4-4764-b893-364f1cbcc6ca"
+   ],
+   "bundle": "009.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "B 端项目上下文（projectId/complexId）的清除入口唯一化与「刷新即清空」行为",
+   "type": "pattern",
+   "content": "情况：B 端登录后是否强制选小区由开关 ENABLE_B_TERMINAL_PROJECT_DIALOG_ON_LOGIN 决定，开关集中放在 projectContext.js 而不是散在页面里。为什么容易改漏：项目上下文有三个写入源——顶部导航栏手动选小区、localStorage 缓存的上次选择、store 里 GetInfo 登录后恢复；只关掉登录弹窗，GetInfo 仍会从 localStorage 把上次的小区恢复回来，layout/index.vue 还会在「无缓存」时默认选第一个小区，结果就是「弹窗关了但请求里照样带 projectId」。做法：开关关闭时 user.js 的 GetInfo 不再恢复 localStorage，layout/index.vue 把「无缓存时默认选第一个」整段替换为 clearBTerminalProjectContext()，一次性清掉 store 与 localStorage 的 currentProjectId。此时 B 端效果是：不弹选择框、不自动选中任何小区、列表与接口请求的 complexId/projectId 为空。坑（长期有效）：用户仍可从顶部导航手动选择，但只在当前会话内生效，刷新页面会再次被清空；因此任何新增的 B 端页面若依赖「刷新后仍保有上次所选项目」，会拿到空上下文，必须自己实现无项目态（禁用/提示先选项目），不能假设上下文已持久化。",
+   "evidence": "会话 6ec74cc2 最终结论：开关集中到 projectContext.js；user.js（GetInfo）在 B 端且开关关闭时不再从 localStorage 恢复上次选中小区；layout/index.vue 去掉「无缓存时默认选第一个」，改为 clearBTerminalProjectContext() 清空 store 与 localStorage 的 currentProjectId；并明确「选择后当前会话内生效，但刷新页面后会再次清空」",
+   "files": [
+    "zhi2-web-admin/src/layout/index.vue",
+    "zhi2-web-admin/src/store",
+    "zhi2-web-admin/src/permission.js",
+    "zhi2-web-admin/src/router/index.js"
+   ],
+   "baseline": "cf49efc",
+   "sessionIds": [
+    "6ec74cc2-fc78-4189-8ef8-6e1b52785377"
+   ],
+   "bundle": "009.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "导入校验失败要拿 data 里的错误文件地址：noReject 在 request.js 成功/HTTP 错误两条分支都要补，且 /zhi2/ 路径不能用 resolveServerAssetUrl 拼",
+   "type": "bug",
+   "content": "场景：物业费申报 excelImport（/v2.0/property/feeDeclare2/excelImport）校验不通过时返回 code:500 + msg + data（错误 Excel 的相对路径 /zhi2/2026/...xlsx），页面必须提示 msg 并自动下载该错误文件。实测只弹了 msg、没下载，根因三条：(1) 请求拦截器在 code !== 200 时直接 reject，配置了 noReject 的调用方在 .then 里拿不到完整响应，data 也取不到；必须在「成功响应的非 200 分支」和「HTTP 错误响应分支」两处都支持 noReject 并回传 res.data。(2) 后端文件路径不能用统一的 resolveServerAssetUrl 解析——它会按当前应用基路径拼成 /sz/property/zhi2/... 这类错误地址，下载必然失败；这类 /zhi2/ 直挂路径改用 window.location.origin + filePath 拼绝对地址。(3) 导入请求同时加 noMessage:true，否则全局弹窗和页面内 msgError 重复提示两次。调用侧还要先判 data 是否有值，为空就只提示 msg、跳过自动下载。差异点：已知条 1070/289 只说地址收口到 resolveServerAssetUrl 与 noMessage 的用法，这条给出的是「该函数对后端直挂路径是错的」及其替代拼法。",
+   "evidence": "会话最终结论：1. noReject 未生效——请求拦截器在 code !== 200 时直接 reject，.then 拿不到完整响应；已在 request.js 补充「失败响应里配置了 noReject 时返回 res.data」与「HTTP 错误响应同样支持 noReject」。2. 错误文件 URL 拼接不正确——/zhi2/... 用 resolveServerAssetUrl 会拼成 /sz/property/zhi2/...，已改为 window.location.origin + filePath。3. 避免重复提示——导入请求增加 noMessage: true。用户诉求 5 明确要求 data 为空时跳过自动下载、只提示 msg。",
+   "files": [
+    "zhi2-web-admin/src/utils/request.js",
+    "zhi2-web-admin/src/views/property/feeDeclare2/components/bulkImportDialog.vue",
+    "zhi2-web-admin/src/views/property/feeDeclare2/index.vue"
+   ],
+   "baseline": "ac184e6",
+   "sessionIds": [
+    "1f367792-daf1-4b22-a41a-28848b798cc5"
+   ],
+   "bundle": "010.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "身份证格式校验的证件类型字典值必须是 document_type 的 '01'，写 30250001 这类长码校验永不通过",
+   "type": "fact",
+   "content": "场景：企业注册备案新增「法人证件」上传等字段时，法人证件类型下拉与「是身份证才做身份证格式校验」的分支需要同一个枚举值。代码里一度用 30250001，导致身份证格式校验分支恒假、选身份证也不校验（或反之误拦）。根因是项目存在两套证件类型编码口径，document_type 字典里「居民身份证」的值是 '01'，30250001 是另一套长码，不能混用。做法：字典值统一以 document_type 为准并写常量，跨页面复用（institution/company/index.vue 是既有正确参考实现）；本次需同改 register/components/companyInfo.vue、company/companyManagement/components/detail.vue、company/companyRegister/detail.vue 三处，改完用同一判定函数收口，避免各页各写一份码值比较。核对方式：直接查 document_type 字典确认 dictValue，而不是看截图或猜。",
+   "evidence": "会话 e747dadd 最终结论：法人证件号码的身份证格式校验，字典值已从 30250001 改为 01（居民身份证），与 document_type 字典及 views/institution/company/index.vue 保持一致；涉及 companyManagement/components/detail.vue、register/components/companyInfo.vue、company/companyRegister/detail.vue。",
+   "files": [
+    "zhi2-web-admin/src/views/register/components/companyInfo.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/detail.vue",
+    "zhi2-web-admin/src/views/company/companyRegister/detail.vue",
+    "zhi2-web-admin/src/views/institution/company/index.vue"
+   ],
+   "baseline": "b0f2039",
+   "sessionIds": [
+    "e747dadd-5d94-41a0-aacd-f7ce9b7e6647"
+   ],
+   "bundle": "010.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "给已有业务加必填字段前先产出「接口 × 入参/返回值」核对表 md；同一字段散落在 5 条业务链路上要一次列全",
+   "type": "workflow",
+   "content": "场景：后端新增必填字段（例：法人-证件 legalPersonIdFile，String、逗号分隔多文件 URL）并要求前端在多个页面落地。直接改代码的后果是漏端——同一字段会散在登录页机构注册、物业服务企业/开发企业新增/编辑/详情、机构注册审核、企业变更记录、企业查询详情等多条链路上，漏一处就出现「能填不能看」或「能看不能存」。可复用套路：(1) 先按用户要求产出 md 核对表，逐个接口标注该字段是「入参」「返回值」还是两者，交后端核对确认契约后再动手；(2) 核对表确认后按「编辑表单 → 保存载荷 → 查看/只读态展示 → 校验规则 → 变更记录差异比对」五条链路逐页对照改，每条链路都在表里打勾；(3) 文件类字段的上传约束（≤5MB、png/jpg/jpeg/pdf、最多 5 个）同时落进上传组件的限制与校验提示，不要只写一处的文案。这条同样适用于任何「后端加必填字段」的批量需求，是本项目事实上的前置交付物。",
+   "evidence": "用户诉求 2/3 两次要求「把涉及到的接口都列出来，这个新增字段需要作为入参还是返回值，形成一个 md 文档，我要和后端核对」；诉求 1 列出影响页面：登录页-机构注册、物业服务企业/开发企业-新增/编辑/详情、机构注册审核、企业变更记录、物业企业查询详情页；诉求 4/5 才进入按计划实施阶段。",
+   "files": [
+    "zhi2-web-admin/src/views/register/components/companyInfo.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/detail.vue",
+    "zhi2-web-admin/src/views/company/companyRegister/detail.vue",
+    "zhi2-web-admin/src/views/company/companyRegister/table.vue",
+    "zhi2-web-admin/src/components/ImageUpload/index.vue",
+    "zhi2-web-admin/src/components/zs-file-upload/zs-file-upload.vue"
+   ],
+   "baseline": "b0f2039",
+   "sessionIds": [
+    "e747dadd-5d94-41a0-aacd-f7ce9b7e6647"
+   ],
+   "bundle": "010.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "弹窗列表要固定「N 条数据」的高度：分页器 v-show 隐藏会连高度一起塌，分页区必须预留固定占位",
+   "type": "bug",
+   "content": "场景：巡检程序、设施/范围选择等弹窗表格，用户要求固定为 10 条数据的高度，不随筛选条件变化。表现是筛选后行数变少时分页器消失，整个弹窗高度忽高忽低。根因：分页器用 v-show 控制，隐藏时不占流，表底那一行高度归零，弹窗高度随内容收缩。做法：让分页区始终占位（容器给定与单行分页器等高的 min-height，或改为隐藏内容但不隐藏盒子），表格可视高度按「10 行 × 行高」定死，行数不足时下方留白而不是把盒子收掉。关联坑：同一批弹窗里若某列写了固定 width，会被 zs-table-column 判为固定宽度逻辑、不再参与自适应，长编号被省略号截断——用户第一反应是「全局自动撑开怎么失效了」，此时删掉该列的 width 即可。",
+   "evidence": "用户诉求 3「巡检程序弹窗也固定为10条数据的高度，不要随着筛选条件变化高度」；诉求 4「这个分页器会显示隐藏，从而隐藏高度」；诉求 5「这里为什么展示不全？这个不是全局处理了吗？」→ 结论：zs-table-column 在 explicitWidth != null 时「页面写死了 width：原样透传，固定宽度」，SelectRecordProcedureDialog 的巡检程序编号列写死 width=160 被截断，去掉后按内容算 min-width。",
+   "files": [
+    "zhi2-web-admin/src/views/dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue",
+    "zhi2-web-admin/src/views/maintenance/facility/components/FacilitySelectDialog.vue",
+    "zhi2-web-admin/src/views/maintenance/accountOpen/owner/components/ScopeSelectDialog.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "baseline": "d9c2e9f",
+   "sessionIds": [
+    "db287272-e3da-43d4-8c77-915cb66320da"
+   ],
+   "bundle": "010.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "侧栏「首页」报页面未授权/高亮错乱：统一把首页路径归一到 /index，且首页菜单只做精确匹配",
+   "type": "bug",
+   "content": "场景：点侧栏「首页」提示「页面未授权或不存在」，修好后又在首页不高亮、切到别的菜单首页仍高亮。三个症状是同一处路径口径不一致引发的连锁：后端菜单下发的首页 path 可能带前导/尾随斜杠或不同写法，路由守卫兜底、侧栏一级叶子菜单跳转、首页识别函数各自比较字符串，于是有的能匹配有的不能。做法：(1) 抽公共归一路径函数（homeRoute 工具），把首页统一成 /index，在「一级叶子菜单点击」「路由守卫兜底」「首页识别」三处共用同一个归一结果；(2) 侧栏高亮比较时也对当前路由做同样归一，否则 /index 与 /index/ 不等；(3) 首页菜单只允许精确匹配，不能让它以「路径前缀」参与高亮，否则 /index/xxx 下的同级菜单会连带把首页点亮、切换菜单后首页依然高亮。验证要覆盖三种状态：进入首页、首页高亮、切走后不再高亮。",
+   "evidence": "会话 cb0377ba 最终结论：1. 侧栏点击首页报错——统一首页路径归一到 /index，修复一级叶子菜单点击、路由守卫兜底及首页识别逻辑；2. 首页未高亮——侧栏高亮比较时同步做首页路径归一；3. 切换菜单后首页仍高亮——首页菜单改为仅精确匹配，避免 /index/xxx 同级菜单误触发高亮。",
+   "files": [
+    "zhi2-web-admin/src/router/index.js",
+    "zhi2-web-admin/src/utils/homeRoute.js",
+    "zhi2-web-admin/src/utils/permission.js",
+    "zhi2-web-admin/src/store"
+   ],
+   "baseline": "c17e4d8",
+   "sessionIds": [
+    "cb0377ba-165d-4411-88e0-da19021618ab"
+   ],
+   "bundle": "010.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "「资产部位/明细」选择弹窗带出了未备案的主单数据：过滤没有生效在正确的层级（明细 bizState vs 主单 houseBizState）",
+   "type": "bug",
+   "content": "场景：benefit/housePart 新增资产部位时，「选择资产」弹窗把经营用房主单仍处于「审核中（未备案）」的房源也列出来并可选。\n\n根因（与已知的「zs-select-dialog 默认带 bizState:2」不是同一件事）：接口只传了 forPart:'1' 做形态区分，没有对主单的备案态做过滤；而弹窗默认的 bizState:2 是作用在「房屋明细」这一层的，主单未备案但明细行为正常态时仍能通过，等于过滤落错了层级。\n\n做法：请求里显式补主单维度的 houseBizState:'2'（B 端再附带 projectId）；列表侧把未备案行置为不可选，确定时再二次拦截一遍（防止脏数据或旧缓存漏网）。\n\n可复用结论：凡是「父单 + 明细」两级数据的选择弹窗，页面默认的 bizState 只筛明细，父单状态必须用后端对应的独立参数（此处 houseBizState）显式传，且选择与确定两处都要判。若前端已传参而列表仍返回未备案数据，则是后端 forPart 查询未支持该过滤参数，需转后端。",
+   "evidence": "会话 ae403e03：用户反馈新增资产部位「选择资产」弹窗带出未备案经营用房；最终结论明确「接口只传了 forPart:'1'，没有按经营用房主单的备案状态过滤；弹窗默认的 bizState:2 作用在明细上，拦不住主单仍为审核中的数据」，改动为请求增加 houseBizState:'2'、B 端附带 projectId、未备案行不可选且确定时二次拦截。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/housePart/index.vue",
+    "zhi2-web-admin/src/views/benefit/housePart/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubHouse/index.vue",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/components/houseTable.vue"
+   ],
+   "baseline": "9acfb2a",
+   "sessionIds": [
+    "ae403e03-b7dd-4d19-be74-3b70c0306a26"
+   ],
+   "bundle": "011.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "B 端「右上角全局物业管理区域」会隐式兜底：选了别的区域必须显式传 complexId，否则后端按全局区域处理",
+   "type": "bug",
+   "content": "场景：B 端服务周报选「发布范围」时，用户选了与右上角全局物业管理区域（currentProjectId）不同的区域，结果筛选、列表、保存全部按全局区域走，数据不对。\n\n根因：后端对 B 端有「缺 complexId 就回落到当前登录用户的全局区域」的隐式兜底。前端此前：① 弹窗列表请求 /property/complex/page 不带 complexId；② 选中项只存了 deptId、把 complexId 丢了；③ 列表页筛选项与保存的提交体都没带 complexId。三处只要漏一处，用户的选择就被全局区域静默覆盖。\n\n做法：选中区域与全局区域不同时，在①弹窗列表查询、②列表页筛选、③新增/编辑保存三处都显式附带 complexId，并把选中行的 complexId 保留进 row 归一化结果（rangeList 取值优先 deptId || complexId）；切换区域后主动刷新列表让请求带上新参数。\n\n可复用约定：涉及「全局上下文 + 局部显式选择」的业务（区域/项目/机构），不能让局部选择只活在组件内状态里，必须在每个请求点把该值显式带上；与全局相同则不传、保持原行为。验证时直接看 Network 里是否出现 complexId 参数。",
+   "evidence": "会话 f09d0d8f：用户指出「服务周报选择物业管理区域，不是右上角选中的物业管理区域需要把选择的 complexId 当查询条件传参」；结论列出弹窗列表未带 complexId、选中项只存 deptId、列表筛选与保存未传三处缺陷，并给出三处修复与 Network 验证方法。",
+   "files": [
+    "zhi2-web-admin/src/views/system/message/service/index.vue",
+    "zhi2-web-admin/src/views/system/message/components/index.vue",
+    "zhi2-web-admin/src/views/system/message/components/detail.vue"
+   ],
+   "baseline": "c2a604a",
+   "sessionIds": [
+    "f09d0d8f-6e96-496a-8a72-7934ff001122"
+   ],
+   "bundle": "011.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "苏房 V3 列表页首次进入只显示 4 行、刷新后正常：底部安全区测量函数在容器未撑满时反向扣高度",
+   "type": "bug",
+   "content": "【什么情况】物业管理区域信息页（property/complex）用 RegionTreeLayout + zs-table，只在奇安信可信浏览器（旧 Chromium 内核）上出现「首次从其他菜单进入列表只露出 4 行多，刷新一次就能显示全部 10 条」。\n【为什么】首次进入时 flex 高度链路尚未稳定，list-container 的高度偏小，容器下方到视口底部留有大量空白；而 zs-table 里的 getBottomSafeInset()（把「容器下方空白」当成需要让出的底部安全区）把这整块空白从表格可用高度里再减了一次，算出来只剩约 4 行。刷新后容器已撑满、空白接近 0，所以表现正常——这就是「刷新能好」被骗过去的原因，不要按偶发问题放过。\n注意这与已知的「calc(100vh - 120px) 常量少减 16px」是不同根因：那个是常量写死对不上，这个是动态测量方向反了，改常量数值永远修不好。\n【怎么做】1）RegionTreeLayout 不再只依赖 calc(100vh - 120px)，改用实际位置算高度：height = window.innerHeight - listContainer.getBoundingClientRect().top - 8，并在 0~3000ms 内多次同步，覆盖区域树异步加载与路由过渡动画；2）zs-table 移除错误的「容器下方空白」扣减，新增 getFillHeightFromContainerBounds() 用容器底边 − 表格顶边计算，并取「容器边界 / 布局高度 / 视口高度」三种算法的最大值兜底；3）分页条未显示时也预留 52px，避免数据返回后高度突变。",
+   "evidence": "会话 284420f4（基线 2a3ef8a）用户连续三轮反馈「只能看到4条」「第一次进来4条、刷新才能看到10条」「还是不行，4条多一点」，最终结论定位到 getBottomSafeInset() 在容器未撑满视口时把下方空白也扣掉；修复为 RegionTreeLayout 用 getBoundingClientRect().top 动态算高度 + zs-table 移除 gapBelowContainer 扣减、新增 getFillHeightFromContainerBounds()、分页未显示预留 52px、三算法取最大值。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/complex/index.vue"
+   ],
+   "baseline": "2a3ef8a",
+   "sessionIds": [
+    "284420f4-9651-4522-a204-e61d73fc5079"
+   ],
+   "bundle": "012.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "字典「全量（含停用）」与「常规」必须用两套缓存 key，靠 formMode 切 options 而不是分两个变量",
+   "type": "bug",
+   "content": "【什么情况】人员类型下拉需要「查看态显示已停用项的正确 label，新增/编辑态下拉不出现停用项」。直接在 utils/dict.js 里让 getDictsIncludeDisabled 复用 getDicts 的缓存 key，两套选项就会互相污染——先调哪个，另一个就拿到错的那份；修完之后又出现反向问题：新增反而用上了全量字典。\n【为什么】两个函数查出来的 dict 列表内容本来就不同（是否含 disabled 项），共用同一个 key 时后写覆盖先写，而页面加载顺序不确定，所以表现为「有时对有时错」。已知清单里的字典坑多是「编码写错 / options 缺失 / 字典未就绪」，「全量与常规共用缓存 key」是另一类根因：数据源串味，不是字段串味。\n【怎么做】1）utils/dict.js 里全量缓存与普通缓存分开两个 key（如 dict_all_* 与 dict_*），互不覆盖；2）不要在页面里同时维护 selectOptions / allOptions 两套变量再手写绑定，抽 mixin（如 mixins/personnelTypeDictMixin.js）：selectOptions ← getDicts、allOptions ← getDictsIncludeDisabled，再由 computed 按 formMode / dialogMode 自动切换，模板只绑一个 xxxOptions，接入页面无需改 template；3）同一字典被多处消费时必须逐处确认用的是哪套，不要默认「字段同名就同源」。",
+   "evidence": "会话 b98071de（基线 d5eee56）用户先提「查全量字典的缓存要和原始的分开，因为查出来不一样，如果用相同的key就混用了」，落地后又追问「为什么现在新增反而用的全量字典，正确的应该是查看用全量，新增就用原来的」；最终新增 mixins/personnelTypeDictMixin.js 并接入 staffManagement/detail、toB/personnelRecord/detail、institution/personnel/detail、personnelDialog、operatorDialog 五个页面。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/utils/dict.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/mixins/personnelTypeDictMixin.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/company/staffManagement/components/detail.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/company/companyManagement/components/personnelDialog.vue"
+   ],
+   "baseline": "d5eee56",
+   "sessionIds": [
+    "b98071de-1d3c-403f-89ee-8b1bfcae504e"
+   ],
+   "bundle": "012.md",
+   "project": "苏住房G"
+  }
+ ]
+}

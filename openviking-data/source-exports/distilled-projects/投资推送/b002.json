@@ -1,0 +1,577 @@
+{
+ "project": "投资推送",
+ "batch": 2,
+ "files": [
+  "005.md",
+  "006.md",
+  "007.md",
+  "008.md"
+ ],
+ "count": 33,
+ "memories": [
+  {
+   "title": "买点消融：美股可删无效硬门槛，宽基/恒科/红利误删核心条件会失真频次",
+   "type": "pattern",
+   "content": "对美股 NDX/SPX 做指标消融时，PEG、距低点、距高点回撤对 `is_buy` 几乎无过滤作用，可从买入判定中移除以保持逻辑干净；但恒科、A 股宽基、红利等模块若把 PE/PEG/股息率/价格位置/回撤/年区间/趋势等硬条件一并删掉，回测买入占比会严重失真（会话中恒科从约 6 次暴涨到 884 次）。精简买点时应逐模块回测对比买入次数与盈亏，区分「边际贡献为 0 的可选过滤」与「决定是否可买的核心门禁」。",
+   "evidence": "005 会话 6fd513ab：恢复恒科全套买点后 HSTECH 买入占比回到 0.5%（6 次）；过度精简阶段宽基逻辑被误删导致频次不可作基准。",
+   "files": [
+    "us_index_signal.py",
+    "cn_broad_signal.py",
+    "cyb_signal.py",
+    "backtest_buy_signals.py",
+    "output/backtest/inception_present.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6fd513ab-4e8c-43a0-b981-c96a3b1bf31c"
+   ],
+   "bundle": "005.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "多因子数据管道：Parquet 优先，远程 API 必须先落本地再算",
+   "type": "workflow",
+   "content": "红利低波等多因子重构约定：能用本地 `stock_daily` 等 Parquet 的字段一律走 Parquet（最优）；无法形成 Parquet 的远程字段先同步进本地 DuckDB，再执行因子与回测，禁止边跑策略边直连远程 API。季报财务优先 StockDB `get_fundamentals`，备用 AKShare `stock_financial_abstract`；PE_TTM 用已有 Parquet，行业用 `cache/dividend_lowvol/stock_industry_sw_l1.csv`。",
+   "evidence": "005 rollout-2026-08-27：用户明确要求「所有需要 API 远程拉取的数据都先同步到本地 duckdb」及「可以用本地 parquet，无法形成 parquet 再使用 duckdb」；最终验收 52 项测试通过。",
+   "files": [
+    "output/validation/comprehensive_report.md",
+    "cache/dividend_lowvol/stock_industry_sw_l1.csv"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-27T12-47-53-01a0418b-c09c-7882-aeea-91ab71028277"
+   ],
+   "bundle": "005.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "PE 行业分位：负 PE / 零 PE 一律按缺失走 L3=0.5，禁止取绝对值",
+   "type": "pattern",
+   "content": "行业内 PE 分位定义方向为「越大越便宜」。负 PE 与零 PE 统一归入缺失，走 L3 路径（会话落地为 L3=0.5），不得对亏损股 PE 取绝对值或做其他变换，否则亏损股会被错误赋予估值信号。",
+   "evidence": "005 rollout 用户口径二及最终结论：「负 PE、零 PE 均进入 L3=0.5」。",
+   "files": [
+    "output/factors/factor_summary.csv",
+    "output/orthogonality/selected_factors.json"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-27T12-47-53-01a0418b-c09c-7882-aeea-91ab71028277"
+   ],
+   "bundle": "005.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "基本面因子行业中性化：ROE/毛利率 z-score，股息率与 PE 分位不中性化",
+   "type": "pattern",
+   "content": "多因子截面处理需全家一致、如实报告：毛利率、ROE_TTM 做行业内 z-score（同行业 ROE 含义不可比）；FCF/EV 先截面 z-score，纯化 IC 不过再考虑行业候选；股息率不中性化（行业息差本身是 alpha）；PE 分位已是行业内时序分位，天然中性；低波/反转不中性化。验收需用相关性热力图与纯化 IC 验证处理是否自洽。",
+   "evidence": "005 rollout 用户口径三表格与「中性化要全家一致」说明。",
+   "files": [
+    "output/orthogonality/orthogonality_report.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-27T12-47-53-01a0418b-c09c-7882-aeea-91ab71028277"
+   ],
+   "bundle": "005.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "美股限购：取消冷却期，用阈值放宽 + 单次基准金额换买入日",
+   "type": "workflow",
+   "content": "场外 QDII 限购下美股不宜再用冷却期压频次；在总投入大致不变（约 ±5 万）前提下，以利润金额（非组合收益率）为目标回测优化：放宽 PE/PEG/年区间等阈值、下调 NDX/SPX 单次基准（如 NDX 880、SPX 210），配合分档金额，在利润几乎不变时显著增加可执行买入日。参数可通过 `push.env` / `config.py` 覆盖。",
+   "evidence": "005 cf508db9：用户先要求限购取消冷却再全量回测；b796121d：利润 +408,550 vs 限购前 +409,120（-0.14%），NDX 买入 251 次×880、SPX 230 次×210。",
+   "files": [
+    "config.py",
+    "optimize_portfolio_amounts.py",
+    "output/backtest/us_quota_friendly.md",
+    "push.env"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cf508db9-302c-47aa-92bc-7a486f51d464",
+    "b796121d-9f78-410e-b0ba-d47165ed26ef"
+   ],
+   "bundle": "005.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "美股买点：21 日 10Y 利率升幅上限拦截利率急升阶段",
+   "type": "fact",
+   "content": "NDX/SPX 买入增加利率斜率过滤：21 个交易日美债 10Y 升幅 ≤ 40bp，环境变量示例 `NDX_BUY_RATE_MAX_SLOPE=0.004`（更严可设 0.003），用于拦截类似 2022 年利率急升阶段的误买。报告中展示「10Y 利率21日升幅」条件。",
+   "evidence": "005 cf508db9 最终结论第 3 节「利率斜率过滤（美股）」。",
+   "files": [
+    "us_index_signal.py",
+    "README.md",
+    "report.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cf508db9-302c-47aa-92bc-7a486f51d464"
+   ],
+   "bundle": "005.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "美股 PEG：Forward PE 缓存 + 增速多级回退链",
+   "type": "fact",
+   "content": "Forward PE 来自 historyofmarket.com 并本地缓存。买入估值：有 Forward 用 Forward PE 分位，否则 TTM；PEG 增速链为显式配置 → 隐含增速 → 5 年历史 CAGR → 兜底（NDX 19%、SPX 10%）；有 Forward 时用 Forward PEG，否则 TTM + 历史/兜底增速。文档章节「美股估值数据与 PEG 回退逻辑」为权威说明；`us_index_signal.py` 需让 PEG 实际参与判定（避免仅有配置未接入 `is_buy`）。",
+   "evidence": "005 cf508db9 README 补充与「代码：us_index_signal.py 已接入 PEG 买入条件（此前仅有配置、未参与判定）」。",
+   "files": [
+    "us_index_signal.py",
+    "README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cf508db9-302c-47aa-92bc-7a486f51d464"
+   ],
+   "bundle": "005.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "红利近 10 年股债利差分位仅作报告参考，不改变 is_buy",
+   "type": "preference",
+   "content": "红利指数在原有 3 年利差分位逻辑外，增加约 2520 交易日（10 年）利差区间与分位展示；分位 ≥ `DIVIDEND_SPREAD_HIGH_PERCENTILE_MIN`（默认 75）标「利差偏高」，但该项只影响报告判定行，不改变原有买入逻辑。历史起点常配合 `DIVIDEND_SIGNAL_HISTORY_START=20150101`；样本不足 10 年时在报告中标注实际年数。",
+   "evidence": "005 7475f214：「该项为参考信息，不改变原有买入逻辑」及 env 可调项说明。",
+   "files": [
+    "cn_broad_signal.py",
+    "config.py",
+    "report.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7475f214-c968-4e83-87b9-748726c29588"
+   ],
+   "bundle": "005.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "择时报告：买卖点位写指数数值，不写距高低点涨跌百分比",
+   "type": "preference",
+   "content": "用户验收要求回测/推送报告中触发买卖时直接给出对应日指数点位数值，而不是「距 252 日低点涨幅 x%（需≤1%）」类百分比表述，避免读起来像过严标准清单而与实际阈值脱节。",
+   "evidence": "005 7475f214 用户诉求 5–6（重复强调）。",
+   "files": [
+    "report.py",
+    "signal_format.py",
+    "logs/backtest/trade_2015_present.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7475f214-c968-4e83-87b9-748726c29588"
+   ],
+   "bundle": "005.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "汇率买点：回测无明显收益贡献则整链移除",
+   "type": "workflow",
+   "content": "将汇率纳入美股买点前必须用全量回测验证对收益的贡献；若无明显贡献，应删除代码、回测与报告中的全部相关逻辑，并保持报告精简、避免重复表述。会话结论为移除汇率买点指标。",
+   "evidence": "005 6fd513ab：用户要求回测验证贡献，不明显则移除；诉求 5–6 要求报告同步精简。",
+   "files": [
+    "us_index_signal.py",
+    "_backtest_fx_buy_signal.py",
+    "_fx_impact_analysis.py",
+    "optimize_us_fx_quota.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6fd513ab-4e8c-43a0-b981-c96a3b1bf31c"
+   ],
+   "bundle": "005.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "组合回测 HTML 未持仓指数不显示买卖点",
+   "type": "bug",
+   "content": "`--portfolio` 组合模式下部分指数（如中证500、沪深300、恒生科技）持仓金额为 0 时，`collect_daily_tables` 会跳过金额为 0 的指数，导致 `inception_present.html` 下拉列表看不到这些指数，误以为没有卖点。修复：新增 `get_chart_buy_amount()`，组合未持仓指数在**图表展示**时回退到基准买入金额（如 28 元），仅用于买卖点可视化，不改变组合回测统计与真实持仓逻辑。",
+   "evidence": "用户反馈「中证1000在HTML里面没有看到卖点」；结论写明组合未持仓指数为 0 被跳过，修复后下拉可见 000905/HSTECH/000300。",
+   "files": [
+    "backtest_trade_signals.py",
+    "config.py",
+    "output/backtest/inception_present.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2c9ec957-ab6d-4729-86cb-b327133a72dd"
+   ],
+   "bundle": "006.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "指标变更后必须全量回测并重生 HTML",
+   "type": "workflow",
+   "content": "项目规则：每次调整买卖/止盈指标或相关参数后，应跑**全量历史回测**并重新生成回测 HTML（如 `inception_present.html`），避免只看单年或旧报告误判信号质量。",
+   "evidence": "用户明确要求「增加项目规则，每次指标调整完需要回测全部数据，重新生产HTML」。",
+   "files": [
+    "backtest_trade_signals.py",
+    "README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2c9ec957-ab6d-4729-86cb-b327133a72dd"
+   ],
+   "bundle": "006.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "数据源变更后跑 validate_data_baostock 七段校验",
+   "type": "workflow",
+   "content": "日常不必持续扩免费数据源；改 `market_data` / `cyb_data` / `us_index_data` 或怀疑估值异常时，执行 `python validate_data_baostock.py`。脚本覆盖：收盘价 baostock 交叉、H30269 ETF 跟踪、国债分页、创业板深交所 PE、美股 Forward PE（HOM + Barron's + Multpl）等。有 VPN 时可偶尔刷新 Barron's 日缓存对照 §7。",
+   "evidence": "baostock 验证会话结论：「改数据源或阈值后要跑 validate」「日常开发不需要再扩源」。",
+   "files": [
+    "validate_data_baostock.py",
+    "market_data.py",
+    "cyb_data.py",
+    "data_sources.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "74fc77f0-d079-4fee-a553-9d9b95532e22"
+   ],
+   "bundle": "006.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "NDX Forward PE 主源 HOM 相对 Barron's 偏低约 13%",
+   "type": "fact",
+   "content": "纳斯达克100 Forward PE 若用 HOM 作主源，与 Barron's 相比约低 **13%**（Birinyi operating earnings vs Bloomberg 一致预期），属口径差而非单纯抓数错误。策略以分位为主时，序列自洽比绝对值更重要；提高 NDX 买点精度可略保守阈值，不必为 NDX 再换主源，除非整套分位历史改口径。",
+   "evidence": "数据源可靠性表：「NDX Forward PE … Barron's 比 HOM 高约 13%」。",
+   "files": [
+    "us_index_data.py",
+    "validate_data_baostock.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "74fc77f0-d079-4fee-a553-9d9b95532e22"
+   ],
+   "bundle": "006.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "H30269 等指数无 baostock K 线需 ETF 收益相关性抽检",
+   "type": "pattern",
+   "content": "中证红利低波（H30269）、科创50（000688）等指数在 baostock 无直接指数 K 线，价格主源仍缺第三方全量直验。可用跟踪 ETF（如 512890/560150）日收益与指数序列做相关性抽检（会话中约 **0.98**）作为价格可靠性的辅助证据，不能替代指数收盘价主源。",
+   "evidence": "验证诉求与结论：「H30269 收盘价 — 可用跟踪 ETF 日收益做相关性抽检」「560150 日收益相关约 0.98」。",
+   "files": [
+    "dividend_data.py",
+    "cn_broad_data.py",
+    "validate_data_baostock.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "74fc77f0-d079-4fee-a553-9d9b95532e22"
+   ],
+   "bundle": "006.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "logs 仅日志、cache 与 output/backtest 与 gitignore 分工",
+   "type": "pattern",
+   "content": "`logs/` 只放运行时日志（如 `push.log`）；外部数据缓存放 `cache/`（含 `cache/us/`）；回测 Markdown/HTML 放 `output/backtest/`。三者均应在 `.gitignore` 中忽略。路径集中在 `config.py`（`LOGS_DIR`、`DATA_CACHE_DIR`、`BACKTEST_OUTPUT_DIR`），`data_cache.py` 与 `backtest_*.py` 统一引用，避免把回测产物或行情缓存误放进 logs。",
+   "evidence": "目录拆分会话：迁移 15 个回测文件到 output/backtest，明确 logs 定义过宽的问题已修复。",
+   "files": [
+    "config.py",
+    "data_cache.py",
+    ".gitignore",
+    "README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "76d358a5-b42c-4657-ac33-cf29a7007295"
+   ],
+   "bundle": "006.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "backtest_trade_signals 共用估值面板避免双倍构建",
+   "type": "pattern",
+   "content": "性能瓶颈：排名分配与波段回测各自 `BacktestPanels()` 会全量构建两遍估值面板（约 81s）。优化：统一 `get_panels()` 启动并行预热一次；同一交易日买卖信号评估去重缓存；热点循环用 `itertuples` 替代 `iterrows`；多只 A 股宽基回测线程池并行。优化后约 20–24s 且结果一致。",
+   "evidence": "会话对比表：默认 55–81s → ~23s，--portfolio 32s → ~19s。",
+   "files": [
+    "backtest_trade_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1b77f0f7-5996-4a5c-bf83-b80f9cb43f04"
+   ],
+   "bundle": "006.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "report 与回测共用 config 阈值与买入金额链路",
+   "type": "pattern",
+   "content": "`report.py` 不维护独立阈值： `evaluate_signal()` 读 `config.py` 买入条件，`enrich_signal_buy_amount()` → `get_buy_amount_base()` 与 `BUY_AMOUNT_TIER_SCHEME` 分档。改 `ANNUAL_INVESTMENT_BUDGET` 或 `push.env` 后报告与回测应对齐同一配置；报告一般不单独展示「年度总投入」文案，但金额已按预算缩放。",
+   "evidence": "用户问「当前的标准也同步到report里面了吧？」结论给出 NDX/SPX 阈值与金额与 config 对照表一致。",
+   "files": [
+    "report.py",
+    "config.py",
+    "buy_amount_tiers.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1ca4bb52-3d77-403a-bdc9-e97df2e904d9"
+   ],
+   "bundle": "006.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "实盘剩余额度与回测年度预算两套分配模型",
+   "type": "pattern",
+   "content": "实盘推送：`REMAINING_INVESTMENT_BUDGET`（兼容旧名 `ANNUAL_INVESTMENT_BUDGET`）表示当年**剩余可投**，由 `buy_amount_allocation.py` 按**当前年区间位置 + 买入就绪度**动态分配，并可外推预计全年投入（`ANNUAL_INVESTMENT_TARGET` 可选）。历史回测仍用收益率排名 + `get_annual_budget()`（如默认按 7.2 万/年估算），避免用「剩余天数比例」污染历史模拟。",
+   "evidence": "配置概念变更表与「回测仍用收益率排名 + get_annual_budget()」。",
+   "files": [
+    "buy_amount_allocation.py",
+    "buy_amount_ranking.py",
+    "push.example.env",
+    "config.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f4362849-b8f0-4fde-975d-48f1772ad6ce"
+   ],
+   "bundle": "006.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 实盘挂单价与现价偏离：根因是调仓日历与筛选参数未对齐建仓日",
+   "type": "bug",
+   "content": "用户看到 live 报告里挂单价区间与现价差距很大，往往不是「改一档限价」能解决的。若报告仍按指数年度调样（如 1 月）沿用放宽参数（如波动率上限固定 50%），而用户要在任意日按现价建仓，则标的池、波动筛选与下次调仓日与回测曲线都不一致。应增加建仓周年调仓模式 entry_anniversary：建仓日视为首次调仓并按当日市场动态算筛选阈值；下次调仓为次年同月同日后首个交易日；回测用 --rebalance-mode entry_anniversary 且 --start 等于建仓日。收益预期应对齐该模式回测（调仓日收盘价+滑点成交），而非固定 1 月指数调仓曲线。",
+   "evidence": "会话结论：新增 DLV_LIVE_REBALANCE_MODE=entry_anniversary、--entry-date；建仓周年下波动上限由 50% 改为按日动态（示例 40%）；用户诉求「任意时间建仓、次年同点调仓」",
+   "files": [
+    "dividend_lowvol_rotation/report.py",
+    "dividend_lowvol_rotation/strategy.py",
+    "dividend_lowvol_rotation/backtest.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2a95465e-28a2-430e-998b-9b57c4140d87"
+   ],
+   "bundle": "007.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] Phase 7-B Alpha 晋级：点估计改善仍可能因预注册闸门整体 FAIL",
+   "type": "workflow",
+   "content": "在 H30269 Beta 锚点校验通过后，对 C1/C2/C3 等 Alpha 变体不能只看点估计年化或回撤改善。预注册多闸门同时判定：例如增量年化与 Bootstrap 下界（G1）、滚动三年最差窗口（G3）等。实测 C3（126 日波动率变体）相对 Beta 点估计略好、回撤略改善，但 G1/G3 未过则整体验证 FAIL、不进入模拟盘，官方一年波动窗口继续保留。交付须保持 Beta 源与预注册 SHA256 不变，全量单测通过后再归档。",
+   "evidence": "C3 闸门表：G1 FAIL（Δ年化 +0.32pp，Bootstrap P5 -1.61pp）；G3 FAIL（三年窗口最差增量 -2.83pp）；结论「126 日窗口不获晋级」",
+   "files": [
+    "output/phase7b/factor_vol_half_year.md",
+    "output/phase7b/beta_anchor_check.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-27T19-28-27-01a042fa-7e61-7451-b55b-60e15f97475d"
+   ],
+   "bundle": "007.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 申万行业映射：静态快照、显式 unmapped、>10% 停线",
+   "type": "pattern",
+   "content": "用申万二级向一级归并（名称含「银行」的二级→「银行」，其余向上归并一级）时，行业分类是当前静态快照而非 PIT，历史调样期存在未知方向错配。无法映射的记录必须标 unmapped 并统计占比，禁止猜测填充。所有引用该分类的报告固定披露上述限制；若 unmapped 占比 >10%，应先解决数据源再继续后续因子实验。银行权重若长期显著（如实测 12 期均值约 27%、均低于冻结阈值 35%），按预注册规则调整因子优先级（如 C2 支付率筛选升首位、C1 行业内股息率居次），而非认定 C1 失效。",
+   "evidence": "用户四项确认：披露文案、unmapped>10% 停线、银行 27.39% 触发 C2/C1 顺序调整、外部「银行约50%」须用实测核验",
+   "files": [
+    "output/phase7b/"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-27T19-28-27-01a042fa-7e61-7451-b55b-60e15f97475d"
+   ],
+   "bundle": "007.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 融合排序稳健性：持仓上限显式化与 buffer 归因",
+   "type": "workflow",
+   "content": "股息+低波融合策略应将 fusion_candidate_n（如 100）与 top_n（如 10）拆分，并在代码中显式 max_holding = top_n + NDrop（如 13），避免候选池逻辑隐式膨胀持仓。Layer2 收益归因须按逐日实际权重计算 core/buffer 贡献，不能用调仓日静态权重，否则缓冲仓收益被低估。若 buffer_contribution 长期 >30%，说明 Alpha 仍依赖缓冲，应回炉。综合验收矩阵（如 7 项中 ≥5 项）未通过前，融合配置保持 experimental，生产默认 fusion_mode: false。",
+   "evidence": "稳健性会话：1/7 通过未升级；原策略 buffer 贡献约 100%、候选枯竭频率 100%；用户确认 max_holding=13、逐日动态权重",
+   "files": [
+    "output/robustness/robustness_report.md",
+    "output/ablation/metrics_fusion_optimal.json"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-27T10-00-16-01a040f2-4dca-7810-b246-594ac1915afc"
+   ],
+   "bundle": "007.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 调仓敏感性 Bootstrap：主方案调仓日偏移，辅方案分块重采样",
+   "type": "pattern",
+   "content": "检验调仓时点与收益稳健性时，主方案应对每个调仓日做交易日随机偏移（如 ±13 日）后全路径重跑并重复足够次数（如 1000），直接测执行延迟与滑点敏感性。辅助方案可用按调仓周期收益的分块 Bootstrap（块长如 36 个月）估计区间，因标准 i.i.d. 重采样会低估短期自相关带来的尾部风险。两方案独立输出，不与「仅改限价」混为一谈。",
+   "evidence": "用户确认 Bootstrap 方案 B 为主、Block Bootstrap 为辅；标准 Bootstrap 对动量/自相关的局限说明",
+   "files": [
+    "output/robustness/"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-27T10-00-16-01a040f2-4dca-7810-b246-594ac1915afc"
+   ],
+   "bundle": "007.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 宽基买入信号年际频率骤降：先查估值分位而非只调阈值",
+   "type": "fact",
+   "content": "对比 2022–2024 高买入占比与 2025–2026 接近零信号时，常见解释是当前宽基估值处于高位（分位偏高），而非单一阈值写错。微调创业板等指标后，部分年份仍为 0 买入天（如 2020、2021），说明当年低点估值分位本身不满足条件。用多年 logs/backtest 分年表做指标松紧分析时，应分指数独立阈值并记录买入占比与信号收益，再决定改 config 还是接受「高位少买」。",
+   "evidence": "2025–2026 A 股宽基（含中证500、科创50）零或近零信号；创业板微调后 2020/2021 仍为 0 天",
+   "files": [
+    "logs/backtest/2021.md",
+    "logs/backtest/2025.md",
+    "config.py",
+    "cyb_signal.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "355a3923-8a06-43e6-aab7-a7daba7d869f",
+    "802ca60b-38e3-47fa-af25-da9516660471"
+   ],
+   "bundle": "007.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 连续多日买卖信号：报告须标出当日可用的阈值与指标数值",
+   "type": "preference",
+   "content": "买入/卖出条件可能连续多日成立，推送或回测 markdown 不能只写「满足买入」而不给出当日可操作的数字。应在报告中列出触发所依据的阈值与实际读数（利差、PB 分位、股债利差等），便于用户区分「仍满足」与「已临界」，并核对是否与 config 一致。",
+   "evidence": "用户诉求：「满足买入和卖出条件的，也要标出什么数字可以买或者卖，因为会有多天连续的买入或者卖出」",
+   "files": [
+    "backtest_buy_signals.py",
+    "logs/backtest/"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "802ca60b-38e3-47fa-af25-da9516660471"
+   ],
+   "bundle": "007.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "宽基回测：iterrows 标量买入评估改为向量化掩码",
+   "type": "pattern",
+   "content": "回测若对每行调用 evaluate_cn_broad_buy（iterrows），全量回测可达百秒级。应实现 vectorized_cn_broad_buy_mask，回测路径设 buy_only=True 跳过卖出评估；图表侧用 build_daily_table_range 批量建表。向量化结果必须与标量逻辑做全量行对行校验（本会话约 16582 行）后再替换。",
+   "evidence": "会话结论：回测全套 194s→74s；「回测不再逐行调用 evaluate_cn_broad_buy」「已向量化掩码与标量逻辑做了 16582 行全量校验」。",
+   "files": [
+    "backtest_buy_signals.py",
+    "cn_broad_signal.py",
+    "backtest_trade_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "17bbafc8-a23f-4d2e-9dc4-3980f571ac77"
+   ],
+   "bundle": "008.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "买入金额排名重复计算与磁盘缓存",
+   "type": "bug",
+   "content": "全量报告慢的主因之一是各指数/图表重复触发收益率排名（单次约 25s，红利+宽基可各占 ~173s）。修复：并行预加载面板、排名结果落盘 cache/ranking_allocation.json（数据未变则秒级命中）；config 侧对 get_cn_broad_signal_config 使用 lru_cache，并修复组合模式下 get_chart_buy_amount 重复触发排名的问题。数据更新后需跑 sync_data_cache.py 刷新排名缓存。",
+   "evidence": "诊断「每个指数重复跑收益率排名，单次约 25 秒」；优化后报告冷启动 ~26s、缓存命中 ~8s。",
+   "files": [
+    "buy_amount_ranking.py",
+    "config.py",
+    "report.py",
+    "data_cache.py",
+    "sync_data_cache.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "17bbafc8-a23f-4d2e-9dc4-3980f571ac77",
+    "28c65c3e-a410-4135-a663-7a2b650b4170"
+   ],
+   "bundle": "008.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "本地报告与微信推送脚本分离",
+   "type": "workflow",
+   "content": "core.py：本地看报告，默认不推送，须具备 if __name__ == \"__main__\" 入口（仅作模块库时 IDE 直接运行无输出）。push.py：生成报告并走 Server酱，供定时任务；推送行为统一为仅显式 --push 时才推送。notify.py 承载推送实现。",
+   "evidence": "用户「推送解耦」「运行 core.py 没有输出」；结论表 core.py / push.py / notify.py 职责划分。",
+   "files": [
+    "core.py",
+    "push.py",
+    "notify.py",
+    "run_report.bat",
+    "run_push.bat"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "44ec2513-8219-4016-9443-488909474cfe",
+    "ed0c79a0-7954-45ec-a6e8-6498987b7dc4"
+   ],
+   "bundle": "008.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "推送/统计改动禁止实测微信推送",
+   "type": "preference",
+   "content": "开发或验收推送文案、统计字段时，只验证脚本标准输出或本地报告，不要调用真实推送通道。用户曾明确要求「完成后不要测试推送，仅测试脚本输出」并写入项目规则。",
+   "evidence": "用户诉求：「不是让你不要测推送吗？写进项目规则里面」。",
+   "files": [
+    "push.py",
+    "run_push.bat"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ed0c79a0-7954-45ec-a6e8-6498987b7dc4"
+   ],
+   "bundle": "008.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "策略阈值与公共配置：config.py + 环境变量优先",
+   "type": "pattern",
+   "content": "指数列表、数据源 URL、策略阈值（如 STRONG_BUY_SPREAD、BUY_CONDITION_SPREAD）、超时等集中在 config.py。覆盖顺序：系统环境变量优先；push.env 启动时加载且不覆盖已有环境变量。买入条件利差业务口径为 3.2% 时设 BUY_CONDITION_SPREAD=0.032。示例见 push.example.env，密钥仍放 push.env。",
+   "evidence": "用户纠正「大于3.2%才符合买入条件」；结论「环境变量优先」「push.env 不覆盖已有环境变量」。",
+   "files": [
+    "config.py",
+    "push.env",
+    "push.example.env",
+    "push.py",
+    "930955.py",
+    "H30269.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ed0c79a0-7954-45ec-a6e8-6498987b7dc4"
+   ],
+   "bundle": "008.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "AlphaPurify：分层收益须与 IC 共用方向翻转后的因子",
+   "type": "bug",
+   "content": "若 compute_quantile_returns 使用原始 factor_values 而 IC 使用 _apply_direction 后的值，会出现 IC 为正但多空收益为负等方向不一致。排查：在 diagnose_factor 中对比 IC 与分层所用因子值范围；调用链 runner → metrics 必须传递 factor_values_oriented；_apply_direction 加断言防止重复翻转。修复后需用 volatility_60d 等因子验证 IC 与多空同向。",
+   "evidence": "分层收益 Bug 任务书：「如果两个范围差异大于 1e-6，说明分层逻辑误用了原始值」；修复后 volatility_60d IC 0.06987、多空 +4.043%、PASS。",
+   "files": [
+    "alphapurify_bridge/diagnostics/runner.py",
+    "alphapurify_bridge/diagnostics/metrics.py",
+    "config/alphapurify/diagnosis_config.yaml"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-26T11-27-41-01a03c1b-fa83-7e81-9a3f-b8e94fdefaeb"
+   ],
+   "bundle": "008.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "因子诊断默认 IC 口径为 Spearman Rank IC",
+   "type": "fact",
+   "content": "AlphaPurify 接入后默认 IC 从 Pearson 改为 Spearman Rank IC；配置与代码兜底默认值需一致。门槛与 primary_horizon（如 20 日）、IC/IR 阈值、单因子 frequency 覆盖等均在 diagnosis_config.yaml / factor_registry.yaml 维护；CLI 支持 --horizon。",
+   "evidence": "用户「将默认 IC 口径从 Pearson 切换为 Spearman Rank IC」；后续 20 日口径 primary_horizon=20、阈值 IC 0.010、IR 0.15。",
+   "files": [
+    "config/alphapurify/diagnosis_config.yaml",
+    "config/alphapurify/factor_registry.yaml",
+    "scripts/run_factor_diagnosis.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "rollout-2026-08-26T08-11-21-01a03b68-3af7-76f0-a623-687ee14362d7",
+    "rollout-2026-08-26T11-27-41-01a03c1b-fa83-7e81-9a3f-b8e94fdefaeb"
+   ],
+   "bundle": "008.md",
+   "project": "投资推送"
+  }
+ ]
+}

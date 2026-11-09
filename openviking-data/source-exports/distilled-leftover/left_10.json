@@ -1,0 +1,162 @@
+{
+ "batch": 10,
+ "files": [
+  "055.md",
+  "056.md",
+  "057.md",
+  "058.md",
+  "059.md",
+  "060.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "title": "「查看」类按钮依赖子单 ID 时：本地 ID 兜底 + 不要用详情接口回冲 sessionStorage 回传的 ID",
+   "type": "bug",
+   "content": "情况：苏州房地产监测V3 预售许可申请详情页（views/presale/permit）里的「预售方案 · 查看」按钮，在新增/编辑态一直灰显，用户以为按钮坏了。\n\n为什么：按钮启用条件是 `:disabled=\"!planId\"`，而 planId 有两个来源——申请单详情接口的返回、以及方案维护页保存后经 sessionStorage 回传的结果。`consumePlanPageResult()` 拿到 sessionStorage 里的 planId 后立刻又调了一次 `getDetail()`；此时申请单本身还没保存过，详情接口返回的还是没有 planId 的旧数据，于是把刚从 sessionStorage 恢复的值覆盖成空，按钮永久灰显。另外后端在部分场景下把 planId 塞在嵌套的 `plan.planId` 里，只读顶层 `planId` 也会判空。\n\n怎么做：1) 组件内统一用 `resolvedPlanId` 取值：`planId || plan?.planId`，模板与逻辑只认这一个；2) 父页面 detail.vue 同样加 `effectivePlanId` 做兜底；3) `detailCallback` 在接口未返回 planId/plan 时保留本地已有值，不要无条件覆盖；4) 去掉 `consumePlanPageResult` 里那次会冲掉本地 ID 的 `getDetail()` 调用。\n\n推广：凡是「子单据 ID 来自另一个页面保存后回传」的按钮启用条件，都不要用详情接口的返回值去回冲本地权威值，先合并再取值。",
+   "evidence": "会话 c979272c：用户截图反馈「详情页面这个预售方案的查看按钮点不了，新增和编辑的时候都是灰的」。排查得：PermitPlanPanel.vue 中 :disabled=\"!planId\"；consumePlanPageResult 调 getDetail() 使 sessionStorage 回传的 planId 被旧详情覆盖。已修复：PermitPlanPanel.vue 引入 resolvedPlanId（planId 或 plan.planId 兜底），detail.vue 新增 effectivePlanId，detailCallback 在接口未返回时保留本地 planId/plan，并移除 consumePlanPageResult 中的 getDetail() 调用。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/components/PermitPlanPanel.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/detail.vue",
+    "zhi2-web-admin/src/views/presale/permit/plan/detail.vue"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "c979272c-3442-49d7-883a-b7048db0acbc"
+   ],
+   "bundle": "055.md"
+  },
+  {
+   "title": "[苏房] zs-select 单选圆点样式挂在 .single-choice 上是全局副作用；视觉单选但语义仍是 checkbox",
+   "type": "pattern",
+   "content": "什么情况：给 zs-select-dialog-func.vue 加 `.zs-select-dialog.single-choice` 规则，把 Element 复选框用 CSS 画成圆点，想让「选项目」类弹窗看起来像单选。\n为什么：`singleChoice` 在 SelectDialog 里默认就是 true（全站绝大多数选择弹窗都没显式关掉），所以这条样式会作用于所有选择弹窗的勾选列，而不是只有本次改的那两个项目选择弹窗；评审时容易被当成「局部样式」而漏掉影响面。另外这只是视觉替换，未改 role/aria，读屏仍把圆点播报成多选框，属于已知 a11y 限制。\n怎么做：需要「圆点单选」视觉时不要扩展既有的 `single-choice` 类，另加专用 class 或 prop（如 `radio-style`）只挂到目标弹窗上，改动前先 grep 出 singleChoice 的消费方评估影响面；若设计确实要求全站统一圆点，就在需求里写明并记为 a11y 已知限制。\n配套结论：去掉 `show-checkbox=\"false\"` / `show-confirm=\"false\"` 换成「勾选列 + 确定」后，选择从「点链接一次完成」变成两步（勾选 → setData 才在 handlePick 里发出），这类交互变化要在需求里写清楚；想保留一点即选就继续 `:show-confirm=\"false\"` 并在行点击里直接 selectData/pickProject。",
+   "evidence": "会话 c985a9b7：评审 template/detail.vue 与 changeDetail.vue 的项目选择弹窗改造时指出 `.zs-select-dialog.single-choice` 会作用到所有 singleChoice=true 的弹窗（默认即 true），并为无障碍问题给出「记为已知限制或改 el-radio 列」的建议；同时指出去掉 show-checkbox/show-confirm 后交互变成两步。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue",
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/template/detail.vue",
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/changeDetail.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "c985a9b7-6ea8-4528-851b-02980b51a755"
+   ],
+   "bundle": "057.md"
+  },
+  {
+   "title": "[苏房] 弹窗查看态把固定高改成自适应高，会让「只滚内层」的策略失效、长内容被裁且不可滚",
+   "type": "bug",
+   "content": "什么情况：ProjectCertificateDetailDialog 原来固定 `92vh`，`.el-dialog__body` 自带滚动；改成「查看态自适应高度」后 `dialogHeight` 在 view 模式为 undefined，`dialogBodyScrollable` 变为 false，内层的 `max-height` + `overflow-y: auto` 也就不再生效，而外层 `.el-dialog__body` 仍是 `overflow: hidden`。\n为什么：本项目的弹窗高度是「外层不滚、只让内层滚动」的分层策略（同「查看随内容、编辑定高内部滚动」的约定），一旦去掉固定高，滚动能力必须由内层兜底；查看态长证书（施工证 + 楼幢列表）恰好是最容易超出视口的场景，用户会看到内容被拦腰截断且鼠标滚轮无反应、无报错。\n怎么做：查看态也要给 body 一条内容超出即滚的策略——`max-height: calc(100vh - …)` + `overflow-y: auto`，或给 `certificateMode === 'view'` 单独一套可滚类，把「定高内部滚动」与「自适应内部滚动」都收在同一个组件里；回归测试用最长的那张证书验证。",
+   "evidence": "会话 470b7d96 评审未提交变更时给出了这条 HIGH：issue 指出 dialogHeight 在 view 时为 undefined、dialogBodyScrollable 为 false，外层仍是 overflow:hidden，查看长证书内容可能被裁切且无法滚动，修复建议为 view 态补 max-height + overflow-y:auto 或另用一套 scroll 类。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/ProjectCertificateDetailDialog.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "470b7d96-37bf-4500-9317-939cedd57d37"
+   ],
+   "bundle": "057.md"
+  },
+  {
+   "baseline": "1c445c7",
+   "content": "「预售许可」和「现售备案」的楼幢列表用的是同一套子表组件（PresaleBuildingTable + 外层 PresaleBuildingSection），但两端要展示的列名、列序、语义都不同。\n\n做法：在表格组件上加 variant prop（'presale' | 'cashsale'，默认 presale 保证预售侧零回归），列定义按 variant 出两套；Section 层原样透传 variant；宿主详情页（CashsaleDetail.vue）传 variant=\"cashsale\"，并在选择楼幢回写时补存现售专属字段（delivered）。其余交互（勾选列、操作列、选择楼幢/批量删除按钮）两模式共用，不要复制第二个组件。\n\n坑：改完表头不等于数据就有了。现售侧新增的「是否交付 / 建筑面积」在当前后端契约里可能根本没有。已在苏州 DM 库核对：现售楼幢落库表是 ZHISHU_PRESALE.T_SALE_RECORD_BUILDING，其中只有 BUILDING_NO / HOUSE_NATURE / ABOVE_FLOOR_COUNT / UNDER_FLOOR_COUNT / HOUSE_COUNT / HOUSE_AREA，没有交付标志、没有独立建筑面积列；DELIVERY_TYPE 是挂在 T_CONS_LIC_BUILD / T_PLAN_LIC_BUILD / T_SA_PRICE_BUILDING 上的，「面积」类字段是 FLOOR_AREA（如 COMMON_FRAMEWORK.T_SP_ACCOUNT）。\n\n所以现象会是「表头对了、两列全空」。此时不要在前端编造字段名或加假兜底，先把 variant 列布局落地（这部分是纯展示，可独立交付），再把「需要后端在现售详情 VO 里补 delivered/floorArea」作为前置条件提给后端。另注意「地上/地下总层数」的语义是总层数，不要直接塞进 aboveGroundFloors 之类的单侧字段。",
+   "evidence": "会话 785cb382（基线 1c445c7）：用户给两张图「图1是需求，图2是现在的，对齐」，agent 在 PresaleBuildingTable.vue 加 variant prop 分流出 presale/cashsale 两套列（现售列：序号/楼幢号/是否交付/建筑面积/房屋性质/地上总层数/地下总层数/现售总套数/现售总面积），PresaleBuildingSection.vue 透传，CashsaleDetail.vue 传 variant=\"cashsale\" 并保存 delivered；结论里明确提示「若保存后是否交付/建筑面积仍为空，需确认详情接口 /presale/cashsale/detail 的楼幢数据是否包含 delivered、floorArea」。列名实际由后端/字典口径决定，未在会话中验证字段是否存在——本次用 DBX 直连苏州 DM 开发库查询 ALL_TAB_COLUMNS 核实：T_SALE_RECORD_BUILDING 无交付/面积列，DELIVERY_TYPE 分散在 T_CONS_LIC_BUILD、T_PLAN_LIC_BUILD、T_SA_PRICE_BUILDING，FLOOR_AREA 在 COMMON_FRAMEWORK.T_SP_ACCOUNT。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleBuildingTable.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleBuildingSection.vue",
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleDetail.vue",
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleSelectBuildingDialog.vue"
+   ],
+   "sessionIds": [
+    "785cb382-b421-4ca3-9ca4-fb422f341466"
+   ],
+   "title": "[苏房] 预售/现售共用楼幢子表的「同构列不同名」分流：variant prop + 现售列字段在 stock 库里压根不存在",
+   "type": "pattern",
+   "bundle": "058.md"
+  },
+  {
+   "title": "详情页子表组件型双请求：subTableMixins 的 created→getList 与父页 detailCallback 里 $nextTick(refresh) 重复拉同一列表",
+   "type": "bug",
+   "content": "场景：详情页把关联子表抽成独立组件（PlanLicRelatedBuildingTable / ConsLicBuildTable），用 v-if=\"form.conEngPlanLicId\" 在拿到主表 ID 后才挂载，父页 detailCallback 里又调用 $refs.xxx?.refresh() 保证数据刷新。\n为什么：子表组件内部继承 subTableMixins，mixin 在 created 阶段就 init→getList；而 v-if 恰好在同一轮拿到 ID 时挂载，于是首屏发生两次分页请求（第一次已把列表拉回，紧接着 refresh 再拉一次）。这不会报错，只会多打一个接口、翻页状态被重置，非常容易被 review 漏掉。\n怎么做：先判断子表生命周期——若子表在挂载时已自带首次请求，父页 detailCallback 里就不要无条件 refresh，改为「仅在父级已负责首拉 / 切换 ID 后需要重取」时才 refresh（或给子表加 skipFirstFetch 约定、由父级显式首次触发）。反之若子表本身不首拉，则必须保留 refresh，避免出现「有 ID 但表格空白」。\n同时要注意：同一批子表组件的行内按钮要跟只读开关对齐——readOnly 时应只保留 viewButton，不要出现 PlanLic 只留查看、ConsLic 仍按另一套分支拼按钮的不一致。",
+   "evidence": "会话 review 结论：planLic/detail.vue:275-277、consLic/detail.vue:428-430 处 v-if 挂载子表后，subTableMixins 的 created→init→getList 已拉列表，同轮 detailCallback 的 $nextTick(refresh) 再 getList 一次（[MEDIUM] 详情首屏可能双请求）；并指出 ConsLicBuildTable 行内按钮未跟随 readOnly（恒为 [viewButton]）与 PlanLic 不一致。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/certificate/planLic/detail.vue",
+    "zhi2-web-admin/src/views/projectManagement/certificate/consLic/detail.vue",
+    "zhi2-web-admin/src/views/projectManagement/certificate/planLic/components/PlanLicRelatedBuildingTable.vue",
+    "zhi2-web-admin/src/views/projectManagement/certificate/consLic/components/ConsLicBuildTable.vue",
+    "zhi2-web-admin/src/mixins/subTableMixins.js",
+    "zhi2-web-admin/src/mixins/table.js"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "1f81510c-8404-4c5d-9c07-1526553f1a49"
+   ],
+   "bundle": "060.md"
+  },
+  {
+   "title": "登录页左右分栏被右侧 width:100% 撑开：flex 面板宽被显式宽度覆盖，线上「最新部署」也照样瘦不下来",
+   "type": "bug",
+   "content": "场景：V3 Web 后台登录页（login.vue）左图右表单两栏布局。用户截图反馈右侧表单卡片明显比左侧图片宽，且已确认线上就是当天最新部署的代码，排除缓存/旧包。\n为什么：右侧 .login-container 上写了 width: 100%，在 flex 容器里优先生效，把父级 > .login-container 上声明的 flex: 0 0 var(--login-panel-width) 与 width: var(--login-panel-width) 全部覆盖，于是右列吃掉剩余空间，左右列宽不等。\n怎么做：去掉右列自己的 width: 100%，只保留 min-width: 0（用于覆盖「无侧图时 min-width: 520px」的兜底），让宽度回归 --login-panel-width 变量控制；改动后需重新部署、在同分辨率下量两侧列宽确认。\n排查经验：用户说「线上是最新部署」时不要再去猜缓存或构建产物，应直接读当前源码里的宽高声明优先级；若改完仍觉左图「窄」，多半是素材圆形构图留白而非列宽不等，先用列宽数值下结论再动样式。",
+   "evidence": "会话中用户连续追问「右侧宽度会跟随屏幕变大吗」「登录表单卡片和左侧图片会不一样宽吗」「截图里右侧表单区域已经很宽了」并说明「线上是今天最新部署的」；结论为去掉右侧 .login-container 的 width:100%，保留 min-width:0，让 flex: 0 0 var(--login-panel-width) 生效。",
+   "files": [
+    "zhi2-web-admin/src/views/login.vue",
+    "zhi2-web-admin/src/views/LoginForm.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "f6a6cafe-422f-4155-b0e8-1bc22074bfb2"
+   ],
+   "bundle": "060.md"
+  },
+  {
+   "title": "列表字段做点击跳转详情的「链接列」改造：列顺序前移到序号后 + 列类型改 link 走 listMixins.handleView",
+   "type": "workflow",
+   "content": "场景：多个同源列表页（如住房租赁合同录入 leaseContractEntry/index.vue 与住房租赁合同备案 leaseContract/index.vue）需要把「房屋坐落」列前移到序号之后，并支持点击进入合同查看页。\n怎么做：1）只改 columns 配置数组的顺序，把目标列放到紧跟固定「序号」列的第一位，后续列顺延（录入页其后接合同备案编号、行政区划等），不动模板结构；2）把该列的类型改为 link（与项目里房号链接列同款），并绑定 listMixins 的 handleView，行为与既有「查看」按钮完全一致，这样跳转路径解析、权限与缺主键提示都复用同一套逻辑，不要自己拼路由；3）同一业务域下「录入」「备案」这类成对菜单必须一起改，用户明确要求「录入和备案都要改」，否则两个列表口径不一致。\n验证：刷新列表应显示为链接样式，点击打开对应单据的查看页。注意不要把链接列写成 type=\"index\" 或纯 slot——那种写法只有蓝色样式、点了没反应。",
+   "evidence": "用户诉求「房屋坐落放在序号之后，加跳转详情的链接」+「录入和备案都要改」；交付说明：两页均把「房屋坐落」移到 columns 第一项（紧跟固定序号列），列类型改为 link，点击调用 listMixins 的 handleView。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/leaseContractEntry/index.vue",
+    "zhi2-web-admin/src/views/presale/leaseContract/index.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/mixins/ListTemplate.js"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "27b95819-f8c3-4211-a41b-49d5148232d1"
+   ],
+   "bundle": "060.md"
+  },
+  {
+   "title": "列表姓名脱敏落地：maskPersonName 工具 + formatters/index.js 注入 + 分隔符/机构名/系统账号三个边界",
+   "type": "pattern",
+   "content": "场景：换签合同等列表的买受人、变更买受人、合并人等姓名列需要脱敏展示。\n落地结构：新建 zhi2-web-admin/src/utils/maskPersonName.js 做核心规则（首字 + 中间 * + 末字）；在 src/formatters/index.js 里导出 listNameFormatter(row, column, cellValue) 等包装器，经 main.js 挂到 Vue.prototype.formatters，页面列上配 formatter 即可。formatter 签名必须与 zs-table-column 的 getCell / Element formatter 一致；已含 * 的字符串原样返回，避免二次脱敏（与 maskPhoneNumber 同一约定）。\n三个必须确认的边界：1）分隔符正则里带 \\s 会把含空格的整段拆成多段分别打星（英文名、后端用空格连接多人），应按产品口径只保留 ,，、;；；2）非自然人片段（「XX有限公司」）会被同一套规则变成「X*****司」，需按证件类型或名称关键字分支；3）createUser 之类可能是登录名/工号，脱敏后会显示成 a***，要先确认是否人名，否则别套 listNameFormatter。体系上建议把 maskPhoneNumber 也从 formatters/index.js 抽到 utils/maskPhoneNumber.js，与 maskIdNumber 对齐，formatter 只做委托，便于维护与单测。",
+   "evidence": "review 会话列出 [MEDIUM] 空白分隔可能误拆姓名、企业/机构名称按自然人规则脱敏、脱敏工具文件组织不一致（maskPhoneNumber 在 formatters/index.js、maskPersonName/maskIdNumber 在 utils/）、同业务域列表脱敏不一致、createUser 字段语义存疑；并确认 listNameFormatter 签名与 zs-table-column getCell 一致、已含 * 原样返回。",
+   "files": [
+    "zhi2-web-admin/src/utils/maskPersonName.js",
+    "zhi2-web-admin/src/utils/maskIdNumber.js",
+    "zhi2-web-admin/src/formatters/index.js",
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/exchangeContract/index.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "e4a1c7f3-e70c-4e3e-a187-2e6455420b80"
+   ],
+   "bundle": "060.md"
+  },
+  {
+   "title": "区划列回退链不能用 ?? 串：空字符串会阻断回退，且要先取 canonical 字段 administrativeArea",
+   "type": "pattern",
+   "content": "场景：列表列 prop 改成 provinceCityArea、并在 formatter 里做 resolveRegionCode(row, cellValue) 兜底时（companyCancel/index.vue 一类页面）。\n两个坑：1）`??` 只跳过 null/undefined，不跳过 ''。若 cellValue / provinceCityArea 是空串而 administrativeArea 有值，会在 code === '' 的分支直接 return '' 显示「-」，回退链等于没写。应统一 pick(v) = (v == null || v === '' ? undefined : String(v).trim()) 再逐级 ??。2）字段优先级要跟接口约定对齐：本项目列表/详情以 administrativeArea（ECONOMIC_INSTITUTIONS_REGION 字典）为准，resolveRegionCode 现有顺序是 cellValue → administrativeArea → provinceCityArea，两字段同时有值且不一致时会展示非 canonical 值，与筛选条件（仍用 administrativeArea）矛盾。建议改为 administrativeArea 优先、仅其为空时落 provinceCityArea。\n另：formatter 内不要触发 store 的区划字典加载（formatter 会被每行每渲染调用），字典应在页面 mounted 统一预取。",
+   "evidence": "review 会话指出 resolveRegionCode 顺序为 cellValue → administrativeArea → provinceCityArea，与 companyCancel.js 注释「以 administrativeArea 为准」不符；并用代码片段说明 `??` 不会跳过 ''，provinceCityArea 为 '' 时直接 return '' 显示「-」，另列 [MEDIUM] formatter 内触发 store 加载。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyCancel/index.vue",
+    "zhi2-web-admin/src/mixins/area.js",
+    "zhi2-web-admin/src/formatters/index.js"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "ca75b76a-9e9e-45c8-b219-635944c7db26"
+   ],
+   "bundle": "060.md"
+  }
+ ]
+}

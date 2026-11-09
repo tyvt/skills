@@ -1,0 +1,96 @@
+{
+ "project": "园区公共收益",
+ "batch": "036",
+ "files": [
+  "036.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "http://192.168.1.51/assets",
+   "type": "preference",
+   "content": "## 结论 `module-main-CI4DD367.js` **本身不是“敏感文件泄露”**，而是线上正在使用的前端主包（Vite 打包产物）。安全扫描对该 URL 的告警，多数是 **SPA 可访问静态资源 + 历史路由回退导致的误报**；但同一次部署里，**关联的密码加密分包确实硬编码了 AES 密钥**，这是需要处理的真实风险。 ## 和当前仓库 dist 的关系 | 项 | 线上 `192.168.1.51` | 本地 `dist` | |---|---|---| | 主包 | `module-main-CI4DD367.js` | `module-main-XbOf4OJl.js` | | 构建时间 | 2026/7/22 09:58 | 2026/7/9 10:00 | | gitHash | `f6ed457` | `ec27fb6c6` | | version | 2.6.1 / production | 2.6.1 / production | 线上 `index.html` 仍引用 `module-main-CI4DD367.js`，所以它是**当前线上包**，只是**不是你本机这份 dist**（本机是更早的一次构建）。 ## 这个文件里实际有什么 对已下载的线上文件排查结果： - **没有**：账号密码、`user.txt`/`password.txt`",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`module-main-CI4DD367.js",
+    "`module-main-XbOf4OJl.js",
+    "`index.html",
+    "`*.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2e8f6bb0-314e-403c-9222-a11180a770ba"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "已修复。 原因： 详情页在查看模式（formMode",
+   "type": "bug",
+   "content": "已修复。 **原因：** 详情页在查看模式（`formMode=view`）下，「承接查验起止日期」的展示配置只绑定了 `startDate`，没有拼接 `endDate`，所以只显示 `2026-08-17`。 **修改：** 在 `zhi2-web-admin/src/views/property/handover/detail.vue` 中，将查看模式的字段值改为： ```598:599:zhi2-web-admin/src/views/property/handover/detail.vue label: '承接查验起止日期', value: [this.form.startDate, this.form.endDate].filter(Boolean).join(' - '), ``` 修复后，有结束日期时会显示为 `2026-08-17 - 2026-08-XX`；若某一端为空，会自动省略，与项目中其他「起止日期」字段的处理方式一致。 **补充：** 同页「前期物业服务合同期限」也存在同样问题（只显示 `entrustStartDate`）。如需一并修复，告诉我即可。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`zhi2-web-admin/src/views/property/handover/detail.vue",
+    "```598:599:zhi2-web-admin/src/views/property/handover/detail.vue",
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\property\\handover\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\resourcesLeaseContractFiling\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\evaluation\\assessmentPlan\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a6391fef-ca00-4f65-9b24-3652ab37afa9"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "分配房屋之后，外面的房屋列表没有刷新数据，需要重新调",
+   "type": "bug",
+   "content": "已修复。原因是分配房屋后只刷新了单元表，下方的房屋信息表（`houseTable`）没有重新请求接口。 **数据流说明：** 1. 在单元表点击「分配房屋」→ 打开 `HouseScopeDialog` 2. 分配/删除成功后，`HouseScopeTable` 会触发 `update` 事件 3. 关闭弹窗时，`HouseScopeDialog` 会触发 `refresh` 事件 4. 原先 `unitTable` 只在这时调用自己的 `getList()`，没有通知外部的 `houseTable` **修改内容：** 1. **`HouseScopeDialog.vue`**：监听 `HouseScopeTable` 的 `update` 事件，分配成功后立即向上触发 `refresh` 2. **`unitTable.vue`**：新增 `onHouseScopeRefresh`，刷新单元表的同时向父组件发出 `refresh-house` 事件 3. **`detail.vue`**：给 `houseTable` 加 `ref`，监听 `refresh-house` 并调用 `getList()` 刷新房屋列表 4. **`HouseScopeTable.vue`**：删除房屋后也触发 `update`，保证删除时外部列表也能同步刷新 分配或删除房屋后，下方「房屋信息」列表",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "**`HouseScopeDialog.vue",
+    "**`unitTable.vue",
+    "**`detail.vue",
+    "**`HouseScopeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "df0fe2ed-a8b0-4936-844e-a31bac399490"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "业务对账，对完账了，查已对账的不好查。银行回单功能不",
+   "type": "preference",
+   "content": "已修复。问题出在**银行回单**功能的校验逻辑误拦了普通对账查询。 ## 原因 之前在 `getList()` 里，只要处于银行回单模式（`isBankReceiptMode`），就会校验「对账方式=手工核销」且「对账状态=未对账」。因此当你把对账状态改为**已对账**再点查询时，会弹出： > 请将对账方式设置为「手工核销」、对账状态设置为「未对账」 查询被直接拦截，右侧表格也为空。 ## 修改说明 1. **普通查询不再受银行回单校验影响** 点「查询」时，只校验管理账户和记账日期，不再因银行回单条件不满足而阻断。 2. **银行回单仅在明确进入该模式时生效** 新增 `shouldUseBankReceiptMode` 计算属性，需同时满足： - 点击了「银行回单」按钮 - 对账方式 = 手工核销 - 对账状态 = 未对账 3. **条件不匹配时自动切回对账单视图** 若已开启银行回单模式，但查询条件改为「已对账」，会自动退出回单模式，按原有逻辑加载银行对账单数据。 4. **进入银行回单模式的限制保留** 点击「银行回单」按钮时，仍会校验必须为「手工核销 + 未对账」，该限制只作用于进入回单功能，不影响查已对账记录。 ## 使用方式 查已对账记录：设置对账状态为「已对账」→ 点「查询」即可，无需再管银行回单按钮状态。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubBankDetailDay\\index.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\components\\BankReconciliation.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\api\\benefit\\pubBankDetailDay.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5f77e518-5da0-4307-9f26-9c451500d423"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "组织工作人员详情，新增选择物业管理区域弹框，已选择的",
+   "type": "preference",
+   "content": "已修复。问题出在 `workerDeptTable.vue` 的「新增」弹框：之前调用的是 `/property/complex/page`，会返回全部物业管理区域，已关联的区域也会被选到。 **修改内容：** 将选择弹框接口替换为 `/autonomy/ownerCommitteeWorker/pageComplex`，并通过 `filterParams` 传入 `ownersCommitteeWorkerId`（对应当前工作人员的 `committeeWorkerId`），由后端排除已关联区域。 ```150:172:d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\ownerCommitteeWorker\\workerDeptTable.vue handleAdd() { SelectDialog.open({ title: '选择物业管理区域', url: '/autonomy/ownerCommitteeWorker/pageComplex', rowKey: 'complexId', singleChoice: false, noBizState: true, filterParams: { ownersCommitteeWorkerId: this.committeeWorkerId }, outParams",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`workerDeptTable.vue",
+    "```150:172:d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\ownerCommitteeWorker\\workerDeptTable.vue",
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\ownerCommitteeWorker\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\ownerCommitteeWorker\\workerDeptTable.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\evaluation\\assessmentPlan\\components\\selectComplexDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5f40807a-f539-47bc-aecc-9bec46a51621"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  }
+ ],
+ "_draft": true
+}

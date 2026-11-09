@@ -1,0 +1,46 @@
+{
+ "project": "产品2.0",
+ "batch": "022",
+ "files": [
+  "022.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "房屋质量保证金-账户明细，缴存/账户明细没有根据所属",
+   "type": "preference",
+   "content": "你的判断基本正确。问题主要有两方面： ## 根因分析 ### 1. 账户详情子表（缴存明细 / 支用明细） **异步 + 残留数据问题：** - 路由复用时，`form` 会保留上一次访问的 `accountId` - 子表在详情接口返回前就挂载，并用**旧的** `accountId` 请求数据 - `detailCallback` 用 `{ ...this.form, ...data }` 合并，若接口未返回 `accountId`，旧值不会被覆盖 **过滤条件不完整：** - 子表只传了 `accountId` / `account`，未传 `propertyProjectId`（物业管理区域） - `subTableMixins` 在 `created` 时自动调 `getList()`，可能在过滤参数就绪前就发起请求 截图中余额为 1856.53 元，却出现 266.62 元的记录，说明子表查到了其他账户的数据。 ### 2. 资金缴存列表 重置时 `handleQuery()` 在区域树就绪前就执行，导致 `parentDeptId` 未带上就请求了接口。 --- ## 修复内容 **`guaranteeDepositAccount/detail.vue`** - 子表在 `!loading` 且 `resolvedAccountId`（`form.accountId ",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "**`guaranteeDepositAccount/detail.vue",
+    "**`AccountDetailTable.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDeposit\\components\\detail.vue、d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\guaranteeDepositAccount\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a2b93bb4-760d-4bb3-93a2-a4c0506cfb2f"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "property/propertyContract/",
+   "type": "bug",
+   "content": "已完成修改。物业合同列表接口实际路径为 `/property/propertyContract/page`（`moduleName` + `businessName` + `apiSuffix`），已在查询参数中按 B 端当前项目注入 `complexId`。 ### 1. 列表页 `index.vue` 在 `getQueryParams` 中，B 端从全局 store 读取当前选中项目并作为 `complexId` 传给列表接口： ```221:228:zhi2-web-admin/src/views/property/propertyContract/components/index.vue getQueryParams() { const result = { ...this.queryParams, contractType: this.propertyContractType } if (this.$store.state.user.terminalType === 'B') { result.complexId = this.$store.getters.currentProjectId } return result }, ``` 该组件被以下页面共用，因此都会生效： - 物业服务合同备案 - 前期物业服务合同备案 - 合同变更 / 解聘 等 ### 2. 详情页 ",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`index.vue",
+    "```221:228:zhi2-web-admin/src/views/property/propertyContract/components/index.vue",
+    "`detail.vue",
+    "```1468:1475:zhi2-web-admin/src/views/property/propertyContract/components/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "35c4f338-b3f4-4660-b726-f1bf15f29ea7"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

@@ -23,14 +23,23 @@ zhi2-admin-h5 是苏州市房地产监管平台后台 H5 前端项目（含管�
 - 2026-11-06 修布局根 .app-wrapper 未撑满视口：加 min-height:100vh; box-sizing:border-box；子模块 8e4c32ad4、父仓库 b587375 已推送，部署 8092 验证生效
 - 本地 8092 可用测试账号：91320505MA1X866218 / ZS0001Aa!（开发企业/测试法人，用户 2026-11-06 提供）
 
+## 市场监测页功能（2026-11-09 改造）
+- MarketHeader.vue：左上角 logo 读 platformConfig.sysLogo（mapState + resolveServerAssetUrl 渲染 <img>，w-9 h-9 容器 overflow-hidden）；未配置或 @error 加载失败回退静态 house SVG；标题静态「苏州市房地产市场数据分析平台」
+- /market-monitor 在路由白名单，守卫不拉平台配置，故 MarketHeader mounted 主动 dispatch('app/getPlatformConfig')（store 已去重）
+- 返回首页按钮由 reset-overview 改为 emit go-home（tooltip「返回对内主页」）；goHome() 先退浏览器全屏，据 beforeRouteEnter 记录 from.fullPath 判断：from.matched 有值（门户内页 SPA 进入）$router.go(-1) 真正后退；直接/新标签打开兜底 $router.replace('/index') 回对内主页；不使用 history.state/length（直接打开时 history.length=2 且 state 非空会误判离开站点）
+- 遗留：PORTING-SPEC.md 与 market-monitor-alignment.md 仍写「返回首页＝重置全域」（上一轮对齐文档，本轮未改）；market-monitor.standalone.html 离线单文件仍旧行为（非交付对象）
+- 区域切换：仅切换数据、布局保持不变、移除返回按钮白底高亮（用户 2026-11-09 选择）
+- 购房人面板（户籍+年龄维度）与 KPI 卡片趋势图（yAxis 隐藏但自动缩放）位于 market-monitor 页
+- 未售房源图右 y 轴因 max: v.max*1.05 破坏 eCharts nice 刻度取整（显示 23.5935/20/15 异常刻度），改用 boundaryGap 修复（2026-11-09）
+- 验证：区域切换前后布局字节级一致，返回按钮保持半透明无白底（2026-11-09）
 
 <!-- MEMORY_FIELDS
 {
   "category": "项目",
   "name": "zhi2_admin_h5",
-  "source_extraction_id": "09cd59afd80b47e4b4195cc488f5fd72",
+  "source_extraction_id": "50d83b9cc77b474f8d8a951a6bf47bd4",
   "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited",
-  "version": 8,
+  "version": 10,
   "memory_type": "entities"
 }
 -->

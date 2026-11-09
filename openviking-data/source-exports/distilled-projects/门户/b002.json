@@ -1,0 +1,185 @@
+{
+ "project": "门户",
+ "batch": 2,
+ "files": [
+  "005.md",
+  "006.md",
+  "007.md",
+  "008.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "title": "苏周到扫码登录：三接口均为 POST，login 只在授权回调页调用",
+   "type": "workflow",
+   "content": "门户 UnifiedLogin 接入苏周到时，后端契约为三个 **POST** 接口：`/v2.0/security/ctAuth/suzhouDao/getQrLoginParam`（返回 `qrCodeId`、`qrUrl`，其中 `pageUrl` 指向前端授权成功链路）、`/v2.0/security/ctAuth/suzhouDao/scanLogin?qrCodeId=...`（PC 端轮询，未扫码时 `accessToken` 为 null）、`/v2.0/security/ctAuth/suzhouDao/login`（入参 `{ code, qrCodeId }` 换登录态）。\n\n**职责拆分（易踩坑）**：苏周到 H5 打开的是 `pageUrl` 上的 **授权回调页**（如 `/suzhou-dao/auth-callback?...&code=...`），在回调页 `created` → `submitAuth()` 里调用 `login`；仅当 `code == 200` 才 `replace` 到 **成功页**（如 `SuzhouDaoAuthSuccess.vue`）。成功页只做展示与「完成」关窗，**不得**再调 `login`。PC 主流程仍靠登录页轮询 `scanLogin` 拿 `accessToken`，与成功页无关。\n\n落地时扫码 H5 与回调/成功页都放在当前 `zhi2-web-admin` 工程内，并核对 nginx/网关前缀与 env 一致。",
+   "evidence": "「对应的接口都是POST」「成功页…只负责展示 UI…不会再去调 login 接口」「login…是在上一页 授权回调页…created → submitAuth() 里调用的」「PC 端登录仍靠登录页轮询 scanLogin 拿 accessToken，与成功页无关」",
+   "files": [
+    "zhi2-web-admin/src/views/suzhouDao/SuzhouDaoAuthCallback.vue",
+    "zhi2-web-admin/src/views/suzhouDao/SuzhouDaoAuthSuccess.vue",
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "zhi2-web-admin/src/api"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "f66860ed-1043-46b7-9784-4b1592fb93aa"
+   ],
+   "bundle": "006.md",
+   "project": "门户"
+  },
+  {
+   "title": "首页存量房业务流程步骤以 homeLayout 本地 DEFAULT_BUSINESS_FLOWS 为权威",
+   "type": "fact",
+   "content": "改门户登录后首页「存量房」等业务中心底部步骤条时，改 `src/views/home/config/homeLayout.js` 中的 `DEFAULT_BUSINESS_FLOWS`（含 `functionCode`、顺序、文案）。渲染链路为 `mergeBusinessFlows → mergeFlowSteps`：**步骤结构、顺序与展示文案以本地 defaults 为准**；接口下发的 `businessCenters` 仅用于补充跳转类字段，不能指望后端覆盖步骤条结构。因此即后端未下发或下发旧数据，本地改 defaults 也会生效。调整菜单后可用模块级脚本打印步骤数与名称链做快速验收；图标映射表（如 `BIZ_ICON_BY_CODE`）里未再使用的 code 可保留，避免历史菜单数据仍引用时缺图标。",
+   "evidence": "「修改…homeLayout.js 的 DEFAULT_BUSINESS_FLOWS」「mergeBusinessFlows → mergeFlowSteps 以本地 defaults 为步骤结构/顺序/文案的权威来源（接口仅补充跳转字段）」「无论后端是否下发 businessCenters，本次修改都会生效」「存量房步骤数: 5，经纪机构管理 → … → 资金托管」",
+   "files": [
+    "zhi2-web-admin/src/views/home/config/homeLayout.js"
+   ],
+   "baseline": "8c17ba3",
+   "sessionIds": [
+    "835934a3-a7f7-4b13-b1a9-07ed7be540b2"
+   ],
+   "bundle": "006.md",
+   "project": "门户"
+  },
+  {
+   "title": "UnifiedLogin platform-banner-desc 设计稿左对齐：避免固定宽度百分比拉伸",
+   "type": "pattern",
+   "content": "门户 UnifiedLogin 顶部平台区文案图（`platform-banner-desc`）要与设计稿一致为**左对齐**时，不要用 `width: 33.55%` 一类固定宽度百分比把文案块拉成视觉居中。推荐：`height: 59.15%`（按设计稿 97/164 比例）+ `width: auto` 等比缩放，`object-position: left top` 让两行文案从左侧装饰区之后起排；`max-width` 限制在右侧按钮区左侧，避免与按钮重叠。用户验收顺序常为「先改 desc 左对齐，再调标签与按钮」；改完后用设计稿截图或 `unified-login-visual.spec.ts` 对比。",
+   "evidence": "「platform-banner-desc在设计图里面是居左的」「去掉 width: 33.55% 的固定宽度拉伸」「height: 59.15%…+ width: auto」「object-position: left top」「两行文案会紧贴左侧装饰区之后显示，左对齐效果与设计稿一致」",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "zhi2-web-admin/tests/e2e/unified-login-visual.spec.ts",
+    "zhi2-web-admin/public/assets/images/UnifiedLogin"
+   ],
+   "baseline": "a1e5beb",
+   "sessionIds": [
+    "1c06a96f-418e-4cc9-93c8-d8e81869540b"
+   ],
+   "bundle": "006.md",
+   "project": "门户"
+  },
+  {
+   "title": "从苏州 V3 同步公共组件后，门户 e2e 登录步骤仍可能指向旧 login.vue",
+   "type": "workflow",
+   "content": "门户 `zhi2-web-admin` 为父仓子模块，常从「苏州市房地产监测V3」同期拷贝公共组件与全局样式（如 `src/components`、`src/styles/index.scss`、`detailLayout.js` 等）。同步后应跑 `npm run build` 验证编译；但 **V3 侧 e2e 用例默认按传统 `.login-form` 登录页编写**，门户对外入口已是 `UnifiedLogin.vue`，直接跑 V3 迁过来的 list-table 等 e2e 可能因选择器不一致而红测。\n\n后续若要稳定绿测：在 `e2e/fixtures/auth-helpers.js` 增加门户 UnifiedLogin 登录步骤，或为门户单独维护登录 fixture；并在 `e2e/.env.e2e` 配置可访问后端的账号后再跑依赖真实接口的用例。子模块提交后记得更新父仓 `门户` 的子模块指针。",
+   "evidence": "「V3 9 月末公共组件与全局 UI 已同步到门户 zhi2-web-admin（子模块…父仓已更新子模块指针）。npm run build 已通过」「当前用例仍按旧登录页 .login-form 写，与门户 UnifiedLogin 不一致，若要稳定绿测需改 e2e/fixtures/auth-helpers.js 或单独加门户登录步骤」",
+   "files": [
+    "zhi2-web-admin/src/components",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/e2e/fixtures/auth-helpers.js",
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "zhi2-web-admin/package.json"
+   ],
+   "baseline": "b84b4e7",
+   "sessionIds": [
+    "f1dec228-6407-422d-9866-035a036d169f"
+   ],
+   "bundle": "006.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 登录引导卡白色环绕光带：conic-gradient + 双层 mask 只保留 1px 环",
+   "type": "pattern",
+   "content": "在 UnifiedLogin 引导卡上实现「沿边框跑动的白色光带」时，用 `.guide-card::before`：`inset: -1px` + `padding: 1px` + `border-radius: inherit`，背景为 `conic-gradient(from var(--guide-ring-angle), …)`，再用 `mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)` 且 `mask-composite: exclude`（或 `-webkit-mask-composite: xor`）抠出仅 1px 的环线。亮弧控制在约 200°–350°（峰值约 305°），其余透明，视觉上是一段光带沿四边旋转。卡片本体保留弱常驻边 `rgba(255,255,255,0.16)`，避免光带转到背面时轮廓消失；动效专用外发光 box-shadow 应去掉以免脏边。用 `@property --guide-ring-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }` 注册角度并在 `@keyframes` 里改该变量，才能线性旋转锥形渐变起点；骨架屏占位卡保持静态弱边、不参与动画。",
+   "evidence": "会话实现并做像素帧差验证：动画暂停时两帧差 0px，运行为 1068px 且变化集中在卡片上缘环线区域；hover 将周期从 3.6s 缩至 2s 并提亮 border。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue",
+    "zhi2-web-admin/src/views/home/components/UnifiedLoginSkeleton.vue"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "session_d1e620fe90b6ddbb66e074177230a456"
+   ],
+   "bundle": "007.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] @property 动画中的自定义角度在 getComputedStyle 里常一直显示初始值",
+   "type": "fact",
+   "content": "对通过 `@property` 注册并由 CSS animation 驱动的自定义属性（如 `--guide-ring-angle`），在动画进行中用 `getComputedStyle(el).getPropertyValue('--guide-ring-angle')` 往往始终返回 `0deg`，这是注册属性中间值不暴露给 JS 的常见行为，不能据此判定动画未运行。验收旋转类边框动效应依赖逐帧截图/像素 diff、或 DevTools 动画面板，而不是只读 computed 自定义属性。",
+   "evidence": "UnifiedLogin 环绕光带会话明确记录：样式动画已用帧差证明生效，但 getPropertyValue 仍为 0deg。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "session_d1e620fe90b6ddbb66e074177230a456"
+   ],
+   "bundle": "007.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 公开门户二级页详情字段对齐：四列网格 + display:contents + subgrid",
+   "type": "pattern",
+   "content": "公开门户（publicPortal）机构/人员等详情若混用「全宽行」与「双列行」，且双列用两个 50% flex 格各自排 label/value，会出现左右列值起点不一致、窄列文字叠在标签上。统一改为字段区四列网格：`180px | 值 | 180px | 值`；双列项容器用 `display: contents` 让 dt/dd 直接落入四列成对排列；全宽项占满一行，优先用 `grid-template-columns: subgrid` 与父网格对齐（不支持时回退为相同四列定义），值从第 2 列跨到行末，与双列左侧值的 x 起点一致。标签列宽度要足够容纳「统一社会信用代码」等长文案避免换行。≤1200px 断点调整时勿把机构详情误收成两列导致再次错位。",
+   "evidence": "用户反馈字段对齐出问题后，根因定位为两套标签宽度 + 双列 flex；改四列网格后要求刷新验证全宽行与双列左侧值纵向对齐。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/portal.scss",
+    "zhi2-web-admin/src/views/home/publicPortal/pages/PropertyPages.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/components/RentalDetailDialog.vue"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "f3136e73-1172-459f-872c-cc4efe5d4b2f"
+   ],
+   "bundle": "007.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 公开门户二级页表单标签与值左对齐：portal.scss 与页面 scoped 分工",
+   "type": "workflow",
+   "content": "首页下所有公开门户二级页要求表单/摘要区「标签列与值列均左对齐」。共享样式放在 `publicPortal/portal.scss`，但勿在全局里耦合仅某一页用的 `property-summary-*` 类——应留在对应页（如 PropertyPages）的 scoped 样式中。Information 等页的 `.portal-summary-label` 需显式 `text-align: left`。Vue3 深度选择器统一 `:deep()`，避免继续写 `::v-deep`。README 应记录左对齐范围及经纪/租赁等无可见 `field.label` 的例外，避免后续改回右对齐或误加全局覆盖。合并前建议跑 `npm run test:e2e:public-portal` 做公开门户回归（仓库内未必有「标签右边缘」类断言，仍值得跑一遍）。",
+   "evidence": "用户两次强调标签与值都要左对齐；收尾改 README、portal.scss 注释、BrokerPages :deep、InformationPages 标签对齐，并说明 E2E 脚本位置与回归命令。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/portal.scss",
+    "zhi2-web-admin/src/views/home/publicPortal/README.md",
+    "zhi2-web-admin/src/views/home/publicPortal/pages/BrokerPages.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/pages/InformationPages.vue",
+    "zhi2-web-admin/tests/e2e/public-portal-interactions.spec.ts"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "cd219f43-3c16-438f-a69b-3bf209ae6601"
+   ],
+   "bundle": "007.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 公开门户二级页缺省人像与二维码：集中工具 + 各页/弹窗统一接入",
+   "type": "workflow",
+   "content": "公开门户各二级页（含经纪、租赁、物业等详情弹窗）需要统一的缺省人像与二维码占位图时，应抽公共模块（如 `portalPersonPhoto.js`）供列表卡与 DetailDialog 共用，避免每页各写一套 URL 或尺寸。接入后注意摘要区/头像区垂直间距，过大时收紧 margin/gap 但不要破坏四列网格的标签-值对齐。Mock 数据（如 brokers.js）与 E2E fixture（public-portal-designs.ts）随占位图策略一起更新，防止联调与截图测试仍指向旧资源。",
+   "evidence": "用户要求「缺省图片和二维码图片都加一下，所有二级页面都要加」，后续又因间距过大调整布局并在对齐修复中涉及多页与 mock/e2e fixture。",
+   "files": [
+    "zhi2-web-admin/src/views/home/publicPortal/portalPersonPhoto.js",
+    "zhi2-web-admin/src/views/home/publicPortal/mock/brokers.js",
+    "zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue",
+    "zhi2-web-admin/src/views/home/publicPortal/components/RentalDetailDialog.vue",
+    "zhi2-web-admin/tests/e2e/fixtures/public-portal-designs.ts"
+   ],
+   "baseline": "e1f8e0b",
+   "sessionIds": [
+    "f3136e73-1172-459f-872c-cc4efe5d4b2f"
+   ],
+   "bundle": "007.md",
+   "project": "门户"
+  },
+  {
+   "title": "[门户] 环绕边框动效需加 prefers-reduced-motion 降级",
+   "type": "preference",
+   "content": "门户登录页等装饰性旋转边框（conic-gradient 环线）在实现 `@keyframes` 无限旋转时，应同时提供 `@media (prefers-reduced-motion: reduce)` 分支停止动画（可保留静态弱边框），避免系统开启「减弱动态效果」的用户仍被强制旋转光带。",
+   "evidence": "UnifiedLogin 引导卡实现中明确加入 prefers-reduced-motion 保护。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue"
+   ],
+   "baseline": "dfee5a6",
+   "sessionIds": [
+    "session_d1e620fe90b6ddbb66e074177230a456"
+   ],
+   "bundle": "007.md",
+   "project": "门户"
+  }
+ ]
+}

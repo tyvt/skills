@@ -1,0 +1,330 @@
+{
+ "project": "苏住房C",
+ "batch": 3,
+ "files": [
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md"
+ ],
+ "count": 17,
+ "memories": [
+  {
+   "title": "[苏房C] 小程序 uni-app 项目里清理人脸/原生桥接能力时，只删调用与页面、保留后端契约字段与工具文件，避免「构建过了但流程断」",
+   "type": "workflow",
+   "content": "适用情况：苏住房C 两个子项目（zhi2-mobile-admin-h5-c-unlimited 管理端 H5、zhi2-mobile-shimin 市民端小程序，均为 uni-app）需要整体下线某类「外部能力」（人脸识别、原生桥接 sfb.js / utils/app.js / useFaceVerify.js）。\n\n为什么容易踩坑：这类能力不是单个页面，而是「页面目录 + 工具文件 + 路由白名单 + 表单签字流 + 后端接口字段」五处耦合。只删页面会导致路由白名单仍放行旧路径（白屏/跳空）、签字流程仍 await 一个已不存在的步骤、或误以为能从后端契约里一并删掉字段。\n\n怎么做：\n1. 先按能力名全仓 grep（startFacialRecognitionVerify、sfbFaceAuth、getSfbToken、useFaceVerify、face 目录），列出页面/工具/白名单/API 四类命中。\n2. 删页面目录与工具文件后，必须回首改路由白名单（usePortal.js / App.vue / home.vue 的免登录与鉴权名单）以及所有跳转点。\n3. 流程节点（签字后跳人脸）改为「签字后直接提交」，走验证链路（实名认证）改为直接调本地业务方法（如 afterFaceSuccessRealName）完成。\n4. 后端契约字段（faceRecognition: '1'、getSfbToken 的调用点）与面向用户的失败文案要分开处理：字段保留（后端仍要），前端不再调 SDK；文案统一改成中性表述（人脸识别失败 → 身份验证失败）。\n5. 遗留的入口（「我的」页测试入口等）一并清掉，最后按业务主链路回归：添加房屋 → 实名认证 → 不动产授权，以及决策/倡议签字提交。\n\n这个「删能力不删契约」的边界是本项目反复出现的验证口径。",
+   "evidence": "会话 220195cd：移除人脸识别后 usePortal.js/home.vue/App.vue 路由白名单更新；保留 faceRecognition:'1' 与 afterFaceSuccessRealName；sendCode.vue 文案改「身份验证失败」。会话 1a8b3ac8：删除 utils/app.js 后原生桥接能力逐项替换为 uni.navigateTo/switchTab、uni.makePhoneCall、uni.openLocation、WebView/PDF 页，小程序跳转提示「暂未开放」。",
+   "files": [
+    "zhi2-mobile-admin-h5-c-unlimited/src/hooks/usePortal.js",
+    "zhi2-mobile-admin-h5-c-unlimited/src/App.vue",
+    "zhi2-mobile-admin-h5-c-unlimited/src/pages/index/home.vue",
+    "zhi2-mobile-shimin/src/utils/app.js",
+    "zhi2-mobile-shimin/src/api/security.js"
+   ],
+   "baseline": "d43894b / a444c05",
+   "sessionIds": [
+    "220195cd-29a6-4933-924f-6a03346a9c72",
+    "1a8b3ac8-9a6b-4000-927d-c833558bcca7"
+   ],
+   "bundle": "009.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] 小程序底部固定按钮「居中 + 撑满宽度」同时成立：flex-direction:column + align-items:stretch，而不是 flex 横排 + align-items:center",
+   "type": "bug",
+   "content": "现象：底部固定按钮区（决策/选举结果页、投票页）按钮不居中；按要求加 display:flex + align-items:center 后又变成「左右居中了、上下没居中、贴到容器上边」，再改成上下居中后按钮反而变窄，宽度和原来不一样。\n\n根因：底部按钮容器默认是横向 flex，子元素（BackBtn / zs-button）宽度由内容决定。只要加 align-items:center，交叉轴（这里是纵向）居中生效了，但主轴仍是横向，子元素按内容收缩 → 按钮变窄；同时纵向因为主轴 stretch 语义被替换而没撑满，视觉上贴顶。换句话说，用户看到的三个现象是同一个错误轴造成的。\n\n正确做法：把轴换过来——容器 flex-direction: column + justify-content: center（纵向居中）+ align-items: stretch（横向撑满）；再通过 :deep(.btn-container)、:deep(.zs-button) 强制 width: 100%，把宽度契约钉死在子节点上，避免组件内部样式把它收回去。\n\n复用要点：本项目底部固定按钮是跨页面复制粘贴的同一段结构（投票与选举两套 pages_*），修一处后要按「底部固定按钮」全局搜同类容器统一修，用户明确要求全局修复而不是只改点名页面。修改后刷新页面复看，不要用旧构建判断。",
+   "evidence": "会话 e1dc3fb9：用户先报「修改选举按钮没有居中」并要求全局修复；加 flex+align-items:center 后报「左右居中了，上下没居中，贴到容器的上边」；再改后报「按钮变得很窄，宽度和原来不一样」；最终改为 flex-direction: column + justify-content: center + align-items: stretch，并对 :deep(.btn-container)/:deep(.zs-button) 强制 width:100%。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_owner/elect/DecisionResult.vue",
+    "zhi2-mobile-shimin/src/pages_vote/elect/DecisionResult.vue",
+    "zhi2-mobile-shimin/src/pages_vote/decision/components/BackBtn.vue"
+   ],
+   "baseline": "9cdf7b8",
+   "sessionIds": [
+    "e1dc3fb9-c043-4801-b13c-330f8468c803"
+   ],
+   "bundle": "009.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] 「两个图标同 URL 一个不显示」的根因是后台双层素材（iconPath+bgPath）与前端单层渲染组件不匹配，不是 URL/路径错",
+   "type": "bug",
+   "content": "现象：首页「我要买房」宫格里的「地图找房」不显示或像裂图，而同样的图标在「苏找房」区域显示正常；两条配置的 iconPath/bgPath/url/isShow 四字段一字不差，curl 两条都是 HTTP 200。\n\n根因：后台同一张图标存在两种素材结构。普通宫格（新房、个人房源）的 iconPath 是 6~7KB 的「背景+图标一体」大图，bgPath 为空；「地图找房」这类是从苏找房体系复用的双层素材——iconPath 只是约 1.6KB 的白色小图标，bgPath 才是约 4.9KB 的圆形底色。苏找房的 HomeNavItem 同时渲染 MenuImage(bgPath, aspectFill) + MenuImage(iconPath, aspectFit)，所以正常；我要买房宫格组件 MidModuleGrid 只渲染 iconPath（aspectFit），等于把透明小图标贴在固定灰底 #eceef9 上，看起来就是裂图/空白。\n\n怎么做：优先改前端——宫格组件检测到 bgPath 存在时，按 HomeNavItem 的方式叠两层（底图 aspectFill + 图标 aspectFit 绝对居中）；不要逐个改后台配置（同一个 url/编码在两个模块共用，改一处会连带另一个模块）。另外注意：用户要求「都改成远程配置」时，远程地址的端口容易被看错（如 8887），排查必须自己 curl 复核地址而不是凭肉眼读配置。\n\n排查口诀：图标各模块写法不一致时，先比「素材是单层还是双层 + 组件渲染了几层」，再怀疑 URL。",
+   "evidence": "会话 66cc6474：对比 navigation.home 与 navigation.mid 的「地图找房」，iconPath/bgPath/url/isShow 完全一致且 curl 均 200；文件大小对比 6507/6582（单层）vs 1633+4924（双层）；HomeNavItem 渲染两层，MidModuleGrid 只渲染 iconPath，底色固定 #eceef9。用户还纠正过识别错的图片地址端口（8887）。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_tab/components/menu/MidModuleGrid.vue",
+    "zhi2-mobile-shimin/src/pages_tab/components/menu/HomeNavItem.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/Home_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/MenuCard.vue"
+   ],
+   "baseline": "4d6dba9",
+   "sessionIds": [
+    "66cc6474-3880-4c57-acf8-17f2a7526b89"
+   ],
+   "bundle": "009.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] 跨 sfb 分支合并的验收口径：先确认缺陷在目标分支可复现，业务逻辑与页面展示对齐原分支，只让 sfb 专属逻辑独立，并补回被漏同步的工具文件",
+   "type": "workflow",
+   "content": "场景：把近一个月在原分支（含架构差异）修复的 bug 与做过的需求合并到 sfb 分支，要求「除了 sfb 特殊逻辑之外，业务逻辑与页面展示都要保持一致」。\n\n做法与判据：\n1. 先复现再合并——确认该缺陷在 sfb 分支上确实存在，不存在就跳过（避免把因架构不同的「伪缺陷」当成需要移植）。\n2. 差异需求以原分支改动为主，但把 sfb 专属逻辑摘出来单独保留，不要用 sfb 的旧实现去覆盖原分支的业务改动。\n3. 合并后必须清冲突并跑一次构建验证（本项目用小程序的 npm run build:test），不要只看 diff。\n4. 构建/运行期报「Cannot read properties of undefined」或模块缺失，先按报错文件回查它 import 的工具文件是否被合并漏掉。典型坑：src/pages/redirect/index.vue 引用 @/utils/app.js 的 backInfo，而合并时 utils/app.js 没同步到 sfb 分支——补回整个原生桥接工具文件（backInfo/device/getMap 等）后构建即通过。\n\n核心心法：分支合并的缺陷往往不是冲突本身，而是「新代码 + 旧工具库」的半合并状态；以「构建通过 + 主链路页面展示一致」作为验收，而不是以「无冲突」作为完成。",
+   "evidence": "会话 b173b982：按要求先确认 sfb 分支存在同样问题再合并，处理冲突后报错定位到 src/pages/redirect/index.vue 引用 @/utils/app.js 的 backInfo 缺失，从主分支补回该文件后 npm run build:test 通过，提交 5bdcbd01 推送 origin/sfb。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages/redirect/index.vue",
+    "zhi2-mobile-shimin/src/utils/app.js",
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue"
+   ],
+   "baseline": "c7d6817",
+   "sessionIds": [
+    "b173b982-e5eb-41ee-8f77-8561a9327f07"
+   ],
+   "bundle": "009.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] WXSS 编译报 error at token `*`：小程序不支持 `> *` 通配选择器，全局撑满宽度要写成具体类名",
+   "type": "bug",
+   "content": "现象：微信开发者工具编译报 [WXSS 文件编译错误]，定位到 app.wxss 与 pages_owner/elevator/add.wxss 的某行 token `*`（lib 3.7.12）。背景需求是「所有 picker 在表单内部宽度撑满 100%」，第一次按常规加 width:100% 没生效，于是加了带通配符的写法，编译才炸。\n\n根因：小程序 WXSS 不支持 `> *` 这类通配子选择器（同类的还有 min()/max()/clamp()），编译器在解析到 `*` 时直接报错，且报错行号指向生成后的 wxss 而非源文件，容易误判成 app.wxss 自身问题。且「撑满不生效」本身也不是宽度问题——uni-app 的 picker/easyinput 有内部节点，外层 width:100% 到不了真正的输入节点。\n\n正确做法：\n1. 不追求通配，直接在全局（uni.scss）用具体类名开白名单：.zs-picker-root、.uni-easyinput 等逐类设置 width:100%，编辑器里能一眼看出覆盖了哪些控件。\n2. 同时删掉 styles/form2.scss 里与 uni.scss 重复的同类规则，避免两份来源互相覆盖（这也是「改了还是不生效」的常见原因）。\n3. 修完必须删掉 dist/dev/mp-weixin 重新 npm run dev，并在微信开发者工具里清缓存再编译——否则旧产物会继续报同一行错误，看起来像没修。\n\n注意事项：本项目的 ZsPicker 是自研组件，宽度问题优先在组件内部节点解决，而不是往全局塞通配规则。",
+   "evidence": "会话 9094fe77：用户先要求「所有 picker 在表单内部宽度撑满100%」，反馈「还是不行」，随后贴出 app.wxss(555:28) 与 pages_owner/elevator/add.wxss(276:45) 的 token `*` 编译错误。最终改为 uni.scss 里用具体类名设置宽度、移除 form2.scss 重复样式，清 dist 重编译通过。",
+   "files": [
+    "zhi2-mobile-shimin/src/styles/uni.scss",
+    "zhi2-mobile-shimin/src/styles/form2.scss",
+    "zhi2-mobile-shimin/src/components/ZsPicker/ZsPicker.vue",
+    "zhi2-mobile-shimin/src/pages_owner/elevator/add.vue"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "9094fe77-3aa6-4ba9-8dce-79bc464969e8"
+   ],
+   "bundle": "009.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏房C] uni-app 条件编译块里同名 import 会被 ESLint 判重复声明而卡住 pre-commit：抽单一实例模块按平台赋值",
+   "type": "bug",
+   "content": "现象：提交时 pre-commit 的 ESLint 报重复定义，报错文件是 echarts-uniapp.vue，但代码本身在微信开发者工具里能正常编译运行——因为它用的是 uni-app 条件编译（#ifdef MP / #ifndef MP），两个分支各写了一句 import echarts，运行时只会保留一支，ESLint 不识别条件编译指令，把两份声明都当成同一作用域内的重复声明。\n\n根因：ESLint 是纯静态分析，看不到 uni-app 的编译期裁剪；只要条件编译块里出现同名 import / const / let，就必然误报。\n\n怎么做（可复用的模式）：把平台相关依赖下沉到一个独立的实例模块（如 echarts-instance.js），模块里只写一次 let echarts，内部再用条件编译按平台赋值并默认导出；组件侧统一 import echarts from './echarts-instance.js'，不再出现条件编译包裹的声明。这样既保留按平台切换实现的能力，又让 ESLint 看到单一声明。\n\n适用范围：本项目所有「两端/多端实现不同」的依赖（echarts、原生桥接、SDK）都建议走这个模式；遇到 pre-commit 被拦且报错指向条件编译文件时，优先按此重构，不要加 eslint-disable 掩盖。",
+   "evidence": "会话 da028f64：从泰兴小程序迁移阳光物业/共有资金功能后 pre-commit ESLint 报错，根因是 echarts-uniapp.vue 里 #ifdef MP / #ifndef MP 两处 echarts 声明被当成重复定义；新增 echarts-instance.js 用单一 let echarts 按平台赋值并改为 import，ESLint 通过后可正常提交。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/echarts-uniapp.vue",
+    "zhi2-mobile-shimin/src/components/echarts-instance.js",
+    "zhi2-mobile-shimin/src/pages.json"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "da028f64-66a9-4513-a69a-b729550bf288"
+   ],
+   "bundle": "009.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏住房C] 小程序主包体积判定必须用「上传预估(source size)≈磁盘×1.17」，超限后按包下沉第三方依赖",
+   "type": "bug",
+   "content": "什么情况：`npm run build` 报主包超限，但本地统计主包磁盘体积只有 1798.4 KB（< 2048 KB 上限），看上去是「没超」。为什么：微信小程序的上传体积并不是磁盘体积，而是构建产物按源码体积折算后的预估值，实测约为磁盘 × 1.17（1798.4 → 2104.1 KB），比磁盘口径多出一截；按磁盘判断必然误判为「可以上传」，实际被微信拒。怎么做：① 把 scripts/size-main-package.mjs 的判定口径改成同时输出「磁盘体积」与「上传预估（×1.17）」，两者都要 < 2048 KB，build 门禁（validate-dist.mjs）只认后者；② 超限时不要先删业务代码，先看主包 node-modules 里新进了什么——本例是新增 z-paging/ZsPaging 后约 92KB 被打进主包，导致超出约 56KB；③ 解法是把组件本身下沉到各分包（pages_xxx/components/），并在构建后用 scripts/relocate-z-paging.mjs 把主包里的 z-paging 目录复制到分包、修正 .js/.json 引用再从主包删除（与 relocate-datetime-picker 同一套路），最后主包 1742.6 KB / 预估 2038.9 KB 通过；④ tab 页（如苏找房）不要引用重分页组件，改回 scroll-view + uni-load-more，否则 tab 主包会把依赖重新拉回主包。",
+   "evidence": "会话 3562f516：诊断表显示「主包磁盘体积 1798.4 KB 通过 / 上传预估(×1.17) 2104.1 KB 超限」，根因是新增 z-paging 约 92KB 进入主包 node-modules，超出约 56KB；修复为 Project_Suzhufang.vue 改回 scroll-view + uni-load-more、ZsPaging 下沉到 pages_transaction/pages_main/pages_owner_extra 三个分包、新增 scripts/relocate-z-paging.mjs 构建后搬运并改引用；结果 MAIN 磁盘 1742.6KB ok、上传预估 2038.9KB ok、validate-dist ok。",
+   "files": [
+    "zhi2-mobile-shimin/scripts/validate-dist.mjs",
+    "zhi2-mobile-shimin/scripts/size-main-package.mjs",
+    "zhi2-mobile-shimin/scripts/prune-main-static.mjs",
+    "zhi2-mobile-shimin/scripts/merge-main-leaks.mjs",
+    "zhi2-mobile-shimin/package.json",
+    "zhi2-mobile-shimin/src/pages_tab/components/Project_Suzhufang.vue"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "3562f516-f5b6-4ae3-b575-1ef94fe84955"
+   ],
+   "bundle": "010.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏住房C] ZsImage 封装默认 aspectFill + height:100%，父级无高度即「请求 200 但图不显示」；须补 width prop + widthFix",
+   "type": "bug",
+   "content": "什么情况：页面里的插图请求返回 200（Network 正常、路径也对），但界面上完全看不到图，用户误以为图片资源丢了或路径错，反复去查 500 / __pageframe__ 重定向。为什么：封装组件 ZsImage 的默认值是 mode=aspectFill + 内部 height:100%，图片高度完全取决于父容器；父级（卡片插槽、inline 容器）没有显式高度时盒高被压成 0，图片「加载成功但渲染为 0 高」。叠加第二个坑：小程序自定义组件默认 styleIsolation 隔离，父组件里写的 width:180px 这类尺寸样式进不到组件内部真实节点，改了也没反应。怎么做：① 先按「高度为 0」排查（父容器有无 height / 是否 flex 无高度），不要先怀疑资源；② 给 ZsImage 补上 width prop，在组件内部以 inline style 落到真实节点，并让 mode=\"widthFix\" 时高度随宽度自适应，调用侧统一写 `<ZsImage mode=\"widthFix\" width=\"180px\" />`；③ 需要外部样式生效时把组件 options 改为 styleIsolation: 'shared' 并合并外部 class（注意这会放开隔离，改前核对是否有同名全局类冲突）；④ 顺带补全模板引用了但未定义的 imageStyle 之类的空引用，避免另一种「无报错但不渲染」。",
+   "evidence": "会话 a875a3cf：用户贴出 Failed to load local image resource .../authorized.png 500 与 307 Internal Redirect 到 /__pageframe__ 的现象，最终定位为两点叠加——ZsImage 默认 aspectFill + height:100% 且父级无高度导致高度为 0（主因），SuccessCard 里的 width:180px 因 shadow-root 进不去组件内部；修改 ZsImage.vue 补 imageStyle、新增 width prop、支持 mode=widthFix、设 styleIsolation:'shared'，SuccessCard 全部改 mode=\"widthFix\" width=\"180px\"。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "zhi2-mobile-shimin/src/components/shared/SuccessCard.vue"
+   ],
+   "baseline": "6aca310",
+   "sessionIds": [
+    "a875a3cf-aa63-4197-994e-ac8f0d49cb8c"
+   ],
+   "bundle": "010.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏住房C] 小程序端 H5-only 全局对象（window/location/sessionStorage）必须收敛到跨端工具，报错点在 setup 而非页面逻辑",
+   "type": "bug",
+   "content": "什么情况：H5 与微信小程序共用一套源码时，运行报 `TypeError: Cannot read property 'location' of undefined`，堆栈停在 `at setup (.../components/shared/AgreementPage.js)`——一个被多个页面复用的公共组件，而不是用户当时打开的页面。为什么：共享组件里直接用了 window.location / location.search / window.addEventListener / document / sessionStorage，这些在 mp-weixin 运行时根本不存在，组件一挂载就在 setup 阶段抛错；错误堆栈只指到公共组件，容易误判为「某个页面坏了」。怎么做：① 按「全局对象 → 跨端替代」逐类替换：location.search 改走 hooks/useUrlQueryParam；sessionStorage 改走新增的 utils/form-cache.js（内部封装 uni.getStorageSync/setStorageSync/removeStorageSync）；document / window.addEventListener 用 H5 条件编译包起来；② 改完后做一次全仓排查，把「还有没有用 window 对象」和「小程序里有问题的处理」一并清干净（本例清理了 pages_guard/guardApply 的 index/step1/step2 三处步骤间表单缓存）；③ 验证要看步骤间来回切换后表单是否保留，而不仅是页面不报错。",
+   "evidence": "会话 4b82f232：用户贴出 setup 阶段 `Cannot read property 'location' of undefined`（来源 components/shared/AgreementPage.js），随后要求「全局排查一下还有没有用 window 对象的」「小程序里面有问题的处理一下」；最终结论新增 utils/form-cache.js 用 uni storage 替换 sessionStorage 并改 guardApply 三步组件，page-query/data-analysis.vue 的 window.addEventListener 与 stockHouse/detail.vue 的 document 操作加 H5 条件编译，company-detail.vue 的 location.search 改 useUrlQueryParam。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/shared/AgreementPage.vue",
+    "zhi2-mobile-shimin/src/pages/components/AgreementPage.vue",
+    "zhi2-mobile-shimin/src/utils/form-cache.js",
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/hooks/useUrlQueryParam.js",
+    "zhi2-mobile-shimin/src/pages_guard/guardApply/index.vue",
+    "zhi2-mobile-shimin/src/pages_guard/guardApply/components/step2.vue"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "4b82f232-7ddb-41e7-b369-187d3bfea551"
+   ],
+   "bundle": "010.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏住房C] 列表「一直加载中、Android 必现」的根因是自研 useLoadMore 请求失败不回 complete，统一改用 z-paging",
+   "type": "bug",
+   "content": "什么情况：社区公告、街道公告、小区公告三个列表页在 Android 真机上一直转圈（iOS 正常、开发者工具正常），表现为「加载中」永不结束。为什么：这几页原是自研 hooks/useLoadMore.js 驱动的分页，请求失败路径没有调用结束/complete 回调，加载态卡死；Android 真机网络与调试器差异让这个失败分支被稳定触发。怎么做：① 不要逐页给 useLoadMore 打补丁，直接把列表分页统一迁到 z-paging（用户明确要求「都改用 z-paging 吧」）；② 抽一个共享 hook（如 hooks/useAnnouncementPaging.js）集中处理 pageNum/pageSize 分页请求、数据映射、社区/街道 code 自动补全，并在失败时显式调用 complete(false)，这是防「永远 loading」的关键；③ pages.json 补 z-paging 的 easycom 配置，否则标签不被识别；④ 列表组件（NoticeList）加 showEmpty 开关，避免与 z-paging 自带空态重复显示「暂无数据」；⑤ 回滚/还原 useLoadMore 本身，避免其他仍在用的页面跟着回归。",
+   "evidence": "会话 802b4a4d：用户报「社区公告、街道公告一直加载中，Android 机可以复现」并要求「都改用 z-paging 吧」；结论为新增 hooks/useAnnouncementPaging.js（统一分页/mapping/code 补全，失败 complete(false) 避免卡 loading），三个公告页改用 z-paging，pages.json 补 easycom，NoticeList 新增 showEmpty，useLoadMore.js 还原。",
+   "files": [
+    "zhi2-mobile-shimin/src/hooks/useLoadMore.js",
+    "zhi2-mobile-shimin/src/hooks/useAnnouncementPaging.js",
+    "zhi2-mobile-shimin/src/pages.json",
+    "zhi2-mobile-shimin/src/pages_owner/community/announcement/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/subdistrict/announcement/index.vue",
+    "zhi2-mobile-shimin/src/pages_owner/subdistrict/components/InfoEntry.vue"
+   ],
+   "baseline": "0cea241",
+   "sessionIds": [
+    "802b4a4d-97e9-4dbb-a0fe-201215024044"
+   ],
+   "bundle": "010.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏住房C] 同一 Tab 组里各列表接口的传参结构并不统一：GET 扁平参数被套上 POST 的嵌套 t 会让条件静默丢失",
+   "type": "bug",
+   "content": "什么情况：苏找房「推荐」列表与 APP 的排序/内容不一致，用户第一反应是「怀疑查询条件不一致」。为什么：同一组 Tab 的三个接口参数形态完全不同——listRecommend 是 GET、参数扁平（pageNo, pageSize, xcoordinate, ycoordinate）；pageByKeyWord（新房）与 houseInfoDisplayList（二手房）是 POST，业务条件全部塞在嵌套对象 t 里。开发时按新房/二手房的写法把坐标包成 `{ pageNo, pageSize, t: { xcoordinate, ycoordinate } }` 发给 listRecommend，GET 请求序列化嵌套对象时 t 传不到后端，坐标等筛选条件被静默丢弃，后端按无坐标返回，列表自然与 APP 不同（且 POST 该接口会直接 500）。怎么做：① 接入或改造列表接口前，先到 api 层确认实际 method 与参数形态，不要按「兄弟 Tab」的结构类推；② GET 接口一律扁平传参，需要嵌套条件的只有 POST 接口；③ 排查「与 APP 不一致」优先对比请求参数结构，而不是先怀疑 UI 或排序逻辑。",
+   "evidence": "会话 65d67b1c：用户诉求「推荐的房屋显示排列需要和 APP 保持一致」+「怀疑是查询条件不一致」；结论表格列出 listRecommend（GET，扁平 pageNo/pageSize/xcoordinate/ycoordinate）与 pageByKeyWord、houseInfoDisplayList（POST，嵌套 t）；误用嵌套 t 导致坐标条件丢失，改回扁平传参后与线上一致。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_tab/components/Project_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages_tab/components/Home_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/buyHouse/index.vue"
+   ],
+   "baseline": "f1939b0",
+   "sessionIds": [
+    "65d67b1c-b2d4-4547-b8ef-f723249dbd4e"
+   ],
+   "bundle": "010.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "[苏住房C] 网关传输层的 GET/POST 判定必须在调用入口处定型，不能等 config.method 被后续改写",
+   "type": "bug",
+   "content": "什么情况：common.js 里用 api.get 写的 GET 接口被识别成 POST；另一个接口的 zs-params 是空的，查询条件没传出去。为什么：项目所有请求走 createHttpClient（api / apiV1）→ 网关，网关要先决定用哪个 interface_id（GET 走 szffluzm-yhcq，POST/PUT/DELETE 走 szffluzm-whyhxx，上传走 szffluzm-wjsc）。旧实现是「先看 config.method 再判断」，而 method 在拦截器等环节可能已被改写（例如 api.post + headers 里的 zs-method: put/delete 的惯用写法），于是把真正的 GET 认成 POST，选错 interface_id 并丢掉参数。正确做法：在 httpInstance 调用 api.get/post/put/file 的那一刻就把 backendMethod 与 gatewayInterfaceMethod 定下来，显式传给网关，不再回读 config.method。附带核对了一遍业务层：GET 用 api.get（200+ 处）、POST 用 api.post（100+ 处）、PUT/DELETE 统一 api.post + zs-method 头（8 处）、上传用 api.file，全部由 createHttpClient 发出、无绕过网关的裸 axios / uni.request。顺带修了两个参数位置写错：api.get 第三个参数 headers 被忽略（须合并进第二个 config）、`{ params, status: 1 }` 里的 status 写在了 config 上（须并入 params）。排查时给请求日志加「网关接口类型」字段，直接对照 interface_id 是否配对。",
+   "evidence": "会话 3863efc7：用户先报「第一个是 GET 接口但被识别为 post，第二个 zs-params 是空的」，再指出「get 和 post 请求的封装接口不一样，加不加 zs-method 影响不大，判断在之前就要确认了」，最后要求核对所有接口调用；结论给出 httpInstance 层 backendMethod/gatewayInterfaceMethod/interface_id 对照表并修复 file.js getAppendixUploadParam 与 articleV1.js articleProblemPage 两处参数传递错误。",
+   "files": [
+    "zhi2-mobile-shimin/src/api/httpInstance.js",
+    "zhi2-mobile-shimin/src/api/common.js",
+    "zhi2-mobile-shimin/src/api/gateway.js",
+    "zhi2-mobile-shimin/src/api/index.js",
+    "zhi2-mobile-shimin/src/utils/sign.js"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "3863efc7-4edd-492d-93be-201508d84835"
+   ],
+   "bundle": "010.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "消息中心 msgUrl 是后端下发的旧分包路径，分包迁移后必须在前端跳转归一化层做路径映射",
+   "type": "bug",
+   "content": "什么情况：苏住房C 小程序「我的-消息」点「业主决策」消息无响应，报 `navigateTo:fail page \"pages_owner/decision/detail?id=...\" is not found`。\n为什么：分包改造后业主决策/选举/投票/建议页已迁到 `pages_vote` 分包（真实路径 `/pages_vote/decision/detail`），但消息接口返回的 `msgUrl` 仍是迁移前的 `/pages_owner/decision/detail`。后端存的是历史字符串，不会随前端分包调整，所以只要前端直接用 msgUrl 做 navigateTo 就必然命中「页面不存在」。\n怎么做：不要逐条去改后端消息数据，也不要给每个消息类型写 if 分支跳转；在消息跳转的唯一入口 `normalizePageUrl`（跳转前的 URL 归一化函数）里加一层旧路径前缀映射表：`pages_owner/decision/ → pages_vote/decision/`、`pages_owner/elect/ → pages_vote/elect/`、`pages_owner/poll/ → pages_vote/poll/`、`pages_owner/propose/ → pages_vote/propose/`，前缀命中即替换后再拼 query。排查时直接看 vConsole 里报错的完整 URL 与 pages.json 注册路径的差异，比逐页面核对跳转代码快。此类问题的推广结论：凡是「后端下发前端路由字符串」的场景（消息中心、待办、扫码），都应有一个集中归一化函数做路径兼容映射，而不是在业务页散落判断。",
+   "evidence": "用户诉求2 贴出 MiniProgramError：navigateTo:fail page \"pages_owner/decision/detail?id=2092151161006612480\" is not found；结论：分包改造后详情页实际路径是 /pages_vote/decision/detail，而 msgUrl 仍是旧路径；修复：在 normalizePageUrl 中增加 pages_owner/decision|elect|poll|propose → pages_vote/... 的前缀映射。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\msg.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\message\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\message\\message.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json"
+   ],
+   "baseline": "72fc01c4-8530-4edb-8ed0-13cf0599aa37 @ 5f0f4dc",
+   "sessionIds": [
+    "72fc01c4-8530-4edb-8ed0-13cf0599aa37"
+   ],
+   "bundle": "011.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "ZsButton 全局开 virtualHost 会把页面各处 size=\"mini\" 的小操作钮撑成整行宽（弹窗双按钮等宽要局部解决）",
+   "type": "bug",
+   "content": "现象：用户先在「选择身份 → 授权确认」弹窗里反馈双按钮不等宽、左侧按钮背景色不生效，改了三轮仍「按钮宽度不对/位置也偏了」；同时「我的房屋」卡片里的 size=\"mini\" 操作钮（完善信息、撤销添加）被拉成整行宽，布局整体乱掉。\n\n根因：在 ZsButton 组件自身 options 里开启了 virtualHost: true，这是组件级全局生效的——小程序端按钮的真实节点直接参与父级 flex 布局，不再有组件包裹层，再叠加 .zs-button { width: 100% } 这类全局规则，所有窄按钮都被撑满父容器宽度，flex 子项的收缩与对齐也随父级变化，于是弹窗里的双按钮既不等宽也偏位。\n\n怎么做：不要用 virtualHost 去解决某个弹窗的等宽问题。本项目的正确做法是：①去掉 ZsButton 上的 virtualHost: true，让所有页面的按钮恢复「组件包裹」行为；②弹窗底栏的等宽需求只在 ZsPopup 的底栏作用域里处理——给底栏里的 ZsButton 加 :style=\"{ width: '100%', display: 'flex', minWidth: 0 }\"，配合 popup-footer__item / popup-footer-btn 两个底栏类实现等宽。\n\n验证顺序（重要）：先看「我的房屋」卡片按钮是否恢复正常（确认没有全局副作用），再打开「选择身份 → 授权确认」看双钮是否等宽。若弹窗宽度仍不对，在不动 virtualHost 的前提下继续微调底栏样式。同源项目（泰兴/G）里若也出现「mini 按钮变整行宽」，优先 grep virtualHost。",
+   "evidence": "会话 d365c947 中用户连续 4 轮反馈弹窗双按钮不等宽、左钮背景色失效、位置偏移；最终结论：ZsButton 上 virtualHost: true 全局生效，小程序按钮直接参与父级 flex，叠加 .zs-button{width:100%} 把列表卡片 size=\"mini\" 操作钮拉成整行宽；处理为去掉 virtualHost，仅 ZsPopup 底栏加 :style=\"{width:'100%',display:'flex',minWidth:0}\" + popup-footer__item / popup-footer-btn。",
+   "files": [
+    "zhi2-mobile-shimin/src/components/ZsButton/ZsButton.vue",
+    "zhi2-mobile-shimin/src/components/ZsPopup/ZsPopup.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/authorization.vue",
+    "zhi2-mobile-shimin/src/pages_owner/house/components/TypeChoose_Suzhufang.vue"
+   ],
+   "baseline": "48bdb17",
+   "sessionIds": [
+    "d365c947-62dc-48ad-abbf-b9814a607332"
+   ],
+   "bundle": "012.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "banner 跳转地址是「菜单码&参数」复合串：小程序侧当整串查菜单表必报「功能暂未开放」",
+   "type": "bug",
+   "content": "现象：首页「热门活动」里「查看装修补贴企业名单」轮播图在小程序/H5 点击提示「功能暂未开放」，但同一个 banner 在 APP 里正常打开。\n\n根因：后端下发的跳转地址不是纯菜单码，而是 3_1_16&richTextId=1989870396182228994 这种「菜单码 + 查询参数」复合串。APP 侧会把它拆成「菜单码 3_1_16 + 参数 richTextId」，跳富文本详情页；小程序/H5 的 navigateMenuItem 把整串当菜单码去查 MENU_ROUTES，查不到就兜底提示「功能暂未开放」——这是查表失败的静态兜底文案，不是功能未上线。\n\n怎么做：①在 utils/menuNav.js 新增 parseMenuLink，把菜单码与参数拆开，同时兼容「?」和「&」两种连接格式；②跳转时把 richTextId 等解析出的参数一并传给 resolveMenuRoute，由菜单码映射到具体页面后带上参数（本案例落到 /pages_main/news/detail?id=1989870396182228994）；③redirect 中转页（redirect/index.vue）也要走同一个解析，否则从中转页进入的同类链接仍会提示未开放。\n\n排查提示：终端用户说「APP 里是好的、小程序不行」时，优先比对两端的菜单码解析链路，而不是去查菜单配置或权限。",
+   "evidence": "会话 5e3bf5c4：后台跳转地址为 3_1_16&richTextId=1989870396182228994；navigateMenuItem 把整串当菜单码查 MENU_ROUTES，查不到触发「功能暂未开放」。修复：menuNav.js 新增 parseMenuLink 支持 ? 与 & 两种格式，把 richTextId 传给 resolveMenuRoute，并同步更新 redirect/index.vue。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/menuNav.js",
+    "zhi2-mobile-shimin/src/utils/menuRouteMap.js",
+    "zhi2-mobile-shimin/src/pages/redirect/index.vue",
+    "zhi2-mobile-shimin/src/pages/index/components/Home_Suzhufang.vue"
+   ],
+   "baseline": "f1939b0",
+   "sessionIds": [
+    "5e3bf5c4-bf75-4a82-9a83-96098fe31155"
+   ],
+   "bundle": "012.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "主包 Tab 页的兜底占位图必须放主包 static：放在分包里未预加载时是空白而非默认图",
+   "type": "bug",
+   "content": "现象：苏找房「全部」Tab 的二手房卡片图片显示空白，连默认占位图也没出来——用户强调「不是默认图，是整块空白」。\n\n根因有四层，排查时要一起看：①listRecommend（全部 Tab）返回的二手房记录 thumbnail 为 null，接口本身不带图片；②默认图 default.png 放在 pages_transaction 分包里，而苏找房 Tab 属于主包页面，分包未预加载时分包内静态资源路径不可访问，占位图加载失败，于是空白；③图片字段映射不完整，部分接口返回 imageUrl 而非 thumbnail，原写法 imageUrl: e.thumbnail 会把已经存在的图片地址覆盖成 undefined；④H5 生产环境图片代理写的是 http://，在 HTTPS WebView 里属于混合内容会被拦截。\n\n怎么做：①把 default.png 复制到主包 src/static/images/szf/，并在 utils/mainStaticPaths.js 注册主包默认图路径，让主包页面的兜底资源有稳定归属；②houseCard.vue 与各列表页的图片字段映射统一改成 thumbnail ?? imageUrl，不再反向覆盖；③pages.json 里进入苏找房 Tab 时预加载 pages_transaction 分包（兜底，不替代①）；④.env.production 的图片代理改 https://szfang.szfcweb.cn。\n\n另需向上游说明：「全部」Tab 缺缩略图属后端数据问题（szfHQuery 已有该数据但 listRecommend 未返回），前端只能保底显示占位图。",
+   "evidence": "会话 fa5768fc：二手房图片整块空白；listRecommend 返回 thumbnail 均为 null；default.png 在 pages_transaction 分包内，主包 Tab 页面未预加载分包导致占位图不可访问；imageUrl: e.thumbnail 反向覆盖；.env.production 图片代理为 http。修复：主包复制 default.png + mainStaticPaths.js 注册、映射改 thumbnail ?? imageUrl、pages.json 预加载分包、代理改 https。",
+   "files": [
+    "zhi2-mobile-shimin/src/static/images/szf/default.png",
+    "zhi2-mobile-shimin/src/utils/mainStaticPaths.js",
+    "zhi2-mobile-shimin/src/components/commonNew/houseCard.vue",
+    "zhi2-mobile-shimin/src/pages_tab/components/Project_Suzhufang.vue",
+    "zhi2-mobile-shimin/src/pages_transaction/stockHouse/index.vue",
+    "zhi2-mobile-shimin/src/pages.json",
+    "zhi2-mobile-shimin/.env.production"
+   ],
+   "baseline": "0cea241",
+   "sessionIds": [
+    "fa5768fc-b738-4e95-83d7-d7bd81e5939a"
+   ],
+   "bundle": "012.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "双分支子模块间功能互迁的固定打法：子模块先迁再更新父仓指针，且按分包/依赖清单成套搬",
+   "type": "workflow",
+   "content": "本仓库是 superproject（苏住房C）+ 子模块 zhi2-mobile-shimin 的双分支开发：主干 suzhou-shiqu-suzhufang-main-v2.1 与 sfb / dev-sfb 分支之间互相迁功能。顺序永远是「子模块先迁 + 构建验证 → 父仓只更新子模块指针」，两个仓库分别各提一次，不要只提一侧。\n\n迁移时按清单成套搬，漏一项就是白屏或跳转失效：①页面与组件（整目录搬，注意 pages/index/components/ 与 pages_tab/components/ 常有两份同名副本）；②pages.json 分包注册；③api 模块（benefit.js / sharedFunds.js / property.js 等）；④共享组件与 hooks（PageButton、useLoadMore、useProjectState、ZsPaging 及 z-paging 依赖）；⑤路由与菜单映射 menuRouteMap.js；⑥工具函数（amountTransform、formatThousand、ensureProjectSelected、resolveStaticUrl/resolveMediaUrl）；⑦菜单兜底配置 static/menus.fallback.json。\n\n已知的两处决策点：本次 sfb → 主干的迁移启用 custom-tab-bar 自定义 TabBar，底部 Tab 由 3 个扩到 5 个（苏找房 / 慧物业 / 首页 / 掌服务 / 我的，首页为中间凸起）；但 pages/benefit/index.vue 与 pages/property/index.vue 保留主干既有的「可跳转子页面」实现，不采用 sfb 的「内测中」占位页。迁移后统一跑 npm run build:suzhufang 验证，再谈推送与打 tag。",
+   "evidence": "会话 c50e16d0（sfb 一级 Tab 页面迁到 suzhou-shiqu-suzhufang-main-v2.1，父子仓分别提交）与 34bc5e22（公共收益/阳光物业从主干迁回 sfb，子模块 sfb@90568e9b + 父仓 dev-sfb@399aa01）两次迁移均按子模块先行、父仓更新指针执行，并用 build:suzhufang / build 验证通过。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages.json",
+    "zhi2-mobile-shimin/src/utils/menuRouteMap.js",
+    "zhi2-mobile-shimin/src/utils/menuNav.js",
+    "zhi2-mobile-shimin/src/store/menu.js",
+    "zhi2-mobile-shimin/src/custom-tab-bar/index.vue",
+    "zhi2-mobile-shimin/src/utils/index.js"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "c50e16d0-db17-4bed-8d44-31e68369a6b2",
+    "34bc5e22-4992-4fe8-8f97-cf066ecb6f2e"
+   ],
+   "bundle": "012.md",
+   "project": "苏住房C"
+  }
+ ]
+}

@@ -1,0 +1,64 @@
+{
+ "project": "泰兴小程序",
+ "batch": "001",
+ "files": [
+  "001.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "[图片] 工单趋势图不显示，且滚动时图表在tabba",
+   "type": "fact",
+   "content": "模拟器还停在登录页，需要你登录后我再做最终截图验证。先汇报本轮结论： --- ## 根因定案：echarts 定制裁剪包缺了 line 系列 **工单趋势图空白的真正原因不是代码，而是图表库本身**。排查链路（通过运行时调试桥直接读运行中的 chart 实例）： 1. setOption 前后 `getModel().getSeries()` **恒为空**，yAxis 数据范围停在默认值 `[0,1]`，zrender 元素树里只有 xAxis 的元素 2. 由此反查 echarts.min.js：项目里三份副本（staff、pages_benefit、pages_owner/decision）是同一个 **624KB 定制裁剪包**（9月10日 18:45 被同时替换，基于 echarts 5.2.1），grep 注册标记发现 **`series.bar` / `series.pie` / `series.gauge` 都在，唯独 `series.line` 完全不存在** 3. 所以 `type: 'line'` 被 echarts **静默跳过**（零报错）——折线不画、legend 无系列可显示、yAxis 无数据范围，全部级联空白；而柱状图/饼图/仪表盘一直正常，实验中柱状图在同一画布上完整画出也印证了这点 ## 已完成的修复与清理 - **`src/staff/pag",
+   "evidence": "extracted source=workbuddy project=泰兴小程序",
+   "files": [
+    "echarts.min.js",
+    "**`src/staff/pages/components/echarts-uniapp/echarts.min.js",
+    "涉及文件：src/staff/pages、D:\\repository\\泰兴小程序\\src\\pages\\staff\\statistics\\index.vue、D:\\repository\\泰兴小程序\\src\\staff\\pages\\components\\echarts-uniapp\\echarts-uniapp.vue、D:\\repository\\泰兴小程序\\src、D:\\repository\\泰兴小程序\\src\\staff\\api\\statistics.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d49c732e-8ba3-4835-a555-2cc946440322"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "工作台-知识库筛选不生效 [图片] [图片] [图片",
+   "type": "preference",
+   "content": "修复已完成。 ## 根因 `src/staff/utils/knowledgeCategory.js` 的 `normalizeCategory(item, parent, top)` 给每个分类节点挂了**反向指针** —— `parent` 父子反向链 + `top` 指向顶级节点（顶层节点 `top` 自指）。`src/staff/pages/knowledge/index.vue` 的 `loadCategories` 把这棵带环树直接塞进 `topCategories.value`，被模板读到后 uni-app 走 `JSON.stringify` 校验 setData payload 时抛 `TypeError: Converting circular structure to JSON`，同步截断 confirmFilter 后续的 `await loadKnowledge({ reset: true })`。`api/index.js` 又会静默删除 `undefined` 参数 → 请求里 `categoryId` 永远是 undefined → 接口返回全量 → \"筛选点了没反应\"。 我拷了 `uni-mp-vue/dist/vue.runtime.esm.js` 的 `setResult` / `unwrapper` / `toTypeString` 段，no",
+   "evidence": "extracted source=workbuddy project=泰兴小程序",
+   "files": [
+    "`src/staff/utils/knowledgeCategory.js",
+    "自指）。`src/staff/pages/knowledge/index.vue",
+    "})`。`api/index.js",
+    "`uni-mp-vue/dist/vue.runtime.esm.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "294e988e-512b-4041-9a2b-8f790756917a"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "调整分包之后原来业主端的很多图片和icon不显示了",
+   "type": "fact",
+   "content": "修复完成并已重建。这轮是**另一个独立 bug**，和上一轮修的 szf 域名/本地文件缺失不同： ## 本轮根因：ZsImage 兜底图双重拼接 报错 URL `__pageframe__/static/https://www.ylzhwy.com:8081/...` 暴露了问题本质——**完整远程 URL 被运行时拼进了本地 `static/` 前缀**。 - `ZsImage` 组件的 `buildStaticUrl`（负责给本地路径拼 `static/` 前缀）**不判断 http 开头** - 从 9/1 的提交起，8 处 `fallBackSrc`（我的页默认头像、首页 news 封面 no_img、ImageGrid、选举/决策系列）被改成了**完整远程 URL**，兜底时被拼成 `static/https://...` → 必然加载失败 - `OptionResult.vue` 的 fallback 还指向已被删除的本地 png ## 为什么 2026-09-09 的版本是好的 fallback 只在**主图加载失败或为空**时才触发：我的页在 `userStore.avatar` 无值、首页 news 无封面图时才走 fallback。09-09 测试时有图，bug 潜伏未触发；现在测试数据无图就集中暴露。不是版本回退，bug 从 9/1 就在。 ## 修复内容（",
+   "evidence": "extracted source=workbuddy project=泰兴小程序",
+   "files": [
+    "`OptionResult.vue",
+    "**`src/components/ZsImage/ZsImage.vue",
+    "**`src/pages_owner/decision/components/multiple/OptionResult.vue",
+    "涉及文件：D:\\repository\\泰兴小程序\\_diag_out.txt、D:\\repository\\泰兴小程序\\src\\pages.json、D:\\repository\\泰兴小程序\\_diag_out2.txt、D:\\repository\\泰兴小程序\\_diag.js、D:\\repository\\泰兴小程序\\vite.config.ts、D:\\repository\\泰兴小程序\\scripts\\findUnUseImages.mjs、D:\\repository\\泰兴小程序\\_scan_refs.js、D:\\repository\\泰兴小程序\\src\\components\\ZsImage\\ZsImage.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9e999a07-f853-49b6-96db-57e8f64f3141"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  }
+ ],
+ "_draft": true
+}

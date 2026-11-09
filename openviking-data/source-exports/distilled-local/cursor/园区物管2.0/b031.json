@@ -1,0 +1,94 @@
+{
+ "project": "园区物管2.0",
+ "batch": "031",
+ "files": [
+  "031.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "在线课堂、常见问题详情页修改：按下方样式修改 将创建",
+   "type": "bug",
+   "content": "合并已全部完成，操作如下： ## 提交记录 | 分支 | 提交 | |------|------| | `develop/v2.6.1` | `8c698dec2` 调整在线课堂、常见问题详情页布局，与流程指南保持一致 | | `develop/v2.6.2` | `d2873e543` Merge branch 'develop/v2.6.1' into develop/v2.6.2 | | `develop/v2.6.2-yulin` | `a2f1920aa` Merge branch 'develop/v2.6.2' into develop/v2.6.2-yulin | ## 说明 合并到 `develop/v2.6.2-yulin` 时，`public/assets/images/sprite.svg` 出现冲突（262 分支已删除该文件，yulin 分支仍有修改）。已按 262 分支的处理方式删除该文件并完成合并。 当前本地三个分支均已包含本次修改，**尚未推送到远程**。如需推送，告诉我即可。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\article、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\article\\components\\enums.js、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\article\\richTextTwo\\detail.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\article\\components\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "bd038b9a-ef1f-4ba3-bb80-f6ee7869d3ac"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "navbar里面的下拉，在地图页面无法点击交互",
+   "type": "preference",
+   "content": "已修复。原因是**层叠上下文（stacking context）**问题，不是 Navbar 本身坏了。 ## 原因 布局结构大致是： - **Navbar**：`z-index: 9` - **主内容区 `app-main`**：未建立独立层叠上下文 地图页搜索栏写了 `z-index: 1888`，腾讯地图内部也可能有高 z-index 子元素。它们会**直接和 Navbar 在同一层级比较**，1888 > 9，于是透明层盖住了 Navbar 下拉区域，看起来能展开但点不到。 ## 修改 1. **`AppMain.vue`**：增加 `position: relative`、`z-index: 0`、`isolation: isolate`，把主内容区限制在 Navbar 之下，避免任意页面内的高 z-index 元素盖住顶栏。 2. **`statisticsMap/index.vue`**： - 搜索栏 `z-index` 从 `1888` 改为 `10`（只需盖过地图） - `content-wrap` 增加 `overflow: hidden`，防止地图溢出 3. **`map.vue`**：地图容器改为 `position: absolute; inset: 0`，严格铺满内容区，不撑出父容器。 请刷新地图页后，再试 Navbar 的「更多功能」和用户下拉菜单。若",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "**`AppMain.vue",
+    "**`statisticsMap/index.vue",
+    "**`map.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\layout\\components\\Navbar.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\statisticsMap\\components\\map.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "afe24635-17e4-4855-b880-847a1c56ae6f"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "1、默认是选中最上级部门，同时展开二级，现在展开了三",
+   "type": "preference",
+   "content": "已按你的 4 点要求改完，主要动了两处组件。 ### 1. 默认选中顶级 + 只展开二级 - `default-expand-level` 从 `2` 改为 `1`（Element Tree 的 level 1 为根；只展开 level 1 时，界面上只看到两级，不会再展开到第三级）。 - 树加载完成后默认选中 `treeData[0]`（最上级部门），并在无缓存时触发 `nodeClick`，让列表按顶级部门筛选。 ### 2 & 3. 本页记忆 / 关闭重置 / 其它页默认顶级 与现有 `listMixins` + `common/cachedSearchParams`（按 `$route.path`）及标签关闭时的 `removeSearchParams` 对齐： | 场景 | 行为 | |------|------| | 标签未关，切换回来 | 从缓存读 `parentDeptId`，树恢复选中，**不重复**触发 `getList` | | 关闭标签再打开 | 缓存已清，回到顶级部门 | | 其它页面首次打开 | 各自 `route.path`，无缓存 → 顶级部门 | 实现上通过 `cachedParentDeptId` 传给 `region-tree` 的 `initial-selected-id`。 ### 4. 树区域滚动条 - 滚动容器改为 `.type-lef",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`regionTree.vue",
+    "`RegionTreeLayout.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\complex\\components\\RegionTreeLayout.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\complex\\components\\regionTree.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\complex\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "47c0000a-51d9-4a99-82c5-48d1b26e9c97"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "资源分类和合同分类label不展示了@zhi2-we",
+   "type": "bug",
+   "content": "已改好：去掉了「全为 0 时隐藏扇区 label」的判断。 现在只要接口返回了分类数据（`donutData` 不为空），环图上就会显示 `0 (0.0%)` 及引导线；tooltip 和底部图例逻辑不变。 刷新页面即可看到效果。资源分类有 13 个子类时，label 可能仍会部分重叠，这是 ECharts 的 `avoidLabelOverlap` 在自动避让；若需要改成只显示分类名、不显示数值，可以再说。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\assetPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\assetPanorama、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\assetPanorama\\mock.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6cb68a08-3eea-415d-bf9e-da0b8b216653"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "添加同步范围弹窗样式修改：参考样式：（如果看不懂来问",
+   "type": "bug",
+   "content": "已按参考样式完成修改，主要变更如下： ### 1. `buildingRoomTable.vue`（添加同步范围弹窗右侧内容） - **统计文案**：改用 `zs-summary-text` 标准样式，颜色为 `var(--summary-text-color)`，去掉数字加粗 - **位置**：仍在筛选条件与表格之间，左对齐、垂直居中 - **表格**：使用 `sub-container` 标准表格样式（无竖线边框） - **布局**：改为 flex 布局，表格区域自适应高度 ### 2. `selectRoomDialog.vue`（添加同步范围弹窗整体） - 去掉右侧顶部多余空白，筛选条件与左侧「选择楼幢」顶部对齐 - 左侧树形结构增加 `dialog-left-body` 容器，样式与「缴存范围选择」弹窗一致 - 移除右侧蓝色背景和内层白色包裹层 ### 3. `propertyOwnerDialog.vue`（权利人信息弹窗） - 去掉 `stripe`、`border` 属性 - 增加 `sub-container` 类，使用标准表格样式 请刷新页面后，在「权利人同步详情 → 查看 → 添加同步范围」路径下验证效果。若统计文案间距或颜色还需微调，告诉我即可。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`buildingRoomTable.vue",
+    "`selectRoomDialog.vue",
+    "`propertyOwnerDialog.vue",
+    "涉及文件：d:\\repository\\园区物管2.0、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\syncObligee\\components\\buildingRoomTable.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\syncObligee\\components\\selectRoomDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4ac14ab7-1d24-43a8-b799-ea0b166135f7"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

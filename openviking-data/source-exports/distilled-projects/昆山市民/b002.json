@@ -1,0 +1,126 @@
+{
+ "project": "昆山市民",
+ "batch": 2,
+ "files": [
+  "005.md",
+  "006.md",
+  "007.md",
+  "008.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "[昆山市民] H5 合同 PDF 预览：scroll-view 与 uni canvas 均不可用，需原生 canvas + pdfjs",
+   "type": "bug",
+   "content": "物业合同等附件走 `src/pages/common/filePreview.vue`。H5 下用 `scroll-view` 会在子节点未就绪时反复读 `offsetWidth`，控制台大量 `Cannot read properties of null (reading 'offsetWidth')`；同时用 `document.getElementById` 绑 uni-app 的 `<canvas>` 拿不到真实绘图节点，pdfjs 无法渲染，最终 catch 显示「文件加载失败」。修复：滚动区改为普通 `view` + `overflow-y: auto`；PDF 每页用原生 DOM 动态创建 `canvas` 渲染；`nextTick` 后再挂载。部署后仍失败时核对附件 URL 是否需带登录 token。",
+   "evidence": "会话 a046a6f8：用户反馈物业合同预览报错，结论明确两点根因与 filePreview.vue 改造方案。",
+   "files": [
+    "src/pages/common/filePreview.vue",
+    "src/pages_contract/detail.vue"
+   ],
+   "baseline": "c8c1c24",
+   "sessionIds": [
+    "a046a6f8-9e58-45ea-a7be-81dc2f303792"
+   ],
+   "bundle": "006.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "[昆山市民] 鹿路通 web-view 内附件下载：H5 桥接 navigateTo downloadFile action",
+   "type": "workflow",
+   "content": "昆物通嵌入鹿路通后，web-view 内 H5 不能直接下载，需调宿主小程序能力。在 `wx.miniProgram.getEnv` 判断 `miniprogram` 后：`navigateTo` 到 `/pages/action/index?action=downloadFile&data=${encodeURIComponent(JSON.stringify({ url, type }))}`。`type`：1 图片 / 2 视频 / 3 文档；参数语义对齐 `wx.downloadFile`。实现落在 `src/utils/wxJssdk.js` 与 `src/utils/index.js` 下载入口。发版 tag 示例：`suzhou-kunshan-wuguan-v1.40.21`。",
+   "evidence": "会话 01a162c8：需求背景与鹿路通文档第六点一致，提交 2236a26 feat 鹿路通 web-view 内附件下载适配。",
+   "files": [
+    "src/utils/wxJssdk.js",
+    "src/utils/index.js"
+   ],
+   "baseline": "2236a26",
+   "sessionIds": [
+    "01a162c8-dee7-70c5-a400-75ccd003ebdf"
+   ],
+   "bundle": "006.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "[昆山市民] 小程序 BASE_URL 禁止沿用 H5 相对路径 /api",
+   "type": "bug",
+   "content": "`src/env/mp.js` 若把小程序 `BASE_URL` 写成 `/api`，开发 H5 可由 Vite 代理转发，但 **小程序打包无代理**，相对路径无法解析到后端，表现为「打包后接口地址不对」。应像 `IMAGE_BASE` 一样按 `wx.getAccountInfoSync().miniProgram.envVersion`（develop / trial / release）选择完整域名：开发/体验走测试域 `...kunshan.suzhou.test.zhishusz.com/prod-api`，正式走 `https://kwt.ksjzaq.com/app/`。改 env 后需 `npm run build:mp` 重新上传。",
+   "evidence": "会话 76e058f1：用户反馈小程序打包接口不对，根因 mp.js 重构误用相对 /api，修复恢复 envVersion 分支表。",
+   "files": [
+    "src/env/mp.js",
+    "src/request/index.js"
+   ],
+   "baseline": "1e46691",
+   "sessionIds": [
+    "76e058f1-ba17-479b-89f8-7c7af2202d46"
+   ],
+   "bundle": "006.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "[昆山市民] 实名成功后 getOauthInfoByIdNumber 缺 accessToken 会静默清空登录态",
+   "type": "bug",
+   "content": "`src/pages/verifyUser/index.vue` 人脸成功只 `setUserInfo(faceRes.data)`，不写 token；`refreshUserAndHouse()` 在 redirect 之后后台调用 `getOauthInfoByIdNumber` 并无条件 `setToken(userRes.data.accessToken)`。若 200 但无 `accessToken`，会把 `wx.login`→`getInfoByCode` 已有 token 写成 `undefined`，请求拦截器不再带 Authorization，后续接口 401 而实名流程表面已成功。`initMyHouseInfo` 只校验 `idNumber` 仍会执行。加固建议：仅当 `accessToken` 存在时再 `setToken`，或失败时保留原 token 并提示刷新。",
+   "evidence": "会话 e7a59e5a：用户问接口不返回 token 会怎样，结论梳理调用链与 setToken(undefined) 隐蔽后果。",
+   "files": [
+    "src/pages/verifyUser/index.vue",
+    "src/stores/user.js",
+    "src/request/index.js"
+   ],
+   "baseline": "818bf9b",
+   "sessionIds": [
+    "e7a59e5a-613e-404d-ab23-37e8863e3fcf"
+   ],
+   "bundle": "006.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "[昆山市民] 业主表决/业委会选举列表勿在 onUnload 多级 navigateBack",
+   "type": "pattern",
+   "content": "`pages_vote/vote/index.vue`、`pages_election/election/index.vue` 曾在 `onUnload` 里主动多次 `navigateBack`，从业主决策返回会一次退出多页。应移除该逻辑，依赖系统导航栏默认单级返回。",
+   "evidence": "会话 3731b85d：用户要求「从业主决策返回会退出多级，改为通用返回」，两处列表页一并处理。",
+   "files": [
+    "src/pages_vote/vote/index.vue",
+    "src/pages_election/election/index.vue"
+   ],
+   "baseline": "38d1482",
+   "sessionIds": [
+    "3731b85d-c4b8-48f3-b25e-7cf1583be2da"
+   ],
+   "bundle": "006.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "[昆山市民] 首页 uni-badge 角标被 swiper overflow 裁切",
+   "type": "bug",
+   "content": "首页/个人中心菜单 `uni-badge` 使用 `absolute=\"rightTop\"` 时角标上移约 10px，超出图标盒；父级 `swiper`、`menu-container` 默认 `overflow: hidden` 会裁切角标上半部。处理：图标外包 `item-icon-wrap` 预留 `padding-top`/`padding-right`；相关容器 `overflow: visible`；略增 swiper 顶部内边距（如 20rpx→32rpx）。`pages_home/home.vue` 与 `personal.vue` 需同步。",
+   "evidence": "会话 2a8a8393：截图「数量图标被遮挡」，结论指向 badge 定位与 swiper 裁切。",
+   "files": [
+    "src/pages_home/home.vue",
+    "src/pages_home/personal.vue"
+   ],
+   "baseline": "38d1482",
+   "sessionIds": [
+    "2a8a8393-4a19-4102-99ee-abcb1056e854"
+   ],
+   "bundle": "006.md",
+   "project": "昆山市民"
+  },
+  {
+   "title": "[昆山市民] 经营性收支公示柱状图：无 dataset 勿用 encode；echarts 实例复用 setOption",
+   "type": "bug",
+   "content": "`pages_benefit/balancePublicity` 横向柱图若 `series.encode` 指向 `amount`/`product` 但未配置 `dataset`，坐标轴映射错乱、轴文字叠在一起。`option` 变化时重复 `echarts.init` 且不 `dispose` 会重影。改法：标准 `yAxis.data` + `series.data`，金额标在柱右侧；有数据再 `v-if` 挂载图表避免 `display:none` 宽高为 0。分包内 `echarts-uniapp.vue`：已有实例只 `setOption(..., { notMerge: true })`，卸载 `dispose`，宽高 0 时短延迟重试。",
+   "evidence": "会话 fa8264ba：经营性收支公示图表展示异常，两点根因与 index + echarts-uniapp 改动。",
+   "files": [
+    "src/pages_benefit/balancePublicity/index.vue",
+    "src/pages_benefit/balancePublicity/echarts-uniapp/echarts-uniapp.vue"
+   ],
+   "baseline": "38d1482",
+   "sessionIds": [
+    "fa8264ba-ca5d-4343-b44e-a4907db958f0"
+   ],
+   "bundle": "006.md",
+   "project": "昆山市民"
+  }
+ ]
+}

@@ -1,0 +1,81 @@
+{
+ "project": "苏住房C",
+ "batch": "015",
+ "files": [
+  "015.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "pages_main/message/index在真",
+   "type": "fact",
+   "content": "已修正。上次改法有问题：`page { height: 100% }` 在微信小程序里会让高度塌陷，整页 flex 链也断了。 ## 本次调整 1. **恢复原有页面结构**，去掉 `message-panel-wrap` 和 `page { overflow: hidden }` 2. **用 `calc` 精确计算高度**：`height: calc(100vh - var(--nav-height))`，减去自定义导航栏高度 3. **在 `index.vue` 注入 CSS 变量**：`--nav-height = 状态栏高度 + 44px` 4. **`ZsPaging` 外包 `paging-host` 容器**，并设置 `:deep(.zs-paging) { height: 100% }`，确保分页组件有确定高度 请重新编译后在模拟器和真机上验证： ```bash cd zhi2-mobile-shimin && npm run build:suzhufang:mp-weixin ``` 如果模拟器恢复了但真机仍有问题，告诉我具体表现（空白、只显示顶部、还是显示「暂无数据」），我再继续排查。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`index.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\message\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\message\\message.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "86040ce3-4045-4591-bad4-02ee7724cc1b"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "我的决策列表绑定 complexPhoto 显示项目",
+   "type": "fact",
+   "content": "已按计划完成修改，变更如下： ### 1. `DecisionList.vue` - 将固定占位 `<image>` 改为 `<ZsImage>` - 绑定 `:src=\"item.complexPhoto\"`，`:local=\"false\"` 走 `resolveMediaUrl` 解析远程路径 - 无图或加载失败时回退到 `images/house_szf.png`（`pages_vote` 分包） ### 2. `decision/index.vue` 与 `elect/index.vue` - 在 `rows.map` 中显式保留 `complexPhoto: el.complexPhoto` ### 验证 - 三个文件无 linter 报错 - `npm run build` 编译通过 ### 请你本地确认 重新编译小程序后，在开发者工具 Network 中查看 `listDecisionView` 响应： - 若 `rows[].complexPhoto` **有值**（如 `/zhi2-pro/...`），列表应显示真实小区照片 - 若该字段为 `null` 或空字符串，仍会显示蓝色占位图——这需要后端在 `listDecisionView` 中填充 `complexPhoto`",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`DecisionList.vue",
+    "`decision/index.vue",
+    "`elect/index.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\decision\\components\\DecisionList.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\decision\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a33c6375-1500-460f-81a1-56831ba1739b"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "业委会信息： 副主任姓名：去掉 业委会成员： 去掉「",
+   "type": "preference",
+   "content": "根据代码，「阳光物业」和「公共收益」的 URL 配置分三层，说明如下。 ## 一、入口页（前端写死菜单） 这两个功能都有独立的**聚合入口页**，子菜单 URL 直接写在对应 `index.vue` 里： ### 阳光物业 文件：`src/pages/property/index.vue` ```10:53:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\property\\index.vue const menuList = [ { name: '物业服务企业', url: '/pages_owner/company/info/index?type=company', level: 'v2', }, { name: '物业人员', url: '/pages_owner/company/staff/index', level: 'v3', }, // ... 服务标准、日常服务、物业服务企业账户、年度预算、服务周报 ] ``` 修改子菜单跳转：改 `menuList` 里每项的 `url` 即可。 ### 公共收益（入口页标题为「共有资金」） 文件：`src/pages/benefit/index.vue` ```10:35:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\benefit\\",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`index.vue",
+    "文件：`src/pages/property/index.vue",
+    "```10:53:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\property\\index.vue",
+    "文件：`src/pages/benefit/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "618910fc-72c7-406b-887e-dd852e5e6cf5"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已修复 pages_vote/elect/Decis",
+   "type": "bug",
+   "content": "已修复 `pages_vote/elect/DecisionResult` 的两个展示问题，并顺带修了选举详情页的关联 bug。 ## 问题原因 1. **最近一次选举为空** 只从 `decisionOptionResponseList[0]` 取 `decisionResponseId`。选举场景下该列表可能为空或没有响应 ID，而 `decisionOptionResponseAllList` 里才有记录，导致 `recordId` 为空，候选人列表无法加载。 2. **选举记录缺少选举人姓名** 列表只用 `getDecisionRecordDetail` 拉详情，该接口可能不返回 `decisionPlayerName`；应优先用 `getAppRecordDetail`（与 `DecisionRecord` 一致）。同时未从 `allList` 中汇总 `decisionResponseId`。 ## 修改内容 **`DecisionResult.vue`** - 从 `decisionOptionResponseList` 和 `decisionOptionResponseAllList` 中解析 `recordId` - 用 `getAppRecordDetail` 获取记录详情（含选举人姓名） - 按 `decisionResponseId` 合并重复记录 - 无",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "**`DecisionResult.vue",
+    "**`ResultDetail.vue",
+    "`ResultRecord.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\elect\\DecisionResult.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\autonomy.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_vote\\decision\\common\\DecisionResult.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "aa7c3d25-bd1a-4ca4-bb8f-8c55d6730cc6"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

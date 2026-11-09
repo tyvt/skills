@@ -1,0 +1,63 @@
+{
+ "project": "园区物管2.0",
+ "batch": "020",
+ "files": [
+  "020.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "生产环境报错index-BiYbvZRJ.js:1 ",
+   "type": "preference",
+   "content": "## 问题原因 报错 `Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON` 出现在 `bootstrapMap` → `loadPlatformDistrictMapGeoJson` 链路中。 根因是 **`tencentDistrictBoundary.js` 在生产包里仍走了开发分支**：用 `fetch('./map/ws/district/...')` + `res.json()` 拉区划数据。生产环境没有 Vite 的 `/map` 代理，该请求会落到 SPA 的 `index.html`，解析 JSON 时就会报上述错误。 对应当前生产包里的逻辑（`index-BiYbvZRJ.js`）： ```javascript fetch(`./map/ws/district/...`).then(r => r.json()) // 实际拿到的是 HTML ``` 原先通过 `import.meta.env.DEV` 区分环境，但在 **terser 压缩后 DEV 分支被错误保留**，JSONP 分支被当成死代码删掉。 ## 修复方案 已修改 `zhi2-web-admin/src/utils/tencentDistrictBoundary.js`：**统一使用 JSONP 直连腾讯行政区划 API**（与 `sta",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "**`tencentDistrictBoundary.js",
+    "`res.js",
+    "`index.html",
+    "对应当前生产包里的逻辑（`index-BiYbvZRJ.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "507339ea-ef77-48b3-981b-3f1a11ff9959"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "这里表格数据为空时，底部边框线没有显示，并且操作列下",
+   "type": "fact",
+   "content": "你的判断是对的：空表时底边被叠了多层。 **之前同时生效的有：** 1. `.el-table { border-bottom: 1px }`（通用规则） 2. `.el-table::before { height: 1px }`（空表修复） 3. `.el-table__fixed-right::before`（固定列底边） 4. 表格内置合计行 `footer` 单元格的 `border-bottom` 5. `zs-table.vue` 里还有一套重复样式 叠在一起大约 2～3px，看起来就会偏粗。 **已调整为：** 空表只保留 `.el-table::before` 这一条 1px 底边，其余全部关掉： - 去掉空表的 `border-bottom` - 隐藏固定列 `::before` - 去掉合计行单元格底边 - 删除 `zs-table.vue` 中的重复样式 请刷新页面再看，底边应恢复为正常 1px 粗细。若仍偏粗，告诉我，我再查是否还有 `body-wrapper` 等其它边框。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`zs-table.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubUseMoneyApply\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2352374e-e4c1-4b7f-8295-5892e58f8155"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "数量选择器不显示数字了",
+   "type": "fact",
+   "content": "已修复，原因有两处： **1. `zs-input-number` 组件样式问题** 组件默认 `controls-position=\"right\"`（按钮在右侧），但 `padding-left: 56px` 仍按两侧都有按钮来设置，覆盖了 Element UI 的默认内边距，导致数字显示区域被挤压或遮挡。 **2. `subDialog.vue` 布局样式问题** `el-form-item__content` 上使用了 `display: flex`，并强制 `.el-input { width: 100% }`，与数量选择器和「个」单位挤在同一行时，输入框宽度计算异常，数字无法显示。 **修复内容：** - **`zs-input-number.vue`**：按控件位置区分内边距——右侧按钮时用 `15px / 50px`，两侧按钮时保持 `56px / 56px` - **`subDialog.vue`**：用 `input-with-unit` 容器包裹数量选择器和单位，移除有问题的全局 flex 覆盖样式 刷新页面后，数量选择器应能正常显示数字。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`subDialog.vue",
+    "**`zs-input-number.vue",
+    "**`subDialog.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\parkingManage\\components\\subDialog.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\pubAdvertiseSpace\\components\\advertiseDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9ffa91df-ef35-47a9-9001-d53cb1cca224"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

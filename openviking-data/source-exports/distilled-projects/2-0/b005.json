@@ -1,0 +1,360 @@
+{
+ "project": "2-0",
+ "batch": 5,
+ "files": [
+  "017.md",
+  "018.md",
+  "019.md",
+  "020.md"
+ ],
+ "count": 22,
+ "memories": [
+  {
+   "title": "[产品2.0] hash 路由 No match：访问路径缺 /#/ 或动态路由尚未 addRoute",
+   "type": "bug",
+   "content": "zhi2-web-admin 使用 createWebHashHistory() 时，浏览器直开 `http://host/to-C/xqgl/project`（无 `/#/`）会报 `[Vue Router warn]: No match found for location with path \"...\"`。修法：外链/菜单统一 hash 形态或只用 router.push 的 path；若要去 # 则改 createWebHistory 并配服务器 history fallback。另：通配符路由在 GenerateRoutes 里动态添加时，直链首次解析可能在 addRoute 完成前先 warn 一次（页面最终能进则多为时机问题）；进不去则核对后端菜单 component/path 与前端 views 是否一致。",
+   "evidence": "会话 dab975d3：用户报 /to-C/xqgl/project 无匹配；结论区分 hash URL 形态与动态路由首次解析时机。",
+   "files": [
+    "zhi2-web-admin/src/router/index.js",
+    "zhi2-web-admin/src/store/modules/permission.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "dab975d3-8f02-4099-9922-936f5a02194f"
+   ],
+   "bundle": "017.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] main.js 重复 createInstance 导致全局组件二次注册",
+   "type": "bug",
+   "content": "入口在 URL 带 token 等场景可能连续触发 createInstance()（例如 token 分支已 createInstance，后续仍落入 else 再调一次），registerGlobalComponents 重复 app.component 会出现 `Component \"xxx\" has already been registered`。修复：`createInstance` 若 instance 已存在直接返回；`registerGlobalComponents` 在 `app._context.components[name]` 已存在时 continue，并用 defineAsyncComponent(loader) 注册 glob 异步组件。与「token + iframe 双路径各调一次」并列，需在同一入口做挂载单例 + 注册幂等双保险。",
+   "evidence": "会话 1210ef9d：main.js:39 registerGlobalComponents 多次触发；已改幂等保护与单例 mount。",
+   "files": [
+    "zhi2-web-admin/src/main.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1210ef9d-24f4-4452-a7cc-89267ce1e575"
+   ],
+   "bundle": "017.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] ElDialog 上挂运行时指令会 Teleport 失效告警",
+   "type": "bug",
+   "content": "Vue3 在根非单元素组件（Element Plus ElDialog 内部 Teleport）上使用自定义运行时指令（如 v-dialogDrag）会报 `Runtime directive used on component with non-element root node`。ZsDialog 应改用 Element Plus 原生 `draggable`（element-plus@2.8.0+），勿把指令写在 `<el-dialog>` 标签上；同类组件要么用内置属性，要么把指令绑到组件内部真实 DOM。",
+   "evidence": "会话 c1098e7c：zs-dialog.vue 去掉 v-dialogDrag，改为 :draggable。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c1098e7c-136f-424c-bd78-3be376262378"
+   ],
+   "bundle": "017.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] 动态菜单 loadView 与 views 目录不一致时用路径兼容映射",
+   "type": "workflow",
+   "content": "后端下发的路由 component 字符串（如 property/propertyManagementHouseDetail/index）若前端 views 已迁移改名，import.meta.glob 映射失败会打 `[permission] loadView 未找到组件`。在 permission.js 的 loadView 增加「后端旧路径 → 前端新路径」表，并日志输出 `原始 => 归一化后` 便于补映射。本批示例：houseInstructionExt/index→instruction/index；propertyHandoverInspectionRange/index→handover/index；propertyManagementHouseDetail/index→propertyManagementHouseConfirm/index。",
+   "evidence": "会话 9a9d1373：三条缺失组件经 loadView 兼容映射修复。",
+   "files": [
+    "zhi2-web-admin/src/store/modules/permission.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9a9d1373-b7fc-470f-b1c6-c3488fb59dc9"
+   ],
+   "bundle": "017.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] AppMain 中 transition 包 router-view 须用 v-slot",
+   "type": "pattern",
+   "content": "Vue Router 4 不允许在 `<router-view>` 上直接嵌套 `<transition>` 的旧写法，会 warn。应改为 `<router-view v-slot=\"{ Component, route }\">` 内 `<transition>` + `<component :is=\"Component\" :key=\"route.fullPath\" />`，保留 fade 与按 fullPath 刷新。",
+   "evidence": "会话 1f2cc58f：AppMain.vue 改为 v-slot 写法消除警告。",
+   "files": [
+    "zhi2-web-admin/src/layout/components/AppMain.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1f2cc58f-3aa3-4fb3-9e4a-7177a0644913"
+   ],
+   "bundle": "017.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] DictTag 向 ElTag 传 type=\"\" 触发校验失败",
+   "type": "bug",
+   "content": "Element Plus ElTag 的 type 只能是 primary/success/info/warning/danger 或不传；DictTag 在 colorMap 模式或 listClass 为空时若绑定 `:type=\"''\"` 会报 Invalid prop type。colorMap 开启时应不传 type（undefined）；无 listClass 时返回 undefined 而非空串。DictDataTable 勿把 primary 映射成空字符串。",
+   "evidence": "会话 d39becce：dict-tag.vue、DictDataTable.vue 去掉向 ElTag 传空 type。",
+   "files": [
+    "zhi2-web-admin/src/components/dict-tag/dict-tag.vue",
+    "zhi2-web-admin/src/views/system/dict/components/DictDataTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d39becce-af94-4451-b0d2-6ffd7cf94261"
+   ],
+   "bundle": "017.md",
+   "project": "2-0"
+  },
+  {
+   "title": "[产品2.0] Element Plus 按钮 size 不支持 mini，ZsButton 层做兼容映射",
+   "type": "bug",
+   "content": "ElButton size 仅支持 \"\"|default|small|large；历史 size=\"mini\"/medium 会告警。在 zs-button.vue 封装层映射 mini→small、medium→default；直写 `<el-button size=\"mini\">` 的页面改为 small（如 pubFinanceAccountSet、facilityDefinition）。",
+   "evidence": "会话 00e00f2e：Invalid prop got value \"mini\"；ZsButton 兼容 + 残留 el-button 改写。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-button/zs-button.vue",
+    "zhi2-web-admin/src/views/benefit/pubFinanceAccountSet/index.vue",
+    "zhi2-web-admin/src/views/maintenance/facilityDefinition/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "00e00f2e-7bd0-4fda-907d-b7a04062a73c"
+   ],
+   "bundle": "017.md",
+   "project": "2-0"
+  },
+  {
+   "title": "ECharts LineView 读 undefined.type：setOption 前归一化 series 数组",
+   "type": "bug",
+   "content": "控制台报 `Cannot read properties of undefined (reading 'type')`（LineView.render）时，根因是 `option.series` 里混入了 `undefined/null/false` 或空洞项，常见于条件拼接 `series: [a && {...}]`、或 `getOption()` 改完再 `setOption` 时 `series[0]` 已被清空仍回写。\n\n防御：在 `setOption` 前统一走 `src/utils/echartsOption.js`——过滤假值项，缺 `type` 的项补默认（如 `line`/`bar`/`map`）。先在地图、气泡、季度申报等高频入口接入，再考虑全局包一层 `setOption`。",
+   "evidence": "会话 74a5d328：用户贴 LineView.js:567 stack；结论为 series 空值 + 新增 echartsOption 归一化并接入 pubQuarterlyDeclaration、BubblesChart、map 等。",
+   "files": [
+    "zhi2-web-admin/src/utils/echartsOption.js",
+    "zhi2-web-admin/src/views/benefit/mobilePreview/pubQuarterlyDeclaration/index.vue",
+    "zhi2-web-admin/src/views/home/components/BubblesChart.vue",
+    "zhi2-web-admin/src/views/transaction/screen/components/map.vue",
+    "zhi2-web-admin/src/views/monitor/components/mapChart/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "74a5d328-683e-4a0f-84af-32d70a0281e6"
+   ],
+   "bundle": "019.md",
+   "project": "2-0"
+  },
+  {
+   "title": "动态路由首跳 No match found：constantRoutes 加 catch-all 消 warn",
+   "type": "pattern",
+   "content": "刷新直进 `/system/config` 等权限路由时，Vue Router 4 会先打 `[Vue Router warn]: No match found`，随后 `beforeEach` 里 `GenerateRoutes` + `addRoute` 再 `replace` 到目标——页面能开但控制台吵。\n\n做法：在 `router/index.js` 的 `constantRoutes` 增加 `path: '/:pathMatch(.*)*'` 指向 404 组件，让首帧至少匹配一条静态路由；动态路由挂上后仍按原守卫 `replace` 到真实页面。与「落地页未注册」类问题不同，本条专消首次匹配前的 warn。",
+   "evidence": "会话 e69bf570：「进入路由之前会报这个错，但是实际上路由可以正常打开」；加 catch-all 兜底。",
+   "files": [
+    "zhi2-web-admin/src/router/index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e69bf570-f1df-461a-a4e3-2caf768354d7"
+   ],
+   "bundle": "019.md",
+   "project": "2-0"
+  },
+  {
+   "title": "ZsTableColumn 卸载期异步回写：_zsUnmounted + 双生命周期",
+   "type": "bug",
+   "content": "待办等页离开路由时若报 `Unhandled error during execution of beforeUnmount hook`（栈在 ElTableColumn），常见原因是列组件在字典异步回调或 `computedWidth/getHeader` 里仍在改状态。\n\n在 `zs-table-column.vue` 增加 `_zsUnmounted`，`created` 里字典回写与宽度计算前检查；同时实现 `beforeDestroy` 与 `beforeUnmount`，兼容 Vue2/Vue3 迁移期。",
+   "evidence": "会话 03d38e43：/index/todo 卸载 warn；结论为卸载后仍更新触发 ElTableColumn beforeUnmount 异常。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "03d38e43-915e-4d67-8a3b-63c1ee8a02cf"
+   ],
+   "bundle": "019.md",
+   "project": "2-0"
+  },
+  {
+   "title": "ElButton type=text 弃用：改 link 并在 zs-button 做透传兼容",
+   "type": "pattern",
+   "content": "Element Plus 3.0 将 `type=\"text\"` 标为废弃，控制台报 `type.text is about to be deprecated, please use link`。\n\n页面侧把裸 `<el-button type=\"text\">` 改为 `<el-button link>`；配置/操作列大量经 `zs-button` 生成时，在 `zs-button.vue` 里若 `rest.type === 'text'` 则删 `type` 并设 `rest.link = true`，避免漏网直传 ElButton。",
+   "evidence": "会话 00b18628：ElementPlusError type.text deprecated；4 处直改 + zs-button 兼容逻辑。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-button/zs-button.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "00b18628-52c8-4770-87e2-b9abc61e87b6"
+   ],
+   "bundle": "019.md",
+   "project": "2-0"
+  },
+  {
+   "title": "MultiSelect 在 updated 调 resetInputHeight 导致递归更新",
+   "type": "bug",
+   "content": "`Maximum recursive updates exceeded` 且栈含 `ElSelectDropdown` 时，检查 `zs-select/MultiSelect.vue` 是否在 `updated()` 里无条件 `this.$refs.elSelect.resetInputHeight()`——会触发下拉内部更新再次进入 `updated` 死循环。\n\n修复：去掉 `updated` 里强制调用；仅在 `$attrs.value` / `$attrs.options` 变化时合并触发一次（去重 + 定时器合并）。",
+   "evidence": "会话 533423a8：8081/#/index/todo 递归更新；根因 MultiSelect updated → resetInputHeight。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-select/MultiSelect.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "533423a8-81bd-4094-9c97-d30615178fc1"
+   ],
+   "bundle": "019.md",
+   "project": "2-0"
+  },
+  {
+   "title": "DictTag 把 listClass=default 传给 ElTag.type 触发校验告警",
+   "type": "bug",
+   "content": "`Invalid prop: custom validator check failed for prop \"type\"` 且栈在 DictTag/ElTag 时，字典项 `listClass` 为 `\"default\"` 会被当成 ElTag 的 `type`，Element Plus 不接受该枚举值。\n\n`dict-tag.vue` 的 `getTagType()`：`default`/空值返回 `undefined`（不传 type）；其余 `trim().toLowerCase()`，避免 `Default` 变体。",
+   "evidence": "会话 19b58a9e：maintenanceProject 页 DictTag → ElTag type 校验失败。",
+   "files": [
+    "zhi2-web-admin/src/components/dict-tag/dict-tag.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "19b58a9e-4df5-44f1-8286-0667d6776a04"
+   ],
+   "bundle": "019.md",
+   "project": "2-0"
+  },
+  {
+   "title": "zs-table-column 字符串 formatter 勿透传 ElTableColumn",
+   "type": "pattern",
+   "content": "列配置写 `formatter: 'amountFormatter'` 时，`<zs-table-column v-bind=\"column\" />` 会把字符串原样进 `$attrs` 并透传给 `ElTableColumn`，触发 `Expected Function, got String`——即便另有 `:formatter=\"formatters[attrs.formatter]\"` 也会先告警。\n\n在 `zs-table-column.vue`：从透传 attrs 剔除字符串 `formatter`；用 `resolvedFormatter` 解析——函数直接用，字符串映射 `@/formatters/index.js` 同名导出，只把函数传给 `ElTableColumn`。",
+   "evidence": "会话 ce31747c：maintenanceProject 列表 formatter 类型告警。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/formatters/index.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ce31747c-5502-4d03-83c2-364130d7d52d"
+   ],
+   "bundle": "019.md",
+   "project": "2-0"
+  },
+  {
+   "title": "Web 图表重复 init：getInstanceByDom 复用 + resize 单次绑定 + dispose",
+   "type": "pattern",
+   "content": "告警 `There is a chart instance already initialized on the dom` 来自 `mounted` 与 `watch(dataList/setOption)` 多次 `drawCharts()`，每次都 `echarts.init(dom)` 且用匿名函数绑 `resize`（无法 remove）。\n\n统一套路：`echarts.getInstanceByDom(dom) || echarts.init(dom)`；组件字段保存 resize handler，只绑一次；`beforeUnmount`/`destroyed` 里 `removeEventListener` + `chart.dispose()`；watch 触发用 `$nextTick` 再画。收益统计、monitor、property dashboard 等同构 `componentCharts` 应批量对齐。",
+   "evidence": "会话 2a9f420a：communityStatistics.vue:35 栈；批量修 benefit/dataStatistics 与多处 componentCharts。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataStatistics/components/communityStatistics.vue",
+    "zhi2-web-admin/src/views/dataStatistics/components/componentCharts.vue",
+    "zhi2-web-admin/src/views/monitor/components/ComponentCharts.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2a9f420a-f2ff-426a-a5c2-7881713c1a52"
+   ],
+   "bundle": "019.md",
+   "project": "2-0"
+  },
+  {
+   "title": "ZsTableColumn 兼容字符串 formatter 并阻断透传",
+   "type": "pattern",
+   "content": "动态列配置或历史代码可能把 ElTableColumn 的 formatter 写成字符串（如 formatter: 'amountFormatter'），Element Plus 只接受 Function，会触发 Vue prop 类型告警。在 zs-table-column 封装层：若 formatter 为字符串则从 @/formatters/index.js 取同名函数再传给 ElTableColumn；且字符串 formatter 不得经 v-bind=\"attrs\" 透传给 ElTableColumn。列配置侧应逐步改为函数引用（如 this.formatters.amountFormatter），后端返回的列配置可在生成阶段做名称到函数的映射。",
+   "evidence": "会话 667b9605：MaintenanceProject 等页告警 Expected Function, got String \"amountFormatter\"；修复 zs-table-column.vue 与 plot/index.vue 字符串用法。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/views/building/plot/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "667b9605-d636-4fd0-9033-f298688576f0"
+   ],
+   "bundle": "020.md",
+   "project": "2-0"
+  },
+  {
+   "title": "跨目录复用子组件必须 import + components 注册",
+   "type": "bug",
+   "content": "在 Vue2/Options API 页面模板中使用 PascalCase/ camelCase 自定义标签（如 <propertyContractTable>）时，若未 import 并在 components 中注册，运行时会报 Failed to resolve component，与是否原生 custom element 无关。从其他业务目录复用组件（如 company 下的 propertyContractTable.vue）必须在当前 SFC 显式 import 路径并注册。",
+   "evidence": "会话 1dad72c5：/toB/companyInfo 对应 companyRecord/detail.vue 使用 propertyContractTable 未注册导致解析失败。",
+   "files": [
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/propertyContractTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1dad72c5-73f0-43c2-8c13-cda8490370ba"
+   ],
+   "bundle": "020.md",
+   "project": "2-0"
+  },
+  {
+   "title": "Element Plus 2.x：el-radio 选中值改用 value 而非 label",
+   "type": "pattern",
+   "content": "Element Plus 弃用 el-radio / el-radio-button 用 label 表示选中值的写法（3.0 将移除），控制台会出现 [el-radio] label act as value is about to be deprecated。模板应把 label=\"1\"、:label=\"dict.dictValue\"、label=\"table\" 等改为对应的 value / :value。展示文案仍放在默认插槽内，不受影响。存量页面需全局搜 <el-radio 与 <el-radio-button 批量替换。",
+   "evidence": "会话 ed53b5d6：error.ts debugWarn useDeprecated；已在 flowable、system/menu、paymentChannel、maintenance/facility 等多处批量改 label→value。",
+   "files": [
+    "zhi2-web-admin/src"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ed53b5d6-854c-4ba8-8358-b4d73be5bd8b"
+   ],
+   "bundle": "020.md",
+   "project": "2-0"
+  },
+  {
+   "title": "Playwright 单用例仅跑 Chromium 的命令",
+   "type": "workflow",
+   "content": "在 zhi2-web-admin 目录对单个 spec 只使用 Chromium 项目：npx playwright test tests/e2e/<文件名>.spec.js --project=chromium。多浏览器项目在 playwright.config.js 中定义时，不加 --project 会跑全部浏览器。",
+   "evidence": "会话 ae02b45e：用户要 navbar-sidebar-accessibility.spec.js 仅 Chrome 测试。",
+   "files": [
+    "zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js",
+    "zhi2-web-admin/playwright.config.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ae02b45e-8b1c-42ef-ab79-e188825e8cee"
+   ],
+   "bundle": "020.md",
+   "project": "2-0"
+  },
+  {
+   "title": "E2E 登录账号通过 .env.e2e 注入",
+   "type": "workflow",
+   "content": "zhi2-web-admin/playwright.config.js 会读取同目录 .env.e2e 并写入 process.env。E2E 用例依赖的 E2E_LOGIN_USER、E2E_LOGIN_PASSWORD 推荐在 zhi2-web-admin/.env.e2e 配置后执行 npm run test:e2e 或 test:all；勿提交含密码的文件，必要时加入 .gitignore。临时可在 bash 下 export 或单行前缀环境变量。",
+   "evidence": "会话 86de4ca3：navbar-sidebar-accessibility.spec.js 第 30 行校验两环境变量；说明 config 第 16–31 行加载 .env.e2e。",
+   "files": [
+    "zhi2-web-admin/playwright.config.js",
+    "zhi2-web-admin/.env.e2e",
+    "zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "86de4ca3-9aab-4074-aca2-8e964a3b2749"
+   ],
+   "bundle": "020.md",
+   "project": "2-0"
+  },
+  {
+   "title": "字典 find 无匹配时 dictLabel 要用可选链",
+   "type": "bug",
+   "content": "计算属性里对 bizStateOptions 等数组 find 后直接 .dictLabel，匹配不到时 find 返回 undefined 会抛 Cannot read properties of undefined (reading 'dictLabel')。应先 const row = list.find(...) 再 return row?.dictLabel；比较 dictValue 与表单字段时字符串/数字不一致会导致 === 匹配失败，可用 == 或统一类型后再 ===。字典缺项时界面可能空白，需补字典或接口数据。",
+   "evidence": "会话 4642db27：depositNotice/company/components/detail.vue 的 bizStateName、stateName。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/depositNotice/company/components/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4642db27-d773-418d-b3f6-c2109f85a0e4"
+   ],
+   "bundle": "020.md",
+   "project": "2-0"
+  },
+  {
+   "title": "ListTemplate 列 v-for 的 key 不能仅用 prop",
+   "type": "bug",
+   "content": "ListTemplate.js 对 displayColumns 循环若 :key=\"column.prop\"，当两列配置相同 prop 不同 label（如两列都是 acctypeName）会触发 Vue Duplicate keys。可将 key 改为 (column.prop || '') + '-' + (column.label || '')。若未来出现同 prop 同 label 两列，需在列配置增加唯一 columnKey。",
+   "evidence": "会话 3c906608：accountCancel/index.vue 两列 prop 均为 acctypeName。",
+   "files": [
+    "zhi2-web-admin/src/mixins/ListTemplate.js",
+    "zhi2-web-admin/src/views/maintenance/accountCancel/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3c906608-3287-4fa5-8f92-5704230e2aad"
+   ],
+   "bundle": "020.md",
+   "project": "2-0"
+  }
+ ]
+}

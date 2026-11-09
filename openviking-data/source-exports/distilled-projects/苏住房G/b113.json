@@ -1,0 +1,63 @@
+{
+  "project": "苏住房G",
+  "batch": "113",
+  "files": ["113.md"],
+  "count": 4,
+  "memories": [
+    {
+      "title": "苏住房G 主子模块包含性验证：merge-base --is-ancestor 逐层验 gitlink，确认他人提交是否已进主线",
+      "type": "workflow",
+      "content": "【什么情况】需要回答「子模块 sjw 提交的划拨相关代码（dbd161219 主体改造 + 7b937cd63b 微调）有没有放在主分支」。不能只看目录里有代码或听提交记录，要给出可复核的包含性证明：主模块（苏住房G）develop/v2.6.2-suzhufang 本地 HEAD 与远程 origin/develop/v2.6.2-suzhufang 的 gitlink 均指向子模块 2900ee6ac，而子模块远程主线也要包含目标提交，三层任一缺失都会让「按主模块拉取 + submodule update」的人拿不到代码。\n【为什么】子模块架构下「代码在不在」是三层引用链问题：主仓库 gitlink → 子模块本地分支 → 子模块远程分支。只验其中一层（比如子模块远程已有该提交）不能推出主仓库使用者能拿到它；gitlink 停留在旧指针时，submodule update 仍会检出到旧提交。\n【怎么做】① 子模块里 `git merge-base --is-ancestor <目标提交> <分支>` 逐条验证目标提交是否为该分支祖先；② 主仓库 `git rev-parse origin/develop/v2.6.2-suzhufang` 取远程 gitlink 指向的子模块 commit，确认它本身包含目标提交（同样用 merge-base --is-ancestor）；③ 结论按层陈述：本地 gitlink ✅、远程 gitlink ✅、子模块远程分支 ✅，才算「任何人按主模块分支拉取并 submodule update 都能拿到」；④ 反之若 gitlink 未更新，修复动作是主仓库提交新的 gitlink 指针并推送，而不是在主仓库里改代码。",
+      "evidence": "会话 session-83e48a3a-8cfa-4291-9272-6a161e7e2bed（基线 6156653）用户诉求 6「帮我查一下子模块sjw提交的划拨相关的代码有没有放在主分支」；最终结论：「主模块 develop/v2.6.2-suzhufang 本地 HEAD 和远程 origin 的 gitlink 均指向子模块 2900ee6ac，经 merge-base --is-ancestor 验证：gitlink 2900ee6ac 包含 sjw 的 dbd161219（划拨通知书主体改造）和 7b937cd63b（微调），子模块远程主线同样包含；任何人按主模块 suzhufang 分支拉取并 submodule update，拿到的子模块代码里 sjw 的划拨改动是完整的」。",
+      "files": [
+        "zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-83e48a3a-8cfa-4291-9272-6a161e7e2bed"],
+      "bundle": "113.md"
+    },
+    {
+      "title": "跨分支改 UI 时用 git worktree 隔离：防汛 -li 工作区原地不动，修复在 worktree 里推主线，主仓库 gitlink 单独补推",
+      "type": "workflow",
+      "content": "【什么情况】防汛自动化测试长期占用主 checkout（子模块在 develop/v2.6.2-suzhufang-li 分支，HEAD 83422e02，还有 flood 页面/E2E 脚本/env/.env 等未提交改动），而 bug 修复/字段调整要改 develop/v2.6.2-suzhufang 主线（如 pubRegulatoryAgreement/detail.vue 签约行文案、4 个签约字段移到区块末尾）。用户口径固定：「用 worktree，做完主子模块都要更新，不要影响本地的防汛测试」「防汛的留在本地」。\n【为什么】git 子模块同一时刻只能检出一条分支，直接在主 checkout 切分支会丢掉防汛测试的运行环境与未提交改动；worktree 让两条业务线并行存在，各自保持自己的分支与工作区状态，推送后主 checkout 的文件一个字节都不用动。\n【怎么做】① 在主仓库 `git worktree add worktrees/<任务名>`（现成例子：worktrees/bug5897），在该 worktree 的子模块里检出目标分支（develop/v2.6.2-suzhufang）做修改、提交、推送；② 防汛主 checkout 完全不碰：不切分支、不提交、不 stash；③ 「主子模块都要更新」落地为：子模块推新提交后，主仓库的 gitlink 指针要单独提交推送（202bd5b 把 gitlink 从 83422e02 → f7e24ed5d）；④ 推送前先核实两条线的分叉点与远端 gitlink 基线，把「同步到主模块」的二义性（同步文件内容还是同步指针）显式确认——gitlink 切到 suzhufang 线后不再引用 -li 上的防汛 E2E 提交，这是口径决策不是失误；⑤ 全程 `git status --short` 核对未提交改动归属，env/.env、worktrees/、dev-config-*.yml 等本地改动永不入库。",
+      "evidence": "会话 session-83e48a3a（用户诉求 1「文字改为签约行，用worktree，做完主子模块都要更新，不要影响本地的防汛测试」）与会话 session-0dadcc97-f58f-4ed1-9143-4045bee1b962（用户诉求 1「签约4个字段放在一起，放在最后。切worktree处理完了提交推送到主分支，不要影响防汛自动化测试」、诉求 3「这个改动同步到主模块提交推送，防汛的留在本地」）；session-0dadcc97 最终结论：「父仓库 202bd5b（gitlink 83422e02 → f7e24ed5d）推送 da6f150..202bd5b；防汛相关：主 checkout 子模块仍在 -li 分支（HEAD 83422e02），防汛未提交改动全部留在本地未动；gitlink 现指向 suzhufang 线，该线不含 -li 上的防汛 E2E 提交（83422e02），这是你在选项里确认的口径」。",
+      "files": [
+        "zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue"
+      ],
+      "baseline": "6156653",
+      "sessionIds": [
+        "session-83e48a3a-8cfa-4291-9272-6a161e7e2bed",
+        "session-0dadcc97-f58f-4ed1-9143-4045bee1b962"
+      ],
+      "bundle": "113.md"
+    },
+    {
+      "title": "禅道 bug 全链路闭环流水线：worktree 修复 → 子模块/父仓库自底向上推送 → 禅道回写 resolved → 数据库回查",
+      "type": "workflow",
+      "content": "【什么情况】用户只丢一个禅道 bug 链接（如 bugID=5918 或 5934）加一句「修复并合并到 suzhufang 分支，不要影响防汛自动化测试」「推送完了改禅道」，期望交付不是代码 diff 而是全链路闭环。\n【为什么】这类任务的验收方不是代码仓库而是禅道：不回写状态提单人看不到，回写了但没推送则解决版本对不上；且子模块架构下漏更新父仓库 gitlink 会让测试环境拉不到修复。六个环节缺一环都算没闭环。\n【怎么做】① 用 worktree 在 develop/v2.6.2-suzhufang 线修复（保防汛主 checkout 不动）；② 提交推送顺序自底向上：子模块 zhi2-web-admin 先推（bug 5918 → b63ca5e1c），父仓库苏住房G 再提交 gitlink（da6f150）并推送；③ 禅道回写：状态 active→resolved、resolution=fixed、解决版本填对应值（trunk 或 develop/v2.6.2-suzhufang 的版本号），指派回提单人（zhunan/lichandan），zt_action 新增 resolved 记录且备注写根因/修复/改动文件/提交号；④ 回查数据库 zt_bug + zt_action 确认写入成功；⑤ 若主 checkout 的另一分支（如 -li）根本没有该页面文件，明确「无需也无法 cherry-pick」而不是硬搬；⑥ 交付记录显式列「未验证项」（如真实页面点击联调未执行、需测试环境账号），不冒充已验证。",
+      "evidence": "会话 session-701392ee-ed1c-4c2b-91b6-192a48883243（基线 6156653，bug 5918）最终结论表格：zhi2-web-admin b63ca5e1c 推送 8ba16de62..b63ca5e1c、苏住房G da6f150 gitlink→b63ca5e1c 推送 d423d12..da6f150、禅道 resolved/fixed/trunk 指回提单人 zhunan，「主模块的 develop/v2.6.2-suzhufang-li 分支没有 alert 页面，无需也无法 cherry-pick」；会话 session-5eadc841-0723-4441-83eb-fe067418c561（基线 b6ffc68，bug 5934）同样闭环：子模块 449f3c6、父仓库 8991da9、禅道 resolved 指回 lichandan、zt_action 新增 resolved 记录。",
+      "files": [
+        "zhi2-web-admin/src/views/property/workOrder/alert/index.vue",
+        "zhi2-web-admin/src/views/property/largeScreen/index.vue"
+      ],
+      "baseline": "6156653",
+      "sessionIds": [
+        "session-701392ee-ed1c-4c2b-91b6-192a48883243",
+        "session-5eadc841-0723-4441-83eb-fe067418c561"
+      ],
+      "bundle": "113.md"
+    },
+    {
+      "title": "大屏统计接口 404 的前端规避口径：删死请求保留数据管道，卡片降级 el-empty，后端补路由后可恢复",
+      "type": "bug",
+      "content": "【什么情况】bug 5934：物业管理大屏（zhi2-web-admin/src/views/property/largeScreen/index.vue 的 getList 内）每次加载都因 `GET /property/screen/getCreditLevelStatistics/${region}` 返回 404 报错，且它是列表请求里唯一失败的接口，「企业信用等级」卡片因此取不到数据。\n【为什么】404 是后端没有该路由（测试环境未实现 getCreditLevelStatistics），不是前端参数或路径拼接错误——URL 与后端约定一致才谈得上「后端缺接口」。前端对「确定不存在的接口」的正确姿势是停发请求消除报错，同时保留数据加工管道，让接口日后恢复时代码无需重写。\n【怎么做】① 判定为后端缺路由后，从 getList 里删除该请求调用；② 卡片保留，无数据时显示 el-empty 空状态，不删卡片、不造假数据；③ 保留全部数据加工函数（setOptionThree/threeData/normalizeCreditLevelData），并在禅道/交付记录写明：「本次仅前端规避（删死接口），若后端应提供企业信用等级统计，补 getCreditLevelStatistics 路由后由前端恢复调用，当前卡片保持空状态」；④ 不要顺手改卡片样式或结构——修复范围只有「消除 404 报错」。",
+      "evidence": "会话 session-5eadc841-0723-4441-83eb-fe067418c561（基线 b6ffc68）最终结论：「删除对 GET /property/screen/getCreditLevelStatistics/${region} 的调用（该接口测试环境返回 404，是唯一失败请求）；「企业信用等级」卡片保留，无数据时显示 el-empty 空状态；setOptionThree / threeData / normalizeCreditLevelData 均保留」，并自注「本次仅前端规避（删死接口）。若后端其实应提供「企业信用等级」统计，需要后端补 getCreditLevelStatistics 路由后再由前端恢复调用；当前卡片会保持空状态」。",
+      "files": [
+        "zhi2-web-admin/src/views/property/largeScreen/index.vue"
+      ],
+      "baseline": "b6ffc68",
+      "sessionIds": ["session-5eadc841-0723-4441-83eb-fe067418c561"],
+      "bundle": "113.md"
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+ "project": "园区公共收益",
+ "batch": "002",
+ "files": [
+  "002.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "[图片] 物业管理区域新增，保存，报：服务器异常 [",
+   "type": "fact",
+   "content": "已修复。 ## 结论：不是后端问题，是请求头塞了中文 报错 `Failed to execute 'setRequestHeader' on 'XMLHttpRequest': String contains non ISO-8859-1 code point.` 是浏览器对请求头的硬限制：**请求头值只能是 ISO-8859-1，含中文即抛异常**。它抛在 axios 的 xhr adapter 里，被 `request.js` 的响应错误拦截器用 `showErrorDialog()` 弹成「异常提示」，所以看着像服务器异常。 完整链路： 1. `property/complex/detail.vue` 的 **宗地号 `landPlotCode` 是必填的手输文本框**（模板 104-105，校验 627-633）——能走到发请求，说明这个框里一定有值； 2. `getForm()` 把整个 `form` 作为 POST body； 3. 全局拦截器 `request.js:124-125` 调 `getLandPlotCodeRequestHeaders()`； 4. `pageRequestContext.js` 把 `landPlotCode` **原样**写进 `zs-remark` 请求头（未编码）。 只要宗地号含中文（如 `苏地2019-WG-1号`），保存 **",
+   "evidence": "extracted source=workbuddy project=园区公共收益",
+   "files": [
+    "`request.js",
+    "`property/complex/detail.vue",
+    "`pageRequestContext.js",
+    "早就有编码处理）；`building/project/detail.vue`、`building/projectChange/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ceb36a3f-e16b-42a0-aa46-df6b3904665d"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "一般表决详情，基本信息模块跑到底部去了 [图片] [",
+   "type": "preference",
+   "content": "已修复。 ## 根因 全局样式 `zhi2-web-admin/src/styles/index.scss:265` 用了 `flex-direction: column-reverse`： ```scss .detail-container { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: 24px; } ``` 这是为了把模板里声明在**最后**的 `<operation-btn-group>`（页面标题 + 操作按钮，`position: sticky; top: 0`）顶到页面最上方。 兄弟页面（逐项 / 排序 / 多议题 / 选举表决详情）顶层内容只有**一个** `el-row`（或一个 `zs-tabs`），反转没有副作用。而 `autonomy/general/detail.vue` 在 `bizState == '2'`（表决已结束）时会渲染**两个同级 el-row**，被一起反转 → 「基本信息」所在的 el-row 掉到了最底部。 ## 改动 只动了 `zhi2-web-admin/src/views/autonomy/general/detail.vue`（1 个文件，+13 −1）： 1. **模板**（约 107–112 行）：把 `Deci",
+   "evidence": "extracted source=workbuddy project=园区公共收益",
+   "files": [
+    "`zhi2-web-admin/src/styles/index.scss",
+    "`autonomy/general/detail.vue",
+    "`zhi2-web-admin/src/views/autonomy/general/detail.vue",
+    "涉及文件：D:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\general\\detail.vue、D:\\repository\\园区公共收益\\zhi2-web-admin\\src\\styles\\index.scss、D:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\autonomy\\general\\components\\DecisionRangeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4e97a820-f6c5-43ad-913d-4d6436b2148e"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "竣工验收详情，“业主代表验收意见”框出来的没显示出来",
+   "type": "bug",
+   "content": "修复完成。 ## 问题与修复 **现象**：竣工验收详情页「业主代表验收意见」表格操作列里，红框处的「删除」按钮被截断，只露出一条边。 **根因**：`ownerAcceptanceTable.vue` 给 `zs-operate-column` 传了固定列宽 `isQuery ? 80 : 120`，但非查询态行内有「查看 / 编辑 / 删除」3 个 mini 按钮，实际需要约 174px，120px 装不下。而 `zs-operate-column` 组件本身已支持自适应宽度（不传 `width` 时按行内可见按钮文字自动估算），固定 120 恰好绕过了这个能力。 **改动**（2 个文件，同源同款同步修改）： - `zhi2-web-admin/src/views/maintenance/completion/components/ownerAcceptanceTable.vue` - `zhi2-web-admin/src/views/maintenance/completion/components/otherAcceptanceTable.vue`（其他代表验收意见，同样的 3 按钮配置，隐患相同） 两处均删除了 `:width=\"operateColumnWidth\"` 绑定和对应的 `operateColumnWidth` computed，让操作列宽度按按钮自动计",
+   "evidence": "extracted source=workbuddy project=园区公共收益",
+   "files": [
+    "**根因**：`ownerAcceptanceTable.vue",
+    "`zhi2-web-admin/src/views/maintenance/completion/components/ownerAcceptanceTable.vue",
+    "`zhi2-web-admin/src/views/maintenance/completion/components/otherAcceptanceTable.vue",
+    "**未动**：`constructionInfoTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4d45f0a4-0b7c-4a2c-a4e5-cff61b2ec75a"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "维修方案征集详情，对外发布链接显示的不对 [图片] ",
+   "type": "preference",
+   "content": "修好了。根因和改动如下： ## 根因 `publishLinkDialog.vue` 里链接是手工拼的： ```js `${window.location.protocol}${window.location.host}/#/solicitation?id=...` ``` 而 `window.location.protocol` 的值是 `\"https:\"`（**自带冒号、没有 `//`**），拼出来就成了截图里的 `https:sipps.sipac.gov.cn/#/solicitation?id=...`。 ## 改动（3 个文件，均在 zhi2-web-admin，分支 develop/v2.6.2-yuanqu，未提交） 1. **`maintenance/planRecruitDecision/components/publishLinkDialog.vue`**（截图这个弹窗，实际生效） - 弹窗展示的链接改为 `this.$router.resolve({ path: '/solicitation', query: { id } }).href`，显示为相对路径 `#/solicitation?id=xxx`，点击新开页时仍解析为完整正确的 `https://域名/#/solicitation?id=...` - 顺带修了 `goto()`：原来手工拼中文参数（维",
+   "evidence": "extracted source=workbuddy project=园区公共收益",
+   "files": [
+    "`publishLinkDialog.vue",
+    "**`maintenance/planRecruitDecision/components/publishLinkDialog.vue",
+    "**`maintenance/planRecruit/components/publishLinkDialog.vue",
+    "**`solicitation/components/loginDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5b869557-b1d3-4952-bc5f-9fb97b7b4809"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "维修资金立项配置详情，项目名称示例配置点编辑，编辑弹",
+   "type": "fact",
+   "content": "修复完成。 **根因**：编辑弹框（`zhi2-web-admin/src/views/maintenance/projectConfig/components/projectNameExampleDialog.vue`）里“维修对象类别”用了 el-cascader 的**懒加载模式**（`lazy: true` + `lazyLoad` 按parentId 逐级加载）。点编辑时 `maintainObjTypeId` 其实已被正确赋进表单，但该值对应的子级节点（如“承重墙体”）从未被加载进级联面板，cascader 找不到节点就回退显示“请选择”。老组件 `ProjectNameDialog.vue`（资金支出公示等页面在用）是一次性拉全量树，所以一直正常。 **修改内容**（仅此一个文件）： 1. 级联改为一次性加载 `/dataProperty/facilityDefinition/listTree` 全量树（与 `maintenanceProject/detail.vue` 等页面同款模式），去掉 `lazy`/`lazyLoad`——编辑回显不再依赖节点是否被展开加载过； 2. 反查名称用的 `originalOptions` 改为全树递归扁平化，顺带消除了原来每次打开弹框重复 push 根节点的问题； 3. 查看弹框里“维修对象类别”原来显示的是裸 ID，改为显示 `",
+   "evidence": "extracted source=workbuddy project=园区公共收益",
+   "files": [
+    "**根因**：编辑弹框（`zhi2-web-admin/src/views/maintenance/projectConfig/components/projectNameExampleDialog.vue",
+    "`ProjectNameDialog.vue",
+    "`maintenanceProject/detail.vue",
+    "涉及文件：D:\\repository\\园区公共收益\\zhi2-web-admin\\src、D:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\maintenance\\projectConfig\\components\\projectNameExampleDialog.vue、D:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\maintenance\\projectConfig\\components\\projectNameExampleTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "46d35854-cd1f-4cd4-8ffd-f3c1f8bcf2dd"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "公共设施设备维护详情，附件 图片预览，预览的图片显示",
+   "type": "fact",
+   "content": "修好了。这是一个全局组件的 z-index 层级问题，不只是设施维护详情页，所有从\"附件信息\"抽屉里打开的图片预览都会复现。 **根因** - 图片预览用的是全局 `ImageViewer` 组件（`src/components/ImageViewer/index.vue`，由 `App.vue` 挂载、store 的 `preview/openPreview` 驱动），底层是 `el-dialog`，z-index 由 Element 的 PopupManager 从 2000 起自动分配。 - 而“附件信息”抽屉（`src/components/OperationBtnGroup/attachmentDraw.vue`）的 CSS 写死了 `.attachment { z-index: 3000 !important }`，且不走 PopupManager——预览弹窗和遮罩永远被压在抽屉下面，右侧 480px 宽的抽屉就把预览图盖住了。 **修改**（只改 `src/components/ImageViewer/index.vue`） - 新增 `raiseAboveOverlay()`：预览打开后（nextTick）把弹窗 wrapper 的 z-index 设为 3002、遮罩 `.custom-image-viewer-mask` 设为 3001，每次打开都重新设置，保证",
+   "evidence": "extracted source=workbuddy project=园区公共收益",
+   "files": [
+    "组件（`src/components/ImageViewer/index.vue",
+    "`App.vue",
+    "而“附件信息”抽屉（`src/components/OperationBtnGroup/attachmentDraw.vue",
+    "`src/components/ImageViewer/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3c99fd44-d5db-4c60-9901-585c3fe1f2e3"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  }
+ ],
+ "_draft": true
+}

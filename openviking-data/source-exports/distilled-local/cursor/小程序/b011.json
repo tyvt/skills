@@ -1,0 +1,97 @@
+{
+ "project": "小程序",
+ "batch": "011",
+ "files": [
+  "011.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "现在人脸识别失败的后退取消了，改为展示失败页面，就在",
+   "type": "fact",
+   "content": "已完成修改，主要变更如下： ### 行为调整 - **识别失败不再后退**：移除了 `goBackAfterFaceFail()`，失败时改为 `pageStatus = 'failed'` 并在当前页展示失败界面。 - **重试**：点击「重新识别」会重置自动重试计数，回到 `verifying` 状态并再次调用 `startFaceVerify()`。 - **参数缺失**：同样展示失败页（不再自动返回），但不显示重试按钮（因 `canStartVerify` 为 `false`）。 ### 页面状态 | 状态 | 展示内容 | |------|----------| | `verifying` | 「正在进行人脸识别」提示 | | `failed` | 失败图标 + 失败文案 + 「重新识别」按钮 | 样式与 `verify.vue` 保持一致（蓝色主按钮、灰色背景）。可在微信开发者工具中进入人脸识别页，故意取消或失败一次，确认失败页与重试流程是否符合预期。",
+   "evidence": "extracted source=cursor project=小程序",
+   "files": [
+    "`verify.vue",
+    "涉及文件：d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\face\\face.vue、d:\\repository\\小程序\\wygl-wxxcx-dev-slh、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\face\\bdc.vue、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\face\\verify.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "da4b6a8b-12d3-4758-b4f7-1405bf4f9282"
+   ],
+   "_draft": true,
+   "project": "小程序"
+  },
+  {
+   "title": "这里轮播图的图片是如何拼接的",
+   "type": "fact",
+   "content": "问题出在 `resolveCtMediaUrl` 的拼接逻辑。 ## 原因 CT API 基址配置是： ```8:12:utils/portal-env-config.js develop: process.env.VUE_APP_CT_AUTH_BASE_URL_DEV || 'https://wygl.wxwgzx.com:8989/sz/api', trial: process.env.VUE_APP_CT_AUTH_BASE_URL_TRIAL || 'http://unlimited.c.h5.shimin.mobile.v2.benefit.shiqu.wuxi.test.zhishusz.com/api', release: process.env.VUE_APP_CT_AUTH_BASE_URL_PROD || 'https://wygl.wxwgzx.com:8989/sz/api' ``` 旧逻辑用正则只取了 **origin**（`https://wygl.wxwgzx.com:8989`），丢掉了 `/sz`： - 接口返回：`/zhi2/2026/f/u/l/873e02a2-....png` - 错误拼接：`https://wygl.wxwgzx.com:8989/zhi2/...` ❌ - 正确地址：`https://wygl.wxwgzx.com:8",
+   "evidence": "extracted source=cursor project=小程序",
+   "files": [
+    "```8:12:utils/portal-env-config.js",
+    "process.env.VUE",
+    "涉及文件：d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\webview\\home.vue、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\api、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\api\\common.js、d:\\repository\\小程序\\wygl-wxxcx-dev-slh、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\utils\\portal-user.js、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\utils\\portal-env-config.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b626c0b5-4df0-46de-a16a-ec035ee4e656"
+   ],
+   "_draft": true,
+   "project": "小程序"
+  },
+  {
+   "title": "selectMyHouse返回的complexId和",
+   "type": "preference",
+   "content": "已在 `pages/webview/externalWebview.vue` 增加判断逻辑： - 获取当前小程序环境 `envVersion`（`develop/trial/release`） - 当存在 `authCode` 且 `authCode === 0` 时： 1. **开发环境（develop）**：视为成功，**不调用** `selectMyHouseByLingXi`，直接继续后续流程拼 `webview src` 2. **非开发环境**：直接弹出 `uni.showToast({ title: \"您未选择房屋\" })`，并 `return` **终止** `selectMyHouse` 调用 同时我把 `lingXiQueried` 仍然置为 `true`，避免重复触发。 本次改动已通过该文件的 linter 检查（无新增报错）。",
+   "evidence": "extracted source=cursor project=小程序",
+   "files": [
+    "`pages/webview/externalWebview.vue",
+    "涉及文件：d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\webview\\externalWebview.vue",
+    "@pages/webview/externalWebview.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "591f20d2-2801-494e-9917-cd9943d6d175"
+   ],
+   "_draft": true,
+   "project": "小程序"
+  },
+  {
+   "title": "现在用户登录之后，在体验版会拉取绑定房屋的列表吗",
+   "type": "fact",
+   "content": "已在体验版加入接口调用日志，改动分两处： ## 1. 统一门户 API 日志（`utils/portal-user.js`） 在 `requestCtAuth` 中统一打印，**仅当 `envVersion === 'trial'`** 时生效，覆盖所有门户接口（登录、profile、ctUserIdentity、灵犀选屋等）： - `[体验版][PortalAPI] 请求` — method、url、data、header（token 已脱敏） - `[体验版][PortalAPI] 响应` — statusCode、响应 data - `[体验版][PortalAPI] 失败` — 网络错误信息 ## 2. 房屋拉取业务日志（`externalWebview.vue`） 在 `maybeLoadTrialHouseList` 中补充业务侧日志： - 未登录跳过 - 开始拉取 - 拉取结果（`ok`、`houseId`、房屋数量、`houseList`） - 失败详情 ## 如何查看 微信开发者工具 → **体验版** → 打开「我的」页 → 登录或刷新 → 在 **Console** 中搜索： - `[体验版][PortalAPI]` - `[体验版][房屋]` 正式版（`release`）不会打印这些日志。",
+   "evidence": "extracted source=cursor project=小程序",
+   "files": [
+    "日志（`utils/portal-user.js",
+    "房屋拉取业务日志（`externalWebview.vue",
+    "涉及文件：d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\pages\\webview\\externalWebview.vue、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\utils\\portal-user.js、d:\\repository\\小程序\\wygl-wxxcx-dev-slh\\utils\\portal-env-config.js",
+    "@pages/webview/externalWebview.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0f172dbf-633a-4df4-a1bc-5adc70d60876"
+   ],
+   "_draft": true,
+   "project": "小程序"
+  },
+  {
+   "title": "小屏幕上提示框文字遮挡，左右需要留足边距，如果超出了",
+   "type": "bug",
+   "content": "是的，**两个弹窗都已经生效了**。 「请先登录」和「请先添加房屋」并不是两个独立组件，而是同一个 `portal-gate-modal` 组件，通过 `type` 区分内容： ```24:36:components/portal-gate-modal/portal-gate-modal.vue const GATE_CONFIG = { login: { icon: '/static/images/zhishu/login.png', title: '请先登录', desc: '您需要先登录，才能继续使用完整功能。', primaryText: '前往登录' }, house: { icon: '/static/images/zhishu/house.png', title: '请先添加房屋', desc: '您需要先添加房屋，才能继续使用完整功能。', primaryText: '前往添加房屋' } } ``` 上次改的是**共用样式**（换行、边距、小屏适配），所以两种弹窗都会一起修复。 在 `home.vue` 和 `externalWebview.vue` 里也是同一个用法： ```96:101:pages/webview/home.vue <portal-gate-modal :visible=\"showGateModal\" :type=\"gateModalType\" ",
+   "evidence": "extracted source=cursor project=小程序",
+   "files": [
+    "```24:36:components/portal-gate-modal/portal-gate-modal.vue",
+    "`home.vue",
+    "`externalWebview.vue",
+    "```96:101:pages/webview/home.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "89963d64-03a6-4bc1-8b8f-ca67ab26fc19"
+   ],
+   "_draft": true,
+   "project": "小程序"
+  }
+ ],
+ "_draft": true
+}

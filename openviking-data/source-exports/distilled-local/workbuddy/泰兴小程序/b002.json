@@ -1,0 +1,83 @@
+{
+ "project": "泰兴小程序",
+ "batch": "002",
+ "files": [
+  "002.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "项目中很多底部弹出弹窗距离页面底部有一端空隙，没有紧",
+   "type": "preference",
+   "content": "已按计划改完并验证到编译产物层面。核心结论和改动如下。 **根因（有编译产物取证）** 1. uni-app 编译小程序时会**给所有组件注入 `options.addGlobalClass = true`**（≈ `styleIsolation: 'apply-shared'`）。证据在 `dist/build/mp-weixin/common/vendor.js`：`const a={multipleSlots:!0,addGlobalClass:!0,...}`。 ⇒ 这意味着两件事：**`app.wxss`（`src/App.vue` 的 `<style>`）里的 class 规则会真的穿透进组件内部**（连第三方 `uni-popup` 也吃得到）；而**兄弟组件自己写的 `:deep()` 进不去**。 2. `src/App.vue` 把 `padding-bottom: env(safe-area-inset-bottom)` 打在了弹窗**最外层容器** `.uni-popup__wrapper.bottom` 上 ⇒ 内容底部那块白卡片填不满这 ~34px，底下就露出遮罩灰。 3. 所以 `ZsDialog` / `ZsBottomPopup` 里那两处 `:deep(.uni-popup__wrapper){padding-bottom:0!important",
+   "evidence": "extracted source=workbuddy project=泰兴小程序",
+   "files": [
+    "`dist/build/mp-weixin/common/vendor.js",
+    "这意味着两件事：**`app.wxss`（`src/App.vue",
+    "`src/App.vue",
+    "app.wxss"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9c0ae57b-34e1-42e1-a284-87b375e87284"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "[图片] 按钮背景色不对，显示是白色背景了 [图片]",
+   "type": "fact",
+   "content": "已修复，构建通过。 ## 问题根因 `反馈进度` 的橙色（`#F39C12`）配置本身没错（`detail.vue:378`），坏在**传不进去**： `PageButton` 把颜色转成内联 `:style` 挂在 `<ZsButton>` 这个**自定义组件标签**上。微信小程序里，写在组件标签上的 `class`/`style`（含 `--css-var`）只落在组件**外层包装节点**，不会透传到组件内部的真实 `<button>`——所以橙色被内部原生 `<button>` 的默认背景 `#f8f8f8`（≈白）盖住，文字色 `#FFFFFF` 又被 `.zs-button{color:#333}` 压掉，正好呈现出「白底 + 深灰字」。 同一原因也解释了为什么上次 4635cee 提交加的 `.zs-button.btn-custom{background-color:var(--btn-bg-color)!important}` 没起作用——`btn-custom` 类同样只在外层节点，这条选择器永远匹配不到，是死代码。受影响的不止这一个按钮，还有同页的 `催办`、`<ZsButton class=\"submit-btn\">`。 ## 改动 | 文件 | 改动 | | --- | --- | | `src/components/ZsButton/ZsButton.vu",
+   "evidence": "extracted source=workbuddy project=泰兴小程序",
+   "files": [
+    "的橙色（`#F39C12`）配置本身没错（`detail.vue",
+    "`src/components/ZsButton/ZsButton.vue",
+    "`src/staff/components/ZsButton/ZsButton.vue",
+    "`src/staff/components/PageButton/PageButton.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a6595586-e4f7-4b47-9b7a-2844397b091d"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "首页收银台-收款与支付方式显示不对 [图片] [图片",
+   "type": "fact",
+   "content": "两个弹层的显示问题都改完了，构建通过。 ## 根因 **1）弹层变成「窄卡片悬浮」——不是样式写少了，是写法被 WXSS 静默丢弃** `src/staff/pages/cashier/result.vue` 里用 `:deep(.payment-popup){ width: min(100vw, 750rpx) }` 想把 `ZsPopup` 内部的 `.popup-container` 撑成全宽底部弹窗。**WXSS 不支持 `min()/max()/clamp()`**，这条声明被丢掉，而同规则里的 `margin:0 auto`、`padding:0`、圆角照常生效 → 宽度回落到 `ZsPopup` 默认的 `.popup-container{width:560rpx}` 并被居中。 量截图验证过：弹层白卡宽 450px（592px 屏 = 750rpx ⇒ ≈570rpx ≈ **560rpx**）、水平居中贴底。卡片比账单卡窄，所以账单明细右侧的金额/日期从弹层旁漏出来（截图右侧那串 `00 6 1 0 8` 就是漏出来的明细值），底部「合计」也被挤到换行。 **2）支付方式只出「银联支付」——接口不对** 员工端调 `GET /system/paymentChannel/list`，业主端同场景调 `POST /system/paymentChannel/listP",
+   "evidence": "extracted source=workbuddy project=泰兴小程序",
+   "files": [
+    "`src/staff/pages/cashier/result.vue",
+    "/system/paymentChannel/listPayablePaymentChannel`（`src/api/system.js",
+    "**`src/staff/api/cashier.js",
+    "**`src/staff/pages/cashier/result.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "54c23926-7b8a-40d1-a6aa-2e3dcc903484"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  },
+  {
+   "title": "含背景的tab页顶部留白边距不一致 [图片] [图片",
+   "type": "fact",
+   "content": "所有改动完成，构建产物全部验证通过。汇总如下： ## 改动汇总 **5 个文件，56 行新增 / 23 行删除**： | 文件 | 改动 | |---|---| | `src/components/ZsImage/ZsImage.vue` | 新增 `mode` prop（默认仍 `aspectFit`），2 处 `<image mode=\"aspectFit\">` → `<image :mode=\"mode\">` | | `src/pages/staff/home/index.vue` | `<ZsImage ... mode=\"aspectFill\">` + `.hero-background{width:815rpx; top:0; right:0}` | | `src/pages/staff/workbench/index.vue` | 去掉 `.hero-bg-wrap`包裹；图片直挂 hero；`width:1071rpx` | | `src/pages/staff/profile/index.vue` | hero 高度改纯 px 计算（`uni.upx2px(280) + statusBarHeight`）；新增 `heroBgStyle` 动态宽度；`mode=\"aspectFill\"` | | `src/pages/staff/organization/inde",
+   "evidence": "extracted source=workbuddy project=泰兴小程序",
+   "files": [
+    "`src/components/ZsImage/ZsImage.vue",
+    "`src/pages/staff/home/index.vue",
+    "`src/pages/staff/workbench/index.vue",
+    "`src/pages/staff/profile/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "46d3f531-42c8-47d5-a99d-50772f08989d"
+   ],
+   "_draft": true,
+   "project": "泰兴小程序"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,149 @@
+{
+  "project": "苏住房G",
+  "batch": "109",
+  "files": ["109.md"],
+  "count": 10,
+  "memories": [
+    {
+      "title": "等级 update() 缺 bizState 守卫：审核中/已备案的单据仍能改等级，绕过审批直接生效",
+      "type": "bug",
+      "content": "【什么情况】物业服务等级的更新接口 `update()` **没有 bizState 守卫**：处于「审核中」或「已备案」状态的等级单据，仍然可以通过 update 接口改掉五类等级 / evalLevel / 频次。E2E 实测断言返回 200 且值已变。\n【为什么】流程类单据的状态机靠「接口层校验当前状态」来守：只有草稿态（bizState=0）才允许编辑，一旦提交（1）就应冻结。这里守卫缺失，意味着**任何拿到接口的人都能在审批前改内容、或在备案后偷偷改内容**，审批人看到的内容与最终生效的内容不一致——审批流形同虚设。已知库里也有同类教训（审核中与已备案记录不能仅靠修改 URL 进入可保存状态，前端控制和后端鉴权都要有），本条是同一个坑落在**后端 update 接口**上。\n【怎么做】① update 接口必须校验 `bizState`（只允许 0 草稿态编辑），其余状态返回明确错误码；② 前端也要按状态置灰/隐藏保存按钮，但**前端置灰不能替代后端校验**——两边都要有；③ 审批前内容被改，审批链路上要有痕迹（变更记录 +1）以便审计；④ E2E 用例要把这条写成显式断言：先提交成审核中，再尝试 update，断言**失败**且**原值未变**；⑤ 回归时把「审核中可改」「已备案可改」两种状态都覆盖；⑥ 同类清单化：等级、等级变更、检查记录、整改通知书、报告编制五类单据的 update/save 接口都要过一遍 bizState 守卫。",
+      "evidence": "会话 00e04b09-06b5-44c0-9662-cf41dca07319（基线 05caac8）最终结论「新发现（已报给 Lead）」表：「D7 高 | 等级 `update()` 无 `bizState` 守卫，审核中/已备案仍可改等级，绕过审批 | 02 断言 200 + 值已变」；同会话的 02 用例改动要点也记录了「已提交不可删 → … → 已备案不可删」的状态断言链，说明删除有守卫而更新没有。",
+      "files": [
+        "zhi2-web-admin/src/views/evaluation/stdEvaluation/serviceGrade/detail.vue",
+        "e2e/std-evaluation/cases/02-service-grade-crud.cjs",
+        "docs/std-evaluation/api-map-grade.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["00e04b09-06b5-44c0-9662-cf41dca07319"],
+      "bundle": "109.md"
+    },
+    {
+      "title": "审批动作枚举只有 1/3/7：传 '2' 会被引擎拒为「审批结果不合法」，撤回用 7、终审用 1",
+      "type": "fact",
+      "content": "【什么情况】审批动作取值踩坑：`approveResults='2'`（直觉上的「退回」）被引擎拒绝，报「审批结果不合法」。探针实测 `submit → approval(2)` 返回 500。**合法值只有 1 / 3 / 7**：终审用 `1`（同意），撤回用 `7`，另一个合法值是 `3`。\n【为什么】审批结果取值来自流程引擎的枚举，前端/脚本若按日常语义猜（「1=同意、2=拒绝」），会在引擎层被直接拒掉，表现为 500 + 「审批结果不合法」，而错误信息不告诉你合法值有哪些，只能靠探针枚举。这类枚举在接口文档里通常不写全，只能从引擎或后端源码里拿。\n【怎么做】① 审批前先确认合法枚举（本次 1/3/7），不要按直觉填数字；② 用**探针脚本**逐值试出合法集（本次即用 submit→approval(2) 探出 500），并把结论写进 API 映射文档；③ 三段式流转的语义要分清：提交（bizState 0→1）→ **撤回(7)** 回退到 0 且 pending 不回写 → **终审(1)** 置 bizState=2 并把 pending 回写为五类等级 / evalLevel / 频次，同时变更记录 +1；④ 审批体固定为 `{dataId, busCode, key, approveResults, approveMessage}`，其中 `key` 从 `POST /v2.0/flowable/task/flowViewer {busCode,dataId}` 响应里取 `completed:false` 的节点 id（不硬编码）；⑤ 撤回与终审的副作用不同（撤回不清 pending，终审清 pending 且回写业务字段），断言要分别写。",
+      "evidence": "会话 00e04b09-06b5-44c0-9662-cf41dca07319（基线 05caac8）最终结论「新发现（已报给 Lead）」表：「D12 中 | `approveResults='2'`（退回）被引擎拒为「审批结果不合法」，合法值仅 1/3/7 | 探针 submit→approval(2)=500」；02 用例改动要点：「提交（`deptId:1`）`bizState 0→1` → 已提交不可删 → flowViewer 取 `completed=false` 节点（不硬编码）→ **撤回(7)** 回退 0 且 pending 不回写 → **终审(1)** `bizState=2` + pending 回写五类等级/evalLevel/频次 + 变更记录 +1 → 已备案不可删；`approveState=2 / RECORD_USER / RECORD_TIME / PENDING_* 清空` 经 DB 逐项核对并 note」。",
+      "files": [
+        "e2e/std-evaluation/cases/02-service-grade-crud.cjs",
+        "e2e/std-evaluation/lib/std-eval-lib.cjs",
+        "docs/std-evaluation/api-map-grade.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["00e04b09-06b5-44c0-9662-cf41dca07319"],
+      "bundle": "109.md"
+    },
+    {
+      "title": "finishedComplexPage 未按已备案过滤，返回全量 8004 条小区：首行小区往往没有等级单据",
+      "type": "bug",
+      "content": "【什么情况】等级单据页用来选小区的接口 `finishedComplexPage` **没有按「已备案等级」过滤**，返回了全量 8004 条小区。用 `complexName` 过滤是正常的，所以问题只在「不过滤已备案条件」这条路径上——结果就是选中的首行小区往往根本没有对应的等级单据，后续新增/关联就落空。\n【为什么】这个接口名字里的 finished（已完成）暗示它应该只返回「有已完成（已备案）等级」的小区，实现里漏了这个过滤条件。数据量大（8004 条）还会带来两个连带问题：下拉/表格加载慢，以及用户以为能选却选到无效目标。\n【怎么做】① 凡是「已完成/已备案」语义的列表接口，都要核对后端是否真的加了对应状态过滤，不能只看接口名；② 排查时用两个维度对照：`complexName` 过滤正常 vs 不加过滤时数据量爆炸（8004），说明过滤条件整体缺失而不是某字段问题；③ 修法在后端查询加 `bizState=2`（或已备案等级关联表）条件，前端不做兜底过滤（前端过滤会和分页 total 打架）；④ E2E 用例里对这类接口加**数据量合理性断言**（如「结果条数不应等于全量小区数」「首行小区必须存在已备案等级」），否则回退无人察觉；⑤ 与之配套，同一功能的删除侧也检查：已提交/已备案等级无任何接口可删/撤销（D8），API 层做不到零残留，残留只能在 DB 清理（SQL 写进文档 §8）。",
+      "evidence": "会话 00e04b09-06b5-44c0-9662-cf41dca07319（基线 05caac8）最终结论「新发现（已报给 Lead）」表：「D11 高 | `finishedComplexPage` 未按已备案过滤，返回全量 8004 条小区（`complexName` 过滤正常） | 首行小区无等级单据」「D8 中 | 已提交/已备案等级无任何接口可删/撤销 → API 层无法做到零残留 | 删除守卫 bizState=0」；同段「残留说明：DB 恒为 **1 条已备案样本 + 1 条终审变更日志**，不随运行次数增长（02 优先复用）；彻底清空需改库，SQL 见文档 §8。」",
+      "files": [
+        "zhi2-web-admin/src/views/evaluation/stdEvaluation/serviceGrade/detail.vue",
+        "e2e/std-evaluation/cases/02-service-grade-crud.cjs",
+        "docs/std-evaluation/api-map-grade.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["00e04b09-06b5-44c0-9662-cf41dca07319"],
+      "bundle": "109.md"
+    },
+    {
+      "title": "环境基线变了用例要跟着改：删掉「流程未配置」降级分支改真实流转断言，并双轮复跑",
+      "type": "workflow",
+      "content": "【什么情况】02/03 两个用例交付后，lead 补齐了 9 条流程配置（`SYS_FLOW_CONFIG` 里 std_eval_* 一条都没有属于环境部署缺口），于是「该业务未配置流程」这条降级分支**不再成立**。task 被 reopen，要求回来改一版并复跑。\n【为什么】用例里留「降级分支」是有害的：它让用例在环境不完整时也能绿，从而**掩盖环境缺口**，等环境补齐后又变成「断言的是假路径」。这类分支必须随环境基线一起收敛掉，否则文档与现实长期不一致。\n【怎么做】① 收到「环境已变」通知后，先逐条核对哪些结论失效（本次 D5 从「环境缺口」改为「已解决」，D6 更新为「用例可产出并复用已备案样本」）；② 把降级分支**删除**，改成真实状态流转断言（02：add → submit `bizState 0→1` → 已提交不可删 → flowViewer 取 key → 撤回(7) 回退 0 → 终审(1) `bizState=2` + pending 回写 + 变更记录 +1 → 已备案不可删；03：变更单 submit → 已提交不可改/不可删 → 终审 2/2 + 留痕回写 → 终审回写主表 → 删主表级联清理，零残留）；③ **复跑两轮**（round 1 / round 2 都 exit=0）验证幂等，不能只跑一次就交；④ 涉及审批的步骤要带 `deptId: 1`、审批 key 从 flowViewer 动态取（不硬编码）；⑤ DB 侧字段（`approveState=2` / `RECORD_USER` / `RECORD_TIME` / `PENDING_*` 清空）用数据库逐项核对并 note；⑥ 环境基线类事实写进 API 映射文档（如「用例里不要自建/删除 flowConfig，它现在是既定环境基线」）。",
+      "evidence": "会话 00e04b09-06b5-44c0-9662-cf41dca07319（基线 05caac8）用户诉求 3「Team message from lead」：「**环境已变，需要你回来改一版并复跑**（这是 task-1 的收尾，我会把 task-1 重新打开）。1）环境变化：9 条流程配置已补齐，`未配置流程` 分支不再成立……**用例里不要自建/删除 flowConfig**，它现在是既定环境基线」「2）请你做的改动：1. **02/03 里「流程未配置」的降级分支删掉**，改为真实状态流转断言」；最终结论「已完成 task-1 第二轮修订并重新 `complete`（revision 6）。仅改动我名下 3 个文件」，复跑结果为「round 1 : 02 exit=0 03 exit=0 / round 2 : 02 exit=0 03 exit=0 / ✔ PASS 02-物业服务等级增删改查 步骤 23 / 0 失败 / ✔ PASS 03-物业服务等级变更流程 步骤 16 / 0 失败」。",
+      "files": [
+        "e2e/std-evaluation/cases/02-service-grade-crud.cjs",
+        "e2e/std-evaluation/cases/03-grade-change-flow.cjs",
+        "docs/std-evaluation/api-map-grade.md",
+        "e2e/std-evaluation/tools/setup-flow-config.cjs"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["00e04b09-06b5-44c0-9662-cf41dca07319"],
+      "bundle": "109.md"
+    },
+    {
+      "title": "E2E 用例要幂等：优先复用已备案样本，让 DB 残留恒定（1 条样本 + 1 条变更日志）而不是随跑次增长",
+      "type": "workflow",
+      "content": "【什么情况】等级与等级变更用例跑完后，DB 残留恒为 **1 条已备案样本 + 1 条终审变更日志**，**不随运行次数增长**（02 用例优先复用已有样本）。彻底清空需要直接改库，SQL 写进文档 §8。临时探针与 `artifacts/tmp-probe-*` 产物已删除。\n【为什么】E2E 每跑一次就造一批新数据，是最常见的「测试污染生产测试库」方式——跑得越多越脏，最后没人敢清。而「已提交/已备案单据接口不可删」（D8）意味着这些数据**接口层删不掉**，只能改库；不控制残留数量，就会不断累积不可清理的垃圾。\n【怎么做】① 用例设计上**优先复用**：先查已有符合条件的样本（已备案等级），有就复用，没有才新建；② 造数据时用可识别前缀，便于人工/脚本批量清（见同包 b107 的 E2E 前缀约定）；③ 残留量写成**不变量**并断言（如「DB 中已备案样本数恒为 1」），运行次数增加时它不变，就说明用例幂等；④ 清库手段写进文档并注明是**改库**而非调接口；⑤ 临时探针脚本与临时产物（`artifacts/tmp-probe-*`）用完即删，不留噪声；⑥ 交付说明里明确写残留的**条数 + 主键 + 清库 SQL**，不要只说「有残留」。",
+      "evidence": "会话 00e04b09-06b5-44c0-9662-cf41dca07319（基线 05caac8）最终结论「残留说明：DB 恒为 **1 条已备案样本 + 1 条终审变更日志**，不随运行次数增长（02 优先复用）；彻底清空需改库，SQL 见文档 §8。临时探针与 `artifacts/tmp-probe-*` 已删除。」",
+      "files": [
+        "e2e/std-evaluation/cases/02-service-grade-crud.cjs",
+        "e2e/std-evaluation/cases/03-grade-change-flow.cjs",
+        "docs/std-evaluation/api-map-grade.md"
+      ],
+      "baseline": "05caac8",
+      "sessionIds": ["00e04b09-06b5-44c0-9662-cf41dca07319"],
+      "bundle": "109.md"
+    },
+    {
+      "title": "PowerShell 脚本必须存成 UTF-8 BOM：否则中文路径被按 GBK 读坏导致脚本解析失败",
+      "type": "bug",
+      "content": "【什么情况】后端启动脚本 `start-all.ps1` 解析失败。根因是**脚本文件被存成不带 BOM 的 UTF-8**，PowerShell 5.x 会按系统 ANSI 代码页（GBK）读取脚本内容，于是里面的中文路径被读成乱码，路径匹配不到、解析直接失败。改成 UTF-8 BOM 保存后恢复正常。\n【为什么】Windows PowerShell 对**无 BOM 的 UTF-8 脚本**没有可靠的编码探测，会退回系统默认代码页。这与「文件本身是 UTF-8」无关——对编辑器/Node 来说都是对的，只有 PowerShell 读脚本时出错。这类 bug 的迷惑性在于：同一段逻辑在 bash/Node 里跑得好好的，只有 `.ps1` 起不来，而报错往往指向路径不存在而不是编码。\n【怎么做】① 所有 `.ps1` 脚本**一律存为 UTF-8 with BOM**（写入时显式指定编码，含 BOM）；② 脚本里出现中文路径时更要注意——本次修的正是硬编码 JDK 路径改成 Scoop 路径 `D:\\sdk\\apps\\temurin8-jdk\\current\\bin\\java.exe` 时暴露的编码问题；③ 编辑这类脚本后立刻实际执行一次验证，不要只看内容对不对；④ 跨团队约定写进脚本模板/工具链，避免每个人按自己编辑器默认保存；⑤ 与其他编码类坑区分：这是**脚本文件编码**，不是控制台输出编码。",
+      "evidence": "会话 session-80e78cbf-5439-4db6-bf65-920d4fe3ee80（基线 b6ffc68）最终结论「本次做了什么（重启后重做）」第 1 条：「**修复启动脚本**：`start-all.ps1` 里硬编码的 `D:\\jdk-sdk\\jdk-8.0.504`（上次清理已删除）改为 Scoop 的 JDK8 `D:\\sdk\\apps\\temurin8-jdk\\current\\bin\\java.exe`；**脚本用 UTF-8 BOM 保存（否则中文路径被 PowerShell 按 GBK 读坏导致解析失败）**。新脚本：`D:/sdk/start-backend.ps1`。」",
+      "files": [
+        "D:/sdk/start-backend.ps1",
+        "D:/sdk/版本管理-CHEATSHEET.md"
+      ],
+      "baseline": "b6ffc68",
+      "sessionIds": ["session-80e78cbf-5439-4db6-bf65-920d4fe3ee80"],
+      "bundle": "109.md"
+    },
+    {
+      "title": "多版本 JDK/Maven 用版本管理工具（Scoop）装在 D 盘：脚本写绝对路径，不写系统环境变量",
+      "type": "workflow",
+      "content": "【什么情况】用户诉求 1：「我的 JDK 有多个版本，需要用版本管理工具，包括 maven 都是这样，**不要放在项目目录里面，不要放在 C 盘**。」最终把启动脚本里硬编码的 `D:\\jdk-sdk\\jdk-8.0.504` 换成 Scoop 管理的 JDK8：`D:\\sdk\\apps\\temurin8-jdk\\current\\bin\\java.exe`，并产出 `D:/sdk/start-backend.ps1` 与 `D:/sdk/版本管理-CHEATSHEET.md`。\n【为什么】把 JDK/Maven 装进项目目录会造成三个问题：① 每个项目重复一份、版本漂移；② 项目目录进了版本库或被 clean 掉；③ 换机器无法复现。装在 C 盘同理（系统盘空间与权限、备份/重装都受影响）。用版本管理工具（Scoop）后，**多版本并存、按需切换、路径稳定**。\n【怎么做】① 统一用版本管理工具安装并固定在 D 盘（如 Scoop 根目录 `D:\\sdk`，JDK 落在 `D:\\sdk\\apps\\temurin8-jdk\\current\\bin\\java.exe`）；② 脚本里**写版本管理工具的绝对路径**，不依赖 PATH——这样任何终端跑脚本都一致（本次即因为硬编码路径被删掉而必须换绝对路径）；③ **不写系统环境变量**（本次交付明确写「Maven/JDK 装在 `D:\\tools`，**未写入系统环境变量**（仅本次会话 PATH 生效）；下次要在别的终端构建需重新指定路径」），保持机器干净，代价是在说明里写清；④ 多个版本并存时在脚本里选 `current` 软链或显式版本目录，并在 CHEATSHEET 里记录版本对照；⑤ 启动 12 个后端服务后**逐端口确认监听**（8080 网关、9211 framework、9700 flowable、9603 data-property、9610 service-expand、9604 property、9606 autonomy、9616 credit、9608 evaluation、9701 external、9605 maintenance、9803 benefit）；⑥ 凭据类配置用运行期注入（本次 Nacos 凭据通过 `SPRING_APPLICATION_JSON` 运行期注入，**不落盘**）。",
+      "evidence": "会话 session-80e78cbf-5439-4db6-bf65-920d4fe3ee80（基线 b6ffc68）用户诉求 1：「我的JDK有多个版本，需要用版本管理工具，包括maven都是这样，不要放在项目目录里面，不要放在C盘」；最终结论第 1 条（脚本改用 Scoop 路径 `D:\\sdk\\apps\\temurin8-jdk\\current\\bin\\java.exe`）、第 2 条「重启全部 12 个后端服务（Nacos 凭据通过 `SPRING_APPLICATION_JSON` 运行期注入，不落盘），端口逐一确认监听」，并给出 12 个端口清单（8080/9211/9700/9603/9610/9604/9606/9616/9608/9701/9605/9803）+ 前端 8082。",
+      "files": [
+        "D:/sdk/start-backend.ps1",
+        "D:/sdk/版本管理-CHEATSHEET.md",
+        "e2e-flood/lib/flood-lib.cjs"
+      ],
+      "baseline": "b6ffc68",
+      "sessionIds": ["session-80e78cbf-5439-4db6-bf65-920d4fe3ee80"],
+      "bundle": "109.md"
+    },
+    {
+      "title": "E2E 偶发超时要先排除并行噪音（dev server 冷编译 + 同时排查）再判失败",
+      "type": "pattern",
+      "content": "【什么情况】跑全流程 E2E 时首次运行出现偶发超时，排查后**清空干扰**（dev server 冷编译 + 当时还在并行排查噪音）完整重跑，**6/6 用例全部 PASS**（verify-flood 16.8s / flood-crud 8-8 71.0s / flood-crud-video 96.1s / batch1-video 537.2s / batch2-video 46-46 384.7s / flood-menus-video 11-11 126.2s）。\n【为什么】E2E 的偶发失败有两类根因：**产品缺陷**与**环境噪音**。环境噪音的常见来源是 dev server 冷编译占满 CPU、同时还在跑别的排查任务（数据库查询、日志 tail、脚本探针），导致 Playwright 的默认超时被拖穿。把噪音当成缺陷去修产品，会引入无效改动；而把缺陷当成噪音去重跑，又会放过真 bug。\n【怎么做】① 超时先分类：看**失败分布**——如果是随机散布在多个用例且耗时接近超时阈值，多半是噪音；如果是固定在某一步、每次都在，多半是真缺陷；② 排查时**串行化**：先停掉并行探针/日志 tail/DB 查询，再让 dev server 完成冷编译，之后再跑 E2E；③ 给冷启动留余量（首次跑前预热页面或调大该用例超时），但**不要**用调大超时掩盖稳定失败；④ 用例耗时数据要记（每个用例的耗时），下次超时能对比是不是同一位置；⑤ 重跑全绿后，结论要写成「首次超时因环境噪音，清空干扰后全绿」，不要只报 PASS——否则下次同样的噪音会再被当成缺陷。",
+      "evidence": "会话 session-80e78cbf-5439-4db6-bf65-920d4fe3ee80（基线 b6ffc68）最终结论「本次做了什么」第 4 条：「跑全流程 E2E（e2e-flood，Playwright）。**首次跑因 dev server 冷编译 + 我并行排查噪音出现偶发超时；清空干扰后完整重跑全绿。**」；E2E 结果表列出 6 个用例的 PASS 状态与耗时（16.8s / 71.0s / 96.1s / 537.2s / 384.7s / 126.2s），并注明「共 6 个用例：6 PASS / 0 FAIL」。",
+      "files": [
+        "e2e-flood/run-all-live2.log",
+        "e2e-flood/lib/flood-lib.cjs",
+        "e2e-flood/cases/flood-crud-batch1-video.cjs"
+      ],
+      "baseline": "b6ffc68",
+      "sessionIds": ["session-80e78cbf-5439-4db6-bf65-920d4fe3ee80"],
+      "bundle": "109.md"
+    },
+    {
+      "title": "提交前必须识别并排除「别人的未提交改动」，并在交付里逐条列出",
+      "type": "workflow",
+      "content": "【什么情况】提交 RepairPanel 修复时，工作区里还有**别人未提交的改动**：`src/api/portal/home.js`、`src/views/home/index-v2.vue`、`src/views/home/v2/components/EvaluationPanel.vue`、`src/views/home/v2/evaluationNav.js`（未跟踪）。这批属于「物业管理标准化评价卡片跳转」的另一个功能，是他人进行中的工作。**没有被带进本次提交，原封不动留在工作区**；父仓的 `env/.env`（本次改动前就存在的本地环境修改）也未提交。\n【为什么】共享工作区里「我的改动」与「别人的改动」混在一起，用 `git add .` / `git commit -a` 一把梭，就会把别人进行中的工作误提交——对方的代码半成品进了主干，比不提交更糟。反过来，若不说明，提交者自己下次也会困惑「为什么这几个文件变了我没改」。\n【怎么做】① 提交前先 `git status --short` 逐条判断归属，只 stage **明确是自己这次改的**文件（本次 3 个：`src/views/home/v2/components/RepairPanel.vue` 修复本体 +4/−3、`tests/e2e/home-repair-panel.spec.mjs` 新增回归用例 225 行、`package.json` 新增 `test:e2e:repair` 脚本）；② 提交后**用 `git show --stat` 核对**文件清单与行数是否与预期一致；③ 在交付里**明确列出被排除的文件**及其原因（他人进行中 / 本地环境配置），并提醒对方知悉以免误提交；④ 本地环境类文件（`env/.env` 代理地址）默认不入库，需要时单独提交；⑤ 顺带记住 PowerShell 下 `git commit`/`git push` 的退出码 1 是 stderr（lint-staged 日志、远端重定向提示）被当作错误流所致，实际均成功，以 log 与同步状态（ahead/behind=0）为准。",
+      "evidence": "会话 session-06bff897-c6b6-4484-ae0c-434e66e78369（基线 5d68a74）用户诉求 1「不要改文案，2不需要你管」；最终结论「需要您注意的一点」：「提交时工作区里还有**别人未提交的改动**，我**没有**把它们带进本次提交，仍原封不动留在工作区：`src/api/portal/home.js`、`src/views/home/index-v2.vue`、`src/views/home/v2/components/EvaluationPanel.vue`、`src/views/home/v2/evaluationNav.js`（未跟踪）……这批看起来是「物业管理标准化评价」卡片跳转的另一个功能，属于他人进行中的工作，请知悉以免误提交。」以及「父仓库的 `env/.env` 是本次改动前就存在的本地环境修改，也未提交」与「`git commit`/`git push` 的退出码显示 1 是 PowerShell 把 stderr（lint-staged 日志、远端重定向提示）当作错误流所致，实际均成功」。",
+      "files": [
+        "zhi2-web-admin/src/views/home/v2/components/RepairPanel.vue",
+        "zhi2-web-admin/tests/e2e/home-repair-panel.spec.mjs",
+        "zhi2-web-admin/package.json",
+        "env/.env"
+      ],
+      "baseline": "5d68a74",
+      "sessionIds": ["session-06bff897-c6b6-4484-ae0c-434e66e78369"],
+      "bundle": "109.md"
+    },
+    {
+      "title": "E2E 像素对比失败先分清「基线过期」还是「本次改动引入」：尺寸差 + 基线是更早版本就不换 baseline",
+      "type": "workflow",
+      "content": "【什么情况】E2E 像素对比失败：`size_mismatch` — baseline **1919×1246**，actual **1919×1258**，多 12px。核对后确认：当前 actual 比旧 baseline **多了「区域 Tab」+「当前数据统计周期」等 UI**，基线图是更早版本的首页；本次热区 CSS 改动已去掉会撑高的 padding/margin，与像素差异无直接关系。\n【为什么】像素基线是**历史快照**，页面正常演进后基线天然过期。此时若直接更新 baseline，等于用「换基线」掩盖差异——真回归会被一起盖掉。判断关键是：差异是**尺寸/结构层面**且能与「页面新增了哪些 UI」对应上（这次是多了区域 Tab 与统计周期），还是**局部内容/位置**偏移（那更像本次改动引入）。\n【怎么做】① 先量尺寸差并与「页面最近新增的 UI」对账，能对上就是基线过期；② **不要为掩盖问题直接换 baseline**——换基线要作为独立动作单独提出（本次明确写「若你希望把 E2E 像素基线更新到当前首页（接受 1258 高度和新顶栏），可以说一声，我按规范单独改 `tests/e2e/screenshots/baseline.png` 并再跑一遍 `test:e2e`」）；③ **DOM 断言要排在像素对比之前执行**（本次「E2E 热区 DOM 断言（3 个 `.kd__value` 均在 `.kd__metric-main--clickable` 内）通过（在像素对比失败之前执行）」），这样即使像素卡住，功能层面的验证结论仍然拿得到；④ 像素之外还要跑 `npm run build` 与 ESLint 兜底；⑤ 像素失败且基线确认过期时，改为请用户在真实环境（1920 宽、已登录、有菜单权限）手工点验：悬停出浅蓝底、点击数字与点字段名同一列表页同一筛选条件、Tab 聚焦后 Enter 可跳转。",
+      "evidence": "会话 session-8f03a474-c1ad-4a51-ab3e-9f85f59280fb（基线 f36e340）最终结论「验证」表：「ESLint `KeyDataNav.vue` | 通过」「`npm run build` | 通过」「E2E **热区 DOM 断言**（3 个 `.kd__value` 均在 `.kd__metric-main--clickable` 内） | **通过**（在像素对比失败之前执行）」「E2E 像素对比 | **失败**：`size_mismatch` — baseline **1919×1246**，actual **1919×1258**」；并写「像素失败与本次热区 CSS **无直接关系**（已去掉会撑高的 padding/margin）。当前 actual 比旧 baseline 多 **区域 Tab +「当前数据统计周期」** 等 UI，基线图是更早版本首页；**不应为掩盖问题直接换 baseline**」及「若你希望 **把 E2E 像素基线更新到当前首页**（接受 1258 高度和新顶栏），可以说一声，我按规范单独改 `tests/e2e/screenshots/baseline.png` 并再跑一遍 `test:e2e`」。",
+      "files": [
+        "zhi2-web-admin/src/views/home/v2/components/KeyDataNav.vue",
+        "zhi2-web-admin/src/views/home/v2/keyDataMap.js",
+        "zhi2-web-admin/tests/e2e/screenshots/baseline.png"
+      ],
+      "baseline": "f36e340",
+      "sessionIds": ["session-8f03a474-c1ad-4a51-ab3e-9f85f59280fb"],
+      "bundle": "109.md"
+    }
+  ]
+}

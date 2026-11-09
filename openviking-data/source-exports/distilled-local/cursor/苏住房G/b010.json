@@ -1,0 +1,73 @@
+{
+ "project": "苏住房G",
+ "batch": "010",
+ "files": [
+  "010.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "物业费申报功能优化 详情字段调整：",
+   "type": "preference",
+   "content": "已修复，原因有两点： ### 1. `noReject` 未生效 请求拦截器在 `code !== 200` 时直接 `reject`，`.then` 拿不到完整响应，`data` 里的文件路径也就无法处理。 已在 `request.js` 中补充： - 成功响应里 `code !== 200` 且配置了 `noReject` 时，返回 `res.data` - HTTP 错误响应里同样支持 `noReject` ### 2. 错误文件 URL 拼接不正确 `/zhi2/...` 这类路径用 `resolveServerAssetUrl` 会拼成错误地址（如 `/sz/property/zhi2/...`），导致下载失败。 已改为使用 `window.location.origin + filePath` 拼接正确地址。 ### 3. 避免重复提示 导入请求增加了 `noMessage: true`，避免全局弹窗和页面内 `msgError` 重复提示。 请重新测试导入：校验失败时应会提示 `msg`，并自动下载错误 Excel，同时显示「下载错误文件」按钮。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "`request.js",
+    "涉及文件：d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\feeDeclare2、d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\index.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1f367792-daf1-4b22-a41a-28848b798cc5"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "物业管理-物业管理区域信息，页面没有自适应小屏幕分辨",
+   "type": "bug",
+   "content": "合并已完成，结果如下： ## 子模块 `zhi2-web-admin` | 分支 | 操作 | 提交 | |------|------|------| | `develop/v2.6.2` | cherry-pick `bug2086` 并 rebase 后推送 | `c00b6a817` | | `develop/v2.6.2-yulin` | 合并 `develop/v2.6.2` 后推送 | `b99f9de0a` | ## 父仓库 | 分支 | 操作 | 提交 | |------|------|------| | `develop/v2.6.2` | 更新子模块指针并推送 | `78c0d94` | 父仓库没有 `develop/v2.6.2-yulin` 分支，因此 yulin 相关合并仅在子模块中完成。 当前工作区已切回 `develop/v2.6.1`。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\complex\\index.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\complex\\components\\RegionTreeLayout.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e1bd177a-f8c4-4da5-9aaf-2c182dd5cb33"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "图1参考图2，图3参考图4，按照261-262-26",
+   "type": "preference",
+   "content": "原因已经找到了。 全局的 `zs-table-column` 确实会根据内容自动计算列宽，但**一旦在列上写了 `width`，就会走固定宽度逻辑，不再参与自适应**： ```223:225:zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue if (this.explicitWidth != null) { // 页面写死了 width：原样透传，固定宽度 return props ``` `SelectRecordProcedureDialog` 里「巡检程序编号」列之前写死了 `width=\"160\"`，所以长编号会被截断显示省略号。 ## 修复 已去掉该列的 `width=\"160\"`，改由 `zs-table-column` 根据 `procedureCode` 内容自动计算 `min-width`。 已同步到 `develop/v2.6.1`、`develop/v2.6.2`、`develop/v2.6.2-yulin`。刷新后编号列会按内容撑开显示。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "```223:225:zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "涉及文件：d:/repository/苏住房G/zhi2-web-admin、d:/repository/苏住房G/.gitmodules、d:/repository/苏住房G、d:/repository/苏住房G/zhi2-web-admin/src/views/maintenance/facility/components/FacilitySelectDialog.vue、d:/repository/苏住房G/zhi2-web-admin/src/views/dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "db287272-e3da-43d4-8c77-915cb66320da"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "修复侧栏点击首页报「页面未授权或不存在」 Imple",
+   "type": "preference",
+   "content": "已完成的修复如下： 1. **侧栏点击首页报错**：统一首页路径归一到 `/index`，修复一级叶子菜单点击、路由守卫兜底及首页识别逻辑。 2. **首页未高亮**：侧栏高亮比较时同步做首页路径归一。 3. **切换菜单后首页仍高亮**：首页菜单改为仅精确匹配，避免 `/index/xxx` 同级菜单误触发高亮。 请在页面上验证：点击侧栏「首页」能正常进入、在首页时高亮、切换到其他菜单后不再高亮。若仍有异常，说明具体操作路径即可。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin\\src、d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\router\\index.js、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\utils\\homeRoute.js、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\utils\\permission.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cb0377ba-165d-4411-88e0-da19021618ab"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,90 @@
+{
+ "project": "苏住房G",
+ "batch": "017",
+ "files": [
+  "017.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "租赁合同「忽略预警」勾选修复方案 Implement",
+   "type": "preference",
+   "content": "修复已完成，变更如下： ## 新增公共 mixin [`zhi2-web-admin/src/mixins/leaseContractWarningMixin.js`](zhi2-web-admin/src/mixins/leaseContractWarningMixin.js) 统一封装： - `isWarningContract` — 判断预警合同（兼容 `1` / `'1'` / `true`） - `isLeaseWarningSelectable` — 预警合同可勾选 - `setWarningRowStyle` — 橙色行样式 - `handleIgnoreWarning` — 忽略预警（校验 + 仅提交预警合同 ID） ## 修改的 4 个列表页 | 页面 | 勾选规则 | |------|----------| | 经营用房租赁合同 | 预警合同 **或** 待提交（`bizState=0`） | | 停车泊位租赁管理 | 预警合同 **或** 待提交/审核中（`0/1`） | | 资源租赁合同 | 预警合同 **或** 待提交（`0`） | | 收入合同（旧页） | 同上 | 各页面统一做了： 1. 勾选列改为 `:selectable=\"(row) => isSelectable(row)\"`，避免 `this` 丢失 2. 「忽略预警」按钮在未选中预警合同时禁",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "[`zhi2-web-admin/src/mixins/leaseContractWarningMixin.js`](zhi2-web-admin/src/mixins/leaseContractWarningMixin.js",
+    "涉及文件：d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\.workbuddy\\memory\\2026-09-10.md、d:\\repository\\苏住房G\\zhi2-web-admin\\src、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\assetsLeaseContractFiling\\index.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\mixins\\table.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1e8e4ca2-26cb-4b86-b061-d23f725e38ef"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "原因说明 从截图里的网络请求可以看出：筛选 「已备案",
+   "type": "preference",
+   "content": "## 原因说明 从截图里的网络请求可以看出：筛选 **「已备案」** 时实际传的是 **`bizStatus=1`**，而系统约定是： | 编码 | 含义 | |------|------| | `1` | 审核中 | | `2` | 已备案 | 详情页 `detail.vue` 也是按这个约定写的（`bizState == 1` 走审核、`== '2'` 走已备案）。 开户申请**列表**却用 `getDicts('BIZ_STATE')` 拉下拉和表格回显。在 UAT 上这套字典把 **1、2 的文案和后端编码对调了**，于是： - 选「已备案」→ 传 `1` → 查到的是审核中数据 - 选「审核中」→ 传 `2` → 查到的是已备案数据 ## 修改说明 在 `zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/index.vue` 中，将业务状态字典改为与详情页、全局 `store` 一致的 **`biz_state`**： ```47:51:d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAccount\\index.vue // 与详情页一致：biz_state（0待提交 1审核中 2已备案）；勿用 BIZ_STATE，部分环境 1/2 ",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "`detail.vue",
+    "`zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/index.vue",
+    "```47:51:d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAccount\\index.vue",
+    "涉及文件：d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\zhi2-web-admin\\src、d:\\repository\\苏住房G\\.gitmodules、d:\\repository\\苏住房G\\.workbuddy\\memory\\2026-09-10.md、d:\\repository\\苏住房G\\.workbuddy\\memory\\2026-09-11.md、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAccount\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7fa26724-2d29-4dbe-accb-87098bace420"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "Briefly inform the user ab",
+   "type": "bug",
+   "content": "「设置账户公开」弹窗不显示「公开 / 不公开」的问题已修复，请刷新页面后在开户申请详情页重新点击该按钮验证。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\maintenance\\accountOpen\\components\\detail.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\propertyAccount\\components\\accountDisclosureDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c4bbc29a-b056-48bc-b316-df2dda31ac81"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "现在手动输入没了，只能下拉选择了",
+   "type": "bug",
+   "content": "原因已经找到了。 下拉里有「**多次输入错误密码**」这一项，而原来的逻辑是：**只要当前原因是这个值，就立刻禁用编辑**。 所以无论你是手动选的，还是系统本来就带这个原因，选完之后字段都会变灰、不能再改。 ### 已做的修改 1. **下拉选项里去掉「多次输入错误密码」** — 这是系统自动冻结的原因，不应在手动操作时可选。 2. **只有「加载时已是系统自动冻结」才锁定** — 即 `originUserAccountState === 冻结` 且原因是「多次输入错误密码」时才只读；手动冻结时选「管理员手动冻结」等不会再被锁死。 3. **选「其他」时自动切到手工输入** — 方便直接填写具体原因。 刷新后再试：选「管理员手动冻结」应可继续编辑；若账号本来就是密码错误自动冻结的，仍会只读显示（符合预期）。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\user\\detail.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\user、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\components\\AccountFreezeFields\\AccountFreezeFields.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\utils\\accountFreeze.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "92b6e126-dfc6-494c-a323-5344cc8169de"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "样式出问题了",
+   "type": "bug",
+   "content": "已修复。上次提交除了隐藏「平铺展示/树状展示」切换按钮外，还额外改动了表格布局，导致样式错乱。 **已回退的改动：** 1. 移除表格 `:key=\"tableViewKey\"` — 会强制重渲染，造成列头与数据错位 2. 移除 `fill-height` — 数据少时会把表格撑出大片空白 3. 合并 `RegionTreeLayout` 中重复的 `.type-right-body` 样式定义 **保留的改动：** - `:show-flat-switch=\"false\"` — 仅隐藏平铺/树状切换按钮 - 左侧区域树结构完整保留 - 请求防竞态逻辑（`listRequestId`）保留 - 切换树节点后调用 `doLayout()` 修正列对齐 刷新页面后，左侧树应正常显示，右侧表格也不会再出现大面积空白和列错位。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth\\index.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\complex\\components\\RegionTreeLayout.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3afefc54-4c44-41c7-a8c6-998c856214d4"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  }
+ ],
+ "_draft": true
+}

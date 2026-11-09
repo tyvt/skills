@@ -1,0 +1,123 @@
+{
+ "project": "园区物管2.0",
+ "batch": "055",
+ "files": [
+  "055.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "菜单图标，用中文搜索不生效",
+   "type": "preference",
+   "content": "已修复。问题出在 `IconSelect.vue` 的搜索事件绑定方式。 ## 原因 原代码使用 `@input.native` 监听原生 DOM 的 `input` 事件。使用中文输入法（IME）时： 1. 输入拼音过程中，原生 `input` 会多次触发，但 `v-model` 绑定的 `name` 尚未更新 2. 选字确认后，`el-input` 通过组件的 `input` 事件更新 `name`，但原生 `input` 不一定再次触发 3. 结果是 `filterIcons` 读到的 `this.name` 为空或仍是拼音，过滤不生效 英文逐字输入时，原生事件与 `v-model` 更新时机更接近，所以有时能搜到，中文 IME 下则基本失效。 ## 修改 在 `zhi2-web-admin/src/views/system/menu/IconSelect.vue` 中： - 将 `@input.native` 改为 `@input`，监听 `el-input` 在选字完成后的组件事件 - `filterIcons` 直接使用事件传入的搜索关键词，避免依赖可能滞后的 `this.name` 刷新页面后，在菜单图标搜索框输入「三方」应能正确过滤出「三方鉴定」等匹配图标。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`IconSelect.vue",
+    "`zhi2-web-admin/src/views/system/menu/IconSelect.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\system\\menu\\IconSelect.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\system\\menu\\requireIcons.js、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\components\\zs-input\\zs-input.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0f4d7bcd-4f58-428d-a808-a25b8e090d3a"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "summary没展示",
+   "type": "preference",
+   "content": "已在 `zhi2-web-admin/src/views/property/complex/components/rangeTable.vue` 修好了 `summary` 不展示的核心问题。 我改了 `showMethod` 的汇总列识别逻辑： - 之前只用 `column.type === 'index'` 判断“小计”列，某些场景（比如有选择列、列定义差异）会匹配不到。 - 现在改为： - 先找 `index` 列（兼容 `column.type` / `column.property`） - 找不到就回退到“第一个非 selection 列” - 同时汇总字段判断改为兼容 `column.property || column.prop`，避免字段名取不到导致空汇总。 这样 `zs-table` 能稳定拿到 `小计`，底部 summary 就能正常渲染了。 你现在刷新页面看下这个表格底部是否已出现汇总；如果还没有，我再帮你继续排查接口 `response.summary` 的返回值是否为空。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`zhi2-web-admin/src/views/property/complex/components/rangeTable.vue",
+    "涉及文件：D:/repository/园区物管2.0/zhi2-web-admin/src/views/property/complex/components/rangeTable.vue、D:/repository/园区物管2.0/zhi2-web-admin/src、D:/repository/园区物管2.0/zhi2-web-admin/src/components/zs-table/zs-table.vue、D:/repository/园区物管2.0/zhi2-web-admin/src/views/property/complex/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5c7bbda7-0993-453f-a4a2-a1efa119c858"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "这里的间距有点大，调整宽度",
+   "type": "bug",
+   "content": "已改好。 **原因**：底部一行用 CSS Grid，原来是 `1.12fr 0.88fr`，左侧「物业管理区域数量」更宽，右侧「物业管理区域账户余额排名」只占约 44%。 **调整**：改为 `1fr 1.22fr`，右侧列略大于左侧，排名区域整体会宽一截，区域名称和金额列也更舒展。 若还想再宽，可把 `1.22fr` 调到 `1.28fr`～`1.35fr`；若觉得左侧柱状图太挤，再往回调一点即可。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1063d8bb-91e2-41cc-a94c-d70270312b59"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "SVG地图移除鼠标移入高亮逻辑",
+   "type": "bug",
+   "content": "已按你的需求改完，说明如下。 ### 原因 `initMap` 里 `geo.emphasis` 用了 `WUXI_GEO_HIGHLIGHT_ITEM_STYLE` 和 `wuxiMapLabelRich(true)`，鼠标移入未单独配置 `regions` 的区域（以及轮播只高亮某一区时的「其余区」）会走这套 **emphasis**，看起来就是移入高亮。 ### 修改 1. 抽出 **`WUXI_GEO_BASE_ITEM_STYLE`**，与原先默认 `itemStyle` 一致。 2. **`geo.itemStyle`** 改为使用该常量。 3. **`geo.emphasis`** 改为：`itemStyle` 与默认相同，`label` 的 `formatter` / `rich` 与普通态一致（`wuxiMapLabelRich(false)`），这样移入时视觉与常态一致，相当于去掉移入高亮。 轮播里 `buildMapGeoCarouselRegions` 仍对各块同时设置 `itemStyle` 与 `emphasis` 为高亮样式，**轮播固定高亮不变**；高亮块上 `itemStyle` 与 `emphasis` 仍一致，移入也不会再「闪一下」。 涉及常量与 `initMap` 中 `geo` 配置，路径：`zhi2-web-admin/src/views",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "配置，路径：`zhi2-web-admin/src/views/benefit/mapOverview/index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\package.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "dc3adc83-b4a0-4e74-9b28-aebb578f54f0"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "江阴市#3B82F6宜兴市#2BDFFA梁溪区#FF",
+   "type": "pattern",
+   "content": "已按你给的配色处理完本页与「区」相关的图表色，并统一了原先沿用旧主色的趋势图。说明如下。 ### 1. `DISTRICT_COLOR`（饼图「各区收入/支出」及图例取色） | 区名 | 颜色 | |------|------| | 江阴市 | `#3B82F6` | | 宜兴市 | `#2BDFFA` | | 梁溪区 | `#FFB95A` | | 锡山区 | `#EC4899` | | 惠山区 | `#A27918` | | 滨湖区 | `#84CC16` | | 新吴区 | `#727EED` | ### 2. 「各区账户余额分布图」横向柱图 - 由整图单色 `#2f7cff` 改为 **每个区一根柱**，颜色与上表一致（与饼图同一套 `DISTRICT_COLOR`）。 ### 3. 趋势与双系列面积图（去掉旧蓝/红，与配置对齐） - **租赁申请数、用款申请数** 折线：`#2f7cff` → `#3B82F6`（江阴主色）。 - **合同 vs 入账/支出** 双面积图：合同线/面积用 `#3B82F6` 及对应渐变；第二条线用 **`#EC4899`（锡山区）** 及粉系渐变，替代原来的 `#ee5253`。 收入/支出 **分类** 柱图仍用整图单色（收入 `#3B82F6`、支出 `#FFA94D`），因为维度是业务类别而不是行政区；若也要改成 7 区色盘里的组合",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\mock.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "3f34cc31-619a-4d49-89fa-8ac011406d40"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "横向滚动条只有纵向滚动到页面底部才出现，能否改为始终",
+   "type": "preference",
+   "content": "## 原因说明 全景页根节点用了 `height: calc(100vh - 84px)` 且 **`min-height` 也是同一值**。主内容区在布局里是 `#app-main`（`flex: 1`），实际高度往往 **小于** `100vh - 84px`（顶部还有 Tags、票据条等，84 只是近似值）。 结果是：根节点盒子比主区可视区域 **更高**，横向滚动条画在这个盒子 **最下边**，落在主区可视区域 **下方**。必须先纵向滚动 `#app-main`，才能滚到盒子底部，横向条才“出现”。 ## 修改说明 在两个文件中已做相同调整： 1. **去掉** `min-height: calc(100vh - 84px)`，避免强制至少占满视口高度、把底部滚出主区。 2. **增加** `max-height: 100%`，让高度 **不超过父级主内容区**。 3. **增加** `min-height: 0`，便于在 flex 布局里正确参与高度计算。 这样横向滚动条会始终落在 **当前主区内的滚动容器底部**，无需先滚到整页最底。 若仍有个别环境 `max-height: 100%` 不生效（父级高度链未算准），可以再在 `AppMain.vue` 给 `.app-main` 加 `min-height: 0` 做布局补强；需要的话我可以再帮你改那一处。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`AppMain.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\assetPanorama\\index.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a2b24d85-02d0-461f-afbd-1db973bf08f3"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "Access to XMLHttpRequest a",
+   "type": "fact",
+   "content": "## 原因说明 控制台里的 CORS 报错不是腾讯地图本身配置错了，而是项目里的 **`public/assets/js/sign.js` 全局改写了 `XMLHttpRequest` / `fetch`**：只要 `sessionStorage` 里有 `Admin-Token`，就会去拉密钥并给**每一次**请求加上 `nonce`、`timestamp`、`sign`。 腾讯地图脚本会用 XHR 访问 `https://pr.map.qq.com/pingd?...` 做统计。浏览器会先 OPTIONS 预检；对方响应里没有允许自定义头 `nonce`，于是请求被拦截。 ## 已做修改 在 `sign.js` 里增加了 **`shouldApplySign`**：只对**当前站点同源**，且路径以 **`/api/v2.0`**（与文件里的 `SIGN_API_BASE` 一致，和你们 `env` 里的 `VITE_APP_BASE_API` 默认一致）开头的接口加签；**外链（如 `pr.map.qq.com`）不再加签**，从而不再触发该 CORS 问题。 同时修正了 `fetch` 在 GET 场景下若第一个参数是 `URL` / `Request` 时取查询串的逻辑（原先用 `url.includes` 不可靠）。 请**硬刷新**页面（或清缓存）后再试地图页。若你们",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "**`public/assets/js/sign.js",
+    "`sign.js",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\public\\assets\\js\\sign.js、d:\\repository\\园区物管2.0\\zhi2-web-admin\\vite.config.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "73936be3-9ab2-412b-8043-33c8c47df458"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

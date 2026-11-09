@@ -1,0 +1,30 @@
+{
+ "batch": 18,
+ "files": [
+  "103.md",
+  "104.md",
+  "105.md",
+  "106.md",
+  "107.md",
+  "108.md"
+ ],
+ "count": 1,
+ "memories": [
+  {
+   "title": "[苏房] listMixins 的 skipSearchParamsCache 只管了 created，watch.query 仍会把详情内嵌子表的分页写进主列表搜索缓存",
+   "type": "bug",
+   "content": "什么情况：详情页里内嵌一个列表子表（如「解封-用款监管」的 PayDetailsTable、担保的 RelatedBuildingsTable、协议的 AgreementDetailsTable），子表在 data 里设了 skipSearchParamsCache: true，本意是不与宿主列表页共用按 $route.path 索引的搜索条件缓存。为什么：listMixins 的 created 里对缓存读写做了 if (!this.skipSearchParamsCache) 守卫，但 watch.query 的 handler 没有同一个守卫，只要翻页、改 pageSize 触发 query 变化，就会 dispatch('common/saveSearchParams', { key: this.$route.path, params: newVal })，把子表的 pageNum/pageSize 以及业务外键（如 useMoneyApplyId）写进当前路由路径下的缓存。由于 key 是 $route.path，详情页与同路径的列表页共用同一个槽位，进入/刷新主列表时就会读到被污染的搜索条件，表现为「列表莫名其妙只剩几条」「条件串到别的页」。怎么做：写这类内嵌子表时，除了 data 里声明 skipSearchParamsCache，必须确认 mixin 的 watcher 也加了 if (this.skipSearchParamsCache) return（与 created 共用一个守卫）；新增带缓存的 mixin 能力时，一律把「读取、写入、监听器」三处当一个整体处理，只堵一处就是半成品。顺带：同类代码在 getList 里往 queryParams 上运行时补字段（this.queryParams.xxx = ...）也必须先声明键或用 $set，Vue 2 侦测不到新增属性。",
+   "evidence": "会话 062d9851 对 listMixins.js 的审查给出 [HIGH]：created:29-36 有 skipSearchParamsCache 守卫，而 watch.query:63-67 直接 saveSearchParams；结论指出 PayDetailsTable 等内嵌子表翻页会把 query 写入当前 $route.path 的缓存，「可能覆盖主列表或同路由其它页的搜索条件」，修复建议为 watcher 增加 if (this.skipSearchParamsCache) return；同一结论另给出 [MEDIUM]：PayDetailsTable.vue:149 运行时新增 queryParams.useMoneyApplyId 未用 $set。",
+   "files": [
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/views/supervision/unblock/usemoney/components/PayDetailsTable.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "062d9851-ae93-4ae5-8f92-aae108b4878c"
+   ],
+   "bundle": "104.md"
+  }
+ ]
+}

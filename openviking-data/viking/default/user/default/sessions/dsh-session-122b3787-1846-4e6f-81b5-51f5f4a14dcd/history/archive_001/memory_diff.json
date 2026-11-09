@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-122b3787-1846-4e6f-81b5-51f5f4a14dcd/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T06:23:33.511074+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited/memories/events/2026/11/09/我的页改用登录接口用户信息.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-09，Lead（gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited）指示「我的」页不可调用 C 端 profile 接口（/v2.0/security/ctAuth/profile），因为当前为管理端用户登录，登录接口（/v2.0/security/auth/login）响应已返回完整用户信息（nickName/userName/userId/phone/roles 等）。助手在 request.ts 新增登录用户缓存（setLoginUser/getLoginUser/clearLoginUser），flood.ts 登录落库并在注销清空，portalData.ts 的 fetchMine 改用本地登录用户信息、删除 api.queryUser 调用；经 Playwright 验证「我的」页展示 管理员/zsbase。Lead 随后选择提交并推送，修复合入 dev（6a7ca98）并推送 origin/dev，worktree 已清理。\n# 2026-11-09 (Monday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: 登录信息不要用profile接口，那是C端用户的信息，当前是管理端用户登录，登录接口已返回用户信息\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: User chose **提交并推送**. Let me commit in the worktree, merge to `dev`, push, then clean up the worktree. First check remote/branch state.\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: All done. Here's the summary.\n\n## 完成：我的页用户信息改用登录接口返回结果\n\n**问题**：管理端登录（`/v2.0/security/auth/login`）响应已直接返回用户信息（`nickName`、`userName`、`userId`、`phone`、`roles`…），但「我的」页仍调用 C 端 `profile` 接口（`/v2.0/security/ctAuth/profile`）取用户信息——那是居民端用户的数据，属跨端误用，导致展示与服务端返回不一致。\n\n**改动**（3 个源码 + 2 个测试文件）：\n- [request.ts](<src/utils/request.ts>)：新增登录用户信息本地缓存 `setLoginUser/getLoginUser/clearLoginUser`，含 `LoginUserInfo` 类型。\n- [flood.ts](<src/stores/flood.ts>)：登录成功后缓存登录接口返回的用户信息（合并 `data.user` 与扁平 `data`，剔除 `token/accessToken` 敏感字段不落库）；注销时一并清空。\n- [portalData.ts](<src/utils/portalData.ts>)：`fetchMine()` 改用本地登录用户信息，删除 `api.queryUser()`（profile）调用。\n- [portal.test.ts](<tests/portal.test.ts>)、[request.test.ts](<tests/request.test.ts>)：补充缓存读写与「我的」页取登录用户信息的单测。\n\n**验证**：\n- 单测全绿：34 passed（含新增 3 条）。\n- 构建通过（`uni build -m test`，remote 模式）。\n- 部署到本地 nginx 站点（127.0.0.1:8095）后用 Playwright 真机联调：登录接口返回 `nickName:\"管理员\"`、`userName:\"zsbase\"`，「我的」页正确展示 **管理员 / 已认证 / 登录名：zsbase**，不再是 C 端静态数据（陈乔乔/300007）。截图见 `.user-card` 文本 `管理员 / 已认证 / 登录名：zsbase`。\n\n**提示（数据侧）**：当前 dev 网关登录接口返回的 `nickName` 原始值为 `\"管理员%\"`（带一个尾随 `%`，接口本身返回如此），页面忠实展示该值。这属后端返回值问题，不在前端本次范围内，如需去掉可让后端修正。\n\n**Git**（顶层仓库，无子模块）：\n- 分支 `fix/login-userinfo-from-login` 提交 `064644e`，已推送远程。\n- 合并入 `dev`（merge commit `6a7ca98`），已推送 `origin/dev`（`2908f6a..6a7ca98`），本地与远程一致。\n- 独立 worktree 已删除（`git worktree remove` + `prune`），主工作区仅剩 `dev`，工作区干净。\n- 注：dev 上另有 2 个此前已完成的任务提交（`fix/study-tab-no-scrollbar`）一并随本次推送上了远程。\n\nnginx 站点根目录 `D:/repository/苏住房防汛C端/dist` 已是本次改动构建产物，可正常访问。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/project/zhi2_query_h5c.md",
+                "memory_type": "entities",
+                "after": "# 苏住房防汛C端移动查询H5\nuni-app Vue3 H5 项目（苏住房防汛C端移动查询），GitLab 仓库 suzhufang-fe/zhi2-mobile-query-h5-c，主开发分支 dev，前端目录 D:\\repository\\苏住房防汛C端。\n\n## 构建与部署\n- 构建：`uni build -m test --outDir ./dist` 为 remote 模式（用 .env.test），默认 `bun run build` 为 demo 模式（usePortalApi() 返回 false 走 seed 数据）\n- 部署：nginx UI 站点「苏住房防汛C端.conf」root 指向 D:/repository/苏住房防汛C端/dist，监听 8095，/api/ 反代到 dev 网关\n- 验证：Playwright 真机联调走端口 8095，e2e 凭据 zsbase / Zs@2026Aa!（密码需 AES-CBC 加密，参考 src/utils/passwordEncrypt.js）\n\n## 登录与用户态\n- 登录：useFloodStore().login 调 /v2.0/security/auth/login，响应 data 含 nickName/userName/userId/phone/roles/roleKeys 等\n- 「我的」页：portalData.ts 的 fetchMine 负责组装我的页数据\n- 任务流程：每任务建 git worktree，验证后合并 dev 再清理 worktree\n\n## 验证与归属\n- 所属项目：苏住房防汛C端；来源会话：2026-11-09 登录用户信息修复任务\n- 被苏住房C端(zhi2-mobile-shimin)参考其接口与跳转模式（2026-11-09）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/query_h5_logininfo.md",
+                "memory_type": "entities",
+                "after": "# 我的页用登录接口用户信息而非C端profile\n苏住房防汛C端移动查询H5 的「我的」页原先调用 C 端 profile 接口取用户信息，属跨端误用，已改为使用管理端登录接口返回的用户信息。\n\n## 问题根因\n- 「我的」页（mine）经 portalData.ts 的 fetchMine 调用 api.queryUser()，底层为 C 端 profile 接口 /v2.0/security/ctAuth/profile\n- 当前为管理端用户登录，该接口返回的是居民端用户数据，导致展示与服务端返回不一致\n\n## 修复方案\n- request.ts：新增 setLoginUser/getLoginUser/clearLoginUser 及 LoginUserInfo 类型，本地缓存登录用户信息（key 如 flood-login-user-v1）\n- flood.ts：登录成功后将登录响应 data（合并 data.user 与扁平 data，剔除 token/accessToken 敏感字段）落库；注销时 clearLoginUser\n- portalData.ts：fetchMine 改用 getLoginUser() 本地登录用户信息，删除 api.queryUser() 调用\n\n## 验证与归属\n- 单测 34 passed（含新增 3 条）；uni build -m test 通过；nginx 8095 站点 Playwright 验证显示 管理员/zsbase 而非 seed 陈乔乔/300007\n- 注意：dev 网关登录接口返回的 nickName 原始值为 \"管理员%\"（带尾随 %，后端数据问题，前端忠实展示）\n- 涉及文件：src/utils/request.ts、src/stores/flood.ts、src/utils/portalData.ts\n- 所属项目：苏住房防汛C端；来源会话：2026-11-09；分支 fix/login-userinfo-from-login 合入 dev(6a7ca98)"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited/memories/profile.md",
+                "memory_type": "profile",
+                "before": "# Lead\n(as of 2026-11-06)\n- 负责门户H5 项目（从苏住房防汛C端迁移登录与子系统选择页）的任务分配与构建协调（as of 2026-11-06）\n- 负责苏住房防汛C端移动查询H5项目（数智页面等）的任务分配与构建协调（as of 2026-11-07）",
+                "after": "# Lead\n(as of 2026-11-06)\n- 负责门户H5 项目（从苏住房防汛C端迁移登录与子系统选择页）的任务分配与构建协调（as of 2026-11-06）\n- 负责苏住房防汛C端移动查询H5项目（数智页面等）的任务分配与构建协调（as of 2026-11-09）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

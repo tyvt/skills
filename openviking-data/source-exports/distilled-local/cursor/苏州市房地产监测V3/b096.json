@@ -1,0 +1,80 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "096",
+ "files": [
+  "096.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "你截图里红框标注的「附件块」，已在 建设用地规划许可",
+   "type": "preference",
+   "content": "你截图里红框标注的「附件块」，已在 **建设用地规划许可证** 详情页落地，实现方式与预售延期、人员备案等页面的内联要件一致。 ### 改动说明 1. **`conLandLic/detail.vue`（正证详情）** - 在「基本信息」下方增加 **「要件上传」**，使用 `AppendixPackageSection`（`requirement-grid`）。 - 顶部操作栏关闭抽屉式 **「附件」**（`:show-attachment=\"false\"`），避免与页面内要件重复。 - `busCode` 来自路由 meta（`060602`，`getRouteMetaValue`）。 - 新增：临时 `attachGroupId` 挂要件，保存时随 `attachGroupId` 提交；保存前 `checkRequiredAppendix` 校验必传要件。 - 新增/编辑态在 `formMode === 'add'` 或 `bizState === '0'` 时可上传要件。 2. **`conLandLic/changeDetail.vue`（变更详情）** - 同样增加内联要件区（`busCode`：`060606`）。 - 从原证发起变更新增时，将 `bizState` 置为 `'0'`，避免继承已备案状态导致要件只读。 查看态（你截图中的场景）在选好项目并存在 `con",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**`conLandLic/detail.vue",
+    "**`conLandLic/changeDetail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\projectManagement\\customerProject\\components\\ProjectCertificateTabs.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\AppendixPackageSection\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "08d158aa-14a3-438a-98bd-09ead4ebdacd"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "原因说明 getLast 在 HTTP 200 / ",
+   "type": "bug",
+   "content": "## 原因说明 `getLast` 在 **HTTP 200 / `code: 200`** 时其实已成功，失败发生在**下一步跳转**： 1. `handleStartChange` 里用 `getRouterPathByFilePath('company/companyAdminChange/.../detail')` 解析路由，但**未传 `busCode`（如开发企业 `qyglybg`）**，动态菜单里变更详情多为 hidden，仅靠 `filePath` 常匹配不到。 2. 匹配失败时 `getRouterPathByFilePath` 会 **抛错**；或拼出**空 path**，`router.push` 再失败。 3. 外层是空的 `catch`，统一提示 **「发起变更失败，请稍后重试」**，看起来像接口失败，实际是**路由未登记/未解析**。 ## 修改说明 1. **`detail.vue`**：用 `buildNavigationByFilePath` 按 `filePath` + `busCode` + `pathHint` + `routeId` 生成跳转（支持 `:tableid` 与命名路由 + `query.id`）；`resolveChangeId(res.data, res)` 兼容多种返回结构。 2. **`ruoyi.js`**：`get",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**`detail.vue",
+    "**`ruoyi.js",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyAdmin\\detail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\utils\\resolveChangeId.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a6708ea4-5668-470a-8195-2f5b2f48cf71"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "原因 从项目备案详情点「变更」会进入 /custom",
+   "type": "preference",
+   "content": "## 原因 从**项目备案详情**点「变更」会进入 `/customerProjectChange/detail/add?projectId=原备案ID`。 保存成功后虽然路径会变成 `/detail/{变更单ID}`，但 query 里仍带着 `projectId`。 原先 `getId()` 会**优先读 query 里的 `projectId`**，详情接口因此仍用备案主键，而不是保存返回的 `projectChangeId`。 ## 修改 1. **`ruoyi.js` — `resolveIdFromRoute`** 路径末段已是业务主键时，优先用路径 ID；`query.projectId` 仅作兜底（例如列表跳转只有 query、没有路径 ID 的场景）。 2. **`customerProject/changeDetail.vue` — `addCallback`** 保存成功后用 `resolveResponseId(response, 'projectChangeId')` 跳转，并从 query 中去掉 `projectId`，避免继续误用备案 ID。 请再测一遍：**已备案项目 → 变更 → 保存**，确认详情请求体里是 `projectChangeId`，且页面数据为变更单内容。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**`ruoyi.js",
+    "**`customerProject/changeDetail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\projectManagement\\auxiliaryProject\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\projectManagement\\buildingTable\\components\\projectForm.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2771a096-b3e2-4777-978c-59d66df37c8e"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "这个没生效，变成1行1列了，全局排查修复类似问题",
+   "type": "fact",
+   "content": "已按计划完成修改，摘要如下： ### 1. [`QualificationFormSection.vue`](zhi2-web-admin/src/views/register/components/QualificationFormSection.vue) - 根节点改为 `section-form`，各字段用 `section-field` 包裹，备注使用 `section-field--full` - 去掉 `el-row` / `el-col`，逻辑与 `data-testid` 不变 ### 2. 引用方 - [`DeveloperBasicInfoForm.vue`](zhi2-web-admin/src/views/company/companyManagement/components/DeveloperBasicInfoForm.vue)：资质区直接渲染组件，删除 `qualification-form` 包裹及 scoped 单列补丁 - [`companyRegister/detail.vue`](zhi2-web-admin/src/views/company/companyRegister/detail.vue)：去掉多余的嵌套 `el-row` ### 3. 全局兜底 - [`detail-form.scss`](zhi2-web-admin/src/s",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`QualificationFormSection.vue`](zhi2-web-admin/src/views/register/components/QualificationFormSection.vue",
+    "[`DeveloperBasicInfoForm.vue`](zhi2-web-admin/src/views/company/companyManagement/components/DeveloperBasicInfoForm.vue",
+    "[`companyRegister/detail.vue`](zhi2-web-admin/src/views/company/companyRegister/detail.vue",
+    "[`detail-form.scss`](zhi2-web-admin/src/styles/detail-form.scss"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ae3c4552-cf65-45ec-8e81-c709ae573cb8"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

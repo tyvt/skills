@@ -1,0 +1,82 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "175",
+ "files": [
+  "175.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "从业人员变更的提交id给错了，给了 personal",
+   "type": "bug",
+   "content": "**原因** 经纪/租赁从业人员在页内变更时，路由里的 `id` 仍是备案主键 `personnelRecordId`，变更单 ID 在 `personnelRecordChangeId`。`operation-btn-group` 未传 `:id` 时会用路由 `id` 做提交，因此变更提交误用了备案 ID。 **修改**（与 `staffManagement/detail.vue`、`AgencyBranchDetail.vue` 一致） 1. **经纪机构** `AgencyPersonnelDetail.vue` 2. **租赁机构** `LeasePersonnelDetail.vue` - 增加计算属性 `flowBusId`：变更态用 `changeRecordId`（即 `personnelRecordChangeId`），否则用 `personnelRecordId` - `primaryKey` 改为计算属性：变更态为 `personnelRecordChangeId` - 给 `operation-btn-group` 传入 `:id=\"flowBusId\"` 开发企业从业人员变更（`company/staffManagement/components/detail.vue`）此前已正确传入 `flowBusId`，未改。 发起变更后点「提交」，请求体应变为变",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`staffManagement/detail.vue`、`AgencyBranchDetail.vue",
+    "`AgencyPersonnelDetail.vue",
+    "`LeasePersonnelDetail.vue",
+    "开发企业从业人员变更（`company/staffManagement/components/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "44e93c46-8334-4d7b-acd0-2ebaf6f3edea"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "什么问题？",
+   "type": "preference",
+   "content": "已按计划完成修复，全部 5 条用例中 4 条通过、1 条按预期 skip。 ## 变更摘要 **根因**：`AgencyBranchDetail.handleSave` 在发 `/company/agencyBranch/submit` 前会调用 `checkRequiredAppendix`，测试只 `patchComponentForm` 填表、未上传必传要件，保存被前端拦截，导致 `waitForResponse` 超时。 **修复内容**： 1. **测试附件 fixture**（`e2e/fixtures/assets/`） - `test-appendix.png` — 图片类要件 - `test-appendix.pdf` — 仅 PDF 要件（如「新入网登记表」） 2. **`institution-helpers.js` 新增 helper** - `uploadRequiredAppendix(page, testId)` — 遍历 `.required` 要件项，按 `.el-upload__tip` 选择 png/pdf，上传并等待 `/file/appendix/upload` - `clickSaveAndWaitForSubmit(page, matchSubmit)` — 点击保存并等待 submit；若未发请求，附带 `.el-message--e",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**`institution-helpers.js",
+    "**`agency-branch-real-api-flow.spec.js",
+    "e2e/institution/agency-branch-real-api-flow.spec.js",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\e2e\\institution\\agency-branch-real-api-flow.spec.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "78e37b39-59fb-4f08-9f79-e96bf254bdd1"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Pr",
+   "type": "bug",
+   "content": "已修复。在 [`guarantee/detail.vue`](zhi2-web-admin/src/views/supervision/unblock/guarantee/detail.vue) 的 `data()` 中补充了三个缺失字段，与同模块列表页 [`guarantee/index.vue`](zhi2-web-admin/src/views/supervision/unblock/guarantee/index.vue) 保持一致： ```javascript primaryKey: 'useMoneyApplyId', moduleName: 'prefund', businessName: 'useMoneyApply', ``` **效果：** - 消除 `businessName`、`primaryKey`（以及 `moduleName`）未定义的 Vue 警告 - `operation-btn-group` 能正确接收参数 - `getDetail()` 可正常拼接并请求 `/prefund/useMoneyApply/detail` 请刷新保函用款详情页确认控制台无警告，且查看/编辑模式下详情数据能正常加载。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`guarantee/detail.vue`](zhi2-web-admin/src/views/supervision/unblock/guarantee/detail.vue",
+    "[`guarantee/index.vue`](zhi2-web-admin/src/views/supervision/unblock/guarantee/index.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\unblock\\guarantee\\detail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\unblock、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\mixins\\detailMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e533c035-bd03-4c12-aa72-72937c898843"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "经纪机构备案证书弹窗改版 Implement the",
+   "type": "pattern",
+   "content": "备案证书弹窗改版已完成，主要变更如下： ### 改动文件 1. **新增** `zhi2-web-admin/src/assets/images/record-certificate-bg.jpg` — 设计稿背景图 2. **重写** `RecordCertificateDialog.vue` — 按设计稿实现正式证书样式 ### 弹窗效果 - 横向 A4 比例证书容器，使用背景图 - 标题：**苏州市房地产经纪机构备案证书** - 右上：**备案证书编号** - 6 个字段：机构名称、统一社会信用代码、法定代表人、经营地址、备案业务范围、备案有效期限 - 右下：备案机关（固定）、发证日期、盖章占位 - 底部监制/印制文案 - 斜向重复水印 ### 已移除 - 旧表格布局 - 「备案经纪人」表格 - `company_certificate_level` 字典相关逻辑 ### 字段映射 | 设计稿 | API 字段 | |---|---| | 备案有效期限 | `recordTermEnd` → `YYYY年MM月DD日` | | 发证日期 | `recordTime` → `YYYY年MM月DD日` | | 备案业务范围 | `businessScope` | | 备案机关 | 固定「苏州市住房和城乡建设局」 | ### 调用方 `institution/record/inde",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`RecordCertificateDialog.vue",
+    "`institution/record/index.vue",
+    "`companyApplyAudit/detail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution\\record\\components\\RecordCertificateDialog.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution\\record\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\api\\company\\companyApply.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c0e6e780-7c64-4045-ac06-51b5d3a2354a"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

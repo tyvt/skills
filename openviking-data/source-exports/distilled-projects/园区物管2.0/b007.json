@@ -1,0 +1,183 @@
+{
+ "project": "园区物管2.0",
+ "batch": 7,
+ "files": [
+  "025.md",
+  "026.md",
+  "027.md",
+  "028.md"
+ ],
+ "count": 10,
+ "memories": [
+  {
+   "baseline": "c97957703",
+   "content": "什么情况：地图总览页生产环境腾讯区划数据加载失败，一直走 ./map/ws/district/... 本地代理（仅开发环境 Vite 有该代理），生产必然 404。为什么：源码里环境判断写成了 `if (void 0 !== import.meta && l && !0)` 这类「判断 import.meta 是否存在」的写法，经 esbuild/terser 压缩后条件被错误求值（l 为空对象时恒为真），导致生产环境仍走 dev 才有的代理路径，而不会回落到 JSONP（apis.map.qq.com）。做法：环境判断必须直接使用 `import.meta.env.DEV`，让压缩器把分支固化成布尔常量、dead code 直接被剔除，而不是运行时探测 import.meta 对象是否存在；这类写法在所有「仅开发环境存在的代理/路径」判断里通用。另外注意 Vite 构建产物带内容哈希，生产报「某 index-*.js 打不开」时先分清是旧哈希残留（部署不完整或 CDN 缓存旧 module-main 仍引用旧 chunk）还是路径不对——排查口径是 Network 看失败文件哈希是否还在 index.html/module-main 的新引用里，处理方式是整包 dist 覆盖部署 + 清缓存，不要只拷部分文件。",
+   "evidence": "旧构建 index-DUzdsYzz.js 中条件被压缩为 `void 0 !== import.meta && l && !0` 恒真走 ./map 代理；新构建改用 import.meta.env.DEV 后正确走 JSONP。生产 404 的另一类根因是哈希 chunk 部署/缓存不一致。",
+   "files": [
+    "zhi2-web-admin/src/utils/tencentDistrictBoundary.js",
+    "zhi2-web-admin/vite.config.js",
+    "env/.env"
+   ],
+   "sessionIds": [
+    "ac58497a-ed22-4c45-9d37-10c8fea8f2dd"
+   ],
+   "title": "[园区物管] 腾讯区划边界接口环境判断必须用 import.meta.env.DEV，不要写 void 0 !== import.meta",
+   "type": "bug",
+   "bundle": "025.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "fc994977f",
+   "content": "什么情况：benefit/pubVerificationReceipts（银行回单核销/验证收款单）模块对接后端时，借贷方向字段 loanDirction 的取值契约与直觉相反。为什么：后端该接口不收 1/2 数字字典值，而是收中文「借 / 贷」；且回单流水号与子表单据列表是强绑定关系——重选回单意味着已选的子表单据要全部删除重选。做法：1) 抽 normalizeLoanDirction 归一化函数，在保存（getForm）、详情回填（detailCallback）、选回单回填（fillFormFromBankReceipt）三处统一把 1/2 或字典值转成「借/贷」；选回单弹窗按业务语义筛选：收入类传「贷」、支出类传「借」。2) 用 isReceiptSerialEditable 控制回单流水号仅新增态可点选/可清空，编辑态 disabled 并在选择弹窗入口和清空函数里加守卫，从交互上杜绝「换回单却要删光子表」的复杂分支。通用启示：与「子表数据来源于某个主选择项」的单据，编辑态应锁定主选择项而不是允许换选后再批量清理。",
+   "evidence": "normalizeLoanDirction 统一三处转换；isReceiptSerialEditable + openBankReceiptSelect/clearBankReceiptFields 守卫；用户明确要求「传借或者贷，不传1或者2」「编辑时不让重新选回单流水号」。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubVerificationReceipts/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubVerificationReceipts/components/VerificationReceiptDetailTable.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/mixins/form.js"
+   ],
+   "sessionIds": [
+    "8e7e3010-be24-4507-a451-7199a958a01e"
+   ],
+   "title": "[园区物管] 银行回单核销单业务约定：loanDirction 传「借/贷」中文枚举，编辑态锁死回单流水号",
+   "type": "pattern",
+   "bundle": "025.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232",
+   "content": "什么情况：生产环境页面报 TypeError: Failed to fetch dynamically imported module（如 .../assets/index-BJlYXbMW.js），但本地构建正常。为什么：控制台里形如 .../assets/%E4%BC%9A%E6%89%80-xxx.js（URL 编码中文）的请求，是 Vite 为每个被 import 的静态资源模块打出的小 JS chunk（再导出图片 URL），chunk 名来自源文件路径。页面里用中文文件名 import PNG（如 会所.png、帐篷租赁.png）时，部署在 /sz/ 子路径下且部分 Nginx/CDN 对 URL 编码的中文路径不友好，会 404，进而触发顶层的动态模块加载失败。怎么做：把源码里所有中文命名的静态资源统一改成英文短名（会所.png→club.png），import 路径同步替换，业务层用中文 key 的映射表（如 STAT_ICON_MAP）无需改动；重建后确认 dist/assets 中不再出现中文命名的 chunk。另注意：若部署后仅主入口 chunk 仍报 Failed to fetch，多半是整包未同步完 / CDN 或浏览器缓存了旧 index.html 指向新 hash / 网关只转发了部分静态文件，处理办法是全量发布 dist 并强刷/清 CDN，保证 index.html 与各 assets/*.js 来自同一次构建。",
+   "evidence": "会话 d9094763：%E4%BC%9A%E6%89%80-xxx.js 等 URL 编码中文 chunk 404；改名后产物变为 club-*.js、temp-stall-*.js 等 ASCII 名。",
+   "files": [
+    "src/views/benefit/statisticsMap/images/",
+    "src/assets/images/benefit/",
+    "src/views/benefit/statisticsMap/components/operatingAssets.vue"
+   ],
+   "sessionIds": [
+    "d9094763-20ae-4fff-969b-13dc3c307504"
+   ],
+   "title": "[园区物管2.0] Vite 静态资源中文文件名会被打成中文命名 chunk，部署到子路径/CDN 时 404 并伪装成动态模块加载失败",
+   "type": "bug",
+   "bundle": "026.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "3965548b6",
+   "content": "什么情况：饼图渲染时控制台反复报 `series not exists. Legend data should be same with series name or data name`，且每次 resize 都触发一次（如窗口/布局度量变化时）。为什么：之前改动在无有效数据时把 series.data 里 count=0 的项过滤掉了，但图例 legend.data 仍写死展示全部 13 个子分类名称；ECharts 强制图例名称必须与 series 名称或数据项名称一致，不一致就会在每次 resize 时报错。怎么做：图例与 series 必须同源派生——只展示 value>0 的分类，保证 legend.data 与 series.data 名称集合一致；无有效数据时干脆隐藏图例，中心显示「暂无数据」。凡是「按条件过滤 series 数据」的图表（0 值过滤、状态过滤等），都要同步用同一份过滤后的数据生成 legend，不能各自维护两份列表。",
+   "evidence": "会话 adffdf74：count=0 项被过滤但图例仍展示全部 13 个子分类，resize 时报 series not exists；修复为图例仅展示 value>0 的分类并无数据时隐藏图例。",
+   "files": [
+    "src/views/benefit/dataSandbox/assetPanorama/index.vue",
+    "src/views/benefit/dataSandbox/assetPanorama/mock.js"
+   ],
+   "sessionIds": [
+    "adffdf74-a80c-4a6c-8841-4709866ec450"
+   ],
+   "title": "[园区物管2.0] ECharts 图例数据未随 0 值过滤同步，resize 时反复报 series not exists",
+   "type": "bug",
+   "bundle": "026.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "177bc3ce4",
+   "content": "什么情况：物业服务监管账户选择弹窗 /benefit/pubRegulatoryAccount/pageIsAgreement 需要按端别区分过滤条件——B 端（物业）必须带 projectId，G 端不带。为什么：zs-select-dialog-func 是公共函数式弹窗，最初把「B 端追加 projectId」写进了组件内部，导致通用组件绑定单一业务语义，其他业务复用时行为不可控；且端别条件本质是调用方的上下文，不是弹窗自身职责。怎么做：把业务逻辑从 zs-select-dialog-func.vue 剥离还原成纯通用组件，在全部 17 个调用页面（assetLeaseApply、pubUseMoneyApply、pubBankReceiptApply、pubCommunityBook 等 benefit 域页面）的 SelectDialog.open 处统一加 filterParams 展开：const isBTerminal = this.$store.state.user.terminalType === 'B'，再按 isBTerminal ? { projectId: this.$store.getters.currentProjectId } : {} 注入。套路与已知「B 端按 terminalType 隐藏搜索项要逐页过滤」同源但方向相反：这里是按页面追加查询参数，同样禁止改公共组件，靠调用方 filterParams 注入端别差异。",
+   "evidence": "027.md 会话 e5aac6dd：『已按你的要求处理：撤销了公共组件中的业务逻辑，并在各业务页面单独添加 B 端 projectId 查询条件』，附 17 个页面清单与 filterParams 代码片段",
+   "files": [
+    "src/components/zs-select-dialog/zs-select-dialog-func.vue",
+    "src/views/benefit/assetLeaseApply/detail.vue",
+    "src/views/benefit/pubBankReceiptApply/detail.vue",
+    "src/views/benefit/pubCommunityBook/index.vue"
+   ],
+   "sessionIds": [
+    "e5aac6dd-3ab0-4e2f-9913-fb3d8282eb18"
+   ],
+   "title": "[园区物管2.0] 公共选择弹窗不塞端别业务逻辑：B 端 projectId 过滤条件在 17 个调用页逐页注入 filterParams",
+   "type": "pattern",
+   "bundle": "027.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "177bc3ce4",
+   "content": "什么情况：维修资金立项配置详情页滚动时，顶部吸顶的「返回/编辑/附件」按钮组被右侧表格固定操作列盖住；同时子表「维修项目名称示例配置」的操作列按钮被裁切。为什么：两层叠加——① OperationBtnGroup 的 z-index 曾从 10 降到 1，而 Element UI 表格 fixed 列的 z-index 是 10，吸顶层低于固定列必然被盖；② zs-operate-column 计算列宽时单元格 padding 按 24px 估算，全局样式实际是 padding: 0 16px（共 32px），三个按钮时列宽偏小导致裁切。怎么做：① OperationBtnGroup z-index 提到 11（只需高于表格固定列的 10，不必大改全局层级）；② zs-operate-column：单元格内边距按 32px 估算、加 8px 宽度缓冲、新增 columnWidth 计算属性避免初始宽度为 0、watch buttons 变化重算列宽；③ Headline 展开态把 overflow 设为 visible，避免子表格操作按钮被容器裁掉。排查同类「吸顶被固定列盖住」先对 z-index 数值，别先怀疑权限或渲染。",
+   "evidence": "027.md 会话 bab7ae04 最终结论：列明 z-index 10→1 被 fixed 列盖住、24px 与实际 32px padding 的估算偏差，及三处修改",
+   "files": [
+    "src/components/OperationBtnGroup/index.vue",
+    "src/components/zs-operate-column/zs-operate-column.vue",
+    "src/components/Headline/index.vue",
+    "src/views/maintenance/projectConfig/detail.vue"
+   ],
+   "sessionIds": [
+    "bab7ae04-5ce6-4273-85a2-99300d7e520e"
+   ],
+   "title": "[园区物管2.0] 吸顶操作栏被表格固定列遮挡 + 操作列按钮裁切：z-index 低于 10 与列宽 padding 估算错的叠加根因",
+   "type": "bug",
+   "bundle": "027.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "f00310232",
+   "content": "什么情况：数据沙箱/全景类大屏页（assetPanorama、fundPanorama、mapOverview）按 1920 设计稿做 scale 等比缩放后，内容偏高时底部留大片空白或超出一屏，收起侧边菜单后宽度右侧留白。为什么：缩放比通常取 min(按宽比例, 按高比例)；当内容偏高时 scale = vh/内容高度 会小于按宽的 vw/1920，此时若设计稿仍固定 1920px，实际显示宽度 = 1920 × scale < 视口宽，右侧必然出现空白。高度写死也导致整体被压出一屏。怎么做：① 动态设计稿宽度——高度受限时把设计稿宽设为 max(1920, ceil(视口宽/scale))，保证 设计稿宽 × scale = 视口宽，横向铺满；② 统一 scale = min(按宽, 按高)，一屏内完整且不变形；③ 收紧各区块默认高度（柱图/饼图/趋势图/指标卡各减 30~50px）减轻高度约束、提高可用缩放比；④ 侧栏收起/展开后重新计算缩放。新增大屏页直接复用 assetPanorama 的这套缩放处理，不要各页自写比例逻辑。",
+   "evidence": "027.md 会话 aedd6cfa 最终结论：给出「内容偏高时按高度收紧 scale，1920×scale<视口宽导致右侧空白」的根因推导与动态设计稿宽度公式",
+   "files": [
+    "src/views/benefit/dataSandbox/assetPanorama/index.vue",
+    "src/views/benefit/dataSandbox/fundPanorama/index.vue",
+    "src/views/benefit/mapOverview/index.vue"
+   ],
+   "sessionIds": [
+    "aedd6cfa-10c2-4204-ace0-2dc1b2eb8a12"
+   ],
+   "title": "[园区物管2.0] 大屏 1920 等比缩放右侧留白：按高度缩放时须动态放大设计稿宽度而非固定 1920",
+   "type": "pattern",
+   "bundle": "027.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "3965548b6",
+   "content": "什么情况：B 端新增页（pubParkingRate/detail.vue 等）带默认小区进入时，街道、社区字段缺失。为什么：initDict 里立刻执行 initCurrentProject（请求 /property/complex/{projectId} 后调 applyPropertyProjectRow），而街道/社区名称要靠 area mixin 的 getSubdistrictNameByCode / getCommunityNameByCode 从字典反查，该字典在 created 里异步加载——反查执行时字典还是空的，拿到 undefined。另外原逻辑若 form.projectId 已有值（如 session 缓存）就直接 return，即使街道/社区为空也不再补全。怎么做：① 新增 syncSubdistrictCommunityFromCodes：字典未就绪时用 $watch 等待字典加载完成后再写入名称；② 调整 initCurrentProject：缺少街道/社区时用当前或默认 projectId 重新拉取小区补全，而不是提前 return。凡使用 initCurrentProject + area mixin 反查的页面（pubQuarterlyDeclaration 等）都可能踩同一竞态，按同方式处理。",
+   "evidence": "027.md 会话 6e97f2b9 最终结论：『initDict 里立刻执行 initCurrentProject，而街道/社区列表在 created 里异步加载，反查时字典常为空』+ 提前 return 问题与两处修改",
+   "files": [
+    "src/views/benefit/pubParkingRate/detail.vue",
+    "src/mixins/area.js"
+   ],
+   "sessionIds": [
+    "6e97f2b9-b0d9-4363-889e-533667c5bbef"
+   ],
+   "title": "[园区物管2.0] B 端默认小区街道/社区反查为空：initCurrentProject 与 area 字典异步加载的竞态 + projectId 提前 return",
+   "type": "bug",
+   "bundle": "027.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "fc994977f",
+   "content": "什么情况：详情页（pubElevMaintenanceNew/detail.vue）渲染时报 `Cannot read properties of undefined (reading 'undefined')`，错误定位在公共组件 OperationBtnGroup，页面本身看不出问题。为什么：OperationBtnGroup 内部渲染打印按钮时会访问 `form[primaryKey]` 来拼 url-params；页面若未传 `:form`、`:primaryKey`，primaryKey 为 undefined 且 form 也未传，渲染期直接崩溃。同时页面把权限串当成了 business-name（写成 `business-name=\"benefit:pubElevMaintenanceNew\"`），导致 `moduleName` 未定义告警。怎么做：给 operation-btn-group 补全 `:form`、`:primaryKey`、`:moduleName`、`:businessName` 四个必要属性（可对齐同模块已有 detail.vue 的写法）；moduleName 与 businessName 分开——moduleName 是模块段、businessName 是业务名（不带模块前缀），发布类按钮权限按 `${moduleName}:${businessName}:publish` 动态拼；form 中须含业务主键字段（如 consumptionId/consumptionNo）供打印 url-params 使用。同一详情页按路由区分业务时，用 computed 按路由名返回不同的 moduleName/primaryKey 组合。",
+   "evidence": "会话最终结论：OperationBtnGroup 渲染访问 form[primaryKey]（打印按钮 url-params），页面未传 :form/:primaryKey/:moduleName/:businessName 且把权限串当 business-name 传入，报 Property \"moduleName\" is not defined 与 Cannot read properties of undefined (reading 'undefined')；修复为补全属性并新增按路由区分业务的 computed（EnergyDeclaration→pubElevMaintenanceNew/maintainId，其他→pubPublicEnergyConsumption/consumptionId）。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubElevMaintenanceNew/detail.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/views/benefit/pubElevMaintenanceNew/components/expendTable.vue"
+   ],
+   "sessionIds": [
+    "99b102a3-dcff-4e89-a5a6-982a16f73b88"
+   ],
+   "title": "OperationBtnGroup 渲染期必传四件套：缺 :form/:primaryKey 会直接崩，businessName 不能填权限串",
+   "type": "bug",
+   "bundle": "028.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "5a288f142",
+   "content": "什么情况：用 driver.js 做新手引导时，若被聚焦的元素位于视口顶部（如顶部导航栏的「切换项目」按钮），聚焦框上边框会被屏幕裁掉，看起来像「聚焦元素超出屏幕」，怎么改 border 都显示不全。为什么：driver.js 默认给聚焦区域加 10px padding，聚焦框比元素大一圈，贴顶元素的高亮框顶部≈元素顶部−10px，落到视口外；且 border 是向外画的，贴顶时上边框同样在视口外。怎么做：两类元素贴近视口边缘时引导高亮要 (1) 设 `padding: 0` 让聚焦框与元素等大，不再向外溢出；(2) 高亮标识不用 border，改用内描边 `box-shadow: inset ...`，边框画在框内，贴顶/贴边时四边都能完整显示。另外 driver.js 的引导标记存在 localStorage（如 driverProjectSwitch），改完引导配置后要 `localStorage.removeItem(key)` 清除旧标记才能重新验证。",
+   "evidence": "会话最终结论：driver.js 默认聚焦区域加 10px padding，贴顶元素聚焦框顶部跑到视口外被裁切；修复为 padding:0 + 红色标识改 box-shadow: inset 内描边，并提示 localStorage.removeItem('driverProjectSwitch') 清除引导标记后重验。",
+   "files": [
+    "zhi2-web-admin/src/utils/driver.js",
+    "zhi2-web-admin/src/views/home/bProjectDialog.vue"
+   ],
+   "sessionIds": [
+    "b97cc65a-b35d-4756-a207-7c59f24b16eb"
+   ],
+   "title": "driver.js 引导聚焦贴顶元素被裁切：padding:0 + inset box-shadow 内描边",
+   "type": "pattern",
+   "bundle": "028.md",
+   "project": "园区物管2.0"
+  }
+ ]
+}

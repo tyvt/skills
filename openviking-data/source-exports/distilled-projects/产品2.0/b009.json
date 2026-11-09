@@ -1,0 +1,101 @@
+{
+ "project": "产品2.0",
+ "batch": 9,
+ "files": [
+  "033.md",
+  "034.md",
+  "035.md",
+  "036.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "页面挂载的审核按钮不出现：zs-approval 只认路由 meta.busCode，实例编码要显式覆盖",
+   "type": "bug",
+   "content": "现象：企业注册详情页（company/companyRegister/detail.vue）的「审核」按钮完全不渲染，控制台无报错。\n\n为什么：审核按钮由公共 zs-approval 渲染，它内部只从 this.$route.meta.busCode 取业务编码，再调 /flowable/task/isApprovalAuth 判当前用户是否该节点审批人。企业注册的实际编码是 040100（定义在 companyRegister.js 常量里），而这条详情路由的 meta 往往没有 busCode，取到 undefined 后流程权限查询被整体跳过，按钮直接不渲染——不报错、不留日志，看起来像权限问题。\n\n怎么做：给 zs-approval / ApprovalProcessDialog 增加一个 bus prop，优先级「prop 显式传值 > 路由 meta」；页面侧写 const registerBusCode = this.$route.meta.busCode || '040100' 并 :bus-code 透传，OperationBtnGroup 负责把 busCode 继续转发给 zs-approval，审批提交接口也用同一个编码。排查顺序上要记住：即使编码对了，按钮仍需 bizState === 1（已提交待审核）+ 有 company:companyRegister:approval 权限码 + isApprovalAuth 返回 true 三者同时成立。\n\n与已知「auditBusCode 兜底」「审批按钮权限从 flowable 动态取」互不重复：那两条讲兜底取值与权限来源，这条讲的是组件根本没有外部覆盖入口。\n\n适用面：同源四项目所有「页面自己挂 zs-approval、而该业务编码不是路由天然携带」的详情页（变更单、专项审批节点等），都应显式传 bus-code 而不是寄望 meta。",
+   "evidence": "会话 784bbb09：用户「companyRegister/detail.vue 审核按钮没出现」；结论为 zs-approval 只从路由 meta.busCode 取编码，企业注册实为 040100，权限查询直接跳过；修复是 detail.vue 传 :bus-code=\"registerBusCode\"、OperationBtnGroup 转发 busCode、zs-approval/ApprovalProcessDialog 支持 bus 覆盖 meta；并列出按钮显示三条件 bizState==1 + 权限码 + isApprovalAuth。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyRegister/detail.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/views/company/companyRegister.js"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "784bbb09-19cb-4209-8311-17aa5fdd0e9f"
+   ],
+   "bundle": "033.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "「列表框总丢」别反复改样式：先在分叉分支上按页对比容器结构，合并定制分支时 list-card 会被吃掉",
+   "type": "pattern",
+   "content": "现象：物业管理区域备案的列表「没有框」，用户反复提过多次、每次改完过一阵又没框，怀疑是合并代码出的问题。\n\n为什么：列表边框不是页面自己画的，而是由包裹层 div.list-card 提供（V3 约定独立列表页必须套 list-card）。做定制分支（如 develop/v2.6.2-yulin 榆林、*-szr）时，给列表页加 getQueryParams 的 B 端改动与大段片段替换一起合入，多次冲突后 list-card 包裹层被静默删掉，功能完全正常所以 CI 与类型检查都发现不了。\n\n怎么做：1) 不再逐次微调样式，先确认是不是包裹层缺失；2) 同源多分支一律按页横向对比：把基础分支与定制分支的同名页面逐个 diff 容器结构，而不是只看当前分支；3) 修复时按「每页补回 list-card」逐页处理，并在提交信息里写明补回边框容器；4) 基础分支也存在同样缺失（如权利人同步一直没框）要一并提交；5) 评估其它定制分支（*-szr 等）是否同病。\n\n关键判断：这类「改好又回退」的问题根源通常不在代码本身，而在分支合并策略——改动必须落到基础分支或每个定制分支，只改一条分支等于没修。",
+   "evidence": "会话 7ae7d4b9：用户「这个物业管理区域备案这儿的列表总是没有框 我感觉我提过很多次了…是不是合并代码出问题了」「2.6.2 上面有这个问题吗？有的话一起修复」；对比 develop/v2.6.2 与 develop/v2.6.2-yulin 后确认榆林分支 4 个页面 list-card 在合入 getQueryParams 改动时丢失，基础分支仅「权利人同步」缺，已分别提交 1d2718782 与修复 4 个文件。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/index.vue",
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "baseline": "50767de",
+   "sessionIds": [
+    "7ae7d4b9-281a-4316-bf51-824355179604"
+   ],
+   "bundle": "033.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "同一模块内审批流分叉：用 OperationBtnGroup 的 show-approval 按页面关闭公共审批按钮",
+   "type": "pattern",
+   "content": "情况：价格备案模块的区县/市级 detail.vue 与 changeDetail.vue 四个页面已自带一套完全自定义的审批按钮（区县受理/办理/通过、市级受理/办理/通过），但 OperationBtnGroup 在 bizState==1 时仍会额外渲染公共的 zs-approval 审批按钮，两套按钮同屏出现，用户只需自定义那套。\n为什么不能全局关：公共审批按钮是按单据 bizState 自动渲染的，而同一模块的「价格备案申请 / 征求意见 / 归档」等页面仍要走公共审批流；若在 OperationBtnGroup 组件内部把审批按钮关掉，会把这些页面一起废掉。\n怎么做：在页面层给 operation-btn-group 加 :show-approval=\"!useCustomApprovalFlow\"，自定义流程页面上 useCustomApprovalFlow 置 true，其余页面默认 false 保持原行为。改动只落在 4 个自定义流程页面，公共组件与其它页面零改动。判据：页面内是否已存在自己的一套审批动作按钮，有则关。改完必须逐页回归同模块仍走公共审批的页面，确认按钮还在。",
+   "evidence": "会话 c05cfd63（基线 62d5fb9）用户截图指出「这几个页面的审批流也是用的自定义的，把公共的关闭」；最终在 operation-btn-group 上加 :show-approval=\"!useCustomApprovalFlow\"，覆盖 recordPriceMngSuzhou 的 county / city / citychange / countychange 四个路由，并明确说明「其他页面（价格备案申请、征求意见、归档等）不受影响，仍按原逻辑显示公共审批」。与已知 #408（用 zs-approval + customDialog 承载需要额外字段的审批）是不同场景下的不同解法。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/detail.vue",
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/changeDetail.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "c05cfd63-9585-47cc-9ca4-a4dd6b15eae9"
+   ],
+   "bundle": "034.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "详情页某字段查看态整行不显示：contentInfo 的 visible 短路 + detailCallback 只取 data.summary 双根因",
+   "type": "bug",
+   "content": "情况：房屋质量保证金管理详情页维护备注并保存后，查看态看不到备注。\n为什么（两处叠加，只修一处都不生效）：\n1) contentInfo 里该字段配了 visible: !!this.form.remark，备注为空就整行不渲染。保存后重新拉详情，只要回填没拿到 remark，整行直接消失，且没有任何报错。\n2) detailCallback 只解构了 response.data.summary 赋给 form，而接口把 remark 放在 data 根节点而不是 summary 里，于是即使接口返回了 remark 也会被丢掉。\n怎么做：\n1) 查看态不要用 visible 做「有值才显示」的判断，改为始终渲染，空值交给 DetailTemplate 显示 -（与结算账户等模块保持一致）；\n2) detailCallback 合并 summary 与根级字段再赋给 form，不要只取一层子对象；\n3) 若保存侧同样漏字段，补一个显式 getForm() 把该字段写进提交体。\n同类问题（查看态某字段没了）固定按这三层顺序查：visible 条件 → detailCallback 取值层级 → getForm 字段白名单。",
+   "evidence": "会话 3faac03b（基线 a5e7e78）用户报「房屋质量保证金-房屋质量保证金管理，维护的备注不显示」；定位到 contentInfo 的 visible: !!this.form.remark 与 detailCallback 只使用 response.data.summary 两处，修复为去掉 visible 条件、合并 summary 与根级字段、新增显式 getForm()。已知 #919 讲的是 contentInfo 的 add() 过滤空值，#941 讲的是取了没写回 form，均未覆盖本条的两个具体根因。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/guaranteeDepositAccount/detail.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "baseline": "a5e7e78",
+   "sessionIds": [
+    "3faac03b-5c75-454c-a0d1-79ae56a3ac95"
+   ],
+   "bundle": "034.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "V3 请求拦截器会把「路径末段不像动作」的 POST 统一补成 /add：编辑保存会静默打到新增接口",
+   "type": "bug",
+   "content": "什么情况：流程配置弹窗（tool/workflow 的 ConfigDialog.vue）点编辑保存，Network 里出现的是 POST /flowable/flowConfig/add 而不是更新接口，表现为「编辑当成新增」。\n为什么：V3 的 $post 补丁与 URL 规范化（normalizeV3ApiUrl）是一条链式改写——第一段把非安全白名单的 $put 一律降级成 POST；第二段对「两段路径 + POST」的请求统一补 /add 动作后缀。所以源码里写的是 $put('/flowable/flowConfig')，发出去却成了 POST /flowable/flowConfig/add；新增与编辑都命中了同一个地址，后端按新增处理。\n怎么做：不要用 $put 去表达更新。新增留在 $post('/flowable/flowConfig')，靠规范化补成 /add；编辑必须显式写全动作 $post('/flowable/flowConfig/update')，因为末段已经是动作就不会再被补。排查同类「编辑打了 add」现象时，先看目标路径是不是两段：两段 + POST 必然被补 /add，改成三段或直接写全动作即可。改完去掉方法名前用 normalizeV3ApiUrl 跑一遍，确认最终 URL 后才交付。",
+   "evidence": "036.md 会话 db0afc1e：编辑保存两处 $put('/flowable/flowConfig', ...) 改为 $post('/flowable/flowConfig/update', ...)；结论明确指出 /flowable/flowConfig 不在安全白名单，$put 会先被改成 POST，随后 V3 URL 规范化把两段路径的 POST 统一补成 /add。验证表：$post('/flowable/flowConfig') → /add；$post('/flowable/flowConfig/update') → /update。",
+   "files": [
+    "zhi2-web-admin/src/views/tool/workflow/components/ConfigDialog.vue",
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/utils（normalizeV3ApiUrl）"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "db0afc1e-0b50-40e1-afa6-15d8133f8ee0"
+   ],
+   "bundle": "036.md",
+   "project": "产品2.0"
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+ "project": "太仓G",
+ "batch": "009",
+ "files": [
+  "009.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "选项表决详情，基本信息那先切到表决项tab，然后再切",
+   "type": "preference",
+   "content": "已修复。根因和改动如下： ## 问题原因 复现路径是：**基本信息 → 表决项 → 投票信息**。 切到「投票信息」后，下方子 tab 只剩「决策明细」（`name: 0`），但 `cardValue` 仍停留在 `1`（表决项）。此时三个 `v-if` 都不满足： - `DecisionRangeTable` 需要 `cardValue == 0` - `VotingItemsTable` 需要 `mainCardValue == 0` 结果是底部区域没有任何组件渲染，决策明细看起来「消失了」。 原先只在 `handleMainTabChange` 里重置 `cardValue`，通过 tab 点击切换时存在时序问题，从「表决项」切过来时容易漏掉重置。 ## 修复方案 1. **合并两个 `DecisionRangeTable`** 为一个，用 `mainCardValue` 动态控制 `show-search`、`show-vote`、`show-icon`（与「一般表决」详情页一致）。 2. **监听 `mainCardValue`**，切换顶层 tab 时始终把 `cardValue` 重置为 `0`，并刷新子 tab 数据。 3. **`showVoteResult` 按钮** 同样会走上述 watch，避免从「表决项」点「表决结果」后出现同样问题。 请按原路径验证：**",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "涉及文件：d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\optionDecision\\components\\DecisionRangeTable.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f7e76921-282e-489a-956f-276a0ef62028"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Er",
+   "type": "bug",
+   "content": "已修复这两个报错，原因如下： ### 1. `mfcontractguardDriver is not defined` 在最近的重构中，`maintainDecision/detail.vue` 把 `mfcontractguardDriver` 的 import 删掉了，但 `mounted` 里还在用它启动引导： ```781:789:d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\maintainDecision\\detail.vue mounted() { if (this.formMode == \"add\") { mfcontractguardDriver.driverStart(this, mfcontractguardDriver.DriverOwnerDecision); } else { mfcontractguardDriver.driverStart( this, mfcontractguardDriver.DriverOwnerDecisionSubmit ); } }, ``` 已补回 import： ```javascript import mfcontractguardDriver from '@/views/repairFunds/usage/fundUsageKs/driver' ``` ###",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "在最近的重构中，`maintainDecision/detail.vue",
+    "```781:789:d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\maintainDecision\\detail.vue",
+    "`money.js",
+    "涉及文件：d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\maintainDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin、d:\\repository\\太仓G\\zhi1-web-admin\\src\\directives\\formatter\\money.js、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8f9057d0-7dbf-4966-9b52-d5d8411e8e4b"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "没展示",
+   "type": "bug",
+   "content": "已修复。 **原因：** `getDetail()` 里先从 `getOwnerDecision` 拿到了正确的 `totalWeight`、`totalHouseholds`、`totalArea`，接着又调用了 `getVoteResult`（`/ownerCalculationChart`）去覆盖这些字段。表决未开始时该接口没有统计数据，返回空值，把接口里已有的数据盖掉了，所以页面上总权数、总户数、总面积显示为空。 **修改：** 去掉 `getVoteResult` 的覆盖逻辑，直接使用 `getOwnerDecision` 返回的数据。 刷新页面后应能正常显示： - 总权数：86 - 总户数：86 - 总面积：4902.73 ㎡",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "涉及文件：d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\detail.vue、d:\\repository\\太仓G\\zhi1-web-admin\\src\\api\\estate\\ownerDecision.js、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\estate\\ownerDecision\\components\\VoteView.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5295a51b-35c1-4303-8d3f-09d1c13d31bc"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  },
+  {
+   "title": "业委会选举申请，新增候选业主，政治面貌选“群众”了，",
+   "type": "bug",
+   "content": "已修复。问题出在 `CandidateDialog.vue`：`所属党组织` 被写死为必填，没有根据政治面貌联动。 **修改内容：** 1. **动态判断**：新增 `isMassesPoliticsStatus`，当政治面貌为“群众”时返回 `true`（通过字典 `dictLabel` 匹配，兼容不同 `dictValue`）。 2. **条件显示**：政治面貌为“群众”时，隐藏“所属党组织”字段。 3. **动态校验**：将 `rules` 改为计算属性，仅在非“群众”时校验“所属党组织”。 4. **切换清理**：选择“群众”时自动清空“所属党组织”，并清除该字段的校验提示。 现在选择“群众”后，“所属党组织”字段会隐藏，也不再显示必填星号。选择党员等其他政治面貌时，该字段仍会正常显示并必填。 请刷新页面后重新打开“新增候选业主”弹窗验证一下。",
+   "evidence": "extracted source=cursor project=太仓G",
+   "files": [
+    "`CandidateDialog.vue",
+    "涉及文件：d:\\repository\\太仓G、d:\\repository\\太仓G\\zhi1-web-admin\\src\\views\\repairFunds\\ownerApply\\components\\CandidateDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ed64bbc0-e94c-47ef-8caf-b46b1c3f85c0"
+   ],
+   "_draft": true,
+   "project": "太仓G"
+  }
+ ],
+ "_draft": true
+}

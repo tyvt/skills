@@ -1,0 +1,99 @@
+{
+  "project": "苏州市房地产监测V3",
+  "batch": "334",
+  "files": [
+    "334.md"
+  ],
+  "count": 5,
+  "memories": [
+    {
+      "title": "Vue2 项目升级 Vite 8 必须把 @vitejs/plugin-vue 换成 vite-ng-plugin-vue2，UnoCSS 拆 @unocss/core 到父仓并让体积分析插件只在 report 模式生效",
+      "type": "fact",
+      "content": "【什么情况】本项目（Vue 2.7.16 + Element UI 2.15.13）要从 Vite 5.4.11 升级到 Vite 8.3.5，需要确认依赖兼容性，并部署到本地 nginx-ui 让用户验证。\n【为什么】`@vitejs/plugin-vue` 是给 Vue 3 用的，Vue2 项目在 Vite 8 上必须用社区维护的 `vite-ng-plugin-vue2`；UnoCSS 升到 66.12.0 后需要把 `@unocss/core` 显式加进依赖；体积分析插件如果在 dev/watch 模式常驻会持续拖慢启动。\n【怎么做】① 子模块 `zhi2-web-admin/package.json`：`vite` 5.4.11 → 8.3.5，改用 `vite-ng-plugin-vue2` 替代 `@vitejs/plugin-vue`，`unocss` → 66.12.0；父仓 `package.json` 新增 `@unocss/core`（父仓是 npm workspaces 根，workspaces: `zhi2-web-admin`）。② `vite.config.js` 里的体积分析插件只在 report 模式启用，不要在 dev/watch 模式常驻。③ `src/main.js`、`SvgIcon/index.vue`、`Navbar.vue` 配合调整，**SVG 雪碧图改异步 chunk**（大 sprite 不再打进首屏包）。④ 部署到 nginx-ui 验证时，把父仓 `env/.env.production` 的生产加密开关 `true → false`，重新构建再部署，否则本地验证会被加解密链路挡住。⑤ 构建产物 `public/version.json` 不入库（本次内容带临时分支标记 `chore/vite7-verify`），构建时会自动重建。⑥ 升级后仍走「构建 → nginx-ui 部署 → 在该站点验证」，不启本地 dev server；子模块先提交推送，再提交父仓 gitlink。",
+      "evidence": "会话 session-fb4582c6-b616-4504-bf40-24995b916018（基线 a86bf95）用户诉求 1「当前项目升级到vite8是否有依赖兼容问题」、诉求 2「部署到nginx ui我验证」、诉求 3「把生成环境的加密验证去掉然后重新部署」、诉求 4「升级之后编译速度提升多少？」；最终结论列出子模块 5 文件改动「`package.json`（vite 5.4.11→8.3.5、`vite-ng-plugin-vue2`、unocss 66.12.0）、`vite.config.js`（体积分析插件仅 report 模式）、`src/main.js`、`SvgIcon/index.vue`、`Navbar.vue`（SVG 雪碧图改异步 chunk）」，父仓 `env/.env.production`（生产加密 `true→false`）、`package.json`（新增 `@unocss/core`）。",
+      "files": [
+        "zhi2-web-admin/package.json",
+        "zhi2-web-admin/vite.config.js",
+        "zhi2-web-admin/src/main.js",
+        "zhi2-web-admin/src/components/SvgIcon/index.vue",
+        "zhi2-web-admin/src/layout/components/Navbar.vue",
+        "package.json",
+        "env/.env.production"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-fb4582c6-b616-4504-bf40-24995b916018"
+      ],
+      "bundle": "334.md"
+    },
+    {
+      "title": "提交菜单与审批菜单分离时待办跳转用前端常量注册表 todoRouteRegistry.js：busCode→路由映射，后端待办行只给菜单 ID 不可靠",
+      "type": "workflow",
+      "content": "【什么情况】本项目把「提交」和「审批」拆成了两个菜单：单子在 A 菜单提交，待办里要点进去审核 B 菜单。用 busCode 去反查菜单不行，让后端在待办行里直接存 path 也不行。\n【为什么】后端待办行只返回 `nodeMenuId`/`nodeMenuPath`，`getFlowList` 里又只取 `menuVos.get(0)`，拿到的常常是提交菜单而不是审批菜单；busCode 反查则要靠 `SYS_MENU.FLOW_BUS_CODE` 之类的库表字段，项目里并没有落全。两条路都依赖后端数据质量，前端没有稳定依据。\n【怎么做】① 前端维护常量注册表 `src/constants/todoRouteRegistry.js`：以 busCode 为键 → `{ path, 参数名 }`，把「待办任务 → 该去哪个审批页」这层映射收到前端一处；本项目已回填 `fzjgbg` → `/agencyBranchChange/<变更单ID>`，注册表共 94 条且组件必须逐条命中磁盘文件。② 待办点击时按 busCode 查注册表拼出目标路由，带 `formMode=view` 跳转（审批视角只读）。③ 同步补齐审批菜单的入口页：如新增 `src/views/institution/agencyBranchChange/detail.vue` 承载菜单 `分支机构变更`（`agencyBranchChange/:tableid`，`busCode=fzjgbg`）。④ **关键坑**：备案详情组件被独立变更路由复用时，主键位置不同——独立变更路由的主键在 `:tableid` 上，而备案详情只认 `query.agencyBranchChangeId`/`query.dataId`。必须在 `AgencyBranchDetail.vue` 的 `changeActive` 里补 `isChangeRoute` 判定，否则变更单会被当成备案详情加载（取错数据、变更单字段全空）。⑤ 注册表是过渡方案，后端根治清单要同时记录：`SYS_MENU.FLOW_BUS_CODE` 补全、待办行返回 `nodeMenuId/nodeMenuPath`、`getFlowList` 的 `menuVos.get(0)` 取全；后端做完前端注册表即可下线。⑥ 配一条 e2e 用例锁住路由解析（如 `e2e/utils/todo-route-resolution.spec.js`），并在 `docs/frontend/common-errors.md` 维护台账编号。",
+      "evidence": "会话 session-546f850e-d156-4e7e-a38e-1815ba8aca58（基线 a86bf95）用户诉求 1「目前待办部分跳转有问题，因为当前项目提交和审批菜单分开了，希望能在A菜单提交，待办里面跳转到B菜单审核。给我一个好的方案，目前用busCode翻查和直接存path都不行」；最终结论写明「`fzjgbg` 已回填 `todoRouteRegistry.js`（注册表 94 条，组件全部命中磁盘文件），待办点进来会带 `formMode=view` 跳到 `/agencyBranchChange/<变更单ID>`」，并指出关键修复「`changeActive` 补上 `isChangeRoute`……会被当成**备案详情**去加载（取错数据、变更单字段全空）」，以及后端根治清单「`SYS_MENU.FLOW_BUS_CODE`、待办行返回 `nodeMenuId/nodeMenuPath`、`getFlowList` 的 `menuVos.get(0)`」。",
+      "files": [
+        "zhi2-web-admin/src/constants/todoRouteRegistry.js",
+        "zhi2-web-admin/src/utils/ruoyi.js",
+        "zhi2-web-admin/src/views/flowable/todo.vue",
+        "zhi2-web-admin/src/views/institution/agencyBranchChange/detail.vue",
+        "zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchDetail.vue"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-546f850e-d156-4e7e-a38e-1815ba8aca58"
+      ],
+      "bundle": "334.md"
+    },
+    {
+      "title": "审核端与报送端同一份内容不一致时以报送端为基准对齐审核端，并加 parity e2e + 两端对照截图锁住差异",
+      "type": "pattern",
+      "content": "【什么情况】「开业信息确认」（审核端 `AgencyEntryNetworkAdminDetail.vue`）与「开业信息报送」（申请端）内容不一致：审核端的小标题字段不对，而且缺了办公信息和租赁经营情况两个区块。用户裁决：「以报送为准」。\n【为什么】两端是同一个业务对象在不同角色下的两种视图，但历史上是各自维护模板的，字段与区块会漂移。审核端是「看别人填的东西」，天然更容易漏字段；一旦审核端缺区块，审核人就看不到关键信息（办公信息、租赁经营情况），但从测试视角两端都能跑通，不会报错。\n【怎么做】① 遇到两端不一致，先确定基准端——用户口径「以报送为准」就以申请端（报送端）为字段与区块的唯一真相源，反向对齐审核端，不要两边各改一半。② 对齐要连**区块小标题**一起对齐，不能只补字段：小标题是审核人理解字段的锚点，标题错位比缺字段更容易误导。③ 改完加一条 parity 回归用例（如 `e2e/company/lease-opening-audit-parity.spec.js`），断言两端区块集合一致，让漂移在 CI 就暴露，而不是等用户再提。④ 同时产出**两端对照截图**（`e2e/output/lease-opening-audit-sections.png` 与 `lease-opening-report-sections.png`）并入库——`e2e/output` 下已有同类 png 入库先例，对照图是「不一致」这类需求最直接的验收证据。⑤ 提交只带本次改动（4 文件 +216/−3），他人遗留的 `public/version.json`、`report.html`、临时脚本、`.tmp-evidence/` 一律不带。",
+      "evidence": "会话 session-d8c928e0-e374-4f01-88d4-9a53999d0afb（基线 a86bf95）用户诉求 1「开业信息确认（审核端）与开业信息报送（申请端）内容不一致，开业信息确认的小标题字段不对，还缺了办公信息和租赁经营情况。以报送为准」；最终结论列出提交 `fix(lease-open): 开业信息确认页与报送页区块对齐，补办公信息与租赁经营情况`，提交内容含 `AgencyEntryNetworkAdminDetail.vue`（唯一源码改动）、新增回归用例 `lease-opening-audit-parity.spec.js`、两端对照截图 `lease-opening-audit-sections.png` 与 `lease-opening-report-sections.png`（并注明「`e2e/output` 下已有同类 png 入库先例，故一并提交」）。",
+      "files": [
+        "zhi2-web-admin/src/views/company/companyRecordAgency/AgencyEntryNetworkAdminDetail.vue",
+        "zhi2-web-admin/src/views/zljg/companyRecordAgency/detail.vue",
+        "zhi2-web-admin/e2e/company/lease-opening-audit-parity.spec.js"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-d8c928e0-e374-4f01-88d4-9a53999d0afb"
+      ],
+      "bundle": "334.md"
+    },
+    {
+      "title": "写公共组件使用手册前必须逐条按当前源码核对：文档里的常量可能早已不存在，目录可能存在但 0 文件，链接要 Test-Path 验存在性",
+      "type": "workflow",
+      "content": "【什么情况】要写 `docs/frontend/components-guide.md`（「新人手册二：公共组件怎么用」），需要说明 70 个组件目录里各组件的用法、接线方式和坑。\n【为什么】本仓库的文档/注释存在历史残留，照抄就会把不存在的东西写进「新人手册」：`.eslintrc.cjs` 注释里的弹窗宽度 700/1100 是旧值（源码 `variables.css:69-70`、`zs-dialog.vue:454-461` 实际是 500/1000）；`docs/detail-template-long-labels.md` 里的 `LABEL_MAX_CHARS = 8` 在当前源码中**根本不存在**，实际算法是 `LABEL_CHAR_WIDTH = 14` + `LABEL_HORIZONTAL_PADDING = 32` 按字数算宽；`branch-business-status-column`、`personnel-business-status-column` 目录存在但里面 0 个文件；`zs-remote-select`、`AiChatbotFloat`、`ComplexPhotoUpload`、`LabelTags`、`zs-dept-region-cascader` 在本项目实际不存在（参考分支里有，本项目没有）。\n【怎么做】① 手册内容一律以**当前源码**为准，历史提交只用来解释规则来源、不能照抄；文档里已失效的结论要保留但**明确标注「当前源码无对应实现」**，不能直接删掉结论也不能当现状写。② 目录存在 ≠ 组件可用：每个目录都要确认有实际文件，0 文件的只写「用途待确认」，不许臆断用途。③ 参考分支有而本项目没有的组件，逐个确认后再写，结论单独成行说明，不要列进「可用组件」表。④ 文档里每条路径链接都要用 `Test-Path` 逐个校验存在性，最终报告 `missing=0`。⑤ 本次产出 22390 字节（要求 16–22KB 区间）、8 章 5 表 54 处链接，收尾附「新人记忆卡（速查）」表格 + lint 提示；写文档的会话只写文档，不改源码、不跑构建/lint/dev server。",
+      "evidence": "会话 57d32ce3-0078-4c6c-a983-06789d92189c（基线 a86bf95）用户诉求 1 指定任务「编写 `D:\\repository\\苏州市房地产监测V3\\docs\\frontend\\components-guide.md`」；最终结论写明「22390 字节 / 21.87 KB（要求 16–22KB ✓）、8 章、5 张表、54 处链接，**逐个 `Test-Path` 校验 `missing=0`**」，并逐条列出「按源码纠正的既有说法」：`LABEL_MAX_CHARS = 8` 在当前源码不存在（实际 `LABEL_CHAR_WIDTH = 14` + `LABEL_HORIZONTAL_PADDING = 32`）、两个 status-column 目录 0 文件、5 个参考分支组件实际不存在。",
+      "files": [
+        "docs/frontend/components-guide.md",
+        "zhi2-web-admin/docs/detail-template-long-labels.md",
+        "zhi2-web-admin/src/components/README.md",
+        "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue",
+        "zhi2-web-admin/src/styles/variables.css"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "57d32ce3-0078-4c6c-a983-06789d92189c"
+      ],
+      "bundle": "334.md"
+    },
+    {
+      "title": "组件名撞名与 props 未透传两个源码级坑：AnnexUpload 内部 name:'FileUpload' 撞全局名、zs-file-upload 的 fieldProps 未透传 isShowTip",
+      "type": "bug",
+      "content": "【什么情况】整理公共组件用法时在源码里发现两个不会报错、但行为不对的坑。\n【为什么】① Vue2 的组件名空间是扁平的：全局按「目录名」注册（`main.js` 用 `import.meta.glob` 扫 `src/components/*`），所以 `AnnexUpload` 内部再写一个 `name: 'FileUpload'`，会与全局注册的 `FileUpload` 撞名——后注册者覆盖前者，表现为「某个页面里 FileUpload 渲染成了另一个组件」，且不会报 Vue warn，只在特定页面复现，极难定位。② `zs-file-upload` 的 `fieldProps` 是逐字段透传给内部 el-upload 的，但 `isShowTip` 不在其中，父组件传了 `fieldProps.isShowTip` 也不会生效（提示语的显示与否被写死）。\n【怎么做】① 写公共组件时，内部子组件的 `name` 不要与 `src/components` 下任何目录名重名；要用私有名（如 `FileUploadBox`）或干脆不写 `name`。② 排查「某个组件渲染成了另一个」时，先查全局注册名与内部 `name` 是否重复，不要先怀疑 props 或数据。③ `zs-file-upload` 这类封装组件若要支持开关型 props，必须在 `fieldProps` 的透传白名单里显式加上（如 `isShowTip`），否则父层传了也没用；改动这类公共组件时要同步确认下游页面的既有表现。④ 把这类「源码级陷阱」写进组件手册的踩坑小节，比只写用法更有价值——新人照着抄就不会重踩。",
+      "evidence": "会话 57d32ce3-0078-4c6c-a983-06789d92189c（基线 a86bf95）用户诉求 1 指定编写组件使用手册；最终结论在「按源码纠正的既有说法」中列出「两个真实陷阱写入文档：`AnnexUpload` 内部 `name:'FileUpload'` 撞名；`zs-file-upload` 的 `fieldProps` 未透传 `isShowTip`」，并核对 `zs-dialog.vue:454-461`、`variables.css:69-70` 等源码行号。",
+      "files": [
+        "zhi2-web-admin/src/components/AnnexUpload/index.vue",
+        "zhi2-web-admin/src/components/zs-file-upload/zs-file-upload.vue",
+        "zhi2-web-admin/src/main.js",
+        "docs/frontend/components-guide.md"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "57d32ce3-0078-4c6c-a983-06789d92189c"
+      ],
+      "bundle": "334.md"
+    }
+  ]
+}

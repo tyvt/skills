@@ -1,0 +1,76 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "065",
+ "files": [
+  "065.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "机构注销「选择机构」弹窗空白优化 Implement",
+   "type": "bug",
+   "content": "机构注销「选择机构」弹窗已按计划完成重构。 列表页「新增」现在通过通用的 `SelectDialog.open` 打开选择弹窗，不再使用原来的 `SelectCompanyDialog`（已删除）。新弹窗会按实际数据行数自适应高度，空白区域会明显减少。 构建已通过，刷新页面后即可验证效果。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyCancel\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyCancel\\components\\SelectCompanyDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "dbc2df17-64c5-4d5a-b8ed-a9c2aaee2dce"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "这个问题是公共的，得全局排查修复",
+   "type": "preference",
+   "content": "全局修复已完成，变更如下： ## 公共层（三层防御） 1. **`resolveResponseId(response, primaryKey)`** — 新增于 [`ruoyi.js`](zhi2-web-admin/src/utils/ruoyi.js)，兼容 `data` 为标量/对象、顶层 `id` 等返回格式 2. **Vue 原型挂载** — [`main.js`](zhi2-web-admin/src/main.js) 挂载 `resolveResponseId`，各页面可通过 `this.resolveResponseId(...)` 调用 3. **`changeFormState` 兜底** — view 模式下拦截 `null` / `undefined` / `'null'` 等无效 ID，避免再跳转到 `/null` 4. **`detailMixins.addCallback`** — 默认新增回调改为使用 `resolveResponseId(response, this.primaryKey)` ## 批量修复页面 - **24 个**仅用 `response?.id` 的文件（supervision 23 + repairFunds 1）已全部替换 - **29 个**已有 `response?.data` / `id||data` 写法的文件已统",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`ruoyi.js`](zhi2-web-admin/src/utils/ruoyi.js",
+    "[`main.js`](zhi2-web-admin/src/main.js",
+    "```493:493:zhi2-web-admin/src/views/supervision/agreement/account/detail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\路由信息.json、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\agreement\\account\\detail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\agreement\\account\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\api\\finance\\account.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "48d8443a-2b9b-4362-94b9-0e8c065800e4"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Th",
+   "type": "preference",
+   "content": "已修复。这个 Vue 警告是因为 **`businessName` 同时被定义为 prop 和 computed**，两者不能同名。 ## 原因 `OperationBtnGroup` 里 `businessName` 是 **prop**（给接口路径用，如 `regProject`）。如果又在 `computed` 里定义同名 `businessName`（常见于想区分权限码和接口名），Vue 就会报： > The computed property \"businessName\" is already defined as a prop. 正确做法是：**权限用另一个计算属性名**，不要复用 `businessName`。 ## 修改内容 在 `OperationBtnGroup` 中： 1. 新增可选 props： - `permissionPrefix` — 完整权限前缀（如 `xmxx:jgxm`） - `permissionModuleName` / `permissionBusinessName` — 分段覆盖 2. 新增计算属性 `effectivePermissionPrefix`（**不叫** `businessName`） 3. 按钮 `:permission` 改用 `effectivePermissionPrefix` 4. 提交/审批仍传 `busines",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`jgxm/detail.vue",
+    "`OperationBtnGroup/index.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\OperationBtnGroup\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\OperationBtnGroup、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\supervision\\agreement\\jgxm\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6bc3a4e9-2565-4bd0-9acd-c67575e5b1aa"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "截图里右侧空白还在，我又补了一轮修复，请硬刷新（Ct",
+   "type": "fact",
+   "content": "截图里右侧空白还在，我又补了一轮修复，请**硬刷新**（Ctrl+F5）后再打开「选择楼幢」看效果。 **原因补充** `building-table-mode` 的样式类挂在 **`el-dialog` 根节点**上，原先写在 `scoped` 里，部分规则实际没生效；弹窗缩放动画结束时表格也没再算一次列宽，所以表头仍按列宽之和收缩，右侧留白。 **本次改动** 1. 为楼幢选择弹窗增加**全局样式**，保证 `dialog-box` → 表格整条链路 `width: 100%`，表头/表体 `table` 也拉满。 2. 弹窗 `opened` 与数据加载后调用 `scheduleBuildingTableLayout()`，重新 `doLayout` + 均分剩余列宽。 3. `zs-table` 在容器尺寸变化时也会触发列宽均分；楼幢模式下强制 `fit=true`。 若刷新后仍不对，告诉我当前是预售还是现售页面，我再对一下 DOM 上的 class 是否带上 `zs-select-dialog--building-table`。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\permit\\components\\PresaleSelectBuildingDialog.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\presale\\cashsale\\components\\CashsaleSelectBuildingDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "04b888af-55b7-4c21-b814-11469c4ecc4f"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

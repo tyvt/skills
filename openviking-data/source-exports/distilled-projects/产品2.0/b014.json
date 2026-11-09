@@ -1,0 +1,191 @@
+{
+ "project": "产品2.0",
+ "batch": 14,
+ "files": [
+  "053.md",
+  "054.md",
+  "055.md",
+  "056.md"
+ ],
+ "count": 11,
+ "memories": [
+  {
+   "baseline": "6accf9a / 0ec4b79 / bca8b74 / 2f68042 / 94b86fa",
+   "content": "什么情况：阳光物业账单收款需要扫码支付能力。为什么：支付链路涉及订单创建与支付状态异步确认，前端必须按固定时序串接，且 payType 决定后端走哪条支付通道（CSCANC=银联C扫B 返回二维码 payData；MINIPROGRAM 返回 miniPayRequest）。怎么做：收款确认流程固定为——1) POST /property/spOrder/createFromBill 创建订单；2) 若 scanPayAmount>0，POST /property/spOrder/payInfo，参数 { orderId, payType: 'CSCANC' }，取返回 payData 作为二维码内容，同时回显 orderNo、payExpireTime（有效期）；3) 轮询 /property/onlinePay/queryOrderStatus 检测支付结果；4) 若账户余额全额抵扣（无需扫码）则直接提示收款成功，不进入二维码分支。payData 为空时按失败提示处理，不放出二维码弹窗。",
+   "evidence": "053.md 会话 af2c138b：collectionDialog.vue 最终结论完整给出 fetchPayInfo/showQrCode/handleConfirm 核心代码与五步支付流程。",
+   "files": [
+    "zhi2-web-admin/src/views/property/spFeeBill/components/collectionDialog.vue",
+    "zhi2-web-admin/src/views/property/bill/components/PaymentDialog.vue"
+   ],
+   "sessionIds": [
+    "af2c138b-8a07-4a0c-9b27-adf12153be13"
+   ],
+   "title": "[产品2.0] 扫码收款链路约定：createFromBill → payInfo(CSCANC) → 轮询 queryOrderStatus",
+   "type": "pattern",
+   "bundle": "053.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "0ec4b79",
+   "content": "什么情况：index.html 里独立的 sign.js（public/assets/js，不进 Vite 打包）需要请求 /secret/key 获取加签密钥，密钥要带 token 放 header，响应体需 base64 解码才是真结果。为什么：sign.js 在打包流程之外，读不到 Vite 的 import.meta.env / define 注入，之前靠 meta 标签 + window.__APP_BASE_API__ 传 API 前缀，链路分散。怎么做：项目最终约定是放弃运行时注入，在 sign.js 里写死常量 SIGN_API_BASE = 'api/v2.0'（与 env/.env 的 VITE_APP_BASE_API 保持一致），resolveSecretKeyUrl() 按该常量拼出 /api/v2.0/secret/key；同时删掉 index.html 的 app-base-api meta 与 vite.config.js inject.data 的 appBaseApi。连带约定：以后改环境 API 前缀，必须同时改 sign.js 的 SIGN_API_BASE 和 VITE_APP_BASE_API 两处（sign.js 注释中已标注）。",
+   "evidence": "053.md 会话 2cd9858a：用户三次收敛诉求（改接口取 key → 逻辑内聚 → 写死），最终结论明确 SIGN_API_BASE 双处同步约定。",
+   "files": [
+    "zhi2-web-admin/public/assets/js/sign.js",
+    "zhi2-web-admin/vite.config.js",
+    "zhi2-web-admin/index.html",
+    "zhi2-web-admin/src/utils/request.js"
+   ],
+   "sessionIds": [
+    "2cd9858a-f845-438d-8395-c6461b78ce48"
+   ],
+   "title": "[产品2.0] public/sign.js 加签脚本与 API 前缀双写同步约定",
+   "type": "pattern",
+   "bundle": "053.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "a10aadfb",
+   "content": "什么情况：spFeeBill 账单导入为三步流程（选条件 → 上传预览 → 确认导入），对接 /property/spFeeBill/import 与 /import/confirm 两个接口。为什么：导入接口先做行级校验并落临时批次，confirm 才真正入库，前端若不按 importId 串联会把数据重复解析或直接入库失败。怎么做：第一步选 complexId/feeTypeId/feeStandardId；第二步 POST /import，从 data 取 importId、successCount/failCount、errorSummary、errorReportUrl、bills；第三步预览 bills（与 errorData 合并展示，行级用 valid/errorMsg 判失败并动态加「校验错误」列，行唯一标识用 rowNum 作 _rowKey）；最后 POST /import/confirm { importId, complexId, feeTypeId, feeStandardId }。预览放行条件：importId 存在 + 有预览数据 + 无 errorReportUrl——即使 failCount>0 也允许预览（错误在第三步提示）；返回 errorReportUrl 时阻断预览，要求下载错误报告后重新上传。接口未返回 complexName 时用第一步选中的区域名称补全，feeCycle 文本缺失回退原字段。",
+   "evidence": "053.md 会话 a10aadfb：完整给出响应字段映射表、预览处理规则与三步数据流图。",
+   "files": [
+    "zhi2-web-admin/src/views/property/spFeeBill/components/import.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/importUploadDialog.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/enums.js"
+   ],
+   "sessionIds": [
+    "a10aadfb-a1ed-4720-8d24-06f8099d14c1"
+   ],
+   "title": "[产品2.0] 账单两段式导入约定：/import 拿 importId 预览，/import/confirm 收尾",
+   "type": "pattern",
+   "bundle": "053.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "6b9d9d7",
+   "content": "什么情况：流程设计器节点面板（Process/nodePanel/task.vue）里候选组下拉有选项、保存后详情再进回显为空。为什么：data() 里 formData 先是 {}（无 dataType），created() 再整份换成 XML 解析结果（含 dataType:'fixed' 和 candidateGroups），watch(formData.dataType) 在 undefined→'fixed' 的首次赋值时也执行了「切换指定方式时清空 assignee/candidateUsers/candidateGroups」的清理逻辑，把刚解析出来的候选组从内存模型删掉；再点保存还会把被清空的模型写回 XML，造成库里数据真的丢失。旁边 formData.userType 的同款逻辑写了 if(oldVal) 所以没事，只有 dataType 少了首次判断。怎么做：watcher 必须处理首次绑定——oldVal 为 undefined/null/'' 视为初次赋值不清空，且仅 val !== oldVal 时才清空人员相关字段。已损坏的流程 XML 需重新选候选组保存一次才能恢复。通用规则：任何「值变化即清空关联字段」的 watcher 都要防组件初始化/数据注水触发的首次赋值。",
+   "evidence": "用户三次反馈「候选组回显不正常/空下拉/保存后再看不显示」；最终结论定位 watch(formData.dataType) 缺 oldVal 判断，同文件 userType 已用 if(oldVal) 对照验证。",
+   "files": [
+    "zhi2-web-admin/src/components/Process/components/nodePanel/task.vue"
+   ],
+   "sessionIds": [
+    "8e2e88bc-89fe-4391-8ce3-07a15df52e5c"
+   ],
+   "title": "[产品2.0] 流程节点面板候选组回显丢失：watcher 首次赋值误清空，需 oldVal 判空 + val!==oldVal",
+   "type": "bug",
+   "bundle": "054.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "64fa9e2",
+   "content": "什么情况：选择类弹窗（如 SelectRecordProcedureDialog）需要「左侧筛选区方形多选 checkbox + 右侧表格单选（圆形 checkbox）」的组合 UI。为什么：单选语义靠 custom-class 挂 single-choice 实现，但全局样式 .single-choice .el-checkbox__inner { border-radius:50% } 作用于弹窗内所有 checkbox，把左侧分类多选也画成圆形，视觉语义错乱。怎么做：不要在弹窗组件里另写样式或换控件，全局规则收窄作用域到表格内——改成 .single-choice .el-table .el-checkbox__inner { border-radius:50% }（与「隐藏表头全选」同类写法），左侧 el-checkbox-group 恢复方形多选，右侧表格选择列保持圆形单选 + handleSelectionChange 只保留一行。新增同类「左侧筛选 + 右侧单选表」弹窗直接复用此约定，弹窗上保留 single-choice class 即可。",
+   "evidence": "已知清单#1023 只记录了「single-choice 圆点是全局副作用」的现象，本次给出根因（规则未限定表格内部）与全局样式层的收窄解法；修复只改 element-ui.scss 一处，弹窗组件零改动。",
+   "files": [
+    "zhi2-web-admin/src/styles/element-ui.scss",
+    "zhi2-web-admin/src/views/dataProperty/recordProcess/components/SelectRecordProcedureDialog.vue"
+   ],
+   "sessionIds": [
+    "6b9584dd-8399-40b2-8b79-9baf367ed910"
+   ],
+   "title": "[产品2.0] 树+筛选+单选表组合弹窗：single-choice 圆形样式须限定 .el-table 内，避免污染左侧多选",
+   "type": "pattern",
+   "bundle": "054.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "526c1ff",
+   "content": "什么情况：公共收益/物业协议等模块的「共管单位」选街道/社区后，页面显示的是编码（如 320508018）而非名称。为什么：接口/表单里长期只存 subdistrict/community 编码，名称字段是后补的；且「社区=哪个编码值」在模块间口径不同——公共收益模块 0=街道、1=社区，物业模块 3=社区、其他=街道，硬写一套判断必错。怎么做：抽公共工具 src/utils/regOrg.js 统一收敛：getSubdistrictName/getCommunityName 优先取名称字段、无名称回退编码（兼容旧数据）；getBenefitRegCompanyName/getPropertyRegCompanyName 分别按两套模块口径判街道/社区；assignSubdistrictCommunity 从监管账户行数据同时赋值编码与名称。所有用 /benefit/pubRegulatoryAccount/page（及 pageIsAgreement）的选择弹窗：街道/社区列展示名称字段，表单赋值同时写入 subdistrictName + communityName；后端未返回名称字段时前端已兼容回退编码。选择管理区域时成对保存「编码+名称」是本项目约定。",
+   "evidence": "批量更新 19 个调用监管账户接口的页面，新建 utils/regOrg.js 收敛四类函数；注意项明确「后端需在接口返回 subdistrictName/communityName，前端未返回时回退编码」。",
+   "files": [
+    "zhi2-web-admin/src/utils/regOrg.js",
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue",
+    "zhi2-web-admin/src/views/property/propertyAgreement/detail.vue"
+   ],
+   "sessionIds": [
+    "8a66ad42-2f27-4ff8-b445-5f8e160f357f"
+   ],
+   "title": "[产品2.0] 街道/社区编码配名称字段的公共工具 regOrg.js 与各模块社区编码口径差异",
+   "type": "pattern",
+   "bundle": "054.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "62d5fb9",
+   "content": "什么情况：产品2.0 的 recordPriceMngSuzhou（价格备案申请/查询）页面少了「申请表模板下载」「新增」等按钮，而参考仓库（苏州市房地产监测）同页面正常。为什么：产品2.0 里用 isApplyRoute 按 meta.title === '价格备案查询' / busCode==='jiagechaxun' 来区分申请页与查询页，查询页因此隐藏了模板下载/新增/编辑按钮；这种按菜单标题文字判定的方式脆弱且与参考项目实现不一致——参考项目的判定是 routeKey === 'recordpricemngsuzhou'，申请和查询页都显示按钮。怎么做：同源项目对齐修复时，页面身份/按钮显隐的判定要对照参考仓库的实际实现（按路由 key 判定），不要沿用按菜单标题字符串分流的写法；恢复按钮时还要同步恢复被一起隐藏的「业务状态」筛选项和行内「编辑」（待提交态可用），并提醒用户核对账号是否有对应权限码（如 presale:recordPriceMng:add）而不是继续怀疑代码。",
+   "evidence": "会话 49b771f7 最终结论：isApplyRoute 在 meta.title==='价格备案查询' 时返回 false 隐藏按钮；参考仓库用 currentRoute=='recordpricemngsuzhou' 两页均显示；改为 isRecordPriceMngSuzhou 判定并恢复筛选与编辑按钮。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/index.vue"
+   ],
+   "sessionIds": [
+    "49b771f7-5363-446e-b96b-bb0ff3c61363"
+   ],
+   "title": "同页面申请/查询分流的按钮显隐判定：按 routeKey 判定，不要按菜单 meta.title 文字分流",
+   "type": "bug",
+   "bundle": "055.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "dfe69d6",
+   "content": "什么情况：zs-select-dialog（及 func 版）在浏览器缩放 125% 时，pageSize=10 的数据最后一条滚动不到。为什么：三层叠加根因——① tableTrCount 写死为 8 而 pageSize 默认 10，表格高度按 8 行算却要展示 10 行，被迫在表格内部滚动；② 125% 缩放下固定 48px 行高与实际渲染高度有偏差，Element UI 表格内部滚动 maxScrollTop 偏小，最后一行永远滚不到；③ .dialog-right 是 flex 布局，表格容器被压缩加剧问题。怎么做：① tableTrCount 改为 min(实际行数, pageSize)，按实际行数算高度避免表格内滚；② 数据加载后调用 doLayout() 重新布局；③ 给 .zs-table-container 设 flex-shrink:0 防被压缩；④ zs-table 层改用 DOM 实测行高/表头高度计算表格高度以兼容缩放，首次渲染后二次校准，并在窗口缩放时重算高度。修改要同步 zs-select-dialog.vue 与 zs-select-dialog-func.vue 两个副本。",
+   "evidence": "会话 319f1f67 最终结论：tableTrCount 写死 8 与 pageSize 10 不符 + 125% 缩放下 maxScrollTop 偏小 + flex 压缩；修复为 min(行数,pageSize)、doLayout、flex-shrink:0、DOM 实测行高二次校准。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue"
+   ],
+   "sessionIds": [
+    "319f1f67-a4c9-4880-b1fc-1857c5d03b4b"
+   ],
+   "title": "选择弹窗 125% 浏览器缩放下最后一条数据滚不到：tableTrCount 写死小于 pageSize + 固定行高与实际渲染偏差",
+   "type": "bug",
+   "bundle": "055.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "6accf9a",
+   "content": "什么情况：收款/支付弹窗依赖三方接口（如 property/spOrder/payInfo）生成二维码，该接口可能较慢，原流程是「创建订单 → 等三方返回 → 才弹窗」，用户长时间面对无反馈。怎么做：改为「先弹窗占位、异步拉取、失败可刷新」的三段式——创建订单后立即弹出扫码窗并展示订单号、金额；后台异步请求 payInfo，请求中显示 loading 与「正在生成支付二维码...」占位文案；成功后展示二维码并开始轮询支付状态；失败时二维码区域显示错误提示并提供「刷新」按钮重调 payInfo，刷新前先停止轮询，成功后再展示二维码并恢复轮询。配套细节：payInfo 请求带 noMessage: true，避免全局错误 toast 与弹窗内错误提示重复。该套路适用于所有慢三方接口的前置展示场景：弹窗先给确定信息，慢数据异步补齐，失败留手动重试入口。",
+   "evidence": "会话 ba1c8c6a 最终结论：立即弹扫码窗显示订单号金额 → 异步请求 payInfo → 成功展示二维码并轮询；失败区显示提示+刷新按钮，刷新先停轮询再恢复；payInfo 用 noMessage:true 防提示重复。",
+   "files": [
+    "zhi2-web-admin/src/views/property/spFeeBill/components/collectionDialog.vue",
+    "zhi2-web-admin/src/views/property/bill/components/PaymentDialog.vue"
+   ],
+   "sessionIds": [
+    "ba1c8c6a-7b49-465a-aab9-2c949eb85f07"
+   ],
+   "title": "慢三方支付接口的交互套路：先弹窗占位、异步拉二维码、失败给刷新按钮重试",
+   "type": "pattern",
+   "bundle": "055.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "代码基线 50767de（zhi2-web-admin，develop/v2.6.2 分支，Element UI / Vue2 Web 后台）",
+   "content": "什么情况：列表页用 el-tabs 做「全部/各状态」筛选，把「全部」tab 的 name 设为空字符串 ''，点击后接口收到 orderStatus=0。为什么：Element UI 的 el-tab-pane 要求 name 是合法非空值，空串不是合法 name，点击时 v-model 会被写入 Tab 的数字索引（第一个 tab 就是 0），而不是预期的「不限」语义；且 getQueryParams 里 this.queryParams.orderStatus || undefined 对字符串 '0' 仍为真值，会把 0 原样传给接口。怎么做：「全部」不用空串也不直接用 0，改用专用哨兵值常量（如 ALL_ORDER_STATUS = 'all'），页面初始 orderStatus 也设为 'all'，在 getQueryParams 里把 'all' 转成 undefined 表示不按状态筛选。通用套路：任何「全部」类 tab/下拉选项都用独立哨兵值 + 提交前转换，绝不用空串或 0 兼做「不限」语义（0 本身可能是有效业务值）。",
+   "evidence": "会话最终结论：el-tab-pane 的 name 为空串不合法，点击后 v-model 被写成 Tab 索引 0；修复为「全部」用专用值 'all'（常量 ALL_ORDER_STATUS），getQueryParams 里把 'all' 转 undefined，刷新后点「全部」接口不再带 orderStatus=0。",
+   "files": [
+    "zhi2-web-admin/src/views/property/workOrder/order/index.vue"
+   ],
+   "sessionIds": [
+    "896a4167-b34c-4afa-9eed-b4e49624b8d5"
+   ],
+   "title": "el-tabs 状态筛选「全部」不能用空字符串 name：会被写成 Tab 索引 0",
+   "type": "bug",
+   "bundle": "056.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "代码基线 50767de（zhi2-web-admin，develop/v2.6.1 与 develop/v2.6.2 双分支对比）",
+   "content": "什么情况：Web 后台点击侧边栏收起（汉堡按钮）后，顶栏系统标题/顶部菜单被裁切或左移消失。为什么：2.6.2 的某次 commit（790f35205，bug1594）把顶栏标题区/顶部菜单容器宽度从固定值改成了 var(--sidebar-width)，而侧栏收起时该变量变为 0px，导致不随侧栏收起变化的顶栏占位也被压缩为 0。排查方法：先在旧分支（2.6.1，固定 276px）确认无此问题，定位到问题只在 2.6.2 引入，避免误改旧分支。怎么做：把「侧栏实际宽度」与「顶栏占位宽度」两个语义解耦——在 variables.scss 新增常量 --sidebar-expanded-width（如 288px），不随收起状态变化；Navbar 的标题区和顶部菜单用 --sidebar-expanded-width，侧栏自身继续用 --sidebar-width 控制收起。通用原则：同一个 CSS 变量只表达一种布局语义，收起态变量不能被不随动收缩的区域引用。",
+   "evidence": "会话最终结论：2.6.1 用固定 276px 无问题；2.6.2 commit 790f35205 改为 var(--sidebar-width)，侧栏收起变量变 0px 导致标题被裁切；修复为新增 --sidebar-expanded-width: 288px 常量给标题区/顶部菜单，侧栏仍用 --sidebar-width。",
+   "files": [
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/styles/variables.scss"
+   ],
+   "sessionIds": [
+    "d115a3e1-0619-44d4-8a93-3c964fe93a54"
+   ],
+   "title": "顶栏标题区不能复用 --sidebar-width：收起侧栏会把标题裁没，需解耦为固定展开宽度变量",
+   "type": "bug",
+   "bundle": "056.md",
+   "project": "产品2.0"
+  }
+ ]
+}

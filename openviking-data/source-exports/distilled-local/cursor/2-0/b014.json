@@ -1,0 +1,115 @@
+{
+ "project": "2-0",
+ "batch": "014",
+ "files": [
+  "014.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "title": "这个组件现在没法正常显示，如图",
+   "type": "bug",
+   "content": "### 处理结果 - **问题原因**：`TagsView` 组件中子组件 `ScrollPane`、`Hamburger` 仍使用 Vue2 的异步写法 `() => import(...)`，在 Vue3 中会被当成函数组件返回一个 `Promise`，从而在页面上直接渲染为文本 `[object Promise]`。 - **已做修改**：在 `TagsView/index.vue` 顶部引入 `defineAsyncComponent`，并改为 Vue3 异步组件写法： ```12:18:zhi2-web-admin/src/layout/components/TagsView/index.vue <script> import { defineAsyncComponent } from \"vue\"; import { mapGetters } from \"vuex\"; import { constantRoutes } from \"@/router\"; export default { name: \"TagsView\", components: { ScrollPane: defineAsyncComponent(() => import(\"./ScrollPane.vue\")), Hamburger: defineAsyncComponent(() => import(",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`TagsView/index.vue",
+    "```12:18:zhi2-web-admin/src/layout/components/TagsView/index.vue",
+    "import(\"./ScrollPane.vue",
+    "import(\"./Hamburger.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "78c42ac6-3d01-4efb-aa4f-c62740fb9e52"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "TypeError: Cannot read pro",
+   "type": "bug",
+   "content": "### 问题原因 在 `HeadTitle` 里，`this.list` 里有元素是 `undefined` / `null`，然后这里直接访问了 `item.value`： - 计算属性里： ```js this.list.filter((item) => item.value) ``` - 模板里： ```vue v-for=\"(item, index) in displayedList\" ... v-if=\"item.value\" ``` 当某个 `item` 为 `undefined` 时，就会出现 `Cannot read properties of undefined (reading 'value')`。 ### 已做修改 在 `zhi2-web-admin/src/components/HeadTitle/index.vue` 中已加空值保护： - 模板中： ```vue v-for=\"(item, index) in displayedList\" :key=\"index\" v-if=\"item && item.value\" ``` - 计算属性中： ```js const visibleItems = this.list.filter((item) => item && item.value) ``` `showExpandButton` 里同样加了 `item ",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`zhi2-web-admin/src/components/HeadTitle/index.vue",
+    "`row.vue",
+    "index.vue",
+    "row.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "81bba5d5-8e98-492f-90aa-3fa01f341b6d"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "index.vue:182 Uncaught (in",
+   "type": "bug",
+   "content": "### 修复说明 **问题原因** - 你现在的路由是 Vue Router 4，`router.currentRoute` 是一个 `ref`，要通过 `.value` 取值。 - 在多个文件里直接用了 `router.currentRoute.query.xxx`，`currentRoute` 本身是 `ref`，所以 `router.currentRoute.query` 为 `undefined`，再读 `formMode` 就会报：**Cannot read properties of undefined (reading 'formMode')**。 - `OperationBtnGroup` 组件里又自己写了一个 `computed formMode`，覆盖了在 `main.js` 里的全局混入 `formMode`，而这个本地的 `formMode` 正好就是上面这种错误写法。 ### 已做的全局修改 我已经在项目里把这类使用方式统一修正为安全写法： - **`OperationBtnGroup/index.vue`** - `props.busCode.default` 改为先取 `const current = router.currentRoute && router.currentRoute.value`，再用 `current.meta.busCode`。",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`main.js",
+    "**`OperationBtnGroup/index.vue",
+    "**`views/maintenance/depositNotice/company/components/index.vue",
+    "**`views/maintenance/depositNotice/components/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "58dcfdc3-e0eb-4a9d-a77c-6b00ecbf41cf"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "More info: https://sass-la",
+   "type": "preference",
+   "content": "### 处理方式 你这个不是“报错”，而是 Dart Sass 提示：当前使用的是 **旧版 JS API（legacy-js-api）**，未来 2.0 会删除，所以现在不断在控制台里打警告。 我已经在 `vite.config.js` 里做了修改，强制 Vite 使用 Sass 的现代编译器 API，并顺便静音这个弃用警告。关键配置已经加到 `css` 里： ```331:346:zhi2-web-admin/vite.config.js css: { // 启用CSS模块化 modules: { localsConvention: \"camelCase\", }, // 提高开发服务器性能 devSourcemap: mode !== \"production\", // 使用 Sass 现代编译器 API，避免 legacy-js-api 弃用警告 preprocessorOptions: { scss: { api: \"modern-compiler\", silenceDeprecations: [\"legacy-js-api\"], }, sass: { api: \"modern-compiler\", silenceDeprecations: [\"legacy-js-api\"], }, }, }, ``` ### 接下来你需要做的 - **1）重启开发服务**：先停掉当前的 `",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`vite.config.js",
+    "```331:346:zhi2-web-admin/vite.config.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e7866ad8-8705-4e0b-9a37-e80f788b005a"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "changeThemeColor这个现在没有生效，我",
+   "type": "fact",
+   "content": "### 核心原因 你现在的 `changeThemeColor` 只在 `:root` 上设置了自己定义的变量（`--primary-color` 等），**没有同步修改 Element Plus 内置的主题变量**（`--el-color-primary`、`--el-color-primary-light-3` 等），所以 Element Plus 组件看不到你的颜色变化。 ### 我已经帮你做的修改 在 `src/utils/index.js` 里对 `changeThemeColor` 做了增强： ```12:83:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\utils\\index.js export function changeThemeColor(color) { const rgbs = hexToRgb(color); const rgb = `${rgbs[0]},${rgbs[1]},${rgbs[2]}`; document.documentElement.style.setProperty(\"--primary-color\", color); document.documentElement.style.setProperty(\"--primary-color-rgb\", rgb); // 同步 Element Plus ",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`src/utils/index.js",
+    "```12:83:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\utils\\index.js",
+    "`main.js",
+    "```42:44:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\main.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0b556b10-58ea-46e4-ba45-77143b7f3de9"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "这个封装现在不正常了，前缀后缀都自动带上了",
+   "type": "fact",
+   "content": "### 处理结果 **问题原因**： `zs-input` 里无论有没有传插槽，都固定写了 `append / prepend / suffix / prefix` 四个插槽模板，`el-input` 检测到有这些插槽，就会预留对应的前后缀或前后置区域，导致看起来“前缀后缀都自动带上了”。 **已修改内容（在 `zs-input.vue`）**： 现在只有在对应插槽实际有内容时才渲染该插槽。 ```12:15:zhi2-web-admin/src/components/zs-input/zs-input.vue <el-input :title=\"$attrs.value\" v-bind=\"attrs\" v-on=\"listeners\"> <template v-if=\"$slots.append\" #append> <slot name=\"append\"></slot> </template> <template v-if=\"$slots.prepend\" #prepend> <slot name=\"prepend\"></slot> </template> <template v-if=\"$slots.suffix\" #suffix> <slot name=\"suffix\"></slot> </template> <template v-if=\"$slots.prefix\" #p",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`zs-input.vue",
+    "```12:15:zhi2-web-admin/src/components/zs-input/zs-input.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4f460db1-c912-4fc0-8cd5-057a4f3235eb"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  }
+ ],
+ "_draft": true
+}

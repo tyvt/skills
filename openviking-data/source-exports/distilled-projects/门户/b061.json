@@ -1,0 +1,39 @@
+{
+  "project": "门户",
+  "batch": "061",
+  "files": [
+    "061.md"
+  ],
+  "count": 2,
+  "memories": [
+    {
+      "title": "同一组件不同分支各写各的 padding，导致首页各板块菜单高度差 8px",
+      "type": "bug",
+      "content": "【什么情况】门户首页「商品房」与「面积管理」两个板块的菜单项高度不一致，用户直接报「菜单高度不一致」。\n【为什么】菜单项在组件里有两套渲染分支：`step-grid` 分支的菜单项 padding 是 `12px/10px`，默认分支是 `18px/12px`；两套参数各写各的，改一处不会同步另一处，跨板块一对比就差出约 8px。这属于「同一组件不同分支样式参数漂移」的典型形态，肉眼只会觉得「这页好像没对齐」，很难定位到是哪个分支写小了。\n【怎么做】① 先确认是分支参数漂移而不是容器/字体差异：对比两个板块实际算出的菜单项盒高（本批 93px 与 85px 之差）；② 把各分支的菜单项 padding 统一到同一组值（本批把 step-grid 改成 `18px 4px 12px`）；③ 补 e2e 断言锁死跨板块一致性（商品房 vs 面积管理菜单项高度差 ≤1px），别等用户再目测；④ 用「带修复 / 不带修复（stash）两条路径结果一致」来判定剩下的失败是不是存量问题——本批存量红点是 `.home-nav-menu .home-nav-item` 断言：`showHomeNavMenu` 要求 `isHomeSuperAdmin`，而 e2e 环境下为 false，与本次改动无关。",
+      "evidence": "会话 session-76cd9c3e-5100-45f7-b730-fdea8d1a6d85（基线 65275e9）用户诉求 1「菜单高度不一致」；最终结论给出根因「面积管理走 step-grid 分支，菜单项 padding 12px/10px，与默认菜单项 18px/12px 不一致，跨板块高度差约 8px」、修复（HomeBizSection.vue 第 210 行附近统一为 18px 4px 12px）与防回归断言（高度差 ≤1px），并披露存量失败点 `.home-nav-menu` 断言的 `isHomeSuperAdmin` 判定问题。",
+      "files": [
+        "zhi2-web-admin/src/views/home/components/HomeBizSection.vue",
+        "zhi2-web-admin/tests/e2e/portal-home-visual.spec.ts"
+      ],
+      "baseline": "65275e9",
+      "sessionIds": [
+        "session-76cd9c3e-5100-45f7-b730-fdea8d1a6d85"
+      ],
+      "bundle": "061.md"
+    },
+    {
+      "title": "靠 padding 撑高的按钮改用 min-height 定高 + inline-flex 居中，并同步窄屏断点",
+      "type": "pattern",
+      "content": "【什么情况】操作指引页的主按钮「文字不是真正的垂直居中」，改完还发现窄屏断点的高度又不对了。\n【为什么】按钮写的是 `display: inline-block` + `padding: 14px 56px`，高度靠内边距撑开，文字还要额外被行盒与内边距叠加影响，视觉偏上；而窄屏断点（≤1024px）又叠加了上下 10px padding，与 `inline-flex` 混用后高度变成 28+20=48px 这种不可控结果。\n【怎么做】① `display: inline-block` → `inline-flex` + `align-items: center` + `justify-content: center`，让高度由 `min-height` 决定、文字在盒里严格居中，不再受行盒与内边距叠加影响；② 上下内边距归零（`padding: 0 56px`），高度只由 `min-height`（本批 48px）决定，语义变成「按钮定高、内容居中」，后续调高度只改一个数；③ 窄屏断点必须同步改（`min-height: 40px; padding: 0 28px`），否则会与 inline-flex 混出别的盒高；④ 字号与行高配套微调（本批 font-size 32px→28px、line-height 1.4→1.2），桌面高度由约 73px 降到 48px、移动端保持约 40px；⑤ 宽度、圆角、配色、hover 变深、`focus-visible` 描边与点击行为均不动。",
+      "evidence": "会话 session-3e238ff9-f252-4506-899f-41ea1c9881c7（基线 b6165db）最终结论：改 `OperationGuideBody.vue:365-380` 为 `inline-flex` + `align-items:center` + `justify-content:center`，`padding: 14px 56px` → `padding: 0 56px`（只留 min-height 48px 定高），font-size 32px→28px、line-height 1.4→1.2，窄屏（≤1024px）同步 `min-height:40px; padding:0 28px`；桌面高度约 73px → 48px，移动端约 40px。",
+      "files": [
+        "zhi2-web-admin/src/views/home/operationGuide/components/OperationGuideBody.vue"
+      ],
+      "baseline": "b6165db",
+      "sessionIds": [
+        "session-3e238ff9-f252-4506-899f-41ea1c9881c7"
+      ],
+      "bundle": "061.md"
+    }
+  ]
+}

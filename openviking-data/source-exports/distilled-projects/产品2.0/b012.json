@@ -1,0 +1,119 @@
+{
+ "project": "产品2.0",
+ "batch": 12,
+ "files": [
+  "045.md",
+  "046.md",
+  "047.md",
+  "048.md"
+ ],
+ "count": 6,
+ "memories": [
+  {
+   "baseline": "57109f9",
+   "content": "什么情况：产品2.0 的 zs-table 同时提供两套汇总能力——表体内部的汇总行（由列上的 showMethod 返回一组「小计」行，含金额汇总，渲染在表格里）和表格下方那条「合计：xxx」统计条（should-render-bottom-summary 控制）。业务页（如 benefit/pubParkingRate）已按设计稿用 showMethod 渲染了小计行，但下方统计条默认开启，同一个数字出现两遍，用户反馈后才要求「去除合计，仅保留小计」。\n\n为什么：这两套汇总是独立的开关，不是互斥的。开启表内小计不会自动关掉表底合计条，模板里也很难一眼看出「合计」来自哪里（它不是页面写的，而是公共表的默认渲染分支），所以容易被当成样式问题去写 CSS 隐藏，越改越乱。\n\n怎么做：页面用 showMethod 输出小计行时，同步在 zs-table 上加 :should-render-bottom-summary=\"false\"，只保留表内小计。反过来：如果只需要一个总数不需要行内小计，按既有约定用 zs-pagination 的纯总数形态（:show-pagination=\"false\"），不要手写 table-summary 或「共计 N 条」。判断「这个合计条是谁渲染的」时先看 zs-table 有没有开 bottom-summary 类开关，再动模板。",
+   "evidence": "会话 199feb40-d0be-457e-b56f-a0a127a49c12（基线 57109f9，views/benefit/pubParkingRate/index.vue）：用户先贴图反馈表格标注问题，随后明确「去除合计，仅保留小计」；最终在 zs-table 上设置 :should-render-bottom-summary=\"false\"，关闭表格下方「合计：」条，保留 showMethod 返回的小计行。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubParkingRate\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\listMixins.js"
+   ],
+   "sessionIds": [
+    "199feb40-d0be-457e-b56f-a0a127a49c12"
+   ],
+   "title": "产品2.0 表内已有汇总行时，表底「合计」条要用 :should-render-bottom-summary=\"false\" 关掉（否则合计重复出现两次）",
+   "type": "bug",
+   "bundle": "046.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "2f68042",
+   "content": "什么情况：产品2.0 里有一批子维护页（计费公式、物业收费标准、收支项目明细等）字段很少，但沿用了「列表 → 整页 detail.vue」的结构。用户给出的判定阈值是：字段不超过 6 个就用弹窗形式做新增/编辑/查看，参考已按弹窗实现的标准收费/收支分类设置页面。\n\n为什么：字段少的单据跳整页详情，用户每次都要在列表与详情之间往返，且详情页空间大部分是空的；而字段多的业务（合同、入网、备案等）仍必须整页承载。所以这不是「统一改成弹窗」，而是按字段数分档，判据必须写死成可复用的阈值（≤6）而不是每页凭感觉。\n\n怎么做：在页面同目录 components 下新建 XxxDialog.vue——zs-dialog + zs-size=\"mini\"；新增/编辑走 zs-form 表单编辑 + 确定，查看态不另写只读表单，直接复用 DetailTemplate 展示（标签样式与被参考的收支分类详情一致）。列表页的新增/编辑/查看全部改成打开弹窗，保留搜索、分页、批量删除和操作列三件套；原来的 detail.vue 可以先保留兼容旧菜单路由，日常交互以弹窗为准。",
+   "evidence": "会话 25aa8b31-b053-4932-8e96-5f08c009b4f0（基线 2f68042，views/property/feeCalculateFormula/index.vue + 新建 FeeCalculateFormulaDialog.vue）：用户贴三张图要求「收费设置界面优化计费公式新增/编辑/查看详情：字段不超过 6 个，采用弹窗形式展示，参考图 1、2 收支分类设置详情」；最终落地 zs-dialog mini + 新增/编辑/查看三模式，查看用 DetailTemplate。",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\feeCalculateFormula\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\feeCalculateFormula\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubBusinessItem\\index.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\ListTemplate.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\listMixins.js"
+   ],
+   "sessionIds": [
+    "25aa8b31-b053-4932-8e96-5f08c009b4f0"
+   ],
+   "title": "详情/子表字段数少于 6 个时改成弹窗承载（zs-dialog zs-size=\"mini\" + DetailTemplate 查看态），列表保留操作列不走详情页",
+   "type": "pattern",
+   "bundle": "046.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "[苏房] 筛选项能选却查不动：getQueryParams 里硬写默认值每次查询重置条件",
+   "type": "bug",
+   "content": "现象：列表页「业务状态」下拉显示可选，但选中其他状态点查询后结果仍是「已备案」，选什么都被打回原值。排查结论是两套代码叠加：2026-05-07 新建 resourcesLeaseContractFiling/index.vue 时把「业务状态」写进了 formItems（筛选区本身没坏），12 天后的 2026-05-19 又有人在 getQueryParams() 里补了一句「无值时默认已备案」，而该赋值写在校验之外、对被用户选中的值也直接覆盖。\n根因：查询参数构造器里把「默认值」写成了无条件赋值（query.bizState = '2'），而不是「仅在字段为空时兜底」。这类写法不报错、不告警，界面上筛选器照常回显用户的选择，只有点查询后的 payload 被静默改写，因此表现为「UI 状态与服务端条件不一致」。\n做法：一、默认值必须写成空值兜底（if (!query.bizState) query.bizState = DEFAULT），绝不在构造器里直接赋值；二、遇到「筛选不生效」先打 log 看 getQueryParams/handleQuery 产出的最终 payload，而不是先怀疑字典或接口；三、同一个筛选条件不要同时存在「组件里给初值」和「构造器里给初值」两处来源。\n考古方法（可复用）：用 git log -S '字段名' -- 文件 定位某字段何时、由谁、在哪个提交引入（本例 717e0e6f1 / cll），能快速把「一直是坏的」和「某次改动改坏的」区分开。",
+   "evidence": "会话 7fcdcc25：用户反馈「现在默认是已备案，也选不了其他状态，选择其他状态然后点查询页还是已备案」，要求排查「什么时候、谁改的、什么原因」。结论：筛选项 2026-05-07 由 cll 随页面新建一起加入（提交 717e0e6f1），强制默认「已备案」是 2026-05-19 由 cll 加进 getQueryParams()（比筛选项晚 12 天），故 5 月 19 日之后每次查询都被代码重置回「已备案」；对比旧页 pubRevenueContract 只有列表列、搜索区没有该筛选项，说明是新建 resourcesLeaseContractFiling 时把筛选条件一并带出来的。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/index.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "baseline": "5029af0",
+   "sessionIds": [
+    "7fcdcc25-208a-4099-b05d-179f9783abeb"
+   ],
+   "bundle": "047.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "[苏房] ImageViewer 挂在 App 常驻，el-dialog 缓存首次的 zIndex，写死 z-index 也压不过后续业务弹窗",
+   "type": "bug",
+   "content": "现象：全局图片预览组件 ImageViewer 一直挂在 App 里、只切 visible，被后打开的业务弹窗盖住；想用 :z-index 或 ::v-deep 写死 9999 救，仍然会翻车。\n根因：Element 的 el-dialog 在「第一次打开」时由 PopupManager 分配 zIndex 并缓存在该实例上（v2.x 的 popup/modal 会把增量后的 zIndex 记到实例）。ImageViewer 是常驻单实例，这个旧值会被反复复用；而业务弹窗每打开一次都从 PopupManager 拿到更大的新值，多轮开关以后预览必然再次被压在下面。所以写死 z-index 只是暂时掩盖，实例缓存值仍在增长。\n做法（交给 Element 叠层，不要手动写数值）：1) 给 el-dialog 加 v-if=\"showViewer\"，关闭时从 DOM 卸掉、再开时新建实例，让它重新走 PopupManager 与其它弹窗自然叠序；2) 删掉 :z-index 以及遮罩/对话框上 ::v-deep 里写死的 z-index；3) 外层包 image-viewer-host 并设 display: contents，既不占布局又满足 Vue2 单根节点要求；4) App.vue 里全局 .viewer-container { z-index: 9999 } 一并删除，它只作用于预览容器还会干扰正常叠层。\n判断准则：弹层层级问题优先怀疑「常驻组件复用旧 PopupManager 值」和「全局写死的 z-index」，不要靠加更大的数字对抗。",
+   "evidence": "会话 f6b10079：用户诉求为图片预览被业务弹窗遮挡（附 git diff）。最终结论明确指出「Element 的 el-dialog 会在第一次打开时用 PopupManager 分配一个 zIndex 并缓存在实例上，ImageViewer 只切 visible 时同一对话框实例反复用这个旧值，业务弹窗每开一次拿到更大新值，多轮开关后预览又被压下面」，做法是 el-dialog 加 v-if=\"showViewer\" + 去掉 :z-index 与 ::v-deep 写死的 z-index + 外层 image-viewer-host 配 display:contents + 删掉 App.vue 的 .viewer-container{z-index:9999}。",
+   "files": [
+    "zhi2-web-admin/src/components/ImageViewer/index.vue",
+    "zhi2-web-admin/src/App.vue",
+    "zhi2-web-admin/src/store/modules/preview.js"
+   ],
+   "baseline": "8d416b2",
+   "sessionIds": [
+    "f6b10079-e6fe-4609-92a4-02cfad456764"
+   ],
+   "bundle": "047.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "[苏房] keep-alive 首页 tab 与统计数字错位：:key 强制重渲染 + 请求序号保护 + activated 重置",
+   "type": "bug",
+   "content": "现象：首页「办件量分析」切到「当日」后进待办详情再返回，tab 回到默认「本周」，但数字还是当日那份，出现「本周选中、当日数据」（当日数 > 本周数的明显错乱）。用户明确说不能稳定复现，只能给出复现步骤——这类 keep-alive 页面的状态残留问题几乎都不靠肉眼定位，必须按「生命周期 + 并发」两条线拆。\n根因（复合）：1) 页面被 keep-alive 缓存，activated 时组件没重建，tab 索引与数字区是两套状态，tab 被重置回默认值而数字区仍保留上次渲染结果；2) DOM 复用导致数字未及时刷新；3) 多次统计请求并发返回，旧响应覆盖新响应；4) 重新激活后没有重新取数。\n做法：一、数字区加 :key=\"'task-stats-' + currentTab\"，切 tab 强制重渲染，杜绝 DOM 复用串数据；二、用计算属性 currentTaskStats 统一安全读取「当前 tab 对应的那份数据」，不要在模板里按索引散取；三、抽 refreshStatsData()，刷新前先清空 todoCount/bubbleList/lineData，避免清空前短暂显示旧值；四、加 statsFetchSeq 自增序号，响应回来时比对序号，丢弃过期响应（这是本项目并发防御的通用写法）；五、补 activated 钩子，从详情返回时把 tab 重置为「本周」并重新拉数。\n可复用结论：用户报「数字与选中项不一致 / 偶发、不稳定复现」时，优先按「keep-alive 缓存 + tab 索引独立状态 + 并发响应乱序」三项排查。",
+   "evidence": "会话 d23cbaf7：用户反馈「首页-办件量分析，在切换的时候数量会出现紊乱，例如当日的大于本周的，不能稳定复现」，并给出复现路径（点当日→点待办进详情→返回首页默认停在本周，此时本周显示的是当日办件数）。修复：:key=\"'task-stats-' + currentTab\"、currentTaskStats 计算属性、refreshStatsData() 刷新前清空 todoCount/bubbleList/lineData、statsFetchSeq 序号保护忽略过期响应、activated 钩子重置为「本周」并重新拉数，改动在 home/index.vue。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index.vue",
+    "zhi2-web-admin/src/views/home/index-wrapper.vue",
+    "zhi2-web-admin/src/router/index.js"
+   ],
+   "baseline": "c98afb0",
+   "sessionIds": [
+    "d23cbaf7-ad9b-42a8-baa6-7897239ffefe"
+   ],
+   "bundle": "047.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "同一模块存在两份同名 api 文件（pricehouse/ 与 presale/）时，接口路径改动只改一份 → 详情页 Tab 静默不调接口且模板读 undefined.length 报渲染错误",
+   "type": "bug",
+   "content": "【什么情况】苏州V3 价格备案详情页（recordPriceMngSuzhou/detail.vue）的「楼幢」Tab 打开后不发请求，控制台同时报 Error in render: \"TypeError: Cannot read properties of undefined (reading 'length')\"，warn 指向子表组件 BuildingsTable.vue（嵌在 zs-tabs 内）。用户明确给出期望的接口与请求体：POST /presale/priceBuilding/list {pageNum, pageSize, priceRecordId}。\n【为什么】src/api 下同一业务存在两份同名封装 recordPriceHouse.js：api/pricehouse/ 与 api/presale/，组件批量被迁移后引用的是其中一份，而「list → page」的路径规范改造只改了另一份，导致页面实际调用的是不存在的旧路径（或反过来 —— 用户要求改回 /page 后组件仍指向未同步的副本）。接口 404/被拦截后没有回调把数据写进 tableData，getList 的返回值是 undefined，模板直接访问 xxx.length 就炸成渲染错误，第一现场看起来像「组件没写请求」而不是「接口路径分叉」。\n【怎么做】1) 改任何一个分页接口路径前，先 grep 同名 api 文件名，确认是全局唯一还是一模块多副本，所有副本一起改或删掉未使用的那份；2) 子表 getList 一律写成 response.rows || []、response.total || 0，让接口异常退化成空表而不是整块组件渲染崩溃；3) 排查顺序固定为：先看 Network 里到底有没有发请求且 URL 是否与期望一致（路径分叉最容易伪装成「没调接口」），再怀疑 zs-tabs 的懒加载，最后才看组件逻辑。",
+   "evidence": "会话 08444023 用户诉求1「楼幢这个地方接口也没调 /presale/priceBuilding/list{\"pageNum\":1,\"pageSize\":5,\"priceRecordId\":\"2092928554058342402\"}」；诉求2 贴出 BuildingsTable.vue 的 render 异常 Cannot read properties of undefined (reading 'length')；诉求3「接口改为 /presale/priceBuilding/page」；最终结论「listRecordPriceBuild 已改回 POST /presale/priceBuilding/page；getList 中改为 response.rows || []、response.total || 0，避免接口无 rows 时模板访问 .length 报错」。涉及 api/pricehouse/recordPriceHouse.js 与 api/presale/recordPriceHouse.js 两份同名文件。",
+   "files": [
+    "zhi2-web-admin/src/api/pricehouse/recordPriceHouse.js",
+    "zhi2-web-admin/src/api/presale/recordPriceHouse.js",
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/components/BuildingsTable.vue",
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/detail.vue",
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/components/PriceTable.vue",
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/components/BuildRecordTable.vue"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "08444023-c60e-41b0-9e6e-c49324a5d33b"
+   ],
+   "bundle": "048.md",
+   "project": "产品2.0"
+  }
+ ]
+}

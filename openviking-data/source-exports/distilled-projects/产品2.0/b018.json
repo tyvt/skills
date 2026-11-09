@@ -1,0 +1,197 @@
+{
+ "project": "产品2.0",
+ "batch": 18,
+ "files": [
+  "069.md",
+  "070.md",
+  "071.md",
+  "072.md"
+ ],
+ "count": 11,
+ "memories": [
+  {
+   "baseline": "018ae18",
+   "content": "什么情况：下载模板类接口（importTemplate 等）设置 responseType:'blob' 后，后端报错时有两种形态：HTTP 4xx/5xx 时 axios 进错误拦截器，但 response.data 是 Blob 读不到 msg，只能提示通用的 Request failed with status code 400；HTTP 200 但 body 是 JSON 错误时，会被直接当成 Excel 文件下载成坏文件。为什么：Blob 响应把 JSON 错误体也封装成了二进制，项目现有的按 JSON 解析 msg 的链路完全失效。怎么做：①在 src/utils/request.js 错误拦截器里判断 response.data 是 Blob 时，用 FileReader/text() 解析出其中的 JSON 并展示后端 msg；②在 src/utils/index.js 新增 downloadBlobFileWithCheck 工具：下载前先检查 Blob 是否为 JSON 错误响应（content-type 或首字节），是错误则弹出提示、不是才触发保存；③各下载模板调用点统一改用该工具。之后未关联房屋等业务性报错能显示后端具体文案。",
+   "evidence": "会话 3f404cf2-9522-42c1-aa00-9a2837b4eb10：改 request.js 错误拦截器 + utils/index.js 新增 downloadBlobFileWithCheck + spFeeBill/components/import.vue 的 getTemplate 换用该工具",
+   "files": [
+    "zhi2-web-admin/src/utils/request.js",
+    "zhi2-web-admin/src/utils/index.js",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/import.vue"
+   ],
+   "sessionIds": [
+    "3f404cf2-9522-42c1-aa00-9a2837b4eb10"
+   ],
+   "title": "[产品2.0] Blob 下载接口的 JSON 错误兼容：downloadBlobFileWithCheck + 错误拦截器解析 Blob",
+   "type": "pattern",
+   "bundle": "069.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "62d5fb9",
+   "content": "什么情况：页面报 Invalid prop: type check failed for prop \"permission\". Expected Array, got Boolean。来源是把按钮配置对象里的 permission: false 通过 v-bind=\"button.attrs\" 透传给了 ZsButton。为什么：ZsButton 的 permission prop 声明为 Array，布尔值触发类型警告；而同样的 permission: false 写在 buttons 配置里给 zs-operate-column 用是合法的（该组件内部 if (!button.permission) return true，布尔是开关语义）。两个组件的 permission 语义不同：ZsButton 是权限码数组（不传 = 无权限限制直接显示），zs-operate-column 是布尔开关。怎么做：给 ZsButton 的按钮 attrs 里不要写 permission: false，直接省略即可达到「不受权限限制」的效果；确需权限控制时传数组如 permission: ['company:personnelRecord:add']。排查此类警告时先分清 permission 流向哪个组件。",
+   "evidence": "会话 238293ef-3bd5-4396-98d5-3034f011a25c：从 certificatesTable.vue 操作按钮 attrs 移除 permission: false，buttons 配置里的保留给 zs-operate-column",
+   "files": [
+    "zhi2-web-admin/src/components/zs-button/zs-button.vue",
+    "zhi2-web-admin/src/views/company/staffManagement/components/certificatesTable.vue"
+   ],
+   "sessionIds": [
+    "238293ef-3bd5-4396-98d5-3034f011a25c"
+   ],
+   "title": "[产品2.0] ZsButton 不吃布尔 permission：v-bind=\"attrs\" 会把按钮配置里的 permission:false 透传触发类型警告",
+   "type": "bug",
+   "bundle": "069.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "6cf33a8",
+   "content": "什么情况：全局把维护类接口前缀从 /maintenance/... 换成 /dataProperty/...（9 个接口、涉及 49 个文件）时，除了直接写死字符串的接口路径，还有 moduleName + businessName 拼接式调用（如统一 request 封装按模块名拼 URL），两种都要排查替换，否则拼接式调用点会残留旧前缀。更大的坑：全局字符串替换会把 import '@/views/maintenance/...' 这类前端页面路径也误替换成 dataProperty，导致编译报错——接口前缀与前端目录名可能同名但含义完全不同。怎么做：批量迁移接口前缀时 ①同时覆盖字面量 URL 与 moduleName/businessName 拼接点（可按 businessName 是否属于目标接口来判定）；②替换范围限定在接口路径上下文，替换后必须复查 @/views/ 等 import 路径是否被误伤并恢复；③收尾用旧路径残留 grep 复查归零。",
+   "evidence": "会话 2a1a3c5d-9f69-436a-93ed-f2b987edfc4a：49 个文件替换后，发现并恢复 3 处被误改的 import '@/views/maintenance/...'",
+   "files": [
+    "zhi2-web-admin/src/api/index.js",
+    "zhi2-web-admin/src/views/maintenance/facility/index.vue"
+   ],
+   "sessionIds": [
+    "2a1a3c5d-9f69-436a-93ed-f2b987edfc4a"
+   ],
+   "title": "[产品2.0] 接口前缀批量迁移（maintenance→dataProperty）：moduleName+businessName 拼接调用也要换，且防误伤 @/views import",
+   "type": "pattern",
+   "bundle": "069.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "bc9b2a3",
+   "content": "什么情况：打印参数保存报「打印配置ID不能为空」，请求体只有 paramKey/paramValue，printConfigId 始终缺失，但数据流本身是通的（PrintDialog → PrintParamsTable :id=... → ParamsDialog :id=id）。为什么：ParamsDialog 混入的 dialogMixins 已把 id 声明为 prop，Vue 中已声明为 prop 的属性不会进入 $attrs，所以代码里写的 this.$attrs.id 恒为 undefined，赋值给 form.printConfigId 后随请求发出的是空。这类坑在混入 dialogMixins 的弹窗组件里普遍存在：凡是 mixin 声明过的 prop（id、visible 等）都不能再从 $attrs 取。怎么做：混入 dialogMixins 的组件直接用 this.id 取主键；出现「某 ID 字段没随请求发出但父组件确实传了」时，优先排查是不是取值走了 $attrs 而 prop 已被声明。",
+   "evidence": "会话 6fdd2549-8d41-469b-94b8-8cd8fe8a1f20：dialogMixins.js props 里声明 id，ParamsDialog.vue confirm 中 this.$attrs.id 为 undefined，改为 this.id 修复",
+   "files": [
+    "zhi2-web-admin/src/mixins/dialogMixins.js",
+    "zhi2-web-admin/src/views/tool/print/components/ParamsDialog.vue"
+   ],
+   "sessionIds": [
+    "6fdd2549-8d41-469b-94b8-8cd8fe8a1f20"
+   ],
+   "title": "[产品2.0] dialogMixins 声明 id 为 prop 后 $attrs.id 恒 undefined：弹窗取主键必须用 this.id",
+   "type": "bug",
+   "bundle": "069.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "49a7aa3",
+   "content": "什么情况：详情页 DetailTemplate 只读态的字段行存在「某字段单独居中、同行其他字段不居中」的不一致。用户通过截图确认的全局规范是：垂直方向标签与值在同一行内垂直居中；横向方向一律左对齐（标签、文本、金额均左对齐；带操作按钮如「延期」时文字在左、按钮在右），任何字段不得单独 align: 'center'。为什么：个别页面给金额/日期字段配 align:'center'、labelAlign:'center' 会与同行其他字段错位。怎么做：①页面侧移除字段配置里的 align:'center'/labelAlign:'center'，金额字段对齐既有页面统一 align:'left'；②组件侧在 detail-template.vue 把行内单元格 align-items 改为 stretch 保证同行等高，标签区与值区用 display:flex + align-items:center 实现垂直居中，字典标签在值区内也垂直居中。改公共组件一处，所有详情页同时生效。",
+   "evidence": "会话 b7d66167-3cc1-4c4a-8a14-79f95779a579：pubPaymentNotice/detail.vue 移除 center 配置，detail-template.vue 行内单元格改 stretch + flex 垂直居中",
+   "files": [
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/views/benefit/pubPaymentNotice/detail.vue"
+   ],
+   "sessionIds": [
+    "b7d66167-3cc1-4c4a-8a14-79f95779a579"
+   ],
+   "title": "[产品2.0] DetailTemplate 对齐规范：垂直居中 + 横向左对齐，字段禁止单独居中",
+   "type": "fact",
+   "bundle": "069.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "无同源结论：已知清单只有「E2E 依赖真实后端用 test.skip 标注」与流程按钮权限从 flowable 取，均未覆盖「业务未配置流程」这一根因与配置路径",
+   "content": "什么情况：企业注册真实接口全流程 E2E（saveCompanyRegister → saveLegalPersonInfo → 要件上传 → saveDraft 均通过）在最后 editAndSubmit 提交审核时返回 HTTP 500，业务消息「该业务未配置流程」，前端所有步骤（股东信息、协议勾选）都已完成。为什么：提交审核接口会按业务编码去 flowable 找已发布的审批流程，新业务或新环境没配置流程时后端直接 500，报错形态像代码故障但实际是环境配置缺失。怎么做：先从对应 api 文件（如 companyRegister.js）查出业务编码（040100=开发企业注册），登录管理端进入工作流/流程配置菜单（tool/workflow 相关），为该业务编码配置并发布审批流程，再重跑 npm run test:e2e:real-api-flow 验证；不要在前端或测试脚本侧找原因。",
+   "evidence": "会话 63a99906：Step1-Step4 保存全部通过，仅 editAndSubmit 500「该业务未配置流程」；结论明确为后端工作流未配置，需为业务编码 040100 配置并发布流程后复测。",
+   "files": [
+    "zhi2-web-admin/e2e/register/real-api-flow.spec.js",
+    "zhi2-web-admin/src/views/company/companyRegister.js"
+   ],
+   "sessionIds": [
+    "63a99906-bb31-47e2-a926-890c925cb6ed"
+   ],
+   "title": "[产品2.0] 真实接口 E2E 报「该业务未配置流程」是后端工作流缺失，不是前端/脚本问题",
+   "type": "workflow",
+   "bundle": "070.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "已知 #529/#553 讲的是「Unknown custom element 时用 import.meta.glob 全局注册修复」，本条是反方向坑：已全局注册的组件被错误路径局部 import 导致 Vite resolve 失败，属不同根因",
+   "content": "什么情况：页面复制粘贴时把 ZsTencentMap 写成 '@/views/projectManagement/project/zsTencentMap/index.vue' 这类不存在路径做局部 import 并注册，Vite 报 Failed to resolve import，构建/启动失败；而模板里 <zs-tencent-map> 标签本身是有效的。为什么：main.js 已用 import.meta.glob 按「父目录名即标签名」把 src/components 下的组件全局注册，ZsTencentMap 真实位置是 @/components/ZsTencentMap/index.vue；对全局组件再写局部 import 不仅冗余，还引入一个会被静态分析的假路径，一处写错整页编译失败。怎么做：凡模板里用的是全局注册标签（zs-* 小写），删除多余的本地 import 与 components 注册即可，与其他页面（venueDialog.vue 等）写法对齐；排查此类报错先核对组件真实目录，再确认是否已全局注册。",
+   "evidence": "会话 0ce851e8：ParcelDialog.vue 与 BaseProjectForm.vue 均错误 import 不存在的 zsTencentMap 路径，删除两处局部 import/注册后错误消失，依赖 main.js 的 import.meta.glob 全局注册。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/project/customerProjectinfo/components/ParcelDialog.vue",
+    "zhi2-web-admin/src/components/ZsTencentMap/index.vue",
+    "zhi2-web-admin/src/main.js"
+   ],
+   "sessionIds": [
+    "0ce851e8-bb59-473a-aaef-ab0400533ead"
+   ],
+   "title": "[产品2.0] 已全局注册的 zs 组件（如 zs-tencent-map）禁止再局部 import：路径写错即 Vite resolve 失败",
+   "type": "bug",
+   "bundle": "070.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "42b6033 / 2198ce6 / 57109f9 / 94b86fa / 1d563df / 8e16dca",
+   "content": "什么情况：多个「按钮不显示/样式不对」类问题看似无关，根因都是跨层契约断链。1) 公共查询复杂详情页右上角的「物业合同备案/业委会备案/开户申请」入口被子组件用 v-if=\"!hasData\" 控制，一旦有数据入口反而消失——入口型按钮的生命周期约定是常显，数据存在性只应控制表格内「暂无数据，请先备案」的空态文案，不应控制入口显隐（对应已知「空态缺省图与维护按钮互斥」的另一面）。2) 列表跳转在路由 query 里带业务标志（如 ifHistory=1 表示历史合同维护、免审批），但中间层详情页没把 query 透传给提交组件，子组件用默认值 0，提交报文走错流程且无任何报错。修法是在 getForm() 里建立「路由参数 > 表单数据 > prop」的取值优先级，确保编辑后二次提交也不丢标志。3) zs-table 的 flexColumnCount 弹性列机制：列在 created 时必须调用 registerFlexColumn、beforeDestroy 时注销，flexColumnCount 从 0 变非 0 时要触发 doLayout() 重算；漏注册则 fit 恒 false，各列按极小 min-width 显示，与 fixed=right 操作列之间出现大片空白。共性教训：跨 2 层以上传递的标志/注册契约，断链时全部静默退化，排查时应沿「路由→页面→组件→提交报文/渲染计数」逐层核对值是否还活着。",
+   "evidence": "071.md：propertyContractTable/committeeTable/managementOrgPanel/regulatoryAccountPanel 移除 v-if=\"!hasData\"；propertyContractTemporary/detail.vue 未传 ifHistory 导致 payload 为 0；zs-table-column 未调 registerFlexColumn 使 flexColumnCount 恒 0",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/complex/detail.vue",
+    "zhi2-web-admin/src/views/property/propertyContractTemporary/detail.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue"
+   ],
+   "sessionIds": [
+    "35553223-dace-4e9a-b3e2-6d7267b933f7",
+    "d952db17-fd70-47a3-8c5e-131e0f221118",
+    "f54cd7c5-5e83-4adc-8f94-724400b04b86"
+   ],
+   "title": "跨层传递的业务标志/列注册契约断链会静默失效：入口 v-if、ifHistory 透传、zs-table 弹性列注册",
+   "type": "pattern",
+   "bundle": "071.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "8e16dca",
+   "content": "什么情况：顶部导航「永远默认选中首页」，点了其他子模块也不高亮。为什么：Navbar.vue 里 isHomeActive 定义在 methods 中，模板却写成 :class=\"{ active: isHomeActive }\"——绑定的是函数引用本身，任何函数引用都是 truthy，所以「首页」恒 active；同时 isActive() 里的 if (this.isHomeActive) return false 也恒成立，其他模块的高亮分支永远走不到。与已知「computed 写成方法简写导致构建失败」同族但表现不同：这里不报错，纯视觉静默错误。怎么做：该值改为 computed 属性，让模板与 isActive() 读到真实布尔；再补一个 syncActiveMenuFromRoute 方法按当前路由匹配一级模块，且路由监听加 immediate: true，保证刷新页面或直接访问子页面 URL 时也能正确回填高亮，实现各模块互斥高亮。排查提示：凡「某状态恒真/恒假且无报错」，先查模板里绑的是方法名还是计算属性。",
+   "evidence": "071.md 会话 428cfc70：函数引用恒 truthy 导致首页永远 active、其他模块永不高亮；修复为 computed + syncActiveMenuFromRoute + immediate watcher",
+   "files": [
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/layout/components/TagsView/index.vue"
+   ],
+   "sessionIds": [
+    "428cfc70-782c-4061-9b59-52d8ce8ccbd5"
+   ],
+   "title": "模板 :class 绑定 methods 方法引用恒为 truthy：导航「首页永远高亮」的静默根因",
+   "type": "bug",
+   "bundle": "071.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "76646e6",
+   "content": "什么情况：dataProperty 巡保记录（recordProcess）的步骤子表弹窗中，「说明/照片」字段是否必填不由本单数据决定，而由所挂巡保程序（procedureId）的步骤配置决定。为什么：同一程序在不同版本下步骤要求不同，若写死必填会与程序配置漂移；而配置是异步拉的，若只在弹窗打开时拉一次，详情接口晚返回（api:true、步骤编号只出现在详情里）时规则会对不上。怎么做：①详情页给步骤子表透传 :procedure-id=\"form.procedureId\"，子表组件再透传给弹窗；②弹窗在 view/edit 态调 GET /dataProperty/procedureProcess/page（procedureId + pageNum:1 + pageSize:500），取 processSerial 与当前步骤一致那条记录的 isExplain/isPicture（'1' 为必填）驱动 dynamicRules；③无 procedureId、无步骤编号、请求失败或未匹配到行时，回退用 detailForm 上的 isExplain/isPicture 兜底；④重写 detailCallback：合并详情数据后再拉一次配置同步规则，保证详情异步返回后校验仍对齐。弹窗打开先拉配置再 init()。",
+   "evidence": "会话 4d8f8198 最终结论：detail.vue 传 :procedure-id，recordProcessStepDialog 新增 procedureId prop、view/edit 调 procedureProcess/page 按 processSerial 匹配取 isExplain/isPicture，detailCallback 重写为详情返回后再拉一次配置，失败兜底 detailForm。",
+   "files": [
+    "zhi2-web-admin/src/views/dataProperty/recordProcess/components/recordProcessStepDialog.vue",
+    "zhi2-web-admin/src/views/dataProperty/recordProcess/components/recordProcessStepTable.vue",
+    "zhi2-web-admin/src/mixins/subTableMixins.js"
+   ],
+   "sessionIds": [
+    "4d8f8198-d7b1-458f-891e-5a0c95b1090a"
+   ],
+   "title": "[产品2.0] 子表弹窗「必填规则来自程序步骤配置接口」的接法与 detailCallback 二次同步",
+   "type": "pattern",
+   "bundle": "072.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "0161609",
+   "content": "什么情况：zs-select-dialog.vue 控制台报 [Vue warn]: The data property \"selectable\" is already declared as a prop，出现在工单报事等使用选择弹窗的页面。为什么：该组件声明了函数类型的 prop `selectable`（控制行是否可选，传给 zs-select-column），同时又混入了 @/mixins/table，而 table mixin 的 data 里也有一个布尔 `selectable`（表示是否显示多选列）。Vue 不允许同名 prop 与 data，二者冲突告警且行为互相踩。怎么做：把 `mixins: [table]` 换成 `mixins: [tableComponents]`——tableComponents 只注册 zs-table、zs-select-column 等组件、不含 selectable 等 data；zs-select-dialog 自身已实现列表查询与选择逻辑，不需要完整 table mixin。经验：给已有同名 data/prop 的公共弹窗组件补 mixin 时，优先选只注册组件的轻量 mixin（tableComponents），完整 table mixin 只给真正跑列表逻辑的页面用。",
+   "evidence": "会话 09ed34db：报错栈定位 zs-select-dialog.vue，根因为 prop selectable（函数）与 table mixin data selectable（布尔）同名；修复为 mixins 由 table 换成 tableComponents，警告消失。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue",
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/mixins/tableComponents.js"
+   ],
+   "sessionIds": [
+    "09ed34db-94d4-41c6-856b-023f0668f865"
+   ],
+   "title": "[产品2.0] zs-select-dialog 混入 table mixin 会与组件 prop `selectable` 同名冲突，应混 tableComponents",
+   "type": "bug",
+   "bundle": "072.md",
+   "project": "产品2.0"
+  }
+ ]
+}

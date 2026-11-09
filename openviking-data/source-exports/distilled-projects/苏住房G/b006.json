@@ -1,0 +1,170 @@
+{
+ "project": "苏住房G",
+ "batch": 6,
+ "files": [
+  "021.md",
+  "022.md",
+  "023.md",
+  "024.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "baseline": "9e5c499",
+   "content": "情况：首页仪表盘类图表（如报事报修趋势图）需求是「右侧补一个单位『（件）』」，即只要单位文字，不要第二套刻度和网格。常见误做是再画一个完整 yAxis，结果右轴多出一列刻度数字和横线，或直接把单位拼进左侧轴 name 导致左边拥挤。为什么：ECharts 的 yAxis.name 是唯一能稳定渲染在轴端部的原生元素，所以正解是「造一个专门放文字的轴」——把右轴做成不可视的数据轴，只用它的 name 当单位标签。怎么做：① 配置两个 yAxis，左轴保持原样（含刻度、轴标签、splitLine）；② 右轴设 name:'（件）'、nameLocation:'end'（贴顶部而非居中）、nameGap:12，并关掉 axisLine/axisTick/axisLabel/splitLine（全部 show:false）；③ 数据系列仍显式写 yAxisIndex:0 绑左轴，不要靠默认值；④ 把 grid.right 预留出来承接这段文字（原 16 → 28），否则 name 会被画布右缘裁掉。验证：若预览环境图表容器高度为 0 会看起来「没生效」，要在有真实数据的本地环境核对，别误判成配置写错。注意与小程序端 ECharts 经验不同——那边还涉及定制裁剪包/同层渲染，Web 端这里纯粹是「借轴画字」的配置技巧。",
+   "evidence": "会话 2cbdebe1；用户在截图标注「右侧缺失单位」，回复确认在 RepairPanel.vue 的 trendOption 中完成：双 Y 轴、右侧仅显示单位（件）（nameLocation:'end'，刻度与网格隐藏）、grid.right 由 16 调整为 28、nameGap:12、系列仍 yAxisIndex:0",
+   "files": [
+    "zhi2-web-admin/src/views/home/v2/components/RepairPanel.vue",
+    "zhi2-web-admin/tests/e2e/home-v2.spec.mjs"
+   ],
+   "sessionIds": [
+    "2cbdebe1-6e3a-4685-97c1-159d222e3131"
+   ],
+   "title": "ECharts 只要「右侧单位（件）」不要第二套刻度：隐藏刻度标签的孪生 Y 轴用 axis name 承载单位",
+   "type": "pattern",
+   "bundle": "022.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "4e59087",
+   "content": "情况：物业管理区域查询页左侧行政区划树（areaCodeTree 接口）点展开箭头无任何反应，节点层级打不开。为什么（三个叠加根因）：① node-key='areaCode' 不稳定——接口返回的节点 areaCode 可能重复或为空，而 Element UI 的 el-tree 内部靠 node-key 建立节点映射，key 重复/空会直接破坏映射，表现就是「点了没反应」而不是报错；② 同时绑了 :current-node-key 受控值，与不稳定 key 配合，重渲染时会连带干扰展开状态；③ default-expanded-keys 对异步数据天然失效——树数据是接口回来后才赋值的，初始化那次展开已经跑完，之后赋 data 不会重放默认展开。怎么做：node-key 改成加载时补全的唯一 id（遍历 treeData 生成/补 id 后赋值），删掉 :current-node-key 和无效的 default-expanded-keys，改为在数据加载完成的回调里手动 setCurrentKey + 展开根节点；再设 :expand-on-click-node=\"false\"，避免点节点文字触发筛选与展开互相打架；排序列表无匹配时回退使用接口返回的完整区县数据。注意与已知「node-key 类型与 setCurrentKey 入参类型不一致」不是同一个坑：那条是类型不匹配，这条是 key 本身不唯一 + 异步默认展开失效。",
+   "evidence": "会话 bd3cdf70；用户截图报「物业管理区域查询：部门树不展开」；结论列出 node-key=\"areaCode\" 不稳定、:current-node-key 受控绑定、default-expanded-keys 异步加载后失效三点，修复为 node-key=\"id\" + 加载时补唯一 id + 移除受控 key + 手动展开根节点并默认选中 + expand-on-click-node=\"false\" + 无匹配回退完整区县数据",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/complex/index.vue",
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue",
+    "zhi2-web-admin/src/views/property/complex/components/regionTree.vue"
+   ],
+   "sessionIds": [
+    "bd3cdf70-1309-4f6d-b4b3-b918206e8052"
+   ],
+   "title": "左侧行政区域树点箭头不展开：node-key 用了可能重复/为空的业务编码，须补唯一 id 并手动展开根节点",
+   "type": "bug",
+   "bundle": "022.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "320507d",
+   "content": "情况：统计展示类页面（如月报统计详情）套了全局 .detail-container 后，标题栏和操作按钮组出现在页面最下方，内容却在上面，视觉上完全颠倒。为什么：这个容器是给「表单详情页」设计的，全局样式里写了 flex-direction: column-reverse —— 目的是让写在模板最后面的操作按钮固定在视觉底部，代价是 DOM 第一个子元素（标题栏）被排到最底部。页面 DOM 顺序本身没错，所以查模板、查 v-if、查 CSS 优先级都查不出问题，也很难联想到「容器把顺序反了」。怎么做：先判断页面性质——有表单提交语义、需要操作按钮常驻底部才用 .detail-container；纯统计/看板/多维汇总类页面（如月报统计、信用申报统计）应换 .list-container，标题与按钮组就回到顶部。不要靠在页面里写 order 或加 flex-direction:column !important 去硬掰，会与容器的底部按钮策略互相打架。已知 detail-container 相关经验多是滚动所有权、底部白条高度、间距叠加，这条补的是「方向本身被反转」这一独立根因。",
+   "evidence": "会话 c63cd57e；用户问「标题和按钮组怎么到页面最下面去了」；结论明确原因为全局 .detail-container 设置 flex-direction: column-reverse 把 DOM 第一个元素（标题栏）排到最底部，已把外层容器改为 list-container（与信用申报统计等页面一致）",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/monthlyReportStat/detail.vue",
+    "zhi2-web-admin/src/views/publicQuery/monthlyReportStat/index.vue"
+   ],
+   "sessionIds": [
+    "c63cd57e-5fe2-4369-a1ab-b24c51627de2"
+   ],
+   "title": "页面标题/按钮组跑到页面最底部：全局 .detail-container 是 flex-direction: column-reverse，统计展示页应改 list-container",
+   "type": "bug",
+   "bundle": "022.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "864b409",
+   "content": "情况：机构银行权限类列表的「启用状态」列，市级行要显示字典转出的文字（如「已启用」），区级行要显示可操作开关；用户明确否掉了两种偷懒做法——「统一成开关」「统一成文字」都不接受，连续报「点完市级再点区级，还是显示成文字了」「市级字典没转换」。为什么难：① 列渲染形态是列级配置，列上写死 type:'switch' 或 type:'dict' 后整列只能是同一种；② 切换分层后字典没转换，是因为走 switch 分支的行不再触发字典翻译，而走 dict 分支的市级行又拿不到 options——两条链路各自漏一半。怎么做：把该列从纯配置改成插槽/自定义渲染，在渲染处先判当前行属于哪一层级（市级/区级标志字段）：市级分支渲染 dict 文案（显式传 options 或 dict-url，不要指望组件按 prop 自动推字典），区级分支渲染开关并绑状态变更事件；两个分支共用同一份字典 options 来源，保证文案与开关开启态同源。改完必须手动点一遍「市级 → 区级 → 市级」，验证切层后不残留上一种形态。与已知「查看态误用开关控件」「有无类字段字典选型」的区别：那两条是选错控件/字典，本条是同列按行运行时分流。",
+   "evidence": "会话 60af88ee；用户依次反馈「启用状态显示不正确」→「点完市级再点区级，还是显示成文字了」→「不行，得用字典」→「市级显示字典，区级显示开关」→「市级字典没转换」，涉及 regionBankAuth/index.vue、detail.vue、listMixins.js",
+   "files": [
+    "zhi2-web-admin/src/views/system/regionBankAuth/index.vue",
+    "zhi2-web-admin/src/views/system/regionBankAuth/detail.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "sessionIds": [
+    "60af88ee-274a-46dc-82a1-ad6da4012c53"
+   ],
+   "title": "同一状态列既要字典又要开关：按行层级（市级/区级）运行时切换渲染形态，而不是整列只选一种",
+   "type": "pattern",
+   "bundle": "022.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "9fb6c2c",
+   "content": "情况：打印配置页等「左侧菜单树(200px) + 右侧列表」布局的页面，表格本身显示正常，但右上角对齐的「新增」「删除」按钮看不到。为什么：合并分支/恢复业务代码时把中间的 table-container 包裹层弄丢了，右栏 list-card 直接落进横向 flex 里并带 width:100%，结果 200px 树 + 100% 右栏 = 超出容器宽度；表格因为自身可横向滚动看着「没坏」，而操作按钮是右对齐定位的，直接被挤出可视区域，表现得像「按钮没渲染」。这类问题最容易被误判成权限不足或 v-if 条件不成立，但实际是纯布局溢出。怎么做：按同类已正确页面（如 fjflpz/index.vue）恢复三层结构——list-container(flex row) → 左 menu-tree，右 table-container 显式 width: calc(100% - 200px) → 里面再放 list-card（表格 + 操作按钮）和弹窗组件。排查手法：先在元素面板看按钮节点是否存在于 DOM（存在 = 布局问题，不存在 = 条件/权限问题），再看右栏计算宽度是否等于父容器 100%。另：这类「左树右表」页的新增通常依赖左侧已选业务编码，顺手补 busCode 校验提示（请先选择左侧菜单业务编码），避免按钮修好后点下去还是空。",
+   "evidence": "会话 d409e8fd；用户报 tool/print/index.vue「新增按钮不显示」；结论指出 develop/v2.6.2 合并恢复代码时丢失 table-container 包裹层，左侧 MenuTree(200px) + 右侧 list-card(width:100%) 在横向 flex 下超宽把右侧按钮挤出可视区，按 fjflpz/index.vue 恢复 list-container → menu-tree + table-container(width: calc(100% - 200px)) → list-card 结构，并为 handleAdd 增加 busCode 校验",
+   "files": [
+    "zhi2-web-admin/src/views/tool/print/index.vue",
+    "zhi2-web-admin/src/mixins/subTableMixins.js",
+    "zhi2-web-admin/src/components/zs-button/zs-button.vue"
+   ],
+   "sessionIds": [
+    "d409e8fd-ad8b-47a8-999b-763e63e18e32"
+   ],
+   "title": "左树+右列表页「新增按钮不见了」：丢了 table-container 包裹层，右栏 width:100% 与 200px 树并排溢出把按钮挤出可视区",
+   "type": "bug",
+   "bundle": "022.md",
+   "project": "苏住房G"
+  },
+  {
+   "baseline": "15e201a",
+   "content": "情况：企业备案变更接口 companyRecordChange/addAndSubmit 需要携带 busCode，该编码由「机构类型 × 是否本地机构」共同决定，不是单一常量；同一套 toB 详情组件同时服务多个机构/场景，页面里很难各自判断。为什么：本地机构变更与非本地机构变更走两条不同审批流程，编码不同（本地 qybgxq，非本地 QYBGJLXQFBD）；若散落在页面写 if(isLocal) 三元，容易出现「保存能过但提交报流程未维护完成」，后续新增机构类型也无从下手。怎么做（分层套路）：① 在 utils/localOrganizationFlow.js 补常量 COMPANY_RECORD_CHANGE_LOCAL_BUS_CODE='qybgxq' 与解析函数 resolveCompanyRecordChangeFlowBusCode，优先级为「路由 meta.busCode 优先 → 兜底本地编码 → 按 isLocalOrganization 映射到非本地编码」，保持与既有 resolveFlowBusCode 一致的形态；② 在 localOrganizationFlowMixin 里加默认 false 的 prop（如 useCompanyRecordChangeFallback），开启时 flowBusCode 走上面的 resolver，其他页面行为完全不变（开关式扩展，不污染公共语义）；③ 消费页只做两件事：operation-btn-group 绑 :bus-code=\"flowBusCode\"，并在 getForm() 的 isChange 分支里把 busCode 一并写进请求体；④ 真正需要「变更专用解析」的入口页（toB/change/detail.vue）显式打开该 prop。验收：无 meta + 本地 → qybgxq；非本地 → QYBGJLXQFBD；有 meta 时以路由为准，并在 Network 核对请求体。前提是 isLocalOrganization 已由 getOwnCompany 等接口回填到 form，否则会恒落本地分支。",
+   "evidence": "会话 a7f41aac；用户要求「/v2.0/company/companyRecordChange/addAndSubmit 加个 busCode，根据机构类型和本地非本地 @src/utils/localOrganizationFlow.js」；结论列出新增常量 COMPANY_RECORD_CHANGE_LOCAL_BUS_CODE='qybgxq'、resolveCompanyRecordChangeFlowBusCode（meta.busCode 优先，否则按 isLocalOrganization 映射到 QYBGJLXQFBD）、mixin 新增 useCompanyRecordChangeFallback（默认 false）、companyRecord/detail.vue 绑 :bus-code 并在 getForm 的 isChange 分支附带 busCode、change/detail.vue 开启 fallback",
+   "files": [
+    "zhi2-web-admin/src/utils/localOrganizationFlow.js",
+    "zhi2-web-admin/src/mixins/localOrganizationFlowMixin.js",
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue",
+    "zhi2-web-admin/src/views/toB/change/detail.vue"
+   ],
+   "sessionIds": [
+    "a7f41aac-d27d-4bbc-95f2-163087036786"
+   ],
+   "title": "变更单提交 busCode 除机构类型外还有「本地/非本地」维度：收敛到 localOrganizationFlow 的 resolver + mixin 开关",
+   "type": "workflow",
+   "bundle": "022.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "同一业务存在两个近名页面（property/account vs property/propertyAccount）时，参数要改「真正发请求的那个」，页面文件必须按接口名+所在目录定位",
+   "type": "bug",
+   "content": "什么情况：需求「开户银行弹窗新增参数 isPubRegulatoryAccount=1」，先在 property/account/detail.vue 改完、用户验收时截图反馈「这里没加上，是不是加错位置了」。为什么：截图里出现的请求是 queryStartBank，它来自 property/propertyAccount/detail.vue 的 showBankDialog()，那个页面走的是 /system/workBank/list 与银行网点接口；account 目录下的页面走的是另一套接口。两个目录名只差一个 property 前缀、都叫「账户」，靠目录名/页面标题无法区分，只能靠「发起该请求的方法是哪个」定位。已知清单只有 967 条「银行名单详情页网点/左侧树接口不能顺手换成 unionBank/page」讲接口口径不同，本条讲的是页面文件同名混淆导致改错位置，根因不同。怎么做：①搜索时以请求名（queryStartBank / selectTJgBankBranchList）而不是以「开户银行」中文为入口，反查调用它的 detail.vue；②改动点在 showBankDialog() 里同时被 spread 的两个参数对象 treeParams 与 filterParams，只改其中一个会出现「树有值、网点列表没有」的半生效；③setBankBranches() 的 filterParams 是第三个独立入口，必须同步；④模式相关参数用 computed（add/openedAdd 返回 {isPubRegulatoryAccount:'1'}、edit 返回 {}）而不是在方法里写 if，改完用 Network 面板核对 add 与 edit 两种模式下的实际 URL；⑤验证话术：明确告诉用户「编辑模式下该参数不应出现」，否则会被当成漏改。",
+   "evidence": "用户截图反馈「这里没加上，是不是加错位置了」；最终结论指出截图里 queryStartBank 来自 property/propertyAccount/detail.vue 的 showBankDialog()，而不是之前改动的 property/account/detail.vue（后者走 /system/workBank/list）；修复后 validation 为 queryStartBank?...&isPubRegulatoryAccount=1&isStart=1&sourceModel=property&regionCode=... 与 selectTJgBankBranchList?...&isPubRegulatoryAccount=1，编辑模式不带该参数。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/propertyAccount/detail.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/account/detail.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/property/account/components/AccountDialog.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/utils/workBank.js"
+   ],
+   "baseline": "a700def",
+   "sessionIds": [
+    "4cfcd91c-2679-4f6f-b33f-ee016bf89b9f"
+   ],
+   "bundle": "024.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "拉「已备案」列表的默认筛选前，先分清 BIZ_STATE 常量与全局 biz_state 字典两套值源；重置语义靠 $options.data() 天然保默认",
+   "type": "workflow",
+   "content": "什么情况：需求「把这批行业管理/项目管理/业主自治模块的列表默认筛选设为已备案」，需要先摸清每个模块的路由、筛选字段名、已备案枚举值、以及是否已有页面实现过。为什么：这些模块的列表页都不是文件直写，而是「薄包装页 + components/index.vue 内核」两级结构（如 company/companyManagement/property/index.vue 只做壳，真实列表逻辑在 company/companyManagement/components/index.vue），拿字段名必须读内核；路由由后端菜单动态生成，meta.filePath 与 views 目录对应，URL 要经 getRouterPathByFilePath() 解析，不能按文件路径猜 URL。已备案值在本项目里是常量 '2'（0 待提交 / 1 审核中 / 2 已备案 / 9 已撤销），源头是 src/views/indemnity/components/enums.js 的 BIZ_STATE.RECORDED，而列表筛选用的是全局 biz_state 字典（登录时 store.dispatch('common/saveBizStateOption') 加载）——已知清单 249 条只说了「业务状态走全局 biz_state、BIZ_STATE 常量保持原样」，本条补的是「默认筛选这个具体动作该取哪个值源」。怎么做：①默认值写进 data().queryParams，不要再写第二个初始化逻辑，因为 resetQuery() 走 this.$options.data().queryParams，默认值会随重置保留；②筛选字段多数是 bizState：物业服务企业、项目经理、项目经理变更、企业备案记录、信用各类、整改通知书、物业管理区域、变更记录、一般/选项/排序/多议题表决口径一致；③项目经理列表有 bizState 列但 formItems 里压根没暴露筛选项，要补「model:'bizState' + options: this.bizStateOptions」才看得见筛选；④同模块存在别名的（propertyManager 只有 jobStatus 在职状态）不是备案列表，别顺手加。",
+   "evidence": "探索结论明确：路由由后端菜单动态生成、meta.filePath 对应 views 目录、URL 用 getRouterPathByFilePath() 解析；列表页统一 listMixins + ListTemplate.js；重置走 resetQuery() → this.$options.data().queryParams；「已备案」枚举值 '2'，见 src/views/indemnity/components/enums.js 的 BIZ_STATE.RECORDED（0 待提交 / 1 审核中 / 2 已备案 / 9 已撤销）；项目经理列表「列表列有 bizState 但筛选项未暴露」，需补 formItems。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/company/companyManagement/property/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/company/companyManagement/components/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/company/staffManagement/personnelRecord/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/company/staffManagement/components/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/indemnity/components/enums.js"
+   ],
+   "baseline": "d109b83",
+   "sessionIds": [
+    "01b7d0f8-8018-41e8-9a52-062f491b10ff"
+   ],
+   "bundle": "024.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "「去掉默认业务状态筛选 + 加新增筛选项」的批量改造：时间区间与「是否本地机构」抽公共工具，前端兜底过滤会与分页 total 打架",
+   "type": "pattern",
+   "content": "什么情况：六个行业管理页面（物业服务企业、企业变更记录、信托公司、机构注册审核、项目经理、项目经理变更）统一改造查询区与列表列：去掉原先的默认「已备案」(defaultBizState=\"2\")、增加更新时间区间与「是否本地机构」筛选、重排查询项与列顺序。为什么：先按 110 条「默认筛选已备案」的结论做了默认值，随后产品口径变成「默认查全部」，所以默认值要从「写进 queryParams」升级成「可开关的 defaultBizState，且逐页确认有没有」，其中信托公司只需去掉 defaultBizState=\"2\"、不做其他新增。时间区间有业务约束（最多 2 年），必须带 disabledDate 且查询前再做一次校验——只管 disabledDate 的话用户改系统时间或程序化赋值仍能绕过。怎么做：①把时间区间表单项（含 disabledDate 与查询前校验）、是否本地机构下拉（1/0）、updateTime 列构建、人员类型白名单与标签解析四件事抽成 src/utils/companyListQuery.js，六页共用，不要在各页复制 formItems；②人员类页面的「人员类型」下拉只保留物业项目经理、企业管理员、信托公司人员，用 excludePersonnelTypes 参数让后端排除「开发企业项目经理」，同时保留前端兜底过滤——注意兜底过滤只影响当前页展示，total 仍是未过滤的全量，分页会「对不上」，需后端支持该参数才算真正一致；③停用字典项在列表里要显示中文名，用新增的 getDictsIncludeDisabled()，不能用 getDict()（后者会丢掉停用项导致显示码值）；④「开发企业项目经理」的 dictValue 从字典接口动态取，不要硬编码；⑤列宽用 minWidth（信用代码 180、企业名称 200、行政区域 160）改善首屏，不要写死 width。",
+   "evidence": "最终结论：新增公共工具 companyListQuery.js（更新时间区间最多 2 年含 disabledDate 与查询前校验、是否本地机构 1/0、updateTime 列、人员类型白名单与字典标签解析）；dict.js 新增 getDictsIncludeDisabled()；物业服务企业/企业变更记录 enableAdvancedQuery=true 并去掉默认「已备案」，信托公司仅去掉 defaultBizState=\"2\"；人员类型下拉只保留物业项目经理/企业管理员/信托公司人员，默认传 excludePersonnelTypes 排除开发企业项目经理并前端兜底过滤；联调注意明确写「若后端未支持，前端兜底过滤但分页 total 可能不准」。",
+   "files": [
+    "d:/repository/苏住房G/zhi2-web-admin/src/utils/companyListQuery.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/utils/dict.js",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/company/companyManagement/components/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/company/companyRegister/index.vue",
+    "d:/repository/苏住房G/zhi2-web-admin/src/views/company/staffManagement/components/index.vue"
+   ],
+   "baseline": "d5eee56",
+   "sessionIds": [
+    "c7bcdd50-859e-48be-b953-435a57e9aa54"
+   ],
+   "bundle": "024.md",
+   "project": "苏住房G"
+  }
+ ]
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "title": "苏服办开放平台接入收敛为「2 个 gateway 接口 + header 里的 zs-path」网关转发模式",
+    "type": "architecture",
+    "content": "接入苏服办（江苏省政务服务开放平台，ydzt.jszwfw.gov.cn/jpaas-jags-server/interface/gateway.do）时，宿迁同源项目的旧做法是「每个业务接口上架一个 interface_id」，苏住房C 没有迁移这套配置，导致文档要求调用的 gateway.do 在项目里不存在。用户拍板的方案是：开放平台只上架 2 个 interface_id（GET 类 / POST 类），前端所有请求统一 POST 到 gateway.do，真实业务路径放在 formData 的 header.zs-path 里，后端在这两个 gateway 接口里解析 header.zs-path + biz_content 再内部转发到真实业务接口，业务代码一行不改（仍是 api.get('/company/companyRecordAuth/page', { params })）。落地要点：开启 VITE_APP_USE_SFB_DISPATCHER=1 后，dispatcher.js 构建 formData{app_id, interface_id, biz_content(业务参数 JSON), header(Authorization + zs-path + zs-sign + zs-timestamp + zs-nonce), sign(SM3 网关签名), timestamp, charset, origin, version}；httpInstance.js 网关模式直连网关地址并解析网关响应；sign.js 必须跳过对 gateway.do 的重复签名；.env.* 新增 VITE_APP_SFB_GATEWAY_URL、VITE_APP_SFB_GET_INTERFACE_ID、VITE_APP_SFB_POST_INTERFACE_ID；vite.config.ts 加 /sfb-gateway 代理绕 CORS。这样新增业务接口不需要再逐条上架。",
+    "evidence": "用户诉求 2/3 明确「所有接口改为两类，后端实际上架 2 个接口，后端内部自己转发，这样就不用所有接口都上架」；最终结论列出 dispatcher.js/httpInstance.js/sign.js/.env/vite.config.ts 五处改动与 header 字段约定。",
+    "files": [
+      "zhi2-mobile-shimin/src/api/dispatcher.js",
+      "zhi2-mobile-shimin/src/api/httpInstance.js",
+      "zhi2-mobile-shimin/src/utils/sign.js",
+      "zhi2-mobile-shimin/vite.config.ts"
+    ],
+    "baseline": "8b5f883",
+    "sessionIds": ["87362be2-5517-4bea-9e71-248ff12f95d1"]
+  },
+  {
+    "title": "脱敏工具按用户给定的固定规则统一，并把 user store 的 secure* 改 getter 避免旧缓存",
+    "type": "preference",
+    "content": "住房类小程序里「系统自动获取」的姓名/手机号/身份证号必须脱敏，且脱敏规则由用户明确指定，不允许各页面自行决定：①中文姓名保留第 1 位，其余用 *（朱楠→朱*，李小明→李**）；②身份证号保留前 2 位和后 2 位（32**************34）；③手机号保留第 1 位和后 2 位（18360916552→1********52）。实现约定：三个函数收在 src/utils/formatter.js 统一维护（blurIdNumber 是本次新增），页面只引 userStore.secureUsername / securePhone / secureIdNumber；且这三个字段必须是 getter 由原始数据实时计算，不能是 state 缓存值——旧 session 缓存会让新规则不生效，改完规则要提示用户重新登录刷新用户信息。适用范围是「展示层脱敏，提交仍用原始值」，加装电梯（add/addAlone/input）、业代报名、房源网签、房源核验、电子业主卡、个人信息、我要买房等自动填充场景一并覆盖。",
+    "evidence": "用户诉求 1 指出加装电梯联系人姓名与联系电话未脱敏，并给出三条规则的示例；最终结论说明改 formatter.js、把 secure* 改为 getter、覆盖 6 类模块。",
+    "files": [
+      "zhi2-mobile-shimin/src/utils/formatter.js",
+      "zhi2-mobile-shimin/src/store/user.js",
+      "zhi2-mobile-shimin/src/pages_owner/elevator/addAlone.vue",
+      "zhi2-mobile-shimin/src/pages_owner/elevator/add.vue",
+      "zhi2-mobile-shimin/src/pages_owner/elevator/input.vue"
+    ],
+    "baseline": "77666f8",
+    "sessionIds": ["2f8d30cf-a249-4fbe-8c17-0429bc7bc7e6"]
+  },
+  {
+    "title": "苏服办 SDK 拨号在微信内必然失败：必须「SDK 优先 + tel: 协议降级」双通道",
+    "type": "pitfall",
+    "content": "在苏服办生态里点电话报错，根因是两个运行环境的拨号机制不同：苏服办 App 走 jmportal.communication.callPhone（可用）；微信环境走 lightAppJssdk.device.call，内部依赖 wx.miniProgram.navigateTo，而页面不在苏服办小程序的 webview 里时 window.wx.miniProgram 根本不存在，SDK 同步抛错且没有降级，表现为「点了电话就报错/无反应」。做法：封装统一拨号函数——先动态加载 jweixin 并等待就绪，尝试苏服办 SDK；SDK 不可用或调用抛错时自动降级为 location.href='tel:号码'；调用点外面包 try-catch 捕获 navigateTo 的同步异常，避免整页崩掉。苏服办 App 内仍只走官方 SDK，不要为它加降级分支。排查时先问清是「微信内置浏览器」还是「某小程序里的 webview」，两者限制不同；改完必须重新构建部署，dev 热更新看不出效果。",
+    "evidence": "用户诉求 1「点击电话报错」→ 诉求 2「使用苏服办的拨打电话SDK」→ 诉求 3「苏服办里面确实可以用，微信里面还是不能拨打」；结论给出两环境对照表与「SDK 优先 + tel: 降级 + try-catch」方案。",
+    "files": [
+      "zhi2-mobile-shimin/src/utils/sfb.js",
+      "zhi2-mobile-shimin/src/pages/policy/fddydetail.vue"
+    ],
+    "baseline": "77666f8",
+    "sessionIds": ["11c71496-2c86-4af0-8987-a08453f769f0"]
+  },
+  {
+    "title": "同源副本缺省图统一时按「无数据判据 + 保留本分支引用路径」跨分支 cherry-pick",
+    "type": "workflow",
+    "content": "苏住房C 里同一类详情页空页面存在两种样式：一种渲染出空的信息模块和字段，另一种显示缺省图 +「暂无数据」，用户要求全部统一成后者。可复用套路：页面外层套 flex flex-column justify-center h-full bg-fff，内容区用 v-if=\"detailInfo.name\"（或用该页真正的「主字段有值」作为判据）包住原信息模块，v-else 直接放 <ZsEmpty />，不要另造空态组件；以已经做对的页（业委会信息 committee/info）为模板复制结构。跨分支合并（mainv2.1-mp → mainv2.1）时只挑逻辑改动，保留目标分支自己的引用路径（baseCard 用 @/pages/commonNew/baseCard.vue，不要跟着 mp 分支改成 @/components/commonNew），否则会在目标分支引入不存在的模块。落地后按「子模块提交 + 父仓库只更新子模块指针」两步走，并核对本地领先远程的提交数。配套需要一并统一的还有：小区/项目信息（project/info）、企业信息（company/info）、街道信息（subdistrict/info）、社区信息（community/info）。",
+    "evidence": "用户诉求 1 描述两种空页面样式并要求统一；诉求 2 要求把 mainv2.1-mp 中社区/街道的 ZsEmpty v-else 改动合并到 mainv2.1；结论给出核心结构与两条提交记录，并说明未引入 mp 分支的路径变更。",
+    "files": [
+      "zhi2-mobile-shimin/src/pages_owner/community/info/index.vue",
+      "zhi2-mobile-shimin/src/pages_owner/subdistrict/info/index.vue",
+      "zhi2-mobile-shimin/src/pages_owner/committee/info/index.vue",
+      "zhi2-mobile-shimin/src/components/ZsEmpty/ZsEmpty.vue"
+    ],
+    "baseline": "0cea241",
+    "sessionIds": ["6999b799-ff93-412c-a39e-adb539ade5ab"]
+  }
+]

@@ -1,0 +1,227 @@
+{
+ "project": "园区物管2.0",
+ "batch": 10,
+ "files": [
+  "037.md",
+  "038.md",
+  "039.md",
+  "040.md"
+ ],
+ "count": 13,
+ "memories": [
+  {
+   "baseline": "7814a0c2a",
+   "content": "什么情况：AmountInput（vue-currency-input 封装）本地开发正常，打包后字段看起来有值却被 el-form 校验为空。为什么：1) el-form 校验读的是 form.model + prop 的 fieldValue，不是输入框显示值；最后一位输入后立即失焦时，el.form.blur 触发的校验可能早于父组件把 v-model 写进 model（生产 vue.min.js、批处理更紧时更易暴露），读到旧值；2) 自定义组件向上找 ElFormItem 用 $options.componentName === 'ElFormItem'，外链/压缩后的 element-ui 表现不一致时找不到表单项，dispatch('el.form.blur') 失效。怎么做：① 显式声明 model: { prop: 'value', event: 'input' } 消除构建链对 v-model 的歧义；② numberValue 的 watch 加 { flush: 'sync' }，先同步 emit input 再处理 blur；③ emit 改用 instance.proxy.$emit（与 vue-currency-input 内部一致）；④ handleBlur 双 nextTick 后再 dispatch el.form.blur，给父级 model 留更新时间；⑤ 向上查找表单项同时认 componentName 和 name 为 ElFormItem。排查时先区分是「点提交整表校验」还是「失焦/change 触发」报错。",
+   "evidence": "会话 65814715：用户报告打包后被校验为空；修复点为 AmountInput/index.vue 的 model 选项、flush sync watch、双 nextTick dispatch、组件名兼容查找",
+   "files": [
+    "zhi2-web-admin/src/components/AmountInput/index.vue"
+   ],
+   "sessionIds": [
+    "65814715-d99f-446d-b239-bd55aaced626"
+   ],
+   "title": "[园区物管2.0] AmountInput 开发能过打包后 el-form 校验为空：blur 校验与 v-model 写入 model 的同 tick 竞态",
+   "type": "bug",
+   "bundle": "037.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "fc994977f",
+   "content": "什么情况：列表页带小计（show-summary）的表格，小计行下方缺一条下边框线。为什么：.list-card 里的表格只设了上/左/右边框没有下边框；有分页时不会加 zs-table-container--bottom-spacing，不会自动补下边框；而小计行在 el-table__footer-wrapper 内，底部边框容易被表格容器的 overflow: hidden 裁切，视觉上就像缺线。怎么做：在 zs-table 组件层统一收敛，不要逐页改样式——启用合计行时给容器加 zs-table-container--with-summary 类名，全局 index.scss 对该类补 border-bottom: 1px solid #f0f0f0；页面侧与项目其他合计表格对齐：绑定 :border=\"border\" 并设置 bottom-summary-variant=\"table\"，让下方「合计」区域与表格边框衔接。该修复对所有带小计的列表页一次性生效。",
+   "evidence": "会话 9a3daf50：修改 zs-table.vue 增加 with-summary 类、index.scss 补下边框、页面设 bottom-summary-variant=\"table\"",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/styles/index.scss"
+   ],
+   "sessionIds": [
+    "9a3daf50-8a49-4516-af4c-070c6201cf9b"
+   ],
+   "title": "[园区物管2.0] zs-table 合计行下边框缺失：overflow hidden 裁切 footer-wrapper，须在组件层加 with-summary 收敛",
+   "type": "pattern",
+   "bundle": "037.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "5a288f142",
+   "content": "什么情况：资金全景页各账户余额/收入/支出分布图柱形几乎不可见甚至不展示，接口本身返回了有效数据。为什么：数据清洗函数 parseCategoryAmount 对接口已经以「万元」为单位返回的 categoryAmount 又执行了一次 yuanToWan（÷10000），金额被二次缩小一万倍；同模块 regionBalance 用的是 toChartWanAmount 直接按万元取值，所以只有余额图正常、分类图异常——同类图表取数路径不一致是典型信号。怎么做：同页面的多个图表必须统一走同一个金额换算入口（toChartWanAmount），先确认接口返回金额的单位再决定是否换算，禁止在各自 parse 函数里单独做 ÷10000；图表 Y 轴上限用 Math.ceil(maxVal * 1.12) 自适应小金额（如最大 0.22 万时上限约 1）。对接新图表接口时先看一条原始返回样例确认单位。",
+   "evidence": "会话 028698e5：regionBalance 返回 0.22 正常而 categoryAmount 图为空，根因是 parseCategoryAmount 多做一次 yuanToWan，改用 toChartWanAmount 后修复",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/dataHelpers.js"
+   ],
+   "sessionIds": [
+    "028698e5-6e86-4303-861e-cf865cc0fb59"
+   ],
+   "title": "[园区物管2.0] 图表金额柱形不显示：接口已返回万元又被 parseCategoryAmount 二次 ÷10000",
+   "type": "bug",
+   "bundle": "037.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7814a0c2a / 49e7729ce",
+   "content": "什么情况：Element UI 树组件（如项目区域树）做「全部展开」时，即使已用 requestAnimationFrame 分批，点击后仍长时间无响应甚至页面卡死。为什么：rAF 分批只分散了调用时机，但每个节点仍调用 treeNode.expand()；Element UI 的 expand() 内部会做懒加载检查、父链 expanded 状态更新和子节点 DOM 创建，节点多时单帧内产生大量 DOM，主线程被长时间阻塞。怎么做：① 不调 expand()/collapse()，直接赋值 node.expanded = true/false，绕过内部多余逻辑；② 按层级展开——先浅层后深层，避免子节点在父节点未展开时重复渲染；收起时自深向浅反向；③ 每层内每帧最多处理约 40 个节点，进一步分摊渲染压力；④ 过程中显示 loading 并禁用按钮（「展开中...」）。补充：树节点总数达上万叶子时全部展开 DOM 本身就大，性能仍有上限，应引导用户改用「平铺展示」模式。",
+   "evidence": "会话 f7783478-e3b1-4561-af77-c5aad81eed77：regionTree.vue 全部展开卡死，原因为逐节点调 expand() 触发加载检查/父链更新/DOM 创建；改为直接设 node.expanded + 分层分批（每帧 40 个）+ loading 防重入",
+   "files": [
+    "src/views/property/complex/components/regionTree.vue",
+    "src/views/property/complex/components/RegionTreeLayout.vue",
+    "src/components/ZsTree/index.vue"
+   ],
+   "sessionIds": [
+    "f7783478-e3b1-4561-af77-c5aad81eed77"
+   ],
+   "title": "Element UI 树「全部展开」卡死的根因与分批套路：直接赋 node.expanded，不调 expand()",
+   "type": "pattern",
+   "bundle": "038.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "7814a0c2a",
+   "content": "什么情况：form.js（detailMixins 体系）里 getDetail 在路由参数缺失（如 id 为空）时仍会发起请求，拼出路径不完整的 detail URL，产生无意义报错请求。为什么：detailMixins.init() 里虽有 if (this.id) 判断，但弹窗、@update 刷新等场景会绕过 init() 直接调 getDetail()，没有统一入口做必需参数校验。怎么做：在 form.js 的 getDetail 前加两层钩子——getDetailRequiredParams() 默认返回与 detailApiFull 路径相关的 moduleName、businessName、id，页面可覆盖扩展（如补 complexId）；validateDetailRequiredParams() 发现 undefined/null/空串时 console.warn（带缺失字段名）并返回 false，getDetail 校验不过直接 return，不设 loading 也不发请求。这样所有进入详情接口的路径都有统一的参数守卫，且扩展方式是覆盖方法而非改 mixin 本体。",
+   "evidence": "会话 6a9618e6-98db-4bc4-8e98-8bedd424f2b4：用户要求「没有定义接口必须的参数则不调用接口，并打印警告日志」；实现在 src/mixins/form.js 的 getDetailRequiredParams/validateDetailRequiredParams，与 detailMixins.init() 的 if (this.id) 互补",
+   "files": [
+    "src/mixins/form.js",
+    "src/mixins/detailMixins.js",
+    "src/views/benefit/alert/detail.vue"
+   ],
+   "sessionIds": [
+    "6a9618e6-98db-4bc4-8e98-8bedd424f2b4"
+   ],
+   "title": "form.js getDetail 增加 getDetailRequiredParams 必需参数守卫钩子，防止路径不完整的详情请求",
+   "type": "pattern",
+   "bundle": "038.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "3353ef164 / 3965548b6",
+   "content": "什么情况：GIS 地图（无锡区县/街道下钻）两个坑：① 区县顺序约束——mapOverview/fundPanorama/assetPanorama 等页面的 mock 区县列表、DISTRICT_COLOR、图表 series 的顺序都统一为「江阴→宜兴→梁溪→锡山→惠山→滨湖→新吴」，但 WUXI_SVG_GROUP_REGIONS 绝不能跟着重排，它必须与 wuxi.svg 里 <g> 节点的文档顺序一一对应，否则地图高亮错位；② 街道点击白屏——点击街道气泡时立即用气泡经纬度移动地图视野，会白屏。为什么：① SVG 高亮按索引匹配，顺序耦合是隐性契约；② 下钻层的定位数据来自 selectOptionalComplexList 接口而非气泡坐标，视野先动、标记未就绪导致白屏。怎么做：区县类顺序调整时只重排数据/mock 与取色表，不动 SVG 顺序数组；接真实接口后由前端按固定顺序 reorder 兜底。街道下钻改为：等接口返回后取列表中第一条有有效经纬度的物业点，先移图（缩放 SEARCH_SINGLE=16）再更新标记；全部无经纬度则只更新标记不移视野。",
+   "evidence": "会话 b97ec724…：明确「未改 WUXI_SVG_GROUP_REGIONS：必须与 wuxi.svg 里 <g> 的文档顺序一一对应，改动会导致地图高亮错位」；会话 b290ab4f…：街道点击白屏，改为等 selectOptionalComplexList 返回后取第一条有经纬度数据、先移图再更新标记",
+   "files": [
+    "src/views/benefit/mapOverview/index.vue",
+    "src/views/benefit/statisticsMap/index.vue",
+    "src/views/benefit/statisticsMap/components/map.vue"
+   ],
+   "sessionIds": [
+    "b97ec724-eb8f-408e-a609-9f918b7b1d71",
+    "b290ab4f-dc47-412c-b6bb-780421a0a4ae"
+   ],
+   "title": "地图下钻两条约定：SVG 区块数组与 svg <g> 文档顺序强耦合不可重排；下钻视野必须等接口数据就绪再移动",
+   "type": "pattern",
+   "bundle": "038.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "177bc3ce4",
+   "content": "什么情况：列表页把小计（summary-method/showMethod 按当前页 data 累加）改成分页累加后，表格下方的合计文字条也跟着变成当前页的值，小计和合计显示完全一样。为什么：zs-table 有两处汇总展示——表格底部行是「小计」，由 summary-method/showMethod 控制；表格下方的 ZsSummaryText 文字条默认直接复用小计行的数值，没有独立数据源，所以一动小计合计就同步变。怎么做：合计不依赖小计，通过 :bottom-summary-items 单独传入接口返回的全量统计（如 totalUnit、totalHouse）；小计继续由 showMethod 对当前页 data 累加。约定：小计=当前页前端求和、合计=接口返回的全量 summary，两条通道分开传参，翻页时小计变、合计恒定。",
+   "evidence": "039.md 会话 4d6c0599：用户先后提出「小计应该用当前分页的数据进行累加」「小计和合计怎么是一样的？合计还是取接口返回的值」，最终结论为 showMethod 管当前页小计、:bottom-summary-items 单独传接口 summary(totalUnit/totalHouse)。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/views/property/complex/components/rangeTable.vue",
+    "zhi2-web-admin/src/views/property/complexChange/components/rangeTable.vue",
+    "zhi2-web-admin/src/views/property/handover/components/deliveryRangeTable.vue",
+    "zhi2-web-admin/src/views/maintenance/budget/index.vue",
+    "zhi2-web-admin/src/components/ZsSummaryText/index.vue"
+   ],
+   "sessionIds": [
+    "4d6c0599-62a1-4620-bba9-35eec0a0c116"
+   ],
+   "title": "zs-table 小计与合计是两条通道：summary-method 管当前页小计，bottom-summary-items 管接口全量合计",
+   "type": "pattern",
+   "bundle": "039.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "4b38cdd27",
+   "content": "什么情况：工作流设计器（Process 组件）依赖第三方包 xcrud 的 x-form 渲染节点面板表单，需要移除该依赖。为什么：外部依赖体积/维护不可控，且项目只用到其中一小部分能力。怎么做：新增本地兼容组件 src/components/Process/common/XForm.vue，只实现流程面板实际用到的能力子集——input/select/radio/switch/datePicker/slot/tabs(表格行增删改)/operate，dic 同时兼容数组和 {data,label,value} 两种格式；关键是保持 v-model 与 this.$refs.xForm.validate() 的对外调用签名完全一致，让现有页面零改动。然后把 mixinXcrud.js / mixinPanel.js 里动态 import('xcrud') 改为静态 import 本地 XForm，package.json 删依赖后需 npm install 同步 lock。验收：全局检索无 xcrud 残留引用 + ESLint，再人工回归监听器参数表格增删校验、多实例配置按钮、节点面板字段联动。套路：移除低频使用的小众依赖时，先枚举实际用到的能力面，再写签名兼容的本地替代组件，调用侧不动。",
+   "evidence": "039.md 会话 29ff46d9：用户要求「xcrud，移除这个依赖，用的到地方用组件改写。保证功能和原来完全一致」，结论为本地 XForm.vue 兼容实现 + mixin 改 import + 删 package.json 依赖 + npm install。",
+   "files": [
+    "zhi2-web-admin/src/components/Process/common/XForm.vue",
+    "zhi2-web-admin/src/components/Process/common/mixinXcrud.js",
+    "zhi2-web-admin/src/components/Process/common/mixinPanel.js",
+    "zhi2-web-admin/package.json"
+   ],
+   "sessionIds": [
+    "29ff46d9-0d81-4017-a199-d9ef206501c7"
+   ],
+   "title": "移除 xcrud 依赖的兼容改写套路：本地 XForm.vue 按「能力子集 + 同签名」替换",
+   "type": "pattern",
+   "bundle": "039.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "6a4835a08",
+   "content": "什么情况：大屏页需要按用户给定的色值替换 SVG 图标颜色（如图例图标要与柱体颜色一致），用正则替换 SVG 里的颜色后，图例颜色仍然不变。为什么：很多 SVG 根节点 svg 上带 fill=\"none\"，真正的颜色写在 path 的 fill=\"#xxx\" 上；若正则只替换「第一个 fill」，会把根节点的 none 误改成目标色，而实际决定显示颜色的 path 仍是旧色。怎么做：色值替换必须只作用于 path 等绘制节点的十六进制 fill，跳过 fill=\"none\"（更稳妥的做法是按「fill=\"#hex\" 完整匹配带 # 的色值」而非裸匹配 fill 属性）。这是大屏「图标颜色与图表配色联动」类需求的通用坑：SVG 装饰图标颜色不是 CSS 控制的，改色要落到 SVG 源码 path 层。",
+   "evidence": "039.md 会话 74cda9bf：用款申请图标颜色与柱体不一致，根因为「apply.svg 根节点是 fill=none，path 上是 fill=#ABAEF1，原先的正则只替换第一个 fill」，修复为只替换 path 上的十六进制颜色。",
+   "files": [
+    "zhi2-web-admin/src/assets/images/mapOverview/apply.svg",
+    "zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue"
+   ],
+   "sessionIds": [
+    "74cda9bf-bc09-433c-99cf-1a36768b982a"
+   ],
+   "title": "SVG 图标换色的坑：正则替换第一个 fill 会误改根节点 fill=\"none\"，只替换 path 上的色值",
+   "type": "bug",
+   "bundle": "039.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "3353ef164",
+   "content": "什么情况：大屏折线图（多系列，如合同金额/入账金额）把 Y 轴 max 写成固定常量，mock 或接口数值一变，曲线就被压在顶部变成直线，看起来很怪。为什么：固定 max/interval 无法随数据量级伸缩，且任意 max 会产生杂乱小数刻度。怎么做：抽公共函数 computeFundLineYAxis(seriesArrays, splitCount=4)：合并多条 series 的所有点取最大值 → 乘 1.08 留顶 → 把上限规整到 1/2/3/5/7/10×10ⁿ 的「好看刻度」→ interval = max/splitCount（默认固定 4 段网格）。init 图表时用返回的 min/max/interval 配 yAxis。这样数据源变化无需再手改轴常量；若要 5 段网格或更大顶边距，只调 splitCount 或 1.08。套路：大屏所有数值图表的坐标轴一律做「取数据极值 → 留顶系数 → 规整刻度档位」的自适应计算，禁止写死 max。",
+   "evidence": "039.md 会话 9d49e543：用户反馈「两块的Y轴最大和间距能否自适应数据，目前曲线看着很奇怪」，最终实现 computeFundLineYAxis（max×1.08、规整 1/2/3/5/7/10×10ⁿ、interval=max/4）并接入资金收入/支出两个图表。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue",
+    "zhi2-web-admin/src/views/benefit/mapOverview/chartOptions.js"
+   ],
+   "sessionIds": [
+    "9d49e543-6329-4f54-ada3-6194a556fc91"
+   ],
+   "title": "多系列折线图 Y 轴自适应刻度套路：取全系列最大值 ×1.08 后规整到 1/2/3/5/7/10×10ⁿ",
+   "type": "pattern",
+   "bundle": "039.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "040.md",
+   "content": "什么情况：园区物管2.0 的发布分支是 develop/v2.6.1 → develop/v2.6.2 → develop/v2.6.2-yulin 的层级关系，用户明确要求「从261分支开始修复，修复好确认后合并到262，再合并到262-yulin」。为什么：bug 存在于多个在途发布分支，若只在最高分支修，低版本分支会继续带着 bug 上线；若在各自分支分别改，同一修复会产生多份冲突的提交。怎么做：修复提交落在受影响的最低版本分支（如 develop/v2.6.1），确认无误后按版本层级逐级 merge 上去（261→262→262-yulin），保持每级分支头部只含一次修复提交；子模块 zhi2-web-admin 最后停留在最末端分支；推送时在子模块内一条命令把三个分支一起 push。",
+   "evidence": "040.md 会话 f5756693：三分支合并结果 develop/v2.6.1=1d5110ed2 fix、262 与 262-yulin 均为 merge 提交，子模块停在 develop/v2.6.2-yulin，并给出 cd zhi2-web-admin && git push origin 三分支的建议",
+   "files": [
+    "zhi2-web-admin"
+   ],
+   "sessionIds": [
+    "f5756693-1ba1-4d89-a2a6-5af45586a832"
+   ],
+   "title": "多版本发布分支的级联合并约定：最低受影响分支修复，逐级向上 merge",
+   "type": "workflow",
+   "bundle": "040.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "040.md",
+   "content": "什么情况：统计地图按街道打点时，气泡数量比街道数少、多几点完全叠在一起。为什么有两类根因要分开处理：一类是接口返回 xcoordinate/ycoordinate 为 null（如羊尖、鹅湖等镇），null 点会渲染异常或聚在原点，必须在前端逐级过滤掉；另一类是接口给多个街道返回了完全相同的经纬度（数据质量问题，如两条街道共用同一个中心点），这类坐标合法但不能叠加，前端无法「修复」只能视觉错开。怎么做：先按空值过滤，再实现 spreadOverlappingMarkers——把相同坐标的 marker 按小圆环错开：2 个重合时左右各偏移约 450m（偏移量用度数常量 OVERLAP_SPREAD_RADIUS_DEG≈0.004，嫌挤可调到 0.006），3 个及以上均匀分布在圆周上。同时在结论里向用户明确：根本解法是后端为每个街道返回独立中心点坐标，前端错开只是兜底。",
+   "evidence": "040.md 会话 d5708d08：用户贴出街道数据含 null 坐标与两组重复坐标（120.4743,31.60915 / 120.53899,31.70204），最终结论分「坐标 null 过滤」与「相同经纬度 spreadOverlappingMarkers 圆环错开」两类处理",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/index.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue"
+   ],
+   "sessionIds": [
+    "d5708d08-435c-462f-8076-056d4fde5c7a"
+   ],
+   "title": "地图打点两类坐标问题的分流处理：null 过滤 + 重合点圆环错开",
+   "type": "pattern",
+   "bundle": "040.md",
+   "project": "园区物管2.0"
+  },
+  {
+   "baseline": "040.md",
+   "content": "什么情况：系统用户管理的「账号类型」字典存在 sys_account_type（新增/编辑时可选的受限集合）与 sys_account_type_all（含历史/停用类型的全量集合）两个字典编码。为什么：如果只调一个字典，要么新增时能选到不该新增的类型，要么查看历史数据时旧类型因不在受限字典里而显示原始码；用户在纠偏后自己给出方案——「2个字典都调用，分别存储，然后使用计算属性」。怎么做：data 里放两个独立字段（accountTypeSelectOptions=sys_account_type、accountTypeAllOptions=sys_account_type_all），initDict 并行请求分别写入；再建 computed accountTypeOptions 按 formMode 在两者间切换（新增/编辑用受限字典，查看/展示用全量字典），模板绑定不动。这个「新增下拉与历史展示拆双字典 + formMode 计算属性切换」的结构可复用到同类字段。",
+   "evidence": "040.md 会话 01127c4b：用户三次纠偏后定下方案，最终结论为 data 双字典字段 + initDict 并行请求 + computed 按 formMode 切换，模板零改动",
+   "files": [
+    "zhi2-web-admin/src/views/system/user/detail.vue"
+   ],
+   "sessionIds": [
+    "01127c4b-5175-4404-8a7f-494fd82416c5"
+   ],
+   "title": "「新增可选」与「全量展示」分两个字典：双字典存储 + formMode 计算属性切换",
+   "type": "pattern",
+   "bundle": "040.md",
+   "project": "园区物管2.0"
+  }
+ ]
+}

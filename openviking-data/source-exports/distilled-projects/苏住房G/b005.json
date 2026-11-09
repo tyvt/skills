@@ -1,0 +1,208 @@
+{
+ "project": "苏住房G",
+ "batch": 5,
+ "files": [
+  "017.md",
+  "018.md",
+  "019.md",
+  "020.md"
+ ],
+ "count": 11,
+ "memories": [
+  {
+   "title": "UAT 上 BIZ_STATE 字典 1/2 文案与后端编码对调：业务状态下拉与回显一律改用 biz_state",
+   "type": "bug",
+   "content": "【什么情况】苏住房G（zhi2-web-admin）开户申请等列表页，业务状态下拉「已备案」查出审核中记录、选「审核中」查出已备案记录。抓包可见筛选「已备案」时实际传 bizStatus=1，而系统约定是 1=审核中、2=已备案（详情页 detail.vue 也是 bizState==1 走审核、=='2' 走已备案）。\n【为什么】这些列表页用 getDicts('BIZ_STATE') 既做下拉选项又做表格回显，而 UAT 环境这套字典把 1、2 的文案与后端编码对调了；前端只是把字典的 dictValue/dictLabel 原样用于查询参数，于是一错到底。已知清单里只覆盖了「字典未配置导致原始码/空选项」和「biz_state 与 cancelStatus 双口径」两类，本条是第三类根因：字典本身存在但内容被环境配反，静态检查与页面都不报错。\n【怎么做】列表页的业务状态字典统一改成小写 biz_state（0 待提交 / 1 审核中 / 2 已备案），与详情页、全局 store 同源；在 getDicts 调用处留注释说明「勿用 BIZ_STATE，部分环境 1/2 文案与后端编码颠倒」。改后若下拉变空，先确认系统字典里配置的是 biz_state 而不是 BIZ_STATE；运维侧可顺手把 BIZ_STATE 的文案与 biz_state 对齐，避免仍引用它的老页面继续踩坑。验证口径：选「已备案」→ 请求 bizStatus/bizState 应为 2，列表为已备案记录。",
+   "evidence": "会话 7fa26724（基线 315702f）用户报「业务状态按已备案查询，查询结果显示的是审核中的记录」。结论：截图网络请求显示筛选已备案实际传 bizStatus=1，而系统约定 1=审核中、2=已备案；列表用 getDicts('BIZ_STATE') 在 UAT 上把 1、2 文案与后端编码对调。修改：pubRegulatoryAccount/index.vue 改为 this.getDicts('biz_state')，并注明「勿用 BIZ_STATE，部分环境 1/2 文案与后端编码颠倒」。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/index.vue"
+   ],
+   "baseline": "315702f",
+   "sessionIds": [
+    "7fa26724-2d29-4dbe-accb-87098bace420"
+   ],
+   "bundle": "017.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "租户可见的冻结原因要从下拉剔除，「只读」只对加载时已是系统冻结的账号生效",
+   "type": "bug",
+   "content": "【什么情况】系统用户管理（system/user/detail.vue + AccountFreezeFields 组件）的冻结原因字段：手动输入改下拉后，不论选哪一项字段都立即变灰不可编辑（用户连问「为什么选择之后直接就禁用了」）。\n【为什么】原来的锁定条件是「当前原因 === 多次输入错误密码 就禁用编辑」。但「多次输入错误密码」是系统自动冻结写入的原因，同时又被放进了可选下拉项，于是用户一选中就命中了锁定条件，字段立刻只读，看起来像选完就被禁用。已知清单里「字段 → 剩余原因动态必填」「按字段值触发远端校验」都未覆盖这个根因：把系统写入值暴露成用户可选项，再拿它当锁定判据，形成自锁。\n【怎么做】① 从人工下拉里删掉「多次输入错误密码」，系统原因不应可选；② 锁定判据改成「加载时的原始状态」——originUserAccountState 为冻结且原始原因是「多次输入错误密码」时才只读，手动冻结选「管理员手动冻结」等可继续编辑；③ 选「其他」时自动切到手工输入态。\n同一页面的控件形态按用户明确要求处理：不要为了「只能下拉」而砍掉手工输入，参考其他页面在字段后缀加切换按钮，手动输入/下拉选择点击切换组件。改完刷新后台验证：选「管理员手动冻结」仍可编辑，原本自动冻结的账号仍只读。",
+   "evidence": "会话 92b6e126（基线 805ea8c）四轮诉求：先「手动输入不行输不进去」，再「现在手动输入没了，只能下拉选择了」，再「参考其他页面，加个后缀按钮，手工输入，下拉选择，点击切换组件」，最后「为什么选择之后直接就禁用了」。结论：下拉里有「多次输入错误密码」，原逻辑只要当前原因是该值就立刻禁用编辑；修复为下拉剔除该项 + 仅当 originUserAccountState===冻结且原因为该项时只读 + 选「其他」自动切手工输入。",
+   "files": [
+    "zhi2-web-admin/src/views/system/user/detail.vue",
+    "zhi2-web-admin/src/components/AccountFreezeFields/AccountFreezeFields.vue",
+    "zhi2-web-admin/src/utils/accountFreeze.js"
+   ],
+   "baseline": "805ea8c",
+   "sessionIds": [
+    "92b6e126-dfc6-494c-a323-5344cc8169de"
+   ],
+   "bundle": "017.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "只隐藏「平铺/树状切换」却顺手改了表格布局：切树节点后列错位与空数据撑满的两个真根因",
+   "type": "bug",
+   "content": "【什么情况】regionBankAuth 列表页要求只去掉「平铺展示/树状展示」切换按钮、左侧区域树必须保留。上次改动除了隐藏按钮还动了表格，导致列头与数据错位、数据少时表格被撑出大片空白；再修一次又把左侧树删了。\n【为什么】改坏来自两个具体动作，都不是样式问题：① 给表格加 :key=\"tableViewKey\"，切树节点时整表重建，Element 的列宽缓存与表头/表体分离渲染不同步，于是列头与数据错位；② 加 fill-height，数据少时表格被拉伸到容器高度，出现大片空白。另外 RegionTreeLayout 里 .type-right-body 有重复定义。已知清单里 zs-table 相关条目讲的是列宽算法、拉伸与测宽，没有覆盖「用 :key 强制重渲染修树表联动」这条反向坑。\n【怎么做】回退两项：删掉 :key=\"tableViewKey\"、删掉 fill-height，合并 RegionTreeLayout 中重复的 .type-right-body。保留：仅 :show-flat-switch=\"false\" 隐藏切换按钮、左侧区域树完整保留、请求防竞态 listRequestId。树表联动的正确姿势是「切树节点后调 doLayout() 修正列对齐」，而不是整表重建。\n另记一条协作教训：用户说「只让去掉 X」时按最小改动执行，不得顺手改布局；出现「样式出问题」时先 diff 上一次提交，确认改坏的到底是哪几行，再决定回退范围。",
+   "evidence": "会话 3afefc54（基线 864b409）用户先报「样式出问题了」，再明确「上次修改改坏了，只让去掉切换按钮，左侧树结构还是还要得」。结论文本列出已回退：移除 :key=\"tableViewKey\"（强制重渲染造成列头与数据错位）、移除 fill-height（数据少时撑出大片空白）、合并 RegionTreeLayout 重复 .type-right-body；保留 :show-flat-switch=\"false\"、左侧树、listRequestId 防竞态，并改为切树节点后 doLayout()。",
+   "files": [
+    "zhi2-web-admin/src/views/system/regionBankAuth/index.vue",
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue"
+   ],
+   "baseline": "864b409",
+   "sessionIds": [
+    "3afefc54-4c44-41c7-a8c6-998c856214d4"
+   ],
+   "bundle": "017.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "多份租赁合同列表的「忽略预警」勾选规则收口到 leaseContractWarningMixin",
+   "type": "workflow",
+   "content": "【什么情况】经营用房租赁合同、停车泊位租赁管理、资源租赁合同、收入合同（旧页）四个列表都有「忽略预警」功能。用户反复反馈：已备案的橙色预警合同勾不上，点了忽略预警却提示「请选择合同」；后来又出现预警数据也不能勾选。改一个页面另外三个依旧错。\n【为什么】这些列表的选择列默认按状态写死可选性（只有待提交/审核中可选），预警合同本身是已备案态，被一并禁选；「忽略预警」收集的是行选择，没勾到预警行自然提示请选择合同。各页面各写一份 selectable 与 handleIgnoreWarning，规则与文案逐渐漂移，改一处漏三处。已知清单里「列表可编辑判断与详情头部判断同源」是判据同源问题，本条是「跨多个同构列表的业务能力抽 mixin」的落地形态。\n【怎么做】新建 zhi2-web-admin/src/mixins/leaseContractWarningMixin.js，统一封装：isWarningContract（兼容 1 / '1' / true）、isLeaseWarningSelectable、setWarningRowStyle（橙色行）、handleIgnoreWarning（校验 + 仅提交预警合同 ID）。四个页面统一：选择列改 :selectable=\"(row) => isSelectable(row)\" —— 必须写成箭头函数，直接传方法引用会丢 this，这是本坑的复发点；各页可选条件为「预警合同 或 对应可操作状态」（经营用房/资源租赁取 bizState=0，停车泊位取 0/1）；未选中预警合同时「忽略预警」按钮禁用；提示文案由 mixin 统一。验证三条：已备案 + 橙色预警可勾选且能执行忽略；待提交合同仍可勾选用于删除/提交；已备案非预警合同仍不可勾选。",
+   "evidence": "会话 1e8e4ca2（基线 320507d）用户报「经营用房租赁合同：已备案的合同，不能选，选忽略预警时提示请选择合同。这个问题还是没改好。预警的数据也不能勾选」。结论：新增 mixins/leaseContractWarningMixin.js 封装 isWarningContract / isLeaseWarningSelectable / setWarningRowStyle / handleIgnoreWarning；4 个列表页统一 :selectable=\"(row) => isSelectable(row)\"（避免 this 丢失）、忽略预警按钮未选中预警合同时禁用、忽略逻辑走 mixin 统一文案。",
+   "files": [
+    "zhi2-web-admin/src/mixins/leaseContractWarningMixin.js",
+    "zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/index.vue",
+    "zhi2-web-admin/src/views/benefit/parkingSpaceContractFiling/index.vue",
+    "zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/index.vue",
+    "zhi2-web-admin/src/mixins/table.js"
+   ],
+   "baseline": "320507d",
+   "sessionIds": [
+    "1e8e4ca2-26cb-4b86-b061-d23f725e38ef"
+   ],
+   "bundle": "017.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "B 端首页恢复旧工作台：index-wrapper 按 terminalType 分流 + 就绪门闩，旧页存为 index-legacy.vue",
+   "type": "pattern",
+   "content": "【什么情况】新版首页 index-v2.vue 上线后，B 端用户看到的仍是图 2 的新版工作台，而按需求应是图 1 的旧工作台。\n【为什么】首页入口做了新老版本切换，但没有按端别分流，B 端直接落进新版。端别 terminalType 来自登录后的用户信息，首屏渲染时常常还没就绪；如果不做门闩，B 端会先渲染默认分支再跳变，或永远落在错误分支。\n【怎么做】入口 index-wrapper.vue 保留为分流壳：终端用户工具 utils/terminalUser.js 提供 terminalType，wrapper 判断 B 端渲染旧工作台，其余走新版；旧工作台不重写、原样另存为 index-legacy.vue，避免在 index.vue 上反复叠加条件。渲染前用「terminalType 就绪」门闩（未就绪先不渲染分支），防止闪跳与误判。改完同步维护 tests/e2e/home-v2.spec.mjs 的断言（B 端应命中旧工作台）。\n提交按仓库既有拓扑走：先在子模块 zhi2-web-admin 提交（fix(home): B 端恢复完整旧工作台首页），再在父仓库只更新子模块指针；env/.env 与其余 WIP 一律不提交。推送前远程有更新须 pull --rebase 后再 push。\n差异说明：已知清单的「B/G 端不拆两套页面、按 terminalType 页面内分流」针对业务单据页；首页是新老两版实现并存，正确做法是「壳页分流 + 旧版文件留档」，不要在新版组件里塞满 if。",
+   "evidence": "会话 e089d931（基线 db4f82c）用户指出「B端用户应该看到的首页是图1，现在看到是图2」。结论：新增 index-legacy.vue，改 index-wrapper.vue 做分流 + terminalType 就绪门闩，同步 utils/terminalUser.js 与 tests/e2e/home-v2.spec.mjs；子模块提交 47d6ce19a「fix(home): B 端恢复完整旧工作台首页」，父仓库提交 1a408c2 仅更新子模块指针，env/.env 等 WIP 未提交，推送前 pull --rebase。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-wrapper.vue",
+    "zhi2-web-admin/src/views/home/index-legacy.vue",
+    "zhi2-web-admin/src/views/home/index-v2.vue",
+    "zhi2-web-admin/src/utils/terminalUser.js",
+    "zhi2-web-admin/tests/e2e/home-v2.spec.mjs"
+   ],
+   "baseline": "db4f82c",
+   "sessionIds": [
+    "e089d931-94c4-4e19-8df7-c93db12d1e61"
+   ],
+   "bundle": "017.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 首页统计卡「接口有数据但数字显示 0」：计数字段名与后端返回不一致，且解析失败被静默兜成 0",
+   "type": "bug",
+   "content": "情况：G 端首页 index-v2.vue 的待办/已办/我发起三张数字卡，接口 /portal/home 明明返回 {code:200,data:{todoNum:3409,finishedNum:36159,myProcessNum:29822}}，但页面上待办恒显示 0，已办与我发起的正常。原因：loadTaskCounts 里用 pickTaskCountField(counts, ['todo','todoCount']) 按候选字段名取值，后端实际给的键是 todoNum，三个候选全命中不了，取值函数返回空后被 `|| 0` 兜成 0 并直接渲染——既不报错也没有空态提示，所以表现为「接口成功但数字为 0」。另外两项之所以正常，只是恰好它们的候选列表里已经包含了 finishedNum / myProcessNum 这种带 Num 后缀的全名，属于运气而非约定。做法：① 排查顺序固定为「先看接口原始响应的字段名，再对照页面 pick*Field 的候选数组」，不要先怀疑卡片渲染、权限或 store；② 修法是把真实字段名补进候选数组（追加 'todoNum'，保持旧名在前以兼容），而不是改成单字段直取，因为该首页历史上后端字段名反复变动；③ 这类「-Num/-Count/-Total 后缀」的计数字段是最典型的命名漂移点，同一模块里凡是走候选数组的地方都要一并核对；④ E2E 的 mock 必须同步改成后端真实字段名（本例 mock 也用的是 todoNum），否则 mock 绿、线上 0 的假阴性会长期存在。体检口径：数字类卡片只要有一项对得上、另一项恒 0，基本可判定是候选字段名缺项，而不是接口没调用。",
+   "evidence": "会话 360057ae：用户贴出接口响应 todoNum=3409 并问「接口返回了数据，为什么页面上待办还是 0」；结论为 loadTaskCounts 只读 todo/todoCount，补入 todoNum 后恢复，E2E mock 同步改为 todoNum。",
+   "files": [
+    "zhi2-web-admin/src/views/home/index-v2.vue",
+    "zhi2-web-admin/src/api/portal/home.js",
+    "zhi2-web-admin/src/views/home/v2/components/TodoPanel.vue"
+   ],
+   "baseline": "9e5c499",
+   "sessionIds": [
+    "360057ae-d967-41ed-b07f-792998bb09db"
+   ],
+   "bundle": "019.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 「行政区划不能为空」的根因：选择物业管理区域只回填 regionName 展示值，没同步 regionCode 提交值",
+   "type": "bug",
+   "content": "什么情况：收费标准（公共收益-小区资产-停车位收费标准 pubParkingRate/detail.vue、物业收费管理 ChargeStandardDialog.vue）保存时报「行政区域/行政区划不能为空」；管理主体模块此前也出现过同一报错（commit 841479510），属同源复发。\n\n为什么：选择「物业管理区域」时，页面只调 getFullRegionNameByRegionCode(this.allAreas, row.region) 把中文全称写进 form.regionName 供展示，却没有把区划编码写进 form.regionCode；后端校验读的是 regionCode，于是前端界面上看着区划已填、请求体里该字段为空。\n\n怎么做：选区域的三件套必须一起写——regionName（展示）、regionCode（提交，取 row.region 这类原始编码）、再从 row.subdistrict/row.community 同步街道与社区（syncSubdistrictCommunityFromCodes）。B 端「自动带入当前小区」的场景走同一个 applyPropertyProjectRow，因此只需在该方法里补齐 regionCode 一处，两条入口同时生效。排查同类「显示已填但后端说为空」时，先对照 form 里哪个字段是提交字段、哪个只是展示字段。",
+   "evidence": "用户报「收费标准，保存时提示行政区域不能为空」；AI 定位到选择物业管理区域时只设了 regionName 未设 regionCode，两处页面（pubParkingRate/detail.vue、ChargeStandardDialog.vue）补写 this.form.regionCode = row.region 后修复，并注明与管理主体模块 commit 841479510 同因。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubParkingRate/detail.vue",
+    "zhi2-web-admin/src/views/property/chargeManage/chargeStandard/ChargeStandardDialog.vue",
+    "zhi2-web-admin/src/api/benefit/pubParkingChargeStandard.js"
+   ],
+   "baseline": "26069c8",
+   "sessionIds": [
+    "23d3fee1-5580-41c7-9e87-e84609a63989"
+   ],
+   "bundle": "020.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 服务周报街道账号「选物业管理区域」列表不全且无分页：选择数据集接分页参数 + 表格 fill-height 消除末行被裁",
+   "type": "bug",
+   "content": "什么情况：街道账号在服务周报里选「物业管理区域」，有 101 条数据但列表没显示全、也没有分页；补了分页后新问题出现——最后一条被挡住半边。\n\n为什么：根因有两层。(1) 选择弹窗的区域列表是「打开即全量取一次」的写法，既没带 pageNum/pageSize，也没接 zs-pagination，超出首批条数即被静默截断，且没有任何截断提示。(2) 第一轮修复仍是手动计算 tableHeight 传给 zs-table，与 flex 纵向布局实际分到的空间有偏差，表格比容器高一点，最后一行就被外层 overflow:hidden 裁掉半边。\n\n怎么做：rangeTable.vue 改走项目内置的 fill-height 能力——表格加 fill-height、删掉全部手动 tableHeight 计算逻辑；table-container 改 flex 纵向布局，表格 flex 占满剩余空间、zs-pagination 固定底部；selectRangeDialog.vue 里随之把不再需要的高度重算逻辑一并移除（留着会和 fill-height 抢高度）。经验：选择类弹窗的大数据集必须服务端分页，表格高度不要手算，交给 fill-height。",
+   "evidence": "用户两轮反馈：先「服务周报选择物业管理区域有101个数据，列表数据未显示全，也没分页」，再「最后一条会被挡住半边」；AI 结论为手动高度计算与 flex 分配不符导致 overflow:hidden 裁行，改用 zs-table fill-height + flex 纵向容器后修复。",
+   "files": [
+    "zhi2-web-admin/src/views/system/message/components/rangeTable.vue",
+    "zhi2-web-admin/src/views/system/message/components/selectRangeDialog.vue",
+    "zhi2-web-admin/src/views/system/message/components/index.vue",
+    "zhi2-web-admin/src/views/system/message/service/index.vue"
+   ],
+   "baseline": "c2a604a",
+   "sessionIds": [
+    "0b5e17ad-9c03-49d8-a182-38e4dddc07e6"
+   ],
+   "bundle": "020.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 共管小区（统计地图）弹窗 Tab 全空白：terminalType 未就绪就 v-if 拦截 + 各 pane 共用 activeContentValue 撞 key + G 端被 skip-fetch",
+   "type": "bug",
+   "content": "什么情况：效益统计地图点共管小区 marker，弹窗里「经营资产」等 7 个 Tab 内容整块空白；单独页面上同一份内容正常。\n\n为什么：三个叠加根因。(1) overviewContent.vue 用 terminalTypeReady 给子组件套 v-if，terminalType 为 null（登录上下文尚未解析）时整块不渲染，且之后没有重挂时机。(2) 各 Tab pane 复用同一个 activeContentValue 做绑定/key，多个 pane 撞 key，切换时内容串味或直接不渲染。(3) G 端传了 :skip-fetch=\"isGTerminal\"，地图弹窗在 G 端压根不发请求，所以「没数据」和「没请求」在界面上长得一样。\n\n怎么做：去掉 terminalTypeReady 的 v-if 拦截，改 watch terminalType 并在延迟就绪时 bumpTabKey 重新挂载；Tab 绑定按 menu.value 各自独立，不再共用 activeContentValue；取消 G 端的 skip-fetch，地图弹窗统一走真实接口；项目主键统一成 resolvedProjectId = complexId ?? projectId ?? sourceData.projectId（index.vue 的 openProjectOverview 优先 complexId，再兜底 projectId/leaseProjectId，operatingAssets.vue 同步支持 complexId 兜底）；无主键时渲染 el-empty「暂无小区数据」，不要留静默空白。验收时看 Network 是否真的发出 selectOperatingAssetsCategory 等 standingBook 请求。",
+   "evidence": "用户报「共管小区：经营资产等内容显示为空白」；AI 修复 3 个文件后说明移除 terminalTypeReady 的 v-if、取消 G 端 skip-fetch、按 menu.value 重构 Tab 绑定、新增 resolvedProjectId 与 bumpTabKey，并以「Network 中应出现 selectOperatingAssetsCategory 请求」作为验证口径。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/overviewContent.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/operatingAssets.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/index.vue"
+   ],
+   "baseline": "3c282a5",
+   "sessionIds": [
+    "59f13d6d-cf6d-464d-b961-060063675ca1"
+   ],
+   "bundle": "020.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 只读列表页隐藏「业务状态」筛选项，但 getQueryParams 仍固定传 bizState='2'：筛选控件与查询口径分离",
+   "type": "bug",
+   "content": "什么情况：广告位列表（以及场地租赁、其他租赁等同类页）打开时「业务状态」默认选中「审核中」，列表里却是已备案的数据；用户要求干脆不显示业务状态筛选了。\n\n为什么：这类页是「只读/已备案视图」（路由 isShow 标识），查询参数由 leaseContractMixins 的 getQueryParams() 固定传 bizState='2'（已备案），而搜索区的业务状态下拉默认值来自另一套字典默认项，两者本来是分开维护的，视觉上就出现了「筛的是审核中、出的是已备案」的矛盾。\n\n怎么做：在只读列表页里按 isShow 条件把「业务状态」这一项从搜索区 formItems 里过滤掉，而不是改 getQueryParams 的 bizState 默认值——查询逻辑不变（仍只出已备案数据）、表格里的「业务状态」列照旧保留；可编辑的租赁合同备案管理页的该筛选项不受影响。相关改动集中在 advSpaceLeaseApply/index.vue、assetLeaseApply/index.vue、resourcesLeaseContractFiling/index.vue 与 leaseContractMixins.js。通用原则：当一个筛选项的默认值并不代表真实查询条件时，隐藏控件比改查询更安全，避免把只读视图的固定过滤一起改没。",
+   "evidence": "用户先报「广告位列表，业务状态默认选中的是审核中，而列表数据是已备案的数据」，再要求「不要显示业务状态筛选了」；AI 在 isShow 只读路由下隐藏筛选项，并说明 getQueryParams 仍默认传 bizState='2'、表格状态列保留、可编辑页不受影响。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/advSpaceLeaseApply/index.vue",
+    "zhi2-web-admin/src/views/benefit/assetLeaseApply/index.vue",
+    "zhi2-web-admin/src/mixins/leaseContractMixins.js",
+    "zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/index.vue"
+   ],
+   "baseline": "f78f7e7",
+   "sessionIds": [
+    "1eb3d199-859d-4273-97af-9e57746818af"
+   ],
+   "bundle": "020.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 「物业管理区域备案保存/权限校验在后端哪」的前端反推路线图：仓库无 Java 源码，只能按 mixin 拼路径 + 组件链路推契约",
+   "type": "workflow",
+   "content": "什么情况：需要弄清 complex（物业管理区域备案）保存/更新接口的后端权限校验、待提交状态字段白名单、recordName/promotionName/legalName/address/region/subdistrict/community 等字段的更新限制，但仓库 d:\\repository\\苏住房G 里没有任何 Java/Kotlin 代码——根目录只是 submodule 容器（.gitmodules 只有 zhi2-web-admin），后端部署在远端（env/.env 指向 https://szf.szzfcjj.cn/test）。\n\n怎么做（可复用的反推路线）：\n1) 由详情页拿到接口三要素：detail.vue 里 primaryKey: 'complexId'、moduleName: 'property'、businessName: 'complex'；\n2) 由 mixins/form.js 的 addApiFull/editApiFull/detailApiFull 拼接规则还原真实路径（/${moduleName}/${businessName}${suffix}）；\n3) 逐层读调用链推断权限：detailMixins.js、form.js、bTerms 项目锁定 mixin（bTerminalProjectMixin.js）、OperationBtnGroup（编辑/保存/提交按钮的显隐条件）、ZsSubmit、utils/flowApi.js、utils/terminalUser.js（角色判断）、utils/projectContext.js（B 端区域过滤）、store/getters.js；\n4) 用「按钮/字段在什么状态下才出现」反推后端的允许编辑态。\n\n注意：结论只能表述为「前端契约推断」，不能当成后端实现事实；若要确认白名单，必须让后端开代码或提供接口文档。同类需求（如「已备案为什么不能改某字段」）都走这条路线，不要在工作区里反复 grep 找 Java 文件。",
+   "evidence": "用户要求搜索 complex 相关 Controller/Service 与角色权限判断；AI 确认仓库内无 Java 代码，转而列出可见的前端文件表并说明「以下是从前端调用链反推的接口契约与权限行为」，给出 form.js 拼接规则与 detail.vue 的 primaryKey/moduleName/businessName 片段。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/detail.vue",
+    "zhi2-web-admin/src/mixins/form.js",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/utils/terminalUser.js",
+    "zhi2-web-admin/src/utils/projectContext.js",
+    ".gitmodules",
+    "env/.env"
+   ],
+   "baseline": "2a3ef8a",
+   "sessionIds": [
+    "231da5b0-82db-4a83-819f-b9b0376ce290"
+   ],
+   "bundle": "020.md",
+   "project": "苏住房G"
+  }
+ ]
+}

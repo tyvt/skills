@@ -1,0 +1,78 @@
+{
+ "project": "产品2.0",
+ "batch": "071",
+ "files": [
+  "071.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "已修复。 原因： BuildingsTable.vu",
+   "type": "bug",
+   "content": "已修复。 **原因：** `BuildingsTable.vue` 中楼栋子表的删除按钮，`disabled` 只判断了 `form.bizState != '0'`，没有判断是否有选中行。虽然传了 `:multi=\"multiple\"`，但 `zs-button` 并不会根据这个属性禁用按钮。 **修复：** 将删除按钮的禁用条件改为： ```vue :disabled=\"form.bizState != '0' || multiple\" ``` `multiple` 在 `handleSelectionChange` 中维护：未选中任何行时为 `true`，选中后变为 `false`。这与项目中其他子表（如 `HouseScopeTable.vue`）的写法一致。 刷新页面后，未勾选数据时删除按钮应呈灰色不可点击。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`BuildingsTable.vue",
+    "`HouseScopeTable.vue",
+    "涉及文件：d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\commercialHousingSales\\priceFiling\\recordPriceMngSuzhou、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\commercialHousingSales\\priceFiling\\recordPriceMngSuzhou\\components\\BuildingsTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a93d9024-80c0-483e-b0d2-40a3f424626b"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "根据procedureId查询dataPropert",
+   "type": "pattern",
+   "content": "已按你的需求改完，说明如下。 ## 行为说明 1. **`detail.vue`** 给步骤子表增加 `:procedure-id=\"form.procedureId\"`，与当前单据上的巡保程序一致。 2. **`recordProcessStepTable.vue`** 增加 `procedureId` 透传给 `RecordProcessStepDialog`。 3. **`recordProcessStepDialog.vue`** - 新增 `procedureId` 属性。 - 在 **`view` / `edit`** 下调用 `GET /dataProperty/procedureProcess/page`，参数：`procedureId`、`pageNum: 1`、`pageSize: 500`。 - 用返回列表里 **`processSerial` 与当前步骤（`detailForm` 或表单里的 `processSerial`）一致** 的那条记录，取 **`isExplain`、`isPicture`**（与 `procedureProcessDialog` 里「必填/非必填」一致，`'1'` 为必填），驱动原有的 `dynamicRules`。 - 若没有 `procedureId`、没有步骤编号、请求失败或未匹配到行，则仍用 **`detailForm` ",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "**`detail.vue",
+    "**`recordProcessStepTable.vue",
+    "**`recordProcessStepDialog.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\recordProcess\\components\\recordProcessStepDialog.vue、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\procedure\\components\\procedureProcessDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4d8f8198-d7b1-458f-891e-5a0c95b1090a"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "移除未用到的代码",
+   "type": "pattern",
+   "content": "已清理 `publicQuery/complex/detail.vue` 中从物业详情页复制过来但未使用的代码，文件从 601 行减至 506 行。 **移除的 import / 组件** - `area` mixin（`detailMixins` 已包含，重复引用） - `PROPERTY_COMPLEX_TYPE`、`houseTable`、`propertyServicesTable`（模板中未使用） **移除的 data 字段** - 弹窗/列表状态：`showProjectDialog`、`showCompanyDialog`、`isQueryDialogVisible`、`isQrCodeDialogVisible`、`isBuildingAuth` - 未引用的列表：`projectList`、`committeeList`、`contractList`、`propertyCommitteeVoList` - `form` 中页面未展示、未引用的字段（如 `projectName`、`otherHouse`、`remark` 等）；接口返回时仍会通过 `detailCallback` 的 `{ ...this.form, ...response.data }` 合并进来 **移除的样式** - `.property-type-*` 相关样式（模板中无对应 DOM，属于",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`publicQuery/complex/detail.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\complex\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\detailMixins.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\area.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "117b67e8-4e61-4da7-9503-e0038e998ea7"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Th",
+   "type": "bug",
+   "content": "已修复。 **原因：** `zs-select-dialog.vue` 同时存在两处 `selectable` 声明： 1. **prop**（函数类型）：控制行是否可选，传给 `zs-select-column` 2. **data**（来自 `@/mixins/table`）：布尔值，表示是否显示多选列 Vue 不允许同名 prop 与 data，因此出现警告。 **修改：** 将 `mixins: [table]` 改为 `mixins: [tableComponents]`。`tableComponents` 只注册 `zs-table`、`zs-select-column` 等组件，不包含 `selectable` 等 data，而 `zs-select-dialog` 本身已实现列表查询、选择等逻辑，不需要完整的 `table` mixin。 刷新页面后，打开「新增报事工单」里的物业管理区域选择弹窗，该警告应不再出现。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`zs-select-dialog.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-select-dialog\\zs-select-dialog.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\table.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\workOrder\\report\\components\\AddOrderDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "09ed34db-94d4-41c6-856b-023f0668f865"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

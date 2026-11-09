@@ -4,6 +4,7 @@
 ## 背景
 - 苏住房G工作区有未提交改动需从惠山撤掉，10个 home-v2 文件恢复源仓库 HEAD。
 - 删除 EvaluationPanel.vue 与 SunshinePanel.vue。
+- 相关提交仅 2 个：b57f471d1（bug 5277 首页待办 UI 间距，TodoPanel 行高 45→72px）、4d9d729b6（bug 5338 首页待办跳转专业化小区详情报错），均为源仓库 HEAD 祖先提交。
 
 ## 解决方案
 - src/utils/ruoyi.js 的 resolveTodoTaskNavigation 移植至惠山版本。
@@ -17,8 +18,8 @@
 {
   "category": "前端技术笔记",
   "name": "home_rollback_nav",
-  "source_extraction_id": "43a4f8da3c1141c1853fc9a9a3194298",
-  "version": 1,
+  "source_extraction_id": "e715db2dfbbd45d092aba2acf15396d8",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

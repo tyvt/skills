@@ -1,0 +1,75 @@
+{
+ "project": "园区物管2.0",
+ "batch": "061",
+ "files": [
+  "061.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "树的边框高度固定，不随着数据缩短",
+   "type": "bug",
+   "content": "已调整左侧树面板的样式，边框高度不再随节点数量变化。 **原因：** 1. `.type-left` 使用了 `align-self: flex-start`，高度会随内容收缩。 2. `.tree-wrap` 被覆盖为 `height: auto`，树区域不会撑满容器。 **修改：** 1. 去掉 `align-self: flex-start`，为 `.type-left` 设置固定的 `height` / `min-height` / `max-height: calc(100vh - 180px)`，边框高度保持恒定。 2. 将 `.tree-wrap` 改回 `height: 100%` 和 `overflow: auto`，节点少时在固定区域内滚动，而不是把整个边框压矮。 数据少时左侧边框会保持 `calc(100vh - 180px)` 的高度；数据多时在 `.type-left-tree` 内滚动。若需要改成别的固定高度（例如跟右侧表格对齐），可以说一下目标高度规则。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\complex\\components\\RegionTreeLayout.vue、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\property\\complex\\components\\regionTree.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "bb65a7e2-6e02-4948-ae2d-480611ff86ef"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "地图SVG整体往右侧移动一些@zhi2-web-ad",
+   "type": "preference",
+   "content": "已按你的需求把无锡地图整体往右挪了一点，改了两处： ### 1. ECharts `geo.layoutCenter` 把水平中心从 `50%` 调到 `54%`，在画布内把 SVG 地图再往右偏一些。 ```1103:1108:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\index.vue geo: { map: 'wuxi_svg', roam: false, layoutCenter: ['54%', '51%'], layoutSize: '108%', ``` ### 2. 地图容器 `.chart-box--map` 沿用原来的「左侧留白 + 收窄宽度」做法，把 `margin-left` 从 `18px` 提到 `40px`，并同步改 `width: calc(100% - 40px)`，整块地图区域相对左侧再让出一段距离，减轻与左上角轮播信息条、宜兴一侧的重叠。 若还想再右一点或略收回，可以说一下偏好：只动 `layoutCenter`（不动左侧空白）或只动 `margin-left`，我可以帮你改成更合适的数值。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "```1103:1108:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d2cb178b-821e-4d12-bc8c-dcc1bbe2bb0d"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "各类支出分布图柱体颜色全部改为#FFA94D",
+   "type": "bug",
+   "content": "已改好。 **原因：**「各类支出分布图」走 `renderCategoryBar`，和收入图不同，没有传第三个参数 `uniformBarColor`，所以会按 `mock.js` 里 `expenseByCategory.colors` 给每根柱子不同颜色。 **修改：**在 `initCharts` 里与收入图一致，为支出柱图传入统一色 `#FFA94D`： ```232:232:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue this.renderCategoryBar(this.$refs.expenseBarRef, expenseByCategory, '#FFA94D'), ``` 这样四根柱子都会是 `#FFA94D`。若你希望 mock 里的 `colors` 也与展示一致，可以说一声再改 `mock.js`。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "`mock.js",
+    "```232:232:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox、d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\dataSandbox\\fundPanorama\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "418857f1-8122-4137-97aa-db7576f9cb72"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  },
+  {
+   "title": "物业管理区域间距小一些",
+   "type": "bug",
+   "content": "已按你的需求收紧左栏「物业管理区域」里三项指标的横向间距，改动如下。 ### 原因 原先 `.summary-list` 使用 `repeat(3, 1fr)`，在较宽的左栏里**每一列占满三分之一宽度**，数字和底座又在列内居中，所以三项之间会留出一大块空白。 ### 修改（`index.vue` 中 `.summary-list`） 1. **`grid-template-columns: repeat(3, auto)`** — 列宽随内容，不再被拉成三等分。 2. **`justify-content: center`** — 三项整体仍居中。 3. **`gap: 4px`** — 列间距由 8px 改为 4px。 4. **左右 `padding` 由 `12px` 改为 `6px`** — 再收一点边距。 若仍觉得挤或太松，可把 `gap` 调成 `2px`～`8px` 之间微调即可。",
+   "evidence": "extracted source=cursor project=园区物管2.0",
+   "files": [
+    "修改（`index.vue",
+    "涉及文件：d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\benefit\\mapOverview\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "76615610-2741-4c89-accc-c5cfe6621d05"
+   ],
+   "_draft": true,
+   "project": "园区物管2.0"
+  }
+ ],
+ "_draft": true
+}

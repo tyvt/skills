@@ -1,0 +1,223 @@
+{
+ "project": "投资推送",
+ "batch": 4,
+ "files": [
+  "013.md",
+  "014.md",
+  "015.md",
+  "016.md"
+ ],
+ "count": 12,
+ "memories": [
+  {
+   "title": "[投资推送] 红利同规则多指数未同买：PE 分位与近1年区间低位豁免",
+   "type": "pattern",
+   "content": "中证红利低波类指数共用同一套买入门禁时，仍可能出现「A/B 有信号、C 无信号」。除股息-国债利差、利差历史分位、距90日低点、高点回撤等外，常见分叉点是 PE 十年分位上限（例 74%）与「近1年区间位置」联动豁免：当近1年区间位置处于极低位（会话例 ≤20%，且规则里另有 ≤62% 的低位判定门槛）时，PE 分位上限可放宽固定幅度（例 +12 → 86%），使 PE 略高于常限但仍可买。若某指数同期年区间仍在年中偏上（例 33%），则拿不到豁免，PE 持续高于常限就会整月无买入——应逐日对照指标表排查，而非先怀疑数据缺失。",
+   "evidence": "会话 23e57464：2024-09 东证红利低波 931446 无买入而 H30269/930955 有信号；9/11 表 PE 81.9%>74% 且近1年位置 33.1% 未触发豁免，另两只 PE 超 74% 但年位置 0–4.2% 触发 +12 放宽。",
+   "files": [
+    "config.py",
+    "core.py",
+    "dividend_data.py",
+    "backtest_buy_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "23e57464-5e24-49fd-9a21-08a69230d25d"
+   ],
+   "bundle": "015.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 环境配置收敛为单一 push.env",
+   "type": "workflow",
+   "content": "遗留按指数拆分的 *.env（如 930955.env、H30269.env）应删除；`config.py` 去掉 `LEGACY_CONFIG_FILES`，`_load_env_files()` / `load_config()` 只读 `push.env`。`setup_task.bat` 不再从旧 env 自动复制。密钥与覆盖项统一维护在 `push.example.env` → 本地 `push.env`。",
+   "evidence": "会话 13aff9f2 执行项 1：删除 930955.env 并收紧 config/setup_task 加载链。",
+   "files": [
+    "config.py",
+    "setup_task.bat",
+    "push.example.env"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "13aff9f2-facc-41b5-9ca3-05a17c0ebd7f"
+   ],
+   "bundle": "015.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 红利报告入口：core 库化、report.py 为 CLI",
+   "type": "workflow",
+   "content": "精简后 `core.py` 仅保留红利模块库函数（如 `generate_report()`），移除 `main()` 与 `if __name__ == \"__main__\"`。本地生成红利报告统一：`python report.py -m dividend`（或 `python report.py` 按 README 默认）；不再维护 `run_report.bat`。微信推送仍走 `push.py`。",
+   "evidence": "会话 13aff9f2 执行项 2–3：删除 core CLI 与 run_report.bat，验证 `python report.py -m dividend`。",
+   "files": [
+    "core.py",
+    "report.py",
+    "README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "13aff9f2-facc-41b5-9ca3-05a17c0ebd7f"
+   ],
+   "bundle": "015.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 组合金额：_build_portfolio_by_code 为未引用死代码",
+   "type": "fact",
+   "content": "回测 `--portfolio` 使用的分指数金额来自 `config._BACKTEST_BUY_AMOUNT_DEFAULTS` 等静态表，而非动态组合分配。`config._build_portfolio_by_code()` 在全仓无调用链；`PORTFOLIO_US_NDX_SHARE` / `PORTFOLIO_SAT_CYB_SHARE` 等仅被该死函数读取。做「去掉组合比例、统一基准金额」类改造时，应优先删/并 portfolio 静态表与 `resolve_backtest_amounts()` 入口，勿误以为动态组合函数仍在生效。",
+   "evidence": "会话 d6b251df 盘点表标注 `_build_portfolio_by_code`「未被调用」、`--portfolio` 固定分指数金额。",
+   "files": [
+    "config.py",
+    "buy_amount_config.py",
+    "backtest_buy_signals.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d6b251df-a88c-464a-83c0-3070ff54e4e1"
+   ],
+   "bundle": "015.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] 实盘买入金额参考链：alloc → ranking → BASE",
+   "type": "pattern",
+   "content": "`get_buy_amount_reference()` 决策顺序为：启用位置×就绪度分配（`BUY_AMOUNT_POSITION_ALLOC_ENABLED`）时用 alloc 基准；否则若启用收益率排名分配则用 ranking；再回退 `BUY_AMOUNT_BASE_BY_CODE`。回测侧入口为 `resolve_backtest_amounts()`，与 `BUY_AMOUNT_RETURN_MAX`、年度预算缩放（`ANNUAL_INVESTMENT_BUDGET_ENABLED`）、分档（`buy_amount_tiers`）联动。单指数覆盖环境变量：`{CODE}_BUY_AMOUNT` 或 `BACKTEST_{CODE}_BUY_AMOUNT`。",
+   "evidence": "会话 d6b251df 对 config/buy_amount_* 全量枚举与函数职责说明。",
+   "files": [
+    "config.py",
+    "buy_amount_config.py",
+    "buy_amount_allocation.py",
+    "buy_amount_ranking.py",
+    "buy_amount_tiers.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d6b251df-a88c-464a-83c0-3070ff54e4e1"
+   ],
+   "bundle": "015.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "[投资推送] dividend_lowvol_rotation：17 项可消融约束与三项必留结构约束",
+   "type": "workflow",
+   "content": "子策略 `dividend_lowvol_rotation` 经消融可删的 17 类开关（`DLV_*_ENABLED`，含 MV_SCORE_PENALTY、MIN_AVG_AMOUNT、SOFT_RISK/ENHANCED_SCORING、各类基本面/估值软过滤、DYNAMIC_THRESHOLD、INDEX_RETENTION_LIQUIDITY 等）删除后应统一为硬剔除逻辑；`market_cap.py` 中部分过滤已空壳为恒 True，但 config/统计/脚本仍可能引用需一并清理。消融后须保留：`MV_TIER_CAP`、`INDUSTRY_CAP`、`BETA_BALANCE`（均在 `scoring.select_with_industry_cap`）；核心硬筛（股息率、低波含 `DYNAMIC_VOL`、risk_screening 排雷、绝对质量底线）；`attach_enhanced_factors` 仅保留 Beta。注意 `SOFT_RISK_SCORING`/`SOFT_ENHANCED_SCORING` 在 `config.py` 默认 true，消融基线脚本里常显式 false。",
+   "evidence": "会话 b3c3f8fe「17 项可消融约束」检索结论与必须保留表。",
+   "files": [
+    "dividend_lowvol_rotation/config.py",
+    "dividend_lowvol_rotation/scoring.py",
+    "dividend_lowvol_rotation/market_cap.py",
+    "dividend_lowvol_rotation/dynamic_params.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b3c3f8fe-8b79-4d45-b23b-e5174cc57f95"
+   ],
+   "bundle": "015.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "红利指数独立脚本与统一 report 流水线并存",
+   "type": "pattern",
+   "content": "仓库内除 `report.py -m` 统一报告外，仍保留按指数拆分的独立脚本（如 `930955.py`、`H30269.py`）：各自 `*.example.env` → `*.env`、`run_*.bat`、`setup_*_task.bat`，股债利差逻辑与主仓一致。新增同类指数时复制该套文件，改指数代码与名称；估值表为 `{code}indicator.xls`，列结构与 930955 相同（PE 取第 7 列、股息率取第 10 列）。`config.INDICES` 登记的是统一推送路径用的元数据，不替代独立脚本入口。",
+   "evidence": "会话为 H30269 仿照 930955 新增脚本并实测 PE/股息率/国债/利差输出；文档列出 H30269.py、H30269.example.env、run_H30269.bat、setup_H30269_task.bat 及与 930955 的差异表。",
+   "files": [
+    "d:\\repository\\投资推送\\930955.py",
+    "d:\\repository\\投资推送\\H30269.py",
+    "d:\\repository\\投资推送\\H30269.example.env",
+    "d:\\repository\\投资推送\\config.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "45feeec0-aa70-4a57-8db0-3ebecabbf778"
+   ],
+   "bundle": "016.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "微信推送从 PushPlus 迁 Server酱 与额度规划",
+   "type": "workflow",
+   "content": "PushPlus 实名推送收费后，独立脚本与统一推送改用 Server酱：环境变量 `SERVERCHAN_SENDKEY`（`push.example.env` / 各指数 `*.env` 模板）。免费档约 5 条/天，多指数各 1 条推送时需合计条数（例：930955 + H30269 各 1 条仍够用）。多个 `.env` 可共用同一 SendKey。",
+   "evidence": "用户问免费方案选方案 1；结论写明 Server酱 额度与两指数合计 2 条。",
+   "files": [
+    "d:\\repository\\投资推送\\push.example.env",
+    "d:\\repository\\投资推送\\930955.env",
+    "d:\\repository\\投资推送\\H30269.example.env"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "45feeec0-aa70-4a57-8db0-3ebecabbf778"
+   ],
+   "bundle": "016.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "drop_to_buy 昨日已买入时的「涨幅熔断」反向推演",
+   "type": "pattern",
+   "content": "在已有「再跌多少可买」的 `drop_to_buy.py` 上，当昨日估值面板已满足买入时，对当日做价格上浮模拟，二分搜索使买入失效的最小当日涨幅（精度与「再跌可买」侧一致，搜索上限约 35%）。推演会重跑完整买入判定（PE/PEG 分位、距低点涨幅等），不限于价格一项。报告文案形如：`按昨日数据已满足买入条件；当日涨幅超 X% 将不再满足买入`；若涨幅需超过上限仍不破买入，则只保留前半句。红利、创业板、纳指及 A 股宽基等模块需同步接入。",
+   "evidence": "纳指收紧与 report 需求后，在 drop_to_buy 新增反向逻辑；A500 示例输出涨幅超 0.3% 不再买入。",
+   "files": [
+    "d:\\repository\\投资推送\\drop_to_buy.py",
+    "d:\\repository\\投资推送\\report.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4215002e-612f-4b6a-9629-020795d9fcb8"
+   ],
+   "bundle": "016.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "废弃 buy_amount_tiers 与孤儿 pyc 清理约定",
+   "type": "workflow",
+   "content": "分档金额已迁到 `buy_amount_change.py` / `buy_amount_config.py` 后，`buy_amount_tiers.py` 与 `config.py` 内 `BUY_AMOUNT_TIER_SCHEME`、`BUY_AMOUNT_TIER_ENABLED` 为死代码，应删除模块并改 README 项目结构为 `buy_amount_change.py`。删除 `.py` 后 `__pycache__` 中无对应源的 `.pyc` 为孤儿缓存，可整批删；与现存 `.py` 匹配的 `.pyc` 属正常产物可保留。清理后 `python -c \"import config\"` 验证。",
+   "evidence": "用户指定清理 19 个孤儿 pyc 与 BUY_AMOUNT_TIER_*；执行删除 buy_amount_tiers.py 并更新 README。",
+   "files": [
+    "d:\\repository\\投资推送\\buy_amount_tiers.py",
+    "d:\\repository\\投资推送\\buy_amount_change.py",
+    "d:\\repository\\投资推送\\config.py",
+    "d:\\repository\\投资推送\\README.md"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "832b9af8-4e22-47d7-936c-c5046be45c61"
+   ],
+   "bundle": "016.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "投资推送按策略类型扩展新指数（非全局注册表）",
+   "type": "pattern",
+   "content": "新指数不按单一 registry 注册，而是对齐策略族：红利走 `config.INDICES` + `dividend_data`/`core` + `report -m dividend --index CODE`；A 股宽基在 `cn_broad_data.CN_BROAD_INDEX_BY_CODE` 增 code，共用 `cn_broad_signal` 与 `generate_cn_broad_report`；创业板/美股等为独立 `config.*_INDEX` + 成对 `*_data.py`/`*_signal.py`。`report.py` 需补 `MODULE_*` 常量、`generators` 映射与 `_resolve_modules()` 默认列表。接入前全库检索代码是否已存在（如恒生科技当时无 HSTECH 实现）。",
+   "evidence": "探索会话归纳四类策略表与 report.py 模块注册方式，并确认库内无恒生科技相关实现。",
+   "files": [
+    "d:\\repository\\投资推送\\config.py",
+    "d:\\repository\\投资推送\\cn_broad_data.py",
+    "d:\\repository\\投资推送\\report.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9aaf372d-57a1-46dc-96cf-d9a7d6f30ae2"
+   ],
+   "bundle": "016.md",
+   "project": "投资推送"
+  },
+  {
+   "title": "dividend_lowvol_rotation 止损无 ATR 与参数优化流水线",
+   "type": "fact",
+   "content": "红利低波轮动子项目全库无 ATR 止损；卖出侧为固定百分比止损（`resolve_stop_loss_pct` in `risk_regime.py`：低波约 -12%，池中位波动≥25% 时约 -8%）及紧急大跌、静态止盈、移动止盈、动量卖出等。`scoring.select_with_industry_cap` 从约 `top_n*3` 候选贪心选股，单行业权重超 `MAX_INDUSTRY_WEIGHT`（默认约 34%）则跳过该行业下一档。超参优化 `backtest_optimize.py` 流水线：`screen` 单参扫描 → `grid`（如 top_n×rebalance_days×sell_rank_multiplier 粗网格 27 组）→ `bayesian` 精调，`--task screen|grid|bayesian|all`。",
+   "evidence": "探索会话 grep ATR 零匹配并列卖出类型与 COARSE_GRID 三维网格。",
+   "files": [
+    "d:\\repository\\投资推送\\dividend_lowvol_rotation\\backtest.py",
+    "d:\\repository\\投资推送\\dividend_lowvol_rotation\\scoring.py",
+    "d:\\repository\\投资推送\\dividend_lowvol_rotation\\backtest_optimize.py",
+    "d:\\repository\\投资推送\\dividend_lowvol_rotation\\risk_regime.py"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7d8be0ac-1851-4d3b-9493-fbdadb789d12"
+   ],
+   "bundle": "016.md",
+   "project": "投资推送"
+  }
+ ]
+}

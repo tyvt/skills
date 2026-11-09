@@ -1,0 +1,44 @@
+{
+ "project": "惠山二期G",
+ "batch": 4,
+ "files": [
+  "013.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "stripDuplicateHomeRoutes 裁掉 /index/home 后：守卫 canonicalize 来不及，须在 constantRoutes 加静态别名重定向",
+   "type": "bug",
+   "content": "现象：侧栏点「首页」进 `/index/home`，弹「页面未授权或不存在」（常伴随落入 `*` → `/404` 再被守卫改写）。\n\n根因链：\n1. `permission.js` 注册动态路由时对 `rewriteRoutes` 执行 `stripDuplicateHomeRoutes`，会删掉 `/index` 树下 `home/index` 子路由，避免覆盖静态首页；\n2. 菜单仍可能 push `/index/home` 或 `/index/index`；\n3. 这些 path **已无匹配记录**，在 `beforeEach` 里 `canonicalizeHomePath` 把别名归一到 `/index` 发生在**路由解析之后**，救不了未匹配；\n4. 先命中 `path: '*'` 兜底 → 404/未授权提示。\n\n修复（与「侧栏链接归一 / 高亮」类改造互补，不能只做守卫）：在 `router/index.js` 的 `constantRoutes`、且排在 `*` 之前增加静态重定向，例如：\n- `{ path: '/index/home', redirect: '/index' }`\n- `{ path: '/index/index', redirect: '/index' }`\n\n排查时同时看：`utils/homeRoute.js` 的 strip/canonical 与 `RecursiveMenu` 的 push 目标是否一致。已知「侧栏首页归一到 /index」只解决链接与高亮一侧，**未注册别名 path** 仍会踩本条。",
+   "evidence": "会话 a4d2b610（基线 89672a4）：用户点侧栏首页报未授权；结论为 stripDuplicateHomeRoutes 裁子路由 + canonicalizeHomePath 在解析后执行；在 constantRoutes 增加 /index/home、/index/index → /index 静态重定向。",
+   "files": [
+    "zhi2-web-admin/src/router/index.js",
+    "zhi2-web-admin/src/utils/homeRoute.js",
+    "zhi2-web-admin/src/store/modules/permission.js",
+    "zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue"
+   ],
+   "baseline": "89672a4",
+   "sessionIds": [
+    "a4d2b610-041f-4020-b150-da4ace92e015"
+   ],
+   "bundle": "013.md",
+   "project": "惠山二期G"
+  },
+  {
+   "title": "竣工备案 completion/detail：相邻字段共用 tip 计算属性时易整段复制错字段文案",
+   "type": "bug",
+   "content": "维修模块 `maintenance/completion/detail.vue` 在「施工结算总额」与「线下核查费」等相邻金额字段上，常用独立 computed（如 `constructionSettleAmountTip`、`offlineCheckFeeAmountTip`）同时挂到：\n- 编辑态 `el-tooltip`（label slot）\n- 查看态 `contentInfo` 的 `labelTooltip`\n\n踩坑：新增线下核查费后，把**线下核查费**的长说明误留在 `constructionSettleAmountTip` 里，导致「施工结算总额」问号提示显示成核查费文案（静默，不报错）。\n\n修复：按产品原文改对应 tip 计算属性（施工结算：「维修工程的实际造价，仅针对维修施工阶段发生的费用。」）；一处 computed 改完要确认**表单与 contentInfo 两处引用**都已指向该属性。\n\n预防：加相邻 tip 时复制粘贴后对照字段中文名与需求截图；同一页面多个 `*Tip` 命名相近，改一个要 grep 另一字段是否仍引用旧文案。",
+   "evidence": "会话 6bac5a7c（基线 413ac3f）：用户反馈施工结算总额注释不对；根因 constructionSettleAmountTip 仍为线下核查费说明；改文案后 el-tooltip 与 contentInfo labelTooltip 同步生效。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/completion/detail.vue",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue"
+   ],
+   "baseline": "413ac3f",
+   "sessionIds": [
+    "6bac5a7c-3034-4609-9345-03915c598bc6"
+   ],
+   "bundle": "013.md",
+   "project": "惠山二期G"
+  }
+ ]
+}

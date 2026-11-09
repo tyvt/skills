@@ -1,0 +1,160 @@
+{
+ "project": "园区公共收益",
+ "batch": 10,
+ "files": [
+  "037.md",
+  "038.md",
+  "039.md",
+  "040.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "title": "全局 dictFormatter 用 !cellValue 会把字典值 0 显示成空白",
+   "type": "bug",
+   "content": "🔴 列表/详情里用全局 dictFormatter 做字典翻译时，若实现为 `if (!cellValue) return \"\"`，则 status、布尔型字典等合法取值 0 会被当成空值，成功/是 等文案整列不显示，而 1 仍正常。修复应只排除 null、undefined、空字符串，让 0 继续走 options 匹配；单页若硬编码文案也要与列表筛选口径一致（如操作日志成功用「成功」而非「正常」）。",
+   "evidence": "operlog 列表 status=0 不显示「成功」；根因在 main.js dictFormatter 的 falsy 判断；修复 main.js 空值判断并改 operlog 详情文案。",
+   "files": [
+    "zhi2-web-admin/src/main.js",
+    "zhi2-web-admin/src/views/system/operlog/index.vue"
+   ],
+   "baseline": "635e747",
+   "sessionIds": [
+    "a2c3210a-38a4-4169-bda2-87a7f0f5a713"
+   ],
+   "bundle": "038.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "支出合同维护收款五字段，资金拨付选合同时从合同带入而非用款申请",
+   "type": "workflow",
+   "content": "🔵 园区公共收益：支出合同（pubExpenditureContract）基本信息需必填收款人 payeeName、收款账号 payeeBankAccount、收款开户行 payeeBankName；开户行选网点时同步写入 payeeBankCode、payeeBankUnionCode。资金拨付（pubAllotNotice）选择支出合同后，上述五字段一律从合同对象带入，金额与监管账户等仍从用款申请接口取。联调前确认合同列表/详情接口已返回并持久化这五字段，否则拨付页无法自动回填。",
+   "evidence": "用户要求支出合同新增三必填并在新增资金拨付时带入；实现改为 pubAllotNotice 选合同后收款信息来源切换为支出合同。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubExpenditureContract/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue"
+   ],
+   "baseline": "08d3255",
+   "sessionIds": [
+    "f1fba927-0937-4139-b4e5-1db96673d052"
+   ],
+   "bundle": "038.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "经营资源租赁合同详情对齐资产租赁合同的管理费与公共收益金额块",
+   "type": "pattern",
+   "content": "🔵 benefit 下 assetsLeaseContractFiling 与 resourcesLeaseContractFiling 为同类详情页，字段块易漂移：租赁总额后应有只读「扣除管理费后归公共收益金额」与可编辑「管理费」，公共收益金额=租赁总额−管理费；管理费校验 0≤管理费≤租赁总额，保存前重算；查看模式 basicInfoList 同步展示。新改一类合同时先对照另一份已上线 detail.vue 的表单项与计算逻辑再改。",
+   "evidence": "经营资源合同详情租赁总额后缺两字段；资产租赁合同已有实现，按同逻辑补 resourcesLeaseContractFiling。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/resourcesLeaseContractFiling/detail.vue",
+    "zhi2-web-admin/src/views/benefit/assetsLeaseContractFiling/detail.vue"
+   ],
+   "baseline": "4468dfa",
+   "sessionIds": [
+    "cf131df6-f786-496a-8f96-1551776fc8f6"
+   ],
+   "bundle": "038.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "备案登记详情「创建工作人员」仅在已备案 bizState=2 显示",
+   "type": "workflow",
+   "content": "🔵 autonomy/record 物管会直接登记（directDetail）与业委会等备案详情（detail）中，「创建工作人员」不能只判 formMode≠add 且存在 committeeVersionId；待提交 bizState=0、已提交待审 bizState=1 均不应出现，仅已备案 bizState=2 显示，避免与「提交」等同屏矛盾。改按钮 v-if 时两处组件保持一致。",
+   "evidence": "已备案物管会登记待提交仍显示创建工作人员；增加 form.bizState == 2 条件。",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/record/components/directDetail.vue",
+    "zhi2-web-admin/src/views/autonomy/record/components/detail.vue"
+   ],
+   "baseline": "bd275b5",
+   "sessionIds": [
+    "e8bd1ba5-4e51-4622-a994-695e0ceb3e3a"
+   ],
+   "bundle": "038.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "楼幢授权双列表弹窗字段与套数来源兼容",
+   "type": "pattern",
+   "content": "🟡 BuildingDialogAuth 类左右待选/已选列表：搜索区与列表列配置用统一 columns，勿维护 rightColumns；房屋套数接口字段可能是 totalHouse 或 houseNumber，列 formatter/映射需双字段兜底；查询参数与已移除的搜索项（如楼幢坐落 position）同步删掉，避免无效筛参。",
+   "evidence": "楼幢关联弹窗改双列表四列与移入移出；实现中统一 columns 并兼容 totalHouse/houseNumber。",
+   "files": [
+    "zhi2-web-admin/src/views/components/BuildingDialogAuth.vue"
+   ],
+   "baseline": "1edaefb",
+   "sessionIds": [
+    "61675c7d-cc31-40dd-b7a9-a334676d6bb6"
+   ],
+   "bundle": "038.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 短信验证码按钮：先 loading、成功后再倒计时、失败 finally 复位",
+   "type": "workflow",
+   "content": "注册等页的「发送验证码」常在子组件（如 accountInfo.vue）而非父页。交互契约：① 点击立刻 `sendLoading=true` 并 `:loading` 绑定按钮，同时 `showCount||sendLoading` 时 return 防重复；② 先 `validateField` 手机号，校验失败立即 `sendLoading=false` 不发请求；③ 仅接口 `code==200` 或 `success` 后才开始 60s 倒计时（`showCount` + `countTimer`，`beforeDestroy` 清理）；④ 请求结束无论成败在 `.finally()` 里 `sendLoading=false`，失败不得进入倒计时。与图形验证码组件的 onFail 复位是不同控件，短信按钮要单独保证「点了就有反馈、失败能立刻重试」。",
+   "evidence": "会话 3c5a3522：用户要求发送验证码调用接口后立刻 loading 或计时，接口异常立刻恢复；结论在 accountInfo.vue 实现 sendLoading、成功后才 startCountTimer、校验失败与 finally 复位。",
+   "files": [
+    "zhi2-web-admin/src/views/register/components/accountInfo.vue",
+    "zhi2-web-admin/src/views/register/companyRegister.vue"
+   ],
+   "baseline": "0c9b8c2",
+   "sessionIds": [
+    "3c5a3522-257e-40bb-9d05-80dadfbbb3a7"
+   ],
+   "bundle": "039.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] benefit 详情选物业管理区域：B 端才按 complexId 过滤 /property/complex/page",
+   "type": "pattern",
+   "content": "收益类详情（车位/房屋/广告位等）里「选择物业管理区域」弹窗请求 `/property/complex/page`，不要用错 `pageOptionalComplex` 等接口。过滤规则：`terminalType === 'B'` 时额外传 `complexId: this.$store.getters.currentProjectId`（全局所选物业管理区域）；G 端只按 `bizState: '2'` 查全部可选区域，不传 complexId。与 pubManagementOrg/detail 等同模块写法对齐。列表页 `getQueryParams` 已注入 projectId 时，详情里的区域选择仍可能漏过滤，需单独检查弹窗 query/filter。",
+   "evidence": "会话 3288a566：parkingSpace/detail B 端未按 complexId 过滤；用户补充仅 B 端需要过滤且接口应恢复为 /property/complex/page。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/parkingSpace/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubHouse/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubAdvertiseSpace/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubParkingSpace/detail.vue"
+   ],
+   "baseline": "b6bf87d",
+   "sessionIds": [
+    "3288a566-1b95-45a9-839d-edc1c433b36e"
+   ],
+   "bundle": "039.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] 自定义列表模板保存列顺序后表格不重排：zs-table 补 :key=\"tableColumnsKey\"",
+   "type": "bug",
+   "content": "使用「自定义列表显示」且页面自写模板（非 ListTemplate.js）时，`displayColumns` 顺序保存后数据已更新，但 Element UI `el-table` 会缓存列顺序，仅改 `v-for` 列顺序界面不变。通用列表模板已在 zs-table 上绑 `:key=\"tableColumnsKey\"`，自定义页（如 property/complex/index.vue、complexChange/index.vue）需同样给 zs-table 加 `:key=\"tableColumnsKey\"`，列 `v-for` 的 `:key` 与 ListTemplate 保持一致（`(column.prop||'')+'-'+(column.label||'')`）。若组件层已用 refreshColumnOrderKey 处理列变更，仍应对「仅改用户列配置顺序」的场景在页面上验证是否还需此 key。",
+   "evidence": "会话 4b2a6426：物业管理区域备案列表自定义排序保存后列顺序没变；根因缺 tableColumnsKey，对照 ListTemplate.js 修复 complex/index 与 complexChange/index。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/index.vue",
+    "zhi2-web-admin/src/views/property/complexChange/index.vue",
+    "zhi2-web-admin/src/mixins/ListTemplate.js",
+    "zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "baseline": "0c9b8c2",
+   "sessionIds": [
+    "4b2a6426-193d-4d85-9729-2061d23f61d0"
+   ],
+   "bundle": "039.md",
+   "project": "园区公共收益"
+  },
+  {
+   "title": "[园区公共收益] zs-table-column 自定义渲染绕过 tooltip：表头/单元格补 title 并放宽过窄 width",
+   "type": "bug",
+   "content": "弹窗内 zs-table 列（如楼幢关联「房屋套数」width:80px）表头被 ellipsis 截成「房屋...」，自定义单元格模板又绕过 Element `show-overflow-tooltip`，长文本（楼幢坐落）无法悬浮查看。组件层修复：表头与文本单元格增加 `title` 展示全文；当配置 width 小于表头所需宽度时自动放宽。业务侧过窄固定 width 改为 `minWidth`（如房屋套数 90px）。与「插槽根节点用 div 被判复杂列定宽 80px」不同：本条是已有自定义列宽仍截断且缺 title 的通用补齐。",
+   "evidence": "会话 4d5ba10a：物业管理区域授权楼幢关联弹框字段显示不全且不能悬浮；改 BuildingDialogAuth 列宽与 zs-table-column.vue 表头/单元格 title 及宽度放宽。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/views/components/BuildingDialogAuth.vue"
+   ],
+   "baseline": "b6bf87d",
+   "sessionIds": [
+    "4d5ba10a-398d-499d-aa18-07403294d1a3"
+   ],
+   "bundle": "039.md",
+   "project": "园区公共收益"
+  }
+ ]
+}

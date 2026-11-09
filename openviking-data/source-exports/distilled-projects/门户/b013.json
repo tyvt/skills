@@ -1,0 +1,25 @@
+{
+  "project": "门户",
+  "batch": "013",
+  "files": [
+    "013.md"
+  ],
+  "count": 1,
+  "memories": [
+    {
+      "title": "门户 public-portal E2E 打到同机其他项目占用的端口会被路由守卫跳登录页：必须用 PLAYWRIGHT_BASE_URL 显式指向本项目服务",
+      "type": "bug",
+      "content": "【什么情况】跑 `npm run test:e2e:public-portal` 时用例大面积失败，页面一律被重定向到登录页，看起来像登录态失效或路由守卫坏了；同批还有 10 条失败用例（楼栋/楼幢文案不一致、存量房深链表头色期望绿色却渲染成蓝色）。\n【为什么】8082 端口被同机的「苏州市房地产监测V3」服务占着，Playwright 按默认 baseURL 打开 http://localhost:8082/ 实际访问的是另一个项目。对方应用有自己的路由守卫，于是带着门户 cookie 的请求被 302 到它自己的登录页——表现是「门户用例全红且都跳登录页」，与本次改动毫无关系。判定「既有失败」的标准是：把改动 stash 掉重跑同一条用例，结论一致即视为存量问题，不要顺手去改旧用例（见已知清单「e2e 有既有红用例时：git stash 到 HEAD 复跑逐条比对」）。\n【怎么做】① 跑门户 e2e 前先确认目标端口归属：`netstat -ano | findstr :8082`，或直接访问一次看是不是本项目首页；② 用 `PLAYWRIGHT_BASE_URL=http://localhost:<门户自己的端口>` 显式指向本项目服务（门户 dev server 常用 8099），不要依赖默认端口；③ 端口冲突时先换端口或停掉占用进程，再谈用例结果；④ 汇报里把「本项目改动导致的失败」与「环境/存量导致的失败」分开列，给出 stash 复跑这一条证据。",
+      "evidence": "会话 session_3d01b16252048fb94546dd89cb938bd8（基线 dfee5a6）用户诉求 1「二级页面面包屑上面的间距小一些」；最终结论末尾明确：「另外，8082 端口被『苏州市房地产监测V3』的服务占着，跑测试时需要用 PLAYWRIGHT_BASE_URL 指向本项目自己的服务，否则会被路由守卫跳到登录页」，并说明 10 个失败用例与本次改动无关、stash 后重跑同样失败。本包其余会话（SVG 标题背景圆角、预售许可公告对接、card-body 负 margin 裁切）分别命中已知条目「区块标题高度用 --section-tab-height 联动丝带」「预售许可公告接口免登录取前四条」「卡片负上边距与溢出隐藏致顶部裁切」，故不重复产出。",
+      "files": [
+        "zhi2-web-admin/tests/e2e/public-portal-visual.spec.ts",
+        "zhi2-web-admin/package.json"
+      ],
+      "baseline": "dfee5a6",
+      "sessionIds": [
+        "session_3d01b16252048fb94546dd89cb938bd8"
+      ],
+      "bundle": "013.md"
+    }
+  ]
+}

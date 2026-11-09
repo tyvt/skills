@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/mcp-store-0d9d1c1e12ef/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-09T05:14:45.584045+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/events/2026/11/09/户室翻页缺陷代码提交.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-09 用户指示「提交推送回写禅道」并全部完成。子模块 zhi2-web-admin 提交 08bea07a3、父仓库提交 e05f947，分支均为 fix/bug-6235-house-pagination-v3，均已推送 origin 且 git ls-remote 与本地 HEAD 一致。\n# 2026-11-09 (Monday) ChatLog:\n**user**: 禅道 bug 6235 状态更新（接前一条「未提交」记忆）：2026-11-09 用户明确指示「提交推送回写禅道」，已全部完成。子模块 zhi2-web-admin 提交 08bea07a3、父仓库提交 e05f947，分支均为 fix/bug-6235-house-pagination-v3，均已推送 origin 并在远程复核一致（git ls-remote 与本地 HEAD 相同）。..."
+            },
+            {
+                "uri": "viking://user/default/memories/events/2026/11/09/户室翻页缺陷禅道回写.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-09 13:11:15 通过 DBX 事务回写禅道 Bug 6235：status=resolved、resolution=fixed、resolvedBuild=trunk、resolvedBy=tiany、assignedTo=lichandan，新增 zt_action id=89271（action=resolved，备注含订正根因/修复/提交号/验证/待客测回归），事务提交后无 session 复核通过。未本地合并 develop/v3.0.0，worktree 苏州市房地产监测V3-wt-bug-6235-v3 保留待后续 MR。\n# 2026-11-09 (Monday) ChatLog:\n**user**: ...按用户采纳的推荐方案未本地合并 develop/v3.0.0，worktree 苏州市房地产监测V3-wt-bug-6235-v3 保留待后续 MR。禅道通过 DBX 事务回写：status=resolved、resolution=fixed、resolvedBuild=trunk、resolvedBy=tiany、resolvedDate=2026-11-09 13:11:15、assignedTo=lichandan，新增 zt_action id=89271（action=resolved，备注含订正后的根因/修复/提交号/验证/待客测回归），事务提交后无 session 复核通过。待办：lichandan 在「新增合同 → 选楼幢 → 6 户室翻页」客测回归。"
+            },
+            {
+                "uri": "viking://user/default/memories/events/2026/11/09/户室翻页缺陷客测回归指派.md",
+                "memory_type": "events",
+                "after": "# Summary\nlichandan 被指派在「新增合同 → 选楼幢 → 6 户室翻页」路径进行客测回归，作为禅道 Bug 6235 修复后的验收待办。\n# 2026-11-09 (Monday) ChatLog:\n**user**: ...按用户采纳的推荐方案未本地合并 develop/v3.0.0，worktree 苏州市房地产监测V3-wt-bug-6235-v3 保留待后续 MR。禅道通过 DBX 事务回写：status=resolved、resolution=fixed、resolvedBuild=trunk、resolvedBy=tiany、resolvedDate=2026-11-09 13:11:15、assignedTo=lichandan，新增 zt_action id=89271（action=resolved，备注含订正后的根因/修复/提交号/验证/待客测回归），事务提交后无 session 复核通过。待办：lichandan 在「新增合同 → 选楼幢 → 6 户室翻页」客测回归。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/禅道缺陷/zentao_bug_6235.md",
+                "memory_type": "entities",
+                "before": "# 禅道 Bug 6235\n苏州市房地产监测V3 / zhi2-web-admin 预售合同签订「新增合同」弹窗户室号翻页失效缺陷，真实根因为后端按楼幢一次返回全量户室并忽略 pageNum。\n\n## 根因\n- 接口 /presale/houseInfo/queryHousesByBuildCode 按楼幢一次返回全量户室、忽略 pageNum\n- 前端 unwrapPageResult 以 rows.length 兜底 total\n- zs-table 的 table-tr 只按 Math.min(tableTr,dataLength) 计算表格高度、不截断数据，翻页仅改变内部滚动位置\n- 11/6 结论「分页参数必须放 URL query、放 body 后端忽略」错误：request.js 第194–205行对非白名单接口执行 moveUrlQueryToBody，将 config.params 合并进 config.data 后 delete config.params\n- 该接口不在 src/config/security.js 白名单，request({params}) 与 post(url,data) 最终加密请求完全相同，11/6 改动为空操作\n\n## 修复\n- 新增 src/views/contract/utils/pageRows.js 的 paginateRows(rows,total,pageNum,pageSize)（rows.length>pageSize 判全量切片，否则原样返回，兼容后端已分页）\n- chooseHouseDialog.vue 新增 applyOriginPage() 统一楼幢/单元路径并清空跨页勾选\n- contractRequest.js 的 queryHousesByBuildCode 恢复 post(url,params) 并写明真实约束\n- 新增 scripts/check-page-rows.mjs 挂入 npm run lint 作回归守卫\n- docs/frontend/common-errors.md 的 E-040 已订正\n\n## 验证与状态\n- 验证：npm run build 通过且产物含 pageRows-*.js，回归守卫通过，改动文件 eslint --quiet 零错误；npm run lint 全量基线 12509 条存量问题\n- 未验证：无客测账号目视回归，本地 8098 站点被并行任务构建占用未覆盖\n- 落地：独立 worktree 苏州市房地产监测V3-wt-bug-6235-v3 / 分支 fix/bug-6235-house-pagination-v3\n- 因用户确认卡片超时，未提交、未推送、未回写禅道（截至 2026-11-09）\n- 2026-11-09 被 lichandan 第三次激活，均反馈「翻页后仍是显示的第一页内容」；此前 11/5、11/6 两次修复均无效",
+                "after": "# 禅道 Bug 6235\n苏州市房地产监测V3 / zhi2-web-admin 预售合同签订「新增合同」弹窗户室号翻页失效缺陷，真实根因为后端按楼幢一次返回全量户室并忽略 pageNum。\n\n## 根因\n- 接口 /presale/houseInfo/queryHousesByBuildCode 按楼幢一次返回全量户室、忽略 pageNum\n- 前端 unwrapPageResult 以 rows.length 兜底 total\n- zs-table 的 table-tr 只按 Math.min(tableTr,dataLength) 计算表格高度、不截断数据，翻页仅改变内部滚动位置\n- 11/6 结论「分页参数必须放 URL query、放 body 后端忽略」错误：request.js 第194–205行对非白名单接口执行 moveUrlQueryToBody，将 config.params 合并进 config.data 后 delete config.params\n- 该接口不在 src/config/security.js 白名单，request({params}) 与 post(url,data) 最终加密请求完全相同，11/6 改动为空操作\n\n## 修复\n- 新增 src/views/contract/utils/pageRows.js 的 paginateRows(rows,total,pageNum,pageSize)（rows.length>pageSize 判全量切片，否则原样返回，兼容后端已分页）\n- chooseHouseDialog.vue 新增 applyOriginPage() 统一楼幢/单元路径并清空跨页勾选\n- contractRequest.js 的 queryHousesByBuildCode 恢复 post(url,params) 并写明真实约束\n- 新增 scripts/check-page-rows.mjs 挂入 npm run lint 作回归守卫\n- docs/frontend/common-errors.md 的 E-040 已订正\n\n## 验证与状态\n- 验证：npm run build 通过且产物含 pageRows-*.js，回归守卫通过，改动文件 eslint --quiet 零错误；npm run lint 全量基线 12509 条存量问题\n- 未验证：无客测账号目视回归，本地 8098 站点被并行任务构建占用未覆盖\n- 落地：独立 worktree 苏州市房地产监测V3-wt-bug-6235-v3 / 分支 fix/bug-6235-house-pagination-v3\n- 2026-11-09 用户指示「提交推送回写禅道」并全部完成：子模块 zhi2-web-admin 提交 08bea07a3、父仓库提交 e05f947，分支均为 fix/bug-6235-house-pagination-v3，均已推送 origin 且 git ls-remote 与本地 HEAD 一致\n- 未本地合并 develop/v3.0.0，worktree 苏州市房地产监测V3-wt-bug-6235-v3 保留待后续 MR\n- 禅道经 DBX 事务回写：status=resolved、resolution=fixed、resolvedBuild=trunk、resolvedBy=tiany、resolvedDate=2026-11-09 13:11:15、assignedTo=lichandan，新增 zt_action id=89271（action=resolved，备注含订正根因/修复/提交号/验证/待客测回归）\n- 待办：lichandan 在「新增合同 → 选楼幢 → 6 户室翻页」客测回归\n- 2026-11-09 被 lichandan 第三次激活，均反馈「翻页后仍是显示的第一页内容」；此前 11/5、11/6 两次修复均无效"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zentao_dbx_update.md",
+                "memory_type": "entities",
+                "before": "# 禅道 Bug 状态回写（DBX 直写）\n当禅道 API 工具不可用时，通过 DBX 直连数据库事务化更新 bug 状态的可复用工作流。\n\n## 适用场景\n- 禅道 API 工具被阻断时，改用 DBX 直连 SQL 更新\n- 需同时更新 zt_bug 主表与 zt_action 操作历史表\n\n## 更新 zt_bug 字段\n- status=resolved、resolution=fixed、resolvedBuild=trunk\n- resolvedBy=处理人、resolvedDate=解决时间、assignedTo=指回原提单人(reporter)\n- 事务内 begin/update/insert/verify/commit，提交后另起新连接复核持久化\n\n## 插入 zt_action 操作历史\n- 一条 resolved/fixed/rnd 动作，product 取 bug 自身 product（不同 bug 产品可能不同，如 6245 为 42）\n- 备注写入根因、修复方案、验证数据、提交号与发布 tag，便于回溯\n- 实例：bug 6245（用户管理不显示用户）回写 action #87983，resolvedBy=tiany，assignedTo=zhangleixin\n- 实例：bug 5983（Navbar返回首页跳门户）回写 action #89165，resolvedBy=tiany，assignedTo=lichandan，resolvedDate=2026-11-09 11:25:06",
+                "after": "# 禅道 Bug 状态回写（DBX 直写）\n当禅道 API 工具不可用时，通过 DBX 直连数据库事务化更新 bug 状态的可复用工作流。\n\n## 适用场景\n- 禅道 API 工具被阻断时，改用 DBX 直连 SQL 更新\n- 需同时更新 zt_bug 主表与 zt_action 操作历史表\n\n## 更新 zt_bug 字段\n- status=resolved、resolution=fixed、resolvedBuild=trunk\n- resolvedBy=处理人、resolvedDate=解决时间、assignedTo=指回原提单人(reporter)\n- 事务内 begin/update/insert/verify/commit，提交后另起新连接复核持久化\n\n## 插入 zt_action 操作历史\n- 一条 resolved/fixed/rnd 动作，product 取 bug 自身 product（不同 bug 产品可能不同，如 6245 为 42）\n- 备注写入根因、修复方案、验证数据、提交号与发布 tag，便于回溯\n- 实例：bug 6245（用户管理不显示用户）回写 action #87983，resolvedBy=tiany，assignedTo=zhangleixin\n- 实例：bug 5983（Navbar返回首页跳门户）回写 action #89165，resolvedBy=tiany，assignedTo=lichandan，resolvedDate=2026-11-09 11:25:06\n- 实例：bug 6235（户室翻页失效）回写 action #89271，resolvedBy=tiany，assignedTo=lichandan，resolvedDate=2026-11-09 13:11:15，备注含订正根因/修复/提交号/验证/待客测回归"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

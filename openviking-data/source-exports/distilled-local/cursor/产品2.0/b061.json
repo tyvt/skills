@@ -1,0 +1,132 @@
+{
+ "project": "产品2.0",
+ "batch": "061",
+ "files": [
+  "061.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "从截图看，“退款利息计算”弹窗左侧的「年利率」「退款",
+   "type": "fact",
+   "content": "从截图看，“退款利息计算”弹窗左侧的「年利率」「退款计息时间」等标签被挤成竖排，原因是窄列里仍用了默认的左右标签布局，`label-width: auto` 在宽度不足时会把中文逐字换行。 已在 `AccountRefundTable.vue` 中调整布局： 1. **左右分栏**：左侧（7 列）放表单和「开始计算」，右侧（17 列）放结果表格 2. **标签改为顶部对齐**：`label-position=\"top\"`，标签在输入框上方横向显示 3. **样式补充**：`white-space: nowrap` 防止标签换行，日期选择器 `width: 100%`，左右区域用分隔线区分 刷新页面后再打开弹窗，标签应正常横向显示。若还需要微调字段顺序或弹窗宽度，告诉我即可。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`AccountRefundTable.vue",
+    "涉及文件：d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\maintenance\\accRefund\\components\\AccountRefundTable.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-form\\zs-form.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "eb221aa1-2087-4199-bdaa-bad2bfefb096"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "v2.0/property/spFeeBill/im",
+   "type": "pattern",
+   "content": "已修复。错误报告接口 `property/spFeeBill/import/errorReport/{id}` 是 **GET**，但之前用了 `this.download()`，内部走的是 **POST**，会导致下载失败。 **修改内容：** 1. **`api/index.js`** — 新增 `downloadGet` 方法，用 GET 请求下载 blob 文件 2. **`main.js`** — 挂载 `Vue.prototype.downloadGet` 3. **`import.vue` / `importUploadDialog.vue`** — 错误报告下载由 `this.download` 改为 `this.downloadGet` 现在下载错误报告时会正确发起 GET 请求，例如： ``` GET /property/spFeeBill/import/errorReport/67572d0e4bc04cd99796c79322a2fc9e ``` 可以重新上传有校验错误的文件，验证「下载错误报告」是否正常。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "**`api/index.js",
+    "**`main.js",
+    "**`import.vue",
+    "`importUploadDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e7bc06b9-bcea-4473-b16e-d02f4f8e8045"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "默认进入的首页左侧的工作中心的菜单栏需要默认展开",
+   "type": "bug",
+   "content": "已修复。原因是工作中心首页在加载时错误地折叠了左侧菜单。 **问题原因** `home/index.vue` 的 `created` 钩子里调用了 `toggleSideBar`： ```176:178:zhi2-web-admin/src/views/home/index.vue created() { this.initDict() ``` 而 Vuex 中侧边栏默认是展开状态（`opened: true`），`toggleSideBar` 会把它切换为折叠，所以进入首页时左侧菜单会被收起。 **修改内容** 1. **`home/index.vue`**：移除 `created` 中的 `toggleSideBar` 调用，进入首页时不再自动折叠侧边栏。 2. **`Navbar.vue`**：在 `goHome` 中补充逻辑，点击顶部「首页」时若侧边栏已折叠，则自动展开。 刷新页面后，进入工作中心首页时，左侧菜单（消息、待办任务、已办任务、我发起的）会默认展开显示。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`home/index.vue",
+    "```176:178:zhi2-web-admin/src/views/home/index.vue",
+    "**`home/index.vue",
+    "**`Navbar.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7306b6f9-4bed-4195-ab23-cda67731b6e0"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "接口代理失效",
+   "type": "preference",
+   "content": "已按你的要求调整：**`.env` 保持相对路径 `api/v2.0`**，只在开发代理配置里补上前导 `/`。 **改动说明** 1. **`env/.env`** — 恢复为相对路径： ```env VITE_APP_BASE_API = 'api/v2.0' ``` 2. **`vite.config.js`** — 开发代理单独规范化路径： ```js const proxyApiPath = env.VITE_APP_BASE_API?.startsWith(\"/\") ? env.VITE_APP_BASE_API : `/${env.VITE_APP_BASE_API}`; ``` **原因** - 生产环境用 `api/v2.0`（无前导 `/`）时，请求是相对当前页面路径解析的，符合部署需求。 - Vite 的 `proxy` 匹配规则要求 key 以 `/` 开头（如 `/api/v2.0`），直接用 `api/v2.0` 会匹配不到。 - 因此在开发配置里把相对路径转成 `/api/v2.0` 做代理，不影响生产环境的 `import.meta.env.VITE_APP_BASE_API`。 已验证代理正常（响应头含 `frontend-proxy`）。Vite 应已自动重启；若接口仍异常，刷新页面后再试。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "**`vite.config.js",
+    "涉及文件：d:\\repository\\产品2.0\\env\\.env、d:\\repository\\产品2.0\\zhi2-web-admin\\vite.config.js、d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\env\\.env.test、d:\\repository\\产品2.0\\env\\.env.production、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\api\\index.js、d:\\repository\\产品2.0\\zhi2-web-admin\\package.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "dace033e-ae46-49f1-97d8-9ea78169740f"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "缺少共XX条记录",
+   "type": "bug",
+   "content": "已修复。问题出在标准账套详情页的财务科目表格。 **原因：** 该表格调用的是 `treeList` 接口，返回树形数据但没有 `total` 字段。代码里 `this.total = response.total || 0` 会把总数写成 0，而 `zs-pagination` 又用了 `v-show=\"total > 0\"`，所以底部的「共 XX 条记录」整块被隐藏，下间距也随之消失。 **修复：** 在 `financialSubjectsTable.vue` 中，当接口未返回 `total` 时，递归统计树形数据节点数作为总数： ```186:189:zhi2-web-admin/src/views/benefit/pubStandardAccountSet/components/financialSubjectsTable.vue }).then((response) => { this.pubStandardFinancialAccountList = response.data || [] this.total = response.total ?? this.countTreeNodes(this.pubStandardFinancialAccountList) }) ``` 刷新标准账套详情页后，表格底部应会显示「共 1 条记录」（或实际条数），并恢复分页区域的下",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`financialSubjectsTable.vue",
+    "```186:189:zhi2-web-admin/src/views/benefit/pubStandardAccountSet/components/financialSubjectsTable.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubStandardAccountSet\\components\\financialSubjectsTable.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-pagination\\zs-pagination.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubFinanceAccount\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ef0140d8-d676-4240-a00f-31f065725288"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "改造文件 d:/repository/产品2.0/z",
+   "type": "fact",
+   "content": "已完成 `jgxm/detail.vue` 与 `SupervisionTable.vue` 的新版框架改造，主要变更如下： ### detail.vue 1. **顶部操作区**：`operation-container` → `operation-btn-group`，已移除 `zs-attachment` 2. **框架配置**：`moduleName: 'prefund'`、`businessName: 'regProject'`、`primaryKey: 'regulatorProjectId'`、`permsPrefix: 'xmxx:jgxm'` 3. **查看模式**：三个 `Headline` 分别对应 `contentInfo` / `contentInfo2` / `contentInfo3`（基本信息、监管协议属性、风险基本信息） 4. **编辑/新增**：保留原有表单字段与校验逻辑 5. **权限按钮**：撤销、允许多协议签署、不允许多协议签署改为 `zs-button :permission` 6. **打印**：`:custom-print=\"true\"`，`zs-print` 使用 `:permission=\"[`${permsPrefix}:print`]\"` 7. **业务逻辑**：`revoke`、`multipleSignatures`、`g",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`jgxm/detail.vue",
+    "`SupervisionTable.vue",
+    "detail.vue",
+    "SupervisionTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d36455ff-aa49-44e4-8e20-51051f2af28f"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "企业注册所有的附件上传接口换成/file/appen",
+   "type": "pattern",
+   "content": "已完成修改。企业注册流程中的附件上传接口已统一替换为 `/file/appendix/uploadAnonymous`。 ## 修改说明 企业注册的附件上传集中在 `uploadAppendixFile` 函数，`Step3` 要件上传组件 `RegisterUploadItem` 通过该函数调用接口。 **核心修改** — `src/api/company/companyRegister.js`： ```127:127:zhi2-web-admin/src/api/company/companyRegister.js xhr.open('POST', `${import.meta.env.VITE_APP_BASE_API}/file/appendix/uploadAnonymous`) ``` **同步更新 E2E 测试**（保持 mock 与断言一致）： - `e2e/fixtures/register-mocks.js` — mock 路由匹配 - `e2e/fixtures/register-helpers.js` — 混合上传 mock 与响应等待 `company/companyRegister` 管理后台详情页中的营业执照上传仍使用 `ImageUpload` 组件（`/file/file/upload`），属于已登录管理端场景，不在本次匿名注册流程范围内。如需一并",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`src/api/company/companyRegister.js",
+    "```127:127:zhi2-web-admin/src/api/company/companyRegister.js",
+    "`e2e/fixtures/register-mocks.js",
+    "`e2e/fixtures/register-helpers.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "70beb6e7-0c07-4d5a-ae9a-5eb0f078c15d"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

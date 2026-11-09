@@ -1,0 +1,77 @@
+{
+  "project": "苏住房G",
+  "batch": "114",
+  "files": ["114.md"],
+  "count": 5,
+  "memories": [
+    {
+      "title": "首页面板统计文案随统计周期切换：用 statPrefix 计算属性从数据反推前缀，禁止把「本月」写死在指标名里",
+      "type": "bug",
+      "content": "【什么情况】bug 5769：首页「马上办」-历史累计视图下，4 个指标卡文案仍是「本月新增工单数（件）」等。根因是 zhi2-web-admin/src/views/home/v2/components/RepairPanel.vue 的 `topStats` 里三个指标名写死「本月…」，而历史累计分段请求的是全量（src/views/home/index-v2.vue 中 `repairMode === 'month'` 才传 month），文案与统计口径矛盾。\n【为什么】指标名里写死时间词，组件一旦支持多种统计周期（当月/历史累计），必然出现「数据显示全量、标题说本月」的口径冲突；这属于文案层 bug 但会直接让用户怀疑数据正确性。\n【怎么做】① 新增 `statPrefix` 计算属性：`mode === 'history'` 返回「历史」，否则「本月」；② 卡片模板改 `` `${p}新增工单数（件）` `` 动态拼接，版式、字段、接口一律不动；③ 回归测试同步更新 zhi2-web-admin/tests/e2e/home-repair-panel.spec.mjs：断言历史累计文案=当月文案的「本月→历史」替换、且历史视图下不得残留「本月」；④ 顺手清理阻塞用例启动的废弃引用（本次是已改静态展示的评价卡片 mockEvaluationData），保证 e2e 能跑。",
+      "evidence": "会话 session-842cd65d-c2fb-49ef-8bd9-afbd83fced37（基线 5d68a74，bugID=5769）最终结论：「根因：RepairPanel.vue 的 topStats 里三个指标名写死为「本月…」…修复：新增 statPrefix 计算属性，mode === 'history' 用「历史」，其余用「本月」；回归：更新 home-repair-panel.spec.mjs，断言历史累计文案应为当月文案的「本月→历史」且不得残留「本月」；顺带移除已废弃的 mockEvaluationData 引用…npm run test:e2e:repair 通过」，提交 93d266264 已推送。",
+      "files": [
+        "zhi2-web-admin/src/views/home/v2/components/RepairPanel.vue",
+        "zhi2-web-admin/src/views/home/index-v2.vue",
+        "zhi2-web-admin/tests/e2e/home-repair-panel.spec.mjs"
+      ],
+      "baseline": "5d68a74",
+      "sessionIds": ["session-842cd65d-c2fb-49ef-8bd9-afbd83fced37"],
+      "bundle": "114.md"
+    },
+    {
+      "title": "首页主指标下钻的子卡片扩展通道：homeStatNav 加 key 即全链路生效，openKeyDataStat 与 navigateWithSearchParams 零改动",
+      "type": "pattern",
+      "content": "【什么情况】首页「物业服务企业数量」主指标（标题+总数）已有 `stat-click` 跳列表，但「本地」「非本地」子卡片没有点击与导航配置。目标：点子卡片进「行业管理→物业服务企业」列表，本地=`bizState:'2'`（已备案）+`isLocalOrganization:'1'`，非本地=已备案+`isLocalOrganization:'0'`。\n【为什么】下钻导航的架构是「配置驱动」：zhi2-web-admin/src/views/home/v2/homeStatNav.js 是 key→路由/筛选参数的映射表，index-v2.vue 的 `openKeyDataStat` 对任意 key 统一走 `navigateWithSearchParams`（自动带上首页 `parentDeptId`）。因此新增一个下钻目标不需要碰导航执行代码，只需要在映射表加条目 + 视图层把点击事件发出来。\n【怎么做】① homeStatNav.js 增加 `companyLocal`、`companyNonLocal` 两个条目，均指向物业服务企业列表并带各自筛选；② KeyDataNav.vue 让子卡片可点击，`$emit('companyLocal'/'companyNonLocal')`；③ 视图侧过滤条件维持已有约定：`showCompanyNonLocal` + zhi2-web-admin/src/views/home/v2/keyDataMap.js 的 `filterCompanyBreakdownRows`（非全市区域隐藏「非本地」子卡片，由 index-v2.vue 传 `:show-company-non-local=\"isPortalCityWide\"`）；④ 验收口径：全市可见两个子卡片且跳转筛选正确；区县只见「本地」且可跳；无菜单权限时仍提示「没有授权相关菜单…」。",
+      "evidence": "会话 session-7650d315-6347-413a-8e9c-088dba54e1ec（基线 f36e340）最终结论：「homeStatNav.js 增加 companyLocal/companyNonLocal…KeyDataNav.vue 子卡片可点击，发出 companyLocal/companyNonLocal…index-v2.vue（此前已有）isPortalCityWide + :show-company-non-local…openKeyDataStat 无需改动，新 key 会走 navigateWithSearchParams（含首页 parentDeptId）」；查重确认：_known.md 3638 条只覆盖「主指标」跳转（统计数字点击跳列表并预置筛选），子卡片通道为本次新增。",
+      "files": [
+        "zhi2-web-admin/src/views/home/v2/homeStatNav.js",
+        "zhi2-web-admin/src/views/home/v2/components/KeyDataNav.vue",
+        "zhi2-web-admin/src/views/home/index-v2.vue",
+        "zhi2-web-admin/src/views/home/v2/keyDataMap.js"
+      ],
+      "baseline": "f36e340",
+      "sessionIds": ["session-7650d315-6347-413a-8e9c-088dba54e1ec"],
+      "bundle": "114.md"
+    },
+    {
+      "title": "rules 校验按后端补字段同步检查：签约行 supervisionBankBranchName 补 required 规则，且以相邻字段（地址/邮箱）的写法为模板",
+      "type": "bug",
+      "content": "【什么情况】bug 5935：监管协议详情页新增保存时「签约行」为空不被拦截。根因是 zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue 的 `rules` 里「管理银行」段漏配 `supervisionBankBranchName` 必填校验——页面已经渲染签约行输入框（前一轮刚把签约行改成 4 字段），但校验规则没跟上。\n【为什么】详情页 rules 是按字段手工维护的映射，功能迭代「加字段/改字段」时最常漏的就是同步 rules；漏配的静默后果是后端校验（或根本没校验）兜底，前端提交脏数据。\n【怎么做】① 在 rules 的「管理银行」段补 `supervisionBankBranchName: { required: pubRequired, message: '签约行不能为空', trigger: 'blur/change' }`（rules 第 446–450 行附近）；② 写法以同段相邻字段（签约行地址/邮箱）为模板，保证 required 开关（pubRequired）、trigger 组合一致；③ 任何「页面新增/重命名表单字段」的任务，交付前对照 rules 走一遍字段清单，缺一个就是 bug 5935 的复刻；④ ESLint 过了不代表校验齐，rules 完整性要靠字段对照表检查。",
+      "evidence": "会话 session-3297273b-8601-4394-a437-81214a17b17b（基线 b6ffc68，bugID=5935）最终结论：「根因：detail.vue 的 rules 里「管理银行」段漏配「签约行」（supervisionBankBranchName）必填校验…修复：补充 supervisionBankBranchName 必填规则（required: pubRequired，message「签约行不能为空」，trigger blur/change），与签约行地址/邮箱一致」，子模块 ac2c591ff、父仓库 907260f 已推送。",
+      "files": [
+        "zhi2-web-admin/src/views/benefit/pubRegulatoryAgreement/detail.vue"
+      ],
+      "baseline": "b6ffc68",
+      "sessionIds": ["session-3297273b-8601-4394-a437-81214a17b17b"],
+      "bundle": "114.md"
+    },
+    {
+      "title": "首页重接口改下钻按需加载：ensureXxxLoaded + fetchedRegion 双状态缓存，区域切换自动失效重拉",
+      "type": "pattern",
+      "content": "【什么情况】`GET /v2.0/evaluation/portal/getCheckData?parentDeptId=xxx`（物业管理标准化评价数据）原先在首页首屏的 `reloadPortalDataCards()` 里就调用，但数据只在用户点「物业管理标准化评价」卡片下钻时才用。\n【为什么】首页聚合页的通病：每个面板各自拉接口会让首屏请求数膨胀，而下钻类数据命中率低——不下钻就是白拉。按需加载的模式要同时解决三件事：首次下钻才发请求、同区域复用不发、切区域后缓存失效重拉；漏掉第三件会展示旧区域数据。\n【怎么做】① `reloadPortalDataCards()` 移除 `loadCheckData()` 调用（首屏/切区域都不再预拉）；② 新增 `ensureCheckDataLoaded()`：首次点卡片下钻时才请求一次，之后按当前区域 `parentDeptId` 缓存复用——用 `checkDataFetched` + `checkDataFetchedRegion` 两个状态位判断是否需要重拉；③ `loadCheckData()` 改为返回 Promise，`openEvaluationStat()` 等数据就绪后再解析跳转参数，请求失败静默不跳转（不能拿空数据拼参数）；④ 验收两问：首页进入时 Network 里无该请求；点卡片下钻时请求按需发出且跳转参数带正确统计周期。文件：zhi2-web-admin/src/views/home/index-v2.vue。",
+      "evidence": "会话 session-2b1d8c35-0436-4e32-a998-dffa124b6fed（基线 6156653）用户诉求 3「首页一进来不要调用这个接口，需要下钻的时候再调用」；最终结论：「首屏/切换区域不再调 getCheckData：reloadPortalDataCards() 中移除了 loadCheckData() 调用；新增 ensureCheckDataLoaded()——首次点「物业管理标准化评价」卡片下钻时才请求一次，之后按当前区域（parentDeptId）缓存复用，切换区域后自动重新拉取；loadCheckData() 改为返回 Promise，记录 checkDataFetched / checkDataFetchedRegion；openEvaluationStat() 改为等数据就绪后再解析跳转参数，请求失败静默不跳转」，子模块 d610cb5fe、主仓库 6156653 已推送。",
+      "files": [
+        "zhi2-web-admin/src/views/home/index-v2.vue",
+        "zhi2-web-admin/src/views/home/v2/checkDataMap.js",
+        "zhi2-web-admin/src/views/home/v2/components/CheckDataNav.vue"
+      ],
+      "baseline": "6156653",
+      "sessionIds": ["session-2b1d8c35-0436-4e32-a998-dffa124b6fed"],
+      "bundle": "114.md"
+    },
+    {
+      "title": "后端已换算单位（万元）的金额字段禁止二次 /10000：重复换算会让真实金额四舍五入显示为 0",
+      "type": "bug",
+      "content": "【什么情况】首页-公共收益「监管公共收益金额」有数据但显示 0。后端 `getBenefitData` 返回的 `fundAmount` 单位本就是**万元**，而 zhi2-web-admin/src/views/home/v2/benefitDataMap.js 的 `displayFund` 又把它除以 10000 并按 0 位小数展示，真实金额（如 3456 元→0.3456 万元）被二次换算后 round 成 0。\n【为什么】「单位约定」散落在前后端之间最容易踩两次：后端已经换算过的字段，前端任何除法都是重复劳动，且小数值经整数 round 后直接归零，还伪装成「接口没数据」而不是「换算错了」。\n【怎么做】① 判定方法：看同页面图表走势线的口径——图表显示正常而数字卡为 0，基本可断定两处换算口径不一致；② 修复：`displayFund` 直接展示 fundAmount、保留 2 位小数，与图表口径一致；③ 同步修正 mock 数据单位：zhi2-web-admin/src/api/portal/home.js 与 zhi2-web-admin/tests/e2e/home-v2-mocks.js 里 mock 的 fundAmount 由元换算为万元，保证 mock 与真实接口同口径；④ 同类审查点：凡是名字带 Amount/Fund/Money 的字段，先确认接口返回单位再写任何 /10000、toFixed。",
+      "evidence": "会话 session-4e56f171-ac58-4210-833f-f3b8644ae41e（基线 f36e340）用户诉求 1「首页-公共收益-监管公共收益金额有数据但显示0[期望]显示对应的公共收益金额」；最终结论：「后端 getBenefitData 返回的 fundAmount 单位本就是万元，原 displayFund 又除以 10000 且按 0 位小数展示，导致真实金额四舍五入显示为 0；现已改为直接展示并保留 2 位小数，与图表走势线口径一致」，提交 ab0df9236（含 benefitDataMap.js / api/portal/home.js / tests/e2e/home-v2-mocks.js 三个文件）。",
+      "files": [
+        "zhi2-web-admin/src/views/home/v2/benefitDataMap.js",
+        "zhi2-web-admin/src/api/portal/home.js",
+        "zhi2-web-admin/tests/e2e/home-v2-mocks.js"
+      ],
+      "baseline": "f36e340",
+      "sessionIds": ["session-4e56f171-ac58-4210-833f-f3b8644ae41e"],
+      "bundle": "114.md"
+    }
+  ]
+}

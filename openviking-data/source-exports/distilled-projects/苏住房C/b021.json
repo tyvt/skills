@@ -1,0 +1,149 @@
+{
+ "project": "苏住房C",
+ "batch": 21,
+ "files": [
+  "081.md",
+  "082.md",
+  "083.md",
+  "084.md"
+ ],
+ "count": 8,
+ "memories": [
+  {
+   "title": "[苏住房C] 微信小程序环境没有 sessionStorage/window 等浏览器 API：列表页复用详情页方法时抛 ReferenceError is not defined",
+   "type": "bug",
+   "content": "**什么情况**：`pages_transaction/intention/list.vue` 与 `my.vue` 共用同一套列表卡片逻辑，点击「联系方式」调用 `viewItem` 时微信开发者工具报 `ReferenceError: sessionStorage is not defined`（栈指向 my.js 的 viewItem），跳转详情完全失效。这类错误只在运行时点击时暴露，编译期与预览首页都不报，很容易被当成偶发。\n\n**为什么**：uni-app 编译到 mp-weixin 后代码跑在小程序 appservice 里，那里**没有 `window`、`sessionStorage`、`localStorage`、`document`**。而项目里同源复制自 Web 后台的代码片段（尤其「列表项 → 详情页传参」这种天然想用 sessionStorage 的写法）会被直接搬过来。同一个文件里 `editItem` 已正确用 `uni.setStorageSync`，`viewItem` 却是浏览器写法，两套并存导致只坏了一条路径。\n\n**怎么做**：\n1. 小程序端存储一律 `uni.setStorageSync/getStorageSync`，禁止 `sessionStorage/localStorage`；\n2. 读侧必须加空值兜底：`JSON.parse(uni.getStorageSync(key) || '{}')`，否则首次无缓存时 `JSON.parse(undefined/'' )` 会再抛一次错，把真正的根因盖住；\n3. 排查顺序：同一个页面里先 grep 出所有 `sessionStorage|localStorage|window\\.|document\\.`，凡是 Web 后台复制来的页面/方法优先怀疑；\n4. 列表页与详情页共用方法时（`list` 复用 `my.vue` 的场景），改一处要检查另一处是否也有同样的浏览器 API。",
+   "evidence": "会话 f3006cc6 报错 ReferenceError: sessionStorage is not defined at viewItem (appservice/my.js)，根因是 pages_transaction/intention/list 复用 my.vue 的 viewItem 时误用浏览器 API；修复为 my.vue 的 viewItem 改 uni.setStorageSync（与同文件 editItem 一致），detail.vue 改 uni.getStorageSync 并加 || '{}' 防解析报错。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\intention\\my.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\intention\\detail.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\intention\\list.vue"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "f3006cc6-3479-4cab-8a4c-e366714a4084"
+   ],
+   "bundle": "081.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "Vue 3.2.45 项目禁用 defineOptions 编译宏：小程序端运行时报 ReferenceError，须改用独立 <script> 导出 inheritAttrs",
+   "type": "bug",
+   "content": "什么情况：在 zhi2-mobile-shimin 的组件里写 `defineOptions({ inheritAttrs: false })`，微信开发者工具打开该页面即崩，报 `ReferenceError: defineOptions is not defined`，堆栈落在 `weapp:///components/ZsMap/ZsMap.js` 的 setup 里，页面整块白屏。为什么：该项目的 Vue 是 3.2.45，而 `defineOptions` 是 3.3+ 才提供的编译宏。在 uni-app/Vue3 的 web 端构建里它会被编译器吸收，但当前版本编译器不识别，宏原样落到运行时代码，setup 执行时找不到该标识符——所以是「低版本 Vue + 新宏」的组合坑，不是组件本身逻辑错误。怎么做：删掉 defineOptions，改成一个不带 setup 的独立 `<script>` 块 `export default { inheritAttrs: false }`，与项目内已有惯例 ZsPaging.vue 保持一致；开态语义不变（仍禁止 attrs 自动透传，组件内手动把 class/style 绑到真实节点）。排查同类「未定义」报错时，先确认语法/宏是否超出项目 Vue 版本，再怀疑代码。改完需重新构建并刷新开发者工具，热更新对编译宏改动不生效。",
+   "evidence": "会话 7b29aae4：用户贴 `ReferenceError: defineOptions is not defined at setup (weapp:///components/ZsMap/ZsMap.js:45:5)`，最终结论为项目 Vue 3.2.45 不支持 3.3+ 的 defineOptions，按 ZsPaging.vue 惯例改为独立 script 导出 inheritAttrs: false",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsMap\\ZsMap.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsPaging\\ZsPaging.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\package.json"
+   ],
+   "baseline": "4630e8e",
+   "sessionIds": [
+    "7b29aae4-6de6-4f5e-9c69-1a5875a30571"
+   ],
+   "bundle": "082.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "网关 zs-param 请求头承载中文会变 ??：统一改 base64 编码，并在 gateway.js 收口",
+   "type": "bug",
+   "content": "什么情况：经 `zhi2-mobile-shimin/src/api/gateway.js` 发出的请求，业务参数放在自定义请求头 `zs-param` 里；带中文时（如报修提交的 contactName「朱楠」、eventDesc「测试上传」）后端收到的中文全变成 `??`，功能静默失败但不报错。为什么：HTTP Header 只允许 ASCII（latin-1）字符集，未编码的中文 JSON/查询串在传输层被替换成 ?。用 encodeURIComponent 只是把问题推后——值变长且不同网关/代理解 URL 编码的行为不一致，用户明确要求改用 base64。怎么做：在 gateway.js 里收口一处，不要在业务页逐个改。新增 encodeZsParam：空值直接返回；否则 `btoa(unescape(encodeURIComponent(value)))`（unescape+encodeURIComponent 先把字符串转成 UTF-8 字节再 base64，避免 btoa 对非 ASCII 抛 InvalidCharacterError）。resolveZsParam 里 GET 走 serializeQueryParams(bizContent)、POST 走 JSON.stringify(bizContent)，统一过 encodeZsParam 再写入 zs-param。注意这是前后端契约变更：后端必须先 base64 解码再解析 JSON/查询串，否则全量接口 400，联调时要显式同步这件事。",
+   "evidence": "会话 ebbcd94a：用户给出两种编码方案并指定「使用方式2处理」（base64），最终结论在 gateway.js 新增 encodeZsParam + resolveZsParam，POST 先 JSON 序列化再 base64、GET 先序列化查询参数再 base64，并提示服务端需 base64 解码",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\gateway.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\repair\\add.vue"
+   ],
+   "baseline": "e04432d",
+   "sessionIds": [
+    "ebbcd94a-0700-4752-b529-af32684cb6c8"
+   ],
+   "bundle": "082.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 市民端（zhi2-mobile-shimin）技术栈与构建告警口径：Vue3 + Vite 的 uni-app 工程，index.html 全局脚本与 vite sourcemap 重复是两类高频噪声",
+   "type": "fact",
+   "content": "什么情况：苏住房C 的移动端是 zhi2-mobile-shimin（uni-app，Vue3 + Vite，页面按 pages_owner / pages_owner_extra / pages_transaction / pages_my / pages_tab 业务域分包，静态资源按页面目录 static 就近放，如 pages_owner/repair/static/）。用户贴终端日志问「是不是编译失败」时，需要先分清噪声与真错。\n\n为什么：① index.html 里的 /static/js/crypto-js.min.js、/static/js/sign.js 用 <script defer> 经典脚本加载，Vite 只 bundle ES module，因此会提示「未被 module 化 / 建议 type=module」，但 sign.js 依赖全局 window.CryptoJS，就必须用经典脚本，这条 WARN 属预期行为，可忽略，只需确认打包产物 /static/js/ 下两文件可访问。② vite.config.ts 的 build 里若用条件编译写了两个 sourcemap 键，esbuild 报 duplicate-object-key，且后者静默覆盖前者，是真正需要修的配置错误。\n\n怎么做：处理构建日志先分层——「脚本未 module」类忽略；duplicate-object-key、resolve 失败清单才是要改的。sourcemap 收敛成一条：sourcemap: process.env.UNI_PLATFORM === 'h5' ? mode !== 'production' : false。\n\n补充：该工程 /static/js/utils 下的国密/字节工具（如 byteUtil.js）走 pre-commit ESLint 门禁，no-mixed-spaces-and-tabs 会直接拦住提交，处理方式是统一缩进后对该文件跑 eslint --fix，再 git add 重新提交。",
+   "evidence": "会话 2adc93a0 / f3ee482c（基线 0011377）：解释 index.html 两个 defer 脚本的 Vite WARN 为预期行为；随后修 vite.config.ts build 中重复 sourcemap，合并为 UNI_PLATFORM 条件表达式。会话 926ce7a5（基线 166ed47）：byteUtil.js 混用空格与 Tab 触发 no-mixed-spaces-and-tabs，eslint --fix 后提交通过。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\index.html",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\vite.config.ts",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\static\\js\\sign.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\static\\js\\utils\\byteUtil.js"
+   ],
+   "baseline": "0011377 / 166ed47",
+   "sessionIds": [
+    "2adc93a0-e3be-4d14-af59-34e1f45599d5",
+    "f3ee482c-8ce3-48c1-b2dc-9cc3313b8344",
+    "926ce7a5-ca77-4897-82df-2246d6158736"
+   ],
+   "bundle": "083.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "「搜索框一半压在 Banner 上」的稳定做法：只给一个锚点量，另一侧用 margin/padding 让位，避免 bottom 负值与容器 padding 互相抵消",
+   "type": "pattern",
+   "content": "什么情况：首页头部要求搜索框上下各露一半、横跨 Banner 图片与下方白色区域交界处，同时白色区域要紧贴 Banner 无缝隙。这在 pages_tab/components/Project_Suzhufang.vue 与 pages/index/components/Project_Suzhufang.vue 两处同源文件里反复返工过。\n\n为什么：overlap 效果需要两个量——偏移量与让位量。当搜索框用 bottom: -24px 表示下移半个高度，同时 header-wrap 又用 padding-bottom: 24px 给下方留空间，两者语义等价、互相抵消，搜索框实际整体落在 Banner 下方，完全没叠上去。另一轮里 header-wrap 残留的 margin-bottom: 24px 又变成 Banner 与白色块的可见缝隙，用户会报「白色背景和 Banner 之间有间距」。\n\n怎么做：① 搜索框改 bottom: 0 + transform: translateY(50%)，以 Banner 底边为锚点上下各露 h/2，不再用负值；② 去掉 header-wrap 的 padding-bottom，把让位改为 margin-bottom: h/2，保证下方导航图标不被压住；③ 若要求白色区域紧贴 Banner，则把 margin-bottom 归零，改由白色块自身 padding-top 承担让位（如 24px 搜索框下半 + 9px 图标间距 = 33px），这样白色底仍从 Banner 底边开始、无缝隙；④ 改完两处同源文件都要同步。",
+   "evidence": "会话 f3ee482c 后经 63ca5f15（基线 8fc3cc5）把 bottom:-24px + padding-bottom:24px 的抵消改为 bottom:0 + translateY(50%) + margin-bottom:24px；会话 8d4ad7df（基线 8fc3cc5）再次报白色区域与 Banner 有间距，最终去掉 margin-bottom、白色块 padding-top 改 33px。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_tab\\components\\Project_Suzhufang.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\Project_Suzhufang.vue"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "63ca5f15-1cf5-4d52-b386-3205bad2f5ba",
+    "8d4ad7df-77b2-4614-8dcd-322eea0ae772"
+   ],
+   "bundle": "083.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "「两个白色区块之间加 10px 间距」：相邻兄弟选择器被中间包裹层打断，间距要挂在锚定块的 margin-bottom，背景铺满靠 page height:100% + 容器 min-height:100%",
+   "type": "pattern",
+   "content": "什么情况：移动端表单页要「提示语与表单之间留 10px」且「灰色背景铺满整屏、两个白色块之间的间隙透出灰底」，在 pages_my/verification/FormLocal.vue 与 pages_transaction/intention/add.vue 都出现过。\n\n为什么：① 结构上两个 .card 之间夹着 uni-forms 包裹层，.card + .card 相邻兄弟选择器命中不了，所以写了间距也不生效；② 页面容器没有撑满视口，白色块之外的区域是页面默认底色而不是目标灰底 #f4f5f7，10px 间隙自然看不到灰；③ 只给区块加 margin-top 而父级是「整块圆角卡片」时，会在卡片内部留下空白把样式撑错位。\n\n怎么做：① 不依赖兄弟选择器，直接给锚定块（通常是上一个白色块）设 margin-bottom: 10px；② 非 scoped 样式块里写 page { height: 100% }，容器 .container 设 min-height: 100% 让灰底铺满，与该目录下 TypeChoose.vue、FormManual.vue 的既有写法保持一致；③ 若某个字段被单独加间距后所在分组变「半截卡片」，就把该字段改成独立圆角卡片，避免中间留空造成错位。",
+   "evidence": "会话 fa080114（基线 9cdf7b8）：FormLocal.vue 因 .card + .card 被 uni-forms 隔开而失效，改给第一个区块 margin-bottom 并加 page/container 高度撑满。会话 dc600b95（基线 8fc3cc5）：intention/add.vue 预算→有效期、手机号→验证码两处 10px，并因中间留空把手机号改为独立圆角卡片。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\FormLocal.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\TypeChoose.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\intention\\add.vue"
+   ],
+   "baseline": "9cdf7b8 / 8fc3cc5",
+   "sessionIds": [
+    "fa080114-764a-417c-9755-a4295d80e743",
+    "dc600b95-4ec1-4576-a1ed-8a5607eda4a7"
+   ],
+   "bundle": "083.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "入口页 init 阶段报 Can't find variable: xxx：多半是调用了 API 封装函数但没 import，字典页无数据先查这条再查后端",
+   "type": "bug",
+   "content": "什么情况：进入「账户注销 → 请选择注销原因」直接报错、选项为空（pages_my/setting/cancellationReason.vue）。\n\n为什么：页面 initDict() 里调用了 getDict('cancel_reason')，但没写 import { getDict } from '@/api/common'。Vue3 setup 里未声明的标识符在运行时抛 ReferenceError: Can't find variable: getDict，是在 onLoad/onMounted 阶段抛出的，整段初始化中断——所以用户看到的表象是「页面报错 + 字典选项一个都没有」，容易被误判成后端字典 cancel_reason 没配。\n\n怎么做：① 拿到「Can't find variable / xxx is not defined」类报错，先在该 SFC 里搜索符号是否既有声明（import / 局部 const / store 解构）又有使用，缺哪个补哪个；尤其 api/common 这类工具函数是最常漏的；② 字典类下拉为空的排查顺序固定为「页面报错 → import 是否齐全 → 再看后端字典是否配置」；③ 新增页面时若照抄同目录页面，注意把被调用的 API 函数一并拷进 import。",
+   "evidence": "会话 8fea7fec（基线 ce9e460）：cancellationReason.vue 的 initDict 调 getDict 但漏 import，页面加载即 ReferenceError；补 import { getDict } from '@/api/common' 后修复。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\setting\\cancellationReason.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\setting\\cancellationForm.vue"
+   ],
+   "baseline": "ce9e460",
+   "sessionIds": [
+    "8fea7fec-d5ff-49f3-8b5d-6fe42f3a7694"
+   ],
+   "bundle": "083.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "移动端接口层约定：请求方法以实际后端为准逐接口核对（listRecommend 是 GET 不是 POST），METHOD 错误表现为「无数据」而非报错",
+   "type": "bug",
+   "content": "什么情况：src/api/transaction.js 里 listRecommend（新房推荐列表）原先写成 POST 调用，与同文件其它列表接口不一致，接口拿不到数据。\n\n为什么：uni-app 项目里 api/*.js 按模块平铺、无接口文档可查，POST/GET 混写不会被编译器拦下；请求拦截器照常发出，只是后端按方法未匹配时返回空/异常数据，前端表现是列表静默为空，很难从现象反推到「方法写错」。\n\n怎么做：① 用户点名某个接口「这是 get 接口」时，直接改成与同文件其它 GET 接口同构的写法：apiV1.get('/模块/资源/listRecommend', { params })，参数走 query string；② 新增接口时先在同文件找同类接口（列表 GET、详情/提交 POST）照抄形态，不要自创；③ 排查「列表无数据」时把方法、参数名、参数包裹层级（params vs body）一起核对，而不是只看字段映射。",
+   "evidence": "会话 00dded85（基线 e04432d）：用户指出 zhi2-mobile-shimin/src/api/transaction.js:247-249 的 listRecommend 应为 GET，改为 apiV1.get 并保持与同文件 GET 写法一致。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\transaction.js"
+   ],
+   "baseline": "e04432d",
+   "sessionIds": [
+    "00dded85-b3a2-4381-8085-aac881094b86"
+   ],
+   "bundle": "083.md",
+   "project": "苏住房C"
+  }
+ ]
+}

@@ -1,0 +1,409 @@
+{
+ "batch": 1,
+ "files": [
+  "009.md",
+  "010.md",
+  "011.md",
+  "012.md",
+  "013.md",
+  "014.md"
+ ],
+ "count": 24,
+ "memories": [
+  {
+   "title": "zs-table-column 自定义列插槽是 { scope } 而非 { row }：接口有数据但表格整块空白/渲染报错",
+   "type": "bug",
+   "content": "场景：zs-table（对 el-table 的封装）里给某列写自定义内容，接口明明有数据，表格却空白或在控制台抛 \"Cannot read properties of undefined (reading 'xxx')\"，调用栈一路指到 packages/table/src/table.vue → zs-table.vue → zs-dialog.vue。\n\n根因：zs-table-column 把单元格上下文又包了一层，作用域插槽给的是 { scope }，真正的行数据在 scope.row；el-table-column 才是直接给 { row }。照 el-table 习惯写 slot-scope=\"{ row }\" 时 row 恒为 undefined，模板里 row.xxx 立刻报错；列表在 doLayout 触发重渲染后每次必现，表现就是「接口通、列表不出」。\n\n做法：项目内所有 zs-table-column 自定义列统一写 slot-scope=\"{ scope }\" 并用 scope.row.字段（空值按既有约定补 '-'）。排查顺序也固定下来：先在相应列模板里搜 slot-scope 的解构写法，再看接口返回，不要先去怀疑接口或列宽。",
+   "evidence": "会话 71d310c7 用户报「这个选择楼幢接口有数据返回，但是列表没显示」，报错 TypeError: Cannot read properties of undefined (reading 'superviseStandard')，最终结论把「监管标准」「初始监管额度」两列改为 slot-scope=\"{ scope }\" 后正常",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleSelectBuildingDialog.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleBuildingTable.vue"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "71d310c7-e8fd-4626-846a-719d1e85dcb3"
+   ],
+   "bundle": "009.md"
+  },
+  {
+   "title": "按 organType 隐藏字段必须四处同步：配置 js / 编辑表单 / 只读详情 / 必填校验（含跳过专属字典接口）",
+   "type": "pattern",
+   "content": "场景：同一套机构基本信息/注册页要按机构类型（经纪/开发/租赁）隐藏字段，本次是租赁机构隐藏加盟品牌、经营地址、机构备案结果状态。\n\n踩坑：只在模板加 v-if 远远不够。字段清单在四处各有一份——xxxContent.js 的字段配置、编辑表单组件、只读详情组件、以及前端 rules 与后端校验；漏改任一处就出现「界面看不见却拦着不让保存」（经营地址仍必填）或只读页照样把字段显示出来。\n\n做法：① 先把类型判定收进共享 js（isLeaseOrganType() 放在 companyBasicInfoShared.js），各页统一引用，别在页面里重复写 organType 比较；② 配置 js 删掉字段项，表单与只读组件同步隐藏；③ 依赖该字段的必填规则同步移除，并排查复用同一套校验的页面（toB/agencyRecord/detail.vue、companyRecordAgency/change/detail.vue）；④ 只为该字段服务的字典/列表接口在对应类型下不再请求（租赁不拉品牌列表）；⑤ 收尾用 E2E 断言页面确无该文案，并把受影响的详情路由都走一遍。",
+   "evidence": "会话 a7c578cf 用户诉求「租赁机构注册 隐藏加盟品牌 / 机构基本信息 隐藏加盟品牌、经营地址」，最终结论列出 5 处变更并说明 lease-institution-register-organ-type.spec.js 已断言页面无「加盟品牌」",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/companyBasicInfoShared.js",
+    "zhi2-web-admin/src/views/institutionRegister/components/Step1BasicInfo.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/agencyBasicInfoContent.js",
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoForm.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue",
+    "zhi2-web-admin/src/views/toB/agencyRecord/detail.vue",
+    "zhi2-web-admin/src/views/company/companyRecordAgency/change/detail.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "a7c578cf-6f9e-4631-a4b6-f0d37807073e"
+   ],
+   "bundle": "009.md"
+  },
+  {
+   "title": "楼盘格网一个组件双模复用：mode=\"select|view\"，替换旧表格时保留 data-testid 让 E2E 不回归",
+   "type": "pattern",
+   "content": "场景：同一张楼盘表要同时服务「解除限制选房弹窗」（可点选）和「房屋限制管理详情页」（只读展示）。\n\n做法：抽一个格网组件 HouseLimitFloorSelectGrid，用 mode=\"select|view\" 区分交互，两种模式共用同一套列结构与状态呈现（首列「所在层」+ 右侧按单元展示户室，格内显示状态文案与底色），右上角图例（限制中/已解除限制/已售）也保持一致。用户明确要求把原先物理层/名义层两列合并，只保留一层且文案叫「所在层」，所以列模型在这里统一收敛，不要在两个消费方各留一套渲染。\n\n关键工程细节：详情页替换掉旧的 BuildingStateTable 渲染时，保留原有 data-testid=\"house-limit-building-grid\"，E2E 用例无需改动即可继续跑；顶部「选择楼幢」的切换逻辑也留在外层，组件只负责按传入楼幢渲染。这样避免选房弹窗与详情页两处展示各自演化、慢慢漂移。",
+   "evidence": "会话 df7ea588 用户诉求「解除限制弹窗与楼盘表列改造」及「房屋限制管理的详情页的那个楼盘也这样修改」，结论为详情页改用 HouseLimitFloorSelectGrid mode=\"view\"，data-testid 未改、E2E 可继续用",
+   "files": [
+    "zhi2-web-admin/src/views/building/houseLimit/components/HouseSelectDialog.vue",
+    "zhi2-web-admin/src/views/components/BuildingStateTable.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/houseLimitConstants.js",
+    "zhi2-web-admin/src/views/building/houseLimit/limitFormMixin.js"
+   ],
+   "baseline": "8f0cfa2",
+   "sessionIds": [
+    "df7ea588-9ecb-491c-91a1-1cfe2e59f839"
+   ],
+   "bundle": "009.md"
+  },
+  {
+   "title": "要件（附件）按业务条件动态必填：上下文对象 + 自定义提交前校验，绕过配置里的 IS_REQUIRED",
+   "type": "pattern",
+   "content": "场景：租赁合同备案（busCode=zlhtba）的要件必填是条件性的——登记备案申请书始终必填；资产管理委托书仅当当前操作机构为租赁机构时必填；共有人同意出租证明仅当出租方数量 > 1 时必填。为什么不能只靠后端配置：这三项在后端要件配置里常是 IS_REQUIRED=0，而配置是静态的，表达不了「按单据数据/机构类型判断」的条件，结果就是该传没传也能提交。怎么做：把规则集中到一个模块（utils/leaseContractRecordAppendix.js），一次导出四件事——识别要件类型、计算是否必传、映射宫格项的 isRequired、提交前校验；detail.vue 构造业务上下文（出租方数量取详情 lessorList 或出租方子表 total、机构类型取 companyOrgan.resolveOrganType(route)）并通过 :lease-contract-record-context 传给 AppendixPackageSection，同时在 beforeSubmitRecord 里传 skip-check 关掉配置自带的校验、只跑这套自定义规则，前端动态标 * 与后端文案对齐「请上传要件：XXX」。机构类型先用路由/菜单推断，后端若在单据上带 organType 等字段就在 context 构造处优先用单据字段覆盖，页面判定代码不动。E2E 要为 zlhtlr（录入）与 zlhtba（备案）分别打桩两套要件配置，否则必填断言互相污染。",
+   "evidence": "会话 7b42eae8：用户给出三条条件必填规则，最终实现落在 src/utils/leaseContractRecordAppendix.js + leaseContract/detail.vue 的 beforeSubmitRecord + skip-check，并在 AppendixPackageSection 内对 busCode=zlhtba 且传入 context 时对 fileList 做动态必填；机构类型判定用 companyOrgan.resolveOrganType，并约定后端有 organType 时用单据字段覆盖。",
+   "files": [
+    "zhi2-web-admin/src/utils/leaseContractRecordAppendix.js",
+    "zhi2-web-admin/src/views/contract/leaseContract/detail.vue",
+    "zhi2-web-admin/src/components/AppendixPackageSection/index.vue"
+   ],
+   "baseline": "2b6e7d0",
+   "sessionIds": [
+    "7b42eae8-c663-424e-8b86-3c8505db739d"
+   ],
+   "bundle": "010.md"
+  },
+  {
+   "title": "跨角色全流程 E2E：企业端提交 → 主管部门审批，同一条 video.webm 录屏的写法与前置条件",
+   "type": "workflow",
+   "content": "场景：企业注册全流程用例要覆盖「企业端填完 Step1~Step5 提交」到「主管部门账号审批通过」，并输出一段连续录屏作为验收证据。为什么容易失败：同一 browser context 里直接改登录态不可靠，必须 clearBrowserSession 再 loginAsAdmin，否则带着企业端 token 去访问审核列表会出现菜单/接口权限异常，看起来像回归失败。做法：单独建 fixtures/company-register-admin-helpers.js，按接口 URL 匹配列表/详情/审批三类响应（isCompanyRegisterListResponse / Detail / Approval），封装 gotoCompanyRegisterAuditList、searchCompanyRegisterInList、openCompanyRegisterDetailFromList（带轮询重试）、approveCompanyRegister、assertCompanyRegisterApproved；spec 里 Step1 之后保存 companyRegisterId 供后面检索，Step5 完成后 clearBrowserSession → loginAsAdmin（PLAYWRIGHT_ADMIN_USER / PLAYWRIGHT_ADMIN_PASSWORD）→ 列表检索 → 打开详情 → 审批；把用例超时要放大到 420s，并在 Step5 完成页与审批完成两处各停顿约 2s，保证同一段 video.webm 里两个角色的画面都有证据。前置条件：管理员账号必须对 Step1 所选 registered_record_dept 字典首项既有列表可见权限又有审批权限，否则属于环境缺失（应 skip/记录），不要改断言迁就。",
+   "evidence": "会话 0e08e573：新增 e2e/fixtures/company-register-admin-helpers.js，扩展 e2e/register/company-register.spec.js（Step5 后 clearBrowserSession → loginAsAdmin → 审核列表检索 → 审批），超时调 420s、录屏两处停留 2s，.env.e2e.example 补 PLAYWRIGHT_ADMIN_USER/PASSWORD 说明；9 个用例通过，产出 test-results/company-register-full.webm。",
+   "files": [
+    "zhi2-web-admin/e2e/fixtures/company-register-admin-helpers.js",
+    "zhi2-web-admin/e2e/register/company-register.spec.js",
+    "zhi2-web-admin/e2e/.env.e2e.example"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "0e08e573-df60-4498-a959-795ecb00ec81"
+   ],
+   "bundle": "010.md"
+  },
+  {
+   "title": "详情页附件「暂无附件」：busCode 在附件与审批流之间分叉 + busId 必须沿用上传时挂载的 id",
+   "type": "bug",
+   "content": "场景：机构注销详情页附件始终不显示。根因是四个问题叠加，逐个查：①busCode 分叉——页面和顶栏附件抽屉用的是审批流编码（companyCancel），而附件配置实际编码是 company_cancel，查不到配置即空；②busId 用错——附件是在新增阶段上传、挂在 companyRecordId 上，查看时却优先用 cancelId 查询，已上传文件对不上；③AnnexUpload 没收到 detail，拿不到 companyId，回退逻辑走错；④查看态附件藏在「注销信息」区块里且没有独立标题，肉眼也不易发现。做法：cancelBusCode 走「附件专用常量 → 路由 busCode → 流程码」三级回退链；appendixBusId 固定优先 companyRecordId（与上传时一致），并把 companyRecordId 映射成 appendixDetail.companyId 传给 AnnexUpload；OperationBtnGroup 新增 attachmentBusCode 属性，让附件抽屉的编码与审批流程 busCode 解耦（流程侧仍走路由 meta.busCode，两套不要互相覆盖）；AnnexUpload 内部监听 id / bus 变化后自动重查列表，避免异步回填后不刷新；查看态单列「注销材料」区块。通用原则：附件 busCode 以附件配置为准，允许且经常不等于流程 busCode；busId 必须与上传时挂载的那个业务 id 完全一致。",
+   "evidence": "会话 adbe12fc：用户反馈 companyCancel/detail.vue 附件不显示，最终结论列出 5 处原因（busCode 不匹配、busId 用错、缺 detail 参数、顶栏附件按钮 busCode 错误、查看态展示不清晰），改动落在 detail.vue / OperationBtnGroup（新增 attachmentBusCode）/ AnnexUpload（监听 id、bus 刷新）。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyCancel/detail.vue",
+    "zhi2-web-admin/src/components/AnnexUpload/index.vue",
+    "zhi2-web-admin/src/utils/appendix.js"
+   ],
+   "baseline": "d5cc617",
+   "sessionIds": [
+    "adbe12fc-224d-4313-8f62-cd4fd5541532"
+   ],
+   "bundle": "010.md"
+  },
+  {
+   "title": "DetailTemplate 一行两列但两列不等分：根因是同一行字段 span 不同，必须组件层强制 flex:1 1 0 + 归一 span",
+   "type": "bug",
+   "content": "场景：详情页已整体改成「一行两列」，但截图里「封闭设施」那一行两列宽度是 1:2 而不是等分。为什么：DetailTemplate 的 getItemStyle 是按 flex: itemSpan / totalRowSpan 分配宽度的，同一行两个字段的 layout 不一致时（小区主入口 span:8、主入口位置 span:16 + keepSpan）就按 1/3 : 2/3 分，看起来像「没改成两列」，实际是行内比例问题。解法不是逐页调 layout，而是改公共组件两处：①getItemStyle 在一行只有两个有效字段时强制 flex: 1 1 0，各占 50%；②新增 normalizeDetailSpan，把历史 span:8（三列时代）和 span:16 + keepSpan（宽窄列）统一归一为 span:12，保证换行逻辑也按两列算。再清理页面侧数据：去掉 wideLayout / keepSpan 这类旧属性，补齐 md/lg/xl: 12（如 PermitPlanPanel）。这样即使个别页面残留旧 layout，组件层也会自动等分。判定口径：看到「有改成两列但宽度不均」先查该行两个字段的 span，不要先怀疑栅格断点或 ElCol 全局补丁。",
+   "evidence": "会话 8938ed10：用户两次要求 DetailTemplate 全局一行两列等分，最终结论给出 getItemStyle 与 normalizeDetailSpan 两处组件层修复，并清理 auxiliaryProject/detail.vue 的 wideLayout/keepSpan、PermitPlanPanel.vue 补 md/lg/xl:12。",
+   "files": [
+    "zhi2-web-admin/src/components/detail-template.vue",
+    "zhi2-web-admin/src/views/auxiliaryProject/detail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/PermitPlanPanel.vue"
+   ],
+   "baseline": "a9b1293",
+   "sessionIds": [
+    "8938ed10-af4c-44bf-8d0c-5e1178985b2e"
+   ],
+   "bundle": "010.md"
+  },
+  {
+   "title": "「子表统一弹窗式 CRUD」的例外：业务上限只有一条时用内联表单承载，提交仍保持数组形态",
+   "type": "pattern",
+   "content": "场景：开发企业注册的资质信息注册时实际只会有一条，用户明确要求「还是用表单的方式」——即内联表单，而不是通用的弹窗式增删改查列表。判定依据是业务上限而不是接口形态：数据上限为 1 的固定结构（资质信息这种）用内联表单，与「填一张证书」的心智一致，也少一次弹窗点击；上限为多的子表仍走弹窗式 CRUD，独立接口的子表照旧不要塞进主表单保存。实现要点：Step1 内联表单直接编辑 qualificationList[0]，但提交 payload 仍保持数组形态（qualificationList[0] 含证书名称等字段），校验与 E2E 断言都按数组写，别改成对象把后端和用例一起改坏；注册详情页（companyRegister/detail.vue）同步用内联只读展示，字段顺序与申请页对齐；资质勾选/编辑的共用逻辑抽到 utils/registerQualification.js 与注册、详情两侧复用，避免双份漂移。以后遇到「只有一条的子表」先问业务上限，再决定内联还是弹窗，不要机械套用统一的弹窗式约定。",
+   "evidence": "会话 3f95c3e8：用户诉求「资质信息注册的时候只会有一条，还是用表单的方式」，改造为资质信息单条内联表单，并抽 src/utils/registerQualification.js + register/components/QualificationDialog.vue 复用；E2E 断言 Step1 保存 payload 含 qualificationList[0] 且证书名称为「房地产开发企业资质证书」，注册→审核全流程录屏通过。",
+   "files": [
+    "zhi2-web-admin/src/views/register/components/Step1CompanyInfo.vue",
+    "zhi2-web-admin/src/utils/registerQualification.js",
+    "zhi2-web-admin/src/views/company/companyRegister/detail.vue",
+    "zhi2-web-admin/e2e/register/company-register-fields.spec.js"
+   ],
+   "baseline": "5f4e161",
+   "sessionIds": [
+    "3f95c3e8-028d-490a-bcb0-f58808492daa"
+   ],
+   "bundle": "010.md"
+  },
+  {
+   "title": "详情页 Headline/Collapse 分块间距消失：`.xxx.el-row` 复合选择器归零 gap 压过间距 token",
+   "type": "bug",
+   "content": "情况：详情页里多个 Headline / Collapse 区块之间的间距全没了、块与块直接贴在一起。根因：全局样式里有一条 `.detail-from-container.el-row { gap: 0 }`，复合选择器特异性高于 `.detail-from-container { gap: var(--detail-block-gap) }`，把 token 定的 12px 直接归零；同时全局又把直接子级的 `.collapse-container` margin 清零，于是既没有 gap 也没有 margin，间距两条兜底路径同时失效。做法：删掉该复合选择器的 gap 归零，并在 `.detail-from-container.el-row` 上显式写 `gap: var(--detail-block-gap) !important` 降低回归概率；严禁再把 `.detail-from-container.el-row` 加回「内层 el-row gap 归零」那条规则。另一个易错点：zs-form 的根 DOM 节点就是 el-form，全局写 `.detail-from-container > .zs-form` 基本不生效，真正生效的是 `> .el-form` 的 row-gap。排查顺序：先列出该页间距的真实来源（容器 flex gap / 父层 row-gap / detail-container 的 gap），再确认是否被更高特异性的归零规则盖掉；不要把 margin 和 gap 混用。",
+   "evidence": "用户反馈「每个 collapse 之间的 padding 没了」，随后要求「全局排查一下是否还有类似问题」。最终结论明确：只有一处 `.detail-from-container.el-row { gap: 0 }` 因特异性高于 `.detail-from-container { gap: var(--detail-block-gap) }` 导致间距归零；并给出「全局已把直接子级 .collapse-container 的 margin 清零，不能再依赖 margin 叠间距，必须靠父级 gap/row-gap」「zs-form 在 DOM 上是 el-form，`.detail-from-container > .zs-form` 几乎不起作用，实际生效的是 > .el-form」两条防再犯注意，顺带把 agency-basic-info-form / developer-basic-info-form 的写死 16px row-gap 抽到 detail-form.scss 对齐 token。",
+   "files": [
+    "zhi2-web-admin/src/styles/detail-form.scss",
+    "zhi2-web-admin/src/styles/index.scss",
+    "zhi2-web-admin/src/components/Headline/index.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoForm.vue"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "5180d428-0584-4329-9241-d8565c0dbc3e"
+   ],
+   "bundle": "011.md"
+  },
+  {
+   "title": "机构基本信息变更：核心字段判定单一来源，决定「留变更页提交审核」还是「保存即生效」",
+   "type": "pattern",
+   "content": "情况：机构基本信息「变更」中，不同字段生效流程不同，B 端与管理端各写一套必然漂移。做法：抽 `utils/agencyChangeCoreFields.js` 作为唯一判定源——核心字段为机构名称、法定代表人姓名/证件类型/证件号码/联系电话、机构管理员姓名/证件号码；统一社会信用代码为锁定字段。管理端 `companyRecordAgency/change/detail.vue` 与 B 端 `toB/agencyRecord/detail.vue` 共用这份判定和同一套保存分流：保存后若触碰任一核心字段，停在变更查看页（`formMode=view&id=变更单id`）并显示「提交」按钮，提交后走备案变更审核流程；若只改非核心字段（机构别名、行政区域、经营地址、管理员联系电话等），保存成功直接回机构基本信息查看页（不带变更单 id）且不显示「提交」。USCI 除在变更模式禁用输入外，还必须在 getForm() 里强制回写原值防篡改。注意前端只负责流程与跳转，非核心字段最终落库依赖后端 update 即时写回备案表，验收时要核对后端是否即时生效。",
+   "evidence": "用户给出三条硬规则：「统一社会信用代码为锁定字段，不可编辑修改」「核心字段（机构名称/法人/法人证件类型/证件号码/联系电话/管理员姓名/管理员证件号码）变更须经主管部门一级审核」「非核心字段编辑后保存即生效，覆盖原有信息」。最终结论按此实现，新增 agencyChangeCoreFields.js，改动 AgencyBasicInfoForm、toB/agencyRecord/detail.vue、companyRecordAgency/change/detail.vue，并列出三条验证路径（非核心改联系电话→回基本信息页无提交；核心改机构名称→留变更页出现提交；USCI 应灰色不可编辑）。",
+   "files": [
+    "zhi2-web-admin/src/utils/agencyChangeCoreFields.js",
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoForm.vue",
+    "zhi2-web-admin/src/views/toB/agencyRecord/detail.vue",
+    "zhi2-web-admin/src/views/company/companyRecordAgency/change/detail.vue"
+   ],
+   "baseline": "979bee5",
+   "sessionIds": [
+    "6c91b23f-bba3-49fb-bd85-76e4879db720"
+   ],
+   "bundle": "011.md"
+  },
+  {
+   "title": "zs-select-dialog 无搜索栏时表格只占左半边、下方大片留白",
+   "type": "bug",
+   "content": "情况：把业务选择弹窗改造成公共 zs-select-dialog 后，弹窗右侧空一大块、高度也被固定撑高，与其它通用弹窗视觉不一致。根因不在业务页：组件默认把表格容器绝对定位铺满整块内容区，并给 `dialog-box` 一个固定很大的高度；带搜索栏时左侧内容把视觉撑起来看不出来，一旦去掉搜索栏，表格只按自身列宽占左侧、右边整片空白，无数据时下方也跟着留白。做法：业务侧覆写 `dialog-right { width: 100%; padding: 0 }`，取消表格区绝对定位并强制 `el-table { width: 100% }`；`dialog-box` 改 `height: auto` 让高度随内容；确认无搜索栏的弹窗单独收紧 padding 而不是改公共组件默认值，避免影响其它消费方。另外列表解析要兼容 `records` / `res.rows` 等返回结构，否则会表现为「接口有数据仍显示暂无数据」，二者容易误判为同一个 bug。验收时按「有搜索栏 / 无搜索栏」两种状态各开一次，并与既有 zs-select-dialog 弹窗并排比对。",
+   "evidence": "用户先要求「这个改成 zs-select-dialog 组件」，改完反馈「和通用的 UI 不一致，排查一下」，再提「这个弹窗没有搜索栏，padding 单独调整小一些」。最终结论定位为 zs-select-dialog 默认把表格容器绝对定位铺满内容区 + dialog-box 固定很高，无搜索栏时表格只占左半边、右侧空白；修复项为 dialog-right width 100% 去内层 padding、取消绝对定位强制 el-table 100%、dialog-box 改 height auto，并顺带让 resolveBuildingList 兼容 records / res.rows。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permit/components/PresaleSelectBuildingDialog.vue",
+    "zhi2-web-admin/src/views/presale/cashsale/components/CashsaleSelectBuildingDialog.vue",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/components/HouseSelectDialog.vue"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "b5dcbf27-aa94-4d27-a97a-978ba9a2e7cd"
+   ],
+   "bundle": "011.md"
+  },
+  {
+   "title": "对接文档驱动的改造：先做「文档能力→现有文件」盘点表，缺口通常只有四类",
+   "type": "workflow",
+   "content": "用户给一份后端/第三方《xx-前端对接文档》并要求「排查是否有对应功能，没有就新做，有就修改」时，不要照文档重写模块：先在 zhi2-web-admin 里产出一张能力盘点表（文档能力 → 现有文件 → 现状），多数主链路已存在（企业资质变更是典型：getByCompanyRecordId/getLast、备案与变更列表详情、changeObject 角标、update/submit/approval 走 operation-btn-group + 路由 busCode 全都是现成的）。真正的缺口通常集中在四类：①变更详情/保存用裸 ID 而不是包对象；②变更链路的 busCode 与备案不同，要在 api 层落常量（QUALIFICATION_CHANGE_BUS_CODE='qyzzbg'）并在菜单未配 meta.busCode 时回落；③缺专门的变更保存 API 封装；④已驳回状态 bizState===3 在 OperationBtnGroup 里没开放编辑/提交。落地：api 层集中导出常量 + resolveQualificationChangeBusCode + detail/update 封装；resolveChangeId.js 补一条 qualificationRecordChangeId 解析；OperationBtnGroup 加 bizState===3 分支。这样改动面最小，审批权限仍走菜单 company:qualificationRecordChange:approval，不引入第二套业务常量。",
+   "evidence": "012.md 会话 56db6f6：用户「参考文档排查是否有对应功能，没有就新做，有就修改」；结论给出文档能力/现状对照表，缺口为变更 detail 裸 ID、提交审批 busCode=qyzzbg、变更保存 API、已驳回(3) 可编辑可提交；修改 qualificationRecord.js、qualificationManagement/components/detail.vue、OperationBtnGroup、resolveChangeId.js。",
+   "files": [
+    "zhi2-web-admin/src/api/company/qualificationRecord.js",
+    "zhi2-web-admin/src/views/company/qualificationManagement/components/detail.vue",
+    "zhi2-web-admin/src/views/company/qualificationManagement/components/index.vue"
+   ],
+   "baseline": "56db6f6",
+   "sessionIds": [
+    "09103355-72fc-45f7-963e-b46a1f638ace"
+   ],
+   "bundle": "012.md"
+  },
+  {
+   "title": "按主体拆分接口（companyAdd/companyUpdate/companyDelete）：共用组件换接口注入 + 明确未改动消费方",
+   "type": "pattern",
+   "content": "开发企业从业人员证书要与经纪机构用不同接口时（企业侧 companyAdd/companyUpdate/companyDelete，经纪侧仍用 add/update/delete），不要复制一套组件：①api 层在 personnelCertificate.js / personnelRecord.js 新增 company* 三个封装，同时保留旧 add/update/delete，供经纪机构 institution/personnel、独立证书列表页 personnelCertificate/index.vue、toB 内联证书列表继续使用；②共用子组件按上下文切换接口，表格类组件（certificatesTable）最省事的做法是覆盖 deleteRequest 指向 companyDeletePersonnelCertificate，弹窗类（certificatesDialog）新增/编辑分别指到 companyAdd/companyUpdate；③结论里必须显式列出「未改动」的消费方清单，否则后续回归会误判；④e2e 中对证书增删改的 URL 断言要同步改成 companyAdd/companyUpdate/companyDelete，否则回归只验证了旧路径、等于没测。坑：staffManagement/components 与 staffManagement/personnelRecord 下各有一份同名 certificatesDialog/certificatesTable，改动必须两边同步，漏一处就会出现某个入口仍在打旧接口。",
+   "evidence": "012.md 会话 d5cc617：用户要求「新增用 /company/personnelCertificate/companyAdd，删除用 companyDelete，和经纪机构分开」；最终在 api 层加三个 company* 封装、切换 4 个组件文件、更新 e2e/company/personnel-record.spec.js 的 URL 断言，并明确经纪机构/独立证书列表/toB 内联未改动。",
+   "files": [
+    "zhi2-web-admin/src/api/company/personnelCertificate.js",
+    "zhi2-web-admin/src/api/company/personnelRecord.js",
+    "zhi2-web-admin/src/views/company/staffManagement/personnelRecord/certificatesTable.vue",
+    "zhi2-web-admin/src/views/company/staffManagement/personnelRecord/certificatesDialog.vue",
+    "zhi2-web-admin/e2e/company/personnel-record.spec.js"
+   ],
+   "baseline": "d5cc617",
+   "sessionIds": [
+    "d544af38-1bc2-4b0f-9bdf-a885e6e993e4"
+   ],
+   "bundle": "012.md"
+  },
+  {
+   "title": "详情页显示字典原始码值：先直查字典接口验证 key 是否存在，前端不加本地映射兜底",
+   "type": "bug",
+   "content": "详情页字段直接显示 0/1 之类原始码值（如业务状态显示「0」而不是「待提交」）时，根因多半是字典 key 写错而非 dictLabel 用法错：presale/entrustSale/detail.vue 用了 BIZ_STATE，而同模块列表页与字典中心里的正确 key 是全小写的 biz_state。字典 key 查不到时接口返回空数组且前端静默不报错，唯一可靠的确诊方式是直接请求 dev 环境字典接口，把 key 逐个比对返回是否有数据——biz_state 有 0 待提交/1 审核中/2 已备案/3 作废，BIZ_STATE 返回空数组即可判定写错。修法两步：key 统一成与同模块列表页一致；详情区块展示值统一改成 dictLabel(值, options) 预翻译，不要把码值直接丢给模板。还要区分第二种情况「key 正确但字典为空」（本例 presale_entrust_sale_sign_status、presale_entrust_sale_effect_status 均返回空），这属于字典未补录，必须交后端补录，前端不要再写一层本地码表兜底，否则字典上线后又会变成两套口径。",
+   "evidence": "012.md 会话 0b15dd3：用户给截图指出 entrustSale/detail.vue 字典回显问题；修复为 BIZ_STATE→biz_state、业务/委托/电子签状态改用 dictLabel 预翻译，并附 dev 字典接口验证表（biz_state 有数据、BIZ_STATE 空、两个状态字典需后端补录）。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/entrustSale/detail.vue",
+    "zhi2-web-admin/src/views/presale/entrustSale/index.vue"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "98dea9b7-0496-43cc-8f46-c865905aa071"
+   ],
+   "bundle": "012.md"
+  },
+  {
+   "title": "E2E 标准化交付物四件套：规则文件 + fixtures(env-loader/helpers) + 录屏合并脚本 + npm 一键脚本",
+   "type": "workflow",
+   "content": "用户抱怨「e2e 用例不规范、工作流和产物没有标准化」时，正确交付是一次性把约定落成四类产物，而不是逐个去改用例：①规则文件 .cursor/rules/e2e-automation.mdc，把目录结构、命名、断言口径、录屏开关、产物落盘位置写成可执行约束；②e2e/fixtures/env-loader.js 统一读取 .env.e2e，并配 .env.e2e.example 模板，禁止各 spec 自己读 process.env、避免跑测时静默用错环境；③e2e/fixtures/register-helpers.js 收敛注册/入网类重复步骤（填字段、上传要件、跨 Step 前进）；④e2e/scripts/*.mjs（如 merge-entrust-sale-video.mjs）把分段 webm 合并成单个验收视频，并在 package.json 用 cross-env 注入 PLAYWRIGHT_RECORD_VIDEO 等变量，配成 npm run test:e2e:xxx 一键跑完含合并。验证口径：PLAYWRIGHT_RECORD_VIDEO=1 npx playwright test e2e/register/company-register.spec.js --grep \"全流程\"，确认通过并检查合并产物落在 e2e/output/。命令与产物路径必须写回规则文件，后续会话才不会各自发明一套。",
+   "evidence": "012.md 会话 5f4e161：用户「当前项目的 e2e 测试用例不规范，工作流，产物没有标准化。约束一下，然后修复一下」，随后要求跑开发企业注册全流程；产物涉及 .cursor/rules/e2e-automation.mdc、e2e/fixtures/env-loader.js、register-helpers.js、e2e/scripts/merge-entrust-sale-video.mjs、e2e/.env.e2e.example、package.json 脚本，结果为通过并合并出 e2e/output/company-register-full.webm。",
+   "files": [
+    "zhi2-web-admin/.cursor/rules/e2e-automation.mdc",
+    "zhi2-web-admin/e2e/fixtures/env-loader.js",
+    "zhi2-web-admin/e2e/fixtures/register-helpers.js",
+    "zhi2-web-admin/e2e/scripts/merge-entrust-sale-video.mjs",
+    "zhi2-web-admin/package.json"
+   ],
+   "baseline": "5f4e161",
+   "sessionIds": [
+    "2f94152a-95c5-474c-9650-9a1bf7e5c28b"
+   ],
+   "bundle": "012.md"
+  },
+  {
+   "title": "zs-operate-column 权限拼出 undefined：permission 是布尔开关，permissionType 才是后缀",
+   "type": "bug",
+   "content": "现象：机构入网审核列表点「查看」报「权限不足…权限标识 company:institutionRegister:undefined」，按钮不显示。根因：把 zs-button 的权限数组写法抄进 zs-operate-column 的 buttons() 就会踩——zs-operate-column 里 permission 是布尔开关（是否启用权限校验），权限后缀由 permissionType（query/add/edit/delete）拼接；写成 permission: ['company:xxx:query'] 时数组为 truthy 仍进入校验分支，但 permissionType 未定义，最终拼出 `…:undefined`。做法：buttons() 统一写 { label, permission: true, permissionType: 'query', function, attrs }，整串权限码由组件按当前菜单路径自动拼，列表页不要硬编码完整权限标识。排查提示：控制台告警里的 `undefined` 后缀几乎都是 permissionType 漏写或少写枚举值，不是后端没发权限。迁移/新写操作列时逐条核对每条按钮的 permissionType。",
+   "evidence": "会话 9447b65e：用户报「查看为什么是 undefined」，修复在 index.vue 的 buttons() 改为 permission: true + permissionType: 'query' 后权限标识变为 company:institutionRegister:query",
+   "files": [
+    "zhi2-web-admin/src/views/company/institutionRegister/index.vue",
+    "zhi2-web-admin/src/components"
+   ],
+   "baseline": "a9b1293",
+   "sessionIds": [
+    "9447b65e-b578-472f-8b57-02017d4e9fea"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "函数式挂载弹窗点不开：propsData 传 visible 被 Vue2 丢弃（老弹窗未声明该 prop）",
+   "type": "bug",
+   "content": "现象：风险登记详情页点「监管项目名称」没有任何反应，控制台无报错。根因：supervision/utils/selectDialog 的 mountSelectDialogComponent 以 propsData: { visible: true } 挂载，而 superviseDialog 这类旧弹窗并未 declare visible（只认 syncVisible 或自管开关），Vue2 会把未声明的 prop 直接丢弃，弹窗内部状态永远是隐藏，所以既不报错也不显示。做法：改用 Shell 组件 render 挂载，打开时同时通过 props 和 attrs 传 visible，兼容「已声明 / 未声明」两类弹窗；打开前 blur 当前焦点，加模块级「已打开」锁防重复挂载，$mount 失败时释放锁；老弹窗补 visible / syncVisible，去掉有问题的 before-close，选行只 $emit('set-data')、由 Shell 统一销毁。同一 helper 承载的用款监管项目、退款选合同、银行网点弹窗会一并修好，改一处即可。",
+   "evidence": "会话 643201ce：mountDialog.js 改为 Shell render + props/attrs 同传 visible；superviseDialog.vue 增加 visible/syncVisible 并去掉 before-close",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/utils/selectDialog/mountDialog.js",
+    "zhi2-web-admin/src/views/supervision/riskmanage/riskregister/components/superviseDialog.vue",
+    "zhi2-web-admin/src/views/supervision/riskmanage/riskregister/detail.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "643201ce-b344-4b8f-9d1d-ca5948636201"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "详情附件按类型显示缩略图：图片取原图、PDF 用固定占位图，判断收口到 utils",
+   "type": "pattern",
+   "content": "需求：详情页证书、规平图、土地出让合同里的 PDF 不能显示成蓝色文件名链接，要统一显示 100×100 缩略图。做法：新建 utils/detailAttachmentDisplay.js，导出常量 DETAIL_ATTACHMENT_PDF_THUMB_PATH = '/assets/images/file/1.png'（与要件模块占位图一致）和一个取图函数——图片类型返回原图地址，PDF 等不可内联预览类型返回固定占位图；前端统一用它，点击缩略图在新窗口打开原文件。接入点：detail-template.vue 中「不动产权证书」等 type:'image' 字段改用该函数渲染缩略图，ParcelDialog.vue 与 detail.vue 的规平图/合同查看态同步复用，避免每页各写一套判断。两个硬要点：类型判断依据是扩展名，不能用后端 fileType（字典码会把 PDF 当图片，走 el-image 预览直接报错）；占位图路径必须集中成常量，设计稿换图只改一处。",
+   "evidence": "会话 f8b24da1：用户提出「文件类型用缩略图，PDF 用固定图片」，最终新增 detailAttachmentDisplay.js 并接入 detail-template / ParcelDialog / detail.vue",
+   "files": [
+    "zhi2-web-admin/src/utils/detailAttachmentDisplay.js",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/ParcelDialog.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/detail.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "f8b24da1-fc8e-489b-974f-b2fbccebc6a9"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "选择类只读输入框统一用 zs-input（suffix-icon + readonly + @focus），且要全模块收敛",
+   "type": "preference",
+   "content": "用户在看到 permitExtend/detail.vue 用 el-input + @click.native 打开选证弹窗后，明确要求「没有使用项目标准写法，全局检查一下」。标准写法：<zs-input v-model=\"form.permitNo\" placeholder=\"请选择预售许可证号\" suffix-icon=\"el-icon-search\" readonly @focus=\"openPermitSelect\" data-testid=\"...\" />——只读 + 放大镜后缀 + focus 触发选择，避免点击穿透和键盘弹出，打开弹窗前先 blur 当前焦点。用户要求的范围不止点名那一处：presale 模块内连同 extend/cancel 两个 PermitSelectDialog 的关键字框一起换掉，最后用全模块搜索 `<el-input` 断言清零 + ESLint 通过作为收尾验证；data-testid 保持原值不动，E2E 无需改。约定：后台输入框一律走公共 zs-* 组件，页面上出现原生 el-input 即视为未标准化，需按此模式统一（全局处理，不做别名注册）。",
+   "evidence": "会话 d6b4b8eb：permitExtend/detail.vue 与 permitCancel/detail.vue 由 el-input + @click.native 改为 zs-input，并同步 PermitSelectDialog 关键字框，验证 presale 模块内已无 el-input",
+   "files": [
+    "zhi2-web-admin/src/views/presale/permitExtend/detail.vue",
+    "zhi2-web-admin/src/views/presale/permitCancel/detail.vue",
+    "zhi2-web-admin/src/views/presale/permit/components/PermitInfoPanel.vue"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "d6b4b8eb-01cf-400b-bf07-683831f325f0"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "同一弹窗查看态与编辑态分离高度策略：查看随内容、编辑定高内部滚动",
+   "type": "pattern",
+   "content": "用户报「弹窗空白过大」：证书查看弹窗固定写了 92vh，内容少时下半屏全是空白。做法：查看态不写死高度，让弹窗随内容增高，内容过长时才用 max-height + overflow 滚动兜底，避免被裁切；同一弹窗的编辑态（施工证编辑）保留 92vh + 内部滚动，因为表单需要稳定视口、按钮位置不能跳。要点：高度策略按「查看 / 编辑」两种模式分别定义，不要在一个 zs-dialog 上共用同一个 height；改之前先确认该弹窗是否被查看与编辑复用，只改查看分支即可，别把编辑态一起放开。决策规则：只读详情类弹窗给上限（max-height）不给固定值，可编辑表单类弹窗给固定值 + 内部滚动。遇到同类「弹窗空白过大」需求按此二分处理，不要靠调 padding/margin 硬凑高度。",
+   "evidence": "会话 f8b24da1：证书查看弹窗不再固定 92vh、随内容增高并保留 max-height 滚动，施工证编辑仍用 92vh 内部滚动",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/ProjectCertificateDetailDialog.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/certificate/ProjectStateLandLicPanel.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "f8b24da1-fc8e-489b-974f-b2fbccebc6a9"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "V3 列表接口必须从 data.records 取，沿用 res.rows 会静默空表",
+   "type": "bug",
+   "content": "什么情况：V3 后台某个选择弹窗（监管标准 RegulatoryDialog）表格一直是空，接口 200 且 Network 里确实有数据，控制台无报错。\n为什么：request.js 拦截器返回的是完整响应体 { code, msg, data }，不会像 V2 那样把 data.records 提升为顶层 rows/total。从老仓库抄来的写法 `this.list = res.rows; this.total = res.total` 于是一条也取不到，静默变成空数组。\n怎么做：一律写成兜底式解析 `res.rows || res.data?.records || []`，总数 `res.total ?? res.data?.total ?? 0`；跨模块反复出现的场景直接复用 zs-select-dialog-func.vue 里的 extractListData(res) 兼容层，不要每个弹窗自己写一份。排查顺序应为：先看拦截器返回层级 → 再看组件取字段，而不是怀疑接口或分页参数；同项目已迁移页面（如 EntrustBuildingTable）就是现成的正确写法参照。",
+   "evidence": "会话 302ec45a：RegulatoryDialog.vue 的 getList 用 res.rows 导致「选择监管标准」弹窗空表；根因定为 V3 响应体层级与 V2 不同，建议改用 res.data?.records 兜底或复用 zs-select-dialog-func 的 extractListData。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/agreement/jgxm/components/RegulatoryDialog.vue",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue",
+    "zhi2-web-admin/src/views/presale/entrustSale/components/EntrustBuildingTable.vue"
+   ],
+   "baseline": "a9b1293",
+   "sessionIds": [
+    "302ec45a-4a8a-4a2c-8b9d-89dca9c35825"
+   ],
+   "bundle": "014.md"
+  },
+  {
+   "title": "V3 行政区划：/system/area/list 已废弃，改用 /system/region/listTree + common store 的 areas",
+   "type": "pattern",
+   "content": "什么情况：合同模块「买受人户籍区划」级联在 V3 下拉无数据，代码仍在调 /system/area/list。用户明确提示该接口在 V3 已不存在，V3 里行政区划相关能力被拆到多个接口。\n为什么：V3 把老的一步式行政区划接口下线，改为树形 /system/region/listTree，且配套的配置读取也换成 /system/config/getByKey（老的 configKey 同步作废）。前端若沿用旧 API 封装只会拿到 404/空数组。\n怎么做：删掉 contractRequest.js 里 getArea 及对 /system/area/list 的封装；created 中 dispatch('common/saveAreaInfo') 一次取树，页面用 mapGetters('common', ['areas']) 作为 el-cascader 的 :options，并显式声明 value/label/children；提交值继续沿用逗号拼接的 regionCode 路径（veDomicileLocation）保持不变，避免后端口径变化。验收看 Network 只有 region/listTree 一条、新增可选三级、编辑能正确回显。整套 V2→V3 废弃接口对照（area/list→region/listTree、config/configKey→config/getByKey）建议集中记录，避免逐页踩。",
+   "evidence": "会话 02c993a6：用户指出 configKey 改 getByKey、/system/area/list 在 V3 已无；最终按计划把户籍区划迁到 /system/region/listTree，用 common/saveAreaInfo + areas getter，保留逗号拼接 regionCode。",
+   "files": [
+    "zhi2-web-admin/src/views/contract/dialogs/vendeeAgentDialog/vendeeTab.vue",
+    "zhi2-web-admin/src/views/contract/utils/contractRequest.js",
+    "zhi2-web-admin/src/utils/apiV3Normalize.js"
+   ],
+   "baseline": "5f4e161",
+   "sessionIds": [
+    "02c993a6-d116-4d1e-bb4c-1d5e4e2f3a51"
+   ],
+   "bundle": "014.md"
+  },
+  {
+   "title": "列表「数据状态」只看 bizState 会漏「已注销」：注销态由 cancelStatus 承载",
+   "type": "pattern",
+   "content": "什么情况：开发企业从业人员备案列表的「数据状态」列只有一列，配置为 { type:'dict', prop:'bizState', dictUrl:'biz_state' }，操作按钮也只判断 bizState。用户要求状态能区分 待提交/审核中/已备案/已注销 四种。\n为什么：注销是独立动作（POST .../cancel），后端只把 cancelStatus 置 1，bizState 仍停留在 2（已备案）。前端只读 bizState 时，已注销记录永远显示「已备案」，且「注销」按钮还会重复出现。全仓库该模块前端根本未使用过 cancelStatus。\n怎么做：状态列改为组合判定——先判 cancelStatus，命中则展示「已注销」（可复用 biz_state 字典的注销项或常量），否则回落 bizState 字典；行操作按钮同步加 cancelStatus 前置条件。注意这里与「能否编辑只看 bizState」的约定不冲突：cancelStatus 只参与展示与注销类按钮，不参与编辑态判定。平行模块（管理端 company/staffManagement/personnelRecord、变更 personnelChange、企业端 toB/personnelRecord）三处要保持同一套判定，抽成公共 formatter 而不是各写一份。",
+   "evidence": "会话 4933304a：排查开发企业从业人员管理，确认状态列仅按 biz_state 字典展示、全仓库未用 cancelStatus；结论指出注销后若 bizState 仍为 2 会继续显示「已备案」。",
+   "files": [
+    "zhi2-web-admin/src/views/company/staffManagement/components/index.vue",
+    "zhi2-web-admin/src/views/company/staffManagement/personnelRecord/index.vue",
+    "zhi2-web-admin/src/api/company/personnelRecord.js"
+   ],
+   "baseline": "d5cc617",
+   "sessionIds": [
+    "4933304a-d17a-4361-af6f-8fe338810ec3"
+   ],
+   "bundle": "014.md"
+  },
+  {
+   "title": "全流程 E2E 被外部服务卡住时，抽独立布局专项 spec 验证改动",
+   "type": "workflow",
+   "content": "什么情况：修「委托代售详情页中间空白」后要验证，但项目主的 real-api-flow 用例走到电子签步骤就挂：天印 createSignFlowByBizTemplate 返回 401「登录信息不存在」，后面的查看态断言根本执行不到。\n为什么：这类全流程 spec 串了多个外部系统（签署/天印），任一环境未配置就整条 case 失败，无法作为布局改动的回归依据；把布局断言挂在它后面等于没有验证。\n怎么做：单独写一条布局专项 spec（如 e2e/presale/entrust-sale-detail-layout.spec.js），直接用管理端登录打开一条已存在单据的 formMode=view 详情，只断言布局：例如 basic-appendix-row 相对双栏内容的额外高度 < 16px，用断言代替肉眼看图。单据 ID 走环境变量（E2E_ENTRUST_SALE_ID）参数化，方便换数据复跑；全流程 spec 保留但在外部服务就绪前不作为验收门槛。副产品：多行文本定位统一用 textarea.el-textarea__inner + .first()，避免 Playwright strict mode 命中多个元素。",
+   "evidence": "会话 ad333c42：新增并执行 entrust-sale-detail-layout.spec.js，1 passed，断言查看态行底额外高度 < 16px；real-api-flow 因天印 401 未跑通，结论明确布局由独立用例验证。",
+   "files": [
+    "zhi2-web-admin/e2e/presale/entrust-sale-detail-layout.spec.js",
+    "zhi2-web-admin/e2e/presale/entrust-sale-real-api-flow.spec.js",
+    "zhi2-web-admin/e2e/fixtures/entrust-sale-helpers.js"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "ad333c42-94b0-4a47-b655-77036ecd0e8e"
+   ],
+   "bundle": "014.md"
+  }
+ ]
+}

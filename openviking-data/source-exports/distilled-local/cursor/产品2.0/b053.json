@@ -1,0 +1,62 @@
+{
+ "project": "产品2.0",
+ "batch": "053",
+ "files": [
+  "053.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "候选组回显不正常",
+   "type": "preference",
+   "content": "## 原因 `task.vue` 里对 **`formData.dataType`** 的监听，在**每次**触发时都会执行这段逻辑： - 删除 `flowable:assignee` / `flowable:candidateUsers` / `flowable:candidateGroups` - 并 `delete this.formData` 里对应字段 面板初次加载时流程是：`data()` 里 `formData` 先是 `{}`（没有 `dataType`），`created()` 里再整份换成 XML 解析结果（含 `dataType: 'fixed'` 和 `candidateGroups`）。 这时 **`dataType` 从 `undefined` 变成 `'fixed'`**，监听器照样跑了一遍「切换时清空」，**把刚解析出来的候选组从内存模型里删掉了**，所以详情再进来看回显是空的；若再点保存，还会把**已删过的模型**写回 XML，看起来像「保存了再打开就没了」。 `formData.userType` 那边用了 `if (oldVal)`，初次不会误删；只有 **`dataType`** 这段少了对「首次赋值」的判断。 ## 修改 为 `formData.dataType` 增加 **`oldVal`**，并只在**用户真的改过指定方式**时清空人员",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`task.vue",
+    "文件：`zhi2-web-admin/src/components/Process/components/nodePanel/task.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\Process\\components\\nodePanel\\task.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\Process\\common\\parseElement.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\Process\\common\\XForm.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8e2e88bc-89fe-4391-8ce3-07a15df52e5c"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "vue.js:5108 [Vue warn]: Av",
+   "type": "bug",
+   "content": "已修复该 Vue 警告。 **原因：** `CompanyBasicInfoForm` 通过 `:form=\"form\"` 接收父组件数据，但模板里用 `v-model=\"form.xxx\"` 直接改写了 prop，触发了 Vue 的单向数据流警告。 **修复方式：** 在子组件中增加 `localForm`，通过 `watch` 与父组件的 `form` 保持**同一对象引用**（不是深拷贝），所有编辑绑定改为 `localForm`： ```167:178:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components\\CompanyBasicInfoForm.vue data() { return { localForm: {} } }, watch: { form: { immediate: true, handler(val) { this.localForm = val || {} } } }, ``` 这样： - 不再直接对 `form` prop 做 `v-model` 绑定，警告会消失 - `localForm` 与父组件 `form` 仍是同一引用，父组件的校验、保存逻辑不受影响 - 父组件整体替换 `form` 时（如 `this.form = { ... }`",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "```167:178:d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components\\CompanyBasicInfoForm.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components\\CompanyBasicInfoForm.vue、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\toB\\companyRecord\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f4820caa-7dba-4a66-83ef-64ac5b12adb3"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "这里的分类应该是procedure_category",
+   "type": "fact",
+   "content": "修改已经加上，说明如下。 ### 原因 `SelectRecordProcedureDialog` 的 `custom-class` 里带有 **`single-choice`**，而全局样式里原来是： ```166:168:zhi2-web-admin/src/styles/element-ui.scss .single-choice .el-checkbox__inner { border-radius: 50%; } ``` 这条规则作用在**整个带 `single-choice` 的对话框**里的所有 `.el-checkbox__inner`，所以左侧「所属类别」的 **Element 复选框也被画成圆形**，看起来像单选。 ### 修改 在 `element-ui.scss` 里把圆形样式**限定在表格内部**，与上面「隐藏表头全选」的写法一致，只影响选择列： - 改为：`.single-choice .el-table .el-checkbox__inner { border-radius: 50%; }` 这样： - **左侧**：仍是 `el-checkbox-group`，恢复为**方形多选复选框**。 - **右侧**：仍在带 `single-choice` 的弹窗里，**表格选择列**保持原来的**圆形单选样式** + 你现有的 `handleSelecti",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "```166:168:zhi2-web-admin/src/styles/element-ui.scss",
+    "`element-ui.scss",
+    "`SelectRecordProcedureDialog.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\recordProcess\\components\\SelectRecordProcedureDialog.vue、d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\procedure\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\dataProperty\\procedure\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6b9584dd-8399-40b2-8b79-9baf367ed910"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

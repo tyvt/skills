@@ -1,0 +1,144 @@
+{
+ "project": "2-0",
+ "batch": "021",
+ "files": [
+  "021.md"
+ ],
+ "count": 8,
+ "memories": [
+  {
+   "title": "这个新增弹窗改为@zhi2-web-admin/sr",
+   "type": "bug",
+   "content": "已按你说的改好了：`@zhi2-web-admin/src/views/maintenance/depositNotice/components/PaymentRangeTable.vue` 里的新增选择弹窗，改成和 `company` 组件一致的写法。 具体改动： - 把两个 `zs-select-dialog` 的 `title=\"初交明细选择\"` 改为 `header=\"初交明细选择\"` - `isProjectDialogVisible` 对应的弹窗 - `isBuildDialogVisible` 对应的弹窗 这样“新增”时这两个弹窗就和 `@zhi2-web-admin/src/views/maintenance/depositNotice/company/components/PaymentRangeTable.vue` 的用法一致了。 另外我看了下 lint，当前文件里有一批既有 TS 报错（不是这次改动引入的）。",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "已按你说的改好了：`@zhi2-web-admin/src/views/maintenance/depositNotice/components/PaymentRangeTable.vue",
+    "`@zhi2-web-admin/src/views/maintenance/depositNotice/company/components/PaymentRangeTable.vue",
+    "@zhi2-web-admin/src/views/maintenance/depositNotice/components/PaymentRangeTable.vue",
+    "这个新增弹窗改为@zhi2-web-admin/src/views/maintenance/depositNotice/company/components/PaymentRangeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "64df7727-22c7-4f7d-ab8e-726440dc4ed9"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "资金代缴单位清除时没有清除model值@zhi2-w",
+   "type": "bug",
+   "content": "已修复你说的问题：在清除“资金代缴单位”时，同步清空表单 model 值。 改动文件：`zhi2-web-admin/src/views/maintenance/depositNotice/company/components/AddDialog.vue` 我加了一个监听： - 监听 `selectedCompany`（`v-model` 绑定值） - 当 `zsLikeSelect` 清空后传回 `{}` / 空值时，自动执行： - `form.companyName = undefined` - `form.companyId = undefined` 这样即使 `@select` 不触发，清空动作也会把 model 一并清掉，不会残留旧值。 你可以直接验证： 1. 选择一个资金代缴单位； 2. 点击输入框右侧清除； 3. 提交前看 `form.companyName/companyId` 应为空，且必填校验会正常生效。",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "改动文件：`zhi2-web-admin/src/views/maintenance/depositNotice/company/components/AddDialog.vue",
+    "资金代缴单位清除时没有清除model值@zhi2-web-admin/src/views/maintenance/depositNotice/company/components/AddDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "76d28965-e3f4-48ff-bdb9-b55a6b87279b"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "L440: handleQuery() { L441",
+   "type": "bug",
+   "content": "已帮你改了，`@OpeningBuildingDialog.vue` 的“查询”现在会真正调用接口，不再只是本地过滤。 ### 我改了什么 - 在 `OpeningBuildingDialog.vue` 新增了 `queryOriginData()`，统一请求 `this.listUrl`。 - `checkChange()` 改为调用 `queryOriginData(...)`，保持勾选树节点后仍然走接口取数。 - `handleQuery()` 改为： - 先重置分页； - 校验左侧是否已勾选节点（未勾选给出提示）； - 调用 `queryOriginData(...)` 发请求，携带 `keyWord/purpose/hasElevator` 查询条件。 ### 根因 你原来的 `handleQuery`（440-466）只在 `originData` 上做 `filter`，并没有发请求，所以看起来“点击查询没反应、没掉接口”。 ### 你可以这样验证 1. 打开弹窗后先勾选左侧树节点； 2. 输入关键字或选择筛选条件点击“查询”； 3. 在 Network 看是否请求了 `listUrl`（默认是 `/maintenance/openaccdtl/queryEnableAccHouseInfoByUnitIds`）。 如果你希望“未勾选树节点时，查询也能掉接口（全量查）",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "已帮你改了，`@OpeningBuildingDialog.vue",
+    "`OpeningBuildingDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d1b2d0b3-aa25-42eb-93c8-7a169f622410"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "this.sum = response.costMa",
+   "type": "bug",
+   "content": "已按你的要求加上防护，改动如下。 **逻辑说明：** - `response.costMap` 为 `null` / `undefined` 时，`response.costMap?.sum` 为 `undefined`，不会抛错。 - `costMap` 存在但 `sum` 为 `null` / `undefined` 时，`sumFromApi != null` 为假，使用默认小计对象。 - 接口正常返回 `sum` 时，用 `{ ...defaultSum, ...sumFromApi }` 合并，缺字段仍用 0，与模板里的 `|| 0` 行为一致。 项目里已有可选链用法（如 `OpeningBuildingDialog.vue`），与当前写法一致。当前文件里的 TS 插件告警是原有问题，并非本次修改引入。",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`OpeningBuildingDialog.vue",
+    "@zhi2-web-admin/src/views/maintenance/accountOpen/owner/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "43c3714d-1845-47df-a896-b1f6b3f03897"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "contentInfo缺失了字段，按照zs-form",
+   "type": "bug",
+   "content": "## 说明 对照同页的 `zs-form`（约第 7–57 行），**查看模式**下的 `contentInfo` 少了一列：**变更/销户原因**（`reason`，对应 `zs-textarea`）。 已在 `contentInfo` 末尾补上该项，并与表单项保持一致： - **标签**：`businessType == '1'` 时为「变更原因」，否则为「销户原因」（与表单项 `:label` 一致） - **取值**：`this.form.reason` - **布局**：与表单里最后一项相同，占满一行（`md/lg/xl: 24`） - **展示**：使用 `DetailTemplate` 的 `textarea` 类型，适合多行说明 当前文件中与本次修改无关的 TypeScript 提示（如 `changeApplyTable.getList`）仍为原有问题，未改动。",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "@zhi2-web-admin/src/views/maintenance/accountCancel/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "491cb20a-e8f3-44cb-9648-5a18d4740d5d"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "[Vue warn]: Property or me",
+   "type": "bug",
+   "content": "## 原因说明 `ListTemplate.js` 里操作列写死了 `:width=\"operationColumnWidth\"`： ```9:9:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\mixins\\ListTemplate.js <zs-operate-column :moduleName=\"moduleName\" :businessName=\"businessName\" :buttons=\"buttons\" :width=\"operationColumnWidth\" /> ``` `AccountCancel` 只用了 `listMixins`，没有在自身 `data` 里声明 `operationColumnWidth`，`table` mixin 里原先也没有该字段，渲染时就会报警。 ## 修改说明 在 **`table.js`**（`listMixins` 依赖的表格 mixin）的 `data` 里增加默认值 **`operationColumnWidth: 80`**（与 `maintenance/query/index.vue` 等页面一致）。 这样所有走 `ListTemplate` 的列表页都会带上该属性；若某页需要更宽的操作列，仍可在页面自己的 `data` 里覆盖。 刷新 `AccountCancel` 页面后，该",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`ListTemplate.js",
+    "```9:9:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\mixins\\ListTemplate.js",
+    "**`table.js",
+    "`maintenance/query/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0613463c-dedd-4264-a38a-7d944299a97c"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "[Vue warn]: Error in rende",
+   "type": "preference",
+   "content": "我在项目里还发现了另一个同样的写法：`src/views/property/complex/components/group-multi-select.vue` 也在 `get()` 里直接 `this.$attrs.value.split(',')`，未来也会遇到同类报错。我会用和 `MultiSelect` 一样的方式把它也做成类型兼容，避免“修一个点、另一个页面又炸”。 **Addressing bug issues** I noticed another component has the same bug the user reported with MultiSelect. I think it’s necessary to address this similar issue to avoid future problems. So, I’ll patch the group-multi-select accordingly. It’s essential to read and understand the existing code to ensure I apply the patch effectively. This way, I can help prevent these bugs from happening again!",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "我在项目里还发现了另一个同样的写法：`src/views/property/complex/components/group-multi-select.vue",
+    "D:/repository/园区物管2.0/zhi2-web-admin/src/components/zs-select/MultiSelect.vue",
+    "D:/repository/园区物管2.0/zhi2-web-admin/src/components/zs-select/zs-select.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "96cc05d6-f240-484b-bd44-cb2ed62f1ebc"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "删除二级正常刷新页面，删除三级页面刷新有问题，实际数",
+   "type": "preference",
+   "content": "## 原因说明 右侧表格用了 **懒加载树表**（`lazy` + `load`）。`getList()` 只更新**根级**的 `tableData`。 - **删二级**：该行就在根列表里，刷新后 `tableData` 与界面一致。 - **删三级**：三级行是父行展开时由 `load` 拉取并缓存在 Element 表格内部的 **`lazyTreeNodeMap`** 里。只调 `getList()` 不会清掉这份缓存，所以界面仍显示已删节点；重新进页面相当于整张表重建，缓存没了，数据就对了。 ## 修改说明 1. 增加 `tableRenderKey`，给 `zs-table` 绑定 `:key=\"tableRenderKey\"`。 2. **删除成功**后执行 `tableRenderKey += 1`，再 `getList()`，强制表格 **重新挂载**，清空懒加载缓存。 3. **`refresh()`**（弹窗保存后）同样 `tableRenderKey += 1`，避免增改子级后列表与缓存不一致。 与同仓库里 `system/dept/index.vue` 里清空 `lazyTreeNodeMap` 的思路一致，这里用 `key` 更省事，也不依赖 `el-table` 内部结构。 --- 变更位置见： ```20:22:d:\\repository\\园区物管",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`system/dept/index.vue",
+    "```20:22:d:\\repository\\园区物管2.0\\zhi2-web-admin\\src\\views\\maintenance\\standardItemType\\index.vue",
+    "删除二级正常刷新页面，删除三级页面刷新有问题，实际数据已删除，关闭当前页面重新进来数据是正常的@zhi2-web-admin/src/views/maintenance/standardItemType/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "183f0f0d-e87d-4696-8caa-bb0bbdf0d30f"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  }
+ ],
+ "_draft": true
+}

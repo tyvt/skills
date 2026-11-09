@@ -1,0 +1,47 @@
+{
+  "project": "苏州市房地产监测V3",
+  "batch": "336",
+  "files": [
+    "336.md"
+  ],
+  "count": 2,
+  "memories": [
+    {
+      "title": "el-upload 的 before-upload 写成 async 返回 Promise<false> 挡不住上传：必须同步返回 false，白名单还要对齐后端字典 sys_dict_data(file_type).remark",
+      "type": "bug",
+      "content": "【什么情况】禅道 Bug 5798：「测试反馈这个改动不生效」。实际查下来有**两个独立原因**：① 测试环境没部署——测试环境构建时间 2026-10-27 11:46 早于首次修复提交 `5424755ae`（19:56），线上产物还是旧的白名单 `[\"png\",\"jpg\",\"jpeg\",\"pdf\"]`，连统一提示常量都没有；② 代码本身也没修到位——`before-upload` 写成了 `async` 并返回 `Promise<false>`。\n【为什么】Element UI 的 `before-upload` 支持返回 `Promise`：但**只有在 Promise resolve 出 `File`/`Blob` 时才采用该返回值**；返回 `Promise<false>` 走的是 reject/其他分支时，文件照样被提交。结果就是「前端提示不支持 → 文件照样上传 → 后端再回『仅支持：img、pdf』」，用户看到的是前端提示失效，实际是校验根本没拦住。异步函数返回一个假值，在 JS 语义上是 `Promise<false>` 而非 `false`，这正是踩坑点。\n【怎么做】① `before-upload` 的**同步**校验分支必须 `return false`；如果校验本身是异步的，要让 Promise **reject**（而不是 resolve 成 `false`），否则拦截无效。② 白名单要与后端一致：后端按字典 `sys_dict_data(file_type)` 的 `remark` 判定（img = `.png, .jpg`），前端不能自己另写一份更大的名单，否则「前端放行、后端拒绝」。要接收 `.jpeg` 时，先维护字典 img 的 remark，再放开前端白名单，顺序不能反。③ 「测试反馈改动不生效」的标准排查顺序：**先比对测试环境构建时间 vs 修复提交时间**（产物没更新就是白查），再核对代码是否真的修到位；两个原因可能同时存在。④ 修复上线要有客观判据：写产物校验脚本（如 `node e2e/scripts/check-testenv-appendix-build.mjs` 返回 0 表示修复已上线），不要靠「我改过了」。⑤ 回归要覆盖新增用例（8 条）+ 相关既有链路回归（公司注册要件 3 条），再回写禅道。",
+      "evidence": "会话 session-eeaa919a-8892-4f7c-b26b-70f4ed5ab48f（基线 a86bf95）用户诉求 1「http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=5798 测试反馈这个改动不生效，自动化测试验证一下」、诉求 2「写回禅道改状态」；最终结论备注逐条写明「环境未部署：测试环境构建 2026-10-27 11:46 早于首次修复提交 `5424755ae`（19:56），线上产物仍是旧的 `[\"png\",\"jpg\",\"jpeg\",\"pdf\"]」「代码也没修到位：`before-upload` 写成 `async` 返回 `Promise<false>`，el-upload 的 Promise 分支只在 resolve 出 `File`/`Blob` 时才采用返回值」「修复：改同步返回（异步校验 resolve 为 `false` 时 reject），白名单与后端 `sys_dict_data(file_type).remark`（img = `.png, .jpg`）保持一致」「测试环境重新构建后，运行 `node e2e/scripts/check-testenv-appendix-build.mjs` 返回 0 就说明修复已上线」。",
+      "files": [
+        "zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementGrid.vue",
+        "zhi2-web-admin/src/components/AnnexUpload/components/AppendixRequirementCard.vue",
+        "zhi2-web-admin/src/views/institutionRegister/institutionRegisterAppendix.js",
+        "zhi2-web-admin/src/views/institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue",
+        "zhi2-web-admin/e2e/register/institution-register.spec.js",
+        "zhi2-web-admin/e2e/scripts/check-testenv-appendix-build.mjs"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-eeaa919a-8892-4f7c-b26b-70f4ed5ab48f"
+      ],
+      "bundle": "336.md"
+    },
+    {
+      "title": "禅道 bug 闭环回写规范：resolved/fixed/trunk + 指派回提单人 + 备注按根因/修复/验证/改动文件/待办六段式并核对 zt_action 操作历史",
+      "type": "workflow",
+      "content": "【什么情况】修完代码并提交推送后，还要把禅道上的 bug/任务状态改掉，否则测试看到的仍是「未解决」，单子在看板里挂着。\n【为什么】禅道状态是交付闭环的一环，且它的「备注」是后续唯一可追溯的根因记录——代码提交号之外，「为什么这么改、怎么验证的、还剩什么没做」只有写进备注才留得住。状态没回写，测试会重复报同一个问题。\n【怎么做】① **状态组合**：bug 置 `resolved`（已解决）+ 解决方案 `fixed` + 解决版本 `trunk`（主干），并把任务指派回**提单人**让其验证（不要自己留着）；任务（story/task）置 `done`，按实际登记消耗工时、剩余工时归零。② **备注六段式**：根因 → 修复 → 验证 → 改动文件 → 待办（环境侧/后端侧未完成事项要写明，例如「测试环境需重新构建发布后再验证」）。③ **操作历史要核对**：确认 `zt_action` 新增记录存在且 `action=resolved`、`extra=fixed` 与备注一致，页面操作历史里能看到这条，而不是只改了状态没留痕。④ **提交号要精确**：若期间做过 rebase/变基导致提交号变化，禅道备注里的提交号要同步更新，否则追溯时对不上（本次明确提示「可以把解决方案备注里的提交号从 `036e3ba85` 更新为 `0fd25ef15`」）。⑤ 写回后要在禅道页面复查一遍状态与指派人，再回复用户。⑥ 无关文件（构建产物 `public/version.json`、`report.html`、临时脚本、`.tmp-evidence/`）不夹带进提交，禅道备注里也不虚报未验证项——未验证的显式列为待办。",
+      "evidence": "会话 session-eeaa919a-8892-4f7c-b26b-70f4ed5ab48f（基线 a86bf95）用户诉求 2「写回禅道改状态」；最终结论表格写明「状态 `resolved`、解决方案 `fixed`、解决版本 `trunk`、解决人/时间 tiany / 2026-10-30 11:06:11、指派给 lichandan（提单人，回到待验证）」、「操作记录 `zt_action` 新增 #83849，`action=resolved`、`extra=fixed`」、「备注按『根因 / 修复 / 验证 / 改动文件 / 待办』写入」、「测试环境重新构建后，运行 `node e2e/scripts/check-testenv-appendix-build.mjs` 返回 0 就说明修复已上线」；同项目另两次回写见 session-975f5f14（禅道任务 2131 置 done、登记消耗 1 小时、指派回提单人戴志超）与 session-c850280a（Bug 5971 置 resolved/fixed/trunk 并指回 zhunan 验证）。",
+      "files": [
+        "C:/Users/Administrator/.dsh/skills/zentao-analyzer/SKILL.md",
+        "C:/Users/Administrator/.dsh/skills/zentao-analyzer/zentao_fetch.py",
+        "C:/Users/Administrator/.dsh/skills/zentao-analyzer/yapi_fetch.py"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-eeaa919a-8892-4f7c-b26b-70f4ed5ab48f",
+        "session-975f5f14-1db5-44c2-bcb1-86ccb2d0b1f3",
+        "session-c850280a-6ea3-4e47-b546-f7192580dd5e"
+      ],
+      "bundle": "336.md"
+    }
+  ]
+}

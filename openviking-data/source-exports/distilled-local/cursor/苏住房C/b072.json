@@ -1,0 +1,129 @@
+{
+ "project": "苏住房C",
+ "batch": "072",
+ "files": [
+  "072.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "pages_owner/company/info/c",
+   "type": "bug",
+   "content": "已修复 `contracts.vue` 中「合同信息」与「收费标准」之间的间距问题。 **原因：** `margin-top: 10px` 写在父页面的 scoped 样式里，但 `base-card` 是子组件，普通选择器无法作用到子组件根节点，间距未生效。 **修改：** 使用 `:deep()` 穿透 scoped，并与同页 `file-list` 保持一致： ```scss :deep(.contract_card_item) { margin-top: 10px; margin-bottom: 10px; } :deep(.fee_card_item) { margin-top: 10px !important; } ``` 这样两个卡片之间会有 10px 灰色间距。请刷新页面确认效果。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`contracts.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\company\\info\\contracts.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\commonNew\\baseCard.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\company\\info\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9fcef1ba-4f8b-422b-b728-7de7e7801513"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已修复选项表决「我的决策」页的两个问题： 修复内容 ",
+   "type": "fact",
+   "content": "已修复选项表决「我的决策」页的两个问题： ## 修复内容 ### 1. 最近一次决策 - 对齐问题 将决策摘要（如「测试」）与「决策详情 >」调整为**同一行左右对齐**： - 左侧：决策选项摘要 - 右侧：决策详情入口 ### 2. 决策详情页内容为空 根因是点击「决策详情」时： - 未写入缓存，详情页拿不到摘要数据 - `detail.vue` 缺少缓存回退与「决策信息」区块 修复措施： - **`goLatestDetail`**：跳转前将摘要、签字、时间等写入 `voteStore` 和本地缓存 - **`detail.vue`**：补齐与 `DecisionRecord.vue` 一致的数据加载逻辑，支持三级回退： 1. `selectOptdec` 接口返回的选项列表 2. `getAppRecordDetail` / `getDecisionRecordDetail` 的 `optionList` 3. 缓存中的 `value` 摘要（按 `、` 拆分展示） - 新增「决策信息」卡片：决策人、签字、决策时间 ### 涉及文件 - `pages_vote/decision/optional/DecisionResult.vue` — 布局对齐 + 跳转缓存 - `pages_vote/decision/optional/detail.vue` — 决策详情完整展示 - ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`detail.vue",
+    "**`detail.vue",
+    "`DecisionRecord.vue",
+    "`pages_vote/decision/optional/DecisionResult.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "30045e67-bafd-468a-a56a-1f3d2ed7b2fe"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "二手房-房源发布，房源核验时，页面显示“网络错误，请",
+   "type": "preference",
+   "content": "## 问题原因 接口实际返回是成功的（外层 `code: 200`），但业务层核验失败（内层 `code: 500`，`message: \"核验失败...\"`）。 问题出在 HTTP 拦截器：`secondVerifyLogVerify` 虽然配置了 `noReject: true`，希望由页面自行处理业务错误，但 `v1Instance.js` 没有开启 `supportNoReject: true`，导致该配置未生效。 拦截器把 `code: 500` 当成请求失败，又因为内层响应用的是 `message` 而不是 `msg`，最终 fallback 成了通用提示： ```103:104:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\httpInstance.js showToast(data.msg || '网络错误，请稍后再试') throw { data } ``` 而 `verification.vue` 里本来已经写好了对 `code == 500` 的处理逻辑，会跳转到核验失败页并展示具体原因，只是这段逻辑从未被执行到。 ## 修复内容 1. **`v1Instance.js`**：补充 `supportNoReject: true`（与 V2 的 `api/index.js` 保持一致），使 `noReject: tr",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`v1Instance.js",
+    "```103:104:d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\httpInstance.js",
+    "`verification.vue",
+    "**`v1Instance.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "df98a5b7-7af2-4775-8bc5-f19612418dfd"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "首页模块-房源核验，记录编号不应该显示蓝色可点击样式",
+   "type": "fact",
+   "content": "问题已修复。 **原因：** 核验失败页通过 `ZsRichText` 渲染接口返回的错误信息，其中 `formatRichTextContent` 会调用 `linkifyPhoneNumbersInHtml`，把文本里的数字自动转成蓝色可点击的电话链接。原来的正则包含 `\\d{8}`（任意 8 位连续数字），记录编号 `202607220192` 这类长数字串会被误识别为电话号码。 **修改：** 在 `zhi2-mobile-shimin/src/utils/index.js` 的电话号码正则前后增加数字边界判断 `(?<!\\d)` 和 `(?!\\d)`，只匹配独立出现的电话号码，不再匹配更长数字串的一部分。 修复后效果： - 记录编号 `202607220192` → 普通灰色文本，不再显示为蓝色链接 - 真实手机号、固话号码 → 仍可正常识别并点击拨打 重新编译运行小程序后，房源核验失败页的记录编号应已恢复正常样式。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`zhi2-mobile-shimin/src/utils/index.js",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\publishHouse\\publishStatus.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\publishHouse\\verification.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "971ae865-b9cb-40f4-b093-4ddfce0be730"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "首页-视频看房，搜索框被覆盖。",
+   "type": "bug",
+   "content": "已修复「视频看房」页面搜索框被遮挡的问题。 **原因：** `ZsSearch` 放在 `z-paging` 外面，而 `z-paging` 默认全屏固定定位，会盖住上方的搜索框，所以截图里看不到搜索栏。 **修复：** 参考同项目的 `goodProject/index.vue`，将搜索框移到 `z-paging` 的 `#top` 插槽中，让列表组件正确预留顶部区域。 修改文件：`zhi2-mobile-shimin/src/pages_transaction/houseVideo/index.vue` 请重新编译运行后，在「首页 → 视频看房」确认搜索框是否正常显示在列表上方。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`goodProject/index.vue",
+    "修改文件：`zhi2-mobile-shimin/src/pages_transaction/houseVideo/index.vue",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\houseVideo\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\temp.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "4c88e3b6-b478-4a11-8f21-8050ecd743a5"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "限制所有富文本内容里面的图片宽度不要超过屏幕宽度",
+   "type": "preference",
+   "content": "已完成修改。根因是微信小程序的 `rich-text` 组件**无法通过外部 CSS 控制内部的 `img`**，而原先 `uni.scss` 里的 `.rich-text img { width: 100% }` 只在 H5 条件编译内生效，小程序端图片会按原始宽度溢出屏幕。 ### 修改内容 1. **`src/utils/index.js`** — 在 `formatRichTextContent` 中统一处理所有富文本图片： - 移除 `width` / `height` 属性 - 清除原有 style 中的宽高设置 - 注入内联样式：`max-width:100%; width:100%; height:auto; display:block` 2. **`src/uni.scss`** — 将 `.rich-text` 基础样式（`max-width`、`overflow`、`word-break`）移到全平台生效；H5 端保留 `img` 的 CSS 兜底。 3. **`src/components/ZsRichText/ZsRichText.vue`** — 容器增加 `max-width: 100%` 和 `overflow: hidden`。 所有通过 `ZsRichText` 展示的富文本（政策内容、公告、协议等）都会自动生效，无需逐个页面改。 请重新编译并在",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`uni.scss",
+    "**`src/utils/index.js",
+    "**`src/uni.scss",
+    "**`src/components/ZsRichText/ZsRichText.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0f7f7bd6-7929-4524-8766-b29fbb4c9405"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "pages_transaction/publishH",
+   "type": "fact",
+   "content": "已修复 `pages_transaction/publishHouse/index` 的 Tab 栏布局异常。 ## 问题原因 1. **Tab 挤在左侧**：`.tab-box` 没有 `display: flex`，三个 Tab（已上架 / 待发布 / 已下架）只是普通行内元素，只会靠左排列。 2. **激活下划线偏移**：`.tab-active::before` 使用了 `transform: translate(-65%, 0)`，导致蓝色下划线没有对齐文字中心。 3. **小程序兼容性**：Tab 使用 `span` 在部分微信小程序环境下 flex 表现不稳定。 ## 修复内容 - `.tab-box` 增加 `display: flex` + `justify-content: space-around`，三个 Tab 均匀分布 - 每个 `.tab-cell` 设置 `flex: 1` + `text-align: center` - 下划线改为 `transform: translateX(-50%)`，与项目内 `customTab` 组件一致 - Tab 元素由 `span` 改为 `div` - 顺带修复：`onLoad` 带 `index` 参数时同步更新 `searchParams.onStatus` 重新编译预览后，Tab 应横向均匀分布，激活态下划",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\publishHouse\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\publishHouse\\houseList.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "46b361be-d49d-4712-aad1-88015b1ae377"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

@@ -15,13 +15,14 @@
 - 涉及文件：zhi2-web-admin/src/components/zs-select/SingleSelect.vue
 - 所属项目：zhi2-web-admin（苏州市房地产监测V3）；来源会话：2026-11-04；提交号：b9de02e9c
 - 禅道 bug 6173 已 resolved/fixed，resolvedBy=tiany，assignedTo=lichandan
+- 2026-11-09 该 bug 被 lichandan 重开，此修复方案废弃，改用对齐 MultiSelect 删除自定义定位（提交 f5b858bd0），详见 zentao_bug_6173
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "single_select_jitter",
-  "source_extraction_id": "7975823eef694e84a287026c4a64ee12",
-  "version": 1,
+  "source_extraction_id": "2d9610a6e14742ef900371b50ae9f06d",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

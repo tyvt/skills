@@ -1,0 +1,98 @@
+{
+ "project": "苏住房C",
+ "batch": "075",
+ "files": [
+  "075.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "Error: MiniProgramError {\"",
+   "type": "fact",
+   "content": "**原因：** 新闻详情页已迁到 `pages_main` 分包（`pages_main/news/detail`），但首页点击新闻时仍跳转到旧路径 `/pages/news/detail`，该页面在 `pages.json` 中不存在，因此报错。 **已修复：** 1. **`Home_Suzhufang.vue`** — `goNewsDetail` 改为使用 `route-map.js` 中的 `PAGES.news.detail()`，生成正确路径 `/pages_main/news/detail?id=...` 2. **`menuRouteMap.js`** — 同步更新菜单路由： - `3_1_10`：`/pages_main/news/index` - `3_1_16`：`/pages_main/news/detail?id=...` 请重新编译小程序后，在首页点击新闻资讯再试。若其他菜单也出现类似 “page not found”，多半是 `menuRouteMap.js` 里还有未迁移的旧 `/pages/...` 路径，可继续发我排查。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`pages.js",
+    "**`Home_Suzhufang.vue",
+    "`route-map.js",
+    "**`menuRouteMap.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "29317b48-dcb1-481b-a230-4459674df2a0"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "security/ctUserRealName/ge",
+   "type": "preference",
+   "content": "是的，**很大概率就是因为你在模拟器里测试**。 ## 原因 `wechat/verify` 只有在**微信人脸核身成功之后**才会被调用： ``` 提交认证 → getRepeatByIdTypeAndIdNumber（你已看到，成功） → uni.startFacialRecognitionVerify（微信人脸核身） ├─ success → wx.login → wechat/verify ← 只有这里才会发请求 └─ fail → 直接弹「认证失败」 ← 模拟器通常走这里 ``` 模拟器里 `startFacialRecognitionVerify` **基本不支持或无法正常完成**人脸核身，会直接走 `fail` 回调，所以： - 会看到「认证失败」弹窗 - **不会有** `/security/ctAuth/wechat/verify` 请求 ## 怎么验证 1. 用**真机**打开微信小程序（开发者工具 → 预览 → 手机扫码） 2. 在 Network 里确认人脸核身完成后是否出现 `wechat/verify` 3. 开发者工具里也可以看 Console，人脸核身失败时通常会有相关报错 ## 补充 | 环境 | 人脸核身 | wechat/verify | |------|---------|---------------| | 模拟器 | 不支持/会失败 | ",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\security.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\FormLocal.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_my\\verification\\FormNonLocal.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "13ed1683-e44e-4216-95c3-4499d21022e8"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "构建已修复。 原因： uni.scss 中使用了相对",
+   "type": "bug",
+   "content": "构建已修复。 **原因：** `uni.scss` 中使用了相对路径 `@import './styles/zs-button.scss'`。`uni.scss` 会被注入到每个页面的样式中，相对路径会按**当前页面文件**解析（例如 `pages_tab/benefit/index.vue`），而不是按 `src/uni.scss` 解析，因此找不到 `styles/zs-button.scss`。 **修复：** 将导入改为项目统一的别名路径： ```scss @import '@/styles/zs-button.scss'; ``` 这与项目中其他样式文件的写法一致（如 `@import \"@/styles/btn.scss\"`）。 `npm run build` 已成功通过。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`uni.scss",
+    "'./styles/zs-button.scss'`。`uni.scss",
+    "`pages_tab/benefit/index.vue",
+    "`src/uni.scss"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8f10f353-5bab-456e-8115-00b593a5bd85"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已完成二手房列表页的三处 UI 调整，修改如下： 1",
+   "type": "preference",
+   "content": "已完成二手房列表页的三处 UI 调整，修改如下： ### 1. Tab 下方增加 12px 间距 在 `stockHouse/index.vue` 的 `tab-line` 组件上增加 `marginBottom=\"12px\"`，使 Tab 与下方筛选栏之间留出 12px 间距。 ### 2. 列表左右间距改为 12px 将 `.stock-house` 的左右内边距从 `23px` 调整为 `12px`： ```194:196:zhi2-mobile-shimin/src/pages_transaction/stockHouse/index.vue .stock-house { padding: 10px 12px 20px; } ``` ### 3. 修复项目名称过早折行 `houseCard.vue` 中 `.house-name` 原先设置了 `max-width: calc(100% - 20px)`，在卡片宽度足够时仍会少占 20px，导致类似「独墅湖西金悦花园」被提前折行。 已移除该宽度限制，并增加 `word-break: keep-all`，避免中文项目名称在中间被拆开。 ```352:362:zhi2-mobile-shimin/src/components/commonNew/houseCard.vue .house-name { font-size: 14p",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`stockHouse/index.vue",
+    "```194:196:zhi2-mobile-shimin/src/pages_transaction/stockHouse/index.vue",
+    "`houseCard.vue",
+    "```352:362:zhi2-mobile-shimin/src/components/commonNew/houseCard.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2f565b3c-4c6d-49db-b019-1fd53eb902b3"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "原因 「我的决策」列表页（pages_owner/d",
+   "type": "preference",
+   "content": "## 原因 「我的决策」列表页（`pages_owner/decision/index.vue`）里已经用了自定义导航 **`ZsNav`**，但 `pages.json` 里该路由仍使用**默认系统导航栏**（`navigationBarTitleText: \"我的决策\"`），没有设置 `navigationStyle: \"custom\"`。 结果是：**系统顶栏 + `ZsNav` 各渲染一次**，标题都是「我的决策」，和截图一致。 同模块里带 `ZsNav` 的页面（例如 `income/index`）已在配置里写了 `navigationStyle: \"custom\"`，只有 `decision/index` 漏了。 ## 修改 在 `zhi2-mobile-shimin/src/pages.json` 的 `decision/index` 中增加： ```json \"navigationStyle\": \"custom\" ``` 重新编译/刷新 H5 或小程序后，应只保留一条「我的决策」头部。 --- 若仍出现双头，说明可能是缓存或未打到最新包，可先清缓存再验；也可以把 `index.vue` 里的 `<ZsNav>` 去掉、只保留系统导航（与决策详情等子页一致），需要的话我可以按你们规范二选一统一。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "「我的决策」列表页（`pages_owner/decision/index.vue",
+    "`pages.js",
+    "`zhi2-mobile-shimin/src/pages.js",
+    "`index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "18d9a799-b438-480c-b29c-cf616ca0f008"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

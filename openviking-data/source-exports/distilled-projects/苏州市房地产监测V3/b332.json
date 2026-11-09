@@ -1,0 +1,79 @@
+{
+  "project": "苏州市房地产监测V3",
+  "batch": "332",
+  "files": [
+    "332.md"
+  ],
+  "count": 4,
+  "memories": [
+    {
+      "title": "菜单权限字符与代码校验字符口径冲突时先查 SYS_MENU 实际数据再定谁改谁：四证类多证照模块按库内口径对齐，改 OperationBtnGroup 只能走 permission-module-name/permission-business-name",
+      "type": "workflow",
+      "content": "【什么情况】四证（建设用地规划许可 planLic / 商品房预售许可 consLic / 不动产权证 conLandLic / 状态不动产 stateLandLic）及其三个变更单的按钮权限不显示：前端校验用的是 `certificate:*`，而数据库 `SYS_MENU` 里配的是 `presale:*`，只有 stateLandLic 一张证两边配对，其余三张对不上。变更单侧还存在前端业务名与后端业务名不一致（前端 `landLicChange` vs 后端 `conEngPlanLicChange`/`conEngConsLicChange`/`landLicChange`）。\n【为什么】第一直觉是「前端写错了」，但查库后结论反转：菜单数据自身分裂（stateLandLic 配对、其余三张没配对），是存量菜单数据的历史口径问题。若按「改前端迁就菜单」的思路硬改全部 11 个文件，会把唯一配对正确的 stateLandLic 也改坏；而如果直接改 `module-name`/`business-name`，业务名参与后端路由与业务标识，接口会全线报错。\n【怎么做】① 先查 `SYS_MENU` 实际菜单/权限数据，确认每个菜单的 perms 字符串，再决定改代码还是改库；查库拿到铁证前不要动任何一边的字符。② 权限字符与接口业务名必须解耦：`OperationBtnGroup` 的权限前缀只从 `permission-module-name` / `permission-business-name` 取，业务名（`module-name`/`business-name`）原样传给后端接口，接口参数零改动。③ 变更单类模块的业务名必须以后端实际接口命名为准，前端拼错会导致 404 而不是权限异常。④ 对齐后用普通角色账号重新登录核对按钮显隐——管理员全量权限看不出差异。⑤ 这类多证照模块要一次性把「正证 + 变更单」共 11 个文件的权限字符成组对齐，不要逐个证照单独改，避免留下半对齐状态。",
+      "evidence": "会话 session-56f7fbda-e26c-465e-b7a1-7aad8886f6f0（基线 235e6ee）用户诉求 4「应该使用其他三证原有的处理逻辑」、诉求 2「业务逻辑，不是UI问题」；最终结论写明「正证 conLandLic/planLic/consLic 走 `presale:*`，stateLandLic 保持 `certificate:*`；变更单业务名对齐后端（`conEngPlanLicChange`/`conEngConsLicChange`/`landLicChange`），且全程用 `permission-module-name`/`permission-business-name` 解耦，接口参数零改动」，复盘结论明确「权限字符口径冲突，先查 `SYS_MENU` 实际数据再定谁改谁」「`OperationBtnGroup` 改权限永远走 `permission-module-name`/`permission-business-name`，不碰 `module-name`/`business-name`」。",
+      "files": [
+        "zhi2-web-admin/src/views/projectManagement/certificate/conLandLic/changeDetail.vue",
+        "zhi2-web-admin/src/views/projectManagement/certificate/consLic/changeDetail.vue",
+        "zhi2-web-admin/src/views/projectManagement/certificate/stateLandLic/changeDetail.vue",
+        "zhi2-web-admin/src/views/projectManagement/certificate/conLandLic/components/BaseLandLicForm.vue"
+      ],
+      "baseline": "235e6ee",
+      "sessionIds": [
+        "session-56f7fbda-e26c-465e-b7a1-7aad8886f6f0"
+      ],
+      "bundle": "332.md"
+    },
+    {
+      "title": "腾讯地图点热力封装套路：优先 TMap.visualization.Heat、无 Heat 回退 MultiMarker，加载失败降级为 el-alert 并 $emit('error') 而不是抛异常白屏",
+      "type": "pattern",
+      "content": "【什么情况】在数据看板里要把「商品房 / 存量房 / 租赁」三个业务的热力数据落到苏州地图上，需要一个可复用的腾讯地图点热力组件，且本地无网络、SDK 加载失败时页面不能白屏。\n【为什么】TMap 的可视化图层（`TMap.visualization.Heat`）在不同版本/授权下可能不存在；而 `loadMap()` 是异步脚本加载，失败、超时、无 key、离线都可能发生。把 `TMap` 当作同步全局变量直接用会在 SDK 未就绪时抛 `TMap is not defined`，把地图实例放进 Vue2 的 `data()` 又会被深度响应式改坏导致 `instanceof` 校验失败（这两点已在全库其它条目覆盖，本条补的是「热力图层 + 优雅降级 + 生命周期清理」的完整封装）。\n【怎么做】① 组件内 `import loadMap from '@/components/ZsTencentMap/mapLoader.js'`（该文件是**默认导出**，返回 `Promise<TMap>`），必须 `await`；② `new TMap.Map(el, { center: new TMap.LatLng(31.30, 120.62), zoom: 11, viewMode: '2D' })`，容器必须有明确高度（否则底图不渲染，本项目热力页统一 520px）；③ 热力优先 `TMap.visualization.Heat({ radius: 40, maxValue, minValue: 0, gradientColor })` → `addTo(map)` → `setData({ lat, lng, count })`；SDK 没有 `Heat` 时回退 `TMap.MultiMarker` 打点，两条路都能出图；④ 失败分支 `catch` 后置 `failed = true` 渲染 `el-alert`「腾讯地图加载失败，已切换为区县热力视图」，并 `$emit('error')` 让父级切到 ECharts 区县 choropleth 视图，绝不抛未捕获异常；⑤ `watch points`（deep）重新 `setData`，`beforeDestroy` 里摘除 heat/marker 并 `map.destroy()`；⑥ 地图实例不要放进 `data()` 的响应式对象里，用普通实例变量持有。本项目组合形态：区县热力用 ECharts `type:'map'` + `map:'suzhou'`（`registerMap('suzhou', suzhou)` 在 `created()` 里 try/catch），`visualMap` 连续色阶 `#e8f4ff → #1a5599`，右侧配 Top 榜 + 区县榜单（`da-rank-bar`）。",
+      "evidence": "会话 session-6c46bea2-2d63-4a2d-b33f-f111655982f2（基线 a86bf95）用户诉求 1「可以使用腾讯地图，本仓库有商用的key，数据都先Mock」；子 agent 结论（诉求 5/6）写明 TencentHeatMap.vue 的 props（points/unit/height 默认 520px）、`loadMap` 默认导出返回 Promise<TMap>、优先 `visualization.Heat` → `addTo` → `setData({lat,lng,count})`，无 Heat 回退 MultiMarker，catch 后 `failed=true` 显示 el-alert 并 `$emit('error')`，`watch points deep` 重设数据、`beforeDestroy` 销毁 map。",
+      "files": [
+        "zhi2-web-admin/src/views/dataAnalysis/pages/heat/TencentHeatMap.vue",
+        "zhi2-web-admin/src/components/ZsTencentMap/mapLoader.js",
+        "zhi2-web-admin/src/components/ZsTencentMap/index.vue"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-6c46bea2-2d63-4a2d-b33f-f111655982f2"
+      ],
+      "bundle": "332.md"
+    },
+    {
+      "title": "多 subagent 并行开发同一批看板页面前先固化共享约定清单：组件导入路径+注册名大小写、mock 具名导出字段、图表主题 token 来源",
+      "type": "workflow",
+      "content": "【什么情况】把一个 HTML 原型拆成「商品房 / 存量房 / 租赁 / 行业管理 / 热力」等一批 Vue 菜单页，拆给多个 subagent 并行做，每个 agent 只负责自己的 1–2 个页面文件，公共的 mock、图表封装、地图 loader 由另一个 agent 提供。\n【为什么】各 agent 看不到彼此的实现，很容易各自造轮子：注册名写成 `DaEChart`（实际组件导出名是 `DaEchart`，Vue2 局部注册区分大小写，模板 `<da-echart>` 匹配不上就静默不渲染）；字段名照任务描述写（描述写 `heatStock`，mock 实际导出 `heatStockList`/`heatStockDeal`）；图表配色各写各的硬编码色值，最后拼不成一套。这些都不是功能报错，而是「能跑但不一致」的隐患，返工成本远高于提前约定。\n【怎么做】开工前先在 prompt 里固化一份共享约定清单，让每个 agent 逐条遵守：① 图表组件统一 `import DaEchart from '../components/EChart.vue'`（热力页用 `'../../components/EChart.vue'`）+ `components: { DaEchart }` + 模板 `<da-echart :option=\"...\">`，注册名必须**精确**是 `DaEchart`，绝不能写成 `DaEChart`；② 数据一律来自 `../mock/index.js` 的**具名导出**，字段名以实际导出为准——任务描述里的名字可能不存在，先核对再写（本次即发现描述写 `heatStock`、实际是 `heatStockList`/`heatStockDeal`）；③ 图表 option 的配色/字号统一取 `theme.js` 的 `C` / `PALETTE` / `base` token，禁止页面里写死色值；④ 各自只许改自己的页面文件，公共的 mock / components / router / mapLoader 由专人维护并先落地，agent 不得越界修改；⑤ 落盘后由 Lead 统一构建，不让每个 agent 各跑一次 build。",
+      "evidence": "会话 session-6c46bea2-2d63-4a2d-b33f-f111655982f2（基线 a86bf95）用户诉求 1 要求把 HTML 拆成多个 Vue 菜单组件并接 xmind 维度；子 agent 结论反复强调「统一 `import DaEchart from '../components/EChart.vue'` + `components: { DaEchart }` + `<da-echart>`，**未**误写成 DaEChart」「全部数据来自 ../mock/index.js，未造数、未调接口」「option 统一使用 theme.js 的 C/PALETTE/base」「已核验 districtValues 的 10 个短名与 suzhou.json 的 properties.name 完全一致。mock 实际导出为 heatStockList/heatStockDeal（描述里写 heatStock），已按实际字段处理。未跑 build（由 Lead 统一构建）」。",
+      "files": [
+        "zhi2-web-admin/src/views/dataAnalysis/pages/NewHouse.vue",
+        "zhi2-web-admin/src/views/dataAnalysis/pages/StockHouse.vue",
+        "zhi2-web-admin/src/views/dataAnalysis/pages/Rent.vue",
+        "zhi2-web-admin/src/views/dataAnalysis/pages/IndustryManage.vue",
+        "zhi2-web-admin/src/views/dataAnalysis/pages/heat/HeatNewProject.vue",
+        "zhi2-web-admin/src/views/dataAnalysis/pages/heat/HeatStock.vue",
+        "zhi2-web-admin/src/views/dataAnalysis/pages/heat/HeatRent.vue"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-6c46bea2-2d63-4a2d-b33f-f111655982f2"
+      ],
+      "bundle": "332.md"
+    },
+    {
+      "title": "菜单/顶栏图标取 meta.icon 时必须做占位符白名单回退：数据库里存着 #、example、druid 这类占位值时渲染会空白",
+      "type": "pattern",
+      "content": "【什么情况】顶栏导航要显示业务图标，图标名存在菜单数据的 `meta.icon` 字段里，但库里很多条目的值是占位串（`#`、`example`、`druid` 等）或空值，直接丢给 `<SvgIcon>` 会渲染出空白图标位。\n【为什么】图标名是运营/运维在数据库菜单表里手工填的，存量数据里混着「随便填个能渲染的图标名」的占位值。前端把它当可信值直接用，空白图标既不像图标也不像占位符，观感上就是「图标区突然塌了一块」。这是数据归一化问题，不是图标组件的 bug。\n【怎么做】① 图标名统一只配一张，取 `meta.icon`；② 在图标组件外层做占位符保护：命中 `#`/`example`/`druid` 等占位关键词或空值时，自动回退到默认图标，不渲染空白；③ 顶栏与侧栏菜单共用同一套回退规则，不要各写一份；④ 存量菜单数据的图标名要批量补成有效图标名（本项目一次性写了 22 个顶级菜单的 ICON）；⑤ 状态差异（激活/未激活）只通过颜色表达，不要叠加底色、阴影、opacity 等多重差异——用户验收时只认可「颜色由浅蓝变纯白」这一处区分。",
+      "evidence": "会话 session-ce327d80-e2cb-48ac-8c65-d3740d649940（基线 89e5947）用户诉求 4「这个图标激活有问题」、诉求 5「我如果改成配置的网络地址的图标，当前这个功能还能生效吗」；最终结论列出保留改动第 1–3 条：「顶栏优先读 `meta.icon`，只配一张图」「占位符保护：`#`、`example`、`druid` 等自动回退关键词图标，不会渲染空白」「数据库 22 个顶级菜单 ICON 已写入有效图标名」，并说明激活态差异收敛为「颜色由浅蓝变纯白」一处。",
+      "files": [
+        "zhi2-web-admin/src/layout/components/Navbar.vue",
+        "zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue",
+        "zhi2-web-admin/src/components/SvgIcon/index.vue"
+      ],
+      "baseline": "89e5947",
+      "sessionIds": [
+        "session-ce327d80-e2cb-48ac-8c65-d3740d649940"
+      ],
+      "bundle": "332.md"
+    }
+  ]
+}

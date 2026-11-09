@@ -1,0 +1,80 @@
+{
+ "project": "2-0",
+ "batch": "009",
+ "files": [
+  "009.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "这个页面有很多组件显示[object Promise",
+   "type": "pattern",
+   "content": "### 已完成的全局修改 我已经在所有匹配到 `components: { Xxx: () => import('...') }` 的文件中，统一改成了 Vue 3 的写法，具体为： - 在这些文件中引入：`import { defineAsyncComponent } from 'vue'` - 把原来的写法，例如： - `GuideSettingDialog: () => import('./GuideSettingDialog.vue')` 全部替换为： - `GuideSettingDialog: defineAsyncComponent(() => import('./GuideSettingDialog.vue'))` ### 涉及的文件 主要修改的文件包括（你可以逐个对比确认）： - `views/home/index.vue` - `views/home/components/FastGuide.vue` - `views/system/config/detail.vue` - `views/system/user/detail.vue` - `views/system/menu/index.vue` - `views/tool/archives/index.vue` - `views/tool/print/components/PrintDialog.vue` -",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "import('./GuideSettingDialog.vue",
+    "`views/home/index.vue",
+    "`views/home/components/FastGuide.vue",
+    "`views/system/config/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d4e317f1-0c0f-4664-a597-3028cba67933"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "App.vue:52 Uncaught (in pr",
+   "type": "preference",
+   "content": "当前进度和用法总结如下： **已完成的修改** 1. **`zhi2-web-admin/src/plugins/driver.js`**（新建） - 引入 `driver.js` 及其样式。 - 创建单例 Driver 实例，并挂载到 `app.config.globalProperties.$driver`。 - 对外提供： - `defineSteps(steps)`：内部调用 0.x 的 `setSteps(steps)`。 - `start(stepIndex)`：内部调用 `driver.start(stepIndex)`。 - 若 `steps` 不是数组或为空，`defineSteps` 会直接 return，不报错。 2. **`zhi2-web-admin/src/main.js`** - 增加：`import driverPlugin from \"./plugins/driver.js\"`。 - 在 `applyGlobalConfig` 中增加：`app.use(driverPlugin)`。 3. **`App.vue`**（此前已改） - 在 `start()` 里保留了对 `this.$driver` 的判断，避免未挂载时报错。 **使用方式** - 进入非「首页」且满足条件时，会延迟约 2 秒自动跑引导（列表页用 `DriverList`，带 `:t",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "**`zhi2-web-admin/src/plugins/driver.js",
+    "`driver.js",
+    "`app.conf",
+    "**`zhi2-web-admin/src/main.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a521eb39-d368-4ec1-a02a-4131c89c94c3"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "这个弹窗打不开",
+   "type": "fact",
+   "content": "已经在 **一处** 做了统一修复，不用逐个改每个弹窗。 **做法说明** 1. **在 `dialogMixins.js` 里改** - 不再把 `modelValue` 和 `visible` 声明为 props。 - 在 Vue 3 里，未声明的属性会进 `$attrs`，父组件的 `v-model`（即 `modelValue`）会通过 `v-bind=\"$attrs\"` 原样传给内部的 `zs-dialog`。 - `dialogVisible` 改为从 `this.$attrs.modelValue ?? this.$attrs.visible` 读取，这样 mixin 里的逻辑（如 `onOpen`）仍然可用。 2. **所有用 `dialogMixins` + `<zs-dialog v-bind=\"$attrs\">` 的弹窗** 都会自动生效，**不需要**再在每个页面写 `:model-value=\"dialogVisible\"` 和 `@update:model-value`。 3. **已还原 `ArchiveDetailDialog.vue`** 去掉了之前单独加的那两行，和其他弹窗一样只保留 `v-bind=\"$attrs\"`。 **结论** - **使用 `dialogMixins` 的弹窗**：不用再改，只改 mixin 即可。 - **没用 `di",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`dialogMixins.js",
+    "`ArchiveDetailDialog.vue",
+    "@zhi2-web-admin/src/views/tool/archives/components/ArchiveDetailDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "42e79baa-7d82-4041-a640-3f06d3408440"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  },
+  {
+   "title": "用户登录的账号是zsbase，密码是ZS001Aa!",
+   "type": "pattern",
+   "content": "### 简短回答 **可以技术上识别，但不推荐把“识别验证码”本身作为自动化测试方案；更稳妥的做法是为测试环境“绕过/弱化验证码”。** --- ### 1. 纯技术上：能不能识别这类验证码？ 你这张图的验证码是很规则的蓝色字符，噪点不多，**用 OCR 或简单图像处理 + 字符分割，是可以做到比较高识别率的**，例如： - Playwright 里拿到 `/code` 接口返回的 `data`（Base64 图片） - 用 Node 库（如 `tesseract.js`）或自己写一个简单的图像识别脚本 - 识别出结果字符串，再填入验证码输入框 但这样做有几个问题： - **不稳定**：OCR 总有识别错误，自动化测试会出现偶发失败 - **实现复杂**：要处理各种字体、噪点、缩放、颜色 - **和真实目标不符**：E2E 关心的不是“验证码能不能被 AI 破掉”，而是“用户登录流程是否正常” --- ### 2. 自动化测试的最佳实践：对“测试环境”的验证码做特殊处理 更推荐你在**测试环境**做下面几种方案之一（都是后端/配置层面改造，比 OCR 简单可靠得多）： - **方案 A：测试环境验证码固定值** 在测试环境，把 `/code` 的返回逻辑改成： - 始终返回一张图片，画的是固定内容（比如 `1234`） - 后端校验时，如果是测试环境（如 `NODE_ENV=tes",
+   "evidence": "extracted source=cursor project=2-0",
+   "files": [
+    "`tesseract.js",
+    "res.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "be5b577d-159c-4126-a301-a93c2e1de71f"
+   ],
+   "_draft": true,
+   "project": "2-0"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,92 @@
+{
+ "project": "苏住房G",
+ "batch": "083",
+ "files": [
+  "083.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "公共查询—物业管理区域查询：筛选条件设置 行政区域 ",
+   "type": "bug",
+   "content": "已修复。问题出在高级筛选组件 `zs-advanced-query`：选择类字段（如行政区域、物业类型、信用等级）被当成数值/日期字段，操作符里出现了“大于”等选项，提交后后端会报错。 ### 修改说明 **1. `complexFieldConfig.js`** - 新增 `SELECT_OPERATORS`，仅包含「等于」 - 选择类字段（`valueType === 'select'`）只返回该操作符列表 - 增加 `fixedOperator` 标记，提交时强制使用 `EQ`（等于） **2. `zs-advanced-query.vue`** - 选择字段后自动将操作符设为「等于」 - 操作符下拉框禁用，不可再改为「大于」等 - 回显已有条件时，选择类字段也会自动纠正为「等于」 ### 效果 在「物业管理区域查询」中设置筛选条件时： - 选择 **行政区域** 等下拉字段 → 操作符自动为 **等于** 且不可编辑 - 只能选具体区域（如高新区）做等值匹配，不会再出现「行政区域 大于 高新区」导致的服务器异常 请刷新页面后重新测试该筛选场景。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "`complexFieldConfig.js",
+    "`zs-advanced-query.vue",
+    "涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\index.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\components\\zs-advanced-query\\zs-advanced-query.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\components\\zs-advanced-query\\complexFieldConfig.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "c97f319c-5174-4600-8411-186ea4f2a5d6"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "已修复该问题。 原因 字段是否置灰由 isStaff",
+   "type": "bug",
+   "content": "已修复该问题。 ## 原因 字段是否置灰由 `isStaffFieldDisabled()` 根据 `staffForm` 判断：选择物业服务人员后，会把接口返回数据写入 `staffForm`，已有值的字段会禁用。 但 `detailMixins` 在切 tab 时只会把 `form` 缓存到 `sessionStorage`，**不会缓存 `staffForm`**。切回页面后： - `form` 从缓存恢复，数据还在 - `staffForm` 被重置为 `{}` - `isStaffFieldDisabled()` 全部返回 `false`，置灰字段又变成可编辑 ## 修复 在 `detail.vue` 中同步缓存和恢复 `staffForm`： 1. 新增 `staffFormStorageKey` 计算属性 2. 监听 `staffForm` 变化，在新增/编辑模式下写入 `sessionStorage` 3. 在 `formMode` 切换时恢复 `staffForm`，查看模式下清除缓存 4. 新增 `restoreStaffForm()` 方法 请按以下步骤验证： 1. 进入物业管家 → 新增 2. 选择物业服务人员，确认部分字段置灰 3. 切换到其他 tab 再切回来 4. 确认置灰字段仍然不可编辑",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "`detail.vue",
+    "涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\property\\propertyManager\\detail.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\mixins\\detailMixins.js、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\mixins\\form.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "168b3d2f-548c-4a2d-98be-20ebeb4d6fb0"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "删除按钮怎么没了",
+   "type": "bug",
+   "content": "删除按钮不是权限或组件问题，而是**操作列配置里漏掉了**。 ## 原因 区级（`district`）的 `buttons` 里原来只配了「查看」和「变更」： ```160:169:zhi2-web-admin/src/views/system/regionBankAuth/index.vue return [ this.viewButton, { label: '变更', ... } ] ``` 但下面其实早就写了 `handleDeleteVersion` 删除方法，只是**没有挂到 `buttons` 上**，所以页面上不会出现删除按钮。`handleUpdate` 编辑方法也是同样情况。 ## 已修复 已在区级操作列补回： | 按钮 | 显示条件 | |------|----------| | **编辑** | 有待提交版本（`pendingVersionId`）或单据状态为草稿（`bizState === '0'`） | | **删除** | 同上 | | **变更** | 已备案（`bizState === '2'`）且没有待提交版本 | 另外修了 `handleDeleteVersion` 里确认框参数写错的问题：原来用了 `content`，`confirm` 方法实际认的是 `message`，会导致提示文案不对。 刷新页面后，在区级节点下，对待提交或草稿状态的记",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "```160:169:zhi2-web-admin/src/views/system/regionBankAuth/index.vue",
+    "涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system\\regionBankAuth\\index.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\mixins、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\system、d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\mixins\\listMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "38650b90-e3ca-4bec-979e-fbc872878820"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "修复月报统计合计列 monthValue 取值 Im",
+   "type": "bug",
+   "content": "已修复。在 [`monthlyReport.js`](d:\\repository\\苏住房G\\zhi2-web-admin\\src\\utils\\monthlyReport.js) 中新增了 `extractMonthValue` 辅助函数，并在 `buildStatTableRows` 里对 `regionValues` 和 `total` 统一解包 `monthValue`： ```javascript function extractMonthValue(item) { return item?.monthValue ?? null } // buildStatTableRows 内 const regionValues = (leaf.regionValues || []).map(extractMonthValue) total: extractMonthValue(leaf.total), ``` 本地验证：`regionValues` 输出 `[1, 2]`，`total` 输出 `3`（不再显示 `{\"monthValue\": 3}`）。 请刷新月报统计详情页，确认「合计」列已正常显示数字。",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "[`monthlyReport.js`](d:\\repository\\苏住房G\\zhi2-web-admin\\src\\utils\\monthlyReport.js",
+    "涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\monthlyReport\\detail.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\monthlyReport、d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\publicQuery\\monthlyReport\\components\\ReportItemsTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "697d27f0-7752-400c-9d86-9e7940bec722"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  },
+  {
+   "title": "关键数据导航切换不需要更新待办数据接口",
+   "type": "pattern",
+   "content": "已按计划在 [`index-v2.vue`](d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\index-v2.vue) 完成改动： ### 改动说明 1. **`onKeyRegionChange`**：去掉 `loadTodoPanel()`，切换关键数据区域时只刷新关键数据、公共收益、报修、学习园地。 2. **待办与区域解耦** - `loadTaskCounts` → `getTaskCount({})`，不再带 `regionCode` - `loadTodoPanelList` → 待办列表仅用 `{ pageNum: 1, pageSize: 4 }` - 两处加了注释，说明待办按用户维度、不随关键数据区域变 ### 请求触发路径（静态核对） | 场景 | 待办相关请求 | |------|----------------| | 首次 `loadAll()` | `taskCount` + `todoTaskList`（无 `regionCode`） | | 关键数据区域切换 | 无 | | 待办 Tab 切换 | 仅列表接口 | Vue 侧 review 结论为 OK，当前文件无新的 lint 问题。你在浏览器里切换关键数据区域 Tab 时，Network 里不应再出现 `taskCount` / `todoTas",
+   "evidence": "extracted source=cursor project=苏住房G",
+   "files": [
+    "[`index-v2.vue`](d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\index-v2.vue",
+    "涉及文件：d:\\repository\\苏住房G\\zhi2-web-admin、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\index-v2.vue、d:\\repository\\苏住房G\\zhi2-web-admin\\src\\views\\home\\v2\\components\\KeyDataNav.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9baedf91-d8d6-40c2-8e79-314e529e757a"
+   ],
+   "_draft": true,
+   "project": "苏住房G"
+  }
+ ],
+ "_draft": true
+}

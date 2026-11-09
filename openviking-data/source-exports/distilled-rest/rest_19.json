@@ -1,0 +1,424 @@
+{
+ "batch": 19,
+ "files": [
+  "117.md",
+  "118.md",
+  "119.md",
+  "120.md",
+  "121.md",
+  "122.md"
+ ],
+ "count": 24,
+ "memories": [
+  {
+   "title": "Vue2 表格操作列插槽作用域是包装对象：读 row 字段报 Cannot read properties of undefined",
+   "type": "bug",
+   "content": "什么情况：证书管理列表（ProjectCertificateTabs）点「查看/编辑」直接抛 Cannot read properties of undefined (reading 'certificateType')，接口与数据都正常。\n\n为什么：zs-table / 列表操作列的作用域插槽传进来的不是行对象本身，而是外面包了一层（形如 { scope }）。沿用其他页面习惯写 slot-scope=\"scope\" 再 scope.certificateType，实际拿到的是包装对象，行字段自然全 undefined；这类错误只在点击回调里读字段时才炸，渲染阶段不报，容易误判成接口问题。\n\n怎么做：1) 操作列插槽统一写成 slot-scope=\"{ scope }\" 解构后再取 scope.row.xxx / scope.xxx；2) 同一文件里多个插槽要一次改齐，避免有的能点有的不能点；3) 排查顺序固定为「先看插槽作用域形态，再看接口」——先 console 打印插槽入参，确认真实结构，比读代码猜快。\n\n同类筛选：凡是「列表能渲染、一点按钮就报 xxx is not defined / undefined reading 字段」的，先怀疑插槽作用域解构层级，而不是字典或接口缺字段。",
+   "evidence": "会话 5a71ab7 中用户反馈图片操作列两个按钮点上报错 Cannot read properties of undefined (reading 'certificateType')；最终结论为「证书管理操作列插槽改为 slot-scope=\"{scope}\" 解构写法」后修复。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/ProjectCertificateTabs.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/components/ProjectCertificateDetailDialog.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/mixins/certificatePanelDetailMixins.js"
+   ],
+   "baseline": "5a71ab7",
+   "sessionIds": [
+    "ae9794fd-fcc0-4677-a413-4453cc799763"
+   ],
+   "bundle": "117.md"
+  },
+  {
+   "title": "新增态附件的临时 attachGroupId 必须每次进入重新生成，否则要件挂到上一单",
+   "type": "bug",
+   "content": "什么情况：限制审核（limitAdd / limitCancel）这类「先新建、保存后才拿到业务主键」的页面，从附录上传组件切到 AppendixPackageSection(requirement-grid) 后，新增态上传的要件会挂到上一次新建单据的临时分组上，表现为「新单子里出现的却是上一单的图片」。\n\n为什么：新增态没有 busId，只靠前端生成的临时 attachGroupId 作为要件归属锚点；该 id 若复用同一实例状态（页面不销毁、keep-alive 或再次进入新增），就会沿用上一单的临时分组，后端按该分组转挂时串单。同时 busId 是在首次保存后才产生的，切到真实 busId 后已上传的要件需要重新拉取。\n\n怎么做：1) 每次进入新增就走一次 attachGroupId 重置（重新生成 uuid），放在表单初始化 / mixin 的 init 钩子里而不是 created 里写死；2) 保存前校验用附录组件的 validateRequired()，不要自己遍历文件数组；3) 首次保存成功后 busId 由空变有，必须监听并 reload() 附件区，把临时分组下的要件按新 busId 重新拉取；4) 切换/复用组件时同步注册 AppendixEmpty 等依赖子组件，避免空态报错。",
+   "evidence": "会话 a861cff 中把 houseLimit 详情改为纵向堆叠 + AppendixPackageSection(requirement-grid)，结论中列出「limitFormMixin 保存前校验改为 validateRequired()，首次保存后 busId 变更时 reload()」「再次进入新增时重新生成 attachGroupId，避免要件挂到上一单临时分组」。",
+   "files": [
+    "zhi2-web-admin/src/views/building/houseLimit/limitAdd.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/limitCancel.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/limitFormMixin.js"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "a27b6736-f064-42fb-8b2a-9382f4acc293"
+   ],
+   "bundle": "117.md"
+  },
+  {
+   "title": "同一详情组件被「本企业菜单」与「待办/主管端」共用时，取数要按路由是否有 ID 分叉",
+   "type": "pattern",
+   "content": "什么情况：企业基本信息详情（DeveloperBasicInfoDetail / AgencyBasicInfoDetail）既挂在本企业的管理菜单下，也会从 flowable 待办、主管部门端跳进来。从待办进来时接口请求体里没有 ID，详情空白。\n\n为什么：待办跳转走 navigateToTodoTask → buildTableIdNavigation，业务主键在 URL 末段或 :tableid 上，组件原来只调 getOwnCompany()（本企业口径），完全忽略路径 ID；入网认证接口 getEntryNetworkDetail() 管理端需要传 companyRecordId 也没传。\n\n怎么做：1) 新增计算属性 routeCompanyRecordId，只取 this.getId()（@/utils/ruoyi.js 的 resolveIdFromRoute）+ query.companyRecordId，不要拿 form 里的 id 兜底——B 端刷新后 form 里的值会让请求误走 detail 接口拉错数据；2) getDetail 里做二选一：有 routeCompanyRecordId 走 getCompanyRecordDetail(id)，没有才走 getOwnCompany()；3) 关联的入网认证同样只在路由有 ID 时传参；4) 与既有的管理端详情（DeveloperEntryNetworkAdminDetail）保持同一套取数姿势。凡「列表/待办能进、数据为空」的详情页优先查这条。",
+   "evidence": "会话 a861cff：用户指出从待办跳转调接口没取到 ID、应从 path 用公共方法获取；结论给出 routeCompanyRecordId = getId() + query.companyRecordId，并明确不用 form.companyRecordId 以免 B 端刷新误走 detail 接口，getDetail 按有无 ID 在 getCompanyRecordDetail / getOwnCompany 之间二选一。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/DeveloperBasicInfoDetail.vue",
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/views/flowable/todo.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "34b3aff3-436f-4179-ac42-dfbfa838e9d3"
+   ],
+   "bundle": "117.md"
+  },
+  {
+   "title": "状态列一直显示错文案：配了不存在的字典编码，dict-tag 静默降级不报错",
+   "type": "bug",
+   "content": "情况：分支机构（agencyBranch）列表/详情的「业务状态」始终显示「已注销」，用户明确指出 biz_status_tag_value 这个字典根本不存在，改完仍「还是显示已注销」。\n为什么：状态文案这条链上有四处冗余来源——utils/branchStatus.js 的映射、listTableRowAugment.js 的行增强、mixins/listMixins+table.js 的列配置、zs-table-column.vue 的列级字典请求，最后才交给 dict-tag.vue 渲染。列上写了不存在的字典编码时，dict-tag 拿不到 options 会静默降级（回落默认映射或原始码），全程不报错，所以「字典名改对了但界面不变」。\n怎么做：①状态文案收敛到单一 utils 映射表，branchStatus 与 personnelStatus 必须分表——分支机构的业务状态与人员状态是两套字典，互推会出现「已注销」这类串味；②不存在的字典编码要在 zs-table-column 层直接跳过请求，不要先发出去再降级；③验收看渲染后的中文而不是接口原始值，并补一条断言文案的 E2E（agency-branch-status.spec.js）。",
+   "evidence": "会话 01a167f4：用户报「biz_status_tag_value 这个字典不存在，目前回显也是不对的」，两轮后仍「还是显示已注销」；最终提交 96d6e26 修复，改动涉及 utils/branchStatus.js、components/zs-table-column/zs-table-column.vue、views/institution/agencyBranch/components/AgencyBranchList.vue 与新增 e2e/institution/agency-branch-status.spec.js。",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/utils/branchStatus.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/utils/personnelStatus.js",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/components/dict-tag/dict-tag.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchList.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/e2e/institution/agency-branch-status.spec.js"
+   ],
+   "baseline": "b28a878",
+   "sessionIds": [
+    "01a167f4-cca6-764e-99b7-42d770b80615"
+   ],
+   "bundle": "118.md"
+  },
+  {
+   "title": "同源分叉剪枝：删 isSuzhouzhizai / currentEnvironment 分支时保留通用逻辑并固化业务固定值",
+   "type": "workflow",
+   "content": "情况：V3 由多个同源项目（建湖/苏州com/智在云等）复制而来，页面里散落 isSuzhouzhizai 判定与 currentEnvironment==='jianhu'|'suzhoucom'|'zhizaiyun' 的分支，苏州版要彻底去掉这些环境分叉。\n怎么做（可复用套路）：①只删 isSuzhouzhizai=true 与各环境常量命中的分支体，保留 !isSuzhouzhizai 的通用实现，而不是整段 v-if 一起删；②删完后 import/常量/environment 计算属性往往变成孤儿，要一并清掉，否则 lint 与 tree-shaking 都会留下死引用；③分叉被删掉后原本由环境决定的值必须固化为常量——本批就固定了退款列表接口 /prefund/refundNotice/list、其它收款用「归集账户」文案、合同弹窗用「合同号」label，以及保留 contractPrice 列；④逐文件改完做一次全库 grep，确认再无残留关键字，并在提交说明里列出文件清单便于回溯。\n注意：这类批量删分支的改动量大且都是结构性删除，必须一次改完立刻编译验证，别和环境相关的接口联调混在一批里。",
+   "evidence": "会话 0248b9c7：用户要求「remove ALL isSuzhouzhizai and currentEnvironment from these files. Rule: delete isSuzhouzhizai=true and currentEnvironment=jianhu/suzhoucom/zhizaiyun branches; keep generic (!isSuzhouzhizai) logic」，最终 13 个 supervision/unblock 与 supervision/deposit 文件全部移除分支并固定了接口 URL、文案与列。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/unblock/usemoney/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/unblock/plan/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/deposit/refund/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/deposit/other_record/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/deposit/notice/components/ContractDialog.vue"
+   ],
+   "baseline": "ffafea1",
+   "sessionIds": [
+    "0248b9c7-2a97-4d4a-bccf-3ebb69f911f1"
+   ],
+   "bundle": "118.md"
+  },
+  {
+   "title": "详情页状态字段别在 computed 里 dictLabel 转纯文本，要交给 DetailTemplate type:'dict'",
+   "type": "pattern",
+   "content": "情况：委托代售详情页的「业务状态 / 委托状态 / 电子签状态」显示为 0/1/2 原始码或无样式纯文本，用户要求用对应字典格式化。\n为什么：页面在 computed 里手动调 dictLabel() 把码值转成了字符串塞进 value，DetailTemplate 收到的是纯文本，永远不会走字典标签渲染，于是三个状态与列表页观感不一致。\n怎么做：字段配置改成「原始码值 + type:'dict' + options」：\n{ label: '业务状态', value: this.form.bizState, type: 'dict', options: this.bizStateOptions }\n由 DetailTemplate → DictTag 统一格式化，带上标签样式。字典加载逻辑保持不变，仍复用 BIZ_STATE、presale_entrust_sale_effect_status、presale_entrust_sale_sign_status，保证详情与列表同源。dictLabel() 只在「销售方式」这类没有标签样式的普通字段上继续用。附带收益：码值不再被抹成字符串，后续签署/提交按钮的状态判定不受影响。",
+   "evidence": "会话 04903604：用户两轮要求「委托代售详情页 业务状态、委托状态、电子签状态 需使用对应字典格式化显示」；修改前在 computed 里手调 dictLabel()，修改后 detail.vue 的 projectInfoView 三个字段改为 type:'dict' + options 交给 DetailTemplate/DictTag。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/entrustSale/detail.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "04903604-bde9-42ca-8925-08dafb67b73b"
+   ],
+   "bundle": "118.md"
+  },
+  {
+   "title": "后端接口基础路径批量迁移（buildinginfo → building）：只换资源基础路径，子路径名与前端目录名保留",
+   "type": "workflow",
+   "content": "情况：后端把楼盘表基础接口从 /building/buildinginfo 改成 /building/building，前端多处 400。\n怎么做：①迁移边界要划清——只替换 URL 里的资源基础路径段，子路径名（listNofenye、xyBuilding、buildinginfo1/add、buildingChange/*）保持原样，前端目录 views/projectManagement/buildinginfo/ 也不改名，否则 component 字符串与目录不匹配会导致页面加载失败；②改动点分布很散，除 API 层（buildinginfo.js、unitinfo.js）外还有 13 个业务组件（监管协议、进度管理、解封保证金、楼幢管理）以及「路由信息.json」里的 approval/submit 流程 API，必须全库 grep 收口而不是只改 api 目录；③报错定位看具体弹窗的实际请求：本批 400 来自定金缴款「选择房屋信息」弹窗 BuildingDialog.vue 的 /building/building/listNofenye；④无登录态时新旧路径都可能 500，无法据此判断对错，静态核对 + 登录后按弹窗逐个看 Network 才可信；⑤/add 后缀是否一致（listNofenye vs listNofenye/add）需对着后端 Swagger 单独对齐。",
+   "evidence": "会话 b46a5433：用户指出「楼盘表那边的基础接口，没有 /building/buildinginfo 了，都是 /building/building」；最终 17 个文件（子模块 16 + 路由信息.json 1）共 25 处 URL 替换，明确保留子路径名与前端目录名，并说明无 token 无法完整联调。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/api/lpgl/buildinginfo.js",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/api/lpgl/unitinfo.js",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/deposit/notice/components/BuildingDialog.vue",
+    "d:/repository/苏州市房地产监测V3/路由信息.json"
+   ],
+   "baseline": "1c445c7",
+   "sessionIds": [
+    "b46a5433-8dbe-4b79-a009-979887275173"
+   ],
+   "bundle": "118.md"
+  },
+  {
+   "title": "多步注册/向导表单：最终提交用的必填字段必须回填到所属步骤的 rules，否则报错落在最后一步",
+   "type": "bug",
+   "content": "现象：用户按页面上的必填星号填完，到第 4 步点「申请入网」才被提示「成立日期不能为空」，而成立日期在第 1 步且当时没有星号、也不拦截「下一步」。根因：注册流程从单页 companyInfo.vue 拆成 Step1/Step3/Step4 多步后，字段和校验规则被拆到了两处——Step1CompanyInfo.vue 的 rules 只搬了字段没搬必填项，而最终提交 editAndSubmit / 后端仍按旧的单页契约强校验该字段，前端在最后一步才暴露。做法：凡是最终提交链路（editAndSubmit、提交接口 DTO）声明必填的字段，都必须在该字段所在的步骤组件 rules 中同步补 required 规则，让它在当场就显示星号并阻止进入下一步；改造多步表单时把「提交必填字段清单」当成迁移检查项逐条对照，而不是只搬模板和 v-model。",
+   "evidence": "会话 07ea18e2：用户第 2 条诉求指出成立时间在第 1 页是非必填却到「申请入网」才报必填；结论是在 Step1CompanyInfo.vue 的 rules 补 foundingDate: [{ required:true, message:'成立日期不能为空', trigger:['change'] }]，与旧版 companyInfo.vue 及 editAndSubmit 的提交要求对齐。",
+   "files": [
+    "zhi2-web-admin/src/views/register/components/Step1CompanyInfo.vue",
+    "zhi2-web-admin/src/views/register/companyRegister.vue",
+    "zhi2-web-admin/src/views/register/components/companyInfo.vue",
+    "zhi2-web-admin/src/utils/registerValidate.js"
+   ],
+   "baseline": "9dba655",
+   "sessionIds": [
+    "07ea18e2-6956-4c76-aee4-59cf48b781f9"
+   ],
+   "bundle": "119.md"
+  },
+  {
+   "title": "zs-table 金额/面积列不要写死 align:'left'：amountFormatter 已由组件自动右对齐，显式对齐会覆盖表头与合计行",
+   "type": "pattern",
+   "content": "现象：房屋信息表格的面积列要求右对齐，但页面上写的是 align:'left'，改样式不生效。根因：zs-table-column 会根据列上是否使用 amountFormatter 判定 isAmountColumn，并据此自动把 align / headerAlign 设为 right（表头、数据行、合计行统一）；页面里显式写的 align:'left' 优先级更高，会把组件的默认判定压掉。做法：金额、面积、单价这类数值列一律不写 align，只用 amountFormatter 格式化，把对齐交给组件；需要右对齐时先确认列是否已经挂了 amountFormatter，确认后删除显式的 align/headerAlign，而不是加 !important 或改 CSS。共用组件（如 houseTable.vue 被楼幢变更、楼幢信息维护多页复用）只需改一处即可全站生效。",
+   "evidence": "会话 25144e0a（截图诉求「房屋信息表格面积列右对齐」）：修复为删除 houseTable.vue 中 6 个面积列的 align:'left'，由 zs-table-column 识别 amountFormatter 后自动设置 align/headerAlign 为 right，两处 houseTable.vue（项目管理楼幢、楼幢模块）同步处理。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/components/houseTable.vue",
+    "zhi2-web-admin/src/views/building/building/components/houseTable.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildingChange/detail.vue"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "25144e0a-b855-4575-b09d-02d82082353f"
+   ],
+   "bundle": "119.md"
+  },
+  {
+   "title": "侧边栏/布局尺寸有四处来源：只改 variables.css 不生效，store 用 setProperty 内联覆盖 CSS 变量",
+   "type": "bug",
+   "content": "现象：把主布局侧栏宽度从 288px 改成 260px，只改 styles/variables.css 后运行时仍是旧宽度（尤其折叠/展开一次后回弹）。根因：同一个布局尺寸存在四个来源——variables.css、variables.scss（两套变量各一份）、store/modules/app.js 的 TOGGLE_SIDEBAR/OPEN_SIDEBAR 里用 document.documentElement.style.setProperty 写到根节点内联样式（内联样式优先级高于样式表里的 :root 变量），以及 Navbar.vue 里 var(--sidebar-width, 260px) 的 fallback 兜底值。只改样式表会被内联值覆盖。做法：改布局/主题类尺寸时必须一次性同步四处，并用全量搜索（含具体像素值 288px 与变量名）确认没有遗漏；容器宽度统一走 layout/index.vue 的 var(--sidebar-width)，不要再新增直接写死的宽度。改完在折叠/展开各一次后核对顶栏 Logo 与菜单左缘对齐。",
+   "evidence": "会话 9c58c8d8：「侧边栏修改宽度为260px」，最终同时改 variables.css、variables.scss、store/modules/app.js 两处 setProperty、Navbar.vue 两处 var fallback，说明单改 CSS 变量不生效。",
+   "files": [
+    "zhi2-web-admin/src/styles/variables.css",
+    "zhi2-web-admin/src/styles/variables.scss",
+    "zhi2-web-admin/src/store/modules/app.js",
+    "zhi2-web-admin/src/layout/components/Navbar.vue",
+    "zhi2-web-admin/src/layout/index.vue"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "9c58c8d8-1b2b-4483-a454-d0a185b8657a"
+   ],
+   "bundle": "119.md"
+  },
+  {
+   "title": "双表同屏页面复刻 ListTemplate/table mixin 的四个坑：loading 时序、丢掉分页、selection 语义、死弹窗",
+   "type": "pattern",
+   "content": "场景：维修资金/监管资金对账页把单表改造成「交易表 + 银行明细表」双表同屏，并复用了 ListTemplate.js / listMixins.js / table.js。审查发现四类可复现的坑：①loading 在 validate 回调外同步置 false，且双表的 zs-table 没绑 v-loading，表现为永远看不到加载态——应在双表容器加 v-loading，并用 Promise.all([...]).finally(() => this.loading = false) 收口，只有校验失败才立即关闭；②替换 ListTemplate 后把 zs-pagination 去掉了，但 queryParams.pageNum/pageSize 还在、直接渲染全量 rows，与 mixin 的分页模型脱节，数据量大时 DOM 压力大；③两张表都写 this.selection = selection，而 multiple 只有一侧更新，与 table.js 的单表假设冲突，应各自维护 tradeSelections/bankSelections 不要覆写 mixin 的 selection；④模板注册了 AutoReconciliationDialog 但 visible 恒为 false，dialogForm 无用，属于死代码或结果没接 UI。另：搜索项 type:'dict' 会自拉字典，再在 initDict 里 getDicts 同一编码就是重复请求。",
+   "evidence": "会话 0a2ce548 对 repairFunds/finance/rec/index.vue 的 Vue 代码审查，逐条给出 HIGH/MEDIUM 及修复建议（Promise.all + finally 关 loading、恢复分页、拆分双表 selection、删除或接通 AutoReconciliationDialog、去掉字典重复拉取）。",
+   "files": [
+    "zhi2-web-admin/src/views/repairFunds/finance/rec/index.vue",
+    "zhi2-web-admin/src/mixins/ListTemplate.js",
+    "zhi2-web-admin/src/mixins/listMixins.js",
+    "zhi2-web-admin/src/mixins/table.js"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "0a2ce548-a2c9-42c5-9173-f4b5fecd7710"
+   ],
+   "bundle": "119.md"
+  },
+  {
+   "title": "el-table/zs-table 列被强行拉满导致间距过大：改 width 固定列宽 + :fit=\"false\"，不要用 min-width 让位",
+   "type": "bug",
+   "content": "现象：股东信息列表里「股东名称」列两边留白巨大，各列间距松散，用户要求收紧。根因：该列写的是 min-width=\"180\"，在表格默认 fit 模式下，剩余宽度会被分摊并优先塞给带 min-width 的弹性列，于是列被拉满、勾出大段空白；同时序号列 width=\"96\" 本身也偏宽。做法：把关键列从 min-width 改成固定 width（如股东名称 width=\"140\"、序号列 60），长文本用 show-overflow-tooltip 保证可读，并给表格加 :fit=\"false\" 禁止列被强行拉伸到容器宽度；需要自适应的列才保留 min-width。注意这与 zs-table 自身的列宽算法叠加：组件层会把剩余空间均分给非序号列，所以页面里能定的列尽量定死宽度，只留一列弹性。",
+   "evidence": "会话 07ea18e2 用户诉求「股东信息列表字段间距修改，间距适宜，股东名称间距不要太大」；结论：序号列 96→60、股东名称 min-width 180→width 140 + show-overflow-tooltip、表格加 :fit=\"false\"。",
+   "files": [
+    "zhi2-web-admin/src/views/register/components/Step4Shareholders.vue",
+    "zhi2-web-admin/src/views/register/companyRegister.vue",
+    "zhi2-web-admin/src/views/register/propertyCompanyRegister.vue"
+   ],
+   "baseline": "9dba655",
+   "sessionIds": [
+    "07ea18e2-6956-4c76-aee4-59cf48b781f9"
+   ],
+   "bundle": "119.md"
+  },
+  {
+   "title": "[苏房] 公共 mixin 的 data 字段被子组件写成同名 computed 会 Vue warn，内嵌态应 watch 驱动 mixin 数据",
+   "type": "bug",
+   "content": "现象：项目详情内嵌的证书列表（StateTable / PlanTable / LicTable）控制台报 [Vue warn]: The computed property \"showListName\" is already defined in data，但页面功能表面上正常。\n原因：列表公共链 listMixins → table.js 的 data 里已经有 showListName，三个证书表格组件为了在内嵌场景隐藏列表标题，各自又定义了同名 computed，Vue2 检测到 data/computed 撞名即告警，且行为取决于初始化顺序，容易变成「独立菜单页也隐藏标题」的隐性回归。\n做法：不要在业务组件里再造同名 computed。改为在业务 mixin（projectEmbeddedCertificateList.js）里 watch isEmbedded，把 mixin 自己的 this.showListName 写成 !embedded，再把三个表格组件里重复的 computed.showListName 全部删掉。\n排查提示：凡是在渲染期出现「x is already defined in data」类告警，先顺着 mixin 链（listMixins / table.js / detailMixins / subTableMixins）核对同名字段归属，不要只看当前组件。",
+   "evidence": "会话 82c57f89 报 [Vue warn]: The computed property \"showListName\" is already defined in data；根因为 listMixins→table.js 的 data.showListName 与 StateTable/PlanTable/LicTable 的 computed.showListName 撞名；改法为 projectEmbeddedCertificateList.js 用 watch isEmbedded 设置 showListName=!embedded 并删除三处重复 computed。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/customerProject/mixins/projectEmbeddedCertificateList.js",
+    "zhi2-web-admin/src/views/projectManagement/certificate/stateLandLic/components/StateTable.vue",
+    "zhi2-web-admin/src/views/projectManagement/certificate/planLic/components/PlanTable.vue",
+    "zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "82c57f89-5320-4ad9-a2ed-1c48587b738a"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "[苏房] 子表「新增」按钮点击没反应：守卫里静默 return（编辑态详情不返回 projectId）",
+   "type": "bug",
+   "content": "现象：建设工程规划许可证（项目备案内嵌）点楼幢区「新增」完全没反应，无报错、无弹窗。\n原因：PlanLicRelatedBuildingTable 打开「选择楼幢」弹窗之前有一句 `if (!this.form.projectId) return`。而项目备案里**编辑**该证时，详情接口通常只回带 projectName，不一定回 projectId，于是 form.projectId 为空，函数在守卫处静默返回——用户看到的就是「按钮坏了」。\n做法：①把单点取值换成 resolveProjectId()，按 form → embedProject（项目备案弹窗下传）→ outQueryParams → 路由 query 逐级兜底；②确实取不到时给出显式提示「请先选择项目后再新增楼幢」，绝不静默 return；③detail.vue 详情加载后若缺 projectId 用内嵌项目/路由信息补全，并向下传 embed-project 属性、在 out-query-params 里带 projectId。\n推广：凡「点了没反应」的交互，先搜该 handler 里的提前 return；子表依赖的父级上下文 id，在「独立菜单页」和「内嵌弹窗」两条渲染路径下来源不同，必须多来源解析。",
+   "evidence": "会话 9905b054：用户反馈建设工程规划许可证新增弹框内楼幢「新增」点击没反应；定位为 PlanLicRelatedBuildingTable 旧逻辑 `if (!this.form.projectId) return`，编辑态详情不带 projectId；改为 resolveProjectId() 多来源解析 + 提示「请先选择项目后再新增楼幢」+ detail.vue 补全并向子表传 embed-project/out-query-params。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/certificate/planLic/components/PlanLicRelatedBuildingTable.vue",
+    "zhi2-web-admin/src/views/projectManagement/certificate/planLic/detail.vue"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "9905b054-5a4d-48c1-a466-7afb0744f153"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "[苏房] 后端给子列表新增字典字段后，列表列/查看弹窗/编辑表单三处要一起接 dict 并做旧字段归一化",
+   "type": "bug",
+   "content": "现象：经纪机构管理-从业人员信息里「资格证书」的证书等级整列显示 `-`，详情与查看弹窗都不回显。\n原因：接口 /company/agencyPersonnel/detail 的 certificateList.item 新增返回 level（字典 company_certificate_level），前端仍在读旧字段 certificateLevel，且该列是纯文本列没有字典映射，所以既对不上字段也不会转中文。\n做法（三处同改，缺一处就还是显示 `-`）：①列表 AgencyPersonnelCertificateTable 列字段 certificateLevel→level，补 type=\"dict\" 与 dict-url=\"company_certificate_level\"；②查看弹窗同一字段配置改 type:'dict'，取值 item.level、选项用 levelOptions；③编辑表单由 zs-input 换成 zs-select 绑 level；④created() 里 getDicts('company_certificate_level') 拉字典；⑤在 AgencyPersonnelDetail 的 loadDetail 与 handleIdNumberBlur 两处 certificateList 映射里加 level 归一化，优先取 level、兼容旧 certificateLevel。\n要点：字典字段只要有一处漏改就会静默显示 `-` 而不报错，改完必须同时核对列表列、查看态、编辑态和提交 payload。",
+   "evidence": "会话 fee19692：用户反馈从业人员查看资格证书的证书等级没有回显；接口 detail 的 certificateList.item 新增 level（字典 company_certificate_level）；修复覆盖 AgencyPersonnelCertificateTable 的列/查看弹窗/编辑表单 + getDicts 加载 + AgencyPersonnelDetail 的 level 归一化并兼容 certificateLevel。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelCertificateTable.vue",
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue"
+   ],
+   "baseline": "979bee5",
+   "sessionIds": [
+    "fee19692-41de-42b8-a8ed-8e08fa99ede8"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "[苏房] 列表页缺 ListOperationButtonContainer 就「没有列表标题」且卡片样式与同模块不一致",
+   "type": "pattern",
+   "content": "现象：管理员变更列表页（companyAdmin）已有 zs-search-form + list-card + zs-table，但表格上方没有左侧「xxx列表」标题，整体样式与同模块其它列表页（机构备案、机构注销、租赁从业人员）明显不一致，用户直接判为「没用通用模板」。\n根因：标准列表页的标题栏并不是 list-card 自带的，而是由公共组件 ListOperationButtonContainer 提供；页面漏了它，就既没有标题也拿不到标题栏右侧按钮位。\n标准结构（照抄同目录最相近页面）：zs-search-form → ListOperationButtonContainer（listName 与菜单名一致，右侧放新增等按钮，权限仍由 zs-button 的 :permission 控制）→ list-card 包 zs-table。列宽也按同类页对齐：序号列 width=80、姓名类列用 min-width、操作列 show-all + width=180。\n要点：新建列表页先横向比对同模块页面的结构骨架，再写字段；「标题文案」与菜单名保持同一套说法（如菜单叫管理员变更，listName 就不能留管理员信息列表）。",
+   "evidence": "会话 3224c947：用户截图反馈「没用通用模板」；定位为 companyAdmin/index.vue 缺少 ListOperationButtonContainer，导致无左侧列表标题、表格区样式不一致；补上标题栏（listName 改为与菜单一致的管理员变更列表）并在右侧保留新增按钮，列宽与同类页对齐。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyAdmin/index.vue",
+    "zhi2-web-admin/src/components/ListOperationButtonContainer/index.vue",
+    "zhi2-web-admin/src/views/company/companyCancel/index.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "3224c947-2f79-4071-9cd1-d9569d70224c"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "[苏房] 字段中文名改名要全链路同步：列头/label/contentInfo/校验提示/placeholder/弹窗标题/变更页",
+   "type": "pattern",
+   "content": "现象：项目备案里同一份「所属企业 / 开发企业」被叫成多种说法，用户在截图里直接要求「列表和详情，所属企业都改成企业名称」。\n关键点：这类需求只改文案，绑定字段仍是 companyCode（后端契约不动），但因为同一字段的展示文案散落在多个位置，只改一处必然被下一轮验收打回。\n一次改全的清单：①列表 query 区与表格列头（列头「开发企业」→「企业名称」）；②详情表单 label 与查看态 contentInfo 配置；③表单校验提示（「企业名称不能为空」）；④输入框 placeholder（「点击选择企业」）与选择弹窗标题；⑤变更详情页 changeDetail.vue 同步；⑥顺手用 grep 扫同模块子页（如 buildingTable/projectForm）是否还残留旧说法。\n推广：术语统一属于全局口径，改完要按「字段名 → 全仓库文案出现点」反查一遍，而不是只改用户截图那一屏。",
+   "evidence": "会话 35ffc28e：用户要求「列表和详情，所属企业都改成企业名称」；改动覆盖 index.vue 列头、detail.vue 的 label/contentInfo/校验提示/placeholder/选择企业弹窗标题、changeDetail.vue，字段绑定仍为 companyCode。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/customerProject/index.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/detail.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/changeDetail.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "35ffc28e-57a3-433e-9e0d-66e8420c0803"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "[苏房] 多主体同构页：共用「内容构造器 build*ContentInfo」，页面组件仍各写各的",
+   "type": "pattern",
+   "content": "背景：租赁机构基本信息页与经纪机构基本信息页是两套页面组件（差异字段会互相踩，不要合并组件），但字段清单可以共用构造器。\n本次两件事：①租赁机构的基本信息附件 busCode 统一改用「开业」编码，与入网/备案链路一致；②补「管理员类别」（adminType，法人 / 受托人），直接加在 agencyBasicInfoContent.js 的 buildAdminContentInfo 最前面，于是经纪基本信息、入网只读、变更页只读（AgencyBasicInfoForm 的 adminInfo）三处同时生效；租赁仍走 buildLeaseAdminPersonContentInfo，两边字段中文名保持「管理员类别」。\n另一点：AgencyBasicInfoDetail 里要件上传的 admin-type 过滤原先只对租赁生效，现在经纪也按管理员类别过滤受托人专属要件，与入网页 AgencyEntryNetworkSections 的口径对齐。\n结论：展示字段的单一事实来源是 agencyBasicInfoContent.js 这层构造器（改一处多页生效）；页面组件按主体分开，要件过滤开关要按主体逐一放开，不能默认沿用单侧配置。",
+   "evidence": "会话 c834701d：用户三轮要求（租赁机构基本信息附件 busCode 用开业 / 缺管理员类别 / 经纪也要加）；实现为 agencyBasicInfoContent.js 的 buildAdminContentInfo 增加 adminType（法人/受托人），AgencyBasicInfoDetail 的 admin-type 过滤扩到经纪，与 AgencyEntryNetworkSections 一致；租赁仍用 buildLeaseAdminPersonContentInfo。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue",
+    "zhi2-web-admin/src/views/zljg/agencyRecord/detail.vue",
+    "zhi2-web-admin/src/views/toB/agencyRecord/detail.vue"
+   ],
+   "baseline": "ed13ca0",
+   "sessionIds": [
+    "c834701d-3464-47d3-a27a-c6a7933f1191"
+   ],
+   "bundle": "120.md"
+  },
+  {
+   "title": "DetailTemplate 的 type:'amount' 只认纯数字：自由文本字段照抄会静默显示「-」并无条件拼上单位",
+   "type": "bug",
+   "content": "什么情况：详情页 contentInfo 里把某个字段从 type:'text' 改成 type:'amount' + unit:'%' + align:'left'，只为和相邻的「国有投资占比」样式对齐（如客户项目 detail.vue / changeDetail.vue 的「车位比」）。为什么错：DetailTemplate 的 getAmountDisplay 走 currencyFormatter(item.value, item.dot, item.dot, '')，而 currencyFormatter 在值不匹配 patterns.number 时 fallback 返回 ''，于是单元格直接渲染 placeholder「-」，原始字符串被吞掉——不会退化显示原文。同时只要匹配到数字就会无条件拼接 item.unit，于是 '1:1.2' 这类配比自由文本变成 '-'、纯数字 1.2 变成 '1.2%'，语义与录入控件（编辑态仍是普通 zs-input，无金额校验）完全脱节。怎么做：①只有表单侧本身就是金额/百分比控件（amount-input）且历史数据可确认为纯数字的字段才用 amount；②只是想左对齐时对 text 保留 type:'text' 并设 align:'left'（getValueClass 对非 amount 也支持 align）；③若业务确认要按百分比展示，必须同步改编辑控件与校验规则，并核对存量数据，三处一起改，不能只改展示配置。同类字段（如容积率）就出现过编辑用 amount-input、展示仍为 text 的口径不一致，改前先对齐各页面同一字段的配置。",
+   "evidence": "detail-template.vue:489-492 `getAmountDisplay(item){ const formattedValue = currencyFormatter(item.value, item.dot, item.dot, ''); return formattedValue === '' ? this.placeholder : `${formattedValue}${item.unit || ''}` }`；formatters/index.js:153-160 `currencyFormatter = (value, min=2, max=min, fallback=value) => { ... if (!patterns.number.test(valueStr)) return fallback }`；调用处传的 fallback 是空串，故非数字直接落成「-」；review 结论标注 [HIGH] 非数字车位比在查看模式被吞掉、[HIGH] 与国有投资占比类比不当（单位与录入不一致）；价格备案 recordPriceMngContentInfo.js 中同一「车位比」仍为 type:'text'。",
+   "files": [
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/formatters/index.js",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/detail.vue",
+    "zhi2-web-admin/src/views/projectManagement/customerProject/changeDetail.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "32181a9c-277f-4cb8-85b3-b2a8fb7246aa"
+   ],
+   "bundle": "121.md"
+  },
+  {
+   "title": "同源多租户条件分支（isSuzhouzhizai / currentEnvironment）下线的改法与验收口径",
+   "type": "workflow",
+   "content": "什么情况：本项目由多个同源版本合并而来，页面里残留大量 isSuzhouzhizai（苏州智在）与 currentEnvironment（jianhu/suzhoucom/zhizaiyun）分支，需要按「保留通用实现」的方向批量下线。改法规则：删除 isSuzhouzhizai === true 的专属分支、保留 !isSuzhouzhizai 的通用分支；删除 currentEnvironment === 'jianhu' 等其余环境的块。落到具体代码的固定动作：①v-if 条件直接拆除，字段与列改为始终显示；对应校验规则从条件判断改成 required:true；②字典与 options 里只为专属分支存在的数据（如 disputeResolutionType、accountStatusOtions、controlRation 校验规则、changeSelect 里的重置）要一并删除，否则留下死代码；③专属接口导入与按钮（如 withdraw / withdrawAccount）整段移除；④同一字段的两种来源（row.bankName vs row.supervisionOfBank、e.policeNo vs e.constructionNo）只保留通用来源；⑤formatter 收敛到通用版（amountFormatter 替代 shiquFormatter，dictFormatter 替代手写判断）；⑥状态判断从 isPrint/双条件简化为单一业务字段（bizState == '2'）。验收：改完后在目标文件内全文检索 isSuzhouzhizai / currentEnvironment / shiquFormatter 应零命中，并注意被同批点名的子组件（如 AgreementDetailsTable、MoneyInformation）不在清单内就不会被改，需单独确认。",
+   "evidence": "两轮同规则批量清理，逐文件结论：xy/detail.vue 移除争议解决事项/利息约定表单列与校验、isPrint 改为 this.form.bizState == '2'、删除 depositInterest/disputeResolutionTypeOptions；account/detail.vue 移除撤回按钮与 withdraw()/withdrawAccount 导入、删除 accountStatusOtions 与 ACCOUNT_STATUS 加载；allocation/detail.vue 的 handlePick 统一用 row.supervisionOfBank；SupervisionTable.vue 的 setData 中 buildingNo 映射改为 e.constructionNo（原 e.policeNo）；houseTable.vue 预测面积三列统一 formatters.amountFormatter；ContractInformation.vue 证件类型统一 dictFormatter；index.vue 的 tabList 固定 5 项、stateList 恒为 short.concat(long)。末轮确认 8 个文件内 isSuzhouzhizai / currentEnvironment / shiquFormatter 零引用。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/agreement/xy/detail.vue",
+    "zhi2-web-admin/src/views/supervision/agreement/version/detail.vue",
+    "zhi2-web-admin/src/views/supervision/agreement/account/detail.vue",
+    "zhi2-web-admin/src/views/supervision/agreement/allocation/detail.vue",
+    "zhi2-web-admin/src/views/supervision/agreement/jgxm/components/SupervisionTable.vue",
+    "zhi2-web-admin/src/views/supervision/agreement/jgxm/components/RegulatoryDialog.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/components/houseTable.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/components/UnitTable.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/components/UnitDialog.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/components/ExtractDialog.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildingTable/index.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildingTable/components/preFundingForm.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildingTable/components/HouseDetailDialog.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildingTable/components/ContractInformation.vue"
+   ],
+   "baseline": "ffafea1",
+   "sessionIds": [
+    "bc9f986a-ff8a-436e-9839-5365ebf91da7",
+    "2a843226-27dd-4ada-8d1e-71b6876799e2"
+   ],
+   "bundle": "121.md"
+  },
+  {
+   "title": "zs-table 空表留白的正解：table-tr 传「实际行数（含 0）」触发紧凑空态，而不是写死固定行数",
+   "type": "pattern",
+   "content": "什么情况：银行账户查询这类子表用 :table-tr=\"5\" 写死固定高度，无数据时表体仍占满 5 行（约 288px），页面出现大片空白；同时「余额查询」按钮被放在内容区单独一行，与标题脱节。根因与做法：zs-table 的 table-tr 决定表体保留的最小行数，写死等于强行撑高。正确姿势是把 table-tr 绑成数据源实际长度（:table-tr=\"itf_bankList.length\"），长度为 0 时自然落到 zs-table 的紧凑空态（表头 + 空态区，约 108px），有数据时按真实行数伸缩。按钮位置统一用 Headline 包裹并放到 #right 插槽，与标题同一行；由于包了 Headline，按钮相关的开关要下沉成 props（titleText、showBalanceQueryButton、form）由父页面传入，同时删掉父页面自己那层重复 Headline，否则标题会重复出现。注意本项目同一业务表格常有多份副本（supervision、property、benefit 各一份 BankAccountTable），改一处必须同步其余副本，并逐个父页面（account/detail.vue、propertyAccount/detail.vue、pubRegAccPropMgmt/detail.vue）确认已改成传 title-text 的用法。",
+   "evidence": "supervision 侧 BankAccountTable.vue：`:table-tr=\"5\"` 改为 `:table-tr=\"itf_bankList.length\"`，用 Headline 包裹、按钮移入 #right 插槽，新增 titleText / showBalanceQueryButton / form props；property 侧 BankAccountTable.vue 同样改 Headline + #right（table-tr 原本已动态），新增 titleText / showBalanceQueryButton props；benefit/pubRegulatoryAccount/components/BankAccountTable.vue 本身已是正确实现无需改；父页面 supervision/agreement/account/detail.vue、property/propertyAccount/detail.vue、benefit/pubRegAccPropMgmt/detail.vue 去除重复 Headline 改为直接传 title-text。效果对比：无数据 约 288px → 表头+空态区约 108px。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/agreement/account/components/BankAccountTable.vue",
+    "zhi2-web-admin/src/views/property/propertyAccount/components/BankAccountTable.vue",
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/components/BankAccountTable.vue",
+    "zhi2-web-admin/src/views/supervision/agreement/account/detail.vue",
+    "zhi2-web-admin/src/views/property/propertyAccount/detail.vue",
+    "zhi2-web-admin/src/views/benefit/pubRegAccPropMgmt/detail.vue"
+   ],
+   "baseline": "9dba655",
+   "sessionIds": [
+    "a5d89768-99be-4451-84bf-85a35b766c41"
+   ],
+   "bundle": "121.md"
+  },
+  {
+   "title": "[苏房] 多步骤表单的「选填」改造：strict 开关与「行已填」判定必须共用一份工具，payload 过滤空壳行",
+   "type": "pattern",
+   "content": "情况：开发企业注册把「资质信息」定为选填后，Step1 已放开，但点「申请入网」仍提示资质必填。为什么：校验参数散落在 Step1CompanyInfo.vue 与 Step4Shareholders.vue 两处，各写各的 strict；且 qualificationList 只要有一行（哪怕只选了默认资质类型、其余为空）就被当成「已填」随表单提交，后端见到非空数组即按必填校。怎么做：在 utils/registerQualification.js 内导出行级判定 isRowFilled / isQualificationRowFilled / getFilledQualificationRows，让「校验」与「payload 构建」共用同一份判定——strict:false 时全空可通过，半填仍走 validateRow 拦截；buildQualificationListPayload 只输出有实质内容的行（仅默认资质类型不算已填），Step4 的 buildSubmitPayload 仅在确有已填行时才带 qualificationList，避免提交空壳对象；两处校验统一传 strict:false，并在标题旁加灰色「选填」文案，让 UI 与校验口径一致。联调若后端仍报必填，先确认前端没再传默认类型空行，再查 editAndSubmit 自身是否要求非空。同流程多步骤页面必须收口到同一工具，否则口径会反复漂移。",
+   "evidence": "会话 5f4e161：资质信息选填与提交校验对齐，改动 registerQualification.js / Step4Shareholders.vue / Step1CompanyInfo.vue，新增 e2e/register/register-qualification-utils.spec.js；结论明确「前端已不再传仅含默认类型的空记录」",
+   "files": [
+    "zhi2-web-admin/src/utils/registerQualification.js",
+    "zhi2-web-admin/src/views/register/components/Step4Shareholders.vue",
+    "zhi2-web-admin/src/views/register/components/Step1CompanyInfo.vue",
+    "zhi2-web-admin/e2e/register/register-qualification-utils.spec.js"
+   ],
+   "baseline": "5f4e161",
+   "sessionIds": [
+    "dd46f406-845b-41b5-b9da-a02d69c7ec8a"
+   ],
+   "bundle": "122.md"
+  },
+  {
+   "title": "[苏房] 正则批量删 Vue 标签属性的两类必伤点：动态 :label-width 与行内 label-width=\"0px\"",
+   "type": "bug",
+   "content": "情况：用 scripts/remove-label-width.mjs 一次性清掉约 186 个 Vue 文件的 label-width，让所有表单统一走 zs-form 默认宽度，review 结论 BLOCK。根因：正则不区分静态属性与动态绑定，`:label-width=\"formLabelWidth\"`（simplifiedLayout 时 140px、否则 auto）被当死代码删掉，标签列宽不再随布局切换，属行为回归；credit/record/components/handle.vue 行内三个空 label 的 el-form-item 的 `label-width=\"0px\"` 也被删，而空 label 仍占父级 label-width 槽位，.cycle-wrap 横向 flex 会多出大段空白。怎么做：codemod 必须分开匹配 `label-width=\"` 与 `:label-width=\"`，动态绑定单列白名单或改成按布局驱动的 CSS；语义化 0px 换成 scoped 覆盖（.cycle-wrap :deep(.el-form-item:not(:first-child) .el-form-item__label){width:0;padding:0}）；只替换 <template> 段，避免误伤模板注释；批量归零前先确认组件全局默认宽度与各页原值（108/118/138/165px）一致，否则全站对齐整体漂移；CI 的 check-no-label-width.mjs 与删除脚本同正则，改一处必须同步另一处。",
+   "evidence": "会话 4555c0d：review 186 文件 label-width 批量删除脚本，给出 3 条 HIGH（BankReceiptForm 动态宽度、credit/handle.vue 行内 0px、193 文件宽度归零）与 4 条正则边界风险，verdict BLOCK",
+   "files": [
+    "zhi2-web-admin/scripts/remove-label-width.mjs",
+    "zhi2-web-admin/scripts/check-no-label-width.mjs",
+    "zhi2-web-admin/src/views/benefit/components/BankReceiptForm.vue",
+    "zhi2-web-admin/src/views/credit/record/components/handle.vue"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "bba88dfd-224f-4d7d-bbaf-0c0bf0f562ed"
+   ],
+   "bundle": "122.md"
+  },
+  {
+   "title": "[苏房] 变更单「变更前/变更后」对比不要并排两张表：单表合并 + 状态列 + 降级匹配键",
+   "type": "pattern",
+   "content": "情况：股东变更详情页原把变更前、变更后拆成两个 block 两张表，行数不一致导致无法对齐、看不出差异。做法：给公共表组件 ShareholderPlainTable 加 beforeRows prop——传了 beforeRows 且与 rows 有差异就进合并模式，否则维持原单表渲染，同一组件同时服务查看态与普通列表。合并算法按 shareholderId → idNumber → 股东名逐级降级匹配：两侧都有则拆成「变更前」「变更后」两行；仅 after 有判「新增」；仅 before 有判「删除」。首列改为宽 100 的状态 tag（变更前灰 #909399、变更后蓝 #2f6bff/#eaf0ff、新增绿、删除红），去掉序号列，其余业务列保持原样。坑：合并后单侧字段为 undefined，原 percentFormatter 会输出 \"undefined%\"，formatter 必须换成空值安全版。上层 ShareholderChangeSection 查看态塌缩成一个 <ShareholderPlainTable :rows=\"list\" :before-rows=\"originList\" />，删掉 showOriginBlock 与 block 标题；编辑态不动。tag 若需跟随主题，把固定色换成 var(--primary-color)。",
+   "evidence": "会话 7f34bd8：ShareholderPlainTable 加 beforeRows 合并态 + 状态 tag，ShareholderChangeSection 查看态两 block 塌缩为单表，formatter 改空值安全；ESLint 通过、vite build 通过",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/ShareholderPlainTable.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/ShareholderChangeSection.vue"
+   ],
+   "baseline": "7f34bd8",
+   "sessionIds": [
+    "f1fe42af-7198-4586-90dc-5a34ed97f963"
+   ],
+   "bundle": "122.md"
+  }
+ ]
+}

@@ -1,0 +1,78 @@
+{
+ "project": "园区公共收益",
+ "batch": "041",
+ "files": [
+  "041.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "物业公司和物管会都关联了这个物业管理区域，在物业管理",
+   "type": "pattern",
+   "content": "已按项目经理确认，移除了物业管理区域详情页的「综合查询」功能。 ## 问题说明 你反馈的现象是：物业公司和物管会已关联该物业管理区域，但点击详情页「综合查询」后，弹窗中「02 物业服务企业」「03 物业管理委员会」等区块显示「暂无数据」。 该弹窗通过接口 `/property/complex/queryComplexRelatedByComplexId/{complexId}` 拉取关联数据；数据未正确展示，可能是接口返回或前端映射问题。根据与项目经理周洪建的沟通，该功能暂时不用，决定先移除按钮，而非修复数据展示。 ## 已做修改 在 `zhi2-web-admin/src/views/property/complex/detail.vue` 中： 1. 移除「综合查询」按钮 2. 移除 `StatisticsDialog` 弹窗组件及其引用 3. 清理相关数据字段（`isQueryDialogVisible`、`projectList`、`contractList` 等） 4. 移除 `getQueryData` 方法及详情加载时的调用 `StatisticsDialog.vue` 组件文件仍保留在项目中，若后续需要恢复该功能，可再接入。 刷新物业管理区域详情页后，「综合查询」按钮将不再显示。若后续需要修复数据展示并恢复该功能，可以继续说明。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`zhi2-web-admin/src/views/property/complex/detail.vue",
+    "`StatisticsDialog.vue",
+    "涉及文件：d:\\repository\\园区公共收益、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\property\\complex\\detail.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\property\\complex\\components\\StatisticsDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e43a5f22-6390-48a0-81a9-f2d8bc611ef1"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "返回按钮还是不能正确返回对应的列表页面，而是直接使用",
+   "type": "bug",
+   "content": "已修复。`OperationBtnGroup` 的返回逻辑已与全局 mixin（`main.js` 中的 `goBack`）对齐。 **原因：** 组件在无 `backUrl` 参数时使用了 `this.$router.go(-1)`（浏览器历史后退），会回到上一个访问页面，而不是对应的列表页。 **修改后的逻辑：** 1. 若 URL 带有 `backUrl` 参数，跳转到该地址 2. 否则从当前路径推导列表页路径（去掉最后一段，如 `/building/building/detail/123` → `/building/building`） 3. 关闭当前标签页（`tagsView/delView`） 4. 使用 `router.push` 跳转，并带上 `query: { type: 'back' }` 例如从楼幢详情 `/building/building/detail/xxx` 点返回，会固定回到 `/building/building` 列表页，而不再依赖浏览器历史。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "mixin（`main.js",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\components\\OperationBtnGroup\\index.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\main.js、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\building\\building\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "119bbc7f-9ba6-43c3-ab43-ee84486668e7"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "新增时没有传projectId,实际主表里面有这个参",
+   "type": "bug",
+   "content": "已修复。 **原因：** `parkingDialog.vue` 提交时只带了 `parkingSpaceId`，没有带主表的 `projectId`。父组件 `detail.vue` 已通过 `:baseInfo=\"form\"` 把含 `projectId` 的主表数据传下来，但新增/编辑接口调用里没用上。 **修改：** 在 `addPubParkingSpaceDetail` 和 `updatePubParkingSpaceDetail` 的请求参数中补充 `projectId: this.baseInfo.projectId`，与已有的 `parkingSpaceId` 传参方式一致。 数据链路：`detail.vue`（`form.projectId`）→ `parkingTable`（`baseInfo`）→ `parkingDialog`（提交时带上 `projectId`）。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "`parkingDialog.vue",
+    "`detail.vue",
+    "数据链路：`detail.vue",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubParkingSpace\\components\\parkingDialog.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubParkingSpace、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\benefit\\pubParkingSpace\\components\\parkingTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "437944e8-f1a8-4cec-b025-0b79cf68765e"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  },
+  {
+   "title": "问题已修复。 原因：userAvatar.vue 里",
+   "type": "preference",
+   "content": "问题已修复。 **原因**：`userAvatar.vue` 里头像容器 `.user-info-head` 在 `:hover` 时会通过 `::after` 伪元素叠一层半透明黑色蒙层（`rgba(0,0,0,0.5)`）和「+」号。在触摸设备或部分浏览器上，第一次点击往往只触发 hover 蒙层，第二次才真正打开弹窗，所以会感觉「多点一次才能操作」。 **修改**：移除了该 hover 蒙层样式，并为头像区域保留 `cursor: pointer`，表示可点击。 刷新个人中心页面后，点击头像应能直接打开「修改头像」弹窗，无需再点第二次。若本地有热更新，保存后刷新 `#/user/profile` 即可验证。",
+   "evidence": "extracted source=cursor project=园区公共收益",
+   "files": [
+    "**原因**：`userAvatar.vue",
+    "涉及文件：d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\system\\user\\profile\\userAvatar.vue、d:\\repository\\园区公共收益\\zhi2-web-admin\\src\\views\\system\\user\\profile\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "131a52c3-5204-4b7a-b895-8e3be39ebfcb"
+   ],
+   "_draft": true,
+   "project": "园区公共收益"
+  }
+ ],
+ "_draft": true
+}

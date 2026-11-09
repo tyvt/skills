@@ -1,0 +1,261 @@
+{
+ "batch": 4,
+ "files": [
+  "027.md",
+  "028.md",
+  "029.md",
+  "030.md",
+  "031.md",
+  "032.md"
+ ],
+ "count": 15,
+ "memories": [
+  {
+   "title": "备案「流程 busCode」与「要件 busCode」必须成对分离，且提交端与审核端用同一个要件编码",
+   "type": "bug",
+   "content": "什么情况：经纪机构基本信息变更提交后附件能传，但主管部门审核页的要件区空白（「要件没显示」）。根因不是附件接口坏，而是提交端与审核端读了不同的 busCode：提交/审批流程走变更申请编码（开发企业 qybgxq / 经纪机构 jjjgbgxq），要件上传与查询走基本信息编码（开发企业 qyjbxx / 经纪机构 jjjgxx）；审核页误用了流程编码去查要件，自然查不到。\n\n为什么：本后台把「流程编码」和「要件编码」设计成两条并行的业务常量，二者语义不同不能混用——不能像有的模块那样让附件与审批共用路由 meta.busCode（那是注册/入网链路的情形），也不能让变更页把要件编码「规整」回备案编码。\n\n怎么做：在 api 层（api/company/companyRecord.js）集中定义两套常量与 resolver：AGENCY_CHANGE_APPENDIX_BUS_CODE + resolveCompanyRecordChangeAppendixBusCode（按机构类型返回 qyjbxx / jjjgxx），页面只调 resolver 不写字面量；审核态组件用 resolveLicenseOrChangeAppendixBusCode 自动落到同一个要件编码。改完要同时核对「变更提交页」「后台审核详情页」「机构端备案记录详情页」三处的 licenseBusCode 是否一致，并检查是否存在把变更编码强行纠正回备案编码的 normalize。",
+   "evidence": "会话 3f846cf3（基线 6b3ac5a）：用户指出「变更提交那里可以了，主管部门审核的时候用的 busCode 不一样，导致要件没显示。基本信息变更的附件和主管部门审核的附件，busCode 要统一」，并要求「应该用 qyjbxx」。最终新增 AGENCY_CHANGE_APPENDIX_BUS_CODE，经纪分支返回 jjjgxx，三处 licenseBusCode 对齐。",
+   "files": [
+    "zhi2-web-admin/src/api/company/companyRecord.js",
+    "zhi2-web-admin/src/views/toB/agencyRecord/detail.vue",
+    "zhi2-web-admin/src/views/company/companyRecordAgency/change/detail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "3f846cf3-25ed-4aa3-8fd0-676def800d49"
+   ],
+   "bundle": "027.md"
+  },
+  {
+   "title": "列表新列整列为 `-` 的判定顺序：先比对详情接口字段，再判定分页 VO 未返回（期限字段统一「起 至 止」formatter）",
+   "type": "workflow",
+   "content": "什么情况：给机构备案管理列表补「备案有效期限」「备案时间」两列，绑定 recordTermStart/recordTermEnd、recordTime 后整列仍显示 `-`。\n\n为什么：这类「详情页有值、列表页全 `-`」几乎都不是前端绑定写错，而是分页接口的 VO 没有下发这几个字段——详情接口与列表接口返回体是两套 VO，详情补齐不代表列表补齐。判断方法：先确认详情「基本信息」同名字段有值（此处 recordTermText / recordTime），再去看 /company/companyApply/page 的返回里是否存在这三个 key；不存在就是后端要在分页 VO 里补，前端不要伪造或用别的字段近似。\n\n怎么做：1) 期限类字段不要拆成两列，用共享 formatter（formatRecordTerm）输出「YYYY-MM-DD 至 YYYY-MM-DD」，缺值统一 `-`，与详情展示口径一致；2) 时间点字段统一走 formatters.dateTimeFormatter（YYYY-MM-DD HH:mm:ss），不手写拼接；3) 同一业务在机构端（institution/record）与主管端（company/companyApplyAudit）列表必须复用同一组字段名与 formatter，避免两端字段漂移；4) 若筛选条件要按业务时间查，需先向后端确认参数名，默认的 beginTime/endTime 通常是创建时间而非业务时间。",
+   "evidence": "会话 d5c18d6a（基线 a861cff）：用户给出字段名「备案有效期限：recordTermStart、recordTermEnd；备案时间：recordTime」，落地为 formatRecordTerm + formatters.dateTimeFormatter，并提示「若仍为 -，多半是列表接口未返回这三项，详情有、列表无时需后端在分页 VO 中补齐」。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyApplyAudit/index.vue",
+    "zhi2-web-admin/src/views/institution/record/index.vue",
+    "zhi2-web-admin/src/api/company/companyApply.js",
+    "zhi2-web-admin/src/formatters/index.js"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "d5c18d6a-1f61-4623-90ae-bdf50e621d50"
+   ],
+   "bundle": "027.md"
+  },
+  {
+   "title": "弹窗「点确定无反应」：rules 必填项在模板里没有对应 el-form-item，校验静默失败",
+   "type": "bug",
+   "content": "什么情况：Web 后台子表弹窗（如监管项目备案 → 编辑监管范围）点「确定」后弹窗不消失、也没有任何提示，看起来像按钮没绑定事件。为什么：通常是四条原因叠加——(1) rules 里给 regulatorStandard 配了必填，但模板中根本没有对应的 el-form-item，validate 失败却没有任何红字提示，表现就是「点了没反应」；(2) 列表行字段名叫 regulatoryStandard，表单用的是 regulatorStandard，编辑打开时该字段被回填成空，必然卡在校验；(3) 金额/面积字段走 v-money，输入后未失焦就点确定，模型值还没同步；(4) 提交时 this.form.priceRecordId = this.priceRecordId 而 prop 未声明，把行里已有主键覆盖成 undefined，接口失败自然不关窗。怎么做：打开弹窗时用 normalizeFormFromRow 合并默认值并做字段映射，提交前先 blur 再 $nextTick，成功/失败都给 message；行主键以 prop 传入，不在提交时覆盖。排查顺序固定为 rules↔form-item 一一对应 → 接口字段名 → 未 blur → 主键被覆盖。",
+   "evidence": "会话 e88f9902 中「编辑监管范围点确定弹窗不消失」，定位为隐藏校验项 + 字段名不一致（regulatoryStandard/regulatorStandard）+ v-money 未失焦 + priceRecordId 被覆盖；修复后改为 normalizeFormFromRow + 提交前 blur/$nextTick + 显式成功失败提示。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/agreement/jgxm/components/SupervisionAddDialog.vue",
+    "zhi2-web-admin/src/views/supervision/agreement/jgxm/components/SupervisionTable.vue",
+    "zhi2-web-admin/src/views/supervision/agreement/jgxm/detail.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "e88f9902-f489-41f1-a8b8-9ae1ba2925b4"
+   ],
+   "bundle": "028.md"
+  },
+  {
+   "title": "只读「查看详情」一律用公共 DetailTemplate，同区多行信息合并成一个模板而非拆两块",
+   "type": "preference",
+   "content": "什么情况：用户在一个会话里连续三次提出「分支机构查看详情没有用 detail-template」「机构注销材料查看详情也要用 detail-template」「这里不要分开，合并到一个」。说明这是本后台的硬性 UI 约定而不是一次性微调。为什么：只读查看页若自己拼 div 或按数据来源拆成两个模板，会出现边框断裂、间距不一致，字段顺序也和申请页对不上，用户每次都要返工。怎么做：查看模式一律交给 DetailTemplate 渲染只读字段（它同时处理 label 样式、必填星号隐藏、列宽）；同一业务区的多行信息（注销时间 / 注销原因 / 注销材料）写进同一个模板的连续 rows，不要再按接口来源拆第二个模板；区块字段构造尽量复用申请页的 build*ContentInfo 构造器，保证与申请页逐块对齐。验收时按申请页逐块比对边框与行距，而不是只看字段是否齐全。",
+   "evidence": "会话 af65260e 中用户三次要求把分支机构查看详情、机构注销材料查看详情改用 detail-template，并要求把拆开的两个模板合并成一个（合并后一个 DetailTemplate 三行：注销时间/注销原因/注销材料，边框与布局连成一块）。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/detail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/AgencyBasicInfoDetail.vue",
+    "zhi2-web-admin/src/views/company/institutionRegister/detail.vue",
+    "zhi2-web-admin/src/views/company/companyRecordAgency/detail.vue"
+   ],
+   "baseline": "a9b1293",
+   "sessionIds": [
+    "af65260e-de64-4518-9636-cdba7fceb42d"
+   ],
+   "bundle": "028.md"
+  },
+  {
+   "title": "[苏房] el-table 树形列的全局省略样式别按 .cell > span 收口：display:block 会把展开箭头和文字拆成两行",
+   "type": "bug",
+   "content": "现象：菜单管理页（el-table 树形表格）字段值互相重叠，为修重叠把省略规则放大到所有 .cell > span 并设 display:block，结果树形第一列的展开箭头与菜单名被拆成上下两行，用户反馈「箭头位置错乱」。根因：.cell > span 是 el-table 所有列共用的内部结构类，display:block 会强制换行；而树形第一列里 .el-table__expand-icon、.el-table__indent、.el-table__placeholder 与文字本应在同一行，其中 indent/placeholder 还承担缩进占位，一旦被块级化或参与截断，缩进与箭头就错位。做法：长文本省略只作用于确需截断的列（权限标识、路由地址、组件路径），用 inline-block 而非 block；菜单名称/树形首列单独写规则，显式排除 .el-table__indent 与 .el-table__placeholder，文字与 .el-table__expand-icon 同行并 vertical-align: middle。结论：树形表格的全站样式治理必须按列收口到具体列类名，不要在 .cell 这一层做通用声明。",
+   "evidence": "会话 0b933a14：用户先说「菜单管理页面字段值重叠了」，改动后用户回「这个问题好了，但是重叠的问题没有解决」，再指出「箭头位置错乱」；最终结论明确「为修重叠，曾对所有 .cell > span 设置了 display: block…块级 span 会把文字挤到下一行」，改为第 3～5 列 inline-block + 菜单名称列排除 indent/placeholder 并 vertical-align: middle。",
+   "files": [
+    "zhi2-web-admin/src/views/system/menu/index.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/styles/index.scss"
+   ],
+   "baseline": "ed13ca0",
+   "sessionIds": [
+    "0b933a14-fbd5-4c86-8301-29f6b89bb1c4"
+   ],
+   "bundle": "029.md"
+  },
+  {
+   "title": "[苏房] 「按字段值触发远端资格校验」的表单：请求序号防旧响应覆盖 + 保存前二次校验 + 查无数据即拦截",
+   "type": "pattern",
+   "content": "场景：经纪机构从业人员新增页，「人员类型=专业人员(professional) 且身份证号非空」时要调 POST /company/agencyPersonnel/queryByIdNumber 带出资格证书类型、证书管理号（字典 company_personnel_certificate_type），返回 null 则不允许保存为专业人员。踩坑有两个：一是用户快速改号时先发的请求后返回，会把新身份证的证书信息覆盖成旧号的；二是只在输入时校验一次，用户先填好再改类型/改号后照样能提交。做法：(1) 每次发起查询自增一个 requestSeq，回调里比对当前值，不一致直接丢弃响应；(2) 命中规则时把请求结果只读回填到表单，data == null 或请求失败要禁用/拦截保存，并在保存入口再复检一次（类型与身份证号都重新判定）；(3) 证书类型统一走字典转中文，不硬编码。该模式可复用到所有「按某字段值触发远端校验」的表单：信用代码查重、企业名称查重、证照号核验，核心是查询态与提交态解耦成两层。",
+   "evidence": "会话 b0af49dc：用户给出接口说明「调用时机，当人员类型为专业人员（字典 agency_personnel_type 值：professional） 且 身份证号不为空时调用。如果返回null 则不允许保存为专业人员」；最终结论写明「data == null 或查询失败：禁止保存为专业人员（保存前会再次校验）」「查询带请求序号，避免快速改号时旧响应覆盖」。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyPersonnel/components/AgencyPersonnelDetail.vue",
+    "zhi2-web-admin/src/api/company/companyRecord.js"
+   ],
+   "baseline": "77f94ab",
+   "sessionIds": [
+    "b0af49dc-1ee9-4bca-82ad-f1b1f4a01bf0"
+   ],
+   "bundle": "029.md"
+  },
+  {
+   "title": "zs-select-dialog 迁移契约：$attrs 覆盖 title、@opened 不抛出、默认带 bizState:2",
+   "type": "bug",
+   "content": "把页面内嵌的选择弹窗改造成 zs-select-dialog（或函数式 openXxxSelect）时，常出现三个静默失效：父页传入的标题不生效、打开前的「请先选择项目名称」校验不执行、列表数据莫名变少。根因分别是：①模板里 v-bind=\"$attrs\" 之后紧跟静态 title=\"选择监管项目\"，后面的静态属性覆盖了 $attrs 里的 title；②zs-select-dialog 只在内部 zs-dialog 上绑定 onOpen，从未 $emit('opened')，所以外层的 @opened=\"onDialogOpened\" 永远不触发，只能靠 no-auto-query 兜住部分场景；③组件默认带 bizState: 2 过滤，查询条件与旧 listSupervise 不一致。做法：标题写 :title=\"$attrs.title || '默认标题'\" 或直接删掉硬编码；前置校验改为 watch visible / $attrs.visible，或在组件 onOpen 末尾补 emit（需评估全局消费方）；不需要状态过滤时显式传 no-biz-state，并逐项核对新老接口参数一致性。另注意 handlePick 同时 emit setData 与 update:visible，会先 resolve 再 reject('cancel')，需 settled 锁。",
+   "evidence": "会话 6b01fe0a（基线 179717a）审查两个 regulatorDialog.vue：HIGH 级问题「静态 title 覆盖父级传入标题」「父组件 @opened 不会触发」「未设置 no-biz-state，默认带 bizState: 2」；mountDialog.js:60-69 存在 resolve 后再 reject('cancel') 的二次结算。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/unblock/usemoney/components/regulatorDialog.vue",
+    "zhi2-web-admin/src/views/supervision/unblock/guarantee/components/regulatorDialog.vue",
+    "zhi2-web-admin/src/views/supervision/utils/selectDialog/mountDialog.js",
+    "zhi2-web-admin/src/components/zs-select-dialog.vue",
+    "zhi2-web-admin/src/views/supervision/unblock/usemoney/usemoneyRegulator.js"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "6b01fe0a-0b8d-4848-b64f-18d5deb4027c"
+   ],
+   "bundle": "030.md"
+  },
+  {
+   "title": "变更管理列表「查看」跳错详情页：后端下发 redirectPath 未读 + 用备案 busCode 解析变更行",
+   "type": "bug",
+   "content": "现象：企业变更管理列表点「查看」，管理员变更行落到「管理员维护」详情页，接口 400「管理员不存在」。根因两层且都在前端跳转逻辑：①后端列表返回的路径字段名是 redirectPath，代码读的是 row.path，于是所有行都取不到路径，只能退化到按 busCode 解析分支；②管理员变更行的 busCode 是管理员备案编码（开发企业 qyglygl、经纪机构 jgglygl），不是变更编码（qyglybg / jgglybg），按备案码解析自然命中管理员维护页，并把变更单主键 dataId 当成管理员主键发到 /company/companyAdmin/detail。解法：跳转优先读 redirectPath 并兼容旧的 path；跳转前把管理员的备案编码映射成变更编码，走已注册的管理员变更详情路由。同时注意后端这份 redirectPath 自身不可靠（personnelRecordChange 与实际路由 personalRecordChange 拼写不一致、基本信息给的是 filePath 风格路径），前端必须有 busCode 兜底并推动后端修，否则待办等其它消费方仍会失效。",
+   "evidence": "会话 session_d246d28e（基线 114af19）：用户报「变更类型为管理员变更的 点查看 跳到管理员维护详情了」；定位为读 row.path 而非 redirectPath、busCode 为备案编码，修复后 8 条记录逐条验证落点正确。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyChangeManage/index.vue"
+   ],
+   "baseline": "114af19",
+   "sessionIds": [
+    "session_d246d28ea25319c1ab08e056d5fbd7c1"
+   ],
+   "bundle": "030.md"
+  },
+  {
+   "title": "机构类型字段约定：走 company_type 字典 + 统一 companyType，禁止默认值 agency",
+   "type": "preference",
+   "content": "情况：分支机构新增页把机构类型写死默认 'agency'，且前端字段名与后端接口不一致，导致保存的主体类型不对。用户明确要求：机构类型仍要保留，但必须取字典 company_type，接口前后端统一用 companyType 作为机构类型字段；并且不要任何默认值，由用户自己选择。做法：①表单控件用 zs-select 绑 company_type 字典；②读写、保存 payload 全程用 companyType，不再出现 agency 之类的硬编码枚举；③初始值留空，init 接口只在后端确实返回 companyType 时回显，不做强制赋值；④没有有效值时不提交该字段并给出必填提示，而不是替用户猜一个。这样既避免默认值掩盖用户漏选，也避免字段名漂移造成「选了没保存上」。",
+   "evidence": "会话 e0b30e60（基线 130ee05）：用户两轮指令「机构类型是要的，但是应该取字典 company_type，前后端接口也是用 companyType 字段作为机构类型」「改完也不需要 agency 的默认值了，是用户自己选择」；改后 companyType 初始为空、仅在后端返回时回显。",
+   "files": [
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchDetail.vue",
+    "zhi2-web-admin/src/views/institution/agencyBranch/components/AgencyBranchList.vue",
+    "zhi2-web-admin/src/api/company/agencyBranch.js"
+   ],
+   "baseline": "130ee05",
+   "sessionIds": [
+    "e0b30e60-1e83-4416-94f2-cfac51a695c9"
+   ],
+   "bundle": "030.md"
+  },
+  {
+   "title": "新增保存后拿不到主键 / 详情请求带 null：统一 resolveResponseId + changeFormState 空值守卫",
+   "type": "bug",
+   "content": "现象：各业务页新增保存成功后，接口明明返回了主键，但切到详情时拿不到 ID，detail 请求参数变成 \"null\"，甚至跳到 /null。根因：页面各自用 response?.id 或 response?.data 硬取，而后端新增接口的返回体格式不统一（data 可能是标量主键、也可能是对象、有的只在顶层给 id），取不到就静默变成 undefined 继续跳转。做法（用户要求「这个问题是公共的，得全局排查修复」）：在 utils/ruoyi.js 新增 resolveResponseId(response, primaryKey)，按 data 标量 → data[primaryKey]/data.id → 顶层 id 逐级兼容；main.js 挂到 Vue 原型，页面统一用 this.resolveResponseId(response, this.primaryKey)；detailMixins.addCallback 默认改用该函数；changeFormState 在 view 模式下拦截 null/undefined/'null' 等无效 ID，避免再跳到 /null。批量替换掉 24 个仅用 response?.id 与 29 个 response?.data / id||data 写法，自定义 addCallback 的页面（entrustSale/evaluationForm/maintenanceRefund/secondHouse 等）单独改。收尾用静态检查确认 changeFormState('view', response?.id) 无残留。",
+   "evidence": "会话 48d8443a：用户报「开户这边id，新增接口返回了，详情没传」，随后要求「这个问题是公共的，得全局排查修复」，最终在 ruoyi.js/main.js/detailMixins/changeFormState 做三层防御并批量改 53+ 个文件。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/main.js",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/views/supervision/agreement/account/detail.vue",
+    "zhi2-web-admin/src/views/supervision/agreement/account/index.vue"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "48d8443a-2b9b-4362-94b9-0e8c065800e4"
+   ],
+   "bundle": "031.md"
+  },
+  {
+   "title": "预售/现售合同签订共用一套详情页，靠路由 /pre/ 与 /cash/ 决定 contractType 并动态加载章节",
+   "type": "pattern",
+   "content": "合同签订模块是一个「同一内核页服务两条业务线」的典型结构：列表页只有一份 commercialHousingSales/presale/contractMainInfo/index.vue（路由 path 分别含 /pre 与 /cash，用 contractType '0'/'1' 区分），详情页也只有一份 src/views/contract/index.vue。详情页内部用 computed contractType = this.$route.path.includes('/pre/') ? '0' : '1' 判定业务类型；loadChapterList 按类型 await import('./chapters/pre/data.js') 或 './chapters/cash/data.js' 取章节清单，loadComponents 从 preChapterModules / cashChapterModules 取组件表。列表跳详情走 `${this.$route.path}/${row.contractId}?formMode=view`，动态路由形如 ContractMainInfo/pre/:tableid。改这类页面时注意两点：一是不要给 pre/cash 各复制一份详情页，新增差异应该沉到 chapters 目录；二是工具栏不在公共 OperationBtnGroup 里，合同域用自己的 src/views/contract/components/toolbar.vue，做 UI 统一时要单独处理。",
+   "evidence": "会话 87dfedb4 的仓库检索结论：列出预售/现售列表页与详情页为同一文件，并给出 contractType computed 与 loadChapterList/loadComponents 的代码片段及路由约定。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/contractMainInfo/index.vue",
+    "zhi2-web-admin/src/views/contract/index.vue",
+    "zhi2-web-admin/src/views/contract/components/toolbar.vue",
+    "zhi2-web-admin/src/views/contract/chapters/pre/data.js",
+    "zhi2-web-admin/src/views/contract/chapters/cash/data.js"
+   ],
+   "baseline": "1c445c7",
+   "sessionIds": [
+    "87dfedb4-171f-469e-9664-9be26db12d6a"
+   ],
+   "bundle": "031.md"
+  },
+  {
+   "title": "匿名/新增态机构注册要件的上传 busId 用 Date.now() 占位，配置只按 busCode 拉，转挂交给后端",
+   "type": "workflow",
+   "content": "机构入网（经纪 030100 / 租赁 030300）要件流程要与开发企业注册完全对齐：拉配置只带 busCode 不传 busId；上传阶段没有业务主键，就用页面级 uploadBusId = Date.now() 作为临时 busId（与 CompanyRegisterSingleForm 保持一致），不再拿注册单 ID 当上传 busId；提交仍传 attachmentList，由 saveAndSubmit 后端统一转挂；暂存/回显场景才有 companyRegisterId，此时用 listAppendixPackage 拉已转挂附件。代码组织上把 busCode 与封装集中到 api/institution/institutionRegister.js（resolveInstitutionRegisterAppendixBusCode、listAppendixConfigsForInstitutionRegister），busCode 只此一处可改；同时删掉不存在的 INSTITUTION_REGISTER_BUS_CODE_AGENCY 常量，页面不再 provide registerBusCode，InstitutionUploadItem 去掉 companyOrganContext/busCode 注入依赖，companyRecord.js 的备案默认 busCode 改为从该 API 引用。管理端详情仍是另一条链路：走 resolveInstitutionRegisterBusCode（路由 meta.busCode 优先）展示已挂接要件，与注册页「先上传后转挂」分离，不要混用。",
+   "evidence": "会话 f8f53b74：用户要求「按照不传busId方式从通用配置里取，处理方式跟之前做的前端拿配置先上传，入参给附件id集合，后端转挂一样」，最终按表中的行为对齐清单改完并删除不存在常量。",
+   "files": [
+    "zhi2-web-admin/src/api/institution/institutionRegister.js",
+    "zhi2-web-admin/src/views/institutionRegister/components/Step3Appendix.vue",
+    "zhi2-web-admin/src/views/institutionRegister/InstitutionRegisterPage.vue",
+    "zhi2-web-admin/src/mixins/companyOrganContext.js",
+    "zhi2-web-admin/src/constants/companyOrgan.js"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "f8f53b74-1e20-4d25-a67b-0c402488c56e"
+   ],
+   "bundle": "031.md"
+  },
+  {
+   "title": "后台 Playwright 探测脚本必须断言已离开登录页，否则「退出码 0」是假阴性",
+   "type": "bug",
+   "content": "用临时 Playwright 脚本验证后台 UI 改动时，脚本可能以退出码 0 正常结束，但页面仍停在 http://localhost:8082/login#/login?redirect=%2Ftodo —— 说明通用选择器没真正登进系统，后面所有截图/断言都是无效证据，容易误判「已改好」或「没改好」。做法：登录步骤后必须显式等待并断言 URL 不含 /login（或断言已出现侧栏/目标菜单），再进入目标路由；失败时把当前 URL 打印出来作为依据。这类探测脚本要复用项目已有的 fixtures 登录助手而不是自己写通用选择器（该项目 e2e 走真实接口 + fixtures 登录助手）。另外，UI 改动在自动化无法验证时，向用户交付要如实说明「未自动化验证」，并给出复现路径（Ctrl+F5 后进入具体菜单页）让用户自检。",
+   "evidence": "会话 f702fb33：后台探测跑完约 35s、退出码 0，但登录后仍停在 /login#/login?redirect=%2Ftodo，结论明确说明「没有用自动化再验证书管理筛选条」，改由用户本地刷新查看。",
+   "files": [
+    "zhi2-web-admin/e2e/fixtures/contract-sign-pre-menu-config.js"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "f702fb33-72f8-4f2e-bc90-481ed771ea30"
+   ],
+   "bundle": "031.md"
+  },
+  {
+   "title": "待办任务跳转 resolver 迁移：壳路由、失效 storedPath、缺主键的三层兜底",
+   "type": "pattern",
+   "content": "场景：V3 后台「待办任务点进去」的跳转逻辑收在 utils/ruoyi.js（resolveTodoTaskNavigation / navigateToTodoTask），需要从苏住房G 项目迁入更稳的解析。为什么：老实现把后端存的 path 当唯一真源，一旦命中目录型路由或旧路径失效就直接跳错页/404。怎么做（4 处，缺一不可）：1) 业务主键取值改为 dataId ?? detailId——G 项目里的 detailId 是主键兜底来源，不是跳转参数名，dataId 有值时必须优先；2) 新增 SHELL_MENU_COMPONENTS 集合与 isMenuShellRoute()，把 component 为 Layout/ParentView/InnerLink 的菜单壳路由排除，getRouteFilePath() 也不再返回这类值，否则 busCode 命中一条目录路由时会拿它当详情页跳；3) pickRouteByStoredPath 在「有 hints 但全不匹配」时返回 null，外层改为在 busCode 候选里找 isDetailRoute，用主键重建路径，而不是盲跳已失效的 storedPath；4) 动态参数段做成混合式：:tableid 仍走 V3 原有 buildTableIdNavigation 多级兜底（它含 pathResolvesToFile 路径段撞车修复，比 G 的纯 name+params 更强，不要被覆盖），其余动态段（如 register/:applyId）走 G 的 name+params；拿不到主键返回 { missingId: true } 并提示「待办任务缺少业务主键，无法打开详情页」后中止。验证：用 esbuild 打桩 router/store 跑 13 个行为用例（dataId 优先级、detailId 兜底、:applyId 填充、缺主键中止、壳路由回退、storedPath 失效重建、全空返回 null、正常跳转）。",
+   "evidence": "032.md 会话 session_57edfc9561082fc82d18c68794e765df：从苏住房G 迁移跳转逻辑，改动只在 utils/ruoyi.js；最终结论列出 4 处改进与 13 个 esbuild 行为用例全通过，并明确保留 V3 的 buildTableIdNavigation 以维持 :tableid 场景更强行为。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js"
+   ],
+   "baseline": "114af19",
+   "sessionIds": [
+    "session_57edfc9561082fc82d18c68794e765df"
+   ],
+   "bundle": "032.md"
+  },
+  {
+   "title": "详情页「返回」找不到授权菜单：不报错，静默降级浏览器返回（router.resolve 判可用性）",
+   "type": "bug",
+   "content": "场景：详情页点返回时，若算出的目标不在已授权菜单里，老代码直接弹「没有授权相关菜单 / 未找到返回列表路由」，用户被卡在详情页。根因：返回目标只靠 backUrl 或拼父路径字符串，从不校验该路径在当前路由表里是否真能命中页面（vue-router 的 catch-all 会把它 redirect 到 /404）。解法：新增 utils/detailBackNavigation.js 提供无副作用方法——isNavigableLocation() 用 router.resolve() 判断目标是否命中真实页面（/404、未填充的 :tableid 都算不可用）；resolveBackUrlPath() 校验 backUrl；resolveDetailBackLocation() 按 backUrl → 直接父路径取第一个可用目标；goBackFromDetail() 先关当前页签，有可用目标就正常跳转（带 type:'back'），没有就 history.back()，连历史都没有才回首页。接入点：共享返回按钮 components/OperationBtnGroup/index.vue、main.js 的全局 goBack mixin、changeDetailMixin.goBackChangeIndex、limitFormMixin.handleOperationBack、picture.vue、statistics/detail.vue。配套：utils/ruoyi.js 的 getRouterPathByFilePath 加可选 silent 参数（非返回场景仍照旧提示抛错，行为不变）；router/index.js 的 /404 守卫在 query 带 type=back 时取消本次导航留在当前页（vue-router 3.6.5 的 catch-all redirect 确实会保留 query，判断才生效）。注意：这条取代了早期「截断路径回列表页并抛错」的做法，需求已明确改为不提示。",
+   "evidence": "032.md 会话 session_dcca4ee681a8111b7f2b93027268aa1e：用户要求「点详情页返回按钮，找不到菜单的话改为使用浏览器返回，不要提示错误」；结论给出 detailBackNavigation.js 四个方法与 7 处接入点，并用 vue-router 3.6.5 源码确认 redirect 保留 query；eslint 无新增报错、npm run test 构建连续三次退出码 0。",
+   "files": [
+    "zhi2-web-admin/src/utils/detailBackNavigation.js",
+    "zhi2-web-admin/src/utils/ruoyi.js",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/main.js",
+    "zhi2-web-admin/src/router/index.js"
+   ],
+   "baseline": "114af19",
+   "sessionIds": [
+    "session_dcca4ee681a8111b7f2b93027268aa1e"
+   ],
+   "bundle": "032.md"
+  }
+ ]
+}

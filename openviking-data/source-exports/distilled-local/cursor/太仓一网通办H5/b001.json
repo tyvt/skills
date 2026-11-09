@@ -1,0 +1,78 @@
+{
+ "project": "太仓一网通办H5",
+ "batch": "001",
+ "files": [
+  "001.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "参考@昆山市民 ，迁移业主决策，业委会选举相关功能。",
+   "type": "fact",
+   "content": "原因是 **标题颜色继承了系统主题色，在深色模式下变成了白色**，而卡片背景也是白色，所以标题“看不见”了。 ## 原因分析 `loginBox.vue` 里： - **标题** `.title-class`：只设置了 `font-size: 18px`，**没有指定颜色**，会继承全局文字色 - **副标题** `.content-class`：写死了 `color: #999`，所以一直能显示 在 `style.css` 里，深色模式会设置： ```css @media (prefers-color-scheme: dark) { :root { color: #fff; /* 白色文字 */ } } ``` 卡片背景是 `#fff`，标题就变成 **白字白底**，看起来就像没显示；副标题仍是灰色，所以只有描述文字可见。 ## 已修复 在 `loginBox.vue` 中为标题补上固定样式： ```css .title-class { font-size: 18px; font-weight: 600; color: #333; line-height: 25px; } ``` 同时给第一个「我的房屋」入口也显式补上了 `title` 和 `content`。 刷新页面后，「我的房屋」「业主决策」「业委会选举」等菜单名称应能正常显示。",
+   "evidence": "extracted source=cursor project=太仓一网通办H5",
+   "files": [
+    "`loginBox.vue",
+    "`style.css",
+    "涉及文件：d:\\repository\\太仓一网通办H5、d:\\repository\\太仓一网通办H5\\src、d:\\repository\\太仓一网通办H5\\src\\router\\index.ts、d:\\repository\\太仓一网通办H5\\src\\views\\decision\\DecisionIndex.vue、d:\\repository\\太仓一网通办H5\\src\\api\\common.ts、d:\\repository\\太仓一网通办H5\\src\\store\\vote.js、d:\\repository\\太仓一网通办H5\\昆山市民\\src\\api\\modules\\election.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "acdb01fd-de9f-4bac-91c4-db011808c9d1"
+   ],
+   "_draft": true,
+   "project": "太仓一网通办H5"
+  },
+  {
+   "title": "选项表决这里好像少了点击跳转？",
+   "type": "bug",
+   "content": "这是**循环依赖**导致的启动报错： - `router/index.ts` 静态引入了 `HomePage` - `HomePage.vue` 又引入了 `router` 两边互相等待初始化，就会触发 `Cannot access 'HomePage' before initialization`。 ## 修复 1. **`HomePage.vue`**：改用 `useRouter()`，不再在模块顶层 import `router` 2. **`router/index.ts`**：首页改为懒加载 `() => import('../views/HomePage.vue')` 刷新页面后这个错误应已消失。若还有问题，把新的报错截图发我。",
+   "evidence": "extracted source=cursor project=太仓一网通办H5",
+   "files": [
+    "`router/index.ts",
+    "`HomePage.vue",
+    "**`HomePage.vue",
+    "**`router/index.ts"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e08bc29b-be15-400b-9854-8a9070c29daa"
+   ],
+   "_draft": true,
+   "project": "太仓一网通办H5"
+  },
+  {
+   "title": "新增一个登录页面，register/phoneUse",
+   "type": "fact",
+   "content": "已移除 mock 相关配置，所有请求统一走真实接口： - **`.env.development` / `.env.test` / `.env.production`**：删除 `VITE_APP_MOCK` 和 `VITE_APP_API_MOCK_URL` - **`src/api/index.ts`**：`baseURL` 固定为 `VITE_APP_API_BASE_URL`（`/tcwxjj/prod-api`），响应拦截器统一校验 `code === 200` - **`src/vite-env.d.ts`**：删除对应类型定义 重启开发服务后，请求会通过 `/tcwxjj/prod-api` 代理到 `VITE_BASE_URL` 真实后端。",
+   "evidence": "extracted source=cursor project=太仓一网通办H5",
+   "files": [
+    "**`src/api/index.ts",
+    "**`src/vite-env.d.ts",
+    "涉及文件：d:\\repository\\太仓一网通办H5\\.env.development、d:\\repository\\太仓一网通办H5\\src\\router\\index.ts、d:\\repository\\太仓一网通办H5\\src\\api\\index.ts、d:\\repository\\太仓一网通办H5\\src\\App.vue、d:\\repository\\太仓一网通办H5\\src\\views\\components\\loginBox.vue、d:\\repository\\太仓一网通办H5\\src\\vite-env.d.ts、d:\\repository\\太仓一网通办H5\\src\\store\\user.ts"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9b39a3f2-89db-4ef6-9aaa-79a4e9737560"
+   ],
+   "_draft": true,
+   "project": "太仓一网通办H5"
+  },
+  {
+   "title": "签名上传已经没问题了，你给的返回里 fileThum",
+   "type": "fact",
+   "content": "签名上传已经没问题了，你给的返回里 `fileThumbnailSite` 是正常的。 当前空白页其实是卡在 **第 4 步「人脸识别」**：`FaceStep` 组件本身几乎是空的，如果跳转失败或提交数据丢失，就会一直白屏。 ## 找到的关键 Bug **选项表决**时，选项存在 `optionGroupList` 里，但跳转人脸时用了这段逻辑： ```js myOptionList || optionGroupList[0].tMfOptionApplyList ``` `myOptionList` 是空数组 `[]`，在 JS 里是 **truthy**，所以永远不会走到 `optionGroupList`。 结果回调 URL 里的 `optionList` 是空的，人脸回来后提交失败，页面就卡住。 ## 本次修复 1. 修正选项获取逻辑，选项表决时正确读取 `optionGroupList` 2. 新增 `selectedOptionList` 缓存，选择/签字时保存已选选项 3. `FaceStep` 增加「正在跳转人脸识别…」提示和失败重试 4. 检测 `wx.miniProgram` 是否可用，失败时给出明确提示 ## 请重新验证 1. **重新部署/刷新**后再走完整流程 2. 签字点「下一步」后，应看到 **「正在跳转人脸识别…」**，然后跳到人脸页面 3. 人脸",
+   "evidence": "extracted source=cursor project=太仓一网通办H5",
+   "files": [
+    "涉及文件：d:\\repository\\太仓一网通办H5\\src\\views\\owner-decision\\ParticipateIn.vue、d:\\repository\\太仓一网通办H5\\src\\views\\decision\\ParticipateIn.vue、d:\\repository\\太仓一网通办H5\\src\\views\\decision\\components\\FaceStep.vue、d:\\repository\\太仓一网通办H5\\src\\store\\vote.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "450cf900-8bb2-4bf4-bf8c-b1ac346c87fb"
+   ],
+   "_draft": true,
+   "project": "太仓一网通办H5"
+  }
+ ],
+ "_draft": true
+}

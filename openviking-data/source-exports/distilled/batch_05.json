@@ -1,0 +1,315 @@
+{
+ "batch": 5,
+ "files": [
+  "025.md",
+  "026.md",
+  "027.md"
+ ],
+ "failed": 0,
+ "count": 19,
+ "memories": [
+  {
+   "title": "业务逻辑统一收敛到页面目录内的本地 store，页面不直接调接口",
+   "type": "pattern",
+   "content": "泰兴小程序遵循「按业务模块建 store」的约定：业务模块（如维修项目 pages_maintain_project）的业务逻辑、mock 分页接口、真实接口请求方法都放在该页面目录下的本地 store 文件（src/pages_maintain_project/maintainProject.js）里，页面 .vue 只做展示与跳转，不直接关心后端字段。该 store 原在 src/store/maintainProject.js（全局 store 目录），用户明确要求迁到 src/pages_maintain_project 内以 import './maintainProject' 引入，并删除原全局文件、确认全局无 @/store/maintainProject 残留引用。后续同类模块应沿用「模块目录内 store + 页面只消费」的结构，而不是再往 src/store 里堆。",
+   "evidence": "会话 7242733d：「store改为@src/pages_maintain_project 放在这个目录里面用」→ 新增 src/pages_maintain_project/maintainProject.js、index.vue 改为 import maintainProjectStore from './maintainProject'、删除 src/store/maintainProject.js，校验全局已无 @/store/maintainProject 引用；会话 a7cba4e4 结论「请求已内聚到 store」；会话 3248cc3b「在 maintainProject.js store 中处理业务逻辑」。",
+   "files": [
+    "src/pages_maintain_project/maintainProject.js",
+    "src/pages_maintain_project/index.vue"
+   ],
+   "baseline": "445ceca2",
+   "sessionIds": [
+    "7242733d-13b2-4811-a69d-3d7e9b5a5aba",
+    "3248cc3b-b003-4b89-a084-3b8ffc0182ee",
+    "a7cba4e4-2167-4cdd-892e-7afdbc7b24c6"
+   ],
+   "bundle": "025.md"
+  },
+  {
+   "title": "接口对接套路：store 内做后端字段→页面字段映射，并保留旧参数兼容",
+   "type": "workflow",
+   "content": "给页面接真实接口时按固定套路做：(1) 在模块 store 里新增接口方法（方法名与后端接口名同名，如 selectTripartiteCertDetail / selectMyShareScopeDetail）；(2) 由 store 内的 fetchXxx 封装真实请求并按主键查询，同时做「后端字段→页面字段」映射，让页面无需感知后端命名，例如 companyName->appraisalUnit、viewVerdictDate->conclusionDate、viewReportValidDate->reportValidUntil、viewReportState->situationText；(3) 页面取参优先读新的业务主键（applyNo），同时保留旧参数（id）兼容，避免其它入口（如 apply-detail.vue）未同步时被打断；(4) 改完对涉及文件跑 lint 确认无新增报错。凡是详情类接口，主键统一用 applyNo（维修申请编号）。",
+   "evidence": "会话 a7cba4e4：新增 selectTripartiteCertDetail，fetchThirdPartyAppraisal 改真实请求并按 applyNo 查询并在 store 内做字段映射；object-detail.vue 跳转从 id 改为 applyNo；third-party-appraisal.vue 优先读 applyNo 并保留旧 id 兼容，「避免其它入口受影响」，并指出 apply-detail.vue 仍是旧 id；会话 41bbe8da 与 1dedcb9e 同样在 maintainProject.js 内新增接口方法。",
+   "files": [
+    "src/pages_maintain_project/maintainProject.js",
+    "src/pages_maintain_project/third-party-appraisal.vue",
+    "src/pages_maintain_project/object-detail.vue"
+   ],
+   "baseline": "fc30f049",
+   "sessionIds": [
+    "a7cba4e4-2167-4cdd-892e-7afdbc7b24c6",
+    "41bbe8da-aee3-450c-a9c6-47cbe8ec62b7"
+   ],
+   "bundle": "025.md"
+  },
+  {
+   "title": "维修资金金额字段按概算/决算后缀区分，用 scope 参数选字段",
+   "type": "pattern",
+   "content": "后端 ShareScopeVo 同一指标有成套的 Y(预算)/G(概算)/J(决算) 后缀字段：principalAmountY/G/J、maintenanceAmountY/G/J、interestAmountY/G/J、shareAmountY/G/J、raiseAmountY/G/J 等。页面不要硬编码某一套后缀，而应由入口页通过 scope 参数声明场景：apply-detail.vue（申请详情）传 scope=estimated 取 G 系列，object-detail.vue（对象/备案后详情）传 scope=final 取 J 系列，budget-apportion.vue 依据 scope 选择字段。新增同类金额页时沿用该 scope 约定，便于后续扩到 Y(预算) 场景。",
+   "evidence": "会话 41bbe8da：接口 selectMyShareScopeDetail 响应含 interestAmountG/J/Y、maintenanceAmountG/J/Y、principalAmountG/J 等字段；结论中 apply-detail.vue 跳转加 scope=estimated、object-detail.vue 加 scope=final，budget-apportion.vue 按 scope 选 shareAmountG/维护费G/raiseAmountG 或对应 J 字段。",
+   "files": [
+    "src/pages_maintain_project/budget-apportion.vue",
+    "src/pages_maintain_project/apply-detail.vue",
+    "src/pages_maintain_project/object-detail.vue"
+   ],
+   "baseline": "fc30f049",
+   "sessionIds": [
+    "41bbe8da-aee3-450c-a9c6-47cbe8ec62b7"
+   ],
+   "bundle": "025.md"
+  },
+  {
+   "title": "字典字段统一走 dictLabel 转换，字典编码用常量提取",
+   "type": "pattern",
+   "content": "后端返回的字典类字段（类型、结论、状态等）不在页面里写死映射，而是：在 store 里把字典编码提成常量（如 MF_PUBLICITY_TYPE = 't_mf_publicityType'、MF_PUBLICITY_CONCLUSION = 't_mf_publicityConclusion'），在 fetchXxx 中用 Promise.all 并行拉取所需字典，再在 mapXxx 映射函数里用 dictLabel 做值→文案转换，且「无匹配时回退原值」防止空显示。新接字典时按此三件套（常量 + 并行拉取 + dictLabel 回退）实现。",
+   "evidence": "会话 1dedcb9e：用户给出「公示类型字典 t_mf_publicityType、公示结论字典 t_mf_publicityConclusion」；结论在 maintainProject.js 新增两个字典常量，fetchPublicityDetail 用 Promise.all 并行拉取，mapPublicityDetail 用 dictLabel 转文案、无匹配回退原值。",
+   "files": [
+    "src/pages_maintain_project/maintainProject.js",
+    "src/pages_maintain_project/publicity-detail.vue"
+   ],
+   "baseline": "fc30f049",
+   "sessionIds": [
+    "1dedcb9e-9461-47e6-ad26-b08c91aca59f"
+   ],
+   "bundle": "025.md"
+  },
+  {
+   "title": "列表页统一用 z-paging + store 列表字段双向绑定，mock 接口写在 store",
+   "type": "pattern",
+   "content": "列表页实现范式：页面用 z-paging 组件并以 v-model 直接绑定 store 中的列表字段（如 v-model=\"maintainProjectStore.applyList\" / projectList），分页数据由 store 暴露的分页接口方法提供，签名统一为 fetchXxxPage(pageNum, pageSize, accountId) 形式，mock 实现内统一分页切分与延时逻辑；跨页上下文（如当前选中的账户）通过 store 的 selectedAccount + setSelectedAccount(item) 传递，同时页面路由也带上 accountId 作为过滤条件。新列表页按此结构复用即可，不要各页各写一套分页逻辑。",
+   "evidence": "会话 3248cc3b：要求「使用 z-paging，mock 接口，在 maintainProject.js store 中处理业务逻辑」；结论新增 fetchApplyPage/fetchProjectPage(pageNum, pageSize, accountId)、新增 selectedAccount 与 setSelectedAccount，页面用 z-paging + v-model 绑 store 列表，index.vue 跳转带 accountId 并 setSelectedAccount，且「统一了分页/延时 mock 逻辑」。",
+   "files": [
+    "src/pages_maintain_project/apply.vue",
+    "src/pages_maintain_project/project.vue",
+    "src/pages_maintain_project/maintainProject.js",
+    "src/pages_maintain_project/index.vue",
+    "src/pages.json"
+   ],
+   "baseline": "3f2bc40c",
+   "sessionIds": [
+    "3248cc3b-b003-4b89-a084-3b8ffc0182ee"
+   ],
+   "bundle": "025.md"
+  },
+  {
+   "title": "新增页面需在 pages.json 注册并同步修改入口页跳转地址",
+   "type": "workflow",
+   "content": "新增页面的完整交付清单是三步齐做：实现页面 vue → 在 src/pages.json 注册页面路径并设置中文标题（如 pages_maintain_project/apply 标题「维修申请」、project 标题「维修项目」）→ 修改入口页（如 index.vue 的 goApply/goProject）的跳转地址指向新页面并带必要参数。只做页面文件不注册、不改入口跳转，功能等于不可达，属于易遗漏项。",
+   "evidence": "会话 3248cc3b：用户明确要求「注册页面 @src/pages.json 修改 @src/pages_maintain_project/index.vue 跳转地址」，结论中同步修改了 pages.json 注册两项与 index.vue 的 goApply/goProject 跳转（带 accountId）。",
+   "files": [
+    "src/pages.json",
+    "src/pages_maintain_project/index.vue"
+   ],
+   "baseline": "3f2bc40c",
+   "sessionIds": [
+    "3248cc3b-b003-4b89-a084-3b8ffc0182ee"
+   ],
+   "bundle": "025.md"
+  },
+  {
+   "title": "步骤区展示条件：已选业务对象即展示，而非等点「下一步」",
+   "type": "bug",
+   "content": "填报页（巡检记录添加）的步骤区域原先用 currentStep === 2 控制显示，导致用户选完程序并确认后步骤列表仍然不出现，必须再点一次「下一步」才可见，与预期交互不符。根因是把「展示条件」错误地绑到了流程步进的数值上，而实际语义应是「是否已选好程序」。修复方式：条件改为 selectedProcedure && currentStep <= 2 && !showStepFormPopup，即已选程序且仍处于步骤阶段、且未被第二步表单弹窗遮挡时展示；这样 fetchProcedureRules 加载完步骤数据后列表立刻显示在程序选择行下方，且「上一步」返回时只要已选程序步骤列表保持可见，步骤增删改与底部两次「下一步」流程均不受影响。可复用结论：这类「选了某对象后要立刻出现后续区块」的场景，展示条件应依赖业务选中状态，不要依赖流程步骤序号。",
+   "evidence": "会话 92e645bc：用户诉求「选择完程序后 步骤在下面展示 当前需要点击下一步才显示」→「选择程序后立即展示步骤」；结论将 src/staff/pages_facility/record/add.vue 第 35 行 v-if 从 currentStep === 2 改为 selectedProcedure && currentStep <= 2 && !showStepFormPopup。",
+   "files": [
+    "src/staff/pages_facility/record/add.vue"
+   ],
+   "baseline": "51efcc54",
+   "sessionIds": [
+    "92e645bc-5c01-4128-9f3c-775bd946395b"
+   ],
+   "bundle": "025.md"
+  },
+  {
+   "title": "小程序列表/卡片右箭头用 svg 图片而非字符「>」，复用同目录 static 资源",
+   "type": "bug",
+   "content": "在 uni-app 小程序的卡片箭头里用字符 > 渲染箭头不可靠（字符形态、垂直居中、与设计图不一致）。项目约定：箭头改用 <image class=\"arrow\" :src=\"rightArrow\" mode=\"aspectFit\" />，通过 import rightArrow from '@/pages_maintain_project/static/right.svg' 引入模块 static 目录下的 svg，并配 width/height 24rpx、display: block，同时删掉原先给字符用的 color、font-size 样式；尺寸偏大偏小时只改 .arrow 的 width/height。写法应参照同模块 index.vue 既有静态图标写法，保持模块内风格统一。",
+   "evidence": "会话 086c7a8f：用户诉求「@project.vue @apply.vue @static/right.svg 右箭头使用图片」；结论把 <view class=\"arrow\">&gt;</view> 换成 image + import rightArrow、去掉 color/font-size 并设 24rpx 与 display:block，且说明「已按 index.vue 里静态图标的写法改好」。",
+   "files": [
+    "src/pages_maintain_project/project.vue",
+    "src/pages_maintain_project/apply.vue",
+    "src/pages_maintain_project/static/right.svg",
+    "src/pages_maintain_project/index.vue"
+   ],
+   "baseline": "3f2bc40c",
+   "sessionIds": [
+    "086c7a8f-1b27-4bc1-9fb2-eaed0a62df1e"
+   ],
+   "bundle": "025.md"
+  },
+  {
+   "title": "标签样式复用 tag-parallelogram 约定：伪元素画倾斜底、文字不倾斜",
+   "type": "pattern",
+   "content": "项目的「平行四边形状彩色标签」有既定的实现约定：用 ::after 伪元素绘制背景（可自由指定背景色），skew(-15deg) 制造倾斜 + border-radius: 4px 做圆角，文字放在伪元素之上以保持水平不倾斜，文字颜色按底色选白色等对比色。新增长期存在的状态标签（如质保期标签）时应沿用 tag-parallelogram 这一既有类与思路，而不是新造一套标签样式；同时该类标签样式集中维护在 src/styles/tag.scss，页面内不要重复定义。",
+   "evidence": "会话 7575c02e：用户「#D4AC0D 用这个颜色，背景形状是有圆角的平行四边形」→ 结论「与项目中 tag-parallelogram 的实现方式一致」：::after 绘制背景、skew(-15deg) + border-radius: 4px、文字白色且保持水平不倾斜；涉及 src/styles/tag.scss。",
+   "files": [
+    "src/styles/tag.scss",
+    "src/pages_facility/maintain-detail.vue"
+   ],
+   "baseline": "05fd6b3c",
+   "sessionIds": [
+    "7575c02e-8d8f-47aa-ba53-4c5056fdd26a"
+   ],
+   "bundle": "025.md"
+  },
+  {
+   "title": "扫码进小程序：必须从 options.q 解析完整 URL，并兼容 id/decisionId 多种参数名",
+   "type": "bug",
+   "content": "【坑/根因】微信扫「普通链接二维码」打开小程序时，微信把完整链接放在 options.q 里（例如 https://txzhwy.cn/decision?id=2084187356435521536），解析出来是 query.id。但详情页原先只读 query.decisionId，导致 decisionId 为 undefined，请求打到 /decision/undefined 并返回 500/400。\n【套路】所有详情页参数读取都要做多来源兼容：options.id、query.id、query.decisionId，且必须先解析 options.q 中的完整 URL 再取参数；拿不到 id 时直接 toast 提示并 return，不要发请求。\n【约定】同类页面（decision/detail.vue、elect/detail.vue、optional/DecisionResult.vue）应保持一致的参数解析写法，新页面照抄同一套逻辑。",
+   "evidence": "会话 a60f6a66：报错 https://txzhwy.cn/api/v2.0/autonomy/decision/undefined（code 500）；最终结论明确指出“扫普通链接二维码时，微信会把完整 URL 放在 options.q 里…详情页原来只取了 query.decisionId…与 elect/detail.vue、optional/DecisionResult.vue 一致，兼容 options.id、query.id、query.decisionId，并在没有 id 时提示、不再发请求”。",
+   "files": [
+    "src/pages_owner/decision/detail.vue",
+    "src/utils/index.js",
+    "src/pages.json"
+   ],
+   "baseline": "40e2b0ad",
+   "sessionIds": [
+    "a60f6a66-186c-48b6-9f7b-49ef0f967601"
+   ],
+   "bundle": "026.md"
+  },
+  {
+   "title": "条件编译导入的常量在其他端会 ReferenceError，须用 typeof 兜底",
+   "type": "bug",
+   "content": "【坑/根因】ZsImage.vue 里 IMAGE_BASE 只在 `#ifdef MP-WEIXIN` 块内 import，但组件在其他端（如 H5）仍会执行 `let base = IMAGE_BASE`，运行时抛 Uncaught (in promise) ReferenceError: IMAGE_BASE is not defined。\n【套路】凡是被条件编译引入的常量/变量，在业务代码里使用时统一写成 `const base = typeof IMAGE_BASE !== 'undefined' ? IMAGE_BASE : ''`，保证微信小程序端照常用到 IMAGE_BASE、非小程序端回退为空串。\n【约定】新增跨端常量（如 BASE / IMAGE_BASE）时，引用点一律加 typeof 判空，不要直接裸引用条件编译变量。",
+   "evidence": "会话 b909b7c3：报错栈指向 ZsImage.vue:28 setup 处的 IMAGE_BASE is not defined；最终结论说明“根因是条件编译导致变量未定义…把 let base = IMAGE_BASE 改为 const base = typeof IMAGE_BASE !== 'undefined' ? IMAGE_BASE : ''”。",
+   "files": [
+    "src/components/ZsImage/ZsImage.vue",
+    "src/env/mp.js"
+   ],
+   "baseline": "3f2bc40c",
+   "sessionIds": [
+    "b909b7c3-6c81-4e91-a2a1-7af56e7c6fa6"
+   ],
+   "bundle": "026.md"
+  },
+  {
+   "title": "页面业务数据走“页面目录下的聚合 js（接口+映射+store）”模式",
+   "type": "pattern",
+   "content": "【架构模式】在泰兴小程序中，复杂业务页不把接口调用散在 vue 文件里，而是放在同目录的聚合 js 中（如 src/pages_maintain_project/maintainProject.js）：\n1) 接口封装函数（如 selectDecisionDetail(params)、selectMainFinalDetail(params)）；\n2) 响应字段映射函数（如 mapMainFinalDetail，把后端字段名转成页面字段：maintenanceEndDate -> completionDate、actualCompletionDate -> acceptanceDate、finalOpinion -> acceptanceOpinion）；\n3) store action（如 fetchDecisionDetail(applyNo)、fetchCompletionAcceptance(projectNo)），返回值同时给出所需字段并保留 raw 原始数据。\n【收益】页面只负责取参数、调 action、跳转，字段适配集中在映射函数里，接口字段变更时只改一处。新页面接入后端接口时应沿用该结构。",
+   "evidence": "会话 2556aaf2：在 maintainProject.js 新增 selectDecisionDetail 与 fetchDecisionDetail(applyNo)，返回 decisionId/decisionType 并保留 raw。会话 62839b0c：在 maintainProject.js 新增 selectMainFinalDetail + mapMainFinalDetail 做字段映射，fetchCompletionAcceptance 改为请求真实接口不再用模拟数据。",
+   "files": [
+    "src/pages_maintain_project/maintainProject.js",
+    "src/pages_maintain_project/object-detail.vue",
+    "src/pages_maintain_project/completion-acceptance.vue"
+   ],
+   "baseline": "fc30f049",
+   "sessionIds": [
+    "2556aaf2-f445-49f4-aeff-5894b26d8360",
+    "62839b0c-f706-49b1-ae5b-1955875a4021"
+   ],
+   "bundle": "026.md"
+  },
+  {
+   "title": "后端字段名/参数名变更在 api 层做适配，页面调用代码不动",
+   "type": "workflow",
+   "content": "【套路】后端接口字段或参数改名时，不在各页面逐个改，而是在 src/api/*.js 的接口封装里做一次性转换，保持页面侧调用签名不变。\n实例：/v2.0/autonomy/decisionResponse 要求 optionList 里的排序字段 sort 改为 optionSort，处理方式是在 autonomy.js 的 decisionResponse 方法中对 optionList 遍历，存在 sort 就改名为 optionSort 后提交，其余字段原样保留。\n【收益】所有复用该接口的页面（decision/form.vue、elect/form.vue 等）自动满足新要求，避免漏改。",
+   "evidence": "会话 ad3300af：用户要求“接口：/v2.0/autonomy/decisionResponse，传参：optionList数组中，排序字段sort 改为 optionSort”；结论说明仅针对该请求做参数转换，页面侧调用代码无需改动。",
+   "files": [
+    "src/api/autonomy.js",
+    "src/pages_owner/decision/form.vue",
+    "src/pages_owner/elect/form.vue"
+   ],
+   "baseline": "d9bc51de",
+   "sessionIds": [
+    "ad3300af-a3f7-415d-9f29-a396ff4abd2d"
+   ],
+   "bundle": "026.md"
+  },
+  {
+   "title": "详情页路由参数以业务编号（applyNo/projectNo）为唯一入参",
+   "type": "pattern",
+   "content": "【项目约定】维修养护类详情页统一用业务编号作为路由参数传递，不再传 projectId + objectId 这类组合内部 ID，页面内再靠 store action 用编号换详情。\n实例：竣工验收页路由从 /pages_maintain_project/completion-acceptance?projectId=..&objectId=.. 改为 ?projectNo=...；页面读取 projectNo 并兼容旧参数 projectId；表决详情跳转则用 applyNo 调 fetchDecisionDetail 换 decisionId/decisionType，再跳 /pages_owner/decision/detail?id=..&type=..。\n【警示】缺少必要参数或接口无有效数据时，要先 toast 提示并中止跳转/请求，不要带着 undefined 继续发请求。",
+   "evidence": "会话 62839b0c：object-detail.vue 的竣工验收跳转“从原来的 projectId + objectId 改为只传 projectNo”，completion-acceptance.vue 读取 projectNo 且兼容旧 projectId。会话 2556aaf2：onVoting 先取 applyNo 调 fetchDecisionDetail 再跳转，“若缺少参数或接口未返回有效数据，会给出 toast 提示”。",
+   "files": [
+    "src/pages_maintain_project/object-detail.vue",
+    "src/pages_maintain_project/completion-acceptance.vue",
+    "src/pages_owner/decision/detail.vue"
+   ],
+   "baseline": "fc30f049",
+   "sessionIds": [
+    "62839b0c-f706-49b1-ae5b-1955875a4021",
+    "2556aaf2-f445-49f4-aeff-5894b26d8360"
+   ],
+   "bundle": "026.md"
+  },
+  {
+   "title": "文档配图偏好：优先 draw.io 可导入 XML，且指定一页竖版 A4",
+   "type": "preference",
+   "content": "【用户偏好】需要把项目文档（如 对接方式.md）转成图示时，用户要的不是 PNG 图片，而是可以直接导入 draw.io 网页版的文本（.drawio XML），并且明确要求布局为“一页竖版 A4”。\n具体参数：mxGraphModel 设 pageWidth=\"827\" pageHeight=\"1169\"，节点用 ellipse/rhombus/rounded=1 区分“标题/判断/方案”三类，配固定 fillColor+strokeColor 配色，导入路径为 File → Import From → Device。交付时直接给出完整 XML 代码块并说明导入步骤。",
+   "evidence": "会话 73fe6b15：用户依次提出“根据这个生成一个图片”→“给我一个可以导入draw.io的文本”→“draw.io 是网页版,需要一页竖版 A4”；结论给出 pageWidth/Height 827×1169 的 .drawio XML 与导入步骤。",
+   "files": [
+    "对接方式.md"
+   ],
+   "baseline": "fa956db4",
+   "sessionIds": [
+    "73fe6b15-ee6f-4611-98fb-2d9b08033574"
+   ],
+   "bundle": "026.md"
+  },
+  {
+   "title": "维修项目模块采用「接口层内聚到模块 JS」的约定",
+   "type": "pattern",
+   "content": "泰兴小程序 src/pages_maintain_project 下各页面（apply.vue、budget-apportion.vue 等）不在页面里直接写 uni.request，而是把接口定义 + 数据映射内聚到模块文件 src/pages_maintain_project/maintainProject.js：1) 每个后端接口一个同名方法（如 selectMaintenanceApplyPage、selectMyShareScopeDetail），方法内写死完整路径（/v2.0/maintenance/miniapp/owner/...）；2) 每个接口配一个 mapXxx 映射方法，把后端 VO 字段翻译成页面已在用的字段名（如 id←maintenanceApplyNo，projectName←maintenanceName，totalApportion←shareAmountY），使页面无需改动即可从 mock 切到真实接口；3) 页面通过 fetchXxx 函数（如 fetchApplyPage、fetchBudgetApportion）消费，保留旧函数签名以便平滑替换 mock。新增维修项目相关接口时应沿此模式追加到 maintainProject.js，而非改页面。",
+   "evidence": "会话 0648373b 用户诉求后，结论明确写「已完成对接，并把接口定义内聚到 src/pages_maintain_project/maintainProject.js」，新增 selectMaintenanceApplyPage + mapHouseMaintenanceApplyToListItem，并保留字段兼容（id→maintenanceApplyNo、projectName←maintenanceName、objectType←sortName、objectName←facilityName）。会话 a965f79b 同样是「已内聚到 maintainProject.js，budget-apportion.vue 无需改动即可使用新接口」，新增 selectMyShareScopeDetail + mapShareScopeDetail，fetchBudgetApportion 用 applyNo 调用并输出兼容字段（totalApportion←shareAmountY、specialAccountPayment←maintenanceAmountY、selfRaised←raiseAmountY）。",
+   "files": [
+    "src/pages_maintain_project/maintainProject.js",
+    "src/pages_maintain_project/apply.vue",
+    "src/pages_maintain_project/budget-apportion.vue"
+   ],
+   "baseline": "fc30f049",
+   "sessionIds": [
+    "0648373b-18e7-48ac-97ba-2fa202d4292d",
+    "a965f79b-60a9-45bd-875d-b67c48fb0a15"
+   ],
+   "bundle": "027.md"
+  },
+  {
+   "title": "维修资金相关字段区分概算/预算/决算三套口径（G/Y/J 后缀）",
+   "type": "fact",
+   "content": "后端维修项目接口的金额字段成组出现，后缀含义固定：G=概算、Y=预算、J=决算。示例：amountG/amountY/amountJ（维修费合计）、interestAmountG/Y/J（分摊利息）、maintenanceAmountG/Y/J（维修资金使用金额）、principalAmountG/Y/J（分摊本金）。前端页面当前默认展示预算（Y）口径：分摊页面 totalApportion←shareAmountY、specialAccountPayment←maintenanceAmountY、selfRaised←raiseAmountY。对接新接口时不要只取单个字段，应把整套 G/Y/J 都透传到页面数据，便于后续按口径切换展示，避免二次改接口层。审批状态同类枚举：approveState 0=待审核、1=审核中、2=已完成(已备案)。",
+   "evidence": "会话 a965f79b 中 ShareScopeVo 响应参数含 interestAmountG/J/Y、maintenanceAmountG/J/Y、principalAmountG/J/Y；结论说明「返回兼容字段 totalApportion←shareAmountY、specialAccountPayment←maintenanceAmountY、selfRaised←raiseAmountY，同时保留了接口原始多套字段（G/Y/J）以便后续页面扩展」。会话 0648373b 中 amountG（概算维修费合计）/amountY（预算）/amountJ（决算）、approveState 枚举亦同。",
+   "files": [
+    "src/pages_maintain_project/maintainProject.js",
+    "src/pages_maintain_project/budget-apportion.vue"
+   ],
+   "baseline": "fc30f049",
+   "sessionIds": [
+    "a965f79b-60a9-45bd-875d-b67c48fb0a15",
+    "0648373b-18e7-48ac-97ba-2fa202d4292d"
+   ],
+   "bundle": "027.md"
+  },
+  {
+   "title": "小程序打开后端附件：IMAGE_BASE 拼前缀 + downloadFile→openDocument",
+   "type": "workflow",
+   "content": "微信小程序无法用 window.open / a 标签打开后端文件，需统一走「下载临时文件再打开」：1) 从 @/env/mp 引入 IMAGE_BASE；2) URL 归一化——若已是 http/https 直接用原地址，否则拼接 `${IMAGE_BASE}${item.url}`；3) 先 uni.downloadFile 拿到 tempFilePath，再 uni.openDocument 打开；4) 下载失败与打开失败都要分别给 toast 提示，不要静默吞掉。适用于验收资料、第三方鉴定报告、维保步骤附件等所有列表里的附件预览。",
+   "evidence": "会话 85114be3 用户明确要求「使用 uni.openDocument，文件地址拼接 IMAGE_BASE」，结论实现为：引入 IMAGE_BASE、onOpenFile 改用 uni.openDocument、http/https 原样否则拼 `${IMAGE_BASE}${item.url}`、downloadFile 后 openDocument、增加下载失败/打开失败 toast。",
+   "files": [
+    "src/pages_maintain_project/third-party-appraisal.vue",
+    "src/env/mp.js"
+   ],
+   "baseline": "fc30f049",
+   "sessionIds": [
+    "85114be3-520e-4346-8bb8-f3e2c06fb899"
+   ],
+   "bundle": "027.md"
+  },
+  {
+   "title": "后端字段定型后应删除前端兼容映射，只保留单一字段",
+   "type": "pattern",
+   "content": "该项目的前端曾为保持页面稳定而写多字段兜底（lastMaintainDate → lastMaintenanceDate → previousMaintenanceDate、yearDetectDate → dateOfAnnualInspection；附件列表由多字段合并 + splitPhotos 字符串解析）。一旦用户/后端确认最终字段名，应一次清理掉全部旧字段兼容与字符串解析逻辑，直接读单一权威字段，并同步改中文标签，不要保留「双轨」兼容代码。",
+   "evidence": "会话 aa699074：用户给出后端 @ApiModelProperty nextMaintenanceDate / dateOfNextAnnualInspection 要求「修改标签和字段」，结论明确「同时移除了旧字段的兼容映射（lastMaintenanceDate、previousMaintenanceDate、dateOfAnnualInspection 等），现在只使用后端提供的这两个字段」。会话 85ed5b32：用户要求用 processPictureList 字段，结论「去掉了原先对多个字段的兼容逻辑和 splitPhotos 解析」，imageList 直接 computed 读取该字段并 filter(Boolean)。",
+   "files": [
+    "src/pages_facility/detail.vue",
+    "src/pages_facility/maintain-detail.vue"
+   ],
+   "baseline": "05fd6b3c",
+   "sessionIds": [
+    "aa699074-0d98-4877-95fc-e374de956a05",
+    "85ed5b32-8860-4663-89e8-42cd36950085"
+   ],
+   "bundle": "027.md"
+  }
+ ]
+}

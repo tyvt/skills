@@ -1,0 +1,160 @@
+{
+ "project": "产品2.0",
+ "batch": 16,
+ "files": [
+  "061.md",
+  "062.md",
+  "063.md",
+  "064.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "baseline": "8d416b2",
+   "content": "什么情况：金额输入框粘贴「1,111,111」时只能进 4~5 位，变成 1111，后几位凭空丢失。为什么：输入框带 maxlength（或其它字符数限制）时，浏览器先把剪贴板原文（含千分位逗号）按字符数截断，之后指令里的 setTimeout 才去读 input.value 去逗号——逗号在截断时已经占用了 maxlength 配额，被删掉后得到的就是被双重损耗的值。怎么做：粘贴处理必须放弃浏览器默认插入，改为 paste 事件里 e.preventDefault()，用 e.clipboardData.getData('text') 取原文，先用 stripMoneyGrouping 正则（/[,，\\s\\u00A0\\u202F]/g，覆盖英文/中文逗号与含不间断空格的各类空白）去掉分组符，再按当前选区拼进已有值，最后对整段再统一去一次分组符；重写 value 前先算好 prefixCleanLen，用 requestAnimationFrame 恢复光标位置避免错位。核心结论：凡是「先插入、后异步清洗」的输入处理都会被 maxlength 抢先截断，清洗必须前移到 preventDefault 之后的同步阶段。",
+   "evidence": "会话 9c57feb1：money.js 的 onpaste 改为 preventDefault + clipboardData 取原文 + stripMoneyGrouping 先清洗再拼值，修复「1,111,111 被卡成 1111」",
+   "files": [
+    "src/directives/formatter/money.js"
+   ],
+   "sessionIds": [
+    "9c57feb1-7d80-4322-82da-ffd6c882352d"
+   ],
+   "title": "money 指令粘贴被 maxlength 截断：必须 preventDefault 先去千分位再写入",
+   "type": "bug",
+   "bundle": "061.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "bc9b2a3",
+   "content": "什么情况：查看态用 DetailTemplate 时想让「发布范围」和「查阅人次」并排一行，配 layout 16+8 却各占一行/错行。为什么：DetailTemplate 的 layout 不是原样透传的栅格 span——查看态会把 layout 值做归一化映射：16 被映射为整行 24，8 被映射为 12；而编辑态的 el-col 是原生 span 直接生效（16+8 本身正确）。两套语义不一致，按编辑态直觉配查看态 layout 必然错行。怎么做：在 DetailTemplate 只读态配置 layout 时必须按「映射后的值合计 24」来推：两个半宽字段各配 12（或按映射规则换算），而不是照抄编辑态 el-col 的 16+8；改这类布局前先确认当前是编辑态 el-col 链路还是查看态 layout 映射链路，两态要分别核算。这与「DetailTemplate column prop 无效、只能逐项配 layout」是互补的更深一层：layout 值本身还经过归一化映射。",
+   "evidence": "会话 49aa0c4f：「查看模式使用 DetailTemplate 时 layout 中 16 会被映射为整行（24）」，将发布范围 layout 从 16 改 12、与查阅人次 8（映射为 12）合计 24 后并排",
+   "files": [
+    "src/views/property/dailyService/detail.vue",
+    "src/components/DetailTemplate"
+   ],
+   "sessionIds": [
+    "49aa0c4f-506a-4246-af2e-a77dde771e08"
+   ],
+   "title": "DetailTemplate 查看/编辑两态 layout 语义不同：查看态 16 映射整行、8 映射半宽",
+   "type": "pattern",
+   "bundle": "061.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "018ae18",
+   "content": "什么情况：物业费账单导入的「下载错误报告」接口 property/spFeeBill/import/errorReport/{id} 是 GET，但页面用 this.download() 调用后下载必然失败。为什么：项目里挂到 Vue.prototype 的 this.download 内部固定用 POST 发请求拿 blob，接口方法不对时后端不返回文件流，前端表现为下载无反应/报错，容易误判成权限或网关问题。怎么做：在 src/api/index.js 新增 downloadGet 方法（GET 请求 + blob 响应），main.js 挂载 Vue.prototype.downloadGet，页面里 GET 下载一律改用 this.downloadGet。以后接入下载类接口先确认 HTTP 方法，POST 用 download、GET 用 downloadGet，不要默认 download 全兼容。",
+   "evidence": "会话 e7bc06b9：错误报告接口是 GET 但 this.download() 走 POST 导致下载失败；新增 api/index.js downloadGet + main.js 挂载，import.vue/importUploadDialog.vue 改用 downloadGet",
+   "files": [
+    "zhi2-web-admin/src/api/index.js",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/import.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/importUploadDialog.vue"
+   ],
+   "sessionIds": [
+    "e7bc06b9-bcea-4473-b16e-d02f4f8e8045"
+   ],
+   "title": "[产品2.0] this.download 固定走 POST：GET 下载接口必须用 downloadGet",
+   "type": "pattern",
+   "bundle": "062.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "dfe69d6",
+   "content": "什么情况：把 env/.env 的 VITE_APP_BASE_API 改成带前导斜杠（/api/v2.0）后本地代理看似能用，但用户明确要求生产环境接口必须是相对路径 api/v2.0（无前导 /，相对当前页面路径解析，符合 Nginx 部署需求）。为什么：Vite 的 server.proxy 匹配 key 要求以 / 开头，直接用 api/v2.0 匹配不到任何请求；而生产又不能带前导斜杠，两者对同一个环境变量的要求冲突。怎么做：env/.env 保持相对路径 api/v2.0 不动，只在 vite.config.js 里对开发代理单独规范化：`const proxyApiPath = env.VITE_APP_BASE_API?.startsWith(\"/\") ? env.VITE_APP_BASE_API : `/${env.VITE_APP_BASE_API}``，用规范化后的值做 proxy key。开发代理与生产 base 路径语义解耦，验证时看响应头 frontend-proxy 确认代理生效。",
+   "evidence": "会话 dace033e：用户要求生产环境接口为相对路径；vite.config.js 对 VITE_APP_BASE_API 补前导 / 做 proxy key，env/.env 恢复 api/v2.0",
+   "files": [
+    "env/.env",
+    "zhi2-web-admin/vite.config.js"
+   ],
+   "sessionIds": [
+    "dace033e-ae46-49f1-97d8-9ea78169740f"
+   ],
+   "title": "[产品2.0] 生产保持相对路径 api/v2.0，Vite 代理 key 单独补前导斜杠",
+   "type": "pattern",
+   "bundle": "062.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "49a7aa3",
+   "content": "什么情况：标准账套详情页的财务科目表格接的是 treeList 树形接口，返回 data 树但没有 total 字段，代码里 `this.total = response.total || 0` 把总数写成 0，表格底部「共 XX 条记录」整块消失、分页区下间距也没了。为什么：zs-pagination 用 v-show=\"total > 0\" 控制显隐，total 为 0 时整个底部（含统计文案和间距）被隐藏，看起来像「缺了共 XX 条记录」而不是数据问题。怎么做：接口未返回 total 时不要写 0，用递归统计树形节点数兜底：`this.total = response.total ?? this.countTreeNodes(this.list)`（countTreeNodes 递归累加 children）。以后树形数据接 zs-pagination 时都要处理「无 total」这一形态，否则统计条会被静默隐藏。",
+   "evidence": "会话 ef0140d8：treeList 无 total，`response.total || 0` 置 0 后 zs-pagination v-show=\"total>0\" 隐藏整块；修复为 response.total ?? countTreeNodes(list)",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubStandardAccountSet/components/financialSubjectsTable.vue",
+    "zhi2-web-admin/src/components/zs-pagination/zs-pagination.vue"
+   ],
+   "sessionIds": [
+    "ef0140d8-d676-4240-a00f-31f065725288"
+   ],
+   "title": "[产品2.0] 树形接口无 total 时 zs-pagination「共 XX 条」整块被隐藏，需递归计数兜底",
+   "type": "bug",
+   "bundle": "062.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "62d5fb9",
+   "content": "什么情况：页面网络面板里出现请求 POST /system/dictData/listByType { dictType: 'build_type' }，但全项目代码搜不到 'build_type' 字符串，表格字典列显示原始码值（如 1）。为什么：zs-table-column 在 type=\"dict\" 且未指定字典时，会把 prop 从驼峰自动转下划线（underline 方法：replace(/[A-Z]/g, '_$&小写')），prop=\"buildType\" 就推导出字典键 build_type 并发请求；后端没配这个字典时 options 为空，getDictLabel 直接显示原始值。另一个叠加根因：模板里写的 <zs-table-column dict-url=\"building_type\">（kebab-case）组件并不读取，静默回退到自动推导；项目里正确字典名是 building_type（见 building/detail.vue 用 getDicts('building_type')）。怎么做：排查特征是「网络面板的字典名在代码里搜不到 = prop 自动推导」；字典列必须用驼峰显式传 dictUrl（或让组件同时兼容 dictUrl 与 dict-url 两种写法，参照组件内 min-width/minWidth 的处理）；字典选项数据存后端 sys_dict_type/sys_dict_data，前端不会写死，显示原始码还要核对后端字典里是否有对应 dictValue 条目。",
+   "evidence": "zs-table-column.vue 的 underline() 方法将 buildType 推导为 build_type 并发 listByType 请求；BuildRecordTable.vue 写的 dict-url=\"building_type\" 未被读取，更新组件兼容 dictUrl/dict-url 两种写法后修复",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/views/commercialHousingSales/priceFiling/recordPriceMngSuzhou/components/BuildRecordTable.vue",
+    "zhi2-web-admin/src/utils/dict.js"
+   ],
+   "sessionIds": [
+    "ee495a83-a53a-4f2d-b96d-432bae5f93c9"
+   ],
+   "title": "zs-table-column 的 dict-url kebab 写法不被读取，且 prop 驼峰自动转下划线推导字典名",
+   "type": "bug",
+   "bundle": "063.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "b2ce3e2 / c420af5",
+   "content": "什么情况：前端部署在网关的 /sz/ 子路径下（如 https://…/sz），接口 base、version.json 版本校验地址若写死根路径前缀就 404。为什么：写死 '/version.json' 或 VITE_APP_PUBLIC_PATH 这类前缀与部署子路径耦合，换环境就失效。怎么做：所有对后端/静态资产的地址走相对当前页面 URL 解析；version-check.js 的默认地址从 '/version.json' 改为相对 'version.json'。注意 vite.config.js 里 public/version.json 是构建时写文件的磁盘路径，不是浏览器请求 URL，不存在前缀问题，不要误改。部署硬约束：访问 https://…/sz（无尾斜杠）或 /sz#/login（sz 与 # 之间无 /）时，浏览器把最后一段当文件名，相对解析会落到站点根；Nginx 须把 /sz 301 到 /sz/，hash 路由地址保持 /sz/#/xxx 形态。",
+   "evidence": "version-check.js 默认地址改相对路径；用户确认 vite.config.js 的 public/version.json 是磁盘写路径不改；env/.env 不再依赖 VITE_APP_PUBLIC_PATH",
+   "files": [
+    "zhi2-web-admin/src/utils/version-check.js",
+    "zhi2-web-admin/vite.config.js",
+    "env/.env"
+   ],
+   "sessionIds": [
+    "faf38ec5-d67c-4895-9f88-bb8d0b738bfb"
+   ],
+   "title": "项目部署在 /sz/ 子路径：地址一律自适应相对路径，禁止写死前缀（含 version.json）",
+   "type": "pattern",
+   "bundle": "063.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "5a86102",
+   "content": "什么情况：后端返回的资源路径形如 /zhi2/...（开头带 /，相对站点根），前端部署在 /sz/ 子路径下时按 origin 拼接会丢掉 /sz 前缀导致 404。为什么：写死 origin + '/zhi2' 或依赖 VITE_APP_PUBLIC_PATH 都与部署子路径耦合。怎么做：在 resolveServerAssetUrl 里把后端路径去掉开头斜杠，用 new URL('zhi2/...', window.location.href) 按浏览器相对解析规则对齐当前页面地址：/sz/login 下解析为 /sz/zhi2/…，本地 dev 下解析为根路径 /zhi2/…，行为与旧 origin 拼接一致但自适应子路径。配套删掉 env/.env 里的 VITE_APP_PUBLIC_PATH 注释。边界：该方案要求页面 URL 以 / 结尾或 hash 前有 /，否则最后一段被当文件名；部署侧须保证 /sz 301 到 /sz/。",
+   "evidence": "resolveServerAssetUrl.js 用 new URL(相对路径, window.location.href) 实现按当前地址解析；多环境对照表验证 /sz/login、/sz/、localhost:5173/login 三种情形",
+   "files": [
+    "zhi2-web-admin/src/utils/resolveServerAssetUrl.js",
+    "zhi2-web-admin/src/views/login.vue",
+    "env/.env"
+   ],
+   "sessionIds": [
+    "9d79292e-940d-4d5f-b243-3a366235b459"
+   ],
+   "title": "后端相对资源路径（/zhi2/...）在子路径部署下的解析套路：new URL 相对 location.href",
+   "type": "pattern",
+   "bundle": "063.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "eab0458",
+   "content": "什么情况：产品2.0 后台通过 utils/portalApiRewrite.js 把旧 system/* 接口重写到门户 /portal/* 前缀，但部门管理页懒加载展开子部门时仍在请求旧接口 /system/dept/list?parentId=100，重写规则没命中。为什么：懒加载路径写成不带前导斜杠的 `system/dept/list`，而 portalApiRewrite 的映射表是按「以前导 / 开头的完整路径」做精确匹配的，缺斜杠直接漏匹配，且不报任何错误。怎么做：一是重写器内部在匹配前自动补全前导 `/`（normalize），让带不带斜杠都能命中；二是页面侧按约定统一拼 `/${moduleName}/${businessName}/${apiSuffix}` 生成路径。排查同类问题时：某接口「明明配了重写却没生效」先打印实际发出的 path 字符串，核对首字符是不是 `/`。",
+   "evidence": "会话 06d23df6：懒加载路径缺前导 / 导致 portalApiRewrite 无法匹配，修复点为 portalApiRewrite.js 匹配前补斜杠 + dept/index.vue load() 统一路径拼接",
+   "files": [
+    "zhi2-web-admin/src/utils/portalApiRewrite.js",
+    "zhi2-web-admin/src/views/system/dept/index.vue"
+   ],
+   "sessionIds": [
+    "06d23df6-d9e0-472b-bdcb-895195ece6ab"
+   ],
+   "title": "portalApiRewrite 接口重写依赖前导斜杠：懒加载路径缺 `/` 会静默漏匹配",
+   "type": "bug",
+   "bundle": "064.md",
+   "project": "产品2.0"
+  }
+ ]
+}

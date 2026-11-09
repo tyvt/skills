@@ -1,0 +1,74 @@
+{
+ "batch": 14,
+ "files": [
+  "079.md",
+  "080.md",
+  "081.md",
+  "082.md",
+  "083.md",
+  "084.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "[苏房] 变更管理列表「基本信息变更」按 organType 分派详情路由：开发/经纪/租赁三机构共用列表，硬编码开发企业路由会跳错",
+   "type": "bug",
+   "content": "场景：`src/views/company/companyChangeManage/index.vue` 是开发企业、经纪机构（jjjg）、租赁机构（zljg）三类机构共用的「机构变更管理」列表页。用户反馈经纪机构列表点「查看」跳到了开发企业的变更详情。\n\n根因：`navigateToChangeDetail` 里「基本信息变更」（busCode `jbxxbg`，以及文案兜底「基本信息」）被硬编码映射为单一目标 `company/companyManagement/change/detail`（开发企业的变更详情）。这个映射与机构类型无关，所以三类机构共用列表时，经纪/租赁的行也被送到开发企业详情页。\n\n做法：新增常量表 `BASIC_CHANGE_TARGET_BY_ORGAN_TYPE`，按列表行的 `organType` 分派基本信息变更详情：开发企业 → `company/companyManagement/change/detail`；经纪机构 → `company/companyRecordAgency/change/detail`（路由 `/jjjg/agencyRecordChange/:tableid`）；租赁机构 → `zljg/agencyRecordChange/detail`。`navigateToChangeDetail` 中仅对「基本信息变更」优先按 organType 解析，资质/从业人员/管理员等其余变更类型仍走原映射，避免回归。\n\n推广规则：凡是「多机构共用一份列表/内核页」的变更跳转，路由目标不能只按 busCode 查表，必须叠加 organType 维度；新增机构类型时要同步补这张常量表。改完跑 ESLint 验证。",
+   "evidence": "会话 01a1630d 用户诉求「经纪机构的变更管理，点查看跳到开发企业的变更详情了」；最终结论给出 `BASIC_CHANGE_TARGET_BY_ORGAN_TYPE` 与 `navigateToChangeDetail` 的按 organType 分派，并注明其他变更类型不受影响。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyChangeManage/index.vue"
+   ],
+   "baseline": "85a6308",
+   "sessionIds": [
+    "01a1630d-6f7a-70c5-a400-7645f4be3469"
+   ],
+   "bundle": "081.md"
+  },
+  {
+   "title": "[苏房] 选项目回填统一社会信用代码为空：接口字段是 uniformSocialCreditCode，旧映射只认 companyCreditCode/enterpriseCreditCode",
+   "type": "bug",
+   "content": "场景：预售/测绘变更（`src/views/presale/surveyChange/detail.vue`）在弹窗里选完项目后，「统一社会信用代码」不回填。\n\n根因：`/presale/surveyChange/selectProject` 返回该字段的键名是 `uniformSocialCreditCode`（与委托销售选项目的返回一致），而 `handleProjectSelect` 里只映射了 `companyCreditCode` 和 `enterpriseCreditCode` 两个候选，字段名对不上就被静默丢弃，表现为「选了项目但这个字段始终为空」，且不报错。\n\n做法：在模块常量文件 `surveyChangeConstants.js` 里新增 `resolveSurveyChangeCreditCode`，按多候选字段名兜底取值；再新增 `mapSurveyChangeProjectRow` 统一把接口行映射成表单字段；`detail.vue` 的 `handleProjectSelect` 改为调用这两个函数，不再在组件里逐字段手写赋值。\n\n推广规则：「选择项目 → 回填主体信息」这类跨接口回填，同一语义字段在不同接口里键名不一致是常态（本项目已出现 uniformSocialCreditCode / companyCreditCode / enterpriseCreditCode 三种）。不要在组件里逐个手写字段映射，一律收敛成一个 resolve + map 函数放在模块 constants 里，新增字段名只改这一处；排查「选完没回填」时第一件事是打印接口原始返回核对键名。",
+   "evidence": "会话 754ddf0b 用户诉求「测绘变更选择项目后社会信用代码未回填」；最终结论指出 `uniformSocialCreditCode` 未被映射，修复为 `resolveSurveyChangeCreditCode` + `mapSurveyChangeProjectRow`。",
+   "files": [
+    "zhi2-web-admin/src/views/presale/surveyChange/detail.vue",
+    "zhi2-web-admin/src/views/presale/surveyChange/surveyChangeConstants.js"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "754ddf0b-9295-4421-b9b9-93fc87b9b996"
+   ],
+   "bundle": "081.md"
+  },
+  {
+   "title": "[苏房] zs-table 多选列(type=selection)必须固定 55px 且不参与剩余宽度均分，否则无数据时被拉宽与序号列之间出现大空白",
+   "type": "bug",
+   "content": "场景：「限制审核列表」详情页里的「关联房屋详情」子表、以及 `limitAdd` / `limitCancel` 编辑态带勾选列的表格，勾选列与「序号」列之间出现一大块空白色块，用户反馈「宽度不对」。\n\n根因：`zs-table-column` 把多选列（`type=\"selection\"`）当成普通列参与剩余宽度均分。据已有的 zs-table 列宽算法，剩余空间会在非序号列之间均分；当表格行数少、右侧留白较多时，多选列被分到很宽，而复选框本身固定在单元格左侧，于是列内右侧留出大片空白。\n\n做法（`src/components/zs-table-column/zs-table-column.vue`）：\n1. 多选列宽度固定 55px，与 Element UI 默认值一致；\n2. 与序号列同样标记为「不参与剩余宽度均分」。\n\n附带提醒：同页另一处序号列写了 `width=\"60\"` 是会绕过组件固定列宽下限的旧写法，若觉得序号列偏宽，应改成与组件下限一致的 `80`，而不是继续在页面上写小宽度手调。",
+   "evidence": "会话 8983ad7d 用户诉求「宽度不对」（附截图）；最终结论明确原因为 `type=\"selection\"` 被当作普通可拉伸列均分，修复为固定 55px 且不参与均分，并提到 `width=\"60\"` 应改 `80`。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/detail.vue",
+    "zhi2-web-admin/src/views/building/houseLimit/limitAdd.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "8983ad7d-8f26-4431-a6d1-191eab39fdfc"
+   ],
+   "bundle": "081.md"
+  },
+  {
+   "title": "[苏房] Web 弹窗自定义居中样式禁止对 .el-dialog__wrapper 的 display 加 !important（会压过 v-show 的内联 display:none）",
+   "type": "bug",
+   "content": "情况：在页面（如 views/components/OrgTypeDialog.vue）用非 scoped 样式给弹窗做垂直居中，写了 `.el-dialog__wrapper { display: flex !important; margin-top: 0; }`，并给内层 .el-dialog 加 `transform: none !important`。项目里已有 zs-dialog 的统一居中，这类页面级规则属于重复实现。\n\n为什么：Element UI 2 关闭弹窗靠 `v-show` 在 wrapper 上写内联 `display: none`，`!important` 的权重压过内联样式，导致弹窗关闭后仍占位/遮罩残留、无法真正隐藏；`transform: none !important` 则会破坏打开/关闭过渡动画（Element 的动画依赖 transform），出现闪烁。zs-dialog 自身在样式注释里已明确「不要对 display 使用 !important」，页面级样式没有遵守这条约定。\n\n怎么做：① 页面不要再写 wrapper 居中，直接依赖 zs-dialog 的 `.el-dialog__wrapper.zs-dialog:not(.zs-select-dialog)` 规则；② 确实需要规避拖拽偏位时，只把 `:draggable=\"false\"` 关掉 v-dialogDrag，再针对内层 `.el-dialog.<custom-class>` 重置 top/position，不要碰 display；③ 若必须写 display: flex，去掉 `!important`；④ 传 `custom-class` 时注意 zs-dialog 是 `inheritAttrs: false`，custom-class 经 $attrs 落到内层 .el-dialog，选择器要用 `> .el-dialog.<class>`；`append-to-body`/`modal-append-to-body` 在 zs-dialog 里已默认 true，页面重复传是冗余。",
+   "evidence": "会话 0d3eb0a5（基线 a861cff）对 OrgTypeDialog.vue 的 Vue2 + Element UI 审查：明确指出第 139 行 `.el-dialog__wrapper { display: flex !important }` 会压过 v-show 内联 display:none，且与 zs-dialog.vue 约 480-481 行「勿对 display 用 !important」的注释相矛盾；另指出第 150 行 transform: none !important 可能让动画失效或闪烁。props 结论表确认 custom-class 经 $attrs 落到内层 .el-dialog 正确、:draggable=\"false\" 正确、append-to-body/modal-append-to-body 冗余。",
+   "files": [
+    "zhi2-web-admin/src/views/components/OrgTypeDialog.vue",
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "0d3eb0a5-f925-45d8-9349-1b43b30611dd"
+   ],
+   "bundle": "083.md"
+  }
+ ]
+}

@@ -1,0 +1,217 @@
+{
+ "batch": 102,
+ "files": [
+  "121.md",
+  "122.md",
+  "123.md",
+  "124.md",
+  "125.md",
+  "126.md"
+ ],
+ "count": 12,
+ "memories": [
+  {
+   "title": "共享 USCI 正则带 /g 会让 .test() 第二次起误判失败",
+   "type": "bug",
+   "content": "patterns/index.js 里的共享正则常量（如 USCI）绝不能带 /g 标志：同一 RegExp 实例被多次 .test() 时会更新 lastIndex，导致「第一个字段校验通过、第二个字段误报不合法」这类只在连续校准时才复现的偶发失败。Vue 里 pattern: this.patterns.USCI 被全项目多处复用，一个实例就是全局共享，所以必须在常量定义处去掉 /g（而不是在调用点每次 new RegExp）。\n配套约定：单位统一社会信用代码之类需要规范化的字段，校验与提交要同源——先 trim().toUpperCase() 得到 normalized，再用同一个 normalized 做 .test() 并写回 payload，否则会出现「小写能过校验但提交的值与校验对象不一致」。校验走 el-form 的 validator（validate() 会跑），不要只挂 blur。",
+   "evidence": "会话 d1b3f1b0-c280-4988-be4b-f5f8178c3c88 的 Review：移除 patterns/index.js 中 USCI 的 /g 被判定为正确且是核心修复，理由即共享 RegExp 的 lastIndex 会在连续 .test() 中造成第二次起误失败；PartyDialog.vue 的 validator 正是 .test()；同时该改动让全项目 pattern: this.patterns.USCI 一并受益。附带指出的 MEDIUM：校验通过但未把 normalized 回写 form，界面仍显示小写。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/patterns/index.js",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/leaseContract/components/PartyDialog.vue",
+    "d:/repository/苏州市区苏服办/src/utils/formatter.js"
+   ],
+   "baseline": "b28a878",
+   "sessionIds": [
+    "d1b3f1b0-c280-4988-be4b-f5f8178c3c88"
+   ],
+   "bundle": "121.md"
+  },
+  {
+   "title": "同一列表组件按 nodeType 区分「申请页 vs 审批页」时用条件展开列，审批页只留过滤不留列",
+   "type": "pattern",
+   "content": "预售许可等「一个 index.vue 承载申请页 + 受理/初审/复审/公示/终审多个审批页」的场景，用 nodeType 是否为空判定页面身份：nodeType 为空 = 企业端申请页，有值 = 某个审批节点页。\n用户明确的口径：审批节点字典只保留在申请页展示，其余审批页隐藏该列——列表仍照旧用 queryParams.currentNode 按节点过滤数据，只是不显示节点名称列（因为当前页本身就是那个节点，列值完全重复）。实现用 columns 里条件展开 ...(!this.nodeType ? [{ label:'审批节点', prop:'currentNodeLabel' }] : [])，比手写 v-if 列或另拷一份列表页都轻。\n关联坑：同一页面多套数据源共用一套 columns 时，字段名常按业务分叉（登记申请表返回 applyTime，解除申请返回 relieveApplyTime），共用列直读 applyTime 会让其中一侧整列空白——按当前路由/模式分支改 prop+label，并在 detail.vue 的 form 里补上新字段初始化，否则 contentInfo 引用到未初始化字段同样显示空。",
+   "evidence": "会话 21aaf3b1：用户要求「申请保留审批节点字典，其余的页面隐藏」，结论为按 ...(!this.nodeType ? [{...}] : []) 条件追加列，审批页保留 currentNode 过滤但不显示节点名；会话 01a166b8 为同模式的字段分叉坑：riskregister 的登记/解除两个列表共用 columns，解除接口返回 relieveApplyTime 而列读 applyTime 导致空白，需按路由分 prop 并给 detail 的 form 补字段。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permit/components/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/riskmanage/riskregister/index.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/supervision/riskmanage/riskregister/detail.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "21aaf3b1-00b7-4253-a461-65500561b965",
+    "01a166b8-ca2d-764e-99b7-41affb9bae7b"
+   ],
+   "bundle": "121.md"
+  },
+  {
+   "title": "弹窗标题不要用 `${nodeLabel}审批` 拼接：按钮与标题共用同一文案常量",
+   "type": "bug",
+   "content": "审批流弹窗出现「初审审批审批」这类重复，根因是两处各拼一次后缀：detail.vue 传给弹窗的 nodeLabel 本身已经是「初审审批」，而 PermitApprovalDialog 的 dialogTitle 又写 `${nodeLabel}审批`，两层拼接叠加。\n约定：节点文案（nodeLabel）由调用方统一给出完整中文名（含「审批」），弹窗标题直接 return this.nodeLabel，不再补任何后缀；特殊节点（isAccept 的受理）单独走分支。这样标题与按钮文案同源，节点改名时不会一处改一处漏。",
+   "evidence": "会话 f2ccc9f2-b2d8-4dc7-97a0-92473b2a178b：用户截图反馈「标题重复」，定位为 dialogTitle 返回 `${nodeLabel}审批` 而 nodeLabel 已是「初审审批」，终审等节点同样出错；修改为 dialogTitle 直接返回 this.nodeLabel（isAccept 时返回「受理」）。",
+   "files": [
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permit/components/PermitApprovalDialog.vue",
+    "d:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/presale/permit/components/detail.vue"
+   ],
+   "baseline": "0b15dd3",
+   "sessionIds": [
+    "f2ccc9f2-b2d8-4dc7-97a0-92473b2a178b"
+   ],
+   "bundle": "121.md"
+  },
+  {
+   "title": "[苏房] v-show=\"isFormDisabled\" 的空列问题要挪到 el-col，但它写在「仅 add/edit 才渲染」的 el-row 里是恒假死代码",
+   "type": "pattern",
+   "content": "详情页 detail.vue 常把只读字段（isPrint/printCount/certificatePrintState/certificatePrintCount/printTime/certificatePrintTime 等打印类字段）用 v-show=\"isFormDisabled\" 包起来。\n\n1) 空列根因：v-show 写在 el-form-item 上时，display:none 只作用于表单项，外层 el-col 仍占 1/3 宽，add/edit 态就出现「有位置没内容」的空栅格列。正确做法是把 v-show 提到 el-col 上——display:none 作用在栅格列上，flex 会重排，空列消失。\n2) 改法必须整组字段一起挪：同一栅格行内的同组只读字段（含打印时间类字段）若只改 4 个、留下 2 个仍把 v-show 放在 el-form-item 上，空列问题依旧出现在那两列。判断标准是「同组字段表现必须一致」，逐个字段核对，不要只改被点名的那几个。\n3) 结构性冗余（既有，不必为小改单独大动）：isFormDisabled 来自 mixins/form.js，实现是 return this.mode == 'view'；而可编辑表单在 <el-row v-else> 内，仅在 formMode != 'view'（add/edit）时渲染，因此该 el-row 里 isFormDisabled 恒为 false，被 v-show 的列永不显示——这是死代码。view 态走 DetailTemplate，根本不会用这段表单项。\n4) 由此带来的两个可选优化：add/edit 下这些列长期不展示，v-show 仍会挂载 radio/input/date-picker 并做字典选项绑定（影响很小，可接受）；若团队接受与 view 完全分离，可改 v-if=\"isFormDisabled\"（在该分支里等价于永不渲染，直接删 markup 亦可），更务实的是保持 v-show 与同文件前一组字段写法一致。\n5) Review 时还应顺带确认：这些字段未出现在 rules 中，隐藏不影响 validate()；v-model 仍挂在 form 上，隐藏不改变「是否随 submitForm 提交 undefined」的行为；v-show 为 display:none，一般不会被读屏当作可见表单项。",
+   "evidence": "会话 f5a8c8b2（2026-10-15，cursor-agent，基线 179717a）：用户对 refund/detail.vue 提出「把 isPrint/printCount/certificatePrintState/certificatePrintCount 的 v-show=\"isFormDisabled\" 从 el-form-item 挪到 el-col，修复 add/edit 态空栅格列」的最小改动请求审查。审查确认改法正确（display:none 作用于 el-col 后 flex 重排，空列消除），并指出：同文件的 printTime、certificatePrintTime 已挂在 el-col 上，同组一致；同时点明 isFormDisabled 在该 el-row 内恒为 false 的语义冗余，以及 v-show→v-if 的可选优化。CRITICAL/HIGH 均为 0。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/deposit/refund/detail.vue",
+    "zhi2-web-admin/src/mixins/form.js"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "f5a8c8b2-4fd0-4562-8da0-49d974d1bfe1"
+   ],
+   "bundle": "124.md"
+  },
+  {
+   "title": "[苏房] table.js handleDelete 必须写成 (row && row[primaryKey]) || this.ids：工具栏无参调用时直接读 row 必崩",
+   "type": "bug",
+   "content": "现象：公司品牌列表（company/brand/index.vue）点工具栏删除，控制台报 TypeError: Cannot read properties of undefined (reading 'brandId')，栈指向 mixins/table.js 的 handleDelete，报错经由 zs-button → ListOperationButtonContainer → index.vue 的 @click 触发。\n\n根因：工具栏的批量删除按钮写成 @click=\"handleDelete()\"，调用时不传行数据；而 handleDelete 里取主键的语句是裸的 row[this.primaryKey]（primaryKey 为 brandId 等），row 为 undefined 时一访问就抛错。批量删除本应走 this.ids（由 handleSelectionChange 按勾选行写入），只有行内操作列的单条删除才传 row。\n\n修复（两处一起改）：\n1. mixins/table.js：取主键改为 let ids = (row && row[this.primaryKey]) || this.ids —— 无参调用时回退到已选 ids，单条删除传 row 时逻辑不变；这一处在公共 mixin 上改，其它同样写 handleDelete() 的列表页一并受益。\n2. 页面模板：与其它列表页保持一致，改为 @click=\"handleDelete\"（不写括号，让事件对象/行数据自然透传）。\n\n约定：新增列表页的工具栏删除一律用 listMixins 的 multiDeleteButton（见既有「列表批量删除按钮必须走 mixin 的 multiDeleteButton」条目），不要自写 @click 调 handleDelete；若写，必须无括号。类名/主键字段因页而异，排查此类 undefined 报错时先看「是否漏传 row」而不是先怀疑接口。",
+   "evidence": "会话 5bbc22cc（2026-10-18，cursor-agent，基线 a861cff）：用户贴出 Vue warn 的完整组件栈与 handleDelete(table.js:327) 堆栈，指向 brand/index.vue 的删除按钮。修复为 table.js 增加 (row && row[this.primaryKey]) 兜底 + 模板去掉括号，并说明「其它同样写 handleDelete() 的列表页也会受益」。",
+   "files": [
+    "zhi2-web-admin/src/mixins/table.js",
+    "zhi2-web-admin/src/views/company/brand/index.vue",
+    "zhi2-web-admin/src/components/zs-button/zs-button.vue",
+    "zhi2-web-admin/src/components/ListOperationButtonContainer/index.vue"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "5bbc22cc-cdf5-42d9-8521-6ed4291d2efc"
+   ],
+   "bundle": "124.md"
+  },
+  {
+   "title": "有无类字段的字典选型：用 have_or_not，误用 sys_include 会因无匹配值而显示原始码 0",
+   "type": "fact",
+   "content": "「有无电梯」这类是/否性质的字段，字典类型是 have_or_not（预售方案模块已在 permitConstants.js 的 PLAN_DICT_TYPES.HAVE_OR_NOT 中定义该常量），不是 sys_include。\n\n踩坑经过：多个列表页误把该列绑定到 sys_include，字典里没有对应 dictValue，转译失败后静默回退显示原始值 0（不报错），看起来像「后端没返文案」。同类页面共 3 处一起修：projectManagement/unitinfo/index.vue（单元管理列表）、building/unit/index.vue（楼盘表-单元列表）、building/unitChange/index.vue（单元变更列表）。\n\n排查与约定：\n- 列显示成数字 0/1 且字典名看起来「差不多」时，先用系统字典管理核对候选字典类型是否真的存在该 dictValue，再比对一份已在用的同类页面（此处以 permitConstants.js 为参照）。\n- 同一业务字段被多个列表页绑定时，改字典要按模块全量 grep 同类列一起改，不要只修截图那一页。\n- 修完后若仍显示数字，检查后端字典管理里 have_or_not 的 dictValue 是否与接口返回值一致（这与既有「状态列一直显示错文案：配了不存在的字典编码」是同一类失败模式，但这里是字典选错而非字典缺失）。",
+   "evidence": "会话 4676abc6（2026-10-16，workbuddy/glm-5.3-flash，基线 2b7e6d0）：用户发截图指出单元管理列表「有无电梯」列显示异常。诊断为本列误用 sys_include（字典无匹配值导致显示原始值 0），改为 have_or_not，并连带修复 building/unit 与 building/unitChange 两处同类问题。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/unitinfo/index.vue",
+    "zhi2-web-admin/src/views/building/unit/index.vue",
+    "zhi2-web-admin/src/views/building/unitChange/index.vue",
+    "zhi2-web-admin/src/views/presale/permit/permitConstants.js"
+   ],
+   "baseline": "2b7e6d0",
+   "sessionIds": [
+    "4676abc6-8d97-4393-94eb-00860b189dc6"
+   ],
+   "bundle": "124.md"
+  },
+  {
+   "title": "[苏房] B 端隐藏搜索项的统一实现：isCompanyTerminal 计算属性 + formItems 展开过滤，terminalType 为空按 B 端处理",
+   "type": "pattern",
+   "content": "需求形态：「B 端（企业端）不展示某个搜索项（如企业名称），G 端（主管部门端）保留」。\n\n项目内已形成的统一写法（与 companyAdmin、companyManagement 等页一致）——不要在模板里写 v-if 撒点，也不要去改公共 zs-search-form（既有条目「B 端隐藏企业/机构主体类搜索条件：逐页过滤，禁止改公共 zs-search-form」是同一约定）：\n\n1. 新增计算属性 isCompanyTerminal，基于 terminalType 判定，且 terminalType 为空时默认视为 B 端；\n2. 在 formItems 的数组字面量里用展开运算符按条件插入，例如 ...(!this.isCompanyTerminal ? [ { 企业名称筛选项 } ] : [])；\n3. 只处理被点名的搜索项，列表列不自动跟随——列表「企业名称」列是否也要隐藏需要单独确认（本次未动列表列，并在回复里主动提出）。\n\n复用要点：这套「计算属性 + formItems 条件展开」是页面级端别裁剪的标准套路，新页面照抄即可；判定口径要与既有条目「端别(terminalType)条件隐藏的判定口径与降级方向」保持一致（缺失→B 端），避免同模块两个页面口径相反。",
+   "evidence": "会话 2ff445a8（2026-10-19，cursor-agent，基线 fc66641）：用户在 customerProject/index.vue:135-142 要求「B 端不展示企业名称搜索」。实现为新增 isCompanyTerminal 计算属性（terminalType 为空默认 B 端）+ formItems 中 ...(!this.isCompanyTerminal ? [...] : [])，并参照 companyAdmin、companyManagement 的既有约定。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/customerProject/index.vue",
+    "zhi2-web-admin/src/views/company/companyAdmin/index.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/index.vue"
+   ],
+   "baseline": "fc66641",
+   "sessionIds": [
+    "2ff445a8-6861-42f2-a2ff-33b1653651f3"
+   ],
+   "bundle": "124.md"
+  },
+  {
+   "title": "多步注册步骤条 resolveIcon 的三态优先级：完成态必须优先 completeIcon，第 5 步缺 completeIcon 目前无影响",
+   "type": "pattern",
+   "content": "RegisterStepper 的 resolveIcon(step, index) 按 stepState 返回图标，正确的三态回退链是「优先本态、再降级」：\n\n| 状态 | 优先级 |\n|---|---|\n| is-complete | completeIcon → currentIcon → pendingIcon |\n| is-current | currentIcon → completeIcon → pendingIcon |\n| is-pending | pendingIcon → currentIcon → completeIcon |\n\n踩坑点：完成态若仍优先 currentIcon，会让第 1–4 步在 step 3/4/5 页面上继续显示「进行中」图标，与 E2E 断言 assertRegisterStepperIconStates（已完成步骤应匹配 -complete.png）不一致——这类错误不会报错，只能靠视觉/E2E 发现。修改判定时要同步检查注册页公司注册与机构注册两条链路。\n\n边界结论（第 5 步「提交审核」）：companyRegister.vue / institutionRegister 的 submit 步只有 currentIcon、pendingIcon，没有 completeIcon。正常流程 registerStep 到 5 时第 5 步是 is-current（不是 complete），用 step-submit-current.png，行为不变；只有 activeStep > 5（如 6）才会变 complete 并回退到 currentIcon。当前路由最多到 step=5，所以缺图无可见影响；将来若新增第 6 步或把结果页 activeStep 设为 6，需补「已提交」专用完成图，或接受完成态仍用 current 图。\n\n其它：某步缺 completeIcon 却被标 complete 会自动回退 currentIcon（合理兜底）；completeIcon 为空字符串会落到下一项（与常见 URL 配置一致）；与 shouldShowImage / @error 的字体图标兜底无冲突。",
+   "evidence": "会话 0179b106（2026-09-20，cursor-agent，基线 4555c0d）：用户请求确认 resolveIcon 把 is-complete 改为优先 step.completeIcon 是否正确、第 5 步无 completeIcon 是否有边界问题。审查结论为正确（原实现优先 currentIcon 会让已完成步骤仍显示进行中图，与 E2E 的 -complete.png 断言冲突），并逐条分析 activeStep≤5 的边界，CRITICAL/HIGH/MEDIUM 全 0。",
+   "files": [
+    "zhi2-web-admin/src/components/RegisterStepper/index.vue",
+    "zhi2-web-admin/src/views/register/companyRegister.vue",
+    "zhi2-web-admin/e2e/register/company-register-visual.spec.js"
+   ],
+   "baseline": "4555c0d",
+   "sessionIds": [
+    "0179b106-f359-4f1d-9f18-f55bd50ca626"
+   ],
+   "bundle": "124.md"
+  },
+  {
+   "title": "[苏房] 多行搜索栏右侧「搜索/重置」按钮与搜索项不垂直居中：isExpanded 的分行对齐与按钮偏移是两套口径",
+   "type": "bug",
+   "content": "现象：zs-search-form 在有 4~6 个搜索项（正好两行、不含展开按钮）时，右侧「搜索 / 重置」按钮顶对齐，与左侧搜索项不垂直居中。\n\n根因（两处叠加）：\n1. 多行布局里 el-row 一律用 align=\"top\"，而 align 的语义应按「是否有展开按钮 / 是否已展开」分档：4~6 项无展开按钮时内容天然成两行，需要 middle 才能让行内所有列（含按钮列）居中对齐；只有「超过两行且已展开」时才需要 top 配合原有的顶部偏移。\n2. 超过两行但处于收起态时还残留 margin-top: 12px 的按钮偏移，在未展开时这个偏移没有任何对应的对齐目标，直接破坏居中。\n\n解法：在组件内派生两个状态而不是写死样式——multiLineRowAlign（无展开按钮或超两行但未展开 → 'middle'；仅展开后 → 'top'）与 multiLineButtonMarginTop（仅展开态用 -40px，其余为 0）。\n\n复用要点：zs-search-form 这类「行对齐 + 按钮偏移」的公共搜索栏，凡是改一处布局，必须把 align 与按钮 margin 当成一个整体来分档，单改其中一个必然在另一种行数下露馅。",
+   "evidence": "会话 5d74e5ab（2026-09-30，基线 0c2da15）：用户反馈「搜索栏中的按钮和搜索项没有垂直居中，在2行的情况下」。最终结论：「多行布局里 el-row 在 isExpanded === false 时使用了 align=\"top\"，4~6 个搜索项（正好两行、无展开按钮）时，右侧「搜索 / 重置」会顶对齐……另外，超过两行但收起时还有 margin-top: 12px，也会破坏居中。」改动为新增 multiLineRowAlign 与 multiLineButtonMarginTop 两个派生量。",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-search-form\\zs-search-form.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-search-form\\QueryResetButtons.vue",
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\zs-search-form\\SearchFormItem.vue"
+   ],
+   "baseline": "0c2da15",
+   "sessionIds": [
+    "5d74e5ab-2eac-4349-9f53-ca8649792eab"
+   ],
+   "bundle": "125.md"
+  },
+  {
+   "title": "[苏房] 查看态触发 business watcher 的远端校验：从业人员详情一打开就弹「未查询到专业人员资格证书」",
+   "type": "bug",
+   "content": "现象：打开从业人员详情（查看态）立即弹出「未查询到专业人员资格证书信息…」，用户要求查证请求只在新增/编辑时发。\n\n根因：查看详情时 loadDetail 把 form.personnelType 写成「专业人员」，触发了 form.personnelType 的 watcher → handlePersonnelTypeChange → queryProfessionalCertificateByIdNumber（POST /company/agencyPersonnel/queryByIdNumber）。这是「数据回填」与「用户改值」共用同一个 watch 处理器的典型误伤：程序回填不应等于用户操作。\n\n解法：在 handlePersonnelTypeChange 与 queryProfessionalCertificateByIdNumber 两个入口都加 formMode === 'view' 直接返回的守卫（双保险，防其它路径误调）；新增/编辑态选「专业人员」仍按身份证号查证，保存时校验逻辑不变。\n\n复用要点：任何「值变化即触发远端查询/校验」的表单，必须区分程序回填与用户交互，并在 handler 与底层请求函数两处都加 formMode 守卫，只守一处会从其它路径漏进去。",
+   "evidence": "会话 2b8ceea5（2026-10-15，基线 179717a）：用户仅发截图 + 「这个在查看的时候不要调用」。最终结论：「查看详情时 loadDetail 会把 personnelType 写成「专业人员」，触发 form.personnelType 的 watcher，进而调用 queryProfessionalCertificateByIdNumber……修改：handlePersonnelTypeChange 在 formMode === 'view' 时直接返回；queryProfessionalCertificateByIdNumber 查看模式同样直接返回。」",
+   "files": [
+    "d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution\\agencyPersonnel\\components\\AgencyPersonnelDetail.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "2b8ceea5-e003-419f-96a4-2a958a3533ab"
+   ],
+   "bundle": "125.md"
+  },
+  {
+   "title": "[苏房] 状态 tag 显示原始值 0/1/2 先查字典编码是否在后端配置：personnel_business_status 未配置 → 统一改用 biz_state",
+   "type": "bug",
+   "content": "现象：开发企业 → 从业人员管理（toB/personnelRecord）列表的状态 tag 直接显示原始值 0/1/2。\n\n根因：该页业务状态字典走的是 personnel_business_status，而后台并未配置该字典，getDicts 返回空 → tag 选项为空 → 降级显示接口原始码。不是前端映射写错。\n\n解法（用户明确指定用 biz_state）：\n1. 列表 index.vue 的 initDict 里把列表 tag 字典改为 getDicts('biz_state')，仍经 listTableRowAugment 传入行增强，保证既有渲染链路不变；\n2. 详情 detail.vue 头部「业务状态」tag 的 personnelStatusOptions 同步改为取 biz_state，两处必须一起改；\n3. 按钮显隐逻辑（按 bizState 与 cancelStatus 判断编辑/注销/删除）不动。\n\n复用要点：tag 显示原始码值时的排查顺序是「先验证字典编码在后端是否真的配置了（字典接口返回空即降级不报错）」，再改前端；换字典后必须自查新字典是否覆盖全部业务码（0 待提交 / 1 审核中 / 2 已备案 / 9 已注销等），缺项会只修好一部分行。",
+   "evidence": "会话 003dced8（2026-10-16，基线 2b6e7d0）：用户发截图 + 「用biz_state」。最终结论：「该页业务状态字典走的是 personnel_business_status，后台未配置该字典导致 tag 选项为空，列表直接显示原始值 0/1/2」；改为 index.vue 的 initDict 与 detail.vue 的 personnelStatusOptions 都取 biz_state。",
+   "files": [
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/toB/personnelRecord/components/index.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/views/toB/personnelRecord/components/detail.vue",
+    "D:/repository/苏州市房地产监测V3/zhi2-web-admin/src/utils/personnelStatus.js"
+   ],
+   "baseline": "2b6e7d0",
+   "sessionIds": [
+    "003dced8-e465-45b4-8431-b2d33508dfd5"
+   ],
+   "bundle": "125.md"
+  },
+  {
+   "title": "[苏房] 合同模块 pre/cash/suzhou2016 三章节对「房屋属性类」接口字段多为未消费：判定字段是否消费必须先按 contracts 目录切分再下结论",
+   "type": "fact",
+   "content": "审计 zhi2-web-admin/src 时，「字段被引用」有全库引用与 contract 模块内消费两个不同口径，混用会得出相反结论。在批量核对新增接口字段是否被前端消费时，必须在 grep 后按 views/contract/ 目录切片，分别标注「全库有引用」与「contract 模块内已消费」：\n\n1. 只在合同模块内消费的字段（其它模块不引用）：annexOne / annexTwo（chapters/pre/annex.vue + chapters/cash/annex.vue）、annexTwelve（仅 cash/annex.vue，pre 章没有）、mortgageEntities（chapters/pre/chapter2.vue + chapters/cash/chapter2.vue + components/tables/MortgageEntitiesTable.vue）、salesCertificate / salesCertificate2 / salesCertificateNo / regOrganizationType / recRegOrganization（仅 cash/chapter2.vue）。\n2. 合同模块内明确未消费、属新增待接入的房屋属性字段：policeHouseNo（只有 projectManagement/buildinginfo/components/HouseDialog.vue 与 houseinfo/detail.vue 在用）、purpose、floorNumberAbove / floorNumberUnder、deliveryType、actualFloorArea / actualInsideArea / actualSharedArea。\n3. 合同模块内已消费的：floor（cash/annex.vue、pre/annex.vue、components/tables/CommercialHousingTable.vue、CommercialJHTable.vue、dialogs/pricingModeDialog.vue、commercialHousingDialog.vue）、buildingStructure（CommercialHousingTable.vue、CommercialJHTable.vue、commercialHousingDialog.vue、pricingModeDialog.vue）、floorHeight（仅 chapters/suzhou2016/components/tables/SzAreaTable.vue）、regulatoryAccount（chapters/pre/chapter3.vue、chapters/cash/chapter3.vue）、accountName（components/tables/RegulatoryAccountsTable.vue）。\n4. ESI/账户一组（bankInfoName、esiName、esiAddress、esiBusiLicenseRegistNo、esiEnterQualifiCertifiNo 等）在合同模块内也基本无消费点。\n5. 合同章节组件 formData 里还存在与接口字段拼写不一致的疑似映射，典型：planningPermitNo vs constrProPlanLiceNo、landCertNo vs landCertificateNo、landEndDate vs endDateOfLandUseRight；核对字段消费时不能只按接口字段名 grep，必须同时查章节组件里的改名版本，否则会把「已消费」误判成「新增未消费」。\n\n结论：字段消费审计的输出必须写成「字段名：引用文件 + 已消费/新增未消费（contract 侧）」，并注明是哪个章节目录（pre / cash / suzhou2016），因为同一字段在不同范本下消费情况不同（annexTwelve 只有 cash 章用）。",
+   "evidence": "会话 sess_subagent_agent_a03232c6（2026-10-21，基线 114af19）在 D:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src 内只读统计 44 个字段的引用分布，逐字段给出结论：annexTwelve 仅 views\\contract\\chapters\\cash\\annex.vue；policeHouseNo/purpose/floorNumberAbove/floorNumberUnder/deliveryType/actualFloorArea/actualInsideArea/actualSharedArea 均标注「contract 模块内未消费」；floor/buildingStructure/floorHeight/regulatoryAccount/accountName 在 chapters 与 components\\tables 的具体文件内命中；并列出 planningPermitNo vs constrProPlanLiceNo、landCertNo vs landCertificateNo、landEndDate vs endDateOfLandUseRight 三处命名不一致。",
+   "files": [
+    "zhi2-web-admin/src/views/contract/chapters/pre/annex.vue",
+    "zhi2-web-admin/src/views/contract/chapters/cash/annex.vue",
+    "zhi2-web-admin/src/views/contract/chapters/pre/chapter2.vue",
+    "zhi2-web-admin/src/views/contract/chapters/cash/chapter2.vue",
+    "zhi2-web-admin/src/views/contract/chapters/pre/chapter3.vue",
+    "zhi2-web-admin/src/views/contract/chapters/cash/chapter3.vue",
+    "zhi2-web-admin/src/views/contract/chapters/suzhou2016/components/tables/SzAreaTable.vue",
+    "zhi2-web-admin/src/views/contract/components/tables/MortgageEntitiesTable.vue",
+    "zhi2-web-admin/src/views/contract/components/tables/CommercialHousingTable.vue",
+    "zhi2-web-admin/src/views/contract/components/tables/CommercialJHTable.vue",
+    "zhi2-web-admin/src/views/contract/components/tables/RegulatoryAccountsTable.vue",
+    "zhi2-web-admin/src/views/contract/dialogs/pricingModeDialog.vue",
+    "zhi2-web-admin/src/views/contract/dialogs/commercialHousingDialog.vue",
+    "zhi2-web-admin/src/views/projectManagement/buildinginfo/components/HouseDialog.vue",
+    "zhi2-web-admin/src/views/projectManagement/houseinfo/detail.vue"
+   ],
+   "baseline": "114af19",
+   "sessionIds": [
+    "sess_subagent_agent_a03232c6-09b0-4cdf-90ac-585c1faa66d7"
+   ],
+   "bundle": "126.md"
+  }
+ ]
+}

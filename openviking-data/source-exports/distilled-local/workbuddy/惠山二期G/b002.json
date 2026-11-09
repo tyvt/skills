@@ -1,0 +1,125 @@
+{
+ "project": "惠山二期G",
+ "batch": "002",
+ "files": [
+  "002.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "多议题表决详情，新增表决项框出来的内置文字显示不全 ",
+   "type": "fact",
+   "content": "## 根因 `zs-input-number` 组件对 root 样式写了一段内边距覆盖： ```scss .zs-input-number:not(.is-controls-right) /deep/ .el-input__inner { padding-left: 56px; padding-right: 56px; // 给加减按钮预留 } ``` `:controls=\"false\"` 时 element-ui 加的是 `is-without-controls`（不是 `is-controls-right`），所以这条规则**仍然命中**，无按钮却白占 112px 内边距 → 输入的 1/2 被吃掉，placeholder 被裁成「请输入最少选」。 ## 修改 | 文件 | 改动 | |---|---| | `src/components/zs-input-number/zs-input-number.vue` | 规则加 `:not(.is-without-controls)` — 无按钮时不再预留 56px，回落 element 默认 15px | | `src/views/autonomy/multiply/components/VotingItemsDialog.vue` | 「最少选择项」「最多选择项」栅格 `md/lg/xl` 6 → 8，输入框再宽 1/3，兜",
+   "evidence": "extracted source=workbuddy project=惠山二期G",
+   "files": [
+    "`src/components/zs-input-number/zs-input-number.vue",
+    "`src/views/autonomy/multiply/components/VotingItemsDialog.vue",
+    "的页面一并恢复正常显示：`benefit/pubHousePart/detail.vue`、`partDialog.vue`、`housePartDialog.vue`、`assetLeaseApply/components/houseTable.vue",
+    "涉及文件：D:/repository/惠山二期G/zhi2-web-admin、D:\\repository\\惠山二期G\\zhi2-web-admin\\src\\views\\autonomy\\multiply\\components\\VotingItemsDialog.vue、D:/repository/惠山二期G/zhi2-web-admin/src、D:/repository/惠山二期G/zhi2-web-admin/src/styles、D:\\repository\\惠山二期G\\zhi2-web-admin\\src\\components\\zs-form\\zs-form.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2381e8b3-483f-4cd3-afac-2e88786cc72a"
+   ],
+   "_draft": true,
+   "project": "惠山二期G"
+  },
+  {
+   "title": "[图片] 选了时间之后没有正确回显，应该是写了0点，",
+   "type": "bug",
+   "content": "修好了。改动文件：`zhi2-web-admin/src/views/autonomy/general/detail.vue` **根因** `@change=\"handleDecisionTimeChange\"` 在用户选完时间后又强行改写值： - 开始时间（非当天）→ `YYYY-MM-DD 00:00:00` - 结束时间 → `YYYY-MM-DD 23:59:59` - 开始时间（当天）→ 当前时间 +1 小时 所以你选的时间被覆盖，回显出来就是 `00:00:00`（截图里的 `2026-09-30 00:00:00 - 2026-10-23 23:59:59` 正是被改写的值）。 **改动** 1. 模板第 42-44 行：删除 `@change=\"handleDecisionTimeChange\"`，改为 `:default-time=\"['00:00:00', '23:59:59']\"`。 2. 删除 `handleDecisionTimeChange` 方法（全库无其他引用，已确认）。 **效果** - 手动选的开始/结束时间原样回显、原样提交。 - 只点日期不点时间时，仍默认 00:00:00 / 23:59:59（与本项目其他页面 `surveyRelease`、`utilityLinkConfig` 的写法一致），不再覆盖用户选择。 - `dayjs` 引",
+   "evidence": "extracted source=workbuddy project=惠山二期G",
+   "files": [
+    "修好了。改动文件：`zhi2-web-admin/src/views/autonomy/general/detail.vue",
+    "涉及文件：D:/repository/惠山二期G/zhi2-web-admin、D:/repository/惠山二期G/zhi2-web-admin/src、D:/repository/惠山二期G/zhi2-web-admin/src/views/autonomy/general/detail.vue、D:/repository/惠山二期G/zhi2-web-admin/src/components/zs-date-picker/zs-date-picker.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "599febc8-15af-4a92-bfc3-4d8864681fc6"
+   ],
+   "_draft": true,
+   "project": "惠山二期G"
+  },
+  {
+   "title": "房屋变更时页面上已存在项目信息的情况下选择楼幢和单元",
+   "type": "bug",
+   "content": "修复完成，改动在 `zhi2-web-admin/src/views/building/houseChange/detail.vue`（房屋信息变更详情页）。 **问题原因** - 从房屋信息跳转变更页（`formMode: 'add'`）时，接口 `/building/house/{houseId}` 返回的房屋数据只带了 `projectName` 显示，但缺少 `projectId`（部分场景 `buildingId` 也可能缺失）。 - 点击楼幢/单元选择框时，`openBuildingDialog`/`openUnitDialog` 校验 `form.projectId` 不存在，就弹出了“请先选择开发项目”。 **修复方案** 1. 新增 `backfillProjectInfo()` 方法，在两个入口自动回填关联信息： - 新增模式：加载房屋数据后调用； - 编辑模式：`detailCallback` 加载变更详情后调用（同样可能缺项目信息）。 2. 回填逻辑： - 有 `buildingId` → 请求 `/building/building/{buildingId}`，取回 `projectId/projectName/projectCode` 回填，顺带补齐缺失的 `buildingNo/buildingCode`； - 无 `buildingId` 但有 `u",
+   "evidence": "extracted source=workbuddy project=惠山二期G",
+   "files": [
+    "`zhi2-web-admin/src/views/building/houseChange/detail.vue",
+    "涉及文件：D:/repository/惠山二期G/zhi2-web-admin、D:/repository/惠山二期G/zhi2-web-admin/src、D:/repository/惠山二期G/zhi2-web-admin/src/views/building/houseChange/detail.vue、D:/repository/惠山二期G/zhi2-web-admin/src/views/building/house、D:/repository/惠山二期G/zhi2-web-admin/src/views/building/house/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9c47b930-1e4a-454a-bb8b-450970d0136c"
+   ],
+   "_draft": true,
+   "project": "惠山二期G"
+  },
+  {
+   "title": "点击左侧菜单栏-首页，提示页面未授权或不存在 @lo",
+   "type": "bug",
+   "content": "修复完成。 **根因**：点击侧栏「首页」跳转 `/index/home`，但动态路由注册时 `stripDuplicateHomeRoutes` 会把 `/index` 下的首页子路由裁剪掉（防止覆盖静态首页），导致 `/index/home` 无任何路由匹配，被 `path: '*'` 兜底重定向到 `/404`。而守卫里的 `canonicalizeHomePath` 归一化（`/index/home → /index`）发生在路由解析**之后**，来不及生效，于是弹出「页面未授权或不存在」。 **修复**（`zhi2-web-admin/src/router/index.js` 的 `constantRoutes`）：新增两条静态别名重定向： - `/index/home` → redirect `/index` - `/index/index` → redirect `/index` 这样在路由解析阶段就命中静态记录，不再落入 `*` 兜底路由，点击「首页」即可正常打开工作中心首页。",
+   "evidence": "extracted source=workbuddy project=惠山二期G",
+   "files": [
+    "**修复**（`zhi2-web-admin/src/router/index.js",
+    "涉及文件：D:/repository/惠山二期G/zhi2-web-admin、D:/repository/惠山二期G/zhi2-web-admin/src/router/index.js、D:/repository/惠山二期G/zhi2-web-admin/src、D:/repository/惠山二期G/zhi2-web-admin/src/utils/homeRoute.js、D:/repository/惠山二期G/zhi2-web-admin/src/layout/components/Sidebar/RecursiveMenu.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a4d2b610-041f-4020-b150-da4ace92e015"
+   ],
+   "_draft": true,
+   "project": "惠山二期G"
+  },
+  {
+   "title": "房屋信息变更时必须要先选择项目，不然楼幢数据查询的就",
+   "type": "preference",
+   "content": "已修复 `zhi2-web-admin/src/views/building/houseChange/detail.vue`。 问题根因：楼幢弹窗 `filterParams: { projectId }`，未选项目时 `projectId` 为 undefined → 后端返回全部项目楼幢。 改动： | 位置 | 改动 | |---|---| | `openBuildingDialog` | 无 `projectId` 时提示\"请先选择开发项目\"并 return，不再打开弹窗 | | `openUnitDialog` | 新增 `buildingId` 前置校验；补上漏掉的 `filterParams: { buildingId }`（原先单元查询也没带楼幢过滤，同样是全量） | | `setProject` | 切换项目时清空已选的楼幢/单元，避免残留旧项目数据 | UI 层原有的 `:disabled=\"!form.projectName\"` 保留，改为双重保险。",
+   "evidence": "extracted source=workbuddy project=惠山二期G",
+   "files": [
+    "`zhi2-web-admin/src/views/building/houseChange/detail.vue",
+    "涉及文件：D:/repository/惠山二期G/zhi2-web-admin、D:/repository/惠山二期G/zhi2-web-admin/src、D:/repository/惠山二期G/zhi2-web-admin/src/views/building/houseChange/detail.vue、D:/repository/惠山二期G/zhi2-web-admin/src/views/building/buildingChange/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "11ad0957-fe32-4048-b697-514a71caef0a"
+   ],
+   "_draft": true,
+   "project": "惠山二期G"
+  },
+  {
+   "title": "竣工验收详情，施工结算总额注释显示的不对 [图片] ",
+   "type": "fact",
+   "content": "已修复。 **问题**：`zhi2-web-admin/src/views/maintenance/completion/detail.vue` 中计算属性 `constructionSettleAmountTip`（第 486 行）文案为「线下核查费金额：统缴项目此项无需填写…」，是「线下核查费」字段的注释被误复制到了「施工结算总额」上。 **修复**：注释改为「维修工程的实际造价，仅针对维修施工阶段发生的费用。」 该计算属性被两处引用，均已同步生效： - 新增/编辑表单中「施工结算总额(元)」的问号提示（el-tooltip） - 详情查看模式 `contentInfo` 中的 `labelTooltip`",
+   "evidence": "extracted source=workbuddy project=惠山二期G",
+   "files": [
+    "**问题**：`zhi2-web-admin/src/views/maintenance/completion/detail.vue",
+    "涉及文件：D:/repository/惠山二期G/zhi2-web-admin、D:/repository/惠山二期G/zhi2-web-admin/src/views/maintenance/completion/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6bac5a7c-3034-4609-9345-03915c598bc6"
+   ],
+   "_draft": true,
+   "project": "惠山二期G"
+  },
+  {
+   "title": "首页，物业账号登录也是新版首页了，B端登录需要保持旧",
+   "type": "pattern",
+   "content": "修复完成。 **改动**：`zhi2-web-admin/src/views/home/index-wrapper.vue` 的 `useBakComponent` 增加 B 端判断——`terminalType === 'B'`（物业账号）时强制渲染旧版首页 `index-bak`；否则维持原逻辑（`cwzxt` 财务中台标记决定新旧版）。 **原理**：路由 `/index` 挂载的是 wrapper 组件，原逻辑只看 `localStorage.cwzxt`，未区分终端类型，导致物业账号也进入新版 `index-v2`。`terminalType` 在路由守卫 `GetInfo` 时写入 store，进入首页前已就绪，时序无问题。 建议验证：物业账号（B端）登录 → 应见旧版首页；G端账号登录 → 仍为新版首页。",
+   "evidence": "extracted source=workbuddy project=惠山二期G",
+   "files": [
+    "**改动**：`zhi2-web-admin/src/views/home/index-wrapper.vue",
+    "涉及文件：D:\\repository\\惠山二期G\\zhi2-web-admin\\src\\views\\home\\index-wrapper.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "cc2fdb8f-a6a1-46f0-b90b-f048bcbf9bd2"
+   ],
+   "_draft": true,
+   "project": "惠山二期G"
+  }
+ ],
+ "_draft": true
+}

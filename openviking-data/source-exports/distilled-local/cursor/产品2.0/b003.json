@@ -1,0 +1,43 @@
+{
+ "project": "产品2.0",
+ "batch": "003",
+ "files": [
+  "003.md"
+ ],
+ "count": 2,
+ "memories": [
+  {
+   "title": "完成后使用playwright进行自动化测试，要求U",
+   "type": "preference",
+   "content": "白名单配置已生效，真实联调进展如下。 ## 联调结果 | 步骤 | 接口 | 状态 | |------|------|------| | Step1 | `saveCompanyRegister` | ✅ 200 | | Step2 | `saveLegalPersonInfo`（短信码 `293858`） | ✅ 200 | | Step3 | `listByBusCode` | ✅ 200，但 **data 为空** | | Step3 | `listAppendixSimplified` | ✅ 200（白名单已通） | | 全流程 Step1→5 | — | ❌ 卡在 Step3「暂无附件配置」 | ## 本次修复 1. **唯一手机号**：避免 `13800000000` 触发「该手机号已注册」 2. **图形验证码**：Step2 加载后从 Vue 状态读取 `/code` 结果，不再误等已完成的请求 3. **Step3 探测用例**：新增 `real-api.spec.js` 中的「Step3 附件配置接口探测」 4. **明确报错**：无附件配置时直接提示需维护 `busCode=8` ## 当前阻塞：测试库缺少附件配置 接口 `/file/appendixConfig/listByBusCode` 传 `busCode=8` 返回 **空数组**，页面因此显示「",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`real-api.spec.js",
+    "`security.js",
+    "涉及文件：c:\\Users\\Administrator\\Documents\\WXWork\\1688857831856144\\Cache\\File\\2026-08\\企业注册与入网确认-接口文档.md、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\register\\companyRegister.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\register\\components\\accountInfo.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "f750b067-6c90-4a44-8c42-69fa4ec69c0d"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "从业人员增删改查生成自动化测试用例，登录账号：913",
+   "type": "preference",
+   "content": "已修复。进入详情页后长时间空等，是因为**详情接口返回后**又调用了 `waitForResponse` 去等「已经发完」的证书列表请求，Playwright 会**白等满 30 秒**再 `.catch()` 吞掉。 ## 改动 1. **去掉重复的 `waitForResponse`**（详情加载完成后不再二次监听网络） 2. **改为 UI 状态等待**： - `waitForDetailLoadingDone` —— `expect.poll` 等 `.el-loading-mask` 消失 - `waitForCertificateSectionReady` —— 等「相关证书」区域 loading 结束 + 表格可见 3. **`gotoPersonnelDetail` 合并就绪判断**：详情接口 200 → loading 消失 → 姓名可见 → 证书区就绪 ## 效果 | 用例 | 优化前 | 优化后 | |------|--------|--------| | 03 证书增删改查 | ~39s | **~8s** | | 全流程 | ~53s | **~21s** | 全程无 `waitForTimeout` / 固定 sleep，均为接口响应 + DOM 状态驱动。可重新跑 `npm run test:e2e:personnel-certificate-crud",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\company\\staffManagement\\personnelRecord\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\company\\staffManagement\\components\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0dc2b982-cbda-4ef5-8a4b-504d7a26d726"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

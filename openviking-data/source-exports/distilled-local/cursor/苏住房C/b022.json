@@ -1,0 +1,97 @@
+{
+ "project": "苏住房C",
+ "batch": "022",
+ "files": [
+  "022.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "新房，户型集锦、最新楼盘、在售楼盘、两智一全 展示的",
+   "type": "fact",
+   "content": "已修复新房列表页楼盘内容遮挡搜索区的问题。 **原因：** `z-paging` 默认 `fixed=true`，会以全屏固定层渲染。搜索框、导航图标（户型集锦 / 最新楼盘 / 在售楼盘 / 两智一全）、筛选条件放在组件外部时，列表层会叠在上面，盖住搜索功能区。 **修复方式：** 将搜索、导航、筛选移入 `z-paging` 的 `#top` 插槽，固定在列表滚动区域上方，仅楼盘列表在下方滚动。 涉及文件： - `newHouse/index.vue` — 新房主页 - `newHouse/indexMore.vue` — 最新楼盘 / 在售楼盘 - `newHouse/houseTypeList.vue` — 户型集锦 - `goodProject/index.vue` — 两智一全 请重新编译后在小程序中验证：搜索框可正常点击输入，列表滚动时顶部功能区保持固定不被遮挡。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`newHouse/index.vue",
+    "`newHouse/indexMore.vue",
+    "`newHouse/houseTypeList.vue",
+    "`goodProject/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "671da04e-7711-4f45-b4cb-a4bcab90d503"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "这个会是什么格式的？例如调用这个接口 https:/",
+   "type": "preference",
+   "content": "已按宿迁苏服办的 `gateway.do` 方式改完，核心变化如下。 ## 改造思路 **旧方案（宿迁）**：每个业务接口单独上架一个 `interface_id` **新方案**：苏服办开放平台只上架 **2 个** `interface_id`（GET / POST），前端统一调 `gateway.do`，真实路径由 `header` 里的 `zs-path` 告诉后端，后端内部转发。 ## 请求格式（与宿迁一致） 开启 `VITE_APP_USE_SFB_DISPATCHER = 1` 后，所有接口统一 POST 到： `https://ydzt.jszwfw.gov.cn/jpaas-jags-server/interface/gateway.do` FormData 字段： | 字段 | 内容 | |------|------| | `app_id` | 应用 ID | | `interface_id` | GET 类接口 ID 或 POST 类接口 ID | | `biz_content` | 业务参数 JSON，如 `{\"pageNum\":1,\"pageSize\":10}` | | `header` | 含 `Authorization`、`zs-path`、`zs-sign` 等 | | `sign` | SM3 网关签名 | | `timestamp` / `ch",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`https://ydzt.js",
+    "`dispatcher.js",
+    "`httpInstance.js",
+    "`sign.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "87362be2-5517-4bea-9e71-248ff12f95d1"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "加装电梯-加装申请，联系人姓名与联系电话没有脱敏 其",
+   "type": "preference",
+   "content": "已修复联系人姓名与联系电话未脱敏的问题，并统一了全项目的脱敏规则。 ## 修改说明 ### 1. 统一脱敏规则（`src/utils/formatter.js`） 按你提供的规则重写了三个工具函数： | 类型 | 规则 | 示例 | |------|------|------| | 中文姓名 | 保留第 1 位，其余用 `*` | `朱楠` → `朱*`，`李小明` → `李**` | | 手机号 | 保留第 1 位和最后 2 位 | `18360916552` → `1********52` | | 身份证号 | 保留前 2 位和后 2 位 | `320105199001011234` → `32**************34` | 新增 `blurIdNumber` 函数。 ### 2. 用户 Store（`src/store/user.js`） 将 `secureUsername`、`securePhone`、`secureIdNumber` 改为 **getter**，根据原始数据实时计算脱敏值，避免旧缓存导致规则不生效。 ### 3. 加装电梯模块 `addAlone.vue`、`add.vue`、`input.vue` 已使用 `userStore.secureUsername` 和 `userStore.securePhone` 展示，配合新规则后截图中的 `朱楠`",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "统一脱敏规则（`src/utils/formatter.js",
+    "Store（`src/store/user.js",
+    "`addAlone.vue`、`add.vue`、`input.vue",
+    "`committee/application/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2f8d30cf-a249-4fbe-8c17-0429bc7bc7e6"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "点击电话报错",
+   "type": "preference",
+   "content": "**原因说明** 微信里和苏服办 App 的拨号机制不同： | 环境 | 拨号方式 | |------|----------| | 苏服办 App | `jmportal.communication.callPhone` ✅ 已可用 | | 微信 | `lightAppJssdk.device.call` 依赖 `wx.miniProgram.navigateTo` | 在微信里，若页面不在苏服办小程序的 webview 中，`wx.miniProgram` 不存在，SDK 会直接报错，之前也没有降级方案。 **本次修改** 微信环境下的拨号策略： 1. **优先**尝试苏服办 SDK（等待 / 动态加载 jweixin） 2. SDK 不可用或调用失败时，**自动降级**为 `tel:` 协议拨号 3. 用 `try-catch` 捕获 `wx.miniProgram.navigateTo` 的同步报错，避免页面崩溃 苏服办 App 仍只走官方 SDK，逻辑不变。 **请重新构建部署后测试。** 微信里点击电话应能唤起系统拨号（若 SDK 不可用会走 `tel:` 降级）。 若部署后仍无法拨打，请告知是「微信内置浏览器」还是「某个小程序里的 webview」，两种环境的限制不同。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\sfb.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\policy\\fddydetail.vue、d:\\repository\\苏住房C\\szffluzm\\index.html"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "11c71496-2c86-4af0-8987-a08453f769f0"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已修复。问题出在 houseCard 卡片底部地址栏",
+   "type": "bug",
+   "content": "已修复。问题出在 `houseCard` 卡片底部地址栏的布局。 **原因：** 地址栏是 flex 布局，`新房 |` 前缀设置了 `flex-shrink: 0`，但定位图标 `.orientation` 没有，在双列窄卡片里会被压缩到 0 宽度，所以只看到「新房 | 高新区」，看不到图标。 **修改：** 在 `houseCard.vue` 中为定位图标补上 `flex-shrink: 0`： ```341:346:d:/repository/苏住房C/zhi2-mobile-shimin/src/components/commonNew/houseCard.vue .house-card-top-box .orientation { width: 9px; height: 10px; margin-right: 5px; flex-shrink: 0; } ``` 该组件用于苏找房页的「推荐 / 新房 / 二手房」三个 Tab，修复后三个列表都会正常显示白色定位图标。请刷新页面验证一下效果。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`houseCard.vue",
+    "```341:346:d:/repository/苏住房C/zhi2-mobile-shimin/src/components/commonNew/houseCard.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\commonNew\\houseCard.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\Project_Suzhufang.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "61371a3a-6a5f-4dcd-a98f-26224110a6a9"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

@@ -1,0 +1,159 @@
+{
+ "project": "产品2.0",
+ "batch": 13,
+ "files": [
+  "049.md",
+  "050.md",
+  "051.md",
+  "052.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "baseline": "a357f32/075e6e9 等（zhi2-web-admin 子模块）",
+   "content": "什么情况：物业费账单列表页点「收款」时提示「缺少物业管理区域信息」，接口完全没发出。为什么：handlePay 在打开收款弹窗前用 row.complexId 做硬校验，但列表分页接口返回的行对象通常只带 complexName 这类展示字段，不带关联外键 complexId，守卫永远不过，收款弹窗和 payDetail 请求被静默拦截——前端没有任何报错，只有一条业务提示。怎么做：操作类前置守卫只校验「发起操作必需的最小主键」（如账单 row.id），不要校验列表行可能缺失的关联外键；弹窗打开后先调 detail 接口（/property/spFeeBill/payDetail/{billId}）取回 complexId，再依赖该 ID 加载后续数据（如支付渠道 listPayablePaymentChannel），形成「主键校验 → detail 补 ID → 再拉依赖数据」的顺序。凡是「列表行缺外键字段导致按钮被拦/接口不发」的场景都可套用这个模式。",
+   "evidence": "会话 eb97ca91：修复方案为 index.vue 的 handlePay 只校验 row?.id，collectionDialog.vue 打开后先调 GET /property/spFeeBill/payDetail/{billId} 取 complexId 再加载支付渠道",
+   "files": [
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/property/spFeeBill/components/index.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/property/spFeeBill/components/collectionDialog.vue"
+   ],
+   "sessionIds": [
+    "eb97ca91-bf05-47bd-962a-06182b75ff56"
+   ],
+   "title": "操作前置守卫依赖列表行缺失的关联 ID 会静默拦截整条操作链",
+   "type": "bug",
+   "bundle": "049.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "产品2.0 zhi2-web-admin",
+   "content": "什么情况：B 端（物业端）新增资金缴存时，页面自动填充的缴存账户来自「已终止」协议对应的账户，导致业务数据挂在无效协议上。为什么：fetchAccountAndAgreement 把「查账户」和「查协议」设计成两个并行独立查询——账户只按 bizState:'2' 取第一条，完全不感知协议状态；协议虽然过滤了 agreementState:'1'（已生效），但账户查询不引用协议结果，两边可能指向不同协议。怎么做：改为串行依赖——先查已生效协议，再按协议的 propertyProjectId、companyId 反查账户，且账户查询本身也加 agreementState:'1' 过滤兜底；B 端在无已生效协议或无可用账户时直接提示「当前物业管理区域暂无已生效的协议，无法新增缴存」并阻止打开弹窗，而不是静默填错账户。G 端选择账户弹窗同样补 agreementState 过滤。通用套路：任何「按主体自动默认关联对象」的逻辑，必须沿业务依赖链（协议→账户）串行取数，并行独立过滤各自的状态字段是不够的；若后端分页接口不支持关联状态参数（如 agreementState），需推动后端同步支持，否则过滤不彻底。协议生效态等魔数值抽成常量（如 EFFECTIVE_AGREEMENT_STATE='1'）放 enums.js。",
+   "evidence": "050.md 会话 9f380095：fetchAccountAndAgreement 并行查询、账户 bizState:'2' 未关联协议状态；修复改 components/index.vue 串行 + AddDialog.vue 同步过滤",
+   "files": [
+    "src/views/maintenance/guaranteeDeposit/components/index.vue",
+    "src/views/maintenance/guaranteeDeposit/components/AddDialog.vue",
+    "src/views/maintenance/guaranteeDeposit/enums.js"
+   ],
+   "sessionIds": [
+    "9f380095-1ae6-4b79-936e-82358c3999ad"
+   ],
+   "title": "自动默认账户必须沿「协议→账户」依赖链串行查询，并行各自过滤状态会命中已终止协议",
+   "type": "bug",
+   "bundle": "050.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "产品2.0 zhi2-web-admin",
+   "content": "什么情况：产品需求要求前端去掉某表单字段（如用款申请的「资金用途」fundsUsage）：删了输入框、校验规则和查看展示，但编辑保存时报「fundsUsage 字段未传 / 资金用途名称不能为空」。为什么：这是代码问题不是数据问题——前端删了 UI 但后端仍必填；且 form 里 fundsUsage 为 undefined 时 JSON.stringify 会整体省略该键，后端收到「字段未传」而非「传了空值」，报错更具迷惑性。另外选明细回填时只设置了 useMoneyApplyName 等展示字段，没有给 fundsUsage 赋值，两个语义独立但后端都要求。怎么做：判定口诀——「UI 删字段 ≠ 后端不再要求」，先确认后端校验是否同步调整（本仓库无后端源码，需推动后端或前端适配）。纯前端方案：提交前在 payload 里自动映射 fundsUsage = useMoneyApplyName || businessSubItemName，或在选明细的 setBusinessSubItem 回调里同步赋值；后端方案：将字段改非必填或废弃校验。通用原则：下线表单字段时要过一遍「提交载荷里这个字段后端还要不要、从哪来」，否则保存链路在用户看不到的地方断掉。",
+   "evidence": "050.md 会话 0ec35fee：pubUseMoneyApply/detail.vue 的 setBusinessSubItem 缺 fundsUsage 赋值、form 里 undefined 提交被序列化省略，后端仍必填",
+   "files": [
+    "src/views/benefit/pubUseMoneyApply/detail.vue",
+    "src/views/property/useMoneyApply/detail.vue"
+   ],
+   "sessionIds": [
+    "0ec35fee-2fec-4d29-8269-642ebfd5c257"
+   ],
+   "title": "前端下线字段但后端仍必填：undefined 字段被 JSON 序列化省略，需提交前映射或后端同步放宽",
+   "type": "bug",
+   "bundle": "050.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "产品2.0/zhi2-web-admin（苏房V3同源），基线 c98afb0",
+   "content": "什么情况：支取通知书（benefit/pubAllotNotice）详情页出现两个「提交」按钮。为什么：详情页顶栏的 operation-btn-group 组件内置通过 ZsSubmit 渲染「提交」按钮（走标准提交流程，含流程校验、附件校验，提交成功后 @update=\"init\" 刷新详情），而页面又在插槽里手写了一个调用 audit() 的「提交」按钮，两者叠加。怎么做：删除插槽中写死的提交按钮及其 audit() 方法，只保留 OperationBtnGroup 内置提交；排查同类问题时先看是否 :showSubmit=\"false\"（如 property/allotNotice 就是这样只留手写按钮的变体）。约定：详情页提交一律走 operation-btn-group 内置 ZsSubmit，禁止在插槽里手写提交按钮。",
+   "evidence": "会话 2c381547 最终结论：删除插槽写死的提交按钮与 audit() 方法，保留 operation-btn-group 内置提交；并指出 property/allotNotice 是 :showSubmit=\"false\" + 手写按钮的变体。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/components/ZsSubmit/index.vue"
+   ],
+   "sessionIds": [
+    "2c381547-658f-48d5-908a-a6017928c089"
+   ],
+   "title": "OperationBtnGroup 内置 ZsSubmit，插槽里再手写提交按钮会出现双「提交」",
+   "type": "bug",
+   "bundle": "051.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "产品2.0/zhi2-web-admin（苏房V3同源），基线 1d563df",
+   "content": "什么情况：产品2.0 的门户菜单路由来源从「前端拼树」切换为后端直出。为什么：原先 getPortalRouters 调 GET /portal/menu/list 拉菜单列表后，由前端按 menuType/appId 过滤并手动组装 Layout/ParentView/组件路径；新接口 GET /portal/menu/listRouters 直接返回与系统 listRouters 结构一致的 Router 树，菜单过滤/去重/排序/hidden/孤儿子菜单提升为根节点等逻辑全部由后端完成。怎么做：api/portal/menu.js 直接调 listRouters；登录 → router 守卫 GenerateRoutes → getPortalRouters() → permission.js filterAsyncRouter 解析 component，permission.js 无需改动（已支持 Layout→@/layout/index.vue、ParentView、InnerLink、loadView）。注意 portalApiRewrite.js 已有 /system/menu/listRouters → /portal/menu/listRouters 重写规则，旧路径会落到同一接口；改后需清 sessionStorage 的 routers 缓存或重新登录才生效。",
+   "evidence": "会话 f27acfa1 最终结论：api/portal/menu.js 改调 listRouters，permission.js 复用 filterAsyncRouter，portalApiRewrite.js 存在重写规则，需清 sessionStorage routers 缓存。",
+   "files": [
+    "zhi2-web-admin/src/api/portal/menu.js",
+    "zhi2-web-admin/src/store/modules/permission.js"
+   ],
+   "sessionIds": [
+    "f27acfa1-8278-4e4b-8253-349e3d4f24e5"
+   ],
+   "title": "Portal 菜单路由改为后端直出 Router 树（/portal/menu/listRouters）+ portalApiRewrite 重写规则",
+   "type": "pattern",
+   "bundle": "051.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "产品2.0/zhi2-web-admin（苏房V3同源），基线 414029f",
+   "content": "什么情况：房屋质量保证金账户详情页的缴存明细/支用明细子表（AccountDetailTable）把待提交、审核中的记录也同步展示了出来。为什么：子表查询接口未传 bizState，后端按全状态返回；账户明细是聚合口径，只应反映已生效（已备案）的资金流水。怎么做：在子表组件 getQueryParams() 中显式增加 bizState: '2'，只查询已备案记录。通用约定：凡是「账户/汇总类详情」里展示业务流水的子表，查询参数必须显式传 bizState=2 做口径过滤，不能依赖列表默认状态。",
+   "evidence": "会话 5050ef10 最终结论：getQueryParams() 增加 bizState: '2'，未备案的缴存/支用记录不再出现在账户明细中。",
+   "files": [
+    "zhi2-web-admin/src/views/maintenance/guaranteeDepositAccount/components/AccountDetailTable.vue"
+   ],
+   "sessionIds": [
+    "5050ef10-38f1-41cf-a707-d4f0fa6f0f5a"
+   ],
+   "title": "聚合类子表明细查询必须显式传 bizState=2，只取已备案数据",
+   "type": "pattern",
+   "bundle": "051.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "645607c",
+   "content": "什么情况：详情页 DetailTemplate 中 type:'amount' 的展示项，value 曾写成 `this.formatters.amountFormatter('', '', this.form.xxx)` 预格式化后再传入，这是错误写法。为什么：DetailTemplate 的 amount 类型内部已按 unit/dot 自己做格式化，预格式化后的字符串会让它做双重格式化（千分位/小数被二次处理），且组件按纯数字判定（已知：type:'amount' 只认纯数字，非数字会静默显示「-」并无条件拼单位）。怎么做：凡是 type:'amount' 的展示项，value 一律直接绑定 `this.form.xxx` 原始数字字段，不要用 amountFormatter 预格式化；小数位与单位交给组件的 unit/dot 配置。修复时全量检索 `value: this.formatters.amountFormatter('', '', this.form.` 清零，并跑 lint 验证。用户明确点名 building/project/detail.vue 是正确范例。",
+   "evidence": "用户指出 owner/vote/detail.vue:410-424 写法不正确，应以 building/project/detail.vue:601-614 为范例；最终 24 个文件全量修复并全局搜索确认无残留",
+   "files": [
+    "zhi2-web-admin/src/views/autonomy/election/owner/vote/detail.vue",
+    "zhi2-web-admin/src/views/building/project/detail.vue"
+   ],
+   "sessionIds": [
+    "959c4f79-0192-4b53-a367-9630388e7f62"
+   ],
+   "title": "[产品2.0] DetailTemplate type:'amount' 的 value 直接绑 form 原始字段，禁止 amountFormatter 预格式化",
+   "type": "pattern",
+   "bundle": "052.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "50767de",
+   "content": "什么情况：可视化地图按腾讯行政区划接口（loadPlatformDistrictMapGeoJson）渲染苏州市区划，业务数据里有「工业园区」，但地图上没有对应多边形。为什么：腾讯行政区划返回的苏州市下级区划不含苏州工业园区（320571，国家级开发区，不是标准区县节点），接口 GeoJSON 天然缺这块。怎么做：1) 从项目内历史 GeoJSON（transaction/screen/components/suzhou.json）提取缺失区划轮廓，存为 `src/utils/districtMapSupplements/<市级adcode>.json`（如 320500.json）；2) 在 tencentDistrictBoundary.js 加 mergeGeoJsonSupplements(geoJson, adcode)：拉取腾讯数据后按 adcode 自动合并本地补丁，只补缺、不覆盖已有区县。后续其他城市出现开发区/功能区缺失，同样往 districtMapSupplementS/ 加对应市级 adcode 补丁文件即可，通用机制已内建。",
+   "evidence": "tencentDistrictBoundary.js 新增 mergeGeoJsonSupplements 并在 loadPlatformDistrictMapGeoJson 中合并；补丁数据来自 transaction/screen/components/suzhou.json",
+   "files": [
+    "zhi2-web-admin/src/utils/tencentDistrictBoundary.js",
+    "zhi2-web-admin/src/utils/districtMapSupplements/320500.json",
+    "zhi2-web-admin/src/views/benefit/mapOverview/index.vue"
+   ],
+   "sessionIds": [
+    "f1c849f4-3cc5-4b13-8600-6f3cd3f51e32"
+   ],
+   "title": "[产品2.0] 腾讯行政区划接口缺开发区/功能区 GeoJSON：本地补丁目录按市级 adcode 合并只补缺",
+   "type": "pattern",
+   "bundle": "052.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "2f68042",
+   "content": "什么情况：物业费账单导入（/property/spFeeBill/import 及 /import/confirm）返回体新增错误报告字段，前端需按约定处理部分失败场景。为什么：后端导入校验失败时不再靠前端拼接错误文案，而是返回结构化结果：`errorReportUrl`（错误明细文件地址）+ `errorSummary`（汇总文案），并附带 `failCount`（替代旧 errorCount）、`bills`（替代 previewList）、`importId`（替代 previewBatchId）。怎么做：导入与确认导入两个环节统一约定——只要返回 `data.errorReportUrl` 有值，就 1) 提示 `errorSummary` 文案；2) 自动调用该 URL 下载错误报告文件；confirm 环节有 errorReportUrl 时不再弹原确认弹窗。文件列表保留「下载错误报告」按钮供用户再次下载。字段适配按新字段为主、兼容旧字段名。该套路可复用到其他模块的批量导入。",
+   "evidence": "import.vue 与 importUploadDialog.vue 实现该逻辑，接口字段映射 failCount←errorCount、bills←previewList、importId←previewBatchId",
+   "files": [
+    "zhi2-web-admin/src/views/property/spFeeBill/components/import.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/importUploadDialog.vue"
+   ],
+   "sessionIds": [
+    "17074586-b181-47e4-98de-bff948d7a54e"
+   ],
+   "title": "[产品2.0] Excel 导入接口的部分失败约定：errorReportUrl 有值即提示 errorSummary 并自动下载错误报告",
+   "type": "pattern",
+   "bundle": "052.md",
+   "project": "产品2.0"
+  }
+ ]
+}

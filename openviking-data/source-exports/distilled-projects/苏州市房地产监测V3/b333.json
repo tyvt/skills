@@ -1,0 +1,59 @@
+{
+  "project": "苏州市房地产监测V3",
+  "batch": "333",
+  "files": [
+    "333.md"
+  ],
+  "count": 3,
+  "memories": [
+    {
+      "title": "已有独立页的功能不要再在变更/详情页内嵌一份弹窗：楼盘表按钮改按 filePath 跳独立页并删除 53 行弹窗模板（减法优先）",
+      "type": "pattern",
+      "content": "【什么情况】楼幢变更记录（`projectManagement/buildinginfo/changeDetail.vue`、`building/buildingChange/detail.vue`）里要提供楼盘表查看能力，最初的做法是在页面内用 `zs-select-dialog` 弹窗内嵌一份楼盘表（本地方法 `propertyView`）。但项目详情页已经有独立的楼盘表页面（`projectManagement/buildingTable/index`），最终改为跳独立页。\n【为什么】同一能力存在两套实现（独立页 + 内嵌弹窗）必然发散：楼盘表的字段、接口、状态图标口径要改两处；而且弹窗内的窄容器会把楼盘表网格压扁（这是全库反复出现的楼盘表弹窗坑）。「减法优先」在这里不是口号：把弹窗副本删掉比维护两份更省。\n【怎么做】① 先确认目标能力是否已有独立页面；有则复用，不再写弹窗副本。② 把按钮的点击处理从 `propertyView`（弹窗）改为 `openBuildingTable`，按**文件路径解析路由**跳转独立楼盘表页（不要手写 path 字符串，手写会与菜单登记的 component 不一致）。③ 跳转前必须确认目标页在菜单里有登记——按 filePath 跳转依赖菜单路由表，薄入口未登记会报「未找到菜单路由」（这条已在全库其它条目覆盖，此处作为前提列出）。④ 删干净：本次连带删除 53 行弹窗模板及其依赖的 state / methods / imports，净变更 `48 insertions, 321 deletions`——删的比加的多才算改干净，不要留半截死代码。⑤ 验收要出**成品页面截图**给用户看（本项目用本地 nginx-ui 部署站点后 e2e 截图取证），只给代码不算交付。",
+      "evidence": "会话 session-16ca1dd8-a463-4fdb-97df-7a1b83c3b2fb（基线 235e6ee）用户诉求 1「楼幢变更记录里面的楼盘表也参考项目详情里面的楼盘表功能实现」、诉求 4/5「把效果截图给我看」「我需要你做完的楼盘表弹窗截图」；最终结论写明「楼盘表按钮由 `propertyView`（本地 `zs-select-dialog` 弹窗）改为 `openBuildingTable`，按文件路径解析路由跳转独立楼盘表页；删除 53 行弹窗模板及其依赖的 state/methods/imports」，净变更 `48 insertions, 321 deletions`，并标注「符合『减法优先』」。",
+      "files": [
+        "zhi2-web-admin/src/views/projectManagement/buildinginfo/changeDetail.vue",
+        "zhi2-web-admin/src/views/building/buildingChange/detail.vue",
+        "zhi2-web-admin/src/views/projectManagement/buildingTable/index.vue"
+      ],
+      "baseline": "235e6ee",
+      "sessionIds": [
+        "session-16ca1dd8-a463-4fdb-97df-7a1b83c3b2fb"
+      ],
+      "bundle": "333.md"
+    },
+    {
+      "title": "同一能力不要挂两条菜单：项目楼盘表查询列表页新增菜单，楼盘表详情页复用已有「楼盘表应用」菜单（component 必须是 views 下的页面入口）",
+      "type": "fact",
+      "content": "【什么情况】禅道任务 #2129「【房产】新增项目楼盘表查询-前端」要求新增「项目楼盘表查询」列表页（`src/views/projectManagement/buildingTableQuery/index.vue`），同时改造楼盘表详情页接入 7 个 lpb* 接口。列表页是全新菜单，但详情页不是——楼盘表详情早已有菜单。\n【为什么】如果给详情页也新加一条菜单，同一个「楼盘表详情」会出现两个入口，用户从不同菜单进同一个页面，后续改菜单名/图标/权限要改两处；而列表页没有菜单就完全进不去。所以两类页面的处理必须区分。\n【怎么做】① 列表页「项目楼盘表查询」新增一条菜单（`MENU_ID=2114991472432386051`，已绑定 `fangdichan`）；② 详情页**不新增菜单**，复用已有的「楼盘表应用」菜单（`MENU_ID=2096854897904476161`，component = `projectManagement/buildingTable/index`）；③ 关键前提：菜单 component 必须指向 `views` 下的真实页面入口文件，按 filePath 反查路由时才能命中——菜单 component 写成目录名或薄入口未登记，按 filePath 跳转必报「未找到菜单路由」。④ 楼盘表查询要接的 7 个接口：`lpbPage`（分页）、`lpbProjectDetail`（项目详情）、`listBuildingByProjectId`（楼幢）、`selectBuildHouse`（房屋）、`lpbStatistics`（状态统计矩阵）、`lpbHousePage`（房屋分页）、`house.detail`（房屋详情）。⑤ 接口调用走公共封装（`this.$post` 等），删除单独建的 `lpb.js` api 文件。⑥ 列表的区划筛选从前端文本框改成区县下拉并传**区划编码**（不是名称），行政区划列回显名称；后端 `ProjectLpbQuery.java` + `ProjectServiceImpl.java` 相应支持 `region`、`projectCode` 过滤——前后端一起改，否则筛选用不上。",
+      "evidence": "会话 session-8d441c21-2bbf-4a16-8871-ebb87e3b9476（基线 a86bf95）用户诉求 1 禅道链接 `zentao-biz.zhi.com/index.php?m=task&f=view&objectID=2129`、诉求 3「接口文件使用公共封装调用，不要单独建api文件，拉取后端代码，本地启动后e2e联调测试，需要截图UI」；最终结论写明「详情页不需要新增菜单，现在『查看』直接复用已有的『楼盘表应用』菜单（`MENU_ID=2096854897904476161`，`projectManagement/buildingTable/index`）；只有列表页『项目楼盘表查询』新增了一条菜单（`MENU_ID=2114991472432386051`，已绑定 `fangdichan`）」，提交内容含前端 `buildingTableQuery/index.vue` 行政区划列回显名称、搜索改为区县下拉并传区划编码，后端 `ProjectLpbQuery.java`/`ProjectServiceImpl.java` 支持 `region`、`projectCode` 过滤。",
+      "files": [
+        "zhi2-web-admin/src/views/projectManagement/buildingTableQuery/index.vue",
+        "zhi2-web-admin/src/views/projectManagement/buildingTable/index.vue",
+        "zhi2-web-admin/src/views/projectManagement/customerProject/detail.vue"
+      ],
+      "baseline": "a86bf95",
+      "sessionIds": [
+        "session-8d441c21-2bbf-4a16-8871-ebb87e3b9476"
+      ],
+      "bundle": "333.md"
+    },
+    {
+      "title": "子表增删入口的可操作性判定下沉到子表组件的 editable 计算属性（bizState=0 或空），父层不再传 :readonly；formMode=view 不等于只读",
+      "type": "pattern",
+      "content": "【什么情况】项目备案申请的宗地表（`ParcelTable.vue`）与证书 Tab（`ProjectCertificateTabs.vue`）需要按状态控制「新增/删除/提取」按钮的显隐。最初的实现是父组件 `detail.vue` / `changeDetail.vue` 传 `:readonly` 给子表，结果用户明确纠正：「查看状态 formMode=view 也要显示」。\n【为什么】`formMode`（路由进入模式：add/edit/view）描述的是**怎么进来的**，不是**能不能改**——本项目里 view 态进详情仍然允许改明细（用户诉求 4 原话「查看状态 formMode=view 也要显示」）。真正的可编辑性由单据的业务状态 `bizState` 承载（`bizState=0` 或空 = 尚未备案 = 可编辑）。把可操作性判定放在父层用 formMode 推导，等于把两个不同语义的口径混在一起，且每个子表各传一遍 `:readonly` 会互相打架。\n【怎么做】① 判定统一收敛到子表组件内部的 `editable` 计算属性，判据是 `bizState === 0 || bizState === undefined`（未备案/草稿才可改），父组件 `detail.vue`、`changeDetail.vue` 移除 `:readonly` 传参；② 不要用 formMode 单独判只读；要判就判业务状态。③ 同一套判定要覆盖子表的全部写操作入口（新增、删除，以及宗地表上的「提取」按钮），不能只挡其中一个，否则会出现「新增没了但提取还在」的半残状态。④ 规则要沉淀成文档——本项目据此在主仓库新增 `docs/子表增删按钮显隐判断规范.md`，让后续新模块照抄而不是各自猜。⑤ 交付前用 eslint 0 error + 构建 `EXITCODE=0` 验证再提交。",
+      "evidence": "会话 session-2f8d23da-97cc-4111-a10a-355b877d6fbc（基线 235e6ee）用户诉求 1「项目已备案之后，点查看按钮进去的项目备案申请详情界面的新增和删除按钮不要」、诉求 2「顺便把宗地上的提取按钮也隐藏掉吧」、诉求 4「查看状态formMode=view 也要显示」；最终结论写明子模块提交 `fix(projectRecord): 宗地/证书增删入口改按备案状态判定`——`ParcelTable.vue`、`ProjectCertificateTabs.vue` 统一 `editable`（`bizState=0` 或空）判定，`detail.vue`、`changeDetail.vue` 移除 `:readonly` 传参；主仓库新增 `docs/子表增删按钮显隐判断规范.md`。",
+      "files": [
+        "zhi2-web-admin/src/views/projectManagement/customerProject/components/ParcelTable.vue",
+        "zhi2-web-admin/src/views/projectManagement/customerProject/components/ProjectCertificateTabs.vue",
+        "zhi2-web-admin/src/views/projectManagement/customerProject/detail.vue",
+        "zhi2-web-admin/src/views/projectManagement/customerProject/changeDetail.vue"
+      ],
+      "baseline": "235e6ee",
+      "sessionIds": [
+        "session-2f8d23da-97cc-4111-a10a-355b877d6fbc"
+      ],
+      "bundle": "333.md"
+    }
+  ]
+}

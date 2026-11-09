@@ -1,0 +1,92 @@
+{
+ "project": "苏住房C",
+ "batch": "001",
+ "files": [
+  "001.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "没有还原设计图，有很多地方还原的不好，确实的图片素材",
+   "type": "fact",
+   "content": "刚才用于验证「dev server 能否正常启动、且无 z-paging 导入报错」的检查任务已被中断，没有跑完，因此目前无法据此确认启动是否完全正常。 从代码侧看，z-paging 仍通过 `vite.config.ts` 的 alias 和 `Project_Suzhufang.vue` 中的显式 import 接入；若你本地再遇到 z-paging 相关报错，把完整控制台输出贴过来即可继续排查。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`vite.config.ts",
+    "`Project_Suzhufang.vue",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\Home_Suzhufang.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\Project_Suzhufang.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d07a249b-d9a2-41e7-a8f1-7018cf24e8c6"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "该项目原来作为H5嵌入到原生APP使用，现在要改为微",
+   "type": "fact",
+   "content": "已修复。根因不是缺少 `componentPlaceholder`，而是**分包之间不能互相引用组件**。 ## 原因 `AgreementCheck` 被放在 `pages_tab` 分包，而登录页在 `pages_main` 分包。微信规则是： - 分包可以引用**主包**资源 - **分包 A 不能引用分包 B** 的组件 因此 `pages_main/login` 找不到 `pages_tab/shared/AgreementCheck`。 ## 修复 将跨业务共用的组件迁回**主包**： | 原路径 | 新路径 | |--------|--------| | `pages_tab/shared/*` | `src/components/shared/*` | | `pages_tab/commonNew/*` | `src/components/commonNew/*` | `pages_tab` 仅保留 Tab 专用组件（`Home_Suzhufang`、`My_Suzhufang` 等），供主包 Tab 页通过 `componentPlaceholder` 异步加载。 登录页构建结果已正确指向主包： ```json \"agreement-check\": \"../../components/shared/AgreementCheck\" ``` ## 体积影响 - 主包：",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\package.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\vite.config.ts、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\manifest.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\app.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "51a70ae2-60f9-4cca-aae7-502b7737b3ad"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "所有使用uni-load-more的页面的分页改为z",
+   "type": "bug",
+   "content": "「排查缺少 `#empty` 的 z-paging 页面」任务已中止，我这边补查了一下结论： 约 **15 个页面**未自定义 `#empty`（如政策法规、公告、楼栋信息、认证列表、收支明细等），但都会走 `ZsPaging` 的**默认空态**（`images/empty.png` +「暂无数据」），不会出现完全空白。 已自定义 `#empty` 的页面（我的合同、收藏、新房列表等）仍使用各自的文案和图片，不受影响。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\hooks\\useLoadMore.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\Project_Suzhufang.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ListLoading\\ListLoading.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "15b35540-03c7-44b7-9ef5-69b1b346d1bb"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "Error: 代码包大小超过限制,subpackag",
+   "type": "preference",
+   "content": "`wx.onLazyLoadError` 返回 `undefined` 是正常的——它只在基础库 ≥ 2.24.3 且错误属于「分包异步加载」时才有；模拟器启动失败时，错误往往发生在更早阶段，Console 只会显示工具包装后的 `[object Object]`，**不是完整错误信息**。 ## 请先确认这两处（比 Console 更重要） ### 1. 详情 → 本地设置 勾选： **「预览及真机调试时主包、分包体积上限调整为 4M」** `project.config.json` 里的 `bigPackageSizeSupport` 只写进配置文件不够，**必须在开发者工具 UI 里勾选**。未勾选时，`pages_transaction` 分包（约 2115KB）超限，可能导致模拟器直接起不来。 ### 2. 看「编译」面板，不是「调试器 → Console」 顶部点 **编译**，看下方 **编译 / 代码依赖分析** 是否有红色报错（例如 `source size exceed`、`Component is not found`、`json 文件内容错误`）。把那一行原文发我即可。 --- ## 本次已更新（请重新构建） ```bash cd zhi2-mobile-shimin npm run build ``` - 主包上传预估：**1962.7KB**（合规） -",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`project.config.js",
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\automaticAdd.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\package.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "672f088f-9a28-4d5f-8510-9425d8259a76"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "参考main-v2.1分支，恢复首页聊天机器人相关功",
+   "type": "preference",
+   "content": "### 原因（不是机器人图片本身） 控制台里的 **ENOENT** 指向： - `dist\\node-modules\\z-paging\\...\\z-paging.wxss` - `dist\\node-modules\\@dcloudio\\uni-ui\\lib\\uni-datetime-picker\\...` 构建后 **`common/vendor.js` 仍会引用主包里的这两条路径**，但旧的 `relocate` 脚本会把主包里的 `z-paging` / `uni-datetime-picker` **删掉**（只留在各分包）。微信开发者工具编译 WXSS/WXML 时就会报找不到文件，并连带出现 `__route__ is not defined`。 ### 已修改 1. **`relocate-z-paging` / `relocate-datetime-picker`**：不再删除主包里的这两份依赖（分包仍保留副本并做路径修正）。 2. 新增 **`scripts/restore-main-vendor-deps.mjs`**：若主包缺失则从 `pages_main` 恢复（已在你当前 `dist` 跑过一次，`z-paging.wxss` 已存在）。 3. **`vite.config.ts` closeBundle** 与 **`npm run build`** 链",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`dist\\node-modules\\z-paging\\...\\z-paging.wxss",
+    "**`common/vendor.js",
+    "跑过一次，`z-paging.wxss",
+    "**`vite.config.ts"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "87fe1c13-6937-4a04-8752-5102a7dffe63"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

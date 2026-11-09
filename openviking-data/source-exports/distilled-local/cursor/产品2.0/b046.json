@@ -1,0 +1,62 @@
+{
+ "project": "产品2.0",
+ "batch": "046",
+ "files": [
+  "046.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "已按参考样式完成物业费简易申报相关调整，主要变更如下",
+   "type": "bug",
+   "content": "已按参考样式完成物业费简易申报相关调整，主要变更如下： ### 1. 列表页（`index.vue`） - 移除表格 `min-height: 500px`，去掉数据较少时下方的大块空白。 ### 2. 详情页 - 欠费户室（`feeBindScopeTable.vue`） - 「申报年度 / 申报小区」改为与业务对账列表一致的浅橙提示条样式（`#fff7e6` 背景、`#ffd591` 边框），**不含**橙色圆形 icon。 - 操作按钮（导入上次申报数据、选择房屋）右对齐，与提示条分开布局。 - 按钮文案「带入上次申报数据」改为「导入上次申报数据」。 ### 3. 选择欠费户室弹窗（`feeBindScopeDialog.vue`） 参考「新增开户明细」样式重构： - 左侧：**选择楼幢** + 带边框楼幢/单元树。 - 右侧：**列表视图** / **楼盘表视图** 两个 Tab。 - 列表视图：完整列（序号、楼幢、单元、户室、房屋面积）。 - 楼盘表视图：选中楼幢单元后加载楼盘表，支持点选户室。 - 修复确定按钮在单选模式下 `row` 未定义的 bug。 如需继续微调提示条文案、弹窗尺寸或楼盘表交互，可以说明具体页面和期望效果。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "列表页（`index.vue",
+    "欠费户室（`feeBindScopeTable.vue",
+    "选择欠费户室弹窗（`feeBindScopeDialog.vue",
+    "涉及文件：d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\feeDeclare2\\components\\feeBindScopeTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "b37d508c-a09b-4cbb-bac4-008c8f7645fb"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "现在默认是已备案，也选不了其他状态，选择其他状态然后",
+   "type": "bug",
+   "content": "## 「业务状态」筛选项 **首次加入时间：2026-05-07** **提交人：cll**（`1005583730@qq.com`） **提交：`717e0e6f1`** **说明：租赁合同停车泊位** 该筛选项不是后来单独加的，而是在新建 `resourcesLeaseContractFiling/index.vue` 时就写进了 `formItems`： ```javascript { label: \"业务状态\", model: \"bizState\", type: \"select\", attrs: { placeholder: \"请选择业务状态\", options: this.bizStateOptions }, } ``` 当时这个页面是从租赁合同相关功能拆出来的，**一创建就带了完整筛选区**（物业管理区域名称、合同名称、资源类型、承租方名称、缴款状态、业务状态）。 --- ## 对比说明 原来的 `pubRevenueContract/index.vue` 里： - 列表列有「业务状态」 - 搜索区**没有**「业务状态」筛选项 新页面 `resourcesLeaseContractFiling/index.vue` 创建时，才把「业务状态」加进搜索条件。 --- ## 其他筛选项补充 | 筛选项 | 首次加入 | 提交人 | |--------|----------|",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`resourcesLeaseContractFiling/index.vue",
+    "`pubRevenueContract/index.vue",
+    "涉及文件：d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubVenue\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubVenue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\resourcesLeaseContractFiling\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7fcdcc25-208a-4099-b05d-179f9783abeb"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "首页-办件量分析，在切换的时候数量会出现紊乱 例如当",
+   "type": "preference",
+   "content": "已修复首页「办件量分析」时间筛选与数量不同步的问题，修改在 `zhi2-web-admin/src/views/home/index.vue`。 ## 问题原因 这是一个**状态不同步**问题，常见触发路径如下： 1. 选中「当日」后 `currentTab = 0`，页面展示当日数据 2. 进入待办详情再返回首页，`currentTab` 恢复默认 `1`（本周） 3. 但办件数量区域可能仍显示上一次的当日数据，出现「本周选中、当日数字」的错乱 可能原因包括： - 切换 tab 时 DOM 复用，数字未及时刷新 - 多次统计请求并发返回，旧数据覆盖新数据 - 页面被缓存后再次激活，tab 与数据未一起重置 ## 修复内容 1. **`:key=\"'task-stats-' + currentTab\"`** — tab 切换时强制重渲染数量区域 2. **`currentTaskStats` 计算属性** — 安全读取当前 tab 对应数据 3. **`refreshStatsData()`** — 刷新前先清空 `todoCount` / `bubbleList` / `lineData`，避免短暂展示旧数据 4. **`statsFetchSeq` 序号保护** — 忽略过期的统计接口响应，避免竞态 5. **`activated` 钩子** — 从详情返回时重置为「本周」，并",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`zhi2-web-admin/src/views/home/index.vue",
+    "涉及文件：d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\home\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\home\\index-wrapper.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d23cbaf7-ad9b-42a8-baa6-7897239ffefe"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

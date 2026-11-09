@@ -1,0 +1,63 @@
+{
+ "project": "repository",
+ "batch": "006",
+ "files": [
+  "006.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "当前页面左上角加一个搜索区域，如图所示。输入点击搜索",
+   "type": "bug",
+   "content": "原因和解决办法如下： ### 为什么搜索会打开 `overview-content` - 在 `Map` 组件里，地图缩放变化时有监听： ```12:45:src/components/Map/index.vue this.map.addListener('zoom_changed',() => { this.$emit('clickMark', false) this.$emit('hoverMark', false) }) ``` - 也就是说，只要缩放级别变动（你搜索后把 `mapZoom` 改为 15），`Map` 就会向父组件触发 `clickMark` 事件，第一个参数是 `false`。 - 而父组件 `statisticsMap/index.vue` 里绑定的是： ```23:31:src/views/benefit/statisticsMap/index.vue <Map ... @clickMark=\"showOverviewContent\" ... /> ``` `showOverviewContent` 原来只接收一个参数 `menu`，不管是什么都直接把 `contentVisible` 设为 `true`，所以当缩放变化时传入的 `false` 也会被当成「点了标记」来处理，从而把抽屉打开。 ### 已为你修改的逻辑 现在在 `statisticsMap",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "```12:45:src/components/Map/index.vue",
+    "`statisticsMap/index.vue",
+    "```23:31:src/views/benefit/statisticsMap/index.vue",
+    "```86:92:src/views/benefit/statisticsMap/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "0c978c4d-3266-400e-856a-6b12b6446659"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "资产租赁页面参考这个设计图，具体的字段和接口参考@s",
+   "type": "bug",
+   "content": "你说的两个问题，我已经同时处理了： ### 1. 资产类型列不显示的问题 - 这个列用的是 `dictFormatter` 做字典翻译，需要先把相关字典数据加载进来。 - 在 `assetLease.vue` 里我补齐了和原列表页 `pubAssetLease/index.vue` 一样的字典初始化逻辑，包括： - `BIZ_STATE`（业务状态） - `PUB_ASSET_TYPE`（资产类别） - `PUB_SETTLEMENT_MODE`（结算方式） - `PUB_LEASE_MODE`（租赁方式） - `PUB_LEASE_TYPE`（出租类型） - `sys_yes_no`（是否有合同 / 是否循环） - 现在 `资产类型` 列会像原来的列表页一样正常显示字典中文名称。 ### 2. 切换按钮传资产类型并重新请求接口 - 顶部 4 个圆角按钮对应的 `value` 已经分别是 `'4' | '3' | '2' | '1'`，并在点击时： - 更新 `activeAssetType` - 把选中的值写入 `queryParams.assetType` - 重置页码 `pageNum = 1` - 调用 `getList()`，从而重新请求 `listPubAssetLease` 接口。 - 接口参数中现在始终会带上当前资产类型，同时保留从地图传入的 `leaseProje",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`assetLease.vue",
+    "`pubAssetLease/index.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6baca9f8-fd57-451d-8849-6e4937fcffa8"
+   ],
+   "_draft": true,
+   "project": "repository"
+  },
+  {
+   "title": "现在是空白的，不显示",
+   "type": "bug",
+   "content": "空白的原因是：这两个列都用了全局的 `dictFormatter`（见你表格里 `:formatter=\"dictFormatter\"`），但 `incomeExpenseDetail.vue` 里原来没有初始化这两个字段对应的字典选项数组——所以 `dictFormatter` 找不到 `isCorrectionOptions / isBusinessReconciliationOptions`，返回空字符串就会导致单元格“显示为空”。 我已经在 `@src/views/benefit/statisticsMap/incomeExpenseDetail.vue` 里补了： - `isCorrectionOptions: []` - `isBusinessReconciliationOptions: []` - `created()` 调用 `initDict()` - `initDict()` 拉取字典： - `benefit_is_correction` - `benefit_is_business_reconciliation` 现在你刷新页面看看 `是否冲正` / `是否已对账` 是否能正常显示对应文案。 如果仍然空白，你把接口返回 `rows` 里这两个字段（`isCorrection`、`isBusinessReconciliation`）的实际值贴一小段给我（例如 0",
+   "evidence": "extracted source=cursor project=repository",
+   "files": [
+    "`incomeExpenseDetail.vue",
+    "`@src/views/benefit/statisticsMap/incomeExpenseDetail.vue",
+    "main.js",
+    "@src/views/benefit/statisticsMap/incomeExpenseDetail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7111a4be-91a8-4d4e-86f1-04e6cabb0d0c"
+   ],
+   "_draft": true,
+   "project": "repository"
+  }
+ ],
+ "_draft": true
+}

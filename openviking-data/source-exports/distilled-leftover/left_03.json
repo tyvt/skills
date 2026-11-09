@@ -1,0 +1,99 @@
+{
+ "batch": 3,
+ "files": [
+  "013.md",
+  "014.md",
+  "015.md",
+  "016.md",
+  "017.md",
+  "018.md"
+ ],
+ "count": 5,
+ "memories": [
+  {
+   "title": "[苏房] 不同表格页的「列宽/省略」需求必须收口到 zs-table 公共层，页面级 CSS 会造出两套相反口径",
+   "type": "pattern",
+   "content": "情况：同一时期不同列表页出现互相矛盾的列宽需求——「专业资格证书管理」页用户反馈列宽乱跳、几列文字互相压住、整表卡顿；而「菜单管理」页用户要求「不要省略，再长也要展示全」。若照字面在页面级 CSS 或单页 el-table-column 上逐个改，会得到两个相反的全站口径（有的页强制 nowrap+ellipsis，有的页强制换行），后续每加一页都要重新决定一次。\n\n为什么：zs-table-column 是公共组件，列宽测算与溢出行为在它内部统一计算；页面底部写 white-space: nowrap + text-overflow: ellipsis（或反过来写 normal + break-word）会与组件默认规则打架，而且深度绑定页面的 :deep 选择器会被后续全局调整覆盖失效。\n\n怎么做：① 先判定需求的真实语义是「列宽不稳」还是「长文本被截断」——前者修测算，后者修溢出策略；② 两个方向都改公共层：zs-table-column 负责文本测算与 tooltip，element-ui.scss / index.scss 负责 overflow 与省略号，zs-table 负责列宽均分；③ 只有确属单页特例（如需要换行展示完整权限标识）才在该页显式关掉 show-overflow-tooltip 并给该页局部规则，同时在提交说明里写清是与全局口径的例外关系。\n\n验收：改完要求用户硬刷新（Ctrl+F5）再看，因为 Vite 下公共 scss / 组件改动常被浏览器缓存掩盖，容易误判为「还是很卡」。",
+   "evidence": "会话 b1715cba 用户先报「表格列一直跳」，再报「还是很卡，还会出现遮挡」，最终把普通 prop/dict/link 列改成不扫 DOM、只做文本测算并恢复 tooltip，测算列改隐藏溢出+省略号，列宽均分加约 16ms 合并；会话 72843b32 则要求菜单管理页四列「不要省略，再长也要展示全」，做法是该页关掉 :show-overflow-tooltip 并把第 1/3/4/5 列改 white-space: normal + word-break: break-word，其余列保持原样。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/views/system/menu/index.vue",
+    "zhi2-web-admin/src/views/company/personnelCertificate/index.vue",
+    "zhi2-web-admin/src/mixins/table.js"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "b1715cba-74d5-4dce-8f3b-36a679a8e083",
+    "72843b32-55a1-45bf-be49-4196528a7cf8"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "[苏房] zs-table 逐列扫 DOM 测宽是列表卡顿的主因：默认走文本测算，全表重算要合并防抖",
+   "type": "bug",
+   "content": "现象：证书类列表列多时「很卡」，同时出现相邻列文字互相压住、看起来像重影叠字。\n\n根因有两层：① 性能——zs-table-column 在普通 prop / dict / link 列上都做整表 DOM 扫行测宽，字典异步加载完成后再扫一遍，每列都触发 doLayout 与列宽均分，列数一多就是 N×行数 次布局重排；② 视觉——列宽被测算得偏窄时，列上若允许 overflow: visible，长文案（如发证机关）会画到下一列上，用户看到的是「遮挡/叠字」，本质是列宽没兜住而不是层级问题。\n\n解法：普通列改为纯文本测算宽度，不再读 DOM；溢出策略统一为隐藏溢出 + 省略号，全文靠 tooltip 查看；zs-table 的列宽均分做约 16ms 的合并调度，避免多列同时注册时连续触发多次布局。这样既降卡顿，又让「列偏窄」表现为可悬停查看的省略号，而不是压到邻列。\n\n排查顺序：先确认卡顿来自单列还是全表（列数×行数），再查异常列是否写了 overflow: visible / 固定 width 绕过默认测算；不要先去怀疑接口数据量或 ECharts。",
+   "evidence": "会话 b1715cba 第二轮反馈「还是很卡，还会出现遮挡」，最终结论明确遮挡来自测算列 overflow: visible 把长文案画到下一列，卡顿来自每列对整表扫行测宽并在字典加载后再测一遍、反复 doLayout；修法为普通 prop/dict/link 列不再扫 DOM、恢复 tooltip、列宽均分加 16ms 合并。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/components/zs-table/zs-table.vue",
+    "zhi2-web-admin/src/assets/styles/element-ui.scss",
+    "zhi2-web-admin/src/assets/styles/index.scss"
+   ],
+   "baseline": "a861cff",
+   "sessionIds": [
+    "b1715cba-74d5-4dce-8f3b-36a679a8e083"
+   ],
+   "bundle": "013.md"
+  },
+  {
+   "title": "银行名单详情页网点/左侧树接口不能顺手换成 unionBank/page：与旧系统的联行号口径不同",
+   "type": "bug",
+   "content": "【什么情况】苏州 V3 监管银行 → 银行名单详情页（views/supervision/bank/superviseBank/detail.vue）重构时，把左侧树的 getBranch() 改成了 pageUnionBank（/system/unionBank/page，联行号体系），右侧列表仍走 /prefund/bankBranch/list。用户对照旧系统截图指出：同一个页面原来调的是两个「银行网点」接口、参数不同，现在取到的联行号数据与以前不一致。\n【为什么】V3 里「联行号（unionBank）」与「银行网点（bankBranch）」是两套数据源，网点挂在监管银行下（workBankId），联行号是全局行号库；用 unionBank 填左侧树会多出不属于该监管银行的网点、并丢掉 bankBranchManageId 这套主键。旧系统参考实现在同级仓库 d:\\repository\\苏州市房地产监测\\apps\\chanpin\\src\\views\\supervision\\bank\\superviseBank\\detail.vue。\n【怎么做】恢复为：左侧树 POST /prefund/bankBranch/list，参数 { workBankId, isSupervisionBank: '1' }，handleTree 主键 bankBranchManageId、label 用 bankBranchName，节点点击写 bankBranchId = data.bankBranchManageId，filterNode 只按 bankBranchName 过滤；右侧列表同一接口 + pageNum/pageSize + bankBranchId；新增弹窗 WdmcDialog 增加 workBankId prop（传 changeBranchId || bankName）并写进请求体。验证口令：superviseBank 目录下不应再有 pageUnionBank / unionBank/page 引用，Network 里三处（树、表、弹窗）都应是 /prefund/bankBranch/list。属于「按旧系统复刻」时必须逐接口比对参数，而不是选一个看起来更规范的 V3 接口替换。",
+   "evidence": "会话 4cd2c6b1 中 agent 先检索 V3 仓库未找到旧 getBranch 实现，从同级旧项目 苏州市房地产监测/apps/chanpin 找到 workBankId + isSupervisionBank:'1' 的原始实现；用户诉求「我看原来的页面，接口调的是两个银行网点的，参数不一样…参考原来的系统」，随后按计划把左侧树从 pageUnionBank 改回 POST /prefund/bankBranch/list 并给 WdmcDialog 补 workBankId，结论中列出三条 Network 核对项。",
+   "files": [
+    "zhi2-web-admin/src/views/supervision/bank/superviseBank/detail.vue",
+    "zhi2-web-admin/src/views/supervision/bank/superviseBank/components/WdmcDialog.vue",
+    "zhi2-web-admin/src/api/system/unionBank.js"
+   ],
+   "baseline": "65d880c",
+   "sessionIds": [
+    "4cd2c6b1-9675-4fe3-93aa-29ae4933abdc",
+    "d44654e4-2690-4616-b914-60c88966d846"
+   ],
+   "bundle": "014.md"
+  },
+  {
+   "title": "薄包装（thin wrapper）弹窗里用 this.$parent.getList() 刷新列表会静默失效：改用 $emit('success')",
+   "type": "bug",
+   "content": "【什么情况】项目许可证「关联楼幢」弹窗重构为三层结构：共享内核 components/LicRelatedBuildingDialog.vue（新建，含查看/编辑分流、DetailTemplate 查看态、visible.sync 经 inheritAttrs + $attrs/$listeners 透传、onClose 中 $refs.form?.resetFields()），planLic 侧薄包装 PlanLicRelatedBuildingDialog.vue，consLic 侧由 ConsLicBuildTable 直连。内核 submitForm 成功后调用 this.$parent.getList?.()。\n【为什么】规划许可走薄包装后，$parent 指向的是包装组件而不是挂表单的页面组件，包装层上没有 getList，可选链静默跳过 —— 编辑保存成功但子表数据不刷新，没有任何报错。而施工许可直连时 $parent 恰好就是 ConsLicBuildTable（且该组件不展示提交），所以两条链路表现不一致，容易只在一条路径上漏测。\n【怎么做】提交成功后 $emit('success')（或 'refresh'），由真正持有表单/列表的父组件监听并调用 getList；需要更强耦合时用 provide/inject 或显式传入刷新函数 prop，禁止依赖 $parent。评审同类「共享内核 + 薄包装 + 直连」三态复用的弹窗时，把 $parent / $refs / $listeners 的每一处访问都按三种挂载形态各推一遍；提交类回归要覆盖薄包装路径。",
+   "evidence": "会话 49edab00 的代码评审结论为 HIGH / BLOCK：「submitForm 成功时调用 this.$parent.getList?.()…规划许可按设计走薄包装 PlanLicRelatedBuildingDialog → LicRelatedBuildingDialog，$parent 断在包装组件，可选链静默跳过，编辑成功但子表数据不更新」，给出的修复是 $emit('success') 或注入刷新函数。",
+   "files": [
+    "zhi2-web-admin/src/views/projectManagement/certificate/components/LicRelatedBuildingDialog.vue",
+    "zhi2-web-admin/src/views/projectManagement/certificate/planLic/components/PlanLicRelatedBuildingDialog.vue",
+    "zhi2-web-admin/src/views/projectManagement/certificate/consLic/components/ConsLicBuildTable.vue"
+   ],
+   "baseline": "5f4e161",
+   "sessionIds": [
+    "49edab00-cdd9-4258-8293-3cb1d8c3de65"
+   ],
+   "bundle": "014.md"
+  },
+  {
+   "title": "[苏房] 表头含「缴款」的编号列被 tableColumnMeasure 误判成金额列：显示 0.00 且右对齐",
+   "type": "bug",
+   "content": "现象：「定金退款列表」的「缴款通知书号」列明明是编号，却显示成 0.00 并右对齐，用户在截图上发现后要求「左对齐、不要按金额显示」。\n\n根因：V3 列表列的金额判定不是看列的 formatter/类型，而是 src/utils/tableColumnMeasure.js 里的 MEASURE_LABEL_EXCLUDE_RE 标签白名单——按表头中文名匹配「缴款」等字样就当成面积/金额度量列，交给 amountFormatter 格式化并右对齐。所以只要列名里含「缴款」「金额」「面积」这类词，哪怕业务上是编号，也会被静默改写成两位小数。\n\n做法：不要在这种列上写 align:'left' 或页面级 formatter 去对抗（会被测算层覆盖），也不要去改全局金额白名单的匹配规则（参考文献 583：右对齐只认「金额/面积」白名单，禁止按列名后缀泛化）。正确做法是在 tableColumnMeasure.js 的 MEASURE_LABEL_EXCLUDE_RE 中追加该列名关键词（本次追加「通知书号」），让「缴款通知书号」这类列走普通文本左对齐链路。\n\n排查口诀：列表出现「编号变小数」「文本列莫名右对齐」，先看表头里有没有金额类词汇，再查 MEASURE_LABEL_EXCLUDE_RE 是否漏了该词的排除项。\n\n同一轮里还有一处容易混：把筛选项从「通知书状态」(refundState / NOTICE_STATE 字典) 换成「业务状态」(bizState / BIZ_STATE 字典) 时，列表列仍保留两列，只切换查询字段——改字段名要区分「查询参数」和「展示列」两套。",
+   "evidence": "用户截图指出「缴款通知书号」列显示异常；最终结论：根因是列标题含「缴款」被 tableColumnMeasure.js 当成金额列，数值会被格式化成 0.00 并右对齐；在 MEASURE_LABEL_EXCLUDE_RE 中增加「通知书号」后按普通文本左对齐展示。",
+   "files": [
+    "zhi2-web-admin/src/utils/tableColumnMeasure.js",
+    "zhi2-web-admin/src/views/supervision/deposit/refund/index.vue",
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue"
+   ],
+   "baseline": "179717a",
+   "sessionIds": [
+    "6f0a6e3a-9141-46e0-84c9-7466c7b18511"
+   ],
+   "bundle": "018.md"
+  }
+ ]
+}

@@ -1,0 +1,206 @@
+{
+ "project": "产品2.0",
+ "batch": 7,
+ "files": [
+  "025.md",
+  "026.md",
+  "027.md",
+  "028.md"
+ ],
+ "count": 11,
+ "memories": [
+  {
+   "title": "生产环境「后缀高度与输入框不一致」的双根因：align-self:stretch 撑高 + index.html 异步链式加载 CSS 的顺序竞态",
+   "type": "bug",
+   "content": "什么情况：带后缀（如面积后缀 ㎡）的输入框组，本地 dev 正常，部署到生产后后缀比输入框高出一截；且此前已把 input-group-fix.css 部署上线仍不生效。\n\n为什么：两个根因叠加。1) 上一版修复用 align-items:stretch + align-self:stretch，而表单项容器有 min-height:38px，后缀被纵向拉满到 38px 以上，输入框却是固定 36px，高度必然不一致——stretch 在「容器有最小高度」时不能用来对齐固定高兄弟。2) index.html 用 media=\"none\" + onload 的方式异步加载 element-ui.css / input-group-fix.css，生产构建产物下加载顺序不稳定，修复样式可能在 element-ui 默认样式之前生效而被覆盖；本地 dev 由 Vite 注入样式，顺序稳定所以看不出来。\n\n怎么做：纵向对齐改 align-items:center 并显式删掉 align-self:stretch，按尺寸给后缀写固定高度（medium:36px）。同时把两个 link 改成同步顺序加载（去掉 media=\"none\"+onload 链式触发），element-ui.css 在前、覆盖样式在后；覆盖样式再在 element-ui.css 文件末尾追加一份兜底，确保 element-ui 无论何时生效都压得住。部署后要强刷缓存再验证。",
+   "evidence": "用户反馈：「后缀高度和输入框高度不一致的问题还是没有修复，本地运行是好的，更新到生产不行」（生产 https://www.ylzhwy.com:8081/，commit 5bb6be7 已部署 input-group-fix.css 但样式仍不对）。结论：1）错误的 flex 拉伸策略：align-items:stretch + align-self:stretch 在表单项 min-height:38px 环境下把后缀纵向撑高，输入框固定 36px；2）CSS 加载竞态：index.html 通过 media=\"none\" + onload 异步加载 element-ui.css 和 input-group-fix.css，生产加载顺序不稳定，本地 dev 正常。修复：element-ui.scss 改 align-items:center、移除 align-self:stretch、按尺寸给后缀设固定高度（medium:36px）；input-group-fix.css 同步；element-ui.css 末尾追加修复样式；index.html 改为同步顺序加载。",
+   "files": [
+    "zhi2-web-admin/src/components/AmountInput/index.vue",
+    "zhi2-web-admin/src/components/zs-input/zs-input.vue",
+    "zhi2-web-admin/src/styles/element-ui.scss",
+    "zhi2-web-admin/public/assets/css/element-ui.css",
+    "zhi2-web-admin/index.html"
+   ],
+   "baseline": "1fa4993",
+   "sessionIds": [
+    "6e092b88-7451-45d2-9591-af86334101f0"
+   ],
+   "bundle": "026.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "支付状态轮询不要调 queryOrderStatus：用订单详情接口的 payState 判定已支付",
+   "type": "pattern",
+   "content": "什么情况：物业收费/账单类页面的收款弹窗需要轮询「扫码支付是否完成」，代码里调用了 /property/onlinePay/queryOrderStatus?orderNo=xxx，接口 404，支付成功后弹窗永不自动关闭。\n\n为什么：该接口在后端不存在（用户明确指出「这个查询接口不对吧，直接查订单详情获取支付状态」）。项目里订单支付状态的权威来源就是订单详情本身，订单详情页（OrderDetailDialog / spOrder/detail）一直这么用。\n\n怎么做：轮询改为 GET /property/spOrder/{orderId}（订单详情），取 payState 字段判定，payState === '1' 或 1 即已支付——后端可能返回字符串或数字，必须两种都判。定时器统一在一个 startPolling/stopPolling 里管理：每次启动先 stopPolling 防重复定时器；orderId 先 String() 归一后再闭包捕获，避免后续被改写；轮询异常直接吞掉继续下一轮，不要弹提示；支付成功分支里先 stopPolling 再弹 message 与关弹窗。间隔取 3s。",
+   "evidence": "用户诉求「这个查询接口不对吧 直接查订单详情获取支付状态」。结论：/property/onlinePay/queryOrderStatus 不存在（404），轮询改为 GET /property/spOrder/{orderId}（订单详情），判断字段 payState === '1' 表示已支付；与 OrderDetailDialog、spOrder/detail 的用法一致。代码形态：startPolling 先 stopPolling、String(orderId) 捕获、setInterval 3000ms、catch 忽略轮询错误。",
+   "files": [
+    "zhi2-web-admin/src/views/property/spFeeBill/components/collectionDialog.vue",
+    "zhi2-web-admin/src/views/property/bill/components/PaymentDialog.vue",
+    "zhi2-web-admin/src/views/property/spFeeBill/components/index.vue"
+   ],
+   "baseline": "6accf9a",
+   "sessionIds": [
+    "89a522be-d7a1-4f44-b621-919cfb27dfd4"
+   ],
+   "bundle": "026.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "登录密码加密曾被整段删除：恢复时 Key/IV/模式必须与历史 bug43754 版本逐字节一致",
+   "type": "pattern",
+   "content": "什么情况：登录页（用户登录 /security/auth/userLogin 与机构登录 /security/auth/companyLogin）的密码加密在某次提交中被整段去掉，密码以明文提交。需要按历史实现恢复。\n\n为什么：加密参数是前后端私有的硬约定，不是任选其一的通用配置。项目历史的 AES-CBC 实现是 Key=`A-16-Byte-keyValA-16-Byte-keyVal`、IV=`A-16-Byte-String`、AES-CBC + PKCS7，后端只按这套解密；任何「改成更安全的随机 IV / 换 Key 长度」都会让登录直接失败。且加密实现依赖 index.html 里全局引入的 CryptoJS，不要另装 crypto-js 依赖或改用 WebCrypto，否则构建环境多一份实现、行为不一致。\n\n怎么做：新增独立工具 src/utils/passwordEncrypt.js 封装 encryptPassword()（复用全局 CryptoJS）；login.vue 在 handleLogin 里对 password 先加密再提交，用户登录与机构登录两条分支都要替换成密文。验证方式是登录页抓包看两个接口的 password 字段是否为 Base64 密文而非明文。这类「谁删的、哪个 commit」的问题先用 git log -S/-L 追到具体提交再动手，避免恢复成另一个版本的参数。",
+   "evidence": "用户诉求：问 login.vue 的登录密码加密是哪个 commit 去掉的、谁提交的，然后要求「恢复到加密的情况」。结论：新增 src/utils/passwordEncrypt.js 封装 AES-CBC，与历史实现及 index.html 全局 CryptoJS 一致；login.vue 引入 encryptPassword，在 handleLogin 中对密码加密，用户登录与机构登录均传密文；参数与之前 bug43754 一致：Key A-16-Byte-keyValA-16-Byte-keyVal、IV A-16-Byte-String、AES-CBC + PKCS7；验证方式为登录页抓包确认 /security/auth/userLogin 与 /security/auth/companyLogin 的 password 为 Base64 密文。",
+   "files": [
+    "zhi2-web-admin/src/utils/passwordEncrypt.js",
+    "zhi2-web-admin/src/views/login.vue",
+    "zhi2-web-admin/index.html"
+   ],
+   "baseline": "dfe69d6",
+   "sessionIds": [
+    "c77f4406-8fd7-4cd0-b97f-9bc57e4e5db2"
+   ],
+   "bundle": "026.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "同一修复分发到多条发布分支：子模块 cherry-pick 单提交 + 父仓库逐个更新指针，yulin 分支要补一次指针纠正",
+   "type": "pattern",
+   "content": "什么情况：一个 bug 修复要同时进 develop/v2.6.1、develop/v2.6.2、develop/v2.6.2-yulin 三条发布分支，仓库是「父仓库 + zhi2-web-admin 子模块」结构，直接 merge 会带出大量冲突。\n\n为什么：三条分支的基线差异很大，全量合并会把不相干的改动一起带过去；而子模块指针在父仓库只是一条 SHA 记录，cherry-pick 到子模块后父仓库不会自动跟，容易出现「父仓库还指着旧 SHA」或「yulin 分支指着主干 SHA」。\n\n怎么做：子模块里在源分支做一次修复提交，另两条分支 cherry-pick 这一条，各得一个新提交号；父仓库在每条分支各做一次「只更新子模块指针」的提交，指针分别指向该分支上对应的子模块 SHA。yulin 这类业务分支要显式核对：如果第一次把指针指成了主干 SHA，需再补一次提交改成该分支自己的 SHA。收尾要报告三张表（子模块三分支的提交号 + 父仓库三分支的提交号与指针），并明确说明 env/.env 的本地代理配置未提交。",
+   "evidence": "用户诉求「提交推送代码，并合并到262和262-yulin」。结论：子模块 develop/v2.6.1 dac8a93e7、develop/v2.6.2 fa00918cc（cherry-pick）、develop/v2.6.2-yulin 298ed67df（cherry-pick）；父仓库 develop/v2.6.1 09519a8、develop/v2.6.2 e4a0034、develop/v2.6.2-yulin d32ba38（子模块指针从 dac8a93 修正为 298ed67）。说明：env/.env 本地代理配置未提交；262 与 262-yulin 采用 cherry-pick 单条修复提交，避免全量合并产生大量冲突。",
+   "files": [
+    "zhi2-web-admin/src/views/evaluation/rectificationNotice/components/ProblemTable.vue",
+    "zhi2-web-admin/src/views/evaluation/rectificationNotice/detail.vue",
+    "zhi2-web-admin/src/components/zs-pagination/zs-pagination.vue"
+   ],
+   "baseline": "6accf9a",
+   "sessionIds": [
+    "c7367ebb-f778-4c8b-8bf6-10398d2dbd47"
+   ],
+   "bundle": "026.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "多模块共用同一弹窗时，业务类型靠父页显式传 prop，禁止从路由名 / 目录名推断",
+   "type": "bug",
+   "content": "情况：资金补交（supplement）、电梯缴存（elevator）、公共收益缴存（benefit）、续筹缴存（renewal）四个模块共用 maintenance/depositNotice/components/ 下同一套弹窗与缴存清册组件。弹窗要用 depositType 去查账户数据，原实现是从路由名 / 目录名反推，结果 benefit 推成 benefit、renewal 推成 renewal，而接口真正认的枚举是 publicincome / continuouspayment，查询恒为空——表现是「选完楼幢右侧表格空白」，而改组件样式、改边框都毫无效果，因为根本没发对参数。为什么：V3 里「薄壳入口页 + components 共享内核」是主流结构，一个组件会被多个业务线入口复用，组件自身不知道自己在哪个业务里，只能用路由/路径猜；而后端枚举名与前端目录名往往不是一套命名（目录名是人起的，枚举是后端定的），一旦不同源就静默错查。怎么做：① 共享组件只声明 props（此处 depositType），由父页（PaymentRangeTable）从自身模块常量显式下传，组件内不留任何路由/路径/目录名推断分支；② 顺带把同类大小写判断一起修（afterpayment / publicincome 必须与枚举完全一致）；③ 验收必须逐个入口各跑一遍（四个模块都要选幢后能看到数据），只测一个模块会漏掉三个。",
+   "evidence": "会话 027 第 1 轮：用户报「电梯缴存、公共收益缴存、续筹缴存问题相同」；最终结论明确「新增 depositType 属性，由父组件传入正确的业务类型；修复原先从路由名推断 depositType 的问题（如 benefit → 应为 publicincome，renewal → 应为 continuouspayment），避免接口查询无数据」，并指出四个模块共用 depositNotice/components/ 下一套组件，改一次即可覆盖四个模块。",
+   "files": [
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/depositNotice/components/AccountDetailDialog.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/depositNotice/components/PaymentRangeTable.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/depositNotice/components/index.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/depositNotice/renewal/index.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/maintenance/depositNotice/company/components/AccountDetailDialog.vue"
+   ],
+   "baseline": "49a7aa3",
+   "sessionIds": [
+    "83dd90e8-3c97-4a8a-a0a8-6a32cf5c91fe"
+   ],
+   "bundle": "027.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "「保存」与「提交」按钮的显隐不能只看主键是否存在，要看单据是否已真正落库",
+   "type": "bug",
+   "content": "情况：企业端详情页点「变更」后，「保存」和「提交」两个按钮同时出现，用户要求「先保存再提交」。根因：发起变更时 getLastChangeByLogin 是幂等的，会立刻返回一个变更单 ID，页面随即把 companyRecordChangeId 挂上；而控制提交按钮的计算属性 showSubmitBtn 只判断「有没有 ID」，于是刚进编辑态就满足了显示条件——但此时详情接口根本没命中（走的是 loadChangeDetailFromOwnCompany 兜底），草稿尚未持久化，用户直接点提交就会提一张空/半成品单。为什么：变更类业务普遍用「getLast 幂等取单」实现页内变更态（无需新路由），ID 在草稿落库前就已存在，于是「有 ID」等于「已保存」这个隐含假设不成立；同类问题还会出现在复制新建、暂存续办等预分配主键的场景。怎么做：① 引入独立状态位（此处 changeDetailPersisted），只在详情接口真正返回数据（200 命中）后置 true；② 按钮显隐 = 主键存在 && persisted，两个条件缺一不可：刚发起变更只有「保存」，保存成功后或重新打开已保存草稿才出「提交」；③ E2E 要在同一用例里断言两段——进入变更表单后断言只有保存、无提交，保存成功后再断言提交出现，否则这类时序回归抓不到。",
+   "evidence": "会话 81d50d9d 用户诉求 3「企业进入详情页后点变更，保存和提交按钮不应该同时出现，先保存后提交」；最终结论给出根因（getLastChangeByLogin 立刻返回变更单 ID，showSubmitBtn 只判断是否有 ID）与修复（新增 changeDetailPersisted，刚发起变更隐藏提交、详情接口 200 后才显示），并在 company-record-change.spec.js 测试 02 补了两段断言。",
+   "files": [
+    "d:/repository/产品2.0/zhi2-web-admin/src/views/toB/companyRecord/detail.vue",
+    "d:/repository/产品2.0/zhi2-web-admin/e2e/company/company-record-change.spec.js"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "81d50d9d-8547-44b3-96d3-9541338567c3"
+   ],
+   "bundle": "027.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "并行迁移（旧项目 → 新项目）时必须有字段命名与时序的映射台账，否则同名不同义会静默错查",
+   "type": "pattern",
+   "content": "情况：产品2.0 与苏州市房地产监测V3 / 泰兴小程序 / 苏住房G·C 是同源复制关系，项目里同时存在两套并行的后端契约与页面实现（如旧 api/lpgl/ 的 projectinfo、buildinginfo、houseinfo + /building/projectinfo/list + { projectid }，与新 building/ 视图的 project/building/house + /building/project/page + { projectId }）；同时新旧两条链路的状态字段含义也不同（旧 recordState、新 bizState）。为什么：迁移不是一次替换，而是长期共存——旧组件（如 ProjectDialog）仍消费旧 api 目录，新页面走 mixin 自动拼路径；两套契约的差异集中在「资源名单复数、主键缩略写 vs 驼峰语义名、list/page 分页、状态字段名」四处，这些差异不会报错，只会在运行时查空或查错，靠人眼 diff 极易漏。怎么做：① 迁移前先产出一张对照台账（旧资源名 → 新资源名、旧主键 → 新主键、旧列表接口 → 新分页接口、旧状态字段 → 新状态字段），放进模块说明，新页面按台账取值；② 判断「某模块是否已迁完」不要凭目录名，要 grep 该目录是否还 import 旧 api 文件；③ 写共享的归一化/解析函数承接两套形态（list 与 page 的响应包装、0 值、扁平与嵌套），页面层不各写一份；④ 迁移完成后再按台账逐条删旧兼容分支，避免半迁移状态长期挂着（如某页 initDict 已改新形态、getDetail 还包旧对象）。",
+   "evidence": "会话 943f9fdb 的迁移模式分析报告明确给出两套契约的差异表（旧 api/lpgl/ 与新 building views 在资源命名、列表接口、详情参数、特殊路径上的不同），并强调 building/**/*.vue 不引用 api/lpgl/、而 api/lpgl/ 仍被 ProjectDialog 等旧组件使用；会话 eb36a68a 同时暴露新旧状态字段两套口径（bizState vs recordState）。",
+   "files": [
+    "D:/repository/产品2.0/zhi2-web-admin/src/api/lpgl/projectinfo.js",
+    "D:/repository/产品2.0/zhi2-web-admin/src/api/lpgl/buildinginfo.js",
+    "D:/repository/产品2.0/zhi2-web-admin/src/views/building/project/index.vue",
+    "D:/repository/产品2.0/zhi2-web-admin/src/views/building/building/index.vue",
+    "D:/repository/产品2.0/zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "baseline": "5169909",
+   "sessionIds": [
+    "943f9fdb-ab14-4e2a-9be4-ba9b39f1e4f0",
+    "eb36a68a-7d68-4208-bd63-fba3a1affffb"
+   ],
+   "bundle": "027.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "[苏房] 详情模板「变更前原值」角标：多字段差异比对 + 原值对象的格式化同源 + 社区选项异步合并",
+   "type": "pattern",
+   "content": "什么情况：detail-template 新增「变更显示」能力——单元格右上角红色三角，鼠标移入显示「原值：XXX」，变更前的值单独放在详情接口返回的 originalObj 里，与主对象字段同名。要求 contentInfo 里所有项都可能被变更，且原值要跟主值一样走 formatter 与字典转换。\n\n为什么容易出错：(1) 字典展示有两套键：getDicts / DictTag 用 dictValue / dictLabel，而旧展示函数与 tag 分支只查 value / label，匹配不到就静默退回显示原始代码（物业类型、所属社区都这样露码）。(2) 所属社区依赖 subdistrict 的社区列表，变更后街道与 originalObj.subdistrict 不同时，当前列表里根本没有「变更前街道」的社区，只能显示代码；若用并行请求补拉变更前街道，慢返回的当前街道请求会整表覆盖 communityOptions，合并失效。(3) 原值不经 formatter 时，日期、金额、字典字段会两侧不可比。\n\n怎么做：在 DetailTemplate 的字段配置里为每项挂」变更前取值「的绑定（原值对象内同名 key），渲染时走与主值完全相同的 formatter / 字典 / 区划链路后再比较与展示，相同则不出三角；字典展示统一优先 dictValue / dictLabel、再回退 value / label；社区选项改成顺序加载——先拉当前 subdistrict 的社区，若 originalObj.subdistrict 存在且不同再拉一次并 merge 进 communityOptions，不做并行。",
+   "evidence": "用户诉求 1-6 与最终结论：formatSelectOptionsDisplay 与 detail-template 的 tag 展示串改 dictValue/dictLabel；所属社区改走 formatCommunityDisplay；detailCallback 用 loadCommunityOptionsForDetail 顺序请求并 merge，避免竞态覆盖",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\detail-template\\detail-template.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\complexChange\\detail.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\detailMixins.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\area.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\dict-tag\\dict-tag.vue"
+   ],
+   "baseline": "6da8974",
+   "sessionIds": [
+    "b608284d-b42b-4810-99bd-afe869af0cbd"
+   ],
+   "bundle": "028.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "[苏房] 表格行悬停色统一：固定列与操作列是独立 DOM，悬停态必须跨表体同步",
+   "type": "bug",
+   "content": "什么情况：用户要求「所有表格的行悬停背景色统一，按当前列表的悬停色」（zs-table 列表页为 #f5f7fa），实际详情子表、弹窗内表格、带固定操作列的表格悬停效果各不相同。\n\n为什么：el-table 的固定列（左/右）渲染在 .el-table__fixed-body-wrapper 里，是独立于主表体的一套 DOM；hover-row class 只在鼠标所在的那一块表体上加，所以悬停主表时固定列不变色、悬停固定列时主表体不变色。另外 zs-operate-column 把操作列单元格背景写死成 #ffffff，即使行拿到 hover-row 也不会跟色。\n\n怎么做：不要在页面级写 .el-table__body tr:hover 覆盖（固定列与操作列都命中不到）。正确的收敛点在三层：①variables.css 新增全局 token --table-row-hover-background-color: #f5f7fa；②element-ui.scss 统一 el-table 悬停规则，覆盖主表体 .hover-row / :hover、固定列 .el-table__fixed-body-wrapper、以及选中行悬停的优先级；③zs-operate-column 去掉写死的白底，改为悬停/选中时跟随行背景；④zs-table.vue 在悬停时把 hover-row 同步派发到主表体与所有固定列（含从固定列反向触发的悬停）。这样一处改完，列表页、详情子表、弹窗表格全部一致。",
+   "evidence": "最终结论「问题原因」两条 + 修改内容四点：variables.css 新增 --table-row-hover-background-color、element-ui.scss 统一悬停、zs-operate-column 跟随行背景、zs-table 同步固定列 hover-row",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\styles\\variables.css",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\styles\\element-ui.scss",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\zs-table\\zs-table.vue",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubSubjectInfo\\index.vue"
+   ],
+   "baseline": "41c6961",
+   "sessionIds": [
+    "80a5b505-898c-436f-8ccc-b4d6fd8cd107"
+   ],
+   "bundle": "028.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "[苏房] E2E 清会话先判当前页协议：about:blank 上调 page.evaluate 清 storage 会抛 SecurityError",
+   "type": "bug",
+   "content": "什么情况：Playwright 跨端用例（03 从企业端切到管理端）调用 clearBrowserSession 时报 SecurityError，用例直接失败。\n\n为什么：用例开始时 page 还停在 about:blank，没有 origin，此时 page.evaluate 里访问 window.localStorage / sessionStorage 会被浏览器按同源策略拒绝并抛 SecurityError。clearCookies 走的是 context 层，不依赖 origin，所以「清 cookie 成功、清 storage 炸」这一步很容易被误判成登录态或权限问题。\n\n怎么做：clearBrowserSession 做成三段式——①先 page.context().clearCookies()（任意页面可用）；②用 page.evaluate 探测 window.location.protocol 是否为 http:/https:（整体 try/catch，失败也返回 false），不满足就先 page.goto('/#/', { waitUntil: 'domcontentloaded' }) 进入应用；③再 page.evaluate 清 localStorage / sessionStorage。要点是「先进入真实 origin 再碰 storage」，且探测本身要有 catch 兜底，否则探测那一行会先炸。另：切换步骤的状态猜测不要靠自己推断——用户明确纠正「没有『待确认』，待提交完了就是审核中」，流程状态文案需按用户口径写。",
+   "evidence": "最终结论：问题出在 clearBrowserSession，03 用例开始时 page 还是 about:blank，直接 page.evaluate 清 localStorage 会触发 SecurityError；给出 canClearOnCurrentPage 探测 + goto('/#/') 后再清的修复代码",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\fixtures\\company-helpers.js",
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\e2e\\company\\company-record-change.spec.js"
+   ],
+   "baseline": "62d5fb9",
+   "sessionIds": [
+    "c24a0b77-252c-498f-8424-de964da60242"
+   ],
+   "bundle": "028.md",
+   "project": "产品2.0"
+  },
+  {
+   "title": "[苏房] 能力开关走 getCustomConfig：按「模块名→配置键」两级取值，不用布尔强制转换",
+   "type": "pattern",
+   "content": "什么情况：需要按后台配置决定某个按钮是否显示（例：楼幢页的「提取」按钮读 isShowSycBtn，自治模块的发布按钮读 isShowPublishButton）。\n\n为什么会踩：/building/common/getCustomConfig 返回的是按模块分组的多层对象，形如 { code, msg, data: { project: { isShowSycBtn: true }, preparatoryGroup: { isShowPublishButton: true } } }——同一个接口服务多个页面，外层 key 是模块名、内层 key 才是配置项。如果把 data 直接当配置对象读，或者把别的模块（如 preparatoryGroup）当作本页的 key，就会恒定取到 undefined、按钮永远不显示，且不报错。另外 $get 返回的是整包 { code, msg, data }，不是 data。\n\n怎么做：封装一个取配置的方法，参数化「模块名 + 配置键」，内部按 res?.data?.[模块]?.[配置键] 取值；拿到值后不要用 !! 一把梭，明确基准（=== true）以免字符串 'false' 被误判为真；catch 里统一返回安全默认值 false（配置取不到时隐藏新功能按钮，而不是显示后点报错）；新增配置项时先与后端确认外层模块 key（project / building / preparatoryGroup 等），确认前不要靠猜写死。",
+   "evidence": "用户诉求 1-3 与最终结论：getCustomConfig 的取值为 this.isShowSycBtn = !!res?.data?.project?.isShowSycBtn，catch 里置 false；结论明确说明 $get 返回整包 {code,msg,data}，且同一接口不同页面读不同模块 key（自治模块是 data.preparatoryGroup）",
+   "files": [
+    "d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\building\\building\\index.vue"
+   ],
+   "baseline": "ff1a3ff",
+   "sessionIds": [
+    "3299b4fb-13f8-4922-8cd8-6edbcc54302b"
+   ],
+   "bundle": "028.md",
+   "project": "产品2.0"
+  }
+ ]
+}

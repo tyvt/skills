@@ -1,0 +1,79 @@
+{
+ "project": "产品2.0",
+ "batch": "077",
+ "files": [
+  "077.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "物业管理区域查询，业委会/物管会是存量业委会/物管会",
+   "type": "bug",
+   "content": "**问题原因** `committeeTable.vue` 的 `handleView` 在跳转存量业委会/物管会（`sourceType == 1`）时，路由只指向 `directDetail`，**没有拼接 `committeeVersionId`**，详情页拿不到对应记录。 新增数据走 `detail` 路径时会拼接 ID，所以表现正常。 **修复内容** 对齐 `autonomy/record/components/index.vue` 的跳转逻辑：无论存量还是新增，都在路径后拼接 `row.committeeVersionId`；存量走 `directDetail`，新增走 `detail`。 ```95:101:zhi2-web-admin/src/views/publicQuery/complex/components/committeeTable.vue handleView(row) { const detailPath = row.sourceType == 1 ? 'directDetail' : 'detail' this.$router.push({ path: getRouterPathByFilePath(`autonomy/record/${BUSINESS_PATH[row.businessType]}/${detailPath}`) + row[",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`committeeTable.vue",
+    "`autonomy/record/components/index.vue",
+    "```95:101:zhi2-web-admin/src/views/publicQuery/complex/components/committeeTable.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\publicQuery\\complex\\components\\committeeTable.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\autonomy\\record\\components\\enums.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "6a98c35a-f7f0-46a2-9882-8721000ff3f1"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "这里勾选框丢失",
+   "type": "bug",
+   "content": "**原因：**「通知对象选择」弹窗里的 `userTable.vue` 勾选列写了 `v-if=\"bizState == '0'\"`，但 `selectUserDialog` 没有向 `userTable` 传入 `bizState`，值为 `undefined`，条件不成立，勾选框就不渲染了。 **修复：** 去掉该 `v-if`。`userTable` 只用于选择通知对象，勾选列应始终显示；已选用户仍由 `isSelectable` 禁用勾选。 刷新页面后重新打开「通知对象选择」弹窗，表格左侧应能看到勾选框。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`userTable.vue",
+    "涉及文件：d:\\repository\\产品2.0、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubUseMoneyApply\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\msg\\notice\\components\\selectUserDialog.vue、d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\msg\\notice\\components\\userTable.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "5687225e-f8a8-4719-a9e7-c4013411f266"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "改为amount-input组件",
+   "type": "fact",
+   "content": "已完成，这两处都改成 `amount-input` 了，并保留了整数限制（`dot=0`）和原有禁用/占位行为。 修改如下： - `zhi2-web-admin/src/views/autonomy/multiply/components/MaintainResultDialog.vue` - `form.minOptionNum`：`el-input + v-money:0` → `amount-input :dot=\"0\" disabled` - `form.mixOptionNum`：`el-input + v-money:0` → `amount-input :dot=\"0\" disabled` - `zhi2-web-admin/src/views/property/partyOrganization/detail.vue` - `form.fullPartyMember`：`zs-input + v-money:0` → `amount-input :dot=\"0\"` - `form.probationaryPartyMember`：`zs-input + v-money:0` → `amount-input :dot=\"0\"` 另外我做了 lint 检查，这两个文件当前有一些既有的 TS 插件报错（与本次替换无直接关系），本次改动没有引入新的语法问题。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`zhi2-web-admin/src/views/autonomy/multiply/components/MaintainResultDialog.vue",
+    "`zhi2-web-admin/src/views/property/partyOrganization/detail.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\benefit\\pubElevMaintenanceIncome\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\AmountInput\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\autonomy\\multiply\\components\\MaintainResultDialog.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "d7c7c5d4-1f13-462a-8aeb-c77645611399"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "这里跳转会携带物业管理区域名称，请放在查询条件里面，",
+   "type": "bug",
+   "content": "修改已经加上，说明如下。 ## 原因 `complexChange/index.vue` 里 `queryParams` 本来就有 `complexName`，列表请求也是用 `getQueryParams()` → `queryParams` 发出去的。但 `listMixins` 在 `created` 里会先读本地缓存再立刻执行 `init()` → `getList()`，**不会**把 `$route.query` 合进 `queryParams`，所以带 `?complexName=xxx` 进来时，表单和首次请求都拿不到这个值。 ## 改动 在 `complexChange/index.vue` 里： 1. 增加 **`syncComplexNameFromRoute()`**：从 `$route.query.complexName` 取值（兼容数组形式的 query），写入 `queryParams.complexName`。 2. **重写 `init()`**（与 `table` mixin 里默认逻辑一致，只是在最前面多一步同步路由）： - 先 `syncComplexNameFromRoute()` - 再 `initDict` - 最后 `getList()` 这样在 `listMixins` 触发第一次拉列表之前，名称已经进搜索条件，`zs-search",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`complexChange/index.vue",
+    "`complex/detail.vue",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\complexChange\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\complex\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\mixins\\listMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "56028024-cb08-49e4-ab44-98078061fc8a"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

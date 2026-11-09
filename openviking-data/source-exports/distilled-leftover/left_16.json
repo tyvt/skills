@@ -1,0 +1,162 @@
+{
+ "batch": 16,
+ "files": [
+  "091.md",
+  "092.md",
+  "093.md",
+  "094.md",
+  "095.md",
+  "096.md"
+ ],
+ "count": 9,
+ "memories": [
+  {
+   "title": "[苏房] DetailTemplate 三列栅格的列宽档位：FORM_COL_TWO(span12) 被归一成 1/3 宽，跨两列要用 FORM_COL_WIDE(span16)",
+   "type": "pattern",
+   "content": "什么情况：在苏房 V3 的 contentInfo 构造器里把一个字段（如机构基本信息的「办公地址」）从 1/3 宽改成「占两列」，照直觉把 layout 从 FORM_COL_THREE 改成 FORM_COL_TWO 后，页面宽度没有任何变化。\n\n为什么：DetailTemplate 在渲染前会走 normalizeDetailSpan 把传入的 span 归一化到它自己的三列栅格口径——span=12 会被归成 span=8，仍然只占三分之一宽；而项目里的 FORM_COL_TWO 本身就是 span=12，所以「two」这个名字指的是 24 栅格里的一半，在 DetailTemplate 里却被解释成 1/3。要真正占三列中的两列，应该用 FORM_COL_WIDE（span=16），而不是 FORM_COL_TWO。\n\n怎么做：\n1) 只读详情的列宽一律用共享的 FORM_COL_* / DETAIL_COL_* 档位常量，不要手写 :span；\n2) 想要「2/3 宽」用 FORM_COL_WIDE（16），「整行」用整行档位（见既有 FULL/HALF 常量条目），「1/3」用 FORM_COL_THREE；\n3) 改完还要同步编辑态：查看态靠 contentInfo 的 layout，编辑态是另一套 grid，需要在编辑表单字段上加 section-field--wide 之类的类，否则两态列宽会漂移（这是项目的既有约定：改「几列布局」必须两态同改）。",
+   "evidence": "会话 9ec6ae3b（基线 0c2da15）：用户要求把 developerBasicInfoContent.js 的「办公地址」改为 2 列。结论明确指出 FORM_COL_TWO(span=12) 在 DetailTemplate 里会被 normalizeDetailSpan 转成 span=8，仍只占 1/3 宽；改用 FORM_COL_WIDE(span=16) 后第一行「联系人+联系电话」、第二行「办公地址」占 2/3 宽。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/developerBasicInfoContent.js",
+    "zhi2-web-admin/src/utils/detailLayout.js",
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/DeveloperBasicInfoForm.vue"
+   ],
+   "baseline": "0c2da15",
+   "sessionIds": [
+    "9ec6ae3b-87cf-4803-bc6c-838d26b02903"
+   ],
+   "bundle": "093.md"
+  },
+  {
+   "title": "[苏房] zs-dialog 弹窗去掉固定 height 后，内部「绝对定位 + height:100% 的 el-table」会失去确定高度源",
+   "type": "bug",
+   "content": "什么情况：把 zs-dialog 里一个左树右表的选择弹窗（chooseHouseDialog）原本的 height=720px 去掉、改成纯 flex 布局（.dialog-box 写 flex:1; min-height:0）后，右栏表格要么高度偏小、要么随数据/窗口变化抖动，小视口下「合同范本/签订」区域还被裁掉且不能滚动。\n\n为什么有两层：\n1) 右侧 .choose-house-table-wrap 用 position:absolute; inset:0 + el-table{height:100%}，这种写法依赖父级有「确定高度」。去掉弹窗固定高度、而 .dialog-box 又没给 height/max-height 上限时，flex 子项只能靠 min-height 撑开，高度链是断的。\n2) zs-dialog 不传 height 时 calculateHeight() 会把 .el-dialog 设成 height:auto，再按 header/body/footer 的 scrollHeight 写像素高度，且挂了 ResizeObserver；页面这边又用 max-height: var(--zs-dialog-viewport-height) + body overflow:hidden + 内部 flex，两套高度模型并存，内容一变（树展开、行数、分页）就反复改外层高度，出现抖动/被截断。\n\n怎么做：想走「视口内 flex 分配」路线，就对 zs-dialog 传固定或视口高度（固定 px 或 92vh），让 calculateHeight 走 fixedHeight 分支（设置 body 的 flex:1; min-height:0）；或者在页面里给 :deep(.dialog-box) 显式加 height 与 max-height: var(--zs-dialog-content-max-height)，并把同一弹窗族（如 ElevatorOpeningDialog）的写法对齐。另外右栏若是 overflow:hidden，就必须给不可压缩区 min-height:0 并留一个滚动出口，否则小视口必然裁切。",
+   "evidence": "会话 98d7bb91（基线 6b3ac5a）：评审用户「removed fixed height 720px, added flex layout for dialog body and table wraps」的改动，指出三点 HIGH —— flex 高度链未闭合、与 zs-dialog calculateHeight 的 auto-height + ResizeObserver 打架、右栏 overflow:hidden 且双 table-wrap 均 flex:1 会裁掉底部表单。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/contractMainInfo/components/chooseHouseDialog.vue",
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "98d7bb91-89bb-4945-a74b-eaff2b59d77b"
+   ],
+   "bundle": "093.md"
+  },
+  {
+   "title": "[苏房] 弹窗内用 table-wrap 包裹 zone + absolute/height:100% 时，必须改传 height 或补 max-height，不能只改 flex",
+   "type": "bug",
+   "content": "什么情况：同源的两个合同弹窗（contractMainInfo 与 contractView 下的 chooseHouseDialog）里，右侧表格区的结构是 .choose-house-table-wrap{position:absolute; inset:0} > el-table{height:100%}，左侧树 .tree-box 有 min-height:380px，右栏容器 .dialog-right.has-tree 是 overflow:hidden。改布局时只调整了外层 flex，结果表格与底部表单在小屏/缩放时被裁。\n\n为什么：绝对定位子元素 + 百分比高度必须有一个显式的、可计算的父高度链；父级是 flex:1 且没有 height/max-height 时，链条会断在「内容撑开」这一步，于是表格高度只由 min-height:140px 决定；而右栏 overflow:hidden 又覆盖了 zs-dialog 全局的 .dialog-right{overflow-y:auto}，被裁掉的部分无法滚动看到。\n\n怎么做：\n1) 表格区优先放弃 absolute+inset 方案，改成普通 flex 纵向链（flex:1; min-height:0; 内部 el-table height:100%）；\n2) 若必须保留 absolute，则父级一定要有确定高度（zs-dialog 传 height，或 :deep(.dialog-box) 给 height + max-height: var(--zs-dialog-content-max-height)）；\n3) 对不可压缩区（搜索条、分页、底部 form）只给 flex-shrink:0，把可压缩区留给表格；\n4) 同源的两个 chooseHouseDialog 是两份副本，改一处必须同步另一处，否则两个入口表现不一致。",
+   "evidence": "同会话 98d7bb91 的评审结论：.dialog-right.has-tree 为 overflow:hidden，两个 .choose-house-table-wrap 均 flex:1 且 min-height:140px，左树还有 min-height:380px；小视口下「合同范本/签订」被裁切且无法滚动；建议给不可压缩区 flex-shrink:0 并保留 min-height:0。",
+   "files": [
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/contractMainInfo/components/chooseHouseDialog.vue",
+    "zhi2-web-admin/src/views/commercialHousingSales/presale/contractView/components/chooseHouseDialog.vue"
+   ],
+   "baseline": "6b3ac5a",
+   "sessionIds": [
+    "98d7bb91-89bb-4945-a74b-eaff2b59d77b"
+   ],
+   "bundle": "093.md"
+  },
+  {
+   "title": "[苏房] 资质列表改 strict 校验后，重置表单必须重新注入「单条占位行」，否则用户填了仍被拦",
+   "type": "bug",
+   "content": "什么情况：注册第一步 Step1CompanyInfo 把资质改成「必填 + strict 校验」，并在提交载荷里始终带 qualificationList。企查查提取后的「重置」调用 resetExtracted → createRegisterForm() 会把 qualificationList 置为 []，但没有像 created 那样调用 ensureSingleQualification。结果：QualificationFormSection 在 qualificationList[0] 缺失时会落到计算属性缓存的游离 {} 对象，用户输入不会写回 form.qualificationList；el-form 的 qualificationList.0.* 规则与模型路径错位，即使用户看着已填，validateQualificationList 仍对 [] 报「请至少填写一条/请完善资质」，形成无法自恢复的卡住状态。\n\n为什么：这个表单的「一行资质」是数组里的实体行，UI 渲染强依赖第 0 行存在；空数组不是「空白表单」，而是「校验模型与视图脱钩」。\n\n怎么做：\n1) 任何把表单还原成初始值的地方（重置、清缓存、步骤间回填、Step4 里把 qualificationList 规范成数组的分支）都在末尾补 ensureSingleQualification(form, this.$set.bind(this))；\n2) strict 校验失败时除了 msgError 还要 scrollToFirstError（或滚动到 [data-testid=\"register-qualification-form\"]），资质在页面下方，不滚动用户不知道为何不能下一步；\n3) 无资质 UI 的步骤（Step4）也要保证至少有一条可校验行，口径与 Step1 一致。",
+   "evidence": "会话 22889bbf（基线 ffce65c）：评审「qualification required via buildQualificationFormRules + strict validate + always send qualificationList」的改动，HIGH 项指出 resetExtracted 用 createRegisterForm() 把 qualificationList 设成 [] 却没有 ensureSingleQualification，导致 QualificationFormSection 落到游离 {}、输入不回写、validateQualificationList 对 [] 报错卡住；MEDIUM 项还指出 strict 失败未滚动到错误区、Step4 未同步注入占位行。",
+   "files": [
+    "zhi2-web-admin/src/views/register/components/Step1CompanyInfo.vue",
+    "zhi2-web-admin/src/views/register/components/Step4Shareholders.vue",
+    "zhi2-web-admin/src/views/register/components/QualificationFormSection.vue",
+    "zhi2-web-admin/src/utils/registerQualification.js",
+    "zhi2-web-admin/src/utils/registerValidate.js",
+    "zhi2-web-admin/src/views/toB/companyRecord/detail.vue"
+   ],
+   "baseline": "ffce65c",
+   "sessionIds": [
+    "22889bbf-d26b-460b-a697-d6f76a4c9af9"
+   ],
+   "bundle": "093.md"
+  },
+  {
+   "title": "[苏房] 表格列优先用列配置 + 全局 formatter 渲染，不要写插槽手搓 dictLabel/formatRatio",
+   "type": "preference",
+   "content": "什么情况：用户对 ShareholderPlainTable.vue 这类子表明确要求「不要写插槽，用格式化器」。改造前页面在模板里手写插槽，同时 mixin 了 detailMixins、在 data/created 里自己拉字典 options，再用 dictLabel / formatRatio / formatAmount 把码值转中文、把比例和金额转格式。\n\n为什么：插槽 + 页面内字典加载是重复劳动，也是漂移源——同一字段在别的表格里已经由组件的列配置渲染（字典列走 type=\"dict\" + dict-url 自动拉取，数值列走 formatter），页面再各写一版就会出现格式/文案不一致，还会因为多 mixin 了 detailMixins 触发不必要的详情请求。\n\n怎么做：\n1) 能声明就别写插槽：字典列 type=\"dict\" + dict-url（苏房必须显式传，不能靠 prop 推导）；\n2) 数值列直接用 @/formatters/index.js 里的全局函数，持股比例用 percentFormatter，认缴/实缴出资用 tenThousandFormatter（万元）；\n3) 配了 formatter 后要确保函数在全局注册，否则会静默显示原始值（项目既有坑）；\n4) 顺带删掉不再需要的 detailMixins、字典 options 的 data/created 加载与 dictLabel/formatRatio/formatAmount 等方法，避免双份数据源。",
+   "evidence": "会话 70131f89（基线 0c2da15）：用户指令「ShareholderPlainTable.vue 不要写插槽，用格式化器」。最终把股东类型/证件类型改成 type=\"dict\" + dict-url，持股比例用 percentFormatter，认缴/实缴用 tenThousandFormatter，并移除 detailMixins、字典 options 加载与 dictLabel/formatRatio/formatAmount。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/components/ShareholderPlainTable.vue",
+    "zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "zhi2-web-admin/src/formatters/index.js"
+   ],
+   "baseline": "0c2da15",
+   "sessionIds": [
+    "70131f89-36fb-48a6-9d8b-7ee2068a86c3"
+   ],
+   "bundle": "093.md"
+  },
+  {
+   "title": "[苏房] 落地页 guard 的兜底必须「可解析」：resolve 失败仍 return { path: '/todo' } 会反复 next 同一路径空转",
+   "type": "bug",
+   "content": "什么情况：把「登录后默认落地页」重构进 defaultLanding.js，并在 router/index.js 的 handleAuthenticatedRoutes 里用 loadDynamicRoutes 单例 Promise + needsDynamicRoutes 双条件控制。评审发现两类边界。\n\n问题一（HIGH，可能死循环）：动态路由已加载后，用户落在 /、/todo、/index 这类「落地路径」，但 router.resolve('/todo') 无有效 match（菜单里根本没有 /todo，待办真实路径是 /flowable/xxx/todo），isResolvedLandingRoute 为 false → redirectToDefaultLanding → resolveDefaultLandingLocation 在菜单与 getRoutes() 都失败时仍 return { path: '/todo' } → 再次进入同一分支，守卫反复 next({path:'/todo'}) 无法前进。\n\n问题二（MEDIUM）：已登录访问 /login、/index 时，redirectToDefaultLanding 直接调 resolveDefaultLandingLocation，没先 await loadDynamicRoutes()，此时 getRoutes() 往往只有 constantRoutes，解析只能落到硬编码 /todo，先 next 到未注册路径，下一次守卫才纠正——多一次导航、短暂 404/空白。\n\n怎么做：\n1) 兜底前先断言目标可解析（router.resolve 命中且 path !== 当前 to），解析不了就 next('/404') 或 next(false)，不要硬编码回退；\n2) redirectToDefaultLanding 改成 async，在 needsDynamicRoutes() 为真时先 await loadDynamicRoutes() 再解析；\n3) 去掉 constantRoutes 里硬编码 redirect: '/todo' 这条「双轨」，落地页只由菜单解析一处决定。",
+   "evidence": "会话 e4408040（基线 d327eb5）：评审 defaultLanding.js（新增）与 router/index.js（handleAuthenticatedRoutes 重构 + loadDynamicRoutes 互斥 + 按菜单解析落地页），列举了「落地页守卫可能在 /todo 上死循环」「已登录访问 /login、/index 时在动态路由加载前解析落地页」「constantRoutes 仍硬编码重定向到 /todo，与菜单落地页双轨」三条。",
+   "files": [
+    "zhi2-web-admin/src/utils/defaultLanding.js",
+    "zhi2-web-admin/src/router/index.js",
+    "zhi2-web-admin/src/store/modules/permission.js",
+    "zhi2-web-admin/src/utils/ruoyi.js"
+   ],
+   "baseline": "d327eb5",
+   "sessionIds": [
+    "e4408040-25ff-40bb-a243-e5e08284772b"
+   ],
+   "bundle": "093.md"
+  },
+  {
+   "title": "[苏房] zs-dialog 里给 wrapper 写 display:flex !important 会让 v-show 关闭的选择弹窗常驻页面（多页面底部冒空壳弹窗）",
+   "type": "bug",
+   "content": "现象：住房租赁合同备案等多个列表/详情页一进入就有一条弹窗残骸贴在页面底部（只剩「选择录入数据」标题 + 取消/确定按钮），看起来像「很多页面都有这个弹窗」，但从未点开过。\n\n根因：公共组件 zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue 里，为让 wrapper 垂直居中写了 `.el-dialog__wrapper { display: flex !important; }`（compact 内层同病）。Element UI 的 el-dialog 用 v-show 关闭，关闭时在 wrapper 上写**内联 display:none**；CSS 的 !important 优先级高于内联样式，于是 `display:flex` 压掉内联 none —— 弹窗逻辑上已 show=false，DOM 却仍以 flex 容器渲染，在 flex 布局的列表/详情里表现为一块普通内容贴在底部。因为所有走 zs-select-dialog/SelectDialog 的页面共享这段样式，故障面呈「全局」。\n\n排查套路：看到「没打开过的弹窗出现在页面上」，先确认它是 v-show 还是 v-if 控制，再全局搜组件样式里带 !important 的 display 声明，而不是去逐页查页面代码。\n\n修复：去掉 wrapper（含 compact 内层）上 display 的 !important，只保留 align-items/justify-content 做居中。关闭时 v-show 的 display:none 生效，打开时仍 display:flex 居中。改完需硬刷新或重启 dev（scss/组件样式有缓存）。若个别页面仍有残留，再查该页是否写了 append-to-body:false 之类覆盖项。",
+   "evidence": "会话 8f2117a1：用户截图「很多页面都有这个弹窗，直接展示在页面上了」；结论定位到 zs-dialog.vue 中 .el-dialog__wrapper 的 display:flex !important 压过 Element UI v-show 的内联 display:none，去掉 !important 后修复。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue",
+    "zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue"
+   ],
+   "baseline": "2b6e7d0",
+   "sessionIds": [
+    "8f2117a1-1117-41a9-bc71-f35f923d4686"
+   ],
+   "bundle": "095.md"
+  },
+  {
+   "content": "【什么情况】Web 后台操作条（如预售合同签订详情的「返回 / 编辑 / 提交 / 重签 / 附件」）出现一大段莫名空白，看起来像相邻两个按钮之间间距异常，而非整条错位。\n\n【为什么】`OperationBtnGroup` 的 `.buttons` 是 `display: flex` + `gap`。按钮外面如果被包了一层 `<div v-hasPermi>`，当用户有权限但内层 `v-if` 条件不成立时，外层 div 仍然渲染出来，成为一个没有任何内容的 flex 子项；`gap` 会照常给这个空子项前后各留一份间距，于是表现为「多了一大块空白」。用 `v-show` 隐藏的按钮只是 `display:none`，不占位；但包裹 div 用 v-if 隐藏内层按钮时，div 本身仍然是 flex item。\n\n【怎么做】\n1. 去掉多余的包裹 div，把 `v-hasPermi` 直接写在 `zs-button` 等真实按钮节点上（与同组「审批」「撤销」保持一致）；\n2. 条件显隐用 `v-if` 而不是 `v-show`，不展示时不留下 DOM 节点；\n3. 页面/版式 scss 里加兜底：对 `.buttons > div:empty { display: none }`，防止后续再有人包出空节点撑间距。\n\n【适用面】所有用 OperationBtnGroup / flex+gap 按钮排布的详情页操作条，排查「间距过大」时应先看 DOM 里有没有空包裹节点，而不是先调 gap 数值。",
+   "evidence": "会话 01a162e0：用户报「这里的间距不对」。定位到 ContractOperationActions.vue 中「人工备案」「数据变更」等按钮外包了 `<div v-hasPermi>`，有权限但内层 v-if 不显示时留下空 flex 子项，在 OperationBtnGroup 的 `.buttons`（display:flex + gap）中占位。改为把 v-hasPermi 直接写在 zs-button 上、「重签」由 v-show 改 v-if，并在 sz-contract.scss 对 `.buttons > div:empty` 做 display:none 兜底。",
+   "files": [
+    "zhi2-web-admin/src/views/contract/components/ContractOperationActions.vue",
+    "zhi2-web-admin/src/components/OperationBtnGroup/index.vue",
+    "zhi2-web-admin/src/views/contract/chapters/suzhou2016/styles/sz-contract.scss",
+    "zhi2-web-admin/src/directives/permission/hasPermi.js"
+   ],
+   "baseline": "85a6308",
+   "sessionIds": [
+    "01a162e0-b3c0-70c5-a400-760bb8192dbc"
+   ],
+   "title": "[苏房] v-hasPermi 包裹层留下空 flex 子项，在 OperationBtnGroup 的 gap 布局里撑出多余间距",
+   "type": "bug",
+   "bundle": "096.md"
+  },
+  {
+   "content": "【什么情况】机构注册单页（institutionRegister）里，某些 adminType（如「法人」）的要件配置全部为可选，用户一个附件都不传也应能提交；但旧代码在提交前有 `if (!this.attachmentList.length) msgError('请上传要件附件')`，把这类合法场景也拦住了。\n\n【为什么】该守卫与真正的必填校验是重复表达：它只判断「有没有至少一个附件 ID」，既不区分必填/可选，又排在 `missingRequiredNames` 之后；缺必填但已上传任意可选件时它本来就放行，真正挡必填的一直是 `missingRequiredNames`。因此删掉它不会削弱必填校验，只会放开「全非必填 + 零上传」的提交面。\n\n【怎么做】\n1. 校验单一入口：`visibleAppendixConfigs` 与 `missingRequiredNames` 都走 `mapAppendixConfigsForAdminType(configList, form.adminType)`；提交时只保留 `if (this.missingRequiredNames.length) { msgError('请上传必填要件：' + 名称.join('、')) }`。\n2. `mapAppendixConfigsForAdminType` 负责：法人场景隐藏受托人专属件；对 company_register_license / legal_person_id_card 强制 isRequired='1'；受托人专属件仅在受托人场景必填；其余沿用配置中心 isRequired。\n3. 必填判定用 appendixConfigId 与 uploadedList 做 String 比较（避免 number/string 不等）。\n4. 兄弟页 CompanyRegisterSingleForm 仍保留旧的 length 守卫，若产品口径一致应同步移除，保持三主体注册流程校验策略统一。",
+   "evidence": "会话 ed99e02b：审查确认 InstitutionRegisterSingleForm.vue 的 handleSubmit 已无 `if (!this.attachmentList.length)` /「请上传要件附件」，仅剩 missingRequiredNames 校验；并指出 CompanyRegisterSingleForm.vue 仍保留该守卫属策略不一致。",
+   "files": [
+    "zhi2-web-admin/src/views/institutionRegister/components/single-page/InstitutionRegisterSingleForm.vue",
+    "zhi2-web-admin/src/utils/registerAppendixAdminType.js",
+    "zhi2-web-admin/src/views/institutionRegister/components/Step3Appendix.vue",
+    "zhi2-web-admin/src/views/register/components/single-page/CompanyRegisterSingleForm.vue"
+   ],
+   "baseline": "99bfdbd",
+   "sessionIds": [
+    "ed99e02b-5c71-4ab5-bed3-6ec3e22d494b"
+   ],
+   "title": "[苏房] 要件附件的提交校验只按「必填配置缺失项」判定，不要再用 attachmentList.length 粗粒度守卫",
+   "type": "pattern",
+   "bundle": "096.md"
+  }
+ ]
+}

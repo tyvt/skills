@@ -1,0 +1,132 @@
+{
+ "project": "淮安物管",
+ "batch": 1,
+ "files": [
+  "001.md",
+  "002.md",
+  "003.md",
+  "004.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "[淮安物管] 列表行政区划筛选同时传 regionCode 与 regionName：zs-region-select 的 label + SearchFormItem labelModel",
+   "type": "pattern",
+   "content": "【什么情况】按接口文档把文档里涉及的列表筛选项统一改为 `regionCode`（区划编码）后，后端仍有一部分表按名称存区划，只传编码会导致筛选落空或查不到历史数据。\n\n【为什么】已知条目只强调「选区域时要同步 regionCode 提交值」（详情/表单场景），列表筛选则是另一套链路：`zs-region-select` 默认只把编码写入 `queryParams.regionCode`，若列表接口或不同表混用 code/name，单字段不够。\n\n【怎么做】① 给 `zs-region-select` 增加 `label` 属性（或等价机制），选择时把区划名称一并回传；② 在 `SearchFormItem` 支持 `labelModel` 配置，把名称自动写入 `queryParams`（如 `labelModel: 'regionName'`）；③ 每个列表页在 `queryParams` 中声明 `regionName`，筛选项与请求体同时带上 `regionCode` + `regionName`，由后端按表结构选用。批量改文档涉及的多页时，用同一套组件能力收口，避免各页手写 @change 同步名称。\n\n【验收】选择「淮安区」后请求应同时出现 `regionCode: '320803'` 与 `regionName: '淮安区'`。",
+   "evidence": "会话 ca3135a9（2026-06-30，基线 1b9f773）：用户确认筛选用 regionCode 编号，并要求文档涉及接口统一修改；追加「regionName 也得传，有的表直接存 name」。最终结论：zs-region-select 增加 label、SearchFormItem 支持 labelModel，22 个列表页补 queryParams.regionName 与 labelModel: 'regionName'。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-region-select/zs-region-select.vue",
+    "zhi2-web-admin/src/components/zs-search-form/SearchFormItem.vue",
+    "zhi2-web-admin/src/mixins/area.js"
+   ],
+   "baseline": "1b9f773",
+   "sessionIds": [
+    "ca3135a9-da8c-4d3a-b8df-92879d2762b6"
+   ],
+   "bundle": "001.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] 变更详情「变更记录」弹窗：以页面 contentInfo 为白名单对比 originalObj 与当前 form",
+   "type": "workflow",
+   "content": "【什么情况】多个业务域的「变更详情」页要在详情区增加【变更记录】按钮，弹窗展示本次变更涉及的字段及变更前/变更后值，且只展示页面 contentInfo 里声明过的字段、且确实发生变化的项。\n\n【为什么】各变更单详情实现分散（企业/从业人员/物业区域/合同/业主自治/公共收益/楼盘表等），若每页手写对比表格会字段口径不一致；后端返回的变更对象字段名与详情 form 嵌套结构也不统一。\n\n【怎么做】① 抽公共组件 `change-record-dialog` + 工具 `contentInfoChange.js`：以详情页已有的 contentInfo（及同类分段 contentInfo2/3…）为字段白名单，用接口返回的变更前对象（如 originalObj）与当前 form 做 diff，仅输出有差异且在白名单内的行；② 弹窗顶部按需展示变更时间、变更人、变更说明（无值则隐藏说明区）；③ 各变更 detail 或共用 detail 组件接入按钮与弹窗，行业管理/物业管理/业主自治/公共收益/项目楼盘表等按需求清单逐模块挂接；④ 与已知「变更前/后单表合并」(#816) 互补：本条是「从详情展示 schema 反推可比字段」的接入套路。\n\n【范围提示】淮安物管会话中一次性接入约 11+ 个变更详情页，合并分支为 feature/company-change-record → develop/v2.6.1-huaian。",
+   "evidence": "会话 e54a78dd（2026-07-06，基线 3e560be）与 95b62123（2026-07-01，基线 22a1d9d）：用户给出跨模块变更记录需求清单；实现 change-record-dialog.vue、contentInfoChange.js，并在 companyManagement/change、complexChange、propertyContractChange 等多处 detail 接入；合并提交保留上述文件与 detail 内按钮逻辑。",
+   "files": [
+    "zhi2-web-admin/src/components/change-record-dialog/change-record-dialog.vue",
+    "zhi2-web-admin/src/utils/contentInfoChange.js",
+    "zhi2-web-admin/src/views/company/companyManagement/components/detail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/change/detail.vue"
+   ],
+   "baseline": "22a1d9d",
+   "sessionIds": [
+    "e54a78dd-db5f-4130-8a53-38052902a30c",
+    "95b62123-9914-4e98-aca3-4d7acff520aa"
+   ],
+   "bundle": "001.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] 变更记录弹窗「变更时间/变更人」为空：detailCallback 先合并顶层审计字段再合并嵌套变更体",
+   "type": "bug",
+   "content": "【什么情况】变更记录弹窗顶部「变更时间」「变更人」「变更说明」显示 `-` 或空白，但表格里字段对比正常；用户反馈弹窗右侧留白、上面三字段无值。\n\n【为什么】变更单详情接口常把 createTime、createUser 等审计字段放在 `response.data` 顶层，而把业务变更字段放在嵌套对象（如 `companyRecordChange`）里。若 `detailCallback` 只 `Object.assign(form, data.companyRecordChange)`，顶层审计字段进不了 `form`，弹窗取 meta 时为空。不同业务变更单的说明字段名也不一致（changeReason / changeDescription / remark 等）。\n\n【怎么做】① 调整 `detailCallback` 合并顺序：先把 `response.data` 顶层通用字段合并进 form，再合并嵌套变更体（后合并的同名键可覆盖业务字段）；② 弹窗侧用 `resolveChangeMeta`（或等价函数）按候选字段名依次取值——时间：changeDate、updateTime、createTime、recordTime…；人员：updateUser、createUser、createUserName…；说明：changeReason、changeDescription、remark…，有则展示、无则隐藏说明行；③ 若制单信息也为空，需后端在变更单详情补审计字段，前端无法凭空生成。\n\n【与已知差异】#1215 是 contentInfo visible + 只取 data.summary；#1098 是 detailCallback 不 return 导致 loading/残留；本条是嵌套变更体合并遗漏顶层审计字段 + meta 字段名多候选。",
+   "evidence": "会话 95b62123：用户报「右边有大量空白，上面三个字段都没有值」。结论：detailCallback 只合并 companyRecordChange 导致 createTime/createUser 未进 form；修复为先合并顶层再合并嵌套，并新增 resolveChangeMeta 兼容多字段名。",
+   "files": [
+    "zhi2-web-admin/src/views/company/companyManagement/change/detail.vue",
+    "zhi2-web-admin/src/components/change-record-dialog/change-record-dialog.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js"
+   ],
+   "baseline": "22a1d9d",
+   "sessionIds": [
+    "95b62123-9914-4e98-aca3-4d7acff520aa"
+   ],
+   "bundle": "001.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] Element UI 动态 required 拦不住条件必填：经营用房类别等字段要自定义 validator + 提交前二次校验",
+   "type": "bug",
+   "content": "【什么情况】弹窗表单里某字段用 `:rules` 动态 `required`（如「经营用房类别」仅在特定业务条件下必填），用户不选仍能通过 `validate` 提交，后端返回「经营用房不能为空」等业务错误。\n\n【为什么】Element UI 对通过表达式切换的 `required` 规则存在不稳定场景，表单项有时不会在空值时拦截提交；与已知「条件必填用 rules.required 表达式」（#1437）不同，本条是动态 required 仍漏拦、需加固校验层。\n\n【怎么做】① 对关键条件字段改用自定义 `validator`，在回调里根据当前 form 状态判空并 `callback(new Error('…'))`；② 在 `submitForm` 内于 `validate` 通过后增加提交前二次检查（同一套判空逻辑），防止 UI 校验穿透；③ 枚举/字典值为数字 `0` 时，判空要同时接受 `0` 与字符串 `'0'`（如 houseCategory），避免误报未选。\n\n【验收】新增时不选「经营用房类别」点确定，应在表单项下出现前端红色提示，而不是仅弹后端错误。",
+   "evidence": "会话 f1ee611c（2026-06-25，基线 1664d0f）：pubHouseDialog.vue「经营用房类别」动态 required 未拦住空值提交；结论为增加自定义 validator、submitForm 二次检查，houseCategory 兼容 0 与 '0'。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubHouse/components/pubHouseDialog.vue"
+   ],
+   "baseline": "1664d0f",
+   "sessionIds": [
+    "f1ee611c-8cd6-4f31-969d-934eec1bceb2"
+   ],
+   "bundle": "001.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] zs-search-form 末行仅剩一项时被拉满整行：给该项显式栅格 md:8",
+   "type": "bug",
+   "content": "现象：列表搜索区筛选项较多（如公共收益「监管账户」约 10 项）时，最后一行若只剩 1 个控件，会被搜索表单布局逻辑撑满整行，与其它行 1/3 宽不一致。根因：zs-search-form 对「行末单项」的默认列宽会占满剩余栅格。修复：在该筛选项的 formItems 配置里与其它项对齐，显式设置 `md: 8`（三列栅格下占 1/3 行宽），不要依赖默认拉伸。排查时先数筛选项总数与每行 3 列换行后的末行个数。",
+   "evidence": "会话 bef0201e 最终结论：已为「账号是否回传」单独设置列宽 md:8，刷新后不再占满一行。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/pubRegulatoryAccount/index.vue",
+    "zhi2-web-admin/src/components/zs-search-form/zs-search-form.vue"
+   ],
+   "baseline": "53c813e",
+   "sessionIds": [
+    "bef0201e-13de-4441-bc9a-7b012a516a24"
+   ],
+   "bundle": "003.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] 物业/前期物业合同变更：从备案详情发起，变更列表去掉「新增」",
+   "type": "workflow",
+   "content": "业务要求与物业管理区域、项目等模块一致：合同变更不能在变更列表里点「新增」再手选备案合同，只能从已备案的备案详情发起。实现要点：① `propertyContract/components/index.vue` 在 `businessType === CHANGE` 时列表工具栏只保留「删除」，隐藏「新增」；② `propertyContract/components/detail.vue` 在备案详情（`businessType = ADD` 且 `bizState === '2'` 已备案）展示「变更」，跳转变更新增页并通过路由参数 `propertyContractId` 带入当前合同——物业合同走 `propertyContractChange/detail`，前期物业合同走 `propertyContractTemporaryChange/detail`；③ 变更新增页增加 `initContractFromRoute`：检测到 `propertyContractId` 时自动调用 `setContract` 预填，等价于原变更页手动选合同编号。涉及模块：物业合同备案、前期物业合同备案及其变更单。",
+   "evidence": "会话 3a4b31d6 变更说明与使用流程四步；用户明确要求去除合同变更中「新增」并与其它功能变更流程保持一致。",
+   "files": [
+    "zhi2-web-admin/src/views/property/propertyContract/components/index.vue",
+    "zhi2-web-admin/src/views/property/propertyContract/components/detail.vue",
+    "zhi2-web-admin/src/views/property/propertyContractChange/detail.vue",
+    "zhi2-web-admin/src/views/property/propertyContractTemporaryChange/detail.vue"
+   ],
+   "baseline": "22a1d9d",
+   "sessionIds": [
+    "3a4b31d6-e54c-4328-a573-791c837f3ea3"
+   ],
+   "bundle": "003.md",
+   "project": "淮安物管"
+  },
+  {
+   "title": "[淮安物管] detail-template hasChangeIndicator：空→有值变更与 originInfo 同步合并",
+   "type": "bug",
+   "content": "现象：企业变更详情中字段从空变为有值（如成立日期 `originInfo.foundingDate: null` → 变更后 `2026-06-30`）却不显示变更角标。根因两层：① `hasChangeIndicator` 在 `getChangeBeforeRaw` 为 `null`/`undefined` 时直接 `return false`，把「空→有值」误判为无变更；② `changeBeforeObject` 只等异步 `beforeForm`，未在详情加载后立刻合并接口已返回的 `form.originInfo`，对比基准在请求完成前为空或不完整。修复：`detail-template.vue` 重写 `hasChangeIndicator`——字段在变更前对象中存在即参与对比，`null`/`undefined` 按空值与当前值比；`formatDateTime` 支持纯日期 `YYYY-MM-DD`。业务详情（如 `companyManagement/components/detail.vue`）：`changeBeforeObject` 同步合并 `form.originInfo`；`setChangeBeforeForm` 先写入 `originInfo` 再异步拉完整备案数据补充。与通用「变更角标」记忆互补，侧重空值与 originInfo 时序。",
+   "evidence": "会话 d95654c9 根因分析与修复后「成立日期」应显示角标、悬停「原值：（空）」。",
+   "files": [
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/components/detail.vue",
+    "zhi2-web-admin/src/views/company/companyManagement/change/detail.vue"
+   ],
+   "baseline": "53c813e",
+   "sessionIds": [
+    "d95654c9-dcbe-475e-8a5b-7cc2aa344fe8"
+   ],
+   "bundle": "003.md",
+   "project": "淮安物管"
+  }
+ ]
+}

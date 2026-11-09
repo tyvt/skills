@@ -1,0 +1,126 @@
+{
+ "project": "苏住房G",
+ "batch": 24,
+ "files": [
+  "093.md",
+  "094.md",
+  "095.md",
+  "096.md"
+ ],
+ "count": 7,
+ "memories": [
+  {
+   "title": "zs-advanced-query 操作符下拉的占位符与「自动选中第一项」规则（含禁用态）",
+   "type": "bug",
+   "content": "场景：公共查询类页面的高级查询条件里，字段下拉选了「物业企业信用等级」后，操作符下拉没有「请选择」占位，直接显示第一个操作符，用户以为系统替他做了选择。为什么：zs-advanced-query 在字段变更时无条件把 operatorList[0] 回填进操作符，既有值就不会显示 placeholder，这是既有代码的「省一步」策略，不是控件缺陷。怎么做：在公共组件里改成按「可操作 + 操作符可选数量」分流——1) 只有「固定操作符」字段（operatorList.length === 1）才自动选中，等价于无需选择；2) 多操作符字段保留空值，并把 placeholder 设为「请选择」，交给用户显式选择；3) placeholder 只在启用的下拉上显示，字段未选/控件禁用时传空字符串 placeholder，避免灰色提示在禁用框里残留成「可选项」。注意点：这条改动落在公共组件 zs-advanced-query 上，会影响所有使用高级查询的页面（如物业管理区域查询），改完要回归「别的字段原本自动带默认操作符」的体验；业务侧字段顺序、默认值不要跟着动，尤其不要在用旧默认值做「未选」判定的地方（会把空值当已选）。",
+   "evidence": "用户：「公共查询-物业管理区域查询：操作符下拉框，需要默认占位提示文字：请选择，禁用的时候不需要显示」。结论：占位符按启用/禁用区分；多操作符字段不再自动选中第一个，「仅固定操作符字段（仅 1 个可选操作符）时自动选中」，涉及 zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue",
+    "zhi2-web-admin/src/views/publicQuery/complex/index.vue"
+   ],
+   "baseline": "5ccda28",
+   "sessionIds": [
+    "429acee0-eca5-4450-8610-60939deb48d6"
+   ],
+   "bundle": "093.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "公共查询「动态字段」渲染成输入框还是下拉：字典 dictValue 必须与前端字段元数据 key 逐字一致",
+   "type": "bug",
+   "content": "场景：公共查询（物业管理区域等）的查询条件由后端字典 complex_field 动态下发（dictLabel/dictValue/remark），部分字段应是下拉选择（物业企业信用等级、行政区域、物业类型），实际却渲染成文本输入框。为什么：前端 mergeFieldOptions 用 item.dictValue 作为 key 去查 COMPLEX_FIELD_META，查不到就回退 VALUE_TYPE.TEXT；后端字典里该字段 dictValue 是 propertyCompanyCreditRating，而前端元数据写的 key 是 companyCreditLevel，两者不相等，于是静默降级为 text。不是 remark 覆盖、也不是字典项缺失——这份字典里所有字段 remark 都为空，字段类型完全靠前端 COMPLEX_FIELD_META 兜底。怎么做：拿到后端完整字典后，先逐字段核对 dictValue 与 COMPLEX_FIELD_META 的 key，把前端 key 改成与后端字典完全一致（本例改 companyCreditLevel → propertyCompanyCreditRating），保留原 valueType/selectKey；selectKey 指向的字典（credit_level）决定下拉选项来源。排查顺序固定为：先在字典 JSON 里找到该字段的 dictValue → 再 grep 前端元数据里的同名 key → 确认是 key 不一致而非 remark 解析失败。新增动态字段时同理：后端加字典项的同时必须补前端 meta，否则一律静默成输入框，不报错。",
+   "evidence": "会话中用户贴出 complex_field 字典全量 JSON；结论确认后端 dictValue=propertyCompanyCreditRating 与前端 companyCreditLevel 不匹配，mergeFieldOptions 回退 VALUE_TYPE.TEXT，修复为把前端 key 改成 propertyCompanyCreditRating，走 selectOptionsMap.creditLevel（credit_level 字典）。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-advanced-query/complexFieldConfig.js",
+    "zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue",
+    "zhi2-web-admin/src/views/publicQuery/complex/index.vue"
+   ],
+   "baseline": "5ccda28",
+   "sessionIds": [
+    "04b34f92-8311-4af3-95f1-c6899f1c1f94"
+   ],
+   "bundle": "093.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "B 端选择框默认值一律用空串而非 null，避免「已选全部」歧义（根因在不同序列化链）",
+   "type": "pattern",
+   "content": "场景：后台筛选/选择类条件（操作符、查询键等）在不选或禁用时，「空值」的表示有三种写法并存：undefined、null、''。同一个空在选择框里表现不同：null 在某些控件里会被当成「已选中的空选项」，undefined 不渲染，'' 才稳定显示 placeholder；三者又被 JSON.stringify 区别对待（undefined 的 key 会被整体丢弃，null 会保留）。为什么：空值语义没有统一，导致「没选却带了一个空条件」「禁用态还显示占位符」「清空后参数里 key 消失」互相打架，且都不报错。怎么做：约定选择类字段的「未选」统一用空字符串 ''，只在提交前做一次显式剔除（不依赖 JSON 自动省略）；禁用态同时清掉 placeholder，避免灰色占位残留成可选项；需要清空外键/下拉时写 '' 而不是 undefined，否则字段会被请求序列化整体丢掉。这条与已有条目「清空外键写成 undefined 会被 JSON.stringify 省略导致解绑失败」是同一根因在不同组件上的实例，但此处给出的是「新建选择框时的默认值约定」，不是事后修解绑。",
+   "evidence": "会话中 zs-advanced-query 的操作符/字段下拉需要区分「启用且有占位符」与「禁用且无占位符」，最终按启停态分别给 placeholder 空值，并把多操作符字段的默认值从「首项」改为空，交由用户选择。",
+   "files": [
+    "zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue"
+   ],
+   "baseline": "5ccda28",
+   "sessionIds": [
+    "429acee0-eca5-4450-8610-60939deb48d6"
+   ],
+   "bundle": "093.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "zs-advanced-query 的 max-groups 是「最大组数」硬上限，默认组数由组件自己兜 1，不能设 1 当默认",
+   "type": "bug",
+   "content": "情况：公共查询—物业管理区域查询（views/publicQuery/complex/index.vue）产品要求「条件组默认 1 个、最多 2 个」，实际页面上点「添加筛选条件组」加不出第二个。\n为什么：页面把 zs-advanced-query 的 :max-groups 传成了 1。组件语义是「最多允许几组」而不是「默认几组」——默认值 1 是组件内部自己给的，max-groups=1 等于把上限锁死在同一值，添加按钮后无空位可加。\n怎么做：max-groups 只表达上限，默认展示数不要通过它表达；本例改 :max-groups=\"2\" 即同时满足「默认 1 组」和「最多 2 组」，删除语义天然是「有 2 组时可删、至少保留 1 组」，组间「且/或」下拉也随组数出现。验收要覆盖三点：初始 1 组、能加到 2 组、2 组时只能删到剩 1 组。\n类比：凡是 max-xxx 型受控上限 prop（max-groups / max-length / max-count），先确认它是否兼任默认值，否则「只能有一个」类反馈往往就是这个上限写死导致的，不要去组件里找 bug。",
+   "evidence": "会话 20e31648：用户反馈「条件组…默认一个，再最多加一个，一共最多是两个。现在只有一个了」；结论「把 zs-advanced-query 的 :max-groups=\"1\" 改为 :max-groups=\"2\"」，并列出改后行为（默认 1 组、可加 1 组、2 组时可删至 1 组、组间且/或切换）。",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/complex/index.vue",
+    "zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue"
+   ],
+   "baseline": "e590ffa",
+   "sessionIds": [
+    "20e31648-4d28-46f2-81a2-de9c591a691a"
+   ],
+   "bundle": "094.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "地图下钻「先清空标记再请求」：慢接口下避免旧层级名称残留成新层级圆圈",
+   "type": "pattern",
+   "content": "情况：小区台账（views/benefit/statisticsMap）按角色权限过滤行政区/街道/物业管理区域，点区县下钻后接口只返回一条街道数据，但地图圆圈里仍显示上层的「区域名称」，缩放一次才恢复正常；同时接口慢，期间一直挂着旧标记。\n为什么：标记层（markList）与下钻结果渲染是两条时序，点击后不立即清场，在接口返回并走 applyMarkListAfterDrillView 之前，旧层级的 mark 及其「名称+数量」气泡还在；缩放会触发地图重绘/聚合重算，所以表现成「缩放后自愈」——这是典型的「数据已换、DOM/图层未清」假象，不要误判为名称字段取错。\n怎么做：下钻点击回调里第一件事 this.markList = []（同步清空气泡/标记），再由接口回包走原有渲染逻辑重建新层级；同时给失败分支补回退——restoreParentAreaLayerAfterDrillFail 重新拉上一级标记，避免异常时地图永久空白。这样慢接口时用户能明确感知「正在加载下一级」，而不是看到错层级。\n适用面：所有「点一个元素 → 请求 → 重绘同一容器」的图表/地图/看板，都应在请求前清空旧数据并把失败回退一并设计，而不是只做 loading。",
+   "evidence": "会话 7c8a2586：用户诉求「点了区域，接口返回了一条街道数据，但是地图上面的圆圈里面还是显示的区域名称，缩放后还原就正常了」+「接口比较慢，可以改为点了之后先移除点，然后数据返回后再渲染吗」；结论为点击时 markList=[]，回包后由 applyMarkListAfterDrillView 重新渲染，失败走 restoreParentAreaLayerAfterDrillFail。",
+   "files": [
+    "zhi2-web-admin/src/views/benefit/statisticsMap/index.vue",
+    "zhi2-web-admin/src/views/benefit/statisticsMap/components/map.vue"
+   ],
+   "baseline": "ff55f8f",
+   "sessionIds": [
+    "7c8a2586-a002-4baf-abaf-c868fa7a8a63"
+   ],
+   "bundle": "094.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "父项目加 private:true 后出现 yarn.lock 与 workspace 锁文件并存：install 结果取决于用 npm 还是 yarn",
+   "type": "fact",
+   "content": "情况：苏州 V3 仓库根是 npm workspaces 容器（workspaces: [\"zhi2-web-admin\"]），本次改动给根 package.json 加了 \"private\": true，并新增了一份根级 yarn.lock（3673 行）。\n为什么：workspaces 容器一旦带 private:true，npm 与 yarn 都会把它当天经地义的「不可发布工作区根」处理，两边都可能接管依赖图并各写自己的锁文件；仓库里同时存在 package-lock.json 与 yarn.lock 时，谁生效完全取决于最后谁执行了 install，很容易出现「本地装到了 A 版、CI 用另一把锁装到 B 版」以及子模块内 node_modules 被提升到根目录导致的路径级差异。\n怎么做：根目录只保留一把锁，跟随团队实际使用的包管理器，另一把不要提交；private:true 只做发布保护，不要顺手切换包管理器。装完依赖后核对子模块 zhi2-web-admin/node_modules 与根 node_modules 的提升情况，构建仍须进入子模块执行（子模块是先构建对象）。提交时注意子模块指针与父仓锁文件属于两次独立提交，不要混在一起。",
+   "evidence": "会话 580b69ca 的 Relevant Diff：根 package.json 新增 \"private\": true，同时新增根级 yarn.lock（yarn lockfile v1，resolved 指向 registry.npmmirror.com），仓库本身已是 npm workspaces 结构。",
+   "files": [
+    "package.json",
+    "yarn.lock",
+    "zhi2-web-admin/package.json"
+   ],
+   "baseline": "359acba",
+   "sessionIds": [
+    "580b69ca-8f1a-46c6-b741-7d3f3fe10ff3"
+   ],
+   "bundle": "094.md",
+   "project": "苏住房G"
+  },
+  {
+   "title": "[苏房] 统计/查询类页面「点搜索完全不发请求」：handleQuery 是空壳方法，不是接口或参数问题",
+   "type": "bug",
+   "content": "什么情况：G 端后台统计页（如 views/publicQuery/companyProjectStats、feeStandardStats）点「搜索」按钮，Network 面板里一条请求都没有，但页面初次进入、点「重置」都能正常出数。用户描述通常是「点搜索不调接口」。\n\n为什么：这些页是复刻 zs-search-form + listMixins 模板来的，mixin/模板约定查询条上的「搜索」回调统一叫 handleQuery。复刻时把 handleQuery 写成了空方法体（或只留了注释），于是按钮点击命中了方法但方法里没有任何 getDetails()/getList() 调用；而重置走的是另一条分支（resetQuery → getDetails()），所以重置正常、搜索哑火。这类 bug 不会报错、不会告警，控制台干净，极容易被误判成接口 404、参数被拦截器丢弃或权限问题。\n\n怎么做：遇到「点了没反应又没有报错」先定位到按钮绑定的事件名，确认该项目约定的查询方法名（V3 统计页是 handleQuery，列表页通常由 table mixin 提供），再确认方法体里确实调用了取数函数；修复就是把 handleQuery 写成 this.getDetails()（或对应取数方法）。\n\n差异说明：已知条目 #1008 是「重写 init() 导致整个页面不调接口」，#1078 是「子组件直接改 prop 导致点了调错接口」；本条是第三种根因——查询回调本身是空实现，且明确带「重置正常、搜索无请求」这个可用于快速判定的对照现象。\n\n附带约定：统计类型这类只影响前端展示的筛选项由 computed（tableRows 按 statType 过滤）在前端过滤，不需要传给接口，不要把前端过滤条件强行塞进请求参数。",
+   "evidence": "用户诉求「点搜索不调接口」；定位到 companyProjectStats/index.vue:196-198 原为空方法 `handleQuery() {}`，改为 `handleQuery() { this.getDetails() }` 后搜索才请求 /company/companyRecord/companyNumStatistics；同时确认重置逻辑本身已调用 getDetails()，统计类型由 tableRows computed 按 statType 前端过滤无需传接口。",
+   "files": [
+    "zhi2-web-admin/src/views/publicQuery/companyProjectStats/index.vue",
+    "zhi2-web-admin/src/views/publicQuery/feeStandardStats/index.vue"
+   ],
+   "baseline": "e590ffa",
+   "sessionIds": [
+    "5fd50fdd-c3d0-40b5-af88-9696e44c5d09"
+   ],
+   "bundle": "096.md",
+   "project": "苏住房G"
+  }
+ ]
+}

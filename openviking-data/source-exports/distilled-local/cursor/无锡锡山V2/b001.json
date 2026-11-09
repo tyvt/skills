@@ -1,0 +1,74 @@
+{
+ "project": "无锡锡山V2",
+ "batch": "001",
+ "files": [
+  "001.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "提示这个呢，物业管理区域选了的",
+   "type": "bug",
+   "content": "原因已经明确：`pageIsAgreement` 调通了，但返回数据里通常**没有** `regulatoryBankCode` / `bankCode`，所以鉴权前仍判空，误提示「请先选择物业管理区域」。 已调整逻辑： 1. 选完物业管理区域后，依次尝试从 `pageIsAgreement` → 开户列表 → 开户详情 → 管理银行列表补全银行编码 2. 仍拿不到时，回退使用「收款账户开户银行」的 `payeeAccountBankCode`（与物业支出合同一致） 3. 提示改为更准确：有区域无编码时提示「未能获取银行编码…」，不再误报未选区域 请刷新后再试：确保已选 **收款账户开户银行**，再点「账户鉴权」。",
+   "evidence": "extracted source=cursor project=无锡锡山V2",
+   "files": [
+    "涉及文件：d:\\repository\\无锡锡山V2、d:\\repository\\无锡锡山V2\\zhi2-web-admin\\src\\views\\benefit\\pubExpenditureContract\\detail.vue、d:\\repository\\无锡锡山V2\\zhi2-web-admin\\src\\views\\benefit\\pubExpenditureContract、d:\\repository\\无锡锡山V2\\zhi2-web-admin、d:\\repository\\无锡锡山V2\\zhi2-web-admin\\src\\views\\property\\expenditureContract\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "e95efacc-3c6a-4c04-84ea-35202f15a58e"
+   ],
+   "_draft": true,
+   "project": "无锡锡山V2"
+  },
+  {
+   "title": "[结果]【锡山公共收益】开户申请详情，点击“销户”后",
+   "type": "bug",
+   "content": "已修复。根因是「销户」成功后只调用了 `getDetail()` 刷新数据，没有给用户任何操作反馈。 ## 问题原因 在 `pubRegulatoryAccount/detail.vue`（开户申请详情）中，`withdraw()` 方法在销户成功后仅刷新详情，未弹出成功提示，用户无法感知操作已完成，容易误以为未生效而再次点击。 ## 修复内容 对以下两个页面做了相同处理： 1. **`benefit/pubRegulatoryAccount/detail.vue`**（开户申请详情） 2. **`benefit/pubRegAccPropMgmt/detail.vue`**（物业共管账户详情，同类问题） 具体改动： - 点击「销户」时先弹出确认框：「确认要销户吗？」 - 销户成功后显示提示：「销户成功」 - 与「取消备案」等操作的成功提示风格保持一致 修复后流程为：点击销户 → 确认 → 成功提示 → 页面自动刷新。",
+   "evidence": "extracted source=cursor project=无锡锡山V2",
+   "files": [
+    "`pubRegulatoryAccount/detail.vue",
+    "**`benefit/pubRegulatoryAccount/detail.vue",
+    "**`benefit/pubRegAccPropMgmt/detail.vue",
+    "涉及文件：d:\\repository\\无锡锡山V2、d:\\repository\\无锡锡山V2\\zhi2-web-admin\\src\\views\\benefit\\pubRegulatoryAccount\\detail.vue、d:\\repository\\无锡锡山V2\\zhi2-web-admin\\src\\views\\benefit\\pubRegAccPropMgmt\\detail.vue、d:\\repository\\无锡锡山V2\\zhi2-web-admin\\src\\views\\property\\propertyAccount\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "1260fc7c-7539-4aac-a8f7-c60a18826489"
+   ],
+   "_draft": true,
+   "project": "无锡锡山V2"
+  },
+  {
+   "title": "公共收益回单详情，这的获取回单明细按钮置灰了",
+   "type": "bug",
+   "content": "**问题原因** 详情页处于 `view` 模式时，`isFormDisabled` 为 `true`，整个 `zs-form` 会被禁用。 「获取回单明细」按钮原先写在这个表单内部，因此跟着被置灰，无法点击。 **修复方案** 已将按钮移到 `Headline` 的 `right` 插槽中，该插槽在 `Headline` 标题栏渲染，不在禁用的 `zs-form` 内，按钮位置不变，但不再受表单禁用影响。 刷新页面后，在 `hasQueryDetail != '1'`（尚未获取过回单明细）时，「获取回单明细」应可正常点击。若已成功获取过明细，按钮会隐藏，并显示下方的「公共收益回单列表」。",
+   "evidence": "extracted source=cursor project=无锡锡山V2",
+   "files": [
+    "涉及文件：d:\\repository\\无锡锡山V2、d:\\repository\\无锡锡山V2\\zhi2-web-admin\\src\\views\\benefit\\pubBankReceiptApply\\detail.vue、d:\\repository\\无锡锡山V2\\zhi2-web-admin、d:\\repository\\无锡锡山V2\\zhi2-web-admin\\src\\views\\property\\bankReceiptApply\\detail.vue、d:\\repository\\无锡锡山V2\\zhi2-web-admin\\src\\mixins\\detailMixins.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8e746406-78d2-4b90-96da-b1cd40c82452"
+   ],
+   "_draft": true,
+   "project": "无锡锡山V2"
+  },
+  {
+   "title": "总额的数值有精度问题",
+   "type": "bug",
+   "content": "已修复季度申报移动端预览中「收入/支出总额」的精度问题。 **原因：** 1. `currentAmount` 用 JavaScript 原生 `+` 累加金额，产生浮点误差（如 `3092.4300000000003`） 2. `:formatter` 写在普通 `<span>` 上不会生效（该属性仅用于表格列），总额未做金额格式化 **修改：** - 使用项目已有的 `calculation.add`（基于 mathjs）做精确累加 - 在模板中调用 `formatters.amountFormatter` 格式化显示，保留两位小数 修复后，支出总额会显示为 `3,092.43`，而不是 `3092.4300000000003`。",
+   "evidence": "extracted source=cursor project=无锡锡山V2",
+   "files": [
+    "涉及文件：d:/repository/无锡锡山V2、d:/repository/无锡锡山V2/zhi2-web-admin/src/views/benefit/mobilePreview/pubQuarterlyDeclaration/index.vue、d:/repository/无锡锡山V2/zhi2-web-admin、d:/repository/无锡锡山V2/zhi2-web-admin/src/formatters/index.js、d:/repository/无锡锡山V2/zhi2-web-admin/src/utils/calculation.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "7f055f1f-e22e-4eda-ad4b-120d04d53c43"
+   ],
+   "_draft": true,
+   "project": "无锡锡山V2"
+  }
+ ],
+ "_draft": true
+}

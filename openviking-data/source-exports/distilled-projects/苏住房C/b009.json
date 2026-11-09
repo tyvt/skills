@@ -1,0 +1,233 @@
+{
+ "project": "苏住房C",
+ "batch": 9,
+ "files": [
+  "033.md",
+  "034.md",
+  "035.md",
+  "036.md"
+ ],
+ "count": 12,
+ "memories": [
+  {
+   "title": "登录后仍提示「请先进行业主身份认证」：getUserInfo 未 await 身份列表 + 登录只存 token 不刷新认证态",
+   "type": "bug",
+   "content": "现象：登录成功进入各 tab 页，点菜单仍弹「请先进行业主身份认证」，明明刚登录。根因两条叠加：① store/user.js 的 getUserInfo 里 identities 赋值没有 await 后面的 listStatus()，接口还没返回就把 identities 先置成空数组，goMenu 的 v3 校验读到空身份，判定恒为未认证；② 登录链路只保存了 token，完全没有拉取身份列表与绑定房屋列表，所以整个会话生命周期里认证态都没有数据源。解法：把 getUserInfo 改成串行——先 await 用户信息/状态接口，拿到结果再写 identities；新增 refreshAuthState()，按「用户信息接口 → getMyHouseList（已认证业主的绑定房屋）」顺序拉齐两类状态；在两个身份类型比较处统一 String() 归一，避免后端返回数字 1 与前端字符串 \"1\" 比较失败。落点：登录页（验证码/密码两条分支）在跳转前 await refreshAuthState；utils/tabBar.js 在各 tab 的 onShow 里对已登录用户调一次；App.vue 里 H5 通过 hash 注入 token 的分支同样刷新；「我的」页删掉自带的 loadIdentityTypes 改由 refreshAuthState 统一负责，避免两处各拉一遍互相覆盖。验证点：登录后立刻点菜单不再误提示，切 tab 后认证态仍正确。",
+   "evidence": "会话 db56ec08：用户反馈「登录成功后点击菜单还是会提示业主认证，在各个tab页都会有，登录后应该立刻调用获取绑定房屋列表的接口，刷新业主认证状态」。最终结论明确根因为 getUserInfo 未 await listStatus 导致 identities 先被置空，且登录后未刷新状态；改动涉及 store/user.js、pages_main/login/index.vue、utils/tabBar.js、App.vue、My_Suzhufang.vue。",
+   "files": [
+    "zhi2-mobile-shimin/src/store/user.js",
+    "zhi2-mobile-shimin/src/pages_main/login/index.vue",
+    "zhi2-mobile-shimin/src/utils/tabBar.js",
+    "zhi2-mobile-shimin/src/App.vue"
+   ],
+   "baseline": "5f0f4dc",
+   "sessionIds": [
+    "db56ec08-2aeb-407a-bde0-498f081066b6"
+   ],
+   "bundle": "033.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "双晒公示页两列卡片塌成一列：flex:0 0 48% + nowrap 标题使最小宽度超出容器，改 CSS Grid 兜底",
+   "type": "bug",
+   "content": "现象：双晒公示页（pages_main/publicNotice/index.vue）最近没改过却 UI 崩了，图标尺寸修好后仍是每行 1 张卡、右侧大片留空。根因不是 flex 比例写错，而是卡片内容的最小宽度（min-content）超过了 48% 的分配宽度：标题带 white-space: nowrap、再加图标和右箭头，实测卡片最小宽度约 400rpx，而容器 48% 只有约 340rpx，flex 布局无法把卡片压到 48%，只能每行放一张。解法：① 容器从 flex 改 CSS Grid，grid-template-columns: repeat(2, minmax(0, 1fr))，其中 minmax(0,1fr) 是关键——它允许子项被压缩到内容最小宽度以下，等价于去掉 flex 的 min-width:auto 保护；② 去掉标题 nowrap，改 word-break: break-all 允许换行，从源头降低最小宽度；③ 卡片加 min-width: 0 与 overflow: hidden，防止任何内容撑破网格；④ 给 ZsImage 宿主元素显式固定宽高（本例 96×110rpx），避免图片按原始尺寸参与测宽。通用结论：小程序里做固定列数卡片墙，一旦卡片内含 nowrap 文本 + 图片 + 图标，用 flex 百分比宽度很脆弱，优先 Grid + minmax(0,1fr) + min-width:0 三件套。",
+   "evidence": "会话 9774c8d1：用户先贴截图问「这个页面UI怎么崩了，最近没改这个页面啊」，修完图标后再次反馈两列布局仍未恢复。最终结论给出根因「flex: 0 0 48% 但标题 white-space: nowrap + 图标箭头，卡片最小宽度约 400rpx 超过 48% 容器宽度（约 340rpx）」，并列出改 Grid、去 nowrap、固定图标尺寸、加 overflow/min-width 四项修复。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_main/publicNotice/index.vue",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue"
+   ],
+   "baseline": "bb6d74a",
+   "sessionIds": [
+    "9774c8d1-2b21-4a57-a4db-44c6514d4939"
+   ],
+   "bundle": "033.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "分包页面图标/背景图不显示：ZsImage 必须补 subpackage 属性，样式类名走 :deep",
+   "type": "bug",
+   "content": "现象：云守护首页的梯形装饰背景图（icon_tip_bg.png）不显示、上传「+」号（up-loader.svg）在申请步骤页整块空白，但这些资源路径看着都对。根因是分包静态资源解析：小程序分包内的图片必须让 ZsImage 知道自己在哪个分包，否则按主包路径拼 URL 直接 404，读屏上就是一块空白或纯色。解法：给 ZsImage 补 subpackage=\"pages_guard\" 之类的分包名，再固定高度（装饰图常因为无内在高度而塌成 0）；分包内新引用的 svg 要复制一份到该分包自己的 static 目录（如 pages_guard/static/svg/），不能指望引用主包或别的分包的文件。同期几个配套细节：头像改读 userStore.avatar 并配加载失败回退；伪元素画图标（添加联系人的加号）时父元素用 inline-flex + align-items/justify-content 居中，不要只靠 line-height 或 text-align 凑圆心，否则在真机上偏位；ZsImage 等内部节点尺寸受组件内部样式控制，外层想改宽高要写到深度选择器里，否则宿主元素写了尺寸也不生效。验收顺序建议：先看图片是否 404（网络面板），再看是否分包路径问题，最后才看尺寸与对齐。",
+   "evidence": "会话 5d912c3c：【掌服务-小区管理-云守护】UI 调整。最终结论第 3 条「梯形背景图：为 icon_tip_bg.png 补充分包路径 subpackage=\"pages_guard\"，并设置固定高度，修复「带有圆角的梯形」不显示问题」；第 4 条「上传附件「+」图标：将 up-loader.svg 复制到 pages_guard/static/svg/，修复分包静态资源缺失导致图标不显示」。",
+   "files": [
+    "zhi2-mobile-shimin/src/pages_guard/index/index.vue",
+    "zhi2-mobile-shimin/src/pages_guard/guardApply/components/step1.vue",
+    "zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue"
+   ],
+   "baseline": "8fc3cc5",
+   "sessionIds": [
+    "5d912c3c-3130-4cf8-9e0a-0d48f904b5f4"
+   ],
+   "bundle": "033.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "生产环境按环境变量跳过某条业务分支：入口 URL 工厂 + 页面 onLoad 重定向双层拦截",
+   "type": "pattern",
+   "content": "需求形态：某功能后端未就绪（本例非居民身份证认证后台不可用），要求生产环境跳过中间的「证件类型选择」页，直接进居民身份证实名认证页，但开发/测试环境保留双选项，后台修好后能低成本恢复。可复用套路是三件套：① 环境判定收敛成工具函数，utils/index.js 里 shouldSkipIdTypeChoose() 用 import.meta.env.PROD 判断，配套 getRealNameEntryUrl() / getRealNameEntryRelativeUrl() 返回绝对与相对两种形态的入口地址，页面永远不直接写环境判断；② 所有跳转入口改成调这两个工厂，本例有「我的-实名信息」入口、未实名拦截确认页、审核失败页三处，改漏一处就出现半跳过的入口；③ 页面自身再做兜底：TypeChoose.vue 在 onLoad 里判断生产就 redirectTo 到 FormLocal，FormNonLocal.vue 同样拦掉非居民身份证流程，防止旧链接、分享链接或返回栈直达。验证要点：生产构建后在产物 JS 里 grep 到内联的 redirectTo({ url: 'FormLocal' }) 才算真生效，开发构建则保持原页面。回滚成本极低：后台恢复后删掉这三个工具函数与两处 onLoad 拦截即可，不必逐个还原跳转。",
+   "evidence": "会话 a48c524a：诉求为「因非居民身份证后台管理系统不能正常使用，生产环境跳过选择身份认证类型页面，直接进入身份证实名认证页面」。最终结论列出 utils/index.js 的 shouldSkipIdTypeChoose/getRealNameEntryUrl/getRealNameEntryRelativeUrl、三处入口跳转更新、TypeChoose 与 FormNonLocal 的 onLoad 兜底，并以产物内联 redirectTo 作为生效证据。",
+   "files": [
+    "zhi2-mobile-shimin/src/utils/index.js",
+    "zhi2-mobile-shimin/src/pages_my/verification/TypeChoose.vue",
+    "zhi2-mobile-shimin/src/pages_my/verification/FormNonLocal.vue",
+    "zhi2-mobile-shimin/src/pages_my/setting/userInfo.vue",
+    "zhi2-mobile-shimin/src/pages_my/verification/UnauthorizedPage.vue",
+    "zhi2-mobile-shimin/src/pages_my/verification/AuthorizedFail.vue"
+   ],
+   "baseline": "0801b84",
+   "sessionIds": [
+    "a48c524a-2cd1-4f84-88a2-2dc51b597b93"
+   ],
+   "bundle": "033.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "z-paging 默认 fixed 全屏铺开：列表遮挡小程序自定义导航栏 + 筛选栏 sticky 失效",
+   "type": "bug",
+   "content": "情况：uni-app 列表页（zhi2-mobile-shimin 的 pages_transaction/newHouse、stockHouse 等）出现「列表盖住页面顶部『新房』标题栏」且筛选栏 position:sticky 完全不吸顶。\n为什么：z-paging 的 fixed 默认为 true，组件按 top:0 + height:100% 全屏固定定位，于是①从页面 0 点开始铺，直接压住自定义导航栏；②列表在自身独立滚动容器里滚动，筛选栏不在同一滚动上下文，sticky 相对页面视口永远不会触发，滚动的其实是列表内部。\n怎么做：对齐已正常的二手房页 stockHouse/index.vue 的布局——给 z-paging 显式 :fixed=\"false\"；页面根容器改 flex 纵向布局 + height:100vh；列表区 flex:1 且必须带 min-height:0，只让列表占满剩余空间内部滚动。改完结构变成「搜索框 → 快捷入口 → 筛选栏（固定在顶部）→ 列表独立滚动」。注意同类子页（最新楼盘/在售楼盘）若共用同一布局模板，要按同一套改，否则一半页面吸顶一半不吸顶。",
+   "evidence": "会话 3346e472（2026-07-02，基线 653505a）：「z-paging 默认 fixed: true，会以全屏固定定位从页面顶部（top: 0）铺开，导致列表遮挡顶部导航栏、筛选栏 position: sticky 失效……修复：设置 :fixed=\"false\"，页面容器 flex 纵向 + height:100vh，列表 flex:1;min-height:0」，并对照 stockHouse/index.vue 已正确实现。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\newHouse\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_transaction\\stockHouse\\index.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\commonNew\\conditionScreening.vue"
+   ],
+   "baseline": "653505a",
+   "sessionIds": [
+    "3346e472-72e7-4a7c-857b-e8e4f61316e0"
+   ],
+   "bundle": "034.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "苏住房C 登录统一改苏服办 SSO：封装 utils/sfb.js 并全量替换 /pages/login 跳转",
+   "type": "workflow",
+   "content": "情况：zhi2-mobile-shimin 要求移除自有登录页（login/forget/password/success 四条路由全部从 pages.json 删除），完全走苏服办容器内 SSO。\n为什么：苏住房C 运行在苏服办 App 的轻应用容器里，登录凭证由容器 JSSDK 下发 ticket 换取 token，保留手机号/密码登录会产生「两套身份来源」，且脱离容器时根本无法登录。\n怎么做：①新增 src/utils/sfb.js 作为唯一登录能力出口：hasLightAppJssdk() 判容器、ensureSfbTicket()/triggerSfbLogin() 取 ticket、loginWithSfbTicket() 换 token 并拉用户信息、initSfbUser() 供 App.vue 启动静默登录、promptSfbLogin() 作为用户主动登录入口；②全仓把跳转 /pages/login/index 的位置替换为 promptSfbLogin()——包括 utils/index.js 的 goMenu() 鉴权拦截、我的页头部 My_Suzhufang.vue、收藏/二手房详情/在线课堂点赞等页面、以及实名认证重复账号弹窗（按钮文案改「苏服办登录」）；③非容器环境统一提示「请在苏服办App中打开」。新增需登录能力时不要再写 router 跳登录页，一律调 promptSfbLogin。",
+   "evidence": "会话 92b16b83（2026-07-15，基线 77666f8）：新增 src/utils/sfb.js（hasLightAppJssdk / ensureSfbTicket / triggerSfbLogin / loginWithSfbTicket / initSfbUser / promptSfbLogin），删除 pages.json 里 login/index、login/forget、login/password、login/success，所有跳转改为 promptSfbLogin()，App.vue 启动时静默 SSO。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\sfb.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\App.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages.json",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\utils\\index.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\My_Suzhufang.vue"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "92b16b83-222f-4c4d-93dd-2c8f89738fb1"
+   ],
+   "bundle": "034.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "移动端请求约定：then 里不再判 code == 200，失败由拦截器统一 toast（配套清 noReject）",
+   "type": "pattern",
+   "content": "情况：zhi2-mobile-shimin 大量页面在 .then() 里写 if (res.data.code == 200) { ... } else { ... }，本次按用户要求批量移除（10 个 Vue 文件 + 2 个 API 文件）。\n为什么：httpInstance.js 拦截器已经对 code != 200 主动 reject 并弹 toast，再在 then 里判一次等于把同一条错误处理两遍；更隐蔽的是 api 层若带 noReject: true，非成功响应会被当成成功继续往下走，then 里的判断就成了唯一防线，两套语义混用必然出现「失败也进成功分支」或「错误弹两次」。\n怎么做：①then 内直接写成功逻辑，不判 code；②业务失败分支（如原 add.vue 的 501 与失败页跳转）改写到 .catch() 里，不要留在 then 的 else；③api 层去掉 noReject: true，让非成功响应正常 reject；④顺手清理不再使用的 showToast 等 import。注意这是「约定级」改动：新写接口调用时默认不判 code，若确需自定义失败页跳转，只能在 catch 分支补，不要在 then 里加回判断。",
+   "evidence": "会话 732c8290（2026-07-15，基线 77666f8）：用户要求「res.data.code == 200 批量移除这个判断，then 里面一定是成功的」；共改 10 个 Vue 文件（house/owner/*.vue、house/verify.vue、decision 与 elect 的 StepChoose、elect/detail.vue）与 2 个 API 文件（api/autonomy.js ownerDecision、api/property.js handleHouseOwner 移除 noReject: true）。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\httpInstance.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\autonomy.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\property.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner\\add.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\decision\\detail.vue"
+   ],
+   "baseline": "77666f8",
+   "sessionIds": [
+    "732c8290-b822-4472-af21-d64590d4673f"
+   ],
+   "bundle": "034.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "多子模块指针分支禁止 rebase：109 个提交中 64 个改子模块，必然在中途反复冲突",
+   "type": "bug",
+   "content": "情况：给 zhi2-mobile-shimin 子模块相关的长期分支（suzhou-shiqu-suzhufang-main-v2.1-mp）执行 git rebase onto 017efba，跑到第 48/103 个提交就因子模块历史分叉失败，且此时仓库本身也停在同一处 rebase 冲突里，反复重试无效。\n为什么：苏住房C 根仓库是 superproject，每次在根仓提交若子模块工作区有更新就会顺带改一次 gitlink 指针；本分支 109 个提交里有 64 个都动过指针，父仓指针与子模块历史是两条独立演化线，rebase 逐个重放时几乎每个指针提交都判定冲突。这与合并场景「冲突只在指针上、选较新 SHA」不同，rebase 是逐个重放，无法一次性裁决。\n怎么做：①先 git rebase --abort 把分支恢复到原 HEAD（本例 25d2063、子模块 d2a5917），确认 git status 干净；②不要再对这类分支做 rebase onto，保持现状或改用 merge（父仓合并只需在指针冲突处选包含对方提交的较新 SHA）；③判断标准：估算「子模块指针提交数 / 总提交数」，占比高（如 64/109）就放弃 rebase。",
+   "files": [
+    "d:/repository/苏住房C/.gitmodules",
+    "d:/repository/苏住房C/package.json"
+   ],
+   "baseline": "9832ba3",
+   "sessionIds": [
+    "98536349-484b-4850-bba5-19593e068a4d"
+   ],
+   "evidence": "会话 98536349（2026-08-21，基线 9832ba3）：「后台 rebase 脚本在第 48/103 个提交处因子模块历史分叉失败；仓库当时又处于同一 rebase 冲突中」；abort 后恢复到 suzhou-shiqu-suzhufang-main-v2.1-mp（25d2063）/ 子模块 d2a5917；结论「不要对这条分支再做 rebase onto 017efba，109 个提交里有 64 个改子模块指针，极易反复冲突。保持现状或改用 merge」。",
+   "bundle": "034.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "首页 tab 切换时按绑定小区列表刷新缓存：空列表必须清掉本地小区信息",
+   "type": "pattern",
+   "content": "情况：苏住房C 首页多 tab（home/property/project/community/my）各自展示小区相关数据，用户解绑全部小区后，页面仍显示旧小区名与旧数据。\n为什么：小区信息被持久化在 user store（project / projectName / community 等）里，只在进入时拉一次；解绑后没有触发清空，缓存就成了「幽灵小区」。多个组件各自持有 projectList 还会出现列表状态不一致。\n怎么做：①userStore 增加 clearProjectInfo()，集中清空 project、projectName、community 等小区字段；②useBoundProjects.js 里把 projectList 提为模块级单例（避免多组件各维护一份），接口返回空数组时调 clearProjectInfo()；③抽 tabBar.js 的 onTabPageShow() 统一处理 tab 切换：设置 tabBar 选中态 + 加载菜单 + 有 token 时调 loadBoundProjects()；④五个 tab 页都改在 onShow 里调 onTabPageShow；⑤把 Home_Suzhufang 里重复的 loadBoundProjects 调用删掉，避免与 tab 逻辑双请求。行为：有小区则保持/自动选中第一个，无小区则清缓存。",
+   "evidence": "会话 30f38fb2（2026-08-04，基线 ce9e460）：用户诉求「tab 页面切换时，如果小区列表为空，则清除缓存」；改动 userStore.clearProjectInfo()、useBoundProjects.js（空列表清缓存 + projectList 模块级单例）、tabBar.js 新增 onTabPageShow()、五个 tab 页 onShow 调用、Home_Suzhufang 移除重复调用。",
+   "files": [
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\hooks\\useBoundProjects.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\store\\user.js",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\property.vue",
+    "d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages\\index\\components\\Property_Suzhufang.vue"
+   ],
+   "baseline": "ce9e460",
+   "sessionIds": [
+    "30f38fb2-cdce-4fec-b6e7-513b5e74f474"
+   ],
+   "bundle": "034.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "ZsImage 图片不显示的双重根因：分包静态资源按「当前页面路由」推断子包 + 默认 height:100% 无父级高度即为 0",
+   "type": "bug",
+   "content": "什么情况：页面里 ZsImage 引用的图标整块不显示，控制台报 `[渲染层网络层错误] Failed to load local image resource /pages_vote/static/icon/tip-szf.png ... status of 500`，或干脆不报错只是看不见。为什么：本仓库的 resolveStaticUrl 会按**当前页面路由**推断分包，不是按文件真实位置。同一个 `icon/tip-szf.png` 放在主包 src/static，被 pages_vote 下的页面（或共享组件 Tips.vue）引用时会被解析成 `/pages_vote/static/...`，该目录下没有文件必然 500；反过来 `pages_transaction` 分包里的 `yiwen.png` 被 pages_owner 下的页面引用时又会解析到主包而丢图。第二重根因是 ZsImage 内部 `height: 100%`，放在没有确定高度的父节点（如裸 uni-forms-item 内容区）里高度算成 0，表现为「路径对但看不见」。怎么做：①跨页面共用的图标必须加进 `src/utils/mainStaticPaths.js` 的 MAIN_STATIC_PATHS 白名单强制走主包，分包独有图标必须在调用处显式传 `subpackage=\"pages_transaction\"` 之类的分包名，不能依赖路由推断；②给 ZsImage 套一个定尺寸容器（如 `w-28 h-28` 的 view），与已正确显示的页面（authentication.vue）保持同一写法。排查顺序：先看控制台实际请求路径与文件真实位置是否同包，再查父级有无高度。",
+   "evidence": "会话 65302824：pages_vote/elect/detail 等页面经共享组件 Tips.vue 引用主包 icon/tip-szf.png，被按路由解析成 /pages_vote/static/icon/tip-szf.png 后 500；修复是把该路径加入 MAIN_STATIC_PATHS 白名单。会话 13824f1b：pages_transaction/publishHouse/type.vue 的「如何区分不动产权证和房产证」疑问图标不显示，根因是 yiwen.png 在 pages_transaction 分包却默认解析到 pages_owner，修复为给 ZsImage 增加 subpackage=\"pages_transaction\"，并用 w-28 h-28 容器包裹以规避 ZsImage 默认 height:100% 在无父级高度时高度为 0（与 authentication.vue 写法对齐）。两个会话同一根因、不同方向（该去主包的被推去子包 / 该留子包的被推去主包），合并为一条规律。",
+   "files": [
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/utils/mainStaticPaths.js",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/components/ZsImage/ZsImage.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/utils",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_transaction/publishHouse/type.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_owner/house/owner/authentication.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_vote/elect/detail.vue"
+   ],
+   "baseline": "8fc3cc5（ZsImage.subpackage 与 mainStaticPaths 修复前）；b7bf813（mainStaticPaths 白名单修复前）",
+   "sessionIds": [
+    "13824f1b-0d06-4c7a-8d3f-79edcf5ccfe4",
+    "65302824-2836-4c68-a79c-8824fab43793"
+   ],
+   "bundle": "035.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "小程序自定义组件标签上的 class 与 scoped CSS 不生效：父级布局类必须挂在内层原生包裹节点，否则 flex 失效（卡片右箭头掉到日期下方）",
+   "type": "bug",
+   "content": "什么情况：公示/公告列表卡片的右侧箭头不显示在右侧，而是被当成块级元素堆在日期下方一行，看起来像「箭头显示坏了」；同一处 bug 反复复发，用户会说「我记得之前修复过」。为什么：模板里把布局类写在了自定义组件标签上——`<base-card class=\"notice-list-card\">`，而 `.notice-list-card` 的 `display:flex` 写在页面自己的 `<style scoped>` 里。scoped 属性只加在组件标签渲染出的那一层，父页面无法给子组件**根节点**应用自己的 scoped 规则；同时小程序端自定义组件的宿主节点 layout 不被父级 flex 规则接管，于是卡片里 body 与 arrow 各自成普通块级流，箭头必然掉到底部。这与「写在组件标签上的 style/CSS 变量不透传到组件内部真实节点」是同一族问题，只是失效方向相反：父级类名落空、父级 flex 管不到子组件内部。怎么做：把布局类从组件标签**下移到内层包裹的原生元素**——`<base-card><div class=\"notice-list-card\"><div class=\"card-body\">…</div><div class=\"arrow\"></div></div></base-card>`，样式不用改，flex 立即作用在组件自身 DOM 上，箭头回到右侧并垂直居中。推广规则：凡是用 flex/grid 控制「子组件 + 兄弟节点」的排列，一律显式套一层 div 承载布局类；需要给子组件内部设样式只能用 props 下发颜色/尺寸，或配 `:deep()` + 足够权重。",
+   "evidence": "会话 0654e8d6：用户反馈「详情页的箭头显示有问题，我记得之前修复过」，随后要求「修复公示列表页箭头显示」。根因定位为 notice-list-card 的 flex 样式写在 base-card 子组件标签上，scoped CSS 在小程序端未穿透，箭头被当成块级元素堆在日期下方。改动是在 pages_main/publicNotice/components/ListIndex.vue 与 ListContractIndex.vue 中把 class=\"notice-list-card\" 从 base-card 移到内层包裹 div，样式保持不变；验证方式为 npm run build 通过并需在微信开发者工具刷新后进「双晒公示 → 维修资金使用」确认。",
+   "files": [
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_main/publicNotice/components/ListIndex.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_main/publicNotice/components/ListContractIndex.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_main/publicNotice/publicNotice.vue"
+   ],
+   "baseline": "bb6d74a",
+   "sessionIds": [
+    "0654e8d6-e325-415f-81d9-23f35e1436b6"
+   ],
+   "bundle": "035.md",
+   "project": "苏住房C"
+  },
+  {
+   "title": "pages_transaction 整包迁移 z-paging 的标准规则集（含 5 类例外页的处理法），19 页一次收敛",
+   "type": "pattern",
+   "content": "什么情况：需要把整个分包里所有使用 useLoadMore / uni-load-more 的列表页统一切到 z-paging，这批页面形态各异（普通列表、底部弹层内列表、Tab 内列表、手工 IntersectionObserver 分页、自定义无更多文案、复杂空态），逐页自由发挥必然写出多套口径。可照抄的迁移规则：①基础设施统一为 `src/hooks/usePaging.js` 暴露 `{ list, pagingRef, queryList, refresh, reset, auto }`，z-paging 走 pages.json 的 easycom，空态样式统一 `.paging-empty` / `.paging-empty-pic` / `.paging-empty-text`；②`useLoadMore` → `usePaging`，getList 的入参改成 `getList(pageParams)` 不再用 arguments；③列表外包 `<z-paging :ref=\"pagingRef\" v-model=\"list\" @query=\"queryList\">`；④删除全部 uni-load-more 与 status/total 分页状态依赖。五类例外：弹层内列表（intention/popup.vue）用 `usePaging(fn,{auto:false})` + `:auto=\"false\"`，弹窗打开时手动 `refresh()`；自定义无更多文案（stockHouse/index.vue）改用 `loading-more-no-more-text` prop；手工写了 IntersectionObserver 的（stockHouse/commonBuildings.vue）直接删观察器改 script setup + usePaging；Tab 内列表与「总数=0 才整页空态」的（publishHouse/index.vue）保留 `totalSum == 0` 顶层空态，列表本身的空态交给 `#empty`；空态统一 `ZsEmpty` → `<template #empty>` 内用 ZsImage + `view.paging-empty-text`，原有图片 url 与文案必须原样保留。另有 buyHouse/myBuy.vue 原本手写分页，迁移时 total 改在 getList 内维护。",
+   "evidence": "会话 df586279：用户给出 11 条迁移规则并要求「Migrate all Vue files in src/pages_transaction that use useLoadMore or uni-load-more to z-paging」。最终改动 19 个文件，收尾结论为「pages_transaction 目录下已无 useLoadMore 或 uni-load-more 引用」，并逐文件列出特殊处理：stockHouse/index.vue（loading-more-no-more-text）、stockHouse/commonBuildings.vue（移除 IntersectionObserver）、service/unionBank.vue（底部弹层内嵌 z-paging）、intention/popup.vue（auto:false 弹窗打开 refresh）、publishHouse/index.vue（保留 totalSum==0 顶层空态）、newHouse/indexMore.vue（移除 loadMore 并修复 update 收藏逻辑）、buyHouse/myBuy.vue（移除手动分页，total 在 getList 中维护）、threeLowOneWide/index.vue（无空态，与原页面一致）。",
+   "files": [
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/hooks/usePaging.js",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages.json",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_transaction/stockHouse/index.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_transaction/stockHouse/commonBuildings.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_transaction/intention/popup.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_transaction/publishHouse/index.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_transaction/buyHouse/myBuy.vue",
+    "d:/repository/苏住房C/zhi2-mobile-shimin/src/pages_transaction/service/unionBank.vue"
+   ],
+   "baseline": "83c4136",
+   "sessionIds": [
+    "df586279-57e8-4ba0-8689-fbab9df6771b"
+   ],
+   "bundle": "035.md",
+   "project": "苏住房C"
+  }
+ ]
+}

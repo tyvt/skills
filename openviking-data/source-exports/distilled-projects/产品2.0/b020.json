@@ -1,0 +1,138 @@
+{
+ "project": "产品2.0",
+ "batch": 20,
+ "files": [
+  "077.md",
+  "078.md",
+  "079.md",
+  "080.md"
+ ],
+ "count": 8,
+ "memories": [
+  {
+   "baseline": "645607c",
+   "content": "什么情况：楼盘/项目列表页同时支持「树状（左侧行政区域树）」与「平铺」两种展示模式，共用同一套 queryParams。用户平铺模式下按 region/subdistrict/community/address/日期筛选后，切回树状：树被重置到第一级，但列表仍显示平铺时的筛选结果，与树不对应。\n为什么：切到平铺时 syncListParentDeptFilter 只清了 parentDeptId；切回树状时树自己重置，但平铺专属的筛选字段（region、subdistrict、community、address、startDate、endDate）仍留在 queryParams 里，handleTreeReady 设置新 parentDeptId 后 getList() 带着旧条件查询。\n怎么做：在切换模式的同步函数里按模式清理对方专属字段——切回树状时 clearFlatModeQueryParams 遍历平铺专属字段把 queryParams 中对应 key 置 undefined，再由树就绪回调（handleTreeReady）按默认节点刷新列表。通用套路：同一列表组件被多种展示/数据源模式复用时，queryParams 必须在模式切换时做「模式专属字段清理」，不能只清模式主键（parentDeptId），否则旧模式的筛选静默残留。",
+   "evidence": "会话最终结论：根因是切换展示模式时列表筛选条件没有和树同步，切回树状时平铺设置的 region/subdistrict/community 等条件仍留在 queryParams；修复为 syncListParentDeptFilter 切回树状时清除 flatOnlyFields 后由 handleTreeReady 刷新。",
+   "files": [
+    "zhi2-web-admin/src/views/property/complex/components/RegionTreeLayout.vue"
+   ],
+   "sessionIds": [
+    "47d34879-47c4-4fc8-beb8-6a3e1375d999"
+   ],
+   "title": "[产品2.0] 树状/平铺双展示模式切换必须清理「模式专属筛选字段」，否则旧筛选残留",
+   "type": "pattern",
+   "bundle": "077.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "c420af5",
+   "content": "什么情况：utils/ruoyi.js 的 getId() 按约定从路由「路径末段」解析业务主键。在新增页（路由末段是字面量 'add'，如 /xxx/project/add）上调用时，会把字符串 'add' 当成 id 返回，后续详情/保存请求带上假主键。\n为什么：getId 的「末段即主键」启发式没有排除非 ID 的动作词段，新增路由没有 :tableid 动态段，末段天然是 'add'。\n怎么做：在 getId 解析处排除 'add'（以及类似动作段）——命中动作词时不当作主键返回。推广口径：所有「从路径末段取主键」的工具都要对已知动作段（add/detail/edit 等路由语义词）做排除白名单；新增页要用主键时走 query.id 或保存后返回值，而不是路径段。",
+   "evidence": "用户诉求：ruoyi.js:47-53 这个位置还有可能是 /add 这种情况，这个 add 不能算 id 的，需要排除；最终结论确认 getId 对 /add 的排除修复已随提交 ee38c27 合入。",
+   "files": [
+    "zhi2-web-admin/src/utils/ruoyi.js"
+   ],
+   "sessionIds": [
+    "8f101920-674b-4cf2-a996-0d54083efaac"
+   ],
+   "title": "[产品2.0] getId() 解析路由主键必须排除 /add 等动作段，否则新增页拿到假主键",
+   "type": "bug",
+   "bundle": "077.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "8d416b2",
+   "content": "什么情况：detail-template 只读详情里的附件点击行为需要按文件类型分流，且不能用「无后缀也当图片」的宽松判定。\n为什么：按后缀白名单（jpg/jpeg/png/gif/bmp/webp/svg）判定图片，避免把 PDF、Office 等无后缀/未知文件误塞进 <img> 加载失败；PDF 用 window.open(url,'_blank','noopener,noreferrer') 由浏览器原生预览；其余类型走 downloadAttachmentFile：优先 fetch（credentials:'same-origin' 同源带 Cookie）取 blob 后调 downloadBlobFile 保存，失败回退带 download 属性的 <a> 点击。\n怎么做：图片→img+preview；PDF→新标签打开；其他→fetch blob 下载，兜底 <a download>。边界事实：附件 URL 跨域且未配 CORS 时 fetch 会失败、浏览器可能忽略 download 属性变成预览——要完全可控必须后端配合 Content-Disposition: attachment 或走带鉴权的下载接口，前端兜底无法根治。",
+   "evidence": "会话最终结论列出三类分流实现与 handleAttachmentFileClick/downloadAttachmentFile 改动，并明确「跨域且未配置 CORS 时 fetch 可能失败，<a download> 会被浏览器忽略，需后端 Content-Disposition 配合」。",
+   "files": [
+    "zhi2-web-admin/src/components/detail-template/detail-template.vue",
+    "zhi2-web-admin/src/utils/index.js"
+   ],
+   "sessionIds": [
+    "f249a45a-ccde-47e1-8e0c-9e45f3720ad5"
+   ],
+   "title": "[产品2.0] 只读详情附件点击的三分流套路：图片后缀白名单 / PDF 新窗口 / 其余 fetch blob 下载",
+   "type": "pattern",
+   "bundle": "077.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "645607c",
+   "content": "什么情况：整理 detail.vue 时发现页面级冗余：mixins 写成 [detailMixins, area] 重复引入 area；data 里重复声明 originForm；contentInfo 末尾挂恒真的 .filter(visible)；watch form.region 加了不必要的 deep:true；仅单点使用的方法单独定义。\n为什么：detailMixins 已经内部 mixins:[form, area]，页面再引 area 会重复合并同名选项；originForm 等字段 form mixin 已声明，页面 data 再写是重复定义；没有 visible 字段的数组 filter 恒全保留。注意 currentRegionCode/currentSubdistrictCode 这类「覆盖 area 默认 regionCode/subdistrictCode」的字段是页面与 form.region/subdistrict 对齐的关键，不能当冗余删。\n怎么做：detail 模板页只写 mixins:[detailMixins] 即可；清理时「只删冗余不改行为」，删前确认字段不是对 mixin 默认值的覆盖；深度 watch 仅用于对象内部属性变更场景。同类清理（合并多次 getDicts、精简 form 未用字段）需先对照接口与提交字段，避免误删业务数据。",
+   "evidence": "会话最终结论：去掉重复 import area 改为 mixins:[detailMixins]，删 data 中 originForm、恒真 filter、deep:true、内联单用 setCompany；并说明 currentRegionCode/currentSubdistrictCode 覆盖 area 默认值不能删。",
+   "files": [
+    "zhi2-web-admin/src/views/building/project/detail.vue",
+    "zhi2-web-admin/src/mixins/detailMixins.js",
+    "zhi2-web-admin/src/mixins/area.js",
+    "zhi2-web-admin/src/mixins/form.js"
+   ],
+   "sessionIds": [
+    "61def959-83e3-4215-8e69-6489f5d1ff6f"
+   ],
+   "title": "[产品2.0] detailMixins 已内含 form+area：页面再引 area 是重复合并，data 不得重复声明 mixin 已有字段",
+   "type": "pattern",
+   "bundle": "077.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "6da8974",
+   "content": "什么情况：从详情页跳列表页并带查询参数（如 ?complexName=xxx）时，列表页搜索表单为空、首次请求也不带该参数。为什么：listMixins 在 created 里读本地缓存后立刻执行 init() → getList()，整个链路不会把 $route.query 合入 queryParams，路由 query 只是躺在 $route 上没人消费。怎么做：在列表页重写 init()（与 table mixin 默认逻辑一致），在 initDict/getList 之前先执行同步函数——从 $route.query 取目标参数（需兼容 query 值为数组的形式）写入 queryParams；这样 listMixins 触发首次拉列表前参数已就位，zs-search-form 也会回显。若同一路由下只改 query 不销毁组件还需再 watch $route.query。",
+   "evidence": "会话结论：listMixins 在 created 里先读缓存再立刻 init()→getList()，不会把 $route.query 合进 queryParams；解法是新增 syncComplexNameFromRoute() 并重写 init() 在 getList 前先同步路由 query。",
+   "files": [
+    "D:/repository/产品2.0/zhi2-web-admin/src/views/property/complexChange/index.vue",
+    "D:/repository/产品2.0/zhi2-web-admin/src/mixins/listMixins.js"
+   ],
+   "sessionIds": [
+    "56028024-cb08-49e4-ab44-98078061fc8a"
+   ],
+   "title": "[产品2.0] listMixins 列表页不消费 $route.query：重写 init() 在 getList 前同步路由参数",
+   "type": "pattern",
+   "bundle": "079.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "9dc17bd",
+   "content": "什么情况：表单里通过选人/带出类回调（handlePick 选关联招标备案、setCompany 选招标方）填充企业字段后，点击「招标方」跳企业详情页没有任何反应。为什么：跳转函数读的是 this.form.companyRecordId，而两个回调只赋值了 this.form.companyId，companyRecordId 始终为空，被 if (!companyRecordId) return 静默拦截——带出回调写入的字段名与跳转读取的字段名不一致。怎么做：两处必须对齐：要么在回调里同时写入 companyRecordId 与 companyId（保持表单字段与 complexNameLinkKeys 语义一致），要么跳转处做兜底 this.form.companyRecordId || this.form.companyId 以兼容详情接口只回 companyId 的情况。教训：为跳转主键引入别名/兼容字段时，所有写入点都要同步，否则静默 return 难以察觉。",
+   "evidence": "会话结论：handlePick/setCompany 只赋 this.form.companyId，goToCompanyDetail 读 this.form.companyRecordId 为空即 return，路由不跳转；修复为写入时双写 + 读取处 companyId 兜底。",
+   "files": [
+    "D:/repository/产品2.0/zhi2-web-admin/src/views/property/propertyTenderPlan/detail.vue"
+   ],
+   "sessionIds": [
+    "1dbfe5a3-173e-4c2f-b2c8-f27d4a2193ae"
+   ],
+   "title": "[产品2.0] 选关联数据回调写字段与跳转读取字段不一致导致点击跳转静默失效",
+   "type": "bug",
+   "bundle": "079.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "4ccb79cb 会话基线 6b9d9d7（2026-05-08）",
+   "content": "什么情况：产品2.0 后台原本用通配路由 { path: '*', redirect: '/404' } 处理未匹配地址，用户要求不进 404 页，改成统一消息提醒「页面未授权或不存在」。为什么：通配重定向发生在 beforeEach 之后，若只在守卫里判断通配会漏掉显式 push('/404') 的场景；且直接渲染 404 页体验差、丢失来源上下文。怎么做：在 router.beforeEach 开头（handleExternalToken 之后）统一拦 to.path === '/404'：有上一跳有效匹配时 next({ path: from.fullPath, replace: true }) 留在原页并抹掉无效历史；首次打开就是非法地址时 next({ path: '/index', replace: true }) 回首页，同时 Message.warning 提示。/404 路由配置保留不删，避免影响其它引用，但实际不再渲染。注意守卫顺序：该拦截需放在登录态处理之后，未登录访问非法路径是否也提示需单独约定。",
+   "evidence": "080.md 会话 4ccb79cb：用户要求「路由跳转做全局拦截，需要跳 404 的改为消息提醒」，最终方案写在 router/index.js 的 beforeEach 内，判断 to.path === '/404' 三分支处理（回原页/回首页/提示）。",
+   "files": [
+    "zhi2-web-admin/src/router/index.js"
+   ],
+   "sessionIds": [
+    "4ccb79cb-b7a0-47a0-8d7a-1873a520064f"
+   ],
+   "title": "[产品2.0] 404 全局拦截约定：beforeEach 拦 to.path==='/404' 改提示，不再渲染 404 页",
+   "type": "pattern",
+   "bundle": "080.md",
+   "project": "产品2.0"
+  },
+  {
+   "baseline": "e9d3b12e 会话基线 62d5fb9（2026-09-02）",
+   "content": "什么情况：Vite 构建报错，UnifiedLogin.vue 里图片写成 public/assets/images/...。为什么：Vite 中 public 目录是「原样拷贝、按根路径服务」的特殊目录，引用其内容必须用以 / 开头的绝对路径（如 /assets/...）；带 public/ 前缀的路径会被 Rollup 当成模块导入去解析文件系统路径，构建直接失败（且 dev 下也解析不到）。怎么做：把模板/CSS 里所有 public/ 前缀替换为根绝对路径（该文件一次性替换了 13 处），与项目内其他页面（如 StatisticsDialog.vue）及同文件 CSS 引用 banner_1.png 的既有写法保持一致。排查构建失败时，若报错指向 public/ 路径的 import 解析，先查这类路径写法再怀疑依赖。",
+   "evidence": "080.md 会话 e9d3b12e：编译失败根因确认为 UnifiedLogin.vue 13 处 public/assets/ 写法，全部替换为 /assets/ 后构建成功（exit code 0，耗时约 3 分 20 秒）。",
+   "files": [
+    "zhi2-web-admin/src/views/home/UnifiedLogin.vue"
+   ],
+   "sessionIds": [
+    "e9d3b12e-b9f2-4d0b-97e0-bd14f38d344c"
+   ],
+   "title": "[产品2.0] Vite 下 public 目录资源必须用 / 绝对路径，写 public/ 前缀会让构建报模块解析错误",
+   "type": "bug",
+   "bundle": "080.md",
+   "project": "产品2.0"
+  }
+ ]
+}

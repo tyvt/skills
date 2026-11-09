@@ -1,0 +1,38 @@
+{
+  "project": "苏住房G",
+  "batch": "110",
+  "files": ["110.md"],
+  "count": 3,
+  "memories": [
+    {
+      "title": "苏住房G std-evaluation 接口契约文档 api-map.md 的 E2E 造数捷径：H5 端 16 接口无权限注解是最省事入口、种子市标 2120000000000000001~005 直接全链路复用、提交用 id 审批用 dataId",
+      "type": "workflow",
+      "content": "【什么情况】为「物业标准化评价」的 E2E 用例作者产出接口契约文档 docs/std-evaluation/api-map.md（1310 行 / 78KB，110 个接口 / 16 个 Controller，覆盖 standard、serviceGrade、serviceGradeChange、checkRecord、rectification、reportPrepare、report/reportArea、H5 九个域），梳理后沉淀出直接决定 E2E 写法的结论。后端在 D:\\repository\\苏住房后端 子模块 zhi2-evaluation（checkout 到 develop/v2.6.2-suzhufang-dev），核心包 zhi2-evaluation-server\\src\\main\\java\\com\\zhishu\\evaluation\\stdEvaluation\\（148 个文件），实体/Mapper 在 zhi2-evaluation-server\\src\\main\\resources\\mapper\\**。\n【为什么】E2E 最贵的环节是「从零造基础数据 + 绕权限」。梳理发现三条捷径：① 种子数据里已有 5 份市标，雪花 id 2120000000000000001~…005，可直接用于全链路，E2E 无需新建标准；② H5 端 16 个接口没有任何 @RequiresPermissions 注解，是最省事的造数入口；③ 写操作沿 zs-method 隧道（修改=POST+zs-method: put、删除=POST+zs-method: delete，直发 PUT/DELETE 不命中路由），新增不传主键、响应 data 即雪花 id，提交用 id、审批用 dataId。\n【怎么做】① 写 std-evaluation 的 E2E 前先读 api-map.md 的「0 通用约定」「数据准备链路」「可用基础数据」「各模块最小新增请求体」四节，造数优先走 H5 接口；② 标准直接用种子 id 2120000000000000001~005，不要每条用例重建；③ 提交/审批的 busCode/key 仓库内无硬编码、Nacos context-path 与网关路由本地核实不了（文档 §12「推断与待确认」共 10 条），用前先实测一次 GET /v2.0/evaluation/standard/page；④ StdEvalGradeChangeSaveDto.changeReason 注释要求必填但无校验注解——按必填传值，但别指望后端拦截；⑤ 接口总数核对表与 Playwright 通用请求模板在文档附录，写用例前先对一遍数量（110/16）防止漏模块。",
+      "evidence": "会话 bdc91889-bdc1-4864-8a03-4e3a6f7cceb5（基线 05caac8）用户诉求 1「你是后端接口契约梳理专员。目标：为 E2E 用例作者提供一份可直接照着写请求体的接口契约文档，产出唯一文件 docs/std-evaluation/api-map.md……不要修改任何后端/前端源码」；最终结论「接口数 110 / 16 个 Controller……核心结论：修改=POST+zs-method: put、删除=POST+zs-method: delete（直发 PUT/DELETE 不命中路由）；新增不传主键、data 即雪花 id；提交用 id、审批用 dataId；种子 5 份市标 2120000000000000001~…005 可直接用于全链路，E2E 无需新建标准；H5 端 16 个接口无任何 @RequiresPermissions，是最省事的造数入口」「主要不确定项：Nacos 侧 context-path 与网关路由无法本地核实（建议实测一次 GET /v2.0/evaluation/standard/page）；changeReason 注释要求必填但无校验注解」。",
+      "files": ["docs/std-evaluation/api-map.md", "zhi2-evaluation/zhi2-evaluation-server/src/main/java/com/zhishu/evaluation/stdEvaluation/standard/controller/StdEvalStandardController.java"],
+      "baseline": "05caac8",
+      "sessionIds": ["bdc91889-bdc1-4864-8a03-4e3a6f7cceb5"],
+      "bundle": "110.md"
+    },
+    {
+      "title": "苏住房G std-evaluation 文档 4 处结论被实证推翻（2026-10-31 复核）：12 个页面菜单本就注册在 SYS_MENU，真阻塞是测试环境 getRouters 返回 500，publish 不是死代码，已备案通知书是后端缺校验而非前端无守卫",
+      "type": "bug",
+      "content": "【什么情况】docs/std-evaluation/ 早版审计写下的 4 条结论被逐条实测推翻：①「5 组菜单未注册、页面生产不可达」→ 错，COMMON_FRAMEWORK.SYS_MENU 里 12 个页面菜单都在；真实限制是测试环境 GET /v2.0/system/menu/getRouters 返回 {\"code\":500,\"msg\":\"服务器异常\"}；且 MENU_ID 2280455896960918819 的 PERMS 应为 :query 而非 :list；②「areaReportApi.publish / reportApi.publish 是死代码、页面无发布按钮」→ 错，全部已接线；③「已备案通知书前端仍可删除」→ 实为后端缺失校验、前端已有守卫（bizState===0 才可删）；④「整改反馈 reply 无入口」→ 由详情页编辑表单覆盖，reply 独立接口未被调用属「等价功能已实现」。\n【为什么】这类反转的教训是：审计结论一旦写进文档就会被后续会话当事实引用（102 批次的审计记忆就引用过「菜单未注册」），而「查表查不到」可能只是查错库/查错环境——数据层（SYS_MENU 有无记录）与接口层（getRouters 是否 500）必须分开归因；「前端仍可删」与「后端缺校验」是两个方向的缺陷，混写会让修复排错队。\n【怎么做】① 引用 std-evaluation 审计/结论文档前先看有没有「2026-10-31 复核」标注，被推翻的 4 条按新表述使用；② 判「菜单是否注册」直接查 COMMON_FRAMEWORK.SYS_MENU（顺带核对 PERMS 后缀是 :query 还是 :list），不要拿测试环境 getRouters 报错当「菜单不存在」的证据；③ 「页面不可达」类问题按「数据层 SYS_MENU 有无记录 → 接口层 getRouters 是否 500 → 前端动态路由是否注册」三层排查；④ 删除类缺陷先分清「前端有守卫、后端缺校验」还是反之：前者 E2E 断言前端禁用态 + 后端补校验挂缺陷，后者才改前端；⑤ 文档更正要最小化编辑（保留小节编号与表格结构），每条标「2026-10-31 复核」+ 证据来源（SYS_MENU 查询 / getRouters 实测 / 前端文件行号）。",
+      "evidence": "会话 e85a43be-9dd9-449a-81e4-863289982125（基线 05caac8）task-5 描述列出 4 处被实证推翻的结论与改后表述；最终结论 Primary Request：「1. '5 组菜单未注册，页面生产不可达' → claimed wrong; 12 page menus exist in COMMON_FRAMEWORK.SYS_MENU; real limitation is test-env GET /v2.0/system/menu/getRouters → 500 服务器异常; also note MENU_ID 2280455896960918819 PERMS should be :query not :list」「2. publish 死代码 → claimed wrong, all wired」「3. 已备案通知书前端仍可删除 → 后端缺失校验，前端已有守卫 (bizState===0)」「4. reply 无入口 → 由详情页编辑表单覆盖（等价功能已实现）」；每条更正须标注「2026-10-31 复核」并写证据来源。",
+      "files": ["docs/std-evaluation/e2e-result.md", "docs/std-evaluation/audit-frontend.md", "docs/std-evaluation/requirements.md"],
+      "baseline": "05caac8",
+      "sessionIds": ["e85a43be-9dd9-449a-81e4-863289982125"],
+      "bundle": "110.md"
+    },
+    {
+      "title": "苏住房G 菜单/权限补数据的 SQL 交付规范：幂等 SELECT-then-INSERT + 回滚 DELETE + 验证 SQL 四段齐备，DBX 只读时只交付脚本到 docs/sql 绝不执行",
+      "type": "workflow",
+      "content": "【什么情况】给 std-evaluation 补「整改通知书-督办提醒」按钮权限，需要往 COMMON_FRAMEWORK.SYS_MENU 插一行 F（按钮）型菜单：MENU_NAME='整改通知书-督办提醒'、PERMS='evaluation:rectification:supervise'、MENU_TYPE='F'、PARENT_ID=2280455896960917576、PATH='#'、STATUS='0'、VISIBLE='0'、ORDER_NUM=现有 F 型最大值+1、MENU_ID=2280455896960917700。本机 DBX 连接是只读的，禁止执行任何写库操作。\n【为什么】权限数据脚本通常由运维/DBA 手工执行：非幂等脚本重复执行会插出重复菜单；只给 INSERT 不给回滚与验证 SQL，出错没有退路、执行完也没有核对依据。\n【怎么做】① 交付脚本固定四段：文件头（执行库/表/影响行数说明）+ 幂等插入（先 SELECT 判存在再 INSERT）+ 回滚（DELETE ... WHERE MENU_ID=...）+ 验证 SQL（插入后查询应得 1 行）；② 主键用显式 MENU_ID（本例 2280455896960917700），不依赖自增，幂等判断才有稳定依据；③ ORDER_NUM 用 SELECT MAX(ORDER_NUM)+1 ... WHERE MENU_TYPE='F' AND PARENT_ID=... 现算，不写死；④ DBX 只读时脚本只落盘到 docs/std-evaluation/sql/（如 2026-10-31-rectification-supervise-perm.sql），绝不尝试执行、也不要绕道写库；⑤ PERMS 命名对齐同模块既有串 evaluation:rectification:reply/confirm/close 的三段式，新增动作（supervise）保持同前缀。",
+      "evidence": "会话 e85a43be-9dd9-449a-81e4-863289982125（基线 05caac8）task-5 描述「新增 docs/std-evaluation/sql/2026-10-31-rectification-supervise-perm.sql（幂等 + 回滚 + 验证 SQL，文件头说明执行库与影响行数）。本机 DBX 只读，禁止执行任何写库操作，只交付脚本」；最终结论「insert COMMON_FRAMEWORK.SYS_MENU row: MENU_NAME='整改通知书-督办提醒', PERMS='evaluation:rectification:supervise', MENU_TYPE='F', PARENT_ID=2280455896960917576, PATH='#', STATUS='0', VISIBLE='0', ORDER_NUM=max existing F+1, MENU_ID=2280455896960917700; idempotent (SELECT-then-INSERT), rollback DELETE, header with target DB/table/affected rows/verification SQL; do not execute (DBX is read-only)」。",
+      "files": ["docs/std-evaluation/sql/2026-10-31-rectification-supervise-perm.sql"],
+      "baseline": "05caac8",
+      "sessionIds": ["e85a43be-9dd9-449a-81e4-863289982125"],
+      "bundle": "110.md"
+    }
+  ]
+}

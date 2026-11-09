@@ -1,0 +1,62 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "047",
+ "files": [
+  "047.md"
+ ],
+ "count": 3,
+ "memories": [
+  {
+   "title": "问题出在「封闭设施」区块：之前把「主入口位置」「次入",
+   "type": "preference",
+   "content": "问题出在「封闭设施」区块：之前把「主入口位置」「次入口位置」「监控设备位置」设成了 `FORM_COL_WIDE`（占 2 列），和数量字段拼成一行两列，所以看起来像两列布局。 已做如下修正： 1. **展示态（DetailTemplate）**：上述位置字段改回默认三列（`span=8`），仅「其他情况」保留整行。 2. **编辑态**：去掉 `zs-form-col wide`，6 个普通字段按三列排列（每行 3 个）。 3. **DetailTemplate 列宽**：`getItemStyle` 按 `span` 固定宽度（8→33.3%，16→66.7%，24→100%），避免行内字段被错误拉伸。 刷新后预期效果： | 基本信息 | 封闭设施 | |---------|---------| | 第1行：项目编号 / 项目名称 / 行政区域 | 第1行：小区主入口 / 主入口位置 / 小区次入口 | | 第2行：项目坐落 / 开发企业 / （空） | 第2行：次入口位置 / 值班室 / 监控设备位置 | | | 第3行：其他情况（整行） | 「基本信息」第二行只有 5 个字段，第三列留空是正常现象。请刷新页面确认效果。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\Headline\\index.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\components\\detail-template\\detail-template.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "8b5d2426-e5c8-4a9a-a656-5be3baa67278"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "修复「变更」按钮无法跳转编辑页 Implement ",
+   "type": "preference",
+   "content": "已按计划完成修复，变更如下： ## 修改内容 ### 1. [`companyRecord.js`](zhi2-web-admin/src/api/company/companyRecord.js) 新增 `resolveChangeId()`，兼容 `getLastByLogin` 返回标量 ID 或对象两种格式。 ### 2. [`CompanyBasicInfoDetail.vue`](zhi2-web-admin/src/views/company/companyManagement/components/CompanyBasicInfoDetail.vue) - **路由查找**：用 `findRouterByFilePath` 静默查找，优先 `toB/change/detail`，再 fallback `company/companyManagement/change/detail`（避免 `getRouterPathByFilePath` 抛错导致 fallback 失效） - **跳转格式**：`path + changeId`，并带 `query: { formMode: 'edit', id }`，与从业人员页一致 - **ID 规范化**：`loadActiveChange`、`detailCallback`、`navigateToChangeEdit` 均",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`companyRecord.js`](zhi2-web-admin/src/api/company/companyRecord.js",
+    "[`CompanyBasicInfoDetail.vue`](zhi2-web-admin/src/views/company/companyManagement/components/CompanyBasicInfoDetail.vue",
+    "[`company/companyManagement/change/detail.vue`](zhi2-web-admin/src/views/company/companyManagement/change/detail.vue",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\institution、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyManagement\\components\\CompanyBasicInfoDetail.vue、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\api\\company\\companyRecord.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "ac2a541a-e0f6-41f2-bba0-8b283388ff32"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "`:index` 弹窗无法选择 — 全局排查与修复计",
+   "type": "fact",
+   "content": "`:index` 弹窗无法选择的问题已按计划全部修复，摘要如下。 ## 根因与组件层修复 [`zs-table-column.vue`](zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue) 重构后： 1. 旧的 `:index=\"handler\"` 点击 API 未被处理 2. `index` / `function` 被透传给 `el-table-column`，与原生 `index` 属性冲突 3. `type=\"link\"` 用 `scope.column.type` 判断，Element UI 不识别自定义 type，点击失效 **修复内容：** - 非 `type=\"index\"` 列：拦截 `index` / `function` 透传 - `type=\"index\"` 列：保留 `:index=\"tableIndex\"` 等原生序号定制 - 用 `$attrs.type` 替代 `scope.column.type` 做列类型判断 - 兼容旧写法：`:index=\"handler\"` 仍可作为 link 点击 - 新写法：`type=\"link\" :function=\"handler\"` 仅在 handler 为函数时显示 link 样式 ## 全局迁移 - **90 个文件** 已从 ",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "[`zs-table-column.vue`](zhi2-web-admin/src/components/zs-table-column/zs-table-column.vue",
+    "[`WdmcDialog.vue`](zhi2-web-admin/src/views/supervision/bank/cbyh/components/WdmcDialog.vue",
+    "[`YhwdDialog.vue`](zhi2-web-admin/src/views/supervision/bank/cbyh/components/YhwdDialog.vue",
+    "[`superviseBank/detail.vue`](zhi2-web-admin/src/views/supervision/bank/superviseBank/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "bb86fbc4-fb2e-46ab-8ef7-7ec642005b52"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}

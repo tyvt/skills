@@ -1,0 +1,75 @@
+{
+ "project": "产品2.0",
+ "batch": "009",
+ "files": [
+  "009.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "tab的样式都要修改，这个是全局改动，改成第二张图片",
+   "type": "preference",
+   "content": "已修复。原因是使用 `amountFormatter` 的列会被 `zs-table-column` 自动设为右对齐，覆盖了列配置里的 `align: 'left'`。 ## 修改说明 1. **`zs-table-column` 组件** 金额类列仅在未显式设置 `align` / `headerAlign` 时才默认右对齐；若列配置里写了左对齐，则按配置生效。 2. **倡议管理列表** 所有列统一设置 `align: 'left'` 和 `headerAlign: 'left'`，表头与单元格均为左对齐。 占比列仍会保留两位小数（`5` 显示为 `5.00`）。刷新倡议管理列表页即可查看效果。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\detail-template\\detail-template.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\autonomy\\multiply\\components\\DecisionDetailDialog.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\autonomy\\suggest\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "378359c0-4d34-425d-b45d-2717c2d30bbf"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "接口不符合规范",
+   "type": "preference",
+   "content": "三步改造已全部落地，摘要如下： ## 长期：统一拦截（兜底） 新增 `src/utils/apiV3Normalize.js`，在 `request.js` 拦截器中自动转换： | V2 写法 | V3 转换 | |---------|---------| | `GET /module/resource/{id}` | `POST /module/resource/detail` + body | | `DELETE /module/resource/{id}` | `POST /module/resource/delete` + `[id]` | | `GET /module/resource/action/{id}` | `POST /module/resource/action` + body（如 `roleId`） | | `PUT /module/resource` | `POST /module/resource/update` | | `POST /module/resource`（新建） | `POST /module/resource/add` | 主键推断：`menu`→`menuId`，`dept`→`deptIdNum`，`dictType`→`dictId`，`dictData`→`dictCode` 等。 未改动的手写调用也会被拦截器兜底；白名单（`/f",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`src/utils/apiV3Normalize.js",
+    "`request.js",
+    "`menu/index.vue",
+    "`role/detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "88e83347-13dd-462f-a082-5dceb7d8e40e"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "去掉v-money指令，使用vue-currency",
+   "type": "fact",
+   "content": "你说得对，`blur` 校验没触发是因为现在用了原生 `input`，少了 `el-input` 内置的 `ElFormItem` 事件分发链。 我已做最小兼容修复（在 `AmountInput` 内）： - 增加 `@blur=\"handleBlur\"`，并在 `handleBlur` 里： - `emit('blur', event)` - 向最近的 `ElFormItem` 手动分发 `el.form.blur` - 在 `handleChange` / `handleClear` 里同步分发 `el.form.change` - 同时保留你已有的业务监听转发（`listeners.blur/change`） 这样 `el-form` 的规则里 `trigger: 'blur'` 应该会恢复触发。 你可以直接在当前页面再试一次离焦校验。",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "涉及文件：D:/repository/产品2.0/zhi2-web-admin/src/components/AmountInput/index.vue、D:/repository/产品2.0/zhi2-web-admin/src、D:/repository/产品2.0/zhi2-web-admin/package.json、D:/repository/产品2.0/zhi2-web-admin/node_modules/vue-currency-input、D:/repository/产品2.0/zhi2-web-admin/src/components/zs-input/zs-input.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "96954bb5-7491-4bdf-854e-917a5232b9e6"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  },
+  {
+   "title": "https://www.ylzhwy.com:808",
+   "type": "preference",
+   "content": "你贴的这段 DOM 结构是对的，修复选择器能命中： - 有 `el-input-group` + `el-input-group--append` - 没有 `map-append` - 后缀是 `.el-input-group__append` **关于多余的 `el-input--suffix`** 这个类来自 `zs-input` 默认 `clearable: true`。Element UI 只要 `clearable` 为 true 就会加 `el-input--suffix`，即使禁用态不显示清除按钮，也会给 input 加 `padding-right: 30px`。 对这种带 `㎡` 单位的 `amount-input` 来说没必要，我已做两处调整： 1. **`AmountInput`**：设置 `:clearable=\"false\"`，去掉多余的 suffix 样式 2. **`zs-input`**：只有父组件真的传了 suffix/prefix 时才转发 slot，避免空 slot 误触发 **请在生产环境 DevTools 里确认** 选中 `.el-input-group__append`，看 Computed 样式： | 属性 | 期望值 | |------|--------| | `display` | `flex`（如果是 `table-cell`",
+   "evidence": "extracted source=cursor project=产品2.0",
+   "files": [
+    "`input-group-fix.css",
+    "涉及文件：d:\\repository\\产品2.0\\zhi2-web-admin\\vite.config.js、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\components\\AmountInput\\index.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\views\\property\\localPropertyBid\\detail.vue、d:\\repository\\产品2.0\\zhi2-web-admin\\src\\styles\\element-ui.scss"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "49ff6642-e504-475e-9982-4f88a028a3b9"
+   ],
+   "_draft": true,
+   "project": "产品2.0"
+  }
+ ],
+ "_draft": true
+}

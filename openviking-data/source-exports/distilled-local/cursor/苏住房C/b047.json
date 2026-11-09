@@ -1,0 +1,73 @@
+{
+ "project": "苏住房C",
+ "batch": "047",
+ "files": [
+  "047.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "{\"zs-sign\":\"\",\"zs-authoriz",
+   "type": "fact",
+   "content": "已恢复 `zs-sign` 业务签名。 `buildGatewayHeader` 会通过 `getSignHeader(params)` 计算签名，并写入 header 的 `zs-sign` 字段；其余平台字段（`zs-authorization`、`zs-param`、`zs-path`）保持不变。 ```javascript const { sign } = getSignHeader(params) return JSON.stringify({ 'zs-sign': sign || '', 'zs-authorization': authorization, 'zs-param': method === 'GET' ? serializeQueryParams(params) : '', 'zs-path': url, }) ``` 签名依赖页面加载的 `crypto-js`（见 `index.html`），H5 环境下会正常生成；若 `CryptoJS` 未就绪，`zs-sign` 会回退为空字符串。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`index.html",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\dispatcher.js、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\api\\httpInstance.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "864297ed-48fa-4d9e-92f6-8c3ade1e6bca"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已修复「历史添加记录」前图标不显示的问题。 原因： ",
+   "type": "preference",
+   "content": "已修复「历史添加记录」前图标不显示的问题。 **原因：** `ZsImage` 默认样式为 `width: 100%`，而「历史添加记录」旁的图标没有固定尺寸。在 flex 布局里父容器宽度由内容撑开，图标宽度被算成 0，所以看不见。 **修改：** 1. 用固定尺寸容器（`28rpx × 28rpx`）包裹图标，让 `ZsImage` 的 `width: 100%` 有参照 2. 补充 `subpackage=\"pages_owner\"`，指向正确的分包静态资源路径 3. 设置 `mode=\"aspectFit\"`，避免小图标被裁剪 重新编译后，「历史添加记录」左侧的蓝色历史图标应能正常显示。若仍有问题，请告诉我运行环境（H5 / 微信小程序）。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\index.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\history.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\components\\CellCard.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2d44d303-a0e8-48dd-9747-099eab934704"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "已修复 pages_owner/house/owne",
+   "type": "preference",
+   "content": "已修复 `pages_owner/house/owner/addHouse` 弹窗中示例图不显示的问题。 **原因：** 1. `ZsImage` 默认 `mode=\"aspectFill\"`，内部样式为 `height: 100%` 2. 弹窗里 `.instructions-img` 又写了固定 `height: 284rpx` 3. 两者冲突后，图片实际渲染高度为 0，只留下空白区域（`margin-bottom` 还在，所以看起来像有占位） 图片资源本身没问题，路径 `pages_owner/static/images/szf/shuoming_bdc.png` 也存在。 **修改：** 1. 给示例图加上 `mode=\"widthFix\"`，按宽度等比缩放 2. 去掉 `.instructions-img` 的固定高度 3. 用 `v-if=\"showInstructionsPopup\"`，弹窗打开后再渲染图片，避免微信小程序在隐藏容器里不加载 请重新编译后在小程序里点开「?」图标验证，示例图应能正常显示。",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "涉及文件：d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner\\addHouse.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\pages_owner\\house\\owner、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "44137331-91dc-4b0c-ad74-f6c700c9aaf6"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  },
+  {
+   "title": "[渲染层网络层错误] Failed to load ",
+   "type": "fact",
+   "content": "## 问题原因 这是**分包迁移后的静态资源路径问题**。 在 `17443e68`（分包）提交中，`empty.png`、`apply-empty.png` 等空态图从主包 `src/static/images/` 迁到了各分包，例如： - `pages_credit/static/images/empty.png` - `pages_main/static/images/empty.png` - `pages_owner/static/images/empty.png` 但代码里仍使用 `images/empty.png`。`resolveStaticUrl` 在以下场景会错误解析到主包路径 `/static/images/empty.png`： 1. **主包 Tab 页**（`pages/index/*`）——路由根是 `pages`，无法推断分包 2. **未单独配置该图的分包**（如 `pages_guard`、`pages_my`、`page-query`） 主包中已无该文件，微信开发者工具就会报 **500**。 ## 修复方案 已在 `src/utils/index.js` 中增加 `SUBPACKAGE_STATIC_IMAGES` 映射（与 `scripts/migrate-main-empty-static.mjs` 一致），并更新 `resolveStat",
+   "evidence": "extracted source=cursor project=苏住房C",
+   "files": [
+    "`src/utils/index.js",
+    "涉及文件：d:\\repository\\苏住房C、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsEmpty\\ZsEmpty.vue、d:\\repository\\苏住房C\\zhi2-mobile-shimin、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\package.json、d:\\repository\\苏住房C\\zhi2-mobile-shimin\\src\\components\\ZsImage\\ZsImage.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "9b92579b-9f3a-4e44-a8e1-f17d395f2790"
+   ],
+   "_draft": true,
+   "project": "苏住房C"
+  }
+ ],
+ "_draft": true
+}

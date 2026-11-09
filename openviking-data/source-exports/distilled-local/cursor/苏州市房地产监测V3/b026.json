@@ -1,0 +1,80 @@
+{
+ "project": "苏州市房地产监测V3",
+ "batch": "026",
+ "files": [
+  "026.md"
+ ],
+ "count": 4,
+ "memories": [
+  {
+   "title": "三种企业注册都按照这个规则修改",
+   "type": "preference",
+   "content": "已按同一套规则覆盖登录里三种企业注册入口： | 入口 | 页面 | 改动 | |------|------|------| | **开发企业** | `CompanyRegisterSingleForm` | 已改用共享组件（此前已改逻辑） | | **经纪机构** | `InstitutionRegisterSingleForm`（非租赁布局） | 新增营业期限 + 校验 + 提交字段 | | **租赁企业** | 同上（`isLeaseOrgan` 布局） | 同上 | ### 统一规则 - **UI**：开始日期 + 结束日期（占位「长期」），不再用 `daterange`（避免 `businessTermEnd` 为 `null` 无法回显）。 - **校验**：`createBusinessTermRangeRules`（`registerValidate.js`）— 开始必填，结束可空，有结束则校验先后。 - **企信通**：仍走 `mapQxtEntInfo.js`（起止映射，`null` 结束 → `''`）。 - **提交**：`businessTermEnd` 用 `omitEmpty`，空表示长期。 ### 抽取复用 - 组件：`src/components/RegisterBusinessTermFields.vue` - E2E：`fillLeaseIns",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "**校验**：`createBusinessTermRangeRules`（`registerValidate.js",
+    "`mapQxtEntInfo.js",
+    "组件：`src/components/RegisterBusinessTermFields.vue",
+    "`companyInfo.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a4953b9d-852c-46bc-8834-4c71e8adf5c6"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "原因：getByCompanyRecordId 的请",
+   "type": "preference",
+   "content": "原因：`getByCompanyRecordId` 的请求体里出现了菜单未替换的占位符 `companyRecordId: \"tabUuid\"`（不是真实备案主键）。原先从 `query` / `getOwnCompany` 取 ID 时未统一过滤占位符，占位值仍可能被发到接口。 ### 修改说明 1. **新增** `src/utils/companyRecordId.js` - `isUsableCompanyRecordId`：排除 `tabUuid`、`tableId` 等占位符 - `resolveCompanyRecordIdFromRoute`：从 `query`（含 `id`）、`:tableid`、路径段解析，并忽略占位 - `shouldResolveCompanyRecordIdFromOwnCompany`：仅 **B 端本企业用户** 在无路由 ID 时回落 `getOwnCompany` 2. **`toB/qualificationRecord/detail.vue`** - 使用上述工具解析 ID；`getOwnCompany` 结果同样校验 - 监听 `$route.fullPath`，切换侧栏菜单时重新拉数 3. **`qualificationRecord.js`** - `getQualificationRecordByCompanyReco",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "`src/utils/companyRecordId.js",
+    "**`toB/qualificationRecord/detail.vue",
+    "**`qualificationRecord.js",
+    "涉及文件：d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\api\\company\\qualificationRecord.js、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyAdmin\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a02500a7-b2e2-4433-9f71-b3fd7a6ccd98"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "预售合同签订列表工具栏按钮颜色修复 Implemen",
+   "type": "bug",
+   "content": "**E2E 结果**：`test:e2e:contract-sign-pre` 未通过，原因是 Playwright 账号在路由里找不到 `commercialHousingSales/presale/contractMainInfo/index`（菜单未授权），不是按钮样式改动导致的。 **代码侧**：预售/现售签订列表与合同撤销列表的工具栏已去掉 `plain`，显示/新增为实心蓝，删除仍为实心红。 若需要自动化回归，请给 E2E 账号开通「预售合同签订」菜单后重跑 `npm run test:e2e:contract-sign-pre`；否则在页面刷新后目视确认即可。",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "涉及文件：d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\commercialHousingSales\\presale\\contractView\\index.vue、d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\mixins\\ListTemplate.js"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "a816325c-00a0-41f5-b764-20f675698e98"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  },
+  {
+   "title": "开发企业入网注册增加资质信息",
+   "type": "preference",
+   "content": "测试已完成，结果如下： ## 测试结果 ### 1. 全流程 E2E（含审核）— 通过 ✅ 用例：`e2e/register/company-register.spec.js` → `全流程 Step1→Step5` 耗时：约 1.1 分钟 验证点包括： - **Step1** `saveCompanyRegister` 请求体含 `qualificationList`，且 `certificateName = 房地产开发企业资质证书` - **Step4** `editAndSubmit` 同样携带完整 `qualificationList` - **管理端审核前**：打开入网确认详情，「资质信息」区块可见，表格中回显证书名称「房地产开发企业资质证书」 - **审核操作**：点击审核并同意，流程正常完成 ### 2. 资质弹窗 maxlength — 通过 ✅ 用例：`e2e/register/company-register-fields.spec.js` → `Step1 资质弹窗字段 maxlength` --- ## 测试过程中的小修复 `assertRegisterStep1Ui` 中 `getByText('资质信息')` 匹配到多个元素（标题、提示文案、列表名等），已改为在 `register-step-1` 内用 `.section-title` 精确匹配，避免 ",
+   "evidence": "extracted source=cursor project=苏州市房地产监测V3",
+   "files": [
+    "用例：`e2e/register/company-register.spec.js",
+    "用例：`e2e/register/company-register-fields.spec.js",
+    "[`companyRegister/detail.vue`](zhi2-web-admin/src/views/company/companyRegister/detail.vue",
+    "涉及文件：c:\\Users\\Administrator\\Documents\\WXWork\\1688857831856144\\Cache\\File\\2026-09\\企业注册与入网确认-接口文档(1).md、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin、d:\\repository\\苏州市房地产监测V3、d:\\repository\\苏州市房地产监测V3\\zhi2-web-admin\\src\\views\\company\\companyRegister\\detail.vue"
+   ],
+   "baseline": "none",
+   "sessionIds": [
+    "2cc4f912-53ec-4229-917e-0977129cd28e"
+   ],
+   "_draft": true,
+   "project": "苏州市房地产监测V3"
+  }
+ ],
+ "_draft": true
+}
