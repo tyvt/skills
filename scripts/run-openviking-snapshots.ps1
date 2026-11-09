@@ -3,7 +3,8 @@ param(
   [string]$Reason = "scheduled"
 )
 
-$ErrorActionPreference = "Stop"
+# Keep ASCII only: Windows PowerShell 5.1 reads BOM-less UTF-8 as ANSI.
+$ErrorActionPreference = "Continue"
 $SkillsRoot = if ($PSScriptRoot) { Split-Path $PSScriptRoot -Parent } else { "D:\repository\skills" }
 $Node = (Get-Command node -ErrorAction Stop).Source
 $DataScript = Join-Path $SkillsRoot "scripts\snapshot-openviking-data.mjs"
@@ -13,7 +14,7 @@ $OvConf = Join-Path $env:USERPROFILE ".openviking\ov.conf"
 $LogDir = Join-Path $env:TEMP "openviking-snapshot"
 $LogFile = Join-Path $LogDir "$(Get-Date -Format yyyyMMdd-HHmmss).log"
 
-New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
+New-Item -ItemType Directory -Force -Path $LogDir -ErrorAction Stop | Out-Null
 
 function Write-Log([string]$msg) {
   $line = "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') $msg"
@@ -42,19 +43,17 @@ function Start-OpenVikingIfDown {
   Start-Sleep -Seconds 4
 }
 
-# Windows PowerShell 5.1 会把 native 命令 stderr 经 2>&1 变成 ErrorRecord，
-# 与 $ErrorActionPreference="Stop" 一起会终止脚本且吞掉日志。
-# 用 cmd.exe /c 在 cmd 层合并输出，并把错误偏好临时降为 Continue。
-function Invoke-Snapshot([string]$script, [string[]]$scriptArgs) {
-  $argLine = ($scriptArgs | ForEach-Object { $_ }) -join ' '
-  $cmdLine = '"' + $Node + '" "' + $script + '" ' + $argLine + ' 2>&1'
-  Write-Log "RUN: $cmdLine"
-  $oldEap = $ErrorActionPreference
-  $ErrorActionPreference = 'Continue'
-  $lines = & cmd.exe /c $cmdLine
+# PS 5.1 turns native stderr piped via 2>&1 into ErrorRecord and aborts under Stop.
+# Redirect all streams to a file (no pipeline), then log the lines and check exit code.
+function Invoke-Snapshot([string]$scriptPath, [string]$tag, [string[]]$argv) {
+  $tmp = Join-Path $LogDir "$tag.out"
+  Write-Log "RUN: $scriptPath $($argv -join ' ')"
+  & $Node $scriptPath @argv *> $tmp
   $code = $LASTEXITCODE
-  $ErrorActionPreference = $oldEap
-  foreach ($l in $lines) { Write-Log ([string]$l) }
+  if (Test-Path $tmp) {
+    foreach ($l in (Get-Content $tmp -ErrorAction SilentlyContinue)) { Write-Log ([string]$l) }
+    Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+  }
   Write-Log "EXIT: $code"
   return $code
 }
@@ -65,11 +64,11 @@ if ($Push) { $commitArgs += "--push" }
 $wasRunning = Stop-OpenVikingIfRunning
 try {
   Write-Log "=== snapshot-openviking-data.mjs ==="
-  $c1 = Invoke-Snapshot $DataScript $commitArgs
+  $c1 = Invoke-Snapshot $DataScript "data" $commitArgs
   if ($c1 -ne 0) { throw "snapshot-openviking-data failed exit $c1" }
 
   Write-Log "=== snapshot-openviking-memory.mjs ==="
-  $c2 = Invoke-Snapshot $MemScript $commitArgs
+  $c2 = Invoke-Snapshot $MemScript "memory" $commitArgs
   if ($c2 -ne 0) { throw "snapshot-openviking-memory failed exit $c2" }
 
   Write-Log "DONE"
