@@ -23,6 +23,13 @@
 - **`openviking-memory/`**：仅 `memories/` 扁平副本，便于人工 diff。
 - **`openviking-data/`**：**全量质量相关 data**（含 sessions + vectordb），用于灾备与整树恢复。
 
+## 原始导出归档（不在本镜像内）
+
+`openviking-data/` 只镜像 OpenViking 自身的**派生状态**（`viking/` + `vectordb/`）。
+**原始会话导出**（cursor / workbuddy / opencode 蒸馏前的源文件）单独放在仓库顶层的
+`memory-migration-archive/`，由 `scripts/snapshot-memory-migration-archive.mjs` 从
+`memory-migration/out/` 同步。两者分开：原始源 vs 派生状态边界清晰，重导/恢复互不干扰。
+
 ## 同步
 
 ```powershell

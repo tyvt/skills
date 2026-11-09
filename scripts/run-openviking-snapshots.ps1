@@ -9,6 +9,7 @@ $SkillsRoot = if ($PSScriptRoot) { Split-Path $PSScriptRoot -Parent } else { "D:
 $Node = (Get-Command node -ErrorAction Stop).Source
 $DataScript = Join-Path $SkillsRoot "scripts\snapshot-openviking-data.mjs"
 $MemScript = Join-Path $SkillsRoot "scripts\snapshot-openviking-memory.mjs"
+$ArchiveScript = Join-Path $SkillsRoot "scripts\snapshot-memory-migration-archive.mjs"
 $OvServer = "C:\Program Files\Python310\Scripts\openviking-server.exe"
 $OvConf = Join-Path $env:USERPROFILE ".openviking\ov.conf"
 $LogDir = Join-Path $env:TEMP "openviking-snapshot"
@@ -102,6 +103,10 @@ try {
   Write-Log "=== snapshot-openviking-memory.mjs ==="
   $c2 = Invoke-Snapshot $MemScript "memory" $commitArgs
   if ($c2 -ne 0) { throw "snapshot-openviking-memory failed exit $c2" }
+
+  Write-Log "=== snapshot-memory-migration-archive.mjs ==="
+  $c3 = Invoke-Snapshot $ArchiveScript "archive" $commitArgs
+  if ($c3 -ne 0) { throw "snapshot-memory-migration-archive failed exit $c3" }
 
   Write-Log "DONE"
 } catch {
