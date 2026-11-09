@@ -31,12 +31,26 @@
 - id: agent-default-model # magpie
   config:
     provider: magpie
-    model: workbuddy/deepseek-v4.1-flash
+    model: auto/deepseek-v4.1-flash
     reasoningEffort: off
 - id: session-log-deepseek
   name: "@deepseek-ai/dsh-session-log-deepseek"
   config:
     enabled: false
+
+# OpenViking 记忆：写回更勤、召回略严（2026-11-05）
+- id: openviking-memory-runtime
+  name: "@openviking/dsh-memory-plugin"
+  config:
+    endpoint: http://127.0.0.1:1933
+    commitTokenThreshold: 8000
+    captureToolResults: true
+    skipSubagentSessions: true
+    recallMaxTokens: 2200
+    scoreThreshold: 0.40
+    recallDedupTurns: 8
+    recallPeerScope: actor
+    mcpToolCallTimeoutMs: 90000
 
 # 自定义插件市场「发现」页索引源（等价于 UI 添加索引源）
 - id: plugin-market
@@ -197,35 +211,35 @@
                 - provider: magpie
                   model: workbuddy/deepseek-v4.1-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy/glm-5.3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy-ai/deepseek-v4.1-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy-ai/deepseek-v4.1-flash-sg
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: raccoon/sn-glm-5-3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: autoclaw-cn/zai_glm-5.3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: codex/gpt-6.1-sol
                   thresholdRatio: 0.2048
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: minimax-code/MiniMax-M3.1-Flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
           - id: command-compact
             name: '@deepseek-ai/dsh-command-compact'
           - id: tool-result-pruner
@@ -302,9 +316,17 @@
 - id: spill-policy
   name: '@deepseek-ai/dsh-spill-policy'
   config:
-    # 原 12500 token ≈ 5 万字符：门户会话最大工具结果才 9,632 字符，一次都没触发过。
-    # 降到 3000 token 后 >12k 字符的结果会落盘并给出可回读路径。
-    maxInlineTokens: 3000
+    # 2026-11-09 token 优化：原 12500 → 3000 → 现 1500。
+    # spill-policy 在 tools/post-execute 逐次调用就裁剪（非等 compaction），但跳过 read。
+    # 1500 token（≈6k 字符）以下内联，超出落盘并给出可回读路径，源头压小每步重发的大结果。
+    maxInlineTokens: 1500
+# 2026-11-09 token 优化：覆盖 dsh-base 默认的重复工具调用提醒（原阈值 3/5/8 太晚）。
+# 收窄到 2/4/6：第二次相同参数 read/grep 即提醒，抑制长会话里反复整读同一文件。
+- id: repeat-tool-reminder
+  name: '@deepseek-ai/dsh-repeat-tool-reminder'
+  config:
+    thresholds: [ 2, 4, 6 ]
+    argumentsPreviewChars: 300
 - id: preset-ptc
   name: '@deepseek-ai/dsh-agent-preset'
   config:
@@ -424,35 +446,35 @@
                 - provider: magpie
                   model: workbuddy/deepseek-v4.1-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy/glm-5.3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy-ai/deepseek-v4.1-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy-ai/deepseek-v4.1-flash-sg
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: raccoon/sn-glm-5-3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: autoclaw-cn/zai_glm-5.3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: codex/gpt-6.1-sol
                   thresholdRatio: 0.2048
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: minimax-code/MiniMax-M3.1-Flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
           - id: command-compact
             name: '@deepseek-ai/dsh-command-compact'
           - id: tool-result-pruner
@@ -551,35 +573,35 @@
                 - provider: magpie
                   model: workbuddy/deepseek-v4.1-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy/glm-5.3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy-ai/deepseek-v4.1-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy-ai/deepseek-v4.1-flash-sg
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: raccoon/sn-glm-5-3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: autoclaw-cn/zai_glm-5.3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: codex/gpt-6.1-sol
                   thresholdRatio: 0.2048
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: minimax-code/MiniMax-M3.1-Flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
           - id: command-compact
             name: '@deepseek-ai/dsh-command-compact'
       - id: persistent-shell
@@ -767,35 +789,35 @@
                 - provider: magpie
                   model: workbuddy/deepseek-v4.1-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy/glm-5.3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy-ai/deepseek-v4.1-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: workbuddy-ai/deepseek-v4.1-flash-sg
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: raccoon/sn-glm-5-3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: autoclaw-cn/zai_glm-5.3-flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: codex/gpt-6.1-sol
                   thresholdRatio: 0.2048
-                  retainTokens: 20000
+                  retainTokens: 12000
                 - provider: magpie
                   model: minimax-code/MiniMax-M3.1-Flash
                   thresholdRatio: 0.1024
-                  retainTokens: 20000
+                  retainTokens: 12000
           - id: command-compact
             name: '@deepseek-ai/dsh-command-compact'
           - id: tool-result-pruner
@@ -870,35 +892,35 @@
       - provider: magpie
         model: workbuddy/deepseek-v4.1-flash
         thresholdRatio: 0.1024
-        retainTokens: 20000
+        retainTokens: 12000
       - provider: magpie
         model: workbuddy/glm-5.3-flash
         thresholdRatio: 0.1024
-        retainTokens: 20000
+        retainTokens: 12000
       - provider: magpie
         model: workbuddy-ai/deepseek-v4.1-flash
         thresholdRatio: 0.1024
-        retainTokens: 20000
+        retainTokens: 12000
       - provider: magpie
         model: workbuddy-ai/deepseek-v4.1-flash-sg
         thresholdRatio: 0.1024
-        retainTokens: 20000
+        retainTokens: 12000
       - provider: magpie
         model: raccoon/sn-glm-5-3-flash
         thresholdRatio: 0.1024
-        retainTokens: 20000
+        retainTokens: 12000
       - provider: magpie
         model: autoclaw-cn/zai_glm-5.3-flash
         thresholdRatio: 0.1024
-        retainTokens: 20000
+        retainTokens: 12000
       - provider: magpie
         model: codex/gpt-6.1-sol
         thresholdRatio: 0.2048
-        retainTokens: 20000
+        retainTokens: 12000
       - provider: magpie
         model: minimax-code/MiniMax-M3.1-Flash
         thresholdRatio: 0.1024
-        retainTokens: 20000
+        retainTokens: 12000
 - id: llm-pi-ai # magpie
   name: "@deepseek-ai/dsh-llm-pi-ai"
   config:
@@ -909,6 +931,13 @@
         api: openai-completions
         baseURL: http://127.0.0.1:3425/v1
         models:
+          - id: auto/hy4free
+            name: Hy4 · routing group
+            contextWindow: 1000000
+            maxTokens: 64000
+            input: [text, image]
+            reasoningEfforts:
+              high: high
           - id: auto/hy3
             name: Hy3 · routing group
             contextWindow: 192000
@@ -923,8 +952,10 @@
             maxTokens: 128000
             input: [text, image]
             reasoningEfforts:
+              "off": none
               low: low
               high: high
+              max: max
           - id: cursor/grok-4.7@256k
             name: Grok 4.7 @ 256k · Cursor
             contextWindow: 256000
@@ -948,6 +979,13 @@
             name: Composer 2.5 · Cursor
             contextWindow: 200000
             input: [text, image]
+          - id: workbuddy/hy4free
+            name: Hy4 · WorkBuddy
+            contextWindow: 960000
+            maxTokens: 64000
+            input: [text, image]
+            reasoningEfforts:
+              high: high
           - id: workbuddy/hy3
             name: Hy3 · WorkBuddy
             contextWindow: 192000
@@ -974,16 +1012,13 @@
             reasoningEfforts:
               low: low
               high: high
-          - id: workbuddy-ai/deepseek-v4.1-flash-sg
-            name: Deepseek-V4.1-Flash · WorkBuddy AI
+          - id: workbuddy-ai/hy4free
+            name: Hy4 · WorkBuddy AI
             contextWindow: 1000000
-            maxTokens: 128000
+            maxTokens: 64000
             input: [text, image]
             reasoningEfforts:
-              "off": none
-              low: low
               high: high
-              max: max
           - id: autoclaw-cn/zai_glm-5.3-flash
             name: GLM-5.3-Flash · AutoClaw 国内 (Zhipu)
             contextWindow: 1048576
@@ -993,15 +1028,6 @@
               low: low
               high: high
               max: max
-          - id: trae-cn/deepseek-v4.1-flash
-            name: DeepSeek-V4.1-Flash · Trae CN
-            contextWindow: 116000
-            maxTokens: 16000
-            input: [text, image]
-            reasoningEfforts:
-              low: low
-              high: high
-              xhigh: xhigh
         streamIdleTimeoutMs: 600000
       magpie-anthropic:
         displayName: Magpie · Anthropic
@@ -1026,4 +1052,4 @@
   config:
     apiKeyEnv: MAGPIE_GATEWAY_KEY
     baseURL: "http://127.0.0.1:3425/v1"
-    model: "workbuddy/deepseek-v4.1-flash"
+    model: "auto/deepseek-v4.1-flash"
