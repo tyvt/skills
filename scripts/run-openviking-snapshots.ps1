@@ -17,7 +17,7 @@ New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
 function Write-Log([string]$msg) {
   $line = "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') $msg"
-  Add-Content -Path $LogFile -Value $line -Encoding utf8
+  Add-Content -Path $LogFile -Value $line -Encoding UTF8
   Write-Host $line
 }
 
@@ -26,7 +26,7 @@ function Stop-OpenVikingIfRunning {
   if (-not $p) { return $false }
   Write-Log "Stopping openviking-server (pid $($p.Id)) for vectordb snapshot"
   Stop-Process -Id $p.Id -Force
-  Start-Sleep -Seconds 3
+  Start-Sleep -Seconds 5
   return $true
 }
 
@@ -42,20 +42,40 @@ function Start-OpenVikingIfDown {
   Start-Sleep -Seconds 4
 }
 
+# Windows PowerShell 5.1 会把 native 命令 stderr 经 2>&1 变成 ErrorRecord，
+# 与 $ErrorActionPreference="Stop" 一起会终止脚本且吞掉日志。
+# 用 cmd.exe /c 在 cmd 层合并输出，并把错误偏好临时降为 Continue。
+function Invoke-Snapshot([string]$script, [string[]]$scriptArgs) {
+  $argLine = ($scriptArgs | ForEach-Object { $_ }) -join ' '
+  $cmdLine = '"' + $Node + '" "' + $script + '" ' + $argLine + ' 2>&1'
+  Write-Log "RUN: $cmdLine"
+  $oldEap = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  $lines = & cmd.exe /c $cmdLine
+  $code = $LASTEXITCODE
+  $ErrorActionPreference = $oldEap
+  foreach ($l in $lines) { Write-Log ([string]$l) }
+  Write-Log "EXIT: $code"
+  return $code
+}
+
 $commitArgs = @("--commit", "--reason", $Reason)
 if ($Push) { $commitArgs += "--push" }
 
 $wasRunning = Stop-OpenVikingIfRunning
 try {
   Write-Log "=== snapshot-openviking-data.mjs ==="
-  & $Node $DataScript @commitArgs 2>&1 | ForEach-Object { Write-Log $_; $_ }
-  if ($LASTEXITCODE -ne 0) { throw "snapshot-openviking-data failed exit $LASTEXITCODE" }
+  $c1 = Invoke-Snapshot $DataScript $commitArgs
+  if ($c1 -ne 0) { throw "snapshot-openviking-data failed exit $c1" }
 
   Write-Log "=== snapshot-openviking-memory.mjs ==="
-  & $Node $MemScript @commitArgs 2>&1 | ForEach-Object { Write-Log $_; $_ }
-  if ($LASTEXITCODE -ne 0) { throw "snapshot-openviking-memory failed exit $LASTEXITCODE" }
+  $c2 = Invoke-Snapshot $MemScript $commitArgs
+  if ($c2 -ne 0) { throw "snapshot-openviking-memory failed exit $c2" }
 
   Write-Log "DONE"
+} catch {
+  Write-Log "FAILED: $($_.Exception.Message)"
+  throw
 } finally {
   if ($wasRunning) { Start-OpenVikingIfDown }
 }
