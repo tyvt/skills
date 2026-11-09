@@ -87,7 +87,12 @@ if (!fs.existsSync(SRC)) {
   const MIN_SRC_FILES = 10;
   const guardSkipPurge =
     srcCount < MIN_SRC_FILES || (baseline > 0 && srcCount < baseline * 0.5);
-  const common = ["/R:3", "/W:2", "/NFL", "/NDL", "/NJH", "/NJS", "/NP"];
+  // /XF 保留归档本地文件：README.md（说明）与 .snapshot-meta.json（由本脚本写出），
+  // 二者都不在源目录中，必须排除在 /MIR 的清理之外，否则会被 purge 掉。
+  const common = [
+    "/R:3", "/W:2", "/NFL", "/NDL", "/NJH", "/NJS", "/NP",
+    "/XF", "README.md", ".snapshot-meta.json",
+  ];
   const switches = guardSkipPurge ? ["/E", "/XO", ...common] : ["/MIR", ...common];
   if (guardSkipPurge) {
     console.warn(
@@ -95,7 +100,9 @@ if (!fs.existsSync(SRC)) {
     );
   }
   const before = new Set(
-    [...walkFiles(DST_ROOT)].map((p) => path.relative(DST_ROOT, p))
+    [...walkFiles(DST_ROOT)]
+      .filter((p) => path.basename(p) !== ".snapshot-meta.json")
+      .map((p) => path.relative(DST_ROOT, p))
   );
   const r = spawnSync("robocopy", [SRC, DST_ROOT, ...switches], {
     encoding: "utf8",
