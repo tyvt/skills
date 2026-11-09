@@ -54,7 +54,7 @@
 8. **compaction 反复失败立即换会话**：出现「summary is not smaller than the shadowed content」等压缩失败 ≥3–5 次，立即收尾换新会话，不要反复 resume 硬撑（2026-11-02 单会话 compaction 199 试/91 败，每败一次都是全量重算）。goal 轮数不做硬性上限，但撞到 compaction 持续失败或产出比 <5% 时，应如实汇报并按第 1 条拆片换会话。
 9. **会话日志是多帧 zstd**：`~/.dsh/sessions/*/session.v4.jsonl.zstd` 由上千个 zstd 帧追加而成，`zlib.zstdDecompressSync(整个buf)` 只解第一帧（只得到 session 头一行）。要按 magic `28 B5 2F FD` 切帧逐帧解，否则审计会得出「0 工具错误/0 compaction」的假结论。`workflow-audit.mjs` 已内建，见 skill `token-frugal`。
 10. **大工具结果只裁剪、不溢出**：`tool-result-pruner` 仅把头尾裁剪后**仍整段留在历史里、每步重发**；`spill-policy.maxInlineTokens:3000`（≈1.2 万字符）几乎不触发落盘。所以真正的省钱在**源头**：grep 先缩小范围、read 用 offset/limit、pwsh 先过滤（`Select-String`/`head`/落盘分段）。2026-11-02 实测单日工具结果 6183 条/8.5MB，其中 >8KB 的 186 条 2.2MB 全是 read/grep/pwsh 全量返回。
-11. **429/503/TRANSPORT 型故障换 provider 同名模型，不原地重试**：额度型 429 的重置时间常在数小时后，原地重试只会把一个会话烧成「重算型」事故（2026-11-05 实测单会话 `fe39d020` 撞 15 次 429，产出比跌到 2.1%、compaction 跑 27 次）；2026-11-09 实测 `magpie` 连续 5 次 `TRANSPORT: Connection error.` 集中在一个会话，也属同类。连续 429/503/TRANSPORT 时直接切到同名的低缓存容忍档（`workbuddy-ai/deepseek-v4.1-flash` → `opencode-zen-free/deepseek-v4.1-flash-free` 或 `cursor/deepseek-v41-flash-1017`）继续；批量导入/长文任务按第 1 条拆批，避免单会话反复撞限流。只在故障时换模型，正常长任务不主动切。
+11. **429/503/TRANSPORT/finish_reason 型故障换 provider 同名模型或新开会话，不原地重试**：额度型 429 的重置时间常在数小时后，原地重试只会把一个会话烧成「重算型」事故（2026-11-05 实测单会话 `fe39d020` 撞 15 次 429，产出比跌到 2.1%、compaction 跑 27 次）；2026-11-09 实测 `magpie` 连续 5 次 `TRANSPORT: Connection error.` 集中在一个会话，也属同类。**`Provider finish_reason: error`（`PI_AI_ERROR`）与 `MALFORMED_RESPONSE` 更隐蔽：2026-11-09 实测今天 12 轮（32.4%）全部不带 `llm/retry` 事件，内建重试与 guard 的 `planRecovery` 都救不了，原地重试必然再挂；连续 2 次立即收尾新开会话或换 provider 同名模型。** 连续故障时直接切到同名的低缓存容忍档（`workbuddy-ai/deepseek-v4.1-flash` → `opencode-zen-free/deepseek-v4.1-flash-free` 或 `cursor/deepseek-v41-flash-1017`）继续；批量导入/长文任务按第 1 条拆批。只在故障时换模型，正常长任务不主动切。
 12. **重复整读是长上下文的隐形杀手**：同一文件在同一会话内**只整篇 `read` 一次**，后续一律 `grep` 定位 + `offset`/`limit` 取片段（2026-11-05 `d47c475c` 单会话重复整读 104 次、`fe39d020` 38 次，全天 230 次）。写大文件一次 `write` 定稿，不要「先写大段再多次 `edit`」。
 
 ## 主动执行与确认方式（全局）
@@ -117,12 +117,14 @@
 10. **`session_search` 120s 超时**：先加 `session_id` / 时间范围 / 更短 query 缩小范围，超时后不要原样重试，改走 `context-mode` MCP（2026-11-09 跨 5 会话 7 次）。
 11. **别名与字段**：定时任务更新用 `schedule_edit`（不是 `schedule_update`）、`grep` 过滤字段是 `include`（不是 `glob`）——二者 guard 已能自动改写；`FS_AMBIGUOUS_EDIT` 用更长 `old_string` 或 `replace_all: true`；`read` 的 `offset` 不要超过文件总行数。
 12. **worktree 路径**：代码改动在独立 worktree 内读写，路径用该 worktree 的绝对路径，别回主仓库目录（2026-11-09 实测跨 worktree 读路径导致 2 次 `FS_NOT_FOUND`）。
+13. **`mcp_gateway` 大参数拆小**：2026-11-09 实测 5 次 `MALFORMED_RESPONSE` 全是该工具调用的参数 JSON 被截断（`Unterminated string` / `Expected ',' or '}'`，最大到 203KB）。按第 10 条把大内容落盘分段、缩小 query/范围，不要一次把整段塞进参数。
 
 审计近期会话失败率（只读，落盘脱敏统计）：
 
 - `node "$env:USERPROFILE\.dsh\skills\tool-call-hygiene\scan.mjs"` —— 只统计**工具层**。
 - `node "$env:USERPROFILE\.dsh\skills\tool-call-hygiene\audit.mjs"` —— 同时统计**工具层 + 供应商层**
-  （`llm/retry` 的 503 / 429 / EOF），报告落在 `~/.dsh/reports/agent-failures-latest.json`。
+  （`llm/retry` 的 503 / 429 / EOF，以及 `turn/end` 的 `PI_AI_ERROR` / `MALFORMED_RESPONSE`），
+  报告落在 `~/.dsh/reports/agent-failures-latest.json`。后者不进重试预算，旧口径会整类漏统计。
   排查「agent 调用失败」时用这个，它覆盖面比 scan.mjs 全。
 
 ## 后台任务清理（全局，所有 agent 默认遵守）

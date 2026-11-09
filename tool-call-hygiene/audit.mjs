@@ -126,6 +126,35 @@ for (const fp of files) {
     byProvider[cat] = (byProvider[cat] || 0) + 1;
   }
 
+  // 供应商层补充：turn/end 的 reason.kind=error（PI_AI_ERROR / MALFORMED_RESPONSE）。
+  // 这类生成中断不产生 llm/retry 事件，内建重试与 dsh-agent-guard 的 planRecovery 都覆盖不到，
+  // 旧口径会整类漏统计（2026-11-09 实测今天 12 轮 / 32.4% 被漏，报表只显示 5 次）。
+  // 按事件时间归属当日，避免跨天会话的历史轮混入；按 turn 与 llm/retry 去重避免双计。
+  const retriedTurns = new Set(
+    ev.filter(e => /llm\/(retry|error|failure)|provider/.test(e.type || ''))
+      .map(e => e.turn ?? (e.data && e.data.turn))
+      .filter(t => t !== undefined && t !== null)
+  );
+  for (const e of ev) {
+    if (e.type !== 'turn/end') continue;
+    const rawTs = e.time ?? (e.data && e.data.time);
+    const ts = typeof rawTs === 'number' ? rawTs : Date.parse(rawTs);
+    if (Number.isFinite(ts) && (ts < dayStart || ts >= dayEnd)) continue;
+    const r = e.data && e.data.reason;
+    if (!r || r.kind !== 'error') continue;
+    const info = r.error || r.failure || {};
+    const code = String(info.code || r.code || '').toUpperCase();
+    const text = String(info.message || r.message || '');
+    if (!code && !text) continue;
+    const turn = e.turn ?? (e.data && e.data.turn);
+    if (turn !== undefined && turn !== null && retriedTurns.has(turn)) continue;
+    pf++;
+    const cat = /MALFORMED/.test(code) ? 'MALFORMED_RESPONSE'
+      : /PI_AI_ERROR|FINISH_REASON/.test(code + ' ' + text) ? 'PI_AI_ERROR'
+      : 'TURN_ERROR';
+    byProvider[cat] = (byProvider[cat] || 0) + 1;
+  }
+
   totalCalls += calls;
   toolFailures += tf;
   providerFailures += pf;

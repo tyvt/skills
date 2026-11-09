@@ -85,9 +85,9 @@ function collectFiles(start, end) {
   return out;
 }
 
-function summarize(files) {
+function summarize(files, start, end) {
   let calls = 0, toolFail = 0, provFail = 0;
-  const byCategory = {};
+  const byCategory = {}, byProvider = {};
   for (const fp of files) {
     const ev = load(fp);
     calls += ev.filter(e => e.type === 'tool/call').length;
@@ -97,6 +97,11 @@ function summarize(files) {
       const code = MAXIS_MAP[String(err.code || err.name || 'OTHER')] || String(err.code || err.name || 'OTHER');
       byCategory[code] = (byCategory[code] || 0) + 1;
     }
+    const retriedTurns = new Set(
+      ev.filter(e => /llm\/(retry|error|failure)|provider/.test(e.type || ''))
+        .map(e => e.turn ?? (e.data && e.data.turn))
+        .filter(t => t !== undefined && t !== null)
+    );
     for (const e of ev) {
       if (!/llm\/(retry|error|failure)|provider/.test(e.type || '')) continue;
       const d = e.data || {};
@@ -106,13 +111,35 @@ function summarize(files) {
       if (/EMPTY_RESPONSE/.test(code)) continue; // 空回复重试，不算供应商故障
       provFail++;
     }
+    // turn/end 的 reason.kind=error：PI_AI_ERROR(Provider finish_reason: error) /
+    // MALFORMED_RESPONSE(mcp_gateway 参数 JSON 截断)。这类失败不产生 llm/retry，
+    // 旧口径整类漏统计（2026-11-09 实测今天 12 轮 / 32.4%）。
+    for (const e of ev) {
+      if (e.type !== 'turn/end') continue;
+      const rawTs = e.time ?? (e.data && e.data.time);
+      const ts = typeof rawTs === 'number' ? rawTs : Date.parse(rawTs);
+      if (Number.isFinite(ts) && (ts < start || ts >= end)) continue;
+      const r = e.data && e.data.reason;
+      if (!r || r.kind !== 'error') continue;
+      const info = r.error || r.failure || {};
+      const code = String(info.code || r.code || '').toUpperCase();
+      const text = String(info.message || r.message || '');
+      if (!code && !text) continue;
+      const turn = e.turn ?? (e.data && e.data.turn);
+      if (turn !== undefined && turn !== null && retriedTurns.has(turn)) continue;
+      provFail++;
+      const cat = /MALFORMED/.test(code) ? 'MALFORMED_RESPONSE'
+        : /PI_AI_ERROR|FINISH_REASON/.test(code + ' ' + text) ? 'PI_AI_ERROR'
+        : 'TURN_ERROR';
+      byProvider[cat] = (byProvider[cat] || 0) + 1;
+    }
   }
   const selfHeal = Object.entries(byCategory).filter(([k]) => SELF_HEAL.has(k)).reduce((a, [, v]) => a + v, 0);
-  return { sessions: files.length, calls, toolFail, provFail, selfHeal, byCategory };
+  return { sessions: files.length, calls, toolFail, provFail, selfHeal, byCategory, byProvider };
 }
 
-const today = summarize(collectFiles(todayStart, todayEnd));
-const yest = summarize(collectFiles(yestStart, yestEnd));
+const today = summarize(collectFiles(todayStart, todayEnd), todayStart, todayEnd);
+const yest = summarize(collectFiles(yestStart, yestEnd), yestStart, yestEnd);
 
 const pct = (a, b) => b ? (a / b * 100).toFixed(1) : '-';
 const delta = (a, b) => { const d = a - b; return (d > 0 ? '+' : '') + d; };
@@ -132,13 +159,17 @@ console.log('\n-- 本窗口错误码 Top --');
 Object.entries(today.byCategory).sort((a, b) => b[1] - a[1]).slice(0, 8).forEach(([k, v]) =>
   console.log('  ' + k.padEnd(26) + String(v).padStart(4) + (SELF_HEAL.has(k) ? '  [可自愈]' : '')));
 
+console.log('\n-- 本窗口供应商层分类 --');
+Object.entries(today.byProvider).sort((a, b) => b[1] - a[1]).forEach(([k, v]) =>
+  console.log('  ' + k.padEnd(26) + String(v).padStart(4)));
+
 const guards = [];
 if (today.selfHeal > 0) {
   const top = Object.entries(today.byCategory).filter(([k]) => SELF_HEAL.has(k)).sort((a, b) => b[1] - a[1])[0];
   guards.push(`可自愈失败 ${today.selfHeal} 次（最多：${top ? top[0] : '-'}）→ 出错先查 tool-call-hygiene 修正表，绝不原样重复。`);
 }
 if (today.toolFail - today.selfHeal > 0) guards.push(`非自愈失败 ${today.toolFail - today.selfHeal} 次 → 多为超时/网络，拆小命令或加 timeoutMs；session_search 超时先缩小范围。`);
-if (today.provFail > 0) guards.push(`供应商失败 ${today.provFail} 次 → 连续 429/503/TRANSPORT 换 provider 同名模型，别原地重试。`);
+if (today.provFail > 0) guards.push(`供应商失败 ${today.provFail} 次 → 连续 429/503/TRANSPORT/finish_reason:error 换 provider 同名模型或新开会话，别原地重试（这类不进 llm-retry 预算）。`);
 if (!guards.length) guards.push('本窗口暂无显著失败，保持现有习惯。');
 
 console.log('\n-- 开局该守 --');
