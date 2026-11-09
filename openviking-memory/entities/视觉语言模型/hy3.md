@@ -5,6 +5,7 @@ OpenViking 使用的视觉语言模型（VLM），负责从会话中抽取记忆
 - 在 OpenViking 中引用为 openai/auto/hy3
 - 复用 magpie 配置，作为记忆抽取器
 - 于 2026-11-02 在 doctor 检查中确认 VLM 探活成功
+- 2026-11-09 用户确认其不支持图像识别（识图），视觉对比基准中排除全部 hy3 变体（auto/hy3、workbuddy-ai/hy3、workbuddy/hy3）
 
 ## 状态备注
 - 2026-11-02 验证 VLM 抽取链路完全打通：实测会话抽取成功（单次 11578 tokens 抽 4 条、8973 tokens 抽 3 条、8712 tokens 抽 2 条记忆），中文结构化抽取准确
@@ -23,8 +24,8 @@ OpenViking 使用的视觉语言模型（VLM），负责从会话中抽取记忆
 {
   "category": "视觉语言模型",
   "name": "hy3",
-  "source_extraction_id": "66f5a71d91d04757bbadc1945a9aeacc",
-  "version": 7,
+  "source_extraction_id": "2964d220700b470b82c317fc5639a34d",
+  "version": 8,
   "memory_type": "entities"
 }
 -->

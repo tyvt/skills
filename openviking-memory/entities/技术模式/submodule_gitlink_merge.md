@@ -16,13 +16,14 @@
 - 会话 2026-11-09 父仓 develop/v2.6.2-portal 合并冲突：本地 50ef0e0c4 vs 远程 c2c645d8d，子模块合并提交 d1acb5e147 已含双方，父仓 gitlink 直写 d1acb5e147，合并提交 1c4a301，推送 8470d07..7247576
 - 本批新提交 1c4a301（合并解冲突）、7247576（清理失效引用）；此前本地 b1cf316、fe3d92a、91a7bdf、f5a2eab 一并推送
 - 涉及文件 zhi2-web-admin；父仓门户（develop/v2.6.2-portal）；来源会话 2026-11-09
+- 会话 2026-11-09 父仓合并 docs/common-errors.md（E-046）时子模块 gitlink 冲突，子模块合并提交 `0fedafd0` 已推送，父仓 gitlink 直写 `0fedafd0`，生成父仓合并提交 `babcfa58b29af09edcee2cc7872f8810ef0d24a6` 并 FF 推送至 `develop/v3.0.0`（第一父 `2dc46e81`）；清理 worktree 时父 worktree 需 `--force` 移除
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "submodule_gitlink_merge",
-  "source_extraction_id": "58da07990856413ca7ca5f372b5fc38c",
-  "version": 1,
+  "source_extraction_id": "d8e06282d525429294a8faf00668115a",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -1,29 +1,30 @@
-# Provider 错误监控与审计修复
-2026-11-09 发现 magpie/workbuddy/hy4free 通道供应商错误终结多轮对话，已修复审计与护栏统计口径。
+# provider_error_audit
+Technical-pattern entity: audit of magpie/workbuddy/hy4free provider errors terminating DSH multi-turn conversations on 2026-11-09, with fixes to audit and guardrails.
 
-## 现象
-- 37 个 turn/end 中 12 个（32.4%）被供应商错误终结，全部集中在 10–12 时、全部跑在 magpie/workbuddy/hy4free 通道（23/24 会话）
-- 失败在会话内连续复发：082ae4a7 4/5 轮、154d41f8 2/2、9429e069 2/2，原地继续几乎必再挂
-- 7 次 PI_AI_ERROR + 5 次 MALFORMED_RESPONSE（mcp_gateway 工具参数 JSON 被截断）
-- 失败轮 inputTokens 均值 67K 低于成功轮 93K，多个失败轮 0 次工具调用即断，指向 magpie 通道不稳而非 Hy4 模型本身
+## Phenomenon
+- 37 turn/end events: 12 (32.4%) terminated by provider errors, all between 10-12, all on magpie/workbuddy/hy4free channels (23/24 sessions)
+- Failures recurred in-session: 082ae4a7 4/5, 154d41f8 2/2, 9429e069 2/2 turns failed consecutively
+- 7 PI_AI_ERROR + 5 MALFORMED_RESPONSE (mcp_gateway tool param JSON truncated)
+- Failed turns avg inputTokens 67K < success 93K; multiple failed turns had 0 tool calls, pointing to magpie channel instability not Hy4 model
 
-## 护栏缺口
-- 12 个失败轮全部不带 llm/retry 事件，内建重试与 dsh-agent-guard 的 planRecovery 都不触发
-- 旧 audit.mjs 只统计 llm/retry 导致漏报（报表显示 5 次，实际 12+ 次）
+## Guardrail Gap
+- 12 failed turns all lacked llm/retry events; built-in retry and dsh-agent-guard planRecovery not triggered
+- Old audit.mjs only counted llm/retry causing underreport (showed 5, actual 12+)
 
-## 修复落地
-- audit.mjs / morning-report.mjs 纳入 turn/end reason.kind=error，新口径供应商失败 18 = PI_AI_ERROR 7 + MALFORMED_RESPONSE 6 + TRANSPORT 5
-- AGENTS.md 第 11 条扩到 finish_reason:error（连出 2 次立即新开会话/换 provider）、新增第 13 条 mcp_gateway 大参数拆小
-- 在独立 worktree skills-wt-finish-reason-20261109（技能库 D:/repository/skills）改 3 文件，提交 dcafe1fa 已 fast-forward 合并 main 并删除 worktree，按用户决定未推送（main 领先 origin/main 2 个提交：c7f682f5、dcafe1fa）
-- 用户选择模型暂不换、先观察
-- 专项报告见 C:/Users/Administrator/.dsh/reports/provider-finish-reason-2026-11-09.md；一次性分析脚本 finish-reason-scan.mjs、finish-reason-detail.mjs、finish-reason-context.mjs 保留在 ~/.dsh/reports/
+## Fixes
+- audit.mjs / morning-report.mjs now include turn/end reason.kind=error; new caliber provider failures 18 = PI_AI_ERROR 7 + MALFORMED_RESPONSE 6 + TRANSPORT 5
+- AGENTS.md rule 11 expanded to finish_reason:error (2 consecutive → new session/change provider); new rule 13 splits mcp_gateway large params
+- In worktree skills-wt-finish-reason-20261109 (D:/repository/skills) changed 3 files, committed dcafe1fa, fast-forward merged main, worktree deleted; per user not pushed (main ahead origin/main by c7f682f5, dcafe1fa)
+- User chose to keep model, observe first
+- Report at C:/Users/Administrator/.dsh/reports/provider-finish-reason-2026-11-09.md; scripts finish-reason-scan.mjs, finish-reason-detail.mjs, finish-reason-context.mjs kept at ~/.dsh/reports/
+
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "provider_error_audit",
-  "source_extraction_id": "4e6b8b0730b7416da48d56a1da50430b",
-  "version": 2,
+  "source_extraction_id": "ee9bac6a81c444b4b0f9e699cdd3d61e",
+  "version": 3,
   "memory_type": "entities"
 }
 -->
