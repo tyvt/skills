@@ -7,13 +7,14 @@ OpenViking 记忆快照脚本，在全部导入完成后执行并提交推送到
 
 ## 关系
 - 属于 OpenViking 记忆导入工具链的收尾环节，在 import-local-sources.mjs / import-to-ov.mjs 之后执行
+- 被 Windows 计划任务 OpenViking-Memory-Snapshot 每天 03:00 调用（顺序②，与 snapshot-openviking-data.mjs 并列）
 
 <!-- MEMORY_FIELDS
 {
   "category": "程序",
   "name": "snapshot_openviking_memory",
-  "source_extraction_id": "feb0f8a0282f43beb0cbb0b2cc1e0f25",
-  "version": 1,
+  "source_extraction_id": "7ab171ffd54748fc90dd07f7ad5c3fc0",
+  "version": 2,
   "memory_type": "entities"
 }
 -->
