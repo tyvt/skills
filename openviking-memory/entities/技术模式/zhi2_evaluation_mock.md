@@ -3,7 +3,7 @@
 
 ## 环境变量与开关
 - `VITE_EVALUATION_MOCK=true` 时注入物业自查演示数据；`isEvaluationMockEnabled()` 仅认此值
-- test 构建(`uni build -m test`)读 `.env.test` 额外开启 `VITE_EVALUATION_MOCK=true`；`.env.example` 增补说明
+- test 构建(`uni build -m test`)读 `.env.test`：2026-11-09 起 `VITE_EVALUATION_MOCK` 改为显式 `false`(原 `true`)；`.env.example` 增补说明
 - 生产 `.env`(`VITE_DATA_MODE=remote`)未设此 flag，联调真实接口不受影响
 
 ## 演示数据
@@ -15,13 +15,14 @@
 - 2026-11-06 提交 ae35a7d 并推送 origin/dev(83bddfa..ae35a7d)
 - nginx 8095 站点部署 test 构建 dist，Playwright 探针 19/19 全通过(列表/发起/填写/详情/整改)
 - worktree 开发后 rebase 到 dev 合并，临时分支清理
+- 2026-11-09 随 flood mock 一同关闭：`.env.test` 改 `VITE_EVALUATION_MOCK=false`，提交 fd05a55 推送 origin/dev；test 包走真实接口
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zhi2_evaluation_mock",
-  "source_extraction_id": "9c1c5cf4058241ec99c5ece7d0fb19d0",
-  "version": 1,
+  "source_extraction_id": "f85698defd2b4f5295e604b8f00a496d",
+  "version": 3,
   "memory_type": "entities"
 }
 -->
