@@ -317,5 +317,34 @@ test('provider 给出可接受等待时长时按其要求等待', () => {
   assert.equal(plan.delayMs, 5000)
 })
 
+console.log('\n=== 工具名 / 参数名别名（2026-11-09 实测样本）===')
+
+test('schedule_update 旧名映射到 schedule_edit', () => {
+  const knownWithEdit = new Set([...known, 'schedule_edit'])
+  const result = repairToolName('schedule_update', (n) => knownWithEdit.has(n))
+  assert.equal(result.name, 'schedule_edit')
+  assert.equal(result.repair.rule, 'tool-name-alias')
+})
+
+test('别名表外的未知工具名仍不瞎猜', () => {
+  const result = repairToolName('schedule_update_typo', (n) => known.has(n))
+  assert.equal(result.name, 'schedule_update_typo')
+  assert.equal(result.repair, null)
+})
+
+test('grep 的 glob 字段改写为 include', () => {
+  const args = { pattern: 'abc', path: 'src', glob: 'README.md' }
+  const { repairs } = repairArguments({ toolName: 'grep', args, schema: {} })
+  assert.equal(args.include, 'README.md')
+  assert.equal(args.glob, undefined)
+  assert.equal(repairs.filter((r) => r.rule === 'arg-alias').length, 1)
+})
+
+test('已有 include 时不覆盖模型意图', () => {
+  const args = { pattern: 'abc', include: '*.md', glob: 'README.md' }
+  repairArguments({ toolName: 'grep', args, schema: {} })
+  assert.equal(args.include, '*.md')
+})
+
 console.log(`\n${failed === 0 ? 'PASS' : 'FAIL'}  passed=${passed} failed=${failed}\n`)
 process.exit(failed === 0 ? 0 : 1)

@@ -54,7 +54,7 @@
 8. **compaction 反复失败立即换会话**：出现「summary is not smaller than the shadowed content」等压缩失败 ≥3–5 次，立即收尾换新会话，不要反复 resume 硬撑（2026-11-02 单会话 compaction 199 试/91 败，每败一次都是全量重算）。goal 轮数不做硬性上限，但撞到 compaction 持续失败或产出比 <5% 时，应如实汇报并按第 1 条拆片换会话。
 9. **会话日志是多帧 zstd**：`~/.dsh/sessions/*/session.v4.jsonl.zstd` 由上千个 zstd 帧追加而成，`zlib.zstdDecompressSync(整个buf)` 只解第一帧（只得到 session 头一行）。要按 magic `28 B5 2F FD` 切帧逐帧解，否则审计会得出「0 工具错误/0 compaction」的假结论。`workflow-audit.mjs` 已内建，见 skill `token-frugal`。
 10. **大工具结果只裁剪、不溢出**：`tool-result-pruner` 仅把头尾裁剪后**仍整段留在历史里、每步重发**；`spill-policy.maxInlineTokens:3000`（≈1.2 万字符）几乎不触发落盘。所以真正的省钱在**源头**：grep 先缩小范围、read 用 offset/limit、pwsh 先过滤（`Select-String`/`head`/落盘分段）。2026-11-02 实测单日工具结果 6183 条/8.5MB，其中 >8KB 的 186 条 2.2MB 全是 read/grep/pwsh 全量返回。
-11. **429/503 型故障换 provider 同名模型，不原地重试**：额度型 429 的重置时间常在数小时后，原地重试只会把一个会话烧成「重算型」事故（2026-11-05 实测单会话 `fe39d020` 撞 15 次 429，产出比跌到 2.1%、compaction 跑 27 次）。连续 429/503 时直接切到同名的低缓存容忍档（`workbuddy-ai/deepseek-v4.1-flash` → `opencode-zen-free/deepseek-v4.1-flash-free` 或 `cursor/deepseek-v41-flash-1017`）继续；批量导入/长文任务按第 1 条拆批，避免单会话反复撞限流。只在故障时换模型，正常长任务不主动切。
+11. **429/503/TRANSPORT 型故障换 provider 同名模型，不原地重试**：额度型 429 的重置时间常在数小时后，原地重试只会把一个会话烧成「重算型」事故（2026-11-05 实测单会话 `fe39d020` 撞 15 次 429，产出比跌到 2.1%、compaction 跑 27 次）；2026-11-09 实测 `magpie` 连续 5 次 `TRANSPORT: Connection error.` 集中在一个会话，也属同类。连续 429/503/TRANSPORT 时直接切到同名的低缓存容忍档（`workbuddy-ai/deepseek-v4.1-flash` → `opencode-zen-free/deepseek-v4.1-flash-free` 或 `cursor/deepseek-v41-flash-1017`）继续；批量导入/长文任务按第 1 条拆批，避免单会话反复撞限流。只在故障时换模型，正常长任务不主动切。
 12. **重复整读是长上下文的隐形杀手**：同一文件在同一会话内**只整篇 `read` 一次**，后续一律 `grep` 定位 + `offset`/`limit` 取片段（2026-11-05 `d47c475c` 单会话重复整读 104 次、`fe39d020` 38 次，全天 230 次）。写大文件一次 `write` 定稿，不要「先写大段再多次 `edit`」。
 
 ## 主动执行与确认方式（全局）
@@ -102,7 +102,7 @@
 
 ## 工具调用卫生（全局，所有 agent 默认遵守）
 
-工具调用失败绝大多数来自「模型行为 / 契约违反」而非 harness bug。出现以下错误码时，**先加载 `tool-call-hygiene` skill 取修正写法，再重试一次**，不要原样重复坏调用：`INVALID_ARGS`、`ESCALATION_ARGS`、`FS_NOT_OBSERVED`、`FS_STALE_VERSION`、`FS_NOT_FOUND`、`FS_NOT_TEXT`、`GOAL_TOOL_INVALID_UPDATE`、`GOAL_INVALID_TRANSITION`、`SEARCH_FAILED`、`SEARCH_RAW_OUTPUT_OVERFLOW`、`SEARCH_ABORTED`、`WEB_BLOCKED_URL`、`WEB_PROVIDER_ERROR`、`UNKNOWN_TOOL`、`TOOL_TIMEOUT`。
+工具调用失败绝大多数来自「模型行为 / 契约违反」而非 harness bug。出现以下错误码时，**先加载 `tool-call-hygiene` skill 取修正写法，再重试一次**，不要原样重复坏调用：`INVALID_ARGS`、`ESCALATION_ARGS`、`FS_NOT_OBSERVED`、`FS_STALE_VERSION`、`FS_NOT_FOUND`、`FS_NOT_TEXT`、`FS_EDIT_NOT_FOUND`、`FS_AMBIGUOUS_EDIT`、`GOAL_TOOL_INVALID_UPDATE`、`GOAL_INVALID_TRANSITION`、`SEARCH_FAILED`、`SEARCH_RAW_OUTPUT_OVERFLOW`、`SEARCH_ABORTED`、`WEB_BLOCKED_URL`、`WEB_PROVIDER_ERROR`、`UNKNOWN_TOOL`、`TOOL_TIMEOUT`。
 
 高频规则（完整版与自愈表见该 skill）：
 1. `justification` 不是「理由」字段：只有和 `sandbox_permissions` 一起（一次性重试被沙箱拒绝的操作）才传；普通读写改不要传，也不要传空串。
@@ -113,6 +113,10 @@
 6. `read` 只读 UTF-8：图片用 `read_image`，GBK/GB2312 源码用 `pwsh`（`Get-Content -Encoding`）查看。
 7. `grep` 的 `include` 是单个 glob（`{a,b}` 交替表示多个）；具体文件路径先用 `glob` 校验存在。
 8. `update_goal` 的 `objective`/`max_goal_rounds` 仅配 `action:"edit"`；不要 resume 已激活的 goal。
+9. **空参数 = 长上下文退化**：报错 `missing required property "pattern"/"file_path"/"command"` 且 `arguments` 整体为空时，guard 无法推断必填值；连续 2 次立即收尾换会话，不要继续刷重试（2026-11-09 单会话 8 次）。
+10. **`session_search` 120s 超时**：先加 `session_id` / 时间范围 / 更短 query 缩小范围，超时后不要原样重试，改走 `context-mode` MCP（2026-11-09 跨 5 会话 7 次）。
+11. **别名与字段**：定时任务更新用 `schedule_edit`（不是 `schedule_update`）、`grep` 过滤字段是 `include`（不是 `glob`）——二者 guard 已能自动改写；`FS_AMBIGUOUS_EDIT` 用更长 `old_string` 或 `replace_all: true`；`read` 的 `offset` 不要超过文件总行数。
+12. **worktree 路径**：代码改动在独立 worktree 内读写，路径用该 worktree 的绝对路径，别回主仓库目录（2026-11-09 实测跨 worktree 读路径导致 2 次 `FS_NOT_FOUND`）。
 
 审计近期会话失败率（只读，落盘脱敏统计）：
 
@@ -146,9 +150,10 @@
 
 1. **重试预算**：内建 llm-retry 是「每会话每 provider 5 次」。预算用完后 provider 的
    503/429 直接变成致命错误。`dsh-agent-guard` 在预算之外再给 3 次带退避的恢复机会。
-2. **额度型 429 重试无意义**：报错里的重置时间通常是几小时后，别原地转圈。
-   连续 429/503 时换 provider 的同名模型继续（`workbuddy-ai/deepseek-v4.1-flash`
+2. **额度型 429 / 连续 TRANSPORT 重试无意义**：报错里的重置时间通常是几小时后，别原地转圈。
+   连续 429/503/TRANSPORT 时换 provider 的同名模型继续（`workbuddy-ai/deepseek-v4.1-flash`
    → `opencode-zen-free/deepseek-v4.1-flash-free` 或 `cursor/deepseek-v41-flash-1017`）。
+   2026-11-09 实测 `magpie` 连续 5 次 `Connection error.` 集中在一个会话，guard 退避重试 4 次仍应尽早换 provider。
 3. **只在故障时换模型**：换模型会让整段前缀缓存失效，只在挂掉时换，长任务里不要主动换。
 
 ## dsh-agent-guard：参数形状守卫
@@ -163,6 +168,9 @@
 - 参数类型不合约（`"true"` → `true`）、`additionalProperties:false` 的多余字段、
   非必填字段上的 `null`。
 - `todo_write` 的 `todos[]` 上多了 `id`/`activeForm`。
+- 工具名 / 参数名别名（2026-11-09 新增）：`schedule_update` → `schedule_edit`、
+  `grep.glob` → `grep.include`；只在原名未注册、别名已注册时改写，不瞎猜未知名字。
+- **守卫修不了**：`arguments` 整体为空（必填字段缺失）—— 语义不可推断，按「工具调用卫生」第 9 条换会话处理。
 
 守卫只做**语义唯一可推断**的修复；路径写错、文件没读就改这类需要业务判断的不碰
 （改变行为的风险大于收益）。每次修复都记账在 `~/.dsh/reports/agent-guard-ledger.jsonl`。

@@ -11,6 +11,23 @@
 /** 模型偶尔把 JSON 片段拼进工具名（实测出现 `grep">`）。 */
 const NAME_NOISE = /^[\s"'`<>]+|[\s"'`<>]+$/g
 
+/**
+ * 工具名别名：模型用了旧名 / 近似名，且目标工具确实是唯一合理的那个。
+ * 只在「原名未注册 + 别名已注册」时改写，避免把真未知的工具名瞎猜成别的。
+ * 来源：2026-11-09 实测 UNKNOWN_TOOL `schedule_update`（正确名 `schedule_edit`）。
+ */
+const TOOL_NAME_ALIASES = Object.freeze({
+  schedule_update: 'schedule_edit',
+})
+
+/**
+ * 参数名别名：字段名写错但语义唯一可推断。
+ * 来源：2026-11-09 实测 `grep` 传了 `glob`（契约里是 `include`）。
+ */
+const ARG_ALIASES = Object.freeze({
+  grep: Object.freeze({ glob: 'include' }),
+})
+
 /** `update_goal` 只有 action=edit 才接受这两个字段。 */
 const GOAL_EDIT_ONLY_FIELDS = ['objective', 'max_goal_rounds']
 
@@ -31,7 +48,7 @@ export const RETRYABLE_CODES = new Set([
 ])
 
 /**
- * 归一化工具名：去掉首尾噪声字符后如果命中已注册工具，就改写。
+ * 归一化工具名：去掉首尾噪声字符 → 查别名表，命中已注册工具就改写。
  * @param {string} name - 模型给出的工具名。
  * @param {(candidate: string) => boolean} isKnown - 判断名字是否已注册。
  * @returns {{ name: string, repair: object | null }}
@@ -44,6 +61,13 @@ export function repairToolName(name, isKnown) {
     return {
       name: trimmed,
       repair: { rule: 'tool-name-trim', detail: `normalized ${JSON.stringify(name)} -> ${JSON.stringify(trimmed)}` },
+    }
+  }
+  const alias = TOOL_NAME_ALIASES[name]
+  if (alias && isKnown(alias)) {
+    return {
+      name: alias,
+      repair: { rule: 'tool-name-alias', detail: `mapped ${JSON.stringify(name)} -> ${JSON.stringify(alias)}` },
     }
   }
   return { name, repair: null }
@@ -332,6 +356,27 @@ export const ALL_RULES = Object.freeze({
 })
 
 /**
+ * 参数名别名修复：把写错的字段名搬到契约字段名，保留原来的值。
+ * 只在「错字段存在 + 目标字段不存在」时改，避免覆盖模型显式给出的意图。
+ * @param {string} toolName - 工具名。
+ * @param {object} args - 原始参数（会被就地修改）。
+ * @returns {object[]} 修复清单。
+ */
+export function repairArgAliases(toolName, args) {
+  const repairs = []
+  const map = ARG_ALIASES[toolName]
+  if (!map || args === null || typeof args !== 'object' || Array.isArray(args)) return repairs
+  for (const [from, to] of Object.entries(map)) {
+    if (!Object.hasOwn(args, from)) continue
+    if (Object.hasOwn(args, to)) continue
+    args[to] = args[from]
+    delete args[from]
+    repairs.push({ rule: 'arg-alias', detail: `${toolName}.${from} -> ${to}` })
+  }
+  return repairs
+}
+
+/**
  * 统一入口：按工具名分派到各条规则，再跑通用 schema 收敛。
  * @param {object} input - 输入。
  * @param {string} input.toolName - 工具名。
@@ -348,6 +393,7 @@ export function repairArguments({ toolName, args, schema, rules = ALL_RULES }) {
   if (rules.semantics === true) {
     if (toolName === 'update_goal') repairs.push(...repairGoalArgs(args))
     if (toolName === 'todo_write') repairs.push(...repairTodoArgs(args))
+    repairs.push(...repairArgAliases(toolName, args))
   }
   if (rules.escalation === true) repairs.push(...repairEscalationArgs(args, schema))
   if (rules.schema === true) repairs.push(...repairAgainstSchema(args, schema))

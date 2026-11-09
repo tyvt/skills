@@ -58,7 +58,22 @@ const TOOL_DEFS = {
       additionalProperties: false,
     },
   },
-  grep: { name: 'grep', parameters: { type: 'object', properties: { pattern: { type: 'string' } }, required: ['pattern'] } },
+  grep: { name: 'grep', parameters: { type: 'object', properties: { pattern: { type: 'string' }, include: { type: 'string' } }, required: ['pattern'] } },
+  schedule_edit: {
+    name: 'schedule_edit',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        expectedUpdatedAt: { type: 'string' },
+        prompt: { type: 'string' },
+        rrule: { type: 'string' },
+        title: { type: 'string' },
+        active: { type: 'boolean' },
+      },
+      required: ['id'],
+    },
+  },
 }
 
 function makeCtx() {
@@ -235,6 +250,34 @@ await (async () => {
     const recovered = lines.filter((l) => l.kind === 'recovered')
     assert.ok(recovered.length >= 2, `恢复记账 ${recovered.length} < 2`)
     assert.equal(recovered[0].rule, 'provider-retry')
+  })
+
+  try { fs.unlinkSync(ledgerPath) } catch { /* ignore */ }
+})()
+
+console.log('\n=== 工具名 / 参数名别名（2026-11-09 实测样本）===')
+
+await (async () => {
+  const { guards, ledgerPath } = makeCtx()
+
+  await test('schedule_update 别名映射后按 schedule_edit 的 schema 执行', () => {
+    const exec = { name: 'schedule_update', agent: {}, callId: 'c8', arguments: { id: 's1', prompt: 'x' } }
+    runGuard(guards, exec)
+    assert.equal(exec.name, 'schedule_edit')
+    assert.equal(exec.arguments.id, 's1')
+  })
+
+  await test('grep 的 glob 字段改写为 include', () => {
+    const exec = { name: 'grep', agent: {}, callId: 'c9', arguments: { pattern: 'x', glob: 'README.md' } }
+    runGuard(guards, exec)
+    assert.equal(exec.arguments.include, 'README.md')
+    assert.equal(exec.arguments.glob, undefined)
+  })
+
+  await test('别名修复写进记账', () => {
+    const lines = fs.readFileSync(ledgerPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l))
+    assert.ok(lines.some((l) => l.rule === 'tool-name-alias'))
+    assert.ok(lines.some((l) => l.rule === 'arg-alias'))
   })
 
   try { fs.unlinkSync(ledgerPath) } catch { /* ignore */ }
