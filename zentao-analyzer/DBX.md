@@ -55,15 +55,24 @@ FROM zt_action WHERE objectType='bug' AND objectID=<id> ORDER BY id;
 4. 跨项目复用（标题带「参照苏住房/江阴已做」）：`git log --grep=<关键词>`、`git grep` 找同名页面。
 5. **根因定位顺序定死：症状 → 先查真实数据（业务库/接口返回/日志）→ 再读代码**。bug6369 反例：step 40–47 空转推演根因，step 48 一条 `SELECT PLAN_FILE_URL FROM SERVICE_EXPAND.T_FLOOD_PLAN` 拿到真实值后瞬间定论。
 
-## 回写（事务化 UPDATE zt_bug + INSERT zt_action）
-
-**首选：直接运行固定脚本生成回写序列，参数只暴露 bugId 和 comment，禁止手拼 SQL：**
+## 回写（唯一推荐路径）
 
 ```text
 node D:\repository\skills\zentao-analyzer\zentao-resolve.mjs <bugId> <commentHTML>
 ```
 
-脚本输出全套 `mcp_gateway` 调用（每步必带 `connection_name`）与各步核验点，照抄执行即可。以下手工流程仅在脚本不可用时使用：
+→ 照抄输出的 mcp_gateway 调用序列执行（每步必带 connection_name）。
+
+⚠️ 禁止手工拼 INSERT。zt_action 是 14 列，历史两次报 Column count mismatch。
+手工 SQL 仅当脚本缺失时使用，见附录 A（且必须逐列数到 14）。只对新禅道库写；老禅道库禁止写。回写后必须复核 resolvedBy/resolvedDate/resolution 已落库。
+
+## 表结构速查
+
+- `zt_bug` 关键列：`id,title,status,severity,openedBy,openedDate,resolvedBy,resolvedDate,resolution,resolvedBuild,assignedTo,product,project,execution`（是 `resolvedBuild`，没有 `build` 列）。
+- 状态：`active`（激活）→ `resolved`（已解决）→ `closed`（关闭）。
+- resolution 可选值：`bydesign, duplicate, external, fixed, notrepro, postponed, willnotfix, productized`。
+
+## 附录 A：脚本损坏时的应急 SQL（禁止跳过脚本直接使用）
 
 1. `dbx_open_session(connection_id=<新禅道>, enable_transactions=true)` 拿 `session_id`；
 2. `dbx_begin_transaction(session_id=...)`；
@@ -89,12 +98,5 @@ VALUES ('bug',<id>,'<product>',<project>,<execution>,'tiany','resolved',NOW(),'<
 ```
 
 - `product` 列可写纯数字（如 `60`）或逗号包裹（如 `,60,`）；与同产物其他 bug 写法一致即可。
-- `zt_action.extra` 写 resolution（`'fixed'`）；`vision` 写 `'rnd'`；`read` 必须 `` `read` `` 反引号。
+- `zt_action.extra` 写 resolution（`'fixed'`）；`vision` 写 `'rnd'`；`read` 必须 `` `read` `` 反引号。列数必须是 14。
 - comment 用 HTML：写根因 + 修复 + 验证证据（构建时间、部署站点、提交号）。
-- 只对新禅道库写；老禅道库禁止写。回写后必须复核 `resolvedBy/resolvedDate/resolution` 已落库。
-
-## 表结构速查
-
-- `zt_bug` 关键列：`id,title,status,severity,openedBy,openedDate,resolvedBy,resolvedDate,resolution,resolvedBuild,assignedTo,product,project,execution`（是 `resolvedBuild`，没有 `build` 列）。
-- 状态：`active`（激活）→ `resolved`（已解决）→ `closed`（关闭）。
-- resolution 可选值：`bydesign, duplicate, external, fixed, notrepro, postponed, willnotfix, productized`。

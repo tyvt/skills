@@ -5,6 +5,13 @@ description: 把会话 token/成本审计变成「可执行降本清单」。读
 
 # token-optimizer — 可执行降本清单
 
+收尾自查清单（逐项打勾，未完成不收尾）：
+
+- [ ] job_list 无遗留后台任务
+- [ ] token-optimizer 已跑，等效成本与未命中 TOP 已看
+- [ ] 构建/回写/部署证据齐（未执行项已写明）
+- [ ] 有行为变更的，在交付说明单列“需客测确认点”
+
 **定位**：token-frugal 回答「为什么烧」，本 skill 回答「先治谁、怎么治、治到什么程度」。数据源与 `dsh-context` 插件的 **Context Insights / 上下文洞察** 面板完全一致（同一份 `session_projcache` 投影），因此脚本输出与界面数字对得上。
 
 ## 数据源
