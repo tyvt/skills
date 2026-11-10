@@ -23,6 +23,13 @@ description: 禅道 Bug/任务分析与回写。给定一条禅道链接（如 h
 
 > ⚠️ 新禅道连接有**写策略**：只读连接写会被拒；事务化写需 `dbx_open_session(enable_transactions=true)` 再 `dbx_begin_transaction` / `dbx_commit_transaction`（或 `dbx_rollback_transaction`）。
 
+### DBX 使用手册（避免重复试错）
+- Dameng：`dbx_list_tables` 的 pattern 参数会被忽略，直接查目录 SQL：`SELECT TABLE_NAME FROM USER_TABLES WHERE TABLE_NAME LIKE '%X%'`；列信息：`SELECT ... FROM ALL_TAB_COLUMNS WHERE OWNER='<schema>' AND TABLE_NAME='<t>'`。
+- `dbx_describe_table` 必须显式 owner，否则返回 No columns found；优先用 ALL_TAB_COLUMNS。
+- `dbx_execute_query` 即使传了 session_id，**仍必须传 connection_id**，否则 CONNECTION_NOT_FOUND。
+- `INSERT zt_action` 严格照抄 14 列，files 列用 NULL 占位（列数不匹配是高频错误）。
+- 以上每条最多重试一次；第二次直接换目录 SQL / 换脚本。
+
 ## 常用脚本
 
 | 脚本 | 作用 |
@@ -134,12 +141,13 @@ $tok = ($r.Content | ConvertFrom-Json).token     # 例：09faa9fe...  （HTTP 20
 $hd = @{ 'Token' = $tok; 'Accept' = 'application/json' }
 $r = Invoke-WebRequest -Uri "$base/api.php/v1/files/<fileID>" -Headers $hd -UseBasicParsing
 $bytes = $r.RawContentStream.ToArray()
-if ($bytes[0] -eq 0x89 -and $bytes[1] -eq 0x50) { [IO.File]::WriteAllBytes("bug<id>.png", $bytes) }
+$out = Join-Path $env:TEMP "bug<id>.png"
+if ($bytes[0] -eq 0x89 -and $bytes[1] -eq 0x50) { [IO.File]::WriteAllBytes($out, $bytes) }
 ```
 
 - 端点：`GET /api.php/v1/files/<fileID>` → `200 application/octet-stream`，返回文件原始字节（PNG 头 `137,80,78,71` / `89,'P','N','G'`）。
 - `/api.php/v1/files/<fileID>/download` 不一定有；**用不带 `/download` 的那个**。`/api.php/v1/bugs/<id>` 返回 JSON 详情（不含图片二进制）。
-- 若拿到的是图片改成 `read_image` 查看直接定位 UI 问题；比看 steps 文字描述准得多。
+- 若拿到的是图片改成 `read_image` 查看直接定位 UI 问题；比看 steps 文字描述准得多。多张附件时先看业务页，再看角色或权限页。
 - **别去 DB 容器 `LOAD_FILE` 读上传目录**：DB 是独立 Docker（MariaDB），禅道 Web 文件在另一容器，`LOAD_FILE` 路径全对不上，返回 NULL。
 
 ## 回写（默认：DBX 数据库回写）
