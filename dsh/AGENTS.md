@@ -19,6 +19,7 @@
 3. 同一会话不中途换模型、不改工具清单，否则整段缓存失效。运行中改 MCP 工具白名单后，当前会话不会重拉 tools/list：新工具报 UNKNOWN_TOOL 或 Connection closed，旧工具也可能消失。若工具报 UNKNOWN_TOOL，先判断是否刚改过 MCP 工具清单；是则说明需要新开会话，不要在本会话反复重试。
 4. 你的 Token 很珍贵。未知具体路径时，禁止用 `grep` 或 `read` 全盘搜索。
 5. 单步 reasoning 超过约 1.5k tokens 即停：反复自我辩论（宽度估算、要不要改配置、方案取舍）说明缺事实，先调一次工具（grep / 截图 / 查一条 SQL）拿到事实再决策，不要在脑内演算。
+6. 截图最后读、一次一张：图片 attachment 会打穿 prefix cache，读 1 张后后续所有 step 全价计费。先读 1 张关键图确认，不够再补读第 2 张；多图任务把读图放到上下文尾部，后面尽量不再有长对话。
 
 ## 重活不进主模型
 
@@ -42,6 +43,8 @@
 4. 工具参数报错时先加载 `tool-call-hygiene` 再重试一次。长期记忆、跨会话检索走 OpenViking 与 `openviking-memory`，不要把 `viking://` 当磁盘路径读。
 5. 用 PowerShell 调 OpenViking 等 HTTP 写入接口时，不要用 `Invoke-RestMethod` 的默认编码。JSON 正文必须先 `[System.Text.Encoding]::UTF8.GetBytes`，再用 `Invoke-WebRequest -ContentType 'application/json; charset=utf-8' -Body` 发送字节。整文件重写 UTF-8 源码仍禁止用 PowerShell 5.1 默认编码。
 6. 执行 `git pull` 或 `git rebase` 之前，必须先运行 `git status --short`。若存在未暂存的环境文件（`env/.env` 及同类本地配置），先用 `git stash push -- env/.env`（需要时加 `-u`）隔离，再 pull/rebase；结束后按需 `git stash pop`。禁止在这些文件仍是脏工作区时直接 pull 或 rebase。提交前同样先看 `git status --short`，不要把环境文件夹进提交。
+7. 自动化环境跑 `git rebase --continue`、`git commit`、`git merge` 前必须先设 `$env:GIT_EDITOR='true'`（或合并进命令 `GIT_EDITOR=true git ...`），否则会在无编辑器时静默挂起等待输入，浪费数分钟。`git merge-base --is-ancestor A B` 一条命令就能判定祖先关系，禁止脑内推演 commit 图。
+8. 构建产物归属：`public/version.json`（含 gitHash）是 build 生成物，**禁止提交**；build 后若它变脏，`git checkout -- public/version.json` 还原而不是带进提交。
 
 ## 找不到就先搜记忆
 

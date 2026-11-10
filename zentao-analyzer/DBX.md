@@ -11,6 +11,13 @@
 - `INSERT zt_action` 严格照抄 14 列，files 列用 NULL 占位（列数不匹配是高频错误）。
 - 写策略：只读连接写会被拒；事务化写需 `dbx_open_session(enable_transactions=true)` 再 `dbx_begin_transaction` / `dbx_commit_transaction`（或 `dbx_rollback_transaction`）。
 - 调 `mcp_gateway` 时 `server: "dbx"` 只用来列工具，真正执行要再带 `tool` 与 `arguments`；执行 SQL 的参数名是 `sql`。
+- **固定调用模板，照抄，不要自己猜工具名/参数**：
+  ```text
+  mcp_gateway { "server": "dbx", "tool": "dbx_execute_query",
+                "arguments": { "connection_name": "新禅道", "sql": "<SQL>" } }
+  ```
+  反例 1：`tool: "query"` → `tool not found`（工具名只有 `dbx_execute_query`，没有缩写）。
+  反例 2：`dbx_execute_query` 只传 `session_id` 漏 `connection_name` → `CONNECTION_NOT_FOUND`。**无论有无 session_id，每次都必须带 `connection_name`（或 connection_id）**。
 
 ## 取详情
 
