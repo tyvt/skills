@@ -8,8 +8,9 @@
  *   - 每次 `agent/pre-step` 前检查阈值，越过就在本轮 messages 末尾追加一条 notice 提示模型收尾/换会话/别再整读；
  *   - 同一阈值只提醒一次（按会话记录），避免每步刷屏。
  *
- * 等效成本口径：cacheRead×0.1 + uncached + output×4（与 token-frugal/token-optimizer 一致），
- * 单位是「相对 token」。阈值默认给出保守值，可在 config 覆盖。
+ * 等效成本口径：cacheRead×0.1 + uncached + output×4。
+ * 0.1 与 4 是假设倍率，待按实际计费校准，不是某次会话日志的证据。
+ * 三键全 0 且没有 cacheReadTokens 的 usage 视为 absent：不进等效成本，只计 absentSteps。
  */
 
 import { randomUUID } from "node:crypto";
@@ -24,23 +25,59 @@ function normalizeConfig(input) {
   return {
     enabled: input?.enabled ?? true,
     sessionEquivBudget: input?.sessionEquivBudget ?? 8_000_000,
-    perStepUncachedBudget: input?.perStepUncachedBudget ?? 15_000,
+    // 单步未命中门槛 10k（2026-11-10 由 15k 下调，实测 >15k 时单步 reasoning 已失控）。
+    perStepUncachedBudget: input?.perStepUncachedBudget ?? 10_000,
     sessionUncachedBudget: input?.sessionUncachedBudget ?? 3_000_000,
+    // 比 800 万更早的两档。15 万 ≈ 10 个单步未命中预算，或约两步 65k 级 cache 重读（按 0.1 倍率）。
+    // 100 万比现有 800 万低一个数量级，避免累计档只在会话末期响一次。
+    sessionEquivEarly: input?.sessionEquivEarly ?? 150_000,
+    sessionEquivMid: input?.sessionEquivMid ?? 1_000_000,
   };
 }
 
+// 0.1 / 4：假设倍率，待计费校准。
 const equivOf = (u) => (u.cacheRead || 0) * 0.1 + (u.uncached || 0) + (u.output || 0) * 4;
 const fmt = (n) => n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(0) + 'k' : String(Math.round(n));
 
-/** 从 assistant/message 事件的 data.usage 提取四类 token，兼容多种字段名。 */
+/**
+ * 从 assistant/message 的 data.usage 取数。
+ * 三键全 0 且没有 cacheReadTokens：absent，不当成零成本。
+ * 带 cacheReadTokens 的显式 0（四键）仍是真实记账。
+ */
 function readUsage(event) {
   const d = event?.data ?? event;
   const u = d?.usage;
   if (!u) return undefined;
+  const hasCacheRead = Object.prototype.hasOwnProperty.call(u, "cacheReadTokens")
+    || Object.prototype.hasOwnProperty.call(u, "cacheRead");
+  const absent = !hasCacheRead
+    && u.uncachedInputTokens === undefined
+    && u.inputTokens === 0
+    && u.outputTokens === 0
+    && (u.totalTokens === 0 || u.totalTokens === undefined);
+  if (absent) return { absent: true };
   return {
+    absent: false,
     uncached: u.uncachedInputTokens ?? u.inputTokens ?? 0,
-    cacheRead: u.cacheReadTokens ?? 0,
+    cacheRead: u.cacheReadTokens ?? u.cacheRead ?? 0,
     output: u.outputTokens ?? 0,
+  };
+}
+
+let latestAcc;
+
+/** 测试与排查：最近一次 enabled apply 的会话累计。 */
+export function inspect(sessionId) {
+  const a = latestAcc?.get(sessionId);
+  if (!a) return undefined;
+  return {
+    uncached: a.uncached,
+    cacheRead: a.cacheRead,
+    output: a.output,
+    steps: a.steps,
+    absentSteps: a.absentSteps,
+    equiv: equivOf(a),
+    fired: [...a.fired],
   };
 }
 
@@ -48,8 +85,9 @@ export function apply(ctx, rawConfig) {
   const config = normalizeConfig(rawConfig);
   if (!config.enabled) return;
 
-  // sessionId -> { uncached, cacheRead, output, steps, fired:Set }
+  // sessionId -> { uncached, cacheRead, output, steps, absentSteps, fired:Set }
   const acc = new Map();
+  latestAcc = acc;
 
   ctx.on("session/event", (session, event) => {
     if (event?.type !== "assistant/message") return;
@@ -58,7 +96,14 @@ export function apply(ctx, rawConfig) {
     const id = session?.header?.id ?? session?.id;
     if (id === undefined) return;
     let a = acc.get(id);
-    if (!a) { a = { uncached: 0, cacheRead: 0, output: 0, steps: 0, lastUncached: 0, fired: new Set() }; acc.set(id, a); }
+    if (!a) {
+      a = { uncached: 0, cacheRead: 0, output: 0, steps: 0, absentSteps: 0, lastUncached: 0, fired: new Set() };
+      acc.set(id, a);
+    }
+    if (u.absent) {
+      a.absentSteps += 1;
+      return;
+    }
     a.uncached += u.uncached;
     a.cacheRead += u.cacheRead;
     a.output += u.output;
@@ -85,6 +130,10 @@ export function apply(ctx, rawConfig) {
         `[cost-meter] 上一步未命中 ${fmt(a.lastUncached)} tokens（>${fmt(config.perStepUncachedBudget)}），极高。先别整读大文件：用 grep 定位 + read offset/limit，或先看已有结果再决定下一步。`],
       ["sessionUncached", a.uncached > config.sessionUncachedBudget,
         `[cost-meter] 本会话累计未命中 ${fmt(a.uncached)} tokens（>${fmt(config.sessionUncachedBudget)}）。成本已高，收窄任务范围、避免重复整读，必要时开新会话。`],
+      ["sessionEquivEarly", equiv > config.sessionEquivEarly,
+        `[cost-meter] 本会话等效成本 ${fmt(equiv)}（>${fmt(config.sessionEquivEarly)}，含 cache 重读；另有 ${a.absentSteps} 步没有用量）。先收窄读取，别等单步未命中才停。`],
+      ["sessionEquivMid", equiv > config.sessionEquivMid,
+        `[cost-meter] 本会话等效成本 ${fmt(equiv)}（>${fmt(config.sessionEquivMid)}）。已明显高于单步预算，准备收尾或换会话。`],
       ["sessionEquiv", equiv > config.sessionEquivBudget,
         `[cost-meter] 本会话等效成本 ${fmt(equiv)}（>${fmt(config.sessionEquivBudget)}，含 ${a.steps} 步）。接近收尾线：尽快给出结论或拆分到新会话，别用 compaction 硬撑。`],
     ];
