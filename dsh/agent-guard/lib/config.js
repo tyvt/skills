@@ -13,6 +13,19 @@
 export const DEFAULTS = {
   /** 关闭后插件完全不介入，只做记账。 */
   enabled: true,
+  /** 检索范围拦截（bug6369：仓库根全量 grep 打穿 prefix cache）。 */
+  scope: {
+    /** 关闭后不再拒绝 grep / glob。 */
+    enabled: true,
+    /** 受保护根：命中本身、其上层，或 `dir/*` 的直接子目录（workspace 根）即拒。 */
+    roots: [
+      '~/Documents/deepseek-harness/*',
+      '~/.dsh',
+      '~/Documents',
+      'D:/repository',
+      'D:/repository/skills',
+    ],
+  },
   /** 工具参数修复。 */
   repair: {
     /** 归一化工具名（模型把 JSON 片段拼进 name）。 */
@@ -82,15 +95,24 @@ export function validate(input) {
   }
   const repair = source.repair ?? {}
   const recovery = source.recovery ?? {}
+  const scope = source.scope ?? {}
   if (typeof repair !== 'object' || Array.isArray(repair)) {
     return { issues: [{ message: 'agent-guard: repair must be an object' }] }
   }
   if (typeof recovery !== 'object' || Array.isArray(recovery)) {
     return { issues: [{ message: 'agent-guard: recovery must be an object' }] }
   }
+  if (typeof scope !== 'object' || Array.isArray(scope)) {
+    return { issues: [{ message: 'agent-guard: scope must be an object' }] }
+  }
+  const roots = Array.isArray(scope.roots) ? scope.roots : DEFAULTS.scope.roots
   return {
     value: {
       enabled: bool(source.enabled, DEFAULTS.enabled),
+      scope: {
+        enabled: bool(scope.enabled, DEFAULTS.scope.enabled),
+        roots: roots.filter((r) => typeof r === 'string' && r.trim() !== ''),
+      },
       repair: {
         toolName: bool(repair.toolName, DEFAULTS.repair.toolName),
         schema: bool(repair.schema, DEFAULTS.repair.schema),

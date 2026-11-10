@@ -4,8 +4,10 @@
 
 ## 手册（逐条禁忌，每条最多重试一次；第二次直接换 SQL / 换工具）
 
+- **禁忌第 1 条（Dameng 找表）：直接查目录 SQL，不试 dbx_list_tables**——它的 pattern 会被忽略，按 pattern 搜两轮返回同一张表（bug6369 实测白跑两轮）。固定脚本：
+  `SELECT OWNER, TABLE_NAME FROM ALL_TABLES WHERE TABLE_NAME LIKE '%<关键词>%';`
+  拿到 schema 后再查列：`SELECT COLUMN_NAME, DATA_TYPE FROM ALL_TAB_COLUMNS WHERE OWNER='<schema>' AND TABLE_NAME='<表名>';`
 - **首次 `dbx_execute_query` 也必须带 `connection_id`（或 connection_name）**，不是只有传 session_id 时才要；否则 CONNECTION_NOT_FOUND。
-- `dbx_list_tables` 的 pattern 参数会被忽略（Dameng），直接查目录 SQL：`SELECT TABLE_NAME FROM USER_TABLES WHERE TABLE_NAME LIKE '%X%'`；列信息：`SELECT ... FROM ALL_TAB_COLUMNS WHERE OWNER='<schema>' AND TABLE_NAME='<t>'`。
 - `dbx_describe_table` 必须显式 owner，否则返回 No columns found；优先用 ALL_TAB_COLUMNS。
 - **长文本字段（steps/comment）被 MCP 按 cell 200 字截断，SUBSTRING 顺序分段也拿不全**：改用 `UNION ALL` 每段一行（见下），或直接用 `dbx_execute_and_show`。
 - `INSERT zt_action` 严格照抄 14 列，files 列用 NULL 占位（列数不匹配是高频错误）。
@@ -51,6 +53,7 @@ FROM zt_action WHERE objectType='bug' AND objectID=<id> ORDER BY id;
 2. 评论里的接口路径、入参、字段名要**原文抄下来**再对代码。
 3. 子任务（`parent` > 0）或 `desc`/`story` 为空时查父任务与需求：`zt_storyspec.spec` 才是需求正文；父任务描述常含原型/参照系统。
 4. 跨项目复用（标题带「参照苏住房/江阴已做」）：`git log --grep=<关键词>`、`git grep` 找同名页面。
+5. **根因定位顺序定死：症状 → 先查真实数据（业务库/接口返回/日志）→ 再读代码**。bug6369 反例：step 40–47 空转推演根因，step 48 一条 `SELECT PLAN_FILE_URL FROM SERVICE_EXPAND.T_FLOOD_PLAN` 拿到真实值后瞬间定论。
 
 ## 回写（事务化 UPDATE zt_bug + INSERT zt_action）
 

@@ -5,6 +5,7 @@
 import assert from 'node:assert/strict'
 
 import { normalizeSchema, planRecovery, repairArguments, repairToolName } from './lib/rules.js'
+import { decideInterception } from './lib/scope.js'
 
 let passed = 0
 let failed = 0
@@ -344,6 +345,63 @@ test('已有 include 时不覆盖模型意图', () => {
   const args = { pattern: 'abc', include: '*.md', glob: 'README.md' }
   repairArguments({ toolName: 'grep', args, schema: {} })
   assert.equal(args.include, '*.md')
+})
+
+test('openviking search 误传 queries 数组 → 搬到 query 字符串', () => {
+  const args = { queries: ['修复与验证'], mode: 'context', detail: 'abstract' }
+  const { repairs } = repairArguments({ toolName: 'mcp__openviking__search', args, schema: {} })
+  assert.equal(args.query, '修复与验证')
+  assert.equal(args.queries, undefined)
+  assert.equal(args.mode, 'context')
+  assert.equal(repairs.filter((r) => r.rule === 'arg-alias').length, 1)
+})
+
+console.log('\n=== 检索范围拦截（bug6369：仓库根全量 grep 打穿 prefix cache）===')
+
+const scopeRoots = ['~/Documents/deepseek-harness/*', '~/.dsh', '~/Documents', 'D:/repository', 'D:/repository/skills']
+const noGit = () => false
+const git = (dir) => dir === 'd:/repo/zhi2-web-admin'
+const call = (args, gitProbe = noGit) =>
+  decideInterception({ tool: 'grep', args, roots: scopeRoots, gitProbe })
+
+test('path 未传 → 拒绝（等同全仓检索）', () => {
+  assert.match(call({ pattern: 'x' }), /工作区根/)
+})
+test("path='.' → 拒绝", () => {
+  assert.match(call({ pattern: 'x', path: '.' }), /工作区根/)
+})
+test('workspace 根（dir/* 直接子目录）→ 拒绝', () => {
+  assert.match(call({ pattern: 'x', path: 'C:\\Users\\Administrator\\Documents\\deepseek-harness\\default-workspace' }), /workspace 根目录/)
+})
+test('workspace 内业务目录 → 放行', () => {
+  assert.equal(call({ pattern: 'x', path: 'C:/Users/Administrator/Documents/deepseek-harness/default-workspace/src/views/flood' }), null)
+})
+test('~/.dsh 本身 → 拒绝', () => {
+  assert.match(call({ pattern: 'x', path: 'C:\\Users\\Administrator\\.dsh' }), /受保护容器/)
+})
+test('~/.dsh/cost-meter/lib → 放行', () => {
+  assert.equal(call({ pattern: 'x', path: 'C:\\Users\\Administrator\\.dsh\\cost-meter\\lib' }), null)
+})
+test('D:/repository 本身 → 拒绝', () => {
+  assert.match(call({ pattern: 'x', path: 'D:/repository' }), /受保护容器/)
+})
+test('D:/repository/skills/zentao-analyzer → 放行', () => {
+  assert.equal(call({ pattern: 'x', path: 'D:/repository/skills/zentao-analyzer' }), null)
+})
+test('git 仓库根 → 拒绝（gitProbe）', () => {
+  assert.match(call({ pattern: 'x', path: 'D:/repo/zhi2-web-admin' }, git), /git 仓库根/)
+})
+test('同仓库业务子目录 → 放行', () => {
+  assert.equal(call({ pattern: 'x', path: 'D:/repo/zhi2-web-admin/src/views/flood' }, git), null)
+})
+test('相对业务路径 → 放行', () => {
+  assert.equal(call({ pattern: 'x', path: 'src/views/flood' }), null)
+})
+test('非 grep/glob 工具 → 不拦截', () => {
+  assert.equal(decideInterception({ tool: 'read', args: { file_path: 'C:\\Users\\Administrator\\.dsh' }, roots: scopeRoots, gitProbe: noGit }), null)
+})
+test('glob 同样受拦截', () => {
+  assert.match(call({ pattern: '**/*.ts', path: '.' }), /工作区根/)
 })
 
 console.log(`\n${failed === 0 ? 'PASS' : 'FAIL'}  passed=${passed} failed=${failed}\n`)

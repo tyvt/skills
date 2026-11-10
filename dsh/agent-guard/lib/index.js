@@ -37,6 +37,7 @@ import path from 'node:path'
 
 import { Config } from './config.js'
 import { planRecovery, repairArguments, repairToolName } from './rules.js'
+import { decideInterception } from './scope.js'
 
 export { Config }
 
@@ -129,16 +130,18 @@ export function apply(ctx, config) {
     : path.join(dshHome(), config.ledgerPath)
 
   const log = ctx.logger
-  const counters = { repaired: 0, recovered: 0 }
+  const counters = { repaired: 0, recovered: 0, rejected: 0 }
 
   log?.info?.(
-    'agent-guard: active (repair=%s/%s/%s/%s recovery=%s maxExtraRetries=%d ledger=%s)',
+    'agent-guard: active (repair=%s/%s/%s/%s recovery=%s maxExtraRetries=%d scope=%s roots=%d ledger=%s)',
     config.repair.toolName ? 'on' : 'off',
     config.repair.schema ? 'on' : 'off',
     config.repair.escalation ? 'on' : 'off',
     config.repair.semantics ? 'on' : 'off',
     config.recovery.enabled ? 'on' : 'off',
     config.recovery.maxExtraRetries,
+    config.scope?.enabled ? 'on' : 'off',
+    Array.isArray(config.scope?.roots) ? config.scope.roots.length : 0,
     ledgerPath,
   )
 
@@ -161,11 +164,25 @@ export function apply(ctx, config) {
 
   const guardDisposer = ctx.tools.guard((exec) => {
     try {
+      // 检索范围拦截（bug6369：仓库根全量 grep 打穿 prefix cache，单步未命中 18k）。
+      // 返回字符串 = 拒绝并把改法回给模型；必须赶在 repairExecution 之前。
+      if (config.enabled && config.scope?.enabled) {
+        const rejected = decideInterception({
+          tool: exec?.name,
+          args: exec?.arguments,
+          roots: config.scope.roots,
+        })
+        if (rejected !== null) {
+          counters.rejected++
+          log?.warn?.('agent-guard: rejected %s: %s', exec?.name, rejected)
+          return rejected
+        }
+      }
       if (config.enabled) repairExecution(exec)
     } catch (error) {
       log?.warn?.('agent-guard: repair failed for %s: %o', exec?.name, error)
     }
-    // 不返回字符串 = 不拒绝。修复是通过替换 exec.arguments 完成的。
+    // 返回 undefined = 放行。修复是通过替换 exec.arguments 完成的。
     return undefined
   })
 
@@ -328,6 +345,6 @@ export function apply(ctx, config) {
 
   ctx.on('dispose', () => {
     try { guardDisposer() } catch { /* 注销失败不影响退出 */ }
-    log?.info?.('agent-guard: disposed (repaired=%d recovered=%d)', counters.repaired, counters.recovered)
+    log?.info?.('agent-guard: disposed (repaired=%d recovered=%d rejected=%d)', counters.repaired, counters.recovered, counters.rejected)
   })
 }

@@ -13,7 +13,7 @@ description: 禅道 Bug/任务分析与回写。给定一条禅道链接（如 h
 4. **回写状态** → read `DBX.md`「回写」：事务化 `UPDATE zt_bug` + `INSERT zt_action`，提交后复核落库。
 5. **定位页面**：按截图的菜单名/按钮文案反查路由，**禁止按方法名猜**；改完全仓 grep 旧接口路径。事故细节见 `CASES.md`。
 6. **任务信息不足**：查父任务（`parent`）与需求（正文在 `zt_storyspec.spec`）；跨项目参照用 `git log --grep`。
-7. **开工前置**：`git worktree list` + 各 worktree `git status --short` 一次做完；用户指定落点是硬约束，不进他人 worktree（详见本文件末「开工前置」）。
+7. **开工前置**：`git worktree list` + **父仓与每个子模块都各跑一次** `git -C <仓> worktree list`（flood 等 bug 代码常在子模块的 worktree 里，父仓列表看不到）+ 各 worktree `git status --short` 一次做完；用户指定落点是硬约束，不进他人 worktree（详见本文件末「开工前置」）。
 8. **临时文件**（截图、导出物）统一落 `<repo>\.tmp-bug<id>\`，不落仓库根，不提交。
 9. **凭据**（密码等）只在脚本内部读取，不要把明文读进会话上下文。
 10. **DBX 报错自愈与逐条禁忌** → read `DBX.md`「手册」；每条最多重试一次。
@@ -56,12 +56,14 @@ if ($bytes[0] -eq 0x89 -and $bytes[1] -eq 0x50) { [IO.File]::WriteAllBytes($out,
 3. 修复 + 验证：改源码 → 窄验证（单文件 `npx eslint <file>`，不要全量 lint 回灌）→ 本地 nginx 站点部署（监测V3 8098 / 门户 8099）→ 核对 dist 已加载新构建。
 4. 提交推送：子模块先提交推送 → 父仓库 gitlink 提交推送（自底向上）；只暂存本次改动，勿夹带 `env/.env` 等本地文件。
 5. 回写禅道：见 `DBX.md`「回写」。
+6. 收尾自查：跑 token-optimizer 看等效成本与未命中 TOP；未验收（构建/部署/回写证据没齐）不收尾。
 
 ## 开工前置：落地位置与并行任务（强制）
 
-1. 开工前一次做完：
+1. 开工前一次做完（**父仓与每个子模块各跑一遍**，子模块的 worktree 在父仓列表里看不到——bug6369 因此空转 8 步）：
    ```powershell
-   git worktree list
+   git worktree list; git submodule status
+   git -C zhi2-web-admin worktree list      # 每个子模块各一次
    git status --short; git -C zhi2-web-admin status --short
    git -C <每个 wt> status --short; git -C <每个 wt> log --oneline -3
    ```

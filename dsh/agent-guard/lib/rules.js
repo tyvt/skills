@@ -22,11 +22,28 @@ const TOOL_NAME_ALIASES = Object.freeze({
 
 /**
  * 参数名别名：字段名写错但语义唯一可推断。
- * 来源：2026-11-09 实测 `grep` 传了 `glob`（契约里是 `include`）。
+ * 来源：2026-11-09 实测 `grep` 传了 `glob`（契约里是 `include`）；
+ * 2026-11-10 实测 openviking search 传 `queries` 数组（契约是 `query` 字符串），
+ * 错一次 INVALID_ARGUMENT 就白烧一步。
  */
 const ARG_ALIASES = Object.freeze({
   grep: Object.freeze({ glob: 'include' }),
+  mcp__openviking__search: Object.freeze({ queries: 'query' }),
 })
+
+/**
+ * 搬运后的值归一化：web search 系工具用 `queries` 数组，openviking search 的
+ * `query` 是字符串——单元素数组解包，多元素用空格连接，标量转字符串。
+ */
+function normalizeAliasValue(toolName, from, value) {
+  if (toolName === 'mcp__openviking__search' && from === 'queries') {
+    if (Array.isArray(value)) {
+      return value.length === 1 ? String(value[0]) : value.map(String).join(' ')
+    }
+    return String(value)
+  }
+  return value
+}
 
 /** `update_goal` 只有 action=edit 才接受这两个字段。 */
 const GOAL_EDIT_ONLY_FIELDS = ['objective', 'max_goal_rounds']
@@ -369,7 +386,7 @@ export function repairArgAliases(toolName, args) {
   for (const [from, to] of Object.entries(map)) {
     if (!Object.hasOwn(args, from)) continue
     if (Object.hasOwn(args, to)) continue
-    args[to] = args[from]
+    args[to] = normalizeAliasValue(toolName, from, args[from])
     delete args[from]
     repairs.push({ rule: 'arg-alias', detail: `${toolName}.${from} -> ${to}` })
   }

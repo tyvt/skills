@@ -46,6 +46,7 @@
 6. 执行 `git pull` 或 `git rebase` 之前，必须先运行 `git status --short`。若存在未暂存的环境文件（`env/.env` 及同类本地配置），先用 `git stash push -- env/.env`（需要时加 `-u`）隔离，再 pull/rebase；结束后按需 `git stash pop`。禁止在这些文件仍是脏工作区时直接 pull 或 rebase。提交前同样先看 `git status --short`，不要把环境文件夹进提交。
 7. 自动化环境跑 `git rebase --continue`、`git commit`、`git merge` 前必须先设 `$env:GIT_EDITOR='true'`（或合并进命令 `GIT_EDITOR=true git ...`），否则会在无编辑器时静默挂起等待输入，浪费数分钟。`git merge-base --is-ancestor A B` 一条命令就能判定祖先关系，禁止脑内推演 commit 图。
 8. 构建产物归属：`public/version.json`（含 gitHash）是 build 生成物，**禁止提交**；build 后若它变脏，`git checkout -- public/version.json` 还原而不是带进提交。
+9. 交付前 token 自查：收尾前跑 token-optimizer 看等效成本与未命中 TOP，超预期先说清原因再收尾；未验收（构建/部署/回写证据没齐）不收尾。bug6369 停在 163k 未验收就收尾，是反面样本。
 
 ## 找不到就先搜记忆
 

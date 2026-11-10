@@ -27,6 +27,9 @@ function normalizeConfig(input) {
     sessionEquivBudget: input?.sessionEquivBudget ?? 8_000_000,
     // 单步未命中门槛 10k（2026-11-10 由 15k 下调，实测 >15k 时单步 reasoning 已失控）。
     perStepUncachedBudget: input?.perStepUncachedBudget ?? 10_000,
+    // 单步 output 门槛 3k（2026-11-10 bug6369：step 46/49/50 单步 output ~10k，
+    // 全耗在反复推翻自己的 reasoning 上——缺事实时不该脑内演算）。
+    perStepOutputBudget: input?.perStepOutputBudget ?? 3_000,
     sessionUncachedBudget: input?.sessionUncachedBudget ?? 3_000_000,
     // 比 800 万更早的两档。15 万 ≈ 10 个单步未命中预算，或约两步 65k 级 cache 重读（按 0.1 倍率）。
     // 100 万比现有 800 万低一个数量级，避免累计档只在会话末期响一次。
@@ -74,6 +77,7 @@ export function inspect(sessionId) {
     uncached: a.uncached,
     cacheRead: a.cacheRead,
     output: a.output,
+    lastOutput: a.lastOutput,
     steps: a.steps,
     absentSteps: a.absentSteps,
     equiv: equivOf(a),
@@ -97,7 +101,7 @@ export function apply(ctx, rawConfig) {
     if (id === undefined) return;
     let a = acc.get(id);
     if (!a) {
-      a = { uncached: 0, cacheRead: 0, output: 0, steps: 0, absentSteps: 0, lastUncached: 0, fired: new Set() };
+      a = { uncached: 0, cacheRead: 0, output: 0, steps: 0, absentSteps: 0, lastUncached: 0, lastOutput: 0, fired: new Set() };
       acc.set(id, a);
     }
     if (u.absent) {
@@ -109,6 +113,7 @@ export function apply(ctx, rawConfig) {
     a.output += u.output;
     a.steps += 1;
     a.lastUncached = u.uncached;
+    a.lastOutput = u.output;
   });
 
   const notice = (text, summary) => ({
@@ -127,7 +132,9 @@ export function apply(ctx, rawConfig) {
     const equiv = equivOf(a);
     const checks = [
       ["perStep", a.lastUncached > config.perStepUncachedBudget,
-        `[cost-meter] 上一步未命中 ${fmt(a.lastUncached)} tokens（>${fmt(config.perStepUncachedBudget)}），极高。先别整读大文件：用 grep 定位 + read offset/limit，或先看已有结果再决定下一步。`],
+        `[cost-meter] 上一步未命中 ${fmt(a.lastUncached)} tokens（>${fmt(config.perStepUncachedBudget)}），极高。典型成因按概率排序：① 全仓/容器级 grep——缩到 src/views/<模块> 再搜；② 缺真实值在脑内演算——先查一条 SQL / 一个接口返回；③ 大文件整读——grep 定位后 read offset/limit。先判断自己属于哪种，再动下一步。`],
+      ["perStepOutput", a.lastOutput > config.perStepOutputBudget,
+        `[cost-meter] 上一步 output ${fmt(a.lastOutput)} tokens（>${fmt(config.perStepOutputBudget)}），reasoning 熔断特征：反复推翻自己 = 缺事实。停：立刻调一次工具（grep 定位 / 查一条真实数据 / 读一段代码），拿到事实再决策，不要再推演。`],
       ["sessionUncached", a.uncached > config.sessionUncachedBudget,
         `[cost-meter] 本会话累计未命中 ${fmt(a.uncached)} tokens（>${fmt(config.sessionUncachedBudget)}）。成本已高，收窄任务范围、避免重复整读，必要时开新会话。`],
       ["sessionEquivEarly", equiv > config.sessionEquivEarly,
