@@ -1,0 +1,66 @@
+# =============================================================================
+# LangGraph Orchestrator — 配置驱动的「工具 -> 模型池」编排
+# =============================================================================
+# 设计目标：
+#   1. 每个工具(tool)绑定一个「模型池」。池内第一个是可用的主模型，后续是备用。
+#   2. 主模型调用失败(异常/超时/空回复/触发 retry_on 关键字)时，自动降级到下一个。
+#   3. 全部走本机 magpie 网关(OpenAI 兼容)，模型名即 /v1/models 暴露的 id。
+#   4. 可全局覆盖网关地址/并发/超时；每个模型可单独覆盖 temperature/max_tokens。
+# =============================================================================
+
+gateway:
+  base_url: http://127.0.0.1:3425/v1
+  api_key: magpie
+  request_timeout: 120          # 单次请求超时(秒)
+  max_retries_per_model: 1      # 同一个模型内部重试次数(指数退避)
+  failure_cooldown: 600         # 模型被判定失败后冷却秒数，冷却期内优先跳过它
+
+# 全局默认参数，模型池条目可覆盖
+defaults:
+  temperature: 0.2
+  max_tokens: 2048
+
+# --- 工具定义 ---------------------------------------------------------------
+# 每个工具：
+#   description: 给路由/规划模型看的工具说明
+#   models:      模型池(有序)。每一项:
+#                  - model:         magpie 模型 id
+#                  - 可选覆盖:      temperature / max_tokens / timeout / weight
+#                  - retry_on:      命中这些子串时视为失败并降级(默认含 common 错误)
+tools:
+
+  # 轻量：读文件/摘要/格式化 —— 用便宜的 flash 档，备用同样廉价
+  file_reader:
+    description: 读取/摘要文本内容，做轻量理解与格式化。
+    models:
+      - model: auto/deepseek-v4.1-flash
+      - model: workbuddy-ai/hy3
+      - model: cursor/deepseek-v41-flash-1017
+
+  # 代码生成/改写 —— 首选强模型，降级到同档
+  code_editor:
+    description: 生成或修改代码，需要较强推理与代码能力。
+    models:
+      - model: workbuddy/deepseek-v4.1-flash
+      - model: auto/deepseek-v4.1-flash
+      - model: cursor/deepseek-v41-flash-1017
+      - model: minimax-code/MiniMax-M3.1-Flash
+    max_tokens: 4096
+
+  # 复杂推理/规划 —— 首选长上下文/强模型(grok 256k)，多档降级
+  planner:
+    description: 复杂任务的规划与推理，需要长上下文与强推理。
+    models:
+      - model: cursor/grok-4.7@256k
+      - model: workbuddy-ai/hy4free
+      - model: auto/hy3
+      - model: autoclaw-cn/zai_glm-5.3-flash
+    max_tokens: 4096
+
+  # 视觉/多模态 —— magpie 模型均支持图像输入
+  # 用户指定(2026-11-10)：image_analyst 强制全部使用 cursor/deepseek-v41-flash-1017，不留备用。
+  image_analyst:
+    description: 分析图像内容(截图/图表/照片)，做视觉理解。
+    models:
+      - model: cursor/deepseek-v41-flash-1017
+    max_tokens: 4096
