@@ -120,7 +120,7 @@ class ModelRouter:
                 if spec.max_tokens is not None
                 else (tool.max_tokens if tool.max_tokens is not None else self.cfg.defaults_max_tokens)
             )
-            timeout = spec.timeout or self.cfg.gateway.request_timeout
+            timeout = spec.timeout or tool.timeout or self.cfg.gateway.request_timeout
             retry_on = spec.effective_retry_on()
 
             for retry in range(self.cfg.gateway.max_retries_per_model + 1):

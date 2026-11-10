@@ -39,6 +39,9 @@ class ToolSpec:
     models: List[ModelSpec]
     temperature: Optional[float] = None
     max_tokens: Optional[int] = None
+    # 工具级超时(秒)：该工具下所有模型默认用它，模型条目可再单独覆盖。
+    # 未设置时回落到 gateway.request_timeout。
+    timeout: Optional[float] = None
 
     def model_ids(self) -> List[str]:
         return [m.model for m in self.models]
@@ -109,6 +112,7 @@ def load_config(path: str) -> OrchestratorConfig:
             models=models,
             temperature=t.get("temperature"),
             max_tokens=t.get("max_tokens"),
+            timeout=t.get("timeout"),
         )
 
     return OrchestratorConfig(
