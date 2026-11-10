@@ -7,6 +7,12 @@ description: 禅道 Bug/任务分析与回写。给定一条禅道链接（如 h
 
 > 本文件为按历史使用记录重建版本（原 SKILL.md 随 `D:\repository\skills` 被误删，Windows 卷影副本未覆盖 D 盘）。
 
+## 按需加载，不要叠加巨型规则
+
+简单 Bug（文案、显隐、单字段、明显空值、换一个已知 URL）只用本 skill。**不要**同时加载 `szfc-page-guard`。
+
+仅当改动涉及复杂表单、子表或加密接口时，才加载 `szfc-page-guard`。本会话技能目录里没有的 skill 直接跳过，不要硬调用。
+
 ## 环境
 
 - 只操作**新禅道**：`http://zentao-biz.zhi.com`（老禅道库禁止写，ID 空间与新版重叠）。
