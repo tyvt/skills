@@ -54,6 +54,14 @@ FROM zt_action WHERE objectType='bug' AND objectID=<id> ORDER BY id;
 
 ## 回写（事务化 UPDATE zt_bug + INSERT zt_action）
 
+**首选：直接运行固定脚本生成回写序列，参数只暴露 bugId 和 comment，禁止手拼 SQL：**
+
+```text
+node D:\repository\skills\zentao-analyzer\zentao-resolve.mjs <bugId> <commentHTML>
+```
+
+脚本输出全套 `mcp_gateway` 调用（每步必带 `connection_name`）与各步核验点，照抄执行即可。以下手工流程仅在脚本不可用时使用：
+
 1. `dbx_open_session(connection_id=<新禅道>, enable_transactions=true)` 拿 `session_id`；
 2. `dbx_begin_transaction(session_id=...)`；
 3. 执行 UPDATE + INSERT（都要带同一 `session_id`、同一 connection_id）；
