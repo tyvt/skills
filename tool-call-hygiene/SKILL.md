@@ -28,6 +28,8 @@ description: 工具调用失败的自愈手册。当工具返回 INVALID_ARGS / 
 | `INVALID_ARGUMENT`（OpenViking `detail`） | `detail` 配了 `mode=list` | `detail` 只能配 `mode=context`，否则丢掉 `detail`。 |
 | PowerShell `ParserError` / `TerminatorExpectedAtEndOfString` | `git commit -m` 用了双引号，正文里的引号被吞 | `-m` 用单引号。 |
 | PowerShell 把 `@{u}` 当哈希解析 | 双引号内 `@{...}` 被 PS 展开 | refspec 一律单引号：`git rev-parse '@{u}'`（bug6401 实测）。 |
+| `CommandNotFoundException`（`GIT_EDITOR=true`） | bash 赋值写进了 PowerShell | `$env:GIT_EDITOR='true'; git rebase --continue`（bug6402 实测）。 |
+| 静默命令套 `Out-String \| Select-Object -Last` 永远无输出 | 管道缓冲到进程结束才刷出 | 用 `*>` 重定向到已存在的日志文件；`Out-File` 前先 `New-Item` 目录。 |
 | `node ../node_modules/...` 解析到不存在目录 | worktree 内相对路径 `../` 指向 worktrees/ 而非仓库根 | 相对路径先 `Test-Path` 验证或改用仓库根绝对路径；同一错误第二次必须换路径/方案。 |
 
 ## 2. 常见参数形状
