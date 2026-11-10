@@ -9,7 +9,7 @@ description: 禅道 Bug/任务分析与回写。给定一条禅道链接（如 h
 
 1. **环境**：只操作**新禅道** `http://zentao-biz.zhi.com`；查询/回写默认走 MCP `dbx`（连接名「新禅道」，`192.168.1.87:13306`，db `zentao`）；老禅道库禁止写（ID 空间重叠）。
 2. **拉详情** → read `DBX.md`「取详情」。**开工第一步先读 `zt_action` 备注**：后端接口变更全在 comment 里，只看 steps 会整轮作废（事故见 `CASES.md`）。
-3. **取截图/附件** → 本文件下方「取截图/附件」。Web 登录被强制改密挡死，必须走 REST Token。
+3. **取截图/附件** → 本文件下方「取截图/附件」。Web 登录被强制改密挡死，必须走 REST Token。**看图默认用 `mcp__magpie-vision__analyze_image`（返回 1-2k 文字描述），不要用 `read_image`**——图片 attachment 打穿 prefix cache，后续所有 step 全价计费（bug6401 一张截图 43k）。
 4. **回写状态** → read `DBX.md`「回写」：事务化 `UPDATE zt_bug` + `INSERT zt_action`，提交后复核落库。
 5. **定位页面**：按截图的菜单名/按钮文案反查路由，**禁止按方法名猜**；改完全仓 grep 旧接口路径。事故细节见 `CASES.md`。
 6. **任务信息不足**：查父任务（`parent`）与需求（正文在 `zt_storyspec.spec`）；跨项目参照用 `git log --grep`。
@@ -44,7 +44,7 @@ if ($bytes[0] -eq 0x89 -and $bytes[1] -eq 0x50) { [IO.File]::WriteAllBytes($out,
 ```
 
 - 端点 `GET /api.php/v1/files/<fileID>` → `200 application/octet-stream`；**用不带 `/download` 的端点**。`/api.php/v1/bugs/<id>` 返回 JSON 不含图片二进制。
-- 拿到图片用 `read_image` 看，比 steps 文字准得多；多张附件先看业务页，再看角色或权限页。
+- 拿到图片先用 `mcp__magpie-vision__analyze_image` 看文字描述，不足再 `read_image` 读原图（一张图 ≈ 43k 且打穿后续每步缓存，bug6401 实测）。多张附件先看业务页，再看角色或权限页。
 - 库里 `zt_user.password` 是 `md5(明文)` 的 32 位哈希；只知道 hash 就换能拿到明文的账号，别暴力猜。
 - **别去 DB 容器 `LOAD_FILE` 读上传目录**：DB 与禅道 Web 是两个容器，路径全对不上。
 
@@ -52,9 +52,9 @@ if ($bytes[0] -eq 0x89 -and $bytes[1] -eq 0x50) { [IO.File]::WriteAllBytes($out,
 
 0. 先定落地位置（见下「开工前置」）。
 1. 取详情：DBX 查 `zt_bug` + `zt_action` 备注（见 `DBX.md`）。
-2. 定位根因：先判代码归属项目（监测V3 = `zhi3-web-admin-...`，门户 = `zhi2-web-admin-...`；用 `.env`/`VITE_APP_PROXY_ADDRESS` 确认），再按截图反查组件。
+2. 定位根因：先判代码归属项目（监测V3 = `zhi3-web-admin-...`，门户 = `zhi2-web-admin-...`；用 `.env`/`VITE_APP_PROXY_ADDRESS` 确认），再按截图反查组件。**列宽/截断类（及显隐、单字段）走 3 步标准流程，不读截图**：`grep "label: '<列名>'"` 定位行号 → `read offset/limit` 只读目标方法 → `edit` 宽度（bug6401：43k 截图 + 20k 整读本可全免）。
 3. 修复 + 验证：改源码 → 窄验证（单文件 `npx eslint <file>`，不要全量 lint 回灌）→ 本地 nginx 站点部署（监测V3 8098 / 门户 8099）→ 核对 dist 已加载新构建。
-4. 提交推送：子模块先提交推送 → 父仓库 gitlink 提交推送（自底向上）；只暂存本次改动，勿夹带 `env/.env` 等本地文件。
+4. 提交推送：子模块先提交推送 → 父仓库 gitlink **先判后动**：`git submodule status` 看 parent 的子模块是否 `+`（指针变化），是才 `git add`，否则跳过并说明（bug6401 先 add 后分析，空转一轮）；只暂存本次改动，勿夹带 `env/.env` 等本地文件。
 5. 回写禅道：见 `DBX.md`「回写」。
 6. 收尾自查：跑 token-optimizer 看等效成本与未命中 TOP；未验收（构建/部署/回写证据没齐）不收尾。
 

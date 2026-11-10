@@ -4,13 +4,13 @@
 
 ## 手册（逐条禁忌，每条最多重试一次；第二次直接换 SQL / 换工具）
 
-- **禁忌第 1 条（Dameng 找表）：直接查目录 SQL，不试 dbx_list_tables**——它的 pattern 会被忽略，按 pattern 搜两轮返回同一张表（bug6369 实测白跑两轮）。固定脚本：
+- **禁忌第 1 条（Dameng 找表，连续两届踩坑：bug6369 / bug6401）：直接查目录 SQL，不试 dbx_list_tables**——它的 pattern 会被忽略，按 pattern 搜两轮返回同一张表（bug6369 实测白跑两轮）；不带 schema 直接查业务表会报「无效表名」（bug6401），先 ALL_TABLES 拿 OWNER。固定脚本：
   `SELECT OWNER, TABLE_NAME FROM ALL_TABLES WHERE TABLE_NAME LIKE '%<关键词>%';`
   拿到 schema 后再查列：`SELECT COLUMN_NAME, DATA_TYPE FROM ALL_TAB_COLUMNS WHERE OWNER='<schema>' AND TABLE_NAME='<表名>';`
 - **首次 `dbx_execute_query` 也必须带 `connection_id`（或 connection_name）**，不是只有传 session_id 时才要；否则 CONNECTION_NOT_FOUND。
 - `dbx_describe_table` 必须显式 owner，否则返回 No columns found；优先用 ALL_TAB_COLUMNS。
 - **长文本字段（steps/comment）被 MCP 按 cell 200 字截断，SUBSTRING 顺序分段也拿不全**：改用 `UNION ALL` 每段一行（见下），或直接用 `dbx_execute_and_show`。
-- `INSERT zt_action` 严格照抄 14 列，files 列用 NULL 占位（列数不匹配是高频错误）。
+- **`INSERT zt_action` 严格照抄 14 列，files 列用 NULL 占位**——连续两届踩坑（bug6369 / bug6401 均报 Column count doesn't match），写 SQL 时逐列数到 14。
 - 写策略：只读连接写会被拒；事务化写需 `dbx_open_session(enable_transactions=true)` 再 `dbx_begin_transaction` / `dbx_commit_transaction`（或 `dbx_rollback_transaction`）。
 - 调 `mcp_gateway` 时 `server: "dbx"` 只用来列工具，真正执行要再带 `tool` 与 `arguments`；执行 SQL 的参数名是 `sql`。
 - **固定调用模板，照抄，不要自己猜工具名/参数**：

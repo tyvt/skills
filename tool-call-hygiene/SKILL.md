@@ -24,6 +24,11 @@ description: 工具调用失败的自愈手册。当工具返回 INVALID_ARGS / 
 | `TOOL_TIMEOUT` | 命令太久 | 拆小、加 `timeoutMs`，或 `run_in_background` 再 `job_output`。`session_search` 固定 120s 超时：先加 `session_id`/时间范围/更短 query 缩小范围，超时后**不要原样重试**，改走 `context-mode` MCP。 |
 | `GOAL_ALREADY_EXISTS` / `GOAL_INVALID_TRANSITION` | goal 状态非法 | `objective`/`max_goal_rounds` 只能配 `action:"edit"`；`blocked_reason` 只能配 `action:"blocked"`；不要 resume 已激活的 goal。 |
 | `SEARCH_FAILED` / `WEB_*` | 搜索/网页失败 | 换关键词或换 URL；`WEB_BLOCKED_URL` 是被拦截的域名。`grep` 的过滤字段是 `include`（不是 `glob`），`path` 目录先用 `glob` 校验存在。 |
+| `DBX_TOOL_ERROR`（无效的表或视图名 / 无效的列名） | 达梦上没查数据字典就猜表名或列名 | 先查 `ALL_TABLES` / `ALL_TAB_COLUMNS`。`dbx_describe_table` 返回 `No columns found` 不算列清单。 |
+| `INVALID_ARGUMENT`（OpenViking `detail`） | `detail` 配了 `mode=list` | `detail` 只能配 `mode=context`，否则丢掉 `detail`。 |
+| PowerShell `ParserError` / `TerminatorExpectedAtEndOfString` | `git commit -m` 用了双引号，正文里的引号被吞 | `-m` 用单引号。 |
+| PowerShell 把 `@{u}` 当哈希解析 | 双引号内 `@{...}` 被 PS 展开 | refspec 一律单引号：`git rev-parse '@{u}'`（bug6401 实测）。 |
+| `node ../node_modules/...` 解析到不存在目录 | worktree 内相对路径 `../` 指向 worktrees/ 而非仓库根 | 相对路径先 `Test-Path` 验证或改用仓库根绝对路径；同一错误第二次必须换路径/方案。 |
 
 ## 2. 常见参数形状
 

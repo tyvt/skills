@@ -14,3 +14,6 @@
 
 ## 纯工具层浪费
 `grep` 漏 `pattern`、`write`/`edit` 漏 `file_path`/`content`、`mcp_gateway` 把 `dbx` 当 tool 名调，重复 5 次以上。工具参数报错先加载 `tool-call-hygiene` 再重试一次。
+
+## bug 6401（简单 bug 成本失控 ~167k：读图 + reasoning 空转 + 已知陷阱重犯）
+"提交时间两个字符显示不清"级别的列宽 bug，等效成本 ~167k、中途 compaction。三大浪费：① `read_image` 读截图 **43k**——文字描述已足够定位 `columns()` 的 `width`，且图片 attachment 打穿后续 30 步 prefix cache；② grep 已返回 43 匹配后仍整读 CheckPage.vue 250 行（+20k）；③ reasoning 单步 2.7k~5k 反复辩论宽度与 parent gitlink（第 17 步已查到事实，第 18 步还在演算）。另有 7 次已知陷阱重犯：glob 失败连试 2 次不换工具、`"@{u}"` 被 PS 展开、`INSERT zt_action` 漏 `files=NULL`（DBX.md 已写明仍踩）等。教训：列宽类走 `grep label → read offset → edit` 三步不读图；看图用 `analyze_image`；查到事实立即停止推演。
