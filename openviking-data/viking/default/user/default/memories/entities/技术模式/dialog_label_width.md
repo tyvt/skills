@@ -7,6 +7,7 @@
 - 保持弹窗字段对齐规范一致
 - 批量改 UI 时需遍历 PortalDialogHost 下各 DetailDialog（人员、信用、公司、预售许可、房屋等），避免只改一处
 - 其余首页弹窗排查后均已是左对齐，无需重复修改
+- 例外：PropertyDetailDialog.vue 房屋概览的5字段（房屋性质、层高、单元号、所在自然层、套型）及「非政策类」标签按用户2026-11-10要求改为右对齐，室号加粗30px，不遵循本规范左对齐约定。
 
 ## 涉及文件与归属
 - zhi2-web-admin/src/views/home/publicPortal/PortalDialogHost.vue
@@ -19,8 +20,8 @@
 {
   "category": "技术模式",
   "name": "dialog_label_width",
-  "source_extraction_id": "38c4fed0fdf5450498d3c66aeea4789a",
-  "version": 3,
+  "source_extraction_id": "a108b50b50254e9c9196c1744e3629fa",
+  "version": 4,
   "memory_type": "entities"
 }
 -->

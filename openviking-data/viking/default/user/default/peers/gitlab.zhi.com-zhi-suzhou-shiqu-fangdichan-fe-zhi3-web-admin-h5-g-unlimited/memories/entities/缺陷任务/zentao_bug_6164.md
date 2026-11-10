@@ -23,15 +23,27 @@
 
 ## 禅道回写
 - 2026-11-04 首轮回写（错误修复）：status=resolved, resolution=fixed, resolvedBy=tiany, assignedTo=zhunan, resolvedBuild=trunk, 操作记录 id 87188
-- 2026-11-06 二次回写（正确修复）：DBX 事务提交，status=resolved, resolution=fixed, assignedTo=zhunan, resolvedBuild=trunk，附根因+修复+验证说明
+- 2026-11-06 二次回写（正确修复，action 88471）：DBX 事务提交，status=resolved, resolution=fixed, assignedTo=zhunan, resolvedBuild=trunk，附根因+修复+验证说明
+
+## 第三次定位与修复（2026-11-10）
+- 前两轮修复（87188/88471）改的是 mainAccount 和 regulatoryAccountNew，但测试人员实际用的是旧版监管账户开户页 supervision/agreement/account/detail.vue
+- 根因：该页 showVisionOfBank() 打开「开户网点」弹窗时只传了 workBankId，未传 bankName；客测环境后端按 workBankId 反查承办银行名称的兜底未生效，bankName 为空导致 /system/unionBank/page 不加过滤返回全量网点（133819 条），选中国银行仍显示工商银行
+- 修复：agreement/account/detail.vue 的 showVisionOfBank() 补传 bankName: this.form.bankName，由联行表 SYS_UNION_BANK.bank_name 模糊过滤，不再单靠后端反查兜底；后端 SysUnionBankServiceImpl.page() 已支持 bank_name LIKE（commit 4432d357），无需改动
+
+## 提交与验证（2026-11-10）
+- 子模块 zhi2-web-admin develop/v3.0.0 提交 988a5d2f5（fix），已推送；父仓库提交 e618b66（仅更新 gitlink 指向 988a5d2f5），已推送；期间远端有他人新提交，正常 merge 集成（非强推），父仓库子模块指针冲突按「我的 988a5d2f5（含远端子模块全部提交+本次修复）」解决
+- 验证：目标文件 eslint 0 error；生产构建 node scripts/vite-build.mjs build EXIT=0；真实库 SYS_UNION_BANK 共 133831 条，bank_name LIKE '%中国银行%' = 8858 条（仅中国银行网点）
+
+## 禅道回写（2026-11-10 第三次）
+- 2026-11-10 08:21:52 第三次回写：DBX 事务提交，status=resolved、resolution=fixed、resolvedBuild=trunk、resolvedBy=tiany、assignedTo=zhunan、resolvedDate=2026-11-10 08:21:52，新增 zt_action id=89871（action=resolved，备注含根因/修复/提交号/验证/待回归）；用户再次要求回写时复核确认已落库，无重复回写
 
 <!-- MEMORY_FIELDS
 {
   "category": "缺陷任务",
   "name": "zentao_bug_6164",
-  "source_extraction_id": "5c515d205bb541f9a542a1833f1b1c22",
+  "source_extraction_id": "d88727c74486422985a77561984ad270",
   "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited",
-  "version": 2,
+  "version": 3,
   "memory_type": "entities"
 }
 -->

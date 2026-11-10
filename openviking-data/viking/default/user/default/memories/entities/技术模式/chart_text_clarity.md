@@ -12,13 +12,17 @@ zhi2-web-admin/src/views/property/marketMonitor/ 看板从 React 参考站移植
 - 独立 worktree fix/marketMonitor-chart-font-clarity 改6面板；他人 zhi2-web-admin-wt-payfund 同批文件不碰。
 - 所属项目：zhi2-web-admin 房地产市场数据分析平台；来源 2026-11-09 会话。
 
+## 复报与缓存诊断（2026-11-10）
+- 用户 2026-11-10 复报大屏图表与坐标轴文字仍不清晰；同区域截图对比（标题「近18个月成交套数趋势」+ Y 轴 8,000/6,000）显示用户截图浅灰细体（旧版 #64748b），线上 8092 实际渲染深墨蓝加粗（修复版 #334155）。
+- 根因：服务端修复已上线（portal dist 于 2026-11-09 21:36 重建含修复），用户看到的是浏览器 30 天静态缓存（nginx 对 js/css 设 immutable, max-age=2592000）中的旧 chunk，或根目录陈旧离线单文件 market-monitor.standalone.html（2026-11-09 10:31 构建，早于 18:20 修复，含 26 处 #64748b）。
+- 处置：无需改码，建议用户 Ctrl+F5 强刷；index.html 为 no-cache、chunk 为内容哈希，正常刷新即拉新资源。来源 2026-11-10 会话。
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "chart_text_clarity",
-  "source_extraction_id": "e713b433f93d40d499739887234a2cc4",
-  "version": 4,
+  "source_extraction_id": "0280547fac6d4a5f8315974d2dc1be76",
+  "version": 5,
   "memory_type": "entities"
 }
 -->

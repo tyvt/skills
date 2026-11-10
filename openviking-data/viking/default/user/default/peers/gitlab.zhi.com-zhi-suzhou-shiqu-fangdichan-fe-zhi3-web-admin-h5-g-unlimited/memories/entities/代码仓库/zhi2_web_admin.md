@@ -7,6 +7,7 @@
 ## 相关页面
 - 现售方案维护页：src/views/presale/cashsale/plan/detail.vue
 - 预售方案页：src/views/presale/permit/plan/detail.vue
+- 预售资金监管 → 合同换房列表页：src/views/commercialHousingSales/presale/exchangeContract/index.vue
 ## 构建部署
 - 使用 vite 8.3.5 构建，产物输出至父仓库 dist。
 - 修复 bug6169 提交哈希 b1bb05685。
@@ -14,14 +15,15 @@
 - `zs-table` 内容溢出时进入 content-scroll 模式，将 `.el-table` 设为 `max-content` 变宽；`.list-card{overflow:hidden}` 会裁掉变宽部分及右侧固定「操作」列，故 `.zs-table-container--content-scroll` 需自行提供横向滚动，否则右侧「操作」列会被窗口右缘截断
 - `index.scss` 的 `--content-scroll` 规则块已添加 `.zs-table-container--content-scroll{overflow-x:auto;overflow-y:hidden}`（bug-6358 修复），提供横向滚动使右侧固定「操作」列可达
 - `v-dialogDrag` 指令曾吞掉 `el-dialog` 关闭按钮 click：`ImageViewer` 将 `:visible.sync` 绑定 store computed，X 按钮 click 被拖拽指令拦截无法关闭；`zs-dialog` 用相同指令但因 `visible` 为普通 data prop 正常关闭。已在 bug 6373 修复（提交 d71a36607）：drag.js 头部 `onmousedown` 内对 `.el-dialog__headerbtn` 直接 `return`，命中关闭按钮不重定位弹窗，保留其 `click`
+- AGENTS.md 第7条：`zs-table-column` 的字典/tag 列必须传 `dictUrl`（如 `dictUrl: 'BIZ_STATE'`）；`displayColumns` 仅在列签名变化时重算，异步字典（`options` 绑定 `getDicts` 结果）不会自动回填，否则显示原始码值。bug 6436 修复（提交 7ea6073b1）已将 exchangeContract 业务状态列从 `options: this.bizStateOptions` 改为 `dictUrl: 'BIZ_STATE'`
 
 <!-- MEMORY_FIELDS
 {
   "category": "代码仓库",
   "name": "zhi2_web_admin",
-  "source_extraction_id": "4f341c27510048b787426e26c71a1255",
+  "source_extraction_id": "13400c900680448babf9b2126cfe630a",
   "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited",
-  "version": 6,
+  "version": 7,
   "memory_type": "entities"
 }
 -->

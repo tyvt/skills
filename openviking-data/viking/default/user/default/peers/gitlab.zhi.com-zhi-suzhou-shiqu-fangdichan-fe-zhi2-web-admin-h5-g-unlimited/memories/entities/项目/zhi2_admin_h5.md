@@ -19,6 +19,8 @@ Suzhou real estate regulation platform back-office H5 frontend (admin + non-admi
 - 2026-11-06 layout root .app-wrapper fill: min-height:100vh;box-sizing:border-box; submodule 8e4c32ad4, parent b587375, deploy 8092 verified.
 - Local 8092 test account: 91320505MA1X866218 / ZS0001Aa! (dev enterprise/test legal, user 2026-11-06).
 - 2026-11-09 BrokerPages.vue 经纪机构「交易记录/信用记录」tab 对齐 zs-tabs：`.portal-tabs` 的 `align-self:stretch`→`center`，未激活色 `#333`→`rgba(0,0,0,0.65)`；提交 330a474df 合并入 develop/v2.6.2-portal（85c948dd5），由并行任务推送远程。
+- 2026-11-10 PropertyDetailDialog.vue 房屋详情弹窗样式调整：室号加粗+字号30px（.portal-house-number strong { font-size:30px; font-weight:700 }）；房屋性质、层高（m）、单元号、所在自然层、套型5字段右对齐（.portal-house-overview > div:not(.portal-house-number) { align-items:flex-end; text-align:right }）；右上角「非政策类」标签右对齐（.portal-house-tags.is-right { justify-content:flex-end; text-align:right }）；scoped 样式，文件 zhi2-web-admin/src/views/home/publicPortal/components/PropertyDetailDialog.vue。
+- 2026-11-10 租赁输入框左对齐修复：RentalContractQueryPanel.vue（操作指引版）与 RentalPages.vue（公众版）及 -wt-payfund 同构副本共 4 文件，标签 `flex:0 0 auto`→`200px`、input 加 `text-align:left`；根因为未 import 的 `operationGuideContract.scss` 死代码含 `flex:0 0 200px` 设计稿。
 
 ## Market Monitor Page (2026-11-09)
 - MarketHeader.vue: logo reads platformConfig.sysLogo (mapState+resolveServerAssetUrl → <img>, w-9 h-9 overflow-hidden); fallback static house SVG on missing/@error; title "苏州市房地产市场数据分析平台".
@@ -34,9 +36,9 @@ Suzhou real estate regulation platform back-office H5 frontend (admin + non-admi
 {
   "category": "项目",
   "name": "zhi2_admin_h5",
-  "source_extraction_id": "e713b433f93d40d499739887234a2cc4",
+  "source_extraction_id": "84a411335b9d46f2b8c16c3d5ab99120",
   "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited",
-  "version": 12,
+  "version": 14,
   "memory_type": "entities"
 }
 -->

@@ -1,0 +1,75 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-46b23de6-32ae-47d0-8d35-220981eb3626/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-10T09:19:08.957523+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/三处token浪费源识别.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-10，用户审计技能运行成本时发现三个新浪费源：两张截图作为附件插入打穿 prefix cache（seq163-166 cacheReadTokens 从45,760崩到13,312）；Windows 无 GIT_EDITOR 时 git rebase --continue 卡死约190秒（seq283-300）；gitlink 冲突脑内演算可压缩80%，实际用 git merge-base --is-ancestor 可定（seq262-304）。总成本70,914，较上轮涨23%。\n# 2026-11-10 (Tuesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: 规则层继续生效，但这次暴露了三个新浪费源：图片注入打穿缓存、rebase 卡编辑器、gitlink 冲突脑内演算。总成本 70,914（6420 为 57,332），仍在 8 万内但涨了 23%。\n\n上一轮建议的落地核验\n建议\t落地\t效果\nskill 瘦身 + 按需读\t✅\tskill 注入 21,529 → 8,724 tokens，无 spill 文件\nreasoning >1.5k 即停\t⚠️ 规则已进 AGENTS.md\t执行侧没守住，step 46 单步 output 1,313 tokens 全在演算 SQL 转义\nDBX 补两条\t✅ 文档已补\t执行侧仍翻车 2 次（见下）\ncost-meter 15k→10k\t❌\tseq 93 仍报 >15k\n临时文件 .tmp-bug<id>/\t✅\t截图落 .tmp-bug6427/，正确\n三个新浪费源（按影响排序）\n1. 读两张截图打穿了 prefix cache（最大单点）\nseq 163→166，cacheReadTokens 从 45,760 崩到 13,312。原因：两张 1920×911 PNG 作为 attachment 插入消息序列，前缀对不上，后续所有 step 按全价算。6420 只读 1 张图且晚，所以便宜；6427 读 2 张且在第 22 步，后面 30+ 步都在补缓存。\n→ 建议：截图最后读，或先读 1 张关键图确认，不够再补。\n\n2. git rebase --continue 在 Windows 无 GIT_EDITOR 直接卡死\nseq 283 启动 → seq 285 等 120s 转后台 → seq 289 才怀疑卡编辑器 → seq 294 kill → seq 300 加 $env:GIT_EDITOR='true' 重跑。整整 3 个 step、约 190 秒纯等待。\n→ 应进 repo-safety（或 AGENTS.md 收尾条）：自动化环境跑 rebase --continue / commit 必须设 GIT_EDITOR=true。\n\n3. gitlink 冲突的脑内演算可压 80%\nseq 262→304 处理父仓库 push 冲突，reasoning 在反复推 c4b948a7 与 d98c4a801 的祖先关系。其实 seq 276 一条 git merge-base --is-ancestor 就定了（c4b948a7 是 d98c4a801 的祖先 → 用 d98c4a801 安全）。前面 seq 268、282 的推理全是重复劳动。\n→ reasoning 规则写对了，但“缺事实先调工具”没执行到 git 场景。\n\n执行侧仍翻车的 DBX 两次\nseq 31：tool: \"query\" 猜错工具名 → dbx: tool not found。DBX.md 第 13 行写了“执行 SQL 的参数名是 sql”，但没写“工具名是 dbx_execute_query 不是 query”。\n\nseq 338：dbx_execute_query 只传 session_id、漏 connection_name → CONNECTION_NOT_FOUND。这正是上一轮让补的第 7 行规则，文档在、agent 没用上。\n\n→ 规则进文档 ≠ 进执行。建议把这两条做成 dbx-snippets.sql 里的固定调用模板，而不是靠读文档。\n\n其他小问题\nseq 103：grep type: 'amount' 在全 src/**/*.vue 搜，命中 574 条、spill 10,884 bytes。其实只需 grep detail-template.vue 一个文件。\n\nseq 211-218：build 后 public/version.json 变了就提交了，还带着过期的 gitHash acce81111（提交本身是 d98c4a801）。AGENTS.md §1 说构建产物不进提交，这里判断偏松，会成为别人的 build 噪音。\n\nseq 62/69：glob C:\\Users\\...\\.dsh\\skills\\... 和 D:\\repository\\skills\\... 都返回 No files，但文件确实在 D 盘（seq 144 pwsh 列出来了）。..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/AGENTS新增GIT_EDITOR规则.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-10，用户建议、助手在 D:\\repository\\skills\\dsh\\AGENTS.md 收尾条7新增规则：自动化环境跑 rebase --continue/commit 前必须设 GIT_EDITOR=true，并附 merge-base --is-ancestor 禁止脑内推演。已随本地提交 e2414c3b 落地。\n# 2026-11-10 (Tuesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: ...glob 对这个路径失效，agent 连试 2 次才换 pwsh。\n\n建议补丁（按性价比）\nAGENTS.md 收尾条加：rebase --continue / commit 前先设 GIT_EDITOR=true（零成本，省 3 step/190s）。...\n...\n**assistant [peer=deepseek-harness-default-workspace]**: 应用补丁。先改 AGENTS.md（两条收尾条 + 截图规则 + version.json 归属）：\n...\n**assistant [peer=deepseek-harness-default-workspace]**: 本轮补丁已全部落地：\n\n| 建议 | 落地 | 位置 |\n|---|---|---|\n| GIT_EDITOR=true 规则 | ✅ | [AGENTS.md](../../repository/skills/dsh/AGENTS.md) 收尾条 7，并附 `merge-base --is-ancestor` 禁止脑内推演 |\n| 截图最后读、一次一张 | ✅ | AGENTS.md Token 条 6（明确 cache 打穿机制与「放上下文尾部」） |\n| DBX 固定调用模板 + 两个反例 | ✅ | [DBX.md](../../repository/skills/zentao-analyzer/DBX.md)：`tool:\"query\"` 错名、漏 `connection_name` 反例照抄模板 |\n| cost-meter 15k→10k | ✅ | 源码早已是 10k，但安装副本 `profiles\\web\\node_modules\\dsh-cost-meter\\lib\\index.js` 仍是 15k——这就是提醒还报 >15k 的根因。已用源码覆盖，核验为 `?? 10_000`。**本会话及运行中的 Web 不生效，重启 web 后新会话生效** |\n| version.json 归属 | ✅ | AGENTS.md 收尾条 8：build 产物禁止提交，脏了 `git checkout --` 还原 |\n\n提交：按你的选择仅本地提交 `e2414c3b`（只含 AGENTS.md、DBX.md 两个文件，未推送）。`selftest.mjs` 与 `tool-call-hygiene/SKILL.md` 的遗留改动仍留在工作区。..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/AGENTS新增截图读取规则.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-10，用户建议、助手在 AGENTS.md Token 条6新增规则：截图放上下文尾部、一次一张，避免 attachment 打穿 prefix cache。已随本地提交 e2414c3b 落地。\n# 2026-11-10 (Tuesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: ...AGENTS.md 或 skill 加：截图最后读；一次一张（省 30k+ cache 重建）。\n\nDBX.md 把 seq 338 的错误做成反例：dbx_execute_query 无论有无 session 都必带 connection_name，附错误信息原文。...\n...\n**assistant [peer=deepseek-harness-default-workspace]**: 应用补丁。先改 AGENTS.md（两条收尾条 + 截图规则 + version.json 归属）：\n...\n**assistant [peer=deepseek-harness-default-workspace]**: 本轮补丁已全部落地：\n\n| 建议 | 落地 | 位置 |\n|---|---|---|\n| GIT_EDITOR=true 规则 | ✅ | [AGENTS.md](../../repository/skills/dsh/AGENTS.md) 收尾条 7，并附 `merge-base --is-ancestor` 禁止脑内推演 |\n| 截图最后读、一次一张 | ✅ | AGENTS.md Token 条 6（明确 cache 打穿机制与「放上下文尾部」） |\n| DBX 固定调用模板 + 两个反例 | ✅ | [DBX.md](../../repository/skills/zentao-analyzer/DBX.md)：`tool:\"query\"` 错名、漏 `connection_name` 反例照抄模板 |\n| cost-meter 15k→10k | ✅ | 源码早已是 10k，但安装副本 `profiles\\web\\node_modules\\dsh-cost-meter\\lib\\index.js` 仍是 15k——这就是提醒还报 >15k 的根因。已用源码覆盖，核验为 `?? 10_000`。**本会话及运行中的 Web 不生效，重启 web 后新会话生效** |\n| version.json 归属 | ✅ | AGENTS.md 收尾条 8：build 产物禁止提交，脏了 `git checkout --` 还原 |\n\n提交：按你的选择仅本地提交 `e2414c3b`（只含 AGENTS.md、DBX.md 两个文件，未推送）。`selftest.mjs` 与 `tool-call-hygiene/SKILL.md` 的遗留改动仍留在工作区。..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/AGENTS新增version.json归属规则.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-10，用户建议、助手在 AGENTS.md 收尾条8新增规则：build 产物（如 version.json）禁止提交，脏了用 git checkout -- 还原。已随本地提交 e2414c3b 落地。\n# 2026-11-10 (Tuesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: ...cost-meter 15k→10k：这条拖了两轮了，落地它。\n\nversion.json 明确归属：要么加进 .gitignore，要么 AGENTS.md 写“build 产生的 version.json 不提交”。\n...\n**assistant [peer=deepseek-harness-default-workspace]**: 应用补丁。先改 AGENTS.md（两条收尾条 + 截图规则 + version.json 归属）：\n...\n**assistant [peer=deepseek-harness-default-workspace]**: 本轮补丁已全部落地：\n\n| 建议 | 落地 | 位置 |\n|---|---|---|\n| GIT_EDITOR=true 规则 | ✅ | [AGENTS.md](../../repository/skills/dsh/AGENTS.md) 收尾条 7，并附 `merge-base --is-ancestor` 禁止脑内推演 |\n| 截图最后读、一次一张 | ✅ | AGENTS.md Token 条 6（明确 cache 打穿机制与「放上下文尾部」） |\n| DBX 固定调用模板 + 两个反例 | ✅ | [DBX.md](../../repository/skills/zentao-analyzer/DBX.md)：`tool:\"query\"` 错名、漏 `connection_name` 反例照抄模板 |\n| cost-meter 15k→10k | ✅ | 源码早已是 10k，但安装副本 `profiles\\web\\node_modules\\dsh-cost-meter\\lib\\index.js` 仍是 15k——这就是提醒还报 >15k 的根因。已用源码覆盖，核验为 `?? 10_000`。**本会话及运行中的 Web 不生效，重启 web 后新会话生效** |\n| version.json 归属 | ✅ | AGENTS.md 收尾条 8：build 产物禁止提交，脏了 `git checkout --` 还原 |\n\n提交：按你的选择仅本地提交 `e2414c3b`（只含 AGENTS.md、DBX.md 两个文件，未推送）。`selftest.mjs` 与 `tool-call-hygiene/SKILL.md` 的遗留改动仍留在工作区。..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/DBX文档补调用模板.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-10，用户指出 DBX 执行侧两次翻车（seq31 工具名错、seq338 漏 connection_name），助手在 D:\\repository\\skills\\zentao-analyzer\\DBX.md 增加固定调用模板与两个反例，照抄模板可避免。已随本地提交 e2414c3b 落地。\n# 2026-11-10 (Tuesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: ...DBX.md 第 13 行写了“执行 SQL 的参数名是 sql”，但没写“工具名是 dbx_execute_query 不是 query”。\n\nseq 338：dbx_execute_query 只传 session_id、漏 connection_name → CONNECTION_NOT_FOUND。这正是上一轮让补的第 7 行规则，文档在、agent 没用上。\n\n→ 规则进文档 ≠ 进执行。建议把这两条做成 dbx-snippets.sql 里的固定调用模板，而不是靠读文档。\n\n其他小问题\nseq 103：grep type: 'amount' 在全 src/**/*....\n...\n**assistant [peer=deepseek-harness-default-workspace]**: AGENTS.md ✅。改 DBX.md，把两次翻车做成固定调用模板：\n...\n**assistant [peer=deepseek-harness-default-workspace]**: 本轮补丁已全部落地：\n\n| 建议 | 落地 | 位置 |\n|---|---|---|\n| GIT_EDITOR=true 规则 | ✅ | [AGENTS.md](../../repository/skills/dsh/AGENTS.md) 收尾条 7，并附 `merge-base --is-ancestor` 禁止脑内推演 |\n| 截图最后读、一次一张 | ✅ | AGENTS.md Token 条 6（明确 cache 打穿机制与「放上下文尾部」） |\n| DBX 固定调用模板 + 两个反例 | ✅ | [DBX.md](../../repository/skills/zentao-analyzer/DBX.md)：`tool:\"query\"` 错名、漏 `connection_name` 反例照抄模板 |\n| cost-meter 15k→10k | ✅ | 源码早已是 10k，但安装副本 `profiles\\web\\node_modules\\dsh-cost-meter\\lib\\index.js` 仍是 15k——这就是提醒还报 >15k 的根因。已用源码覆盖，核验为 `?? 10_000`。**本会话及运行中的 Web 不生效，重启 web 后新会话生效** |\n| version.json 归属 | ✅ | AGENTS.md 收尾条 8：build 产物禁止提交，脏了 `git checkout --` 还原 |\n\n提交：按你的选择仅本地提交 `e2414c3b`（只含 AGENTS.md、DBX.md 两个文件，未推送）。`selftest.mjs` 与 `tool-call-hygiene/SKILL.md` 的遗留改动仍留在工作区。..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/cost-meter安装副本覆盖.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-10，用户要求落地 cost-meter 15k→10k，助手发现源码已是10k但安装副本 profiles\\web\\node_modules\\dsh-cost-meter\\lib\\index.js 仍为15k，用源码覆盖后核验为 ?? 10_000；重启 web 后新会话生效，运行中不生效。\n# 2026-11-10 (Tuesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: ...cost-meter 15k→10k：这条拖了两轮了，落地它。\n\nversion.json 明确归属：要么加进 .gitignore，要么 AGENTS.md 写“build 产生的 version.json 不提交”。\n...\n**assistant [peer=deepseek-harness-default-workspace]**: cost-meter 源码已是 10k，但 `profiles\\web\\node_modules` 里的安装副本还是 15k（这正是提醒仍报 >15k 的原因）。用源码覆盖安装副本：\n...\n**assistant [peer=deepseek-harness-default-workspace]**: 本轮补丁已全部落地：\n\n| 建议 | 落地 | 位置 |\n|---|---|---|\n| GIT_EDITOR=true 规则 | ✅ | [AGENTS.md](../../repository/skills/dsh/AGENTS.md) 收尾条 7，并附 `merge-base --is-ancestor` 禁止脑内推演 |\n| 截图最后读、一次一张 | ✅ | AGENTS.md Token 条 6（明确 cache 打穿机制与「放上下文尾部」） |\n| DBX 固定调用模板 + 两个反例 | ✅ | [DBX.md](../../repository/skills/zentao-analyzer/DBX.md)：`tool:\"query\"` 错名、漏 `connection_name` 反例照抄模板 |\n| cost-meter 15k→10k | ✅ | 源码早已是 10k，但安装副本 `profiles\\web\\node_modules\\dsh-cost-meter\\lib\\index.js` 仍是 15k——这就是提醒还报 >15k 的根因。已用源码覆盖，核验为 `?? 10_000`。**本会话及运行中的 Web 不生效，重启 web 后新会话生效** |\n| version.json 归属 | ✅ | AGENTS.md 收尾条 8：build 产物禁止提交，脏了 `git checkout --` 还原 |\n\n提交：按你的选择仅本地提交 `e2414c3b`（只含 AGENTS.md、DBX.md 两个文件，未推送）。`selftest.mjs` 与 `tool-call-hygiene/SKILL.md` 的遗留改动仍留在工作区。..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/补丁本地提交.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-10，助手将 AGENTS.md 与 DBX.md 改动本地提交为 e2414c3b（未推送），selftest.mjs 与 tool-call-hygiene/SKILL.md 遗留改动留工作区。\n# 2026-11-10 (Tuesday) ChatLog:\n**assistant [peer=deepseek-harness-default-workspace]**: ...提交：按你的选择仅本地提交 `e2414c3b`（只含 AGENTS.md、DBX.md 两个文件，未推送）。`selftest.mjs` 与 `tool-call-hygiene/SKILL.md` 的遗留改动仍留在工作区。..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/补丁遗留两项未决.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-10，补丁落地后遗留：① cost-meter 需重启 web 生效；② glob 对 .dsh\\skills、D:\\repository\\skills 路径失效问题未修，暂靠 glob 空结果一次即换 pwsh 规避。\n# 2026-11-10 (Tuesday) ChatLog:\n**assistant [peer=deepseek-harness-default-workspace]**: ...遗留两点：① cost-meter 需重启 web 生效；② glob 对 `.dsh\\skills`、`D:\\repository\\skills` 路径失效的问题本轮未修，属于工具层 bug，先靠「glob 空结果一次即换 pwsh」规避。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术文档/dbx_md.md",
+                "memory_type": "entities",
+                "after": "# DBX.md\nzentao-analyzer 技能下的 DBX 查询文档，位于 D:\\repository\\skills\\zentao-analyzer\\DBX.md。\n\n## 目的\n- 规范 DBX 工具调用，避免执行侧翻车。\n\n## 关键内容（2026-11-10 更新）\n- 固定调用模板：dbx_execute_query 必须带 connection_name（无论有无 session_id），附反例错误原文\n- 反例 1：tool 名误用 \"query\" 导致 dbx: tool not found（正确为 dbx_execute_query）\n- 反例 2：仅传 session_id 漏 connection_name 导致 CONNECTION_NOT_FOUND\n\n## 关联\n- 属于 zentao-analyzer 技能，与 skills_repo 同仓库"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/工具/dsh_cost_meter.md",
+                "memory_type": "entities",
+                "after": "# dsh-cost-meter\nDSH 的 token 成本计量工具，源码阈值已为 10k。\n\n## 实现\n- 源码位于 dsh 仓库，安装副本位于 profiles\\web\\node_modules\\dsh-cost-meter\\lib\\index.js\n- 2026-11-10 发现安装副本仍为 15k 导致提醒误报 >15k，已用源码覆盖为 10k\n\n## 注意事项\n- 修改后需重启 web 才能对新会话生效（运行中 web 不生效）\n- 核验标志为 `?? 10_000`\n\n## 关联\n- 与 token_optimizer 技能同源成本数据"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术文档/dsh_agents_md.md",
+                "memory_type": "entities",
+                "before": "# D:\\repository\\skills\\dsh\\AGENTS.md\ndsh 技能的代理行为说明文档，规定代码与系统运维工作的默认原则与约束。\n\n## 编码状态\n- 修复前为混合编码：前部合法 UTF-8，尾部约 1KB（从「仅要求提交时…」起）为 GBK\n- 2026-11-10 修复后全文为合法 UTF-8 无 BOM，34,908 字节，严格解码通过\n\n## 关键规则\n- 「编码任务默认走编排器」第 6 条：严禁未知具体路径时全盘 grep/read 搜索代码\n- 大面积排查代码逻辑须调用 orchestrate 编排器，自身只阅读底层廉价模型返回的摘要\n\n## 关联\n- 位于 dsh 技能仓库（D:\\repository\\skills\\dsh）\n- 改动未提交（截至 2026-11-10）",
+                "after": "# D:\\repository\\skills\\dsh\\AGENTS.md\ndsh 技能的代理行为说明文档，规定代码与系统运维工作的默认原则与约束。\n\n## 编码状态\n- 修复前为混合编码：前部合法 UTF-8，尾部约 1KB（从「仅要求提交时…」起）为 GBK\n- 2026-11-10 修复后全文为合法 UTF-8 无 BOM，34,908 字节，严格解码通过\n\n## 关键规则\n- 「编码任务默认走编排器」第 6 条：严禁未知具体路径时全盘 grep/read 搜索代码\n- 大面积排查代码逻辑须调用 orchestrate 编排器，自身只阅读底层廉价模型返回的摘要\n\n## 新增规则（2026-11-10）\n- 收尾条 7：自动化环境跑 rebase --continue / commit 前必须设 GIT_EDITOR=true，并附 merge-base --is-ancestor 禁止脑内推演祖先关系\n- Token 条 6：截图放上下文尾部、一次一张，避免 attachment 打穿 prefix cache\n- 收尾条 8：build 产物（如 version.json）禁止提交，脏了用 git checkout -- 还原\n\n## 关联\n- 位于 dsh 技能仓库（D:\\repository\\skills\\dsh）\n- 2026-11-10 本地提交 e2414c3b（仅 AGENTS.md 与 DBX.md，未推送）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 10,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

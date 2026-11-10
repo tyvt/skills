@@ -1,0 +1,23 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-da6775d6-7969-4a7a-b3ee-d60fce610ed4/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-10T03:53:34.365775+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/bug/openviking_embedder_fix.md",
+                "memory_type": "entities",
+                "after": "# OpenViking Embedder Client Closed Fix\nOpenViking's local patch in litellm_embedders.py caused embedding failures by closing the shared httpx client after each call.\n\n## Root Cause\n- OpenViking's litellm_embedders.py closed shared `module_level_aclient` and deleted the attribute after every `embed_async`\n- LiteLLM 1.91.1 client cache (TTL 1 hour) still returned the same closed httpx client handler on next request\n- Ollama embedding call via httpx `client.send` then raised RuntimeError: Cannot send a request, as the client has been closed\n- Circuit breaker OPEN and LoggingWorker task destroyed were downstream side effects\n- `DISABLE_AIOHTTP_TRANSPORT=True` retained to avoid earlier aiohttp cross-event-loop issues\n\n## Fix Details\n- Removed the active close of shared httpx client after each embedding\n- Added fallback: if client closed error occurs, flush LiteLLM client cache (`in_memory_llm_clients_cache.flush_cache()`) and retry once\n- `get_async_httpx_client` now creates a new client instead of returning cached closed object\n\n## Files and Ownership\n- Affected file: litellm_embedders.py (OpenViking local patch)\n- Environment: OpenViking with Ollama bge-m3-ov model for knowledge base embeddings\n\n## Verification\n- OpenViking restarted with original ov.conf, `/health` returned ok (version 0.5.3)\n- Async embedding with ollama/bge-m3 returned 1024 dimensions in ~6.2 seconds"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

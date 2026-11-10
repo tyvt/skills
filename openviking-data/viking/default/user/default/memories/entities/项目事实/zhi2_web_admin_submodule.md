@@ -8,6 +8,7 @@ zhi2-web-admin 是房产综合服务平台门户（父仓库「门户」）的 g
 - 根目录 market-monitor.standalone.html 为离线备用产物，非部署对象
 - 构建命令为 `node scripts/vite-build.mjs build`；`dashboard.css` 由 `gen-mm-css.mjs` 手动生成且未接入构建链，直接修改 `dashboard.css` 不会被构建覆盖（2026-11-09 字体清晰度修复 fix/marketMonitor-chart-font-clarity 时确认）
 - 市场监测大屏原在 `index.html` 引入外部字体 `JetBrains Mono`、`dashboard.css` 中 `--font-sans` 指向该字体；2026-11-09 字体清晰度修复已移除外部字体引入并将 `--font-sans` 改为系统字体栈；`dashboard.css` 的 `.mm-dashboard .font-mono` 工具类也曾将 `JetBrains Mono` 硬编码于 `font-family` 首位导致产物残留外部字体，同期修复中已将其改为纯系统内宽栈
+- nginx 对 js/css 设 `immutable, max-age=2592000`（30 天），`index.html` 为 no-cache；2026-11-10 用户复报大屏文字不清，实为浏览器缓存旧 chunk 或根目录陈旧离线单文件 market-monitor.standalone.html（2026-11-09 10:31 构建、早于 18:20 修复、含 26 处 #64748b），portal dist 已于 21:36 重建含修复
 
 ## 并行任务隔离
 - 主工作区可能存在并行任务的未提交改动（如 TradePanel.vue、BuyerOverviewPanel.vue、vite.config.js、public/version.json），改动时须避免夹带
@@ -30,8 +31,8 @@ zhi2-web-admin 是房产综合服务平台门户（父仓库「门户」）的 g
 {
   "category": "项目事实",
   "name": "zhi2_web_admin_submodule",
-  "source_extraction_id": "c2bd987b448a45b8acd1d99b15cd1dc6",
-  "version": 9,
+  "source_extraction_id": "0280547fac6d4a5f8315974d2dc1be76",
+  "version": 10,
   "memory_type": "entities"
 }
 -->

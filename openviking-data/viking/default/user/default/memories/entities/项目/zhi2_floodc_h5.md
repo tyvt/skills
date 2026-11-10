@@ -19,12 +19,18 @@
 - 所属项目：苏住房防汛C端
 - 验证证据：2026-11-09 会话构建部署 localhost:8095 截图确认
 
+## 汛前检查预警接口
+- 手持端 `src/stores/flood.ts` 的 `fetchTemplate` 在进入汛前检查时调用 `/v2.0/safety/flood/event/page` 获取预警，该接口后端 `FloodEventServiceImpl.page` 带 `@DataScope` 按创建部门过滤
+- B 端新增检查单走 `/event/options`（`FloodEventServiceImpl.options`），只返回已备案且阶段匹配的预警，不受部门数据权限限制
+- 阶段参数：汛前=2、汛中=3、汛后=4（inspectionStage 参数）
+- 禅道 Bug 6413（2026-11-10）：因手持端用 `/event/page` 导致物业账号看不到市住建创建的预警，后改为与 B 端同口径请求 `/event/options`
+
 <!-- MEMORY_FIELDS
 {
   "category": "项目",
   "name": "zhi2_floodc_h5",
-  "source_extraction_id": "f00383fee52145f293049426072d1963",
-  "version": 1,
+  "source_extraction_id": "693ce07a83204387b48531dd70132c4d",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

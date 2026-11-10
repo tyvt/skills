@@ -27,14 +27,17 @@
 - 单文件保留 Google Fonts 外链以与参考站字体一致；离线回退本地字体布局不变
 - 最新版「返回首页」语义为重置全域，本实现保持一致
 
+## 2026-11-10 缓存诊断更新
+- 根目录 market-monitor.standalone.html 为 2026-11-09 10:31 构建、早于 18:20 字体修复，含 26 处 #64748b，已陈旧非线上产物；线上 #/market-monitor 实际由门户 dist（Vue 源码构建，2026-11-09 21:36 重建含修复）提供，经 nginx 8092 站点访问。
+- 2026-11-10 用户复报文字不清，实为浏览器 30 天静态缓存（nginx 对 js/css immutable, max-age=2592000）旧 chunk，非代码未修复；强刷即可生效。
 
 <!-- MEMORY_FIELDS
 {
   "category": "project",
   "name": "market_monitor_dashboard",
-  "source_extraction_id": "09cd59afd80b47e4b4195cc488f5fd72",
+  "source_extraction_id": "0280547fac6d4a5f8315974d2dc1be76",
   "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited",
-  "version": 7,
+  "version": 8,
   "memory_type": "entities"
 }
 -->

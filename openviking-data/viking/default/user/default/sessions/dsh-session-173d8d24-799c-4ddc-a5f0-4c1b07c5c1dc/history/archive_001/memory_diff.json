@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-173d8d24-799c-4ddc-a5f0-4c1b07c5c1dc/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-10T09:23:27.207146+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷任务/zentao_bug_6436.md",
+                "memory_type": "entities",
+                "after": "# 禅道Bug 6436 合同换房列表业务状态显示原始码值\n预售资金监管 → 合同换房列表页「业务状态」列显示原始数字\"2\"而非字典中文标签。\n\n## 现象与定位\n- 模块：预售资金监管 → 合同换房（exchangeContract）列表页 `zhi2-web-admin/src/views/commercialHousingSales/presale/exchangeContract/index.vue`\n- 现象：业务状态列 `prop: 'bizState'` 显示原始码值 `2`，未回显中文标签\n- 对比：同模块已知正确页面 `contractRevoke/index.vue`、`versionManagement/index.vue`、`contractMainInfo/index.vue` 的「业务状态」列均用 `type: 'tag' + dictUrl: 'BIZ_STATE'`\n\n## 根因\n- 该列原配置 `type: 'tag', options: this.bizStateOptions`（异步 `getDicts('BIZ_STATE')` 结果渲染）\n- 按 AGENTS.md 第7条：`zs-table-column` 的字典/tag 列须传 `dictUrl`——`displayColumns` 仅在列签名变化时重算，异步字典（options 绑定）不会自动回填，故显示原始码值\n\n## 修复方案与验证\n- 将列配置 `options: this.bizStateOptions` 改为 `dictUrl: 'BIZ_STATE'`，保留 `type: 'tag'` 样式\n- 保留 `initDict()`（查询表单 select 仍依赖 `bizStateOptions` 本地选项）\n- 在子模块主工作区直接修改，未创建独立 worktree\n- `npx eslint <file>` → 0 error/warning（exit 0）\n- `npm run build` → 通过（exit 0，仅 Sass `@import` 存量弃用告警，与本次无关）\n- 未启动本地 dev server 目视验证；字典回显逻辑与同模块列表一致，已通过 lint + 构建间接验证\n\n## 提交推送与禅道回写（2026-11-10 用户授权后执行）\n- 子模块 `zhi2-web-admin` 提交 `7ea6073b1` 推送 origin/develop/v3.0.0（先于父仓库）\n- 父仓库 gitlink 提交 `6559142` 推送 origin/develop/v3.0.0（gitlink `d98c4a801..7ea6073b1` → `7dd856c..6559142`）\n- 还原构建污染的 `public/version.json` 等构建产物，仅提交 `index.vue`；未夹带 `env/.env` 及临时文件（`.tmp-bug*`、bug6417 截图等）\n- 禅道回写（DBX 事务，connection ID `4027e274-2f63-49e6-8a8d-5f25eb1e6c5e`）：`zt_bug` 置 `resolved/fixed`（解决人 tiany，指派回 zhunan），新增 `zt_action` 90296（extra=fixed），事务内与提交后双校验通过"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/代码仓库/zhi2_web_admin.md",
+                "memory_type": "entities",
+                "before": "# zhi2_web_admin\n苏州市房地产监测V3的前端管理后台子模块仓库，承载预售与现售方案维护等页面。\n## 描述\n- 是父仓库“苏州市房地产监测V3”的 git 子模块，路径为 zhi2-web-admin。\n- 基于 Vue 的前端 H5 管理项目，主分支 develop/v3.0.0。\n- 主仓库中的 `zhi2-web-admin` 子模块目录曾为空且 `.git` 链接缺失（预存在未初始化/损坏状态，非 agent 任务 worktree 造成；子模块 gitdir 含全部提交可 `git submodule update` 恢复）（2026-11-09）\n## 相关页面\n- 现售方案维护页：src/views/presale/cashsale/plan/detail.vue\n- 预售方案页：src/views/presale/permit/plan/detail.vue\n## 构建部署\n- 使用 vite 8.3.5 构建，产物输出至父仓库 dist。\n- 修复 bug6169 提交哈希 b1bb05685。\n## 组件约束\n- `zs-table` 内容溢出时进入 content-scroll 模式，将 `.el-table` 设为 `max-content` 变宽；`.list-card{overflow:hidden}` 会裁掉变宽部分及右侧固定「操作」列，故 `.zs-table-container--content-scroll` 需自行提供横向滚动，否则右侧「操作」列会被窗口右缘截断\n- `index.scss` 的 `--content-scroll` 规则块已添加 `.zs-table-container--content-scroll{overflow-x:auto;overflow-y:hidden}`（bug-6358 修复），提供横向滚动使右侧固定「操作」列可达\n- `v-dialogDrag` 指令曾吞掉 `el-dialog` 关闭按钮 click：`ImageViewer` 将 `:visible.sync` 绑定 store computed，X 按钮 click 被拖拽指令拦截无法关闭；`zs-dialog` 用相同指令但因 `visible` 为普通 data prop 正常关闭。已在 bug 6373 修复（提交 d71a36607）：drag.js 头部 `onmousedown` 内对 `.el-dialog__headerbtn` 直接 `return`，命中关闭按钮不重定位弹窗，保留其 `click`",
+                "after": "# zhi2_web_admin\n苏州市房地产监测V3的前端管理后台子模块仓库，承载预售与现售方案维护等页面。\n## 描述\n- 是父仓库“苏州市房地产监测V3”的 git 子模块，路径为 zhi2-web-admin。\n- 基于 Vue 的前端 H5 管理项目，主分支 develop/v3.0.0。\n- 主仓库中的 `zhi2-web-admin` 子模块目录曾为空且 `.git` 链接缺失（预存在未初始化/损坏状态，非 agent 任务 worktree 造成；子模块 gitdir 含全部提交可 `git submodule update` 恢复）（2026-11-09）\n## 相关页面\n- 现售方案维护页：src/views/presale/cashsale/plan/detail.vue\n- 预售方案页：src/views/presale/permit/plan/detail.vue\n- 预售资金监管 → 合同换房列表页：src/views/commercialHousingSales/presale/exchangeContract/index.vue\n## 构建部署\n- 使用 vite 8.3.5 构建，产物输出至父仓库 dist。\n- 修复 bug6169 提交哈希 b1bb05685。\n## 组件约束\n- `zs-table` 内容溢出时进入 content-scroll 模式，将 `.el-table` 设为 `max-content` 变宽；`.list-card{overflow:hidden}` 会裁掉变宽部分及右侧固定「操作」列，故 `.zs-table-container--content-scroll` 需自行提供横向滚动，否则右侧「操作」列会被窗口右缘截断\n- `index.scss` 的 `--content-scroll` 规则块已添加 `.zs-table-container--content-scroll{overflow-x:auto;overflow-y:hidden}`（bug-6358 修复），提供横向滚动使右侧固定「操作」列可达\n- `v-dialogDrag` 指令曾吞掉 `el-dialog` 关闭按钮 click：`ImageViewer` 将 `:visible.sync` 绑定 store computed，X 按钮 click 被拖拽指令拦截无法关闭；`zs-dialog` 用相同指令但因 `visible` 为普通 data prop 正常关闭。已在 bug 6373 修复（提交 d71a36607）：drag.js 头部 `onmousedown` 内对 `.el-dialog__headerbtn` 直接 `return`，命中关闭按钮不重定位弹窗，保留其 `click`\n- AGENTS.md 第7条：`zs-table-column` 的字典/tag 列必须传 `dictUrl`（如 `dictUrl: 'BIZ_STATE'`）；`displayColumns` 仅在列签名变化时重算，异步字典（`options` 绑定 `getDicts` 结果）不会自动回填，否则显示原始码值。bug 6436 修复（提交 7ea6073b1）已将 exchangeContract 业务状态列从 `options: this.bizStateOptions` 改为 `dictUrl: 'BIZ_STATE'`"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

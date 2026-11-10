@@ -1,0 +1,48 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-548e00ca-324b-4443-8f45-6f77400edd8b/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-10T03:49:10.293694+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/分时定价策略引入决策.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-10 决定在路由机制中引入分时定价策略，于 config.yaml 增加 scheduling 段（工作日 09:00-12:00、14:00-18:00 为 DeepSeek 峰时），并在 src/config.py 增加 SchedulingConfig 数据类解析该配置。\n# 2026-11-10 (Tuesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: 我们要对现有的路由机制进行最终升级，目标是：引入分时定价策略（DeepSeek 谷/峰时段），将免费模型 hy3 引入规划器，并在峰时用 glm-5.3-flash 替代，同时加入质量兜底机制，保证规划可靠性。\n\n请按以下四个步骤完成代码改造：\n\n第一步：修改 config.yaml 引入调度策略\n增加全局 scheduling 配置段，并更新对应的工具模型池：\n\nyaml\nscheduling:\n  deepseek_peak_hours:\n    weekdays: [1, 2, 3, 4, 5]\n    peak_periods: [\"09:00-12:00\", \"14:00-18:00\"]\n  strategies:\n    planner_use_free_hy3: true\n    peak_use_glm_as_fallback: true\n\ntools:\n  planner:\n    description: 复杂任务的规划与推理。\n    models:\n      - model: openrouter/tencent/hy3-preview:free  # 免费规划主力...\n...\n**user [peer=deepseek-harness-default-workspace]**: ...max_tokens: 4096\n    timeout: 300\n第二步：修改 src/config.py\n增加 SchedulingConfig 数据类，并在 OrchestratorConfig 中解析上述 YAML 配置，确保类型安全。..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/规划器免费模型引入决策.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-10 决定在规划器中引入免费模型 openrouter/tencent/hy3-preview:free 作为主力，并以 cursor/grok-4.7@256k 作为质量兜底。\n# 2026-11-10 (Tuesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: 我们要对现有的路由机制进行最终升级，目标是：引入分时定价策略（DeepSeek 谷/峰时段），将免费模型 hy3 引入规划器，并在峰时用 glm-5.3-flash 替代，同时加入质量兜底机制，保证规划可靠性。...\n...\n**user [peer=deepseek-harness-default-workspace]**: ...peak_use_glm_as_fallback: true\n\ntools:\n  planner:\n    description: 复杂任务的规划与推理。\n    models:\n      - model: openrouter/tencent/hy3-preview:free  # 免费规划主力\n      - model: cursor/grok-4.7@256k                  # 质量兜底\n    max_tokens: 4096\n    timeout: 300\n\n  file_reader:..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/峰时模型替换决策.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-10 决定在 DeepSeek 峰时，对 file_reader 与 code_editor 工具跳过 deepseek-v4.1-flash，优先使用 workbuddy/glm-5.3-flash。\n# 2026-11-10 (Tuesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: 我们要对现有的路由机制进行最终升级，目标是：引入分时定价策略（DeepSeek 谷/峰时段），将免费模型 hy3 引入规划器，并在峰时用 glm-5.3-flash 替代，同时加入质量兜底机制，保证规划可靠性。...\n...\n**user [peer=deepseek-harness-default-workspace]**: ...description: 读取/摘要文本内容。\n    models:\n      - model: auto/deepseek-v4.1-flash  # 谷时主力，峰时由代码动态降级\n      - model: workbuddy/glm-5.3-flash   # 峰时替补\n      - model: workbuddy-ai/hy3\n      - model: cursor/deepseek-v41-flash-1017\n\n  code_editor:\n    description: 生成或修改代码。\n    models:\n      - model: workbuddy/deepseek-v4.1-flash\n      - model: workbuddy/glm-5.3-flash\n      - model: auto/deepseek-v4.1-flash..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/规划质量兜底决策.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-10 决定在 src/graph.py 的 node_plan 后增加校验：当 hy3 输出解析失败、步骤数少于1或命中高复杂度关键词时，自动以 force_model='cursor/grok-4.7@256k' 重新规划。\n# 2026-11-10 (Tuesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: 我们要对现有的路由机制进行最终升级，目标是：引入分时定价策略（DeepSeek 谷/峰时段），将免费模型 hy3 引入规划器，并在峰时用 glm-5.3-flash 替代，同时加入质量兜底机制，保证规划可靠性。...\n...\n**user [peer=deepseek-harness-default-workspace]**: ...如果当前是 谷时，则保留原有顺序。\n\n第四步：在 src/graph.py 增加“规划质量兜底”\n因为我们把规划交给了免费的 hy3，为了防止它在复杂场景下漏步或规划不完整，请在 node_plan 节点后加一层校验：\n\n检查 hy3 的输出。如果解析失败，或者拆解出来的步骤数 steps 少于 1 步，或者系统判断这是一个需要深度推理的高复杂度任务（可以看 prompt 里是否包含特定的疑难杂症关键词），自动触发降级。\n\n降级逻辑：直接调用 router.run_tool('planner', messages, force_model='cursor/grok-4.7@256k')，让 Grok 重新规划一次。..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/10/路由升级实现完成.md",
+                "memory_type": "events",
+                "after": "# Summary\n助手于 2026-11-10 完成路由机制四步升级：修改 config.yaml、src/config.py、src/router.py、src/graph.py，新增 scheduling 配置、SchedulingConfig 数据类、时间感知路由与规划质量兜底；tests/test_scheduling.py 7项与 test_router.py 5项测试全部通过，模拟周二10:00峰时验证 file_reader 切换到 glm-5.3-flash。\n# 2026-11-10 (Tuesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: 我们要对现有的路由机制进行最终升级，目标是：引入分时定价策略（DeepSeek 谷/峰时段），将免费模型 hy3 引入规划器，并在峰时用 glm-5.3-flash 替代，同时加入质量兜底机制，保证规划可靠性。\n\n请按以下四个步骤完成代码改造：\n\n第一步：修改 config.yaml 引入调度策略\n增加全局 scheduling 配置段，并更新对应的工具模型池：\n\nyaml\nscheduling:\n  deepseek_peak_hours:\n    weekdays: [1, 2, 3, 4, 5]\n    peak_periods: [\"09:00-12:00\", \"14:00-18:00\"]\n  strategies:\n    planner_use_free_hy3: true\n    peak_use_glm_as_fallback: true\n\ntools:\n  planner:\n    description: 复杂任务的规划与推理。\n    models:\n      - model: openrouter/tencent/hy3-preview:free  # 免费规划主力\n      - model: cursor/grok-4.7@256k                  # 质量兜底\n    max_tokens: 4096\n    timeout: 300\n\n  file_reader:\n    description: 读取/摘要文本内容。\n    models:\n      - model: auto/deepseek-v4.1-flash  # 谷时主力，峰时由代码动态降级\n      - model: workbuddy/glm-5.3-flash   # 峰时替补\n      - model: workbuddy-ai/hy3\n      - model: cursor/deepseek-v41-flash-1017\n\n  code_editor:\n    description: 生成或修改代码。\n    models:\n      - model: workbuddy/deepseek-v4.1-flash\n      - model: workbuddy/glm-5.3-flash\n      - model: auto/deepseek-v4.1-flash\n    max_tokens: 4096\n    timeout: 300\n第二步：修改 src/config.py\n增加 SchedulingConfig 数据类，并在 OrchestratorConfig 中解析上述 YAML 配置，确保类型安全。\n\n第三步：改造 src/router.py 增加时间感知\n在 ModelRouter 类中增加动态池生成逻辑：\n\n编写一个 _is_deepseek_peak_time 方法，根据配置判断当前是否处于 DeepSeek 的峰时。\n\n在每次 run_tool 获取模型列表时，调用一个 _get_effective_models(tool_name) 方法：\n\n如果当前是 DeepSeek 峰时，且工具是 file_reader 或 code_editor，则跳过 deepseek-v4.1-flash，优先使用 glm-5.3-flash。\n\n如果当前是 谷时，则保留原有顺序。\n\n第四步：在 src/graph.py 增加“规划质量兜底”\n因为我们把规划交给了免费的 hy3，为了防止它在复杂场景下漏步或规划不完整，请在 node_plan 节点后加一层校验：\n\n检查 hy3 的输出。如果解析失败，或者拆解出来的步骤数 steps 少于 1 步，或者系统判断这是一个需要深度推理的高复杂度任务（可以看 prompt 里是否包含特定的疑难杂症关键词），自动触发降级。\n\n降级逻辑：直接调用 router.run_tool('planner', messages, force_model='cursor/grok-4.7@256k')，让 Grok 重新规划一次。\n\n在 Trace 中输出 [WARNING] hy3 规划异常或不够详尽，已自动升级给 grok-4.7 重新规划。\n\n请完成代码编写，并跑一次 mock 测试。测试时，请手动模拟一次峰时环境（比如在代码里临时 mock 一下时间），验证 file_reader 是否真的自动切到了 glm-5.3-flash。”\n...\n**assistant [peer=deepseek-harness-default-workspace]**: 分时定价调度已落地，峰时切换用注入的时间验证通过。\n\n## 改动\n\n**`config.yaml`** 新增 `scheduling` 段：工作日（ISO 周一=1）的 `09:00-12:00`、`14:00-18:00` 为 DeepSeek 峰时，`planner_use_free_hy3` 与 `peak_use_glm_as_fallback` 两个策略开关默认开启。`planner` 池改为 `openrouter/tencent/hy3-preview:free` 主力、`cursor/grok-4.7@256k` 兜底；`file_reader` 和 `code_editor` 都把 `workbuddy/glm-5.3-flash` 放进池里。\n\n**`src/config.py`** 新增 `DeepSeekPeakHours` 与 `SchedulingConfig` 两个 dataclass，`load_config` 解析 YAML 后挂到 `OrchestratorConfig.scheduling`，缺段时回落默认值。\n\n**`src/router.py`** 新增 `_is_deepseek_peak_time`（按本地时间判断，闭区间起点、开区间终点）和 `_get_effective_models`。峰时且策略开启时，`file_reader` / `code_editor` 跳过所有 `deepseek-v4.1-flash` 并把 `glm-5.3-flash` 提到队首；谷时、周末或策略关闭时保持原序。`run_tool` 增加 `force_model`（只调指定模型，规划兜底用）和 `now`（测试注入时间），冷却排序仍作用于有效池。\n\n**`src/graph.py`** 的 `node_plan` 在 `planner_use_free_hy3` 开启时调用 `plan_needs_fallback`：输出解析不出 JSON、拆出 0 步、或用户需求命中高复杂度关键词（死锁、深度推理、疑难、竞态、内存泄漏、递归爆栈、分布式事务）时，trace 输出 `[WARNING] hy3 规划异常或不够详尽，已自动升级给 grok-4.7 重新规划`，再以 `force_model='cursor/grok-4.7@256k'` 重规划一次。\n\n## 测试\n\n先写了 `tests/test_scheduling.py`，首次运行因 `DeepSeekPeakHours` 不存在而失败（RED），实现后 7 项全过：峰时 `file_reader` 池变为 `[glm-5.3-flash, hy3, cursor]` 且 flash 被剔除、谷时与周末保持原序、策略关闭不降级、`run_tool` 在模拟的周二 10:00 实际只调用 `workbuddy/glm-5.3-flash`、`force_model` 绕过池、规划兜底三种触发与正常规划不触发。原有 `tests/test_router.py` 5 项故障转移测试也全部通过，YAML 加载验证打印出的模型池与配置一致。"
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/entities/项目代码库/langgraph_orchestrator.md",
+                "memory_type": "entities",
+                "after": "# langgraph-orchestrator\n\nLangGraph + Magpie 多模型编排代码库，位于 D:\\repository\\skills\\dsh\\langgraph-orchestrator。\n\n## Description\n- 基于 LangGraph 的多模型编排架构，用于复杂任务的规划与工具调用。\n- 包含配置、路由、图执行三大核心模块。\n\n## Structure\n- config.yaml：全局配置，含 tools 模型池与 scheduling 调度段。\n- src/config.py：OrchestratorConfig 及 SchedulingConfig 数据类。\n- src/router.py：ModelRouter 类，负责模型池动态生成与时间感知。\n- src/graph.py：node_plan 等图节点，含规划质量兜底逻辑。\n\n## Tools\n- planner：主力 openrouter/tencent/hy3-preview:free，兜底 cursor/grok-4.7@256k。\n- file_reader：谷时主力 deepseek-v4.1-flash，峰时替补 glm-5.3-flash。\n- code_editor：含 deepseek-v4.1-flash 与 glm-5.3-flash。\n\n## Scheduling\n- DeepSeek 峰时：工作日（周一至五）09:00-12:00、14:00-18:00。\n- 峰时 file_reader/code_editor 跳过 deepseek-v4.1-flash，优先 glm-5.3-flash。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 6,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

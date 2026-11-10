@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-7dd9d0a5-d233-4e55-9d9a-d0e377e0dda5/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-10T06:14:31.209533+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/mcp_whitelist_bug.md",
+                "memory_type": "entities",
+                "after": "# MCP 工具白名单热改致工具失联\n在运行中的 DSH 会话里热改 MCP 工具白名单，会导致当前会话工具瞬间“失联”且需新开会话才能恢复。\n\n## 问题现象\n- seq 150 将 OPENVIKING_MCP_TOOL_ALLOW 改为 search,find,read,remember,write\n- seq 155 调 mcp__openviking__write 报 Error: Connection closed\n- seq 156 调 mcp__openviking__remember 报 Error: unknown tool \"mcp__openviking__remember\"\n- seq 169 改回原白名单后 seq 184 仅 find/read/search 回归，remember 与 write 在当前会话被永久踢出\n\n## 根因\n- MCP 代理的 tools/list 在客户端（DSH）启动或重连时拉取\n- 热改子进程环境变量后，当前会话 MCP 客户端不会重新拉取工具列表\n- 代理拒接新工具，而旧工具可能已被替换掉一起消失\n\n## 解决方案\n- 不要在运行中的会话改 MCP 工具白名单；应改好所有白名单后直接开新会话\n- 若必须在当前会话修，改完后在 AGENTS.md 写：工具报 UNKNOWN_TOOL 先检查是否刚改了 MCP 工具清单，必要时说明需重启会话\n- 当前会话已失联的工具（如 remember/write）只能绕开 MCP，用 pwsh 直接调 HTTP API 完成写入"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/powershell_utf8_bug.md",
+                "memory_type": "entities",
+                "before": "# PowerShell 5.1 重写 UTF-8 文件致中文乱码\nWindows PowerShell 5.1 默认按系统 ANSI 代码页（简体中文为 GBK）读写文件，不带 -Encoding UTF8 重写 UTF-8 源码/HTML 会把整份中文二次转码成乱码。\n\n## 问题根因\n- PS 5.1 的 Get-Content/Set-Content/Out-File 默认编码为系统 ANSI（GBK），按 GBK 解码 UTF-8 字节\n- 写回时按 GBK 编码，多字节中文被二次转码为乱码，损坏是整份文件而非局部\n- 在乱码基础上继续改会造成二次污染，无法逐字符修复\n\n## 解决方案\n- 禁止用 PowerShell 5.1 整文件重写 UTF-8 源码/HTML，改用 edit 工具做定点补丁\n- 若必须用 PowerShell，显式 Get-Content -Encoding UTF8 加 Set-Content -Encoding UTF8（注意 PS5.1 的 UTF8 带 BOM，源无 BOM 时需去掉）\n- 已改坏时恢复路径：用改动前完整副本还原，再只用 edit 打补丁，不尝试修乱码\n- 改完必须做编码体检：无 BOM、UTF-8 正常解码、关键中文词计数正确、乱码特征串计数为 0\n- 习惯：改中文文件前先 Get-Content -Encoding UTF8 确认内容读对再动手\n\n## 验证与归属\n- 验证：会话 12c5a5c9 用户用 PS5.1 重写 index.html 致中文乱码，已用改动前副本还原并仅用 edit 打补丁；校验无 BOM、UTF-8 正常、常量/买入/授权写入 计数正确、甯搁噺 乱码计数 0\n- 顺带在 README.md 补「数据到底存在哪」一节说明三个存放位置与刷新行为\n- 涉及文件：分析产出/持仓面板/index.html、分析产出/持仓面板/README.md\n- 来源会话ID：session-12c5a5c9-6a1b-48dd-a554-1fba34f5640e；代码基线：none",
+                "after": "# PowerShell 5.1 默认编码破坏 UTF-8 中文\nWindows PowerShell 5.1 默认按系统 ANSI 代码页（简体中文为 GBK）处理文本，在整文件重写与调用 HTTP 写入接口两种场景下都会把 UTF-8 中文字符破坏成乱码或问号。\n\n## 问题根因\n- PS 5.1 的 Get-Content/Set-Content/Out-File 默认编码为系统 ANSI（GBK），按 GBK 解码 UTF-8 字节\n- 写回时按 GBK 编码，多字节中文被二次转码为乱码，损坏是整份文件而非局部\n- 调用 HTTP 写入接口时，Invoke-RestMethod 默认按 ISO-8859-1 或 GBK 序列化 JSON 正文，UTF-8 中文被破坏（如读 profile.md 返回 # ????）\n- 在乱码基础上继续改会造成二次污染，无法逐字符修复\n\n## 解决方案\n- 禁止用 PowerShell 5.1 整文件重写 UTF-8 源码/HTML，改用 edit 工具做定点补丁\n- 若必须用 PowerShell，显式 Get-Content -Encoding UTF8 加 Set-Content -Encoding UTF8（注意 PS5.1 的 UTF8 带 BOM，源无 BOM 时需去掉）\n- 已改坏时恢复路径：用改动前完整副本还原，再只用 edit 打补丁，不尝试修乱码\n- 改完必须做编码体检：无 BOM、UTF-8 正常解码、关键中文词计数正确、乱码特征串计数为 0\n- 习惯：改中文文件前先 Get-Content -Encoding UTF8 确认内容读对再动手\n\n## 调用写入 API 解决方案\n- 调 OpenViking 等 HTTP 写入接口时，JSON 必须先 [System.Text.Encoding]::UTF8.GetBytes($json) 转字节流\n- 再用 Invoke-WebRequest -Method Post -Uri $url -ContentType 'application/json; charset=utf-8' -Body $bytes 发送字节，不用 Invoke-RestMethod 默认编码\n- 若坚持用 Invoke-RestMethod，脚本开头需 $OutputEncoding = [System.Text.Encoding]::UTF8 与 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8，但显式字节流更稳\n- 验证：seq 191 改用字节流后 seq 194 返回 200、seq 202 中文正常\n\n## 验证与归属\n- 验证：会话 12c5a5c9 用户用 PS5.1 重写 index.html 致中文乱码，已用改动前副本还原并仅用 edit 打补丁；校验无 BOM、UTF-8 正常、常量/买入/授权写入 计数正确、甯搁噺 乱码计数 0\n- API 验证：seq 187 读 profile.md 中文成问号，seq 191 改字节流、seq 194 OK 200、seq 202 中文正常\n- 顺带在 README.md 补「数据到底存在哪」一节说明三个存放位置与刷新行为\n- 涉及文件：分析产出/持仓面板/index.html、分析产出/持仓面板/README.md\n- 来源会话ID：session-12c5a5c9-6a1b-48dd-a554-1fba34f5640e；代码基线：none"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,54 @@
+# Summary
+用户要求把 planner 池 hy3 的 max_tokens 限制到 2048，并在 node_plan System Prompt 强硬要求输出精简 JSON 数组、最多 5 步。助手于 2026-11-10 完成：config.yaml 中 planner 池 max_tokens 由 4096 改为 2048（同时套在 hy3 与兜底 grok-4.7），PLANNER_SYSTEM 改为仅输出 JSON 数组、禁解释与 Markdown、1-5 步，node_plan 仅留前 5 步。
+# 2026-11-10 (Tuesday) ChatLog:
+**user [peer=deepseek-harness-default-workspace]**: 这份投影报告很有价值。为了提高我们系统的可观测性（Observability）并压榨成本，请立刻做以下三件事：
+
+1. 编排器内部调用落盘（解决黑盒问题）
+我们现在有 model_calls 和 usage_totals 了，但只存在于内存和 CLI 输出里。
+请在 src/api.py 的 run_full 结束时，把 model_calls（包含 role, model, elapsed, usage）以 JSONL 格式追加写入到 .sessions/<session_id>.costs.jsonl（或者统一的 .costs/ 目录）。这样，我们后续就能通过脚本按工具（planner/code_editor）或按模型（hy3/flash）做长线成本报表。
+
+2. 调查高 Token 未命中（Cache Miss）
+针对 4aa52982（未命中 38 万）和 5b8643ac 这两个会话。请检查一下：当 file_reader 读取大型文件并返回给主模型时，是否有没有做截断？如果是，请立刻在 file_reader 的返回处理里，加上 头尾各保留 2000 字符 的硬截断逻辑，防止大文件直接撑爆 Grok 的上下文。
+
+3. 给 hy3 加上“紧箍咒”
+hy3 虽然免费，但在某些任务（如 0b07842d）输出了 3.1 万 token，太啰嗦了。请在 planner 的工具配置 max_tokens 里，把 hy3 所在池的 max_tokens 限制到 2048。并在 node_plan 的 System Prompt 中强硬要求：输出计划必须是精简的 JSON 数组，禁止输出任何解释性废话，最多不超过 5 步。
+
+改完并测试通过后，请告诉我怎么运行一段 Python 脚本，把刚才的 .costs.jsonl 聚合打印成一张清晰的《工具 × 模型 × Token 消耗账单》。
+...
+**assistant [peer=deepseek-harness-default-workspace]**: 三处都已改完，并通过语法检查和一次不联网的行为验证：`planner.max_tokens` 读出来是 2048，头尾截断和 JSONL 追加都按预期工作。本机没有 pytest，所以没有跑 `tests/` 里那套完整用例。
+
+## 1. 调用落盘
+
+`run_full` 结束时把每次 `model_call` 追加一行到 `.sessions/<session_id>.costs.jsonl`。没有合法 session id 时写到 `anonymous.costs.jsonl`。每行包含 `ts`、`session_id`、`role`、`tool`、`model`、`ok`、`elapsed`、`usage`。
+
+## 2. 未命中调查：不是 file_reader
+
+`4aa52982` 和 `5b8643ac` 的未命中发生在宿主 `cursor/grok-4.7@256k` 上，不是编排器的 file_reader。这里的 file_reader 并不读磁盘，它只是一个摘要模型。真正把命令输出送回模型的是 pwsh，而它本来就有头尾各 1000 字的 `_clip`。
+
+这次仍按你的要求加了截断：file_reader 写进步骤结果之前，以及 summarize 的最终答复，都改成头尾各保留 2000 字。这挡不住那两个会话已经发生的未命中。
+
+## 3. hy3 的长度限制
+
+`config.yaml` 里 planner 池的 `max_tokens` 从 4096 改为 2048。这个上限同时套在池里的 hy3 和兜底的 grok-4.7 上。`PLANNER_SYSTEM` 现在要求只输出 JSON 数组，禁止解释和 Markdown，步骤数 1 到 5。`node_plan` 解析后也会再切一刀，只留前 5 步。
+
+## 账单
+
+下一次 `run_full` 才会产生 jsonl。在 `D:\repository\skills\dsh\langgraph-orchestrator` 下执行：
+
+```powershell
+python scripts/cost_bill.py
+```
+
+脚本会把 `.sessions/*.costs.jsonl` 打成一张表，列是工具/角色、模型、调用次数、prompt、completion、耗时、缺 usage 的次数。
+
+<!-- MEMORY_FIELDS
+{
+  "event_name": "hy3最大令牌限制",
+  "goal": "压缩hy3冗余输出",
+  "summary": "用户要求把 planner 池 hy3 的 max_tokens 限制到 2048，并在 node_plan System Prompt 强硬要求输出精简 JSON 数组、最多 5 步。助手于 2026-11-10 完成：config.yaml 中 planner 池 max_tokens 由 4096 改为 2048（同时套在 hy3 与兜底 grok-4.7），PLANNER_SYSTEM 改为仅输出 JSON 数组、禁解释与 Markdown、1-5 步，node_plan 仅留前 5 步。",
+  "ranges": "0-5,57-64",
+  "source_extraction_id": "37e5e36be0754b7990cf67134d6a274f",
+  "version": 1,
+  "memory_type": "events"
+}
+-->

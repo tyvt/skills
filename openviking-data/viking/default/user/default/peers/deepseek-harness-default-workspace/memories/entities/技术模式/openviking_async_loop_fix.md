@@ -5,6 +5,7 @@ OpenViking 0.5.3 console raised RuntimeError "Task attached to a different loop"
 - openviking console logged ERROR "Task exception was never retrieved" with RuntimeError("Task <Task pending...> attached to a different loop")
 - Traceback from aiohttp client.py:1593 close() -> connector.py:1083 close(); internal aiohttp ClientSession bound to the server's main loop
 - Triggered when the watchdog restarted OpenViking at 16:58 and 17:18 on 2026-11-09; error log timestamp 2026-11-09 17:59:35
+- User pasted the same "Task exception was never retrieved" / "attached to a different loop" traceback (client.py:1593 -> connector.py:1083) again on 2026-11-10 03:29; the recurring error was later root-caused to a separate LiteLLM embedder aiohttp cross-loop close in litellm_embedders.py (see openviking_litellm_loop_fix), so the async_client_cache patch alone was insufficient
 
 ## Root Cause
 - openviking/utils/async_client_cache.py: close_all() (line 132) calls asyncio.run(self._close_clients(...)) (line 146) when no running loop exists, creating a new loop to close clients
@@ -24,11 +25,11 @@ OpenViking 0.5.3 console raised RuntimeError "Task attached to a different loop"
 
 <!-- MEMORY_FIELDS
 {
-  "peer_id": "deepseek-harness-default-workspace",
   "category": "技术模式",
   "name": "openviking_async_loop_fix",
-  "source_extraction_id": "30ff07316c0c48b7b69f8a74b22e5fcd",
-  "version": 1,
+  "source_extraction_id": "10a5b6db04964ff69bb531bc5aeb19fe",
+  "peer_id": "deepseek-harness-default-workspace",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

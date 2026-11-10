@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/mcp-store-e9d8ae64073c/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-10T12:17:08.167081+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/events/2026/11/10/本机构建止损规则写入技能.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于2026-11-10复盘bug6402：本机vite-build在version.json后卡死，用Out-String|Select-Object缓冲管道加job_output长轮询，触发3次compaction，等效成本约1.03M（历史167k的6.2倍）。用户要求将P0写进agent-cost-hygiene技能：默认不跑本机npm test；若跑则建日志目录、Start-Process、30s查CPU；cost-meter首次约150k警告即止损。助手同日报已写入D:\\repository\\skills\\agent-cost-hygiene\\SKILL.md「本机构建与止损」和tool-call-hygiene的GIT_EDITOR/缓冲管道两行，尚未提交。\n# 2026-11-10 (Tuesday) ChatLog:\n**user**: bug6402 复盘：等效成本约 1.03M（历史 167k 的 6.2 倍）。主因是本机 vite-build 在 version.json 后卡死，用 Out-String|Select-Object 缓冲管道加 job_output 长轮询，触发 3 次 compaction。要求把 P0 写进 skill：默认不跑本机 npm test；若跑则建日志目录、Start-Process、30s 查 CPU；cost-meter 首次约 150k 警告即止损。\n**assistant**: 已写入 D:\\repository\\skills\\agent-cost-hygiene\\SKILL.md「本机构建与止损」和 tool-call-hygiene 的 GIT_EDITOR / 缓冲管道两行。尚未提交。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/vite_build_stuck.md",
+                "memory_type": "entities",
+                "after": "# vite build 本机卡死引发成本溢出\n本机 vite-build 在 version.json 后卡死，配合缓冲管道与长轮询触发多次 compaction，导致等效成本激增至约 1.03M。\n\n## 问题根因\n- 本机 vite-build 在生成 version.json 后卡死，未正常退出\n- 使用 `Out-String|Select-Object` 缓冲管道加 job_output 长轮询，加剧阻塞\n- 触发 3 次 compaction，等效成本约 1.03M（历史基线 167k 的 6.2 倍）\n\n## 止损规则（P0）\n- 默认不跑本机 npm test\n- 若必须跑：建日志目录、用 Start-Process 启动、每 30s 查 CPU\n- cost-meter 首次约 150k 等效成本警告即止损\n\n## 归属与验证\n- 来源：bug6402 复盘（2026-11-10）\n- 已写入 D:\\repository\\skills\\agent-cost-hygiene\\SKILL.md「本机构建与止损」与 tool-call-hygiene 的 GIT_EDITOR / 缓冲管道两行（尚未提交）"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/default/本机构建与测试规范.md",
+                "memory_type": "preferences",
+                "after": "- 默认不运行本机 npm test（2026-11-10 要求写入 skill 的 P0 规则）。\n- 若必须运行本机构建/测试：先建立日志目录，用 Start-Process 启动，每 30s 查询 CPU 占用。\n- cost-meter 首次约 150k 等效成本警告即止损，不继续放任。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/openviking_import_deadlock_recovery.md",
+                "memory_type": "entities",
+                "before": "# OpenViking导入并发提交死锁与恢复\n驱动脚本超时未中止或队列堆积导致任务死锁，通过停服改磁盘任务JSON标cancelled（无BOM）并重启恢复，并新增preflight门禁防复发。\n\n## 问题根因\n- import-to-ov.mjs 第126行for循环超时后未break，任务持续堆积；同会话1个running加多个pending互相卡死\n- PowerShell ConvertTo-Json重写任务文件写入UTF-8 BOM，Python json.loads无法解析致服务启动崩溃\n\n## 队列与接口限制\n- SessionCommit队列堆积与历史dsh-session commit抢VLM max_concurrent=4越跑越失败\n- OV session_commit 报 Connection error（VLM/Magpie链路异常或1933宕机）时批量写入失败\n- Cancel API 返回 403 ROOT may not cancel tasks，须重启服务清队列；ov-drain-commit-queue.mjs 亦返此错，因队列中30个 dsh-session-* 为真实线上 Web 会话，导入占满 commit 单通道致线上会话排在后面\n\n## 恢复措施\n- 停驱动脚本/停服，将卡死任务JSON标记cancelled（UTF-8 无 BOM），须先停服再改文件再重启（单实例占openviking.lock）\n- 脚本 ov-cancel-stuck-commit-tasks.mjs 将 pending/running 的 session_commit 标 cancelled，曾一次取消111个\n- 断点续跑：done文件记录已完成批次自动跳过断点；repair等主tail跑完再补\n\n## 门禁与验证\n- 导入门禁 ov-import-preflight.mjs 检查1933 health + 3425探针 + 队列深度，已接入 import-to-ov.mjs 每项目导入前自动preflight，--skip-preflight 可跳过\n- commit_queue=0 时 preflight 放行；Embedding 在 ov observer queue 有 backlog 属正常\n\n## 限流与重算风险\n- 2026-11-05会话fe39d020撞15次RATE_LIMIT(429)，compaction反复27次、产出比2.1%；建议连续429时换provider同名模型继续而非原地重试，批量任务应拆批\n- 同会话重复整读38次、会话d47c475c重复整读104次，须同文件同会话只整读一次后续用offset/limit切片\n\n## 2026-11-06导入失败实例\n- import-to-ov（pwsh-4c3697f2dccf4567）于2026-11-06约10:06 completed exit 1；苏州市房地产监测V3 第110/168批commit失败：500 INTERNAL lock I/O error（锁文件 .exact.ovlock）\n- 产品2.0 AUTO续跑30/43提交超时中止（task 7e6a6da5），done 219/282\n- 本轮4/99项目记为成功：产品2.0(282)、苏住房C(382)、苏住房G(261)、苏州市房地产监测V3(669)\n- import-local-sources-state.json finishedAt 2026-11-06 10:06:22 +08:00；OV preflight ok但commit_queue=1，锁I/O 500说明数据目录/锁文件可能损坏或并发残留\n- 上述10:06失败run已于2026-11-06 14:30由 pwsh-fdd5d5130e5b4bae（exit 0）续跑收尾完成；随后自动起 pwsh-be983e783496464d 全量覆盖99个Cursor项目\n\n## 验证与归属\n- 观察来源：2026-11-02导入会话、2026-11-04/05恢复会话、2026-11-05排查会话fe39d020、2026-11-06定时汇报；涉及服务：OpenViking、Ollama、Magpie/VLM\n- 2026-11-09 审计确认：debug/health=false 误报源于此恢复遗留的 Embedding Errors=2 历史计数未清零；Requeued 1008 为本次恢复重放尾巴，12:57→13:11 冻结无新增",
+                "after": "# OpenViking导入并发提交死锁与恢复\n驱动脚本超时未中止或队列堆积导致任务死锁，通过停服改磁盘任务JSON标cancelled（无BOM）并重启恢复，并新增preflight门禁防复发。\n\n## 问题根因\n- import-to-ov.mjs 第126行for循环超时后未break，任务持续堆积；同会话1个running加多个pending互相卡死\n- PowerShell ConvertTo-Json重写任务文件写入UTF-8 BOM，Python json.loads无法解析致服务启动崩溃\n\n## 队列与接口限制\n- SessionCommit队列堆积与历史dsh-session commit抢VLM max_concurrent=4越跑越失败\n- OV session_commit 报 Connection error（VLM/Magpie链路异常或1933宕机）时批量写入失败\n- Cancel API 返回 403 ROOT may not cancel tasks，须重启服务清队列；ov-drain-commit-queue.mjs 亦返此错，因队列中30个 dsh-session-* 为真实线上 Web 会话，导入占满 commit 单通道致线上会话排在后面\n\n## 恢复措施\n- 停驱动脚本/停服，将卡死任务JSON标记cancelled（UTF-8 无 BOM），须先停服再改文件再重启（单实例占openviking.lock）\n- 脚本 ov-cancel-stuck-commit-tasks.mjs 将 pending/running 的 session_commit 标 cancelled，曾一次取消111个\n- 断点续跑：done文件记录已完成批次自动跳过断点；repair等主tail跑完再补\n\n## 门禁与验证\n- 导入门禁 ov-import-preflight.mjs 检查1933 health + 3425探针 + 队列深度，已接入 import-to-ov.mjs 每项目导入前自动preflight，--skip-preflight 可跳过\n- commit_queue=0 时 preflight 放行；Embedding 在 ov observer queue 有 backlog 属正常\n\n## 限流与重算风险\n- 2026-11-05会话fe39d020撞15次RATE_LIMIT(429)，compaction反复27次、产出比2.1%；建议连续429时换provider同名模型继续而非原地重试，批量任务应拆批\n- 同会话重复整读38次、会话d47c475c重复整读104次，须同文件同会话只整读一次后续用offset/limit切片\n\n## 2026-11-06导入失败实例\n- import-to-ov（pwsh-4c3697f2dccf4567）于2026-11-06约10:06 completed exit 1；苏州市房地产监测V3 第110/168批commit失败：500 INTERNAL lock I/O error（锁文件 .exact.ovlock）\n- 产品2.0 AUTO续跑30/43提交超时中止（task 7e6a6da5），done 219/282\n- 本轮4/99项目记为成功：产品2.0(282)、苏住房C(382)、苏住房G(261)、苏州市房地产监测V3(669)\n- import-local-sources-state.json finishedAt 2026-11-06 10:06:22 +08:00；OV preflight ok但commit_queue=1，锁I/O 500说明数据目录/锁文件可能损坏或并发残留\n- 上述10:06失败run已于2026-11-06 14:30由 pwsh-fdd5d5130e5b4bae（exit 0）续跑收尾完成；随后自动起 pwsh-be983e783496464d 全量覆盖99个Cursor项目\n\n## 验证与归属\n- 观察来源：2026-11-02导入会话、2026-11-04/05恢复会话、2026-11-05排查会话fe39d020、2026-11-06定时汇报；涉及服务：OpenViking、Ollama、Magpie/VLM\n- 2026-11-09 审计确认：debug/health=false 误报源于此恢复遗留的 Embedding Errors=2 历史计数未清零；Requeued 1008 为本次恢复重放尾巴，12:57→13:11 冻结无新增"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}
