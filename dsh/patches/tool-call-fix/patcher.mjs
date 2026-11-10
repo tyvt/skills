@@ -5,11 +5,20 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 const home = path.dirname(fileURLToPath(import.meta.url));
 export const hash = text => createHash('sha256').update(text).digest('hex');
+const PATCH_TARGETS = ['dsh-tools', 'dsh-tools-pipeline', 'dsh-llm-pi-ai', 'dsh-sandbox', 'dsh-tool-fs', 'dsh-tool-fs-search', 'dsh-tool-session-query'];
+function resolvePatchFile(resolve, patch) {
+  const pkg = patch.resolveAs ?? (patch.name === 'dsh-tools-pipeline' ? 'dsh-tools' : patch.name);
+  const main = fs.realpathSync(resolve.resolve('@deepseek-ai/' + pkg));
+  const pkgRoot = path.dirname(path.dirname(main));
+  return path.join(pkgRoot, patch.relpath ?? 'lib/index.js');
+}
 export function planPatch(entry, manifest = JSON.parse(fs.readFileSync(path.join(home, 'manifest.json'), 'utf8'))) {
   const resolve = createRequire(path.resolve(entry));
-  return manifest.patches.map(({ name, edits }) => {
-    if (!['dsh-tools', 'dsh-llm-pi-ai', 'dsh-sandbox', 'dsh-tool-fs', 'dsh-tool-fs-search', 'dsh-tool-session-query'].includes(name)) throw new Error('Unexpected patch target: ' + name);
-    const file = fs.realpathSync(resolve.resolve('@deepseek-ai/' + name));
+  return manifest.patches.map(patch => {
+    const { name, edits } = patch;
+    if (!PATCH_TARGETS.includes(name)) throw new Error('Unexpected patch target: ' + name);
+    const file = resolvePatchFile(resolve, patch);
+    if (!fs.existsSync(file)) throw new Error('DSH tool-call fix requires compatibility review: ' + name + ' (' + (patch.relpath ?? 'lib/index.js') + ' missing). No files were changed.');
     const original = fs.readFileSync(file, 'utf8');
     let next = original;
     for (const { before, after } of edits) {

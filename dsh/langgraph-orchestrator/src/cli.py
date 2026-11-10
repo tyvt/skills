@@ -8,9 +8,15 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import sys
 from pathlib import Path
+
+if hasattr(sys.stdout, "buffer"):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "buffer"):
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 from .config import load_config
 from .router import ModelRouter
@@ -67,6 +73,13 @@ def main(argv=None) -> int:
     print("\n=== RESULT (per step) ===")
     for i, r in enumerate(final_state.get("results", [])):
         print(f"[{i+1}] tool={r['tool']} model={r.get('model_used')} ok={r['ok']}")
+    print("\n=== MODEL CALLS ===")
+    for c in final_state.get("model_calls", []):
+        u = c.get("usage") or {}
+        print(
+            f"  {c.get('role')} model={c.get('model')} elapsed={c.get('elapsed')}s "
+            f"prompt={u.get('prompt_tokens')} completion={u.get('completion_tokens')}"
+        )
     print("\n=== FINAL ===")
     print(final_state.get("final", ""))
     return 0

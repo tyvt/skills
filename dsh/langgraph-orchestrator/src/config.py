@@ -42,6 +42,7 @@ class ToolSpec:
     # 工具级超时(秒)：该工具下所有模型默认用它，模型条目可再单独覆盖。
     # 未设置时回落到 gateway.request_timeout。
     timeout: Optional[float] = None
+    local: bool = False
 
     def model_ids(self) -> List[str]:
         return [m.model for m in self.models]
@@ -57,11 +58,45 @@ class GatewayConfig:
 
 
 @dataclass
+class SecurityConfig:
+    guard_tool: str = "security_guard"
+    fast_guard_tool: str = ""
+    guarded_tools: List[str] = field(default_factory=lambda: ["pwsh", "db_write"])
+    deny_regex: List[str] = field(default_factory=list)
+
+
+@dataclass
+class ExecutionConfig:
+    mock_execution: bool = True
+    pwsh_timeout: float = 30.0
+
+
+@dataclass
+class DeepSeekPeakHours:
+    """DeepSeek 峰时窗口。weekdays 为 ISO 编号(周一=1 ... 周日=7)。"""
+    weekdays: List[int] = field(default_factory=lambda: [1, 2, 3, 4, 5])
+    peak_periods: List[str] = field(
+        default_factory=lambda: ["09:00-12:00", "14:00-18:00"]
+    )
+
+
+@dataclass
+class SchedulingConfig:
+    """分时定价调度策略。"""
+    deepseek_peak_hours: DeepSeekPeakHours = field(default_factory=DeepSeekPeakHours)
+    planner_use_free_hy3: bool = False
+    peak_use_glm_as_fallback: bool = False
+
+
+@dataclass
 class OrchestratorConfig:
     gateway: GatewayConfig
     defaults_temperature: float
     defaults_max_tokens: int
     tools: Dict[str, ToolSpec]
+    security: SecurityConfig = field(default_factory=SecurityConfig)
+    execution: ExecutionConfig = field(default_factory=ExecutionConfig)
+    scheduling: SchedulingConfig = field(default_factory=SchedulingConfig)
 
     def tool(self, name: str) -> ToolSpec:
         if name not in self.tools:
@@ -104,7 +139,8 @@ def load_config(path: str) -> OrchestratorConfig:
                     retry_on=list(m.get("retry_on", [])),
                 )
             )
-        if not models:
+        local = bool(t.get("local", False))
+        if not models and not local:
             raise ValueError(f"工具 {name!r} 未配置任何模型")
         tools[name] = ToolSpec(
             name=name,
@@ -113,11 +149,43 @@ def load_config(path: str) -> OrchestratorConfig:
             temperature=t.get("temperature"),
             max_tokens=t.get("max_tokens"),
             timeout=t.get("timeout"),
+            local=local,
         )
+
+    sec_raw = raw.get("security", {}) or {}
+    security = SecurityConfig(
+        guard_tool=str(sec_raw.get("guard_tool", "security_guard")),
+        fast_guard_tool=str(sec_raw.get("fast_guard_tool", "")),
+        guarded_tools=list(sec_raw.get("guarded_tools", ["pwsh", "db_write"])),
+        deny_regex=list(sec_raw.get("deny_regex", [])),
+    )
+
+    ex_raw = raw.get("execution", {}) or {}
+    execution = ExecutionConfig(
+        mock_execution=bool(ex_raw.get("mock_execution", True)),
+        pwsh_timeout=float(ex_raw.get("pwsh_timeout", 30)),
+    )
+
+    sch_raw = raw.get("scheduling", {}) or {}
+    peak_raw = sch_raw.get("deepseek_peak_hours", {}) or {}
+    strat = sch_raw.get("strategies", {}) or {}
+    scheduling = SchedulingConfig(
+        deepseek_peak_hours=DeepSeekPeakHours(
+            weekdays=[int(d) for d in peak_raw.get("weekdays", [1, 2, 3, 4, 5])],
+            peak_periods=[str(p) for p in peak_raw.get(
+                "peak_periods", ["09:00-12:00", "14:00-18:00"]
+            )],
+        ),
+        planner_use_free_hy3=bool(strat.get("planner_use_free_hy3", False)),
+        peak_use_glm_as_fallback=bool(strat.get("peak_use_glm_as_fallback", False)),
+    )
 
     return OrchestratorConfig(
         gateway=gateway,
         defaults_temperature=dt,
         defaults_max_tokens=dm,
         tools=tools,
+        security=security,
+        execution=execution,
+        scheduling=scheduling,
     )

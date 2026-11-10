@@ -26,7 +26,7 @@ export const inject = ['tools']
 
 const TOOL_NAME = 'orchestrate'
 const ALLOWED_OPS = ['full', 'tool', 'list']
-const TOOL_NAMES = ['planner', 'code_editor', 'file_reader', 'image_analyst']
+const TOOL_NAMES = ['planner', 'code_editor', 'file_reader', 'image_analyst', 'pwsh']
 
 /**
  * 用子进程跑 Python JSON 桥，stdin 吃 JSON，stdout 吐 JSON。
@@ -35,6 +35,30 @@ const TOOL_NAMES = ['planner', 'code_editor', 'file_reader', 'image_analyst']
  * @param {AbortSignal} [signal]
  * @returns {Promise<object>} python 返回的 JSON 对象
  */
+function hostSessionId(exec) {
+  const found = [
+    exec?.agent?.id,
+    exec?.sessionId,
+    exec?.session?.id,
+    exec?.session?.sessionId,
+  ].find((value) => typeof value === 'string' && value.trim())
+  return found ? found.trim() : ''
+}
+
+const sessionQueues = new Map()
+
+function enqueueSession(sessionId, task) {
+  if (!sessionId) return task()
+  const previous = sessionQueues.get(sessionId) || Promise.resolve()
+  const current = previous.catch(() => undefined).then(task)
+  sessionQueues.set(sessionId, current)
+  const release = () => {
+    if (sessionQueues.get(sessionId) === current) sessionQueues.delete(sessionId)
+  }
+  current.then(release, release)
+  return current
+}
+
 function callPython(config, payload, signal) {
   return new Promise((resolve, reject) => {
     const args = ['-X', 'utf8', '-m', 'src.jsonbridge']
@@ -95,8 +119,17 @@ function callPython(config, payload, signal) {
   })
 }
 
+function renderUsage(usage) {
+  if (!usage || typeof usage !== 'object') return ''
+  const prompt = usage.prompt_tokens
+  const completion = usage.completion_tokens
+  if (prompt == null && completion == null) return ''
+  return `[Tokens] Prompt: ${prompt ?? '-'}, Completion: ${completion ?? '-'}`
+}
+
 /** 把编排结果渲染成给模型读的紧凑文本。 */
 function renderResult(result, verbose) {
+  const usageLine = renderUsage(result.usage)
   if (result.mode === 'list') {
     const lines = [`编排器网关: ${result.gateway}`]
     for (const [tool, info] of Object.entries(result.tools)) {
@@ -115,6 +148,7 @@ function renderResult(result, verbose) {
       }
     }
     lines.push('', result.content)
+    if (usageLine) lines.push('', usageLine)
     return lines.join('\n')
   }
   // full
@@ -135,6 +169,7 @@ function renderResult(result, verbose) {
     lines.push('')
   }
   lines.push(result.final || '(无结果)')
+  if (usageLine) lines.push('', usageLine)
   return lines.join('\n')
 }
 
@@ -191,15 +226,21 @@ export function apply(ctx, config) {
       }
       if (op === 'tool') {
         if (!args.tool) throw new Error('orchestrate: op=tool 需要 tool 参数')
+        const sessionId = hostSessionId(exec)
         const result = await callPython(
           config,
-          { op: 'tool', tool: args.tool, request: args.request },
+          { op: 'tool', tool: args.tool, request: args.request, session_id: sessionId },
           exec.signal,
         )
         return renderResult(result, config.verbose)
       }
       // full
-      const result = await callPython(config, { op: 'full', request: args.request }, exec.signal)
+      const sessionId = hostSessionId(exec)
+      const result = await enqueueSession(sessionId, () => callPython(config, {
+        op: 'full',
+        request: args.request,
+        session_id: sessionId,
+      }, exec.signal))
       return renderResult(result, config.verbose)
     },
     presentCall: (args) => ({

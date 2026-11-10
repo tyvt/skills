@@ -17,10 +17,16 @@
         {
           "before": "if (violations.length > 0) throw new ToolArgsError(violations);",
           "after": "if (violations.length > 0) {\n                const error = new ToolArgsError(violations);\n                const required = (parameters.required ?? []).map(key => key + \" (\" + (parameters.properties?.[key]?.type ?? \"see schema\") + \")\").join(\", \");\n                error.message += '\\nTool \"' + options.name + '\" was not executed. Send a JSON object using the declared parameter names. Required parameters: ' + (required || \"none\") + '.';\n                if (typeof args === \"string\") error.message += \"\\nArgument parsing diagnostic: \" + args.slice(0, 1600);\n                throw error;\n            }"
-        },
+        }
+      ]
+    },
+    {
+      "name": "dsh-tools-pipeline",
+      "relpath": "lib/pipeline.js",
+      "edits": [
         {
-          "before": "if (!tool) throw new ToolNotFoundError(exec.name);",
-          "after": "if (!tool) {\n                const names = this.schemas(exec.agent).filter(schema => !this.collapses(schema.name, exec.agent, exec.parent !== void 0)).map(schema => schema.name);\n                throw new ToolNotFoundError(exec.name, \"currently callable tools: \" + (names.join(\", \") || \"none\") + \". Use a name from this list and its declared parameters.\");\n            }"
+          "before": "const tool = this.resolveExecution(exec.name, exec.agent, exec.parent !== void 0, exec.toolSet);\n\t\t\tif (!tool) throw new ToolNotFoundError(exec.name);",
+          "after": "const tool = this.resolveExecution(exec.name, exec.agent, exec.parent !== void 0, exec.toolSet);\n\t\t\tif (!tool) {\n                const names = this.tools.schemas(exec.agent, exec.toolSet).map(schema => schema.name);\n                throw new ToolNotFoundError(exec.name, \"currently callable tools: \" + (names.join(\", \") || \"none\") + \". Use a name from this list and its declared parameters.\");\n            }"
         }
       ]
     },

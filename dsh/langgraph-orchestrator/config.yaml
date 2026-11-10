@@ -20,6 +20,15 @@ defaults:
   temperature: 0.2
   max_tokens: 2048
 
+# 分时定价调度。weekdays 用 ISO 编号(周一=1 ... 周日=7)，时段为本地时间闭区间起点、开区间终点。
+scheduling:
+  deepseek_peak_hours:
+    weekdays: [1, 2, 3, 4, 5]
+    peak_periods: ["09:00-12:00", "14:00-18:00"]
+  strategies:
+    planner_use_free_hy3: true      # 规划器以免费 hy3 为主力
+    peak_use_glm_as_fallback: true  # 峰时 file_reader/code_editor 跳过 deepseek-v4.1-flash
+
 # --- 工具定义 ---------------------------------------------------------------
 # 每个工具：
 #   description: 给路由/规划模型看的工具说明
@@ -29,34 +38,34 @@ defaults:
 #                  - retry_on:      命中这些子串时视为失败并降级(默认含 common 错误)
 tools:
 
-  # 轻量：读文件/摘要/格式化 —— 用便宜的 flash 档，备用同样廉价
+  # 轻量：读文件/摘要/格式化
+  # 谷时 deepseek-v4.1-flash 为主力；峰时由路由器跳过它，改用 glm-5.3-flash
   file_reader:
-    description: 读取/摘要文本内容，做轻量理解与格式化。
+    description: 读取/摘要文本内容。
     models:
       - model: auto/deepseek-v4.1-flash
+      - model: workbuddy/glm-5.3-flash
       - model: workbuddy-ai/hy3
       - model: cursor/deepseek-v41-flash-1017
 
-  # 代码生成/改写 —— 首选强模型，降级到同档
+  # 代码生成/改写。峰时同样跳过 deepseek-v4.1-flash，优先 glm-5.3-flash
   code_editor:
-    description: 生成或修改代码，需要较强推理与代码能力。
+    description: 生成或修改代码。
     models:
       - model: workbuddy/deepseek-v4.1-flash
+      - model: workbuddy/glm-5.3-flash
       - model: auto/deepseek-v4.1-flash
-      - model: cursor/deepseek-v41-flash-1017
-      - model: minimax-code/MiniMax-M3.1-Flash
     max_tokens: 4096
     # 代码生成可能耗时较长，单独放宽超时到 300 秒(覆盖 gateway.request_timeout)
     timeout: 300
 
-  # 复杂推理/规划 —— 首选长上下文/强模型(grok 256k)，多档降级
+  # 复杂推理/规划。免费 hy3 为主力，grok-4.7 做质量兜底(见 graph.node_plan)
   planner:
-    description: 复杂任务的规划与推理，需要长上下文与强推理。
+    description: 复杂任务的规划与推理。
     models:
+      - model: openrouter/tencent/hy3-preview:free
+        max_tokens: 2048
       - model: cursor/grok-4.7@256k
-      - model: workbuddy-ai/hy4free
-      - model: auto/hy3
-      - model: autoclaw-cn/zai_glm-5.3-flash
     max_tokens: 4096
     # 复杂规划推理耗时长，单独放宽超时到 300 秒(覆盖 gateway.request_timeout)
     timeout: 300
@@ -68,3 +77,53 @@ tools:
     models:
       - model: cursor/deepseek-v41-flash-1017
     max_tokens: 4096
+
+  # 审查节点专用，不进规划工具列表。只挂 grok-4.7，不做故障转移。
+  security_guard:
+    description: 审查 pwsh / 写库参数，只输出 JSON。
+    models:
+      - model: cursor/grok-4.7@256k
+    max_tokens: 512
+    timeout: 60
+
+  # 写操作一审。明确安全才放行，拿不准或失败由 security_guard 终审。
+  security_guard_fast:
+    description: 写操作一审，只输出 JSON。
+    models:
+      - model: workbuddy/deepseek-v4.1-flash
+    max_tokens: 256
+    timeout: 30
+
+  git:
+    description: >
+      本地只读 Git 摘要，不经模型。默认只执行 git status --short 与 git diff --stat，
+      超过 20 行截断。rebase 或 stash 冲突只返回冲突文件名和 Conflict detected。
+      不要用它执行 pull、rebase、push。
+    local: true
+
+  pwsh:
+    description: >
+      把自然语言转成一条 PowerShell 命令并执行。适用于查看目录、
+      跑 Python 单测并读取失败（python -m pytest -q --tb=short）。
+      Git 状态请用 git 工具，不要用本工具跑 git status/diff/pull/rebase。
+      每步只做一件事。不要用它做 git push --force、reset --hard、删库或递归强删。
+    models:
+      - model: workbuddy/deepseek-v4.1-flash
+      - model: auto/hy3
+    max_tokens: 512
+    timeout: 120
+
+execution:
+  mock_execution: false
+  pwsh_timeout: 30
+
+# 高危工具审查。deny_regex 只作为线索交给 security_guard，不自动拒绝。
+security:
+  guard_tool: security_guard
+  fast_guard_tool: security_guard_fast
+  guarded_tools: [pwsh, db_write]
+  deny_regex:
+    - '(?i)\bdrop\s+(table|database|schema)\b'
+    - '(?i)\btruncate\s+(table\s+)?\S+'
+    - '(?i)\brm\s+-[a-z]*r[a-z]*f\b|\brm\s+-[a-z]*f[a-z]*r\b'
+    - '(?i)\bRemove-Item\b[\s\S]{0,80}-Recurse\b[\s\S]{0,40}-Force\b'

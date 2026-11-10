@@ -127,6 +127,101 @@ function fullTextOf(content) {
   return content.map((b) => (b.type === "text" ? b.text : "")).join("");
 }
 
+const GREP_MATCH = /^\s*(?:Line\s+)?\d+:/;
+const GREP_FILE_LINE = /^(.+?):(\d+):(.*)$/;
+const GREP_NOTE = "(\u7ed3果过多，已截断。请缩小搜索范围或使用更精确的正则)";
+const PWSH_WARN = "[警告] 工具产生了大量报错输出，可能包含许多与当前修改无关的既有错误。";
+const BUILD_CMD = /\bnpm\s+run\s+lint\b|\bnpm\s+run\s+build\b|\bnpm\s+test\b/;
+const ERROR_LINE = /\b(?:error|err!|failed|failure|exception)\b|✖|error TS\d+/i;
+
+function grepStats(text) {
+  const files = new Set();
+  let matches = 0;
+  let current = null;
+  for (const line of text.split("\n")) {
+    const located = line.match(GREP_FILE_LINE);
+    if (located && !located[1].includes(" ")) {
+      files.add(located[1]);
+      matches += 1;
+      continue;
+    }
+    if (GREP_MATCH.test(line)) {
+      matches += 1;
+      if (current) files.add(current);
+      continue;
+    }
+    const header = line.trim();
+    if (header && !header.includes(" ") && /[\\/]/.test(header)) current = header;
+  }
+  return { files: files.size, matches };
+}
+
+function capGrep(text) {
+  const stats = grepStats(text);
+  if (stats.files <= 10 && stats.matches <= 20) return null;
+  const kept = [];
+  const files = new Set();
+  let matches = 0;
+  let current = null;
+  for (const line of text.split("\n")) {
+    const located = line.match(GREP_FILE_LINE);
+    const isMatch = Boolean(located && !located[1].includes(" ")) || GREP_MATCH.test(line);
+    if (isMatch) {
+      const file = located && !located[1].includes(" ") ? located[1] : current;
+      if (file && !files.has(file) && files.size >= 10) break;
+      if (matches >= 20) break;
+      if (file) files.add(file);
+      matches += 1;
+    } else {
+      const header = line.trim();
+      if (header && !header.includes(" ") && /[\\/]/.test(header)) {
+        if (files.size >= 10 && !files.has(header)) break;
+        current = header;
+      }
+    }
+    kept.push(line);
+  }
+  return `${kept.join("\n").replace(/\n+$/, "")}\n${GREP_NOTE}`;
+}
+
+function capPwsh(command, text) {
+  if (!BUILD_CMD.test(String(command || ""))) return null;
+  const lines = text.split("\n");
+  const errors = lines.filter((line) => ERROR_LINE.test(line));
+  if (errors.length <= 20) return null;
+  const omitted = lines.length - 15;
+  return [
+    PWSH_WARN,
+    ...lines.slice(0, 10),
+    `... (省略 ${omitted} 行错误) ...`,
+    ...lines.slice(-5),
+  ].join("\n");
+}
+
+function capOrchestrate(text) {
+  if (text.length <= 1000 || !/无法读取|示意/.test(text)) return null;
+  return `${text.slice(0, 1000)}\n(结果不可用，已截断。请宿主重新规划，不要沿用无法读取或示意性内容。)`;
+}
+
+/** 超限时返回截断文本；未超限返回 null。 */
+function cappedText(exec, text) {
+  const toolName = exec?.name;
+  if (toolName === "grep") return capGrep(text);
+  if (toolName === "pwsh") return capPwsh(exec?.arguments?.command, text);
+  if (toolName === "orchestrate") return capOrchestrate(text);
+  if (toolName === "read") {
+    const lines = text.split("\n");
+    if (lines.length <= 500) return null;
+    return lines.slice(0, 500).join("\n")
+      + "\n[token-guard] read 已超过 500 行，其余已截断。请用 offset/limit 续读，或改用 grep 定位。";
+  }
+  if (toolName === "skill" && text.length > 2500) {
+    return text.slice(0, 2500)
+      + "\n[token-guard] skill 正文已截断。只保留前 2500 字，按已给出的步骤执行，不要为了补全文再整篇重读。";
+  }
+  return null;
+}
+
 export function apply(ctx, rawConfig) {
   const config = normalizeConfig(rawConfig);
   if (!config.enabled) return;
@@ -140,9 +235,16 @@ export function apply(ctx, rawConfig) {
   ctx.on("tools/post-execute", async (exec, result, next) => {
     const decision = await next();
     if (decision.kind !== "accept" || Object.hasOwn(decision, "value")) return decision;
-    if (!watched.has(exec.name)) return decision;
-    const content = decision.content ?? result.content;
+    let content = decision.content ?? result.content;
     if (!retainable(content) || content.length === 0) return decision;
+    const shortened = cappedText(exec, fullTextOf(content));
+    if (shortened) {
+      content = [{ type: "text", text: shortened }];
+      if (!watched.has(exec.name) || priceContent(content) <= threshold) {
+        return { kind: "accept", content };
+      }
+    }
+    if (!watched.has(exec.name)) return decision;
     if (priceContent(content) <= threshold) return decision;
 
     try {

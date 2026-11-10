@@ -2,8 +2,8 @@
 
 供 DSH Node 工具插件(dsh-orchestrator)调用。避免命令行参数转义/编码问题。
 
-stdin:  {"op": "full"|"tool"|"list", "request": "...", "tool": "planner", "config": "可选路径"}
-stdout: 单个 JSON 对象；出错时 {"ok": false, "error": "..."} 且退出码非 0。
+stdin:  {"op": "full"|"tool"|"list", "request": "...", "tool": "planner", "session_id": "对话ID", "config": "可选路径"}
+stdout: 只有最终那一个 JSON 对象。日志、[usage]、库打印都走 stderr。
 """
 from __future__ import annotations
 
@@ -13,43 +13,61 @@ import sys
 from . import api
 
 
+def _emit(out, payload: dict) -> None:
+    out.write(json.dumps(payload, ensure_ascii=False) + "\n")
+    out.flush()
+
+
 def main() -> int:
+    real_stdout = sys.stdout
+    # 工作期间任何 print / 库日志都不能进 stdout，否则 Node 侧 JSON.parse 会被 [usage] 冲掉。
+    sys.stdout = sys.stderr
+    code = 1
     try:
-        # 容忍 BOM(PowerShell echo 等会在前面加 BOM)
-        raw = sys.stdin.buffer.read().decode("utf-8-sig")
-        req = json.loads(raw) if raw.strip() else {}
-    except Exception as e:
-        print(json.dumps({"ok": False, "error": f"bad stdin json: {e}"}, ensure_ascii=False))
-        return 2
-
-    op = req.get("op", "full")
-    cfg = req.get("config") or api.DEFAULT_CFG
-    try:
-        if op == "list":
-            out = api.list_tools(cfg)
-            out["ok"] = True
-        elif op == "tool":
-            tool = req.get("tool", "")
-            request = req.get("request", "")
-            if not tool or not request:
-                print(json.dumps({"ok": False, "error": "tool 和 request 必填"}, ensure_ascii=False))
-                return 2
-            out = api.run_tool(tool, request, cfg)
-        elif op == "full":
-            request = req.get("request", "")
-            if not request:
-                print(json.dumps({"ok": False, "error": "request 必填"}, ensure_ascii=False))
-                return 2
-            out = api.run_full(request, cfg)
-        else:
-            print(json.dumps({"ok": False, "error": f"未知 op: {op}"}, ensure_ascii=False))
+        try:
+            raw = sys.stdin.buffer.read().decode("utf-8-sig")
+            req = json.loads(raw) if raw.strip() else {}
+        except Exception as e:
+            _emit(real_stdout, {"ok": False, "error": f"bad stdin json: {e}"})
             return 2
-    except Exception as e:  # noqa: BLE001
-        print(json.dumps({"ok": False, "error": f"{type(e).__name__}: {e}"}, ensure_ascii=False))
-        return 1
 
-    print(json.dumps(out, ensure_ascii=False))
-    return 0 if out.get("ok", True) else 1
+        op = req.get("op", "full")
+        cfg = req.get("config") or api.DEFAULT_CFG
+        session_id = req.get("session_id", "") or ""
+        try:
+            if op == "list":
+                out = api.list_tools(cfg)
+                out["ok"] = True
+            elif op == "tool":
+                tool = req.get("tool", "")
+                request = req.get("request", "")
+                if not tool or not request:
+                    _emit(real_stdout, {"ok": False, "error": "tool 和 request 必填"})
+                    return 2
+                out = api.run_tool(tool, request, cfg, session_id)
+            elif op == "full":
+                request = req.get("request", "")
+                if not request:
+                    _emit(real_stdout, {"ok": False, "error": "request 必填"})
+                    return 2
+                out = api.run_full(request, cfg, session_id)
+            else:
+                _emit(real_stdout, {"ok": False, "error": f"未知 op: {op}"})
+                return 2
+        except Exception as e:  # noqa: BLE001
+            _emit(real_stdout, {"ok": False, "error": f"{type(e).__name__}: {e}"})
+            return 1
+        if isinstance(out, dict) and "usage" not in out:
+            out["usage"] = out.get("usage_totals") or {
+                "prompt_tokens": None,
+                "completion_tokens": None,
+                "total_tokens": None,
+            }
+        _emit(real_stdout, out)
+        code = 0 if out.get("ok", True) else 1
+    finally:
+        sys.stdout = real_stdout
+    return code
 
 
 if __name__ == "__main__":

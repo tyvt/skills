@@ -17,12 +17,16 @@ function fixture(t) {
   fs.mkdirSync(path.dirname(entry), { recursive: true });
   fs.writeFileSync(path.join(modules, 'dsh/package.json'), '{"name":"@deepseek-ai/dsh","type":"module"}');
   const files = [];
-  for (const { name } of manifest.patches) {
-    const dir = path.join(modules, name);
+  for (const patch of manifest.patches) {
+    const pkg = patch.resolveAs ?? (patch.name === 'dsh-tools-pipeline' ? 'dsh-tools' : patch.name);
+    const dir = path.join(modules, pkg);
     fs.mkdirSync(path.join(dir, 'lib'), { recursive: true });
-    fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: '@deepseek-ai/' + name, type: 'module', exports: './lib/index.js' }));
-    const file = path.join(dir, 'lib/index.js');
-    fs.copyFileSync(path.join(snapshots, name + '-index.js'), file);
+    fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: '@deepseek-ai/' + pkg, type: 'module', exports: './lib/index.js' }));
+    const relpath = patch.relpath ?? 'lib/index.js';
+    const file = path.join(modules, pkg, relpath);
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    const snapshot = path.join(snapshots, patch.relpath ? patch.name + '-' + path.basename(relpath) : patch.name + '-index.js');
+    fs.copyFileSync(snapshot, file);
     files.push(file);
   }
   return { root, entry, files, backupDir: path.join(root, 'backups') };
@@ -45,7 +49,7 @@ test('a second startup is idempotent and does not rewrite modules', t => {
 });
 test('incompatible update fails preflight before changing either module', t => {
   const f = fixture(t);
-  fs.appendFileSync(f.files[1], '\nif (!tool) throw new ToolNotFoundError(exec.name);\n');
+  fs.appendFileSync(f.files[1], '\n/* incompatible-snapshot */\n');
   const before = f.files.map(file => fs.readFileSync(file, 'utf8'));
   assert.throws(() => applyPatch(f.entry, { backupDir: f.backupDir }), /compatibility review/);
   assert.deepEqual(f.files.map(file => fs.readFileSync(file, 'utf8')), before);

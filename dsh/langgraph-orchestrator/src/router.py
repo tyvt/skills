@@ -9,13 +9,20 @@
 """
 from __future__ import annotations
 
+import sys
 import time
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from openai import OpenAI
 
 from .config import ModelSpec, OrchestratorConfig, ToolSpec
+
+# 峰时降级只作用于这两个工具；其余工具保持配置顺序。
+PEAK_GLM_TOOLS = {"file_reader", "code_editor"}
+DEEPSEEK_FLASH = "deepseek-v4.1-flash"
+GLM_FLASH = "glm-5.3-flash"
 
 
 @dataclass
@@ -28,12 +35,28 @@ class Attempt:
 
 
 @dataclass
+class Usage:
+    """单次成功调用的 token 用量。网关不返回 usage 时全部为 None，不要用 0 冒充。"""
+    prompt_tokens: Optional[int] = None
+    completion_tokens: Optional[int] = None
+    total_tokens: Optional[int] = None
+
+    def as_dict(self) -> Dict[str, Optional[int]]:
+        return {
+            "prompt_tokens": self.prompt_tokens,
+            "completion_tokens": self.completion_tokens,
+            "total_tokens": self.total_tokens,
+        }
+
+
+@dataclass
 class ToolResult:
     tool: str
     ok: bool
     content: str
     model_used: Optional[str]
     attempts: List[Attempt] = field(default_factory=list)
+    usage: Optional[Usage] = None
 
     @property
     def failed_models(self) -> List[str]:
@@ -55,6 +78,46 @@ class ModelRouter:
     # ------------------------------------------------------------------ #
     # 内部工具
     # ------------------------------------------------------------------ #
+    @staticmethod
+    def _parse_hhmm(text: str):
+        hour, minute = text.split(":")
+        return int(hour) * 60 + int(minute)
+
+    def _is_deepseek_peak_time(self, now: Optional[datetime] = None) -> bool:
+        """当前是否处于配置的 DeepSeek 峰时(本地时间)。"""
+        peak = self.cfg.scheduling.deepseek_peak_hours
+        now = now or datetime.now()
+        if now.isoweekday() not in peak.weekdays:
+            return False
+        minutes = now.hour * 60 + now.minute
+        for period in peak.peak_periods:
+            start, end = period.split("-")
+            if self._parse_hhmm(start) <= minutes < self._parse_hhmm(end):
+                return True
+        return False
+
+    def _get_effective_models(
+        self, tool_name: str, now: Optional[datetime] = None
+    ) -> List[ModelSpec]:
+        """返回本次调用实际使用的模型池。
+
+        峰时且策略开启时，file_reader / code_editor 跳过 deepseek-v4.1-flash，
+        并把 glm-5.3-flash 提到队首；谷时保持配置原序。
+        """
+        tool = self.cfg.tool(tool_name)
+        models = list(tool.models)
+        sched = self.cfg.scheduling
+        if not (
+            sched.peak_use_glm_as_fallback
+            and tool_name in PEAK_GLM_TOOLS
+            and self._is_deepseek_peak_time(now)
+        ):
+            return models
+        kept = [m for m in models if DEEPSEEK_FLASH not in m.model]
+        glm = [m for m in kept if GLM_FLASH in m.model]
+        rest = [m for m in kept if GLM_FLASH not in m.model]
+        return (glm + rest) or models
+
     def _ordered_pool(self, tool: ToolSpec) -> List[ModelSpec]:
         """把处于冷却期的模型排到队尾，但不剔除(允许兜底)。"""
         now = time.time()
@@ -87,7 +150,7 @@ class ModelRouter:
         temperature: float,
         max_tokens: int,
         timeout: float,
-    ) -> str:
+    ) -> tuple:
         resp = client.chat.completions.create(
             model=model,
             messages=messages,
@@ -95,7 +158,20 @@ class ModelRouter:
             max_tokens=max_tokens,
             timeout=timeout,
         )
-        return resp.choices[0].message.content or ""
+        u = getattr(resp, "usage", None)
+        usage = Usage(
+            prompt_tokens=getattr(u, "prompt_tokens", None),
+            completion_tokens=getattr(u, "completion_tokens", None),
+            total_tokens=getattr(u, "total_tokens", None),
+        ) if u is not None else None
+        if usage is not None:
+            print(
+                f"[usage] model={model} prompt={usage.prompt_tokens} "
+                f"completion={usage.completion_tokens} total={usage.total_tokens}",
+                file=sys.stderr,
+                flush=True,
+            )
+        return (resp.choices[0].message.content or ""), usage
 
     # ------------------------------------------------------------------ #
     # 对外主入口
@@ -104,12 +180,26 @@ class ModelRouter:
         self,
         tool_name: str,
         messages: List[Dict[str, Any]],
+        force_model: Optional[str] = None,
+        now: Optional[datetime] = None,
     ) -> ToolResult:
-        """用指定工具的模型池执行一次对话补全，自动故障转移。"""
+        """用指定工具的模型池执行一次对话补全，自动故障转移。
+
+        force_model 给定时只调用该模型(规划质量兜底用)，不走池与降级。
+        now 仅供测试注入时间；生产路径留空即取本地当前时间。
+        """
         tool = self.cfg.tool(tool_name)
         attempts: List[Attempt] = []
 
-        for spec in self._ordered_pool(tool):
+        pool = self._get_effective_models(tool_name, now=now)
+        if force_model:
+            match = next((m for m in tool.models if m.model == force_model), None)
+            pool = [match or ModelSpec(model=force_model)]
+        now_ts = time.time()
+        hot = [m for m in pool if now_ts >= self._cooldown.get(m.model, 0)]
+        cold = [m for m in pool if m not in hot]
+
+        for spec in hot + cold:
             temperature = (
                 spec.temperature
                 if spec.temperature is not None
@@ -126,7 +216,7 @@ class ModelRouter:
             for retry in range(self.cfg.gateway.max_retries_per_model + 1):
                 t0 = time.time()
                 try:
-                    content = self._call_once(
+                    content, usage = self._call_once(
                         self._client, spec.model, messages, temperature, max_tokens, timeout
                     )
                     elapsed = time.time() - t0
@@ -136,7 +226,7 @@ class ModelRouter:
                     self._mark_success(spec.model)
                     return ToolResult(
                         tool=tool_name, ok=True, content=content,
-                        model_used=spec.model, attempts=attempts,
+                        model_used=spec.model, attempts=attempts, usage=usage,
                     )
                 except Exception as e:  # noqa: BLE001 —— 任一异常都视为本模型失败
                     elapsed = time.time() - t0
