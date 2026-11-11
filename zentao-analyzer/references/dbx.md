@@ -52,8 +52,12 @@ FROM zt_action WHERE objectType='bug' AND objectID=<id> ORDER BY id;
 ## 回写（唯一推荐路径）
 
 ```text
-node D:\repository\skills\zentao-analyzer\zentao-resolve.mjs <bugId> <commentHTML>
+node D:\repository\skills\zentao-analyzer\zentao-resolve.mjs <bugId> --comment-file <path>
+node D:\repository\skills\zentao-analyzer\zentao-resolve.mjs <bugId> --comment-b64 <base64>
+node D:\repository\skills\zentao-analyzer\zentao-resolve.mjs <bugId> <commentHTML>   # 兼容，仅短文本
 ```
+
+**comment 含 `'` / 换行 / HTML 时禁止走位置参数**（bug6402 亲历：单引号破坏 PowerShell 单引号字符串 → `ParserError`）。优先 `--comment-file` 写 UTF-8 文件再传，或 `--comment-b64`（`[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($html))`）。脚本内部已把 `'` 转义为 `''`，无需手工处理引号；文件/base64 末尾换行会自动去除。
 
 脚本只**打印** mcp_gateway 序列，不代执行。照抄执行，每步必带 connection_name。禁止手工拼 INSERT。只写新禅道；老禅道库禁止写。回写后复核 resolvedBy/resolvedDate/resolution 已落库。
 

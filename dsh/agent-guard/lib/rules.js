@@ -422,6 +422,33 @@ export function repairPwshAtBrace(toolName, args) {
 }
 
 /**
+ * PowerShell 缓冲管道告警（审计 §2.4，bug6402 亲历）。
+ *
+ * `| Out-String`、`| Format-Table`、`| ConvertTo-Json` 之类的 cmdlet 会把整条
+ * 管道输出**攒到结束才吐出**。后台任务（run_in_background）用了它们，就会「看起来
+ * 一直没进度」，模型误判卡死、反复 poll（日志 seq 140→177 等 16+ 分钟、seq 222 才
+ * 因去掉 Out-String 真相大白）。这里做**纯告警、不改命令**：命中时返回一条
+ * `pwsh-buffering` 修复记录，提示改用直通 `2>&1` 或 `*>` 流式重定向到文件。
+ * 只在 tool === 'pwsh' 时触发；命中条件是命令里出现管道到缓冲型 cmdlet。
+ *
+ * @param {string} toolName - 工具名。
+ * @param {object} args - 参数（不修改）。
+ * @returns {object[]} 告警清单。
+ */
+const PWSH_BUFFERING_RE = /\|\s*(?:Out-String|Format-Table|Format-List|ConvertTo-Json|ConvertTo-Csv)\b/i
+export function warnPwshBuffering(toolName, args) {
+  if (toolName !== 'pwsh') return []
+  const command = args?.command
+  if (typeof command !== 'string') return []
+  const m = command.match(PWSH_BUFFERING_RE)
+  if (!m) return []
+  return [{
+    rule: 'pwsh-buffering',
+    detail: `pipe to ${m[0].replace(/^\|\s*/, '').trim()} buffers all output until the process ends; for background jobs use "2>&1" or "*> log.txt" streaming redirection instead`,
+  }]
+}
+
+/**
  * 统一入口：按工具名分派到各条规则，再跑通用 schema 收敛。
  * @param {object} input - 输入。
  * @param {string} input.toolName - 工具名。
@@ -440,6 +467,7 @@ export function repairArguments({ toolName, args, schema, rules = ALL_RULES }) {
     if (toolName === 'todo_write') repairs.push(...repairTodoArgs(args))
     repairs.push(...repairArgAliases(toolName, args))
     repairs.push(...repairPwshAtBrace(toolName, args))
+    repairs.push(...warnPwshBuffering(toolName, args))
   }
   if (rules.escalation === true) repairs.push(...repairEscalationArgs(args, schema))
   if (rules.schema === true) repairs.push(...repairAgainstSchema(args, schema))

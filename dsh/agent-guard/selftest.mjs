@@ -375,6 +375,25 @@ test('pwsh 命令字符 @{} 无花括号内容不误伤（正常哈希不拦）'
   assert.equal(repairs.filter((r) => r.rule === 'pwsh-at-brace').length, 0)
 })
 
+test('pwsh | Out-String 缓冲告警（不改命令，只提示，bug6402 遗留）', () => {
+  const args = { command: 'npm test 2>&1 | Out-String -Width 200' }
+  const { repairs } = repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(args.command, 'npm test 2>&1 | Out-String -Width 200', '命令不被修改')
+  assert.equal(repairs.filter((r) => r.rule === 'pwsh-buffering').length, 1)
+})
+
+test('pwsh | ConvertTo-Json 也命中缓冲告警', () => {
+  const args = { command: 'Get-ChildItem | ConvertTo-Json' }
+  const { repairs } = repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(repairs.filter((r) => r.rule === 'pwsh-buffering').length, 1)
+})
+
+test('pwsh 无缓冲管道不误报', () => {
+  const args = { command: 'npm test 2>&1 *> test.log' }
+  const { repairs } = repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(repairs.filter((r) => r.rule === 'pwsh-buffering').length, 0)
+})
+
 console.log('\n=== 检索范围拦截（bug6369：仓库根全量 grep 打穿 prefix cache）===')
 const scopeRoots = ['~/Documents/deepseek-harness/*', '~/.dsh', '~/Documents', 'D:/repository', 'D:/repository/skills']
 const noGit = () => false

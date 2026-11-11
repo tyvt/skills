@@ -5,21 +5,48 @@
  * 用途：把「开事务 → UPDATE zt_bug → INSERT zt_action → 复核 → commit」封成固定脚本，
  *       参数只暴露 bugId 和 comment，杜绝漏 connection_name / 列数不匹配等复发错误。
  *
- * 用法：
- *   node zentao-resolve.mjs <bugId> <commentHTML>
+ * 用法（推荐用文件/base64 传 comment，彻底避开 shell 引号地狱）：
+ *   node zentao-resolve.mjs <bugId> --comment-file <path>      # 从 UTF-8 文件读 comment
+ *   node zentao-resolve.mjs <bugId> --comment-b64 <base64>     # 从 base64 读（跨 shell 最安全）
+ *   node zentao-resolve.mjs <bugId> <commentHTML>              # 兼容旧用法（短文本）
  * 输出：可直接照抄执行的 mcp_gateway 调用序列（JSON），以及各步的预期核验点。
  *
  * 约束（与 DBX.md 一致）：
  *   - 只对新禅道库（connection_name: "新禅道"）写；每次调用都必须带 connection_name。
  *   - zt_action 严格 14 列，files 用 NULL 占位；`read` 必须反引号。
  *   - comment 走 HTML，写根因 + 修复 + 验证证据。
+ *   - 含 `'` / 换行 / HTML 的 comment 不要走位置参数（bug6402 亲历：单引号破坏
+ *     PowerShell 单引号字符串 → ParserError），改用 --comment-file 或 --comment-b64。
  */
 
-const bugId = Number(process.argv[2]);
-const comment = process.argv[3] ?? "";
+import { readFileSync } from "node:fs";
+
+const argv = process.argv.slice(2);
+const bugId = Number(argv[0]);
+
+function flagValue(name) {
+  const i = argv.indexOf(name);
+  return i >= 0 && i + 1 < argv.length ? argv[i + 1] : undefined;
+}
+
+function loadComment() {
+  const trimEol = (s) => s.replace(/[\r\n]+$/, "");
+  const file = flagValue("--comment-file");
+  if (file) return trimEol(readFileSync(file, "utf8"));
+  const b64 = flagValue("--comment-b64");
+  if (b64) return trimEol(Buffer.from(b64, "base64").toString("utf8"));
+  // 兼容旧位置参数：跳过已消费的 flag 对，取第一个非 flag 参数
+  for (let i = 1; i < argv.length; i++) {
+    if (argv[i] === "--comment-file" || argv[i] === "--comment-b64") { i++; continue; }
+    if (!argv[i].startsWith("--")) return argv[i];
+  }
+  return "";
+}
+
+const comment = loadComment();
 
 if (!Number.isInteger(bugId) || bugId <= 0) {
-  console.error("用法: node zentao-resolve.mjs <bugId> <commentHTML>  （bugId 必须为正整数）");
+  console.error("用法: node zentao-resolve.mjs <bugId> [--comment-file <path> | --comment-b64 <base64> | <commentHTML>]（bugId 必须为正整数）");
   process.exit(1);
 }
 if (!comment.trim()) {
@@ -107,10 +134,13 @@ for (const s of steps) {
   if (s.call) {
     console.log("mcp_gateway " + JSON.stringify(s.call, null, 2));
   } else {
+    const inTxn = /^[4-6]\)/.test(s.name);
+    const arguments_ = { connection_name: CONN, sql: s.sql };
+    if (inTxn) arguments_.session_id = "<session_id>";
     console.log(
       "mcp_gateway " +
         JSON.stringify(
-          { server: "dbx", tool: "dbx_execute_query", arguments: { connection_name: CONN, sql: s.sql } },
+          { server: "dbx", tool: "dbx_execute_query", arguments: arguments_ },
           null,
           2
         )
