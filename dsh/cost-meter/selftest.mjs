@@ -140,4 +140,21 @@ assert.equal(got286.uncached, 244);
 assert.equal(got286.cacheRead, 65152);
 assert.equal(got286.absentSteps, 0);
 
-console.log('cost-meter selftest: ALL PASS');
+// 审计 P0：连续纯推理步升级。第 1 步软提示（bareReasoning），第 2 步起硬指令（bareReasoningEscalate）。
+const bareS = { header: { id: 'bare-streak' } };
+const bareMsg = (n) => ({ type: 'assistant/message', data: { content: [{ type: 'text', text: 'x' }], usage: { uncachedInputTokens: 1, cacheReadTokens: 0, outputTokens: n } } });
+const preBare = (res) => (res.messages ?? []).map((m) => m.source?.summary ?? '');
+onRule(bareS, bareMsg(3000));
+b = await preRule({ agent: { session: bareS }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
+assert.ok(preBare(b).includes('cost-meter bareReasoning'), '1st bare step: soft reasoning-watchdog');
+assert.ok(!preBare(b).includes('cost-meter bareReasoningEscalate'), '1st bare step: no escalation yet');
+onRule(bareS, bareMsg(4000));
+b = await preRule({ agent: { session: bareS }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
+assert.ok(preBare(b).includes('cost-meter bareReasoningEscalate'), '2nd consecutive bare step: escalate to must-call-tool');
+assert.ok(!preBare(b).includes('cost-meter bareReasoning'), '2nd bare step: soft notice replaced by escalation');
+// 出现工具调用即清零 streak，回到软提示。
+onRule(bareS, toolMsg(4000));
+onRule(bareS, bareMsg(3000));
+b = await preRule({ agent: { session: bareS }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
+assert.ok(preBare(b).includes('cost-meter bareReasoning') && !preBare(b).includes('bareReasoningEscalate'), 'tool call resets bare streak');
+console.log('cost-meter selftest: ALL PASS (bare escalation)');

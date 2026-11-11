@@ -356,8 +356,26 @@ test('openviking search 误传 queries 数组 → 搬到 query 字符串', () =>
   assert.equal(repairs.filter((r) => r.rule === 'arg-alias').length, 1)
 })
 
-console.log('\n=== 检索范围拦截（bug6369：仓库根全量 grep 打穿 prefix cache）===')
+test('pwsh 未加引号的 @{u} 补单引号（bug6401 遗留）', () => {
+  const args = { command: 'git rev-parse @{u}' }
+  const { repairs } = repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(args.command, "git rev-parse '@{u}'")
+  assert.equal(repairs.filter((r) => r.rule === 'pwsh-at-brace').length, 1)
+})
 
+test('pwsh 已加引号的 @{u} 不重复包裹', () => {
+  const args = { command: "git rev-parse '@{u}'" }
+  repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(args.command, "git rev-parse '@{u}'")
+})
+
+test('pwsh 命令字符 @{} 无花括号内容不误伤（正常哈希不拦）', () => {
+  const args = { command: 'Write-Output "hello"' }
+  const { repairs } = repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(repairs.filter((r) => r.rule === 'pwsh-at-brace').length, 0)
+})
+
+console.log('\n=== 检索范围拦截（bug6369：仓库根全量 grep 打穿 prefix cache）===')
 const scopeRoots = ['~/Documents/deepseek-harness/*', '~/.dsh', '~/Documents', 'D:/repository', 'D:/repository/skills']
 const noGit = () => false
 const git = (dir) => dir === 'd:/repo/zhi2-web-admin'

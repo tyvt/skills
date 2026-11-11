@@ -394,6 +394,34 @@ export function repairArgAliases(toolName, args) {
 }
 
 /**
+ * PowerShell 的 `@{...}` 修复（审计 P1，bug6401/bug6402 亲历）。
+ *
+ * 在 PowerShell 里 `@{u}` / `@{...}` 是哈希字面量，双引号内会被展开，
+ * `git rev-parse @{u}` 会被当成哈希 → ParserError / hash literal 报错，
+ * 白烧一两步。确定性修复：把命令里**未被引号包裹**的 `@{...}` 用单引号包起来
+ * （git 的 refspec 正需要单引号，如 `git rev-parse '@{u}'`）。只在 tool === 'pwsh'
+ * 且命令含 `@{` 时触发，且只包未加引号的片段，避免破坏已经是 `'@{u}'` 的写法。
+ *
+ * @param {string} toolName - 工具名。
+ * @param {object} args - 原始参数（会被就地修改）。
+ * @returns {object[]} 修复清单。
+ */
+export function repairPwshAtBrace(toolName, args) {
+  const repairs = []
+  if (toolName !== 'pwsh') return repairs
+  const command = args?.command
+  if (typeof command !== 'string' || !command.includes('@{')) return repairs
+  // 匹配未被单/双引号包裹的 @{...}。命令里已由模型加了引号的不会命中。
+  const pattern = /(^|[^\w'"])(@\{[^}]*\})/g
+  const next = command.replace(pattern, (m, lead, brace) => `${lead}'${brace}'`)
+  if (next !== command) {
+    args.command = next
+    repairs.push({ rule: 'pwsh-at-brace', detail: 'quoted @{...} for PowerShell (git refspec needs single quotes)' })
+  }
+  return repairs
+}
+
+/**
  * 统一入口：按工具名分派到各条规则，再跑通用 schema 收敛。
  * @param {object} input - 输入。
  * @param {string} input.toolName - 工具名。
@@ -411,6 +439,7 @@ export function repairArguments({ toolName, args, schema, rules = ALL_RULES }) {
     if (toolName === 'update_goal') repairs.push(...repairGoalArgs(args))
     if (toolName === 'todo_write') repairs.push(...repairTodoArgs(args))
     repairs.push(...repairArgAliases(toolName, args))
+    repairs.push(...repairPwshAtBrace(toolName, args))
   }
   if (rules.escalation === true) repairs.push(...repairEscalationArgs(args, schema))
   if (rules.schema === true) repairs.push(...repairAgainstSchema(args, schema))

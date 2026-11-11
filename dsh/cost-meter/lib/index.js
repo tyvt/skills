@@ -126,6 +126,10 @@ export function apply(ctx, rawConfig) {
     a.lastUncached = u.uncached;
     a.lastOutput = u.output;
     a.lastBare = classifyAssistant(event) === "text" && u.output > config.bareReasoningBudget;
+    // 连续纯推理步计数：只有「保持纯推理」才累加，一旦出现工具调用/正常步就清零。
+    // 审计 P0：同一 turn 连续 2 个无工具调用步后必须升级为硬性「下一步必须调工具」，
+    // 而不是每步都发同一句软提示（软提示实测拦不住 3–8k 的反复自我辩论）。
+    a.bareStreak = a.lastBare ? (a.bareStreak || 0) + 1 : 0;
     if (a.lastBare) a.bareCount += 1;
     // 连续大未命中：第一次只提醒，第二次起把「提示」改成「下一步必须是取数」。
     a.bigMissStreak = u.uncached > config.perStepUncachedBudget ? (a.bigMissStreak || 0) + 1 : 0;
@@ -175,8 +179,13 @@ export function apply(ctx, rawConfig) {
         `[cost-meter] 连续 ${a.bigMissStreak} 步未命中 >${fmt(config.perStepUncachedBudget)}，提醒没改掉走势。下一步第一件事必须是一次取数：一条 SQL（先 ALL_TAB_COLUMNS / 一行样本）、或带 offset/limit 的窄读、或缩到模块的 grep。禁止再整读、禁止再全仓搜、禁止再推演。`],
       ["perStepOutput", overOutput && !priorBare, outputText],
       ["perStepOutputAfterA", overOutput && priorBare, outputText],
-      ["bareReasoning", a.lastBare,
+      ["bareReasoning", a.lastBare && a.bareStreak < 2,
         `[reasoning-watchdog] 上一步输出 ${fmt(a.lastOutput)} tokens 且无工具调用，疑似自我辩论。停止推演：调一次工具取事实，或直接下结论。`],
+      // 审计 P0：连续第 2 个纯推理步起升级为硬指令。插件层无法真正下调 reasoningEffort
+      // （reasoningEffort 在 turn 开始时已固定，pre-step 只能在 enter/reject 间选），
+      // 所以这里用「下一步第一件事必须是工具调用」把空转截断在行为层。
+      ["bareReasoningEscalate", a.lastBare && a.bareStreak >= 2,
+        `[reasoning-watchdog] 已连续 ${a.bareStreak} 步无工具调用（每步 >${fmt(config.bareReasoningBudget)} tokens，当前 ${fmt(a.lastOutput)}）。这是「推理代替取数」的硬信号：下一步第一件事必须是工具调用——查一条数据 / 一次窄读 / 一次 grep 定位。禁止再列 Option 1/2/3，禁止再自我辩论；若确实无法推进就直接下结论收尾。`],
       ["closingCheck", a.closing,
         `[closing-check] 收尾自查未做：本轮有提交，未见 token-optimizer 记录。`],
       ["sessionUncached", a.uncached > config.sessionUncachedBudget,
@@ -189,7 +198,7 @@ export function apply(ctx, rawConfig) {
         `[cost-meter] 本会话等效成本 ${fmt(equiv)}（>${fmt(config.sessionEquivBudget)}，含 ${a.steps} 步）。接近收尾线：尽快给出结论或拆分到新会话，别用 compaction 硬撑。`],
     ];
     // 只看上一步的规则：每步都可能再超，不能被会话级 fired 吞掉。
-    const repeatable = new Set(["perStepOutput", "perStepOutputAfterA", "bareReasoning", "perStepLookup"]);
+    const repeatable = new Set(["perStepOutput", "perStepOutputAfterA", "bareReasoning", "bareReasoningEscalate", "perStepLookup"]);
     const extra = [];
     for (const [key, hit, text] of checks) {
       if (!hit) continue;
