@@ -1,6 +1,6 @@
 ---
 name: agent-cost-hygiene
-description: 会话 token/成本卫生规范。读文件策略（grep 定位 + 窄读）、会话配置稳定性、本机 vite 构建卡死与 cost-meter 首次警告止损、收口时机与收尾格式。当会话 token 消耗过高、要跑 npm test/vite build、或上下文接近窗口压力时使用。
+description: 会话 token/成本卫生规范。读文件策略（grep 定位 + 窄读）、截断/失败即换路径（不连试三次）、会话配置稳定性、截图与 vision 去重、环境预检（先确认工具/配置存在）、构建顺序（commit 之后）与本机 vite 构建卡死止损、收口时机与按模式归因成本。当会话 token 消耗过高、要跑 test/build/lint、或上下文接近窗口压力时使用。
 ---
 
 # agent-cost-hygiene
@@ -23,6 +23,12 @@ description: 会话 token/成本卫生规范。读文件策略（grep 定位 + �
 - 出现 `[reasoning-watchdog]` 且带「已连续 N 步无工具调用」= 已经第 2 个纯推理步，**下一步第一件事必须是工具调用**（一条 SQL / 一次窄读 / 一次 grep 定位），不准再列 Option 1/2/3、不准再自我辩论。
 - 判定词自检：写出「Option 1/2/3」「要不要」「我纠结」「让我想想」时，视为缺事实，立刻查一条命令，而不是继续脑内演算。
 - 单步 reasoning 输出 >1.5k tokens 且无工具调用即停：先取数或直接下结论。
+- **同一形态工具调用不连试三次**：一次失败/被截断就换形态，别把 `SUBSTRING`→`execute_and_show`→再分段这样三次试错走一遍（bug6452 seq44/49/54）。出现「是否再试一次」的念头 = 已经在空转，立刻换路径或直接下结论。
+
+## 截断即换路径（工具结果被截断的固定反应）
+- 工具返回带 `[...chars 0..200; next cell_char_offset=...]`、`omitted N bytes`、`已截断` 一类标记时，**不要原样重跑同一条**，直接换形态：DBX 长文本用 `UNION ALL SUBSTRING(col,n,180)` 分段或 `dbx_execute_and_show`（细则见 zentao-analyzer `references/dbx.md`）；文件用 `read offset/limit` 续读。
+- 分两次拼完整文件是可接受的（一次 1–240、一次 240–419），但**同一区间不重复读**；被 compaction shadow 后只补变更段。
+- 规则已写死在 references 的，直接照做，不要在 reasoning 里重新推导一遍。
 
 ## 读前守卫（大文件先 grep 再读）
 - 目标文件 >150 行且本 turn 还没 grep 过它 → 先 `grep -n` 拿行号表（或确认函数/常量位置），再 `read offset/limit`，禁止直接整读。
@@ -38,12 +44,14 @@ description: 会话 token/成本卫生规范。读文件策略（grep 定位 + �
 - 默认不看截图：文案、显隐、单字段、计数口径、纯文字描述类需求一律不读图。
 - 只有涉及布局/像素对齐/多字段对照/难以文字描述的视觉问题时才读，且最后读、一次一张（图片打穿 prefix cache，读 1 张后后续 step 全价计费）。
 - 需要看图时优先看宿主/日志里已有的文字描述或 DOM，别为了确认一个文案去读 43k 的整图。
+- **同一图片本会话只分析一次**：`analyze_image` 的结果是文档，别对同一张图（如 22340/22341.png）二次全页分析；第一次全页转录通常已含答案，第二次的提问从那里面找。确需更细时只针对未覆盖区域追加 prompt，不重跑整图（bug6452 每图重复分析一次各多烧一屏）。
 
 ## skill references 懒加载
 - skill 正文提到的 `references/*` 按需读：正文说「进入该子场景才 read」就不要一次性全读；用到哪一条读哪一条。
 - skill 正文与 references 属高优先级上下文，压缩时不应被丢弃后又回填；若发现 skill 正文被 prune 再 replace 回填，说明读得过多，收尾时记一笔。
 
 ## 环境预检与命令失败缓存
+- 跑 lint / type-check / test / build 前先确认**工具本身存在**：`read package.json` 看 scripts 里到底用什么（`vue-tsc`？`uni build`？`eslint`？），并确认对应配置文件在（有 `eslint.config.*` 才跑 eslint，无配置就跑 = 白跑一次，bug6452 seq193）。缺配置就直接跳过该项，交付里写「未跑 lint（项目无 eslint 配置）」，不要硬跑再报错。
 - 跑 test/build 前先看 `package.json` 脚本与本机已知坑（见下「本机构建与止损」）；`vitest` 版本与 `vite` 不匹配类错误（`ERR_PACKAGE_PATH_NOT_EXPORTED`）改走 `vue-tsc` 等替代，不要反复重试同一条坏命令。
 - 同一 test/build 命令失败一次后，本 turn 内不再原样重试，直接换备用路径；失败原因写进交付说明。
 
@@ -51,11 +59,13 @@ description: 会话 token/成本卫生规范。读文件策略（grep 定位 + �
 - git 检查开工一次（worktree list + status -sb + fetch）、收尾一次即可；中间只跑单条 `status -sb`。
 - 最终报告 = 结论 + 证据表 + 未验证项，不复述改动细节。
 - **结尾必须用 `ask_user_question`**：需要用户选择时（如仅提交/提交并推送/暂不处理）弹选项卡片，禁止在正文末尾用「要吗」提问。
-- **成本超预期先说清**：cost-meter 触发后，总结里一句话说明主要成本来源，再收尾。
+- **成本超预期先说清，且按模式归因**：cost-meter 触发后，总结里点明主要成本是哪种**模式**而非哪一步——`reasoning_bare`（空转）、`wide_grep`（宽搜）、`repeat_read`（重复整读）、`vision_repeat`（同图重析）、`tool_retry`（同形态试错），各配一句下次怎么改。只说「某步未命中 17k」对行为没帮助。
+- **警告后不许继续空转**：收到 cost-meter / reasoning-watchdog 后，下一步第一件事必须是工具调用或直接下结论，不能接着长 reasoning（bug6452 seq129→146→159 连环三步纯推理）。
 - **不确定性给验证方法**：接口路径/参数不确定时，给出可执行的验证命令 + 失败改哪一行，而非只标注「可能不对」。
 - **死代码显式标注**：发现已无调用方的新遗留代码，在交付说明里写明「已知遗留 X 待清理」，不只留在内部推理。
 
 ## 本机构建与止损（bug6402）
+- **顺序：构建必须在 commit 之后**。构建 hash 要指向含修复的提交，先 commit 再 build；先 build 后 commit（bug6452 seq222 build / seq280 commit）虽结论对但顺序错，构建证据指向的 hash 不含修复。若确实要先构建验证再提交，交付里写明「构建基于工作区未提交态」。
 - 本机 `npm test`（`node scripts/vite-build.mjs build --mode test --logLevel error`）会在写出 `version.json` 后卡死（CPU 约为 0）。默认不跑，交付写「构建未执行」；要构建证据走 CI。
 - 若仍要跑：先 `New-Item -ItemType Directory -Force` 建日志目录；`Start-Process -PassThru` 拿 PID；约 30 秒查一次 CPU，为 0 立即 kill。禁止连续 3 次以上 `job_output` 长等。
 - `--logLevel error` 下禁止 `Out-String | Select-Object -Last`（进程不结束就永远无输出）；日志用 `*>` 流式重定向。`Out-File` 不会建不存在的目录。
