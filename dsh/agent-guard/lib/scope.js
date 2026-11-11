@@ -77,6 +77,39 @@ function hint(tool, why) {
 }
 
 /**
+ * pwsh 递归列举判定（审计 P0-3）。
+ *
+ * `Get-ChildItem -Recurse` / `gci -r` / `ls -r` / `dir /s` 这类递归列举会把整棵
+ * 目录树扫出来，与 bug6369 的「仓库根全量 grep」同源：结果巨大、打穿 prefix cache、
+ * 单步未命中。命中条件（全部满足）：
+ *   1. 出现列举命令词：Get-ChildItem / gci / ls / dir（词边界）；
+ *   2. 出现递归旗标：-Recurse / -r（词边界）/ /s（词边界）；
+ *   3. 不含收窄参数：-Filter / -Include / -Depth / -Path。
+ * 任一不满足即放行。正则保守：`-r\b` 不会误伤 `git rev-list`、`--dry-run`、`-Raw` 等
+ * 出现在别的词里的 `-r`；`ls` / `dir` / `gci` 都用词边界，避免命中路径片段或子串。
+ */
+const PWSH_LIST_RE = /(?:Get-ChildItem|\bgci\b|\bls\b|\bdir\b)/i
+const PWSH_RECURSE_RE = /(?:-Recurse\b|-r\b|\/s\b)/i
+const PWSH_NARROW_RE = /(?:-Filter\b|-Include\b|-Depth\b|-Path\b)/i
+
+function pwshHint(command) {
+  const text = String(command).trim()
+  const snippet = text.length > 80 ? `${text.slice(0, 80)}…` : text
+  return `[agent-guard] pwsh 拒绝递归列举：${snippet}。改用 glob 指定 pattern，` +
+    '或 Get-ChildItem <具体目录> -Filter <通配> 收窄范围后再列举；别用 -Recurse / -r / /s 全树扫。'
+}
+
+function decidePwshInterception(args) {
+  if (args === null || typeof args !== 'object' || Array.isArray(args)) return null
+  const command = args.command
+  if (typeof command !== 'string' || command.trim() === '') return null
+  if (!PWSH_LIST_RE.test(command)) return null
+  if (!PWSH_RECURSE_RE.test(command)) return null
+  if (PWSH_NARROW_RE.test(command)) return null
+  return pwshHint(command)
+}
+
+/**
  * 判定一次 grep / glob 调用是否因范围过大被拒。
  * @param {object} input - 输入。
  * @param {string} input.tool - 工具名。
@@ -86,6 +119,8 @@ function hint(tool, why) {
  * @returns {string | null} 拒绝理由（返回给工具层的字符串即拒绝）；放行返回 null。
  */
 export function decideInterception({ tool, args, roots = DEFAULT_ROOTS, gitProbe = defaultGitProbe }) {
+  // pwsh 递归列举拦截（P0-3）。
+  if (tool === 'pwsh') return decidePwshInterception(args)
   if (tool !== 'grep' && tool !== 'glob') return null
   if (args === null || typeof args !== 'object') return null
   const raw = args.path

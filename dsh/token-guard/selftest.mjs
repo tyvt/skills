@@ -66,20 +66,22 @@ apply({
 
 function textResult(body) {
   return capHandler(
-    { name: body.name, callId: 'c', agent: { session: { header: { id: 'sess1' } } } },
+    { name: body.name, callId: 'c', arguments: body.arguments, agent: { session: { header: { id: 'sess1' } } } },
     { content: [{ type: 'text', text: body.text }] },
     async () => ({ kind: 'accept' }),
   );
 }
 const grepLines = Array.from({ length: 40 }, (_, i) => `Line ${i + 1}: hit`).join('\n');
 const grepOut = await textResult({ name: 'grep', text: grepLines });
-assert.ok(grepOut.content[0].text.includes('结果过多，已截断'), 'grep capped');
-assert.equal((grepOut.content[0].text.match(/Line /g) || []).length, 20);
+assert.ok(grepOut.content[0].text.includes('无文件信息'), 'grep no-file summary');
+assert.ok(!grepOut.content[0].text.includes('Line '), 'grep no line content');
 
 const manyFiles = Array.from({ length: 12 }, (_, i) => `src/f${i}.js\n  1: hit`).join('\n');
-const fileOut = await textResult({ name: 'grep', text: manyFiles });
-assert.ok(fileOut.content[0].text.includes('结果过多，已截断'), 'grep file cap');
-assert.ok(!fileOut.content[0].text.includes('src/f11.js'), 'eleventh file dropped');
+const fileText = (await textResult({ name: 'grep', text: manyFiles })).content[0].text;
+assert.ok(fileText.includes('个文件'), 'grep file list header');
+assert.ok(fileText.includes('src/f0.js') && fileText.includes('src/f9.js'), 'first 10 files listed');
+assert.ok(!fileText.includes('src/f10.js'), 'eleventh file dropped');
+assert.ok(fileText.includes('条'), 'per-file counts present');
 
 const errors = Array.from({ length: 30 }, (_, i) => `error line ${i}`).join('\n');
 const pwshOut = await capHandler(
@@ -105,7 +107,11 @@ assert.equal(longOk, clean, 'clean orchestrate result untouched');
 
 const readLines = Array.from({ length: 520 }, (_, i) => `L${i}`).join('\n');
 const readOut = await textResult({ name: 'read', text: readLines });
-assert.ok(readOut.content[0].text.includes('已超过 500 行'), 'read capped at 500 lines');
+assert.ok(readOut.content[0].text.includes('未带 offset/limit'), 'read gate without offset/limit');
+assert.ok(!readOut.content[0].text.includes('L0'), 'read gate returns no content');
+
+const readRangeOut = await textResult({ name: 'read', text: readLines, arguments: { offset: 0, limit: 400 } });
+assert.ok(readRangeOut.content[0].text.includes('已超过 500 行'), 'read with range falls back to 500-line cap');
 
 const skillOut = await textResult({ name: 'skill', text: 'S'.repeat(6000) });
 assert.ok(skillOut.content[0].text.length < 3000, 'skill receipt shortened');

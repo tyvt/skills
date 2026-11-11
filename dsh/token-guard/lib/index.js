@@ -129,59 +129,49 @@ function fullTextOf(content) {
 
 const GREP_MATCH = /^\s*(?:Line\s+)?\d+:/;
 const GREP_FILE_LINE = /^(.+?):(\d+):(.*)$/;
-const GREP_NOTE = "(\u7ed3果过多，已截断。请缩小搜索范围或使用更精确的正则)";
 const PWSH_WARN = "[警告] 工具产生了大量报错输出，可能包含许多与当前修改无关的既有错误。";
 const BUILD_CMD = /\bnpm\s+run\s+lint\b|\bnpm\s+run\s+build\b|\bnpm\s+test\b/;
 const ERROR_LINE = /\b(?:error|err!|failed|failure|exception)\b|✖|error TS\d+/i;
 
 function grepStats(text) {
-  const files = new Set();
+  const counts = new Map();
   let matches = 0;
   let current = null;
   for (const line of text.split("\n")) {
     const located = line.match(GREP_FILE_LINE);
     if (located && !located[1].includes(" ")) {
-      files.add(located[1]);
+      const file = located[1];
+      counts.set(file, (counts.get(file) ?? 0) + 1);
       matches += 1;
       continue;
     }
     if (GREP_MATCH.test(line)) {
       matches += 1;
-      if (current) files.add(current);
+      if (current) counts.set(current, (counts.get(current) ?? 0) + 1);
       continue;
     }
     const header = line.trim();
     if (header && !header.includes(" ") && /[\\/]/.test(header)) current = header;
   }
-  return { files: files.size, matches };
+  return { files: counts.size, matches, counts };
 }
 
 function capGrep(text) {
   const stats = grepStats(text);
   if (stats.files <= 10 && stats.matches <= 20) return null;
-  const kept = [];
-  const files = new Set();
-  let matches = 0;
-  let current = null;
-  for (const line of text.split("\n")) {
-    const located = line.match(GREP_FILE_LINE);
-    const isMatch = Boolean(located && !located[1].includes(" ")) || GREP_MATCH.test(line);
-    if (isMatch) {
-      const file = located && !located[1].includes(" ") ? located[1] : current;
-      if (file && !files.has(file) && files.size >= 10) break;
-      if (matches >= 20) break;
-      if (file) files.add(file);
-      matches += 1;
-    } else {
-      const header = line.trim();
-      if (header && !header.includes(" ") && /[\\/]/.test(header)) {
-        if (files.size >= 10 && !files.has(header)) break;
-        current = header;
-      }
-    }
-    kept.push(line);
+  // 无文件信息（如 "Line 3: hit"）：只报总命中数，不回灌行内容。
+  if (stats.files === 0) {
+    return `[token-guard] grep 命中 ${stats.matches} 条（无文件信息），请缩范围或加 include。`;
   }
-  return `${kept.join("\n").replace(/\n+$/, "")}\n${GREP_NOTE}`;
+  // 有文件信息：折叠为「文件清单 + 每文件命中数」，最多列 10 个文件。
+  const entries = [...stats.counts.entries()];
+  const shown = entries.slice(0, 10).map(([file, k]) => `${file}  (${k} 条)`);
+  const lines = [
+    `[token-guard] grep 命中 ${stats.matches} 条 / ${stats.files} 个文件，已折叠为文件清单（不返回行内容）。请缩范围或加 include 精确定位。`,
+    ...shown,
+  ];
+  if (entries.length > 10) lines.push("...（其余文件已省略）");
+  return lines.join("\n");
 }
 
 function capPwsh(command, text) {
@@ -211,9 +201,16 @@ function cappedText(exec, text) {
   if (toolName === "orchestrate") return capOrchestrate(text);
   if (toolName === "read") {
     const lines = text.split("\n");
-    if (lines.length <= 500) return null;
-    return lines.slice(0, 500).join("\n")
-      + "\n[token-guard] read 已超过 500 行，其余已截断。请用 offset/limit 续读，或改用 grep 定位。";
+    const args = exec?.arguments;
+    const hasRange = args != null && (args.offset != null || args.limit != null);
+    if (!hasRange && lines.length > 300) {
+      return `[token-guard] read 未带 offset/limit 且共 ${lines.length} 行（>300）。先 grep 定位，或带 offset/limit 分段读，不要整读。`;
+    }
+    if (hasRange && lines.length > 500) {
+      return lines.slice(0, 500).join("\n")
+        + "\n[token-guard] read 已超过 500 行，其余已截断。请缩小 offset/limit 范围后再读。";
+    }
+    return null;
   }
   if (toolName === "skill" && text.length > 2500) {
     return text.slice(0, 2500)

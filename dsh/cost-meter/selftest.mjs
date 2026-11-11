@@ -81,9 +81,32 @@ assert.ok(texts(b).includes('极高') && !texts(b).includes('必须是一次取�
 onRule(streak, big(21000));
 b = await preRule({ agent: { session: streak }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
 assert.ok(texts(b).includes('必须是一次取数'), 'second consecutive big miss forces a lookup');
+assert.ok(texts(b).includes('只允许'), 'second big miss uses whitelist wording');
 onRule(streak, big(500));
 b = await preRule({ agent: { session: streak }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
 assert.ok(!texts(b).includes('必须是一次取数'), 'a small step resets the streak');
+
+// P3-11 意图→todo 外化：user 消息同时含「修改+验证+提交」才注入 todo-gate，只触发一次。
+const userMsg = (t) => ({ role: 'user', content: [{ type: 'text', text: t }] });
+const intentS = { header: { id: 'intent-todo' } };
+b = await preRule({ agent: { session: intentS }, messages: [userMsg('请修复这个 bug，跑测试验证后提交')] }, async () => ({ kind: 'enter', messages: [] }));
+assert.ok(texts(b).includes('[todo-gate]'), 'intent with modify+verify+commit triggers todo-gate');
+b = await preRule({ agent: { session: intentS }, messages: [userMsg('继续修复、测试并提交')] }, async () => ({ kind: 'enter', messages: [] }));
+assert.ok(!texts(b).includes('[todo-gate]'), 'todo-gate fires only once');
+const intentMiss = { header: { id: 'intent-todo-missing' } };
+b = await preRule({ agent: { session: intentMiss }, messages: [userMsg('请修复并实现，然后验证测试')] }, async () => ({ kind: 'enter', messages: [] }));
+assert.ok(!texts(b).includes('[todo-gate]'), 'missing commit element does not trigger todo-gate');
+
+// P3-12 改前 build 基线：先 edit 工具事件再 pre-step → 注入 build-gate；跑过 build 后不注入。
+const buildS = { header: { id: 'build-baseline' } };
+onRule(buildS, { type: 'tool/use', data: { name: 'edit', arguments: { path: 'a.js' } } });
+b = await preRule({ agent: { session: buildS }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
+assert.ok(texts(b).includes('[build-gate]'), 'edit without build triggers build-gate');
+const buildRan = { header: { id: 'build-baseline-ran' } };
+onRule(buildRan, { type: 'tool/use', data: { name: 'edit', arguments: { path: 'a.js' } } });
+onRule(buildRan, { type: 'tool/use', data: { name: 'pwsh', arguments: { command: 'npm run build' } } });
+b = await preRule({ agent: { session: buildRan }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
+assert.ok(!texts(b).includes('[build-gate]'), 'running build suppresses build-gate');
 
 // 夹具：session.v4.jsonl 的真实 assistant/message，不手写 usage。
 const logPath = 'C:/Users/Administrator/Downloads/session.v4.jsonl';

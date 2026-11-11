@@ -449,6 +449,125 @@ export function warnPwshBuffering(toolName, args) {
 }
 
 /**
+ * PowerShell POSIX 兼容预检（审计 P1-5）。
+ *
+ * 模型常在 pwsh 里写 POSIX 管道命令，Windows pwsh 没有 head/tail/cat/grep/sed/awk/wc/find。
+ * 分两类处理：
+ *   1. 语义唯一可改写的先自动改写（记 rule='pwsh-posix-rewrite'）：
+ *      `head -n N` / `head -N` → `Select-Object -First N`；
+ *      `tail -n N` / `tail -N` → `Select-Object -Last N`；
+ *      `cat <path>` → `Get-Content <path>`。只在「行首或管道/分隔符之后」匹配，
+ *      避免把参数或普通单词里的 head/tail/cat 误改。
+ *   2. 无语义唯一改写的只告警、不改命令（记 rule='pwsh-posix-warn'）：
+ *      命令位置出现独立词 grep/sed/awk/wc/find 各记一条，detail 说明 Windows pwsh
+ *      无此命令、改用 Select-String / Get-ChildItem -Filter / Measure-Object 等。
+ *
+ * 保守优先：词边界 + 命令位置前缀 + 尾部断言，宁可漏报也不误伤参数里的同名子串
+ * （如 `--grep=`、`'grep'`、`grep.js`、`used`）。
+ *
+ * @param {string} toolName - 工具名。
+ * @param {object} args - 原始参数（会被就地修改）。
+ * @returns {object[]} 修复/告警清单。
+ */
+const PWSH_CMD_SEP = '(^|&&|\\|\\||[|;&({\\r\\n])'
+const PWSH_HEAD_RE = new RegExp(`${PWSH_CMD_SEP}(\\s*)head\\s+(?:-n\\s*|-)(\\d+)`, 'gi')
+const PWSH_TAIL_RE = new RegExp(`${PWSH_CMD_SEP}(\\s*)tail\\s+(?:-n\\s*|-)(\\d+)`, 'gi')
+const PWSH_CAT_RE = new RegExp(`${PWSH_CMD_SEP}(\\s*)cat\\s+([^-\\s|;&<>"'][^\\s|;&<>]*)`, 'gi')
+const PWSH_POSIX_CMD_RE = /(^|&&|\|\||[|;&({\r\n])\s*(grep|sed|awk|wc|find)(?=[\s"']|$|[|;&)])/gi
+const POSIX_CMD_HINTS = Object.freeze({
+  grep: 'Select-String',
+  sed: 'PowerShell 的 -replace / 字符串运算符',
+  awk: 'PowerShell 的 ForEach-Object / 字符串运算符',
+  wc: 'Measure-Object',
+  find: 'Get-ChildItem -Filter',
+})
+
+export function repairPwshPosix(toolName, args) {
+  const repairs = []
+  if (toolName !== 'pwsh') return repairs
+  const command = args?.command
+  if (typeof command !== 'string' || command === '') return repairs
+
+  const next = command
+    .replace(PWSH_HEAD_RE, (m, sep, ws, n) => `${sep}${ws}Select-Object -First ${n}`)
+    .replace(PWSH_TAIL_RE, (m, sep, ws, n) => `${sep}${ws}Select-Object -Last ${n}`)
+    .replace(PWSH_CAT_RE, (m, sep, ws, target) => `${sep}${ws}Get-Content ${target}`)
+  if (next !== command) {
+    args.command = next
+    repairs.push({ rule: 'pwsh-posix-rewrite', detail: 'rewrote POSIX head/tail/cat to Select-Object/Get-Content' })
+  }
+
+  // 仅告警、不改命令：命令位置出现独立 POSIX 命令词。
+  const seen = new Set()
+  for (const m of String(args.command).matchAll(PWSH_POSIX_CMD_RE)) {
+    const word = m[2].toLowerCase()
+    if (seen.has(word)) continue
+    seen.add(word)
+    repairs.push({
+      rule: 'pwsh-posix-warn',
+      detail: `${word} 在 Windows pwsh 中不可用；改用 ${POSIX_CMD_HINTS[word]} 等 PowerShell 原生命令`,
+    })
+  }
+  return repairs
+}
+
+/**
+ * glob / grep 的 Windows 绝对路径分隔符规范化（审计 P1-6）。
+ *
+ * 只在 tool ∈ {glob, grep} 且 `args.path` 是盘符绝对路径（`D:/...`）且混用正斜杠时，
+ * 把分隔符统一成反斜杠。相对路径、POSIX 绝对路径、已是反斜杠的路径都不动。
+ *
+ * @param {string} toolName - 工具名。
+ * @param {object} args - 原始参数（会被就地修改）。
+ * @returns {object[]} 修复清单。
+ */
+export function repairGlobPath(toolName, args) {
+  const repairs = []
+  if (toolName !== 'glob' && toolName !== 'grep') return repairs
+  const p = args?.path
+  if (typeof p !== 'string') return repairs
+  if (!/^[A-Za-z]:[\\/]/.test(p)) return repairs
+  if (!p.includes('/')) return repairs
+  const next = p.replace(/\//g, '\\')
+  if (next !== p) {
+    args.path = next
+    repairs.push({ rule: 'glob-path-normalize', detail: `normalized path separators: ${p} -> ${next}` })
+  }
+  return repairs
+}
+
+/**
+ * 本次 read 是否是「整读」（无 offset 也无 limit）。返回 file_path 或 null。
+ * @param {object} args - read 的参数。
+ * @returns {string | null}
+ */
+export function isWholeFileRead(args) {
+  if (args === null || typeof args !== 'object' || Array.isArray(args)) return null
+  const filePath = args.file_path
+  if (typeof filePath !== 'string' || filePath.trim() === '') return null
+  const hasOffset = args.offset !== undefined && args.offset !== null
+  const hasLimit = args.limit !== undefined && args.limit !== null
+  if (hasOffset || hasLimit) return null
+  return filePath
+}
+
+/**
+ * 重复整读检测（审计 P1-7）：同一会话里已整读过的文件再次整读时返回拒绝提示。
+ * 纯函数：只读 state（Set<string>），不写入。首次整读由调用方负责写入集合。
+ * @param {Set<string>} state - 本会话已整读过的文件集合。
+ * @param {object} args - read 的参数。
+ * @returns {string | null} 拒绝提示；放行返回 null。
+ */
+export function shouldRejectDuplicateRead(state, args) {
+  const filePath = isWholeFileRead(args)
+  if (filePath === null) return null
+  if (state && typeof state.has === 'function' && state.has(filePath)) {
+    return `[agent-guard] 已整读过 ${filePath}，改用 offset/limit 续读或 grep 定位，不要重复整读`
+  }
+  return null
+}
+
+/**
  * 统一入口：按工具名分派到各条规则，再跑通用 schema 收敛。
  * @param {object} input - 输入。
  * @param {string} input.toolName - 工具名。
@@ -467,7 +586,9 @@ export function repairArguments({ toolName, args, schema, rules = ALL_RULES }) {
     if (toolName === 'todo_write') repairs.push(...repairTodoArgs(args))
     repairs.push(...repairArgAliases(toolName, args))
     repairs.push(...repairPwshAtBrace(toolName, args))
+    repairs.push(...repairPwshPosix(toolName, args))
     repairs.push(...warnPwshBuffering(toolName, args))
+    repairs.push(...repairGlobPath(toolName, args))
   }
   if (rules.escalation === true) repairs.push(...repairEscalationArgs(args, schema))
   if (rules.schema === true) repairs.push(...repairAgainstSchema(args, schema))

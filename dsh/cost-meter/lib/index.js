@@ -96,6 +96,23 @@ export function inspect(sessionId) {
   };
 }
 
+/** P3-11：从 pre-step 的 messages 里取 user 文本，判断是否同时含「修改+验证+提交」三要素。 */
+function hasIntentSignal(messages) {
+  if (!Array.isArray(messages)) return false;
+  const text = messages
+    .filter((m) => m && m.role === "user")
+    .map((m) => {
+      const c = m.content;
+      if (typeof c === "string") return c;
+      if (Array.isArray(c)) return c.map((b) => (typeof b === "string" ? b : b?.text ?? "")).join("\n");
+      return "";
+    })
+    .join("\n");
+  return /(修复|实现|修改|新增|开发|重构)/.test(text)
+    && /(验证|测试|构建|build)/.test(text)
+    && /(提交|push|推送)/.test(text);
+}
+
 export function apply(ctx, rawConfig) {
   const config = normalizeConfig(rawConfig);
   if (!config.enabled) return;
@@ -103,6 +120,14 @@ export function apply(ctx, rawConfig) {
   // sessionId -> { uncached, cacheRead, output, steps, absentSteps, fired:Set }
   const acc = new Map();
   latestAcc = acc;
+
+  const newAcc = () => ({
+    uncached: 0, cacheRead: 0, output: 0, steps: 0, absentSteps: 0,
+    lastUncached: 0, lastOutput: 0, lastBare: false, bareCount: 0, bigMissStreak: 0,
+    committed: false, optimized: false, closing: false,
+    todoWritten: false, edited: false, buildRan: false,
+    fired: new Set(),
+  });
 
   ctx.on("session/event", (session, event) => {
     if (event?.type !== "assistant/message") return;
@@ -112,7 +137,7 @@ export function apply(ctx, rawConfig) {
     if (id === undefined) return;
     let a = acc.get(id);
     if (!a) {
-      a = { uncached: 0, cacheRead: 0, output: 0, steps: 0, absentSteps: 0, lastUncached: 0, lastOutput: 0, lastBare: false, bareCount: 0, bigMissStreak: 0, committed: false, optimized: false, closing: false, fired: new Set() };
+      a = newAcc();
       acc.set(id, a);
     }
     if (u.absent) {
@@ -138,12 +163,21 @@ export function apply(ctx, rawConfig) {
   ctx.on("session/event", (session, event) => {
     const id = session?.header?.id ?? session?.id;
     if (id === undefined) return;
-    const a = acc.get(id);
-    if (!a) return;
+    let a = acc.get(id);
+    if (!a) {
+      a = newAcc();
+      acc.set(id, a);
+    }
     const type = String(event?.type ?? "");
     const d = event?.data ?? {};
     const toolName = d.name ?? d.tool ?? d.toolName ?? "";
     const blob = JSON.stringify(d.arguments ?? d.input ?? d.args ?? d.command ?? "");
+    // P3-11：todo_write 出现即视为已外化阶段。
+    if (/todo_write/i.test(toolName)) a.todoWritten = true;
+    // P3-12：出现过 edit/write 类工具（\b 不把 todo_write 里的 write 算进来）。
+    if (/\b(edit|write|apply_patch|multiedit|create_file|str_replace)\b/i.test(toolName)) a.edited = true;
+    // P3-12：出现过 build/lint/test 命令（npm/pnpm/yarn 同类）。
+    if (/\b(?:npm|pnpm|yarn)\b[^\n]*\b(?:build|lint|test)\b/i.test(blob)) a.buildRan = true;
     if (/pwsh/i.test(toolName) && /git\s+commit/.test(blob)) a.committed = true;
     if (/token-optimizer/.test(blob) || /token-optimizer/.test(toolName)) a.optimized = true;
     const reason = d.reason ?? d.status ?? "";
@@ -162,10 +196,15 @@ export function apply(ctx, rawConfig) {
 
   ctx.on("agent/pre-step", ({ agent, messages }, next) => {
     const id = agent?.session?.header?.id ?? agent?.session?.id;
-    const a = id !== undefined ? acc.get(id) : undefined;
-    if (!a) return next();
+    if (id === undefined) return next();
+    let a = acc.get(id);
+    if (!a) {
+      a = newAcc();
+      acc.set(id, a);
+    }
 
     const equiv = equivOf(a);
+    const intentHit = !a.todoWritten && hasIntentSignal(messages);
     // 本 turn 早先已有过无工具超长步，才给带工具的超预算步加上“下一步必须调工具”。
     const priorBare = a.bareCount > (a.lastBare ? 1 : 0);
     const overOutput = a.lastOutput > config.perStepOutputBudget;
@@ -176,7 +215,7 @@ export function apply(ctx, rawConfig) {
       ["perStep", a.lastUncached > config.perStepUncachedBudget && a.bigMissStreak < 2,
         `[cost-meter] 上一步未命中 ${fmt(a.lastUncached)} tokens（>${fmt(config.perStepUncachedBudget)}），极高。典型成因按概率排序：① 全仓/容器级 grep——缩到 src/views/<模块> 再搜；② 缺真实值在脑内演算——先查一条 SQL / 一个接口返回；③ 大文件整读——grep 定位后 read offset/limit。先判断自己属于哪种，再动下一步。`],
       ["perStepLookup", a.bigMissStreak >= 2,
-        `[cost-meter] 连续 ${a.bigMissStreak} 步未命中 >${fmt(config.perStepUncachedBudget)}，提醒没改掉走势。下一步第一件事必须是一次取数：一条 SQL（先 ALL_TAB_COLUMNS / 一行样本）、或带 offset/limit 的窄读、或缩到模块的 grep。禁止再整读、禁止再全仓搜、禁止再推演。`],
+        `[cost-meter] 连续 ${a.bigMissStreak} 步未命中 >${fmt(config.perStepUncachedBudget)}，提醒没改掉走势。下一步第一件事必须是一次取数，且只允许以下三种之一：① 带 offset/limit 的窄读 ② 带 path+include 的 grep ③ 一条 SQL（先 ALL_TAB_COLUMNS / 一行样本）。禁止整读、禁止全仓/容器级 grep、禁止推演。`],
       ["perStepOutput", overOutput && !priorBare, outputText],
       ["perStepOutputAfterA", overOutput && priorBare, outputText],
       ["bareReasoning", a.lastBare && a.bareStreak < 2,
@@ -187,7 +226,11 @@ export function apply(ctx, rawConfig) {
       ["bareReasoningEscalate", a.lastBare && a.bareStreak >= 2,
         `[reasoning-watchdog] 已连续 ${a.bareStreak} 步无工具调用（每步 >${fmt(config.bareReasoningBudget)} tokens，当前 ${fmt(a.lastOutput)}）。这是「推理代替取数」的硬信号：下一步第一件事必须是工具调用——查一条数据 / 一次窄读 / 一次 grep 定位。禁止再列 Option 1/2/3，禁止再自我辩论；若确实无法推进就直接下结论收尾。`],
       ["closingCheck", a.closing,
-        `[closing-check] 收尾自查未做：本轮有提交，未见 token-optimizer 记录。`],
+        `[closing-check] 收尾证据不齐：本轮有提交，但未见构建/测试记录、也未见 token-optimizer 记录。构建/部署/回写证据不齐不要收尾——用 ask_user_question 明确是否继续排查。`],
+      ["intentTodo", intentHit,
+        `[todo-gate] 本任务含「修改+验证+提交」，先用 todo_write 把阶段外化，再动手。`],
+      ["buildBaseline", a.edited && !a.buildRan,
+        `[build-gate] 已开始改文件但本会话未见构建/测试基线。先跑一次 npm run build（或读最近 CI 结果），区分「预存在编译错误」与本次改动。`],
       ["sessionUncached", a.uncached > config.sessionUncachedBudget,
         `[cost-meter] 本会话累计未命中 ${fmt(a.uncached)} tokens（>${fmt(config.sessionUncachedBudget)}）。成本已高，收窄任务范围、避免重复整读，必要时开新会话。`],
       ["sessionEquivEarly", equiv > config.sessionEquivEarly,

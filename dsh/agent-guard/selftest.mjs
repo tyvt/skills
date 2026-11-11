@@ -4,7 +4,7 @@
 // 退出码 0 = 全通过；1 = 有失败。
 import assert from 'node:assert/strict'
 
-import { normalizeSchema, planRecovery, repairArguments, repairToolName } from './lib/rules.js'
+import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead } from './lib/rules.js'
 import { decideInterception } from './lib/scope.js'
 
 let passed = 0
@@ -439,6 +439,127 @@ test('非 grep/glob 工具 → 不拦截', () => {
 })
 test('glob 同样受拦截', () => {
   assert.match(call({ pattern: '**/*.ts', path: '.' }), /工作区根/)
+})
+
+console.log('\n=== P0-3 禁用 pwsh 递归列举 ===')
+const pwshCall = (command) => decideInterception({ tool: 'pwsh', args: { command }, roots: scopeRoots, gitProbe: noGit })
+test('Get-ChildItem -Recurse → 拒绝', () => {
+  assert.match(pwshCall('Get-ChildItem -Recurse'), /递归列举/)
+})
+test('gci -r → 拒绝', () => {
+  assert.match(pwshCall('gci -r'), /递归列举/)
+})
+test('ls -r → 拒绝', () => {
+  assert.match(pwshCall('ls -r'), /递归列举/)
+})
+test('dir /s → 拒绝', () => {
+  assert.match(pwshCall('cmd /c dir /s'), /递归列举/)
+})
+test('带 -Path/-Filter 收窄 → 放行（不误伤定向列举）', () => {
+  assert.equal(pwshCall('Get-ChildItem -Path src -Recurse -Filter *.js'), null)
+})
+test('无递归旗标 → 放行', () => {
+  assert.equal(pwshCall('Get-ChildItem src -Filter *.ts'), null)
+})
+test('git rev-list -r 不误伤（-r 出现在别的词里）', () => {
+  assert.equal(pwshCall('git rev-list -r -- count HEAD'), null)
+})
+test('Get-Content 路径含 dir 片段不误伤', () => {
+  assert.equal(pwshCall('Get-Content D:\\repo\\dir\\file.txt'), null)
+})
+test('非 pwsh 命令工具不拦截', () => {
+  assert.equal(decideInterception({ tool: 'grep', args: { command: 'Get-ChildItem -Recurse', pattern: 'x', path: 'src/x' }, roots: scopeRoots, gitProbe: noGit }), null)
+})
+
+console.log('\n=== P1-5 pwsh POSIX 兼容预检（自动改写 + 仅告警）===')
+test('head -n N 改写为 Select-Object -First N', () => {
+  const args = { command: 'Get-ChildItem | head -n 5' }
+  const { repairs } = repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(args.command, 'Get-ChildItem | Select-Object -First 5')
+  assert.equal(repairs.filter((r) => r.rule === 'pwsh-posix-rewrite').length, 1)
+})
+test('tail -N 改写为 Select-Object -Last N', () => {
+  const args = { command: 'Get-Content a.log | tail -20' }
+  repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(args.command, 'Get-Content a.log | Select-Object -Last 20')
+})
+test('cat <path> 改写为 Get-Content <path>', () => {
+  const args = { command: 'cat package.json' }
+  repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(args.command, 'Get-Content package.json')
+})
+test('grep 仅告警、不改命令', () => {
+  const args = { command: 'Get-ChildItem | grep foo' }
+  const { repairs } = repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(args.command, 'Get-ChildItem | grep foo')
+  assert.equal(repairs.filter((r) => r.rule === 'pwsh-posix-warn').length, 1)
+})
+test('wc / find 各记一条告警', () => {
+  const args = { command: 'Get-Content a.log | wc -l; find . -name "*.js"' }
+  const { repairs } = repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(repairs.filter((r) => r.rule === 'pwsh-posix-warn').length, 2)
+})
+test('参数里的 grep 子串不误伤（--grep= / 引号内 / grep.js）', () => {
+  for (const command of ['git log --grep=fix', 'Select-String -Pattern "grep"', 'Get-Content grep.js']) {
+    const { repairs } = repairArguments({ toolName: 'pwsh', args: { command }, schema: {} })
+    assert.equal(repairs.filter((r) => r.rule === 'pwsh-posix-warn').length, 0, command)
+    assert.equal(repairs.filter((r) => r.rule === 'pwsh-posix-rewrite').length, 0, command)
+  }
+})
+
+console.log('\n=== P1-6 glob / grep Windows 绝对路径分隔符规范化 ===')
+test('glob 盘符绝对路径统一为反斜杠', () => {
+  const args = { pattern: '**/*.ts', path: 'D:/repository/skills/src' }
+  const { repairs } = repairArguments({ toolName: 'glob', args, schema: {} })
+  assert.equal(args.path, 'D:\\repository\\skills\\src')
+  assert.equal(repairs.filter((r) => r.rule === 'glob-path-normalize').length, 1)
+})
+test('grep 盘符绝对路径统一为反斜杠', () => {
+  const args = { pattern: 'x', path: 'C:/Users/x/src' }
+  repairArguments({ toolName: 'grep', args, schema: {} })
+  assert.equal(args.path, 'C:\\Users\\x\\src')
+})
+test('相对路径不误伤', () => {
+  const args = { pattern: '**/*.ts', path: 'src/views/flood' }
+  const { repairs } = repairArguments({ toolName: 'glob', args, schema: {} })
+  assert.equal(args.path, 'src/views/flood')
+  assert.equal(repairs.filter((r) => r.rule === 'glob-path-normalize').length, 0)
+})
+test('已是反斜杠的盘符路径不动', () => {
+  const args = { pattern: 'x', path: 'D:\\repository\\skills\\src' }
+  const { repairs } = repairArguments({ toolName: 'glob', args, schema: {} })
+  assert.equal(args.path, 'D:\\repository\\skills\\src')
+  assert.equal(repairs.filter((r) => r.rule === 'glob-path-normalize').length, 0)
+})
+test('非 glob/grep 工具的 path 不处理', () => {
+  const args = { file_path: 'D:/a/b' }
+  const { repairs } = repairArguments({ toolName: 'read', args, schema: {} })
+  assert.equal(args.file_path, 'D:/a/b')
+  assert.equal(repairs.filter((r) => r.rule === 'glob-path-normalize').length, 0)
+})
+
+console.log('\n=== P1-7 重复整读检测 ===')
+test('isWholeFileRead：无 offset/limit 视为整读', () => {
+  assert.equal(isWholeFileRead({ file_path: 'a.js' }), 'a.js')
+})
+test('isWholeFileRead：带 offset 或 limit 不算整读', () => {
+  assert.equal(isWholeFileRead({ file_path: 'a.js', offset: 10 }), null)
+  assert.equal(isWholeFileRead({ file_path: 'a.js', limit: 50 }), null)
+})
+test('首次整读放行，二次整读拒绝', () => {
+  const state = new Set()
+  assert.equal(shouldRejectDuplicateRead(state, { file_path: 'a.js' }), null)
+  state.add('a.js')
+  assert.match(shouldRejectDuplicateRead(state, { file_path: 'a.js' }), /已整读过 a\.js/)
+})
+test('带 offset/limit 的续读不拒绝', () => {
+  const state = new Set(['a.js'])
+  assert.equal(shouldRejectDuplicateRead(state, { file_path: 'a.js', offset: 20 }), null)
+  assert.equal(shouldRejectDuplicateRead(state, { file_path: 'a.js', limit: 100 }), null)
+})
+test('不同文件不误伤', () => {
+  const state = new Set(['a.js'])
+  assert.equal(shouldRejectDuplicateRead(state, { file_path: 'b.js' }), null)
 })
 
 console.log(`\n${failed === 0 ? 'PASS' : 'FAIL'}  passed=${passed} failed=${failed}\n`)

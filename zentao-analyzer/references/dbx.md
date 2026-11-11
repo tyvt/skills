@@ -92,3 +92,13 @@ VALUES ('bug',<id>,'<product>',<project>,<execution>,'tiany','resolved',NOW(),'<
 - `product` 可写纯数字或逗号包裹，与同产物其他 bug 一致。
 - `extra` 写 resolution；`vision` 写 `'rnd'`；`` `read` `` 必须反引号。列数必须是 14。
 - comment 用 HTML：根因 + 修复 + 验证证据（构建时间、部署站点、提交号）。
+
+## SQL 合并与长文本（审计 P1-8）
+
+- 同一连接、同一对象的多条查询**合并成一条多语句**（`dbx_execute_query` 的 `sql` 支持分号分隔），减少往返与每步未命中。不要分 4、5 次各查一点。
+- 长文本（steps/comment）**先量长度再分段**：`SELECT LENGTH(steps) FROM zt_bug WHERE id=<id>;` 拿到总长度，再按需 `SUBSTRING` 分段；禁止同一形态连试三次。仍拿不全改 `git log` 或 `UNION ALL` 每段一行。
+
+## 回写链路现状（审计 P5-18 / P5-19）
+
+- `zentao-resolve.mjs` 已支持 `--comment-file` 与 `--comment-b64`（P5-19 的 base64 规避引号/HTML 转义**已落地**），脚本内部把 `'` 转成 `''`。
+- 脚本仍只**打印** 8 步 mcp_gateway 序列，不代执行：`dbx_open_session → begin → UPDATE → INSERT → 复核 → commit → close` 需要 MCP 会话编排，本地插件/离线脚本无法直接驱动（P5-18 的"复合事务工具"是 MCP 服务端能力，不在本仓可改范围）。照抄打印的序列执行，每步必带 `connection_name`+`session_id`。

@@ -36,7 +36,7 @@ import os from 'node:os'
 import path from 'node:path'
 
 import { Config } from './config.js'
-import { planRecovery, repairArguments, repairToolName } from './rules.js'
+import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead } from './rules.js'
 import { decideInterception } from './scope.js'
 
 export { Config }
@@ -162,6 +162,21 @@ export function apply(ctx, config) {
   // 两条路径共用同一个幂等修复函数（WeakSet 去重），不会重复记账。
   const repairedExecs = new WeakSet()
 
+  // ── 1.5 重复整读检测（审计 P1-7）──────────────────────────────────────────
+  // 按 session 记录「已整读过的文件」；同一文件本会话再次整读（无 offset/limit）
+  // 直接拒绝并提示续读/定位，避免重复整读把 prefix cache 打穿。state 是纯 Set，
+  // 判定逻辑抽到 rules.js 的 shouldRejectDuplicateRead 便于单测。
+  const sessionReads = new Map()
+  function getSessionReads(exec) {
+    const sessionId = exec?.agent?.session?.header?.id ?? 'anon'
+    let state = sessionReads.get(sessionId)
+    if (state === undefined) {
+      state = new Set()
+      sessionReads.set(sessionId, state)
+    }
+    return state
+  }
+
   const guardDisposer = ctx.tools.guard((exec) => {
     try {
       // 检索范围拦截（bug6369：仓库根全量 grep 打穿 prefix cache，单步未命中 18k）。
@@ -177,6 +192,18 @@ export function apply(ctx, config) {
           log?.warn?.('agent-guard: rejected %s: %s', exec?.name, rejected)
           return rejected
         }
+      }
+      // 重复整读拦截（P1-7）：与 scope 拦截同层，同样赶在 repairExecution 之前。
+      if (config.enabled && exec?.name === 'read') {
+        const state = getSessionReads(exec)
+        const duplicate = shouldRejectDuplicateRead(state, exec?.arguments)
+        if (duplicate !== null) {
+          counters.rejected++
+          log?.warn?.('agent-guard: rejected %s: %s', exec?.name, duplicate)
+          return duplicate
+        }
+        const wholeRead = isWholeFileRead(exec?.arguments)
+        if (wholeRead !== null) state.add(wholeRead)
       }
       if (config.enabled) repairExecution(exec)
     } catch (error) {
