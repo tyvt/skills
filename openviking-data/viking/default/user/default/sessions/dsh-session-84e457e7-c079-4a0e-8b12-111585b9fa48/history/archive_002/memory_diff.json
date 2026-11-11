@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-84e457e7-c079-4a0e-8b12-111585b9fa48/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-11T06:32:39.695088+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/面板下单去筛选化决策.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-11 明确放入持仓面板的标的即视为可买，面板层面不再做筛选，只保留价格因素（现价相对目标买价）与配置权重。助手确认将名单过滤与基本面二筛（buy_list、治理、OCF、支付率、行业红线、总分）从下单路径移除；这些字段仍保留用于持仓预警，但不挡买单。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: ...剩下要确认的是“被指路的那份 README 能否独立算出同一个目标价”“buy_list 是否可复现”“预算分母语义是否写清”“3 项测试失败是否改成新断言而不是标已知失败”。这些不是新问题，是“把规则从文档挪到 README”之后，README 和测试要承担原来文档承担的可审计责任。**\n另外放入面板的标的就是可以买的，不要在面板层面筛选，面板这边只有价格因素和配置权重。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 面板里的标的视为已经可买，买入只看价格和配置权重。我先把名单和基本面二筛从下单路径拿掉，再核对测试是不是还在按旧分层断言。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 下单路径里还有名单过滤和基本面打分。按你的口径，进了面板的标的不再过这两关，只留价格和权重。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 已提交 `24cd0a74`，未推送。自测全部通过。\n\n面板下单现在只看两件事：现价相对目标买价，以及配置权重。进了面板的标的不再过 `buy_list`、治理、OCF、支付率、行业红线或总分。这些字段还在，持仓预警照常显示，但不挡买单。\n\n价格门槛没动：高于目标价 5% 以内按半仓，超过 10% 释放权重。只数上限是 `rules.max_buys`（默认 3，和 `config.js` 一致），金额按已过价格门槛的候选只数均分，没买成的份额记为留存现金。排序先看低于目标价的幅度，再看权重。\n\n自测里旧断言按这个口径改了：治理或 family 缺失不再被挡掉；唐山港已不在当前目标池，第三条达标标的换成了农业银行。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/旧测试断言改写确认.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-11 指出 3 项自测失败并非「过期」，而是旧断言假设了 marginBuy=✓ 即买入的错误分层，建议改写为新断言：marginBuy=✓ 但不在 buy_list 则不买且日志带排除原因；buy_list 只数小于 max_buys 时预算分母仍为 max_buys 且留存现金大于 0；唐山港改用动态读取 config.buy_list。助手确认按新口径改写：治理或 family 缺失不再被挡掉，唐山港已不在当前目标池、第三条达标标的换成农业银行。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: ...### 4. 测试 3 项失败：不是“过期”，是“旧断言假设了错误的分层”\n\n你说 3 项失败都出在改动之前的断言上：\n\n- 唐山港不在当前 `config.js` 的 `buy_list` 里；\n- 另外两项假定名单外的达标标的也能买满。\n\n**这三项失败恰恰印证了“marginBuy ≠ 买入”的新分层，不是测试过期，是旧测试假设了旧逻辑。** 建议不要只标记为“已知失败”，而是改成新断言：\n\n- 断言“`marginBuy=✓` 但不在 `buy_list` → 不买，且日志带排除原因”；\n- 断言“`buy_list` 只数 < max_buys 时，预算分母仍为 max_buys，留存现金 >0”；\n- 唐山港那条改成读 `config.buy_list` 动态断言，不硬编码名单。\n\n否则下次跑测试还是 3 项红，真问题会被“已知失败”掩盖。\n\n### 5. 农行和平安的价格分口径：现在一致了，但“缺指标”要可区分...\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 唐山港已经不在当前目标池里，那条断言读的是旧名单。改成按现价和目标价判断。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: A 溢价 11%，走的是 10% 释放权重，不是 5% 那条。测试按实际口径改，并补上 `max_buys`。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 唐山港不在当前目标池，测试用现有池里的青岛港代替它。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: ...价格门槛没动：高于目标价 5% 以内按半仓，超过 10% 释放权重。只数上限是 `rules.max_buys`（默认 3，和 `config.js` 一致），金额按已过价格门槛的候选只数均分，没买成的份额记为留存现金。排序先看低于目标价的幅度，再看权重。\n\n自测里旧断言按这个口径改了：治理或 family 缺失不再被挡掉；唐山港已不在当前目标池，第三条达标标的换成了农业银行。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/面板改动提交未推送.md",
+                "memory_type": "events",
+                "after": "# Summary\n助手于 2026-11-11 将面板下单去筛选化改动提交至 24cd0a74（未推送），自测全部通过。改动后面板下单只看现价相对目标买价与配置权重，进了面板的标的不再过 buy_list、治理、OCF、支付率、行业红线或总分，这些字段仍在但持仓预警照常显示且不挡买单。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: ...剩下要确认的是“被指路的那份 README 能否独立算出同一个目标价”“buy_list 是否可复现”“预算分母语义是否写清”“3 项测试失败是否改成新断言而不是标已知失败”。这些不是新问题，是“把规则从文档挪到 README”之后，README 和测试要承担原来文档承担的可审计责任。**\n另外放入面板的标的就是可以买的，不要在面板层面筛选，面板这边只有价格因素和配置权重。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 已提交 `24cd0a74`，未推送。自测全部通过。\n\n面板下单现在只看两件事：现价相对目标买价，以及配置权重。进了面板的标的不再过 `buy_list`、治理、OCF、支付率、行业红线或总分。这些字段还在，持仓预警照常显示，但不挡买单。..."
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/持仓面板/holding_panel_rules.md",
+                "memory_type": "entities",
+                "before": "# 持仓面板执行层规则\n面板实际运行的「买入价约束 + 行业分组目标股息率」规则集，定义在面板 README 与 config.js，不属于《筛选标准_最终版.md》§5。\n\n## 规则口径\n- 目标股息率：公用交运 dynamic 均值+0.3；消费医药均值+0.2；金融 fixed 5.5%\n- 目标价：每股分红 ÷ 目标股息率\n- marginBuy：现价 ≤ 目标价 即判定通过\n- 价格分：折价分 < 15（溢价超过 5%）绝对不买，对所有能算出指标的标的统一生效\n- max_buys：从 rules.max_buys 读取（旧版写死 3），预算按已过门槛候选只数均分，未买成份额不回补给已买标的\n\n## 配置与买入分层\n- 配置权重（w）是目标权重，不是本次下单指令\n- 诊断日志含「本次动作=买入 / 持有不买 / 剔除」列与「成交 / 留存现金」原因\n\n## 买入清单生成\n- buy_list 由选股脚本按 score 取前 max_buys 只，先去掉上市不满三年、高于目标买价超过 10% 的，面板不再重算\n- marginBuy=✓ 仅表示现价≤目标价，是否买入还需过 buy_list，排除理由须在日志显示\n\n## 文档归属\n- 《筛选标准》§5.4 只管「高于目标买价 10% 不占组合名额」\n- §5.5 已写明面板执行层口径以面板 README 为准，不并入筛选标准\n- 来源会话：2026-11-11 审查会话，提交 de529892（未推送）",
+                "after": "# 持仓面板执行层规则\n面板实际运行的「买入价约束 + 行业分组目标股息率」规则集，定义在面板 README 与 config.js，不属于《筛选标准_最终版.md》§5。\n\n## 规则口径\n- 目标股息率：公用交运 dynamic 均值+0.3；消费医药均值+0.2；金融 fixed 5.5%\n- 目标价：每股分红 ÷ 目标股息率\n- marginBuy：现价 ≤ 目标价 即判定通过（仅为状态标记，不代表已买入）\n- 价格分：折价分 < 15（溢价超过 5%）绝对不买，对所有能算出指标的标的统一生效\n- max_buys：从 rules.max_buys 读取（默认 3，与 config.js 一致）\n\n## 价格与预算\n- 价格门槛：高于目标价 5% 以内按半仓，超过 10% 释放权重（不占用预算）\n- 预算按已过价格门槛的候选只数均分，未买成的份额记为留存现金，不回补给已买标的\n- 排序：先看低于目标价的幅度，再看配置权重\n\n## 配置与买入分层\n- 配置权重（w）是目标权重，不是本次下单指令\n- 诊断日志含「本次动作=买入 / 持有不买 / 剔除」列与「成交 / 留存现金」原因\n- 面板不再二次筛选：进了面板的标的即视为可买，不再过 buy_list、治理、OCF、支付率、行业红线或总分；这些字段仍在，持仓预警照常显示，但不挡买单\n\n## 买入清单生成\n- buy_list 由选股脚本按 score 取前 max_buys 只，先去掉上市不满三年、高于目标买价超过 10% 的（脚本侧剔除，面板不重算）\n\n## 文档归属\n- 《筛选标准》§5.4 只管「高于目标买价 10% 不占组合名额」\n- §5.5 已写明面板执行层口径以面板 README 为准，不并入筛选标准\n- 来源会话：2026-11-11 审查会话，提交 24cd0a74（未推送）"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/量化系统/面板执行规则.md",
+                "memory_type": "entities",
+                "before": "# 面板执行规则\n持仓面板前端执行规则。\n\n## 规则\n- buildPlan 删去判断逻辑，只读取 Python 产出的 buy_list，直接为各代码平分金额展示；buy_list 为空提示「本轮不买」\n- 买入后单票>25% 或单行业>35%，该行标红「超限跳过」，资金退回不占用（前端最后防线）",
+                "after": "# 面板执行规则\n持仓面板前端执行规则。\n\n## 规则\n- buildPlan 不再做二次筛选：进了面板的标的即视为可买，仅按价格因素（现价相对目标买价）与配置权重执行；高于目标价 5% 以内半仓，超过 10% 释放权重；金额按已过价格门槛候选只数均分，未买成份额记为留存现金\n- 买入后单票>25% 或单行业>35%，该行标红「超限跳过」，资金退回不占用（前端最后防线）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-f0316437-b945-4a0b-94bc-33569d11ba33/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-11T03:23:48.699800+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited/memories/events/2026/11/11/汛前检查历史页筛选缺陷重开.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-11 09:32 lichandan 重开禅道 Bug 6418，指出手持端汛前检查历史页「待提交」错误显示在「已提交」下，暴露真实的待提交/已提交状态筛选逻辑缺陷；Ref8443 演示数据修复并非真正根因。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6418\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: I now understand the bug. Key findings:\n\n- **Original bug (6418)**: Mobile 手持端 — after submitting 汛前检查 (pre-flood inspection), the 历史记录 (history) page didn't show the new record. tiany resolved it as a test-build artifact (Ref8443 hardcoded demo data).\n- **Reopened (2026-11-11 09:32 by lichandan)**: A *real* logic bug — \"待提交 (pending) and 已提交 (submitted): what status distinguishes them? Now 待提交 also shows under 已提交.\" (screenshot fileID 22344)\n\nSo the Ref8443 fix was correct, but there's a genuine filtering bug between 待提交 / 已提交 in the 汛前检查 history page. Let me set up a goal and explore the codebase."
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_6418.md",
+                "memory_type": "entities",
+                "before": "# 禅道 Bug 6418\n禅道缺陷 6418：test 构建开启 VITE_UI_REF8443=true 导致历史/汛前填报/详情/求援整页被静态演示数据替换，提交不进真实列表、筛选数字不随列表变化。\n\n## Description\n- 现象对得上静态演示页，并非接口未返回数据。\n- `Ref8443History.vue` 写死文案：「全部工单 (14)」「已提交归档 (12)」及两张固定卡片（待提交、已提交）。\n- test 构建开 `VITE_UI_REF8443=true`，历史、汛前填报、详情、求援整页被替换成演示数据。\n\n## Fix\n- `.env.test` 中 `VITE_UI_REF8443` 改为 `false`。\n- `isRef8443()` 在 `VITE_DATA_MODE=remote` 时固定返回 false，避免远程模式被静态页盖住。\n\n## Verification\n- `npm run test`：34 个单测通过，`uni build -m test` 完成。\n- 产物里 `VITE_UI_REF8443` 为 `\"false\"`，`isRef8443` 收成恒 false，包内已无「全部工单 (14)」。\n\n## Status\n- 代码已改完，测试构建已重新打出（截至 2026-11-10 会话）。\n- 未提交，未回写禅道。\n- 待验证账号 601117997：汛前检查提交后进历史记录数量应与实际工单一致，已提交归档不再出现演示用待提交卡片。\n- 提交并回写禅道需用户告知。",
+                "after": "# 禅道 Bug 6418\n禅道缺陷 6418：最初为 test 构建开 VITE_UI_REF8443=true 导致历史/汛前填报/详情/求援整页被静态演示数据替换；2026-11-11 被 lichandan 重开，暴露真实的待提交/已提交状态筛选逻辑缺陷。\n\n## Description（原始）\n- 现象对得上静态演示页，并非接口未返回数据。\n- `Ref8443History.vue` 写死文案：「全部工单 (14)」「已提交归档 (12)」及两张固定卡片（待提交、已提交）。\n- test 构建开 `VITE_UI_REF8443=true`，历史、汛前填报、详情、求援整页被替换成演示数据。\n\n## 原始 Fix\n- `.env.test` 中 `VITE_UI_REF8443` 改为 `false`。\n- `isRef8443()` 在 `VITE_DATA_MODE=remote` 时固定返回 false，避免远程模式被静态页盖住。\n- 验证：`npm run test` 34 单测通过，`uni build -m test` 完成；产物 `VITE_UI_REF8443` 为 `\"false\"`，包内已无「全部工单 (14)」。\n\n\n## 重开（2026-11-11 09:32 by lichandan）\n- 真实逻辑缺陷：手持端汛前检查历史页「待提交」也显示在「已提交」下，无法区分两状态。\n- 截图 fileID 22344；Ref8443 修复正确，但历史页状态筛选存在真实 bug。\n\n## 重开根因（2026-11-11 分析）\n- `src/stores/flood.ts` 的 `inspectionRowToRecord` 对每条记录无条件写死 `status: 'submitted'`，忽略后端 `bizState`（0=待提交/1=审核中/2=已备案）。\n- `fetchHistoryRemote` / `countHistory` 从未将 status 筛选传给后端，远程模式待提交/已提交无法分离。\n- 合同：bizState `0=待提交`，`1/2=已提交/已备案`；前端二进制 status 应映射 `bizState==='0'→'draft'`，否则 `'submitted'`。\n\n## 修复方案（规划，未提交）\n- `inspectionRowToRecord` 映射 bizState→status（`'0'`→`'draft'`，否则 `'submitted'`），同时修复历史列表与详情页。\n- `fetchHistoryRemote` 实际应用 status 筛选（全量拉取+客户端按映射后 status 过滤）。\n- `countHistory` 按 status 分别计数。\n- flood 后端 service-expand（端口 9610）不在本工作区，页面 API 是否支持 bizState 筛选未确认，故采用客户端过滤。\n\n## Status\n- 原始 Ref8443 问题代码已改完、测试构建已打出（截至 2026-11-10 会话），未提交、未回写禅道。\n- 2026-11-11 被重开，根因已定位，修复方案已规划但未落地提交。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

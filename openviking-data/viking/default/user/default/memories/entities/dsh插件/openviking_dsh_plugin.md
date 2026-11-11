@@ -1,5 +1,5 @@
 # @openviking/dsh-memory-plugin
-OpenViking 官方 DSH 插件，实时镜像 DSH 会话到 OpenViking（端点 http://127.0.0.1:1933，直连无需配置）。
+OpenViking 官方 DSH 插件，实时镜像 DSH 会话到 OpenViking（http://127.0.0.1:1933 直连）。
 
 ## 基本信息
 - 版本 0.5.31（官方插件，非社区版 @yadsh）；会话 URI 为 viking://user/default/sessions/dsh-session-<id>
@@ -29,8 +29,8 @@ OpenViking 官方 DSH 插件，实时镜像 DSH 会话到 OpenViking（端点 ht
 {
   "category": "DSH插件",
   "name": "openviking_dsh_plugin",
-  "source_extraction_id": "12f21042b5f24c76a2245c639adc3272",
-  "version": 10,
+  "source_extraction_id": "4a65ec5568c14ed4a10f48ae0ac23686",
+  "version": 11,
   "memory_type": "entities"
 }
 -->

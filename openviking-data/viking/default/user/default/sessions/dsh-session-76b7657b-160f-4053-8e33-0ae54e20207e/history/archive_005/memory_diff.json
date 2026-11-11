@@ -1,0 +1,24 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-76b7657b-160f-4053-8e33-0ae54e20207e/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-11T04:48:02.231726+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_6369.md",
+                "memory_type": "entities",
+                "before": "# ZenTao Bug 6369\n禅道缺陷 6369：应急预案附件下载后文件后缀变成 .txt 的问题，由 tiany 此前修复但被重新激活，当前在 -li 的 worktree 中排查。\n\n## Description\n- 模块：应急预案（emergency plan）附件下载，涉及 `zhi2-web-admin/src/components/detail-template/detail-template.vue` 的 `DetailTemplate.downloadAttachmentFile`。\n- 现象：下载后文件后缀变成 .txt（\"下载后，文件后缀变成了txt\"）。\n- 历史：tiany 之前修复将方法改为 `downloadGet` + `window.open` 回退，但 bug 被重新激活（re-activated）。\n\n## Root Cause Analysis\n- 旧代码使用 `res.blob()` 保留服务端 MIME 类型 → `downloadBlobFile(blob, filename)`。\n- tiany 的修复替换为 `downloadGet` → `saveBlobToFile`，后者 `new Blob([data])` 无 MIME 类型，且传入的 `filename` 可能缺少扩展名（遗留记录 `planFileName` 为空时 `fileNameFromUrl()` 返回无扩展名段）。\n- 项目约定（`zipdownload.js`）应显式设置 blob MIME 类型并从 `Content-Disposition` 提取文件名。\n\n## 深层排查（2026-11-11）\n- `downloadGet`→`GET` 返回 `res.data`（仅 blob、无响应头），`saveBlobToFile` 拿不到 `Content-Disposition`，且 `new Blob([data])` 丢失 MIME 类型。\n- `zs-file-upload` 组件 `POST /file/file/upload`，回设 `name = res.data.fileName`（含原始扩展名）、`url = res.data.fileSite`；新上传附件 `file.name` 自带正确扩展名。\n- `resolvePublicAssetUrl` 仅基于 `fileSite` 拼静态文件 URL，`downloadGet` 可正确拉取文件。\n- `saveBlobToFile` 被 `download`/`downloadJson`/`downloadGet` 共用（117 处调用，多为显式扩展名 `.xlsx` 导出），修复须向后兼容（仅当传入文件名缺扩展名时覆盖，并保留 blob 类型）。\n\n## Work Context\n- 用户要求在 -li 的 worktree（分支 `develop/v2.6.2-suzhufang-li`）中修改。\n- 截至 2026-11-11 排查完成并确定修复方案：保留 blob MIME 类型并从响应 `Content-Disposition` 提取真实文件名+扩展名（同 `zipdownload.js`）；让 `downloadGet` 返回原始响应使头可达；尚未提交修复。",
+                "after": "# ZenTao Bug 6369\nZenTao defect 6369: emergency-plan attachment download produced a .txt suffix instead of the original file extension; fixed, committed, pushed, and written back as resolved on 2026-11-11.\n\n## Description\n- Module: emergency-plan attachment download, involving `DetailTemplate.downloadAttachmentFile` in `zhi2-web-admin/src/components/detail-template/detail-template.vue`.\n- Symptom: downloaded file extension became `.txt` (\"下载后，文件后缀变成了txt\").\n- History: tiany previously changed the method to `downloadGet` + `window.open` fallback, but the bug was re-activated.\n\n## Root Cause\n- Old code used `res.blob()` preserving server MIME type → `downloadBlobFile(blob, filename)`.\n- tiany's fix replaced it with `downloadGet` → `saveBlobToFile`, where `new Blob([data])` dropped the MIME type and the passed `filename` could miss the extension.\n- Project convention (`zipdownload.js`) requires explicitly setting blob MIME type and extracting the filename from `Content-Disposition`.\n\n## Fix and Verification\n- Fix: `saveBlobToFile` preserves blob type + `Content-Disposition` fallback; `downloadGet` adds `returnRawResponse`; new `getAttachmentDownloadName` added.\n- `saveBlobToFile` is shared by `download`/`downloadJson`/`downloadGet` (117 call sites, mostly explicit `.xlsx` exports), so the fix stays backward-compatible (only overrides when filename lacks extension, keeps blob type).\n- Verification: ESLint 0 errors, `npm test` exit 0; commits: submodule `fix/bug6369-download-txt-ext` (`8d5f9c0ce`) and parent `develop/v2.6.2-suzhufang-li` (`738b010`) gitlink pushed.\n\n## ZenTao Writeback\n- ZenTao 6369 set `status=resolved`, `resolution=fixed`, `resolvedBuild=trunk`, `resolvedBy=tiany`, `assignedTo=lichandan` (returned to reporter).\n- New `zt_action` id `90930` (actor=tiany, action=resolved); note covers root cause, fix points, verification, commit, and pending customer-test regression.\n- Metadata: `openedBy=lichandan`, `product=79`, `project=141`, `execution=142`.\n- Remaining: real-account/backend download joint-debug verification marked \"待客测回归\" (pending customer-test regression), handed to lichandan for acceptance."
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

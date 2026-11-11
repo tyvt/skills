@@ -1,0 +1,48 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-697770ab-9b3b-495e-8ea7-ab70d0ad59d7/history/archive_006",
+    "trace_id": null,
+    "extracted_at": "2026-11-11T05:21:11.350821+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/治理运行时限要求.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-11，用户要求运行持仓治理检查（41只标的），且单次运行时间不能超过2分钟。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 把治理跑了，时间不能超过2分钟"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/代理故障根因定位.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-11，诊断确认41只标的全部抓取失败的根因为本地代理127.0.0.1:7890未运行（ProxyError：目标计算机积极拒绝），并非抓取速度问题；78.5秒均消耗在重试退避上。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 把治理跑了，时间不能超过2分钟\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 78.5 秒（在 2 分钟内），但**41 只全部抓取失败**——不是超时，是每只都 `fail`（2 次重试都抛异常）。这说明是**接口/网络/代理层面的系统性问题**，不是慢。先查真实错误，别瞎猜。\n\n用单只手动抓一次，把完整异常打出来：\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 根因找到了，**不是慢，是代理挂了**：\n\n```\nProxyError: Unable to connect to proxy (127.0.0.1:7890)\n[WinError 10061] 由于目标计算机积极拒绝\n```\n\n`configure_proxy()` 把请求指向本地代理 `127.0.0.1:7890`（典型 Clash/机场客户端端口），但这个代理**当前没在运行**，连接被拒。所以 41 只全部失败——78 秒全耗在重试退避上。\n\n## 现状\n- **代码没问题、并发方案也没问题**，纯粹是**本地代理 7890 没开**\n- 2 分钟红线的瓶颈根本不是抓取速度，是网络不通\n\n## 需要你确认怎么走"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/端口预检逻辑新增.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-11，助手在治理重跑前新增本地代理端口7890连通性预检逻辑，不通则直接提示、不再进入重试，避免无效等待。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 把治理跑了，时间不能超过2分钟\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 好，你开代理。开好告诉我，我立刻重跑（并发 4，预计 1 分钟内出结果）。\n\n在你开代理的同时，我先加个**预检**：重跑前先探测 7890 端口通不通，不通就直接提示、不浪费 78 秒重试。这样不会白等。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 预检加好了。现在先跑一次预检看代理是否已通（你刚说要开，可能已经开了）："
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/代理恢复确认.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-11，用户开启本地代理后，端口7890连通性预检通过，代理恢复可用，具备重跑治理的网络条件。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 把治理跑了，时间不能超过2分钟\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 代理 7890 已通。立刻重跑治理（并发 4，有预检保护）："
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/治理核查结果产出.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-11，治理检查在3.6秒内完成（远低于2分钟红线）。41只标的中22只通过（国资/无实控人）、11只否决（个人/家族实控人）、8只待确认（法人未列名录/供销社集体所有制）、0只缺失；结果已写入分析产出/_治理预览.csv。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 把治理跑了，时间不能超过2分钟\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 代理已通，治理已经跑完了——**3.6 秒**，远低于 2 分钟。\n\n## 治理核查结果（41 只）\n\n| 结论 | 只数 |\n|---|---|\n| **通过** | **22** |\n| 否决（个人/家族实控人） | 11 |\n| 待确认（法人未列名录 / 供销社集体所有制） | 8 |\n| 缺失 | 0 |\n\n**22 只治理通过**（国资/无实控人），结果已写入 [`_治理预览.csv`](分析产出/_治理预览.csv)。通过的典型代表：\n\n- **无实控人**：格力电器、平安银行、青农商行、兰州银行、宁波银行\n- **地方国资**：五粮液、东莞控股、粤高速、现代投资、苏州银行、涪陵榨菜、兴蓉环境、城发环境、陕国投、贵州轮胎、华西证券、浙"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/数据湖选股/governance_check.md",
+                "memory_type": "entities",
+                "after": "# 持仓治理核查\n数据湖选股模块中对候选股票进行治理实控人核查的流程，输出预览CSV供人工确认。\n\n## 抓取机制\n- 单只抓取 fetch_one 独立请求、无共享状态，可安全并发\n- 实控人判定调用 classify_owner\n- 缓存与合并复用 fetch_many 同款逻辑\n- 采用并发 4 路抓取，命中缓存跳过，失败重试最多 2 次，整体硬超时保护\n- 网络依赖本地代理 127.0.0.1:7890（Clash/机场客户端端口），代理未运行会导致全部请求 ProxyError\n\n## 输出与分类\n- 结果写入分析产出/_治理预览.csv\n- 判定分类：通过（国资/无实控人）、否决（个人/家族实控人）、待确认（法人未列名录/供销社集体所有制）、缺失\n\n## 运行约束\n- 单次治理运行需在 2 分钟内完成（用户设定的时限）"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 6,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

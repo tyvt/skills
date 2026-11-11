@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-6a98e686-ab9a-45c9-a874-2e59cb896f28/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-11T01:19:26.042538+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/11/PowerShell升级完成.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-11，PowerShell 7.6.9 安装至 C:\\Program Files\\PowerShell\\7\\pwsh.exe，从镜像下载官方 zip 解压（非 MSI 注册）并写入系统 PATH；winget 的 MSIX 安装卡在暂存阶段、GitHub 直连下不动。5.1 保留于 C:\\Windows\\System32\\WindowsPowerShell\\v1.0 未动。DSH 解析顺序为 pwshPath（未设）→ 7 路径 → PATH pwsh → 5.1，新会话自动用 7.6.9，当前会话仍走 5.1。升级消除 694 次 NativeCommandError 与 GBK 写文件问题。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 给出修改方案，需要升级你可以直接帮我升级好\n...\n**assistant [peer=github.com-tyvt-skills]**: winget 卡在 MSIX 安装阶段，改用 MSI 安装。\n...\n**assistant [peer=github.com-tyvt-skills]**: PowerShell 7.6.9 已装好，验证通过。当前这个会话里的 pwsh 工具进程是在安装前启动的，仍然走 5.1；**新开的会话会自动用 7.6.9**，不用改 DSH 配置。\n\n## 已完成\n\n- 安装位置：`C:\\Program Files\\PowerShell\\7\\pwsh.exe`，版本 `7.6.9`。\n- 已写入系统 PATH。\n- winget 的 MSIX 安装卡在暂存阶段，GitHub 直连又下不动，最后是从镜像下的官方 zip 解压安装的，不是 MSI 注册。功能上 DSH 只认这个路径，够用。以后 `winget upgrade` 可能认不出这次安装，要升级时再覆盖这个目录即可。\n- 5.1 保留在 `C:\\Windows\\System32\\WindowsPowerShell\\v1.0`，系统组件没动。\n\nDSH 的解析顺序是：配置里的 `pwshPath`（当前没设）→ `C:\\Program Files\\PowerShell\\7\\pwsh.exe` → PATH 上的 `pwsh.exe` → 5.1。所以新会话会命中第一项。\n\n## 这次升级实际消掉什么\n\n7 默认不把原生命令的 stderr 包成 `NativeCommandError`，最近 8 天 694 次这类「git 明明成功、工具报 exit 1」会消失。7 写文件默认 UTF-8，`Set-Content` / `Out-File` 整文件重写不再按 GBK 破坏中文。输出乱码本来就被每次命令前的 UTF-8 前缀压住了，这块不变。\n\n## 升级消不掉、也不该改工具的\n\n- 约 925 次没有 PowerShell 错误记录的 exit 1：子进程自己失败，换 shell 没用。\n- 引号和变量写法：`-m` 用单引号；`git rev-parse '@{u}'`；`$env:GIT_EDITOR='true'`，不要写 `GIT_EDITOR=true`。\n- 15 次空参数 `INVALID_ARGS`：长会话退化，连续两次就收尾换会话，不是 shell 问题。\n\n调用约定已经写在 `tool-call-hygiene` 自愈表里，没有再改规则文件。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/程序/dsh_pwsh_local.md",
+                "memory_type": "entities",
+                "before": "# dsh-pwsh-local\nDSH 本地 PowerShell 执行工具，负责在会话中运行 pwsh 命令，其行为与近期失败率分析如下。\n\n## 运行环境与版本\n- 机器仅安装 Windows PowerShell 5.1.19041.6456，`C:\\Program Files\\PowerShell\\7\\pwsh.exe` 不存在（as of 2026-11-11）\n- dsh-pwsh-local 优先查找 PowerShell 7，找不到则退回 5.1，且每次命令前强制把控制台输出改为 UTF-8（注释写明专门补 5.1）\n- DSH 检测到 PowerShell 7 后会自动改用，无需改配置\n\n## 近期失败审计（347 个会话文件，近 8 天，as of 2026-11-11）\n- pwsh 调用 17686 次；工具层失败 27 次（0.15%）：INVALID_ARGS 15（参数被吐成空 `{}`）、ABORTED 8、TOOL_OUTCOME_UNKNOWN 4\n- 进程退出码非 0 共 1912 次（10.8%）；2026-11-11 当天工具失败为 0 次\n- 1912 次退出码 1 拆解：925 次无 PowerShell 错误记录（子进程自退，如测试/git/node）、694 次 NativeCommandError（5.1 特有）、约 70 次语法错、其余用法错\n- 语法类：UnexpectedToken 22、MissingEqualsInHashLiteral 21（双引号内 `@{u}`）、TerminatorExpectedAtEndOfString 10、InvalidVariableReferenceWithDrive 13\n- 用法类：CommandNotFoundException 33、ConvertFrom-Json 23、Select-String/Get-ChildItem/Get-Content 路径不存在约 43\n\n## 升级建议与边界\n- 建议装 PowerShell 7，优先级不高；装上后主要消除两类 5.1 问题：stderr 被当失败、Set-Content/Out-File 默认按系统 ANSI（GBK）写文件\n- 仍存在：约一半真实退出码 1、引号与 `@{u}` 解析错误、空参数 INVALID_ARGS；前两块靠调用约定（`-m` 与 refspec 用单引号），最后一块靠长会话及时收尾\n- 空参数 INVALID_ARGS 属长会话退化而非 shell 版本问题，与 2026-11-09 结论一致",
+                "after": "# dsh-pwsh-local\nDSH 本地 PowerShell 执行工具，负责在会话中运行 pwsh 命令；PowerShell 7.6.9 已于 2026-11-11 安装，行为与失败率分析如下。\n\n## 运行环境与版本\n- PowerShell 7.6.9 已装于 `C:\\Program Files\\PowerShell\\7\\pwsh.exe`（2026-11-11 从镜像下官方 zip 解压安装，非 MSI 注册），已写入系统 PATH\n- Windows PowerShell 5.1.19041.6456 保留于 `C:\\Windows\\System32\\WindowsPowerShell\\v1.0`，系统组件未动\n- DSH 解析顺序：配置 `pwshPath`（当前未设）→ `C:\\Program Files\\PowerShell\\7\\pwsh.exe` → PATH 上 `pwsh.exe` → 5.1；新开会话自动命中 7.6.9\n- 升级当时的会话因 pwsh 工具进程在安装前启动，仍走 5.1；后续新会话自动用 7.6.9，无需改 DSH 配置\n- 7 默认不把原生命令 stderr 包成 NativeCommandError，写文件默认 UTF-8（`Set-Content`/`Out-File` 不再按 GBK 破坏中文）\n\n## 近期失败审计（347 个会话文件，近 8 天，as of 2026-11-11）\n- pwsh 调用 17686 次；工具层失败 27 次（0.15%）：INVALID_ARGS 15（参数被吐成空 `{}`）、ABORTED 8、TOOL_OUTCOME_UNKNOWN 4\n- 进程退出码非 0 共 1912 次（10.8%）；2026-11-11 当天工具失败为 0 次\n- 1912 次退出码 1 拆解：925 次无 PowerShell 错误记录（子进程自退，如测试/git/node）、694 次 NativeCommandError（5.1 特有，升级后消失）、约 70 次语法错、其余用法错\n- 语法类：UnexpectedToken 22、MissingEqualsInHashLiteral 21（双引号内 `@{u}`）、TerminatorExpectedAtEndOfString 10、InvalidVariableReferenceWithDrive 13\n- 用法类：CommandNotFoundException 33、ConvertFrom-Json 23、Select-String/Get-ChildItem/Get-Content 路径不存在约 43\n\n## 升级结果与边界\n- 2026-11-11 已装 PowerShell 7.6.9，消除两类 5.1 问题：stderr 被当失败（694 次 NativeCommandError）、Set-Content/Out-File 默认按系统 ANSI（GBK）写文件\n- 仍存在：925 次无 PS 错误记录的退出码 1（子进程自退，换 shell 无用）、引号与 `@{u}` 解析错误、空参数 INVALID_ARGS\n- 调用约定（已写入 tool-call-hygiene 自愈表）：`-m` 用单引号；`git rev-parse '@{u}'`；`$env:GIT_EDITOR='true'`（勿写 `GIT_EDITOR=true`）\n- 空参数 INVALID_ARGS 属长会话退化而非 shell 版本问题：连续两次就收尾换会话"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

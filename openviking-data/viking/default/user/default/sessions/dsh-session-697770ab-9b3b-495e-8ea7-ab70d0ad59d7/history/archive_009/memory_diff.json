@@ -1,0 +1,48 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-697770ab-9b3b-495e-8ea7-ab70d0ad59d7/history/archive_009",
+    "trace_id": null,
+    "extracted_at": "2026-11-11T05:38:59.914442+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/沪市条件筛选请求.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户要求对深市 24 只股票按沪市 11 条标准做逐项对比，判断哪些沪市条件该加入深市筛选；用户提到股息率卡到 3 也有入选，希望逐项核对。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 但是按照现在这个条件，股息率卡到3也有入选的，能不能逐项对比，加入沪市的条件筛选\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 明白：你想做**逐项对比**——看深市这 24 只在沪市那 11 条标准下**每一条**的通过情况，找出\"深市通过但沪市某条会砍掉\"的股票，从而判断要不要把沪市某些条件加进深市筛选。关键是**逐项、逐股**，不是笼统。\n\n我需要沪市 11 条的每项指标值。先确认沪市脚本能对任意深市票算出这 11 项（screen_sh 里各指标已有），写个探针对 24 只逐项判定，输出对比矩阵。\n\n先看 screen_sh 的判定段（296-320行）确认每条的确切阈值和豁免，避免口径错。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/支付率计算缺陷修复.md",
+                "memory_type": "events",
+                "after": "# Summary\n分析探针初跑时 ⑤支付率全 24 只显示 0.0（全不通过），经查为 bug（np_y 取净利列键不匹配致分母 NaN，pay3_mean 公式错）。改为三年分红总额除以三年净利总额（同深市 pay3 口径）重算，修复后 7 只不通过，其余 13 条维持。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 但是按照现在这个条件，股息率卡到3也有入选的，能不能逐项对比，加入沪市的条件筛选\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 跑完了。但有个**数据问题必须先说**：⑤支付率均值**全部 0.0、全 24 只都 ✗**——这明显是我探针里 `pay3_mean` 算法错了（分母净利取不到或公式错），不是真的全不达标。所以 ⑤ 这条结果**不可信**，其余条基本可用。\n\ncare：先看清楚 —— `pay3_mean` 用了 `dps_series × 负数/NaN`。实际 ⑤ 应该用 screen_sh 的口径（分红总额/净利）。我探针里 `np_y` 取数可能失败。先验证 ⑤ 数据，否则给你错误结论。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: ⑤ 确实全 0，bug 确认（`np_y` 取净利时列键不匹配导致分母 NaN→支付率算成0）。修这一列：⑤ 支付率直接用**三年分红总额 ÷ 三年净利总额**（与深市 pay3 同口径，更稳），或用 screen_sh 的逐年均值。我用总额口径重算⑤并重判。\n\ncare：只修 ⑤ 一列，其余 13 条已验证合理，不推翻。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/筛选探针变量引用修复.md",
+                "memory_type": "events",
+                "after": "# Summary\n探针运行 exit=1 报错，因 div3 变量定义被删；将裸 div3 引用统一改为 idx['div3']（第 89、95、103 行），修复后脚本跑通，数据可信。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 但是按照现在这个条件，股息率卡到3也有入选的，能不能逐项对比，加入沪市的条件筛选\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: exit=1，脚本报错了（⑤ 还是 0，说明改动前的变量引用崩了）。看日志真实错误：\n**assistant [peer=github.com-tyvt-financial-data-lake]**: `div3` 定义被删了。改为 `idx['div3']`：\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 还要确认 `div3` 后面别处有无引用（第89行之后 disp 里用 `div3_yi` 应OK）。查一下：\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 第95、103行也用了裸 `div3`。统一改 `idx['div3']`："
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/沪市标准对比结论.md",
+                "memory_type": "events",
+                "after": "# Summary\n24 只深市票在沪市 14 项标准下，无一通过全部 11 条（①-⑪）。②三年均股息>3.5% 砍 15 只（最杀手），③净利同比连正砍 13，⑦ROE>8% 砍 10，⑪分红>10亿砍 7，⑤支付率砍 7；⑥OCF/分红与①连续分红全过。最接近全过：粤高速A、华润三九、宁波银行、兴蓉环境（13/14）。结果存 分析产出/_沪标逐项对比.csv。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 但是按照现在这个条件，股息率卡到3也有入选的，能不能逐项对比，加入沪市的条件筛选\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: ⑤ 修好了（7 只不过，合理）。现在数据可信。完整结果见 [沪标逐项对比.csv](分析产出/_沪标逐项对比.csv)。\n\n## 逐项对比结论\n\n**核心事实：沪市 11 条全过 = 0 只。** 深市 24 只在沪市标准下**没有一只全部通过**。\n\n按沪市 11 条（①-⑪）逐条砍掉多少（24 只里\"不过\"的只数）：\n\n| 条 | 沪市条件 | 不过 | 最杀手 |\n|---|---|---:|---|\n| ② | 三年均股息 >3.5% | **15** | 利率杀手，一半以上不够 |\n| ③ | 净利同比连续三年 >0 | **13** | 银行/公用/周期利润波动 |\n| ④ | 资产负债率 <60% | 9 | 银行豁免后仍砍券商/高负债 |\n| ⑤ | 支付率 30-80% | 7 | 银行免⑤ |\n| ⑦ | ROE >8% | 10 | 券商 ROE 低 |\n| ⑩ | 净利 CAGR >3% | 9 | 成熟股无成长 |\n| ⑪ | 分红 >10亿 | 7 | 小盘不够 |\n| ⑨ | 近12月 >-20% | 6 | |\n| ⑧ | 现金流/净利 >80% | 1 | 仅陕国投 |\n| ⑥ | OCF/分红 >1 | 0 | 全过 |\n| ① | 连续分红 | 0 | 全过 |\n\n**最接近沪市全过的（通过数最多）**：\n- **粤高速A、华润三九、宁波银行、兴蓉环境：13/14**（只差 1 条）\n- 招商公路、湖北能源、陕天然气：12/14\n\n**几乎全灭的**：浙江交科、现代投资、博深股份（7/14）。\n\n## 你说\"股息率卡3也有入选\"——验证成立..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/股息率阈值验证.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户称股息率卡 3 仍有入选，验证成立：24 只中>2.5% 全部满足（②过 9 只），但>3.5% 仅 9 只；将②从 2.5% 提至 3.5% 则只剩 9 只。可选加固方向含提高②阈值、加③⑦⑪⑤等条件。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 但是按照现在这个条件，股息率卡到3也有入选的，能不能逐项对比，加入沪市的条件筛选\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: ...- **粤高速A、华润三九、宁波银行、兴蓉环境：13/14**（只差 1 条）\n- 招商公路、湖北能源、陕天然气：12/14\n\n**几乎全灭的**：浙江交科、现代投资、博深股份（7/14）。\n\n## 你说\"股息率卡3也有入选\"——验证成立\n- 24 只里**三年均股息 >2.5% 全部满足**（②过 9 只），但**>3.5% 只有 9 只**（15 只不够）。\n- 也就是说：**把②从 2.5% 提到 3.5%，24 只只会剩 9 只**。股息率卡 3 确实仍有入选，卡 3.5 剩 9 只。\n\n## 可选加固方向（都基于真实数据，不是拍脑袋）\n1. **②股息率提到 3.0% 或 3.5%** —— 一刀砍到 9~14 只，最有效\n2. **③净利同比连续正** —— 砍 13 只（但会误杀银行/公用，与深市\"不看成长\"初衷冲突）..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/程序/screen_sh.md",
+                "memory_type": "entities",
+                "after": "# screen_sh\n沪市股票筛选脚本，内含红利质量指标判定逻辑；可被探针复用只算数据不落盘，用于对任意股票逐项判定。\n\n## 筛选指标\n- ① 连续分红（基准项，24 只深市票全过）\n- ② 三年均股息 >3.5%\n- ③ 净利同比连续三年 >0\n- ④ 资产负债率 <60%（银行豁免）\n- ⑤ 支付率 30-80%（公用事业豁免）\n- ⑥ OCF/分红 >1\n- ⑦ ROE >8%\n- ⑧ 现金流/净利 >80%\n- ⑨ 近12月 >-20%\n- ⑩ 净利 CAGR >3%\n- ⑪ 三年分红 >10亿\n- ⑫ 波动 <25%\n- ⑬ 63日均额 ≥5000万\n- ⑭ 股息率倍数 <2\n\n## 关联\n- 属数据湖选股模块，与深市筛选脚本（pay3 同口径）并列\n- 2026-11-11 探针复用其函数对 24 只深市票逐项判定 14 项，输出对比矩阵至 分析产出/_沪标逐项对比.csv"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 6,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

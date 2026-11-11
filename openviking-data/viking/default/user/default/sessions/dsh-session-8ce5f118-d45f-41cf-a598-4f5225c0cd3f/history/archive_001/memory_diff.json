@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-8ce5f118-d45f-41cf-a598-4f5225c0cd3f/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-11T03:23:48.720708+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/11/看门狗闪窗原因确认.md",
+                "memory_type": "events",
+                "after": "# Summary\n确认一闪而过的 PowerShell/CMD 窗口来自 OpenViking-Watchdog 计划任务。该任务每 1 分钟运行一次，原命令为 powershell.exe -WindowStyle Hidden -File C:\\Users\\Administrator\\.openviking\\watch-openviking.ps1；因 Windows 在应用隐藏样式前先创建控制台导致闪屏。任务仅在 dsh web（端口 3080）运行时检查 OpenViking（端口 1933）与 Ollama（端口 11434），正常则仅写日志后退出。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: 现在会是不是的弹出一个powershell还是cmd窗口，一闪就关闭了，看下是哪里触发的，在干什么工作，能不能改为静默的\n...\n**assistant [peer=deepseek-harness-default-workspace]**: 一闪而过的是 **OpenViking-Watchdog** 计划任务，不是 DSH 会话里的命令。\n\n- **频率**：每 1 分钟一次（刚才 9:15 刚跑过，结果码 0）。\n- **原来怎么启动**：`powershell.exe -WindowStyle Hidden -File C:\\Users\\Administrator\\.openviking\\watch-openviking.ps1`。`-WindowStyle Hidden` 生效前，Windows 仍会先建一个控制台，所以会闪一下。\n- **在做什么**：只在本机 `dsh web`（端口 3080）已经在跑时检查 OpenViking（1933）和 Ollama（11434）。都正常就写一行日志后退出；挂了才尝试拉起。多数时候是空转检查。..."
+            },
+            {
+                "uri": "viking://user/default/peers/deepseek-harness-default-workspace/memories/events/2026/11/11/看门狗静默启动改造.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-11 将 OpenViking-Watchdog 计划任务改为 wscript.exe 运行 C:\\Users\\Administrator\\.openviking\\watch-openviking-hidden.vbs，窗口样式隐藏，不再经过可见的 powershell/cmd，脚本逻辑不变。另外两个任务 dsh-cursor-quiet-reapply（已 wscript 隐藏）与 Scheduling Target Schedule Automation Our（每 10 分钟运行不存在的 l340snjM.exe，报错 0x80070002）均非闪窗来源。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=deepseek-harness-default-workspace]**: 现在会是不是的弹出一个powershell还是cmd窗口，一闪就关闭了，看下是哪里触发的，在干什么工作，能不能改为静默的\n...\n**assistant [peer=deepseek-harness-default-workspace]**: ...已经改成静默启动：任务改为 `wscript.exe` 跑 `C:\\Users\\Administrator\\.openviking\\watch-openviking-hidden.vbs`，窗口样式为隐藏，不再经过可见的 powershell/cmd。脚本逻辑没变，下次触发大约在一分钟内。\n\n另外两个近期任务不是这次的闪窗：`dsh-cursor-quiet-reapply` 本来就是 wscript 隐藏的；`Scheduling Target Schedule Automation Our` 每 10 分钟去跑一个已不存在的 `l340snjM.exe`（结果 `0x80070002` 找不到文件），不会弹出 powershell。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/程序服务/openviking_watchdog.md",
+                "memory_type": "entities",
+                "before": "# OpenViking看门狗\nOpenViking 自启动看门狗机制，由 DeepSeek Harness 于 2026-11-09 创建，用于填补 dsh web 已启动但 OpenViking 未启动的缺口。\n\n## 看门狗脚本\n- 路径 C:\\Users\\Administrator\\.openviking\\watch-openviking.ps1\n- 每轮检查「dsh web 在跑（端口 3080）但 OpenViking 没跑（端口 1933）」时，调用 start-server.bat 自动拉起 OpenViking\n- 严格只在 dsh web 运行时管理 OpenViking；dsh web 未运行则不动\n\n## 防重复启动\n- 三重保护：端口监听检查 + 进程存在检查 + 2 分钟冷却状态文件\n\n## 配套计划任务\n- Windows 计划任务 OpenViking-Watchdog：每 5 分钟运行脚本一次，登录后持续生效、重启自愈\n- 已验证 Last Result 0，日志显示 dsh web up; OpenViking healthy (port 1933 listening). OK.，未误启",
+                "after": "# OpenViking看门狗\nOpenViking 自启动看门狗机制，由 DeepSeek Harness 于 2026-11-09 创建，用于填补 dsh web 已启动但 OpenViking 未启动的缺口。\n\n## 看门狗脚本\n- 主脚本路径 C:\\Users\\Administrator\\.openviking\\watch-openviking.ps1\n- 静默启动包装脚本 C:\\Users\\Administrator\\.openviking\\watch-openviking-hidden.vbs（由 wscript.exe 调用，窗口隐藏）\n- 每轮在 dsh web 在跑（端口 3080）时检查 OpenViking（端口 1933）与 Ollama（端口 11434）；均正常则写一行日志后退出，挂了才尝试拉起\n- 严格只在 dsh web 运行时管理 OpenViking；dsh web 未运行则不动\n\n## 防重复启动\n- 三重保护：端口监听检查 + 进程存在检查 + 2 分钟冷却状态文件\n\n## 配套计划任务\n- Windows 计划任务 OpenViking-Watchdog：每 1 分钟运行一次，登录后持续生效、重启自愈\n- 2026-11-11 起改为 wscript.exe 运行 watch-openviking-hidden.vbs 实现静默启动，不再经过可见 powershell/cmd（原先 powershell.exe -WindowStyle Hidden 仍会先建控制台导致闪屏）\n- 已验证 Last Result 0，日志显示 dsh web up; OpenViking healthy (port 1933 listening). OK.，未误启"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

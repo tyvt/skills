@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-697770ab-9b3b-495e-8ea7-ab70d0ad59d7/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-11T05:17:13.890457+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/先跑廉价筛选决策.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于2026-11-11决定先跑低波/财务/支付率筛选，并设置硬约束：该筛选耗时必须≤2分钟，不碰治理外抓步骤。助手随后编写并运行仅含三道关卡的探针。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 先把低波/财务/支付率筛完\n如果超过2分钟我是不能接受的\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 明白，硬约束：**低波/财务/支付率筛完必须 ≤2 分钟，不碰治理**。我写一个只跑这三道的探针（复用脚本已有函数），只对 246 只初筛候选算，跑完计时给你看。\n\n依赖确认：低波要 `rebuilt_returns`+`Sufficiency`（对246只，非全市场），财务要 OCF+净利查询（只查246只）。这些都在脚本里现成。写探针："
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/11/低波财务支付率筛选完成.md",
+                "memory_type": "events",
+                "after": "# Summary\n低波+财务+支付率筛选于2026-11-11完成，耗时13.9秒（远低于2分钟红线），246只初筛候选经股息率/低波/现金流/支付率筛选后降至41只，结果写入_低波财务支付_预览.csv。剩余治理关卡（41只约1分钟）未跑。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 先把低波/财务/支付率筛完\n如果超过2分钟我是不能接受的\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 跑完了，**13.9 秒**，远低于 2 分钟红线。\n\n## 低波 + 财务 + 支付率 筛完\n\n| 步骤 | 条件 | 剩余 |\n|---|---|---|\n| ① 基础池 | 深市主板 + 上市满3年 | 1383 只 |\n| ④ 股息率 | >2.5% + 连续分红 | 246 只 |\n| ③ 低波 | <25% | **51 只** |\n| ⑤ 现金流 | 三年 OCF/分红 >1 | **45 只** |\n| ⑥ 支付率 | 三年合计 <100% | **41 只** |\n\n**41 只**全部通过，已写入 [`_低波财务支付_预览.csv`](分析产出/_低波财务支付_预览.csv)。**这一关不需要外抓，13.9 秒完成**——最贵的低波复权只对 246 只算，比全市场快得多。..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/技术模式/实控人治理抓取机制.md",
+                "memory_type": "entities",
+                "after": "# 实控人治理抓取机制\n`ownership.py` 的 `fetch_many` 串行单线程抓取东财接口，是数据湖选股模块最慢环节。\n\n## Description\n- 每只股票一次 `requests.get`（超时 15s），股间强制 `sleep(0.6~1.8s)` 防东财限流\n- 失败指数退避重试（最多 3 次，2^k×1.5s + 抖动）\n- 无缓存新股实际每只约 1.3–2s\n- 属于数据湖选股模块（final_portfolio_v3.py 等）\n\n## Performance\n- 246 只全新抓：约 5–8 分钟\n- 全市场 2791 只：1 小时以上\n- 41 只（先筛后抓）：约 1 分钟\n\n## Cache\n- `fetch_many` 第 311–314 行：当日已抓命中缓存跳过不发请求\n- 缓存文件 `实控人核查.csv` 共 86 条，2026-11-11 当日有效仅 1 条\n\n## Optimization\n- 放宽缓存时效至 N 天（如实控人极少变，30 天最划算）\n- 并发抓取（ThreadPool 4–6）+ 调小 sleep，注意东财 403 限流\n- 先跑廉价关卡压候选量再抓治理，最省且不改逻辑"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/preferences/github.com-tyvt-financial-data-lake/选股初筛工作流.md",
+                "memory_type": "preferences",
+                "before": "- 选股筛选时优先只跑零/低计算量条件（上市年限、股息率、连续分红等取数成本低者）做初筛看候选池，再决定是否继续跑低波复权、财务取数、治理等重计算关卡\n- 明确要求「不要大计算量」时，仅执行廉价过滤，不碰复权收益波动率、财报取数、外抓治理等昂贵步骤",
+                "after": "- 选股筛选时优先只跑零/低计算量条件（上市年限、股息率、连续分红等取数成本低者）做初筛看候选池，再决定是否继续跑低波复权、财务取数、治理等重计算关卡\n- 明确要求「不要大计算量」时，仅执行廉价过滤，不碰复权收益波动率、财报取数、外抓治理等昂贵步骤\n- 对选股筛选设硬约束：低波/财务/支付率等单轮筛选耗时必须 ≤2 分钟，超过则不可接受"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

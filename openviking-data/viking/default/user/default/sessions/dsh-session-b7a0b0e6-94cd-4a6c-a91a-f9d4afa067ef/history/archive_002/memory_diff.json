@@ -1,0 +1,43 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-b7a0b0e6-94cd-4a6c-a91a-f9d4afa067ef/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-11T07:06:49.803384+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/D--repository---H5/memories/events/2026/11/11/门户H5重新构建启用远程接口.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户反馈 localhost:8091 登录页未调用真实接口。排查确认 dist 于 2026-11-11 10:55 以 demo 模式构建，早于当日 12:00 将 .env 改为 VITE_DATA_MODE=remote，故运行包仍为演示模式不调接口。于 2026-11-11 15:03 重新执行 npm run build:h5，将 VITE_DATA_MODE=remote 烘焙进新包，登录改为调用真实接口。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=D--repository---H5]**: http://localhost:8091/登录没有调用接口？全部改为真实接口调用\n...\n**assistant [peer=D--repository---H5]**: 已修复。问题根因和验证如下。\n\n## 根因\n`src/pages/login-design/index.vue:9` 用 `isRemote = import.meta.env.VITE_DATA_MODE !== 'demo'` 决定登录是否真正调接口。你今天 12:00 把 `.env` 改成了 `VITE_DATA_MODE=remote`，但 **`dist` 是在 10:55 构建的旧包**——那时候还是 `demo` 模式。所以跑在 `localhost:8091`（nginx 托管的 `dist`）的页面处于演示模式：`sendSmsCode`/`submit` 里 `if (!isRemote)` 直接走假倒计时、不调后端，正是你看到的「登录没调接口」。\n\n`VITE_DATA_MODE` 是 **构建期常量**（Vite 在打包时内联），改 `.env` 不重启/刷新不会生效，必须重新构建。\n\n## 已做\n1. 重新构建 `dist`（`npm run build:h5`，已于 15:03 完成，exit 0），`VITE_DATA_MODE=remote` 已烘焙进新包。..."
+            },
+            {
+                "uri": "viking://user/default/peers/D--repository---H5/memories/events/2026/11/11/验证码接口链路验证通过.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-11 通过 nginx 代理 POST http://localhost:8091/api/v3.0/portal/appLogin/captcha 返回 HTTP 200 及验证码数据，确认 nginx(8091)→网关(8086)→门户(9222) 全链路打通，登录真实接口可用。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=D--repository---H5]**: http://localhost:8091/登录没有调用接口？全部改为真实接口调用\n...\n**assistant [peer=D--repository---H5]**: ...2. 确认链路通畅：直接打 nginx 的接口（等价于前端会发的请求）——\n   `POST http://localhost:8091/api/v3.0/portal/appLogin/captcha`\n   返回 `HTTP 200 {\"code\":200,\"msg\":\"操作成功\",\"data\":{\"uuid\":\"...\",\"img\":\"data:image/png;base64,...\"}}`\n   即 **nginx(8091) → 网关(8086) → portal(9222)** 全链路打通，验证码接口已真实响应。..."
+            },
+            {
+                "uri": "viking://user/default/peers/D--repository---H5/memories/entities/前端项目/h5_portal_frontend.md",
+                "memory_type": "entities",
+                "after": "# H5门户前端项目\nuni-app 编写的 H5 门户前端项目，构建产物为 dist，由 nginx 托管在 localhost:8091。\n\n## Description\n- 使用 Vite 构建，VITE_DATA_MODE 为构建期常量，支持 demo 与 remote 两种模式。\n- 登录页 src/pages/login-design/index.vue 以 isRemote 判断 VITE_DATA_MODE 是否不为 demo，决定是否真正调用后端接口。\n- demo 模式下 sendSmsCode 与 appLoginAction 不调接口，仅走本地假倒计时。\n- 验证码登录需手机号、身份证后四位、图形验证码、短信码；密码登录分支当前抛「密码登录接口未开放」。\n\n## Build Config\n- .env 设置 VITE_DATA_MODE=remote 且 VITE_API_BASE_URL=/api 时走真实接口。\n- 修改 .env 后必须重新执行 npm run build:h5，构建期常量才会烘焙进包，仅刷新页面无效。\n- portalAuth.ts 调用 /api/v3.0/portal/appLogin/{captcha,sms,login,apps} 及 /api/v3.0/portal/sso/jump。\n\n## Significance\n- 2026-11-11 因 dist 在切 remote 前以 demo 模式构建，导致登录不调接口，当日重新构建修复。"
+            },
+            {
+                "uri": "viking://user/default/peers/D--repository---H5/memories/entities/服务器配置/menhu_h5_nginx_conf.md",
+                "memory_type": "entities",
+                "after": "# 门户H5 nginx配置\nnginx 站点配置文件，位于 D:\nginx\\conf\\sites-enabled\\门户H5.conf，负责托管 H5 门户 dist 并反向代理接口。\n\n## Description\n- 监听端口 8091，root 指向 H5 门户构建产物 dist，index.html 已设 no-cache，JS 资源带 hash。\n\n## Proxy Rules\n- /api/v3.0/ 代理到 127.0.0.1:8086 并剥离 /api（即转发至 8086/v3.0/）。\n- /api/v2.0/ 与 /zhi2* 同样代理到 127.0.0.1:8086。\n\n## Significance\n- 后端网关地址为本地 8086；修改站点配置后才需执行 nginx -s reload。"
+            },
+            {
+                "uri": "viking://user/default/peers/D--repository---H5/memories/entities/后端服务/backend_gateway_portal.md",
+                "memory_type": "entities",
+                "after": "# 门户后端服务\nH5 门户对应的本地后端服务，由网关与门户服务组成。\n\n## Description\n- 网关服务监听 8086（2026-11-11 PID 7756），门户服务监听 9222（2026-11-11 PID 26280）。\n- 网关路由 /v3.0/portal/appLogin/* 等请求至门户服务。\n\n## Relations\n- 前端请求链路：nginx(8091) → 网关(8086) → 门户(9222)。\n- 联调分支 feature/feat-dzc-261111 提交 484848e「固定短信验证码（联调用）」，可用固定码免真实短信下发。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

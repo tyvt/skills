@@ -1,0 +1,36 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-5dac3c23-bbb9-45f5-a76b-5a303bc75f64/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-11T03:26:37.313573+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/nginx_site/portal_h5_site.md",
+                "memory_type": "entities",
+                "after": "# 门户H5站点\n本地门户H5前端通过 nginx 部署，用于联调本地后端。\n## Description\n- 监听端口 8091，root 为 D:/repository/门户H5/dist，与「门户」站点(8092)共用同一 nginx 且独立不覆盖。\n- 2026-11-11 助手将该站点代理改指本地网关 127.0.0.1:8086，并剥除 /api 前缀（因网关路由本身不带 /api，生产由入口层剥离）。\n- 改后联调链路打通：浏览器开 http://localhost:8091 可登录，请求经 nginx 8091 → 网关 8086 → portal-server 9222。\n## Relations\n- 与「门户」站点（8092）独立；8092 仍走远程网关未改动。\n- 与「门户后端」联动，代理指向其网关模块。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/nginx_site/portal_site.md",
+                "memory_type": "entities",
+                "before": "# Portal Site\n原「门户」前端（旧 checkout，分支 develop）通过 nginx 部署，与「门户H5」(master) 是不同项目。\n## Description\n- 配置文件：D:/nginx/conf/sites-enabled/门户.conf（符号链接 → D:/nginx/conf/sites-available/门户），root 为 D:/repository/门户/dist（旧项目门户，分支 develop）。\n- 监听端口 8092，server_name localhost；2026-11-11 助手曾误将 root 改为 门户H5/dist 后已还原，nginx 重新加载后确认正常服务门户/dist（HTTP 200，MD5 匹配）。\n- 通过 D:/nginx-ui 面板管理；磁盘直接改配置后需面板 Reload 同步避免漂移。\n## Relations\n- 与「门户H5」站点（端口 8091，root D:/repository/门户H5/dist）共用同一 nginx，二者独立不覆盖。\n- 与家园区一网通办H5 共用 nginx，曾通过将该 H5 移至 8093 解决端口冲突。",
+                "after": "# Portal Site\n原「门户」前端（旧 checkout，分支 develop）通过 nginx 部署，与「门户H5」(master) 是不同项目。\n## Description\n- 配置文件：D:/nginx/conf/sites-enabled/门户.conf（符号链接 → D:/nginx/conf/sites-available/门户），root 为 D:/repository/门户/dist（旧项目门户，分支 develop）。\n- 监听端口 8092，server_name localhost；2026-11-11 助手曾误将 root 改为 门户H5/dist 后已还原，nginx 重新加载后确认正常服务门户/dist（HTTP 200，MD5 匹配）。\n- 通过 D:/nginx-ui 面板管理；磁盘直接改配置后需面板 Reload 同步避免漂移。\n## Relations\n- 与「门户H5」站点（端口 8091，root D:/repository/门户H5/dist）共用同一 nginx，二者独立不覆盖。\n- 与家园区一网通办H5 共用 nginx，曾通过将该 H5 移至 8093 解决端口冲突。\n- 2026-11-11 门户H5(8091) 代理改指本地网关 127.0.0.1:8086 并剥除 /api 前缀以联调；门户(8092) 保持原样仍走远程网关。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/project/menhu_backend.md",
+                "memory_type": "entities",
+                "before": "# 门户后端\nJava/Maven 多模块后端项目，供门户H5等前端调用。\n## Description\n- 本地目录 D:/repository/门户后端，当前分支 feature/feat-dzc-261111（禅道1431：管理端APP接入统一门户登录）。\n- 模块含 common-gateway、common-portal-server 等。\n- 网关模块 common-gateway 已构建，jar 位于 target/，端口 8086，作为 API 入口处理 /v3.0/portal/... 等请求。\n- 前端代理 /api/v2.0、/api/v3.0、/zhi2* 均指向该网关。\n## Relations\n- 与「门户H5」前端联动；2026-11-11 用户要求将门户H5接口代理改指本地该后端以联调。",
+                "after": "# 门户后端\nJava/Maven 多模块后端项目，供门户H5等前端调用。\n## Description\n- 本地目录 D:/repository/门户后端，当前分支 feature/feat-dzc-261111（禅道1431：管理端APP接入统一门户登录）。\n- 模块含 common-gateway、common-portal-server 等。\n- 网关模块 common-gateway 已构建，jar 位于 target/，端口 8086，作为 API 入口；路由为 /v3.0/**、/v2.0/** 不带 /api 前缀（生产由入口层剥离，本地 nginx 代剥），处理 /v3.0/portal/... 等请求。\n- 前端代理 /api/v2.0、/api/v3.0、/zhi2* 均指向该网关；本地 门户H5(8091) 已改代理到 127.0.0.1:8086 并剥除 /api 前缀联调成功。\n- 依赖远程 Nacos（nacos.dev.zhi.com，命名空间 suzhou-shiqu-fangchanzonghe）做服务注册与配置中心，profile=dev；本机需连通该 Nacos 才能起服务。\n- 项目使用 Java 21 构建（应用类 class 65）并需用 Java 21 运行；早先误用 Java 8/17 导致 UnsupportedClassVersionError。\n- 2026-11-11 启动状态：gateway 8086 ✅、portal-server 9222 ✅ 已起并连 dev Nacos；framework-server 9219 ❌ 因 dev Nacos 中某 URL 配置含未解析 ${...} 占位符报 Illegal character found in host: '{'，暂不影响门户登录接口。\n## Relations\n- 与「门户H5」前端联动；2026-11-11 用户要求将门户H5接口代理改指本地该后端以联调。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

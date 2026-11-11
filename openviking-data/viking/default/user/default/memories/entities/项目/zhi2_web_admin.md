@@ -1,8 +1,8 @@
 # zhi2-web-admin
-房地产综合服务平台门户；`门户` 主仓库的 git 子模块，路径 `D:epository\门户\zhi2-web-admin`。
+房地产综合服务平台门户；`门户` 主仓库的 git 子模块，路径 `D:\repository\门户\zhi2-web-admin`。
 
 ## 仓库上下文
-- 父主仓库：`苏州市房地产监测V3`，本地路径 `D:epository\苏州市房地产监测V3\`
+- 父主仓库：`苏州市房地产监测V3`，本地路径 `D:\repository\苏州市房地产监测V3\`
 - 作为 git 子模块记录，gitlink SHA `77a7e6dee` 与 HEAD 一致（2026-11-09）
 - 父仓库维护编号错误台账 `docs/frontend/common-errors.md`（`E-XXX` 条目，2026-11-09 新增 E-046）
 
@@ -20,8 +20,8 @@
 {
   "category": "项目",
   "name": "zhi2_web_admin",
-  "source_extraction_id": "b207853aafb6424bbe77c58d64034b87",
-  "version": 5,
+  "source_extraction_id": "6f72dc685eb64f608f5f0aaabe1d5bc3",
+  "version": 10,
   "memory_type": "entities"
 }
 -->

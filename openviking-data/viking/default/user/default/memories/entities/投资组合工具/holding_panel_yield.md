@@ -8,6 +8,8 @@
 - targetYld=4.8：仅作参考值，dynamic 模式下不参与计算
 - 买入硬门槛：当前股息率 ≥ max(3.0, 近3年均值+0.5)
 - margin_by_ind 按申万一级行业覆盖全局参数（如银行 fixed 5.5%、公用事业下限3.0%），覆盖时以行业参数为准，详见「分行业择时矩阵」实体
+- dps 口径：dividend per share 采用近12个月滚动（rolling 12 months）计算
+- max_gap_pct=10：买入清单与持仓面板的现价相对目标买价偏离上限，高于10%不入选（唐山港+29.1%、渝农商行+20.4%因此剔除，2026-11-11 生效）
 
 ## 判定逻辑
 - floor 只决定低均值标的兜底，调 floor 无法让「当前股息率低于自身历史均值」的标的可买
@@ -22,8 +24,8 @@
 {
   "category": "投资组合工具",
   "name": "holding_panel_yield",
-  "source_extraction_id": "55955a178e9b4d8594c4786c62e6f612",
-  "version": 2,
+  "source_extraction_id": "5d76cc33a7004cfea7b9cf9a8d01c3a9",
+  "version": 4,
   "memory_type": "entities"
 }
 -->
