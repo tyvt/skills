@@ -112,7 +112,7 @@ export function apply(ctx, rawConfig) {
     if (id === undefined) return;
     let a = acc.get(id);
     if (!a) {
-      a = { uncached: 0, cacheRead: 0, output: 0, steps: 0, absentSteps: 0, lastUncached: 0, lastOutput: 0, lastBare: false, committed: false, optimized: false, closing: false, fired: new Set() };
+      a = { uncached: 0, cacheRead: 0, output: 0, steps: 0, absentSteps: 0, lastUncached: 0, lastOutput: 0, lastBare: false, bareCount: 0, bigMissStreak: 0, committed: false, optimized: false, closing: false, fired: new Set() };
       acc.set(id, a);
     }
     if (u.absent) {
@@ -126,6 +126,9 @@ export function apply(ctx, rawConfig) {
     a.lastUncached = u.uncached;
     a.lastOutput = u.output;
     a.lastBare = classifyAssistant(event) === "text" && u.output > config.bareReasoningBudget;
+    if (a.lastBare) a.bareCount += 1;
+    // 连续大未命中：第一次只提醒，第二次起把「提示」改成「下一步必须是取数」。
+    a.bigMissStreak = u.uncached > config.perStepUncachedBudget ? (a.bigMissStreak || 0) + 1 : 0;
   });
 
   ctx.on("session/event", (session, event) => {
@@ -159,15 +162,23 @@ export function apply(ctx, rawConfig) {
     if (!a) return next();
 
     const equiv = equivOf(a);
+    // 本 turn 早先已有过无工具超长步，才给带工具的超预算步加上“下一步必须调工具”。
+    const priorBare = a.bareCount > (a.lastBare ? 1 : 0);
+    const overOutput = a.lastOutput > config.perStepOutputBudget;
+    const outputText = priorBare
+      ? `[cost-meter] 上一步已超预算，output ${fmt(a.lastOutput)} tokens（>${fmt(config.perStepOutputBudget)}）。下一步第一件事必须是工具调用，禁止再并列 Option 1/2/3。`
+      : `[cost-meter] 上一步 output ${fmt(a.lastOutput)} tokens（>${fmt(config.perStepOutputBudget)}）。`;
     const checks = [
-      ["perStep", a.lastUncached > config.perStepUncachedBudget,
+      ["perStep", a.lastUncached > config.perStepUncachedBudget && a.bigMissStreak < 2,
         `[cost-meter] 上一步未命中 ${fmt(a.lastUncached)} tokens（>${fmt(config.perStepUncachedBudget)}），极高。典型成因按概率排序：① 全仓/容器级 grep——缩到 src/views/<模块> 再搜；② 缺真实值在脑内演算——先查一条 SQL / 一个接口返回；③ 大文件整读——grep 定位后 read offset/limit。先判断自己属于哪种，再动下一步。`],
-      ["perStepOutput", a.lastOutput > config.perStepOutputBudget,
-        `[cost-meter] 上一步 output ${fmt(a.lastOutput)} tokens（>${fmt(config.perStepOutputBudget)}），reasoning 熔断特征：反复推翻自己 = 缺事实。停：立刻调一次工具（grep 定位 / 查一条真实数据 / 读一段代码），拿到事实再决策，不要再推演。`],
+      ["perStepLookup", a.bigMissStreak >= 2,
+        `[cost-meter] 连续 ${a.bigMissStreak} 步未命中 >${fmt(config.perStepUncachedBudget)}，提醒没改掉走势。下一步第一件事必须是一次取数：一条 SQL（先 ALL_TAB_COLUMNS / 一行样本）、或带 offset/limit 的窄读、或缩到模块的 grep。禁止再整读、禁止再全仓搜、禁止再推演。`],
+      ["perStepOutput", overOutput && !priorBare, outputText],
+      ["perStepOutputAfterA", overOutput && priorBare, outputText],
       ["bareReasoning", a.lastBare,
         `[reasoning-watchdog] 上一步输出 ${fmt(a.lastOutput)} tokens 且无工具调用，疑似自我辩论。停止推演：调一次工具取事实，或直接下结论。`],
       ["closingCheck", a.closing,
-        `[closing-check] 本 turn 有提交但未跑 token-optimizer / 未核对后台任务。收尾前先执行，未验收项写入交付说明。`],
+        `[closing-check] 收尾自查未做：本轮有提交，未见 token-optimizer 记录。`],
       ["sessionUncached", a.uncached > config.sessionUncachedBudget,
         `[cost-meter] 本会话累计未命中 ${fmt(a.uncached)} tokens（>${fmt(config.sessionUncachedBudget)}）。成本已高，收窄任务范围、避免重复整读，必要时开新会话。`],
       ["sessionEquivEarly", equiv > config.sessionEquivEarly,
@@ -177,12 +188,14 @@ export function apply(ctx, rawConfig) {
       ["sessionEquiv", equiv > config.sessionEquivBudget,
         `[cost-meter] 本会话等效成本 ${fmt(equiv)}（>${fmt(config.sessionEquivBudget)}，含 ${a.steps} 步）。接近收尾线：尽快给出结论或拆分到新会话，别用 compaction 硬撑。`],
     ];
+    // 只看上一步的规则：每步都可能再超，不能被会话级 fired 吞掉。
+    const repeatable = new Set(["perStepOutput", "perStepOutputAfterA", "bareReasoning", "perStepLookup"]);
     const extra = [];
     for (const [key, hit, text] of checks) {
-      if (hit && !a.fired.has(key)) {
-        a.fired.add(key);
-        extra.push(notice(text, `cost-meter ${key}`));
-      }
+      if (!hit) continue;
+      if (!repeatable.has(key) && a.fired.has(key)) continue;
+      a.fired.add(key);
+      extra.push(notice(text, `cost-meter ${key}`));
     }
     if (extra.length === 0) return next();
     return next().then((decision) => {

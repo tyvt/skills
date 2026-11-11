@@ -6,7 +6,8 @@ description: 会话 token/成本卫生规范。读文件策略（grep 定位 + �
 # agent-cost-hygiene
 
 ## 读文件
-- 先 `grep -n` 拿行号表，再 `read offset/limit`，单次 ≤120 行；禁止整读 >300 行的文件。
+- 先 `grep -n` 拿行号表，再 `read offset/limit`，单次 ≤120 行；禁止整读 >300 行的文件。超过 200 行且没给 offset/limit 的 read，只看前 40 行，然后改成按行号窄读。
+- grep 先缩到本会话已读过的模块目录，禁止从仓根开搜；命中超过 20 条只留文件列表和每文件前 3 条，全文不回灌。
 - 同一文件同一段落不重复读；需要多处时一次读「行号表 + 3 段窄读」。
 - skill/文档用 grep 定位章节后只读该区间，不从 offset 39 试到 142。
 - **该 grep 的不整读**：只为确认函数签名/常量值时，`grep "export function xxx"` 一行即可，不要整读几百行。
