@@ -34,13 +34,12 @@
 - 观察来源：2026-11-02导入会话、2026-11-04/05恢复会话、2026-11-05排查会话fe39d020、2026-11-06定时汇报；涉及服务：OpenViking、Ollama、Magpie/VLM
 - 2026-11-09 审计确认：debug/health=false 误报源于此恢复遗留的 Embedding Errors=2 历史计数未清零；Requeued 1008 为本次恢复重放尾巴，12:57→13:11 冻结无新增
 
-
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "openviking_import_deadlock_recovery",
-  "source_extraction_id": "c6dd1ba5977146d4b03342c85dcfb672",
-  "version": 9,
+  "source_extraction_id": "9c6c6ee6b6884c42bff1ad1ddc28caff",
+  "version": 10,
   "memory_type": "entities"
 }
 -->

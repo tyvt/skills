@@ -6,7 +6,7 @@ Front-end project for Suzhou Housing G-end/management H5, uses zhi2-web-admin su
 
 ## Repo Structure & Workflow
 - Main workspace branch develop/v2.6.2-suzhufang, submodule same branch.
-- Worktrees in 苏住房G/worktrees/: bug5897 (branch li, HEAD cfe7f9930), task2192 (branch evaluation, HEAD 4e2cf39b3), unmerged but pushed to origin as of 2026-11-04.
+- Worktrees in 苏住房G/worktrees/: bug5897 (branch develop/v2.6.2-suzhufang-li, HEAD 7675b3197 as of 2026-11-10), task2192 (branch evaluation, HEAD 4e2cf39b3), unmerged but pushed to origin as of 2026-11-04.
 - Parent feature branch creates same-name parent branch to fix gitlink; .gitmodules set branch then commit/push; as of 2026-11-04 parent branch li (44274f8) pushed, evaluation (3940898) push rejected.
 - 2026-11-04 ZenTao 2295 changed detail.vue directly on develop/v2.6.2-suzhufang, submodule commit 8992db265, parent commit 8fb06ce updated gitlink.
 - Local nginx site port 8101, root D:/repository/苏住房G/dist, reloaded.
@@ -28,13 +28,12 @@ Front-end project for Suzhou Housing G-end/management H5, uses zhi2-web-admin su
 - Project: 苏住房G; evidence: extracted source=cursor project=苏住房G
 - Source session: 765750a0-13d8-4789-8d78-9bb82bdf1e1f
 
-
 <!-- MEMORY_FIELDS
 {
   "category": "project",
   "name": "苏住房G",
-  "source_extraction_id": "b38f11a4c3b04acabdd149126d3eb5aa",
-  "version": 25,
+  "source_extraction_id": "fda41f4158bd415c8f3b293c4de2ae17",
+  "version": 26,
   "memory_type": "entities"
 }
 -->

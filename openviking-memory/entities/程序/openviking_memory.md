@@ -16,12 +16,15 @@ OpenViking 是当前会话后台运行的长程记忆注入层，负责把历史
 - 本会话 `list_mcp_resources(server="openviking")` 返回 disconnected，实际可用的是插件注入 + 服务 HTTP
 - `context-mode`/`dbx` 经 `dsh-mcp-gateway` 按需拉起，是沙箱代码/缓存与禅道业务库，并非 OpenViking 本体
 
+## 工具暴露
+- MCP 暴露 24 个 mcp__openviking__* 工具；插件无按工具名裁剪的开关，无法仅保留 search/find/read，低频工具（如 add_resource、privacy_tree）暂无法隐藏。
+
 <!-- MEMORY_FIELDS
 {
   "category": "程序",
   "name": "openviking_memory",
-  "source_extraction_id": "fb50c21532e146739b8cc98ff0b723a2",
-  "version": 2,
+  "source_extraction_id": "e47ec749dd8846b8a08fc03cb4dcbd6a",
+  "version": 3,
   "memory_type": "entities"
 }
 -->
