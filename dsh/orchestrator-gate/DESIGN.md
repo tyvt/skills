@@ -467,7 +467,23 @@ passThroughSubagents: true        # delegationDepth>0 放行（编排器内部�
 - **重启后**：先看 fingerprint 日志确认版本，再对**每条改动规则**做一次真实工具调用灰度（正例拦、反例放）。
   指纹不符则不得声称已生效。
 
-### 10.4 P2 回退：typecheck 移出全量拦截（2026-11）
+#### 重启后 30 秒三段式 checklist（每次重启完先跑，别直接跳去跑业务）
+
+把「重启了但插件加载失败」这种**静默故障**挡在灰度之外。三步各约 30 秒，顺序不可省：
+
+1. **看指纹**：日志出现 `orchestrator-gate loaded: fingerprint=56cca912 ...`，且与源码算出的期望值一致 → **新进程已加载**。
+   （源码期望值：`node -e "import('./lib/index.js').then(m=>console.log(m.rulesFingerprint()))"`）
+   - 无此行 → 插件没加载；指纹不符 → 加载的是旧副本。**两种情况都停，别往下走。**
+2. **跑一个已知必拦命令**：对**仓库根**做 grep（如 `grep` 且 `path` 缺省/为仓库根）→ 确认 `[orchestrator-gate]` 真的弹出
+   → **证明拦截链路活着**（不是只加载了、规则却没接上）。
+   - 没弹 `[orchestrator-gate]`（弹了别的前缀或干脆放行）→ 拦截链路没接上，停。
+3. **跑一个已知必放命令**：`npm run typecheck`（或 `bun run typecheck`）→ 确认**未被**拦截 → **证明 P2 回退生效**
+   （typecheck 已移出全量拦截，验证网恢复）。
+
+> 三步全绿才算「重启已生效」。任一不绿 → 先查加载（第 1 步）→ 再查规则接线（第 2 步）→ 最后查规则内容（第 3 步），
+> 不要跳过诊断直接去跑业务，否则往往要等某条命令莫名被拦/莫名放行才发现。
+
+
 
 v9 §3.1 把「类型检查」并入了全量 build/lint 拦截。v10 修正：**`typecheck` / `type-check` / `tsc` / `vue-tsc`
 脚本名从 `FULL_SCRIPTS` 移出，不再按全量构建拦**（`build`/`lint` 仍拦）。理由：
