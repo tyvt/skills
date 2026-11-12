@@ -2,7 +2,9 @@
 
 供 DSH Node 工具插件(dsh-orchestrator)调用。避免命令行参数转义/编码问题。
 
-stdin:  {"op": "full"|"tool"|"list", "request": "...", "tool": "planner", "session_id": "对话ID", "config": "可选路径"}
+stdin:  {"op": "full"|"tool"|"list"|"plan_review", "request": "...", "tool": "planner",
+        "plan": "Markdown 计划正文(plan_review)", "context": "任务背景(plan_review)",
+        "session_id": "对话ID", "config": "可选路径"}
 stdout: 只有最终那一个 JSON 对象。日志、[usage]、库打印都走 stderr。
 """
 from __future__ import annotations
@@ -51,6 +53,15 @@ def main() -> int:
                     _emit(real_stdout, {"ok": False, "error": "request 必填"})
                     return 2
                 out = api.run_full(request, cfg, session_id)
+            elif op == "plan_review":
+                # req 带 plan（Markdown 计划正文）与 request/context（任务背景）。
+                plan = req.get("plan", "") or ""
+                if not plan.strip():
+                    _emit(real_stdout, {"ok": False, "error": "plan 必填"})
+                    return 2
+                context = req.get("context", "") or req.get("request", "") or ""
+                plan_path = req.get("plan_path", "") or ""
+                out = api.run_plan_review(plan, context, cfg, session_id, plan_path)
             else:
                 _emit(real_stdout, {"ok": False, "error": f"未知 op: {op}"})
                 return 2
