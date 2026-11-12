@@ -437,3 +437,47 @@ passThroughSubagents: true        # delegationDepth>0 放行（编排器内部�
 ## 9. 待用户确认后执行
 
 本文档是设计稿（v9）。确认后我再：① 新建 `dsh/orchestrator-gate/` 四件套；② 写 `selftest.mjs` 覆盖 §3 每条规则正反例 + §7 的 S1~S5 组，并补八审新增 `ForEach-Object { python cost_bill.py }`（拦）、`grep "cost_bill.py" logs/`（放行）、exec.cwd 子目录下 `cd .sessions && cat`（拦）（预估 40+ 用例）；③ 跑 selftest 通过；④ 交付并说明「需重启 Web 生效」。**`blockBuildLint` 默认不随插件首启开启**，等 **§7 实测项 M1（子 ctx 是否触发 guard）** 与 **§7.5（config 写权限）** 两项实测通过再手动打开；`blockRootGrep` 可先灰度（不依赖 M1，误伤面最小，作首个"guard 能收到事件"验证点）。
+
+---
+
+## 10. v10 运行时可观测：派生指纹 + 启动日志（2026-11）
+
+### 10.1 变更动机
+
+模型曾在未重启 Web 的情况下声称「改动已生效 / 实测被拦」，但插件装的是安装副本，**未重启 = 加载的是旧代码**，
+任何「实测」结论都不成立。§5 的「需重启 Web」是要求，但缺一个**可核对凭证**。v10 补上：
+
+- `rulesFingerprint()`：由「`RULES` 全部开关 + `BINS` + `FULL_SCRIPTS`」内容派生一个 8 位十六进制短哈希（FNV-1a）。
+  **故意不手写版本号**——手写号会忘记更新，派生指纹不会：任何一条规则开关或 bin 集合变了，指纹必变。
+- `apply()` 启动时 `log.warn` 打印：`fingerprint=<8hex> rules=<全部开关=值,...> fullScripts=[...]`。
+
+### 10.2 怎么读这个指纹（三件一套，缺一不可）
+
+1. **记下源码期望值**：在仓库里 `node -e "import('./lib/index.js').then(m=>console.log(m.rulesFingerprint()))"`
+   （或跑 selftest 时打印），得到当前源码应有的指纹，例如 `a1b2c3d4`。
+2. **看启动日志**：重启 Web 后，在日志里找 `orchestrator-gate loaded: fingerprint=...`。
+3. **比对 + 看全量开关**：日志里的指纹 **等于** 第 1 步期望值 → 加载的是你以为的那份代码；
+   **不等** → 加载的是旧副本（未重启 / 装错目录），此时**任何「实测被拦/未被拦」结论作废**。
+   日志同时打印 `rules=` 全量开关状态，逐条核对哪些规则实际为 true。
+
+### 10.3 灰度规则：重启前结论不成立
+
+- **重启前**：只能证明**纯函数逻辑**（`selftest.mjs` 的 N checks 全绿）。**不能**证明线上实际拦截行为。
+  交付语必须写清「selftest 通过 = 函数逻辑正确；线上拦截需重启后以 fingerprint 日志确认加载版本，再实测」。
+- **重启后**：先看 fingerprint 日志确认版本，再对**每条改动规则**做一次真实工具调用灰度（正例拦、反例放）。
+  指纹不符则不得声称已生效。
+
+### 10.4 P2 回退：typecheck 移出全量拦截（2026-11）
+
+v9 §3.1 把「类型检查」并入了全量 build/lint 拦截。v10 修正：**`typecheck` / `type-check` / `tsc` / `vue-tsc`
+脚本名从 `FULL_SCRIPTS` 移出，不再按全量构建拦**（`build`/`lint` 仍拦）。理由：
+
+- 项目常无 eslint，**typecheck 是唯一的静态自检安全网**；把它关进全量拦截 = 砍掉验证网。
+- orchestrate 的 `pwsh` **无本地 FS**，全量 typecheck 在 orchestrate 侧跑不了 → 宿主被拦 + orchestrate 跑不了 = 死路，
+  比原来的「漏拦」更糟：模型只得报「未执行」，更容易在未验证时声称完成。
+- typecheck 交宿主**窄跑**（单文件/单模块，必要时后台 + 超时），成本靠自律与超时控制，不靠本门禁。
+
+> 注意：**直接二进制** `bare tsc` / `bare vue-tsc`（无文件、无 `-p`/`-b`）仍按 §3.1 原 tsc 子规则拦（那是另一套规则，
+> 非 `FULL_SCRIPTS`）；只有 `npm/pnpm/yarn/bun run typecheck` 这类**脚本名**不再被全量拦截。
+> `npm run typecheck` 曾也漏拦过（旧 `FULL_SCRIPTS` 只含 build/lint），现一并交宿主窄跑。
+

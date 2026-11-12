@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import {
   RULES, decideInterception, splitSegments, tokenize, classifyBuild, classifyBilling,
-  pathInSessions, apply,
+  pathInSessions, apply, rulesFingerprint,
 } from "./lib/index.js";
 
 const CFG = {
@@ -75,17 +75,10 @@ withRules({ blockBuildLint: true }, () => {
     ["npm run build -- --version", "script version arg"],
     [`cd packages/app && npx eslint src/foo.ts`, "cd relative eslint"],
     [`tsc ${FILE} `, "single file compile without noEmit"],
-    ["bun run typecheck", "bun run typecheck"],
     ["bun run build", "bun run build"],
     ["bun run lint:fix", "bun run lint variant"],
-    ["bun typecheck", "bun bare typecheck"],
-    ["bun run type-check", "bun type-check"],
-    ["bun tsc", "bun bare tsc"],
     ["bunx eslint", "bunx eslint no args"],
     ["bun x eslint src/**/*.ts", "bun x eslint glob"],
-    ["bun run typecheck -- --watch", "bun typecheck extra arg"],
-    ["npm run typecheck", "npm run typecheck"],
-    ["pnpm typecheck", "pnpm bare typecheck"],
   ];
   for (const [c, name] of block) check(name, shell(c), true);
 
@@ -104,6 +97,14 @@ withRules({ blockBuildLint: true }, () => {
     [`npx eslint ${FILE}`, "single file eslint"],
     [`tsc ${FILE} --noEmit`, "single file tsc"],
     ["Get-ChildItem", "listing"],
+    // typecheck 是验证安全网，不纳入全量拦截（见 index.js FULL_SCRIPTS 注释）
+    ["bun run typecheck", "bun run typecheck passes"],
+    ["bun typecheck", "bun bare typecheck passes"],
+    ["bun run type-check", "bun type-check passes"],
+    ["bun tsc", "bun bare tsc passes"],
+    ["bun run typecheck -- --watch", "bun typecheck extra arg passes"],
+    ["npm run typecheck", "npm run typecheck passes"],
+    ["pnpm typecheck", "pnpm bare typecheck passes"],
     ["bun run dev", "bun dev"],
     ["bun install", "bun install"],
     ["bun add lodash", "bun add"],
@@ -244,5 +245,16 @@ withRules({ blockWholeRead: true }, () => {
 // classify 单元冒烟
 assert.equal(classifyBuild(tokenize("pnpm run rebuild")), null);
 assert.ok(classifyBilling(splitSegments("python cost_bill.py"), { cwd: CWD }));
+
+// 派生指纹：稳定、且随规则变化而变
+{
+  const fp1 = rulesFingerprint();
+  assert.match(fp1, /^[0-9a-f]{8}$/, "fingerprint is 8 hex chars");
+  assert.equal(rulesFingerprint(), fp1, "fingerprint stable within same rules");
+  withRules({ passThroughSubagents: false }, () => {
+    assert.notEqual(rulesFingerprint(), fp1, "fingerprint changes when a rule flips");
+  });
+  assert.equal(rulesFingerprint(), fp1, "fingerprint restored after rule restore");
+}
 
 console.log(`selftest ok: ${n} checks`);

@@ -34,6 +34,27 @@ Object.defineProperty(RULES, 'blockRootGrep', { writable: false, configurable: t
 Object.defineProperty(RULES, 'blockWholeRead', { writable: false, configurable: true });
 Object.defineProperty(RULES, 'blockBillingBypass', { writable: false, configurable: true });
 
+/**
+ * 派生指纹：由「规则开关 + BINS + FULL_SCRIPTS」的内容派生一个短哈希。
+ * 改这些规则 → 指纹变；重启后日志里指纹若与预期不同，说明加载的不是你以为的那份。
+ * 故意不手写版本号：手写版本号会被遗忘更新，派生指纹不会。
+ */
+export function rulesFingerprint() {
+  const ruleKeys = Object.keys(RULES).sort();
+  const material = [
+    "rules:" + ruleKeys.map((k) => `${k}=${RULES[k]}`).join(","),
+    "bins:" + [...BINS].sort().join(","),
+    "full:" + [...FULL_SCRIPTS].sort().join(","),
+  ].join("|");
+  // FNV-1a 32-bit，零依赖，稳定跨进程
+  let h = 0x811c9dc5;
+  for (let i = 0; i < material.length; i++) {
+    h ^= material.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(16).padStart(8, "0");
+}
+
 const SHELL_TOOLS = new Set(["pwsh", "bash", "terminal"]);
 const COMMAND_FIELDS = ["command", "script", "cmd"];
 const BINS = new Set(["npm", "pnpm", "yarn", "bun", "bunx", "npx", "eslint", "tsc", "vue-tsc", "vite"]);
@@ -214,12 +235,19 @@ function statFile(p, fsImpl) {
   }
 }
 
-/** 全量脚本名：命中即视为 build/lint/类型检查（支持 `name:` 变体，如 build:prod）。 */
-const FULL_SCRIPTS = new Set(["build", "lint", "typecheck", "type-check", "tsc", "vue-tsc"]);
+/**
+ * 全量脚本名：只有 build / lint 及 `name:` 变体算「全量构建类」。
+ * 注意：typecheck / type-check / tsc / vue-tsc 故意**不在此列**。
+ * 项目常无 eslint，typecheck 是唯一的静态自检安全网；而 orchestrate 的 pwsh
+ * 无本地 FS 跑不了全量 typecheck —— 若把 typecheck 关进全量拦截，宿主直跑被拦、
+ * orchestrate 又跑不了，等于砍掉验证网，比漏拦更糟。typecheck 交宿主直跑（可窄跑），
+ * 成本靠「单文件/单模块」自律与后台超时控制，不靠本门禁。
+ */
+const FULL_SCRIPTS = new Set(["build", "lint"]);
 function isFullScript(script) {
   if (!script) return false;
   if (FULL_SCRIPTS.has(script)) return true;
-  return /^(build|lint|typecheck|type-check):/.test(script);
+  return /^(build|lint):/.test(script);
 }
 
 /** §3.1：一段 argv 是否全量 build/lint/类型检查。返回命中原因或 null。 */
@@ -478,6 +506,14 @@ export function apply(ctx, raw, { counters = { rejected: 0, errors: 0, shellWrap
   const sessionWholeReads = new Map();
   if (!config.enabled) return;
   const log = typeof ctx?.logger === "function" ? ctx.logger(name) : ctx?.logger;
+  // 启动日志：指纹 + 全量开关状态。改规则后必须重启 Web 才生效；
+  // 重启前任何「实测被拦/未被拦」的结论都不成立——以这行日志为加载凭证。
+  log?.warn?.(
+    "orchestrator-gate loaded: fingerprint=%s rules=%s fullScripts=[%s]",
+    rulesFingerprint(),
+    Object.keys(RULES).sort().map((k) => `${k}=${RULES[k]}`).join(","),
+    [...FULL_SCRIPTS].sort().join(","),
+  );
   const disposer = ctx?.tools?.guard?.((exec) => {
     try {
       const sess = exec?.agent?.session?.header;
