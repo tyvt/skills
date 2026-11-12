@@ -36,7 +36,7 @@ Object.defineProperty(RULES, 'blockBillingBypass', { writable: false, configurab
 
 const SHELL_TOOLS = new Set(["pwsh", "bash", "terminal"]);
 const COMMAND_FIELDS = ["command", "script", "cmd"];
-const BINS = new Set(["npm", "pnpm", "yarn", "npx", "eslint", "tsc", "vue-tsc", "vite"]);
+const BINS = new Set(["npm", "pnpm", "yarn", "bun", "bunx", "npx", "eslint", "tsc", "vue-tsc", "vite"]);
 const WRAP_HEADS = new Set(["&", "start-process", "cmd", "bash", "pwsh", "sh"]);
 
 const BUILD_LINT_NON_EXEC = new Set([
@@ -148,7 +148,7 @@ function scriptRuns(argv) {
   const at = text.indexOf("{");
   if (at < 0) return false;
   const inner = text.slice(at);
-  return /\b(python|node|pwsh|bash|npm|pnpm|yarn|npx|eslint|tsc|vue-tsc|vite|start-process)\b/i.test(inner)
+  return /\b(python|node|pwsh|bash|npm|pnpm|yarn|bun|bunx|npx|eslint|tsc|vue-tsc|vite|start-process)\b/i.test(inner)
     || /-command/i.test(inner);
 }
 
@@ -164,10 +164,14 @@ function hasExecToken(argv) {
 function peelBin(argv) {
   let i = 0;
   const h = headOf(argv);
-  if (h === "npx") {
+  const second = (argv[1] ?? "").toLowerCase();
+  if (h === "npx" || h === "bunx") {
     i = 1;
     while (i < argv.length && argv[i].startsWith("-")) i++;
-  } else if ((h === "pnpm" || h === "npm") && (argv[1] ?? "").toLowerCase() === "exec") {
+  } else if ((h === "pnpm" || h === "npm") && second === "exec") {
+    i = 2;
+    while (i < argv.length && argv[i].startsWith("-")) i++;
+  } else if (h === "bun" && second === "x") {
     i = 2;
     while (i < argv.length && argv[i].startsWith("-")) i++;
   }
@@ -210,6 +214,14 @@ function statFile(p, fsImpl) {
   }
 }
 
+/** 全量脚本名：命中即视为 build/lint/类型检查（支持 `name:` 变体，如 build:prod）。 */
+const FULL_SCRIPTS = new Set(["build", "lint", "typecheck", "type-check", "tsc", "vue-tsc"]);
+function isFullScript(script) {
+  if (!script) return false;
+  if (FULL_SCRIPTS.has(script)) return true;
+  return /^(build|lint|typecheck|type-check):/.test(script);
+}
+
 /** §3.1：一段 argv 是否全量 build/lint/类型检查。返回命中原因或 null。 */
 export function classifyBuild(argv, { fsImpl, baseDir } = {}) {
   if (!argv.length) return null;
@@ -217,14 +229,16 @@ export function classifyBuild(argv, { fsImpl, baseDir } = {}) {
   const h = headOf(argv);
   if (BUILD_LINT_NON_EXEC.has(h)) return null;
 
-  if (h === "npm" || h === "pnpm" || h === "yarn") {
+  if (h === "npm" || h === "pnpm" || h === "yarn" || h === "bun") {
     let script = "";
     if ((argv[1] ?? "").toLowerCase() === "run") script = argv[2] ?? "";
     else if ((argv[1] ?? "").toLowerCase() === "exec") return classifyBuild(argv.slice(2), { fsImpl, baseDir });
-    else script = argv[1] ?? "";
-    if (script === "build" || script === "lint" || script.startsWith("build:") || script.startsWith("lint:")) {
-      return `script ${script}`;
-    }
+    else if (h === "bun" && (argv[1] ?? "").toLowerCase() === "x") return classifyBuild(argv.slice(2), { fsImpl, baseDir });
+    else if (h === "bun" && ["install", "i", "add", "remove", "rm", "update", "upgrade", "pm", "init", "create", "-h", "--help", "-v", "--version"].includes((argv[1] ?? "").toLowerCase())) {
+      // bun 的子命令而非脚本名；`bun x <bin>` 已在 peelBin 处理，其余放行
+      return null;
+    } else script = argv[1] ?? "";
+    if (isFullScript(script)) return `script ${script}`;
     return null;
   }
 

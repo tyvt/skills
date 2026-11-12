@@ -75,6 +75,17 @@ withRules({ blockBuildLint: true }, () => {
     ["npm run build -- --version", "script version arg"],
     [`cd packages/app && npx eslint src/foo.ts`, "cd relative eslint"],
     [`tsc ${FILE} `, "single file compile without noEmit"],
+    ["bun run typecheck", "bun run typecheck"],
+    ["bun run build", "bun run build"],
+    ["bun run lint:fix", "bun run lint variant"],
+    ["bun typecheck", "bun bare typecheck"],
+    ["bun run type-check", "bun type-check"],
+    ["bun tsc", "bun bare tsc"],
+    ["bunx eslint", "bunx eslint no args"],
+    ["bun x eslint src/**/*.ts", "bun x eslint glob"],
+    ["bun run typecheck -- --watch", "bun typecheck extra arg"],
+    ["npm run typecheck", "npm run typecheck"],
+    ["pnpm typecheck", "pnpm bare typecheck"],
   ];
   for (const [c, name] of block) check(name, shell(c), true);
 
@@ -93,6 +104,14 @@ withRules({ blockBuildLint: true }, () => {
     [`npx eslint ${FILE}`, "single file eslint"],
     [`tsc ${FILE} --noEmit`, "single file tsc"],
     ["Get-ChildItem", "listing"],
+    ["bun run dev", "bun dev"],
+    ["bun install", "bun install"],
+    ["bun add lodash", "bun add"],
+    ["bun --version", "bun version"],
+    ["bun pm ls", "bun pm ls"],
+    ["bun rebuild", "bun rebuild"],
+    ["bun run test", "bun test"],
+    [`bunx eslint ${FILE}`, "bunx eslint single file"],
   ];
   for (const [c, name] of pass) check(name, shell(c), false);
 
