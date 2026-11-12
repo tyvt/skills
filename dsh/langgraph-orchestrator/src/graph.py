@@ -5,15 +5,17 @@
 
 - plan:           用 planner 工具(模型池)把用户需求拆成有序步骤，每步指定 tool
 - dispatch:       取下一个待执行步骤
-- security_guard: pwsh / 写库必须经 grok-4.7 审查；解析失败或模型失败则拒绝
+- security_guard: pwsh / 写库必须经安全审查模型审查；解析失败或模型失败则拒绝
 - execute:        通过审查后调 ModelRouter.run_tool()，并把环境变更写回 state
 - summarize:      用 file_reader 池把各步结果汇总成最终答案
 """
 from __future__ import annotations
 
+import fnmatch
 import json
 import os
 import re
+import stat
 import subprocess
 from typing import Any, Dict, List, Optional, TypedDict
 
@@ -72,14 +74,17 @@ _EXPORT = re.compile(
 )
 
 
-PLANNER_FALLBACK_MODEL = "cursor/grok-4.7@256k"
+# 备用高级模型：Cursor 系列已移除（2026-11-12），改用网关内非 Cursor 的最强档。
+# 注意：该 fallback 路径被 cfg.scheduling.planner_use_free_hy3 守卫，当前配置为 false，
+# 实际不会触发；保留此常量只为将来重新启用时指向有效模型。
+PLANNER_FALLBACK_MODEL = "autoclaw-cn/zai_glm-5.3-flash"
 
 # 命中任一关键词即视为需要深度推理，免费 hy3 的规划不可靠，直接升级。
 _HARD_TASK = re.compile(r"死锁|深度推理|疑难|竞态|内存泄漏|递归爆栈|分布式事务")
 
 
 def plan_needs_fallback(content: str, steps: List[Dict[str, str]], user_request: str) -> bool:
-    """hy3 规划是否需要升级给 grok-4.7 重做。
+    """判定规划是否需要升级给备用高级模型重做。
 
     三种情况任一成立即降级：输出无法解析、拆出的步骤少于 1 步、
     或用户需求命中高复杂度关键词。
@@ -164,10 +169,171 @@ def _apply_env_delta(ctx: Dict[str, Any], command: str, content: str) -> Dict[st
 # 审查白名单：以这些只读命令开头，且没有命令拼接符，才跳过 Grok。
 _WHITELIST_PREFIX = re.compile(
     r"^(?:请|执行|运行)?\s*"
-    r"(Get-ChildItem|Get-Location|git\s+status|git\s+diff|python\s+-m\s+pytest)\b",
+    r"(Get-ChildItem|Get-Location|Get-Date|Test-Path|git\s+status|git\s+diff|python\s+-m\s+pytest)\b",
     re.I,
 )
 _DANGEROUS_CHARS = re.compile(r"[;&|`]|\$\(|>>?|<")
+
+# Get-Content / Select-String 窄放行（v2 计划，见 .plan/6f0992433bb9.md）：
+# 仅显式 cmdlet 全名 + 当前目录相对路径 + 允许参数白名单，其余一律回退 flash→grok 原链路（fail-safe）。
+# 已知限制：不支持含空格/中文/转义引号的路径（未命中即回退，无安全风险，只多花升级成本）；
+# 'token'、'credential' 为子串匹配，可能误伤正常文件名（如 tokenizers.py），同样只增加升级成本。
+_SENSITIVE_NAME = re.compile(
+    r"(?i)\.env\b|id_rsa|id_ed25519|\.pem$|credential|secret|token"
+)
+_READ_CMD = re.compile(
+    r"^(?:(?:请|执行|运行)(?:命令)?[：:]?\s*)?(?:\$[\w]{1,20}\s*=\s*)?(Get-Content|Select-String)\b(.*)$",
+    re.I | re.S,
+)
+_READ_ARGS = re.compile(
+    r"^(?:\s*"
+    r"(?:-Path\s+(?!-)['\"]?[\w.-]+(?:[\\/][\w.-]+)*['\"]?"
+    r"|(?!-)['\"]?[\w.-]+(?:[\\/][\w.-]+)*['\"]?"
+    r"|-Pattern\s+['\"][^'\"]{0,200}['\"]"
+    r"|-Encoding\s+['\"]?[\w]+['\"]?"
+    r"|-Raw\b"
+    r"|-TotalCount\s+\d{1,4}(?!\d)"
+    r"))*\s*$"
+)
+
+
+def _readonly_read_ok(command: str) -> bool:
+    """Get-Content / Select-String 的窄放行：相对路径、白名单参数、无敏感文件名。"""
+    m = _READ_CMD.match(command.strip())
+    if not m:
+        return False
+    args = m.group(2).strip()
+    if not args or _SENSITIVE_NAME.search(args):
+        return False
+    if re.search(r"(?i)[A-Za-z]:\\|^\\\\|\.\.|[*?]", args):
+        return False
+    return _READ_ARGS.match(args) is not None
+
+
+_ABS_READ_CMD = re.compile(
+    r"^(?:(?:请|执行|运行)(?:命令)?[：:]?\s*)?(Get-Content|Select-String)\b(.*)$",
+    re.I | re.S,
+)
+# 敏感 basename 名单（整名 fnmatch）
+_SENSITIVE_GLOBS = (
+    ".env*", "id_rsa*", "id_ed25519*", "*.pem", "*.key", "*.pfx", "*.p12",
+    "kubeconfig*", ".npmrc", ".git-credentials",
+)
+# 敏感词匹配：stem 末段命中 secret/credential（含 mysecret 连写），不误杀 secretary/tokenizer
+_SENSITIVE_WORD = re.compile(r"(?:^|[._-])(?:my)?(?:secret|credential)s?$")
+
+
+def _is_sensitive_basename(basename: str) -> bool:
+    b = basename.lower()
+    if any(fnmatch.fnmatch(b, g) for g in _SENSITIVE_GLOBS):
+        return True
+    stem = b.rsplit(".", 1)[0] if "." in b and not b.startswith(".") else b
+    return _SENSITIVE_WORD.search(stem) is not None
+
+
+def _under_repo_roots(path: str, roots: List[str]) -> bool:
+    try:
+        pn = os.path.normcase(os.path.realpath(path))
+    except Exception:
+        return False
+    for r in roots or []:
+        try:
+            rn = os.path.normcase(os.path.realpath(r))
+        except Exception:
+            continue
+        if pn == rn or pn.startswith(rn + os.sep):
+            return True
+    return False
+
+
+def _path_is_link_chain(path: str) -> bool:
+    """abspath 后逐段 lstat，任一段是 symlink / Windows reparse point 即为真。"""
+    try:
+        ap = os.path.abspath(path)
+    except Exception:
+        return True
+    cur = os.path.splitdrive(ap)[0] + os.sep if os.path.splitdrive(ap)[0] else os.sep
+    parts = ap.replace("\\", "/").split("/")
+    for part in parts:
+        if not part or (len(part) == 2 and part[1] == ":"):
+            cur = part + os.sep if part.endswith(":") else cur
+            continue
+        cur = os.path.join(cur, part)
+        try:
+            st = os.lstat(cur)
+        except OSError:
+            # 路径段不存在（如通配），交给后续 fail-safe
+            return True
+        if stat.S_ISLNK(st.st_mode):
+            return True
+        # Windows junction / symlink
+        if hasattr(st, "st_file_attributes") and (
+            st.st_file_attributes & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+        ):
+            return True
+    return False
+
+
+def _readonly_read_ok_abs(command: str, roots: List[str]) -> bool:
+    """绝对路径 Get-Content/Select-String 只读放行：仅 repoRoots 下、无 symlink/reparse、
+    无敏感名、无通配/UNC/..；参数不确定一律回退不放行。"""
+    s = command.strip()
+    m = _ABS_READ_CMD.match(s)
+    if not m:
+        return False
+    rest = m.group(2).strip()
+    if not rest:
+        return False
+    # 解析候选路径：位置参数 / -Path / -LiteralPath 的值；其余形参值跳过；含空格未引号→回退
+    tokens = rest.split()
+    paths: List[str] = []
+    i = 0
+    known_flags = {
+        "-path", "-literalpath", "-pattern", "-encoding", "-raw",
+        "-totalcount", "-casesensitive", "-notmatch", "-simplematch",
+        "-allmatches", "-context", "-list",
+    }
+    while i < len(tokens):
+        tk = tokens[i]
+        low = tk.lower()
+        if low in ("-path", "-literalpath"):
+            if i + 1 >= len(tokens):
+                return False
+            paths.append(tokens[i + 1].strip("'\""))
+            i += 2
+            continue
+        if tk.startswith("-"):
+            if low not in known_flags:
+                return False  # 未知形参 → 回退
+            # 取下一 token 作该形参值（除了不带值的开关）
+            if low in ("-raw", "-casesensitive", "-notmatch", "-simplematch", "-allmatches", "-list"):
+                i += 1
+                continue
+            if i + 1 >= len(tokens):
+                return False
+            i += 2
+            continue
+        # 位置参数
+        paths.append(tk.strip("'\""))
+        i += 1
+    if not paths:
+        return False
+    for p in paths:
+        if not p or " " in p or "\t" in p:
+            return False  # 含空格未正确引号 → 回退
+        # 拒绝 UNC、通配、..
+        if p.startswith("\\\\") or ".." in p or "*" in p or "?" in p:
+            return False
+        if not re.match(r"(?i)^[A-Za-z]:[\\/]|^\\\\", p):
+            # 非绝对路径 → 不归本函数（回退，让 _readonly_read_ok 处理相对）
+            return False
+        if _is_sensitive_basename(os.path.basename(p)):
+            return False
+        if _path_is_link_chain(p):
+            return False
+        if not _under_repo_roots(p, roots):
+            return False
+    return True
 
 
 _RISK_WORDS = re.compile(
@@ -193,14 +359,21 @@ def _safe_write_command(command: str) -> bool:
     ) is not None
 
 
-def _whitelist_bypass(text: str, deny_patterns) -> bool:
-    """本地极速通道：命中只读前缀、无危险字符、未命中 deny_regex 才放行。"""
+def _whitelist_bypass(text: str, deny_patterns, roots: Optional[List[str]] = None) -> bool:
+    """本地极速通道：命中只读前缀或只读窄放行、无危险字符、未命中 deny_regex 才放行。"""
     s = (text or "").strip()
     if not s or _DANGEROUS_CHARS.search(s):
         return False
     if any(p.search(s) for p in deny_patterns):
         return False
-    return _WHITELIST_PREFIX.match(s) is not None
+    if _WHITELIST_PREFIX.match(s) is not None:
+        return True
+    if _readonly_read_ok(s):
+        return True
+    # E1 绝对路径只读放行（env 开关默认关，灰度开）
+    if os.environ.get("DSH_ORCH_READONLY_ALLOW_ABS", "0") != "0" and roots:
+        return _readonly_read_ok_abs(s, roots)
+    return False
 
 
 def _clip(text: str, head: int = 1000, tail: int = 1000) -> str:
@@ -407,12 +580,12 @@ def build_graph(router: ModelRouter, cfg):
             "role": "plan", "model": res.model_used, "ok": res.ok,
             "elapsed": _elapsed(res), "usage": _usage_dict(res),
         })
-        # 免费 hy3 的质量兜底：解析失败、零步骤或高复杂度任务，升级给 grok-4.7 重规划。
+        # 质量兜底：解析失败、零步骤或高复杂度任务，升级给备用高级模型重规划。
         if cfg.scheduling.planner_use_free_hy3 and plan_needs_fallback(
             res.content, plan, state["user_request"]
         ):
             trace.append(
-                "[WARNING] hy3 规划异常或不够详尽，已自动升级给 grok-4.7 重新规划"
+                "[WARNING] 规划异常或不够详尽，已自动升级给备用高级模型重新规划"
             )
             res = router.run_tool("planner", messages, force_model=PLANNER_FALLBACK_MODEL)
             plan = _extract_json_array(res.content) if res.ok else []
@@ -437,8 +610,15 @@ def build_graph(router: ModelRouter, cfg):
         if tool_name not in guarded:
             trace.append(f"guard skip tool={tool_name}")
             return {"guard": {"allow": True, "reason": "not guarded"}, "trace": trace}
-        if _whitelist_bypass(instruction, deny_patterns):
-            trace.append(f"guard ALLOW (bypass local rule) tool={tool_name}")
+        _roots = [state.get("cwd") or state.get("root") or os.getcwd()]
+        if _whitelist_bypass(instruction, deny_patterns, _roots):
+            if _readonly_read_ok(instruction):
+                kind = "readonly-read"
+            elif os.environ.get("DSH_ORCH_READONLY_ALLOW_ABS", "0") != "0" and _readonly_read_ok_abs(instruction, _roots):
+                kind = "readonly-abs"
+            else:
+                kind = "prefix"
+            trace.append(f"guard ALLOW (bypass local rule[{kind}]) tool={tool_name}")
             return {
                 "guard": {"allow": True, "reason": "bypass local rule"},
                 "trace": trace,
@@ -479,6 +659,16 @@ def build_graph(router: ModelRouter, cfg):
                 else "flash 无有效 JSON"
             )
             trace.append(f"guard flash escalate tool={tool_name} reason={why}")
+
+        if tool_name == "pwsh":
+            # pwsh 的终审延迟到命令生成后（node_execute）：真实命令才能做白名单窄放行，
+            # 命中免 grok，未命中照旧升级终审（fail-safe）。
+            trace.append(f"guard defer tool={tool_name} (command-level review)")
+            return {
+                "guard": {"allow": True, "reason": "defer-to-command"},
+                "trace": trace,
+                "model_calls": calls,
+            }
 
         hits = [p.pattern for p in deny_patterns if p.search(instruction)]
         ctx = _default_env(state)
@@ -596,6 +786,11 @@ def build_graph(router: ModelRouter, cfg):
                         "单测用 python -m pytest -q --tb=short；"
                         "Git 用 git status --short、git switch -c <name>、git add -- <path>、"
                         "git commit -m <msg>。不要生成 push --force、reset --hard 或 rm -rf。"
+                        "读取文件/检索文本时，直接输出一条裸命令："
+                        "Get-Content <相对路径>（可带 -Raw/-Encoding UTF8/-TotalCount N）或 "
+                        "Select-String -Path <相对路径> -Pattern \"关键词\"；"
+                        "不要加变量赋值（$x = ...）、Set-Location、管道后处理或正文解析代码，"
+                        "由调用方自己解读返回内容。"
                     )},
                     {
                         "role": "user",
@@ -612,37 +807,46 @@ def build_graph(router: ModelRouter, cfg):
             escalated = None
             if (
                 command
-                and guard_reason == "flash prescreen"
+                and guard_reason in ("flash prescreen", "defer-to-command")
                 and not _safe_write_command(command)
             ):
-                escalated = router.run_tool(
-                    guard_tool,
-                    [
-                        {"role": "system", "content": (
-                            "你是命令终审。只输出 JSON："
-                            '{"allow": true或false, "reason": "一句话"}。'
-                            "破坏系统或核心数据则 allow=false。"
-                        )},
-                        {"role": "user", "content": command},
-                    ],
-                )
-                parsed = _extract_json_object(escalated.content) if escalated.ok else None
-                if not isinstance(parsed, dict) or parsed.get("allow") is not True:
-                    reason = (
-                        str(parsed.get("reason"))
-                        if isinstance(parsed, dict)
-                        else "终审无有效 JSON"
-                    )
-                    content, ok, model_used = (
-                        f"security_guard 终审拦截: {reason}: {command}",
-                        False,
-                        gen.model_used,
-                    )
-                    command = ""
-                    trace.append(f"guard DENY (grok final) tool=pwsh reason={reason}")
+                _roots = [state.get("cwd") or ctx.get("cwd") or os.getcwd()]
+                if _whitelist_bypass(command, deny_patterns, _roots):
+                    # 生成的命令本身命中只读窄放行（Get-Content/Select-String 相对路径等），
+                    # 免 grok 终审，直接执行。审计：trace 带 readonly-read 标记便于量化降本。
+                    if guard_reason == "defer-to-command":
+                        trace.append("guard ALLOW (bypass local rule[readonly-read]) tool=pwsh")
                 else:
-                    trace.append("guard ALLOW (grok final) tool=pwsh")
-            if command and bypassed and not _whitelist_bypass(command, deny_patterns):
+                    escalated = router.run_tool(
+                        guard_tool,
+                        [
+                            {"role": "system", "content": (
+                                "你是命令终审。只输出 JSON："
+                                '{"allow": true或false, "reason": "一句话"}。'
+                                "破坏系统或核心数据则 allow=false。"
+                            )},
+                            {"role": "user", "content": command},
+                        ],
+                    )
+                    parsed = _extract_json_object(escalated.content) if escalated.ok else None
+                    if not isinstance(parsed, dict) or parsed.get("allow") is not True:
+                        reason = (
+                            str(parsed.get("reason"))
+                            if isinstance(parsed, dict)
+                            else "终审无有效 JSON"
+                        )
+                        content, ok, model_used = (
+                            f"security_guard 终审拦截: {reason}: {command}",
+                            False,
+                            gen.model_used,
+                        )
+                        command = ""
+                        trace.append(f"guard DENY (final) tool=pwsh reason={reason}")
+                    else:
+                        trace.append("guard ALLOW (final) tool=pwsh")
+            if command and bypassed and not _whitelist_bypass(
+                command, deny_patterns, [state.get("cwd") or ctx.get("cwd") or os.getcwd()]
+            ):
                 content, ok, model_used = (
                     f"本地白名单复检未通过，未执行: {command}", False, gen.model_used
                 )
