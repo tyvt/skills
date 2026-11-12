@@ -18,10 +18,10 @@ export const inject = ["tools"];
 
 /** 方案 B：规则开关不进 config。 */
 export const RULES = {
-  blockBuildLint: false,
+  blockBuildLint: true,
   blockRootGrep: true,
-  blockWholeRead: false,
-  blockBillingBypass: false,
+  blockWholeRead: true,
+  blockBillingBypass: true,
   passThroughSubagents: true,
   wholeReadDedup: true,
   tscTreatProjectFlagAsFull: true,

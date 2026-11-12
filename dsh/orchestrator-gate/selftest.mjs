@@ -178,7 +178,7 @@ withRules({ blockWholeRead: true }, () => {
 // --- 放行：orchestrate / 子 ctx / 默认关 ---
 check("orchestrate", decide("orchestrate", { op: "full", request: "npm run build" }), false);
 check("subagent", decide("pwsh", { command: "npm run build" }, { isSubagent: true }), false);
-check("build off by default", decide("pwsh", { command: "npm run build" }), false);
+check("build on by default (npm run build blocks)", decide("pwsh", { command: "npm run build" }), true);
 check("edit untouched", decide("edit", { file_path: FILE }), false);
 
 // bash 字段缺失只计 uncovered
@@ -213,13 +213,13 @@ withRules({ blockWholeRead: true }, () => {
   assert.equal(counters.rejected, 1);
 });
 
-// 开关不在 config：config 里的 blockBuildLint 不生效
+// 开关不在 config：config 里的 blockBuildLint 不能关掉硬编码的 true
 {
   const got = decideInterception({
     tool: "pwsh", args: { command: "npm run build" },
-    config: { ...CFG, blockBuildLint: true }, cwd: CWD, fsImpl,
+    config: { ...CFG, blockBuildLint: false }, cwd: CWD, fsImpl,
   });
-  check("config switch ignored", got, false);
+  check("config switch ignored (hardcoded true wins)", got, true);
 }
 
 // classify 单元冒烟
