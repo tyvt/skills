@@ -13,16 +13,20 @@ description: 会话 token / 上下文成本审计与治理。分析哪些会话�
 ## 0. 先分清两个问题
 
 - **账的问题**：哪个会话、哪个模型烧了多少未命中 → 用 `audit-tokens.mjs`。
+- **每模型清单**：每个会话里**每个实际参与的模型**到底用了多少输入/输出/缓存命中，含 orchestrate 子模型 → 用 `audit-models.mjs`（见 §2.5）。
 - **因的问题**：这些 token 是怎么被工作流烧掉的（goal 反复续跑、compaction 反复失败、重复整读、大结果回灌、工具错误自愈）→ 用 `workflow-audit.mjs`。
 
-两个脚本都在本 skill 目录，**只读**，不写任何文件。
+脚本都在本 skill 目录，**只读**，不写任何文件。
+
+> ⚠️ `audit-tokens.mjs` 只读 projcache 的「整会话合计」，模型字段只取 `modelSelection.lastUsed` 单值——**算不出每个模型的输入/输出/缓存命中，也看不到 orchestrate 子模型消耗**。要每模型清单用 `audit-models.mjs`。
 
 ## 1. 数据源（也是最容易踩的坑）
 
 | 数据 | 路径 | 说明 |
 |---|---|---|
 | 会话汇总 | `~/.dsh/storages/session_projcache/sessions/session-<sid>.json` | `record.rows.tokenUsage.totals`：uncachedInputTokens / cacheReadTokens / cacheWriteTokens / outputTokens；`sessionStats`：steps/turns；`contextBreakdown.breakdown`：system/tools/message 分项；`modelSelection.lastUsed`：provider/model/reasoningEffort |
-| 事件日志 | `~/.dsh/sessions/<enc-cwd>/session-<sid>/session.v4.jsonl.zstd` | 逐事件流（tool/call、tool/result、compaction/*、user/message、goal/change…） |
+| 事件日志 | `~/.dsh/sessions/<enc-cwd>/session-<sid>/session.v4.jsonl.zstd` | 逐事件流（tool/call、tool/result、compaction/*、user/message、goal/change…）；`assistant/message.data.usage` 携每步 usage，`.message.source.{provider,model}` 携模型 → 每模型清单的来源 |
+| 网关用量 | `http://127.0.0.1:3425/v1/magpie/usage/requests` · `/v1/magpie/trace` · `/v1/magpie/usage` | orchestrate 子模型每请求 provider/model/in/out/cache_read/credits；`agent` 区分 dsh vs 子模型池 |
 
 ⚠️ **`session.v4.jsonl.zstd` 是多帧追加格式**：每完成一次交互就追加一个 zstd 帧，整个文件有上千帧。`zlib.zstdDecompressSync(buf)` **只解第一帧**（只拿到 session 头一行，193 字节），会得出「0 工具错误、0 compaction」的假结论。必须按 magic `28 B5 2F FD` 切帧逐帧解：
 
@@ -62,6 +66,29 @@ node "$env:USERPROFILE\.dsh\skills\token-frugal\workflow-audit.mjs" --session ee
 - **命中率 &lt;80% 或 每步未命中 &gt;12k** → 记为异常会话，进第 3 步找因。
 - **产出/未命中 &lt;5%** 且 steps 很大 → 典型的“读得多、产出少、被拖长”。
 - **单个会话占全天未命中 &gt;20%** → 一定有工作流事故，单独复盘。
+
+## 2.5 每模型 token 清单（`audit-models.mjs`）
+
+```powershell
+# 某天所有会话，逐会话·逐模型列 入/出/缓存命中/步数
+node "$env:USERPROFILE\.dsh\skills\token-frugal\audit-models.mjs" 2026-11-12
+
+# 单会话逐模型 + 逐轮明细（turn/step 级）
+node "$env:USERPROFILE\.dsh\skills\token-frugal\audit-models.mjs" --session f46ac2bf
+
+# 网关不可用时离线（只出事件日志口径）
+node "$env:USERPROFILE\.dsh\skills\token-frugal\audit-models.mjs" 2026-11-12 --no-gateway
+```
+
+口径（两段，可信度不同）：
+| 段 | 数据源 | 覆盖 | 精确度 |
+|---|---|---|---|
+| 会话·每模型 | 事件日志 `assistant/message.data.usage` + `.message.source.{provider,model}` | 主 agent + teammate 每轮实际模型 | **精确**（完整历史，逐 step 可回放） |
+| 网关·全局每模型 | `/v1/magpie/usage/requests`（`agent` 区分 dsh vs AsyncOpenAI/OpenAI 子模型池）+ `/v1/magpie/trace` | orchestrate 子模型（plan/execute/summarize 多模型） | 全局**准确**；会话级仅「最近会话 + 时间窗」best-effort（标 ≈） |
+
+- 入 = 未命中 + 缓存读 + 缓存写；命中% = 缓存读 / 入；每步未命中 = 未命中 / 步数。
+- **为什么 orchestrate 子模型不能精确落到会话**：网关无 session_id；且 `/v1/magpie/trace` 是**最近 60 条路由的环形缓冲**（`?limit` 无效），`/usage/requests` 每次最多 500 行、无 `session` 过滤。故历史会话的子模型 token 只能看「网关·全局每模型」。
+- 看什么：一个会话若出现**多个模型**（`[N个模型]` 标记）= teammate 或中途切模型；网关段 `AsyncOpenAI`/`OpenAI` 行 = orchestrator 真正在跑的子模型，若其命中率很低（如 hy3 12%）= 子模型每次都未命中，是隐藏成本大头。
 
 ## 3. 归因：五类浪费来源（2026-11-02 实测）
 
