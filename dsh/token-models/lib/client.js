@@ -31,6 +31,14 @@ window.__ModuleLoader__.load({
         steps: "Steps",
         total: "Total",
         note: "Source: dsh-context contextTimeline.cost (per-message usage grouped by provider/model). Input = uncached + cacheRead + cacheWrite.",
+        orchTitle: "Orchestrator models (orchestrate subprocess)",
+        orchPrompt: "Prompt",
+        orchCalls: "Calls",
+        orchRoles: "Roles",
+        orchNote: "Source: langgraph-orchestrator .sessions/*.costs.jsonl via GET /api/token-models/orchestrator-usage. These model calls run inside the orchestrate subprocess and are NOT in the host session's contextTimeline.",
+        orchLoading: "Loading orchestrator usage…",
+        orchEmpty: "No orchestrator usage recorded yet.",
+        orchError: "Failed to load orchestrator usage:",
       },
       zh: {
         tab: "模型",
@@ -46,6 +54,14 @@ window.__ModuleLoader__.load({
         steps: "步数",
         total: "合计",
         note: "口径：dsh-context contextTimeline.cost（按 provider/model 聚合逐条 usage）。输入 = 未命中 + 缓存读 + 缓存写。",
+        orchTitle: "编排器模型（orchestrate 子进程）",
+        orchPrompt: "输入",
+        orchCalls: "调用次数",
+        orchRoles: "角色",
+        orchNote: "口径：langgraph-orchestrator .sessions/*.costs.jsonl，经 GET /api/token-models/orchestrator-usage 读取。这些模型调用发生在 orchestrate 子进程内，不进宿主会话的 contextTimeline。",
+        orchLoading: "正在加载编排器用量…",
+        orchEmpty: "暂无编排器用量记录。",
+        orchError: "加载编排器用量失败：",
       },
     };
 
@@ -90,6 +106,127 @@ window.__ModuleLoader__.load({
       return rows;
     }
 
+    // 从编排器成本端点返回体展开成每模型行（与 rowsFromCost 同构，字段名不同）
+    // 端点返回：{ ok, models:[{model, prompt, completion, total, calls, roles}], total }
+    function rowsFromOrchestrator(payload) {
+      if (!payload || payload.ok !== true || !Array.isArray(payload.models)) return [];
+      const rows = [];
+      for (const m of payload.models) {
+        const prompt = Number(m.prompt) || 0;
+        const completion = Number(m.completion) || 0;
+        const total = Number(m.total) || prompt + completion;
+        if (prompt === 0 && completion === 0) continue;
+        rows.push({
+          key: "orchestrator/" + (m.model || "(unknown)"),
+          model: m.model,
+          prompt,
+          completion,
+          total,
+          calls: Number(m.calls) || 0,
+          roles: Array.isArray(m.roles) ? m.roles : [],
+        });
+      }
+      rows.sort((a, b) => b.total - a.total);
+      return rows;
+    }
+
+    // 编排器子模型区块：自己 fetch 端点（不经会话事件日志，数据来自 .costs.jsonl）
+    function OrchestratorSection(props) {
+      const t = typeof props.t === "function" ? props.t : (k) => (dict.en[k] ?? k);
+      const react = props.__react;
+      const useState = react.useState;
+      const useEffect = react.useEffect;
+      const [state, setState] = useState({ loading: true, rows: [], error: null });
+
+      useEffect(() => {
+        let alive = true;
+        const sessionId = props.sessionId;
+        const qs = sessionId ? "?session_id=" + encodeURIComponent(sessionId) : "";
+        const url = "/api/token-models/orchestrator-usage" + qs;
+        fetch(url, { headers: { accept: "application/json" } })
+          .then((r) => r.json().then((body) => ({ ok: r.ok, body })))
+          .then(({ ok, body }) => {
+            if (!alive) return;
+            if (!ok || !body || body.ok !== true) {
+              setState({ loading: false, rows: [], error: (body && body.error) || "request failed" });
+              return;
+            }
+            setState({ loading: false, rows: rowsFromOrchestrator(body), error: null });
+          })
+          .catch((e) => {
+            if (alive) setState({ loading: false, rows: [], error: String((e && e.message) || e) });
+          });
+        return () => {
+          alive = false;
+        };
+      }, [props.sessionId]);
+
+      const cell = { padding: "4px 10px", whiteSpace: "nowrap" };
+      const headCell = { ...cell, fontWeight: 600, opacity: 0.7, textAlign: "left", borderBottom: "1px solid var(--dsw-alias-border-neutral, rgba(128,128,128,.25))" };
+      const numCell = { ...cell, textAlign: "right", fontVariantNumeric: "tabular-nums" };
+      const title = { fontWeight: 600, fontSize: 14, margin: "16px 0 8px" };
+
+      if (state.loading) {
+        return jsx.jsx("div", { style: { padding: "4px 8px", opacity: 0.6, fontSize: 12 }, children: t("orchLoading") });
+      }
+      if (state.error) {
+        return jsx.jsx("div", { style: { padding: "4px 8px", opacity: 0.6, fontSize: 12 }, children: t("orchError") + " " + state.error });
+      }
+      if (state.rows.length === 0) {
+        return jsx.jsx("div", { style: { padding: "4px 8px", opacity: 0.6, fontSize: 12 }, children: t("orchEmpty") });
+      }
+      const tot = state.rows.reduce((a, r) => { a.prompt += r.prompt; a.completion += r.completion; a.total += r.total; return a; }, { prompt: 0, completion: 0, total: 0 });
+      const bodyRows = state.rows.map((r) =>
+        jsx.jsxs("tr", {
+          children: [
+            jsx.jsx("td", { style: { ...cell, fontWeight: 500 }, children: r.key }),
+            jsx.jsx("td", { style: numCell, children: fmt(r.prompt) }),
+            jsx.jsx("td", { style: numCell, children: fmt(r.completion) }),
+            jsx.jsx("td", { style: numCell, children: fmt(r.total) }),
+            jsx.jsx("td", { style: numCell, children: String(r.calls) }),
+            jsx.jsx("td", { style: { ...cell, opacity: 0.7 }, children: r.roles.join(",") }),
+          ],
+        }, r.key)
+      );
+      return jsx.jsxs("div", {
+        children: [
+          jsx.jsx("div", { style: title, children: t("orchTitle") }),
+          jsx.jsxs("table", {
+            style: { borderCollapse: "collapse", fontSize: 13, minWidth: 620 },
+            children: [
+              jsx.jsx("thead", {
+                children: jsx.jsxs("tr", {
+                  children: [
+                    jsx.jsx("th", { style: headCell, children: t("model") }),
+                    jsx.jsx("th", { style: { ...headCell, textAlign: "right" }, children: t("orchPrompt") }),
+                    jsx.jsx("th", { style: { ...headCell, textAlign: "right" }, children: t("output") }),
+                    jsx.jsx("th", { style: { ...headCell, textAlign: "right" }, children: t("total") }),
+                    jsx.jsx("th", { style: { ...headCell, textAlign: "right" }, children: t("orchCalls") }),
+                    jsx.jsx("th", { style: headCell, children: t("orchRoles") }),
+                  ],
+                }),
+              }),
+              jsx.jsx("tbody", { children: bodyRows }),
+              jsx.jsx("tfoot", {
+                children: jsx.jsxs("tr", {
+                  style: { borderTop: "1px solid var(--dsw-alias-border-neutral, rgba(128,128,128,.25))", fontWeight: 600 },
+                  children: [
+                    jsx.jsx("td", { style: cell, children: t("total") }),
+                    jsx.jsx("td", { style: numCell, children: fmt(tot.prompt) }),
+                    jsx.jsx("td", { style: numCell, children: fmt(tot.completion) }),
+                    jsx.jsx("td", { style: numCell, children: fmt(tot.total) }),
+                    jsx.jsx("td", { style: numCell, children: String(state.rows.reduce((a, r) => a + r.calls, 0)) }),
+                    jsx.jsx("td", { style: cell, children: "" }),
+                  ],
+                }),
+              }),
+            ],
+          }),
+          jsx.jsx("div", { style: { marginTop: 8, fontSize: 11, opacity: 0.6 }, children: t("orchNote") }),
+        ],
+      });
+    }
+
     // 视图组件：props 由 slot 宿主注入（useProjection / sessionId / t）
     function TokenModelsView(props) {
       const t = typeof props.t === "function" ? props.t : (k) => (dict.en[k] ?? k);
@@ -117,7 +254,11 @@ window.__ModuleLoader__.load({
       if (rows.length === 0) {
         return jsx.jsxs("div", {
           style: { padding: "16px", opacity: 0.7, fontSize: 13 },
-          children: [jsx.jsx("div", { style: { fontWeight: 600, marginBottom: 6 }, children: t("title") }), jsx.jsx("div", { children: t("empty") })],
+          children: [
+            jsx.jsx("div", { style: { fontWeight: 600, marginBottom: 6 }, children: t("title") }),
+            jsx.jsx("div", { children: t("empty") }),
+            jsx.jsx(OrchestratorSection, { __react: react, sessionId: props.sessionId, t }),
+          ],
         });
       }
 
@@ -173,6 +314,7 @@ window.__ModuleLoader__.load({
             ],
           }),
           jsx.jsx("div", { style: { marginTop: 10, fontSize: 11, opacity: 0.6 }, children: t("note") }),
+          jsx.jsx(OrchestratorSection, { __react: react, sessionId: props.sessionId, t }),
         ],
       });
     }

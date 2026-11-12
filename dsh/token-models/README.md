@@ -12,9 +12,17 @@
 渲染成一张清单表。因此：
 
 - 会话内**主 agent + teammate** 的每模型用量都覆盖（数据来自每步 assistant/message 的 usage 归集）。
-- **orchestrate 子模型**（网关进程里跑的多模型）不写入会话事件日志，故不在本表内——那部分只在网关
-  `/v1/magpie/usage/requests` 侧。要全量含子模型的离线清单，用
-  `token-frugal` 技能的 `audit-models.mjs`。
+- **orchestrate 子模型**（网关进程里跑的多模型）不写入会话事件日志。为把这部分也展示出来，服务端半新增
+  `GET /api/token-models/orchestrator-usage`，读取 `langgraph-orchestrator/.sessions/*.costs.jsonl`
+  按模型聚合，前端在面板下方追加「**编排器模型（orchestrate 子进程）**」区块展示其逐模型 prompt/output/次数/角色。
+
+## 编排器用量端点
+
+- `GET /api/token-models/orchestrator-usage[?session_id=<id>]`
+- 返回 `{ ok, dir, sessions, models: [{model, prompt, completion, total, calls, roles}], total }`
+- 目录由 `cordis.patch.yml` 的 `config.sessionsDir` 指定（默认
+  `D:\repository\skills\dsh\langgraph-orchestrator\.sessions`）。
+- 无 `webServer` 服务时端点不注册（host 侧面板仍可用），日志会 warn。
 
 ## 形态
 

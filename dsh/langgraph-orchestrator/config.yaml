@@ -26,7 +26,8 @@ scheduling:
     weekdays: [1, 2, 3, 4, 5]
     peak_periods: ["09:00-12:00", "14:00-18:00"]
   strategies:
-    planner_use_free_hy3: true      # 规划器以免费 hy3 为主力
+    # 2026-11-12：免费 hy3 档网关不存在，planner 主选已改为 workbuddy/hy3；此开关仅历史保留。
+    planner_use_free_hy3: false
     peak_use_glm_as_fallback: true  # 峰时 file_reader/code_editor 跳过 deepseek-v4.1-flash
 
 # --- 工具定义 ---------------------------------------------------------------
@@ -38,32 +39,35 @@ scheduling:
 #                  - retry_on:      命中这些子串时视为失败并降级(默认含 common 错误)
 tools:
 
-  # 轻量：读文件/摘要/格式化
+  # 轻量：摘要/格式化已提供的文本（注意：无本地磁盘读取权限，读文件请用 pwsh Get-Content）
   # 谷时 deepseek-v4.1-flash 为主力；峰时由路由器跳过它，改用 glm-5.3-flash
   file_reader:
-    description: 读取/摘要文本内容。
+    description: 摘要/整理“已提供”的文本内容（无磁盘读取权限；要读本地文件请用 pwsh Get-Content）。
     models:
       - model: auto/deepseek-v4.1-flash
       - model: workbuddy/glm-5.3-flash
       - model: workbuddy-ai/hy3
       - model: cursor/deepseek-v41-flash-1017
 
-  # 代码生成/改写。峰时同样跳过 deepseek-v4.1-flash，优先 glm-5.3-flash
+  # 代码生成/改写。主选用 cursor/composer-2.5（非 Flash 强代码模型，200k 上下文），
+  # 兼顾质量；后续为廉价 Flash 兜底。峰时策略仍会按 scheduling 跳过 deepseek-v4.1-flash 档。
   code_editor:
-    description: 生成或修改代码。
+    description: 生成或修改代码（纯文本生成，无本地磁盘读写权限；读写磁盘文件请用 pwsh）。
     models:
-      - model: workbuddy/deepseek-v4.1-flash
+      - model: cursor/composer-2.5
       - model: workbuddy/glm-5.3-flash
+      - model: workbuddy/deepseek-v4.1-flash
       - model: auto/deepseek-v4.1-flash
     max_tokens: 4096
     # 代码生成可能耗时较长，单独放宽超时到 300 秒(覆盖 gateway.request_timeout)
     timeout: 300
 
-  # 复杂推理/规划。免费 hy3 为主力，grok-4.7 做质量兜底(见 graph.node_plan)
+  # 复杂推理/规划。主用网关真实存在的 workbuddy/hy3（免费档原 openrouter/tencent/hy3-preview:free
+  # 网关并不提供，曾导致规划每次都瞬间失败回退到最贵的 grok）；grok-4.7 做质量兜底。
   planner:
     description: 复杂任务的规划与推理。
     models:
-      - model: openrouter/tencent/hy3-preview:free
+      - model: workbuddy/hy3
         max_tokens: 2048
       - model: cursor/grok-4.7@256k
     max_tokens: 4096
@@ -71,11 +75,12 @@ tools:
     timeout: 300
 
   # 视觉/多模态 —— magpie 模型均支持图像输入
-  # 用户指定(2026-11-10)：image_analyst 强制全部使用 cursor/deepseek-v41-flash-1017，不留备用。
+  # 主选 cursor/deepseek-v41-flash-1017；2026-11-12 追加 auto/deepseek-v4.1-flash 作单点兜底。
   image_analyst:
     description: 分析图像内容(截图/图表/照片)，做视觉理解。
     models:
       - model: cursor/deepseek-v41-flash-1017
+      - model: auto/deepseek-v4.1-flash
     max_tokens: 4096
 
   # 审查节点专用，不进规划工具列表。只挂 grok-4.7，不做故障转移。

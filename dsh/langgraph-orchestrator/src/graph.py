@@ -49,6 +49,8 @@ class OrchState(TypedDict, total=False):
 PLANNER_SYSTEM = """你是一个任务规划器。把用户需求拆成有序步骤，最少 1 步，最多 5 步。
 每一步必须从下列工具中选一个，并给出明确指令：
 {tools}
+重要：要读取/查看磁盘上的本地文件内容，必须用 pwsh 工具执行 Get-Content 等命令；
+file_reader / code_editor 是纯文本摘要器，没有本地磁盘读取权限，不能用来读取文件。
 只输出一个 JSON 数组，形如:
 [{{"tool": "工具名", "instruction": "具体做什么"}}]
 禁止输出任何解释、前言、Markdown 或多余文字。"""
