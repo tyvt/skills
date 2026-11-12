@@ -6,7 +6,7 @@
 //      此前面板看不到，正是本端点要补的缺口。
 //
 // 端点：GET /api/token-models/orchestrator-usage[?session_id=<id>]
-//   返回 { ok, dir, sessions, models: [{model, prompt, completion, total, calls, roles}], total }
+//   返回 { ok, dir, sessions, models: [{model, prompt, completion, total, calls, elapsedSec, roles}], total }
 //   - 不带 session_id：聚合该目录下所有 *.costs.jsonl；
 //   - 带 session_id：只聚合 <session_id>.costs.jsonl（文件名匹配）。
 
@@ -78,22 +78,25 @@ function aggregate(config, sessionId) {
       const prompt = Number(u.prompt_tokens) || 0;
       const completion = Number(u.completion_tokens) || 0;
       const total = Number(u.total_tokens) || prompt + completion;
+      // 单次调用耗时（秒）；缺失或非有限值按 0 累加，杜绝 NaN 污染。
+      const elapsed = Number.isFinite(Number(rec.elapsed)) ? Number(rec.elapsed) : 0;
       let m = byModel.get(model);
       if (!m) {
-        m = { model, prompt: 0, completion: 0, total: 0, calls: 0, roles: new Set() };
+        m = { model, prompt: 0, completion: 0, total: 0, calls: 0, elapsedSec: 0, roles: new Set() };
         byModel.set(model, m);
       }
       m.prompt += prompt;
       m.completion += completion;
       m.total += total;
       m.calls += 1;
+      m.elapsedSec += elapsed;
       if (typeof rec.role === "string") m.roles.add(rec.role);
       if (typeof rec.session_id === "string") sessions.add(rec.session_id);
     }
   }
 
   const models = [...byModel.values()]
-    .map((m) => ({ model: m.model, prompt: m.prompt, completion: m.completion, total: m.total, calls: m.calls, roles: [...m.roles].sort() }))
+    .map((m) => ({ model: m.model, prompt: m.prompt, completion: m.completion, total: m.total, calls: m.calls, elapsedSec: m.elapsedSec, roles: [...m.roles].sort() }))
     .sort((a, b) => b.total - a.total);
 
   const total = models.reduce(
@@ -102,6 +105,7 @@ function aggregate(config, sessionId) {
       a.completion += m.completion;
       a.total += m.total;
       a.calls += m.calls;
+      a.elapsedSec += m.elapsedSec;
       return a;
     },
     emptyTotals()
@@ -111,7 +115,7 @@ function aggregate(config, sessionId) {
 }
 
 function emptyTotals() {
-  return { prompt: 0, completion: 0, total: 0, calls: 0 };
+  return { prompt: 0, completion: 0, total: 0, calls: 0, elapsedSec: 0 };
 }
 
 /** 极简 CORS + JSON 响应。 */

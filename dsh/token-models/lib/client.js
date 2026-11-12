@@ -33,6 +33,7 @@ window.__ModuleLoader__.load({
         note: "Source: dsh-context contextTimeline.cost (per-message usage grouped by provider/model). Input = uncached + cacheRead + cacheWrite.",
         orchTitle: "Orchestrator models (orchestrate subprocess)",
         orchPrompt: "Prompt",
+        orchElapsed: "Cumulative time",
         orchCalls: "Calls",
         orchRoles: "Roles",
         orchNote: "Source: langgraph-orchestrator .sessions/*.costs.jsonl via GET /api/token-models/orchestrator-usage. These model calls run inside the orchestrate subprocess and are NOT in the host session's contextTimeline.",
@@ -56,6 +57,7 @@ window.__ModuleLoader__.load({
         note: "口径：dsh-context contextTimeline.cost（按 provider/model 聚合逐条 usage）。输入 = 未命中 + 缓存读 + 缓存写。",
         orchTitle: "编排器模型（orchestrate 子进程）",
         orchPrompt: "输入",
+        orchElapsed: "累计耗时",
         orchCalls: "调用次数",
         orchRoles: "角色",
         orchNote: "口径：langgraph-orchestrator .sessions/*.costs.jsonl，经 GET /api/token-models/orchestrator-usage 读取。这些模型调用发生在 orchestrate 子进程内，不进宿主会话的 contextTimeline。",
@@ -70,6 +72,15 @@ window.__ModuleLoader__.load({
       if (n >= 1e6) return (n / 1e6).toFixed(2) + "M";
       if (n >= 1e3) return (n / 1e3).toFixed(1) + "k";
       return String(Math.round(n));
+    };
+    // 累计耗时格式化：原始秒数判断阈值；<60 固定一位小数，≥60 用 Xm Ys（Y===60 时分钟进位）。
+    const fmtDur = (sec) => {
+      const s = typeof sec === "number" && Number.isFinite(sec) && sec > 0 ? sec : 0;
+      if (s < 60) return s.toFixed(1) + "s";
+      const mins = Math.floor(s / 60);
+      let rem = Math.round(s - mins * 60);
+      if (rem >= 60) return mins + 1 + "m 0s";
+      return mins + "m " + rem + "s";
     };
 
     // 从 contextTimeline.cost 展开成每模型行
@@ -123,6 +134,7 @@ window.__ModuleLoader__.load({
           completion,
           total,
           calls: Number(m.calls) || 0,
+          elapsedSec: Number.isFinite(Number(m.elapsedSec)) ? Number(m.elapsedSec) : 0,
           roles: Array.isArray(m.roles) ? m.roles : [],
         });
       }
@@ -184,6 +196,7 @@ window.__ModuleLoader__.load({
             jsx.jsx("td", { style: numCell, children: fmt(r.completion) }),
             jsx.jsx("td", { style: numCell, children: fmt(r.total) }),
             jsx.jsx("td", { style: numCell, children: String(r.calls) }),
+            jsx.jsx("td", { style: numCell, children: fmtDur(r.elapsedSec) }),
             jsx.jsx("td", { style: { ...cell, opacity: 0.7 }, children: r.roles.join(",") }),
           ],
         }, r.key)
@@ -202,6 +215,7 @@ window.__ModuleLoader__.load({
                     jsx.jsx("th", { style: { ...headCell, textAlign: "right" }, children: t("output") }),
                     jsx.jsx("th", { style: { ...headCell, textAlign: "right" }, children: t("total") }),
                     jsx.jsx("th", { style: { ...headCell, textAlign: "right" }, children: t("orchCalls") }),
+                    jsx.jsx("th", { style: { ...headCell, textAlign: "right" }, children: t("orchElapsed") }),
                     jsx.jsx("th", { style: headCell, children: t("orchRoles") }),
                   ],
                 }),
@@ -216,6 +230,7 @@ window.__ModuleLoader__.load({
                     jsx.jsx("td", { style: numCell, children: fmt(tot.completion) }),
                     jsx.jsx("td", { style: numCell, children: fmt(tot.total) }),
                     jsx.jsx("td", { style: numCell, children: String(state.rows.reduce((a, r) => a + r.calls, 0)) }),
+                    jsx.jsx("td", { style: numCell, children: fmtDur(state.rows.reduce((a, r) => a + r.elapsedSec, 0)) }),
                     jsx.jsx("td", { style: cell, children: "" }),
                   ],
                 }),
