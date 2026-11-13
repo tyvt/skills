@@ -12,6 +12,7 @@
 - **要执行动作 → 一律 `orchestrate {op:"full"}`**：跑命令/构建（`bun run build`、`npm run build`、`pytest`）、全仓或大目录检索、读大文件、改代码/写文件，全部走 `op:"full"`。它走 `generate_command → security_guard → _run_pwsh` 真实执行，回传 `$ <cmd> / exit= / stdout / stderr`，宿主只收摘要。
 - **`op:"tool"` 只做纯文本加工**（摘要、改写、图像判读、代码文本生成）：**绝不**用它跑构建/命令/读盘。若把执行需求投给 `op:"tool"`，模型只会回「我没有执行能力」，等于没做，并会把活全推回主模型，token 与耗时双爆（实例：某会话 57 次调用仅 1 次走编排器，且是 `op:"tool"` 跑 build 失败，主模型 hy3 吃掉 2.14M token、耗时 12 分钟）。
 - 这条是**选型阶段**就该做对的判断，不能指望 `orchestrator-gate`：gate 只在被拒绝时才提示，主模型若一开始就选 `op:"tool"` 根本不会触发拦截。
+- **触发词表（词面匹配即触发，不靠理解规则；bug6520 复盘 O3：gate 兜底拦截 3 次，每多一轮全套重发）**：意图含「跑 / 执行 / 构建 / build / lint / 测试 / 部署 / 全仓 / 大目录 / 检索 / 多文件 grep」任一词 → **第一次就 `orchestrate {op:"full"}`**，不等 gate。例外：单文件窄 read（带 offset/limit）、已缩到具体模块目录的 grep，可直跑。
 
 ## 并行扇出（强制）
 
@@ -32,6 +33,7 @@
 - **只在计划含 `edit`/`write` 代码改动时才送 `plan_review`**；纯文档交付、纯分析、纯复盘直接交用户，不送审。
 - **首轮送审整篇 ≤4k chars**；被打回后**只发「变更段 + 新增证据」**，禁止整篇重发。
 - **同一计划 >2 轮给提示（不阻断）、>3 轮硬拒**；确需越过须在计划 frontmatter 置 `review_override: true` 显式解锁。
+- **计划前置事实清单（bug6520 复盘 O6：缺 headTitleList 定义方式一轮被 P0 打回，复审多烧 ~7k token）**：计划涉及修改某个 data/computed/props/字段时，动笔前先 `grep <字段名>` 拿到定义行号，并把「定义方式（data/computed/接口返回）」写进「现状与证据」。缺定义行的计划不得送审。
 
 ## 文档写作与文件落地（成本约束，禁止整篇重写）
 

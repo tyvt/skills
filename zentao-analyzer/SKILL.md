@@ -26,6 +26,20 @@ description: 禅道 Bug/任务分析与回写。给定禅道链接时拉取详�
 | `yapi_fetch.py` | 从 YApi 拉接口定义 |
 | `zentao_html.py` | 抓取的 HTML 转纯文本 |
 
+## 定位三步曲（硬顺序，禁止跳步；bug6520 复盘 O1）
+
+1. 查菜单/路由表（路由配置或菜单数据），用 bug 标题/截图菜单名匹配 → 拿 path。
+2. 进 `src/views/<path>/`，只在该目录内 read/grep。
+3. 仅当 1、2 都无命中，才允许扩大到模块级检索。
+禁止：按 bug 标题字面量在源码里 grep 猜页面（标题≠路由名，例：「用款通知书」实际路由是「划拨通知书」`unblock/notice`，绕了 10 步）。
+
+## 截图/标题冲突熔断（bug6520 复盘 O2）
+
+vision（analyze_image）结论与 bug 标题/描述矛盾时，**立即停止按标题推演**，二选一：
+- 查 `zt_file` 条数与文件名，确认是否传错附件；
+- `ask_user_question` 直接问报告人。
+禁止「maybe vision misread / screenshot shows related page」式假设后继续推演。
+
 ## 定位顺序（P0 硬约束，先于动手）
 
 1. **DBX 报错/接口返回**：先看禅道 Bug 的报错截图/复现步骤，查一条真实数据（SQL 或接口），不脑内演算。

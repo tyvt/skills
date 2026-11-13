@@ -93,10 +93,20 @@ VALUES ('bug',<id>,'<product>',<project>,<execution>,'tiany','resolved',NOW(),'<
 - `extra` 写 resolution；`vision` 写 `'rnd'`；`` `read` `` 必须反引号。列数必须是 14。
 - comment 用 HTML：根因 + 修复 + 验证证据（构建时间、部署站点、提交号）。
 
-## SQL 合并与长文本（审计 P1-8）
+## SQL 合并与长文本（审计 P1-8 / F1）
 
 - 同一连接、同一对象的多条查询**合并成一条多语句**（`dbx_execute_query` 的 `sql` 支持分号分隔），减少往返与每步未命中。不要分 4、5 次各查一点。
-- 长文本（steps/comment）**先量长度再分段**：`SELECT LENGTH(steps) FROM zt_bug WHERE id=<id>;` 拿到总长度，再按需 `SUBSTRING` 分段；禁止同一形态连试三次。仍拿不全改 `git log` 或 `UNION ALL` 每段一行。
+- 长文本（steps/comment）固定动作，四步一次完成（bug6520 复盘 O4：量了 LENGTH=352 仍续读一次，禁止复现）：
+  1. `SELECT LENGTH(steps) FROM zt_bug WHERE id=<id>;` → 得 `L`；
+  2. 心算段数 `ceil(L/500)`；
+  3. 一条 SQL 一次取完（段数按 L 定）：`SELECT seq, SUBSTRING(steps,(seq-1)*500+1,500) FROM zt_bug WHERE id=<id>` 按段数写多条 `UNION ALL SELECT <n>, SUBSTRING(steps,(<n>-1)*500+1,500) ...`（例 352 字两条即全取）；
+  4. 禁止先取一段、等截断提示再续读（seq 46→58 用了 3 次才拿全 371 字）。返回若被截断带 `next_cell_char_offset`，用总长减已读一次补齐。仍拿不全改 `git log`；禁止同一形态连试三次。
+
+## INSERT 列数预校验（审计 F2，已在 mcp_gateway 落地）
+
+- `mcp_gateway` 对 `dbx_execute_query` 的 INSERT 做**发送前列数 vs 值数预校验**：不匹配直接抛错并点出常见漏项（zt_action 固定 14 列、`files` 写 NULL、`extra` 写 resolution、`` `read` `` 反引号、vision `'rnd'`），不会再等 MySQL 报 `Column count doesn't match`（seq 614）。
+- 即便如此，回写**只用 `zentao-resolve.mjs` 生成的模板照抄**，别手拼 INSERT。
+
 
 ## 回写链路现状（审计 P5-18 / P5-19）
 
