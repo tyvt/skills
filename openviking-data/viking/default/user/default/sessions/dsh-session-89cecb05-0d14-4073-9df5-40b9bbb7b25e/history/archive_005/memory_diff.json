@@ -1,0 +1,53 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-89cecb05-0d14-4073-9df5-40b9bbb7b25e/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T08:06:46.414017+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/路由日志补完决策.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 用户指出规划器未选中 code_edit_with_signal 说明最需要的不是 off-task 日志而是路由日志，要求先补 [ROUTE-MISS] 和 route_source 字段再写核查清单，避免 30 条样本永远等不到或不代表生产分流。助理确认并开始实施。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 的实现质量够，但规划器没选中这个工具这件事，说明你现在最需要的日志不是 off-task 日志，是路由日志。先补 [ROUTE-MISS] 和 route_source 字段，再写核查清单——否则 30 条样本可能永远等不到，或者等到了也不代表生产分流。\n**assistant [peer=github.com-tyvt-skills]**: 你说得对——off-task 日志记录的是“输出对不对”，而真正没验证的是“工具有没有被选中”。这两个问题的分母完全不同：路由日志的分母是**每次规划决策**，而不是代码类调用。\n\n我先看 `node_plan` 的代码，确定路由数据从哪里取。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/路由检测模块实现.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 助理在 node_plan 中区分三种 route_source（planner/fallback_planner/unknown_tool），新增路由检测模块判定\"该选未选\"，编写 route_stats.py 与 offtask_stats.py 统计脚本，pytest 从 108 增至 119 passed。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 的实现质量够，但规划器没选中这个工具这件事，说明你现在最需要的日志不是 off-task 日志，是路由日志。先补 [ROUTE-MISS] 和 route_source 字段，再写核查清单——否则 30 条样本可能永远等不到，或者等到了也不代表生产分流。\n...\n**assistant [peer=github.com-tyvt-skills]**: 现在能看清问题所在。`node_plan:712-714` 有一处**静默失败**：规划失败时默认给 `planner`，而 `planner` 恰好也是“跑题”时的兜底——我上次实测就撞上了这个。\n\n关键设计问题：`route_source` 需要区分三种来源，否则日志无法归因。\n**assistant [peer=github.com-tyvt-skills]**: 现在设计路由日志。核心是定义三件事：`route_source`（决策来源）、`[ROUTE-MISS]`（该选没选）、以及独立于 off-task 的日志文件。\n\n关键：`route_source` 必须区分“规划器选的”和“兜底强塞的”——否则混淆两者会污染统计。\n\n先加 `session_id` 到 state，再写路由模块。\n**assistant [peer=github.com-tyvt-skills]**: 现在编写路由检测模块：判断“该选没选”，并提供 `route_source` 常量。\n\n判断规则必须保守且可解释——只在**明确应该有更专精工具**时算 MISS。\n**assistant [peer=github.com-tyvt-skills]**: 现在插入路由模块（在 off-task 模块之后）。\n**assistant [peer=github.com-tyvt-skills]**: 现在把 `route_source` 接入 `node_plan`，把三种来源区分清楚。\n**assistant [peer=github.com-tyvt-skills]**: 现在在执行节点区分 `unknown_tool`，并补上测试。\n**assistant [peer=github.com-tyvt-skills]**: 现在编写路由日志测试，重点验证三件事：`route_source` 的区分、MISS 判定的保守性、日志能算出真实命中率。\n**assistant [peer=github.com-tyvt-skills]**: 11 passed。现在实机验证：那次“写函数+pytest 断言”的真实请求，现在会被正确记为 MISS 吗？\n\n这是对之前缺陷的直接复现验证。\n**assistant [peer=github.com-tyvt-skills]**: 端到端验证成功——`[ROUTE-MISS] 期望 code_edit_with_signal 实际 code_editor`，`route_source=planner`，日志落盘正确。\n\n这证实了一个更精确的事实：上次我以为规划器选择了 `planner`，这次实际是选择了 **`code_editor`**（规划器行为有波动）。无论哪种，都记录了 MISS。\n\n接着做路由统计工具。\n**assistant [peer=github.com-tyvt-skills]**: 直接新建路由统计脚本，复用同样的结构约定。\n**assistant [peer=github.com-tyvt-skills]**: 路由统计器工作正常，输出正是需要的归因信息：`MISS 1/1`、`code_edit_with_signal → code_editor`。\n\n现在跑完整回归。\n**assistant [peer=github.com-tyvt-skills]**: **119 passed**（108 + 11）。现在清理验证数据并提交。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/端到端验证捕获路由缺失.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 实机复现\"写函数+pytest 断言\"请求，路由日志首次真实调用即捕获 [ROUTE-MISS]：期望 code_edit_with_signal 实际 code_editor，route_source=planner。修正上一轮误判——此前以为规划器选了 planner，本次实测选了 code_editor，证实规划器行为有波动。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 的实现质量够，但规划器没选中这个工具这件事，说明你现在最需要的日志不是 off-task 日志，是路由日志。先补 [ROUTE-MISS] 和 route_source 字段，再写核查清单——否则 30 条样本可能永远等不到，或者等到了也不代表生产分流。\n...\n**assistant [peer=github.com-tyvt-skills]**: 11 passed。现在实机验证：那次“写函数+pytest 断言”的真实请求，现在会被正确记为 MISS 吗？\n\n这是对之前缺陷的直接复现验证。\n...\n**assistant [peer=github.com-tyvt-skills]**: 端到端验证成功——`[ROUTE-MISS] 期望 code_edit_with_signal 实际 code_editor`，`route_source=planner`，日志落盘正确。\n\n这证实了一个更精确的事实：上次我以为规划器选择了 `planner`，这次实际是选择了 **`code_editor`**（规划器行为有波动）。无论哪种，都记录了 MISS。\n\n接着做路由统计工具。\n...\n**assistant [peer=github.com-tyvt-skills]**: ## 路由日志补完了，实测直接抓到了 MISS\n\n你的判断是对的。补上路由日志后，**第一次真实调用就捕获了 MISS**：\n\n```\n[ROUTE-MISS] 期望 code_edit_with_signal 实际 code_editor（route_source=planner）\n```\n\n而且修正了上一轮的一个误判：那次我以为规划器选了 `planner`，**这次选了 `code_editor`**。规划器行为本身有波动——这正是单次冒烟不能作数的证据。\n\n### `route_source` 三态（关键设计）..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/路由核查清单创建.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 创建 LOG-REVIEW-CHECKLIST.md，写死三件事：先看路由再看 off-task、route_source 分布不干净先修规划器（兜底>20% 时样本不能评估分流）、小样本唯一合法结论是\"样本不足继续采\"；并明确 op:tool 不写路由日志的边界。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 的实现质量够，但规划器没选中这个工具这件事，说明你现在最需要的日志不是 off-task 日志，是路由日志。先补 [ROUTE-MISS] 和 route_source 字段，再写核查清单——否则 30 条样本可能永远等不到，或者等到了也不代表生产分流。\n...\n**assistant [peer=github.com-tyvt-skills]**: 已提交。现在编写核查清单。\n...\n**assistant [peer=github.com-tyvt-skills]**: 清单已创建。现在提交，并核实最终状态。\n...\n**assistant [peer=github.com-tyvt-skills]**: ...### 核查清单\n\n[LOG-REVIEW-CHECKLIST.md](dsh/langgraph-orchestrator/docs/LOG-REVIEW-CHECKLIST.md) 写死了三件事：\n\n1. **先看路由再看 off-task**，并说明为什么不能反过来\n2. **`route_source` 分布不干净就先修规划器**（兜底 >20% 时，样本不能用来评估分流）\n3. **小样本唯一合法结论是“样本不足，继续采”**\n\n还有一条重要边界：**`op:\"tool\"` 不写路由日志**（不经规划）。如果你的流量以 `op:\"tool\"` 为主，路由日志会永远是空的——而这本身就是结论：分流根本没跑。\n\n### 提交与验证..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/路由日志代码提交.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 提交路由日志（a9232c5b）与核查清单（3213eda2），pytest 119 passed，selftest EXIT=0。工作区剩余 README.md、test_scheduling.py、.plan/、op-tool-execute-design.md 为先前已有改动，非本次。助理另诚实提醒路由日志因仅 op:full 走规划可能很久到不了 30 条，提议做一次性脚本从历史会话提炼 30 条真实代码类请求批量落日志以快速补样本，该提议待确认。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 的实现质量够，但规划器没选中这个工具这件事，说明你现在最需要的日志不是 off-task 日志，是路由日志。先补 [ROUTE-MISS] 和 route_source 字段，再写核查清单——否则 30 条样本可能永远等不到，或者等到了也不代表生产分流。\n...\n**assistant [peer=github.com-tyvt-skills]**: **119 passed**（108 + 11）。现在清理验证数据并提交。\n...\n**assistant [peer=github.com-tyvt-skills]**: ...- `pytest`：108 → **119 passed**\n- `selftest`：**EXIT=0**\n- 提交：`a9232c5b`（路由日志）、`3213eda2`（清单）\n\n工作区剩下的 `README.md`、`test_scheduling.py`、`.plan/`、`op-tool-execute-design.md` 都是**先前就有的改动**，非本次。\n\n### 一个诚实的提醒\n\n清单里写的是 n≥30，但按当前流量，**路由日志可能很久都到不了 30 条**——因为只有 `op:\"full\"` 走规划。若想真拿到数据，可能需要主动跑一批真实请求灌进日志。要我做一个一次性脚本，从历史会话里提炼 30 条真实代码类请求、批量走 graph 路径并落日志吗？这样样本量能立刻到位，比干等生产流量快。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/技术模式/route_miss_logging.md",
+                "memory_type": "entities",
+                "after": "# 路由缺失日志系统\n在 langgraph 编排器中补充的路由可观测性方案，用于记录\"该选未选\"的工具分流错误。\n\n## 核心设计\n- [ROUTE-MISS] 标记：明确该用更专精工具却选了 code_editor 或 planner 时记录\n- route_source 三态：planner（规划器正常返回并选中，计入命中率）、fallback_planner（规划解析失败静默强塞 planner，不计入）、unknown_tool（规划器给了未定义工具名，单独统计）\n- node_plan:712-714 存在静默失败：规划失败时默认给 planner，与跑题兜底相同，须靠 route_source 区分归因\n\n## 统计脚本\n- route_stats.py：分母为每一次规划决策，输出 route_source 分布、分流命中率（仅 planner）、兜底率、MISS 去向\n- offtask_stats.py：分母为已选中的代码类调用，衡量输出质量\n- 两脚本分母不同：路由日志分母是每次规划决策，off-task 分母是代码类调用\n\n## 判定边界\n- route_miss 判据刻意保守：仅在明确该用 signal 却选 code_editor/planner 时报 MISS，模糊情形不判\n- pwsh/git 等非代码生成不参与判定\n- op:tool 不经规划不写路由日志；若流量以 op:tool 为主则路由日志恒空，本身说明分流未跑\n\n## 相关文件\n- dsh/langgraph-orchestrator 下的路由检测模块、route_stats.py、LOG-REVIEW-CHECKLIST.md"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/路由日志审查原则.md",
+                "memory_type": "preferences",
+                "after": "- 补可观测性时优先补\"工具未被选中\"的路由日志，而非仅补\"输出对不对\"的离题日志；路由日志分母为每次规划决策而非代码类调用 (as of 2026-11-13)\n- 审查路由日志须严格先看 route_source 分布是否干净；兜底（fallback_planner）>20% 时样本不能用于评估分流，须先修规划器 (as of 2026-11-13)\n- 小样本（n<30）唯一合法结论是\"样本不足，继续采\"，不得据此下行动结论 (as of 2026-11-13)\n- route_source 必须区分 planner（正常选中计入命中率）、fallback_planner（解析失败强塞不计入）、unknown_tool（未定义工具名单独统计），否则命中率被污染 (as of 2026-11-13)\n- op:tool 不经规划不写路由日志；若流量以 op:tool 为主则路由日志恒空，这本身说明分流未跑 (as of 2026-11-13)"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 7,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,27 @@
+# Summary
+2026-11-13 用户询问是否需要重启，助手确认修改 config.yaml 更新 planner 池顺序（codex/gpt-6-luna → codex/gpt-5.6-luna → workbuddy/deepseek-v4.1-flash）后必须重启 DSH Web 才能生效；重启由用户执行，助手将在重启后通过 op:list 复验池结构。助手已提交 29cf959e，无后台任务，重启安全。
+# 2026-11-13 (Friday) ChatLog:
+**user [peer=github.com-tyvt-skills]**: 需要重启吗
+**assistant [peer=github.com-tyvt-skills]**: **需要。** 从我的记忆确认（`config/graph.py` 启动时读死配置）：planner 池是编排器在启动时加载进内存的，改完 config.yaml 后必须**重启 DSH Web** 才会生效。
+
+怎么验证生效：重启后调用编排器 `op:list`，看 `planner` 池是否已变成新的三项顺序（`codex/gpt-6-luna → codex/gpt-5.6-luna → workbuddy/deepseek-v4.1-flash`）。
+
+注意：重启 DSH Web 是你这侧的操作（我会话跑在这个 Web 里，不能自己重启自己）。你重启完告诉我，我可以立刻用 `op:list` 帮你复验池结构是否正确加载。
+
+要现在重启吗？重启前确认一下：
+- 已提交 `29cf959e`，工作区里其他人的脏改动未动，重启不会丢我的改动。
+- 我这边没有正在跑的后台任务（跑测和 pytest 都已结束）。
+
+你重启后我复验。
+
+<!-- MEMORY_FIELDS
+{
+  "event_name": "DSH Web重启确认",
+  "goal": "确认配置生效需重启",
+  "summary": "2026-11-13 用户询问是否需要重启，助手确认修改 config.yaml 更新 planner 池顺序（codex/gpt-6-luna → codex/gpt-5.6-luna → workbuddy/deepseek-v4.1-flash）后必须重启 DSH Web 才能生效；重启由用户执行，助手将在重启后通过 op:list 复验池结构。助手已提交 29cf959e，无后台任务，重启安全。",
+  "ranges": "0-3",
+  "source_extraction_id": "633d9badf4834f198c9f7f7e92ac1bae",
+  "version": 1,
+  "memory_type": "events"
+}
+-->

@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-ecd7ee06-deab-438b-9895-d1920c35846d/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-12T00:42:11.859105+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/12/编排器未严格使用结论.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-05至2026-11-12，扫描DSH全部1927个会话存档中303个近期会话（288个有工具调用）。对照dsh-token-policy（重活应走orchestrate），发现orchestrate仅调用21次（11-10的16次、11-11的5次，其余四天0次），而pwsh直跑11174次、read 4654次、grep 2517次。build/lint直跑585次（164个会话，其中582次在零编排会话），无offset/limit整读1535次。结论：近期对话未严格使用langgraph-orchestrator编排器，重活基本绕过编排器直接执行。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 分析一下最近的对话，有没有严格使用langgraph-orchestrator编排器\n...\n**assistant [peer=github.com-tyvt-skills]**: 证据链完整。数据质量足够下结论了，收尾。\n\n## 分析结论：**没有严格使用 langgraph-orchestrator 编排器**\n\n我扫了 DSH 全部 1927 个会话存档（`C:\\Users\\Administrator\\.dsh\\sessions\\**\\session.v4.jsonl.zstd`），聚焦最近 7 天（2026-11-05 ~ 11-12）的 **303 个会话 / 288 个有工具调用**。对照 `dsh-token-policy`（重活——大文件整读 >300 行、全量 lint/build、账单/大结果查询、编码实现——应先走 `orchestrate`）逐条核对，结论是**基本没走编排器**，属于明显不达标。\n\n### 关键数据\n\n**1. 编排器几乎缺席**\n- 最近 7 天 `orchestrate` 总调用 **21 次**，且只集中在 11-10（16 次）和 11-11（5 次）两天；11-05 / 11-06 / 11-07 / 11-09 四天 **0 次**。\n- 同期 `pwsh` 直跑 **11,174 次**、`read` 4,654 次、`grep` 2,517 次。\n\n**2. 明确该走编排器的重活，绝大多数直接做了**\n| 信号 | 应走 orchestrate | 实际 |\n|---|---|---|\n| 全量 build / lint / vue-tsc / tsc | 应走 | 直跑 **585 次**，分布在 **164 个会话** |\n| 其中在\"含 orchestrate 的会话\"里 | — | 仅 3 次 |\n| 其中在\"完全没用 orchestrate 的会话\"里 | — | **582 次** |\n| 无 offset/limit 的整读 read | 应走 | **1,535 次** |\n\n即：build/lint 直跑的 582/585 都发生在完全绕过编排器的会话里。\n\n**3. 反样本：重活最多的都是零编排会话**\n- `门户` 项目单会话直跑 build/lint **16 次**，`苏州房地产V3` 系列单会话 12/12/12/10/9 次——全部 `orch=False`。\n- `苏住房防汛C端` 反复手跑 `npx vue-tsc --noEmit`，也没走编排器。\n\n**4. 21 次 orchestrate 里还有\"用错\"的**\n- 多次是 `op=list`（仅列举工具/模型池），不是真正执行重活；\n- 有些是 `op=tool` 把单条窄命令丢给编排器——这跟 policy\"单条窄命令可直接执行\"的判断标准也没对齐，属于把编排器当壳子用。\n\n### 结论\n- **不算\"严格使用\"**：编排器是\"偶尔用、局部用\"，日常重活（build/lint/整读/检索）基本是宿主直接开 pwsh/read/grep 硬刚。\n- **最该走没走的类别**：build/lint 验证（585 次里 582 次绕过）和整读（1535 次无 range），正是 token-policy 点名要求走 `orchestrate` 的两类，也是 token 成本最容易失控的地方。\n- 只有 11-10 那批禅道 bug 修复（苏住房G 等）真正按 `op=tool`/`op=full` 走了编排器，是少数合规样本。\n\n需要的话我可以：① 导出这 164 个\"直跑 build/lint\"的会话清单（含项目、会话 id、次数）做成报表；② 或按 `token-frugal` 思路给出具体的路由纠偏规则。要哪个？"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/规范/dsh_token_policy.md",
+                "memory_type": "entities",
+                "after": "# dsh-token-policy\nDSH 会话降本规范，规定重活必须经由 orchestrate 编排器执行。\n\n## 核心规则\n- 大文件整读（>300 行，无 offset/limit）应走 orchestrate\n- 全量 lint/build（vue-tsc/tsc 等）应走 orchestrate\n- 账单查询、大结果查询、编码实现应走 orchestrate\n- 单条窄命令可直接执行，不必走编排器\n\n## 关系\n- 由 dsh-orchestrator 插件提供 `orchestrate` 入口工具\n- 与 dsh-cost-meter、dsh-token-guard 共同组成降本体系"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

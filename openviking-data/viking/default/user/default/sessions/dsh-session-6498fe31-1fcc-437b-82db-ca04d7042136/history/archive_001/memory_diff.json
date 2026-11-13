@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-6498fe31-1fcc-437b-82db-ca04d7042136/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T02:22:01.586563+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/AGENTS索引三行新增.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户要求在 dsh/AGENTS.md 顶部「编排器选型」附近加三行索引（会话时间硬约束、二次ask拦截、e2e预检、定位顺序/lint指向skill），只加索引不加细节；助手实施后系统回读确认生效 (2026-11-13)\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: AGENTS.md 的改动（只加索引，不加细节）\n在 AGENTS.md 顶部「编排器选型」附近加三行：\n\nmarkdown\n## 会话时间硬约束（P0，细节见 skill/hook）\n- 计划确认轮必须把可预见待定项（提交方式/推送/是否重建）一次问清（hook 拦截二次 ask）。\n- 跑 `playwright test` 前必须先过 `node e2e/scripts/preflight.mjs`（hook 拦截）。\n- 定位顺序与 lint 命令模板见 `zentao-analyzer` / `szfc-page-guard` skill。\n汇总：改哪里\n项\t落点\t优先级\t收益\nP0-1 两次 ask\thook（tool-call 拦截 + 告警兜底）\t最高\t~250–500s\nP0-3 e2e 预检\thook + e2e/scripts/preflight.mjs\t最高\t~300s\nP0-2 定位顺序\tskill（zentao-analyzer + szfc-page-guard 双写）\t高\t~300s\nP0-4 lint 模板\tskill 命令原文 + 一句预期说明\t中\t~60s + 少读基线\n索引\tAGENTS.md 三行\t必做\t保证上述被加载\n一句话：P0-1、P0-3 必须 hook 硬卡（动作缺失可判定，硬卡零误伤）；P0-2、P0-4 落 skill（语义顺序，硬卡必误伤）；AGENTS.md 只做索引入口，避免越写越厚被模型跳过。\n出个计划给我"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/szfc页面守卫撤销.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户明确表示不需要业务级 szfc-page-guard skill，助手将其删除，定位顺序与lint模板保留在 zentao-analyzer 双写 (2026-11-13)\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: szfc-page-guard是干嘛的？我不需要业务级别的\n**assistant [peer=github.com-tyvt-skills]**: 明白，`szfc-page-guard` 是我刚按计划新建的「页面调试守卫」skill（页面定位顺序/截图等待策略/lint 模板），确实带了业务仓色彩。你不需要就撤掉：定位顺序与 lint 模板已双写在 `zentao-analyzer`，只留它即可。\n...\n**assistant [peer=github.com-tyvt-skills]**: 实施完成，`szfc-page-guard` 已按你要求撤销。汇总：\n\n**已落地**\n| 项 | 落点 | 状态 |\n|---|---|---|\n| AGENTS.md 索引三行 | [dsh/AGENTS.md](dsh/AGENTS.md)（第 5-8 行，指向 zentao-analyzer） | ✅ 已生效（系统已回读新版） |\n| P0-1 二次 ask 拦截 | [ask-guard.js](dsh/agent-guard/lib/ask-guard.js)（纯函数）+ [index.js](dsh/agent-guard/lib/index.js) 接线 + [cordis.patch.yml](dsh/agent-guard/cordis.patch.yml) `askGuard.mode: warn` 灰度 | ✅ 初始 warn，不阻断 |\n| P0-3 preflight | 按你选择**暂缓**，设计（单键 session_id schema）留在计划附录 | ⏸ |\n| P0-2/P0-4 skill | [zentao-analyzer/SKILL.md](zentao-analyzer/SKILL.md) 增补「定位顺序」+「lint 命令模板」；szfc-page-guard 已删除 | ✅ |\n| 灰度切换脚本 | [ask-guard-promote.ps1](dsh/scripts/ask-guard-promote.ps1)（误伤率统计 + `-Mode block/-Apply` 切换，pwsh 7+） | ✅ |\n\n**验证**：selftest 90/90 全绿（含 8 条 ask-guard 用例：补问 missing→block、合法二次 ask 不拦、高危豁免、跨 phase 不拦、mode 三档）、integration-test 16/16 全绿。构建基线不适用（本仓无 build 流程），以 selftest/integration-test 为验证门槛。\n\n**注意**：工作区还有大量**本次无关的预存在改动**（cost-meter/orchestrator-gate/token-guard 等其他插件、openviking-data 向量库），提交时需只挑本次范围（`dsh/AGENTS.md`、`dsh/agent-guard/*`、`dsh/scripts/ask-guard-promote.ps1`、`zentao-analyzer/SKILL.md`、`.plan/`）。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/ask守卫钩子落地.md",
+                "memory_type": "events",
+                "after": "# Summary\n基于用户「P0-1、P0-3 必须 hook 硬卡」要求，在 dsh/agent-guard 实现 ask-guard.js 纯函数 + index.js 接线 + cordis.patch.yml askGuard.mode: warn 灰度 + ask-guard-promote.ps1 切换脚本；selftest 90/90、integration-test 16/16 全绿，初始 warn 不阻断 (2026-11-13)\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: ...索引\tAGENTS.md 三行\t必做\t保证上述被加载\n一句话：P0-1、P0-3 必须 hook 硬卡（动作缺失可判定，硬卡零误伤）；P0-2、P0-4 落 skill（语义顺序，硬卡必误伤）；AGENTS.md 只做索引入口，避免越写越厚被模型跳过。\n出个计划给我\n...\n**assistant [peer=github.com-tyvt-skills]**: AGENTS.md 索引已生效（系统已回读新版）。继续实现 askGuard hook——先看 agent-guard 入口接线点：\n**assistant [peer=github.com-tyvt-skills]**: 将其接入 `index.js` (import、会话状态、`guard hook`) 和配置：\n**assistant [peer=github.com-tyvt-skills]**: 第二处 edit 把 guard 回调结尾吞掉了，立即修复：\n**assistant [peer=github.com-tyvt-skills]**: 现在开始进行 promote 脚本和技能的编写。先跑 selftest 验证 hook 未破坏：\n**assistant [peer=github.com-tyvt-skills]**: selftest 全绿（82/82）。补 user_bypass 落账（在 pre-execute 包装点看 ask 结果）：\n**assistant [peer=github.com-tyvt-skills]**: 给 selftest 增加 ask-guard 用例（按计划验证矩阵）：\n...\n**assistant [peer=github.com-tyvt-skills]**: 验证全绿。现在 skill 双写（zentao-analyzer 增补 + 新建 szfc-page-guard 骨架）："
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/tyvt_skills.md",
+                "memory_type": "entities",
+                "before": "# tyvt/skills 仓库\nGitHub 上的 tyvt/skills 仓库（本地路径 D:\\repository\\skills），用于存放 OpenViking 记忆快照与导入工具脚本。\n\n## 描述\n- 对应远程 https://github.com/tyvt/skills.git 的 origin/main 分支\n- 本地路径为 D:\\repository\\skills\n\n## 内容\n- openviking-memory/ 目录存放 OpenViking 记忆库快照\n- openviking-data/ 目录存放 OpenViking「所有影响记忆质量」的数据备份：viking/.../user/default/ 整树（memories、peers、sessions、skills、resources、privacy、摘要）、vectordb/ 与 backend_meta.json；初始提交 1a4a1b9 仅含 memories+peers（约11.36MB/7213 md），2026-11-07 扩展为全量质量快照 4cdcd7bf（约213MB/20154 文件），2026-11-09 09:01 提交 c9a15051「全量快照 20237 files」；同日经独立验证的全量快照 dc290366（21,050 文件/214MB，含 4,359 原始导出文件）与记忆快照 605e1435（6,609 md/8.49MB）推上 origin/main 并确认 local HEAD == origin/main，取代 c9a15051 成为最新；sessions/ 含 505 个目录（其中 277 个为 mm-* 导入记忆会话）；该备份为手动时间点快照（无定时备份任务）非自动化；原始对话文本（cursor/workbuddy/opencode）位于 memory-migration/out/（本地磁盘），本不入 OpenViking；2026-11-09 曾临时拷入 openviking-data/source-exports/ 并随数据快照 dc290366 推上 GitHub（4,359 文件/240.2MB），但因违反纯镜像约定，用户同日决定迁出为独立顶层 memory-migration-archive/ 并由专门快照脚本备份；仍不入库 data/_system/、锁文件、pending/、state/ 等运行时数据\n- skills/scripts/ 目录含 patch-ov-cursor-evidence.mjs、fix-ov-memory-footer-order.mjs、refresh-cursor-import-state.mjs 等导入质量脚本\n- openviking-autostart/ 目录含 OpenViking 不可用自动拉起 skill（SKILL.md 全流程 + drill.ps1 演练脚本），2026-11-13 经 plan_review 通过并真实停服演练成功\n\n## 关系\n- 作为 OpenViking 记忆备份与工具脚本的托管仓库\n- default-workspace 下的 memory-migration/ 并非独立 git 仓库，工具脚本备份至此仓库",
+                "after": "# tyvt/skills 仓库\nGitHub 上的 tyvt/skills 仓库（本地路径 D:\\repository\\skills），用于存放 OpenViking 记忆快照与导入工具脚本。\n\n## 描述\n- 对应远程 https://github.com/tyvt/skills.git 的 origin/main 分支\n- 本地路径为 D:\\repository\\skills\n\n## 内容\n- openviking-memory/ 目录存放 OpenViking 记忆库快照\n- openviking-data/ 目录存放 OpenViking「所有影响记忆质量」的数据备份：viking/.../user/default/ 整树（memories、peers、sessions、skills、resources、privacy、摘要）、vectordb/ 与 backend_meta.json；初始提交 1a4a1b9 仅含 memories+peers（约11.36MB/7213 md），2026-11-07 扩展为全量质量快照 4cdcd7bf（约213MB/20154 文件），2026-11-09 09:01 提交 c9a15051「全量快照 20237 files」；同日经独立验证的全量快照 dc290366（21,050 文件/214MB，含 4,359 原始导出文件）与记忆快照 605e1435（6,609 md/8.49MB）推上 origin/main 并确认 local HEAD == origin/main，取代 c9a15051 成为最新；sessions/ 含 505 个目录（其中 277 个为 mm-* 导入记忆会话）；该备份为手动时间点快照（无定时备份任务）非自动化；原始对话文本（cursor/workbuddy/opencode）位于 memory-migration/out/（本地磁盘），本不入 OpenViking；2026-11-09 曾临时拷入 openviking-data/source-exports/ 并随数据快照 dc290366 推上 GitHub（4,359 文件/240.2MB），但因违反纯镜像约定，用户同日决定迁出为独立顶层 memory-migration-archive/ 并由专门快照脚本备份；仍不入库 data/_system/、锁文件、pending/、state/ 等运行时数据\n- skills/scripts/ 目录含 patch-ov-cursor-evidence.mjs、fix-ov-memory-footer-order.mjs、refresh-cursor-import-state.mjs 等导入质量脚本\n- dsh/ 子目录含 agent 规则演进代码：agent-guard 插件（ask-guard.js 纯函数 + index.js 接线 + cordis.patch.yml 灰度 askGuard.mode: warn）、scripts/ask-guard-promote.ps1 切换脚本、AGENTS.md 三行硬约束索引（指向 zentao-analyzer）、zentao-analyzer/SKILL.md 含定位顺序与 lint 模板；szfc-page-guard 曾建后删；2026-11-13 提交 80512c00（10 files, +496/−18）至 origin/main\n- openviking-autostart/ 目录含 OpenViking 不可用自动拉起 skill（SKILL.md 全流程 + drill.ps1 演练脚本），2026-11-13 经 plan_review 通过并真实停服演练成功\n\n## 关系\n- 作为 OpenViking 记忆备份与工具脚本的托管仓库\n- default-workspace 下的 memory-migration/ 并非独立 git 仓库，工具脚本备份至此仓库"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/agent约束执行策略.md",
+                "memory_type": "preferences",
+                "before": "- 认为 AGENTS.md/skill 规则是软约束，长会话中会被模型选择性忽略，不赞成继续往里堆字。\n- 偏好三层分离保障约束：硬约束用 git pre-commit hook 门禁（管可判定缺件）、半硬约束用 DSH plugin 注入 notice（管时机性提醒）、软约束用 skill 示例/清单（管流程顺序）。",
+                "after": "- 认为 AGENTS.md/skill 规则是软约束，长会话中会被模型选择性忽略，不赞成继续往里堆字。\n- 偏好三层分离保障约束：硬约束用 git pre-commit hook 门禁（管可判定缺件）、半硬约束用 DSH plugin 注入 notice（管时机性提醒）、软约束用 skill 示例/清单（管流程顺序）。\n- 在 skills 仓库 agent 规则演进中确认：AGENTS.md 只做索引入口（三行硬约束索引）不堆细节；可判定动作缺失项（如二次ask、e2e预检）用 hook 硬卡（零误伤），语义顺序类（定位顺序、lint模板）落 skill 双写 (as of 2026-11-13)"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

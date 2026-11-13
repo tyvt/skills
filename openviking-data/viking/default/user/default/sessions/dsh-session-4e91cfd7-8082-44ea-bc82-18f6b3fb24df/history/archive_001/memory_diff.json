@@ -1,0 +1,41 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-4e91cfd7-8082-44ea-bc82-18f6b3fb24df/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T03:18:14.570654+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/webview_h5_cache_update.md",
+                "memory_type": "entities",
+                "after": "# web-view 内 H5 缓存更新方案\n微信小程序 web-view 嵌入的 H5 在用户不清缓存时也能更新版本的技术方案与取舍。\n\n## 问题本质\n- 小程序 web-view 的 H5 HTTP 缓存（HTML/JS/CSS）独立于小程序包缓存，清小程序缓存不会清除它。\n- 更新思路是让浏览器自己判断拉新版本，而非依赖用户清缓存。\n\n## 推荐方案\n- 静态资源带 content hash（Vite 默认开启）：HTML 更新后引用新文件名，旧缓存自然失效。\n- HTML 禁止缓存（nginx 加 `Cache-Control: no-cache`）：核心配置，用户无感更新。\n- 小程序 web-view 的 src 在 `#` 前拼发布版本号（如 `?v=2026111301`）：可让历史已缓存用户立刻生效。\n- 前端轮询 `version.json` 做版本检测：解决长时间停留 H5 期间发版的场景。\n\n## 关键结论\n- nginx 配 HTML no-cache 只对未来用户生效；已中招的历史用户需靠换 URL 版本号参数穿透缓存。\n- token 不能替代版本号：拼在 `#` 后不参与 HTTP 请求；拼在 `#` 前会重新引入会话固定漏洞且每次登录变导致重复下载。\n- 版本号用写死发布号而非 `Date.now()`，避免同版本期间也重复下载。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/h5项目/shimin_h5_zhishu.md",
+                "memory_type": "entities",
+                "after": "# 市民H5指数C项目\n作为 web-view 嵌入微信小程序的 H5 项目（gitlab 路径含 homeland-fe-zhi2/mobile/shimin/h5/zhishu-c）。\n\n## Description\n- 本项目以 web-view 形式嵌入微信小程序，使用 hash 路由，入口 URL 始终是同一个 index.html。\n- 构建工具为 Vite，默认开启 filename hashing，dist 产物文件名带 hash。\n- vite.config.ts 的 html-transform 插件向 `<html>` 写入 build-time 构建时间，每次构建 HTML 内容都会变。\n\n## 技术细节\n- index.html 直接引用 `./static/js/tracker.js`，该文件走 static 原样拷贝、无 hash，会被 WebView 永久缓存。\n- App.vue 包含 `stripTokenFromUrl()`，专门把 token 从地址栏剥掉。\n- 与小程序的代码分属不同仓库，本仓库可改动点含 tracker.js 版本化（可选）。\n\n## 关键事实\n- 2026-11-09 修复过会话固定漏洞，`stripTokenFromUrl()` 即为该修复的一部分。\n- 部署侧缓存头（nginx）不在本项目仓库内，是当前缓存问题的关键缺口。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/miniprogram_h5_comm.md",
+                "memory_type": "entities",
+                "before": "# 小程序与 H5 通信方案选型\ni淮安公版项目中小程序与 H5（web-view）通信有多种可选方案，按实时性/稳定性有不同取舍。\n\n## 可选方案\n- URL 参数（启动参数）：小程序打开 web-view 时带参给 H5；最简单稳定，但仅初始化单向\n- `wx.miniProgram.postMessage` + `web-view @message`：官方能力接入成本低，但时机触发非强实时\n- `wx.miniProgram.navigateBack` + 页面栈参数/全局状态：业务闭环稳定，但偏流程式不适持续双向\n- 后端中转（推荐主链路）：H5 写后端、小程序轮询/刷新读状态；最稳可追踪可重试可审计、端间解耦，需接口与状态设计\n- 轮询：实现快，但有延迟耗电耗流量，适合短期过渡\n- WebSocket（经后端）：强实时双向体验最好，但服务端复杂度高（连接管理、重连、鉴权）\n\n## 适用建议\n- 若场景为“登录结果必须可靠到达”，建议主链路采用后端中转\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=i淮安公版\n- 涉及文件：src/pages/index/home.vue\n- 所属项目：i淮安公版；来源会话：13c153e8-478a-41cb-b96b-542c5621b6d8；代码基线：none",
+                "after": "# 小程序与 H5 通信方案选型\ni淮安公版项目中小程序与 H5（web-view）通信有多种可选方案，按实时性/稳定性有不同取舍。\n\n## 可选方案\n- URL 参数（启动参数）：小程序打开 web-view 时带参给 H5；最简单稳定，但仅初始化单向\n- `wx.miniProgram.postMessage` + `web-view @message`：官方能力接入成本低，但时机触发非强实时、生命周期触发\n- `wx.miniProgram.navigateBack` + 页面栈参数/全局状态：业务闭环稳定，但偏流程式不适持续双向\n- 后端中转（推荐主链路）：H5 写后端、小程序轮询/刷新读状态；最稳可追踪可重试可审计、端间解耦，需接口与状态设计\n- 轮询：实现快，但有延迟耗电耗流量，适合短期过渡\n- WebSocket（经后端）：强实时双向体验最好，但服务端复杂度高（连接管理、重连、鉴权）\n\n## 适用建议\n- 若场景为“登录结果必须可靠到达”，建议主链路采用后端中转\n\n## 验证与归属\n- 验证证据：extracted source=cursor project=i淮安公版\n- 涉及文件：src/pages/index/home.vue\n- 所属项目：i淮安公版；来源会话：13c153e8-478a-41cb-b96b-542c5621b6d8；代码基线：none"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/miniprogram_h5_communication.md",
+                "memory_type": "entities",
+                "deleted_content": "# 小程序与 H5 通信方案\ni淮安项目中小程序与 H5（web-view）通信的常用方案与取舍。\n\n## 可选方案\n- URL 参数（启动参数）：小程序打开 web-view 时带参给 H5，最简单稳定，但仅初始化单向\n- wx.miniProgram.postMessage + web-view @message：官方能力、接入成本低，但非强实时、生命周期触发\n- wx.miniProgram.navigateBack + 页面栈/全局状态：业务闭环稳定，但偏流程式，不适合持续双向\n- 后端中转（推荐业务主链路）：H5 写后端、小程序轮询读取同一状态，最稳可追踪审计、端间解耦，需接口与状态设计\n- 轮询：实现快，但有延迟耗资源，适合短期过渡\n- WebSocket（经后端）：强实时双向体验最好，但服务端复杂度高\n\n## 建议\n- 若场景为「登录结果必须可靠到达」，主链路采用后端中转保证可靠交付\n\n## 验证与归属\n- 验证证据：extracted source=cursor session=13c153e8-478a-41cb-b96b-542c5621b6d8\n- 涉及文件：src/pages/index/home.vue\n- 所属项目：i淮安公版；代码基线：none"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

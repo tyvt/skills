@@ -1,0 +1,36 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-85dfba32-0596-4df5-8307-ca304c3e942d/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-12T08:12:26.533008+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/12/暂停接入cursor模型.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户在 2026-11-12 要求暂时移除 plan_review 链路中 cursor 相关模型的接入，待后续评估后再引入。该指令源于对一次 30 分钟编码任务的耗时分析：约 77% 时间消耗在计划审核环节，含编排器 planner 模型池重试（约 6.8 分钟）与 grok-4.7@256k 超时等待（约 7 分钟）。assistant 回应将先探查 plan-review 配置结构再提改动方案。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: ...5. **计划/代码用局部 edit 而非整段重写**，降低单次输出体积和响应延迟。\n6. **让延迟可见**：在 cost-meter 或 token 面板里把「编排器重试/超时等待」也计入墙钟，否则永远发现不了这 6 分钟是账外的。\n\n优化一下，暂时移除cursor相关模型的接入，我后续评估后再引入\n**assistant [peer=github.com-tyvt-skills]**: I'll start by understanding the current structure of the plan-review configuration before proposing changes."
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/mechanism/plan_review_chain.md",
+                "memory_type": "entities",
+                "before": "# plan_review_chain\nDSH orchestrator's multi-step plan-approval chain required by dsh/AGENTS.md \"Plan Review\" section.\n\n## Trigger\n- The orchestrate tool's op enum is only full|tool|list; there is no standalone plan_review op.\n- Triggered via op:\"full\" with the full plan text inlined in the request (PLAN_REVIEW wording).\n- planner is a pure-text model with no disk access and cannot review file paths, so plan text must be inlined.\n\n## Chain Structure\n- planner produces the initial plan.\n- plan_reviewer (preferred: cursor/grok-4.7@256k) reviews the plan.\n- glm-5.3-flash produces the final summary.\n\n## Timing and Timeout\n- Each step takes 20~70s; full chain usually 1~3 min, all ok:true per .costs.jsonl.\n- Orchestrator 300s timeout: grok-4.7 reviewing a long plan may exceed 5 min and report \"python call timeout (300000ms)\"; retry or shorten the plan.",
+                "after": "# plan_review_chain\nDSH orchestrator's multi-step plan-approval chain required by dsh/AGENTS.md \"Plan Review\" section.\n\n## Trigger\n- The orchestrate tool's op enum is only full|tool|list; there is no standalone plan_review op.\n- Triggered via op:\"full\" with the full plan text inlined in the request (PLAN_REVIEW wording).\n- planner is a pure-text model with no disk access and cannot review file paths, so plan text must be inlined.\n\n## Chain Structure\n- planner produces the initial plan.\n- plan_reviewer (preferred: grok-4.7@256k; cursor temporarily removed per user 2026-11-12 pending re-evaluation) reviews the plan.\n- glm-5.3-flash produces the final summary.\n\n## Timing and Timeout\n- Each step takes 20~70s; full chain usually 1~3 min, all ok:true per .costs.jsonl.\n- Orchestrator 300s timeout: grok-4.7 reviewing a long plan may exceed 5 min and report \"python call timeout (300000ms)\"; retry or shorten the plan.\n- Observed 2026-11-12: planner pool (workbuddy/deepseek-v4.1-flash) single point of failure retried ~100s×2 before downgrading to glm-5.3-flash; grok-4.7@256k slow (~8.8s/10tok) caused 120s/300s timeouts; retry/wait time invisible in .costs.jsonl."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/计划审批工作流要求.md",
+                "memory_type": "preferences",
+                "before": "- Requires the model to first produce a markdown plan (listing tasks/bugs with causes and distributed implementation) rather than just creating a todo list and executing.\n- The plan is reviewed by a senior model (e.g. grok); if rejected, it is sent back to the main model for revision until approved.\n- The final draft requires explicit user confirmation before implementation starts.\n- AGENTS.md requires invoking the orchestrator for plan approval; the orchestrate tool's op enum is only full|tool|list, so plan_review is triggered via op:\"full\" with the full plan text inlined (planner is a pure-text model with no disk access); reviewer pool preferred: cursor/grok-4.7@256k.\n- This requirement is written into the \"Plan Review\" section of dsh/AGENTS.md and takes effect globally.",
+                "after": "- Requires the model to first produce a markdown plan (listing tasks/bugs with causes and distributed implementation) rather than just creating a todo list and executing.\n- The plan is reviewed by a senior model (e.g. grok); if rejected, it is sent back to the main model for revision until approved.\n- The final draft requires explicit user confirmation before implementation starts.\n- AGENTS.md requires invoking the orchestrator for plan approval; the orchestrate tool's op enum is only full|tool|list, so plan_review is triggered via op:\"full\" with the full plan text inlined (planner is a pure-text model with no disk access); reviewer pool preferred: grok-4.7@256k (cursor temporarily removed per user 2026-11-12 pending re-evaluation).\n- This requirement is written into the \"Plan Review\" section of dsh/AGENTS.md and takes effect globally."
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

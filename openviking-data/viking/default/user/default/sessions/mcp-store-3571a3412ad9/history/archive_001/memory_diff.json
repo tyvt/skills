@@ -1,0 +1,24 @@
+{
+    "archive_uri": "viking://user/default/sessions/mcp-store-3571a3412ad9/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-12T09:57:41.562133+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_6457.md",
+                "memory_type": "entities",
+                "before": "# 禅道 Bug 6457\n禅道缺陷 6457 为苏住房防汛C端移动查询H5「首页/我的页待办计数不符及待处理文案」问题，2026-11-11 由助手实现修复、提交并回写禅道为已解决。\n\n## Description\n- 问题：首页待办角标显示 12，但进入任务列表仅显示 3；手持端应与G端一致（该账号G端为0）。附截图。\n- 产品备注要求移除「待处理」文案（我的页任务菜单徽标上的字面文案）。\n\n## 根因与改动\n- 首页与我的页待办计数取自流程引擎 `getTaskCount` 接口（`/v2.0/flowable/task/taskCount`）返回的 `todoNum`（演示种子值12），而任务中心列表取自 `getTodoTaskList` 接口（`/v2.0/flowable/task/todoTaskList`）返回的 `total`（3），两接口口径不一致造成不符。\n- 修复：首页 badge 与 mine badge 统一改为读取 `getTodoTaskList().total`，使「首页显示X = 进入列表X」。\n- 我的页 `mine/index.vue:34` 原展示字面「待处理」徽标，改为展示数字计数（保留信息且移除文案）。\n- 移除不再被引用的 `getTaskCount` API 包装（无测试引用），提交 `72bc8cf`。\n\n## 处理时间线\n- 助手在 worktree 探索代码，定位计数来源与文案位置，应用编辑并通过 vue-tsc 类型检查（exit 0）。\n- 提交 `72bc8cf`（三文件改动：src/utils/portalData.ts、src/pages/mine/index.vue、src/api/portal.ts）并推送到 `origin/dev`，随后通过 DBX 事务回写禅道：bug 置 resolved/fixed，`resolvedBy=tiany`，`assignedTo` 退回 `lichandan`；`zt_action 90929`（resolved/fixed/read=0）已落库。\n- 禅道元数据：`openedBy=lichandan`，`product=79`，`project=141`，`execution=142`。\n\n## 当前状态\n- 禅道 6457 为 resolved/fixed，assignedTo=lichandan。\n- 代码已推送到 `origin/dev`；验证仅执行 `vue-tsc` 类型检查（exit 0），未执行 H5 全量构建/本地 8099 部署（vitest 与 vite 版本不匹配）；建议本地联调确认计数一致。",
+                "after": "# 禅道 Bug 6457\n禅道缺陷 6457 为苏住房防汛C端移动查询H5（zhi2-mobile-query-h5-c-unlimited）「首页/我的页待办计数不符及待处理文案」问题，2026-11-11 首轮修复、2026-11-12 二次激活后再次修复并回写禅道为已解决。\n\n## Description\n- 问题：首页待办角标显示 12，但进入任务列表仅显示 3；手持端应与G端一致（该账号G端为0）。附截图。\n- 产品备注要求移除「待处理」文案（我的页任务菜单徽标上的字面文案）。\n\n## 根因与改动\n- 首页与我的页待办计数取自流程引擎 `getTaskCount` 接口（`/v2.0/flowable/task/taskCount`）返回的 `todoNum`（演示种子值12），而任务中心列表取自 `getTodoTaskList` 接口（`/v2.0/flowable/task/todoTaskList`）返回的 `total`（3），两接口口径不一致造成不符。\n- 修复：首页 badge 与 mine badge 统一改为读取 `getTodoTaskList().total`，使「首页显示X = 进入列表X」。\n- 我的页 `mine/index.vue:34` 原展示字面「待处理」徽标，改为展示数字计数（保留信息且移除文案）。\n- 移除不再被引用的 `getTaskCount` API 包装（无测试引用），提交 `72bc8cf`。\n\n## 二次激活根因与改动（2026-11-12）\n- 首轮 72bc8cf 统一角标取 todoTaskList total 后角标正确为0，但任务中心仍显示3条待处理。\n- 根因：`src/utils/portalData.ts` 的 `fetchList` 在 remote 模式下接口返回空列表时回退到 `mock/portalSeed.ts` 的3条假任务（seed-task-1/2/3，status=待处理）。\n- 修复：按用户要求 remote 模式移除全部 mock/seed 回退（`fetchList`/`fetchHome`/`fetchStudyTab`/`fetchMine`/`fetchDetail`），空数据/接口异常展示真实空态或0，仅 demo 构建保留 seed。\n- `home/index.vue` 与 `mine/index.vue` 初始 ref 不再挂 `SEED_HOME`/`SEED_MINE`，提交 `3dee5ab` 推送 `origin/dev`。\n\n## 处理时间线\n- 助手在 worktree 探索代码，定位计数来源与文案位置，应用编辑并通过 vue-tsc 类型检查（exit 0）。\n- 提交 `72bc8cf`（三文件改动：src/utils/portalData.ts、src/pages/mine/index.vue、src/api/portal.ts）并推送到 `origin/dev`，随后通过 DBX 事务回写禅道：bug 置 resolved/fixed，`resolvedBy=tiany`，`assignedTo` 退回 `lichandan`；`zt_action 90929`（resolved/fixed/read=0）已落库。\n- 2026-11-12：助手再次修复 remote 空列表回退问题，提交 `3dee5ab` 推送 `origin/dev`；`tests/portal.test.ts` 新增 remote 空态用例（vi.stubEnv('VITE_DATA_MODE','remote')），npm test 38/38 通过，uni build -m test 构建通过；无测试账号凭据未做 remote 手工验证。\n- 2026-11-12：经 DBX 事务回写禅道 resolved/fixed，`assignedTo` 退回 `lichandan`。\n- 禅道元数据：`openedBy=lichandan`，`product=79`，`project=141`，`execution=142`。\n\n## 当前状态\n- 禅道 6457 为 resolved/fixed，assignedTo=lichandan。\n- 代码已推送到 `origin/dev`；最新提交 `3dee5ab`（首轮 `72bc8cf`）；验证 npm test 38/38 通过、uni build -m test 通过；dev 网关登录凭据 admin/zsbase 与 zsbase/ZS001Aa! 均无效，图形验证码可自动识别（算式型）。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

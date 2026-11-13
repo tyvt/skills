@@ -1,0 +1,43 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-03b85096-abdc-4f59-a3f5-21bc8961db6e/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-12T09:38:25.215891+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/12/串行偏好分析请求.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-12 发现模型经常串行执行任务、不愿用子智能体并行，请求分析近期对话以确认是否可增强并行能力。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 我发现模型经常串行进行任务，不愿意用子智能体并行执行任务，分析一下近期的对话，看看是不是可以增强一下"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/12/串行偏好量化结论.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12 基于全部 652 个会话投影缓存统计，确认存在明显串行偏好：仅 4.8% 会话使用 orchestrate、5.7% 使用 spawn_teammate，等效成本 TOP34 大会话中 79% 零编排，最近 7 天 86% 高成本会话串行。典型串行模式为批量任务由主模型单步执行，放大缓存未命中。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 我发现模型经常串行进行任务，不愿意用子智能体并行执行任务，分析一下近期的对话，看看是不是可以增强一下\n...\n**assistant [peer=github.com-tyvt-skills]**: ## 分析结论：确实存在明显的「串行偏好」，且可量化\n\n数据源：全部 652 个会话的投影缓存（与 dsh-context 面板同源），统计 orchestrate / spawn_teammate / workflow 的真实调用次数。\n\n### 证据\n\n| 指标 | 数字 | 解读 |\n|---|---|---|\n| orchestrate 使用过的会话 | **31 / 652（4.8%）** | 编排器几乎只在专项排查会话里被用过 |\n| spawn_teammate 使用过的会话 | **37 / 652（5.7%）** | 子智能体也只在少数会话用过，且多为每次 spawn 1~4 个后即收 |\n| 等效成本 TOP34 大会话中零编排/零子智能体 | **27 / 34（79%）** | 最烧钱的会话恰恰是最串行的 |\n| 最近 7 天 equiv>1M 的 94 个会话中串行的 | **81 / 94（86%）** | 近期行为没有改善，还在加剧 |\n| agentTeam 有成员的会话 | 37 / 1972 | 团队协作机制基本闲置 |\n\n典型串行模式：`0f28a5ed`（1111 步，26.3M）、`fe39d020`（1307 步，1775 次工具调用，21.1M）——这类「批量导入/批量查询/逐 Bug 排查」任务天然可扇出，但全部由主模型单步单步做，缓存读和每步未命中被放大了几十倍。\n\n### 根因判断\n\n1. **AGENTS.md 已有「要执行动作一律 orchestrate」**，但没有「**何时必须扇出并行**」的判据——模型对「做 10 个同类任务」没有触发条件，只会循环 10 次。\n2. spawn_teammate 的说明在系统提示深处，没有像编排器那样配硬门（orchestrator-gate），所以不遵守没有代价。\n3. 缺「任务形态识别」：批量对象（多个 Bug、多个页面、多文件迁移）= 天然并行，没人提示模型先识别这个形态。\n\n### 建议增强（写进 `~/.dsh/AGENTS.md`）\n\n- **扇出判据（强制）**：同一动作要对 ≥3 个同类对象（多 Bug、多页面、多文件、多查询）执行时，必须先 `spawn_teammate` 扇出并行或 `workflow` 编排，禁止主模型循环串行；主模型只做汇总与验收。\n- **长会话预警**：单会话 steps>300 或等效成本>5M 时，剩余任务必须改用子智能体并行拆片，不允许继续主循环。\n- **team 硬门**：把 orchestrator-gate 的思路复制一份成「fanout-gate」——检测到连续 ≥5 次对同类对象的重复工具调用（如连续 read 不同文件）时拒绝并提示扇出。\n\n要不要我把这几条规则实际写入 `~/.dsh/AGENTS.md`（以及可选地让 dsh_orchestrator_gate 插件加 fanout 检测）？"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/12/并行扇出方案审批通过.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12 针对串行偏好的 fanout-gate 增强计划经 r1-r8 多轮审核，r8 终审 verdict=approve，计划文件为 .plan/fanout-gate-20261112.md，涵盖扇出判据、长会话预警、team 硬门三项增强，待用户人工确认后实施。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 我发现模型经常串行进行任务，不愿意用子智能体并行执行任务，分析一下近期的对话，看看是不是可以增强一下\n...\n**assistant [peer=github.com-tyvt-skills]**: ✅ r8 终审 **verdict=approve**（无阻塞问题，附三条落笔建议，已吸收）。更新计划状态并请你确认。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/12/并行扇出实施启动.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12 用户确认后开始实施 fanout-gate，修改 dsh_orchestrator_gate 插件的 lib/index.js（新增有状态扇出跟踪，含 skipFanout 豁免标志、offset≥1 且 limit≥1 豁免）与 selftest.mjs（追加自测用例）。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 我发现模型经常串行进行任务，不愿意用子智能体并行执行任务，分析一下近期的对话，看看是不是可以增强一下\n...\n**assistant [peer=github.com-tyvt-skills]**: 开始实施。先看 selftest.mjs 的测试模式。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/并行扇出强制策略.md",
+                "memory_type": "preferences",
+                "after": "- 当同一动作需对 ≥3 个同类对象（多 Bug、多页面、多文件、多查询）执行时，必须先 spawn_teammate 扇出并行或 workflow 编排，禁止主模型循环串行；主模型只做汇总与验收\n- 单会话 steps>300 或等效成本>5M 时，剩余任务必须改用子智能体并行拆片，不允许继续主循环\n- 要求将 fanout-gate 逻辑加入 dsh_orchestrator_gate 插件：检测连续 ≥5 次对同类对象的重复工具调用（如连续 read 不同文件）时拒绝并提示扇出"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

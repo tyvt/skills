@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-4e91cfd7-8082-44ea-bc82-18f6b3fb24df/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T03:20:07.948968+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/nginx_config/main_nginx_conf.md",
+                "memory_type": "entities",
+                "after": "# Main Nginx Conf Windows\nMain reverse-proxy nginx.conf for the production Windows Server (nginx-1.30.4).\n## Description\n- Windows-specific corrected v3 config; fixed v2 error where stream-module ssl_handshake_timeout was wrongly used in the HTTP block (unsupported there), replaced by client_header_timeout to govern TLS handshake and request-header read.\n- worker_processes 1 (Windows: only one worker actually does work); worker_connections 1024 (FD_SETSIZE=1024 compile-time hard limit); sendfile off (Windows defect); tcp_nodelay on; server_tokens off.\n- Timeouts tightened: client_header_timeout 10s, client_body_timeout 15s, send_timeout 15s, keepalive_timeout 15s; ssl_session_timeout 10m, ssl_session_tickets off, ssl_prefer_server_ciphers on (ssl_session_cache declared in 443.conf to avoid zone conflict).\n- access_log buffer=256k flush=5s; geo $white_ip whitelist plus limit_req/limit_conn zones with static assets exempted via empty-key map (limit_req off is Tengine-only); includes D:/www/conf.d/*.conf.\n## Upstreams\n- sipps-g: 127.0.0.1:5081; sipps-app-api: 172.24.96.6:9980/9981; be_880/881/882/80: 172.24.96.2; be_8899/8080: 172.24.96.4.\n- be_10001: 172.24.96.6:10001 (wechatapph5); be_18666: 172.24.96.6; be_8092: 172.24.96.7:8092; be_5081: 172.24.96.5:5081.\n- be_8961: 172.24.96.3:8961; be_8892: 172.24.96.3:8892; be_18080: 172.24.96.2:18080.\n## Relations\n- Acts as the reverse-proxy layer; site configs live in D:/www/conf.d/*.conf.\n- 家园区一网通办H5 production is served via upstream be_10001 -> 172.24.96.6:10001."
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/nginx_site/jiayuanqu_h5.md",
+                "memory_type": "entities",
+                "before": "# Jiayuanqu H5\nH5 site for 家园区一网通办 (public opinion survey) served via nginx.\n## Description\n- Config file: D:/nginx/conf/sites-enabled/家园区一网通办H5.conf with root D:/repository/家园区一网通办/dist.\n- Used for survey scoring and pagination verification (bug6234).\n- Listen port changed from 8092 to 8093 on 2026-11-06 to resolve conflict with portal.\n## Relations\n- Accessed at http://localhost:8093/ (302 redirect to /wechatapph5/); config maintained via nginx UI panel.",
+                "after": "# Jiayuanqu H5\nH5 site for 家园区一网通办 (wechatapph5, public-opinion survey system), served via nginx; wechatapph5 is the current project.\n## Description\n- Local dev config: D:/nginx/conf/sites-enabled/家园区一网通办H5.conf, listen 8093, alias D:/repository/家园区一网通办/dist/, location /wechatapph5/ with try_files $uri $uri/ /wechatapph5/index.html.\n- Local port changed from 8092 to 8093 on 2026-11-06 to resolve conflict with portal; used for survey scoring and pagination verification (bug6234).\n- Local config had NO Cache-Control output, causing browser/WebView heuristic caching of stale HTML; fix is add_header Cache-Control \"no-cache\" always on the HTML location and a regex location for assets with \"public, max-age=31536000, immutable\".\n- Production: server listen 10001, root D:/wechatapph5/dist, pure static hosting by nginx (no backend), fronted by outer portal nginx (upstream be_10001 -> 172.24.96.6:10001 wechatapph5).\n- Production 10001 server keeps API locations (/api/actuator, /api/druid, /api/swagger-resources, /api/version/1/) handled by backend; static files and fallback HTML get Cache-Control headers.\n## Caching Fix Notes\n- Config change only controls FUTURE caching; historical cached WebView users are not guaranteed an immediate refresh.\n- Mini-program web-view src must append release version (?v=release_number, placed before #, not the token) to bust old caches; both measures together are required.\n## Relations\n- Accessed locally at http://localhost:8093/ (302 redirect to /wechatapph5/); config maintained via nginx UI panel.\n- Production config reload done via nginx panel to avoid panel/disk drift."
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

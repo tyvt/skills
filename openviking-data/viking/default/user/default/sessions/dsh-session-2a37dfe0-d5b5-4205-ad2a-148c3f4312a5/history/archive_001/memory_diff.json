@@ -1,0 +1,36 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-2a37dfe0-d5b5-4205-ad2a-148c3f4312a5/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T12:28:53.376861+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/计划审核池保持现状决定.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 用户经排查确认 grok 在 plan_reviewer 中仅是慢（15-174s）非故障，11-12 的 10 次失败是 max_tokens:2048 旧 bug 已修复；决定保持 grok 首选不动，不修改 config.yaml。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 现在编排器审核的时候，有反馈说grok超时无响应，检查一下近期的会话，必要时可以把最近的所有plan都重发审核验证一下到底是偶发现象，还是有什么限制条件\n...\n**assistant [peer=github.com-tyvt-skills]**: You chose **保持现状（grok 首选不动）**. No config change needed — the current setup has no fault.\n\n## 最终结论\n\n**grok 没有超时故障，不需要修；「超时无响应」是它慢（15–174s）被误读，真正的 10 次失败是 11-12 的旧 bug，早已修复。**\n\n关键证据链：\n1. **历史数据（75 会话聚合）**：grok 8 次调用 **8/8 成功**，0 失败；最慢 173.8s 但每次都返回了结果。\n2. **那 10 次真失败** 全是 `model=null`（整池耗尽），全部集中在 **11-12**，根因是旧配置 `max_tokens: 2048` → DeepSeek reasoning 耗尽预算 → 502 empty reply。现配置 `max_tokens: 8192` 后，**11-13 全天零失败**。\n3. **活体实测**：grok 单字回复 15.1s vs deepseek 1.4s（~11×，慢但稳定）；重发真实计划审核 `model_used=cursor/grok-4.7@256k`、`ok=true`、`verdict=pass`、27.1s——全链路健康。\n4. **本会话两次 \"编排失败\"** 也非 grok，是我内联 11k+ 字超计划触发 `exceeds review size limit` 保护，直连 bridge 与正常尺寸计划均 100% 成功。\n\n**保持现状 = 不动 config.yaml**：`plan_reviewer` 池 `grok → workbuddy/deepseek → auto/deepseek`，`max_tokens: 8192`、`timeout: 300` 已是最优可靠配置。grok 首选保留其满分校准优势，慢在可接受范围内（审核频率低、单次≈$0.02），且失败自动落 deepseek 兜底。\n\n无需任何改动，也无需提交。若日后确实觉得审核等待太久，随时可让我把 grok 降为次选（取舍而非修 bug）。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/mechanism/plan_review_chain.md",
+                "memory_type": "entities",
+                "before": "# plan_review_chain\nDSH orchestrator's multi-step plan-approval chain required by dsh/AGENTS.md \"Plan Review\" section.\n\n## Trigger\n- The orchestrate tool's op enum is only full|tool|list; there is no standalone plan_review op.\n- Triggered via op:\"full\" with the full plan text inlined in the request (PLAN_REVIEW wording).\n- planner is a pure-text model with no disk access and cannot review file paths, so plan text must be inlined.\n\n## Chain Structure\n- planner produces the initial plan.\n- plan_reviewer (preferred: grok-4.7@256k; cursor temporarily removed per user 2026-11-12 pending re-evaluation) reviews the plan.\n- glm-5.3-flash produces the final summary.\n\n## Timing and Timeout\n- Each step takes 20~70s; full chain usually 1~3 min, all ok:true per .costs.jsonl.\n- Orchestrator 300s timeout: grok-4.7 reviewing a long plan may exceed 5 min and report \"python call timeout (300000ms)\"; retry or shorten the plan.\n- Observed 2026-11-12: planner pool (workbuddy/deepseek-v4.1-flash) single point of failure retried ~100s×2 before downgrading to glm-5.3-flash; grok-4.7@256k slow (~8.8s/10tok) caused 120s/300s timeouts; retry/wait time invisible in .costs.jsonl.\n- 2026-11-12 实测：送审约 9.6k 字长 plan 致 reviewer 生成 120s stall；改用\"变更点摘要+证据\"小粒度送审可降低负担，但 reviewer 仍可能要求更细的可复核证据。",
+                "after": "# plan_review_chain\nDSH orchestrator 的多步计划审批链，由 dsh/AGENTS.md \"Plan Review\" 章节要求。\n\n## 触发方式\n- orchestrate 工具的 op 枚举仅 full|tool|list，无独立 plan_review op。\n- 通过 op:\"full\" 将完整计划文本内联触发（PLAN_REVIEW 语境）。\n- planner 为纯文本模型无磁盘访问，计划文本必须内联。\n- 内联计划超过 api.py:299 的 PLAN_REVIEW_CLIP_CHARS 会触发 \"plan exceeds review size limit\" 保护导致编排失败；正常尺寸计划或直连 `python -m src.jsonbridge` 均正常。\n\n## 链路结构\n- planner 产出初始计划（历史曾观测 planner 池 workbuddy/deepseek-v4.1-flash 单点故障重试 ~100s×2 后降级 glm-5.3-flash）。\n- plan_reviewer 审核计划；当前池（2026-11-13 19:38 配置）：`cursor/grok-4.7@256k` → `workbuddy/deepseek-v4.1-flash` → `auto/deepseek-v4.1-flash`，max_tokens:8192，timeout:300。\n- glm-5.3-flash 产出最终摘要。\n\n## 耗时与可靠性（2026-11-13 排查结论）\n- 各步通常 20~70s，全链 1~3min；历史 .costs.jsonl 记录多数为 ok:true。\n- grok 基线开销约 deepseek 的 11 倍（单字回复 15.1s vs 1.4s），随 token 线性放大（大计划 173.8s ≈ 11ms/token），但从未失败。\n- 历史聚合（75 会话 cost 日志）：grok 8 调用 8 成功 0 失败（29.7s~173.8s）；deepseek 系 72 调用全成功。\n- 11-12 的 10 次 plan_review 失败（model=null, ok=false）根因是当时 max_tokens:2048 → DeepSeek reasoning 耗尽预算 → 502 empty reply，已于 11-13 配置升至 8192 修复；11-13 全天零失败。\n- \"grok 超时无响应\"反馈实为 grok 高延迟被误读，非可靠性故障；用户 2026-11-13 决定保持 grok 首选不动。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/计划审批工作流要求.md",
+                "memory_type": "preferences",
+                "before": "- Requires the model to first produce a markdown plan (listing tasks/bugs with causes and distributed implementation) rather than just creating a todo list and executing.\n- The plan is reviewed by a senior model (e.g. grok); if rejected, it is sent back to the main model for revision until approved.\n- The final draft requires explicit user confirmation before implementation starts.\n- AGENTS.md requires invoking the orchestrator for plan approval; the orchestrate tool's op enum is only full|tool|list, so plan_review is triggered via op:\"full\" with the full plan text inlined (planner is a pure-text model with no disk access); reviewer pool preferred: grok-4.7@256k (cursor temporarily removed per user 2026-11-12 pending re-evaluation).\n- This requirement is written into the \"Plan Review\" section of dsh/AGENTS.md and takes effect globally.",
+                "after": "- Requires the model to first produce a markdown plan (listing tasks/bugs with causes and distributed implementation) rather than just creating a todo list and executing.\n- The plan is reviewed by a senior model (e.g. grok); if rejected, it is sent back to the main model for revision until approved.\n- The final draft requires explicit user confirmation before implementation starts.\n- AGENTS.md requires invoking the orchestrator for plan approval; the orchestrate tool's op enum is only full|tool|list, so plan_review is triggered via op:\"full\" with the full plan text inlined (planner is a pure-text model with no disk access); reviewer pool preferred: grok-4.7@256k first with deepseek fallbacks (user confirmed keep grok-first on 2026-11-13 after timeout investigation).\n- This requirement is written into the \"Plan Review\" section of dsh/AGENTS.md and takes effect globally."
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

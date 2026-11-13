@@ -4,7 +4,7 @@
 ## 对账结果
 - 开发企业变更：`qybgxq`，菜单已配且详情页 meta.busCode 一致
 - 经纪机构变更：`jjjgbgxq`，菜单已配且一致
-- 租赁机构变更：`zljgbgxq`，菜单未出现、无对应项，与前端常量及 `companyRecordChangeRoute.js` 回退逻辑一致（租赁侧只能等后续菜单或误用 `jjjgbgxq`）
+- Lease org change: `zljgbgxq`; `companyRecord.js` now exports `LEASE_CHANGE_FLOW_BUS_CODE = 'zljgbgxq'` (added 2026-11-11 beside `LEASE_CHANGE_APPENDIX_BUS_CODE`), but the menu is still not configured and `companyRecordChangeRoute.js` fallback lacks a lease branch (`AgencyBasicInfoDetail.vue:240` references the constant directly).
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
@@ -15,8 +15,8 @@
 {
   "category": "技术模式",
   "name": "buscode_reconcile",
-  "source_extraction_id": "62dedeb762f4419ea3e8f6efbbe1b55c",
-  "version": 1,
+  "source_extraction_id": "12a4bc7ea2fa4bd3be363b4606f83214",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

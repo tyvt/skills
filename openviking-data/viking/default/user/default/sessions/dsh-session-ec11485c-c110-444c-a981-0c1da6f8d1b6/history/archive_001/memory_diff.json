@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-ec11485c-c110-444c-a981-0c1da6f8d1b6/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-12T05:55:39.133211+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/D--repository---H5/memories/events/2026/11/12/门户后端服务启动.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12，发现 nginx(8091) 返回 502，原因是本地 common-portal(9222) 与 common-gateway(8086) 未启动（Nacos 中残留的远程实例已失效）。使用 JDK 21 启动 portal(PID 172) 与 gateway(PID 7636)，两者注册到远程 Nacos（nacos.dev.zhi.com）。恢复 nginx(8091)→gateway(8086)→portal(9222) 全链路，三个端口均正常监听。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=D--repository---H5]**: 启动后端服务，测试手机号是15962389375，身份证后四位是4315账号登录，短信验证码123456，图形验证码你看看/code接口有没有返回，没有就把图片返回这个对话，由你分析出答案回填\n...\n**assistant [peer=D--repository---H5]**: All three ports listening: 8086 (gateway), 9222 (portal), 8091 (nginx/frontend). The java processes show blank in the table but PIDs 172 and 7636 are bound and holding the ports — services are running.\n\nAll backend services are up and the complete login flow is verified end-to-end. Here's the summary.\n\n## ✅ 后端已启动，登录全流程验证通过\n\n**启动的服务（后台运行，JDK21）：**\n| 服务 | 端口 | PID |\n|---|---|---|\n| common-portal（业务服务） | 9222 | 172 |\n| common-gateway（网关） | 8086 | 7636 |\n| nginx（前端 8091 → 网关 8086） | 8091 | 4168（原有） |\n\n**关键依赖（无需本地起）：** Nacos 配置/注册用远程 `nacos.dev.zhi.com(192.168.1.71)`，Redis 用 `192.168.1.110:16379 db0`，数据库用远程达梦。之前 8091 报 502 是因为本地网关+portal 都没起（Nacos 里残留的远程实例 192.168.1.134/129 已失效）。..."
+            },
+            {
+                "uri": "viking://user/default/peers/D--repository---H5/memories/events/2026/11/12/门户登录链路验证.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12，经 nginx(8091) 同源链路实测门户 H5 登录全流程：生成图形验证码（答案从 Redis 读取并核对图片一致）→ 发送短信 POST /api/v3.0/portal/appLogin/sms（phone=15962389375, idNumberSuffix=4315, captchaUuid+captchaCode）→ 200 → 登录 POST /api/v3.0/portal/appLogin/login（smsCode=123456 万能码）→ 成功返回 token，用户蒋婷（userName 300832, userId 211）→ 带 token 获取子系统列表 POST /api/v3.0/portal/appLogin/apps 成功。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=D--repository---H5]**: 启动后端服务，测试手机号是15962389375，身份证后四位是4315账号登录，短信验证码123456，图形验证码你看看/code接口有没有返回，没有就把图片返回这个对话，由你分析出答案回填\n...\n**assistant [peer=D--repository---H5]**: ...**关于 `/code` 接口：** 后端**没有** `/code` 接口返回明文验证码——图形验证码由 `/v3.0/portal/appLogin/captcha` 返回 base64 图片+uuid，答案是 4 位、一次性、存 Redis（`portal:applogin:captcha:<uuid>`，120s 有效），无任何接口能直接拿到答案。因此按你的要求，我从 Redis 里取到了权威答案并核对图片（我读取/分析出答案回填，不需要你分析）。\n\n**登录全流程（走 8091 同源，与前端完全一致的链路）已实测：**\n1. 生成图形验证码 → 拿到 uuid，答案从 Redis 读取并核对图片一致（如 `0qc7`）\n2. 发短信 `POST /api/v3.0/portal/appLogin/sms` （phone=`15962389375`, idNumberSuffix=`4315`, captchaUuid+captchaCode）→ `200 {\"data\":true}`\n3. 登录 `POST /api/v3.0/portal/appLogin/login`（smsCode=`123456` 为后端配置的万能码）→ **成功**，返回 token，用户：**蒋婷**（userName 300832，userId 211）\n4. 带 token 取子系统列表 `POST .../appLogin/apps` → 200，含「苏住房(authorized=true)」等\n\n前端现在打开 http://127.0.0.1:3080（即 8091 站点）即可正常走完：手机号 15962389375 + 身份证后四位 4315 + 图形验证码 + 短信码 123456 登录。..."
+            },
+            {
+                "uri": "viking://user/default/memories/entities/程序/menhu_backend.md",
+                "memory_type": "entities",
+                "after": "# 门户后端系统\nSpring Boot 后端服务，含网关与业务模块，支撑门户 H5 前端登录与子系统功能。\n\n## 架构与端口\n- 前端 nginx 在 8091，代理 /api/v3.0/ → 127.0.0.1:8086（网关）\n- common-gateway（网关）监听 8086，路由 /v3.0/** 到 common-portal 服务\n- common-portal（业务服务）监听 9222，注册到 Nacos 供网关负载均衡\n- 启动需 JDK 21（位于 D:\\sdk\u0007pps\temurin21-jdk），默认 Java 8 不满足\n\n## 外部依赖\n- Nacos 配置/注册中心：nacos.dev.zhi.com（192.168.1.71），命名空间 suzhou-shiqu-fangchanzonghe\n- Redis：192.168.1.110:16379，db0，密码 Redis_gqpVKeIEUGia1tQe\n- 数据库：远程达梦 DM，192.168.1.101\n\n## 登录接口\n- 图形验证码：POST /api/v3.0/portal/appLogin/captcha，返回 uuid + base64 PNG，答案为 4 位存 Redis 键 portal:applogin:captcha:<uuid>（120s 有效），无 /code 明文接口\n- 短信：POST /api/v3.0/portal/appLogin/sms，参数 phone/idNumberSuffix/captchaUuid/captchaCode；后端配置万能短信码 CONFIG_SMS_MASTER_CODE=123456\n- 登录：POST /api/v3.0/portal/appLogin/login，参数 phone/idNumberSuffix/smsCode，返回 token\n- 子系统列表：POST /api/v3.0/portal/appLogin/apps（带 token）\n- 验证码生成有按 IP 限流（键 portal:applogin:captcha:cnt:<ip>），超限返回 500\n\n## 测试账号\n- 手机号 15962389375 + 身份证后四位 4315 + 短信码 123456 → 用户蒋婷（userName 300832，userId 211）"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

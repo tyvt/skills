@@ -1,0 +1,48 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-6b9db111-c20f-418b-acff-f72ba1ed28d8/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T05:49:02.782861+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/历史推理累积排查请求.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户提出 P0-1 假设——历史 reasoning 二次累积是最大杠杆（8.8M/62%，随步数平方增长），要求排查 magpie-responses 是否在后续请求重发历史 assistant 的 reasoning/encrypted_content，并确认能否配置丢弃或只保留最近 1–2 步 reasoning。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: P0-1：历史 reasoning 二次累积（最大杠杆，8.8M / 62%）\n\n依据：上面的平方关系；改任何别的项，收益都是线性的，只有这个随步数平方增长。\n\n手段（按可行性）：\n\n查 magpie-responses 是否在后续请求重发历史 assistant 的 reasoning/encrypted_content。如果能配置丢弃或只保留最近 1–2 步 reasoning，这是单项最大收益（预期上下文直接砍 60%）。\n平台做不到时，靠\"拆会话\"稀释累积（见 P0-2）。\n预期：strip 成功则等效成本降约 50%；做不到则靠拆会话降 30–40%。\n排查一下"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/历史推理重发根因确认.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 排查确认 P0-1 成立但仅限 magpie-responses 路径：该 provider（openai-responses API，store:false）每步全量重发历史 assistant reasoning/encrypted_content，openai-responses-shared.js:234-240 无条件回传所有 thinking 块且无“保留最近 N 步”配置；主模型 magpie（openai-completions）路径不回传历史 reasoning。平台无现成裁剪开关，只能 patch 或加代理。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: P0-1：历史 reasoning 二次累积（最大杠杆，8.8M / 62%）\n\n依据：上面的平方关系；改任何别的项，收益都是线性的，只有这个随步数平方增长。\n\n手段（按可行性）：\n\n查 magpie-responses 是否在后续请求重发历史 assistant 的 reasoning/encrypted_content。如果能配置丢弃或只保留最近 1–2 步 reasoning，这是单项最大收益（预期上下文直接砍 60%）。\n平台做不到时，靠\"拆会话\"稀释累积（见 P0-2）。\n预期：strip 成功则等效成本降约 50%；做不到则靠拆会话降 30–40%。\n排查一下\n...\n**assistant [peer=github.com-tyvt-skills]**: 排查完成，证据链闭合。结论如下：\n\n## P0-1 排查结论：**确认成立，但仅限 magpie-responses 路径**\n\n### 证据链（本机 DSH 安装实测）\n\n**1. `magpie-responses`（openai-responses API）每步全量重发历史 reasoning —— 实锤**\n\n- `~/.dsh/profiles/web/cordis.patch.yml:1029`：`magpie-responses` provider，`api: openai-responses`，挂 `codex/gpt-6.1-sol` 等模型\n- `pi-ai/dist/api/openai-responses.js:264`：`store: false` —— 无状态模式，服务端不存历史，全靠客户端每步重放\n- `openai-responses.js:295`：请求带 `include: [\"reasoning.encrypted_content\"]`，每步产出加密 reasoning\n- **关键点** `openai-responses-shared.js:234-240`：历史 assistant 消息序列化时，每个 thinking 块只要带 `thinkingSignature`（存的就是含 `encrypted_content` 的完整 reasoning item JSON），就**无条件** `JSON.parse` 后 push 回 input——没有“只保留最近 N 步”的任何条件或配置项\n\n**2. 主模型走的 `magpie`（openai-completions）路径：历史 reasoning 不回传，无此问题**\n\n- `openai-completions.js:993-999`：只有 thinkingSignature 非空（magpie 网关模型流式时置 `\"\"`，仅 opencode-go 例外）才写 `reasoning_content` 字段；`requiresThinkingAsText` compat 默认 false（:1267）→ **主模型（hy3 / zai_glm-5.3-flash 等）的历史 thinking 在序列化时被丢弃**\n- 意外收获：这意味着 62% 的二次累积集中发生在用 `codex/gpt-6.1-sol`（magpie-responses）的长会话里\n\n**3. 平台无现成开关**：`dsh-agent-loop`、`dsh-compaction*`、pi-ai transform 全部只有 `reasoningEffort` 旋钮，无历史 reasoning 裁剪配置 → **配置丢弃做不到，只能 patch**\n\n### 可行修法（供决策，未动手）\n\n| 方案 | 落点 | 说明 |\n|---|---|---|\n| A. patch pi-ai | `openai-responses-shared.js:234-240` 加“仅保留最近 1–2 个 assistant 消息的 reasoning item，更早的跳过并同步抹掉 function_call 的 item id”（代码已有 cross-provider 先例 ：275-277，规避 rs_* 配对校验） | 约 20 行；缺点：dsh 升级会冲掉，需备份重放（profile 目录已有 .bak 先例） |\n| B. magpie 网关侧剥离 | 请求经 127.0.0.1:3425 本地网关，在网关转发前剥掉旧 reasoning item | 不受 dsh 升级影响，且对所有 responses 会话生效；改的是网关项目 |\n| C. 拆会话稀释（P0-2） | 不改代码 | 兜底，收益 30–40% |\n\n预期：A/B 落地后，responses 长会话历史 reasoning 从 O(N) 项降到常数项，等效成本降约 50%，与你的估算一致。上线前需一次单请求冒烟验证 codex 上游不因缺旧 reasoning item 报 400。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/网关侧剥离方案选择.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 用户确认采用方案 B——在 magpie 网关（127.0.0.1:3425）侧转发前剥掉旧 reasoning item，不受 dsh 升级影响且对所有 responses 会话生效，改的是网关项目而非 dsh。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: P0-1：历史 reasoning 二次累积（最大杠杆，8.8M / 62%）\n\n依据：上面的平方关系；改任何别的项，收益都是线性的，只有这个随步数平方增长。\n\n手段（按可行性）：\n\n查 magpie-responses 是否在后续请求重发历史 assistant 的 reasoning/encrypted_content。如果能配置丢弃或只保留最近 1–2 步 reasoning，这是单项最大收益（预期上下文直接砍 60%）。\n平台做不到时，靠\"拆会话\"稀释累积（见 P0-2）。\n预期：strip 成功则等效成本降约 50%；做不到则靠拆会话降 30–40%。\n排查一下\n...\n**assistant [peer=github.com-tyvt-skills]**: 用户确认方案 B。第一步定位 3425 网关进程："
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/本地剥离代理方案确定.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 排查发现 magpie.exe 是 Bun 编译单文件（82MB），responses 路由内嵌二进制不可直接改；plugin-host 插件不含 responses 路由。方案 B 落地形态改为在 3425 前加本地剥离代理（Node 零依赖脚本，监听 3426 转发 3425，仅对 /v1/responses 请求体重写），DSH 侧 magpie-responses baseURL 改指 3426，且剥离须按检查点式（非滑动窗口）以保 prompt cache。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: P0-1：历史 reasoning 二次累积（最大杠杆，8.8M / 62%）\n\n依据：上面的平方关系；改任何别的项，收益都是线性的，只有这个随步数平方增长。\n\n手段（按可行性）：\n\n查 magpie-responses 是否在后续请求重发历史 assistant 的 reasoning/encrypted_content。如果能配置丢弃或只保留最近 1–2 步 reasoning，这是单项最大收益（预期上下文直接砍 60%）。\n平台做不到时，靠\"拆会话\"稀释累积（见 P0-2）。\n预期：strip 成功则等效成本降约 50%；做不到则靠拆会话降 30–40%。\n排查一下\n...\n**assistant [peer=github.com-tyvt-skills]**: 网关确认是 **magpie.exe 内嵌代码**（Bun 编译单文件，82MB，`reasoning.encrypted_content`、错误串都在 exe 内偏移 33–38MB 处），plugin-host 插件不含 responses 路由 → **直接改二进制不可行**。\n\n可行落地形态改为：在 3425 前面加一个**本地剥离代理**（Node 零依赖脚本，监听 3426，转发 3425，仅对 `/v1/responses` 请求体重写），DSH 侧 `magpie-responses` baseURL 改指 3426。有一个关键设计约束：滑动窗口每步都变前缀会**打穿 prompt cache**，所以剥离必须按“检查点式”——累积超阈值才切一次，切点之后前缀保持稳定。按硬门先写计划送审："
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/剥离代理计划审核通过.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 本地剥离代理实施计划审核通过（72/100），3 个 P1 建议有效，先将修订并入计划再交确认。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: P0-1：历史 reasoning 二次累积（最大杠杆，8.8M / 62%）\n\n依据：上面的平方关系；改任何别的项，收益都是线性的，只有这个随步数平方增长。\n\n手段（按可行性）：\n\n查 magpie-responses 是否在后续请求重发历史 assistant 的 reasoning/encrypted_content。如果能配置丢弃或只保留最近 1–2 步 reasoning，这是单项最大收益（预期上下文直接砍 60%）。\n平台做不到时，靠\"拆会话\"稀释累积（见 P0-2）。\n预期：strip 成功则等效成本降约 50%；做不到则靠拆会话降 30–40%。\n排查一下\n...\n**assistant [peer=github.com-tyvt-skills]**: 审核通过（72/100），3 个 P1 建议都有效，先把修订并入计划再交确认："
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/技术模式/magpie_responses_reasoning_accumulation.md",
+                "memory_type": "entities",
+                "after": "# DSH magpie-responses 历史 reasoning 全量重发根因\nDSH 的 magpie-responses（openai-responses API）provider 每步将全部历史 assistant reasoning/encrypted_content 重发，是 P0-1 二次累积（8.8M/62%）的根因。\n\n## 关键事实\n- magpie-responses provider 定义于 ~/.dsh/profiles/web/cordis.patch.yml:1029，api 为 openai-responses，挂 codex/gpt-6.1-sol 等模型\n- pi-ai openai-responses.js:264 设置 store:false（无状态全量重放），:295 请求带 include:[\"reasoning.encrypted_content\"]\n- openai-responses-shared.js:234-240 历史 assistant 消息序列化时，每个带 thinkingSignature 的 thinking 块无条件 JSON.parse 后 push 回 input，无“仅保留最近 N 步”配置项\n- 主模型 magpie（openai-completions）路径：openai-completions.js:993-999 仅 thinkingSignature 非空才写 reasoning_content，主模型历史 thinking 序列化时被丢弃，无此问题\n- 平台无现成开关：dsh-agent-loop、dsh-compaction*、pi-ai transform 仅有 reasoningEffort 旋钮，无历史 reasoning 裁剪配置\n\n## 修复方案\n- 方案 A：patch pi-ai openai-responses-shared.js:234-240 加“仅保留最近 1–2 个 assistant 消息的 reasoning item”，约 20 行，但 dsh 升级会冲掉\n- 方案 B（用户已选）：在 3425 网关前加本地剥离代理（监听 3426 转发 3425，仅重写 /v1/responses 请求体），DSH 侧 magpie-responses baseURL 改指 3426\n- 方案 C：拆会话稀释（P0-2），不改代码，收益 30–40%\n- 网关 magpie.exe 为 Bun 编译单文件（82MB），responses 路由内嵌二进制不可直接改，故方案 B 落地为外部剥离代理\n- 剥离代理设计约束：按“检查点式”累积超阈值才切一次（非滑动窗口），避免打穿 prompt cache\n\n## 影响\n- 预期 A/B 落地后 responses 长会话历史 reasoning 从 O(N) 降到常数项，等效成本降约 50%\n- 62% 的二次累积集中发生在用 codex/gpt-6.1-sol（magpie-responses）的长会话"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 6,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

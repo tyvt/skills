@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-82d894fc-3e88-4fe0-8ef1-57cc7361f613/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T09:17:11.552803+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/封批补丁失效复发.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 用户反馈 cursor 通道「native call arrived after its batch was sealed」在最近多次对话中复发，要求排查并修复。只读诊断确认：补丁文件仍在磁盘（native-session.mjs 758/762 两段守卫完好），但 DSH 计划任务中已无 cursor-quiet-reapply 自动重打任务；2026-11-13 15:30 install-cache 出现 cursor-auth 0.2.46 新版本副本，16:30 magpie-bun 重启疑似加载未打补丁副本导致封批守卫缺陷复发。修复待续。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 本轮运行失败native call arrived after its batch was sealed\n排查这个问题的原因并修复，最近多次对话出现这个问题\n...\n**assistant [peer=github.com-tyvt-skills]**: 记忆里已有完整根因与修复方案（magpie cursor 插件封批守卫缺陷，已打过补丁并有自动重打任务）。现在的问题是「最近又多次出现」，说明补丁可能失效了（插件更新锚点漂移 / magpie-bun 未重启 / 重打任务停了）。先做只读诊断确认现状：\n...\n**assistant [peer=github.com-tyvt-skills]**: 补丁文件还在（758/762 两段守卫），但 DSH 计划任务里**没有 cursor-quiet-reapply**，且最近仍报错。继续确认：Windows 计划任务是否存在、magpie-bun 实际加载的插件路径、以及最近报错的时间线：\n...\n**assistant [peer=github.com-tyvt-skills]**: 关键发现：install-cache 里今天 15:30 出现了 **cursor-auth 0.2.46** 新版本副本，magpie-bun 16:30 重启——疑似插件自动升级后加载了未打补丁的副本。继续核实补丁脚本目标路径、0.2.46 的守卫代码、以及重打任务详情："
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/cursor_batch_sealed.md",
+                "memory_type": "entities",
+                "before": "# Cursor 通道批处理封口 502 报错根因与修复\nCursor 通道整轮失败时报 native call arrived after its batch was sealed，根因是 magpie cursor 插件封批守卫未区分重传 exec 帧，已通过两段式守卫补丁修复。\n\n## 现象\n- 用 cursor/deepseek-v41-flash-1017 等 cursor 通道时整轮突然失败，turn/end 里 kind=error、code=PI_AI_ERROR、message=\"native call arrived after its batch was sealed\"。\n- 前一步并行调用正常完成，本步只发一个工具调用，几十毫秒后即报错结束。\n\n## 根因\n- 根因位于 magpie cursor 插件 @magpie-community/opencode-cursor-auth 的 native-session.mjs，NativeSession.acceptCall() 封批守卫：if (this.terminal || this.state === \"awaiting-results\") invalid(\"native call arrived after its batch was sealed\", 502)。\n- 某步工具调用数等于声明数（尤其只发一个时），sealBatch() 在第一条调用进来就满足 made==expected，状态立刻变 awaiting-results、批次封口。\n- Cursor 连接未收尾可能重传同 ExecServerMessage.id 的 exec 帧；去重靠 this.execs.get(call.requestID)，首帧被丢弃未登记则 prior 为空，走到封批守卫抛 502。\n- 守卫上方注释已写明重传应在封口后先校验身份、只有新 exec 才违规，但代码未实现，直接把重传判成新调用，属稳定复现的设计缺陷。\n\n## 修复方案\n- 把守卫拆两段：terminal 仍致命；awaiting-results 分支先用 requestID+digest 在 this.batches 里找匹配，命中则 return 丢弃重传，找不到才 502。\n- 同 requestID 但 digest 变了也不放行，保持上游「exec 身份中途被改」的判断。\n- 仅治标：让插件符合自身注释承诺；若 Cursor 真在封批后发全新 exec 仍会 502，属协议层异常。\n\n## 落地与验证\n- 补丁写在已加载副本 ~/.config/magpie/plugins/node_modules/@magpie-community/opencode-cursor-auth/native-session.mjs（非 ~/.cache/magpie/bun/install-cache 那份未加载拷贝）。\n- 补丁目录 ~/.dsh/patches/cursor-batch-sealed/，已挂入 dsh-cursor-quiet-reapply 计划任务（登录时+每5分钟）自动重打，锚点失效时拒绝写入。\n- 打完必须重启 magpie-bun（plugin-host）内存才生效；验证 node --test batch-sealed.test.mjs 6/6 通过，还原 pristine 后 reapply 自动回到 patched。\n- 已提交 skills 仓库 main 分支 4742b76（dsh/patches/cursor-batch-sealed/ 新增 + cursor-quiet/reapply.mjs 接入），推送 origin。",
+                "after": "# Cursor 通道批处理封口 502 报错根因与修复\nCursor 通道整轮失败时报 native call arrived after its batch was sealed，根因是 magpie cursor 插件封批守卫未区分重传 exec 帧，已通过两段式守卫补丁修复。\n\n## 现象\n- 用 cursor/deepseek-v41-flash-1017 等 cursor 通道时整轮突然失败，turn/end 里 kind=error、code=PI_AI_ERROR、message=\"native call arrived after its batch was sealed\"。\n- 前一步并行调用正常完成，本步只发一个工具调用，几十毫秒后即报错结束。\n\n## 根因\n- 根因位于 magpie cursor 插件 @magpie-community/opencode-cursor-auth 的 native-session.mjs，NativeSession.acceptCall() 封批守卫：if (this.terminal || this.state === \"awaiting-results\") invalid(\"native call arrived after its batch was sealed\", 502)。\n- 某步工具调用数等于声明数（尤其只发一个时），sealBatch() 在第一条调用进来就满足 made==expected，状态立刻变 awaiting-results、批次封口。\n- Cursor 连接未收尾可能重传同 ExecServerMessage.id 的 exec 帧；去重靠 this.execs.get(call.requestID)，首帧被丢弃未登记则 prior 为空，走到封批守卫抛 502。\n- 守卫上方注释已写明重传应在封口后先校验身份、只有新 exec 才违规，但代码未实现，直接把重传判成新调用，属稳定复现的设计缺陷。\n\n## 修复方案\n- 把守卫拆两段：terminal 仍致命；awaiting-results 分支先用 requestID+digest 在 this.batches 里找匹配，命中则 return 丢弃重传，找不到才 502。\n- 同 requestID 但 digest 变了也不放行，保持上游「exec 身份中途被改」的判断。\n- 仅治标：让插件符合自身注释承诺；若 Cursor 真在封批后发全新 exec 仍会 502，属协议层异常。\n\n## 落地与验证\n- 补丁写在已加载副本 ~/.config/magpie/plugins/node_modules/@magpie-community/opencode-cursor-auth/native-session.mjs（非 ~/.cache/magpie/bun/install-cache 那份未加载拷贝）。\n- 补丁目录 ~/.dsh/patches/cursor-batch-sealed/，原方案曾挂入 dsh-cursor-quiet-reapply 计划任务（登录时+每5分钟）自动重打，锚点失效时拒绝写入；但 2026-11-13 诊断发现该 DSH 计划任务已不存在。\n- 打完必须重启 magpie-bun（plugin-host）内存才生效；验证 node --test batch-sealed.test.mjs 6/6 通过，还原 pristine 后 reapply 自动回到 patched。\n- 已提交 skills 仓库 main 分支 4742b76（dsh/patches/cursor-batch-sealed/ 新增 + cursor-quiet/reapply.mjs 接入），推送 origin。\n\n## 2026-11-13 复发诊断\n- 补丁文件仍在磁盘（native-session.mjs 758/762 两段守卫完好），但 DSH 计划任务里**没有 cursor-quiet-reapply** 自动重打任务，插件更新后补丁未被重打。\n- 2026-11-13 15:30：~/.cache/magpie/bun/install-cache 出现 cursor-auth 0.2.46 新版本副本。\n- 2026-11-13 16:30：magpie-bun 重启，疑似插件自动升级后加载未打补丁的 0.2.46 副本，封批守卫缺陷复发。\n- 排查仍在进行，待核实补丁脚本目标路径、0.2.46 守卫代码、重打任务详情后修复。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-ad19c239-78df-44f2-87c1-13f009aacedf/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-12T02:50:58.249626+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_6502.md",
+                "memory_type": "entities",
+                "after": "# 禅道 Bug 6502\n禅道缺陷 6502 为苏住房防汛C端移动查询H5「手持端直接打开地址显示登录状态」问题；2026-11-12 助手加载 zentao-analyzer skill 分析，定位根因为持久化 token 未校验，截至会话结束尚未实施修复。\n\n## Description\n- 问题标题：【苏住房】手持端：直接打开地址，系统是登录状态。\n- 现象：移动端（手持端）直接打开深链地址时，系统显示已登录状态，实际不应为登录态。\n- 禅道链接：http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6502\n- 附 2 张截图附件，用于确认具体 UI 症状。\n\n## 根因分析（2026-11-12）\n- App.vue 的 onLaunch 逻辑：只要存在 token 就 reLaunch 到首页，盲目信任持久化 token，无任何有效性校验。\n- 项目存在两套 token 体系：store/user.ts 使用 storage key `token`（persist:true 持久化）；request.ts 使用 key `flood-token-v1`。\n- 登录响应缓存在本地（flood-login-user-v1），token（flood-token-v1）持久化在 localStorage，但全程无任何校验逻辑。\n- 测试环境 VITE_FLOOD_MOCK=false，故 demo token 自动注入不是根因；真正根因为持久化 token（flood-token-v1 + user-store persist:true）无校验。\n- 设计本意是「本地已有 token 直接进入首页」（持久登录），故 bug 本质是缺乏 token 校验：过期或失效 token 使直接打开时仍显示已登录。\n- 登录接口为 /v2.0/security/auth/login（管理端 auth）；校验须用同上下文端点，不能用 C 端 ctAuth/profile（可能误将合法管理 token 判为 401）。\n\n## 当前状态\n- 助手已完成根因定位，仍在探索合适的管理端校验端点，尚未实施代码修复（截至 2026-11-12 会话）。\n- 代码未提交、禅道未回写；状态仍为待处理 / 分析中。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

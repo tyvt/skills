@@ -17,14 +17,20 @@ OpenViking 是当前会话后台运行的长程记忆注入层，负责把历史
 - `context-mode`/`dbx` 经 `dsh-mcp-gateway` 按需拉起，是沙箱代码/缓存与禅道业务库，并非 OpenViking 本体
 
 ## 工具暴露
-- MCP 暴露 24 个 mcp__openviking__* 工具；插件无按工具名裁剪的开关，无法仅保留 search/find/read，低频工具（如 add_resource、privacy_tree）暂无法隐藏。
+- A-1 改动后，openviking 24 个 mcp__openviking__* 工具已从 MCP 目录消失，改由单一 `mcp_gateway` 入口按需拉起（2026-11-13 验证：目录仅剩 mcp_gateway 1 个入口，toolsTokens 16327→9142，降 44%）
+- 经 `mcp_gateway(server=openviking)` 可 list 24 工具并 write/grep/search/health 全部往返成功；首次 search 偶发 litellm embedding 冷启动 event-loop 报错，重试即恢复，与改动无关
+- gateway 拉起的 openviking proxy 是独立进程，拿不到 dsh 逐会话注入的 peer，`recallPeerScope` 退化为 `all`（broad），模型主动调工具可能看到全 peer 范围；dev 单 peer 无实际泄漏，多 peer 生产环境需留意
+- 故 R1 仅影响显式工具调用路径，不影响每步自动召回注入
+
+## 链路构成（2026-11-13 复查）
+- 由三条链路组成：会话镜像写入（绝对主力）、turn 开头免检索注入（profile/events/entities，有效但 profile.md 持续 404）、Agent 主动检索 search/find（延迟改善但使用频率低）
 
 <!-- MEMORY_FIELDS
 {
   "category": "程序",
   "name": "openviking_memory",
-  "source_extraction_id": "e47ec749dd8846b8a08fc03cb4dcbd6a",
-  "version": 3,
+  "source_extraction_id": "241e1d1d00734fc6bbf3a090b1d68b60",
+  "version": 5,
   "memory_type": "entities"
 }
 -->

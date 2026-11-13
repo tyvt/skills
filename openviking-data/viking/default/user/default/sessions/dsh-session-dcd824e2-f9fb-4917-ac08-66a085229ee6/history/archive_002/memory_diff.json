@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-dcd824e2-f9fb-4917-ac08-66a085229ee6/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-12T08:29:01.704101+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/D--repository---H5/memories/events/2026/11/12/后端服务退出后重启.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12 用户要求启动服务，助手发现后端进程（common-portal、common-gateway）已退出，nginx 8091 仍在线，按原方式重新拉起。重启后 common-portal 监听 9222（PID 11112，已注册 Nacos），common-gateway 监听 8086（PID 12952），nginx 前端 8091 一直在线。全链路 http://127.0.0.1:8091 → 网关 8086 → 门户 9222 可用，固定短信验证码 123456 仍生效。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=D--repository---H5]**: 启动服务\n**assistant [peer=D--repository---H5]**: 后端进程已退出（8091 nginx 还在），按同样方式重新拉起：\n**assistant [peer=D--repository---H5]**: ✅ 服务已重新启动，可以联调了。\n\n| 服务 | 端口 | PID | 状态 |\n|---|---|---|---|\n| common-portal | 9222 | 11112 | `Started CommonPortalApplication`，已注册 Nacos |\n| common-gateway | 8086 | 12952 | 已启动，探测返回 400（无参请求，路由正常） |\n| nginx 前端 | 8091 | 4168 | 一直在线 |\n\n之前两个 Java 进程已退出（进程不在了，不是端口冲突），本次按原方式重启完成。全链路 `http://127.0.0.1:8091` → 网关 8086 → 门户 9222 可用，固定验证码 123456 仍生效。"
+            },
+            {
+                "uri": "viking://user/default/peers/D--repository---H5/memories/events/2026/11/12/服务丢失改用WMI重启.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12 用户反馈服务没了，助手查看日志发现 15:26:52 请求处理中被截断、无 shutdown 记录，判定进程被外部杀掉——每次轮次结束后台子进程被回收，并非服务自身崩溃。助手改用 WMI 完全脱离会话进程树启动（父进程为 WMI 服务），common-portal 监听 9222（PID 12968），common-gateway 监听 8086（PID 13960），前端 8091 一直在线，全链路可用。助手说明前两次丢失均因后台子进程在会话轮次结束后被回收，WMI 启动的进程独立于会话理论上不再被回收；若再次丢失需改为 Windows 计划任务或开机自启兜底。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=D--repository---H5]**: 服务没了\n**assistant [peer=D--repository---H5]**: 日志在 15:26:52 请求处理中被截断，没有 shutdown 记录——进程是被外部杀掉的（每次轮次结束后台子进程被回收）。这次用 WMI 完全脱离会话进程树启动：\n**assistant [peer=D--repository---H5]**: ✅ 服务已重新启动，这次用 WMI 方式完全脱离会话进程树（父进程是 WMI 服务，不会被会话结束时回收）：\n\n| 服务 | 端口 | PID |\n|---|---|---|\n| common-portal | 9222 | 12968 |\n| common-gateway | 8086 | 13960 |\n\n**之前两次丢失的原因**：日志无 shutdown 记录、请求处理中被截断——是后台子进程在会话轮次结束后被回收杀掉，不是服务自身崩溃。WMI 启动的进程独立于本会话，理论上不会再被回收。\n\n前端 8091 一直在线，全链路可用，继续联调吧。如果这次再丢，就需要做成 Windows 计划任务/开机自启来兜底。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/project/menhu_backend.md",
+                "memory_type": "entities",
+                "before": "# 门户后端\nJava/Maven 多模块后端项目，供门户H5等前端调用。\n## Description\n- 本地目录 D:/repository/门户后端，当前分支 feature/feat-dzc-261111（HEAD 484848e 固定短信验证码，联调用；禅道1431：管理端APP接入统一门户登录）。\n- 模块含 common-gateway、common-portal-server 等。\n- 网关模块 common-gateway 已构建，jar 位于 target/，端口 8086，作为 API 入口；路由为 /v3.0/**、/v2.0/** 不带 /api 前缀（生产由入口层剥离，本地 nginx 代剥），处理 /v3.0/portal/... 等请求。\n- 前端代理 /api/v2.0、/api/v3.0、/zhi2* 均指向该网关；本地 门户H5(8091) 已改代理到 127.0.0.1:8086 并剥除 /api 前缀联调成功。\n- 依赖远程 Nacos（nacos.dev.zhi.com，命名空间 suzhou-shiqu-fangchanzonghe，auth nacos/nacos123qwe）做服务注册与配置中心，profile=dev；本机需连通该 Nacos 才能起服务。\n- 项目使用 Java 21 构建（应用类 class 65）并需用 Java 21 运行；早先误用 Java 8/17 导致 UnsupportedClassVersionError。JDK21 路径为 D:\\sdk\\apps\\temurin21-jdk\\21.0.13-9.0；因 PowerShell 会把 -Dfile.encoding=UTF-8 的 JVM 参数吞掉（Java 误将 .encoding=UTF-8 当主类），须用 JAVA_TOOL_OPTIONS 环境变量传入 JVM 参数启动。\n- 2026-11-11 启动状态：gateway 8086 ✅（Nacos 注册名 common-gateway-portal，本机 192.168.1.129:8086，后台任务 pwsh-e170938d997849a4，日志 gateway-console.log）、portal-server 9222 ✅（Nacos 注册名 common-portal，192.168.1.129:9222，后台任务 pwsh-ad165702c1dc4150，日志 portal-console.log）已起并连 dev Nacos；Nacos 中 192.168.10.10 上的同名实例均为 enabled=false，网关只命中本地；framework-server 9219 ❌ 因 dev Nacos 中某 URL 配置含未解析 ${...} 占位符报 Illegal character found in host: '{'，暂不影响门户登录接口。\n## Relations\n- 与「门户H5」前端联动；2026-11-11 用户要求将门户H5接口代理改指本地该后端以联调。",
+                "after": "# 门户后端\nJava/Maven 多模块后端项目，供门户H5等前端调用。\n## Description\n- 本地目录 D:/repository/门户后端，当前分支 feature/feat-dzc-261111（HEAD 484848e 固定短信验证码，联调用；禅道1431：管理端APP接入统一门户登录）。\n- 模块含 common-gateway、common-portal-server 等。\n- 网关模块 common-gateway 已构建，jar 位于 target/，端口 8086，作为 API 入口；路由为 /v3.0/**、/v2.0/** 不带 /api 前缀（生产由入口层剥离，本地 nginx 代剥），处理 /v3.0/portal/... 等请求。\n- 前端代理 /api/v2.0、/api/v3.0、/zhi2* 均指向该网关；本地 门户H5(8091) 已改代理到 127.0.0.1:8086 并剥除 /api 前缀联调成功。\n- 依赖远程 Nacos（nacos.dev.zhi.com，命名空间 suzhou-shiqu-fangchanzonghe，auth nacos/nacos123qwe）做服务注册与配置中心，profile=dev；本机需连通该 Nacos 才能起服务。\n- 项目使用 Java 21 构建（应用类 class 65）并需用 Java 21 运行；早先误用 Java 8/17 导致 UnsupportedClassVersionError。JDK21 路径为 D:\\sdk\\apps\\temurin21-jdk\\21.0.13-9.0；因 PowerShell 会把 -Dfile.encoding=UTF-8 的 JVM 参数吞掉（Java 误将 .encoding=UTF-8 当主类），须用 JAVA_TOOL_OPTIONS 环境变量传入 JVM 参数启动。\n- 启动约束：以会话后台子进程方式启动的 gateway/portal 会在会话轮次结束后被回收杀掉（日志无 shutdown 记录、请求处理中被截断），须用 WMI 完全脱离会话进程树启动（父进程为 WMI 服务）才能持久。Nacos 注册名 common-gateway-portal（本机 192.168.1.129:8086，日志 gateway-console.log）、common-portal（192.168.1.129:9222，日志 portal-console.log）；Nacos 中 192.168.10.10 上的同名实例均为 enabled=false，网关只命中本地；framework-server 9219 ❌ 因 dev Nacos 中某 URL 配置含未解析 ${...} 占位符报 Illegal character found in host: '{'，暂不影响门户登录接口。\n## Relations\n- 与「门户H5」前端联动；2026-11-11 用户要求将门户H5接口代理改指本地该后端以联调。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

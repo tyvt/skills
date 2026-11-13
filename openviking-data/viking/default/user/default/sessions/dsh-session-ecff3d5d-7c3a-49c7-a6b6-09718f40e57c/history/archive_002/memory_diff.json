@@ -1,0 +1,48 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-ecff3d5d-7c3a-49c7-a6b6-09718f40e57c/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-12T07:19:39.449045+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/12/守卫优化任务授权.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12 用户表示\"按你的建议来\"，授权助手按建议执行 graph.py 守卫系统的优化任务，目标为减少只读命令不必要的 grok 终审 token 消耗。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 按你的建议来"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/12/守卫白名单根因确认.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12 查明 graph.py 守卫系统根因：`_WHITELIST_PREFIX` 未覆盖 `Get-Content`/`Select-String`（graph.py:165-169），且 guard_fast 提示词写死仅新建文件夹或写 .json/.txt/.md 才 allow=true（graph.py:455-459），导致一切只读命令必然 flash=false 升级 grok 终审，每次 op=full 白花约 1.7k grok tokens。该发现形成初始优化方案。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 按你的建议来\n...\n**assistant [peer=github.com-tyvt-skills]**: 现状已查清，根因明确：\n\n- `_WHITELIST_PREFIX` 只覆盖 `Get-ChildItem|Get-Location|git status|git diff|pytest`，**没有 `Get-Content`/`Select-String`**（graph.py:165-169）；\n- guard_fast 的提示词写死「新建文件夹或写 .json/.txt/.md 才 allow=true」（graph.py:455-459），所以**一切只读命令必然 flash=false → 升级 grok 终审**。这就是每次 op=full 白花 ~1.7k grok tokens 的原因。\n\n按流程先写计划送审："
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/12/守卫优化计划审核通过.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12 守卫优化计划经 planner 生成、reviewer 打回修改后重送，最终 verdict=approve；5 条 suggestions（bypass 审计日志、`-TotalCount` 限 `\\d{1,4}`、参数外一律回退、补 `-Raw` 反用例）已并入实施方案，待用户确认终稿后实施。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 按你的建议来\n...\n**assistant [peer=github.com-tyvt-skills]**: planner 是纯文本模型读不到文件，改为把计划全文内联送审：\n**assistant [peer=github.com-tyvt-skills]**: reviewer 打回，意见有效。按 suggestions 修改计划后重送：\n**assistant [peer=github.com-tyvt-skills]**: 超时了。先查这次调用是否实际落盘/卡在哪，不盲目重试同一形态：\n**assistant [peer=github.com-tyvt-skills]**: 超时run 的 verdict 无法确认（那次会话文件混入了别的调用）。直接精简重送 v2 审核：\n**assistant [peer=github.com-tyvt-skills]**: 审核通过（verdict=approve），5 条 suggestions 都合理，已并入实施方案（bypass 审计日志、`-TotalCount` 限 `\\d{1,4}`、参数外一律回退、补 `-Raw` 反用例）。按流程请你确认终稿："
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/12/守卫终审延迟到命令级.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12 查明真正根因：grok 升级发生在 instruction 阶段（node_security_guard:519-565），此时命令尚未生成，而 planner 总给 instruction 补中文说明使白名单永远匹配不上；决定将 pwsh 终审延迟到命令生成后的 node_execute，命中窄放行则免 grok、未命中回退 grok（fail-safe）。此为核心架构修正。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 按你的建议来\n...\n**assistant [peer=github.com-tyvt-skills]**: 根因终于清楚了：grok 升级发生在 **instruction 阶段**（node_security_guard:519-565），此时命令还没生成；而 planner 几乎总会给 instruction 补一句中文说明，instruction 白名单永远匹配不上。我把 pwsh 的终审**延迟到命令生成后**（node_execute），那里既有真实命令、又有白名单窄放行——这正是计划里「未命中回退 grok」的正确落点："
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/12/守卫优化落地验证完成.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-12 graph.py 守卫优化完成并验证：py_compile exit=0，单测 16/16 ALL PASS（含 `-TotalCount 99999` 回溯绕过、`gc` 别名、`$c = Get-Content D:\\x\\.env` 等反用例）；端到端正用例轨迹 `guard defer → guard ALLOW (bypass local rule[readonly-read])` 本次 0 次 grok guard 调用；反向用例 `Remove-Item -Recurse -Force` 照走 grok 终审，安全链路生效。改动仅 src/graph.py、config.yaml 未动、已过 grok 审核+用户人工确认，但未提交，待用户确认后提交/推送。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 按你的建议来\n...\n**assistant [peer=github.com-tyvt-skills]**: ## 完成汇报\n\n**改动（仅 `src/graph.py`，config.yaml 未动，已过 grok 审核 + 你的人工确认）**\n\n1. **终审延迟到命令级**（核心修正）：原流程 grok 升级发生在 instruction 阶段，而白名单只匹配命令，planner 又总给 instruction 补中文说明 → 白名单永远白设。现在 pwsh 被 flash 一审拒绝后不再立即升 grok，改为 `guard defer`，等真实命令生成后在 node_execute 终审。\n2. **只读窄放行** `_readonly_read_ok()`：`Get-Content`/`Select-String` 须满足——显式 cmdlet 全名、当前目录相对路径（拒盘符/UNC/`..`/通配）、敏感名黑名单（`.env|id_rsa|.pem|credential|secret|token`）、参数白名单（`-Path/-Raw/-Encoding/-TotalCount≤9999/-Pattern`）、无拼接重定向。命中免 grok，未命中照旧升级（fail-safe）。\n3. **`_WHITELIST_PREFIX`** 补 `Get-Date|Test-Path`（无执行语义、不回显内容）；pwsh 生成提示要求读取类输出裸命令。\n4. **审计**：bypass 轨迹记 `guard ALLOW (bypass local rule[readonly-read])`，可从 costs/trace 量化降本。\n\n**验证证据**\n- `py_compile` exit=0；单测 **16/16 ALL PASS**（含 `-TotalCount 99999` 回溯绕过、`gc` 别名、`$c = Get-Content D:\\x\\.env` 等 5 个 review 要求的反用例）。\n- 端到端正用例：轨迹 `guard defer → guard ALLOW (bypass local rule[readonly-read])`，**本次 0 次 grok guard 调用**（原先每次升 ~1.7k tokens）。\n- 端到端反用例：`Remove-Item -Recurse -Force` 未进白名单、照走 grok 终审；非白名单命令（py_compile 复合命令）同样正常升级。临时测试脚本已清理。\n\n**遗留说明**：plan_review 与 reverse 用例本身仍各花一次 grok 调用（策略要求/必要审查）；generate_command 偶尔仍产出复合脚本，那些命令会照旧走 grok——失败方向是「多花升级成本」而不是「漏审」，安全。改动未提交，需要提交/推送时说一声。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/graph_guard_system.md",
+                "memory_type": "entities",
+                "after": "# graph.py 守卫系统\ngraph.py 中的命令安全守卫，在 LangGraph 编排中对 pwsh 命令做 flash 一审与 grok 终审，控制是否升级高级模型审核。\n\n## 架构\n- 指令阶段守卫 node_security_guard(519-565) 原在此做 grok 升级，但白名单只匹配命令、instruction 常带中文说明导致永远匹配不上\n- 修复后将 pwsh 终审延迟到命令生成后的 node_execute，命令级窄放行命中则免 grok、未命中回退 grok(fail-safe)\n- 一审 guard_fast 提示词写死仅新建文件夹或写文件才 allow=true，只读命令默认 flash=false\n\n## 只读窄放行\n- `_readonly_read_ok()`：Get-Content/Select-String 须显式 cmdlet 全名、当前目录相对路径、敏感名黑名单(.env|id_rsa|.pem|credential|secret|token)、参数白名单(-Path/-Raw/-Encoding/-TotalCount≤9999/-Pattern)、无拼接重定向\n- `_WHITELIST_PREFIX` 覆盖 Get-ChildItem|Get-Location|git status|git diff|pytest|Get-Date|Test-Path\n- 命中免 grok 终审，未命中照旧升级\n\n## 审计与状态\n- bypass 轨迹记 `guard ALLOW (bypass local rule[readonly-read])`，可从 costs/trace 量化降本\n- 修复前每次 op=full 只读命令白花约 1.7k grok tokens，修复后免审正例 0 次 grok guard 调用\n- 改动仅 src/graph.py、config.yaml 未动、已过 grok 审核+用户人工确认，但未提交(会话 2026-11-12)"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 6,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

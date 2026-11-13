@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-3865f6c5-6d98-4092-b497-994e9c6f854a/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T04:41:27.711125+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/技术模式/build_session_retro.md",
+                "memory_type": "entities",
+                "after": "# 苏住房防汛C端构建会话P0复盘\n2026-11-13 用户对苏住房防汛C端项目构建/测试会话做 P0 耗时与 Token 复盘，并获助手交付优化方案。\n\n## 会话真实指标\n- 总耗时 9分34秒（seq 5→366），用户离开 2分00秒（3 次 ask_user_question），纯模型+编排器 ~7分34秒\n- 宿主 2.39M 输入/16.8k 输出（命中 98%、未命中 40.6k）；编排器 48.2k token/57 次调用/3m45s\n- 纯模型时间约 454s：测试 110s（happy-dom 跨源 9 用例全挂+重跑 2 次）、提交 62s、构建 48s、计划审核 91s\n\n## P0 根因（路径/文本/日志）\n- P0-1 编排器 cwd 落 langgraph-orchestrator，子模型把 `D:\\repository\\苏住房防汛C端` 写成 `D:\\苏住房防汛C端`，build 试 3 次（seq 47/51/52，~60s+大 token 回灌）\n- P0-2 计划写 4 遍+edit 失败重试（seq 21/26/27/29，~3.5k output 浪费），根因违反「先 read 再 edit、plan_review 传 diff 而非全文」\n- P0-3 编排器回灌完整日志/审核意见撑起 40.6k 未命中（seq 25/26/44/47/51/52），根因 op:\"full\" summarizer 贴原始输出尾部\n\n## P0 根因（编排/规则）\n- P0-4 过度编排 57 次子调用/3m45s（占纯工作 ~50%），git 提交拆 4 步 4 次 pwsh（~40s），根因 AGENTS.md 要求命令/构建/检索一律 op:full\n- P0-5 gate 未首次给可执行替代命令（grep path=src 被拒、Get-ChildItem 被拒、窄 grep 却放行），模型试→拒→缩范围→再试（每轮 ~3–5s+数百 token）\n\n## 结论与预估\n- 最大 P0 为「路径/命令不稳+日志回灌+计划重复」叠加，吃掉 ~2 分钟和 40k 未命中；其次为过度编排（57 次子调用）\n- 修 P0-1~P0-3 预计省 30–40% 耗时、50%+ 未命中（用户预估，助手列为待验证进阶目标，因耗时重叠不可简单相加）\n- 项目路径 `D:\\repository\\苏住房防汛C端`；优化方案见助手交付的「执行确定性与上下文预算治理」"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/优化方案/execution_budget_plan.md",
+                "memory_type": "entities",
+                "after": "# 执行确定性与上下文预算治理方案\n2026-11-13 助手针对苏住房防汛C端构建会话 P0 问题交付的优化方案（仅方案，未改代码），主题为执行确定性与上下文预算治理。\n\n## 核心改动（第一批最优先）\n- 执行器强制 workdir 为参数（非自然语言），校验目录存在后作子进程 cwd，禁子模型手写 Set-Location/cd，失败返 WORKDIR_NOT_FOUND\n- 工具结果硬预算：构建/测试成功 ~200 token、失败 ~800 token（≤10 行关键错误）、计划审核 ~1000 token，完整日志按引用窄读不回传\n- 已知命令确定性快路径：git add/commit/status/push、单文件 Get-Content、带 workdir 的 npm run build（失败再升级编排）\n\n## 计划与 gate 治理\n- 计划首轮全文（≤4k 字符+planId/revision/哈希），复审只传变更段+证据+基准 revision；FS_EDIT_NOT_FOUND 固定「窄读→修正→重试一次」\n- gate 首次拒绝返回机器字段（code/ruleId/reason/suggestedAction/retryable），替代命令须来自已知事实（未确认目录则建议列一层结构）\n- 测试环境预检（happy-dom 跨源）、门禁识别当前请求动作意图（避免把「只方案」误判为「改+验+提交」）\n\n## 验收目标（基线纯工作 454s）\n- 纯工作耗时降 25–35%；宿主未命中 40.6k→20k–25k；编排器子调用 57→减 ≥40%\n- cwd 无效执行 2→0；计划 edit 匹配失败 1→0；完整日志进宿主 多次→0\n- 用户估「省 30–40% 耗时、50%+ 未命中」列为进阶目标未证实（路径重试/日志/编排耗时重叠不可简单相加）\n\n## 实施批次\n- 第一批：强制 workdir、项目校验、日志硬预算（路径错误不启动、大日志不回灌）\n- 第二批：计划版本引用、增量复审、精确 edit 恢复（不重复传整篇）\n- 第三批：确定性执行快路径、统一 gate 策略（已知命令不走多轮规划）\n- 第四批：测试环境预检、意图误判修正、效果统计（减少环境性重跑和无关门禁）"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,0 +1,53 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-f95e5cbe-e5f2-47fe-b065-0a3b09a707f9/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-12T02:06:17.048187+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/12/预售转现售审核按钮缺陷上报.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户上报预售转现售申请详情页缺少审核按钮，连超管都没有，需排查修复。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 预售转现售申请页面，详情里没有审核按钮，超管都没有"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/12/转现售按钮缺失根因定位.md",
+                "memory_type": "events",
+                "after": "# Summary\nAI助手定位根因：`yszxs` 流程在 `SYS_FLOW_CONFIG` 绑定通用审批模板 `process_68xcwhhq:29`（节点 key `Activity_1ksnm9e`），前端 `TRANSFER_AUDIT_NODES` 仅含 `taskFinalAudit`，`visibleAdminNodes` 查不到返回空，超管也无审核按钮。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 预售转现售申请页面，详情里没有审核按钮，超管都没有\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 前端代码逻辑已经理清，关键在 `flowBusCode`：转现售详情取的是 `resolveAppendixBusCode` 返回的 `yszxs`（要件编码），如果流程定义里的业务编码不是这个，`getFlowViewer`/`isApprovalAuth` 就查不到节点，按钮全隐藏。我去数据库核对流程定义的实际 busCode。\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 根因找到了：转现售流程 `yszxs` 在 `SYS_FLOW_CONFIG` 绑定的是**通用流程** `process_68xcwhhq:29`，其任务节点 key 是 `Activity_0zrk1re`（提交）/`Activity_1ksnm9e`（审批）；而前端 `TRANSFER_AUDIT_NODES` 只映射了 `taskFinalAudit`，`visibleAdminNodes` 查不到配置直接返回空 → 超管也没有按钮。再看一眼现有节点文案映射保持一致："
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/12/转现售初版硬编码修复.md",
+                "memory_type": "events",
+                "after": "# Summary\nAI助手在 `cashsaleConstants.js` 的 `TRANSFER_AUDIT_NODES` 补 `Activity_1ksnm9e` 映射，构建通过。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 预售转现售申请页面，详情里没有审核按钮，超管都没有\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 修复完成，构建通过。\n\n## 结论\n\n**根因**：预售转现售申请（busCode `yszxs`）在流程配置里绑定的是**通用审批流程** `process_68xcwhhq:29`（节点 key 为 `Activity_0zrk1re`/`Activity_1ksnm9e`），而直报现售申请（`xsbasq`）用的是 `PRESALE_PERMIT` 流程（节点 key 为 `taskAccept`/`taskFinalAudit`）。前端 `CashsaleDetail.vue` 的审核按钮门控 `visibleAdminNodes` 按 `flowKeyNode` 查 `TRANSFER_AUDIT_NODES`，表里只有 `taskFinalAudit`，通用流程的 `Activity_1ksnm9e` 查不到配置直接返回空数组——所以详情里审核按钮全无，权限码都没走到，超管也一样。\n\n**依据**（DM 数据库 dev 环境）：\n- `SYS_FLOW_CONFIG`：`yszxs → process_68xcwhhq:29`，`xsbasq → PRESALE_PERMIT:5`\n- `ACT_RU_TASK`：`process_68xcwhhq:29` 存量实例的任务 key 就是 `Activity_1ksnm9e`（审批）/`Activity_0zrk1re`（提交）\n\n**改动**（[cashsaleConstants.js:103](<zhi2-web-admin/src/views/presale/cashsale/cashsaleConstants.js#L103-L108>)）：\n- `TRANSFER_AUDIT_NODES` 与 `TRANSFER_CURRENT_NODE_LABELS` 补 `Activity_1ksnm9e` 映射（label 沿用终审口径「终审审批」/「市住建审批」，权限码 `presale:cashsale:approval`，api `approval`）。\n\n**验证**：\n- `npx eslint` 该文件 0 告警；`npm run build` exit 0（仅存量 sass @import 弃用警告）。\n- 未验证：站点实际点击（未部署；转现售审核中详情应出现「终审审批」按钮）。另外「待办跳转列表页」的当前节点文案同一映射已一并生效。\n\n**备注**：若后端将来把 `yszxs` 换成专用流程，此映射不影响（`taskFinalAudit` 仍在）。\n\n改动落在子模块 Git 仓库，本轮如何处理提交？"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/12/转现售改为柔性节点匹配.md",
+                "memory_type": "events",
+                "after": "# Summary\nAI助手将转现售改为不按节点 key 匹配，只要流程查看器返回未办结节点且后端 `isApprovalAuth` 通过即出「终审审批」按钮，固定取 `TRANSFER_AUDIT_NODES.taskFinalAudit`，并撤掉之前硬编码的 `Activity_1ksnm9e` 映射，lint 0 告警、构建通过。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 预售转现售申请页面，详情里没有审核按钮，超管都没有\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 有道理——转现售本来就是**单审批节点**流程，节点 key（无论 `taskFinalAudit` 还是通用流程的 `Activity_1ksnm9e`）在流程设计器里可换，前端按 key 写死匹配本来就脆。改成：转现售不按 key 匹配，只要流程查看器返回未办结节点且当前人有审批权（后端 `isApprovalAuth` 判定），就出「终审审批」按钮，配置固定取 `TRANSFER_AUDIT_NODES.taskFinalAudit`。先把刚才在常量表里写死的 key 映射撤掉：\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 已改为不写死节点 key，lint 0 告警、`npm run build` exit 0。\n\n## 最终方案\n\n- [CashsaleDetail.vue:437](<zhi2-web-admin/src/views/presale/cashsale/components/CashsaleDetail.vue#L437-L469>)：转现售分支不再按 `flowKeyNode` 查 `TRANSFER_AUDIT_NODES` 映射（无论专用流程 `taskFinalAudit` 还是通用模板 `Activity_1ksnm9e` 都能过），条件只剩「审核中 + 流程查看器有未办结节点 + 后端 `isApprovalAuth` 通过」，按钮固定取 `TRANSFER_AUDIT_NODES.taskFinalAudit` 的文案/权限/接口。\n- [cashsaleConstants.js:103](<zhi2-web-admin/src/views/presale/cashsale/cashsaleConstants.js#L103-L107>)：撤掉之前临时加的 `Activity_1ksnm9e` 硬编码映射，只留注释说明。\n- 直报流程节点多、key→阶段强绑定，仍走原 `APPLY_AUDIT_NODES` 匹配，不受影响。\n\n根因回顾：`yszxs` 流程绑定的是通用审批模板，节点 key 不在前端映射表里，导致 `visibleAdminNodes` 恒为空，超管也看不到审核按钮。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/12/转现售修复合入并行提交.md",
+                "memory_type": "events",
+                "after": "# Summary\n远端并行提交 `9c66d761f` 已 rebase 合入，AI助手重新核对改动、eslint 0 新增、`npm run build` exit 0，DM 库核对 `SYS_FLOW_CONFIG`/`ACT_RU_TASK`。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 预售转现售申请页面，详情里没有审核按钮，超管都没有\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 远端有新提交且也改了 CashsaleDetail.vue，auto-merge 成功，但需要确认我的改动仍在并重新验证：\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: ...**验证**：DM 库核对 `SYS_FLOW_CONFIG`/`ACT_RU_TASK`；eslint 0 新增；`npm run build` exit 0。远端有并行提交（9c66d761f）已 rebase 合入后重新构建。..."
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/12/转现售修复提交推送.md",
+                "memory_type": "events",
+                "after": "# Summary\nAI助手将修复提交并推送 `develop/v3.0.0`：子模块 `8d2811555`、父仓 gitlink `87ee992`、错误台账 E-050 `cfc5ce8`。\n# 2026-11-12 (Thursday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 预售转现售申请页面，详情里没有审核按钮，超管都没有\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: 已全部提交并推送 `develop/v3.0.0`：\n\n## 交付摘要\n\n**根因**：`yszxs`（预售转现售）流程绑定的是通用审批模板 `process_68xcwhhq`（节点 key `Activity_1ksnm9e`），前端 `visibleAdminNodes` 按 key 查 `TRANSFER_AUDIT_NODES`（只有 `taskFinalAudit`）落空，按钮连权限判断都走不到，超管也看不到。\n\n**修复**：转现售单审批节点不再按节点 key 匹配——流程查看器有未办结节点且后端 `isApprovalAuth` 通过即出「终审审批」，固定取 `TRANSFER_AUDIT_NODES.taskFinalAudit` 配置；直报流程（多节点强绑 key）不受影响。\n\n**提交**：\n- 子模块 `8d2811555`（push 已核对 ls-remote）\n- 父仓 gitlink `87ee992` + 错误台账 E-050 `cfc5ce8`..."
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷任务/yszxs_audit_missing.md",
+                "memory_type": "entities",
+                "after": "# 预售转现售审核按钮缺失缺陷\n房产管理系统 zhi2-web-admin 中预售转现售申请（业务编码 `yszxs`）详情页审核中状态缺少审核按钮，连超管都无，根因是流程绑定通用模板而前端按 key 匹配落空，已改为柔性匹配并推送。\n\n## 根因与定位\n- 页面：预售转现售申请详情页 `presale/cashsale/components/CashsaleDetail.vue`\n- 业务编码 `yszxs` 在 `SYS_FLOW_CONFIG` 绑定通用审批模板 `process_68xcwhhq:29`，节点 key 为 `Activity_0zrk1re`（提交）/`Activity_1ksnm9e`（审批）\n- 直报现售 `xsbasq` 用 `PRESALE_PERMIT` 流程（节点 key `taskAccept`/`taskFinalAudit`），不受影响\n- 前端 `visibleAdminNodes` 按 `flowKeyNode` 查 `TRANSFER_AUDIT_NODES`（仅含 `taskFinalAudit`），通用流程的 `Activity_1ksnm9e` 查不到返回空数组 → 审核按钮全无，权限码未走到，超管也无\n\n## 修复方案\n- 转现售单审批节点不再按节点 key 匹配：流程查看器有未办结节点且后端 `isApprovalAuth` 通过即出「终审审批」按钮\n- 按钮固定取 `TRANSFER_AUDIT_NODES.taskFinalAudit` 的文案/权限码 `presale:cashsale:approval`/接口 `approval`\n- 撤掉临时加的 `Activity_1ksnm9e` 硬编码映射，只留注释说明（`cashsaleConstants.js`）\n- 直报流程（多节点强绑 key）仍走原 `APPLY_AUDIT_NODES` 匹配，不受影响\n- 错误台账 `docs/frontend/common-errors.md` 补充 E-050\n\n## 验证与交付\n- 子模块 zhi2-web-admin 提交 `8d2811555`（push 已核对 ls-remote），父仓 gitlink `87ee992`，错误台账 E-050 `cfc5ce8`，均推送 `origin/develop/v3.0.0`\n- DM 库核对 `SYS_FLOW_CONFIG`/`ACT_RU_TASK`；eslint 0 新增；`npm run build` exit 0\n- 远端并行提交 `9c66d761f` 已 rebase 合入后重新构建\n\n## 未验证项\n- 浏览器实测未做（需部署后用审核中转现售单确认按钮出现、审批接口带 `Activity_*` 节点 key 能正常通过）"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 7,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

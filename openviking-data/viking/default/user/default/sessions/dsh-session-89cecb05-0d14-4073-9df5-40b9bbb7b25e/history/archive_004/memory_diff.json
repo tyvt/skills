@@ -1,0 +1,66 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-89cecb05-0d14-4073-9df5-40b9bbb7b25e/history/archive_004",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T07:57:51.487721+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/偏题检测方案决策.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户于 2026-11-13 指示：第1步与第3步一起做，第3步正则保持保守（只拦高度特征化词），第2步分批做；最重要的是第3步的日志记录，它是真实流量上估计触发率的唯一手段，比再跑 11 次重放有用得多。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 一起做，3 的正则先保守（只拦高度特征化词），2 分批做。最重要的不是选哪个选项，而是 3 的日志记录——它是在真实流量上估计触发率的唯一手段，比再跑 11 次重放有用得多。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/偏题正则保守并入.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 将 FAKE_DELIVERY 模式并入 run-matrix.ps1:41 的 OFFTASK_PATTERN，采用保守正则（仅高度特征化词，如「请保存为」加扩展名后缀约束避免误伤）。golden 样本 Recall 由 0% 升至 100%，11 条正常输出零误报。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 一起做，3 的正则先保守（只拦高度特征化词），2 分批做。最重要的不是选哪个选项，而是 3 的日志记录——它是在真实流量上估计触发率的唯一手段，比再跑 11 次重放有用得多。\n...\n**assistant [peer=github.com-tyvt-skills]**: 找到了。第 1 步：把 `FAKE_DELIVERY` 并入 `OFFTASK_PATTERN`（`run-matrix.ps1:41`）。\n\n重试这次编辑。\n...\n**assistant [peer=github.com-tyvt-skills]**: 两仓均已提交，工作区干净（`test_scheduling.py` 是先前遗留改动，非本次）。\n\n## 1 和 3 都做完了，重点落在 3 的日志\n\n### 1 — 并入 `Test-OffTask`\n\n[run-matrix.ps1:41](cursor-model-routing/run-matrix.ps1#L41) 补了 `FAKE_DELIVERY` 模式。按你说的**保守**，只取高度特征化词：\n\n```\nsource/blogs | blog_skill | Mike Dane | Giraffa\n| 请保存为 <路径>.<ext> | 正在阅读项目内的风格指南\n```\n\n`请保存为` 特意加了后缀约束（必须跟文件扩展名），避免把正常回答里的“请保存为”误伤。..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/偏题日志系统实现.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 在 dsh/langgraph-orchestrator/src/graph.py 新增 log_offtask，每次代码类工具调用均记一行 JSONL（含 ts/session_id/tool/model/hit/matched/chars/head/tail），命中后自动降级重跑至下一模型（composer→glm→deepseek）并标 [OFFTASK]/[OFFTASK-RETRY]；新增 scripts/offtask_stats.py 用 Wilson 区间输出分模型触发率并硬编码「样本<30 不可作结论」警示。pytest 由 100 增至 108 passed。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 一起做，3 的正则先保守（只拦高度特征化词），2 分批做。最重要的不是选哪个选项，而是 3 的日志记录——它是在真实流量上估计触发率的唯一手段，比再跑 11 次重放有用得多。\n...\n**assistant [peer=github.com-tyvt-skills]**: 第 1 步完成。现在做最主要的第 3 步，也就是输出后校验与日志记录。我先看编排器在哪里能挂接执行后的逻辑。\n...\n**assistant [peer=github.com-tyvt-skills]**: ...校验结果：golden 样本 Recall 0%→100%，11 条正常输出零误报。\n\n### 3 — 日志是主体\n\n**[graph.py](dsh/langgraph-orchestrator/src/graph.py) 的 `log_offtask`**：每次代码类工具调用**都记一行**，命中与否都记。\n\n这是关键设计——**分母必须包含未命中的调用**，否则算不出触发率。记录字段：\n\n| 字段 | 用途 |\n|---|---|\n| `ts` / `session_id` / `tool` / `model` | 分组维度 |\n| `hit` / `matched` | 分子 + 特征聚类 |\n| `chars` | 区分“短正常回答”和“长偏题成稿” |\n| `instruction_head` / `head` / `tail` | 人工复核用，不落全文 |\n\n**命中后自动降级重跑**到池内下一个模型（composer → glm → deepseek），trace 标 `[OFFTASK]` / `[OFFTASK-RETRY]`。\n\n**[offtask_stats.py](dsh/langgraph-orchestrator/scripts/offtask_stats.py)** 直接出报告：\n\n```\n样本总数: 3\n总触发: 1/3 = 33.33%  (95% CI 6.1%-79.2%)\n--- 按 model ---\n  cursor/composer-2.5       1/2 = 50.00%  CI 9.5%-90.5%  (样本<30，区间很宽，不可作结论)\n```\n\n用 Wilson 区间而不用裸比例，并**硬编码“样本<30 不可作结论”的警示**——避免过几天看到“50%”就误判。..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/规划器分流缺陷发现.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 实测发现：规划器未将「写函数+给 pytest 断言」请求分给 code_edit_with_signal，而是分给 planner；尽管触发词表「pytest」命中，规划器仍选 planner，说明提示词判据实际效力弱于预期，分流准确率需靠真实流量数据而非一次冒烟验证。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 一起做，3 的正则先保守（只拦高度特征化词），2 分批做。最重要的不是选哪个选项，而是 3 的日志记录——它是在真实流量上估计触发率的唯一手段，比再跑 11 次重放有用得多。\n...\n**assistant [peer=github.com-tyvt-skills]**: 关键发现：规划器把请求分给了 `planner` 而不是 `code_edit_with_signal`，因此没走代码路径，日志自然为空。\n\n这暴露一个真实问题：**分流判据“写函数+给 pytest 断言”没有被归入 signal 类**。我验证一下规划器的实际选择。\n...\n**assistant [peer=github.com-tyvt-skills]**: ...### 两个实测暴露的真问题\n\n1. **规划器没把“写函数+pytest 断言”分给 `code_edit_with_signal`**，而是给了 `planner`。触发词表里“pytest”命中了，但规划器仍选了 planner。..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/规划节点覆写缺陷发现.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 实测发现 graph.py:930 会覆盖测试里 hardcode 的 plan，规划节点重跑导致工具被改写，使第一版端到端验证出现假阳性；已改为直接调用执行节点验证检测器与日志。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 一起做，3 的正则先保守（只拦高度特征化词），2 分批做。最重要的不是选哪个选项，而是 3 的日志记录——它是在真实流量上估计触发率的唯一手段，比再跑 11 次重放有用得多。\n...\n**assistant [peer=github.com-tyvt-skills]**: 日志写入成功，而且又暴露了**第二个真实问题**：我强制指定的 `code_edit_with_signal` 被改成了 `code_editor`。\n\n原因在 `graph.py:930`——规划器覆盖了 plan 里的工具。但这个 trace 显示 `plan via ...: 1 steps`，说明规划节点**重跑了**，覆盖了我的 plan。\n\n这是测试方法的缺陷，并非代码缺陷。我直接调用执行节点验证。\n...\n**assistant [peer=github.com-tyvt-skills]**: ...说明提示词判据的实际效力弱于预期——这正是你要求上日志的原因：**分流准确率也得靠真实流量数据，不能靠一次冒烟**。\n2. **`graph.py:930` 会覆盖测试里 hardcode 的 plan**，规划节点重跑导致工具被改写。..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/偏题检测双仓提交.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 按 submodule-commit 规则自底向上提交：子模块 dsh 提交 39f162d0，父仓 skills 提交 74f12da9；results/ 被 gitignore 排除，11 条重放负类+golden 正类语料留本地未提交。pytest 108 passed，selftest EXIT=0。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 一起做，3 的正则先保守（只拦高度特征化词），2 分批做。最重要的不是选哪个选项，而是 3 的日志记录——它是在真实流量上估计触发率的唯一手段，比再跑 11 次重放有用得多。\n...\n**assistant [peer=github.com-tyvt-skills]**: 108 passed + JS EXIT=0。现在提交。\n...\n**assistant [peer=github.com-tyvt-skills]**: 两仓都有改动（`dsh` 是子模块，`skills` 是父仓）。按 `submodule-commit` 的规则：自底向上，先提交子模块。\n...\n**assistant [peer=github.com-tyvt-skills]**: 子模块已提交。现在提交 `skills` 父仓的第 1 步和第 2 步产物。\n...\n**assistant [peer=github.com-tyvt-skills]**: `results/` 被 gitignore 排除（这是合理的，其中包含大量模型输出）。语料文件留在本地，不提交。\n\n现在做最终校验。\n...\n**assistant [peer=github.com-tyvt-skills]**: ...- 子模块 `dsh`：`39f162d0`\n- 父仓 `skills`：`74f12da9`\n\n`results/` 被 gitignore，语料留在本地未提交（含 11 条重放负类 + golden 正类）。..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/日志满30条复核计划.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13 约定：等日志积累到约 30 条代码类调用后再动第2步，届时用 offtask_stats.py 看分模型触发率，优先扩标注集的是触发率高或样本量大的模型，而非笼统全扫。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 1 和 3 一起做，3 的正则先保守（只拦高度特征化词），2 分批做。最重要的不是选哪个选项，而是 3 的日志记录——它是在真实流量上估计触发率的唯一手段，比再跑 11 次重放有用得多。\n...\n**assistant [peer=github.com-tyvt-skills]**: ...### 2 怎么分批\n\n等日志积累到 ~30 条代码类调用再动。届时用 `offtask_stats.py` 看**分模型触发率**，优先扩标注集的是**触发率高或样本量大的那个模型**，而不是笼统全扫。要我现在把“日志满 30 条后如何复核”写成一份核查清单吗？"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/项目/tyvt_skills.md",
+                "memory_type": "entities",
+                "before": "# tyvt/skills 仓库\nGitHub 仓库（本地 D:\\repository\\skills，远程 https://github.com/tyvt/skills.git 的 origin/main），托管 OpenViking 记忆快照与导入工具脚本。\n\n## 目录与内容\n- openviking-memory/：OpenViking 记忆库快照\n- openviking-data/：OpenViking 质量数据备份，含 viking/.../user/default/ 整树（memories、peers、sessions、skills、resources、privacy、摘要）、vectordb/、backend_meta.json；初始提交 1a4a1b9 仅含 memories+peers（约11.36MB/7213 md）；2026-11-07 扩展为全量快照 4cdcd7bf（约213MB/20154 文件）；2026-11-09 09:01 提交 c9a15051「全量快照 20237 files」；同日验证快照 dc290366（21,050 文件/214MB，含 4,359 原始导出文件）与记忆快照 605e1435（6,609 md/8.49MB）推上 origin/main，local HEAD == origin/main，取代 c9a15051；sessions/ 含 505 目录（277 个 mm-* 导入会话）；手动时间点快照（无定时）；原始对话文本在 memory-migration/out/（本地，不入 OpenViking），2026-11-09 曾临时拷入 openviking-data/source-exports/ 随 dc290366 推 GitHub（4,359 文件/240.2MB），因违纯镜像约定同日迁出为独立 memory-migration-archive/ 由专门脚本备份；不入库 data/_system/、锁文件、pending/、state/\n- skills/scripts/：patch-ov-cursor-evidence.mjs、fix-ov-memory-footer-order.mjs、refresh-cursor-import-state.mjs 等导入质量脚本\n- dsh/：agent 规则演进代码，含 agent-guard 插件（ask-guard.js 纯函数 + index.js 接线 + cordis.patch.yml 灰度 askGuard.mode: warn）、scripts/ask-guard-promote.ps1、AGENTS.md 三行硬约束索引（指向 zentao-analyzer）、zentao-analyzer/SKILL.md（定位顺序与 lint 模板）；szfc-page-guard 曾建后删；2026-11-13 提交 80512c00（10 files, +496/−18）至 origin/main\n- openviking-autostart/：OpenViking 不可用自动拉起 skill（SKILL.md + drill.ps1），2026-11-13 plan_review 通过并真实停服演练成功\n- dsh/patches/openviking-audit-phaseA/：阶段 A 审计补丁副本、.bak-20261113A 原版备份、verify_a1_a0.py、README；2026-11-13 提交 a128d4ee（仅本地未推送）；关联 OpenViking 源码 clone 于 D:\\repository\\OpenViking（worktree D:\\repository\\OpenViking-wt-phasea 分支 feat/ov-audit-phasea 基于 v0.5.3 f691133d，仅本地未推送）；回滚=还原 .bak + 重启 openviking-server\n\n## 关系\n- OpenViking 记忆备份与工具脚本托管仓库\n- default-workspace 的 memory-migration/ 非独立 git 仓库，工具脚本备份至此",
+                "after": "# tyvt/skills 仓库\nGitHub 仓库（本地 D:\\repository\\skills，远程 https://github.com/tyvt/skills.git 的 origin/main），托管 OpenViking 记忆快照与导入工具脚本。\n\n## 目录与内容\n- openviking-memory/：OpenViking 记忆库快照\n- openviking-data/：OpenViking 质量数据备份，含 viking/.../user/default/ 整树（memories、peers、sessions、skills、resources、privacy、摘要）、vectordb/、backend_meta.json；初始提交 1a4a1b9 仅含 memories+peers（约11.36MB/7213 md）；2026-11-07 扩展为全量快照 4cdcd7bf（约213MB/20154 文件）；2026-11-09 09:01 提交 c9a15051「全量快照 20237 files」；同日验证快照 dc290366（21,050 文件/214MB，含 4,359 原始导出文件）与记忆快照 605e1435（6,609 md/8.49MB）推上 origin/main，local HEAD == origin/main，取代 c9a15051；sessions/ 含 505 目录（277 个 mm-* 导入会话）；手动时间点快照（无定时）；原始对话文本在 memory-migration/out/（本地，不入 OpenViking），2026-11-09 曾临时拷入 openviking-data/source-exports/ 随 dc290366 推 GitHub（4,359 文件/240.2MB），因违纯镜像约定同日迁出为独立 memory-migration-archive/ 由专门脚本备份；不入库 data/_system/、锁文件、pending/、state/\n- skills/scripts/：patch-ov-cursor-evidence.mjs、fix-ov-memory-footer-order.mjs、refresh-cursor-import-state.mjs 等导入质量脚本\n- dsh/：git 子模块（agent 规则演进代码），含 agent-guard 插件（ask-guard.js 纯函数 + index.js 接线 + cordis.patch.yml 灰度 askGuard.mode: warn）、scripts/ask-guard-promote.ps1、AGENTS.md 三行硬约束索引（指向 zentao-analyzer）、zentao-analyzer/SKILL.md（定位顺序与 lint 模板）；szfc-page-guard 曾建后删；langgraph-orchestrator 新增 offtask 检测（graph.py 的 log_offtask 记 JSONL 日志 + scripts/offtask_stats.py 统计分模型触发率）；2026-11-13 提交 80512c00（10 files, +496/−18）与 39f162d0 至 origin/main\n- openviking-autostart/：OpenViking 不可用自动拉起 skill（SKILL.md + drill.ps1），2026-11-13 plan_review 通过并真实停服演练成功\n- dsh/patches/openviking-audit-phaseA/：阶段 A 审计补丁副本、.bak-20261113A 原版备份、verify_a1_a0.py、README；2026-11-13 提交 a128d4ee（仅本地未推送）；关联 OpenViking 源码 clone 于 D:\\repository\\OpenViking（worktree D:\\repository\\OpenViking-wt-phasea 分支 feat/ov-audit-phasea 基于 v0.5.3 f691133d，仅本地未推送）；回滚=还原 .bak + 重启 openviking-server\n\n## 关系\n- OpenViking 记忆备份与工具脚本托管仓库\n- default-workspace 的 memory-migration/ 非独立 git 仓库，工具脚本备份至此\n- dsh 是 skills 仓库的 git 子模块，独立提交；按 submodule-commit 规则自底向上先提交子模块再提交父仓"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/模型偏题定性处理偏好.md",
+                "memory_type": "preferences",
+                "before": "- 不将模型偏题/失效轻描淡写为\"偶发\"来收尾；低频不等于无害，不能靠\"改个 prompt 就好了\"糊过去\n- 最低成本验证步骤：将偏题输出加入 off-task 语料并跑正则，先于重放或复杂实验\n- 用多次重放（如 11 次：5 baseline + 3 注入 + 3 max_tokens）区分\"不可通过请求参数复现\"与\"偶发噪音\"\n- 偏题成稿若形似正常交付（如\"虚构交付物型\"整篇博客），必须靠正则拦截而非人工快扫",
+                "after": "- 不将模型偏题/失效轻描淡写为\"偶发\"来收尾；低频不等于无害，不能靠\"改个 prompt 就好了\"糊过去\n- 最低成本验证步骤：将偏题输出加入 off-task 语料并跑正则，先于重放或复杂实验\n- 用多次重放（如 11 次：5 baseline + 3 注入 + 3 max_tokens）区分\"不可通过请求参数复现\"与\"偶发噪音\"\n- 偏题成稿若形似正常交付（如\"虚构交付物型\"整篇博客），必须靠正则拦截而非人工快扫\n- 偏题触发率必须靠真实流量日志统计（分母含未命中调用），这是估计触发率的唯一手段，价值高于再跑多次重放"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 7,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

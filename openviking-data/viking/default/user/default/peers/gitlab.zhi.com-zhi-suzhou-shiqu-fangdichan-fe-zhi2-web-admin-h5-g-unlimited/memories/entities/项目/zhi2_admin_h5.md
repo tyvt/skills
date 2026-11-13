@@ -31,14 +31,15 @@ Suzhou real estate regulation platform back-office H5 frontend (admin + non-admi
 - Buyer panel (household+age) + KPI trend chart (yAxis hidden, auto-scaled) on page.
 - Unsold-housing right y-axis max:v.max*1.05 broke eCharts nice ticks (23.5935/20/15); fixed via boundaryGap (2026-11-09).
 - Verified: layout byte-identical across region switch; return button semi-transparent no white bg (2026-11-09).
+- 2026-11-12 Vue 源码大屏（marketMonitor）重对齐至 market-monitor.v2.html（编译版 React 包），navbar（MarketHeader）确认未改，图表区像素相似度 98.06%（≥98% PASS），子模块提交 ea3860a58。
 
 <!-- MEMORY_FIELDS
 {
   "category": "项目",
   "name": "zhi2_admin_h5",
-  "source_extraction_id": "84a411335b9d46f2b8c16c3d5ab99120",
+  "source_extraction_id": "5e28bfd933f94709b10b769b3e6049fe",
   "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi2-web-admin-h5-g-unlimited",
-  "version": 14,
+  "version": 15,
   "memory_type": "entities"
 }
 -->

@@ -16,7 +16,6 @@ DeepSeek Harness (DSH)：用户 AI 会话工作台；历史会话规划导入 Op
 - agent-guard lib/scope.js（as of 2026-11-10）：仓库根/受保护容器/工作区根 grep、glob 直接拒绝；git 仓库根探测；openviking search 别名 queries→query
 - agent-guard 2026-11-11 新增 repairPwshAtBrace（pwsh 命令未加引号 @{} 自动补单引号，修复 git rev-parse @{u} 类错误）与 warnPwshBuffering（命令含 Out-String/Format-Table/ConvertTo-Json/ConvertTo-Csv 时返回纯告警提示后台任务改用 2>&1 或 *> 流式重定向，不改命令）；P1-5 pwsh POSIX 预检、P1-6 glob 路径规范化、P1-7 重复整读拦截在 lib/rules.js + lib/index.js
 - cost-meter（as of 2026-11-11）：perStepOutputBudget=3000、bareReasoningBudget=1500；规则 A/B/C；closing-check 文案；fired 改按 turn 计数且仅对上一步生效；规则 A 升级 bareReasoningEscalate（连续2个纯推理步升格硬中断要求下一步调工具，对应审计 P0#1）；P0-4 白名单文案、P3-11 意图→todo、P3-12 改前 build 基线、P3-13 证据门禁在 lib/index.js
-- dsh-token-guard（as of 2026-11-11）：capGrep 命中 >20 或 >10 文件即截断只返回文件列表+行号（P0-1）；read 无 offset/limit 且 >300 行直接拦回不返内容（P0-2），带 range 且 >500 行兜底截断；skill >2500 字截断
 - 2026-11-09：dsh-context 插件 v0.83.0；token-frugal 含 audit-tokens.mjs；新增 token-optimizer 技能
 - 2026-11-11 降本优化新增 agent-cost-hygiene（大文件/grep 保护）、zentao-analyzer（先查数据阻塞 gate）、submodule-commit（commit→build→resolve 顺序）技能更新
 - git-ab.mjs（as of 2026-11-11）：submodule-commit/scripts/git-ab.mjs 封装 git rev-list --left-right --count 为 ahead=X behind=Y（实测 ahead=8 behind=0），SKILL.md 步骤 0/5 改用
@@ -52,13 +51,12 @@ DeepSeek Harness (DSH)：用户 AI 会话工作台；历史会话规划导入 Op
 - worktree-snapshot/scripts/snapshot.ps1 本仓跑通：`main | dirty=5 | 6e166ee91796`（as of 2026-11-11）
 - submodule-commit/SKILL.md 只放 7 步清单（as of 2026-11-11）
 
-
 <!-- MEMORY_FIELDS
 {
   "category": "程序",
   "name": "dsh",
-  "source_extraction_id": "c9b2869e096e448fbf6f2d739d1add2d",
-  "version": 30,
+  "source_extraction_id": "241c46bf784d4b089593bea97a35e621",
+  "version": 31,
   "memory_type": "entities"
 }
 -->

@@ -1,0 +1,48 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-89cecb05-0d14-4073-9df5-40b9bbb7b25e/history/archive_007",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T08:59:46.984120+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/规划器定性二分拆解请求.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户要求推翻\"等30条\"错误前提，先将\"planner占50.6%=分流失效总根源\"的定性拆为\"本该走工具vs本来不需要工具\"两类，并在换会话前产出交接文档，使下个会话起点清晰。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 这轮把“等 30 条”的错误前提推翻了，修了真 bug，方向对。但“planner 占 50.6% = 分流失效总根源”这个定性需要先拆“本该走工具 vs 本来不需要工具”两类，再决定下一个课题是修偏好还是评质量。换会话前花十分钟做这个拆分，能让下一个会话的起点清楚很多。做一个交接文档，描述清楚，我新开会话"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/规划器执行二分拆解完成.md",
+                "memory_type": "events",
+                "after": "# Summary\n助手经分析成本日志（不含请求文本，用 usage 作代理指标）发现 planner 在 execute 中 median completion 2313 tokens（n=37，max 8192），非寒暄而是长篇作答。按 prompt_tokens 拆分：28/43（65%）prompt<400 纯模型知识作答（本来不需要工具，合理），15/43（35%）带上下文仍自答（真失效候选）。原 50.6% 定性被推翻，仅 15 条（占 graph execute 17.6%）需关注。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 这轮把“等 30 条”的错误前提推翻了，修了真 bug，方向对。但“planner 占 50.6% = 分流失效总根源”这个定性需要先拆“本该走工具 vs 本来不需要工具”两类，再决定下一个课题是修偏好还是评质量。换会话前花十分钟做这个拆分，能让下一个会话的起点清楚很多。做一个交接文档，描述清楚，我新开会话\n...\n**assistant [peer=github.com-tyvt-skills]**: 成本日志里**不包含请求文本**，因此无法直接判断“本该走工具还是本来不需要工具”。\n\n但有个可用的代理指标：`planner` 作为 execute 工具时，**产出了什么内容**。我需要从会话历史里找实际请求。\n\n先看是否有别的日志留存了 plan 内容。\n...\n**assistant [peer=github.com-tyvt-skills]**: 这些 bucket 都没有 jsonl，说明会话存储的格式不同。时间成本已经不低，我换一个更有效的思路。\n\n**关键的代理指标**：`planner` 作为 execute 工具时，它产出的 `content` 是否是“代码”或“解答”。而 costs 日志不存 content。\n\n但有一个**成本低且直接**的方法：`planner` 执行时的 `usage`. 如果它大量输出，说明在“写答案”；如果极短，说明只是寒暄。\n\n先看这个分布。\n...\n**assistant [peer=github.com-tyvt-skills]**: 数据已经足够清楚：`planner` 的中位数是 2313，远高于 `file_reader` 的 116，也高于 `code_editor` 的 1530。\n\n现在按你的要求做二分类：本该走工具，还是本来不需要工具。\n...\n**assistant [peer=github.com-tyvt-skills]**: 拆分数据齐了。核心结果：\n\n**28/43 (65%) 是 prompt<400 的纯模型知识作答**——这类“本来不需要工具”是合理的；**15/43 (35%) 带了上下文但规划器仍自己答**——这类才是真失效。\n\n现在写交接文档。\n...\n**assistant [peer=github.com-tyvt-skills]**: ## 拆分做完了，我的定性确实是错的\n\n**先承认**：我说“planner 占 50.6% = 分流失效总根源”，这个定性不成立——没拆任务类型。拆分后数字完全不同。\n\n### 新数据：按输入上下文拆分（n=43 有 usage）\n\n| 类型 | 条数 | 占比 | 判定 |\n|---|---|---|---|\n| `prompt_tokens < 400` | **28** | **65%** | 未读大上下文，**纯靠模型知识作答** → 本来就不需要工具，**合理** |\n| `prompt_tokens >= 400` | **15** | **35%** | 带了上下文却仍自己答 → **真失效候选** |\n\n所以 50.6% 里**三分之二其实是对的**。真正需要关注的只有 15 条（占 graph execute 的 17.6%）。\n\n### 一个佐证：planner 不是在摘要，是在写答案\n\n| 工具 | n | median completion | max |\n|---|---|---|---|\n| planner | 37 | **2313** | 8192 |\n| plan_reviewer | 6 | 2206 | 9364 |\n| code_editor | 4 | 1530 | 1604 |\n| file_reader | 26 | 116 | 1543 |\n\nplanner 输出量是 file_reader 的 **20 倍**，比 code_editor 还大。`prompt<400` 那组 completion 中位数 1516、最大 5839——确实是实质作答，不是寒暄。..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/规划器分流交接文档与验证产出.md",
+                "memory_type": "events",
+                "after": "# Summary\n助手产出交接文档 dsh/langgraph-orchestrator/docs/HANDOFF-planner-share.md（145行），含已核验事实 E1-E6、二分结论 A/B 类、2×2 归因方法与判别步骤、6 条已知坑（route_miss 须 plan-aware、单次冒烟不可信、成本日志不含请求文本、session_event_search 超时 120s、.dsh/sessions bucket 无 jsonl 等）、本轮 7 个 commit 清单与验证状态、建议开局方式（不要一上来改 PLANNER_SYSTEM、不先做批量重放）。本轮 pytest 123 passed，HEAD 7d9fded9，工作区遗留未跟踪文件 op-tool-execute-design.md 非本次改动。新会话读此文档按第四节做 B 类 15 条的 2×2 归因即可接上。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 这轮把“等 30 条”的错误前提推翻了，修了真 bug，方向对。但“planner 占 50.6% = 分流失效总根源”这个定性需要先拆“本该走工具 vs 本来不需要工具”两类，再决定下一个课题是修偏好还是评质量。换会话前花十分钟做这个拆分，能让下一个会话的起点清楚很多。做一个交接文档，描述清楚，我新开会话\n...\n**assistant [peer=github.com-tyvt-skills]**: 交接文档已写好。现在提交并做最后核验。\n...\n**assistant [peer=github.com-tyvt-skills]**: ...必须先回答这个，否则又会像我上一轮那样，拿一个未拆分的数字下错定性。\n\n### 交接文档\n\n[HANDOFF-planner-share.md](dsh/langgraph-orchestrator/docs/HANDOFF-planner-share.md) — 145 行，含：\n\n- 已核验事实 E1–E6（可直接引用，不用重跑）\n- 二分结论 A/B 类\n- 2×2 归因方法与判别步骤\n- 6 条已知的坑（`route_miss` 必须 plan-aware、单次冒烟不可信、成本日志不含请求文本等）\n- 本轮 7 个 commit 清单与验证状态\n- **建议的开局方式**，并明确“不要一上来改 `PLANNER_SYSTEM`、不先做批量重放”\n\n### 一个已知的限制\n\n成本日志**不含请求文本**，只有 `role/tool/model/elapsed/usage`。所以那 15 条的原始请求得去会话历史里找。我试过 `session_event_search`，本次实测**超时 120s**；也试过直接读 `.dsh/sessions/` 下的 bucket，但那 45 个目录下没有 jsonl。\n\n这一点文档里写进了“已知的坑”，下个会话可能需要换一种方式关联请求（比如限定小时间窗重试，或直接用成本日志里的 `ts` 去 DSH 会话存储里匹配）。我没把它写成“已解决”。\n\n### 收尾\n\n- `pytest`：**123 passed**\n- HEAD：`7d9fded9`\n- 工作区里 `op-tool-execute-design.md` 是先前遗留的未跟踪文件，非本次\n\n新会话说「读 HANDOFF-planner-share.md，按第四节做 B 类 15 条的 2×2 归因」就能接上。"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术架构/planner_execute_tool.md",
+                "memory_type": "entities",
+                "after": "# planner execute 工具\ndsh/langgraph-orchestrator 编排中的 execute 工具，在 graph execute 阶段负责产出作答与规划内容。\n\n## 角色与定位\n- 在 LangGraph 多模型编排中作为 execute 工具承担实际作答职责\n- 曾误判为\"占 graph execute 50.6% = 分流失效总根源\"，后经二分拆分推翻该定性\n\n## 输出特征\n- execute 中 median completion 2313 tokens、max 8192（n=37）\n- 输出量约为 file_reader（116）的 20 倍，高于 code_editor（1530）与 plan_reviewer（2206）\n- 51% 的 planner 执行输出 ≥2k tokens，属长篇作答而非寒暄\n\n## 二分拆分结论\n- 28/43（65%）为 prompt_tokens<400 的纯模型知识作答，本来不需要工具，属合理\n- 15/43（35%）带上下文但规划器仍自答，属真失效候选，仅占 graph execute 的 17.6%\n\n## 后续归因课题\n- 对 15 条真失效候选需做 2×2 归因（本该走工具/本来不需工具 × 答题合格/不合格）\n- 判别维度：偏好问题（该转交却自答→修 PLANNER_SYSTEM）vs 质量问题（转交无用→评估工具选择影响）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术文档/handoff_planner_share.md",
+                "memory_type": "entities",
+                "after": "# HANDOFF-planner-share 交接文档\ndsh/langgraph-orchestrator 项目中记录规划器分流分析的会话交接文档，供后续会话接续。\n\n## 位置与规模\n- 路径：dsh/langgraph-orchestrator/docs/HANDOFF-planner-share.md\n- 规模：145 行\n\n## 内容结构\n- 已核验事实 E1–E6（可直接引用，无需重跑）\n- 二分结论 A/B 类（A 类 28 条合理、B 类 15 条真失效候选）\n- 2×2 归因方法与判别步骤\n- 6 条已知坑（route_miss 须 plan-aware、单次冒烟不可信、成本日志不含请求文本、session_event_search 超时 120s、.dsh/sessions bucket 无 jsonl 等）\n- 本轮 7 个 commit 清单与验证状态、建议开局方式（不先改 PLANNER_SYSTEM、不先做批量重放）\n\n## 使用方式\n- 新会话读此文档并按第四节做 B 类 15 条的 2×2 归因即可接上"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/user/问题分析与方法论.md",
+                "memory_type": "preferences",
+                "after": "- 在给问题下定性（如\"X 占总量的 Y% = 总根源\"）前，先按任务类型做二分或多分拆分（例如\"本该走工具 vs 本来不需要工具\"），避免用未拆分的聚合数字下结论\n- 换会话前，先花时间做关键数据拆分并产出描述清晰的交接文档，使下个会话起点清楚"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 6,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

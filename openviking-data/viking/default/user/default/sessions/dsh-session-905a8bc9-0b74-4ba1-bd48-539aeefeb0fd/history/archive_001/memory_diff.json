@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-905a8bc9-0b74-4ba1-bd48-539aeefeb0fd/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T06:11:58.090829+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/magpie_plugin/opencode_autoclaw_auth.md",
+                "memory_type": "entities",
+                "after": "# @magpie-community/opencode-autoclaw-auth\nMagpie 出站插件，为 autoclaw-cn 模型池提供 OpenCode 兼容认证并在请求出站前注入/改写官方系统人格。\n\n## Description\n- 属于 @magpie-community 组织，是 AutoClaw 国内认证插件（opencode-autoclaw-auth）\n- 在每次请求发往 autoclaw-cn 池时前置拼接官方人格，满足上游网关身份校验\n\n## Key Facts\n- 第 63 行硬编码 OFFICIAL_SYSTEM_PROMPT = 'You are AutoClaw. Answer the user directly and concisely.'\n- autoclawRewriteBody()（同文件 421–455 行）在 system 消息开头非官方人格时执行 `${OFFICIAL_SYSTEM_PROMPT}\\n\\n${cur}` 前置拼接\n- 第 157–158 行 REFUSED_HINT 说明 AutoClaw 官方网关对携带其他 agent 身份行的请求返回 406\n- 第 66–126 行正则把 Claude Code/Codex/Cursor/Grok 等各家身份行改写掉\n- 本机安装缓存位于 C:\\Users\\Administrator\\.cache\\magpie\\bun\\install-cache\\@T@sha512-f033fde...@@@1\\index.mjs\n\n## Relations\n- 与 magpie 网关（http://127.0.0.1:3425）协同，是 DSH 系统提示词第一句\"You are AutoClaw\"的唯一来源\n- DSH 侧无法修改该注入，只能换非 autoclaw 系 provider 或向该包提 issue"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/program/dsh.md",
+                "memory_type": "entities",
+                "before": "# DSH\nDSH 是一个“一切皆插件”的 AI 代理系统，工具、技能、会话、沙箱、agent 循环、子 agent、工作流、UI 均可插拔。\n\n## Description\n- 设计原则：用插件/钩子替代文字约束，减少每轮上下文成本\n- 用户配置位于 ~/.dsh/AGENTS.md（符号链接到 dsh/AGENTS.md）\n- 技能目录 ~/.dsh/skills，包含 zentao-analyzer、dsh-token-policy 等\n\n## Key Facts\n- 上一轮成本复盘指出 200k 量级浪费来自把可确定性执行的事写成文字\n- P0 已落地：AGENTS.md 瘦身、zentao-analyzer 拆分、禁止项写入常驻层\n\n## Relations\n- 包含 zentao-analyzer skill（入口+references）\n- 包含 dsh-token-policy skill（Token与编排策略）\n- 规划 szfc 项目专属插件包与 zentao 通用插件包\n\n## 插件钩子机制（as of 2026-11-12）\n- `tools.guard(fn)`：注册于 dsh-tools 工具注册表 layer，每次工具执行前同步跑，返回字符串即拒绝该次调用，模型收到 `Error: <理由>`，守卫单调（不可被其它 guard 强放行）——是跨 plane 唯一可靠的强制拦截点\n- `tools/pre-execute`：dsh-tools 中的 waterfall 钩子，可返回 `{kind:'deny',reason,info}` 拦截单个工具；但工具注册表在 agent plane、插件在 host plane，跨 plane 导致 `ctx.on('tools/pre-execute')` 收不到事件，必须用 `ctx.tools.guard()`\n- `agent/pre-step`：dsh-agent-loop 中的 waterfall 钩子，进入下一步前可 `enter` 注入提示或 `reject`；`reject` 会直接以 `blocked` 终止整个 turn，无法做逐工具重试拦截\n- `agent-guard` 插件是生产级 `tools/pre-execute` + `tools.guard` 范例（注释证实单纯 `ctx.on('tools/pre-execute')` 收不到事件）",
+                "after": "# DSH\nDSH 是一个“一切皆插件”的 AI 代理系统，工具、技能、会话、沙箱、agent 循环、子 agent、工作流、UI 均可插拔。\n\n## Description\n- 设计原则：用插件/钩子替代文字约束，减少每轮上下文成本\n- 用户配置位于 ~/.dsh/AGENTS.md（符号链接到 dsh/AGENTS.md）\n- 技能目录 ~/.dsh/skills，包含 zentao-analyzer、dsh-token-policy 等\n\n## Key Facts\n- 上一轮成本复盘指出 200k 量级浪费来自把可确定性执行的事写成文字\n- P0 已落地：AGENTS.md 瘦身、zentao-analyzer 拆分、禁止项写入常驻层\n\n## Relations\n- 包含 zentao-analyzer skill（入口+references）\n- 包含 dsh-token-policy skill（Token与编排策略）\n- 规划 szfc 项目专属插件包与 zentao 通用插件包\n\n## 插件钩子机制（as of 2026-11-12）\n- `tools.guard(fn)`：注册于 dsh-tools 工具注册表 layer，每次工具执行前同步跑，返回字符串即拒绝该次调用，模型收到 `Error: <理由>`，守卫单调（不可被其它 guard 强放行）——是跨 plane 唯一可靠的强制拦截点\n- `tools/pre-execute`：dsh-tools 中的 waterfall 钩子，可返回 `{kind:'deny',reason,info}` 拦截单个工具；但工具注册表在 agent plane、插件在 host plane，跨 plane 导致 `ctx.on('tools/pre-execute')` 收不到事件，必须用 `ctx.tools.guard()`\n- `agent/pre-step`：dsh-agent-loop 中的 waterfall 钩子，进入下一步前可 `enter` 注入提示或 `reject`；`reject` 会直接以 `blocked` 终止整个 turn，无法做逐工具重试拦截\n- `agent-guard` 插件是生产级 `tools/pre-execute` + `tools.guard` 范例（注释证实单纯 `ctx.on('tools/pre-execute')` 收不到事件）\n\n## System Prompt 注入架构（as of 2026-11-13）\n- 系统提示词由三句独立来源拼接：\"You are AutoClaw...\" / \"You are an AI agent.\" / \"You are a coding agent powered by the {{model}} model.\"\n- 句①\"You are AutoClaw. Answer the user directly and concisely.\"来自 magpie 出站插件 @magpie-community/opencode-autoclaw-auth 硬编码 OFFICIAL_SYSTEM_PROMPT（index.mjs:63），经 autoclawRewriteBody() 出站前前置拼接\n- 句②\"You are an AI agent.\"来自 DSH 核心 dsh-system-prompt 的 harness:identity 段（includeHarnessIdentity 默认开，lib/index.js:231）\n- 句③\"You are a coding agent powered by the {{model}} model.\"来自 bundle 出厂模板 personaPrefix，{{model}} 由 dsh-agent-loop 注册并在组装时替换为当前模型 id（本机副本 ~\\.dsh\\profiles\\web\\cordis.patch.yml:108）\n- 修改点：句③改 cordis.patch.yml 的 persona prefix；句②设 includeHarnessIdentity:false；句① DSH 侧无法改，只能换非 autoclaw provider 或改 magpie 插件"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

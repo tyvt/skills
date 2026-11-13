@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-1e92c762-4cd2-4e8e-b20f-a882af9db4ec/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T12:06:54.997484+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited/memories/events/2026/11/13/图标sprite化完成.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户提出方案三：将 SVG 图标改为 public 目录静态 sprite 引用（<use href>），以解决 vite-plugin-svg-icons 内联 410 图标导致构建约150秒的问题。助手核实已提交 sprite.svg 过期（仅408 symbol、硬写 48x48 变形4个非标图标），重新生成完整410个正确 viewBox 的 sprite 并改造 SvgIcon/main.js/vite.config.js/build 脚本，移除 virtual:svg-icons-register。2026-11-13 真实构建验证：exit 0，42.4秒（原约150秒，-72%），module-main 2817KB→977KB，bundle 内 <symbol> 数=0。提交推送至 develop/v2.6.2-suzhufang（子模块 0e14875de、根仓 e6d5c70d）。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited]**: 方案三：把 sprite 文件放到 public 目录，用 <use href=\"/sprite.svg#icon-xxx\"> 引用\n原理：你提到 public/.../sprite.svg 已经存在（1.7MB）。Vite 的 public 目录资源不经过 Rollup 打包，构建时直接复制到 dist。如果 SvgIcon 组件直接渲染 <use href=\"/sprite.svg#icon-name\">，构建时 JS bundle 里就完全没有图标内容。\n\n风险：\n\n浏览器兼容性：跨文件 <use> 引用同源 sprite 在现代浏览器中基本可用，但需要确认你的目标浏览器范围；\n\n首次渲染时浏览器会额外请求 sprite.svg（可缓存），这是运行时成本，不是构建成本；\n\n如果项目部署在子路径下，需要处理 base 路径。\n\n这是最接近“运行时 fetch”但改动更小的方案：不需要改造 SvgIcon 的 props 或调用方式，只需要把 <use :xlink:href=\"symbolId\"> 改成 <use :href=\"\\/sprite.svg#${symbolId}`\">，并移除import 'virtual:svg-icons-register'`。改动范围可能只有 SvgIcon 组件内部的一两行。\n试一下这个方案\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited]**: 方案三实施完成并验证通过。\n\n## 结果：构建 **150s → 42.4s**（-72%）\n\n| 阶段 | 构建耗时 |\n|---|---|\n| 原始基线 | ~150s |\n| 方案一（SVGO preset-default，纯压缩内联图标） | ~108s |\n| **方案三（sprite 静态化）** | **42.4s** |\n\n### 改了什么\n把图标内容彻底移出 JS bundle，改由 `public/assets/images/sprite.svg` 静态提供（构建时直接复制到 dist）：\n\n1. **`generate-sprite.js`**（仓库根）：改为 `__dirname` 定位、遍历全部 410 个源图标，**保留每个图标真实 viewBox**（修掉旧脚本硬写 `0 0 48 48` 导致 4 个非标图标变形的问题），输出到 `public/assets/images/sprite.svg`。\n2. **`src/components/SvgIcon/index.vue`**：删除 `import 'virtual:svg-icons-register'`；`iconName` 改为 `${resolveServerAssetUrl('/assets/images/sprite.svg')}#icon-${name}`（复用现有基址感知工具，兼容子目录部署）；`<use>` 增加 `:href`。\n3. **`src/main.js`**：移除 `import 'virtual:svg-icons-register'`。\n4. **`vite.config.js`**：移除 `createSvgIconsPlugin` 及其 import。\n5. **构建接入**：`vite-build.mjs` 在 spawn vite 前、`pm.mjs` 在 dev 前调用 `generate-sprite.js`（失败 fail-fast）。\n6. **`.gitignore`**：`public/assets/images/sprite.svg` 列为构建产物（已 `git rm --cached` 停止跟踪，防再冲突）。\n\n### 验证证据\n- 真实 `npm run build`：**exit 0，42.4s**。\n- `module-main` **2817KB → 977KB**，bundle 内 `<symbol>` 数 = **0**（图标完全不在 JS 里）；`dist/assets/images/sprite.svg`（1762KB）已生成。\n- sprite 校验：**410 个 symbol 全有 viewBox**，4 个非 48 图标（路径/路径-2/el-icon-pref/el-icon-red）viewBox 与源一致。\n- `SvgIcon/index.vue` eslint 通过（`main.js` 的报错是既有全文件双引号风格问题，与本次只删 1 行无关）。\n- 产物引用正确：bundle 中 `assets/images/sprite.svg` 引用 1 处，无残留 `virtual:svg-icons`。\n\n### 未验证 / 需注意\n- **浏览器视觉未实测**：本环境无法开浏览器逐页确认。机制是同源外部 sprite `<use>`，现代浏览器支持；建议你本地跑一次 dev 抽检**动态菜单图标**与 4 个非 48 图标。发现异常可一键回滚（revert 上述文件）。\n- 发现 `停车泊位.svg` 源文件本身是空 SVG（`<svg></svg>` 无内容），该图标在旧方案下也是空白——**预存数据问题**，非本次改动引入。\n- 目标浏览器若含不支持外部 sprite `<use>` 的极老版本，需另行加 fallback。\n\n计划文档：[build-perf-sprite-static.md](<.plan/build-perf-sprite-static.md>)。\n\n改动涉及根仓（`generate-sprite.js`、`icons.js`、`scripts/pm.mjs`）和子模块 `zhi2-web-admin`。需要我如何处理提交？\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited]**: Both local and remote SHAs match — push verified.\n\n## 完成总结\n\n**打包慢已排查并优化到位：构建 ~150s → 42.4s（-72%）。**..."
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/suzhufang_sprite_static.md",
+                "memory_type": "entities",
+                "after": "# 苏住房图标Sprite静态化\n苏住房前端（zhi2-web-admin）把 SVG 图标移出 JS bundle、改为 public 目录静态 sprite 引用，构建耗时从约150秒降至42.4秒。\n\n## 背景\n- 原构建约150秒，根因是 410 个 SVG 图标被 vite-plugin-svg-icons 经 virtual:svg-icons-register 内联进 module-main（约1.8MB 字符串），占约64%构建时间。\n- 原 svgoOptions 漏配 preset-default，图标几乎未压缩；方案一（SVGO preset-default）曾将构建降至约108秒，后被方案三取代。\n\n## 实施方案\n- 改造 generate-sprite.js：用 __dirname 定位、遍历全部 410 个源图标，保留每个图标真实 viewBox（修掉旧脚本硬写 0 0 48 48 导致 4 个非标图标变形的问题），输出到 public/assets/images/sprite.svg。\n- SvgIcon/index.vue：删除 import 'virtual:svg-icons-register'，iconName 改为 resolveServerAssetUrl('/assets/images/sprite.svg')#icon-${name}（基址感知，兼容子目录部署），<use> 增加 :href。\n- main.js 移除 virtual:svg-icons-register 引用；vite.config.js 移除 createSvgIconsPlugin。\n- vite-build.mjs 与 pm.mjs 在构建/dev 前调用 generate-sprite.js（失败 fail-fast）。\n- .gitignore 增加 public/assets/images/sprite.svg，并 git rm --cached 停止跟踪，转为构建产物。\n\n## 验证结果\n- 真实 npm run build：exit 0，42.4秒（原约150秒，-72%）；module-main 2817KB→977KB，bundle 内 <symbol> 数=0。\n- dist/assets/images/sprite.svg（1762KB）已生成；sprite 校验 410 个 symbol 均含正确 viewBox，4 个非48图标（路径/路径-2/el-icon-pref/el-icon-red）viewBox 与源一致。\n- SvgIcon/index.vue eslint 通过；bundle 无残留 virtual:svg-icons。\n\n## 注意事项\n- 与园区物管2.0 的 unused_sprite_cleanup 不同，苏住房分支重新启用并修正了 sprite 生成链路（generate-sprite.js 保留并改造）。\n- 停车泊位.svg 源文件本身为空 SVG（<svg></svg> 无内容），该图标旧方案下也是空白，属预存数据问题。\n- 浏览器逐页视觉未实测，建议本地 dev 抽检动态菜单图标与4个非48图标。\n- 提交：子模块 0e14875de、根仓 e6d5c70d，分支 develop/v2.6.2-suzhufang。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

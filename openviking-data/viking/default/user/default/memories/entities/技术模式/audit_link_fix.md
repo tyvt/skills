@@ -15,6 +15,7 @@
 ## 账单与验证
 - op=full 规划、读文件、生成、审查、生成命令、汇总均跑通并写出完整账单，四个断言通过
 - 本机 pytest 会话启动崩溃（NodeId._str_cache），改用等价直接断言验证
+- 同款 NodeId._str_cache 崩溃于 2026-11-13 会话被定位为 pytest 9.x 与 anyio/langsmith/pluggy 插件不兼容，并通过锁 pytest>=8,<9（8.4.2）修复，pytest 全量回归恢复
 - op=full 未带 session id 时落在 .sessions/anonymous.costs.jsonl
 - op=full payload 原仅从 `exec.sessionId` 取会话 ID，宿主实际挂在 `exec.agent.id` 上，导致一直为空而落 anonymous；已补上 `exec.agent.id` 取值（2026-11-10）
 - 宿主调用 orchestrate（op=full）自身输入、缓存、输出 Token 无接口可取，不报数字
@@ -30,8 +31,8 @@
 {
   "category": "技术模式",
   "name": "audit_link_fix",
-  "source_extraction_id": "76556331c9454f4cafe584abf72d12b7",
-  "version": 2,
+  "source_extraction_id": "c389a0fa386a43f0b8517315442aad33",
+  "version": 3,
   "memory_type": "entities"
 }
 -->
