@@ -6,6 +6,7 @@ import assert from 'node:assert/strict'
 
 import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead } from './lib/rules.js'
 import { decideInterception } from './lib/scope.js'
+import { evaluateAsk } from './lib/ask-guard.js'
 
 let passed = 0
 let failed = 0
@@ -23,6 +24,67 @@ function test(name, fn) {
 }
 
 const known = new Set(['grep', 'glob', 'edit', 'write', 'read', 'pwsh', 'update_goal', 'todo_write', 'mcp_gateway'])
+
+const askQ = (q, header) => ({ questions: [{ id: 'q0', question: q, ...(header ? { header } : {}) }] })
+
+console.log('\n=== ask-guard（P0-1 二次 ask 拦截）===')
+
+test('mode=off 一律放行', () => {
+  const st = { asks: [{ phase: '__default__', text: '是否实施' }] }
+  assert.equal(evaluateAsk(st, askQ('是否提交？'), { mode: 'off' }).verdict, 'allow')
+})
+
+test('首 ask 放行并记录（计数起点=本会话第一次 ask）', () => {
+  const st = { asks: [] }
+  const d = evaluateAsk(st, askQ('是否按计划实施？'), { mode: 'block' })
+  assert.equal(d.verdict, 'allow')
+  assert.equal(st.asks.length, 1)
+})
+
+test('同 phase 补问 missing → block（看上一轮漏了什么）', () => {
+  const st = { asks: [] }
+  evaluateAsk(st, askQ('是否确认实施？'), { mode: 'block' }) // 未问提交方式/推送
+  const d = evaluateAsk(st, askQ('提交方式选哪种？'), { mode: 'block' })
+  assert.equal(d.verdict, 'block')
+  assert.ok(d.message.includes('提交方式'))
+})
+
+test('warn 模式不阻断', () => {
+  const st = { asks: [] }
+  evaluateAsk(st, askQ('是否确认实施？'), { mode: 'warn' })
+  const d = evaluateAsk(st, askQ('是否推送远端？'), { mode: 'warn' })
+  assert.equal(d.verdict, 'warn')
+})
+
+test('合法二次 ask（新问题，不含 missing 词）不拦截', () => {
+  const st = { asks: [] }
+  evaluateAsk(st, askQ('是否按计划实施？'), { mode: 'block' })
+  const d = evaluateAsk(st, askQ('是否影响存量数据？'), { mode: 'block' })
+  assert.equal(d.verdict, 'allow')
+})
+
+test('上一轮已覆盖的项不再 warn（问了推送，再问推送细节不拦）', () => {
+  const st = { asks: [] }
+  evaluateAsk(st, askQ('是否确认实施并推送？'), { mode: 'block' })
+  const d = evaluateAsk(st, askQ('推送用哪种方式？'), { mode: 'block' })
+  assert.equal(d.verdict, 'allow')
+})
+
+test('高危词命中永不拦截（block 模式下也放行）', () => {
+  const st = { asks: [] }
+  evaluateAsk(st, askQ('是否确认实施？'), { mode: 'block' })
+  const d = evaluateAsk(st, askQ('是否发布到生产环境？'), { mode: 'block' })
+  assert.equal(d.verdict, 'allow')
+  assert.equal(d.highRisk, true)
+})
+
+test('header 不同 = 跨 phase，不拦', () => {
+  const st = { asks: [] }
+  evaluateAsk(st, askQ('是否确认实施？', '计划确认'), { mode: 'block' })
+  const d = evaluateAsk(st, askQ('提交方式选哪种？', '其他话题'), { mode: 'block' })
+  assert.equal(d.verdict, 'allow')
+})
+
 
 console.log('\n=== 工具名归一化 ===')
 
@@ -560,6 +622,32 @@ test('带 offset/limit 的续读不拒绝', () => {
 test('不同文件不误伤', () => {
   const state = new Set(['a.js'])
   assert.equal(shouldRejectDuplicateRead(state, { file_path: 'b.js' }), null)
+})
+test('C3：Map 记录下重复整读给出上次读到的区间与续读 offset', () => {
+  const state = new Map()
+  state.set('a.vue', { whole: false, ranges: [{ offset: 0, limit: 160, lines: 160 }] })
+  const msg = shouldRejectDuplicateRead(state, { file_path: 'a.vue' })
+  assert.ok(/上次读到 0–159 行，续读用 offset=160/.test(msg), 'gives last range + next offset')
+  // Map 中没有该文件 → 放行。
+  assert.equal(shouldRejectDuplicateRead(state, { file_path: 'c.vue' }), null)
+  // 已整读（whole）→ 无区间也能拒绝。
+  const state2 = new Map([['d.vue', { whole: true, ranges: [] }]])
+  assert.match(shouldRejectDuplicateRead(state2, { file_path: 'd.vue' }), /已整读过 d\.vue/)
+})
+
+console.log('\n=== G ask_user_question 缺 id 自动补 ===')
+test('缺 id 的 question 自动补 q0/q1，已有的不覆盖', () => {
+  const args = { questions: [{ question: 'a' }, { id: 'keep', question: 'b' }, { question: 'c' }] }
+  const repairs = repairArguments({ toolName: 'ask_user_question', args }).repairs
+  assert.equal(args.questions[0].id, 'q0')
+  assert.equal(args.questions[1].id, 'keep')
+  assert.ok(typeof args.questions[2].id === 'string' && args.questions[2].id !== '')
+  assert.ok(repairs.some((r) => r.rule === 'ask-user-id'))
+})
+test('全部已带 id 时不改动', () => {
+  const args = { questions: [{ id: 'a', question: 'x' }] }
+  const repairs = repairArguments({ toolName: 'ask_user_question', args }).repairs
+  assert.ok(!repairs.some((r) => r.rule === 'ask-user-id'))
 })
 
 console.log(`\n${failed === 0 ? 'PASS' : 'FAIL'}  passed=${passed} failed=${failed}\n`)

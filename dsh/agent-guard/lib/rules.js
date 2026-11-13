@@ -552,19 +552,75 @@ export function isWholeFileRead(args) {
 }
 
 /**
- * 重复整读检测（审计 P1-7）：同一会话里已整读过的文件再次整读时返回拒绝提示。
- * 纯函数：只读 state（Set<string>），不写入。首次整读由调用方负责写入集合。
- * @param {Set<string>} state - 本会话已整读过的文件集合。
+ * 重复整读检测（审计 P1-7 / C3）：同一会话里已整读过的文件再次整读时返回拒绝提示。
+ * 纯函数：只读 state，不写入。state 形态比早期更丰富（见下），既记录「是否整读过」，
+ * 也记录「上次/此前读到过哪些区间」，这样拒绝时能给出**可执行的续读 offset**，
+ * 而不是只丢一句「已整读过」（审计 C3：seq 496 重复整读被拦时没告诉上次读到哪）。
+ *
+ * state 兼容两种形态：
+ *   - 旧：Set<string>（只记整读过的文件）；
+ *   - 新：Map<string, { whole: boolean, ranges: Array<{offset:number, limit?:number, lines?:number}> }>
+ * @param {Set<string> | Map<string, object>} state - 本会话读取记录。
  * @param {object} args - read 的参数。
  * @returns {string | null} 拒绝提示；放行返回 null。
  */
 export function shouldRejectDuplicateRead(state, args) {
   const filePath = isWholeFileRead(args)
   if (filePath === null) return null
-  if (state && typeof state.has === 'function' && state.has(filePath)) {
-    return `[agent-guard] 已整读过 ${filePath}，改用 offset/limit 续读或 grep 定位，不要重复整读`
+  if (state === null || typeof state !== 'object') return null
+
+  const isMap = typeof state.get === 'function' && typeof state.has === 'function' && !(state instanceof Set)
+  let record
+  if (isMap) {
+    if (!state.has(filePath)) return null
+    record = state.get(filePath)
+  } else if (state instanceof Set) {
+    if (!state.has(filePath)) return null
+    record = { whole: true, ranges: [] }
+  } else {
+    return null
   }
-  return null
+
+  // 已经完整读过 → 拒绝，并尽量给出「上次读到哪」的续读建议。
+  let hint = ''
+  const ranges = Array.isArray(record?.ranges) ? record.ranges : []
+  if (ranges.length > 0) {
+    const last = ranges[ranges.length - 1]
+    const start = last?.offset ?? 0
+    const end = last?.lines != null
+      ? start + last.lines - 1
+      : (last?.limit != null ? start + last.limit - 1 : start)
+    hint = `上次读到 ${start}–${end} 行，续读用 offset=${end + 1}；`
+  }
+  return `[agent-guard] 已整读过 ${filePath}，${hint}或改用 grep 定位关键行，不要重复整读`
+}
+
+/**
+ * `ask_user_question` 的每个 question 必须带 `id`（审计 G，session.v4 seq 670 漏 id 被拒）。
+ * 这里给缺 id 的 question 自动补 `q0`/`q1`…（与已有 id 不冲突），避免一次无效调用。
+ * @param {string} toolName - 工具名。
+ * @param {object} args - 原始参数（会被就地修改）。
+ * @returns {object[]} 修复清单。
+ */
+export function repairAskUserIds(toolName, args) {
+  const repairs = []
+  if (toolName !== 'ask_user_question') return repairs
+  if (args === null || typeof args !== 'object' || Array.isArray(args)) return repairs
+  const questions = args.questions
+  if (!Array.isArray(questions)) return repairs
+  const used = new Set(questions.map((q) => q?.id).filter((id) => typeof id === 'string' && id !== ''))
+  let seq = 0
+  for (const q of questions) {
+    if (q === null || typeof q !== 'object' || Array.isArray(q)) continue
+    if (typeof q.id === 'string' && q.id !== '') continue
+    let id = `q${seq}`
+    while (used.has(id)) { seq += 1; id = `q${seq}` }
+    used.add(id)
+    q.id = id
+    seq += 1
+    repairs.push({ rule: 'ask-user-id', detail: `filled missing question id -> ${id}` })
+  }
+  return repairs
 }
 
 /**
@@ -584,6 +640,7 @@ export function repairArguments({ toolName, args, schema, rules = ALL_RULES }) {
   if (rules.semantics === true) {
     if (toolName === 'update_goal') repairs.push(...repairGoalArgs(args))
     if (toolName === 'todo_write') repairs.push(...repairTodoArgs(args))
+    repairs.push(...repairAskUserIds(toolName, args))
     repairs.push(...repairArgAliases(toolName, args))
     repairs.push(...repairPwshAtBrace(toolName, args))
     repairs.push(...repairPwshPosix(toolName, args))

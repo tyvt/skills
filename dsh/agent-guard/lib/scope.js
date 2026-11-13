@@ -72,8 +72,14 @@ function defaultGitProbe(dir) {
 }
 
 function hint(tool, why) {
-  return `[agent-guard] ${tool} 拒绝：${why}。缩到目标业务目录（如 src/views/<模块>）再检索；` +
-    '连目标目录都定不了时先走 orchestrate（op=tool file_reader/planner），别全仓 grep。'
+  // 审计 C1：拒绝时给**可直接照抄的调用**，不要只说「缩到目标业务目录」。按工具给出模板。
+  if (tool === 'glob') {
+    return `[agent-guard] glob 拒绝：${why}。改用具体目录+pattern，例如 `
+      + `glob{ path: "src/views/<模块>", pattern: "**/*.vue" }；还没定目录就先 mcp__openviking__search 定位文件。别扫工作区根。`
+  }
+  return `[agent-guard] ${tool} 拒绝：${why}。改用具体目录+pattern，例如 `
+    + `grep{ path: "src/views/<模块>", pattern: "<关键词>", include: "*.{ts,vue}" }（include 只写一个 glob）；`
+    + '连目标目录都定不了时先 mcp__openviking__search（mode=context, detail=abstract）定位文件，别全仓 grep。'
 }
 
 /**

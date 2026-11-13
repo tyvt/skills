@@ -38,6 +38,7 @@ import path from 'node:path'
 import { Config } from './config.js'
 import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead } from './rules.js'
 import { decideInterception } from './scope.js'
+import { evaluateAsk } from './ask-guard.js'
 
 export { Config }
 
@@ -162,19 +163,40 @@ export function apply(ctx, config) {
   // 两条路径共用同一个幂等修复函数（WeakSet 去重），不会重复记账。
   const repairedExecs = new WeakSet()
 
-  // ── 1.5 重复整读检测（审计 P1-7）──────────────────────────────────────────
-  // 按 session 记录「已整读过的文件」；同一文件本会话再次整读（无 offset/limit）
-  // 直接拒绝并提示续读/定位，避免重复整读把 prefix cache 打穿。state 是纯 Set，
-  // 判定逻辑抽到 rules.js 的 shouldRejectDuplicateRead 便于单测。
+  // ── 1.5 重复整读检测（审计 P1-7 / C3）──────────────────────────────────────
+  // 按 session 记录每个文件的读取记录：{ whole: 是否整读过, ranges: 读过的区间 }。
+  // 同一文件本会话再次整读（无 offset/limit）直接拒绝，并在提示里带上「上次读到哪」的
+  // 续读 offset（审计 C3：只拒绝不说上次范围，模型还得自己再定位）。
   const sessionReads = new Map()
+  // ask-guard（P0-1）按 session 记录 ask 历史：{ asks: [{ phase, text }] }。
+  const sessionAsks = new Map()
   function getSessionReads(exec) {
     const sessionId = exec?.agent?.session?.header?.id ?? 'anon'
     let state = sessionReads.get(sessionId)
     if (state === undefined) {
-      state = new Set()
+      state = new Map()
       sessionReads.set(sessionId, state)
     }
     return state
+  }
+  function recordRead(exec) {
+    const args = exec?.arguments
+    const filePath = args?.file_path
+    if (typeof filePath !== 'string' || filePath.trim() === '') return
+    const state = getSessionReads(exec)
+    let rec = state.get(filePath)
+    if (rec === undefined) {
+      rec = { whole: false, ranges: [] }
+      state.set(filePath, rec)
+    }
+    const whole = isWholeFileRead(args) !== null
+    if (whole) {
+      rec.whole = true
+      return
+    }
+    const offset = Number.isFinite(Number(args?.offset)) ? Number(args.offset) : 0
+    const limit = Number.isFinite(Number(args?.limit)) ? Number(args.limit) : undefined
+    rec.ranges.push({ offset, limit })
   }
 
   const guardDisposer = ctx.tools.guard((exec) => {
@@ -193,7 +215,7 @@ export function apply(ctx, config) {
           return rejected
         }
       }
-      // 重复整读拦截（P1-7）：与 scope 拦截同层，同样赶在 repairExecution 之前。
+      // 重复整读拦截（P1-7 / C3）：与 scope 拦截同层，同样赶在 repairExecution 之前。
       if (config.enabled && exec?.name === 'read') {
         const state = getSessionReads(exec)
         const duplicate = shouldRejectDuplicateRead(state, exec?.arguments)
@@ -202,8 +224,36 @@ export function apply(ctx, config) {
           log?.warn?.('agent-guard: rejected %s: %s', exec?.name, duplicate)
           return duplicate
         }
-        const wholeRead = isWholeFileRead(exec?.arguments)
-        if (wholeRead !== null) state.add(wholeRead)
+        recordRead(exec)
+      }
+      // 二次 ask 拦截（P0-1，.plan/p0-hooks-skills-20261113.md）：warn 只记 ledger 告警，
+      // block 才拒绝。判定链在 ask-guard.js（纯函数，可单测）。
+      if (config.enabled && config.askGuard?.enabled && exec?.name === 'ask_user_question') {
+        const sessionId = exec?.agent?.session?.header?.id ?? 'anon'
+        let askState = sessionAsks.get(sessionId)
+        if (askState === undefined) {
+          askState = { asks: [] }
+          sessionAsks.set(sessionId, askState)
+        }
+        const d = evaluateAsk(askState, exec?.arguments, config.askGuard)
+        appendLedger(ledgerPath, {
+          ts: new Date().toISOString(),
+          kind: 'ask-guard',
+          rule: d.verdict,
+          hit_word: d.hitWord,
+          ask_seq_in_phase: d.askSeq,
+          high_risk: d.highRisk,
+          session_id: sessionId,
+          mode: config.askGuard.mode ?? 'off',
+          verdict: d.verdict,
+          missing: d.missing,
+        })
+        if (d.verdict === 'block') {
+          counters.rejected++
+          log?.warn?.('agent-guard: %s', d.message)
+          return d.message
+        }
+        if (d.verdict === 'warn') log?.warn?.('agent-guard: %s', d.message)
       }
       if (config.enabled) repairExecution(exec)
     } catch (error) {
@@ -220,6 +270,23 @@ export function apply(ctx, config) {
       log?.warn?.('agent-guard: repair failed for %s: %o', exec?.name, error)
     }
     const decision = await next()
+    // ask-guard：用户跳过（空选择/自定义空答）= user_bypass，写回 ledger 供误伤率统计。
+    if (config.enabled && config.askGuard?.enabled && exec?.name === 'ask_user_question') {
+      try {
+        const raw = JSON.stringify(decision ?? null) ?? ''
+        const skipped = /"selected"\s*:\s*\[\]|"selected"\s*:\s*null|"custom"\s*:\s*""/.test(raw)
+        if (skipped) {
+          appendLedger(ledgerPath, {
+            ts: new Date().toISOString(),
+            kind: 'ask-guard-bypass',
+            tool: exec?.name,
+            session_id: exec?.agent?.session?.header?.id ?? 'anon',
+            user_bypass: true,
+            bypass_reason: 'empty-selection',
+          })
+        }
+      } catch { /* bypass 探测失败不影响放行 */ }
+    }
     return decision ?? { kind: 'allow' }
   })
 

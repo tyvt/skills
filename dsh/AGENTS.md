@@ -2,6 +2,49 @@
 
 细节按需加载，不要把 skill 整篇读进上下文。简单 Bug（文案、显隐、单字段、明显空值、换一个已知 URL）只加载当前任务必须的那一个 skill。Token、编排器阈值、编码默认走编排器：加载 `dsh-token-policy`，此处不展开。
 
+## 会话时间硬约束（P0，细节见 skill/hook）
+- 计划确认轮必须把可预见待定项（提交方式/推送/是否重建）一次问清（hook 拦截二次 ask）。
+- 跑 `playwright test` 前必须先过 `node e2e/scripts/preflight.mjs`（hook 拦截）。
+- 定位顺序与 lint 命令模板见 `zentao-analyzer` skill。
+
+## 编排器选型（主动遵守，不等 gate 拒绝）
+
+- **要执行动作 → 一律 `orchestrate {op:"full"}`**：跑命令/构建（`bun run build`、`npm run build`、`pytest`）、全仓或大目录检索、读大文件、改代码/写文件，全部走 `op:"full"`。它走 `generate_command → security_guard → _run_pwsh` 真实执行，回传 `$ <cmd> / exit= / stdout / stderr`，宿主只收摘要。
+- **`op:"tool"` 只做纯文本加工**（摘要、改写、图像判读、代码文本生成）：**绝不**用它跑构建/命令/读盘。若把执行需求投给 `op:"tool"`，模型只会回「我没有执行能力」，等于没做，并会把活全推回主模型，token 与耗时双爆（实例：某会话 57 次调用仅 1 次走编排器，且是 `op:"tool"` 跑 build 失败，主模型 hy3 吃掉 2.14M token、耗时 12 分钟）。
+- 这条是**选型阶段**就该做对的判断，不能指望 `orchestrator-gate`：gate 只在被拒绝时才提示，主模型若一开始就选 `op:"tool"` 根本不会触发拦截。
+
+## 并行扇出（强制）
+
+- **同类批量对象 ≥3 时，禁止主模型串行逐个处理**：必须扇出到 spawn_teammate（多对象并行首选）、workflow（大规模编排）或 orchestrate `{op:"full"}`（编排器内部并行）。串行逐个对象处理会成倍拉长耗时并烧穿主模型上下文。
+- 辅助判据（引导，非硬规则）：预估步骤 >300 或等效 token >5M 的任务，应优先编排器拆解。
+- 默认连续 5 次 read 整读 / 5 次 grep 会被拒绝（阈值以插件配置 `fanoutStreakThreshold` 为准）；带 offset/limit 的分页读不受限；收到拒绝必须改道不得原样重试。
+
+## 计划审批（强制，所有会话生效）
+
+- **任何「修改 / 修复 / 实现 / 配置改动」动手前，必须先产出 Markdown 计划，不能只建 todo list 就开干。**
+- 计划文件放仓库根 `.plan/<sessionId>.md`（或用 dsh 的 plan 模板 `.plan/TEMPLATE.md`），必须包含：任务/Bug 的**前因后果**、**现状与证据**、**分布实施方案**（分步、每步落哪个文件、怎么验证）、**风险与回滚**、**验证计划**。
+- 计划先交**高级模型审核（reviewer = 编排器 `plan_reviewer` 池，当前 `workbuddy/deepseek-v4.1-flash`）**：调用编排器 `op:"plan_review"`。审核不通过（verdict=reject）被打回时，主控按 issues/suggestions 修改计划后**重新送审，直到通过**。
+- 审核通过后，**终稿必须提交用户人工确认**（用 `ask_user_question` 给出"确认实施 / 继续修改"选项）；用户确认前不得改动代码。确认后把计划 frontmatter 置 `status: approved`、`human_confirmed: true`。
+- `dsh-plan-gate` 会在 edit/write 落地前校验：无"已审核通过且已人工确认"的计划则拒绝改动。这是硬门，不要绕过。
+
+## 计划审批边界（成本约束，降低 plan_review 开销）
+
+- **只在计划含 `edit`/`write` 代码改动时才送 `plan_review`**；纯文档交付、纯分析、纯复盘直接交用户，不送审。
+- **首轮送审整篇 ≤4k chars**；被打回后**只发「变更段 + 新增证据」**，禁止整篇重发。
+- **同一计划 >2 轮给提示（不阻断）、>3 轮硬拒**；确需越过须在计划 frontmatter 置 `review_override: true` 显式解锁。
+
+## 文档写作与文件落地（成本约束，禁止整篇重写）
+
+- **新建文件用 `write`，已有文件一律 `edit`**；禁止对已存在文件整篇 `write` 覆盖（典型反例：方案 v2 整篇覆盖 v1，一次全量 write 的代价会在后续每一步复利放大）。
+- **计划/方案文档先出骨架（≤1.5k）**，再逐节 `edit` 增量补章节；禁止「想清楚后一次性 5k 全文 write」。
+- **写前先定结构：骨架 → 逐节 edit → 定稿**，全程不重读全文；某节要改写也只 replace 该节，不发整篇。
+
+## 长任务日志与半分钟监听（强制，所有会话生效）
+
+- **任何预计可能超过 1 分钟的任务（build、全量测试、批量查询、长编排、大目录检索、部署）都必须加日志 + 可观测监听**，禁止静默长时间阻塞等待。
+- 用 `dsh/scripts/task-watchdog.ps1` 以 `run_in_background: true` 启动：它写 `.task-state/<name>.state.json` 并每 30 秒打印一次心跳；主控**每半分钟**用 `job_output` 读一次状态，出现 `STALL` 或长时间无心跳要告警/止损，不要干等。
+- 长操作一律走编排器 `op:"full"`，并依赖其进度日志判断是否卡住；`orchestrate` 若返回 `stalled`/超时，必须立即查 `.task-state` 与 stderr 尾部，而不是重试同一形态。
+
 ## 落地
 
 - 用户指定的 worktree / 目录是硬约束：不进、不改、不合并他人 worktree。
