@@ -11,8 +11,13 @@
 gateway:
   base_url: http://127.0.0.1:3425/v1
   api_key: magpie
-  request_timeout: 120          # 单次请求超时(秒)
-  max_retries_per_model: 1      # 同一个模型内部重试次数(指数退避)
+  # 单次请求超时(秒)。90s 让卡住的请求更早失败、更快切下一个模型；
+  # 单个工具可再用 tools.*.timeout 覆盖（planner/code_editor 已定 120）。
+  request_timeout: 90
+  # 同一个模型内部重试次数。0 = 不重试，一次失败立即降级到池内下一个模型。
+  # 2026-11-12：1 -> 0。原值 1 意味着单模型要试 2 次（每次最多 90s），
+  # 这是 planner 两轮各 203s 墙钟的成因之一。fail-fast 后再靠模型池兜底。
+  max_retries_per_model: 0
   failure_cooldown: 600         # 模型被判定失败后冷却秒数，冷却期内优先跳过它
 
 # 全局默认参数，模型池条目可覆盖
@@ -46,48 +51,48 @@ tools:
     models:
       - model: auto/deepseek-v4.1-flash
       - model: workbuddy/glm-5.3-flash
-      - model: workbuddy-ai/hy3
-      - model: cursor/deepseek-v41-flash-1017
 
-  # 代码生成/改写。主选用 cursor/composer-2.5（非 Flash 强代码模型，200k 上下文），
-  # 兼顾质量；后续为廉价 Flash 兜底。峰时策略仍会按 scheduling 跳过 deepseek-v4.1-flash 档。
+  # 代码生成/改写。Cursor 系列已整体移除（2026-11-12），主选换为
+  # workbuddy/deepseek-v4.1-flash（与后两位不重复），保留 glm-flash 与 auto 两档兜底。
   code_editor:
     description: 生成或修改代码（纯文本生成，无本地磁盘读写权限；读写磁盘文件请用 pwsh）。
     models:
-      - model: cursor/composer-2.5
-      - model: workbuddy/glm-5.3-flash
       - model: workbuddy/deepseek-v4.1-flash
+      - model: workbuddy/glm-5.3-flash
       - model: auto/deepseek-v4.1-flash
     max_tokens: 4096
-    # 代码生成可能耗时较长，单独放宽超时到 300 秒(覆盖 gateway.request_timeout)
-    timeout: 300
+    # 单模型请求超时 120 秒：仍能覆盖慢模型，但故障转移更快（不再死等 300s）。
+    timeout: 120
 
-  # 复杂推理/规划。主用网关真实存在的 workbuddy/hy3（免费档原 openrouter/tencent/hy3-preview:free
-  # 网关并不提供，曾导致规划每次都瞬间失败回退到最贵的 grok）；grok-4.7 做质量兜底。
+  # 复杂推理/规划。与 plan_reviewer 同理，reasoning 模型需要足够 max_tokens，
+  # 过低会被 reasoning 吃干预算后返回 502 empty reply。
   planner:
     description: 复杂任务的规划与推理。
     models:
-      - model: workbuddy/hy3
-        max_tokens: 2048
-      - model: cursor/grok-4.7@256k
-    max_tokens: 4096
-    # 复杂规划推理耗时长，单独放宽超时到 300 秒(覆盖 gateway.request_timeout)
-    timeout: 300
+      - model: workbuddy/deepseek-v4.1-flash
+        max_tokens: 8192
+      - model: auto/deepseek-v4.1-flash
+        max_tokens: 8192
+    max_tokens: 8192
+    # 单模型请求超时 120 秒：仍能覆盖慢模型，但故障转移更快（不再死等 300s）。
+    timeout: 120
 
   # 视觉/多模态 —— magpie 模型均支持图像输入
-  # 主选 cursor/deepseek-v41-flash-1017；2026-11-12 追加 auto/deepseek-v4.1-flash 作单点兜底。
+  # Cursor 系列已移除（2026-11-12）；auto 为主选，workbuddy 同型号兵底。
   image_analyst:
     description: 分析图像内容(截图/图表/照片)，做视觉理解。
     models:
-      - model: cursor/deepseek-v41-flash-1017
       - model: auto/deepseek-v4.1-flash
+      - model: workbuddy/deepseek-v4.1-flash
     max_tokens: 4096
 
-  # 审查节点专用，不进规划工具列表。只挂 grok-4.7，不做故障转移。
+  # 审查节点专用，不进规划工具列表。
+  # Cursor 系 grok-4.7 已移除（2026-11-12）；改为双模型池，避免单点无兜底。
   security_guard:
     description: 审查 pwsh / 写库参数，只输出 JSON。
     models:
-      - model: cursor/grok-4.7@256k
+      - model: workbuddy/deepseek-v4.1-flash
+      - model: autoclaw-cn/zai_glm-5.3-flash
     max_tokens: 512
     timeout: 60
 
@@ -98,6 +103,34 @@ tools:
       - model: workbuddy/deepseek-v4.1-flash
     max_tokens: 256
     timeout: 30
+
+  # 汇总器（node_summarize 专用，不进规划工具列表）。独立于 file_reader：
+  # 失败时靠池内 failover 兜底，两级全失败由 graph.py 输出带 [未摘要] 标注的行级脱敏尾部。
+  summarizer:
+    description: 汇总各步骤结果为最终答复（node_summarize 专用）。
+    models:
+      - model: workbuddy/deepseek-v4.1-flash
+      - model: workbuddy/glm-5.3-flash
+    max_tokens: 2048
+    timeout: 30
+
+  # 计划审核器（plan_review op 专用）。高级模型严格审核 Markdown 计划是否  # 前因后果清楚、实施方案可落地且分布合理、有风险与回滚、有验证步骤。
+  #
+  # 2026-11-12 实测：deepseek-v4.1-flash 系列是 reasoning 模型，审一份完整计划时
+  # reasoning 吃掉 7.9k–13.4k token。max_tokens=2048 会让预算全耗在 reasoning 上，
+  # content 一个字都没开始写就截断，网关返回 502 empty reply（实测 40.8s 必失败）。
+  # 抬到 8192 后两个模型均稳定输出（workbuddy 33.8s / auto 91.6s）。
+  # 同模型池，按实测速度排序：workbuddy 比 auto 快约 2.7 倍。
+  plan_reviewer:
+    description: 高级方案审核员，严格审核 Markdown 计划，只输出 JSON（plan_review op 使用，不进规划工具列表）。
+    models:
+      - model: workbuddy/deepseek-v4.1-flash
+        max_tokens: 8192
+      - model: auto/deepseek-v4.1-flash
+        max_tokens: 8192
+    max_tokens: 8192
+    # 审核需要通读整份计划并逐条给结论，放宽超时。
+    timeout: 300
 
   git:
     description: >
@@ -112,15 +145,21 @@ tools:
       跑 Python 单测并读取失败（python -m pytest -q --tb=short）。
       Git 状态请用 git 工具，不要用本工具跑 git status/diff/pull/rebase。
       每步只做一件事。不要用它做 git push --force、reset --hard、删库或递归强删。
+      【重要】真实执行只在 orchestrate op:"full" 路径发生；op:"tool" 只是纯文本
+      补全，不会执行命令（模型会回答"我没有执行能力"）。要跑构建/命令/读盘请用 op:"full"。
     models:
+      # reasoning 模型：max_tokens 必须大于 reasoning 开销，否则 content 被截断成空回复。
       - model: workbuddy/deepseek-v4.1-flash
-      - model: auto/hy3
-    max_tokens: 512
+        max_tokens: 4096
+      - model: workbuddy/glm-5.3-flash
+        max_tokens: 1024
+    max_tokens: 4096
     timeout: 120
 
 execution:
   mock_execution: false
-  pwsh_timeout: 30
+  # 命令执行超时(秒)。与 pwsh 单请求超时保持一致；30s 会让 npm run build 必然超时。
+  pwsh_timeout: 180
 
 # 高危工具审查。deny_regex 只作为线索交给 security_guard，不自动拒绝。
 security:
