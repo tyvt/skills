@@ -314,6 +314,15 @@ function renderResult(result, verbose) {
   }
   // full
   const lines = []
+  // workdir 来源：兜底到 project_cwd / process_cwd 时必须可见，否则不知道自己跑在哪个目录。
+  if (result.workdir) {
+    const source = result.workdir_source ? ` (${result.workdir_source})` : ''
+    lines.push(`工作目录: ${result.workdir}${source}`)
+    if (result.workdir_source && result.workdir_source !== 'workdir') {
+      lines.push('提示: 未显式指定 workdir，相对路径以该目录为基准；如需操作其他仓库请显式传绝对 workdir。')
+    }
+    if (verbose) lines.push('')
+  }
   if (verbose) {
     if (Array.isArray(result.trace) && result.trace.length) {
       lines.push('轨迹: ' + result.trace.join(' | '))
