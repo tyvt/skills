@@ -37,8 +37,11 @@ $GIFT    = @('cursor/deepseek-v41-flash-1017','cursor/kimi-k3','cursor/kimi-k2.7
 
 # 跑题（模板坍缩 / 串题 runaway）检测正则。离线验证见 REPORT §6b.2：
 # 84 样本 / 4 正类，Precision 100% / Recall 100%（含 composer T5rep3 的 "Final file content: tasks/architecture" 串题）。
-# 注意：只覆盖已观测到的模板坍缩与文件转储型串题，不穷尽所有串题；未命中不等于 on-task。
-$script:OFFTASK_PATTERN = '第\s*\d+\s*轮|【ID】|【Title】|【Difficulty】|SkillUpgradeTracker|skill-upgrade-tracker|前端面试题|面试题|instruction\.md|Final file content|tasks/architecture|#{1,3}\s*助手\s*$|#{1,3}\s*用户\s*$'
+# 注意：只覆盖已观测到的模板坍缩、文件转储与虚构交付物三类，不穷尽所有串题；未命中不等于 on-task。
+# 2026-11-13 新增第 5 类「虚构交付物型」：凭空构造项目路径/blog_skill/风格名并输出无关成稿。
+#   样本=code_edit_with_signal 首次冒烟（32.6s）；旧模式对该样本 Recall=0，补后 1正/11负=100%/100%。
+#   「请保存为」「正在阅读项目内的风格指南」属高度特征化词，保守入选：宁可漏检也不误伤正常回答。
+$script:OFFTASK_PATTERN = '第\s*\d+\s*轮|【ID】|【Title】|【Difficulty】|SkillUpgradeTracker|skill-upgrade-tracker|前端面试题|面试题|instruction\.md|Final file content|tasks/architecture|#{1,3}\s*助手\s*$|#{1,3}\s*用户\s*$|source/blogs|blog_skill|Mike Dane|Giraffa|请保存为|drafts/[\w-]+\.md|正在阅读项目内的风格指南'
 function Test-OffTask {
   param([string]$Text)
   if ([string]::IsNullOrEmpty($Text)) { return $false }

@@ -47,6 +47,8 @@ description: Cursor 模型分流测试集与实测工具（T1–T7 任务分类 
 完整矩阵与结论见 [REPORT.md](./REPORT.md)。关键：
 - **可先行**：T1/T2 有界代码任务 composer 3/3 稳、快、池额度；T3 终端调试 composer 2/3（1/3 坍缩）→ 归 grok-4.7（3/3）。
 - **需缓解**：composer 有 ~1/3 间歇性模板坍缩/串题（T3/T7b 实证）。`run-matrix.ps1` 内置 `Test-OffTask` 正则（4 正类/84 样本：旧版漏检 composer T5rep3 的 "Final file content/tasks/…" 串题→Recall 75%，补 runaway 模式后 100%/100%）；但只覆盖模板坍缩+文件转储两类，**未命中≠on-task**，仍需人工抽检。命中标 `⚠OFFTASK` → 拒收重跑/升级 grok。
+- **2026-11-13 新增第 5 类：虚构交付物型偏题（正则已漏检）**。样本：编排器 `code_edit_with_signal` 首次冒烟（提问「一句话说明 dict.get 与 [] 区别」，32.6s），输出凭空构造项目路径 `source/blogs/drafts/*.md`、不存在的 `blog_skill`、以及无关的「Mike Dane 风格博客」整篇成稿。**旧 OLD/NEW 正则对此 Recall=0**（实测 MATCH_NEW=False）。已在 `validate-offtask-signal.py` 补 `FAKE_DELIVERY` 模式（`source/blogs|blog_skill|Mike Dane|Giraffa|请保存为|drafts/\w+\.md|正在阅读项目内的风格指南`），在该语料上 **Precision 100% / Recall 100%**（1 正类 / 11 负类）。
+- **复现性实测（重要边界）**：同一提问重放 11 次（5×baseline + 3×注入 `NO_LOCAL_FILE_SYSTEM` system + 3×max_tokens 6144）**全部 on-task**，无法靠请求本身复现。因此该偏题**不能归为「偶发可忽略」**，但也没有稳定触发器；处理方式=正则拦截 + 人工抽检，不能靠「改 prompt 就没事」。详见 `results/offtask-*20261113*`。
 - **T5**：composer 覆盖高但取舍失控（同 prompt 3 次 3.6k/4.9k/31.5k 字符）、grok 稳 ~2k → 要成品用 grok。
 - **T7b**：grok 3/3 on-task 但 ~1/3 数值漂移（含数字基准须复核）。
 - **池额度悬崖**：composer 30d 白吃 95.5M tok/$0，同量走 grok 约 $462/月；悬崖=Cursor Pro 外部周额度墙，网关无读数，靠 `unpriced`/错误率监控。
