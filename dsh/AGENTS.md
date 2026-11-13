@@ -25,7 +25,7 @@
 ## 计划审批（强制，所有会话生效）
 
 - **任何「修改 / 修复 / 实现 / 配置改动」动手前，必须先产出 Markdown 计划，不能只建 todo list 就开干。**
-- 计划文件放仓库根 `.plan/<sessionId>.md`（或用 dsh 的 plan 模板 `.plan/TEMPLATE.md`），必须包含：任务/Bug 的**前因后果**、**现状与证据**、**分布实施方案**（分步、每步落哪个文件、怎么验证）、**风险与回滚**、**验证计划**。
+- 计划文件放仓库根 `.plan/<sessionId>.md`（或用 dsh 的 plan 模板 `.plan/TEMPLATE.md`），**极简 4 段式骨架，禁止扩写**：①**前因后果**（≤3 句，说清痛点）②**现状与证据**（只写文件:行号/字段名，**严禁**贴大段源码或完整 JSON/YAML，只写 diff 要点）③**实施方案**（逐步写清改哪里，不写具体实现代码）④**验证计划**（只写怎么跑测试）。**禁止单列「风险与回滚」章节**——回滚靠 git：确需一句则写"变更受 git 管理，git revert 即可"。
 - 计划先交**高级模型审核（reviewer = 编排器 `plan_reviewer` 池，当前 `workbuddy/deepseek-v4.1-flash`）**：调用编排器 `op:"plan_review"`。审核不通过（verdict=reject）被打回时，主控按 issues/suggestions 修改计划后**重新送审，直到通过**。
 - 审核通过后，**终稿必须提交用户人工确认**（用 `ask_user_question` 给出"确认实施 / 继续修改"选项）；用户确认前不得改动代码。确认后把计划 frontmatter 置 `status: approved`、`human_confirmed: true`。
 - `dsh-plan-gate` 会在 edit/write 落地前校验：无"已审核通过且已人工确认"的计划则拒绝改动。这是硬门，不要绕过。
