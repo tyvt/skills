@@ -114,12 +114,12 @@ tools:
     max_tokens: 4096
 
   # 审查节点专用，不进规划工具列表。
-  # Cursor 系 grok-4.7 已移除（2026-11-12）；改为双模型池，避免单点无兜底。
+  # 2026-11-13 去 glm 备选：controller-bench M3-3（幻觉工具题）glm 误判为 execute_tools，
+  # guard 角色不能把清单外工具当真；且已核实失败路径 fail-closed（graph.py 模型失败即 DENY）。
   security_guard:
     description: 审查 pwsh / 写库参数，只输出 JSON。
     models:
       - model: workbuddy/deepseek-v4.1-flash
-      - model: autoclaw-cn/zai_glm-5.3-flash
     max_tokens: 512
     timeout: 60
 
@@ -151,6 +151,11 @@ tools:
   plan_reviewer:
     description: 高级方案审核员，严格审核 Markdown 计划，只输出 JSON（plan_review op 使用，不进规划工具列表）。
     models:
+      # 2026-11-13 controller-bench 实测（14 模型×25 题）：grok-4.7@256k 路由校准唯一满分 1.00、
+      # 总分 0.90 最高——审核员要绝对正确，故列首位；慢（13.3s）与计费（≈$0.02/次）可接受，
+      # 失败自动落 deepseek 次选。
+      - model: cursor/grok-4.7@256k
+        max_tokens: 8192
       - model: workbuddy/deepseek-v4.1-flash
         max_tokens: 8192
       - model: auto/deepseek-v4.1-flash

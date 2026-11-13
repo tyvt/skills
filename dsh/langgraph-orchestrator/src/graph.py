@@ -62,6 +62,10 @@ PLANNER_SYSTEM = """你是一个任务规划器。把用户需求拆成有序步
 【硬约束二：有验证意图必须选 code_edit_with_signal】若需求里出现“跑/测/验证/修报错/按方案”，
 哪怕只是“并给出 pytest 断言”这种附带要求，也一律选 code_edit_with_signal，不要选 code_editor。
 只有当需求是纯片段生成、无任何运行或验证意图时，才用 code_editor。
+【硬约束三：简单任务一步聚合】能合并为一条命令完成的事禁止拆成多步：例如“读文件找某行”
+“统计文件里某词出现次数”“对比两个配置文件”“批量查引用”，都是一条 pwsh 聚合命令（Select-String /
+Measure-Object / Compare-Object / 管道循环）就能交付的，必须只出 1 步。读→改→验证这类有依赖链的
+中等任务 ≤3 步，禁止把“读+改”拆开或把验证单独拆给 pwsh。主控 token 是最大成本，每多一步都成倍放大。
 重要：要读取/查看磁盘上的本地文件内容，必须用 pwsh 工具执行 Get-Content 等命令；
 file_reader / code_editor / code_edit_with_signal 是纯文本摘要/生成器，没有本地磁盘读取权限，
 不能用来读取文件。
