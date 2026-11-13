@@ -11,6 +11,7 @@ description: 子模块改动的固定提交顺序。在分支 worktree 提交、
    `node D:\repository\skills\submodule-commit\scripts\git-ab.mjs <worktree> --fetch <branch>`
    输出 `ahead=X behind=Y`。behind > 0 先 `git pull --rebase`（脏的 `env/.env`、`public/version.json` 先 stash），再开始改。
 1. 在分支所在 worktree 编辑
+   - **git 输出瘦身（P0-5，2026-11-13）**：`git pull --rebase` / `git push` 加 `-q`；确需看摘要时只截 stdout 尾部（`| Select-Object -Last 15`），**stderr 与 exit code 保持完整不截**（防丢冲突文件列表/错误首行），长输出落盘 `.task-state/git-<op>.log` 备查。父仓状态查询一律限定路径：`git -C <父仓> status --short <submodule>`，禁止裸 `git status --short` 打出全部未跟踪目录。status/pull 优先用 `git-ab.mjs` 封装，不临场拼命令。
 2. `node ../node_modules/eslint/bin/eslint.js <file> --ext .vue`（路径按该仓实际位置）
 3. `git add <file>`；`git commit -m "<type>(scope): <desc>"`
 4. 需要构建产物哈希：**commit → build → 核对** `version.json.gitHash == git rev-parse HEAD`。不一致 = 顺序反了，必须重 build，禁止写「acceptable」放过（bug6520 复盘 O5：build 在 commit 前，hash e8b351511 ≠ 实际提交 65b114c93）。

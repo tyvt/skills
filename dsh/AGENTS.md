@@ -12,8 +12,9 @@
 - **要执行动作 → 一律 `orchestrate {op:"full"}`**：跑命令/构建（`bun run build`、`npm run build`、`pytest`）、全仓或大目录检索、读大文件、改代码/写文件，全部走 `op:"full"`。它走 `generate_command → security_guard → _run_pwsh` 真实执行，回传 `$ <cmd> / exit= / stdout / stderr`，宿主只收摘要。
 - **`op:"tool"` 只做纯文本加工**（摘要、改写、图像判读、代码文本生成）：**绝不**用它跑构建/命令/读盘。若把执行需求投给 `op:"tool"`，模型只会回「我没有执行能力」，等于没做，并会把活全推回主模型，token 与耗时双爆（实例：某会话 57 次调用仅 1 次走编排器，且是 `op:"tool"` 跑 build 失败，主模型 hy3 吃掉 2.14M token、耗时 12 分钟）。
 - 这条是**选型阶段**就该做对的判断，不能指望 `orchestrator-gate`：gate 只在被拒绝时才提示，主模型若一开始就选 `op:"tool"` 根本不会触发拦截。
-- **触发词表（词面匹配即触发，不靠理解规则；bug6520 复盘 O3：gate 兜底拦截 3 次，每多一轮全套重发）**：意图含「跑 / 执行 / 构建 / build / lint / 测试 / 部署 / 全仓 / 大目录 / 检索 / 多文件 grep」任一词 → **第一次就 `orchestrate {op:"full"}`**，不等 gate。例外：单文件窄 read（带 offset/limit）、已缩到具体模块目录的 grep，可直跑。
+- **触发词表（词面匹配即触发，不靠理解规则；bug6520 复盘 O3：gate 兜底拦截 3 次，每多一轮全套重发）**：意图含「跑 / 执行 / 构建 / build / lint / 测试 / 部署 / 全仓 / 大目录 / 检索 / 多文件 grep」任一词 → **第一次就 `orchestrate {op:"full"}`**，不等 gate。例外（直跑豁免白名单）：① 单文件窄 read（带 offset/limit）；② 已缩到具体模块目录的 grep；③ **单目录 + 关键词已知的 grep**（含「grep 类名拿行号」）。
 - **定位阶段一律走编排器（P0-1，2026-11-13）**：定位 Bug/字段时的 grep（字段定义、声明确认）、大文件读取、跨模块检索，**第一次即 `orchestrate {op:"full"}`**，宿主只收命中行摘要；例外仅限单文件窄 read 和已缩到具体模块且预估单轮的 grep，**预估 ≥2 轮定位时一律走编排器**，禁止宿主直跑把结果整段回灌上下文。
+- **局部改动固定路径（P0-2，2026-11-13）**：改样式类/局部行时先 `grep -n "类名|符号"` 拿行号 → `read offset/limit ±30 行`，禁止脑内推演行号后整读。整读双门槛（须同时满足）：同目录文件数 ≤5 且 grep 唯一命中，**且预估读取 ≤150 行**；任一不满足必须 grep 缩行号（反例：483 行组件整读两遍只改 3 行 CSS）。
 
 ## 并行扇出（强制）
 
@@ -47,6 +48,8 @@
 - **任何预计可能超过 1 分钟的任务（build、全量测试、批量查询、长编排、大目录检索、部署）都必须加日志 + 可观测监听**，禁止静默长时间阻塞等待。
 - 用 `dsh/scripts/task-watchdog.ps1` 以 `run_in_background: true` 启动：它写 `.task-state/<name>.state.json` 并每 30 秒打印一次心跳；主控**每半分钟**用 `job_output` 读一次状态，出现 `STALL` 或长时间无心跳要告警/止损，不要干等。
 - 长操作一律走编排器 `op:"full"`，并依赖其进度日志判断是否卡住；`orchestrate` 若返回 `stalled`/超时，必须立即查 `.task-state` 与 stderr 尾部，而不是重试同一形态。
+- **build 基线异步化 + 豁免时限（P0-3，2026-11-13）**：预计要改文件的会话，开工（edit/write 之前）即用 `task-watchdog.ps1` 后台起基线 build（结果落 `.task-state/build-baseline.state.json`，并发 ≤1），或读最近一次构建结果；改动仅含 scoped CSS/注释/文案的 CSS-only 豁免**只能在改动开始前声明**——一旦已开始改文件，必须有基线或写「未执行+原因」，禁止改完再豁免。
+- **stall 熔断（P0-3，2026-11-13）**：同一会话内 orchestrate 对同一命令 stall 一次即打标记（记 `.task-state/<name>.state.json`：name/cmd/status/heartbeatAt/stderrTail≤500）；再调前必须换形态（查 state 文件、改用窄命令）或写明「未执行+原因」，禁止同形态重试。
 
 ## 落地
 
