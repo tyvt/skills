@@ -58,6 +58,19 @@ export const DEFAULTS = {
   ledgerPath: 'reports/agent-guard-ledger.jsonl',
   /** 打开后每次工具调用都记一条 inspected，用来验证钩子真的挂上了。 */
   traceCalls: false,
+  /** 探索漂移拦截（explore-drift-guard-20261113）：off=不启用；warn=只记 ledger（灰度默认）；block=拒绝。 */
+  exploration: {
+    enabled: false,
+    mode: 'off',
+    /** 整读门槛：已知行数超过此值的无范围 read 拒绝。 */
+    maxWholeReadLines: 300,
+    /** 行数未知的首读注入 limit。 */
+    firstReadLimit: 60,
+    /** 重复盲搜熔断：连续同 pattern 第 N 次拒绝。 */
+    minRepeatPattern: 3,
+    /** 未知根 glob 试错窗口（毫秒）。 */
+    globRepeatWindowMs: 60000,
+  },
 }
 
 function bool(value, fallback) {
@@ -96,6 +109,7 @@ export function validate(input) {
   const repair = source.repair ?? {}
   const recovery = source.recovery ?? {}
   const scope = source.scope ?? {}
+  const exploration = source.exploration ?? {}
   if (typeof repair !== 'object' || Array.isArray(repair)) {
     return { issues: [{ message: 'agent-guard: repair must be an object' }] }
   }
@@ -105,6 +119,12 @@ export function validate(input) {
   if (typeof scope !== 'object' || Array.isArray(scope)) {
     return { issues: [{ message: 'agent-guard: scope must be an object' }] }
   }
+  if (typeof exploration !== 'object' || Array.isArray(exploration)) {
+    return { issues: [{ message: 'agent-guard: exploration must be an object' }] }
+  }
+  const explorationMode = typeof exploration.mode === 'string' && ['off', 'warn', 'block'].includes(exploration.mode)
+    ? exploration.mode
+    : DEFAULTS.exploration.mode
   const roots = Array.isArray(scope.roots) ? scope.roots : DEFAULTS.scope.roots
   return {
     value: {
@@ -130,6 +150,14 @@ export function validate(input) {
       },
       ledgerPath: text(source.ledgerPath, DEFAULTS.ledgerPath),
       traceCalls: bool(source.traceCalls, DEFAULTS.traceCalls),
+      exploration: {
+        enabled: bool(exploration.enabled, DEFAULTS.exploration.enabled),
+        mode: explorationMode,
+        maxWholeReadLines: positiveInt(exploration.maxWholeReadLines, DEFAULTS.exploration.maxWholeReadLines),
+        firstReadLimit: positiveInt(exploration.firstReadLimit, DEFAULTS.exploration.firstReadLimit),
+        minRepeatPattern: positiveInt(exploration.minRepeatPattern, DEFAULTS.exploration.minRepeatPattern),
+        globRepeatWindowMs: positiveInt(exploration.globRepeatWindowMs, DEFAULTS.exploration.globRepeatWindowMs),
+      },
     },
   }
 }

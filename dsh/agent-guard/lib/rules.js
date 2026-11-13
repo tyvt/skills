@@ -635,6 +635,103 @@ export function shouldRejectDuplicateRead(state, args) {
 }
 
 /**
+ * 探索漂移三规则（.plan/explore-drift-guard-20261113.md M1）：
+ * 全部为执行前可判定的形态信号，不依赖工具执行结果（0 命中属执行后信号，不可用）。
+ *
+ * 规则1 整读门槛：read 无 offset/limit 且已知行数 > maxWholeReadLines → 拒绝；
+ *        行数未知时放行（由调用方把 args.limit 注入为 firstReadLimit 再记录行数）。
+ * 规则2 重复盲搜熔断：连续 minRepeatPattern 次调用 grep/glob 且 pattern 完全相同
+ *        （无论命中与否，第 3 次即拒）。
+ * 规则3 未知根试错：glob 无 path 且 globRepeatWindowMs 内同 pattern 第 2 次 → 拒绝。
+ *
+ * 子代理豁免：session header 带 parentSession 的会话（spawn_teammate/fork 派生）
+ * 对三条规则整体豁免——外包探索正是要放开读，只拦主会话。
+ *
+ * state 形态（每会话一份，由 index.js 维护）：
+ *   { fileLines: Map<string,number>, grepSeq: number, lastPattern: string,
+ *     lastGlob: { pattern: string, ts: number } | null }
+ * 纯函数：只读 state + args，写操作由调用方完成。
+ *
+ * @param {object} state - 本会话探索漂移状态。
+ * @param {string} tool - 工具名（read/grep/glob）。
+ * @param {object} args - 工具参数。
+ * @param {object} opts - { isSubagent, nowMs, maxWholeReadLines, firstReadLimit,
+ *                           minRepeatPattern, globRepeatWindowMs }
+ * @returns {{ verdict: 'pass'|'block', message?: string, injectLimit?: number }}
+ */
+export function decideExplorationDrift(state, tool, args, opts = {}) {
+  const isSubagent = opts.isSubagent === true
+  const nowMs = Number.isFinite(opts.nowMs) ? opts.nowMs : Date.now()
+  const maxWholeReadLines = positiveOpt(opts.maxWholeReadLines, 300)
+  const firstReadLimit = positiveOpt(opts.firstReadLimit, 60)
+  const minRepeatPattern = positiveOpt(opts.minRepeatPattern, 3)
+  const globRepeatWindowMs = positiveOpt(opts.globRepeatWindowMs, 60000)
+  const base = { verdict: 'pass' }
+  if (!state || typeof state !== 'object') return base
+  if (!args || typeof args !== 'object') return base
+
+  // 子代理豁免在工具白名单之前：外包探索代理放开读。
+  if (isSubagent) return base
+
+  if (tool === 'read') {
+    const filePath = typeof args.file_path === 'string' ? args.file_path : ''
+    if (filePath.trim() === '') return base
+    const hasRange = (args.offset != null && args.offset !== '') || (args.limit != null && args.limit !== '')
+    const known = state.fileLines instanceof Map ? state.fileLines.get(filePath) : undefined
+    if (known !== undefined && known > maxWholeReadLines && !hasRange) {
+      return {
+        verdict: 'block',
+        message: `[explore-drift:BLOCKED] ${filePath} 约 ${known} 行，整读会吃掉大量未命中预算。改用 offset/limit 分页（如 offset=1&limit=60），或先 grep 定位行号再 ±30 行局部读`,
+      }
+    }
+    // 行数未知：首次无范围整读放行并注入首读 limit（探针，审核 P1-1）；
+    // 同会话第 2 次无范围整读同一文件 → 拒绝（行数未知时的保守门槛）。
+    if (!hasRange && known === undefined) {
+      if (state.wholeReads instanceof Set && state.wholeReads.has(filePath)) {
+        return {
+          verdict: 'block',
+          message: `[explore-drift:BLOCKED] ${filePath} 本会话已整读过一次（行数未知）。续读用 offset 接着上次位置，或 grep 定位行号局部读`,
+        }
+      }
+      base.injectLimit = firstReadLimit
+    }
+    return base
+  }
+
+  if (tool === 'grep' || tool === 'glob') {
+    const pattern = typeof args.pattern === 'string' ? args.pattern : ''
+    if (pattern.trim() === '') return base
+    if (tool === 'grep') {
+      // 规则2：连续同 pattern 熔断（中断即重置，由调用方维护）。
+      if (state.lastPattern === pattern && state.grepSeq >= minRepeatPattern - 1) {
+        return {
+          verdict: 'block',
+          message: `[explore-drift:BLOCKED] 同一 pattern 已连续 ${state.grepSeq + 1} 次搜索（含本次）仍无进展。换关键词、换 include 过滤，或先 pwsh Get-ChildItem 列目录再缩范围`,
+        }
+      }
+      return base
+    }
+    // 规则3：未知根 glob 试错（无 path 且窗口内同 pattern 第 2 次）。
+    if (args.path == null || args.path === '') {
+      const last = state.lastGlob
+      if (last && last.pattern === pattern && nowMs - last.ts <= globRepeatWindowMs) {
+        return {
+          verdict: 'block',
+          message: `[explore-drift:BLOCKED] 60s 内已用同一 pattern 无 path 试过一次（未知根直接 glob 易连环试错）。先 pwsh Get-ChildItem <根> 列目录确认结构，或给 glob 指定 path`,
+        }
+      }
+    }
+    return base
+  }
+  return base
+}
+
+function positiveOpt(value, fallback) {
+  const n = Number(value)
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback
+}
+
+/**
  * `ask_user_question` 的每个 question 必须带 `id`（审计 G，session.v4 seq 670 漏 id 被拒）。
  * 这里给缺 id 的 question 自动补 `q0`/`q1`…（与已有 id 不冲突），避免一次无效调用。
  * @param {string} toolName - 工具名。

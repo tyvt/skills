@@ -4,7 +4,7 @@
 // 退出码 0 = 全通过；1 = 有失败。
 import assert from 'node:assert/strict'
 
-import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead } from './lib/rules.js'
+import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift } from './lib/rules.js'
 import { decideInterception } from './lib/scope.js'
 import { evaluateAsk } from './lib/ask-guard.js'
 
@@ -633,6 +633,73 @@ test('C3：Map 记录下重复整读给出上次读到的区间与续读 offset'
   // 已整读（whole）→ 无区间也能拒绝。
   const state2 = new Map([['d.vue', { whole: true, ranges: [] }]])
   assert.match(shouldRejectDuplicateRead(state2, { file_path: 'd.vue' }), /已整读过 d\.vue/)
+})
+
+console.log('\n=== explore-drift 探索漂移三规则 ===')
+function freshDrift() {
+  return { fileLines: new Map(), grepSeq: 0, lastPattern: '', lastGlob: null, wholeReads: new Set() }
+}
+test('规则1：已知 >300 行整读拒绝，带范围放行', () => {
+  const s = freshDrift()
+  s.fileLines.set('big.vue', 483)
+  const d = decideExplorationDrift(s, 'read', { file_path: 'big.vue' }, {})
+  assert.equal(d.verdict, 'block')
+  assert.match(d.message, /offset\/limit/)
+  const d2 = decideExplorationDrift(s, 'read', { file_path: 'big.vue', offset: 1, limit: 60 }, {})
+  assert.equal(d2.verdict, 'pass')
+})
+test('规则1：行数未知首读放行并注入 limit（探针）', () => {
+  const d = decideExplorationDrift(freshDrift(), 'read', { file_path: 'x.js' }, { firstReadLimit: 60 })
+  assert.equal(d.verdict, 'pass')
+  assert.equal(d.injectLimit, 60)
+})
+test('规则1：行数未知同文件第 2 次无范围整读拒绝', () => {
+  const s = freshDrift()
+  s.wholeReads.add('x.js')
+  const d = decideExplorationDrift(s, 'read', { file_path: 'x.js' }, {})
+  assert.equal(d.verdict, 'block')
+  assert.match(d.message, /已整读过一次/)
+})
+test('规则2：同 pattern 连续第 3 次 grep 拒绝，换词重置', () => {
+  const s = freshDrift()
+  s.lastPattern = 'foo'; s.grepSeq = 2
+  const d = decideExplorationDrift(s, 'grep', { pattern: 'foo' }, {})
+  assert.equal(d.verdict, 'block')
+  assert.match(d.message, /BLOCKED.*连续 3 次|连续 \$\{/)
+  const d2 = decideExplorationDrift(s, 'grep', { pattern: 'bar' }, {})
+  assert.equal(d2.verdict, 'pass')
+})
+test('规则2：连续次数不足放行', () => {
+  const s = freshDrift()
+  s.lastPattern = 'foo'; s.grepSeq = 1
+  assert.equal(decideExplorationDrift(s, 'grep', { pattern: 'foo' }, {}).verdict, 'pass')
+})
+test('规则3：60s 内未知根同 pattern 第 2 次 glob 拒绝', () => {
+  const s = freshDrift()
+  s.lastGlob = { pattern: '*.md', ts: Date.now() - 1000 }
+  const d = decideExplorationDrift(s, 'glob', { pattern: '*.md' }, {})
+  assert.equal(d.verdict, 'block')
+  // 带 path 或换 pattern 或超窗 → 放行。
+  assert.equal(decideExplorationDrift(s, 'glob', { pattern: '*.md', path: 'D:/a' }, {}).verdict, 'pass')
+  assert.equal(decideExplorationDrift(s, 'glob', { pattern: '*.ts' }, {}).verdict, 'pass')
+  const s2 = freshDrift()
+  s2.lastGlob = { pattern: '*.md', ts: Date.now() - 61000 }
+  assert.equal(decideExplorationDrift(s2, 'glob', { pattern: '*.md' }, {}).verdict, 'pass')
+})
+test('子代理豁免：三规则全 pass', () => {
+  const s = freshDrift()
+  s.fileLines.set('big.vue', 483)
+  s.lastPattern = 'foo'; s.grepSeq = 5
+  s.lastGlob = { pattern: '*.md', ts: Date.now() }
+  const o = { isSubagent: true }
+  assert.equal(decideExplorationDrift(s, 'read', { file_path: 'big.vue' }, o).verdict, 'pass')
+  assert.equal(decideExplorationDrift(s, 'grep', { pattern: 'foo' }, o).verdict, 'pass')
+  assert.equal(decideExplorationDrift(s, 'glob', { pattern: '*.md' }, o).verdict, 'pass')
+})
+test('block 前缀与空 state 容错', () => {
+  const d = decideExplorationDrift(freshDrift(), 'read', { file_path: 'y.js', offset: 5 }, {})
+  assert.equal(d.verdict, 'pass')
+  assert.equal(decideExplorationDrift(null, 'grep', { pattern: 'x' }, {}).verdict, 'pass')
 })
 
 console.log('\n=== G ask_user_question 缺 id 自动补 ===')

@@ -36,7 +36,7 @@ import os from 'node:os'
 import path from 'node:path'
 
 import { Config } from './config.js'
-import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead } from './rules.js'
+import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift } from './rules.js'
 import { policy } from '../../shared/p0-policy.mjs'
 import { decideInterception } from './scope.js'
 import { evaluateAsk } from './ask-guard.js'
@@ -171,6 +171,28 @@ export function apply(ctx, config) {
   const sessionReads = new Map()
   // ask-guard（P0-1）按 session 记录 ask 历史：{ asks: [{ phase, text }] }。
   const sessionAsks = new Map()
+  // 探索漂移（explore-drift-guard-20261113 M1）按 session 记录形态信号。
+  // LRU 上限防无界增长（审核 P1-3）：超出按最旧插入序淘汰整个会话状态。
+  const sessionDrift = new Map()
+  const DRIFT_MAX_SESSIONS = 200
+  function getSessionDrift(exec) {
+    const sessionId = exec?.agent?.session?.header?.id ?? 'anon'
+    let state = sessionDrift.get(sessionId)
+    if (state === undefined) {
+      if (sessionDrift.size >= DRIFT_MAX_SESSIONS) {
+        const oldest = sessionDrift.keys().next().value
+        if (oldest !== undefined) sessionDrift.delete(oldest)
+      }
+      state = { fileLines: new Map(), grepSeq: 0, lastPattern: '', lastGlob: null }
+      sessionDrift.set(sessionId, state)
+    }
+    return state
+  }
+  /** 子代理判定：header 带 parentSession（dsh-session/index.js:1051/1836）即派生会话。 */
+  function isSubagentSession(exec) {
+    const parent = exec?.agent?.session?.header?.parentSession
+    return typeof parent === 'string' && parent.trim() !== ''
+  }
   function getSessionReads(exec) {
     const sessionId = exec?.agent?.session?.header?.id ?? 'anon'
     let state = sessionReads.get(sessionId)
@@ -226,6 +248,55 @@ export function apply(ctx, config) {
           return duplicate
         }
         recordRead(exec)
+      }
+      // 探索漂移拦截（explore-drift-guard-20261113 M1）：整读门槛/重复盲搜/未知根试错。
+      // warn 模式只记 ledger 不阻断；block 模式拒绝并回改法。规则纯函数在 rules.js。
+      if (config.enabled && config.exploration?.enabled) {
+        const drift = getSessionDrift(exec)
+        const tool = exec?.name
+        const d = decideExplorationDrift(drift, tool, exec?.arguments, {
+          isSubagent: isSubagentSession(exec),
+          maxWholeReadLines: config.exploration.maxWholeReadLines,
+          firstReadLimit: config.exploration.firstReadLimit,
+          minRepeatPattern: config.exploration.minRepeatPattern,
+          globRepeatWindowMs: config.exploration.globRepeatWindowMs,
+        })
+        // 状态回填（在 verdict 判定后、放行前）：
+        if (tool === 'grep' || tool === 'glob') {
+          const pattern = typeof exec?.arguments?.pattern === 'string' ? exec.arguments.pattern : ''
+          if (pattern !== '') {
+            if (pattern === drift.lastPattern) drift.grepSeq += 1
+            else { drift.lastPattern = pattern; drift.grepSeq = 1 }
+          }
+          if (tool === 'glob' && (exec?.arguments?.path == null || exec?.arguments?.path === '')) {
+            drift.lastGlob = { pattern, ts: Date.now() }
+          }
+        }
+        if (d.injectLimit != null && exec?.arguments && typeof exec.arguments === 'object') {
+          // 首读探针：注入 limit；同文件记入 wholeReads，第 2 次无范围整读会被拒。
+          exec.arguments.limit = d.injectLimit
+          if (!(drift.wholeReads instanceof Set)) drift.wholeReads = new Set()
+          const fp = typeof exec.arguments.file_path === 'string' ? exec.arguments.file_path : ''
+          if (fp !== '') drift.wholeReads.add(fp)
+        }
+        if (d.verdict === 'block' || d.injectLimit != null) {
+          appendLedger(ledgerPath, {
+            ts: new Date().toISOString(),
+            kind: 'explore-drift',
+            rule: d.verdict === 'block' ? 'drift-block' : 'first-read-inject',
+            tool: exec?.name,
+            session_id: exec?.agent?.session?.header?.id ?? 'anon',
+            subagent: isSubagentSession(exec),
+            mode: config.exploration.mode ?? 'warn',
+            message: d.message ?? '',
+          })
+          if (d.verdict === 'block') {
+            counters.rejected++
+            log?.warn?.('agent-guard: explore-drift %s: %s', exec?.name, d.message)
+            if ((config.exploration.mode ?? 'warn') === 'block') return d.message
+            // warn：不阻断，但注入的 limit 已生效（首读探针）。
+          }
+        }
       }
       // 二次 ask 拦截（P0-1，.plan/p0-hooks-skills-20261113.md）：warn 只记 ledger 告警，
       // block 才拒绝。判定链在 ask-guard.js（纯函数，可单测）。
