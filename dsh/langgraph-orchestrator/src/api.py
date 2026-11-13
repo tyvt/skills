@@ -27,8 +27,8 @@ PLAN_REVIEW_TOOL = "plan_reviewer"
 # 计划 Markdown 太长会让审核模型 token 爆掉且抓不住重点，超出则截断保留头尾。
 PLAN_REVIEW_CLIP_CHARS = 16000
 # 送审前对计划做「有损结构化抽取」：只送 前因后果/现状与证据/实施方案/验证计划/设计/方案 等核心段，
-# 削掉冗长背景、超长源码粘贴、回滚八股。默认关闭（false 送原计划全文），置 PLAN_REVIEW_SLIM=true 开启。
-PLAN_REVIEW_SLIM = os.getenv("PLAN_REVIEW_SLIM", "false").strip().lower() == "true"
+# 削掉冗长背景、超长源码粘贴、回滚八股。默认开启；置 PLAN_REVIEW_SLIM=false 可回退送原计划全文。
+PLAN_REVIEW_SLIM = os.getenv("PLAN_REVIEW_SLIM", "true").strip().lower() == "true"
 _PLAN_REVIEW_SYSTEM = (
     "你是高级方案审核员。审核提交的 Markdown 计划，重点判断是否存在会阻断落地的问题。\n"
     "【分级】把每个问题标为 P0 / P1 / P2：\n"
