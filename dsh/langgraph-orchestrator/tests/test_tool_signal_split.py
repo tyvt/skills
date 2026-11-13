@@ -58,6 +58,15 @@ def test_new_tool_in_no_local_read_set():
     assert OLD in graph_mod._NO_LOCAL_READ_TOOLS
 
 
+def test_code_selfcheck_system_exists_and_covers_key_points():
+    """[Fix3] 代码工具写前三秒自检：常量存在且覆盖 ESM/pwsh 验证/串行三要点。"""
+    sc = graph_mod.CODE_SELFCHECK_SYSTEM
+    assert "写前三秒自检" in sc
+    assert "ESM" in sc                 # module 类型一致性
+    assert "Write-Output" in sc        # pwsh 解析器验证
+    assert "串行" in sc                 # 禁并发耗时任务
+
+
 # ---------- step 7：触发词单一来源 ----------
 
 def test_signal_triggers_render_into_prompt():

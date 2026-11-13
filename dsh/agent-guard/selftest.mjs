@@ -456,6 +456,45 @@ test('pwsh 无缓冲管道不误报', () => {
   assert.equal(repairs.filter((r) => r.rule === 'pwsh-buffering').length, 0)
 })
 
+console.log('\n=== [Fix2] 前台长任务告警（不改命令，只提示走编排器/后台）===')
+const fgCount = (cmd) => {
+  const args = { command: cmd }
+  const { repairs } = repairArguments({ toolName: 'pwsh', args, schema: {} })
+  assert.equal(args.command, cmd, '命令不被修改')
+  return repairs.filter((r) => r.rule === 'foreground-build').length
+}
+test('[Fix2] npm run build 前台 → 告警', () => {
+  assert.equal(fgCount('npm run build'), 1)
+})
+test('[Fix2] npm test 前台 → 告警', () => {
+  assert.equal(fgCount('npm test'), 1)
+})
+test('[Fix2] vite build 前台 → 告警', () => {
+  assert.equal(fgCount('npx vite build'), 1)
+})
+test('[Fix2] pytest 前台 → 告警', () => {
+  assert.equal(fgCount('python -m pytest -q'), 1)
+})
+test('[Fix2] & 后台运行 → 放行', () => {
+  assert.equal(fgCount('npm run build &'), 0)
+})
+test('[Fix2] Start-Job 后台 → 放行', () => {
+  assert.equal(fgCount('Start-Job { npm run build }'), 0)
+})
+test('[Fix2] 流式重定向 *> log → 放行', () => {
+  assert.equal(fgCount('npm run build *> build.log'), 0)
+})
+test('[Fix2] 管道 | Select-Object 仍是前台 → 告警', () => {
+  assert.equal(fgCount('npm run build | Select-Object -First 5'), 1)
+})
+test('[Fix2] 非 pwsh 工具 → 不告警', () => {
+  const { repairs } = repairArguments({ toolName: 'grep', args: { path: 'src', pattern: 'npm run build' }, schema: {} })
+  assert.equal(repairs.filter((r) => r.rule === 'foreground-build').length, 0)
+})
+test('[Fix2] 普通 pwsh 命令 → 不误报', () => {
+  assert.equal(fgCount('Get-Content package.json'), 0)
+})
+
 console.log('\n=== 检索范围拦截（bug6369：仓库根全量 grep 打穿 prefix cache）===')
 const scopeRoots = ['~/Documents/deepseek-harness/*', '~/.dsh', '~/Documents', 'D:/repository', 'D:/repository/skills']
 const noGit = () => false
@@ -519,6 +558,16 @@ test('dir /s → 拒绝', () => {
 })
 test('带 -Path/-Filter 收窄 → 放行（不误伤定向列举）', () => {
   assert.equal(pwshCall('Get-ChildItem -Path src -Recurse -Filter *.js'), null)
+})
+test('[Fix1] pwsh 拒绝文案含可复制命令（Get-ChildItem -Path + -Filter + glob 模板）', () => {
+  const msg = pwshCall('Get-ChildItem -Recurse')
+  assert.match(msg, /Get-ChildItem -Path/)
+  assert.match(msg, /-Filter \*\./)
+  assert.match(msg, /glob\{ path:/)
+})
+test('[Fix1] pwsh 拒绝文案回填原命令里的目标目录', () => {
+  const msg = pwshCall('Get-ChildItem src/views -Recurse')
+  assert.match(msg, /src\/views/)
 })
 test('无递归旗标 → 放行', () => {
   assert.equal(pwshCall('Get-ChildItem src -Filter *.ts'), null)

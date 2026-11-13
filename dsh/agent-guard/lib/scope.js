@@ -71,14 +71,19 @@ function defaultGitProbe(dir) {
   }
 }
 
-function hint(tool, why) {
+function hint(tool, why, rawPath) {
   // 审计 C1：拒绝时给**可直接照抄的调用**，不要只说「缩到目标业务目录」。按工具给出模板。
+  // P1（heal-4fixes）：把占位符 <模块> 换成真实可粘贴的 pattern 示例，并尽量回填用户原 path。
+  const pathHint = rawPath && String(rawPath).trim() && !REL_ROOTS.has(String(rawPath).trim())
+    ? String(rawPath).trim().replace(/[\\/]+$/, '')
+    : 'src/views/<模块>'
   if (tool === 'glob') {
-    return `[agent-guard] glob 拒绝：${why}。改用具体目录+pattern，例如 `
-      + `glob{ path: "src/views/<模块>", pattern: "**/*.vue" }；还没定目录就先 mcp__openviking__search 定位文件。别扫工作区根。`
+    return `[agent-guard] glob 拒绝：${why}。请直接复制改窄：`
+      + `glob{ path: "${pathHint}", pattern: "**/*.vue" }（path 填具体子目录，pattern 填扩展名）；`
+      + `还没定目录就先 mcp__openviking__search 定位文件。别扫工作区根。`
   }
-  return `[agent-guard] ${tool} 拒绝：${why}。改用具体目录+pattern，例如 `
-    + `grep{ path: "src/views/<模块>", pattern: "<关键词>", include: "*.{ts,vue}" }（include 只写一个 glob）；`
+  return `[agent-guard] ${tool} 拒绝：${why}。请直接复制改窄：`
+    + `grep{ path: "${pathHint}", pattern: "<关键词>", include: "*.{ts,vue}" }（include 只写一个 glob）；`
     + '连目标目录都定不了时先 mcp__openviking__search（mode=context, detail=abstract）定位文件，别全仓 grep。'
 }
 
@@ -101,8 +106,16 @@ const PWSH_NARROW_RE = /(?:-Filter\b|-Include\b|-Depth\b|-Path\b)/i
 function pwshHint(command) {
   const text = String(command).trim()
   const snippet = text.length > 80 ? `${text.slice(0, 80)}…` : text
-  return `[agent-guard] pwsh 拒绝递归列举：${snippet}。改用 glob 指定 pattern，` +
-    '或 Get-ChildItem <具体目录> -Filter <通配> 收窄范围后再列举；别用 -Recurse / -r / /s 全树扫。'
+  // P1（heal-4fixes）：从原命令里抽「列举目标目录」，回填一条可直接复制的收窄命令，
+  // 而不是让模型对着「改用 glob 收窄」自行猜。抽不到就给 <具体目录> 占位并指路定位。
+  // 取 Get-ChildItem/gci/ls/dir 之后的第一个非旗标 token 作为目录；缺失则用占位。
+  const dirMatch = text.match(/(?:Get-ChildItem|\bgci\b|\bls\b|\bdir\b)\s+(?:-Path\s+)?([^\s-][^\s]*)/i)
+  const dir = dirMatch ? dirMatch[1].replace(/[\\/]+$/, '') : '<具体目录>'
+  return `[agent-guard] pwsh 拒绝递归列举：${snippet}。请直接复制改窄后执行：`
+    + `Get-ChildItem -Path ${dir} -Filter *.<扩展名> （单层，不递归）；`
+    + `若要递归找某类文件用：Get-ChildItem -Path ${dir} -Recurse -Filter *.<扩展名>；`
+    + `或用 glob{ path: "${dir}", pattern: "**/*.<扩展名>" }。`
+    + '别用裸 -Recurse / -r / /s 全树扫。'
 }
 
 function decidePwshInterception(args) {
@@ -131,16 +144,16 @@ export function decideInterception({ tool, args, roots = DEFAULT_ROOTS, gitProbe
   if (args === null || typeof args !== 'object') return null
   const raw = args.path
   const s = raw === undefined || raw === null ? '' : String(raw).trim()
-  if (REL_ROOTS.has(s)) return hint(tool, 'path 未指定或指向工作区根')
+  if (REL_ROOTS.has(s)) return hint(tool, 'path 未指定或指向工作区根', s)
   const dir = normalizeDir(expandHome(s))
   if (!dir) return null // 相对业务路径（src/views/xxx 等）：放行
   for (const root of roots) {
     const r = normalizeDir(expandHome(String(root)))
-    if (r && isAncestorOrEqual(dir, r)) return hint(tool, `${s} 是受保护容器 ${root} 本身或其上层`)
+    if (r && isAncestorOrEqual(dir, r)) return hint(tool, `${s} 是受保护容器 ${root} 本身或其上层`, s)
   }
   for (const root of roots) {
-    if (matchWildcardChild(dir, String(root))) return hint(tool, `${s} 是 workspace 根目录级检索`)
+    if (matchWildcardChild(dir, String(root))) return hint(tool, `${s} 是 workspace 根目录级检索`, s)
   }
-  if (gitProbe(dir)) return hint(tool, `${s} 是 git 仓库根`)
+  if (gitProbe(dir)) return hint(tool, `${s} 是 git 仓库根`, s)
   return null
 }

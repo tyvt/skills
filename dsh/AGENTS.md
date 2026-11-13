@@ -47,6 +47,7 @@
 ## 长任务日志与半分钟监听（强制，所有会话生效）
 
 - **任何预计可能超过 1 分钟的任务（build、全量测试、批量查询、长编排、大目录检索、部署）都必须加日志 + 可观测监听**，禁止静默长时间阻塞等待。
+- **前台长任务硬约束（heal-4fixes Fix2）**：预期 >30s 的 `build`/`test`/`install`（`npm [run] build|test`、`vite build`、`pytest`、`vitest`、`jest` 等）**禁止在主模型 `pwsh` 前台直跑**；改用 `orchestrate {op:"full", execution:{program,args}}` 结构化通道，或 `pwsh` 加 `run_in_background: true` 让日志落 `.task-state` 再半分钟读一次。`agent-guard` 已对该类前台命令出 `foreground-build` warn（不改命令、不阻断，灰度），收到告警即改道。
 - 用 `dsh/scripts/task-watchdog.ps1` 以 `run_in_background: true` 启动：它写 `.task-state/<name>.state.json` 并每 30 秒打印一次心跳；主控**每半分钟**用 `job_output` 读一次状态，出现 `STALL` 或长时间无心跳要告警/止损，不要干等。
 - 长操作一律走编排器 `op:"full"`，并依赖其进度日志判断是否卡住；`orchestrate` 若返回 `stalled`/超时，必须立即查 `.task-state` 与 stderr 尾部，而不是重试同一形态。
 - **build 基线异步化 + 豁免时限（P0-3，2026-11-13）**：预计要改文件的会话，开工（edit/write 之前）即用 `task-watchdog.ps1` 后台起基线 build（结果落 `.task-state/build-baseline.state.json`，并发 ≤1），或读最近一次构建结果；改动仅含 scoped CSS/注释/文案的 CSS-only 豁免**只能在改动开始前声明**——一旦已开始改文件，必须有基线或写「未执行+原因」，禁止改完再豁免。

@@ -488,6 +488,41 @@ export function warnBareGitStatus(toolName, args) {
 }
 
 /**
+ * 前台长任务告警（heal-4fixes Fix2）。
+ *
+ * 模型常在主模型前台直跑 `npm run build`/`vite build`/`npm test`/`pytest` 等预期 >30s
+ * 的命令：阻塞 + 海量日志回灌触发多次 compaction（memory `vite_build_stuck`）。编排器
+ * `execution.py` 已有结构化外包通道，这里做**纯告警、不改命令、不阻断**（灰度），
+ * 提示改 `orchestrate{op:"full",execution:...}` 或 `run_in_background:true`。
+ *
+ * 命中：tool==='pwsh' 且命令**词边界**命中构建/测试命令词。
+ * 放行（不报告）：
+ *   - 后台写法：`&`（PS 后台运算符）、`Start-Job`、`Start-Process`；
+ *   - 流式重定向到文件：`*> file` / `2> file` / `> file`；
+ *   - 注意：管道 `|` **不放行**（`npm run build | Select-Object -First 5` 仍是前台阻塞）。
+ * 保守优先：宁可漏报也不误伤已后台化的写法。
+ *
+ * @param {string} toolName - 工具名。
+ * @param {object} args - 参数（不修改）。
+ * @returns {object[]} 告警清单。
+ */
+const BUILD_TEST_RE = /(?:\bnpm\b|\bpnpm\b|\byarn\b|\bbun\b|\bvite\b|\bpytest\b|\bvitest\b|\bjest\b|\btsc\b|rollup|esbuild)/i
+const BUILD_VERB_RE = /\b(?:run\s+)?(?:build|test|install|ci)\b|(?:\bvite\s+build\b)|(?:\bpytest\b)|(?:\bvitest\b)|(?:\bjest\b)/i
+const BACKGROUND_RE = /(?:^|[^&])&\s*$|&(?:\s|$)|Start-Job|Start-Process|\*\s*>|\d?\s*>\s*\S+/i
+export function warnForegroundBuild(toolName, args) {
+  if (toolName !== 'pwsh') return []
+  const command = args?.command
+  if (typeof command !== 'string' || command.trim() === '') return []
+  if (!BUILD_TEST_RE.test(command)) return []
+  if (!BUILD_VERB_RE.test(command)) return []
+  if (BACKGROUND_RE.test(command)) return []
+  return [{
+    rule: 'foreground-build',
+    detail: 'build/test/install 类命令在主模型前台直跑会阻塞并回灌海量日志（易触发 compaction）。预期 >30s 时改用 orchestrate{op:"full", execution:{program,args}} 或 pwsh 加 run_in_background:true，日志落 .task-state 再半分钟读一次。',
+  }]
+}
+
+/**
  * PowerShell POSIX 兼容预检（审计 P1-5）。
  *
  * 模型常在 pwsh 里写 POSIX 管道命令，Windows pwsh 没有 head/tail/cat/grep/sed/awk/wc/find。
@@ -782,6 +817,7 @@ export function repairArguments({ toolName, args, schema, rules = ALL_RULES }) {
     repairs.push(...repairPwshPosix(toolName, args))
     repairs.push(...warnPwshBuffering(toolName, args))
     repairs.push(...warnBareGitStatus(toolName, args))
+    repairs.push(...warnForegroundBuild(toolName, args))
     repairs.push(...repairGlobPath(toolName, args))
   }
   if (rules.escalation === true) repairs.push(...repairEscalationArgs(args, schema))

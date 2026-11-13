@@ -105,6 +105,18 @@ NO_LOCAL_FILE_SYSTEM = (
 )
 _NO_LOCAL_READ_TOOLS = frozenset({"file_reader", "code_editor", "code_edit_with_signal"})
 
+# 一次性脚本「写前三秒自检」（heal-4fixes Fix3）。
+# 直写 mjs / 复杂 pwsh 管道常因环境不兼容（CommonJS vs type:module）、解析器行为误判而语法错、
+# 反复自愈烧 token。此自检注入 code_editor / code_edit_with_signal 与 pwsh 生成两处系统提示。
+# 注意：本文件的代码工具无本地读盘权限，严禁要求它们去读 package.json；只能在有上下文时遵循。
+CODE_SELFCHECK_SYSTEM = (
+    "【写前三秒自检】"
+    "1) 若上下文已给出 module/type 信息则遵循；未给出时默认按 ESM 写（import/export），"
+    "并在回复首行标注“假定 ESM”，不要自行声称读过 package.json。"
+    "2) 复杂 pwsh 管道先给一条 `Write-Output` 小命令验证解析器行为，再上正式命令。"
+    "3) 禁止在脚本/命令里并发启动多个耗时任务（并发 build 会污染基准），必须串行。"
+)
+
 # ===================================================================== #
 # off-task（跑题）检测与真实流量触发率统计
 # ===================================================================== #
@@ -1096,6 +1108,8 @@ def build_graph(router: ModelRouter, cfg):
                         "Select-String -Path <相对路径> -Pattern \"关键词\"；"
                         "不要加变量赋值（$x = ...）、Set-Location、管道后处理或正文解析代码，"
                         "由调用方自己解读返回内容。"
+                        "【自检】复杂管道先用一条 Write-Output 小命令验证解析器行为再上正式命令；"
+                        "禁止一条命令里并发启动多个耗时任务（并发 build 污染基准，必须串行）。"
                     )},
                     {
                         "role": "user",
@@ -1237,6 +1251,8 @@ def build_graph(router: ModelRouter, cfg):
         messages: List[Dict[str, str]] = [{"role": "user", "content": prompt}]
         if tool_name in _NO_LOCAL_READ_TOOLS:
             messages.insert(0, {"role": "system", "content": NO_LOCAL_FILE_SYSTEM})
+        if tool_name in ("code_editor", "code_edit_with_signal"):
+            messages.insert(0, {"role": "system", "content": CODE_SELFCHECK_SYSTEM})
         res: ToolResult = router.run_tool(tool_name, messages)
         content = res.content or ""
 
