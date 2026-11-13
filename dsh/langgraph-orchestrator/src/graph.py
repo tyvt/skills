@@ -1001,6 +1001,8 @@ def build_graph(router: ModelRouter, cfg):
             # 行级白名单：只留 工具名/exit 码/文件路径/状态关键字 行，其余 [redacted]。
             keep = re.compile(
                 r"exit\s*=|^\[步骤|tool=|\.py\b|\.ts\b|\.vue\b|\.js\b|\.json\b|\.md\b"
+                r"|\.ya?ml\b|\.ps1\b|\.mjs\b|\.jsonc\b|\.txt\b"
+                r"|^\s*\d+\s+\d+\s+\S"
                 r"|fail|error|warn|passed|failed|ok=|ALLOW|DENY",
                 re.I,
             )
