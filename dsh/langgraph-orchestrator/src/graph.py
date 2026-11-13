@@ -147,51 +147,96 @@ ROUTE_FORCED = "forced"              # 测试/人工强制指定
 _SIGNAL_TOOL = "code_edit_with_signal"
 _CODE_TOOLS = frozenset({"code_editor", _SIGNAL_TOOL})
 
+# ---------------------------------------------------------------------
+# 弱信号改造（2026-11-13）：expected_tool 是日志对照用的关键词弱分类器。
+# 教训：执行类请求（npm run build / eslint / Select-String 检索 / python 统计）
+# 天然携带「验证/代码/脚本」字眼，旧版子串匹配把 5 条执行请求全判成假 MISS。
+# 三级判定：①命令形态执行标记压倒一切 ②signal 触发词 ③code 词排除纯分析。
+# 标记词全部用命令形态（npm run / python -c），不用裸词（python/build），
+# 否则会把「写 python 函数」「实现 build 功能」这类编码请求误判为执行意图。
+# ---------------------------------------------------------------------
+_EXEC_MARKERS: tuple = (
+    "npm run", "npm test", "eslint", "python -c", "python -m",
+    "node ../", "select-string", "get-childitem", "get-content",
+    "exit code", "回传 exit", "命令：",
+)
+_ANALYSIS_WORDS = ("解释", "说明", "分析", "为什么", "是什么", "怎么用")
+_CODE_WORDS = ("写", "实现", "修改", "重构", "函数", "代码", "代码片段",
+               "def ", "class ", "脚本", "报错")
+
 _ROUTE_LOG = Path(__file__).resolve().parent.parent / ".sessions" / "route.jsonl"
 
 
-def expected_tool(user_request: str) -> Optional[str]:
-    """按 SIGNAL_TRIGGERS 粗判「理想工具」，仅用于日志对照，不用于实际调度。
+def _classify_request(user_request: str) -> tuple:
+    """三级判定「理想工具」。返回 (expected, why, base)。
 
-    返回 _SIGNAL_TOOL / "code_editor" / None（无法判定）。
+    expected: _SIGNAL_TOOL / "code_editor" / None
+    why:      命中词与判定路径，落盘 route.jsonl 供人工复核
+    base:     "exec"（执行意图/无代码诉求）| "expected"（明确工具期望）
+              | "ambiguous"（有工具味但证据不足，仅观测不判 MISS）
     """
     text = (user_request or "").lower()
     if not text.strip():
-        return None
-    hit = any(w.lower() in text for words in SIGNAL_TRIGGERS.values() for w in words)
-    if hit:
-        return _SIGNAL_TOOL
-    # 只有「写代码」类诉求但没有验证信号时，才期望 code_editor
-    code_words = ("写", "实现", "修改", "重构", "函数", "代码", "代码片段",
-                  "def ", "class ", "脚本", "报错")
-    if any(w in text for w in code_words):
-        return "code_editor"
-    return None
+        return None, "empty", "exec"
+    # ① 强执行标记（命令形态）：执行意图压倒工具词
+    for w in _EXEC_MARKERS:
+        if w in text:
+            return None, f"exec_marker={w}", "exec"
+    # ② signal 触发词（保持旧口径：触发即期望 signal——「跑 pytest 验证一下」
+    #    这类真样本已由回归测试锁定，不引入共现条件以免漏报）
+    for words in SIGNAL_TRIGGERS.values():
+        for w in words:
+            if w.lower() in text:
+                return _SIGNAL_TOOL, f"signal_trigger={w}", "expected"
+    # ③ code 词 → 期望 code_editor；纯分析诉求排除
+    for w in _CODE_WORDS:
+        if w in text:
+            for a in _ANALYSIS_WORDS:
+                if a in text:
+                    return None, f"analysis_only={w}+{a}", "ambiguous"
+            return "code_editor", f"code_word={w}", "expected"
+    return None, "no_code_intent", "exec"
+
+
+def expected_tool(user_request: str) -> Optional[str]:
+    """按弱信号三级判定「理想工具」，仅用于日志对照，不用于实际调度。
+
+    返回 _SIGNAL_TOOL / "code_editor" / None（执行意图或无法判定）。
+    """
+    return _classify_request(user_request)[0]
 
 
 def route_miss(user_request: str, chosen_tool: str, route_source: str,
                plan_tools: Optional[List[str]] = None) -> Optional[Dict[str, str]]:
-    """判定本次路由是否 miss；命中返回详情，否则 None。
+    """判定本次路由是否 miss；命中返回详情（含 why），否则 None。
 
-    2026-11-13 实战修正两处：
+    2026-11-13 历次修正：
     1) 初版只把 code_editor / planner 计为误选，漏了 pwsh。
-    2) 更关键的：初版只看 plan[0]。但多步计划里第一步用 pwsh 去「定位报错文件」、
-       第二步才用 code_edit_with_signal 修复，是完全合理的——把首步当最终路由会误判。
-       因此若 plan_tools 里已经包含期望工具，就不算 MISS。
+    2) 初版只看 plan[0]；多步计划「pwsh 定位 -> signal 修复」是正当的，
+       plan_tools 已含期望工具则不算 MISS（f8dec839）。
+    3) 弱信号改造：命令形态执行标记先行；plan_tools 反向验证——
+       code_editor 期望但整份计划全为执行类工具时视为执行形态，不计 MISS
+       （修复「修改时间」这类携带 code 字眼的纯执行请求残余误报）。
+       signal 期望不反向豁免：修复报错类真样本全执行计划仍是真 MISS（有回归锁定）。
     """
     if route_source != ROUTE_PLANNER:
         return None  # 兜底/强制的路由不算规划器的错
-    want = expected_tool(user_request)
+    want, why, _base = _classify_request(user_request)
     if want is None:
         return None
     # 计划后续步骤已经用到了正确工具 -> 不算 MISS
     if plan_tools and want in plan_tools:
         return None
+    # plan_tools 反向验证（仅 code_editor 路径）：整份计划全是执行类工具
+    # -> 规划器已把请求当执行形态处理，expected 是残余误报
+    if want == "code_editor" and plan_tools and \
+            not any(t in _CODE_TOOLS for t in plan_tools):
+        return None
     if chosen_tool == want:
         return None
     if want not in _CODE_TOOLS:
         return None
-    return {"expected": want, "got": chosen_tool}
+    return {"expected": want, "got": chosen_tool, "why": why}
 
 
 def log_route(
@@ -206,6 +251,18 @@ def log_route(
     「多步计划里第一步定位、第二步改代码」——后者是正当的，算成 MISS 会误报。
     """
     try:
+        # decision/why：MISS 判定的可解释化（2026-11-13）。
+        # miss 行直接带 route_miss 给出的 why；非 miss 行按弱信号分级落盘
+        # ambiguous/exec 供趋势观察，不计入 miss 统计（r["miss"] 恒为 False）。
+        _want, _why, _base = _classify_request(user_request)
+        if miss:
+            decision, why = "miss", miss.get("why") or _why
+        elif _base == "ambiguous":
+            decision, why = "ambiguous", _why
+        elif _base == "exec":
+            decision, why = "exec", _why
+        else:
+            decision, why = "ok", _why
         row = {
             "ts": time.time(),
             "session_id": session_id,
@@ -213,6 +270,8 @@ def log_route(
             "chosen": chosen_tool,
             "expected": (miss or {}).get("expected"),
             "miss": bool(miss),
+            "decision": decision,
+            "why": why,
             "steps": step_count,
             "plan_tools": list(plan_tools or []),
             "request_head": (user_request or "")[:200],
@@ -827,7 +886,7 @@ def build_graph(router: ModelRouter, cfg):
         miss = route_miss(state["user_request"], chosen, route_source, plan_tools)
         if miss:
             trace.append(
-                f"[ROUTE-MISS] 期望 {miss['expected']} 实际 {miss['got']} "
+                f"[ROUTE-MISS] 期望 {miss['expected']} 实际 {miss['got']} why={miss.get('why')} "
                 f"（plan={plan_tools}, route_source={route_source}）"
             )
         log_route(

@@ -85,12 +85,28 @@ def main():
     for name, n in sorted(src.items(), key=lambda x: -x[1]):
         print("  %-22s %4d  (%5.1f%%)" % (name, n, 100.0 * n / len(rows)))
 
-    # 2) 只在 planner 正常路由里算 miss（兜底不算规划器的错）
+    # 2) 判定分级分布（2026-11-13 弱信号改造新增）
+    # decision: miss=真 MISS | ok=正常 | ambiguous=弱命中仅观测 | exec=执行意图
+    # 旧行（无 decision 键）按 miss 标志折算，保持旧口径可读。
+    print("\n--- decision 分布 ---")
+    for r in rows:
+        if "decision" not in r:
+            r["decision"] = "miss" if r.get("miss") else "ok"
+    dec = defaultdict(int)
+    for r in rows:
+        dec[r.get("decision") or "?"] += 1
+    for name, n in sorted(dec.items(), key=lambda x: -x[1]):
+        print("  %-12s %4d  (%5.1f%%)" % (name, n, 100.0 * n / len(rows)))
+
+    # 2.5) 只在 planner 正常路由里算 miss（兜底不算规划器的错）
     normal = [r for r in rows if r.get("route_source") == "planner"]
     print("\n--- 分流命中率（仅 route_source=planner，n=%d）---" % len(normal))
     if normal:
-        miss = sum(1 for r in normal if r.get("miss"))
+        miss = sum(1 for r in normal if r.get("decision") == "miss")
         print("  MISS: " + pct(miss, len(normal)))
+        amb = sum(1 for r in normal if r.get("decision") == "ambiguous")
+        if amb:
+            print("  ambiguous(不计 MISS，仅观测): " + pct(amb, len(normal)))
     else:
         print("  （无正常规划路由样本）")
 
@@ -102,14 +118,20 @@ def main():
         print("  未定义工具率(unknown_tool): " + pct(unk, len(rows)))
 
     # 4) MISS 的实际去向——决定下一步调什么
-    print("\n--- MISS 去向（期望 -> 实际）---")
+    print("\n--- MISS 去向（期望 -> 实际，附 why）---")
     flow = defaultdict(int)
+    why_by_pair = {}
     for r in normal:
-        if r.get("miss"):
-            flow[(r.get("expected"), r.get("chosen"))] += 1
+        if r.get("decision") == "miss":
+            pair = (r.get("expected"), r.get("chosen"))
+            flow[pair] += 1
+            w = r.get("why")
+            if w:
+                why_by_pair[pair] = w
     if flow:
         for (exp, got), n in sorted(flow.items(), key=lambda x: -x[1]):
-            print("  %-22s -> %-22s %d" % (exp, got, n))
+            w = why_by_pair.get((exp, got), "")
+            print("  %-22s -> %-22s %d  %s" % (exp, got, n, w))
     else:
         print("  （无 MISS）")
 

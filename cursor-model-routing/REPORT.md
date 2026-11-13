@@ -216,6 +216,16 @@
 
 ## 七、复现
 
+### 7.0 测量方法警示：编排器 ROUTE-MISS 计数不是路由失效率（2026-11-13）
+
+引用本报告或 langgraph-orchestrator 路由数据时的口径约束：
+
+- `.sessions/route.jsonl` 的 `[ROUTE-MISS]` 由 `expected_tool()` 关键词弱分类器产生，**是「候选警报」，不是「路由失效率」，禁止直接当 KPI 引用**。
+- 2026-11-13 复盘实证：5 条执行类请求（npm run build / eslint 校验 / Select-String 检索 / python 统计 jsonl）因携带「验证 / 代码 / 脚本」字眼被旧版子串匹配全判为假 MISS（4/4 复核为误报，pwsh 实际派发全部正确）。
+- 该教训与 composer-2.5 的「虚构交付物」检测教训同构：**弱分类器的单类命中不构成统计结论**——offtask 正则当时仅 1 正类/11 负类不具统计意义，ROUTE-MISS 同理，归因必须结合 plan_tools、decision/why 字段与人工复核。
+- 弱信号改造后的正确口径：MISS 仅计 `decision=miss` 行；`ambiguous`（弱命中仅观测）与 `exec`（执行意图）不计入；多步计划 plan_tools 已含期望工具的正向豁免、code_editor 期望且计划全执行形态的反向豁免均已在判定内生效。
+- 复现/核查入口：`python scripts/route_stats.py`（含 decision 分布与 MISS 去向 why）。
+
 ```powershell
 cd D:\repository\skills\cursor-model-routing
 pwsh run-matrix.ps1 -Suite smoke             # 11 模型冒烟
