@@ -169,10 +169,16 @@ def _apply_env_delta(ctx: Dict[str, Any], command: str, content: str) -> Dict[st
 # 审查白名单：以这些只读命令开头，且没有命令拼接符，才跳过 Grok。
 _WHITELIST_PREFIX = re.compile(
     r"^(?:请|执行|运行)?\s*"
-    r"(Get-ChildItem|Get-Location|Get-Date|Test-Path|git\s+status|git\s+diff|python\s+-m\s+pytest)\b",
+    r"(Get-ChildItem|Get-Location|Get-Date|Test-Path|git\s+status|git\s+diff|git\s+log|python\s+-m\s+pytest)\b",
     re.I,
 )
 _DANGEROUS_CHARS = re.compile(r"[;&|`]|\$\(|>>?|<")
+
+# git 只读子命令（status/diff/log）的写/执行面参数黑名单（黑名单制而非白名单制，
+# 避免打断 --grep/--author/-S 等常用只读带值参数）。命中即不放行，回退终审。
+_GIT_WRITE_ARGS = re.compile(
+    r"(?i)--output(?:=|\s)|--ext-diff\b|--upload-pack\b|--exec\b|--receive-pack\b"
+)
 
 # Get-Content / Select-String 窄放行（v2 计划，见 .plan/6f0992433bb9.md）：
 # 仅显式 cmdlet 全名 + 当前目录相对路径 + 允许参数白名单，其余一律回退 flash→grok 原链路（fail-safe）。
@@ -341,6 +347,11 @@ _RISK_WORDS = re.compile(
     re.I,
 )
 
+# 密钥模式扫描（summarize 失败回退尾部脱敏用）
+_SECRET_PATTERN = re.compile(
+    r"(?i)(sk-[A-Za-z0-9]{8,}|AKIA[A-Z0-9]{8,}|bearer\s+[A-Za-z0-9._-]{10,}|api[_-]?key\s*[=:])"
+)
+
 def _safe_write_command(command: str) -> bool:
     """只放行当前目录下建目录，或写相对路径的 json/txt/md。"""
     s = (command or "").strip()
@@ -367,6 +378,9 @@ def _whitelist_bypass(text: str, deny_patterns, roots: Optional[List[str]] = Non
     if any(p.search(s) for p in deny_patterns):
         return False
     if _WHITELIST_PREFIX.match(s) is not None:
+        # git 只读子命令（status/diff/log）额外过写/执行面参数黑名单
+        if re.match(r"(?i)^git\s+", s) and _GIT_WRITE_ARGS.search(s):
+            return False
         return True
     if _readonly_read_ok(s):
         return True
@@ -967,7 +981,7 @@ def build_graph(router: ModelRouter, cfg):
             for i, r in enumerate(results)
         )
         res = router.run_tool(
-            "file_reader",
+            "summarizer",
             [
                 {"role": "system", "content": "你是汇总器。把各步骤结果整合成对用户连贯的最终答复，去除重复与中间过程。"},
                 {"role": "user", "content": f"用户需求：{state['user_request']}\n\n各步骤结果：\n{joined}"},
@@ -980,7 +994,22 @@ def build_graph(router: ModelRouter, cfg):
             "role": "summarize", "model": res.model_used, "ok": res.ok,
             "elapsed": _elapsed(res), "usage": _usage_dict(res),
         })
-        final = _clip(res.content or "", 2000, 2000) if res.ok else joined
+        if res.ok:
+            final = _clip(res.content or "", 2000, 2000)
+        else:
+            # 两级模型全失败：输出带 [未摘要] 标注的行级脱敏尾部，绝不静默裸回。
+            # 行级白名单：只留 工具名/exit 码/文件路径/状态关键字 行，其余 [redacted]。
+            keep = re.compile(
+                r"exit\s*=|^\[步骤|tool=|\.py\b|\.ts\b|\.vue\b|\.js\b|\.json\b|\.md\b"
+                r"|fail|error|warn|passed|failed|ok=|ALLOW|DENY",
+                re.I,
+            )
+            lines = []
+            for ln in joined.splitlines():
+                lines.append(ln if (keep.search(ln) and not _SECRET_PATTERN.search(ln)) else "[redacted]")
+            tail = "\n".join(lines)[-2000:]
+            reason = ((res.attempts[-1].error if res.attempts else "") or "unknown").splitlines()[0][:120]
+            final = f"[未摘要·失败原因:{reason}·池:summarizer]\n{tail}"
         return {"final": final, "trace": trace, "model_calls": calls}
 
     g = StateGraph(OrchState)
