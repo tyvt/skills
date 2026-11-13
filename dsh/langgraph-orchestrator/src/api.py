@@ -24,15 +24,22 @@ PLAN_REVIEW_TOOL = "plan_reviewer"
 # 计划 Markdown 太长会让审核模型 token 爆掉且抓不住重点，超出则截断保留头尾。
 PLAN_REVIEW_CLIP_CHARS = 16000
 _PLAN_REVIEW_SYSTEM = (
-    "你是高级方案审核员。严格审核提交的 Markdown 计划是否满足以下要求：\n"
-    "1) 前因后果清楚：讲清任务/Bug 的背景、问题现象与根因；\n"
-    "2) 实施方案可落地且分布合理：分步、每步落哪个文件、怎么验证，步骤之间无遗漏或矛盾；\n"
-    "3) 有风险与回滚：列出可能风险及失败时的回滚/止损办法；\n"
-    "4) 有验证步骤：可执行的验收验证计划。\n"
+    "你是高级方案审核员。审核提交的 Markdown 计划，重点判断是否存在会阻断落地的问题。\n"
+    "【分级】把每个问题标为 P0 / P1 / P2：\n"
+    "- P0（阻断落地）：不修就无法安全/正确实施，或会直接导致事故。仅以下情形算 P0：\n"
+    "  a) 缺关键前置事实/依赖，按计划执行必然失败；\n"
+    "  b) 存在会破坏数据/环境/历史的不可逆操作且无回滚；\n"
+    "  c) 涉及高危写操作（删库/强推/越权）且无防护；\n"
+    "  d) 实施方案自相矛盾或关键步骤缺失，无法落地；\n"
+    "  e) 明确违反仓库/安全硬规则（如提交 .env、绕过 gate）。\n"
+    "- P1（重要但不阻断）：影响质量/可维护性，可在实施中处理（如验证偏弱、边界未覆盖）。\n"
+    "- P2（建议）：措辞、排版、可优化项。\n"
+    "【灰区】拿不准是 P0 还是 P1 的，一律判 P1，并在该条文本末尾标注「（灰区，待人确认）」。\n"
+    "【判定】verdict=reject 当且仅当存在 P0 问题；P1/P2 一律判 pass。score 仅作参考，不参与判定。\n"
     "只输出一个 JSON 对象，不要任何解释文字或代码块标记，字段为："
-    '{"verdict":"pass"|"reject","score":0-100,"issues":["..."],"suggestions":["..."]}。\n'
-    "score 为整体质量分（0-100）；只要存在阻断落地的问题，verdict 必须为 reject，"
-    "score 低于 70 也应判 reject。issues 写具体问题，suggestions 写可直接执行的修改建议。"
+    '{"verdict":"pass"|"reject","score":0-100,'
+    '"issues":[{"level":"P0"|"P1"|"P2","text":"..."}],"suggestions":["..."]}。\n'
+    "issues 写具体问题并标注 level，suggestions 写可直接执行的修改建议。"
 )
 _SESSION_ID = re.compile(r"^[A-Za-z0-9_-]{8,128}$")
 _RESET = re.compile(r"重置环境|回到根目录")
@@ -205,35 +212,60 @@ def _extract_json_object(text: str) -> Optional[Dict[str, Any]]:
 
 
 def _normalize_review(obj: Optional[Dict[str, Any]], raw: str) -> Dict[str, Any]:
-    """把审核模型输出收敛成稳定结构；解析失败时按 reject 保守处理。"""
+    """把审核模型输出收敛成稳定结构；解析失败时按 reject 保守处理。
+
+    仅 P0 阻断：verdict=reject 当且仅当存在 level=P0 的问题；score 不参与判定。
+    """
     if not isinstance(obj, dict):
         return {
             "verdict": "reject",
             "score": 0,
-            "issues": ["审核模型输出无法解析为 JSON，按保守策略判 reject", (raw or "")[:500]],
+            "issues": [{"level": "P0", "text": "审核模型输出无法解析为 JSON，按保守策略判 reject"},
+                       {"level": "P0", "text": (raw or "")[:500]}],
+            "issue_texts": ["审核模型输出无法解析为 JSON，按保守策略判 reject", (raw or "")[:500]],
+            "p0_count": 2,
             "suggestions": ["请人工复核计划，或重试 plan_review"],
         }
-    verdict = str(obj.get("verdict", "")).strip().lower()
-    if verdict not in ("pass", "reject"):
-        verdict = "reject"
     try:
         score = int(obj.get("score", 0))
     except (TypeError, ValueError):
         score = 0
     score = max(0, min(100, score))
+
+    def _norm_issues(v):
+        """兼容两种格式：对象数组 [{level,text}] 或旧字符串数组。旧字符串默认 P1（不阻断）。"""
+        out = []
+        items = v if isinstance(v, list) else ([v] if v not in (None, "") else [])
+        for it in items:
+            if isinstance(it, dict):
+                text = str(it.get("text", "")).strip()
+                lvl = str(it.get("level", "")).strip().upper()
+                if lvl not in ("P0", "P1", "P2"):
+                    lvl = "P1"
+            else:
+                text = str(it).strip()
+                lvl = "P1"
+            if text:
+                out.append({"level": lvl, "text": text})
+        return out
+
     def _as_list(v):
         if isinstance(v, list):
             return [str(x) for x in v]
         if v in (None, ""):
             return []
         return [str(v)]
-    # 与判定对齐：分数不足 70 的 pass 视为 reject，避免「勉强通过」。
-    if verdict == "pass" and score < 70:
-        verdict = "reject"
+
+    issues = _norm_issues(obj.get("issues"))
+    p0_count = sum(1 for i in issues if i["level"] == "P0")
+    # 一致性裁决：只看是否有 P0，忽略模型原始 verdict 与 score（score 不参与判定）。
+    verdict = "reject" if p0_count > 0 else "pass"
     return {
         "verdict": verdict,
         "score": score,
-        "issues": _as_list(obj.get("issues")),
+        "issues": issues,
+        "issue_texts": [i["text"] for i in issues],
+        "p0_count": p0_count,
         "suggestions": _as_list(obj.get("suggestions")),
     }
 
