@@ -1,0 +1,78 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-11-13",
+    "purpose": "Cursor 模型分流测试集 T1-T7：同一 prompt 分别喂给不同 cursor 模型，比较 耗时/token/缓存命中/质量。每题自包含，不依赖外部文件。",
+    "scoring": {
+      "quality": "1-5 人工判读（初版留空，见 REPORT.md 填写）",
+      "cache_hit_pct": "cached_tokens / prompt_tokens * 100",
+      "pass_first_try": "一遍过：输出是否无需返工即满足判据"
+    }
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "type": "单文件快速修改",
+      "expect_model": "composer",
+      "prompt": "下面是一个 JS 函数。请只做一处修改：为参数 age 增加校验（必须为非负整数，否则 throw new RangeError），保持现有代码风格，不引入新依赖，不改其它逻辑。只输出修改后的完整函数。\n\nfunction buildProfile(name, age) {\n  const profile = { name, age };\n  if (age >= 18) profile.adult = true;\n  return profile;\n}",
+      "criteria": "1) 仅在 buildProfile 内加校验；2) 校验逻辑正确（负数/小数/非数均抛 RangeError）；3) 保持风格、无新依赖；4) 未改动 adult 逻辑。",
+      "observe": "是否过度思考/diff 是否干净/耗时"
+    },
+    {
+      "id": "T2",
+      "type": "多文件跨模块重构",
+      "expect_model": "composer",
+      "prompt": "把下面基于回调的 loadUser 改写为 async/await 版本，并同步更新两个调用方。要求：1) loadUser 返回 Promise；2) 错误用 try/catch 或 Promise.reject 传播；3) 调用方不再传 callback；4) 保持行为等价。输出三个文件改后的代码块并标注文件名。\n\n// api.js\nexport function loadUser(id, cb) {\n  db.get(id, (err, row) => cb(err, row));\n}\n\n// profile.js\nimport { loadUser } from './api';\nexport function renderProfile(id) {\n  loadUser(id, (err, user) => {\n    if (err) return console.error(err);\n    console.log(user.name);\n  });\n}\n\n// list.js\nimport { loadUser } from './api';\nfunction loadAll(ids) {\n  ids.forEach(id => loadUser(id, (e, u) => e ? console.warn(e) : console.log(u)));\n}",
+      "criteria": "1) 三处调用点全部改动无遗漏；2) 错误传播正确；3) 行为等价；4) 无回调残留。",
+      "observe": "跨文件一致性/是否漏改调用方"
+    },
+    {
+      "id": "T3",
+      "type": "终端/CLI 调试",
+      "expect_model": "composer",
+      "prompt": "一个 Node 脚本在 CI 报错：Error: Cannot find module './config/production'。本地 src/index.js 里写的是 require('./config/' + process.env.NODE_ENV)。请给出：1) 最可能的 3 个成因（按概率排序）；2) 每个成因对应的一条验证命令（PowerShell 或 bash 均可）；3) 最可能的修复方案。只输出结论，不要泛泛而谈。",
+      "criteria": "1) 成因覆盖 NODE_ENV 未设置/文件不存在/大小写与扩展名；2) 验证命令具体可跑；3) 修复明确；4) 不空泛。",
+      "observe": "命令选择/错误定位效率/是否反复试错"
+    },
+    {
+      "id": "T4",
+      "type": "长上下文代码库理解",
+      "expect_model": "grok",
+      "prompt": "阅读下面这段（虚构）模块代码，回答：数据从 HTTP 入口到写入数据库经过哪几个函数？中间对数据做了哪三处变换？指出调用链中任意一个可能的空指针风险点并说明条件。要求引用具体函数名。\n\n// router.js\nexport async function handleCreate(req, res) {\n  const payload = parseBody(req.body);\n  const normalized = normalizeUser(payload);\n  const saved = await persistUser(normalized);\n  res.json({ id: saved.id });\n}\nfunction parseBody(b) { return { name: b.name?.trim(), email: b.email?.toLowerCase(), age: Number(b.age) }; }\nfunction normalizeUser(u) { u.name = u.name || 'anon'; u.age = isNaN(u.age) ? null : u.age; return u; }\nasync function persistUser(u) { if (!u.email) throw new Error('email required'); return db.users.insert(u); }\n// db.users.insert returns { id }",
+      "criteria": "1) 调用链 handleCreate→parseBody→normalizeUser→persistUser→db；2) 三处变换点准确（trim/lowercase、name 默认、age NaN→null）；3) 空指针风险点：email 缺失时 persistUser 抛错可举；或 name/email 为 undefined 时 b.name?.trim 安全但 b 不存在会抛；4) 引用函数名。",
+      "observe": "是否漏关键调用链/引用准确性"
+    },
+    {
+      "id": "T5",
+      "type": "设计/评审类",
+      "expect_model": "grok",
+      "prompt": "为「给现有同步 REST API 增加一个写操作审计日志」出一页设计。必须覆盖：1) 边界条件；2) 失败模式（日志写失败是否影响主操作）；3) 回滚方式；4) 数据保留与隐私；5) 一个你认为最容易被忽视的隐藏风险。输出结构化 Markdown，不要写代码实现。",
+      "criteria": "1) 五部分齐全；2) 失败模式明确（建议日志失败不阻塞主操作、异步落盘）；3) 回滚可操作；4) 发现隐藏风险（如日志含敏感字段、写入放大、顺序性）；5) 结构清晰。",
+      "observe": "结构完整性/是否发现隐藏风险"
+    },
+    {
+      "id": "T6",
+      "type": "浏览器/工具操作规划",
+      "expect_model": "composer",
+      "prompt": "用 Playwright（Node）写一段脚本：打开 https://example.com/register ，依次填写 username=testuser、password=Passw0rd!，勾选同意条款 checkbox#tos，点击 button[type=submit]，然后收集 page 的 console 错误到数组并打印。要求：用 getByLabel/getByRole 优先选择器，带 30s 超时与失败截图。只输出脚本代码。",
+      "criteria": "1) 用语义选择器；2) 覆盖填写/勾选/提交三步；3) console 错误收集正确（page.on('console')）；4) 有超时与失败截图；5) 代码可运行。",
+      "observe": "工具调用规划/步骤数"
+    },
+    {
+      "id": "T7",
+      "type": "知识工作/文档",
+      "expect_model": "grok",
+      "prompt": "把这次故障写成给非技术同事的 1 页简报（≤250 字）：现象、影响范围、已采取动作、预估恢复时间、需要大家做什么。故障事实：缓存 miss 导致登录接口 500，影响约 12% 用户登录，已回滚到上一版本稳定运行，预计 30 分钟内全量恢复，期间建议用户重试登录。",
+      "criteria": "1) ≤250 字；2) 五个要素齐全；3) 无技术黑话（不用 cache/miss 等）；4) 面向非技术受众、信息取舍合理。",
+      "observe": "受众适配/信息取舍"
+    },
+    {
+      "id": "T7b",
+      "type": "知识工作/文档（复杂版·取舍压力测试）",
+      "expect_model": "grok",
+      "prompt": "把下面这次多系统故障写成给公司高管的 1 页决策简报（≤300 字）。要求：1) 第一句直接给结论（是否已控制、需不需要高管拍板）；2) 明确本次事故对本周营收的估算影响与依据；3) 给出两个可选后续方案（各一句利弊），并推荐一个；4) 不出现任何技术缩写或产品内部代号；5) 结尾一句话说明高管现在需要做的唯一一件事。事实：支付网关(代号 PB)证书过期导致 6 小时内约 18% 订单支付失败，按日均 50 万单、客单价 120 元、成功率回归正常后这 6 小时未补单估算损失约 65 万元；工程已续签证书恢复，但证书自动轮换机制缺失；可选方案A=本周内上线证书到期自动告警(2人日,只解决告警不解决轮换)，方案B=接入自动轮换(8人日,根治但需排期到下周)。",
+      "criteria": "1) ≤300 字；2) 首句给结论；3) 营收影响有数字+依据；4) 两方案各一句利弊+推荐；5) 无技术缩写/内部代号；6) 结尾唯一行动项。",
+      "observe": "复杂信息取舍/面向高管的结论先行/利弊权衡质量"
+    }
+  ]
+}
