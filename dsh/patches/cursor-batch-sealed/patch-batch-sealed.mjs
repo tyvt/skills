@@ -21,10 +21,10 @@
 // frame whose identity matches a call already in the sealed batch is dropped as
 // the retransmission it is; only an exec that is genuinely new still fails.
 //
-//   node patch-batch-sealed.mjs            apply (idempotent)
-//   node patch-batch-sealed.mjs --check    exit 0 patched, 3 pristine, 2 missing, 1 unknown
-//   node patch-batch-sealed.mjs --restore  restore from backup
-import { readFileSync, writeFileSync, existsSync, copyFileSync, renameSync, realpathSync } from 'node:fs';
+//   node patch-batch-sealed.mjs            apply (idempotent, all targets)
+//   node patch-batch-sealed.mjs --check    per-target status; exit 0 all patched, 3 pristine, 2 missing, 1 unknown/error
+//   node patch-batch-sealed.mjs --restore  restore every target from its backup
+import { readFileSync, writeFileSync, existsSync, copyFileSync, renameSync, readdirSync, realpathSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { execFileSync } from 'node:child_process';
@@ -42,6 +42,29 @@ export const PLUGIN_DIR = join(
 );
 export const NATIVE = join(PLUGIN_DIR, 'native-session.mjs');
 const BACKUP = join(PLUGIN_DIR, 'native-session.mjs.orig-batch-sealed');
+
+// magpie updates the plugin from npm and the running plugin-host then loads it
+// from bun's versioned install-cache directories
+// (@magpie-community/opencode-cursor-auth@<version>@@registry.npmmirror.com@@@1),
+// NOT from the .config tree. Every cache copy carries its own upstream guard,
+// so the patch must cover all of them, not just the .config copy (2026-11-13:
+// 0.2.44-0.2.46 upgrades re-introduced the sealed-batch 502 because only the
+// stale 0.2.32 .config copy was patched).
+export const targets = () => {
+  const out = [PLUGIN_DIR];
+  const scope = join(homedir(), '.cache', 'magpie', 'bun', 'install-cache', '@magpie-community');
+  let entries;
+  try {
+    entries = readdirSync(scope, { withFileTypes: true });
+  } catch {
+    entries = [];
+  }
+  for (const e of entries) {
+    if (!e.isDirectory() || !e.name.startsWith('opencode-cursor-auth@')) continue;
+    out.push(join(scope, e.name));
+  }
+  return out;
+};
 
 const MARK = '// [cursor-batch-sealed]';
 
@@ -63,55 +86,99 @@ const REPLACEMENT = `    // [cursor-batch-sealed] a frame duplicating a call alr
       invalid("native call arrived after its batch was sealed", 502)
     }`;
 
-export const status = () => {
-  if (!existsSync(NATIVE)) return 'missing';
-  const src = readFileSync(NATIVE, 'utf8');
+// Per-target status. `dir` is a plugin package directory (the one holding
+// native-session.mjs).
+export const statusOf = (dir = PLUGIN_DIR) => {
+  const file = join(dir, 'native-session.mjs');
+  if (!existsSync(file)) return 'missing';
+  const src = readFileSync(file, 'utf8');
   if (src.includes(MARK)) return 'patched';
   if (src.includes(GUARD)) return 'pristine';
   return 'unknown';
 };
 
-export const apply = ({ force = false } = {}) => {
-  const state = status();
-  if (state === 'missing') throw new Error(`native-session.mjs not found at ${PLUGIN_DIR}`);
-  if (state === 'unknown') throw new Error('native-session.mjs layout changed; refusing to patch batch-sealed guard');
-  if (state === 'patched' && !force) return { changed: false, version: 'patched' };
-  const src = readFileSync(NATIVE, 'utf8');
+// Compatibility: status of the .config copy.
+export const status = () => statusOf(PLUGIN_DIR);
+
+const applyTo = (dir, { force = false } = {}) => {
+  const file = join(dir, 'native-session.mjs');
+  const backup = join(dir, 'native-session.mjs.orig-batch-sealed');
+  const state = statusOf(dir);
+  if (state === 'missing' || state === 'unknown') return { dir, changed: false, state, skipped: true };
+  if (state === 'patched' && !force) return { dir, changed: false, state };
+  const src = readFileSync(file, 'utf8');
   const occurrences = src.split(GUARD).length - 1;
-  if (occurrences !== 1) throw new Error(`expected exactly 1 sealed-batch guard, found ${occurrences}`);
-  if (!existsSync(BACKUP)) copyFileSync(NATIVE, BACKUP);
+  if (occurrences !== 1) throw new Error(`${dir}: expected exactly 1 sealed-batch guard, found ${occurrences}`);
+  // First-run backup only: never overwrite a backup with patched content, so
+  // --restore always returns the file to pristine.
+  if (!existsSync(backup)) copyFileSync(file, backup);
   const patched = src.replace(GUARD, REPLACEMENT);
-  if (patched === src) throw new Error('sealed-batch guard not replaced');
+  if (patched === src) throw new Error(`${dir}: sealed-batch guard not replaced`);
   // Verify syntax before the swap so a bad patch can never be loaded. The temp
   // file must end in .mjs: node refuses to syntax-check an unknown extension.
-  const tmp = `${NATIVE}.tmp-batch-sealed.mjs`;
+  const tmp = `${file}.tmp-batch-sealed.mjs`;
   writeFileSync(tmp, patched);
   execFileSync(process.execPath, ['--check', tmp], { stdio: 'pipe' });
-  renameSync(tmp, NATIVE);
-  return { changed: true };
+  renameSync(tmp, file);
+  return { dir, changed: true, state: 'patched' };
+};
+
+// Apply to every target: the .config copy plus all versioned install-cache
+// copies. Per-target failures are collected, not fatal — one unreadable copy
+// must not leave the others unpatched. reapply.mjs only reads `.changed`.
+export const apply = ({ force = false } = {}) => {
+  const results = targets().map((dir) => {
+    try {
+      return applyTo(dir, { force });
+    } catch (e) {
+      return { dir, changed: false, state: 'error', error: e.message };
+    }
+  });
+  return {
+    changed: results.some((r) => r.changed),
+    results,
+    version: results.every((r) => r.state === 'patched' || r.skipped) && results.some((r) => r.state === 'patched')
+      ? 'patched'
+      : 'mixed',
+  };
 };
 
 export const restore = () => {
-  if (!existsSync(BACKUP)) throw new Error('no backup to restore (native-session.mjs.orig-batch-sealed)');
-  copyFileSync(BACKUP, NATIVE);
-  return { restored: true };
+  const results = targets().map((dir) => {
+    const backup = join(dir, 'native-session.mjs.orig-batch-sealed');
+    if (!existsSync(backup)) return { dir, restored: false };
+    copyFileSync(backup, join(dir, 'native-session.mjs'));
+    return { dir, restored: true };
+  });
+  return { restored: results.some((r) => r.restored), results };
 };
 
 const main = () => {
   const args = process.argv.slice(2);
   try {
     if (args.includes('--check')) {
-      const s = status();
-      console.log(`batch-sealed status: ${s}`);
-      process.exitCode = s === 'patched' ? 0 : s === 'pristine' ? 3 : s === 'missing' ? 2 : 1;
+      const results = targets().map((dir) => ({ dir, s: statusOf(dir) }));
+      for (const { dir, s } of results) console.log(`batch-sealed [${s}]: ${dir}`);
+      const worst = results.every((r) => r.s === 'patched')
+        ? 0
+        : results.some((r) => r.s === 'unknown' || r.s === 'error')
+          ? 1
+          : results.some((r) => r.s === 'pristine')
+            ? 3
+            : 2;
+      process.exitCode = worst;
       return;
     }
     if (args.includes('--restore')) {
-      console.log(`restored native-session.mjs (${JSON.stringify(restore())})`);
+      const r = restore();
+      console.log(`restored native-session.mjs (${JSON.stringify(r)})`);
       return;
     }
     const r = apply();
-    console.log(r.changed ? `patched batch-sealed guard in ${NATIVE}` : 'batch-sealed guard already patched; nothing to change');
+    for (const t of r.results) {
+      console.log(`batch-sealed [${t.state}]: ${t.dir}${t.error ? ` (${t.error})` : ''}`);
+    }
+    console.log(r.changed ? 'sealed-batch guard applied to at least one target' : 'all targets already patched; nothing to change');
   } catch (e) {
     console.error(`error: ${e.message}`);
     process.exitCode = 1;

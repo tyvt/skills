@@ -12,9 +12,25 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { NATIVE } from './patch-batch-sealed.mjs';
+import { join } from 'node:path';
+import { targets } from './patch-batch-sealed.mjs';
 
-const src = readFileSync(NATIVE, 'utf8');
+// Every installed copy of the plugin (.config + versioned install-cache) that
+// carries a native-session.mjs must carry the patched guard: the running
+// plugin-host loads the versioned cache copy, not the .config one.
+const nativeFiles = () =>
+  targets()
+    .map((dir) => join(dir, 'native-session.mjs'))
+    .filter((f) => {
+      try {
+        readFileSync(f, 'utf8');
+        return true;
+      } catch {
+        return false;
+      }
+    });
+
+const guardSources = () => nativeFiles().map((f) => ({ f, src: readFileSync(f, 'utf8') }));
 
 const invalid = (message, status = 409) => {
   throw Object.assign(new Error(message), { status });
@@ -31,12 +47,16 @@ const guard = (session, call, digest) => {
   return 'accepted';
 };
 
-test('installed plugin carries the patched sealed-phase guard', () => {
-  assert.match(src, /\[cursor-batch-sealed\]/);
-  assert.match(src, /if \(this\.terminal\) invalid\("native call arrived after its batch was sealed", 502\)/);
-  assert.match(src, /const sealed = this\.batches\?\.find/);
-  // the unpatched combined guard must be gone
-  assert.doesNotMatch(src, /if \(this\.terminal \|\| this\.state === "awaiting-results"\) invalid\("native call arrived after its batch was sealed", 502\)/);
+test('every installed plugin copy carries the patched sealed-phase guard', () => {
+  const sources = guardSources();
+  assert.ok(sources.length >= 1, 'no installed native-session.mjs found');
+  for (const { f, src } of sources) {
+    assert.match(src, /\[cursor-batch-sealed\]/, `${f}: missing patch marker`);
+    assert.match(src, /if \(this\.terminal\) invalid\("native call arrived after its batch was sealed", 502\)/, `${f}: terminal guard missing`);
+    assert.match(src, /const sealed = this\.batches\?\.find/, `${f}: retransmission lookup missing`);
+    // the unpatched combined guard must be gone
+    assert.doesNotMatch(src, /if \(this\.terminal \|\| this\.state === "awaiting-results"\) invalid\("native call arrived after its batch was sealed", 502\)/, `${f}: unpatched guard still present`);
+  }
 });
 
 test('retransmission already sealed into the batch is dropped, not fatal', () => {

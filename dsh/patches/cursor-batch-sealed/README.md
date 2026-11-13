@@ -101,6 +101,15 @@ node patch-batch-sealed.mjs --check # exit 0 = 已打，3 = 未打，2 = 文件�
 - `reapply.mjs` 现在依次重打三处：静默重试、quiet 阈值、**封批重传修复**。
 - 锚点找不到（插件大改）时**拒绝写入**并记日志，绝不会把插件改坏。
 
+## 多目标（2026-11-13 复发教训）
+
+运行中的 plugin-host 实际从 bun 的**版本化缓存目录**加载插件
+（`~/.cache/magpie/bun/install-cache/@magpie-community/opencode-cursor-auth@<版本>@@registry.npmmirror.com@@@1/`），
+不是 `~/.config` 那份。magpie 自动升级（0.2.44→0.2.45→0.2.46）后新副本未打补丁，
+sealed 502 复发 10 次。现在补丁脚本遍历全部目标：`.config` 副本 + install-cache
+所有版本化副本，逐目录备份（仅首次创建，保证 `--restore` 回 pristine），
+`--check` 逐目标输出状态。插件再升级出新目录时 reapply 每 5 分钟自动重打新副本。
+
 ## 生效条件
 
 补丁改的是磁盘文件，**运行中的 `magpie-bun.exe`（plugin-host）已经把旧代码读进内存**。
@@ -114,19 +123,17 @@ Stop-Process -Id (Get-Process magpie-bun).Id -Force   # magpie 会自动拉起�
 
 | 文件 | 作用 |
 | --- | --- |
-| `patch-batch-sealed.mjs` | 打补丁 / 检查 / 还原（幂等，带语法预校验） |
+| `patch-batch-sealed.mjs` | 打补丁 / 检查 / 还原（幂等，多目标，带语法预校验） |
 | `batch-sealed.test.mjs` | 6 例验证（`node --test`） |
 | `smoke.mjs` | 打补丁后插件仍可 import |
-| `status.mjs` | 快速查看当前状态 |
 
 ## 常用命令
 
 ```powershell
 cd ~/.dsh/patches/cursor-batch-sealed
-node patch-batch-sealed.mjs            # 打补丁（幂等）
-node patch-batch-sealed.mjs --check    # 看状态
-node patch-batch-sealed.mjs --restore  # 还原（用 .orig-batch-sealed 备份）
-node status.mjs                         # 人读的状态输出
+node patch-batch-sealed.mjs            # 打补丁（幂等，覆盖 .config + install-cache 全部版本副本）
+node patch-batch-sealed.mjs --check    # 逐目标看状态（全 patched 才 exit 0）
+node patch-batch-sealed.mjs --restore  # 还原（各目录 .orig-batch-sealed 首次备份）
 ```
 
 ## 局限
