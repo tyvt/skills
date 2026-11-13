@@ -1,0 +1,203 @@
+diff --git a/client.mjs b/client.mjs
+index a97d15221adb5d554c485daa00e7292ca1181d73..367e613fe8d94ada738b75965c705dd9996962f8 100644
+--- a/client.mjs
++++ b/client.mjs
+@@ -20,7 +20,7 @@ export class OpenVikingClient {
+     const response = await this.fetchJSON("/api/v1/sessions", {
+       method: "POST",
+       body: JSON.stringify({ session_id: sessionId }),
+-    }, { actorPeerId });
++    }, { actorPeerId, caller: "session-create" });
+     return response;
+   }
+ 
+diff --git a/index.mjs b/index.mjs
+index 63e51257e7afd8a6b6ce52c90ca25c2c116b4c5a..0e35f2e078e5265c937486736545d09fa83af6d4 100644
+--- a/index.mjs
++++ b/index.mjs
+@@ -110,7 +110,15 @@ export function apply(ctx, input = {}) {
+   // Mounted last, and deliberately not awaited: the bridge's apply blocks on
+   // its first tools/list, so a server that accepts the connection but never
+   // answers would otherwise hold up every registration above it.
+-  mountOpenVikingMcp(ctx, config);
++  // [patch A-1 ovgw] toolSurface gates the MCP tool surface only (memory
++  // capture/recall/commit/skills stay mounted). Read raw `input` (pre-schema)
++  // so an out-of-schema value is not stripped by buildPluginConfig. Legal
++  // values in A-1: 'direct' | 'off'; 'gateway' is reserved for A-2.
++  const surface = input.toolSurface ?? "direct";
++  if (!["direct", "off"].includes(surface)) {
++    ctx.logger?.warn(`[openviking] unknown toolSurface=${surface}, fallback to direct`);
++  }
++  if (surface !== "off") mountOpenVikingMcp(ctx, config);
+   mountOpenVikingSkills(ctx);
+ }
+ 
+diff --git a/shared/ov-http.mjs b/shared/ov-http.mjs
+index f1bc32d2d91755f6253167af982dd72c530a1b6d..5b3ae5bdef3d3ec7912146b3215209ed130d248a 100644
+--- a/shared/ov-http.mjs
++++ b/shared/ov-http.mjs
+@@ -25,13 +25,14 @@ import { parseExtraHeaders } from "./mcp-proxy-config.mjs";
+  * `identityHeaders` overrides `cfg.sendIdentityHeaders` for the callers that
+  * decide per request rather than per config — the doctor probes both ways.
+  */
+-export function buildOvHeaders(cfg = {}, { actorPeerId = "", identityHeaders, extraHeaders } = {}) {
++export function buildOvHeaders(cfg = {}, { actorPeerId = "", caller = "", identityHeaders, extraHeaders } = {}) {
+   const identity = identityHeaders === undefined ? Boolean(cfg.sendIdentityHeaders) : Boolean(identityHeaders);
+   const headers = { "Content-Type": "application/json" };
+   if (cfg.apiKey) headers["Authorization"] = `Bearer ${cfg.apiKey}`;
+   if (identity && cfg.account) headers["X-OpenViking-Account"] = cfg.account;
+   if (identity && cfg.user) headers["X-OpenViking-User"] = cfg.user;
+   if (actorPeerId) headers["X-OpenViking-Actor-Peer"] = actorPeerId;
++  if (caller) headers["X-OpenViking-Caller"] = caller;
+   if (cfg.userAgent) headers["User-Agent"] = cfg.userAgent;
+   return { ...headers, ...extraHeaders };
+ }
+@@ -79,6 +80,7 @@ export function createOvHttp(cfg = {}, {
+       const headers = {
+         ...buildOvHeaders(cfg, {
+           actorPeerId: options.actorPeerId ?? resolveActorPeerId(),
++          caller: options.caller ?? "",
+           identityHeaders,
+           extraHeaders: resolvedExtraHeaders,
+         }),
+diff --git a/shared/pending-queue.mjs b/shared/pending-queue.mjs
+index e86f59b00ededf19a8aa876696a09fd5b9daeb40..41bee8feef3d1f002480f2e52e70fa3bff776f02 100644
+--- a/shared/pending-queue.mjs
++++ b/shared/pending-queue.mjs
+@@ -423,12 +423,12 @@ export async function replayPending(fetchJSON, log, options = {}) {
+         res = await fetchJSON(`/api/v1/sessions/${encodedSid}/messages`, {
+           method: "POST",
+           body: JSON.stringify(entry.payload),
+-        });
++        }, { caller: "capture" });
+       } else if (entry.type === "commitSession") {
+         res = await fetchJSON(`/api/v1/sessions/${encodedSid}/commit`, {
+           method: "POST",
+           body: JSON.stringify(entry.payload || {}),
+-        });
++        }, { caller: "background-extract" });
+       } else {
+         await dequeue(claimedFilename);
+         skipped++;
+diff --git a/shared/profile-inject.mjs b/shared/profile-inject.mjs
+index aa8e1a1bdfaddd0bb30a3756b2987fee837d29d3..86b5c4be972e43d5ba31fb40cafa4c111922574f 100644
+--- a/shared/profile-inject.mjs
++++ b/shared/profile-inject.mjs
+@@ -46,7 +46,7 @@ async function resolveUserSpace(fetchJSON, actorPeerId = "") {
+   const lsRes = await fetchJSON(
+     `/api/v1/fs/ls?uri=${encodeURIComponent("viking://user")}&output=original`,
+     {},
+-    { actorPeerId },
++    { actorPeerId, caller: "profile-inject" },
+   );
+   if (lsRes.ok && Array.isArray(lsRes.result)) {
+     const spaces = lsRes.result
+@@ -107,11 +107,33 @@ function tokensToCharsBudget(content, maxTokens) {
+   return Math.floor(maxTokens / Math.max(tokensPerChar, 0.25));
+ }
+ 
++const _missingProfileWarned = new Set();
++
+ async function readProfile(fetchJSON, profileUri, actorPeerId = "") {
++  // Existence pre-check: a missing profile.md used to turn into a content/read
++  // 404 on every injection. Check the parent directory first and skip the read
++  // entirely when the file is absent (warn once per URI).
++  const slash = profileUri.lastIndexOf("/");
++  const parentUri = slash > 0 ? profileUri.slice(0, slash) : "";
++  if (parentUri) {
++    const lsRes = await fetchJSON(
++      `/api/v1/fs/ls?uri=${encodeURIComponent(parentUri)}&output=original`,
++      {},
++      { actorPeerId, caller: "profile-inject" },
++    );
++    const entries = lsRes.ok && Array.isArray(lsRes.result) ? lsRes.result : null;
++    if (entries && !entries.some((e) => e?.name === "profile.md")) {
++      if (!_missingProfileWarned.has(profileUri)) {
++        _missingProfileWarned.add(profileUri);
++        console.warn(`[openviking] profile.md missing at ${profileUri}; skipping injection`);
++      }
++      return null;
++    }
++  }
+   const res = await fetchJSON(
+     `/api/v1/content/read?uri=${encodeURIComponent(profileUri)}`,
+     {},
+-    { actorPeerId },
++    { actorPeerId, caller: "profile-inject" },
+   );
+   if (!res.ok || typeof res.result !== "string") return null;
+   const trimmed = res.result.trim();
+@@ -329,7 +351,7 @@ async function fetchSkillCatalog(fetchJSON, actorPeerId = "") {
+   const res = await fetchJSON(
+     `/api/v1/skills?node_limit=${SKILL_CATALOG_NODE_LIMIT}`,
+     {},
+-    { actorPeerId },
++    { actorPeerId, caller: "profile-inject" },
+   );
+   const skills = res.ok && Array.isArray(res.result?.skills) ? res.result.skills : [];
+   const own = [];
+diff --git a/shared/recall-core.mjs b/shared/recall-core.mjs
+index ecbaed1b2ec508ac4c946133e48adf752f7a9485..cd2a6874a1e3e9948ce2c3a5561a6e4982d8a3a7 100644
+--- a/shared/recall-core.mjs
++++ b/shared/recall-core.mjs
+@@ -276,7 +276,7 @@ async function resolveUserSpace(fetchJSON, actorPeerId = "") {
+   const lsRes = await fetchJSON(
+     `/api/v1/fs/ls?uri=${encodeURIComponent("viking://user")}&output=original`,
+     {},
+-    { actorPeerId },
++    { actorPeerId, caller: "auto-recall" },
+   );
+   if (lsRes.ok && Array.isArray(lsRes.result)) {
+     const spaces = lsRes.result
+@@ -324,13 +324,13 @@ async function searchOneSource(fetchJSON, cfg, query, source, limit, options) {
+     // Session-aware retrieval may decide no context is needed. Only after all
+     // targets are empty do we retry without the session. Old servers still
+     // support find; an unsupported search route can fall back to it.
+-    let res = await fetchJSON(sessionId ? "/api/v1/search/search" : "/api/v1/search/find", init, { actorPeerId });
++    let res = await fetchJSON(sessionId ? "/api/v1/search/search" : "/api/v1/search/find", init, { actorPeerId, caller: "auto-recall" });
+     if (sessionId && !res.ok && (
+       !res.status || res.status === 404 || res.status === 405 || res.status >= 500
+       || ((res.status === 400 || res.status === 422) && looksLikeUnknownField(res))
+     )) {
+       const { session_id, ...findBody } = body;
+-      res = await fetchJSON("/api/v1/search/find", { method: "POST", body: JSON.stringify(findBody) }, { actorPeerId });
++      res = await fetchJSON("/api/v1/search/find", { method: "POST", body: JSON.stringify(findBody) }, { actorPeerId, caller: "auto-recall" });
+     }
+     const items = res.ok && Array.isArray(res.result?.[source.bucket]) ? res.result[source.bucket] : [];
+     return items.map((item) => ({ ...item, _sourceType: source.type }));
+@@ -370,7 +370,7 @@ async function resolveItemContent(fetchJSON, item, cfg, actorPeerId = "") {
+       const res = await fetchJSON(
+         `/api/v1/content/read?uri=${encodeURIComponent(item.uri)}`,
+         {},
+-        { actorPeerId },
++        { actorPeerId, caller: "auto-recall" },
+       );
+       const body = res.ok && typeof res.result === "string" ? res.result.trim() : "";
+       content = body || (item.abstract || item.overview || "").trim() || item.uri;
+@@ -523,7 +523,7 @@ export async function fetchAssembledContext(fetchJSON, cfg, query, options = {})
+   const res = await fetchJSON("/api/v1/search/search", {
+     method: "POST",
+     body: JSON.stringify(body),
+-  }, { actorPeerId, timeoutMs: contextRequestTimeoutMs(cfg, body) });
++  }, { actorPeerId, caller: "auto-recall", timeoutMs: contextRequestTimeoutMs(cfg, body) });
+ 
+   if (!res.ok) {
+     const status = res.status || 0;
+@@ -644,7 +644,7 @@ export async function postRecall(fetchJSON, body, opts = {}) {
+   const res = await fetchJSON("/api/v1/search/recall", {
+     method: "POST",
+     body: JSON.stringify(request),
+-  }, { actorPeerId });
++  }, { actorPeerId, caller: "auto-recall" });
+   if (!request.peer_scope || (res.status !== 400 && res.status !== 422)) {
+     return res;
+   }
+@@ -663,7 +663,7 @@ export async function postRecall(fetchJSON, body, opts = {}) {
+   return fetchJSON("/api/v1/search/recall", {
+     method: "POST",
+     body: JSON.stringify(downgraded),
+-  }, { actorPeerId });
++  }, { actorPeerId, caller: "auto-recall" });
+ }
+ 
+ /**
