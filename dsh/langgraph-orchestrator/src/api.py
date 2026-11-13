@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 import time
@@ -17,6 +18,8 @@ from typing import Any, Dict, Optional
 from .config import load_config
 from .router import ModelRouter
 from .graph import build_graph, run_orchestration
+
+_LOGGER = logging.getLogger(__name__)
 
 DEFAULT_CFG = str(Path(__file__).resolve().parent.parent / "config.yaml")
 # 计划审核专用工具池名（见 config.yaml tools.plan_reviewer）。
@@ -362,18 +365,66 @@ def run_plan_review(
     return result
 
 
-def run_full(request: str, config_path: str = DEFAULT_CFG, session_id: str = "", workdir: str = "") -> Dict[str, Any]:
-    if not isinstance(workdir, str) or not workdir.strip():
-        return {"mode": "full", "ok": False, "error": "WORKDIR_REQUIRED"}
-    if not Path(workdir).is_absolute():
-        return {"mode": "full", "ok": False, "error": "WORKDIR_REQUIRED"}
-    try:
-        directory = Path(workdir).resolve(strict=True)
-        if not directory.is_dir():
-            raise ValueError("not a directory")
-    except (OSError, ValueError):
-        return {"mode": "full", "ok": False, "error": "WORKDIR_NOT_FOUND"}
+def _is_blank(value) -> bool:
+    """统一空值判定：None / 缺失 / 纯空白都算空。禁止写成 value == ""（原 bug 形态）。"""
+    return value is None or str(value).strip() == ""
+
+
+def _resolve_workdir(workdir, project_cwd):
+    """三级 workdir 解析：workdir(显式) → project_cwd → 进程 cwd。
+
+    返回 (Path | None, source, error)。source ∈ {workdir, project_cwd, process_cwd}。
+    显式给了 workdir 却解析不到目录时立即失败，不静默下洩，避免在错误目录执行。
+    """
+    base = None
+    if not _is_blank(project_cwd):
+        candidate = Path(str(project_cwd)).expanduser().resolve()
+        if candidate.is_dir():
+            base = candidate
+    if base is None:
+        base = Path(os.getcwd()).resolve()
+
+    if not _is_blank(workdir):
+        raw = Path(str(workdir)).expanduser()
+        target = raw.resolve() if raw.is_absolute() else (base / raw).resolve()
+        if target.is_dir():
+            return target, "workdir", None
+        return None, "workdir", {
+            "ok": False,
+            "error": "WORKDIR_NOT_FOUND",
+            "cwd": str(target),
+            "workdir_source": "workdir",
+            "hint": (
+                "显式传入的 workdir 不是已存在的目录。请传一个绝对路径（例如 "
+                "D:/repository/your-repo）；相对路径以 project_cwd 为基准解析。"
+            ),
+        }
+
+    if not _is_blank(project_cwd):
+        candidate = Path(str(project_cwd)).expanduser().resolve()
+        if candidate.is_dir():
+            return candidate, "project_cwd", None
+
+    fallback = Path(os.getcwd()).resolve()
+    if fallback.is_dir():
+        return fallback, "process_cwd", None
+    return None, "process_cwd", {
+        "ok": False,
+        "error": "WORKDIR_REQUIRED",
+        "cwd": str(fallback),
+        "hint": "无法确定工作目录：未传 workdir、project_cwd 不可用、进程 cwd 也不是目录。请显式传 workdir。",
+    }
+
+
+def run_full(request: str, config_path: str = DEFAULT_CFG, session_id: str = "",
+             workdir: str = "", project_cwd: str = "") -> Dict[str, Any]:
+    directory, source, failure = _resolve_workdir(workdir, project_cwd)
+    if failure is not None:
+        return {"mode": "full", **failure}
     root = str(directory)
+    if source == "process_cwd":
+        # 兜底路径打告警：告知本次未显式指定 workdir，避免在预期外目录执行而不自知。
+        _LOGGER.warning("orchestrate/full: workdir 未显式指定，使用进程 cwd=%s", root)
     cfg = load_config(config_path)
     router = ModelRouter(cfg)
     app = build_graph(router, cfg)
@@ -401,6 +452,8 @@ def run_full(request: str, config_path: str = DEFAULT_CFG, session_id: str = "",
         "usage_totals": usage,
         "session_id": _session_key(session_id),
         "cwd": ctx.get("cwd", root),
+        "workdir": root,
+        "workdir_source": source,
     }
 
 

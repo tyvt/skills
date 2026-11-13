@@ -1,5 +1,7 @@
 """Pure local contract tests: no model/network calls."""
 import json
+from pathlib import Path
+
 import pytest
 from src.plan_versions import prepare, record, plan_sha
 
@@ -100,11 +102,90 @@ def test_path_boundary(tmp_path, path):
         prepare(tmp_path, path, 'session1', 'text')
 
 
-@pytest.mark.parametrize('directory,error', [('', 'WORKDIR_REQUIRED'), ('.', 'WORKDIR_REQUIRED'), ('Z:/missing/p0-directory', 'WORKDIR_NOT_FOUND')])
+@pytest.mark.parametrize('directory,error', [('Z:/missing/p0-directory', 'WORKDIR_NOT_FOUND'), (__file__, 'WORKDIR_NOT_FOUND')])
 def test_full_invalid_workdir_before_router(monkeypatch, directory, error):
     from src import api
     monkeypatch.setattr(api, 'load_config', lambda *_: pytest.fail('must not load config'))
     assert api.run_full('request', workdir=directory)['error'] == error
+
+
+def test_full_explicit_workdir_resolution(monkeypatch, tmp_path):
+    """显式 workdir（含相对路径）归一化后是目录 → 成功且 source=workdir。"""
+    from src import api
+    _stub_graph(monkeypatch)
+    result = api.run_full('request', workdir='.', project_cwd=str(tmp_path))
+    assert result['ok'] is True
+    assert result['workdir_source'] == 'workdir'
+    assert Path(result['workdir']).is_absolute()
+
+
+def test_full_relative_workdir_uses_project_cwd_base(monkeypatch, tmp_path):
+    """相对 workdir 以 project_cwd 为基准解析，而不是进程 cwd。"""
+    from src import api
+    sub = tmp_path / 'sub-repo'
+    sub.mkdir()
+    _stub_graph(monkeypatch)
+    result = api.run_full('request', workdir='sub-repo', project_cwd=str(tmp_path))
+    assert result['ok'] is True
+    assert result['workdir_source'] == 'workdir'
+    assert Path(result['workdir']).resolve() == sub.resolve()
+
+
+@pytest.mark.parametrize('directory', [None, ''])
+def test_full_missing_workdir_falls_back_to_project_cwd(monkeypatch, tmp_path, directory):
+    """**回归原 bug**：未传/空 workdir 不得再返回 WORKDIR_REQUIRED，而是回落 project_cwd。"""
+    from src import api
+    _stub_graph(monkeypatch)
+    kwargs = {} if directory is None else {'workdir': directory}
+    result = api.run_full('request', project_cwd=str(tmp_path), **kwargs)
+    assert result['ok'] is True
+    assert result['workdir_source'] == 'project_cwd'
+    assert Path(result['workdir']).resolve() == tmp_path.resolve()
+
+
+@pytest.mark.parametrize('directory', [None, '', '   '])
+def test_full_missing_workdir_falls_back_to_process_cwd(monkeypatch, directory):
+    """未传 workdir 且 project_cwd 不可用 → 回落进程 cwd。"""
+    from src import api
+    _stub_graph(monkeypatch)
+    kwargs = {} if directory is None else {'workdir': directory}
+    result = api.run_full('request', project_cwd='', **kwargs)
+    assert result['ok'] is True
+    assert result['workdir_source'] == 'process_cwd'
+
+
+def test_full_unusable_project_cwd_falls_through(monkeypatch, tmp_path):
+    """project_cwd 指向不存在的目录时不报错，直接下洩到进程 cwd。"""
+    from src import api
+    _stub_graph(monkeypatch)
+    bogus = tmp_path / 'no-such-dir'
+    result = api.run_full('request', project_cwd=str(bogus))
+    assert result['ok'] is True
+    assert result['workdir_source'] == 'process_cwd'
+
+
+def test_full_invalid_workdir_carries_hint(monkeypatch, tmp_path):
+    """显式 workdir 不存在 → NOT_FOUND + hint，且不下洩到兜底。"""
+    from src import api
+    monkeypatch.setattr(api, 'load_config', lambda *_: pytest.fail('must not load config'))
+    missing = str(tmp_path / 'nope-dir')
+    result = api.run_full('request', workdir=missing, project_cwd=str(tmp_path))
+    assert result['ok'] is False
+    assert result['error'] == 'WORKDIR_NOT_FOUND'
+    assert 'hint' in result and result['hint']
+
+
+def _stub_graph(monkeypatch):
+    """掉真实模型调用，只验证 workdir 解析与返回字段。"""
+    from src import api
+    monkeypatch.setattr(api, 'load_config', lambda *_: object())
+    monkeypatch.setattr(api, 'ModelRouter', lambda *_: object())
+    monkeypatch.setattr(api, 'build_graph', lambda *_: object())
+    monkeypatch.setattr(api, 'load_environment', lambda *_: {'cwd': 'wrong', 'env': {}})
+    monkeypatch.setattr(api, 'run_orchestration',
+                        lambda app, request, start: {'final': 'ok', 'results': [{'ok': True}]})
+    monkeypatch.setattr(api, '_append_costs', lambda *_: None)
+    monkeypatch.setattr(api, 'save_environment', lambda *_: None)
 
 
 def test_full_pins_cwd_and_failed_steps(monkeypatch, tmp_path):

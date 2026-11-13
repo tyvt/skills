@@ -378,7 +378,7 @@ export function apply(ctx, config) {
           type: 'string',
           description: 'When op=plan_review, optional task/background context (falls back to request).',
         },
-        workdir: { type: 'string', description: 'Explicit absolute working directory; required for every full request. For plan_review, identifies the repository containing .plan.' },
+        workdir: { type: 'string', description: 'Optional for full graph mode; defaults to the orchestrator project dir, then the process cwd. Required when execution is set. Relative paths resolve against the project dir. For plan_review, identifies the repository containing .plan.' },
         execution: {
           type: 'object', description: 'Deterministic full fast path: program + argument array; no shell or model calls.',
           properties: {
@@ -458,6 +458,7 @@ export function apply(ctx, config) {
         op: 'full',
         request: args.request,
         workdir: args.workdir, execution: args.execution,
+        project_cwd: config.projectDir,
         log_ref: args.log_ref, offset: args.offset, limit: args.limit,
         session_id: sessionId,
       }, exec.signal))

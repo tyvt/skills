@@ -60,7 +60,9 @@ def main() -> int:
                     if not request:
                         _emit(real_stdout, {"ok": False, "error": "request 必填"})
                         return 2
-                    out = api.run_full(request, cfg, session_id, workdir=req.get("workdir", ""))
+                    out = api.run_full(request, cfg, session_id,
+                                       workdir=req.get("workdir") or "",
+                                       project_cwd=req.get("project_cwd") or req.get("projectCwd") or "")
             elif op == "plan_review":
                 # req 带 plan（Markdown 计划正文）与 request/context（任务背景）。
                 plan = req.get("plan", "") or ""
