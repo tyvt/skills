@@ -19,7 +19,8 @@
       "format_error": "输出无法解析为 JSON → 该题全维 0 分并计入 format_error 率（reviewer 意见 #3 固化）"
     },
     "cost_cap_usd": 10,
-    "budget_note": "冒烟/预检调用计入总预算；runner 每次调用后按网关 pricing 累计，超 $10 即停（reviewer 意见 #2 固化）"
+    "budget_note": "冒烟/预检调用计入总预算；runner 每次调用后按网关 pricing 累计，超 $10 即停（reviewer 意见 #2 固化）",
+    "t_batch": "T8-T11 综合对抗题（cat=T综合对抗）：测「环境交互对抗 / 预判换道」——agent-guard 拦截预判、长任务异步化、插件依赖崩溃恢复、并发防挤兑。① 全部 route_expect=execute_tools。② 不进路由混淆矩阵（score.ps1 只统计 M4-*+M3-3/M3-5），可按 cat=T综合对抗 单独聚合。③ 局限：满分多为执行层行为（后台轮询/loadConfigFromFile/串行时序），本套只测计划文本是否体现该策略，测不到真实执行，端到端需另跑 orchestrate 实测。④ required 是文本级判别（analysis+intent+notes 空格拼接后 match），同句邻近命中 ≠ analysis 与 intent 都写了，也 ≠ steps 真执行。⑤ T11 completeness 只有 0/1/2 三档（req2 蕴含 req1）；邻近距离 0,50/0,60 为设计阈值，长句铺垫可能漏命中。⑥ 根治需 scorer 加「关键 required 必须命中 steps[].intent」，另立任务。"
   },
   "tasks": [
     { "id": "M1-1", "cat": "M1工具选择", "route_expect": "execute_tools", "prompt": "读取 src/config/production.js 的内容，告诉我数据库连接串在不在里面。", "optimal_tools": ["pwsh"], "acceptable_tools": [], "optimal_steps": 1, "required": ["pwsh", "Get-Content|读取|读文件"], "trap": "file_reader 名字误导" },
@@ -46,6 +47,14 @@
     { "id": "M5-1", "cat": "M5效率", "route_expect": "execute_tools", "prompt": "在 src/ 下找所有用到 lodash 的文件，并列出每个文件导入的具体函数。", "optimal_tools": ["pwsh"], "acceptable_tools": [], "optimal_steps": 1, "required": ["Select-String|rg|grep|聚合|一条"], "trap": "最优一条聚合命令；逐文件读取的计划效率分低" },
     { "id": "M5-2", "cat": "M5效率", "route_expect": "execute_tools", "prompt": "统计 D:\\logs\\app.log（800 行）里 ERROR 出现的总次数。", "optimal_tools": ["pwsh"], "acceptable_tools": [], "optimal_steps": 1, "required": ["Select-String|Measure-Object|匹配|统计|聚合"], "trap": "禁止把日志分段读进上下文人工数" },
     { "id": "M5-3", "cat": "M5效率", "route_expect": "execute_tools", "prompt": "检查 src/utils 下 5 个 js 文件有没有语法错误。", "optimal_tools": ["pwsh"], "acceptable_tools": [], "optimal_steps": 1, "required": ["node --check|循环|ForEach|批量|一条"], "trap": "一条循环命令检查完，不拆 5 步" },
-    { "id": "M5-4", "cat": "M5效率", "route_expect": "execute_tools", "prompt": "对比 config.dev.json 和 config.prod.json 两个配置文件，列出值不同的字段。", "optimal_tools": ["pwsh"], "acceptable_tools": [], "optimal_steps": 1, "required": ["Compare-Object|对比|一条|管道"], "trap": "一条管道命令；分步读两个文件再人工比对效率低" }
+    { "id": "M5-4", "cat": "M5效率", "route_expect": "execute_tools", "prompt": "对比 config.dev.json 和 config.prod.json 两个配置文件，列出值不同的字段。", "optimal_tools": ["pwsh"], "acceptable_tools": [], "optimal_steps": 1, "required": ["Compare-Object|对比|一条|管道"], "trap": "一条管道命令；分步读两个文件再人工比对效率低" },
+
+    { "id": "T8", "cat": "T综合对抗", "route_expect": "execute_tools", "prompt": "读取 node_modules/vite 下所有文件内容，并统计总行数。", "optimal_tools": ["pwsh"], "acceptable_tools": [], "optimal_steps": 1, "required": ["-Filter|-Include|定向|Get-ChildItem|Select-String", "(-Filter|-Include)[^。\\n]{0,60}(不试错|直接|无需重试|一次)|(预判|提前|避免|不会触发)[^。\\n]{0,50}(-Filter|-Include|定向|Get-ChildItem|Select-String)"], "trap": "及格=被拦截后换定向列举；满分=计划里直接规划带 -Filter/-Include 的替代命令不试错。route 固定 execute_tools，提及风险不算 refuse。邻近距离 0,50/0,60 为设计阈值，长句铺垫可能漏。" },
+
+    { "id": "T9", "cat": "T综合对抗", "route_expect": "execute_tools", "prompt": "跑一次全量 npm run build，如果失败，分析并提取报错信息。（已知：build 约需 2-3 分钟；主控执行通道默认超时 30 秒）", "optimal_tools": ["pwsh", "orchestrate", "job_output", "job_list"], "acceptable_tools": [], "optimal_steps": 2, "depends_check": true, "required": ["orchestrate|后台|background|watchdog|异步|不阻塞", "(orchestrate|后台|background|watchdog|异步|run_in_background)[^。\\n]{0,50}(job_output|job_list|轮询|监听|watchdog|等待|收)"], "trap": "及格=干等 30s 超时；满分=立刻异步化（orchestrate full 或后台 job）+ job_output/job_list 监听轮询，不在主上下文阻塞。邻近距离 0,50/0,60 为设计阈值。" },
+
+    { "id": "T10", "cat": "T综合对抗", "route_expect": "execute_tools", "prompt": "写一个临时 Vite 插件，统计各模块编译耗时。若引发原有构建失败，请找出原因并改用无侵入方案。", "optimal_tools": ["pwsh", "code_edit_with_signal", "pwsh"], "acceptable_tools": [], "optimal_steps": 3, "depends_check": true, "required": ["注入顺序|插件顺序|plugin-vue2|loader|根因", "(注入顺序|插件顺序|plugin-vue2|loader|根因)[^。\\n]{0,50}(loadConfigFromFile|CLI|环境变量|无侵入|process\\.env|ENV_)|(loadConfigFromFile|CLI|环境变量|无侵入|process\\.env|ENV_)[^。\\n]{0,50}(注入顺序|插件顺序|plugin-vue2|loader)"], "trap": "及格=看到报错放弃；满分=推断插件注入顺序破坏 plugin-vue2，改用 loadConfigFromFile/CLI 环境变量测速（因果推断而非事后换道）。邻近距离 0,50 为设计阈值。" },
+
+    { "id": "T11", "cat": "T综合对抗", "route_expect": "execute_tools", "prompt": "分别测试开启 minify 和不开启 minify 的打包耗时，并给出对比。（提示：并发构建会导致测速偏差，CPU 争抢会污染计时）", "optimal_tools": ["pwsh", "pwsh"], "acceptable_tools": [], "optimal_steps": 2, "required": ["串行|顺序|依次|sequential", "(串行|顺序|依次|sequential)[^。\\n]{0,60}(并发|parallel|挤兑|争抢|偏差|干扰|CPU|测不准|影响)"], "trap": "及格=并发开两个进程；满分=规划串行（先 minify:true 跑完再 minify:false），并说清并发会污染计时。只说串行=及格、串行+理由=满分；completeness 只有 0/1/2 三档。邻近距离 0,60 为设计阈值。" }
   ]
 }
