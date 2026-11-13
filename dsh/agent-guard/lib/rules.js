@@ -449,6 +449,45 @@ export function warnPwshBuffering(toolName, args) {
 }
 
 /**
+ * 裸 `git status` 告警（P0 复盘 ④-5，R5 规则 hook 化）。
+ *
+ * 复盘会话（.plan/p0-retro-implement-session-20261113.md）step 51 跑了未限定子模块
+ * 路径的 `git status --short`，把 openviking-data 下数百个未跟踪文件整段回灌（23KB），
+ * 证明纯文本规则对执行侧约束力不足。这里做**纯告警、不改命令**：当 tool==='pwsh' 且
+ * 命令位置出现 `git [-C <dir>] status`，其后仅允许选项 token（--short/-s/--porcelain/
+ * --branch 等）、重定向（2>&1）、命令分隔（&& / ;），**不含**非选项路径 token 或
+ * `-- <path>` 时，判定为「裸、未限定范围」，提示改用限定子模块路径的写法。
+ *
+ * 放行（不报告）：`git -C <dir> status`、带路径参数、带 `-- <path>`、以及任何非 pwsh
+ * 工具。保守优先：宁可漏报也不误伤合法带范围写法。
+ *
+ * @param {string} toolName - 工具名。
+ * @param {object} args - 参数（不修改）。
+ * @returns {object[]} 告警清单。
+ */
+const GIT_STATUS_RE = /(^|&&|\|\||[|;&(\r\n])\s*git(\s+-C\s+\S+)?\s+status\b([^\n]*)/i
+const GIT_STATUS_OPTS_ONLY_RE = /^(\s+(?:--short|-s|--porcelain|-b|--branch|-sb|--untracked-files=\S+|--ignored|2>&1|2>\S+|>\S+))*(?:\s*(?:&&|\|\||;)[\s\S]*)?$/i
+export function warnBareGitStatus(toolName, args) {
+  if (toolName !== 'pwsh') return []
+  const command = args?.command
+  if (typeof command !== 'string') return []
+  const re = new RegExp(GIT_STATUS_RE.source, 'gi')
+  for (const m of command.matchAll(re)) {
+    const cwdFlag = m[2] // \s+-C <dir> 存在则已限定目录，放行
+    const tail = m[3] ?? ''
+    if (cwdFlag) continue
+    // 命中命令位置后，剩余部分只有选项/重定向，或选项后接命令分隔（&&/;/||）→ 裸、未限定范围。
+    if (GIT_STATUS_OPTS_ONLY_RE.test(tail)) {
+      return [{
+        rule: 'bare-git-status',
+        detail: 'git status 未限定子模块路径，易回灌大量未跟踪文件；多子模块/需限定范围时改用 git status --short <submodule>（根仓或已带 -C 目录可忽略本告警）',
+      }]
+    }
+  }
+  return []
+}
+
+/**
  * PowerShell POSIX 兼容预检（审计 P1-5）。
  *
  * 模型常在 pwsh 里写 POSIX 管道命令，Windows pwsh 没有 head/tail/cat/grep/sed/awk/wc/find。
@@ -645,6 +684,7 @@ export function repairArguments({ toolName, args, schema, rules = ALL_RULES }) {
     repairs.push(...repairPwshAtBrace(toolName, args))
     repairs.push(...repairPwshPosix(toolName, args))
     repairs.push(...warnPwshBuffering(toolName, args))
+    repairs.push(...warnBareGitStatus(toolName, args))
     repairs.push(...repairGlobPath(toolName, args))
   }
   if (rules.escalation === true) repairs.push(...repairEscalationArgs(args, schema))

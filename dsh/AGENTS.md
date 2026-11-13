@@ -14,6 +14,7 @@
 - 这条是**选型阶段**就该做对的判断，不能指望 `orchestrator-gate`：gate 只在被拒绝时才提示，主模型若一开始就选 `op:"tool"` 根本不会触发拦截。
 - **触发词表（词面匹配即触发，不靠理解规则；bug6520 复盘 O3：gate 兜底拦截 3 次，每多一轮全套重发）**：意图含「跑 / 执行 / 构建 / build / lint / 测试 / 部署 / 全仓 / 大目录 / 检索 / 多文件 grep」任一词 → **第一次就 `orchestrate {op:"full"}`**，不等 gate。例外（直跑豁免白名单）：① 单文件窄 read（带 offset/limit）；② 已缩到具体模块目录的 grep；③ **单目录 + 关键词已知的 grep**（含「grep 类名拿行号」）。
 - **定位阶段一律走编排器（P0-1，2026-11-13）**：定位 Bug/字段时的 grep（字段定义、声明确认）、大文件读取、跨模块检索，**第一次即 `orchestrate {op:"full"}`**，宿主只收命中行摘要；例外仅限单文件窄 read 和已缩到具体模块且预估单轮的 grep，**预估 ≥2 轮定位时一律走编排器**，禁止宿主直跑把结果整段回灌上下文。
+- **未知目录先 pwsh 列目录再 glob（P0-2，2026-11-13 复盘）**：对未知根/未知层级（如不确定是否 monorepo）时，先 `pwsh Get-ChildItem <dir>` 确认目录结构，再对**具体目录**用 glob 带 `path`；禁止对未知根直接 glob 反复试错（复盘实例：glob 4 次全败、pwsh 列目录 3 次全成）。
 - **局部改动固定路径（P0-2，2026-11-13）**：改样式类/局部行时先 `grep -n "类名|符号"` 拿行号 → `read offset/limit ±30 行`，禁止脑内推演行号后整读。整读双门槛（须同时满足）：同目录文件数 ≤5 且 grep 唯一命中，**且预估读取 ≤150 行**；任一不满足必须 grep 缩行号（反例：483 行组件整读两遍只改 3 行 CSS）。
 
 ## 并行扇出（强制）
@@ -42,6 +43,7 @@
 - **新建文件用 `write`，已有文件一律 `edit`**；禁止对已存在文件整篇 `write` 覆盖（典型反例：方案 v2 整篇覆盖 v1，一次全量 write 的代价会在后续每一步复利放大）。
 - **计划/方案文档先出骨架（≤1.5k）**，再逐节 `edit` 增量补章节；禁止「想清楚后一次性 5k 全文 write」。
 - **写前先定结构：骨架 → 逐节 edit → 定稿**，全程不重读全文；某节要改写也只 replace 该节，不发整篇。
+- **合并/拆分 edit（P0-1，2026-11-13 复盘）**：同类多文件/多段修改**合并成一次 edit**；常驻 instructions 类文件（AGENTS.md 等）批量改——一次 edit 多段，**禁止逐条 edit 反复重发全文**（复盘实例：2 次 edit 触发 3 次全文 instructions 重发；step 28 一次 5.8k output 重写 5 节）。一次大改拆成 2–3 次中等 edit，避免单步过大。
 
 ## 长任务日志与半分钟监听（强制，所有会话生效）
 
@@ -64,7 +66,7 @@
 - 未知具体路径时，禁止全仓 `grep` / `read`；禁止 `src/**` 全量 grep，先缩到具体模块。
 - 找不到文件先 `mcp__openviking__search`（`mode=context`，`detail=abstract`）。不要把 `viking://` 当磁盘路径读。
 - DBX 长文本读不全时改 `git log` 或 `UNION ALL` 分段（细则在 `zentao-analyzer` 的 `references/dbx.md`），禁止同一形态连试三次。
-- 禁止提交 `env/.env` 与 `public/version.json`。`git pull` / `git rebase` 前先 `git status --short`，脏的环境文件先 stash。
+- 禁止提交 `env/.env` 与 `public/version.json`。`git pull` / `git rebase` 前先 `git status --short <子模块路径>`，脏的环境文件先 stash。**多子模块/需限定范围时禁止裸 `git status`（无范围）——易回灌大量未跟踪文件；根仓或已带 `git -C <dir>` 可裸用（R5 hook `bare-git-status` 会告警，见 agent-guard）。**
 - 自动化环境的 `git commit` / `rebase --continue` / `merge` 必须先设 `GIT_EDITOR=true`。
 - 未跑构建必须写「未执行」。构建、部署、回写证据不齐不收尾。
 
@@ -73,5 +75,6 @@
 - 修改、修复、配置、实现直接做完可逆部分并验证。只有高风险、不可逆、越权，或缺少无法推断的信息时才问。
 - 要用户选择时只用 `ask_user_question`，禁止在正文末尾提问。已回答且范围未变的不重复问。
 - 改动落在 Git 仓库时，收尾问：仅提交 / 提交并推送 / 暂不处理。用户本轮已明确说不用提交或直接提交推送时不再问。
+- **提交前一次性校验（P0-6，2026-11-13 复盘）**：提交前一次性核对脏文件、子模块状态、待推送范围（`git status --short <submodule>`），避免提交来回返工（复盘实例：step 51→53 提交返工）。
 - 收尾前 `job_list`，停掉不再需要的后台任务。工具参数报错先加载 `tool-call-hygiene` 再重试一次。
 - `repo-safety`、`web-deploy` 仅当本会话技能目录已经列出时才加载；未注册则忽略，不要因此报错。
