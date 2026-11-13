@@ -101,11 +101,28 @@ export const inject = ["tools"];
  * `.validate()`，零依赖插件无法提供，会导致加载失败。配置在 apply 内自行归一化。
  */
 function normalizeConfig(input) {
+  // pwsh 读取类裁剪配置：max/head/tail 必须为正整数且 head+tail<=max，否则整组回退默认。
+  let pwshReadMaxLines = Number(input?.pwshReadMaxLines ?? 200);
+  let pwshHeadLines = Number(input?.pwshHeadLines ?? 120);
+  let pwshTailLines = Number(input?.pwshTailLines ?? 40);
+  const validPwsh =
+    Number.isInteger(pwshReadMaxLines) && pwshReadMaxLines > 0
+    && Number.isInteger(pwshHeadLines) && pwshHeadLines > 0
+    && Number.isInteger(pwshTailLines) && pwshTailLines > 0
+    && pwshHeadLines + pwshTailLines <= pwshReadMaxLines;
+  if (!validPwsh) {
+    pwshReadMaxLines = 200;
+    pwshHeadLines = 120;
+    pwshTailLines = 40;
+  }
   return {
     enabled: input?.enabled ?? true,
     readBudgetTokens: input?.readBudgetTokens ?? 4000,
     inlineTokens: input?.inlineTokens ?? 1500,
     extraTools: Array.isArray(input?.extraTools) ? input.extraTools : [],
+    pwshReadMaxLines,
+    pwshHeadLines,
+    pwshTailLines,
   };
 }
 
@@ -207,60 +224,119 @@ const GREP_FILE_LINE = /^(.+?):(\d+):(.*)$/;
 const PWSH_WARN = "[警告] 工具产生了大量报错输出，可能包含许多与当前修改无关的既有错误。";
 const BUILD_CMD = /\bnpm\s+run\s+lint\b|\bnpm\s+run\s+build\b|\bnpm\s+test\b/;
 const ERROR_LINE = /\b(?:error|err!|failed|failure|exception)\b|✖|error TS\d+/i;
+// 读取类 pwsh 命令：锚定命令首部或管道/分隔符之后的整词 token（大小写不敏感）。
+// 避免把 `--type=`、`npm test` 等 build/参数误判为读取类（build 已在前面短路）。
+const PWSH_READ_CMD = /(^|&&|\|\||[|;&({\r\n])\s*(?:get-content|select-string|get-childitem|gc|cat|type|more|ls|dir)(?=[\s("']|$|[|;&)])/i;
 
 function grepStats(text) {
+  // 每文件：命中数 + 命中行号（最多记前 30 个行号，够定位即可）。
   const counts = new Map();
+  const lineNos = new Map();
+  const record = (file, n) => {
+    counts.set(file, (counts.get(file) ?? 0) + 1);
+    const arr = lineNos.get(file);
+    if (arr && arr.length < 30 && Number.isFinite(n)) arr.push(n);
+  };
   let matches = 0;
   let current = null;
   for (const line of text.split("\n")) {
     const located = line.match(GREP_FILE_LINE);
     if (located && !located[1].includes(" ")) {
       const file = located[1];
-      counts.set(file, (counts.get(file) ?? 0) + 1);
+      record(file, Number(located[2]));
       matches += 1;
       continue;
     }
     if (GREP_MATCH.test(line)) {
       matches += 1;
-      if (current) counts.set(current, (counts.get(current) ?? 0) + 1);
+      if (current) {
+        const m = line.match(/\d+/);
+        record(current, m ? Number(m[0]) : NaN);
+      }
       continue;
     }
     const header = line.trim();
-    if (header && !header.includes(" ") && /[\\/]/.test(header)) current = header;
+    if (header && !header.includes(" ") && /[\\/]/.test(header)) {
+      current = header;
+      if (!lineNos.has(current)) lineNos.set(current, []);
+    }
   }
-  return { files: counts.size, matches, counts };
+  return { files: counts.size, matches, counts, lineNos };
 }
 
-function capGrep(text) {
+// 上下文参数：模型显式要了 -C/-A/-B 上下文（或 grep 结果里带上下文块），
+// 说明是刻意取上下文，不应折叠成文件清单——折叠会把刚拿到的上下文又丢掉，逼出第二次 grep。
+function wantsContext(args) {
+  if (args === null || typeof args !== "object") return false;
+  const keys = ["context", "-C", "after", "-A", "before", "-B", "contextLines", "around"];
+  return keys.some((k) => args[k] !== undefined && args[k] !== null && args[k] !== 0 && args[k] !== false);
+}
+
+function capGrep(args, text) {
   const stats = grepStats(text);
-  if (stats.files <= 10 && stats.matches <= 20) return null;
+  // 审计 B：折叠阈值改为**组合条件**（文件 ≥5 且 命中 ≥30）。单文件即使几十条也回行内容，
+  // 避免「1 文件 24 条也被折叠成文件名」逼出一次多余 read（旧逻辑 files<=10||matches>20 即折）。
+  if (wantsContext(args)) return null;
+  if (stats.files < 5 || stats.matches < 30) return null;
   // 无文件信息（如 "Line 3: hit"）：只报总命中数，不回灌行内容。
   if (stats.files === 0) {
     return `[token-guard] grep 命中 ${stats.matches} 条（无文件信息），请缩范围或加 include。`;
   }
-  // 有文件信息：折叠为「文件清单 + 每文件命中数」，最多列 10 个文件。
+  // 有文件信息：折叠为「文件清单 + 每文件命中数与行号」，最多列 10 个文件。
+  // 返回行号让模型能直接 read offset=<行号> 续读，不必二次 grep（审计 B）。
   const entries = [...stats.counts.entries()];
-  const shown = entries.slice(0, 10).map(([file, k]) => `${file}  (${k} 条)`);
+  const shown = entries.slice(0, 10).map(([file, k]) => {
+    const nos = (stats.lineNos.get(file) ?? []).slice(0, 8);
+    const tail = nos.length ? `  行 ${nos.join(",")}${k > nos.length ? ",…" : ""}` : "";
+    return `${file}  (${k} 条${tail})`;
+  });
   const lines = [
-    `[token-guard] grep 命中 ${stats.matches} 条 / ${stats.files} 个文件，已折叠为文件清单（不返回行内容）。请缩范围或加 include 精确定位。`,
+    `[token-guard] grep 命中 ${stats.matches} 条 / ${stats.files} 个文件，已折叠为文件清单 + 行号（不返回行内容）。按行号 read offset=<行号> 续读，或缩范围/加 include。`,
     ...shown,
   ];
   if (entries.length > 10) lines.push("...（其余文件已省略）");
   return lines.join("\n");
 }
 
-function capPwsh(command, text) {
-  if (!BUILD_CMD.test(String(command || ""))) return null;
+// 返回结构化 { text: string|null, spillRequested: boolean, omittedLines?: number }。
+// text===null 表示「原样放过」（上层不得替换 content）。
+// build/lint/test 走原裁剪逻辑（文本逐字不变，spillRequested=false）。
+// 非 build 的读取类命令大输出走头 head + 尾 tail 裁剪，spillRequested=true（需落盘）。
+function capPwsh(command, text, pwsh) {
+  const cmd = String(command || "");
+  // 1) build 优先短路：命中即走原逻辑，文本逐字不变，不落盘。
+  if (BUILD_CMD.test(cmd)) {
+    const lines = text.split("\n");
+    const errors = lines.filter((line) => ERROR_LINE.test(line));
+    if (errors.length <= 20) return { text: null, spillRequested: false };
+    const omitted = lines.length - 15;
+    return {
+      text: [
+        PWSH_WARN,
+        ...lines.slice(0, 10),
+        `... (省略 ${omitted} 行错误) ...`,
+        ...lines.slice(-5),
+      ].join("\n"),
+      spillRequested: false,
+    };
+  }
+  // 2) 读取类：非 build 且命令形如 get-content/select-string/... 才裁剪。
+  if (!PWSH_READ_CMD.test(cmd)) return { text: null, spillRequested: false };
   const lines = text.split("\n");
-  const errors = lines.filter((line) => ERROR_LINE.test(line));
-  if (errors.length <= 20) return null;
-  const omitted = lines.length - 15;
-  return [
-    PWSH_WARN,
-    ...lines.slice(0, 10),
-    `... (省略 ${omitted} 行错误) ...`,
-    ...lines.slice(-5),
+  const total = lines.length;
+  const max = pwsh?.max ?? 200;
+  const head = pwsh?.head ?? 120;
+  const tail = pwsh?.tail ?? 40;
+  if (total <= max) return { text: null, spillRequested: false };
+  const omitted = total - head - tail;
+  const headPart = lines.slice(0, head);
+  const tailPart = tail > 0 ? lines.slice(total - tail) : [];
+  const text2 = [
+    ...headPart,
+    `... (省略${omitted}行，建议改用 read offset/limit 或 grep 定位) ...`,
+    ...tailPart,
   ].join("\n");
+  return { text: text2, spillRequested: true, omittedLines: omitted };
 }
 
 function capOrchestrate(text) {
@@ -268,30 +344,37 @@ function capOrchestrate(text) {
   return `${text.slice(0, 1000)}\n(结果不可用，已截断。请宿主重新规划，不要沿用无法读取或示意性内容。)`;
 }
 
-/** 超限时返回截断文本；未超限返回 null。 */
-function cappedText(exec, text) {
+/**
+ * 返回结构化 { text: string|null, spillRequested: boolean, omittedLines?: number }。
+ * text===null 表示原样放过；spillRequested 仅 pwsh 读取类裁剪时为 true。
+ * 其它工具（grep/read/skill/orchestrate）沿用旧 string|null 语义，包装为 { text, spillRequested:false }。
+ */
+function cappedText(exec, text, pwshCfg) {
   const toolName = exec?.name;
-  if (toolName === "grep") return capGrep(text);
-  if (toolName === "pwsh") return capPwsh(exec?.arguments?.command, text);
-  if (toolName === "orchestrate") return capOrchestrate(text);
+  const args = exec?.arguments;
+  if (toolName === "pwsh") return capPwsh(exec?.arguments?.command, text, pwshCfg);
+  if (toolName === "grep") return { text: capGrep(args, text), spillRequested: false };
+  if (toolName === "orchestrate") return { text: capOrchestrate(text), spillRequested: false };
   if (toolName === "read") {
     const lines = text.split("\n");
-    const args = exec?.arguments;
     const hasRange = hasReadRange(args);
-    if (!hasRange && lines.length > 300) {
-      return `[token-guard] read 未带 offset/limit 且共 ${lines.length} 行（>300）。先 grep 定位，或带 offset/limit 分段读，不要整读。`;
+    // .vue 保留既有 500 行门槛，同时使用 P0 严格分页验证。
+    const isVue = typeof args?.file_path === "string" && /\.vue$/i.test(args.file_path);
+    const wholeGate = isVue ? 500 : 300;
+    if (!hasRange && lines.length > wholeGate) {
+      return { text: `[token-guard] read 未带 offset/limit 且共 ${lines.length} 行（>${wholeGate}）。先 grep 定位，或带 offset/limit 分段读，不要整读。`, spillRequested: false };
     }
     if (hasRange && lines.length > 500) {
-      return lines.slice(0, 500).join("\n")
-        + "\n[token-guard] read 已超过 500 行，其余已截断。请缩小 offset/limit 范围后再读。";
+      return { text: lines.slice(0, 500).join("\n")
+        + "\n[token-guard] read 已超过 500 行，其余已截断。请缩小 offset/limit 范围后再读。", spillRequested: false };
     }
-    return null;
+    return { text: null, spillRequested: false };
   }
   if (toolName === "skill" && text.length > 2500) {
-    return text.slice(0, 2500)
-      + "\n[token-guard] skill 正文已截断。只保留前 2500 字，按已给出的步骤执行，不要为了补全文再整篇重读。";
+    return { text: text.slice(0, 2500)
+      + "\n[token-guard] skill 正文已截断。只保留前 2500 字，按已给出的步骤执行，不要为了补全文再整篇重读。", spillRequested: false };
   }
-  return null;
+  return { text: null, spillRequested: false };
 }
 
 export function apply(ctx, rawConfig) {
@@ -302,11 +385,14 @@ export function apply(ctx, rawConfig) {
     throw new Error(`token-guard: inlineTokens must be a non-negative integer (got ${budget})`);
   }
   const threshold = config.readBudgetTokens;
-  const watched = new Set(["read", ...config.extraTools]);
+  const pwshCfg = { max: config.pwshReadMaxLines, head: config.pwshHeadLines, tail: config.pwshTailLines };
+  const watched = new Set(["read", "pwsh", ...config.extraTools]);
   const directTools = new Set(['grep', 'glob', 'read', 'pwsh']);
   const logStore = createLogStore();
   // Host integrations can expose this narrow reader without using arbitrary read paths.
-  ctx.p0LogReader = logStore.read;
+  // cordis Context 是代理：未 provide 声明的属性直接赋值会抛 cannot set property (2026-11-13)。
+  if (typeof ctx.provide === 'function') ctx.provide('p0LogReader', logStore.read);
+  else ctx.p0LogReader = logStore.read;
   ctx.tools?.register?.({
     name: 'p0_log_read',
     description: 'Read a token-guard logRef only (not execution logs). Session bound; at most 2000 characters / 40 lines, 3 reads / 6000 characters per session.',
@@ -331,7 +417,24 @@ export function apply(ctx, rawConfig) {
       const source = Object.hasOwn(decision, 'value') ? decision.value : (decision.content ?? result.content);
       const original = typeof source === 'string' ? source : Array.isArray(source) ? fullTextOf(source) : JSON.stringify(source ?? '');
       const text = redact(original);
-      const shortened = cappedText(exec, text) ?? text;
+      const capped = cappedText(exec, text, pwshCfg);
+      let shortened = capped.text ?? text;
+      if (capped.spillRequested) {
+        try {
+          const owner = exec.agent?.session?.header?.id;
+          const spillStore = ctx.get('spillStore');
+          if (owner === undefined || !spillStore) throw new Error('no session spillStore');
+          const ref = await spillStore.saveText({
+            owner: { sessionId: owner },
+            source: { kind: 'tool', toolName: exec.name, callId: exec.callId, label: 'result' },
+            suggestedName: `${exec.name}.txt`, content: text,
+          });
+          shortened += `\n\n${formatNotice(0, ref)}`;
+        } catch (error) {
+          ctx.logger?.warn?.(`token-guard: pwsh spill failed: ${String(error)}`);
+          shortened += '\n(落盘失败，全文未保存；请改用 read offset/limit 或缩小命令输出)';
+        }
+      }
       if (shortened !== original || text.length > policy.result.directChars) {
         const session = exec.agent?.session?.header?.id;
         const logRef = logStore.save(session, text);
@@ -344,14 +447,13 @@ export function apply(ctx, rawConfig) {
     if (Object.hasOwn(decision, 'value')) return decision;
     let content = decision.content ?? result.content;
     if (!retainable(content) || content.length === 0) return decision;
-    const shortened = cappedText(exec, fullTextOf(content));
-    if (shortened) {
-      content = [{ type: "text", text: shortened }];
-      if (!watched.has(exec.name) || priceContent(content) <= threshold) {
-        return { kind: "accept", content };
-      }
+    const capped = cappedText(exec, fullTextOf(content), pwshCfg);
+    if (capped.text !== null) content = [{ type: 'text', text: capped.text }];
+
+    // 其它工具（grep/read/skill/orchestrate）沿用旧逻辑：裁剪后体积仍超阈值且可落盘才走 spillStore。
+    if (!watched.has(exec.name) || priceContent(content) <= threshold) {
+      return capped.text !== null ? { kind: "accept", content } : decision;
     }
-    if (!watched.has(exec.name)) return decision;
     if (priceContent(content) <= threshold) return decision;
 
     try {
