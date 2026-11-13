@@ -26,6 +26,9 @@ DEFAULT_CFG = str(Path(__file__).resolve().parent.parent / "config.yaml")
 PLAN_REVIEW_TOOL = "plan_reviewer"
 # 计划 Markdown 太长会让审核模型 token 爆掉且抓不住重点，超出则截断保留头尾。
 PLAN_REVIEW_CLIP_CHARS = 16000
+# 送审前对计划做无损结构压缩（只削空白/表格外纯装饰线，保留代码块/frontmatter/表格）。
+# 默认开启；置 PLAN_REVIEW_CONDENSE=false 可一键回退到原样送审。
+PLAN_REVIEW_CONDENSE = os.getenv("PLAN_REVIEW_CONDENSE", "true").strip().lower() == "true"
 _PLAN_REVIEW_SYSTEM = (
     "你是高级方案审核员。审核提交的 Markdown 计划，重点判断是否存在会阻断落地的问题。\n"
     "【分级】把每个问题标为 P0 / P1 / P2：\n"
@@ -189,6 +192,94 @@ def _clip_plan(plan_markdown: str, limit: int = PLAN_REVIEW_CLIP_CHARS) -> tuple
     return clipped, True
 
 
+def _is_fence(line: str) -> bool:
+    return line.strip().startswith("```")
+
+
+def _is_decoration(line: str) -> bool:
+    """整行只由 - * _ 空格 制表 组成且含至少 3 个此类符号（避免误删单字符行）。"""
+    body = [c for c in line if c not in " \t"]
+    return len(body) >= 3 and all(c in "-*_" for c in body)
+
+
+def _condense_plan(plan_markdown: str) -> tuple:
+    """送审前无损结构压缩。状态机逐行扫描（非全局正则），迭代到不动点以保证幂等。
+
+    保留（红线）：fenced code block 内部逐字、开头 frontmatter 段（---…---）逐字、
+    GFM 表格分隔行、setext 标题下划线、行尾空格（硬换行）。
+    精简：连续空行折叠为 1；表格外的正文纯装饰线（``---``/``***`` 等）删除。
+    返回 (condensed_text, ratio)，ratio = len(condensed)/len(original)。
+    """
+    orig = plan_markdown or ""
+    prev = orig
+    cur = _condense_once(prev)
+    # 删除装饰线后可能留下连续空行，再跑一遍收敛（最多 3 轮）
+    for _ in range(3):
+        if cur == prev:
+            break
+        prev = cur
+        cur = _condense_once(cur)
+    ratio = (len(cur) / len(orig)) if orig else 1.0
+    return cur, ratio
+
+
+def _condense_once(text: str) -> str:
+    orig_len = len(text)
+    lines = text.split("\n")
+    out = []
+    in_code = False
+    blank_count = 0
+    # frontmatter：仅当首行是纯 --- 时，标出其后到下一个纯 ---（含）的区间（按行号）
+    fm_end = -1
+    if lines and all(c in "- \t" for c in lines[0]) and lines[0].strip():
+        for j in range(1, len(lines)):
+            if all(c in "- \t" for c in lines[j]) and lines[j].strip():
+                fm_end = j
+                break
+    for i, line in enumerate(lines):
+        # 红线1：代码块
+        if _is_fence(line):
+            in_code = not in_code
+            out.append(line)
+            blank_count = 0
+            continue
+        if in_code:
+            out.append(line)
+            blank_count = 0
+            continue
+        # 红线3：开头 frontmatter 段（含边界 ---）逐字保留
+        if 0 <= i <= fm_end:
+            out.append(line)
+            blank_count = 0
+            continue
+        # 红线2：空行折叠为 1
+        if not line.strip():
+            blank_count += 1
+            if blank_count == 1:
+                out.append("")
+            continue
+        blank_count = 0
+        # 装饰线/setext 判定
+        if _is_decoration(line):
+            # ② GFM 表格分隔行（含 |）保留
+            if "|" in line:
+                out.append(line)
+                continue
+            # ③ setext 标题下划线（上一行非空且非 # 标题）保留
+            prev = lines[i - 1] if i > 0 else ""
+            if prev.strip() and not prev.lstrip().startswith("#"):
+                out.append(line)
+                continue
+            # ④ 其余为正文纯装饰线 → 删除（并把紧邻前导空行折叠掉，避免留下连续空行）
+            if out and out[-1] == "":
+                # 若再往前也是空行则已折叠；这里保留一个空行，删除装饰线本身
+                pass
+            continue
+        # 普通内容行原样保留（不删行尾空格）
+        out.append(line)
+    return "\n".join(out)
+
+
 def _extract_json_object(text: str) -> Optional[Dict[str, Any]]:
     """从模型输出里抠出第一个 JSON 对象（容忍 ```json 包裹或前后废话）。失败返回 None。"""
     if not text:
@@ -294,8 +385,13 @@ def run_plan_review(
     prepared = prepare(workdir or _root_for(config_path), plan_path, session_id,
                        plan_markdown, base_sha, base_version, delta)
     plan = prepared["plan_markdown"]
+    # 送审输入压缩（默认开）：先 condense 再套长度上限；sha/version 已按原 plan 计算，不受影响。
+    if PLAN_REVIEW_CONDENSE:
+        review_plan, condense_ratio = _condense_plan(plan)
+    else:
+        review_plan, condense_ratio = plan, 1.0
     # A pass must cover the complete reconstructed version, never a clipped plan.
-    if len(plan) > PLAN_REVIEW_CLIP_CHARS:
+    if len(review_plan) > PLAN_REVIEW_CLIP_CHARS:
         raise ValueError("plan exceeds review size limit; shorten before review")
     latest = prepared.get("latest")
     if (latest and latest.get("verdict") == "pass" and not latest.get("stale")
@@ -310,10 +406,14 @@ def run_plan_review(
     clipped = False
     cfg = load_config(config_path)
     router = ModelRouter(cfg)
+    _LOGGER.info(
+        "plan_review condense: original=%d condensed=%d ratio=%.3f est_tokens=%d",
+        len(plan), len(review_plan), condense_ratio, round(len(review_plan) / 1.5),
+    )
     user_content = (
         (f"## 任务背景\n{task_context.strip()}\n\n" if task_context and task_context.strip() else "")
         + "## 待审核计划\n"
-        + plan
+        + review_plan
     )
     messages = [
         {"role": "system", "content": _PLAN_REVIEW_SYSTEM},
