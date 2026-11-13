@@ -17,6 +17,8 @@ import os
 import re
 import stat
 import subprocess
+import time
+from pathlib import Path
 from typing import Any, Dict, List, Optional, TypedDict
 
 from langgraph.graph import END, StateGraph
@@ -90,6 +92,72 @@ NO_LOCAL_FILE_SYSTEM = (
     "禁止输出超过 20 个字的说明。"
 )
 _NO_LOCAL_READ_TOOLS = frozenset({"file_reader", "code_editor", "code_edit_with_signal"})
+
+# ===================================================================== #
+# off-task（跑题）检测与真实流量触发率统计
+# ===================================================================== #
+# 背景（2026-11-13）：code_edit_with_signal 首次冒烟时，composer-2.5 输出了一整篇与提问
+# 无关的「博客成稿」，还凭空编造项目路径（source/blogs/...）、不存在的 blog_skill 与
+# 风格名。同一提问重放 11 次（含注入 NO_LOCAL system / max_tokens 6144）全部 on-task，
+# 即：**低频、无法靠请求参数复现**。因此不能用「偶发」放过，也不应为此改 prompt 就了事；
+# 正确做法是上线后**在真实流量上统计触发率**——本节的 JSONL 日志就是那个分母。
+#
+# 设计约束：正则必须保守（只拦高度特征化词）。误报会直接抬高重跑率与成本，
+# 比漏检更伤；宁可漏检，先把统计做起来，后续按日志里的人工复核结果再调。
+_OFFTASK_PATTERN = re.compile(
+    r"source/blogs\s*"
+    r"|blog_skill"
+    r"|Mike Dane"
+    r"|Giraffa"
+    r"|请保存为\s*[*_`]*[\w./-]+\.(?:md|py|ts|tsx|js|vue|json|ya?ml)"
+    r"|正在阅读项目内的风格指南",
+    re.IGNORECASE,
+)
+
+# 只在「代码生成类」工具上统计：摘要类工具输出短、误报意义不大。
+_OFFTASK_TOOLS = frozenset({"code_editor", "code_edit_with_signal"})
+
+# 日志位置：与 api.py 的 .sessions 同级，方便一并归档分析。
+_OFFTASK_LOG = Path(__file__).resolve().parent.parent / ".sessions" / "offtask.jsonl"
+
+
+def detect_offtask(content: str) -> Optional[str]:
+    """命中返回命中的特征词（便于聚类），否则 None。"""
+    if not content:
+        return None
+    m = _OFFTASK_PATTERN.search(content)
+    return m.group(0) if m else None
+
+
+def log_offtask(
+    *, tool: str, model: Optional[str], matched: Optional[str],
+    content: str, instruction: str, session_id: str = "anonymous",
+) -> None:
+    """每次代码类工具调用都记一行（命中与否都记），用于算触发率。
+
+    只记长度与截断片段，不落全文：避免把大输出写进日志。
+    写日志失败绝不能影响主流程，所以整段包 try。
+    """
+    if tool not in _OFFTASK_TOOLS:
+        return
+    try:
+        row = {
+            "ts": time.time(),
+            "session_id": session_id,
+            "tool": tool,
+            "model": model,
+            "hit": bool(matched),
+            "matched": matched,
+            "chars": len(content or ""),
+            "instruction_head": (instruction or "")[:120],
+            "head": (content or "")[:200],
+            "tail": (content or "")[-200:] if content and len(content) > 400 else "",
+        }
+        _OFFTASK_LOG.parent.mkdir(parents=True, exist_ok=True)
+        with _OFFTASK_LOG.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+    except Exception:  # noqa: BLE001 —— 观测日志永不阻断业务
+        pass
 _GIT_LINE_CAP = 20
 _UNMERGED_PREFIX = re.compile(r"^(UU|AA|DD|AU|UA|DU|UD)\s+(.+)$")
 
@@ -971,6 +1039,38 @@ def build_graph(router: ModelRouter, cfg):
             messages.insert(0, {"role": "system", "content": NO_LOCAL_FILE_SYSTEM})
         res: ToolResult = router.run_tool(tool_name, messages)
         content = res.content or ""
+
+        # off-task 检测：命中则降级重跑一次（池内下一个模型），否则原样返回。
+        # 无论命中与否都落一行 JSONL，用于在真实流量上统计触发率（分母是全部代码类调用）。
+        matched = detect_offtask(content)
+        if matched and res.tool in _OFFTASK_TOOLS:
+            retry_pool = [m.model for m in cfg.tool(res.tool).models if m.model != res.model_used]
+            trace.append(
+                f"[OFFTASK] tool={res.tool} model={res.model_used} matched={matched!r}，降级重跑 {retry_pool}"
+            )
+            for alt in retry_pool:
+                retry = router.run_tool(res.tool, messages, force_model=alt)
+                if not retry.ok:
+                    continue
+                retry_matched = detect_offtask(retry.content or "")
+                trace.append(
+                    f"[OFFTASK-RETRY] model={alt} hit={bool(retry_matched)}"
+                )
+                res = retry
+                content = retry.content or ""
+                matched = retry_matched
+                if not retry_matched:
+                    break
+
+        log_offtask(
+            tool=res.tool,
+            model=res.model_used,
+            matched=matched,
+            content=content,
+            instruction=instruction,
+            session_id=str(state.get("session_id") or "anonymous"),
+        )
+
         if res.tool == "file_reader":
             content = _clip(content, 2000, 2000)
         new_ctx = (
