@@ -55,3 +55,10 @@ Bug 6563 只改 5 行却耗 117 步/等效 65k，浪费集中在「取图绕路�
 - **反向统一**：全仓 `Select-String -Pattern 'npx eslint --ext','首轮送审整篇','--out'`（限这 4 文件）均应为 0 命中（`--out` 仅允许出现在"非 --out"说明中）。
 - **范围**：`git diff --stat` 只含上述 4 个 .md，无代码文件夹带。
 - **未执行构建**：纯 Markdown 规则文本改动，仓库为 skills 文档仓、非可构建前端工程，`npm run build` 不适用（未执行，原因：无应用代码/package.json）。
+
+## 五、验证结果（已执行，2026-11-13）
+- V1/V2/V4 SKILL.md：`Select-String` 确认「位置参数/非 --out/credentials.py/menuFilePath/companyManagement/禁止按标题字面量猜目录/LASTEXITCODE/Select-String」全命中；反向确认无活跃 `npx eslint --ext .js,.vue src`（仅出现在"禁止…回灌"说明中）。
+- V5 token-policy：`:23` 命中「workdir 必须含 package.json…INVALID_EXECUTION」。
+- V6 AGENTS.md：`:36` 命中「首轮即只发…」，旧句「首轮送审整篇」已无。
+- 范围：`git diff --cached --name-only` 仅 4 文件；提交 `d10e85e5`，`git push` 后 remote main == local HEAD。
+- 问题③（organType/companyType 业务字段对照）：按用户"业务细节不需要做"**未实施**，其余 5 条全部落地。
