@@ -48,6 +48,8 @@ class OrchState(TypedDict, total=False):
     model_calls: List[Dict[str, Any]]  # [{role, model, ok, elapsed, usage}]
     environment_context: Dict[str, Any]  # {cwd, env}
     guard: Dict[str, Any]                # {allow, reason}
+    session_id: str                      # 路由/跑题日志共用
+    route_source: str                    # 见 ROUTE_* 常量
 
 
 PLANNER_SYSTEM = """你是一个任务规划器。把用户需求拆成有序步骤，最少 1 步，最多 5 步。
@@ -119,6 +121,85 @@ _OFFTASK_TOOLS = frozenset({"code_editor", "code_edit_with_signal"})
 
 # 日志位置：与 api.py 的 .sessions 同级，方便一并归档分析。
 _OFFTASK_LOG = Path(__file__).resolve().parent.parent / ".sessions" / "offtask.jsonl"
+
+# ===================================================================== #
+# 路由日志（[ROUTE-MISS]）—— 与 off-task 日志是不同分母
+# ===================================================================== #
+# off-task 日志回答「选中的工具输出对不对」，分母 = 代码类工具调用数。
+# 路由日志回答「到底有没有选中该选的工具」，分母 = **每一次规划决策**。
+# 两者不可混：若只盯 off-task，会出现「样本永远等不到」（因为压根没选中该工具），
+# 或者等到了一批不代表生产分流的数据（因为分母是已选中的，不是全部候选）。
+
+# route_source：这次执行的工具有多确定是「规划器主动选的」。
+ROUTE_PLANNER = "planner"            # 规划器正常返回并选中
+ROUTE_FALLBACK_PLANNER = "fallback_planner"  # 规划失败/空计划，强塞 planner 兜底
+ROUTE_UNKNOWN_TOOL = "unknown_tool"  # 规划器给了未定义工具名，回退 planner
+ROUTE_FORCED = "forced"              # 测试/人工强制指定
+
+# 「该选没选」的保守判据：只在出现明确的专精信号、但工具却没选对时才算 MISS。
+# 刻意不把模糊情形计为 MISS——否则 MISS 率无法作为行动依据。
+_SIGNAL_TOOL = "code_edit_with_signal"
+_CODE_TOOLS = frozenset({"code_editor", _SIGNAL_TOOL})
+
+_ROUTE_LOG = Path(__file__).resolve().parent.parent / ".sessions" / "route.jsonl"
+
+
+def expected_tool(user_request: str) -> Optional[str]:
+    """按 SIGNAL_TRIGGERS 粗判「理想工具」，仅用于日志对照，不用于实际调度。
+
+    返回 _SIGNAL_TOOL / "code_editor" / None（无法判定）。
+    """
+    text = (user_request or "").lower()
+    if not text.strip():
+        return None
+    hit = any(w.lower() in text for words in SIGNAL_TRIGGERS.values() for w in words)
+    if hit:
+        return _SIGNAL_TOOL
+    # 只有「写代码」类诉求但没有验证信号时，才期望 code_editor
+    code_words = ("写", "实现", "修改", "重构", "函数", "代码", "代码片段",
+                  "def ", "class ", "脚本", "报错")
+    if any(w in text for w in code_words):
+        return "code_editor"
+    return None
+
+
+def route_miss(user_request: str, chosen_tool: str, route_source: str) -> Optional[Dict[str, str]]:
+    """判定本次路由是否 miss；命中返回详情，否则 None。"""
+    if route_source != ROUTE_PLANNER:
+        return None  # 兜底/强制的路由不算规划器的错
+    want = expected_tool(user_request)
+    if want is None or chosen_tool == want:
+        return None
+    # 只关心「代码类工具之间选错」与「根本没选代码工具」
+    if chosen_tool == _SIGNAL_TOOL:
+        return None
+    if want == _SIGNAL_TOOL and chosen_tool in ("code_editor", "planner"):
+        return {"expected": want, "got": chosen_tool}
+    return None
+
+
+def log_route(
+    *, user_request: str, chosen_tool: str, route_source: str,
+    step_count: int, session_id: str = "anonymous",
+    miss: Optional[Dict[str, str]] = None,
+) -> None:
+    """每次规划决策写一行，用于统计真实分流命中率。写失败不阻断业务。"""
+    try:
+        row = {
+            "ts": time.time(),
+            "session_id": session_id,
+            "route_source": route_source,
+            "chosen": chosen_tool,
+            "expected": (miss or {}).get("expected"),
+            "miss": bool(miss),
+            "steps": step_count,
+            "request_head": (user_request or "")[:200],
+        }
+        _ROUTE_LOG.parent.mkdir(parents=True, exist_ok=True)
+        with _ROUTE_LOG.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+    except Exception:  # noqa: BLE001 —— 观测日志永不阻断业务
+        pass
 
 
 def detect_offtask(content: str) -> Optional[str]:
@@ -712,8 +793,29 @@ def build_graph(router: ModelRouter, cfg):
         plan = plan[:5]
         if not plan:
             plan = [{"tool": "planner", "instruction": state["user_request"]}]
+            route_source = ROUTE_FALLBACK_PLANNER
+            trace.append("[ROUTE-MISS] 规划为空/不可解析，已兜底 planner（不代表正常分流）")
+        else:
+            route_source = ROUTE_PLANNER
         trace.append(f"plan via {res.model_used or 'FALLBACK-FAIL'}: {len(plan)} steps")
-        return {"plan": plan, "cursor": 0, "results": [], "trace": trace, "model_calls": calls}
+
+        # 路由日志：分母 = 每一次规划决策。与 off-task 日志（分母=代码类调用）不同。
+        chosen = plan[0].get("tool", "planner") if plan else "planner"
+        miss = route_miss(state["user_request"], chosen, route_source)
+        if miss:
+            trace.append(
+                f"[ROUTE-MISS] 期望 {miss['expected']} 实际 {miss['got']} "
+                f"（route_source={route_source}）"
+            )
+        log_route(
+            user_request=state["user_request"], chosen_tool=chosen,
+            route_source=route_source, step_count=len(plan),
+            session_id=str(state.get("session_id") or "anonymous"), miss=miss,
+        )
+        return {
+            "plan": plan, "cursor": 0, "results": [], "trace": trace,
+            "model_calls": calls, "route_source": route_source,
+        }
 
     def node_dispatch(state: OrchState) -> OrchState:
         return state
@@ -1024,6 +1126,17 @@ def build_graph(router: ModelRouter, cfg):
             # 容错不变（仍回退 planner），但必须可观测：否则规划器选了一个未配置的
             # 工具名时会静默退化成 planner 作答，漏配无法发现。
             trace.append(f"[WARN] 未知工具 {requested!r}，已回退 planner")
+            trace.append(f"[ROUTE-MISS] 规划器给出未定义工具 {requested!r}")
+            try:
+                log_route(
+                    user_request=instruction or state.get("user_request", ""),
+                    chosen_tool=requested, route_source=ROUTE_UNKNOWN_TOOL,
+                    step_count=len(state.get("plan", [])),
+                    session_id=str(state.get("session_id") or "anonymous"),
+                    miss={"expected": "<defined>", "got": requested},
+                )
+            except Exception:  # noqa: BLE001
+                pass
         tool_name = requested if requested in cfg.tools and requested != guard_tool else "planner"
         prompt = instruction
         if requested in guarded:
