@@ -9,7 +9,8 @@
 import assert from 'node:assert'
 import { Config, apply } from './lib/index.js'
 
-const PROJECT = 'D:\\repository\\skills\\dsh\\langgraph-orchestrator'
+import { fileURLToPath } from 'node:url'
+const PROJECT = fileURLToPath(new URL('../langgraph-orchestrator', import.meta.url))
 
 async function main() {
   // 1) config 校验
@@ -29,7 +30,14 @@ async function main() {
   assert.ok(registered, '应注册工具')
   assert.equal(registered.name, 'orchestrate')
   assert.ok(typeof registered.execute === 'function')
-  assert.deepEqual(registered.parameters.required, ['request'])
+  assert.equal(registered.parameters.required, undefined)
+  assert.ok(registered.parameters.properties.workdir)
+  assert.deepEqual(registered.parameters.properties.execution.required, ['program', 'args'])
+  assert.ok(registered.parameters.properties.delta)
+  await assert.rejects(() => registered.execute({ op: 'plan_review' }, {}), /plan/)
+  const invalid = await registered.execute({ op: 'full', workdir: PROJECT + '/missing',
+    execution: { program: 'git', args: ['status', '--short'] } }, {})
+  assert.ok(invalid.includes('WORKDIR'), 'invalid cwd must fail before execution')
   console.log('[PASS] apply registers orchestrate tool')
 
   // 3) 真实跑 op=list(会 spawn python)
@@ -41,13 +49,14 @@ async function main() {
   assert.ok(out.includes('planner'), 'list 输出应含工具')
   console.log('[PASS] op=list via python bridge')
 
-  // 4) 真实跑 op=tool file_reader(一次真实模型调用)
-  const out2 = await registered.execute(
-    { op: 'tool', tool: 'file_reader', request: '用三个字回答: 你好吗' },
-    { signal: undefined },
-  )
-  assert.ok(out2.length > 0, 'tool 输出不应为空')
-  console.log('[PASS] op=tool file_reader ->', out2.split('\n')[0])
+  // Network/model smoke test is explicit opt-in; default selftests are offline.
+  if (process.env.DSH_TEST_MODELS === '1') {
+    const out2 = await registered.execute(
+      { op: 'tool', tool: 'file_reader', request: '用三个字回答: 你好吗' }, {},
+    )
+    assert.ok(out2.length > 0)
+    console.log('[PASS] optional model smoke test')
+  }
 
   console.log('\nALL ORCHESTRATOR SELFTESTS PASSED')
 }

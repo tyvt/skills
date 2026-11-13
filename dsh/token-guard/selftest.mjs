@@ -1,6 +1,6 @@
 // 自测：验证零依赖插件的裁剪/落盘逻辑与事件契约。
 import assert from 'assert';
-import { apply, name, inject } from './lib/index.js';
+import { apply, name, inject, createLogStore } from './lib/index.js';
 
 assert.equal(name, 'token-guard');
 assert.deepEqual(inject, ['tools']);
@@ -30,12 +30,8 @@ const decision = { kind: 'accept' };
 const next = async () => decision;
 const out = await handler(exec, result, next);
 assert.equal(out.kind, 'accept');
-assert.ok(saved.text && saved.text.length === 2000, 'full text spilled');
-assert.ok(Array.isArray(out.content) && out.content.length >= 1, 'content present');
-const joined = out.content.map(b => b.text).join('');
-assert.ok(joined.includes('token-guard: middle pruned'), 'GAP marker present');
-assert.ok(joined.includes('Full result stored at'), 'notice present');
-assert.ok(joined.length < bigText.length, 'trimmed smaller than original');
+assert.equal(saved.text, undefined, 'direct results never spill sensitive raw text');
+assert.equal(out, decision, 'direct result below hard cap is untouched');
 
 // 小 read 结果：不动
 let handler2; const ctx2 = { on(e, h) { if (e === 'tools/post-execute') handler2 = h; }, get() { return undefined; }, logger: { warn() {} } };
@@ -110,11 +106,55 @@ const readOut = await textResult({ name: 'read', text: readLines });
 assert.ok(readOut.content[0].text.includes('未带 offset/limit'), 'read gate without offset/limit');
 assert.ok(!readOut.content[0].text.includes('L0'), 'read gate returns no content');
 
-const readRangeOut = await textResult({ name: 'read', text: readLines, arguments: { offset: 0, limit: 400 } });
+const readRangeOut = await textResult({ name: 'read', text: readLines, arguments: { offset: 1, limit: 200 } });
 assert.ok(readRangeOut.content[0].text.includes('已超过 500 行'), 'read with range falls back to 500-line cap');
 
 const skillOut = await textResult({ name: 'skill', text: 'S'.repeat(6000) });
 assert.ok(skillOut.content[0].text.length < 3000, 'skill receipt shortened');
 assert.ok(skillOut.content[0].text.includes('skill 正文已截断'));
 
+for (const name of ['grep', 'glob', 'read', 'pwsh']) {
+  const bounded = await textResult({ name, text: '密'.repeat(10000), arguments: { offset: 1, limit: 40 } });
+  assert.ok(bounded.content[0].text.length <= 3200, `${name} hard char cap`);
+  assert.match(bounded.content[0].text, /logRef=[a-f0-9]{32}/);
+}
+const logStore = createLogStore();
+const ref = logStore.save('owner', 'token=secret-value\n' + 'line\n'.repeat(1000));
+assert.equal(logStore.read('../escape', 'owner').ok, false);
+assert.equal(logStore.read(ref, 'other').ok, false);
+assert.equal(logStore.read(ref, 'owner', { limit: 2001 }).ok, false);
+assert.equal(logStore.read(ref, 'owner', { maxLines: 41 }).ok, false);
+for (let i = 0; i < 3; i++) {
+  const page = logStore.read(ref, 'owner', { offset: i * 200 });
+  assert.equal(page.ok, true);
+  assert.ok(page.content.length <= 2000 && page.content.split('\n').length <= 40);
+  assert.ok(!page.content.includes('secret-value'));
+}
+assert.equal(logStore.read(ref, 'owner').error, 'log_quota_exceeded');
+const valueOut = await capHandler({ name: 'pwsh', agent: {} }, {}, async () => ({ kind: 'accept', value: 'x'.repeat(5000) }));
+assert.ok(valueOut.value.length <= 3200, 'value decision cannot bypass hard cap');
+let logTool;
+let guarded;
+apply({ tools: { register(tool) { logTool = tool; } }, on(event, fn) { if (event === 'tools/post-execute') guarded = fn; } }, {});
+const wrapped = await guarded({ name: 'glob', agent: { session: { header: { id: 'tool-session' } } } }, { content: [{ type: 'text', text: 'x'.repeat(9000) }] }, async () => ({ kind: 'accept', callId: 'keep-id' }));
+assert.equal(wrapped.callId, 'keep-id');
+const toolRef = wrapped.content[0].text.match(/logRef=([a-f0-9]{32})/)[1];
+assert.equal(logTool.name, 'p0_log_read');
+assert.equal(JSON.parse(logTool.execute({ logRef: toolRef }, { agent: { session: { header: { id: 'intruder' } } } })).ok, false);
+assert.equal(JSON.parse(logTool.execute({ logRef: toolRef }, { agent: { session: { header: { id: 'tool-session' } } } })).ok, true);
+const structured = { stdout: 'x'.repeat(4000), stderr: '', exitCode: 7, metadata: { id: 'job' } };
+const structuredOut = await capHandler({ name: 'pwsh', agent: {} }, {}, async () => ({ kind: 'accept', callId: 'structured-call', value: structured }));
+assert.equal(typeof structuredOut.value, 'object');
+assert.equal(structuredOut.callId, 'structured-call');
+assert.equal(structuredOut.value.exitCode, 7);
+assert.equal(structuredOut.value.metadata.id, 'job');
+assert.equal(structuredOut.value.stderr, '');
+assert.equal(typeof structuredOut.value.stdout, 'string');
+assert.ok(JSON.stringify(structuredOut.value).length <= 3200);
+assert.equal(structured.stdout.length, 4000, 'input value is not mutated');
+const hugeMetadata = await capHandler({ name: 'pwsh', agent: {} }, {}, async () => ({ kind: 'accept', value: { ...structured, metadata: { id: 'job', detail: '"\\n'.repeat(10000), entries: Array.from({ length: 1000 }, () => ({ detail: 'x'.repeat(1000) })) } } }));
+assert.equal(hugeMetadata.value.metadata.id, 'job');
+assert.equal(hugeMetadata.value.exitCode, 7);
+assert.ok(JSON.stringify(hugeMetadata.value).length <= 3200);
+assert.match(JSON.stringify(hugeMetadata.value.metadata), /truncated/);
 console.log('token-guard selftest: ALL PASS');

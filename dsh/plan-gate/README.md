@@ -65,10 +65,16 @@ orchestrate {
 
 ### 4) 人工确认
 用 `ask_user_question` 给出「确认实施 / 继续修改」选项，用户选「确认实施」后，
-把计划 frontmatter 落为终态：
+把计划 frontmatter 落为终态，并将审核响应中的 `plan_sha256`、`version` 分别填入 `approved_sha256`、`approved_version`。门禁要求 schema v2 的最新审核为 pass、session 匹配、正文摘要匹配及人工确认绑定同一版本；旧审批须重新审核。摘要统一 LF，排除审批 frontmatter 字段；正文变更必须重审。
+
+差量审核通过 `run_plan_review` 的 `workdir`、`plan_path`、`session_id`、`base_sha`、`base_version`、`delta` 传入；此时全文参数为空。`delta` 为 `[{"old":"唯一原文","new":"替换内容"}]`，服务端逐项精确替换并审核重建全文。旧基线、重复匹配和 `.plan` 外路径均拒绝。
+
+终态示例：
 ```yaml
 status: approved
 human_confirmed: true
+approved_sha256: "<审核响应plan_sha256>"
+approved_version: 1
 reviewer: cursor/grok-4.7@256k
 reviewed_at: "2026-11-12T15:00:00+08:00"
 ```

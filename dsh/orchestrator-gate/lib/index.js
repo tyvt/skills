@@ -16,6 +16,8 @@ export const name = "orchestrator-gate";
 // `cannot get property "tools" without inject`，apply 中断、插件不激活、守卫生效不了。
 export const inject = ["tools"];
 
+import { hasReadRange, validExecution, policy } from '../../shared/p0-policy.mjs';
+
 /** 方案 B：规则开关不进 config。 */
 export const RULES = {
   blockBuildLint: true,
@@ -98,7 +100,7 @@ export function commandOf(args) {
   return undefined;
 }
 
-/** 引号感知切段：; && || |。引号内不切；换行不当语句分隔。 */
+/** 引号感知切段：; && || | 和 CR/LF；引号内不切。 */
 export function splitSegments(command) {
   const src = String(command ?? "");
   const out = [];
@@ -116,7 +118,7 @@ export function splitSegments(command) {
       continue;
     }
     if (c === "'" || c === "\"") { quote = c; buf += c; continue; }
-    if (c === ";") { push(); continue; }
+    if (c === ";" || c === '\n' || c === '\r') { push(); continue; }
     if (c === "&" && src[i + 1] === "&") { push(); i++; continue; }
     if (c === "|" && src[i + 1] === "|") { push(); i++; continue; }
     if (c === "|") { push(); continue; }
@@ -424,7 +426,7 @@ export function classifyGrep(args, config, { cwd, bag } = {}) {
 
 function isWholeRead(args) {
   if (!args) return false;
-  return args.offset === undefined && args.limit === undefined;
+  return !hasReadRange(args);
 }
 
 /** §3.3 */
@@ -442,8 +444,9 @@ export function classifyRead(args, config, { alreadyWholeRead, fsImpl } = {}) {
   return null;
 }
 
-function reason(tool, summary, hint) {
+function reason(tool, summary, hint, fastPath) {
   return [
+    JSON.stringify({ code: 'ORCHESTRATION_REQUIRED', reason: summary, recommendation: { tool: 'orchestrate', arguments: validExecution(fastPath) ? { op: 'full', ...fastPath } : { op: 'full', request: hint } }, budgetChars: policy.result.directChars }),
     "[orchestrator-gate] 该操作必须走 orchestrate 编排器，禁止宿主直跑。",
     `操作：${tool} ${summary}`,
     `\u6539\u7528\uff1aorchestrate {op:\"full\", request:\"${hint}\"}`,
@@ -456,7 +459,10 @@ function reason(tool, summary, hint) {
  * bag 可选：{ errors, shellWrapped, uncovered } 供调用方计数。
  */
 export function decideInterception({ tool, args, config, isSubagent, alreadyWholeRead, cwd, fsImpl, bag }) {
-  if (tool === "orchestrate") return null;
+  if (tool === "orchestrate") {
+    if (args?.execution !== undefined && !validExecution(args)) return JSON.stringify({ code: 'INVALID_EXECUTION', reason: '结构化执行需要绝对workdir、安全program/args；shell元字符须走已有授权流程', recommendation: { tool: 'orchestrate', arguments: { op: 'full', request: '审查并授权所需命令' } } });
+    return null;
+  }
   if (RULES.passThroughSubagents && isSubagent) return null;
   const cfg = config ?? {};
 
@@ -474,7 +480,7 @@ export function decideInterception({ tool, args, config, isSubagent, alreadyWhol
         for (const seg of segments) {
           const argv = tokenize(seg);
           const why = classifyBuild(argv, { fsImpl, baseDir: cwd });
-          if (why) return reason(tool, command.slice(0, 160), `build/lint: ${why}`);
+          if (why) return reason(tool, command.slice(0, 160), `build/lint: ${why}`, segments.length === 1 ? { workdir: args?.workdir ?? cwd, execution: { program: argv[0], args: argv.slice(1) } } : undefined);
         }
       }
       if (RULES.blockBillingBypass) {
@@ -495,7 +501,7 @@ export function decideInterception({ tool, args, config, isSubagent, alreadyWhol
       const msg = why === "本会话已整读"
         ? "该文件本会话已整读过，请改用 offset 续读后半段，或先 grep 定位目标行再读"
         : `整读超过字节阈值（${why}），请带 offset/limit 分段读`;
-      return `[orchestrator-gate] ${msg}\n文件：${args?.file_path ?? ""}`;
+      return JSON.stringify({ code: 'READ_RANGE_REQUIRED', reason: msg, recommendation: { tool: 'read', arguments: { file_path: args?.file_path, offset: 1, limit: 40 } }, budgetChars: policy.result.directChars });
     }
   }
   return null;

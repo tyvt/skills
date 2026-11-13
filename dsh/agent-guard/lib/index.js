@@ -37,6 +37,7 @@ import path from 'node:path'
 
 import { Config } from './config.js'
 import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead } from './rules.js'
+import { policy } from '../../shared/p0-policy.mjs'
 import { decideInterception } from './scope.js'
 import { evaluateAsk } from './ask-guard.js'
 
@@ -194,7 +195,7 @@ export function apply(ctx, config) {
       rec.whole = true
       return
     }
-    const offset = Number.isFinite(Number(args?.offset)) ? Number(args.offset) : 0
+    const offset = args?.offset != null && args.offset !== '' && Number.isFinite(Number(args.offset)) ? Number(args.offset) : policy.pagination.offsetBase
     const limit = Number.isFinite(Number(args?.limit)) ? Number(args.limit) : undefined
     rec.ranges.push({ offset, limit })
   }

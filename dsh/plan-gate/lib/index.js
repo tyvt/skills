@@ -13,7 +13,23 @@
  * 访问 ctx.tools.guard() 必须先声明 tools 依赖。
  */
 
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, realpathSync } from "node:fs";
+import { createHash } from "node:crypto";
+
+const APPROVAL_FIELDS = new Set(['status', 'human_confirmed', 'review_verdict', 'review_score', 'reviewer', 'approved_sha256', 'approved_version', 'reviewed_at']);
+export function canonicalPlan(text) {
+  const lines = String(text).replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n').split('\n');
+  if (lines[0]?.trim() === '---') {
+    const end = lines.findIndex((line, i) => i > 0 && line.trim() === '---');
+    if (end > 0) {
+      const retained = lines.slice(1, end).filter(line => !APPROVAL_FIELDS.has(line.split(':', 1)[0].trim()));
+      if (retained.some(line => line.trim())) lines.splice(1, end - 1, ...retained);
+      else lines.splice(0, end + 1);
+    }
+  }
+  return lines.join('\n');
+}
+export function planSha(text) { return createHash('sha256').update(canonicalPlan(text), 'utf8').digest('hex'); }
 import path from "node:path";
 
 export const name = "plan-gate";
@@ -105,18 +121,23 @@ export function findApprovedPlan({ root, planDir, sessionId, require, fs = {} })
       return { ok: true, file: target, checked };
     }
     // 2) 该 session 的活跃计划（<sessionId>.*.md 或 *.md 前缀含 sessionId）
-    const active = entries.filter((n) => n !== `${sessionId}.md` && n.startsWith(sessionId));
+    const active = entries.filter((n) => n.startsWith(`${sessionId}.`));
     for (const n of active) {
       const f = path.join(dir, n);
       checked.push(f);
       if (approvedFn(f)) return { ok: true, file: f, checked };
     }
   }
-  // 3) 任意已放行计划
+  // Custom names are eligible only through an explicit current-session review.
+  let bound = [];
+  try {
+    const state = JSON.parse(readFile(path.join(dir, '_review.json'), 'utf-8'));
+    bound = (state.entries || []).filter(e => e.schema_version === 2 && e.session_id === sessionId).map(e => e.plan_key);
+  } catch {}
   for (const n of entries) {
     const f = path.join(dir, n);
-    if (!checked.includes(f)) checked.push(f);
-    if (approvedFn(f)) return { ok: true, file: f, checked };
+    const key = path.relative(root, f).replace(/\\/g, '/');
+    if (bound.includes(key) && approvedFn(f)) return { ok: true, file: f, checked };
   }
   return { ok: false, checked };
 }
@@ -166,7 +187,7 @@ function rejectReason(tool, args, config, found) {
  * 返回 {action: "allow"|"block"|"warn", reason}。fail-open：文件缺失/损坏一律 allow。
  * @param {object} p - {root, planDir, planFile, enableGuard, fs}
  */
-export function checkReviewState({ root, planDir, planFile, enableGuard, fs = {} }) {
+export function checkReviewState({ root, planDir, planFile, sessionId, enableGuard, fs = {} }) {
   const readFile = fs.readFileSync ?? readFileSync;
   const join = path.join;
   const dir = join(root, planDir || ".plan");
@@ -176,7 +197,7 @@ export function checkReviewState({ root, planDir, planFile, enableGuard, fs = {}
     state = JSON.parse(readFile(reviewPath, "utf-8"));
   } catch (e) {
     // 缺失/损坏 → fail-open 放行
-    return { action: "allow", reason: "review_json_absent_or_corrupt" };
+    return { action: "block", reason: "review_json_absent_or_corrupt; re-review required" };
   }
   const entries = Array.isArray(state?.entries) ? state.entries : [];
   if (!planFile) return { action: "allow", reason: "no_plan_file" };
@@ -188,10 +209,21 @@ export function checkReviewState({ root, planDir, planFile, enableGuard, fs = {}
     return { action: "allow", reason: "plan_key_derive_failed" };
   }
   // 同 plan_key 的条目（禁跨 key 复用）
-  const same = entries.filter((e) => e && e.plan_key === planKey);
-  if (!same.length) return { action: "allow", reason: "no_entry_for_plan" };
-  same.sort((a, b) => String(a.ts || "").localeCompare(String(b.ts || "")));
+  const same = entries.filter((e) => e && e.plan_key === planKey && e.session_id === sessionId && e.schema_version === 2);
+  if (!sessionId || !same.length) return { action: 'block', reason: 'no_session_version_review' };
   const latest = same[same.length - 1];
+  try {
+    const real = fs.realpathSync ?? realpathSync;
+    const boundary = real(path.join(root, '.plan'));
+    const relative = path.relative(boundary, real(planFile));
+    if (!relative || relative.startsWith('..') || path.isAbsolute(relative) || path.dirname(boundary) !== real(root)) throw new Error('outside .plan');
+    const text = readFile(planFile, 'utf-8');
+    const fm = parseFrontmatter(text);
+    if (latest.verdict !== 'pass' || latest.stale || latest.plan_sha256 !== planSha(text) ||
+        fm.approved_sha256 !== latest.plan_sha256 || String(fm.approved_version) !== String(latest.version)) {
+      return { action: 'block', reason: 'approval_version_mismatch; review and confirm current hash/version' };
+    }
+  } catch { return { action: 'block', reason: 'invalid_plan_boundary_or_content' }; }
   const round = Number(latest.round) || 0;
 
   // 读当前计划 frontmatter（risk:high / review_override）
@@ -202,22 +234,17 @@ export function checkReviewState({ root, planDir, planFile, enableGuard, fs = {}
   } catch (e) {
     fm = {};
   }
-  const riskHigh = String(fm.risk || "").toLowerCase() === "high";
   const override = String(fm.review_override || "").toLowerCase() === "true";
 
   // 轮次上限（按 plan_key 累计 round）
-  if (round > 4 && !riskHigh && !override) {
+  if (round > 3 && !override) {
     return {
       action: "block",
-      reason: `plan-review rounds=${round}>4，已达上限；如确需续审请在计划 frontmatter 置 review_override: true`,
+      reason: `plan-review rounds=${round}>3，已达上限；如确需续审请在计划 frontmatter 置 review_override: true`,
     };
   }
-  if (round >= 3 && round <= 4 && !riskHigh) {
-    return {
-      action: "warn",
-      reason: `plan-review rounds=${round}>2，请只改结论或有证据的增量点`,
-    };
-  }
+  const roundWarning = round > 2 && !override
+    ? `plan-review rounds=${round}>2，请只改结论或有证据的增量点` : '';
 
   // 证据章节校验（enablePlanReviewGuard: 0/未设=不查; 1=硬拒; 2=warn-only 灰度）
   const g = Number(enableGuard) || 0;
@@ -232,7 +259,7 @@ export function checkReviewState({ root, planDir, planFile, enableGuard, fs = {}
       return { action: "block", reason: msg };
     }
   }
-  return { action: "allow", reason: "ok" };
+  return roundWarning ? {action: 'warn', reason: roundWarning} : { action: "allow", reason: "ok" };
 }
 
 /**
@@ -257,6 +284,7 @@ export function decideInterception({ tool, args, config, sessionId, cwd, fs }) {
       root,
       planDir: config.planDir,
       planFile: found.file,
+      sessionId,
       enableGuard: config.enablePlanReviewGuard,
       fs,
     });

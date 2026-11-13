@@ -1,7 +1,15 @@
 // cost-meter 自测：验证 usage 累加、阈值触发一次、注入到 messages。
 import assert from 'assert';
 import fs from 'fs';
-import { apply, inspect, name } from './lib/index.js';
+import { apply, inspect, name, hasIntentSignal } from './lib/index.js';
+
+const user = (text) => ({ role: 'user', content: text });
+assert.equal(hasIntentSignal([user('修改组件，验证后提交并推送')]), true);
+assert.equal(hasIntentSignal([user('历史：修改、测试、提交浪费很多。给我一份改进方案')]), false);
+assert.equal(hasIntentSignal([user('修改验证提交'), user('现在只要分析报告')]), false);
+assert.equal(hasIntentSignal([user('修改验证提交'), user('<system-reminder>测试提交</system-reminder>')]), true);
+assert.equal(hasIntentSignal([user('> 修改、验证、提交\n给我建议')]), false);
+assert.equal(hasIntentSignal([user('修改并测试，暂不提交')]), false);
 
 assert.equal(name, 'cost-meter');
 

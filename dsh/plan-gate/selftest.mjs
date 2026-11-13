@@ -2,10 +2,11 @@
  * plan-gate selftest：E1 无关；覆盖 E2 消费方（checkReviewState / decideInterception 读 _review.json）。
  * 用临时目录，不依赖真实工作区。node selftest.mjs
  */
-import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { checkReviewState, decideInterception } from "./lib/index.js";
+import { checkReviewState as checkState, decideInterception, planSha } from "./lib/index.js";
+const checkReviewState = args => checkState({ sessionId: 's1', ...args });
 
 let pass = 0, fail = 0;
 function ok(name, cond) {
@@ -24,6 +25,15 @@ function writePlan(root, name, content) {
   return f;
 }
 function writeReview(root, entries) {
+  entries = entries.map(entry => {
+    const file = path.join(root, entry.plan_key);
+    let text;
+    try { text = readFileSync(file, 'utf8'); } catch { return entry; }
+    const sha = planSha(text);
+    text = text.replace('---\n', `---\napproved_sha256: ${sha}\napproved_version: 1\n`);
+    writeFileSync(file, text);
+    return { schema_version: 2, session_id: path.basename(file, '.md'), version: 1, plan_sha256: sha, verdict: 'pass', ...entry };
+  });
   writeFileSync(path.join(root, ".plan", "_review.json"), JSON.stringify({ entries }), "utf-8");
 }
 const baseFM = "---\nstatus: approved\nhuman_confirmed: true\n---\n";
@@ -33,7 +43,7 @@ const baseFM = "---\nstatus: approved\nhuman_confirmed: true\n---\n";
   const root = mkRepo();
   const planFile = writePlan(root, "s1.md", baseFM + "## 二、已核验事实\n- a `x.py:1`\n");
   const rs = checkReviewState({ root, planDir: ".plan", planFile, enableGuard: 2 });
-  ok("missing review -> allow", rs.action === "allow");
+  ok("missing review -> block", rs.action === "block");
 }
 
 // 2. 损坏 json → allow fail-open
@@ -42,7 +52,7 @@ const baseFM = "---\nstatus: approved\nhuman_confirmed: true\n---\n";
   const planFile = writePlan(root, "s1.md", baseFM);
   writeFileSync(path.join(root, ".plan", "_review.json"), "{bad", "utf-8");
   const rs = checkReviewState({ root, planDir: ".plan", planFile, enableGuard: 2 });
-  ok("corrupt review -> allow", rs.action === "allow");
+  ok("corrupt review -> block", rs.action === "block");
 }
 
 // 3. round=2 → allow
@@ -51,7 +61,7 @@ const baseFM = "---\nstatus: approved\nhuman_confirmed: true\n---\n";
   const planFile = writePlan(root, "s1.md", baseFM);
   writeReview(root, [{ plan_key: ".plan/s1.md", round: 2, ts: "t1", verdict: "reject" }]);
   const rs = checkReviewState({ root, planDir: ".plan", planFile, enableGuard: 0 });
-  ok("round 2 -> allow", rs.action === "allow");
+  ok("latest reject -> block", rs.action === "block");
 }
 
 // 4. round=3 → warn (不阻断)
@@ -87,7 +97,7 @@ const baseFM = "---\nstatus: approved\nhuman_confirmed: true\n---\n";
   const planFile = writePlan(root, "s1.md", "---\nstatus: approved\nhuman_confirmed: true\nrisk: high\n---\n");
   writeReview(root, [{ plan_key: ".plan/s1.md", round: 5, ts: "t1" }]);
   const rs = checkReviewState({ root, planDir: ".plan", planFile, enableGuard: 0 });
-  ok("round 5 + risk high -> allow", rs.action === "allow");
+  ok("round 5 + risk high -> block", rs.action === "block");
 }
 
 // 8. 证据缺失 enableGuard=1 → block
@@ -123,7 +133,7 @@ const baseFM = "---\nstatus: approved\nhuman_confirmed: true\n---\n";
   const planFile = writePlan(root, "s1.md", baseFM);
   writeReview(root, [{ plan_key: ".plan/s2.md", round: 5, ts: "t1" }]);
   const rs = checkReviewState({ root, planDir: ".plan", planFile, enableGuard: 0 });
-  ok("cross plan_key no reuse", rs.action === "allow");
+  ok("cross plan_key no reuse", rs.action === "block");
 }
 
 // 12. decideInterception：计划 approved + round=5 → 拦截
@@ -152,6 +162,35 @@ const baseFM = "---\nstatus: approved\nhuman_confirmed: true\n---\n";
   };
   const r = decideInterception({ tool: "edit", args: { file_path: "x.js" }, config, sessionId: "sess2", cwd: root, fs: {} });
   ok("decideInterception normal -> null", r === null);
+}
+
+// Round four boundary; round warnings cannot bypass evidence checks.
+for (const risk of ['', 'risk: high\n']) {
+  const root = mkRepo();
+  const file = writePlan(root, 's1.md', baseFM.replace('status:', risk + 'status:'));
+  writeReview(root, [{plan_key: '.plan/s1.md', round: 4}]);
+  ok(`round 4 ${risk ? 'high risk' : 'normal'} -> block`, checkReviewState({root, planFile: file, enableGuard: 0}).action === 'block');
+}
+{
+  const root = mkRepo();
+  const file = writePlan(root, 's1.md', baseFM + 'No evidence');
+  writeReview(root, [{plan_key: '.plan/s1.md', round: 3}]);
+  const result = checkReviewState({root, planFile: file, enableGuard: 1});
+  ok('round 3 missing evidence still blocks', result.action === 'block' && result.reason.includes('已核验事实'));
+}
+
+// Version/session binding and stale confirmation regressions.
+{
+  const root = mkRepo();
+  const file = writePlan(root, 's1.md', baseFM + '## 已核验事实\n- a.py:1\noriginal');
+  writeReview(root, [{ plan_key: '.plan/s1.md', round: 1 }]);
+  ok('bound current version passes', checkReviewState({root, planFile: file}).action === 'allow');
+  ok('foreign session blocked', checkState({root, planFile: file, sessionId: 'other'}).action === 'block');
+  writeFileSync(file, readFileSync(file, 'utf8').replace('original', 'changed'));
+  ok('changed content invalidates confirmation', checkReviewState({root, planFile: file}).action === 'block');
+  const config = {enabled: true, planDir: '.plan', guardTools: new Set(['edit']), requireFrontmatter: {status: 'approved', human_confirmed: 'true'}};
+  ok('no foreign plan fallback', typeof decideInterception({root, cwd: root, sessionId: 'other', tool: 'edit', config}) === 'string');
+  ok('approval-only changes preserve digest', planSha(baseFM + 'x') === planSha(baseFM.replace('approved', 'draft').replace('true', 'false') + 'x'));
 }
 
 console.log(`\nplan-gate selftest: ${fail === 0 ? "ALL PASS" : "FAIL"} passed=${pass} failed=${fail}`);

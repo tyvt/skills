@@ -135,7 +135,7 @@ def _extract_json_object(text: str) -> Optional[dict]:
 def _default_env(state: OrchState) -> Dict[str, Any]:
     ctx = state.get("environment_context") or {}
     return {
-        "cwd": ctx.get("cwd") or os.getcwd(),
+        "cwd": ctx.get("cwd", os.getcwd()),
         "env": dict(ctx.get("env") or {}),
         "recent_env": dict(ctx.get("recent_env") or {}),
     }
@@ -413,41 +413,50 @@ def _extract_command(text: str) -> str:
     return lines[0] if lines else ""
 
 
+def _changes_directory(command: str) -> bool:
+    """Recognize directory commands at command positions, preserving quoted arguments."""
+    tokens = re.findall(
+        r'''(?s)<\#.*?\#>|\#[^\r\n]*|'(?:''|[^'])*'|"(?:`.|[^"`])*"|[;|&{}()\r\n=]|[^\s;|&{}()=]+''',
+        command,
+    )
+    names = {'set-location', 'cd', 'chdir', 'sl', 'pushd', 'popd', 'push-location', 'pop-location', 'cd..'}
+    at_command = True
+    invoked = False
+    for token in tokens:
+        if token.startswith(('#', '<#')):
+            continue
+        if token in {';', '|', '&', '{', '}', '(', ')', '\r', '\n', '='}:
+            at_command = True
+            invoked = token == '&'
+            continue
+        if at_command:
+            if token == '.':
+                invoked = True
+                continue
+            quoted = token.startswith(('\"', "'"))
+            name = token[1:-1] if quoted else token
+            name = name.replace('`', '').rsplit('\\', 1)[-1].lower()
+            if (not quoted or invoked) and name in names:
+                return True
+            at_command = False
+            invoked = False
+    return False
+
+
 def _run_pwsh(command: str, cwd: str, env: Dict[str, str], timeout: float) -> str:
-    if not cwd or not os.path.isdir(cwd):
-        cwd = os.getcwd()
+    if not cwd or not os.path.isabs(cwd) or not os.path.isdir(cwd):
+        raise ValueError("workdir must be an existing absolute directory")
+    if _changes_directory(command):
+        raise ValueError('directory switching commands are forbidden; use explicit workdir')
     merged = {**os.environ, **{str(k): str(v) for k, v in (env or {}).items()}}
-    completed = subprocess.run(
-        [
-            "powershell.exe",
-            "-NoProfile",
-            "-NonInteractive",
-            "-ExecutionPolicy", "Bypass",
-            "-Command", command,
-        ],
-        cwd=cwd,
-        env=merged,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        timeout=timeout,
-        shell=False,
+    from .execution import _execute
+    result = _execute(
+        ['powershell.exe', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', command],
+        timeout, cwd, 'legacy-' + str(os.getpid()), env=merged,
     )
-    raw = (
-        f"$ {command}\n"
-        f"exit={completed.returncode}\n"
-        f"--- stdout ---\n{completed.stdout or ''}\n"
-        f"--- stderr ---\n{completed.stderr or ''}"
-    )
-    if re.search(r"(?i)\bgit\b", command or ""):
-        return _sanitize_git_text(raw)
-    return (
-        f"$ {command}\n"
-        f"exit={completed.returncode}\n"
-        f"--- stdout ---\n{_clip(completed.stdout)}\n"
-        f"--- stderr ---\n{_clip(completed.stderr)}"
-    )
+    if not result['ok']:
+        raise subprocess.CalledProcessError(result['exitCode'], command, output=result['content'])
+    return result['content']
 
 
 def _limit_lines(text: str, cap: int = _GIT_LINE_CAP) -> str:
@@ -536,8 +545,8 @@ def _git_dir_exists(cwd: str, env: Dict[str, str], timeout: float, name: str) ->
 
 def _run_git_brief(cwd: str, env: Dict[str, str], timeout: float, instruction: str) -> str:
     """本地 Git 摘要：不经模型，不回灌大段建议。"""
-    if not cwd or not os.path.isdir(cwd):
-        cwd = os.getcwd()
+    if not cwd or not os.path.isabs(cwd) or not os.path.isdir(cwd):
+        raise ValueError("workdir must be an existing absolute directory")
     merged = {**os.environ, **{str(k): str(v) for k, v in (env or {}).items()}}
 
     def capture(args: List[str]) -> str:
@@ -768,7 +777,7 @@ def build_graph(router: ModelRouter, cfg):
                         ctx.get("cwd") or "", ctx.get("env") or {}, cfg.execution.pwsh_timeout, instruction
                     )
                     ok = not content.startswith("git ") or "failed" not in content
-                except (OSError, subprocess.TimeoutExpired) as exc:
+                except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
                     content, ok = f"git brief failed: {exc}"[:120], False
             results.append(
                 {
@@ -875,10 +884,14 @@ def build_graph(router: ModelRouter, cfg):
                         command, ctx["cwd"], ctx.get("env") or {}, cfg.execution.pwsh_timeout
                     )
                     ok, model_used = True, gen.model_used
-                except subprocess.TimeoutExpired as e:
-                    content = f"$ {command}\nTIMEOUT\n{e}"
+                except subprocess.CalledProcessError as e:
+                    content = e.output or f"exit={e.returncode}"
                     ok, model_used = False, gen.model_used
-            new_ctx = _apply_env_delta(ctx, command or "", content)
+                except (subprocess.TimeoutExpired, OSError, ValueError) as e:
+                    from .execution import _result
+                    content = _result(False, f"$ {command}\n{type(e).__name__}: {e}")['content']
+                    ok, model_used = False, gen.model_used
+            new_ctx = _apply_env_delta(ctx, command or "", content) if ok else ctx
             results.append(
                 {
                     "tool": "pwsh",

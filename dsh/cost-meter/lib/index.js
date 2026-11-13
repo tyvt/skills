@@ -97,20 +97,26 @@ export function inspect(sessionId) {
 }
 
 /** P3-11：从 pre-step 的 messages 里取 user 文本，判断是否同时含「修改+验证+提交」三要素。 */
-function hasIntentSignal(messages) {
+export function hasIntentSignal(messages) {
   if (!Array.isArray(messages)) return false;
-  const text = messages
-    .filter((m) => m && m.role === "user")
-    .map((m) => {
-      const c = m.content;
-      if (typeof c === "string") return c;
-      if (Array.isArray(c)) return c.map((b) => (typeof b === "string" ? b : b?.text ?? "")).join("\n");
-      return "";
-    })
-    .join("\n");
-  return /(修复|实现|修改|新增|开发|重构)/.test(text)
-    && /(验证|测试|构建|build)/.test(text)
-    && /(提交|push|推送)/.test(text);
+  // Evaluate the latest human request, not quoted audits or injected notices.
+  const texts = messages.filter((m) => m?.role === "user").map((m) => {
+    const c = m.content;
+    return typeof c === "string" ? c : Array.isArray(c)
+      ? c.map((b) => typeof b === "string" ? b : b?.text ?? "").join("\n") : "";
+  });
+  const text = [...texts].reverse().find((s) => s.trim()
+    && !/^\s*(?:<system-reminder>|<openviking-context|\[(?:cost-meter|todo-gate|build-gate|ask-wait)\])/.test(s));
+  if (!text) return false;
+  const request = text.replace(/```[\s\S]*?```/g, "")
+    .replace(/<openviking-context[\s\S]*?<\/openviking-context>/g, "")
+    .split("\n").filter((s) => !/^\s*(?:>|\||[-*]\s*seq\b)/i.test(s)).join("\n");
+  if (/(?:给我|提供|输出|一份|只要|仅需).{0,12}(?:方案|分析|复盘|建议|报告)/.test(request)
+      && !/(?:按.{0,12}(?:落地|实施)|开始(?:修改|实现)|直接(?:修复|修改|实现))/.test(request)) return false;
+  return /(修复|实现|修改|新增|开发|重构)/.test(request)
+    && /(验证|测试|构建|build)/.test(request)
+    && /(?:提交|push|推送)/.test(request)
+    && !/(?:不要|无需|暂不|不必)(?:提交|推送)/.test(request);
 }
 
 export function apply(ctx, rawConfig) {

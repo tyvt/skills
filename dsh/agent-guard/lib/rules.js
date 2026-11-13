@@ -580,13 +580,13 @@ export function repairGlobPath(toolName, args) {
  * @param {object} args - read 的参数。
  * @returns {string | null}
  */
+import { hasReadRange } from '../../shared/p0-policy.mjs'
+
 export function isWholeFileRead(args) {
   if (args === null || typeof args !== 'object' || Array.isArray(args)) return null
   const filePath = args.file_path
   if (typeof filePath !== 'string' || filePath.trim() === '') return null
-  const hasOffset = args.offset !== undefined && args.offset !== null
-  const hasLimit = args.limit !== undefined && args.limit !== null
-  if (hasOffset || hasLimit) return null
+  if (hasReadRange(args)) return null
   return filePath
 }
 

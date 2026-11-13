@@ -36,6 +36,7 @@ _PLAN_REVIEW_SYSTEM = (
     "- P2（建议）：措辞、排版、可优化项。\n"
     "【灰区】拿不准是 P0 还是 P1 的，一律判 P1，并在该条文本末尾标注「（灰区，待人确认）」。\n"
     "【判定】verdict=reject 当且仅当存在 P0 问题；P1/P2 一律判 pass。score 仅作参考，不参与判定。\n"
+    "最多列3个阻断项，每项text不超过180字；建议最多3条且每条不超过100字。不要复述计划或输出全文。\n"
     "只输出一个 JSON 对象，不要任何解释文字或代码块标记，字段为："
     '{"verdict":"pass"|"reject","score":0-100,'
     '"issues":[{"level":"P0"|"P1"|"P2","text":"..."}],"suggestions":["..."]}。\n'
@@ -270,124 +271,42 @@ def _normalize_review(obj: Optional[Dict[str, Any]], raw: str) -> Dict[str, Any]
     }
 
 
-def _review_state_path(root: str) -> Path:
-    return Path(root) / ".plan" / "_review.json"
-
-
-def _load_review_state(root: str) -> Dict[str, Any]:
-    """读 .plan/_review.json；缺失/损坏返回空结构（fail-open，不抛）。"""
-    p = _review_state_path(root)
-    try:
-        data = json.loads(p.read_text(encoding="utf-8"))
-        if isinstance(data, dict) and isinstance(data.get("entries"), list):
-            return data
-    except Exception:
-        pass
-    return {"entries": []}
-
-
-def _write_review_state(root: str, state: Dict[str, Any]) -> None:
-    """原子写 .plan/_review.json（tmp + os.replace）；任何异常吞掉，不阻断 review。"""
-    try:
-        p = _review_state_path(root)
-        p.parent.mkdir(parents=True, exist_ok=True)
-        tmp = p.with_suffix(".json.tmp")
-        tmp.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
-        os.replace(str(tmp), str(p))
-    except Exception:
-        pass
-
-
-def _record_review(
-    root: str, plan_markdown: str, plan_path: str, verdict: str, score: int,
-) -> None:
-    """把本轮 review 结果按 plan_key 落盘：轮次按 plan_key 累计（与内容 sha 解耦）。"""
-    import hashlib
-    plan_sha = hashlib.sha256((plan_markdown or "").encode("utf-8")).hexdigest()
-    try:
-        if plan_path:
-            plan_key = os.path.relpath(os.path.abspath(plan_path), os.path.abspath(root))
-        else:
-            plan_key = ".plan/_unknown.md"
-    except Exception:
-        plan_key = ".plan/_unknown.md"
-    plan_key = plan_key.replace("\\", "/")
-
-    state = _load_review_state(root)
-    entries = state.get("entries", [])
-    # 同 plan_key 的条目按时间排序找最新
-    same = [e for e in entries if e.get("plan_key") == plan_key]
-    same.sort(key=lambda e: e.get("ts", ""))
-    prev_round = same[-1].get("round", 0) if same else 0
-    prev_sha = same[-1].get("plan_sha256") if same else None
-
-    # 内容未变（同 sha）→ round 不增；内容变 → round+1
-    if prev_sha == plan_sha:
-        new_round = prev_round if prev_round > 0 else 1
-    else:
-        new_round = prev_round + 1
-
-    try:
-        plan_mtime = os.path.getmtime(plan_path) if plan_path and os.path.exists(plan_path) else 0.0
-    except Exception:
-        plan_mtime = 0.0
-
-    ts = time.strftime("%Y-%m-%dT%H:%M:%S%z")
-    # 同 plan_key 旧条目标 stale=true
-    for e in entries:
-        if e.get("plan_key") == plan_key and e.get("plan_sha256") != plan_sha:
-            e["stale"] = True
-
-    entry = {
-        "plan_key": plan_key,
-        "plan_rel_path": plan_key,
-        "plan_sha256": plan_sha,
-        "plan_markdown": plan_markdown or "",
-        "plan_mtime": plan_mtime,
-        "round": new_round,
-        "parent_sha": prev_sha,
-        "verdict": verdict,
-        "score": score,
-        "ts": ts,
-        "stale": False,
-    }
-    # 同 plan_key + 同 sha 覆盖旧条；否则 append
-    replaced = False
-    for idx, e in enumerate(entries):
-        if e.get("plan_key") == plan_key and e.get("plan_sha256") == plan_sha:
-            entries[idx] = entry
-            replaced = True
-            break
-    if not replaced:
-        entries.append(entry)
-    # 每个 plan_key 保留最近 5 轮
-    from collections import OrderedDict
-    by_key: Dict[str, list] = OrderedDict()
-    for e in entries:
-        by_key.setdefault(e.get("plan_key", ""), []).append(e)
-    kept = []
-    for k, lst in by_key.items():
-        lst.sort(key=lambda e: e.get("ts", ""))
-        kept.extend(lst[-5:])
-    state["entries"] = kept
-    _write_review_state(root, state)
-
-
 def run_plan_review(
     plan_markdown: str,
     task_context: str = "",
     config_path: str = DEFAULT_CFG,
     session_id: str = "",
     plan_path: str = "",
+    workdir: str = "",
+    base_sha: str = "",
+    base_version: Optional[int] = None,
+    delta: Optional[list] = None,
 ) -> Dict[str, Any]:
     """把 Markdown 计划交高级模型（plan_reviewer 池，当前首选 workbuddy/deepseek-v4.1-flash）审核。
 
     返回 {verdict, score, issues, suggestions, model_used, usage, ok, clipped}。
     plan 过长会在 PLAN_REVIEW_CLIP_CHARS 处截断（保留头尾）并置 clipped=True。
     """
+    from .plan_versions import prepare, record
+    prepared = prepare(workdir or _root_for(config_path), plan_path, session_id,
+                       plan_markdown, base_sha, base_version, delta)
+    plan = prepared["plan_markdown"]
+    # A pass must cover the complete reconstructed version, never a clipped plan.
+    if len(plan) > PLAN_REVIEW_CLIP_CHARS:
+        raise ValueError("plan exceeds review size limit; shorten before review")
+    latest = prepared.get("latest")
+    if (latest and latest.get("verdict") == "pass" and not latest.get("stale")
+            and latest.get("plan_sha256") == prepared["plan_sha256"]):
+        return {
+            "mode": "plan_review", "ok": True, "verdict": "pass", "reused": True,
+            "code": "PLAN_UNCHANGED_USE_REVIEW", "plan_sha256": prepared["plan_sha256"],
+            "version": latest["version"], "plan_key": prepared["plan_key"],
+            "session_id": prepared["session_id"], "score": latest.get("score", 0),
+            "p0_count": latest.get("p0_count", 0), "issues": [], "suggestions": [],
+        }
+    clipped = False
     cfg = load_config(config_path)
     router = ModelRouter(cfg)
-    plan, clipped = _clip_plan(plan_markdown or "")
     user_content = (
         (f"## 任务背景\n{task_context.strip()}\n\n" if task_context and task_context.strip() else "")
         + "## 待审核计划\n"
@@ -408,50 +327,71 @@ def run_plan_review(
         "elapsed": round(sum(a.elapsed for a in res.attempts), 2),
         "usage": usage,
     }])
-    # E2 桥接：把本轮 review 结果落盘 .plan/_review.json，供 plan-gate 读盘复用/计轮次。
-    # plan_path 缺省时按 session_id 派生，plan-gate 用同一相对路径键匹配。
-    _pp = plan_path
-    if not _pp:
-        try:
-            _pp = str(Path(_root_for(config_path)) / ".plan" / f"{_session_key(session_id) or 'anonymous'}.md")
-        except Exception:
-            _pp = ""
-    _record_review(
-        _root_for(config_path), plan, _pp,
-        review["verdict"], int(review.get("score") or 0),
-    )
-    return {
+    if not res.ok:
+        review["verdict"] = "reject"
+    p0_count = sum(1 for item in review["issues"] if
+                   (str(item.get("level", "")).upper() == "P0" if isinstance(item, dict)
+                    else bool(re.search(r"\bP0\b", str(item), re.I))))
+    entry = record(prepared, review["verdict"], int(review.get("score") or 0), p0_count)
+    issues = review["issues"][:3]
+    issues = [{"level": str(item.get("level", "P0"))[:8], "text": str(item.get("text", ""))[:240]}
+              if isinstance(item, dict) else str(item)[:240] for item in issues]
+    result = {
         "mode": "plan_review",
+        "plan_sha256": entry["plan_sha256"],
+        "version": entry["version"],
+        "plan_key": entry["plan_key"],
         "ok": bool(res.ok),
         "verdict": review["verdict"],
         "score": review["score"],
-        "issues": review["issues"],
-        "suggestions": review["suggestions"],
-        "model_used": res.model_used,
-        "usage": usage,
+        "issues": issues,
+        "p0_count": p0_count,
+        "reused": False,
+        "suggestions": [str(item)[:160] for item in review["suggestions"][:3]],
+        "model_used": str(res.model_used)[:120],
+        "usage": {k: v if isinstance(v, (int, float, type(None))) else None for k, v in usage.items() if k in {"prompt_tokens", "completion_tokens", "total_tokens"}},
         "clipped": clipped,
-        "raw": res.content,
-        "attempts": _attempts(res),
-        "session_id": _session_key(session_id) or "anonymous",
+        "session_id": prepared["session_id"],
     }
+    # Enforce a serialized Unicode-character budget, including JSON syntax.
+    if len(json.dumps(result, ensure_ascii=False)) > 4000:
+        result.pop("suggestions", None)
+        result["issues"] = ["Review output exceeded response budget; inspect the plan and re-review."]
+    if len(json.dumps(result, ensure_ascii=False)) > 4000:
+        result.pop("plan_key", None)
+    return result
 
 
-def run_full(request: str, config_path: str = DEFAULT_CFG, session_id: str = "") -> Dict[str, Any]:
+def run_full(request: str, config_path: str = DEFAULT_CFG, session_id: str = "", workdir: str = "") -> Dict[str, Any]:
+    if not isinstance(workdir, str) or not workdir.strip():
+        return {"mode": "full", "ok": False, "error": "WORKDIR_REQUIRED"}
+    if not Path(workdir).is_absolute():
+        return {"mode": "full", "ok": False, "error": "WORKDIR_REQUIRED"}
+    try:
+        directory = Path(workdir).resolve(strict=True)
+        if not directory.is_dir():
+            raise ValueError("not a directory")
+    except (OSError, ValueError):
+        return {"mode": "full", "ok": False, "error": "WORKDIR_NOT_FOUND"}
+    root = str(directory)
     cfg = load_config(config_path)
-    root = _root_for(config_path)
     router = ModelRouter(cfg)
     app = build_graph(router, cfg)
     reset = _RESET.search(request or "") is not None
     start = {"cwd": root, "env": {}, "recent_env": {}} if reset else load_environment(session_id, root)
+    start["cwd"] = root
     state = run_orchestration(app, request, start)
     ctx = state.get("environment_context") or {}
-    save_environment(session_id, ctx, root)
+    results = state.get("results") or []
+    succeeded = bool(state.get("final")) and all(isinstance(step, dict) and step.get("ok") is True for step in results)
+    if succeeded:
+        save_environment(session_id, ctx, root)
     calls = state.get("model_calls", [])
     _append_costs(session_id, calls)
     usage = state.get("usage_totals") or _sum_usage(calls)
     return {
         "mode": "full",
-        "ok": bool(state.get("final")),
+        "ok": succeeded,
         "final": state.get("final", ""),
         "plan": state.get("plan", []),
         "steps": state.get("results", []),

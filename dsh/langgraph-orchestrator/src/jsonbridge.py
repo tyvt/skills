@@ -49,19 +49,30 @@ def main() -> int:
                 out = api.run_tool(tool, request, cfg, session_id)
             elif op == "full":
                 request = req.get("request", "")
-                if not request:
-                    _emit(real_stdout, {"ok": False, "error": "request 必填"})
-                    return 2
-                out = api.run_full(request, cfg, session_id)
+                if req.get("execution") is not None:
+                    from .execution import run_execution
+                    out = run_execution(req.get("workdir", ""), req["execution"], session_id)
+                elif req.get("log_ref"):
+                    from .execution import read_log
+                    out = read_log(req["log_ref"], session_id,
+                                   offset=req.get("offset", 0), limit=req.get("limit", 2000))
+                else:
+                    if not request:
+                        _emit(real_stdout, {"ok": False, "error": "request 必填"})
+                        return 2
+                    out = api.run_full(request, cfg, session_id, workdir=req.get("workdir", ""))
             elif op == "plan_review":
                 # req 带 plan（Markdown 计划正文）与 request/context（任务背景）。
                 plan = req.get("plan", "") or ""
-                if not plan.strip():
-                    _emit(real_stdout, {"ok": False, "error": "plan 必填"})
+                if not plan.strip() and not req.get("delta"):
+                    _emit(real_stdout, {"ok": False, "error": "plan 或 delta 必填"})
                     return 2
                 context = req.get("context", "") or req.get("request", "") or ""
                 plan_path = req.get("plan_path", "") or ""
-                out = api.run_plan_review(plan, context, cfg, session_id, plan_path)
+                out = api.run_plan_review(plan, context, cfg, session_id, plan_path,
+                                          workdir=req.get("workdir", ""),
+                                          base_sha=req.get("base_sha", ""),
+                                          base_version=req.get("base_version"), delta=req.get("delta"))
             else:
                 _emit(real_stdout, {"ok": False, "error": f"未知 op: {op}"})
                 return 2

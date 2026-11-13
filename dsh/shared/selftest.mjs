@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import { hasReadRange, validExecution, redact } from './p0-policy.mjs';
+for (const args of [{}, { offset: null }, { offset: 1 }, { offset: 0, limit: 40 }, { offset: -1, limit: 40 }, { offset: null, limit: 40 }, { limit: null }, { limit: 999999 }, { limit: '40' }, { offset: '1', limit: 40 }, { limit: 0 }]) assert.equal(hasReadRange(args), false, JSON.stringify(args));
+for (const args of [{ limit: 40 }, { offset: 1, limit: 200 }]) assert.equal(hasReadRange(args), true);
+const fast = execution => validExecution({ workdir: 'D:\\项目', execution });
+for (const program of ['npm', 'pnpm', 'bun']) assert.equal(fast({ program, args: ['run', 'test'] }), true);
+assert.equal(fast({ program: 'python', args: ['-m', 'pytest', '-q'] }), true);
+assert.equal(fast({ program: 'git', args: ['diff', '--stat'] }), true);
+assert.equal(fast({ program: 'node', args: ['--version'], timeout: 3600 }), true);
+for (const execution of [{ program: 'node.exe', args: ['--version'] }, { program: 'node', args: ['evil.js'] }, { program: 'python', args: ['-c', 'print(1)'] }, { program: 'git', args: ['diff', '--output=file'] }, { program: 'npm', args: ['run', 'evil'] }, { program: 'git', args: ['show', '$(whoami)'] }, ...[0, -1, 3601, true, '120', NaN, Infinity].map(timeout => ({ program: 'node', args: ['--version'], timeout }))]) assert.equal(fast(execution), false, JSON.stringify(execution));
+assert.ok(!redact('{"token":"sensitive"} Bearer abc.def').includes('sensitive'));
+assert.ok(!redact('{"token":"sensitive"} Bearer abc.def').includes('abc.def'));
+console.log('shared P0 policy selftest: PASS');

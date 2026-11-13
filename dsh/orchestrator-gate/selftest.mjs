@@ -257,4 +257,12 @@ assert.ok(classifyBilling(splitSegments("python cost_bill.py"), { cwd: CWD }));
   assert.equal(rulesFingerprint(), fp1, "fingerprint restored after rule restore");
 }
 
-console.log(`selftest ok: ${n} checks`);
+assert.deepEqual(splitSegments('echo ok\r\nnpm run build'), ['echo ok', 'npm run build']);
+assert.deepEqual(splitSegments('echo "first\nsecond"'), ['echo "first\nsecond"']);
+assert.ok(decideInterception({ tool: 'pwsh', args: { command: 'echo ok\nnpm run build' }, config: CFG }));
+const fast = { workdir: 'D:\\repository\\项目', execution: { program: 'node', args: ['--version'] } };
+assert.equal(decideInterception({ tool: 'orchestrate', args: fast }), null);
+const denied = JSON.parse(decideInterception({ tool: 'orchestrate', args: { ...fast, execution: { program: 'node', args: ['ok;whoami'] } } }));
+assert.equal(denied.code, 'INVALID_EXECUTION');
+assert.equal(denied.recommendation.arguments.op, 'full');
+console.log(`selftest ok: ${n} checks + P0 structured/newline regressions`);

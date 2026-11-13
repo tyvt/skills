@@ -40,7 +40,20 @@ def main(argv=None) -> int:
     ap.add_argument("--config", default=DEFAULT_CFG)
     ap.add_argument("--tool", help="只调单个工具，不跑完整编排")
     ap.add_argument("--list", action="store_true", help="列出工具与模型池")
+    ap.add_argument('--workdir', help='执行工作目录，必须为绝对有效目录')
+    ap.add_argument('--execution', help='结构化JSON {program,args,timeout?}，无模型快路径')
     args = ap.parse_args(argv)
+
+    if args.execution:
+        from .execution import run_execution
+        result = run_execution(args.workdir or '', json.loads(args.execution), 'cli')
+        print(json.dumps(result, ensure_ascii=False))
+        return 0 if result.get('ok') else 1
+    if not args.tool and not args.list:
+        from .api import run_full
+        result = run_full(args.request or '', args.config, 'cli', workdir=args.workdir or '')
+        print(json.dumps(result, ensure_ascii=False))
+        return 0 if result.get('ok') else 1
 
     cfg = load_config(args.config)
 

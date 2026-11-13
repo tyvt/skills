@@ -605,7 +605,7 @@ test('isWholeFileRead：无 offset/limit 视为整读', () => {
   assert.equal(isWholeFileRead({ file_path: 'a.js' }), 'a.js')
 })
 test('isWholeFileRead：带 offset 或 limit 不算整读', () => {
-  assert.equal(isWholeFileRead({ file_path: 'a.js', offset: 10 }), null)
+  assert.equal(isWholeFileRead({ file_path: 'a.js', offset: 10, limit: 40 }), null)
   assert.equal(isWholeFileRead({ file_path: 'a.js', limit: 50 }), null)
 })
 test('首次整读放行，二次整读拒绝', () => {
@@ -616,7 +616,7 @@ test('首次整读放行，二次整读拒绝', () => {
 })
 test('带 offset/limit 的续读不拒绝', () => {
   const state = new Set(['a.js'])
-  assert.equal(shouldRejectDuplicateRead(state, { file_path: 'a.js', offset: 20 }), null)
+  assert.equal(shouldRejectDuplicateRead(state, { file_path: 'a.js', offset: 20, limit: 40 }), null)
   assert.equal(shouldRejectDuplicateRead(state, { file_path: 'a.js', limit: 100 }), null)
 })
 test('不同文件不误伤', () => {

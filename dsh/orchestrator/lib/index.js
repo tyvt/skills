@@ -15,6 +15,7 @@
 
 import { spawn } from 'node:child_process'
 import { Config } from './config.js'
+import { preflight } from '../../scripts/preflight-p0.mjs'
 
 export { Config }
 
@@ -181,7 +182,7 @@ function callPython(config, payload, signal) {
     })
     child.stderr.on('data', (d) => {
       const chunk = d.toString('utf8')
-      stderr += chunk
+      stderr = (stderr + chunk).slice(-8000)
       lastProgressAt = Date.now()
       armStallTimer()
       // 逐行实时透传为进度日志（保留末尾汇总用于报错）。
@@ -205,8 +206,8 @@ function callPython(config, payload, signal) {
         finish(reject, new Error(`orchestrator: 解析 python 输出失败: ${e.message}\n${text.slice(-800)}`))
         return
       }
-      if (parsed && parsed.ok === false) {
-        finish(reject, new Error(parsed.error || 'orchestrator: 编排失败'))
+      if (parsed && parsed.ok === false && !['execution', 'log_read'].includes(parsed.mode)) {
+        finish(reject, new Error(bounded(parsed.error || 'orchestrator: 编排失败', 3200)))
         return
       }
       finish(resolve, parsed)
@@ -254,7 +255,7 @@ function renderPlanReview(result) {
   if (suggestions.length) suggestions.forEach((s, i) => lines.push(`${i + 1}. ${s}`))
   else lines.push('（无）')
   if (result.verdict === 'pass') {
-    lines.push('', '> 审核通过：请把计划提交用户人工确认（ask_user_question），确认后置 frontmatter `status: approved` / `human_confirmed: true` 再实施。')
+    lines.push('', '> 审核通过：人工确认后设置 status: approved / human_confirmed: true，并绑定本响应的 approved_sha256 与 approved_version。')
   } else {
     lines.push('', '> 审核未通过：仅需修 P0 项即可通过，P1/P2 可在实施中处理。修完重新送审。')
   }
@@ -264,8 +265,31 @@ function renderPlanReview(result) {
 }
 
 /** 把编排结果渲染成给模型读的紧凑文本。 */
+function bounded(text, cap) {
+  const value = String(text ?? '');
+  const mark = '\n[output truncated; use registered log_ref for narrow read]';
+  return value.length <= cap ? value : value.slice(0, cap - mark.length) + mark;
+}
+
 function renderResult(result, verbose) {
-  if (result.mode === 'plan_review') return renderPlanReview(result)
+  if (result.mode === 'execution' || result.mode === 'log_read') {
+    const cap = result.mode === 'log_read' ? 3200 : result.ok ? 800 : 3200;
+    const value = { ...result };
+    let text = JSON.stringify(value);
+    while (text.length > cap && value.content?.length) {
+      value.content = value.content.slice(0, Math.max(0, value.content.length - (text.length - cap) - 32));
+      value.truncated = true;
+      text = JSON.stringify(value);
+    }
+    return text.length <= cap ? text : JSON.stringify({ mode: result.mode, ok: result.ok,
+      exitCode: result.exitCode, logRef: result.logRef, error: 'metadata exceeds output budget' });
+  }
+  if (result.mode === 'plan_review') {
+    const header = JSON.stringify({ plan_key: result.plan_key, approved_sha256: result.plan_sha256,
+      approved_version: result.version, verdict: result.verdict });
+    return bounded(header + '\n' + renderPlanReview({ ...result,
+      issues: result.issues?.slice(0, 3), suggestions: result.suggestions?.slice(0, 3) }), 4000);
+  }
   const usageLine = renderUsage(result.usage)
   if (result.mode === 'list') {
     const lines = [`编排器网关: ${result.gateway}`]
@@ -305,9 +329,9 @@ function renderResult(result, verbose) {
     }
     lines.push('')
   }
-  lines.push(result.final || '(无结果)')
+  lines.push(result.final || result.error || '(无结果)')
   if (usageLine) lines.push('', usageLine)
-  return lines.join('\n')
+  return bounded(lines.join('\n'), 3200)
 }
 
 /**
@@ -318,7 +342,7 @@ function renderResult(result, verbose) {
 export function apply(ctx, config) {
   const description = [
     'Run a multi-model tool orchestration on the local LangGraph orchestrator.',
-    'op="full" (default): decompose the request, dispatch to tools, and run each tool on its own magpie model pool with automatic failover, then summarize.',
+    'op="full" (default): use workdir + execution {program,args} for a deterministic known command without model calls; otherwise decompose request with model pools. Execution requires absolute workdir. Use log_ref for quota-limited log reads.',
     'op="tool": run a single named tool on its pool.',
     'op="list": list configured tools and their model pools.',
     'op="plan_review": submit a Markdown plan (arg `plan`) for strict review by the plan_reviewer model pool (current: workbuddy/deepseek-v4.1-flash); returns verdict pass|reject, score, issues, suggestions. Any edit/write must be preceded by an approved AND human-confirmed plan in .plan/; use plan_review, then ask_user_question for final confirmation.',
@@ -354,6 +378,28 @@ export function apply(ctx, config) {
           type: 'string',
           description: 'When op=plan_review, optional task/background context (falls back to request).',
         },
+        workdir: { type: 'string', description: 'Explicit absolute working directory; required for every full request. For plan_review, identifies the repository containing .plan.' },
+        execution: {
+          type: 'object', description: 'Deterministic full fast path: program + argument array; no shell or model calls.',
+          properties: {
+            program: { type: 'string', enum: ['npm', 'pnpm', 'bun', 'python', 'git', 'node'] },
+            args: { type: 'array', items: { type: 'string' } },
+            timeout: { type: 'number' },
+          }, required: ['program', 'args'], additionalProperties: false,
+        },
+        preflight: { type: 'object', description: 'Optional declared test environment; checked before execution.',
+          properties: { testUrl: { type: 'string' }, expectedOrigin: { type: 'string' },
+            environment: { type: 'string' } }, additionalProperties: false },
+        log_ref: { type: 'string', description: 'Registered log reference for quota-limited narrow read.' },
+        offset: { type: 'integer', minimum: 0 },
+        limit: { type: 'integer', minimum: 1, maximum: 2000 },
+        plan_path: { type: 'string', description: 'Plan path within workdir/.plan.' },
+        base_sha: { type: 'string' },
+        base_version: { type: 'integer', minimum: 1 },
+        delta: { type: 'array', items: { type: 'object', properties: {
+          old: { type: 'string' }, new: { type: 'string' },
+        }, required: ['old', 'new'], additionalProperties: false } },
+
       },
       // 不强制 request：plan_review 可用 plan+context 独立调用；各 op 在 execute 内自行校验必填项。
       additionalProperties: false,
@@ -382,7 +428,7 @@ export function apply(ctx, config) {
         return renderResult(result, config.verbose)
       }
       if (op === 'plan_review') {
-        if (!args.plan || !String(args.plan).trim()) {
+        if ((!args.plan || !String(args.plan).trim()) && !args.delta?.length) {
           throw new Error('orchestrate: op=plan_review 需要 plan 参数（Markdown 计划正文）')
         }
         const sessionId = hostSessionId(exec)
@@ -392,17 +438,27 @@ export function apply(ctx, config) {
             op: 'plan_review',
             plan: args.plan,
             context: args.context || args.request || '',
+            workdir: args.workdir, plan_path: args.plan_path,
+            base_sha: args.base_sha, base_version: args.base_version, delta: args.delta,
             session_id: sessionId,
           },
           exec.signal,
         )
         return renderResult(result, config.verbose)
       }
-      // full
+      // full: environment precheck precedes child execution.
+      if (args.execution) {
+        const { program, args: argv = [] } = args.execution;
+        const packageScript = ['npm', 'pnpm', 'bun'].includes(program) && argv[0] === 'run' ? argv[1] : undefined;
+        const checked = preflight({ ...args.preflight, workdir: args.workdir, packageScript });
+        if (!checked.ok) return JSON.stringify({ mode: 'execution', ok: false, code: checked.errors[0], errors: checked.errors });
+      }
       const sessionId = hostSessionId(exec)
       const result = await enqueueSession(sessionId, () => callPython(config, {
         op: 'full',
         request: args.request,
+        workdir: args.workdir, execution: args.execution,
+        log_ref: args.log_ref, offset: args.offset, limit: args.limit,
         session_id: sessionId,
       }, exec.signal))
       return renderResult(result, config.verbose)
