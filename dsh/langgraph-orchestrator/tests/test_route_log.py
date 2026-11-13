@@ -66,8 +66,45 @@ def test_fallback_route_never_counts_as_miss():
 
 
 def test_non_code_tool_not_judged():
-    """pwsh/git 等本来就不是代码生成，不该判 MISS。"""
-    assert g.route_miss("跑 pytest", "pwsh", g.ROUTE_PLANNER) is None
+    """无代码意图的请求选了 pwsh 不判 MISS（如“查看目录”）。"""
+    assert g.route_miss("看看当前目录有什么文件", "pwsh", g.ROUTE_PLANNER) is None
+
+
+def test_miss_when_pwsh_chosen_instead_of_code_tool():
+    """2026-11-13 实战踩到："修报错，修完自测"与"按方案逐条改，最后跑测试"都被分给 pwsh。
+
+    pwsh 比 code_editor 更糟：它会真去执行命令而不是生成代码，且要过安全审查。
+    任何「该生成代码却选了执行/直答工具」都必须计入 MISS。
+    """
+    for req in ("修复这个报错：TypeError，修完自测一下", "按方案逐条改掉，最后跑测试"):
+        miss = g.route_miss(req, "pwsh", g.ROUTE_PLANNER)
+        assert miss is not None, f"未判 MISS: {req}"
+        assert miss["expected"] == g._SIGNAL_TOOL
+        assert miss["got"] == "pwsh"
+
+
+def test_miss_for_any_wrong_tool_when_signal_expected():
+    """该选 signal 时，选任何别的工具都算 MISS（单步计划）。"""
+    for wrong in ("code_editor", "planner", "pwsh", "file_reader", "git"):
+        assert g.route_miss("跑 pytest 验证一下", wrong, g.ROUTE_PLANNER) is not None, wrong
+
+
+def test_multi_step_plan_with_signal_later_is_not_miss():
+    """2026-11-13 实战修正：两步计划「pwsh 定位 -> signal 修代码」是正当的。
+
+    初版只看 plan[0]，把这类正确计划误判成 MISS。若 plan_tools 已含期望工具，不算 MISS。
+    """
+    plan = ["pwsh", "code_edit_with_signal"]
+    assert g.route_miss("修复这个报错，修完自测", "pwsh", g.ROUTE_PLANNER, plan) is None
+    plan2 = ["pwsh", "code_edit_with_signal", "pwsh"]
+    assert g.route_miss("按方案逐条改，最后跑测试", "pwsh", g.ROUTE_PLANNER, plan2) is None
+
+
+def test_multi_step_without_signal_still_miss():
+    """多步但全程没有期望工具，仍算 MISS。"""
+    plan = ["pwsh", "file_reader"]
+    miss = g.route_miss("修复这个报错，修完自测", "pwsh", g.ROUTE_PLANNER, plan)
+    assert miss is not None and miss["got"] == "pwsh"
 
 
 # ---------- log_route ----------

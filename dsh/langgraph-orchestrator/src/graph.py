@@ -56,6 +56,12 @@ PLANNER_SYSTEM = """你是一个任务规划器。把用户需求拆成有序步
 每一步必须从下列工具中选一个，并给出明确指令：
 {tools}
 {signal}
+【硬约束一：涉及写代码就必须选代码工具】只要需求涉及写/改/重构代码（函数、类、脚本、代码片段、
+正则、SQL、组件），**禁止**选 planner。planner 只用于“不需要动手、直接回答就行”的纯问答。
+选错会导致宿主拿不到可用代码，后果比你多花一步更严重。
+【硬约束二：有验证意图必须选 code_edit_with_signal】若需求里出现“跑/测/验证/修报错/按方案”，
+哪怕只是“并给出 pytest 断言”这种附带要求，也一律选 code_edit_with_signal，不要选 code_editor。
+只有当需求是纯片段生成、无任何运行或验证意图时，才用 code_editor。
 重要：要读取/查看磁盘上的本地文件内容，必须用 pwsh 工具执行 Get-Content 等命令；
 file_reader / code_editor / code_edit_with_signal 是纯文本摘要/生成器，没有本地磁盘读取权限，
 不能用来读取文件。
@@ -163,27 +169,42 @@ def expected_tool(user_request: str) -> Optional[str]:
     return None
 
 
-def route_miss(user_request: str, chosen_tool: str, route_source: str) -> Optional[Dict[str, str]]:
-    """判定本次路由是否 miss；命中返回详情，否则 None。"""
+def route_miss(user_request: str, chosen_tool: str, route_source: str,
+               plan_tools: Optional[List[str]] = None) -> Optional[Dict[str, str]]:
+    """判定本次路由是否 miss；命中返回详情，否则 None。
+
+    2026-11-13 实战修正两处：
+    1) 初版只把 code_editor / planner 计为误选，漏了 pwsh。
+    2) 更关键的：初版只看 plan[0]。但多步计划里第一步用 pwsh 去「定位报错文件」、
+       第二步才用 code_edit_with_signal 修复，是完全合理的——把首步当最终路由会误判。
+       因此若 plan_tools 里已经包含期望工具，就不算 MISS。
+    """
     if route_source != ROUTE_PLANNER:
         return None  # 兜底/强制的路由不算规划器的错
     want = expected_tool(user_request)
-    if want is None or chosen_tool == want:
+    if want is None:
         return None
-    # 只关心「代码类工具之间选错」与「根本没选代码工具」
-    if chosen_tool == _SIGNAL_TOOL:
+    # 计划后续步骤已经用到了正确工具 -> 不算 MISS
+    if plan_tools and want in plan_tools:
         return None
-    if want == _SIGNAL_TOOL and chosen_tool in ("code_editor", "planner"):
-        return {"expected": want, "got": chosen_tool}
-    return None
+    if chosen_tool == want:
+        return None
+    if want not in _CODE_TOOLS:
+        return None
+    return {"expected": want, "got": chosen_tool}
 
 
 def log_route(
     *, user_request: str, chosen_tool: str, route_source: str,
     step_count: int, session_id: str = "anonymous",
     miss: Optional[Dict[str, str]] = None,
+    plan_tools: Optional[List[str]] = None,
 ) -> None:
-    """每次规划决策写一行，用于统计真实分流命中率。写失败不阻断业务。"""
+    """每次规划决策写一行，用于统计真实分流命中率。写失败不阻断业务。
+
+    plan_tools 必须落盘：否则事后无法区分「真的没选对」与
+    「多步计划里第一步定位、第二步改代码」——后者是正当的，算成 MISS 会误报。
+    """
     try:
         row = {
             "ts": time.time(),
@@ -193,6 +214,7 @@ def log_route(
             "expected": (miss or {}).get("expected"),
             "miss": bool(miss),
             "steps": step_count,
+            "plan_tools": list(plan_tools or []),
             "request_head": (user_request or "")[:200],
         }
         _ROUTE_LOG.parent.mkdir(parents=True, exist_ok=True)
@@ -801,16 +823,18 @@ def build_graph(router: ModelRouter, cfg):
 
         # 路由日志：分母 = 每一次规划决策。与 off-task 日志（分母=代码类调用）不同。
         chosen = plan[0].get("tool", "planner") if plan else "planner"
-        miss = route_miss(state["user_request"], chosen, route_source)
+        plan_tools = [s.get("tool", "") for s in plan]
+        miss = route_miss(state["user_request"], chosen, route_source, plan_tools)
         if miss:
             trace.append(
                 f"[ROUTE-MISS] 期望 {miss['expected']} 实际 {miss['got']} "
-                f"（route_source={route_source}）"
+                f"（plan={plan_tools}, route_source={route_source}）"
             )
         log_route(
             user_request=state["user_request"], chosen_tool=chosen,
             route_source=route_source, step_count=len(plan),
             session_id=str(state.get("session_id") or "anonymous"), miss=miss,
+            plan_tools=plan_tools,
         )
         return {
             "plan": plan, "cursor": 0, "results": [], "trace": trace,
