@@ -4,7 +4,7 @@
 
 ## 会话时间硬约束（P0，细节见 skill/hook）
 - 计划确认轮必须把可预见待定项（提交方式/推送/是否重建）一次问清（hook 拦截二次 ask）。
-- 跑 `playwright test` 前必须先过 `node e2e/scripts/preflight.mjs`（hook 拦截）。
+- 跑 `playwright test` 前必须过 e2e 预检（**暂缓，落点仓确定后启用**，设计见 `.plan/p0-hooks-skills-20261113.md` 附录）。
 - 定位顺序与 lint 命令模板见 `zentao-analyzer` skill。
 
 ## 编排器选型（主动遵守，不等 gate 拒绝）
