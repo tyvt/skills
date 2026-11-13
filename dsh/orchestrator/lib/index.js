@@ -27,7 +27,7 @@ export const inject = ['tools']
 
 const TOOL_NAME = 'orchestrate'
 const ALLOWED_OPS = ['full', 'tool', 'list', 'plan_review']
-const TOOL_NAMES = ['planner', 'code_editor', 'file_reader', 'image_analyst', 'pwsh']
+const TOOL_NAMES = ['planner', 'code_editor', 'code_edit_with_signal', 'file_reader', 'image_analyst', 'pwsh']
 
 /**
  * 用子进程跑 Python JSON 桥，stdin 吃 JSON，stdout 吐 JSON。

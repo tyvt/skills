@@ -64,6 +64,33 @@ tools:
     # 单模型请求超时 120 秒：仍能覆盖慢模型，但故障转移更快（不再死等 300s）。
     timeout: 120
 
+  # 「有可执行验证信号」场景专用（2026-11-13 新增）。与 code_editor 同为纯文本生成，无磁盘读写。
+  #
+  # 拆分理由：code_editor 一个池子服务所有代码文本任务，从「写个正则」到「按方案改完并跑通测试」
+  # 共用同一主选。后者需要模型自己意识到「改完还得能被验证」，flash 级主选在该模式下产出常缺
+  # 可执行验证落点，宿主还得二次返工。
+  #
+  # 主选 cursor/composer-2.5：该模型当初因与 cursor/grok-4.7 同批清理被连带移除，并非因自身慢
+  #（移除计划记录 composer 当年冒烟 4.4s 正确，且明写「可随时恢复」）。2026-11-13 实测同题材：
+  #   cursor/composer-2.5              5.9s / 198 completion token（约 34 tok/s，含函数+pytest断言）
+  #   workbuddy/deepseek-v4.1-flash   1.3s / 33 token（约 25 tok/s）
+  # 绝对延迟多 4.6s，但产出体积与结构化程度明显更高。仍保留两位 flash 兜底，挂掉自动回落。
+  code_edit_with_signal:
+    description: >
+      生成或修改代码，用于「有可执行验证手段」的任务：需跑测试/修报错/按方案逐条改/需验证跑通。
+      纯文本生成，无本地磁盘读写权限（读写文件请用 pwsh）。
+      不适用于纯片段生成、改写、格式化、解释代码等无需验证的轻量场景（那种请用 code_editor）。
+    models:
+      - model: cursor/composer-2.5
+        max_tokens: 6144
+      - model: workbuddy/glm-5.3-flash
+        max_tokens: 4096
+      - model: workbuddy/deepseek-v4.1-flash
+        max_tokens: 4096
+    max_tokens: 6144
+    # 强代码模型首 token 较慢，给足预算；仍快于全局 300s 口径。
+    timeout: 150
+
   # 复杂推理/规划。与 plan_reviewer 同理，reasoning 模型需要足够 max_tokens，
   # 过低会被 reasoning 吃干预算后返回 502 empty reply。
   planner:

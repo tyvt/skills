@@ -20,6 +20,14 @@ from openai import OpenAI
 from .config import ModelSpec, OrchestratorConfig, ToolSpec
 
 # 峰时降级只作用于这两个工具；其余工具保持配置顺序。
+#
+# 【为什么 code_edit_with_signal 刻意不在此集合】2026-11-13 实测发现：
+# 本策略会把 glm-5.3-flash 提到队首并去掉 deepseek-flash，而 code_edit_with_signal
+# 的主选 cursor/composer-2.5 本身就是「特意选的强代码模型」。若加入此集合，
+# 峰时（工作日 09:00-12:00 / 14:00-18:00）该工具会永远跑到 glm 上，composer 排在后面
+# 根本不执行——等于把本次拆分的意义完全抵消（实测池变为 [glm, composer]）。
+# 另外本策略的出发点是「峰时避开 deepseek 的定价/限流」，而本工具主选不是 deepseek，
+# 加入集合属于错误套用。因此保持原序，只靠 failure_cooldown 做故障转移。
 PEAK_GLM_TOOLS = {"file_reader", "code_editor"}
 DEEPSEEK_FLASH = "deepseek-v4.1-flash"
 GLM_FLASH = "glm-5.3-flash"

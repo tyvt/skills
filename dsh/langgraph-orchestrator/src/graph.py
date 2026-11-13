@@ -51,11 +51,36 @@ class OrchState(TypedDict, total=False):
 PLANNER_SYSTEM = """你是一个任务规划器。把用户需求拆成有序步骤，最少 1 步，最多 5 步。
 每一步必须从下列工具中选一个，并给出明确指令：
 {tools}
+{signal}
 重要：要读取/查看磁盘上的本地文件内容，必须用 pwsh 工具执行 Get-Content 等命令；
-file_reader / code_editor 是纯文本摘要器，没有本地磁盘读取权限，不能用来读取文件。
+file_reader / code_editor / code_edit_with_signal 是纯文本摘要/生成器，没有本地磁盘读取权限，
+不能用来读取文件。
 只输出一个 JSON 数组，形如:
 [{{"tool": "工具名", "instruction": "具体做什么"}}]
 禁止输出任何解释、前言、Markdown 或多余文字。"""
+
+# 「有可执行验证信号」触发词的唯一定义源。
+# 同时用于两处，避免两份词表漂移：(1) 渲染进 PLANNER_SYSTEM 的 {signal} 占位符；
+# (2) tests/test_tool_signal_split.py 断言「测的就是分流用的」。
+SIGNAL_TRIGGERS: dict = {
+    "跑测试": ("跑测试", "单测", "pytest", "vitest", "jest", "npm test", "用例", "覆盖率"),
+    "修报错": ("修报错", "报错", "异常", "堆栈", "traceback", "编译不过", "lint 不通过"),
+    "按方案改": ("按方案", "按计划", "按文档", "逐条改", "分步实现"),
+    "要验证": ("验证", "跑通", "回归", "确认修复", "自测"),
+}
+
+
+def _render_signal_rules() -> str:
+    """把 SIGNAL_TRIGGERS 渲染成给规划器的分流判据文本。"""
+    lines = [
+        "工具选择判据（命中下列任一触发词则用 code_edit_with_signal，全不命中用 code_editor）："
+    ]
+    for kind, words in SIGNAL_TRIGGERS.items():
+        lines.append(f"- {kind}：{'、'.join(words)}")
+    lines.append(
+        "无验证意图的纯片段生成/改写/格式化/解释，一律用 code_editor。"
+    )
+    return "\n".join(lines)
 
 # 没有本地读文件能力的模型（file_reader / code_editor）必须带上这条。
 NO_LOCAL_FILE_SYSTEM = (
@@ -64,7 +89,7 @@ NO_LOCAL_FILE_SYSTEM = (
     "[ERROR] 无法读取本地文件，请宿主提供源码片段。"
     "禁止输出超过 20 个字的说明。"
 )
-_NO_LOCAL_READ_TOOLS = frozenset({"file_reader", "code_editor"})
+_NO_LOCAL_READ_TOOLS = frozenset({"file_reader", "code_editor", "code_edit_with_signal"})
 _GIT_LINE_CAP = 20
 _UNMERGED_PREFIX = re.compile(r"^(UU|AA|DD|AU|UA|DU|UD)\s+(.+)$")
 
@@ -590,7 +615,7 @@ def build_graph(router: ModelRouter, cfg):
             for t in cfg.tools.values()
             if t.name not in {guard_tool, cfg.security.fast_guard_tool}
         )
-        sys = PLANNER_SYSTEM.format(tools=tools_desc)
+        sys = PLANNER_SYSTEM.format(tools=tools_desc, signal=_render_signal_rules())
         messages = [
             {"role": "system", "content": sys},
             {"role": "user", "content": state["user_request"]},
@@ -927,6 +952,10 @@ def build_graph(router: ModelRouter, cfg):
                 "environment_context": new_ctx,
             }
 
+        if requested not in cfg.tools:
+            # 容错不变（仍回退 planner），但必须可观测：否则规划器选了一个未配置的
+            # 工具名时会静默退化成 planner 作答，漏配无法发现。
+            trace.append(f"[WARN] 未知工具 {requested!r}，已回退 planner")
         tool_name = requested if requested in cfg.tools and requested != guard_tool else "planner"
         prompt = instruction
         if requested in guarded:
