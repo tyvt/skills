@@ -105,8 +105,8 @@ title: P1(A) 裁剪重型低频工具组 + 补齐可达路径（profile 级）
 - **断言 B ✅**：恰好移除 7 工具 = **1,275 token/步**（schedule 829 + goal 446）；新会话 toolsTokens = 8,025、39 工具
 - **断言 B' ✅**：session_search / session_event_search / workflow / team_task_create / spawn_teammate **全部仍在**；"new-but-not-old" 为空（无额外误删）
 - **断言 E ✅**：pwsh/read/edit/grep/glob 全在
-- **断言 D**：composition 层已验证 full-tools order 5 + schedule 启用无误；实际切换需用户在 UI 切 full-tools 预设抽验（可后补）
-- **断言 C**：command-goal 未动，`/goal` 命令入口保留（可后补实测）
+- **断言 D ✅**：切 `full-tools` 预设新会话 `8ac072fd`（"测试会话"）→ 46 工具，schedule_*(create/edit/list/view)+goal(create/get/update) **7 个全部恢复**；与 standard 精简会话差集为空（一个不多一个不少）。**可达路径闭环成立**。
+- **断言 C ⏳（待用户敲命令）**：`--dump-config` 证实 command-goal 在 preset-standard 内未 disabled（命令入口挂载）；goal 工具在 full-tools 也正常。`/goal` 实际执行需 UI 输入 ` slash 命令确认（暂无历史调用可引）。
 
 **收益**：每步固定重发 −1,275 token（占 tools 中位 ~12.7k 的 ~10%）。批 2（session_query+workflow ≈2,100 token）待做。
 
