@@ -49,12 +49,14 @@ title: P1(A) 裁剪重型低频工具组 + 补齐可达路径（profile 级）
 > 落实审阅 P1：①按**插件 id 锚点**定位（不靠行号，B1-0 插入会使行号下移）；②**只改 preset-standard**——已核实 L369-370 属 preset-ptc、L716-717 属 preset-cordis，是**不同预设、非 standard 副本**，误禁会连带砍掉 ptc/cordis 的 schedule/goal，故不动。
 
 - **B1-0（先行）新增 full-tools 预设**：落 `~/.dsh/profiles/web/cordis.patch.yml`，**在 `- id: preset-standard`（L99）块整体结束之后插入**：
-  - 结构：`- id: preset-full-tools` / `name: '@deepseek-ai/dsh-agent-preset'` / `config.id: full-tools` / `config.order: 5`（沿用 preset-standard L99-103 结构）；
-  - **注册机制（已核验）**：preset 由 `dsh-agent-preset/index.js:25` 的 `ctx.agentPresets.register(this.config)` **自注册**——新增 `- id: preset-full-tools` 块即被自动发现并可选，**无需** 往 `agent-preset-registry`（L311-314，仅含 default/selectedDefault）追加枚举。default/selectedDefault 保持 standard 不变。
-  - **id/order 冲突（已核验）**：全表唯一 preset id 为 standard/ptc/minimal/cordis，`order` 用 1/2/3/4，**无 order:5、无 full-tools** → order:5 与本 id 均空闲。
+  - 结构：`- insert:` → `- id: preset-full-tools` / `name: '@deepseek-ai/dsh-agent-preset'` / `config.id: full-tools` / `config.order: 5`（沿用 preset-standard L99-103 结构）；
+  - **⚠️ 必须用 `insert:`（实施复盘点，2026-11-14）**：新预设是"新增条目"，profile patch 里**裸 `- id: preset-full-tools` 是"覆盖已有条目"，找不到会 `entry not found` 被静默跳过**（`--dump-config` 首行会打印 `patch: entry "preset-full-tools" not found`）。故 full-tools 必须包在 `- insert:` 下（对齐 web-app `presets/*.patch.yml` 的 insert 写法）。
+  - **注册机制（已核验）**：preset 由 `dsh-agent-preset/index.js:25` 的 `ctx.agentPresets.register(this.config)` **自注册**——insert 进去即被自动发现并可选，**无需** 往 `agent-preset-registry`（仅含 default/selectedDefault）追加枚举。default/selectedDefault 保持 standard 不变。
+  - **id/order 冲突（已核验）**：唯一 preset id 为 standard/ptc/minimal/cordis，`order` 用 1/2/3/4，**无 order:5、无 full-tools**。
   - **复制语义（明确）**：**逐条完整复制 preset-standard 的全部 plugins 并保留各自原有的 `disabled` 标记**（含有意禁用的 tool-subagent*、tool-plugin-manager、tool-plugin-market、bash-on-win32，切勿在 full-tools 里重开），**唯一差异 = full-tools 内 tool-schedule 与 tool-goal 不加 disabled**（即这两组在 full-tools 启用）。
 - B1-1 `tool-schedule`：**只在 preset-standard 块内**（`- id: tool-schedule`，按 id 定位，当前 L132-133）加 `disabled: true`。**不动 preset-ptc(L369-370)/preset-cordis(L716-717)**。
 - B1-2 `tool-goal`：**只在 preset-standard 块内**（`- id: tool-goal`，按 id 定位，当前 L142-143）加 `disabled: true`。不动 ptc/cordis。
+  - **机制订正（实施复盘，2026-11-14）**：真实 `preset-standard` 由 **`dsh-web-app/presets/standard.patch.yml`（insert）** 定义，profile 层的 `- id: preset-standard` 是"覆盖已有条目"——**按 id 命中后 config 会被替换/合并，本人实测有效**。`--dump-config` 已证实：加 disabled 后组合树里 preset-standard 的 tool-schedule/tool-goal = `disabled: true`，full-tools order=5 且 schedule 启用。**故批 1 无需改 harness 或 bundle，纯 profile patch 即可**；此前"未生效"是运行时重启时序问题（详见验证节），非语义错误。
 - 影响：仅 standard（默认预设）本会话失去 schedule/goal 工具。schedule 1.4%、goal 5.9%；command-goal(L140-141) 保留，/goal 命令仍可用、不依赖 tool-goal。
 - 在途 schedule：禁用只移除"创建/管理定时任务"工具，已在途任务由 side 调度器继续执行；如需查询/取消，切 `full-tools` 后用 `schedule_list`/`schedule_delete`。
 
@@ -89,3 +91,22 @@ title: P1(A) 裁剪重型低频工具组 + 补齐可达路径（profile 级）
 1. team_task：**方案 X 不动**（认掉 1.5k）。
 2. 可达路径：**full-tools 预设切换**。
 3. 节奏：**批 1 先行**，验证通过再做批 2。批 1 **只改 preset-standard**，不动 ptc/minimal/cordis。
+
+## 六、批 1 实施与验证结果（2026-11-14 完成）
+
+**已实施**（`~/.dsh/profiles/web/cordis.patch.yml`，备份 `.bak-p1a-20261114144410`）：
+- preset-standard：`tool-schedule`、`tool-goal` 各加 `disabled: true`（按 id 定位命中 web-app bundle 的 preset，config 合并生效）
+- 新增 `- insert: preset-full-tools`（order 5，复制 standard 全 plugins、保留原 disabled、schedule/goal 启用）——**必须用 insert:**，裸 `- id:` 会 `entry not found` 被跳过。
+
+**`--dump-config` 组合树验证**：preset-standard schedule/goal=`disabled:true`；preset-full-tools order=5 且 schedule 启用；无 patch 错误；YAML 合法；语义 diff 0 删除行。
+
+**live 新会话验证**（session `794ca361`，全新，preset=standard）：
+- **断言 A ✅**：schedule_* = 0、goal 工具 = 0
+- **断言 B ✅**：恰好移除 7 工具 = **1,275 token/步**（schedule 829 + goal 446）；新会话 toolsTokens = 8,025、39 工具
+- **断言 B' ✅**：session_search / session_event_search / workflow / team_task_create / spawn_teammate **全部仍在**；"new-but-not-old" 为空（无额外误删）
+- **断言 E ✅**：pwsh/read/edit/grep/glob 全在
+- **断言 D**：composition 层已验证 full-tools order 5 + schedule 启用无误；实际切换需用户在 UI 切 full-tools 预设抽验（可后补）
+- **断言 C**：command-goal 未动，`/goal` 命令入口保留（可后补实测）
+
+**收益**：每步固定重发 −1,275 token（占 tools 中位 ~12.7k 的 ~10%）。批 2（session_query+workflow ≈2,100 token）待做。
+
