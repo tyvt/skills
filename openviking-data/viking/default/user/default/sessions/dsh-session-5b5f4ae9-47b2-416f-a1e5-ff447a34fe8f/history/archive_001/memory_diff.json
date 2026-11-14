@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-5b5f4ae9-47b2-416f-a1e5-ff447a34fe8f/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-14T01:38:18.473730+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/优化方案/cost_bloat_plan.md",
+                "memory_type": "entities",
+                "after": "# 上下文膨胀优化方案（turn3 会话）\n2026-11-14 针对 turn3 删除/重构会话（74 步、52 万 token、仅 13 个有效改动）的 P0 膨胀问题交付的优化方案文档 .plan/cost-bloat-optimization-20261114.md，纯文档未改代码，已过 grok 审核。\n\n## 审计背景（turn3 会话）\n- turn3 从 step 1 跑到 step 74，模型上下文约 16 万→52 万 token，整会话累积 25.9M 输入（缓存读 25.81M，命中率 100%）\n- 实际产出仅 13 个文件改动（3 删除 + 5 代码 + 4 文档），过程性膨胀源于整读/整写/回滚循环\n- 五大 P0 项：上下文膨胀、为测试扩生产 API（inspectSize）、脱敏导致误编辑、plan_review 用 grok（审计误判为停用）、多次 ask 可合并\n\n## 方案要点（A/B 两批）\n- A 批·执行纪律（规则文本零代码风险）：A1 ≤40 行小文件禁整篇 write 逐段 edit；A2 脱敏行（token/===）改用 grep -n→read offset 局部读禁靠记忆补；A3 测试不得反向扩生产 API；A4 一次问清省 22 分钟级 ask 往返\n- B 批·机制层（插件代码需另立计划送审）：B1 撤 inspectSize 生产导出（先查调用方仅测试引用才删）；B2 复用已有 M1 白名单刹车纳入整读样本；B3 保留 grok 首位不动模型池仅固化首轮只送变更段+证据\n\n## 与审计差异及审核\n- 未采纳审计 P0#3「移除 grok-4.7@256k」：核 config.yaml:159-162，grok 为 2026-11-13 controller-bench 路由满分 1.00、总分 0.90 最高之有意首选，非配置漂移；用户明示「grok 审核还是要的」\n- grok plan_review 结果 PASS 74/100，0 P0，3 P1 建议（node --check 仅限 JS、B1 先查调用方/B2 白名单放行验收命令、A/B 批补计数口径与误伤阈值）已全部并入修订版\n- 交付状态：文档 .plan/cost-bloat-optimization-20261114.md 定稿并 present 给用户；A 批规则文本待用户确认是否落地，B 批代码改动建议另起一轮单独送审"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/mechanism/plan_review_chain.md",
+                "memory_type": "entities",
+                "before": "# plan_review_chain\nDSH orchestrator 的多步计划审批链，由 dsh/AGENTS.md \"Plan Review\" 章节要求。\n\n## 触发方式\n- orchestrate 工具的 op 枚举仅 full|tool|list，无独立 plan_review op。\n- 通过 op:\"full\" 将完整计划文本内联触发（PLAN_REVIEW 语境）。\n- planner 为纯文本模型无磁盘访问，计划文本必须内联。\n- 内联计划超过 api.py:299 的 PLAN_REVIEW_CLIP_CHARS 会触发 \"plan exceeds review size limit\" 保护导致编排失败；正常尺寸计划或直连 `python -m src.jsonbridge` 均正常。\n\n## 链路结构\n- planner 产出初始计划（历史曾观测 planner 池 workbuddy/deepseek-v4.1-flash 单点故障重试 ~100s×2 后降级 glm-5.3-flash）。\n- plan_reviewer 审核计划；当前池（2026-11-13 19:38 配置）：`cursor/grok-4.7@256k` → `workbuddy/deepseek-v4.1-flash` → `auto/deepseek-v4.1-flash`，max_tokens:8192，timeout:300。\n- glm-5.3-flash 产出最终摘要。\n\n## 耗时与可靠性（2026-11-13 排查结论）\n- 各步通常 20~70s，全链 1~3min；历史 .costs.jsonl 记录多数为 ok:true。\n- grok 基线开销约 deepseek 的 11 倍（单字回复 15.1s vs 1.4s），随 token 线性放大（大计划 173.8s ≈ 11ms/token），但从未失败。\n- 历史聚合（75 会话 cost 日志）：grok 8 调用 8 成功 0 失败（29.7s~173.8s）；deepseek 系 72 调用全成功。\n- 11-12 的 10 次 plan_review 失败（model=null, ok=false）根因是当时 max_tokens:2048 → DeepSeek reasoning 耗尽预算 → 502 empty reply，已于 11-13 配置升至 8192 修复；11-13 全天零失败。\n- \"grok 超时无响应\"反馈实为 grok 高延迟被误读，非可靠性故障；用户 2026-11-13 决定保持 grok 首选不动。\n\n## 三池复验（2026-11-13 重启后）\n- plan_reviewer 池首位 `cursor/grok-4.7@256k` 复验确认，端到端真实 plan_review 实测审核模型为 grok-4.7@256k，verdict PASS，route 1.00\n- security_guard 仅 `workbuddy/deepseek-v4.1-flash` 单模型，fail-closed\n- planner 池 `workbuddy/deepseek-v4.1-flash` ×2 不变，带「一步聚合」约束，冒烟验证 1 步输出；遗留监控项：planner 若出现「计划含不存在工具」漂移触发重测",
+                "after": "# plan_review_chain\nDSH orchestrator 的多步计划审批链，由 dsh/AGENTS.md \"Plan Review\" 章节要求。\n\n## 触发方式\n- orchestrate 工具的 op 枚举仅 full|tool|list，无独立 plan_review op。\n- 通过 op:\"full\" 将完整计划文本内联触发（PLAN_REVIEW 语境）。\n- planner 为纯文本模型无磁盘访问，计划文本必须内联。\n- 内联计划超过 api.py:299 的 PLAN_REVIEW_CLIP_CHARS 会触发 \"plan exceeds review size limit\" 保护导致编排失败；正常尺寸计划或直连 `python -m src.jsonbridge` 均正常。\n\n## 链路结构\n- planner 产出初始计划（历史曾观测 planner 池 workbuddy/deepseek-v4.1-flash 单点故障重试 ~100s×2 后降级 glm-5.3-flash）。\n- plan_reviewer 审核计划；当前池（2026-11-13 19:38 配置）：`cursor/grok-4.7@256k` → `workbuddy/deepseek-v4.1-flash` → `auto/deepseek-v4.1-flash`，max_tokens:8192，timeout:300。\n- glm-5.3-flash 产出最终摘要。\n\n## 耗时与可靠性（2026-11-13 排查结论）\n- 各步通常 20~70s，全链 1~3min；历史 .costs.jsonl 记录多数为 ok:true。\n- grok 基线开销约 deepseek 的 11 倍（单字回复 15.1s vs 1.4s），随 token 线性放大（大计划 173.8s ≈ 11ms/token），但从未失败。\n- 历史聚合（75 会话 cost 日志）：grok 8 调用 8 成功 0 失败（29.7s~173.8s）；deepseek 系 72 调用全成功。\n- 11-12 的 10 次 plan_review 失败（model=null, ok=false）根因是当时 max_tokens:2048 → DeepSeek reasoning 耗尽预算 → 502 empty reply，已于 11-13 配置升至 8192 修复；11-13 全天零失败。\n- \"grok 超时无响应\"反馈实为 grok 高延迟被误读，非可靠性故障；用户 2026-11-13 决定保持 grok 首选不动。\n- 2026-11-14 用户审计误判 grok 已停用（称吞吐约 1.1 tok/s 且停用），核 config.yaml:159-162 确认 grok 为 2026-11-13 controller-bench 路由 1.00/总分 0.90 最高之有意首选，非配置漂移；用户明示「grok 审核还是要的」，当日优化方案保留 grok 首位不动模型池\n\n## 三池复验（2026-11-13 重启后）\n- plan_reviewer 池首位 `cursor/grok-4.7@256k` 复验确认，端到端真实 plan_review 实测审核模型为 grok-4.7@256k，verdict PASS，route 1.00\n- security_guard 仅 `workbuddy/deepseek-v4.1-flash` 单模型，fail-closed\n- planner 池 `workbuddy/deepseek-v4.1-flash` ×2 不变，带「一步聚合」约束，冒烟验证 1 步输出；遗留监控项：planner 若出现「计划含不存在工具」漂移触发重测"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

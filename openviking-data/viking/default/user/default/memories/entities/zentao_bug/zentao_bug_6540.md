@@ -22,7 +22,6 @@
 - 禅道已回写 resolved/fixed，resolvedBy=tiany，assignedTo 退回 lichandan，附根因+证据评论
 - 修复计划经编排器审核通过并人工确认：.plan/bug6540-broken-image.md
 - 真实登录态 E2E 未执行（无登录态），需测试同学按 401→重登→查看记录 2120785757668904961 复验
-- 真实登录态 E2E 未执行
 - 注意：api/index.js 存在预存 eslint semi/arrow-parens 报错，非本次引入
 - 注意：env/.env 有一份非本次的 stash 冲突（"temp env changes"，他人遗留）已还原为 HEAD，stash 条目保留未动
 
@@ -30,8 +29,8 @@
 {
   "category": "zentao_bug",
   "name": "zentao_bug_6540",
-  "source_extraction_id": "5634ca7588e74a0e9ff2ad2c831e040e",
-  "version": 2,
+  "source_extraction_id": "d8e5f062be2349b393824ab2c27d1e21",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

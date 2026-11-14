@@ -18,14 +18,20 @@ DSH orchestrator 的多步计划审批链，由 dsh/AGENTS.md "Plan Review" 章�
 - 历史聚合（75 会话 cost 日志）：grok 8 调用 8 成功 0 失败（29.7s~173.8s）；deepseek 系 72 调用全成功。
 - 11-12 的 10 次 plan_review 失败（model=null, ok=false）根因是当时 max_tokens:2048 → DeepSeek reasoning 耗尽预算 → 502 empty reply，已于 11-13 配置升至 8192 修复；11-13 全天零失败。
 - "grok 超时无响应"反馈实为 grok 高延迟被误读，非可靠性故障；用户 2026-11-13 决定保持 grok 首选不动。
+- 2026-11-14 用户审计误判 grok 已停用（称吞吐约 1.1 tok/s 且停用），核 config.yaml:159-162 确认 grok 为 2026-11-13 controller-bench 路由 1.00/总分 0.90 最高之有意首选，非配置漂移；用户明示「grok 审核还是要的」，当日优化方案保留 grok 首位不动模型池
+
+## 三池复验（2026-11-13 重启后）
+- plan_reviewer 池首位 `cursor/grok-4.7@256k` 复验确认，端到端真实 plan_review 实测审核模型为 grok-4.7@256k，verdict PASS，route 1.00
+- security_guard 仅 `workbuddy/deepseek-v4.1-flash` 单模型，fail-closed
+- planner 池 `codex/gpt-6-luna` → `gpt-5.6-luna` → `deepseek-v4.1-flash`（2026-11-13 改，gpt-6-luna 首选已生效，活体验证 `plan via codex/gpt-6-luna`），带「一步聚合」约束，冒烟验证 1 步输出；遗留监控项：planner 若出现「计划含不存在工具」漂移触发重测
 
 <!-- MEMORY_FIELDS
 {
   "category": "mechanism",
   "name": "plan_review_chain",
-  "source_extraction_id": "68d370b655984f7eb3e102404979991c",
+  "source_extraction_id": "a2db3a6730df41a3af43f4122e55dcfb",
   "peer_id": "github.com-tyvt-skills",
-  "version": 4,
+  "version": 7,
   "memory_type": "entities"
 }
 -->

@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-11c198b8-127b-4da3-a03a-b6a2e68463b2/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-14T02:38:59.849447+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/程序/dsh_subagent_model_selection.md",
+                "memory_type": "entities",
+                "before": "# dsh子代理模型选择机制\nDSH 子代理模型选择功能，由 dsh-tool-subagent 实现，控制子代理可使用哪些模型。\n\n## 机制说明\n- 子代理创建可传 provider+model+reasoning_effort 覆盖父模型（dsh-tool-subagent/lib/index.js:43-96）\n- 开关一：每工具实例 enabled 开关（configured._modelSelectionEnabled），关闭时模型请求抛 \"child model selection is disabled for this tool instance\"\n- 开关二：Session 级 policy.routes 白名单（subagent-model-selection 命名空间，存于 settings.yaml，按 session）\n- 无 policy 时子代理只能用父模型 route；有 policy 时可选 policy.routes 中任一 route，否则抛错\n- 无 policy 继承父模型正是\"所有子代理都等于主控模型\"的直接根因\n\n## 配置与状态\n- 启用路径：Settings→Plugins→Subagent 打开 model selection，写入角色白名单 routes\n- 截至 2026-11-14 该功能存在但未配置（settings.yaml 无 subagent/model-selection 段）\n- 模型注册表位于 ~/.dsh/settings.yaml 的 llm-pi-ai.providers.*.models，共 39 个模型（magpie/cursor/workbuddy/codex/autoclaw）\n\n## 与编排器关系\n- plan_reviewer/verifier 池是编排器内部 review 节点池（config.yaml，grok-4.7→deepseek），服务 op:plan_review/op:full\n- 子代理模型选择改的是宿主 spawn 子代理路由，两者独立互不干扰",
+                "after": "# dsh子代理模型选择机制\nDSH 子代理模型选择功能，由 dsh-tool-subagent 实现，控制子代理可使用哪些模型。\n\n## 机制说明\n- 子代理创建可传 provider+model+reasoning_effort 覆盖父模型（dsh-tool-subagent/lib/index.js:43-96，服务层 child-agent.js/manager.js 均支持）\n- 开关一：每工具实例 modelSelection:true 开关（config.modelSelection === true），决定工具 schema 是否向模型暴露 provider/model 参数\n- 开关二：Session 级 policy.routes 白名单（subagent-model-selection 命名空间），实际为每会话 durable projection，由会话事件 subagent/model-selection-policy 写入 session log（.sessions），非全局 settings.yaml\n- 开关二b：Settings 表单 SubagentModelSelectionConfig.enabled（默认 false，.volatile() 不落盘）为总闸，决定新顶层会话是否写入 policy；与开关一为两个独立开关，须同时开启（index.js:351 + model-selection-settings.js:76,98）\n- route 格式（P2）：Array<{provider:string(min1), model:string(min1)}>，.strict()、不得重复，例 {provider:\"magpie\", model:\"cursor/composer-2.5\"}（model-selection-settings.js:8-39）\n- 无 policy 时子代理只能用父模型 route；有 policy 时可选 policy.routes 中任一 route，否则抛错\n- 无 policy 继承父模型正是\"所有子代理都等于主控模型\"的直接根因\n\n## 三条 Spawn 路径差异\n- workflow agent({provider,model})：直达 startActivation、绕开 policy 白名单、spawn provider 声明 agentOptions:true，今天零配置即可用（dsh-workflow-ptc startActivation 透传 request.agentOptions）\n- spawn_teammate（Team）：request 无 model 字段，成员硬继承 Lead 的 root.options.model，无法换模型\n- model-facing subagent 工具：受白名单约束，但标准 preset 中 disabled:true；assertAllowedModelSelection 仅存在于该工具，workflow/spawn 路径不调用\n\n## 配置与状态\n- 启用路径：Settings→Plugins→Subagent 打开 model selection（SubagentModelSelectionConfig，volatile 不落盘），写入角色白名单 routes\n- 截至 2026-11-14 该功能存在但未配置；Settings 表单为 volatile，仅在 agent/created 时把 enabled+allowedModels 快照作为会话事件写入 session log\n- 模型注册表位于 ~/.dsh/settings.yaml 的 llm-pi-ai.providers.*.models，共 39 个模型（magpie/cursor/workbuddy/codex/autoclaw）\n\n## 与编排器关系\n- plan_reviewer/verifier 池是编排器内部 review 节点池（config.yaml，grok-4.7→deepseek），服务 op:plan_review/op:full\n- 子代理模型选择改的是宿主 spawn 子代理路由，两者独立互不干扰"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/编排器架构分工偏好.md",
+                "memory_type": "preferences",
+                "before": "- 主张多模型参与与降本是同向的，不是矛盾的；编排器应承担检索、读文件、改代码、跑命令、判读输出等可分流工作，宿主只保留判断方向、审 diff、写结论。\n- 编排器优化顺序：先改配置级低成本项（guard 白名单、模型池对调、code_editor 启用），再做代码级改动（返回体裁剪、targets 扇出、op:read 窄读）。\n- guard 对只读/低风险命令按命令前缀直接 ALLOW，避免 escalate→defer→ALLOW 双重评审循环浪费延迟。\n- execute（格式转换类）用 flash 模型，summarize（长输出判读）用强模型，二者模型不应配反。\n- 白名单不新增任何写/执行类命令，不可逆操作（如 git push --force、npm run build 执行任意脚本、npx eslint --fix 改源码）必须保留评审。",
+                "after": "- 主张多模型参与与降本是同向的，不是矛盾的；编排器应承担检索、读文件、改代码、跑命令、判读输出等可分流工作，宿主只保留判断方向、审 diff、写结论。\n- 编排器优化顺序：先改配置级低成本项（guard 白名单、模型池对调、code_editor 启用），再做代码级改动（返回体裁剪、targets 扇出、op:read 窄读）。\n- guard 对只读/低风险命令按命令前缀直接 ALLOW，避免 escalate→defer→ALLOW 双重评审循环浪费延迟。\n- execute（格式转换类）用 flash 模型，summarize（长输出判读）用强模型，二者模型不应配反。\n- 白名单不新增任何写/执行类命令，不可逆操作（如 git push --force、npm run build 执行任意脚本、npx eslint --fix 改源码）必须保留评审。\n- 异构模型分工优先用 workflow agent({provider,model}) 而非 spawn_teammate；后者 request 无 model 字段、成员硬继承 Lead 模型无法换模，workflow 路径绕开 policy 白名单且 spawn 支持 agentOptions，零配置可用 (as of 2026-11-14)"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

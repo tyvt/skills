@@ -1,0 +1,56 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-5296be84-0e3e-47da-a055-504306780477/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-13T19:16:11.405585+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/主控模型池首选偏好.md",
+                "memory_type": "preferences",
+                "after": "- 主控模型池首选型优先速度/成本而非微小分数差：现役 workbuddy/deepseek-v4.1-flash 与 top 差距 ≤0.03 但快 3 倍、免费，故维持池首"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/效率弥补方式偏好.md",
+                "memory_type": "preferences",
+                "after": "- 效率短板通过 PLANNER_SYSTEM 加\"简单任务一步聚合\"约束弥补，而非换模型"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/模型对照与降级偏好.md",
+                "memory_type": "preferences",
+                "after": "- 免费模型（如 glm-5.3-flash）作 A/B 对照；复杂规划降级场景保留强模型（如 grok-4.7）"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/模型淘汰标准偏好.md",
+                "memory_type": "preferences",
+                "after": "- 安全一票否决：凡在安全题（如\"密码导出\"）未拒绝的模型（如 gpt-6-astra）直接淘汰\n- 输出非 JSON 坍缩（如 composer-2.5 5/6）或分数过低（如 gpt-5.6 全系 0.77–0.80）的模型淘汰"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/编排器安全前置偏好.md",
+                "memory_type": "preferences",
+                "after": "- 编排器需保留 security_guard 前置，因幻觉工具题（deploy_tool）有模型误判为 execute_tools"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/mechanism/plan_review_chain.md",
+                "memory_type": "entities",
+                "before": "# plan_review_chain\nDSH orchestrator 的多步计划审批链，由 dsh/AGENTS.md \"Plan Review\" 章节要求。\n\n## 触发方式\n- orchestrate 工具的 op 枚举仅 full|tool|list，无独立 plan_review op。\n- 通过 op:\"full\" 将完整计划文本内联触发（PLAN_REVIEW 语境）。\n- planner 为纯文本模型无磁盘访问，计划文本必须内联。\n- 内联计划超过 api.py:299 的 PLAN_REVIEW_CLIP_CHARS 会触发 \"plan exceeds review size limit\" 保护导致编排失败；正常尺寸计划或直连 `python -m src.jsonbridge` 均正常。\n\n## 链路结构\n- planner 产出初始计划（历史曾观测 planner 池 workbuddy/deepseek-v4.1-flash 单点故障重试 ~100s×2 后降级 glm-5.3-flash）。\n- plan_reviewer 审核计划；当前池（2026-11-13 19:38 配置）：`cursor/grok-4.7@256k` → `workbuddy/deepseek-v4.1-flash` → `auto/deepseek-v4.1-flash`，max_tokens:8192，timeout:300。\n- glm-5.3-flash 产出最终摘要。\n\n## 耗时与可靠性（2026-11-13 排查结论）\n- 各步通常 20~70s，全链 1~3min；历史 .costs.jsonl 记录多数为 ok:true。\n- grok 基线开销约 deepseek 的 11 倍（单字回复 15.1s vs 1.4s），随 token 线性放大（大计划 173.8s ≈ 11ms/token），但从未失败。\n- 历史聚合（75 会话 cost 日志）：grok 8 调用 8 成功 0 失败（29.7s~173.8s）；deepseek 系 72 调用全成功。\n- 11-12 的 10 次 plan_review 失败（model=null, ok=false）根因是当时 max_tokens:2048 → DeepSeek reasoning 耗尽预算 → 502 empty reply，已于 11-13 配置升至 8192 修复；11-13 全天零失败。\n- \"grok 超时无响应\"反馈实为 grok 高延迟被误读，非可靠性故障；用户 2026-11-13 决定保持 grok 首选不动。",
+                "after": "# plan_review_chain\nDSH orchestrator 的多步计划审批链，由 dsh/AGENTS.md \"Plan Review\" 章节要求。\n\n## 触发方式\n- orchestrate 工具的 op 枚举仅 full|tool|list，无独立 plan_review op。\n- 通过 op:\"full\" 将完整计划文本内联触发（PLAN_REVIEW 语境）。\n- planner 为纯文本模型无磁盘访问，计划文本必须内联。\n- 内联计划超过 api.py:299 的 PLAN_REVIEW_CLIP_CHARS 会触发 \"plan exceeds review size limit\" 保护导致编排失败；正常尺寸计划或直连 `python -m src.jsonbridge` 均正常。\n\n## 链路结构\n- planner 产出初始计划（历史曾观测 planner 池 workbuddy/deepseek-v4.1-flash 单点故障重试 ~100s×2 后降级 glm-5.3-flash）。\n- plan_reviewer 审核计划；当前池（2026-11-13 19:38 配置）：`cursor/grok-4.7@256k` → `workbuddy/deepseek-v4.1-flash` → `auto/deepseek-v4.1-flash`，max_tokens:8192，timeout:300。\n- glm-5.3-flash 产出最终摘要。\n\n## 耗时与可靠性（2026-11-13 排查结论）\n- 各步通常 20~70s，全链 1~3min；历史 .costs.jsonl 记录多数为 ok:true。\n- grok 基线开销约 deepseek 的 11 倍（单字回复 15.1s vs 1.4s），随 token 线性放大（大计划 173.8s ≈ 11ms/token），但从未失败。\n- 历史聚合（75 会话 cost 日志）：grok 8 调用 8 成功 0 失败（29.7s~173.8s）；deepseek 系 72 调用全成功。\n- 11-12 的 10 次 plan_review 失败（model=null, ok=false）根因是当时 max_tokens:2048 → DeepSeek reasoning 耗尽预算 → 502 empty reply，已于 11-13 配置升至 8192 修复；11-13 全天零失败。\n- \"grok 超时无响应\"反馈实为 grok 高延迟被误读，非可靠性故障；用户 2026-11-13 决定保持 grok 首选不动。\n\n## 三池复验（2026-11-13 重启后）\n- plan_reviewer 池首位 `cursor/grok-4.7@256k` 复验确认，端到端真实 plan_review 实测审核模型为 grok-4.7@256k，verdict PASS，route 1.00\n- security_guard 仅 `workbuddy/deepseek-v4.1-flash` 单模型，fail-closed\n- planner 池 `workbuddy/deepseek-v4.1-flash` ×2 不变，带「一步聚合」约束，冒烟验证 1 步输出；遗留监控项：planner 若出现「计划含不存在工具」漂移触发重测"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/主控模型选型偏好.md",
+                "memory_type": "preferences",
+                "deleted_content": "- 主控模型池首选型优先速度/成本而非微小分数差：现役 workbuddy/deepseek-v4.1-flash 与 top 差距 ≤0.03 但快 3 倍、免费，故维持池首\n- 效率短板通过 PLANNER_SYSTEM 加\"简单任务一步聚合\"约束弥补，而非换模型\n- 免费模型（如 glm-5.3-flash）作 A/B 对照；复杂规划降级场景保留强模型（如 grok-4.7）\n- 安全一票否决：凡在安全题（如\"密码导出\"）未拒绝的模型（如 gpt-6-astra）直接淘汰\n- 输出非 JSON 坍缩（如 composer-2.5 5/6）或分数过低（如 gpt-5.6 全系 0.77–0.80）的模型淘汰\n- 编排器需保留 security_guard 前置，因幻觉工具题（deploy_tool）有模型误判为 execute_tools"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 5,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

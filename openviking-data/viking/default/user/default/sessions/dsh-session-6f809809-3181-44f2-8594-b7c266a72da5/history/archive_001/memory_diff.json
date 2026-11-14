@@ -1,0 +1,88 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-6f809809-3181-44f2-8594-b7c266a72da5/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-14T10:14:43.343418+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/14/银行股息率门槛确认.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-14，用户要求选股标准中银行类单独增加门槛：近三年平均股息率大于 5% 才能入选，否则根本没法触发买入条件，并要求改完后重新运行脚本拉取清单。\n# 2026-11-14 (Saturday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 选股标准里面的银行类单独加个标准，近三年平均股息率大于5%才能入选，不然根本没法触发买入条件，完了重新跑脚本拉清单\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 已确认深市脚本已有全市场三年均值算法（一般门槛 3.5%），银行专项目前只检查资本、不良率和拨备率。为避免改变非银行标准，我准备在银行专项门内单独要求 `yld3 > 5%`，并重跑 `screen_sz.py` 输出正式清单、待确认/漏斗及银行剔除表。正在核实脚本将覆盖哪些文件。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 沪深脚本都调用同一个 `bank_screen`，且两边已有 `yld3`，因此这项银行准入应同步作用于沪市和深市；重跑两份脚本才能让两张清单保持一致。我会使用脚本默认缓存，不触发 `--refresh` 外抓治理，并在计划里列出所有会被覆盖的结果 CSV。目标代码文件当前没有既有改动。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/14/银行专项门槛代码实施.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-14，在共用函数 bank_screen.bank_gate 中加入 yld3 严格大于 5% 的银行准入条件，沪市与深市脚本均传入现有 yld3；缺失或无效股息率按不通过处理，非银行标准不变。改动落地于 bank_screen.py、screen_sh.py、screen_sz.py，未新增单测。\n# 2026-11-14 (Saturday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 选股标准里面的银行类单独加个标准，近三年平均股息率大于5%才能入选，不然根本没法触发买入条件，完了重新跑脚本拉清单\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 收到确认：按计划实施沪深两套筛选，使用默认缓存，不新增单测，暂不提交。现在修改共用银行判定，并让两侧把现有 `yld3` 传进去；银行缺失/无效股息率也会按不通过处理。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 代码改动已落地，三个目标文件原本干净；正式结果文件也没有既有改动，重跑会生成本轮结果。结构化语法检查命令被执行器拒绝，我不会重复相同调用；接下来脚本运行本身会验证可解析性，并按后台日志方式监看耗时。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 沪市脚本跑到治理阶段后以退出码 1 结束，沪市和深市两份新清单尚未完整生成。我正在查失败原因；日志显示它已经按新门槛剔除了 3 家银行，但还不能把这次运行当作成功清单交付。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/14/沪市脚本监控误报.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-14，沪市脚本两次运行被 watchdog 包装器报告失败，但实际 SCRIPT_EXIT=0 且三份结果 CSV 已写出；原因是包装器对 PowerShell exit 的状态处理有误，随后改为单独直接运行。\n# 2026-11-14 (Saturday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 选股标准里面的银行类单独加个标准，近三年平均股息率大于5%才能入选，不然根本没法触发买入条件，完了重新跑脚本拉清单\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 沪市脚本跑到治理阶段后以退出码 1 结束，沪市和深市两份新清单尚未完整生成。我正在查失败原因；日志显示它已经按新门槛剔除了 3 家银行，但还不能把这次运行当作成功清单交付。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 两次沪市运行都已写出三份 CSV，但任务状态仍是失败，输出停在治理与上市年限后，原因没有出现在 watchdog 日志。我正把 Python 退出码单独打印并强制 UTF‑8 留日志，分离脚本退出状态与监控包装器状态后再决定是否继续。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 原因已定位：沪市脚本实际成功退出（`SCRIPT_EXIT=0`），三份结果 CSV 已写好；显示失败的是 watchdog 包装器对 PowerShell `exit` 的状态处理。沪市新门槛已生效：三家银行被专项剔除，其中一只因三年均值 4.71%，另外两只虽高于 5% 但监管指标不达标。现在单独运行深市脚本，避免再用会误报状态的包装方式。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/14/沪市清单重跑完成.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-14，沪市脚本按新银行门槛成功重跑，生成 11 只入选清单，入选银行为渝农商行（三年均值 5.69%）和沪农商行（5.45%）；3 家银行被银行专项门剔除，其中 1 家因三年均值 4.71%，另外 2 家虽高于 5% 但监管指标不达标。\n# 2026-11-14 (Saturday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 选股标准里面的银行类单独加个标准，近三年平均股息率大于5%才能入选，不然根本没法触发买入条件，完了重新跑脚本拉清单\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 原因已定位：沪市脚本实际成功退出（`SCRIPT_EXIT=0`），三份结果 CSV 已写好；显示失败的是 watchdog 包装器对 PowerShell `exit` 的状态处理。沪市新门槛已生效：三家银行被专项剔除，其中一只因三年均值 4.71%，另外两只虽高于 5% 但监管指标不达标。现在单独运行深市脚本，避免再用会误报状态的包装方式。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 已完成银行专项股息率门槛和沪深清单重跑：银行须满足**近三年平均股息率严格高于 5%**，并继续通过原有三项监管指标。\n\n- 共用银行判定已加入该门槛；缺失或无效的股息率按不通过处理，非银行不受影响。[bank_screen.py:25](</D:/repository/数据湖/分析产出/bank_screen.py:25>) [bank_screen.py:71](</D:/repository/数据湖/分析产出/bank_screen.py:71>)\n- 沪深正式标准文档、筛选条件说明和漏斗记录已同步更新。[筛选标准_最终版.md:104](</D:/repository/数据湖/分析产出/筛选标准_最终版.md:104>) [screen_sh.py:357](</D:/repository/数据湖/分析产出/screen_sh.py:357>) [screen_sz.py:549](</D:/repository/数据湖/分析产出/screen_sz.py:549>)\n- 沪市结果 11 只，入选银行为渝农商行（5.69%）和沪农商行（5.45%）。[沪市清单](</D:/repository/数据湖/分析产出/沪市主池_筛选结果.csv>)\n- 深市结果 8 只，入选银行为平安银行（6.03%）。青农商行、兰州银行和宁波银行均因股息率低于 5% 被剔除；苏州银行股息率为 5.10%，但未通过资本充足率门槛。[深市清单](</D:/repository/数据湖/分析产出/深市专用标准_筛选结果.csv>)\n\n两份脚本均已成功运行；对清单的核验确认入选银行都高于 5%，沪市低于 5% 的非银行仍保留。未新增或运行单测，按你的选择暂不提交。首次监控曾误报沪市脚本失败；随后确认脚本实际退出码为 0，清单已生成。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/14/深市清单重跑完成.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-14，深市脚本以退出码 0 完成，生成 8 只入选清单；平安银行以三年均股息率 6.03% 入选，青农商行、兰州银行、宁波银行因低于 5% 被银行门剔除，苏州银行虽为 5.10% 但核心一级资本未达标。\n# 2026-11-14 (Saturday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 选股标准里面的银行类单独加个标准，近三年平均股息率大于5%才能入选，不然根本没法触发买入条件，完了重新跑脚本拉清单\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 深市脚本已成功完成（退出码 0），生成 8 只入选清单；银行里平安银行三年均股息率 6.03% 入选，青农商行、兰州银行、宁波银行均因低于 5% 被银行门剔除，苏州银行虽为 5.10% 但核心一级资本未达标。接下来我核对沪深输出文件、入选银行阈值及改动范围，并补齐银行模块顶部的标准说明。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 已完成银行专项股息率门槛和沪深清单重跑：银行须满足**近三年平均股息率严格高于 5%**，并继续通过原有三项监管指标。\n\n- 共用银行判定已加入该门槛；缺失或无效的股息率按不通过处理，非银行不受影响。[bank_screen.py:25](</D:/repository/数据湖/分析产出/bank_screen.py:25>) [bank_screen.py:71](</D:/repository/数据湖/分析产出/bank_screen.py:71>)\n- 沪深正式标准文档、筛选条件说明和漏斗记录已同步更新。[筛选标准_最终版.md:104](</D:/repository/数据湖/分析产出/筛选标准_最终版.md:104>) [screen_sh.py:357](</D:/repository/数据湖/分析产出/screen_sh.py:357>) [screen_sz.py:549](</D:/repository/数据湖/分析产出/screen_sz.py:549>)\n- 沪市结果 11 只，入选银行为渝农商行（5.69%）和沪农商行（5.45%）。[沪市清单](</D:/repository/数据湖/分析产出/沪市主池_筛选结果.csv>)\n- 深市结果 8 只，入选银行为平安银行（6.03%）。青农商行、兰州银行和宁波银行均因股息率低于 5% 被剔除；苏州银行股息率为 5.10%，但未通过资本充足率门槛。[深市清单](</D:/repository/数据湖/分析产出/深市专用标准_筛选结果.csv>)\n\n两份脚本均已成功运行；对清单的核验确认入选银行都高于 5%，沪市低于 5% 的非银行仍保留。未新增或运行单测，按你的选择暂不提交。首次监控曾误报沪市脚本失败；随后确认脚本实际退出码为 0，清单已生成。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/14/正式标准文档同步.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-14，核对发现正式标准文档 筛选标准_最终版.md 仍只列三项监管指标，经确认扩展变更范围后，在第 104–114 行补入银行股息率门槛、yld3 字段与严格大于说明；脚本保持现状且已成功的清单不重跑。\n# 2026-11-14 (Saturday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 选股标准里面的银行类单独加个标准，近三年平均股息率大于5%才能入选，不然根本没法触发买入条件，完了重新跑脚本拉清单\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 核对时发现正式规则文档 [筛选标准_最终版.md](D:/repository/数据湖/分析产出/筛选标准_最终版.md) 仍只列三项监管指标，没写收益率门。为避免代码与选股标准文档不一致，我会把该文件也纳入变更计划；这超出刚才确认的文件范围，我先补审并请你确认这一处扩展，已完成的脚本结果不会再重复跑。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 新增文档范围的计划审核通过，但还要求把“>5%”直接关联到代码中的严格比较和阈值常量，并给出可执行的输出核验。沪深清单已经核对到银行股分别为 5.69%、5.45%、6.03%；我正在把这些验证依据和正式文档的写入范围补进计划，再请你确认只新增这份标准文档的修改。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 审核通过了补充计划，但标注了两点边界：我不会为这次文档同步新增单测，也不会重跑已成功的脚本；输出核验使用真实列名和 `>5` 条件。现在只差你确认这项新增范围：修改正式标准文档第 104–114 行，脚本保持现状、清单不重跑、不提交。\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 正式文档已按确认补上门槛、`yld3` 字段和严格大于的说明。现在做最后核验：检查文档内容、用现有沪深 CSV 断言入选银行均高于 5%，并确认沪市低于 5% 的非银行仍保留。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/events/2026/11/14/本轮改动暂不提交.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-14，按用户选择，本轮银行股息率门槛改动不新增或运行单元测试，也不提交 git，仅保留在工作区并重跑沪深清单。\n# 2026-11-14 (Saturday) ChatLog:\n**user [peer=github.com-tyvt-financial-data-lake]**: 选股标准里面的银行类单独加个标准，近三年平均股息率大于5%才能入选，不然根本没法触发买入条件，完了重新跑脚本拉清单\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 计划第三次审核通过，但审阅仍建议用内存样本跑边界单测。当前仓库规则要求未被用户要求时不新增或运行测试；我把边界预期写进计划，改用代码分支静态核对、沪深脚本结果和实际剔除原因验证。请在一次确认中选实施方式及提交方式；你确认后我才改代码并重跑。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: 审核通过了补充计划，但标注了两点边界：我不会为这次文档同步新增单测，也不会重跑已成功的脚本；输出核验使用真实列名和 `>5` 条件。现在只差你确认这项新增范围：修改正式标准文档第 104–114 行，脚本保持现状、清单不重跑、不提交。\n...\n**assistant [peer=github.com-tyvt-financial-data-lake]**: ...csv>)\n\n两份脚本均已成功运行；对清单的核验确认入选银行都高于 5%，沪市低于 5% 的非银行仍保留。未新增或运行单测，按你的选择暂不提交。首次监控曾误报沪市脚本失败；随后确认脚本实际退出码为 0，清单已生成。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/文档标准/筛选标准_最终版.md.md",
+                "memory_type": "entities",
+                "after": "# 筛选标准_最终版.md\n沪深选股的正式筛选标准文档，位于 D:/repository/数据湖/分析产出/。\n\n## Description\n- 记录沪深选股准入条件、筛选条件说明与漏斗口径，是脚本对齐的正式真相源\n- 2026-11-14 在第 104–114 行补充银行专项股息率门槛：近三年平均股息率 yld3 须严格大于 5%\n- 明确该门槛使用严格大于比较，缺失或无效股息率按不通过处理\n\n## Role\n- 需与 bank_screen.py、screen_sh.py、screen_sz.py 的判定逻辑保持同步\n- 文档同步经追加计划审核确认，脚本保持现状、已成功清单不重跑\n\n## Relations\n- 与《深市打新底仓专用标准.md》并列，分别对应沪市与深市的正式标准"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/程序脚本/bank_screen.py.md",
+                "memory_type": "entities",
+                "after": "# bank_screen.py\n沪深选股脚本共用的银行专项判定模块，位于 D:/repository/数据湖/分析产出/。\n\n## Description\n- 提供共用函数 bank_gate（约第 25、71 行），沪市 screen_sh.py 与深市 screen_sz.py 均调用\n- 原有判定覆盖核心一级资本、不良率、拨备率等银行专项监管指标\n\n## 2026-11-14 变更\n- 新增近三年平均股息率门槛 yld3 > 5%，使用严格大于比较\n- 缺失或无效股息率一律判定不通过；非银行标的完全不受影响\n\n## Relations\n- 被 screen_sh.py、screen_sz.py 共用，避免沪深银行标准分叉\n- 判定说明同步写入《筛选标准_最终版.md》第 104–114 行"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/文档标准/深市打新底仓专用标准.md.md",
+                "memory_type": "entities",
+                "before": "# 深市打新底仓专用标准.md\n深市打新底仓筛选的权威标准文档。\n\n## Description\n- 声明7条标准，第⑦条豁免净利增速、不看资产负债率\n- ④条股息底线已改为三年平均股息率>3.5%（2026-11-11修订）\n- 2026-11-11移除私设两道门（净利增速、股息倍数），误杀格力/平安银行已回归\n- 银行须过独立银行专项门（核心一级≥9.5%等）\n\n## 2026-11-11修正与补充\n- 2.3节改「股息率三个口径」；顶部引言改三年均股息>3.5%\n- 漏斗⑦改「豁免确认」；第四节注纠正苏州/青农/兰州从未进24只\n- 第七节补兴蓉环境存量持仓由卖出线独立判定、不因筛选池变化自动清仓（2026-11-11后续实现：兴蓉加入panel_extra_targets.json，面板config.js含000598，文档与产物一致）\n- §6治理否决由12只修正为6只（六家三年均股息<3.5%在④落选）；§9产物表同步\n- 上述改动写入工作区未提交git\n\n## Purpose\n- 作为screen_sz.py等脚本的对齐真相源\n## Relations\n- 被screen_sz.py引用并需保持对齐",
+                "after": "# 深市打新底仓专用标准.md\n深市打新底仓筛选的权威标准文档。\n\n## Description\n- 声明7条标准，第⑦条豁免净利增速、不看资产负债率\n- ④条股息底线已改为三年平均股息率>3.5%（2026-11-11修订）\n- 2026-11-11移除私设两道门（净利增速、股息倍数），误杀格力/平安银行已回归\n- 银行须过独立银行专项门（核心一级≥9.5%等）；2026-11-14 起银行专项门新增近三年平均股息率严格>5%（yld3），缺失/无效不通过\n\n## 修订记录\n- 2.3节改「股息率三个口径」；顶部引言改三年均股息>3.5%\n- 漏斗⑦改「豁免确认」；第四节注纠正苏州/青农/兰州从未进24只\n- 第七节补兴蓉环境存量持仓由卖出线独立判定、不因筛选池变化自动清仓（2026-11-11后续实现：兴蓉加入panel_extra_targets.json，面板config.js含000598，文档与产物一致）\n- §6治理否决由12只修正为6只（六家三年均股息<3.5%在④落选）；§9产物表同步\n- 上述改动写入工作区未提交git\n- 2026-11-14：银行专项门新增近三年平均股息率严格>5%（yld3）要求，与核心一级资本等原三项监管指标并行；深市据此重跑，入选 8 只，平安银行 6.03% 入选，青农商行/兰州银行/宁波银行低于 5% 被剔除，苏州银行 5.10% 但核心一级资本未达标\n\n## Purpose\n- 作为screen_sz.py等脚本的对齐真相源\n## Relations\n- 被screen_sz.py引用并需保持对齐"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/程序脚本/screen_sz.py.md",
+                "memory_type": "entities",
+                "before": "# screen_sz.py\n深市打新底仓筛选脚本，隶属数据湖选股模块，按《深市打新底仓专用标准.md》7条筛选深市候选股并输出CSV。\n\n## 基础池与筛选逻辑\n- ①基础池SQL：深市主板A股+上市满3年+剔ST/退市+剔创业板\n- B方案拆两道私设门（净利增速门、股息倍数门），仅留文档7条\n- ⑦上市满三年并入①SQL；④三年平均股息率>3.5%前置；③低波仅对④通过者算复权收益\n- OCF取数SQL加PIT防未来函数；银行须过独立银行专项门\n- 禁用--no-gov；GBK控制台不能输出−(U+2212)\n\n## 验证与效果\n- py_compile/AST通过；⑥通过~41~42只\n- 2026-11-11新口径重跑：基础池2653→1383；全7条候选246只\n- ④改三年平均>3.5%后漏斗1383→26→22→19→19→12→入选9→待确认1\n- 最终9只：格力、平安银行、粤高速A、五粮液、招商公路、陕天然气、东莞控股、现代投资、宁波银行，与文档第四节零差异\n\n## 运行与提交\n- 用户默认「只改不跑」，授权后才重跑\n- 所有改动未提交git；OUT/PEND/FUNNEL/治理否决CSV改绝对路径\n- 治理否决表仅含治理通过==False（6行），银行专项不达标单列3行\n- 2026-11-11向量化div_agg 13.96s→0.57s（32.5×），加速沪市screen_sh.py\n\n## Relations\n- 对齐文档《深市打新底仓专用标准.md》；与screen_sh.py、final_portfolio_v3.py同模块\n- 筛选标准细节见实体「数据湖筛选标准」",
+                "after": "# screen_sz.py\n深市打新底仓筛选脚本，隶属数据湖选股模块，按《深市打新底仓专用标准.md》7条筛选深市候选股并输出CSV。\n\n## 基础池与筛选逻辑\n- ①基础池SQL：深市主板A股+上市满3年+剔ST/退市+剔创业板\n- B方案拆两道私设门（净利增速门、股息倍数门），仅留文档7条\n- ⑦上市满三年并入①SQL；④三年平均股息率>3.5%前置；③低波仅对④通过者算复权收益\n- OCF取数SQL加PIT防未来函数；银行须过独立银行专项门，并自 2026-11-14 起要求近三年平均股息率严格 >5%（yld3），缺失或无效股息率视为不通过\n- 禁用--no-gov；GBK控制台不能输出−(U+2212)\n\n## 验证与效果\n- py_compile/AST通过；⑥通过~41~42只\n- 2026-11-11新口径重跑：基础池2653→1383；全7条候选246只\n- ④改三年平均>3.5%后漏斗1383→26→22→19→19→12→入选9→待确认1\n- 最终9只：格力、平安银行、粤高速A、五粮液、招商公路、陕天然气、东莞控股、现代投资、宁波银行，与文档第四节零差异\n- 2026-11-14 银行股息率门槛重跑：深市入选 8 只，平安银行以三年均股息率 6.03% 入选；青农商行、兰州银行、宁波银行因低于 5% 被银行门剔除，苏州银行 5.10% 但核心一级资本未达标；脚本退出码 0\n\n## 运行与提交\n- 用户默认「只改不跑」，授权后才重跑\n- 所有改动未提交git；OUT/PEND/FUNNEL/治理否决CSV改绝对路径\n- 治理否决表仅含治理通过==False（6行），银行专项不达标单列3行\n- 2026-11-11向量化div_agg 13.96s→0.57s（32.5×），加速沪市screen_sh.py\n\n## Relations\n- 对齐文档《深市打新底仓专用标准.md》；与screen_sh.py、final_portfolio_v3.py同模块\n- 筛选标准细节见实体「数据湖筛选标准」"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/程序脚本/screen_sh.py.md",
+                "memory_type": "entities",
+                "before": "# screen_sh.py\n沪市打新底仓/选股筛选脚本，隶属数据湖选股模块，对沪市股票执行准入标准筛选并输出候选池；内含红利质量指标判定逻辑，可被探针复用只算数据不落盘对任意股票逐项判定。\n\n## 基础池与筛选逻辑\n- ①基础池 SQL：沪市主板 A 股 + 上市满 3 年（list_date <= base - 3年，第386-398行已含）+ 剔 ST/退市 + 剔科创板（substr(symbol,1,3) not like '688%'）；打印同步；沪市无创业板故仅需剔科创板\n- 须同时满足沪市准入 11 条（连续三年分红+三年平均股息率>3.5%、净利同比正、资产负债率<60%、支付率30-80%、OCF/分红>1、ROE>8%、现金流/净利>80%、近12月收益>-20%、净利CAGR>3%、三年累计分红>10亿、年化波动<25%、63日均额≥5000万、股息率/均值<2倍）\n- 银行仍须过独立银行专项门（核心一级≥9.5% 等）\n\n## 性能优化（2026-11-11）\n- 热点：cProfile 显示共用函数 div_agg（定义在 screen_sz.py）原 13.96s（嵌套 groupby 循环约 11.8 万组）为最大瓶颈；screen_sh.py 另有两处列表列展开 iterrows\n- div_agg 向量化（一次 groupby(code,year) 求和+pivot）：13.96s→0.57s（32.5×），输出逐行一致（5696 代码相同）\n- screen_sh.py 两处列表列展开改为 (n,3) 矩阵取列；沪市全量 32.3s→约 15s（2.2×），严格 <2 分钟（约 8× 余量），输出 CSV 改前改后 DataFrame.equals==True（12 行×25 列）\n- 深市同受益（共用 div_agg）：全量 6.2s，结果仍 9 只不变；改动文件 screen_sz.py、screen_sh.py，均 py_compile 通过\n\n## 验证与提交状态\n- 2026-11-11 新增沪深统一基础池：①SQL 加剔科创板，与 screen_sz.py 对称；全部 py_compile 通过，改动未提交 git\n- 2026-11-11 探针复用其函数对 24 只深市票逐项判定 14 项，输出对比矩阵至 分析产出/_沪标逐项对比.csv\n\n## Relations\n- 与 screen_sz.py、final_portfolio_v3.py、annual_review.py 同属数据湖选股模块，与深市筛选脚本（pay3 同口径）并列\n- 筛选标准细节见实体「数据湖筛选标准」",
+                "after": "# screen_sh.py\n沪市打新底仓/选股筛选脚本，隶属数据湖选股模块，对沪市股票执行准入标准筛选并输出候选池；内含红利质量指标判定逻辑，可被探针复用只算数据不落盘对任意股票逐项判定。\n\n## 基础池与筛选逻辑\n- ①基础池 SQL：沪市主板 A 股 + 上市满 3 年（list_date <= base - 3年，第386-398行已含）+ 剔 ST/退市 + 剔科创板（substr(symbol,1,3) not like '688%'）；打印同步；沪市无创业板故仅需剔科创板\n- 须同时满足沪市准入 11 条（连续三年分红+三年平均股息率>3.5%、净利同比正、资产负债率<60%、支付率30-80%、OCF/分红>1、ROE>8%、现金流/净利>80%、近12月收益>-20%、净利CAGR>3%、三年累计分红>10亿、年化波动<25%、63日均额≥5000万、股息率/均值<2倍）\n- 银行仍须过独立银行专项门（核心一级≥9.5% 等），并自 2026-11-14 起要求近三年平均股息率严格 >5%（yld3，共用 bank_screen.bank_gate）；缺失或无效股息率视为不通过，非银行不受影响\n\n## 性能优化（2026-11-11）\n- 热点：cProfile 显示共用函数 div_agg（定义在 screen_sz.py）原 13.96s（嵌套 groupby 循环约 11.8 万组）为最大瓶颈；screen_sh.py 另有两处列表列展开 iterrows\n- div_agg 向量化（一次 groupby(code,year) 求和+pivot）：13.96s→0.57s（32.5×），输出逐行一致（5696 代码相同）\n- screen_sh.py 两处列表列展开改为 (n,3) 矩阵取列；沪市全量 32.3s→约 15s（2.2×），严格 <2 分钟（约 8× 余量），输出 CSV 改前改后 DataFrame.equals==True（12 行×25 列）\n- 深市同受益（共用 div_agg）：全量 6.2s，结果仍 9 只不变；改动文件 screen_sz.py、screen_sh.py，均 py_compile 通过\n\n## 验证与提交状态\n- 2026-11-11 新增沪深统一基础池：①SQL 加剔科创板，与 screen_sz.py 对称；全部 py_compile 通过，改动未提交 git\n- 2026-11-11 探针复用其函数对 24 只深市票逐项判定 14 项，输出对比矩阵至 分析产出/_沪标逐项对比.csv\n- 2026-11-14 银行股息率门槛重跑：沪市入选 11 只，入选银行为渝农商行（三年均值 5.69%）、沪农商行（5.45%）；3 家银行被银行专项门剔除，其中 1 家三年均值 4.71%，另 2 家高于 5% 但监管指标不达标\n- 2026-11-14 首次 watchdog 包装器误报沪市脚本失败，实际 SCRIPT_EXIT=0 且三份结果 CSV 已写出；本轮改动未提交 git\n\n## Relations\n- 与 screen_sz.py、final_portfolio_v3.py、annual_review.py 同属数据湖选股模块，与深市筛选脚本（pay3 同口径）并列\n- 筛选标准细节见实体「数据湖筛选标准」"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/preferences/github.com-tyvt-financial-data-lake/选股买入推荐过滤.md",
+                "memory_type": "preferences",
+                "before": "- 选股买入推荐应排除现价高于目标买价超过 10% 的标的（生成买入清单时即剔除，不再留到面板里再挡）；用户称此类为「好公司但价格太差」，按波动当前季度难有买入可能\n- 持仓面板「未买入」行仅展示距买点 10% 以内的标的，超过 10% 的连兜底名单也不出现（面板容忍线已由 15% 改为 10%）\n- 数据湖选股模块（final_portfolio_v3.py 等）沪深统一硬性标准：上市不满 3 年、创业板（30x 开头）、科创板（688 开头）的标的在基础池层面直接剔除",
+                "after": "- 选股买入推荐应排除现价高于目标买价超过 10% 的标的（生成买入清单时即剔除，不再留到面板里再挡）；用户称此类为「好公司但价格太差」，按波动当前季度难有买入可能\n- 持仓面板「未买入」行仅展示距买点 10% 以内的标的，超过 10% 的连兜底名单也不出现（面板容忍线已由 15% 改为 10%）\n- 数据湖选股模块（final_portfolio_v3.py 等）沪深统一硬性标准：上市不满 3 年、创业板（30x 开头）、科创板（688 开头）的标的在基础池层面直接剔除\n- 银行类须单独设门槛：近三年平均股息率严格高于 5%（yld3 > 5%）才可入选，否则无法触发买入条件；该门槛与核心一级资本、不良率、拨备率等原银行专项指标并行，缺失或无效股息率按不通过处理"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 9,
+        "total_updates": 4,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

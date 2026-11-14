@@ -1,0 +1,24 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-39e84ea8-c9fa-4831-883f-b1cfb4aa42a8/history/archive_194",
+    "trace_id": null,
+    "extracted_at": "2026-11-14T10:13:01.144050+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/本地ai系统/openviking.md",
+                "memory_type": "entities",
+                "before": "# OpenViking\n本地运行的 AI 记忆与向量化系统，当前版本 0.5.5，健康检查地址为 http://127.0.0.1:1933/health。\n\n## 架构与运行\n- 主服务 openviking-server.exe 监听 127.0.0.1:1933，由看门狗与每 1 分钟计划任务 OpenViking-Watchdog 巡检拉起；每日 03:00 执行记忆快照\n- 向量化依赖本地 Ollama（127.0.0.1:11434）；嵌入代码位于 C:\\Program Files\\Python310\\Lib\\site-packages\\openviking\\models\\embedder\\litellm_embedders.py\n- 任务目录 ~\\.openviking\\data\u000biking\\default\\_system\tasks\\default，看门狗日志 ~\\.openviking\\watchdog.log\n\n## 故障与重试\n- session_commit 向量化失败报 Failed to generate embedding，历史根因为 Ollama 断连或 httpx 客户端被关\n- 2026-11-14 13:24 升级到 0.5.5 覆盖了 site-packages 中的旧重试补丁（线上文件 8736 字节、无重试逻辑）；0.5.5 自带 model_retry.py 与 RetryEmbedder（默认 max_retries=3），Server disconnected 归为 TRANSIENT_NETWORK_ERROR 可重试\n- 2026-11-14 抖动真因：bge-m3-ov 在无独显机器上纯 CPU 单槽串行，40 并发排队超时后断连；已备份 ov.conf.bak-20261114-154622，在 embedding 段设 max_concurrent: 2（默认 10）后重启，16 并发 0 断连、最大 103.8s\n- start-server.bat 仅在 11434 无监听时才拉起 Ollama，进程存活但不接连接时不会重启；2026-11-11 改为请求 /api/tags 失败时先结束 ollama.exe 再拉起\n- 崩溃后最多等 1 分钟由计划任务拉起，掉线期间 commit 会失败或丢失；重新提交失败会话可补嵌入，无 pending/running 卡死时无需停服清队列\n- 看门狗在 dsh web 存活时同样探测，认定 1933 存活须 /health 返回 2xx；openviking-server.exe 与 Ollama 建议设为登录常驻（NSSM/计划任务）\n\n## 运维记录\n- 2026-11-12：两个 openviking-server.exe 进程（PID 13340、PID 10668 占 1933）修为单实例（PID 26388 监听 15284），/health 返回 ok\n- 2026-11-12 C1：start-server.bat 加 1>>server.log 2>&1；watchdog.log 曾 212KB 全为 OK 心跳无轮转，server.err.log/ollama.*.log 自 2026-11-02 停更，001617.log 为二进制不可作运维日志\n- 可观测性缺口：find 8 次检索错误（success 43/error 8），request_audit 仅聚合计数无单次详情；404 来自 16 条 __unmatched__ 探测路径、5 次重复拉取不存在的 profile.md 与 1 次 POST，409 为重复 create session，405 为用错 HTTP 方法\n- 2026-11-12 A1+A2：ov.conf retrieval 段 enable_intent:false、recall_intent_timeout_s:2.0 关闭 VLM 意图改写，search 延迟 5.2s→0.18s（约 27×），VLM token 增量降为 0，走 _semantic.py fail-closed 原 query 路径\n- 2026-11-12 抓到 LiteLLM async embedding slow call duration_ms=9016（bge-m3/Ollama 首调用约 9s），留待 Stage A3/B 排查\n- usage_audit 的 WAL 曾膨胀至 4.2MB 才 checkpoint（后回落 1B）\n- 升级会覆盖 site-packages 修改文件，补丁副本与 README 存于 dsh/patches/openviking-embed-retry，本地提交 28cc9c62 未推送（早期为 f71763fe）",
+                "after": "# OpenViking\n本地运行的 AI 记忆与向量化系统，当前版本 0.5.5，健康检查地址 http://127.0.0.1:1933/health。\n\n## 架构与运行\n- 主服务 openviking-server.exe 监听 127.0.0.1:1933，由看门狗与每 1 分钟计划任务 OpenViking-Watchdog 巡检拉起；每日 03:00 做记忆快照\n- 向量化依赖本地 Ollama（127.0.0.1:11434）；嵌入代码在 C:\\Program Files\\Python310\\Lib\\site-packages\\openviking\\models\\embedder\\litellm_embedders.py\n- 任务目录 ~\\.openviking\\data\\viking\\default\\_system\\tasks\\default；看门狗日志 ~\\.openviking\\watchdog.log\n- 看门狗在 dsh web 存活时同样探测，认定 1933 存活须 /health 返回 2xx；openviking-server.exe 与 Ollama 建议设为登录常驻（NSSM/计划任务）\n- 崩溃后最多 1 分钟由计划任务拉起，掉线期间 commit 会失败或丢失；失败会话可重新提交补嵌入，无 pending/running 卡死时无需停服清队列\n\n## 故障与重试\n- session_commit 向量化失败报 Failed to generate embedding，历史根因为 Ollama 断连或 httpx 客户端被关\n- 2026-11-14 13:24 升级 0.5.5 覆盖 site-packages 旧重试补丁（线上文件 8736 字节、无重试逻辑）；0.5.5 自带 model_retry.py 与 RetryEmbedder（默认 max_retries=3），Server disconnected 属 TRANSIENT_NETWORK_ERROR 可重试\n- 2026-11-14 抖动真因：bge-m3-ov 无独显纯 CPU 单槽串行，40 并发排队超时断连；备份 ov.conf.bak-20261114-154622 后在 embedding 段设 max_concurrent: 2（默认 10）重启，16 并发 0 断连、最大 103.8s\n- start-server.bat 仅在 11434 无监听时才拉起 Ollama，进程存活但不接连接时不会重启；2026-11-11 改为请求 /api/tags 失败时先结束 ollama.exe 再拉起\n\n## 运维记录\n- 2026-11-12：两个 openviking-server.exe（PID 13340、PID 10668 占 1933）修为单实例（PID 26388 监听 15284），/health 返回 ok\n- 2026-11-12 C1：start-server.bat 加 1>>server.log 2>&1；watchdog.log 曾 212KB 全为 OK 心跳无轮转，server.err.log/ollama.*.log 自 2026-11-02 停更，001617.log 为二进制不可作运维日志\n- 2026-11-12 A1+A2：ov.conf retrieval 段 enable_intent:false、recall_intent_timeout_s:2.0 关闭 VLM 意图改写，search 延迟 5.2s→0.18s（约 27×），VLM token 增量为 0，走 _semantic.py fail-closed 原 query 路径\n- 2026-11-12 LiteLLM async embedding slow call duration_ms=9016（bge-m3/Ollama 首调用约 9s），留待 Stage A3/B 排查\n- usage_audit 的 WAL 曾膨胀至 4.2MB 才 checkpoint（后回落 1B）\n\n## 可观测性与补丁\n- 可观测性缺口：find 8 次检索错误（success 43/error 8），request_audit 仅聚合计数无单次详情；404 来自 16 条 __unmatched__ 探测路径、5 次重复拉取不存在的 profile.md 与 1 次 POST，409 为重复 create session，405 为用错 HTTP 方法\n- 升级会覆盖 site-packages 修改文件，补丁副本与 README 存于 dsh/patches/openviking-embed-retry，本地提交 28cc9c62 未推送（早期为 f71763fe）"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

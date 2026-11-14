@@ -1,0 +1,24 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-6f809809-3181-44f2-8594-b7c266a72da5/history/archive_011",
+    "trace_id": null,
+    "extracted_at": "2026-11-14T11:00:51.551514+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-financial-data-lake/memories/entities/数据湖项目/持仓面板.md",
+                "memory_type": "entities",
+                "before": "# 持仓面板\n数据湖项目「分析产出/持仓面板」下的静态 HTML 持仓监控面板，用于红利底仓买入推荐与风险预警。\n\n## 功能定位\n- 含 renderAlerts 风险预警与 buildPlan 买入推荐两套逻辑\n- 当前买入逻辑基于股息率安全边际 margin，支持 margin_by_ind 分行业覆盖与 risk_type 行业风控；原逻辑基于 vwap60 折溢价，2026-11-06 升级后 vwap60 降级兜底\n\n## 矛盾修复（2026-11-09）\n- 原矛盾：renderAlerts 分母用 T.mv（约4.4万），buildPlan 用 total_capital（10万），未建满仓时买卖信号自相矛盾\n- 修复：capitalBase(T)=Math.max(total_capital, T.mv) 统一预警与买入口径\n- 新增 recentTradeMap() 护栏（recent_trade_days 默认3天）：预警不催刚买卖、买入不重复建仓/买回\n- _selftest.js 新增11条用例通过；分支 fix/panel-split-base-guard 合并 main（commit a0a8e508）\n\n## 文件结构与数据\n- index.html：9列买入推荐表；getMarginParams 行业优先、_mThresh 行业感知、indRiskFlags 进一票否决与红条；无 targetYld 回退4.8\n- config.js：含 margin 全局与 margin_by_ind（13行业），由 final_portfolio_v3.py 生成，缓存键 panel_margin_v4\n- _selftest.js / panel_margin_metrics.js.json / README.md / holding.sqlite（库内 cfg 为运行时准）\n- 生成源：final_portfolio_v3.py、panel_margin_metrics.py 重跑覆盖 config.js；数据源为数据湖 duckdb 的 daily_bars_adj、corporate_actions\n\n## 配置要点\n- 全局 margin：targetYldMode=dynamic、yldPadPct=0.5、targetYldFloor=3.0（原 4.8/1.0）；目标股息率=max(floor, 近3年均值+0.5)；targetYld 4.8 仅参考、targetYldFixed 已移除\n- margin_by_ind：银行/非银 fixed 5.5%（ocfdMin=0）；公用/交运/环保 dynamic 垫0.3 下限3.0%；家电/食饮/医药 dynamic 垫0.2 下限3.0%；周期 fixed 8.0%\n- 面板以 holding.sqlite 库内 cfg 为准，需「从 config.js 同步」；configStale 比对矩阵、行业标签、risk_type、total_capital、dps、yld、score_*、yldWarnPct 等（2026-11-11 补齐）\n\n## 已知行为与修复（2026-11-11）\n- 兴蓉环境（公用事业）目标价约6.2元，需回调约15%达标（2026-11-09）；唐山港（交运）同理不达标\n- 平安银行 fixed 5.5%→目标买价11.08元（ref 11.74，回调约5.6%可买）；渝农商行5.83元；华润三九 targetYldRef 仍4.8%\n- 选股脚本 final_portfolio_v3.py 只看财务与波动，不判定「现价是否贵于目标买价」，故唐山港、渝农商行可通过筛选但距买点超20%\n- 2026-11-11 起「未买入」行排除距买点超15%标的：唐山港、渝农商行消失，权重释放给青岛港、永兴股份\n- 超配徽章分母改 capitalBase 与预警对齐；占比列仍显当前市值\n- 持仓导出补 accts 字段；Esc 关弹窗复用 _closeMask；#maskDb 加 data-locked\n- 编辑旧交易 feeInput.dataset.auto='0' 不重算费用\n- renderAlerts 分位告警走 getMarginParams 取行业 yldWarnPct/pctYears\n- buildPlan 沪深都有候选时任一侧最多「本次只数-1」名额\n- recentTradeMap 跳过未来日期；delDiv 不级联删 trade；刷新间隔 Math.max(5,...)；meta app-version 与 const BUILD 对齐\n- 资金池沪60%/深40%未改；东财并发限制、北交所 secid、卖出非100整数倍未改",
+                "after": "# 持仓面板\n数据湖项目「分析产出/持仓面板」下的静态 HTML 持仓监控面板，用于红利底仓买入推荐与风险预警。\n\n## 功能与算法\n- renderAlerts 风险预警与 buildPlan 买入推荐两套逻辑\n- 买入逻辑用股息率安全边际 margin，支持 margin_by_ind 分行业覆盖与 risk_type 行业风控；原 vwap60 折溢价逻辑于 2026-11-06 升级后仅作兜底\n- 2026-11-09 修复信号矛盾：renderAlerts 原用 T.mv（约4.4万）作分母、buildPlan 用 total_capital（10万），未满仓时自相矛盾；改为 capitalBase(T)=Math.max(total_capital, T.mv) 统一口径\n- 新增 recentTradeMap() 护栏（recent_trade_days 默认3天）：预警不催刚买卖、买入不重复建仓/买回\n- _selftest.js 新增11条用例通过；分支 fix/panel-split-base-guard 合入 main（commit a0a8e508）\n\n## 文件与数据\n- index.html：9列买入推荐表；getMarginParams 行业优先、_mThresh 行业感知、indRiskFlags 进一票否决与红条；无 targetYld 回退4.8\n- config.js：全局 margin + margin_by_ind（13行业），由 final_portfolio_v3.py 生成、panel_margin_metrics.py 重跑覆盖，缓存键 panel_margin_v4\n- 另含 _selftest.js、panel_margin_metrics.js.json、README.md、holding.sqlite（库内 cfg 为运行时准）\n- 数据源：数据湖 duckdb 的 daily_bars_adj、corporate_actions\n\n## 配置要点\n- 全局 margin：targetYldMode=dynamic、yldPadPct=0.5、targetYldFloor=3.0（原4.8/1.0）；目标股息率=max(floor, 近3年均值+0.5)；targetYld 4.8 仅参考、targetYldFixed 已移除\n- margin_by_ind：银行/非银 fixed 5.5%（ocfdMin=0）；公用/交运/环保 dynamic 垫0.3、下限3.0%；家电/食饮/医药 dynamic 垫0.2、下限3.0%；周期 fixed 8.0%\n- 以 holding.sqlite 库内 cfg 为准，需「从 config.js 同步」；2026-11-11 补齐 configStale 比对矩阵、行业标签、risk_type、total_capital、dps、yld、score_*、yldWarnPct\n\n## 已知行为与修复\n- 兴蓉环境（公用事业）目标价约6.2元、需回调约15%达标（2026-11-09），唐山港（交运）同理不达标；平安银行 fixed 5.5%→目标买价11.08元（ref 11.74，回调约5.6%可买），渝农商行5.83元，华润三九 targetYldRef 仍4.8%\n- final_portfolio_v3.py 只看财务与波动、不判「现价是否贵于目标买价」，故唐山港、渝农商行可入选但距买点超20%；2026-11-11 起「未买入」行排除距买点超15%标的，两者消失、权重释放给青岛港与永兴股份\n- 超配徽章分母改 capitalBase 与预警对齐，占比列仍显当前市值；renderAlerts 分位告警走 getMarginParams 取行业 yldWarnPct/pctYears；buildPlan 沪深都有候选时任一侧最多「本次只数-1」名额\n- 持仓导出补 accts；Esc 关弹窗复用 _closeMask；#maskDb 加 data-locked；编辑旧交易 feeInput.dataset.auto='0' 不重算费用\n- recentTradeMap 跳过未来日期；delDiv 不级联删 trade；刷新间隔 Math.max(5,...)；meta app-version 与 const BUILD 对齐；资金池沪60%/深40%、东财并发限制、北交所 secid、卖出非100整数倍均未改"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

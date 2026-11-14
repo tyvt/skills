@@ -9,6 +9,9 @@ DSH 本地 host 工具插件，拦截式强制所有对话经编排器执行（�
 - cordis.patch.yml 中 projectDir 指向的编排器目录存在 Write Deny ACL，导致 pnpm 每次跳过 orchestrator-gate → node_modules 永远旧拷贝 → 重启无数次不生效
 - 移除 Deny 后重装，gate 真机被 [orchestrator-gate] 拦截验证通过
 
+## 拦截实例
+- 2026-11-14 构建命令被该门禁拦下，要求改走 orchestrate op=full；当次计划指定的 watchdog 脚本在 `.dsh/scripts` 与仓库路径均不存在。
+
 ## 关系
 - 与 dsh-orchestrator 插件协同；设计文档 dsh/orchestrator-gate/DESIGN.md
 
@@ -16,8 +19,8 @@ DSH 本地 host 工具插件，拦截式强制所有对话经编排器执行（�
 {
   "category": "插件",
   "name": "orchestrator_gate",
-  "source_extraction_id": "039129965bd2450d84b764f7f5f3efd1",
-  "version": 1,
+  "source_extraction_id": "22ff556503114a24b450c66086241fcd",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

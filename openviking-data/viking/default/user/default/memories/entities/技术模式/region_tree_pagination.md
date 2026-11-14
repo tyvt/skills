@@ -15,23 +15,19 @@
 - 停车泊位租赁管理(parkingSpaceContractFiling)
 - 所有使用RegionTreeLayout的列表页
 
-## 验证与来源
-- 验证：src=无锡市区G（会话93dc00ea-d07f-4b3d-ba3e-0060780b7cdb）
-- 涉及文件：index.scss、zs-table.vue等
-- 代码基线：none
-
 ## 验证与归属
 - 所属项目：无锡市区G
 - 验证证据：extracted source=cursor project=无锡市区G
 - 来源会话：93dc00ea-d07f-4b3d-ba3e-0060780b7cdb
-
+- 涉及文件：index.scss、zs-table.vue等
+- 代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "region_tree_pagination",
-  "source_extraction_id": "487b125f28014405af5c516b05a5f94f",
-  "version": 1,
+  "source_extraction_id": "5a9f20922fc24d489ddaf9b213d2ef51",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

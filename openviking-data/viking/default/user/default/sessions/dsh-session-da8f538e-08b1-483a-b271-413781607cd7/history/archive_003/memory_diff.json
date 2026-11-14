@@ -1,0 +1,48 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-da8f538e-08b1-483a-b271-413781607cd7/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-14T03:24:40.696441+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/14/规划器规则句改造提议.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户提议优先改造 PLANNER_SYSTEM，仅写入\"按题型派活、引用统一路由表\"的规则句，不写死模型 id，使后续调模型只需改路由表一处、不散落 prompt。\n# 2026-11-14 (Saturday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 建议先做 PLANNER_SYSTEM，只写“按题型派活、引用统一路由表”的规则句、不写死模型 id"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/14/规划器改造计划审核通过.md",
+                "memory_type": "events",
+                "after": "# Summary\nPLANNER_SYSTEM 增加\"硬约束五：按题型选执行档\"的计划经 plan_review 评分为 pass（score 82，P0=0）；审核提出 3 条 P1/P2 建议（内嵌题型→档位映射使规划器可执行、加回归测试断言、固定插入锚点），均已并入计划。\n# 2026-11-14 (Saturday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 建议先做 PLANNER_SYSTEM，只写“按题型派活、引用统一路由表”的规则句、不写死模型 id\n...\n**assistant [peer=github.com-tyvt-skills]**: **pass，score 82，P0=0。** 三条 P1/P2 是改进建议。解读（乱码但从字段/建议可读）：\n\n- **P1-1**：规则句里\"以 .plan/explore-multimodel... 附统一路由表为准\"——规划器在执行时读不到 `.md` 文件。建议：把路由表的**题型→档位映射摘要**一并写进 PLANNER_SYSTEM（或让 file_reader 可达），否则规划器无法执行引用。→ 这条重要。**但用户明确要求\"引用统一路由表、不写死模型 id\"**。折中：在规则句内嵌\"题型类别清单 + 各题型归到哪类工具档\"（**档位，不是模型 id**），并注明权威模型另见路由表。这样规划器可执行、且不含模型 id、且路由表仍是唯一模型来源。\n- **P1-2**：验证计划只靠手动 print/grep，建议在 `test_tool_signal_split.py` 加一条**测试**：format 后含\"硬约束五\"、且新增段**不含模型 id 模式**（正则断言）。\n- **P2-1**：明确插入位置（硬约束四之后、\"重要：要读取\"之前），固定锚点防 diff 漂移。\n\n我把这三条并入计划后可直接实施（都是让规则可执行、可测、锚点固定，符合\"不写死模型 id\"）。先更新计划文件，再请你确认。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/14/用户确认实施规划器改造.md",
+                "memory_type": "events",
+                "after": "# Summary\n用户在查看 plan_review pass 结果与并入 3 条建议的计划后，明确回复\"确认\"实施该含代码改动（graph.py + 测试）的计划。\n# 2026-11-14 (Saturday) ChatLog:\n**assistant [peer=github.com-tyvt-skills]**: 三条 P1/P2 已并入。现在请你确认：这是**代码改动**（graph.py + 测试），需你人工确认后才实施。\n\n## plan_review：pass（score 82，P0=0）\n\n**核心设计**（满足你\"只写规则句、不写死模型 id\"）：\n- 在 PLANNER_SYSTEM 固定锚点（硬约束四之后）加【硬约束五：按题型选执行档】\n- 规则句内嵌**题型→工具档映射**（7 类题型 → 执行档位/工具），**不含任何模型 id**；并写明\"各题型最强模型以编排器统一路由表为准，规划器只需选对工具档\"\n- 模型映射仍只在 `.plan/explore-multimodel-20261114.md` 路由表一处维护\n- 加一条测试断言：format 后含\"硬约束五\"且**该段不含模型 id 模式**（防回归）\n\n三条审核意见已处理：\n- P1-1（规划器读不到 .md）→ 改为内嵌\"题型→工具档\"映射，不依赖读文件，仍不点模型 id\n- P1-2（验证太弱）→ 新增 pytest 断言\"硬约束五存在 + 无模型 id 正则\"\n- P2-1（插入位置）→ 固定锚点\"硬约束四段末、JSON 数组说明前\"\n\n请你确认是否实施（这是含代码改动的计划，确认后我改 graph.py + 加测试 + 跑 pytest）。\n...\n**assistant [peer=github.com-tyvt-skills]**: 确认。回填 approved，然后改 graph.py + 加测试 + 跑 pytest。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/14/规划器按题型派活规则落地.md",
+                "memory_type": "events",
+                "after": "# Summary\n在 graph.py 硬约束四之后、JSON 数组说明之前追加【硬约束五：按题型选执行档，不写死模型】，内嵌 7 类题型→执行档/工具映射（检索效率→pwsh 聚合、抗坏工具→改道、对抗根因→有序多步+依赖、代码生成→code_editor、长输出判读→summarizer、安全拒绝→refuse/强模型+guard 等），不含任何模型 id，并写明各题型最强模型以编排器统一路由表为准；改动仅完成 graph.py 一处常量 + 测试一处，尚未提交 git。\n# 2026-11-14 (Saturday) ChatLog:\n**assistant [peer=github.com-tyvt-skills]**: 确认。回填 approved，然后改 graph.py + 加测试 + 跑 pytest。\n...\n**assistant [peer=github.com-tyvt-skills]**: ## 完成：PLANNER_SYSTEM「硬约束五」已落地\n\n**改动内容**（[graph.py:79-88](D:\\repository\\skills\\dsh\\langgraph-orchestrator\\src\\graph.py#L79-L88)）：\n在硬约束四之后、JSON 数组说明之前，追加【硬约束五：按题型选执行档，不写死模型】——把 7 类题型的\"题型→执行档/工具\"映射写进提示（执行检索效率→一条 pwsh 聚合；抗坏工具→改道；对抗根因→有序多步+依赖；代码生成→code_editor/code_edit_with_signal；长输出判读→summarizer；安全拒绝→refuse/强模型+guard），**不含任何模型 id**，并明写\"各题型最强模型以编排器统一路由表为准，模型映射只在路由表一处维护，换模型不改本提示\"。..."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/14/规划器改造测试通过.md",
+                "memory_type": "events",
+                "after": "# Summary\n在 tests/test_tool_signal_split.py 新增断言（format 后含\"硬约束五\"且该段无模型 id 正则），该文件 13 passed（原 12+1）；全量 pytest 160 passed（原 159+1），无回归；手动 format 验证无 KeyError、无残留占位符。\n# 2026-11-14 (Saturday) ChatLog:\n**assistant [peer=github.com-tyvt-skills]**: 确认。回填 approved，然后改 graph.py + 加测试 + 跑 pytest。\n...\n**assistant [peer=github.com-tyvt-skills]**: 13 passed（原 12 + 新增 1）。现在跑一次手动 format 确认无 KeyError、新规则句渲染正常。\n...\n**assistant [peer=github.com-tyvt-skills]**: 全量 **160 passed**（原 159 + 新增 1），无回归。改动完成。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/提示中模型id引用规范.md",
+                "memory_type": "preferences",
+                "after": "- 在提示/规划器（如 PLANNER_SYSTEM）中只写\"按题型派活、引用统一路由表\"的规则句，不写死具体模型 id\n- 模型→题型映射只在统一路由表（如 .plan/explore-multimodel-*.md）一处维护，换模型或调池只改路由表与 config.yaml，提示本身不漂移"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 6,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

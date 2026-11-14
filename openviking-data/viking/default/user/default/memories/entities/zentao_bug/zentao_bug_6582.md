@@ -24,12 +24,21 @@
 - 禅道回写 resolved/fixed，resolvedBy=tiany，assignedTo 退回 zhunan，新增 tiany resolved 动作
 - 未执行多区域/多分辨率全量回归（纯CSS无分支差异）
 
+## 高度统一二次修复（2026-11-13）
+- 用户实测红框子数据框仍不等高（左行1=40px、左行2两行字=49px、右卡=40px），要求「红色圈出要一样高度」
+- 根因：单行 min-height:40px 被两行文字撑高至 49px，框高未真正统一
+- 修复：KeyDataNav.vue 中 `.kd__box` 与 `.kd__box--stack` 改为 `height:50px; min-height:50px`（50px 可容纳两行文字不裁切），公司行（.kd__box--company，底行）不强制改
+- 验证：ESLint 通过，npm run build exit 0，本地 nginx 8101 Playwright 实测四组框全部 h=50px，左右卡子数据框等高
+- 已知：右卡标题「专业化物业管理住宅小区面积（万㎡）」折行导致首框起点比左卡低约十余像素（顶端对齐问题，本次仅按用户要求做等高，未处理）
+- 提交：本地 4bfd385d9，pull --rebase 后推送 8bd507eab 至 develop/v2.6.2-suzhufang
+- 测试环境仍部署旧 40px 构建，需待 pipeline 重新构建部署 8bd507eab 后 Ctrl+F5 强刷查看
+
 <!-- MEMORY_FIELDS
 {
   "category": "zentao_bug",
   "name": "zentao_bug_6582",
-  "source_extraction_id": "b2bf673f53294b028993274e5d85e94c",
-  "version": 1,
+  "source_extraction_id": "ae78de75a0c14230b1fe2c5a625b5342",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

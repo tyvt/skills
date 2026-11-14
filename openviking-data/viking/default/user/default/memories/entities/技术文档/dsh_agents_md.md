@@ -19,17 +19,24 @@ dsh 技能的代理行为说明文档，规定代码与系统运维工作的默�
 - 禁忌第 1 条改为 Dameng 找表固定 ALL_TABLES+LIKE 脚本
 - 新增「先查真实数据再读代码」流程条
 
+## 新增规则（2026-11-14 A批）
+- A1 小文件禁整写：小文件禁止整篇 write，已有文件一律用 edit（文档写作节，第47行）
+- A2 脱敏视图不可作 edit 依据：脱敏/打码视图不可作为 edit 定位依据（编排器选型·局部改动节，第18行）
+- A3 测试不得反向扩展生产 API：测试代码不得反向扩展生产 API 面（文档写作节，第48行）
+- A4 一次问清：使用 ask_user_question 时一次问清所有必选项（提问与收尾节，第80行）
+
 ## 关联
 - 位于 dsh 技能仓库（D:\repository\skills\dsh）
 - 2026-11-10 本地提交 e2414c3b（仅 AGENTS.md 与 DBX.md，未推送）
 - 2026-11-10 bug6369 复盘，AGENTS.md 第 9 条与 DBX.md 禁忌变更随提交 86279dd0 合入 skills 仓库（仅提交未推送）
+- 2026-11-14 A 批 4 段规则文本落地，本地提交 6ce87699（仅 AGENTS.md，+4 行，未推送，main 分支 ahead 1）
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术文档",
   "name": "dsh_agents_md",
-  "source_extraction_id": "4b1f3497c14d489baa4f340b256e6981",
-  "version": 3,
+  "source_extraction_id": "972b193013f44921a17a1d47850db51e",
+  "version": 4,
   "memory_type": "entities"
 }
 -->

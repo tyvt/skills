@@ -15,14 +15,15 @@
 
 ## 落地状态
 - 2026-11-13 仅完成只读归因与方案设计，未改动任何配置；规则类（路由纪律、一子任务一会话拆片）与 patch 类（P1/P2）待出 .plan 送审
+- 2026-11-14 澄清：面板/模型标签 `(off)`（auto/deepseek-v4.1-flash）指推理档位关闭（settings.yaml reasoningEfforts "off": none），与缓存开关无关；缓存命中率偏低需另找原因。工具固定开销治理由 context_overhead_audit 专项接续，批 1/批 2 已落地
 
 <!-- MEMORY_FIELDS
 {
-  "peer_id": "github.com-tyvt-skills",
   "category": "技术模式",
   "name": "dsh_token_optimization",
-  "source_extraction_id": "0f2351485d624e2ba92b8db17781a489",
-  "version": 1,
+  "source_extraction_id": "a99f3affed2044db87ef72c4487e4122",
+  "peer_id": "github.com-tyvt-skills",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

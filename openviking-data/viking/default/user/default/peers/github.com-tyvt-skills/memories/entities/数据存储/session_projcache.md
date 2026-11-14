@@ -1,10 +1,10 @@
-
 # session_projcache
 DSH 的会话统计数据存储，位于 ~/.dsh/storages/session_projcache，含逐会话真实计时字段。
 
 ## Description
 - 存储每个会话的 sessionStats，提供墙钟与各阶段真实耗时（非 token 估算）。
 - 路径为 ~/.dsh/storages/session_projcache。
+- 会话记录含工具目录快照（toolCount 与 toolsTokens），可用来校验预设或工具变更是否在新会话生效；工具集在会话创建时冻结，恢复旧会话仍显示旧目录。
 
 ## 字段结构
 - wallMs：总墙钟耗时（毫秒），近似等于 llmMs 加 toolMs
@@ -24,14 +24,13 @@ DSH 的会话统计数据存储，位于 ~/.dsh/storages/session_projcache，含
 - ask_user 总等待 87.7min/83 次（含并发打点，早前口径 80 次）；P50=27s、P90=126s（早前审计）；≥300s 长尾 = 2 次（dde42845=11.3min、ec65ff86=17.6min），合计 28.9min，占 ask 总等待 33%，为高影响长尾。
 - job_output 与 ask_user_question 为宿主内置工具（host 级），不在 dsh 插件 checkout 内，其等待已含于 toolMs 内不可单列，插件层无法直接修改其逻辑。
 
-
 <!-- MEMORY_FIELDS
 {
   "category": "数据存储",
   "name": "session_projcache",
-  "source_extraction_id": "4bf3994e2b2f41d69b4e97f5c39863c4",
+  "source_extraction_id": "662ed593c73847fa9a354249db78103e",
   "peer_id": "github.com-tyvt-skills",
-  "version": 3,
+  "version": 4,
   "memory_type": "entities"
 }
 -->

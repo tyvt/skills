@@ -3,7 +3,7 @@ github.com-tyvt-skills 维护的主控模型评测基准仓库，实际目录名
 
 ## Description
 - 用于评测多模型编排器中主控模型的工具选择、计划完整性、计划效率、路由/拒绝校准四维能力
-- 测试题定义在 tasks-master.json，2026-11-13 含 T1–T11 共 29 道任务（T1–T7 执行层 + T8–T11 综合对抗）
+- 测试题定义在 tasks-master.json，2026-11-14 含 T1–T11 + M6–M10 共 35 道任务（T1–T7 执行层 + T8–T11 综合对抗 + M6–M10 多轮纠错/扇出去重/长上下文判读/多模态判读/diff评审，提交 b013ef3f）
 - 含 run-bench.ps1（支持 -Suite full -DryRun 仅打印不调网关）、score.ps1、score-t.ps1（T题单独聚合不进混淆矩阵）、compare.ps1（M vs T 对照）等评测脚本
 
 ## Relations
@@ -14,9 +14,9 @@ github.com-tyvt-skills 维护的主控模型评测基准仓库，实际目录名
 {
   "category": "评测基准仓库",
   "name": "controller_bench",
-  "source_extraction_id": "a8f596e6caa44c1f997b8900addef7bc",
+  "source_extraction_id": "e98da92f15f34cb2b92ccd6e9d16a846",
   "peer_id": "github.com-tyvt-skills",
-  "version": 2,
+  "version": 3,
   "memory_type": "entities"
 }
 -->

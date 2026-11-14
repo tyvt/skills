@@ -22,13 +22,14 @@
 - 2026-11-06 提交并推送到 origin/dev(commit 47af55e)；主仓库 `npm test` 通过(含 test 模式 dist 构建)
 - 用 nginx UI 把站点 root 指到 `dist/`(test 构建产物)刷新打开；浏览器旧 remote 数据可清存储或删 `flood-demo-v1` 重注入
 - 2026-11-09 按 Lead 要求关闭 test 环境 mock：`.env.test` 改 `remote`+显式 `false`，提交 fd05a55 推送 origin/dev(`8a2983c..fd05a55`)；`npm test` 21/21 通过，nginx 8095 验证 `VITE_FLOOD_MOCK:"false"` 且无 demo 种子
+- 2026-11-14 运行时 mock 进一步清理：防汛/自查/门户运行时 mock 与 seed fallback 已移除，demo 自动登录与模式开关已移除（提交 e925eec6 本地未推送）；门户请求错误继续向上冒泡
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zhi2_flood_mock",
-  "source_extraction_id": "f85698defd2b4f5295e604b8f00a496d",
-  "version": 4,
+  "source_extraction_id": "5873dc1ad52440c6ab2ff23954a7e50c",
+  "version": 5,
   "memory_type": "entities"
 }
 -->

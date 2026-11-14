@@ -16,13 +16,14 @@ zhi2-mobile-query-h5-c（苏住房防汛C端移动查询H5）的登录与 token 
 - 来源：2026-11-12 bug 6502 token 盲信修复任务
 - 关联禅道 bug 6502（product=79, project=141, execution=142, openedBy=lichandan, assignedTo=tiany）
 - 修复提交 1446391 已推送 origin/dev（仅改 src/App.vue）
+- 2026-11-14 401 处理细化：原拦截未生效因 demo 登录绕过启动时令牌校验、请求层只检查 HTTP 状态码未处理 HTTP 200 响应体 code:401；现 request.ts:79 识别两种 401，App.vue:50 将鉴权失败识别为令牌无效（提交 e925eec6 本地未推送，详见项目 修复记录）
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zhi2_flood_auth",
-  "source_extraction_id": "2f4ed25ac98e42fa9a21fd5f09da3187",
-  "version": 2,
+  "source_extraction_id": "5873dc1ad52440c6ab2ff23954a7e50c",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

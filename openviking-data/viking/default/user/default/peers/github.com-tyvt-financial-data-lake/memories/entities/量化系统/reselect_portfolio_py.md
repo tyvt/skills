@@ -8,13 +8,17 @@
 - score 定义为 1/√(波动率×|最大回撤|)，据此对候选排序
 - 写清单时硬剔除现价高于目标买价超 10% 的标的（唐山港高 29.1%、渝农商行高 20.4% 不入选），面板容忍线由15%改为10%，「未买入」兜底名单超10%也不出现
 
+## 2026-11-14 重选结果
+- 重选已完成，但触发计划中的停止条件：按价格偏离目标买价超 10% 排除沪市候选后，仅剩沪市 2 只、深市 3 只可选
+- 组合与面板数据库尚未同步；先核对生成的成员 CSV，再由用户决定是否维持价格门槛
+
 <!-- MEMORY_FIELDS
 {
   "category": "量化系统",
   "name": "reselect_portfolio_py",
-  "source_extraction_id": "cba0f2217b8745baa719b9636a097c32",
+  "source_extraction_id": "39b45ac42c61463285c698cec3db3015",
   "peer_id": "github.com-tyvt-financial-data-lake",
-  "version": 2,
+  "version": 3,
   "memory_type": "entities"
 }
 -->

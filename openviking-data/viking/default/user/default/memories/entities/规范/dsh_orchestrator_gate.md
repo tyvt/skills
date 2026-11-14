@@ -13,12 +13,17 @@ DSH Web 进程内的预执行工具守卫插件，通过 ctx.tools.guard 拦截�
 ## 关系
 - 与 dsh-token-guard 阶段不同：gate 预执行拦截，token-guard 后置结果裁剪
 
+## 守卫回调签名
+- ctx.tools.guard((exec) => {...}) 为同步守卫：返回字符串则拒绝该工具调用（字符串反馈给模型），返回 undefined 则放行
+- exec.name = 工具名，exec.arguments = 参数，exec.agent.session.header.id = 会话 id
+- 守卫闭包可通过 exec.agent.session.header.id 读取对应会话的 acc 状态（如 bigMissStreak），实现按会话的拦截逻辑
+
 <!-- MEMORY_FIELDS
 {
   "category": "规范",
   "name": "dsh_orchestrator_gate",
-  "source_extraction_id": "25ad0de73bae476d9e5933c26df1a4ac",
-  "version": 2,
+  "source_extraction_id": "4db6c3cf3de54d18b634401b9d361f6d",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

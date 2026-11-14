@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-d445298a-ec84-48c0-ba8e-394bd99c2e64/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-14T02:07:57.347590+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/14/pwsh_p0_review.md",
+                "memory_type": "events",
+                "after": "# Summary\ngithub.com-tyvt-skills identified a P0 bug while reviewing orchestrator-gate plan step 5 on 2026-11-14: placing the pwsh branch before the existing path-based interception and returning null for not-git did not confine the new git-gate logic to pwsh-only, risking path-interception bypass. The corrected design keeps the entire git-gate inside a strictly `tool===\"pwsh\"` early-return branch so pwsh never flows into plan-approval; unknown states always reject.\n# 2026-11-14 (Saturday) ChatLog:\n**assistant [peer=github.com-tyvt-skills]**: Review now **REJECT (66/100, 1 P0)**. The reviewer's P0 is a valid bug in my step-5 wording:\n\n> P0: \"pwsh 分支置路径拦截之前……not-git 显式 return null，但 command 缺失/非字符串→拒，**且未限定对 pwsh 以外 git 工具的前置拦截**……路径类拦截会被绕过 / args.command 字符串被拦\"\n\nReading carefully: the P0 concern is that putting the pwsh branch **before** the existing path-based interception, and having `not-git` `return null`, doesn't confine the new logic to pwsh only — a non-pwsh tool could be affected, or the ordering lets something slip. The reviewer suggests: **when tool is pwsh handle three states; `not-git` should not `return null` early — should fall through to the original path**, and `unknown` always reject (drop write-priority complexity).\n\nAlso P1-3: must verify `from src.verify import compute_content_sha` is actually importable AND use identical path bytes; the review wants me to confirm the import path works.\n\nLet me verify the Python import works (cheap, concrete), then fix the plan:\n- pwsh branch: **only within `tool===\"pwsh\"`**; `not-git` → fall through to existing logic (which for pwsh is harmless since pwsh isn't in default path tools—but after I add pwsh to guardTools, the existing path branch would call `rejectReason` requiring a plan!). That's the real trap: if pwsh is in guardTools and I `return null` for not-git, fine; but if I let it fall through, the existing `findApprovedPlan` logic applies — which would require a plan for every pwsh command. So `not-git` must `return null` to avoid that. The reviewer's suggestion conflicts.\n\nLet me re-read: reviewer says \"not-git 显式 return null 应保留原路径处理\" — this is ambiguous. The correct design: keep the **entire new git-gate inside the pwsh branch and return early** so pwsh never flows into the plan-approval path branch. The P0 seems to be about **not clobbering non-pwsh tools**. Let me make it explicit and unambiguous: the pwsh handling is a separate early return guarded strictly by `if (tool === \"pwsh\")`, and it completely owns pwsh (never falls into plan-approval check). First verify the import, then rewrite."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/14/verify_sha_import.md",
+                "memory_type": "events",
+                "after": "# Summary\ngithub.com-tyvt-skills verified on 2026-11-14 that `from src.verify import compute_content_sha` imports successfully with cwd set to `dsh/langgraph-orchestrator` (it pulls langgraph warnings but succeeds). This is the correct invocation for byte-level selftest cross-check of the gate.\n# 2026-11-14 (Saturday) ChatLog:\n**assistant [peer=github.com-tyvt-skills]**: Confirmed the working import: `cd dsh/langgraph-orchestrator` then `from src.verify import compute_content_sha` works (importing it pulls langgraph warnings but succeeds). The correct invocation for the byte-level selftest cross-check is: run python with `cwd = dsh/langgraph-orchestrator`, `from src.verify import compute_content_sha`.\n\nNow let me fix the plan's step 5 (P0) and verification (P1-3). I'll make the pwsh branch strictly `tool===\"pwsh\"`-owned with clear early-return semantics that don't touch non-pwsh tools, drop the ambiguous \"write-priority over unknown\" (unknown always rejects), and pin the exact Python import."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/14/capture_test_baseline.md",
+                "memory_type": "events",
+                "after": "# Summary\ngithub.com-tyvt-skills captured the test baseline on 2026-11-14 before any source edits: selftest 21 passed and pytest 159 passed for the langgraph-orchestrator project.\n# 2026-11-14 (Saturday) ChatLog:\n**assistant [peer=github.com-tyvt-skills]**: The orchestrator-gate wants a todo list before editing. I have one but need to refresh it as in_progress. Baseline is already captured (selftest 21 pass, pytest 159 pass) — I'll note that. Let me update the todo list.\n...\n**assistant [peer=github.com-tyvt-skills]**: Baseline already captured this session (selftest 21 pass, pytest 159 pass — before any source edits). Now retry the edit."
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/14/taskstate_cwd_bug.md",
+                "memory_type": "events",
+                "after": "# Summary\ngithub.com-tyvt-skills found on 2026-11-14 that a relative path `.task-state\\...` resolved under the wrong cwd when the runner launched from `dsh/langgraph-orchestrator`; the rerun must use the repo-root workdir so the relative path resolves correctly.\n# 2026-11-14 (Saturday) ChatLog:\n**assistant [peer=github.com-tyvt-skills]**: Note: I ran from `dsh/langgraph-orchestrator` (cwd), but the runner script uses absolute paths so it's fine. Let me wait.\n...\n**assistant [peer=github.com-tyvt-skills]**: The relative path `.task-state\\...` resolved under the wrong cwd. Let me rerun with the correct workdir (repo root) so relative path resolves, or use absolute path."
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

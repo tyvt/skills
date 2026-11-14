@@ -5,15 +5,15 @@
 - 编排器审小改动时将 diff/关键片段内联进 request，不让编排器自己读盘；小任务不走 op:"full" 的 decompose→dispatch
 - eslint --fix 只修自己新增行，改完先 git diff 看是否误伤历史行；新增代码从一开始就写成项目风格免 --fix
 - 用户已表态的方案选择不再重复问（合并交互确认）
-
+- 方案 plan_review 连续多轮 grok PASS（0 P0）后主动停止循环并置 review_override: true 交用户确认，避免验证路径 token 浪费
 
 <!-- MEMORY_FIELDS
 {
-  "peer_id": "github.com-tyvt-skills",
   "user": "github.com-tyvt-skills",
   "topic": "agent降本操作纪律",
-  "source_extraction_id": "2a76057ea4d44a3e8b5b64e97cc32fc5",
-  "version": 1,
+  "source_extraction_id": "5e931fb4b68b489cb2c68dd13b880794",
+  "peer_id": "github.com-tyvt-skills",
+  "version": 2,
   "memory_type": "preferences"
 }
 -->

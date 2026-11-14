@@ -1,0 +1,44 @@
+# Summary
+2026-11-14，github.com-tyvt-skills 提供提交信息后，将 dsh/plan-gate 的 git 写子命令拦截改动提交到 main 分支，提交为 6d38afdd「feat(plan-gate): 拦截 git 写子命令，需通过验证门禁凭证」，仅含 3 个文件（dsh/plan-gate/lib/index.js、cordis.patch.yml、selftest.mjs，+293/−3）。提交前确认 dsh/ 为主仓直接跟踪而非子模块 gitlink，工作区存在大量其他会话的脏文件，因此只按路径 stage 本次任务的 3 个文件，未使用 git add -A；使用 GIT_EDITOR=true 完成提交，未推送远端。
+# 2026-11-14 (Saturday) ChatLog:
+**user [peer=github.com-tyvt-skills]**: feat(plan-gate): 拦截 git 写子命令，需通过验证门禁凭证
+
+- guardTools 增补 pwsh（index.js + cordis.patch.yml 同步）
+- 复用 orchestrator-gate splitSegments/tokenize，新增三态 classifyGitCommand
+  (write/not-git/unknown；任一 unknown 段整体拒；5 大子命令统一拦；
+  branch/remote 按参数细分；git -C/.exe/-c 前缀识别)
+- sha256Content 逐字节复刻 verify.py compute_content_sha（真跑 Python 对拍 MATCH）
+- pwsh 独立块独占，not-git 放行 / unknown 拒 / write 走 _review.json 凭证校验
+- selftest 70/70（+49）；pytest 159 passed 无回归
+**assistant [peer=github.com-tyvt-skills]**: You've provided the commit message. Since you previously said "落完交我复核，不自动提交" and now you're giving a commit message, this signals you've reviewed and want me to commit. Per AGENTS.md, git commits need `GIT_EDITOR=true`, and I should do the commit-time one-shot check (dirty files / scope). Let me load the submodule-commit skill since this is a submodule-bearing repo, and do the pre-commit check.
+**assistant [peer=github.com-tyvt-skills]**: The `dsh/` tree — let me check if it's a submodule or part of the main repo. Let me use worktree-snapshot approach / check git layout first.
+**assistant [peer=github.com-tyvt-skills]**: `dsh/` is **part of the main repo** (files tracked directly, not a submodule gitlink). Single repo, branch `main`. So it's a plain commit — no submodule dance needed. Let me do the pre-commit one-shot check: dirty files, and confirm only my 3 files are staged-worthy (there were pre-existing unrelated dirty files per the handoff: README.md, tests/test_scheduling.py, docs/op-tool-execute-design.md).
+**assistant [peer=github.com-tyvt-skills]**: There are **many** dirty files from other sessions (concurrent multi-session work). I must commit **only my 3 files** — `dsh/plan-gate/{lib/index.js, cordis.patch.yml, selftest.mjs}`. I'll stage explicitly by path (never `git add -A`).
+
+Let me stage just my 3 files and verify the staged set.
+**assistant [peer=github.com-tyvt-skills]**: Exactly my 3 files staged. Now commit with `GIT_EDITOR=true` and the provided message.
+**assistant [peer=github.com-tyvt-skills]**: Committed as `6d38afdd` (3 files, +293/−3). Let me verify the commit contains exactly my 3 files and nothing else.
+**assistant [peer=github.com-tyvt-skills]**: 已提交，范围干净。
+
+## 提交结果
+- **Commit `6d38afdd`** on `main`：`feat(plan-gate): 拦截 git 写子命令，需通过验证门禁凭证`
+- **仅含 3 个文件**（+293/−3）：`dsh/plan-gate/lib/index.js`、`cordis.patch.yml`、`selftest.mjs`
+- 提交前一次性核对：仓库 `dsh/` 是主仓直接跟踪（非子模块 gitlink），工作区有大量其他会话的脏文件/未跟踪项，均已排除，**只按路径 stage 了本任务 3 个文件**，未 `git add -A`
+- `GIT_EDITOR=true` 已设
+- **未推送**（你说的是"不自动提交"，我理解为交付复核后提交；推送需你另行确认）
+
+验证证据已在前一轮给出并保持：selftest 70/70、pytest 159 passed、哈希 JS↔Python 对拍 MATCH。
+
+需要我 **推送** 到远端吗？（`git push origin main`）
+
+<!-- MEMORY_FIELDS
+{
+  "event_name": "plan-gate 写命令拦截提交",
+  "goal": "记录 plan-gate 改动提交入库",
+  "summary": "2026-11-14，github.com-tyvt-skills 提供提交信息后，将 dsh/plan-gate 的 git 写子命令拦截改动提交到 main 分支，提交为 6d38afdd「feat(plan-gate): 拦截 git 写子命令，需通过验证门禁凭证」，仅含 3 个文件（dsh/plan-gate/lib/index.js、cordis.patch.yml、selftest.mjs，+293/−3）。提交前确认 dsh/ 为主仓直接跟踪而非子模块 gitlink，工作区存在大量其他会话的脏文件，因此只按路径 stage 本次任务的 3 个文件，未使用 git add -A；使用 GIT_EDITOR=true 完成提交，未推送远端。",
+  "ranges": "0-17",
+  "source_extraction_id": "14deaea199e54d7cbcf5aaa44ccbf436",
+  "version": 1,
+  "memory_type": "events"
+}
+-->

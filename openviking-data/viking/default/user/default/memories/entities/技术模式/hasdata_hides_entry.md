@@ -11,13 +11,8 @@
 - 空数据表格内提示逻辑不变。
 
 ## 涉及文件
-- src/views/publicQuery/complex/detail.vue
-- components/propertyContractTable.vue
-- components/committeeTable.vue
-- components/managementOrgPanel.vue
-- components/regulatoryAccountPanel.vue
-- components/advertiseTable.vue
-- components/overviewSubTableTemplate.js
+- 页面与子组件：src/views/publicQuery/complex/detail.vue、components/propertyContractTable.vue、components/committeeTable.vue、components/managementOrgPanel.vue、components/regulatoryAccountPanel.vue、components/advertiseTable.vue
+- 模板工具：components/overviewSubTableTemplate.js
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
@@ -30,8 +25,8 @@
 {
   "category": "技术模式",
   "name": "hasdata_hides_entry",
-  "source_extraction_id": "55bb34ba05c74db7846be6cfd5d6ceb5",
-  "version": 1,
+  "source_extraction_id": "93fc02dc1e89499999a4e056d2d8c26e",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

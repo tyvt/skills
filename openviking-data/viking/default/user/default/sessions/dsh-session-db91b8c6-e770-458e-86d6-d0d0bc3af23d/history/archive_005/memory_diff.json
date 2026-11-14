@@ -1,0 +1,36 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-db91b8c6-e770-458e-86d6-d0d0bc3af23d/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-14T02:06:08.476083+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/13/规划器池验证.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-13，用户询问编排器 planner 何时触发；助手经 orchestrate op:\"full\" 委派多步任务（盘点 controller-bench 结果文件统计：列目录→读 JSON→汇总）做活体验证。轨迹显示 `plan via codex/gpt-6-luna: 1 steps`，规划由 gpt-6-luna 完成（planner 池新首选已生效）；执行与汇总走 workbuddy/deepseek-v4.1-flash；产出 7 个 json、bench-full.json 406 rows（M1-M5 350 + T8-T11 56）。gpt-6-luna 将任务聚合为单条 PowerShell 命令，体现一步聚合特性。验证表明 planner 池仅在 op:\"full\" 需模型规划时介入，与 plan_review 所用的 plan_reviewer 池无关。\n# 2026-11-13 (Friday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 什么时候会触发呢？每次写plan会吗\n...\n**assistant [peer=github.com-tyvt-skills]**: ...要不要我实际发一个 `op:\"full\"` 多步任务做一次活体验证，让你看到它确实用 `codex/gpt-6-luna` 规划、并在轨迹里显示 `plan via codex/gpt-6-luna`？\n**assistant [peer=github.com-tyvt-skills]**: 发一个多步任务做活体验证。为了能明显看到规划器在起作用、且安全可逆，我让它去**盘点 controller-bench 结果文件的统计信息**（多步：列目录 → 读 JSON → 汇总），这是典型的需要\"先规划再执行\"的活。\n**assistant [peer=github.com-tyvt-skills]**: ✅ 活体验证成功，正是你想要的证据。看轨迹第一行：\n\n```\n轨迹: plan via codex/gpt-6-luna: 1 steps | guard defer tool=pwsh ...\n      | execute 1/1 tool=pwsh model=workbuddy/deepseek-v4.1-flash mock=False ok=True\n      | summarize via workbuddy/deepseek-v4.1-flash ok=True\n```\n\n## 关键看点（验证了新配置）\n1. **`plan via codex/gpt-6-luna`** —— 规划确实由 **gpt-6-luna** 完成（新池首选，已生效）。\n2. **分工清晰**：\n   - **规划**（拆解步骤）→ `codex/gpt-6-luna`\n   - **执行**（跑 pwsh 命令）→ `workbuddy/deepseek-v4.1-flash`\n   - **汇总**（整理答复）→ `workbuddy/deepseek-v4.1-flash`\n3. 我改的是 **planner 池**，所以只有\"plan\"这一步换成了 gpt-6-luna；执行/汇总走的是 `pwsh`/`summarizer` 各自的池，不归 planner 管——这与预期完全一致。\n4. 结果正确：7 个 json，bench-full.json 406 rows（正是我们 M1-M5 350 + T8-T11 56 的结果）。\n\n## 顺带印证了上一条回答\n这次 gpt-6-luna 把任务**一步聚合**成一条 PowerShell 命令（列目录+解析+汇总一把梭），没有拆成 4-5 步——这正是它 T8-T11 效率分高（步骤精简）的体现。\n\n所以你之前问的\"什么时候触发\"：**就是这么触发的**——我用 `orchestrate {op:\"full\"}` 委派一个需要拆解的任务时，planner 池（gpt-6-luna 首选）就会介入做规划。日常我直接 `pwsh`/`read`/`grep` 的窄操作不经过它。\n\n一切符合预期。这次的任务也是纯读取、安全可逆，未产生任何改动或提交。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/mechanism/plan_review_chain.md",
+                "memory_type": "entities",
+                "before": "# plan_review_chain\nDSH orchestrator 的多步计划审批链，由 dsh/AGENTS.md \"Plan Review\" 章节要求。\n\n## 触发方式\n- orchestrate 工具的 op 枚举仅 full|tool|list，无独立 plan_review op。\n- 通过 op:\"full\" 将完整计划文本内联触发（PLAN_REVIEW 语境）。\n- planner 为纯文本模型无磁盘访问，计划文本必须内联。\n- 内联计划超过 api.py:299 的 PLAN_REVIEW_CLIP_CHARS 会触发 \"plan exceeds review size limit\" 保护导致编排失败；正常尺寸计划或直连 `python -m src.jsonbridge` 均正常。\n\n## 链路结构\n- planner 产出初始计划（历史曾观测 planner 池 workbuddy/deepseek-v4.1-flash 单点故障重试 ~100s×2 后降级 glm-5.3-flash）。\n- plan_reviewer 审核计划；当前池（2026-11-13 19:38 配置）：`cursor/grok-4.7@256k` → `workbuddy/deepseek-v4.1-flash` → `auto/deepseek-v4.1-flash`，max_tokens:8192，timeout:300。\n- glm-5.3-flash 产出最终摘要。\n\n## 耗时与可靠性（2026-11-13 排查结论）\n- 各步通常 20~70s，全链 1~3min；历史 .costs.jsonl 记录多数为 ok:true。\n- grok 基线开销约 deepseek 的 11 倍（单字回复 15.1s vs 1.4s），随 token 线性放大（大计划 173.8s ≈ 11ms/token），但从未失败。\n- 历史聚合（75 会话 cost 日志）：grok 8 调用 8 成功 0 失败（29.7s~173.8s）；deepseek 系 72 调用全成功。\n- 11-12 的 10 次 plan_review 失败（model=null, ok=false）根因是当时 max_tokens:2048 → DeepSeek reasoning 耗尽预算 → 502 empty reply，已于 11-13 配置升至 8192 修复；11-13 全天零失败。\n- \"grok 超时无响应\"反馈实为 grok 高延迟被误读，非可靠性故障；用户 2026-11-13 决定保持 grok 首选不动。\n- 2026-11-14 用户审计误判 grok 已停用（称吞吐约 1.1 tok/s 且停用），核 config.yaml:159-162 确认 grok 为 2026-11-13 controller-bench 路由 1.00/总分 0.90 最高之有意首选，非配置漂移；用户明示「grok 审核还是要的」，当日优化方案保留 grok 首位不动模型池\n\n## 三池复验（2026-11-13 重启后）\n- plan_reviewer 池首位 `cursor/grok-4.7@256k` 复验确认，端到端真实 plan_review 实测审核模型为 grok-4.7@256k，verdict PASS，route 1.00\n- security_guard 仅 `workbuddy/deepseek-v4.1-flash` 单模型，fail-closed\n- planner 池 `workbuddy/deepseek-v4.1-flash` ×2 不变，带「一步聚合」约束，冒烟验证 1 步输出；遗留监控项：planner 若出现「计划含不存在工具」漂移触发重测",
+                "after": "# plan_review_chain\nDSH orchestrator 的多步计划审批链，由 dsh/AGENTS.md \"Plan Review\" 章节要求。\n\n## 触发方式\n- orchestrate 工具的 op 枚举仅 full|tool|list，无独立 plan_review op。\n- 通过 op:\"full\" 将完整计划文本内联触发（PLAN_REVIEW 语境）。\n- planner 为纯文本模型无磁盘访问，计划文本必须内联。\n- 内联计划超过 api.py:299 的 PLAN_REVIEW_CLIP_CHARS 会触发 \"plan exceeds review size limit\" 保护导致编排失败；正常尺寸计划或直连 `python -m src.jsonbridge` 均正常。\n\n## 链路结构\n- planner 产出初始计划（历史曾观测 planner 池 workbuddy/deepseek-v4.1-flash 单点故障重试 ~100s×2 后降级 glm-5.3-flash）。\n- plan_reviewer 审核计划；当前池（2026-11-13 19:38 配置）：`cursor/grok-4.7@256k` → `workbuddy/deepseek-v4.1-flash` → `auto/deepseek-v4.1-flash`，max_tokens:8192，timeout:300。\n- glm-5.3-flash 产出最终摘要。\n\n## 耗时与可靠性（2026-11-13 排查结论）\n- 各步通常 20~70s，全链 1~3min；历史 .costs.jsonl 记录多数为 ok:true。\n- grok 基线开销约 deepseek 的 11 倍（单字回复 15.1s vs 1.4s），随 token 线性放大（大计划 173.8s ≈ 11ms/token），但从未失败。\n- 历史聚合（75 会话 cost 日志）：grok 8 调用 8 成功 0 失败（29.7s~173.8s）；deepseek 系 72 调用全成功。\n- 11-12 的 10 次 plan_review 失败（model=null, ok=false）根因是当时 max_tokens:2048 → DeepSeek reasoning 耗尽预算 → 502 empty reply，已于 11-13 配置升至 8192 修复；11-13 全天零失败。\n- \"grok 超时无响应\"反馈实为 grok 高延迟被误读，非可靠性故障；用户 2026-11-13 决定保持 grok 首选不动。\n- 2026-11-14 用户审计误判 grok 已停用（称吞吐约 1.1 tok/s 且停用），核 config.yaml:159-162 确认 grok 为 2026-11-13 controller-bench 路由 1.00/总分 0.90 最高之有意首选，非配置漂移；用户明示「grok 审核还是要的」，当日优化方案保留 grok 首位不动模型池\n\n## 三池复验（2026-11-13 重启后）\n- plan_reviewer 池首位 `cursor/grok-4.7@256k` 复验确认，端到端真实 plan_review 实测审核模型为 grok-4.7@256k，verdict PASS，route 1.00\n- security_guard 仅 `workbuddy/deepseek-v4.1-flash` 单模型，fail-closed\n- planner 池 `codex/gpt-6-luna` → `gpt-5.6-luna` → `deepseek-v4.1-flash`（2026-11-13 改，gpt-6-luna 首选已生效，活体验证 `plan via codex/gpt-6-luna`），带「一步聚合」约束，冒烟验证 1 步输出；遗留监控项：planner 若出现「计划含不存在工具」漂移触发重测"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/编排器 op 选型策略.md",
+                "memory_type": "preferences",
+                "before": "- 执行类任务（跑命令/构建/检索/读大文件/改代码）一律使用 orchestrate {op:\"full\"}，因其真实执行 _run_pwsh\n- op:\"tool\" 仅做纯文本加工，绝不执行命令、构建或读盘\n- 选型须主动判断，不能依赖 gate 拒绝提示纠正：主模型若一开始就选 op:\"tool\" 不会触发 gate，故规则以 AGENTS.md 与规范主动约束\n- 计划审核类任务应使用 op:\"plan_review\"（reviewer 池首选 grok-4.7@256k，cursor 已于 2026-11-12 移除），切勿误用 op:\"full\"；若以纯文本直接提交计划内容做审核，可用 op:\"tool\" 规避 reviewer 读盘卡住的问题",
+                "after": "- 执行类任务（跑命令/构建/检索/读大文件/改代码）一律使用 orchestrate {op:\"full\"}，因其真实执行 _run_pwsh\n- op:\"tool\" 仅做纯文本加工，绝不执行命令、构建或读盘\n- 选型须主动判断，不能依赖 gate 拒绝提示纠正：主模型若一开始就选 op:\"tool\" 不会触发 gate，故规则以 AGENTS.md 与规范主动约束\n- 计划审核（plan_review）经 orchestrate op:\"full\" 内联完整计划文本触发（op 枚举仅 full|tool|list，无独立 plan_review op）；reviewer 池首选 grok-4.7@256k（cursor 已于 2026-11-12 移除）；纯文本直接提交计划内容做审核可用 op:\"tool\" 规避 reviewer 读盘卡住问题"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}
