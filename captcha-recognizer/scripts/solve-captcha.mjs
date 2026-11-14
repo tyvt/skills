@@ -8,7 +8,7 @@
  *   echo <base64> | node solve-captcha.mjs -       # stdin 传 base64（可带 data: 前缀）
  *
  * 环境变量:
- *   CAPTCHA_VISION_MODEL  默认 auto/hy3（需支持图片输入）
+ *   CAPTCHA_VISION_MODEL  默认 auto/deepseek-v4.1-flash（需支持图片输入；勿用 auto/hy3，hy3 不支持识图）
  *   CAPTCHA_GATEWAY_URL   默认 http://127.0.0.1:3425/v1/chat/completions
  *   MAGPIE_GATEWAY_KEY    默认 magpie
  *
@@ -18,7 +18,7 @@ import fs from 'node:fs'
 import process from 'node:process'
 
 const GATEWAY = process.env.CAPTCHA_GATEWAY_URL || 'http://127.0.0.1:3425/v1/chat/completions'
-const MODEL = process.env.CAPTCHA_VISION_MODEL || 'auto/hy3'
+const MODEL = process.env.CAPTCHA_VISION_MODEL || 'auto/deepseek-v4.1-flash'
 const KEY = process.env.MAGPIE_GATEWAY_KEY || 'magpie'
 
 const PROMPT = `你是验证码识别器。图片是登录验证码，通常是算术题（如 "5+4=?"、"12-3=?"、"6*7=?"）或纯字母数字。

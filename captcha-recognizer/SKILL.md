@@ -7,7 +7,7 @@ description: 识别图片验证码（算术型如 5+4=?、字母数字文本型�
 
 把图片验证码（**算术型** `5+4=?`、`12-3=?`、`6×7=?`，或**字母数字文本型**）识别出答案，供 Playwright/E2E、脚本自动登录使用。
 
-核心能力：`scripts/solve-captcha.mjs` —— 调本地 **magpie 视觉网关** (`http://127.0.0.1:3425/v1/chat/completions`，模型 `auto/hy3`) 做 OCR，算术题自动算结果。
+核心能力：`scripts/solve-captcha.mjs` —— 调本地 **magpie 视觉网关** (`http://127.0.0.1:3425/v1/chat/completions`，模型 `auto/deepseek-v4.1-flash`) 做 OCR，算术题自动算结果。
 
 ## 何时用
 
@@ -17,7 +17,7 @@ description: 识别图片验证码（算术型如 5+4=?、字母数字文本型�
 
 ## 前置
 
-- magpie 视觉网关可用：`127.0.0.1:3425` 上有支持图片输入的模型（`auto/hy3` / `auto/deepseek-v4.1-flash`）。
+- magpie 视觉网关可用：`127.0.0.1:3425` 上有支持图片输入的模型（`auto/deepseek-v4.1-flash`；**勿用 `auto/hy3`，hy3 不支持识图**）。
 - key：`MAGPIE_GATEWAY_KEY`（本地默认值 `magpie`，脚本已内置回退）。
 - Node ≥ 18（用内置 fetch）。
 
@@ -33,7 +33,7 @@ echo "<base64...>" | node scripts/solve-captcha.mjs -
 ```
 
 环境变量：
-- `CAPTCHA_VISION_MODEL` 默认 `auto/hy3`
+- `CAPTCHA_VISION_MODEL` 默认 `auto/deepseek-v4.1-flash`
 - `CAPTCHA_GATEWAY_URL` 默认 `http://127.0.0.1:3425/v1/chat/completions`
 - `MAGPIE_GATEWAY_KEY` 默认 `magpie`
 
