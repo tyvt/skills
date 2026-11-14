@@ -24,6 +24,8 @@ export const RULES = {
   blockRootGrep: true,
   blockWholeRead: true,
   blockBillingBypass: true,
+  blockEditWithoutPlan: true,
+  blockSerialFanout: true,
   passThroughSubagents: true,
   wholeReadDedup: true,
   tscTreatProjectFlagAsFull: true,
@@ -35,6 +37,41 @@ Object.defineProperty(RULES, 'blockBuildLint', { writable: false, configurable: 
 Object.defineProperty(RULES, 'blockRootGrep', { writable: false, configurable: true });
 Object.defineProperty(RULES, 'blockWholeRead', { writable: false, configurable: true });
 Object.defineProperty(RULES, 'blockBillingBypass', { writable: false, configurable: true });
+Object.defineProperty(RULES, 'blockEditWithoutPlan', { writable: false, configurable: true });
+Object.defineProperty(RULES, 'blockSerialFanout', { writable: false, configurable: true });
+
+/** 扇出敏感工具：同会话连续整读/整仓检索是最大串行浪费源。 */
+const FANOUT_TOOLS = new Set(["read", "grep"]);
+const FANOUT_STREAK_MAX_SESSIONS = 500;
+// 会话记忆性 Map（sessionWholeReads/sessionHasPlan）的 FIFO 上限。
+// 取 1000 = FANOUT_STREAK_MAX_SESSIONS 的 2×，给长驻进程多会话留冗余；
+// 淘汰最久未插入会话仅丢其「已整读/已出计划」记忆，新会话从 false 起算（偏宽松、不误阻断）。
+const SESSION_MEMO_MAX_SESSIONS = 1000;
+
+/** offset/limit 均为 ≥1 整数才算分页读（豁免计数）；offset-only / 0 / 非整数按整读计。 */
+function isPagedRead(args) {
+  return Number.isInteger(args?.offset) && args.offset >= 1
+    && Number.isInteger(args?.limit) && args.limit >= 1;
+}
+
+/**
+ * 扇出连击判定（纯函数，r8 终审版口径）。
+ * streak：该工具在本会话内的连续计数；达到阈值 → 返回拒绝文案（N=streak，M=threshold）。
+ */
+export function classifyFanout(tool, streak, threshold) {
+  if (!Number.isInteger(streak) || !Number.isInteger(threshold) || threshold < 3) return null;
+  if (streak < threshold) return null;
+  return [
+    `[orchestrator-gate] 已连续 ${streak} 次 ${tool}（阈值 ${threshold}）。同类对象批量任务请改道：`,
+    "① spawn_teammate 扇出并行（多对象首选）；② workflow 编排大规模扇出；③ orchestrate {op:\"full\"} 走编排器。",
+    "本次已重置计数，继续单发将再次累计拦截。",
+  ].join("\n");
+}
+
+/** 编码/样式改动的落地工具：edit / write。首次落地前必须先出计划。 */
+const EDIT_TOOLS = new Set(["edit", "write"]);
+/** 视为「已出计划」的工具：todo_write（计划外化）。 */
+const PLAN_TOOLS = new Set(["todo_write"]);
 
 /**
  * 派生指纹：由「规则开关 + BINS + FULL_SCRIPTS」的内容派生一个短哈希。
@@ -78,7 +115,7 @@ const CD_HEADS = new Set(["cd", "set-location", "pushd"]);
 const EXEC_TOKENS = new Set(["--exec", "-exec", "-execdir", "-ok", "-okdir", "-command"]);
 const QUERY_FLAGS = new Set(["--version", "--help", "-v", "-h"]);
 
-function normalizeConfig(input) {
+export function normalizeConfig(input) {
   const roots = Array.isArray(input?.repoRoots) ? input.repoRoots.filter((s) => typeof s === "string" && s) : [];
   const modules = Array.isArray(input?.moduleRoots) ? input.moduleRoots.filter((s) => typeof s === "string" && s) : [];
   return {
@@ -89,6 +126,9 @@ function normalizeConfig(input) {
     grepFailClosedWhenNoRepoRoot: input?.grepFailClosedWhenNoRepoRoot === true,
     wholeReadBytesVue: input?.wholeReadBytesVue ?? 61440,
     wholeReadBytesOther: input?.wholeReadBytesOther ?? 40960,
+    // 扇出连击阈值：合法值=整数≥3，非法一律回退默认 5（0/2/"x"/3.5/-1/"5"/null/undefined/"3"）。
+    fanoutStreakThreshold: Number.isInteger(input?.fanoutStreakThreshold) && input.fanoutStreakThreshold >= 3
+      ? input.fanoutStreakThreshold : 5,
   };
 }
 
@@ -378,23 +418,31 @@ function depthUnder(root, p) {
   return rel.split(/[/\\]/).filter(Boolean).length;
 }
 
-/** §3.2：返回命中原因或 null。repoRoot 缺失时写 bag.errors。 */
+/** §3.2：返回命中原因或 null。全项目覆盖：不再依赖 repoRoots 白名单。 */
 export function classifyGrep(args, config, { cwd, bag } = {}) {
   const raw = args?.path;
   const empty = raw === undefined || raw === null || String(raw).trim() === "" || String(raw).trim() === ".";
   const roots = config.repoRoots ?? [];
   const base = cwd ?? null;
-  const root = repoRootFor(base, roots) ?? (roots.length === 1 ? roots[0] : null);
+  // 全项目覆盖：优先用 cwd 作为基准根；cwd 缺失时退回配置里的第一个 repoRoot。
+  const root = base ?? (roots.length === 1 ? roots[0] : null);
   if (empty) return "仓库根 grep";
-  const target = path.isAbsolute(String(raw)) ? String(raw) : (base ? path.resolve(base, String(raw)) : null);
+  const target = path.isAbsolute(String(raw)) ? String(raw) : (root ? path.resolve(root, String(raw)) : null);
   if (!target) {
     if (config.grepFailClosedWhenNoRepoRoot) return "无 repoRoot 的 grep";
     if (bag) bag.errors = (bag.errors ?? 0) + 1;
     return null;
   }
-  const matched = repoRootFor(target, roots);
+  // 盘根一律拦。
+  if (norm(target) === norm(path.parse(target).root)) return "盘根 grep";
+  // 全项目覆盖：以 cwd（或 repoRoot）为基准判断是否「仓库根级」。
+  const matched = root ? (normWithin(root, target) ? root : repoRootFor(target, roots)) : repoRootFor(target, roots);
   if (!matched) {
-    if (norm(target) === norm(path.parse(target).root)) return "盘根 grep";
+    // 不在任何已知根下：仍按「相对 cwd 深度」判定，浅层即拦（全项目覆盖）。
+    if (root) {
+      const depth = depthUnder(root, target);
+      if (depth >= 0 && depth < (config.grepMinDepth ?? 2)) return "仓库根 grep";
+    }
     return null;
   }
   const rel = path.relative(matched, target);
@@ -424,6 +472,13 @@ export function classifyGrep(args, config, { cwd, bag } = {}) {
   return "仓库根 grep";
 }
 
+/** target 是否落在 root 之下（含相等）。 */
+function normWithin(root, target) {
+  const r = norm(root).replace(/[\\/]+$/, "");
+  const t = norm(target);
+  return t === r || t.startsWith(r + path.sep) || t.startsWith(r + "/");
+}
+
 function isWholeRead(args) {
   if (!args) return false;
   return !hasReadRange(args);
@@ -450,21 +505,41 @@ function reason(tool, summary, hint, fastPath) {
     "[orchestrator-gate] 该操作必须走 orchestrate 编排器，禁止宿主直跑。",
     `操作：${tool} ${summary}`,
     `\u6539\u7528\uff1aorchestrate {op:\"full\", request:\"${hint}\"}`,
+    "注意：要真正执行命令/构建/检索跑本地文件，必须用 op:\"full\"（它会 generate_command→security_guard→_run_pwsh 真实执行并回传 exit/stdout/stderr）。",
+    "op:\"tool\" 只做纯文本加工，不会执行 pwsh（模型只会回\"我没有执行能力\"），不要用它跑构建/命令/读盘。",
     "\uff08\u672c\u89c4\u5219\u5168\u5c40\u5f3a\u5236\u3002\u82e5\u786e\u9700\u76f4\u8dd1\u7a84\u547d\u4ee4\uff0c\u8bf7\u5148\u7f29\u5230\u5355\u6587\u4ef6/\u5355\u6a21\u5757\u3002\uff09",
+  ].join("\n");
+}
+
+function planReason(tool, args) {
+  const f = args?.file_path ?? args?.path ?? "(未知文件)";
+  return [
+    "[orchestrator-gate] 编码/样式改动必须先出计划，再落盘。",
+    `操作：${tool} ${f}`,
+    "本会话尚未用 todo_write 列出计划。请先调用：",
+    '  todo_write { todos: [ {content:"…", status:"in_progress"}, … ] }',
+    "列出本轮要改的文件/步骤（多步改动应标 in_progress/pending），然后重试本次编辑。",
+    "（全项目覆盖：任何项目、任何 cwd 下首次落地改动前都要求先出计划。）",
   ].join("\n");
 }
 
 /**
  * 返回 string = 拒绝；null = 放行。
  * bag 可选：{ errors, shellWrapped, uncovered } 供调用方计数。
+ * hasPlan：本会话是否已调用过 todo_write（计划门禁用）。
  */
-export function decideInterception({ tool, args, config, isSubagent, alreadyWholeRead, cwd, fsImpl, bag }) {
+export function decideInterception({ tool, args, config, isSubagent, alreadyWholeRead, cwd, fsImpl, bag, hasPlan = false }) {
   if (tool === "orchestrate") {
     if (args?.execution !== undefined && !validExecution(args)) return JSON.stringify({ code: 'INVALID_EXECUTION', reason: '结构化执行需要绝对workdir、安全program/args；shell元字符须走已有授权流程', recommendation: { tool: 'orchestrate', arguments: { op: 'full', request: '审查并授权所需命令' } } });
     return null;
   }
   if (RULES.passThroughSubagents && isSubagent) return null;
   const cfg = config ?? {};
+
+  // 计划门禁：首次 edit/write 前必须已有 todo 计划。全项目覆盖，不受 repoRoots 限制。
+  if (RULES.blockEditWithoutPlan && EDIT_TOOLS.has(tool) && !hasPlan) {
+    return planReason(tool, args);
+  }
 
   if (SHELL_TOOLS.has(tool)) {
     const command = commandOf(args);
@@ -492,7 +567,7 @@ export function decideInterception({ tool, args, config, isSubagent, alreadyWhol
 
   if (tool === "grep" && RULES.blockRootGrep) {
     const why = classifyGrep(args, cfg, { cwd, bag });
-    if (why) return reason("grep", `path=${args?.path ?? "(缺省)"}`, "缩到具体模块目录再搜");
+    if (why) return reason("grep", `path=${args?.path ?? "(缺省)"}`, "在全仓/大目录内检索该模式并返回命中文件与行号（op:full 会真实执行 pwsh Select-String/rg）");
   }
 
   if (tool === "read" && RULES.blockWholeRead) {
@@ -507,9 +582,25 @@ export function decideInterception({ tool, args, config, isSubagent, alreadyWhol
   return null;
 }
 
-export function apply(ctx, raw, { counters = { rejected: 0, errors: 0, shellWrapped: 0, uncovered: 0 } } = {}) {
+export function apply(ctx, raw, { counters = { rejected: 0, errors: 0, shellWrapped: 0, uncovered: 0, rejectedByTool: {} } } = {}) {
   const config = normalizeConfig(raw);
   const sessionWholeReads = new Map();
+  // 计划门禁状态：sessionId -> 是否已调用过 todo_write（出过计划）。
+  const sessionHasPlan = new Map();
+  // sessionWholeReads/sessionHasPlan 首次插入前做 FIFO 上限淘汰（防无界增长）。
+  const enforceMemoCap = (map, id) => {
+    if (!map.has(id) && map.size >= SESSION_MEMO_MAX_SESSIONS) {
+      map.delete(map.keys().next().value); // Map 迭代序=插入序，O(1) 淘汰最旧
+    }
+  };
+  // 扇出连击状态：sessionId -> {read, grep}（分槽独立计数；有界，第 501 条插入时淘汰最旧）。
+  const sessionStreaks = new Map();
+  const setStreaks = (id, val) => {
+    if (!sessionStreaks.has(id) && sessionStreaks.size >= FANOUT_STREAK_MAX_SESSIONS) {
+      sessionStreaks.delete(sessionStreaks.keys().next().value); // Map 迭代序=插入序，O(1) 淘汰最旧
+    }
+    sessionStreaks.set(id, val);
+  };
   if (!config.enabled) return;
   const log = typeof ctx?.logger === "function" ? ctx.logger(name) : ctx?.logger;
   // 启动日志：指纹 + 全量开关状态。改规则后必须重启 Web 才生效；
@@ -529,14 +620,19 @@ export function apply(ctx, raw, { counters = { rejected: 0, errors: 0, shellWrap
       const alreadyWholeRead = whole && (memo?.has(exec?.arguments?.file_path) ?? false);
       const bag = { errors: 0, shellWrapped: 0, uncovered: 0 };
       const cwd = exec?.cwd ?? exec?.agent?.session?.header?.cwd ?? null;
+      // 记录计划：本会话只要调用过 todo_write 即视为「已出计划」。
+      if (sess?.id !== undefined && PLAN_TOOLS.has(tool)) { enforceMemoCap(sessionHasPlan, sess.id); sessionHasPlan.set(sess.id, true); }
+      const hasPlan = sess?.id !== undefined ? (sessionHasPlan.get(sess.id) ?? false) : false;
+      const isSub = (sess?.delegationDepth ?? 0) > 0;
       const hit = decideInterception({
         tool,
         args: exec?.arguments,
         config,
-        isSubagent: (sess?.delegationDepth ?? 0) > 0,
+        isSubagent: isSub,
         alreadyWholeRead,
         cwd,
         bag,
+        hasPlan,
       });
       counters.errors += bag.errors;
       counters.shellWrapped += bag.shellWrapped;
@@ -544,13 +640,38 @@ export function apply(ctx, raw, { counters = { rejected: 0, errors: 0, shellWrap
       if (bag.shellWrapped) log?.warn?.("orchestrator-gate: shell-wrapped segment, not intercepted");
       if (bag.uncovered) log?.warn?.("orchestrator-gate: %s command field missing (M3 uncovered)", tool);
       if (!hit && whole && sess?.id !== undefined) {
+        enforceMemoCap(sessionWholeReads, sess.id);
         if (!sessionWholeReads.has(sess.id)) sessionWholeReads.set(sess.id, new Set());
         sessionWholeReads.get(sess.id).add(exec?.arguments?.file_path);
       }
       if (hit) {
         counters.rejected++;
         log?.warn?.("orchestrator-gate: rejected %s", tool);
-        return hit;
+        return hit; // 铁律：被任何规则拒绝的调用不修改扇出状态
+      }
+      // --- fanout 计数（仅在调用必然执行时才改状态；r8 终审口径）---
+      if (sess?.id !== undefined) {
+        if (tool === "orchestrate") {
+          setStreaks(sess.id, { read: 0, grep: 0 }); // 编排器直过并清零两槽
+        } else if (RULES.blockSerialFanout && !isSub && FANOUT_TOOLS.has(tool)) {
+          // 分页读豁免：offset≥1 且 limit≥1 且均为整数 → 不计数也不清零
+          const paged = tool === "read" && isPagedRead(exec?.arguments);
+          if (!paged) {
+            const st = sessionStreaks.get(sess.id) ?? { read: 0, grep: 0 };
+            st[tool]++;
+            if (st[tool] >= config.fanoutStreakThreshold) {
+              st[tool] = 0; // 显式例外：fanout 自身拒绝清零本槽
+              setStreaks(sess.id, st);
+              counters.rejected++;
+              counters.rejectedByTool[tool] = (counters.rejectedByTool[tool] ?? 0) + 1;
+              log?.warn?.("orchestrator-gate: fanout-rejected session=%s tool=%s x%d", sess.id, tool, config.fanoutStreakThreshold);
+              return classifyFanout(tool, config.fanoutStreakThreshold, config.fanoutStreakThreshold);
+            }
+            setStreaks(sess.id, st);
+          }
+        } else if (!FANOUT_TOOLS.has(tool)) {
+          setStreaks(sess.id, { read: 0, grep: 0 }); // 非 fanout 工具调用清零两槽
+        }
       }
     } catch (e) {
       counters.errors++;
@@ -559,5 +680,5 @@ export function apply(ctx, raw, { counters = { rejected: 0, errors: 0, shellWrap
     return undefined;
   });
   ctx?.on?.("dispose", () => disposer?.());
-  return { counters, sessionWholeReads };
+  return { counters, sessionWholeReads, sessionHasPlan, sessionStreaks };
 }

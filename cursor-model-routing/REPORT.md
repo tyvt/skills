@@ -3,7 +3,7 @@
 - 日期：2026-11-13
 - 网关：`http://127.0.0.1:3425/v1`（直连，未经编排器；编排器池 2026-11-12 已移除 Cursor）
 - 方法：`tasks.json` 的 T1–T7(+T7b) 同一 prompt 分喂各模型，单轮、temperature=0.2。**主矩阵与赠额首轮 max_tokens=2048；复现轮（t3/t7b/composer-repro）已收紧到 1024**。采集 耗时/prompt_tokens/completion_tokens/cached_tokens/成本（网关 pricing 实时读）。
-- 原始数据：`results/smoke.json`、`primary.json`(35格)、`gift.json`(12格)、`t3-repro.json`、`composer-repro.json`、`t7b.json`、`grok-repro.json`（**results/ 未入 git**，由 `.gitignore` 排除；复现靠重跑 `run-matrix.ps1` 与 `validate-offtask.ps1`）。
+- 原始数据：`results/smoke.json`、`primary.json`(35格)、`gift.json`(12格)、`t3-repro.json`、`composer-repro.json`、`t7b.json`、`grok-repro.json`（**results/ 未入 git**，由 `.gitignore` 排除；复现靠重跑 `run-matrix.ps1` 与 `validate-offtask-signal.py`）。
 - 局限：直连网关=**裸能力 + 池缓存行为**，无 DSH 端到端注入的大 system prompt、无工具调用、单轮。不代表真实多轮 agentic 会话成本。
 
 ---
@@ -233,5 +233,5 @@ pwsh run-matrix.ps1 -Suite primary           # 主池 5×7=35（max_tokens 已�
 pwsh run-matrix.ps1 -Suite gift              # 赠额 6×2，硬上限 $8
 ```
 - 成本表：脚本从 `/v1/models` 的 pricing **动态读取**（uncached/cacheRead/cacheWrite/completion 四项分别计价），pricing=null 的模型（composer-2.5 等）按池额度 0 计并在结果里标 `priced=false`。
-- 复现数据：`results/*.json` **未入 git**（`.gitignore` 排除，避免测试数据污染仓库）；旧 report 引用的 repro 文件由上面命令重跑生成，跑题正则验证另跑 `pwsh validate-offtask.ps1`。
+- 复现数据：`results/*.json` **未入 git**（`.gitignore` 排除，避免测试数据污染仓库）；旧 report 引用的 repro 文件由上面命令重跑生成，跑题正则验证另跑 `python validate-offtask-signal.py`。
 - 成本：主矩阵 grok 约 $0.38、composer 池额度；赠额整轮约 $0.065；复现约 $0.15（grok T3 三次较重）。

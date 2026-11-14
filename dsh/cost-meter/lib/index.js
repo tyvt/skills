@@ -30,13 +30,19 @@ function normalizeConfig(input) {
     // 单步 output 门槛 3k（2026-11-10 bug6369：step 46/49/50 单步 output ~10k，
     // 全耗在反复推翻自己的 reasoning 上——缺事实时不该脑内演算）。
     perStepOutputBudget: input?.perStepOutputBudget ?? 3_000,
-    // 纯文本且无工具调用：1500 即疑似自我辩论（有工具的长输出仍走 3k）。
-    bareReasoningBudget: input?.bareReasoningBudget ?? 1_500,
+    // 纯文本且无工具调用：3000 即疑似自我辩论（有工具的长输出仍走 3k）。
+    // 审计 A.3：2k 在多文件正常推理里很常见，会误报；提到 3000 与 perStepOutput 对齐，
+    // 只有真正开始空转（连续 2 步无工具且单步 >3k）才升级为硬指令。
+    bareReasoningBudget: input?.bareReasoningBudget ?? 3_000,
     sessionUncachedBudget: input?.sessionUncachedBudget ?? 3_000_000,
     // 比 800 万更早的两档。15 万 ≈ 10 个单步未命中预算，或约两步 65k 级 cache 重读（按 0.1 倍率）。
     // 100 万比现有 800 万低一个数量级，避免累计档只在会话末期响一次。
     sessionEquivEarly: input?.sessionEquivEarly ?? 150_000,
     sessionEquivMid: input?.sessionEquivMid ?? 1_000_000,
+    // 步数提醒门槛：单会话步数达到即提醒「评估收尾/无效步」。仅提醒不阻断。<=0 关闭。
+    stepReminderThreshold: input?.stepReminderThreshold ?? 120,
+    // ask_user 长等待门槛(毫秒)：一次 ask_user_question 耗时达到即在下步提醒。<=0 关闭。
+    askUserLongWaitMs: input?.askUserLongWaitMs ?? 300_000,
   };
 }
 
@@ -96,6 +102,11 @@ export function inspect(sessionId) {
   };
 }
 
+/** 测试与排查：最近一次 enabled apply 累计的会话条数（验证 LRU 上限）。 */
+export function inspectSize() {
+  return latestAcc?.size ?? 0;
+}
+
 /** P3-11：从 pre-step 的 messages 里取 user 文本，判断是否同时含「修改+验证+提交」三要素。 */
 export function hasIntentSignal(messages) {
   if (!Array.isArray(messages)) return false;
@@ -126,14 +137,37 @@ export function apply(ctx, rawConfig) {
   // sessionId -> { uncached, cacheRead, output, steps, absentSteps, fired:Set }
   const acc = new Map();
   latestAcc = acc;
+  // 会话级成本累计的 LRU 上限：长驻进程多会话时防无界增长。
+  // 用 LRU-by-touch：每次命中把 key 移到末尾；超容量淘汰最久未使用（空闲）会话。
+  // 活跃会话因持续被 touch 不会被淘汰，避免误清活跃会话成本；仅清理长期空闲会话。
+  const ACC_MAX_SESSIONS = 2000;
 
   const newAcc = () => ({
     uncached: 0, cacheRead: 0, output: 0, steps: 0, absentSteps: 0,
     lastUncached: 0, lastOutput: 0, lastBare: false, bareCount: 0, bigMissStreak: 0,
     committed: false, optimized: false, closing: false,
     todoWritten: false, edited: false, buildRan: false,
+    askPending: {}, askLongMs: 0,
     fired: new Set(),
   });
+
+  // 取会话累计账；命中则刷新 LRU（移到末尾），未命中则新建（超容量淘汰最久未用）。
+  const touchAcc = (id) => {
+    let a = acc.get(id);
+    if (a === undefined) {
+      if (acc.size >= ACC_MAX_SESSIONS) {
+        const oldest = acc.keys().next().value;
+        if (oldest !== undefined) acc.delete(oldest);
+      }
+      a = newAcc();
+      acc.set(id, a);
+    } else {
+      // 命中：delete+set 把该会话移到末尾，标记为最近使用（LRU）。
+      acc.delete(id);
+      acc.set(id, a);
+    }
+    return a;
+  };
 
   ctx.on("session/event", (session, event) => {
     if (event?.type !== "assistant/message") return;
@@ -141,11 +175,7 @@ export function apply(ctx, rawConfig) {
     if (!u) return;
     const id = session?.header?.id ?? session?.id;
     if (id === undefined) return;
-    let a = acc.get(id);
-    if (!a) {
-      a = newAcc();
-      acc.set(id, a);
-    }
+    let a = touchAcc(id);
     if (u.absent) {
       a.absentSteps += 1;
       return;
@@ -169,11 +199,7 @@ export function apply(ctx, rawConfig) {
   ctx.on("session/event", (session, event) => {
     const id = session?.header?.id ?? session?.id;
     if (id === undefined) return;
-    let a = acc.get(id);
-    if (!a) {
-      a = newAcc();
-      acc.set(id, a);
-    }
+    let a = touchAcc(id);
     const type = String(event?.type ?? "");
     const d = event?.data ?? {};
     const toolName = d.name ?? d.tool ?? d.toolName ?? "";
@@ -186,6 +212,20 @@ export function apply(ctx, rawConfig) {
     if (/\b(?:npm|pnpm|yarn)\b[^\n]*\b(?:build|lint|test)\b/i.test(blob)) a.buildRan = true;
     if (/pwsh/i.test(toolName) && /git\s+commit/.test(blob)) a.committed = true;
     if (/token-optimizer/.test(blob) || /token-optimizer/.test(toolName)) a.optimized = true;
+    // A2：ask_user_question 长等待计时（按 callId 关联 tool/call 与 tool/result，按会话 a 隔离）。
+    // 事件时间取 event.time/ts/timestamp/data.time；缺失则只用序号无法计时，忽略（不误报）。
+    const evTime = event?.time ?? event?.ts ?? event?.timestamp ?? d?.time ?? d?.ts;
+    const isToolCall = /tool[\/_]call/i.test(type) || /tool[\/_]call/i.test(String(d?.kind ?? ""));
+    const isToolResult = /tool[\/_]result/i.test(type) || /tool[\/_]result/i.test(String(d?.kind ?? ""));
+    const cid = d.callId ?? d.id ?? d.toolCallId ?? d.message?.toolCallId;
+    if (toolName === "ask_user_question" && isToolCall && cid != null && evTime != null) {
+      a.askPending[cid] = evTime;
+    }
+    if (isToolResult && cid != null && a.askPending[cid] != null && evTime != null) {
+      const dur = evTime - a.askPending[cid];
+      delete a.askPending[cid];
+      if (Number.isFinite(dur) && dur >= 0 && dur >= config.askUserLongWaitMs) a.askLongMs = dur;
+    }
     const reason = d.reason ?? d.status ?? "";
     if ((type === "turn/end" || type === "agent/turn-end" || type === "turn/completed") && reason === "completed" && a.committed && !a.optimized) {
       a.closing = true;
@@ -203,11 +243,7 @@ export function apply(ctx, rawConfig) {
   ctx.on("agent/pre-step", ({ agent, messages }, next) => {
     const id = agent?.session?.header?.id ?? agent?.session?.id;
     if (id === undefined) return next();
-    let a = acc.get(id);
-    if (!a) {
-      a = newAcc();
-      acc.set(id, a);
-    }
+    let a = touchAcc(id);
 
     const equiv = equivOf(a);
     const intentHit = !a.todoWritten && hasIntentSignal(messages);
@@ -225,7 +261,7 @@ export function apply(ctx, rawConfig) {
       ["perStepOutput", overOutput && !priorBare, outputText],
       ["perStepOutputAfterA", overOutput && priorBare, outputText],
       ["bareReasoning", a.lastBare && a.bareStreak < 2,
-        `[reasoning-watchdog] 上一步输出 ${fmt(a.lastOutput)} tokens 且无工具调用，疑似自我辩论。停止推演：调一次工具取事实，或直接下结论。`],
+        `[reasoning-watchdog] 上一步输出 ${fmt(a.lastOutput)} tokens 且无工具调用，疑似自我辩论。下一步第一件事必须是一次工具调用（grep 定位 / read offset / 一条 SQL / mcp_gateway），拿到一条事实再继续；若确实已经能下结论，就直接收尾，不要再权衡 Option 1/2/3。`],
       // 审计 P0：连续第 2 个纯推理步起升级为硬指令。插件层无法真正下调 reasoningEffort
       // （reasoningEffort 在 turn 开始时已固定，pre-step 只能在 enter/reject 间选），
       // 所以这里用「下一步第一件事必须是工具调用」把空转截断在行为层。
@@ -245,21 +281,32 @@ export function apply(ctx, rawConfig) {
         `[cost-meter] 本会话等效成本 ${fmt(equiv)}（>${fmt(config.sessionEquivMid)}）。已明显高于单步预算，准备收尾或换会话。`],
       ["sessionEquiv", equiv > config.sessionEquivBudget,
         `[cost-meter] 本会话等效成本 ${fmt(equiv)}（>${fmt(config.sessionEquivBudget)}，含 ${a.steps} 步）。接近收尾线：尽快给出结论或拆分到新会话，别用 compaction 硬撑。`],
+      ["stepGuard", config.stepReminderThreshold > 0 && a.steps >= config.stepReminderThreshold,
+        `[step-guard] 本会话已 ${a.steps} 步（≥${config.stepReminderThreshold}）。请评估：是否有无效步（重复整读/工具错误自愈/无进展循环）？是否该收尾或换会话？仅提醒，不强制中断。`],
+      ["askWait", a.askLongMs > 0,
+        `[ask-wait] 上一次 ask_user_question 等待约 ${Math.round(a.askLongMs / 1000)}s（≥${Math.round(config.askUserLongWaitMs / 1000)}s）：用户可能离开或决策复杂。下次尽量先查全事实、一次问清多个待定项并给默认选项，减少长等待。`],
     ];
+    // 已消费的长等待记录清零，允许之后再次触发一次提醒。
+    if (a.askLongMs > 0) a.askLongMs = 0;
     // 只看上一步的规则：每步都可能再超，不能被会话级 fired 吞掉。
     const repeatable = new Set(["perStepOutput", "perStepOutputAfterA", "bareReasoning", "bareReasoningEscalate", "perStepLookup"]);
-    const extra = [];
+    const fired = [];
     for (const [key, hit, text] of checks) {
       if (!hit) continue;
       if (!repeatable.has(key) && a.fired.has(key)) continue;
       a.fired.add(key);
-      extra.push(notice(text, `cost-meter ${key}`));
+      fired.push({ key, text });
     }
-    if (extra.length === 0) return next();
+    if (fired.length === 0) return next();
+    // 审计 A.1：不要每步插多条 user message。把本步命中的检查**合并成一条** user 消息，
+    // 既省 message 数、也少占 cache 位置；summary 列出全部命中的 key 便于排查。
+    const summary = fired.map((f) => `cost-meter ${f.key}`).join(",");
+    const mergedText = fired.map((f) => f.text).join("\n");
+    const merged = notice(mergedText, summary);
     return next().then((decision) => {
       if (decision?.kind && decision.kind !== "enter") return decision;
       const base = decision?.messages ?? messages ?? [];
-      return { ...(decision ?? {}), kind: "enter", messages: [...base, ...extra] };
+      return { ...(decision ?? {}), kind: "enter", messages: [...base, merged] };
     });
   });
 }

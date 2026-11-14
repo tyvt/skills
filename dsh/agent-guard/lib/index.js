@@ -126,6 +126,14 @@ function deepFreeze(value) {
  * @param {object} ctx - cordis 上下文。
  * @param {object} config - 已由 {@link Config} 收敛过的配置。
  */
+/** 测试与排查：最近一次 apply 的会话级 Map（读/ask 历史），用于验证 FIFO 上限。 */
+let lastSessionMaps = null
+export function inspectSessionSizes() {
+  return lastSessionMaps
+    ? { reads: lastSessionMaps.reads.size, asks: lastSessionMaps.asks.size }
+    : { reads: 0, asks: 0 }
+}
+
 export function apply(ctx, config) {
   const ledgerPath = path.isAbsolute(config.ledgerPath)
     ? config.ledgerPath
@@ -171,6 +179,11 @@ export function apply(ctx, config) {
   const sessionReads = new Map()
   // ask-guard（P0-1）按 session 记录 ask 历史：{ asks: [{ phase, text }] }。
   const sessionAsks = new Map()
+  // 会话级 Map 的 FIFO 上限（防长驻进程多会话无界增长）。与 sessionDrift 同款：插入序最旧淘汰。
+  // 淘汰只丢该会话的读取/ask 历史，可由后续事件重建，安全。
+  const MAP_MAX_SESSIONS = 200
+  // 测试与排查：暴露最近一次 apply 的会话级 Map（供 selftest 断言淘汰上限）。
+  lastSessionMaps = { reads: sessionReads, asks: sessionAsks }
   // 探索漂移（explore-drift-guard-20261113 M1）按 session 记录形态信号。
   // LRU 上限防无界增长（审核 P1-3）：超出按最旧插入序淘汰整个会话状态。
   const sessionDrift = new Map()
@@ -197,6 +210,10 @@ export function apply(ctx, config) {
     const sessionId = exec?.agent?.session?.header?.id ?? 'anon'
     let state = sessionReads.get(sessionId)
     if (state === undefined) {
+      if (sessionReads.size >= MAP_MAX_SESSIONS) {
+        const oldest = sessionReads.keys().next().value
+        if (oldest !== undefined) sessionReads.delete(oldest)
+      }
       state = new Map()
       sessionReads.set(sessionId, state)
     }
@@ -304,6 +321,10 @@ export function apply(ctx, config) {
         const sessionId = exec?.agent?.session?.header?.id ?? 'anon'
         let askState = sessionAsks.get(sessionId)
         if (askState === undefined) {
+          if (sessionAsks.size >= MAP_MAX_SESSIONS) {
+            const oldest = sessionAsks.keys().next().value
+            if (oldest !== undefined) sessionAsks.delete(oldest)
+          }
           askState = { asks: [] }
           sessionAsks.set(sessionId, askState)
         }
@@ -476,6 +497,9 @@ export function apply(ctx, config) {
 
   // ── 2. 供应商失败后的额外恢复 ────────────────────────────────────────────
   // 内建 llm-retry 先跑；它放弃（预算用尽 / 失败码不匹配）时才会走到这里。
+  // 注意：attempts 的 key 是 `provider|turn|step`，是**单步内 llm-retry 升级计数**（非会话累计预算）。
+  // 这里刻意不做 FIFO/淘汰：淘汰会把某步的升级计数归零、使其超出预期恢复预算（削弱限流语义）。
+  // 其增长受「出错步数」天然约束（每步最多几条），长驻进程下量级可控，暂不处理。
   const attempts = new Map()
   ctx.on('agent/request-error', async (payload, next) => {
     if (!config.enabled || !config.recovery.enabled) return next()

@@ -1,7 +1,7 @@
 // cost-meter 自测：验证 usage 累加、阈值触发一次、注入到 messages。
 import assert from 'assert';
 import fs from 'fs';
-import { apply, inspect, name, hasIntentSignal } from './lib/index.js';
+import { apply, inspect, inspectSize, name, hasIntentSignal } from './lib/index.js';
 
 const user = (text) => ({ role: 'user', content: text });
 assert.equal(hasIntentSignal([user('修改组件，验证后提交并推送')]), true);
@@ -75,7 +75,7 @@ onRule(onlyTool, toolMsg(4000));
 let b = await preRule({ agent: { session: onlyTool }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
 assert.ok(!texts(b).includes('下一步第一件事'), 'tool-only over-output does not demand a tool');
 const afterA = { header: { id: 'rule-b-after-a' } };
-onRule(afterA, textMsg(2000));
+onRule(afterA, textMsg(3200));
 onRule(afterA, toolMsg(4000));
 b = await preRule({ agent: { session: afterA }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
 assert.ok(texts(b).includes('下一步第一件事必须是工具调用'), 'after rule A, over-output demands a tool');
@@ -115,6 +115,24 @@ onRule(buildRan, { type: 'tool/use', data: { name: 'edit', arguments: { path: 'a
 onRule(buildRan, { type: 'tool/use', data: { name: 'pwsh', arguments: { command: 'npm run build' } } });
 b = await preRule({ agent: { session: buildRan }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
 assert.ok(!texts(b).includes('[build-gate]'), 'running build suppresses build-gate');
+
+// ---- LRU 淘汰：活跃会话不被淘汰、总数受 ACC_MAX_SESSIONS(2000) 约束 ----
+{
+  const h2 = [];
+  const ctx2 = { on(evt, fn) { if (evt === 'session/event') h2.push(fn); } };
+  apply(ctx2, { enabled: true });
+  const fire = (sid, n) => { for (const f of h2) f({ header: { id: sid } }, { type: 'assistant/message', data: { content: [{ type: 'text', text: 'x' }], usage: { uncachedInputTokens: 1, cacheReadTokens: 0, outputTokens: n } } }); };
+  fire('hot-A', 100);
+  for (let i = 0; i < 2500; i++) {
+    fire('s' + i, 1);
+    if (i % 100 === 0) fire('hot-A', 1); // 持续 touch 保持最近使用
+  }
+  assert.ok(inspectSize() <= 2000, 'acc size 受 2000 上限约束，实际=' + inspectSize());
+  assert.ok(inspect('hot-A'), '活跃会话 hot-A 未被淘汰');
+  assert.equal(inspect('s0'), undefined, '最早插入的空闲会话 s0 已被淘汰');
+  assert.ok(inspect('s2499'), '最新插入会话仍在');
+  console.log('cost-meter selftest: LRU eviction PASS (size=' + inspectSize() + ')');
+}
 
 // 夹具：session.v4.jsonl 的真实 assistant/message，不手写 usage。
 const logPath = 'C:/Users/Administrator/Downloads/session.v4.jsonl';
@@ -175,7 +193,7 @@ assert.equal(got286.absentSteps, 0);
 const bareS = { header: { id: 'bare-streak' } };
 const bareMsg = (n) => ({ type: 'assistant/message', data: { content: [{ type: 'text', text: 'x' }], usage: { uncachedInputTokens: 1, cacheReadTokens: 0, outputTokens: n } } });
 const preBare = (res) => (res.messages ?? []).map((m) => m.source?.summary ?? '');
-onRule(bareS, bareMsg(3000));
+onRule(bareS, bareMsg(3200));
 b = await preRule({ agent: { session: bareS }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
 assert.ok(preBare(b).includes('cost-meter bareReasoning'), '1st bare step: soft reasoning-watchdog');
 assert.ok(!preBare(b).includes('cost-meter bareReasoningEscalate'), '1st bare step: no escalation yet');
@@ -185,7 +203,7 @@ assert.ok(preBare(b).includes('cost-meter bareReasoningEscalate'), '2nd consecut
 assert.ok(!preBare(b).includes('cost-meter bareReasoning'), '2nd bare step: soft notice replaced by escalation');
 // 出现工具调用即清零 streak，回到软提示。
 onRule(bareS, toolMsg(4000));
-onRule(bareS, bareMsg(3000));
+onRule(bareS, bareMsg(3200));
 b = await preRule({ agent: { session: bareS }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
 assert.ok(preBare(b).includes('cost-meter bareReasoning') && !preBare(b).includes('bareReasoningEscalate'), 'tool call resets bare streak');
 console.log('cost-meter selftest: ALL PASS (bare escalation)');

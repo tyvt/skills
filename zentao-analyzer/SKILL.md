@@ -22,7 +22,6 @@ description: 禅道 Bug/任务分析与回写。给定禅道链接时拉取详�
 | 脚本 | 作用 |
 | --- | --- |
 | `zentao-resolve.mjs` | 打印回写事务序列（不执行） |
-| `zentao_fetch.py` / `zentao_resolve.py` | Web 登录路径，已被强制改密挡住，不要用 |
 | `yapi_fetch.py` | 从 YApi 拉接口定义 |
 | `zentao_html.py` | 抓取的 HTML 转纯文本 |
 

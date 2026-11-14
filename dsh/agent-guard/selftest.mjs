@@ -7,6 +7,7 @@ import assert from 'node:assert/strict'
 import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift } from './lib/rules.js'
 import { decideInterception } from './lib/scope.js'
 import { evaluateAsk } from './lib/ask-guard.js'
+import { apply, inspectSessionSizes, Config } from './lib/index.js'
 
 let passed = 0
 let failed = 0
@@ -765,6 +766,23 @@ test('全部已带 id 时不改动', () => {
   const repairs = repairArguments({ toolName: 'ask_user_question', args }).repairs
   assert.ok(!repairs.some((r) => r.rule === 'ask-user-id'))
 })
+
+// --- apply：sessionReads FIFO 上限（MAP_MAX_SESSIONS=200）---
+{
+  const guarded = []
+  const handlers = {}
+  const ctx = {
+    tools: { guard(fn) { guarded.push(fn); return () => {} } },
+    on(evt, fn) { handlers[evt] = fn },
+    logger: { info() {}, warn() {} },
+  }
+  apply(ctx, Config['~standard'].validate({ enabled: true, ledgerPath: './ag-selftest-ledger.jsonl' }).value)
+  const fire = (sid) => guarded[0]({ name: 'read', arguments: { file_path: 'x.ts' }, agent: { session: { header: { id: sid } } } })
+  for (let i = 0; i < 250; i++) fire('rg' + i)
+  const sizes = inspectSessionSizes()
+  assert.ok(sizes.reads <= 200, 'sessionReads size 受 200 上限约束，实际=' + sizes.reads)
+  console.log(`agent-guard: sessionReads FIFO eviction PASS (size=${sizes.reads})`)
+}
 
 console.log(`\n${failed === 0 ? 'PASS' : 'FAIL'}  passed=${passed} failed=${failed}\n`)
 process.exit(failed === 0 ? 0 : 1)

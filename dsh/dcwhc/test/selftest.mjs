@@ -24,7 +24,7 @@ import { claimInbound as upstreamClaim } from '../lib/upstream-hook.mjs'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { cachedContext } from '../lib/context-store.mjs'
+import { cachedContext, rememberContext } from '../lib/context-store.mjs'
 process.env.DSH_HOME = mkdtempSync(join(tmpdir(), 'dsh-wechat-selftest-'))
 
 let failures = 0
@@ -185,6 +185,22 @@ async function main() {
     const target = session('session-aaaaaaaaaaaa-bbbb')
     check('观察消息不抢占聊天', upstreamClaim({ accountId: '6f77@im.bot', peerId: 'me@im.bot', contextToken: 'persisted-context', observeOnly: true }) === false)
     check('缓存不串 bot 账号', cachedContext('another-bot', 'me@im.bot') === undefined)
+
+    // --- context-store 条目上限 200（按 receivedAt 最旧淘汰）---
+    // 用独立临时 DSH_HOME，避免污染后续用例依赖的持久化令牌。
+    {
+      const savedHome = process.env.DSH_HOME
+      process.env.DSH_HOME = mkdtempSync(join(tmpdir(), 'dsh-ctxstore-'))
+      try {
+        for (let i = 0; i < 260; i++) rememberContext({ accountId: 'acc' + i, peerId: 'peer', contextToken: 'tok' + i })
+        check('context 最近条目仍可读', cachedContext('acc259', 'peer') === 'tok259')
+        check('context 最早条目已淘汰', cachedContext('acc0', 'peer') === undefined)
+        rememberContext({ accountId: 'acc259', peerId: 'peer', contextToken: 'tok259b' })
+        check('context 同 bot 同 peer 覆盖不重复', cachedContext('acc259', 'peer') === 'tok259b')
+      } finally {
+        process.env.DSH_HOME = savedHome
+      }
+    }
 
     harness.fire('session/event', target, { type: 'turn/start', data: { turn: 1 } })
     harness.fire('session/event', target, assistant('我把配置改好了。'))
