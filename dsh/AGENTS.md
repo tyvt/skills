@@ -67,7 +67,7 @@
 ## 禁止
 
 - 未知具体路径时，禁止全仓 `grep` / `read`；禁止 `src/**` 全量 grep，先缩到具体模块。
-- 找不到文件先 `mcp__openviking__search`（`mode=context`，`detail=abstract`）。不要把 `viking://` 当磁盘路径读。
+- 找不到文件/开始排障/设计出方案前，先 `mcp__openviking__search`（`mode=context`，`detail=abstract`）查历史是否处理过、是否已有结论，再考虑 grep/glob 或直接动手。不要把 `viking://` 当磁盘路径读。
 - DBX 长文本读不全时改 `git log` 或 `UNION ALL` 分段（细则在 `zentao-analyzer` 的 `references/dbx.md`），禁止同一形态连试三次。
 - 禁止提交 `env/.env` 与 `public/version.json`。`git pull` / `git rebase` 前先 `git status --short <子模块路径>`，脏的环境文件先 stash。**多子模块/需限定范围时禁止裸 `git status`（无范围）——易回灌大量未跟踪文件；根仓或已带 `git -C <dir>` 可裸用（R5 hook `bare-git-status` 会告警，见 agent-guard）。**
 - 自动化环境的 `git commit` / `rebase --continue` / `merge` 必须先设 `GIT_EDITOR=true`。
