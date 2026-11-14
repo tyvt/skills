@@ -169,6 +169,23 @@ tools:
     # 审核需要通读整份计划并逐条给结论，放宽超时。
     timeout: 300
 
+  # 验证器（node_verify 专用，不进规划工具列表）。任务执行结束后核对「验证证据是否
+  # 真正证明了结果」：逐改动步比对其声明的 verify.kind 与 run 级 evidence_pool 的实际产出。
+  # grok-4.7 走 cursor 通道（与 headless 停用 cursor 作 planner/editor 不冲突）。
+  # 必须实测 deepseek 兜底 failover：cursor 网关抽风时自动落 workbuddy/deepseek-v4.1-flash，
+  # 否则会因 verified=false 让所有任务卡死（见 .plan/orchestrator-verification-gate-20261114.md）。
+  verifier:
+    description: 高级验证员，核对执行结果是否被证据真正证明，只输出 JSON（node_verify 专用）。
+    models:
+      - model: cursor/grok-4.7@256k
+        max_tokens: 4096
+      - model: workbuddy/deepseek-v4.1-flash
+        max_tokens: 4096
+      - model: auto/deepseek-v4.1-flash
+        max_tokens: 4096
+    max_tokens: 4096
+    timeout: 120
+
   git:
     description: >
       本地只读 Git 摘要，不经模型。默认只执行 git status --short 与 git diff --stat，

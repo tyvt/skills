@@ -183,7 +183,7 @@ def _stub_graph(monkeypatch):
     monkeypatch.setattr(api, 'build_graph', lambda *_: object())
     monkeypatch.setattr(api, 'load_environment', lambda *_: {'cwd': 'wrong', 'env': {}})
     monkeypatch.setattr(api, 'run_orchestration',
-                        lambda app, request, start: {'final': 'ok', 'results': [{'ok': True}]})
+                        lambda app, request, start: {'final': 'ok', 'results': [{'ok': True}], 'verify': {'verified': True}})
     monkeypatch.setattr(api, '_append_costs', lambda *_: None)
     monkeypatch.setattr(api, 'save_environment', lambda *_: None)
 
@@ -196,7 +196,7 @@ def test_full_pins_cwd_and_failed_steps(monkeypatch, tmp_path):
     monkeypatch.setattr(api, 'load_environment', lambda *_: {'cwd': 'wrong', 'env': {}})
     def execute(app, request, start):
         assert start['cwd'] == str(tmp_path.resolve())
-        return {'final': 'looks successful', 'results': [{'ok': False}]}
+        return {'final': 'looks successful', 'results': [{'ok': False}], 'verify': {'verified': True}}
     monkeypatch.setattr(api, 'run_orchestration', execute)
     monkeypatch.setattr(api, '_append_costs', lambda *_: None)
     monkeypatch.setattr(api, 'save_environment', lambda *_: pytest.fail('failed execution must not save environment'))

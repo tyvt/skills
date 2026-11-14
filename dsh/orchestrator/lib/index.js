@@ -336,6 +336,13 @@ function renderResult(result, verbose) {
       result.steps.forEach((s, i) =>
         lines.push(`  ${i + 1}. ${s.tool} model=${s.model_used} ok=${s.ok}`))
     }
+    if (result.verify) {
+      const v = result.verify
+      lines.push(`验证: ${v.verified ? 'PASS' : 'FAIL'}${v.reason ? ` — ${v.reason}` : ''}`)
+      if (Array.isArray(v.gaps) && v.gaps.length) {
+        lines.push('  缺口: ' + v.gaps.join('; '))
+      }
+    }
     lines.push('')
   }
   lines.push(result.final || result.error || '(无结果)')

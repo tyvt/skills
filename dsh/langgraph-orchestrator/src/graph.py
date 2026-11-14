@@ -50,6 +50,8 @@ class OrchState(TypedDict, total=False):
     guard: Dict[str, Any]                # {allow, reason}
     session_id: str                      # 路由/跑题日志共用
     route_source: str                    # 见 ROUTE_* 常量
+    verify: Dict[str, Any]               # {verified, reason, gaps} —— node_verify 结果
+    evidence_pool: List[Dict[str, Any]]  # run 级证据池 [{kind, step, evidence}]，dispatch 循环 append
 
 
 PLANNER_SYSTEM = """你是一个任务规划器。把用户需求拆成有序步骤，最少 1 步，最多 5 步。
@@ -69,8 +71,15 @@ Measure-Object / Compare-Object / 管道循环）就能交付的，必须只出 
 重要：要读取/查看磁盘上的本地文件内容，必须用 pwsh 工具执行 Get-Content 等命令；
 file_reader / code_editor / code_edit_with_signal 是纯文本摘要/生成器，没有本地磁盘读取权限，
 不能用来读取文件。
+【硬约束四：改动类步骤必须带验证方案】凡 step 会写/改代码、UI 或纯逻辑（tool 为 code_editor /
+code_edit_with_signal，或 pwsh 含写/改/创建/删除/重构/修复/实现意图），该 step **必须**额外带
+"verify" 字段声明如何验证：{{"kind": "e2e"|"ui_screenshot"|"unit"|"mixed", "target": "跑什么/看什么",
+"evidence": "期望产出（测试 stdout 关键字 / 截图路径）"}}。前端改动用 e2e、UI 视觉用 ui_screenshot、
+纯逻辑用 unit、混合改动覆盖多类。并**另起一个测试/截图步骤**（pwsh 跑测试或截图）来真正产出该证据，
+编辑步只声明验收标准。纯问答 planner step 不需要 verify。
 只输出一个 JSON 数组，形如:
-[{{"tool": "工具名", "instruction": "具体做什么"}}]
+[{{"tool": "工具名", "instruction": "具体做什么", "verify": {{"kind": "...", "target": "...", "evidence": "..."}}}}]
+（verify 仅改动类步骤需要，其余步骤省略该键）
 禁止输出任何解释、前言、Markdown 或多余文字。"""
 
 # 「有可执行验证信号」触发词的唯一定义源。
@@ -401,6 +410,52 @@ def _extract_json_object(text: str) -> Optional[dict]:
     except json.JSONDecodeError:
         return None
     return data if isinstance(data, dict) else None
+
+
+# 允许的验证类型
+VERIFY_KINDS = {"e2e", "ui_screenshot", "unit", "mixed"}
+
+
+def _step_is_change(step: Dict[str, Any]) -> bool:
+    """改动类 step：代码/有信号/pwsh 且指令含写意图。pv纯问答 planner 不算。"""
+    tool = (step.get("tool") or "").strip()
+    if tool in {"code_editor", "code_edit_with_signal"}:
+        return True
+    if tool == "pwsh":
+        instr = step.get("instruction") or ""
+        return any(k in instr for k in ("写", "改", "创建", "删除", "重构", "修复", "实现"))
+    return False
+
+
+def _step_verify_kinds(step: Dict[str, Any]) -> List[str]:
+    """取该 step 声明的 verify.kind（mixed 展开为其声明覆盖的多类，简化处理为 ['mixed']）。"""
+    v = step.get("verify")
+    if not isinstance(v, dict):
+        return []
+    kind = v.get("kind")
+    return [kind] if kind else []
+
+
+def _normalize_verify(obj: Optional[dict], verified_evidence_kinds: List[str],
+                      declared_kinds: List[str]) -> Dict[str, Any]:
+    """把 verifier 输出归一化为 {verified, reason, gaps}，并做一致性裁决。
+
+    fail-closed：非 dict / 缺字段 -> verified=False。
+    verified 需同时满足模型判 true 且声明的每个 kind 都在 evidence 中出现过。
+    """
+    if not isinstance(obj, dict):
+        return {"verified": False, "reason": "verifier 输出非 JSON，fail-closed", "gaps": []}
+    model_true = obj.get("verified") is True
+    gaps = obj.get("gaps") or []
+    if not isinstance(gaps, list):
+        gaps = [str(gaps)]
+    # 一致性：声明了但 evidence 里没有的 kind 计为缺口
+    missing = [k for k in declared_kinds if k != "mixed" and k not in verified_evidence_kinds]
+    if missing:
+        gaps = list(gaps) + [f"缺少 {k} 类验证证据" for k in missing]
+    verified = bool(model_true) and not missing
+    reason = str(obj.get("reason") or ("验证通过" if verified else "验证未通过"))
+    return {"verified": verified, "reason": reason, "gaps": gaps}
 
 
 def _default_env(state: OrchState) -> Dict[str, Any]:
@@ -1372,12 +1427,108 @@ def build_graph(router: ModelRouter, cfg):
             final = f"[未摘要·失败原因:{reason}·池:summarizer]\n{tail}"
         return {"final": final, "trace": trace, "model_calls": calls}
 
+    def node_verify(state: OrchState) -> OrchState:
+        """验证节点：核对改动步声明的 verify 是否被 run 级 evidence_pool 真正证明。
+
+        - 证据按 run 聚合：测试/截图类 step（verify.kind∈{e2e,ui_screenshot,unit}）
+          的实际 stdout/截图路径汇入 evidence_pool；编辑步自身无 verify_evidence 属正常。
+        - 逐改动步：声明的每个 kind 必须在 evidence_pool 找到同 kind 实际产出，否则不达标。
+        - fail-closed：verifier 超时/非 JSON/空 results -> verified=false。
+        """
+        plan = state.get("plan", []) or []
+        results = state.get("results", []) or []
+        trace = list(state.get("trace", []))
+        calls = list(state.get("model_calls", []))
+
+        # 1) 构建 run 级 evidence_pool：从各 step 的 verify.kind + 对应 result 内容采集
+        pool: List[Dict[str, Any]] = []
+        for i, step in enumerate(plan):
+            kinds = _step_verify_kinds(step)
+            if not kinds:
+                continue
+            # 该 step 是测试/截图类（不是改动类自证）：其产出即证据
+            if _step_is_change(step) and not (set(kinds) & {"e2e", "ui_screenshot", "unit"}):
+                continue
+            if i < len(results):
+                content = results[i].get("content") or ""
+                for k in kinds:
+                    if k in {"e2e", "ui_screenshot", "unit"}:
+                        pool.append({"kind": k, "step": i, "evidence": content[:4000]})
+
+        evidence_kinds = sorted({e["kind"] for e in pool})
+        declared_kinds: List[str] = []
+        for step in plan:
+            for k in _step_verify_kinds(step):
+                if k and k not in declared_kinds:
+                    declared_kinds.append(k)
+
+        # 没有任何改动步声明 verify -> 无验证要求，视为通过（纯问答任务）
+        change_steps = [s for s in plan if _step_is_change(s)]
+        if not change_steps:
+            trace.append("verify skipped: 无改动步，免验证")
+            return {"verify": {"verified": True, "status": "passed", "reason": "无改动步，无需验证", "gaps": []},
+                    "evidence_pool": pool, "trace": trace}
+
+        # 无证据但有改动步 -> fail-closed，直接不通过，不浪费一次模型调用
+        if not pool:
+            gaps = [f"改动步声明了验证但无任何 {k} 类证据" for k in declared_kinds] or ["无验证证据"]
+            trace.append("verify FAIL (fail-closed): 有改动步但 evidence_pool 为空")
+            return {"verify": {"verified": False, "status": "failed", "reason": "无验证证据，fail-closed", "gaps": gaps},
+                    "evidence_pool": pool, "trace": trace}
+
+        # 2) 交 verifier 池核对
+        evidence_brief = "\n".join(
+            f"- [{e['kind']}] 步{e['step']}: {e['evidence'][:800]}" for e in pool
+        )
+        plan_brief = "\n".join(
+            f"步{i} [{s.get('tool')}] {s.get('instruction','')} | verify={s.get('verify')}"
+            for i, s in enumerate(plan)
+        )
+        res = router.run_tool(
+            "verifier",
+            [
+                {"role": "system", "content": (
+                    "你是高级验证员。判断执行步骤的『验证是否真正证明了改动结果』。"
+                    "对照改动步声明的 verify（应验什么）与实际证据（测试输出/截图），"
+                    "只有证据真实覆盖了声明才算通过。只输出 JSON："
+                    '{"verified": true或false, "reason": "一句话", "gaps": ["缺失项"]}。'
+                )},
+                {"role": "user", "content": (
+                    f"用户需求：{state['user_request']}\n\n计划步骤：\n{plan_brief}\n\n"
+                    f"实际验证证据：\n{evidence_brief}"
+                )},
+            ],
+        )
+        obj = _extract_json_object(res.content) if res.ok else None
+        verify = _normalize_verify(obj, evidence_kinds, declared_kinds)
+        # 区分两类失败：
+        # - 基础设施失败（verifier 模型调用失败/非 JSON）：status=error，不粗暴否定业务结果，
+        #   由 run_full 标记为异常、保留业务成功，但 verified 仍为 False（无法证明，不放行提交）。
+        # - 业务验证不通过（证据不足/缺口）：status=failed，业务结果判为未通过。
+        if not res.ok or obj is None:
+            verify["status"] = "error"
+            verify["reason"] = f"验证基础设施异常（verifier {res.model_used} ok={res.ok}）: {verify.get('reason','')}"
+        elif verify.get("verified"):
+            verify["status"] = "passed"
+        else:
+            verify["status"] = "failed"
+        calls.append({
+            "role": "verify", "tool": "verifier", "model": res.model_used, "ok": res.ok,
+            "elapsed": _elapsed(res), "usage": _usage_dict(res),
+        })
+        trace.append(
+            f"verify via {res.model_used} ok={res.ok} status={verify['status']} "
+            f"verified={verify['verified']} evidence_kinds={evidence_kinds} declared={declared_kinds}"
+        )
+        return {"verify": verify, "evidence_pool": pool, "trace": trace, "model_calls": calls}
+
     g = StateGraph(OrchState)
     g.add_node("node_plan", node_plan)
     g.add_node("node_dispatch", node_dispatch)
     g.add_node("node_security_guard", node_security_guard)
     g.add_node("node_execute", node_execute)
     g.add_node("node_summarize", node_summarize)
+    g.add_node("node_verify", node_verify)
 
     g.set_entry_point("node_plan")
     g.add_edge("node_plan", "node_dispatch")
@@ -1386,7 +1537,8 @@ def build_graph(router: ModelRouter, cfg):
     g.add_conditional_edges(
         "node_execute", should_continue, {"dispatch": "node_dispatch", "summarize": "node_summarize"}
     )
-    g.add_edge("node_summarize", END)
+    g.add_edge("node_summarize", "node_verify")
+    g.add_edge("node_verify", END)
     return g.compile()
 
 

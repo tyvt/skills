@@ -41,6 +41,9 @@ _PLAN_REVIEW_SYSTEM = (
     "- P1（重要但不阻断）：影响质量/可维护性，可在实施中处理（如验证偏弱、边界未覆盖）。\n"
     "- P2（建议）：措辞、排版、可优化项。\n"
     "【灰区】拿不准是 P0 还是 P1 的，一律判 P1，并在该条文本末尾标注「（灰区，待人确认）」。\n"
+    "【验证方案强制】计划必须为改动类步骤声明验证方案（verify）：前端→e2e、UI 视觉→ui_screenshot、纯逻辑→unit、混合→覆盖多类。"
+    "只有「改动类步骤完全缺失 verify」或「verify.kind 与改动明显矛盾（如纯前端却只写 unit 且无 e2e/截图）」记 P0 → reject；"
+    "覆盖某类的轻微遗漏记 P1 不阻断，避免门禁误伤把正常流程卡死。\n"
     "【判定】verdict=reject 当且仅当存在 P0 问题；P1/P2 一律判 pass。score 仅作参考，不参与判定。\n"
     "最多列3个阻断项，每项text不超过180字；建议最多3条且每条不超过100字。不要复述计划或输出全文。\n"
     "【审核重点】聚焦：是否漏关键文件/依赖、边界（空值/并发/异常）是否处理、验证计划是否覆盖改动风险点。\n"
@@ -552,18 +555,41 @@ def run_full(request: str, config_path: str = DEFAULT_CFG, session_id: str = "",
     state = run_orchestration(app, request, start)
     ctx = state.get("environment_context") or {}
     results = state.get("results") or []
-    succeeded = bool(state.get("final")) and all(isinstance(step, dict) and step.get("ok") is True for step in results)
-    if succeeded:
+    verify = state.get("verify") or {}
+    base_ok = bool(state.get("final")) and all(isinstance(step, dict) and step.get("ok") is True for step in results)
+    verify_status = verify.get("status") or ("passed" if verify.get("verified") else "failed")
+    verified = verify.get("verified") is True
+    # 业务执行结果：以各步执行是否成功为准（不被验证基建异常否掉）。
+    business_ok = base_ok
+    # 最终 ok：
+    # - verify passed：业务与验证都通过 -> ok
+    # - verify failed（业务验证不通过，代码/证据不达标）：业务结果不算最终通过 -> ok=False
+    # - verify error（验证基建失败：模型超时/网关/非JSON）：不粗暴否定业务成功，保留 business_ok，
+    #   但标记 anomaly，且 verified 仍为 False（无法证明，不放行提交）。
+    if verify_status == "error":
+        ok = business_ok
+        anomaly = True
+    else:
+        ok = business_ok and verified
+        anomaly = False
+    # 验证门禁：无论成败都写 _review.json；仅当真正 verified 才 verified=true（error/failed 均 false）。
+    _write_review_marker(root, session_id, verified, verify)
+    if ok and not anomaly:
         save_environment(session_id, ctx, root)
     calls = state.get("model_calls", [])
     _append_costs(session_id, calls)
     usage = state.get("usage_totals") or _sum_usage(calls)
     return {
         "mode": "full",
-        "ok": succeeded,
+        "ok": ok,
+        "business_ok": business_ok,
+        "verified": verified,
+        "verify_status": verify_status,
+        "anomaly": anomaly,
         "final": state.get("final", ""),
         "plan": state.get("plan", []),
         "steps": state.get("results", []),
+        "verify": verify,
         "trace": state.get("trace", []),
         "model_calls": calls,
         "usage": usage,
@@ -573,6 +599,30 @@ def run_full(request: str, config_path: str = DEFAULT_CFG, session_id: str = "",
         "workdir": root,
         "workdir_source": source,
     }
+
+
+def _write_review_marker(root: str, session_id: str, verified: bool, verify: Dict[str, Any]) -> None:
+    """把验证结论写入 workdir/_review.json（成败都写）。
+
+    关键：固化被验证文件的 paths[] 与内容哈希；后续 commit 门禁按 paths[] 重算，
+    绝不用 git status 现算（commit 后文件离开 status 会误判）。
+    """
+    try:
+        from .verify import REVIEW_FILE, compute_content_sha
+        paths, content_sha = compute_content_sha(root)
+        marker = {
+            "verified": bool(verified),
+            "session_id": _session_key(session_id) or "",
+            "run_ts": time.time(),
+            "paths": paths,
+            "content_sha": content_sha,
+            "reason": (verify or {}).get("reason", ""),
+            "gaps": (verify or {}).get("gaps", []),
+        }
+        path = Path(root) / REVIEW_FILE
+        path.write_text(json.dumps(marker, ensure_ascii=False), encoding="utf-8")
+    except Exception as exc:  # 写标记失败不应阻断编排返回，但需记录
+        _LOGGER.warning("write _review.json failed: %s", exc)
 
 
 def _append_costs(session_id: str, calls: list) -> None:
