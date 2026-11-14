@@ -79,3 +79,16 @@ title: P1(A) 批 2 — 裁剪 session_query + workflow（profile 级）
 - 已实施：`~/.dsh/profiles/web/cordis.patch.yml` 顶层追加 `- id: optional-tool-session-query / disabled: true`（备份 `.bak-b2sq-20261114152739`）。
 - `--dump-config` 验证：`optional-tool-session-query` = `disabled: true`，无 patch 错误，full-tools 仍在；YAML 合法（24 条）；语义 diff 0 删除行。
 - **live 验证待重启 + 新会话**：断言 A=新会话 tools 无 `session_search`/`session_event_search`/`session_trace`/`session_event_trace`/`session_event_read`（dsh-tool-session-query 注册的全部 5 个）；B'=team_task/spawn/pwsh/read/edit/grep/glob/mcp_gateway 仍在；预计 toolsTokens 降 ≈1,254。
+
+## 九、session_query live 验证结果 + workflow 意外解决（2026-11-14 完成 ✅）
+
+**新会话 `5d0bf922`（全新，preset=standard，steps=9）实测：**
+- **断言 A ✅**：`session_search`/`session_event_search`/`session_trace`/`session_event_trace`/`session_event_read` 5 个**全部消失**。
+- **断言 B' ✅**：pwsh/read/edit/grep/glob/mcp_gateway/spawn_teammate/team_task_create 全在；"多增"=0。
+- **token**：toolsTokens 8,025→**6,182**（降 **1,843**，实测移除 6 工具=1,867 tok：session_query 5 个 1,015 + workflow 852）。
+- **意外收获：`workflow` 也消失了**。原因：DSH 启动时对 profile 做 reconcile/重写，把 web-app bundle host-plane 的 `disabled` 下沉固化到文件里 standard 的 `tool-workflow`（现 L293 `disabled: true`）→ 新会话按此挂载，workflow 不再出现。**这解释了批 1 时"文件 disabled 但会话仍有 workflow"——那是该次 boot 重写尚未固化的旧快照**。故 workflow 的"阻塞"已由 DSH 标准化隐式解决，无需再单独改。
+- **full-tools 保留 workflow**（composition 层已证：full-tools 块 L509 的 tool-workflow **无 disabled**）；session_query 全局禁 → full-tools 也无（符合决策）。full-tools live 抽验可选。
+
+**批 2 实际总降幅**：toolsTokens 8,025→6,182 = **−1,843 tok/步**（比计划的仅 session_query −1,254 更多，因 workflow 一并清除）。叠加批 1（−1,275），standard 相对原始 ~8,864 基线累计 ≈**−2,682 tok/步（~30%）**。
+
+**当前文件**：`.bak-b2sq-20261114152739` 备份；仅比它多 session_query 3 行（workflow 的 disabled 是 DSH 写入的既有内容，非本次新增）。
