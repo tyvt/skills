@@ -40,7 +40,7 @@ def test_tool_registered_with_models():
 def test_two_tools_have_different_primary():
     """拆分的意义就在于主选不同；若相同则本改动无意义。"""
     cfg = load_config(CFG_PATH)
-    assert cfg.tool(NEW).models[0].model == "cursor/composer-2.5"
+    assert cfg.tool(NEW).models[0].model == "workbuddy/kimi-k3.1-pro"
     assert cfg.tool(NEW).models[0].model != cfg.tool(OLD).models[0].model
 
 
@@ -125,7 +125,7 @@ def test_op_list_offline():
     result = list_tools(CFG_PATH)
     assert result["mode"] == "list"
     assert NEW in result["tools"]
-    assert result["tools"][NEW]["models"][0] == "cursor/composer-2.5"
+    assert result["tools"][NEW]["models"][0] == "workbuddy/kimi-k3.1-pro"
 
 
 # ---------- step 10：未知工具名回退可观测 ----------
@@ -154,7 +154,7 @@ def test_new_tool_not_in_peak_glm_tools():
 
 
 def test_primary_stays_composer_during_peak(now_injected=True):
-    """峰时与谷时，池首都必须是 cursor/composer-2.5。"""
+    """峰时与谷时，池首都必须是 workbuddy/kimi-k3.1-pro。"""
     from datetime import datetime
 
     from src.router import ModelRouter
@@ -165,5 +165,5 @@ def test_primary_stays_composer_during_peak(now_injected=True):
     off = datetime(2026, 11, 13, 20, 0)    # 周五 20:00，谷时
     for moment in (peak, off):
         pool = [m.model for m in router._get_effective_models(NEW, now=moment)]
-        assert pool[0] == "cursor/composer-2.5", f"{moment} 池首变成 {pool[0]}"
+        assert pool[0] == "workbuddy/kimi-k3.1-pro", f"{moment} 池首变成 {pool[0]}"
         assert "workbuddy/space-bunny" in pool, "兜底不得丢失"
