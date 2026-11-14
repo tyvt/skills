@@ -16,10 +16,11 @@ uni-app Vue3 H5 project for Suzhou Housing mobile C-end (owner initiative/signin
 - Pre-commit lint-staged hook fails (missing module in parent workspace); commits use --no-verify.
 - gitee remote is stale personal fork; correct push target is origin (gitlab.zhi.com).
 - Deploy via nginx UI (admin port 9000) site 家园区一网通办H5.conf, D:\nginx, listen 8093, base /wechatapph5/, root project dist; main dev branch dev-v0; package manager bun.
+- eslint 安装在父仓库，须在根目录（父仓）运行以使用本地 eslint 检查。
 
 ## Project Overview
 - Mobile C-end with second-hand housing, new housing, loan guide, policy pages.
-- Known technical patterns tracked in tech-pattern entities (scoped_deep_fix, fddydetail_sections_missing, formmanual_load_check, vote_houseno_missing, decision_result_vote, dual_identity_flows, zspopup_pseudo_empty, z_paging_relocate_fix, api_dispatcher_consol, sfb_token_fix, url_token_session_fix, main_pkg_optimize, list_paging_migrate, richtext_rel_url_fix, cancel_cfg_key_fix, filelist_import_fix, c_announcement_zspaging, realname_skip_idtype, menuimage_defineoptions_fix, ref8443_render_mode, font_pixel_diff, ref8443_native_button, ref8443_header_fix).
+- Known technical patterns tracked in tech-pattern entities (scoped_deep_fix, fddydetail_sections_missing, formmanual_load_check, vote_houseno_missing, decision_result_vote, dual_identity_flows, zspopup_pseudo_empty, z_paging_relocate_fix, api_dispatcher_consol, sfb_token_fix, url_token_session_fix, main_pkg_optimize, list_paging_migrate, richtext_rel_url_fix, cancel_cfg_key_fix, filelist_import_fix, c_announcement_zspaging, realname_skip_idtype, menuimage_defineoptions_fix, ref8443_render_mode, font_pixel_diff, ref8443_native_button, ref8443_header_fix, sfb_tdz_fix).
 - Code baseline: none; sourced from multiple cursor sessions.
 
 ## Verification & Attribution
@@ -27,13 +28,12 @@ uni-app Vue3 H5 project for Suzhou Housing mobile C-end (owner initiative/signin
 - Source session: fd000b83-ec69-43c3-8313-394ae8ba40c3
 - Referenced by Suzhou Housing flood-control C-end H5 (GitLab suzhufang-fe/zhi2-mobile-query-h5) for homepage/mine pages (2026-11-09)
 
-
 <!-- MEMORY_FIELDS
 {
   "category": "project",
   "name": "zhi2_mobile_shimin",
-  "source_extraction_id": "b38f11a4c3b04acabdd149126d3eb5aa",
-  "version": 15,
+  "source_extraction_id": "7723bed536d64b0eac5ad4ceb4e6811f",
+  "version": 16,
   "memory_type": "entities"
 }
 -->

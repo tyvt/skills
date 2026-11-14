@@ -1,4 +1,3 @@
-
 # 双 Y 轴量纲悬殊去掉 alignTicks
 园区物管2.0 双 Y 轴趋势图（份数 vs 万元）开启 alignTicks:true 后报刻度不可读警告。
 
@@ -20,15 +19,15 @@
 - 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：园区物管2.0/047.md
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/mock.js
+- 典型结果：收入图左轴 0–2000（步长400）右轴 0–300（步长60）；支出图左轴 0–600（步长120）右轴 0–80（步长20）
 - 所属项目：园区物管2.0；来源会话：7ed0f29d-3da8-4470-918b-f0872f9b6a9f；代码基线：c97957703
-
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "echarts_dual_y_scale",
-  "source_extraction_id": "375e45458ebe4081b83c67686d521542",
-  "version": 2,
+  "source_extraction_id": "831d3fafc2784244ba1296acd85f732b",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

@@ -1,22 +1,21 @@
 # OpenViking Memory Server
-OpenViking is the agent's local memory and vector database server backed by Ollama embeddings.
+OpenViking 是 agent 本地部署的记忆与向量数据库服务，嵌入依赖 Ollama。
 
-## Description
-- Main process is `openviking-server.exe` launched with `--config ov.conf` via `start-server.bat`
-- Uses Ollama for embeddings on port 11434; the server listens on port 1933
-- Health endpoint `/health` returns `200 healthy` when running
-- Holds memory `.md` files under `data/viking/default/user/default/` and vectors under `data/vectordb/`, plus `backend_meta.json`
+## 基本构成
+- 主进程 openviking-server.exe，由 start-server.bat 以 --config ov.conf 启动
+- 嵌入走 Ollama（端口 11434）；server 监听端口 1933，/health 返回 200 healthy
+- 记忆 md 文件位于 data/viking/default/user/default/，向量在 data/vectordb/，另有 backend_meta.json
 
-## Relations
-- Monitored and auto-restarted by the `watch-openviking.ps1` watchdog
-- Backed up daily by `run-openviking-snapshots.ps1` into `skills/openviking-data/`
+## 运维关系
+- 由 watch-openviking.ps1 看门狗监控并自动重启
+- 由 run-openviking-snapshots.ps1 每日备份到 skills/openviking-data/，原始数据在 data/vectordb/
 
 <!-- MEMORY_FIELDS
 {
   "category": "program",
   "name": "openviking",
-  "source_extraction_id": "6f5d10adb0bc48258ef3bd043a2e3b79",
-  "version": 1,
+  "source_extraction_id": "6918e6043fcc4daa9872921ea3761dca",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

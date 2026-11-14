@@ -1,25 +1,37 @@
-# tyvt/skills 仓库
-GitHub 上的 tyvt/skills 仓库（本地路径 D:\repository\skills），用于存放 OpenViking 记忆快照与导入工具脚本。
+# D:\repository\skills 技能仓库
+GitHub 仓库（本地 D:\repository\skills，远程 origin/main），由 github.com-tyvt-skills 维护，存可复用 DSH 技能、OpenViking 记忆快照与导入脚本；DSH 经 ~/.dsh/skills/<name> 符号链（根 C:\Users\Administrator\.dsh\skills）加载。
 
-## 描述
-- 对应远程 https://github.com/tyvt/skills.git 的 origin/main 分支
-- 本地路径为 D:\repository\skills
+## 规模与技能
+- 2026-11-13 全量审查：19 skill 目录 + 10 dsh 插件；带 SKILL.md 真技能原 8 个，2026-11-04 删 grill-me、i-have-adhd、long-form-corpus-rewrite 后剩 5
+- 2026-11-14 调用量：zentao-analyzer 128（最常用）、decision-options 22、token-frugal 7、tool-call-hygiene 4、tdd 1；新增 clarify-first
+- 会话日志 ~/.dsh/sessions（2026-11-04 有 1602 个多帧 zstd 日志）；2026-11-13 评级：指令类 8A/4B/0C，脚本类 zentao-analyzer 为 C，dsh 插件多为 A
 
-## 内容
-- openviking-memory/ 目录存放 OpenViking 记忆库快照
-- openviking-data/ 目录存放 OpenViking「所有影响记忆质量」的数据备份：viking/.../user/default/ 整树（memories、peers、sessions、skills、resources、privacy、摘要）、vectordb/ 与 backend_meta.json；初始提交 1a4a1b9 仅含 memories+peers（约11.36MB/7213 md），2026-11-07 扩展为全量质量快照 4cdcd7bf（约213MB/20154 文件），2026-11-09 09:01 提交 c9a15051「全量快照 20237 files」；同日经独立验证的全量快照 dc290366（21,050 文件/214MB，含 4,359 原始导出文件）与记忆快照 605e1435（6,609 md/8.49MB）推上 origin/main 并确认 local HEAD == origin/main，取代 c9a15051 成为最新；sessions/ 含 505 个目录（其中 277 个为 mm-* 导入记忆会话）；该备份为手动时间点快照（无定时备份任务）非自动化；原始对话文本（cursor/workbuddy/opencode）位于 memory-migration/out/（本地磁盘），本不入 OpenViking；2026-11-09 曾临时拷入 openviking-data/source-exports/ 并随数据快照 dc290366 推上 GitHub（4,359 文件/240.2MB），但因违反纯镜像约定，用户同日决定迁出为独立顶层 memory-migration-archive/ 并由专门快照脚本备份；仍不入库 data/_system/、锁文件、pending/、state/ 等运行时数据
-- skills/scripts/ 目录含 patch-ov-cursor-evidence.mjs、fix-ov-memory-footer-order.mjs、refresh-cursor-import-state.mjs 等导入质量脚本
+## 目录与提交
+- openviking-memory/ 记忆库快照；openviking-data/ 质量数据备份（初提 1a4a1b9；2026-11-07 全量 4cdcd7bf 213MB/20154；2026-11-09 dc290366 21050/214MB 与 605e1435 推 origin/main；sessions/ 505 目录；data/_system/、锁、pending/、state/ 不入库）
+- skills/scripts/ 含 patch-ov-cursor-evidence.mjs 等导入脚本；captcha-recognizer/ 2026-11-14 入库；openviking-autostart/ 为 OV 自动拉起 skill，2026-11-13 演练成功；cursor-model-routing/ 路由技能 2026-11-13 本地提 3437a788 未推，main ahead 8
+- 提交：2026-11-13 75d14ff5 推 origin/main；2026-11-10 zentao-analyzer SKILL.md 补 submodule 状态 86279dd0 仅提交未推；2026-11-14 计划+批 1 验证 b3b9a7a1、批 1 配置实施 ca2a29d9 均未推
+- 2026-11-14 修复与工具裁剪：6 组修复 21766e33、第二轮清理 4e25406e 均推 origin/main；批 2 草案待用户拍板，详见 tyvt_skills_20261114 实体卡
+- dsh/ 为 git 子模块、controller-bench/ 为批量测试目录，细节见 dsh_plugins 与 controller_bench 实体卡
+
+## 安全与仓库卫生
+- P0 明文凭据：zentao-analyzer/credentials.py:13 与 zentao_file.py:69 硬编码禅道账号 tiany + 明文密码 Field123456（两处不一致），用户确认原样保留
+- P0 向量库巨量：git ls-files 35244 文件，约 87% 为 DB/记忆快照；openviking-memory/data 续随 git 同步
+- P0 运行态/大二进制：tool-error-today.json、重复 PNG；一致性漂移：dsh-explore hook 名 explore-drift 实为 agent-guard·exploration、plan-gate 注释 fail-open 实为 block、README 列不存在 skill
+- 完整审查报告 .task-state/REVIEW-2026-11-13.md
 
 ## 关系
-- 作为 OpenViking 记忆备份与工具脚本的托管仓库
-- default-workspace 下的 memory-migration/ 并非独立 git 仓库，工具脚本备份至此仓库
+- dsh 为 skills 子模块独立提交（先子后父）；skills 与 langgraph-orchestrator 同仓一次提交；~/.dsh/skills 为指向仓库技能目录的符号链，悬空已清理
 
 <!-- MEMORY_FIELDS
 {
   "category": "项目",
   "name": "tyvt_skills",
-  "source_extraction_id": "5f0deedf3a1348f0950086f0dbf8d58a",
-  "version": 5,
+  "source_extraction_ids": [
+    "06401e30356f44b7931a89723cf979f0",
+    "56afe6d268ed4224b7de33d546af5e42"
+  ],
+  "source_extraction_id": "b4bc945669684a75a6afd31539e38417",
+  "version": 30,
   "memory_type": "entities"
 }
 -->

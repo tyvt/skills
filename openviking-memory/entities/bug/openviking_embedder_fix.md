@@ -21,12 +21,17 @@ OpenViking 在 litellm_embedders.py 的本地补丁曾因每次调用后关闭�
 - OpenViking 以原始 ov.conf 重启，/health 返回 ok（版本 0.5.3）
 - 异步嵌入 ollama/bge-m3 返回 1024 维，耗时约 6.2 秒
 
+## 2026-11-14 状态
+- OpenViking 于 2026-11-14 13:24 升级到 0.5.5，site-packages 中打过补丁的 litellm_embedders.py 被覆盖（线上 8736 字节、无重试逻辑），本补丁在线上已失效
+- 0.5.5 自带 model_retry.py 与 RetryEmbedder（默认 max_retries=3），Server disconnected 归类 TRANSIENT_NETWORK_ERROR 可重试，故旧补丁无需恢复
+- 抖动真因另有其他：bge-m3-ov 纯 CPU 单槽推理下并发排队超时，2026-11-14 以 embedding.max_concurrent=2 止血
+
 <!-- MEMORY_FIELDS
 {
   "category": "bug",
   "name": "openviking_embedder_fix",
-  "source_extraction_id": "bc8b08c42cf742b9b15729a245549da2",
-  "version": 2,
+  "source_extraction_id": "6918e6043fcc4daa9872921ea3761dca",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

@@ -1,35 +1,36 @@
 # dsh-pwsh-local
-DSH 本地 PowerShell 执行工具，负责在会话中运行 pwsh 命令；PowerShell 7.6.9 已于 2026-11-11 安装，行为与失败率分析如下。
+DSH local PowerShell execution tool for running pwsh commands in sessions; PowerShell 7.6.9 installed on 2026-11-11.
 
-## 运行环境与版本
-- PowerShell 7.6.9 已装于 `C:\Program Files\PowerShell\7\pwsh.exe`（2026-11-11 从镜像下官方 zip 解压安装，非 MSI 注册），已写入系统 PATH
-- Windows PowerShell 5.1.19041.6456 保留于 `C:\Windows\System32\WindowsPowerShell\v1.0`，系统组件未动
-- DSH 解析顺序：配置 `pwshPath`（当前未设）→ `C:\Program Files\PowerShell\7\pwsh.exe` → PATH 上 `pwsh.exe` → 5.1；新开会话自动命中 7.6.9
-- 升级当时的会话因 pwsh 工具进程在安装前启动，仍走 5.1；后续新会话自动用 7.6.9，无需改 DSH 配置
-- 7 默认不把原生命令 stderr 包成 NativeCommandError，写文件默认 UTF-8（`Set-Content`/`Out-File` 不再按 GBK 破坏中文）
+## Environment and Version
+- PowerShell 7.6.9 installed at `C:\Program Files\PowerShell\7\pwsh.exe` on 2026-11-11 from official zip (not MSI), added to PATH.
+- Windows PowerShell 5.1.19041.6456 retained at `C:\Windows\System32\WindowsPowerShell\v1.0` untouched.
+- DSH resolution order: config `pwshPath` (unset) -> 7.6.9 path -> PATH `pwsh.exe` -> 5.1; new sessions auto-use 7.6.9.
+- Session active during upgrade still used 5.1; later sessions auto 7.6.9, no DSH config change needed.
+- PS 7 does not wrap native stderr as NativeCommandError; file writes default UTF-8 (no GBK corruption).
 
-## 近期失败审计（347 个会话文件，近 8 天，as of 2026-11-11）
-- pwsh 调用 17686 次；工具层失败 27 次（0.15%）：INVALID_ARGS 15（参数被吐成空 `{}`）、ABORTED 8、TOOL_OUTCOME_UNKNOWN 4
-- 进程退出码非 0 共 1912 次（10.8%）；2026-11-11 当天工具失败为 0 次
-- 1912 次退出码 1 拆解：930 次无 PowerShell 错误记录（修正：原记 925 为解析错误，arguments 以字符串保存未被解析，命令实际存在，非 925 个独立故障）、694 次 NativeCommandError（5.1 特有，升级后消失）、约 70 次语法错、其余用法错
-- 930 次无 PS 错误记录的非零退出（近 8 天）拆解：约 690 次为探测命令正常返回值（git status --porcelain 49、grep/check-ignore 25、ls-remote/remote/ls-tree 25、push 19 中 12 正常 7 真错、log/show/diff 39；Get-ChildItem/Get-Content/Get-Process/Test-Path/Select-String 带 -ErrorAction SilentlyContinue 共 168 次故意吞路径不存在；git diff | Select-Object 穿透管道保留 1），约 240 次真失败（网络 70、构建/测试 81、脚本错 68、路径不存在 38、空输出 34），约 70 次引号变量问题
-- 15 次空参数 INVALID_ARGS 全在会话 904a727e（11-09 跨天 cursor/composer-2.5），同段 read/grep 也吐空参数，属长会话上下文退化，非 pwsh 参数契约损坏
-- 语法类：UnexpectedToken 22、MissingEqualsInHashLiteral 21（双引号内 `@{u}`）、TerminatorExpectedAtEndOfString 10、InvalidVariableReferenceWithDrive 13
-- 用法类：CommandNotFoundException 33、ConvertFrom-Json 23、Select-String/Get-ChildItem/Get-Content 路径不存在约 43
+## Failure Audit (347 session files, last 8 days, as of 2026-11-11)
+- 17686 pwsh calls; tool-layer failures 27 (0.15%): INVALID_ARGS 15 (empty `{}`), ABORTED 8, TOOL_OUTCOME_UNKNOWN 4.
+- Non-zero exit codes 1912 (10.8%); on 2026-11-11 tool failures 0.
+- 1912 exit-1 breakdown: 930 no PS error log (correction: originally 925 misparsed; args stored as string, commands existed), 694 NativeCommandError (5.1 only, gone after upgrade), ~70 syntax, rest usage.
+- 930 no-error exits: ~690 probe normal returns (git status --porcelain 49, grep/check-ignore 25, ls-remote/remote/ls-tree 25, push 19 with 12 ok/7 real, log/show/diff 39; Get-ChildItem/Get-Content/Get-Process/Test-Path/Select-String with -ErrorAction SilentlyContinue 168 swallowed missing paths; git diff | Select-Object 1), ~240 real failures (network 70, build/test 81, script 68, path missing 38, empty output 34), ~70 quote/variable issues.
+- 15 empty-arg INVALID_ARGS all in session 904a727e (11-09 cross-day cursor/composer-2.5), alongside empty read/grep: long-session context decay, not pwsh contract broken.
+- Syntax errors: UnexpectedToken 22, MissingEqualsInHashLiteral 21 (double-quote `@{u}`), TerminatorExpectedAtEndOfString 10, InvalidVariableReferenceWithDrive 13.
+- Usage errors: CommandNotFoundException 33, ConvertFrom-Json 23, Select-String/Get-ChildItem/Get-Content path missing ~43.
 
-## 升级结果与边界
-- 2026-11-11 已装 PowerShell 7.6.9，消除两类 5.1 问题：stderr 被当失败（694 次 NativeCommandError）、Set-Content/Out-File 默认按系统 ANSI（GBK）写文件
-- 仍存在：930 次无 PS 错误记录的非零退出（修正：原 925 为解析错误；其中约 690 为探测命令正常返回值、约 240 为真失败、约 70 为引号变量问题，换 shell 无用）、引号与 @{u} 解析错误、空参数 INVALID_ARGS
-- 调用约定（已写入 tool-call-hygiene 自愈表）：`-m` 用单引号；`git rev-parse '@{u}'`；`$env:GIT_EDITOR='true'`（勿写 `GIT_EDITOR=true`）
-- 空参数 INVALID_ARGS 属长会话退化而非 shell 版本问题：连续两次就收尾换会话
-- 失败处理约定（不改工具，放调用层）：探测用 `git status --porcelain; exit 0` 或仅末尾有 `; if` 才看退出码；`git push`/`git commit` 非零才当失败；GitHub 访问走镜像或代理不在 pwsh 重试；`node -e` 超一行落成 `.mjs` 再跑；路径先 `Test-Path`；同会话连续两次空参数即停换新会话
+## Upgrade Outcome and Boundaries
+- 2026-11-11 PS 7.6.9 eliminated two 5.1 issues: stderr-as-failure (694 NativeCommandError), GBK file writes.
+- Remaining: 930 no-error non-zero exits (~690 probes, ~240 real, ~70 quote issues; shell change useless), quote/`@{u}` parse errors, empty-arg INVALID_ARGS.
+- Call conventions (in tool-call-hygiene): use single quotes for `-m`; `git rev-parse '@{u}'`; `$env:GIT_EDITOR='true'` (not `GIT_EDITOR=true`).
+- Empty-arg INVALID_ARGS is long-session decay: stop and switch session after two consecutive.
+- Failure handling at call layer (not tool): probes use `git status --porcelain; exit 0` or only check exit on `; if`; `git push`/`commit` non-zero is failure; GitHub via mirror/proxy not pwsh retry; `node -e` >1 line write `.mjs`; `Test-Path` first; two empty args -> new session.
+
 
 <!-- MEMORY_FIELDS
 {
   "category": "程序",
   "name": "dsh_pwsh_local",
-  "source_extraction_id": "043faea2d2f3450692f143e9bf320935",
-  "version": 3,
+  "source_extraction_id": "9e2988b6bbf64d64ab44c4e9b8cd46cc",
+  "version": 4,
   "memory_type": "entities"
 }
 -->

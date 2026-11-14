@@ -1,0 +1,36 @@
+# langgraph-orchestrator
+DSH 本地 Python/LangGraph 编排器项目，由 dsh-orchestrator 插件经 orchestrate 工具调用，模型调用走本机 magpie 网关 127.0.0.1:3425。
+
+## 模型池（orchestrate op=list 实测 2026-11-12）
+- planner（规划推理）：workbuddy/hy3 → cursor/grok-4.7@256k
+- file_reader（摘要器，无磁盘读取权限，真实读文件走pwsh）：auto/deepseek-v4.1-flash → workbuddy/glm-5.3-flash → workbuddy-ai/hy3 → cursor/deepseek-v41-flash-1017
+- code_editor（写代码）：cursor/composer-2.5 → workbuddy/glm-5.3-flash → auto/deepseek-v4.1-flash
+- code_edit_with_signal（带验证信号编辑，2026-11-13 新增）：cursor/composer-2.5 → workbuddy/glm-5.3-flash → auto/deepseek-v4.1-flash，刻意排除峰时 glm 提首策略
+- image_analyst（看图）：cursor/deepseek-v41-flash-1017 → auto/deepseek-v4.1-flash
+- security_guard（审查写操作）：cursor/grok-4.7@256k
+- security_guard_fast：workbuddy/deepseek-v4.1-flash
+- pwsh（自然语言→命令）：workbuddy/deepseek-v4.1-flash → auto/hy3
+
+## 运行与记录
+- orchestrate op=full 完整编排：规划→分派→汇总，逐模型降级链运行。
+- op=tool 仅做文本加工（摘要/改写/判读），不执行命令；真实 pwsh 执行仅在 op=full 的 graph 路径（_run_pwsh + security_guard）；误用 op=tool 跑 pwsh 会导致构建不执行（2026-11-12 session-26c1c52d 实证）
+- 成本记录写于项目目录 langgraph-orchestrator\.sessions\session-*.costs.jsonl（非 ~/.dsh/sessions）。
+- 2026-11-12 实测 op=full：plan→grok-4.7、execute→glm-5.3-flash、summarize→glm-5.3-flash，token 明细落盘。
+- 56条真实调用中 workbuddy-ai/hy3 与 free hy3 均0次，hy3 12%命中率告警在本编排器不成立；真正成本大户是 cursor/grok-4.7@256k 规划。
+- config.yaml 已备份为 .bak-20261112-modelpool。
+
+## 配置调优与计划审批（2026-11-12）
+- config.yaml 超时调优：pwsh_timeout 30→180（build 不再必然超时）、code_editor/planner 单请求 300→120（故障转移更快）、request_timeout 120→90
+- orchestrator 新增 op:plan_review：reviewer 池首选 cursor/grok-4.7@256k，由 src/api.py 的 run_plan_review + jsonbridge 分支实现
+- plan_review 与 dsh/plan-gate 插件配合：欠完整计划→reject/46，完整计划→pass/78（grok-4.7 实测）
+- 2026-11-13 改造：plan_review 改为 P0/P1/P2 分级制，仅 P0（阻断落地）reject，P1/P2 仅提示；score 不参与判定；灰度区按 P1 待人确认；security_guard 独立兜底。改动 src/api.py 的 _PLAN_REVIEW_SYSTEM 与 _normalize_review、dsh/orchestrator/lib/index.js 的 renderPlanReview，新增 tests/test_plan_review_p0.py（6/6 通过）
+
+<!-- MEMORY_FIELDS
+{
+  "category": "编排器",
+  "name": "langgraph_orchestrator",
+  "source_extraction_id": "6b0a58e666ef4ee4baf5867a9f5038bb",
+  "version": 7,
+  "memory_type": "entities"
+}
+-->

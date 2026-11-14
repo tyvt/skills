@@ -10,6 +10,7 @@
 
 ## 平台密钥
 - 平台签名密钥 WEXL6R2P7S3Q9T4V8Y1U5Z0OAICBHDGE 在昆山G 与太仓G 完全一致，复用太仓G 同一套平台 RSA 私钥（平台级密钥，跨同底座项目通用）
+- 该解密模式已被昆山物管 C端（zhi1-mobile-shimin-h5-zhishu-c-unlimited）复用，参照本实现新增响应解密拦截器（2026-11-12）
 - 若昆山G 后端使用不同密钥对，需替换两处 RSA_PRIVATE_KEY 常量
 
 ## 提交与验证
@@ -21,8 +22,8 @@
 {
   "category": "技术模式",
   "name": "昆山G响应解密逻辑",
-  "source_extraction_id": "c3f74519c7614ce3882fe7eaff97bfe4",
-  "version": 1,
+  "source_extraction_id": "1ad5a19ddba4401da31040dd7b8d0599",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -1,0 +1,35 @@
+# 资金拨付无合同申请前端实现
+惠山二期G zhi2-web-admin 禅道任务2393 前端实现资金拨付支持无合同申请、合同分多次支取。
+
+## 需求与改动
+- 禅道任务 2393【前端】【惠山物管】资金拨付支持无合同申请、合同分多次支取
+- 分支：develop/v2.6.2-huishan；项目：惠山二期G/zhi2-web-admin
+- 参考苏住房G task 2104 提交 dbd161219+7b937cd63（pubAllotNotice/detail.vue、index.vue、pubExpenditureContract/detail.vue 三文件）以 git merge-file 三方合并移植
+- 保留惠山特有：cancelPubAllotNotice 用内联 request 调用、见证文案 labelAbove、列表「当前状态」列文案与 fixed=right
+
+## 关键能力
+- 是否有合同分支、无合同上限=待申请金额-contractReservedAmount
+- 后端返回字段校验：haveWithdrawAmount/remainWithdrawAmount/remainExcludeSelf
+- 选申请弹窗 filterZeroRemain、剩余可用申请金额 remainApplyAmount 列
+
+## 验证与部署
+- eslint 三文件 0 错误（须用父目录 node_modules\.bin\eslint.cmd 在 zhi2-web-admin cwd 下跑，父级跑会 alias 解析失败 16 误报）
+- npm run build 成功；nginx 8119 站点（惠山二期G.conf，root=惠山二期G/dist）部署并 MD5 核对
+- 子模块提交 b7b998803 已推送，父仓 gitlink aa09f0d 已推送
+
+## 回写与状态
+- 禅道回写：zt_action id 92182 comment（task 类型，product=",10,"，未改任务状态，标前端完成待后端联调）
+- 页面真实链路联调未执行，依赖惠山后端发版
+- 2026-11-13 数据库核查确认惠山 Dameng 库 T_JG_ALLOT_NOTICE 无 HAVE_WITHDRAW_AMOUNT/CONTRACT_FLAG 等合同支取列（苏住房测试库有），证实后端未实现 task 2393 服务端部分，故联调无法完成（见 Bug 6559）
+- 2026-11-13 Bug6559 前端修复完成并提交：惠山 `6fc3bb94d`（develop/v2.6.2-huishan）、苏住房 `4a32dc38f`（develop/v2.6.2-suzhufang），均仅改 detail.vue（补 noticeAmount + getDetail 兜底）；禅道 6559 置 resolved/fixed（zt_action 92984），指派回 fuxiachao；页面目视验证因登录验证码竞态未稳定通过，备注建议联合验证后再关闭
+- 来源会话：2026-11-12；代码基线：develop/v2.6.2-huishan
+
+<!-- MEMORY_FIELDS
+{
+  "category": "惠山二期G技术",
+  "name": "pub_allot_no_contract",
+  "source_extraction_id": "a22a1c47c07d44fd94d96c8d11c09cdc",
+  "version": 3,
+  "memory_type": "entities"
+}
+-->

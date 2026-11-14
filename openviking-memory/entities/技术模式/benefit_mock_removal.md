@@ -13,15 +13,16 @@ i淮安H5 项目中对 benefit 相关页面移除 mock 分支，改走真实接�
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=i淮安H5
-- 涉及文件：src/pages_benefit/benefit/index.vue、src/pages_benefit/assetsPublicity/index.vue、src/pages.json、src/hooks/useLoadMore.js 等
+- 验证：src=i淮安H5/001.md
+- 涉及文件：src/pages_benefit/benefit/index.vue、src/pages_benefit/assetsPublicity/index.vue、src/pages.json、src/hooks/useLoadMore.js、package.json、node_modules/@dcloudio/uni-ui/lib/uni-load-more/uni-load-more.vue、src/api/benefit.js、src/store/user.js
 - 所属项目：i淮安H5；来源会话：472544ee-238b-483c-9e2d-72850c506abd；代码基线：none
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "benefit_mock_removal",
-  "source_extraction_id": "39b0dbebf07c42e1b9eae62b778a900a",
-  "version": 1,
+  "source_extraction_id": "b0f3e84cf6da47f181eda9967ae5d0cd",
+  "version": 2,
   "memory_type": "entities"
 }
 -->
