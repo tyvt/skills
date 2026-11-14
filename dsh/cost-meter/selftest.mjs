@@ -1,7 +1,7 @@
 // cost-meter 自测：验证 usage 累加、阈值触发一次、注入到 messages。
 import assert from 'assert';
 import fs from 'fs';
-import { apply, inspect, inspectSize, name, hasIntentSignal } from './lib/index.js';
+import { apply, inspect, name, hasIntentSignal } from './lib/index.js';
 
 const user = (text) => ({ role: 'user', content: text });
 assert.equal(hasIntentSignal([user('修改组件，验证后提交并推送')]), true);
@@ -127,11 +127,81 @@ assert.ok(!texts(b).includes('[build-gate]'), 'running build suppresses build-ga
     fire('s' + i, 1);
     if (i % 100 === 0) fire('hot-A', 1); // 持续 touch 保持最近使用
   }
-  assert.ok(inspectSize() <= 2000, 'acc size 受 2000 上限约束，实际=' + inspectSize());
+  // 等价断言降级（A3：测试不反向扩生产 API）：撤掉 inspectSize 后不承诺精确 size，
+  // 只按行为验证 LRU：活跃会话存活 / 最早空闲会话淘汰 / 最新会话在。
   assert.ok(inspect('hot-A'), '活跃会话 hot-A 未被淘汰');
   assert.equal(inspect('s0'), undefined, '最早插入的空闲会话 s0 已被淘汰');
   assert.ok(inspect('s2499'), '最新插入会话仍在');
-  console.log('cost-meter selftest: LRU eviction PASS (size=' + inspectSize() + ')');
+  console.log('cost-meter selftest: LRU eviction PASS (behavioral: hot-A alive / s0 evicted / s2499 alive)');
+}
+
+// ---- B2 enforcement：连续大未命中后按白名单软拦截（首次实现 enforcement）----
+// 放在夹具 early-exit 之前，保证无 session.v4.jsonl 夹具时也必跑。
+{
+  const b2Handlers = [];
+  let b2Guard;
+  const ctxB2 = {
+    on(evt, h) { if (evt === 'session/event') b2Handlers.push(h); },
+    tools: { guard(fn) { b2Guard = fn; return () => {}; } },
+  };
+  apply(ctxB2, { enabled: true, enforceBigMiss: true }); // perStepUncachedBudget 默认 10000
+  assert.equal(typeof b2Guard, 'function', 'B2 registers ctx.tools.guard');
+  const onB2 = (session, event) => { for (const h of b2Handlers) h(session, event); };
+  const b2big = (n) => ({ type: 'assistant/message', data: { usage: { uncachedInputTokens: n, cacheReadTokens: 0, outputTokens: 1 } } });
+  const sess = { header: { id: 'b2-streak' } };
+  const exec = (name, args) => ({ name, arguments: args, agent: { session: sess } });
+
+  // 单步大未命中（streak=1）：不拦。
+  onB2(sess, b2big(20000));
+  assert.equal(b2Guard(exec('read', { file_path: 'a.js' })), undefined, 'streak<2: no block');
+
+  // 第二步大未命中（streak=2）：进入 enforcement。
+  onB2(sess, b2big(21000));
+  // 软拦：无参整读 / 无 path grep / 整段回灌。
+  assert.ok(typeof b2Guard(exec('read', { file_path: 'a.js' })) === 'string', 'block: whole read (no offset/limit)');
+  assert.ok(typeof b2Guard(exec('grep', { pattern: 'foo' })) === 'string', 'block: grep without path');
+  assert.ok(typeof b2Guard(exec('pwsh', { command: 'git log' })) === 'string', 'block: git log whole dump');
+  // 硬放行：带 offset/limit 的 read、带 path 的 grep、edit/write、验证命令、未列名工具。
+  assert.equal(b2Guard(exec('read', { file_path: 'a.js', limit: 40 })), undefined, 'pass: paged read with limit');
+  assert.equal(b2Guard(exec('read', { file_path: 'a.js', offset: 10 })), undefined, 'pass: paged read with offset');
+  assert.equal(b2Guard(exec('grep', { pattern: 'foo', path: 'src/x' })), undefined, 'pass: grep with path');
+  assert.equal(b2Guard(exec('edit', { file_path: 'a.js' })), undefined, 'pass: edit');
+  assert.equal(b2Guard(exec('write', { file_path: 'a.js' })), undefined, 'pass: write');
+  assert.equal(b2Guard(exec('pwsh', { command: 'node --check a.js' })), undefined, 'pass: verify command node --check');
+  assert.equal(b2Guard(exec('pwsh', { command: 'npm test' })), undefined, 'pass: verify command npm test');
+  assert.equal(b2Guard(exec('glob', { pattern: '**/*.js' })), undefined, 'pass: unlisted tool (glob) defaults to pass');
+
+  // 边界：小步把 streak 归零 → 全放行。
+  onB2(sess, b2big(500));
+  assert.equal(b2Guard(exec('read', { file_path: 'a.js' })), undefined, 'small step resets streak: no block');
+
+  // 边界：uncached 缺失/为 0 时不计 streak（absent 事件），不误判。
+  const sessAbsent = { header: { id: 'b2-absent' } };
+  const execAbsent = (name, args) => ({ name, arguments: args, agent: { session: sessAbsent } });
+  onB2(sessAbsent, { type: 'assistant/message', data: { usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 } } });
+  assert.equal(b2Guard(execAbsent('read', { file_path: 'a.js' })), undefined, 'absent/zero usage: no false block');
+
+  // 开关关闭（env=0）：即使 streak>=2 也全放行。
+  const b2HandlersEnv = [];
+  let b2GuardEnv;
+  const ctxEnv = {
+    on(evt, h) { if (evt === 'session/event') b2HandlersEnv.push(h); },
+    tools: { guard(fn) { b2GuardEnv = fn; return () => {}; } },
+  };
+  const prevEnv = process.env.DSH_COST_METER_ENFORCE;
+  process.env.DSH_COST_METER_ENFORCE = '0';
+  try {
+    apply(ctxEnv, { enabled: true, enforceBigMiss: true });
+    const onEnv = (session, event) => { for (const h of b2HandlersEnv) h(session, event); };
+    const sessEnv = { header: { id: 'b2-env' } };
+    onEnv(sessEnv, b2big(20000)); onEnv(sessEnv, b2big(21000));
+    const eEnv = (name, args) => ({ name, arguments: args, agent: { session: sessEnv } });
+    assert.equal(b2GuardEnv(eEnv('read', { file_path: 'a.js' })), undefined, 'env=0: fully pass even at streak>=2');
+  } finally {
+    if (prevEnv === undefined) delete process.env.DSH_COST_METER_ENFORCE;
+    else process.env.DSH_COST_METER_ENFORCE = prevEnv;
+  }
+  console.log('cost-meter selftest: ALL PASS (B2 enforcement whitelist)');
 }
 
 // 夹具：session.v4.jsonl 的真实 assistant/message，不手写 usage。

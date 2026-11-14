@@ -14,6 +14,7 @@
  */
 
 import { randomUUID } from "node:crypto";
+import { appendFileSync } from "node:fs";
 
 export const name = "cost-meter";
 export const inject = [];
@@ -43,7 +44,19 @@ function normalizeConfig(input) {
     stepReminderThreshold: input?.stepReminderThreshold ?? 120,
     // ask_user 长等待门槛(毫秒)：一次 ask_user_question 耗时达到即在下步提醒。<=0 关闭。
     askUserLongWaitMs: input?.askUserLongWaitMs ?? 300_000,
+    // B2：连续大未命中（bigMissStreak>=2）时对「无参整读 / 无 path 全仓 grep / 整段输出回灌」
+    // 做软拦截（tools.guard 返回拒绝串）。默认开；env DSH_COST_METER_ENFORCE=0 或此处置 false 即全放行。
+    enforceBigMiss: input?.enforceBigMiss ?? true,
+    // 灰度观测：enforce 拦截/放行写 ledger，供统计误伤次数与降幅。
+    enforceLedgerPath: input?.enforceLedgerPath ?? null,
   };
+}
+
+// env 关闭开关（优先级高于 config）：置 "0"/"false" 即全放行。
+function enforceEnabledByEnv() {
+  const v = process.env.DSH_COST_METER_ENFORCE;
+  if (v === undefined || v === "") return true;
+  return !(v === "0" || /^false$/i.test(v));
 }
 
 // 0.1 / 4：假设倍率，待计费校准。
@@ -100,11 +113,6 @@ export function inspect(sessionId) {
     equiv: equivOf(a),
     fired: [...a.fired],
   };
-}
-
-/** 测试与排查：最近一次 enabled apply 累计的会话条数（验证 LRU 上限）。 */
-export function inspectSize() {
-  return latestAcc?.size ?? 0;
 }
 
 /** P3-11：从 pre-step 的 messages 里取 user 文本，判断是否同时含「修改+验证+提交」三要素。 */
@@ -309,4 +317,67 @@ export function apply(ctx, rawConfig) {
       return { ...(decision ?? {}), kind: "enter", messages: [...base, merged] };
     });
   });
+
+  // B2：连续大未命中 → 工具软拦截（首次实现 enforcement；M1 此前仅文字 notice）。
+  // 拦截读的是「上一步结算后的 bigMissStreak」，与当前步是否分页无关（分页读属放行项不计入 streak）。
+  // 硬放行：edit/write；带 offset|limit 的 read；带 path 的 grep；验证命令；其它未列名工具默认放行。
+  // 软拦：无参整读、无 path 全仓 grep、pwsh 明显整读/整段回灌文本。判定不确定一律放行（避免误伤）。
+  if (typeof ctx?.tools?.guard === "function") {
+    const classifyBlock = (exec) => {
+      const tool = String(exec?.name ?? "");
+      const args = exec?.arguments ?? {};
+      if (tool === "read") {
+        const hasWin = args.offset != null || args.limit != null;
+        return hasWin ? null : "read 无 offset/limit 属整读";
+      }
+      if (tool === "grep") {
+        const hasPath = typeof args.path === "string" && args.path !== "";
+        return hasPath ? null : "grep 无 path 属全仓/容器级搜索";
+      }
+      if (tool === "pwsh") {
+        const cmd = String(args.command ?? "");
+        // 仅拦明显整段回灌：无行限的 git log、无分页的整文件 cat/Get-Content、无 path 的递归 grep。
+        if (/\bgit\s+log\b/.test(cmd) && !/-n\s*\d|--oneline|-p\b|--stat|--max-count/.test(cmd)) {
+          return "git log 无行数/--oneline 属整段输出回灌";
+        }
+        if (/\b(?:cat|type|Get-Content|gc)\b/i.test(cmd) && !/-TotalCount|Select-Object|\|\s*Select|-First|-Tail|offset|limit/i.test(cmd)) {
+          return "整文件读取无分页属整段回灌";
+        }
+        return null;
+      }
+      return null; // 其它工具（edit/write/glob/bash/未列名）默认放行
+    };
+    const enforceOn = config.enabled && config.enforceBigMiss && enforceEnabledByEnv();
+    const guardDisposer = ctx.tools.guard((exec) => {
+      if (!enforceOn) return undefined;
+      try {
+        const id = exec?.agent?.session?.header?.id ?? exec?.agent?.session?.id;
+        if (id === undefined) return undefined;
+        const a = acc.get(id);
+        const streak = a?.bigMissStreak ?? 0;
+        if (streak < 2) return undefined;
+        const reason = classifyBlock(exec);
+        if (reason === null) return undefined;
+        const msg = `[cost-meter] 已连续 ${streak} 步未命中过大，暂拦「${exec?.name}」：${reason}。`
+          + `下一步只允许：① 带 offset/limit 的窄读 ② 带 path 的 grep ③ 一次小幅取数（SQL/接口）。改法后重试。`;
+        if (config.enforceLedgerPath) {
+          try {
+            appendFileSync(config.enforceLedgerPath, JSON.stringify({
+              ts: new Date().toISOString(), kind: "cost-meter-enforce",
+              verdict: "block", tool: exec?.name, session_id: id, bigMissStreak: streak, reason,
+            }) + "\n");
+          } catch { /* ledger 失败不影响拦截 */ }
+        }
+        return msg;
+      } catch {
+        return undefined; // guard 内异常一律放行，避免误伤
+      }
+    });
+    // disposer 随插件 dispose 注销（与 agent-guard 同约定：ctx.on('dispose', ...)）。
+    if (typeof guardDisposer === "function") {
+      ctx.on?.("dispose", () => {
+        try { guardDisposer(); } catch { /* 注销失败不影响退出 */ }
+      });
+    }
+  }
 }
