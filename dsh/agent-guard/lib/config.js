@@ -60,8 +60,8 @@ export const DEFAULTS = {
   traceCalls: false,
   /** 探索漂移拦截（explore-drift-guard-20261113）：off=不启用；warn=只记 ledger（灰度默认）；block=拒绝。 */
   exploration: {
-    enabled: false,
-    mode: 'off',
+    enabled: true,
+    mode: 'warn',
     /** 整读门槛：已知行数超过此值的无范围 read 拒绝。 */
     maxWholeReadLines: 300,
     /** 行数未知的首读注入 limit。 */
