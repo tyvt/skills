@@ -7,8 +7,18 @@
         # Python 解释器
         pythonExe: python
         # 编排器项目根目录(含 src/jsonbridge.py 与 config.yaml)
+        # 注意：绝对路径为本机默认；换机器/换检出目录时改这里指向实际 langgraph-orchestrator 目录。
         projectDir: 'D:\repository\skills\dsh\langgraph-orchestrator'
         # 单次编排调用超时(毫秒)。完整编排会跑多个模型，给足时间。
         timeoutMs: 300000
+        # 停滞检测(毫秒)：子进程超过该时长无任何 stdout/stderr 新输出即判定卡住并 kill，
+        # 返回最后 stderr 尾部。0 表示关闭(仅受 timeoutMs 约束)。
+        # 2026-11-12：45000→120000。plan_review 的 auto/deepseek-v4.1-flash 静默推理约
+        # 91.6s，45s 会被误判卡住（本次实测 python 卡住 45s 致 plan_review 三连挂）。
+        # 120000 给足静默推理余量，仍能捕获真死锁；硬兜底仍是 timeoutMs=300000。
+        stallMs: 120000
+        # 软上限告警线(毫秒)：单次调用到点仅在日志输出 [orchestrate/warn]，不 kill、不改返回。
+        # 0 表示关闭。默认 240000（依据 full 实测 P90=242s 取略低告警线）。
+        warnCapMs: 240000
         # 是否把完整 trace/steps 也返回给模型(否则只返回 final，省 token)
         verbose: true

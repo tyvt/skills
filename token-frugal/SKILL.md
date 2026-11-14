@@ -14,9 +14,9 @@ description: 会话 token / 上下文成本审计与治理。分析哪些会话�
 
 - **账的问题**：哪个会话、哪个模型烧了多少未命中 → 用 `audit-tokens.mjs`。
 - **每模型清单**：每个会话里**每个实际参与的模型**到底用了多少输入/输出/缓存命中，含 orchestrate 子模型 → 用 `audit-models.mjs`（见 §2.5）。
-- **因的问题**：这些 token 是怎么被工作流烧掉的（goal 反复续跑、compaction 反复失败、重复整读、大结果回灌、工具错误自愈）→ 用 `workflow-audit.mjs`。
+- **因的问题**：这些 token 是怎么被工作流烧掉的（goal 反复续跑、compaction 反复失败、重复整读、大结果回灌、工具错误自愈）→ 用 `templates/workflow-audit.mjs`。
 
-脚本都在本 skill 目录，**只读**，不写任何文件。
+脚本都在本 skill 目录（`workflow-audit.mjs` 在 `templates/` 下），**只读**，不写任何文件。
 
 > ⚠️ `audit-tokens.mjs` 只读 projcache 的「整会话合计」，模型字段只取 `modelSelection.lastUsed` 单值——**算不出每个模型的输入/输出/缓存命中，也看不到 orchestrate 子模型消耗**。要每模型清单用 `audit-models.mjs`。
 
@@ -43,7 +43,7 @@ function zstdDecompressAll(buf) {
   return out;
 }
 ```
-（`workflow-audit.mjs` 已内建此实现。）
+（`templates/workflow-audit.mjs` 已内建此实现。）
 
 其它数据坑：
 - `tool/result` 的工具名不在 `data` 上，在 **`data.message.toolCallId`**，再回查 `tool/call` 的 `data.callId` 才能对上；`data.toolCallId` 是 undefined。
@@ -56,10 +56,10 @@ function zstdDecompressAll(buf) {
 node "$env:USERPROFILE\.dsh\skills\token-frugal\audit-tokens.mjs" 2026-11-02
 
 # 因：goal 轮数、工具错误自愈、大结果、重复整读、compaction 试/成/败
-node "$env:USERPROFILE\.dsh\skills\token-frugal\workflow-audit.mjs" 2026-11-02
+node "$env:USERPROFILE\.dsh\skills\token-frugal\templates\workflow-audit.mjs" 2026-11-02
 
 # 只深挖一个会话（最详细）
-node "$env:USERPROFILE\.dsh\skills\token-frugal\workflow-audit.mjs" --session ee03fc37
+node "$env:USERPROFILE\.dsh\skills\token-frugal\templates\workflow-audit.mjs" --session ee03fc37
 ```
 
 看什么：

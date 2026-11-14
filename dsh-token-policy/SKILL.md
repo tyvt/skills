@@ -7,6 +7,10 @@ description: DSH 会话的 token 与编排器路由细则。当任务涉及大�
 
 常驻禁止（全仓 grep、递归列 worktree、未验收收尾）在 AGENTS.md。这里只放阈值。
 
+> 配套 references（**进入对应场景才读**，不要一次性全读）：
+> - `references/plan-contract.md` — 计划审批的 4 段式契约与送审/确认流程细节，写计划或做 plan_review 时读。
+> - `references/dual-model-prompts.md` — 双模型（执行/审核）分工 prompt 模板与选型细则，编排器跨模型编排时读。
+
 ## Token
 
 1. 命令输出先过滤或分段，禁止大段结果整段回灌。大文件一次 `write` 定稿，小改才 `edit`。

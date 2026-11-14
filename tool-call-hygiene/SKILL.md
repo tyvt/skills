@@ -55,6 +55,13 @@ node "$env:USERPROFILE\.dsh\skills\tool-call-hygiene\audit.mjs" 2026-11-06
 ```
 排查「agent 调用失败」用 `audit.mjs`，覆盖面比 `scan.mjs` 全。`morning-report.mjs` 缺省按**滚动 24 小时**生成（避免凌晨跑时当天尚无会话、报表显示「0 失败」），显式传日期则按自然日复盘。
 
+**合并日报**：`daily-report.mjs` 一次汇总 Token 总览 + 工具/供应商失败今昨对比 + 工作流根因（复用 audit-tokens/morning-report/workflow-audit），落一份 markdown 到 `~/.dsh/reports/`：
+
+```powershell
+# 缺省=今天(Asia/Shanghai)；可传 YYYY-MM-DD；只落盘不提交
+node "$env:USERPROFILE\.dsh\skills\tool-call-hygiene\daily-report.mjs" [YYYY-MM-DD]
+```
+
 ## 4. 为什么重要
 
 一次失败不是“一步”，是“一步失败 + 一步重试 + 一步说明”，历史里全部重发。2026-11-02 实测 78 次工具错误中 62 次属于本表可一次避免的类型（FS_NOT_OBSERVED 33、FS_EDIT_NOT_FOUND 17、FS_NOT_FOUND 5…）。**这些是纯浪费的未命中。**

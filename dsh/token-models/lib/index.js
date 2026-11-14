@@ -18,7 +18,8 @@ export const name = "dsh-token-models";
 // 依赖 webServer 服务注册 HTTP 路由；cordis 会等该服务就绪后再调用 apply（与 orchestrator-gate 同款）。
 export const inject = ["webServer"];
 
-const DEFAULT_SESSIONS_DIR = "D:\\repository\\skills\\dsh\\langgraph-orchestrator\\.sessions";
+const DEFAULT_SESSIONS_DIR =
+  process.env.DSH_ORCH_SESSIONS_DIR || "D:\\repository\\skills\\dsh\\langgraph-orchestrator\\.sessions";
 
 function normalizeConfig(input) {
   return {

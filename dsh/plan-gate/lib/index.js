@@ -2,7 +2,7 @@
  * dsh-plan-gate —— 计划审批门（零依赖本地插件，仿 dsh-orchestrator-gate）。
  *
  * 规则：任何「修改 / 修复 / 实现 / 配置改动」落地前，必须先产出 Markdown 计划，
- * 经 reviewer（cursor/grok-4.7@256k）审核通过，且经用户人工确认，方可落盘。
+ * 经 reviewer（workbuddy/deepseek-v4.1-flash）审核通过，且经用户人工确认，方可落盘。
  *
  * 本门在 edit / write / apply_patch 等改动类工具执行前检查：
  *   - 仓库根 .plan/<sessionId>.md 是否存在（或 .plan/ 下任一已放行的计划文件）；
@@ -184,7 +184,7 @@ function rejectReason(tool, args, config, found) {
 
 /**
  * E2：读 .plan/_review.json，按当前计划文件的 plan_key + sha256 做复用/轮次/证据校验。
- * 返回 {action: "allow"|"block"|"warn", reason}。fail-open：文件缺失/损坏一律 allow。
+ * 返回 {action: "allow"|"block"|"warn", reason}。fail-safe：文件缺失/损坏一律 block（要求重新过审）。
  * @param {object} p - {root, planDir, planFile, enableGuard, fs}
  */
 export function checkReviewState({ root, planDir, planFile, sessionId, enableGuard, fs = {} }) {
@@ -196,7 +196,7 @@ export function checkReviewState({ root, planDir, planFile, sessionId, enableGua
   try {
     state = JSON.parse(readFile(reviewPath, "utf-8"));
   } catch (e) {
-    // 缺失/损坏 → fail-open 放行
+    // 缺失/损坏 → fail-safe block（要求重新过审，绝不静默放行）
     return { action: "block", reason: "review_json_absent_or_corrupt; re-review required" };
   }
   const entries = Array.isArray(state?.entries) ? state.entries : [];

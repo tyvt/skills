@@ -27,12 +27,21 @@ const port = portIdx >= 0 ? args[portIdx + 1] : null;
 
 // ---- 定位 dsh bin ----
 function findDshBin() {
-  const cands = [
-    'D:\\nvm\\nodejs\\node_modules\\@deepseek-ai\\dsh\\lib\\bin.js',
-    path.join(os.homedir(), 'AppData', 'Roaming', 'npm', 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js'),
+  // 优先：与当前 node 同级的 node_modules 树（nvm/portable 安装最稳，换机无需改）。
+  // 兼容两种布局：<nodeDir>/node_modules 与 <nodeDir>/../node_modules。
+  const nodeDir = path.dirname(process.execPath);
+  const nearNode = [
+    path.join(nodeDir, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js'),
+    path.join(nodeDir, '..', 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js'),
   ];
-  for (const c of cands) if (fs.existsSync(c)) return c;
-  throw new Error('未找到 dsh bin.js，请手动指定 DSH_BIN');
+  const cands = [
+    process.env.DSH_BIN,
+    ...nearNode,
+    path.join(os.homedir(), 'AppData', 'Roaming', 'npm', 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js'),
+    process.env.APPDATA && path.join(process.env.APPDATA, 'npm', 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js'),
+  ].filter(Boolean);
+  for (const c of cands) if (c && fs.existsSync(c)) return c;
+  throw new Error('未找到 dsh bin.js，请设置 DSH_BIN 环境变量指向 bin.js');
 }
 
 let failures = 0, warns = 0;
