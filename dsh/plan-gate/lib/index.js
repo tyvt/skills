@@ -15,6 +15,7 @@
 
 import { readFileSync, readdirSync, realpathSync } from "node:fs";
 import { createHash } from "node:crypto";
+import { splitSegments, tokenize } from "../../orchestrator-gate/lib/index.js";
 
 const APPROVAL_FIELDS = new Set(['status', 'human_confirmed', 'review_verdict', 'review_score', 'reviewer', 'approved_sha256', 'approved_version', 'reviewed_at']);
 export function canonicalPlan(text) {
@@ -36,10 +37,159 @@ export const name = "plan-gate";
 export const inject = ["tools"];
 
 /** 默认改动类工具（config.guardTools 可覆盖）。 */
-const DEFAULT_GUARD_TOOLS = ["edit", "write", "apply_patch"];
+const DEFAULT_GUARD_TOOLS = ["edit", "write", "apply_patch", "pwsh"];
 
 /** 视为「产出/回写计划」的工具：命中时不拦（允许写计划文件本身）。 */
 const PLAN_WRITE_TOOLS = new Set(["plan_review"]);
+
+// ── git 写命令门控（验证门禁凭证；见 .plan/verify-gate-commit-gate-20261114.md）──
+// 与 dsh/langgraph-orchestrator/src/verify.py compute_content_sha 逐字节对齐。
+const GIT_WRITE_SUBCMDS = new Set([
+  "commit", "push", "tag", "reset", "clean", "revert", "merge", "rebase",
+  "cherry-pick", "am", "apply", "stash", "restore", "switch", "checkout",
+]);
+// 仅无写标志/无位置名时才算 read 的 git 子命令（branch/remote 细分处理）。
+const GIT_READ_SUBCMDS = new Set([
+  "status", "log", "diff", "show", "rev-parse", "describe", "blame",
+  "ls-files", "show-ref", "for-each-ref",
+]);
+const DELETED_SENTINEL = "<DELETED>";
+const REVIEW_FILE = "_review.json";
+
+/** 去词的配对引号（tokenize 已去，这里兜底命令行头）。 */
+function stripQuotes(s) {
+  const v = String(s ?? "");
+  return v.length >= 2 && (v[0] === '"' || v[0] === "'") && v.at(-1) === v[0] ? v.slice(1, -1) : v;
+}
+
+/**
+ * 判断单个 token 段是否为 git 写操作。返回 "write" | "not-git" | "unknown"。
+ * 非 git 命令 → "not-git"；git 但子命令无法静态判定 → "unknown"。
+ */
+function classifySegment(segment) {
+  const toks = tokenize(segment).map(stripQuotes);
+  if (!toks.length) return "not-git";
+  // 找 argv0 = git/git.exe，跳过 git -C <path> / git -c k=v 前缀取真实子命令。
+  let i = 0;
+  const head0 = toks[0].replace(/^\.\\|^\.\//, "").toLowerCase();
+  const isGit = head0 === "git" || head0 === "git.exe";
+  if (!isGit) {
+    // 非 git 命令：若含动态执行包装（iex/Start-Process/cmd /c 等）或变量/子表达式 → unknown
+    const joined = toks.join(" ");
+    if (/(^|\s)(iex|invoke-expression|start-process|cmd)(\s|$)/i.test(joined) ||
+        /\$\(|`|\$env:|&\s*\$/i.test(segment)) {
+      return "unknown";
+    }
+    return "not-git";
+  }
+  i = 1;
+  // 跳过全局选项 git -C <path> / -c k=v / --git-dir=... 等
+  while (i < toks.length) {
+    const t = toks[i];
+    if (t === "-C" || t === "-c" || t === "--git-dir" || t === "--work-tree" || t === "--namespace") { i += 2; continue; }
+    if (t.startsWith("-")) { i += 1; continue; }
+    break;
+  }
+  const sub = (toks[i] || "").toLowerCase();
+  const rest = toks.slice(i + 1);
+  if (!sub) return "unknown"; // git 但无子命令（如仅 git）→ 无法判定
+  if (GIT_WRITE_SUBCMDS.has(sub)) return "write";
+  if (sub === "branch") {
+    // 纯列支（无位置名、无写标志）→ read；否则 write
+    const writeFlag = rest.some((a) => /^(-[dDmMcCfF]|--delete|--move|--copy|--force|--create)$/.test(a));
+    const positional = rest.some((a) => !a.startsWith("-"));
+    if (!writeFlag && !positional) return "not-git";
+    return "write";
+  }
+  if (sub === "remote") {
+    const op = (rest[0] || "").toLowerCase();
+    if (["", "-v", "show", "get-url"].includes(op) || op.startsWith("-v")) return "not-git";
+    if (["add", "remove", "rm", "rename", "set-url", "prune", "update"].includes(op)) return "write";
+    return "unknown";
+  }
+  if (sub === "config") {
+    const hasGet = rest.some((a) => a === "--get" || a === "--get-all" || a === "--list" || a === "-l");
+    return hasGet ? "not-git" : "write"; // config --unset / --add 等写
+  }
+  if (GIT_READ_SUBCMDS.has(sub)) return "not-git";
+  // 其余 git 子命令（pull/fetch/add/rm/mv/notes/... 写或未知）→ unknown（fail-closed）
+  return "unknown";
+}
+
+/**
+ * 三态命令判定：任一段 unknown → unknown（优先）；任一段 write 且无 unknown → write；
+ * 全为 not-git → not-git。无法解析/含动态执行 → unknown。
+ * @returns {"write"|"not-git"|"unknown"}
+ */
+export function classifyGitCommand(command) {
+  if (typeof command !== "string" || !command.trim()) return "unknown";
+  let segs;
+  try { segs = splitSegments(command); } catch { return "unknown"; }
+  if (!segs.length) return "unknown";
+  let sawWrite = false;
+  for (const seg of segs) {
+    let r;
+    try { r = classifySegment(seg); } catch { return "unknown"; }
+    if (r === "unknown") return "unknown";
+    if (r === "write") sawWrite = true;
+  }
+  return sawWrite ? "write" : "not-git";
+}
+
+/** 文本归一化（与 verify.py _normalize 对齐）：UTF-8 严格解码成功→CRLF/CR→LF；失败→\x00BIN\x00+raw。 */
+function normalizeBytes(buf) {
+  // 严格 UTF-8 解码：Node 的 TextDecoder({fatal:true}) 失败抛错
+  let text;
+  try {
+    text = new TextDecoder("utf-8", { fatal: true }).decode(buf);
+  } catch {
+    return Buffer.concat([Buffer.from("\x00BIN\x00", "latin1"), buf]);
+  }
+  const lf = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  return Buffer.from(lf, "utf8");
+}
+
+/** 读文件字节，失败返回 <DELETED> 哨兵字节（与 verify.py _read_bytes 对齐）。 */
+function readBytesOrDeleted(workdir, relPath) {
+  try {
+    return readFileSync(path.join(workdir, relPath));
+  } catch {
+    return Buffer.from(DELETED_SENTINEL, "utf8");
+  }
+}
+
+/**
+ * 复刻 verify.py compute_content_sha(workdir, paths!=None)：去重 + 排除 _review.json basename
+ * → sorted → 逐 path 追加 path(utf8) + \x1f + normalize(bytes) + \x1e → sha256 hex。
+ * @returns {string} hex sha256
+ */
+export function sha256Content(workdir, paths) {
+  const list = Array.isArray(paths) ? paths : [];
+  const filtered = [...new Set(list.map(String))].filter(
+    (p) => p && path.basename(p) !== REVIEW_FILE,
+  );
+  filtered.sort();
+  const h = createHash("sha256");
+  for (const p of filtered) {
+    h.update(Buffer.from(p, "utf8"));
+    h.update(Buffer.from("\x1f", "latin1"));
+    h.update(normalizeBytes(readBytesOrDeleted(workdir, p)));
+    h.update(Buffer.from("\x1e", "latin1"));
+  }
+  return h.digest("hex");
+}
+
+/** 凭证路径合法性：非数组/空 → 无效；含越界（.. 段或绝对路径）→ 无效。 */
+function reviewPathsInvalid(paths) {
+  if (!Array.isArray(paths) || paths.length === 0) return true;
+  for (const p of paths) {
+    if (typeof p !== "string" || !p) return true;
+    if (path.isAbsolute(p)) return true;
+    if (p.split(/[\\/]/).includes("..")) return true;
+  }
+  return false;
+}
+
 
 /**
  * 极简 frontmatter 解析：只取文件开头 `---` 与下一个 `---` 之间的 key: value。
@@ -270,6 +420,45 @@ export function decideInterception({ tool, args, config, sessionId, cwd, fs }) {
   if (!config.guardTools.has(tool)) return null;
   if (PLAN_WRITE_TOOLS.has(tool)) return null;
   const root = cwd || config.repoRoot;
+
+  // ── pwsh git 写门控：独立块严格独占 pwsh，所有分支显式 return，绝不落入下方 plan-approval ──
+  if (tool === "pwsh") {
+    try {
+      const command = args?.command;
+      const klass = classifyGitCommand(command);
+      if (klass === "not-git") return null; // 非 git：放行（零影响）
+      if (klass === "unknown") {
+        return `[plan-gate] 无法静态判定该 pwsh 命令是否含 git 写操作，保守拒绝。命令：${String(command).slice(0, 200)}`;
+      }
+      // klass === "write"：需验证凭证
+      const base = root || "";
+      let marker;
+      try {
+        marker = JSON.parse(readFileSync(path.join(base, REVIEW_FILE), "utf-8"));
+      } catch {
+        return "[plan-gate] 检测到 git 写操作，但缺少验证凭证 _review.json（请先经验证门禁 run_full 生成）。";
+      }
+      if (!marker || marker.verified !== true) {
+        return "[plan-gate] 检测到 git 写操作，但验证未通过（verified!=true），拒绝提交/推送。";
+      }
+      if (reviewPathsInvalid(marker.paths)) {
+        return "[plan-gate] 验证凭证 paths 非法（空或含越界路径），拒绝。";
+      }
+      let recomputed;
+      try {
+        recomputed = sha256Content(base, marker.paths);
+      } catch (e) {
+        return `[plan-gate] 凭证哈希重算失败，保守拒绝：${e?.message ?? e}`;
+      }
+      if (recomputed !== marker.content_sha) {
+        return "[plan-gate] 验证后被改动（内容哈希不一致），拒绝 git 写操作，请重新验证。";
+      }
+      return null; // 凭证有效且未被改动：放行
+    } catch (e) {
+      return `[plan-gate] pwsh 门禁校验异常，保守拒绝：${e?.message ?? e}`;
+    }
+  }
+
   if (!root) return rejectReason(tool, args, config, { checked: [] });
   const found = findApprovedPlan({
     root,
