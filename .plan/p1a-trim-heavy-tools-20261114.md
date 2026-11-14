@@ -92,7 +92,9 @@ title: P1(A) 裁剪重型低频工具组 + 补齐可达路径（profile 级）
 2. 可达路径：**full-tools 预设切换**。
 3. 节奏：**批 1 先行**，验证通过再做批 2。批 1 **只改 preset-standard**，不动 ptc/minimal/cordis。
 
-## 六、批 1 实施与验证结果（2026-11-14 完成）
+## 六、批 1 实施与验证结果（2026-11-14 完成 — 全部断言通过 ✅）
+
+**状态：批 1 全部断言 A/B/B'/C/D/E 通过，闭环。**
 
 **已实施**（`~/.dsh/profiles/web/cordis.patch.yml`，备份 `.bak-p1a-20261114144410`）：
 - preset-standard：`tool-schedule`、`tool-goal` 各加 `disabled: true`（按 id 定位命中 web-app bundle 的 preset，config 合并生效）
@@ -106,7 +108,7 @@ title: P1(A) 裁剪重型低频工具组 + 补齐可达路径（profile 级）
 - **断言 B' ✅**：session_search / session_event_search / workflow / team_task_create / spawn_teammate **全部仍在**；"new-but-not-old" 为空（无额外误删）
 - **断言 E ✅**：pwsh/read/edit/grep/glob 全在
 - **断言 D ✅**：切 `full-tools` 预设新会话 `8ac072fd`（"测试会话"）→ 46 工具，schedule_*(create/edit/list/view)+goal(create/get/update) **7 个全部恢复**；与 standard 精简会话差集为空（一个不多一个不少）。**可达路径闭环成立**。
-- **断言 C ⏳（待用户敲命令）**：`--dump-config` 证实 command-goal 在 preset-standard 内未 disabled（命令入口挂载）；goal 工具在 full-tools 也正常。`/goal` 实际执行需 UI 输入 ` slash 命令确认（暂无历史调用可引）。
+- **断言 C ✅**：live 实测会话 `70d2180c` raw log：`command/run name=goal source=user` → `command/done kind=success text="No goal is currently set. Usage: /goal ..."`。`/goal` 命令成功执行、返回正常状态（非"命令不存在"），命令入口完好、不依赖 tool-goal 工具。
 
 **收益**：每步固定重发 −1,275 token（占 tools 中位 ~12.7k 的 ~10%）。批 2（session_query+workflow ≈2,100 token）待做。
 
