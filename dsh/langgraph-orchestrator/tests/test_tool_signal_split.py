@@ -97,6 +97,27 @@ def test_prompt_renders_without_residual_placeholder():
     assert NEW in out and OLD in out
 
 
+# ---------- 硬约束五：按题型选执行档，且不写死模型 id ----------
+
+def test_planner_has_type_routing_rule_without_model_ids():
+    """PLANNER_SYSTEM 含【硬约束五：按题型选执行档】，且该段不含任何具体模型 id（防回归）。"""
+    out = graph_mod.PLANNER_SYSTEM.format(
+        tools="- X: y", signal=graph_mod._render_signal_rules()
+    )
+    assert "硬约束五" in out and "按题型选执行档" in out
+    # 抽取硬约束五段落（到「只输出一个 JSON 数组」为止）做模型 id 断言
+    seg = out.split("硬约束五", 1)[1].split("只输出一个 JSON 数组", 1)[0]
+    import re
+    # provider/model 形态、带 @ 变体、以及常见模型家族前缀均不得出现在该段
+    model_id_pat = re.compile(
+        r"[a-z0-9_.\-]+/[a-z0-9_.\-@]+|@\d+k|\b(composer|gpt-|glm-|deepseek-|grok|claude|gemini)",
+        re.I,
+    )
+    hits = model_id_pat.findall(seg)
+    assert not hits, f"硬约束五段落不应写死模型 id，命中: {hits}"
+
+
+
 # ---------- step 8：op=list 不依赖外部服务 ----------
 
 def test_op_list_offline():

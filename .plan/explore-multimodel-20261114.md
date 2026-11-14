@@ -1,8 +1,8 @@
 ---
 status: approved
 human_confirmed: true
-approved_sha256: dea7407973a19779f35053fb6cac4d0e895243da8f2fdc2e1c0ca83f23fdfcf7
-approved_version: 2
+approved_sha256: 2e9622a5c0a5489836a375fb74430f1203feef7a49000186e2b7e6f22d690c03
+approved_version: 3
 ---
 
 # 探索阶段（非编排器）多模型分工优化方案
@@ -53,7 +53,7 @@ approved_version: 2
 - 开关入口在 Settings → Plugins → Subagent（`dsh-client-ui-settings-subagent`，含 model selection 段），底层写 `subagent-model-selection` 命名空间。
 
 **因此层二=配置工作，不是编码**：
-- 在 Settings→Subagent 打开 model selection，并把"角色模型白名单 routes"写入（如 explore 用 flash 系、code 用 composer-2.5/gpt-6.1-sol、plan 用 gpt-6-luna）。
+- 在 Settings→Subagent 打开 model selection，并把"角色模型白名单 routes"写入——**权威映射见文末「附：统一路由表」**（explore/执行→glm-flash 或 cursor/deepseek-v41-flash-1017；抗坏工具→deepseek-flash 系【非 glm-flash】；code→composer-2.5/gpt-6.1-sol；plan/对抗→gpt-6-luna；summarize→强判读档；安全→强模型+guard）。route 格式 `{provider:"magpie", model:"..."}`。
 - 主控派子代理时按类型传对应 provider/model；不在白名单的 route 会被拒（安全兜底）。
 
 ### 层三：探索阶段也走编排器工具路由（人少活多时）
@@ -135,3 +135,31 @@ approved_version: 2
 3. **文档 diff**：新增段已核对含分派级别表 + 回退句，位置在「并行扇出（强制）」之后。
 
 > 结论：变更 A 落地且验证通过——探索阶段已可按动作类型用 `workflow agent({provider,model})` 走多模型，零配置改动、零 preset 风险。变更 B（启用 subagent 工具+白名单）按约定未做。
+
+---
+
+## 附：统一路由表（v3 新增，2026-11-14；controller-bench 406 行实测依据，口径唯一权威）
+
+> 依据：`controller-bench/results/{bench-full,score-full}.json`（14 模型 × 29 题 = 406 行，M1–M5 + T8–T11）；成本/耗时取自 bench-full。原则：**效率第一、质量第二、成本第三；安全/对抗保强模型。** 本表为**唯一权威**，与「层二」第 56 行、上文 110 行分派顺序、AGENTS.md「探索阶段按动作类型选模型」段一致。
+
+| 动作/题型 | 权威模型 | 实测依据 | 易错点（务必排除） |
+|---|---|---|---|
+| 执行/检索/效率（M2/M5） | **workbuddy/glm-5.3-flash** 或 **cursor/deepseek-v41-flash-1017** | M5 满分 1.000；后者综合最快 3922ms | 不用 `workbuddy/deepseek-v4.1-flash` 作效率首选（M5 仅 0.846） |
+| 抗坏工具/改道（M3） | **cursor/deepseek-v41-flash-1017** 或 **workbuddy/deepseek-v4.1-flash** | M3 0.932 / 0.919，deepseek-flash 系最强（套餐按量，非免费） | **不派 glm-flash**（M3 仅 0.737，明确短板） |
+| 工具选择精准（M1，难题降级） | cursor/grok-4.7@256k 或 codex/gpt-5.6-terra | tool 0.88/0.87 | 峰值高但慢+计费，仅难题用 |
+| 对抗/根因/多轮纠错（T，=plan 规划） | **codex/gpt-6-luna** | T 类 0.875 全场第一；deepseek-flash 垫底 0.605，Δ0.27 | planner（规划拆解）池首依据 |
+| 代码生成 | cursor/composer-2.5 / codex/gpt-6.1-sol | 质量敏感 | — |
+| 长输出判读汇总（M8 待测） | 强判读档（terra/sol），输入 >2k 行时 | token 效率维 | summarizer 池 |
+| diff 评审/verifier（≠plan 规划） | plan_reviewer 池（现 grok-4.7，route 1.00） | 2026-11-14 verifier 新增 | 评审角色，勿与 plan 规划混淆 |
+| 安全拒绝（M4-5） | **强模型 + security_guard 前置** | 弱模型 gpt-6-astra 唯一失守密码导出 | guard 不可省 |
+| 低成本兜底 | workbuddy/deepseek-v4.1-flash | 套餐按量、最快 4.5s，M5 偏弱 | 仅兜底（非免费，仅 hy3 免费） |
+
+**一句话规则**：执行/检索/效率→glm-flash 或 cursor/deepseek-v41-flash-1017（v4.1-flash 仅低成本兜底）；抗坏工具→deepseek-flash 系（非 glm-flash）；对抗/根因→gpt-6-luna；代码→composer/gpt-6.1-sol；安全→强模型+guard；**overall 排名不看，看题型派活**。
+
+**route 字段说明（回应审核 P1-2）**：route 统一写成 `{provider:"magpie", model:"<带斜杠前缀的完整 model id>"}`——**斜杠前缀属于 `model` 字段**（如 `workbuddy/glm-5.3-flash`、`cursor/deepseek-v41-flash-1017`、`codex/gpt-6-luna` 都整体作为 model 值），`provider` 恒为 `magpie`。例：`{provider:"magpie", model:"workbuddy/glm-5.3-flash"}`。
+
+**与第 110 行对齐（回应审核 P1-1）**：第 110 行既有顺序"探索/检索→workbuddy/glm-5.3-flash→auto/deepseek-v4.1-flash"与本表一致——**效率/探索首选 glm-flash（或更快的 cursor/deepseek-v41-flash-1017）；workbuddy/deepseek-v4.1-flash 仅列兜底**，不矛盾。
+
+**口径修正留痕（2026-11-14 用户指正）**：①"免费 flash 系最强"是误表述，准确为 **deepseek-flash 系**最强、glm-flash 是 M3 短板；②执行/检索首选不能用 workbuddy/deepseek-v4.1-flash（M5 0.846 不达 0.9+），改 glm-flash / cursor-deepseek-v41-flash-1017。③**成本口径更正（2026-11-14 用户指正）**：仅 hy3 免费，glm-flash / deepseek-flash / composer / grok 等均为套餐按量计用量；本表"低成本兜底""最廉价档"仅指"套餐内最廉价档位"，非免费，成本选择应看套餐月费+用量而非 bench 的 cost=0 列。
+
+**局限（口径诚实）**：本表基于单轮计划产出评测，端到端多轮执行/真实工具回报未覆盖；改池首前建议对首选模型做 1 周影子对照（同任务双跑比对成功率与 token）。
