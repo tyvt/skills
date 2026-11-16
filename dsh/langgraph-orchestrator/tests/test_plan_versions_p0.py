@@ -212,3 +212,87 @@ def test_cross_session_and_concurrent_state(tmp_path):
     record(prepare(tmp_path, '.plan/shared.md', 'session1', 'reject'), 'reject', 0)
     with pytest.raises(ValueError, match='changed'):
         record(pending, 'pass', 90)
+
+
+# ── P0-1 plan_path 契约：text 空时从文件读入 ──────────────────────────────
+
+def test_prepare_reads_from_plan_path_when_text_empty(tmp_path):
+    content = '# File Plan\n\nfrom file body\n'
+    p = tmp_path / '.plan' / 'x.md'
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(content, encoding='utf-8')
+    out = prepare(tmp_path, '.plan/x.md', 'session1', '')
+    assert out['plan_markdown'] == content
+    # digest 一致性（阻塞点①）：文件读入与内联同内容 digests 必须相等
+    inline = prepare(tmp_path, '.plan/y.md', 'session1', content)
+    assert out['plan_sha256'] == inline['plan_sha256'] == plan_sha(content)
+
+
+def test_prepare_plan_path_missing_file_raises(tmp_path):
+    with pytest.raises(ValueError):
+        prepare(tmp_path, '.plan/nope.md', 'session1', '')
+
+
+def test_prepare_plan_path_empty_file_raises(tmp_path):
+    p = tmp_path / '.plan' / 'empty.md'
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text('   \n\n', encoding='utf-8')
+    with pytest.raises(ValueError, match='empty'):
+        prepare(tmp_path, '.plan/empty.md', 'session1', '')
+
+
+def test_prepare_plan_path_oversize_raises(tmp_path):
+    from src.plan_versions import MAX_PLAN_CHARS
+    p = tmp_path / '.plan' / 'big.md'
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text('x' * (MAX_PLAN_CHARS + 100), encoding='utf-8')
+    with pytest.raises(ValueError, match='size limit'):
+        prepare(tmp_path, '.plan/big.md', 'session1', '')
+
+
+def test_prepare_plan_path_multibyte_within_char_limit(tmp_path):
+    """多字节 UTF-8：字符数在上限内但字节数超 4× 不该误拒（按字符判上限）。"""
+    from src.plan_versions import MAX_PLAN_CHARS
+    # 字符数 = MAX_PLAN_CHARS-100，但每字符 3 字节，总字节可能 > MAX_PLAN_CHARS*4（需保证没超）
+    content = '中' * (MAX_PLAN_CHARS - 100)  # 3 bytes each → ~3*(MAX-100) bytes < 4*MAX，stat 放行；len=MAX-100 放行
+    p = tmp_path / '.plan' / 'mb.md'
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(content, encoding='utf-8')
+    out = prepare(tmp_path, '.plan/mb.md', 'session1', '')
+    assert out['plan_markdown'] == content
+
+
+def test_prepare_empty_text_with_delta_does_not_read_file(tmp_path):
+    """阻塞点：text 空且有 delta 时走 delta 分支，不读 plan_path（plan_path 指向不存在文件也不影响）。"""
+    first = prepare(tmp_path, '.plan/d.md', 'session1', '# Plan\nold body\n')
+    record(first, 'pass', 90)
+    second = prepare(tmp_path, '.plan/d.md', 'session1', '', first['plan_sha256'], 1, [{'old': 'old body', 'new': 'new body'}])
+    assert second['plan_markdown'] == '# Plan\nnew body\n'
+
+
+def test_prepare_inline_text_wins_over_plan_path(tmp_path):
+    p = tmp_path / '.plan' / 'both.md'
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text('file content', encoding='utf-8')
+    out = prepare(tmp_path, '.plan/both.md', 'session1', 'inline content')
+    assert out['plan_markdown'] == 'inline content'
+
+
+def test_api_plan_review_from_plan_path_end_to_end(tmp_path, monkeypatch):
+    """集成（阻塞点④）：run_plan_review 只给 plan_path（不给内联正文）也能返回 verdict。"""
+    from types import SimpleNamespace
+    from src import api
+    p = tmp_path / '.plan' / 'e2e.md'
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text('# E2E Plan\nbody via file\n', encoding='utf-8')
+    response = SimpleNamespace(ok=True, content='{"verdict":"pass","score":88,"issues":[],"suggestions":[]}',
+                              attempts=[], tool='plan_reviewer', model_used='fake')
+    monkeypatch.setattr(api, 'load_config', lambda *_: object())
+    monkeypatch.setattr(api, 'ModelRouter', lambda *_: SimpleNamespace(run_tool=lambda t, m: response))
+    monkeypatch.setattr(api, '_append_costs', lambda *_: None)
+    out = api.run_plan_review('', workdir=str(tmp_path), session_id='s_e2e', plan_path='.plan/e2e.md')
+    assert out['ok'] is True and out['verdict'] == 'pass'
+    assert out['version'] == 1
+    # 落盘的版本正文来自文件
+    state = json.loads((tmp_path / '.plan/_review.json').read_text())
+    assert 'body via file' in state['entries'][-1]['plan_markdown']

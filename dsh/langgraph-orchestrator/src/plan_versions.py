@@ -8,6 +8,10 @@ from pathlib import Path
 
 APPROVAL_FIELDS = {'status', 'human_confirmed', 'review_verdict', 'review_score', 'reviewer', 'approved_sha256', 'approved_version', 'reviewed_at'}
 
+# 镜像 api.PLAN_REVIEW_CLIP_CHARS（=16000）；此处独立定义避免 plan_versions<->api 循环导入。
+# 用于 plan_path 从文件读入时的体积闸，与内联送审共用同一字符上限（按字符，非字节）。
+MAX_PLAN_CHARS = 16000
+
 
 def canonical_plan(text):
     text = str(text).lstrip('\ufeff').replace('\r\n', '\n').replace('\r', '\n')
@@ -74,8 +78,19 @@ def prepare(root, plan_path, session_id, text, base_sha='', base_version=None, d
             text = text.replace(old, new, 1)
     elif base_sha or base_version is not None:
         raise ValueError('base fields require delta')
+    # plan_path 契约：text 为空且无 delta 时，从 resolve_plan 解析出的 target 读文件（受 .plan 边界+.md 约束）。
+    # digest 一致性：直接赋 read_text 原值，不 strip 不改写；plan_sha 内 canonical_plan 已统一 CRLF/BOM→\n，
+    # 故「文件读入」与「内联同内容」digest 必然一致，approved_sha256 版本比对不漂移。
+    if (not isinstance(text, str) or not text.strip()) and delta is None:
+        if target.exists() and target.is_file():
+            # 先按字节 stat 粗筛（避免大文件整读进内存），read 后再按字符数复核上限。
+            if target.stat().st_size > MAX_PLAN_CHARS * 4:
+                raise ValueError('plan exceeds review size limit; shorten before review')
+            text = target.read_text(encoding='utf-8')
     if not isinstance(text, str) or not text.strip():
         raise ValueError('plan is empty')
+    if len(text) > MAX_PLAN_CHARS:
+        raise ValueError('plan exceeds review size limit; shorten before review')
     digest = plan_sha(text)
     version = (latest['version'] + (latest['plan_sha256'] != digest)) if latest else 1
     return {'root': str(root), 'target': str(target), 'plan_key': key, 'session_id': session_id,

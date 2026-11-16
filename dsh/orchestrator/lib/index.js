@@ -14,6 +14,8 @@
  */
 
 import { spawn } from 'node:child_process'
+import { resolve as pathResolve, isAbsolute, relative as pathRelative, sep } from 'node:path'
+import { existsSync, statSync } from 'node:fs'
 import { Config } from './config.js'
 import { preflight } from '../../scripts/preflight-p0.mjs'
 
@@ -24,6 +26,26 @@ export const name = 'orchestrator'
 
 /** 需要工具注册表就位。 */
 export const inject = ['tools']
+
+/**
+ * plan_review 的 plan_path 轻量预检（P0-1 契约修复）。
+ * 语义：plan_path 为「相对 workdir 的路径」，与 Python resolve_plan 的 root/target 一致。
+ * 仅当 workdir 可解析时校验：解析后必须落在 <workdir>/.plan 内、后缀 .md、且文件存在。
+ * 返回错误串（应中止）或 null（放行交 Python 做权威校验）。
+ */
+export function validatePlanPath(planPath, workdir) {  if (!planPath) return null
+  if (isAbsolute(planPath)) return 'plan_path 必须是相对 workdir 的路径（如 .plan/xxx.md）'
+  if (!workdir) return null // workdir 不可解析时跳过，交 Python 权威校验
+  const planDir = pathResolve(workdir, '.plan')
+  const target = pathResolve(workdir, planPath)
+  const rel = pathRelative(planDir, target)
+  if (rel === '' || rel.startsWith('..') || rel.includes('..' + sep) || isAbsolute(rel)) {
+    return 'plan_path 必须位于 workdir/.plan 内'
+  }
+  if (!target.toLowerCase().endsWith('.md')) return 'plan_path 必须是 Markdown(.md) 文件'
+  if (!existsSync(target) || !statSync(target).isFile()) return 'plan_path 文件不存在'
+  return null
+}
 
 const TOOL_NAME = 'orchestrate'
 const ALLOWED_OPS = ['full', 'tool', 'list', 'plan_review']
@@ -444,9 +466,12 @@ export function apply(ctx, config) {
         return renderResult(result, config.verbose)
       }
       if (op === 'plan_review') {
-        if ((!args.plan || !String(args.plan).trim()) && !args.delta?.length) {
-          throw new Error('orchestrate: op=plan_review 需要 plan 参数（Markdown 计划正文）')
+        // P0-1：允许「plan 正文」或「plan_path(.plan 内 md)」或「delta 增量」三种入口，三者皆空才报错。
+        if ((!args.plan || !String(args.plan).trim()) && !args.plan_path && !args.delta?.length) {
+          throw new Error('orchestrate: op=plan_review 需要 plan 或 plan_path 参数（plan 正文，或 .plan 内 md 相对 workdir 路径）')
         }
+        const planPathErr = validatePlanPath(args.plan_path, args.workdir)
+        if (planPathErr) throw new Error('orchestrate: ' + planPathErr)
         const sessionId = hostSessionId(exec)
         const result = await callPython(
           config,

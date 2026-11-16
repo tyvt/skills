@@ -7,7 +7,10 @@
  * 运行: node selftest.mjs
  */
 import assert from 'node:assert'
-import { Config, apply } from './lib/index.js'
+import { Config, apply, validatePlanPath } from './lib/index.js'
+import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 import { fileURLToPath } from 'node:url'
 const PROJECT = fileURLToPath(new URL('../langgraph-orchestrator', import.meta.url))
@@ -35,6 +38,27 @@ async function main() {
   assert.deepEqual(registered.parameters.properties.execution.required, ['program', 'args'])
   assert.ok(registered.parameters.properties.delta)
   await assert.rejects(() => registered.execute({ op: 'plan_review' }, {}), /plan/)
+  // P0-1 plan_path 契约校验（纯逻辑，不 spawn python）
+  {
+    const wd = mkdtempSync(join(tmpdir(), 'orch-pp-'))
+    mkdirSync(join(wd, '.plan'), { recursive: true })
+    writeFileSync(join(wd, '.plan', 'ok.md'), '# ok\n')
+    // ① 存在且合法的 plan_path：放行（返回 null）
+    assert.equal(validatePlanPath('.plan/ok.md', wd), null)
+    // ② 文件不存在：预检报错
+    assert.match(validatePlanPath('.plan/nope.md', wd), /不存在/)
+    // ③ 越界（不在 .plan 内）：报错
+    assert.match(validatePlanPath('outside.md', wd), /\.plan/)
+    // ④ 非 .md：报错
+    assert.match(validatePlanPath('.plan/ok.txt', wd), /Markdown/)
+    // ⑤ 绝对路径：报错
+    assert.match(validatePlanPath(join(wd, '.plan', 'ok.md'), wd), /相对/)
+    // ⑥ 无 plan_path：放行
+    assert.equal(validatePlanPath('', wd), null)
+    // ⑦ 仅 plan_path 不抛「需要 plan 参数」——参数校验前置不再因缺 body 而报错
+    //    （真正执行会 spawn python，这里只验证校验函数与不误判）
+    console.log('[PASS] validatePlanPath contract')
+  }
   const invalid = await registered.execute({ op: 'full', workdir: PROJECT + '/missing',
     execution: { program: 'git', args: ['status', '--short'] } }, {})
   assert.ok(invalid.includes('WORKDIR'), 'invalid cwd must fail before execution')
