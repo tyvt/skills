@@ -14,13 +14,14 @@
 - 验证证据：会话 2f6a0465（基线 69cd251）用户诉求配置图不写死环境变量及子目录部署疑问，结论给出三类资源路径矩阵。
 - 涉及文件：zhi2-mobile-shimin/src/utils/index.js、utils/mainStaticPaths.js、store/menu.js、vite.config.ts。
 - 判断口径：缺的是 nginx 根路径代理，不是子目录部署本身。
+- 2026-11-15 复核：测试库一级菜单 `ICON` 仍多为 `#`，部分菜单带 `/zhi2-pro/...png`；本机 8101 未配置该路径代理，直连 `/zhi2-pro/...` 返回 404，需先恢复原站再核验。
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "config_img_root_path",
-  "source_extraction_id": "ca1c03debbd649dab1b71cd5d75db317",
-  "version": 1,
+  "source_extraction_id": "6e54cc1db083466db6acc44f04e02851",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

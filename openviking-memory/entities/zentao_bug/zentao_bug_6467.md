@@ -18,16 +18,17 @@
 
 ## Verification & Resolution
 - `npx eslint` 通过；生产构建成功（version 2.6.1，buildTime 2026-11-11 14:04:44，gitHash daf1a2956，分支 develop/v2.6.2-huishan）。
-- 本地 nginx 新增站点 http://127.0.0.1:8119（root D:/repository/惠山二期G/dist，监听 8119，代理 huishan dev 网关），首页与全部 JS/CSS 资源均 200；交互式 E2E 未执行（无 huishan 后端登录态）。
+- 本地 nginx 站点 http://127.0.0.1:8119（root D:/repository/惠山二期G/dist，代理 huishan dev 网关），首页与全部 JS/CSS 资源均 200；未执行交互式 E2E（无 huishan 后端登录态）。
 - 禅道回写：zt_bug 6467 status=resolved、resolution=fixed、resolvedBy=tiany、assignedTo=zhoudongdong（退回报告人）、resolvedBuild=trunk；zt_action 91037（resolved/fixed）已事务提交并复核落库。
 - 改动落于 D:/repository/惠山二期G/zhi2-web-admin 子目录（仅 decisionRangeBuildingSelectMixins.js 为实际改动；public/version.json 为构建产物按规范不提交）。惠山二期G 是 zhi2-web-admin 的惠山物管专项部署分支（区别于门户部署 D:/repository/门户/zhi2-web-admin），代理地址 huishan.wuxi.dev.zhi.com。
+- 2026-11-16 后续：方案改为移除楼盘表视图、仅保留列表视图并优先性能，详见「禅道Bug6467表决户室卡顿修复」卡片。
 
 <!-- MEMORY_FIELDS
 {
   "category": "zentao_bug",
   "name": "zentao_bug_6467",
-  "source_extraction_id": "6f72dc685eb64f608f5f0aaabe1d5bc3",
-  "version": 1,
+  "source_extraction_id": "1aed269553104cfab6c6a411510229d1",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -10,13 +10,15 @@ dsh（DeepSeek Harness）的成本计量插件，监控会话步数与 ask_user 
 - 合成事件实测 step-guard 在阈值触发且仅一次、ask-wait 在 ≥300s 等待触发
 - 涉及文件：cost-meter/lib/index.js、cost-meter/cordis.patch.yml
 - 所属项目：dsh；来源会话：2026-11-12
+## Status
+- As of 2026-11-16 the A2 edits in dsh/cost-meter/cordis.patch.yml (stepReminderThreshold, askUserLongWaitMs) are still uncommitted changes from a prior session and were deliberately excluded from commit 99a0e514 (the inject fix).
 
 <!-- MEMORY_FIELDS
 {
   "category": "程序工具",
   "name": "dsh_cost_meter_plugin",
-  "source_extraction_id": "c34ec82b95544a2b95ac7d8de15df2b3",
-  "version": 1,
+  "source_extraction_id": "bc770cd55b1d44cbbbac2f7efddbb30b",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

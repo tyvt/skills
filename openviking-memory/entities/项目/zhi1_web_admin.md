@@ -1,27 +1,30 @@
 # zhi1-web-admin（太仓物管前端）
-太仓物管（苏州太仓武港）房地产/物管平台前端子模块，GitLab 项目 `gitlab.zhi.com-zhi-suzhou-taicang-wuguan-fe-zhi1-web-admin-h5-g-unlimited`，本地路径 `D:\repository\太仓G\zhi1-web-admin`。
+太仓物管（苏州太仓武港）房地产/物管平台的前端子模块。
 
-## 项目与任务
-- 禅道任务 2334：按附件 HTML 100% 还原企业注册流程优化页面（独立登录认证关卡 + 基本资料录入页）；旧流程混杂机构选择、组织登记、管理员与附件流程，沿用平台现有管理员/附件/提交审核组件，不重做规格。
-- `package.json` 依赖安装脚本改为仓库安装脚本，属用户未提交改动，保持原样。
+## 项目信息
+- GitLab 项目 `gitlab.zhi.com-zhi-suzhou-taicang-wuguan-fe-zhi1-web-admin-h5-g-unlimited`，本地路径 `D:epository\太仓G\zhi1-web-admin`。
+- 仓库 `package.json` 的依赖安装脚本被改为仓库安装脚本，属用户未提交改动，保持原样。
 
-## 注册与登录契约
-- 机构类型短码 `01/04`、附件业务码 `040100/040600`；匿名临时账号 7 天有效期、凭证经 Vuex 一次性交接不入 URL、验证码默认隐藏等细则见实体卡「zhi1 登录注册验证码默认隐藏」与「zhi1 企业注册登录契约」。
+## 仓库状态
+- 2026-11-15 处理前子模块与父仓各落后各自 origin 1 个提交；子模块内已有本任务代码、测试、预存 `package.json` 改动与本地生成物，处理顺序为先保留这些状态、同步上游，再只提交任务源文件与相关手工检查脚本。
+- 2026-11-15 任务提交在隔离分支完成并推送：子模块 `a82cf35d`（`feat(register): align registration and login with prototype`）推到 `fix/task-2334-registration-ui` 与 `suzhou-taicang-wuguan-main-v1.26`；父仓 `90373376`（`chore(submodule): update zhi1-web-admin for task 2334`）gitlink 指向 `a82cf35d` 并推送同分支，远端 SHA 与本地一致；暂存仅 11 个前端源文件与 8 个无敏感值手工检查脚本，机器专用 `visual-baseline.mjs`、`package.json` 与运行产物未纳入；提交前构建与真实 API E2E 通过，临时工作树已移除。
+- 2026-11-16 登录页视觉回退已提交并推送：子模块 `2b1ea2ac7`（`revert(login): 回退登录页视觉改为旧版，保留临时账号登录续填功能`，3 文件 +61/-875）推到 `suzhou-taicang-wuguan-main-v1.26`；父仓 `6c49ae2`（`chore(submodule): update zhi1-web-admin 回退登录页视觉`）gitlink 指向 `2b1ea2ac7` 并推送，远端 SHA 与本地 HEAD 一致。
+- 2026-11-16 回退范围与验证：`src/views/login.vue` 回到 `a82cf35d` 之前的旧版外观，仅保留 `created()` 临时账号凭证预填与 `handleLogin()` 中 `userType === '01'` 跳 `/register/add`；删除 `tests/manual/2334/login-page-ui-contract.test.mjs`，并从 `ui-contract.test.mjs` 删掉 7 条登录视觉断言；未纳入会话前既有的 `package.json` 改动与未跟踪的 `.eslintcache/.task-state/_review.json/visual-baseline.mjs`；7 个手测全过、ESLint 与 build 均 exit 0。
 
-## 最新进展
-- 2026-11-14：注册首屏完成（示例数据与原型一致）；默认空选/禁用态契约、登录页重做（首条红测指出 hero 装饰线缺失）、「填入示例」修正（未选机构类型时自动选中默认类型、填充并聚焦代码框）均转绿；截图两处差异（类型卡片图标加载失败、页头为维修图标而非原型房屋标记）补契约后先红后绿，8 个 2334 契约、Vue 模板/脚本解析与限定 whitespace 检查均通过。
-- 2026-11-14：登录与注册契约改动改为本地生产构建 + 复用现有 Nginx 截图核对，不启动开发服务器、不填示例数据；最终构建后台运行、30 秒心跳正常无错误，完成后截取空白状态页并检查最终截图。
-- 2026-11-14：注册页与登录页改为共享行内 SVG 组件、复用同一组原型路径；相关契约与全套手动检查再次通过；最终构建已启动，随后核对两张截图中的屋顶图标与类型卡片图案。
-
-## 相关实体
-- 联调、DBX/Nacos 凭据与 Playwright E2E 验证见「zhi1 注册流程联调与 E2E 验证」；实施计划第 14 版复审见「zhi1 企业注册流程实施计划复审」；后端仓库 `D:\repository\太仓物管后端` 的分支、接口模块与 Nacos 配置见「太仓物管后端」。
+## 任务与关联
+- 任务 2334（企业注册流程优化）的需求要点与逐轮进展见「zhi1_任务2334」。
+- 细则见「zhi1 登录注册验证码默认隐藏」「zhi1 企业注册登录契约」；联调与 E2E 见「zhi1 注册流程联调与 E2E 验证」；实施计划第 14 版复审见「zhi1 企业注册流程实施计划复审」；后端仓库分支、接口模块与 Nacos 配置见「太仓物管后端」。
 
 <!-- MEMORY_FIELDS
 {
   "category": "项目",
   "name": "zhi1_web_admin",
-  "source_extraction_id": "76f7f713c2624209a7f6618bc55ea396",
-  "version": 29,
+  "source_extraction_id": "957581bc204b4bb58a80535daef7f819",
+  "source_extraction_ids": [
+    "8954da6527344278aeedb1f4d5669418",
+    "9e3298fc242a4bf8b98296349c80c7cc"
+  ],
+  "version": 44,
   "memory_type": "entities"
 }
 -->
