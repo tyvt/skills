@@ -8,6 +8,9 @@
 import { apply, status, log } from './install.mjs';
 import { applyQuiet, statusQuiet } from './patch-quiet.mjs';
 import { apply as applyBatchSealed } from '../cursor-batch-sealed/patch-batch-sealed.mjs';
+import { apply as applyFastDefault } from '../cursor-fast-default/patch-fast-default.mjs';
+
+let wiringFailed = false;
 
 try {
   const before = status();
@@ -35,7 +38,23 @@ try {
   } catch (e) {
     log(`sealed-batch fix skipped: ${e.message}`);
   }
+
+  // Keep the fast-default on every plugin copy: without it direct API calls
+  // without service_tier never run Cursor's fast variant.
+  try {
+    const f = applyFastDefault();
+    if (f.results.some((r) => !r.ok)) {
+      wiringFailed = true;
+      log(`fast-default fix incomplete: ${f.results.filter((r) => !r.ok).map((r) => `${r.path} (${r.reason})`).join(', ')}`);
+    } else if (f.changed) {
+      log('reapplied fast-default on plugin index.mjs copy(ies)');
+    }
+  } catch (e) {
+    wiringFailed = true;
+    log(`fast-default fix skipped: ${e.message}`);
+  }
 } catch (error) {
   log(`reapply failed: ${error.message}`);
   process.exitCode = 1;
 }
+if (wiringFailed) process.exitCode = 1;
