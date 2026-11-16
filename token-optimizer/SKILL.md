@@ -1,6 +1,6 @@
 ---
 name: token-optimizer
-description: 把会话 token/成本审计变成「可执行降本清单」。读取 dsh-context 插件同源的投影缓存，输出等效成本 TOP、低缓存会话、provider/模型每步未命中、上下文组成、高压力会话，并自动生成优化建议。当用户要“token 优化建议”“能不能做什么插件/脚本降本”“哪个模型最费”“复盘烧钱会话”时使用。与 token-frugal（工作流归因）互补：本 skill 偏「成本排序 + 落地建议」，token-frugal 偏「为什么烧的工作流病因」。
+description: 会话 token/成本的跨会话排序与行动建议。读取 dsh-context 同源投影缓存，输出等效成本 TOP、低缓存会话、provider/模型用量、上下文组成和窗口压力；使用同一缓存数据时，成本排名及行动优先级以本 skill 为准。需要分析 goal 反复、compaction 失败、重复读取等工作流原因时使用 token-frugal。当用户要“token 优化建议”“哪个模型或会话最费”“先优化哪里”时使用。
 ---
 
 # token-optimizer — 可执行降本清单
@@ -12,7 +12,7 @@ description: 把会话 token/成本审计变成「可执行降本清单」。读
 - [ ] 构建/回写/部署证据齐（未执行项已写明）
 - [ ] 有行为变更的，在交付说明单列“需客测确认点”
 
-**定位**：token-frugal 回答「为什么烧」，本 skill 回答「先治谁、怎么治、治到什么程度」。数据源与 `dsh-context` 插件的 **Context Insights / 上下文洞察** 面板完全一致（同一份 `session_projcache` 投影），因此脚本输出与界面数字对得上。
+**定位**：本 skill 负责跨会话成本排序与行动优先级；`token-frugal` 负责单会话/模型用量口径和工作流病因。与 `dsh-context` 的 **Context Insights / 上下文洞察** 面板读取同一份 `session_projcache` 投影，因此成本排名和面板数据可对照。
 
 ## 数据源
 
@@ -48,6 +48,8 @@ node "$env:USERPROFILE\.dsh\skills\token-optimizer\analyze.mjs" "C:\path\to\sess
 **降本第一抓手是「压步数 × 压每步上下文」，不是再挤命中率**（命中率已 94% 时无空间，但步数砍半≈缓存读砍半）。
 
 ## 判读阈值
+
+> 数值口径以 `dsh-token-policy` 为准，本表仅为判读速查；与政策不一致时以政策为准。
 
 | 信号 | 阈值 | 动作 |
 |---|---|---|
