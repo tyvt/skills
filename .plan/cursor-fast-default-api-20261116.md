@@ -43,4 +43,4 @@ approved_version: 2
 - 回滚：`node patch-fast-default.mjs --restore` + 重启 plugin-host；skills 仓变更 git revert。
 
 ## 六、提交
-- 沿用已确认的「提交并推送」；push 当前因 github 不可达阻塞，恢复后补推（含上轮 7b0456fe）。
+- 提交 `538f35d9`（含计划文件 + 补丁目录 + reapply 接线）；push 随 github 连通性恢复后补推（连同上轮 `7b0456fe`）。
