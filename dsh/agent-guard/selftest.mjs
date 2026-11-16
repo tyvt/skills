@@ -4,7 +4,7 @@
 // 退出码 0 = 全通过；1 = 有失败。
 import assert from 'node:assert/strict'
 
-import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift } from './lib/rules.js'
+import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, isPwshExploration } from './lib/rules.js'
 import { decideInterception } from './lib/scope.js'
 import { evaluateAsk } from './lib/ask-guard.js'
 import { apply, inspectSessionSizes, Config } from './lib/index.js'
@@ -766,6 +766,90 @@ test('全部已带 id 时不改动', () => {
   const repairs = repairArguments({ toolName: 'ask_user_question', args }).repairs
   assert.ok(!repairs.some((r) => r.rule === 'ask-user-id'))
 })
+
+console.log('\n=== viking-first 探索前置记忆检索 + isPwshExploration ===')
+function freshVfState() {
+  return { vikingSearched: false, vikingNudged: false, vikingSkipped: false }
+}
+test('isPwshExploration：探索动词命中（词边界）', () => {
+  assert.equal(isPwshExploration('Get-ChildItem D:/x'), true)
+  assert.equal(isPwshExploration('gci -Force'), true)
+  assert.equal(isPwshExploration('Select-String -Path a.txt -Pattern foo'), true)
+})
+test('isPwshExploration：构建/测试命令不误判', () => {
+  assert.equal(isPwshExploration('npm run build'), false)
+  assert.equal(isPwshExploration('pnpm test'), false)
+  assert.equal(isPwshExploration('vite build'), false)
+  assert.equal(isPwshExploration('node --test'), false)
+})
+test('isPwshExploration：路径含 ls/dir 或 $false 不误伤', () => {
+  assert.equal(isPwshExploration('npm run build -- ls-dist'), false)
+  assert.equal(isPwshExploration('$x = $false; npm test'), false)
+  assert.equal(isPwshExploration('git status --short dir'), false)
+})
+test('isPwshExploration：空/非字符串容错', () => {
+  assert.equal(isPwshExploration(''), false)
+  assert.equal(isPwshExploration(null), false)
+  assert.equal(isPwshExploration('ls'), false) // 裸 ls 不算（词表不含 ls）
+})
+test('viking-first：首次探索未查 → warn 并 nudge', () => {
+  const d = decideVikingFirst(freshVfState(), 'grep', { pattern: 'foo' }, { mode: 'warn' })
+  assert.equal(d.verdict, 'warn')
+  assert.equal(d.nudge, true)
+  assert.match(d.message, /openviking__search/)
+})
+test('viking-first：block 模式返回 block', () => {
+  const d = decideVikingFirst(freshVfState(), 'read', { file_path: 'a.js' }, { mode: 'block' })
+  assert.equal(d.verdict, 'block')
+})
+test('viking-first：已查过 → pass', () => {
+  const s = freshVfState(); s.vikingSearched = true
+  assert.equal(decideVikingFirst(s, 'grep', { pattern: 'foo' }, {}).verdict, 'pass')
+})
+test('viking-first：已 nudge 过 → pass（只拦一次）', () => {
+  const s = freshVfState(); s.vikingNudged = true
+  assert.equal(decideVikingFirst(s, 'grep', { pattern: 'foo' }, {}).verdict, 'pass')
+})
+test('viking-first：子代理豁免 → pass', () => {
+  assert.equal(decideVikingFirst(freshVfState(), 'grep', { pattern: 'foo' }, { isSubagent: true }).verdict, 'pass')
+})
+test('viking-first：跳过开关 / 跳过标记 → pass', () => {
+  assert.equal(decideVikingFirst(freshVfState(), 'grep', { pattern: 'foo' }, { skip: true }).verdict, 'pass')
+  const s = freshVfState(); s.vikingSkipped = true
+  assert.equal(decideVikingFirst(s, 'grep', { pattern: 'foo' }, {}).verdict, 'pass')
+})
+test('viking-first：带 offset/limit 的 read 豁免 → pass', () => {
+  assert.equal(decideVikingFirst(freshVfState(), 'read', { file_path: 'a.js', offset: 1, limit: 60 }, {}).verdict, 'pass')
+})
+test('viking-first：pwsh 非探索命令 → pass', () => {
+  assert.equal(decideVikingFirst(freshVfState(), 'pwsh', { command: 'npm run build' }, {}).verdict, 'pass')
+})
+test('viking-first：pwsh 探索命令 → warn', () => {
+  assert.equal(decideVikingFirst(freshVfState(), 'pwsh', { command: 'Get-ChildItem D:/x' }, {}).verdict, 'warn')
+})
+test('viking-first：非探索工具（如 edit）不触发 → pass', () => {
+  assert.equal(decideVikingFirst(freshVfState(), 'edit', {}, {}).verdict, 'pass')
+})
+{ // apply 集成：enabled 时首读被 warn 记 ledger，调过 search 后放行
+  const guarded = []
+  const ctx = {
+    tools: { guard(fn) { guarded.push(fn); return () => {} } },
+    on() {},
+    logger: { info() {}, warn() {} },
+  }
+  apply(ctx, Config['~standard'].validate({
+    enabled: true, ledgerPath: './ag-selftest-ledger.jsonl',
+    vikingFirst: { enabled: true, mode: 'warn' },
+  }).value)
+  const sid = 'vf-int'
+  const execRead = () => ({ name: 'read', arguments: { file_path: 'D:/proj/src/a.js', offset: 1, limit: 40 }, agent: { session: { header: { id: sid } } } })
+  const execExplore = () => ({ name: 'grep', arguments: { pattern: 'p', path: 'D:/proj/src' }, agent: { session: { header: { id: sid } } } })
+  assert.equal(guarded[0](execExplore()), undefined, 'warn 模式放行')
+  guarded[0]({ name: 'mcp__openviking__search', arguments: { query: 'x' }, agent: { session: { header: { id: sid } } } })
+  assert.equal(guarded[0](execExplore()), undefined)
+  void execRead
+}
+
 
 // --- apply：sessionReads FIFO 上限（MAP_MAX_SESSIONS=200）---
 {

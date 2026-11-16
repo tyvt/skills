@@ -36,8 +36,8 @@ import os from 'node:os'
 import path from 'node:path'
 
 import { Config } from './config.js'
-import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift } from './rules.js'
-import { policy } from '../../shared/p0-policy.mjs'
+import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst } from './rules.js'
+import { policy } from './p0-policy.mjs'
 import { decideInterception } from './scope.js'
 import { evaluateAsk } from './ask-guard.js'
 
@@ -196,7 +196,7 @@ export function apply(ctx, config) {
         const oldest = sessionDrift.keys().next().value
         if (oldest !== undefined) sessionDrift.delete(oldest)
       }
-      state = { fileLines: new Map(), grepSeq: 0, lastPattern: '', lastGlob: null }
+      state = { fileLines: new Map(), grepSeq: 0, lastPattern: '', lastGlob: null, vikingSearched: false, vikingNudged: false, vikingSkipped: false }
       sessionDrift.set(sessionId, state)
     }
     return state
@@ -205,6 +205,36 @@ export function apply(ctx, config) {
   function isSubagentSession(exec) {
     const parent = exec?.agent?.session?.header?.parentSession
     return typeof parent === 'string' && parent.trim() !== ''
+  }
+  /**
+   * 尽力取本会话最近用户消息文本，用于 viking-first 跳过语探测。
+   * DSH 会话消息 API 未在本仓确认，故按常见形态防御性尝试：
+   * session.messages / agent.messages 的最新 user 条目。取不到返回 ''，
+   * 跳过口退化为仅 config.vikingFirst.skip 开关（不新增脆弱依赖）。
+   */
+  function collectSessionText(exec) {
+    try {
+      const lists = [
+        exec?.agent?.session?.messages,
+        exec?.agent?.messages,
+        exec?.session?.messages,
+      ]
+      for (const list of lists) {
+        if (!Array.isArray(list) || list.length === 0) continue
+        for (let i = list.length - 1; i >= 0; i -= 1) {
+          const m = list[i]
+          if (!m || typeof m !== 'object') continue
+          const role = m.role || m.author?.role
+          if (role !== 'user') continue
+          if (typeof m.content === 'string') return m.content
+          if (Array.isArray(m.content)) {
+            return m.content.map((c) => (typeof c?.text === 'string' ? c.text : '')).join(' ')
+          }
+          if (typeof m.text === 'string') return m.text
+        }
+      }
+    } catch { /* 探测失败不影响放行 */ }
+    return ''
   }
   function getSessionReads(exec) {
     const sessionId = exec?.agent?.session?.header?.id ?? 'anon'
@@ -265,6 +295,50 @@ export function apply(ctx, config) {
           return duplicate
         }
         recordRead(exec)
+      }
+      // 探索前置记忆检索（viking-first）：本会话首次探索动作前若未查过 OpenViking，
+      // warn/block 提示先 mcp__openviking__search。默认 enabled:false（inert）。
+      if (config.enabled && config.vikingFirst?.enabled) {
+        const drift = getSessionDrift(exec)
+        // 标记「已查」：mcp__openviking__search 必经 guard（唯一可靠拦截点）。
+        if (exec?.name === 'mcp__openviking__search') {
+          drift.vikingSearched = true
+        } else {
+          // 跳过口：用户消息含明确跳过语 → 本会话放行。
+          if (!drift.vikingSearched && !drift.vikingSkipped) {
+            const phrases = config.vikingFirst.skipPhrases ?? []
+            if (phrases.length) {
+              const promptText = collectSessionText(exec)
+              if (promptText && phrases.some((p) => p && promptText.includes(p))) {
+                drift.vikingSkipped = true
+                appendLedger(ledgerPath, {
+                  ts: new Date().toISOString(), kind: 'viking-first', rule: 'skip-phrase',
+                  session_id: exec?.agent?.session?.header?.id ?? 'anon',
+                })
+              }
+            }
+          }
+          const vf = decideVikingFirst(drift, exec?.name, exec?.arguments, {
+            isSubagent: isSubagentSession(exec),
+            tools: config.vikingFirst.tools,
+            mode: config.vikingFirst.mode,
+            skip: config.vikingFirst.skip === true || drift.vikingSkipped === true,
+          })
+          if (vf.nudge) {
+            drift.vikingNudged = true
+            appendLedger(ledgerPath, {
+              ts: new Date().toISOString(), kind: 'viking-first', rule: vf.verdict,
+              tool: exec?.name, mode: config.vikingFirst.mode ?? 'warn',
+              session_id: exec?.agent?.session?.header?.id ?? 'anon',
+            })
+          }
+          if (vf.verdict === 'block') {
+            counters.rejected++
+            log?.warn?.('agent-guard: viking-first block %s: %s', exec?.name, vf.message)
+            return vf.message
+          }
+          if (vf.verdict === 'warn') log?.warn?.('agent-guard: viking-first warn %s', exec?.name)
+        }
       }
       // 探索漂移拦截（explore-drift-guard-20261113 M1）：整读门槛/重复盲搜/未知根试错。
       // warn 模式只记 ledger 不阻断；block 模式拒绝并回改法。规则纯函数在 rules.js。

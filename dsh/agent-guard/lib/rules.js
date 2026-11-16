@@ -615,7 +615,7 @@ export function repairGlobPath(toolName, args) {
  * @param {object} args - read 的参数。
  * @returns {string | null}
  */
-import { hasReadRange } from '../../shared/p0-policy.mjs'
+import { hasReadRange } from './p0-policy.mjs'
 
 export function isWholeFileRead(args) {
   if (args === null || typeof args !== 'object' || Array.isArray(args)) return null
@@ -765,6 +765,68 @@ function positiveOpt(value, fallback) {
   const n = Number(value)
   return Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback
 }
+
+/**
+ * 判断一条 pwsh 命令是否为「探索」动作（Get-ChildItem/Select-String 等盲搜），
+ * 供 viking-first 规则决定是否在探索前置记忆检索。按**命令首词/词边界**匹配，
+ * 禁止裸 `ls`/`dir`/`gci` 子串（避免误伤路径含 ls/dir 或 `$false` 的构建命令）。
+ * 命中探索动词且不含构建/测试动词才为 true。
+ * @param {string} command - pwsh 命令文本。
+ * @returns {boolean}
+ */
+export function isPwshExploration(command) {
+  if (typeof command !== 'string' || command.trim() === '') return false
+  // 探索动词：必须出现在命令位置（行首或 && || | ; & ( { 换行 之后）。
+  const EXPLORE_RE = /(^|&&|\|\||[|;&({\r\n])\s*(Get-ChildItem|gci|Select-String|sls|Get-Content|gc)\b/i
+  if (!EXPLORE_RE.test(command)) return false
+  // 构建/测试类命令即使带探索词也不拦（gbuild 优先）。
+  if (BUILD_TEST_RE.test(command) || BUILD_VERB_RE.test(command)) return false
+  return true
+}
+
+/**
+ * 探索前置记忆检索（viking-first）规则：本会话「首次探索动作」前若尚未调用过
+ * `mcp__openviking__search`，返回 warn/block 提示先查记忆。只提示/拦一次
+ * （state.vikingNudged），子代理豁免；用户明确跳过（state.vikingSkipped）时放行。
+ * 纯函数：只读 state + 参数，状态回填由调用方负责。
+ * @param {object} state - 每会话 state（含 vikingSearched/vikingNudged/vikingSkipped）。
+ * @param {string} tool - 工具名（read/grep/glob/pwsh）。
+ * @param {object} args - 工具参数。
+ * @param {object} opts - { isSubagent, tools, mode:'warn'|'block', skip }
+ * @returns {{ verdict:'pass'|'warn'|'block', message?:string, nudge?:boolean }}
+ */
+export function decideVikingFirst(state, tool, args, opts = {}) {
+  const base = { verdict: 'pass' }
+  if (!state || typeof state !== 'object') return base
+  if (opts.isSubagent === true) return base
+  if (opts.skip === true || state.vikingSkipped === true) return base
+  if (state.vikingSearched === true) return base
+  if (state.vikingNudged === true) return base
+
+  const tools = Array.isArray(opts.tools) && opts.tools.length
+    ? opts.tools
+    : ['read', 'grep', 'glob', 'pwsh']
+  if (!tools.includes(tool)) return base
+
+  // 带明确目标的 read（offset/limit 或非探索性精确读）豁免，减少误伤。
+  if (tool === 'read') {
+    const hasRange = (args?.offset != null && args?.offset !== '')
+      || (args?.limit != null && args?.limit !== '')
+    if (hasRange) return base
+  }
+  // pwsh 仅在探索命令时触发。
+  if (tool === 'pwsh' && !isPwshExploration(typeof args?.command === 'string' ? args.command : '')) {
+    return base
+  }
+
+  const mode = opts.mode === 'block' ? 'block' : 'warn'
+  return {
+    verdict: mode,
+    nudge: true,
+    message: '[viking-first] 本会话还没查过 OpenViking 记忆。很多配置/偏好/历史事件/踩过的坑可能已在记忆里——请先调用 mcp__openviking__search(query=你要找的配置名/报错/主题) 查一遍：命中就沿用，确实查不到再 grep/read 探索。若用户已明确「别查记忆/直接看代码」，可跳过本条。',
+  }
+}
+
 
 /**
  * `ask_user_question` 的每个 question 必须带 `id`（审计 G，session.v4 seq 670 漏 id 被拒）。

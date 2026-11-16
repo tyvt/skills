@@ -71,6 +71,18 @@ export const DEFAULTS = {
     /** 未知根 glob 试错窗口（毫秒）。 */
     globRepeatWindowMs: 60000,
   },
+  /**
+   * 探索前置记忆检索（viking-first）：本会话首次探索动作前若未查过 OpenViking，
+   * warn/block 提示先 mcp__openviking__search。默认 enabled:false（inert），
+   * 未显式开启时现网行为不变。mode 先 warn 灰度，稳定后转 block。
+   */
+  vikingFirst: {
+    enabled: false,
+    mode: 'warn',
+    tools: ['read', 'grep', 'glob', 'pwsh'],
+    skip: false,
+    skipPhrases: ['别查记忆', '不用查记忆', '直接看代码', '跳过记忆'],
+  },
 }
 
 function bool(value, fallback) {
@@ -110,6 +122,7 @@ export function validate(input) {
   const recovery = source.recovery ?? {}
   const scope = source.scope ?? {}
   const exploration = source.exploration ?? {}
+  const vikingFirst = source.vikingFirst ?? {}
   if (typeof repair !== 'object' || Array.isArray(repair)) {
     return { issues: [{ message: 'agent-guard: repair must be an object' }] }
   }
@@ -122,6 +135,12 @@ export function validate(input) {
   if (typeof exploration !== 'object' || Array.isArray(exploration)) {
     return { issues: [{ message: 'agent-guard: exploration must be an object' }] }
   }
+  if (typeof vikingFirst !== 'object' || Array.isArray(vikingFirst)) {
+    return { issues: [{ message: 'agent-guard: vikingFirst must be an object' }] }
+  }
+  const vfMode = typeof vikingFirst.mode === 'string' && ['warn', 'block'].includes(vikingFirst.mode)
+    ? vikingFirst.mode
+    : DEFAULTS.vikingFirst.mode
   const explorationMode = typeof exploration.mode === 'string' && ['off', 'warn', 'block'].includes(exploration.mode)
     ? exploration.mode
     : DEFAULTS.exploration.mode
@@ -157,6 +176,17 @@ export function validate(input) {
         firstReadLimit: positiveInt(exploration.firstReadLimit, DEFAULTS.exploration.firstReadLimit),
         minRepeatPattern: positiveInt(exploration.minRepeatPattern, DEFAULTS.exploration.minRepeatPattern),
         globRepeatWindowMs: positiveInt(exploration.globRepeatWindowMs, DEFAULTS.exploration.globRepeatWindowMs),
+      },
+      vikingFirst: {
+        enabled: bool(vikingFirst.enabled, DEFAULTS.vikingFirst.enabled),
+        mode: vfMode,
+        tools: Array.isArray(vikingFirst.tools) && vikingFirst.tools.length
+          ? vikingFirst.tools.filter((t) => typeof t === 'string' && t.trim() !== '')
+          : DEFAULTS.vikingFirst.tools.slice(),
+        skip: bool(vikingFirst.skip, DEFAULTS.vikingFirst.skip),
+        skipPhrases: Array.isArray(vikingFirst.skipPhrases) && vikingFirst.skipPhrases.length
+          ? vikingFirst.skipPhrases.filter((p) => typeof p === 'string' && p.trim() !== '')
+          : DEFAULTS.vikingFirst.skipPhrases.slice(),
       },
     },
   }
