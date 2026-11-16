@@ -27,6 +27,8 @@ class ModelSpec:
     timeout: Optional[float] = None
     weight: float = 1.0
     retry_on: List[str] = field(default_factory=list)
+    # OpenAI service_tier 透传（cursor 通道 Fast 档 = "priority"）；None 不发该字段。
+    service_tier: Optional[str] = None
 
     def effective_retry_on(self) -> List[str]:
         return self.retry_on or DEFAULT_RETRY_ON
@@ -137,6 +139,7 @@ def load_config(path: str) -> OrchestratorConfig:
                     timeout=m.get("timeout"),
                     weight=float(m.get("weight", 1.0)),
                     retry_on=list(m.get("retry_on", [])),
+                    service_tier=m.get("service_tier"),
                 )
             )
         local = bool(t.get("local", False))

@@ -158,14 +158,19 @@ class ModelRouter:
         temperature: float,
         max_tokens: int,
         timeout: float,
+        service_tier: Optional[str] = None,
     ) -> tuple:
-        resp = client.chat.completions.create(
+        kwargs: Dict[str, Any] = dict(
             model=model,
             messages=messages,
             temperature=temperature,
             max_tokens=max_tokens,
             timeout=timeout,
         )
+        # service_tier 仅在配置时下发（None 不发字段，不影响其他 provider）。
+        if service_tier:
+            kwargs["service_tier"] = service_tier
+        resp = client.chat.completions.create(**kwargs)
         u = getattr(resp, "usage", None)
         usage = Usage(
             prompt_tokens=getattr(u, "prompt_tokens", None),
@@ -225,7 +230,8 @@ class ModelRouter:
                 t0 = time.time()
                 try:
                     content, usage = self._call_once(
-                        self._client, spec.model, messages, temperature, max_tokens, timeout
+                        self._client, spec.model, messages, temperature, max_tokens, timeout,
+                        service_tier=spec.service_tier,
                     )
                     elapsed = time.time() - t0
                     if self._looks_failed(content, retry_on):
