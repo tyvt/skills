@@ -64,13 +64,13 @@ def main() -> int:
                                        workdir=req.get("workdir") or "",
                                        project_cwd=req.get("project_cwd") or req.get("projectCwd") or "")
             elif op == "plan_review":
-                # req 带 plan（Markdown 计划正文）与 request/context（任务背景）。
+                # req 带 plan（Markdown 计划正文）或 plan_path（.plan 内 md，由 api 读入）与 request/context（任务背景）。
                 plan = req.get("plan", "") or ""
-                if not plan.strip() and not req.get("delta"):
-                    _emit(real_stdout, {"ok": False, "error": "plan 或 delta 必填"})
+                plan_path = req.get("plan_path", "") or ""
+                if not plan.strip() and not req.get("delta") and not plan_path:
+                    _emit(real_stdout, {"ok": False, "error": "plan 或 delta 或 plan_path 必填"})
                     return 2
                 context = req.get("context", "") or req.get("request", "") or ""
-                plan_path = req.get("plan_path", "") or ""
                 out = api.run_plan_review(plan, context, cfg, session_id, plan_path,
                                           workdir=req.get("workdir", ""),
                                           base_sha=req.get("base_sha", ""),
