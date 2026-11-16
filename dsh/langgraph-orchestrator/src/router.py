@@ -29,6 +29,10 @@ from .config import ModelSpec, OrchestratorConfig, ToolSpec
 # 另外本策略的出发点是「峰时避开 deepseek 的定价/限流」，而本工具主选不是 deepseek，
 # 加入集合属于错误套用。因此保持原序，只靠 failure_cooldown 做故障转移。
 PEAK_GLM_TOOLS = {"file_reader", "code_editor"}
+
+# retry_on 关键字的子串匹配只针对「短错误体」生效；超过此长度的回复视为正常输出，
+# 不再按关键字判失败（避免 plan_review 等长 JSON 因含 "not available"/"timeout" 被误判）。
+RETRY_KEYWORD_MAX_LEN = 240
 DEEPSEEK_FLASH = "deepseek-v4.1-flash"
 GLM_FLASH = "glm-5.3-flash"
 
@@ -144,9 +148,17 @@ class ModelRouter:
         self._cooldown.pop(model, None)
 
     def _looks_failed(self, content: str, retry_on: List[str]) -> bool:
-        """内容为空，或命中失败关键字 -> 视为失败。"""
+        """内容为空，或「短错误体」命中失败关键字 -> 视为失败。
+
+        子串匹配仅对**短的、疑似错误响应**生效：正常模型输出（尤其 plan_review 的
+        JSON）可能天然包含 "not available" / "timeout" / "429" 等词，若对长文本整段
+        子串匹配，会把有效回复误判为失败，导致整个模型池 ok:false、model_used=None。
+        因此超过 RETRY_KEYWORD_MAX_LEN 的回复一律不按关键字判失败。
+        """
         if content is None or not content.strip():
             return True
+        if len(content) > RETRY_KEYWORD_MAX_LEN:
+            return False
         low = content.lower()
         return any(k.lower() in low for k in retry_on)
 
