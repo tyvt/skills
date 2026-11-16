@@ -17,7 +17,7 @@ import { randomUUID } from "node:crypto";
 import { appendFileSync } from "node:fs";
 
 export const name = "cost-meter";
-export const inject = [];
+export const inject = ['tools'];
 
 /**
  * 配置归一化（零依赖，不 export Config 以免被 Cordis 当 schemastery schema 校验）。

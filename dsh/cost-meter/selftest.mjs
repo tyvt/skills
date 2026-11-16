@@ -1,7 +1,7 @@
 // cost-meter 自测：验证 usage 累加、阈值触发一次、注入到 messages。
 import assert from 'assert';
 import fs from 'fs';
-import { apply, inspect, name, hasIntentSignal } from './lib/index.js';
+import { apply, inspect, name, hasIntentSignal, inject } from './lib/index.js';
 
 const user = (text) => ({ role: 'user', content: text });
 assert.equal(hasIntentSignal([user('修改组件，验证后提交并推送')]), true);
@@ -12,6 +12,9 @@ assert.equal(hasIntentSignal([user('> 修改、验证、提交\n给我建议')])
 assert.equal(hasIntentSignal([user('修改并测试，暂不提交')]), false);
 
 assert.equal(name, 'cost-meter');
+
+// 回归：cost-meter 使用 ctx.tools.guard，必须 inject 'tools' 才能在真 cordis 下激活（否则报 cannot get property "tools" without inject）。
+assert.ok(Array.isArray(inject) && inject.includes('tools'), 'inject 必须声明 tools');
 
 // 收集事件处理器
 const sessionHandlers = [];
