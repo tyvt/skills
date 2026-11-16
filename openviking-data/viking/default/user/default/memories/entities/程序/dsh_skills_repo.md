@@ -1,8 +1,8 @@
 # dsh_skills_repo
-DSH 技能与插件仓库：位于 D:/repository/skills，运行时目录 C:\Users\Administrator\.dsh\skills 指向该仓库。
+DSH 技能与插件仓库，本体位于 D:/repository/skills，运行时目录 C:\Users\Administrator\.dsh\skills 指向它。
 
 ## 结构与插件
-- 仓库 D:/repository/skills（运行时 C:\Users\Administrator\.dsh\skills 指向此）；dsh-token-guard、dsh-cost-meter、dsh-orchestrator、agent-guard 符号链接到 ~/.dsh/，均零依赖
+- dsh-token-guard、dsh-cost-meter、dsh-orchestrator、agent-guard 均符号链接到 ~/.dsh/，全部零依赖
 - agent-guard、cost-meter 的规则/参数/升级细节见 agent_guard、cost_meter 实体卡（as of 2026-11-14）
 - 2026-11-09 dsh-context v0.83.0、token-frugal 含 audit-tokens.mjs、新增 token-optimizer 技能；2026-11-11 新增 agent-cost-hygiene（大文件/grep 保护）、zentao-analyzer（先查数据阻塞 gate）、submodule-commit（commit→build→resolve 顺序）
 
@@ -21,8 +21,8 @@ DSH 技能与插件仓库：位于 D:/repository/skills，运行时目录 C:\Use
 {
   "category": "程序",
   "name": "dsh_skills_repo",
-  "source_extraction_id": "2389fa8cbc7e404f80af333df09282d2",
-  "version": 3,
+  "source_extraction_id": "4671e11c20024654b153211808bfa3c1",
+  "version": 4,
   "memory_type": "entities"
 }
 -->

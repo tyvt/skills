@@ -12,14 +12,15 @@
 ## 复审门禁
 - 计划复审服务遇到超时，改为更窄的复审请求来完成门禁
 - 验收口径收紧在复审通过前不被放宽
+- 视觉相似度门槛为 99.5%，未达标版本不得作为候选对外提供
 
 <!-- MEMORY_FIELDS
 {
-  "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited",
   "category": "技术模式",
   "name": "visual_acceptance_rules",
-  "source_extraction_id": "f0b02f30e20640cda7fae76497c83b62",
-  "version": 1,
+  "source_extraction_id": "49b341ccddd94e0fa0b73909f809f1aa",
+  "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -13,14 +13,17 @@
 - Navbar 单文件 ESLint 通过；test 模式构建（含基线构建）通过；`public/version.json` 中 `gitHash=b48629cd4` 与子模块提交 SHA 一致。
 - 本地 nginx 页面与登录态不可用，真实视口截图与交互验收未执行。
 
+## Lint 与台账
+- 仓库无适用于 Navbar 的通用错误台账（现存台账仅覆盖防汛），2026-11-14 判定本次无需改防汛文档。
+- 父仓 E2E `.mjs` 目录无 ESLint 配置，交由子模块 ESLint 会直接退出；其 `node --check` 已通过，本次仅对 Navbar 运行 scoped lint。
 
 <!-- MEMORY_FIELDS
 {
-  "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited",
   "category": "技术模式",
   "name": "navbar_menu_horizontal_scroll",
-  "source_extraction_id": "59f9e8de80a34feb8db67d15bd1689e2",
-  "version": 1,
+  "source_extraction_id": "07ec5999e2294760bcdd6179a89cb430",
+  "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -16,12 +16,17 @@
 - 计划文件位于 D:/repository/苏住房G/.plan/task-2468-navbar-visual-e2e.md
 - 2026-11-14 用户回复“确认实施”，助手开始按计划实施并核对父仓、子模块与 worktree 状态
 
+## 实施进展
+- 已确认 Navbar 组件只有一个调用方，且未传 props/slots，视觉对齐改动不会影响其他页面契约
+- E2E runner 已调整为视觉比对失败时仍继续执行交互检查与空权限检查
+- 2026-11-14 实施顺序为先做静态检查，再进行构建
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "navbar_visual_plan",
-  "source_extraction_id": "46df6c0a0eb840a6868c9f28d66979db",
-  "version": 1,
+  "source_extraction_id": "6c155a7782784beb85eeb09774d1d119",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

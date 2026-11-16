@@ -2,8 +2,8 @@
 苏州住房防汛物业管理 C 端 uni-app(Vue3) H5 项目，含数智数据看板等页面。
 
 ## Description
-- 技术栈为 uni-app Vue3 H5，构建用 bun run build（本机无全局 uni/npm）
-- 主工作区 D:\repository\苏住房防汛C端 为只读，严禁直接修改
+- 技术栈为 uni-app Vue3 H5；2026-11-16 构建命令确认为 npm run build:h5，e2e 为 npm run test:e2e:shuzhi
+- 2026-11-16 在 dev 分支主工作区直接实施改动（工作区干净，仅 .task-state/ 未跟踪）；历史 worktree 有 -wt-login-align（fix/login-design-align）与 -wt-shuzhi
 
 ## Environment
 - 唯一可写 worktree：D:\repository\苏住房防汛C端-wt-login-align，分支 fix/login-design-align
@@ -18,11 +18,11 @@
 
 <!-- MEMORY_FIELDS
 {
-  "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited",
   "category": "项目环境",
   "name": "苏住房防汛C端",
-  "source_extraction_id": "cc87a43f612e4cb6bf6334dfb520819f",
-  "version": 1,
+  "source_extraction_id": "6138828c21f343448d40413458bbf858",
+  "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

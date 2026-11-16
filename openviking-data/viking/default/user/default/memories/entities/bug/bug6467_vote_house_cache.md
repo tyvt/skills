@@ -16,13 +16,17 @@
 - 所属项目：惠山二期G（含 zhi2-web-admin 子模块）
 - 涉及文件：decisionRangeBuildingSelectMixins.js
 
+## 后续方案变更（2026-11-16）
+- 2026-11-16 用户反馈：该「选择户室」弹窗每次打开都卡死，楼盘表视图近期因此被回退，但跨幢选房需求仍需；要求移除「楼盘表视图」只保留「列表视图」，保留跨幢选中房屋能力，并优先考虑性能。
+- 代码现状：最新提交 aba72c9d7「恢复选择户室楼盘表视图」之后相关文件无改动，当前 HEAD 即带楼盘表视图 Tab 的版本，卡死仍存在，本次在该版本上移除。
+- 改动点：general（一般表决详情）弹窗 DecisionRangeTable.vue 的 viewMode / flattenHouseList / syncListSelection / buildingTableData，共享混入 decisionRangeBuildingSelectMixins.js，共享 Tab 组件 zs-select-dialog.vue。
 
 <!-- MEMORY_FIELDS
 {
   "category": "bug",
   "name": "bug6467_vote_house_cache",
-  "source_extraction_id": "9267aef47c9249b899e8ede3cc002af0",
-  "version": 1,
+  "source_extraction_id": "1aed269553104cfab6c6a411510229d1",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

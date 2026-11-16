@@ -17,6 +17,7 @@
 ## 项目归属
 - 所属项目：苏住房G（zhi2-web-admin）
 - 首页相关页面：src/views/home/index-v2.vue 及 v2/components 下组件
+- 2026-11-14 任务 2468 的 Navbar 视觉改造在 worktree `D:/repository/苏住房G/worktrees/task2468-navbar-visual/zhi2-web-admin` 中进行，候选版经 nginx UI 部署后按参考图量化比对还原度
 
 ## 构建性能
 - 2026-11-13 优化：vite.config.js 的 svgoOptions 由仅 removeViewBox 改为 preset-default(保留 removeViewBox:false)，410个SVG图标由约1804KB压至约727KB，npm run build 由约150秒降至107.5秒(省约28%)，图标symbol完整且viewBox保留。
@@ -25,8 +26,8 @@
 {
   "category": "项目事实",
   "name": "suzhufang_g_deploy",
-  "source_extraction_id": "756d604a2d58428797f0fb0cce0b5dbe",
-  "version": 2,
+  "source_extraction_id": "1cc31f765bab4d44afcbb9ee1ff1c9c7",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

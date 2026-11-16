@@ -12,6 +12,7 @@
 - 可通过调整 background-position（如 left bottom 或百分比）微调裁切
 
 ## 验证与归属
+- 2026-11-15 只读比对 V3 主 checkout：背景图尺寸与当前候选相同，原组件采用 cover 与底部对齐；随后继续比对品牌区、菜单布局与背景样式（尚无结论）
 - 所属项目：苏州市房地产监测V3；验证证据：extracted source=cursor
 - 涉及文件：`zhi2-web-admin/src/layout/components/Navbar.vue`
 - 来源会话ID：34e98571-54c2-446a-b11e-33e725fa6bc5；代码基线：none
@@ -20,8 +21,8 @@
 {
   "category": "技术模式",
   "name": "navbar_bg_change",
-  "source_extraction_id": "0f5bf290b820418491b3cd580b84c35a",
-  "version": 1,
+  "source_extraction_id": "08db786d773549be87ae5bac8bc79344",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

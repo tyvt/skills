@@ -11,6 +11,7 @@
 ## 输出与分类
 - 结果写入分析产出/_治理预览.csv
 - 判定分类：通过（国资/无实控人）、否决（个人/家族实控人）、待确认（法人未列名录/供销社集体所有制）、缺失
+- 2026-11-15 沪市清单更新为 5 只通过项；海尔智家因现有治理缓存标为待确认，单列在未提交的运行证据中
 
 ## 运行约束
 - 单次治理运行需在 2 分钟内完成（用户设定的时限）
@@ -20,9 +21,9 @@
 {
   "category": "数据湖选股",
   "name": "governance_check",
-  "source_extraction_id": "2571d6307e8e4e6f99943d20ceca54c3",
+  "source_extraction_id": "83d6b745422b483cac5982e69623187a",
   "peer_id": "github.com-tyvt-financial-data-lake",
-  "version": 2,
+  "version": 3,
   "memory_type": "entities"
 }
 -->

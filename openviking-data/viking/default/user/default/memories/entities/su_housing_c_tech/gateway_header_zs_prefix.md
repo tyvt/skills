@@ -1,14 +1,14 @@
-# Gateway Header Desensitization Field Must Use Unified zs- Prefix
-In Su Zhu Fang C (zhi2-mobile-shimin), the backend requires gateway header fields to use the zs- prefix consistent with zs-method. gateway.js was changed to write the field as zs-desensitize-flag with case-insensitive compatibility, and user.js/autonomy.js business request headers were unified to the zs- prefix.
+# 网关脱敏头字段需统一使用 zs- 前缀
+苏住房 C 端（zhi2-mobile-shimin）后端要求网关头字段统一使用与 zs-method 一致的 zs- 前缀；gateway.js 已改为写入 zs-desensitize-flag 并保留大小写兼容回退，user.js/autonomy.js 的业务请求头也统一为 zs- 前缀。
 
-## Root Cause
-- Backend requires gateway header fields to use the zs- prefix, consistent with zs-method and others
+## 根因
+- 后端要求网关头字段使用 zs- 前缀，与 zs-method 等保持一致
 
-## Solution
-- gateway.js writes the gateway header field as zs-desensitize-flag，兼容多种大小写回退链：customHeaders['zs-desensitize-flag'] ?? customHeaders['ZS-DESENSITIZE-FLAG'] ?? customHeaders['Desensitize-Flag'] ?? customHeaders['desensitize-flag'] ?? customHeaders['DESENSITIZE-FLAG']
-- user.js / autonomy.js business request headers unified to the zs- prefix
+## 解决方案
+- gateway.js 将网关头字段写为 zs-desensitize-flag，兼容多种大小写回退链：customHeaders['zs-desensitize-flag'] ?? customHeaders['ZS-DESENSITIZE-FLAG'] ?? customHeaders['Desensitize-Flag'] ?? customHeaders['desensitize-flag'] ?? customHeaders['DESENSITIZE-FLAG']
+- user.js / autonomy.js 的业务请求头统一为 zs- 前缀
 
-## Involved Files
+## 涉及文件
 - d:/repository/苏住房C/zhi2-mobile-shimin/src/api/gateway.js
 - d:/repository/苏住房C/zhi2-mobile-shimin/src/store/user.js
 - d:/repository/苏住房C/zhi2-mobile-shimin/src/pages/message/message.vue
@@ -18,16 +18,16 @@ In Su Zhu Fang C (zhi2-mobile-shimin), the backend requires gateway header field
 - d:/repository/苏住房C/zhi2-mobile-shimin/src/utils/sfb.js
 - d:/repository/苏住房C/zhi2-mobile-shimin/src/api/security.js
 
-## Verification and Attribution
-- Verification evidence: extracted source=cursor session=3c9178fd-8c0a-4ebe-bb2c-b90f30794556
-- Code baseline: none
+## 验证与归属
+- 验证证据：extracted source=cursor session=3c9178fd-8c0a-4ebe-bb2c-b90f30794556
+- 代码基线：无
 
 <!-- MEMORY_FIELDS
 {
   "category": "su_housing_c_tech",
   "name": "gateway_header_zs_prefix",
-  "source_extraction_id": "cbccc77e23c04a3fb98fe21d70df4ad3",
-  "version": 2,
+  "source_extraction_id": "00a08230b40345aa9d5dac9102965f54",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

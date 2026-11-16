@@ -9,17 +9,23 @@
 - 已按接口文档实现临时账号登录与对应受限路由。
 - 临时身份不混入正式角色权限，权限判断上保持隔离。
 
-## 后续工作
-- 接下来落地前端测试与页面改造。
+## 2026-11-15 真实页面验证
+- 真实页面流程已走通：注册与登录均返回 `200`，登录密码确认为前端 AES 密文。
+- `getInfo` 返回临时用户类型 `01`；未调用企业列表、区域保存或动态路由接口，印证临时账号需绕过动态路由生成。
+- 录屏截图出现「登录状态已过期」提示覆盖凭据弹窗，正在确认其触发点，暂不把被遮挡的交互当作正常完成。
+- 2026-11-15 构建通过（exit code 0）；录屏中按钮使用真实点击，响应监视器只记录返回 401 的接口路径，不记录响应内容。
 
+## 后续工作
+- 需定位「登录状态已过期」提示的触发时机，并继续落地前端测试与页面改造。
+- 下一次录屏将重新创建一条唯一的合成临时账号（凭据只在创建响应中展示一次），账号数据按要求保留不清理。
 
 <!-- MEMORY_FIELDS
 {
-  "peer_id": "gitlab.zhi.com-zhi-suzhou-taicang-wuguan-fe-zhi1-web-admin-h5-g-unlimited",
   "category": "技术模式",
   "name": "temporary_account_login",
-  "source_extraction_id": "d86f61e1147041b9948c4e95a4c60543",
-  "version": 1,
+  "source_extraction_id": "1d41751a4a4843e8889e2f4913eae243",
+  "peer_id": "gitlab.zhi.com-zhi-suzhou-taicang-wuguan-fe-zhi1-web-admin-h5-g-unlimited",
+  "version": 3,
   "memory_type": "entities"
 }
 -->
