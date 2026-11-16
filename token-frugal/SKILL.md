@@ -97,6 +97,13 @@ node "$env:USERPROFILE\.dsh\skills\token-frugal\audit-models.mjs" 2026-11-12 --n
 
 本 skill 负责提供会话/模型用量证据与工作流病因；将结论转成通用会话纪律时，遵循 `agent-cost-hygiene` 与 `dsh-token-policy`，不在此重复维护模型、窗口、goal 或工具调用阈值。检查和修改 profile 时，以对应插件与 profile 配置为准。
 
+按 §3 信号触发动作：
+- **A 低缓存长跑**：§3 症状（命中 38–75%、每步未命中高）的长任务，换高缓存模型（模型纪律以 `dsh-token-policy` 为准）。
+- **B goal 续跑**：§3 信号 `≥5` 轮即按「一批文件一个 goal」拆片。
+- **C compaction**：§3 症状「compaction/start ≫ summary」（反复失败）即换新会话，勿硬撑续压。
+- **D 大结果+重复整读**：同文件整篇只读一次，后续 `offset/limit` 取片段；大输出先过滤。
+- **E 工具错误自愈**：改文件前先 `read`；按 `tool-call-hygiene` 修，勿原样重试。
+
 ## 5. 报告边界
 
 - 报告工作流原因时附**具体会话 sid + 相关事件或指标**，不要只说“很费”。
