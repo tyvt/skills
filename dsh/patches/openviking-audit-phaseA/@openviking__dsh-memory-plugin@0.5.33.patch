@@ -99,9 +99,9 @@ index aa8e1a1bdfaddd0bb30a3756b2987fee837d29d3..86b5c4be972e43d5ba31fb40cafa4c11
 +const _missingProfileWarned = new Set();
 +
  async function readProfile(fetchJSON, profileUri, actorPeerId = "") {
-+  // Existence pre-check: a missing profile.md used to turn into a content/read
-+  // 404 on every injection. Check the parent directory first and skip the read
-+  // entirely when the file is absent (warn once per URI).
++  // Negative cache: once a profile is confirmed missing, skip all further
++  // probes (including the fs/ls pre-check) for the rest of this process.
++  if (_missingProfileWarned.has(profileUri)) return null;
 +  const slash = profileUri.lastIndexOf("/");
 +  const parentUri = slash > 0 ? profileUri.slice(0, slash) : "";
 +  if (parentUri) {
@@ -111,11 +111,11 @@ index aa8e1a1bdfaddd0bb30a3756b2987fee837d29d3..86b5c4be972e43d5ba31fb40cafa4c11
 +      { actorPeerId, caller: "profile-inject" },
 +    );
 +    const entries = lsRes.ok && Array.isArray(lsRes.result) ? lsRes.result : null;
-+    if (entries && !entries.some((e) => e?.name === "profile.md")) {
-+      if (!_missingProfileWarned.has(profileUri)) {
-+        _missingProfileWarned.add(profileUri);
-+        console.warn(`[openviking] profile.md missing at ${profileUri}; skipping injection`);
-+      }
++    // Missing parent dir (404) or no profile.md -> mark missing and stop; do
++    // not fall through to content/read (would emit a second 404).
++    if (!lsRes.ok || (entries && !entries.some((e) => e?.name === "profile.md"))) {
++      _missingProfileWarned.add(profileUri);
++      console.warn(`[openviking] profile.md missing at ${profileUri}; skipping injection`);
 +      return null;
 +    }
 +  }
