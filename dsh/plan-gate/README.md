@@ -90,7 +90,8 @@ reviewed_at: "2026-11-12T15:00:00+08:00"
       name: dsh-plan-gate
       config:
         enabled: true
-        planDir: ".plan"
+        planRoot: "D:\\plan"   # 计划全局根；最终目录 = <planRoot>/<工作区目录名>
+        planDir: ".plan"       # 仅 planRoot 留空时的回退目录名
         guardTools: [edit, write, apply_patch]
         requireFrontmatter:
           status: approved
@@ -100,8 +101,9 @@ reviewed_at: "2026-11-12T15:00:00+08:00"
 
 ## 说明
 
-- 门禁优先检查 `<planDir>/<sessionId>.md`；不存在则检查该 session 的活跃计划
-  （文件名以 sessionId 前缀），最后才接受 `.plan/` 下任意已放行计划。
+- 门禁优先检查 `<planRoot>/<工作区目录名>/<sessionId>.md`；不存在则检查该 session 的活跃计划
+  （文件名以 sessionId 前缀），最后才接受该计划目录下任意已放行计划。
+- `planRoot` 可由环境变量 `DSH_PLAN_ROOT` 覆盖；留空时回退 `<仓库根>/.plan`（旧行为）。
 - 校验异常时**保守拒绝**改动，避免门禁失效放过未审批改动。
 - 本插件零依赖（不 import `@deepseek-ai/*`），与 `dsh-orchestrator-gate` 同构。
 - 「审核通过后自动写回 .plan 并等人工确认」当前为**手动/半自动**：结果显示在 orchestrate

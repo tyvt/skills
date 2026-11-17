@@ -33,6 +33,22 @@ export function canonicalPlan(text) {
 export function planSha(text) { return createHash('sha256').update(canonicalPlan(text), 'utf8').digest('hex'); }
 import path from "node:path";
 
+/**
+ * 计划目录解析（统一规则）：
+ * 全局根 = planRoot（默认 D:\plan，可由 DSH_PLAN_ROOT 覆盖）；
+ * 工作区子目录 = basename(root)，即 <planRoot>/<工作区目录名>。
+ * planRoot 未配置时回退旧行为 <root>/.plan（保持 selftest 与旧仓兼容）。
+ */
+export function resolvePlanDir(root, planRoot = "", planDir = ".plan") {
+  if (planRoot) return path.join(planRoot, path.basename(root || ""));
+  return path.join(root, planDir || ".plan");
+}
+
+function planKeyOf(root, planRoot, planFile) {
+  const base = planRoot ? planRoot : root;
+  return path.relative(base, planFile).replace(/\\/g, "/");
+}
+
 export const name = "plan-gate";
 export const inject = ["tools"];
 
@@ -241,10 +257,10 @@ export function planFileApproved(file, require) {
  * 优先 <planDir>/<sessionId>.md；其次该 session 的活跃计划；最后任一已放行 .md。
  * @returns {{ok: boolean, file?: string, checked: string[]}}
  */
-export function findApprovedPlan({ root, planDir, sessionId, require, fs = {} }) {
+export function findApprovedPlan({ root, planDir, planRoot, sessionId, require, fs = {} }) {
   const readdir = fs.readdirSync ?? readdirSync;
   const readFile = fs.readFileSync ?? readFileSync;
-  const dir = path.join(root, planDir || ".plan");
+  const dir = resolvePlanDir(root, planRoot, planDir);
   const approvedFn = (f) => {
     let text;
     try { text = readFile(f, "utf-8"); } catch { return false; }
@@ -286,7 +302,7 @@ export function findApprovedPlan({ root, planDir, sessionId, require, fs = {} })
   } catch {}
   for (const n of entries) {
     const f = path.join(dir, n);
-    const key = path.relative(root, f).replace(/\\/g, '/');
+    const key = planKeyOf(root, planRoot, f);
     if (bound.includes(key) && approvedFn(f)) return { ok: true, file: f, checked };
   }
   return { ok: false, checked };
@@ -305,6 +321,9 @@ function normalizeConfig(input) {
   return {
     enabled: input?.enabled ?? true,
     planDir: typeof input?.planDir === "string" && input.planDir ? input.planDir : ".plan",
+    planRoot: typeof input?.planRoot === "string" && input.planRoot
+      ? input.planRoot
+      : (process.env?.DSH_PLAN_ROOT || ""),
     guardTools: new Set(guardTools),
     requireFrontmatter: normReq,
     repoRoot: typeof input?.repoRoot === "string" ? input.repoRoot : "",
@@ -315,15 +334,19 @@ function normalizeConfig(input) {
   };
 }
 
+function planRootLabel(config) {
+  return config.planRoot || "D:\\plan";
+}
+
 function rejectReason(tool, args, config, found) {
   const f = args?.file_path ?? args?.path ?? "(未知文件)";
   return [
     "[plan-gate] 改动被拒绝：缺少「已审核通过且已人工确认」的 Markdown 计划。",
     `操作：${tool} ${f}`,
-    `计划要求：仓库根 ${config.planDir}/<sessionId>.md，frontmatter 需含 ` +
+    `计划要求：${planRootLabel(config)}/<工作区>/<sessionId>.md，frontmatter 需含 ` +
       Object.entries(config.requireFrontmatter).map(([k, v]) => `${k}: ${v}`).join(" 且 ") + "。",
     "正确流程：",
-    '  1) 先产出 Markdown 计划（可复制 .plan/TEMPLATE.md），写入 .plan/<sessionId>.md；',
+    `  1) 先产出 Markdown 计划，写入 ${planRootLabel(config)}/<工作区目录名>/<sessionId>.md；`,
     '  2) 调 orchestrate {op:"plan_review", plan:"<计划正文>"} 交高级模型审核；',
     "  3) 审核 pass 后，用 ask_user_question 让用户人工确认终稿；",
     "  4) 用户确认后把计划 frontmatter 置 status: approved、human_confirmed: true；",
@@ -337,10 +360,10 @@ function rejectReason(tool, args, config, found) {
  * 返回 {action: "allow"|"block"|"warn", reason}。fail-safe：文件缺失/损坏一律 block（要求重新过审）。
  * @param {object} p - {root, planDir, planFile, enableGuard, fs}
  */
-export function checkReviewState({ root, planDir, planFile, sessionId, enableGuard, fs = {} }) {
+export function checkReviewState({ root, planDir, planRoot, planFile, sessionId, enableGuard, fs = {} }) {
   const readFile = fs.readFileSync ?? readFileSync;
   const join = path.join;
-  const dir = join(root, planDir || ".plan");
+  const dir = resolvePlanDir(root, planRoot, planDir);
   const reviewPath = join(dir, "_review.json");
   let state;
   try {
@@ -351,10 +374,10 @@ export function checkReviewState({ root, planDir, planFile, sessionId, enableGua
   }
   const entries = Array.isArray(state?.entries) ? state.entries : [];
   if (!planFile) return { action: "allow", reason: "no_plan_file" };
-  // plan_key = 相对 root 的路径（与 api.py 一致，用 / 分隔）
+  // plan_key = 相对 planRoot（配置时）或 root 的路径（与 api.py / resolve_plan 一致，用 / 分隔）
   let planKey;
   try {
-    planKey = path.relative(root, planFile).replace(/\\/g, "/");
+    planKey = planKeyOf(root, planRoot, planFile);
   } catch (e) {
     return { action: "allow", reason: "plan_key_derive_failed" };
   }
@@ -364,9 +387,9 @@ export function checkReviewState({ root, planDir, planFile, sessionId, enableGua
   const latest = same[same.length - 1];
   try {
     const real = fs.realpathSync ?? realpathSync;
-    const boundary = real(path.join(root, '.plan'));
+    const boundary = real(resolvePlanDir(root, planRoot, planDir));
     const relative = path.relative(boundary, real(planFile));
-    if (!relative || relative.startsWith('..') || path.isAbsolute(relative) || path.dirname(boundary) !== real(root)) throw new Error('outside .plan');
+    if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('outside planDir');
     const text = readFile(planFile, 'utf-8');
     const fm = parseFrontmatter(text);
     if (latest.verdict !== 'pass' || latest.stale || latest.plan_sha256 !== planSha(text) ||
@@ -463,6 +486,7 @@ export function decideInterception({ tool, args, config, sessionId, cwd, fs }) {
   const found = findApprovedPlan({
     root,
     planDir: config.planDir,
+    planRoot: config.planRoot,
     sessionId,
     require: config.requireFrontmatter,
     fs,
@@ -472,6 +496,7 @@ export function decideInterception({ tool, args, config, sessionId, cwd, fs }) {
     const rs = checkReviewState({
       root,
       planDir: config.planDir,
+      planRoot: config.planRoot,
       planFile: found.file,
       sessionId,
       enableGuard: config.enablePlanReviewGuard,

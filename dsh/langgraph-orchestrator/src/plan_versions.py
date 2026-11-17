@@ -12,6 +12,14 @@ APPROVAL_FIELDS = {'status', 'human_confirmed', 'review_verdict', 'review_score'
 # 用于 plan_path 从文件读入时的体积闸，与内联送审共用同一字符上限（按字符，非字节）。
 MAX_PLAN_CHARS = 16000
 
+# 计划全局根：默认 D:\plan，可用环境变量 DSH_PLAN_ROOT 覆盖（与 JS 侧一致）。
+# 最终计划目录 = <PLAN_ROOT>/<工作区目录名>；_review.json 存于该目录。
+PLAN_ROOT = Path(os.getenv('DSH_PLAN_ROOT', 'D:/plan'))
+
+
+def plan_dir_for(root: Path) -> Path:
+    return (PLAN_ROOT / Path(root).name).resolve()
+
 
 def canonical_plan(text):
     text = str(text).lstrip('\ufeff').replace('\r\n', '\n').replace('\r', '\n')
@@ -36,18 +44,23 @@ def resolve_plan(root, plan_path, session_id):
     root = Path(root).resolve(strict=True)
     if not root.is_dir():
         raise ValueError('workdir must be a directory')
-    boundary = (root / '.plan').resolve()
-    if boundary.parent != root:
-        raise ValueError('.plan must remain inside workdir')
-    target = Path(plan_path) if plan_path else Path('.plan') / (session_id + '.md')
-    target = (root / target).resolve() if not target.is_absolute() else target.resolve()
+    boundary = plan_dir_for(root)
+    target = Path(plan_path) if plan_path else boundary / (session_id + '.md')
+    if not target.is_absolute():
+        # 兼容两类相对路径：相对 root（旧 .plan/x.md）与相对计划目录（新 x.md）。
+        via_root = (root / target).resolve()
+        target = via_root if via_root.is_relative_to(boundary) else (boundary / target).resolve()
+    else:
+        target = target.resolve()
     if not target.is_relative_to(boundary) or target == boundary or target.suffix.lower() != '.md':
-        raise ValueError('plan_path must be a Markdown file within .plan')
-    return root, target, target.relative_to(root).as_posix()
+        raise ValueError('plan_path must be a Markdown file within <planRoot>/<workspace>')
+    # plan_key 相对「计划根」(boundary 的父目录)：新布局 = <workspace>/x.md，
+    # 旧布局 = .plan/x.md，与 JS 侧 planKeyOf 的口径保持一致。
+    return root, target, target.relative_to(boundary.parent).as_posix()
 
 
 def load_state(root):
-    path = Path(root) / '.plan' / '_review.json'
+    path = plan_dir_for(root) / '_review.json'
     if not path.exists():
         return {'entries': []}
     state = json.loads(path.read_text(encoding='utf-8'))

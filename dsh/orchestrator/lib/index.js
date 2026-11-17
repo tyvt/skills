@@ -14,10 +14,10 @@
  */
 
 import { spawn } from 'node:child_process'
-import { resolve as pathResolve, isAbsolute, relative as pathRelative, sep } from 'node:path'
+import { resolve as pathResolve, basename as pathBasename, isAbsolute, relative as pathRelative, sep } from 'node:path'
 import { existsSync, statSync } from 'node:fs'
 import { Config } from './config.js'
-import { preflight } from '../../scripts/preflight-p0.mjs'
+import { preflight } from './preflight-p0.mjs'
 
 export { Config }
 
@@ -28,19 +28,21 @@ export const name = 'orchestrator'
 export const inject = ['tools']
 
 /**
- * plan_review 的 plan_path 轻量预检（P0-1 契约修复）。
- * 语义：plan_path 为「相对 workdir 的路径」，与 Python resolve_plan 的 root/target 一致。
- * 仅当 workdir 可解析时校验：解析后必须落在 <workdir>/.plan 内、后缀 .md、且文件存在。
+ * plan_review 的 plan_path 轻量预检（P0-1 契约修复，2026-11-17 迁至 D:\plan）。
+ * 语义：plan_path 可为「相对 workdir 的路径」或绝对路径；解析后必须落在
+ * <planRoot>/<basename(workdir)> 内（planRoot 默认 D:\plan，env DSH_PLAN_ROOT 可覆盖）。
+ * 仅当 workdir 可解析时校验：后缀 .md、文件存在。
  * 返回错误串（应中止）或 null（放行交 Python 做权威校验）。
  */
-export function validatePlanPath(planPath, workdir) {  if (!planPath) return null
-  if (isAbsolute(planPath)) return 'plan_path 必须是相对 workdir 的路径（如 .plan/xxx.md）'
+export function validatePlanPath(planPath, workdir) {
+  if (!planPath) return null
   if (!workdir) return null // workdir 不可解析时跳过，交 Python 权威校验
-  const planDir = pathResolve(workdir, '.plan')
-  const target = pathResolve(workdir, planPath)
+  const planRoot = process.env?.DSH_PLAN_ROOT || pathResolve('D:/plan')
+  const planDir = pathResolve(planRoot, pathBasename(workdir))
+  const target = isAbsolute(planPath) ? pathResolve(planPath) : pathResolve(planDir, planPath)
   const rel = pathRelative(planDir, target)
   if (rel === '' || rel.startsWith('..') || rel.includes('..' + sep) || isAbsolute(rel)) {
-    return 'plan_path 必须位于 workdir/.plan 内'
+    return 'plan_path 必须位于 <planRoot>/<工作区目录名> 内'
   }
   if (!target.toLowerCase().endsWith('.md')) return 'plan_path 必须是 Markdown(.md) 文件'
   if (!existsSync(target) || !statSync(target).isFile()) return 'plan_path 文件不存在'
@@ -383,7 +385,7 @@ export function apply(ctx, config) {
     'op="full" (default): use workdir + execution {program,args} for a deterministic known command without model calls; otherwise decompose request with model pools. Execution requires absolute workdir. Use log_ref for quota-limited log reads.',
     'op="tool": run a single named tool on its pool.',
     'op="list": list configured tools and their model pools.',
-    'op="plan_review": submit a Markdown plan (arg `plan`) for strict review by the plan_reviewer model pool (current: workbuddy/deepseek-v4.1-flash); returns verdict pass|reject, score, issues, suggestions. Any edit/write must be preceded by an approved AND human-confirmed plan in .plan/; use plan_review, then ask_user_question for final confirmation.',
+    'op="plan_review": submit a Markdown plan (arg `plan`) for strict review by the plan_reviewer model pool (current: workbuddy/deepseek-v4.1-flash); returns verdict pass|reject, score, issues, suggestions. Any edit/write must be preceded by an approved AND human-confirmed plan under D:\\plan/<workspace>; use plan_review, then ask_user_question for final confirmation.',
     `op="tool" requires tool ∈ {${TOOL_NAMES.join(', ')}}.`,
     'Use this when a task benefits from multiple specialized models or from failover across backup models.',
   ].join(' ')
@@ -416,7 +418,7 @@ export function apply(ctx, config) {
           type: 'string',
           description: 'When op=plan_review, optional task/background context (falls back to request).',
         },
-        workdir: { type: 'string', description: 'Optional for full graph mode; defaults to the orchestrator project dir, then the process cwd. Required when execution is set. Relative paths resolve against the project dir. For plan_review, identifies the repository containing .plan.' },
+        workdir: { type: 'string', description: 'Optional for full graph mode; defaults to the orchestrator project dir, then the process cwd. Required when execution is set. Relative paths resolve against the project dir. For plan_review, identifies the workspace whose plan dir is D:/plan/<workspace basename>.' },
         execution: {
           type: 'object', description: 'Deterministic full fast path: program + argument array; no shell or model calls.',
           properties: {
@@ -431,7 +433,7 @@ export function apply(ctx, config) {
         log_ref: { type: 'string', description: 'Registered log reference for quota-limited narrow read.' },
         offset: { type: 'integer', minimum: 0 },
         limit: { type: 'integer', minimum: 1, maximum: 2000 },
-        plan_path: { type: 'string', description: 'Plan path within workdir/.plan.' },
+        plan_path: { type: 'string', description: 'Plan path within D:/plan/<workspace basename> (relative to that plan dir, or absolute).' },
         base_sha: { type: 'string' },
         base_version: { type: 'integer', minimum: 1 },
         delta: { type: 'array', items: { type: 'object', properties: {
@@ -468,7 +470,7 @@ export function apply(ctx, config) {
       if (op === 'plan_review') {
         // P0-1：允许「plan 正文」或「plan_path(.plan 内 md)」或「delta 增量」三种入口，三者皆空才报错。
         if ((!args.plan || !String(args.plan).trim()) && !args.plan_path && !args.delta?.length) {
-          throw new Error('orchestrate: op=plan_review 需要 plan 或 plan_path 参数（plan 正文，或 .plan 内 md 相对 workdir 路径）')
+          throw new Error('orchestrate: op=plan_review 需要 plan 或 plan_path 参数（plan 正文，或 D:/plan/<工作区> 内 md 相对路径）')
         }
         const planPathErr = validatePlanPath(args.plan_path, args.workdir)
         if (planPathErr) throw new Error('orchestrate: ' + planPathErr)

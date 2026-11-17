@@ -96,7 +96,8 @@ def test_delta_requires_unique_exact_match(tmp_path, delta):
         prepare(tmp_path, '', 'session1', '', first['plan_sha256'], 1, delta)
 
 
-@pytest.mark.parametrize('path', ['../outside.md', 'outside.md', '.plan/../../outside.md', '.plan/x.json'])
+# outside.md 在新契约下可合法解析为「计划目录内相对路径」，故移除；保留真实越界与非 md 后缀。
+@pytest.mark.parametrize('path', ['../outside.md', '../../outside.md', '.plan/../../outside.md', '.plan/x.json'])
 def test_path_boundary(tmp_path, path):
     with pytest.raises(ValueError):
         prepare(tmp_path, path, 'session1', 'text')

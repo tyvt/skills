@@ -38,25 +38,36 @@ async function main() {
   assert.deepEqual(registered.parameters.properties.execution.required, ['program', 'args'])
   assert.ok(registered.parameters.properties.delta)
   await assert.rejects(() => registered.execute({ op: 'plan_review' }, {}), /plan/)
-  // P0-1 plan_path 契约校验（纯逻辑，不 spawn python）
+  // P0-1 plan_path 契约校验（纯逻辑，不 spawn python；测试用临时 DSH_PLAN_ROOT 隔离）
   {
     const wd = mkdtempSync(join(tmpdir(), 'orch-pp-'))
-    mkdirSync(join(wd, '.plan'), { recursive: true })
-    writeFileSync(join(wd, '.plan', 'ok.md'), '# ok\n')
-    // ① 存在且合法的 plan_path：放行（返回 null）
-    assert.equal(validatePlanPath('.plan/ok.md', wd), null)
-    // ② 文件不存在：预检报错
-    assert.match(validatePlanPath('.plan/nope.md', wd), /不存在/)
-    // ③ 越界（不在 .plan 内）：报错
-    assert.match(validatePlanPath('outside.md', wd), /\.plan/)
-    // ④ 非 .md：报错
-    assert.match(validatePlanPath('.plan/ok.txt', wd), /Markdown/)
-    // ⑤ 绝对路径：报错
-    assert.match(validatePlanPath(join(wd, '.plan', 'ok.md'), wd), /相对/)
-    // ⑥ 无 plan_path：放行
-    assert.equal(validatePlanPath('', wd), null)
-    // ⑦ 仅 plan_path 不抛「需要 plan 参数」——参数校验前置不再因缺 body 而报错
-    //    （真正执行会 spawn python，这里只验证校验函数与不误判）
+    const prevRoot = process.env.DSH_PLAN_ROOT
+    const testRoot = mkdtempSync(join(tmpdir(), 'orch-planroot-'))
+    process.env.DSH_PLAN_ROOT = testRoot
+    try {
+      const wsName = wd.split(/[\\/]/).filter(Boolean).pop()
+      const pd = join(testRoot, wsName)
+      mkdirSync(pd, { recursive: true })
+      writeFileSync(join(pd, 'ok.md'), '# ok\n')
+      // ① 存在且合法的 plan_path（相对计划目录）：放行（返回 null）
+      assert.equal(validatePlanPath('ok.md', wd), null)
+      // ② 文件不存在：预检报错
+      assert.match(validatePlanPath('nope.md', wd), /不存在/)
+      // ③ 越界（用 .. 逃出 <planRoot>/<workspace>）：报错
+      assert.match(validatePlanPath('../outside.md', wd), /工作区目录名/)
+      // ④ 非 .md：报错
+      writeFileSync(join(pd, 'ok.txt'), 'x')
+      assert.match(validatePlanPath('ok.txt', wd), /Markdown/)
+      // ⑤ 绝对路径指向计划目录内：放行
+      assert.equal(validatePlanPath(join(pd, 'ok.md'), wd), null)
+      // ⑤b 绝对路径越界：报错
+      assert.match(validatePlanPath(join(testRoot, 'other.md'), wd), /工作区目录名/)
+      // ⑥ 无 plan_path：放行
+      assert.equal(validatePlanPath('', wd), null)
+    } finally {
+      if (prevRoot === undefined) delete process.env.DSH_PLAN_ROOT
+      else process.env.DSH_PLAN_ROOT = prevRoot
+    }
     console.log('[PASS] validatePlanPath contract')
   }
   const invalid = await registered.execute({ op: 'full', workdir: PROJECT + '/missing',
