@@ -30,14 +30,14 @@
           enabled: true
           # off=不启用；warn=只记 ledger 告警不阻断（灰度默认）；block=拦截二次补问。
           # 灰度判据与切换脚本见 dsh/scripts/ask-guard-promote.ps1。
-          mode: warn
+          mode: block
         exploration:
           # 探索漂移拦截（.plan/explore-drift-guard-20261113）：
           # off=不启用；warn=只记 ledger 不阻断（灰度默认）；block=拒绝。
           # 子代理会话（header.parentSession 存在）整体豁免。
           # promote 门槛：warn ≥2 天且 ≥20 条中误拦 <10%。
           enabled: true
-          mode: warn
+          mode: block
           maxWholeReadLines: 300
           firstReadLimit: 60
           minRepeatPattern: 3
@@ -61,3 +61,35 @@
             - 不用查记忆
             - 直接看代码
             - 跳过记忆
+        # 探索外包（explore-outsource，2026-11-17）：本会话首次探索动作前若未派只读子代理，
+        # warn 提示先派 dsh-explore。派发工具（spawn_teammate/task/workflow/orchestrate）置位豁免；
+        # 子代理会话豁免；带 offset/limit 的精确 read、非探索 pwsh 豁免。只 nudge 一次。
+        # promote 门槛：warn 观察误伤（已派子代理/精确读不误报）后再转 block。
+        exploreOutsource:
+          enabled: true
+          mode: warn
+          tools:
+            - read
+            - grep
+            - glob
+            - pwsh
+          dispatchTools:
+            - spawn_teammate
+            - task
+            - workflow
+            - orchestrate
+        # 同类扇出（fanout，2026-11-17）：主会话连续 ≥threshold 次同类工具调用，
+        # warn 提示改派子代理并行处理，避免串行逐个烧上下文。AGENTS.md 的
+        # fanoutStreakThreshold 此前代码零实现，这是新计数。子代理豁免；换类即重置。
+        # promote 门槛：warn 观察误伤后再转 block。
+        fanout:
+          enabled: true
+          mode: warn
+          threshold: 3
+          tools:
+            - read
+            - grep
+            - glob
+            - edit
+            - write
+            - pwsh

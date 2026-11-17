@@ -36,7 +36,7 @@ import os from 'node:os'
 import path from 'node:path'
 
 import { Config } from './config.js'
-import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst } from './rules.js'
+import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak } from './rules.js'
 import { policy } from './p0-policy.mjs'
 import { decideInterception } from './scope.js'
 import { evaluateAsk } from './ask-guard.js'
@@ -196,7 +196,7 @@ export function apply(ctx, config) {
         const oldest = sessionDrift.keys().next().value
         if (oldest !== undefined) sessionDrift.delete(oldest)
       }
-      state = { fileLines: new Map(), grepSeq: 0, lastPattern: '', lastGlob: null, vikingSearched: false, vikingNudged: false, vikingSkipped: false }
+      state = { fileLines: new Map(), grepSeq: 0, lastPattern: '', lastGlob: null, vikingSearched: false, vikingNudged: false, vikingSkipped: false, subagentDispatched: false, outsourceNudged: false, fanoutTool: '', fanoutStreak: 0, fanoutFired: false }
       sessionDrift.set(sessionId, state)
     }
     return state
@@ -339,6 +339,71 @@ export function apply(ctx, config) {
           }
           if (vf.verdict === 'warn') log?.warn?.('agent-guard: viking-first warn %s', exec?.name)
         }
+      }
+      // 探索外包（explore-outsource，2026-11-17）：首次探索前若未派只读子代理则 warn。
+      // 检测到派发工具即置位 subagentDispatched；状态与 nudge 都在 drift 上维护。
+      if (config.enabled && config.exploreOutsource?.enabled) {
+        const drift = getSessionDrift(exec)
+        const tool = exec?.name
+        const dispatchTools = config.exploreOutsource.dispatchTools
+        if (Array.isArray(dispatchTools) && dispatchTools.includes(tool)) {
+          drift.subagentDispatched = true
+        } else {
+          const eo = decideExploreOutsource(drift, tool, exec?.arguments, {
+            isSubagent: isSubagentSession(exec),
+            tools: config.exploreOutsource.tools,
+            mode: config.exploreOutsource.mode,
+          })
+          if (eo.nudge) {
+            drift.outsourceNudged = true
+            appendLedger(ledgerPath, {
+              ts: new Date().toISOString(), kind: 'explore-outsource', rule: eo.verdict,
+              tool, mode: config.exploreOutsource.mode ?? 'warn',
+              session_id: exec?.agent?.session?.header?.id ?? 'anon',
+              subagent: isSubagentSession(exec),
+            })
+          }
+          if (eo.verdict === 'block') {
+            counters.rejected++
+            log?.warn?.('agent-guard: explore-outsource block %s: %s', tool, eo.message)
+            return eo.message
+          }
+          if (eo.verdict === 'warn') log?.warn?.('agent-guard: explore-outsource warn %s', tool)
+        }
+      }
+      // 同类扇出（fanout，2026-11-17）：连续 ≥threshold 次同类工具则 warn 提示扇出。
+      // 跨调用 streak 在 drift 上维护；换类即重置并清 fanoutFired。
+      if (config.enabled && config.fanout?.enabled) {
+        const drift = getSessionDrift(exec)
+        const tool = exec?.name
+        if (tool !== drift.fanoutTool) {
+          drift.fanoutTool = tool
+          drift.fanoutStreak = 1
+          drift.fanoutFired = false
+        } else {
+          drift.fanoutStreak = (drift.fanoutStreak || 0) + 1
+        }
+        const fo = decideFanoutStreak(drift, tool, exec?.arguments, {
+          isSubagent: isSubagentSession(exec),
+          tools: config.fanout.tools,
+          threshold: config.fanout.threshold,
+          mode: config.fanout.mode,
+        })
+        if (fo.nudge) {
+          drift.fanoutFired = true
+          appendLedger(ledgerPath, {
+            ts: new Date().toISOString(), kind: 'fanout', rule: fo.verdict,
+            tool, streak: fo.streak, mode: config.fanout.mode ?? 'warn',
+            session_id: exec?.agent?.session?.header?.id ?? 'anon',
+            subagent: isSubagentSession(exec),
+          })
+        }
+        if (fo.verdict === 'block') {
+          counters.rejected++
+          log?.warn?.('agent-guard: fanout block %s: %s', tool, fo.message)
+          return fo.message
+        }
+        if (fo.verdict === 'warn') log?.warn?.('agent-guard: fanout warn %s (streak=%s)', tool, fo.streak)
       }
       // 探索漂移拦截（explore-drift-guard-20261113 M1）：整读门槛/重复盲搜/未知根试错。
       // warn 模式只记 ledger 不阻断；block 模式拒绝并回改法。规则纯函数在 rules.js。

@@ -4,7 +4,7 @@
 // 退出码 0 = 全通过；1 = 有失败。
 import assert from 'node:assert/strict'
 
-import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, isPwshExploration } from './lib/rules.js'
+import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, isPwshExploration } from './lib/rules.js'
 import { decideInterception } from './lib/scope.js'
 import { evaluateAsk } from './lib/ask-guard.js'
 import { apply, inspectSessionSizes, Config } from './lib/index.js'
@@ -866,6 +866,96 @@ test('viking-first：非探索工具（如 edit）不触发 → pass', () => {
   const sizes = inspectSessionSizes()
   assert.ok(sizes.reads <= 200, 'sessionReads size 受 200 上限约束，实际=' + sizes.reads)
   console.log(`agent-guard: sessionReads FIFO eviction PASS (size=${sizes.reads})`)
+}
+
+console.log('\n=== explore-outsource 探索外包 + fanout 同类扇出（2026-11-17）===')
+function freshEsState() {
+  return { subagentDispatched: false, outsourceNudged: false, fanoutTool: '', fanoutStreak: 0, fanoutFired: false }
+}
+// ① explore-outsource 纯函数
+test('explore-outsource：首次探索未派子代理 → warn 并 nudge', () => {
+  const d = decideExploreOutsource(freshEsState(), 'grep', { pattern: 'foo' }, { mode: 'warn' })
+  assert.equal(d.verdict, 'warn')
+  assert.equal(d.nudge, true)
+  assert.match(d.message, /子代理/)
+})
+test('explore-outsource：block 模式返回 block', () => {
+  assert.equal(decideExploreOutsource(freshEsState(), 'grep', {}, { mode: 'block' }).verdict, 'block')
+})
+test('explore-outsource：已派子代理 → pass', () => {
+  const s = freshEsState(); s.subagentDispatched = true
+  assert.equal(decideExploreOutsource(s, 'grep', {}, {}).verdict, 'pass')
+})
+test('explore-outsource：已 nudge → pass（只拦一次）', () => {
+  const s = freshEsState(); s.outsourceNudged = true
+  assert.equal(decideExploreOutsource(s, 'grep', {}, {}).verdict, 'pass')
+})
+test('explore-outsource：子代理会话豁免 → pass', () => {
+  assert.equal(decideExploreOutsource(freshEsState(), 'grep', {}, { isSubagent: true }).verdict, 'pass')
+})
+test('explore-outsource：带 offset/limit 的 read 豁免 → pass', () => {
+  assert.equal(decideExploreOutsource(freshEsState(), 'read', { file_path: 'a.js', limit: 60 }, {}).verdict, 'pass')
+})
+test('explore-outsource：非探索 pwsh 豁免 → pass', () => {
+  assert.equal(decideExploreOutsource(freshEsState(), 'pwsh', { command: 'npm run build' }, {}).verdict, 'pass')
+})
+test('explore-outsource：探索 pwsh → warn', () => {
+  assert.equal(decideExploreOutsource(freshEsState(), 'pwsh', { command: 'Get-ChildItem D:/x' }, {}).verdict, 'warn')
+})
+test('explore-outsource：非探索工具（edit）→ pass', () => {
+  assert.equal(decideExploreOutsource(freshEsState(), 'edit', {}, {}).verdict, 'pass')
+})
+// ② fanout 纯函数
+test('fanout：streak 未达阈值 → pass', () => {
+  const s = freshEsState(); s.fanoutStreak = 2
+  assert.equal(decideFanoutStreak(s, 'read', {}, { threshold: 3 }).verdict, 'pass')
+})
+test('fanout：streak 达阈值 → warn 并 nudge，带 streak', () => {
+  const s = freshEsState(); s.fanoutStreak = 3
+  const d = decideFanoutStreak(s, 'read', {}, { threshold: 3, mode: 'warn' })
+  assert.equal(d.verdict, 'warn')
+  assert.equal(d.nudge, true)
+  assert.equal(d.streak, 3)
+})
+test('fanout：block 模式返回 block', () => {
+  const s = freshEsState(); s.fanoutStreak = 4
+  assert.equal(decideFanoutStreak(s, 'read', {}, { threshold: 3, mode: 'block' }).verdict, 'block')
+})
+test('fanout：已 fired → pass（同一 streak 只报一次）', () => {
+  const s = freshEsState(); s.fanoutStreak = 5; s.fanoutFired = true
+  assert.equal(decideFanoutStreak(s, 'read', {}, { threshold: 3 }).verdict, 'pass')
+})
+test('fanout：子代理豁免 → pass', () => {
+  const s = freshEsState(); s.fanoutStreak = 5
+  assert.equal(decideFanoutStreak(s, 'read', {}, { threshold: 3, isSubagent: true }).verdict, 'pass')
+})
+test('fanout：非白名单工具 → pass', () => {
+  const s = freshEsState(); s.fanoutStreak = 5
+  assert.equal(decideFanoutStreak(s, 'todo_write', {}, { threshold: 3, tools: ['read', 'grep'] }).verdict, 'pass')
+})
+// apply 集成：①② enabled 时探索被 warn 放行，派发工具置位后放行，连续同类 warn 一次
+{
+  const guarded = []
+  const ctx = {
+    tools: { guard(fn) { guarded.push(fn); return () => {} } },
+    on() {},
+    logger: { info() {}, warn() {} },
+  }
+  apply(ctx, Config['~standard'].validate({
+    enabled: true, ledgerPath: './ag-selftest-ledger.jsonl',
+    exploreOutsource: { enabled: true, mode: 'warn' },
+    fanout: { enabled: true, mode: 'warn', threshold: 3 },
+  }).value)
+  const sid = 'es-int'
+  const mk = (name, args) => ({ name, arguments: args, agent: { session: { header: { id: sid } } } })
+  // 首次探索 → outsource warn，放行；连续 3 次 read 还会触发 fanout warn，均放行
+  assert.equal(guarded[0](mk('grep', { pattern: 'p', path: 'D:/p/src' })), undefined)
+  assert.equal(guarded[0](mk('read', { file_path: 'D:/p/a.js' })), undefined)
+  assert.equal(guarded[0](mk('read', { file_path: 'D:/p/b.js' })), undefined)
+  assert.equal(guarded[0](mk('read', { file_path: 'D:/p/c.js' })), undefined)
+  // 派发子代理后置位 → outsource 放行（且 fanout 换类 reset）
+  guarded[0](mk('spawn_teammate', { name: 'x' }))
+  assert.equal(guarded[0](mk('grep', { pattern: 'q', path: 'D:/p/src' })), undefined)
 }
 
 console.log(`\n${failed === 0 ? 'PASS' : 'FAIL'}  passed=${passed} failed=${failed}\n`)

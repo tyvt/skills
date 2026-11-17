@@ -827,6 +827,82 @@ export function decideVikingFirst(state, tool, args, opts = {}) {
   }
 }
 
+/**
+ * 探索外包（explore-outsource，2026-11-17）：本会话首次探索动作前若尚未派只读子代理，
+ * warn/nudge 提示先派 dsh-explore。外包探索的会话自身豁免（isSubagent）；
+ * state.subagentDispatched 由调用方在检测到派发工具时置位；只 nudge 一次（state.outsourceNudged）。
+ * 带 offset/limit 的精确 read、非探索 pwsh 不触发，减少误伤。
+ * 纯函数：只读 state + 参数，状态回填由调用方负责。
+ * @param {object} state - 每会话 state（含 subagentDispatched/outsourceNudged）。
+ * @param {string} tool - 工具名（read/grep/glob/pwsh）。
+ * @param {object} args - 工具参数。
+ * @param {object} opts - { isSubagent, tools, mode:'warn'|'block' }
+ * @returns {{ verdict:'pass'|'warn'|'block', message?:string, nudge?:boolean }}
+ */
+export function decideExploreOutsource(state, tool, args, opts = {}) {
+  const base = { verdict: 'pass' }
+  if (!state || typeof state !== 'object') return base
+  if (opts.isSubagent === true) return base
+  if (state.subagentDispatched === true) return base
+  if (state.outsourceNudged === true) return base
+
+  const tools = Array.isArray(opts.tools) && opts.tools.length
+    ? opts.tools
+    : ['read', 'grep', 'glob', 'pwsh']
+  if (!tools.includes(tool)) return base
+
+  if (tool === 'read') {
+    const hasRange = (args?.offset != null && args?.offset !== '')
+      || (args?.limit != null && args?.limit !== '')
+    if (hasRange) return base
+  }
+  if (tool === 'pwsh' && !isPwshExploration(typeof args?.command === 'string' ? args.command : '')) {
+    return base
+  }
+
+  const mode = opts.mode === 'block' ? 'block' : 'warn'
+  return {
+    verdict: mode,
+    nudge: true,
+    message: '[explore-outsource] 本会话首次探索前还没派只读子代理。按 P0-2，找东西的探索应先派 dsh-explore 只读子代理（未知根/跨模块/批量≥3 一律先派），主控只收 ≤30 行结论、带 offset/limit 局部读；确需主控直探的精确 read/pwsh 已豁免。已派子代理则忽略本条。',
+  }
+}
+
+/**
+ * 同类扇出（fanout，2026-11-17）：主会话连续 ≥threshold 次调用同类工具（read/grep/glob/edit/...）时
+ * warn/nudge 提示改用 spawn_teammate/workflow/orchestrate 并行扇出，避免串行逐个烧上下文。
+ * AGENTS.md 提的 fanoutStreakThreshold 此前代码零实现，这里是新的跨调用计数判定。
+ * 计数由调用方维护在 state.fanoutTool/fanoutStreak/fanoutFired：同类工具连续则 streak+1，
+ * 换类或非白名单工具则重置为 1 并清 fanoutFired；streak 首次达 threshold 才触发一次（state.fanoutFired）。
+ * 子代理自身豁免。纯函数：只读 state + 参数，状态回填由调用方负责。
+ * @param {object} state - 每会话 state（含 fanoutTool/fanoutStreak/fanoutFired）。
+ * @param {string} tool - 工具名。
+ * @param {object} args - 工具参数（保留签名一致，当前未用）。
+ * @param {object} opts - { isSubagent, tools, threshold, mode:'warn'|'block' }
+ * @returns {{ verdict:'pass'|'warn'|'block', message?:string, nudge?:boolean, streak?:number }}
+ */
+export function decideFanoutStreak(state, tool, args, opts = {}) {
+  const base = { verdict: 'pass' }
+  if (!state || typeof state !== 'object') return base
+  if (opts.isSubagent === true) return base
+  const tools = Array.isArray(opts.tools) && opts.tools.length
+    ? opts.tools
+    : ['read', 'grep', 'glob', 'edit', 'write', 'pwsh']
+  if (!tools.includes(tool)) return base
+  const threshold = positiveOpt(opts.threshold, 3)
+  const streak = Number.isFinite(state.fanoutStreak) ? state.fanoutStreak : 0
+  if (streak < threshold) return base
+  if (state.fanoutFired === true) return base
+
+  const mode = opts.mode === 'block' ? 'block' : 'warn'
+  return {
+    verdict: mode,
+    nudge: true,
+    streak,
+    message: `[fanout] 主会话已连续 ${streak} 次调用同类工具 ${tool}。按并行扇出规则，同类批量对象 ≥3 应改派 spawn_teammate/workflow/orchestrate 并行处理，别在主模型串行逐个烧上下文。`,
+  }
+}
+
 
 /**
  * `ask_user_question` 的每个 question 必须带 `id`（审计 G，session.v4 seq 670 漏 id 被拒）。

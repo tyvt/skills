@@ -83,6 +83,20 @@ export const DEFAULTS = {
     skip: false,
     skipPhrases: ['别查记忆', '不用查记忆', '直接看代码', '跳过记忆'],
   },
+  /** 探索外包（explore-outsource）：首次探索前未派只读子代理则 warn/block。默认 inert。 */
+  exploreOutsource: {
+    enabled: false,
+    mode: 'warn',
+    tools: ['read', 'grep', 'glob', 'pwsh'],
+    dispatchTools: ['spawn_teammate', 'task', 'workflow', 'orchestrate'],
+  },
+  /** 同类扇出（fanout）：连续 ≥threshold 次同类工具则 warn/block 提示并行扇出。默认 inert。 */
+  fanout: {
+    enabled: false,
+    mode: 'warn',
+    threshold: 3,
+    tools: ['read', 'grep', 'glob', 'edit', 'write', 'pwsh'],
+  },
 }
 
 function bool(value, fallback) {
@@ -123,6 +137,8 @@ export function validate(input) {
   const scope = source.scope ?? {}
   const exploration = source.exploration ?? {}
   const vikingFirst = source.vikingFirst ?? {}
+  const exploreOutsource = source.exploreOutsource ?? {}
+  const fanout = source.fanout ?? {}
   if (typeof repair !== 'object' || Array.isArray(repair)) {
     return { issues: [{ message: 'agent-guard: repair must be an object' }] }
   }
@@ -138,9 +154,21 @@ export function validate(input) {
   if (typeof vikingFirst !== 'object' || Array.isArray(vikingFirst)) {
     return { issues: [{ message: 'agent-guard: vikingFirst must be an object' }] }
   }
+  if (typeof exploreOutsource !== 'object' || Array.isArray(exploreOutsource)) {
+    return { issues: [{ message: 'agent-guard: exploreOutsource must be an object' }] }
+  }
+  if (typeof fanout !== 'object' || Array.isArray(fanout)) {
+    return { issues: [{ message: 'agent-guard: fanout must be an object' }] }
+  }
   const vfMode = typeof vikingFirst.mode === 'string' && ['warn', 'block'].includes(vikingFirst.mode)
     ? vikingFirst.mode
     : DEFAULTS.vikingFirst.mode
+  const eoMode = typeof exploreOutsource.mode === 'string' && ['warn', 'block'].includes(exploreOutsource.mode)
+    ? exploreOutsource.mode
+    : DEFAULTS.exploreOutsource.mode
+  const fanoutMode = typeof fanout.mode === 'string' && ['warn', 'block'].includes(fanout.mode)
+    ? fanout.mode
+    : DEFAULTS.fanout.mode
   const explorationMode = typeof exploration.mode === 'string' && ['off', 'warn', 'block'].includes(exploration.mode)
     ? exploration.mode
     : DEFAULTS.exploration.mode
@@ -187,6 +215,24 @@ export function validate(input) {
         skipPhrases: Array.isArray(vikingFirst.skipPhrases) && vikingFirst.skipPhrases.length
           ? vikingFirst.skipPhrases.filter((p) => typeof p === 'string' && p.trim() !== '')
           : DEFAULTS.vikingFirst.skipPhrases.slice(),
+      },
+      exploreOutsource: {
+        enabled: bool(exploreOutsource.enabled, DEFAULTS.exploreOutsource.enabled),
+        mode: eoMode,
+        tools: Array.isArray(exploreOutsource.tools) && exploreOutsource.tools.length
+          ? exploreOutsource.tools.filter((t) => typeof t === 'string' && t.trim() !== '')
+          : DEFAULTS.exploreOutsource.tools.slice(),
+        dispatchTools: Array.isArray(exploreOutsource.dispatchTools) && exploreOutsource.dispatchTools.length
+          ? exploreOutsource.dispatchTools.filter((t) => typeof t === 'string' && t.trim() !== '')
+          : DEFAULTS.exploreOutsource.dispatchTools.slice(),
+      },
+      fanout: {
+        enabled: bool(fanout.enabled, DEFAULTS.fanout.enabled),
+        mode: fanoutMode,
+        threshold: positiveInt(fanout.threshold, DEFAULTS.fanout.threshold),
+        tools: Array.isArray(fanout.tools) && fanout.tools.length
+          ? fanout.tools.filter((t) => typeof t === 'string' && t.trim() !== '')
+          : DEFAULTS.fanout.tools.slice(),
       },
     },
   }
