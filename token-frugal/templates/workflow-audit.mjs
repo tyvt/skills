@@ -92,11 +92,20 @@ for (const fp of files) {
     if (b > 8000) { bigResult++; bigBytes += b; const nm = nameByCall[tr.data.toolCallId] || '?'; bigByTool[nm] = (bigByTool[nm] || 0) + 1; }
   }
 
-  // 重复整读：同一 file_path 的 read 次数 - 唯一文件数
+  // 重复无范围整读：同一 file_path 的无 offset/limit 的 read 次数 - 唯一文件数。
+  // 口径与 dsh/agent-guard/lib/rules.js:714 对齐：带 offset 或 limit 的分页读豁免；
+  // arguments 解析失败/非对象跳过该条，不让一条坏数据中断整次审计。
   const readCalls = ev.filter(e => e.type === 'tool/call' && e.data.name === 'read');
   const fileSeen = {};
   let fullReadOfSameFile = 0;
-  for (const c of readCalls) { let a = {}; try { a = JSON.parse(c.data.arguments); } catch {} const k = a.file_path || '?'; fileSeen[k] = (fileSeen[k] || 0) + 1; }
+  for (const c of readCalls) {
+    let a; try { a = JSON.parse(c.data.arguments); } catch { continue; }
+    if (a === null || typeof a !== 'object' || Array.isArray(a)) continue;
+    const hasRange = (a.offset != null && a.offset !== '') || (a.limit != null && a.limit !== '');
+    if (hasRange) continue;
+    const k = a.file_path || '?';
+    fileSeen[k] = (fileSeen[k] || 0) + 1;
+  }
   for (const k in fileSeen) if (fileSeen[k] > 1) fullReadOfSameFile += fileSeen[k] - 1;
 
   // compaction 命中率：compaction/start 多但 summary 少 = 反复尝试压缩
@@ -135,4 +144,4 @@ if (A.weirdErr > 0) console.log(`• 可自愈工具错误 ${A.weirdErr} 次（$
 if (A.bigResult > 0) console.log(`• 大结果 ${A.bigResult} 条/${(A.bigBytes / 1048576).toFixed(1)}MB：pwsh/grep 先过滤再落盘，read 用 offset/limit 切片。`);
 if (A.goalRounds >= 6) console.log(`• goal 自动续跑 ${A.goalRounds} 轮：长任务要分片（一批文件一个 goal），单 goal 轮数上限压低，别让同一目标反复重跑。`);
 if (A.compStart > 0 && A.compSummary < A.compStart) console.log(`• compaction 尝试 ${A.compStart} 次/成功 ${A.compSummary}：上下文持续近满，压缩反复失败——长任务应换新会话，别硬撑。`);
-if (A.reRead > 0) console.log(`• 重复整读 ${A.reRead} 次：同文件只整篇读一次，后续只取片段。`);
+if (A.reRead > 0) console.log(`• 重复无范围整读 ${A.reRead} 次：同文件只整篇读一次，后续只取片段（带 offset/limit 的分页读已豁免）。`);
