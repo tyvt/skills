@@ -75,6 +75,16 @@
 - **长 reasoning 即缺事实（P1-2，2026-11-14）**：单步推理超约 1.5k token 仍无工具调用＝缺事实，立即发**一条**窄命令（`grep -n` / `read offset/limit` / `ls`）取证再继续，禁止继续空转推理。
 - 意图含「修改/修复/实现 + 验证 + 提交」时，先 `todo_write` 把阶段外化，不在推理里反复重述阶段目标。
 
+## 记忆时效性验证与优化（P1）
+
+- **触发**：auto-recall 召回 `viking://` 事实记忆时即做时效验证，不照单全收。每条记忆先读 frontmatter；**无 frontmatter / 空证据一律标 suspect**（不采信为当前事实，也不删）。
+- **四态判定**（按证据，不靠相似度）：VALID（现状一致）、STALE（被新值覆盖）、CONFLICT（同主体互斥值）、INVALID（幻觉/测试垃圾/隐私违规）。现状证据优先级：本会话用户新陈述 > 本轮工具实时返回 > 召回记忆交叉一致性 > `source_of_truth` 权威记忆；新证据时间须晚于记忆 `updated_at` 且语义冲突才判过期。证据不足 → 只标 `needs_review`，不动内容。
+- **动作优先级：修正 > 归档 > 删除**。STALE→原地 `edit` 改正文+frontmatter（`updated_at`/`valid_until`/`change_log`）；CONFLICT 或仅历史有效→归档降级（写 `_archive/` 并打 `archived/stale` 标签，检索默认过滤）；INVALID→删除。
+- **禁止 agent 自由删除长期稳定事实**（如用户固定偏好、底层规则）；删除仅限确认的幻觉/测试垃圾/隐私，且需高置信。拿不准一律归档+过滤，不删。
+- **归档检索过滤**：召回排序对 `updated_at` 新、`confidence` 高、非 archived 加权；多条冲突时采信更新时间新的，旧冲突记忆仅作历史参考。
+- **审计与 24h 冷却**：每次优化记审计（URI/动作/证据/时间）；同一 URI 24h 内不重复优化，防抖动。若当前记忆工具不支持归档目录或冷却字段，**降级为仅标注 + 禁止删除**，不得以不支持为由跳过验证或一刀切删。
+- reindex 由 SDK/CLI 在 edit/write/forget 后自动触发，无需手动 reindex 步骤。
+
 ## 禁止
 
 - 未知具体路径时，禁止全仓 `grep` / `read`；禁止 `src/**` 全量 grep，先缩到具体模块。
