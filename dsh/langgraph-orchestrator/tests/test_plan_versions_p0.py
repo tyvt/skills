@@ -297,3 +297,22 @@ def test_api_plan_review_from_plan_path_end_to_end(tmp_path, monkeypatch):
     # 落盘的版本正文来自文件
     state = json.loads((tmp_path / '.plan/_review.json').read_text())
     assert 'body via file' in state['entries'][-1]['plan_markdown']
+
+
+def test_record_writes_review_state_to_global_plan_dir(tmp_path, monkeypatch):
+    """回归：审核状态须写入 plan_dir_for(root)，与 load_state 同址；
+    外迁遗漏会让 record 散落到 <workdir>/.plan，破坏版本/复用/delta。"""
+    from src import plan_versions
+    global_dir = (tmp_path / 'global_plan').resolve()
+    monkeypatch.setattr(plan_versions, 'plan_dir_for', lambda root: global_dir)
+
+    first = prepare(tmp_path, '', 's_global', '# Plan\nbody')
+    record(first, 'pass', 90)
+
+    assert (global_dir / '_review.json').is_file()
+    assert not (tmp_path / '.plan' / '_review.json').exists()
+
+    second = prepare(tmp_path, '', 's_global', '# Plan\nbody')
+    assert second['latest'] is not None
+    assert second['latest']['verdict'] == 'pass'
+    assert second['version'] == 1

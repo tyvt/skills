@@ -91,7 +91,7 @@ def prepare(root, plan_path, session_id, text, base_sha='', base_version=None, d
             text = text.replace(old, new, 1)
     elif base_sha or base_version is not None:
         raise ValueError('base fields require delta')
-    # plan_path 契约：text 为空且无 delta 时，从 resolve_plan 解析出的 target 读文件（受 .plan 边界+.md 约束）。
+    # plan_path 契约：text 为空且无 delta 时，从 resolve_plan 解析出的 target 读文件（受全局计划目录边界+.md 约束）。
     # digest 一致性：直接赋 read_text 原值，不 strip 不改写；plan_sha 内 canonical_plan 已统一 CRLF/BOM→\n，
     # 故「文件读入」与「内联同内容」digest 必然一致，approved_sha256 版本比对不漂移。
     if (not isinstance(text, str) or not text.strip()) and delta is None:
@@ -123,8 +123,9 @@ def record(prepared, verdict, score, p0_count=0):
     for old in same:
         old['stale'] = True
     entries.append(entry)
-    directory = Path(prepared['root']) / '.plan'
-    directory.mkdir(exist_ok=True)
+    # 与 load_state 同址：审核状态写入全局计划目录，不再散落到 <workdir>/.plan。
+    directory = plan_dir_for(Path(prepared['root']))
+    directory.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(prefix='_review.', suffix='.tmp', dir=directory)
     try:
         with os.fdopen(fd, 'w', encoding='utf-8') as stream:
