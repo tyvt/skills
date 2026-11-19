@@ -13,15 +13,17 @@ description: 禅道 Bug/任务分析与回写。给定禅道链接时拉取详�
 4. **先看截图提取页面标识，再定位**：截图里若有「编号 / 菜单名 / 页签」等标识（如 `BASQ202611110001`），先 `analyze_image` 提取出来，直接 grep 该编号/菜单名定位到具体 record，别先绕 `institutionRegister` 之类的接口名走 10+ 步（事故见 `CASES.md` bug6401 同类）。**定位页面**：按截图菜单名/按钮文案反查路由（查 DB `SYS_MENU.menuFilePath` 或 `openviking search "<菜单名>"`，映射 `src/views/<path>`，见下方定位三步曲第 1 步），禁止按方法名猜；改完在目标模块内 grep 旧接口路径，禁止全 `src` grep。grep 命中超过 20 条只取文件列表，不回灌全文。
 5. **先取数再读代码（阻塞）**：字段名、枚举、接口返回不确定时，先查一条真实数据（表结构或一行样本，见 `references/dbx.md`），没拿到结果之前不读业务代码、不推演字段长什么样。**`getTrueInfo` 的 fieldName 是后端映射名，不是页面字段名**（`idNumber→legalPersonIdNumber`、`phone→contactPhone`）；未知映射时不要猜，改调 `getCompanyRecordDetail(companyRecordId)` 拿整条记录，但**先确认 `companyRecordId` 真在 detail 接口返回里**（`grep companyRecordId` 或在返回对象上打印），否则修复是 no-op。
 6. **信息不足**：查父任务（`parent`）与 `zt_storyspec.spec`；跨项目用 `git log --grep`。
-7. **开工** → `references/worktree.md`。用户指定落点是硬约束。临时文件落 `<repo>\.tmp-bug<id>\`，不提交。凭据只在脚本内读，不进会话。
+7. **开工** → `references/worktree.md`。用户指定落点是硬约束。临时文件一律落**项目外**临时目录（Windows `$env:TEMP\zentao-<id>\`，其他 `${TMPDIR:-/tmp}/zentao-<id>/`），**禁止**落 `<repo>\.tmp-bug<id>\` 等项目目录；任务完工后连目录一起删（删前校验路径非空、前缀命中临时根、先列后删 + 删后复核，见 AGENTS.md「过程产物清零」）。凭据只在脚本内读，不进会话。
 8. **修复**：先判项目（监测V3 = `zhi3-web-admin-...`，门户 = `zhi2-web-admin-...`，用 `.env` / `VITE_APP_PROXY_ADDRESS` 确认）。改源码后只跑 `npx eslint <file>`，不要全量 lint 回灌。本地站点：监测V3 8098 / 门户 8099。未跑构建必须写「未执行」。
 9. **提交** → `references/commit.md`。要构建哈希就放在 commit 之后，否则 hash 指向旧 HEAD。
-10. **回写**：`node D:\repository\skills\zentao-analyzer\zentao-resolve.mjs <bugId> <commentHTML>`，脚本只打印序列，照抄执行。细节与禁忌在 `references/dbx.md`。
+10. **回写**：`node D:\repository\skills\zentao-analyzer\zentao-resolve.mjs <bugId> <commentHTML>`，脚本只打印序列，照抄执行。细节与禁忌在 `references/dbx.md`。**回写硬门（2026-11-19）**：前端任务的 comment **必须贴 agent-browser 验证证据**——多帧截图用 `zentao_gif.py` 合成 GIF，用 `zentao_upload.py` 上传到禅道拿 fileID（`OK <id> <ext>`），再给 resolve 脚本传 `--attach "<id:ext,...>"` 内嵌 `<img src="{id.ext}">`；上传不通停下说明，禁止静默略过。**无证据图/GIF 不得回写**。证据落禅道后才删本地产物（见 AGENTS.md「前端任务验证门」顺序）。上传/GIF 契约见 `references/attach.md`。
 11. **收尾**：构建、部署、回写证据齐才收尾。再看 token-optimizer 的等效成本与未命中 TOP。
 
 | 脚本 | 作用 |
 | --- | --- |
-| `zentao-resolve.mjs` | 打印回写事务序列（不执行） |
+| `zentao-resolve.mjs` | 打印回写事务序列（不执行），`--attach` 内嵌附件 |
+| `zentao_upload.py` | 上传本地 PNG/GIF 到禅道，stdout `OK <fileID> <ext>` |
+| `zentao_gif.py` | ffmpeg 把多帧 PNG 合成 GIF（展示操作过程） |
 | `yapi_fetch.py` | 从 YApi 拉接口定义 |
 | `zentao_html.py` | 抓取的 HTML 转纯文本 |
 

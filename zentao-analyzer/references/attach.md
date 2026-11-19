@@ -28,3 +28,28 @@ Web 登录任何请求都被 302 到「修改密码」。用禅道 REST v1 Token
 **凭据**在 `credentials.py`（`resolve()`/`base()`），脚本内读，不进会话。**不问用户、不裸 `Invoke-WebRequest`、不用 vision 读内部 URL。**
 
 Token 细节：`POST http://zentao-biz.zhi.com/api.php/v1/tokens`，body `{account,password}`，HTTP 201 的 `token`；下载 `GET /api.php/v1/files/<fileID>`，Header 名 `Token`，**不要用带 `/download` 的端点**。PNG/GIF 等魔数校验在脚本内做。库里 `zt_user.password` 是 `md5(明文)`；只有 hash 就换有明文的账号，不要猜，也不要 DB 容器 `LOAD_FILE`（DB 与 Web 是两个容器）。
+
+## 上传附件 / 合成 GIF（回写内嵌证据，已实测）
+
+**合成 GIF（展示操作过程）**：agent-browser 无原生录屏/GIF，只能截静态 PNG。多帧合成：
+```
+python zentao-analyzer/zentao_gif.py <帧目录> <out.gif> --fps 5 --width 900
+```
+stdout `OK <abs>` / `ERR <reason>`。ffmpeg 路径取 `$ZENTAO_FFMPEG` 或 `D:\ffmpeg-8.0.1-essentials_build\bin\ffmpeg.exe`。GIF 按图片内嵌（`{id.gif}`）、自动循环播放；禅道评论 `<video>` 无先例，优先 GIF。
+
+**上传拿 fileID**：
+```
+python zentao-analyzer/zentao_upload.py <本地png/gif>          # stdout: OK <fileID> <ext>
+python zentao-analyzer/zentao_upload.py <path> --object-type bug --object-id 6576  # 回退通道直挂
+```
+实测契约（2026-11-19，新禅道实例）：
+- `POST /api.php/v1/tokens` 取 token（复用 `credentials.py`，不问用户）。
+- `POST /api.php/v1/files`：multipart 字段名 **`imgFile`**（**不是 `file`**——用 `file` 会 400「文件格式不在规定范围内」）+ `uid`，Header `Token`。返回 `{"id":"23497","url":"/index.php?m=file&f=read&t=png&fileID=23497"}`。
+- 通道 A 失败且带了 `--object-type/--object-id` 时回退 `POST /api.php/v1/attachments`。
+- PNG/GIF 均实测上传成功；上传后在 DB `zt_file` 生成 `objectType='' objectID=0` 的行。
+
+**comment 内嵌格式（DB 实证 4398 条，0 条直链）**：
+```
+<img src="{<fileID>.<ext>}" alt="index.php?m=file&amp;f=read&amp;t=<ext>&amp;fileID=<fileID>" />
+```
+把收集到的 `fileID:ext` 传给 `zentao-resolve.mjs <bugId> --attach "23494:png,23178:gif"`，脚本自动生成上述标签、把 `files` 列写成逗号分隔 fileID，并 `UPDATE zt_file SET objectType='bug',objectID=<bugId>` 挂到 bug。`files` 列格式已 DB 实证（如 `22907,22908,22909`）。

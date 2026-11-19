@@ -61,6 +61,12 @@ node D:\repository\skills\zentao-analyzer\zentao-resolve.mjs <bugId> <commentHTM
 
 脚本只**打印** mcp_gateway 序列，不代执行。照抄执行，每步必带 connection_name。禁止手工拼 INSERT。只写新禅道；老禅道库禁止写。回写后复核 resolvedBy/resolvedDate/resolution 已落库。
 
+**回写必须附验证证据（2026-11-19 硬门）**：前端任务（UI/页面/样式/交互）回写 comment 时，**必须把 agent-browser 的验证截图/GIF 贴进禅道**，禁止无证据空回写。完整通路（已实测）：
+1. 多帧展示过程：先 `agent-browser screenshot` 截多帧 PNG，再 `python zentao-analyzer/zentao_gif.py <帧目录> <out.gif> --fps 5` 合成 GIF（本机 ffmpeg=`D:\ffmpeg-8.0.1-essentials_build\bin\ffmpeg.exe`；GIF 按图片内嵌、自动播放，优先于 video——禅道评论 `<video>` 无先例）。
+2. 上传拿 fileID：`python zentao-analyzer/zentao_upload.py <png或gif路径>` → stdout `OK <fileID> <ext>`。实测契约：`POST /api.php/v1/files`，multipart 字段 **`imgFile`**（不是 file）+ `uid`，Token header；返回 `{id,url}`。多文件逐个调用，收集 `id:ext`。
+3. 回写：把 `id:ext` 列表传给 `zentao-resolve.mjs ... --attach "23494:png,23178:gif"`，脚本自动在 comment 追加 `<img src="{id.ext}" alt="...fileID=id" />`（禅道内嵌格式，DB 实证 4398 条）、`files` 列写逗号分隔 fileID、并 `UPDATE zt_file` 把附件挂到 bug。
+4. 时序：会话展示证据 → 用户确认 → 上传+回写落库 → 最后清理本地产物。上传失败（`ERR`）必须停下说明，禁止静默略过。细节见 `references/attach.md`。
+
 ## 表结构速查
 
 - `zt_bug`：`id,title,status,severity,openedBy,openedDate,resolvedBy,resolvedDate,resolution,resolvedBuild,assignedTo,product,project,execution`（是 `resolvedBuild`，没有 `build`）。

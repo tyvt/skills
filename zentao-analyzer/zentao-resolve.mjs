@@ -37,16 +37,44 @@ function loadComment() {
   if (b64) return trimEol(Buffer.from(b64, "base64").toString("utf8"));
   // 兼容旧位置参数：跳过已消费的 flag 对，取第一个非 flag 参数
   for (let i = 1; i < argv.length; i++) {
-    if (argv[i] === "--comment-file" || argv[i] === "--comment-b64") { i++; continue; }
+    if (argv[i] === "--comment-file" || argv[i] === "--comment-b64" || argv[i] === "--attach") { i++; continue; }
     if (!argv[i].startsWith("--")) return argv[i];
   }
   return "";
 }
 
-const comment = loadComment();
+function loadAttachments() {
+  // --attach <fileID:ext,...>  例：--attach 23494:png,23178:gif
+  const raw = flagValue("--attach");
+  if (!raw) return [];
+  return raw.split(",").map((s) => s.trim()).filter(Boolean).map((token) => {
+    const [id, ext] = token.split(":");
+    if (!/^\d+$/.test(id || "") || !/^[a-z0-9]+$/i.test(ext || "")) {
+      console.error("--attach 格式错误（应为 fileID:ext，如 23494:png）: " + token);
+      process.exit(1);
+    }
+    return { id, ext: ext.toLowerCase() };
+  });
+}
+
+const attachments = loadAttachments();
+
+// 把上传好的附件以内嵌图片标签追加到 comment（禅道渲染格式，见 attach.md）
+function withAttachments(html, atts) {
+  if (!atts.length) return html;
+  const tags = atts
+    .map(({ id, ext }) =>
+      `<p><img src="{${id}.${ext}}" alt="index.php?m=file&amp;f=read&amp;t=${ext}&amp;fileID=${id}" /></p>`
+    )
+    .join("");
+  return html + tags;
+}
+
+const comment = withAttachments(loadComment(), attachments);
+const filesValue = attachments.length ? "'" + attachments.map((a) => a.id).join(",") + "'" : "NULL";
 
 if (!Number.isInteger(bugId) || bugId <= 0) {
-  console.error("用法: node zentao-resolve.mjs <bugId> [--comment-file <path> | --comment-b64 <base64> | <commentHTML>]（bugId 必须为正整数）");
+  console.error("用法: node zentao-resolve.mjs <bugId> [--comment-file <path> | --comment-b64 <base64> | <commentHTML>] [--attach <fileID:ext,...>]（bugId 必须为正整数）");
   process.exit(1);
 }
 if (!comment.trim()) {
@@ -93,14 +121,23 @@ const steps = [
     verify: "affected rows = 1",
   },
   {
-    name: "5) INSERT zt_action（14 列，files=NULL 占位）",
+    name: "5) INSERT zt_action（14 列，files 挂附件 id 列表或 NULL）",
     sql:
       `INSERT INTO zt_action ` +
       `(objectType,objectID,product,project,execution,actor,action,date,comment,files,extra,\`read\`,efforted,vision) ` +
       `VALUES ('bug',${bugId},'<product>','<project>','<execution>','${ACTOR}','resolved',NOW(),` +
-      `'${esc(comment)}',NULL,'fixed',0,0,'rnd');`,
-    verify: "affected rows = 1；product/project/execution 用第 1 步查到的原值",
+      `'${esc(comment)}',${filesValue},'fixed',0,0,'rnd');`,
+    verify: "affected rows = 1；product/project/execution 用第 1 步查到的原值；files 为逗号分隔 fileID 或 NULL",
   },
+  ...(attachments.length
+    ? [{
+        name: "5b) 把上传的附件 zt_file 挂到 bug（comment 内嵌需要 objectType/objectID 正确）",
+        sql:
+          `UPDATE zt_file SET objectType='bug',objectID=${bugId},addedBy='${ACTOR}',addedDate=NOW() ` +
+          `WHERE id IN (${attachments.map((a) => a.id).join(",")});`,
+        verify: "affected rows = 附件数；objectType='bug' 且 objectID=" + bugId,
+      }]
+    : []),
   {
     name: "6) 事务内复核",
     sql:
@@ -134,7 +171,7 @@ for (const s of steps) {
   if (s.call) {
     console.log("mcp_gateway " + JSON.stringify(s.call, null, 2));
   } else {
-    const inTxn = /^[4-6]\)/.test(s.name);
+    const inTxn = /^[4-9](\w*)\)/.test(s.name);
     const arguments_ = { connection_name: CONN, sql: s.sql };
     if (inTxn) arguments_.session_id = "<session_id>";
     console.log(
