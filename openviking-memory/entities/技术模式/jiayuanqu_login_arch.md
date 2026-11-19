@@ -1,3 +1,14 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+superseded_by: null
+valid_until: null
+source_of_truth: unknown
+gov_checked_at: 2026-11-18
+gov_note: 同项目登录架构，与three_layer_login.md近重复，内容互补，待人工评估合并
+---
+
 # 家园区一网通办登录架构
 家园区一网通办为 uni-app 项目（无 Vue Router），登录态判断不依赖前端路由守卫，由 HTTP 响应、Pinia userStore 与 URL token 三方协作完成。
 

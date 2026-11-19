@@ -1,3 +1,14 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+superseded_by: null
+valid_until: null
+source_of_truth: unknown
+gov_checked_at: 2026-11-18
+gov_note: 存量无 frontmatter；召回即验证，未采信为当前事实；无新证据不改正文
+---
+
 # 查看表决流程接入
 泰兴小程序维修项目已接入「查看表决」流程，从对象详情跳转至表决详情页。
 

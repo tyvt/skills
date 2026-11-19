@@ -1,3 +1,14 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+superseded_by: null
+valid_until: null
+source_of_truth: unknown
+gov_checked_at: 2026-11-18
+gov_note: 代码修复事实，commit基线存在，无新证据
+---
+
 # 决策页onLoad兼容id与decisionId
 泰兴小程序 decision/detail.vue 的 onLoad 兼容普通链接与二维码场景的取值逻辑。
 ## 问题根因
