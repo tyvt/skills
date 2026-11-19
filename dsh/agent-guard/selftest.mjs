@@ -4,10 +4,11 @@
 // 退出码 0 = 全通过；1 = 有失败。
 import assert from 'node:assert/strict'
 
-import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, isPwshExploration } from './lib/rules.js'
+import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, isPwshExploration, decideEditPreflight, decideSearchRetry } from './lib/rules.js'
 import { decideInterception } from './lib/scope.js'
 import { evaluateAsk } from './lib/ask-guard.js'
 import { apply, inspectSessionSizes, Config } from './lib/index.js'
+import { validate } from './lib/config.js'
 
 let passed = 0
 let failed = 0
@@ -957,6 +958,66 @@ test('fanout：非白名单工具 → pass', () => {
   guarded[0](mk('spawn_teammate', { name: 'x' }))
   assert.equal(guarded[0](mk('grep', { pattern: 'q', path: 'D:/p/src' })), undefined)
 }
+
+console.log('\n=== edit-preflight（FS_EDIT_NOT_FOUND 根治）===')
+
+test('old_string 在盘上内容中 → pass', () => {
+  const d = decideEditPreflight('edit', { file_path: 'a.js', old_string: 'const x = 1' }, 'const x = 1\nconst y = 2', {})
+  assert.equal(d.verdict, 'pass')
+})
+
+test('old_string 不在盘上 → block', () => {
+  const d = decideEditPreflight('edit', { file_path: 'a.js', old_string: 'const zzz = 9' }, 'const x = 1\nconst y = 2', {})
+  assert.equal(d.verdict, 'block')
+  assert.match(d.message, /grep -n/)
+})
+
+test('CRLF/LF 归一 + BOM 去除 → 命中 pass', () => {
+  const d = decideEditPreflight('edit', { file_path: 'a.js', old_string: 'line1\nline2' }, '\uFEFFline1\r\nline2\r\n', {})
+  assert.equal(d.verdict, 'pass')
+})
+
+test('读盘失败(null)/空内容/非 edit → 一律放行', () => {
+  assert.equal(decideEditPreflight('edit', { file_path: 'a.js', old_string: 'x' }, null, {}).verdict, 'pass')
+  assert.equal(decideEditPreflight('edit', { file_path: 'a.js', old_string: 'x' }, '', {}).verdict, 'pass')
+  assert.equal(decideEditPreflight('read', { file_path: 'a.js', old_string: 'x' }, 'x', {}).verdict, 'pass')
+})
+
+test('空 old_string / 子代理 → 放行', () => {
+  assert.equal(decideEditPreflight('edit', { file_path: 'a.js', old_string: '' }, 'abc', {}).verdict, 'pass')
+  assert.equal(decideEditPreflight('edit', { file_path: 'a.js', old_string: 'zzz' }, 'abc', { isSubagent: true }).verdict, 'pass')
+})
+
+console.log('\n=== search-retry（SEARCH_FAILED 换形态）===')
+
+test('同 pattern 上次失败 → block', () => {
+  const d = decideSearchRetry({ failedPattern: 'foo' }, 'grep', { pattern: 'foo', path: 'D:/p' }, {})
+  assert.equal(d.verdict, 'block')
+  assert.match(d.message, /换关键词/)
+})
+
+test('换 pattern / 无失败标记 → pass', () => {
+  assert.equal(decideSearchRetry({ failedPattern: 'foo' }, 'grep', { pattern: 'bar', path: 'D:/p' }, {}).verdict, 'pass')
+  assert.equal(decideSearchRetry({ failedPattern: null }, 'glob', { pattern: 'foo' }, {}).verdict, 'pass')
+})
+
+test('子代理 / 非搜索工具 → 放行', () => {
+  assert.equal(decideSearchRetry({ failedPattern: 'foo' }, 'grep', { pattern: 'foo' }, { isSubagent: true }).verdict, 'pass')
+  assert.equal(decideSearchRetry({ failedPattern: 'foo' }, 'read', { pattern: 'foo' }, {}).verdict, 'pass')
+})
+
+console.log('\n=== 新增配置项校验 ===')
+
+test('editPreflight/searchRetry 合法 mode 透传、非法回退默认', () => {
+  const v = validate({ editPreflight: { enabled: true, mode: 'warn' }, searchRetry: { enabled: false, mode: 'block' } }).value
+  assert.equal(v.editPreflight.mode, 'warn')
+  assert.equal(v.editPreflight.enabled, true)
+  assert.equal(v.searchRetry.mode, 'block')
+  assert.equal(v.searchRetry.enabled, false)
+  const bad = validate({ editPreflight: { mode: 'bogus' }, searchRetry: { mode: 'bogus' } }).value
+  assert.equal(bad.editPreflight.mode, 'block')
+  assert.equal(bad.searchRetry.mode, 'warn')
+})
 
 console.log(`\n${failed === 0 ? 'PASS' : 'FAIL'}  passed=${passed} failed=${failed}\n`)
 process.exit(failed === 0 ? 0 : 1)

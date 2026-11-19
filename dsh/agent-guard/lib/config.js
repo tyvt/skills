@@ -71,6 +71,16 @@ export const DEFAULTS = {
     /** 未知根 glob 试错窗口（毫秒）。 */
     globRepeatWindowMs: 60000,
   },
+  /** edit 前置校验：old_string 不在盘上真实内容中即拒（零误伤可判定，默认 block）。 */
+  editPreflight: {
+    enabled: true,
+    mode: 'block',
+  },
+  /** 搜索失败换形态：同 pattern 上次失败后本次同形态提示换法（语义判断，默认 warn 灰度）。 */
+  searchRetry: {
+    enabled: true,
+    mode: 'warn',
+  },
   /**
    * 探索前置记忆检索（viking-first）：本会话首次探索动作前若未查过 OpenViking，
    * warn/block 提示先 mcp__openviking__search。默认 enabled:false（inert），
@@ -136,6 +146,8 @@ export function validate(input) {
   const recovery = source.recovery ?? {}
   const scope = source.scope ?? {}
   const exploration = source.exploration ?? {}
+  const editPreflight = source.editPreflight ?? {}
+  const searchRetry = source.searchRetry ?? {}
   const vikingFirst = source.vikingFirst ?? {}
   const exploreOutsource = source.exploreOutsource ?? {}
   const fanout = source.fanout ?? {}
@@ -150,6 +162,12 @@ export function validate(input) {
   }
   if (typeof exploration !== 'object' || Array.isArray(exploration)) {
     return { issues: [{ message: 'agent-guard: exploration must be an object' }] }
+  }
+  if (typeof editPreflight !== 'object' || Array.isArray(editPreflight)) {
+    return { issues: [{ message: 'agent-guard: editPreflight must be an object' }] }
+  }
+  if (typeof searchRetry !== 'object' || Array.isArray(searchRetry)) {
+    return { issues: [{ message: 'agent-guard: searchRetry must be an object' }] }
   }
   if (typeof vikingFirst !== 'object' || Array.isArray(vikingFirst)) {
     return { issues: [{ message: 'agent-guard: vikingFirst must be an object' }] }
@@ -172,6 +190,12 @@ export function validate(input) {
   const explorationMode = typeof exploration.mode === 'string' && ['off', 'warn', 'block'].includes(exploration.mode)
     ? exploration.mode
     : DEFAULTS.exploration.mode
+  const editPreflightMode = typeof editPreflight.mode === 'string' && ['off', 'warn', 'block'].includes(editPreflight.mode)
+    ? editPreflight.mode
+    : DEFAULTS.editPreflight.mode
+  const searchRetryMode = typeof searchRetry.mode === 'string' && ['off', 'warn', 'block'].includes(searchRetry.mode)
+    ? searchRetry.mode
+    : DEFAULTS.searchRetry.mode
   const roots = Array.isArray(scope.roots) ? scope.roots : DEFAULTS.scope.roots
   return {
     value: {
@@ -204,6 +228,14 @@ export function validate(input) {
         firstReadLimit: positiveInt(exploration.firstReadLimit, DEFAULTS.exploration.firstReadLimit),
         minRepeatPattern: positiveInt(exploration.minRepeatPattern, DEFAULTS.exploration.minRepeatPattern),
         globRepeatWindowMs: positiveInt(exploration.globRepeatWindowMs, DEFAULTS.exploration.globRepeatWindowMs),
+      },
+      editPreflight: {
+        enabled: bool(editPreflight.enabled, DEFAULTS.editPreflight.enabled),
+        mode: editPreflightMode,
+      },
+      searchRetry: {
+        enabled: bool(searchRetry.enabled, DEFAULTS.searchRetry.enabled),
+        mode: searchRetryMode,
       },
       vikingFirst: {
         enabled: bool(vikingFirst.enabled, DEFAULTS.vikingFirst.enabled),

@@ -36,7 +36,7 @@ import os from 'node:os'
 import path from 'node:path'
 
 import { Config } from './config.js'
-import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak } from './rules.js'
+import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, decideEditPreflight, decideSearchRetry } from './rules.js'
 import { policy } from './p0-policy.mjs'
 import { decideInterception } from './scope.js'
 import { evaluateAsk } from './ask-guard.js'
@@ -196,7 +196,7 @@ export function apply(ctx, config) {
         const oldest = sessionDrift.keys().next().value
         if (oldest !== undefined) sessionDrift.delete(oldest)
       }
-      state = { fileLines: new Map(), grepSeq: 0, lastPattern: '', lastGlob: null, vikingSearched: false, vikingNudged: false, vikingSkipped: false, subagentDispatched: false, outsourceNudged: false, fanoutTool: '', fanoutStreak: 0, fanoutFired: false }
+      state = { fileLines: new Map(), grepSeq: 0, lastPattern: '', lastGlob: null, failedPattern: null, vikingSearched: false, vikingNudged: false, vikingSkipped: false, subagentDispatched: false, outsourceNudged: false, fanoutTool: '', fanoutStreak: 0, fanoutFired: false }
       sessionDrift.set(sessionId, state)
     }
     return state
@@ -295,6 +295,54 @@ export function apply(ctx, config) {
           return duplicate
         }
         recordRead(exec)
+      }
+      // edit 前置校验（FS_EDIT_NOT_FOUND 根治）：old_string 不在盘上真实内容即拒。
+      // 读盘失败/非 UTF-8/路径不可解析一律放行（审核 P1-1），绝不据猜测拦截。
+      if (config.enabled && config.editPreflight?.enabled && exec?.name === 'edit') {
+        let disk = null
+        try {
+          let fp = typeof exec?.arguments?.file_path === 'string' ? exec.arguments.file_path : ''
+          if (fp !== '' && !path.isAbsolute(fp)) {
+            const cwd = exec?.agent?.session?.header?.cwd
+            fp = typeof cwd === 'string' && cwd !== '' ? path.resolve(cwd, fp) : path.resolve(fp)
+          }
+          if (fp !== '' && fs.existsSync(fp) && fs.statSync(fp).isFile()) {
+            disk = fs.readFileSync(fp, 'utf8')
+          }
+        } catch { disk = null }
+        const ep = decideEditPreflight('edit', exec?.arguments, disk, {
+          isSubagent: isSubagentSession(exec),
+        })
+        if (ep.verdict === 'block') {
+          appendLedger(ledgerPath, {
+            ts: new Date().toISOString(), kind: 'edit-preflight', rule: 'old-string-missing',
+            tool: 'edit', mode: config.editPreflight.mode ?? 'block',
+            session_id: exec?.agent?.session?.header?.id ?? 'anon',
+            subagent: isSubagentSession(exec),
+          })
+          counters.rejected++
+          log?.warn?.('agent-guard: edit-preflight %s', ep.message)
+          if ((config.editPreflight.mode ?? 'block') === 'block') return ep.message
+        }
+      }
+      // 搜索失败换形态（SEARCH_FAILED 根治）：同 pattern 上次失败后提示换法，warn 默认不阻断。
+      if (config.enabled && config.searchRetry?.enabled && (exec?.name === 'grep' || exec?.name === 'glob')) {
+        const sr = decideSearchRetry(getSessionDrift(exec), exec?.name, exec?.arguments, {
+          isSubagent: isSubagentSession(exec),
+        })
+        if (sr.verdict === 'block') {
+          appendLedger(ledgerPath, {
+            ts: new Date().toISOString(), kind: 'search-retry', rule: 'same-pattern-after-fail',
+            tool: exec?.name, mode: config.searchRetry.mode ?? 'warn',
+            session_id: exec?.agent?.session?.header?.id ?? 'anon',
+            subagent: isSubagentSession(exec),
+          })
+          // 命中后清标记，避免同一失败反复提示；换 pattern 自然不命中。
+          getSessionDrift(exec).failedPattern = null
+          counters.rejected++
+          log?.warn?.('agent-guard: search-retry %s', sr.message)
+          if ((config.searchRetry.mode ?? 'warn') === 'block') return sr.message
+        }
       }
       // 探索前置记忆检索（viking-first）：本会话首次探索动作前若未查过 OpenViking，
       // warn/block 提示先 mcp__openviking__search。默认 enabled:false（inert）。
@@ -493,6 +541,49 @@ export function apply(ctx, config) {
     }
     // 返回 undefined = 放行。修复是通过替换 exec.arguments 完成的。
     return undefined
+  })
+
+  // 搜索失败形态记录（search-retry 的执行后信号源）：guard 单靠执行前看不到失败，
+  // 由本监听把 grep/glob 的失败 pattern 写进 sessionDrift.failedPattern（复用 LRU Map）。
+  // 事件形状（cost-meter/lib/index.js:226-228 + workflow-audit.mjs:73/79 实证）：
+  //   tool/call   → data.callId / data.name / data.arguments(JSON string)
+  //   tool/result → data.toolCallId / data.error.code
+  const SEARCH_FAIL_CODES = new Set(['SEARCH_FAILED', 'SEARCH_INVALID_PATTERN', 'SEARCH_RAW_OUTPUT_OVERFLOW'])
+  ctx.on('session/event', (session, event) => {
+    if (!config.enabled || !config.searchRetry?.enabled) return
+    const sessionId = session?.header?.id ?? session?.id
+    if (sessionId === undefined) return
+    const type = String(event?.type ?? '')
+    const d = event?.data ?? {}
+    if (/tool[\/_]call/i.test(type)) {
+      const name = d.name ?? d.tool ?? d.toolName ?? ''
+      if (name !== 'grep' && name !== 'glob') return
+      let pattern = ''
+      try {
+        const a = typeof d.arguments === 'string' ? JSON.parse(d.arguments) : (d.arguments ?? {})
+        pattern = typeof a?.pattern === 'string' ? a.pattern : ''
+      } catch { return }
+      if (pattern === '') return
+      const cid = d.callId ?? d.id ?? d.toolCallId
+      if (cid == null) return
+      let state = sessionDrift.get(sessionId)
+      if (state && !(state.searchCalls instanceof Map)) state.searchCalls = new Map()
+      if (state?.searchCalls instanceof Map) state.searchCalls.set(cid, pattern)
+      return
+    }
+    if (/tool[\/_]result/i.test(type)) {
+      const err = d.error
+      if (!err) return
+      const code = err.code ?? err.name ?? ''
+      if (!SEARCH_FAIL_CODES.has(code)) return
+      const cid = d.toolCallId ?? d.callId ?? d.id ?? d.message?.toolCallId
+      if (cid == null) return
+      const state = sessionDrift.get(sessionId)
+      const pattern = state?.searchCalls instanceof Map ? state.searchCalls.get(cid) : null
+      if (typeof pattern !== 'string' || pattern === '') return
+      state.failedPattern = pattern
+      state.searchCalls.delete(cid)
+    }
   })
 
   ctx.on('tools/pre-execute', async (exec, next) => {

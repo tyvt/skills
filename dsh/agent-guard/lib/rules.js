@@ -761,6 +761,65 @@ export function decideExplorationDrift(state, tool, args, opts = {}) {
   return base
 }
 
+/**
+ * edit 前置校验（FS_EDIT_NOT_FOUND 根治）：old_string 必须在目标文件盘上真实内容中存在。
+ * 零误伤判据——old_string 不在盘上，该次 edit 本必失败，拦下只省一次失败调用。
+ *
+ * 纯函数：磁盘内容由调用方同步读出后传入（fileContent）。任何取数不确定——
+ * 文件不存在 / 读取抛错 / 非 UTF-8 / 空内容 / old_string 为空——一律 pass 放行（审核 P1-1）：
+ * 调用方拿不到可靠真值时不得据猜测拦截。换行 CRLF/LF 统一、去 BOM 后再比（P1-1 兼容）。
+ * TOCTOU：判定基于调用入参快照，读到盘与 edit 执行之间文件若被改，由 edit 自身报错，不在此拦（P1-3）。
+ *
+ * @param {string} tool 工具名，仅 'edit' 进入判定。
+ * @param {object} args { file_path, old_string }。
+ * @param {string|null} fileContent 调用方读出的盘上真实内容；读不到传 null。
+ * @param {object} opts { isSubagent }。
+ * @returns {{ verdict:'pass'|'block', message?:string }}
+ */
+export function decideEditPreflight(tool, args, fileContent, opts = {}) {
+  const base = { verdict: 'pass' }
+  if (tool !== 'edit') return base
+  if (opts.isSubagent === true) return base
+  if (!args || typeof args !== 'object') return base
+  const filePath = typeof args.file_path === 'string' ? args.file_path : ''
+  const oldString = typeof args.old_string === 'string' ? args.old_string : ''
+  if (filePath.trim() === '' || oldString.length === 0) return base
+  // 取数不确定：一律放行，不据猜测拦截。
+  if (typeof fileContent !== 'string' || fileContent.length === 0) return base
+  const norm = (s) => s.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+  if (norm(fileContent).includes(norm(oldString))) return base
+  return {
+    verdict: 'block',
+    message: `[edit-preflight:BLOCKED] old_string 不在 ${filePath} 的盘上真实内容中——该次 edit 必然触发 FS_EDIT_NOT_FOUND。先 grep -n "<关键片段>" ${filePath} 取行号，再 read offset/limit 局部读真实内容，用真实文本作 old_string（脱敏行须取盘上真值，勿按掩码猜）`,
+  }
+}
+
+/**
+ * 搜索失败换形态（SEARCH_FAILED 根治，warn 灰度）：同 pattern 检索失败后，下一次同形态检索提示换法。
+ * 失败是执行后信号，由调用方经 session/event 的 tool/result 记录进 state.failedPattern；
+ * guard 执行前查该字段。纯函数，只读 state。
+ *
+ * @param {object} state 含 failedPattern: string | null。
+ * @param {string} tool grep/glob 进入判定。
+ * @param {object} args { pattern }。
+ * @param {object} opts { isSubagent }。
+ */
+export function decideSearchRetry(state, tool, args, opts = {}) {
+  const base = { verdict: 'pass' }
+  if (!state || typeof state !== 'object') return base
+  if (opts.isSubagent === true) return base
+  if (tool !== 'grep' && tool !== 'glob') return base
+  const pattern = typeof args?.pattern === 'string' ? args.pattern : ''
+  if (pattern.trim() === '') return base
+  if (typeof state.failedPattern === 'string' && state.failedPattern === pattern) {
+    return {
+      verdict: 'block',
+      message: `[search-retry:BLOCKED] 同一 pattern「${pattern}」上次检索失败，本次同形态重试大概率再失败。换关键词、换 include 过滤、或先 pwsh Get-ChildItem 列目录确认结构后再搜`,
+    }
+  }
+  return base
+}
+
 function positiveOpt(value, fallback) {
   const n = Number(value)
   return Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback
