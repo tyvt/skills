@@ -1,3 +1,14 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+superseded_by: null
+valid_until: null
+source_of_truth: unknown
+gov_checked_at: 2026-11-18
+gov_note: 存量无 frontmatter；召回即验证，未采信为当前事实；无新证据不改正文
+---
+
 # 合同范本跳转改造
 苏州市房地产监测V3 中 `commercialHousingSales/presale/template/detail.vue` 的 `gotoContractTemplate` 改为使用公共路由解析函数，跳转更可靠。
 

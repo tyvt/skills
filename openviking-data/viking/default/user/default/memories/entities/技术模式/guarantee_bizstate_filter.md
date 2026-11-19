@@ -1,3 +1,14 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+superseded_by: null
+valid_until: null
+source_of_truth: unknown
+gov_checked_at: 2026-11-18
+gov_note: 存量无 frontmatter；召回即验证，未采信为当前事实；无新证据不改正文
+---
+
 # 房屋质量保证金明细未备案记录过滤
 产品2.0 项目中房屋质量保证金账户详情页子表组件查询缴存/支用明细时未传 bizState，导致未备案记录错误展示，已在 getQueryParams() 增加 bizState: '2' 修复。
 

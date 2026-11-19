@@ -1,3 +1,14 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+superseded_by: null
+valid_until: null
+source_of_truth: unknown
+gov_checked_at: 2026-11-18
+gov_note: 同项目登录架构，与jiayuanqu_login_arch.md近重复，内容互补，待人工评估合并
+---
+
 # 三层登录模式
 家园区一网通办基于 uni-app 构建且未引入 vue-router，不存在 beforeEach 路由级登录拦截；前端采用 URL token 换票、Pinia 持久化与接口「请先登录」拦截的三层登录机制。
 

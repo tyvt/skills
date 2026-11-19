@@ -1,3 +1,14 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+superseded_by: null
+valid_until: null
+source_of_truth: unknown
+gov_checked_at: 2026-11-18
+gov_note: 缺陷已resolved/fixed，为历史准确记录，无归档过滤能力，仅标记suspect
+---
+
 # 禅道 Bug 6281
 禅道项目管理模块中楼幢变更维护页面的滚动条缺陷，奇安信旧内核下仅控制基本信息区域。
 
@@ -13,7 +24,6 @@
 ## 状态
 - 状态回写 resolved/fixed/trunk
 - resolvedBy=tiany，指派回 zhunan
-
 
 <!-- MEMORY_FIELDS
 {
