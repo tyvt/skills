@@ -35,6 +35,7 @@
 ## 计划审批（强制，所有会话生效）
 
 - **任何「修改 / 修复 / 实现 / 配置改动」动手前，必须先产出 Markdown 计划，不能只建 todo list 就开干。**
+- **禅道 bug 工单前置复现**：type=bug 工单的计划须先含 `agent-browser` 复现证据（只读复现先于写计划，五类字段＝现象/页面/组件/接口/证据路径）。失败出口（与 zentao-analyzer SKILL.md 逐字一致）：站点不可达 / 登录失败 / browser 不可用 / 非浏览器可复现 → 注明原因后走原流程，不阻断写计划。此步不替代修复后验证门（见「前端任务验证门」与 zentao-analyzer 回写硬门）。
 - 计划文件放全局目录 `D:\plan\<工作区目录名>\<sessionId>.md`（模板 `D:\plan\TEMPLATE.md`，可用环境变量 `DSH_PLAN_ROOT` 改根）；**不得写入工作区自身的 `.plan`**，极简 4 段式骨架，禁止扩写：①**前因后果**（≤3 句，说清痛点）②**现状与证据**（只写文件:行号/字段名，**严禁**贴大段源码或完整 JSON/YAML，只写 diff 要点）③**实施方案**（逐步写清改哪里，不写具体实现代码）④**验证计划**（只写怎么跑测试）。**禁止单列「风险与回滚」章节**——回滚靠 git：确需一句则写"变更受 git 管理，git revert 即可"。
 - 计划先交**高级模型审核（reviewer = 编排器 `plan_reviewer` 池，当前 `workbuddy/deepseek-v4.1-flash`）**：调用编排器 `op:"plan_review"`。**送审必须用 `plan_path`（禁止在请求里手打整篇 plan 正文）**；审核不通过（verdict=reject）被打回时，主控按 issues/suggestions 修改计划后**重新送审，直到通过**。
 - 审核通过后，**终稿必须提交用户人工确认（用 `ask_user_question` 给出"确认实施 / 继续修改"选项）；用户确认前不得改动代码。确认后把返回的 `approved_sha256` 原值回填 frontmatter 并置 `status: approved`、`human_confirmed: true`，禁止提前手写 approved**。
