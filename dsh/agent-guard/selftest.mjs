@@ -4,7 +4,7 @@
 // 退出码 0 = 全通过；1 = 有失败。
 import assert from 'node:assert/strict'
 
-import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, isPwshExploration, decideEditPreflight, decideSearchRetry } from './lib/rules.js'
+import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, isPwshExploration, decideEditPreflight, decideSearchRetry, decideVerifyLoop, isAgentBrowserCall, isSleepCall } from './lib/rules.js'
 import { decideInterception } from './lib/scope.js'
 import { evaluateAsk } from './lib/ask-guard.js'
 import { apply, inspectSessionSizes, Config } from './lib/index.js'
@@ -1006,8 +1006,66 @@ test('子代理 / 非搜索工具 → 放行', () => {
   assert.equal(decideSearchRetry({ failedPattern: 'foo' }, 'read', { pattern: 'foo' }, {}).verdict, 'pass')
 })
 
-console.log('\n=== 新增配置项校验 ===')
+console.log('\n=== P1 pwsh 盲搜逃生通道封堵（2026-11-20）===')
+function pwshDrift() {
+  const s = freshDrift()
+  s.pwshCmd = ''; s.pwshSeq = 0
+  return s
+}
+const PS = { minRepeatPattern: 3 }
+test('pwsh 盲搜：同命令连续第 3 次 block', () => {
+  const s = pwshDrift()
+  s.pwshCmd = 'Get-ChildItem D:/repo'; s.pwshSeq = 2
+  const d = decideExplorationDrift(s, 'pwsh', { command: 'Get-ChildItem D:/repo' }, PS)
+  assert.equal(d.verdict, 'block')
+  assert.match(d.message, /pwsh 盲搜命令已连续 3 次/)
+})
+test('pwsh 盲搜：次数不足 / 换命令 → pass（独立槽不污染 grep）', () => {
+  const s = pwshDrift()
+  s.pwshCmd = 'Get-ChildItem D:/repo'; s.pwshSeq = 1
+  assert.equal(decideExplorationDrift(s, 'pwsh', { command: 'Get-ChildItem D:/repo' }, PS).verdict, 'pass')
+  assert.equal(decideExplorationDrift(s, 'pwsh', { command: 'Get-ChildItem D:/other' }, PS).verdict, 'pass')
+  assert.equal(s.grepSeq, 0, 'pwsh 不触碰 grepSeq')
+})
+test('pwsh 盲搜：构建命令 / 非探索命令 / 子代理 → pass', () => {
+  const s = pwshDrift()
+  s.pwshCmd = 'npm run build'; s.pwshSeq = 5
+  assert.equal(decideExplorationDrift(s, 'pwsh', { command: 'npm run build' }, PS).verdict, 'pass')
+  assert.equal(decideExplorationDrift(s, 'pwsh', { command: 'git status --short' }, PS).verdict, 'pass')
+  assert.equal(decideExplorationDrift(s, 'pwsh', { command: 'Get-ChildItem D:/repo' }, { ...PS, isSubagent: true }).verdict, 'pass')
+})
 
+console.log('\n=== P2 verify-loop 前端验证轮询（2026-11-20）===')
+test('命令识别：agent-browser / Start-Sleep 别名大小写，构建命令不误伤', () => {
+  assert.equal(isAgentBrowserCall('agent-browser open http://x'), true)
+  assert.equal(isAgentBrowserCall('npx agent-browser screenshot'), true)
+  assert.equal(isAgentBrowserCall('npm run build'), false)
+  assert.equal(isSleepCall('Start-Sleep -Seconds 3'), true)
+  assert.equal(isSleepCall('start-sleep 2'), true)
+  assert.equal(isSleepCall('npm test'), false)
+  assert.equal(isAgentBrowserCall(''), false)
+})
+test('verifyLoop：agent-browser 超阈值 block，未超 pass', () => {
+  const o = { agentBrowserMax: 12, sleepMax: 5, mode: 'block' }
+  assert.equal(decideVerifyLoop({ verifyBrowser: 12 }, 'pwsh', { command: 'agent-browser open' }, o).verdict, 'pass')
+  const d = decideVerifyLoop({ verifyBrowser: 13 }, 'pwsh', { command: 'agent-browser open' }, o)
+  assert.equal(d.verdict, 'block')
+  assert.match(d.message, /合并|多断言/)
+})
+test('verifyLoop：Start-Sleep 超阈值 block；warn 模式不阻断', () => {
+  const o = { agentBrowserMax: 12, sleepMax: 5, mode: 'block' }
+  assert.equal(decideVerifyLoop({ verifySleep: 6 }, 'pwsh', { command: 'Start-Sleep 2' }, o).verdict, 'block')
+  const w = decideVerifyLoop({ verifySleep: 6 }, 'pwsh', { command: 'Start-Sleep 2' }, { ...o, mode: 'warn' })
+  assert.equal(w.verdict, 'warn')
+})
+test('verifyLoop：子代理 / skip / 非 pwsh → pass', () => {
+  const o = { mode: 'block' }
+  assert.equal(decideVerifyLoop({ verifyBrowser: 99 }, 'pwsh', {}, { ...o, isSubagent: true }).verdict, 'pass')
+  assert.equal(decideVerifyLoop({ verifyBrowser: 99, verifySkipped: true }, 'pwsh', {}, o).verdict, 'pass')
+  assert.equal(decideVerifyLoop({ verifyBrowser: 99 }, 'read', {}, o).verdict, 'pass')
+})
+
+console.log('\n=== 新增配置项校验 ===')
 test('editPreflight/searchRetry 合法 mode 透传、非法回退默认', () => {
   const v = validate({ editPreflight: { enabled: true, mode: 'warn' }, searchRetry: { enabled: false, mode: 'block' } }).value
   assert.equal(v.editPreflight.mode, 'warn')
@@ -1017,6 +1075,16 @@ test('editPreflight/searchRetry 合法 mode 透传、非法回退默认', () => 
   const bad = validate({ editPreflight: { mode: 'bogus' }, searchRetry: { mode: 'bogus' } }).value
   assert.equal(bad.editPreflight.mode, 'block')
   assert.equal(bad.searchRetry.mode, 'warn')
+})
+test('verifyLoop 合法 mode 透传、非法回退默认、阈值校验', () => {
+  const v = validate({ verifyLoop: { enabled: true, mode: 'block', agentBrowserMax: 20, sleepMax: 8 } }).value
+  assert.equal(v.verifyLoop.mode, 'block')
+  assert.equal(v.verifyLoop.enabled, true)
+  assert.equal(v.verifyLoop.agentBrowserMax, 20)
+  assert.equal(v.verifyLoop.sleepMax, 8)
+  const bad = validate({ verifyLoop: { mode: 'bogus' } }).value
+  assert.equal(bad.verifyLoop.mode, 'warn')
+  assert.equal(bad.verifyLoop.agentBrowserMax, 12)
 })
 
 console.log(`\n${failed === 0 ? 'PASS' : 'FAIL'}  passed=${passed} failed=${failed}\n`)

@@ -79,7 +79,9 @@
         # promote 门槛：warn 观察误伤（已派子代理/精确读不误报）后再转 block。
         exploreOutsource:
           enabled: true
-          mode: warn
+          # 2026-11-20 灰度 promote：ledger 149 条 warn 抽检全为主会话真阳性
+          # （read76/pwsh52/grep12/glob9，subagent=False），误拦率 0% < 10% 门槛，转 block 硬拦。
+          mode: block
           tools:
             - read
             - grep
@@ -105,3 +107,11 @@
             - edit
             - write
             - pwsh
+        # 前端验证轮询（verify-loop，2026-11-20）：agent-browser/Start-Sleep 走 pwsh，
+        # 按命令内容累计，超阈值 block。先 warn 灰度记 ledger，观察误报 ≥3天≥20条<10% 再转 block。
+        # 验证门只合并不砍：拒绝文案引导合并多断言、禁裸 sleep。子代理豁免。
+        verifyLoop:
+          enabled: true
+          mode: warn
+          agentBrowserMax: 12
+          sleepMax: 5

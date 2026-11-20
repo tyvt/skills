@@ -107,6 +107,16 @@ export const DEFAULTS = {
     threshold: 3,
     tools: ['read', 'grep', 'glob', 'edit', 'write', 'pwsh'],
   },
+  /**
+   * 前端验证轮询（verify-loop，2026-11-20）：agent-browser/Start-Sleep 走 pwsh，
+   * 按命令内容累计次数，超阈值 block（先 warn 灰度）。默认 inert，未显式开启不变现网。
+   */
+  verifyLoop: {
+    enabled: false,
+    mode: 'warn',
+    agentBrowserMax: 12,
+    sleepMax: 5,
+  },
 }
 
 function bool(value, fallback) {
@@ -151,6 +161,7 @@ export function validate(input) {
   const vikingFirst = source.vikingFirst ?? {}
   const exploreOutsource = source.exploreOutsource ?? {}
   const fanout = source.fanout ?? {}
+  const verifyLoop = source.verifyLoop ?? {}
   if (typeof repair !== 'object' || Array.isArray(repair)) {
     return { issues: [{ message: 'agent-guard: repair must be an object' }] }
   }
@@ -178,6 +189,9 @@ export function validate(input) {
   if (typeof fanout !== 'object' || Array.isArray(fanout)) {
     return { issues: [{ message: 'agent-guard: fanout must be an object' }] }
   }
+  if (typeof verifyLoop !== 'object' || Array.isArray(verifyLoop)) {
+    return { issues: [{ message: 'agent-guard: verifyLoop must be an object' }] }
+  }
   const vfMode = typeof vikingFirst.mode === 'string' && ['warn', 'block'].includes(vikingFirst.mode)
     ? vikingFirst.mode
     : DEFAULTS.vikingFirst.mode
@@ -187,6 +201,9 @@ export function validate(input) {
   const fanoutMode = typeof fanout.mode === 'string' && ['warn', 'block'].includes(fanout.mode)
     ? fanout.mode
     : DEFAULTS.fanout.mode
+  const verifyLoopMode = typeof verifyLoop.mode === 'string' && ['off', 'warn', 'block'].includes(verifyLoop.mode)
+    ? verifyLoop.mode
+    : DEFAULTS.verifyLoop.mode
   const explorationMode = typeof exploration.mode === 'string' && ['off', 'warn', 'block'].includes(exploration.mode)
     ? exploration.mode
     : DEFAULTS.exploration.mode
@@ -265,6 +282,12 @@ export function validate(input) {
         tools: Array.isArray(fanout.tools) && fanout.tools.length
           ? fanout.tools.filter((t) => typeof t === 'string' && t.trim() !== '')
           : DEFAULTS.fanout.tools.slice(),
+      },
+      verifyLoop: {
+        enabled: bool(verifyLoop.enabled, DEFAULTS.verifyLoop.enabled),
+        mode: verifyLoopMode,
+        agentBrowserMax: positiveInt(verifyLoop.agentBrowserMax, DEFAULTS.verifyLoop.agentBrowserMax),
+        sleepMax: positiveInt(verifyLoop.sleepMax, DEFAULTS.verifyLoop.sleepMax),
       },
     },
   }

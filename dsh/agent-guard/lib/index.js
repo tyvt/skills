@@ -36,7 +36,7 @@ import os from 'node:os'
 import path from 'node:path'
 
 import { Config } from './config.js'
-import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, decideEditPreflight, decideSearchRetry } from './rules.js'
+import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, decideEditPreflight, decideSearchRetry, decideVerifyLoop, isPwshExploration, isAgentBrowserCall, isSleepCall } from './rules.js'
 import { policy } from './p0-policy.mjs'
 import { decideInterception } from './scope.js'
 import { evaluateAsk } from './ask-guard.js'
@@ -196,7 +196,7 @@ export function apply(ctx, config) {
         const oldest = sessionDrift.keys().next().value
         if (oldest !== undefined) sessionDrift.delete(oldest)
       }
-      state = { fileLines: new Map(), grepSeq: 0, lastPattern: '', lastGlob: null, failedPattern: null, vikingSearched: false, vikingNudged: false, vikingSkipped: false, subagentDispatched: false, outsourceNudged: false, fanoutTool: '', fanoutStreak: 0, fanoutFired: false }
+      state = { fileLines: new Map(), grepSeq: 0, lastPattern: '', lastGlob: null, pwshCmd: '', pwshSeq: 0, verifyBrowser: 0, verifySleep: 0, failedPattern: null, vikingSearched: false, vikingNudged: false, vikingSkipped: false, subagentDispatched: false, outsourceNudged: false, fanoutTool: '', fanoutStreak: 0, fanoutFired: false }
       sessionDrift.set(sessionId, state)
     }
     return state
@@ -453,6 +453,40 @@ export function apply(ctx, config) {
         }
         if (fo.verdict === 'warn') log?.warn?.('agent-guard: fanout warn %s (streak=%s)', tool, fo.streak)
       }
+      // 前端验证轮询（verify-loop，2026-11-20）：agent-browser/Start-Sleep 走 pwsh，
+      // 按命令内容计数（工具名抓不住）。先累加当前调用再判定，warn 灰度只记 ledger。
+      if (config.enabled && config.verifyLoop?.enabled) {
+        const drift = getSessionDrift(exec)
+        const tool = exec?.name
+        if (tool === 'pwsh' || tool === 'agent-browser') {
+          const cmd = tool === 'pwsh'
+            ? (typeof exec?.arguments?.command === 'string' ? exec.arguments.command : '')
+            : (typeof exec?.arguments?.args === 'string' ? exec.arguments.args : '')
+          if (isAgentBrowserCall(cmd) || tool === 'agent-browser') drift.verifyBrowser = (drift.verifyBrowser || 0) + 1
+          if (isSleepCall(cmd)) drift.verifySleep = (drift.verifySleep || 0) + 1
+          const vl = decideVerifyLoop(drift, tool, exec?.arguments, {
+            isSubagent: isSubagentSession(exec),
+            agentBrowserMax: config.verifyLoop.agentBrowserMax,
+            sleepMax: config.verifyLoop.sleepMax,
+            mode: config.verifyLoop.mode,
+          })
+          if (vl.nudge) {
+            appendLedger(ledgerPath, {
+              ts: new Date().toISOString(), kind: 'verify-loop', rule: vl.verdict,
+              tool, browser: drift.verifyBrowser, sleep: drift.verifySleep,
+              mode: config.verifyLoop.mode ?? 'warn',
+              session_id: exec?.agent?.session?.header?.id ?? 'anon',
+              subagent: isSubagentSession(exec),
+              message: vl.message ?? '',
+            })
+          }
+          if (vl.verdict === 'block') {
+            counters.rejected++
+            log?.warn?.('agent-guard: verify-loop block %s: %s', tool, vl.message)
+            return vl.message
+          }
+        }
+      }
       // 探索漂移拦截（explore-drift-guard-20261113 M1）：整读门槛/重复盲搜/未知根试错。
       // warn 模式只记 ledger 不阻断；block 模式拒绝并回改法。规则纯函数在 rules.js。
       if (config.enabled && config.exploration?.enabled) {
@@ -474,6 +508,15 @@ export function apply(ctx, config) {
           }
           if (tool === 'glob' && (exec?.arguments?.path == null || exec?.arguments?.path === '')) {
             drift.lastGlob = { pattern, ts: Date.now() }
+          }
+        }
+        // pwsh 盲搜序列回填（规则4）：仅探索类 pwsh 计入独立槽，换命令即重置。
+        // 判定用 isPwshExploration 与 rules 内同款，避免构建命令污染计数。
+        if (tool === 'pwsh') {
+          const cmd = typeof exec?.arguments?.command === 'string' ? exec.arguments.command : ''
+          if (isPwshExploration(cmd)) {
+            if (cmd === drift.pwshCmd) drift.pwshSeq += 1
+            else { drift.pwshCmd = cmd; drift.pwshSeq = 1 }
           }
         }
         if (d.injectLimit != null && exec?.arguments && typeof exec.arguments === 'object') {

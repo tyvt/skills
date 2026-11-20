@@ -758,6 +758,23 @@ export function decideExplorationDrift(state, tool, args, opts = {}) {
     }
     return base
   }
+
+  // 规则4（2026-11-20）：pwsh 盲搜逃生通道封堵。grep/glob 已 block 后，主会话把
+  // Get-ChildItem/Select-String 盲搜改走 pwsh，此前完全裸奔。复用 isPwshExploration
+  // 识别探索动词（含 gci/sls/gc 别名与词边界），独立 state 槽 pwshCmd/pwshSeq，
+  // 不复用 grepSeq 以免两类命令互相污染；换命令即重置（调用方维护），
+  // 构建/测试命令由 isPwshExploration 内建排除，不误伤。子代理在入口已豁免。
+  if (tool === 'pwsh') {
+    const cmd = typeof args.command === 'string' ? args.command : ''
+    if (!isPwshExploration(cmd)) return base
+    if (state.pwshCmd === cmd && state.pwshSeq >= minRepeatPattern - 1) {
+      return {
+        verdict: 'block',
+        message: `[explore-drift:BLOCKED] 同一 pwsh 盲搜命令已连续 ${state.pwshSeq + 1} 次（含本次）无进展（Get-ChildItem/Select-String 走 pwsh 同样受探索漂移约束）。换关键词、用 -Filter 缩范围，或改用 dsh-explore 只读子代理`,
+      }
+    }
+    return base
+  }
   return base
 }
 
@@ -960,6 +977,65 @@ export function decideFanoutStreak(state, tool, args, opts = {}) {
     streak,
     message: `[fanout] 主会话已连续 ${streak} 次调用同类工具 ${tool}。按并行扇出规则，同类批量对象 ≥3 应改派 spawn_teammate/workflow/orchestrate 并行处理，别在主模型串行逐个烧上下文。`,
   }
+}
+
+/**
+ * 前端验证轮询识别（verify-loop，2026-11-20）：agent-browser / Start-Sleep 走 pwsh CLI，
+ * 工具名统一为 pwsh，fanout 按工具名计数抓不住。昨日 agent-browser 2816 次、
+ * Start-Sleep 527 次，多为「多次截图 + 裸 sleep 轮询」烧步数。
+ *
+ * 命令按「命令位置」匹配（行首或 && || | ; & ( { 换行之后），仿 isPwshExploration，
+ * 兼容大小写、别名与参数边界；构建/测试命令不误伤。纯函数。
+ */
+const VERIFY_BROWSER_RE = /(^|&&|\|\||[|;&({\r\n])\s*(?:npx\s+|pnpm\s+dlx\s+)?agent-browser\b/i
+const VERIFY_SLEEP_RE = /(^|&&|\|\||[|;&({\r\n])\s*Start-Sleep\b/i
+const VERIFY_BUILD_RE = BUILD_TEST_RE
+
+/** pwsh 命令是否含 agent-browser 调用（命令位置匹配）。 */
+export function isAgentBrowserCall(command) {
+  if (typeof command !== 'string' || command.trim() === '') return false
+  if (VERIFY_BUILD_RE.test(command)) return false
+  return VERIFY_BROWSER_RE.test(command)
+}
+
+/** pwsh 命令是否含 Start-Sleep 调用（命令位置匹配）。 */
+export function isSleepCall(command) {
+  if (typeof command !== 'string' || command.trim() === '') return false
+  if (VERIFY_BUILD_RE.test(command)) return false
+  return VERIFY_SLEEP_RE.test(command)
+}
+
+/**
+ * verifyLoop 规则：每会话/每轮累计 agent-browser 与 Start-Sleep 调用次数，
+ * 超阈值时 block（默认 warn 灰度），引导「合并多断言、禁裸 sleep」。
+ * 子代理豁免；用户规则 skip 短语放行；验证门只能合并、不能砍。
+ *
+ * state 槽：verifyBrowser / verifySleep 两个计数器，由调用方在 guard 中先累加当前调用
+ * 再传入（即 state 计数已含本次）。子代理会话整体豁免。
+ * @returns {{ verdict:'pass'|'warn'|'block', message?:string, nudge?:boolean }}
+ */
+export function decideVerifyLoop(state, tool, args, opts = {}) {
+  const base = { verdict: 'pass' }
+  if (!state || typeof state !== 'object') return base
+  if (opts.isSubagent === true) return base
+  if (opts.skip === true || state.verifySkipped === true) return base
+  if (tool !== 'pwsh' && tool !== 'agent-browser') return base
+  const cmd = tool === 'pwsh'
+    ? (typeof args?.command === 'string' ? args.command : '')
+    : (typeof args?.args === 'string' ? args.args : JSON.stringify(args ?? {}))
+  const browserMax = positiveOpt(opts.agentBrowserMax, 12)
+  const sleepMax = positiveOpt(opts.sleepMax, 5)
+  const browser = Number.isFinite(state.verifyBrowser) ? state.verifyBrowser : 0
+  const sleep = Number.isFinite(state.verifySleep) ? state.verifySleep : 0
+  let message = null
+  if (browser > browserMax) {
+    message = `[verify-loop:BLOCKED] 本轮已调用 agent-browser ${browser} 次（阈值 ${browserMax}）。前端验证门要保留，但把多次截图/检查合并为一次多断言：一次打开页面后批量读 DOM/状态/控制台，别反复截图轮询。`
+  } else if (sleep > sleepMax) {
+    message = `[verify-loop:BLOCKED] 本轮已用 Start-Sleep ${sleep} 次（阈值 ${sleepMax}）。别裸 sleep 轮询，改用显式等待条件（如 waitForSelector / 条件判断循环带上限）。`
+  }
+  if (message === null) return base
+  const mode = opts.mode === 'block' ? 'block' : 'warn'
+  return { verdict: mode, nudge: true, message }
 }
 
 
