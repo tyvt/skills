@@ -19,6 +19,28 @@ import { appendFileSync } from "node:fs";
 export const name = "cost-meter";
 export const inject = ['tools'];
 
+// 2026-11-21：可自愈工具错误码（与 token-frugal/workflow-audit.mjs WEIRD_ERR 对齐）。
+// 这些是"改形态/换参数即可规避"的错误，连续出现说明模型在原地重试，应硬拦。
+const RETRYABLE_ERR = new Set([
+  'INVALID_ARGS', 'ESCALATION_ARGS', 'FS_NOT_OBSERVED', 'FS_STALE_VERSION',
+  'FS_NOT_FOUND', 'FS_NOT_TEXT', 'FS_EDIT_NOT_FOUND', 'FS_AMBIGUOUS_EDIT',
+  'GOAL_TOOL_INVALID_UPDATE', 'GOAL_INVALID_TRANSITION', 'SEARCH_FAILED',
+  'SEARCH_INVALID_PATTERN', 'UNKNOWN_TOOL', 'TOOL_TIMEOUT',
+]);
+// 探索型工具：步数超限时拦这些，逼模型收尾；其余（含收尾工具）默认放行。
+const EXPLORE_TOOLS = new Set(['read', 'grep', 'glob', 'pwsh', 'bash', 'web_fetch', 'web_search']);
+// 收尾型工具：任何情况下放行，避免长任务被卡死。
+const CLOSING_TOOLS = new Set(['edit', 'write', 'apply_patch', 'multiedit', 'str_replace', 'create_file',
+  'present', 'ask_user_question', 'todo_write', 'schedule_create', 'send_message']);
+
+// 归一化错误类别：只认可自愈错误码，其余返回 ""（不计入 errStreak）。
+function errKindOf(data) {
+  const err = data?.error;
+  if (!err) return "";
+  const code = String(err.code || err.name || "");
+  return RETRYABLE_ERR.has(code) ? code : "";
+}
+
 /**
  * 配置归一化（零依赖，不 export Config 以免被 Cordis 当 schemastery schema 校验）。
  */
@@ -42,6 +64,13 @@ function normalizeConfig(input) {
     sessionEquivMid: input?.sessionEquivMid ?? 1_000_000,
     // 步数提醒门槛：单会话步数达到即提醒「评估收尾/无效步」。仅提醒不阻断。<=0 关闭。
     stepReminderThreshold: input?.stepReminderThreshold ?? 120,
+    // 步数硬拦门槛（2026-11-21）：steps>=此值且当前工具为「探索型」时经 tools.guard 拒绝，
+    // 逼模型收尾/换会话；收尾型工具（edit/write/present/ask/build）始终放行，长任务不被卡死。
+    // 默认 250（2026-11-21 ledger 回放定阈：昨日 48 会话命中 6.3%，精准拦极端长尾）；<=0 关闭。
+    stepGuardThreshold: input?.stepGuardThreshold ?? 250,
+    // 同类可自愈错误连续门槛（2026-11-21）：同 errKind 连续>=此值即拒该形态重试，
+    // 强制换工具/换参数或加载 tool-call-hygiene。默认 3；<=0 关闭。
+    errorStreakThreshold: input?.errorStreakThreshold ?? 3,
     // ask_user 长等待门槛(毫秒)：一次 ask_user_question 耗时达到即在下步提醒。<=0 关闭。
     askUserLongWaitMs: input?.askUserLongWaitMs ?? 300_000,
     // B2：连续大未命中（bigMissStreak>=2）时对「无参整读 / 无 path 全仓 grep / 整段输出回灌」
@@ -165,6 +194,8 @@ export function apply(ctx, rawConfig) {
   const newAcc = () => ({
     uncached: 0, cacheRead: 0, output: 0, steps: 0, absentSteps: 0,
     lastUncached: 0, lastOutput: 0, lastBare: false, bareCount: 0, bigMissStreak: 0,
+    // 连续同类工具错误计数（2026-11-21）：errKind 为归一化的错误类别，errStreak 为其连续次数。
+    errKind: "", errStreak: 0,
     committed: false, optimized: false, closing: false,
     todoWritten: false, edited: false, buildRan: false,
     askPending: {}, askLongMs: 0,
@@ -245,6 +276,18 @@ export function apply(ctx, rawConfig) {
       const dur = evTime - a.askPending[cid];
       delete a.askPending[cid];
       if (Number.isFinite(dur) && dur >= 0 && dur >= config.askUserLongWaitMs) a.askLongMs = dur;
+    }
+    // 2026-11-21：连续同类可自愈错误累计（用于 guard 硬拦"原地重试"）。
+    // 只有 tool/result 才参与：带可自愈错误码则同类累加；无错误（成功）则清零。
+    if (isToolResult && config.errorStreakThreshold > 0) {
+      const kind = errKindOf(d);
+      if (kind !== "") {
+        a.errStreak = (a.errKind === kind) ? (a.errStreak || 0) + 1 : 1;
+        a.errKind = kind;
+      } else {
+        a.errStreak = 0;
+        a.errKind = "";
+      }
     }
     const reason = d.reason ?? d.status ?? "";
     if ((type === "turn/end" || type === "agent/turn-end" || type === "turn/completed") && reason === "completed" && a.committed && !a.optimized) {
@@ -362,30 +405,62 @@ export function apply(ctx, rawConfig) {
       }
       return null; // 其它工具（edit/write/glob/bash/未列名）默认放行
     };
-    const enforceOn = config.enabled && config.enforceBigMiss && enforceEnabledByEnv();
+    // 总开关：enabled + env。三类规则各自有独立开关（enforceBigMiss / stepGuardThreshold / errorStreakThreshold），
+    // 互不牵连——关掉 big-miss 不应连带关掉步数/错误硬拦。
+    const enforceOn = config.enabled && enforceEnabledByEnv();
     const guardDisposer = ctx.tools.guard((exec) => {
       if (!enforceOn) return undefined;
       try {
         const id = exec?.agent?.session?.header?.id ?? exec?.agent?.session?.id;
         if (id === undefined) return undefined;
         const a = acc.get(id);
+        if (!a) return undefined;
+        const tool = String(exec?.name ?? "");
+
+        // 收尾工具永远放行：edit/write/present/ask 等，避免超限后长任务无法落地被卡死。
+        if (CLOSING_TOOLS.has(tool)) return undefined;
+
+        const block = (kind, msg, extra) => {
+          if (config.enforceLedgerPath) {
+            try {
+              appendFileSync(config.enforceLedgerPath, JSON.stringify({
+                ts: new Date().toISOString(), kind: "cost-meter-enforce",
+                verdict: "block", rule: kind, tool, session_id: id, ...extra,
+              }) + "\n");
+            } catch { /* ledger 失败不影响拦截 */ }
+          }
+          return msg;
+        };
+
+        // 规则 C（2026-11-21）：连续同类可自愈错误 → 拦同形态重试，逼换工具/换参数。
+        if (config.errorStreakThreshold > 0 && a.errStreak >= config.errorStreakThreshold && a.errKind) {
+          return block("error-streak",
+            `[cost-meter] 工具「${tool}」的「${a.errKind}」错误已连续 ${a.errStreak} 次（≥${config.errorStreakThreshold}），原地重试无效。`
+            + `禁止原样再发：先加载 tool-call-hygiene，换工具/换参数/缩范围后再试。`,
+            { errKind: a.errKind, errStreak: a.errStreak });
+        }
+
+        // 规则 D（2026-11-21）：会话步数超限且当前为探索型工具 → 拦，逼收尾/换会话。
+        // 只拦探索型工具；收尾型已在上面放行。
+        if (config.stepGuardThreshold > 0 && a.steps >= config.stepGuardThreshold && EXPLORE_TOOLS.has(tool)) {
+          return block("step-guard",
+            `[cost-meter] 本会话已 ${a.steps} 步（≥${config.stepGuardThreshold}），仍在做探索型操作「${tool}」。`
+            + `请立即收尾：给出结论或写入产出（edit/write/present）；确需继续请先换新会话，勿在本会话反复探索。`,
+            { steps: a.steps });
+        }
+
+        // 规则 B2（既有）：连续大未命中 → 拦无参整读/全仓 grep/整段回灌。
+        if (!config.enforceBigMiss) return undefined;
         const streak = a?.bigMissStreak ?? 0;
         if (streak < 2) return undefined;
         const reason = classifyBlock(exec);
         if (reason === null) return undefined;
-        const msg = `[cost-meter] 已连续 ${streak} 步未命中过大，暂拦「${exec?.name}」：${reason}。`
-          + `下一步只允许：① 带 offset/limit 的窄读 ② 带 path 的 grep ③ 一次小幅取数（SQL/接口）。改法后重试。`;
-        if (config.enforceLedgerPath) {
-          try {
-            appendFileSync(config.enforceLedgerPath, JSON.stringify({
-              ts: new Date().toISOString(), kind: "cost-meter-enforce",
-              verdict: "block", tool: exec?.name, session_id: id, bigMissStreak: streak, reason,
-            }) + "\n");
-          } catch { /* ledger 失败不影响拦截 */ }
-        }
-        return msg;
+        return block("big-miss",
+          `[cost-meter] 已连续 ${streak} 步未命中过大，暂拦「${tool}」：${reason}。`
+          + `下一步只允许：① 带 offset/limit 的窄读 ② 带 path 的 grep ③ 一次小幅取数（SQL/接口）。改法后重试。`,
+          { bigMissStreak: streak, reason });
       } catch {
-        return undefined; // guard 内异常一律放行，避免误伤
+        return undefined; // guard 内异常一律放行（fail-open），避免误伤
       }
     });
     // disposer 随插件 dispose 注销（与 agent-guard 同约定：ctx.on('dispose', ...)）。

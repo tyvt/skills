@@ -237,6 +237,80 @@ ho = await preHandoff2({ agent: { session: hoS2 }, messages: [] }, async () => (
 assert.ok(!texts(ho).includes('session-handoff'), 'handoff directive fires once per session');
 console.log('cost-meter selftest: ALL PASS (auto-handoff)');
 
+// ===== 2026-11-21：步数/错误硬拦截 guard 自测 =====
+// 必须放在 log-fixture 的 process.exit(0) 之前，否则 fixture 缺失时这段永远跑不到。
+// selftest 的常规 ctx 无 tools，guard 分支不注册；这里显式提供 tools.guard 捕获回调。
+const guardHandlers = [];
+const guardEvents = [];
+const ctxGuard = {
+  on(evt, h) { if (evt === 'session/event') guardEvents.push(h); },
+  tools: { guard: (fn) => { guardHandlers.push(fn); return () => {}; } },
+};
+const onGuardEvent = (session, event) => { for (const h of guardEvents) h(session, event); };
+apply(ctxGuard, {
+  enabled: true,
+  stepGuardThreshold: 5,
+  errorStreakThreshold: 3,
+  enforceBigMiss: false, // 隔离 big-miss 规则，专测新两类
+});
+assert.equal(guardHandlers.length, 1, 'guard registered when ctx.tools.guard present');
+const guardFn = guardHandlers[0];
+const gsession = (id) => ({ header: { id } });
+const gexec = (sid, name, args = {}) => ({ name, arguments: args, agent: { session: gsession(sid) } });
+const stepEv = () => ({ type: 'assistant/message', data: { usage: { uncachedInputTokens: 1, cacheReadTokens: 10, outputTokens: 1 } } });
+const errEv = (code) => ({ type: 'tool/result', data: { name: 'grep', error: { code } } });
+const okEv = () => ({ type: 'tool/result', data: { name: 'grep', error: null, status: 'ok' } });
+
+// 规则 D：步数未超限时探索工具放行；超限后拦探索工具、放行收尾工具。
+const gsS = gsession('guard-step');
+onGuardEvent(gsS, stepEv()); // steps=1
+assert.equal(guardFn(gexec('guard-step', 'grep', { pattern: 'x' })), undefined, 'below step threshold: grep allowed');
+for (let i = 0; i < 4; i++) onGuardEvent(gsS, stepEv()); // steps=5
+assert.match(guardFn(gexec('guard-step', 'grep', { pattern: 'x' })), /本会话已 5 步/, 'step>=threshold + explore tool: blocked');
+assert.match(guardFn(gexec('guard-step', 'pwsh', { command: 'ls' })), /收尾/, 'step>=threshold + pwsh: blocked');
+assert.match(guardFn(gexec('guard-step', 'read', {})), /本会话已 5 步/, 'read is explore tool: blocked at high steps');
+assert.equal(guardFn(gexec('guard-step', 'edit', { file: 'a' })), undefined, 'closing tool edit allowed at high steps');
+assert.equal(guardFn(gexec('guard-step', 'present', {})), undefined, 'closing tool present allowed at high steps');
+assert.equal(guardFn(gexec('guard-step', 'ask_user_question', {})), undefined, 'closing tool ask allowed at high steps');
+assert.equal(guardFn(gexec('guard-step', 'some_unknown_tool', {})), undefined, 'unknown tool default allowed');
+
+// 规则 C：连续同类可自愈错误 → 拦；不同错误码重置；成功清零；不可自愈码不计。
+const gsE = gsession('guard-err');
+onGuardEvent(gsE, errEv('SEARCH_FAILED'));
+onGuardEvent(gsE, errEv('SEARCH_FAILED'));
+assert.equal(guardFn(gexec('guard-err', 'grep')), undefined, '2 consecutive errors below threshold: allowed');
+onGuardEvent(gsE, errEv('SEARCH_FAILED')); // errStreak=3
+const blocked = guardFn(gexec('guard-err', 'grep'));
+assert.match(blocked, /SEARCH_FAILED.*连续 3 次/, '3 consecutive same errors: blocked');
+assert.match(blocked, /tool-call-hygiene/, 'error block tells agent to load tool-call-hygiene');
+onGuardEvent(gsE, errEv('FS_NOT_FOUND')); // 新类别从 1 开始
+assert.equal(guardFn(gexec('guard-err', 'grep')), undefined, 'different error kind resets streak');
+onGuardEvent(gsE, errEv('FS_NOT_FOUND'));
+onGuardEvent(gsE, errEv('FS_NOT_FOUND')); // streak=3
+assert.match(guardFn(gexec('guard-err', 'grep')), /连续 3 次/, 'streak reaches 3 again');
+onGuardEvent(gsE, okEv()); // 成功 → errStreak=0
+assert.equal(guardFn(gexec('guard-err', 'grep')), undefined, 'successful result resets errStreak');
+const gsU = gsession('guard-unc');
+for (let i = 0; i < 3; i++) onGuardEvent(gsU, errEv('SOME_VENDOR_500'));
+assert.equal(guardFn(gexec('guard-unc', 'grep')), undefined, 'non-retryable error not counted');
+
+// 收尾工具优先级：高步数 + 错误超限下 edit 仍放行（双门都被绕过）。
+const gsP = gsession('guard-priority');
+for (let i = 0; i < 6; i++) onGuardEvent(gsP, stepEv());
+for (let i = 0; i < 3; i++) onGuardEvent(gsP, errEv('INVALID_ARGS'));
+assert.match(guardFn(gexec('guard-priority', 'grep')), /连续 3 次|本会话已 6 步/, 'explore tool gated by error/step');
+assert.equal(guardFn(gexec('guard-priority', 'edit')), undefined, 'closing tool bypasses both gates');
+
+// env 总开关关闭 → 全放行（含新两类规则）。
+process.env.DSH_COST_METER_ENFORCE = '0';
+const guardOff = [];
+apply({ on() {}, tools: { guard: (fn) => { guardOff.push(fn); return () => {}; } } },
+  { enabled: true, stepGuardThreshold: 1, errorStreakThreshold: 1 });
+assert.equal(guardOff[0](gexec('any', 'grep')), undefined, 'env=0 disables all guard rules');
+delete process.env.DSH_COST_METER_ENFORCE;
+
+console.log('cost-meter selftest: ALL PASS (step/error hard guard)');
+
 // 夹具：session.v4.jsonl 的真实 assistant/message，不手写 usage。
 const logPath = 'C:/Users/Administrator/Downloads/session.v4.jsonl';
 if (!fs.existsSync(logPath)) {
@@ -309,5 +383,6 @@ onRule(bareS, toolMsg(4000));
 onRule(bareS, bareMsg(3200));
 b = await preRule({ agent: { session: bareS }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
 assert.ok(preBare(b).includes('cost-meter bareReasoning') && !preBare(b).includes('bareReasoningEscalate'), 'tool call resets bare streak');
+console.log('cost-meter selftest: ALL PASS (bare escalation)');
 console.log('cost-meter selftest: ALL PASS (bare escalation)');
 
