@@ -41,3 +41,18 @@
 - `openviking-data/` — OpenViking data 全量异地备份（含 memories/peers/sessions/skills/resources + vectordb；`scripts/snapshot-openviking-data.mjs` 每日同步 `--commit --push`）。恢复时复制回 `~/.openviking/data/` 并重启服务。
 - `memory-migration-archive/` — 历史迁移归档。
 - `data/` — 本地数据。
+
+## 插件链接纪律（单一真相源）
+
+`dsh/` 下插件是唯一源码。web / headless profile 的 `node_modules/dsh-*` 用 junction 指向本目录源码，不保留 C 盘副本。
+
+- **每次 `pnpm install` 之后必须重跑**（pnpm 会把 junction 冲回实体副本）：
+
+  ```powershell
+  pwsh -File dsh\scripts\link-plugins.ps1
+  pwsh -File dsh\scripts\link-plugins.ps1 -NodeModules "$env:USERPROFILE\.dsh\profiles\headless\node_modules"
+  ```
+
+- 必须用 `pwsh`（PS7 / UTF-8），不能用 `powershell`（PS5.1 会把中文串按 GBK 读成乱码）。
+- 改完插件源码后需重启 dsh web 才生效。
+- 回滚：删掉 junction 再跑 `pnpm install --force` 恢复实体副本。
