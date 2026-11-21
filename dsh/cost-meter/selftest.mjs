@@ -207,6 +207,36 @@ assert.ok(!texts(b).includes('[build-gate]'), 'running build suppresses build-ga
   console.log('cost-meter selftest: ALL PASS (B2 enforcement whitelist)');
 }
 
+// 自动链式交接（autoHandoff）：默认关闭不注入；开启且触顶注入 P0 硬指令；同会话只注入一次。
+const handoffHandlers = [];
+let preHandoff;
+const ctxHandoff = { on(evt, handler) {
+  if (evt === 'session/event') handoffHandlers.push(handler);
+  if (evt === 'agent/pre-step') preHandoff = handler;
+} };
+apply(ctxHandoff, { enabled: true, autoHandoff: false, sessionEquivEarly: 100 });
+const hoSession = { header: { id: 'handoff-s1' } };
+const hoOn = (s, e) => { for (const h of handoffHandlers) h(s, e); };
+hoOn(hoSession, { type: 'assistant/message', data: { usage: { uncachedInputTokens: 500, cacheReadTokens: 0, outputTokens: 0 } } });
+let ho = await preHandoff({ agent: { session: hoSession }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
+assert.ok(!texts(ho).includes('session-handoff'), 'autoHandoff=false: no handoff directive');
+
+const hoHandlers2 = [];
+let preHandoff2;
+apply({ on(evt, handler) {
+  if (evt === 'session/event') hoHandlers2.push(handler);
+  if (evt === 'agent/pre-step') preHandoff2 = handler;
+} }, { enabled: true, autoHandoff: true, autoHandoffAt: 'early', sessionEquivEarly: 100, maxHandoffHops: 10 });
+const hoS2 = { header: { id: 'handoff-s2' } };
+const hoOn2 = (s, e) => { for (const h of hoHandlers2) h(s, e); };
+hoOn2(hoS2, { type: 'assistant/message', data: { usage: { uncachedInputTokens: 500, cacheReadTokens: 0, outputTokens: 0 } } });
+ho = await preHandoff2({ agent: { session: hoS2 }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
+assert.ok(texts(ho).includes('session-handoff') && texts(ho).includes('P0'), 'autoHandoff=true + over early: P0 directive injected');
+assert.ok(texts(ho).includes('handoff-required'), 'directive body has handoff-required marker');
+ho = await preHandoff2({ agent: { session: hoS2 }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
+assert.ok(!texts(ho).includes('session-handoff'), 'handoff directive fires once per session');
+console.log('cost-meter selftest: ALL PASS (auto-handoff)');
+
 // 夹具：session.v4.jsonl 的真实 assistant/message，不手写 usage。
 const logPath = 'C:/Users/Administrator/Downloads/session.v4.jsonl';
 if (!fs.existsSync(logPath)) {
@@ -280,3 +310,4 @@ onRule(bareS, bareMsg(3200));
 b = await preRule({ agent: { session: bareS }, messages: [] }, async () => ({ kind: 'enter', messages: [] }));
 assert.ok(preBare(b).includes('cost-meter bareReasoning') && !preBare(b).includes('bareReasoningEscalate'), 'tool call resets bare streak');
 console.log('cost-meter selftest: ALL PASS (bare escalation)');
+

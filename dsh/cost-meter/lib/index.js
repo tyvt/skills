@@ -49,6 +49,12 @@ function normalizeConfig(input) {
     enforceBigMiss: input?.enforceBigMiss ?? true,
     // 灰度观测：enforce 拦截/放行写 ledger，供统计误伤次数与降幅。
     enforceLedgerPath: input?.enforceLedgerPath ?? null,
+    // 自动链式交接（灰度）：默认关闭；开启后累计等效成本越过 autoHandoffAt 对应档位时，
+    // 在 pre-step 注入 P0 硬交接指令（要求 agent 走 session-handoff + schedule_create）。
+    // 插件层无动作能力，只能注入文本；真正落文档/排程由 agent 完成。
+    autoHandoff: input?.autoHandoff ?? false,
+    autoHandoffAt: input?.autoHandoffAt ?? "mid", // early | mid | budget
+    maxHandoffHops: input?.maxHandoffHops ?? 10,
   };
 }
 
@@ -61,6 +67,12 @@ function enforceEnabledByEnv() {
 
 // 0.1 / 4：假设倍率，待计费校准。
 const equivOf = (u) => (u.cacheRead || 0) * 0.1 + (u.uncached || 0) + (u.output || 0) * 4;
+/** 自动交接触发档位：early/mid/budget 对应三档累计等效成本。 */
+const handoffBudgetOf = (config) => config.autoHandoffAt === "early"
+  ? config.sessionEquivEarly
+  : config.autoHandoffAt === "budget"
+    ? config.sessionEquivBudget
+    : config.sessionEquivMid;
 const fmt = (n) => n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(0) + 'k' : String(Math.round(n));
 
 /**
@@ -261,7 +273,10 @@ export function apply(ctx, rawConfig) {
     const outputText = priorBare
       ? `[cost-meter] 上一步已超预算，output ${fmt(a.lastOutput)} tokens（>${fmt(config.perStepOutputBudget)}）。下一步第一件事必须是工具调用，禁止再并列 Option 1/2/3。`
       : `[cost-meter] 上一步 output ${fmt(a.lastOutput)} tokens（>${fmt(config.perStepOutputBudget)}）。`;
+    const handoffBudget = handoffBudgetOf(config);
     const checks = [
+      ["handoffRequired", config.autoHandoff && equiv > handoffBudget && !a.fired.has("handoffRequired"),
+        `[handoff-required] P0 硬交接指令：本会话累计等效成本 ${fmt(equiv)} 已越过自动交接档位 ${fmt(handoffBudget)}（档位 ${config.autoHandoffAt}，上限 ${config.maxHandoffHops} 跳）。**不可跳过、不可只收尾了事**：立即按 session-handoff skill 执行——写 9 节交接文档（第 5 节带 chain_id/hop/maxHops 链式元信息，第 4 节列未完成项）+ schedule_create 排定下一跳接续 + 随后停手不在本会话继续。若未完成项为空或 hop≥${config.maxHandoffHops}，改回报链路终止、不排程。此指令每会话仅注入一次。`],
       ["perStep", a.lastUncached > config.perStepUncachedBudget && a.bigMissStreak < 2,
         `[cost-meter] 上一步未命中 ${fmt(a.lastUncached)} tokens（>${fmt(config.perStepUncachedBudget)}），极高。典型成因按概率排序：① 全仓/容器级 grep——缩到 src/views/<模块> 再搜；② 缺真实值在脑内演算——先查一条 SQL / 一个接口返回；③ 大文件整读——grep 定位后 read offset/limit。先判断自己属于哪种，再动下一步。`],
       ["perStepLookup", a.bigMissStreak >= 2,
