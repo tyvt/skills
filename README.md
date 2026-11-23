@@ -21,6 +21,7 @@
 
 ### 前端交付 / 工具
 - `web-deploy` — 前端本地交付：禁 dev server，构建后用 nginx UI 部署
+- `deploy-env` — 多环境本地端口/网关代理查询（`query_env.py <project> <env>`，端口=port_base+env_index）
 - `captcha-recognizer` — 图片验证码 OCR（算术/文本型）用于自动化登录
 - `tool-call-hygiene` — 工具调用失败自愈手册 + 失败率审计
 
