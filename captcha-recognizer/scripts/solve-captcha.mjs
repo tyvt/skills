@@ -12,6 +12,9 @@
  *   CAPTCHA_GATEWAY_URL   默认 http://127.0.0.1:3425/v1/chat/completions
  *   MAGPIE_GATEWAY_KEY    默认 magpie
  *
+ *   --vote=K         K 次独立识别取众数（默认 1；>1 时 temperature=0.3 增加多样性）
+ *   --upscale=N      与 vote 合并生效，N 次采样并在提示中强调放大细节（默认 1）
+ *   --model=NAME     覆盖默认识图模型
  * 退出码: 0 成功并打印答案; 1 失败。
  */
 import fs from 'node:fs'
@@ -54,44 +57,45 @@ function mimeOf(ext) {
 
 function normalizeAnswer(text) {
   let t = String(text || '').trim()
-  // 去掉 markdown / 引号 / 等号等杂讯，优先取算式结果
-  t = t.replace(/```/g, '').trim()
-  // 若模型回显了题目如 "6+4=? 10"，取最后一个数字或最合理的
-  const eqMatch = t.match(/(\d+)\s*([+\-*/×÷])\s*(\d+)/)
-  if (eqMatch && !/^=\s*-?\d/.test(t)) {
-    const a = +eqMatch[1], op = eqMatch[2], b = +eqMatch[3]
+  t = t.replace(/`/g, '').trim()
+  // 算式：允许负数操作数；算术由脚本自行计算，不采信模型给出的结果
+  // （消除"认错数字再算对"如 8+9->105，以及 X-1?= 被读成负数的历史弱点）
+  const eqMatch = t.match(/(-?\d+)\s*([+\-*/×÷])\s*(-?\d+)/)
+  if (eqMatch) {
+    const a = Number(eqMatch[1]), op = eqMatch[2], b = Number(eqMatch[3])
     let v = null
-    if (op === '+' ) v = a + b
+    if (op === '+') v = a + b
     else if (op === '-') v = a - b
     else if (op === '*' || op === '×') v = a * b
     else if (op === '/' || op === '÷') v = b !== 0 ? Math.round(a / b) : null
-    if (v !== null) return String(v)
+    if (v !== null && Number.isFinite(v)) return { answer: String(v), confidence: 'high', raw: t }
   }
-  // 否则取第一个 token（字母数字）
-  const token = (t.match(/[A-Za-z0-9]+/g) || [t])[0]
-  return token
+  // 模型只给出结果数字（未回显算式）：范围自检，|值|>9999 视为离谱值
+  const numMatch = t.match(/^=?\s*(-?\d+(?:\.\d+)?)$/)
+  if (numMatch) {
+    const v = Number(numMatch[1])
+    if (Number.isInteger(v) && Math.abs(v) <= 9999) return { answer: String(v), confidence: 'medium', raw: t }
+    return { answer: '', confidence: 'low', raw: t }
+  }
+  // 文本型：取首个 token，保留大小写
+  const token = (t.match(/[A-Za-z0-9]+/) || [t])[0]
+  return token ? { answer: token, confidence: 'medium', raw: t }
+               : { answer: '', confidence: 'low', raw: t }
 }
 
-async function main() {
-  const args = process.argv.slice(2)
-  const wantJson = args.includes('--json')
-  const arg = args.find((a) => a !== '--json') || '-'
-  const { buf, ext } = readInput(arg)
-  const b64 = buf.toString('base64')
-  const url = `data:${mimeOf(ext)};base64,${b64}`
-
+async function recognizeOnce({ url, model, vote, upscale }) {
+  const extra = upscale > 1 ? ' 请放大图片细节，仔细辨认每个字符。' : ''
   const body = JSON.stringify({
-    model: MODEL,
+    model,
     messages: [
-      { role: 'user', content: [ { type: 'text', text: PROMPT }, { type: 'image_url', image_url: { url } } ] }
+      { role: 'user', content: [ { type: 'text', text: PROMPT + extra }, { type: 'image_url', image_url: { url } } ] }
     ],
     max_tokens: 30,
-    temperature: 0
+    temperature: vote > 1 ? 0.3 : 0
   })
-
-  let res
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 45000)
+  let res
   try {
     res = await fetch(GATEWAY, {
       method: 'POST',
@@ -108,13 +112,59 @@ async function main() {
   }
   const data = await res.json()
   const raw = data?.choices?.[0]?.message?.content ?? ''
-  const answer = normalizeAnswer(raw)
-  if (!answer) throw new Error('empty answer; raw=' + JSON.stringify(raw))
-  if (wantJson) console.log(JSON.stringify({ answer, raw: raw.trim() }))
-  else console.log(answer)
+  return normalizeAnswer(raw)
 }
 
-main().catch((e) => {
-  console.error('[solve-captcha] ' + (e?.message || e))
-  process.exit(1)
-})
+function parseArgs(args) {
+  const wantJson = args.includes('--json')
+  const getOpt = (name, def) => {
+    const hit = args.find((a) => a.startsWith(name + '='))
+    return hit ? hit.slice(name.length + 1) : def
+  }
+  const vote = Math.max(1, parseInt(getOpt('--vote', '1'), 10) || 1)
+  const upscale = Math.max(1, parseInt(getOpt('--upscale', '1'), 10) || 1)
+  const model = getOpt('--model', MODEL)
+  const arg = args.find((a) => a !== '--json' && !a.startsWith('--')) || '-'
+  return { wantJson, vote: Math.max(vote, upscale), upscale, model, arg }
+}
+
+async function main() {
+  const opts = parseArgs(process.argv.slice(2))
+  const { buf, ext } = readInput(opts.arg)
+  const url = `data:${mimeOf(ext)};base64,${buf.toString('base64')}`
+
+  const results = []
+  for (let i = 0; i < opts.vote; i++) {
+    results.push(await recognizeOnce({ url, model: opts.model, vote: opts.vote, upscale: opts.upscale }))
+  }
+
+  // 众数取答案；平票时按 confidence 等级（high > medium > low）优先
+  const rank = { high: 0, medium: 1, low: 2 }
+  const groups = new Map()
+  for (const r of results) {
+    if (!r.answer) continue
+    if (!groups.has(r.answer)) groups.set(r.answer, [])
+    groups.get(r.answer).push(r)
+  }
+  let best = null
+  for (const [answer, rs] of groups) {
+    const conf = rs.reduce((acc, r) => rank[r.confidence] < rank[acc] ? r.confidence : acc, 'low')
+    if (!best || rs.length > best.n || (rs.length === best.n && rank[conf] < rank[best.confidence])) {
+      best = { answer, n: rs.length, confidence: conf }
+    }
+  }
+  if (!best) throw new Error('empty answer; raw=' + JSON.stringify(results.map((r) => r.raw)))
+  const confidence = opts.vote > 1 ? `${best.n}/${opts.vote}` : best.confidence
+  if (opts.wantJson) console.log(JSON.stringify({ answer: best.answer, raw: results[0].raw.trim(), confidence }))
+  else console.log(best.answer)
+}
+
+export { normalizeAnswer, parseArgs }
+
+// 作为 CLI 执行时才跑 main；被 import 时仅导出纯函数供测试
+if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+  main().catch((e) => {
+    console.error('[solve-captcha] ' + (e?.message || e))
+    process.exit(1)
+  })
+}
