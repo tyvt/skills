@@ -319,7 +319,7 @@ export function apply(ctx, rawConfig) {
     const handoffBudget = handoffBudgetOf(config);
     const checks = [
       ["handoffRequired", config.autoHandoff && equiv > handoffBudget && !a.fired.has("handoffRequired"),
-        `[handoff-required] P0 硬交接指令：本会话累计等效成本 ${fmt(equiv)} 已越过自动交接档位 ${fmt(handoffBudget)}（档位 ${config.autoHandoffAt}，上限 ${config.maxHandoffHops} 跳）。**不可跳过、不可只收尾了事**：立即按 session-handoff skill 执行——写 9 节交接文档（第 5 节带 chain_id/hop/maxHops 链式元信息，第 4 节列未完成项）+ schedule_create 排定下一跳接续 + 随后停手不在本会话继续。若未完成项为空或 hop≥${config.maxHandoffHops}，改回报链路终止、不排程。此指令每会话仅注入一次。`],
+        `[handoff-required] P0 硬交接指令：本会话累计等效成本 ${fmt(equiv)} 已越过自动交接档位 ${fmt(handoffBudget)}（档位 ${config.autoHandoffAt}，上限 ${config.maxHandoffHops} 跳）。**不可跳过、不可只收尾了事**：立即按 session-handoff skill 执行——写 9 节交接文档（第 5 节带 chain_id/hop/maxHops 链式元信息，第 4 节列未完成项）+ schedule_create 排定下一跳接续（prompt 只保留四项：交接文档路径 + 读第 9 节 + chain 元信息 chain_id/hop/maxHops + 一句目标；禁止重抄"禁止重跑清单/待办明细/终止条件"，交接文档第 3/4/9 节已有，以压低每跳冷缓存成本）+ 随后停手不在本会话继续。若未完成项为空或 hop≥${config.maxHandoffHops}，改回报链路终止、不排程。此指令每会话仅注入一次。`],
       ["perStep", a.lastUncached > config.perStepUncachedBudget && a.bigMissStreak < 2,
         `[cost-meter] 上一步未命中 ${fmt(a.lastUncached)} tokens（>${fmt(config.perStepUncachedBudget)}），极高。典型成因按概率排序：① 全仓/容器级 grep——缩到 src/views/<模块> 再搜；② 缺真实值在脑内演算——先查一条 SQL / 一个接口返回；③ 大文件整读——grep 定位后 read offset/limit。先判断自己属于哪种，再动下一步。`],
       ["perStepLookup", a.bigMissStreak >= 2,
