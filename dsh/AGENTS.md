@@ -73,7 +73,8 @@
 - **任何成本交接 / 链式接续的下一跳排程，必须在 30 秒内启动**：`schedule_create` 的 `DTSTART` 取「当前本地时刻 + 约 10–20 秒」（留最小安全余量确保仍在未来，但总计 ≤30 秒），`RRULE:FREQ=DAILY;COUNT=1` 一次性投递；**禁止**把 DTSTART 设成 +N 分钟 / +N 小时（旧 hop 曾设 +2 分钟致用户久等，已明确否决）。
 - DTSTART 用 `Get-Date -Format 'yyyyMMddTHHmmss'`（配 `TZID=Asia/Shanghai`）现算现用，禁止手敲固定分钟数；DTSTART 必须晚于调用时刻，否则 `COUNT=1` 不会投递。
 - 交接接续用 `target=new` 或 `new_once` 开新会话（瞬时上下文，避免旧会话成本累积）；仅本会话提醒/跟进才用 `this_session`。
-- **下一跳 schedule prompt 只保留四项**：交接文档路径 + 读第 9 节 + chain 元信息（chain_id/hop/maxHops）+ 一句目标；禁止在 prompt 里重抄「禁止重跑清单/待办明细/终止条件」（交接文档第 3/4/9 节已有），把重复上下文压到最低。
+- **下一跳 schedule prompt 只保留四项**：交接文档路径 + 读第 9 节 + chain 元信息（chain_id/hop，**禁带 maxHops**）+ 一句目标；禁止在 prompt 里重抄「禁止重跑清单/待办明细/终止条件」（交接文档第 3/4/9 节已有），把重复上下文压到最低。
+- **交接链路不设最大跳数、任务未完成不得停止（P0，2026-11-23）**：成本交接 / 链式接续的 schedule prompt 一律**禁止设置 maxHops**，也不得标注「最后一跳」。链路终止条件只看交接文档第 4 节「未完成项」是否清空、第 9 节目标是否达成，**与跳数无关**；任何一跳不得因「到达 maxHops / 最后一跳」主动终止。只有任务真正完成（未完成项清零、目标达成）才停止接续，否则继续排下一跳。反例（已否决）：历史 `chain-20261123-portal-task2741-quicknav-role` hop7/maxHops=10、`禅道6779资讯中心详情` hop10/maxHops=10 既带 maxHops 又标「最后一跳」。
 
 ## 落地
 
