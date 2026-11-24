@@ -81,13 +81,11 @@ function envCard(items,label){
   return `<div class="site"><a class="url" title="${esc(it.frontend_url)}" href="${esc(it.frontend_url)}" target="_blank">${esc(it.frontend_url)}</a> ${health}${extra}
   <div class="kv" title="网关 ${esc(it.backend_gateway)}">网关 <b>${esc(it.backend_gateway)}</b> ${be}</div></div>`;
  }).join('');
- const built=items.map(it=>it.built_at||'').filter(Boolean).sort().pop()||'-';
  const acctSeen=new Set(), accts=[];
  items.forEach(it=>(it.accounts||[]).forEach(a=>{if(!acctSeen.has(a.role)){acctSeen.add(a.role);accts.push(a);}}));
  const merged=Object.assign({},first,{accounts:accts});
  return `<div class="env"><div class="head"><b title="${esc(label)} · ${esc(items.map(it=>it.env).join(','))}">${esc(label)}</b><span title="环境 ${esc(items.map(it=>it.env).join(','))} · ${esc(first.nginx_conf)}"><i class="dot ${cls}"></i>${LABEL[cls]||cls}</span></div>
  ${sites}
- <div class="built">构建 ${esc(built.slice(0,16))}</div>
   ${acctTable(merged)}
   </div>`;}
 function placeholder(label){
@@ -114,7 +112,9 @@ function render(st){
    ENV_ORDER.forEach(function(pair){const env=pair[0],label=pair[1];const hit=by[p].filter(function(it){return it.env===env||it.env.indexOf(env+'-')===0;});cards+=hit.length?envCard(hit,label):placeholder(label);});
    const rest=by[p].filter(function(it){return !ENV_ORDER.some(function(pair){return pair[0]===it.env||it.env.indexOf(pair[0]+'-')===0;});});
    if(rest.length) cards+=envCard(rest,'其他');
-   const pdist=(by[p].find(function(it){return it.dist_root;})||{}).dist_root||'-'; html+=`<section class="group"><h2>${esc(p)}<span class="pdist" title="dist ${esc(pdist)}">dist ${esc(pdist)}</span></h2><div class="grid">${cards}</div></section>`;
+   const pdist=(by[p].find(function(it){return it.dist_root;})||{}).dist_root||'-';
+    const built=by[p].map(function(it){return it.built_at||'';}).filter(Boolean).sort().pop()||'-';
+    html+=`<section class="group"><h2>${esc(p)}<span class="pdist" title="dist ${esc(pdist)}">dist ${esc(pdist)}</span><span class="pdist" title="构建 ${esc(built)}">构建 ${esc(built.slice(0,16))}</span></h2><div class="grid">${cards}</div></section>`;
  }
  html+=`<section class="group"><h3>最近部署事件</h3><table><tr><th>时间</th><th>项目</th><th>环境</th><th>动作</th><th>结果</th><th>备注</th></tr>`+
  (st.events.length?st.events.map(e=>`<tr><td>${esc(e.ts)}</td><td>${esc(e.project)}</td><td>${esc(e.env)}</td><td>${esc(e.action)}</td><td>${esc(e.result)}</td><td>${esc(e.detail)}</td></tr>`).join(''):'<tr><td colspan="6">暂无</td></tr>')+`</table></section>`;
