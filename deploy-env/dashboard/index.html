@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>本地部署看板</title>
+<style>
+:root{--ok:#22c55e;--warn:#eab308;--bad:#ef4444;--down:#94a3b8;--bg:#0f172a;--card:#1e293b;--tx:#e2e8f0;--mut:#64748b}
+*{box-sizing:border-box}body{margin:0;font:14px/1.5 "Segoe UI",Microsoft YaHei,sans-serif;background:var(--bg);color:var(--tx)}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--card)}
+header h1{font-size:16px;margin:0}
+header .meta{color:var(--mut);font-size:12px}
+main{padding:16px 20px;display:flex;flex-direction:column;gap:16px}
+.group{background:var(--card);border-radius:10px;padding:12px 14px}
+.group h2{margin:0 0 10px;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.env{border:1px solid #334155;border-radius:8px;padding:10px 12px;background:#0b1220}
+.env .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.env .url{color:#7dd3fc;text-decoration:none;word-break:break-all}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px}
+.ok{background:var(--ok)}.empty{background:var(--warn)}.mismatch,.bad{background:var(--bad)}.missing{background:var(--down)}
+.kv{color:var(--mut);font-size:12px;margin:2px 0}
+.kv b{color:var(--tx);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:4px 8px;border-bottom:1px solid #1e293b;text-align:left}
+th{color:var(--mut);font-weight:500}
+.empty-row{color:var(--warn)}
+h3{font-size:13px;margin:0 0 6px;color:var(--mut)}
+</style>
+</head>
+<body>
+<header><h1>本地部署看板</h1><span class="meta" id="meta">加载中…</span>
+<button onclick="load()" style="margin-left:auto;background:#334155;color:#e2e8f0;border:0;border-radius:6px;padding:4px 12px;cursor:pointer">刷新</button></header>
+<main id="main">加载中…</main>
+<script>
+const LIGHT={ok:'ok',empty:'empty',mismatch:'mismatch',missing:'missing'};
+const LABEL={ok:'nginx 命中',empty:'空 conf',mismatch:'conf 不匹配',missing:'缺 conf'};
+function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function envCard(it){
+ const cls=LIGHT[it.nginx_status]||'missing';
+ const health=it.health==='up'?'<span style="color:var(--ok)">服务中</span>':it.health==='down'?'<span style="color:var(--bad)">不通</span>':'<span style="color:var(--warn)">'+esc(it.health)+'</span>';
+ const be=it.backend==='open'?'<span style="color:var(--ok)">通</span>':'<span style="color:var(--bad)">不通</span>';
+ return `<div class="env"><div class="head"><b>${esc(it.env)}</b>
+ <span title="${esc(it.nginx_conf)}"><i class="dot ${cls}"></i>${LABEL[it.nginx_status]||it.nginx_status}</span></div>
+ <div><a class="url" href="${esc(it.frontend_url)}" target="_blank">${esc(it.frontend_url)}</a> ${health}</div>
+ <div class="kv">网关 <b>${esc(it.backend_gateway)}</b> ${be}</div>
+ <div class="kv">dist <b>${esc(it.dist_root)}</b></div>
+ <div class="kv">conf <b>${esc(it.nginx_conf)}</b>${it.listen_ports?(' listen='+esc(it.listen_ports.join(','))):''}</div>
+ </div>`;}
+function render(st){
+ document.getElementById('meta').textContent='生成于 '+st.generated_at+' · '+st.items.length+' 个站点 · '+st.orphans.length+' 个未收录 conf';
+ const by={};
+ st.items.forEach(it=>{(by[it.project]=by[it.project]||[]).push(it)});
+ let html='';
+ for(const p of Object.keys(by).sort()){
+  html+=`<section class="group"><h2>${esc(p)}</h2><div class="grid">${by[p].map(envCard).join('')}</div></section>`;
+ }
+ if(st.orphans.length){
+  html+=`<section class="group"><h3>未收录 conf（sites-enabled 中存在但注册表没有，空 conf 标黄）</h3><table><tr><th>文件</th><th>状态</th><th>listen</th><th>大小</th></tr>`+
+  st.orphans.map(o=>`<tr class="${o.status==='empty'?'empty-row':''}"><td>${esc(o.name)}</td><td>${LABEL[o.status]||o.status}</td><td>${esc(o.listen_ports?o.listen_ports.join(','):'-')}</td><td>${o.size}</td></tr>`).join('')+`</table></section>`;
+ }
+ html+=`<section class="group"><h3>最近部署事件</h3><table><tr><th>时间</th><th>项目</th><th>环境</th><th>动作</th><th>结果</th><th>备注</th></tr>`+
+ (st.events.length?st.events.map(e=>`<tr><td>${esc(e.ts)}</td><td>${esc(e.project)}</td><td>${esc(e.env)}</td><td>${esc(e.action)}</td><td>${esc(e.result)}</td><td>${esc(e.detail)}</td></tr>`).join(''):'<tr><td colspan="6">暂无</td></tr>')+`</table></section>`;
+ document.getElementById('main').innerHTML=html;
+}
+async function load(){
+ try{const r=await fetch('/api/state');render(await r.json());}
+ catch(e){document.getElementById('main').textContent='加载失败: '+e;}
+}
+load();setInterval(load,30000);
+</script>
+</body>
+</html>

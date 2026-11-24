@@ -32,12 +32,24 @@ $env:PYTHONIOENCODING='utf-8'
 3. 用 `agent-browser` 打开 `frontend_url`，按 `login_selector`（JSON，含用户名/密码/提交按钮选择器）填 `login_user` + 解析出的密码并提交；登录后核验跳到后台页。
 4. 切换环境＝换 `frontend_url` 端口重开浏览器，无需改代码或重启 nginx。
 
-## selftest（两例）
+## 部署看板（先查再部署，禁猜地址）
+- 启动：`python dashboard/api.py`（绑 127.0.0.1:18098，占用退 18099，均占中止）；页面 `http://127.0.0.1:18098/`，状态 JSON `/api/state`。
+- **agent 接前端部署任务时，第一步查注册表**（`query_env.py <project> <env>` 或看板 `/api/state`），直接用返回的 `frontend_url`/`backend_gateway`；禁止猜端口、禁止手改 `D:\nginx\conf\sites-enabled\*.conf`。
+- 看板显示三态：nginx 命中 / 空 conf / 缺 conf，以及前后端探活、未收录 conf、最近事件（`deploy_events` 表）。
+- 收敛：`pwsh -File sync.ps1`（备份→生成片段→冲突感知归档→`nginx -t` 门禁→reload→退化探活回滚）；负向测试加 `-SimulateBadFragment`。
+- 端口冲突 conf 一律不归档、不重生成，只在 events 记待人工；密码仍不入库，token 落 `dashboard/.token`（gitignore）。
+
+## selftest（两例 + 看板四例）
 ```
 $env:PYTHONIOENCODING='utf-8'
 & 'C:\Program Files\Python310\python.exe' 'D:\repository\skills\deploy-env\selftest.py'
 ```
 预期：`portal/test -> port=8092 url=http://localhost:8092`、`fdc-v3/prod -> port=8104 url=http://localhost:8104`，末行 `SELFTEST PASS (2/2)`。
+看板：
+```
+& 'C:\Program Files\Python310\python.exe' 'D:\repository\skills\deploy-env\selftest_dashboard.py'
+```
+预期：`DASHBOARD SELFTEST PASS`（0 字节识别 / listen 解析 / 探活超时降级 / 双端口占满中止）。
 
 ## 约束
 - 调 Python 子进程读中文前必须设 `$env:PYTHONIOENCODING='utf-8'`（Windows 默认 GBK 会乱码）。
