@@ -126,10 +126,13 @@ def load_registry():
             has = bool(SECRET_REF_RE.match((a.get('secret_ref') or '').strip()))
             a['has_password'] = has
             a['password_masked'] = '****' if has else ''
+            with _SECRET_LOCK:
+                plaintext = _SECRET_CACHE.get((a['project_key'], a['env'], a['role']), '')
             acct.setdefault((a['project_key'], a['env']), []).append({
                 'role': a['role'], 'role_label': a.get('role_label') or a['role'],
                 'username': a.get('username') or '', 'has_password': has,
                 'password_masked': a['password_masked'],
+                'password': plaintext,
             })
     except sqlite3.OperationalError:
         pass
@@ -233,17 +236,19 @@ def refresh_loop():
 
 
 class Handler(BaseHTTPRequestHandler):
-    def _send(self, code, body, ctype='application/json; charset=utf-8'):
+    def _send(self, code, body, ctype='application/json; charset=utf-8', no_store=False):
         data = body if isinstance(body, bytes) else json.dumps(body, ensure_ascii=False).encode('utf-8')
         self.send_response(code)
         self.send_header('Content-Type', ctype)
         self.send_header('Content-Length', str(len(data)))
+        if no_store:
+            self.send_header('Cache-Control', 'no-store')
         self.end_headers()
         self.wfile.write(data)
 
     def do_GET(self):
         if self.path == '/api/state' or self.path.startswith('/api/state?'):
-            self._send(200, get_state(force='refresh=1' in self.path))
+            self._send(200, get_state(force='refresh=1' in self.path), no_store=True)
         elif self.path == '/':
             # 服务端注入一次性 token（本地源才可见），避免把 token 硬编码进静态 HTML
             with open(INDEX_HTML, 'r', encoding='utf-8') as f:
