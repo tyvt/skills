@@ -30,6 +30,17 @@ $env:PYTHONIOENCODING='utf-8'
 - `query_env.py` 只读注册表，按 `project`+`env` 精确取一行；查不到返回 `{"error": ...}` 且退出码 1。
 - `resolve_password()` 仅从 `secret_ref` 解析出隐私路径 `deploy_env/<project>/<env>/password`；本轮 `login_user` 为空 → `password_resolved=false`、`password=null`，**不返回任何假密码**。
 
+## 复现查询流程（bug 复现先查面板，禁猜地址/账号/密码）
+- 凡 bug 复现要地址、账号、密码，第一步必查面板：`query_env.py <project> <env>` 或看板 `/api/state`，取 `frontend_url`/`backend_gateway`/`login_user`/`login_selector`/`secret_ref_path`。
+- 查不到（退出码 1 / `{"error":...}`）才用 `ask_user_question` 问用户；拿到后用 `agent-browser` 实机验证地址可达、账号可登录。
+- 验证正确再回写（见下节），禁止用占位符当真密码试登，禁止猜端口/网关。
+
+## 验证后回写 / 会话纠错（写回面板，单源）
+- 非密字段（地址/账号/环境/端口/网关/项目名）：`upsert_env.py` 或看板 `POST /api/registry/upsert`（本机 + `X-Auth-Token`，token 见 `dashboard/.token`）；env 严格 local/dev/test/uat/prod，端口全局唯一（允许同 project/env 自更新）。
+- 密码链路：`privacy_upsert(category=credential, target_key=deploy_env/<project>/<env>/<role>, values={password})` 存真实值 → 取返回的 `{{ov_privacy:...}}` 引用写入 `env_accounts.secret_ref` → `POST /api/secrets/inject` 注入看板内存；明文密码绝不入库。
+- 用户在会话中指出部署信息有误（端口/网关/账号/环境/项目名），当即回写，不留到下次。
+- `upsert_env.py` 幂等（SELECT+UPDATE 兜底 + 单事务写锁），无明文密码参数入口；测试用 `--db` 或 `DEPLOY_ENV_DB` 指向 `%TEMP%` 副本。
+
 ## 登录流程（resolve 密码 → agent-browser）
 1. 取连接信息：`frontend_url`（登录入口）、`backend_gateway`、`login_user`。
 2. resolve 密码：把 `secret_ref_path`（`deploy_env/<project>/<env>/password`）交 OpenViking/ov_privacy 取真实值；未补录则停止并提示补录，禁止用占位符当密码试登。

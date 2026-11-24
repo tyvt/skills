@@ -76,6 +76,11 @@
 - **下一跳 schedule prompt 只保留四项**：交接文档路径 + 读第 9 节 + chain 元信息（chain_id/hop，**禁带 maxHops**）+ 一句目标；禁止在 prompt 里重抄「禁止重跑清单/待办明细/终止条件」（交接文档第 3/4/9 节已有），把重复上下文压到最低。
 - **交接链路不设最大跳数、任务未完成不得停止（P0，2026-11-23）**：成本交接 / 链式接续的 schedule prompt 一律**禁止设置 maxHops**，也不得标注「最后一跳」。链路终止条件只看交接文档第 4 节「未完成项」是否清空、第 9 节目标是否达成，**与跳数无关**；任何一跳不得因「到达 maxHops / 最后一跳」主动终止。只有任务真正完成（未完成项清零、目标达成）才停止接续，否则继续排下一跳。反例（已否决）：历史 `chain-20261123-portal-task2741-quicknav-role` hop7/maxHops=10、`禅道6779资讯中心详情` hop10/maxHops=10 既带 maxHops 又标「最后一跳」。
 
+## 部署面板硬拦截（P0，所有会话生效）
+- **部署必注册**：任何前端项目部署必须先经部署面板注册（项目身份 + 环境），禁止绕过面板直接改 nginx 站点/手配端口；部署严格按 5 环境 `local/dev/test/uat/prod`（对应本地/公司开发/公司测试/客户测试/生产），`port=port_base+env_index` 且端口全局唯一，禁止环境名/端口段之外的部署。查询入口 `skill("deploy-env")` → `query_env.py <project> <env>` 或看板 `/api/state`（单源，禁猜端口/网关）。
+- **bug 复现先查面板**：凡 bug 复现需要地址、账号、密码的，第一步必须查部署面板（`query_env.py` / `/api/state`），直接用返回的 `frontend_url`/`backend_gateway`/账号；查不到才用 `ask_user_question` 问用户，用户给出后用 `agent-browser` 实机验证正确。
+- **验证通过必回写**：地址/账号/环境等验证正确后，必须回写面板注册表（`deploy-env/upsert_env.py` 或看板 `POST /api/registry/upsert`）；密码走 `privacy_upsert` 存真实值→把 `{{ov_privacy:...}}` 引用写入 `secret_ref`→`POST /api/secrets/inject` 注入，明文密码绝不入库。用户在会话中指出的部署信息错误（端口/网关/账号/环境/项目名），同样当即更新面板，不留到下次。
+
 ## 落地
 
 - 用户指定的 worktree / 目录是硬约束：不进、不改、不合并他人 worktree。

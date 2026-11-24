@@ -10,13 +10,17 @@ import json
 import os
 import socket
 import sqlite3
+import sys
 import urllib.request
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 DASH = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(DASH)  # deploy-env 根目录（registry.sqlite 所在）
-DB = os.path.join(ROOT, 'registry.sqlite')
+sys.path.insert(0, ROOT)  # 让 upsert_env 可导入
+from upsert_env import upsert_registry  # noqa: E402  写回逻辑单一来源
+
+DB = os.environ.get('DEPLOY_ENV_DB') or os.path.join(ROOT, 'registry.sqlite')
 TOKEN_FILE = os.path.join(DASH, '.token')
 INDEX_HTML = os.path.join(DASH, 'index.html')
 SITES_DIR = r'D:\nginx\conf\sites-enabled'
@@ -274,13 +278,19 @@ class Handler(BaseHTTPRequestHandler):
             return None
 
     def do_POST(self):
-        if self.path not in ('/api/event', '/api/secrets/inject', '/api/account/reveal'):
+        if self.path not in ('/api/event', '/api/secrets/inject', '/api/account/reveal',
+                             '/api/registry/upsert'):
             return self._send(404, {'error': 'not found'})
         if not self._authorized():
             return self._send(403, {'error': 'forbidden'})
         body = self._read_body()
         if body is None:
             return self._send(400, {'error': 'bad json'})
+
+        if self.path == '/api/registry/upsert':
+            # 写回校验与 CLI 共用 upsert_registry，DB 可经 DEPLOY_ENV_DB 指向临时副本
+            ok, payload = upsert_registry(body, db_path=DB)
+            return self._send(200 if ok else 400, payload)
 
         if self.path == '/api/event':
             con = sqlite3.connect(DB)
