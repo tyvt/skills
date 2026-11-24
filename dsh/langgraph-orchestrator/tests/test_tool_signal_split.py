@@ -49,7 +49,7 @@ def test_new_tool_has_flash_fallbacks():
     cfg = load_config(CFG_PATH)
     pool = [m.model for m in cfg.tool(NEW).models]
     assert any("space-bunny" in m for m in pool[1:]), pool
-    assert any("deepseek-v4.1-flash" in m for m in pool[1:]), pool
+    assert any("hy4flash" in m for m in pool[1:]), pool
 
 
 def test_new_tool_in_no_local_read_set():
