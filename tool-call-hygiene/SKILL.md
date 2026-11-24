@@ -1,11 +1,22 @@
 ---
 name: tool-call-hygiene
-description: 工具调用失败的自愈手册。当工具返回 INVALID_ARGS / ESCALATION_ARGS / FS_NOT_OBSERVED / FS_STALE_VERSION / FS_NOT_FOUND / FS_NOT_TEXT / FS_EDIT_NOT_FOUND / FS_AMBIGUOUS_EDIT / GOAL_INVALID_TRANSITION / UNKNOWN_TOOL / TOOL_TIMEOUT / SEARCH_FAILED 等错误码时，先查本 skill 的修正表再重试一次，不要原样重复坏调用。也用于审计近期会话的工具失败率。
+description: 工具调用失败的自愈手册。当工具返回 INVALID_ARGS（空参数退化）/ FS_NOT_OBSERVED / FS_STALE_VERSION / FS_NOT_FOUND / FS_NOT_TEXT / FS_EDIT_NOT_FOUND / FS_AMBIGUOUS_EDIT / TOOL_TIMEOUT / SEARCH_FAILED 等「插件自动兜底覆盖不到」的错误码时，先查本 skill 的修正表再重试一次，不要原样重复坏调用。也用于审计近期会话的工具失败率。
 ---
 
 # tool-call-hygiene — 工具调用卫生 & 自愈表
 
 绝大多数工具错误是「模型行为 / 契约违反」，不是 harness bug。规则：**出错先查表修正，重试一次仍失败就换本质不同的方案；绝不原样重复坏调用。**
+
+## 0. 边界：插件已自动兜底的范围（本表不再重复）
+
+`agent-guard` 插件在工具调用执行前已自动修复下列项（默认全部开启），`orchestrator` 负责供应商失败的跨备用模型故障转移：
+
+- **工具名**：trim 噪声、旧名别名（`schedule_update`→`schedule_edit`）。
+- **参数形状**：字段名别名（`grep.glob`→`include`、`queries`→`query`）、越界字段剔除、类型强制转换、null 剔除、`justification` 与 `sandbox_permissions` 配对、`todo_write`/`update_goal` 字段与 action 一致性。
+- **PowerShell**：未加引号的 `@{...}` 自动补单引号、POSIX head/tail/cat 改写。
+- **供应商失败**：SERVER / RATE_LIMIT / TIMEOUT / TRANSPORT / EMPTY_RESPONSE / OVERLOADED 由 agent-guard 带退避重试，预算耗尽后由 orchestrator 故障转移。
+
+**本表只列插件覆盖不到的错误码。** 若自动修复未发生（插件未加载/开关关闭）或修复后仍报错，按 stdout 的实际错误码对照原文 schema 人工核对一次，不要原样重复坏调用。
 
 ## 1. 高频错误自愈表
 
@@ -17,30 +28,21 @@ description: 工具调用失败的自愈手册。当工具返回 INVALID_ARGS / 
 | `FS_AMBIGUOUS_EDIT` | `old_string` 在同一文件里匹配多处 | 用更长/带上下文的唯一片段，或明确 `replace_all: true`；不要原样重试。 |
 | `FS_NOT_FOUND` | 路径不存在，或 `offset` 超出文件行数 | 先用 `glob` 校验路径存在；worktree 任务用 worktree 内路径，别回主仓库；`read` 前先确认总行数再给 `offset`。 |
 | `FS_NOT_TEXT` | 拿 `read` 读二进制/非 UTF-8 | 图片用 `read_image`；GBK/GB2312 源码用 `pwsh`（`Get-Content -Encoding`）查看。 |
-| `INVALID_ARGS` | 参数形状不对 | 见第 2 节字段清单；布尔用 `true/false`，不要 `"true"`；不要塞多余字段。**其中 `grep.glob→include`、`openviking queries→query`、`todo_write`/`update_goal` 字段越界、`justification` 落单、类型字符串这些「形状可推断」的错误，agent-guard 已在执行前自动修（不必等报错再手改）。** |
-| `INVALID_ARGS`（`arguments: "{}"`） | 长上下文退化：模型把必填参数整体吐空（`missing required property "pattern"/"file_path"/"command"`） | guard 无法推断必填值，**不要继续刷重试**；连续 2 次立即收尾换会话/压缩上下文，这是模型退化信号而非形状错误。 |
-| `ESCALATION_ARGS` | `justification` 与 `sandbox_permissions` 落单 | 二者**要么都传要么都不传**；普通读写改不要传 `justification`。 |
-| `UNKNOWN_TOOL` | 工具名拼错/被拼进 JSON/用了旧名 | 核对工具名；`grep">` 是被误拼进参数；`schedule_update` 是旧名，正确为 `schedule_edit`（guard 已能自动改写）。 |
+| `INVALID_ARGS`（`arguments: "{}"`） | 长上下文退化：模型把必填参数整体吐空（`missing required property "pattern"/"file_path"/"command"`） | guard 无法推断必填值，**不要继续刷重试**；连续 2 次立即收尾换会话/压缩上下文，这是模型退化信号而非形状错误（其余形状错误见第 0 节，插件已自动兜底）。 |
 | `TOOL_TIMEOUT` | 命令太久 | 拆小、加 `timeoutMs`，或 `run_in_background` 再 `job_output`。`session_search` 固定 120s 超时：先加 `session_id`/时间范围/更短 query 缩小范围，超时后**不要原样重试**，改走 `context-mode` MCP。 |
-| `GOAL_ALREADY_EXISTS` / `GOAL_INVALID_TRANSITION` | goal 状态非法 | `objective`/`max_goal_rounds` 只能配 `action:"edit"`；`blocked_reason` 只能配 `action:"blocked"`；不要 resume 已激活的 goal。 |
 | `SEARCH_FAILED` / `WEB_*` | 搜索/网页失败 | 换关键词或换 URL；`WEB_BLOCKED_URL` 是被拦截的域名。`grep` 的过滤字段是 `include`（不是 `glob`），`path` 目录先用 `glob` 校验存在。 |
 | `DBX_TOOL_ERROR`（无效的表或视图名 / 无效的列名） | 达梦上没查数据字典就猜表名或列名 | 先查 `ALL_TABLES` / `ALL_TAB_COLUMNS`。`dbx_describe_table` 返回 `No columns found` 不算列清单。 |
 | `INVALID_ARGUMENT`（OpenViking `detail`） | `detail` 配了 `mode=list` | `detail` 只能配 `mode=context`，否则丢掉 `detail`。 |
 | PowerShell `ParserError` / `TerminatorExpectedAtEndOfString` | `git commit -m` 用了双引号，正文里的引号被吞 | `-m` 用单引号。 |
-| PowerShell 把 `@{u}` 当哈希解析 | 双引号内 `@{...}` 被 PS 展开 | refspec 一律单引号：`git rev-parse '@{u}'`（bug6401 实测）。**agent-guard 已对 pwsh 命令里未加引号的 `@{...}` 自动补单引号（rule `pwsh-at-brace`），无需手动改**。 |
 | `CommandNotFoundException`（`GIT_EDITOR=true`） | bash 赋值写进了 PowerShell | `$env:GIT_EDITOR='true'; git rebase --continue`（bug6402 实测）。 |
 | 静默命令套 `Out-String \| Select-Object -Last` 永远无输出 | 管道缓冲到进程结束才刷出 | 用 `*>` 重定向到已存在的日志文件；`Out-File` 前先 `New-Item` 目录。 |
 | `node ../node_modules/...` 解析到不存在目录 | worktree 内相对路径 `../` 指向 worktrees/ 而非仓库根 | 相对路径先 `Test-Path` 验证或改用仓库根绝对路径；同一错误第二次必须换路径/方案。 |
 
-## 2. 常见参数形状
+## 2. 残留的形状约束（插件覆盖不到的）
 
-- `justification`：**只有**和一次性 `sandbox_permissions` 重试一起用才传；普通调用不传、不传空串。
-- 布尔：`run_in_background`、`replace_all` 必须 `true/false`。
-- `todo_write`：项只有 `content` + `status`；顶层只有 `todos`；不要 `id`/`activeForm`。
-- `grep.include`：单个 glob，多个用 `{a,b}`；具体文件先用 `glob` 校验。字段名是 `include`，不是 `glob`（guard 已能自动改写）。
-- 定时任务：更新用 `schedule_edit`，不是 `schedule_update`（guard 已能自动改写）。
+字段别名、类型、布尔、todo/goal 字段、escalation 配对等形状错误已由 agent-guard 自动修（见第 0 节），此处不再列。仅剩两条插件无法推断的约束：
+
 - `read`：默认 400 行，用 `offset`/`limit` 续读；`offset` 不要超过文件总行数。
-- `update_goal`：见上表 GOAL_* 行。
 - worktree：代码改动在独立 worktree 内读写，路径用该 worktree 的绝对路径，别回主仓库目录。
 
 ## 3. 审计近期失败率
