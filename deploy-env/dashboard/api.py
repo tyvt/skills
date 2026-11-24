@@ -192,20 +192,8 @@ def build_state():
                     (it['health'], datetime.now().isoformat(timespec='seconds'), it['project'], it['env']))
     con.commit()
     con.close()
-    # sites-enabled 全量扫描：未被注册表引用的 conf 记为 orphan
-    referenced = {os.path.basename(it['nginx_conf']) for it in items}
-    orphans = []
-    for name in sorted(os.listdir(SITES_DIR)):
-        if not name.endswith('.conf'):
-            continue
-        if name in referenced:
-            continue
-        p = os.path.join(SITES_DIR, name)
-        st, listens = scan_conf(p)
-        orphans.append({'name': name, 'status': st, 'listen_ports': listens,
-                        'size': os.path.getsize(p)})
     return {'generated_at': datetime.now().isoformat(timespec='seconds'),
-            'items': items, 'orphans': orphans, 'events': events}
+            'items': items, 'events': events}
 
 
 _STATE_CACHE = {'data': None, 'at': 0.0}

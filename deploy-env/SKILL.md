@@ -37,9 +37,9 @@ $env:PYTHONIOENCODING='utf-8'
 4. 切换环境＝换 `frontend_url` 端口重开浏览器，无需改代码或重启 nginx。
 
 ## 部署看板（先查再部署，禁猜地址）
-- 启动：`python dashboard/api.py`（绑 127.0.0.1:18098，占用退 18099，均占中止）；页面 `http://127.0.0.1:18098/`，状态 JSON `/api/state`。
+- 自启：已配置为开机静默运行（计划任务 `deploy-env-dashboard`，pythonw 后台，工作目录本仓根）；手动兜底启动：`python dashboard/api.py`（绑 127.0.0.1:18098，占用退 18099，均占中止）；页面 `http://127.0.0.1:18098/`，状态 JSON `/api/state`。安装/重建自启：`powershell -ExecutionPolicy Bypass -File install-autostart.ps1`。
 - **agent 接前端部署任务时，第一步查注册表**（`query_env.py <project> <env>` 或看板 `/api/state`），直接用返回的 `frontend_url`/`backend_gateway`；禁止猜端口、禁止手改 `D:\nginx\conf\sites-enabled\*.conf`。
-- 看板显示三态：nginx 命中 / 空 conf / 缺 conf，以及前后端探活、未收录 conf、最近事件（`deploy_events` 表）。
+- 看板显示三态：nginx 命中 / 空 conf / 缺 conf，以及前后端探活、最近事件（五环境固定槽位：本地/公司开发/公司测试/客户测试/生产，未部署置灰；nginx UI 已下线，站点 conf 由本仓脚本维护；`deploy_events` 表）。
 - 收敛：`pwsh -File sync.ps1`（备份→生成片段→冲突感知归档→`nginx -t` 门禁→reload→退化探活回滚）；负向测试加 `-SimulateBadFragment`。
 - 端口冲突 conf 一律不归档、不重生成，只在 events 记待人工；密码仍不入库，token 落 `dashboard/.token`（gitignore）。
 
