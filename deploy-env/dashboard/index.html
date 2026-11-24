@@ -12,7 +12,10 @@ header .meta{color:var(--mut);font-size:12px}
 main{padding:16px 20px;display:flex;flex-direction:column;gap:16px}
 .group{background:var(--card);border-radius:10px;padding:12px 14px}
 .group h2{margin:0 0 10px;font-size:15px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.group h2 .pdist{font-size:11px;color:var(--mut);font-weight:400;margin-left:8px;word-break:break-all}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.env .site{padding:2px 0}
+.env .site+.site{border-top:1px solid #16223a;margin-top:4px;padding-top:5px}
 .env{border:1px solid #334155;border-radius:8px;padding:10px 12px;background:#0b1220;min-width:0;overflow:hidden}
 .env .head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
 .env .head b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
@@ -66,31 +69,52 @@ function acctTable(it){
 }
 const ENV_ORDER=[['local','本地'],['dev','公司开发'],['test','公司测试'],['uat','客户测试'],['prod','生产']];
 const ENV_LABEL=Object.fromEntries(ENV_ORDER);
-function envCard(it){
- const cls=LIGHT[it.nginx_status]||'missing';
- const health=it.health==='up'?'<span style="color:var(--ok)">服务中</span>':it.health==='down'?'<span style="color:var(--bad)">不通</span>':'<span style="color:var(--warn)">'+esc(it.health)+'</span>';
- const be=it.backend==='open'?'<span style="color:var(--ok)">通</span>':'<span style="color:var(--bad)">不通</span>';
- return `<div class="env"><div class="head"><b title="${esc(it.display_name||it.project)} · ${esc(it.env)}">${esc(ENV_LABEL[it.env]||('环境 '+it.env))}</b><span title="环境 ${esc(it.env)} · ${esc(it.nginx_conf)}"><i class="dot ${cls}"></i>${LABEL[it.nginx_status]||it.nginx_status}</span></div>
- <div><a class="url" title="${esc(it.frontend_url)}" href="${esc(it.frontend_url)}" target="_blank">:${esc(it.port)} ${esc(it.frontend_url)}</a> ${health}</div>
- <div class="kv" title="网关 ${esc(it.backend_gateway)}">网关 <b>${esc(it.backend_gateway)}</b> ${be}</div>
- <div class="kv" title="dist ${esc(it.dist_root)}">dist <b>${esc(it.dist_root||'-')}</b></div>
- <div class="built">端口 ${esc(it.port)} · 构建 ${esc((it.built_at||'-').slice(0,16))}</div>
-  ${acctTable(it)}
+function envCard(items,label){
+ // 同槽位可能含多条登记（如 local + local-8098）：逐条渲染 URL/网关/健康，账号按角色合并
+ const first=items[0];
+ const worst=['mismatch','missing','empty','ok'].find(s=>items.some(it=>(LIGHT[it.nginx_status]||'missing')===s))||'missing';
+ const cls=worst;
+ const sites=items.map(it=>{
+  const health=it.health==='up'?'<span style="color:var(--ok)">服务中</span>':it.health==='down'?'<span style="color:var(--bad)">不通</span>':'<span style="color:var(--warn)">'+esc(it.health)+'</span>';
+  const be=it.backend==='open'?'<span style="color:var(--ok)">通</span>':'<span style="color:var(--bad)">不通</span>';
+  const extra=items.length>1?` <span class="kv" style="display:inline">[${esc(it.env)}]</span>`:'';
+  return `<div class="site"><a class="url" title="${esc(it.frontend_url)}" href="${esc(it.frontend_url)}" target="_blank">${esc(it.frontend_url)}</a> ${health}${extra}
+  <div class="kv" title="网关 ${esc(it.backend_gateway)}">网关 <b>${esc(it.backend_gateway)}</b> ${be}</div></div>`;
+ }).join('');
+ const built=items.map(it=>it.built_at||'').filter(Boolean).sort().pop()||'-';
+ const acctSeen=new Set(), accts=[];
+ items.forEach(it=>(it.accounts||[]).forEach(a=>{if(!acctSeen.has(a.role)){acctSeen.add(a.role);accts.push(a);}}));
+ const merged=Object.assign({},first,{accounts:accts});
+ return `<div class="env"><div class="head"><b title="${esc(label)} · ${esc(items.map(it=>it.env).join(','))}">${esc(label)}</b><span title="环境 ${esc(items.map(it=>it.env).join(','))} · ${esc(first.nginx_conf)}"><i class="dot ${cls}"></i>${LABEL[cls]||cls}</span></div>
+ ${sites}
+ <div class="built">构建 ${esc(built.slice(0,16))}</div>
+  ${acctTable(merged)}
   </div>`;}
 function placeholder(label){
  return `<div class="env ph"><div class="head"><b>${esc(label)}</b><span>未部署</span></div><div class="kv na">该环境尚未登记到注册表</div></div>`;
+}
+function sortNames(by){
+ // 按项目最新部署时间倒序；built_at 由后端按 dist mtime 生成，空值排末位，同时间回退名称
+ return Object.keys(by).sort(function(a,b){
+  const ta=by[a].reduce(function(m,it){return (it.built_at||'')>m?(it.built_at||''):m;},'');
+  const tb=by[b].reduce(function(m,it){return (it.built_at||'')>m?(it.built_at||''):m;},'');
+  if(ta&&tb&&ta!==tb)return ta<tb?1:-1;
+  if(ta&&!tb)return -1;
+  if(!ta&&tb)return 1;
+  return a.localeCompare(b);
+ });
 }
 function render(st){
  document.getElementById('meta').textContent='快照 '+st.generated_at.slice(11,19)+' · '+st.items.length+' 站点 · 五环境视图';
  const by={};
  st.items.forEach(it=>{const p=it.display_name||it.project_key||it.project;(by[p]=by[p]||[]).push(it)});
  let html='';
- for(const p of Object.keys(by).sort()){
+ for(const p of sortNames(by)){
    let cards='';
-   ENV_ORDER.forEach(function(pair){const env=pair[0],label=pair[1];const hit=by[p].filter(function(it){return it.env===env;});cards+=hit.length?hit.map(envCard).join(''):placeholder(label);});
-   const extra=by[p].filter(function(it){return !ENV_ORDER.some(function(pair){return pair[0]===it.env;});});
-   if(extra.length) cards+=extra.map(envCard).join('');
-   html+=`<section class="group"><h2>${esc(p)}</h2><div class="grid">${cards}</div></section>`;
+   ENV_ORDER.forEach(function(pair){const env=pair[0],label=pair[1];const hit=by[p].filter(function(it){return it.env===env||it.env.indexOf(env+'-')===0;});cards+=hit.length?envCard(hit,label):placeholder(label);});
+   const rest=by[p].filter(function(it){return !ENV_ORDER.some(function(pair){return pair[0]===it.env||it.env.indexOf(pair[0]+'-')===0;});});
+   if(rest.length) cards+=envCard(rest,'其他');
+   const pdist=(by[p].find(function(it){return it.dist_root;})||{}).dist_root||'-'; html+=`<section class="group"><h2>${esc(p)}<span class="pdist" title="dist ${esc(pdist)}">dist ${esc(pdist)}</span></h2><div class="grid">${cards}</div></section>`;
  }
  html+=`<section class="group"><h3>最近部署事件</h3><table><tr><th>时间</th><th>项目</th><th>环境</th><th>动作</th><th>结果</th><th>备注</th></tr>`+
  (st.events.length?st.events.map(e=>`<tr><td>${esc(e.ts)}</td><td>${esc(e.project)}</td><td>${esc(e.env)}</td><td>${esc(e.action)}</td><td>${esc(e.result)}</td><td>${esc(e.detail)}</td></tr>`).join(''):'<tr><td colspan="6">暂无</td></tr>')+`</table></section>`;
