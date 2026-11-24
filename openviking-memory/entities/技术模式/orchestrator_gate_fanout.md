@@ -5,6 +5,7 @@ DSH Web 的 orchestrator-gate 插件，用于拦截会话内串行扇出（连�
 - RULES.blockSerialFanout 恒为 true（defineProperty 锁定）
 - normalizeConfig 增加 fanoutStreakThreshold：整数 ≥3 合法、默认 5、非法一律回退
 - 纯函数 classifyFanout(tool, streak, threshold)：达阈值返回改道文案（spawn_teammate / workflow / orchestrate 三条出路）
+- 2026-11-24 起 AGENTS.md 并行扇出首选 orchestrate {op:"full"}，spawn_teammate/workflow 预设禁用（仅 full-tools 可用、默认不选），详见 agents_md_fanout_policy
 
 ## 状态机与计数
 - apply 内扇出状态机：既有规则先判被拒不改状态 → skipFanout 豁免 → orchestrate 直过清零两槽 → read/grep 分槽独立计数、第 5 次拒绝并清零本槽；非 fanout 工具清零两槽
@@ -25,8 +26,8 @@ DSH Web 的 orchestrator-gate 插件，用于拦截会话内串行扇出（连�
 {
   "category": "技术模式",
   "name": "orchestrator_gate_fanout",
-  "source_extraction_id": "c6e84dc317c54a77aad2cd1443b17280",
-  "version": 1,
+  "source_extraction_id": "f4acdfa9d69a47c1b8df73059f877ab7",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

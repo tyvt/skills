@@ -7,13 +7,15 @@
 - 2026-11-11 新建时因 http 级 gzip 重复报错，已将 gzip 移入 server{} 块，nginx -t 通过并验证 HTTP 200。
 ## Relations
 - 与「门户」站点（8092）共用 nginx，二者独立。
+- 2026-11-24 确认 8091 门户H5 的 manifest name 为「苏住房防台防汛」；登录后从「应用列表」点防汛卡片，由后端下发 launch URL 跳转防汛C端；门户登录需手机号+短信码，无法自主进入。
+- 门户将防汛作为子应用 `__UNI__FLOOD_C`（async 异步加载）挂在 8091 自源下；2026-11-24 核对其内嵌防汛为 11-18 旧构建（js hash `CxVsCj6a`、index 481 字节），与当前 dist（index 1033 字节）不同。
 
 <!-- MEMORY_FIELDS
 {
   "category": "nginx_site",
   "name": "menhu_h5_site",
-  "source_extraction_id": "eb1361cacb384c28997e79b2364de32f",
-  "version": 1,
+  "source_extraction_id": "a5bb84377f824810939d97ca9ef65808",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

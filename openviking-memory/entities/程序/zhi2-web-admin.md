@@ -11,18 +11,18 @@
 - 开发分支 develop/v2.6.2-portal，子模块与父仓成对提交推送（先推子模块再父仓 gitlink）。
 - 不纳入提交：package.json、public/version.json、report.html、父仓 .dsh/。
 - 编辑页 getDetail 后 fillProjectInfo() 补齐 projectAddr/regionName 等；后端 DTO 要求各字段 @NotBlank；同步数据可能缺失 projectAddr 需异步补。
+- 按钮权限链路：公共 table.js 的 addButton（attrs.permission=[this.perms.add]）→ permsMixins 按 moduleName:businessName:add 拼权限码 → zs-button 用 v-if=checkPermission → permission.js 与 store.getters.permissions 比对显隐。
 
 ## Deployment
 - 本地 nginx 127.0.0.1:8105 托管 dist 自测；「门户.conf」端口 8092 root 指向 dist 验证。
 - 2026-11-09 字体修复：worktree 8c5bfa8e2 → 合并 10bfe920a → 父仓 gitlink 99058ef。
 
-
 <!-- MEMORY_FIELDS
 {
   "category": "程序",
   "name": "zhi2-web-admin",
-  "source_extraction_id": "e713b433f93d40d499739887234a2cc4",
-  "version": 12,
+  "source_extraction_id": "e0c486589cb34a44bec67637b523409d",
+  "version": 13,
   "memory_type": "entities"
 }
 -->
