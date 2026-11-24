@@ -12,16 +12,26 @@ header .meta{color:var(--mut);font-size:12px}
 main{padding:16px 20px;display:flex;flex-direction:column;gap:16px}
 .group{background:var(--card);border-radius:10px;padding:12px 14px}
 .group h2{margin:0 0 10px;font-size:15px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-.env{border:1px solid #334155;border-radius:8px;padding:10px 12px;background:#0b1220}
-.env .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.env .url{color:#7dd3fc;text-decoration:none;word-break:break-all}
-.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.env{border:1px solid #334155;border-radius:8px;padding:10px 12px;background:#0b1220;min-width:0;overflow:hidden}
+.env .head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.env .head b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.env .url,.env .kv{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.env .url{color:#7dd3fc;text-decoration:none}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;flex:none}
 .ok{background:var(--ok)}.empty{background:var(--warn)}.mismatch,.bad{background:var(--bad)}.missing{background:var(--down)}
 .kv{color:var(--mut);font-size:12px;margin:2px 0}
 .kv b{color:var(--tx);font-weight:600}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:4px 8px;border-bottom:1px solid #1e293b;text-align:left}
+.built{color:var(--mut);font-size:11px;margin-top:4px}
+.accts{margin-top:6px;border-top:1px solid #1e293b;padding-top:5px}
+.accts .t{font-size:11px;color:var(--mut);margin-bottom:3px}
+.accts table{font-size:11px}
+.accts td,.accts th{padding:2px 4px;border-bottom:1px solid #16223a}
+.accts .rev{background:#334155;color:#e2e8f0;border:0;border-radius:4px;padding:1px 6px;cursor:pointer;font-size:11px}
+.accts .na{color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+th,td{padding:4px 8px;border-bottom:1px solid #1e293b;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+th:nth-child(1){width:28%}th:nth-child(2){width:14%}th:nth-child(3){width:14%}th:nth-child(4){width:14%}th:nth-child(5){width:14%}th:nth-child(6){width:16%}
 th{color:var(--mut);font-weight:500}
 .empty-row{color:var(--warn)}
 h3{font-size:13px;margin:0 0 6px;color:var(--mut)}
@@ -35,21 +45,39 @@ h3{font-size:13px;margin:0 0 6px;color:var(--mut)}
 const LIGHT={ok:'ok',empty:'empty',mismatch:'mismatch',missing:'missing'};
 const LABEL={ok:'nginx 命中',empty:'空 conf',mismatch:'conf 不匹配',missing:'缺 conf'};
 function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+async function reveal(btn){
+ const k=btn.dataset.pk,e=btn.dataset.env,r=btn.dataset.role;
+ if(btn.dataset.shown==='1'){btn.textContent='显示';btn.dataset.shown='0';btn.nextElementSibling.textContent='****';return;}
+ try{const resp=await fetch('/api/account/reveal',{method:'POST',headers:{'Content-Type':'application/json','X-Auth-Token':window.__DASH_TOKEN__||''},body:JSON.stringify({project_key:k,env:e,role:r})});const d=await resp.json();
+  if(d.ok){btn.nextElementSibling.textContent=d.password;btn.textContent='隐藏';btn.dataset.shown='1';}
+  else{btn.nextElementSibling.textContent=d.reason==='need_reload'?'需重载':esc(d.error||'失败');}
+ }catch(err){btn.nextElementSibling.textContent='失败';}
+}
+function acctTable(it){
+ const list=it.accounts||[];
+ if(!list.length)return '<div class="accts"><div class="t">账号：未登记</div></div>';
+ const rows=list.map(a=>{
+  const mask=a.has_password?'****':'<span class="na">未登记</span>';
+  const btn=a.has_password?`<button class="rev" data-pk="${esc(it.project_key||it.project)}" data-env="${esc(it.env)}" data-role="${esc(a.role)}" data-shown="0" onclick="reveal(this)">显示</button>`:'';
+  return `<tr><td>${esc(a.role_label||a.role)}</td><td>${esc(a.username||'-')}</td><td>${mask} ${btn}</td></tr>`;
+ }).join('');
+ return `<div class="accts"><div class="t">账号（${list.length} 角色）</div><table><tr><th>角色</th><th>用户名</th><th>密码</th></tr>${rows}</table></div>`;
+}
 function envCard(it){
  const cls=LIGHT[it.nginx_status]||'missing';
  const health=it.health==='up'?'<span style="color:var(--ok)">服务中</span>':it.health==='down'?'<span style="color:var(--bad)">不通</span>':'<span style="color:var(--warn)">'+esc(it.health)+'</span>';
  const be=it.backend==='open'?'<span style="color:var(--ok)">通</span>':'<span style="color:var(--bad)">不通</span>';
- return `<div class="env"><div class="head"><b>${esc(it.env)}</b>
- <span title="${esc(it.nginx_conf)}"><i class="dot ${cls}"></i>${LABEL[it.nginx_status]||it.nginx_status}</span></div>
- <div><a class="url" href="${esc(it.frontend_url)}" target="_blank">${esc(it.frontend_url)}</a> ${health}</div>
- <div class="kv">网关 <b>${esc(it.backend_gateway)}</b> ${be}</div>
- <div class="kv">dist <b>${esc(it.dist_root)}</b></div>
- <div class="kv">conf <b>${esc(it.nginx_conf)}</b>${it.listen_ports?(' listen='+esc(it.listen_ports.join(','))):''}</div>
- </div>`;}
+ return `<div class="env"><div class="head"><b title="${esc(it.display_name||it.project)}">${esc(it.display_name||it.project)}</b><span title="环境 ${esc(it.env)} · ${esc(it.nginx_conf)}"><i class="dot ${cls}"></i>${LABEL[it.nginx_status]||it.nginx_status}</span></div>
+ <div><a class="url" title="${esc(it.frontend_url)}" href="${esc(it.frontend_url)}" target="_blank">${esc(it.frontend_url)}</a> ${health}</div>
+ <div class="kv" title="网关 ${esc(it.backend_gateway)}">网关 <b>${esc(it.backend_gateway)}</b> ${be}</div>
+ <div class="kv" title="dist ${esc(it.dist_root)}">dist <b>${esc(it.dist_root||'-')}</b></div>
+ <div class="built">环境 ${esc(it.env)} · 构建 ${esc((it.built_at||'-').slice(0,16))}</div>
+  ${acctTable(it)}
+  </div>`;}
 function render(st){
- document.getElementById('meta').textContent='生成于 '+st.generated_at+' · '+st.items.length+' 个站点 · '+st.orphans.length+' 个未收录 conf';
+ document.getElementById('meta').textContent='快照 '+st.generated_at.slice(11,19)+' · '+st.items.length+' 站点 · '+st.orphans.length+' 未收录';
  const by={};
- st.items.forEach(it=>{(by[it.project]=by[it.project]||[]).push(it)});
+ st.items.forEach(it=>{const p=it.display_name||it.project_key||it.project;(by[p]=by[p]||[]).push(it)});
  let html='';
  for(const p of Object.keys(by).sort()){
   html+=`<section class="group"><h2>${esc(p)}</h2><div class="grid">${by[p].map(envCard).join('')}</div></section>`;
@@ -66,7 +94,7 @@ async function load(){
  try{const r=await fetch('/api/state');render(await r.json());}
  catch(e){document.getElementById('main').textContent='加载失败: '+e;}
 }
-load();setInterval(load,30000);
+load();setInterval(load,20000);
 </script>
 </body>
 </html>

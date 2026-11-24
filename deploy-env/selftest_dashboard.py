@@ -6,9 +6,22 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from dashboard.api import probe_http, scan_conf, pick_port
+from dashboard.api import (display_and_built, probe_http, scan_conf, pick_port,
+                           build_state, _SECRET_CACHE, _SECRET_LOCK, SECRET_REF_RE)
 
 failed = 0
+n = display_and_built({'project': 'p', 'dist_root': 'D:/repo/proj/dist/', 'nginx_conf': 'p.conf'})
+ok = n[0] == 'proj'
+print('%s display-name-workspace' % ('PASS' if ok else 'FAIL'))
+failed += not ok
+n = display_and_built({'project': 'p', 'dist_root': 'D:/repo/数据湖/分析产出/持仓面板', 'nginx_conf': 'p.conf'})
+ok = n[0] == '持仓面板'
+print('%s display-name-custom-dist' % ('PASS' if ok else 'FAIL'))
+failed += not ok
+n = display_and_built({'project': 'p', 'dist_root': '', 'nginx_conf': 'legacy.conf'})
+ok = n[0] == 'legacy'
+print('%s display-name-fallback' % ('PASS' if ok else 'FAIL'))
+failed += not ok
 with tempfile.TemporaryDirectory() as d:
     empty = os.path.join(d, 'empty.conf')
     open(empty, 'w').close()
@@ -42,6 +55,46 @@ try:
 finally:
     for s in socks:
         s.close()
+
+# --- 治理后 e2e：state 无明文 / 干净显示名 / 账号打码 / secret 缓存 reveal ---
+try:
+    st = build_state()
+    items = st.get('items', [])
+    ok = all('password' not in it for it in items) and all(
+        a.get('password_masked') in ('', '****') and 'password' not in a
+        for it in items for a in it.get('accounts', []))
+    print('%s state-no-plaintext' % ('PASS' if ok else 'FAIL'))
+    failed += not ok
+
+    ok = not any('bug' in (it.get('display_name') or '').lower() for it in items)
+    print('%s clean-display-name' % ('PASS' if ok else 'FAIL'))
+    failed += not ok
+
+    portal = next((it for it in items if it.get('project_key') == 'portal' and it.get('env') == 'local'), None)
+    ok = portal is not None and any(a['role'] == 'admin' and a['has_password'] for a in portal['accounts'])
+    print('%s accounts-rendered' % ('PASS' if ok else 'FAIL'))
+    failed += not ok
+
+    p8098 = next((it for it in items if it.get('port') == 8098), None)
+    ok = p8098 is not None and p8098.get('project_key') == 'fdc-v3'
+    print('%s port-8098-remapped' % ('PASS' if ok else 'FAIL'))
+    failed += not ok
+except Exception as exc:
+    print('FAIL e2e-state (%s)' % exc)
+    failed += 1
+
+ok = bool(SECRET_REF_RE.match('{{ov_privacy:deploy_env/portal/local/admin/password}}'))
+print('%s secret-ref-parse' % ('PASS' if ok else 'FAIL'))
+failed += not ok
+with _SECRET_LOCK:
+    before = dict(_SECRET_CACHE)
+    _SECRET_CACHE[('portal', 'local', 'admin')] = 'unit-secret'
+ok = _SECRET_CACHE.get(('portal', 'local', 'admin')) == 'unit-secret'
+print('%s secret-inject-reveal' % ('PASS' if ok else 'FAIL'))
+failed += not ok
+with _SECRET_LOCK:
+    _SECRET_CACHE.clear()
+    _SECRET_CACHE.update(before)
 
 print('DASHBOARD SELFTEST %s' % ('PASS' if not failed else 'FAIL'))
 sys.exit(1 if failed else 0)

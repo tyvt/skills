@@ -8,12 +8,16 @@ description: 多环境 dist 端口切换与凭据查询。给定 project+env，�
 一份 `dist` 按访问端口切接口目标（同源、前端零环境感知）。项目 × 环境二维，每项目独占端口段；切换环境＝换端口，零代码改动、零 nginx 重启。
 
 ## 目录与数据
-- `registry.sqlite`：`env_registry` 表，字段 `project/env/port/port_base/dist_root/backend_gateway/frontend_url/login_user/login_selector/secret_ref/status/updated_at`；`UNIQUE(project,env)` + port 唯一索引。
+- `registry.sqlite`：
+  - `projects` 表：`key/display_name/aliases/status` —— 项目身份唯一来源，`display_name` 为治理后的干净显示名（看板分组/标题只读它，不再从 dist 目录名推导）。
+  - `env_registry` 表：`project_key/display_name/project/env/port/port_base/dist_root/backend_gateway/frontend_url/login_user/login_selector/secret_ref/status/updated_at`；`UNIQUE(project_key,env)` + port 唯一索引。`project_key→projects.key`。
+  - `env_accounts` 表：`project_key/env/role/role_label/username/secret_ref/login_selector/sort_order`；`UNIQUE(project_key,env,role)`，一环境多角色。
+  - **去重归并**：`fdc-v3`（display=苏州市房地产监测V3）含 6 env，其中 8098 原 `苏州市房地产监测V3/local` 改挂 `fdc-v3/local-8098` 保留站点；`榆林G bug6220`→`榆林G`（key=`yulin-g`）。
 - 端口规则：`port = port_base + env_index`，`local=0/dev=1/test=2/uat=3/prod=4`。
   - portal: base=8090 → 8090/8091/8092/8093/**8094**
   - fdc-v3: base=8100 → 8100/8101/8102/8103/**8104**
 - `env-sites/*.conf`：`gen_nginx_sites.ps1` 由注册表生成的 nginx 片段（每 project×env 一个 `server{}`），顶层 include 到各项目 `deploy/nginx.conf`。
-- **密码绝不入库**：`secret_ref` 只存占位符 `{{ov_privacy:deploy_env/<project>/<env>/password}}`；`login_user`/`login_selector` 本轮为空占位、不补录。
+- **密码绝不入库**：`secret_ref` 只存占位符；单环境账号 `{{ov_privacy:deploy_env/<project>/<env>/password}}`，多角色账号 `{{ov_privacy:deploy_env/<project_key>/<env>/<role>/password}}`。真实密码由 agent 经 ov_privacy 解析后经 `POST /api/secrets/inject` 注入看板进程内存（本地+token+白名单鉴权），**不落盘**；看板默认 `****`，点"显示"经 `POST /api/account/reveal` 取明文，未注入返回 `need_reload`。迁移脚本 `migrate_projects.py`（幂等+备份+审计）。
 
 ## 查询流程（project + env → 连接信息）
 调用查询后端，返回 UTF-8 JSON（含 port/frontend_url/backend_gateway/login_user/secret_ref/secret_ref_path/password_resolved/password）：
