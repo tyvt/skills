@@ -47,8 +47,7 @@ param(
         'mcp-gateway',
         'orchestrator-gate',
         'token-guard',
-        'token-models',
-        'dcwhc'
+        'token-models'
     ),
 
     [switch]$DryRun
@@ -67,9 +66,7 @@ if (-not $NodeModules) {
 }
 
 # 插件目录名 -> node_modules 里的包名（默认同名，个别不一致的在此映射）
-$PackageNameMap = @{
-    'dcwhc' = 'dsh-channel-wechat-companion'
-}
+$PackageNameMap = @{}
 
 function Resolve-PackageName([string]$Plugin) {
     if ($PackageNameMap.ContainsKey($Plugin)) { return $PackageNameMap[$Plugin] }

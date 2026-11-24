@@ -34,7 +34,7 @@
 
 ## 其它目录
 
-- `dsh/` — DSH harness 的 cordis 插件集合（agent-guard、cost-meter、dcwhc、mcp-gateway、orchestrator、orchestrator-gate、plan-gate、token-guard、token-models 等）。详见各插件 `README.md` / `DESIGN.md`。
+- `dsh/` — DSH harness 的 cordis 插件集合（agent-guard、cost-meter、mcp-gateway、orchestrator、orchestrator-gate、plan-gate、token-guard、token-models 等）。详见各插件 `README.md` / `DESIGN.md`。
 - `controller-bench/` — controller 评测基准（非 skill，含运行/打分脚本）。
 - `cursor-model-routing/` — Cursor 模型分流测试集与实测矩阵。
 - `scripts/` — OpenViking 记忆快照同步等仓库级脚本。
