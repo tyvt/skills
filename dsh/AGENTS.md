@@ -19,9 +19,9 @@
 - **脱敏视图不可作 edit 依据（2026-11-14 复盘）**：工具对含 token 赋值或 `===` 比较等敏感行会脱敏显示（显示为掩码），此时不得据脱敏视图猜 `old_string`；须先 `grep -n` 取行号 → `read offset/limit` 局部读真实内容再 `edit`。反例：context-store.mjs 的 token 赋值行被掩码，据掩码猜 `old_string` 导致 FS_EDIT_NOT_FOUND，随后整篇 write 靠记忆补语义引发回归。
 - **拒绝/失败即改形态（P0-1，2026-11-14）**：同一工具/同一命令/同一门禁的**同形态**调用，被拒或失败后**最多再试 0 次**——必须改变形态（换工具、换参数、缩范围、换命令）或停下查事实，禁止原样重发。本条针对门禁拒绝与工具失败重试；与「连续盲搜 ≤2 次」（探索特例）并行不悖。
 
-## 并行扇出（强制）
+## 并行扇出（强制；2026-11-24 依 1348 会话实测校准）
 
-- **同类批量对象 ≥3 时，禁止主模型串行逐个处理**：必须扇出到 spawn_teammate（多对象并行首选）、workflow（大规模编排）或 orchestrate `{op:"full"}`（编排器内部并行）。串行逐个对象处理会成倍拉长耗时并烧穿主模型上下文。
+- **同类批量对象 ≥3 时，禁止主模型串行逐个处理**：必须并行化——**首选 orchestrate `{op:"full"}`（编排器内部并行，实测均 8.9k 等效/步、缓存命中率 0.957，三组最优）**。`spawn_teammate`/`workflow` 已在全部预设禁用（工具目录里没有就是没有，不要尝试调用；仅 full-tools 预设会话可用，且实测建团会话均 16.0k 等效/步、命中率 0.925，性价比为负，默认不选）。串行逐个对象处理会成倍拉长耗时并烧穿主模型上下文。
 - 辅助判据（引导，非硬规则）：预估步骤 >300 或等效 token >5M 的任务，应优先编排器拆解。
 - 默认连续 5 次 read 整读 / 5 次 grep 会被拒绝（阈值以插件配置 `fanoutStreakThreshold` 为准）；带 offset/limit 的分页读不受限；收到拒绝必须改道不得原样重试。
 - **被拒不 abort（P2-1，2026-11-14）**：门禁拒绝只是**一个 step** 的结果，不是 turn 的终止条件——收到拒绝必须窄化后继续本 turn，禁止直接结束整轮。
@@ -29,8 +29,8 @@
 
 ## 探索阶段按动作类型选模型（异构多模型，2026-11-14）
 
-- **默认探索仍首选 `dsh-explore` 只读子代理；仅当需并行扇出或需异构模型时，升级到 `workflow` 的 `agent(prompt,{provider,model})`。** `spawn_teammate` **不支持 per-spawn 模型**（成员继承 Lead，换不掉），需要异构模型时改用 `workflow agent()`。
-- **`workflow agent()` 的 `provider`/`model` 覆盖不受 `allowedModels` 白名单约束**，须自行确保该 id **已在网关注册**；`provider` 必须**显式给出**（如 `{provider:"magpie", model:...}`）。**未注册 / 返回 null / 超时即回退主控模型执行并记录原因，不重试同形态。**
+- **默认探索仍首选 `dsh-explore` 只读子代理。** `spawn_teammate`/`workflow` 已在全部预设禁用（见并行扇出）；仅 full-tools 预设会话在确需异构模型时可升级到 `workflow` 的 `agent(prompt,{provider,model})`（`spawn_teammate` 不支持 per-spawn 模型，成员继承 Lead）。standard 会话需要异构模型时改走 orchestrate 子任务或回退主控模型执行，不要尝试调用 workflow。
+- **（仅 full-tools）`workflow agent()` 的 `provider`/`model` 覆盖不受 `allowedModels` 白名单约束**，须自行确保该 id **已在网关注册**；`provider` 必须**显式给出**（如 `{provider:"magpie", model:...}`）。**未注册 / 返回 null / 超时即回退主控模型执行并记录原因，不重试同形态。**
 - **按级别选型，不写死版本号**（具体 id 以 roster / settings.yaml 已注册项为准）：**探索/检索=flash 级**、**代码生成=composer 级**、**规划拆解=luna 级**。**不给主控换静态强模型**（避免高频读盘拉贵模型）。
 
 ## 计划审批（强制，所有会话生效）
