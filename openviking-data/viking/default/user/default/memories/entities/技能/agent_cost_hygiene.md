@@ -16,10 +16,9 @@ DSH 技能仓库中的成本卫生技能，定义跨会话通用的 AI 降本纪
 - 成本按模式归因：reasoning_bare / wide_grep / repeat_read / vision_repeat / tool_retry；警告后不许继续空转（seq129→146→159）。
 
 ## 维护与定位
-- 源码位于 D:/repository/skills/agent-cost-hygiene/SKILL.md（运行时 C:\Users\Administrator\.dsh\skills 指向）。
+- 源码已于 2026-11-24 由 commit 8872b3b4 删除（git log --diff-filter=D 核实；磁盘/git 均无，且未链接 ~/.dsh/skills）；功能由 token-frugal / tool-call-hygiene / dsh-token-policy / token-guard 覆盖。
 - 与 agent-guard、dsh-cost-meter、token-optimizer 协同；DBX UNION ALL 细则在 zentao-analyzer/references/dbx.md，不重复定义。
 - 2026-11-11 由 session.v4.json（bug 6452）成本审计报告补全上述规则（提交 d535b3a2）；同日 DSH 调用日志分析建议落地，与 dsh-cost-meter perStepLookup 同源优化。
-
 
 <!-- MEMORY_FIELDS
 {

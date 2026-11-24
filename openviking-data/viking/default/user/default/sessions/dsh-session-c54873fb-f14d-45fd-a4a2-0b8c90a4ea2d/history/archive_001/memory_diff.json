@@ -1,0 +1,33 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-c54873fb-f14d-45fd-a4a2-0b8c90a4ea2d/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-24T09:10:09.157384+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited/memories/events/2026/11/24/作废按钮显隐条件排查确认.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-24，用户询问资金拨付详情页为什么有的单据显示「作废」按钮、有的不显示。助手排查后确认按钮显隐由 `zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue:285-292` 的内联 v-if 决定，需同时满足查看态（`isFormDisabled`）、`tradeStateCode != '0000'`、`tradeStateCode != null` 以及账号具备 `benefit:pubAllotNotice:cancel` 权限；并说明在线支付已完成、无交易流水或缺少权限三种情况会导致按钮不显示。\n# 2026-11-24 (Tuesday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 这个页面怎么有的单据有作废按钮，有的没有\n...\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 查清楚了。作废按钮的显隐由详情页一个内联 `v-if` 决定，代码在 `zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue:285-292`：\n\n```html\n<zs-button\n  v-if=\"isFormDisabled && form.tradeStateCode != '0000' && form.tradeStateCode != null\"\n  :v-haspermi=\"['benefit:pubAllotNotice:cancel']\"\n  ... @click=\"toVoid\">作废</zs-button>\n```\n\n**要同时满足 4 个条件才显示：**\n\n| 条件 | 含义 | 来源 |\n|---|---|---|\n| `isFormDisabled` | 页面处于**查看态**（`mode == 'view'`） | mixins/form.js:23 |\n| `tradeStateCode != '0000'` | 交易状态码不是\"已完成/成功\" | 详情接口 `response.data` |\n| `tradeStateCode != null` | 交易状态码不为空 | 同上 |\n| `v-haspermi` | 当前账号有 `benefit:pubAllotNotice:cancel` 权限 | 权限体系 |\n\n所以**有的单据没有作废按钮，通常是这三种情况之一**：走在线支付且交易状态已是 `0000`（缴款完成）、单据没有交易流水导致 `tradeStateCode` 为空（如线下支付/未发起在线交易），或该账号没有 `cancel` 权限。你截图这张就是没有作废按钮的那类。\n\n**另外发现一个容易踩的坑**：同文件 `:678-681` 有个 `showVoidButton()` 方法，注释写的是按**通知书状态**判断（`noticeState !..."
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited/memories/events/2026/11/24/作废按钮死代码发现.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-24 排查中发现，`zhi2-web-admin` 的 `pubAllotNotice/detail.vue:678-681` 存在按通知书状态判断的 `showVoidButton()` 方法（`noticeState !== 'X'` 非全部缴款、`!== '4'` 非已作废），但该方法未被任何地方引用、属死代码；代码中描述的业务规则与实际生效的交易状态码规则不一致，可能是按钮显隐表现异常困惑的根源。\n# 2026-11-24 (Tuesday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 这个页面怎么有的单据有作废按钮，有的没有\n...\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 查清楚了。作废按钮的显隐由详情页一个内联 `v-if` 决定，代码在 `zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue:285-292`：\n\n```html\n<zs-button\n  v-if=\"isFormDisabled && form.tradeStateCode != '0000' && form.tradeStateCode != null\"\n  :v-haspermi=\"['benefit:pubAllotNotice:cancel']\"\n  ... @click=\"toVoid\">作废</zs-button>\n```\n\n**要同时满足 4 个条件才显示：**\n\n| 条件 | 含义 | 来源 |\n|---|---|---|\n| `isFormDisabled` | 页面处于**查看态**（`mode == 'view'`） | mixins/form.js:23 |\n| `tradeStateCode != '0000'` | 交易状态码不是\"已完成/成功\" | 详情接口 `response.data` |\n| `tradeStateCode != null` | 交易状态码不为空 | 同上 |\n| `v-haspermi` | 当前账号有 `benefit:pubAllotNotice:cancel` 权限 | 权限体系 |\n\n所以**有的单据没有作废按钮，通常是这三种情况之一**：走在线支付且交易状态已是 `0000`（缴款完成）、单据没有交易流水导致 `tradeStateCode` 为空（如线下支付/未发起在线交易），或该账号没有 `cancel` 权限。你截图这张就是没有作废按钮的那类。\n\n**另外发现一个容易踩的坑**：同文件 `:678-681` 有个 `showVoidButton()` 方法，注释写的是按**通知书状态**判断（`noticeState !..."
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited/memories/entities/技术模式/pub_allot_notice_void_button.md",
+                "memory_type": "entities",
+                "after": "# 资金拨付详情作废按钮显隐条件\n资金拨付详情页的「作废」按钮由详情模板内联 v-if 与权限指令共同决定，同文件另有一个未被引用的 showVoidButton() 死代码。\n\n## 实际生效条件\n- 代码位置：`zhi2-web-admin/src/views/benefit/pubAllotNotice/detail.vue:285-292`\n- 内联条件：`isFormDisabled && form.tradeStateCode != '0000' && form.tradeStateCode != null`\n- `isFormDisabled` 来自 `mixins/form.js:23`，表示页面处于查看态（`mode == 'view'`）\n- `tradeStateCode` 来自详情接口 `response.data`，`'0000'` 表示交易已完成/缴款成功\n- 权限字符：`benefit:pubAllotNotice:cancel`（通过 `v-haspermi` 控制）\n- 点击按钮触发 `toVoid`\n\n## 按钮不显示的常见原因\n- 走在线支付且交易状态已为 `0000`（缴款完成），按钮被隐藏\n- 单据没有交易流水导致 `tradeStateCode` 为空（线下支付或未发起在线交易）\n- 当前账号缺少 `benefit:pubAllotNotice:cancel` 权限\n\n## 死代码与规则不一致\n- 同文件 `:678-681` 存在 `showVoidButton()`，按通知书状态判断（`noticeState !== 'X'` 非全部缴款、`!== '4'` 非已作废）\n- 该方法未被任何地方引用，属死代码，实际不生效\n- 代码描述的业务规则（通知书状态）与实际生效规则（交易状态码）是两套，可能是「该有却没有/该没有却有」困惑的根源\n- 如需统一口径，可启用 `showVoidButton()` 或改写内联判断依据"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

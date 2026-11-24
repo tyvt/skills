@@ -1,38 +1,30 @@
 # zhi2-web-admin
-zhi2-web-admin 是“苏住房G”前端项目，由苏住房前端 Lead 负责开发与视觉验收。
+苏住房G前端后台项目，采用 Vue 编写，包含电动车管理等业务模块。
 
-## 项目信息
-- 仓库根路径 D:/repository/苏住房G（Windows，D: 盘）；Navbar 组件 src/layout/components/Navbar.vue；视觉回归用例 e2e/home-v2/navbar-visual.spec.mjs。
-- 全图 E2E 视觉验收门槛为相似度 99.5%。
+## 项目结构
+- 列表页按业务分目录存放，如电动车管理 > 隐患处置列表页为 `src/views/electrocar/hazard/index.vue`。
+- 隐患处置详情页另设有反馈进度、处置完成等操作入口。
 
-## 任务与基线
-- 视觉任务 worktree：worktrees/task2468-navbar-visual，对应任务 2468（Navbar 视觉一致性）；2026-11-15 本机站点已恢复到基线提交 0e14875de，候选改动仅保留在 worktree 中。
-- 2026-11-15 两个 Navbar 视觉任务分支相对项目主线均为 0 ahead / 0 behind；先只暂存 Navbar 源码与对应资源。
-- 2026-11-15 子模块暂存 Navbar、映射/生成代码与 36 个图标及背景资源；`git diff --cached --check` 通过，生成脚本末尾多余空行已修正并通过 `node --check`，按先子模块后父仓顺序提交。
-- 2026-11-15 用户明确指示提交推送代码到主分支，遂先核对工作树、子模块与远端主分支再走提交流程；92.707% 仍不作为视觉验收通过。
+## 列表按钮机制
+- 列表操作列按钮由 mixin 的 `disableButton` 基于 `bizState` 控制禁用，可在 `buttons()` 中通过 `disabled` 覆写覆盖默认逻辑。
+- 接口返回的行字段包含 `canEdit`、`canDelete`、`canFeedback`、`canFinish`，用于判断按钮是否禁用。
 
-## 提交与构建
-- 2026-11-15 子模块提交 9ba4ccc0dcbae04ac8460854186587b2a1391f0b（`feat(navbar): restyle top navigation`），父仓提交 ba246959ba1477131c03d88af11b850ff9e6b976（`feat(navbar): update submodule and add visual E2E`），已推送主线 develop/v2.6.2-suzhufang。
-- 远端 SHA 已核对一致，本机主线检出已快进；未纳入其他未提交文件，也未部署。
-- 提交后生产构建通过，构建哈希与子模块提交一致。
+## 验证方式
+- 静态检查使用 `eslint src/views/<dir> --ext .vue,.js`。
+- 构建检查使用 `npm test`（test 模式的 Vite 构建）。
 
-## 验收情况
-- 2026-11-15 最佳候选为 Navbar 背景高度 105%，全图 E2E 相似度 92.707%，未达 99.5% 门槛。
-- 活动标签以 15px 临时试验样式出图为 92.712%，与保留源码版 92.707% 仅差约 0.005 个百分点，试验样式未保留。
-- 官方 E2E 中导航溢出、滚动箭头与空权限检查通过；排除图标区域的诊断分数 94.168% 不作为验收分数。
-- Navbar lint、E2E 脚本语法检查和构建均通过；临时诊断钩子已清除，预提交审查未发现调试钩子。
-- 默认 profile.png 仅改为与参考图一致的用户轮廓，占位图场景生效、真实头像仍显示。
-
-## 相关规范
-- 视觉候选调整中，真实 meta.icon 优先于标题 fallback 显示。
+## Environment and Access
+- Real-machine URL is `http://localhost:8101/#/safety/electrocar/hazard`; port 8100 serves a different app (无锡市惠山住建局维修基金管理系统), not 苏住房G.
+- Property account 601117997 (李翠萍) can log in on 8101, but its menu has no hazard/electrocar route, so direct access redirects back to index.
+- Admin account zsbase holds `*:*:*` permissions and can open the hazard route; its password is stored in `%TEMP%\e2e_pass.txt`.
 
 <!-- MEMORY_FIELDS
 {
   "category": "前端项目",
   "name": "zhi2-web-admin",
-  "source_extraction_id": "4aa6beebaa4b4fbbab23b04a93eba51d",
+  "source_extraction_id": "b264f29f13c442be959a7c52d1304e4d",
   "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited",
-  "version": 6,
+  "version": 2,
   "memory_type": "entities"
 }
 -->

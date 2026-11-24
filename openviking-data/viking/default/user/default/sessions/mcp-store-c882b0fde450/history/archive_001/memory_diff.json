@@ -1,0 +1,47 @@
+{
+    "archive_uri": "viking://user/default/sessions/mcp-store-c882b0fde450/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-24T02:51:43.919215+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/events/2026/11/24/验证轮询门禁降级为告警.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-24 用户裁决将 agent-guard 的前端验证轮询门禁（verify-loop）由 block 降级为 warn：保留 ledger 记录与提醒文案、不再拒绝工具调用，改动位于 ~/.dsh/agent-guard/cordis.patch.yml:115，重启 DSH Web 后生效。\n# 2026-11-24 (Tuesday) ChatLog:\n**user**: 用户裁决与偏好：① verify-loop 门禁于 2026-11-24 由 block 降级为 warn（保留 ledger 记录与提醒文案、不拒绝工具调用），已改 ~/.dsh/agent-guard/cordis.patch.yml:115，重启 DSH Web 后生效；② 用户明确表达：不希望任务没完成就停下来等用户输入「继续」，模型被门禁拦截时应改变形态继续本 turn（与 AGENTS.md 被拒不 abort 规则一致），禁止把「等继续」当作应对门禁的手段。"
+            },
+            {
+                "uri": "viking://user/default/memories/preferences/default/任务执行与中断处理.md",
+                "memory_type": "preferences",
+                "after": "- 不希望任务没完成就停下来等用户输入「继续」，应把当前 turn 做完。\n- 被门禁/守卫拦截时应改变形态继续本 turn（与 AGENTS.md「被拒不 abort」规则一致），而不是结束回合求用户确认。\n- 禁止把「等继续」当作应对门禁拦截的手段。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/dsh插件/agent_guard.md",
+                "memory_type": "entities",
+                "before": "# agent-guard\nDSH 本地插件（符号链接到 ~/.dsh/，零依赖），为 agent 的文件与命令调用加守卫规则，实现分在 lib/scope.js、lib/rules.js 与 lib/index.js。\n\n## 拦截规则\n- lib/scope.js（as of 2026-11-10）：仓库根、受保护容器、工作区根下的 grep/glob 直接拒绝，并做 git 仓库根探测\n- openviking search 参数别名 queries→query\n- P1-5 pwsh POSIX 预检、P1-6 glob 路径规范化、P1-7 重复整读拦截（lib/rules.js + lib/index.js）\n\n## 自修复与告警（as of 2026-11-11）\n- repairPwshAtBrace：pwsh 命令里未加引号的 @{} 自动补单引号，修复 git rev-parse @{u} 类错误\n- warnPwshBuffering：命令含 Out-String/Format-Table/ConvertTo-Json/ConvertTo-Csv 时返回纯告警，提示改用 2>&1 或 *> 流式重定向，不改命令本身\n\n## 关系\n- 由 github.com-tyvt-skills 维护；探索漂移三规则 enabled:true、mode:'warn'，只记账不阻断\n- 与 dsh-explore 探索外包 skill 配合；同为零依赖本地插件的还有 dsh-token-guard、dsh-cost-meter、dsh-orchestrator",
+                "after": "# agent-guard\nDSH 本地插件（符号链接到 ~/.dsh/，零依赖），运行时注入时机性提醒并对 agent 的文件与命令调用加守卫规则，实现分散在 lib/scope.js、lib/rules.js 与 lib/index.js。\n\n## 定位与维护\n- 作为「半硬约束」在运行时注入时机性提醒，弥补 AGENTS.md/skill 软约束被模型忽略的缺口，把规则下沉为框架强制而非靠模型自觉\n- 由 github.com-tyvt-skills 维护\n- 改动后必须重启 DSH WEB 才生效，否则旧实例沿用旧规则 (as of 2026-11-11)\n- 同次改动含 skill 文档 references/dbx.md，文档按需读取通常无需重启即可生效\n\n## 拦截规则与告警\n- lib/scope.js（as of 2026-11-10）：仓库根、受保护容器、工作区根下的 grep/glob 直接拒绝，并做 git 仓库根探测\n- openviking search 参数别名 queries→query；P1-5 pwsh POSIX 预检、P1-6 glob 路径规范化、P1-7 重复整读拦截（lib/rules.js + lib/index.js）\n- repairPwshAtBrace：pwsh 命令里未加引号的 @{} 自动补单引号，修复 git rev-parse @{u} 类错误\n- warnPwshBuffering：检测 `pwsh | Out-String` 类命令后返回 `pwsh-buffering` 告警，提示改用 2>&1 或 *> 流式重定向，不改命令本身\n- 探索漂移三规则 enabled:true、mode:'warn'，只记账不阻断\n\n## 前端验证轮询门禁（verify-loop）\n- 规则在 lib/rules.js:1017 decideVerifyLoop：同一会话内 agent-browser 调用 >12 或 Start-Sleep >5 即拒绝，文案为 `[verify-loop:BLOCKED] 本轮已调用 agent-browser N 次（阈值 12）`\n- 关键缺陷：计数器按 session id 累计、跨轮从不重置（lib/index.js:191-203 getSessionDrift），模型误判「按轮计数、下一轮重置」而主动结束回合等用户回复「继续」，但回复不解锁\n- ~/.dsh/reports/agent-guard-ledger.jsonl 中该门禁累计触发 2198 次\n- 2026-11-24 用户裁决：verify-loop 由 block 降级为 warn（保留 ledger 记录与提醒文案、不拒绝工具调用），改 ~/.dsh/agent-guard/cordis.patch.yml:115，重启 DSH Web 后生效\n\n## 关联\n- 与 dsh-explore 探索外包 skill 配合；同为零依赖本地插件、同属 DSH 本地插件的还有 dsh-token-guard、dsh-cost-meter、dsh-orchestrator"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/dsh插件/orchestrator_gate.md",
+                "memory_type": "entities",
+                "before": "# orchestrator-gate\nDSH Web 的网关插件（编排器门禁），用于在命令执行前根据路径深度与 moduleRoots 进行放行或拦截，强制重活走编排器。代码位于 D:\\repository\\skills\\dsh\\orchestrator-gate。\n\n## 功能与规则\n- 通过 ctx.tools.guard() 在每次工具执行前拦截重活工具，返回以 `[orchestrator-gate]` 开头的拒绝理由引导改用 orchestrate，不自动转发\n- 路径深度 >=2 或命中 moduleRoots 的 grep 天然放行；仓库根（如 `.` 或 `D:\\repository\\skills`）的 grep 硬拦截\n- 配置项 blockBuildLint:false、blockWholeRead:false 关闭构建/整读拦截；首启仅 blockRootGrep=true\n- 规则开关硬编码在 lib/index.js 的 RULES，config 同名字段无效；按 DESIGN.md v9 实现，node selftest.mjs 通过 80 项自测\n- 默认配置：repoRoots 仅含 D:\\repository\\skills；moduleRoots 为 src/views/ 与 dsh/，grepMinDepth 为 2\n\n## 部署与加载\n- 通过符号链接（~/.dsh/orchestrator-gate）与 web profile 的 package.json 依赖（file:../../orchestrator-gate）及 dsh.profile.bundles 挂载，重启 Web 生效\n- pnpm install 时该包为 node_modules 实体拷贝（非符号链接）；改源码后必须 pnpm install --force 重装刷新拷贝再重启，否则 Web 加载旧快照\n\n## 根因与修复（2026-11-12）\n- 早期根因：lib/index.js 的 export const inject = [] 为空导致 cordis 抛错、插件不激活；已修复为 inject = [\"tools\"]（line 17）\n- 真正根因：cordis.patch.yml 上存在非继承的、主体为 DESKTOP-0AKGC7K\\Administrator 的 Write DENY ACL，pnpm 硬链接拷贝该文件时拒绝访问（os error 5），整个包安装中止，node_modules 里的 gate 永远停在旧拷贝（10:30 版，18937 字节）；源码新版（11:13，21561 字节，含 rulesFingerprint 启动凭证日志）从未装入。其余 6 个 file: 插件 11:44 重装成功，唯独 gate 漏刷\n- 修复：Set-Acl 移除 Write DENY；pnpm install --force --no-lockfile 成功，node_modules 与源码哈希一致（21561 字节）\n- 用户重启 Web（新进程 11:52:37 启动）后，根级 grep 被 `[orchestrator-gate]` 拦截，证实新版 gate 已加载生效\n- 二次刷新：用户重启后助手验证 node_modules 物理拷贝仍是 12:33 旧快照，于 profiles\\web 执行 pnpm install --force --no-lockfile 重刷，lib/index.js 哈希 183C0EF1…、selftest.mjs 哈希 266EEE9B… 与源码一致；请用户再次重启，重启后以日志指纹 7d4a5962 验证新版 gate 已加载并做真实拦截探针\n\n## 验证与提交\n- 真实 grep 调用 D:\\repository\\skills（仓库根，深度不足）被 `[orchestrator-gate]` 拦截；orchestrate op=full 实测 plan→cursor/grok-4.7@256k、execute(file_reader)→workbuddy/glm-5.3-flash、summarize→workbuddy/glm-5.3-flash，逐模型成本落盘\n- 早期提交：dsh/orchestrator-gate/ 5 文件 commit 9acaf317（未推送）",
+                "after": "# orchestrator-gate\nDSH Web 的网关插件（编排器门禁），在命令执行前按路径深度与 moduleRoots 放行或拦截，强制重活走编排器；代码位于 D:\\repository\\skills\\dsh\\orchestrator-gate。\n\n## 功能与规则\n- 通过 ctx.tools.guard() 在每次工具执行前拦截重活工具，返回以 `[orchestrator-gate]` 开头的拒绝理由引导改用 orchestrate，不自动转发\n- 路径深度 >=2 或命中 moduleRoots 的 grep 天然放行；仓库根（如 `.` 或 `D:\\repository\\skills`）的 grep 硬拦截\n- 配置项 blockBuildLint:false、blockWholeRead:false 关闭构建/整读拦截；首启仅 blockRootGrep=true\n- 规则开关硬编码在 lib/index.js 的 RULES，config 同名字段无效；按 DESIGN.md v9 实现，node selftest.mjs 通过 80 项自测\n- 默认配置：repoRoots 仅含 D:\\repository\\skills；moduleRoots 为 src/views/ 与 dsh/，grepMinDepth 为 2\n\n## 部署与加载\n- 通过符号链接（~/.dsh/orchestrator-gate）与 web profile 的 package.json 依赖（file:../../orchestrator-gate）及 dsh.profile.bundles 挂载，重启 Web 生效\n- pnpm install 时该包为 node_modules 实体拷贝（非符号链接）；改源码后必须 pnpm install --force 重装刷新拷贝再重启，否则 Web 加载旧快照\n\n## 根因与修复\n- 早期根因：lib/index.js 的 export const inject = [] 为空导致 cordis 抛错、插件不激活；已修复为 inject = [\"tools\"]（line 17）\n- 真正根因（2026-11-12）：cordis.patch.yml 上存在非继承的、主体为 DESKTOP-0AKGC7K\\Administrator 的 Write DENY ACL，pnpm 硬链接拷贝该文件时拒绝访问（os error 5），整个包安装中止，node_modules 里的 gate 永远停在旧拷贝（10:30 版，18937 字节），源码新版（11:13，21561 字节，含 rulesFingerprint 启动凭证日志）从未装入；其余 6 个 file: 插件 11:44 重装成功，唯独 gate 漏刷\n- 修复：Set-Acl 移除 Write DENY；pnpm install --force --no-lockfile 成功，node_modules 与源码哈希一致（21561 字节）\n- 用户重启 Web（新进程 11:52:37 启动）后，根级 grep 被 `[orchestrator-gate]` 拦截，证实新版 gate 已加载生效\n- 二次刷新：用户重启后助手验证 node_modules 物理拷贝仍是 12:33 旧快照，于 profiles\\web 执行 pnpm install --force --no-lockfile 重刷，lib/index.js 哈希 183C0EF1…、selftest.mjs 哈希 266EEE9B… 与源码一致；请用户再次重启，重启后以日志指纹 7d4a5962 验证新版 gate 已加载并做真实拦截探针\n\n## 验证与提交\n- 真实 grep 调用 D:\\repository\\skills（仓库根，深度不足）被 `[orchestrator-gate]` 拦截；orchestrate op=full 实测 plan→cursor/grok-4.7@256k、execute(file_reader)→workbuddy/glm-5.3-flash、summarize→workbuddy/glm-5.3-flash，逐模型成本落盘\n- 早期提交：dsh/orchestrator-gate/ 5 文件 commit 9acaf317（未推送）"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/插件/agent_guard.md",
+                "memory_type": "entities",
+                "deleted_content": "# agent-guard\nDSH 本地代理守护插件，运行时注入时机性提醒（半硬约束），弥补 AGENTS.md/skill 软约束被模型忽略的缺口。\n\n## 基本属性\n- 源码含 lib/rules.js，定义 warnPwshBuffering 等运行时规则，作为已被 DSH 加载的模块运行\n- 改动后必须重启 DSH WEB 才生效，否则旧实例沿用旧规则 (as of 2026-11-11)\n- 同次改动含 skill 文档 references/dbx.md，但文档按需读取通常无需重启即可生效\n\n## 功能\n- warnPwshBuffering：检测 `pwsh | Out-String` 之类命令，重启 DSH 后开始返回 `pwsh-buffering` 告警\n\n## 关联\n- 与 dsh-token-guard 同属 DSH 本地插件，规则下沉为框架强制而非靠模型自觉\n- 对应三层约束中的\"半硬约束\"（DSH plugin 注入 notice 管时机性提醒）"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 2,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

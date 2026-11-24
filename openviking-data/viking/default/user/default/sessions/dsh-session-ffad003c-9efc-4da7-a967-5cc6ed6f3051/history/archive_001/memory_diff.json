@@ -1,0 +1,35 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-ffad003c-9efc-4da7-a967-5cc6ed6f3051/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-24T03:26:42.496457+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_6909.md",
+                "memory_type": "entities",
+                "after": "# 禅道 Bug 6909\n苏州市房地产监测V3 登录态上传图片后缩略图 preview 404 的缺陷，2026-11-24 已完成后端四处修复并编译通过，实机验证与提交回写顺延到 hop2 新会话。\n\n## 问题与根因\n- 登录态 upload 不落 T_APPENDIX 附件表 → preview 404；匿名链路能走通是因为匿名上传会落表\n- 原方案 A：后端 upload 出参签发 previewTicket、前端零改动\n- 关键发现：previewByTicket（FileController:61-73）校验票据后仍调 writePreview → isRegisteredPath 登记校验（FilePreviewServiceImpl:143），未登记一律 404，只签票据修不掉 bug\n- 增补两点：票据通道豁免登记校验 + 票据绑定校验支持 `_s.jpg` 派生缩略图（bug6909 是「上传→保存前」窗口，path 为 fileThumbnailSite）\n\n## 代码改动（4 处，JDK21 编译 EXIT=0，git 未提交）\n- FileVo.java：新增 `previewTicket` 字段\n- FileController.java：upload 签发票据（IdUtil.fastUUID() + Redis TTL 600s，先例 AppendixServiceImpl:587）；previewByTicket 改调 writeTicketPreview；新增 issuePreviewTicket；类中已注入 redisService\n- FilePreviewService.java：接口新增 writeTicketPreview\n- FilePreviewServiceImpl.java：实现票据免登记出流 + isTicketBoundPath 放行 `_s.jpg` 派生缩略图\n\n## 构建环境\n- common-utils 目标 Java 21，需 temurin21（JDK17 报「无效的标记: --release」）\n- inputFiles.lst 含中文路径历史文件编码损坏 → 删除该模块 stale maven-status 后重试；JDK17 失败那次又写入损坏状态，再清一次\n- 基线编译与改动后编译均通过（EXIT=0）\n\n## 验证与交接\n- 用户选择本地起后端验证：nacos 可达、8080/9211 空闲、nginx 8098 upstream 现成、JDK21/UTF-8 启动先例已记录\n- 交接文档 D:\\plan\\苏州市房地产监测V3\\HANDOFF-CHAIN-bug6909-cert-upload-thumbnail-hop2-20261124-1120.md，第 4 节 6 项待办按序执行并含失败出口\n- 排程 hop=2，2026-11-24 11:25 投递新会话（schedule-108b62ef）"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/编排器计划送审通道故障与人工兜底.md",
+                "memory_type": "entities",
+                "after": "# 编排器计划送审通道故障与人工兜底\nbug6909 链路上编排器 plan_review / plan_path 通道持续失败（invalid review state），四种形态全试无效后改由用户人工确认计划。\n\n## 故障表现\n- hop1 对同一计划文件已送审 6 次失败；2026-11-24 本会话再试 3 次仍失败，累计 9 次\n- 四种换形态均无效：plan_path 通道、plan 正文直送、frontmatter 引号规范化（session_id 补引号）、复制为 v2 新文件名换取全新 review state\n- frontmatter 字段检查无异常，判断为编排器残留损坏的 review state，通道确认故障\n\n## 兜底做法\n- 按交接文档预案「>2 次失败停下记录原因，征询用户后继续」，停止重试并向用户征询裁决\n- 用户确认以人工确认代替模型审核，回填 frontmatter 后直接开工实施\n- 同类失败可优先走人工确认通道，避免反复消耗在送审重试上"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_6457.md",
+                "memory_type": "entities",
+                "before": "# 禅道 Bug 6457\n苏住房防汛 C 端移动查询 H5「首页/我的页待办计数不符及待处理文案」缺陷，2026-11-11、2026-11-12 两轮修复（提交 72bc8cf、3dee5ab），均回写禅道已解决。\n\n## 问题\n- 首轮：首页待办角标显示 12，进入任务列表仅显示 3；手持端应与 G 端一致（该账号 G 端为 0），附截图。\n- 产品备注要求移除我的页任务菜单徽标上的「待处理」字面文案。\n- 次轮（lichandan 反馈）：角标已显示 0，任务中心列表仍显 3 条待处理，两处应一致且正确。\n\n## 根因与修复\n- 首轮根因：首页/我的页取 getTaskCount（/v2.0/flowable/task/taskCount）的 todoNum（演示种子 12），列表取 getTodoTaskList（/v2.0/flowable/task/todoTaskList）的 total（3），两接口口径不一致。\n- 首轮修复：首页/我的页 badge 统一读 getTodoTaskList().total；mine/index.vue:34 原「待处理」徽标改数字计数；删除无引用的 getTaskCount API 包装。\n- 次轮根因：remote 模式接口返回空列表时 fetchList 仍回退 3 条 demo 假待办（mock/portalSeed.ts 的 seed-task-1/2/3，状态均「待处理」），即「角标 0 / 任务中心 3 条」来源。\n- 次轮修复：remote 移除全部 mock/seed 回退；portalData.ts 的 fetchList/fetchHome/fetchStudyTab/fetchMine/fetchDetail seed 兜底仅限 demo，空数据与接口异常显示真实空态或 0；home/index.vue、mine/index.vue 初始 ref 不再挂 SEED_HOME/SEED_MINE（remote 初始骨架屏空态）；portal.test.ts 新增「remote 空数据不回退 seed」用例。\n\n## 处理时间线\n- 首轮（2026-11-11）：worktree 定位计数来源与文案位置，vue-tsc 检查通过（exit 0）；提交 72bc8cf（src/utils/portalData.ts、src/pages/mine/index.vue、src/api/portal.ts）推 origin/dev；DBX 回写 resolved/fixed，resolvedBy=tiany，assignedTo 退回 lichandan，zt_action 90929 已落库；元数据 openedBy=lichandan、product=79、project=141、execution=142。\n- 次轮（2026-11-12）：提交 3dee5ab（src/utils/portalData.ts、src/pages/home/index.vue、src/pages/mine/index.vue、tests/portal.test.ts）推 origin/dev；npm test 38/38 通过（含 remote 空态用例），uni build -m test 构建通过；vue-tsc 报错均预存在（store/user.ts、utils/index.ts、watermark.ts，非本次文件），eslint 未配置未执行；未做 remote 手工部署验证（无测试账号凭据，已备注请测试回归）；禅道二次回写 resolved/fixed，assignedTo 退回 lichandan；计划存档 .plan/bug-6457-round2.md。\n\n## 当前状态\n- 禅道 6457 resolved/fixed，assignedTo=lichandan；代码两轮已推 origin/dev（72bc8cf、3dee5ab），建议测试回归确认计数一致。",
+                "after": "# 禅道 Bug 6457\n苏住房防汛 C 端移动查询 H5「首页/我的页待办计数不符及待处理文案」缺陷，2026-11-11、2026-11-12 两轮修复（提交 72bc8cf、3dee5ab 已推 origin/dev），当前禅道 resolved/fixed、assignedTo=lichandan，建议测试回归确认计数一致。\n\n## 问题\n- 首轮：首页待办角标显示 12，进入任务列表仅显示 3；手持端应与 G 端一致（该账号 G 端为 0），附截图。\n- 产品备注要求移除我的页任务菜单徽标上的「待处理」字面文案。\n- 次轮（lichandan 反馈）：角标已显示 0，任务中心列表仍显 3 条待处理，两处应一致且正确。\n\n## 根因与修复\n- 首轮根因：首页/我的页取 getTaskCount（/v2.0/flowable/task/taskCount）的 todoNum（演示种子 12），列表取 getTodoTaskList（/v2.0/flowable/task/todoTaskList）的 total（3），两接口口径不一致。\n- 首轮修复：首页/我的页 badge 统一读 getTodoTaskList().total；mine/index.vue:34 原「待处理」徽标改数字计数；删除无引用的 getTaskCount API 包装。\n- 次轮根因：remote 模式接口返回空列表时 fetchList 仍回退 3 条 demo 假待办（mock/portalSeed.ts 的 seed-task-1/2/3，状态均「待处理」），即「角标 0 / 任务中心 3 条」来源。\n- 次轮修复：remote 移除全部 mock/seed 回退；portalData.ts 的 fetchList/fetchHome/fetchStudyTab/fetchMine/fetchDetail seed 兜底仅限 demo，空数据与接口异常显示真实空态或 0；home/index.vue、mine/index.vue 初始 ref 不再挂 SEED_HOME/SEED_MINE（remote 初始骨架屏空态）；portal.test.ts 新增「remote 空数据不回退 seed」用例。\n\n## 处理记录\n- 首轮（2026-11-11）：worktree 定位计数来源与文案位置，vue-tsc 检查通过（exit 0）；提交 72bc8cf（src/utils/portalData.ts、src/pages/mine/index.vue、src/api/portal.ts）；DBX 回写 resolved/fixed，resolvedBy=tiany，assignedTo 退回 lichandan，zt_action 90929 已落库；元数据 openedBy=lichandan、product=79、project=141、execution=142。\n- 次轮（2026-11-12）：提交 3dee5ab（src/utils/portalData.ts、src/pages/home/index.vue、src/pages/mine/index.vue、tests/portal.test.ts）；npm test 38/38 通过（含 remote 空态用例），uni build -m test 构建通过；vue-tsc 报错均预存在（store/user.ts、utils/index.ts、watermark.ts，非本次文件），eslint 未配置未执行；未做 remote 手工部署验证（无测试账号凭据，已备注请测试回归）；禅道二次回写 resolved/fixed 并退回 lichandan；计划存档 .plan/bug-6457-round2.md。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

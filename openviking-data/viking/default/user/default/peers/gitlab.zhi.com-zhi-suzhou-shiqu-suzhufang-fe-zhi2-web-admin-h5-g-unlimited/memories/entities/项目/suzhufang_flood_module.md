@@ -3,6 +3,7 @@
 
 ## 代码与文件
 - 页面：src/views/flood/ 下应急预案详情页 detail.vue、积水原因复盘 cause/index.vue
+- 防汛应急指挥大屏：src/views/flood/ 大屏 index.vue 与险情速报 LiveReportPanel.vue；本机部署 http://localhost:8101（站点 苏住房G.conf）
 - 下载：src/components/detail-template/detail-template.vue（466-485行）；上传：zs-file-upload.vue（url=res.data.fileSite 存 planFileUrl）
 - 下载链：detail.vue 用 DetailTemplate(type:'image',download:true)→getAttachmentFullUrl→resolvePublicAssetUrl→resolveServerAssetUrl（依 pathname 重建URL，viteBase="./"）
 
@@ -19,15 +20,15 @@
 - Bug 6401：防台防汛页单据编号/提交时间列被省略号截断，已 resolved/fixed。
 - Bug 6402：积水原因复盘必填校验缺失，已 resolved/fixed。
 - Bug 6435：汛前检查统计汇总详情页优化，禅道事务会话待开启。
-
+- Bug 6899：防汛应急指挥大屏险情速报卡片滚过第 7 条消失、险情是否解除状态反向，2026-11-24 代码修复完成、静态检查通过，实机验证受阻于目标事件不在大屏下拉列表（详见 bug6899_flood_screen 卡片）。
 
 <!-- MEMORY_FIELDS
 {
   "category": "项目",
   "name": "suzhufang_flood_module",
-  "source_extraction_id": "4d9639be9c314282bb13e95c830f71d4",
+  "source_extraction_id": "4b375d64a3974bb19bd33f22e87d7e94",
   "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited",
-  "version": 10,
+  "version": 12,
   "memory_type": "entities"
 }
 -->

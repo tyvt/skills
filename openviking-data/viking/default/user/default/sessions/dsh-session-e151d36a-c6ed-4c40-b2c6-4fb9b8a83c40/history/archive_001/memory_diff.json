@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-e151d36a-c6ed-4c40-b2c6-4fb9b8a83c40/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-24T09:39:16.246031+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited/memories/events/2026/11/24/产品2.0生产网关地址确认.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-24，用户提供产品2.0 生产网关地址 http://221.228.235.73:5777/。实测该地址 /api/v2.0/code 返回 data 字段、登录接口存在（返回「验证码不能为空」而非 404），与本地 zhi2-web-admin dist 的 /api/v2.0/* 契约完全配套；此前使用的 www.hsqhoafunds.cn:5777 属产品1.0，接口前缀为 /prod-api/*，无法与本 dist 对接。\n# 2026-11-24 (Tuesday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: http://221.228.235.73:5777/用这个地址\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 用户给了产品2.0 生产网关地址 `http://221.228.235.73:5777/`（此前抓包也见过这个 IP）。先探测它的接口契约——重点看 `/api/v2.0/code` 返回 `data` 还是 `img` 字段，判断它是否与本地 dist 配套：\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 找到了！`http://221.228.235.73:5777/api/v2.0/code` 返回 `{\"msg\":\"操作成功\",\"code\":200,\"data\":\"...\"}`——**字段是 `data`，与本地 dist（产品2.0）配套**！这才是正确的产品2.0 生产网关，之前用的 `www.hsqhoafunds.cn:5777` 是产品1.0 站点，用错了。\n\n现在验证登录接口也在（POST 空参数应返回业务错误而非 404），然后把 nginx 切到这个 IP：\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 登录接口存在（返回\"验证码不能为空\"而非 404）✅。IP 网关与本地 dist 完全配套。现在把 nginx 切到这个正确地址：Host 头设为该 IP（或保留，实测用 IP 直连返回正确即可），4 处 proxy_pass 改为 `http://221.228.235.73:5777`。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited/memories/events/2026/11/24/本地代理网关切换并登录验证.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-24，将本地 8119 nginx 的 Host 头与 4 处 proxy_pass 切换至 http://221.228.235.73:5777（autonomy 的 9606 保留不动），nginx -t 与 reload 通过；验证码由 base64,undefined 恢复为正常图片，本地 dist 登录成功并正常加载后台首页，确认产品2.0 生产后端配套打通。\n# 2026-11-24 (Tuesday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: http://221.228.235.73:5777/用这个地址\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 用户给了产品2.0 生产网关地址 `http://221.228.235.73:5777/`（此前抓包也见过这个 IP）。先探测它的接口契约——重点看 `/api/v2.0/code` 返回 `data` 还是 `img` 字段，判断它是否与本地 dist 配套：\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 找到了！`http://221.228.235.73:5777/api/v2.0/code` 返回 `{\"msg\":\"操作成功\",\"code\":200,\"data\":\"...\"}`——**字段是 `data`，与本地 dist（产品2.0）配套**！这才是正确的产品2.0 生产网关，之前用的 `www.hsqhoafunds.cn:5777` 是产品1.0 站点，用错了。\n\n现在验证登录接口也在（POST 空参数应返回业务错误而非 404），然后把 nginx 切到这个 IP：\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 登录接口存在（返回\"验证码不能为空\"而非 404）✅。IP 网关与本地 dist 完全配套。现在把 nginx 切到这个正确地址：Host 头设为该 IP（或保留，实测用 IP 直连返回正确即可），4 处 proxy_pass 改为 `http://221.228.235.73:5777`。\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 本地代理验证码接口现在返回正确的 `data` 字段。重载登录页，确认验证码图片能正常渲染（不再是 `base64,undefined`）：\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 验证码正常渲染了（真实 base64）。现在走 HAR 抓「前端实际取码图」→ 识别 → 登录。先 HAR start + 点刷新取码：\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 有个覆盖元素（可能是登录失败弹窗遗留）。先查有没有弹窗，关掉再点登录：\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 无弹窗，是别的覆盖层。用 `click` 的 selector 模式直接点（绕过 ref 遮挡检测），或用 eval 触发 click：\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 登录请求已发出（按钮\"登录中...\"）。等待并查看结果：\n**assistant [peer=gitlab.zhi.com-zhi-wuxi-huishan-product-fe-zhi2-web-admin-h5-g-unlimited]**: 登录成功！本地 dist（8119）+ 正确生产网关 IP（221.228.235.73:5777）完全打通，后台首页数据正常加载（200）。产品2.0 生产后端确认配套。\n\n现在进入作废验证。需要先找到一条可作废的\"资金拨付通知\"单据。从菜单进入：物业管理 → 找资金拨付模块。先看路由/菜单，用网络请求找列表接口更高效。查代码里作废相关的列表路由路径："
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/prod_gateway_contract.md",
+                "memory_type": "entities",
+                "after": "# 产品2.0 生产网关与本地联调契约\n本地 zhi2-web-admin（产品2.0）dist 的接口前缀硬编码为 /api/v2.0/，只有产品2.0 生产网关 221.228.235.73:5777 与之配套，产品1.0 站点无法对接。\n\n## 地址与契约差异\n- 产品2.0 生产网关：http://221.228.235.73:5777；其 /api/v2.0/code 返回 `{\"msg\",\"code\":200,\"data\":\"...\"}`，字段为 data，与本地 dist 读取方式一致（as of 2026-11-24 用户提供）\n- 产品1.0 站点 www.hsqhoafunds.cn:5777 只认 /api/* 与 /prod-api/*（登录为 /prod-api/auth/login），/code 返回平铺 img 字段，没有 /api/v2.0/* 与 security/auth/userLogin，访问返回 404\n- 本地 dist 指向产品1.0 网关时，验证码渲染成 `base64,undefined`、登录 POST 404，8119 完全不可用\n- 本地 dist 登录接口固定为 /api/v2.0/security/auth/userLogin，接口契约只对产品2.0 后端成立\n\n## 本地联调配置\n- 本地站点 8119 nginx 的 Host 头与 4 处 proxy_pass 需指向同一网关；autonomy 代理保留 9606 不动\n- 改配置后须 `nginx -t` 校验 + reload；改错（指向产品1.0）应立即回滚到原 dev 网关，不留坏配置\n- 登录态 token 存在 sessionStorage 的 `Admin-Token`，调后端接口需带该 header\n\n## 验证与归属\n- 2026-11-24 将 4 处 proxy_pass 切至 221.228.235.73:5777 后，验证码正常渲染，本地 8119 登录成功、后台首页数据正常加载\n- 所属项目：惠山二期G（产品2.0 zhi2-web-admin）；服务于禅道 bug 6950「资金拨付作废」前端验证环境搭建"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/pub_allot_notice_cancel.md",
+                "memory_type": "entities",
+                "after": "# 资金拨付通知作废接口（pubAllotNotice cancel）\n禅道 bug 6950：资金拨付作废请求方式由 GET 改为 POST，接口为 /v2.0/benefit/pubAllotNotice/cancel/{id}。\n\n## 接口与代码\n- 作废请求：POST /v2.0/benefit/pubAllotNotice/cancel/{id}；旧实现 toVoid() 用 GET，生产报「不支持 GET」\n- 代码位置：zhi2-web-admin 资金拨付详情 detail.vue:1195 已为 `method:'post'`（2026-11-24 只读核验确认，交接文档记录滞后）\n- 列表接口：GET /api/v2.0/benefit/pubAllotNotice/page（实测共 48 条）\n- 菜单与路由由后端 getRouters 动态生成，dist 内无静态路由可搜\n\n## 业务条件\n- 作废按钮仅在详情页显示，条件为 `tradeStateCode != '0000'` 且 `!= null`\n- 典型可作废单据：id 2123239254058409985，tradeStateCode=9999（即禅道 bug 中的那条）\n\n## 验收与流程\n- 验收标准：作废成功无「不支持 GET」报错 + 代码提交推送 + 禅道 6950 回写附图 + 前端验证门走完\n- 前端验证门：本地 8119 打开可作废单据→执行作废→抓 POST 请求→截图自检→present 内嵌→用户确认\n- 截至 2026-11-24 尚未提交与禅道回写（遵守验证门，未验证不放行）"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

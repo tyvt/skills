@@ -1,26 +1,22 @@
 # github.com-tyvt-skills
-- Maintains the LangGraph+Magpie multi-model orchestrator: planner pool gpt-6-luna/gpt-5.4-mini/dsv4.1-flash; code_edit_with_signal and security_guard primary kimi-k3.1-pro; plan_reviewer/verifier grok-4.7@256k; workbuddy fallback space-bunny (file_reader/code_editor/summarizer/pwsh). (as of 2026-11-14)
-- Model gateway exposes 22 available models; the cursor pool shrank from 14 to 10 on 2026-11-14; running an A/B comparison of auto/glm-5.3-flash (pay-as-you-go). (as of 2026-11-14)
-- Retired models: codex/gpt-6-astra, codex/gpt-5.6-luna (all variants), cursor/composer-2.5, cursor/gpt-5.3-codex, cursor/gemini-4-hydrogen, cursor/gpt-5.4-nano, cursor/glm-5p3-flash, cursor/gpt-5.5@1m, cursor/gpt-5.5@272k, cursor/kimi-k3, cursor/muse-spark-1.3@300k, workbuddy/glm-5.3-flash, workbuddy/deepseek-v4-pro, workbuddy/glm-5.3. (as of 2026-11-14)
-- Maintains the agent-guard interception system (exploration-drift rules enabled:true, mode:'warn', bookkeeping only) and the dsh-explore exploration-outsourcing skill. (as of 2026-11-14)
-- Maintains dsh tools: cost-meter (tools.guard whitelist blocks whole read/grep/dump, bigMissStreak>=2, perStepUncachedBudget=10000, stepReminderThreshold=120, no per-step cacheRead/context-growth guard), plan-gate (pwsh git three-state interception for write/not-git/unknown plus _review.json credential check), solve-captcha.mjs (default vision model auto/deepseek-v4.1-flash, auto/hy3 image recognition disabled), concise-report (conclusion/evidence/pending three-part format, pointer at AGENTS.md:94). (as of 2026-11-16)
-- Maintains zentao-analyzer (attachment-cache downloader zentao_file.py under D:\repository\skills\zentao-analyzer) and the OpenViking dsh-memory-plugin (profile-inject injection plus active retrieval; L1 active retrieval verified, caller=user baseline 0, observed across 5 troubleshooting sessions). (as of 2026-11-14)
-- dsh subagent model selection is unconfigured in-repo: gated by per-tool enabled switches and the Session-level policy.routes whitelist; without a policy, subagents inherit the parent model. (as of 2026-11-14)
-- Evaluation assets: T1–T7 execution-layer tasks, planner attribution samples #1–#15, route_miss logs, controller-bench (35 tasks across multiple models). (as of 2026-11-14)
-- Maintains the DSH web profile config cordis.patch.yml at C:\Users\Administrator\.dsh\profiles\web\ (outside git); config and code/plugin changes take effect only after a manual web restart; ~/.dsh/orchestrator and ~/.dsh/cost-meter are symlinks to the repo, while ~/.dsh/profiles is a separate real directory. (as of 2026-11-16)
-- The managed copy dsh/profiles/web/cordis.patch.yml in the skills repo is a stale snapshot (1055 lines vs 1418 live, roughly 409 lines behind); appends one line per semantic change and commits that single file. (as of 2026-11-14)
-- web profile presets: preset-standard's tool-workflow is disabled while preset-cordis and preset-full-tools stay enabled; batches 1+2 together save about 2,123 tokens per step. (as of 2026-11-14)
-- web profile skill catalog cut from 120 to 40 entries and dsh-harness-dev-context disabled; per-step fixed context 15.5k→14.6k (system prompt 1716→1383, skill injection 766→461), about 900 tokens/step saved; 14.6k treated as the reasonable end state. (as of 2026-11-14)
+- 维护 skills 仓库（本地 D:\repository\skills，远程 origin/main）：链接 16 个 skill 与 8 个 dsh 插件；加载集中在 zentao-analyzer、worktree-snapshot、submodule-commit，未链接 cursor-model-routing、memory-migration-archive、openviking-autostart、session-handoff、vite-build-profiler。(as of 2026-11-24)
+- 维护 deploy-env 本地部署看板与收敛器：SQLite 注册表 32 行（8 个项目，local/dev/test/uat/prod 五环境；端口按 base+index：local=+0/dev=+1/test=+2/uat=+3/prod=+4）、看板端口 18098、nginx 站点与代理地址单源、五环境槽位视图；计划任务 deploy-env-dashboard + pythonw（install-autostart.ps1）开机静默自启；nginx UI 已移除、仅作静态服务；看板密码列 2026-11-24 起明文直显，/api/state 返回 Cache-Control: no-store；registry.sqlite 已入库并受 git 跟踪。(as of 2026-11-24)
+- 维护 DSH web 多模型编排（LangGraph+Magpie）：planner 池 gpt-6-luna/gpt-5.4-mini；编排器 config.yaml 2026-11-24 起 15 处 deepseek 模型 id 全量换为 hy4flash-free（workbuddy 10 处、auto 5 处），配置按请求加载无需重启，router.py 峰时跳过策略因 id 不再命中自动 no-op，code_edit_with_signal 与 security_guard 主用 kimi-k3.1-pro，plan_reviewer/verifier 用 grok-4.7@256k，workbuddy 兜底 space-bunny（file_reader/code_editor/summarizer/pwsh）；网关 22 模型、cursor 池 10 个，auto/glm-5.3-flash 按量付费 A/B 进行中；子代理选模型未在仓库内配置，受逐工具开关与 Session 级 policy.routes 白名单控制。(as of 2026-11-24)
+- dsh 工具链：cost-meter（bigMissStreak>=2、perStepUncachedBudget=10000、stepReminderThreshold=120）、plan-gate（git 三态拦截 + _review.json 校验）、solve-captcha.mjs（默认 auto/deepseek-v4.1-flash）、concise-report（三段式）。(as of 2026-11-16)
+- agent-guard：exploration-drift 为 warn 仅记账；verify-loop（agentBrowserMax 12、Start-Sleep 5，按 session 累计不重置）2026-11-24 由 block 降为 warn，需重启 web 后新会话生效。(as of 2026-11-24)
+- web 预设：preset-standard 禁用 tool-workflow，preset-cordis 与 preset-full-tools 仍启用；skill 目录 40 项（dsh-harness-dev-context 禁用），每步固定上下文约 14.6k token。(as of 2026-11-14)
+- 维护 zentao-analyzer（D:\repository\skills\zentao-analyzer，附着缓存下载 zentao_file.py）与 OpenViking dsh-memory-plugin（profile-inject 注入 + 主动检索）；维护 C:\Users\Administrator\.openviking\ 下 OV 启动脚本与看门狗（非 git 仓，改动前备份 .bak）。(as of 2026-11-24)
+- 评测资产：T1–T7 执行层任务、planner 归因样本 #1–#15、route_miss 日志、controller-bench（35 任务跨多模型）。(as of 2026-11-14)
 
 <!-- MEMORY_FIELDS
 {
-  "source_extraction_id": "32c920e17f2d469aa04dfc739405acc7",
+  "source_extraction_id": "ea28dbbe77804524ba9b2f32dfda6b61",
   "peer_id": "github.com-tyvt-skills",
   "source_extraction_ids": [
-    "0924dc862aaa409aa51cbab9170f1d9e",
-    "1f9af026e7b54d939eb27b0664623a3e"
+    "05c44fadf32a4b00bb008d75f7a71b8b",
+    "56d0b39026ce4ed0b4e8d1445610ebe7"
   ],
-  "version": 37,
+  "version": 57,
   "memory_type": "profile"
 }
 -->

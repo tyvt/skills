@@ -1,25 +1,31 @@
-# 无限版查询H5测试服务器
-苏住房防汛C端移动查询H5 的测试服务器，用户（Lead）用于查看线上效果的部署环境。
+# Unlimited Query H5 Test Server
+Test server for the Suzhou Housing flood-control C-end mobile query H5, used by the Lead (user) to view the deployed effect online.
 
-## 地址与构建来源
-- 访问地址：`http://unlimited.c.h5.query.mobile.v2.suzhufang.shiqu.suzhou.test.zhi.com/`
-- 该环境从 GitLab 仓库构建，而非本地 `dist`；本地提交的修复需推送到远端分支后才会重建生效
-- 本地部署为 nginx 8095（`http://127.0.0.1:8095/`），直接服务本地 `dist`，采用 hash 模式路由
-- 若测试服务器显示旧效果，说明远端分支尚未包含对应提交（如 `97c9460`）
-- 2026-11-14 移动查询H5 提交 `e925eec6ebd0b59fdf9cf47e0d763d35e8be3d7d` 已推送到 origin/dev（本地与远端哈希一致），但尚未部署到该测试服务器，需重新构建部署后才会体现修复
+## Address & Build Source
+- Access URL: `http://unlimited.c.h5.query.mobile.v2.suzhufang.shiqu.suzhou.test.zhi.com/`
+- Built from the GitLab repo, not local `dist`; local fixes only take effect after pushing to the remote branch and rebuilding
+- Local deployment is nginx 8095 (`http://127.0.0.1:8095/`) serving local `dist` directly with hash-mode routing; 2026-11-24 confirmed the live site config is `D:\nginx\conf\sites-enabled\防汛C端.conf` (the `防汛C端-local.conf` outside `sites-enabled` is not the running one)
+- 2026-11-24 re-check: that nginx site was live and serving the built app; `dist` (14:59:35) was newer than the source (14:59:16) and the build had exited 0
+- Old effects on the test server mean the remote branch lacks the commit (e.g. `97c9460`)
+- 2026-11-14 commit `e925eec6ebd0b59fdf9cf47e0d763d35e8be3d7d` was pushed to origin/dev (local and remote hashes match) but not yet deployed to this test server; it shows only after rebuild/deploy
 
-## 临时 Nginx 切换与恢复
-- 截图校验期间需临时调整本地 Nginx：须先备份配置、校验完成后恢复原配置
-- 2026-11-14 本地 Nginx 临时切换经 nginx UI 操作，认证动作仍待本机完成；临时配置文件已备好，旧站点尚未改变
-- 2026-11-14 首次截图脚本在保存前停止（页面初始化未暴露 uni 存储接口、临时令牌未写入），期间本地 Nginx 只指向隔离构建产物
-- 2026-11-14 收尾完成：临时 Nginx 已恢复到原来的 `dist` 根目录，首页与 `/api/v2.0/code` 均返回 HTTP 200，端口 18927 的 Chromium 已退出，随后只审查本次源码文件并按分支流程提交
+## Login & Verification
+- 2026-11-24: login requires username + password + graphic captcha; the project `.env` auto-login note holds test account `zsbase`; no other stored credential exists (deploy-env and memory searches found none)
+- 2026-11-24: logged in successfully as `zsbase` (captcha recognized as `3`) and reached the app home with 街镇检查/区县检查/市级检查 entries
+
+## Temporary Nginx Switching & Restore
+- Screenshot verification needs a temporary local nginx change: back up the config first and restore it afterwards
+- 2026-11-14 switch was done via nginx UI with the temp config prepared and the old site untouched at that point; 2026-11-24 confirmed the nginx UI panel is 127.0.0.1:9000 managing the same `D:\nginx` conf set (see 「nginx_ui」)
+- 2026-11-14 the first screenshot script stopped before saving (page init did not expose uni storage APIs, temp token not written); during that time local nginx pointed only at the isolated build
+- 2026-11-14 cleanup finished: temp nginx restored to the original `dist` root, homepage and `/api/v2.0/code` both returned HTTP 200, Chromium on port 18927 exited, then only the session's source files were reviewed and committed per branch flow
+- 2026-11-24 switch: `/api/v2.0/evaluation/` 改指本地后端 `localhost:9608`，其余 `/api/` 仍走远程网关保留登录；验证后必须恢复原配置并 reload（详见「查询H5本地后端验证环境」）
 
 <!-- MEMORY_FIELDS
 {
   "category": "部署环境",
   "name": "test_server_unlimited",
-  "source_extraction_id": "c51eda4d06e84ffba67a65a4e962bb92",
-  "version": 5,
+  "source_extraction_id": "c19b5901ace040e9bb5820b3731654ce",
+  "version": 8,
   "memory_type": "entities"
 }
 -->

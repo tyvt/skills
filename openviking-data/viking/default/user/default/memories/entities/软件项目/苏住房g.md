@@ -17,6 +17,7 @@
 - `src/utils/request.js` 的 401 拦截逻辑含 `isLoggingOut` 标志，主动退出时抑制过期弹窗
 - `src/utils/resolveServerAssetUrl.js` 提供按当前页面地址解析的资源 URL 方法，适配子路径部署
 - `src/views/publicQuery/monthlyReport/index.vue` 的「是否提交」列使用 `dictUrl: 'monthly_report_submitted'`
+- 求援工单模块：`src/api/flood/index.js:251` 的 `getRescue(rescueId)` 请求 `GET /safety/flood/rescue/{rescueId}`，列表/详情全链路只用数字主键 `rescueId`，`rescueNo` 仅作编号展示列
 
 ## Relations
 - 涉及模块：物业服务企业等公司管理模块
@@ -25,8 +26,8 @@
 {
   "category": "软件项目",
   "name": "苏住房G",
-  "source_extraction_id": "d04d4dc7431546908ac70fda3a11aba5",
-  "version": 2,
+  "source_extraction_id": "4b7a3f65ddc44d9aa106556b3c91bad3",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

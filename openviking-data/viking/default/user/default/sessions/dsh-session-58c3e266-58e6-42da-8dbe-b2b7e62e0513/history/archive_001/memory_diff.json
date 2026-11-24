@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-58c3e266-58e6-42da-8dbe-b2b7e62e0513/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-24T04:23:58.934937+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷任务/zentao_bug_6909.md",
+                "memory_type": "entities",
+                "before": "# 禅道Bug 6909 项目证书附件缩略图「加载失败」\n房产管理系统项目证书管理新增证书上传附件上传成功却回显「加载失败」、保存后图片正常显示的前端回归缺陷，2026-11-24 定位为后端 MinIO 鉴权改造引入。\n\n## 现象与范围\n- 路径：项目管理 → 项目证书管理 → 建设工程规划许可证，新增证书上传附件\n- 上传接口返回 200 成功，缩略图组件却显示「加载失败」；保存后图片正常显示\n- 前端代码在 src/views/projectManagement/certificate/planLic/，缩略图组件 AppendixFileThumbnail，外层 StandaloneAppendixField\n- 「加载失败」不是业务文案，而是 Element UI el-image 加载失败的默认文案\n\n## 根因\n- 前端链路：zs-file-upload → StandaloneAppendixField/index.vue:319 → AppendixFileThumbnail.vue:83-87 → resolveServerAssetUrl.js:22-31，缩略图 thumbUrl 最终走 /file/file/preview?path=..&token=.. 通道\n- 后端 FilePreviewServiceImpl 类注释：预览必须已在 T_APPENDIX/T_ATTACHMENT 登记，未登记一律 404\n- 新增证书上传接口只写 MinIO 不登记（2026-11-24 上传无 T_APPENDIX 登记行），故 preview 404 → el-image 显示「加载失败」；保存后登记即正常\n- 2026-11-24 实锤回归来源为 2026-11-23「MinIO越权问题修复」（嫌疑提交 30e91add8，bug 提报前一天）；后端 FilePreviewServiceImpl 位于 origin/dev 提交 c5d2eedf；ImageUpload 注释已提示「主 preview 通道按登记校验会 404」\n- 登录态上传出参 FileVo 无预览票据字段，票据只在匿名上传链路签发；前端 handleUploadSuccess 只取 res.data?.fileSite || res.data?.url\n\n## 排查过程与环境\n- 后端本地克隆停在 11-20，fetch 后才见到 11-23 上线的 preview 端点\n- 证据链：禅道截图 D:\\禅道附件\\bug\\6909\\file24058_*.png + 前端代码链 + T_APPENDIX 数据库取数（11-24 当日零新增）；按规则仍补一次 agent-browser 实机复现\n- 客测环境 58.210.252.230:9002，账号 zsbase/ZS001Aa!，2026-11-24 登录成功并导航到项目管理 → 项目证书管理（agent-browser 会话保留），页面级复现并入验证门\n- 编排器 op:\"full\" 派只读探索连续两次失败（中断+编排失败），转主控兜底带 path 窄 grep（≤2 次）\n\n## 状态\n- 2026-11-24 根因已实锤：登录态上传 /file/file/upload 只传 MinIO 不落附件表，保存前 preview 强校验登记必 404\n- 修复方案（计划已落盘待送审）：后端 upload 出参签发短时效 previewTicket 并给 FileVo 加字段，前端零改动\n- 交接：hop=2 已排程至 2026-11-24 10:55:55（新会话），交接文档 D:\\plan\\苏州市房地产监测V3\\HANDOFF-CHAIN-bug6909-cert-upload-thumbnail-hop1-20261124-1055.md\n- 未完成项：计划送审 → 用户确认 → 实施 → 实机验证 → 提交回写；2026-11-24 P0 交接完成、本会话停手，仍未提交代码、未回写禅道",
+                "after": "# 禅道Bug 6909 项目证书附件缩略图「加载失败」\n房产管理系统项目证书管理新增证书上传附件上传成功却回显「加载失败」、保存后图片正常的回归缺陷，2026-11-24 定位为 2026-11-23 MinIO 鉴权改造引入，hop4 补齐 nginx 反代与前端票据透传两处修复点。\n\n## 现象与范围\n- 路径：项目管理 → 项目证书管理 → 建设工程规划许可证，新增证书上传附件；前端在 src/views/projectManagement/certificate/planLic/，外层 StandaloneAppendixField、缩略图 AppendixFileThumbnail\n- POST /file/file/upload 返回 200 成功，缩略图 GET /file/file/preview 返回 404 并显示「加载失败」（Element UI el-image 默认失败文案）；保存后图片正常显示\n- 2026-11-24 本地实机复现，含重新打开表单回显缩略图同样 404\n\n## 根因\n- FilePreviewServiceImpl 要求预览已在 T_APPENDIX/T_ATTACHMENT 登记，未登记一律 404；登录态新增上传只写 MinIO 不落表（11-24 无登记行），匿名链路因落表才能走通\n- 回归来源 2026-11-23「MinIO越权问题修复」（嫌疑提交 30e91add8，bug 提报前一天）；FilePreviewServiceImpl 位于 origin/dev c5d2eedf；ImageUpload 注释已提示主 preview 通道按登记校验会 404\n- 登录态 FileVo 原无预览票据字段，票据只在匿名上传签发；handleUploadSuccess 只取 res.data?.fileSite || res.data?.url\n- hop4 新证：nginx 8098 把 upload 反代到远程 58.210.252.230:9002（sites-available/苏州市房地产监测V3.conf），已改回本地 8080 并 reload；证书页 v-model 只存路径字符串，回写丢弃 previewTicket，缩略图仍走未登记 preview\n\n## 排查证据\n- 后端本地克隆停在 11-20，fetch 后才见 11-23 上线的 preview 端点；证据链为禅道截图 D:\\禅道附件\\bug\\6909\\file24058_*.png、前端代码链、T_APPENDIX 取数（11-24 零新增）\n- 网关侧：日志无上传异常；Nacos common-gateway.yml 白名单 `/file/file/**` 明文放行，字段不是加密层丢弃；直连 9211 与 8080 都带回 previewTicket，仅经 8098 丢失\n- jar 字符串计数 0 与源码对不上，改用 class 字节码核对；源码与 11:29 jar 均含签发方法；本地 Nacos 实例 192.168.1.129:9211，验证码 session/Redis key 需一致\n- 客测环境 58.210.252.230:9002，账号 zsbase/ZS001Aa!，2026-11-24 登录并导航到项目管理 → 项目证书管理；编排器 op:\"full\" 派只读探索两次失败，转主控 path 窄 grep（≤2 次）\n\n## 修复与状态\n- 计划 2026-11-24 过审（_review.json 曾被别的流程写成非 entries 格式，备份后改回）：映射键统一 fileSite，范围只覆盖上传后、保存前回显，刷新与已保存附件仍走登记预览，用户已确认\n- 修复目标：缩略图改走 GET /file/file/previewByTicket（前端源码本有「有 ticket 就走 previewByTicket」分支）；hop2 已完成后端方案：FileVo 加 previewTicket、upload 用 IdUtil.fastUUID()+Redis TTL 600s 签发、previewByTicket 免登记出流并放行 _s.jpg 派生缩略图\n- 已在 StandaloneAppendixField 补 4 处票据透传；eslint 无新增问题，构建通过（12:21 dist 含改动），正做页面实传验证\n- 未完成：实机验证 → 提交代码 → 回写禅道；截至 2026-11-24 04:22 未提交、未回写；交接文档在 D:\\plan\\苏州市房地产监测V3\\（hop2 排程 2026-11-24 11:25，schedule-108b62ef）"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/缺陷/bug6909.md",
+                "memory_type": "entities",
+                "deleted_content": "# bug6909\n项目管理—项目证书管理—建设工程规划许可证新增上传图片后缩略图显示“加载失败”的缺陷。\n\n## 现象\n- 上传接口 POST /file/file/upload 返回 200 上传成功，但缩略图请求 GET /file/file/preview 返回 404，页面显示“加载失败”。\n- 2026-11-24 在本地实机复现该现象（含重新打开表单后回显缩略图同样 404）。\n\n## 修复方案\n- 修复目标是让缩略图改走 GET /file/file/previewByTicket，凭后端签发的 previewTicket 预览。\n- 前端源码已存在“有 ticket 就走 previewByTicket”的分支逻辑。\n\n## 排查线索\n- 待确认三点：后端 jar 是否编入改动、网关响应是否返回 previewTicket 字段、前端 dist 是否为旧构建。\n- 本地 Nacos 注册的 framework 实例为 192.168.1.129:9211（本机），需注意验证码 session/Redis key 一致性。\n\n## 状态\n- 截至 2026-11-24 尚未证明修复生效，已交接至 hop4（chain_id=bug6909-cert-upload-thumbnail）继续排查。"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

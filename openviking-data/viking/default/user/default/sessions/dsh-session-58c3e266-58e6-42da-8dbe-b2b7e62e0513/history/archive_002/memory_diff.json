@@ -1,0 +1,46 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-58c3e266-58e6-42da-8dbe-b2b7e62e0513/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-24T04:29:41.311119+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/技术模式/zhi3_preview_ticket_401.md",
+                "memory_type": "entities",
+                "after": "# zhi3 图片缩略图 previewByTicket 401 与网关登录白名单\n苏州房产管理端 H5 新增页缩略图改走 `previewByTicket` 后返回 401 的定位过程、根因与修复方向。\n\n## 现象\n- 清理可能残留的附件后实传图片成功，缩略图改为走 `previewByTicket` 拉取，但该请求直接返回 401。\n\n## 定位过程\n- 先怀疑票据与路径的绑定校验不通过，用刚签发的票据重打一次并核对 Redis 中存的路径，问题依旧。\n- 再查网关登录白名单快照，其中没有 `previewByTicket` 条目；随后查 `StringUtils.matches` 的通配规则以确认该补哪一条。\n\n## 根因与修复方向\n- 401 根因：`previewByTicket` 未加入登录白名单，而 img 标签无法携带请求头，网关拿不到登录令牌即直接 401。\n- 白名单配置在 Nacos，改本地配置副本不会生效，需在 Nacos 控制台或发布入口只补这一条。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/技术模式/zhi3_personnel_change_entry.md",
+                "memory_type": "entities",
+                "after": "# zhi3 从业人员变更入口与详情接口\n苏州房产管理端 H5 从业人员变更（禅道 6891）在区县账号下的菜单入口、路由与详情接口用法。\n\n## 入口与路由\n- 区县账号没有「从业人员变更」独立菜单，菜单只有「从业人员备案」列表 `/jgcyry/agencyPersonnel`。\n- 直接访问 `/personalRecordChange/:id` 会被路由守卫重定向；变更详情须从「已办事项」点「从业人员变更」链接进入，正确路径带 `/jgcyry/` 前缀。\n\n## 详情接口\n- `/api/v3.0/company/personnelRecordChange/detail` 以裸 changeId 字符串作请求体（`POST(url, personnelRecordChangeId)`），传 `{id:...}` 会 400。\n- changeId `2120331787932631041` 与交接文档的 `2113249234228731906` 均返回 HTTP 400「服务器异常」、页面字段全「-」，疑为测试数据问题。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/项目交接/zhi3_handoff_chain_6891.md",
+                "memory_type": "entities",
+                "after": "# 禅道 6891 从业人员变更 UI 交接链\n苏州房产管理端 H5「从业人员变更」任务（禅道 6891）的 hop 交接文档与后续排程。\n\n## 交接文档\n- hop3：`D:\\plan\\苏州市房地产监测V3\\HANDOFF-CHAIN-zentao6891-personnel-change-ui-hop3-20261124-1055.md`，第 4 节 6 项未完成。\n- hop4：`D:\\plan\\苏州市房地产监测V3\\HANDOFF-CHAIN-zentao6891-personnel-change-ui-hop4-20261124-1210.md`，9 节，第 4 节 5 项未完成。\n\n## 排程\n- hop5 排程 `schedule-b42ebc89-b62a-4efd-9ebf-6170582a1725`，2026-11-24 12:11:18 投递（target=new_once）。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/技术模式/zhi3_h5_captcha_login.md",
+                "memory_type": "entities",
+                "before": "# zhi3 管理端 H5（8098）验证码登录要点\n苏州房产管理端 H5 在 8098 用区县账号实机登录时的接口、验证码流程与反复踩到的坑。\n\n## 登录链路\n- 登录接口 `POST /api/v3.0/security/auth/userLogin`，验证码接口 `POST /api/v3.0/code`；HTTP 200 但 body code=500「验证码错误」即验证码不对。\n- 提交体携带前端加密后的密码（如 `NE3Cqwy3nFw3Nna6VXxScQ==`）；直接调接口须用前端已加密值，传明文会报「密码格式错误」。\n- 验证码为算术式图片（如 `6*9=?`），图片与 uuid 同轮绑定且短时效，识别过久会过期失败。\n- 登录成功跳 `http://localhost:8098/#/home/todo`；登录态存于 sessionStorage 的 `Admin-Token`。\n\n## 关键坑\n- 手动 `fetch('/code')` 会让后端生成新验证码（uuid=B），页面 img 与前端 uuid 仍是 A，提交 code(X)+uuid(A) 必然失败；禁止手动请求 `/code`，只刷新页面走原生流程。\n- 跳 8101 不是链路故障，只是登录失败后的错误跳转；8098 的 `/code` 与 `userLogin` 都正常。\n- 填验证码与账号密码须用 MCP fill（触发 Vue 事件），原生 setter 会被忽略。\n- 视觉模型多次误读：`6*0=0` 被读成 10，`6*9=?` 中间波浪线实为手写等号；应自己用 read_image 放大判读并不重新请求验证码。\n- 本轮实测算式与答案：`6*0=0`、`3+2=5`、`6*9=54`、`3*8=24`、`6+7=13`。",
+                "after": "# zhi3 管理端 H5（8098）验证码登录要点\n苏州房产管理端 H5 在 8098 用区县账号实机登录时的接口、验证码流程与反复踩到的坑。\n\n## 登录链路\n- 登录接口 `POST /api/v3.0/security/auth/userLogin`，验证码接口 `POST /api/v3.0/code`；HTTP 200 但 body code=500「验证码错误」即验证码不对。\n- 提交体携带前端加密后的密码（如 `NE3Cqwy3nFw3Nna6VXxScQ==`）；直接调接口须用前端已加密值，传明文会报「密码格式错误」。\n- 验证码为算术式图片（如 `6*9=?`），图片与 uuid 同轮绑定且短时效，识别过久会过期失败。\n- 登录成功跳 `http://localhost:8098/#/home/todo`；登录态存于 sessionStorage 的 `Admin-Token`。\n\n## 关键坑\n- 手动 `fetch('/code')` 会让后端生成新验证码（uuid=B），页面 img 与前端 uuid 仍是 A，提交 code(X)+uuid(A) 必然失败；禁止手动请求 `/code`，只刷新页面走原生流程。\n- 跳 8101 不是链路故障，只是登录失败后的错误跳转；8098 的 `/code` 与 `userLogin` 都正常。\n- 填验证码与账号密码须用 MCP fill（触发 Vue 事件），原生 setter 会被忽略。\n- 视觉模型多次误读：`6*0=0` 被读成 10，`6*9=?` 中间波浪线实为手写等号；应自己用 read_image 放大判读并不重新请求验证码。\n- 本轮实测算式与答案：`6*0=0`、`3+2=5`、`6*9=54`、`3*8=24`、`6+7=13`、`3+3=6`、`8×7=56`。\n- 登录态失效时页面会被重定向到登录页，需重新走算术验证码登录；验证码随页面刷新立即更换，旧答案随即失效。\n- 截图识别脚本无输出或裁切只切到验证码上沿时，改按页面中验证码图片的实际位置重新截图再识别，不要重新请求验证码。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/部署环境/zhi3_verify_env.md",
+                "memory_type": "entities",
+                "before": "# zhi3 验证环境（8098 / 9002）\n苏州房产管理端 H5（zhi3-web-admin-h5）联调与实机验证所用的本地 nginx 站点、后端环境与验证入口。\n\n## 端口与代理\n- 8098 为本地主验证站点：静态服务父仓 `dist/`，`/api/v3.0/` 代理到 `58.210.252.230:9002`，即需求中的「专用端口常驻代理 9002」；「8098 本地后端 502 不可用」为过时结论，无需另建端口或上传 9002。\n- 8101 为并行项目「苏住房智慧物业管理平台」（苏住房G）站点，8102 同为多环境站点，二者 env-sites conf 均代理 `127.0.0.1:8080`；主 nginx include `sites-enabled/*.conf` 与 `conf.d/*.conf`；8105 端口空闲。\n- 9002 是唯一已证实可登录、含测试数据的真实环境，其重新部署无 SSH 通道；隐私库无 9002 凭据。\n\n## 本地后端与构建\n- 后端仓为 dev 分支、4 处改动完整；framework jar 原早于修复代码必须重打包（JDK21 已就绪，新 jar 11:29:21），gateway jar 代码未改可复用。\n- 起序 framework 9211 → gateway 8080，均后台启动并注册 Nacos dev 命名空间 `suzhou-shiqu-fangchanzonghe`，framework 日志 `Started in 19.53s`；8098 nginx 早已监听（PID 19508），dist 为 2026-11-24 10:24 构建产物。\n- 2026-11-24 `npm run build` exit 0，产物 gitHash 9a324be7f（新产物 `index-MrL8Ylkn.js`）。\n- 门控流程：build → 确认验证环境 → agent-browser 实机验证 → 截图入会话+用户确认 → 提交推送 → 禅道回写 → 清理。\n\n## 账号与验证入口\n- 区县测试账号 `6001039` / `ZS0001Aa!`，凭据出自禅道 6891 工单 steps（hop1 曾据此登录「测试吴中区」，2026-11-24 复核密码）。\n- 区县账号无「从业人员变更」独立菜单，菜单只有「从业人员备案」列表 `/jgcyry/agencyPersonnel`；直接访问 `/personalRecordChange/:id` 被路由守卫重定向，变更详情须从「已办事项」点「从业人员变更」链接进入，正确路径带 `/jgcyry/` 前缀。\n- 详情接口 `/api/v3.0/company/personnelRecordChange/detail` 以裸 changeId 字符串作请求体（`POST(url, personnelRecordChangeId)`），传 `{id:...}` 会 400；changeId `2120331787932631041` 与交接文档的 `2113249234228731906` 均返回 HTTP 400「服务器异常」、页面字段全「-」，疑为测试数据问题。\n- 实机验证用自有 agent-browser 会话（如 `zt6891-cc910e265cf3`），机器上有并行任务会话（bug6899/bug6909）不可混用。\n\n## 交接与排程\n- hop3 交接文档 `D:\\plan\\苏州市房地产监测V3\\HANDOFF-CHAIN-zentao6891-personnel-change-ui-hop3-20261124-1055.md`（第 4 节 6 项未完成）。\n- hop4 交接文档 `D:\\plan\\苏州市房地产监测V3\\HANDOFF-CHAIN-zentao6891-personnel-change-ui-hop4-20261124-1210.md`（9 节，第 4 节 5 项未完成）。\n- hop5 排程 `schedule-b42ebc89-b62a-4efd-9ebf-6170582a1725`，2026-11-24 12:11:18 投递（target=new_once）。",
+                "after": "# zhi3 验证环境（8098 / 9002）\n苏州房产管理端 H5（zhi3-web-admin-h5）联调与实机验证所用的本地 nginx 站点、后端环境与验证入口。\n\n## 端口与代理\n- 8098 为本地主验证站点：静态服务父仓 `dist/`，`/api/v3.0/` 代理到 `58.210.252.230:9002`，即需求中的「专用端口常驻代理 9002」；「8098 本地后端 502 不可用」为过时结论，无需另建端口或上传 9002。\n- 8101 为并行项目「苏住房智慧物业管理平台」（苏住房G）站点，8102 同为多环境站点，二者 env-sites conf 均代理 `127.0.0.1:8080`；主 nginx include `sites-enabled/*.conf` 与 `conf.d/*.conf`；8105 端口空闲。\n- 9002 是唯一已证实可登录、含测试数据的真实环境，其重新部署无 SSH 通道；隐私库无 9002 凭据。\n\n## 本地后端与构建\n- 后端仓为 dev 分支、4 处改动完整；framework jar 原早于修复代码必须重打包（JDK21 已就绪，新 jar 11:29:21），gateway jar 代码未改可复用。\n- 起序 framework 9211 → gateway 8080，均后台启动并注册 Nacos dev 命名空间 `suzhou-shiqu-fangchanzonghe`，framework 日志 `Started in 19.53s`；8098 nginx 早已监听（PID 19508），dist 为 2026-11-24 10:24 构建产物。\n- 2026-11-24 `npm run build` exit 0，产物 gitHash 9a324be7f（新产物 `index-MrL8Ylkn.js`）。\n- 门控流程：build → 确认验证环境 → agent-browser 实机验证 → 截图入会话+用户确认 → 提交推送 → 禅道回写 → 清理。\n\n## 账号与会话\n- 区县测试账号 `6001039` / `ZS0001Aa!`，凭据出自禅道 6891 工单 steps（hop1 曾据此登录「测试吴中区」，2026-11-24 复核密码）。\n- 实机验证用自有 agent-browser 会话（如 `zt6891-cc910e265cf3`），机器上有并行任务会话（bug6899/bug6909）不可混用。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

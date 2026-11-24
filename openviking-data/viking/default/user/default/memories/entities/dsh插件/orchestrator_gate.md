@@ -1,35 +1,35 @@
 # orchestrator-gate
-DSH Web 的网关插件（编排器门禁），用于在命令执行前根据路径深度与 moduleRoots 进行放行或拦截，强制重活走编排器。代码位于 D:\repository\skills\dsh\orchestrator-gate。
+DSH Web gateway plugin (orchestrator gate) that intercepts tool calls before execution and forces heavy work through the orchestrator; code lives at D:\repository\skills\dsh\orchestrator-gate.
 
-## 功能与规则
-- 通过 ctx.tools.guard() 在每次工具执行前拦截重活工具，返回以 `[orchestrator-gate]` 开头的拒绝理由引导改用 orchestrate，不自动转发
-- 路径深度 >=2 或命中 moduleRoots 的 grep 天然放行；仓库根（如 `.` 或 `D:\repository\skills`）的 grep 硬拦截
-- 配置项 blockBuildLint:false、blockWholeRead:false 关闭构建/整读拦截；首启仅 blockRootGrep=true
-- 规则开关硬编码在 lib/index.js 的 RULES，config 同名字段无效；按 DESIGN.md v9 实现，node selftest.mjs 通过 80 项自测
-- 默认配置：repoRoots 仅含 D:\repository\skills；moduleRoots 为 src/views/ 与 dsh/，grepMinDepth 为 2
+## Rules and config
+- ctx.tools.guard() runs before each tool call; a rejection starts with `[orchestrator-gate]` and tells the model to switch to orchestrate — calls are never auto-forwarded.
+- Grep at path depth >=2, or inside any moduleRoots entry, passes; grep at a repo root (e.g. `.` or `D:\repository\skills`) is hard-blocked.
+- blockBuildLint:false and blockWholeRead:false switch off build/whole-read blocking; first start enables only blockRootGrep=true.
+- Rule switches are hardcoded in RULES inside lib/index.js, so same-named config fields have no effect; built per DESIGN.md v9 and passes 80 self-tests in node selftest.mjs.
+- Defaults: repoRoots only D:\repository\skills; moduleRoots src/views/ and dsh/; grepMinDepth 2.
 
-## 部署与加载
-- 通过符号链接（~/.dsh/orchestrator-gate）与 web profile 的 package.json 依赖（file:../../orchestrator-gate）及 dsh.profile.bundles 挂载，重启 Web 生效
-- pnpm install 时该包为 node_modules 实体拷贝（非符号链接）；改源码后必须 pnpm install --force 重装刷新拷贝再重启，否则 Web 加载旧快照
+## Deployment and loading
+- Mounted via symlink ~/.dsh/orchestrator-gate, a web-profile package.json dependency (file:../../orchestrator-gate) and dsh.profile.bundles; takes effect after a Web restart.
+- pnpm install materialises the package as a real node_modules copy (not a symlink); after source edits run pnpm install --force to refresh that copy and restart, otherwise Web keeps loading the old snapshot.
 
-## 根因与修复（2026-11-12）
-- 早期根因：lib/index.js 的 export const inject = [] 为空导致 cordis 抛错、插件不激活；已修复为 inject = ["tools"]（line 17）
-- 真正根因：cordis.patch.yml 上存在非继承的、主体为 DESKTOP-0AKGC7K\Administrator 的 Write DENY ACL，pnpm 硬链接拷贝该文件时拒绝访问（os error 5），整个包安装中止，node_modules 里的 gate 永远停在旧拷贝（10:30 版，18937 字节）；源码新版（11:13，21561 字节，含 rulesFingerprint 启动凭证日志）从未装入。其余 6 个 file: 插件 11:44 重装成功，唯独 gate 漏刷
-- 修复：Set-Acl 移除 Write DENY；pnpm install --force --no-lockfile 成功，node_modules 与源码哈希一致（21561 字节）
-- 用户重启 Web（新进程 11:52:37 启动）后，根级 grep 被 `[orchestrator-gate]` 拦截，证实新版 gate 已加载生效
-- 二次刷新：用户重启后助手验证 node_modules 物理拷贝仍是 12:33 旧快照，于 profiles\web 执行 pnpm install --force --no-lockfile 重刷，lib/index.js 哈希 183C0EF1…、selftest.mjs 哈希 266EEE9B… 与源码一致；请用户再次重启，重启后以日志指纹 7d4a5962 验证新版 gate 已加载并做真实拦截探针
+## Root causes and fixes
+- Early cause: `export const inject = []` in lib/index.js left the plugin inactive with a cordis error; fixed to inject = ["tools"] (line 17).
+- Real cause (2026-11-12): cordis.patch.yml carried a non-inherited Write DENY ACL for DESKTOP-0AKGC7K\Administrator, so pnpm's hardlink copy failed (os error 5), the whole install aborted, and node_modules kept the old gate copy (10:30 version, 18937 bytes) while the new source (11:13, 21561 bytes, with rulesFingerprint start-up log) never loaded; the other 6 file: plugins reinstalled successfully at 11:44, only gate missed the refresh.
+- Fix: Set-Acl removed the Write DENY; pnpm install --force --no-lockfile succeeded and node_modules matched the source hash (21561 bytes).
+- After the user restarted Web (new process 11:52:37) a root-level grep was blocked by `[orchestrator-gate]`, confirming the new gate loaded.
+- Second refresh: the assistant found the node_modules copy still the 12:33 snapshot and re-ran pnpm install --force --no-lockfile in profiles\web; lib/index.js hash 183C0EF1… and selftest.mjs hash 266EEE9B… now match the source, and the user was asked to restart again and verify loading via log fingerprint 7d4a5962 plus a real interception probe.
 
-## 验证与提交
-- 真实 grep 调用 D:\repository\skills（仓库根，深度不足）被 `[orchestrator-gate]` 拦截；orchestrate op=full 实测 plan→cursor/grok-4.7@256k、execute(file_reader)→workbuddy/glm-5.3-flash、summarize→workbuddy/glm-5.3-flash，逐模型成本落盘
-- 早期提交：dsh/orchestrator-gate/ 5 文件 commit 9acaf317（未推送）
-
+## Verification and commits
+- A real grep against D:\repository\skills (repo root, insufficient depth) was blocked by `[orchestrator-gate]`.
+- orchestrate op=full run: plan to cursor/grok-4.7@256k, execute(file_reader) to workbuddy/glm-5.3-flash, summarize to workbuddy/glm-5.3-flash, with per-model costs logged.
+- Early commit: dsh/orchestrator-gate/ (5 files), commit 9acaf317, not pushed.
 
 <!-- MEMORY_FIELDS
 {
   "category": "DSH插件",
   "name": "orchestrator_gate",
-  "source_extraction_id": "b60129e53e214b45abe5b188850b3b57",
-  "version": 7,
+  "source_extraction_id": "11a9ac8607854987a4541fd8aef492b9",
+  "version": 9,
   "memory_type": "entities"
 }
 -->

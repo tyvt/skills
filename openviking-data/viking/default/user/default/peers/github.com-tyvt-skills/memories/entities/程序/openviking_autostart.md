@@ -13,6 +13,7 @@ OpenViking 会话内不可用自动拉起 skill，2026-11-13 创建于 D:\reposi
 - 复用 C:\Users\Administrator\.openviking\start-server.bat（先保 Ollama，1933 未监听才单实例启动，日志 server.log）
 - 服务端命令：C:\Program Files\Python310\Scripts\openviking-server.exe --config %USERPROFILE%\.openviking\ov.conf
 - 启动方式：Start-Process cmd '/c start-server.bat' -WindowStyle Hidden，保留进程句柄
+- 2026-11-24 起 start-server.bat 第 22 行改为 wscript.exe 调用 start-server-bat-hidden.vbs 隐藏拉起服务（原 start "" /min cmd /c 会闪窗），本 skill 复用该 bat 时同样无窗口
 - 幂等：启动前 Get-NetTCPConnection -LocalPort 1933 已监听则跳过；Mutex 互斥防并发冲突
 
 ## 就绪与记录
@@ -26,11 +27,11 @@ OpenViking 会话内不可用自动拉起 skill，2026-11-13 创建于 D:\reposi
 
 <!-- MEMORY_FIELDS
 {
-  "peer_id": "github.com-tyvt-skills",
   "category": "程序",
   "name": "openviking_autostart",
-  "source_extraction_id": "68619ab83cde4408957970de4fca9709",
-  "version": 1,
+  "source_extraction_id": "7d094108eeb24f9dad3f83ba17f356b5",
+  "peer_id": "github.com-tyvt-skills",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

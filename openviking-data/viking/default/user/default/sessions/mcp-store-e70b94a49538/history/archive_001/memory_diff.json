@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/mcp-store-e70b94a49538/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-24T02:55:46.819007+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/规范/agents_md_fanout_policy.md",
+                "memory_type": "entities",
+                "after": "# AGENTS.md 并行扇出策略\nDSH 的 AGENTS.md 中规定会话并行执行路径的条款，2026-11-24 依据全库 A/B 实测改为首选 orchestrate。\n\n## 实测数据（全库 1348 会话）\n- 口径：contextActivity.days.*.tools 计数 + agentTeam.tasks>0 判定真实建团\n- 真实建团（spawn_teammate/workflow）：35 会话（2.6%）、112 任务，均 253 步、16.0k 等效/步、命中率 0.925\n- 仅用 orchestrate：267 会话，均 93 步、8.9k 等效/步、命中率 0.957（三组最优）\n- 纯串行：751 会话，11.1k 等效/步、命中率 0.869；workflow 全库仅 41 次调用\n\n## 结论与决定\n- spawn_teammate/workflow 性价比为负：teammate 独立上下文每步全量重放系统提示与工具目录，父会话还需轮询收结果\n- 判定禁用合理，orchestrate 是数据最优的并行路径\n\n## 2026-11-24 条款改动（D:\\repository\\skills\\dsh\\AGENTS.md，即 ~/.dsh/AGENTS.md）\n- 并行扇出条款：首选改为 orchestrate {op:\"full\"}；spawn_teammate/workflow 标注已全预设禁用、仅 full-tools 可用且默认不选\n- 异构多模型条款：standard 会话需异构模型时改走 orchestrate 子任务或回退主控，workflow agent() 限 full-tools\n\n## 计数口径教训\n- contextActivity.tools.spawn_teammate.n 计数含 selftest 污染（A 组虚高到 323），不能作为建团依据\n- 真实建团须以 agentTeam.tasks>0 判定（35 会话）"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/orchestrator_gate_fanout.md",
+                "memory_type": "entities",
+                "before": "# DSH orchestrator-gate 串行扇出拦截插件\nDSH Web 的 orchestrator-gate 插件，用于拦截会话内串行扇出（连续整读/检索触发子代理扩散），实现于 2026-11-12。\n\n## 核心规则\n- RULES.blockSerialFanout 恒为 true（defineProperty 锁定）\n- normalizeConfig 增加 fanoutStreakThreshold：整数 ≥3 合法、默认 5、非法一律回退\n- 纯函数 classifyFanout(tool, streak, threshold)：达阈值返回改道文案（spawn_teammate / workflow / orchestrate 三条出路）\n\n## 状态机与计数\n- apply 内扇出状态机：既有规则先判被拒不改状态 → skipFanout 豁免 → orchestrate 直过清零两槽 → read/grep 分槽独立计数、第 5 次拒绝并清零本槽；非 fanout 工具清零两槽\n- skipFanout：子代理豁免 + offset≥1&limit≥1 分页读豁免（只影响计数不绕过通用规则）\n- 有界 Map：会话条目 500 封顶、O(1) 淘汰最旧\n- 计数器 rejectedByTool + 日志 fanout-rejected session=%s tool=%s x%d\n\n## 验证与部署\n- 自测 node selftest.mjs：195 checks 全绿（原 110 保留，新增 classifyFanout 纯函数、阈值矩阵、13 系列用例、有界 Map、AGENTS.md 一致性）\n- AGENTS.md「并行扇出（强制）」小节插入两份文件、MD5 一致 AE84D97D…、阈值字面量 5 == 默认值\n- ~/.dsh/orchestrator-gate 为源码符号链接；部署指纹 rulesFingerprint=7d4a5962\n- 改动保留工作区未提交；重启 DSH Web 后日志应出现 orchestrator-gate loaded: fingerprint=7d4a5962\n\n## 可观测口径\n- 按周统计 fanout-rejected，>50% 误拦 → 阈值 5→8，仍 >50% → 关闭规则",
+                "after": "# DSH orchestrator-gate 串行扇出拦截插件\nDSH Web 的 orchestrator-gate 插件，用于拦截会话内串行扇出（连续整读/检索触发子代理扩散），实现于 2026-11-12。\n\n## 核心规则\n- RULES.blockSerialFanout 恒为 true（defineProperty 锁定）\n- normalizeConfig 增加 fanoutStreakThreshold：整数 ≥3 合法、默认 5、非法一律回退\n- 纯函数 classifyFanout(tool, streak, threshold)：达阈值返回改道文案（spawn_teammate / workflow / orchestrate 三条出路）\n- 2026-11-24 起 AGENTS.md 并行扇出首选 orchestrate {op:\"full\"}，spawn_teammate/workflow 预设禁用（仅 full-tools 可用、默认不选），详见 agents_md_fanout_policy\n\n## 状态机与计数\n- apply 内扇出状态机：既有规则先判被拒不改状态 → skipFanout 豁免 → orchestrate 直过清零两槽 → read/grep 分槽独立计数、第 5 次拒绝并清零本槽；非 fanout 工具清零两槽\n- skipFanout：子代理豁免 + offset≥1&limit≥1 分页读豁免（只影响计数不绕过通用规则）\n- 有界 Map：会话条目 500 封顶、O(1) 淘汰最旧\n- 计数器 rejectedByTool + 日志 fanout-rejected session=%s tool=%s x%d\n\n## 验证与部署\n- 自测 node selftest.mjs：195 checks 全绿（原 110 保留，新增 classifyFanout 纯函数、阈值矩阵、13 系列用例、有界 Map、AGENTS.md 一致性）\n- AGENTS.md「并行扇出（强制）」小节插入两份文件、MD5 一致 AE84D97D…、阈值字面量 5 == 默认值\n- ~/.dsh/orchestrator-gate 为源码符号链接；部署指纹 rulesFingerprint=7d4a5962\n- 改动保留工作区未提交；重启 DSH Web 后日志应出现 orchestrator-gate loaded: fingerprint=7d4a5962\n\n## 可观测口径\n- 按周统计 fanout-rejected，>50% 误拦 → 阈值 5→8，仍 >50% → 关闭规则"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

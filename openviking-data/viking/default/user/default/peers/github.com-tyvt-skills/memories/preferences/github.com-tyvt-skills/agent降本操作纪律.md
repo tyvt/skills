@@ -6,14 +6,16 @@
 - eslint --fix 只修自己新增行，改完先 git diff 看是否误伤历史行；新增代码从一开始就写成项目风格免 --fix
 - 用户已表态的方案选择不再重复问（合并交互确认）
 - 方案 plan_review 连续多轮 grok PASS（0 P0）后主动停止循环并置 review_override: true 交用户确认，避免验证路径 token 浪费
+- 浏览器验证优先用 agent-browser 内置 wait 条件而非 Start-Sleep；verify-loop 按 session 累计 sleep 会拦截 pwsh，此时改走 mcp_gateway 的 agent-browser 通道
+- 源文件关键行被工具脱敏（token/密码等）时不据掩码构造 edit 的 old_string，改用按行号脚本重建并用断言校验锚点
 
 <!-- MEMORY_FIELDS
 {
   "user": "github.com-tyvt-skills",
   "topic": "agent降本操作纪律",
-  "source_extraction_id": "5e931fb4b68b489cb2c68dd13b880794",
+  "source_extraction_id": "73c4afa79d41462f87ecf9065e268d76",
   "peer_id": "github.com-tyvt-skills",
-  "version": 2,
+  "version": 4,
   "memory_type": "preferences"
 }
 -->

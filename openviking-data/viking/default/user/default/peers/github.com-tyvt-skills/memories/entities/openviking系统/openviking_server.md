@@ -5,6 +5,7 @@ OpenViking 服务端是提供 MCP 工具接口（含 rule_search）的守护进�
 - 作为守护进程暴露 MCP 工具，DSH MCP 代理（mcp-proxy.mjs）纯透传 OPENVIKING_MCP_URL
 - 插件 dsh-memory-plugin 0.5.33 仅做代理，工具清单由服务端 build 决定
 - 服务端升级后工具列表自动重新同步，无需插件发版
+- 启动链路：start-server.bat 第 22 行经 wscript.exe 调用 start-server-bat-hidden.vbs（窗口样式 0）隐藏拉起，2026-11-24 起拉起全程无 cmd 窗口
 
 ## 关键事实
 - 安装位置：C:\Program Files\Python310\Scripts\openviking-server.exe（Python 包 openviking）
@@ -19,11 +20,11 @@ OpenViking 服务端是提供 MCP 工具接口（含 rule_search）的守护进�
 
 <!-- MEMORY_FIELDS
 {
-  "peer_id": "github.com-tyvt-skills",
   "category": "OpenViking系统",
   "name": "openviking_server",
-  "source_extraction_id": "1b7f0841444c44109560e3b342fe9ec1",
-  "version": 1,
+  "source_extraction_id": "7d094108eeb24f9dad3f83ba17f356b5",
+  "peer_id": "github.com-tyvt-skills",
+  "version": 2,
   "memory_type": "entities"
 }
 -->
