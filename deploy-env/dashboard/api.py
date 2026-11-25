@@ -30,7 +30,7 @@ PROBE_TIMEOUT = 2.0
 
 STATE_STATUS = ('ok', 'empty', 'mismatch', 'missing')
 
-# 多角色账号：密码仅在进程内缓存（由 agent 经 ov_privacy 解析后注入），绝不落盘/入 state JSON
+# 多角色账号：密码明文持久化在 DB(password_plain)，内存缓存 _SECRET_CACHE 作兜底；state JSON 携带明文供看板展示
 _SECRET_CACHE = {}  # (project_key, env, role) -> plaintext
 _SECRET_LOCK = __import__('threading').Lock()
 SECRET_REF_RE = __import__('re').compile(r'^\{\{ov_privacy:([^}]+)\}\}$')
@@ -125,13 +125,14 @@ def load_registry():
     # 多角色账号（按 project_key/env 分组，绝不取明文）
     acct = {}
     try:
-        for a in con.execute('SELECT project_key,env,role,role_label,username,secret_ref FROM env_accounts ORDER BY sort_order,id'):
+        for a in con.execute('SELECT project_key,env,role,role_label,username,secret_ref,password_plain FROM env_accounts ORDER BY sort_order,id'):
             a = dict(a)
-            has = bool(SECRET_REF_RE.match((a.get('secret_ref') or '').strip()))
+            plain = (a.get('password_plain') or '').strip()
+            has = bool(plain) or bool(SECRET_REF_RE.match((a.get('secret_ref') or '').strip()))
             a['has_password'] = has
             a['password_masked'] = '****' if has else ''
             with _SECRET_LOCK:
-                plaintext = _SECRET_CACHE.get((a['project_key'], a['env'], a['role']), '')
+                plaintext = plain or _SECRET_CACHE.get((a['project_key'], a['env'], a['role']), '')
             acct.setdefault((a['project_key'], a['env']), []).append({
                 'role': a['role'], 'role_label': a.get('role_label') or a['role'],
                 'username': a.get('username') or '', 'has_password': has,
@@ -315,14 +316,25 @@ class Handler(BaseHTTPRequestHandler):
             con.close()
             if not ok:
                 return self._send(400, {'error': 'unknown account'})
+            con = sqlite3.connect(DB)
+            con.execute('UPDATE env_accounts SET password_plain=?,updated_at=? WHERE project_key=? AND env=? AND role=?',
+                        (value, datetime.now().isoformat(timespec='seconds'), key, env, role))
+            con.commit()
+            con.close()
             with _SECRET_LOCK:
                 _SECRET_CACHE[(key, env, role)] = value
             return self._send(200, {'ok': True, 'injected': True})
 
         # /api/account/reveal：仅从内存缓存取，未注入/键不存在 -> need_reload
         key, env, role = (str(body.get(k, '')) for k in ('project_key', 'env', 'role'))
-        with _SECRET_LOCK:
-            value = _SECRET_CACHE.get((key, env, role))
+        con = sqlite3.connect(DB)
+        row = con.execute('SELECT password_plain FROM env_accounts WHERE project_key=? AND env=? AND role=?',
+                          (key, env, role)).fetchone()
+        con.close()
+        value = row[0] if (row and row[0]) else None
+        if value is None:
+            with _SECRET_LOCK:
+                value = _SECRET_CACHE.get((key, env, role))
         if value is None:
             return self._send(200, {'ok': False, 'reason': 'need_reload'})
         return self._send(200, {'ok': True, 'password': value})

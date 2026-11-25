@@ -14,11 +14,11 @@ from query_env import query
 CASES = [
     (
         "portal", "test", 8092, "http://localhost:8092",
-        "http://192.168.1.199:8081", "deploy_env/portal/test/password",
+        "http://192.168.1.199:8081", "default:viking://~/privacy/credential/deploy_env-portal-test#/values/password",
     ),
     (
         "fdc-v3", "prod", 8104, "http://localhost:8104",
-        "http://127.0.0.1:8080", "deploy_env/fdc-v3/prod/password",
+        "http://127.0.0.1:8080", "default:viking://~/privacy/credential/deploy_env-fdc-v3-prod#/values/password",
     ),
 ]
 

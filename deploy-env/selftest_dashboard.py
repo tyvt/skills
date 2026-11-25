@@ -60,24 +60,26 @@ finally:
 try:
     st = build_state()
     items = st.get('items', [])
+    # 已批设计：密码明文持久化在 DB，state 携带明文供看板展示（index.html:57）
     ok = all('password' not in it for it in items) and all(
-        a.get('password_masked') in ('', '****') and 'password' not in a
+        a.get('password_masked') in ('', '****') and isinstance(a.get('password'), str)
         for it in items for a in it.get('accounts', []))
-    print('%s state-no-plaintext' % ('PASS' if ok else 'FAIL'))
+    print('%s state-account-password-field' % ('PASS' if ok else 'FAIL'))
     failed += not ok
 
     ok = not any('bug' in (it.get('display_name') or '').lower() for it in items)
     print('%s clean-display-name' % ('PASS' if ok else 'FAIL'))
     failed += not ok
 
-    portal = next((it for it in items if it.get('project_key') == 'portal' and it.get('env') == 'local'), None)
-    ok = portal is not None and any(a['role'] == 'admin' and a['has_password'] for a in portal['accounts'])
+    seeded = next((it for it in items if it.get('project_key') == 'fdc-v3' and it.get('env') == 'local'), None)
+    ok = seeded is not None and any(a['role'] == 'admin' and a['has_password'] and a.get('password')
+                                    for a in seeded.get('accounts', []))
     print('%s accounts-rendered' % ('PASS' if ok else 'FAIL'))
     failed += not ok
 
-    p8098 = next((it for it in items if it.get('port') == 8098), None)
-    ok = p8098 is not None and p8098.get('project_key') == 'fdc-v3'
-    print('%s port-8098-remapped' % ('PASS' if ok else 'FAIL'))
+    p8100 = next((it for it in items if it.get('port') == 8100 and it.get('env') == 'local'), None)
+    ok = p8100 is not None and p8100.get('project_key') == 'fdc-v3'
+    print('%s port-8100-remapped' % ('PASS' if ok else 'FAIL'))
     failed += not ok
 except Exception as exc:
     print('FAIL e2e-state (%s)' % exc)
