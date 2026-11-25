@@ -34,7 +34,7 @@ FM_FIELDS = ("audit_status", "last_checked", "verdict_note")
 FM_RE = re.compile(r"\A---\s*\n(.*?)\n---\s*\n?", re.S)
 DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}")
 
-VALID_VERDICTS = {"valid", "invalid", "suspect"}
+VALID_VERDICTS = {"valid", "invalid"}
 
 
 def now_iso():
@@ -305,7 +305,7 @@ def audit_event(uri, action, verdict, note):
 
 def cmd_stats(args):
     uris = list_all_uris()
-    counts = {"valid": 0, "invalid": 0, "suspect": 0, "unchecked": 0, "invalid_date": 0}
+    counts = {"valid": 0, "invalid": 0, "unchecked": 0, "invalid_date": 0}
     # 一次 grep 取全库 audit_status, 避免对 6000+ 条逐条 read 超时.
     g = ov_json(["grep", "audit_status:", "-u", MEM_ROOT, "-n", "20000"])
     status_map = {}
@@ -320,7 +320,7 @@ def cmd_stats(args):
             counts[status] += 1
         else:
             counts["unchecked"] += 1
-    checked = counts["valid"] + counts["invalid"] + counts["suspect"]
+    checked = counts["valid"] + counts["invalid"]
     print(json.dumps({
         "total": len(uris),
         "checked": checked,

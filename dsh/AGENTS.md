@@ -95,24 +95,11 @@
 
 ## 记忆时效性验证与优化（P1）
 
-- **触发**：auto-recall 召回 `viking://` 事实记忆时即做时效验证，不照单全收。每条记忆先读 frontmatter；**无 frontmatter / 空证据一律标 suspect**（不采信为当前事实，也不删）。
-- **四态判定**（按证据，不靠相似度）：VALID（现状一致）、STALE（被新值覆盖）、CONFLICT（同主体互斥值）、INVALID（幻觉/测试垃圾/隐私违规）。现状证据优先级：本会话用户新陈述 > 本轮工具实时返回 > 召回记忆交叉一致性 > `source_of_truth` 权威记忆；新证据时间须晚于记忆 `updated_at` 且语义冲突才判过期。证据不足 → 只标 `needs_review`，不动内容。
-- **动作优先级：修正 > 归档 > 删除**。STALE→原地 `edit` 改正文+frontmatter（`updated_at`/`valid_until`/`change_log`）；CONFLICT 或仅历史有效→归档降级（写 `_archive/` 并打 `archived/stale` 标签，检索默认过滤）；INVALID→删除。
-- **禁止 agent 自由删除长期稳定事实**（如用户固定偏好、底层规则）；删除仅限确认的幻觉/测试垃圾/隐私，且需高置信。拿不准一律归档+过滤，不删。
-- **归档检索过滤**：召回排序对 `updated_at` 新、`confidence` 高、非 archived 加权；多条冲突时采信更新时间新的，旧冲突记忆仅作历史参考。
-- **审计与 24h 冷却**：每次优化记审计（URI/动作/证据/时间）；同一 URI 24h 内不重复优化，防抖动。若当前记忆工具不支持归档目录或冷却字段，**降级为仅标注 + 禁止删除**，不得以不支持为由跳过验证或一刀切删。
+- **触发**：记忆质量只走抽检验证，不照单全收 auto-recall 召回内容；无 frontmatter / 空证据**不再单独判 suspect**，一切以抽检对代码/现状的证据核对为准。
+- **二态判定**（抽检唯一口径，只有两种结果）：VALID（代码与现状证据一致 → 有效）/ INVALID（幻觉、测试垃圾、隐私违规、或记忆描述与现状证据不符 → 无效）。现状证据优先级：本轮工具实时代码核对 > 本会话用户新陈述 > 召回记忆交叉一致性 > `source_of_truth` 权威记忆。证据不足时以现状为准核对；无法证明有效即判 INVALID，不留第三态。
+- **工具链**：用 `scripts/memory_audit.py` 的 select → 逐条代码证据核对 → apply 写回 `audit_status`（仅 valid/invalid）→ stats 看覆盖率。中间文件只在 `~/.dsh/cache/memory-audit/`，不写项目目录。
+- **审计与 24h 冷却**：每次抽检写审计日志（URI/动作/判定/证据/时间）；同一 URI 24h 内不重复抽检，防抖动。无归档、无 suspect 消费灰度机制。
 - reindex 由 SDK/CLI 在 edit/write/forget 后自动触发，无需手动 reindex 步骤。
-
-## suspect 记忆消费约束（灰度·软提示）
-
-- 生效范围：仅对带 `status:suspect` 的记忆生效，读到 suspect 才加载；不改平台召回打分、不剔除 suspect（保留兜底召回）。稳定性未判定通过前，仅软提示灰度，不扩量、不切常态化。
-- 软排序口径（agent 侧消费，非平台 API）：`valid` 基准默认优先；`suspect` 与无 status 的存量记忆同档后置、权重压低但保留在候选池；同档内按语义相似度排序；penalty 初值 0.25（相对 base_score∈[0,1]），灰度期按观测可调，不设硬阈值过滤。
-- 命中 `status:suspect` 时：
-  1. 优先采信 `status=valid` 的事实；同主题 valid 与 suspect 冲突时以 valid 为准。
-  2. suspect 仅作参考线索，使用前必须显式校验（本会话新陈述 / 实时工具返回 / 权威记忆交叉验证）；校验通过方可作事实使用，否则不使用。
-  3. 输出依赖 suspect（即使已校验）建议标注【来源记忆待复核】，除非已被 valid 覆盖。
-  4. 禁止将 suspect 作为删除/归档/提交/对外输出等不可逆操作的唯一依据。
-- 消费日志（阶段 C 数据源）：命中 suspect 的会话记录三字段——会话标识、命中 suspect 条数、直接采信 case 数；召回平台不输出 status/confidence/rank，以本日志替代召回埋点。
 
 ## 禁止
 
