@@ -23,7 +23,8 @@ from upsert_env import upsert_registry  # noqa: E402  写回逻辑单一来源
 DB = os.environ.get('DEPLOY_ENV_DB') or os.path.join(ROOT, 'registry.sqlite')
 TOKEN_FILE = os.path.join(DASH, '.token')
 INDEX_HTML = os.path.join(DASH, 'index.html')
-SITES_DIR = r'D:\nginx\conf\sites-enabled'
+SITES_ENV_DIR = r'D:\nginx\conf\env-sites'
+SITES_LEGACY_DIR = r'D:\nginx\conf\sites-enabled'
 NGINX_EXE = r'D:\nginx\nginx.exe'
 PREFERRED_PORT, FALLBACK_PORT = 18098, 18099  # 8098/8099 被 legacy nginx 站点占用，避开 8090-8110 站点段
 PROBE_TIMEOUT = 2.0
@@ -61,8 +62,35 @@ def pick_port(preferred=PREFERRED_PORT, fallback=FALLBACK_PORT):
 
 
 def conf_path_for(row):
-    name = row.get('nginx_conf') or (row['project'] + '.conf')
-    return os.path.join(SITES_DIR, name)
+    """多环境片段在 env-sites/{project}-{env}.conf；legacy 单文件仍在 sites-enabled。"""
+    env = (row.get('env') or 'local').strip()
+    tried = []
+    for k in ('display_name', 'project', 'project_key'):
+        proj = (row.get(k) or '').strip()
+        if not proj or proj in tried:
+            continue
+        tried.append(proj)
+        multi = os.path.join(SITES_ENV_DIR, '%s-%s.conf' % (proj, env))
+        if os.path.exists(multi):
+            return multi
+    port = row.get('port')
+    if port and os.path.isdir(SITES_ENV_DIR):
+        suffix = '-%s.conf' % env
+        try:
+            port = int(port)
+        except (TypeError, ValueError):
+            port = None
+        if port is not None:
+            for fn in os.listdir(SITES_ENV_DIR):
+                if not fn.endswith(suffix):
+                    continue
+                path = os.path.join(SITES_ENV_DIR, fn)
+                st, listens = scan_conf(path)
+                if st == 'ok' and listens and port in listens:
+                    return path
+    proj = (row.get('project') or row.get('project_key') or '').strip()
+    name = (row.get('nginx_conf') or '').strip() or (proj + '.conf')
+    return os.path.join(SITES_LEGACY_DIR, name)
 
 
 def scan_conf(path):

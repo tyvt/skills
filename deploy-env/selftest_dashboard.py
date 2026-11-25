@@ -7,7 +7,7 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from dashboard.api import (display_and_built, probe_http, scan_conf, pick_port,
-                           build_state, _SECRET_CACHE, _SECRET_LOCK, SECRET_REF_RE)
+                           build_state, conf_path_for, _SECRET_CACHE, _SECRET_LOCK, SECRET_REF_RE)
 
 failed = 0
 n = display_and_built({'project': 'p', 'dist_root': 'D:/repo/proj/dist/', 'nginx_conf': 'p.conf'})
@@ -93,6 +93,21 @@ with _SECRET_LOCK:
     _SECRET_CACHE[('portal', 'local', 'admin')] = 'unit-secret'
 ok = _SECRET_CACHE.get(('portal', 'local', 'admin')) == 'unit-secret'
 print('%s secret-inject-reveal' % ('PASS' if ok else 'FAIL'))
+failed += not ok
+
+import tempfile
+with tempfile.TemporaryDirectory() as d:
+    env_dir = os.path.join(d, 'env-sites')
+    os.makedirs(env_dir)
+    p = os.path.join(env_dir, '苏住房G-local.conf')
+    open(p, 'w', encoding='utf-8').write('listen 8101;\n')
+    import dashboard.api as api_mod
+    old_env, old_leg = api_mod.SITES_ENV_DIR, api_mod.SITES_LEGACY_DIR
+    api_mod.SITES_ENV_DIR, api_mod.SITES_LEGACY_DIR = env_dir, os.path.join(d, 'legacy')
+    hit = conf_path_for({'project': '苏住房G', 'env': 'local', 'project_key': '苏住房G'})
+    api_mod.SITES_ENV_DIR, api_mod.SITES_LEGACY_DIR = old_env, old_leg
+    ok = hit == p
+print('%s conf-path-env-sites' % ('PASS' if ok else 'FAIL'))
 failed += not ok
 with _SECRET_LOCK:
     _SECRET_CACHE.clear()
