@@ -18,6 +18,8 @@ description: 禅道 Bug/任务分析与回写。给定禅道链接时拉取详�
 9. **修复**：先判项目（监测V3 = `zhi3-web-admin-...`，门户 = `zhi2-web-admin-...`，用 `.env` / `VITE_APP_PROXY_ADDRESS` 确认）。改源码后只跑 `npx eslint <file>`，不要全量 lint 回灌。本地站点：监测V3 8098 / 门户 8099。未跑构建必须写「未执行」。
 10. **提交** → `references/commit.md`。要构建哈希就放在 commit 之后，否则 hash 指向旧 HEAD。
 11. **回写**：`node D:\repository\skills\zentao-analyzer\zentao-resolve.mjs <bugId> <commentHTML>`，脚本只打印序列，照抄执行。细节与禁忌在 `references/dbx.md`。**回写硬门（2026-11-19）**：前端任务的 comment **必须贴 agent-browser 验证证据**——多帧截图用 `zentao_gif.py` 合成 GIF，用 `zentao_upload.py` 上传到禅道拿 fileID（`OK <id> <ext>`），再给 resolve 脚本传 `--attach "<id:ext,...>"` 内嵌 `<img src="{id.ext}">`；上传不通停下说明，禁止静默略过。**无证据图/GIF 不得回写**。证据落禅道后才删本地产物（见 AGENTS.md「前端任务验证门」顺序）。上传/GIF 契约见 `references/attach.md`。
+    - **回写前提交硬门（2026-11-25，用户要求）**：回写禅道前必须先确认代码已 commit 且已 push 到远程分支（git 工作区干净、无未推送提交），**禁止"只回写禅道、不提交代码"**——代码未提交则回写状态无从验证。禅道任务在用户确认验证通过后即视为已授权提交推送+回写两件事都做，**不再二次询问提交方式**；仅用户明示暂不提交时跳过（见 AGENTS.md「禅道任务免二次问」、`references/commit.md`）。
+   - **task 类工单回写硬约束（用户明确要求，禁止只备注）**：task 类工单回写**不得只 INSERT `commented` 备注**，必须同时做到三要素——① 完成：`zt_task.status='done'`（写 `finishedBy`/`finishedDate`，动作 `finished`）；② 填工时：`consumed`/`left`/`estimate` + 工时明细 `zt_taskestimate` + 动作 `recordworkhour`；③ 指派创建人：`assignedTo = openedBy`（动作 `assigned`）。**现有 `zentao-resolve.mjs` 仅支持 bug，不可拿来回写 task**；task 回写需独立事务 SQL（见 `references/dbx.md` 附录 A）或新建专用脚本。字段/枚举/action 细则见 `references/dbx.md` 回写章节。
 12. **收尾**：构建、部署、回写证据齐才收尾。再看 token-optimizer 的等效成本与未命中 TOP。
 
 | 脚本 | 作用 |
