@@ -54,6 +54,18 @@ $env:PYTHONIOENCODING='utf-8'
 - 收敛：`pwsh -File sync.ps1`（备份→生成片段→冲突感知归档→`nginx -t` 门禁→reload→退化探活回滚）；负向测试加 `-SimulateBadFragment`。
 - 端口冲突 conf 一律不归档、不重生成，只在 events 记待人工；密码仍不入库，token 落 `dashboard/.token`（gitignore）。
 
+## 看板排障与注册表治理（P0，避免假「缺 conf」与异网关注册）
+- **多环境 conf 真路径**：注册表生成的片段在 `D:\nginx\conf\env-sites\{项目显示名}-{env}.conf`（`gen_nginx_sites.ps1`）；legacy 单文件仍在 `sites-enabled\{项目}.conf`。看板 nginx 三态由 `dashboard/api.py` 的 `conf_path_for` 解析：先 `env-sites`，再按 `display_name` / `project` / `project_key` 与 **listen 端口** 回退；`project_key`（如 `suzhufang-g`）与中文文件名不一致时，不得只靠 `project_key+.conf` 判缺。
+- **大面积「缺 conf」**：先确认磁盘上 `env-sites` 是否存在对应 `{项目}-{env}.conf` 且非 0 字节；再跑 `selftest_dashboard.py`（含 `conf-path-env-sites`）；仍异常再查 `nginx_conf` 字段与端口是否与注册表一致，禁止手改 `sites-enabled` 冒充多环境。
+- **非本地环境网关**：本地 nginx 代理应以 **local（含 `local-*`）环境的 `backend_gateway`** 为准。无 local 登记的项目，面板不应保留 dev/test/uat/prod 远程公司网关行（仅展示 local 代理场景）。
+- **清理脚本（先 dry-run）**：
+  ```
+  $env:PYTHONIOENCODING='utf-8'
+  & 'C:\Program Files\Python310\python.exe' 'D:\repository\skills\deploy-env\prune_mismatched_gw_envs.py'
+  ```
+  默认只打印将删行：无 local → 删该项目全部非 local 环境；有 local → 删 `backend_gateway` 与 local 归一化后不一致的非 local。确认后加 `--apply`（自动备份 `registry.sqlite.bak-prune-gw-*`）。
+- **删行后**：`pwsh -File gen_nginx_sites.ps1` 或 `sync.ps1` 使片段与注册表一致；刷新看板 `/api/state`。
+
 ## selftest（两例 + 看板四例）
 ```
 $env:PYTHONIOENCODING='utf-8'

@@ -81,7 +81,8 @@
 ## 部署面板硬拦截（P0，所有会话生效）
 - **部署必注册**：任何前端项目部署必须先经部署面板注册（项目身份 + 环境），禁止绕过面板直接改 nginx 站点/手配端口；部署严格按 5 环境 `local/dev/test/uat/prod`（对应本地/公司开发/公司测试/客户测试/生产），`port=port_base+env_index` 且端口全局唯一，禁止环境名/端口段之外的部署。查询入口 `skill("deploy-env")` → `query_env.py <project> <env>` 或看板 `/api/state`（单源，禁猜端口/网关）。
 - **bug 复现先查面板**：凡 bug 复现需要地址、账号、密码的，第一步必须查部署面板（`query_env.py` / `/api/state`），直接用返回的 `frontend_url`/`backend_gateway`/账号；查不到才用 `ask_user_question` 问用户，用户给出后用 `agent-browser` 实机验证正确。
-- **验证通过必回写**：地址/账号/环境等验证正确后，必须回写面板注册表（`deploy-env/upsert_env.py` 或看板 `POST /api/registry/upsert`）；密码走 `privacy_upsert` 存真实值→把 `{{ov_privacy:...}}` 引用写入 `secret_ref`→`POST /api/secrets/inject` 注入，明文密码绝不入库。用户在会话中指出的部署信息错误（端口/网关/账号/环境/项目名），同样当即更新面板，不留到下次。
+- **验证通过必回写**：地址/账号/环境等验证正确后，必须回写面板注册表（`deploy-env/upsert_env.py` 或看板 `POST /api/registry/upsert`）；密码走 `privacy_upsert` 存真实值→把 `{{ov_privacy:...}}` 引用写入 `secret_ref`→`POST /api/secrets/inject` 注入，明文密码绝不入库。用户在会话中指出部署信息有误（端口/网关/账号/环境/项目名），同样当即更新面板，不留到下次。
+- **看板异常必加载 deploy-env 排障节**：大面积「缺 conf」、非 local 环境挂了与公司侧不同的远程网关、或用户要求清理异环境登记时，先 `skill("deploy-env")` 读 **「看板排障与注册表治理」**，按 `prune_mismatched_gw_envs.py` dry-run→apply 与 `env-sites` 片段刷新处理，禁止只改注册表不刷新 nginx 片段。
 
 ## 落地
 
