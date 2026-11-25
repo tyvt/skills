@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T18:34:03+08:00
+verdict_note: 太仓G仓DecisionRangeTable.vue含showSuccess/decisionId同步，generalDecision与maintainDecision/detail.vue调用，zsTable/index.vue有doLayout，动态增列重渲染修复属实。
+---
 # 决策范围表格动态增列未重渲染致空
 太仓G端切换「投票信息」标签时 DecisionRangeTable 动态增加列，表格未强制重渲染与调用 doLayout()，导致分页有数但内容空。
 

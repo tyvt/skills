@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T20:40:16+08:00
+verdict_note: 门户确已切换 HomeBizSection（HomeLayoutSidebar.vue-66/79、渲染-18/25）且 HomeDeveloperIconRow.vue 已删除，此核心属实；但记忆所述 homeDataMixin.js 的 developerCommodityFlow 与 index-new.vue 的 -developer-flow 在工作树及 git 历史均无痕迹，现状为 businessFlows+variant 架构，实现细节与现状不符。
+---
 # 开发企业首页旧组件致步骤无箭头角标
 开发企业首页曾误用 HomeDeveloperIconRow 而非 HomeBizSection，导致步骤无箭头且带序号角标；已切换为 HomeBizSection 并删除旧组件。
 

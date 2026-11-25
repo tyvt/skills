@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 预售楼幢子表误用listMixins修复
 苏州市房地产监测V3 中 PresaleBuildingTable.vue 误用 listMixins 导致 Vue2 警告，已通过移除 mixin 修复。
 

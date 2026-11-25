@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 企业信息变更统一管理列表查看页未授权修复
 苏州市房地产监测V3 修复企业信息变更统一管理列表（companyChangeManage）点击「查看」时报「页面未授权 / 详情页未授权或不存在」的问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T20:39:21+08:00
+verdict_note: 区域报告 publish 差异实为 query 参数 reportState/publishState（api-map-report.md-20/-147），第二参是发布状态且可选，非记忆所称『区域编码维度参数、缺参落错分区』；e2e-result.md-301 明确勿误判参数不一致。核心描述与现状不符。
+---
 # 区域报告 publish 接口额外参数陷阱
 区域报告链路的 publish 接口可能带第二个参数（区域维度），只按文档或姊妹链路调用会缺参导致数据落错分区。
 

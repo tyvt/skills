@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 企业端登录后项目选择弹窗缺失
 企业用户登录后「物业管理区域/项目选择」弹窗由开关控制，曾因配置关闭而缺失，后在 develop/v2.6.2 修复。
 
@@ -22,7 +29,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=榆林G
-
 
 <!-- MEMORY_FIELDS
 {

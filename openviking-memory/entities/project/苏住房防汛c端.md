@@ -2,7 +2,7 @@
 苏住房防汛C端移动查询H5项目，基于 uni-app Vue3 的 C 端移动网页，包含数智页面等模块。
 
 ## Description
-- uni-app Vue3 H5 移动查询应用，主工作区 dev 分支，构建产物部署至 nginx 8095 站点（root 指向主工作区 dist）
+- uni-app Vue3 H5 移动查询应用，主工作区 dev 分支；2026-11-25 部署面板核对 dev 为 http://localhost:8161（test 为 8162，health up），8095 仅为本地 nginx 备份/旧结论（原 root 指向主工作区 dist）而非部署面板端口
 - 工作区路径 D:\repository\苏住房防汛C端（worktree 曾用 D:\repository\苏住房防汛C端-wt-shuzhi）
 - 页面路由含 src/pages/data/ 数智页面，参考本地 HTML 静态稿重新实现
 
@@ -18,8 +18,8 @@
 {
   "category": "project",
   "name": "苏住房防汛C端",
-  "source_extraction_id": "e6c9ece10ec04cda8e07002c71bf1e98",
-  "version": 4,
+  "source_extraction_id": "fc898aa9db5749e6b8abf2406f60aca1",
+  "version": 5,
   "memory_type": "entities"
 }
 -->

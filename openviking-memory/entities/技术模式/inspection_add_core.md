@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T00:39:33+08:00
+verdict_note: 物业手持B端 src/pages_facility/record/add.vue 实存；ZsDialog/ZsUploader、api/maintenance(getProcedurePage/addRecordWithProcedureProcess)、巡检步骤逻辑均在文件中，描述属实。
+---
 # 巡检记录添加核心位于 record/add.vue
 在B端物业管理移动应用中，添加和移除巡检记录步骤的核心位于 src/pages_facility/record/add.vue，与图片上传组件 ZsUploader、对话框 ZsDialog 以及相应的 API 相关联。
 

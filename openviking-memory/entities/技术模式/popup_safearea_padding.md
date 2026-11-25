@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T01:33:51+08:00
+verdict_note: 泰兴小程序 src/App.vue-90-105 有样式穿透 uni-popup 与 .uni-popup__wrapper.bottom 安全区 padding 层级注释及规则，根因描述属实。
+---
 # 弹窗外层内边距致底部安全区留白
 uni-app 编译注入 `addGlobalClass:true` 使 `App.vue` 样式穿透至 `uni-popup` 内部，根因系 `App.vue` 将 `padding-bottom: env(safe-area-inset-bottom)` 作用于 `.uni-popup__wrapper.bottom` 外层，致内容白卡片无法填充而露遮罩灰。
 ## 问题根因

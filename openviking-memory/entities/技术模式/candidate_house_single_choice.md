@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T20:39:32+08:00
+verdict_note: 园区公共收益 BuildingTable.vue 有 singleChoice prop(-73)、clearAllChecked()(-157)及单选逻辑(-176-177)；CandidateDialog.vue 有 onCellClick(-1003)、enforceSingleChecked(-1014,调用-1035)。与记忆一致。
+---
 # 筹备组户室选择列表与楼盘表互斥单选
 园区公共收益项目(zhi2-web-admin)中 BuildingTable 新增单选模式，使楼盘表与列表视图在候选人征集选户室时互斥只选一条。
 

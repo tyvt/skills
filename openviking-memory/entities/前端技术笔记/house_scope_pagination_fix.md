@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T20:40:05+08:00
+verdict_note: 园区公共收益 HouseScopeDialog.vue .transfer-footer--left(-66)下 pagination-total white-space-nowrap+flex-shrink-0(-391-392)、pagination-container flex-wrap-nowrap(-382)、el-pagination flex-1(-396)，与记忆修复内容吻合。
+---
 # 楼幢房屋关联弹框分页文字竖排修复
 修复园区公共收益项目楼幢信息详情「关联房屋」弹框分页区「共 61 条记录」中文逐字换行、竖排显示的问题。
 

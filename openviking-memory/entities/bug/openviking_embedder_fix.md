@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # OpenViking Embedder 客户端关闭修复
 OpenViking 在 litellm_embedders.py 的本地补丁曾因每次调用后关闭共享 httpx 客户端，导致嵌入失败。
 

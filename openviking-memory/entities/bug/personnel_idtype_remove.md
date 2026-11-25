@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 从业人员详情去掉证件类型字段
 苏州市房地产监测V3 项目从经纪从业人员、租赁从业人员两处详情页移除「证件类型」字段。
 

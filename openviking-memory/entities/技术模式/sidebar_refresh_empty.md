@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:39:59+08:00
+verdict_note: 核验通过：门户/zhi2-web-admin/src/utils/menuVisibility.js 含 normalizeMenuPath，permission.js、layout/components/{Navbar,Sidebar,TagsView} 均命中；侧栏/顶栏菜单修复涉及文件与现状一致
+---
 # 门户侧栏刷新空菜单与顶栏更多功能
 门户刷新后侧栏只剩箭头、顶栏一级菜单为空的问题，已按 vue-reviewer 三项结论修复。
 
@@ -16,7 +21,6 @@
 ## 验证与归属
 - 所属项目：门户
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

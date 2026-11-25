@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 构建失败：Windows与Linux文件名大小写差异
 产品2.0 的 zhi2-web-admin 在 GitLab Runner（Linux）构建失败，根因为 import 路径大小写与实际文件名不一致。
 

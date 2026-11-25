@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 费用绑定表格金额不显示修复
 苏住房G(zhi2-web-admin) 费用申报 feeBindScopeTable.vue 金额列因字段未对齐汇总接口导致显示 0.00，已修复。
 

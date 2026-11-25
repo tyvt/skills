@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T19:35:08+08:00
+verdict_note: companyScheme/index.vue-69 v-if=schemeDialogOpen 重挂载；CompanySchemeDialog.vue-5 form-layout=single、-9 DetailTemplate 查看态；institutionRegister/detail.vue-61 服务方案详情弹窗+关闭按钮。功能属实(实现已迁至 companyScheme 模块)。
+---
 # 服务方案详情弹窗改造
 苏州市房地产监测V3 中服务方案详情弹窗已改为单列弹窗并简化底部按钮。
 

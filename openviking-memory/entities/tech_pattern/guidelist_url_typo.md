@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T02:34:05+08:00
+verdict_note: guideList.vue-4 为 guideDetail?id（单问号已修复），guideDetail.vue-19-20 有 this.id=options.id 及 if(!this.id) 空值校验，与记忆一致
+---
 # guideList URL Typo and Missing ID Check
 In zhi2-mobile-shimin, guideList.vue had extra question mark in jump URL and guideDetail.vue lacked empty ID validation.
 ## Root Cause
@@ -20,7 +25,6 @@ In zhi2-mobile-shimin, guideList.vue had extra question mark in jump URL and gui
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：396b7339-8e50-4545-8923-92c3135143b9
-
 
 <!-- MEMORY_FIELDS
 {

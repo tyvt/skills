@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T20:39:09+08:00
+verdict_note: portalApiRewrite.js 实位于 门户/zhi2-web-admin/src/utils/，产品2.0 全树无此文件；产品2.0 user.js getInfo 走 /system/user/getInfo(-132) 后端路径，非记忆所述 /v2.0/portal/user/getInfo。文件归属与接口路径均与现状证据不符。
+---
 # 门户与后台接口族混淆致1400方法不支持
 登录后请求 /v2.0/portal/user/getInfo 返回 code:1400、msg「HTTP请求方法不支持」，登录停留原页。
 
@@ -21,7 +26,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

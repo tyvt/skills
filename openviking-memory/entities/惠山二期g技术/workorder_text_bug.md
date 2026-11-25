@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T00:40:28+08:00
+verdict_note: 惠山二期G zhi2-web-admin/src/views/property/workOrder/order/detail.vue 实存；contentInfo 中 orderContent 设 type-'textarea'，DetailTemplate 展示，与长文截断改 textarea 描述一致。
+---
 # 报事工单详情文本截断Bug
 报事工单详情因DetailTemplate默认单行省略致长文显示不全，已通过textarea类型修复。
 

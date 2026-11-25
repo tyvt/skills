@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T00:40:34+08:00
+verdict_note: 苏州市房地产监测V3 zhi2-web-admin/src/api/company/companyApply.js 已导出 getCompanyApplyCertificateInfo 等 11 个函数，与补全机构备案 API 导出、修复 is not exported 的描述一致。
+---
 # 构建报 API 未导出需于 companyApply 补
 zhi2-web-admin build failed with "is not exported" because companyApply.js missed institution filing API exports.
 
@@ -19,7 +24,6 @@ zhi2-web-admin build failed with "is not exported" because companyApply.js misse
 ## 验证与归属
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

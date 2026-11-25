@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 预售选房弹窗已选房屋清空修复
 苏州市房地产监测V3 禅道 Bug #6337（lichandan 提交，截图 fileID 21960）：预售合同签订「新增合同」弹窗点左侧楼幢后已选房屋被清空，已修复闭环。
 
@@ -28,7 +35,6 @@
 - 主工作区首构建触发 bun install 致缺 esbuild，用 PM=npm node scripts/install.mjs 修复，package-lock 未改
 - 主工作区他人未提交（env/.env、eslint-rules/* 缺失、.tmp-bug-6324.png、.tmp-bug6285/）未触碰
 - 涉及文件：chooseHouseDialog.vue；所属项目：苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

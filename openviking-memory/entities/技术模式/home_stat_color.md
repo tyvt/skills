@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T01:32:46+08:00
+verdict_note: 门户 HomeStatCard.vue-9/11 用 span.stat-today/.stat-month 包值，75/79 行定义色；dist CSS 为 #f5a623/#2b5ea7，与记忆一致。
+---
 # 首页统计卡今日橙本月蓝配色模式
 门户首页统计卡要求今日值橙色、本月值蓝色且同卡并存时，应给数值包 span 挂类名而非整块动态设色。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T23:33:54+08:00
+verdict_note: 记忆核心为 wrapper-class 传 z-index-100000!important。实查园区物管2.0 zs-dialog.vue 仅 z-index-100/-1，AdvertiseAssetDialog.vue 用 -above-drawer 而非 wrapper-class；V3 全域无 wrapper-class/100000。描述与现状不符。
+---
 # zs-dialog 弹窗层级提升需用 wrapper-class
 scoped 样式对 el-dialog 内部渲染的 el-dialog__wrapper 生效不确定，需用 wrapper-class 提层避免被更高层级遮罩盖住。
 

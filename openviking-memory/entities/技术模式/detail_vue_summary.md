@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T20:38:58+08:00
+verdict_note: 产品2.0 cloudguardian/plan/detail.vue 绑定 -summary-method="showMethod" -show-summary="showSummary"(-52)、mixins-[detailMixins](-70)、data showSummary-false(-92)、空 showMethod(-163)，与记忆完全吻合。
+---
 # detail.vue 缺 summary 定义致 zs-table 表格警告
 detail.vue 中 zs-table 绑定 :summary-method 与 :show-summary，但 PlanDetail 仅用 detailMixins 未提供这两个成员致表格警告。
 

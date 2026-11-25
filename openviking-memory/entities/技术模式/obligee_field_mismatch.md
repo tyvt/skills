@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T21:33:22+08:00
+verdict_note: 太仓G zhi1-web-admin 四个 DecisionRangeDialog.vue(decisionCommon/Lite/ownerDecision/optionDecision)均用 obligeeName：prop、v-model=form.obligeeName、data obligeeName-undefined 齐备，与记忆一致。
+---
 # 决策范围详情权利人字段不一致修复
 太仓G端「决策范围详情」弹窗因字段名不一致导致权利人拼接为空，已修复。
 

@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 机构变更行政区域字段保留修复
 苏州市房地产监测V3 项目修复机构变更保存时未保留原 `provinceCityArea`（行政区域）字段值的问题。
 

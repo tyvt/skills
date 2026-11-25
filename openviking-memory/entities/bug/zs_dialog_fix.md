@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # zs-dialog弹窗不居中修复
 苏州市房地产监测V3 中「菜单详情」等 `zs-dialog` 弹窗不居中的问题已修复，所有使用该组件的弹窗均受益。
 

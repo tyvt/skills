@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T22:34:45+08:00
+verdict_note: zhi2-mobile-shimin/src/pages_owner/static/images/svg/flag-szf.svg 存在，StepConfirm.vue 与 pages_vote/decision/sort/ResultStatistics.vue 均引用它；与记忆一致。
+---
 # flag-szf.svg 丢失致构建未解析报错
 ResultStatistics.vue 与 StepConfirm.vue 引用的 pages_owner/static/images/svg/flag-szf.svg 在工作区丢失，构建报 didn't resolve at build time。
 

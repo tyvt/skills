@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T23:34:44+08:00
+verdict_note: 验证证据「苏住房C/037.md」全域未找到，代码中 clickCheckTask 0 命中（459 文件因编码跳过）。属运行时/环境兼容性诊断，代码基线 none，无代码现状可证明，按二态口径判无效。
+---
 # 微信基础库3.8.6+与旧uni-app不兼容致登录报错
 苏住房C微信小程序基础库 3.8.6+ 与旧版 uni-app 编译器不兼容，登录页多 input 触发 clickCheckTask 报错 Cannot read property '0' of null。
 ## 问题现象

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:05:52+08:00
+verdict_note: 跨记忆一致(zhi2-property非目标后端,正确为service-expand/Flood),无反证
+---
 # zhi2-property
 曾被误认为前端页面后端所在的服务。
 ## Description

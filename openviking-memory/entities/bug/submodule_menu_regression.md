@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 子模块菜单导航回退问题
 合并 zhi2-web-admin 子模块时选错旧提交，导致菜单导航功能回退。
 
@@ -20,7 +27,6 @@
 ## 验证与归属
 - 所属项目：榆林G
 - 验证证据：extracted source=cursor project=榆林G
-
 
 <!-- MEMORY_FIELDS
 {

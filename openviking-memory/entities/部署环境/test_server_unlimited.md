@@ -1,31 +1,30 @@
-# Unlimited Query H5 Test Server
-Test server for the Suzhou Housing flood-control C-end mobile query H5, used by the Lead (user) to view the deployed effect online.
+# 苏住房防汛C端 H5 测试服
+苏住房防汛C端移动查询 H5 的 test 环境站点，用户（Lead）用于在线查看部署效果。
 
-## Address & Build Source
-- Access URL: `http://unlimited.c.h5.query.mobile.v2.suzhufang.shiqu.suzhou.test.zhi.com/`
-- Built from the GitLab repo, not local `dist`; local fixes only take effect after pushing to the remote branch and rebuilding
-- Local deployment is nginx 8095 (`http://127.0.0.1:8095/`) serving local `dist` directly with hash-mode routing; 2026-11-24 confirmed the live site config is `D:\nginx\conf\sites-enabled\防汛C端.conf` (the `防汛C端-local.conf` outside `sites-enabled` is not the running one)
-- 2026-11-24 re-check: that nginx site was live and serving the built app; `dist` (14:59:35) was newer than the source (14:59:16) and the build had exited 0
-- Old effects on the test server mean the remote branch lacks the commit (e.g. `97c9460`)
-- 2026-11-14 commit `e925eec6ebd0b59fdf9cf47e0d763d35e8be3d7d` was pushed to origin/dev (local and remote hashes match) but not yet deployed to this test server; it shows only after rebuild/deploy
+## 地址与构建来源
+- 访问地址：`http://unlimited.c.h5.query.mobile.v2.suzhufang.shiqu.suzhou.test.zhi.com/`；由 GitLab 仓库构建而非本地 `dist`，本地修复须推远端分支并重新构建后才生效
+- test 服效果陈旧说明远端分支缺少对应提交（如 `97c9460`）
+- 2026-11-14 提交 `e925eec6ebd0b59fdf9cf47e0d763d35e8be3d7d` 已推 origin/dev（本地远端哈希一致）但尚未部署到该站，需重新构建/部署后才显示
+- 本地部署为 nginx 8095（`http://127.0.0.1:8095/`）直读本地 `dist`，hash 路由；2026-11-24 确认线上生效配置为 `D:\nginx\conf\sites-enabled\防汛C端.conf`（`防汛C端-local.conf` 未生效），该站点在线服务构建产物，`dist`（14:59:35）晚于源码（14:59:16），构建 exit 0
+- 2026-11-25 后台配置搜索：本地站点由 `防汛C端-test.conf` 提供，生效副本在 `D:\nginx\conf\env-sites\防汛C端-test.conf`；站点服务 dist，新代码在 `pages-home-index.DhnvhcDL.js`
 
-## Login & Verification
-- 2026-11-24: login requires username + password + graphic captcha; the project `.env` auto-login note holds test account `zsbase`; no other stored credential exists (deploy-env and memory searches found none)
-- 2026-11-24: logged in successfully as `zsbase` (captcha recognized as `3`) and reached the app home with 街镇检查/区县检查/市级检查 entries
+## 登录与验证
+- 2026-11-24：登录需用户名+密码+图形验证码；项目 `.env` 自动登录说明里的测试账号为 `{{ov_privacy:default:viking://~/privacy/credential/deploy_env-huishan-g-dev#/values/username}}`，无其他已存凭证（deploy-env 与记忆检索均无）
+- 2026-11-24 以上述账号登录成功（验证码识别为 `3`），进入首页可见街镇检查/区县检查/市级检查
+- 2026-11-25：用 `suzhufang-g` 应用的管理员账号（deploy_env-huishan-g-dev）真实登录本 C 端 test 环境成功，拿到 G 端管理员 token；注入 `flood-token-v1`/`flood-login-user-v1` 后需鉴权接口（getInfo/treeInPermission/getKeyData/getBenefitData）全部 500，免登录 `region/list` 返回 200，真实数值无法展示，前端显示「—」空态
 
-## Temporary Nginx Switching & Restore
-- Screenshot verification needs a temporary local nginx change: back up the config first and restore it afterwards
-- 2026-11-14 switch was done via nginx UI with the temp config prepared and the old site untouched at that point; 2026-11-24 confirmed the nginx UI panel is 127.0.0.1:9000 managing the same `D:\nginx` conf set (see 「nginx_ui」)
-- 2026-11-14 the first screenshot script stopped before saving (page init did not expose uni storage APIs, temp token not written); during that time local nginx pointed only at the isolated build
-- 2026-11-14 cleanup finished: temp nginx restored to the original `dist` root, homepage and `/api/v2.0/code` both returned HTTP 200, Chromium on port 18927 exited, then only the session's source files were reviewed and committed per branch flow
-- 2026-11-24 switch: `/api/v2.0/evaluation/` 改指本地后端 `localhost:9608`，其余 `/api/` 仍走远程网关保留登录；验证后必须恢复原配置并 reload（详见「查询H5本地后端验证环境」）
+## 临时 nginx 切换与还原
+- 截图验证需临时改本地 nginx：先备份配置、验证后还原；2026-11-14 经 nginx UI 切换（临时配置就绪，旧站点当时未动），nginx UI 面板 127.0.0.1:9000 管理同一套 `D:\nginx` 配置（见「nginx_ui」）
+- 2026-11-14 首版截图脚本未落盘即停（页面初始化未暴露 uni storage API，临时 token 未写入），期间本地 nginx 仅指向隔离构建
+- 2026-11-14 清理完成：临时 nginx 还原至原 `dist` 根，首页与 `/api/v2.0/code` 均 HTTP 200，18927 端口 Chromium 退出，随后按分支流程只提交本会话源码
+- 2026-11-24 切换：`/api/v2.0/evaluation/` 改指本地后端 `localhost:9608`，其余 `/api/` 仍走远程网关保留登录；验证后必须恢复原配置并 reload（详见「查询H5本地后端验证环境」）
 
 <!-- MEMORY_FIELDS
 {
   "category": "部署环境",
   "name": "test_server_unlimited",
-  "source_extraction_id": "c19b5901ace040e9bb5820b3731654ce",
-  "version": 8,
+  "source_extraction_id": "83ff1908b6ce4fd3a2dc035c137eecfe",
+  "version": 10,
   "memory_type": "entities"
 }
 -->

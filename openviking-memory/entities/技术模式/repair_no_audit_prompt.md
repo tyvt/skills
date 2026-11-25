@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T01:32:35+08:00
+verdict_note: 太仓G step2.vue-277、step2-1.vue-258 实有 msgWarning('当前维修项目无需审计') 并 return，getCurrentPriceInfo 接口存在，行号与记忆一致。
+---
 # 维修项目无需审计提示关联页面禁填
 太仓G端维修资金用法页面在接口返回空时提示「当前维修项目无需审计」并禁止填数。
 

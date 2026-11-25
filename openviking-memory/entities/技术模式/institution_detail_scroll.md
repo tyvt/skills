@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T01:33:40+08:00
+verdict_note: 苏州V3 institutionRegister/detail.vue-16-41 四区块已包进 el-row.detail-from-container，index.scss-291/297 min-height-0+overflow-y-auto，与修复描述一致。
+---
 # 机构注册详情页内容被裁切且无法滚动
 苏州市房地产监测V3 中 `company/institutionRegister/detail.vue` 的四个区块直接挂在 `.detail-container` 下导致内容超出固定高度后被裁切且无法滚动。
 

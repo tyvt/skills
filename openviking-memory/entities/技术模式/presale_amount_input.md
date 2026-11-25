@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T00:40:56+08:00
+verdict_note: 苏州市房地产监测V3 PermitInfoPanel.vue 实存；amount-input、unit="㎡"、-dot="2"、presaleAreaValue、formatFixedDecimal 视图均在，与改 amount-input 组件并两位小数格式化描述一致。
+---
 # 预售面积字段改用 amount-input 组件
 苏州市房地产监测V3 的 PermitInfoPanel.vue 将预售面积输入框改为 amount-input 组件并统一两位小数格式化。
 

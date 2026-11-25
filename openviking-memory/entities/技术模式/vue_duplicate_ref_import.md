@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T02:33:11+08:00
+verdict_note: 实际 ExpenseList.vue 位于 src/pages_benefit/maintain/components/，仅第33行一处 ref import；记忆所述 src/pages_owner/maintain 路径及28/34行均不存在，无法证实
+---
 # Vue中ref的重复导入
 `ExpenseList.vue` 出现了从 'vue' 重复导入 `ref` 导致 ESLint 冲突。
 ## 描述
@@ -13,7 +18,6 @@
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：82027868-3f83-446c-a0bf-5e3fec501631
-
 
 <!-- MEMORY_FIELDS
 {

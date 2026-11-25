@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T22:34:34+08:00
+verdict_note: 记忆标注所属项目=产品2.0，但 loginAsCompany/PLAYWRIGHT_COMPANY_USERNAME/company-record-change e2e 全在苏州市房地产监测V3仓，产品2.0源码零命中；项目归属与现状证据不符。
+---
 # E2E 双账号流程修复空视频问题
 产品2.0 项目修复企业变更 e2e 录屏为空的问题，通过双账号分离重构测试流程。
 

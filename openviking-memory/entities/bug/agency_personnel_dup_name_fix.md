@@ -1,3 +1,13 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-25T17:13:08+08:00
+verdict_note: 抽查2026-11-25-实机 AgencyPersonnelList.vue queryParams无name(line99/101仅keyWord/personnelType),冗余筛选确已移除,校验通过转正(原suspect)
+---
 # 从业人员信息筛选区重复姓名字段修复
 苏州市房地产监测V3 主管部门端「从业人员信息」筛选区重复姓名字段问题已修复。
 

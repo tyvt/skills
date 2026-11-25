@@ -1,5 +1,5 @@
 # D:\repository\skills 技能仓库
-GitHub 仓库（本地 D:\repository\skills，远程 origin/main），github.com-tyvt-skills 维护，存可复用 DSH 技能、OpenViking 记忆快照与导入脚本；DSH 经 ~/.dsh/skills/<name> 符号链（根 C:\Users\Administrator\.dsh\skills）加载。
+GitHub 仓库（本地 D:\repository\skills，远程 origin/main），github.com-tyvt-skills 维护，存可复用 DSH 技能、OpenViking 记忆快照与导入脚本；DSH 经 ~/.dsh/skills/<name>（根 C:\Users\Administrator\.dsh\skills）符号链/Junction 加载；悬空链已清理，session-handoff 于 2026-11-25 补挂后恢复可用。
 
 ## 规模与内容
 - 2026-11-13 全量审查：19 skill 目录 + 10 dsh 插件；2026-11-04 删 grill-me、i-have-adhd、long-form-corpus-rewrite 后，带 SKILL.md 的真技能剩 5（原 8）
@@ -13,6 +13,7 @@ GitHub 仓库（本地 D:\repository\skills，远程 origin/main），github.com
 - 2026-11-24 deploy-env：28ed9a70 看板明文密码（dashboard/api.py + index.html）、d72eab21、d55ae787（AGENTS.md 部署面板硬拦截 P0 段 + upsert_env.py + POST /api/registry/upsert + SKILL.md 两节）已推 origin/main
 - 2026-11-24 dsh/langgraph-orchestrator/config.yaml 15 处 deepseek 模型 id 全量换为 hy4flash-free（workbuddy 10 处、auto 5 处），同步更新描述注释与 tests/test_tool_signal_split.py:52 兜底断言
 - 未推：636e780b（上述编排器替换，仅两文件）与 1a86b32b（index.html 网关换行 + registry.sqlite），本地 main ahead 2，网络恢复后 git push origin main
+- 另有遗留未推提交 30209316 与一批脏文件，2026-11-25 未触碰
 - 批 2 草案待用户拍板，详见 tyvt_skills_20261114 实体卡
 
 ## 安全与仓库卫生
@@ -23,18 +24,17 @@ GitHub 仓库（本地 D:\repository\skills，远程 origin/main），github.com
 
 ## 关系
 - dsh/ 为 git 子模块（独立提交，先子后父），skills 与 langgraph-orchestrator 同仓一次提交；controller-bench/ 为批量测试目录，细节见 dsh_plugins 与 controller_bench 实体卡
-- ~/.dsh/skills 为指向仓库技能目录的符号链，悬空已清理
 
 <!-- MEMORY_FIELDS
 {
   "category": "项目",
   "name": "tyvt_skills",
-  "source_extraction_id": "ea28dbbe77804524ba9b2f32dfda6b61",
+  "source_extraction_id": "ce0e8ae1665b4eb08766450d66a51951",
   "source_extraction_ids": [
     "06401e30356f44b7931a89723cf979f0",
     "56afe6d268ed4224b7de33d546af5e42"
   ],
-  "version": 34,
+  "version": 35,
   "memory_type": "entities"
 }
 -->

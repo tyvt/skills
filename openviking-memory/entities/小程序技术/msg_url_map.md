@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T17:06:07+08:00
+verdict_note: 抽查2026-11-25-苏住房C源码全仓无normalizePageUrl,记忆主张的修复入口不存在(pages.json仅证页面注册)。用户判过期/无效。
+---
 # 消息中心msgUrl旧分包路径须前端归一化映射
 苏住房C小程序消息接口返回迁移前分包路径，直接navigateTo必报页面不存在，须在normalizePageUrl集中映射。
 

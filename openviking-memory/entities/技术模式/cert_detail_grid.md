@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T18:34:22+08:00
+verdict_note: 苏州V3仓personnelCertificate/detail.vue含性别字段sex及sexOptions、getDicts('sys_user_sex')、grid布局与证件号解析带出性别，14字段栅格改造属实。
+---
 # 证书详情表单14字段三列栅格
 苏州市房地产监测V3 中将证书信息表单调整为 14 字段 3 列栅格对齐设计稿，新增性别等必填字段。
 

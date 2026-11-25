@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 楼幢授权弹窗样式同步修复
 产品2.0 的楼幢授权弹窗已从 develop/v2.6.1-yuanqu 分支同步样式，对应提交 cd9696539。
 ## 主要变更
@@ -12,7 +19,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

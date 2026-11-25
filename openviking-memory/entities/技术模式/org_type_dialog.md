@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:10:42+08:00
+verdict_note: 抽查2026-11-25-实机 OrgTypeDialog.vue-17-34 每选项仅图标+标准全称,无灰色类别标签,testid保留,主张成立
+---
 # 注册机构类别名称规范调整
 苏州市房地产监测V3 中 OrgTypeDialog.vue 已删除前面的灰色类别标签及样式，每个选项仅保留图标 + 标准全称。
 

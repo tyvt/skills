@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # zs-select-dialog selectable 声明冲突修复
 产品2.0（zhi2-web-admin）中 zs-select-dialog.vue 因同时存在 prop 与 data 的同名 selectable 导致 Vue 警告，已通过替换 mixin 修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T21:34:27+08:00
+verdict_note: 记忆称去 align-items-center、100vw→100%、94.4vw→94.4%、publicity-title 去80vw；实机 benefit/index.vue 无这些样式，PublicityTab.vue-109 仍有 align-items-center，描述的修复样式与文件现状不符。
+---
 # H5 z-paging 虚拟列表宽度修复
 H5 项目 main.ts 全局开启 z-paging 的 use-virtual-list: true，虚拟列表需测量 cell 宽高、滚动区须占满横向宽度。
 

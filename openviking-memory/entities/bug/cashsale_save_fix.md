@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 现售/预售转现售保存后停留编辑态缺陷修复
 苏州市房地产监测V3（zhi2-web-admin）中 CashsaleDetail.vue 新增保存成功后页面停留在编辑态，导致按钮仍显示「保存」而非「编辑」。
 

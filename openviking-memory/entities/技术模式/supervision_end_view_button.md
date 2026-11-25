@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T23:34:12+08:00
+verdict_note: 苏州市房地产监测V3 AgreementDetailsTable.vue viewButton(-133-141) 无 disabled，disableButton(-158-159) 含 currentRoute=='end' 禁用编辑/删除，查看未被禁。核心逻辑属实；实际文件在 agreement/xy/components 而非记忆标注的 jgxm。
+---
 # 监管协议终止详情查看按钮修复
 苏州市房地产监测V3 的 zhi2-web-admin 中修复了监管协议终止详情里「监管范围」表格「查看」按钮误禁用的问题。
 

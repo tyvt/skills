@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-26T02:33:21+08:00
+verdict_note: ZsPopup.vue 内无 zIndex 属性或默认值1000 代码，pages_vote/decision/form.vue 的 ZsPopup 亦无 -zIndex=9999，记忆描述属性在现状中不存在
+---
 - 偏好通过组件化封装 z-index 逻辑，避免页面中手写 z-index 样式冗余，提升样式维护性
 - 新增 `ZsPopup` 的 `zIndex` 属性（默认 `1000`），应用到 `uni-popup` 根节点 style（文件：`src/components/ZsPopup/ZsPopup.vue`）
 - 决策成功弹窗等需提层时直接给 `ZsPopup` 传 `:zIndex="xxxx"`（如 `src/pages_owner/decision/form.vue` 两弹窗用 `:zIndex="9999"`）
@@ -11,7 +15,6 @@
 - 所属项目：repository
 - 验证证据：extracted source=cursor project=repository
 - 来源会话：2d1d0d28-89de-4c7e-9e05-5135f6725d28
-
 
 <!-- MEMORY_FIELDS
 {

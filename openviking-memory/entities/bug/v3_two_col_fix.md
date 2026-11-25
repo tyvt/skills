@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 详情页两列不等分全局修复
 苏州市房地产监测V3 中开发企业入网确认和从业人员管理详情页「封闭设施」两列不等分，已在 detail-template.vue 全局修复。
 

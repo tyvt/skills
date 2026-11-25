@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T22:35:59+08:00
+verdict_note: V3 仓存在 companyRegister.vue、Step3Appendix.vue 及单个文件不超过5MB全局提示文案，与记忆的上传 UI 全局提示改造一致。
+---
 # 企业要件上传UI全局提示且标签同行
 苏州市房地产监测V3 中企业要件上传布局由逐项提示改为顶部单条全局提示且标签与控件同行。
 

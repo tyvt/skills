@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 禅道Bug6467表决户室卡顿修复
 惠山二期G 项目禅道 Bug #6467：表决选择户室列表视图惰性扁平化去卡顿，2026-11-11 提交修复但测试反馈未生效，已定位缓存问题。
 

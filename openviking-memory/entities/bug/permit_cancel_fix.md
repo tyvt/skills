@@ -1,3 +1,13 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-25T19:35:30+08:00
+verdict_note: detail-template.vue-700 消费 item.gridOffset；permitCancelConstants.js-123 gridOffset=CANCEL_BASIC_INFO_COL3_GRID_OFFSET；permitCancel/detail.vue-199/358 buildCancelBasicInfoView、-82 统一社会信用代码；证据充分，suspect 标记不成立。
+---
 # 预售注销与许可模块栅格偏移修复
 苏州市房地产监测V3 修复预售注销（permitCancel）与预售许可（permitExtend）详情页中「统一社会信用代码」因前一行占满 24 栅格导致换行后从第 1 列排起、无法与上行第 3 列纵向对齐的问题。
 

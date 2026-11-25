@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # group-multi-select 类型兼容修复
 园区物管2.0（zhi2-web-admin）中 `src/views/property/complex/components/group-multi-select.vue` 在 `get()` 里直接 `this.$attrs.value.split(',')`，与 MultiSelect 同类写法，未来会报同类错误。
 

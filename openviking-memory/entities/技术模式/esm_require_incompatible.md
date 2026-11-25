@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:25:16+08:00
+verdict_note: 代码核对通过 commercialHousingSales/presale/template/detail.vue L456 使用 debounce 无 require 调用 与记忆一致
+---
 # ESM 环境 require 不兼容致引用错误
 在 Vite ESM 项目中误用 CommonJS `require` 导致 ReferenceError，需改用项目全局 `debounce`。
 

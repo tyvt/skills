@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 查询暂存后要件附件被清空
 苏州市房地产监测V3 单页机构注册中，点击「查询」回填暂存单会导致本地已上传要件附件被清空。
 

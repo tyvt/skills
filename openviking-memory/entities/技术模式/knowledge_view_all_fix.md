@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:10:03+08:00
+verdict_note: 抽查2026-11-25-实机代码确认 response.js-1 extractArrayData + knowledgeCategory.js-64-82 resolveCategory兜底 + knowledge/index.vue多处@tap,主张成立
+---
 # 工作台知识库查看全部无响应修复
 泰兴小程序工作台知识库「点击查看全部没有反应」问题已全局修复，新增共享解析工具并改造交互事件。
 

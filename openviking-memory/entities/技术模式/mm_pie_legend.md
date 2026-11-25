@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:39:35+08:00
+verdict_note: 核验通过：门户/zhi2-web-admin/src/views/property/marketMonitor/components/TradePanel.vue 存在，DistrictPie/chartConstants/chartRenderers 命中；房产监测饼图与区县图例组件代码现状一致
+---
 # 房产监测饼图左移与图例完整
 zhi2-web-admin 房产监测页（market-monitor）「各板块成交套数比例」饼图需左移且右侧图例区县名完整无省略。
 

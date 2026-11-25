@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T18:33:30+08:00
+verdict_note: 园区公共收益仓projectNameExampleDialog.vue已去lazy/lazyLoad，改一次性拉/dataProperty/facilityDefinition/listTree并用originalOptions递归扁平化回显，描述属实。
+---
 # 维修资金立项配置详情项目名称示例编辑弹框级联回显修复
 园区公共收益项目维修资金立项配置详情中项目名称示例编辑弹框维修对象类别回显为请选择的根因与修复。
 

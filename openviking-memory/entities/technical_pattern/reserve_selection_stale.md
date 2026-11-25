@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T00:39:44+08:00
+verdict_note: 苏住房G assetsLeaseContractFiling/index.vue 有 isWarningContract/setRowStyle/isSelectable 与忽略预警 disabled；mixin leaseContractWarningMixin.js 归一 flag==1||true、按 tableData.filter 取数、共用判定函数，与描述一致。
+---
 # el-table reserve-selection 行快照滞后致忽略预警误报
 苏住房G 经营用房租赁合同备案页用 el-table 的 reserve-selection 跨页保留勾选，导致选中项字段不随 tableData 刷新而误报「请选择合同」。
 

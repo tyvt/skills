@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T19:35:42+08:00
+verdict_note: houseTable.vue-60 bizState-undefined、-182 canOperate()、-217 disabled-()=>!canOperate 禁用删除，禁用行不可删的修复属实；方法名 isButtonDisabled/onButtonClick 已演化为直接 -disabled 绑定。
+---
 # zs-operate-column Disabled Still Triggers Delete
 zs-operate-column.vue disabled state still fires @click.native, and houseTable.vue handleDelete lacked canOperate check, causing deletes on disabled rows.
 
@@ -20,7 +25,6 @@ zs-operate-column.vue disabled state still fires @click.native, and houseTable.v
 - 所属项目：园区公共收益
 - 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：4901c51b-48fd-4552-a991-5fc17b4c1409
-
 
 <!-- MEMORY_FIELDS
 {

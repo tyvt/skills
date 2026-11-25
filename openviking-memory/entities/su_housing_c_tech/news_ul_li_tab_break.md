@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T23:34:22+08:00
+verdict_note: 苏住房C pages_main/news/index.vue-3-12 用 scroll-view+view 横向 tab；components/article/ListIndex.vue-2 用 @tap="goDetail" 替代 @click，inner 为 view。与 ul/li 破坏布局修复描述一致。
+---
 # News page ul/li breaks tab layout and click
 In 苏住房C (zhi2-mobile-shimin), using ul/li in the news page broke the horizontal tab layout and disabled item clicks.
 
@@ -19,7 +24,6 @@ In 苏住房C (zhi2-mobile-shimin), using ul/li in the news page broke the horiz
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：81595210-d77b-4b6b-b35b-a2d8a5bf4a14
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:39:23+08:00
+verdict_note: 核验通过：园区物管2.0/zhi2-web-admin/src 大量列表页引用 ListTemplate/list-card，zs-search-form 结构属实；记忆所述 list-container>zs-search-form+div.list-card 标准结构与代码现状一致
+---
 # 列表页 list-container/list-card 标准包裹结构
 园区物管2.0 Web 后台列表页应采用 list-container > zs-search-form + div.list-card 标准结构，弹窗保持在 list-card 外部。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

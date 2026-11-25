@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T19:34:34+08:00
+verdict_note: search.vue-4 autoFocus=true、-6 -fixed=false、-15 暂无数据全部吻合；add.vue-9 ZsSearch 绑定 goto(search) 点击可跳转。记忆所述@focus/外层@tap细节与现状(@click.native)略异，但修复实质属实。
+---
 # 添加求购搜索小区点击无反应修复
 苏住房C小程序「我的求购-添加求购」页面搜索小区点击无反应及空状态缺失问题已修复。
 

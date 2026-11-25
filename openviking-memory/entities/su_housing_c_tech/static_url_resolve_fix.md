@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:10:15+08:00
+verdict_note: 抽查2026-11-25-实机 utils/index.js-330 resolveStaticUrl调用resolveSubpackageForStatic按文件名映射分包,主张成立
+---
 # 渲染层图片路径解析错误修复
 苏住房C小程序因 `resolveStaticUrl` 按当前路由误判分包，导致 `images/szf/*` 资源加载500，已按文件名映射修复。
 

@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 网格最高备案均价校验pattern缺失修复
 苏州市房地产监测V3 中「网格最高备案均价」因引用未定义的校验 pattern 导致合法小数被误判。
 

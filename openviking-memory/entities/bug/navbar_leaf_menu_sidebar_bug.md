@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 顶栏叶子菜单侧栏错误拼接修复
 苏州市房地产监测V3 修复点击顶栏叶子菜单后侧栏被错误拼出无关项的问题。
 

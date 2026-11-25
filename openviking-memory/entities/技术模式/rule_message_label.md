@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T21:35:00+08:00
+verdict_note: 苏住房G propertyManager/detail.vue-49 label='入职日期'、-257 message='入职日期不能为空' 逐字一致，其余字段(姓名/区域/证件)亦 label 同源，与记忆一致。
+---
 # 表单项校验提示文案须与 label 逐字一致
 苏住房G 物业管家等表单中，必填校验 rules.message 必须与表单项 label 文案完全复用，避免近义词造成字段误判。
 

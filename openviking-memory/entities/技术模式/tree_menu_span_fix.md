@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T19:34:04+08:00
+verdict_note: zs-table-column.vue-521/527/534 用 .el-table__indent/.el-table__expand-icon/.el-table__placeholder 识别树单元格，-1038 与 element-ui.scss-249 vertical-align-middle，-984/-1004 display-block，与描述一致。
+---
 # 全局块级span致树形菜单箭头与名称错位
 在苏州市房地产监测V3中，为修复重叠曾对全部 `.cell > span` 设 `display: block`，导致树形第一列展开箭头与菜单名换行错位。
 

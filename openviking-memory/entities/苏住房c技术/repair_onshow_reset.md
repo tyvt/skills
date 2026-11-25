@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T02:32:49+08:00
+verdict_note: submit.vue-234-244 存在 if(form.house) 分支，命中后补齐 complexId/complexName/userIdentityId/houseId/position 并 return 跳过默认逻辑，与记忆描述一致
+---
 # 报修提交页onShow重载覆盖已选房屋
 苏住房C市民端报修提交页在onShow中无条件重载房屋列表，导致从子页返回时用户手动选择的房屋被默认逻辑重置，报修挂错房屋。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T02:33:54+08:00
+verdict_note: ResetPwdDialog.vue 与 ChangePasswordDialog/index.vue 均含 .el-form-item__error position-relative、overflow-visible、line-height-1.4，与记忆一致
+---
 # 修改密码弹窗错误提示样式修复
 修复园区公共收益项目修改密码弹窗中 Element UI 校验错误提示因 overflow 裁剪导致红字显示不全的问题。
 ## 问题根因

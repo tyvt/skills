@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T18:33:08+08:00
+verdict_note: 苏州V3仓ruoyi.js含resolveIdFromRoute/buildTableIdNavigation，DeveloperBasicInfoDetail.vue有routeCompanyRecordId，入网详情走getEntryNetworkDetail，描述属实。
+---
 # 待办跳转取ID修复
 苏州市房地产监测V3 修复从待办跳转时未从路径取业务主键 ID 的问题。
 

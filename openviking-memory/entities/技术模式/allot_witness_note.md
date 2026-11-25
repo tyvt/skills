@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T02:34:16+08:00
+verdict_note: pubAllotNotice/detail.vue 含 approvalDeptName 字段，detail-template.vue 含 labelAbove 及社区已见证通过文案，与记忆一致
+---
 # 资金拨付详情社区见证说明
 苏住房G 项目资金拨付（pubAllotNotice）详情页在「用款申请名称」标签上方展示社区见证说明。
 
