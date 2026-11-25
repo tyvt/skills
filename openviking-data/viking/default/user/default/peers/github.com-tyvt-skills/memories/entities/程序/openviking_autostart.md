@@ -23,15 +23,15 @@ OpenViking 会话内不可用自动拉起 skill，2026-11-13 创建于 D:\reposi
 
 ## 关系
 - 与系统看门狗 OpenViking-Watchdog 互补：看门狗依赖 dsh web 在线且延迟数分钟，本 skill 为会话内即时检测拉起
-- 属于 tyvt/skills 仓库（D:\repository\skills），文件未提交 Git
+- 属于 tyvt/skills 仓库（D:\repository\skills）；2026-11-25 补建 Junction 指向 C:/Users/Administrator/.dsh/skills 后进入可用技能目录（此前为仓库有 SKILL.md 但生效目录无链接，自愈路径实际不可用）；同日将 SKILL.md（3445B）与 drill.ps1（2201B）git add 并提交推送（commit e6548862，2 files/119 insertions），本地已与 origin/main 同步
 
 <!-- MEMORY_FIELDS
 {
   "category": "程序",
   "name": "openviking_autostart",
-  "source_extraction_id": "7d094108eeb24f9dad3f83ba17f356b5",
+  "source_extraction_id": "980e0a51151d4fc7bf02c5cbf5be61aa",
   "peer_id": "github.com-tyvt-skills",
-  "version": 2,
+  "version": 3,
   "memory_type": "entities"
 }
 -->

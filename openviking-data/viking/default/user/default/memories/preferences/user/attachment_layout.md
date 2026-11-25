@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T01:34:03+08:00
+verdict_note: 无 frontmatter/项目/文件/会话归属的孤立指令片段；搜苏州V3 等仓 vue 无'其他信息' Headline 证据，无法定位代码证实，按无法证明有效判无效。
+---
 - Wrap 「附件图片」(attachment images) and 「备注」(remarks) into a new Headline block 「其他信息」(other info) to reuse the margin-top:12px block spacing.
 - Add v-if="formMode != 'view'" to the edit block to prevent duplicate display with regulatoryInfo's DetailTemplate view mode.
 

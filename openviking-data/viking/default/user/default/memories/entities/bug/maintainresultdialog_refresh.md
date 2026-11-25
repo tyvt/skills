@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 选项表决结论弹窗父组件刷新修复
 园区公共收益项目修复 `MaintainResultDialog.vue` 提交成功后调用 `this.$parent.getList()` 报错的问题，改为事件通知父组件刷新。
 

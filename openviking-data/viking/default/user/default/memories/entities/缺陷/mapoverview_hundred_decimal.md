@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T23:34:05+08:00
+verdict_note: 园区物管2.0 dataHelpers.js-24 formatHundredValue、-43 formatHundredCount 复用；chartOptions.js-107 computeHundredCountYAxis、-239/-279/-294 统一格式化，三通道复用同一函数，描述完全属实。
+---
 # 经营资产「百个」单位小数位修复（ECharts Y轴刻度小数位失控）
 园区物管2.0 地图概览页经营资产「百个」单位小数位显示三位，应显示两位，已修复；该问题揭示 ECharts 多通道展示同一指标时必须复用同一格式化函数并约束 Y 轴 interval 的通用套路。
 

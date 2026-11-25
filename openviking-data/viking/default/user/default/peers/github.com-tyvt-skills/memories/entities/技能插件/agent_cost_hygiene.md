@@ -11,14 +11,15 @@ Skills 仓库中存在目录但未链接到 ~/.dsh/skills 的 DSH skill，实际
 
 ## 相关
 - 同批未链接 skill：concise-report、cursor-model-routing、dsh-explore、memory-migration-archive、openviking-autostart、session-handoff、vite-build-profiler
+- 2026-11-25 复查：cursor-model-routing、vite-build-profiler、openviking-autostart、session-handoff 已补建 Junction 生效，clarify-first 由实体副本转为链接，其余 18 个挂载均 valid
 
 <!-- MEMORY_FIELDS
 {
-  "peer_id": "github.com-tyvt-skills",
   "category": "技能插件",
   "name": "agent_cost_hygiene",
-  "source_extraction_id": "f606424bb52a4330b267945b793d7552",
-  "version": 1,
+  "source_extraction_id": "980e0a51151d4fc7bf02c5cbf5be61aa",
+  "peer_id": "github.com-tyvt-skills",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # topMenus访问children报错修复
 苏州市房地产监测V3 中 `NavBar` 和首页 `Index` 的 `topMenus` 计算属性访问 `menu.children[0]` 导致 TypeError，已修复。
 

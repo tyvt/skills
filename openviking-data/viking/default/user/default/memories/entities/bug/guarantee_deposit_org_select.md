@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 房屋质量保证金协议-物业服务企业选择弹窗修复
 榆林G 项目 zhi2-web-admin 中房屋质量保证金协议新增页，物业服务企业选择弹窗曾因机构类型错误无法选择，已修复并实现按合同自动带出。
 

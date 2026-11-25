@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 从业人员列表操作列按钮样式缺失修复
 产品2.0 的 staffManagement 模块因重写 buttons() 导致操作列按钮缺少统一样式与 disabled 逻辑，已修复为使用 mixin 配置。
 ## 问题根因

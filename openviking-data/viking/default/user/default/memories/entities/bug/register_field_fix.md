@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 企业账号注册字段压扁修复
 苏州市房地产监测V3 项目修复「企业账号注册（经纪机构）」中统一社会信用代码、注册地址等字段被压扁、看不清的问题。
 

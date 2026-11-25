@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T17:06:19+08:00
+verdict_note: 抽查2026-11-25-现代码index.vue-1318为repeat(3,minmax(0,1fr))非记忆所述repeat(3,auto),gap/padding亦不符。用户判过期/无效。
+---
 # 大屏指标区 repeat(3,1fr) 间距虚大
 园区物管2.0 mapOverview 左栏 summary 三列指标用 repeat(3,1fr) 在宽容器内数字间出现大块空白，需改 auto 列宽并居中。
 

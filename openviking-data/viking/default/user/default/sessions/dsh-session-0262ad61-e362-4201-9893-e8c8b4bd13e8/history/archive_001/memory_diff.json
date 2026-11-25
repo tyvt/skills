@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-0262ad61-e362-4201-9893-e8c8b4bd13e8/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-25T07:19:02.997547+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/禅道缺陷/bug6965_楼幢导入失败弹窗.md",
+                "memory_type": "entities",
+                "before": "# bug6965 楼幢导入失败弹窗图标文案同行\n相城G（zhi1-web-admin dev panel）禅道缺陷，要求楼幢导入真实失败弹窗的图标与文案「导入失败，请按下列提示修正后重试」置于同一行。\n\n## 缺陷与验收\n- 禅道 bug6965：楼幢导入真实失败弹窗，图标与文案「导入失败，请按下列提示修正后重试」需同一行。\n- 验收须完整 UI 截图（禁止 DOM 注入），用户确认后再提交代码并回写禅道。\n- 8171 面板登录 → 楼幢信息 → 导入失败态 → present + 内嵌图 → 用户确认为待完成验证流程。\n\n## 技术定位\n- 路由：`GET /prod-api/system/menu/getRouters` 返回楼幢信息页 `/#/xmxx/lz/buildinginfo`（勿用 `/getRouters`）。\n- 代码：`BuildHouseImport.vue` 有未提交改动（+2 行 CSS，见 `BuildHouseImport.vue:236`）。\n- 登录：`/code` + vision + `POST /auth/login` 可走通（Admin-Token）；浏览器侧易被改密弹窗/会话顶回登录，截至 2026-11-25 未拿到失败弹窗截图。\n\n## 交接状态\n- 2026-11-25 触发 P0 交接并停手；hop4 文档 `D:\\plan\\相城G\\HANDOFF-CHAIN-xiangcheng-g-dev-panel-hop4-20261125-1454.md`，new_once 续接（schedule-37780a1e，约 2026-11-25 14:54:05 Asia/Shanghai）。\n- 待办：用户确认后 git 提交 + 禅道附图，并清理 TEMP 证据。",
+                "after": "# 禅道 Bug 6965：楼幢导入失败弹窗图标文案同行\n相城G（zhi1-web-admin dev panel）禅道缺陷；2026-11-25 已完成 CSS-only 修复、实机验证并闭环为 resolved/fixed，仅提交未推送。\n\n## 缺陷信息\n- 禅道 http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6965；复现页 http://unlimited.gh5.admin.web.v1.wuguan.xiangcheng.suzhou.dev.zhi.com/xmxx/xmxx/projectinfo/project。\n- 现象：「导入小区基础信息/楼幢导入」失败弹窗红色错误图标独占一行，未与「导入失败，请按下列提示修正后重试」同行（禅道截图已核验）。\n- 根因：失败态 `<i class=import-icon-error>`（inline）后接 `<p class=import-result-title>`（block），标题 `margin:12px 0 8px` 放大纵向错位。\n- 初始禅道截图 `D:\\禅道附件\\bug\\6965\\file24319_企业微信截图_17955756105692.png`。\n\n## 修复方案\n- 仅加 2 行 scoped CSS：失败态标题 `display:inline; margin:0 0 0 8px`，图标与文案同行左对齐；未改 DOM/逻辑/接口，成功态未改。\n- 文件 `src/views/projectManagement/components/BuildHouseImport.vue:234-235`（hop2 记 235-236）；计划 v2 审核通过并经用户确认（D:\\plan\\相城G\\session-f5dcb893-fba8-4448-acef-b66549cd6e6f.md）。\n- 基线构建与改后构建均 exit 0（改后 Hash 1c8788125360b84e，59.8s）。\n\n## 验证与闭环（2026-11-25）\n- 验收（用户原话）：真实导入弹窗失败态红叉与「导入失败，请按下列提示修正后重试」同一行、样式与其他导入弹窗一致；否决登录页注入 DOM 取巧截图。\n- 实机闭环：本地 8171 + Cookie 注入 `Admin-Token`（API 登录 token）→ `#/xmxx/lz/buildinginfo` →「导入」→ 隐藏 `input[type=file]` 上传 `xc6965-import-bad-20261125-144500.xlsx` → 失败态整弹窗截图，红叉与文案同一行（`BuildHouseImport.vue:236` 的 `display:inline` 生效）；验证图 `xc6965-fail-dialog-20261125-150652.png`，用户已确认 UI。\n- 本地提交 `81d7b7262`（仅 `BuildHouseImport.vue` 两行 CSS）；禅道 #6965 回写 `status=resolved` / `resolution=fixed`，含验证图 fileID 24372。\n- 已清理 `TEMP/xc6965*`、关闭浏览器会话；未 push（用户本次仅要提交+禅道）；hop4 目标完成，链路终止，不再排 hop5。\n\n## 环境与经验（勿重跑）\n- 本地 nginx 8171、面板登记、登录/token 验证、AES 参数与 privacy 注入均完成；路由接口 `GET /prod-api/system/menu/getRouters` 返回 `/#/xmxx/lz/buildinginfo`（勿用 `/getRouters`）；代码在 dev 分支。\n- 登录：`/code` + vision + `POST /auth/login` 走通；浏览器内 `fetch /prod-api/code` 与页面 uuid 同源同步；专属会话先 session list，不用 default/AGENT_BROWSER_NAMESPACE，先点 Close 关改密弹窗、填明文密码、验证码每次重取、优先 find placeholder/text（避免 PowerShell 吞 @ref）。\n- 早期受阻（面板无「相城G」、.env 无本地地址、dev 域名 ERR_BLOCKED_BY_CLIENT、无可用 Chrome）已由本地 8171 + 专属 agent-browser 会话解决；为找路由对 src 宽搜致 >10k 未命中应避免；文档与 schedule 冲突以交接文档为准，maxHops 已否决。\n- 交接文档 `D:\\plan\\相城G\\HANDOFF-CHAIN-xiangcheng-g-dev-panel-hop4-20261125-1454.md`。"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_6965.md",
+                "memory_type": "entities",
+                "deleted_content": "# 禅道 Bug 6965\n相城G「导入小区基础信息」弹窗红色错误图标独占一行，2026-11-25 完成 CSS-only 修复与构建验证；本地 8171 验证环境已就绪，但真实导入弹窗失败态仍未验收，未提交、未回写禅道。\n\n## 问题信息\n- 禅道地址 http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6965\n- 现象：「导入小区基础信息」弹窗中红色错误图标独占一行，未与错误文案同行对齐（禅道截图已核验）\n- 截图 D:\\禅道附件\\bug\\6965\\file24319_企业微信截图_17955756105692.png\n- 复现页面 http://unlimited.gh5.admin.web.v1.wuguan.xiangcheng.suzhou.dev.zhi.com/xmxx/xmxx/projectinfo/project\n\n## 根因与修复\n- 根因：失败态 `<i class=import-icon-error>`（inline）后接 `<p class=import-result-title>`（block），使图标独占一行；标题 `margin:12px 0 8px` 放大纵向错位\n- 改动：仅加 2 行 scoped CSS，失败态标题改为 `display:inline; margin:0 0 0 8px`，使图标与「导入失败」标题同行左对齐；未改 DOM/逻辑/接口，成功态未改（规避回归风险）\n- 文件 `src/views/projectManagement/components/BuildHouseImport.vue:234-235`（hop2 交接记 235-236）\n- 计划经审核通过（v2）并经用户确认：D:\\plan\\相城G\\session-f5dcb893-fba8-4448-acef-b66549cd6e6f.md\n- 基线构建与改后构建均 exit 0（改后 Hash 1c8788125360b84e，59.8s）\n\n## 验证要求与环境（hop2 已就绪，不重跑）\n- 核心验收（用户原话）：必须在真实导入弹窗验证失败态——红色图标与「导入失败，请按下列提示修正后重试」同一行、样式与其他导入弹窗一致；否决登录页注入 DOM 的取巧截图\n- 已完成：面板登记、本地 nginx 8171、登录/token 验证、CSS 修复与 dist 构建、AES 参数与 privacy 注入\n- 早期受阻（部署面板无「相城G」项目、`.env` 无本地地址、dev 域名 ERR_BLOCKED_BY_CLIENT、无可用 Chrome：D:\\ungoogled-chromium\\App\\chrome.exe 启动无输出/下载超时），后改本地 8171 + 专属 agent-browser 会话解决\n- 专属 session（如 xc6965final）：先 session list，不用 default、不用 AGENT_BROWSER_NAMESPACE；登录先点 Close 关改密弹窗、填明文密码、验证码每次重取、填表优先 find placeholder/find text（避免 PowerShell 吞 @ref）\n- 文档与 schedule 冲突以交接文档为准：maxHops 已否决，是否继续以「第 4 节未完成项是否清空」为准\n\n## 验证进度与交接\n- 专用会话 xc6965final 多次登录到 /index；仍未产出合格验证图（未在楼幢信息页点「导入」并触发失败态）；为找路由对 src 宽搜导致多步未命中 >10k，应避此路径\n- 当前 dev 分支；未提交、未推送、未回写禅道\n- 下一步：session list → 登录 8171 → 关改密 → 侧栏进楼幢信息 → 「导入」→ 上传无效 xlsx → 截图；通过后 git 提交 + 禅道带图回写 + 清理 TEMP 证据\n- hop2 成本触顶交接：文档 D:\\plan\\相城G\\HANDOFF-CHAIN-xiangcheng-g-dev-panel-hop3-20261125-1428.md（9 节）；排程 schedule-f7ec191d-…，约 14:28:19 new_once 开 hop3\n- 待定：① 是否提交并推送（用户确认后执行）；② 是否回写禅道 #6965（无合格验证截图按前端验证门不得回写）"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

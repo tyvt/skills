@@ -10,7 +10,7 @@
 ## Login
 - 安装脚本 `login.mjs` 显示用 admin 账号登录，密码脱敏。
 - `install.mjs` 保留初始密码行，但脱敏视图不可作依据。
-- 会话技能 `web-deploy` 为本地 nginx UI 部署；`deploy-env` 注册表（portal/fdc-v3）不含防汛C端，不适用。
+- 会话技能 `web-deploy` 为本地 nginx UI 部署；2026-11-25 发现 `deploy-env` 注册表另有「防汛C端 / test」公司测试环境（8162），非本面板站点。
 
 ## Usage
 - 2026-11-24 通过数据库与磁盘 conf 交叉核对，确认本项目唯一站点为「防汛C端」（id=29，未软删除，8095）。
@@ -20,8 +20,8 @@
 {
   "category": "部署工具",
   "name": "nginx_ui",
-  "source_extraction_id": "a5bb84377f824810939d97ca9ef65808",
-  "version": 1,
+  "source_extraction_id": "4a27cb0811cf41638470f3ea79348b8f",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

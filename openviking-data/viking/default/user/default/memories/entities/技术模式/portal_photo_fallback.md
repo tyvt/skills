@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T19:34:57+08:00
+verdict_note: portalPersonPhoto.js-1 DEFAULT=/assets/images/empty.svg，-3 键 photo/photoUrl/avatar/headPortrait，-18 resolvePersonPhotoSrc、-19 photoFailed 回退，与描述完全一致。
+---
 # 门户照片回退
 在租赁门户中使用 empty.svg 作为缺失人员照片的回退方案。
 
@@ -18,7 +23,6 @@
 - 所属项目：门户
 - 验证证据：extracted source=cursor project=门户
 - 来源会话：5942ae9c-e4bd-4732-877f-0bca30cb992b
-
 
 <!-- MEMORY_FIELDS
 {

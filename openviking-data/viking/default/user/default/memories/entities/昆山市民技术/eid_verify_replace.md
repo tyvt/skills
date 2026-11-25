@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T18:32:49+08:00
+verdict_note: 昆山市民仓核实：App.vue有initEid及排除wx0e2cb0b052a91c92，pages.json注册mp_ecard_sdk，estate.js与useEidVerify.js含getEidToken/faceRecognition，核身封装属实。
+---
 # 腾讯云E证通替换原生人脸核身流程
 昆山市民为替换 uni.startFacialRecognitionVerify 原生人脸流程，接入腾讯云 E 证通（mp_ecard_sdk）并完成核身逻辑封装。
 

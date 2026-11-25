@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:39:08+08:00
+verdict_note: 核验通过：产品2.0/zhi2-web-admin 存在 src/views/register/companyRegister.vue 与 src/components/AnnexUpload/index.vue，注册+附件链路文件属实；E2E 唯一手机号/验证码读取/附件配置探测为来源会话经验，文件侧证据一致
+---
 # 注册类真实接口 E2E 三处必改
 用真实接口跑注册全链路 E2E 时，每次都必须处理唯一手机号、图形验证码读取方式与附件配置接口探测三件事。
 

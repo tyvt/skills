@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 旧物业管理区域变更详情名称回显修复
 苏住房G 项目 property/complexChange/detail.vue 在变更旧物业管理区域时名称显示异常，已通过新增 resolveRecordName 等方法修复。
 

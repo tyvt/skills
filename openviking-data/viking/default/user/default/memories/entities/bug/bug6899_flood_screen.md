@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 禅道 6899：防汛大屏险情速报卡片滚动与状态显示缺陷
 苏住房前端 zhi2-web-admin 防汛应急指挥大屏「现场险情实时速报」禅道缺陷，2026-11-24 完成修复、提交推送与链路收口。
 

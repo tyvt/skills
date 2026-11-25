@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 不动产权证书详情弹窗按钮无响应与项目名为空修复
 苏州市房地产监测V3 不动产权证书详情因废弃指令与预填时机导致弹窗按钮无响应及项目名为空，已修复。
 

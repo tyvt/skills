@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T01:33:08+08:00
+verdict_note: 现状 Project_Suzhufang.vue-354-358 .home-nav-wrap 用 padding-33px 0 8px + 白底紧贴，无 margin-top-36px→0、header-wrap 也无 padding-bottom-24px，描述与现状不符。
+---
 # 苏找房首页导航外边距致Banner下灰色间隙
 苏住房C 苏找房首页 `.home-nav-wrap` 的外边距在浅灰背景下产生灰色间隙，已在 cursor 会话 82834510 修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T01:34:12+08:00
+verdict_note: dsh 目录插件齐全；git log 实有 ba1fadce/99a0e514/80512c00/39f162d0/c006aa92/e7318dba/a128d4ee 全部 commit，99a0e514 即 inject=['tools'] 修复，属实。
+---
 # skills 仓库的 dsh 插件子模块
 skills 仓库中的 dsh 目录（无 .gitmodules，不是经典子模块）（D:\repository\skills\dsh），承载 DSH 侧插件、补丁与插件链配置。
 

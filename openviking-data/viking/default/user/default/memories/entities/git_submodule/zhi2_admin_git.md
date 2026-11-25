@@ -29,8 +29,8 @@ zhi2-web-admin 是父仓「门户」的独立 git 子模块，改动经 submodul
 {
   "category": "git_submodule",
   "name": "zhi2_admin_git",
-  "source_extraction_id": "2370fda52b0f40e2a19c85f898630070",
-  "version": 27,
+  "source_extraction_id": "f61f579abe764cdfa8d29918a57cc7da",
+  "version": 28,
   "memory_type": "entities"
 }
 -->

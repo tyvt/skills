@@ -1,0 +1,24 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-8bc91400-143b-4d96-a616-5c45dcd87dbd/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-25T06:41:55.670612+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_6944.md",
+                "memory_type": "entities",
+                "before": "# 禅道 Bug 6944\n禅道缺陷 6944：2026-11-25 处理巡查记录新增/编辑页「发现隐患」下仍显示提示的问题；源码已删除提示且本地 dist 无该文案，但禅道工单被重新激活，计划重建并实机验证后回写。\n\n## 工单与现象\n- 禅道链接 http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6944；2026-11-25 会话中开始处理，先加载 `zentao-analyzer` 拉取详情。\n- 工单重新激活原因是新增/编辑页「发现隐患」下仍显示该提示；禅道截图仍能看到提示。\n- 仓库位于 `D:\\repository\\苏住房G\\zhi2-web-admin`，正在检索提示文案、相关页面，并核对 `patrol/index.vue` 新增入口与 `detail.vue` 现状。\n\n## 代码状态\n- 代码侧提交 `94e58351c` 已删除该提示；本地 `dist` 无该文案。\n- 判断工单重新激活多半是测试环境未重建；下一步聚焦重建与实机验证，避免再全仓检索。\n\n## 验证尝试\n- 曾尝试验证码脚本登录并进入巡查记录新增/编辑页取证；验证码 `0+8=8` 填 `8`、`0×4=0` 填 `0`，但 UI 登录反复失败。\n- 后续改走窄路径：看禅道截图路由、打开部署面板测试域名（与禅道截图一致）、关闭验证码弹窗并刷新验证码重试。\n- 还尝试查登录 token 存储方式，`login.vue` 含登录接口细节，计划用 API 取 token 并注入会话直达新增页；最后改为先探测 `/code` 响应结构，再登录并注入 token。\n\n## 回写准备\n- 计划后台 `build`、核对 `zentao-resolve.mjs` 调用方式，并用带 hash 的路由实机验证。\n- 若登录仍失败，将用构建产物证据准备禅道回写说明。",
+                "after": "# 禅道 Bug 6944\n禅道缺陷 6944：2026-11-25 处理巡查记录新增/编辑页「发现隐患」下仍显示零报告提示的问题；源码已删提示、本地 dist 无该文案，hop=2 已完成实机验证（页面无灰字），待用户确认后禅道回写。\n\n## 工单与现象\n- 禅道链接 http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6944；2026-11-25 会话中先加载 zentao-analyzer 拉取详情。\n- 原始目标：「发现隐患」下不应再出现灰字「不登记任何隐患直接保存即为零报告，仍计入巡查次数」（需求无此文案）。\n- 工单重新激活原因是新增/编辑页仍显示该提示，禅道截图可见。\n- 仓库 D:\\repository\\苏住房G\\zhi2-web-admin；检索提示文案与相关页面，核对 patrol/index.vue 新增入口与 detail.vue 现状。\n\n## 代码状态（不重跑）\n- 提交 94e58351c 已删除提示；develop/v2.6.2-suzhufang @ 9a86b3bc7；npm run build 与 dist 全文 grep 均无目标串；本地 dist 无该文案。\n- 判断重新激活多半是测试环境未重建；不再改码（除非 grep 又出现该句），聚焦重建与实机验证，避免再全仓检索。\n\n## 验证（hop=2 已完成）\n- 上轮卡点：agent-browser 验证码未过关、未进入 patrol/add，禅道回写未做；环境 http://localhost:8167（本地 dist，git 含 94e58351c），页面 #/safety/electrocar/patrol/add?formMode=add（新增巡查记录）。\n- 先探测 /code 响应结构、查 token 存储（login.vue 含登录接口细节），计划用 API 取 token 注入会话直达新增页。\n- 浏览器识图登录反复失败（验证码 0+8=8 填 8、0×4=0 填 0）；曾看禅道截图路由、打开部署面板测试域名（与禅道截图一致）、关闭验证码弹窗刷新重试。\n- 改走原子链路：拉新验证码 → 识图 → API `/api/v2.0/code` 登录取 JWT → 浏览器注入 → 打开 patrol/add，在同一次 /code 响应下完成识图与 API 登录。\n- API 登录成功、JWT 注入后页面打开且无目标灰字；全页截图 C:/Users/Administrator/AppData/Local/Temp/bug6944-verify-full-20261125-1433.png；自查 DOM 未出现目标提示、patrol 源码 grep 0 命中。\n\n## 回写待办\n- 完成判定：验证截图无提示 → 用户确认 → 禅道 resolved、comment 附图；当前正等待用户确认。\n- 回写准备：后台 build、核对 zentao-resolve.mjs 调用方式、带 hash 路由实机验证。\n- 通过 → zentao-resolve.mjs 6944 回写（说明根因旧包/未部署 vs 代码已修、commit、验证图），并询问提交/推送/暂不处理。\n- 未通过 → 核对 nginx root=D:/repository/苏住房G/dist 并 reload、查旧 UI；若登录仍失败则以构建产物证据准备回写说明。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

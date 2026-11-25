@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T00:39:56+08:00
+verdict_note: 记忆称 /api-flood→9610、/api-auth→9211、VITE_API_BASE_URL=/api-flood 反代解决CORS；实查防汛C端 request.js 为 VITE_API_BASE_URL="/api"、纯demo模式，全仓无 api-flood/api-auth nginx 配置，无法证明有效。
+---
 # Nginx same-origin reverse proxy solves browser CORS
 When an H5 app served from nginx calls a backend on a different origin, missing Access-Control-Allow-Origin headers block the calls; a same-origin nginx reverse proxy removes the need for backend CORS headers.
 

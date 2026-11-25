@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 综合查询弹窗高度过长修复
 产品2.0 物业管理区域备案详情页点击「综合查询」弹窗高度超出视口，已修复。
 

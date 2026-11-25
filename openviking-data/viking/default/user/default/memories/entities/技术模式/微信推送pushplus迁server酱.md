@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T20:39:54+08:00
+verdict_note: fund/push.example.env 实有 # Server酱 SendKey 注释与 SERVERCHAN_SENDKEY=(-1/-3)，印证 PushPlus→Server酱迁移与环境变量。930955/H30269 专属 env 当前工作树未见（疑本地/gitignore），免费额度属用户决策不可代码核验，核心配置属实。
+---
 # 微信推送PushPlus迁Server酱
 投资推送项目在 PushPlus 实名收费后将微信推送迁移至 Server酱，并约定多指数推送的免费额度合计规则。
 

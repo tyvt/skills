@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T00:40:07+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src/pages_owner/house/index.vue 实存；PageBg/ZsImage 引用 images/szf/Bg-szf.png 且带 subpackage="pages_owner"，与跨包静态资源改本包路径描述一致。
+---
 # 分包静态资源跨包访问致真机图片404
 苏住房C小程序pages_owner分包跨包引用pages_transaction静态图片，真机未加载交易分包时触发404。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

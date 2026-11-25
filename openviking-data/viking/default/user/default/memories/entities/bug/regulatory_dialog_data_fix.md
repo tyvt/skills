@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 选择监管标准弹窗列表数据解析修复
 苏州市房地产监测V3 项目修复「选择监管标准」弹窗（`RegulatoryDialog.vue`）接口返回列表但表格显示「暂无数据」的问题。
 

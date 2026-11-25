@@ -1,14 +1,13 @@
 # tiany
-- Serves as Lead on the zhi2-web-admin (Suzhufang front-end) project, owning task assignment and implementation decisions (as of 2026-11-09)
-- ZenTao account is tiany (as of 2026-11-12)
-- Currently developing the Suzhufang front-end repository on branch develop/v2.6.2-suzhufang (as of 2026-11-24)
-
+- 担任 zhi2-web-admin（苏住房前端项目）Lead，负责任务分配与实现方案决策、开发与视觉验收 (as of 2026-11-09)
+- 禅道账号为 tiany (as of 2026-11-12)
+- 当前在 develop/v2.6.2-suzhufang 分支开发苏住房前端仓库 (as of 2026-11-25)
 
 <!-- MEMORY_FIELDS
 {
-  "source_extraction_id": "988798ff7e4b4ac2bd1b3aa16ff2890c",
+  "source_extraction_id": "ee14901f4a53466cbd622cc16829b2ac",
   "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited",
-  "version": 5,
+  "version": 7,
   "memory_type": "profile"
 }
 -->

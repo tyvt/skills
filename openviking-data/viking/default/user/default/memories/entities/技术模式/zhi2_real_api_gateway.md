@@ -11,13 +11,15 @@
 - `GET/POST /api/v3.0/portal/appLogin/apps` 在网关返回 500（路由存在、能到后端），说明接口是活的
 - 无 token 或假 Bearer 均 500，需有效登录态 Bearer token 才能返回数据
 - `portal/appLogin/captcha` 无 token 也 500，疑似网关边缘拒 plain http，需 https 复测
+- 2026-11-25：test 环境登录接口 `/v2.0/security/auth/login` 正常（图形验证码强制开启 captchaOnOff=True），返回 accessToken 及 roles=[admin]、roleKeys=[admin]、deptId=1；但带 Bearer token 的 getInfo/treeInPermission/getKeyData/getBenefitData 全部 500「内部服务器错误」，免登录 `region/list` 返回 200 真实数据
+- 2026-11-25：前端 token 存 `flood-token-v1`、登录用户存 `flood-login-user-v1`，注入后请求头带 `Bearer <token>` + projectId（`getProjectId` 取 `suzhufang`）
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",
   "name": "zhi2_real_api_gateway",
-  "source_extraction_id": "f30aaf58dbd94f4bb90809f2ddbfb567",
-  "version": 5,
+  "source_extraction_id": "cab3481dcaa34416ad9d1d2e2086f408",
+  "version": 6,
   "memory_type": "entities"
 }
 -->

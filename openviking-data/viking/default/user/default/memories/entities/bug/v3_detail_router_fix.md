@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 列表页进入详情页授权路由修复
 苏州市房地产监测V3 中从列表页进入详情页频繁提示没有授权路由，已通过 ruoyi.js 与 listMixins.js 修复。
 

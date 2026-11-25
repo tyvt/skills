@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 台账物业管理区域详情页接口排查与修复
 苏住房G(zhi2-web-admin) 台账物业管理区域详情页显示全 0 和「暂无数据」，根因是 commit 5d50941f2 改 ID 优先级导致传错 ID。
 

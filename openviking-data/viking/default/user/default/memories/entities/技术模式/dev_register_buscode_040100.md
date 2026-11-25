@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T17:05:55+08:00
+verdict_note: 抽查2026-11-25-产品2.0全仓无companyRegister.js/companyRecord.js,040100仅见dist产物,当前代码基线不支持。用户判过期/无效。
+---
 # 开发企业注册与入网认证共用 busCode 040100
 开发企业注册与入网认证取附件配置共用同一 busCode `040100`，靠复用同一常量保证一致；经纪/租赁必须分开。
 

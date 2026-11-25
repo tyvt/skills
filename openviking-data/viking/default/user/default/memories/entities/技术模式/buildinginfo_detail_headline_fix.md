@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T23:33:43+08:00
+verdict_note: 苏州市房地产监测V3 buildinginfo/detail.vue-224 命中 <template slot="right">；Headline/index.vue-95 用 --detail-content-padding 变量控制间距。核心修复手法（Vue2 slot写法+变量控制padding）属实，collapse-header-actions 类名未直接命中。
+---
 # 楼幢信息详情页表格间距与按钮对齐修复
 苏州市房地产监测V3 的 buildinginfo/detail.vue 修复了表格上方无间距与按钮未对齐标题的问题。
 

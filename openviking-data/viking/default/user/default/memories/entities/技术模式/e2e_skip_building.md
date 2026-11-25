@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:24:08+08:00
+verdict_note: 代码核对通过 presale-survey-change-helpers.js L127 bizState 0/1 过滤 L141-142 selectable/hasActiveSurveyChange 排除 L198 selectBuildingInDialog 与记忆一致
+---
 # e2e选楼幢须跳过在途及不可用标记
 e2e 辅助函数 `selectBuildingInDialog` 取 bizState 0/1 楼幢与弹窗列表求交集，排除在途及不可用标记，无可用行则跳过测试。
 

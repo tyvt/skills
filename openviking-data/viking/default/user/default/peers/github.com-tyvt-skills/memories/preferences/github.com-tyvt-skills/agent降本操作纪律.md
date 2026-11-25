@@ -8,14 +8,17 @@
 - 方案 plan_review 连续多轮 grok PASS（0 P0）后主动停止循环并置 review_override: true 交用户确认，避免验证路径 token 浪费
 - 浏览器验证优先用 agent-browser 内置 wait 条件而非 Start-Sleep；verify-loop 按 session 累计 sleep 会拦截 pwsh，此时改走 mcp_gateway 的 agent-browser 通道
 - 源文件关键行被工具脱敏（token/密码等）时不据掩码构造 edit 的 old_string，改用按行号脚本重建并用断言校验锚点
+- 启动常驻服务用 run_in_background: true；pwsh 每次调用是独立进程，前台启动会在调用结束后退出、端口无监听。
+- 服务启动慢（如 get_state 探测 34 行）时按预估延长等待并反复探测端口，不凭输出缓冲或超时误判崩溃。
+- 精确路径读取被探索门禁拦截时，按「确需主控直探的精确读取」豁免把形式从 read 改为 pwsh 精确读取该文件，不整目录探索、也不放弃读文档。
 
 <!-- MEMORY_FIELDS
 {
   "user": "github.com-tyvt-skills",
   "topic": "agent降本操作纪律",
-  "source_extraction_id": "73c4afa79d41462f87ecf9065e268d76",
+  "source_extraction_id": "d78e356feee040eea64432a18cebce8b",
   "peer_id": "github.com-tyvt-skills",
-  "version": 4,
+  "version": 6,
   "memory_type": "preferences"
 }
 -->

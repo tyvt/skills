@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # standardItemType 懒加载树表删除三级刷新修复
 园区物管2.0（zhi2-web-admin）中 `src/views/maintenance/standardItemType/index.vue` 删除三级节点后列表不刷新，实际数据已删除。
 

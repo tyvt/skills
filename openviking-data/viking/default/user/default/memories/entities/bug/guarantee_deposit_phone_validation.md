@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 房屋质量保证金协议-联系电话格式校验修复
 榆林G 项目 zhi2-web-admin 中房屋质量保证金协议新增页，开发企业和物业服务企业联系电话字段缺少手机号格式校验，已修复。
 

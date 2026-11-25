@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T19:34:27+08:00
+verdict_note: git submodule status 与 .gitmodules 证实产品2.0为父仓、zhi2-web-admin 为子模块(url gitlab.zhi.com/zhi/v2/fe)，与记忆的父子仓/分支协作结构一致；流程型记忆，结构锚点属实。
+---
 # 多分支并行合并丢代码的定位与恢复流程
 develop/v2.6.2 等目标分支上工单、知识库代码整块消失时，需按目录比对差异文件数，再单提交恢复。
 

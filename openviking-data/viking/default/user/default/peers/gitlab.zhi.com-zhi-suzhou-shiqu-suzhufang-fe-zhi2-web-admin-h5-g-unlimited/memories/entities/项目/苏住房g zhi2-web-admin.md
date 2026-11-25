@@ -1,0 +1,23 @@
+# 苏住房G zhi2-web-admin
+苏住房G 前端项目 zhi2-web-admin，缺陷在禅道跟踪并由本地计划/交接文档衔接。
+
+## 仓库与环境
+- 本地 nginx 8101 提供 `dist`；2026-11-25 表头吸顶返工构建后 dist 更新且 nginx 8101 返回 HTTP 200。
+- 计划与交接文档目录为 `D:\plan\苏住房G`；禅道任务2730表头吸顶返工交接文档为 `D:\plan\苏住房G\HANDOFF-CHAIN-禅道任务2730-表头吸顶返工-hop1-20261125-1447.md`。
+- 2026-11-25 会话中确认当前开发分支为 `develop/v2.6.2-suzhufang`。
+
+## 关联工作
+- 2026-11-25 禅道任务2730统计表表头吸顶、横向滚动和纵向双滚动条返工，见「统计表表头吸顶与单滚动修复」技术模式及相关事件。
+- 2026-11-25 首轮实机验证 eval 断言通过（pageNoScroll=true 整页无第二条纵向滚动条、stickyHead=true、topStable=true，表头滚动前后 top 约 211px）；三张对照图按 `$env:TEMP`、正斜杠、尖括号、时间戳规范内嵌于对话，文件为 verify2730-20261125-150130-before.png、verify2730-20261125-150140-after.png、verify2730-20261125-150200-scroll-x.png。
+- 2026-11-25 用户反馈「对话里看不见图」后改为正文内嵌；验收反馈表头吸顶漏底、横向体验仍差，随后窄读 `detail.vue` 表头 sticky 与 `.stat-table-wrap` 样式、核对根容器是否含 `display:flex`，改 sticky 防透出与横向滚动体验并后台跑构建。
+
+<!-- MEMORY_FIELDS
+{
+  "category": "项目",
+  "name": "苏住房G zhi2-web-admin",
+  "source_extraction_id": "8af66b78f2cf406ba2dfe78a91d0a349",
+  "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-web-admin-h5-g-unlimited",
+  "version": 2,
+  "memory_type": "entities"
+}
+-->

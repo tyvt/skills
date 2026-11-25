@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T21:34:48+08:00
+verdict_note: 记忆称新增 normalizeDictList 并在 getDictLabel 中先调用；实机 无锡锡山业主决策H5/src/utils/index.ts-128-137 为内联三元数组兼容，全项目无 normalizeDictList 函数，描述的方案与现状不符。
+---
 # getDictLabel 类型兼容修复避免 find is not a function
 getDictLabel 对 options 调用 .find() 必须是数组，字典接口返回 data 为对象时触发报错，已用 normalizeDictList 统一成数组修复。
 

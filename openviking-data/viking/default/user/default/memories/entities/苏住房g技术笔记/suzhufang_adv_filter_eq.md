@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T18:33:01+08:00
+verdict_note: 苏住房G仓advancedQueryCore.js确含sanitizeConditionGroups与condition.operator兜底逻辑，zs-advanced-query.vue对应，根因与方案属实。
+---
 # 苏住房G 高级筛选返回暂无数据问题
 公共查询列表页用高级筛选查询后点查看再返回，条件摘要正常但表格暂无数据。
 

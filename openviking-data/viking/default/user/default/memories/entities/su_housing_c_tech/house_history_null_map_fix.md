@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-25T17:25:54+08:00
+verdict_note: 代码核对通过 pages_owner/house/history.vue L31 res.rows ?.map L46 catch reject 与记忆一致
+---
 # 我的房屋历史记录空数据导致加载卡死修复
 苏住房C「我的-我的房屋」未添加过房屋的用户点击历史添加记录时，因接口返回 rows:null 调用 .map() 报错，页面一直停在「正在加载..」。
 
@@ -16,7 +20,6 @@
 - 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：src/pages_owner/house/history.vue、tenant/history.vue、pages_owner/house/index.vue、pages.json
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：d96faf99-8932-4fca-b475-a68344311240；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

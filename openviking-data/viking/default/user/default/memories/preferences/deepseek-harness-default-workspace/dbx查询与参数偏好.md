@@ -3,13 +3,15 @@
 - DBX connection_name 第三次复发（2026-11-10）证明文档约束对「顺手省略参数」行为无效；用户偏好用脚本或参数校验机制替代文档提醒（已封装 zentao-resolve.mjs）。
 - DBX steps/comment 字段被 MCP 按 cell 200 字截断，应使用 UNION ALL 每段一行或 dbx_execute_and_show 拿全量，避免 SUBSTRING 分段仍不全。
 - OpenViking detail 配置仅支持 mode=context；配 mode=list 会报 INVALID_ARGUMENT。
+- In DBX transaction writes, every dbx_execute call also needs connection_id together with session_id, not only query calls.
+- On Dameng, `left` is a reserved word; wrap it in backticks when used as a column alias or other SQL identifier.
 
 <!-- MEMORY_FIELDS
 {
   "user": "deepseek-harness-default-workspace",
   "topic": "DBX查询与参数偏好",
-  "source_extraction_id": "2db04767ba7f4eb4901f135a19dba987",
-  "version": 1,
+  "source_extraction_id": "0526d73aa2f4419abc1d92d7ef831b82",
+  "version": 2,
   "memory_type": "preferences"
 }
 -->

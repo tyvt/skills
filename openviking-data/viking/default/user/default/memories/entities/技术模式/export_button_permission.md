@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T21:33:54+08:00
+verdict_note: 淮安物管 pubRegulatoryAccount/index.vue-235 导出按钮确有 permission-[this.perms.export]，与记忆描述一致（-215/-225 为 add 属其他按钮）。
+---
 # 开户申请导出按钮权限控制
 淮安物管开户申请列表页无导出权限时仍显示导出按钮，已通过增加 permission 属性隐藏按钮修复。
 

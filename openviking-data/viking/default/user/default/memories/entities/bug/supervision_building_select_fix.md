@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 监管项目备案选择楼幢接口更换
 苏州市房地产监测V3 项目中，完成监管项目备案「选择楼幢」接口更换与字段映射修复。
 

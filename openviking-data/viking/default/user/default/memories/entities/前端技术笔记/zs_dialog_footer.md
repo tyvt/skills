@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T00:40:45+08:00
+verdict_note: 产品2.0 zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue 有 calculateHeight，末尾 dialogElement.style.height='auto'、flex 分配，与嵌套弹窗 footer 溢出改 height auto 描述一致（文件名 zs-dialog.vue 非 index.vue，属记忆路径小误差）。
+---
 # 嵌套zs-dialog footer溢出修复
 弹窗内再开 zs-dialog 时内层 footer 被裁切或跑出可视区域，需修改 calculateHeight 逻辑。
 

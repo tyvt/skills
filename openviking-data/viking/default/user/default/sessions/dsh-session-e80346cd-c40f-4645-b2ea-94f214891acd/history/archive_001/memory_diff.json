@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-e80346cd-c40f-4645-b2ea-94f214891acd/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-25T07:12:41.473051+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/events/2026/11/25/DSH Web git 推送修复.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-25 用户要求在 DSH Web 内配好 git 推送且不影响全局配置；将 niugit 自带 git-credential-wincred.exe 复制为 niubash prepared 目录的 git-credential-manager.exe，仅修改 .dsh 不动全局 git config，验证 git ls-remote 与 git push origin dev 正常；目标仓为 D:\\repository\\苏住房防汛C端（origin http://gitlab.zhi.com/zhi2-mobile-query-h5-c-unlimited.git，dev 与 origin/dev 同步）。\n# 2026-11-25 (Wednesday) ChatLog:\n**user [peer=github.com-tyvt-skills]**: 你配置好，在dsh web里面要能用，也不要影响全局的\n...\n**assistant [peer=github.com-tyvt-skills]**: ## 结论\n\n**DSH Web 里（`ops_bash` / niubash）已可在不改全局 `git config` 的前提下正常 `git push`。**\n做法是把 niugit 自带的 **`git-credential-wincred.exe`** 复制到当前 niubash 准备的 **`winuxcmd/usr/bin/git-credential-manager.exe`**，让全局仍生效的 `credential.helper=manager` 能调到可执行文件（否则会报 `credential-manager is not a git command` 并超时）。\n\n---\n\n### 已生效的修改（仅 `.dsh`，不动全局 git）\n\n| 位置 | 说明 |\n|------|------|\n| `C:\\Users\\Administrator\\.dsh\\dsh-ops\\shells\\niubash-prepared\\e3765d439d5d873f50e910706e380ece9fa29d6349c02cf383cb54aeae4e4701\\winuxcmd\\usr\\bin\\git-credential-manager.exe` | 实为 **wincred** 副本，供 `manager` helper 解析 |\n| 验证 | `git ls-remote origin HEAD`、`git push origin dev` → 正常（含此前误操作推到 `87d84b0..5fb2f05` 的一次推送，当前 **Everything up-to-date**） |\n\n**说明：** 复制标准 Git 自带的 **GCM .exe** 到 niubash 会在本环境 **.NET 异常/挂死**；**wincred 别名** 稳定，且已能读到 GitLab `gitlab.zhi.com` 凭据。\n\n**无效项（已排除）：** `~/.niubashrc`（`ops_bash` **不读**）、仅设 `GIT_CONFIG_GLOBAL=wincred`（仍会走全局 helper 链并卡住）、`credential.helper=wincred` 单条 `-c`（需先清空 helper 链：`credential.helper=` 再 `wincred`）。\n\n---\n\n### 以后 niubash 被 dsh-ops 重装/重建时\n\n需在同样路径 **再执行一次** 复制（或跑维护脚本）。我写的 `C:\\Users\\Administrator\\.dsh\\scripts\\ensure-niubash-git-credential.sh` 因 **plan-gate** 未落盘，你可自行保存：\n\n```bash\n#!/usr/bin/env bash\nset -euo pipefail\nPREP_ROOT=\"${DSH_HOME:-$HOME/.dsh}/dsh-ops/shells/niubash-prepared\"\nshopt -s nullglob\nfound=0\nfor dir in \"$PREP_ROOT\"/*/winuxcmd/usr/bin; do\n  src=\"${dir%/usr/bin}/../opt/niugit/mingw64/libexec/git-core/git-credential-wincred.exe\"\n  [ -f \"$src\" ] || continue\n  cp -f \"$src\" \"$dir/git-credential-manager.exe\"\n  found=1\ndone\n[ \"$found\" -eq 1 ] || { echo \"no prepared niubash\" >&2; exit 1; }\necho ok\n```\n\n**新开会话无需重启 DSH Web**（改的是磁盘上的 prepared shell，不是 profile 里的 patch）。\n\n---\n\n### 待定\n\n- 是否把上述脚本正式写到 `.dsh/scripts`（需你确认后我按 plan 流程落地）\n- 防汛 C 端仓库工作区里仍有未提交/异常未跟踪文件，与推送能力无关"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/git_niugit_credential.md",
+                "memory_type": "entities",
+                "before": "# niugit 会话推送失败与 git-credential-manager\n当前会话的 git 是 niugit，其 PATH 不含标准 Git 的 bin 目录，导致 credential.helper=manager 找不到 git-credential-manager.exe，推送报 「credential-manager is not a git command」（表现为超时 exit 124）。这是「之前一直能推送、现在不行」的根因。\n\n## 环境事实\n- git-credential-manager.exe 确实存在：C:/Program Files/Git/mingw64/bin/\n- 全局/系统 git 配置 credential.helper=manager，但 niugit 的 PATH 未含该 bin 目录\n- 无 .git-credentials 文件，但补 PATH 后 git credential fill 能返回已存的 gitlab.zhi.com 凭据（凭据一直在，无需用户提供）\n- SSH key id_ed25519 存在但对该 GitLab 为 Permission denied（无权限），HTTP 匿名推送被拒（302 到登录）\n\n## 解决\n- 临时补 PATH：export PATH=\"/c/Program Files/Git/mingw64/bin:$PATH\" 后推送成功，不改全局配置\n- 不要因报 helper 缺失就直接索要凭据，先用带标准 Git bin 的 PATH 验证 git credential fill\n- 教训：fetch/push 卡住时先查 git 安装来源（niugit vs 标准 Git）与 helper 可执行文件位置，再决定是否问用户",
+                "after": "# niugit 会话推送失败与 git-credential-manager\n当前会话的 git 是 niugit，其 PATH 不含标准 Git 的 bin 目录，导致 credential.helper=manager 找不到 git-credential-manager.exe，推送报 「credential-manager is not a git command」（表现为超时 exit 124）。这是「之前一直能推送、现在不行」的根因。\n\n## 环境事实\n- git-credential-manager.exe 确实存在：C:/Program Files/Git/mingw64/bin/\n- 全局/系统 git 配置 credential.helper=manager，但 niugit 的 PATH 未含该 bin 目录\n- 无 .git-credentials 文件，但补 PATH 后 git credential fill 能返回已存的 gitlab.zhi.com 凭据（凭据一直在，无需用户提供）\n- SSH key id_ed25519 存在但对该 GitLab 为 Permission denied（无权限），HTTP 匿名推送被拒（302 到登录）\n\n## 解决\n- 临时补 PATH：export PATH=\"/c/Program Files/Git/mingw64/bin:$PATH\" 后推送成功，不改全局配置\n- 不要因报 helper 缺失就直接索要凭据，先用带标准 Git bin 的 PATH 验证 git credential fill\n- 教训：fetch/push 卡住时先查 git 安装来源（niugit vs 标准 Git）与 helper 可执行文件位置，再决定是否问用户\n\n## DSH Web 持久修复（2026-11-25）\n- 触发范围：仅 DSH Web/niubash（ops_bash）里推送失败，UGit/完整 Git 终端正常；本仓是内网 GitLab 的 helper 路径问题，与 GitHub 443 超时属另一类\n- 2026-11-25 用户要求 DSH Web 内可用且不影响全局配置：把 niugit 自带 git-credential-wincred.exe 复制为 niubash prepared 目录的 winuxcmd/usr/bin/git-credential-manager.exe，使全局 credential.helper=manager 可解析到可执行文件；仅改 .dsh，不动全局 git config\n- 具体路径 C:\\Users\\Administrator\\.dsh\\dsh-ops\\shells\\niubash-prepared\\<hash>\\winuxcmd\\usr\\bin\\git-credential-manager.exe；git ls-remote 与 git push origin dev 已验证正常（含 87d84b0..5fb2f05 一次推送，当前 Everything up-to-date）；目标仓 苏住房防汛C端 D:\\repository\\苏住房防汛C端，origin http://gitlab.zhi.com/zhi2-mobile-query-h5-c-unlimited.git，dev 与 origin/dev 同步\n- 标准 Git 自带 GCM .exe 复制到 niubash 会本地 .NET 异常/挂死；wincred 别名稳定且能读到 gitlab.zhi.com 凭据；无效项：~/.niubashrc（ops_bash 不读）、仅设 GIT_CONFIG_GLOBAL=wincred（仍走全局 helper 链卡住）、credential.helper=wincred 单条 -c（须先 credential.helper= 清空 helper 链再加 wincred）\n- 新开会话无需重启 DSH Web（改的是 prepared shell）；niubash 被 dsh-ops 重装/重建后需重跑复制或维护脚本 C:\\Users\\Administrator\\.dsh\\scripts\\ensure-niubash-git-credential.sh（因 plan-gate 未落盘，待用户确认）；防汛C端工作区未提交改动与异常未跟踪文件与推送无关"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

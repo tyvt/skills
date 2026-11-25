@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T01:33:29+08:00
+verdict_note: 苏州V3 AgencyPersonnelDetail.vue-133/386 用 isValidIdNumber 且红字'请输入正确的18位身份证号'在386行，utils/idCard.js-7 有校验函数，属实。
+---
 # 从业人员信息身份证校验红字为预期行为
 苏州市房地产监测V3 经纪机构管理→从业人员信息（`AgencyPersonnelDetail.vue`）红字「请输入正确的18位身份证号」是预期校验，不是前端 bug。
 

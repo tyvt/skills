@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T22:35:37+08:00
+verdict_note: 记忆核心的 guaranteeDepositAccount 等保证金模块文件及保证金关键词在产品2.0源码零命中；isBTerminalPractitioner 存在但与 propertyProjectId 组合不在保证金模块，描述与现状不符。
+---
 # B端业务列表按小区隔离
 产品2.0 房屋质量保证金模块在 B 端从业人员账号下，统一用 isBTerminalPractitioner 门控 + currentProjectId 传 propertyProjectId 做小区过滤。
 

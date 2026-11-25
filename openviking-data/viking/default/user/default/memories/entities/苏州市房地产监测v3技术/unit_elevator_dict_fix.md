@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T18:33:20+08:00
+verdict_note: 记忆称三文件有无电梯列已由sys_include改为have_or_not，但实机unitinfo/index.vue-130、building/unit/index.vue-107、unitChange/index.vue-78仍为sys_include；have_or_not仅在permitConstants.js定义未应用，描述与现状不符。
+---
 # 单元列表有无电梯列误用sys_include显0
 单元管理、楼盘表单元、单元变更列表的「有无电梯」列错误使用 sys_include 字典，无匹配值显示原始值0。
 

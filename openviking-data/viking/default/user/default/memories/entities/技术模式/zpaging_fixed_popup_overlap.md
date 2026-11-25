@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T18:33:41+08:00
+verdict_note: 苏住房C仓intention/popup.vue实机为flex三段、-fixed=false、-use-page-scroll=false、75vh限高、底部flex-shrink-0及安全区，核心修复属实（具体rpx数值略有差异，不影响结论）。
+---
 # z-paging 弹窗内 fixed 定位导致按钮重叠
 苏住房C 市民端弹窗内使用 z-paging 默认 fixed:true 会按全屏固定定位渲染，盖住底部操作按钮。
 
@@ -18,7 +23,6 @@
 - 验证：会话 451f9781（基线 d43894b）「我的求购」附近小区弹窗重叠；修复为 flex 三段 + :fixed="false" + :use-page-scroll="false" + min-height:500rpx + max-height:75vh + 底部 flex-shrink:0。
 - 涉及文件：src/pages_transaction/intention/popup.vue、src/pages_transaction/intention/add.vue
 - 所属项目：苏住房C；来源会话ID：451f9781-7f9a-465f-90a9-7f258714b1cc；代码基线：d43894b。
-
 
 <!-- MEMORY_FIELDS
 {

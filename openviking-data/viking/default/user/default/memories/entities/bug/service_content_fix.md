@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 服务内容弹窗固定文本与输入项混淆修复
 产品2.0 的 complexServiceDetailDialog.vue 中「服务内容」弹窗曾将固定文本与占位符塞进同一输入框，已修复为内联展示。
 ## 问题根因

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T20:39:43+08:00
+verdict_note: 苏州市房地产监测V3 Navbar.vue .navbar 用 background-image url('/assets/images/navbar-bg.png')(-830)、background-color 兜底(-809)、background-size-cover(-833)，图片在 public/assets/images/navbar-bg.png 存在。仅 background-position 实为 left bottom(-832)非 center bottom，核心属实。
+---
 # 顶栏背景天际线图
 苏州市房地产监测V3 管理端顶栏使用天际线背景图，并保留纯色兜底防止加载失败。
 ## 实现要点

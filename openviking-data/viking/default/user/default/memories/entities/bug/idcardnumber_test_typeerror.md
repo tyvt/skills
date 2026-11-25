@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 法人证件号码校验 TypeError 修复
 苏住房G 项目中 patterns/index.js 里 IDCardNumber 是校验函数而非正则，误用 .test() 导致的同类 TypeError 问题已全部修复。
 

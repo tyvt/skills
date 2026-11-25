@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T02:33:00+08:00
+verdict_note: 小程序项目 wygl-wxxcx-dev-slh 下无 pages/home/login/index 路由及 login/index.vue 文件，仅 face/verify.vue 存在，代码基线 none，无法证实
+---
 # 登录授权弹窗结构与跳转规范
 在 pages/home/login/index 实现按设计稿的登录授权弹窗结构与跳转逻辑。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T22:35:16+08:00
+verdict_note: AppendixRequirementGrid.vue-45-46 定义 appendixUploadNoop/appendixBeforeUploadNoop，94/98/102/106 行作为 default；与记忆描述一致。
+---
 # 绑定到 Card 的默认 null 回调触发类型检查警告
 在 Suzhou Real Estate Monitoring V3 (zhi2-web-admin) 项目中，在只读路径下，`AppendixPackageSection` 使用 `AppendixRequirementGrid.vue` 时未传递 callbacks，而绑定到 `AppendixRequirementCard` 的默认 null 触发了 "Expected Function got Null" 警告。
 
@@ -18,7 +23,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：fe17d399-463d-45e5-9c19-4d7ebc506fcd
-
 
 <!-- MEMORY_FIELDS
 {

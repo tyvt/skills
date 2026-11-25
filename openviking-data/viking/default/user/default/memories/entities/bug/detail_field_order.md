@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 查看页字段顺序与展示项调整
 产品2.0 的两个详情页 `DetailTemplate`（contentInfo）已按图片顺序统一调整字段顺序并补齐全字段。
 

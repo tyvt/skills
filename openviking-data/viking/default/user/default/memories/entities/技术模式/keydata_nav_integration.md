@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T02:34:27+08:00
+verdict_note: home/v2/keyDataMap.js 含 normalizeKeyData，index-v2.vue/home.js 含 keyDataFetchSeq、companyNum、floorAreaTotal 映射，与记忆一致
+---
 # KeyDataNav 与 getKeyData 对接（苏住房G）
 苏住房G 首页 KeyDataNav 与 `getKeyData` 接口已完成对接。
 

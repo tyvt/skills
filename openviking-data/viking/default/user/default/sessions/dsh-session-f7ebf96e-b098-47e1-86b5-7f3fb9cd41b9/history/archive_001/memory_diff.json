@@ -1,0 +1,40 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-f7ebf96e-b098-47e1-86b5-7f3fb9cd41b9/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-25T05:53:53.016439+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/前端技术笔记/home_todo_restore.md",
+                "memory_type": "entities",
+                "after": "# 首页待办卡片内容行恢复（bug 6959）\n苏住房防汛C端移动查询H5（zhi2-mobile-query-h5-c）首页待办卡片在 hop3 因「修复过度」删掉了内容行，2026-11-25 按用户决策以「单行摘要」方案恢复。\n\n## 改动\n- 文件 src/pages/home/index.vue：恢复 todoText ref + data.todoText 赋值\n- 模板 .todo-head 下恢复单行 .todo-sub「任务标题：部门」（taskTitle：taskLocation），顶格左对齐新闻公告\n- 样式 .todo-sub 12px / $on-variant / 左对齐（$on-variant 定义于第 525 行）\n- .todo-more「共X项待办需处理」保持删除，不显示提示、不重复计数\n- 数据层 portalData.ts:180/193 的 fetchHome 已返回 todoText = taskTitle：taskLocation（不含尾巴），无需改动\n\n## 验证与交付\n- npm test 18 个测试文件全绿 + uni build -m test Build complete（TEST_EXIT=0）\n- agent-browser（CDP 9229 + token 注入）实机截图显示「待办事项 4912 + 内容摘要行」，用户确认通过\n- 禅道 6959 回写：status=resolved / resolution=fixed / resolvedBy=tiany / assignedTo=lichandan，zt_action id=99536、附图 fileID=24348（原值 product=9 / project=141 / execution=142 / openedBy=lichandan，回写前 status=active）\n- commit d2effe51842d8795acb53ff2fb935bba93487dac 提交 dev 并推送 origin/dev（远程 SHA 一致）\n- 产物 $env:TEMP\\zentao-6959\\ 与 .task-state 已删，dist 为 gitignore 保留未提交，链路终止"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/git_niugit_credential.md",
+                "memory_type": "entities",
+                "after": "# niugit 会话推送失败与 git-credential-manager\n当前会话的 git 是 niugit，其 PATH 不含标准 Git 的 bin 目录，导致 credential.helper=manager 找不到 git-credential-manager.exe，推送报 「credential-manager is not a git command」（表现为超时 exit 124）。这是「之前一直能推送、现在不行」的根因。\n\n## 环境事实\n- git-credential-manager.exe 确实存在：C:/Program Files/Git/mingw64/bin/\n- 全局/系统 git 配置 credential.helper=manager，但 niugit 的 PATH 未含该 bin 目录\n- 无 .git-credentials 文件，但补 PATH 后 git credential fill 能返回已存的 gitlab.zhi.com 凭据（凭据一直在，无需用户提供）\n- SSH key id_ed25519 存在但对该 GitLab 为 Permission denied（无权限），HTTP 匿名推送被拒（302 到登录）\n\n## 解决\n- 临时补 PATH：export PATH=\"/c/Program Files/Git/mingw64/bin:$PATH\" 后推送成功，不改全局配置\n- 不要因报 helper 缺失就直接索要凭据，先用带标准 Git bin 的 PATH 验证 git credential fill\n- 教训：fetch/push 卡住时先查 git 安装来源（niugit vs 标准 Git）与 helper 可执行文件位置，再决定是否问用户"
+            },
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/agent_browser_token_eval.md",
+                "memory_type": "entities",
+                "after": "# agent-browser 注入长 token 用 base64 eval\n用 agent-browser 在 CDP 9229 上做实机验证时需向 localStorage 注入登录态 token（key flood-token-v1），长 JWT 内联会触发 SyntaxError，导致注入失败、页面停在未登录态。\n\n## 问题与修复\n- 失败形态：eval 内联长 JWT（约 270 字符）时引号/特殊字符解析出错，报 SyntaxError\n- 修复：把 localStorage.setItem(\"flood-token-v1\",\"<TOKEN>\") 编码为 base64，改用 agent-browser eval -b <base64> 注入\n- 本例 base64 约 416 字符，注入后页面加载真实数据（真实计数 4912 + 内容摘要行）\n- 验证脚本用 timeout 包住，避免 agent-browser wrapper 未 kill 干净导致外层 wait 挂起\n\n## 归属\n- 所属项目：苏住房防汛C端移动查询H5（zhi2-mobile-query-h5-c）\n- 来源：2026-11-25 bug 6959 首页待办实机验证门"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited/memories/profile.md",
+                "memory_type": "profile",
+                "before": "# Lead\n- 负责门户H5 项目（从苏住房防汛C端迁移登录与子系统选择页）的任务分配与构建协调（as of 2026-11-06）\n- 负责苏住房防汛C端移动查询H5项目（数智页面、首页接口失败隔离、动态页面骨架屏改造、数智页面像素级还原与 e2e 视觉验收）的任务分配与构建协调（as of 2026-11-16）\n- 负责该 H5 项目的真实构建执行（op:\"full\" 触发 bun run build:h5）、产物校验、nginx 直读 dist 的部署确认与 E2E 验收（as of 2026-11-16）\n- 负责该 H5 项目基于 chain 的链式执行与硬交接编排（chain_id、P0 硬交接文档、hop 排程续接、遗留项跟进）（as of 2026-11-25）\n- 负责该 H5 项目实机验证（agent-browser 截图取证）、用户确认后按选择提交 vue 文件并清理过程产物（as of 2026-11-24）\n- 负责 nginx UI（127.0.0.1:9000）站点自查、验证地址确认与 8095 实机验证（as of 2026-11-24）\n- 负责该项目禅道缺陷的全链路处理：根因定位、门控代码改动、构建、实机验证取证、提交推送 origin/dev、DBX 事务化回写 resolved/fixed 并附截图、产物清零与链路终止；已处理 6931、6938、6955、6957，6967 完成修复、禅道带图回写（resolved/fixed 附三图）与产物清零并终止链路；6968 完成禅道带图回写（resolved/fixed、附图 fileID 24342）、产物清零并终止链路（修复提交 `43f282f` 由并发会话推送，本环境网络受限无法直连确认远端）(as of 2026-11-25)",
+                "after": "# Lead\n- 负责门户H5 项目（从苏住房防汛C端迁移登录与子系统选择页）的任务分配与构建协调（as of 2026-11-06）\n- 负责苏住房防汛C端移动查询H5项目（数智页面、首页接口失败隔离、动态页面骨架屏改造、数智页面像素级还原与 e2e 视觉验收）的任务分配与构建协调（as of 2026-11-16）\n- 负责该 H5 项目的真实构建执行（op:\"full\" 触发 bun run build:h5）、产物校验、nginx 直读 dist 的部署确认与 E2E 验收（as of 2026-11-16）\n- 负责该 H5 项目基于 chain 的链式执行与硬交接编排（chain_id、P0 硬交接文档、hop 排程续接、遗留项跟进）（as of 2026-11-25）\n- 负责该 H5 项目实机验证（agent-browser 截图取证）、用户确认后按选择提交 vue 文件并清理过程产物（as of 2026-11-24）\n- 负责 nginx UI（127.0.0.1:9000）站点自查、验证地址确认与 8095 实机验证（as of 2026-11-24）\n- 负责该项目禅道缺陷的全链路处理：根因定位、门控代码改动、构建、实机验证取证、提交推送 origin/dev、DBX 事务化回写 resolved/fixed 并附截图、产物清零与链路终止；已处理 6931、6938、6955、6957，6967 完成修复、禅道带图回写（resolved/fixed 附三图）与产物清零并终止链路；6968 完成禅道带图回写（resolved/fixed、附图 fileID 24342）、产物清零并终止链路（修复提交 `43f282f` 由并发会话推送，本环境网络受限无法直连确认远端）；6959 完成首页待办内容行恢复（单行摘要方案）、禅道带图回写（resolved/fixed、附图 fileID 24348、zt_action 99536）、commit d2effe5 推送 origin/dev、产物清零并终止链路 (as of 2026-11-25)"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 3,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

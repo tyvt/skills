@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T20:38:37+08:00
+verdict_note: 园区物管2.0 两处 PaymentRangeTable.vue（components/ 与 company/components/）的两个 zs-select-dialog 均用 header="初交明细选择"（-43/-53、-38/-48），与记忆一致。
+---
 # zs-select-dialog弹窗标题对齐
 维保模块初交明细选择弹窗与company侧PaymentRangeTable对齐，统一使用header而非title属性。
 

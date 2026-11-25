@@ -8,7 +8,7 @@ dsh（DeepSeek Harness）的编排插件，提供 callPython 能力并管理 Pyt
 - callPython 透传 payload.op（`const op = payload?.op || 'full'`），原消息主体保留
 - warnCapMs 到点只打 `[orchestrate/warn] elapsed=Ns op=...`，不终止调用、不改返回
 ## 已知问题
-- plan_review 机器审核通道在 dsh 环境不可用：reviewer 的 Flash 模型（网关仅有 Flash 级）返回空（model:null, ok:false）
+- plan_review 机器审核通道曾不可用：reviewer 的 Flash 模型（网关仅有 Flash 级）返回空（model:null, ok:false）；2026-11-25 改用 workbuddy/hy4flash-free 作审核模型跑 plan_review，86 分通过
 ## 验证与归属
 - 假 bridge 超时实测 `[orchestrate/timeout]`、warnCapMs=500 实测 `[orchestrate/warn]` 均通过
 - 涉及文件：orchestrator/lib/index.js、orchestrator/lib/config.js、orchestrator/cordis.patch.yml
@@ -18,8 +18,8 @@ dsh（DeepSeek Harness）的编排插件，提供 callPython 能力并管理 Pyt
 {
   "category": "程序工具",
   "name": "dsh_orchestrator_plugin",
-  "source_extraction_id": "c34ec82b95544a2b95ac7d8de15df2b3",
-  "version": 1,
+  "source_extraction_id": "95c35e1e3eab47f4b910788abbebf5b7",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

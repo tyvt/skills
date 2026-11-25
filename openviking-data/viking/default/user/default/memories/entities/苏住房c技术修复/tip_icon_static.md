@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T18:34:15+08:00
+verdict_note: 苏住房C仓mainStaticPaths.js的MAIN_STATIC_PATHS含'icon/tip-szf.png'，Tips.vue引用该文件，resolveStaticUrl存在，主包静态路径修正属实。
+---
 # 投票页提示图标加载失败修复
 苏住房C小程序中 pages_vote 下共享组件 Tips.vue 引用主包图标被错误解析到分包导致500，已加入主包静态路径强制修正。
 

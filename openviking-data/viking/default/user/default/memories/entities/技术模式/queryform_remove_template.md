@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T22:35:48+08:00
+verdict_note: maintenance/components/ScopeSelectDialog.vue-15 为 zs-form ref=queryForm，无 DetailTemplate 包裹；与记忆去除 DetailTemplate、只保留 zs-form 一致。
+---
 # ref=queryForm 弹窗去除 DetailTemplate 规则
 全局检索 DetailTemplate + v-if dialogMode view/else + 内层 zs-form ref=queryForm 结构时，统一改为只保留 zs-form 及其子项。
 

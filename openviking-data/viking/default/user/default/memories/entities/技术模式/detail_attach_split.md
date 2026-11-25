@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T19:34:16+08:00
+verdict_note: detail-template.vue-429 图片白名单 jpg/jpeg/png/gif/bmp/webp/svg；-463 window.open(_blank,noopener,noreferrer) PDF；-468-474 downloadAttachmentFile 用 fetch credentials-same-origin→blob→downloadBlobFile；utils/index.js-42 导出，全部吻合。
+---
 # 只读详情附件点击三分流套路
 产品2.0 的 detail-template 只读详情中，附件点击需按文件类型分流：图片缩略图预览、PDF 新窗口打开、其余 fetch blob 下载。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T17:38:57+08:00
+verdict_note: 与现状不符：记忆称改 pages/home/new/index.vue 与 pages/home/index/index.vue 仅 MP-WEIXIN 端 uni.login，全库 find 两文件均不存在；iHome小程序/小程序/惠山小程序 无对应 webViewUrl+?code 拼接与 41002 处理代码，来源会话无法落地到当前代码
+---
 # uni.login 非微信端 appid missing 报错
 uni.login 在非微信端因拿不到小程序 appid 触发 41002 appid missing。
 

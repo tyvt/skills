@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T21:33:33+08:00
+verdict_note: 记忆称三处列已由 sys_include 改为 have_or_not；实机 unitinfo/index.vue-130、building/unit/index.vue-107、unitChange/index.vue-78 仍为 dictUrl-'sys_include'，描述与现状不符。
+---
 # 单元有无电梯字典修正
 苏州市房地产监测V3 中将单元管理相关列表的「有无电梯」列字典由错误的 `sys_include` 改为 `have_or_not`，修复显示原始值 0 的问题。
 

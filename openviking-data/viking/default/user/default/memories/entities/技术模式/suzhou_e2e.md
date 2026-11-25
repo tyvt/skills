@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T18:33:52+08:00
+verdict_note: 苏住房G仓根node_modules/playwright存在，e2e/下createSuite/ctx.ui.login用例齐备，std-eval-lib.cjs验证码固定1234、站点8101，架构契约属实。
+---
 # 苏住房G E2E 黑盒验收契约
 苏住房G 自动化验收采用仓库根 hoist 的 Playwright 加 createSuite，黑盒打 nginx 部署站点 8101，验证码固定 1234，退出码 0 代表 PASS、1 代表 FAIL。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T21:34:16+08:00
+verdict_note: 记忆称门户 index-new.vue 约715行有 .flow-arrow/--flow-step-col/display-none 绝对定位层叠；实机该文件仅 -12/-29 business-flows、-100 overflow-x-hidden，无 flow-arrow/flow-step 样式，描述与现状不符。
+---
 # 业务流步骤箭头绝对定位层叠遮挡
 门户 index-new.vue 业务流步骤区固定列宽与 .flow-arrow 绝对定位组合，存在 display:none 调试残留与伸入邻列被后绘步骤盖住的问题。
 

@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # Flood Inspection Summary Table Frozen Column Scroll Overlap Fix (Bug 6435)
 Bug 6435 in zhi2-web-admin (Su Housing frontend) fixed the issue where two frozen columns of the pre-flood inspection summary table overlapped with scrolling column text during horizontal scroll.
 

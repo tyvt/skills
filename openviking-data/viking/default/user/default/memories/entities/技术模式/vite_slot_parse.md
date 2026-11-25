@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:39:47+08:00
+verdict_note: 核验通过：产品2.0/zhi2-web-admin/src/views/maintenance/{final,maintenanceProject}/components/feeCustomTypeDialog.vue 存在，SelectDialog.open 组件模式命中；记忆所述涉及文件与代码现状一致
+---
 # Vite 构建误解析 slot 模板节点
 产品2.0 中 `npm run build` 可能把带 slot 的模板节点误当 JS 模块解析，需改用函数式弹窗与 template 插槽。
 

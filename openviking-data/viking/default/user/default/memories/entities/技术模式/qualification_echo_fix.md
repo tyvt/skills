@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:24:21+08:00
+verdict_note: 代码核对通过 registerQualification.js L102 extractQualificationListFromPayload L116 resolvePrimaryQualificationFromPayload companyRecord.js L84 resolveLicenseAppendixBusCode 与记忆一致
+---
 # 企业基本信息资质/要件回显修复
 苏州市房地产监测V3 完成企业基本信息资质/要件回显修复，涉及工具函数与详情组件改造。
 

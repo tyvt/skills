@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T23:34:33+08:00
+verdict_note: 家园区一网通办 maintain.vue-23 detail-btn 无条件展示「申请查看明细」；depositDetailApplyProjectNames/shouldShowDetailBtn/SmParameterList 均 0 命中（已删），与白名单改全员可见描述一致。
+---
 # 维修资金明细按钮逻辑
 家园区一网通办 maintain.vue 中维修资金卡片的「申请查看明细」按钮，已从项目名白名单控制改为全员可见。
 

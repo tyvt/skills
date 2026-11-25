@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T19:34:45+08:00
+verdict_note: authentication.vue-16/27 已改 ZsImage + images/szf/ 路径；publishHouse/index.vue-83 ZsImage warn.png、-129 相对 static 路径；ZsImage 改造与路径修正属实(具体字符串已迭代)。
+---
 # 构建报错资源路径修复（authentication/publishHouse）
 苏住房C 因 `authentication.vue` 等资源路径解析到错误目录导致构建失败，已改为 `ZsImage` 并修正相对路径，构建通过。
 

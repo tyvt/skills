@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T23:33:28+08:00
+verdict_note: 苏住房G feeDeclare2/detail.vue 命中 .step-container(-4,457)、flex-direction-column(-459)、.step-list(-5,465)、.step-alert(-28,469)、-deep(.el-alert__title) white-space-normal(-451-453)，与纵向布局修复描述一致。
+---
 # 物业费简易申报步骤条纵向布局
 苏住房G 物业费简易申报编辑页因步骤条与提示框横向 flex 导致窄屏换行溢出，改为纵向布局并复用新增页样式类。
 ## 问题现象

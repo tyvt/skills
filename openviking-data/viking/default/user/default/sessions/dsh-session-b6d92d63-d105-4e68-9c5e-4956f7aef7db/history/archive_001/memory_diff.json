@@ -1,0 +1,23 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-b6d92d63-d105-4e68-9c5e-4956f7aef7db/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-25T06:03:31.346688+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_6969.md",
+                "memory_type": "entities",
+                "after": "# 禅道 Bug 6969\n禅道缺陷 6969「历史页全部工单计数骨架长期不消失」：2026-11-25 在 zhi2-mobile-query-h5-c 完成根因定位与代码修复、构建通过，实机验证受验证码阻塞，当前未提交、未回写禅道。\n\n## 问题与定位\n- 提单 URL：http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6969；部署 key 为「防汛C端」。\n- 现象：历史页「全部工单」计数 Skeleton 长期不消失，禅道截图证实，对比管理端 APP 期望约 1s 内显示数字。\n- 定位收窄为历史页并发 4 路计数 + 列表多路分页请求。\n- 根因：`refreshCounts` 用单一 `countsLoading` 等 `Promise.all` 最慢一路；汛前/汛后仍并发拉非必要的 `rescue` 计数（UI 不展示）；`onShow` 与 z-paging 首屏 `query` 抢带宽。\n\n## 修复与构建\n- 改动落地 `src/pages/history/index.vue`：`refreshCounts` 按 `all` / `rescue` / `submitted` 分路拉数并各自解除 Skeleton。\n- 汛前/汛后不再请求 rescue；首屏计数延后到 `nextTick`，减轻与列表 `query` 竞争。\n- 用户于 2026-11-25 确认后开始改；`npm run build` 已通过；全仓 `typecheck` 仍有既有报错（与本次改动无关）。\n- 计划文档：`D:/plan/苏住房防汛C端/bug6969-history-counts.md`（plan_review 曾报 state 异常，用户已人工确认实施）。\n\n## 验证阻塞与待办\n- `agent-browser` 打开 `http://localhost:8162` 后图形验证码登录两次未通过（算术验证码停在登录页），无法录制「进入历史记录 ≤1s 显示全部工单数字」证据。\n- 已请用户二选一：管理端 APP 按工单步骤打开「防台防汛 → 历史记录」实测汛前数字是否约 1s 出现；或提供可过验证码的联调方式/已登录会话。\n- 待用户点选提交决策：A 仅 `git commit`；B commit + push `origin`；C 暂不提交。确认通过后再走提交/推送 + 禅道回写附图。\n- 当前状态：未提交、未回写禅道。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

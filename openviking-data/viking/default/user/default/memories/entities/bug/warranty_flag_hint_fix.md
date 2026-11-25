@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 质保金额提示逻辑修复
 质保弹窗金额提示原用 `guaranteeDate` 与当天比较，与表格 `warrantyFlagG` 判定分歧导致提示相反，已在 `maintenanceFeeDtlDialog.vue` 中统一改用 `warrantyFlagG` 与 `costG`。
 
@@ -20,7 +27,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=2-0
-
 
 <!-- MEMORY_FIELDS
 {

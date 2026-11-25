@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # visible 逗号正则改坏致构建失败
 苏州市房地产监测V3 前端为 contentInfo 批量补 visible 时正则误改约 55 处代码，导致 npm run build 失败，现已修复。
 

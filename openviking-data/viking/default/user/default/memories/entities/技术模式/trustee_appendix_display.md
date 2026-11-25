@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T17:06:30+08:00
+verdict_note: 抽查2026-11-25-现代码registerAppendixAdminType.js-22-27注释明确授权委托书始终展示不在此列,与记忆根因(受adminType过滤)冲突。用户判过期/无效。
+---
 # 授权委托书显示与过滤逻辑
 苏州市房地产监测V3 中授权委托书（busCode: glygly）显示受管理员类型过滤影响；另有改动使其始终显示、不过滤，spec 中其他用例属既有基线失败。
 

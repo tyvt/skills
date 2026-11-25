@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T02:33:42+08:00
+verdict_note: statisticsMap/index.vue 含 areaLayerLoadSeq、resolveOverviewLayerLevel；map.vue 含 markerRenderSig、_markerRedrawSeq，与记忆描述完全吻合
+---
 # 小区台账地图街道气泡与小区点混显修复
 benefit/statisticsMap 缩放或下钻时偶发街道气泡与小区点同时显示或标记残留，需父子组件协同修复异步竞态与重绘。
 

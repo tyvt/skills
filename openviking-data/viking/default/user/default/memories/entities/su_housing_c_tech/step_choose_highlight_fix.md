@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T17:40:11+08:00
+verdict_note: 核验通过：苏住房C/zhi2-mobile-shimin/src/pages_vote/decision/optional/StepChoose.vue 含 highlight，ZsCheckbox 组件存在；选项表决选中背景色修复落点与代码现状一致
+---
 # 选项表决选中背景色修复
 苏住房C小程序中`optional/StepChoose.vue`选中项无背景色，因`:deep`无法穿透ZsCheckbox，已新增highlight属性修复。
 

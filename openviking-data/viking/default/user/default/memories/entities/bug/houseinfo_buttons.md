@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 户室管理列表操作列按钮顺序修复
 苏州市房地产监测V3 项目中，户室管理列表操作列按钮顺序与项目默认不一致的问题已修复。
 

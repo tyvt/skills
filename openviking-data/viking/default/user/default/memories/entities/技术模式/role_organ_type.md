@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T17:26:47+08:00
+verdict_note: 代码核对不符 园区公共收益 src 全量无 loadRoleOptions 定义 system/user/detail.vue L209 角色请求仅传 roleType 1 无 organType 传参 记忆描述与现状不一致 判 invalid
+---
 # 角色下拉仅查机构类型需传 organType
 园区公共收益项目查询机构类型角色时，接口除 roleType: '2' 外还须传 organType，已修复。
 

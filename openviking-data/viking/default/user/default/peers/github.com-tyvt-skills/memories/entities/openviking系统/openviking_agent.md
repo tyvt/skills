@@ -17,7 +17,7 @@ OpenViking 本地 agent，基于 DSH Web 运行，具备主动检索（search）
 ## 重启验证（2026-11-14）
 - 2026-11-14 10:00 改文件后 DSH Web 新进程于 10:02–10:03 启动，`/health` 返回 `{"status":"ok","healthy":true}`；对运行时安装副本断言得 `HINT_PRESENT=true`，`<openviking-hint>` 在 profile 块末尾
 - 重启后新会话首批请求在 `request_audit` 记为 `caller=profile-inject`（fs/ls、content/read、skills 均 200），证明新代码在真实链路生效
-- `caller=user` 基线仍为 0（预期，需 agent 后续主动 search）；两处 commit（OpenViking `57ebe7aa` / skills `ee78fe00`）保持本地未推送
+- `caller=user` 基线仍为 0（预期，需 agent 后续主动 search）
 
 ## 关键数据
 - usage_audit 数据库位于 C:\Users\Administrator\.openviking\data\_system\usage_audit\usage_audit.sqlite3
@@ -28,9 +28,9 @@ OpenViking 本地 agent，基于 DSH Web 运行，具备主动检索（search）
 {
   "category": "OpenViking系统",
   "name": "openviking_agent",
-  "source_extraction_id": "fa049ff27bf94cea909ff331a50cdbbf",
+  "source_extraction_id": "5a1bdecf0086456ba96bc0a7cf696695",
   "peer_id": "github.com-tyvt-skills",
-  "version": 4,
+  "version": 5,
   "memory_type": "entities"
 }
 -->

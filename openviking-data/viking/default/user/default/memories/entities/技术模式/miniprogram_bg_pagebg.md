@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-25T23:34:55+08:00
+verdict_note: 苏住房C house/index.vue-9/14/106、TypeChoose_Suzhufang.vue-11/51、tenant/index.vue 均使用 PageBg 组件并 import，三页统一方案属实，与装饰背景改用 PageBg 描述一致。
+---
 # 小程序背景图改用 PageBg 组件
 苏住房C 小程序中装饰性背景图禁止手拼内联 :style backgroundImage url(相对/静态资源路径)，应统一使用项目 PageBg 组件。
 

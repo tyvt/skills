@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 企业信息页空白且无操作按钮修复
 苏住房G 项目 B 端企业管理员进入企业信息页时字段空白且缺少变更按钮，根因是 form.js mixin 新增参数校验要求 id 而该页无需 id，已完成修复。
 

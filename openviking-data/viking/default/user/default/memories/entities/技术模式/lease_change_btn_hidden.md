@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T21:34:05+08:00
+verdict_note: 记忆称 resolvedShowChangeBtn 在 isLeaseOrgan 时返回 false；实机 AgencyBasicInfoDetail.vue-278-283 仅按 showChangeBtn/bizState==='2' 判断，注释明确租赁终审后允许变更，无隐藏逻辑，与描述不符。
+---
 # 变更按钮未按机构类型隐藏
 在苏州市房地产监测V3项目中，租赁机构基本信息页面的工具栏未根据机构类型隐藏变更按钮。
 

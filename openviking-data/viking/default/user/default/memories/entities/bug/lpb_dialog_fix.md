@@ -1,3 +1,10 @@
+---
+status: suspect
+needs_review: true
+confidence: 0.3
+gov_checked_at: 2026-11-25
+gov_note: 高频 bug 实体·batch3·仅标记
+---
 # 楼盘表状态统计弹窗样式修复
 苏州市房地产监测V3 楼盘表页「状态统计」弹窗（LpbStatisticsDialog.vue）修复文字换行、行高过窄、未居中三个问题。
 

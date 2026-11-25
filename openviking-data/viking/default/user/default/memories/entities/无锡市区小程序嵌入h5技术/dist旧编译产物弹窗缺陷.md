@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-25T19:35:19+08:00
+verdict_note: 记忆称已彻底删除 showOwnerDecisionConfirmModal 及文案并产出 usePortal.be15442a.js；实测 usePortal.js-134/350/385/437/501 仍调用/定义该函数，owner-decision-confirm-modal.vue-30 仍有「业主电子表决」文案，dist 仅有 usePortal.5732b10f.js，与现状矛盾。
+---
 # dist旧编译产物导致业主决策弹窗未消失
 无锡市区小程序嵌入H5中，源码已改动但页面仍弹「业主电子表决」确认框，根因为加载了dist目录旧编译产物。
 
