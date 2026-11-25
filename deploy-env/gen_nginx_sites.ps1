@@ -8,7 +8,7 @@ $env:PYTHONIOENCODING = 'utf-8'
 
 $root    = 'D:\repository\skills\deploy-env'
 $db      = Join-Path $root 'registry.sqlite'
-$siteDir = Join-Path $root 'env-sites'
+$siteDir = 'D:\nginx\conf\env-sites'
 $py      = 'C:\Program Files\Python310\python.exe'
 
 if (-not (Test-Path -LiteralPath $db)) { throw "registry.sqlite 不存在: $db" }
@@ -68,6 +68,11 @@ $fdcApi = @'
         add_header Cache-Control "public" always;
         try_files $uri =404;
     }
+    # 业务 API：/api/v2.0 → 网关原生路径（验证码等；恒等 rewrite 保 /api/v2.0 前缀）
+    location /api/v2.0/ {
+        rewrite ^/api/v2.0/(.*)$ /api/v2.0/$1 break;
+        proxy_pass __GATEWAY__;
+    }
     # 业务 API：/api/v3.0 → /v3.0 后打到本环境网关
     location /api/v3.0/ {
         rewrite ^/api/v3.0/(.*)$ /v3.0/$1 break;
@@ -83,14 +88,14 @@ $serverTpl = @'
 server {
     listen __PORT__;
     server_name _;
-    root __DIST__;
+    root "__DIST__";
     index index.html;
     charset utf-8;
     client_max_body_size 100m;
 
     proxy_http_version 1.1;
     proxy_set_header Connection "";
-    proxy_set_header Host $host;
+    proxy_set_header Host __GATEWAY_HOST__;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
@@ -116,9 +121,14 @@ $enc = [System.Text.UTF8Encoding]::new($false)  # 无 BOM，避免 nginx 报 unk
 $generated = @()
 foreach ($r in $rows) {
     if ($r.Status -ne 'enabled') { continue }
+    # 空网关无法生成有效 proxy_pass（nginx -t 会全盘失败），跳过该片段
+    if ([string]::IsNullOrWhiteSpace($r.Gateway)) { Write-Output ("SKIP empty gateway: " + $r.Project + '/' + $r.Env); continue }
     $apiTpl = if ($r.Project -eq 'portal') { $portalApi } else { $fdcApi }
     $apiLocs = $apiTpl.Replace('__GATEWAY__', $r.Gateway)
-    $conf = $serverTpl.Replace('__PROJECT__', $r.Project).Replace('__ENV__', $r.Env).Replace('__PORT__', [string]$r.Port).Replace('__GATEWAY__', $r.Gateway).Replace('__DIST__', $r.Dist).Replace('__API_LOCS__', $apiLocs)
+    # 网关按 Host 路由：Host 必须是网关域名，传 $host(localhost) 会 500 (x-proxy-url 空)
+    $gwHost = ([uri]$r.Gateway).Host
+    if ([string]::IsNullOrWhiteSpace($gwHost)) { $gwHost = '$host' }
+    $conf = $serverTpl.Replace('__PROJECT__', $r.Project).Replace('__ENV__', $r.Env).Replace('__PORT__', [string]$r.Port).Replace('__GATEWAY__', $r.Gateway).Replace('__GATEWAY_HOST__', $gwHost).Replace('__DIST__', $r.Dist).Replace('__API_LOCS__', $apiLocs)
     $file = Join-Path $siteDir ("{0}-{1}.conf" -f $r.Project, $r.Env)
     [System.IO.File]::WriteAllText($file, $conf, $enc)
     $generated += $file

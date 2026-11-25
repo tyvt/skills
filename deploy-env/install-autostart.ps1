@@ -1,4 +1,4 @@
-# deploy-env 看板开机静默自启安装脚本
+﻿# deploy-env 看板开机静默自启安装脚本
 # 幂等：任务已存在则先删除再重建；用 pythonw.exe 无窗口后台运行，工作目录显式指向 deploy-env。
 # 用法（管理员权限）：powershell -ExecutionPolicy Bypass -File D:\repository\skills\deploy-env\install-autostart.ps1
 
@@ -30,4 +30,7 @@ Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger `
     -Principal $principal -Settings $settings -Description '本地部署看板后台静默服务 (127.0.0.1:18098)' | Out-Null
 
 Write-Host "已创建开机自启任务 $taskName (S4U/Highest, pythonw, 工作目录 $root)"
-Write-Host "启动任务：Start-ScheduledTask -TaskName $taskName"
+
+# 注册后立即启动，避免安装完仍停留在 Ready 状态（静默后台，无黑窗）
+Start-ScheduledTask -TaskName $taskName
+Write-Host "已启动任务 $taskName（State=$((Get-ScheduledTask -TaskName $taskName).State)）"

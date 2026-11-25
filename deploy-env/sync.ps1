@@ -8,8 +8,8 @@ $env:PYTHONIOENCODING = 'utf-8'
 
 $root      = 'D:\repository\skills\deploy-env'
 $sites     = 'D:\nginx\conf\sites-enabled'
-$envSites  = Join-Path $root 'env-sites'
-$archive   = Join-Path $root 'sites-archive'
+$envSites  = 'D:\nginx\conf\env-sites'
+$archive   = 'D:\nginx\conf\sites-archive'
 $nginxConf = 'D:\nginx\conf\nginx.conf'
 $nginxExe  = 'D:\nginx\nginx.exe'
 $bakRoot   = 'D:\nginx\conf\backup'
@@ -73,10 +73,10 @@ try {
     }
 
     # ---- 4) nginx.conf 增加 include env-sites（幂等；必须插入 http 上下文内，锚点=sites-enabled include）----
-    $incLine = 'include D:/repository/skills/deploy-env/env-sites/*.conf;'
+    $incLine = 'include D:/nginx/conf/env-sites/*.conf;'
     $raw = [System.IO.File]::ReadAllText($nginxConf)
     $includeAdded = $false
-    if (-not $raw.Contains('deploy-env/env-sites/*.conf')) {
+    if (-not $raw.Contains('nginx/conf/env-sites/*.conf')) {
         $anchor = 'include sites-enabled/*.conf;'
         if (-not $raw.Contains($anchor)) { throw 'nginx.conf 未找到 sites-enabled include 锚点' }
         $raw = $raw.Replace($anchor, $anchor + "`r`n" + $incLine)

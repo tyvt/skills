@@ -16,7 +16,7 @@ description: 多环境 dist 端口切换与凭据查询。给定 project+env，�
 - 端口规则：`port = port_base + env_index`，`local=0/dev=1/test=2/uat=3/prod=4`。
   - portal: base=8090 → 8090/8091/8092/8093/**8094**
   - fdc-v3: base=8100 → 8100/8101/8102/8103/**8104**
-- `env-sites/*.conf`：`gen_nginx_sites.ps1` 由注册表生成的 nginx 片段（每 project×env 一个 `server{}`），顶层 include 到各项目 `deploy/nginx.conf`。
+- `D:\nginx\conf\env-sites\*.conf`：`gen_nginx_sites.ps1` 由注册表生成的 nginx 片段（每 project×env 一个 `server{}`），顶层 include 写进 `D:\nginx\conf\nginx.conf`（配置不放在本仓项目目录内）。归档片段在 `D:\nginx\conf\sites-archive\`。
 - **密码绝不入库**：`secret_ref` 只存占位符；单环境账号 `{{ov_privacy:deploy_env/<project>/<env>/password}}`，多角色账号 `{{ov_privacy:deploy_env/<project_key>/<env>/<role>/password}}`。真实密码由 agent 经 ov_privacy 解析后经 `POST /api/secrets/inject` 注入看板进程内存（本地+token+白名单鉴权），**不落盘**；看板默认 `****`，点"显示"经 `POST /api/account/reveal` 取明文，未注入返回 `need_reload`。迁移脚本 `migrate_projects.py`（幂等+备份+审计）。
 
 ## 查询流程（project + env → 连接信息）
