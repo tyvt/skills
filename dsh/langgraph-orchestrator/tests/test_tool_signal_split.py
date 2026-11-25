@@ -48,7 +48,7 @@ def test_new_tool_has_flash_fallbacks():
     """composer 挂掉必须能回落，否则单点故障。"""
     cfg = load_config(CFG_PATH)
     pool = [m.model for m in cfg.tool(NEW).models]
-    assert any("space-bunny" in m for m in pool[1:]), pool
+    assert any("composer-2.5" in m for m in pool[1:]), pool
     assert any("hy4flash" in m for m in pool[1:]), pool
 
 
@@ -166,4 +166,4 @@ def test_primary_stays_composer_during_peak(now_injected=True):
     for moment in (peak, off):
         pool = [m.model for m in router._get_effective_models(NEW, now=moment)]
         assert pool[0] == "workbuddy/kimi-k3.1-pro", f"{moment} 池首变成 {pool[0]}"
-        assert "workbuddy/space-bunny" in pool, "兜底不得丢失"
+        assert "cursor/composer-2.5" in pool, "兜底不得丢失"
