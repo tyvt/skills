@@ -278,18 +278,15 @@ def cmd_apply(args):
             with os.fdopen(fd, "w", encoding="utf-8") as f:
                 f.write(new_content)
             ok = ov_json(["write", uri, "--from-file", tmp, "--wait"])
-            if ok and ok.get("ok"):
-                applied.append({"uri": uri, "verdict": verdict})
+            # --wait 可能在 embedding 阶段报错(Ollama 断连)但正文已落盘,
+            # 以回读为准判定成功, 不信 write 响应(P1-3).
+            back = read_full(uri)
+            back_fm, _b, _ = parse_frontmatter(back or "")
+            if back_fm.get("audit_status") == verdict:
+                applied.append({"uri": uri, "verdict": verdict, "verify": "ok", "write_resp": "ok" if ok and ok.get("ok") else "post_persist_embedding_err"})
                 audit_event(uri, "apply", verdict, note)
-                # 回读校验(P1-3)
-                back = read_full(uri)
-                back_fm, _b, _ = parse_frontmatter(back or "")
-                if back_fm.get("audit_status") != verdict:
-                    applied[-1]["verify"] = "MISMATCH"
-                else:
-                    applied[-1]["verify"] = "ok"
             else:
-                skipped.append({"uri": uri, "reason": "write_failed", "detail": str(ok)[:200]})
+                skipped.append({"uri": uri, "reason": "write_failed_or_unverified", "detail": str(ok)[:200], "back_status": back_fm.get("audit_status")})
         finally:
             try:
                 os.unlink(tmp)
@@ -309,14 +306,18 @@ def audit_event(uri, action, verdict, note):
 def cmd_stats(args):
     uris = list_all_uris()
     counts = {"valid": 0, "invalid": 0, "suspect": 0, "unchecked": 0, "invalid_date": 0}
+    # 一次 grep 取全库 audit_status, 避免对 6000+ 条逐条 read 超时.
+    g = ov_json(["grep", "audit_status:", "-u", MEM_ROOT, "-n", "20000"])
+    status_map = {}
+    if g and g.get("ok"):
+        for mt in g.get("result", {}).get("matches", []):
+            c = mt.get("content", "")
+            if "audit_status:" in c:
+                status_map[mt.get("uri", "")] = c.split("audit_status:", 1)[1].strip()
     for u in uris:
-        head = ov_text(["read", u, "--offset", "0", "--limit", "12"])
-        fm, _b, _ = parse_frontmatter(head)
-        status = fm.get("audit_status", "")
+        status = status_map.get(u, "")
         if status in counts:
             counts[status] += 1
-        elif fm.get("last_checked"):
-            counts["invalid_date"] += 1
         else:
             counts["unchecked"] += 1
     checked = counts["valid"] + counts["invalid"] + counts["suspect"]
