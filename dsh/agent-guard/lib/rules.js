@@ -1132,3 +1132,40 @@ export function planRecovery({ failure, attempts, config, random = Math.random }
   if (hasProviderWait) delayMs = Math.min(providerWaitMs, config.maxDelayMs)
   return { delayMs: Math.max(0, Math.round(delayMs)) }
 }
+
+/**
+ * 部署看板强制审计门禁（dashboard-audit）：改动看板相关文件时提示必跑 audit_dashboard.py。
+ * 纯函数、零副作用；不在本层执行脚本（子进程/超时归调用方）。
+ * 路径归一化覆盖 Windows/Unix 分隔符、大小写与相对/绝对路径差异。
+ *
+ * @param {object} exec - 工具执行描述（name / arguments）。
+ * @param {object} config - dashboardAudit 配置（enabled/mode/tools/paths）。
+ * @returns {{ verdict: 'warn'|'block', message: string } | null} 命中则回判定，未命中 null。
+ */
+export function decideDashboardAudit(exec, config) {
+  if (!config || config.enabled !== true) return null
+  const tools = Array.isArray(config.tools) ? config.tools : []
+  const name = typeof exec?.name === 'string' ? exec.name : ''
+  if (!tools.includes(name)) return null
+
+  const args = exec?.arguments ?? {}
+  const raw = [args.file_path, args.path, args.filePath]
+    .filter((v) => typeof v === 'string' && v.trim() !== '')
+    .join(' ')
+  if (raw === '') return null
+
+  const normalize = (s) => String(s).replace(/\\/g, '/').toLowerCase()
+  const target = normalize(raw)
+  const paths = Array.isArray(config.paths) ? config.paths : []
+  const hit = paths.find((p) => {
+    const np = normalize(p)
+    return np !== '' && target.includes(np)
+  })
+  if (!hit) return null
+
+  const mode = config.mode === 'block' ? 'block' : 'warn'
+  const message = '看板强制检查：你正在改动受控文件（命中 ' + hit + '）。'
+    + '改动前后必须运行 D:\\repository\\skills\\deploy-dashboard-audit\\audit_dashboard.py '
+    + '（退出码 0 才算合规；非 0 禁止宣布合规/提交/回写）。'
+  return { verdict: mode, message }
+}

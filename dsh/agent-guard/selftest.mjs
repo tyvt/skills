@@ -4,7 +4,7 @@
 // 退出码 0 = 全通过；1 = 有失败。
 import assert from 'node:assert/strict'
 
-import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, isPwshExploration, decideEditPreflight, decideSearchRetry, decideVerifyLoop, isAgentBrowserCall, isSleepCall } from './lib/rules.js'
+import { isWholeFileRead, normalizeSchema, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, isPwshExploration, decideEditPreflight, decideSearchRetry, decideVerifyLoop, decideDashboardAudit, isAgentBrowserCall, isSleepCall } from './lib/rules.js'
 import { decideInterception } from './lib/scope.js'
 import { evaluateAsk } from './lib/ask-guard.js'
 import { apply, inspectSessionSizes, Config } from './lib/index.js'
@@ -1085,6 +1085,61 @@ test('verifyLoop 合法 mode 透传、非法回退默认、阈值校验', () => 
   const bad = validate({ verifyLoop: { mode: 'bogus' } }).value
   assert.equal(bad.verifyLoop.mode, 'warn')
   assert.equal(bad.verifyLoop.agentBrowserMax, 12)
+})
+
+console.log('\n=== dashboard-audit（部署看板强制审计门禁）===')
+const daCfg = { enabled: true, mode: 'warn', tools: ['edit', 'write'], paths: ['deploy-env/registry.sqlite', 'nginx/conf/env-sites/'] }
+test('enabled=false 一律不触发（inert 灰度默认）', () => {
+  assert.equal(decideDashboardAudit({ name: 'edit', arguments: { file_path: 'deploy-env/registry.sqlite' } }, { ...daCfg, enabled: false }), null)
+})
+test('命中受控路径 edit → warn', () => {
+  const r = decideDashboardAudit({ name: 'edit', arguments: { file_path: 'D:\\repository\\skills\\deploy-env\\registry.sqlite' } }, daCfg)
+  assert.ok(r && r.verdict === 'warn')
+  assert.match(r.message, /audit_dashboard\.py/)
+})
+test('Windows 反斜杠 / 大小写归一化命中', () => {
+  const r = decideDashboardAudit({ name: 'write', arguments: { path: 'NGINX\\CONF\\ENV-SITES\\x.conf' } }, daCfg)
+  assert.ok(r && r.verdict === 'warn')
+})
+test('未命中路径 / 非受控工具 → null', () => {
+  assert.equal(decideDashboardAudit({ name: 'edit', arguments: { file_path: 'src/main.js' } }, daCfg), null)
+  assert.equal(decideDashboardAudit({ name: 'read', arguments: { file_path: 'deploy-env/registry.sqlite' } }, daCfg), null)
+})
+test('mode=block 回 block；非法 mode 回落 warn', () => {
+  assert.equal(decideDashboardAudit({ name: 'edit', arguments: { file_path: 'deploy-env/registry.sqlite' } }, { ...daCfg, mode: 'block' }).verdict, 'block')
+  assert.equal(decideDashboardAudit({ name: 'edit', arguments: { file_path: 'deploy-env/registry.sqlite' } }, { ...daCfg, mode: 'bogus' }).verdict, 'warn')
+})
+test('config：合法 mode 透传、非法回落、tools/paths 空数组回落默认', () => {
+  const v = validate({ dashboardAudit: { enabled: true, mode: 'block', tools: ['edit'], paths: ['x'] } }).value
+  assert.equal(v.dashboardAudit.mode, 'block')
+  assert.equal(v.dashboardAudit.enabled, true)
+  assert.deepEqual(v.dashboardAudit.tools, ['edit'])
+  const bad = validate({ dashboardAudit: { mode: 'bogus', tools: [], paths: 'not-array' } }).value
+  assert.equal(bad.dashboardAudit.mode, 'warn')
+  assert.ok(bad.dashboardAudit.tools.length > 0)
+  assert.ok(bad.dashboardAudit.paths.length > 0)
+  assert.equal(bad.dashboardAudit.enabled, false)
+})
+test('apply 接线：block 命中受控文件返回拦截信息；enabled=false 不触发', () => {
+  const guarded = []
+  const ctx = {
+    tools: { guard(fn) { guarded.push(fn); return () => {} } },
+    on() {},
+    logger: { info() {}, warn() {} },
+  }
+  apply(ctx, Config['~standard'].validate({
+    enabled: true, ledgerPath: './ag-selftest-ledger.jsonl',
+    dashboardAudit: { enabled: true, mode: 'block' },
+  }).value)
+  const sid = 'da-int'
+  const hit = () => ({ name: 'edit', arguments: { file_path: 'D:\\repository\\skills\\deploy-env\\registry.sqlite' }, agent: { session: { header: { id: sid } } } })
+  const r = guarded[0](hit())
+  assert.equal(typeof r, 'string')
+  assert.match(r, /audit_dashboard\.py/)
+  const guardedOff = []
+  const ctxOff = { tools: { guard(fn) { guardedOff.push(fn); return () => {} } }, on() {}, logger: { info() {}, warn() {} } }
+  apply(ctxOff, Config['~standard'].validate({ enabled: true, ledgerPath: './ag-selftest-ledger.jsonl' }).value)
+  assert.equal(guardedOff[0](hit()), undefined, 'inert 默认放行')
 })
 
 console.log(`\n${failed === 0 ? 'PASS' : 'FAIL'}  passed=${passed} failed=${failed}\n`)

@@ -100,6 +100,21 @@ export const DEFAULTS = {
     tools: ['read', 'grep', 'glob', 'pwsh'],
     dispatchTools: ['spawn_teammate', 'task', 'workflow', 'orchestrate'],
   },
+  /** 部署看板强制审计（dashboard-audit）：改动看板相关文件时提示必跑 audit_dashboard.py。默认 inert。 */
+  dashboardAudit: {
+    enabled: false,
+    mode: 'warn',
+    tools: ['edit', 'write'],
+    paths: [
+      'deploy-env/registry.sqlite',
+      'deploy-env/dashboard/',
+      'deploy-env/upsert_env.py',
+      'deploy-env/gen_nginx_sites.ps1',
+      'deploy-env/sync.ps1',
+      'deploy-dashboard-audit/',
+      'nginx/conf/env-sites/',
+    ],
+  },
   /** 同类扇出（fanout）：连续 ≥threshold 次同类工具则 warn/block 提示并行扇出。默认 inert。 */
   fanout: {
     enabled: false,
@@ -162,6 +177,7 @@ export function validate(input) {
   const exploreOutsource = source.exploreOutsource ?? {}
   const fanout = source.fanout ?? {}
   const verifyLoop = source.verifyLoop ?? {}
+  const dashboardAudit = source.dashboardAudit ?? {}
   if (typeof repair !== 'object' || Array.isArray(repair)) {
     return { issues: [{ message: 'agent-guard: repair must be an object' }] }
   }
@@ -192,6 +208,9 @@ export function validate(input) {
   if (typeof verifyLoop !== 'object' || Array.isArray(verifyLoop)) {
     return { issues: [{ message: 'agent-guard: verifyLoop must be an object' }] }
   }
+  if (typeof dashboardAudit !== 'object' || Array.isArray(dashboardAudit)) {
+    return { issues: [{ message: 'agent-guard: dashboardAudit must be an object' }] }
+  }
   const vfMode = typeof vikingFirst.mode === 'string' && ['warn', 'block'].includes(vikingFirst.mode)
     ? vikingFirst.mode
     : DEFAULTS.vikingFirst.mode
@@ -204,6 +223,9 @@ export function validate(input) {
   const verifyLoopMode = typeof verifyLoop.mode === 'string' && ['off', 'warn', 'block'].includes(verifyLoop.mode)
     ? verifyLoop.mode
     : DEFAULTS.verifyLoop.mode
+  const dashboardAuditMode = typeof dashboardAudit.mode === 'string' && ['warn', 'block'].includes(dashboardAudit.mode)
+    ? dashboardAudit.mode
+    : DEFAULTS.dashboardAudit.mode
   const explorationMode = typeof exploration.mode === 'string' && ['off', 'warn', 'block'].includes(exploration.mode)
     ? exploration.mode
     : DEFAULTS.exploration.mode
@@ -288,6 +310,16 @@ export function validate(input) {
         mode: verifyLoopMode,
         agentBrowserMax: positiveInt(verifyLoop.agentBrowserMax, DEFAULTS.verifyLoop.agentBrowserMax),
         sleepMax: positiveInt(verifyLoop.sleepMax, DEFAULTS.verifyLoop.sleepMax),
+      },
+      dashboardAudit: {
+        enabled: bool(dashboardAudit.enabled, DEFAULTS.dashboardAudit.enabled),
+        mode: dashboardAuditMode,
+        tools: Array.isArray(dashboardAudit.tools) && dashboardAudit.tools.length
+          ? dashboardAudit.tools.filter((t) => typeof t === 'string' && t.trim() !== '')
+          : DEFAULTS.dashboardAudit.tools.slice(),
+        paths: Array.isArray(dashboardAudit.paths) && dashboardAudit.paths.length
+          ? dashboardAudit.paths.filter((p) => typeof p === 'string' && p.trim() !== '')
+          : DEFAULTS.dashboardAudit.paths.slice(),
       },
     },
   }

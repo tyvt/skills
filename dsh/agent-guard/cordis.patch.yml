@@ -108,10 +108,19 @@
             - write
             - pwsh
         # 前端验证轮询（verify-loop，2026-11-20）：agent-browser/Start-Sleep 走 pwsh，
-        # 按命令内容累计，超阈值 block。先 warn 灰度记 ledger，观察误报 ≥3天≥20条<10% 再转 block。
-        # 验证门只合并不砍：拒绝文案引导合并多断言、禁裸 sleep。子代理豁免。
+        # 按命令内容累计，超阈值仅告警不拒绝。2026-11-24 用户裁决降级为 warn：
+        # block 会导致模型误判「按轮重置」而停下来等用户回复「继续」，体验差且不解锁。
+        # verifyLoop 计数按会话累计、跨轮不重置（lib/index.js:191），warn 只记 ledger+提醒。
+        # 验证门只合并不砍：告警文案引导合并多断言、禁裸 sleep。子代理豁免。
         verifyLoop:
           enabled: true
-          mode: block
+          mode: warn
           agentBrowserMax: 12
           sleepMax: 5
+        # 部署看板强制审计（dashboard-audit，2026-11-26）：改动看板受控文件
+        # （registry / dashboard / env-sites conf / 审计脚本）时提示必跑
+        # audit_dashboard.py（退出码 0 才算合规）。warn 灰度先记 ledger+提醒；
+        # 稳定后再 promote 到 block。钩子不在插件内执行脚本，避免子进程/超时。
+        dashboardAudit:
+          enabled: true
+          mode: warn

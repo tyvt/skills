@@ -36,7 +36,7 @@ import os from 'node:os'
 import path from 'node:path'
 
 import { Config } from './config.js'
-import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, decideEditPreflight, decideSearchRetry, decideVerifyLoop, isPwshExploration, isAgentBrowserCall, isSleepCall } from './rules.js'
+import { isWholeFileRead, planRecovery, repairArguments, repairToolName, shouldRejectDuplicateRead, decideExplorationDrift, decideVikingFirst, decideExploreOutsource, decideFanoutStreak, decideEditPreflight, decideSearchRetry, decideVerifyLoop, decideDashboardAudit, isPwshExploration, isAgentBrowserCall, isSleepCall } from './rules.js'
 import { policy } from './p0-policy.mjs'
 import { decideInterception } from './scope.js'
 import { evaluateAsk } from './ask-guard.js'
@@ -484,6 +484,25 @@ export function apply(ctx, config) {
             counters.rejected++
             log?.warn?.('agent-guard: verify-loop block %s: %s', tool, vl.message)
             return vl.message
+          }
+        }
+      }
+      // 部署看板强制审计（dashboard-audit）：改动受控文件时提示必跑 audit_dashboard.py。
+      // 默认 enabled:false（inert）；warn 记 ledger，block 拒绝。钩子不执行脚本。
+      if (config.enabled && config.dashboardAudit?.enabled) {
+        const da = decideDashboardAudit(exec, config.dashboardAudit)
+        if (da) {
+          appendLedger(ledgerPath, {
+            ts: new Date().toISOString(), kind: 'dashboard-audit', rule: da.verdict,
+            tool: exec?.name, mode: config.dashboardAudit.mode ?? 'warn',
+            session_id: exec?.agent?.session?.header?.id ?? 'anon',
+            subagent: isSubagentSession(exec),
+            message: da.message ?? '',
+          })
+          if (da.verdict === 'block') {
+            counters.rejected++
+            log?.warn?.('agent-guard: dashboard-audit block %s: %s', exec?.name, da.message)
+            return da.message
           }
         }
       }
