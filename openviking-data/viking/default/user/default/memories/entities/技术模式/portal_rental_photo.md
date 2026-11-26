@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:15:36+08:00
+verdict_note: 门户 RentalDetailDialog.vue 命中 personPhotoFailed，失败态重置修复属实。
+---
 # 门户租赁详情证件照失败态
 RentalDetailDialog 证件照区在 record.id 不变仅更换 photo/photoUrl 字段时，先前加载失败态不会重置，导致一直显示占位图。
 

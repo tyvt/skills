@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:18:43+08:00
+verdict_note: 确认isSubmittedBiz、generalDecision/detail.vue、v-hasPermi及formMode，一般表决多余按钮的v-show/v-hasPermi冲突修复属实。
+---
 # 一般表决新增页多余按钮修复
 太仓G端一般表决详情页底部按钮同时用 `v-show` 与 `v-hasPermi`，导致新增页也显示撤销、延期等操作按钮。
 

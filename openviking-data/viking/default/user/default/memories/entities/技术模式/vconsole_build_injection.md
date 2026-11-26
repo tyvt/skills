@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:12:24+08:00
+verdict_note: 确认vite.config.ts中VITE_DELETE_CONSOLE注入开关及main.ts，构建期vConsole注入与拆包问题诊断与现状一致。
+---
 # vite-plugin-vconsole 构建期注入致启动弹面板
 vite-plugin-vconsole 在 test 模式构建期向 src/main.ts 静态注入 vConsole，使 app 启动即出现调试面板，并将 vconsole 内联进主包导致无法按需拆包。
 

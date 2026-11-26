@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:14:44+08:00
+verdict_note: 苏住房C命中 pages/message/message.vue 与 msg_bus_code_H5 字典，消息列表布局修复描述属实
+---
 # 消息列表页面布局修复
 苏住房C小程序消息列表页面布局错位已修复，对齐参考图样式。
 

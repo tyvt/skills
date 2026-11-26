@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:41:37+08:00
+verdict_note: listMixins/table.js/zs-operate-column.vue 在苏住房G命中，moduleName/businessName mixin 契约描述属实。
+---
 # operate_column_contract
 苏房 zs-operate-column 所在页必须在 data() 声明 moduleName/businessName，否则列表操作列 mixin 契约断裂。
 ## 问题现象

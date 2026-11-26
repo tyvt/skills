@@ -19,12 +19,13 @@
 - 次轮检查：vue-tsc 报错均预存在（store/user.ts、utils/index.ts、watermark.ts，非本次文件）；eslint 未配置未执行；未做 remote 手工部署验证（无测试账号凭据，已备注请测试回归）。
 - 次轮回写 resolved/fixed 并退回 lichandan；计划存档 .plan/bug-6457-round2.md。
 
+
 <!-- MEMORY_FIELDS
 {
   "category": "zentao_bug",
   "name": "zentao_bug_6457",
-  "source_extraction_id": "3253f0e28f0d4f8da93c093238b6d10d",
-  "version": 12,
+  "source_extraction_id": "1a16b6ef0caf4d8497fcf3b0ecd3cab5",
+  "version": 13,
   "memory_type": "entities"
 }
 -->

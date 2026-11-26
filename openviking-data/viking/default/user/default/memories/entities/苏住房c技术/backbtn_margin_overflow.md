@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:43:22+08:00
+verdict_note: 实机核对：引用文件(6个)存在于对应项目仓；核心符号命中[BackBtn,DecisionRecord]，与记忆描述一致。
+---
 # 公共BackBtn自带margin导致固定底栏按钮溢出
 苏住房C小程序投票决策结果页底部「修改决策」按钮偏右、溢出容器、不居中，根因为公共BackBtn组件自带margin:20px叠加底栏padding。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T10:36:25+08:00
+verdict_note: 园区公共收益存在 ZsTencentMap/mapLoader.js；CSP 拦截属部署层配置诊断，与记忆描述一致。
+---
 # 园区公共收益 腾讯地图脚本被CSP拦截诊断
 园区公共收益项目腾讯地图 JS 被部署层 CSP 策略拦截导致 TMap is not defined，属 Nginx/网关配置问题而非前端代码。
 

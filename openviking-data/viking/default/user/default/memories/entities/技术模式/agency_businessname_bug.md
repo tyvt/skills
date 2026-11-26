@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T12:34:31+08:00
+verdict_note: AgencyPersonnelDetail.vue-239-240/266 businessName 计算属性按 changeActive 在 personnelRecordChange/agencyPersonnel 间切换并拼 /company/personnelRecordChange/approval，LeasePersonnelDetail.vue-294-320 同构，写死已修复，与记忆一致。
+---
 # 经纪变更审批接口因写死致路径错误
 苏州市房地产监测V3 中经纪机构从业人员变更详情的 operation-btn-group 因 businessName 写死为 agencyPersonnel，导致审批拼接错误接口路径。
 

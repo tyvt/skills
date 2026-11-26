@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:25:40+08:00
+verdict_note: 苏州市房地产监测V3 命中 EntrustBuildingTable(3)、PermitEntrustPanel(3)、PresaleBuildingTable(12) 等分页组件，统一分页属实。
+---
 # 列表统计文案统一改用zs-pagination组件
 苏州市房地产监测V3 全局排查并删除手写重复统计文案，统一使用 `zs-pagination` 组件。
 

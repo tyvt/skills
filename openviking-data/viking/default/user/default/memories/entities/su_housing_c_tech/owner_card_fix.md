@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T17:17:40+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src/pages_owner/ownerCard/index.vue-23 仍保留 w-500，且无 info-card-content、padding-right-160rpx，与「去掉 w-500 并加层级」修复描述矛盾。
+---
 # 电子业主卡页面背景图与文字遮挡修复
 苏住房C小程序电子业主卡因宽度限制截断长文本、装饰背景层遮挡文字，已通过去宽度限制与调层级修复。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

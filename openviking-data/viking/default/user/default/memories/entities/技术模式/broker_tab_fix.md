@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:42:19+08:00
+verdict_note: 门户源码：BrokerPages.vue存在，portal-tabs命中该文件160/1077行，align-self-center存在；下划线/按钮高度修复描述与现状一致。
+---
 # 门户经纪机构页 Tab 下划线修复
 修复门户经纪机构信息公示详情页「交易记录/信用记录」Tab 下划线错位与按钮高度异常问题，统一为 zs-tabs type=line 风格。
 

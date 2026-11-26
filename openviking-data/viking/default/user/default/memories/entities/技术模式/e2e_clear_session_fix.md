@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:45:57+08:00
+verdict_note: VALID；clearBrowserSession/clearCookies/about-blank 在产品2.0 e2e 真实代码命中。
+---
 # 产品2.0 E2E会话清理SecurityError修复
 产品2.0 项目修复 E2E 用例因 about:blank 页清理 localStorage 触发 SecurityError 导致「待提交完即审核中」的问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:50:49+08:00
+verdict_note: 产品2.0 zs-select-dialog.vue 含 tableComponents、selectable 处理，AddOrderDialog 存在，同名 prop/data 冲突修复属实。
+---
 # 同名prop与data冲突致Vue组件告警
 `zs-select-dialog.vue`的`selectable`同时声明为prop与`@/mixins/table`的data，Vue禁止同名致告警，需改用tableComponents混入。
 

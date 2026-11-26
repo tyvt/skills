@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:15:56+08:00
+verdict_note: 确认projectSubType、createProjectTypeRules/getProjectSubType、triggerProjectTypeValidate，级联项目类型校验修复属实。
+---
 # 级联项目类型单级保存校验静默失败修复
 物业管理区域等项目类型为「一级 + 子类型」级联时，el-form rules 只挂在已隐藏的 projectSubType 表单项会导致只选一级保存时可见输入框不报错。
 

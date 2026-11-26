@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T11:34:54+08:00
+verdict_note: 记忆称涉及guaranteeDeposit/components/AddDialog.vue等文件，实机核对产品2.0与园区物管2.0仓库均无guaranteeDeposit目录/文件，全库glob未命中；声称的代码锚点不存在，无法证明有效。
+---
 # 弹窗账户自动带出需按角色分叉
 园区物管2.0 房屋质量保证金新增弹窗中，账户字段的自动带出必须按操作角色区分，管理员不继承左侧区域树，B 端才自动带。
 

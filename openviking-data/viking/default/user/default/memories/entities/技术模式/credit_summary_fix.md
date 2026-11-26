@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:44:46+08:00
+verdict_note: 苏住房G credit/assessment/search.vue 命中 bottom-summary-items，统计改用表格下方展示属实。
+---
 # 考评统计底部省略号修复（苏住房G）
 苏住房G 信用考评列表底部统计文字被写进表格 footer 各列，列宽不足时触发 text-overflow: ellipsis 且无 tooltip，悬停看不到完整内容，已修复。
 

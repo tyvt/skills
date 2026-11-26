@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:26:58+08:00
+verdict_note: 园区物管2.0 assetPanorama/index.vue实见getDonutSlicePercent(-181)仅用p.percent(-182)及parseAssetCategories(-273)，属实。
+---
 # 饼图占比统一走 ECharts 计算
 园区物管2.0 资产全景饼图 label 与 tooltip 占比统一仅使用 ECharts 的 `p.percent`。
 

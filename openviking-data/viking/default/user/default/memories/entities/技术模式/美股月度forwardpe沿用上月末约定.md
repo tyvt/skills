@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:42:18+08:00
+verdict_note: fund/README.md 明确「沿用上一月已发布的月度值」时效规则，us_index_data.py 含 forward_pe 配置，规则描述属实。
+---
 # 美股月度ForwardPE沿用上月末约定
 美股月度 Forward PE 在回测与实盘须沿用上月末已发布值，避免当月未来数据造成的未来函数嫌疑。
 

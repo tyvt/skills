@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:11:31+08:00
+verdict_note: operation-guide-scroll/OperationGuide.vue 在门户 zhi2-web-admin 命中，长页面 body 高度截断的页面级绕开修复属实。
+---
 # 长页面滚不到底全局body高度截断
 操作指引等长页面滚不到底，根因是全局body{height:100%}锁死文档高度，用页面级类名+:global规则局部绕开而不动全局样式。
 

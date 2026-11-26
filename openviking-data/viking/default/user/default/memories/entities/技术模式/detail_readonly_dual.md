@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:12:52+08:00
+verdict_note: 确认detail.vue/feeBindScopeTable.vue及showEdit/readOnly/formMode/bizState只读双判表达式，与代码现状一致。
+---
 # 详情页查看态表格只读双判模式
 苏住房G物业费申报详情页需去除showEdit=false，子表readOnly同时判formMode与bizState，仅编辑态+草稿可操作。
 

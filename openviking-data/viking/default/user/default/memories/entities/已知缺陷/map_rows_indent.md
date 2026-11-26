@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:43:46+08:00
+verdict_note: 产品2.0 mapOverview/index.vue 含 mapTipRows 与「本年新增账户数」字段，lv 缩进修复对象属实。
+---
 # 新字段 lv=2 导致资金余额子项缩进不正确
 在 mapTipRows 中，3 个字段（例如：本年新增账户数）使用 lv=2 和 padding-left:20px 来模仿收入/支出子项的缩进，导致错位。
 
@@ -17,7 +22,6 @@
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：0c9c218b-0876-4484-af0e-4452a8f8c076
-
 
 <!-- MEMORY_FIELDS
 {

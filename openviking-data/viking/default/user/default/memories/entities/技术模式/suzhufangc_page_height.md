@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:19:26+08:00
+verdict_note: 苏住房C源码未见--nav-height/paging-host/calc(100vh)，声称pages_main/message目录不存在，高度塌陷修复无法证实。
+---
 # 苏住房C 小程序 page 高度塌陷致列表真机空白
 苏住房C 市民端消息/微聊列表因给 page 设 height:100% 致高度塌陷、ZsPaging 拿不到确定高度而整页空白。
 

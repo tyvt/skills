@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:18:46+08:00
+verdict_note: 太仓G directives/permission/hasPermi.js 含 inserted(el,binding) 钩子，与记忆补 inserted 钩子一致。
+---
 # v-hasPermi指令inserted钩子缺失缺陷
 太仓G端hasPermi.js若仅在update钩子改display，首屏权限校验会失效。
 

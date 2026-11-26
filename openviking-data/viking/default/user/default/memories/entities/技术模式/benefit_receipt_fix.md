@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T05:33:21+08:00
+verdict_note: pubBankReceiptApply/detail.vue-328 rowKey-'projectId'，与记忆将 complexId 改为 projectId 一致；项目/路径吻合。
+---
 # benefit_receipt_fix
 产品2.0 公共收益回单模块 (`pubBankReceiptApply` 等) 完成多项界面优化与问题修复。
 
@@ -19,7 +24,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

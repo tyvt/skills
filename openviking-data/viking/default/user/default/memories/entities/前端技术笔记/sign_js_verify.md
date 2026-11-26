@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:27:43+08:00
+verdict_note: 园区公共收益 public/assets/js/sign.js 命中「验签」(10)，引用文件存在，sign.js 验签说明属实。
+---
 # sign.js 验签与 request.js 加解密是两套独立链路
 产品2.0 的 zhi2-web-admin 中，public/assets/js/sign.js 验签与 request.js 的 SM2/SM4 加解密是两套独立机制。
 

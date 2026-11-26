@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:19:26+08:00
+verdict_note: langgraph-orchestrator/graph.py 实机含 _whitelist_bypass、_readonly_read_ok、defer-to-command，白名单降本机制属实。
+---
 # guard 白名单放行与降本机制
 langgraph-orchestrator 的 security_guard 降本方案：靠指令级/命令级白名单与只读 bypass 免掉 grok 升级审核。
 

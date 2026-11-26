@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:44:14+08:00
+verdict_note: chartOptions.js/constants.js/dataHelpers.js 在园区物管2.0命中（3/3），四件套拆分属实。
+---
 # 超大地图图表页面四件套拆分
 园区物管2.0 超大地图/图表页面按 constants / dataHelpers / chartOptions / index.vue 四件套拆分精简，逻辑不变。
 

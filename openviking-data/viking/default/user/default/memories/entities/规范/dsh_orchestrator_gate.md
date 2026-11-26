@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:12:45+08:00
+verdict_note: 规范/插件记忆：.dsh DESIGN.md-310-311/247 实存 blockWholeRead、blockBillingBypass、passThroughSubagents 三规则，描述属实。
+---
 # dsh-orchestrator-gate
 DSH Web 进程内的预执行工具守卫插件，通过 ctx.tools.guard 拦截违规工具调用。
 

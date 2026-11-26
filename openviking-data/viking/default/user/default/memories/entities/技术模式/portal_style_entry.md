@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:46:31+08:00
+verdict_note: 产品2.0 main.js 含 changeThemeColor，门户存在 publicPortal/portalTheme.js 与 --primary-color 变量，样式入口描述属实。
+---
 # 门户全局样式与骨架屏前置约定
 门户 zhi2-web-admin 做骨架屏/动效前需知悉样式入口、主题变量与 anim.scss 未全局注入等工程事实。
 

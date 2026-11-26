@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:12:06+08:00
+verdict_note: zhi2-web-admin 命中 GenerateRoutes、menuFilePath 于 router/index.js 与 permission.js，菜单路由约定描述属实
+---
 # zhi2-web-admin 菜单路由与资源导入约定
 房产前端项目采用后端驱动菜单，页面按约定路径落位即可被菜单引用。
 

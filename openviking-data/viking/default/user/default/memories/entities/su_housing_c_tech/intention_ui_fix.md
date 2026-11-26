@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:12:32+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 我的求购列表UI紊乱修复
 苏住房C小程序「我的 → 我的求购」列表UI紊乱已修复，涉及 pages_transaction/intention/my.vue。
 
@@ -15,7 +20,6 @@
 - 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：`pages_transaction/intention/my.vue`
 - 来源会话ID：31d82de8-28b1-42cc-8741-623368194dca；代码基线none
-
 
 <!-- MEMORY_FIELDS
 {

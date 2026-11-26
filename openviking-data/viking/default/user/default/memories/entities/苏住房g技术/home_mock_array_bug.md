@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:44:51+08:00
+verdict_note: 苏住房G 存在 fetchCityRegionTabOptions（含 probe-dist 资源），与裸数组 mock 致静默降级的解析约定一致。
+---
 # 首页大屏 Mock 响应形态缺陷
 苏住房G 首页 index-v2 大屏区县 Tab 因 $get mock 直接返回裸数组导致静默降级只剩「全市」Tab。
 

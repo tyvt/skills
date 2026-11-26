@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-26T22:43:01+08:00
+verdict_note: 虽带 suspect 标记，但 complexServiceDetailDialog/contentType/[x] 代码证据命中，与#16同源修复，按代码证据判有效。
 ---
 # 服务内容弹窗固定文本与输入项混淆修复
 产品2.0 的 complexServiceDetailDialog.vue 中「服务内容」弹窗曾将固定文本与占位符塞进同一输入框，已修复为内联展示。

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:25:24+08:00
+verdict_note: 园区物管2.0 命中 richTextTwo(19)，7个引用文件存在，sprite/svg 合并冲突处理有据。
+---
 # sprite.svg合并冲突修复
 合并至 develop/v2.6.2-yulin 时 public/assets/images/sprite.svg 因分支删除状态不一致产生冲突，按 develop/v2.6.2 已删该文件的方式解决。
 

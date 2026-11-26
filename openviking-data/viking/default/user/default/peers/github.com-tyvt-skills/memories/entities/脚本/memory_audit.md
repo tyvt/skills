@@ -1,32 +1,34 @@
 # memory_audit.py
-scripts/memory_audit.py 是 OpenViking 记忆审计抽查脚本。
+scripts/memory_audit.py is the OpenViking memory audit sampling script.
 
-## 用法
-- 流程为 `select` 抽候选、按规则判定、`apply` 写回；`stats` 汇总覆盖情况。
-- 抽查可指定条数（如 `select --n 10`），默认 7 天冷却。
-- 判定口径为只接受 `valid`/`invalid` 两态（匹配当前治理规则，弃用旧 `suspect`）；无 frontmatter/空证据标 `invalid`，不采信为当前事实、不删除。
-- 写回字段包括 `audit_status`、`last_checked`、`verdict_note`。
+## Usage
+- Flow: `select` draws candidates, judge by rules, `apply` writes back; `stats` summarizes coverage.
+- Sampling can specify a count (e.g. `select --n 10`), with a default 7-day cooldown.
+- Verdicts accept only `valid`/`invalid` (current governance; `suspect` deprecated); no frontmatter or empty evidence is marked `invalid`, not trusted as a current fact, and not deleted.
+- Writeback fields: `audit_status`, `last_checked`, `verdict_note`.
 
-## 运维状态
-- 脚本位于 `scripts/memory_audit.py`；2026-11-25 定位时全仓 grep 未命中，缩小到 `scripts` 目录后找到。
-- 相关提交为 `a871747d`、`e9b7c364`：apply 改为回读判成功，stats 改为单次 ov grep。
-- push 已恢复，远端同步。
-- 审计日志位于 `~/.dsh/cache/memory-audit/audit.jsonl`。
-- 2026-11-25 第二轮抽检 apply 时遇 URI 归一化：MCP 写入把标题空格转成 `_`，带空格标题记忆生成下划线副本、原空格版仍未审计；已将 frontmatter 合并到规范文件并删除空格版重复项，最终该 URI 唯一。
+## Operations
+- Script is at `scripts/memory_audit.py`; on 2026-11-25 a full-repo grep missed it and narrowing to the `scripts` directory found it.
+- Commits `a871747d` and `e9b7c364`: apply changed to a read-back success check, stats changed to a single ov grep.
+- Push restored; remote synced.
+- Audit log at `~/.dsh/cache/memory-audit/audit.jsonl`.
+- On 2026-11-25 second-round apply hit URI normalization: MCP write converted title spaces to `_`, producing an underscored copy of a spaced-title memory while the original spaced version stayed unaudited; frontmatter was merged into the canonical file and the spaced duplicate deleted, leaving one unique URI.
 
-## Recent Audit Round
-- On 2026-11-25, a sample audit checked 10 memories against real code in D:/repository with two-state verdicts: 7 valid and 3 invalid; apply wrote back 10/10 verify:ok with skipped:0 and no concurrent changes.
-- Three memories were invalid: `portal_api_1400` (portalApiRewrite.js actually lives in the 门户 repo, not 产品2.0; 产品2.0 getInfo uses /system/user/getInfo at line 132), `area_publish_arg` (the area report publish difference is reportState/publishState query parameters, not a second region-code argument; e2e-result.md:301 explicitly warns against misjudgment), `dev_icon_row_bug` (developerCommodityFlow/:developer-flow have no trace in the working tree or git history; current code uses businessFlows+variant).
-- This round did not change memory body semantics, delete memories, commit git, or write to project directories; intermediate files stayed only in ~/.dsh/cache/memory-audit/.
-- In a further 2026-11-25 sample audit, 10 candidates were checked against real code with verdicts 7 valid and 3 invalid; apply wrote back 10/10 successfully with skipped:0. Invalid memories: `git_branch_strategy` (abstract preference statement with no concrete code fact to verify), `zs_dialog_zindex` (code actually uses `:above-drawer` and z-index 100/-1, no wrapper-class/100000), `wechat_uniapp_incompat` (`037.md` evidence not found, `clickCheckTask` 0 hits, baseline none). No memory body changes, deletions, or git commit; intermediate files stayed in ~/.dsh/cache/memory-audit/.
+## Recent Audit Rounds
+- 2026-11-25: 10 sampled, 7 valid/3 invalid, apply 10/10 verify:ok skipped:0, no concurrent changes. Invalid: `portal_api_1400` (portalApiRewrite.js is in the 门户 repo, not 产品2.0; 产品2.0 getInfo uses /system/user/getInfo at line 132), `area_publish_arg` (difference is reportState/publishState query parameters, not a second region-code argument; e2e-result.md:301 warns against misjudgment), `dev_icon_row_bug` (developerCommodityFlow/:developer-flow absent from tree and git history; current code uses businessFlows+variant).
+- 2026-11-25: 10 sampled, 7 valid/3 invalid, apply 10/10 skipped:0. Invalid: `git_branch_strategy` (abstract preference, no concrete code fact), `zs_dialog_zindex` (code uses `:above-drawer` and z-index 100/-1, no wrapper-class/100000), `wechat_uniapp_incompat` (037.md evidence absent, clickCheckTask 0 hits, no baseline).
+- 2026-11-25 third round: 10 sampled; brief first said 7/3 then explicitly corrected to VALID 8/INVALID 2; apply 10/10 verify=ok, no skipped. Invalid: `小程序技术/appid_missing_fix` (only wygl-wxxcx-dev-slh; home/index/index.vue keeps the login call, no MP-WEIXIN conditional compilation/41002/appid missing/?code= logic; home/new/index.vue and README.md absent), `项目/book_summarizer` (D:/repository/book-summarizer absent; no summarize.py/chapter_parser.py/llama_runner.py). Valid eight: 详情模板未定义常量报错修复, 苏住房g/home_todo_decouple, clear_company_model, 记录变更详情中按钮的显示, 择时报告点位格式, complexchange_areafields, building_dialog_columns, dayjs全局实例使用约定.
+- 2026-11-25: 10 sampled, VALID 7/INVALID 3, apply 10/10 verify=ok skipped:0, no pending items. Invalid: `inspection_dialog_flex` (claimed a `div.step-form-body` flex change, zero hits; add.vue:129/detail.vue:97 still nest `scroll-view.step-form-scroll`), `date_filter_adapt` (vague, no function name/line/mechanism, hover-fix unproven), `wechat_call_fallback` (claimed sfb.js and jmportal/lightAppJssdk/wx.miniProgram/tel: fallback, absent from non-dist source; callPhone only uses uni.makePhoneCall). Valid seven: `survey_change_payload`, `zentao_bug_6467`, `login_first_menu_redirect`, `change_schema_tableid`, `register_url_fallback`, `std_report_company_gap`, `organ_type_all`.
+- Across these rounds: no memory body semantic changes, no deletions, no git commits, no project-directory writes; intermediate files stayed only in ~/.dsh/cache/memory-audit/.
+
 
 <!-- MEMORY_FIELDS
 {
   "category": "脚本",
   "name": "memory_audit",
-  "source_extraction_id": "17b54dcf5f2247bbb888db259bcbc0ac",
+  "source_extraction_id": "206f012ae7b245a586129647542d7983",
   "peer_id": "github.com-tyvt-skills",
-  "version": 4,
+  "version": 6,
   "memory_type": "entities"
 }
 -->

@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-2cad5f5f-7166-45bd-b6e7-99bebb9ef688/history/archive_002",
+    "trace_id": null,
+    "extracted_at": "2026-11-26T02:59:10.869424+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zhishu_h5_login.md",
+                "memory_type": "entities",
+                "after": "# zhi2-mobile-shimin-h5-zhishu-c-unlimited 登录要点\n`zhi2-mobile-shimin-h5-zhishu-c-unlimited` 项目 H5 密码登录与图形验证码环节依赖 `uuid` 的技术要点。\n\n## 登录参数\n- 密码登录需 `uuid`（表单字段 `form.udid`）。\n- 图形验证码由 `ImgCode` 组件绑定 uuid。\n\n## 排障要点\n- 登录卡在验证码页时，先窄查登录是否依赖 uuid。\n- 可尝试从浏览器读取 token 跳过重复登录。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/zhishu_h5_watermark.md",
+                "memory_type": "entities",
+                "before": "# zhi2-mobile-shimin-h5-zhishu-c-unlimited 水印与登录技术要点\n`zhi2-mobile-shimin-h5-zhishu-c-unlimited` 项目在禅道 2920 C 端水印迁移 hop2（2026-11-26）中的水印失败根因、修复方向与登录要点。\n\n## 水印问题与修复\n- H5 下 `canvasToTempFilePath` 返回 blob URL，是水印合成失败的根因；修复方向为处理该 blob URL（hop2 2026-11-26 进行中）。\n- hop2 为便于实机验证临时开放相册选图。\n- 2026-11-26 发现 H5 下 `uni.createCanvasContext` 导出易失败且被静默降级，改用原生 Canvas 合成水印。\n- 相册选图时 `crossOrigin` 可能导致 `loadHtmlImage` 失败，改为优先用 `File` + `objectURL` 加载图片。\n- 上传接口正常但缩略图仍用占位图；补 `canvas.toDataURL` 直出预览（新字段 `previewDataUrl`）并重建，将含该字段的源码重构建同步到 8185。\n\n## 登录要点\n- 密码登录需 `uuid`（表单字段 `form.udid`）；图形验证码由 `ImgCode` 组件绑定 uuid。\n- 登录卡在验证码页时，先窄查登录是否依赖 uuid，并尝试从浏览器读取 token 跳过重复登录。\n\n## 验证与排查\n- 实机验证流程：检查浏览器会话 → 取验证码图并识别 → 进提交页 → 注入测试图截取带水印证据；2026-11-26 02:36–02:53 会话为先开 8185 → 注入登录态 → 单条 eval 确认新包加载 → 上传测试图 → 整页截图。\n- 曾因构建早于代码修改导致验证误用旧产物；已重新打包并同步 dist。该会话浏览器曾停留旧 `index-cd253602.js`（截图哈希与 hop3 相同），新包为 `index-a339ff3b.js`，需强刷 index。\n- 排查缩略图空白时用窄验证：一条命令拉控制台 upload/水印报错、窄 grep 确认新包是否含 `previewDataUrl`、窄 read 对照 `fileUpload` 入参与成功回调真实文本，避免大段读盘。\n- 截至该会话结束，截图仍无水印、缩略图仍为空/占位图，水印尚未叠到缩略图，问题未闭环、仍在排查。\n\n## 交接与状态\n- 本链路关联禅道任务 2920，为 C 端 H5 水印迁移续接。\n- 交接文档 `D:\\plan\\苏住房C\\HANDOFF-CHAIN-zt2920-c-h5-watermark-hop2-20261126-095841.md` 第 9 节为目标与待办；按第 9 节第 2 步修复水印与相册选图，不重做已完成项。\n- 2026-11-26 交接链进入 hop4：按交接文档第 9 节接续，已窄读 §4–§5–§9 核对目标与待办，确认已接入 hop4；首要待办为 8185 实机产出可见「时间/位置」水印的证据，下一步窄读 `buildUploadPayload` 与 H5 canvas 用法。",
+                "after": "# zhi2-mobile-shimin-h5-zhishu-c-unlimited 水印技术要点\n`zhi2-mobile-shimin-h5-zhishu-c-unlimited` 项目在禅道 2920 C 端水印迁移 hop2（2026-11-26）中的水印失败根因、修复方向与验证交接要点。\n\n## 水印问题与修复\n- H5 下 `canvasToTempFilePath` 返回 blob URL，是水印合成失败的根因；修复方向为处理该 blob URL（hop2 2026-11-26 进行中）。\n- hop2 为便于实机验证临时开放相册选图。\n- 2026-11-26 发现 H5 下 `uni.createCanvasContext` 导出易失败且被静默降级，改用原生 Canvas 合成水印。\n- 相册选图时 `crossOrigin` 可能导致 `loadHtmlImage` 失败，改为优先用 `File` + `objectURL` 加载图片。\n- 上传接口正常但缩略图仍用占位图；窄读 `ZsUploader.vue` 约 165–190 行，在成功回调里补 `previewDataUrl`（`canvas.toDataURL` 直出）作缩略图并回显，避免被服务端 URL 盖掉本地水印预览，已重建验证。\n\n## 目标与交接\n- 本链路关联禅道任务 2920，为 C 端 H5 水印迁移续接。\n- 交接文档 `D:\\plan\\苏住房C\\HANDOFF-CHAIN-zt2920-c-h5-watermark-hop2-20261126-095841.md` 第 9 节为目标与待办；按第 9 节第 2 步修复水印与相册选图，不重做已完成项。\n- 2026-11-26 交接链进入 hop4：按交接文档第 9 节接续，已窄读 §4–§5–§9 核对目标与待办，确认已接入 hop4；首要待办为 8185 实机产出可见「时间/位置」水印的证据，下一步窄读 `buildUploadPayload` 与 H5 canvas 用法。\n\n## 验证过程\n- 实机验证流程：检查浏览器会话 → 取验证码图并识别 → 进提交页 → 注入测试图截取带水印证据。\n- 2026-11-26 02:36–02:53 会话：浏览器曾停留在旧 `index-cd253602.js`，新包为 `index-a339ff3b.js`，需强刷 index；验证流程为先开 8185 → 注入登录态 → 单条 eval 确认新包加载 → 上传测试图 → 整页截图。\n- 排查缩略图空白时用窄验证：一条命令拉控制台 upload/水印报错、窄 grep 确认新包是否含 `previewDataUrl`、窄 read 对照 `fileUpload` 成功回调真实文本，避免大段读盘。\n- 2026-11-26 02:53–02:56 会话：在新包上注入后上传并截图验证，缩略图仍空白；用一条 eval 确认当前加载的 bundle 与缩略图 `src` 前缀。\n- 截至 2026-11-26 02:56 会话结束，缩略图仍为空/占位图，水印尚未叠到缩略图，问题未闭环、仍在排查。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:45:46+08:00
+verdict_note: 产品2.0 syncLog/index.vue 命中 min-width，复杂控件列宽修复属实。
+---
 # zs-table-column 内嵌复杂控件列宽修复
 在子表内用 zs-table-column 内嵌 zs-select/zs-input 等复杂控件时，列宽会被压到约 80px，需改用 min-width。
 

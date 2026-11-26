@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:08:56+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 同一接口 SelectDialog 同步补 B 端 projectId 隔离
 园区物管2.0 同一接口被多处 SelectDialog 消费时，须同步补齐 B 端 projectId 隔离条件防止数据越权。
 

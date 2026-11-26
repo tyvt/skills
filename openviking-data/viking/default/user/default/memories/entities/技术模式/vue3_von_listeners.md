@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:41:24+08:00
+verdict_note: 实机核对：引用文件(4个)存在于对应项目仓；核心符号命中[SearchFormItem,ZsForm,object,components,listeners]，与记忆描述一致。
+---
 # Vue3 v-on 无参展开绑定告警修复
 产品2.0 中 SearchFormItem/ZsForm 沿用 Vue2 的 `$listeners` 写法，在 Vue3 下 `$listeners` 已不存在，导致 `v-on="undefined"` 触发告警，已改为永远传对象。
 

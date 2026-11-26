@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T13:33:55+08:00
+verdict_note: 苏住房G StreetAuthDialog.vue-23/89/154确认 /system/streetBankPolicy/{subdistrictCode}/authorizedBanks、并行请求详情+可选银行、rowVersion乐观锁、失效银行disabled，描述属实。
+---
 # 街道银行授权下拉数据源改造
 街道银行授权弹窗下拉选项须来自上级区有效授权接口，失效历史值补回下拉并disabled，保存走{subdistrictCode}+rowVersion。
 

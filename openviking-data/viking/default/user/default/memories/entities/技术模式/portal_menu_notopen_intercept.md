@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:12:16+08:00
+verdict_note: 门户仓命中 notOpen-true、handleMenuClick、openPortal、getMenuChildren/getMenuMoreItems、.el-message，三处拦截属实
+---
 # 门户存量房菜单暂未开放拦截
 UnifiedLogin 对未上线菜单项加 `notOpen: true`，点击时提示「暂未开放」并阻止进入二级页面，三处入口统一拦截。
 

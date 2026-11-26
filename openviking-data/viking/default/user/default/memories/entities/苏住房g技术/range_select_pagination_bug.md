@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T05:33:32+08:00
+verdict_note: system/message/components/rangeTable.vue-6 用 fill-height，21 接 zs-pagination/pageNum，455-473 flex column 布局，与记忆修复方案（fill-height+分页+flex纵向、删手动tableHeight）一致。
+---
 # 服务周报区域选择列表不全
 苏住房G 街道账号在服务周报选「物业管理区域」列表不全且无分页，补分页后因手动高度计算末行被裁。
 

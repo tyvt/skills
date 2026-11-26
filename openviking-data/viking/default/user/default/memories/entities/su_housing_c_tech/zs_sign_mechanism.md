@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:42:12+08:00
+verdict_note: 实机核对 苏住房C 仓库确认关键符号(19/22)存在：CryptoJS、authorization、buildGatewayHeader、crypto、crypto-js；文件与描述一致，记忆有效。
+---
 # zs-sign业务签名机制
 苏住房C(zhi2-mobile-shimin)恢复了`zs-sign`业务签名，网关头通过`getSignHeader`计算并写入。
 

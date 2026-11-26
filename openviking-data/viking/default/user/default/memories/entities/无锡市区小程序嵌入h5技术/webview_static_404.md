@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:22:21+08:00
+verdict_note: 属实：无锡H5 utils/zhishuAsset.js 用 new URL(...,import.meta.url) 实现 resolveZhishuAsset，home.vue 等已引用，404 修复成立。
+---
 # 迁入门户webview后本地图404修复
 小程序页面迁入门户 H5 后静态资源被错误拼到 /h5/pages/webview/static 导致 404，改用 resolveZhishuAsset + import.meta.url。
 

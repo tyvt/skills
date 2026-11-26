@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-d1c93089-0355-4350-a01a-480c3dc2ff8f/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-26T00:03:06.604554+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/技术模式/工作日早间会话复盘20261125.md",
+                "memory_type": "entities",
+                "after": "# 2026-11-25 工作日早间会话复盘\n2026-11-25 早间复盘目标日期 D=2026-11-25，按文件 mtime 命中 140 个会话，纯只读，未改动任何文件。\n\n## 取证口径与失败信号\n- 结构化失败字段（llmRetry / goal.failure / failedAttempt）当天会话均为空；context-mode 全文检索未命中 D 当天错误日志，仅返回历史无关片段。\n- 失败按会话标题信号列出，非日志逐条取证：12a86e33… 会话交接技能加载失败、6adcffac… 禅道2730表头吸顶返工（交接 hop2）、dcf614a5… 本地dist部署拒绝代理方式。\n- 其他标题信号：cc489262… 自动交接对话排序异常、e80346cd… 苏住防汛C端仓库Git推送失败排查；结论为交接加载/排序、部署代理拒绝、Git 推送、返工重做集中。\n- 错误段为标题信号推断；如需精确失败原因，可对指定 sid 用 context-mode 按 sid 再检索。\n\n## Token 消耗\n- 会话数 140；未命中 41,965,515、缓存读 536,716,747、输出 4,873,274；等效成本约 115,130,286。\n- 整体缓存命中率 92.7%（正常，>80%）；无单会话等效成本占比>20%，最高约 3.5%。\n- TOP3 高消耗：b6d92d63… View Zentao bug 6969（eq 3.98M，命中 55.6%）；0262ad61… 接续 bug6965 弹窗验证 hop4（eq 2.64M，命中 37.9%）；c11ba9d7… 记忆治理稳定性交接计划（eq 2.34M，命中 88.7%）。\n\n## 会话步数\n- 总 steps 9,538 / turns 216；平均 68.1 steps、1.54 turns（n=140）。\n- TOP3 步数：b07b2f6a… 求援工单详情修复验证 191 步；0262ad61… bug6965 hop4 176 步；a5399904… 禅道6522 hop3 158 步。\n- 异常高步数：上述三条及 f37f8e2c…(152)、0babc990…(148) 属成本交接长链路，步数偏高但命中率多在 96%+，缓存健康。\n\n## 可提升点\n- 低缓存集中在 composer-2.5（55.6%/37.9%/52.6%，每步未命中最高 23.5k）：长任务优先路由回高缓存 hy4flash，避免 composer-2.5 跑探索型盲搜。\n- 交接类会话（16 个 hopN）步数 140–190、返工反复：交接前先 grep 缩行号 + 局部读、结论落盘，减少重复定位与整读。\n- 三类失败前置：交接先实机核验技能可用、排程后复核会话置顶顺序、推送前一次性校验子模块状态，降低返工重试。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/entities/技术模式/implement_session_retro.md",
+                "memory_type": "entities",
+                "before": "# 实施优化方案会话P0复盘\n2026-11-13 用户对「实施上一会话优化方案」会话做 P0 复盘，文档 .plan/p0-retro-implement-session-20261113.md 定为「实施类会话」基线文档。\n\n## 会话真实指标\n- 未命中 59.3k（97% 缓存命中），总输入 2.10M，输出 20.3k；活跃 603s；编排器仅调用 1 次 plan_review（34.3s）；人工切换约 61s（51.5s 决策 + 9.8s 抖动）不计入 agent 成本\n- agent 有效耗时 542s：执行 42s(7.7%)，模型侧约 92%；耗时结构=参数 183s(33.8%)+等待 193s(含人工 61s)+思考 139s(25.6%)+回复 44.5s(8.2%)+执行 42s(7.7%)\n\n## 耗时根因（T2-T5，T1 已撤回）\n- T2 单步 5.8k output：step 28 reasoning 预演 8 条修订只发 1 个 edit（39.9s + 6k 未命中）\n- T3 工具参数 183s(33.8%) 为耗时第一：57 次调用×3.2s，主因 10 次 edit 中文长 new_string\n- T4 ≥10 次无效调用：glob 失败 4、grep 被 orchestrator-gate 拒 3、write 被 plan-gate 拒 1、read 路径错 1（约 35-45s）\n- T5 ask 选项错位：step 9 问实施范围未覆盖「先改方案」（1 轮往返）\n\n## Token 根因（K1-K6）\n- K1 工具结果 781.2k(36.9%)：step 51 git status --short 打 23,259 bytes（openviking-data 未跟踪 spill）\n- K2 工具定义 486.1k(23.0%)：9.1k/步×56 步固定重发，23 工具全量注入\n- K3 AGENTS.md 编辑复利：2 次 edit 触发 3 次全量 instructions 注入（seq 275/283/285，283/285 同 digest 疑 harness 冗余）；step 45 input=457（seq 271）、46=3,356、47=3,370\n- K4+K5 注入 351.0k（recall + 成本告警含 18k 冷启误报 + 3 次 system-reminder）；未命中 59.3k 中 40% 可避免（首步 18.3k + step 28 的 6k）\n- K6 定位阶段 18 步低效(step 10-27)：12 grep + 8 glob + 1 pwsh 拿 4 组文件:行号，6 次失败/0 结果\n\n## 归纳与落地\n- 步数膨胀：56 步中 18 步定位、≥10 步无效、4 步可合并小 edit(step 29-32)，有效步<30；固定开销 655k(31%)=工具定义 486k + 系统提示 110k + 技能注入 59k\n- 最优先 3 动作：合并/拆分 edit、检索前先 pwsh 定位、工具定义按需加载；次级：instructions 批量改、R5 升级 hook；新增第 6 条「提交返工(step 51→53)」；反证：违反 R5（step 51 裸 git status 未限子模块）需 hook enforcement\n- 交付：.plan/p0-retro-implement-session-20261113.md（TEMPLATE 六节定稿基线，无代码改动未走 plan_review）\n- 2026-11-13 实施计划 .plan/implement-retro-optimizations-20261113.md 获批执行：R5 hook（dsh/agent-guard/lib/rules.js 新增 warnBareGitStatus 纯告警函数 + repairArguments 分派，单测 11/11 通过）、AGENTS.md 四条规则（④-1 合并 edit、④-2 pwsh 定位、④-4 instructions 批量改、④-6 提交前校验）落地，提交 f95d1add（main，未推送）；④-3 工具懒加载（harness 核心）未做留议；R5 hook 需重启 dsh web 生效",
+                "after": "# 实施优化方案会话P0复盘\n2026-11-13 用户对「实施上一会话优化方案」会话做 P0 复盘；文档 .plan/p0-retro-implement-session-20261113.md 定为「实施类会话」基线文档。\n\n## 真实指标\n- 未命中 59.3k（97% 缓存命中）、总输入 2.10M、输出 20.3k；活跃 603s；编排器仅调用 1 次 plan_review（34.3s）；人工切换约 61s（51.5s 决策 + 9.8s 抖动）不计入 agent 成本。\n- agent 有效耗时 542s，模型侧约 92%；耗时结构：参数 183s(33.8%)+等待 193s(含人工 61s)+思考 139s(25.6%)+回复 44.5s(8.2%)+执行 42s(7.7%)。\n\n## 耗时根因（T2-T5，T1 已撤回）\n- T2：step 28 reasoning 预演 8 条修订只发 1 个 edit，单步 5.8k output（39.9s + 6k 未命中）。\n- T3：工具参数 183s(33.8%) 为耗时第一，57 次调用×3.2s，主因 10 次 edit 中文长 new_string。\n- T4：≥10 次无效调用，glob 失败 4、grep 被 orchestrator-gate 拒 3、write 被 plan-gate 拒 1、read 路径错 1（约 35-45s）。\n- T5：step 9 问实施范围时 ask 选项未覆盖「先改方案」，多 1 轮往返。\n\n## Token 根因（K1-K6）\n- K1：工具结果 781.2k(36.9%)，step 51 git status --short 输出 23,259 bytes（openviking-data 未跟踪 spill）。\n- K2：工具定义 486.1k(23.0%)，9.1k/步×56 步固定重发，23 工具全量注入。\n- K3：AGENTS.md 编辑复利：2 次 edit 触发 3 次全量 instructions 注入（seq 275/283/285；283/285 同 digest 疑 harness 冗余）；step 45 input=457（seq 271）、46=3,356、47=3,370。\n- K4+K5：注入 351.0k（recall + 成本告警含 18k 冷启误报 + 3 次 system-reminder）；未命中 59.3k 中 40% 可避免（首步 18.3k + step 28 的 6k）。\n- K6：step 10-27 定位阶段 18 步低效，12 grep + 8 glob + 1 pwsh 拿 4 组文件:行号，6 次失败/0 结果。\n\n## 归纳与落地\n- 步数膨胀：56 步中 18 步定位、≥10 步无效、4 步可合并小 edit(step 29-32)，有效步<30；固定开销 655k(31%)=工具定义 486k + 系统提示 110k + 技能注入 59k。\n- 最优先 3 动作：合并/拆分 edit、检索前先 pwsh 定位、工具定义按需加载；次级：instructions 批量改、R5 升级 hook；新增第 6 条「提交返工(step 51→53)」；反证：违反 R5（step 51 裸 git status 未限子模块）需 hook enforcement。\n- 交付：.plan/p0-retro-implement-session-20261113.md（TEMPLATE 六节定稿基线，无代码改动未走 plan_review）。\n- 2026-11-13 实施计划 .plan/implement-retro-optimizations-20261113.md 获批执行：R5 hook（dsh/agent-guard/lib/rules.js 新增 warnBareGitStatus 纯告警函数 + repairArguments 分派，单测 11/11 通过）、AGENTS.md 四条规则（④-1 合并 edit、④-2 pwsh 定位、④-4 instructions 批量改、④-6 提交前校验）落地，提交 f95d1add（main，未推送）；④-3 工具懒加载（harness 核心）未做留议；R5 hook 需重启 dsh web 生效。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

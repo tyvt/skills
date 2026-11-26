@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:12:28+08:00
+verdict_note: 产品2.0 命中 procedureProcess、isExplain、recordProcessStepDialog，必填规则取自程序步骤配置属实。
+---
 # 子表弹窗必填规则取自程序步骤配置
 dataProperty 巡保记录（recordProcess）步骤子表弹窗中，「说明/照片」是否必填由所挂巡保程序（procedureId）的步骤配置决定，而非本单数据。
 

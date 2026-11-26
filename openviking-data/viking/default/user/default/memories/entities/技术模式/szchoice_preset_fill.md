@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:20:05+08:00
+verdict_note: 属实：suzhou2016 chapter4/chapter7 有 fill-from-option、fillFromOption 与 outdoorParkingOther，预设单选联动填充成立。
+---
 # SzChoice 预设单选联动输入框
 苏州市房地产监测V3 的 2016 合同中，`SzChoice` 组件已实现「预设单选 + 后方输入框」自动填充交互。
 

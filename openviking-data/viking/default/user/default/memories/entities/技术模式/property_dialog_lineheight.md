@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:50:56+08:00
+verdict_note: 门户 PropertyDetailDialog.vue 实测 line-height-1.5，行高对齐修复属实。
+---
 # 门户企业弹窗行高对齐修复
 门户企业基本信息弹窗（PropertyDetailDialog）行高被覆盖为1导致行距过密，按从业人员弹窗（BrokerPages）的1.5比例对齐修复。
 

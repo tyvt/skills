@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:11:52+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 嵌套或数组形式的设施类别名称解析
 修复当设施类别名称来自子对象或数组时出现的空白列表问题。
 
@@ -18,7 +23,6 @@
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：f8b4bd31-2a17-4162-a6aa-7b14123bf0f6
-
 
 <!-- MEMORY_FIELDS
 {

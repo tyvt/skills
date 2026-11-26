@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:49:14+08:00
+verdict_note: permitCancel/companyName/label 命中，预售许可注销列表文案统一属实。
+---
 # 预售许可注销列表文案统一
 苏州市房地产监测V3 的 zhi2-web-admin 中将预售许可注销页「所属区域」统一为「行政区划」，并将列表列「开发企业」改为「开发企业名称」。
 

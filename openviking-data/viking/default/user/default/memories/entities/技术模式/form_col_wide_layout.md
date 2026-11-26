@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:21:01+08:00
+verdict_note: AgencyPersonnelDetail.vue存在且已无FORM_COL_WIDE导入，与"移除FORM_COL_WIDE归一化布局"结论一致（现改用PersonnelBasicInfoLayout）。
+---
 # 两列栅格FORM_COL_WIDE未归一化致错位
 AgencyPersonnelDetail.vue 的两列栅格中 FORM_COL_WIDE 未归一化，打破 50/50 布局并致标签错位。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:22:35+08:00
+verdict_note: 未指明项目；多个仓库仍存在size="mini"，声称main.js/index.vue改为small无法定位证实。
+---
 # Element Plus size 不支持 mini 致全局告警
 Element Plus `size` 仅接受空/default/small/large，项目全局及 `el-select` 使用 Vue2 的 `"mini"` 触发 Invalid prop 告警。
 ## 问题根因

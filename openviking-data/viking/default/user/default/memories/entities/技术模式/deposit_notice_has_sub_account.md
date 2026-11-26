@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:22:48+08:00
+verdict_note: 产品2.0 depositNotice/components/detail.vue 命中 hasSubAccount(4)，押金通知子账户判断属实。
+---
 # 公共收益缴存结算账户是否启用子账户显示为空修复
 园区公共收益 zhi2-web-admin 修复新增选择结算账户时 hasSubAccount 列显示为空。
 
@@ -12,7 +17,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：7e4c18c0-5ce0-41ce-b4dd-d28988df5d00；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

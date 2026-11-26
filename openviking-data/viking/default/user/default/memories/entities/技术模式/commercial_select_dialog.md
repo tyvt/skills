@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:38:59+08:00
+verdict_note: SelectDialog/contractRevoke/project/page/NoticeContractDialog 在苏州监测V3命中，统一弹窗描述属实。
+---
 # 商品房详情页开发项目选择统一为zs-select-dialog
 苏州市房地产监测V3 项目将商品房相关详情页的「开发项目选择」统一为 `zs-select-dialog`（SelectDialog 组件）。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

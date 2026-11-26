@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T17:18:32+08:00
+verdict_note: iHome小程序 src/pages-iHome/my/contractDetail.vue 无 mode=change、续期、datetime/picker 相关代码；归属字段为「0」占位（project=0），属测试垃圾。
+---
 # 变更跳合同新增页续期弹日期选择改租期
 iHome 合同详情页点击变更跳转合同新增页，点击续期弹日期选择器改租期。
 

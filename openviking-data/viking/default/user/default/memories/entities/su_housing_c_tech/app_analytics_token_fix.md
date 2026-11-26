@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:27:25+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src/utils未见appAnalytics.js，skipToken/token修复无法证实。
+---
 # 埋点请求缺失 token 修复
 苏住房C小程序 `appAnalytics.js` 埋点请求因 `skipToken: true` 未带登录 token，已修复。
 

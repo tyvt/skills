@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:47:34+08:00
+verdict_note: menuNav.js/redirect/index.vue/resolveMenuRoute/richTextId 在苏住房C命中；parseMenuLink 未直接命中（疑已重构），主体链路证据充分。
+---
 # 装修补贴企业名单轮播图跳转修复
 苏住房C小程序点击热门活动「查看装修补贴企业名单」轮播图提示「功能暂未开放」，已解析嵌入参数修复。
 

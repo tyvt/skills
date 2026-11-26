@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:14:50+08:00
+verdict_note: 小程序 wygl-wxxcx-dev-slh 命中 externalWebview 与 portal-user，移除 @click.stop 修复属实。
+---
 # picker内@click.stop致切换点击无反应
 切换按钮位于 picker 内且绑定 @click.stop 无对应方法，拦截事件致选择器无法弹出。
 

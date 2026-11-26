@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T21:42:38+08:00
+verdict_note: 全仓无 navbar-sidebar-accessibility.spec.js，记忆声称的 e2e 文件不存在，无法证实。
+---
 # clickLeafMenusUnderParent顺序点击
 按目录批量点子菜单时，用 DOM 计数 + nth 顺序点 sub-menu a，断言失败只记录不中断，是最小可靠版。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=2-0
-
 
 <!-- MEMORY_FIELDS
 {

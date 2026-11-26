@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:18:52+08:00
+verdict_note: 产品2.0 子模块实机 b2d27db21、8eff3cf75 均为 commit，detached cherry-pick 记录属实。
+---
 # 子模块detached HEAD上的业务提交迁回命名分支
 在 zhi2-web-admin 子模块内若在 detached HEAD（例如基于 develop/v2.6.2 的临时检出）完成提交，该提交不会落在任何分支上。
 

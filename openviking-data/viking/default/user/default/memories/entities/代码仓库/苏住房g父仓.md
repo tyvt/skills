@@ -14,13 +14,14 @@
 - 2026-11-13 子模块推送 `bef0c34eb`（首页企业总数卡跳转带 parentDeptId 区域过滤修复，bug#5819 同源）后，父仓提交 `fbf3e12`（仅更新 gitlink），gitlink 冲突已解（远程 66e1ed397 为本地提交祖先，未回退他人代码），已推送 `origin/develop/v2.6.2-suzhufang`
 - 2026-11-15 子模块提交 `9ba4ccc0d`（Navbar 顶部导航重样式）后，父仓提交 `ba24695`（`feat(navbar): update submodule and add visual E2E`，含新增视觉 E2E 用例），已推送 `origin/develop/v2.6.2-suzhufang`，远端 SHA 核对一致、本机主线已快进，未部署
 - 2026-11-24 禅道 6899 链路收口：子模块提交 `ce9b34955`（仅 `src/views/flood/screen/index.vue` 与 `docs/flood/common-errors.md`）→ 父仓提交 `2adb355`（gitlink 指向 `ce9b34955`），均已推送 `origin/develop/v2.6.2-suzhufang` 且远端 SHA 一致；未纳入 `ScreenHeader.vue`、`particles.js`、`HeatMapPanel.vue`、`_review.json`、`env/.env`；已清理 `Temp\zentao-6899`、`D:\禅道附件\bug\6899`、nginx 备份 `苏住房G.bak-6899` 与 `.task-state`，无残留后台任务，本跳未重跑 eslint／npm test（沿用 hop4 exit 0 基线）
+- 2026-11-26 维修资金迁移切独立分支：父仓新建 `develop/v2.6.2-suzhufang-maintain`，提交 `0226156`（仅更新 gitlink `72307fa → f3fbb7f`），已推送且本地/远程 SHA 均为 `02261568c`；子模块同名分支基于含迁移和补文件的 `f3fbb7fb`（SHA `f3fbb7fb0`），未含 6899/6915 等后续 bugfix，后续合并时再解冲突。
 
 <!-- MEMORY_FIELDS
 {
   "category": "代码仓库",
   "name": "苏住房G父仓",
-  "source_extraction_id": "8287222ff0194d5ca1280044e2752a4c",
-  "version": 7,
+  "source_extraction_id": "b38572146b7e4be2a267745ae40722c1",
+  "version": 8,
   "memory_type": "entities"
 }
 -->

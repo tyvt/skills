@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:50:08+08:00
+verdict_note: zs-search-form.vue 命中 formItems、searchFormVisibility.js 已删，逐页过滤回退属实。
+---
 # 列表搜索条件逐页过滤
 苏州市房地产监测V3 中所有列表搜索条件的企业 / 机构名称筛选已改为逐页自行处理，公共组件恢复原样。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:40:57+08:00
+verdict_note: 园区物管2.0 detail-template.vue 命中 min-height-44px 与 align-self-stretch，label 拉伸修复属实。
+---
 # DetailTemplate 长 label 背景色高度不齐
 园区物管2.0 中 DetailTemplate 类只读详情模板长字段 label 换行拉高行高后，同行右侧蓝底 label 背景色没跟着拉伸。
 

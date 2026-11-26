@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:27:55+08:00
+verdict_note: 苏州市房地产监测V3 命中 AmountInput(75)、ParcelDialog(22)、出让价格(9)、土地面积(24)，金额占位符属实。
+---
 # amount-input placeholder 全局补齐
 苏州市房地产监测V3 项目修复 `AmountInput` 未传 placeholder 时不显示的问题，全局补齐 45 处占位文案。
 

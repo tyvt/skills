@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:03:42+08:00
+verdict_note: 抽检2026-11-26 技术点与ZsImage/widthFix叙述自洽；苏住房C路径本机未复核
+---
 # 新增房源弹窗示例图不显示修复
 苏住房C 移动端 `pages_owner/house/owner/addHouse` 弹窗中示例图不显示的问题已修复，根因为 ZsImage 样式冲突与隐藏容器不加载。
 

@@ -1,0 +1,38 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-7c433746-5b07-44be-84dc-3139f312d19f/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-26T02:02:53.930565+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited/memories/events/2026/11/26/决策按钮状态结论.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-26，用户反馈点击决策详情后“参与决策”变成“修改决策”；分析结论是按钮文案由后端 voteState 驱动，goDetail 只设置 tableId 和 ownerVoteOpinCode 并跳转详情，不直接修改 voteState，返回后的变化来自列表重新拉取到的后端状态。\n# 2026-11-26 (Thursday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited]**: 点击决策详情后，参与决策就变成了修改决策，之前app也是有这个逻辑么？\n参考D:\\repository\\家园区appios，看看接口调用链路是否一致\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited]**: 分析完成。结论如下：\n\n## 结论\n**「参与决策/修改决策」的切换逻辑完全由后端返回的 `voteState` 决定，跟「点击决策详情」这个动作本身无关；而 iOS 原生仓库里根本没有决策逻辑——它是 WKWebView 壳，「业主决策」只是菜单码 `3_0_0` 加载 H5，所以不存在可对比的原生接口链路。**\n\n## 关键证据\n\n**当前项目（一网通办 H5/小程序）**\n- 按钮文案在 `src/pages-decision/components/index.vue:51-53` 计算：`voteState == '未表决' || '未选举'` → 显示「参与」，其余状态 → 显示「修改」，`typeLabel` 拼成「决策/选举」。\n- 点击「决策详情」的 `goDetail`（`components/index.vue:202-208`）只做两件事：`decisionStore.setTableId / setOwnerVoteOpinCode`，然后 `navigateTo` 详情页——**不改 voteState，也不改标签**。\n- 详情页 `decision/detail.vue` 只调 `SmUserVoteDetail`（`common.ts:162`）渲染字段，没有任何参与/修改按钮。\n- 标签会变，是因为列表在 `onShow` 时 `reload()`（`components/index.vue:195`），重新拉 `SmCastVoteListApp`（`/version/1/app/SmCastVoteListApp`）拿到新的 `voteState`。也就是说「点详情再返回后变修改」= 后端把该记录状态更新了，前端只是被动反映。..."
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited/memories/events/2026/11/26/苹果端决策链路核查.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-26，为回答用户关于此前 app 是否也有相同逻辑及接口链路是否一致的问题，分析确认家园区appios（MatroBBC）没有原生决策或投票逻辑，业主决策是菜单码 3_0_0 通过 WKWebView 加载 H5；内嵌 H5 源码不在该仓库中，无法直接证实文案逻辑，但后端接口与当前 H5 同属 /version/1/app/* 链路。\n# 2026-11-26 (Thursday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited]**: 点击决策详情后，参与决策就变成了修改决策，之前app也是有这个逻辑么？\n参考D:\\repository\\家园区appios，看看接口调用链路是否一致\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited]**: ...- 提交链路：`goForm` → 阅读须知弹窗 → `form` 页 → `SmCastVoteSubmitApp`（`common.ts:179`）。\n\n**iOS 仓库（家园区appios / MatroBBC）**\n- 全部 `.m/.h` 均为 UTF-8；搜 `决策/投票/表决/vote/decision` 在业务代码中零命中（`vote/decision` 仅命中 WKWebView 的 `decisionHandler` 代理方法）。\n- 「业主决策」仅存在于 `menu.json:192` 和 `Common/menus.json:987`，是菜单项 `url: \"3_0_0\"` + 图标素材，**没有对应的原生页面/接口实现**。\n- 即 iOS 端决策功能是 H5 提供的，app 只负责用 WebView 承载；它调用的后端接口与当前 H5 是同一套（`/version/1/app/*`），不存在第二套独立链路。\n\n## 说明\n- 无法从该 iOS 仓库读到它内嵌 H5 的具体代码（菜单码映射到服务端的 H5 地址，H5 源码不在此仓），因此“iOS 内嵌 H5 是否用了同一份 `voteState` 文案逻辑”无法在这个仓库里直接证实；但从架构看它必然走同一后端接口。\n- 如果你要确认的是「点详情返回后状态被改成已表决、导致标签翻转」这个行为是否符合预期，需要去查后端 `SmCastVoteGoHandleApp`/`SmCastVoteListApp` 是否在打开详情时更新了 voteState——这是服务端问题，不在前端两个仓库范围内。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited/memories/entities/代码仓库/家园区appios.md",
+                "memory_type": "entities",
+                "after": "# 家园区appios\n家园区appios（MatroBBC）是用户参考的 iOS 仓库，业主决策功能通过 WKWebView 承载的 H5 提供。\n## 描述\n- 用户引用的仓库路径为 D:\\repository\\家园区appios。\n- 仓库内 .m/.h 源码均为 UTF-8。\n- 业务代码中没有发现原生决策或投票逻辑。\n## 业主决策入口\n- “业主决策”出现在 menu.json:192 和 Common/menus.json:987。\n- 对应菜单项为 url: \"3_0_0\" 加图标素材。\n- 未发现与业主决策对应的原生页面或接口实现。\n- iOS 端后端接口与当前 H5 同属 /version/1/app/* 链路。\n## 核查限制\n- 该仓库不包含内嵌 H5 源码，无法直接证实 H5 文案逻辑是否一致。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited/memories/entities/代码模块/业主决策模块.md",
+                "memory_type": "entities",
+                "after": "# 业主决策模块\n业主决策模块是一网通办 H5/小程序中的表决与选举模块，“参与/修改”按钮文案由后端返回的 voteState 决定。\n## 展示逻辑\n- 按钮文案在 src/pages-decision/components/index.vue:51-53 根据 voteState 计算。\n- voteState 为“未表决”或“未选举”时显示“参与”，再与 typeLabel 拼成“决策/选举”。\n- 其他 voteState 显示“修改”，再与 typeLabel 拼成“决策/选举”。\n## 请求链路\n- 列表页在 onShow 时 reload，通过 SmCastVoteListApp（/version/1/app/SmCastVoteListApp）重新获取 voteState。\n- 详情页通过 SmUserVoteDetail（common.ts:162）渲染字段，没有参与或修改按钮。\n- 提交链路为 goForm→阅读须知弹窗→form 页→SmCastVoteSubmitApp（common.ts:179）。\n## 详情行为\n- goDetail（components/index.vue:202-208）只设置 decisionStore.setTableId 和 setOwnerVoteOpinCode 后跳转详情页。\n- goDetail 不修改 voteState，也不直接改变按钮文案。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

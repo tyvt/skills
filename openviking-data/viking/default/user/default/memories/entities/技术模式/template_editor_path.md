@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:45:40+08:00
+verdict_note: 苏州市房地产监测V3 存在 commercialHousingSales/presale/template/index.vue 与 detail.vue，contract-editor 数据属性存在（在 views/contract/index.vue）。
+---
 # 合同范本列表详情编辑器组件路径模式
 苏州市房地产监测V3 中合同范本列表页位于 `commercialHousingSales/presale/template/index.vue`，详情与编辑器组件同目录。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:20:50+08:00
+verdict_note: fund/scripts/factor_builder_extended.py 有 L1/L2/L3 fallback（-143 明确 L3=0.5），factor_orthogonality.py/selected_factors 相关存在，与「负/零 PE 归 L3=0.5、禁取绝对值」一致。
+---
 # PE 行业分位负值处理约定
 行业内 PE 分位定义方向为「越大越便宜」，负 PE 与零 PE 统一归入缺失走 L3 路径，禁止取绝对值。
 

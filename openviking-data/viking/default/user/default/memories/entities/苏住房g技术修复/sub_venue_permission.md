@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T12:34:11+08:00
+verdict_note: subVenueTable.vue-48 moduleName='benefit'，-89/104 businessName=isRevenueContractFiling?'pubRevenueContractVenue'-'pubLeaseApplyVenue'，拼接 benefit-pubRevenueContractVenue-remove 成立，与记忆一致。
+---
 # 资源租赁合同备案子表删除按钮权限字符（苏住房G）
 苏住房G 项目资源租赁合同备案页子表「删除」按钮的权限字符为 `benefit:pubRevenueContractVenue:remove`。
 

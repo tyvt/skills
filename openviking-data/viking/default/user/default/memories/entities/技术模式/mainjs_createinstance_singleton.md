@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T20:50:45+08:00
+verdict_note: 产品2.0 zhi2-web-admin/src/main.js 仅有 createInstance 单例(if instance return，line206-207)，但记忆核心的 registerGlobalComponents 幂等注册、app._context.components、defineAsyncComponent 在全仓业务代码中均不存在，仅命中 skills 记忆归档自身；描述与现状证据不符，判无效。
+---
 # main.js 重复 createInstance 导致全局组件二次注册
 产品2.0 中入口连续触发 createInstance 会使 registerGlobalComponents 重复注册组件并报已注册警告。
 

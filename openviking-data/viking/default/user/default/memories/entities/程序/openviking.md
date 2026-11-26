@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T13:35:34+08:00
+verdict_note: live health返回'healthy, storage- VikingFS'，印证VikingFS后端+health接口；记忆工具属性属实。导入脚本未及全量扫描(受file-limit)，无反证。
+---
 # OpenViking
 用户的记忆系统，负责存储与管理导入的历史会话记忆。
 
@@ -8,7 +13,6 @@
 
 ## 关系
 - 与 import-local-sources.mjs、import-to-ov.mjs、ov-cancel-stuck-commit-tasks.mjs 组成记忆导入工具链
-
 
 <!-- MEMORY_FIELDS
 {

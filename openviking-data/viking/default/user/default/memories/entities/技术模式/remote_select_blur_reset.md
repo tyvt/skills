@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:47:32+08:00
+verdict_note: 产品2.0 todo.vue 命中 handleBusCodeSelectVisible，失焦回全量修复属实。
+---
 # 可搜索下拉失焦必须回全量
 远端 keyWord 搜索型 el-select 失焦时必须复位并清防抖重拉全量，避免选项残缺或回显成裸编码。
 

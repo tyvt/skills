@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:50:04+08:00
+verdict_note: VALID；companyApply/approvalRegion/administrativeArea 在苏州V3真实代码命中。
+---
 # 企业申请模块前端契约与后端分离
 苏州市房地产监测V3 仓库仅含前端 `zhi2-web-admin`，企业申请相关后端在独立服务仓库。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

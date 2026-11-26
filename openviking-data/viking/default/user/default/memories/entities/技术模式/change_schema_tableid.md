@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T07:34:29+08:00
+verdict_note: index.vue-106 tableId 返回 `${base}_v2`，hasFilingForm(64/140/218)、delete contractStatus/recordTimeStart(324/334) 均在；enums.js-31 BUSINESS_TYPE.CHANGE=propertyContractChange。与记忆一致。
+---
 # 变更列表复用新增schema须白名单过滤并bump tableId
 苏住房G项目中 propertyContractChange（变更列表）复用 contract info schema 后，请求侧残留旧字段且缓存未失效，须按 schema 白名单过滤并升版 tableId 做缓存击穿。
 

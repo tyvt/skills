@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:42:53+08:00
+verdict_note: BuildingForm.vue/changeDetail.vue 等项目文件命中，缺 typecheck 脚本的描述与现状一致。
+---
 # 项目缺少 typecheck 脚本且 Vue 审查不完整
 项目 zhi2-web-admin 没有 typecheck 脚本，且 Vue 审查未覆盖整个仓库；独立的 eslint 未产生新的错误。
 
@@ -22,7 +27,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：eda148ea-5077-4e6e-a126-ed8b88e4742b
-
 
 <!-- MEMORY_FIELDS
 {

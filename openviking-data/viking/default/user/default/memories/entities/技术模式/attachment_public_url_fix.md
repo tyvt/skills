@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:12:51+08:00
+verdict_note: 苏住房G worktrees/screen-motion/src/utils/resolveServerAssetUrl.js-85 有 resolvePublicAssetUrl，detail-template.vue-164 已使用。
+---
 # 附件预览下载不拼接API前缀修复
 苏住房G项目zhi2-web-admin的detail-template附件预览与下载改用resolvePublicAssetUrl，不再拼接VITE_APP_BASE_API。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:21:39+08:00
+verdict_note: 抽检2026-11-26 第三轮 message_height_fix.md 叙述/路径合理
+---
 # 消息页高度塌陷修复
 苏住房C 微信小程序 `pages_main/message/index` 页因 `page { height: 100% }` 导致高度塌陷，已改用 calc 精确计算并包裹分页容器修复。
 

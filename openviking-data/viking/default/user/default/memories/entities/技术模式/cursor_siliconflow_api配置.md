@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:17:29+08:00
+verdict_note: 现状证据缺失：本机 Cursor settings.json 无 siliconflow/THUD 配置，证据仅存在于记忆归档，无法按现状证明有效。
+---
 # Cursor 接入硅基流动 API 配置
 
 在 Cursor 中使用硅基流动（SiliconFlow）API 作为模型时，需正确开启 Key 开关、修改 Base URL 并确认模型名，否则会报 Model name is not valid。
@@ -16,7 +21,6 @@
 - 重新验证方法：清空 Key 重新粘贴保存，或开开关后发测试消息看是否报错。
 - 涉及文件：C:\Users\Administrator\.cursor\skills-cursor\update-cursor-settings\SKILL.md、C:\Users\Administrator\AppData\Roaming\Cursor\User\settings.json
 - 所属项目：d-repository；来源会话：d053681c-4823-458c-a33f-ab528b504230
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T11:34:07+08:00
+verdict_note: 实机核对产品2.0：propertyContractTable/committeeTable/managementOrgPanel/regulatoryAccountPanel 备案入口HeadlineNavIcon均常显无hasData控制，checkCommitteeDataFlags未命中(已删)，与记忆修复内容一致。
+---
 # 物业合同备案入口v-if隐藏修复
 产品2.0多个物业相关组件因`v-if="!hasData"`在有数据时隐藏右上角备案入口，已修复为常显。
 

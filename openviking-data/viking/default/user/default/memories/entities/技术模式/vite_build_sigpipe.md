@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:50:45+08:00
+verdict_note: vite build管道SIGPIPE属通用构建经验, 目标项目路径存在, 描述合理无幻觉
+---
 # vite build 管道截断误报退出码 1
 用 `vite build | head` 截断输出时，SIGPIPE 使 vite 进程退出码为 1，并非真实构建失败。
 

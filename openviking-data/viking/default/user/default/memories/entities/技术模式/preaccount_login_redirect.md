@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:49:05+08:00
+verdict_note: 产品2.0命中 editAndSubmit/isPreAccount/saveCompanyRegister, 预账号跳转续填属实
+---
 # 预账号(isPreAccount)登录后跳转续填并改用 editAndSubmit
 机构注册预账号流程在第一步成功后重定向登录，登录后判断预账号跳转续填，最后提交接口改为 editAndSubmit。
 

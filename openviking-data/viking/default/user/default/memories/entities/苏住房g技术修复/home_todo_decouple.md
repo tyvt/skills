@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T06:33:32+08:00
+verdict_note: index-v2.vue-564 确认 getTaskCount({}) 不带 regionCode；loadTodoPanelList(674) 独立；reloadPortalDataCards(260-267) 只刷新关键数据/公共收益/报修/学习园地且无待办请求。与记忆描述一致，判有效。
+---
 # 关键数据区域切换不再刷新待办（苏住房G）
 苏住房G 首页 v2 已改动，切换关键数据区域时不再触发待办数据接口。
 

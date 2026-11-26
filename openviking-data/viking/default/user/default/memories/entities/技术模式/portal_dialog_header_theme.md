@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:12:55+08:00
+verdict_note: 门户命中 portal-dialog、header-cell、表头，弹窗表头主题色分流修复属实。
+---
 # 门户弹窗表头主题色区分与全量排查
 公网门户信息公示类弹窗按业务线区分表头主题色：商品房统一蓝色表头，存量房绿色。
 ## 问题根因
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

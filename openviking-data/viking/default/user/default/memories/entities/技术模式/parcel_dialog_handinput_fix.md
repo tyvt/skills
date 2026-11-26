@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:43:14+08:00
+verdict_note: ParcelDialog.vue 命中；clearLandFields/openLandSelect/fillFromLand 未命中，恰与记忆'移除相关逻辑'描述一致。
+---
 # 项目备案宗地信息地块编号改手输
 苏州市房地产监测V3 项目将项目备案新增宗地信息弹窗的地块编号改为手动输入。
 

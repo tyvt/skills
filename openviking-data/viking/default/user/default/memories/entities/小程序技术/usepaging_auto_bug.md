@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:51:40+08:00
+verdict_note: 苏住房C 含 usePaging、indexMore.vue、halfYearAgo，auto-false+refresh 修复对象属实。
+---
 # 分页hook自动请求早于onLoad设参致接口未调用
 苏住房C新房列表因usePaging默认auto:true在onLoad读参前发请求，导致参数错或似未调用接口。
 

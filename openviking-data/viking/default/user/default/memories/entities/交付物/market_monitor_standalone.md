@@ -4,7 +4,7 @@
 ## Description
 - 单 HTML 文件，约 1.36 MB，整个应用（Vue 2.7 + ECharts 6 + Tailwind v4 样式）全部内联，scoped 在 `.mm-dashboard` 下
 - 运行时零外链：文件中的 `http://`/`src=`/`href=` 均为许可证注释、SVG xmlns 命名空间、截图导出的内生 dataURL，无网络请求
-- 对齐文档 `docs/market-monitor-alignment.md` 实测「离线单文件 100%」相似度（Playwright + pixelmatch，1920×1080 与 1366×768）
+- 对齐文档 `docs/market-monitor-alignment.md` 门禁（Playwright + pixelmatch，1920×1080 与 1366×768）实测确定性/真实联网/离线单文件/交互/多分辨率均 ≥99.999%，记录「离线单文件 100%」相似度
 
 ## 面板结构
 - 顶栏：标题/实时时钟/统计期/监测范围/全屏/返回首页
@@ -19,8 +19,8 @@
 {
   "category": "交付物",
   "name": "market_monitor_standalone",
-  "source_extraction_id": "bdb7bdb18e534a38b91ef5b943711f92",
-  "version": 1,
+  "source_extraction_id": "41c091d5347145fa8e4d82178fe9c355",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:18:35+08:00
+verdict_note: 苏州V3 实机存在 PresalePlanFillForm.vue、narrative-line、PermitPlanPanel，预售方案布局修复属实。
+---
 # 预售方案填空式布局修复
 苏州市房地产监测V3 预售方案 Tab 填空式布局改造已完成，修复价格管理（备案）Tab 重叠问题。
 

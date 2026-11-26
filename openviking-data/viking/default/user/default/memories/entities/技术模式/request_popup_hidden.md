@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:16:16+08:00
+verdict_note: 与现状不符：request.js 中 showErrorDialog 在第119/147行被主动调用（MessageBox.confirm 生效），业务异常弹窗并未被注释隐藏。
+---
 # 接口异常 MessageBox 弹窗暂时隐藏
 园区物管2.0 在 axios 响应拦截器暂时注释两处接口异常 MessageBox 弹窗，保留 401 提示。
 

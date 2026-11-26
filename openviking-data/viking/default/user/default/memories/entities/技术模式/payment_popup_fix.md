@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:42:23+08:00
+verdict_note: 实机核对 泰兴小程序 仓库确认关键符号(23/25)存在：PaymentChannelPopup、ZsPopup、bills、cashier、column；文件与描述一致，记忆有效。
+---
 # 收银台支付方式弹窗修复
 泰兴小程序员工端收银台支付方式弹窗修复完成，改动集中在 src/staff/pages/cashier/result.vue。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T01:50:19+08:00
+verdict_note: 园区公共收益 zs-operate-column.vue 实机未见 onButtonClick/isButtonDisabled（真实源码 onButtonClick=0）；核心修复描述未在代码落地。
+---
 # 操作列删除按钮置灰修复
 园区公共收益项目资产租赁合同备案详情页删除按钮置灰不可删的问题已修复，涉及 zs-operate-column.vue 与 houseTable.vue。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区公共收益
-
 
 <!-- MEMORY_FIELDS
 {

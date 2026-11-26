@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:12:17+08:00
+verdict_note: 门户命中 PortalDialogHost.vue 与 InformationPages.vue，公网弹窗按业务线拆独立 key 的组件基础属实。
+---
 # 公网弹窗独立路由 Key 避免串台
 商品房与存量房等结构相同的业务线弹窗，必须拆独立路由 key 并分别配置标题与主题，避免共用导致标题串台。
 ## 问题根因
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

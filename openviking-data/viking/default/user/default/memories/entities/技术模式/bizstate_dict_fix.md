@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:48:22+08:00
+verdict_note: 苏住房G benefit/pubRegulatoryAccount/index.vue 含 biz_state，与详情页/全局字典一致，字典编码修复属实。
+---
 # 开户申请已备案筛选字典编码对调修复
 苏住房G项目修复监管账户列表因字典编码对调导致「已备案/审核中」筛选结果相反的缺陷。
 

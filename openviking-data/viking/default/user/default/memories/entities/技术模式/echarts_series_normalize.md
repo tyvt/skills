@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:28:17+08:00
+verdict_note: 产品2.0未见src/utils/echartsOption.js集中归一化工具；filter(Boolean)/replaceMerge仅零散存在，无法证实统一方案。
+---
 # ECharts series 归一化防护
 在 setOption 前对 option.series 做假值过滤与缺 type 补默认，避免 LineView 读 undefined.type。
 

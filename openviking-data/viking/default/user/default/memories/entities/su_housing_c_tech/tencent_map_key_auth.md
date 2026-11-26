@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T21:42:00+08:00
+verdict_note: 苏住房C ZsMap.vue/manifest.json 均无 subkey 与 3SQBZ key；该 key 实际在 iHome小程序等项目，记忆归属与现状不符。
+---
 # 腾讯地图Key鉴权失败排查
 苏住房C(zhi2-mobile-shimin)地图渲染报「当前产品鉴权失败」，属腾讯地图Key未与小程序AppID正确绑定，非业务代码错误。
 

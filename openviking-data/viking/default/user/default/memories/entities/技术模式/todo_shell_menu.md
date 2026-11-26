@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:15:44+08:00
+verdict_note: 苏住房G 编译产物含 SHELL_MENU_COMPONENTS、isMenuShellRoute、resolveTodoTaskNavigation，壳菜单回退逻辑属实。
+---
 # 待办跳转壳菜单组件误判
 苏住房G 待办跳转因 flattenTree 将 Layout 壳组件写入 meta.filePath，导致单菜单时打开空壳而非真实详情页。
 ## 问题根因

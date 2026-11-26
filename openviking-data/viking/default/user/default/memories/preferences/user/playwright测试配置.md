@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:14:31+08:00
+verdict_note: 产品2.0 命中 webkit(33)，Playwright 浏览器配置场景属实。
+---
 - 主流 PC 浏览器测试配置为 Chromium（Chrome）、Firefox、Edge 三个项目，未包含 WebKit（Windows 上录像会报写入路径错误）。
 - 录像配置 `video: 'on'`，每个用例无论成功或失败都会录制并保存为 `video.webm`。
 - 将 `/404` 加入路由白名单，以便未登录也能访问 404 页；修正 404「返回首页」用例断言（未登录时会被重定向到登录页）。

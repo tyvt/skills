@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:44:05+08:00
+verdict_note: 实机核对 园区物管2.0 仓库确认关键符号(27/28)存在：AmountInput、ElFormItem、admin、componentName、components；文件与描述一致，记忆有效。
+---
 # AmountInput 打包后 el-form 校验为空
 AmountInput（vue-currency-input 封装）本地开发正常、打包后字段有值却被 el-form 校验为空的同 tick 竞态问题。
 
@@ -18,7 +23,6 @@ AmountInput（vue-currency-input 封装）本地开发正常、打包后字段�
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

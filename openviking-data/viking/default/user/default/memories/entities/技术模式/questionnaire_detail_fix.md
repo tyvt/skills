@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T10:35:06+08:00
+verdict_note: 产品2.0 存在 survey/template/components/TopicInfoTable.vue、TopicDialog.vue；弹窗含 Headline「基本信息」，表格按分组展示逻辑与记忆一致。
+---
 # 问卷模版详情页与新增题目弹窗修改
 产品2.0 项目根据截图需求完成问卷模版详情页组件新建及新增题目弹窗样式统一。
 

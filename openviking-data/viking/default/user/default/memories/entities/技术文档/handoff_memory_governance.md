@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:42:33+08:00
+verdict_note: D-\plan\skills\HANDOFF-memory-governance-20261118.md 存在，交接文档记忆属实。
+---
 # HANDOFF-memory-governance-20261118 交接文档
 记录存量过时/错误记忆治理的会话交接文档，供后续新会话接续执行。
 

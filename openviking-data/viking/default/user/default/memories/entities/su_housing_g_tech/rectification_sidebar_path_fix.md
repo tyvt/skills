@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:43:25+08:00
+verdict_note: VALID；sidebarActivePath.js 与 RecursiveMenu.vue 在苏住房G真实代码命中，detailA 路径归并逻辑属实。
+---
 # 整改通知书侧边栏高亮修复
 苏住房G项目修复了整改通知书详情路径变更后侧边栏无法关联列表菜单的问题。
 

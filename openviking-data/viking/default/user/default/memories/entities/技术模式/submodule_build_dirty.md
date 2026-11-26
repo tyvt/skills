@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:21:00+08:00
+verdict_note: 榆林G/zhi2-web-admin 中 public/version.json、report.html 均为真实构建产物文件，子模块脏标记与指针区分的 git 知识描述与现状一致。
+---
 # 构建产物未提交致父仓显示 m zhi2-web-admin
 前端 npm run build 后按用户要求只提交业务改动、不提交 public/version.json 与 report.html，父仓显示小写 m 是子模块工作区脏标记，不是指针不一致。
 ## 问题根因

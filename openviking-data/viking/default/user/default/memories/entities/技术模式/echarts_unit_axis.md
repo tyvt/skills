@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:18:00+08:00
+verdict_note: 苏住房G命中 RepairPanel、splitLine、nameLocation、nameGap、axisTick/axisLabel，孪生Y轴配置属实
+---
 # ECharts右侧单位不附刻度的孪生Y轴
 苏住房G首页仪表盘图表需求右侧补单位「（件）」而不要第二套刻度，借隐藏刻度标签的孪生Y轴用axis name承载单位。
 ## 误做与正解

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:13:13+08:00
+verdict_note: 门户 zhi2-web-admin/.../OperationGuideBody.vue 存在且采用 min-height 定高（213/249/289 行），组件与手法属实；48px 具体值当前已迭代。
+---
 # 操作指引页主按钮定高居中
 操作指引页主按钮原靠 padding 撑高导致文字不垂直居中，改为 min-height 定高 + inline-flex 居中，并同步窄屏断点。
 

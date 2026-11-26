@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:17:14+08:00
+verdict_note: 修复属实：zhi2-mobile-shimin/src/utils/index.js 有 resolveFullMediaUrl，My_Suzhufang.vue 组件存在，与补全图片域名方案一致。
+---
 # 接口图片相对路径须补全域名
 苏住房C 小程序把以 / 开头的接口图片地址当包内资源加载致 500，须先经 resolveFullMediaUrl/resolveMediaUrl 补全域名或改用 ZsImage。
 

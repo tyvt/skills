@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:45:13+08:00
+verdict_note: portal-detail-dialog/PropertyDetailDialog/RentalDetailDialog/portal-house-body 在门户命中，弹窗内边距规则属实。
+---
 # 门户详情弹窗正文内边距统一规则与例外
 portal.scss 对 .portal-detail-dialog 正文区统一内边距规则，并规定例外与去重约束。
 
@@ -27,7 +32,6 @@ portal.scss 对 .portal-detail-dialog 正文区统一内边距规则，并规定
 - 会话 a4628c5f 将分散在各组件的 padding 收敛至 portal.scss（PropertyDetailDialog、RentalDetailDialog、UnifiedLoginMenuMoreDialog）
 - 验证证据：portal/038.md、portal/039.md；E2E 布局断言与 ESLint 通过
 - 所属项目：门户；来源会话ID：8088d086-ac9e-4292-b17b-9ffd0590a85f、a4628c5f-d778-4c31-8176-5b38c95b7139；代码基线：e1f8e0b
-
 
 <!-- MEMORY_FIELDS
 {

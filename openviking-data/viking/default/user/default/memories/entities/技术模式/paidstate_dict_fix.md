@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:41:44+08:00
+verdict_note: 产品2.0 spFeeBill 中存在 SP_PAY_STATUS_DICT、PAY_STATUS_TAB、sp_pay_status 常量与引用，与描述一致。
+---
 # 支付状态 paidState 字典对齐修复
 支付状态 paidState 的入参与展示已统一对齐字典 sp_pay_status，并修正了原先枚举值写反的问题。
 

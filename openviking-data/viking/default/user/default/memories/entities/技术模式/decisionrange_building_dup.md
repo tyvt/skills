@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:17:40+08:00
+verdict_note: 太仓G DecisionRangeTable.vue 楼幢下拉用 searchDecisionRange({decisionId})，只传 decisionId 取全部楼幢，与记忆一致。
+---
 # 一般表决详情楼幢号下拉重复修复
 太仓G 一般表决详情「决策范围」楼幢号下拉出现大量重复楼幢（如多个「1幢」），已修复为只传 decisionId 获取全部楼幢。
 

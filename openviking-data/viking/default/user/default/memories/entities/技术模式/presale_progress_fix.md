@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:51:12+08:00
+verdict_note: 苏州市房地产监测V3 命中 refreshDetailSnapshot、saveForProgress、openProgressDialog、PresaleBuildingTable，与形象进度修复一致。
+---
 # 预售楼幢列表工程形象进度即时维护修复
 苏州市房地产监测V3 中预售许可详情页与楼幢表的工程形象进度即时维护已修复，保存后保持编辑态并支持补保存。
 

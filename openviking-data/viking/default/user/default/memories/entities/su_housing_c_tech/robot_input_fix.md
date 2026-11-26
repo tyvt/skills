@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:41:51+08:00
+verdict_note: 实机核对 苏住房C 仓库确认关键符号(13/15)存在：.zs-button、-deep、ZsButton、automaticRobot、chitchatDetail；文件与描述一致，记忆有效。
+---
 # 智能机器人页发送按钮与输入框高度对齐修复
 苏住房C 移动端 automaticRobot 页修复发送按钮与输入框高度不一致问题，统一为 80rpx。
 

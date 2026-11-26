@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:41:57+08:00
+verdict_note: utils/portal.js 含 Base64/btoa，face.vue 含 backUrl，bdc.vue 含 backUrl+Base64，回跳编码描述属实。
+---
 # 第三方人脸跳转backUrl用Base64
 生产 H5 为 hash 路由时，将完整回跳地址作为外层 query 的 backUrl 须用 Base64 编码，不能仅用 encodeURIComponent。
 

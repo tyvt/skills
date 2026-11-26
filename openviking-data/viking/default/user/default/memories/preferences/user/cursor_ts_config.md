@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:20:39+08:00
+verdict_note: 现状证据缺失：本机 Cursor settings.json 无 maxTsServerMemory/hybridMode/8192，证据仅存在于记忆归档，无法按现状证明。
+---
 - To avoid TS language service memory overflow and Volar hybrid mode conflict crashes, config must be in user-level `%APPDATA%\Cursor\User\settings.json`.
 - Set `typescript.tsserver.maxTsServerMemory` to `8192` and `vue.server.hybridMode` to `false`.
 - Exclude `node_modules`/`dist`/`unpackage` from watch and search.
@@ -8,7 +13,6 @@
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：6911ad2f-da24-42ab-a070-15f71b1f2ffa
-
 
 <!-- MEMORY_FIELDS
 {

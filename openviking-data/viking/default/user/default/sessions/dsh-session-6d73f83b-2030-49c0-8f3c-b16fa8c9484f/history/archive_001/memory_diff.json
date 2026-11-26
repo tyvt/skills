@@ -1,0 +1,24 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-6d73f83b-2030-49c0-8f3c-b16fa8c9484f/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-26T03:32:50.396709+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited/memories/entities/zentao_bug/zentao_bug_7008.md",
+                "memory_type": "entities",
+                "before": "# 禅道 Bug 7008\n苏住房防汛 C 端移动查询 H5「汛后整改与复盘」提交必填校验缺失缺陷；2026-11-26 已完成代码/单测/build 修复，实机 toast 未闭环，会话因成本交接待续办。\n\n## 工单与现象\n- 禅道链接 http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=7008；2026-11-26 会话先加载 zentao-analyzer 拉取工单详情与部署环境。\n- 缺陷：汛后「整改与复盘」提交时缺少必填校验，工作区为防汛 C 端 H5。\n- 根因：`bug6754` 注释写明汛后表头字段「不设必填」，工单 7008 要求提交时校验。\n- 定位到 `src/pages/inspection/index.vue`（汛后「整改与复盘」）的 `submit` 与校验逻辑，整改区块在源码中已存在；检索 `防汛C端`/`suzhufang-c` 部署配置与 `views` 目录，中文关键词未命中。\n\n## 代码改动与验证\n- 必填范围：「整改与复盘」五字段 + 现场照片均带红色 `*`，而非仅「物业管理区域」必填。\n- 新增 `src/utils/postInspectionValidate.ts:1` 的 `validatePostExtraForm`；`src/pages/inspection/index.vue:217` 提交前调用并加 `*` 标签；`src/styles/theme.css:140` 红星号样式。\n- `tests/flood.test.ts` 新增 bug7008 用例，共 127 tests 通过。\n- 验证：build ✓、单测 ✓、浏览器 ✓（区块与星号），截图 `bug7008-post-section-20261126-110119.png`；PC 端在苏住房 G 仓，本仓未改。\n\n## 待办与交接\n- ✗ 未闭环：实机在「已选小区」下未截到「请输入整改措施」toast，实机 toast 序列为「整改项」，本地搜不到小区（「永林」无匹配）；复现仍被「物业管理区域」未选抢先拦截，H5 疑似不用裸 localStorage，正查存储键。\n- 本会话因成本 1.02M 已交接，约 11:06 自动开新会话续办；交接文档 `D:/plan/苏住房防汛C端/HANDOFF-CHAIN-bug7008-hop1-20261126-1105.md`。\n- 新会话计划：查部署面板有效 `complexId` → 补 toast 截图 → 待用户确认后再提交并禅道回写；另待确认 `photos` 是否进入提交载荷、G 端是否已有同类校验。",
+                "after": "# 禅道 Bug 7008\n苏住房防汛 C 端移动查询 H5「汛后整改与复盘」提交必填校验缺失缺陷；2026-11-26 完成代码/单测/build 修复、实机 toast 验证、提交推送与禅道回写，chain `bug7008-flood-post-validate` 已终止。\n\n## 工单与现象\n- 禅道链接 http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=7008；openedBy=lichandan，product=79/project=141/execution=142，原 status=active；2026-11-26 会话先加载 zentao-analyzer 拉取工单详情与部署环境。\n- 缺陷：汛后「整改与复盘」提交时缺少必填校验，工作区为防汛 C 端 H5。\n- 根因：`bug6754` 注释写明汛后表头字段「不设必填」，工单 7008 要求提交时校验。\n- 定位到 `src/pages/inspection/index.vue`（汛后「整改与复盘」）的 `submit` 与校验逻辑，整改区块在源码中已存在；检索 `防汛C端`/`suzhufang-c` 部署配置与 `views` 目录，中文关键词未命中。\n\n## 代码改动与验证\n- 必填范围：「整改与复盘」五字段 + 现场照片均带红色 `*`，而非仅「物业管理区域」必填。\n- 新增 `src/utils/postInspectionValidate.ts:1` 的 `validatePostExtraForm`；`src/pages/inspection/index.vue:217` 提交前调用并加 `*` 标签；`src/styles/theme.css:140` 红星号样式。\n- `tests/flood.test.ts` 新增 bug7008 用例，共 127 tests 通过；`npm run build` exitCode=0。\n- 截图 `bug7008-post-section-20261126-110119.png` 证整改区块与星号；PC 端在苏住房 G 仓，本仓未改。\n\n## 实机 toast 验证（2026-11-26）\n- 关键逻辑：URL 带 `complexId` + `eventId` 两个非空参数即进入 `fromStageDialog` 分支锁定区域并设置 `complexId`，提交时 `buildRemoteValues` 越过「请选择物业管理区域」命中 `validatePostExtra`（「请输入整改措施」）。\n- dev 8161（与 local 同一 dist）带参打开汛后检查页，五项留空点「提交」→ 页面中央深色 toast「请输入整改措施」，命中核心验收点。\n- 证据图 `C:/Users/Administrator/AppData/Local/Temp/bug7008-post-toast-20261126-111900.png` 已入会话、自检五项通过并经用户确认。\n- 实操坑：URL 中 `&` 被 Windows cmd 截断，用 `eval` + `String.fromCharCode(38)` 规避；Edge newtab 抢焦点、session 不跨命令持久，改用 `agent-browser batch` 单进程完成导航+提交+截图；8150 无监听改用 8161/8162。\n\n## 提交、回写与收尾\n- 仅提交 3 个 7008 文件：`theme.css` 红星号 + `postInspectionValidate.ts` + `postInspectionValidate.test.ts`；`index.vue`/`flood.test.ts` 已在先前 HEAD，他人 notice-preview 改动未混提；commit `3abf23b` 推送 dev，remote/local SHA 一致。\n- 禅道回写 resolved/fixed，resolvedBy=tiany、指派回 lichandan；验证图 fileID 24561 内嵌评论并挂载（zt_action files），事务复核通过已提交。\n- 收尾：TEMP 过程产物清零、后台任务全部停止、交接文档 `D:/plan/苏住房防汛C端/HANDOFF-CHAIN-bug7008-hop1-20261126-1105.md` 第 4 节标注清空与链路终止。\n- 待定：PC 端（苏住房 G 仓）同需求属另仓，不在本 chain 范围。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

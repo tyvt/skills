@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:22:05+08:00
+verdict_note: VerificationReceiptDetailTable(38)、pubReceiptVerificationDetail(23)、receiptVerifyFilter(14) 均在真实代码确认，筛选参数修复属实。
+---
 # VerificationReceiptDetailTable
 A Vue component that renders the receipt verification detail table.
 ## Behavior

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:42:17+08:00
+verdict_note: 惠山小程序存在 pdfPreview.vue、utils/index.js，vite.config.js 配 VITE_PUBLIC_PATH 与 /statics 代理，属实。
+---
 # H5根路径PDF地址打开规则
 惠山小程序中以 `/` 开头的 PDF 根路径地址在同源时可正常打开，跨域需补全域名或代理。
 

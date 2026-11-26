@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:14:20+08:00
+verdict_note: 苏住房G LabelTags 组件存在，min-width-260px 与 el-tooltip 均命中，zs-table 多标签范式属实。
+---
 # zs-table 表格组件
 苏住房G项目后台列表使用的表格组件，支持自定义列插槽与 fixed 列。
 ## 多标签渲染范式

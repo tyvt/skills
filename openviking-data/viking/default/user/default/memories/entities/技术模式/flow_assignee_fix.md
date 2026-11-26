@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:11:55+08:00
+verdict_note: 命中 assignee/formData/flowable/parseElement，产品2.0 审批人修复描述属实
+---
 # 流程定义指定人员点击空白清除修复
 产品2.0 项目修复流程定义中选中指定人员后，点击画布空白导致人员被清空的问题。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

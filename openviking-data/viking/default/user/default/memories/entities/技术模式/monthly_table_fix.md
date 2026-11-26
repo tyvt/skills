@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:52:25+08:00
+verdict_note: 苏住房G命中 monthlyReportStat, 表格minWidth留白修复属实
+---
 # 月报统计表格右侧留白修复（苏住房G）
 苏住房G 修复物业管理信息月报统计详情页表格右侧留白问题，改动位于 monthlyReportStat/detail.vue。
 

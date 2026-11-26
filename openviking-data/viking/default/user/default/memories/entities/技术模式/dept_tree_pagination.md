@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:43:18+08:00
+verdict_note: 实机核对 苏住房G 仓库确认关键符号(11/11)存在：RegionTreeLayout、complex、complexChange、cursor、extracted；文件与描述一致，记忆有效。
+---
 # 部门树平铺展示翻页缺失修复
 苏住房G 项目部门树在「平铺展示」时列表底部翻页组件被裁切，已通过布局调整修复。
 

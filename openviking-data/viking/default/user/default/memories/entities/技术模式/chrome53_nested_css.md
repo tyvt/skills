@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:50:25+08:00
+verdict_note: 泰兴小程序 pages-suggest/list.vue 含 -deep(.zs-button) 与 page-button-container，嵌套 CSS 修复对象属实。
+---
 #:deep()嵌套编译出Chrome53不支持CSS
 泰兴小程序在 `list.vue`、`create.vue`、`proposal-item-detail.vue` 中将 `:deep(.zs-button)` 嵌套于 `.page-button-container {}` 内，编译生成 Chrome53 不支持的嵌套 CSS 触发警告。
 

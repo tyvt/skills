@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:47:09+08:00
+verdict_note: guaranteeDepositAccount 相关 detail.vue/AccountDetailTable.vue 命中 resolvedAccountId 与 filterSignature，子表主键修复属实（实际在苏住房G仓）。
+---
 # 详情页子表按未就绪主键发请求查到别的数据
 房屋质量保证金账户明细页子表未按物业管理区域过滤，因路由复用残留旧 accountId、subTableMixins 提前请求、detailCallback 浅合并不覆盖，查到别的账户数据。
 ## 问题现象

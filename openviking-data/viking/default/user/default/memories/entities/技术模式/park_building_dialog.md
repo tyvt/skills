@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:26:30+08:00
+verdict_note: 园区公共收益BuildingDialogAuth.vue存在且已无rightColumns，与"统一columns配置、删除rightColumns"结论一致。
+---
 # 楼幢关联弹窗字段与样式调整
 园区公共收益项目完成「楼幢关联」弹窗（BuildingDialogAuth.vue）调整，已按设计稿与产品确认。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:08:40+08:00
+verdict_note: menuVisibility.js 含 isTruthyHiddenFlag、/redirect 剥离(-43)、flattenPhantomMenuParents(-193)、normalizeSidebarRoutes(-215)、filterHiddenRoutes，与记忆所述归一化/幽灵父级修复一致。
+---
 # 门户侧栏菜单可见性组合缺陷
 门户侧栏 hidden 菜单仍显示、切页签或开启 topNav 出现幽灵父级、首页刷新只剩箭头、顶栏一级菜单空白，是 menuVisibility 归一化、侧栏写入时机与 constantRoutes 污染叠加根因。
 
@@ -43,7 +48,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

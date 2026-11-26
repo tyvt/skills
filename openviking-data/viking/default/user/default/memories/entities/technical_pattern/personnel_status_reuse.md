@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T22:18:09+08:00
+verdict_note: 记忆称 staffManagement/toB personnelRecord 的 listCallback appends _personnelStatusCode；实机该字段全库0命中。虽 personnelStatus.js、personnel_business_status、isPersonnelCancelled 存在，但核心字段断言无法证实。
+---
 # Developer personnel status reuses personnelStatus
 In Suzhou Real Estate Monitoring V3, `personnelStatus.js` and a dictionary are reused to display personnel business status by composite state.
 
@@ -15,7 +20,6 @@ In Suzhou Real Estate Monitoring V3, `personnelStatus.js` and a dictionary are r
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：aee9a3ba-5a81-43af-bc39-5611731be2b1
-
 
 <!-- MEMORY_FIELDS
 {

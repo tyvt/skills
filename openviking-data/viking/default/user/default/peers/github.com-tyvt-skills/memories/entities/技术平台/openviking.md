@@ -37,14 +37,15 @@ OpenViking（当前版本 0.5.5，端口 1933）是本地部署的记忆服务�
 - Ollama↔OpenViking（litellm）embedding 抖动：历史 server.log 中 `OllamaException - Server disconnected` 累计 214 次，embedding 队列积压 error 并触发 circuit breaker（约 54s 重试）。
 - server 偶发崩溃（aiohttp event loop 关闭异常），依赖看门狗重启恢复。
 - `auto/hy3` 历史缺陷：抽取慢且易 502、planner 输出 JSON 常被 reasoning 污染不可解析、曾把整批记忆译成葡萄牙语（语言漂移）。
+- 2026-11-26 排查发现会话提交后抽取静默产出 0：近三天约 274 会话中 40 个 `memories_extracted.total=0`，约 25 个为已 commit 但抽取 0 条记忆的实质缺口；抽样 dsh-session-75914db7（11-25 17:34）commit_count=1、total_message_count=46、message_count=0（已归档），但 llm_token_usage 全 0，说明 commit 发生而抽取未实际产出；与 2026-11-02 记录（commit_count=1 但 memories_extracted=0、VLM/embedding token 为 0）一致，问题从 11-02 延续至今。
 
 <!-- MEMORY_FIELDS
 {
   "category": "技术平台",
   "name": "openviking",
-  "source_extraction_id": "55ec517f876a490cabd712f25c420452",
+  "source_extraction_id": "d3e7cd231bda4cc783c3c42a8a320573",
   "peer_id": "github.com-tyvt-skills",
-  "version": 3,
+  "version": 4,
   "memory_type": "entities"
 }
 -->

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:16:02+08:00
+verdict_note: 抽检2026-11-26 resolveMediaUrl 在 index.js 存在
+---
 # H5媒体资源相对路径缺前导斜杠修复
 苏住房C H5 部署在子目录时 `resolveMediaUrl` 返回相对路径导致图片 404，已通过统一加前导 `/` 修复。
 
@@ -15,7 +20,6 @@
 - 重新构建并部署 H5 后即可验证
 - 涉及文件：`src/utils/index.js`、`vite.config.ts`、`src/components/ZsImage/ZsImage.vue`
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：288c6ff2-ac59-4b55-b6ee-a561f76eeba1；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

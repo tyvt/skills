@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:10:22+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 行政区划 dictFormatter 回显改用全量区划数据
 苏住房G(zhi2-web-admin) 行政区划回显数据原按默认行政区划代码过滤，已改为使用全量区划数据并合入 develop/v2.6.2。
 

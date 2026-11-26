@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:45:11+08:00
+verdict_note: 实机核对：引用文件(8个)存在于对应项目仓；核心符号命中[housingTransferList,contractRecordReportList,queryOffTakeMonthList,queryIsResidentialContractList]，与记忆描述一致。
+---
 # Report Double main-box Full Height Blank
 Root cause: In queryIsResidentialContractList.vue, two .main-box elements both set height: calc(100vh - 65px), causing query area to fill screen with blank space.
 
@@ -20,7 +25,6 @@ Root cause: In queryIsResidentialContractList.vue, two .main-box elements both s
 - 所属项目：太仓存量房
 - 验证证据：extracted source=cursor project=太仓存量房
 - 来源会话：40ebf349-c632-4932-a588-7e64f006ba8d
-
 
 <!-- MEMORY_FIELDS
 {

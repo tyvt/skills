@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:12:33+08:00
+verdict_note: 命中 global-table-config(App.vue 引用)及 zs-table 组件族，固定列样式修复场景与现状一致。
+---
 # zs-table 固定列横向滚动内容穿透修复
 固定列横向滚动时非固定列内容透到固定列下，需给固定列 cell 显式不透明背景，且在公共表格组件层统一改。
 

@@ -1,0 +1,33 @@
+# 汛中检查上传图片手机不显示修复
+苏住房防汛C端移动查询 H5 汛中检查页上传图片在 PC 可见、手机浏览器不可见，2026-11-26 定位为 `resolveAssetUrl` 拼接测试内网域名兜底值，并改为返回根相对路径、已交接待续验证。
+
+## 问题根因
+- 现象：汛中检查页上传图片后 PC 浏览器可见、手机浏览器（外网/流量）不可见；无禅道工单；用户确认全部为 H5、无小程序端。
+- `src/utils/upload.ts:96` 的 `resolveAssetUrl` 把接口返回的站内相对路径（如 `/zhi2-pro/...`）拼到 `PROXY_TARGET`，其值取自 `VITE_API_PROXY_TARGET`，未注入时兜底为测试内网域名 `http://unlimited.c.h5.query.mobile.v2.suzhufang.shiqu.suzhou.test.zhi.com`（upload.ts:14-16）。
+- 构建产物 `dist/assets/upload.CR90LREJ.js` 证实仅注入 `VITE_API_BASE_URL: "./api"`、未注入 `VITE_API_PROXY_TARGET`，故全部上传图片被拼成测试域名；PC 内网可达、手机外网不可达（https 页面加载 http 图片还可能被 mixed-content 拦截）。
+- 三处域名不一致：`richText.ts:13` 用生产域名 `https://szfweb.szzfcjj.cn:8887`，`vite.config.ts:6` 是另一测试网关，upload.ts 用最旧测试兜底。
+- 关联历史：已批准计划 `zentao6971-hop2-media-proxy.md` 处理同一函数上一轮修复（结论"PC 同源 test 网关可加载"），未覆盖手机外网场景。
+
+## 修复方案与实施
+- 2026-11-26 用户确认：走同源相对路径（nginx 反代）并立即修复；`/zhi2-pro/...` 为根相对路径，由当前站点 origin 解析；去掉小程序分支统一处理。
+- 改动 `resolveAssetUrl`：完整 URL/blob/data 原样返回，其余一律返回以 `/` 开头的根相对路径；保留 `isServerMediaStoragePath`、`resolveServerMediaUrl` 及常量定义。
+- 反证：`richText.ts:5` 注释称"门户 H5 站点没有反代 `/zhi2-pro`"，与方案前提相反，不同站点 nginx 配置可能不同。
+- 前置门：curl 证实 H5 地址（该 test 域名）可达且 `/zhi2-pro/` 反代返回 HTTP 200，问题不在网络层。
+
+## 验证与待办
+- 计划 v2 审核通过（86 分、0 阻断项）；改前改后构建均 EXIT=0；已补 `resolveAssetUrl` 单测。
+- 单测未执行：node_modules 中 vitest 5.0.5 与 vite 不兼容（`ERR_PACKAGE_PATH_NOT_EXPORTED`），属预存损坏、非本次改动导致。
+- agent-browser 打开该域名被 `ERR_BLOCKED_BY_CLIENT` 拦截；部署面板查得本项目 local 8150（dist_root=`D:/repository/苏住房防汛C端/dist`），改用 localhost 地址续做实机验证。
+- 2026-11-26 成本越过 1.00M 触发 P0 硬交接：交接文档 `D:/plan/苏住房防汛C端/HANDOFF-CHAIN-汛中检查图片手机不显示-hop1-20261126-1732.md`，已排 hop2（新会话）续做验证与提交。
+- 代码在 dev 分支工作区未提交；另有脏文件 `project-check/records`、`start` 与本改动无关；待实机出图 + 用户确认后再提交推送。
+
+<!-- MEMORY_FIELDS
+{
+  "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited",
+  "category": "缺陷",
+  "name": "upload_img_mobile_hidden",
+  "source_extraction_id": "90ebf2aa9d2b48038cd81c1127ba3fb5",
+  "version": 1,
+  "memory_type": "entities"
+}
+-->

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:15:22+08:00
+verdict_note: 该仓存在 index.html 加载SDK、utils/sfbFaceAuth.js、utils/h5Context.js、pages/face/bdc.vue，核心文件属实。
+---
 # 苏服办人脸识别模块文件与信息源
 无锡市区小程序嵌入H5中苏服办人脸识别无独立文档，核心逻辑分布在特定文件并由SDK支持。
 

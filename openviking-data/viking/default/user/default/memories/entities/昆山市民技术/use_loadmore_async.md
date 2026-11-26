@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:11:54+08:00
+verdict_note: 昆山市民命中 useLoadMore、regenerator，async 压缩冲突修复属实。
+---
 # 昆山市民useLoadMore异步函数压缩冲突
 小程序编译后 `useLoadMore(async function(){...})` 生成的 regenerator 包装会令内部变量与外层压缩 ref 同名，运行时报 `read-only` 错误，需改普通函数并改名易冲突 ref。
 

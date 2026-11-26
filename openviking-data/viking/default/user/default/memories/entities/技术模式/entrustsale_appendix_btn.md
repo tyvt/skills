@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T16:23:45+08:00
+verdict_note: 苏州市房地产监测V3 命中 assertEntrustSaleAppendixButtons(3)、canOperateAppendix(3)、entrustSale(11)，附件按钮权限属实。
+---
 # 委托销售详情要件区按钮可点修复
 苏州市房地产监测V3 中委托销售（entrustSale）详情页在查看状态下要件区按钮不可点击的问题已修复。
 
@@ -12,7 +16,6 @@
 - 新增 `assertEntrustSaleAppendixButtons` E2E helper，并在 `entrust-sale-real-api-flow.spec.js` 中增强验证
 - 涉及文件：`presale/entrustSale/detail.vue`、`AnnexUpload/components/FileList.vue`、`e2e/presale/entrust-sale-real-api-flow.spec.js`
 - 所属项目：苏州市房地产监测V3；来源会话：80d2603f-f2d9-4f58-9273-3841d86f0ce0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:20:23+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/.npmrc 含 shamefully-hoist=true，Cursor npm 误报涉及文件属实。
+---
 # Cursor报npm任务检测无法分析package.json是IDE误报
 苏住房C小程序项目在 Cursor 中提示「npm 任务检测: 无法分析文件 .../zhi2-mobile-shimin/package.json」，实为 IDE 误报而非 monorepo 配置损坏。
 

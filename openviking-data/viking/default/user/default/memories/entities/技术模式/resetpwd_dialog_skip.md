@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:50:53+08:00
+verdict_note: VALID；isUpdatePwd/ResetPwdDialog/resetPwd 在真实代码命中。
+---
 # 强制改密弹窗刷新被跳过与isUpdatePwd门禁覆盖
 园区公共收益项目中，登录响应 isUpdatePwd:false 需强制改密，但 GetInfo 异步回写可能覆盖 store 标记导致刷新跳过弹窗。
 

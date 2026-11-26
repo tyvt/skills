@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T16:49:31+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin 源码无 toggle-row/专属 range 样式（仅 node_modules 命中），描述的布局与滑块修复无法证实。
+---
 # toggle_row与range滑块样式修复
 苏住房C(zhi2-mobile-shimin) 页面中全局 `uni-button` 样式打散 `.toggle-row` 布局、range 滑块被主题样式压成「数字1」的问题已部分修复。
 

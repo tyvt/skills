@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:16:47+08:00
+verdict_note: 大丰V0 src/commonData/tools.js 有 needAccessToken() 匹配 ZS_UReport/download 并追加 token，报表页 window.open 走该链路，与记忆一致。
+---
 # 报表导出401全局拦截解法
 在全局 window.open 拦截器的 needAccessToken 匹配表中增加 ZS_UReport/download，一处覆盖所有报表导出鉴权，避免逐个修改报表文件。
 

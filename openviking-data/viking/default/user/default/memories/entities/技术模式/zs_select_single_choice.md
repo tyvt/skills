@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:41:32+08:00
+verdict_note: 园区物管2.0 中 userDialog.vue、zs-select-dialog.vue 存在，含 single-choice 类与 zsAssign.vue 的 singleSubmit，描述属实。
+---
 # 页面级选择弹窗单选契约对齐
 维保模块页面级选人弹窗 userDialog 对齐公共 zs-select-dialog 的单选交互契约，统一选择类弹窗语义。
 

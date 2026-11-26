@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T21:41:18+08:00
+verdict_note: 全仓无 IntentionMyList.vue，记忆声称组件移入 intention/components 无法证实，判无效。
+---
 # 主包上传体积超限构建失败修复
 苏住房C 小程序因主包上传体积超限（2048KB）构建失败，已将仅单分包使用的组件移入对应分包解决。
 

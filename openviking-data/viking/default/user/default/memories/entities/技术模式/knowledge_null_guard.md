@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:19:42+08:00
+verdict_note: 修复属实：KnowledgePreviewDialog.vue 用 knowledgeData 归一化 null，detail.vue 有 previewKnowledge-null，handleQuote 存在。
+---
 # 知识预览组件未处理null致Vue警告
 园区物管2.0 工单知识预览组件因 `previewKnowledge` 初始为 null 且组件始终挂载，触发访问 `knowledge.title` 的 Vue 警告。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:07:49+08:00
+verdict_note: PermitInfoPanel.vue-8 section-form、-35 section-field--wide 含项目坐落、-41 统一社会信用代码、-84 section-field--full，三列栅格修复与记忆描述完全一致。
+---
 # 预售许可详情栅格对齐修复
 修复苏州市房地产监测V3中预售许可详情页「统一社会信用代码」因「项目坐落」占位导致的列错位问题。
 

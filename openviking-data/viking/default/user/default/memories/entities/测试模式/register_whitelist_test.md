@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T17:18:03+08:00
+verdict_note: 产品2.0 全仓无 real-api.spec.js、listAppendixSimplified；saveCompanyRegister/appendixConfig 虽在，但「新增 Step3 探测用例」无法证实，且含短信码 293858 测试数据。
+---
 # 企业注册真实接口白名单联调
 产品2.0 的 zhi2-web-admin 企业注册全流程已接入白名单真实联调，卡在 Step3 暂无附件配置。
 

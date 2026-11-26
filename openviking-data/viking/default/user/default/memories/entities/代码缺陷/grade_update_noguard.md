@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:22:33+08:00
+verdict_note: 证据不足：虽 evalLevel/bizState 字段存在于后端，但当前代码未能证明 update() 缺少 bizState 守卫这一缺陷现状，无可核对的代码锚点。
+---
 # 等级 update() 缺 bizState 守卫
 物业服务等级更新接口 update() 未校验 bizState，审核中/已备案单据仍可改五类等级/evalLevel/频次，绕过审批直接生效。
 

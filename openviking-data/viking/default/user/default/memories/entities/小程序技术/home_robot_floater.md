@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:44:40+08:00
+verdict_note: 苏住房C源码：HomeRobotFloater、clampPosition、RobotFloater、悬浮均0命中(仅memory归档出现)。所述悬浮按钮组件及其left/top修复在当前代码无实证，判无效。
+---
 # HomeRobotFloater悬浮按钮固定left仅纵向
 根因在 `HomeRobotFloater.vue` 中 `clampPosition` 与 `onTouchMove` 同时变更 `left` 和 `top` 致可拖至屏幕中间。
 

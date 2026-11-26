@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:14:10+08:00
+verdict_note: 门户 homeLayout.js 命中 resolveHomeLayoutVariant 与 bizSectionCodes，作用域结论属实。
+---
 # resolveHomeLayoutVariant 的 bizSectionCodes 作用域
 resolveHomeLayoutVariant 中 bizSectionCodes 仅用于判断是否走 B 端企业首页，不参与 broker/developer 皮肤选择。
 

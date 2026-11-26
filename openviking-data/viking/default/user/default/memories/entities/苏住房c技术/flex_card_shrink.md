@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T03:33:58+08:00
+verdict_note: community/info/index.vue-150 .link-icon flex-shrink-0、156 .item_bottom min-width-0、167 .item_address word-break-break-all，三件套与记忆完全吻合。
+---
 # flex 横向卡片长文本挤压封面图
 苏住房C 辖区小区列表 flex 横向卡片中长地址把左侧封面图挤压变形，需三件套 flex-shrink:0 + min-width:0 + word-break。
 

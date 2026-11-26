@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:21:37+08:00
+verdict_note: 苏住房C源码未见prune-component-wxss-leak.mjs/size-main-package.mjs及×1.17上传预估口径，构建脚本结论无法证实。
+---
 # 主包scss组件注入uni.scss致上传超限
 苏住房C小程序因未加scoped的scss组件把整份uni.scss注入组件wxss，导致主包上传预估超2048KB。
 

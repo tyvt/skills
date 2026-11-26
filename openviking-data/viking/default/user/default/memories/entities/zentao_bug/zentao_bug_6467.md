@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T07:33:42+08:00
+verdict_note: 惠山二期G 中 decisionRangeBuildingSelectMixins.js 存在，refreshBuildingCheckCache(169)、onListSelectionChange(303) 及6个表决页 DecisionRangeTable.vue 均在。treeDataVersion 已随记忆自述的11-16后续方案变更移除，主体改动属实。
+---
 # ZenTao Bug 6467
 禅道缺陷 6467：惠山物管表决模块选择户室时页面卡死，楼幢筛选一直加载中、点击无响应。
 

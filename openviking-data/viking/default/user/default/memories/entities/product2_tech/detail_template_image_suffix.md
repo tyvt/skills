@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:44:00+08:00
+verdict_note: 产品2.0 recordProcessStepDialog.vue 存在 stepPictureUrlList，resolveServerAssetUrl 多处使用，与改 images 类型方案一致。
+---
 # DetailTemplate type:image 后缀不匹配导致无扩展名图片无法显示
 DetailTemplate 的 type:'image' 仅在后缀匹配 jpg/jpeg/png/gif/bmp/webp/svg 时才渲染 <img>；无扩展名的内部地址被误判为附件链接，从而无法显示。
 
@@ -19,7 +24,6 @@ DetailTemplate 的 type:'image' 仅在后缀匹配 jpg/jpeg/png/gif/bmp/webp/svg
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：321b7eb6-d1b4-4f6b-865c-11661215d619
-
 
 <!-- MEMORY_FIELDS
 {

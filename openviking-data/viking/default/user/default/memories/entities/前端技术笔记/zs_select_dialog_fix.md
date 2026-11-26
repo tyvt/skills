@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:48:50+08:00
+verdict_note: 园区公共收益源码：tableTrCount命中zs-select-dialog.vue-47与zs-select-dialog-func.vue-52/308，pubBankDetailDay/index.vue-127，zs-select-dialog(374)。弹窗表格行数动态计算与doLayout修复属实。
+---
 # 选择管理账户弹窗表格高度与压缩修复
 修复园区公共收益项目「选择管理账户」弹窗（pubBankDetailDay 引用 `zs-select-dialog`）分页显示「共 8 条记录」但表格仅露 7 行、缩放仍不完整的问题。
 

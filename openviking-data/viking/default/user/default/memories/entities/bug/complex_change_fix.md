@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-26T23:11:15+08:00
+verdict_note: 苏住房G仓命中 complexChange/detail、detailMixins、resolveRecordName/recordName/complexName，名称回显修复属实；原 suspect 标记不影响本次代码证据判定
 ---
 # 旧物业管理区域变更详情名称回显修复
 苏住房G 项目 property/complexChange/detail.vue 在变更旧物业管理区域时名称显示异常，已通过新增 resolveRecordName 等方法修复。

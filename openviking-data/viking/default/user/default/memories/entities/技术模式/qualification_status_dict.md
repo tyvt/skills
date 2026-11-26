@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:44:50+08:00
+verdict_note: 实机核对 苏州市房地产监测V3 仓库确认关键符号(12/15)存在：1、certState、contentInfo、data、detail.vue；文件与描述一致，记忆有效。
+---
 # 资质详情页状态字典未加载
 资质详情页「资质状态」字段因未加载字典显示原始值1，改为tag类型绑定字典选项修复。
 

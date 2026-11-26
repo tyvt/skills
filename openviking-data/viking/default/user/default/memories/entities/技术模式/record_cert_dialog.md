@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:44:18+08:00
+verdict_note: RecordCertificateDialog.vue、companyApply.js 等4文件齐备，record-certificate-bg 背景图与 company_certificate_level 命中，A4 证书样式属实。
+---
 # 备案证书弹窗重写弃表格改背景图样式
 苏州市房地产监测V3 的 RecordCertificateDialog.vue 因设计稿要求重写为 A4 比例背景图证书样式，移除旧表格布局。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:47:17+08:00
+verdict_note: skills/dsh/token-guard/lib/index.js 等真实插件源码存在，readBudgetTokens 在包与 selftest 命中，与后置裁剪插件描述一致。
+---
 # dsh-token-guard
 DSH 后置结果裁剪插件，非预执行拦截器。
 
@@ -8,7 +13,6 @@ DSH 后置结果裁剪插件，非预执行拦截器。
 
 ## 关系
 - 与 dsh-orchestrator-gate 互补：宿主直读时 gate 先按字节拦，子 ctx 时 gate 豁免后 token-guard 按行拦
-
 
 <!-- MEMORY_FIELDS
 {

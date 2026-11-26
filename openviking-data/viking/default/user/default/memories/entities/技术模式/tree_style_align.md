@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:29:51+08:00
+verdict_note: 园区物管2.0 命中 sort-left-header(17)、node-count(17)，4个引用文件存在，左侧树样式对齐属实。
+---
 # 左侧树样式对齐设施定义页规范
 园区物管2.0 中 publicQuery/complex/index.vue 左侧树 UI 需对齐 maintenance/facilityDefinition/index.vue 的样式层规范。
 

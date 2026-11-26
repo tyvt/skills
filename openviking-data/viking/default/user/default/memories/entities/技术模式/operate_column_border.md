@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:53:28+08:00
+verdict_note: 门户 命中 zs-operate-column-cell、todo-table、element-ui.scss、HomeTodoTable，与操作列去竖线样式偏好一致。
+---
 # 操作列去竖线样式勿全局写死
 在 zs-operate-column 或 element-ui.scss 全局去除操作列左边框会误伤全站列表页竖线，应限定表格级 class。
 

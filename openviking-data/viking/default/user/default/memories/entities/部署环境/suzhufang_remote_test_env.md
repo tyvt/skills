@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:14:57+08:00
+verdict_note: 苏住房G docs/flood/common-errors.md-41 命中远程域名，std-evaluation 文档命中 develop/v2.6.2-suzhufang 分支，环境信息属实。
+---
 # 苏住房远程测试环境
 苏住房前端 zhi2-web-admin 的远程测试环境域名，与本地 nginx 8101 为相互独立的部署。
 

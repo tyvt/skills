@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:49:24+08:00
+verdict_note: 园区物管2.0 命中「其他信息」、pubAllotNotice、resourcesLeaseContractFiling、formMode，与附件图片间距修复描述一致。
+---
 # 园区物管2.0 附件图片区块间距修复
 园区物管2.0 的 benefit 详情页中「附件图片」紧贴上方表单，已通过包进统一 Headline 区块来对齐间距。
 

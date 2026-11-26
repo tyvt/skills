@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:44:11+08:00
+verdict_note: formatWanIntegerValue 在 mapOverview/dataHelpers.js、index.vue 命中，取整函数存在（记忆所写 chartOptions.js 未命中）。
+---
 # 资金余额整数显示
 园区物管2.0 的地图总览页将「资金余额」改为整数展示，与「资金收支」图表一致。
 

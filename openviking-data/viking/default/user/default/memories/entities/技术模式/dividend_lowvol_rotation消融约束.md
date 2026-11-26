@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:42:07+08:00
+verdict_note: 投资推送=fund仓库。仅scripts/有dividend_lowvol字符串(消融脚本)，记忆核心的结构约束MV_TIER_CAP/DYNAMIC_VOL/risk_screening/SOFT_RISK及select_with_industry_cap在源码均0命中；17项DLV_*开关与scoring.py实现无法证明，判无效。
+---
 # dividend_lowvol_rotation消融约束
 投资推送子策略 dividend_lowvol_rotation 有 17 项可消融开关，消融后须保留三项结构约束与核心硬筛。
 

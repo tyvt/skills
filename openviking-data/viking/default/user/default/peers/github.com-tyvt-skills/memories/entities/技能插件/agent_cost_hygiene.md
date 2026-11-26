@@ -1,9 +1,10 @@
-# agent_cost_hygiene
-Skills 仓库中存在目录但未链接到 ~/.dsh/skills 的 DSH skill，实际不生效。
+# agent_cost_hygiene（已删除，勿再当作在用 skill）
+2026-11-24 由 commit 8872b3b4 从 skills 仓库删除；历史上未链接到 ~/.dsh/skills，从未实际生效。
 
 ## 定位与状态
-- 官方描述覆盖读文件策略、截断即换、构建顺序、收口时机、vision 去重、环境预检
-- 未链接到 ~/.dsh/skills，属被拆分后遗留的旧壳，本会话无法加载
+- 官方描述曾覆盖读文件策略、截断即换、构建顺序、收口时机、vision 去重、环境预检
+- 旧壳状态已终结：磁盘/git 均无该目录；功能由 token-frugal / tool-call-hygiene / dsh-token-policy / token-guard 覆盖
+- 2026-11-26 复核：仅本报告记忆事件仍引用，不得据此判定为在用组件
 
 ## 重叠关系
 - 功能已被 token-frugal（工作流归因）、tool-call-hygiene（错误自愈）、dsh-token-policy（构建/收尾时机）、token-guard（结果裁剪）覆盖

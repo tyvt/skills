@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T05:33:42+08:00
+verdict_note: 记忆称已统一改为 getInstanceByDom 复用+保存 handler+removeEventListener+dispose。实机 benefit/dataStatistics/components 下 communityStatistics.vue-104 等4文件仍是匿名 addEventListener('resize',()=>...)，无 getInstanceByDom。描述与现状不符。
+---
 # ECharts 实例复用与 resize 监听修复
 在 zhi2-web-admin 的多个统计组件中，因重复 echarts.init 与匿名 resize 监听导致 `There is a chart instance already initialized on the dom` 告警，已统一改为复用实例并清理监听。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:19:50+08:00
+verdict_note: 产品2.0/苏住房G src 命中 collapse-container、collapse-header、border-only；move-subtable-toolbar 脚本未改动文件与记忆「执行未改动」一致，样式约定成立。
+---
 - 在 `zhi2-web-admin/src/styles/index.scss` 中，详情页 card/line 型 `zs-tabs` 的 `.tabs-content` 内对 `.collapse-container` 去除内层 border 与 border-radius
 - `.collapse-header` 设 `min-height:40px`、`padding:0`
 - `.collapse-content` 顶部 `padding-top:0`，保留 `--border-only` 模式

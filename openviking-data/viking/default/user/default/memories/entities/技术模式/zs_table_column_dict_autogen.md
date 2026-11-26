@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:44:48+08:00
+verdict_note: zs-table-column.vue 及驼峰转下划线逻辑在产品2.0命中。
+---
 # 产品2.0 zs-table-column 字典类型自动推导
 产品2.0 中 `zs-table-column` 组件在 `type="dict"` 且未指定字典类型时，会把 `prop` 从驼峰转下划线自动推导为字典类型名。
 

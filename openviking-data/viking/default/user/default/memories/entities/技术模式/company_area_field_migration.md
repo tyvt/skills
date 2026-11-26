@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:16:05+08:00
+verdict_note: 字段迁移属实：companyCancel/detail.vue 引入并调用 normalizeCompanyBasicForm，companyCancel.js 注释注明用 administrativeArea 不再用 provinceCityArea。
+---
 # 企业备案详情行政区域字段迁移
 苏州市房地产监测V3 按 /company/companyRecord/detail 接口变更，将前端行政区域字段从 provinceCityArea 迁移为 administrativeArea。
 

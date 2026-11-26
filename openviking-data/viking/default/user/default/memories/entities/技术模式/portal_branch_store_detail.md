@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:45:34+08:00
+verdict_note: 实机核对 门户 仓库确认关键符号(17/19)存在：BrokerPages、admin、broker、brokers、cursor；文件与描述一致，记忆有效。
+---
 # 分店详情页规范与审查结论
 门户 publicPortal 分店（store-detail）详情页已对照 vue-reviewer 审查结论核对，当前无需再改代码。
 
@@ -13,7 +18,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T09:41:53+08:00
+verdict_note: 惠山二期H5 analytics.js-4 确认 POST /appAnalytics/track/events/batch 且 noReject-true；App.vue-5/11/29 调 initTrackSession/flushTrack；utils/track/{client,context}.js 队列实现存在，C端批量埋点属实。
+---
 # C端批量埋点上报功能
 惠山二期H5 已完成 C 端批量埋点接入，由 `src/utils/track/` 队列与 `src/api/analytics.js` 接口共同实现。
 
@@ -21,7 +25,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=惠山二期H5
 - 来源会话ID：d17cb678-ebbf-4f71-be88-1e5cc9646c10；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

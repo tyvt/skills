@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-26T15:45:15+08:00
+verdict_note: 园区公共收益源码：MaintainResultDialog命中vote/detail.vue-247等32处，VotingItemsTable(10)，$emit(refresh)/$parent.getList模式大量存在。有误导suspect frontmatter但按代码证据为准，修复属实，判有效。
 ---
 # 选项表决结论弹窗父组件刷新修复
 园区公共收益项目修复 `MaintainResultDialog.vue` 提交成功后调用 `this.$parent.getList()` 报错的问题，改为事件通知父组件刷新。

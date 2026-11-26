@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:19:57+08:00
+verdict_note: 同族仓 苏州G/家园 etc. 命中 allow-create 与 freezeReason 相关代码；账户冻结字段属实（onFreezeReasonSelect 具体函数名已迭代）。
+---
 # 冻结原因手动输入下拉多出选项修复
 苏住房G 项目修复 AccountFreezeFields 组件因 allow-create 导致历史手动输入原因变为下拉选项的问题。
 

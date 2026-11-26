@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:14:32+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 后端响应混用PascalCase致交易项目不显示
 维修资金交易详情因后端响应混用PascalCase且storage传参不稳定，需忽略大小写兼容并优先内存缓存。
 

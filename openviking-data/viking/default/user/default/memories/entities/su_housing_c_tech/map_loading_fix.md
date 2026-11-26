@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:42:50+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[getDetail,showLoading,onUnload]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # 地图找房页面加载中交互
 苏住房C小程序在地图找房页面新增加载中交互，避免连续请求时loading提前消失。
 

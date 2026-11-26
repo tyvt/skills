@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:13:07+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 详情页复制须遵detailMixins删query
 苏州市房地产监测V3 中 template/detail.vue 复制与路由变更集中在 copyContract、getForm 与 addCallback，遵循 detailMixins + buildDetailNavigation 模式。
 

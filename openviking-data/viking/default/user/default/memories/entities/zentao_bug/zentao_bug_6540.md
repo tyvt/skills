@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T14:08:14+08:00
+verdict_note: 记忆称登录页改为 window.location.replace('/') 共4处、api/index.js 401 跳 '/#/login'；现状已重构为 appBase.js 的 redirectToAppRoot()/redirectToLogin()（getAppBasePath），api/index.js 仅留 redirectToLogin() 调用，源码无字面 '/#/login' 或 login 页 replace('/')。描述与现状不符，判无效。
+---
 # 禅道 Bug 6540
 苏住房G（zhi2-web-admin）物业自查记录详情页图片破图，2026-11-12 完成根因定位与代码修复，禅道回写为已解决（resolved by tiany）。
 

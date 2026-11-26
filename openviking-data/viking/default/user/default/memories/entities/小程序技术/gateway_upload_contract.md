@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:16:58+08:00
+verdict_note: 苏住房C 有 api/file.js、httpInstance.js、ImageUploader/ZsUploader，编译产物含 szffluzm-wjsc 上传契约；当前无 gateway.js 但上传链路契约属实。
+---
 # 苏住房C市民端网关文件上传契约
 苏住房C市民端所有上传走苏服办网关专用上传接口，二进制multipart独立字段+精简header，禁止base64塞进biz_content。
 ## 契约要点

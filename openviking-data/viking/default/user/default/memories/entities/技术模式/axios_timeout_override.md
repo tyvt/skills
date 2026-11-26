@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:18:02+08:00
+verdict_note: 产品2.0 spFeeBill/components/enums.js 有 IMPORT_REQUEST_TIMEOUT=5*60*1000，import.vue/importUploadDialog.vue 请求带 timeout，单接口超时覆盖属实。
+---
 # 单接口超时覆盖套路
 在产品2.0中，针对个别慢接口使用 axios 请求级 timeout 配合 enums 常量覆盖全局100秒默认超时，避免调大全局超时失去保护。
 

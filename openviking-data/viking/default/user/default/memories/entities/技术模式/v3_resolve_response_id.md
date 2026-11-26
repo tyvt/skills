@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T08:34:00+08:00
+verdict_note: 苏州市房地产监测V3 中 ruoyi.js-148 定义 resolveResponseId，main.js-7/144 挂载原型，detailMixins.js-136 addCallback 使用，大量 detail.vue 调用。记忆所述公共函数 + 全局替换与代码一致。
+---
 # 全局响应ID解析修复
 苏州市房地产监测V3 新增 `resolveResponseId` 公共函数并全局排查替换，统一处理响应ID解析以防跳转到 `/null`。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:51:05+08:00
+verdict_note: VALID；lease-personnel-real-api-flow/PLAYWRIGHT_LEASE_COMPANY_USERNAME/auth-helpers 在苏州V3真实代码命中。
+---
 # 租赁从业人员 E2E 真实接口流程
 苏州市房地产监测V3 的 zhi2-web-admin 已补充租赁从业人员端到端真实接口测试。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:20:35+08:00
+verdict_note: 产品2.0/榆林G guaranteeDepositAccount/index.vue 实机含业务账号且无 width-180，列宽修复属实。
+---
 # zs-table-column宽度计算修复
 产品2.0 的 zhi2-web-admin 中 zs-table-column 仅对未写 width 的列按内容计算宽度，修复业务账号列省略号问题。
 

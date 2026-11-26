@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:18:56+08:00
+verdict_note: 属实：InformationPush/detail.vue 与 changeDetail.vue 分别声明 name-InformationPushDetail / InformationPushChangeDetail，与重命名方案一致。
+---
 # 缺少字段和组件名称不正确导致 Vue warn
 在 Suzhou Real Estate Monitoring V3 项目中，`detail.vue` 和 `changeDetail.vue` 未声明主键和字段，并且组件名称不兼容，触发了 Vue warn。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:47:55+08:00
+verdict_note: privacy_tree 确认存在 nacos-taicang-dev 私密槽，含 base_url/password/username，Nacos 凭据存私有槽属实。
+---
 # OpenViking 私有凭据槽
 OpenViking 提供的私有凭据存储槽，用于持久保存敏感凭据，不写入代码仓或普通记忆。
 

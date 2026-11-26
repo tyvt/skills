@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:11:04+08:00
+verdict_note: 苏州V3 命中 ShareholderChangeSection.vue 与 DeveloperBasicInfoDetail.vue，股东信息表弹性列修复属实。
+---
 # 股东信息表单列弹性致满屏空白
 苏州市房地产监测V3 的 ShareholderChangeSection 股东信息表仅「股东名称」列弹性，满屏时剩余空间全堆该列形成空白，改为多列弹性均摊修复。
 

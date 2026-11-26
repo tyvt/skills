@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T03:32:47+08:00
+verdict_note: ZsTencentMap 组件确在 @/components/ZsTencentMap/index.vue，main.js-28 有 import.meta.glob 全局注册，对照文件 venueDialog.vue 存在；技术核心属实。目标两文件未在当前源码命中(扫描受 invalid-encoding 干扰)。
+---
 # ZsTencentMap组件错误本地引用修复
 产品2.0的ParcelDialog.vue与BaseProjectForm.vue因错误本地引用ZsTencentMap组件路径导致Internal server error，已修复。
 

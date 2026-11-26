@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T17:23:41+08:00
+verdict_note: 苏住房G/zhi2-web-admin/.../statisticsMap/index.vue-94-95/485 命中 areaLayerLoadSeq、markListLayerLevel、processMapZoomChange，与「请求序号守卫+防抖」一致。
+---
 # 共管小区地图缩放层级竞态修复（苏住房G）
 苏住房G 项目共管小区地图（benefit/statisticsMap）缩放层级竞态修复，避免旧请求覆盖新层级数据与气泡残留。
 
@@ -9,7 +13,6 @@
 ## 项目归属
 - 所属项目：苏住房G（zhi2-web-admin）
 - 验证：extracted source=cursor project=苏住房G；来源会话ID 08185609-5b39-49e3-a32e-abce2cd09d68
-
 
 <!-- MEMORY_FIELDS
 {

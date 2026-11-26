@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:14:02+08:00
+verdict_note: 产品2.0 命中 spFeeBill，导入5分钟超时定制属实。
+---
 # spFeeBill/import custom 5-minute timeout
 The global default 100-second timeout cannot satisfy the long-running /property/spFeeBill/import requirement, so the timeout must be overridden per request.
 
@@ -19,7 +24,6 @@ The global default 100-second timeout cannot satisfy the long-running /property/
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：f95fd685-fb92-457c-98a8-0d5d19ac9f6f
-
 
 <!-- MEMORY_FIELDS
 {

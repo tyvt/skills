@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:49:53+08:00
+verdict_note: VALID；RentalDetailDialog/empty.svg/headPortrait 在门户真实代码命中。
+---
 # 住房租赁从业人员证件照缺省图
 住房租赁从业人员信息公示「基本信息」弹窗补齐右上角证件照区域，无照片时显示项目内缺省图。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

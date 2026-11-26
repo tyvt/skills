@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:13:17+08:00
+verdict_note: 苏住房C 命中 TypeChoose_Suzhufang 与 page-bg、page-wrapper，WXSS -not() 伪类替换修复属实。
+---
 # WXSS不支持:not()伪类选择器修复
 苏住房C微信小程序因在WXSS中使用`:not()`伪类选择器导致编译报错，已替换为显式类名选择器修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:42:43+08:00
+verdict_note: 园区物管2.0 zs-table.vue 与 index.scss 存在，list-card 下有『数据不足一页随内容收缩』注释，策略一致。
+---
 # 列表页表格高度跟随内容约定
 园区物管2.0 后台列表页表格高度随内容收缩，取消 .list-card 自动撑满，禁止业务页各自覆盖。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

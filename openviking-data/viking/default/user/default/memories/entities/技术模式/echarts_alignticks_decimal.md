@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:48:02+08:00
+verdict_note: 产品2.0/园区物管2.0 fundPanorama 含 renderFundTrendMixed，bundle 含 alignTicks、toFixed(2)，双 Y 轴修复属实。
+---
 # ECharts 双 Y 轴 alignTicks 无限小数刻度
 园区物管2.0 中双 Y 轴混合图（左轴份数、右轴万元）开启 alignTicks 后右轴出现 2.6666666666666665 这类无限小数刻度。
 

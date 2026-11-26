@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T21:09:29+08:00
+verdict_note: 记忆核心标识 H5_EXTERNAL_URL_STORAGE_KEY/resolveExternalWebViewUrlFromQuery/buildExternalWebViewSrc/from=storage 在小程序仓全部0命中，仅页面壳文件在，描述与现状不符
+---
 # 外链H5长URL用storage中转再开web-view
 灵犀投票等外链 query 很长，直接 navigateTo?url= 易超长或编码丢失，改用 storage 中转。
 

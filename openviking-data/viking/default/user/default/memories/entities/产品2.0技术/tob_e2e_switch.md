@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T02:42:57+08:00
+verdict_note: 声称用 e2e/.env.e2e 的 PLAYWRIGHT_LOGIN_TYPE 切换登录类型并「4 passed/5 skipped」，但全仓真实代码无 PLAYWRIGHT_LOGIN_TYPE（仅 memory-archive），产品2.0 亦无对应 .env.e2e，无法证明有效。
+---
 # ToB 一套 E2E 用登录类型切管理端/企业端
 同一份 ToB e2e 用例通过 e2e/.env.e2e 的 PLAYWRIGHT_LOGIN_TYPE 切换管理端与企业管理端，无法两端执行的用例需 test.skip 并单列跳过原因。
 
@@ -11,7 +16,7 @@
 - 实测管理端模式结果 4 passed / 5 skipped（21.6s）
 
 ## 验证与归属
-- 来源会话 f5a65df2：模式由 PLAYWRIGHT_LOGIN_TYPE 控制，account 为管理端（默认 zsbase）、company 为企业端全流程
+- 来源会话 f5a65df2：模式由 PLAYWRIGHT_LOGIN_TYPE 控制，account 为管理端（默认 {{ov_privacy:ambiguous}}）、company 为企业端全流程
 - 给出 01~09 用例通过/跳过矩阵与「4 passed, 5 skipped（21.6s）」
 - 涉及文件：e2e/.env.e2e、e2e/fixtures；所属项目：产品2.0；代码基线：5169909
 

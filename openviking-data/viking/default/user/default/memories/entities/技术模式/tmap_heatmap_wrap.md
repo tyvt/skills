@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:16:56+08:00
+verdict_note: 命中 TencentHeatMap、mapLoader，腾讯地图热力封装组件存在且场景一致。
+---
 # 腾讯地图点热力封装套路
 在数据看板中封装可复用的腾讯地图点热力组件，优先使用可视化热力图层并在加载失败时优雅降级而非白屏。
 

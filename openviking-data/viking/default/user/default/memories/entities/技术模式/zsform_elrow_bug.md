@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:08:29+08:00
+verdict_note: 实机 AccountRefundTable.vue-38-54 为 form-box > el-row.detail-from-container > zs-form > el-col(50%)，el-row 确实置于 zs-form 外部（detail-from-container 为 el-row 自身的 class），与记忆修复方案一致。
+---
 # 弹窗表单 el-row 须置于 zs-form 外部
 在 zs-dialog 弹窗两列表单中，将 el-row 放在 zs-form 内部会导致输入框宽度塌陷、placeholder 显示不全。
 

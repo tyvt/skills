@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:39:10+08:00
+verdict_note: collapse-container 与 RegionTreeLayout 在园区公共收益命中，间隔元素与-deep覆盖修复描述与代码一致。
+---
 # 样式覆盖和间隔元素导致间距丢失
 在 Park Public Benefit (zhi2-web-admin) 项目中，pubHouse/detail.vue 中的 :deep 规则和 RegionTreeLayout.vue 中的间隔元素导致全局列表页面中块之间的间距丢失。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:52:06+08:00
+verdict_note: 产品2.0 propertyContract/components/detail.vue 含 initComplexFromRoute，配合 currentProjectId/complexId，complexId 注入口径属实。
+---
 # B端项目上下文complexId注入口径
 物业合同等B端业务列表需带全局当前项目complexId，详情新增态仅在缺值时从store兜底，防止跨项目数据混查。
 

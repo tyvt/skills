@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:39:12+08:00
+verdict_note: common.js getFiles 实测 {noReject-true}(90行)、注释「业务数据在res.data.data」(93)、body=res.data 再取 body.data(94-95)，与noReject取res.data.data描述一致。
+---
 # getFiles在noReject模式需读res.data.data取附件数组
 苏住房C小程序附件列表整块空白，根因为getFiles在noReject模式下响应被包两层，附件数组实际位于res.data.data。
 

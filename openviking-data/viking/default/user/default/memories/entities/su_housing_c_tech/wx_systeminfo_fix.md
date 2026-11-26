@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T01:51:50+08:00
+verdict_note: 苏住房C 实机未见 src/polyfills/mp-weixin-system-info.js（polyfill=0 命中）；所述 polyfill 重定向修复无法在代码证实。
+---
 # 苏住房C系统信息API弃用告警修复
 微信小程序基础库对 wx.getSystemInfoSync 发出弃用警告，已通过业务代码改造与 polyfill 重定向修复。
 

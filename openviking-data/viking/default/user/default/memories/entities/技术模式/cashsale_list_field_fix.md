@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:20:50+08:00
+verdict_note: 属实：cashsaleListMixin.js 含 sourcePermitNo 字段与“预售转现售申请编号”文案，列 prop/formatter 回退改造成立。
+---
 # 修复预售转现售列表字段显示
 苏州市房地产监测V3 中修复了预售转现售列表的列标题文案与预售许可证编号字段映射。
 

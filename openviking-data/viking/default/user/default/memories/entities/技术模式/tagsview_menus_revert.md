@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:17:49+08:00
+verdict_note: 命中 TagsView childrenMenus，菜单还原描述属实（证据偏弱但符号存在）
+---
 # TagsView childrenMenus 改动撤回与菜单路径诊断
 Vue3 迁移中，撤回 TagsView 强算 childrenMenus 的改动并诊断 complexChange 菜单空白问题。
 ## 改动撤回

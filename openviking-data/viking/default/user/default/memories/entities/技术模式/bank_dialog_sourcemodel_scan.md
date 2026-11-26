@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:51:23+08:00
+verdict_note: 苏住房G 命中 isPubRegulatoryAccount、sourceModel、workBank、queryStartBank，与选银行弹窗多模块区分描述一致。
+---
 # 选开户银行弹窗多模块复用靠sourceModel+业务标记区分
 苏住房G同一套选开户银行弹窗被多模块复用，业务域由 sourceModel + 业务标记参数决定，新模块接入须全量回扫消费方。
 

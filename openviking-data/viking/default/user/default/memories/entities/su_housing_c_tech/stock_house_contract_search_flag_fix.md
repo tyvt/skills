@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T01:13:38+08:00
+verdict_note: 苏住房C 命中 stockHouseContract、searchFlag、houseNewContract，空结果区域修复属实。
+---
 # 存量房网签合同查询空结果区域缺失修复
 苏住房C小程序（zhi2-mobile-shimin）中stockHouseContract.vue因缺少错误处理导致接口报错时无查询结果区域，已参照houseNewContract.vue修复。
 
@@ -21,7 +25,6 @@
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话ID：e5a11fd1-77fb-4778-8bf6-a4cb438ff07d
 - 代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

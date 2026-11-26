@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:40:41+08:00
+verdict_note: 实机核对 昆山G 仓库确认关键符号(50/61)存在：Cause、Homeowners、Kunshan、MaintenanceProject、Missing；文件与描述一致，记忆有效。
+---
 # Tab Switch Homeowners Info Bug
 Kunshan G project bug where switching Tabs rebuilds the page from sessionStorage without re-fetching homeowners committee info, breaking dropdown validation.
 

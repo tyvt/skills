@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:12:08+08:00
+verdict_note: 苏住房C 命中 zhi2-mobile-shimin 仓，子模块修复后合并并父仓同步引用的工作流与现状一致。
+---
 - After fixing submodule zhi2-mobile-shimin issues, merge submodule commits into main-v2.1 branch
 - Parent repo must sync-commit the updated submodule reference pointer to keep parent/child repo versions consistent
 - Source session: 03f3446f-c658-4574-9c4c-b7fce4195e30
@@ -6,7 +11,6 @@
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：03f3446f-c658-4574-9c4c-b7fce4195e30
-
 
 <!-- MEMORY_FIELDS
 {

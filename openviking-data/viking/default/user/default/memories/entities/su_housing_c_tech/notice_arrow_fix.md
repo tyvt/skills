@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:16:44+08:00
+verdict_note: 命中 publicNotice、ListIndex、ListContractIndex，公示列表箭头修复属实
+---
 # 公示列表页箭头显示修复
 苏住房C 小程序 `pages_main/publicNotice` 列表卡片箭头错位问题已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:40:54+08:00
+verdict_note: 实机核对：引用文件(4个)存在于对应项目仓；核心符号命中[legacyText,normalizePlanRows,parseFlexibleDate,parseCompletionPlanLegacy,permitConstants]，与记忆描述一致。
+---
 # 预售历史文本解析回填至输入框
 预售方案历史文本经逆向解析函数回填至结构化输入框以消除橙色 legacyText 展示。
 

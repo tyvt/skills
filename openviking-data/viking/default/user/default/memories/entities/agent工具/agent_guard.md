@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:45:55+08:00
+verdict_note: 工作流/偏好类记忆，无单一代码修复点；所述文件(exception commit/status 约定)与 AGENTS.md 及仓库现状一致，未发现幻觉或隐私违规。
+---
 # agent-guard
 agent-guard 是 agent 调用调度与别名映射的守护工具。
 

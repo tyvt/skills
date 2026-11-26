@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T22:20:30+08:00
+verdict_note: 记忆称计划在 D-/repository/数据湖/.plan/2026-11-14-panel-sync.md 且 commit 846e8ca1；实机该仓库目录不存在（数据在 D-/plan/数据湖），plan 文件与 commit 均查无。路径与现状不符。
+---
 # 面板同步实施计划（2026-11-14-panel-sync.md）
 数据湖个人持仓面板配置与数据库同步的修订实施计划，2026-11-14 送审未获批前仍为草稿。
 

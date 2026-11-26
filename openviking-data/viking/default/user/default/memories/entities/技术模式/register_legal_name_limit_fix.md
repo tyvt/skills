@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:47:23+08:00
+verdict_note: REGISTER_MAX_LENGTH_FIELDS.step2/register-helpers.js 在苏州市房地产监测V3 e2e 命中。
+---
 # 注册法人姓名长度限制修复
 苏州市房地产监测V3 开发企业注册中法人姓名输入框长度限制与校验修复，避免超长触发后端 400 错误。
 

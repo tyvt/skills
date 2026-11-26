@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:38:48+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[HaveBgItem,Project_Suzhufang,HomeNavItem,Community_Suzhufang,img-class]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # MenuImage组件尺寸修复
 苏住房C(zhi2-mobile-shimin)中小程序端多个tab页因MenuImage组件样式隔离导致图标尺寸异常，已通过集中管理尺寸修复。
 

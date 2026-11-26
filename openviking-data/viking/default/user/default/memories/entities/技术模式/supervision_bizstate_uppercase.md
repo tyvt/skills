@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:43:51+08:00
+verdict_note: 产品2.0 common.js 含 saveBizStateOption，supervision 目录大量 biz_state 用法，大写字典修复方向属实。
+---
 # 监管模块BIZ_STATE大写字典修复
 预售资金银行监管模块因业务状态字典类型误用大写`BIZ_STATE`导致状态列渲染为原始码值，已统一改为小写`biz_state`。
 

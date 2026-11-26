@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:13:56+08:00
+verdict_note: 苏住房防汛C端 src/styles/theme.css-220-221 有 detail-row-label/value，overflow-wrap-anywhere 命中，标签换行修复属实。
+---
 # 汛中巡检工单详情标签省略号修复
 修复苏住房防汛C端 H5 汛中巡检工单详情页左侧标签被单行省略、右侧空白的问题。
 
@@ -15,7 +20,8 @@
 - 独立 worktree 开发，合并进 dev，提交 `f006228`，已 `git push origin dev`
 - 本地 `bun run build:h5`，产物在 `dist/`
 - 8095 站点 root 指向该目录后强刷 `http://127.0.0.1:8095` 打开「汛中巡检工单详情」验证
-- 若仍像旧版，nginx UI 将该站点 root 指到 `D:epository\苏住房防汛C端\dist`
+- 若仍像旧版，nginx UI 将该站点 root 指到 `D:
+epository\苏住房防汛C端\dist`
 
 ## 项目归属
 - 所属项目：苏住房防汛C端 H5

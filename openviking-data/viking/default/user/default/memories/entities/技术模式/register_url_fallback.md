@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T07:34:43+08:00
+verdict_note: 门户 app.js-139 DEFAULT_REGISTER_URL='http-//58.210.252.230-9002'，normalizePlatformConfig(115) 及 registerUrl 兜底(125-129) 均在，login.vue 存在。核心修复属实。
+---
 # 机构注册跳转未配置回退默认地址
 平台配置 registerUrl 缺失或接口失败时，登录页机构注册跳转无可用地址。
 ## 问题根因

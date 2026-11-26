@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:23:15+08:00
+verdict_note: 园区物管2.0 命中 areaDrillStack(11)、getAreaQueryParams(11)、getRegionCode(16)、overviewLayerLevel(11)、platformRegionCode(23)，维度下钻属实。
+---
 # 统计地图街道级接口参数区分滚动与下钻
 园区物管2.0 statisticsMap 的 `getAreaQueryParams` 需区分滚轮放大与点击下钻的街道级取数维度。
 

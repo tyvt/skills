@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:10:30+08:00
+verdict_note: zs-table-subtotal-divider 在多个项目 zs-table.vue 命中，operatingAssets 命中，小计行分隔线修复属实。
+---
 # 小计行分隔线层级修复
 园区物管2.0 中 zs-table 小计行底部分隔线被固定操作列白色背景遮挡。
 

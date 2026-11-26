@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:20:38+08:00
+verdict_note: 产品2.0/zhi2-web-admin git log 确认 0fedafd04（fix 分支合并）、37e25da4d 均存在，与远程 develop 推进后重合并的 SHA 与 fix 分支合并模式吻合。
+---
 # 远程develop推送后重合并模式
 当并行任务在 fetch 之后推进了远程 origin/develop，本地基于旧 develop 的合并提交无法 FF 推送时，需基于最新 origin/develop 重新合并特性分支再推送。
 

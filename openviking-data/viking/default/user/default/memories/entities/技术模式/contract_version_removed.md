@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:15:25+08:00
+verdict_note: 命中 suzhou2016/SzToolbar、templateVersion、SUZHOU_2016，合同版本移除描述属实
+---
 # 合同范本标签移除
 苏州市房地产监测V3 中 2016 版合同 UI 已移除工具栏「范本：SUZHOU_2016」标识，改动 2 个文件共 -7 行。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:50:50+08:00
+verdict_note: 苏州市房地产监测V3 命中 resolveChangeId、coerceRequestBodyIds、fetchLastChangeId；coerceIdFieldValue 收口于全局 jsonParseSafeIds.js，描述属实。
+---
 # 接口ID强转收口全局去冗余
 苏州市房地产监测V3 的 zhi2-web-admin 将多处重复 ID 处理逻辑收口到全局工具，消除冗余。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:38:48+08:00
+verdict_note: ratingRule/detail-template/assessmentPlan 在园区物管2.0命中，详情页同行布局描述有代码支撑。
+---
 # 信用评级规则详情名称与年度同行显示修复
 园区物管2.0 中信用评级规则详情页将名称与年度字段调整为同一行显示，已从 develop/v2.6.1 提交并逐级合并。
 

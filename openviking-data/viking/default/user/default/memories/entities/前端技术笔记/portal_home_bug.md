@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:45:17+08:00
+verdict_note: 苏州市房地产监测V3 Navbar.vue 含 sys.portal.index.url、redirectToPortal、pushDefaultIndex，且有 navbar-back-home e2e。
+---
 # 返回首页门户跳转缺陷（bug#5983）
 zhi2-web-admin（苏州市房地产监测V3）的「返回首页」按钮应跳转至参数配置 sys.portal.index.url 指向的已登录门户首页；曾因回归失效，点击落回本系统待办（/todo）。
 

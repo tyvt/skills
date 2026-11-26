@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:47:12+08:00
+verdict_note: 产品2.0 companyInfo.vue命中 getDicts(document_type), 证件字典值属实
+---
 # 身份证格式校验证件类型字典值必须为 document_type 的 '01'
 苏住房G 后台企业注册备案的法人证件类型校验必须统一用 document_type 字典「居民身份证」值 '01'，不能写 30250001 这类长码否则校验永不通过。
 

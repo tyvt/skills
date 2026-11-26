@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:47:30+08:00
+verdict_note: 实机核对 产品2.0 仓库确认关键符号(8/11)存在：ElButton、Element、ZsButton、cancel、components；文件与描述一致，记忆有效。
+---
 # ZsButton type=cancel 兼容映射
 Element Plus 的 ElButton 不支持 type="cancel"，ZsButton 原样透传会触发 Vue warn，需在封装层映射。
 ## 问题根因

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:52:49+08:00
+verdict_note: 苏州市房地产监测V3 命中 AgencyPersonnelList、agencyPersonnel、AgencyBranchList，与经纪机构列表主组件描述一致。
+---
 # 经纪机构管理(jjjg)列表筛选主组件为AgencyPersonnel
 苏州市房地产监测V3 中经纪机构管理（/jjjg）菜单的 filePath 为 institution/agencyPersonnel/index，列表与筛选主逻辑由 AgencyPersonnelList.vue 承载。
 

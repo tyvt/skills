@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:46:12+08:00
+verdict_note: 实机核对 产品2.0 仓库确认关键符号(17/18)存在：before、benefit、border、bottom、complex；文件与描述一致，记忆有效。
+---
 # 表格容器底部间距样式修复
 移除 zs-table-container--bottom-spacing 的 padding-bottom:12px，避免横向滚动条下方多余空白。
 
@@ -15,7 +20,6 @@
 - 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：benefit/pubHouse/index.vue、pubHouseTable.vue、property/complex/components/regionTree.vue
 - 来源会话：c719772b-6ff9-441f-b247-7d29dfa7d3e2；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

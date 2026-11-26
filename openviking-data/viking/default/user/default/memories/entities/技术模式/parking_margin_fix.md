@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:13:44+08:00
+verdict_note: 产品2.0/园区物管2.0 operatingAssets.vue 实机含 parking-total-card 与 operating-assets__stats，边距修复属实。
+---
 # 统计地图停车泊位区块边距修复
 统计地图抽屉停车泊位 Tab 汇总卡因缺少统一内边距，与其他 Tab 间距不一致，已修复。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

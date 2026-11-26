@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:48:31+08:00
+verdict_note: nodePanel/task.vue 在苏住房G存在；记忆自述为归纳性模式，方法论类无幻觉。
+---
 # 苏住房G 流程节点区块预览渲染守卫
 苏住房G 流程定义配置弹窗中按 taskId 取活动列表的区块须在预览态加显式业务谓词，避免空区块与异常请求。
 ## 问题现象
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:45:59+08:00
+verdict_note: selectTJgBankBranchList/pubRegulatoryAccount 在产品2.0命中。
+---
 # 银行授权弹窗未选银行搜索拦截修复
 苏住房G 项目 zs-select-dialog-func.vue 修复太仓区无授权银行时右侧网点列表误查全部的问题。
 

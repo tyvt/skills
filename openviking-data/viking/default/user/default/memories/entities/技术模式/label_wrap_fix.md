@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:42:44+08:00
+verdict_note: 苏州V3 detail-template.vue 命中 LABEL_HORIZONTAL_PADDING 与 nowrap，标签换行修复属实。
+---
 # 标签内边距导致文字换行修复
 苏州市房地产监测V3 的 detail-template.vue 修复了标签 padding 改为 16px 后文字换行的问题。
 

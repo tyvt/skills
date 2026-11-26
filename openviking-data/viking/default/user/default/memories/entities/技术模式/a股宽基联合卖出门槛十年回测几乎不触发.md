@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T20:15:59+08:00
+verdict_note: 投资推送项目目录在 D-/repository 不存在，config.py/cn_broad_signal.py 等回测代码无法核对，无法证明有效。
+---
 # A股宽基「PE分位+股债利差分位」联合卖出门槛几乎不触发
 A股宽基采用 PE 分位与股债利差分位联合卖出门槛，在十年回测中卖出极少，诊断时须同时看卖出/买入比。
 

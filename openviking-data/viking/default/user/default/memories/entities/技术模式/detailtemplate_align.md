@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:18:13+08:00
+verdict_note: 产品2.0 detail-template.vue 行内单元格为 align-items- stretch/flex，字段对齐规范与组件改动属实。
+---
 # DetailTemplate 详情页字段对齐规范
 详情页 DetailTemplate 只读态字段行须垂直居中、横向左对齐，任何字段禁止单独 align:'center'。
 

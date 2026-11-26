@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:26:50+08:00
+verdict_note: 真实代码命中 GlobalWorkerOptions(8)、workerSrc(8)、createObjectURL(580)、revokeObjectURL(418)、pdfPreview(11)，Blob URL 方案属实。
+---
 # PDF预览Worker的Blob URL加载方案
 惠山小程序`pdfPreview.vue`通过`?raw`读取pdfjs worker源码并包装为Blob URL，规避服务器MIME类型问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T02:18:31+08:00
+verdict_note: 核心引用Home_Jiayuanqu.vue、pages_main子包在苏住房C代码中均不存在，仅命中通用NoticeList与pages.json；记忆描述的子包跨引用修复无法用代码证据证实。
+---
 # 子包组件无法在子包之间引用
 在小程序 SuzhouFangC (zhi2-mobile-shimin) 中，子包组件不能在不同的子包之间被引用；Home_Jiayuanqu（子包 pages_tab）引用了子包 pages_main 中的 NoticeList 导致错误，需要将组件移动到主包并统一导入路径。
 

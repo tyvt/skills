@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T21:41:40+08:00
+verdict_note: i淮安H5 FileList/Type2.vue、contracts.vue 均无 scrollTop/translate/scale，PDF 缩放核心符号无法证实。
+---
 # 多页PDF缩放scrollTop问题
 i淮安H5 多页 PDF 缩放因未计入 scrollTop 以文档顶部为基准导致画面跳页。
 

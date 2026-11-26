@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:48:35+08:00
+verdict_note: 苏州市房地产监测V3 permit/components/detail.vue 命中 batchNo，保存参数补批次字段属实。
+---
 # detail.vue 保存时未发送 batchNo 字段
 
 在项目 苏州市房地产监测V3 中，`src/views/presale/permit/components/detail.vue` 在 `getForm()` 中组装参数时缺少 `batchNo`，该字段仅在 `handleProjectChange` 中计算用于显示。

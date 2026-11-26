@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T22:16:42+08:00
+verdict_note: 记忆称 LoginByUidResponse.data 为 string 型 accessToken 且 setToken(res.data)；实机 security.ts 中 data 为 LoginByUidData{token-string,houseCode?}，login.vue 用 res.data?.token 再 setToken(token)。类型/字段名/用法均不符。
+---
 # 登录接口 data 为 accessToken 字符串
 `LoginByUidResponse` 的 `data` 字段定义为 `string` 类型的 `accessToken`，江阴C端登录流程据此写入令牌。
 

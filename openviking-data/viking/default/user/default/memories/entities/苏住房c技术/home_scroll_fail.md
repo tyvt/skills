@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:47:57+08:00
+verdict_note: 苏住房C home.vue 命中 disableScroll/page-body，首页 scroll-view 限高修复属实。
+---
 # 首页disableScroll未限高致scroll-view滚动失败
 苏住房C 小程序首页home.vue设disableScroll:true依赖内部scroll-view，但未用page-body限制高度致其撑满视口无法滚动，需加包裹层并修正滚动容器高度。
 ## 现象与根因

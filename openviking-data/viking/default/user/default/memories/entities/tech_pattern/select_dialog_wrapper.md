@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T11:34:30+08:00
+verdict_note: 实机核对zs-select-dialog-func.vue-738精确命中this.$emit('setData',this.singleChoice?...)；singleChoice/visible.sync/bizState-2(547)/setData后不自动关闭均属实，行号与描述吻合。
+---
 # SelectDialog Functional Wrapper
 Public selection dialog component at @/components/zs-select-dialog/zs-select-dialog-func.vue used to replace hand-rolled zs-dialog + zs-table + zs-pagination + keyword-search popups.
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:51:22+08:00
+verdict_note: 产品2.0 含 ZsTencentMap 与 mapLoader、map.qq.com 加载逻辑；CSP 由部署层配置，与「项目内无 CSP 配置」结论一致。
+---
 # 腾讯地图脚本CSP拦截排查
 园区公共收益 Web 后台 ZsTencentMap 动态加载腾讯地图 SDK 被部署层 CSP 拦截时，需先查 script-src 白名单。
 

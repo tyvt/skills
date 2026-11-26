@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:16:27+08:00
+verdict_note: 泰兴小程序 src/staff/styles/theme.scss-1 命中 $staff-primary，多页 staff-page-theme mixin 命中，主题冲突修复属实。
+---
 # 员工端工单页主题未注入致主色冲突
 泰兴小程序员工端工单列表页未注入主题，Tab 硬编码 `#0168F0` 而按钮走 `var(--primary-color)` 继承业主端 `#0A3D62`，产生主色冲突。
 ## 问题根因

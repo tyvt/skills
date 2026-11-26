@@ -1,0 +1,45 @@
+# Summary
+2026-11-06，用户提出把 config.js 并入 holding.sqlite，确定采用以 sqlite 为准、config.js 仅作首次导入源并在设置中新增「从 config.js 同步」按钮的方案。实现复用现有 setting(k,v) 表存储 cfg（整份 PANEL_CONFIG 的 JSON），把 CFG/RULES/TARGETS/TGT 改为可刷新，在 readState() 末尾调用 loadConfigFromDb() 按「库优先、缺失时导入 config.js」的优先级加载。改造后面板成为真正的单 HTML + 单个 sqlite，config.js 变为可选；node _selftest.js 的 39 项测试全绿，包括无 config.js 时仅靠库内 cfg 恢复 9 只目标。改动涉及 index.html、_selftest.js、README.md，并删除 panel_margin_metrics.js/.json 与 panel_margin_metrics.py；截至当时改动尚未提交，上次推送因断网未成功。
+# 2026-11-06 (Friday) ChatLog:
+**user [peer=github.com-tyvt-financial-data-lake]**: config.js能不能并入sqlite？
+...
+**assistant [peer=github.com-tyvt-financial-data-lake]**: ...js 仅首次导入 + 手动同步**」，现在面板是真正的「**单 HTML + 单个 sqlite**」。
+
+### 做法
+1. **存储**：复用现有 `setting(k,v)` 表，新增一行 `cfg`（整份 `PANEL_CONFIG` 的 JSON）。不需要改表结构。
+2. **加载优先级**（`loadConfigFromDb()`，在每次 `readState()` 末尾调用）：
+   - 库里有 `cfg` → **用库里的**（此时即使 `config.js` 不存在也照常运行）
+   - 库里没有 → 首次把 `config.js` 导入并写库
+   - 都没有 → 退化为空（新库需同步一次）
+3. **手动同步**：设置弹窗新增「目标配置」区块 + 按钮「从 config.js 同步目标配置」——重跑 `final_portfolio_v3.py` 得到新 config.js 后点一下覆盖进库（会弹确认，丢弃库内手改）。
+4. 把 `CFG/RULES/TARGETS/TGT` 改为可刷新（`applyConfig()`），DB 配置在 DB 就绪后重新应用，行情/安全边际指标全部基于库内配置计算。
+
+### 验证（`node _selftest.js`，39 项全绿）
+- ✅ 首次打开把 config.js 写入 `setting.cfg`（2217 字符）
+- ✅ 库内配置生效，列出 9 只目标
+- ✅ **仅靠库内 cfg、无 config.js 注入，也能恢复 9 只目标** ← 单 sqlite 的关键验证
+- ✅ `syncConfigFromJs` 手动同步成功
+- ✅ 之前所有测试（成本/盈亏/分红/多账户/买入推荐/安全边际指标）不回归
+
+### 现在的本地依赖
+只剩 **`holding.sqlite`** 一个文件（交易、分红、设置、**目标配置**全在里面）。`config.js` 变成可选的一次性导入源，没有它也能跑。其余（行情/分红/布林带/分位）全部免费公开接口实时获取。
+
+### 改动文件（尚未提交）
+- [index.html](<分析产出/持仓面板/index.html>) — 配置入库、DB 优先加载、设置内同步按钮
+- [_selftest.js](<分析产出/持仓面板/_selftest.js>) — 新增 6 项配置入库存取测试
+- [README.md](<分析产出/持仓面板/README.md>) — 文件表/数据库结构/配置口径更新
+- 删除（上次已提交、现删）：`panel_margin_metrics.js/.json`、`panel_margin_metrics.py`
+
+你可以在浏览器打开 `index.html` 验证：设置里会看到「目标配置 · 9 只（基准 2026-11-04）」和同步按钮。要我把这批改动一起提交吗？（上次推送因断网还没成功，网络恢复后再推）
+
+<!-- MEMORY_FIELDS
+{
+  "event_name": "config.js 配置入库改造",
+  "goal": "配置并入 sqlite",
+  "summary": "2026-11-06，用户提出把 config.js 并入 holding.sqlite，确定采用以 sqlite 为准、config.js 仅作首次导入源并在设置中新增「从 config.js 同步」按钮的方案。实现复用现有 setting(k,v) 表存储 cfg（整份 PANEL_CONFIG 的 JSON），把 CFG/RULES/TARGETS/TGT 改为可刷新，在 readState() 末尾调用 loadConfigFromDb() 按「库优先、缺失时导入 config.js」的优先级加载。改造后面板成为真正的单 HTML + 单个 sqlite，config.js 变为可选；node _selftest.js 的 39 项测试全绿，包括无 config.js 时仅靠库内 cfg 恢复 9 只目标。改动涉及 index.html、_selftest.js、README.md，并删除 panel_margin_metrics.js/.json 与 panel_margin_metrics.py；截至当时改动尚未提交，上次推送因断网未成功。",
+  "ranges": "0,62-71",
+  "source_extraction_id": "28a20d86ed9546b38f4f7efb6415dd04",
+  "version": 1,
+  "memory_type": "events"
+}
+-->

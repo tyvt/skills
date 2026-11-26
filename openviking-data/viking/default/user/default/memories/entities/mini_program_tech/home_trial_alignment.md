@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:12:47+08:00
+verdict_note: 确认ensureHouseSelected/houseBoundViaAuth/houseId、clearPortalHouseFields、mergeCtUserIdentityHouseIntoPortalUser，试住保留逻辑一致。
+---
 # Home Menu Trial Alignment
 home.vue ensureHouseSelected required houseBoundViaAuth && houseId and cleared house on missing, dropping trial-version houses; aligned with externalWebview.vue to retain trial houses.
 ## Problem
@@ -15,7 +20,6 @@ home.vue ensureHouseSelected required houseBoundViaAuth && houseId and cleared h
 - 所属项目：小程序
 - 验证证据：extracted source=cursor project=小程序
 - 来源会话：0058f23d-986e-4656-8a58-d2a02848f549
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:41:55+08:00
+verdict_note: 无锡市区小程序嵌入H5 存在 .gitmodules 且引用 zhi2-mobile-admin-h5-c-unlimited 子模块，仓库拓扑属实。
+---
 # 无锡市区H5发版子模块流程
 无锡市区小程序嵌入H5主仓通过git submodule引用子模块，发版须先推子模块再更新主仓指针并打时间tag。
 

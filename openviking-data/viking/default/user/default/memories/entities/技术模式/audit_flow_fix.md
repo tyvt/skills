@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:15:34+08:00
+verdict_note: 确认DeveloperBasicInfoDetail、auditFlowBusCode、activeChangeId、CHANGE_FLOW_BUS_CODE、showAuditFlowBtn及ApprovalProcess，审核流程修复属实。
+---
 # 企业基本信息审核流程查看修复
 已修复企业基本信息「审核流程查看」按钮缺失，并补上审核抽屉的数据 ID 传递。
 

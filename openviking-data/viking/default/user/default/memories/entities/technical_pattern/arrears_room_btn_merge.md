@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:43:12+08:00
+verdict_note: 园区物管2.0源码：feeBindScopeTable(35处)存在，欠费户室命中feeDeclare2/detail.vue-18/66/263，Headline组件存在。提交哈希属git历史无法以当前快照验证，但核心组件与文件属实。
+---
 # 欠费户室按钮位置调整合入三分支
 园区物管2.0 中欠费户室按钮位置调整提交后合入 develop/v2.6.1、v2.6.2、v2.6.2-yulin 三个分支。
 
@@ -13,7 +18,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

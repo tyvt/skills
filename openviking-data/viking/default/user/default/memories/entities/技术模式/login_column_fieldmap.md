@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:15:12+08:00
+verdict_note: 在产品2.0定位system/logininfor/index.vue，登录名称列prop由loginName改userName与接口字段对齐的描述与现状无矛盾。
+---
 # 登录名称列字段映射修正
 「登录名称」列原先绑定 `loginName`，而接口返回字段为 `userName`，导致列一直为空。
 ## 问题根因

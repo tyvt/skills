@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T17:21:25+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src 及 scripts 无 SUBPACKAGE_STATIC_IMAGES、pages_main/static/images 回退、prune-main-static；resolveStaticUrl 虽在，但记忆所述映射表修复不存在。
+---
 # 分包迁移后静态图需SUBPACKAGE_STATIC_IMAGES映射回退pages_main
 苏住房C小程序空态图迁到分包后代码仍写主包路径，resolveStaticUrl未登记致500空白，需映射表回退pages_main。
 

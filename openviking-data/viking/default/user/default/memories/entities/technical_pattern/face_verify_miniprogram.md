@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:25:16+08:00
+verdict_note: 太仓一网通办H5 router/index.ts-66-67实见faceSuccess/faceError结果展示页，未见getUserMedia，与H5仅展示、跳小程序核验结论一致。
+---
 # 人脸识别非H5自调摄像头仅微信环境跳转小程序核验
 太仓一网通办H5 的人脸识别依赖微信小程序原生页跳转核验，H5 页面仅作结果展示未调用摄像头。
 

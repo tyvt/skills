@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:42:07+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[VITE_EVALUATION_MOCK,dataMode,example,stores,isEvaluationMockEnabled]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # 苏住房防汛C端物业自查mock配置
 苏住房防汛C端H5(zhi2-mobile-query-h5-c-unlimited)的物业自查(project-check)模块演示数据，按 Lead 要求于 2026-11-06 新增。
 

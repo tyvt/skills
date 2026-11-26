@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:25:51+08:00
+verdict_note: 命中 findDepartment(2)、getDeptNodeId(1)、getDeptNodeLabel(1)、toPickerItems(2)，5个引用文件存在，部门显示属实。
+---
 # 首页切换小区行政区域不显示修复
 物业手持B端首页切换小区时行政区域（部门树）不显示，但接口有数据。
 

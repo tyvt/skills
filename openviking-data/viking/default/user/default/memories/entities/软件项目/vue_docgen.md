@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T19:22:02+08:00
+verdict_note: 园区公共收益 未找到 vue_docgen/.workbuddy/docgen 脚本(extract.py/gen_md/parse_ref)，文档生成器记忆无法证明有效。
+---
 # Vue 需求文档生成器 (vue_docgen)
 基于项目 园区公共收益 (zhi2-web-admin) 的 Vue 文件生成需求规格文档的工具/skill。
 

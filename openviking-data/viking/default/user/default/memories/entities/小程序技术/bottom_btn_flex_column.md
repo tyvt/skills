@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:18:54+08:00
+verdict_note: 确认pages_owner、BackBtn、DecisionResult，底部固定按钮flex column+stretch居中的修复与代码现状一致。
+---
 # 底部固定按钮居中撑满修复
 底部固定按钮区需居中且撑满宽度时，用 flex-direction:column + align-items:stretch 而非横排 align-items:center。
 

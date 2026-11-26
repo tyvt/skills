@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:50:29+08:00
+verdict_note: VALID；7个命名文件均存在，decisionPlayerName/DecisionResult.vue 在真实代码命中，展开记录字段对齐方案属实。
+---
 # 展开record冲掉姓名且缺分组致决策人丢失
 苏住房C 移动端 DecisionResult.vue 中 `...record` 展开冲掉 `decisionPlayerName` 且同 `decisionResponseId` 记录未分组合并，导致决策人丢失。
 

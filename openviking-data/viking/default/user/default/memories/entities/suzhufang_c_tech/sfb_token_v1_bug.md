@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:27:09+08:00
+verdict_note: 苏住房C App.vue未见initSfbUser/getTokenV1/tokenV1，V1 token换取修复无法证实。
+---
 # SFB login only stored V2 token missing V1 swap
 SuZhuFang C SFB login logic only saved V2 token without swapping for V1 token, causing apiV1 requests depending on V1 token to fail.
 
@@ -19,7 +24,6 @@ SuZhuFang C SFB login logic only saved V2 token without swapping for V1 token, c
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：cf09ca87-b417-43c0-b05d-5168f3aa3e55
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:48:33+08:00
+verdict_note: VALID；pubRegulatoryAgreement/initDict/getDicts 在苏住房G真实代码命中。
+---
 # 协议签署单据状态字典错位修复
 苏住房G协议签署页(pubRegulatoryAgreement)修复initDict中getDicts字典项配置错误导致的「单据状态」查询错位。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T14:39:01+08:00
+verdict_note: e2e filechooser 超时「既有环境问题」属测试观察结论，涉及接口无法在代码中定位佐证，无有效现状证据，无法证明有效。
+---
 # 租赁机构注册 e2e 附件上传 filechooser 超时既有问题
 苏州市房地产监测V3 中租赁机构注册 e2e 用例（lease-institution-register-organ-type）失败点为附件上传 filechooser 超时，属既有环境问题。
 

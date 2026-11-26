@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:45:18+08:00
+verdict_note: 宿迁苏服办 documentNumber.js 实测存在，按证件类型分流校验、addPersonInfo.vue 改用 idCardType 属实。
+---
 # 证件校验未分类型致统一信用代码失败
 addPersonInfo.vue 证件号码仅按二代身份证正则校验，未区分类型导致统一社会信用代码校验失败，提示「证件号码格式不正确」。
 

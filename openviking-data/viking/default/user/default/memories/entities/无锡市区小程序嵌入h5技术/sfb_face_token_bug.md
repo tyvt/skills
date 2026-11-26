@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:14:21+08:00
+verdict_note: 无锡市区H5 sfbFaceAuth.js 命中 sfbFaceAuth、tokenType，默认换票改类型致令牌失效的修复属实。
+---
 # 苏服办人脸核验默认换票改类型致令牌失效
 苏服办SDK人脸核验要求传入用户token及tokenType='1'，原默认走getTicket换票据并改tokenType为'0'导致令牌失效，曾引发苏服办与支付宝扫脸均报「用户扫脸核验令牌已失效」。
 

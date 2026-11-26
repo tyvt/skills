@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:51:01+08:00
+verdict_note: i淮安公版 命中 decisionPlayerName、realName、ViewOptionsList，与决策提交人用实名描述一致。
+---
 # 决策提交人姓名统一用实名
 i淮安公版提交决策时 decisionPlayerName 统一改为用户实名 realName，展示页保持接口返回值。
 

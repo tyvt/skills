@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T14:41:06+08:00
+verdict_note: contracts.vue 及 pages_owner 下 grep page-block 0命中，仅见其他 margin-top(20rpx等)；描述的 div.page-block 相邻兄弟选择器方案不在现状代码。
+---
 # 小程序卡片间距双失效
 苏住房C 小程序多个 owner 页卡片区块上下间距为 0，根因是 flex gap 对自定义组件根节点支持不稳定，且排查时清掉了组件自带 margin，双通道同时断掉。
 

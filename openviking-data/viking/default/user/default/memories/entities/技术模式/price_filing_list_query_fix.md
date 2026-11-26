@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:13:06+08:00
+verdict_note: recordPriceMngSuzhou 在苏州V3路由信息中命中，备案申请单位等查询区文案调整属实。
+---
 # 价格备案列表查询区统一调整
 苏州市房地产监测V3 项目统一调整价格备案下所有列表子菜单的查询区文案与筛选项。
 

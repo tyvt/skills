@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:15:06+08:00
+verdict_note: 泰兴小程序存在 ZsTextarea 组件及 placeholder-class 机制，原生 textarea 对齐 placeholder 样式的修复上下文属实。
+---
 # 巡检步骤弹窗placeholder样式对齐修复
 泰兴小程序新增巡检步骤弹窗中「巡检说明」placeholder 与输入框颜色字号不一致，根因是混合使用原生 input 与 ZsTextarea，已统一为原生 textarea 修复。
 

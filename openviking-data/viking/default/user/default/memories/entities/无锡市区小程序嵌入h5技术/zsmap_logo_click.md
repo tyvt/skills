@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:04:27+08:00
+verdict_note: 抽检2026-11-26 腾讯Logo约束正确；ZsMap路径本机未找到不排除他处克隆
+---
 # 腾讯地图组件Logo点击跳转约束
 ZsMap.vue使用uni-app原生<map>组件（底层腾讯地图），其左下角Logo/版权文字点击会跳转，官方无禁用配置项。
 

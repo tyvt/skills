@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:11:10+08:00
+verdict_note: 命中 PLAN_DICT_TYPES、resolveDictLabel、land_use_rights_type、project_verification_land_purpose、have_or_not，三字典接入属实。
+---
 # 预售方案三字典字段接入
 苏州市房地产监测V3 将土地使用权类型、土地用途、有无委托三个字典字段接入预售方案。
 

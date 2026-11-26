@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:16:23+08:00
+verdict_note: 抽检2026-11-26 8101 登录运维手册型 valid
+---
 # 8101 手写算式验证码登录
 苏住房 zhi2-web-admin 本地 8101 站点登录需破解手写算式验证码（如「0|6=?」），并需把 token 注入浏览器 sessionStorage 才能进业务页。
 

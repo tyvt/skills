@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:17:15+08:00
+verdict_note: 命中 entryNetwork、AppendixPackageSection、AnnexUpload，附件复用描述属实
+---
 # 开业要件包按配置名复用注册包附件回显
 苏州市房地产监测V3 租赁开业要件包在为空时按配置名复用注册要件包附件回显，并标记只读来源。
 

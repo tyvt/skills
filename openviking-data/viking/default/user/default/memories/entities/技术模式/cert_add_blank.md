@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:04:04+08:00
+verdict_note: 抽检2026-11-26 consLic/detail.vue 本机存在
+---
 # 证书新增无楼幢走旧接口致空白
 `ProjectConsLicPanel` 与 `ProjectPlanLicPanel` 原仅在草稿楼幢非空时调主子表接口，否则走旧单表接口导致无楼幢时弹窗空白，已改为始终调新接口。
 

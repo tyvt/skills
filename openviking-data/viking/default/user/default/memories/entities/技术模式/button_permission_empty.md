@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:50:56+08:00
+verdict_note: 产品2.0命中 operationButtons/mixins/table.js/ListTemplate, 空权限数组红线属实
+---
 # 临时放开按钮权限只能写 permission: [] 且交付前接回真实权限串
 四个证书管理页调试时将按钮 attrs.permission 改为 [] 或 false 以绕过校验，但空权限数组语义是「无任何权限要求」，等于对所有登录用户开放。
 

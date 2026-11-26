@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:45:23+08:00
+verdict_note: VALID；propertyContractTemporary/propertyContract/components/index.vue 列表页结构在 estate-manage 真实代码命中。
+---
 # 苏住房G 物业相关列表页文件结构
 苏住房G 项目前端中，物业管理区域列表、前期物业合同列表、物业合同列表的入口与核心逻辑分布如下。
 

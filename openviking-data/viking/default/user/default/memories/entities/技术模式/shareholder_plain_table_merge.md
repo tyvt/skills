@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:53:46+08:00
+verdict_note: 苏州V3命中 beforeRows/mergedRows/ShareholderPlainTable/ShareholderChangeSection, 合并渲染属实
+---
 # 股东变更对比表合并渲染模式
 苏州市房地产监测V3 中 `ShareholderPlainTable.vue` 新增 `beforeRows` prop 支持变更前/后数据合并对比，`ShareholderChangeSection.vue` 同步改造。
 

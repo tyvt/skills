@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:28:41+08:00
+verdict_note: 门户/zhi2-web-admin 命中 AreaStructurePanel、BrokerPages、BuyerOverviewPanel、DetailModalC、成交面积段结构(5) 等大量组件符号，子模块与部署结构属实。
+---
 # zhi2-web-admin 子模块与门户部署结构
 zhi2-web-admin 是房产综合服务平台门户（父仓库「门户」）的 git 子模块，承载 Vue2 大屏前端代码，开发分支 develop/v2.6.2-portal。
 

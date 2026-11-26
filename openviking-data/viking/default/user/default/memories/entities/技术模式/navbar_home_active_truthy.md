@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T22:17:06+08:00
+verdict_note: 记忆称产品2.0 Navbar.vue 有 isHomeActive 漏括号 bug 并修复；实机产品2.0 该 Navbar.vue 无 isHomeActive（仅 isActive），全库仅榆林G 的 Navbar.vue 含该符号。项目归属/代码不符。
+---
 # 顶栏首页高亮方法引用陷阱
 产品2.0 Web 后台 Navbar.vue 中 isHomeActive 方法在模板与方法内部均被当属性引用（漏写括号），导致首页永远高亮、其他模块恒不高亮的布尔判断失效。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:40:08+08:00
+verdict_note: 同CAND03：AgencyPersonnelList.vue zs-operate-column 有 show-all、无 -width=480，移除固定宽度改自动计算列宽属实。
+---
 # 操作列固定宽度致留白过多
 AgencyPersonnelList.vue 中 zs-operate-column 固定宽度 :width="480" 导致操作列留白多，移除该宽度后由组件按按钮文字自动计算列宽，保留 show-all 使按钮平铺不换行。
 

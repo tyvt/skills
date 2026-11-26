@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:40:36+08:00
+verdict_note: ZsPageFooter/tab-bar-placeholder/56px 在苏住房C命中，落款定位修复描述与代码一致。
+---
 # Tab页落款定位修复
 苏住房C移除`ZsPageFooter`的fixed固定定位，使落款回到各Tab页滚动内容最底部。
 

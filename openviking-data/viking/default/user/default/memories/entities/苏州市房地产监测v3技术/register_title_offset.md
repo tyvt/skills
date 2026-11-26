@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:42:41+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[RegisterPageHeader,institutionRegister,leaseInstitutionRegister]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # 注册页标题偏移修复
 苏州市房地产监测V3注册页因RegisterPageHeader与表单区版心不一致导致标题偏右，已通过CSS变量对齐修复。
 

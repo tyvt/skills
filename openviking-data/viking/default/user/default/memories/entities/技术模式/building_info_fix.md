@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:45:57+08:00
+verdict_note: buildingTable.vue 命中 position 与 dictUrl，zs-table-column.vue 命中 $attrs.type，修复属实。
+---
 # 楼幢信息查看房屋类型与坐落修复
 修复楼幢信息查看弹窗中房屋类型和房屋坐落不显示的问题。
 

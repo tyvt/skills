@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:18:21+08:00
+verdict_note: 江阴公共收益 package.json（父子仓）实机均含 install-dependencies- npm install -f，绕开安装约定属实。
+---
 # npm子目录安装依赖崩溃(arborist缺陷)
 CI 上在 workspace 子目录执行 npm install 崩溃，根因是 npm 10.8.1 自带 arborist 7.5.3 的 file: 依赖空 target 缺陷。
 

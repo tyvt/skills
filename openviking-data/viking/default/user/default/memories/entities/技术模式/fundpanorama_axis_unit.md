@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:14:41+08:00
+verdict_note: 园区物管2.0 命中 fundPanorama，线柱混合图轴单位修复属实。
+---
 # fundPanorama 线柱混合图轴单位与图例错开
 园区物管2.0 的 fundPanorama 线柱混合图中，左右 Y 轴单位曾与图例重叠，已改为轴中段竖排错开。
 

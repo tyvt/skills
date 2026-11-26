@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:46:14+08:00
+verdict_note: 苏州市房地产监测V3源码：multiLineRowAlign命中zs-search-form.vue-32/175，multiLineButtonMarginTop命中-71/183。所述两个新增变量精确命中，垂直居中修复属实。
+---
 # 搜索表单多行垂直居中修复
 苏州市房地产监测V3 中 `zs-search-form` 组件在多行搜索时因 `el-row` 的 `align="top"` 与 `margin-top` 导致按钮未垂直居中。
 

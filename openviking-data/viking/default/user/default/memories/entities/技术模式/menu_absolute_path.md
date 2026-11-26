@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:39:40+08:00
+verdict_note: 实机核对：引用文件(3个)存在于对应项目仓；核心符号命中[system,menuItem,buildNavbarChildrenMenus,router,isActive]，与记忆描述一致。
+---
 # 门户菜单相对路径绝对化修复
 若依式菜单在 Vue Router 3 中相对 path 会被相对当前路由解析，门户新增 `toRouterAbsolutePath` 统一前导斜杠。
 

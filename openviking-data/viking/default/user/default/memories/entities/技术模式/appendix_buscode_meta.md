@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:21:08+08:00
+verdict_note: 苏州市房地产监测V3 companyRecord.js 含 resolveLicenseAppendixBusCode 及 CompanyOrganProvider busCode 注入，附件 busCode 兜底属实。
+---
 # 经纪机构详情附件busCode取路由meta
 `companyApplyAudit/detail.vue` 未请求附件因 `appendixBusCode` 未适配路由菜单，改为优先注入 busCode 并回溯路由 meta 兜底。
 

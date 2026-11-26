@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:44:26+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[project,customerProject,building,projectId,projectManagement]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # 楼栋表 projectId 为空导致点击无响应
 在苏州市房地产监测V3项目中，`projectId` 为空导致楼栋表点击无响应。
 
@@ -16,7 +20,6 @@
 - 证据：src=苏州市房地产监测V3-rest/025.md
 - 会话：01a16159-63a8-7295-ba46-c2ad374e49ae
 - 项目：苏州市房地产监测V3；基线：none
-
 
 <!-- MEMORY_FIELDS
 {

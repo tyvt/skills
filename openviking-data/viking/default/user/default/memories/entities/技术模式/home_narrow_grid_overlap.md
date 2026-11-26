@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:12:02+08:00
+verdict_note: 在产品2.0/门户确认HomeLayoutSidebar.vue、HomeLayoutAdmin.vue及minmax(0,1fr)、z-index层叠约定，与代码一致。
+---
 # 首页窄屏两栏网格重叠修复
 门户首页在窄屏下因两栏网格使用 minmax(280px,1fr) 且侧栏 z-index 问题，导致右侧栏覆盖主内容，需改网格与断点。
 

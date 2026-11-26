@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:41:34+08:00
+verdict_note: BankReconciliation/tip-text/bankDetailDay 在产品2.0命中，提示语布局优化描述与代码一致。
+---
 # 业务对账界面提示语布局优化
 产品2.0 项目优化业务对账界面提示语布局，回退其他无关修改。
 

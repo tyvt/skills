@@ -1,9 +1,12 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T06:34:46+08:00
+verdict_note: 兴化物管 zhi1-web-admin/src/main.js-63 确认 Vue.prototype.dayjs=dayjs 全局挂载，与记忆'用 this.dayjs、勿直接 import dayjs'约定一致。判有效。
+---
 - 禁止在页面/模块中直接 `import dayjs from "dayjs"`，应使用项目全局实例 `this.dayjs`（在 main.js 中通过 `Vue.prototype.dayjs` 挂载）。
 - 原因：index.html 通过普通 `<script>` 加载全局 UMD 脚本 `/assets/js/dayjs.min.js`，若某模块直接 import dayjs，Rollup 构建会将其打成 ESM 分包并覆盖 public 里的 UMD 全局脚本，导致线上报错。
 - 涉及修复文件：PaymentNotice.vue、OwnerNotice.vue、CommercialNotice.vue、feeDocFormatters.js。
 - 适用于兴化物管 zhi1-web-admin 项目。
-
 
 <!-- MEMORY_FIELDS
 {

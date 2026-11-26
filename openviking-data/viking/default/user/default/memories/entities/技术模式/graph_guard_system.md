@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:48:44+08:00
+verdict_note: dsh/langgraph-orchestrator/src/graph.py 中 _readonly_read_ok、_readonly_read_ok_abs、node_security_guard 均在，与守卫系统描述一致。
+---
 # graph.py 守卫系统
 graph.py 中的命令安全守卫，在 LangGraph 编排中对 pwsh 命令做 flash 一审与 grok 终审，控制是否升级高级模型审核。
 

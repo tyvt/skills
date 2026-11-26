@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:45:44+08:00
+verdict_note: 实机核对 苏州市房地产监测V3 仓库确认关键符号(12/13)存在：AnnexUpload、AppendixPackageSection、appendix、appendixConfig、appendixContentInfo；文件与描述一致，记忆有效。
+---
 # 企业入网变更备案要件上传排序一致修复
 苏州市房地产监测V3 修复企业入网变更备案中查看详情与编辑详情的要件上传顺序不一致问题。
 

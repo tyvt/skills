@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:12:27+08:00
+verdict_note: 泰兴小程序命中 knowledgeCategory/normalizeCategory、loadCategories，循环引用修复描述属实
+---
 # 分类节点反向指针致循环引用
 `src/staff/utils/knowledgeCategory.js` 的 `normalizeCategory` 建立 parent 与 top 自指反向指针形成带环树，导致 `knowledge/index.vue` 的 `loadCategories` 触发 uni-app `JSON.stringify` 循环引用异常并截断 `confirmFilter` 请求。
 ## 问题根因

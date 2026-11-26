@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:17:55+08:00
+verdict_note: 苏住房C 实机含多 uni-app 子模块（.gitmodules- zhi2-mobile-shimin）及 assetsPublicity，同源复用约定属实；示例父仓 commit 存在。
+---
 # 苏住房C同步无锡版本复用约定
 苏住房C主仓下有多 uni-app 子模块，与无锡市区小程序嵌入 H5（zhi2-mobile-admin-h5-c-unlimited）同源，新业务页可从无锡版本整目录移植。
 

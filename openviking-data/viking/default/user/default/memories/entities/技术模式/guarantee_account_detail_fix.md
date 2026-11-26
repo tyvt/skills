@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:42:35+08:00
+verdict_note: 实机核对 产品2.0 仓库确认关键符号(12/17)存在：account、accountId、cursor、detailCallback、extracted；文件与描述一致，记忆有效。
+---
 # 房屋质量保证金账户明细子表修复
 产品2.0 项目修复房屋质量保证金账户明细（缴存/支用明细）查到其他账户数据及资金缴存列表重置问题。
 

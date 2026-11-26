@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:18:28+08:00
+verdict_note: 苏住房C publicNotice/detail.vue-6/9 引入 ListDetail，FileList 组件与 szffluzm 构建产物实存；显式 import 路径当前已重构，整体修复属实。
+---
 # 分包迁移后easycom未命中FileList致附件静默不渲染
 苏住房C双晒公示三类详情页因分包迁移后 FileList 组件未显式 import 且 easycom 扫不到，附件整块空白不报错。
 

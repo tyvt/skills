@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:14:54+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 列表切换选中丢失修复
 Element 表格同步选中触发的 selection-change 会清空 checked，已在 preparatoryRangeTable.vue 修复。
 ## 问题根因

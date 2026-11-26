@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:39:52+08:00
+verdict_note: 苏州市房地产监测V3 surveyChangeConstants.js-258/266 定义 resolveSurveyChangeCreditCode、mapSurveyChangeProjectRow，detail.vue-425/537 实际调用，uniformSocialCreditCode 映射修复属实。
+---
 # Survey Change Project Credit Code Mapping
 In Suzhou Real Estate Monitoring V3, `/presale/surveyChange/selectProject` returns `uniformSocialCreditCode`, but the detail page only mapped legacy fields, leaving the field blank; fixed with a compatibility resolver.
 
@@ -16,7 +21,6 @@ In Suzhou Real Estate Monitoring V3, `/presale/surveyChange/selectProject` retur
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：754ddf0b-9295-4421-b9b9-93fc87b9b996
-
 
 <!-- MEMORY_FIELDS
 {

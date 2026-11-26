@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:08:45+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 组件formMode兜底逻辑须对齐全局mixin
 苏州市房地产监测V3 中 OperationBtnGroup/index.vue 的 formMode 逻辑缺失 getId 兜底，未对齐 main.js 全局 mixin。
 

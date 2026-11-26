@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:21:03+08:00
+verdict_note: 抽检2026-11-26 第三轮 view_image_preview.md 叙述/路径合理
+---
 # 查看模式图片点击预览
 苏住房防汛C端移动查询H5(zhi2-mobile-query-h5-c-unlimited)查看模式下的图片已补全 `uni.previewImage` 点击预览交互。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:50:23+08:00
+verdict_note: AccountRefundTable.vue 命中 el-row/zs-form 栅格，弹窗表单宽度修复属实。
+---
 # 弹窗表单栅格宽度修复
 产品2.0（zhi2-web-admin）中 `el-row` 误置于 `zs-form` 内导致栅格宽度计算错误、输入框被压窄，已修复。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T16:45:50+08:00
+verdict_note: D-/repository 无「投资推送」仓；fund 仓虽有 backtest.py 与 dividend_lowvol，但无 dividend_lowvol_rotation 目录及 daily-monitor 参数，具体文件与语义无法证实。
+---
 # 日频调仓daily_monitor语义
 红利低波回测中 --daily-monitor 参数与用户期望的日频买卖语义存在差异，需分别跑回测对比。
 

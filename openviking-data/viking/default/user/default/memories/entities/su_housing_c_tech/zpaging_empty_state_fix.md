@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T08:33:39+08:00
+verdict_note: 苏住房C uni.scss-422/433/445 定义 .paging-empty/.paging-empty-pic(320rpx)/.paging-empty-text 全局样式，ZsPaging.vue-86/97/109 有 scoped 同款样式。记忆所述全局补样式 + 组件 scoped 修复与代码一致。
+---
 # z-paging空态组件UI修复
 苏住房C小程序修复视频看房等使用z-paging空态页面文字靠左、空态图不显示的问题。
 

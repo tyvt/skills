@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:52:38+08:00
+verdict_note: 苏住房C 命中 StockHouse、NewHouse、collectBtn、houseMap，与房源地图组件路径修复描述一致。
+---
 # 房源地图组件路径引用修复
 苏住房C 小程序 `pages_main/houseMap/components/` 下 `StockHouse.vue` 与 `NewHouse.vue` 因引用已删除的相对路径导致组件找不到，已修正为绝对路径。
 

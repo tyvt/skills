@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:46:58+08:00
+verdict_note: C-/Program Files/PowerShell/7/pwsh.exe 存在，PS 7.6.9 记忆属实。
+---
 # dsh-pwsh-local
 DSH local PowerShell execution tool for running pwsh commands in sessions; PowerShell 7.6.9 installed on 2026-11-11.
 
@@ -23,7 +28,6 @@ DSH local PowerShell execution tool for running pwsh commands in sessions; Power
 - Call conventions (in tool-call-hygiene): use single quotes for `-m`; `git rev-parse '@{u}'`; `$env:GIT_EDITOR='true'` (not `GIT_EDITOR=true`).
 - Empty-arg INVALID_ARGS is long-session decay: stop and switch session after two consecutive.
 - Failure handling at call layer (not tool): probes use `git status --porcelain; exit 0` or only check exit on `; if`; `git push`/`commit` non-zero is failure; GitHub via mirror/proxy not pwsh retry; `node -e` >1 line write `.mjs`; `Test-Path` first; two empty args -> new session.
-
 
 <!-- MEMORY_FIELDS
 {

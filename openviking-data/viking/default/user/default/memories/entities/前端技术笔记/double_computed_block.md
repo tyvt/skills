@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T17:43:33+08:00
+verdict_note: INVALID；核心标识符 districtStatsByName/threeAssetsMax 全仓真实代码 0 命中；所称园区物管2.0 mapOverview/index.vue 不存在（mapOverview 仅见于产品2.0 dataSandbox）。描述与现状证据不符，无法证明。
+---
 # 组件重复 computed 块致属性丢失
 在 Vue 组件中写两个 computed: { } 块会导致后者覆盖前者，先写的计算属性静默变 undefined。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T04:32:58+08:00
+verdict_note: 无锡市区小程序嵌入H5 的 face.vue-106 仅保留「人脸认证成功，请选择房屋」提示，源码无 syncFaceSuccessToBackend/handleFaceSuccess 调用，重复实名后端调用已去除，描述属实。
+---
 # face.vue去除重复实名后端调用修复
 苏服办app中业主进投票H5、返回首页再进投票H5时，人脸成功后会误调后端导致重复实名toast，已修复。
 

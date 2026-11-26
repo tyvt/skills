@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:48:23+08:00
+verdict_note: i淮安H5与惠山二期H5命中 OptionCardList/decisionOptionApplyList/decisionWaiver, 属实
+---
 # 多选投票页弃权判定漏空对象致空白行
 OptionCardList.vue 渲染弃权逻辑未过滤后端返回的 {} 占位对象，导致空白行，需校验有效属性排除。
 

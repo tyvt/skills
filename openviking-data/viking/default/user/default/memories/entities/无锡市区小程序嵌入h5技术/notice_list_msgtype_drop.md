@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T08:33:50+08:00
+verdict_note: 无锡市区小程序嵌入H5 中 NoticeList.vue-10 getDictLabel(item.msgType,...)||'-' 存在，index.vue-84 显式 msgType- el.msgType 映射存在（修复痕迹），代码基线 3c384c1。记忆所述映射丢字段致占位及修复方案与代码一致。
+---
 # 公告列表映射丢字段致getDictLabel占位
 NoticeList等子组件用getDictLabel展示类型标签时因父页map漏传msgType而始终显示占位符`-`。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:45:25+08:00
+verdict_note: bTerminalProjectMixin/editApiFull/detailMixins 命中；前端契约反推方法论无幻觉，结论边界已声明为推断。
+---
 # 物业管理区域备案后端契约前端反推路线
 苏住房G仓库无Java源码，只能通过mixin拼路径与组件链路反推complex保存/权限校验契约。
 ## 适用场景
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:46:29+08:00
+verdict_note: VALID；pubBankReceiptApply/dateRangeText 在 benefit 回单相关真实代码命中。
+---
 # 回单详情起止日期补全结束时间
 宜兴公共收益项目在 `pubBankReceiptApply/detail.vue` 中参考物业模块写法，将起止日期格式化为「开始日期 - 结束日期」以补全结束时间。
 

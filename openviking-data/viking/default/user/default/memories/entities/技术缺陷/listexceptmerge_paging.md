@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:45:12+08:00
+verdict_note: 实机核对 靖江物管 仓库确认关键符号(14/24)存在：OpeningBuildingDialog、build、estate、feature、keyWord；文件与描述一致，记忆有效。
+---
 # 楼幢弹窗分页参数缺陷
 靖江物管物业区域拆分合并的「选择楼幢」弹窗因分页参数位置错误导致始终返回第一页数据。
 

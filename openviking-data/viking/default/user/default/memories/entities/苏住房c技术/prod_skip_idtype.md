@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:45:55+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src/utils/index.js：shouldSkipIdTypeChoose、getRealNameEntryUrl均0命中，FormLocal在该文件0命中(仅pages.json有页面)。生产跳过证件类型选择的核心函数与入口逻辑无法证明，判无效。
+---
 # 生产环境跳过证件类型选择模式
 苏住房C因非居民身份证后台管理系统不可用，生产环境跳过证件类型选择页，直接进入居民身份证实名认证流程。
 

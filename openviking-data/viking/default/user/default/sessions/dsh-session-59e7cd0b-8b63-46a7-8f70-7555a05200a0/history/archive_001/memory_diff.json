@@ -1,0 +1,23 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-59e7cd0b-8b63-46a7-8f70-7555a05200a0/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-26T01:35:27.353007+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/events/2026/11/11/备案申请详情法定代表人电话缺失根因确认.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-11，排查 ZenTao bug 6470：机构备案申请只读详情页的“法定代表人联系电话”显示为“-”，而机构基本信息页可正常显示该电话。确认根因为备案申请详情页读取 companyApply.legalPersonPhone，但数据库表 T_COMPANY_APPLY 无电话字段；法定代表人电话实际存于 T_COMPANY.LEGAL_PERSON_PHONE，并通过 COMPANY_ID/COMPANY_RECORD_ID 与申请记录关联，需改为从公司记录取数修复。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=6470\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: Now the bug is clear:\n- **Screenshot 22405** (the bug): 机构备案申请 read-only detail page — `法定代表人联系电话` shows `**-**` (empty).\n- **Screenshot 22406** (expected/normal): 机构基本信息 detail page — `法定代表人联系电话` = `18293204433` (correct).\n\nSo the data exists in the backend, but the **备案申请 detail page** fails to display the legal rep phone. Let me examine `CompanyForm.vue` (the company section of the record detail).\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: There are mask formatters but they're list-only; the detail view doesn't use them, so the `证件号码` masking in the audit view is backend-driven. I need real data to confirm whether `companyApply.legalPersonPhone` exists. Let me check what DB connections `dbx` exposes (the business DB may also be reachable).\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: The business DB is accessible — \"门户Dameng-dev\" (ZHISHU_PORTAL) for the portal project. Let me find the `companyApply` table.\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: Found `T_COMPANY_APPLY` (schema `ZHISHU_COMPANY`). Let me check its columns for the legal person phone field.\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: **Root cause found**: `T_COMPANY_APPLY` has `LEGAL_PERSON_NAME`, `LEGAL_PERSON_ID_NUMBER`, `LEGAL_PERSON_ID_TYPE`, `LEGAL_PERSON_ID_PHOTO` — but **no phone column**. The legal person phone lives on the company record (`T_COMPANY`). Let me confirm `T_COMPANY` has it and find how `companyApply` links to the company.\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: Confirmed: `T_COMPANY_APPLY` links via `COMPANY_ID`/`COMPANY_RECORD_ID`, and `T_COMPANY` has `LEGAL_PERSON_PHONE`. So `companyApply` truly lacks the phone. Let me pull the actual record from screenshot 22405 (`BASQ202611110001`) to confirm the link resolves to a company with a phone.\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: No data in `ZHISHU_COMPANY`. The customer-test data may be in another schema. Let me search across all three.\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited]**: The customer-test data isn't in these dev schemas, but the **structural root cause is confirmed**: `T_COMPANY_APPLY` has no phone column; `LEGAL_PERSON_PHONE` lives on `T_COMPANY` (linked by `COMPANY_ID`/`COMPANY_RECORD_ID`). The 备案申请 detail reads `companyApply.legalPersonPhone`, which can never exist. The phone must be sourced from the company record. Let me find the company-info API the working page uses."
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

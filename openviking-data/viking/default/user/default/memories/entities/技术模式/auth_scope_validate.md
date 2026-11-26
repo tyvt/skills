@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:44:06+08:00
+verdict_note: 园区物管2.0 system/user/detail.vue 存在，含授权范围为空校验提示与 beforeSaveHook，属实。
+---
 # 用户详情保存时授权范围校验
 园区物管2.0 的 zhi2-web-admin 在 system/user/detail.vue 重写 beforeSaveHook，保存时校验授权范围不为空。
 

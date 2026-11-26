@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:07:37+08:00
+verdict_note: 实机核对 chooseHouseDialog.vue-84-85 label=房屋用途/prop=purpose，-255 getDicts('cyzt_lpgl_purpose')，with 预售版一致；根因与修复描述属实。提交号无法本地逐一核验属归属信息，不影响事实核。
+---
 # 禅道 Bug 6383
 
 【苏州房地产客测环境】合同网签-现售合同签订-新增合同，房屋性质显示为数字。status=resolved/fixed，resolvedBy=tiany，2026-11-09。

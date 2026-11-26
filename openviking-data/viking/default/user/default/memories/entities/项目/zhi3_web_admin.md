@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T22:39:59+08:00
+verdict_note: 记忆涉及 zhi3-web-admin 父仓及9个提交SHA，本地无任何仓库含这些commit，父仓路径未明，无法实机证明。
+---
 # zhi3-web-admin-h5-g-unlimited
 房地产综合服务平台门户父仓库，包含 zhi2-web-admin 子模块，分支 develop/v3.0.0。
 

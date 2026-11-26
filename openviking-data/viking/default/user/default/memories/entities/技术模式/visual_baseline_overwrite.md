@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:22:36+08:00
+verdict_note: 门户/zhi2-web-admin/tests/e2e/fixtures/operation-guide-designs.ts 命中 maskBanner、normalizeIllustration，视觉基线覆盖方案有据。
+---
 # 视觉回归基线与设计稿不一致的处理
 视觉回归相似度下降时，先归因基线过期还是样式退化；基线过期则覆盖同名fixture图并标注「当前实现截图」，原设计稿留git历史。
 ## 背景

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:47:34+08:00
+verdict_note: 产品2.0 命中 amountFormatter 与 type-amount 绑定，展示项值绑定修复属实。
+---
 # amount 类型展示项值绑定修复
 产品2.0 项目中 `type: 'amount'` 的展示项原使用 `this.formatters.amountFormatter(...)` 预格式化，已全量改为直接绑定 `this.form.xxx`。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

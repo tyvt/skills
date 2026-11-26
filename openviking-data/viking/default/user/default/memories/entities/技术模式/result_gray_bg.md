@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:15:45+08:00
+verdict_note: 确认ResultRecord/DecisionRecord及page/.container的min-height-100vh灰底铺满修复，投票结果页背景约定与代码一致。
+---
 # 投票结果/记录页灰色背景铺满修复
 苏住房C 项目 zhi2-mobile-shimin 修复投票结果页与记录页下方空白区域背景未铺满整页的问题。
 

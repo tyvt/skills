@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:19:37+08:00
+verdict_note: 证据缺失：全仓源码无 waitForDetailLoadingDone/waitForCertificateSectionReady/gotoPersonnelDetail，描述的 E2E 优化函数不存在。
+---
 # 从业人员证书CRUD的E2E优化
 产品2.0 的 zhi2-web-admin 从业人员增删改查 E2E 用例（登录账号 913）去除重复网络等待，改为 UI 状态驱动，耗时大幅下降。
 

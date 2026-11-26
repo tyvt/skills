@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:46:03+08:00
+verdict_note: 实机核对：引用文件(5个)存在于对应项目仓；核心符号命中[publicPortal,PortalDialogHost,skeletonVariant,PortalSkeleton,waitForMinDuration]，与记忆描述一致。
+---
 # 门户首页二级页骨架屏实现
 门户首页二级页在导航过渡（首页→二级页 open()、二级页内 navigate()）时展示统一骨架屏组件；直接刷新二级页不触发全页骨架屏（数据 mock/同步，仅数据区异步加载时显示局部骨架）。
 

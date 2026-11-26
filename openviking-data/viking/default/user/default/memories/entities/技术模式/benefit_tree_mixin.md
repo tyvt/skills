@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:46:59+08:00
+verdict_note: benefitRegionTreeMixin/getPageQueryParams 在苏住房G命中。
+---
 # G端树状/平铺双模式列表与区划树mixin
 苏住房G 公共收益与共有资产 12 个 benefit 列表页在树状模式下因 parentDeptId 对业务接口无效而空白，需抽 mixin 改用区划参数过滤。
 

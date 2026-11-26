@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:48:38+08:00
+verdict_note: VALID；RegionTreeLayout.vue 中 containerHeightTimers（修复后去掉下划线前缀）真实命中，修复已落地。
+---
 # Vue2 data 下划线属性未代理修复
 苏住房G 物业复杂视图 RegionTreeLayout.vue 因 Vue2 不代理 data 中以 _ 或 $ 开头的属性，导致 mounted 调用时为 undefined 而报错。
 

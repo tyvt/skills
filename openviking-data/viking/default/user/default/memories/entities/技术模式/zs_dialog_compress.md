@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:17:41+08:00
+verdict_note: 修复属实：zs-select-dialog-func.vue 有 tableTrCount 计算属性且第380行调用 doLayout()，与动态行数+防压缩方案一致。
+---
 # 选择对话框表格被压缩且行数不足
 在项目 园区公共收益 (zhi2-web-admin) 中，`zs-select-dialog` 的固定 `tableTrCount` 导致水平滚动条占据高度并截断最后一行；`.dialog-right` 中带有 `flex:1; min-height:0` 的表格被压缩。
 

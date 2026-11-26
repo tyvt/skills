@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:47:35+08:00
+verdict_note: 苏州V3命中 resolveLicenseAppendixBusId/DeveloperBasicInfoDetail/companyRecord.js, 属实
+---
 # 审核中要件busId须用变更单ID
 苏州市房地产监测V3 中变更主管部门审核中要件查询须用变更单ID，误用备案ID会导致数据错误。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:11:44+08:00
+verdict_note: 命中 busCode/bizState/dataId 流程参数与 OperationBtnGroup/ApprovalProcess，流程查看参数修复描述属实
+---
 # 流程查看点击不发请求的根因与修复
 同一流程能力被多主体页复用时，若页面未传自己的业务主键，审批流组件拿不到 id 就静默不发请求。
 

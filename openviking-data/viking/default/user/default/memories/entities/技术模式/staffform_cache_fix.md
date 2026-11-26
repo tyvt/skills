@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:15:46+08:00
+verdict_note: 苏住房G propertyManager/detail.vue-347/644/31 命中 staffFormStorageKey/restoreStaffForm/isStaffFieldDisabled，缓存修复属实。
+---
 # 物业管家详情页人员字段置灰缓存修复（苏住房G）
 苏住房G 项目修复物业管家新增页选择物业服务人员后字段置灰，但切换 tab 再切回置灰失效的问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:13:14+08:00
+verdict_note: 在产品2.0 detail.vue组件确认附件type-'image'渲染分支；资金缴存附件需type-image的核心结论与代码一致，旧页面名已重构。
+---
 # DetailTemplate 附件字段须配 type:'image'
 产品2.0 中 DetailTemplate 的附件字段若配成 type:'text' 仅渲染路径字符串、无法预览，须改为 type:'image'。
 

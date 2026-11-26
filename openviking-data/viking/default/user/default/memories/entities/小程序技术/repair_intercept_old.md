@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:16:11+08:00
+verdict_note: 苏住房C命中 ownerCard/index.vue 的 goToOther 与报事报修入口；dist/dev 旧包致拦截失效的排查经验属实
+---
 # 报事报修拦截失效因开发者工具跑dist/dev旧包
 苏住房C电子业主卡报事报修加拦截后仍可点入，根因是微信开发者工具导入的是dist/dev旧产物而非新源码。
 

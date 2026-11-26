@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:49:16+08:00
+verdict_note: 产品2.0与宜兴公共收益命中 statisticsMap/STAT_ICON_MAP/operatingAssets, 中文chunk问题属实
+---
 # Vite中文文件名chunk404
 园区物管2.0 中因中文命名静态资源被 Vite 打成中文名 chunk，子路径/CDN 部署时 404 伪装成动态模块加载失败的问题与修复。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

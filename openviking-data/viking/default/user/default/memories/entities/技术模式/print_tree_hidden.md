@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:49:39+08:00
+verdict_note: 产品2.0命中 MenuTree/index.vue+PrintDialog, 打印树被挤压问题属实
+---
 # 打印配置页左侧树被表格挤压不显示
 泰兴G 打印配置页因 list-card 直接放在 list-container 占满整行，左侧 menu-tree（200px）被挤压消失，附件配置页正常。
 

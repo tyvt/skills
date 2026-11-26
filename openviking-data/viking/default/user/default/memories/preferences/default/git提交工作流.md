@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:51:17+08:00
+verdict_note: VALID；按路径暂存/两层仓库提交/version.json不纳入提交 与本工作区 AGENTS.md 规则一致。
+---
 - 提交时若 husky 钩子退出码为 1，先 git log -1 --oneline + git show --stat HEAD 核实提交对象是否已落地、内容是否只含本次目标文件，内容完整就不要再提交
 - 提交必须按具体路径暂存（不要 git add .），避免纳入别人正在改的文件
 - 两层仓库都提交：子模块先行、父仓只更新 gitlink 指针，核对父仓指针与子模块 HEAD 一致、两层与远程 0/0 同步

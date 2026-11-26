@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T23:43:52+08:00
+verdict_note: version-check.js/version.json/vite.config.js 在产品2.0命中（3/3），/sz/ 子路径相对地址描述属实。
+---
 # 项目部署在 /sz/ 子路径：地址自适应相对路径
 产品2.0 前端部署在网关 /sz/ 子路径下，所有对后端/静态资产的地址须走相对当前页面 URL 解析，禁止写死前缀（含 version.json）。
 
@@ -18,7 +22,6 @@
 ## 涉及与来源
 - 涉及文件：version-check.js、vite.config.js、env/.env；所属项目：产品2.0
 - 来源会话：faf38ec5；代码基线：b2ce3e2 / c420af5
-
 
 <!-- MEMORY_FIELDS
 {

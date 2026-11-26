@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:23:38+08:00
+verdict_note: V3 ruoyi.js-498实见resolveListRoutePathHint，测试脚本resolve-list-route-path-hint.test.mjs存在，pathHint结论属实。
+---
 # 路由名首段作pathHint致合同缴款页误命中
 `buildDetailNavigation` 取路由 name 首段为 `pathHint`，合同缴款与定金缴款共用 `notice/detail` 导致解析命中定金详情。
 

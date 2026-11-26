@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T01:47:24+08:00
+verdict_note: 苏州市房地产监测V3 未找到 saleAgencyDialog.vue 与 </zs-button-group> 闭合标签；涉及文件在该项目不存在，改动无法在代码证实。
+---
 # 修复不带 zs 前缀的 Vue 标签闭合
 在 苏州市房地产监测V3 项目中，不带 `zs` 前缀的闭合标签 `</el-input>` 和 `</el-button-group>` 导致了 Vite 编译错误，已修正为 `</zs-input>` 和 `</zs-button-group>`。
 

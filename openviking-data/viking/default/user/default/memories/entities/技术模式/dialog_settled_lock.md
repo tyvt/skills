@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:14:50+08:00
+verdict_note: 确认SelectDialog(setData/resolve/reject)、settled锁及openUnionBankWdmcSelect，确认按钮被reject覆盖的修复属实。
+---
 # SelectDialog 确认无效因 reject 覆盖 resolve
 Bug 在 `zs-select-dialog-func.vue` 中：点击确认时，`setData` 之后跟着 `resolve`，但关闭触发了 `reject('cancel')` 将其覆盖，导致 `handleAdd` 的 catch 静默错误且列表未更新。
 
@@ -25,7 +30,6 @@ Bug 在 `zs-select-dialog-func.vue` 中：点击确认时，`setData` 之后跟�
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：b1936cf8-2758-4591-92a8-a76aef6e1db5
-
 
 <!-- MEMORY_FIELDS
 {

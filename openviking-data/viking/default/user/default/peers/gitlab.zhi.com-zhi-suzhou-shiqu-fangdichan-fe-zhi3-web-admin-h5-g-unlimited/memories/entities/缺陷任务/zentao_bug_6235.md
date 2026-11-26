@@ -22,14 +22,17 @@
 ## 落地与历史
 - 独立 worktree 分支 fix/bug-6235-house-pagination-v3，D:\repository\苏州市房地产监测V3-wt-bug-6235-v3 保留；开工 6 个、收尾 7 个 worktree；主工作区 HEAD 被其他任务从 0967c67 推到 0144a81 再到 d140832，wt-bug-6173／wt-bug-6285 被其他任务删除，本轮仅用 wt-bug-6235-v3
 - 历史误判（2026-11-06，已作废）：曾误判根因为 body/query 分页位置并回写 resolved/fixed/assignedTo=lichandan/resolvedBy=tiany；空操作提交子模块 fdb331230、父仓库 3749533 均推 develop/v3.0.0，保留在历史
+- 2026-11-05 首次修复（后经 11/06、11/09 验证无效）：chooseHouseDialog.vue 户室号表格 :table-tr 4→5（对齐 pageSize=5）、已选房屋表格 :table-tr 3→5，新增 computed pageSizeRows()=5，.dialog-right-panel overflow-y:auto→hidden，.choose-house-table-wrap 改 flex:0 1 auto;min-height:0;overflow:hidden；根因是 table-tr 只固定显示行数而每页 5 条被内部滚动遮挡、外层面板整体滚动体验差
+- 2026-11-05 交付：子模块 zhi2-web-admin 提交 96dc27b22、父仓库 gitlink bce4c7e，同推 origin/develop/v3.0.0；禅道 status=resolved、resolution=fixed、resolvedBuild=trunk、resolvedBy=tiany、assignedTo=lichandan，zt_action id=87821
+- 2026-11-05 验证：npm run build 通过、产物 contractMainInfo-*.js 含 pageSizeRows(){return 5}；eslint 159→159 无新增命中（存量风格问题）；本地 nginx 8098 部署最新 dist，但登录态目视回归被远程测试环境图形验证码（captchaOnOff=true）阻断；两仓库工作区干净，未夹带开工前既有的 env/.env 代理切换，public/version.json 构建产物已还原未入库
 
 <!-- MEMORY_FIELDS
 {
   "category": "缺陷任务",
   "name": "zentao_bug_6235",
+  "source_extraction_id": "a653a1d6c0264fb3a969ceae1fce4411",
   "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited",
-  "source_extraction_id": "07f6d5383f84443283aa84f8c5522090",
-  "version": 5,
+  "version": 6,
   "memory_type": "entities"
 }
 -->

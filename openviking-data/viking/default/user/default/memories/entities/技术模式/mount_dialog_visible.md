@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:27:46+08:00
+verdict_note: V3 selectDialog/mountDialog.js存在，BranchOneDialog.vue-6,113实见syncVisible，对话框补visible定义结论属实。
+---
 # 旧对话框因缺少 visible prop 而隐藏
 在项目 Suzhou Real Estate Monitoring V3 中，当使用 `propsData: { visible: true }` 挂载时，未声明 `visible` prop 的旧对话框会被 Vue 2 隐藏；已通过 Shell `render` 在 `props` 和 `attrs` 中传递 `visible` 进行修复。
 

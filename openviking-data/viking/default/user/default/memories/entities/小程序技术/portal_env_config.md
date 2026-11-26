@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:15:48+08:00
+verdict_note: 小程序命中 portal-env-config、bdc，环境配置集修复属实。
+---
 # 环境配置集至portal-env-config.js
 新建 utils/portal-env-config.js 统一维护三类环境配置及解析逻辑，供各模块导入。
 

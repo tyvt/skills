@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:43:28+08:00
+verdict_note: workbuddy 为用户陈述的会话导入目标程序，属元信息记忆，无代码可核对但与现状无矛盾。
+---
 # workbuddy
 用户提及的程序，其历史会话计划导入 OpenViking。
 

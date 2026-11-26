@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:43:44+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[operationColumnWidth,ListTemplate,listMixins,AccountCancel]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # ListTemplate操作列宽度未定义告警修复
 园区物管2.0 中 AccountCancel 页面使用 ListTemplate 时因未声明 operationColumnWidth 触发 Vue warn。
 
@@ -15,7 +19,6 @@
 - 涉及文件：zhi2-web-admin/src/mixins/ListTemplate.js、table.js（表格mixin）、maintenance/query/index.vue
 - 所属项目：园区物管2.0（项目2-0）
 - 来源会话：0613463c-dedd-4264-a38a-7d944299a97c
-
 
 <!-- MEMORY_FIELDS
 {

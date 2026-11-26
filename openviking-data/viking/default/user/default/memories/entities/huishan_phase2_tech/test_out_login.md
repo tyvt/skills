@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:15:00+08:00
+verdict_note: 惠山二期H5 lingxi.js 实机含 isOutLoginEnabled、skipLingxiHouseAuthInTest，.env.test 存在，第三方登录开关属实。
+---
 # 测试环境开启第三方登录
 惠山二期H5在测试与生产环境开启灵锡第三方登录，开发环境仍用账号密码。
 

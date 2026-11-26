@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:27:31+08:00
+verdict_note: 苏住房G 命中 recordUser(4)，原 evaluator 字段0命中与「改回 recordUser」一致；引用文件存在，列prop修复属实。
+---
 # 列表操作人列误绑 ID 字段：横向比对同模块兄弟页改 prop
 信用管理-检查记录列表「操作人」列渲染成 19 位雪花 ID 形态数字，实为列 prop 绑了存用户 ID 的 evaluator 字段。
 ## 问题根因

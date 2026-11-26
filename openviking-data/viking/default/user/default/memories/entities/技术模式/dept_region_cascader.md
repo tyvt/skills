@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:47:59+08:00
+verdict_note: 苏住房G 存在 zs-dept-region-cascader、parentDeptId、deptTypes，三级级联筛选配置属实。
+---
 # 部门树三级区划级联筛选
 苏住房G 列表页行政区划筛选使用 zs-dept-region-cascader 实现区县→街道→社区三级级联，需跳过市级根节点并显式限定部门类型。
 

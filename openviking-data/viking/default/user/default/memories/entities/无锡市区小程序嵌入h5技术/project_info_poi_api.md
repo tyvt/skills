@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:10:52+08:00
+verdict_note: 无锡市区小程序嵌入H5仓命中 property/complex/getExtendedByComplexId、api/property、utils/transaction、utils/qqMapKey，接口分工描述属实
+---
 # 小区信息页数据与周边POI接口分工
 pages_owner/project/info/index.vue的小区详情、地图Key与周边配套分别调用不同接口，避免与维修资金接口混淆。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:14:11+08:00
+verdict_note: 命中 attachmentDraw/attachmentDraw.vue、OperationBtnGroup，Teleport 抽屉显隐修复属实
+---
 # 产品2.0抽屉显隐修复：Teleport到body+根节点隐藏
 产品2.0前端中，OperationBtnGroup的附件抽屉按钮不显示，已通过Teleport和根节点隐藏修复。
 

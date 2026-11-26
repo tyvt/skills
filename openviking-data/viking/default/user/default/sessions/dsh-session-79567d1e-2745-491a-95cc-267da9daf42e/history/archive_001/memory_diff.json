@@ -1,0 +1,24 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-79567d1e-2745-491a-95cc-267da9daf42e/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-26T09:03:13.651500+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/h5_login_automation.md",
+                "memory_type": "entities",
+                "before": "# uni-app H5 登录自动化技术要点\n源自 zhi2-mobile-shimin-h5-b-unlimited 登录验证会话，记录 agent-browser 自动化验证 uni-app H5 登录时的事件触发、验证码提取与命令行为要点。\n\n## 登录填充与事件\n- 原生 `fill` 填充后 DOM 三个 input 均有值，但未触发 uni-app 的 v-model `input` 事件，Vue 内部 data 仍为空，登录停留在 `#/` 并提示“请输入用户名”。\n- 该会话确认真正卡点是 v-model 事件未触发、而非图形验证码识别错误；成本触顶后在该步骤边界按 skill 交接 hop6。\n- 2026-11-26 登录排障：面板两个注册账号均返 HTTP 400「用户名或密码错误」；本次 netlog 仅 1 条 `userLogin`（code=36，即 hop9 旧验证码 6*6=36，HTTP 400），与填入的验证码 1 不符，点击后无新请求，密码字段为加密串 `NE3Cqwy3nFw3Nna6VXxScQ==`；根因倾向验证码 v-model 绑定/点击触发问题而非凭据本身。\n\n## 验证码提取\n- 验证码图为页面第 3 个 img，src 是 `data:image/jpeg;base64,...`；`find` 偶发返回 undefined，改用 `filter` 重试可稳定提取。\n- 解码需先去掉 base64 前缀污染；有效图约 2966 字节 JPEG，用视觉模型多轮确认以降低误判。\n\n## 浏览器命令行为\n- agent-browser 命令执行后浏览器持有 stdout 使进程挂起，但结果已返回；用 `timeout` 包裹命令。\n- 中途 kill job 会连带关闭浏览器进程导致下次重启，应保持浏览器在后台以便复用（无 \"launched browser\" 输出即复用成功）。\n- Windows shell 把 `|` 当管道符，含管道的 eval 会失败；写门禁禁止为纯浏览器验证落地临时脚本，改用内联命令。",
+                "after": "# uni-app H5 登录自动化技术要点\n源自 zhi2-mobile-shimin-h5-b-unlimited 登录验证会话，记录 agent-browser 自动化验证 uni-app H5 登录时的事件触发、验证码提取与命令行为要点。\n\n## 登录填充与事件\n- 原生 `fill` 填充后 DOM 三个 input 均有值，但未触发 uni-app 的 v-model `input` 事件，Vue 内部 data 仍为空，登录停留在 `#/` 并提示“请输入用户名”。\n- 该会话确认真正卡点是 v-model 事件未触发、而非图形验证码识别错误；成本触顶后在该步骤边界按 skill 交接 hop6。\n- 2026-11-26 登录排障：面板两个注册账号均返 HTTP 400「用户名或密码错误」；本次 netlog 仅 1 条 `userLogin`（code=36，即 hop9 旧验证码 6*6=36，HTTP 400），与填入的验证码 1 不符，点击后无新请求，密码字段为加密串 `NE3Cqwy3nFw3Nna6VXxScQ==`；当时判断卡在验证码 v-model 绑定/点击触发，后经续排推翻（见下文）。\n\n## 验证码提取\n- 验证码图为页面第 3 个 img，src 是 `data:image/jpeg;base64,...`；`find` 偶发返回 undefined，改用 `filter` 重试可稳定提取。\n- 解码需先去掉 base64 前缀污染；有效图约 2966 字节 JPEG，用视觉模型多轮确认以降低误判。\n\n## 浏览器命令行为\n- agent-browser 命令执行后浏览器持有 stdout 使进程挂起，但结果已返回；用 `timeout` 包裹命令。\n- 中途 kill job 会连带关闭浏览器进程导致下次重启，应保持浏览器在后台以便复用（无 \"launched browser\" 输出即复用成功）。\n- Windows shell 把 `|` 当管道符，含管道的 eval 会失败；写门禁禁止为纯浏览器验证落地临时脚本，改用内联命令；本次以 heredoc 经 stdin 喂入 XHR patch 规避 `|`/`||` 引号问题。\n\n## 2026-11-26 续排结论与交接\n- 2026-11-26 续排（hop11）：重新干净 patch XHR 并清空 netlog 后，点击「立即登录」触发全新 `userLogin`（新 uuid=041e…，验证码 `4+9=?` 答案 13），密码密文仍为 `NE3Cqwy3nFw3Nna6VXxScQ==`，后端仍返 HTTP 400「用户名或密码错误」；证明请求已正常发出且值正确，卡点不是验证码绑定或点击。\n- 根因：8180 站点活动 nginx conf `物业手持B端-local.conf` 将 `/api/v2.0` 反代到 `https://www.ylzhwy.com:8081`，而部署面板 registry 的 `backend_gateway`（用户凭据可用的网关）为 `http://unlimited.c.h5.query.mobile.v2.suzhufang.shiqu.suzhou.test.zhishusz.com`（`login_user=601117997`）；走错后端网关导致正确凭据被拒，属 conf/registry 不匹配而非代码问题。\n- 登录页实现：真实登录页 `src/pages/login/index.vue`，提交逻辑约 200–240 行；登录出错时（237–238 行）清空 code 并刷新验证码；`validate()` 要求 `form.code` 与 `form.uuid`，uuid 由 `ImgCode` 的 `@get-code` 事件提供；按钮为唯一 `uni-button`「立即登录」。\n- 交接：成本触顶（184k > 150k）且第 4 节非空，按 skill 交接 hop12；已写交接文档并调度新会话 `session-71da…`（schedule-0faf1e43…，17:01:03 触发）。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

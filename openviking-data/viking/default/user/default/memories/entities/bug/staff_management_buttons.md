@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: invalid
+last_checked: 2026-11-26T16:27:20+08:00
+verdict_note: 产品2.0 staffManagement/components/index.vue、certificatesTable.vue 中 viewButton/editButton/deleteButton/buttons() 均0命中，描述所指 mixin 按钮写法不在现状代码；原已标 suspect，无法证明有效。
 ---
 # 从业人员列表操作列按钮样式缺失修复
 产品2.0 的 staffManagement 模块因重写 buttons() 导致操作列按钮缺少统一样式与 disabled 逻辑，已修复为使用 mixin 配置。

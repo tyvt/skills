@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:13:06+08:00
+verdict_note: 命中 companyAdmin、行政区域，管理员行政区域字典显示修复属实。
+---
 # 经纪机构管理员管理行政区域显示修复
 苏州市房地产监测V3 的 companyAdmin/index.vue 行政区域列已修复为显示字典名称或区划全称。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

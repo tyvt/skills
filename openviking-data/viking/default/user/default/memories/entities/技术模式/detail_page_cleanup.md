@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T05:34:40+08:00
+verdict_note: publicQuery/complex/detail.vue-109/138 仅保留 detailMixins，grep 无 houseTable/area mixin/property-type 样式，与记忆移除复制来的重复 area mixin 与未用 houseTable 一致。
+---
 # 清理复制的详情页中未使用的代码
 复制详情页时移除重复 mixins 和组件的规范。
 
@@ -17,7 +22,6 @@
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：117b67e8-4e61-4da7-9503-e0038e998ea7
-
 
 <!-- MEMORY_FIELDS
 {

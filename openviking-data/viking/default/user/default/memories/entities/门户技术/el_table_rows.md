@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:12:49+08:00
+verdict_note: 门户仓命中 HomeTodoTable、querySelectorAll，el-table 固定列行数翻倍描述属实
+---
 # el-table 固定列行数翻倍
 门户首页待办等使用 el-table 固定列时，DOM 会复制固定列对应行节点，导致 e2e 行数计数翻倍。
 

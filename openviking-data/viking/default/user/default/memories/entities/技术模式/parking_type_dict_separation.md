@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T10:35:36+08:00
+verdict_note: 园区公共收益 parkingSpace/index.vue：parkingSpaceTypeOptions 固定 benefit_parking_type 全量，筛选用 parkingSpaceTypeFilterOptions 分离。
+---
 # 停车泊位车位类型字典分离修复
 修复园区公共收益项目停车泊位列表「车位类型」列在按产权类型筛选时显示原始数字而非文字的问题。
 ## 问题根因

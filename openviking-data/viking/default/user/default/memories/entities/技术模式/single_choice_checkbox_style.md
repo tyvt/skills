@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:17:28+08:00
+verdict_note: 产品2.0 element-ui.scss 实机含 .single-choice .el-table .el-checkbox__inner 限定，圆形复选框修复属实。
+---
 # 选择流程弹窗复选框误显圆形修复
 产品2.0 SelectRecordProcedureDialog 因全局 single-choice 样式作用于所有复选框，导致左侧类别复选框被画成圆形，已修复。
 

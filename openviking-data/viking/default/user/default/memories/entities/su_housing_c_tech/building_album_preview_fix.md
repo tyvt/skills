@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T16:47:00+08:00
+verdict_note: 苏住房C 构建产物含 buildingAlbum 与 resolveMediaUrl，src 含 uni.previewImage 预览链路，修复对象属实。
+---
 # 楼盘相册图片预览失败修复
 苏住房C小程序楼盘相册页面点击预览图片失败（显示问号占位图）的问题已修复。
 
@@ -15,7 +19,6 @@
 - 验证路径：首页 → 我要买房 → 地图找房 → 打开小区详情 → 楼盘相册预览
 - 涉及文件：buildingAlbum/index.vue、houseSupermarket/detail.vue、newHouse/detail.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：b5c173dc-ea32-4e53-9c29-1ef11624641c；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

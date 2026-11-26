@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:47:29+08:00
+verdict_note: VALID；message.vue/msg_bus_code_H5 在苏住房C真实代码命中。
+---
 # Message List Item Layout Misalignment Fix
 In Su Zhu Fang C (zhi2-mobile-shimin), the message list item originally placed icon, title, and tag on the same row with summary on a separate line, causing summary misalignment and title compression. Fixed by a left bell icon with red dot, right first-row title + tag + time, second-row summary, title font-weight 600.
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:13:36+08:00
+verdict_note: 无锡 zhi2-mobile-admin-h5-c-unlimited/src/App.vue-29/43、pages.json-31/36、newHome.vue-3 命中 newHome/无锡三资监管/reLaunch，描述属实。
+---
 # 路由拦截与首页改版约定
 无锡H5实现无Token仅允许访问首页newHome，且首页改为「无锡三资监管」并移除TabBar等。
 

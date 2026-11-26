@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T01:48:23+08:00
+verdict_note: 产品2.0 AmountInput/index.vue 仍用 v-money-[dot] 与 onBlur，vue-currency-input 为 0 命中；所述组件改造与现状不符。
+---
 # AmountInput 金额输入组件
 `产品2.0` 的 `AmountInput` 组件基于 `vue-currency-input` 实现，并修复了表单校验事件与清除图标样式问题。
 
@@ -13,7 +18,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

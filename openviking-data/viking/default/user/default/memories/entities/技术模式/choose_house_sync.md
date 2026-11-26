@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:24:23+08:00
+verdict_note: V3 contract/index.vue-518/576实见getContractMainInfo且含.catch兜底，buildCode经queryHousesByBuildCode，属实。
+---
 # 选房弹窗同步信息避免创建异常
 苏州市房地产监测V3 的 chooseHouseDialog.vue 在展开项目/楼栋/单元时同步 projectInfo 与 buildCode，提交前校验，避免创建异常。
 

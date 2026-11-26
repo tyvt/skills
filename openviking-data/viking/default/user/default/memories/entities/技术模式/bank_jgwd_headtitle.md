@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:54:34+08:00
+verdict_note: 苏州V3 jgwd/detail.vue命中 HeadTitle/index.vue及L34用法与操作人/操作时间, 属实
+---
 # 银行网点管理详情页 HeadTitle 接入
 苏州市房地产监测V3 在银行网点管理详情页按项目惯例接入 HeadTitle 展示操作人/操作时间。
 

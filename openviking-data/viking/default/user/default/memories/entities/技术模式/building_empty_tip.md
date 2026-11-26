@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:20:17+08:00
+verdict_note: 产品2.0/园区公共收益/园区物管2.0 的 buildingTable.vue 命中原文「暂无数据，请先到物业管理区域详情页维护」(15处)；OverviewEmptyTip(81)、goEmptyFiling(71) 均在真实代码，描述一致。
+---
 # 楼幢信息空数据提示改为纯文本不穿透
 产品2.0 公共查询-物业管理区域详情页的楼幢信息空数据提示已由可点击链接改为纯文本，不再穿透跳转。
 
@@ -13,7 +18,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

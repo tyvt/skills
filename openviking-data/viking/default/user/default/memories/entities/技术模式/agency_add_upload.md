@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:18:57+08:00
+verdict_note: 苏州市房地产监测V3 存在 AgencyPersonnelDetail.vue，页面 formMode!=='add' 条件渲染模式普遍使用，新增页隐藏要件上传描述属实。
+---
 # 机构人员新增页隐藏要件上传
 苏州市房地产监测V3 项目中调整机构人员详情（`AgencyPersonnelDetail.vue`）编辑表单，新增页不显示要件上传区块。
 ## 修改内容

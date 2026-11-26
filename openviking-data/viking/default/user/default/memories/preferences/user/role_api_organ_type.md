@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:15:21+08:00
+verdict_note: 园区公共收益命中 organType(60)、ownerCommitteeWorker，查询角色API需 organType 属实。
+---
 - Querying org-type role API requires organType besides roleType: '2'; missing it causes a "type is empty" error
 - In loadRoleOptions add organType: this.form.accountType and skip the request when no org type is selected
 - Remove the init request from initDict; trigger it after selecting/switching org type, route prefill, or edit load
@@ -8,7 +13,6 @@
 - 所属项目：园区公共收益
 - 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：9878244d-a568-49fa-8751-9ff53a3f3559
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:14:16+08:00
+verdict_note: 园区物管2.0/产品2.0 实机含 asset-detail-top__value 与 HouseAssetDialog 等弹窗组件，嵌套修复属实。
+---
 # 资产明细值区域嵌套与断行修复
 园区物管2.0 修复资产明细弹窗中因非法嵌套与断行导致的展示错乱问题。
 

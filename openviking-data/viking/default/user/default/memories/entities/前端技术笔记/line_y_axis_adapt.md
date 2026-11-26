@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:53:35+08:00
+verdict_note: 产品2.0命中 computeFundLineYAxis/seriesArrays/splitCount/chartOptions, Y轴自适应属实
+---
 # 多系列折线图 Y 轴自适应刻度
 大屏多系列折线图 Y 轴禁止写死 max，需取全系列最大值 ×1.08 后规整到 1/2/3/5/7/10×10ⁿ 自适应。
 

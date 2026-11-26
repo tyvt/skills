@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T14:38:13+08:00
+verdict_note: zs-search-form.vue 实测仍用 .el-select .el-input__inner(239-246行)统一高度，无 .el-select__wrapper 选择器；产品2.0亦无命中，描述的修复不在现状代码。
+---
 # zs-select 高度不齐：el-select 内层改为 .el-select__wrapper
 zhi2-web-admin 搜索区 zs-select 在 Element Plus 下因旧选择器命不中而高度与其他组件不一致。
 

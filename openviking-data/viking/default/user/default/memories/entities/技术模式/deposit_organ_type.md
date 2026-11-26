@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T13:34:18+08:00
+verdict_note: 榆林G detail.vue-176物业服务企业弹窗filterParams organType-'02'属实；614 getByComplexId、591 companyInfo兜底均在，描述与代码一致。
+---
 # 质保金协议物业弹窗 organType 须用 02
 房屋质量保证金协议物业服务企业弹窗误用 organType '03'（会计机构），正确为 '02'，导致列表为空，须修正并规范自动填充逻辑。
 ## 问题根因

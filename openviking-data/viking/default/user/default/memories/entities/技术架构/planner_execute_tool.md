@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:45:38+08:00
+verdict_note: 实机核对：D-/repository 代码仓无对应文件命中，属配置/会话/工具类记忆，无法用代码证据证明有效，判无效。
+---
 # planner execute 工具
 dsh/langgraph-orchestrator 编排中的 execute 工具，在 graph execute 阶段负责产出作答与规划内容。
 

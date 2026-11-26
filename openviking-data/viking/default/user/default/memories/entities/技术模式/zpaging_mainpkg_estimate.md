@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:24:00+08:00
+verdict_note: Project_Suzhufang.vue虽用scroll-view(-39)但仍import ZsPaging(-99)，且relocate-z-paging.mjs与uni-load-more均不存在，与描述不符。
+---
 # 苏住房C主包上传预估超限(z-paging)
 构建失败因主包上传预估体积超限(2104.1KB>2048KB)，非磁盘体积本身(1798.4KB通过)。新增z-paging/ZsPaging后约92KB被打进主包node-modules，上传预估超约56KB。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,36 +1,36 @@
 # zhi2-web-admin Git Submodule
-zhi2-web-admin 是父仓「门户」的独立 git 子模块，改动经 submodule worktree 落地。
+zhi2-web-admin is an independent git submodule of the parent "portal" repo; changes land through the submodule worktree.
 
 ## Workflow
-- 标准链路：子模块 worktree 开发 → commit → 快进合并进 develop/v3.0.0 推送 → 父仓提交 gitlink（`M zhi2-web-admin`）推送 → 删 worktree 与临时分支。
-- 例外「在主线上做」（均在 develop/v2.6.2-suzhufang）：task2295 月度报表导出；2026-11-24 bug6903 隐患按钮右移（子模块 `5b6400983`/父仓 `6eef297`）、bug6915（子模块远端 `d9ed05cc7`/父仓 `36f559c`）、bug6932 录入分值现场图片逐项独立（子模块 `fee36597d`/父仓 `3315a33`）、bug6950 资金拨付作废 GET→POST（子模块 `79093564e` 连同既有 parkingSpace 提交 `e4430964e`，父仓 `2d3ca6cc`），推送后远程 SHA 均一致。
-- 他人脏文件 `ScreenHeader.vue`、`particles.js`、`_review.json` 与父仓 `env/.env` 本地代理切换一律不纳入提交；2026-11-24 判定子模块 `public/version.json`（受保护构建产物，禁 git add）、`report.html`（3.5MB 已跟踪 build 报告，删除会产生 `D` 状态）、`_review.json`（早于任务 8 天的历史文件）均保留不删。
-- 嵌套子模块 worktree（`.git` → `.git/worktrees/.../modules/zhi2-web-admin`）文件为空，需在新父仓 worktree 内 `git submodule update --init`；父仓 `-b` 只建父仓分支，子模块任务分支另建（2026-11-09 fix/contract-version-dialog-public-component 从干净 HEAD 建 worktree 与同名子模块分支；worktree `D:\repository\苏州市房地产监测V3-wt-bug-6363` 的子模块分支 `fix/bug-6363-attachment-lost` 基于 `6009ddf16`）。
-- 父仓只 add 子模块指针、勿带 dirty 的防汛文件；避免 PowerShell `export &&` 链（静默失败），改 pwsh 设 env + 分号链并核对新 SHA。父仓 behind=1 时先 `pull --rebase`（设 `GIT_EDITOR` 免交互）再 add gitlink 提交推送，2026-11-24 bug6950 即此路（gitlink `6a95e30→7909356`）。
+- Standard chain: develop in submodule worktree -> commit -> fast-forward merge into develop/v3.0.0 and push -> commit and push parent gitlink (`M zhi2-web-admin`) -> delete worktree and temporary branch. In the parent, add only the gitlink, not dirty flood-control files; avoid PowerShell `export &&` chains (silent failures), use pwsh env assignment plus semicolon chains and verify the new SHA. If parent is behind by 1, `pull --rebase` (set `GIT_EDITOR`) before gitlink commit and push; 2026-11-24 bug6950 used this path (gitlink `6a95e30->7909356`).
+- Exception "work on mainline" (all on develop/v2.6.2-suzhufang): task2295 monthly report export; 2026-11-24 bug6903 hazard button moved right (submodule `5b6400983`, parent `6eef297`), bug6915 (submodule remote `d9ed05cc7`, parent `36f559c`), bug6932 on-site image for each scored entry (submodule `fee36597d`, parent `3315a33`), bug6950 fund-allocation void GET->POST (submodule `79093564e` with existing parkingSpace commit `e4430964e`, parent `2d3ca6cc`); after pushes, remote SHAs matched.
+- Never commit others' dirty files `ScreenHeader.vue`, `particles.js`, `_review.json`, or parent `env/.env` local proxy switches; on 2026-11-24, keep submodule `public/version.json` (protected build artifact, forbidden for git add), `report.html` (3.5MB tracked build report; deleting creates `D`), and `_review.json` (historical file 8 days before the task).
+- Nested submodule worktree `.git` -> `.git/worktrees/.../modules/zhi2-web-admin` has an empty file; run `git submodule update --init` in a new parent worktree. Parent `-b` creates only the parent branch, so create submodule task branches separately (2026-11-09 `fix/contract-version-dialog-public-component` created from clean HEAD as both worktree and same-name submodule branch; worktree `D:\repository\苏州市房地产监测V3-wt-bug-6363` with submodule branch `fix/bug-6363-attachment-lost` based on `6009ddf16`).
+- 2026-11-11 bug6468: after the user chose `提交并推送` (commit and push), set `GIT_EDITOR=true`, removed the temp build log, checked ahead/behind; submodule was behind by 2 commits touching `DeveloperBasicInfoForm.vue` and `toB/companyRecord/detail.vue`, not `RecordCertificateDialog.vue`, so with no conflict the fix was stashed, `pull --rebase` fast-forwarded, and restored cleanly. Build-modified `public/version.json` was restored, parent `docs/前端/` stayed untracked and was not committed, the parent gitlink was stashed while the parent fast-forwarded to `7f74d31`, and only the gitlink was committed; result: submodule commit `94803e92f` on updated `develop/v3.0.0` pushed `15d739808..94803e92f`, parent gitlink to `94803e9` committed as `acb1350` and pushed `7f74d31..acb1350`, remotes matched, gitlink diff syntax errored but status confirmed modification, and post-commit `dist/` rebuild was noted as separate work.
 
 ## Build / Lint
-- worktree 无 node_modules：workspaces 依赖提升到父仓，worktree 在主目录外致 Node 向上查找错过根 node_modules；不要 junction 主 node_modules（残缺依赖），应干净 `npm install`（禁 husky）；SFC 编译检查借主工作区 node_modules（纯 Vue2 Options API 写法一致即安全），构建验证放主工作区（worktree 的 vite 更严可能失败）。
-- Lint 门：`eslint-plugin-duplicate-attributes: "file:eslint-rules"` 依赖主工作区 eslint-rules/ 与 node_modules，缺失致 `npm run lint` 加载失败；worktree 干净 install 恢复插件后可跑，但全库基线为红（2026-11-09 共 12,509 条），真正的门是改动文件零引用；备选 ESLint 8 `--resolve-plugins-relative-to` 主仓；另按「改完必编译」跑生产构建。
-- 禁用 PowerShell Get/Set-Content 处理中文 Vue 文件（破坏 UTF-8+BOM），改用读写工具。
-- 榆林 worktree 与主仓共用 vite rootDir `D:/repository/榆林G` 覆盖同一 dist → 用 `--outDir` 隔离；榆林改动只落 develop/v2.6.2-yulin（无父仓分支）。
+- Worktrees have no `node_modules`: workspaces hoist dependencies to the parent, and an out-of-root worktree makes Node miss root `node_modules`. Do not junction the main `node_modules` (incomplete dependencies); use clean `npm install` (disable husky), borrow main-workspace `node_modules` for SFC compile checks (Vue2 Options API syntax is identical), and run build verification in the main workspace because worktree Vite is stricter and may fail.
+- Lint gate: `eslint-plugin-duplicate-attributes: "file:eslint-rules"` depends on the main workspace `eslint-rules/` and `node_modules`; if missing, `npm run lint` fails to load. A clean worktree install restores the plugin; full-repo baseline is red (2026-11-09: 12,509 issues), so the real gate is zero new hits in changed files. Alternative: ESLint 8 with `--resolve-plugins-relative-to` the main repo; also run production build per "changed code must compile".
+- Do not use PowerShell `Get/Set-Content` on Chinese Vue files (breaks UTF-8+BOM); use read/write tools.
+- Yulin worktree and main repo share Vite rootDir `D:/repository/榆林G` and overwrite the same `dist`; use `--outDir` isolation. Yulin changes land only on `develop/v2.6.2-yulin` (no parent branch).
 
 ## Parallel / Remote
-- 远程 develop/v3.0.0 并行前进不可快进 → 禁止 force push：fix 分支合并进子模块 develop/v3.0.0 并推送，再在父仓合并远程 develop 把 gitlink 冲突解到新子模块 head；同文件冲突两边都保留；用 merge 而非 rebase 以保留父仓 gitlink commit hash；远程 CI 的 unused-files vite.config.js 修复可合并进子模块。
-- 同文件并行冲突例：#6337 beginDialogAsyncLoad 乱序守卫 vs #6235 paginateRows 切片（chooseHouseDialog.vue）→ 两方法都留，用 applyOriginPage（paginateRows 切片 + syncOriginSelection）。
-- 仅落后 origin 时：fix 分支 rebase 到 origin/develop/v3.0.0 使推送成快进，单 gitlink 提交干净重放、子模块 SHA 不变；远程再前进则子模块 rebase 到新 origin tip、重指父仓 gitlink、再 rebase 父仓。
+- If remote `develop/v3.0.0` advanced and cannot fast-forward, do not force push: merge the fix branch into submodule `develop/v3.0.0` and push, then merge remote develop in the parent and resolve the gitlink conflict to the new submodule head; keep both sides in same-file conflicts; use merge, not rebase, to preserve parent gitlink commit hash; remote CI's unused-files `vite.config.js` fix can merge into the submodule.
+- Same-file parallel conflict example: #6337 `beginDialogAsyncLoad` ordering guard vs #6235 `paginateRows` slicing in `chooseHouseDialog.vue`; keep both methods and use `applyOriginPage` (`paginateRows` slicing plus `syncOriginSelection`).
+- If only behind origin: rebase the fix branch onto `origin/develop/v3.0.0` so push is fast-forward, replay one gitlink commit cleanly, and keep submodule SHA unchanged; if remote advances again, rebase submodule to new origin tip, repoint parent gitlink, then rebase parent.
 
 ## Cleanup & Recovery
-- worktree 清理：有 junction 到主 node_modules 先 `cmd /c rmdir` 再删 worktree；含子模块时 git 拒删 → 删自身目录后 prune。
-- 2026-11-09 worktree 内合并 develop/v3.0.0（子模块 tip `c29dcdb87`、父仓 tip `2892034`，gitlink 解到 `c29dcdb87`）：恢复主父仓失败因 worktree 仍占用 develop（分支被锁）→ 先 detach 释放 develop 再恢复；wtSub 与 mainSub 是不同仓库，主子模块无碍。
-- 子模块 .git 链接丢失时 `git -C $sub` 静默落到父仓 → 推送前恢复链接；误删 worktree 可用恢复链接 + checkout 找回，无损失。
-- 2026-11-09 误删主工作区 zhi2-web-admin 的 .git 链接、worktree 与 node_modules：保留 gitdir 重建链接 + `reset --hard HEAD` 找回跟踪文件，`npm install` 恢复 870 依赖，git status 干净、构建通过，无损失。
+- Worktree cleanup: if there is a junction to main `node_modules`, first `cmd /c rmdir`, then delete worktree; if the worktree contains a submodule, git refuses deletion, so delete its own directory and then prune.
+- 2026-11-09 worktree merge of `develop/v3.0.0` (submodule tip `c29dcdb87`, parent tip `2892034`, gitlink resolved to `c29dcdb87`): restoring the main parent failed because the worktree still occupied `develop` (locked branch); detach to release `develop`, then restore. `wtSub` and `mainSub` are different repos, so the main submodule was unaffected.
+- If the submodule `.git` link is lost, `git -C $sub` silently falls back to the parent repo; restore the link before pushing. An accidentally deleted worktree can be recovered with the restored link plus checkout, with no loss.
+- 2026-11-09 accidental deletion of main workspace `zhi2-web-admin` `.git` link, worktree, and `node_modules`: kept the gitdir, rebuilt the link, ran `reset --hard HEAD` to recover tracked files, and restored 870 dependencies with `npm install`; git status became clean and build passed with no loss.
 
 <!-- MEMORY_FIELDS
 {
   "category": "git_submodule",
   "name": "zhi2_admin_git",
-  "source_extraction_id": "f61f579abe764cdfa8d29918a57cc7da",
-  "version": 28,
+  "source_extraction_id": "ce61e01aa0944a3391e938adc440bc7d",
+  "version": 29,
   "memory_type": "entities"
 }
 -->

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:40:54+08:00
+verdict_note: 苏住房C/zhi2-mobile-shimin 子模块实测存在（api/common.js、pages_transaction、pages_owner 均可访问），与「子模块为 zhi2-mobile-shimin」核心事实一致。
+---
 # 苏住房C端小程序
 苏住房（苏州住房）业主端H5/小程序前端，子模块为 zhi2-mobile-shimin，承载业主倡议与签字环节。
 
@@ -11,7 +16,8 @@
 - 榆林版新接口：addAppSuggest(发起倡议,顶层signatureUrl)、cancelSuggestV2(撤回倡议,revocationSignatureUrl)、appSuggestResponse+suggestResponseStatus(响应/撤回响应)
 
 ## 参考实现
-- 榆林C端代码参考实现位于"泰兴小程序"项目（用户2026-11-04确认），路径 D:epository\泰兴小程序 分支 dev-ui-yulin-v2.6.8 的 src/pages-suggest/
+- 榆林C端代码参考实现位于"泰兴小程序"项目（用户2026-11-04确认），路径 D:
+epository\泰兴小程序 分支 dev-ui-yulin-v2.6.8 的 src/pages-suggest/
 - 接口封装 src/api/autonomy.js（addAppSuggest/cancelSuggestV2/hasResponded/appSuggestResponse）
 - 签字组件：苏住房C端已有 src/pages/components/SignBoard.vue（mp分支 src/components/shared/SignBoard.vue）+ pages_owner/decision/components/StepSign.vue
 

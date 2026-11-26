@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:28:07+08:00
+verdict_note: 产品2.0 ArchiveDetailDialog.vue实见dirState单选(-34-36)、fileDirStateOptions-[] (-69)，与描述一致。
+---
 # ArchiveDetailDialog字典项误引dirState致options未定义
 ArchiveDetailDialog.vue 的 contentInfo 中"状态"项绑定 this.dirStateOptions，但 data 仅定义 fileDirStateOptions，致使 DictTag 内 options 为 undefined 并调用 find 报错。
 

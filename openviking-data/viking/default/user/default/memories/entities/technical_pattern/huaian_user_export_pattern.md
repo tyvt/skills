@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:41:45+08:00
+verdict_note: 淮安物管源码：publicExport命中system/publicPage/index.vue-217与system/user/index.vue-237，exportLoading(78)、getQueryParams大量存在；与"共用getQueryParams、exportLoading防重复"描述吻合。
+---
 # Huaian User Export Pattern
 Huaian Property Management export fixes for system/user lists covering consistent params passing, shared precheck/download params, loading guard, and backend permission alignment.
 
@@ -17,7 +22,6 @@ Huaian Property Management export fixes for system/user lists covering consisten
 - 所属项目：淮安物管
 - 验证证据：extracted source=cursor project=淮安物管
 - 来源会话：1f213572-ce02-4c37-b44f-d1f8f9f8b64c
-
 
 <!-- MEMORY_FIELDS
 {

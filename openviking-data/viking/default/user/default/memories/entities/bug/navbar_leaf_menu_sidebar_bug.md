@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-26T23:45:37+08:00
+verdict_note: collectNavbarChildrenMenus/shouldSyncSidebarForTopNav/resolveSidebarRoutes 在苏州市房地产监测V3 Navbar.vue 命中；原 suspect 标记按二态口径以代码证据为准。
 ---
 # 顶栏叶子菜单侧栏错误拼接修复
 苏州市房地产监测V3 修复点击顶栏叶子菜单后侧栏被错误拼出无关项的问题。

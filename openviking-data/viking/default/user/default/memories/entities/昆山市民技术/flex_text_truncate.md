@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:20:50+08:00
+verdict_note: 昆山市民无pages_examine/examineDetail.vue及common.scss；min-width-0/word-break虽在listStyle.scss存在，但声称文件不符，无法证实该修复。
+---
 # flex 子项缺最小宽致长文本截断
 昆山市民审批详情页 flex 横向布局中长文本因缺 min-width:0 不收缩而横向溢出截断，需改 flex:1 与 min-width:0 实现换行。
 

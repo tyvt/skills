@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:29:05+08:00
+verdict_note: 苏住房G 命中 areaLayerLoadSeq(6)、loadAreaComplexLayer(11)、markListLayerLevel(11)、nextMarkListLayerLevel(11)，缩放竞态保护属实。
+---
 # 地图聚合层级缩放竞态序号守卫
 苏住房G 资金统计地图在聚合层级切换时异步请求返回顺序不确定，旧响应覆盖新层级数据且旧标记残留。
 

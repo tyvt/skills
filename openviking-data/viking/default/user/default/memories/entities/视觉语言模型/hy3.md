@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:47:36+08:00
+verdict_note: settings.yaml 与 ov.conf(vlm) 均有 auto/hy3，SKILL 及 openviking_hy3 记忆一致确认 hy3 不支持识图，描述属实。
+---
 # hy3
 OpenViking 使用的视觉语言模型（VLM），负责从会话中抽取记忆。
 

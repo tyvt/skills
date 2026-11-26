@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:40:32+08:00
+verdict_note: vite.config.js 173-174行实测 define-{debounce-'window.debounce'}，与「vite define 注入全局 debounce」核心描述一致。
+---
 # Vite ESM 环境使用 require 触发浏览器报错
 苏州市房地产监测V3 的 Vite ESM 环境使用 `require('lodash/debounce')` 触发浏览器不支持 CommonJS 报错。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:46:08+08:00
+verdict_note: 苏住房G zhi2-web-admin 中 8992db265/cc496589e/1b3c7f6c5/1df2da437 四个commit均存在，terminalUser.js/passwordReset.js 命中，项目记录属实。
+---
 # 苏住房G (Suzhou Housing G-end)
 Front-end project for Suzhou Housing G-end/management H5, uses zhi2-web-admin submodule, local workspace D:/repository/苏住房G.
 

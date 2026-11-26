@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:16:38+08:00
+verdict_note: 修复属实：家园区一网通办 src/style/index.scss 用 !important 强制对齐 --picker-view-column-indicator-height，注释说明 rpx 内联覆盖问题。
+---
 # uv-picker内联rpx覆盖指示器致H5滚动错位
 家园区一网通办中 main.ts 设 uni.$uv.config.unit 为 rpx，使 uv-picker 输出内联 height/line-height，优先级高于 picker-view 的 --picker-view-column-indicator-height 变量，导致 H5 滚动步长与渲染错位。
 

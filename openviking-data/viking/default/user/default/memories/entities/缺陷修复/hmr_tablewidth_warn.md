@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:47:55+08:00
+verdict_note: 苏住房G 真实源码命中 buildStatColumnWidths、columnWidths.tableWidth；firstColWidth 已移除，与描述一致。
+---
 # Vue 未注册 computed 的 HMR 警告
 在 Suzhou Housing G 项目中，模板在 HMR 后引用了未注册的 computed `tableWidth`，导致警告。
 
@@ -20,7 +25,6 @@
 - 所属项目：苏住房G
 - 验证证据：extracted source=cursor project=苏住房G
 - 来源会话：e2b799d6-2c74-4d75-98c4-123b9c9d51db
-
 
 <!-- MEMORY_FIELDS
 {

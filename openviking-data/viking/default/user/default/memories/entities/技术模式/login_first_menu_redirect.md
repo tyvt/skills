@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T07:33:56+08:00
+verdict_note: utils/landingPath.js 存在，resolveFirstMenuPath(76)、getPostLoginPath(125)、Layout/ParentView(44)、InnerLink(45) 全部命中，与记忆实现要点一致。
+---
 # 登录后默认跳转首菜单实现
 苏州市房地产监测V3 实现了登录成功或进入系统首页时按侧栏菜单顺序进入第一个可访问页面的逻辑。
 

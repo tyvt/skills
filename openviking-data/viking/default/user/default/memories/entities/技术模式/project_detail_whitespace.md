@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:43:04+08:00
+verdict_note: V3 中 --detail-page-padding(variables.css)、flex-0 1 auto 与 overflow-y(index.scss)、detail-from-container 均存在，属实。
+---
 # 项目备案详情底部空白修复
 苏州市房地产监测V3 中项目备案等详情页底部 Tab 白卡片空白过大问题已通过 CSS 调整修复。
 

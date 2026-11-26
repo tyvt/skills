@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:24:21+08:00
+verdict_note: 苏州市房地产监测V3 命中 listVersionManagement(20)、versionManagement(36)、setContractData(7)，合同版本选择属实。
+---
 # 合同版本选择弹窗改造
 苏州市房地产监测V3 中「合同版本」选择弹窗（contractDialog.vue）当前手写表格与分页，未使用公共 zs-select-dialog 组件，需改造为标准化选择弹窗。
 

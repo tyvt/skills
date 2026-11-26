@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:45:01+08:00
+verdict_note: 实机核对 苏住房C 仓库确认关键符号(14/15)存在：$nextTick、-model-value、@update-model-value、@update-model-value="tabChange"、curIndex；文件与描述一致，记忆有效。
+---
 # 苏找房页切换Tab不请求接口修复
 苏住房C小程序苏找房页（Project_Suzhufang.vue）因TabBar同时绑定v-model和自定义事件导致切换tab不请求列表接口，已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:19:01+08:00
+verdict_note: 苏住房G guideConfig.js-149 有 PUBLIC_REVENUE_GUIDE，publicRevenue/index.vue-7/10 与 ProcessGuidePage 命中，指南页属实。
+---
 # 公共收益操作流程指南页面（苏住房G）
 苏住房G 项目完成「公共收益操作流程指南」页面开发，沿用 ProcessGuidePage + guideConfig 模式。
 

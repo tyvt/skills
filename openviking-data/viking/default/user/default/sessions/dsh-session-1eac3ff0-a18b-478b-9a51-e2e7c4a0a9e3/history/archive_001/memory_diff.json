@@ -1,0 +1,30 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-1eac3ff0-a18b-478b-9a51-e2e7c4a0a9e3/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-26T01:32:13.815079+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited/memories/events/2026/11/11/物业管理区域下拉改造实施.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-11，用户就苏住房防汛C端移动查询H5的「物业管理区域」输入框确认采用下拉+默认展示前10条+可搜索方案；助手在 project-check/start/index.vue、inspection/index.vue、rescue/index.vue 三页及 stores/evaluation.ts、stores/flood.ts、styles/theme.css 完成实现，npm run build 编译通过但未做真机交互验证、改动尚未提交，并提示 flood.ts 的 searchComplex 空关键词请求 complex/options 不带参数、若后端要求 complexName 必传可能无法获取默认10条。\n# 2026-11-11 (Wednesday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: 那是不是要改成“请输入关键词搜索”啊我以为是个下拉的，或者先展示10条，不带搜素文字的先查一些数据展示\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: 基线构建通过。现在改三个页面。\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: Now add chevron style to rescue scoped styles and theme.css:\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: Now inspection/index.vue:\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: Now project-check/start/index.vue:\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: 构建通过。确认三处改动都符合预期：\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited]**: 已按你选的方案改完：**下拉 + 默认展示前 10 条 + 可搜索**。三个用到「物业管理区域」的页面都统一了。\n\n## 改了什么\n\n1. **聚焦即展示前 10 条**：点击/聚焦输入框时，关键词为空则先查一次并只取前 10 条展示，不再是一片空白。\n2. **输入即时过滤**：输入关键词 250ms 防抖后再查（之前输入前无任何数据）；清空关键词回退到前 10 条。\n3. **带下拉箭头**：右侧加了 `›`，视觉上明确是下拉选择，不再像纯输入框。\n4. **文案与状态**：占位改为「请选择物业管理区域」；加载中显示「加载中…」；无数据按有无关键词分别显示「无匹配区域 / 暂无可选区域」。\n\n## 涉及文件\n- [project-check/start/index.vue](src/pages/project-check/start/index.vue) — 发起检查页（就是你截图这个），`finishedComplexPage` 支持传 pageSize 取 10 条\n- [inspection/index.vue](src/pages/inspection/index.vue) — 检查填报页\n- [rescue/index.vue](src/pages/rescue/index.vue) — 险情上报页\n- [stores/evaluation.ts](src/stores/evaluation.ts) — `finishedComplexPage` 增加 pageSize 参数\n- [stores/flood.ts](src/stores/flood.ts) — `searchComplex` 去掉「空关键词直接返回空」的拦截，允许无关键词拉默认候选\n- [styles/theme.css](src/styles/theme.css) — 新增下拉箭头样式\n\n## 验证\n- `npm run build` 编译通过（改动前也先跑了一次基线，均无预存在编译错误）。\n- 未做真机/浏览器交互点击验证（构建产物 dist 已生成）。\n\n⚠️ 一个后端依赖点：`flood.ts` 的 `searchComplex` 现在空关键词也会请求 `complex/options`（不带参数）。**如果该接口要求 `complexName` 必传**，进入页面时可能拿不到默认 10 条——届时需确认后端是否支持无参返回默认列表（或改成分页接口取前 10）。发起检查页走的 `finishedComplexPage` 本身就支持无参分页，没这个风险。\n\n要不要我起本地预览确认交互，或者只提交这几个改动？"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited/memories/entities/技术模式/inspection_area_fix.md",
+                "memory_type": "entities",
+                "before": "# 苏住房防汛C端物业管理区域搜索修复\n苏住房防汛C端移动查询H5的inspection页面「物业管理区域」搜索框空关键词查不到区域，已修复为提示输入小区名称。\n\n## 问题根因\n- 前端聚焦时调用 `loadComplexOptions('')` 期望默认展示前10条，但后端 `FloodCommonController.complexOptions` 的 `complexName` 参数必传，空值直接返回空列表。\n- 测试库无「星耀商务中心」小区（仅「星耀之光大厦」「星耀君庭」），搜不到属数据不存在非bug。\n- 后端仅搜已备案（biz_state=2）且有住宅（purpose=1）房屋的小区，按complex_name/record_name/promotion_name/legal_name四个名字模糊匹配。\n\n## 修复内容\n- `src/pages/inspection/index.vue`：聚焦空关键词不再请求后端，直接置空选项列表。\n- 空状态文案改为「请输入小区名称搜索」（原「暂无可选区域」），有关键词无结果显「无匹配区域，请换关键词」。\n- placeholder 改为「请输入小区名称搜索」。\n\n## 验证与归属\n- 提交 `15156c3` `fix(inspection): 物业管理区域空关键词不再请求后端，提示输入小区名称搜索`，1文件+4/-4，已推送 origin/dev。\n- `npm run build` 通过；`npx vitest run` 因预存在环境依赖问题（ERR_PACKAGE_PATH_NOT_EXPORTED）未通过，非本次改动引起。\n- 所属项目：苏住房防汛C端移动查询H5。",
+                "after": "# 苏住房防汛C端物业管理区域下拉搜索\n苏住房防汛C端移动查询H5三个页面的「物业管理区域」输入框已改为下拉选择：聚焦展示前10条、输入防抖过滤、带下拉箭头。\n\n## 当前实现（2026-11-11，未提交）\n- 统一三页：`src/pages/project-check/start/index.vue`（发起检查）、`src/pages/inspection/index.vue`（检查填报）、`src/pages/rescue/index.vue`（险情上报）。\n- 聚焦且关键词为空先查一次并只取前10条；输入关键词250ms防抖查询；清空关键词回退前10条；右侧加 `›` 下拉箭头。\n- 占位改「请选择物业管理区域」；加载中「加载中…」；无数据按有无关键词显示「无匹配区域 / 暂无可选区域」。\n- `src/stores/evaluation.ts` 的 `finishedComplexPage` 增加 pageSize 参数；`src/stores/flood.ts` 的 `searchComplex` 去掉「空关键词直接返回空」拦截以允许无关键词拉默认候选；`src/styles/theme.css` 新增下拉箭头样式。\n\n## 验证与风险\n- `npm run build` 编译通过（改动前后均跑基线）；未做真机/浏览器交互点击验证，dist 已生成；本次改动尚未提交。\n- `searchComplex` 空关键词也会请求 `complex/options`（不带参数）；若后端要求 `complexName` 必传，进入页面可能拿不到默认10条，需确认后端支持无参返回默认列表或改分页接口取前10。\n- 发起检查页走 `finishedComplexPage`（本身支持无参分页），无此风险。\n\n## 背景与历史\n- 后端 `FloodCommonController.complexOptions` 的 `complexName` 参数必传，空值返回空列表（上述风险来源）。\n- 测试库无「星耀商务中心」（仅「星耀之光大厦」「星耀君庭」），搜不到属数据不存在非bug。\n- 后端仅搜已备案（biz_state=2）且有住宅（purpose=1）的小区，按 complex_name/record_name/promotion_name/legal_name 四个名字模糊匹配。\n- 此前已提交并推送 `15156c3`（fix(inspection): 物业管理区域空关键词不再请求后端，提示输入小区名称搜索，1文件+4/-4）；该「提示输入」方案已被本次下拉方案取代。\n- `npx vitest run` 曾因预存环境问题（ERR_PACKAGE_PATH_NOT_EXPORTED）失败，非改动引起；所属项目：苏住房防汛C端移动查询H5。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

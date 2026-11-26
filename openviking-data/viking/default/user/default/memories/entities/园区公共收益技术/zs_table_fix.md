@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:29:06+08:00
+verdict_note: 园区公共收益 zs-table.vue实见handleCellMouseEnter(-1021)/handleCellMouseLeave(-1025)，空值修复有代码支撑。
+---
 # zs-table 单元格空值修复
 zs-table.vue 的单元格鼠标移入/移出处理函数增加空值判断，修复 [Vue warn] 报错。
 

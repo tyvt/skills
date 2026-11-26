@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T17:21:41+08:00
+verdict_note: 惠山G 仓无源码；refundDetailDialog/maintenanceObjectId/loadDialogData 仅出现在 memory-migration-archive/deletion-review-report.json，非实际代码，无法证明修复存在。
+---
 # onOpen And watch Double Trigger Duplicate Dialog Calls
 Both `onOpen` and the `maintenanceObjectId` watcher call `loadDialogData()`, and `$nextTick` with `v-if` mounting `commonTable` overlap to cause duplicate requests.
 ## Root Cause
@@ -16,7 +21,6 @@ Both `onOpen` and the `maintenanceObjectId` watcher call `loadDialogData()`, and
 - 所属项目：惠山G
 - 验证证据：extracted source=cursor project=惠山G
 - 来源会话：69fe4877-9065-40ce-b4bb-17b22cfdb965
-
 
 <!-- MEMORY_FIELDS
 {

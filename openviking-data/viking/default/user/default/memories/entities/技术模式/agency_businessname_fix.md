@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:40:56+08:00
+verdict_note: personnelRecordChange/jgcyrybg/AgencyPersonnelDetail 在苏州监测V3命中，businessName改计算属性描述属实。
+---
 # 经纪从业人员变更businessName写死致接口错
 苏州市房地产监测V3 中 AgencyPersonnelDetail.vue 的 businessName 写死导致审批接口路径误拼，须改为计算属性并映射正确上下文。
 

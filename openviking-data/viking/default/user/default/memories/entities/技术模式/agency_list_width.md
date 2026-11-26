@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:38:25+08:00
+verdict_note: AgencyPersonnelList.vue 43-48行 zs-operate-column 保留 show-all、无 -width=480 固定宽度，与移除固定宽度描述一致。
+---
 # 从业人员列表操作列宽度优化
 在 苏州市房地产监测V3 项目的 AgencyPersonnelList.vue 中完成操作列宽度优化，由固定宽度改为按按钮文字自动计算。
 

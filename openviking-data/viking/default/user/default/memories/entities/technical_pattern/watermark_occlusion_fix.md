@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:15:08+08:00
+verdict_note: 苏州V3 index.scss 实机含水印 z-index 1990 与 watermark，AppMain 挂水印，遮挡修复属实。
+---
 # Watermark Occlusion By High Z-index Components
 Detail page sticky bar and table fixed columns blocked watermark; fixed by body-level watermark.
 
@@ -19,7 +24,6 @@ Detail page sticky bar and table fixed columns blocked watermark; fixed by body-
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：0f975e81-59d4-42d7-853f-761ce72bd1f7
-
 
 <!-- MEMORY_FIELDS
 {

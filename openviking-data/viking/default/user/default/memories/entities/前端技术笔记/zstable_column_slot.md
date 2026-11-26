@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:45:19+08:00
+verdict_note: 园区物管2.0 zs-table-column.vue 命中 hasEffectiveCustomSlot/isMeasurableFlexSlot/measureSlotContentWidth，插槽误判修复属实。
+---
 # zs-table-column 误判 v-if 未渲染列为自定义列
 列表页用 v-for + v-if 动态渲染 zs-table-column 时整表列宽塌陷成固定 80px，根因为插槽误判。
 
@@ -21,7 +26,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

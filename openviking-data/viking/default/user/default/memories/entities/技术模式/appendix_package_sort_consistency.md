@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T11:35:17+08:00
+verdict_note: 实机核对监测V3 appendix.js-61定义sortAppendixPackages，236-238行mapAppendixPackageToFileList映射前调用排序；AppendixPackageSection/index.vue、AnnexUpload/index.vue均在，与记忆一致。
+---
 # 企业入网要件编辑态未排序与查看态不一致
 苏州市房地产监测V3 中企业入网要件编辑态此前未排序，与查看态排序不一致，已新增 `sortAppendixPackages` 统一排序规则。
 

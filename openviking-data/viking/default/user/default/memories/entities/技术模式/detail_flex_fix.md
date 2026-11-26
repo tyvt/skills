@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:10:59+08:00
+verdict_note: 苏州市房地产监测V3 zhi2-web-admin 命中 detail-from-container(365)、zs-tabs(75)、flex-0 0 auto(33)，index.scss 全局布局修复与现状一致。
+---
 # 项目备案详情纵向布局全局修复
 苏州市房地产监测V3 修复项目备案详情因 flex 撑满导致 Tab 被顶到下方的全局样式问题。
 

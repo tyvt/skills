@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:17:42+08:00
+verdict_note: 小程序命中灵犀回调(externalWebview.vue)，合并房屋事件/快照竞态修复属实。
+---
 # 合并灵犀房屋后事件与快照竞态导致房屋信息被清
 mergeLingXiHouseIntoPortalUser 合并房屋后触发 PORTAL_HOUSE_SELECTION_CHANGED_EVENT，快照未更新导致正式环境清空刚合并的房屋。
 

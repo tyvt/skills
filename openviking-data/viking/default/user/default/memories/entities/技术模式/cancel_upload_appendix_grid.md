@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T13:35:12+08:00
+verdict_note: 苏州监测V3 companyCancel.js-4 COMPANY_CANCEL_APPENDIX_BUS_CODE='jgzx'确认；detail.vue-79注销材料用要件网格(现为CompanyCancelMaterialGrid→AppendixRequirementGrid)，FileUpload已被配置分组要件网格替换，属实。
+---
 # 机构注销上传组件统一替换为要件网格
 苏州市房地产监测V3 的机构注销管理"注销材料"上传已从 `FileUpload` 替换为要件组件 `AppendixPackageSection` 按配置分组上传。
 

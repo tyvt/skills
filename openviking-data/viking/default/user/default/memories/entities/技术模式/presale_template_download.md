@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T05:34:04+08:00
+verdict_note: PermitPlanPanel.vue-164 注释与要件下载模板一致，166 handleDownloadPlan，182 await downloadServerAssetFile；与记忆下载逻辑收敛至统一方法一致。
+---
 # 预售模板下载复用下载模板写法
 苏州市房地产监测V3 中预售模板下载实现与要件"下载模板"对齐，按钮样式布局保持不变，下载逻辑收敛至统一方法。
 

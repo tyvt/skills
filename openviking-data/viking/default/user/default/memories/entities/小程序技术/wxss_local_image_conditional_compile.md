@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:44:22+08:00
+verdict_note: 苏住房C pages_owner/house/index.vue 命中 history-szf.png、Bg-szf.png，WXSS 条件编译修复属实。
+---
 # WXSS本地背景图必须条件编译
 苏住房C 小程序 WXSS 中 background:url() 引用本地图片必然失败，需条件编译区分 H5 本地路径与小程序 CDN 绝对地址。
 

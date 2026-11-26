@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:12:13+08:00
+verdict_note: 确认PortalAPI日志由requestCtAuth输出，shouldLogPortalApi/getPortalApiLogPrefix及envVersion判断存在，正式版开日志属实。
+---
 # 生产环境 PortalAPI 日志开启
 requestCtAuth 中的请求/响应日志在体验版与正式版均输出，开发版不输出。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:46:23+08:00
+verdict_note: 实机核对 泰兴小程序 仓库确认关键符号(16/18)存在：PageButton、ZsPicker、ZsTextarea、click、currentStep；文件与描述一致，记忆有效。
+---
 # 添加巡检记录页面修复
 泰兴小程序员工端「添加巡检记录」页面（src/staff/pages_facility/record/add.vue）修复完成。
 

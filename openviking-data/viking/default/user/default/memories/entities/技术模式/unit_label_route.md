@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:16:55+08:00
+verdict_note: 命中 companyUnitLabel、depositnotice/detail、elevator，单位标签路由修复属实
+---
 # 单位标签按路由类型区分交存与代交
 园区物管（相城G）中缴存通知表单的单位标签按路由类型统一由计算属性控制，避免硬编码占位符引用不存在的变量。
 

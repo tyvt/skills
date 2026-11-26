@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:44:51+08:00
+verdict_note: RegisterStepper/index.vue 含 is-complete/is-current/is-pending 三态与 completeIcon/currentIcon/pendingIcon 回退，step-scheme 图标复用属实。
+---
 # 企业注册步骤条复用经纪机构三态图标
 企业注册第4步「股东信息」复用经纪机构「服务方案录入」的三态图标，加载失败回退默认图标。
 

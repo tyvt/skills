@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T00:48:45+08:00
+verdict_note: 苏住房C intention/add.vue L42实测为 font-(28 weight-400) leading-40, 非记忆声称的32rpx/leading-44, 数值不符
+---
 # add.vue信息有效期至误用区块标题样式
 苏住房C移动端 pages_transaction/intention/add.vue 中「信息有效期至」误用区块标题样式，而非表单项 label 样式。
 

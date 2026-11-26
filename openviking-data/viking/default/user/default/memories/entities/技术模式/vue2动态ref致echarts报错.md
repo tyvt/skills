@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:52:00+08:00
+verdict_note: 产品2.0命中 chartRenderers/asChartDom/fundPanorama/dataSandbox, 动态ref解包属实
+---
 # Vue2 v-for动态ref返回DOM数组致echarts报错
 Vue2 中 v-for + 动态字符串 :ref 场景下 $refs[name] 是 DOM 数组而非单个元素，直接传给 echarts.init 会因内部调用 dom.getContext 崩溃。
 

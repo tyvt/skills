@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:22:32+08:00
+verdict_note: 苏州市房地产监测V3 src/docs 命中 isolation- isolate、doLayout、OperationBtnGroup、zs-table，与「固定列裁剪+按钮栏 z-index+doLayout」一致。
+---
 # 表格固定列层级过高未裁剪覆盖按钮栏
 zs-table.vue 固定列 z-index 高于 OperationBtnGroup 按钮栏且缺裁剪，导致溢出穿屏覆盖按钮栏。
 ## 问题根因

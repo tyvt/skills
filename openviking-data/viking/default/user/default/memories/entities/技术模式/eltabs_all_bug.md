@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:46:07+08:00
+verdict_note: 产品2.0 order/index.vue 命中 ALL_ORDER_STATUS 与 getQueryParams，「全部」哨兵值修复属实。
+---
 # el-tabs「全部」筛选空串 name 被写成索引 0
 列表页用 el-tabs 做状态筛选时，「全部」tab 的 name 设为空串会导致点击后接口收到 orderStatus=0。
 

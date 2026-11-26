@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:43:34+08:00
+verdict_note: 产品2.0源码：guaranteeDepositAgreementEnd、agreementEndId、guaranteeDeposit均0命中；agreementEnd命中属pubRegulatoryStopAgreement另一模块。所述列表/详情文件、接口/maintenance/guaranteeDepositAgreementEnd/page、主键均无法证明，判无效。
+---
 # 房屋质量保证金协议终止前端功能
 产品2.0 项目实现房屋质量保证金协议终止前端功能，包含列表页、详情页与联动更新。
 

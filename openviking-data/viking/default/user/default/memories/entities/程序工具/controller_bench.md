@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:47:57+08:00
+verdict_note: skills/controller-bench 目录存在，含 REPORT.md、tasks-master.json 与 PLANNER_SYSTEM 描述，工具记忆属实。
+---
 # controller_bench
 controller-bench 是 D:\repository\skills\controller-bench 下的主控模型批量测试技能，用于评估编排器在不同大模型下的工具选择、步骤依赖、路由校准与效率表现。
 

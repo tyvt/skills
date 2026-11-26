@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T04:33:24+08:00
+verdict_note: fund/backtest_trade_signals.py-29 导入 get_chart_buy_amount、-706 调用，组合回测图表买入金额回退函数存在，描述属实。
+---
 # 组合回测HTML未持仓指数买卖点显示修复
 `--portfolio` 组合模式下持仓金额为 0 的指数曾被跳过，导致 HTML 下拉看不到买卖点；修复后图表展示回退基准买入金额。
 

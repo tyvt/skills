@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:21:58+08:00
+verdict_note: git worktree 隔离属操作流程记忆，无具体代码修复可核；其命令与 AGENTS.md worktree 规范一致，无矛盾证据。
+---
 # Git Worktree 隔离改代码工作流
 本地 checkout 有进行中需求时，用 git worktree 隔离临时改动，主分支原样不动。
 
@@ -15,7 +20,6 @@
 - 父仓 gitlink 指向旧提交属预期差异（父仓在别的分支且有进行中需求），勿替用户动，等合并或回主线再统一升级
 - 提交后仍校验（示例 ea95e825d → rebase 后 f78fdd58a，基于他人 dbd161219 task 2104 无冲突）
 - 来源会话 session-07a67f50；代码基线 6156653；所属项目 zhi2-web-admin
-
 
 <!-- MEMORY_FIELDS
 {

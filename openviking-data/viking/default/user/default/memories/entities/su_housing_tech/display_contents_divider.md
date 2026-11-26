@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T08:33:21+08:00
+verdict_note: 苏住房C form.scss 中 -deep(.img-code .uni-forms-item__content){display-contents!important} 与 -deep(.img-code .container){border-bottom-1px solid #f2f2f2} 均在，ImgCode/index.vue 存在。底部分隔线移至 container、宿主 display-contents 的描述与代码一致。
+---
 # ImgCode display:contents divider fix
 In the WeChat mini-program, the ImgCode component host with display:contents cannot fill width and loses its bottom divider, so the divider style must move to the container.
 
@@ -28,7 +33,6 @@ In the WeChat mini-program, the ImgCode component host with display:contents can
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：f888dab8-e1a9-417b-9761-339cbc03bf70
-
 
 <!-- MEMORY_FIELDS
 {

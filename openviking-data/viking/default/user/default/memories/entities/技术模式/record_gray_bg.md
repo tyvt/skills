@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:41:05+08:00
+verdict_note: 实机核对：引用文件(8个)存在于对应项目仓；核心符号命中[detail,f7f7f7,backgroundColor,add-record-page,uni-page-body]，与记忆描述一致。
+---
 # 记录详情页白卡需浅灰底色分区显示
 泰兴小程序员工端记录详情页需设置浅灰底色分区，避免下拉露白。
 ## 修改内容

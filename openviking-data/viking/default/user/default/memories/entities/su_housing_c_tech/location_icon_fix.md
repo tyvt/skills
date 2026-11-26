@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T19:16:08+08:00
+verdict_note: 当前 houseMap.vue 仍 import @/static/icon/location-red.png（主包路径），未见 pages_main 分包副本或 resolveStaticUrl(...,pages_main)，与记忆修复内容不符。
+---
 # 地图marker图标location-red.png加载失败修复
 苏住房C(zhi2-mobile-shimin)中 houseMap.vue 引用的 location-red.png 因主包静态资源被清理导致加载500，已改用分包路径修复。
 

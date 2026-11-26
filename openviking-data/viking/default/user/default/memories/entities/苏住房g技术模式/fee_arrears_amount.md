@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:16:38+08:00
+verdict_note: 苏住房G命中 arrearsAmount、oweAmountSum、calcArrearsAmount、checkTableDataFields，欠缴金额字段修复属实
+---
 # 物业费申报明细欠缴金额字段须用 arrearsAmount
 物业费申报详情编辑申报明细时欠缴金额不显示且不回显，根因是列绑定 oweAmountSum、编辑弹窗用计算禁用、保存取计算值，需统一为 arrearsAmount。
 

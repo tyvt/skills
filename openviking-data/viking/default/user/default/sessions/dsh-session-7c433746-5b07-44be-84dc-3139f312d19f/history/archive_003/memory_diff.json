@@ -1,0 +1,36 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-7c433746-5b07-44be-84dc-3139f312d19f/history/archive_003",
+    "trace_id": null,
+    "extracted_at": "2026-11-26T02:07:21.640835+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited/memories/events/2026/11/26/后端接口排查结论.md",
+                "memory_type": "events",
+                "after": "# Summary\n2026-11-26，用户要求排查 D:\\repository\\园区V0APP后端。排查确认该仓库服务老 H5（园区表决H5），只提供 /h5decision/* 接口；新 app 的 SmCastVote* 系列在本仓库及本地兄弟仓库均未找到，老 H5 的 /h5decision/ownerDecision 详情实现只查询不写状态。新一网通办点详情后的 voteState 变化根因仍需新 app 实际后端代码确认。\n# 2026-11-26 (Thursday) ChatLog:\n**user [peer=gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited]**: D:\\repository\\园区V0APP后端\n排查一下后端接口\n...\n**assistant [peer=gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited]**: 排查完成。结论如下。\n\n## 结论\n\n**`园区V0APP后端` 里没有新 app 的那套决策接口，也没有「打开详情就改状态」的逻辑。** 它是老 H5（`园区表决H5`）的后端，只提供 `/h5decision/*` 系列；新 app 调的 `SmCastVote*` 系列在这个后端仓库、以及本地其它后端仓库里都查不到。\n\n## 关键证据\n\n**1. 新 app 接口 → 0 命中**\n- 全仓（所有文件类型）搜 `SmCastVote* / SmUserVote* / SmElection* / queryOwnerVoteOptionList`：**0 命中**\n- `/version/1/app` 前缀的 Controller 只有 7 个（反馈、房产、车位、门禁、参数等），**无决策相关**\n- `ShiroConfig.java:202-205` 里 `/version/1/app/*` 白名单也只有反馈/参数，没有 vote 接口\n- `门户后端`、`太仓物管后端`、`苏住房后端` 等兄弟仓库同样查不到 `SmCastVoteListApp/SmUserVoteDetail`\n\n**2. 老 H5 接口在这里，且详情只读**\n- `MtplOwnerVoteObligeeListH5Controller.java:28` → `@RequestMapping(\"/h5decision\")`，含 `/decisionRecord`、`/ownerDecisionRecord`（`:34/:53`）\n- `MtplOwnerVoteObligeeDetailH5Controller.java:45` → `/h5decision/ownerDecision`\n- 其实现 `MtplOwnerVoteObligeeDetailH5ServiceImpl.java:79-106` 的 `ownerDecision()` 全是 `selectById` / `selectList` **纯查询**，没有 update/insert；类级虽标 `@Transactional`，但详情路径无写库操作\n\n## 对你最初问题的回答\n\n- **老 app（iOS→老H5→V0后端）没有「点详情后参与变修改」这回事**：老 H5 是 Tab 分流（`未参与/已参与/已完成`），详情接口只读不改状态。\n- **新一网通办的「点详情回来变修改」**：前端是 `onShow` 重载 + `voteState` 驱动（`components/index.vue:51-53,195`），但 `voteState` 为何在打开详情后变化——**产生这个状态的后端接口不在本地这几个仓库里**，无法从代码层面定位根因。\n\n## 待定项\n要继续定位新端状态翻转的根因，需要拿到新 app 实际对接的后端仓库地址（或 `SmUserVoteDetail`/`SmCastVoteGoHandleApp` 的服务代码）。如果这几个仓库就是你手头全部后端，那新端接口可能是另一个服务，建议确认部署环境对应的后端工程。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited/memories/entities/后端服务/园区v0app后端.md",
+                "memory_type": "entities",
+                "before": "# 园区V0APP后端\n园区V0APP后端提供决策列表和详情接口，详情接口会在打开详情时修改用户表决相关业务状态。\n\n## 接口链路\n- 列表接口为 SmCastVoteListApp，路径由 SmCastVoteAppController 提供，安卓 VoteRequest.java:44 使用同路径。\n- 详情接口为 SmUserVoteDetail，后端锚点为 :236，安卓 VoteRequest.java:73 使用同 POST。\n- 新 app 与安卓的列表、详情核心 URL 与后端 /EstateManagement/version/1/app/... 对齐。\n\n## 状态写入\n- SmUserVoteDetail 通过 detailExecute/updateVoteOpin 改 busiState/voteopinion。\n- 交接文档锚点 SmCastVoteAppServiceImpl.java:1950,2181 指向该写状态逻辑。\n- 详情可能把业务标成已读、表决中或已表决。\n\n## 差异\n- 去办理/提交等能力：新 app 使用 common.ts 一串接口，安卓原生另有 GoHandle/Submit 流程，后端属于同一 Controller 族。",
+                "after": "# 园区V0APP后端\n园区V0APP后端是老 H5（园区表决H5）的后端，提供 /h5decision/* 决策接口；排查确认这里没有新 app 的 SmCastVote* 接口或打开详情写状态逻辑。\n\n## 服务范围\n- 本地路径 D:\\repository\\园区V0APP后端；实际服务老 H5，而非新一网通办 app 的决策服务。\n- 全仓（所有文件类型）搜 SmCastVote* / SmUserVote* / SmElection* / queryOwnerVoteOptionList 为 0 命中。\n- /version/1/app 前缀 Controller 只有 7 个（反馈、房产、车位、门禁、参数等），无决策相关；ShiroConfig.java:202-205 白名单也只有反馈/参数，没有 vote 接口。\n- 门户后端、太仓物管后端、苏住房后端等兄弟仓库同样查不到 SmCastVoteListApp/SmUserVoteDetail。\n\n## 老 H5 决策接口\n- MtplOwnerVoteObligeeListH5Controller.java:28 映射 /h5decision，包含 /decisionRecord 与 /ownerDecisionRecord（:34/:53）。\n- MtplOwnerVoteObligeeDetailH5Controller.java:45 提供 /h5decision/ownerDecision。\n- MtplOwnerVoteObligeeDetailH5ServiceImpl.java:79-106 的 ownerDecision() 仅执行 selectById / selectList，未发现 update/insert。\n- 类级 @Transactional 存在，但详情路径没有写库操作。\n\n## 状态结论\n- 老 app（iOS→老H5→V0后端）没有“点详情后参与变修改”；老 H5 用未参与、已参与、已完成 Tab 分流，详情接口只读不改状态。\n- 新一网通办的点详情回来变修改由前端 onShow 重载与 voteState 驱动（components/index.vue:51-53,195）。\n- 产生 voteState 的后端接口不在本地这几个仓库里，无法从现有代码定位根因；需确认新 app 实际后端仓库或取得 SmUserVoteDetail / SmCastVoteGoHandleApp 服务代码。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited/memories/entities/网页应用/园区表决h5.md",
+                "memory_type": "entities",
+                "before": "# 园区表决H5\n园区表决H5 是 1.0 H5，决策按钮按 CardList 的 type 分流，与 voteState 无关。\n\n## 决策列表\n- 使用另一套 estate 接口。\n- 按钮按 D:/repository/园区表决H5/src/views/decision/components/CardList.vue:19-26 的 type 分流：0 参与、1 修改、2 详情。\n\n## 边界\n- 该 H5 不是 homeland-android 老 app。\n- 不能用它代替安卓原生实现来判断老 app 逻辑。",
+                "after": "# 园区表决H5\n园区表决H5 是 1.0 H5，决策按钮按 CardList 的 type 分流，与 voteState 无关。\n\n## 决策列表\n- 园区V0APP后端是该 H5 的后端，提供 /h5decision/* 决策接口。\n- 使用另一套 estate 接口。\n- 页面按未参与、已参与、已完成 Tab 分流；详情接口只读不改状态。\n- 按钮按 D:/repository/园区表决H5/src/views/decision/components/CardList.vue:19-26 的 type 分流：0 参与、1 修改、2 详情。\n\n## 边界\n- 该 H5 不是 homeland-android 老 app。\n- 不能用它代替安卓原生实现来判断老 app 逻辑。\n- 老 app 链路 iOS→老H5→V0后端没有“点详情后参与变修改”。\n- 新一网通办的点详情回来变修改不能归因于该 H5 或园区V0APP后端。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 2,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

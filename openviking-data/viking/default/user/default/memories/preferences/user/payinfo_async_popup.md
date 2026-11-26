@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:12:50+08:00
+verdict_note: 产品2.0 collectionDialog.vue 命中 payInfo 异步扫码流程，noMessage 约定属实。
+---
 - When an order is created, immediately pop up the scan-code dialog to show order info, then request payInfo from the third-party interface asynchronously in the background to avoid blocking on slow responses.
 - On payInfo success, display the QR code and start polling; on failure, show a refresh button to re-call payInfo (stop polling first).
 - Configure the payInfo request with noMessage: true to avoid duplicate prompts with the dialog's own messages.
@@ -7,7 +12,6 @@
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：ba1c8c6a-7b49-465a-aab9-2c949eb85f07
-
 
 <!-- MEMORY_FIELDS
 {

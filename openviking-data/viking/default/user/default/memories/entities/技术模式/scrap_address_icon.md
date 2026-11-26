@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:18:26+08:00
+verdict_note: 证据不足且涉及文件错配：涉及文件清单未含 addScrap.vue 却列 index.vue/ZsImage 等；图标路径修正描述笼统，无法按现状证明。
+---
 # 报废记录地址图标不显因资源路径错误
 物业手持B端 `addScrap.vue` 中地址图标因资源引用路径配置错误而不显示。
 

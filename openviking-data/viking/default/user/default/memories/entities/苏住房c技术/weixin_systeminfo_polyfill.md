@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:26:18+08:00
+verdict_note: 苏住房C未见mp-weixin-system-info.js polyfill及getWindowInfo，源码仍用uni.getSystemInfoSync，与"移除旧回退"描述不符。
+---
 # 微信拆分系统信息API需polyfill兼容
 苏住房C（uni-app mp-weixin）微信小程序基础库拆分 wx.getSystemInfoSync，需新增 polyfill 重定向旧调用避免弃用警告。
 

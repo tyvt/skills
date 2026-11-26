@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:09:54+08:00
+verdict_note: zs-operate-column 组件在产品2.0命中；permissionType、institutionRegister 均有源码命中，布尔 permission+permissionType 模式属实。
+---
 # zs-operate 列需要布尔权限
 列 `zs-operate-column` 使用 `permission` 作为布尔开关，并使用 `permissionType` 作为权限后缀。
 

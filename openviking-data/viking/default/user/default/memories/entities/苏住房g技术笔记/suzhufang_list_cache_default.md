@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T12:33:10+08:00
+verdict_note: complexChange/index.vue-61 bizState=undefined、-147 占位符「全部」属实；listMixins.js-24-40 按路由路径做 store 搜索条件缓存并 merge 回 queryParams，覆盖新默认的根因成立，与记忆一致。
+---
 # 苏住房G 列表默认查询值改 undefined 的缓存治理
 物业管理变更单列表把 bizState 默认值由 '2' 改 undefined 做查全部，但 listMixins 条件缓存让老用户仍见旧默认。
 

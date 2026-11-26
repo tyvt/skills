@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:40:53+08:00
+verdict_note: 实机核对 苏住房C 仓库确认关键符号(16/20)存在：WebView、ZsTextarea、addAlone、capture、click；文件与描述一致，记忆有效。
+---
 # 地图与文本框原生组件互相遮挡致输入失效
 苏住房C业主端电梯加装页因 map 与 textarea 原生组件同屏遮挡且 uni-forms 纵向压扁，申请说明输入框点不到。
 

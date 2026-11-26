@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:15:18+08:00
+verdict_note: 苏州V3 companyAdmin/detail.vue 实机已无 RegisterUploadItem 冗余注册，符合修复后状态。
+---
 # Detail.vue 中注册但未使用的组件缺陷
 在项目 Suzhou Real Estate Monitoring V3 中，companyAdmin/detail.vue 在 components 中注册了 RegisterUploadItem 但未导入它，且模板未使用它，导致引用错误。
 
@@ -17,7 +22,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：0cdbc4de-abdb-4fc7-8b12-467375ea1019
-
 
 <!-- MEMORY_FIELDS
 {

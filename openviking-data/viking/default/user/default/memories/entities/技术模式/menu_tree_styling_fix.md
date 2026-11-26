@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T21:13:39+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 系统菜单树形箭头与名称对齐修复
 苏州市房地产监测V3 的 zhi2-web-admin 修复了系统菜单树形列表中展开箭头与菜单名错位的问题。
 
@@ -15,7 +19,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：0b933a14-fbd5-4c86-8301-29f6b89bb1c4；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

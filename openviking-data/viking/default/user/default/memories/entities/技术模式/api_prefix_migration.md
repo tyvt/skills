@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:40:30+08:00
+verdict_note: 实机核对 产品2.0 仓库确认关键符号(11/12)存在：admin、businessName、cursor、dataProperty、extracted；文件与描述一致，记忆有效。
+---
 # 维护类接口前缀批量迁移 maintenance→dataProperty
 全局把维护类接口前缀从 /maintenance/ 换成 /dataProperty/ 时，需同时覆盖拼接式调用并防止误伤前端 import 路径。
 

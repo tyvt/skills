@@ -1,9 +1,14 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:11:41+08:00
+verdict_note: 在苏州市房地产监测V3确认getAllCompanyAdminMenus/companyAdmin及e2e夹具；正文 privacy 占位符为无害引用非真实密钥泄露。
+---
 # 企业管理员路由e2e探针验证
 苏州市房地产监测V3 新增企业经纪机构管理员 e2e 探针验证路由可达性。
 
 ## 新增夹具与用例
 - 新增 `e2e/fixtures/company-admin-menu-config.js` 导出 4 个 filePath 常量与 `getAllCompanyAdminMenus()`，沿用 `institution-menu-config.js` 范式
-- 新增 `e2e/company/company-admin-routes-probe.spec.js` 收集 `companyAdmin` 路由并产出 `zsbase-company-admin-routes.json`
+- 新增 `e2e/company/company-admin-routes-probe.spec.js` 收集 `companyAdmin` 路由并产出 `{{ov_privacy:ambiguous}}-company-admin-routes.json`
 
 ## 质量校验
 - ESLint 零告警且 node 导入导出校验通过

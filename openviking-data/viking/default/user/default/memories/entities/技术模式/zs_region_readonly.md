@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:44:59+08:00
+verdict_note: regionDisplayOptions 在苏住房G regionBankAuth/detail.vue 命中。
+---
 # zs-region-select 只读页区划编码回显
 苏住房G 中区划由上游页面决定、本页只读时，误用 zs-region-select 会导致输入框回显 6 位编码而非名称。
 

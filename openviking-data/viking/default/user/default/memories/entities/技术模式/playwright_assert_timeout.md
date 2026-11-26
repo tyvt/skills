@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T00:47:57+08:00
+verdict_note: 目标文件 navbar-sidebar-accessibility.spec.js 全仓不存在, 项目标注2-0异常, 无法证明有效
+---
 # Playwright断言timeout含义与设置
 Playwright 断言 timeout 定义元素可见性检查的最长等待时间，非固定休眠，需按慢加载设合理值。
 

@@ -1,8 +1,11 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T19:41:12+08:00
+verdict_note: MicroCommunityWeb 实机存在 src/utils/externalCodeLoginHandler.js、loginApi.js、router/index.js，handler 内含 ?code= 处理，与描述一致。
+---
 - 对于 MicroCommunityWeb 的 SSO 单点登录功能，代码改动仅限于 `src/api/user/loginApi.js`、`src/router/index.js`、`src/utils/externalCodeLoginHandler.js`；回退对 `App.vue` 及其他原有文件的修改。
 - 多用户选择弹窗在 `externalCodeLoginHandler.js` 内动态挂载，不再修改 `App.vue` 等文件。
 - 外部系统可在任意 URL 后附加 `?code=授权码` 完成单点登录，不侵入原有登录页及其他业务代码。
-
 
 <!-- MEMORY_FIELDS
 {

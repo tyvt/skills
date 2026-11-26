@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:46:46+08:00
+verdict_note: AgencyPersonnelCertificateTable.vue 命中 company_certificate_level 字典，level+type=dict 绑定修复属实。
+---
 # 证书等级字典绑定修复
 苏州市房地产监测V3 的机构人员证书表修复证书等级未绑定字典类型导致列表回显失败的问题。
 

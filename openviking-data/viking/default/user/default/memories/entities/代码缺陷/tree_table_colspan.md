@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T03:32:40+08:00
+verdict_note: monthlyReport.js-259/364 确有 cell.colspan||1 与 HIERARCHY_DEPTH-level 的层级 colspan 计算，ReportItemsTable.vue、monthlyReportStat/detail.vue 均在苏住房G源码命中，与描述一致。
+---
 # 月报三级树表占位空列导致合并错乱
 在苏住房G项目(zhi2-web-admin)物业管理信息月报表填报/统计详情，手工渲染3级树表用placeholder空列补位，造成单元格合并错位。
 ## 根因

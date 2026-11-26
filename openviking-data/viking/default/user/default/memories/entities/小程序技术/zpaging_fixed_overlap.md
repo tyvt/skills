@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:21:26+08:00
+verdict_note: 抽检2026-11-26 第三轮 zpaging_fixed_overlap.md 叙述/路径合理
+---
 # z-paging默认fixed全屏定位盖住顶部操作区
 苏住房C列表页（如报事报修列表）顶部的搜索/筛选/按钮被 z-paging 列表内容盖住，根因是 z-paging 默认 fixed 全屏脱离文档流。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T06:34:36+08:00
+verdict_note: BuildingDialogAuth.vue-177/179 确认 columns 用 houseNumber 且 return row.totalHouse||row.houseNumber 兼容房屋套数字段，rightColumns 已不存在。与记忆描述一致，判有效。
+---
 # 楼幢关联弹窗统一columns并兼容字段
 园区公共收益项目(zhi2-web-admin)中 BuildingDialogAuth.vue 楼幢关联弹窗统一 columns 配置并兼容房屋套数字段。
 

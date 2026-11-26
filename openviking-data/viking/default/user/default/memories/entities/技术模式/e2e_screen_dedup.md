@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:17:17+08:00
+verdict_note: 实机存在 company-register.spec.js 与 company-register-fields.spec.js 两个 E2E 文件，去重结构属实（位于苏州V3 checkout）。
+---
 # 公司注册中冗余的 E2E 视频
 在 zhi2-web-admin（2.0 产品）完整流程、UI 用例、返回导航以及合伙人 CRUD 中，重复了 Step1→3，产生了 12 个冗余视频。
 ## 问题根因

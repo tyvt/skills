@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:46:52+08:00
+verdict_note: VALID；pending-icon/countFields/reportCount/repairCount 在物业手持B端相关真实代码命中。
+---
 # 首页待办卡片tap穿透与隐藏巡检项
 首页待办卡片因 `@click` 及图标遮挡不支持穿透且含多余巡检维保项，需改用 `@tap` 并隐藏。
 ## 问题根因

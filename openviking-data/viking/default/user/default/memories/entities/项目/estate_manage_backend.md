@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:14:18+08:00
+verdict_note: estate-manage 命中 nacos(39)与 UTF-8 编码配置，后端+Nacos 背景属实；启动参数未直接命中但无矛盾。
+---
 # 园区物管2.0后端（estate-manage）
 园区物管2.0（榆林G）Spring Cloud 微服务后端，仓库 http://gitlab.zhi.com/zhishu/estate-manage，分支 develop/v2.6.2-yulin。
 

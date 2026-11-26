@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:49:51+08:00
+verdict_note: 产品2.0 含 regulatoryAccountPanel、feeDeclare2 与 toFixed(2) 比率格式化，聚合字段分母/防除零结论属实。
+---
 # 统计率类指标分母取聚合字段
 苏住房G 详情页户室/资金收缴率须取接口聚合字段为分母，空/0 分母回退 0.00 并禁除零。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:17:54+08:00
+verdict_note: 实机 ollama list 命中 bge-m3-latest(1.2GB)，记忆所述嵌入模型属实。
+---
 # bge-m3
 Ollama 托管的嵌入模型，用于中文语义向量化。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:11:13+08:00
+verdict_note: AgencyPersonnelDetail 命中机构人员 detail.vue，禅道6424 回写记录与代码文件一致。
+---
 # ZenTao Bug 6424
 ZenTao defect 6424: AgencyPersonnelDetail.vue fix resolved via DBX transactional write-back on 2026-11-10.
 

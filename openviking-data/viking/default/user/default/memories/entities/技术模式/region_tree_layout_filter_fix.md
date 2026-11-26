@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:18:33+08:00
+verdict_note: 产品2.0 命中 RegionTreeLayout、syncListParentDeptFilter，平铺/树筛选同步修复属实。
+---
 # 平铺/树状展示筛选不同步修复
 产品2.0 的 zhi2-web-admin 修复切换平铺与树状展示时列表筛选条件未同步的问题。
 

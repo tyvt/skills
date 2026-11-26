@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:15:01+08:00
+verdict_note: 在园区物管2.0定位mapOverview/index.vue、chartOptions.js、dataHelpers.js，资金余额整数显示且柱高保精度的落点文件存在。
+---
 # 资金余额整数显示且保留柱高精度
 园区物管2.0 资金余额改为整数显示，但与资金收支图表保持一致，且柱高按原始精度绘制。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

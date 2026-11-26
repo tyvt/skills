@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:46:25+08:00
+verdict_note: 苏住房C 6个信息页命中 module-gap/10px 间距统一，与 baseCard 规则一致。
+---
 # 信息页模块间距统一为10px
 苏住房C小程序将 6 个信息页的模块间距统一为 10px，与 `baseCard` 组件的 `.base-card + .base-card` 规则保持一致。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

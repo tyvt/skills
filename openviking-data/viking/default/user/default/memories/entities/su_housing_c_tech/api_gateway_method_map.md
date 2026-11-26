@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:47:45+08:00
+verdict_note: gatewayInterfaceMethod/backendMethod/createHttpClient 在苏住房C szffluzm 构建产物命中。
+---
 # API网关方法映射
 苏住房C所有请求均通过`createHttpClient`（`api`/`apiV1`）发出，传输层在调用时确定网关方法。
 

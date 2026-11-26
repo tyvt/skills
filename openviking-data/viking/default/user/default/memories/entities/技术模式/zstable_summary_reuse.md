@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:12:54+08:00
+verdict_note: 园区物管2.0命中 zs-table、ZsSummaryText、summary，合计复用小计描述属实
+---
 # zs-table合计默认复用小计值致显示一致
 园区物管2.0 的 zs-table 底部文字条合计默认复用 summary-method 小计行数值，导致合计与小计显示相同。
 
@@ -14,7 +19,6 @@
 - 验证证据：extracted source=cursor project=园区物管2.0
 - 验证：src=园区物管2.0/039.md；涉及文件 zs-table.vue、ZsSummaryText/index.vue、complex/components/rangeTable.vue、budget/index.vue 等。
 - 所属项目：园区物管2.0；来源会话：4d6c0599-62a1-4620-bba9-35eec0a0c116；代码基线：none。
-
 
 <!-- MEMORY_FIELDS
 {

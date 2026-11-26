@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:17:19+08:00
+verdict_note: 无锡市区小程序嵌入H5 命中 usePortal、zhi2-mobile-admin-h5-c-unlimited，轮播图相对路径修复属实。
+---
 # 首页轮播图相对路径解析错误修复
 无锡市区小程序嵌入H5首页轮播图因相对路径随页面路由错误解析导致接口/图片未正常加载的修复约定。
 

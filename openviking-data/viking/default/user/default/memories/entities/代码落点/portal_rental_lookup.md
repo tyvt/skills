@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:53:23+08:00
+verdict_note: 门户 命中 RentalPages、PortalDialogHost、matchRentalContract、portal-rental-contract，与租赁合同备案查询落点描述一致。
+---
 # 住房租赁合同备案查询代码落点
 住房租赁合同备案查询仅在 zhi2-web-admin 的 publicPortal（Vue2）实现，排查该功能勿去 React 或其他子工程找页面。
 

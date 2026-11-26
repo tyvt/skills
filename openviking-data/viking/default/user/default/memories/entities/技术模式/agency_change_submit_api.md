@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:49:22+08:00
+verdict_note: VALID；COMPANY_RECORD_CHANGE_SPECIAL_SUBMIT_API/agencyRecord 在苏州V3-rest真实代码命中。
+---
 # 被配置覆盖的机构变更提交 API
 在 Suzhou Real Estate Monitoring V3 项目中，`resolveSubmitApi` 读取菜单 meta 或流程配置，导致机构变更请求命中旧接口。
 

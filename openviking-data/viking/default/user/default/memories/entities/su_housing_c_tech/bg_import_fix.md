@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:11:41+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # pages_my 背景图 import 失败修复
 苏住房C 小程序 pages_my 分包因重构改用 import 静态资源导致背景图不显示，已改用 resolveStaticUrl 按分包解析修复。
 

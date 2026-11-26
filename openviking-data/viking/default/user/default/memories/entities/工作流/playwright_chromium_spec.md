@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:44:56+08:00
+verdict_note: navbar-sidebar-accessibility仅命中skills/memory-migration-archive/归档，门户真实源码0命中，所述tests/e2e/navbar-sidebar-accessibility.spec.js不存在。Playwright单用例命令记忆缺乏实证，判无效。
+---
 # Playwright 单用例仅跑 Chromium 命令
 在 zhi2-web-admin 目录对单个 spec 只使用 Chromium 项目：npx playwright test tests/e2e/<文件名>.spec.js --project=chromium。
 

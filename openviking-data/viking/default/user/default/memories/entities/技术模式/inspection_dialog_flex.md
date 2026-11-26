@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T07:34:07+08:00
+verdict_note: 记忆称改 div.step-form-body flex 替代 scroll-view 嵌套，但源码 step-form-body 零命中；add.vue-129/detail.vue-97 仍是 scroll-view.step-form-scroll 嵌套。方案描述与现状不符。
+---
 # 巡检弹框滚动遮字改flex布局
 巡检添加/详情弹框因 `scroll-view` 嵌套 `max-height` 导致滚动条遮字，需弃嵌套滚动改 flex。
 ## 问题根因

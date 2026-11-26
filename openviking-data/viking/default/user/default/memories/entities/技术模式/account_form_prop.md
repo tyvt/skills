@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:50:39+08:00
+verdict_note: 园区公共收益 AccountListTable.vue 使用 -form="form"（非 $attrs.form），与子表传主单 form 偏好描述一致。
+---
 # 子表组件传主单form勿用$attrs.form
 账户拆分等详情子表需要主单 form 做校验或合计时，应显式 :form="form" 而非 :form="$attrs.form"。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T22:16:52+08:00
+verdict_note: 记忆称 env/.env 配 https-//222.184.31.232-15777 且 vite.config.js 加 secure-false；实机 淮安物管/env/.env 为 http 域名，IP 全库0命中，vite.config.js 无 secure。配置与现状不符。
+---
 # Vite 代理 HTTPS 配置修复
 淮安物管 zhi2-web-admin 中 env/.env 误配 http:// 致代理向 TLS 端口发明文请求，改为 https 并增 secure 配置。
 

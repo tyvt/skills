@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:40:18+08:00
+verdict_note: 实机核对 苏州市房地产监测V3 仓库确认关键符号(16/17)存在：Cannot、PayDetailsTable、cursor、extracted、listMixins；文件与描述一致，记忆有效。
+---
 # PayDetailsTable queryParams.pageSize 未定义报错修复
 苏州市房地产监测V3 项目用款明细子表 PayDetailsTable.vue 因 listMixins 路由缓存导致 undefined.pageSize 白屏。
 
@@ -17,7 +22,6 @@
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：PayDetailsTable.vue、listMixins.js、usemoney/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话：ad7a580b-3a8f-4044-8329-77ea3f59363a；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

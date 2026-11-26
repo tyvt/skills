@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:23:49+08:00
+verdict_note: V3 navigateToTodoTask在ruoyi.js-1312，companyChangeManage/index.vue-52引用，跳转company/companyManagement/change/detail属实。
+---
 # 变更单查看误落备案详情入口致错调备案接口
 苏州市房地产监测V3 列表「查看」通过 navigateToTodoTask 按备案 busCode 解析路由，导致变更单 ID 误调备案详情接口。
 

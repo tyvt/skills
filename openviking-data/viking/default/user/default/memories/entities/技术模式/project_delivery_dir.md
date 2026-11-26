@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:20:27+08:00
+verdict_note: 苏州市房地产监测V3 命中 projectDelivery、PermitAppendixPanel，且 supervision/delivery 已不存在（与「移除中间层」一致），目录调整属实。
+---
 # 交付备案申请前端目录调整
 苏州市房地产监测V3 将交付备案申请前端目录调整为 `supervision/projectDelivery`，移除中间 `delivery` 层级。
 ## 变更内容

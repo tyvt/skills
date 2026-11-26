@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:14:17+08:00
+verdict_note: 确认listRouters、GenerateRoutes、filterAsyncRouter、ParentView/InnerLink/loadView，门户菜单后端直出Router树描述一致。
+---
 # Portal 菜单路由改为后端直出 Router 树
 产品2.0 门户菜单路由来源从「前端拼树」切换为后端直出（GET /portal/menu/listRouters）。
 

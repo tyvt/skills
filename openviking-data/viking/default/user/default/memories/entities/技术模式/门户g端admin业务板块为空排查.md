@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:14:05+08:00
+verdict_note: 确认listPerms、bizSection、authorizedSectionCodes、三码commodityHouseTrade等及resolveHomeLayoutVariant，admin板块为空排查属实。
+---
 # 门户 G 端 admin 首页业务板块为空排查
 门户登录后首页中间业务板块显示「暂无可办理的业务板块」且为对内 admin 布局时的根因与排查约定。
 

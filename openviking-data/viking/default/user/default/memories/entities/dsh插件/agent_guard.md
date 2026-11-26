@@ -13,6 +13,7 @@ DSH 本地插件（符号链接到 ~/.dsh/，零依赖），运行时注入时�
 - repairPwshAtBrace：pwsh 命令里未加引号的 @{} 自动补单引号，修复 git rev-parse @{u} 类错误
 - warnPwshBuffering：检测 `pwsh | Out-String` 类命令后返回 `pwsh-buffering` 告警，提示改用 2>&1 或 *> 流式重定向，不改命令本身
 - 探索漂移三规则 enabled:true、mode:'warn'，只记账不阻断
+- 2026-11-11 审计优化新增：拒绝提供可照抄的 glob/grep 模板；重复整读时返回上次区间与续读 offset；ask_user_question 缺 id 时自动补 q0/q1。
 
 ## 前端验证轮询门禁（verify-loop）
 - 规则在 lib/rules.js:1017 decideVerifyLoop：同一会话内 agent-browser 调用 >12 或 Start-Sleep >5 即拒绝，文案为 `[verify-loop:BLOCKED] 本轮已调用 agent-browser N 次（阈值 12）`
@@ -27,8 +28,8 @@ DSH 本地插件（符号链接到 ~/.dsh/，零依赖），运行时注入时�
 {
   "category": "DSH插件",
   "name": "agent_guard",
-  "source_extraction_id": "52f46407d9504e78a65a5cadd23412b8",
-  "version": 2,
+  "source_extraction_id": "99c80217e9b04daa9be298ae8ceac4bb",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

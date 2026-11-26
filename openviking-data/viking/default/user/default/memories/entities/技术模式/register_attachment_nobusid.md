@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:41:34+08:00
+verdict_note: 苏州市房地产监测V3源码实证：saveAndSubmit(25处)、attachmentList(196)、companyRegisterId(162)，AppendixRequirementCard在src/components/AnnexUpload/components/AppendixRequirementCard.vue-106；涉及文件齐备，描述与现状一致。
+---
 # 无 busId 的注册附件上传
 在 Suzhou Real Estate Monitoring V3 项目中，注册附件的上传不依赖于 busId，而是在提交后由后端处理。
 

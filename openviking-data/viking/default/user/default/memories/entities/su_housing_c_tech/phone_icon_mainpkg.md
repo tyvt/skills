@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T19:15:33+08:00
+verdict_note: 当前源码无 phone-auth-icon.png/mainStaticPaths.js/WechatPhoneAuthPopup.vue（仅见于已删除记忆归档），记忆描述文件与现状不符，无法证明有效。
+---
 # 手机号授权页图标主包化修复
 苏住房C 安卓手机号授权弹窗图标原先放 `pages_main` 分包且未打入构建产物，导致不显示，已迁入主包改用 ZsImage。
 

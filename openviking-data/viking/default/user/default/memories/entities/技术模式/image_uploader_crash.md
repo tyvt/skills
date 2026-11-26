@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:29:38+08:00
+verdict_note: 苏住房C 命中 chooseFile(32)、chooseImage(33)、chooseMedia(15)，3个引用文件存在，图片上传崩溃根因属实。
+---
 # 小程序端 ImageUploader 调 uni.chooseFile 必崩
 苏住房C 的 zhi2-mobile-shimin 中，ImageUploader 统一用 uni.chooseFile 选文件，但微信小程序端不存在该 API，运行时报 TypeError 崩溃。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:11:04+08:00
+verdict_note: 苏住房C仓命中 FileList 与 pages_vote/decision/components/BackBtn，分包复制组件描述属实
+---
 # 分包不可跨包引用组件需复制本包
 微信小程序分包不可跨包引用组件，pages_vote 不能直接 import pages_main 下 FileList。
 

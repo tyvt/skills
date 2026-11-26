@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:11:34+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 年度预算页面科目显示与背景修复
 苏住房C小程序 pages_benefit/budget/index.vue 中预算科目显示错误且页面背景未撑满全屏，已修复。
 

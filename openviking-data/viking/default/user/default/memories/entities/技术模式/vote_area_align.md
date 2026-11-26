@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:45:33+08:00
+verdict_note: 淮安物管存在 amountFormatter 与多处 DecisionRangeTable.vue，建筑面积列对齐方案落点属实。
+---
 # 淮安表决建筑面积列与惠山对齐
 淮安物管表决范围/明细表「建筑面积(㎡)」列已与惠山 41b5c0e67 对齐同步。
 

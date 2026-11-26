@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T14:39:44+08:00
+verdict_note: 苏住房C/zhi2-mobile-shimin/src/components 下未找到 AgreementCheck 等迁主包组件（glob 0命中）；跨组件迁主包描述无现状证据，无法证实。
+---
 # 分包不可互引组件跨业务组件须置主包
 微信分包间不能互相引用组件，苏住房C项目将跨业务组件从分包迁至主包 src/components/ 下。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:45:52+08:00
+verdict_note: 产品2.0 changeDetail.vue/detail.vue 命中 show-approval、useCustomApprovalFlow，自定义审批流关公共按钮属实。
+---
 # 价格备案自定义审批流关闭公共按钮
 产品2.0 中价格备案模块区县/市级四个页面自带自定义审批按钮，需用 show-approval 按页面关闭 OperationBtnGroup 的公共审批按钮。
 

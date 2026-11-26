@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:48:00+08:00
+verdict_note: 惠山小程序源码：optionApplyList(56)、optionGroupList(67)、"暂无表决选项"命中vote.vue-148，selectOption(8)。空数组??[]兜底与onLoad提示修复精确命中。
+---
 # 表决页空optionGroupList致渲染崩溃
 惠山小程序表决页因接口返回空数组时越界访问 optionGroupList 导致渲染崩溃，已加 `?? []` 兜底修复。
 

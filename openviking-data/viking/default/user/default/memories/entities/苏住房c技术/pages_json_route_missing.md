@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:46:55+08:00
+verdict_note: 苏住房C pages.json 与 login/index.vue 命中，路由注册被删致 navigateTo 失败、需补4注册属实。
+---
 # navigateTo 报 page not found：vue 在但 pages.json 路由被删
 苏住房C 小程序多处跳转报页面不存在，根因是 pages.json 路由注册被删而 .vue 文件仍在，与 H5 直觉相反。
 

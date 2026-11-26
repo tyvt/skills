@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:45:34+08:00
+verdict_note: 实机核对：引用文件(8个)存在于对应项目仓；核心符号命中[complexId,property,loading,propertyContractTable,complexName]，与记忆描述一致。
+---
 ﻿# zhi2-web-admin
 Vue.js web administration frontend for the "产品2.0" real-estate management system.
 
@@ -13,7 +18,6 @@ Vue.js web administration frontend for the "产品2.0" real-estate management sy
 
 ## Relations
 - Belongs to the "产品2.0" product line
-
 
 <!-- MEMORY_FIELDS
 {

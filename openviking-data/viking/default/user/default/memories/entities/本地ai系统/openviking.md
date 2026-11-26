@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:13:47+08:00
+verdict_note: 本机 GET /health 返回 status ok、version 0.5.5；max_concurrent 等运维参数见 .dsh 会话记录，系统描述属实。
+---
 # OpenViking
 本地 AI 记忆/向量化系统，v0.5.5，健康检查 http://127.0.0.1:1933/health。
 

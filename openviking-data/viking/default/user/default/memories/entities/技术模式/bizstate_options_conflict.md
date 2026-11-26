@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:48:32+08:00
+verdict_note: V3 存在 personnelStatusOptions、personnel_business_status 字典与 bizStateOptions，去 prop 冲突方案落点属实。
+---
 # bizStateOptions 命名冲突触发 Vue 警告
 在 Suzhou Real Estate Monitoring V3 项目中，bizStateOptions 在 props 和 data() 中声明导致了冲突和 Vue 警告。
 
@@ -17,7 +22,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：c7e8e793-52a0-4fb3-835f-ca02c35c1248
-
 
 <!-- MEMORY_FIELDS
 {

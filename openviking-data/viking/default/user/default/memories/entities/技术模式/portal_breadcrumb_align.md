@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:21:35+08:00
+verdict_note: 门户仓命中 BrokerPages(4)、PortalBreadcrumb(5)、publicPortal(13)，3个引用文件存在，面包屑对齐属实。
+---
 # 门户 PortalBreadcrumb 行内左排对齐
 对外门户经纪人等详情页面包屑整体靠左，当前级文字与 › 分隔符同一水平中线，不可整行居中。
 

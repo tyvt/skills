@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:45:54+08:00
+verdict_note: 园区物管2.0 zs-table.vue 存在 zs-table-subtotal-divider 类，与抬高 z-index 修复一致。
+---
 # zs-table 固定列遮挡小计行分隔线
 园区物管2.0 的 zs-table 带固定列且有自定义小计行时，固定列白色背景遮挡小计行底部分隔线，需将分隔线 z-index 提到固定列之上。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

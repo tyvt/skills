@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:43:34+08:00
+verdict_note: 泰兴小程序含 StaffCustomTabbar、echarts-uniapp、renderFailed 兜底，排查结论所述文件与组件均存在。
+---
 # 物业端统计页canvas渲染排查结论
 泰兴小程序物业端统计页图表未渲染，经逐层验证代码与编译产物正常，疑似运行环境同层渲染兼容或运行时状态问题。
 

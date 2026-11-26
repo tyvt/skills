@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:45:14+08:00
+verdict_note: Navbar.vue 命中，align-items 居中样式修复描述属实。
+---
 # 更多功能下拉菜单内容居中修复
 园区物管2.0 中 Navbar.vue 的「更多功能」下拉菜单项内容未居中，已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:46:17+08:00
+verdict_note: 惠山二期H5 zhi2-mobile 下 assetsPublicity/index.vue 存在 getProjectAssetInfo 且含 onLoad/onShow，属实。
+---
 # 资产公示页onShow并行请求3接口
 惠山二期H5 的 assetsPublicity/index.vue 在 onShow 并行请求 3 接口，根因系请求置于展示钩子导致重复调用。
 

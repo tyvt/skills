@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T07:33:30+08:00
+verdict_note: surveyChangeConstants.js-321 确有 buildSurveyChangeAddPayload，projectName/enterpriseCreditCode/oldTotalUnits 等字段齐全；detail.vue-453 getForm() 调用，编辑仅传{id,changeReason}(449)。与记忆一致。
+---
 # 测绘变更add接口入参经映射函数构造
 在 `surveyChangeConstants.js` 新增 `buildSurveyChangeAddPayload` 将 form 字段映射为 API 入参，强校验含 `projectName`、`region` 等。
 

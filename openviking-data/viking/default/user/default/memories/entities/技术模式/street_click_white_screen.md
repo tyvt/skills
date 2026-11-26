@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:10:09+08:00
+verdict_note: 园区物管2.0 statisticsMap/index.vue 命中 selectOptionalComplexList 与 SEARCH_SINGLE 常量，描述属实。
+---
 # 点击街道进入物业点白屏修复
 园区物管2.0 统计地图点击街道后进入物业点层级出现白屏，已改为等待接口返回有效经纬度后再移动地图中心。
 

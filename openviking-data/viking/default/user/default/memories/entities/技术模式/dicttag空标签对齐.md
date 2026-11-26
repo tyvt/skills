@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:13:16+08:00
+verdict_note: 精确命中 rawDictParts、tagDisplayList、resolveDisplayText，DictTag 空标签对齐修复属实。
+---
 # DictTag 空标签对齐 detail-template
 淮安物管详情页 type=tag 字段出现只有 el-tag 底色无文字，根因为 dict-tag.vue 只认 dictValue/dictLabel 未对齐 detail-template 双口径。
 

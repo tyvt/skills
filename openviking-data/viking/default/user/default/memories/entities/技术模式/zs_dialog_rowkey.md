@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:26:37+08:00
+verdict_note: 园区物管2.0 命中 bankDetailDay(33)，5个引用文件存在，弹窗 row-key 属实。
+---
 # zs-select-dialog row-key 必传
 打开 zs-select-dialog 默认勾选列时，宿主未传 row-key 会导致 ElTable 报警告，须显式传主键。
 

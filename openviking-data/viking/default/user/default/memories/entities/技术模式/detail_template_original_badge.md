@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:40:24+08:00
+verdict_note: originalObj/formatSelectOptionsDisplay/loadCommunityOptionsForDetail/dictValue 在产品2.0命中，原值角标修复属实。
+---
 # 详情模板变更前原值角标
 detail-template 新增「变更显示」能力，单元格右上角红色三角显示原值，需保证原值与主值走相同 formatter/字典/区划链路。
 

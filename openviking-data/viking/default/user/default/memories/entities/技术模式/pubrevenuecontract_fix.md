@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:16:13+08:00
+verdict_note: 抽检2026-11-26 pubRevenueContract/detail.vue 本机存在
+---
 # 收入合同列表与详情修复
 产品2.0 的 zhi2-web-admin 中按图片标注修复收入合同管理列表与详情两处问题。
 

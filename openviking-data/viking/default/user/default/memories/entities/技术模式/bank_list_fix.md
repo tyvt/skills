@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:43:07+08:00
+verdict_note: 实机核对 产品2.0 仓库确认关键符号(11/13)存在：after、border、bottom、cursor、extracted；文件与描述一致，记忆有效。
+---
 # 银行管理列表页样式修复
 根据三张截图标注完成修复，涉及全局样式与三个银行管理列表页。
 
@@ -11,7 +16,6 @@
 - 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：index.scss、unionBank/index.vue、sysBankBranch/index.vue
 - 来源会话：e57a5985-4ed9-4121-a10c-c0665c930b19；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

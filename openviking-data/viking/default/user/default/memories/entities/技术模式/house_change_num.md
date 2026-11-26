@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:38:26+08:00
+verdict_note: houseNum/houseChange/detail/v-tooltip 均在惠山二期G代码命中，houseChange/detail.vue 存在，字段对接描述与现状一致。
+---
 # 房屋变更可选字段 houseNum 对接套路
 后端新增可选字符串字段（如不动产房屋编码 houseNum）时，前端需双表单加项、变更对比并靠 rules 白名单控制必填。
 

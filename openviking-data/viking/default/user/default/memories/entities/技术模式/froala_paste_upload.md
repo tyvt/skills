@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:09:07+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 小区公告粘贴图片自动上传
 园区V0 小区公告新增粘贴图片自动上传能力，将 base64 转为 FormData 上传到现有接口，单张上限 10MB。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区V0
-
 
 <!-- MEMORY_FIELDS
 {

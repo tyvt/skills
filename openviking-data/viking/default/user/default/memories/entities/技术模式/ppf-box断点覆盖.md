@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:21:46+08:00
+verdict_note: 关键尺寸缺失：.ppf-box 文件仅有 max-width-180px，1440/1200 断点与 180×270/140×210/120×180 规则在代码中查无。
+---
 # .ppf-box断点前置被覆盖致比例畸形
 苏州市房地产监测V3 的 zhi2-web-admin 修复 .ppf-box 断点规则被覆盖导致比例畸形的问题。
 

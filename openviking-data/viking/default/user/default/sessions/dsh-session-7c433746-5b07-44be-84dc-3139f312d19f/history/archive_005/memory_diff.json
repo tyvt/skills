@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-7c433746-5b07-44be-84dc-3139f312d19f/history/archive_005",
+    "trace_id": null,
+    "extracted_at": "2026-11-26T02:09:46.291694+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited/memories/entities/功能模块/决策详情状态翻转.md",
+                "memory_type": "entities",
+                "after": "# 决策详情状态翻转\n点决策详情后「参与决策」变「修改决策」是新 app 后端 SmUserVoteDetail 打开详情时写库导致，不是前端 bug，前端只是忠实反映后端返回的 voteState。\n\n## 因果链路\n- 前端详情页加载调 SmUserVoteDetail（家园区一网通办/src/pages-decision/decision/detail.vue:143,162）→ 后端 Controller /SmUserVoteDetail → detailExecute（SmCastVoteAppController.java:236,249）。\n- detailExecute 写库：updateVoteOpin 把 voteopinion 4→3（未表决→已送达未表决）（SmCastVoteAppServiceImpl.java:2181 → SmCommonMessageDtlAppMapper.xml:190-205）。\n- 同时把消息 isReader 0→1、busiState 0→1 并 updateById（SmCastVoteAppServiceImpl.java 约 :2203/:2211/2214）。\n- 列表接口 SmCastVoteListApp 按 po.getBusiState() 映射 voteState：0→未表决、1→表决中、2→已表决、3→已过期（SmCastVoteAppServiceImpl.java:392-416）。\n- 前端按钮文案：未表决/未选举→参与，其余→修改（components/index.vue:51-53）；即打开详情→后端置 busiState=1→列表返回「表决中」→标签变「修改决策」。\n\n## 新老 app 差异\n- 老 app（iOS→园区表决H5→V0 后端）用 /estate/AppDecision/selectAppDecisionList、/h5decision/ownerDecision，按 Tab 静态分流，详情只读不写状态，没有这个行为。\n- 该行为是新一网通办 /version/1/app/Sm* 接口引入的。\n\n## 结论与待办\n- 状态翻转是后端有意设计（打开即标记已读/送达）；把「已读消息」映射成「表决中」并显示「修改决策」是否合理需产品确认。\n- 若要改为「未实际投票仍显示参与决策」，得改后端 updateVoteOpin 与 busiState→voteState 字段映射，不在前端范围内。\n- 本次为纯静态排查，未跑构建/测试。"
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c-unlimited/memories/entities/代码仓库/园区v0app后端仓库.md",
+                "memory_type": "entities",
+                "after": "# 园区V0APP后端仓库\n仓库路径 D:/repository/园区V0APP后端，包含新一网通办 app 的决策接口，位于 EstateManagement-App 模块。\n\n## 位置与模块\n- 仓库路径：D:/repository/园区V0APP后端。\n- 新 app 决策接口在 EstateManagement-App 模块，Controller 为 SmCastVoteAppController.java，基址 /version/1/app。\n- 选举接口在 SmElectionVoteController.java:40/:145；与前端 src/api/common.ts 一一对应，链路一致。\n\n## 新 app 决策接口清单\n- SmCastVoteAppController.java：:59 SmCastVoteListApp、:95 SmCastVoteListAppHistory、:130 SmCastVoteGoHandleApp、:165 SmCastVoteSubmitApp。\n- 同文件：:200 SmUserFaceCheck、:236 SmUserVoteDetail、:282 getVoteAnalysis、:305 SmUserVoteDetailList、:338 getVoteAnalysisByWeb、:358 queryOwnerVoteOptionList。\n\n## 检索注意事项\n- 之前用 ops_grep 检索被 scan-budget 截断（scanComplete=false，1 万文件上限），漏掉整个 EstateManagement-App 模块，导致「新 app 接口不在本仓库」的错误结论。\n- 改用 Bash grep -r（无 scan-budget 限制）才找到；在本仓库做全量代码检索时应优先用 Bash grep -r。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

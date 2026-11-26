@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:21:53+08:00
+verdict_note: 园区V0 src 命中 AccOpeningApplyForm.java、openAccountDeleteBS，而 openAccBS/open_acc_bs 全仓不存在，与「检索无结果+分页参数/业务码结论」一致。
+---
 # 园区V0 acc模块代码检索结论
 园区V0 仓库中检索 openAccBS 等字段无结果，并理清 acc 模块分页参数与相近业务实体。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区V0
-
 
 <!-- MEMORY_FIELDS
 {

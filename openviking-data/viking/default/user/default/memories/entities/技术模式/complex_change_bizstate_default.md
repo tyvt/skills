@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:49:35+08:00
+verdict_note: 苏住房G complexChange/index.vue 中 bizState- undefined，与业务状态默认「全部」改动描述一致。
+---
 # 变更记录业务状态默认「全部」（苏住房G）
 苏住房G 物业管理区域下「变更记录」页（complexChange/index.vue）已将业务状态默认筛选改为「全部」。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:53:00+08:00
+verdict_note: 苏州市房地产监测V3 命中 chargeUnitFromFeeTypeLabel、formatSchemeChargeStandard、schemeDetailTemplate，与收费标准单位修复一致。
+---
 # 入网审核详情服务方案收费标准缺单位
 苏州市房地产监测V3 中 institutionRegister/detail.vue 服务方案收费标准未按类型拼接单位，已抽取公共函数修复。
 

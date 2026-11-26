@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:53:12+08:00
+verdict_note: 园区公共收益 命中 containerHeight、setScrollTop、updateContainerHeight、ScopeSelectDialog，与 zs-table 末行裁切修复一致。
+---
 # zs-table选择弹窗末行裁切与重置停留底部修复
 在ScopeSelectDialog内嵌zs-table时，默认table-tr算高导致末行被裁切，且搜索重置后scrollTop未归零使列表停在底部。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:44:40+08:00
+verdict_note: pages_owner/project/info 与 ProjectDetail/contracts 在无锡市区小程序嵌入H5命中，合main单独处理描述属实。
+---
 # 小区信息物业合同精简合main单独处理
 市区交付要求精简小区信息/物业合同 UI，合并到 main 时因 main 版 project/info 无地图模块须单独改，不能机械 cherry-pick。
 

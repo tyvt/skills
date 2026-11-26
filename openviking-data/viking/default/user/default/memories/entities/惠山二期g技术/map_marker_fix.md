@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:49:17+08:00
+verdict_note: 惠山二期G 源码命中 areaLayerLoadSeq、markerRenderSig、processMapZoomChange、_markerRedrawSeq，与地图标记修复一致。
+---
 # 小区台账地图标记混显修复
 惠山二期G 项目小区台账地图标记混显修复已迁移完成，改动 2 个文件（+95/-27 行）。
 

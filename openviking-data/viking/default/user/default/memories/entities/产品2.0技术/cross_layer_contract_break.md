@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:16:02+08:00
+verdict_note: 产品2.0 命中 registerFlexColumn、flexColumnCount、ifHistory，跨层标志契约断链修复属实。
+---
 # 跨层传递业务标志/列注册契约断链静默失效
 多个「按钮不显示/样式不对」类问题的根因都是跨 2 层以上传递的标志或注册契约断链，断链时全部静默退化且无报错。
 

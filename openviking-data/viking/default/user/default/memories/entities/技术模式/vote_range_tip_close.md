@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T04:33:35+08:00
+verdict_note: 太仓G ownerDecision/components/VoteRangeDialog.vue-342 finalSubmit 成功回调内 -346/351 设 tipDialogVisible=false，close() 亦重置，提示框关闭修复描述属实。
+---
 # 线下投票成功提示框未关闭修复
 太仓G端一般表决详情线下投票提交成功后，嵌套的「线下票录入信息确认」提示框残留页面。
 

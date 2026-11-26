@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:43:12+08:00
+verdict_note: 产品2.0 depositNotice/PaymentRangeTable.vue 第43/53行确为 header=，title→header 对齐描述属实。
+---
 # zs-select-dialog 的 title 改为 header 对齐写法
 在 depositNotice 的 PaymentRangeTable.vue 中，将 zs-select-dialog 的 title 属性改为 header，以与 company 组件一致。
 ## 背景

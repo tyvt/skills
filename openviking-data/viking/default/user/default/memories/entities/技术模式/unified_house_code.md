@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:43:32+08:00
+verdict_note: V3 houseLimit/limitFormMixin.js 存在 resolveUnifiedHouseCode 与 unifiedHouseCode 引用，与修复一致。
+---
 # 统一编码列误取房屋编号致显示异常
 根因 `houseCode` 为房屋编号，统一房屋编码列误取致显示错误，需新增解析函数优先取统一编码。
 

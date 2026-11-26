@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:09:18+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # Owner card w-500 truncates and background occludes text
 In 苏住房C (zhi2-mobile-shimin), the electronic owner card truncated long community names and its decorative background layer covered the text.
 
@@ -19,7 +24,6 @@ In 苏住房C (zhi2-mobile-shimin), the electronic owner card truncated long com
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：5a765087-11ff-4a31-9326-3d3a3b8980b1
-
 
 <!-- MEMORY_FIELDS
 {

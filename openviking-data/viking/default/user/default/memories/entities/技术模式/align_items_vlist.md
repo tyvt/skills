@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:41:35+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[关键标识]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # align-items:center 致虚拟列表失效
 main.ts 全局开启 z-paging 虚拟列表，.list-container 的 align-items:center 致滚动区宽度收缩为 0 算高失败。
 

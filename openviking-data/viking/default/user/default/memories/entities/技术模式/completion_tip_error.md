@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:21:23+08:00
+verdict_note: 惠山二期G maintenance/completion/detail.vue 命中 constructionSettleAmountTip(1)、施工结算总额(1)、labelTooltip(2)，相邻 tip 文案修复属实。
+---
 # 竣工备案detail相邻tip复制错文案
 维修模块 completion/detail.vue 相邻金额字段共用 tip 计算属性时易整段复制错字段文案，静默不报错。
 

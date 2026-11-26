@@ -14,12 +14,18 @@
 - 涉及文件：`src/utils/wxJssdk.js`、`src/utils/index.js`。
 - 所属项目：昆山市民；代码基线：2236a26；来源会话ID：01a162c8-dee7-70c5-a400-75ccd003ebdf。
 
+## 下载入口与合同页适配（2026-11-11 更新）
+- 环境检测：`isInMiniProgram()` 依赖 jweixin SDK（index.html 第 13 行加载）提供的 `window.wx.miniProgram.getEnv` 判断 `miniprogram`；SDK 未加载时恒为 false 而走预览。
+- `previewFileInH5` 新增 `download` 参数：为 true 时直接下载而非内嵌预览（PDF 原走 `uni.navigateTo` 到 `filePreview.vue`）；`filePreview(file, options)` 支持 `options.download`。
+- 新增 `downloadFileViaBrowser`（H5）：带 `Authorization` 鉴权 + `credentials` 触发浏览器 blob 下载，用于非小程序环境；token 取自 `getToken`（`@/api/index`，读 `useUserStore().accessToken`），该引入无循环依赖。
+- 合同详情页 `src/pages_contract/detail.vue` 修复：原传 `item.fileThumbnailSite`（缩略图）而非真实文件，改为 `item.fileUrl || item.fileThumbnailSite` 并传 `{ download: true }`。
+
 <!-- MEMORY_FIELDS
 {
   "category": "昆山市民技术",
   "name": "llt_download_bridge",
-  "source_extraction_id": "227214d675d14725964edfb851677a3e",
-  "version": 1,
+  "source_extraction_id": "fd46031b97fe4c0e9efadae86b0a94ff",
+  "version": 2,
   "memory_type": "entities"
 }
 -->

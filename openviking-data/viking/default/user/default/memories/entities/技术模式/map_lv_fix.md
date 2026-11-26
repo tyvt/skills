@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:34:51+08:00
+verdict_note: 产品2.0 mapOverview/index.vue 实机核对：275行资金余额lv-1、276-277资金收入/支出lv-2、278-280三个本年新增字段均lv-1，与记忆所述lv修复一致（仅字段排列顺序描述略异，不影响修复结论）。
+---
 # 可视化行政划分新字段缩进对齐修复
 产品2.0项目benefit/mapOverview/index.vue中“行政划分”新增3个字段因lv设置错误导致缩进显示异常已修复。
 
@@ -17,7 +22,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

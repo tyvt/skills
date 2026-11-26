@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:17:52+08:00
+verdict_note: 修复属实：parkingSpace/index.vue 有 parkingSpaceTypeFilterOptions 筛选选项，benefit_parking_type 字典调用存在，选项分离属实。
+---
 # 属性筛选器覆盖字典并在车位类型列显示数字
 在项目 Park Public Benefit (zhi2-web-admin) 中，parkingSpace/index.vue 中的函数 onParkingSpaceTypeChange 将 parkingSpaceTypeOptions 替换为字典的子集，导致 dictFormatter 失败并显示数字 1。
 

@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-26T21:42:11+08:00
+verdict_note: 全仓无 DEMO_ROW，苏住房G TodoPanel.vue 也无 DEMO_ROW/is-placeholder，代码审查描述无法证实。
+---
 # 首页 V2 代码审查发现（苏住房G）
 苏住房G 项目 zhi2-web-admin 分支 develop/v2.6.2-suzhufang-home 首页 V2 相关代码审查结果。
 
@@ -20,7 +24,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话ID：22db11e4-4ebb-4504-8a6e-e93aa9791182；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:19:38+08:00
+verdict_note: V3中PresaleBuildingTable.vue存在且已无listMixins/$set/queryParams，与"移除listMixins"修复结论一致。
+---
 # 子表混用 listMixins 未声明属性引发 Vue 警告
 在项目 Suzhou Real Estate Monitoring V3 (zhi2-web-admin) 中，`PresaleBuildingTable.vue` 作为子表混用了 `listMixins`，并在 `created` 中使用 `this.$set` 动态挂载未在 `data` 中声明的 `queryParams`，触发了 Vue 2 警告。
 
@@ -18,7 +23,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：69921419-8a4f-4e43-b9d8-780e617536da
-
 
 <!-- MEMORY_FIELDS
 {

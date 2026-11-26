@@ -11,6 +11,7 @@
 - src/api/system.js:61 定义 getRegisterToken，在 login.vue:371（register 流程，未登录场景）实际调用
 - login.vue:211 引入 getRegisterToken
 - 请求库为标准 axios，params 自动 URL 编码（含 +/=）
+- src/views/system/user/detail.vue：已移除获取配置密码接口 getConfigKey('sys.user.initPassword') 与「初始化密码」按钮/方法，密码框提示改为「请联系管理员获取初始密码」（2026-11-11，提交 75be98636）
 
 ## 安全整改（禅道任务2421，2026-11-12）
 - 漏洞 VUL-20261104155309778683：/auth/getToken 零鉴权签发 token，任意用户可登录
@@ -29,9 +30,9 @@
 {
   "category": "项目",
   "name": "苏找房G端",
-  "source_extraction_id": "7349cea5db22451c8c99b509004f65ea",
+  "source_extraction_id": "6aae8be9a39342cf9de8276924bc4ca0",
   "peer_id": "gitlab.zhi.com-zhi-suzhou-shiqu-fangyuanma-fe-zhi1-web-admin-h5-g-unlimited",
-  "version": 2,
+  "version": 3,
   "memory_type": "entities"
 }
 -->

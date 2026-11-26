@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:47:11+08:00
+verdict_note: 苏住房G dict.js 存在 getDictsIncludeDisabled 调用 /system/dictData/listByType/{dictType}，与全量接口切换一致。
+---
 # 字典全量接口切换
 苏住房G 项目将字典全量查询由分页接口切换为按类型全量接口。
 

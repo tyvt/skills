@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:42:39+08:00
+verdict_note: feeBills/property/bill/feeDeclare2/shareFee 在产品2.0命中，发票页面定位描述与代码一致。
+---
 # 未找到截图样式的发票页面；feeBills 是最接近的
 仓库 产品2.0 没有与截图（包含成本/费率项目列和收款折扣选项卡）相对应的页面；最接近的模块是 feeBills。
 
@@ -17,7 +22,6 @@
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：e57753a2-9e6d-4464-a761-3a7905b9034a
-
 
 <!-- MEMORY_FIELDS
 {

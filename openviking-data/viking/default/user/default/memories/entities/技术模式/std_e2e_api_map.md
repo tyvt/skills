@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T10:36:01+08:00
+verdict_note: 苏住房G/docs/std-evaluation/api-map.md 实测 1310 行，含 zs-method 隧道与 2120000000000000001 等 E2E 造数说明，与记忆一致。
+---
 # 标准化评价E2E造数捷径（api-map.md）
 为「物业标准化评价」E2E 用例作者产出的接口契约文档 docs/std-evaluation/api-map.md 沉淀出直接决定 E2E 写法的结论。
 

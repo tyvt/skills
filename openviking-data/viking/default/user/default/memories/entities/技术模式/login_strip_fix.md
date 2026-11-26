@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:43:44+08:00
+verdict_note: login.vue 侧栏 520px 命中，装饰图布局文件属实；maxPanelW 等变量名已变更但主题一致。
+---
 # 登录框左侧装饰图底部白条修复
 苏州市房地产监测V3 的 login.vue 修复了登录框左侧装饰图与表单高度不一致导致的底部白条问题。
 

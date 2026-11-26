@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:20:41+08:00
+verdict_note: 苏州市房地产监测V3 AppendixPackageSection/index.vue 命中 resolvedBusId(1)；companyId、companyRegisterId、listAppendixPackage 及9个引用文件均在，兼容处理属实。
+---
 # 企业入网详情资质附件缺ID兼容
 苏州市房地产监测V3 中企业入网详情因缺失 companyId 导致资质要件不显示，已做兼容处理。
 

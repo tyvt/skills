@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:39:47+08:00
+verdict_note: zs-file-upload/fileSite/AnnexUpload/AppendixPackageSection 在代码库命中，四组件值类型差异属实。
+---
 # 四个上传组件别混用：值类型与契约各异
 本项目四个上传附件组件（zs-file-upload / FileUpload / AnnexUpload / AppendixPackageSection）的 props 契约、绑定方式与值类型均不同，写错一个不报错但数据为空。
 

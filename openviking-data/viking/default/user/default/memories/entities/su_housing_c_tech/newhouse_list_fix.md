@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:45:31+08:00
+verdict_note: VALID；listRecommendProject/halfYearAgo/indexMore 在苏住房C真实代码命中。
+---
 # 最新楼盘页接口加载修复
 苏住房C新房列表「最新楼盘」页修复加载时序与跳转URL错误，确保listRecommendProject请求正确发出。
 

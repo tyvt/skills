@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:43:51+08:00
+verdict_note: 实机核对 苏住房G 仓库确认关键符号(20/22)存在：_all、accountTypeAllOptions、accountTypeOptions、accountTypeSelectOptions、admin；文件与描述一致，记忆有效。
+---
 # 字典编辑子集与展示全集双字典模式
 同一字段在表单只能选「可选子集」，查看/回显需展示含已停用项在内的全集，否则历史数据回显成空或原始码值；本项目（苏州 V3 / 苏住房G）用「双字典 + computed 按 formMode 切换」形态复用。
 
@@ -21,7 +26,6 @@
 - 验证证据：会话 b310969f 全仓检索确认 `_all` 后缀仅 system/user/detail.vue 一处，并给出 computed accountTypeOptions 切换代码；变体 transaction_region / transaction_region_real
 - 涉及文件：zhi2-web-admin/src/views/system/user/detail.vue；utils/dict.js；main.js；institution/record/index.vue
 - 所属项目：苏住房G；来源会话ID：b310969f-eb74-47fd-bd9f-361fe91d807f；代码基线：b0f2039
-
 
 <!-- MEMORY_FIELDS
 {
