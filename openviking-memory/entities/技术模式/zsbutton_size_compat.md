@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:19:25+08:00
+verdict_note: 与现状不符：产品2.0 zs-button.vue 仅 v-bind="$attrs" 透传，无 mini→small/medium→default 映射；映射只存在于记忆归档。
+---
 # Element Plus 按钮 size 不支持 mini 的兼容映射
 ElButton size 仅支持 ""|default|small|large，历史 size="mini"/medium 会告警，需在 ZsButton 封装层做映射。
 ## 问题根因

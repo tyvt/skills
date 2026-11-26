@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:15:56+08:00
+verdict_note: 苏州V3 agencyPersonnel 下 InfoCardDialog.vue-79、WorkCardDialog.vue-77 实存，弹窗置空修复涉及文件属实。
+---
 # InfoCard/WorkCard弹窗关闭置空动画期报错
 苏州市房地产监测V3 中 InfoCardDialog 与 WorkCardDialog 在 @closed 将 credential 置 null，导致关闭动画期间模板访问属性报错，修复为重置为 {}。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:24:11+08:00
+verdict_note: 受阻断言法为E2E方法论，docs/std-evaluation/api-map-report.md及"尚未关联参与评价企业"仅见于记忆归档JSON，无项目代码证据可核对。
+---
 # 后端缺陷阻塞用例的受阻断言法
 当 E2E 用例被后端缺陷阻塞时，改用「不写库的负向断言」记录真实行为与无副作用，而非造数据硬闯。
 

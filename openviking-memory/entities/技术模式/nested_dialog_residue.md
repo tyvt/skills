@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:45:22+08:00
+verdict_note: 太仓G zhi1-web-admin 的 VoteRangeDialog.vue 存在 tipDialogVisible 控制嵌套确认弹框，属实。
+---
 # 嵌套确认弹框独立visible致父关后残留
 VoteRangeDialog.vue 中嵌套「线下票录入信息确认」弹框由独立 tipDialogVisible 控制，且 zs-dialog 挂载 body，父框 close() 后确认框残留。
 

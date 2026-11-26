@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:49:44+08:00
+verdict_note: VALID；hasOnlineDecisionPush/isMaintainDecision/OwnerDecision/owner 在惠山物管V1真实代码命中。
+---
 # Huishan Property Management V1 Frontend (zhi1-web-admin H5)
 The Wuxi Huishan property management admin H5 frontend project is validated locally on nginx at localhost:8100.
 
@@ -18,7 +23,6 @@ The Wuxi Huishan property management admin H5 frontend project is validated loca
 - Fix: checks accept both `owner` and `maintain` through computed `isMaintainDecision` references (index.vue:304 and detail.vue).
 - Validation on 2026-11-24: local nginx 8100 site showed 542 records, headers "Associated Business Name" and "Business Type", and request decisionType=MAINTAIN; vote/supervisory regression passed.
 - Delivery: remote SHA `9c7dea66e` was pushed and the parent gitlink updated; the uncommitted deletion of `src/api/estate/ownerDecision.js` was left out because it was pre-existing work by someone else.
-
 
 <!-- MEMORY_FIELDS
 {

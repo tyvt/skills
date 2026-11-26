@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:48:08+08:00
+verdict_note: resolveStaticUrl 在苏住房C szffluzm 命中。
+---
 # pages_my 分包 tip.png 缺失修复
 苏住房C 小程序 pages_my 分包因缺少 static/icon/tip.png 导致 ZsImage 渲染 500 错误，已从 pages_owner 复制修复。
 

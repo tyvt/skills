@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:45:22+08:00
+verdict_note: 实机核对 太仓一网通办H5 仓库确认关键符号(21/23)存在：ElectionResult、GroupResult、ProgressBar、ResultStatistics、ResultStatisticsTab；文件与描述一致，记忆有效。
+---
 # 选项表决须用optionList而非选举统计字段
 太仓一网通办H5 迁移至 /owner-decision 时选项表决统计误用选举接口字段，须改用 optionList。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:11:25+08:00
+verdict_note: captcha-recognizer技能真实存在于skills目录，SKILL.md含solve-captcha.mjs、deepseek-v4.1-flash、magpie网关3425端口，描述与现状一致。
+---
 # captcha-recognizer 验证码识别技能
 一个放置在 D:\repository\skills\captcha-recognizer 的 DSH 技能，用于识别登录验证码并自动计算算术结果。
 
@@ -20,7 +25,8 @@
 - 2026-11-14 实测根因：默认模型 `auto/hy3` 早在 2026-11-09 被确认不支持图像识别（已剔除全部视觉基准），却为 solve-captcha.mjs 第21行默认模型，SKILL.md 亦误写"hy3 支持识图"
 - 本地 magpie 网关实测：正常噪声 24 张 `auto/hy3`=70.8%（17/24）、`auto/deepseek-v4.1-flash`=100%（24/24）；极端噪声 30 张两者均降至约 53-57%，叠加多数投票(K=5)可回升至 73.3%
 - 优化杠杆：P0 换默认模型为 `auto/deepseek-v4.1-flash`（零成本 70.8%→100%）；P1 多数投票(K=3)+合法性校验+可选 2-3×上采样；P2 识别失败刷新验证码重试+多模型 fallback
-- 评估报告存于 `D:epository\skills\.tmp_cap\captcha-evaluation.md`，纯评估未改代码，落地改代码需走计划→送审→确认流程
+- 评估报告存于 `D:
+epository\skills\.tmp_cap\captcha-evaluation.md`，纯评估未改代码，落地改代码需走计划→送审→确认流程
 
 <!-- MEMORY_FIELDS
 {

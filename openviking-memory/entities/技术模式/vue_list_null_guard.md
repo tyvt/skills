@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:16:30+08:00
+verdict_note: 在产品2.0 HeadTitle/index.vue确认displayedList、showExpandButton及(item&&item.value)空值保护，描述属实。
+---
 # Vue 组件列表空值保护模式
 产品2.0 中 `HeadTitle` 等组件的列表元素可能为 `undefined`/`null`，直接访问 `item.value` 会报 `Cannot read properties of undefined (reading 'value')`，须加空值保护。
 

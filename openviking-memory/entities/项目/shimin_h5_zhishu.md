@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:16:03+08:00
+verdict_note: 小程序仓库实机存在记忆所列 4 个时间戳 tag（202611061622/091537/121822/131658），仓库 tag 约定属实。
+---
 # 园区市民h5智数仓库
 苏州园区住房市民h5智数c前端仓库（gitlab 路径 zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c），使用 dev-v0 分支，无子模块，采用时间戳 tag 与版本号 tag 两套命名。
 

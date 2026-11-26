@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:47:36+08:00
+verdict_note: 泰兴小程序源码：payment-popup命中result.vue-192/194/251，cashier/result在pages.json-1154，ZsPopup(92)，!important大量存在。-deep权重打平加!important压过ZsPopup描述精确命中。
+---
 # :deep权重打平致默认样式覆盖popup
 泰兴小程序 `staff/pages/cashier/result` 中 `:deep(.payment-popup){width:100%}` 编译后权重 0-2-0，因样式权重打平、组件自身 wxss 后生效，被 `ZsPopup` 默认样式覆盖。注意根因并非 `min()`（该问题已在更早会话修复，见 wxss_deep_discard）。
 

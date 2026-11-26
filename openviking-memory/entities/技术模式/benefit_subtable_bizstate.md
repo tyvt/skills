@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:51:06+08:00
+verdict_note: 产品2.0命中 canOperate/assetsLeaseContractFiling/houseTable, 仅按bizState控操作属实
+---
 # 园区收益租赁类子表仅按 bizState 控操作
 资产租赁/经营资产合同等 benefit 子表，业务方明确要求不要用 formMode（查看/编辑）限制行内操作，仅以主单 bizState 为准。
 

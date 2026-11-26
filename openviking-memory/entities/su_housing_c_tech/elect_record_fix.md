@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:18:44+08:00
+verdict_note: 苏住房C 命中 DecisionResult、decisionOptionResponseAllList、ResultRecord，选举人姓名修复属实。
+---
 # 选举记录选举人姓名不显示修复
 苏住房C小程序选举记录（pages_vote/elect/DecisionResult.vue）因分组与展开逻辑导致选举人姓名丢失，已修复。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

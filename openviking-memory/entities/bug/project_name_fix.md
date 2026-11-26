@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-27T02:42:46+08:00
+verdict_note: 实机核对 i淮安公版 仓库确认关键符号(11/16)存在：assetsPublicity、benefit、complexId、complexName、cursor；文件与描述一致，记忆有效。
 ---
 # H5外链complexId缺projectName修复
 i淮安公版 H5 外链仅解析 complexId 未同步 projectName，导致资产公示、公共收益等页项目名显示为空，已修复。

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:52:19+08:00
+verdict_note: 产品2.0 含 mainCardValue/cardValue/DecisionRangeTable/VotingItemsTable，太仓G optionDecision/detail.vue 含 showVoteResult，Tab 重置修复属实。
+---
 # 选项表决详情Tab切换内容消失修复
 太仓G端选项表决详情按基本信息→表决项→投票信息切换后底部无组件渲染，根因是 cardValue 未随 tab 重置，已通过监听 mainCardValue 修复。
 

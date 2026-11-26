@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T00:54:18+08:00
+verdict_note: 目标文件 ownerCommitteeWorker/detail.vue 无 roleName 或 label.sync, 仅 sex/status 等 value.sync, 描述与现状不符
+---
 # 改角色只传roleIds保存后名称错乱修复（zs-select须label.sync）
 组织工作人员等详情改角色只更新roleIds，roleName保留旧值，保存提交错误角色名。
 

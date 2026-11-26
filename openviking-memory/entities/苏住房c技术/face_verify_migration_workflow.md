@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:16:41+08:00
+verdict_note: 确认weChatVerify/ctAuth、AuthorizedSuccess、FormManual及pages_my；人脸核身迁移接入点与代码现状一致。
+---
 # 从泰兴小程序迁移微信人脸核身实名认证
 苏住房C以泰兴小程序已跑通页面为模板，整体迁移居民身份证实名认证的人脸核身链路。
 

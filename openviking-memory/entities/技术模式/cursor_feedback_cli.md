@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:17:16+08:00
+verdict_note: ~/.cursor-feedback/cli.json 实存且内容 model=composer-2.5，与「默认模型设为 composer-2.5」一致；飞书/new 用法属 CLI 配置结论。
+---
 # 飞书机器人发起 Cursor Feedback 配置
 苏州市房地产监测V3 项目配置飞书机器人通过 cursor-feedback CLI 拉起会话并设默认模型。
 

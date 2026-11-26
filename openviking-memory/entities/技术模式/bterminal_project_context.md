@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:47:04+08:00
+verdict_note: VALID；clearBTerminalProjectContext/currentProjectId 上下文清除逻辑在真实代码命中。
+---
 # B 端项目上下文清除入口唯一化与「刷新即清空」行为
 苏住房G 后台将 B 端项目上下文（projectId/complexId）的清除入口唯一化到 clearBTerminalProjectContext()，关闭开关后不弹框、不自动选小区、刷新即清空。
 

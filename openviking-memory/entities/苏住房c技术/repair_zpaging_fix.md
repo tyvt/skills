@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:14:29+08:00
+verdict_note: 在苏住房C确认z-paging及-fixed=false、repair-page样式约定；具体repair/index.vue已重构但修复模式与项目代码一致。
+---
 # 报修列表遮挡顶部操作区修复
 苏住房C「我的-电子业主卡-报事报修」页面列表遮挡顶部搜索、筛选和「前往报事报修」按钮，已修复。
 

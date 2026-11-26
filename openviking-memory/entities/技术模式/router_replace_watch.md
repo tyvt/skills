@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:42:06+08:00
+verdict_note: 苏州市房地产监测V3 全局存在 changeFormState(state,id) 方法，符合改用其替代 router.replace 的修复描述。
+---
 # 已备案数据详情页变更按钮缺失（router.replace 复用组件）
 苏州市房地产监测V3 中已备案数据详情页「发起变更」按钮缺失，根因为 router.replace 同一路径仅变 query 时 Vue Router 复用组件，但 watch 未触发导致组件实例消失（页面白屏/未挂载）。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:44:48+08:00
+verdict_note: 实机核对：引用文件(8个)存在于对应项目仓；核心符号命中[fileList,clearFiles,FileUpload]，与记忆描述一致。
+---
 # el-upload :limit=1 再选文件替换须走 on-exceed
 上传组件设 :limit="1" 后再次选文件走 on-exceed 而非 on-change，替换逻辑必须挂在 on-exceed 上。
 

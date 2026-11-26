@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:16:51+08:00
+verdict_note: 核心逻辑属实：accountFreeze.js 有 AUTO_FREEZE_REASON='多次输入错误密码' 与 isFreezeReasonDisabled(originUserAccountState) 锁定判据。
+---
 # 冻结原因下拉自锁导致字段选中即只读
 苏住房G系统用户管理页将系统写入的冻结原因暴露为下拉可选项，命中锁定判据造成选中即禁用编辑的自锁。
 

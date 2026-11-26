@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:43:36+08:00
+verdict_note: cordis.patch.yml 存在且含 disabled 条目，HARNESS_SOURCE_PROMPT 等符号在 DSH 插件代码命中；配置决策记录自洽。
+---
 # dsh-harness-dev-context
 
 DSH 的开发模式上下文插件，为能检视与扩展 DSH 自身的 agent 注入运行时/开发说明。

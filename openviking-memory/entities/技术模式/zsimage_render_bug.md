@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:16:31+08:00
+verdict_note: 苏住房C/zhi2-mobile-shimin 实机存在 ZsImage.vue、SuccessCard.vue 与 widthFix，渲染修复文件属实。
+---
 # ZsImage高度为0及宽度无法穿透shadow-root
 苏住房C移动端ZsImage在SuccessCard中渲染失败(渲染层网络层错误)，根因是高度0与宽度样式无法进入shadow-root两点叠加。
 

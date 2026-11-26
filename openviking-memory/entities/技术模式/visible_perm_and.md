@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T19:15:56+08:00
+verdict_note: 产品2.0 zs-operate-column.vue getRowButtons 仍 return button.visible(row) 短路、未做 visible&&permission 的 AND 组合，与记忆“已改AND”描述不符。
+---
 # 操作列 visible 与 permission 必须为 AND 组合
 zs-operate-column 中按钮的 visible(row) 与 permission 需同时命中才渲染，避免业务态可见性旁路权限。
 

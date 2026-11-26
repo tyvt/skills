@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:16:20+08:00
+verdict_note: 苏州V3 companyCancel/index.vue、detail.vue 与 mixins/area.js 实机含 economicRegionOptions、findRegionLabel、ensureAreaTreeLoaded，mixin 接入属实。
+---
 # 机构注销列表页接入area mixin
 苏州市房地产监测V3 的机构注销列表页已改用公共 `@/mixins/area.js` 处理行政区划展示，并与详情页命名和回显逻辑对齐。
 

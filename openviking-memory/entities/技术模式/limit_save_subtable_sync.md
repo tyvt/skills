@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:45:48+08:00
+verdict_note: syncSelectedHousesFromSubTablePage/limitFormMixin/houseLimit/page/selectedHouses 在苏州监测V3命中，子表同步修复属实。
+---
 # 保存限额后子表不更新
 在限额编辑详情中，子表分页同步的缺失导致其在保存后不更新。
 
@@ -18,7 +23,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：f7ff995f-0339-4200-9550-e6b17381deaf
-
 
 <!-- MEMORY_FIELDS
 {

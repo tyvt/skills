@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:47:46+08:00
+verdict_note: 产品2.0与门户命中 portalApiRewrite.js+system/dept/list, 前导斜杠归一化属实
+---
 # 门户接口重写前导斜杠归一化
 产品2.0 后台通过 portalApiRewrite.js 把旧 system/* 接口重写到门户 /portal/* 前缀，匹配前须补全前导斜杠否则懒加载路径静默漏匹配。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

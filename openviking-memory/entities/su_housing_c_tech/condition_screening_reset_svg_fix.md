@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-27T00:19:45+08:00
+verdict_note: 苏住房C 全仓 src 下无 reset.svg（仅 static/images/szf/reset.png）；记忆称已将 reset.svg 复制到 pages_transaction 分包与现状不符。
+---
 # 筛选弹窗reset.svg加载失败修复
 苏住房C小程序（zhi2-mobile-shimin）中conditionScreening.vue引用images/szf/reset.svg因分包路径解析错误导致500，已复制文件到分包目录修复。
 
@@ -23,7 +27,6 @@
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话ID：ffbc909f-a8cb-4166-8285-a0ac8381920f
 - 代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

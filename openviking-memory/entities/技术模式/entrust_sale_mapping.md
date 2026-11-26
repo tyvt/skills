@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:44:48+08:00
+verdict_note: VALID；mapProjectOption/buildSavePayload/normalizeDetail 在苏州V3委托代售真实代码命中。
+---
 # 委托代售接口与表单间缺失字段映射函数
 苏州市房地产监测V3 委托代售新增/详情接口字段与表单结构不一致，缺乏转换层导致数据错乱。
 

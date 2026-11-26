@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:24:20+08:00
+verdict_note: 产品2.0 zs-select-dialog.vue-3/187 命中 zs-select-dialog 与 no-auto-query，与「自定义插槽分页脱离上下文、需接管回调重建 payload」一致。
+---
 # zs-select-dialog 自定义插槽分页脱离上下文
 园区物管2.0 中 zs-select-dialog 在自定义插槽内放分页控件时，页码切换不生效、数据不更新。
 

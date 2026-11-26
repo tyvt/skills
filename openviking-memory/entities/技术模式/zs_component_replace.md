@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:46:46+08:00
+verdict_note: 命中 attachmentDraw/contractNoDialog/chooseHouseDialog/contract/index.vue, zs组件替换属实
+---
 # 未注册 zs 组件全局替换修复
 苏州市房地产监测V3 项目 zhi2-web-admin 中全局替换未注册的 `zs-button-group` 与 `zs-attachment` 组件。
 

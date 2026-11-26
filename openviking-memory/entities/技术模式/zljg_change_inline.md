@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:21:01+08:00
+verdict_note: 属实：zljg/companyRecord/detail.vue 与 zljg/agencyRecord/detail.vue 均存在，CompanyOrganProvider 在代码中，页内变更改造成立。
+---
 # 租赁机构变更当前页内切换
 苏州市房地产监测V3 将租赁机构「变更」改为在当前菜单页内切换查看/编辑，不再跳转到经纪菜单路径。
 ## 改动内容

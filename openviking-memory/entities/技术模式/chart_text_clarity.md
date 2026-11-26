@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:08:01+08:00
+verdict_note: dashboard.css 顶部 --font-sans 已改系统栈、无 Google Fonts 引入，AreaStructurePanel.vue 含 #334155 加深；记忆所述字体/配色修复在现状代码中成立。
+---
 # 房地产市场监测看板图表文字清晰度排查
 zhi2-web-admin/src/views/property/marketMonitor/ 看板从 React 参考站移植，ECharts option 逐字照抄；技术栈本地 echarts6 + Tailwind，页面字体 Noto Sans SC/JetBrains Mono（Google Fonts）。
 

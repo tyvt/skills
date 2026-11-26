@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:14:11+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # zs_table_resync_fix
 园区公共收益项目综合查询列表小计行错位到操作列，通过调整 zs-table 布局重同步机制在组件层修复。
 

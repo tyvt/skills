@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:48:38+08:00
+verdict_note: 产品2.0 listMixins.js/zs-search-form 含 formItems，pubElevMaintenanceNew 存在，旧 search-container 迁移结论属实。
+---
 # 旧 search-container 组件已废弃
 园区物管2.0 新列表页因复刻旧模板使用未注册的 <search-container> 而报 Unknown custom element，需统一改用 <zs-search-form>。
 ## 现象
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

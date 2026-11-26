@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-26T06:33:42+08:00
+verdict_note: 记忆称项目位于 d-/repository/book-summarizer。实机核对该目录不存在，全仓 find summarize.py/chapter_parser.py/llama_runner.py 均无结果，项目与所列文件均无法证实，判无效。
+---
 # Book Summarizer
 本地书籍摘要工具，通过本地 LLM 对 `.txt` 书籍进行摘要。
 
@@ -23,7 +27,6 @@
 - 所属项目：book-summarizer
 - 验证证据：extracted source=cursor project=book-summarizer
 - 来源会话：16cfcbd7-f1da-4c37-85fc-9b33c312a150
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:38:59+08:00
+verdict_note: 实机核对：D-/repository 代码仓无对应文件命中，属配置/会话/工具类记忆，无法用代码证据证明有效，判无效。
+---
 # OpenViking 的 hy3 视觉语言模型
 hy3（`auto/hy3`）是 OpenViking 记忆系统的视觉语言模型（VLM），在 `~/.openviking/ov.conf` 中绑于 `vlm` 段（provider: openai，指向 magpie 网关 127.0.0.1:3425/v1，max_concurrent: 8）。
 

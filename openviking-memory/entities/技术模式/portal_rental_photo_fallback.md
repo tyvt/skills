@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:21:57+08:00
+verdict_note: 属实：portalPersonPhoto.js 定义 photo/photoUrl/avatar/headPortrait 候选与 DEFAULT_PERSON_PHOTO，empty.svg 兜底在代码中。
+---
 # 门户住房租赁人员弹窗证件照兜底
 publicPortal 的 RentalDetailDialog 基本信息区 102×128 证件照位按多字段读取，失败展示 empty.svg。
 

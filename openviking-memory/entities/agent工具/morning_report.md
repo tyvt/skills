@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:21:37+08:00
+verdict_note: skills/tool-call-hygiene/morning-report.mjs-14-40 明确缺省为滚动24小时窗口并于 2026-11-09 修正「今日0失败」假象，与记忆一致；c7f682f5 在相关记忆中出现。
+---
 # morning-report
 morning-report 是 agent 每日晨报生成工具。
 

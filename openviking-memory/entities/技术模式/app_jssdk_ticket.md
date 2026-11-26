@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:13:25+08:00
+verdict_note: 宿迁苏服办构建产物 fwzlhtba/assets 中 getTicket/verifyTicket/lightAppJssdk 均命中，JSSDK 取票流程属实。
+---
 # 苏服办JSSDK取票流程
 在宿迁苏服办项目中，App.vue 的 initUser() 通过 lightAppJssdk.user.getTicket() 获取票据，无需显式传 appid。
 

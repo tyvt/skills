@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:19:14+08:00
+verdict_note: 属实：public-portal-designs.ts 第63-65行注释与 masks 明确屏蔽 y=111 的 1px 白边伪影，与描述完全一致。
+---
 # 门户视觉比对设计稿头部 1px 伪影屏蔽
 public-portal 视觉失败若集中在设计 PNG 头部色块最底 1px 白边，而实机渲染为纯色底：先按像素坐标确认是否为切图伪影。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:21:35+08:00
+verdict_note: 属实：portalTheme.js 定义 PORTAL_BLUE='#3f669c'，resolvePortalAccent 被 PortalDialogHost 引用，主题色统一方案成立。
+---
 # 门户主题色统一商品房蓝
 publicPortal 二级页与首页弹窗主题色经 `resolvePortalAccent` 统一写入 `--portal-accent`，统一返回 `PORTAL_BLUE`（`#3f669c`）。
 

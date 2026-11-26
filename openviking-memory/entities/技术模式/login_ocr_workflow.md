@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T02:41:37+08:00
+verdict_note: 涉及文件 tests/e2e/login.spec.js、tesseract.js、res.js 及函数 parseCaptchaText 在全仓真实代码中均不存在（仅 memory-archive 副本）。会话描述的OCR登录代码无法在现状代码核实，无法证明有效。
+---
 # 登录图形验证码E2E识别不可靠
 zhi2-web-admin 登录 E2E 用 Tesseract+规则纠错识别扭曲算式图常失败，测试环境应返回 answer 或降难度。
 ## 问题现象

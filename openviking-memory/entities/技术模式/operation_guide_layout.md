@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:18:16+08:00
+verdict_note: 门户 operationGuide 下 README-71/73、OperationGuide.vue-31 命中 operationGuideBanners/Content，1398px 命中多个组件，设计稿还原属实。
+---
 # 门户操作指引页面设计稿还原规范
 门户操作指引页按设计稿像素级重写，统一顶栏、Banner、Tab 与内容区尺寸及三类正文版式。
 

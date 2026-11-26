@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:13:59+08:00
+verdict_note: projectDelivery 多仓命中，苏州V3 命中 PermitAppendixPanel，交付备案目录迁移属实。
+---
 # 交付备案目录调整弃用中间delivery层级
 苏州市房地产监测V3 中交付备案页面由 supervision/delivery/ 迁移至 supervision/projectDelivery/ 并删除旧目录。
 

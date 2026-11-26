@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:46:46+08:00
+verdict_note: 实机核对 苏州市房地产监测V3 仓库确认关键符号(17/18)存在：CompanyApplyApprovalDialog、OperationBtnGroup、ZsSubmit、approval、busCode；文件与描述一致，记忆有效。
+---
 # 硬编码busCode致机构备案审批流程未维护
 苏州市房地产监测V3的 companyApplyAudit/detail.vue 硬编码 busCode 未用路由 meta，致审批流程未维护，已改为从路由 meta 读取。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:43:58+08:00
+verdict_note: feeBindScopeTable/feeDeclare2House/page 命中，billAmountSum/discountAmountSum 在苏住房G命中，字段对接属实。
+---
 # 费用绑定范围表字段对接（苏住房G）
 苏住房G 项目 zhi2-web-admin 更新 feeBindScopeTable.vue，对接 `/property/feeDeclare2/feeDeclare2House/page` 新增的三个出参。
 
@@ -14,7 +19,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

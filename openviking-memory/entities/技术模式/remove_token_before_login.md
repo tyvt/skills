@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:42:33+08:00
+verdict_note: 多个 zhi2-web-admin 仓的 register/companyRegister、accountInfo 中确有 removeToken 后跳转登录页，属实。
+---
 # 返回登录页前清除 Token
 机构注册等流程中「返回首页」「取消」回到登录页时，应先 removeToken 再 router.replace，避免残留 token。
 

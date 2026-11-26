@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:44:08+08:00
+verdict_note: VALID；parentDeptId/build-time 三线分支对照在 estate-manage 等真实代码命中，属排障方法论记忆。
+---
 # 「没效果」先定位测试环境构建的是哪条分支
 修复只在功能分支、没合入测试分支等于没交付；用户实际运行的分支若也没构建，看到的仍是旧代码。
 

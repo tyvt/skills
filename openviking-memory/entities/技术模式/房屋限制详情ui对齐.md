@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:45:43+08:00
+verdict_note: V3 houseLimit/detail.vue 存在，e2e fixture 用 house-limit-tab-grid/list，zs-tabs 改法属实。
+---
 # 房屋限制详情UI对齐
 苏州市房地产监测V3 中房屋限制管理→项目详情页（houseLimit/detail.vue）按项目规范对齐处理了截图标注的三处 UI 问题。
 

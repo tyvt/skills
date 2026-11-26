@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:22:17+08:00
+verdict_note: 产品2.0 zs-select/MultiSelect.vue-24 有 Array.isArray(this.$attrs.value) 归一化，数组兼容修复属实。
+---
 # MultiSelect $attrs.value 数组兼容
 搜索表单 zs-select → MultiSelect 的 getter 若直接 split(',')，父级传数组会 TypeError，须先归一化类型。
 

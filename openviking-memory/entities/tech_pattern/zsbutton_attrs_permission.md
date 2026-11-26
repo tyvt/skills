@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:14:02+08:00
+verdict_note: 命中 subTableMixins、operationButtons，zs-button 权限属性描述属实
+---
 # zs-button attrs 透传 permission 触发 Vue 警告
 certificatesTable.vue 的 operationButtons 在 attrs 中定义 permission:false，经 v-bind="button.attrs" 透传触发 Vue warn。
 
@@ -15,7 +20,6 @@ certificatesTable.vue 的 operationButtons 在 attrs 中定义 permission:false�
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

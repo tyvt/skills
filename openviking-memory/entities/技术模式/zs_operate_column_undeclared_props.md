@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:24:55+08:00
+verdict_note: 园区公共收益 src 命中 moduleName、businessName、bankagent 与 zs-operate-column，与「data 补声明 moduleName/businessName 消除警告」一致。
+---
 # zs-operate-column用未声明属性致警告
 园区公共收益项目中组件 `zs-operate-column` 使用 `moduleName` 与 `businessName`，但页面 `data()` 未定义且 `listMixins` 不提供，需参考 `logininfor/index.vue` 自行声明。
 

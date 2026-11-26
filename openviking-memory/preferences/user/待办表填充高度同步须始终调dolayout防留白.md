@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:50:08+08:00
+verdict_note: 门户源码命中 syncFillHeight、doLayout、HomeTodoTable、sidebar.opened，与待办表填充高度修复描述一致。
+---
 - 首页待办表开 fill-height，侧栏收起宽度变但表格高度不变，syncFillHeight 在 tableHeight===height 时 return 未调 doLayout 致列间留白
 - 修复为高度不变仍调 doLayout，监听 sidebar.opened 切换布局，app.js 首屏初始化 --sidebar-width
 - 涉及文件：zhi2-web-admin/src/views/home/components/HomeTodoTable.vue、zhi2-web-admin/src/views/home/index.vue、zhi2-web-admin/src/views/home/index-new.vue、zhi2-web-admin/src/views/home/index-wrapper.vue、zhi2-web-admin/src/views/home/components/layouts/HomeLayoutAdmin.vue、zhi2-web-admin/package.json、zhi2-web-admin/e2e/list/table-column-width.spec.js、zhi2-web-admin/src/components/zs-table/zs-table.vue
@@ -6,7 +11,6 @@
 ## 验证与归属
 - 所属项目：门户
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

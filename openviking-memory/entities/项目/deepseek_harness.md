@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:19:58+08:00
+verdict_note: 抽检2026-11-26 第三轮 deepseek_harness.md 叙述/路径合理
+---
 # DeepSeek Harness
 DeepSeek Harness 是一个采用 OpenViking 作为长期记忆方案的项目。
 

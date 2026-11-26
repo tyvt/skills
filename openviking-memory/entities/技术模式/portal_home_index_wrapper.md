@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:47:05+08:00
+verdict_note: 门户 zhi2-web-admin 中 index-wrapper、cwzxt、index-new、DEFAULT_BUSINESS_FLOWS、portal-bizSection 全部在真实源码命中。
+---
 # 门户首页 index-wrapper 路由与挂载
 门户首页 `/index` 经 index-wrapper.vue 按 localStorage.cwzxt 在 index-new.vue 与 index-bak.vue 间分流，设计以 index-new 为准。
 

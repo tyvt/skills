@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:13:36+08:00
+verdict_note: 苏住房G feeStandardStats/index.vue 实机 handleCellClick 传 rowLabel 字段（值取自 payload.dimensionValue），rowLabel 修复属实。
+---
 # 费用标准统计下钻rowLabel字段修复
 苏住房G 项目修复 publicQuery/feeStandardStats 下钻时行标识字段传错导致接口异常的问题。
 

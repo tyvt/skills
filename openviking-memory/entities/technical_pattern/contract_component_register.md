@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:46:48+08:00
+verdict_note: V3 contract/index.vue 存在 loadComponents 且按文件名键注册组件解决小写 comp 动态组件问题；实现已演进为模块表(import.meta.glob)而非 require.context，核心修复属实。
+---
 # 合同页动态组件仅按PascalCase注册
 预售合同页用 `data.js` 小写 `comp` 作动态组件，而 `loadComponents` 仅按 SFC 的 PascalCase `name` 注册，导致 `Unknown custom element`。
 

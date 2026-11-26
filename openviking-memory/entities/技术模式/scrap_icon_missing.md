@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:46:25+08:00
+verdict_note: 物业手持B端 addScrap.vue 存在，address-box 与 flex-shrink-0 规则在报废相关页面存在，与修复一致。
+---
 # 报废记录图标消失因未设flex-shrink防挤
 物业手持B端报废记录页因 .address-box 未用 flex 且图标无 flex-shrink，长文本挤压致图标消失。
 

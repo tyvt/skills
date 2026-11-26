@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:40:35+08:00
+verdict_note: zs-select-dialog.vue 命中 SELECT_DIALOG_MAX_VISIBLE_ROWS，可视行数限制属实。
+---
 - `zs-select-dialog` 表格可视高度限制为 `SELECT_DIALOG_MAX_VISIBLE_ROWS=10`，超出部分在 tbody 内滚动
 - 涉及文件：zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog.vue、zhi2-web-admin/src/components/zs-select-dialog/zs-select-dialog-func.vue、zhi2-web-admin/src/views/maintenance/repair/detail.vue、zhi2-web-admin/src/components/zs-select-dialog/SKILL.md、zhi2-web-admin/src/views/maintenance/mainFundUsePublicity/detail.vue、zhi2-web-admin/src/components/zs-table/zs-table.vue
 - 验证：来源会话 87f0dc25-1868-4178-8a96-df8892eb0b8f
@@ -5,7 +10,6 @@
 ## 验证与归属
 - 所属项目：园区公共收益
 - 验证证据：extracted source=cursor project=园区公共收益
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:12:38+08:00
+verdict_note: 命中 showModal、userStore、security/ctAuth/logout、switchTab、property.vue，退出登录二次确认属实
+---
 # 退出登录用 uni.showModal 二次确认并 @tap.stop 防冒泡
 顶栏退出登录仅在有 token 时显示，点击 uni.showModal 二次确认，确认后调 userStore.logout()。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:25:29+08:00
+verdict_note: 真实代码命中 personnelRecordChange(84)、personnelRecord(420)，引用文件存在，人员变更按钮属实。
+---
 # 从业人员备案企业端发起变更按钮缺失
 苏州市房地产监测V3 中 toB/personnelRecord/components/detail.vue 企业端从业人员备案详情页缺少「发起变更」按钮的问题记录与修复要点。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:49:03+08:00
+verdict_note: 社区页分栏布局命中 flex/sidebar/stretch，高度塌陷修复属实。
+---
 # 社区页分栏布局高度塌陷修复
 苏住房C(zhi2-mobile-shimin)小程序中社区页分栏模式下右侧菜单图标和文字不显示，因.sidebar-right高度被误设为0导致。
 

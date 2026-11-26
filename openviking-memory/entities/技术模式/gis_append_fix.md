@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:46:18+08:00
+verdict_note: map-append/min-width-96px/inline-flex/zs-form.vue 在苏州监测V3命中，GIS地图按钮最小宽度修复属实。
+---
 # GIS 地图按钮 append 最小宽度修复
 苏州市房地产监测V3 项目中修复了 `map-append` 在三列栅格较窄时图标与「GIS地图」文字挤在一起的问题。
 

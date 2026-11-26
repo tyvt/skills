@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:47:22+08:00
+verdict_note: 园区物管2.0 operatingAssets.vue 含 parking-space-total 等英文名图标，import 更名修复属实。
+---
 # benefit图标更名import路径未同步
 园区物管2.0 benefit 模块停车位图标改为英文名后，import 路径未同步触发 `import/no-unresolved` 报错。
 

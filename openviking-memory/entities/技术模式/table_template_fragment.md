@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:13:50+08:00
+verdict_note: 命中 zs-button、button.label 插值、listeners，按钮组件属性描述属实
+---
 # zs-button 模板外残留片段致 button 未定义报错
 bookDetailTable.vue 与 businessItemTable.vue 因模板中被多复制一段 `{{ button.label }}` 等片段，在 v-for 作用域外访问 button 导致报错。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:46:29+08:00
+verdict_note: file/upload/decisionResponse/listDecisionRangeId/StepSign/voteStore.signUrl 在苏住房C命中，决策提交API序列属实。
+---
 # 决策提交流程
 提交业主决策/选举表单时的 API 调用序列。
 
@@ -18,7 +23,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：b84da848-f75a-4ee3-8fc5-7e4346f247b5
-
 
 <!-- MEMORY_FIELDS
 {

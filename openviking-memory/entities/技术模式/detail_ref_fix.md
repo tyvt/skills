@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:15:35+08:00
+verdict_note: 泰兴小程序 src/api/maintenance.js-9-10 有 getFacilityDetail/getDetailByFacilityId，detail.vue-48 调用，详情接口修复属实。
+---
 # 设施详情页空白未调用详情接口修复
 泰兴小程序 detail.vue 详情页空白、未调用详情接口的问题已修复。
 

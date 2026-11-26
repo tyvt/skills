@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:50:33+08:00
+verdict_note: 产品2.0命中 SingleSelect/syncPopperStyle/getMaxLayerZIndex/MultiSelect, 下拉跳动修复属实
+---
 # SingleSelect下拉跳动修复（价格备案户室维护抖动）
 价格备案申请维护户室时，编辑弹窗中户型下拉列表打开瞬间跳动，根因在公共组件 SingleSelect.vue 的 syncPopperStyle 反复重定位。
 

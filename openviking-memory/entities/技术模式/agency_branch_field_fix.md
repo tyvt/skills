@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:18:50+08:00
+verdict_note: 苏州V3 bizState 与 AgencyBranchList/AgencyBranchDetail 命中，经纪机构分支字段对齐属实。
+---
 # 经纪机构分支前端字段与接口对齐修复
 修复经纪机构分支（注销功能仅主管部门使用）前端字段名与接口不一致导致业务状态不显示、删除按钮缺失、机构类型回显原始值的问题。
 ## 问题1修复

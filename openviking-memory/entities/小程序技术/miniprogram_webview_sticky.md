@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:13:38+08:00
+verdict_note: 苏住房C命中 isMiniProgramWebView/getPageHeaderOffset（utils/index.js、newHouse/detail.vue），web-view 偏移修复属实
+---
 # web-view 内 H5 吸顶偏移须为 0
 苏找房新房详情页 H5 嵌在三方小程序 web-view 内时 Tab 吸顶出现「穿屏」，根因是回退导航栏高度 40px 在 web-view 内凭空多出缝隙。
 

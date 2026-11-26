@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:52:56+08:00
+verdict_note: 苏住房G命中 resetPageScroll, 产品2.0命中 AppMain/scrollBehavior/afterEach, 滚动重置属实
+---
 # 跳新页面后内容停在中部：滚动容器是 #app-main 而非 window，scrollBehavior 对它完全无效
 从「物业管理区域查询」详情页进入子页面时新页面从中段显示，根因是 SPA 实际滚动发生在 #app-main 而非 window，router 的 scrollBehavior 对其无效。
 

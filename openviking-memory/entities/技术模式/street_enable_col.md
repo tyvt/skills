@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:25:18+08:00
+verdict_note: 苏住房G/zhi2-web-admin/.../regionBankAuth/index.vue-122/68 命中 enableStatus、is_enable、streetBankPolicy，与「street 层增启用状态字典列」一致。
+---
 # 街道节点列缺启用状态列
 街道节点（level === 'street'）在 regionBankAuth/index.vue 的 columns 仅配置「区级可用」「街道授权」，缺失「启用状态」列。
 

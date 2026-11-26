@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T05:34:26+08:00
+verdict_note: 记忆称 worktree 实现 ref8443 渲染模式并新增 Ref8443Detail.vue 等。实机 zhi2-mobile-shimin 全仓 glob **/Ref8443*.vue 为0，worktrees 目录不存在，isRef8443 无命中。核心代码不可核验。
+---
 # ref8443渲染模式
 苏住房C H5 新增与8443参考站一致的 ref8443 渲染模式，配套像素比对E2E。
 

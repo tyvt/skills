@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:21:47+08:00
+verdict_note: 小程序仓命中 currentToken(6)、getCurrentToken(6)、externalWebview(23)、requestHeader(20)、requestProfile(2)，外部token回退属实。
+---
 # externalWebview token 兜底获取
 pages/webview/externalWebview.vue 的 requestProfile 增加 token 兜底逻辑，属重复出现的兜底处理模式。
 

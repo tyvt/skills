@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:12:34+08:00
+verdict_note: 苏住房G zhi2-web-admin/toB/personnelRecord/detail.vue-346 有 loadRoleOptions，-186 organType-undefined，与描述一致。
+---
 # 角色下拉按机构类型联动修复
 人员管理新增/编辑人员页角色下拉因organType写死默认值'02'导致跨机构返回错误角色集，须改为动态取类型。
 

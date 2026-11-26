@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T16:43:13+08:00
+verdict_note: 产品2.0 dialogMixins.js 全文无 $attrs.modelValue/visible 读取，仅见 emit(update-visible)；描述的 v-model 透传机制无法证实。
+---
 # 弹窗mixin借$attrs透传v-model免声明
 Vue 3 中弹窗 mixin 借 `$attrs` 透传 `v-model` 相关属性，父级无需显式绑定。
 

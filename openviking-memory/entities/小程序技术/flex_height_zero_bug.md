@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:46:21+08:00
+verdict_note: 苏住房C flex height-0 塌陷 CSS 定位，方法论类无具体修复行，内容自洽。
+---
 # 横向flex分栏height:0致右栏塌陷
 苏住房C首页href服务区「平铺/分栏」双布局复用同一类名，分栏模式用height:0修滚动致右侧菜单塌陷。
 

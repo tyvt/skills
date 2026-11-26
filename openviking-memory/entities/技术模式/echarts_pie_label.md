@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:46:59+08:00
+verdict_note: 园区物管2.0 fundPanorama/assetPanorama 存在 renderDistrictPie、donutUnit，label.formatter 控制方案属实。
+---
 # 数据沙盘饼图外侧标签控制
 园区物管2.0 数据沙盘 ECharts 饼图通过 label.formatter 单独控制展示名/数值/单位，数值细节放 tooltip。
 

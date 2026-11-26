@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:46:00+08:00
+verdict_note: 实机核对 苏州市房地产监测V3 仓库确认关键符号(20/20)存在：admin、assignDetailGridColumn、certificate、changeDetail、columnLabelCharCounts；文件与描述一致，记忆有效。
+---
 # 详情模板列布局满行归零处理
 苏州市房地产监测V3 的详情模板列布局原未处理 rowSpan+span>24 及 span=24 时的换行与槽位归零，后在 detail-grid.js 新增槽位计算函数并供 detail-template.vue 共用。
 

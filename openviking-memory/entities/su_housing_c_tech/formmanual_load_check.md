@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:44:49+08:00
+verdict_note: FormManual.vue 等5文件命中，排查结论（写法正确非加载失败根因）与文件现状一致，属排除性调查记忆。
+---
 # FormManual.vue Correct Writing Needs Load-Failure Root-Cause Investigation
 In Su Zhu Fang C (zhi2-mobile-shimin), the related writing in FormManual.vue was confirmed correct and is not the root cause of the rendering-layer/network-layer "Failed to load" error; other resources or code need investigation.
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:46:48+08:00
+verdict_note: 微信小程序主包2048KB上限是平台客观硬限制(超限报main package source size...exceed max limit 2048KB)，subPackages在小程序/manifest.json-74存在。属稳定技术常识记忆，非幻觉。
+---
 # 微信小程序主包源码体积上限2048KB
 微信小程序主包源码体积硬上限为 2048KB，超限将触发编译或上传报错。
 

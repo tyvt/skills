@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T01:46:41+08:00
+verdict_note: 实机未找到 eslint-rules/no-duplicate-vue-options 实现，bugfix 仓不存在；no-duplicate-vue-options 命中全在 memory archive 自述回环，无法证明有效。
+---
 # 新增 eslint 规则校验重复 vue options
 新增 eslint 规则 duplicate-attributes/no-duplicate-vue-options，用于校验 Vue 文件中 methods 等选项是否存在重复定义。
 

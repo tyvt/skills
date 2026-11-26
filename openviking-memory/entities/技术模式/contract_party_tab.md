@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:45:22+08:00
+verdict_note: 实机核对：引用文件(3个)存在于对应项目仓；核心符号命中[zs-tabs,createParty,SzBlank,SzChoice,formData]，与记忆描述一致。
+---
 # 2016版合同当事人块Tab化
 苏州市房地产监测V3 中 2016 版合同买受人块（SzPartyBlock.vue）改造为 zs-tabs 卡片式 4 页签，已验证通过。
 

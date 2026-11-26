@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:21:13+08:00
+verdict_note: 修复属实：portalData.ts 对 5 个首页接口逐个 .catch() 回退空态，与逐接口失败隔离一致；注：所列提交哈希在当前 git 历史未检出。
+---
 # 首页接口失败隔离修复
 苏住房防汛C端移动查询H5 的首页五个 portal 区块由共用 Promise.all 改为逐接口失败隔离，避免单个接口失败导致整页空白。
 

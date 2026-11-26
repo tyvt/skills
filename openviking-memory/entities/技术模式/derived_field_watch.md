@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:25:55+08:00
+verdict_note: 苏住房G complex/detail.vue-485实见watch，-506-507将form.aboveFloorArea/underFloorArea绑handleChangeFloorArea，面积字段无@change，与结论一致。
+---
 # 派生汇总字段必须用 watch 而非 @change
 苏房G 物业管理区域编辑页中由子字段相加得出的只读派生字段（如总建筑面积），挂 @change 会因复制粘贴/程序化赋值不触发而存脏数据。
 

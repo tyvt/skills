@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:23:18+08:00
+verdict_note: V3两套ProjectDialog均用@open=onOpen并在onOpen调getList(-72)，与懒挂载@open不匹配结论一致。
+---
 # 弹窗懒挂载与 @open 不匹配导致列表未加载
 苏州市房地产监测V3 中父页面用 `v-if` + `:visible.sync` 懒创建弹窗，导致 `@open` 生命周期不匹配、`getList()` 首次打开未调用。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

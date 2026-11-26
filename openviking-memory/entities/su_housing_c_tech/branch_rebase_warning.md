@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:46:06+08:00
+verdict_note: 苏住房C 当前正处 suzhou-shiqu-suzhufang-main-v2.1-mp 分支，拓扑与禁 rebase 警告属实（HEAD 已由25d2063前进到09cf726，属正常推进）。
+---
 # 苏住房C分支rebase冲突警告
 苏住房C 分支 suzhou-shiqu-suzhufang-main-v2.1-mp 曾因 rebase 子模块历史分叉失败，需避免再次 rebase。
 

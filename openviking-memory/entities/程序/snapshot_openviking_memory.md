@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:16:30+08:00
+verdict_note: 存在 snapshot-openviking-memory.mjs 与 data.mjs，README 确认每天03-00 --commit --push 快照到 openviking-memory；正文脚本名写成 data.mjs 属笔误但工具链属实。
+---
 # snapshot_openviking_memory
 OpenViking 记忆快照脚本，在全部导入完成后执行并提交推送到本地仓库。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:50:37+08:00
+verdict_note: 门户 zhi2-web-admin loading.js 含 waitForMinDuration，UnifiedLogin.vue 含 UnifiedLoginSkeleton 与 observeDropIn，骨架屏规范属实。
+---
 # UnifiedLogin 骨架屏技术规范
 UnifiedLogin.vue 接入骨架屏，含最短展示600ms控制、banner兜底色，并修复动画提前播放问题。
 

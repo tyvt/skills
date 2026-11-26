@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:24:51+08:00
+verdict_note: 产品2.0 命中 priceFiling(19)、recordPriceMngSuzhou(17)、showApprovalHeader(4)，2个引用文件存在，苏州SCSS修复属实。
+---
 # 迁移苏州原代码审批流组件SCSS变量缺失致编译失败
 从苏州市房地产监测原始代码迁移 showApproval 等审批流组件后，本地 dev 编译报错，业务详情页打不开。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

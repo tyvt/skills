@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:51:07+08:00
+verdict_note: ZsImage.vue/conditionScreening.vue 命中，szf 图片按分包拆分缺失致500 描述属实。
+---
 # szf 图片按分包拆分缺失致500
 苏住房C 小程序筛选弹窗重置图标报 Failed to load local image resource .../reset.svg status 500，根因是 images/szf/ 资源按 resolveSzfImageSubpackage 归对应分包，但文件仅放主包。
 

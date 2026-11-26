@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T07:35:07+08:00
+verdict_note: 苏住房G src 中 organ_type_all 多处命中：organTypeDictMixin.js、companyRegister/index.vue/table.vue、companyManagement/components/index.vue，回显切全量字典属实。
+---
 # organ_type_all 全量回显字典
 为解决已停用字典项导致历史数据回显空白，后端新增全量字典 organ_type_all 专供回显，新增/编辑仍用原 organ_type。
 

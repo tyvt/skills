@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:46:26+08:00
+verdict_note: 小程序wygl项目命中 portal-user.js/externalWebview.vue, requestCtAuth+envVersion+trial分支代码属实
+---
 # trial环境门户与房屋日志
 wygl小程序在 trial 环境下打印门户API与房屋拉取业务日志，正式版不打印。
 

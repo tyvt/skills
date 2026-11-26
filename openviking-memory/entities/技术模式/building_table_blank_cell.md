@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:45:05+08:00
+verdict_note: 苏州市房地产监测V3 含 selectBuildHouse、BuildingTableGrid.vue、buildingTableStatus.js，图表视图状态渲染逻辑属实。
+---
 # 楼盘表户室格空白渲染
 楼盘表图表视图户室格空白，是因后端 selectBuildHouse 返回的 7 个状态字段均无 '1' 命中，前端如实渲染无状态，非前端 bug。
 

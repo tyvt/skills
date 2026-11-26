@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:25:07+08:00
+verdict_note: 园区物管2.0 src 命中 fundApplyTrend、leaseApplyTrend、fundPanorama，与「两接口同格式、已支持数组/data 解析无需改码」一致。
+---
 - `fundApplyTrend` response format is the same as `leaseApplyTrend`; code already supports root array `[{month,count,...}]` or `{data:[]}` parsing, no code change needed.
 - If the bar chart shows mock data, check the Network tab for API 200 status and actual response structure.
 - Verified from cursor session 23f97ddb-0548-4b59-92be-632f21518698; related files: fundPanorama/index.vue, fundPanorama/mock.js, assetPanorama/index.vue, mapOverview/index.vue, statisticsMap/index.vue, pubBankAccountQueryRecord.js, bankAccountSupervision/index.vue, property/dashboard/index.vue.
@@ -6,7 +11,6 @@
 - 所属项目：园区物管2.0
 - 验证证据：extracted source=cursor project=园区物管2.0
 - 来源会话：23f97ddb-0548-4b59-92be-632f21518698
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:26:46+08:00
+verdict_note: 惠山二期G未见bTerminalRedirect/index.vue及noopener/opener=null/location.replace修复代码，无法证实。
+---
 # B端SSO空白窗noopener冲突
 B端单点登录先开空白窗再异步换授权URL时，window.open第三个参数带noopener会导致无法编程式跳转。
 

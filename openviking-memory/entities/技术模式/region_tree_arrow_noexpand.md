@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:50:16+08:00
+verdict_note: VALID；pubRegulatoryAgreement/RegionTreeLayout/setCurrentKey/node-key 在苏住房G真实代码命中。
+---
 # 行政区域树点击箭头不展开根因与修复
 苏住房G项目物业管理区域查询页左侧行政区划树点展开箭头无反应，根因为node-key不稳定叠加异步默认展开失效。
 

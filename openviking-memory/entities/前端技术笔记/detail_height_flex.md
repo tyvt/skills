@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:46:29+08:00
+verdict_note: 产品2.0 complexChange/detail.vue 命中 basic-info-overview 与 area-overview-wrapper，高度对齐修复属实。
+---
 # 区域变更详情左右高度对齐修复
 产品2.0 中 complexChange/detail.vue 查看模式右侧区域概览卡片与左侧表格高度不一致，已通过补全 flex 样式链修复。
 

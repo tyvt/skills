@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:43:45+08:00
+verdict_note: VALID；userStore.houseId 与 currentHouse.houseId 回退解析顺序在 i淮安H5 真实代码命中。
+---
 # houseId 应兼容 userStore 与路由参数
 `App.vue` 仅将 URL 中的 `houseId` 写入 `userStore.houseId`，而非 `houseStore.currentHouse`，导致出现选择房屋的提示。已确定解析顺序。
 

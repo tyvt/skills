@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:17:40+08:00
+verdict_note: 苏州V3 src/styles/index.scss-137/429/547 命中 height-100%、detail-container、app-main-has 规则，calc(100vh-120px) 已移除，高度修复属实。
+---
 # 详情页高度计算误差致底部白条与滚动遮挡
 detail-container 使用 height:calc(100vh - 120px) 比实际可用高度（104px）多 16px 露出底部白条；Headline 未包裹 detail-from-container 致滚动层级错误。
 

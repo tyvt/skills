@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:47:41+08:00
+verdict_note: VALID；proposed-account-name-tip/pubRegulatoryAccount 在苏住房G真实代码命中。
+---
 # 拟开户账户名称提示框样式调整（苏住房G）
 苏住房G 项目 zhi2-web-admin 调整 benefit/pubRegulatoryAccount/detail.vue 中 `.proposed-account-name-tip` 样式，使 el-alert 提示框仅包住文字与图标。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

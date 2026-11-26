@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:43:54+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[pages_poll,ProjectPicker,pages-suggest,ZsMonthRangeCalendar,create]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # Picker 全局贴底修复方案
 泰兴小程序新建 `ZsBottomPopup` 组件并替换 5 个核心 Picker 与 8 个页面级弹层，实现全局贴底。
 ## 核心改动

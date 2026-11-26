@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:11:57+08:00
+verdict_note: zhi1-web-admin ownerDecision 命中 ownerCalculationChart、getVoteResult、getOwnerDecision，空值覆盖修复属实。
+---
 # getVoteResult 空值覆盖致汇总数据不展示
 getDetail() 中 getVoteResult（/ownerCalculationChart）在表决未开始时返回空值，覆盖 getOwnerDecision 的正确 totalWeight、totalHouseholds、totalArea。
 

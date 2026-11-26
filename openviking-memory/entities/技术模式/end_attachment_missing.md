@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:44:28+08:00
+verdict_note: 实机核对 产品2.0 仓库确认关键符号(18/22)存在：admin、attachments、benefit、cursor、extracted；文件与描述一致，记忆有效。
+---
 # 协议终止详情页缺失附件上传组件
 `guaranteeDepositAgreementEnd/detail.vue` 终止详情页缺少附件上传，需在「终止原因」下增加 `zs-file-upload` 组件。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

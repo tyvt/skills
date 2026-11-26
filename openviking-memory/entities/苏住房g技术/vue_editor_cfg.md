@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:17:37+08:00
+verdict_note: 确认VITE_LAUNCH_EDITOR/VITE_EDITOR及launch-editor配置，Vue调试工具跳Cursor失败的中间件误配修复属实。
+---
 # Vue调试工具跳Cursor失败因编辑器中间件误配
 `env/.env` 中编辑器相关变量误配导致 Vue DevTools 无法跳转 Cursor 的配置问题。
 

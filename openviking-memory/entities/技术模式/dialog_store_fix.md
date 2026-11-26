@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:19:53+08:00
+verdict_note: 修复属实：main.js 设置 window.__VUE_APP_STORE__，zs-select-dialog-func.vue-670 注入 store，与动态实例注入 store 方案一致。
+---
 # zs-select-dialog 动态实例未注入 store 修复
 园区物管2.0 中 SelectDialog.open() 动态创建弹窗实例时未注入 Vuex store，导致使用 @/mixins/table 的组件报错。
 

@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T21:47:21+08:00
+verdict_note: 苏州V3 QualificationFormSection.vue 命中 section-form/section-field，弃用栅格属实。
+---
 # 资质表单弃el栅格采用section-form
 苏州市房地产监测V3 中资质表单重构，弃用 el-row/el-col 栅格，改用 section-form 与 section-field 结构。
 
@@ -14,7 +18,6 @@
 - 验证证据：src=苏州市房地产监测V3-rest/067.md；另 src=苏州市房地产监测V3/117.md
 - 涉及文件：QualificationFormSection.vue、detail-form.scss、zs-form.vue、index.scss、Headline/index.vue、Step1CompanyInfo.vue、DeveloperBasicInfoForm.vue、companyRegister/detail.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：ae3c4552-cf65-45ec-8e81-c709ae573cb8；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:44:15+08:00
+verdict_note: 昆山市民 filePreview.vue 已无 scroll-view、改用 overflow-y+createElement(canvas)+nextTick，getElementById 已移除，与修复一致。
+---
 # 物业合同PDF预览报错修复
 昆山市民小程序物业合同预览因 scroll-view H5 兼容性与 canvas 获取方式错误导致报错，已修复。
 

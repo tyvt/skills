@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:16:27+08:00
+verdict_note: 苏住房C命中 swiper-component、allList[currentSlide].fileSite、currentSlide、fileSite，预挂载空数组修复属实
+---
 # Swiper 预挂载空数组导致 fileSite 错误
 页面 `pages_transaction/stockHouse/detail` 在数据加载前挂载了 `swiper-component` 且未使用 `v-if`，导致在数组为空时访问 `allList[currentSlide].fileSite` 产生错误。
 
@@ -18,7 +23,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：db381270-844e-45c8-899a-a19894dde18f
-
 
 <!-- MEMORY_FIELDS
 {

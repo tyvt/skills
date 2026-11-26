@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:45:43+08:00
+verdict_note: 无锡市区小程序嵌入H5：initQqMapKeys命中App.vue-17/116，initH5Context命中h5Context.js-311，getConfigKey(13)、qqMapKey(14)。初始化顺序与无token跳过请求描述实证充分。
+---
 # 苏服办H5初始化顺序与qqMapKey请求约束
 无锡市区小程序嵌入H5中 initQqMapKeys 必须在 await initH5Context 之后执行，且无 token 时不请求 getConfigKey。
 

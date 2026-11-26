@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T16:44:04+08:00
+verdict_note: 门户 zhi2-web-admin UnifiedLogin.vue 图片均为 /assets/ 绝对路径（仅注释残留 public/assets 字样），修复结果属实；实际归属门户而非产品2.0，同源项目。
+---
 # 统一登录页公共路径修复
 产品2.0 的 zhi2-web-admin 中 UnifiedLogin.vue 因图片路径带 public 前缀导致构建报错，已替换为绝对路径。
 ## 问题原因
@@ -16,7 +20,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

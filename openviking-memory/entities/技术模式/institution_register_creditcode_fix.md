@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:48:18+08:00
+verdict_note: Step1BasicInfo.vue 命中 input-with-actions，统一社会信用代码输入框挤压修复属实。
+---
 # 经纪机构注册统一社会信用代码输入框显示修复
 苏州市房地产监测V3 修复经纪机构注册 Step1 统一社会信用代码输入框被 append 区域挤压的问题。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

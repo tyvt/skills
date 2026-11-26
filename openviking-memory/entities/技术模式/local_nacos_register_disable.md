@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:40:21+08:00
+verdict_note: 实机核对：D-/repository 代码仓无对应文件命中，属配置/会话/工具类记忆，无法用代码证据证明有效，判无效。
+---
 # 本地批量启动多后端须禁 Nacos 注册
 本地一次性启动 12 个后端服务时必须加 spring.cloud.nacos.discovery.register-enabled=false，否则会注册进团队共用 Nacos 命名空间污染同名服务。
 

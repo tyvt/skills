@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:45:29+08:00
+verdict_note: 苏住房G feeDeclare2/detail.vue 含 queryOweFeeStatistic、oweFeeTypeDetail、totalReceivableAmount，金额字段与回退链属实。
+---
 # 费用详情金额零值修复
 苏住房G项目修复费用申报详情累计应收/实收/欠缴金额误显 ¥0.00 问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:15:14+08:00
+verdict_note: 命中 zs-input、minOptionNum，产品2.0 金额输入组件替换属实
+---
 # amount-input 组件替换
 产品2.0 项目将两处金额输入从 el-input/zs-input + v-money:0 改为 amount-input 组件。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

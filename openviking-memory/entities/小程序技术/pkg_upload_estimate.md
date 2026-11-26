@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T16:47:33+08:00
+verdict_note: 苏住房C 无 size-main-package.mjs / relocate-z-paging.mjs / validate-dist.mjs 脚本，也无 1.17 折算规则痕迹；仅 z-paging 依赖存在，描述的大小脚本无法证实。
+---
 # 主包上传预估体积折算规则
 苏住房C小程序主包体积判定须用上传预估（源码体积≈磁盘×1.17），超限后按包下沉第三方依赖。
 

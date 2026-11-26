@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T05:34:15+08:00
+verdict_note: AgencyPersonnelDetail.vue-4 -id=flowBusId、243 changeRecordId、252 primaryKey、255 flowBusId；LeasePersonnelDetail.vue-8/310 同构。与记忆变更态用 personnelRecordChangeId 一致。
+---
 # 从业人员变更提交 ID 修复
 苏州市房地产监测V3 修复经纪/租赁从业人员页内变更提交时误用备案 ID 的问题，改为使用变更单 ID。
 

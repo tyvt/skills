@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T14:41:18+08:00
+verdict_note: 门户 zhi2-web-admin/src 下 version.js 未找到 2.6.1/be0bc4eaa/portal-design-sync-20261012（grep 0命中）；构建产物与分支描述无现状证据，无法证实。
+---
 # 门户设计稿对齐收尾（分支 portal-design-sync-20261012）
 房产综合服务平台门户按新设计稿对齐 UI，最终 14/14 状态全部达标。
 

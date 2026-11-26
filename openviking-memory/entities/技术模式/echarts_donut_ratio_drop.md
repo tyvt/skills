@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:08:34+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 饼图比例弃用接口ratio仅取ECharts计算值
 园区物管2.0 资产全景饼图改造中 getDonutSlicePercent 仅用 ECharts percent，弃用接口 ratio 字段。
 

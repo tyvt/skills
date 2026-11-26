@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:43:23+08:00
+verdict_note: companyRecordChange/beforeForm/companyBasicInfoShared/pickChangeBeforeForm 在产品2.0命中，双数据源契约属实。
+---
 # 变更详情双数据源契约：form只放变更单、beforeForm只放对比字段
 企业基本信息变更详情需展示「变更前/变更后」对比，页面同时请求 companyRecordChange/detail 与 companyRecord/detail，误将备案单整表合并进 form 污染 bizState。
 

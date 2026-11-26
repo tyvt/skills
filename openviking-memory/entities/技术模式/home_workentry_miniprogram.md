@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T17:17:28+08:00
+verdict_note: i淮安公版 zhi2-mobile-admin-h5-c-unlimited/src 无 handleWorkEntry、WORK_MINI_PROGRAM_APP_ID、wx.miniProgram.navigateTo；weixin-js-sdk 仅见 package-lock，描述代码不存在。
+---
 # 首页工作端小程序跳转
 home.vue 的 handleWorkEntry 通过 weixin-js-sdk 跳转至工作端小程序，含环境校验。
 
@@ -17,7 +22,6 @@ home.vue 的 handleWorkEntry 通过 weixin-js-sdk 跳转至工作端小程序，
 - 验证证据：extracted source=cursor
 - 来源会话ID：64986899-a25f-4e59-87dc-d9adc4405920
 - 代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

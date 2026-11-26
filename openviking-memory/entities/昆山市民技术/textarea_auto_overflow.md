@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:44:37+08:00
+verdict_note: 实机核对：引用文件(2个)存在于对应项目仓；核心符号命中[overflow,hidden,auto-height,textarea,textarea-box]，与记忆描述一致。
+---
 # auto-height 致文本域撑出边框溢出
 昆山市民审批弹框中 textarea 使用 auto-height 自动增高导致文字溢出固定高度容器边框，需改为固定高度内部滚动。
 

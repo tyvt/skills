@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T21:41:08+08:00
+verdict_note: 全仓无 utils/form-cache.js（form-cache 命中0），记忆声称新增该文件无法证实，判无效。
+---
 # 跨端全局对象隔离规范
 苏住房C小程序与H5共用源码时，window/location/sessionStorage等H5-only对象须收敛到跨端工具，避免setup阶段报错。
 

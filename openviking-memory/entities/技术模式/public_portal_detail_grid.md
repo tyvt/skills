@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:47:52+08:00
+verdict_note: VALID；subgrid/display-contents/portal.scss/publicPortal 在门户真实代码命中。
+---
 # 公开门户二级页详情字段对齐方案
 公开门户（publicPortal）机构/人员等详情采用四列网格 + display:contents + subgrid 解决标签值错位。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:20:35+08:00
+verdict_note: 抽检2026-11-26 第三轮 entry_clear_validate.md 叙述/路径合理
+---
 # 进编辑态业务范围清空校验避免飘红
 苏州市房地产监测V3 中经纪/租赁机构进编辑态时业务范围为空会立刻飘红，需 clearValidate 处理。
 

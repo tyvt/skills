@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:25:43+08:00
+verdict_note: 苏住房C mainStaticPaths.js、SUBPACKAGE_STATIC_IMAGES及prune-main-static.mjs等脚本均不存在，白名单图超限修复无法证实。
+---
 # 主包白名单误加图致上传预估超限
 苏住房C小程序主包磁盘未超但上传预估(source size)超2048KB，因 mainStaticPaths 白名单误加回分包已有大图。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:51:53+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin ImageUploader.vue 含 grid-auto-rows、aspect-ratio，上传宫格布局修复属实。
+---
 # 上传宫格因grid-auto-rows算零高度不显示
 苏住房C 人工添加房屋页 ImageUploader 因容器固定高 h-144 与 grid-auto-rows 按宽度算行高失准导致格子高度 0，整块上传组件不可见。
 

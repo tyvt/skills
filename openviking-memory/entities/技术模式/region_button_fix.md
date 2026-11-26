@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:29:13+08:00
+verdict_note: 苏住房G regionBankAuth/index.vue实见handleDeleteVersion(-165,384)，与区级删除按钮修复描述一致。
+---
 # 区域银行授权删除按钮缺失修复（苏住房G）
 苏住房G 项目修复系统管理区域银行授权区级节点操作列缺少删除（及编辑）按钮的问题。
 

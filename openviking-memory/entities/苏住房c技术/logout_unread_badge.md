@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:13:21+08:00
+verdict_note: 确认getMsgNum/unreadCount、onShow、loadUnread及MenuSection/HaveBgItem，注销角标三层防护与代码一致。
+---
 # 注销后消息未读角标不消失三层防护
 苏住房C 小程序注销/退出登录后「消息」未读角标仍显示，需状态层、展示层、请求层三层防护才能彻底解决。
 

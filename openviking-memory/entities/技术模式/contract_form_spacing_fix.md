@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:13:55+08:00
+verdict_note: 苏州V3 实机存在 contract-form 样式与 contract/chapters/cash/chapter1.vue，合同表单间距修复属实。
+---
 # 合同表单间距修复
 苏州市房地产监测V3 的合同表单间距已修复，统一了标签与行列间距样式。
 

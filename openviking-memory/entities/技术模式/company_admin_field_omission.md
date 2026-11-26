@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:23:03+08:00
+verdict_note: 苏州市房地产监测V3 src 命中 showAgencyFields、organType、personnelType 与 companyAdmin/detail，与「计算属性兜底补三字段」一致。
+---
 # 公司管理员详情页人员字段因organType缺失漏存
 苏州市房地产监测V3 中 companyAdmin/detail.vue 因接口缺 organType 致人员字段隐藏且提交遗漏，已新增计算属性兜底修复。
 

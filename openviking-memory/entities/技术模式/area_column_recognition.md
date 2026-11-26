@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:22:39+08:00
+verdict_note: 苏州市房地产监测V3 utils/tableColumnMeasure.js 有 isMeasureColumnProp，Area 列识别属实。
+---
 # Area列的统一识别
 带有 "Area" 的表格 Props 必须通过 `isMeasureColumnProp` 来标识，以避免意外损坏和对齐覆盖。
 
@@ -17,7 +22,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：211494e9-a81b-4b9a-af2c-3ec7d67b86e9
-
 
 <!-- MEMORY_FIELDS
 {

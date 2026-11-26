@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:47:08+08:00
+verdict_note: 实机核对 产品2.0 仓库确认关键符号(10/11)存在：building、catch、common、getCustomConfig、isShowPublishButton；文件与描述一致，记忆有效。
+---
 # 能力开关走 getCustomConfig 两级取值
 按后台配置决定按钮显示需走 /building/common/getCustomConfig，按「模块名→配置键」两级取值，不用布尔强制转换。
 

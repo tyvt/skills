@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:20:11+08:00
+verdict_note: 产品2.0 advertiseTable.vue 实机 handleView 用 benefit/pubAdvertiseSpace/detail 正确路径，路由修复属实。
+---
 # 广告位查看路由路径错误修复
 产品2.0 公共查询详情页点击广告位列表「查看」时，因路由路径写错导致提示无权限，实为路径错误。
 

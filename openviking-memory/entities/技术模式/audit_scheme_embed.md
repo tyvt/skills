@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:48:40+08:00
+verdict_note: 苏州市房地产监测V3：schemeList/companySchemeList命中29处(institution-register-audit-scheme.spec.js等)，companyScheme(129)。审核方案走内嵌数组、原分页接口常空的行为有E2E与数据佐证，判有效。
+---
 # 机构入网审核详情服务方案须用内嵌列表防空数据
 苏州市房地产监测V3 中审核方案位于详情接口 schemeList/companySchemeList，原分页接口常空致表格无数据，需优先取内嵌数组。
 

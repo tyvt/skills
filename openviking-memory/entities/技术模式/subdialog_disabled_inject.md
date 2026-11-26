@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:39:18+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[assetLeaseApply,subAdvertiseDialog,resourcesLeaseContractFiling]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # 详情页子表弹窗取消按钮禁用级联
 园区公共收益 Vue2 + Element UI 详情页将子表移出 zs-form 后，嵌套弹窗 footer 按钮仍可能因 inject 链继承查看态 disabled。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区公共收益
-
 
 <!-- MEMORY_FIELDS
 {

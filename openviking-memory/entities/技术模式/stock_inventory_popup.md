@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:13:28+08:00
+verdict_note: 命中 stock-inventory、出售信息公示、PortalDialogHost，存量房独立入口修复属实。
+---
 # 存量房弹窗独立入口与绿色表头
 门户首页存量房「出售信息公示」与商品房「可售房源信息公示」共用入口导致表头混淆的 bug 与修复要点。
 

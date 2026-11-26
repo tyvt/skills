@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:14:39+08:00
+verdict_note: 确认LeasePersonnelDetail、resolvePersonnelRole、lease_personnel_role字典及AgencyPersonnelDetail，角色自动推导属实。
+---
 # 从业人员详情页隐藏人员角色并自动推导值
 苏州市房地产监测V3 中从业人员详情页隐藏人员角色行与编辑下拉，保存时按是否合同操作员从字典自动推导角色值。
 

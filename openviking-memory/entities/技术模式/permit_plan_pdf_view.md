@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:17:31+08:00
+verdict_note: 苏州市房地产监测V3 命中 planDocSite、planUrl，预售方案PDF查看修复属实。
+---
 # 预售方案查看PDF修复
 苏州市房地产监测V3 预售许可详情「查看」方案现可正确在新标签页打开 PDF。
 

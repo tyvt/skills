@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T02:16:53+08:00
+verdict_note: 确认businessType、identityFlag、CandidateDialog、owner_candidate_apply_identity_flag、isOwnerIdentity/initDict，候选人类型显示属实。
+---
 # 业委会候选人征集显示候选人类型字段
 业委会候选人征集（businessType='0'）需展示「候选人类型」下拉，弹窗与表格均显示，不再强制 identityFlag='0'。
 
@@ -19,7 +23,6 @@
 - 验证：extracted source=workbuddy project=产品2.0
 - 涉及文件：D:/repository/产品2.0/zhi2-web-admin/src/views/autonomy/candidateCollect/components/CandidateDialog.vue、CandidateTable.vue
 - 所属项目：产品2.0；来源会话：a7a5e039-a9de-4b35-abd5-2be482e8d502；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

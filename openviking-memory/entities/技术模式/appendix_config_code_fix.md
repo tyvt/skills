@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T01:48:11+08:00
+verdict_note: 产品2.0 真实源码仍用 configAppendixCode(2处)，appendixConfigCode 为 0 命中、仅存于记忆档案；所述字段改名未在代码落地。
+---
 # 附件字段名 appendixConfigCode 修正
 前端误用 configAppendixCode 而后端实体为 appendixConfigCode，已在表单与 normalizeAppendixConfig 统一改为输出 appendixConfigCode 并兼容旧字段。
 

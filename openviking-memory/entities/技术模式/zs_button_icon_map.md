@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:24:56+08:00
+verdict_note: zs-button.vue未见ICON_MAP及folder-opened/circle-plus映射；Process/index.vue虽用el-icon-folder-opened，组件内无对应映射，与描述不符。
+---
 # zs-button图标映射缺失修复
 zs-button 通过 ICON_MAP 将 el-icon-xxx 映射到 Element Plus 图标，原映射缺失致 Process/index.vue 图标不显。
 

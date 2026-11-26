@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:18:35+08:00
+verdict_note: bond/detail.vue 存在 ProjectDialog/outletsTable 及 selectDialog 工具导入，SelectDialog 拆分解析问题所在文件属实。
+---
 # SelectDialog 拆散致 Vite 解析失败
 苏州市房地产监测V3 的 bond/detail.vue 中 SelectDialog 标签被拆散分离导致 Vue SFC 解析失败及 Vite 热更新报错。
 

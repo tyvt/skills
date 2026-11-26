@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:41:45+08:00
+verdict_note: 实机核对：引用文件(4个)存在于对应项目仓；核心符号命中[zs-table-column,amountFormatter,center,formatter]，与记忆描述一致。
+---
 # 物业费简易申报详情数值列对齐修复（苏住房G）
 苏住房G 项目修复物业费简易申报详情页「申报明细」表格数值列表头与数据错位问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:15:17+08:00
+verdict_note: 门户 publicPortal 命中 PortalDetailFooter.vue 与 PortalDetailHeader.vue，公共底栏组件属实。
+---
 # 门户弹窗公共底栏组件
 门户 publicPortal 弹窗统一接入 PortalDetailFooter.vue 公共底栏，按钮居右、尺寸 80×40、距右 40px。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:46:04+08:00
+verdict_note: countPerPage/pageNumber 命中，acc 分页改用 pageNumber 且无 openAccBS 属实。
+---
 # acc分页用pageNumber无openAccBS
 园区V0项目EstateManagement中acc模块的分页与开户处理技术事实。
 
@@ -17,7 +22,6 @@
 ## 验证与归属
 - 所属项目：园区V0
 - 验证证据：extracted source=cursor project=园区V0
-
 
 <!-- MEMORY_FIELDS
 {

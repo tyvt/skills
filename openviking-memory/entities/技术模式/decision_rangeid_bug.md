@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:44:36+08:00
+verdict_note: VALID；resolveDecisionRangeId/decisionRange/decisionRangeId 在 autonomy 决策相关真实代码命中。
+---
 # 决策跳转须带rangeId否则接口缺参
 惠山二期H5 中决策列表跳转未携带 rangeId 导致请求层丢弃空字段、接口缺参。
 

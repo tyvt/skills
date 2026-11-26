@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:37:52+08:00
+verdict_note: 苏住房G 存在 router/index.js、utils/homeRoute.js、utils/permission.js；homeRoute.js 定义 HOME_CANONICAL_PATH='/index'、normalizePath、isHomeMenuRoute，首页路径归一与精确匹配描述属实。
+---
 # 侧栏首页路径归一修复（苏住房G）
 苏住房G 项目侧栏首页点击报错与高亮异常的修复记录。
 

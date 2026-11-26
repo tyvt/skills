@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T00:52:36+08:00
+verdict_note: 苏住房C命中 taxGuide/zzsscs/fzzsscc/thirdMap/webViewNav, 第三方地址属实
+---
 # 苏住房C第三方 web-view 地址汇总
 苏住房C（zhi2-mobile-shimin）项目中所有 web-view 相关地址已梳理汇总。
 
@@ -15,7 +19,6 @@
 - 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：webView.vue、webViewNav.vue、thirdMap/index.vue、taxGuide/index.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：c5d58c85-6292-401f-b7fb-abc1ca9f514c；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

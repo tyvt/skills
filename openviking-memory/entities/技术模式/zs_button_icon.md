@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T13:34:42+08:00
+verdict_note: 产品2.0 zs-button.vue仅21行Vue2 el-button包装(v-bind=$attrs/权限校验)，无$attrs.icon拦截、无Element Plus图标映射；记忆描述功能在代码中不存在。
+---
 # ZsButton 全局适配 el-icon 旧写法
 在 Vue3 + Element Plus 迁移中，zs-button.vue 拦截 $attrs.icon 自动映射 Element Plus 图标组件，避免逐页面修改。
 ## 问题根因

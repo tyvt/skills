@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:51:19+08:00
+verdict_note: 太仓一网通办H5 StepConfirm.vue 实测含 selectedOptionItems，选项表决 OPTION 模板补齐属实。
+---
 # 选项表决确认页内容空白
 太仓一网通办H5 的选项表决在选择决策项后点击下一步，确认页仅显示「我的决策」标题而内容区域为空。
 
@@ -13,7 +18,6 @@
 - 验证证据：extracted source=cursor project=太仓一网通办H5
 - 涉及文件：src/views/owner-decision/components/StepConfirm.vue、src/views/owner-decision/ParticipateIn.vue、src/views/owner-decision/components/OptionStepChoose.vue、src/views/decision/components/StepConfirm.vue
 - 所属项目：太仓一网通办H5；来源会话：6eb5120c-c134-4e15-a744-163291e6d855；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

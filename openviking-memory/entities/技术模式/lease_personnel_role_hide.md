@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:45:08+08:00
+verdict_note: 苏州V3 LeasePersonnelDetail.vue 命中 resolvePersonnelRole 与 personnelRole，角色字段隐藏属实。
+---
 # 住房租赁从业人员详情隐藏人员角色字段
 苏州市房地产监测V3 中 `LeasePersonnelDetail.vue` 移除「人员角色」展示与必填校验，保存时按是否合同操作员自动推导。
 

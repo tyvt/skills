@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T02:17:15+08:00
+verdict_note: 投资推送项目仓不在D-/repository；docs/stockdb_vs_rqalpha.md、dividend_lowvol_rotation/prices.py等引用文件在代码中均不存在，RQAlpha仅命中fund/README，无法以代码证据证实。
+---
 # StockDB全量扫描超时与定向探测对比
 投资推送项目中对比 StockDB 与 RQAlpha 全量能力时，顶层 `rd.get('*')` 全量扫描易超时，应改为文档加定向探测。
 

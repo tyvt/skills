@@ -1,8 +1,14 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:15:47+08:00
+verdict_note: 苏住房C 命中 FormLocal/FormNonLocal/FormManual 与 verification 目录，仓库结构与双认证流程属实。
+---
 # 苏住房C仓库结构与认证流程
 苏住房C 仓库主体为 zhi2-mobile-shimin(uni-app + Vue3 + Vite)，代码区分实名认证与身份认证两套流程。
 
 ## 技术栈
-- 仓库路径：`d:epository\苏住房C\zhi2-mobile-shimin`
+- 仓库路径：`d:
+epository\苏住房C\zhi2-mobile-shimin`
 - 技术栈：uni-app + Vue3 + Vite 小程序
 
 ## 认证流程区分

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T19:21:19+08:00
+verdict_note: 产品2.0 未找到 auth-helpers.js/loginAsCompanyOnce/personnel-record.spec.js（仅监测V3、门户有 auth-helpers.js），登录优化实现无法在所属项目证实。
+---
 - 若一次登录可完成的用例，合并为单用例单次登录，内部用 test.step 保留分步结果，步骤间共用同一 page 不重复登录/恢复会话
 - 跨账号场景保留必要登录（如审批需管理端登录，清理需 switchToCompany 切回企业端）
 - 增强 auth-helpers.js 中 loginAsCompanyOnce 恢复会话后的动态路由注入，供其他 spec 复用
@@ -5,7 +10,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

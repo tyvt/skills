@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:11:24+08:00
+verdict_note: getRouterPathByFilePath 与 unitinfo 目录均命中，单元列表动态路由跳转方案属实。
+---
 # 单元列表项目与楼幢号跳转详情
 苏州市房地产监测V3 中单元列表的项目名称与楼幢号改为链接跳转各自详情页，动态解析路由。
 

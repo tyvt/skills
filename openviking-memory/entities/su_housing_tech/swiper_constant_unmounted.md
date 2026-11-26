@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:11:58+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # swiperComponent.vue constant unmounted error
 In the 苏住房C mobile `swiperComponent.vue` using Options API, the top-level `playIcon` and `closeIcon` were not mounted to the component instance, so template `:src="playIcon"` access threw an error.
 
@@ -18,7 +23,6 @@ In the 苏住房C mobile `swiperComponent.vue` using Options API, the top-level 
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：eb88fc33-134b-41f2-b2d5-78dd948cbb83
-
 
 <!-- MEMORY_FIELDS
 {

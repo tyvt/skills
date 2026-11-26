@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:18:19+08:00
+verdict_note: 确认pubLedger/index.vue(views/property/pubLedger)、subdistrictName、pageNum等汇总台账字段，展示口径与代码一致。
+---
 # 物业全域管理台账 pubLedger 展示口径
 淮安物管物业全域管理台账 pubLedger 汇总物业管理区域在多业务态链路上的状态，支持筛选与导出。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=淮安物管
-
 
 <!-- MEMORY_FIELDS
 {

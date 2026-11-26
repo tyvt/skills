@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:42:22+08:00
+verdict_note: fund/ 下 drop_to_buy.py、cn_broad_signal.py、dividend_data.py 均存在，信号层归属属实。
+---
 # drop_to_buy盘中推演信号在signal层
 投资推送中 drop_to_buy.py 仅为盘中推演工具，真实买卖信号在 *_signal.py 与 dividend_data。
 

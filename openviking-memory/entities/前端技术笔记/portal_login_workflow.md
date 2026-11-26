@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:46:34+08:00
+verdict_note: 工作流/偏好类记忆，无单一代码修复点；所述文件(exception commit/status 约定)与 AGENTS.md 及仓库现状一致，未发现幻觉或隐私违规。
+---
 # 门户联调取登录态避免反复试密码
 排查门户跳转管理端需门户登录态，但试错密码会锁dev账号30分钟，应优先用未鉴权接口或e2e凭据而非改密码登录。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:22:43+08:00
+verdict_note: 产品2.0 src 命中 getInitialPassword、/system/user/、FjDialog，与「$get 资源根路径被改写 POST /add、改明确接口」一致。
+---
 # 详情页新增态勿用 $get 根路径顺带取数
 产品2.0（与苏房V3同源）中详情/新增页用 $get('/module/business/') 根路径顺带取数会被规范化层改写成 POST /add 空 body，导致报错。
 

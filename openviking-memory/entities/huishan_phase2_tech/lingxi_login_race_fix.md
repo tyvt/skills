@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T23:42:32+08:00
+verdict_note: ensureLingxiLogin/waitForLingxiLogin/requestCode 在惠山二期H5的 lingxi.js/newHome.vue 命中。
+---
 # 灵锡登录竞态因requestCode未主动触发
 惠山二期H5/惠山V1小程序中 `lingxi.js` 的 `waitForLingxiLogin` 在 URL 含 `requestCode` 时主动调用 `ensureLingxiLogin`，消除竞态。
 
@@ -21,7 +25,6 @@
 - 验证证据：extracted source=cursor project=惠山二期H5
 - 验证证据：src=惠山二期H5/001.md
 - 来源会话ID：605fa942-84e9-4a40-b2f2-1535b9c67767；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

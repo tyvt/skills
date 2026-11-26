@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:22:14+08:00
+verdict_note: git 标签冲突处理属 git 操作记忆；would clobber 为真实 git 行为，苏住房G 仓存在，无矛盾证据。
+---
 # Git标签冲突处理
 苏住房G 父仓库中本地标签与远程同名标签冲突导致 git pull --tags 报 would clobber existing tag 的处理方式。
 

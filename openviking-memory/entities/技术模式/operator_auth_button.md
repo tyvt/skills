@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T00:18:40+08:00
+verdict_note: 园区公共收益 operatorTable.vue-305/338、operatorAuth/detail.vue、permission company-operatorAuth-edit-118 命中，授权功能与范围来源属实；提交端点现用 batchAdd。
+---
 # 操作人员详情页授权按钮新增
 园区公共收益项目在操作人员详情页操作栏增加「授权」功能。
 
@@ -13,7 +17,6 @@
 ## Relations
 - 来源会话：8fad698f-5f49-4e9c-a532-d96b53a28885（extracted source=cursor）
 - 所属项目：园区公共收益；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

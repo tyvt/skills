@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T01:10:20+08:00
+verdict_note: 核心断言 flow-step-group 类全仓业务源码无命中；所述 home/index-new.vue 不存在（仅 index-wrapper.vue），flow-arrow 另属 OperationGuideBody，无法证实。
+---
 # 门户首页流程箭头 flex 布局修复模式
 门户项目 zhi2-web-admin 的 home/index-new.vue 中流程箭头间距修复，因 Vue2 编译器限制采用 display:contents 包裹。
 

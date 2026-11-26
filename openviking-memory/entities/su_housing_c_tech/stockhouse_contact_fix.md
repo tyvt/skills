@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:46:44+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin stockHouse/detail.vue 含 ZsImage、header-img、resolvemediaurl，联系业主区修复对象属实。
+---
 # 二手房详情联系业主区域UI修复
 苏住房C小程序二手房详情底部「联系业主」区域UI错乱已修复，涉及 detail.vue 与 ZsImage.vue。
 
@@ -15,7 +20,6 @@
 - 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：`pages_transaction/stockHouse/detail.vue`、`components/ZsImage/ZsImage.vue`、`agentDetail.vue`
 - 来源会话ID：3c86796a-b65f-466f-a1d2-266feae580a5
-
 
 <!-- MEMORY_FIELDS
 {

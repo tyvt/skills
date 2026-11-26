@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T12:33:49+08:00
+verdict_note: 实机核对无锡市区G- VerificationReceiptDetailTable.vue-119-120 单据类型仅用全局 formatter-this.dictFormatter，Dialog.vue-368 contractTypeLabel 直接调 dictFormatter；main.js-135-141 按逗号 split 后 join(', ')，无 contractTypeText() 与日文逗号「、」拼接。记忆描述的实现与现状不符。
+---
 # Multi-value field single-dict match failure shows code
 relBusinessType stores comma-separated multi-values (e.g. 1,2); original translation only matched single values, so dict lookup failed and showed raw codes.
 

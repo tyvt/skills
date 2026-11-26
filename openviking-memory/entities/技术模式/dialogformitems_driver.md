@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:17:03+08:00
+verdict_note: 与现状不符：dialogFormItems 在全仓源码中不存在，仅出现于记忆归档 JSON；描述的重构不在当前代码。
+---
 # Dialog Form Items Config Driver
 对话框表单基于配置渲染的重构模式。
 
@@ -18,7 +23,6 @@
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：b13808d4-8e61-472e-9b96-c5618a65f78f
-
 
 <!-- MEMORY_FIELDS
 {

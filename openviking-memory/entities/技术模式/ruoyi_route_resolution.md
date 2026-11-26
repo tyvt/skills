@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:20:00+08:00
+verdict_note: 苏住房G ruoyi.js 实机含 getCurrentRouterByFilePath、resolveRegisteredRoute、数字 path 正则，路由解析属实。
+---
 # ruoyi 同 filePath 多路由解析规则
 苏住房G 已在 `@/utils/ruoyi.js` 统一处理「同一 meta.filePath 对应多条路由」的解析规则。
 

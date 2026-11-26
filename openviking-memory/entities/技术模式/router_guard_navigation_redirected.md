@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T12:33:27+08:00
+verdict_note: router/index.js-179 next({...to,replace-true}) 属实；-272-294 isBenignNavigationError 用 NavigationFailureType.duplicated/redirected 吞掉两类导航失败，等价 NavigationDuplicated+NavigationRedirected，与记忆一致。
+---
 # 登录守卫重定向控制台误报
 园区物管2.0 中登录后 permission 守卫内 next(replace) 触发 NavigationRedirected 控制台误报，并非登录失败。
 

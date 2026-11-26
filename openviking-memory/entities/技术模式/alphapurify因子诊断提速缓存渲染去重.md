@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:50:01+08:00
+verdict_note: fund命中 alphapurify_bridge/AlphaPurify/alphapurify_perf.log, 提速缓存属实
+---
 # AlphaPurify 因子诊断提速：进程内缓存与报告渲染去重
 在不改官方 alphapurify 1.0.6、不降级分层/horizon 精度的前提下，瓶颈多在重复加载快照与指标聚合。
 

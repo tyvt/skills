@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:13:05+08:00
+verdict_note: 2026-11-26 葡语 URI 已治理；正文简体中文，门户 CI/git add 偏好有效
+---
 - 在提交到门户之前，执行 `git add portalTheme.js` 以避免 CI 构建失败（未跟踪的文件导致了错误）
 - 现有的绿色表头 E2E 用例必须继续断言标题 «可售房屋展示»
 - 上下文：门户表头颜色的改造；不带 `portalSegment` 的深度链接 `?portal=houses` 显示了不正确的蓝色

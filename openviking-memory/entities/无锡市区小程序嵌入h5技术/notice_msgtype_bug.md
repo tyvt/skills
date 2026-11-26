@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:41:15+08:00
+verdict_note: NoticeList.vue、item.msgType、getDictLabel 在 H5 项目命中，msgType 缺失致类型显示'-'的逻辑链与代码一致。
+---
 # 公告列表类型文字未展示（msgType缺失）
 无锡市区小程序嵌入H5中 `NoticeList.vue` 的类型标签一直显示为「-」，因父页面未传递 `msgType`。
 

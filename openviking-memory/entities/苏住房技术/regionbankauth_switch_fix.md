@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:14:33+08:00
+verdict_note: 苏住房G 命中 regionBankAuth 与 handleEnableChange，开关回滚按目标态反推原值的修复属实。
+---
 # 未备案单据开关回滚失效修复
 苏住房G 区域银行授权页 `el-switch` 变更时因先写新值再取旧值，导致未备案单据开关回滚失败。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:42:19+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[enableState,contentInfo,DetailTemplate,switch,companyAdmin]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # 管理员详情启用状态文字展示修复
 苏州市房地产监测V3 项目中修复公司管理员详情查看态（`companyAdmin/detail.vue`）启用状态误渲染为禁用复选框的问题，改为文字展示。
 ## 问题原因

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:15:52+08:00
+verdict_note: 无锡市区小程序嵌入H5 实机含 topicvoteid、buildPortalHomeBackUrl、buildOwnerDecisionVoteBackUrlParam，深链处理属实。
+---
 # 苏服办深链topicvoteid处理
 苏服办打开轻应用 URL 会额外带 topicvoteid，需入库并在登录后自动开门主决策，外链追加参数与 backUrl。
 

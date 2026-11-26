@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:42:20+08:00
+verdict_note: presale-detail-section-stack/cashsale-info-panel/permit-info-panel 在苏州市房地产监测V3命中。
+---
 # 详情页纵向分块白卡片样式补齐
 苏州市房地产监测V3 中预售许可、机构注册审核等详情页按「纵向分块 + 16px 间距 + 白卡片」补齐样式。
 

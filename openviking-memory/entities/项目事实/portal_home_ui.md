@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:14:52+08:00
+verdict_note: 门户命中 HomeUserCard、HomeNoticeList、portal-home-visual，首页三角色 UI 对齐属实。
+---
 # 门户对内首页三角色 UI 对齐与验证
 门户对内首页（admin/developer/broker）按设计稿对齐 UI 并完成 e2e 验证，全部收尾。
 

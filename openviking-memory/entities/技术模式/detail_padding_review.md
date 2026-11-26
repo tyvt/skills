@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:46:35+08:00
+verdict_note: 苏州V3命中 FORM_COL_THREE/companyScheme/Headline/detail-form.scss, 审查结论符号属实
+---
 # 详情页表单 padding 审查结论
 苏州市房地产监测V3 对详情页表单 padding 的 Vue/CSS 审查已完成，并给出合并前处理建议。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

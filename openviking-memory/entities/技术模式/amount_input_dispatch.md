@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T22:18:41+08:00
+verdict_note: 记忆称 AmountInput 在 numberValue watch 中 nextTick 内 dispatchToFormItem('el.form.change')；实机园区物管2.0 该组件用 computed normal + v-money + $emit('input')，无 numberValue/dispatch/nextTick。实现描述不符。
+---
 # AmountInput 校验变更分发对齐
 AmountInput 组件对齐 ElInput 在值变化时通知 ElFormItem 的行为，修复填写后仍为必填校验失败的问题。
 
@@ -16,7 +21,6 @@ AmountInput 组件对齐 ElInput 在值变化时通知 ElFormItem 的行为，�
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:44:17+08:00
+verdict_note: 实机核对 苏住房G 仓库确认关键符号(10/13)存在：CheckPage、cause、common、develop、errors；文件与描述一致，记忆有效。
+---
 # 防台防汛列表列宽规范
 苏住房G 防台防汛（flood）模块列表列宽截断问题的统一修复方案：单据编号类列 width: 200，时间类列 width: 190。
 

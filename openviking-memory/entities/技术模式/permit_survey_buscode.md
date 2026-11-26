@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:11:45+08:00
+verdict_note: 苏州V3 permitConstants.js 命中 PERMIT_SURVEY_BUS_CODE='ysxkcs'，PermitApprovalDialog 均存在，常量统一属实。
+---
 # 踏勘表业务编码统一定义为 ysxkcs 常量
 苏州市房地产监测V3 中硬编码 busCode 易致模块间不一致，故在 `permitConstants.js` 定义 `PERMIT_SURVEY_BUS_CODE = 'ysxkcs'`。
 

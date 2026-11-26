@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T12:33:16+08:00
+verdict_note: ShareholderDialog.vue-3/100/116 已用 dialogMode prop 控制 DetailTemplate 与 view 态；detailMixins.js-26 确有同名 computed mode 覆盖根因，prop 改名修复属实，与记忆一致。
+---
 # ShareholderDialog组件mode prop被mixin覆盖
 `ShareholderDialog.vue` 的 `mode` prop 被 `detailMixins` 同名 computed 覆盖，父组件传参失效致弹窗恒为新增态。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:16:18+08:00
+verdict_note: 在物业手持B端定位detail.vue/add.vue/ZsUploader等8个落点文件，URL归一化与加载回退修复与项目代码结构一致。
+---
 # 巡检图片不显因URL未归一化及加载未回退
 物业手持B端巡检记录详情页因 pictureList 字段提取错误且步骤数据无回退导致图片不显示。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:28:31+08:00
+verdict_note: 苏住房G README及vite.config.js实见VITE_APP_BASE_API=/api/v2.0，permission.js-171,206实见loadView动态路由，属实。
+---
 # 苏住房G 接口前缀与 env 目录实际位置
 苏住房G 前端接口基址 VITE_APP_BASE_API 定义在父仓库根 env 目录，子模块内无同名 env，拼 URL 需以此为准。
 

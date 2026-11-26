@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T21:15:05+08:00
+verdict_note: 所属项目 bugfix 无对应本地仓库，仅搜到通用 mapState，无法证明该 computed 覆盖修复存在
+---
 # index.vue中重复computed选项覆盖projectId
 在 `index.vue` 中定义两个 `computed` 选项，导致 `projectId` 未被注册并触发 Vue 警告，需合并为一个 computed 对象。
 

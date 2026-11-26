@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:21:40+08:00
+verdict_note: 产品2.0 存在 recordProcessStepDialog.vue、scrappedRecord/detail.vue 及 resolveServerAssetUrl，image 无后缀退化修复文件属实。
+---
 # DetailTemplate image 类型无后缀退化成链接
 产品2.0 的 zhi2-web-admin 中，DetailTemplate 查看态 type:'image' 会因 URL 无后缀而退化成可点链接而非缩略图。
 

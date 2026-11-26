@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:16:06+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin 中 NoticeList 与 community/subdistrict/announcement 路由实存，空状态统一由 NoticeList 展示属实。
+---
 # 公告列表页重复空状态修复
 苏住房C 项目/社区/街道三处公告列表页重复 `ZsEmpty` 空状态的问题已修复，统一由 `NoticeList` 组件展示。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

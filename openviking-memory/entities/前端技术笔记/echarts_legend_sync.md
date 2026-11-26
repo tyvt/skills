@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:17:51+08:00
+verdict_note: 园区物管2.0 存在 benefit/dataSandbox/assetPanorama 模块及 api/mock，ECharts 图例同源过滤所在模块属实。
+---
 # ECharts图例与Series同源过滤
 园区物管2.0 中饼图等图表在过滤 0 值数据后，图例未同步导致 resize 报错 series not exists 的已知 bug。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T07:34:55+08:00
+verdict_note: ComplexApiImpl.listByIdList(239) 仅 BeanUtil 拷贝+setCompanyName(249)，无 setCompanyId；ComplexServiceImpl-2302 对照组有 setCompanyId；StdEvalReportPrepareServiceImpl.deriveCompanies(820) 依赖 getCompanyId。根因链属实。
+---
 # 报告编制企业列表恒空的根因链
 报告编制接口companyCount恒为0、companyList恒空，根因是跨服务DTO契约缺口，需锁定到行号。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:24:33+08:00
+verdict_note: 园区公共收益 src 命中 getTodoTaskRoutePath、detailId 与 todoTask.js，与「新增兼容函数统一待办跳转」一致。
+---
 # 待办跳转历史path数据兼容
 园区公共收益(zhi2-web-admin)原待办/流程跳转未兼容历史数据 path 格式，导致路由错误。
 

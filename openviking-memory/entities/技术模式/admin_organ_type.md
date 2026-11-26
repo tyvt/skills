@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:17:47+08:00
+verdict_note: 确认organType、companyAdmin、companyOrgan相关字段，人员字段隐藏与保存不完整由organType缺失导致的描述与代码一致。
+---
 # 因缺少 organType 导致人员字段隐藏和保存不完整
 `companyAdmin/detail.vue` 依赖 `form.organType` 来显示人员字段；没有 `organType` 的界面会隐藏它们，并且 `getForm()` 忽略了 `personnelType` 等字段。
 

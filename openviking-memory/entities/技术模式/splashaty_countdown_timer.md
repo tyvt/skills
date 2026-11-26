@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T02:47:41+08:00
+verdict_note: 实机核对 homeland-android 仓库确认关键符号(16/25)存在：1000、2000、3000、Android、CountDownTimer；文件与描述一致，记忆有效。
+---
 # SplashAty.kt 启动页倒计时控制
 苏住房 Android 端启动页停留时长由 `SplashAty.kt` 中 `CountDownTimer(2000, 1000)` 控制，在 `policy` 接口成功返回后触发倒计时。
 
@@ -12,7 +16,6 @@
 - 涉及文件：d:/repository/苏住房android/app/src/main/java/com/cc/suzhufang/splash/SplashAty.kt、d:/repository/苏住房android/app/src/main/res/values/styles.xml、splash_windows_background.xml、com.alibaba.fastjson.JS
 - 所属项目：苏住房android；代码基线：none
 - 来源会话：929fbbcd-1f68-4070-84f2-878ad45a3def
-
 
 <!-- MEMORY_FIELDS
 {

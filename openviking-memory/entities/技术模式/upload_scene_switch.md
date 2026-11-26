@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T04:32:38+08:00
+verdict_note: 园区公共收益 subVenueDialog.vue-54/113/116/227 命中 ImageUpload 与 isRevenueContractFiling 分支，场景标志切换上传组件描述属实。
+---
 # 弹窗多业务线附件口径分流
 园区公共收益项目同一弹窗组件服务多业务线时，用场景标志切换 ImageUpload 与 zs-file-upload，勿先改全局上传组件。
 

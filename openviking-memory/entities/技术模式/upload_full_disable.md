@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:40:10+08:00
+verdict_note: 实机核对：引用文件(7个)存在于对应项目仓；核心符号命中[activeConfig,hideUploadTrigger,AppendixRequirementCard,canUpload,loadPackage]，与记忆描述一致。
+---
 # 满量禁用el-upload致删除失效与列表弹跳
 苏州市房地产监测V3 中满量时禁用整个 el-upload 致列表删除失效，受控 file-list 刷新触发入场动画与状态标签弹跳。
 

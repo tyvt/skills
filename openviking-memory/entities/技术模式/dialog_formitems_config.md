@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:16:27+08:00
+verdict_note: 与现状不符：全仓代码（排除记忆归档）无 dialogFormItems 计算属性；property/complex/index.vue 仍保留硬编码 zs-date-picker 与 contentInfo。
+---
 # 弹窗表单数组配置驱动渲染
 property/complex 等弹窗表单改为 dialogFormItems 计算属性配置驱动，v-for 循环渲染 label/prop/layout/type/attrs，按 type 渲染 zs-date-picker，替代原硬编码与未驱动 contentInfo。
 

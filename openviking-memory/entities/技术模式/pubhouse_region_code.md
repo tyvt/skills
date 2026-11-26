@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:14:22+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 修复 pubHouse 中的区域代码
 
 在提交 `/benefit/pubHouse` 时缺少 `regionCode`，且 `subdistrict`/`community` 被转换为名称，但后端需要代码。
@@ -15,7 +20,6 @@
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：b86fe772-d48c-4f14-83ed-0fae40ff6861
-
 
 <!-- MEMORY_FIELDS
 {

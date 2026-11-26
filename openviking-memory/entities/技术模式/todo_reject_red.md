@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:15:36+08:00
+verdict_note: 命中 todoTask、utils/todoTask，待办驳回标红描述属实
+---
 # 待办驳回标识红色【驳回】渲染
 园区公共收益(zhi2-web-admin)待办主题中驳回标识需统一渲染为红色【驳回】样式。
 

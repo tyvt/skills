@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:45:11+08:00
+verdict_note: V3 依赖 vue-qr 4.0.9，WorkCardDialog.vue 含 -white-margin="false"，与去 margin 修复一致。
+---
 # vue-qr 默认 margin 导致过多空白
 项目 苏州市房地产监测V3 的 zhi2-web-admin 中的 vue-qr 使用默认 margin=20，导致 50px 的二维码出现空白。
 
@@ -23,7 +28,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：271fe773-92e0-4ead-a113-8889fcea1743
-
 
 <!-- MEMORY_FIELDS
 {

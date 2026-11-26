@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:20:46+08:00
+verdict_note: 苏住房C/zhi2-mobile-shimin ZsPopup.vue 实机 .popup-container--after 为空壳（content 空、无渐变），事实记忆属实。
+---
 # 苏住房C弹窗ZsPopup伪元素事实
 苏住房C的ZsPopup组件中`.popup-container::after`为空白壳伪元素，全库10+项目均无蓝色渐变样式。
 

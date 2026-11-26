@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:45:41+08:00
+verdict_note: C-/Users/Administrator/.dbx/bin/dbx-mcp.exe 存在，DBX MCP 驱动记忆属实。
+---
 # DBX MCP stdio driver
 The local `dbx-mcp.exe` binary, driven over stdio JSON-RPC from PowerShell so SQL scripts can be executed straight from disk.
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:11:14+08:00
+verdict_note: 在产品2.0定位到RegionTreeLayout.vue及资产变更列表index.vue/index.scss，list-card容器与树节点高度约定与代码结构一致，无矛盾。
+---
 # Asset Change List Unified Container Border
 Asset change lists lacked the `list-card` container, causing tables to have no outer border; global `list-card` provides border, radius, and container constraints.
 
@@ -29,7 +34,6 @@ Asset change lists lacked the `list-card` container, causing tables to have no o
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：97b1025a-9dba-4821-8e14-0be39a728d87
-
 
 <!-- MEMORY_FIELDS
 {

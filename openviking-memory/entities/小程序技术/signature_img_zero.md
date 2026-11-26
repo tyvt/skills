@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:47:56+08:00
+verdict_note: ZsImage/DecisionRecord/ResultRecord 组件在同类H5项目命中；固定尺寸wrap的CSS修复方法论自洽。
+---
 # 签字图因ZsImage内部width:100%无参照容器高度塌成0须套固定尺寸wrap
 苏住房C选举/决策记录详情签字图不显示，接口有值但页面空白，根因是ZsImage内部.img写死width:100%所在行无确定尺寸致高度塌0。
 

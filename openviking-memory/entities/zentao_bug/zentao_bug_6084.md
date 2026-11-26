@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:41:23+08:00
+verdict_note: DBX 新禅道确认 bug6084 存在，标题一致、resolution=fixed、resolvedDate=2026-11-09 13-28-49 与记忆吻合。
+---
 # ZenTao Bug 6084
 Bug 6084 in zhi2-web-admin about supervision account opening branch-select dialog pagination not staying in one screen; reactivated 2026-11-09, reviewed and resolved same day.
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T14:08:56+08:00
+verdict_note: 记忆明确称 loadBanners 实现仅为 banners.value=getPortalLocalBanners()、当前不请求后端接口；实机 usePortal.js-455-475 loadBanners 调用 getBannerList 后端接口，仅在失败/空时回退本地图。描述与现状不符，判无效。
+---
 # 苏服办门户首页轮播仅用本地图
 应用 Tab「首页」对应 pages/webview/home，轮播为页面内原生 swiper，当前仅加载本地图不调后端接口。
 

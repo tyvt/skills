@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:52:14+08:00
+verdict_note: 产品2.0命中 tableColumnsKey/refreshColumnOrderKey/complexChange, 列顺序修复属实
+---
 # 自定义列表列顺序保存后表格不重排修复
 园区公共收益项目中使用自定义列表模板（非 ListTemplate.js）保存列顺序后，el-table 缓存列顺序导致界面不重排，需给 zs-table 补 :key="tableColumnsKey"。
 

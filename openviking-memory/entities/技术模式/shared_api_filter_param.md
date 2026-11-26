@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:20:19+08:00
+verdict_note: 抽检2026-11-26 第三轮 shared_api_filter_param.md 叙述/路径合理
+---
 # 共用接口过滤参数仅页面级注入
 苏住房G 同一接口被多页面共用时，专属过滤参数只在调用点加，不在 utils/api 层统一注入，避免影响其他页面。
 ## 问题背景

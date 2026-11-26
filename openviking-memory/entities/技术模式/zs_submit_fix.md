@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:15:29+08:00
+verdict_note: 园区公共收益/产品2.0 实机含 ensureFlowConfigured、getSubmitApi、getApprovalApi 与 flowApi.js，提交流程修复属实。
+---
 # ZsSubmit 提交前流程配置校验修复
 园区公共收益项目(zhi2-web-admin)中，ZsSubmit 提交流程原在解析 submitApi 前调用 ensureFlowConfigured，导致误报「审核流程未维护完成」。
 

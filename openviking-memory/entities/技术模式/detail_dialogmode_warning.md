@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:46:07+08:00
+verdict_note: 产品2.0 facility/detail.vue、facilityChange/detail.vue 含 formMode 判定，涉及文件与修复目标属实。
+---
 # 详情页误用dialogMode触发Vue警告
 园区物管2.0 设施详情页因 FacilityDetail 未定义 `dialogMode` 属性、却依赖 detailMixins 的 `formMode`，触发 Vue 警告。
 

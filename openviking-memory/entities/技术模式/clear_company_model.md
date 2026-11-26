@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T06:33:53+08:00
+verdict_note: AddDialog.vue-353-357 确认 selectedCompany watcher 内清空时执行 form.companyName=undefined 与 form.companyId=undefined，路径与记忆完全一致。判有效。
+---
 # 资金代缴单位清除时同步清空表单 model
 在 depositNotice/company 的 AddDialog.vue 中，清除资金代缴单位时需同步清空表单 model 值，避免残留旧值。
 ## 根因

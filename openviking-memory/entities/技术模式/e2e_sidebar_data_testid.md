@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:14:54+08:00
+verdict_note: 命中 RecursiveMenu、sidebar、submenu，侧边栏 data-testid 改造描述属实
+---
 # E2E 侧边栏菜单定位改用 data-testid
 产品2.0前端为 RecursiveMenu.vue 增加 data-testid，E2E 测试仅用 testid 与文本定位，摆脱 class 选择器。
 

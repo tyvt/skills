@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:11:02+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # Step2 Data Empty Disable
 调用 `POST /estate/totalprice/getCurrentPriceInfo` 返回 `data` 为空时，`step2.vue` 的 `getDetail` 方法执行 `msgWarning('当前维修项目无需审计')` 并 `return`，终止金额与明细加载。
 

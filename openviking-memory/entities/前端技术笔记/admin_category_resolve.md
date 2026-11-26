@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:51:30+08:00
+verdict_note: portalCategory.js 实测存在，search/hash 双来源解析、去清空规则、afterEach 同步属实。
+---
 # 管理端板块名兼容hash路由双来源解析
 门户已带portalCategory到管理端却读不到，根因是hash路由参数可能在search或hash query，且app.js在模块import期就解析，须双来源解析并在首屏URL读到。
 

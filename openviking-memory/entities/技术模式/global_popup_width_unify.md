@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:48:41+08:00
+verdict_note: ProjectCertificateDetailDialog/PriceTableDialog/detail-form.scss/form-layout 全部命中，弹窗宽度改造属实。
+---
 # 全局弹窗宽度统一改造
 苏州市房地产监测V3全局排查所有弹窗，统一为单列表单和双列表单两种宽度，已全完成。
 

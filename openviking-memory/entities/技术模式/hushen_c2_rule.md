@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T23:42:01+08:00
+verdict_note: 沪深C2选股数据湖项目不在本机；external_lake.py/screen_sh.py 等脚本及口径配置文件全盘D盘搜索均不存在，无任何代码证据，无法证明有效。
+---
 # 沪深 C2 选股统一门槛
 数据湖选股项目中沪深两市共用的 C2 财务筛选口径。
 

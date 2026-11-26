@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:16:13+08:00
+verdict_note: 苏住房G feeStandardStats 命中 feeStandardStatsDrill、groupMode，按维度注入下钻参数属实。
+---
 # 费用标准统计下钻参数（苏住房G）
 苏住房G 项目 publicQuery/feeStandardStats 表格下钻时按维度注入 groupMode 参数。
 ## 字段与逻辑

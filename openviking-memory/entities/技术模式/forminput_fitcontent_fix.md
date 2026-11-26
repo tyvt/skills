@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T03:32:58+08:00
+verdict_note: formInput.vue-60 `if (!this.fitContent) return`，65-67 读 inputWrap.clientWidth 赋值 width，与仅 fitContent 为 true 时测量外层 span 宽度完全吻合。
+---
 # FormInput 非 fitContent 测宽报错修复
 FormInput 在 fitContent 非 true 时误读 $el 宽度触发 Vue 警告，已改为仅 fitContent 为 true 时测量。
 

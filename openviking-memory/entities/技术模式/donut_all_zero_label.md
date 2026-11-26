@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:22:50+08:00
+verdict_note: 园区物管2.0 src 命中 donutData、assetCategories、avoidLabelOverlap，与「全0用占位值但显真实 count/ratio、assetPanorama 去隐藏 label」一致。
+---
 # 环图空数据与全0展示
 园区物管2.0 统计地图四列卡片环形图（资产分类、车位分类、资源分类、合同分类）及资产全景环图，对空数据与全0的展示约定。
 

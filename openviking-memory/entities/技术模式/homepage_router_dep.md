@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:13:01+08:00
+verdict_note: 太仓一网通办H5 src/views/HomePage.vue-56 用 useRouter，router/index.ts-10 引入 HomePage，循环依赖修复属实。
+---
 # HomePage与router循环依赖致初始化前报错
 太仓一网通办H5 中 router 静态引入 HomePage 与 HomePage 引入 router 造成循环依赖，触发初始化前报错。
 

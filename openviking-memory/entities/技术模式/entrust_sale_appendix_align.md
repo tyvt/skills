@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:47:11+08:00
+verdict_note: 苏州市房地产监测V3源码：EntrustSaleAddAppendix命中presale/entrustSale/detail.vue-148/181/290，show-attachment(50)，FileList/ImageGrid存在。复用全局组件并隐藏附件抽屉描述属实。
+---
 # 委托代售要件上传对齐全局并隐藏附件抽屉
 苏州市房地产监测V3预售委托代售重构 EntrustSaleAddAppendix.vue 复用全局 FileList/ImageGrid 对齐 AnnexUpload 样式与工具栏，并隐藏查看态附件抽屉避免重复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T12:34:00+08:00
+verdict_note: publicPage/index.vue-51 queryParams 含 phone-undefined，formItems-71/77/83 「所属单位」「手机号码」「角色」顺序与记忆一致；listMixins.js 自动缓存 phone 条件。
+---
 # 用户注册查询新增手机号查询条件
 淮安物管「公共查询 > 用户注册查询」页面（zhi2-web-admin/src/views/system/publicPage/index.vue）新增手机号码查询条件。
 

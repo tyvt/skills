@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:48:34+08:00
+verdict_note: 无锡市区小程序嵌入H5 真实源码命中 newHome 与 reLaunch(401 回首页)，与演示门禁描述一致。
+---
 # 无锡三资监管演示门禁
 无锡小程序嵌入H5在对外演示时未登录仅允许访问newHome极简门户，移除TabBar后401统一reLaunch回首页。
 

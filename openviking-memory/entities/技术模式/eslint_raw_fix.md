@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:14:35+08:00
+verdict_note: 产品2.0 fundPanorama/chartConstants.js-17-18 命中 apply.svg?raw 与 eslint-disable-next-line import/no-unresolved，修复属实。
+---
 # 园区物管2.0 ESLint 无法解析 Vite ?raw 导入
 园区物管2.0 中 pre-commit 的 ESLint `import/no-unresolved` 规则无法解析 Vite 的 `?raw` 导入（如 `apply.svg?raw`），导致提交失败。
 

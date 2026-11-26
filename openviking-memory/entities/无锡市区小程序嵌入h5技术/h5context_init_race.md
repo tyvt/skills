@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:41:49+08:00
+verdict_note: whenH5ContextReady 在 zhi2-mobile-admin-h5-c-unlimited/maintain/index.vue 命中，与记忆声称路径一致。
+---
 # 小程序web-view内H5的localStorage恢复与异步init竞态
 切换小区后web-view URL参数已更新，但H5页仍显示旧小区名或houseId与名称错位，需h5Context同步URL并await whenH5ContextReady。
 

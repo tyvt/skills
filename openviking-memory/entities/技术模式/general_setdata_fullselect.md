@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:13:43+08:00
+verdict_note: 确认DecisionRangeTable.setData、initHouseChecked、exist==1过滤及RangeTable组件，建筑物全选修复描述属实。
+---
 # setData 中因缺陷导致建筑物全选丢失
 `general` 组件中的 DecisionRangeTable.setData 在选中后仅提交当前建筑物，导致全选丢失；需要优先修复。
 

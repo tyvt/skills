@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:43:05+08:00
+verdict_note: 园区物管2.0 detail.vue 命中 applyPropertyProjectRow/initCurrentProject/isBTerminal 四件套，表单自动填充属实。
+---
 # B 端新增表单默认填充物业管理区域
 园区物管2.0 中 benefit 模块申报/备案类详情页（pubManagementOrg、pubParkingRate、pubQuarterlyDeclaration 等）新增表单自动带入物业管理区域的可复制套路。
 

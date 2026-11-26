@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T19:43:55+08:00
+verdict_note: 记忆称监听8101且加载 sites-enabled 旧副本；现状生效配置为 env-sites/suzhufang-g-local.conf 监听8165（20261124 端口迁移、部署面板生成），与现状不符。
+---
 # 苏住房G站点
 苏住房前端在本地 nginx 上的站点，监听 8101，其启用配置副本与 nginx UI 修改的配置存在不同步问题。
 
@@ -13,7 +18,6 @@
 ## 操作约束
 - 不直接手改 `sites-enabled` 文件。
 - 配置变更应通过 nginx UI 的启用流程处理。
-
 
 <!-- MEMORY_FIELDS
 {

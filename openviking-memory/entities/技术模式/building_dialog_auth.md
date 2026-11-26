@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:11:35+08:00
+verdict_note: 园区公共收益/产品2.0 命中 BuildingDialogAuth.vue，houseNumber、totalHouse 双字段来源属实。
+---
 # 楼幢授权双列表弹窗字段与套数来源兼容
 BuildingDialogAuth 类左右待选/已选列表弹窗需统一列配置并兼容房屋套数双字段来源。
 

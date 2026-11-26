@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T08:34:11+08:00
+verdict_note: 惠山二期G tencentDistrictBoundary.js-12-13 定义 search/getchildren 两接口，-70 get_polygon、-71 max_offset、-410 注释『区级街道轮廓(get_polygon=3)』。记忆所述接口、参数及 get_polygon=3 为请求参数非独立接口的描述属实。
+---
 # 惠山二期G大屏区划接口
 惠山二期G物管大屏区级场景通过腾讯行政区划WebService接口按参数拉取街道级轮廓，get_polygon=3是请求参数而非独立接口。
 ## 接口说明
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=惠山二期G
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:13:03+08:00
+verdict_note: 在无锡市区小程序嵌入H5确认accountDisclosure字段及sharedFunds/fundPublicity页面，隐藏查询明细约定属实。
+---
 # accountDisclosure隐藏查询明细
 接口 accountStatistics 新增 `accountDisclosure` 字段，值为字符串 "0" 时隐藏共有资金/公示页「查询明细」按钮。
 

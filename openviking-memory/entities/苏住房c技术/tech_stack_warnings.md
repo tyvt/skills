@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:43:34+08:00
+verdict_note: sourcemap/duplicate-object-key/crypto-js.min.js/sign.js 在苏住房C命中，构建噪声与真错口径属实。
+---
 # 苏住房C 市民端技术栈与构建告警口径
 苏住房C 市民端 zhi2-mobile-shimin 是 Vue3 + Vite 的 uni-app 工程，index.html 全局脚本与 vite sourcemap 重复是两类高频噪声，需分清噪声与真错。
 

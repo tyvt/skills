@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:42:49+08:00
+verdict_note: 苏住房G regionTree.vue 含 expand-on-click-node=false 及 expandPathToNode，共用树组件修复属实。
+---
 # 共用区域树点击节点自动收起
 苏住房G 物业管理区域树点击有下级节点行后自动收起，根因为 el-tree 默认属性与展开逻辑叠加。
 ## 问题根因

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:17:29+08:00
+verdict_note: statsFetchSeq/currentTaskStats/refreshStatsData 在同族仓 榆林G home/index.vue-172/40/180 命中，办件量同步修复属实（产品2.0 当前文件已迭代）。
+---
 # 首页办件量分析数量同步修复
 产品2.0 首页 `home/index.vue` 的「办件量分析」时间筛选与数量不同步问题已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:47:24+08:00
+verdict_note: zhi2-web-admin/jsconfig.json 实测 checkJs-false，编辑器轻量配置偏好与配置现状一致。
+---
 - 配置编辑器时不要提升内存上限，保持轻量设置（移除 8192MB 内存配置）
 - 考虑移除或禁用不必要的扩展与检查：禁用/卸载 Vue.volar、禁用 shenjiaolong.vue-helper、可选禁用 Error Lens；关闭 TS/JS 校验与 Vue inlay hints
 - `zhi2-web-admin/jsconfig.json` 设 `checkJs: false` 并移除 `types: ["vite/client"]`，扩充 `exclude`

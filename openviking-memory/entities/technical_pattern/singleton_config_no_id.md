@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:54:02+08:00
+verdict_note: 无锡市区G 命中 getDetailRequiredParams、platformConfig、getInfo，与单例配置页绕过 id 校验描述一致。
+---
 # Singleton config page no id skips mixin request
 platformConfig/detail.vue route has no id, triggering mixins/form.js getDetail() id-empty check that skipped the /system/platformConfig/getInfo request, leaving the form empty.
 

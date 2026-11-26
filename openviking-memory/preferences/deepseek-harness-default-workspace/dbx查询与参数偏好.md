@@ -5,13 +5,14 @@
 - OpenViking detail 配置仅支持 mode=context；配 mode=list 会报 INVALID_ARGUMENT。
 - In DBX transaction writes, every dbx_execute call also needs connection_id together with session_id, not only query calls.
 - On Dameng, `left` is a reserved word; wrap it in backticks when used as a column alias or other SQL identifier.
+- DBX transactions block aggregate queries such as SUM/CASE; review rows one by one inside the transaction and verify counts and sums with an independent connection after commit.
 
 <!-- MEMORY_FIELDS
 {
   "user": "deepseek-harness-default-workspace",
   "topic": "DBX查询与参数偏好",
-  "source_extraction_id": "0526d73aa2f4419abc1d92d7ef831b82",
-  "version": 2,
+  "source_extraction_id": "fe1adb8ac60a4380882c01b73c00b80e",
+  "version": 3,
   "memory_type": "preferences"
 }
 -->

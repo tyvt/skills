@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:20:21+08:00
+verdict_note: 惠山二期G 实机含 housePosition.js、housePositionFormatter 与隆舜园，bug 6677 修复属实。
+---
 # 禅道 bug 6677 房屋坐落缺分隔符
 惠山二期G 物管端（zhi2-web-admin，分支 develop/v2.6.2-huishan）房屋坐落列缺少「-」分隔符的前端缺陷，2026-11-25 已修复、实机验证、推送并回写禅道。
 

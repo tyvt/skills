@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T13:34:30+08:00
+verdict_note: 苏住房C utils/index.js-15媒体前缀带前导/，54/72/79 startsWith('/')补斜杠，154 resolveMediaUrl，ZsImage.vue引用，子目录拼前缀修复属实。
+---
 # H5 子目录部署媒体路径被拼前缀
 H5 端部署在子目录时，媒体相对路径会被拼进页面路径前缀，resolveMediaUrl 需统一补前导斜杠。
 

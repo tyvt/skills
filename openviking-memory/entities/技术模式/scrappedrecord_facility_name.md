@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:28:55+08:00
+verdict_note: 产品2.0 scrappedRecord/index.vue实见resolveFacilityDefinitionName(-112,137)及facility.facilityDefinitionName优先级(-127)，属实。
+---
 # 报废记录设施设备类别列显示修复
 产品2.0 的 scrappedRecord 列表因接口返回类别名称不在顶层字段或为名数组，导致「设施设备类别」列空白，后通过 formatter 兼容多级路径与数组。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:48:56+08:00
+verdict_note: 昆山市民 election 目录命中 default.svg、zs-image；headUrl 已移除，与业委会选举默认图修复描述一致。
+---
 # 业委会选举列表默认图不显示修复
 昆山市民小程序「已完成」业委会选举列表因本地默认图被当服务端图片解析且兜底图缺失，导致默认图不显示，已修复。
 

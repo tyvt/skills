@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:43:33+08:00
+verdict_note: 苏州V3 companyApplyAudit/index.vue 命中 administrativeArea 与 ECONOMIC_INSTITUTIONS_REGION，字段对齐属实。
+---
 # 备案列表 administrativeArea 字段对齐
 后端字段变更为 administrativeArea，前端查询参数、列与筛选同步适配。
 

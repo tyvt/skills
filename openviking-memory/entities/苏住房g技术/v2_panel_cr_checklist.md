@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:48:07+08:00
+verdict_note: 苏住房G：index-v2、downloadStudy(10)、openTodoItem(12)、StudyPanel(29)、PublicBenefit(111)命中e2e/artifacts构建产物assets/*.js，证明V2面板组件确实存在。CR清单所列缺陷对象属实，判有效。
+---
 # 首页V2卡片面板Code Review存量缺陷清单
 苏住房G首页V2聚合卡片门户做整体review时反复出现的五类问题，可直接当检查清单并按CRITICAL/HIGH/MEDIUM分级。
 ## 缺陷清单

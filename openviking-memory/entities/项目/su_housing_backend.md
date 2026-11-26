@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T23:42:41+08:00
+verdict_note: A-16-Byte-String/A-16-Byte-keyVal 在产品2.0 passwordEncrypt.js 命中。
+---
 # 苏住房后端
 苏住房（苏州住房）物业系统多模块 Maven Spring Cloud 后端项目，位于 D:\repository\苏住房后端。
 
@@ -9,20 +13,19 @@
 - property(9604)不承载登录(404)，登录由common-framework(9211)提供；本机zhi3网关(8080)无法复用dev namespace
 
 ## 登录与鉴权
-- 测试账号 zsbase / Zs@2026Aa! (USER_ID=1, 管理员, 权限*:*:*, 角色admin)
+- 测试账号 {{ov_privacy:ambiguous}} / {{ov_privacy:ambiguous}} (USER_ID=1, 管理员, 权限*:*:*, 角色admin)
 - 密码须AES/CBC/PKCS5Padding加密 KEY=`A-16-Byte-keyVal` IV=`A-16-Byte-String` Base64；明文致NPE
 - 服务间Feign须带zhi-project-id头，缺失报MissingRequestHeaderException致"获取用户失败"
-- 2026-11-03联调login 9211用zsbase报NPE因common-framework处test profile连test DB无账号
+- 2026-11-03联调login 9211用{{ov_privacy:ambiguous}}报NPE因common-framework处test profile连test DB无账号
 
 ## 数据库与运行
-- 达梦测试库「苏住房测试」dameng.v2.suzhufang.shiqu.suzhou.test.zhi.com:5236；SYS_USER含zsbase(USER_ID=1)密码BCrypt空
+- 达梦测试库「苏住房测试」dameng.v2.suzhufang.shiqu.suzhou.test.zhi.com:5236；SYS_USER含{{ov_privacy:ambiguous}}(USER_ID=1)密码BCrypt空
 - 巡检表ZHISHU_PROPERTY.T_PATROL系列；2026-11-03插入样本关联小区667562048676123与COMPANY_ID 1744632087085916161；插入后接口仍total=0根因未定位
 - Java8+Maven3.9.16；远程Nacos nacos.dev.zhi.com需鉴权；本机zhi3网关8080连yulin namespace不识别dev；本地Redis6379在跑MySQL未起
 
 ## 启动要点
 - 须-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8防Nacos UTF-8中文GBK解析失败
 - 中文路径jar需用workdir相对路径 -jar zhi2-property-server.jar
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:42:50+08:00
+verdict_note: portalRoutes/UnifiedLogin/PortalDialogHost/portal=projects 在门户命中，直刷跳过骨架描述属实。
+---
 # 门户直刷二级路由跳过首页骨架
 用户直接刷新带门户查询参数的 URL（如 `?portal=projects`）时，不应先闪对外首页骨架再进入二级页。
 

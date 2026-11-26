@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:23:29+08:00
+verdict_note: 小程序/pages/face/user-agreement.vue不存在，删除第七条、第八条改名结论无法证实。
+---
 # 协议删除原第七条并改第八条为第七条
 wygl小程序用户协议文档结构调整，删除原第七条争议解决并将原第八条重命名为第七条。
 

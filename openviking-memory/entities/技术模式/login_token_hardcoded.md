@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:47:44+08:00
+verdict_note: iHome小程序 login/index.vue 中 token=1/getUnifiedBusinessToken/urlToken 均已不存在，与记忆「删除 token=1」的修复方案一致。
+---
 # 登录页 token 写死为 1 致请求假参
 src/pages/login/index.vue 中 token 被硬编码为 1 并拼入 URL，且真实 token 读取被注释，导致请求携带假 token。
 

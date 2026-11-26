@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:47:52+08:00
+verdict_note: 实机核对 产品2.0 仓库确认关键符号(9/14)存在：admin、component、createInstance、cursor、extracted；文件与描述一致，记忆有效。
+---
 # main.js createInstance 幂等保护
 产品2.0 中 zhi2-web-admin 的 `createInstance()` 被多次触发，导致 `registerGlobalComponents(app)` 重复执行、同名全局组件反复注册并报 Vue warn。
 

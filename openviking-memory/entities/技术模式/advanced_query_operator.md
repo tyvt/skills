@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:48:19+08:00
+verdict_note: complexFieldConfig/operatorOptions 在产品2.0命中。
+---
 # 高级查询操作符字典化
 苏住房G 公共查询 zs-advanced-query 条件组的操作符须统一走 operator_type 字典取值，禁止页面本地定义。
 

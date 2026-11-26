@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:47:22+08:00
+verdict_note: 园区物管2.0 fundPanorama/index.vue 存在 panorama-block__title 且全局有 #1890ff 色值，样式落点属实。
+---
 # fundPanorama标题左对齐加蓝色竖条
 
 在`fundPanorama/index.vue`中，`.panorama-block__title`与`.chart-wrap__title`改用`display:flex`左对齐，通过`::before`绘制4×16px `#1890ff`竖条（圆角1px，间距8px），移除原`text-align:center`。
@@ -9,6 +14,7 @@
 **所属项目**：园区物管2.0
 **来源会话**：3bb2b763-7e41-4a6c-893a-450eceb6ab41
 **代码基线**：none
+
 <!-- MEMORY_FIELDS
 {
   "category": "技术模式",

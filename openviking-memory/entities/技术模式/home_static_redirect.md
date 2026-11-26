@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:39:55+08:00
+verdict_note: router/index.js 98-105行实测 /index/home→/index、/index/index→/index 静态重定向且带兜底注释，与constantRoutes加静态别名描述一致。
+---
 # 首页静态别名重定向
 stripDuplicateHomeRoutes 裁掉 /index/home 后守卫 canonicalize 来不及，须在 constantRoutes 加静态别名重定向。
 

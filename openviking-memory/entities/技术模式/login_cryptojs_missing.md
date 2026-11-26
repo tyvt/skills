@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:46:17+08:00
+verdict_note: 实机核对：引用文件(6个)存在于对应项目仓；核心符号命中[undefined,passwordEncrypt,assets,crypto-js,CryptoJS]，与记忆描述一致。
+---
 # 登录页CryptoJS未引入致加密报错
 产品2.0 的 login.vue 调用 encryptPassword 依赖 window.CryptoJS，但 index.html 漏引 crypto-js.min.js，导致登录报错，后补脚本并加空值检查。
 

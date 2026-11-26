@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:49:07+08:00
+verdict_note: VALID；tableColumnsKey/displayColumns/global-table-config 在淮安物管真实代码命中。
+---
 # 由于缓存和未持久化配置导致的自定义列排序失败
 在淮安物管 (zhi2-web-admin) 项目中，el-table 在仅更换 v-for 顺序时不重新排序；displayColumns 未从 localStorage 恢复，且缺少 order 字段的旧数据导致 NaN。
 
@@ -18,7 +23,6 @@
 - 所属项目：淮安物管
 - 验证证据：extracted source=cursor project=淮安物管
 - 来源会话：23259f03-6ebe-4aaa-8a85-fd3a770bfa1b
-
 
 <!-- MEMORY_FIELDS
 {

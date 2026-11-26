@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:26:25+08:00
+verdict_note: 产品2.0 命中 getCustomSlotContentWidth(13)、hasCustomSlot(12)、shouldMeasureRowData(13)、slotWidth(23)，列宽自适应属实。
+---
 # zs-table-column 自动宽度逻辑修复
 产品2.0 的 zhi2-web-admin 中 zs-table-column 修复自定义插槽列被排除在自动宽度计算之外的问题。
 

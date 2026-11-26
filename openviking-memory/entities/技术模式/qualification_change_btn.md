@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:19:18+08:00
+verdict_note: qualificationRecord/detail.vue-85 有 canChange 计算属性且模板 v-if=canChange，变更按钮逻辑属实。
+---
 # 资质记录变更按钮条件放宽
 苏州市房地产监测V3 中 qualificationRecord/detail.vue 的变更按钮展示逻辑放宽，让存量数据可用。
 

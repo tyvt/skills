@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:47:45+08:00
+verdict_note: 泰兴小程序 staff/pages/cashier/result.vue 含 tab-item__label，并引用 staff 版 ZsTab，Tab 修复对象属实。
+---
 # 收银台 Tab 布局紊乱修复
 泰兴小程序收银台 Tab 布局紊乱问题已修复，改动在 src/staff/pages/cashier/result.vue。
 

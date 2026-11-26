@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:17:26+08:00
+verdict_note: 确认uniConfig/qqMapKey、sdkConfigs、loadMaps、qqMapRenderKey、WebService，uni-app地图key配置修复与代码一致。
+---
 # uni-app地图key配置
 uni-app H5 地图报 `Map key not configured` 时需写 `__uniConfig.qqMapKey` 而非 `sdkConfigs.maps`。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:09:20+08:00
+verdict_note: 02-service-grade-crud.cjs-11 明确 approveResults 合法值 1/3/7、2 被引擎拒；-330-386 撤回(7) bizState 回退 0 pending 不回写、终审(1) 回写五类等级，key 取自 flowViewer，与记忆一致。
+---
 # 审批动作枚举仅 1/3/7
 审批结果 approveResults 合法值只有 1/3/7，传 '2'（直觉退回）会被引擎拒为「审批结果不合法」并 500。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:20:29+08:00
+verdict_note: 园区公共收益 candidateCollect/detail.vue 命中 showCandidateTable(3)；CandidateTable(75)、bizState 及引用文件均在，显隐控制属实。
+---
 # 候选征集报名信息区块显隐控制
 修复园区公共收益项目筹备组征集与业委会征集详情页新增保存后报名信息显隐逻辑，统一要求已备案才显示。
 ## 修改说明

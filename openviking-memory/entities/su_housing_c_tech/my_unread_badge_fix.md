@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:50:03+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin api/msg.js 含 readFlag/getMsgNum，My_Suzhufang.vue 存在，未读角标参数修复属实。
+---
 # 我的页未读角标参数缺失修复
 苏住房C 小程序「我的」页未读消息角标因调用 `getMsgNum()` 未传参导致显示总数而非未读数，已修复。
 

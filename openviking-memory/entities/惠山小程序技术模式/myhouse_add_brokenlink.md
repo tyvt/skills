@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:41:17+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[verifyUser,AddBtn]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # 添加房屋主路径灵犀手动页断链
 AddBtn.vue 的 goAdd() 跳转灵犀/不动产第三方 H5 授权为主路径，但 add.vue 与 application.vue 存在却无导航入口形成断链。
 

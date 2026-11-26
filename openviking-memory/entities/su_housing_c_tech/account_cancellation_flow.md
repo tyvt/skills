@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:15:30+08:00
+verdict_note: 抽检2026-11-26 注销流程接口描述型 valid
+---
 # 账户注销接口流程
 苏住房C小程序（zhi2-mobile-shimin 市民端）账户注销按步骤调用 3 个后端接口（外加发验证码）。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T06:33:10+08:00
+verdict_note: 实机核对：小程序项目仅 wygl-wxxcx-dev-slh 一份，pages/home/index/index.vue 仍有 login 调用与 return，全文无 MP-WEIXIN 条件编译、无 41002/appid missing、无 ?code= 拼接逻辑；涉及文件 pages/home/new/index.vue、README.md 不存在。记忆描述的修复在当前代码中无法证实，判无效。
+---
 # uni.login appid缺失报错修复
 非微信端执行 uni.login 报 41002 appid missing，已限制仅在微信小程序端执行。
 ## 问题根因

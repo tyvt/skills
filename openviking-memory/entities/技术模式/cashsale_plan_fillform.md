@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:19:23+08:00
+verdict_note: 苏州V3 CashsalePlanFillForm.vue-361、CashsaleDetail.vue-1042、cashsale/plan/detail.vue-130、openPlanPage 命中，现售填报组件属实。
+---
 # 现售维护页专用填报组件修正编辑态
 在苏州市房地产监测V3中，现售维护页通过引入专用填报组件修正编辑态逻辑。
 

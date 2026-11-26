@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:25:12+08:00
+verdict_note: 苏州市房地产监测V3 命中 bankBranchPrefixUrl(1)、Supervisebank(2)、superviseBank(26)，10个引用文件存在，404修复属实。
+---
 # 银行网点列表路由误判走estate路径致404修复
 苏州市房地产监测V3 的 zhi2-web-admin 中银行网点列表因路由名误判请求 `estate` 路径 404，统一前缀为 `/prefund/bankBranch/`。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:23:52+08:00
+verdict_note: 昆山市民 src 命中 decisionRangeId、getVoteChart、selectDecisionViewById、voteDetail，与「图表失败不阻断详情+回退查询」一致。
+---
 # 决策详情数据加载失败修复
 昆山市民小程序「我的决策-已完成表决-决策详情」页面曾因图表接口失败阻断详情加载，导致字段空白或 NaN，已修复。
 
@@ -16,7 +21,6 @@
 - 代码基线：none
 - 验证证据：extracted source=cursor project=昆山市民
 - 涉及文件：stores/vote.js、votedetail.vue、index.vue、DetailTop.vue 等
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T19:48:21+08:00
+verdict_note: formatPiePercent 仅在记忆归档出现，真实投票详情 js 仍用 data.percent/toFixed，所述自定义函数不存在，无法证明有效。
+---
 - 业主投票详情页（mfap_MfapOwnerVoteDetail.js、mtpl_MtplOwnerVoteDetail.js）饼图百分比应使用自定义 formatPiePercent(value, total, digits=2) 四舍五入保留两位小数，替代依赖 data.percent，避免 ECharts 默认截断导致 69.56% 之类显示误差
 - 修改涉及 tooltip.formatter、label.formatter、label.normal.formatter，去掉 data.percent 依赖
 - 涉及文件：EstateManagement-Park/src/main/webapp/mfap/js/mfap_MfapOwnerVoteDetail.js、EstateManagement-Park/src/main/webapp/mtpl/js/mtpl_MtplOwnerVoteDetail.js；所属项目：0
@@ -5,7 +10,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=0
-
 
 <!-- MEMORY_FIELDS
 {

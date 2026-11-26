@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:46:52+08:00
+verdict_note: ZsButton.vue/AgreementPage.vue 在苏住房C命中，disabled 属性修复描述属实。
+---
 # stockHouseSign倒计时按钮可点击修复
 苏住房C小程序 pages_transaction/stockHouseSign 中 ZsButton 未传递 disabled 导致倒计时期间按钮仍可点击，已修复。
 

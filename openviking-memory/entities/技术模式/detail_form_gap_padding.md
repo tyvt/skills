@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:51:51+08:00
+verdict_note: VALID；--detail-block-gap/detail-form/padding-bottom 在苏州V3真实代码命中。
+---
 # 详情表单中 gap 与 padding 的重叠
 在 Suzhou Real Estate Monitoring V3 项目中，详情表单的垂直间距因 padding-bottom 与 row-gap 的重叠而不均匀。
 
@@ -17,7 +22,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：14ac23b1-f562-46c6-80d9-d8e3b7a96870
-
 
 <!-- MEMORY_FIELDS
 {

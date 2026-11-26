@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:43:34+08:00
+verdict_note: 实机核对：引用文件(8个)存在于对应项目仓；核心符号命中[NodeDetailsDialog,el-row,el-col,zs-dialog,form-box]，与记忆描述一致。
+---
 # 节点弹窗单行单列布局
 苏州市房地产监测V3 的节点弹窗通过让 el-col 成为 zs-form 直接子节点实现单行单列排布。
 

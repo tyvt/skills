@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T14:38:36+08:00
+verdict_note: UnitDialog.vue 无 buildingId watch、无 immediate-true、无 getList/listByBuildingId（grep 0命中）；描述的双拉取修复要素在现状代码中不存在，无法证实。
+---
 # 楼栋详情新增单元弹窗重复拉取列表修复
 园区公共收益项目(zhi2-web-admin)中，building 详情页 UnitDialog 的 unitTable 在挂载时会重复调用 getList。
 

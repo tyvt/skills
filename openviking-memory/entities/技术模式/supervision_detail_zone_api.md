@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T03:33:26+08:00
+verdict_note: supervision/agreement/version/detail.vue-100 `import { listZone } from '@/api/system/zone'`，与改为 @/api/system/zone 与 index.vue 对齐一致。
+---
 # 监管详情区域 API 不匹配
 由于 zhi2-web-admin 中 API 引用未统一，监管区域的下拉框没有值。
 

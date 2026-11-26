@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:17:19+08:00
+verdict_note: 园区物管2.0 store/modules/user.js 有 clearProjectContext 且在 LogOut/FedLogOut 调用，退出清理逻辑属实。
+---
 # 退出登录清理小区业务上下文
 退出登录必须清 localStorage 三键 + Vuex + 组件 local 状态三处小区/项目上下文，否则切换账号残留。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

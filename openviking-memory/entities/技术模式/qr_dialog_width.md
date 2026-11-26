@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:45:11+08:00
+verdict_note: VALID；SuzhouDaoQrLoginDialog.vue 在门户真实代码命中，zs-size 档位致留白说法属实。
+---
 # 苏周到扫码弹窗二维码宽度适配
 苏周到扫码登录弹窗内约240px宽二维码原套用zs-size="mini"(616px)导致两侧留白过大，需改显式像素宽贴合内容。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

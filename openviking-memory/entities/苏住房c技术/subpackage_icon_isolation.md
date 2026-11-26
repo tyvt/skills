@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:20:39+08:00
+verdict_note: 苏住房C源码无pages_owner_extra/ownerCard页面，subpackage切换与图标复制结论无法证实。
+---
 # 分包页面跨包引用图标不显示
 苏住房C 移动端「电子业主卡」页面图标全不显示，根因为微信分包隔离限制，须复制资源到本分包并改 subpackage。
 

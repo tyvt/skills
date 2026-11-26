@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T03:33:09+08:00
+verdict_note: push.py、run_push.bat 在仓库列表中均未定位到(glob/grep 无命中，投资推送项目不在 79 个仓内)，无代码证据支撑 GBK 规避方式，仅会话叙述，无法证明有效。
+---
 # 推送脚本 GBK 编码冲突
 在中文 Windows 默认 GBK 控制台直接运行 `push.py` 时，报告打印含 `✗` 等字符会触发编码错误导致进程在推送前失败。
 

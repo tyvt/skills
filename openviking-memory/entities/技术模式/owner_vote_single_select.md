@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:09:59+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 使用多选表格进行单选时遗留旧 ID
 在项目 EstateManagement-Park (园区物管V0) 中，当使用多选表格进行单选时，旧 ID 会残留在 chooseList 中。
 
@@ -15,7 +20,6 @@
 ## 验证与归属
 - 所属项目：园区物管V0
 - 验证证据：extracted source=cursor project=园区物管V0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:23:33+08:00
+verdict_note: 小程序静态资源分包偏好；house_szf(20)、pages_benefit/pages_owner/pages_vote 目录真实存在，描述一致。
+---
 - 分包静态资源不可跨包访问：静态资源引用须收敛至本分包内或提至公共目录，避免跨包限制导致渲染层 Failed to load 错误。
 - 案例：`DecisionList.vue` 跨包引用 `/pages_vote/static/images/house_szf.png`（实际位于 `pages_owner/static/images/`）致图标加载失败，须修正资源路径至本包。
 - 案例：`pages_benefit` 分包 11 处静态资源跨包访问触发渲染层网络层 Failed to load 错误。

@@ -7,8 +7,8 @@ DSH local plugin that enforces token-cost guardrails and hard-truncates oversize
 - Complements agent-guard (pwsh POSIX pre-check), dsh-cost-meter (interactive merge) and dsh-spill-policy (read/grep/skill big-result governance); targets the biggest waste item from the 2026-11-12 token-cost analysis (pwsh Get-Content on source files flooding the context).
 
 ## Truncation rules (as of 2026-11-10)
-- grep: truncated past 10 files or 20 lines, with a hint appended.
-- read: over 500 lines truncated with an offset/limit or grep hint; skill bodies over 2,500 chars keep only the head plus a truncation note.
+- grep: 2026-11-11 起折叠改为组合条件（文件数≥5 且命中数≥30），返回行号；带 -C/-A/-B 参数时不折叠（旧规则：超过 10 文件或 20 行折叠）。
+- read: over 500 lines truncated with an offset/limit or grep hint; skill bodies over 2,500 chars keep only the head plus a truncation note；2026-11-11 vue 门禁放宽到 500 行。
 - pwsh: npm run lint/build/test errors over 20 lines keep the first 10 and last 5 lines.
 - orchestrate: returns over 1000 chars containing "无法读取"/"示意" are cut to 1000 chars.
 
@@ -33,8 +33,8 @@ DSH local plugin that enforces token-cost guardrails and hard-truncates oversize
 {
   "category": "DSH插件",
   "name": "dsh_token_guard",
-  "source_extraction_id": "bc770cd55b1d44cbbbac2f7efddbb30b",
-  "version": 3,
+  "source_extraction_id": "99c80217e9b04daa9be298ae8ceac4bb",
+  "version": 4,
   "memory_type": "entities"
 }
 -->

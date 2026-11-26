@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-26T19:44:40+08:00
+verdict_note: 产品2.0 complex/detail.vue 引用 StatisticsDialog，组件内 max-height-var(--zs-dialog-viewport-height,88vh)，修复属实（原 suspect 标记按代码证据改判）。
 ---
 # 综合查询弹窗高度过长修复
 产品2.0 物业管理区域备案详情页点击「综合查询」弹窗高度超出视口，已修复。

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T06:34:25+08:00
+verdict_note: complexChange/detail.vue-788 确认存在 contentInfo3，注册 landArea/underFloorArea/totalBuilding/totalHouse 等字段(791-825)，面积带㎡、数量带幢/户后缀。与记忆描述一致，判有效。
+---
 # 物业管理区域变更区域概览变更记录
 淮安物管物业管理区域变更详情中，区域概览字段需注册到变更记录对比的技术修复模式。
 

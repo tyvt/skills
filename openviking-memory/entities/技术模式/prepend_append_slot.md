@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:44:16+08:00
+verdict_note: 实机核对：引用文件(4个)存在于对应项目仓；核心符号命中[StatisticsDialog]，与记忆描述一致。
+---
 # #prepend 与 #append 插槽须同级放置
 多个 vue 文件将 #append/#footer 错误嵌套于 #prepend/form-box 内，需调整插槽同级并将对话框改为 :visible+@update:visible。
 ## 问题根因

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:46:50+08:00
+verdict_note: 惠山二期H5 lingxi.js 命中 ensureLingxiLogin 与 requestCode，token 缓存缺陷属实。
+---
 # 灵锡requestCode令牌缓存导致绑房401缺陷
 惠山二期H5 中因 requestCode-token 缓存逻辑缺陷，导致灵锡绑房回跳时复用过期 token 请求接口报 401。
 

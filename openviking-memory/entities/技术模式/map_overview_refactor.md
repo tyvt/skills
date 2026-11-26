@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:40:13+08:00
+verdict_note: buildRegionByNameMap/loadOverviewStat/mapOverview 在园区物管2.0命中，拆分重构描述与代码一致。
+---
 # mapOverview 详情页精简重构
 园区物管2.0 驾驶舱地图概览页 mapOverview/index.vue 被拆分为多模块，业务逻辑与交互保持不变。
 

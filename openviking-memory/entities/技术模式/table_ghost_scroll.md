@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:50:42+08:00
+verdict_note: VALID；zs-table-column/body-wrapper/overflow-x 在苏州V3真实代码命中。
+---
 # 表格幽灵滚动修复
 苏州市房地产监测V3 中 zs-table 修复列多总宽超出容器时被误判为「幽灵滚动」导致右侧列裁切且无法横向滚动的问题。
 

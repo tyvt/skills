@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:15:53+08:00
+verdict_note: 证书类型必填规则属实：两份 certificatesDialog.vue 第109行均有 message-'证书类型不能为空'，certificateType required 规则在代码中。
+---
 # 证书对话框缺少类型必填验证
 在项目苏州市房地产监测V3中，证书对话框的表单规则未包含`certificateType`的必填验证，导致缺少必填星号且未阻止提交。
 

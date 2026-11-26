@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:45:41+08:00
+verdict_note: tableLayoutFix.js 实测含 refreshBase/doLayout，zs-table.vue 冗余清理描述属实。
+---
 # zs-table 冗余代码清理
 产品2.0 的 zhi2-web-admin 清理 zs-table 与 tableLayoutFix 两处冗余，功能逻辑不变。
 

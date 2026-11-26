@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T19:19:32+08:00
+verdict_note: 园区物管2.0 pubElevMaintenanceNew/detail.vue 与 OperationBtnGroup 均存在，渲染报错修复所在文件属实。
+---
 # OperationBtnGroup渲染报错修复
 园区物管2.0 的 pubElevMaintenanceNew 页面因 OperationBtnGroup 缺少必要属性且 businessName 误用导致读取 undefined 的 bug 与修复。
 
@@ -18,7 +22,6 @@
 - 验证：问题已修复，会话 99b102a3 给出修改内容
 - 涉及文件：pubElevMaintenanceNew/index.vue、components/expendTable.vue、pubElevMaintenance/detail.vue 等
 - 所属项目：园区物管2.0；来源会话：99b102a3-dcff-4e89-a5a6-982a16f73b88；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

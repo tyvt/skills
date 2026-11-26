@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:20:28+08:00
+verdict_note: 属实：fund/cn_broad_signal.py 引用 make_drawdown_from_high_criterion 与 effective_drawdown_threshold，与近252日高点回撤对齐方案一致。
+---
 # 红利report近252日高点回撤对齐
 分红指数报告 build_dividend_signal_eval 须与 is_buy_signal() 一致的「近252日高点回撤」条件，避免达标项计数与回测硬门槛不一致。
 

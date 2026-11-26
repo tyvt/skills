@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T10:35:29+08:00
+verdict_note: 苏住房G RegionTreeLayout 含 syncListContainerHeight/scheduleContainerHeightSync；zs-table.vue 有 getFillHeightFromContainerBounds 且无 gapBelowContainer。
+---
 # 物业管理区域页面高度计算修复
 苏住房G项目修复了物业管理区域页面在奇安信可信浏览器中因高度计算错误导致表格仅显示约4行的问题。
 

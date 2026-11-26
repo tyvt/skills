@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:50:40+08:00
+verdict_note: app.js/index.js 与 build/dist/validate 命中，苏住房C 小程序+H5双执行环境描述属实。
+---
 # 苏住房C双执行环境
 苏住房C主业务仓库 zhi2-mobile-shimin 同时存在小程序与 H5 两条构建/运行链，共用同一套 src 源码与工具函数。
 

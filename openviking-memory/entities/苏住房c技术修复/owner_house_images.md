@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:40:17+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src/utils/index.js 命中 resolveStaticUrl，图片走分包静态解析的修复属实。
+---
 # 我的房屋列表图片真机不显示修复
 苏住房C小程序「我的房屋」「添加房屋」页面图片在真机上不显示，根因为分包 static 目录错位。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:21:15+08:00
+verdict_note: 抽检2026-11-26 第三轮 refund_interest_dialog.md 叙述/路径合理
+---
 # 退款利息计算弹窗改造
 退款利息计算弹窗已按新设计改造，计算与确认拆分为两个独立步骤，结果表格展示多列信息。
 

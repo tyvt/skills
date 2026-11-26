@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:28:18+08:00
+verdict_note: 命中 useBack(6)、composables(40)、TypeScript(25)，2个引用文件存在，uni-app 返回兜底属实。
+---
 # uni-app 刷新后返回按钮失效兜底
 刷新后页面栈被重建为 1 层，navigateBack 静默失败，需用栈深分支到 reLaunch 兜底。
 

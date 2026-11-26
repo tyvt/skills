@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:40:00+08:00
+verdict_note: 工作流/偏好类记忆，无单一代码修复点；所述文件(exception commit/status 约定)与 AGENTS.md 及仓库现状一致，未发现幻觉或隐私违规。
+---
 # 提交前排除他人未提交改动
 共享工作区提交前需识别并排除别人进行中的未提交改动，只在交付里逐条列出被排除文件。
 

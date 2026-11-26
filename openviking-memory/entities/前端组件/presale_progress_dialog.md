@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:10:04+08:00
+verdict_note: 苏州市房地产监测V3 中 PresaleProgressDialog.vue 命中 snapshotFiles；downloadServerAssetFile、组件文件均存在。
+---
 # PresaleProgressDialog.vue
 预售许可申请中“工程形象进度查看”弹窗组件，位于 zhi2-web-admin/src/views/presale/permit/components/。
 
@@ -13,7 +18,6 @@
 ## 关联
 - 所属项目：苏州市房地产监测V3（szfc-v3）
 - 相关Bug：禅道6297（2026-11-06修复）
-
 
 <!-- MEMORY_FIELDS
 {

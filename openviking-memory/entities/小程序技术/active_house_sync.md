@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:20:57+08:00
+verdict_note: 小程序 utils/portal-user.js-9 定义 PAGE_PORTAL_ACTIVE_SELECTION_KEY='__ew_portal_active_house__'，跨Tab选择存储属实。
+---
 # 跨Tab小区选择同步方案
 首页与「我的」Tab 切换时小区选择须保持一致，通过独立存储用户选择避免被刷新覆盖。
 

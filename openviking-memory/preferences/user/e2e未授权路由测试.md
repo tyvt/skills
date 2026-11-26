@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:24:46+08:00
+verdict_note: E2E未授权路由test.skip为泛化偏好，无具体项目代码证据可核对，无法证明有效。
+---
 - E2E 用例对未授权路由应使用 `test.skip` 避免 CI 误报。
 - 全局排查表格底部空白时仅机构注销 `list-card` 间距断言通过，价格备案详情因账号未授权菜单跳过，车位合同失败与改动无关。
 

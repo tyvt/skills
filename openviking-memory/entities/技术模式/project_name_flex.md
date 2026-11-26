@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:44:39+08:00
+verdict_note: 实机核对 苏州市房地产监测V3 仓库确认关键符号(23/27)存在：${name}（${short}）、InformationPush、ProjectNameDialog、agreement、components；文件与描述一致，记忆有效。
+---
 # 监管项目名称的 flex 布局
 在项目 苏州市房地产监测V3 中，监管 jgxm 的 `detail.vue` 使用 flex 来对齐主名称和楼栋号，并且查看状态拼接全角括号。
 

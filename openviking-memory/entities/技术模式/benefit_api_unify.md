@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:47:32+08:00
+verdict_note: i淮安公版 benefit.js 存在，均为 export function + api.get({params})，无 async/options/http.get，与统一格式一致。
+---
 # 小区公告 benefit.js 接口格式统一
 i淮安公版项目将 benefit.js 中标出的 4 个接口统一为与其他接口一致的调用格式。
 

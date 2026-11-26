@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:40:46+08:00
+verdict_note: 产品2.0 facilityTable.vue 命中 dataProperty，路由前缀 moduleName 同步修复属实。
+---
 # 接口路由改 dataProperty 须同步 moduleName
 接口 URL 由 `/maintenance/` 变更为 `/dataProperty/` 后，原 `moduleName: 'maintenance'` 未同步会导致请求路径错误，须全局改 moduleName。
 

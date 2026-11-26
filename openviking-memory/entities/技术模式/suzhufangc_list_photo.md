@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:49:28+08:00
+verdict_note: 苏住房C与产品2.0命中 complexPhoto/resolveMediaUrl/DecisionList, 图片三件套属实
+---
 # 苏住房C 列表绑定后端 complexPhoto 字段三件套
 苏住房C 列表展示后端相对路径图片字段 complexPhoto 需用 ZsImage 解析、rows.map 显式保留、无图回退占位图。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

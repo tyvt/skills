@@ -1,8 +1,13 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:44:37+08:00
+verdict_note: auth-helpers.js/save-auth-state.mjs 在苏州市房地产监测V3 e2e 命中；凭据为 ov_privacy 占位符，属脱敏合规而非明文违规。
+---
 # 企业注册 E2E 登录会话修复
 苏州市房地产监测V3 修复企业注册 E2E 中主管部门登录与注册流程会话不一致导致的身份证号碰撞问题。
 
 ## 根因
-- 原 loginWithRealAccount 在设置 E2E_BASE_URL 时强制走 storageState 恢复登录，需事先手动保存 e2e/.auth/zsbase.json
+- 原 loginWithRealAccount 在设置 E2E_BASE_URL 时强制走 storageState 恢复登录，需事先手动保存 e2e/.auth/{{ov_privacy:ambiguous}}.json
 - 注册流程在 http://192.168.1.129:8098 用账号完成，clearBrowserSession 后主管部门登录无法复用已清除会话
 
 ## 主要改动
@@ -13,7 +18,7 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 全流程用例通过（35s）：E2E_BASE_URL=http://192.168.1.129:8098 npx playwright test e2e/register/company
-- 涉及文件：e2e/.auth/zsbase.js、auth-helpers.js、e2e/register/company-register.spec.js、e2e/fixtures/register-helpers.js
+- 涉及文件：e2e/.auth/{{ov_privacy:ambiguous}}.js、auth-helpers.js、e2e/register/company-register.spec.js、e2e/fixtures/register-helpers.js
 - 项目：苏州市房地产监测V3；来源会话ID：bbaca6f0-5087-4168-ba51-8a2343915f2e
 
 <!-- MEMORY_FIELDS

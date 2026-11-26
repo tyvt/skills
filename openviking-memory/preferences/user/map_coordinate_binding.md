@@ -1,11 +1,14 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T23:17:38+08:00
+verdict_note: 命中 xcoor/ycoor、lat/lng 绑定 form.xcoor/form.ycoor，地图坐标绑定修复属实
+---
 - 项目坐标约定：`xcoor` 实际存储纬度，`ycoor` 存储经度（例如 `xcoor: 33.44`、`ycoor: 119.78`）。
 - 地图组件绑定应为 `:lat="form.xcoor"`、`:lng="form.ycoor"`、`:address="form.address"`。
 - 移除无效的 `:xcoor`/`:ycoor` 属性，统一改为 `:lat`/`:lng`，并统一引用 `projectinfo` 组件。
 - 修复文件：`customerProjectinfo/BaseProjectForm.vue`、`customerProjectinfo/changeDetail.vue`（改用 `:lat`/`:lng` 并统一引用）、`propertyProject/detail.vue`、`propertychange/detail.vue`（补充 `:address`/`:lat`/`:lng`）、`buildland/detail.vue`（补充 `:address`）。
 - 外部传入经纬度和坐落时，打开地图应默认定位到对应位置。
 - 适用于兴化物管 zhi1-web-admin 项目。
-
 
 <!-- MEMORY_FIELDS
 {

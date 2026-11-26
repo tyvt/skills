@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:45:48+08:00
+verdict_note: secureIdNumber/secureUsername/blurIdNumber 命中。
+---
 # 苏住房C 统一脱敏规则
 苏住房C 已统一全项目脱敏规则，并在用户 Store 中以 getter 实时计算脱敏值，避免旧缓存导致规则不生效。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T19:48:10+08:00
+verdict_note: 所述 D-/repository/苏找房WEB/public/assets/js/house_data.js 在苏找房web/G端均不存在，无代码证据，无法证明有效。
+---
 # 苏找房WEB house_data.js 的 id 重排
 已按数据顺序把 `public/assets/js/house_data.js` 的 `id` 全部重排为连续 1–73，修复跳号。
 

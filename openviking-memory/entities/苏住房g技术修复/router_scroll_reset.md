@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:15:26+08:00
+verdict_note: router/index.js 命中 scrollBehavior，AppMain #app-main 滚动容器命中，afterEach 重置滚动位置修复属实。
+---
 # 路由切换重置主内容区滚动位置（苏住房G）
 苏住房G 已全局修复从详情页进入其他页面时主内容区滚动位置残留的问题。
 

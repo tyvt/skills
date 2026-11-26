@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:16:45+08:00
+verdict_note: 门户命中 card-body，card-body 上 padding 选择器覆盖修复属实。
+---
 # 门户首页 card-body 上 padding 被更具体选择器覆盖
 门户 index-new.vue 只改基础 .card-body 的 padding 常不生效，业务中心、常用功能、待办/公告等子区块用更具体选择器与 !important 把 padding 设回。
 

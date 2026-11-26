@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:43:01+08:00
+verdict_note: 实机核对：引用文件(8个)存在于对应项目仓；核心符号命中[AppMain,DetailTemplate]，与记忆描述一致。
+---
 # 详情查看态去必填星号须改DetailTemplate
 从多个详情页的 DetailTemplate 数据中移除 required: true 以消除查看态必填星号，校验规则不变。
 

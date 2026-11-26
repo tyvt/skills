@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:28:07+08:00
+verdict_note: 无锡市区小程序嵌入H5 命中 resolveFilePreviewUrl(2)，3个引用文件存在，相对路径预览属实。
+---
 # H5文件预览相对路径解析
 无锡市区小程序嵌入H5的文件预览 filePreview 与 ZsImage 一致，后端根路径转 ./ 相对地址走当前域与 Vite 代理。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:39:36+08:00
+verdict_note: portal-link/portal.scss/BrokerPages 在门户仓库命中，链接加粗样式描述与代码一致。
+---
 # 门户首页二级页面表格链接加粗与测试失败归属
 首页二级页面表格点击链接需统一加粗（部分已实现），Playwright 失败为既有问题，与 `portal.scss` 改动无关。
 

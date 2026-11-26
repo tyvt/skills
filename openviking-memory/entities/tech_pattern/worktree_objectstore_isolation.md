@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:22:50+08:00
+verdict_note: 通用 git 原理记忆：嵌套 worktree 的 submodule 拥有独立 object store 属实且描述自洽；无项目文件锚点，但属原理性记忆且无反证。
+---
 # Worktree Submodule Object Store Isolation
 A nested submodule worktree inside a parent repo worktree keeps its own independent object store, so commits fetched into the main submodule are invisible to it.
 

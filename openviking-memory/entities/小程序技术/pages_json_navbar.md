@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:46:40+08:00
+verdict_note: 多个 pages.json 命中 navigationBarBackgroundColor+navigationBarTextStyle，单页导航栏配置属实。
+---
 # pages.json 可为单页单独设置导航栏白底黑字
 uni-app 小程序在 pages.json 的 style 中可为单个页面单独设置导航栏样式，无需全局改 navigationStyle。
 

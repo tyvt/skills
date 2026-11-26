@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:18:11+08:00
+verdict_note: 命中 landArea、DetailTemplate、getAmountDisplay、propertyContract/detail，带单位字段规范属实
+---
 # 产品2.0 查看态带单位数值字段规范
 查看态模板字符串手拼单位会让 undefined 变成「undefined㎡」，数值字段必须走 type:'amount' + unit。
 

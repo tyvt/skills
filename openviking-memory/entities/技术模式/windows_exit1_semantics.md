@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:15:13+08:00
+verdict_note: 运维约定记忆：苏住房G docs/flood/delivery-2026-10-29.md 与 vite.config.js 实存，exit 1 终止语义判定规则与既有交付文档一致。
+---
 # Windows 后台进程 exit 1 语义
 Windows 上被终止的 dev server 也会以裸 exit 1 结束，判定失败必须看日志而非退出码。
 
@@ -16,7 +21,6 @@ Windows 上被终止的 dev server 也会以裸 exit 1 结束，判定失败必�
 ## 验证与归属
 - 来源会话 session-42ca405e-529e-4af3-98b5-81e2b92083de（基线 6156653）最终结论附注
 - 涉及文件：zhi2-web-admin/vite.config.js、docs/flood/delivery-2026-10-29.md
-
 
 <!-- MEMORY_FIELDS
 {

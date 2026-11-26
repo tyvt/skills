@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:43:15+08:00
+verdict_note: zhi2-web-admin parkingSpaceContractFiling/detail.vue 存在 parkingChargeStandardId prop 及『收费标准名称不能为空』必填规则，属实。
+---
 # 停车泊位租赁合同必填星号修复
 停车泊位租赁管理详情页「收费标准名称」必填星号缺失问题已修复。
 

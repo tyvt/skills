@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:19:49+08:00
+verdict_note: 园区物管2.0 AddDialog.vue 实机含 zs-like-select 与 companyId，三态回填修复属实。
+---
 # 可手输选择组件三态回填
 园区物管2.0 中 zs-like-select 等 allow-custom 选择组件回填表单需分三态处理，缺 companyId 不等于空值。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

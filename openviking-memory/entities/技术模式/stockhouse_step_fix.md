@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:14:49+08:00
+verdict_note: 苏住房C/zhi2-mobile-shimin 实机存在 stockHouseSign/apply.vue 与 steps.vue，步骤条修复文件属实。
+---
 # 步骤条缺w-full与flex:1致收缩重叠
 苏住房C 移动端 `stockHouseSign/apply.vue` 根容器 `items-center` 使步骤条 flex 子项收缩，`steps.vue` 未均分宽度。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:44:29+08:00
+verdict_note: 无锡H5 contracts.vue 实测含 showAttachments，模板 v-if 与条件 getList 命中，附件临时隐藏套路属实。
+---
 # 详情页临时下线一块 UI 套路
 无锡 H5 中需暂时隐藏某块 UI 但保留一键恢复能力时，采用布尔开关 + 模板 v-if + 逻辑层跳过对应接口的组合套路。
 

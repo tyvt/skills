@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T04:32:23+08:00
+verdict_note: fund/setup_task.bat 实机核对：/tn %TASK_NAME% 未加引号、schtasks /create 无 /tz、用 tzutil 校验 China Standard Time、任务名含中文，与记忆一致。
+---
 # Windows 计划任务中文名创建
 在部分 Windows 上用 `schtasks /Create` 创建中文计划任务时，需禁用 `/tz` 且 `/tn` 勿加引号。
 

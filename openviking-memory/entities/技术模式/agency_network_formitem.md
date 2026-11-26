@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:51:03+08:00
+verdict_note: 苏州市房地产监测V3 含 AgencyEntryNetworkSections.vue 与 AgencyEntryNetworkAdminDetail.vue，el-form-item 修复对象属实。
+---
 # 经纪机构入驻网络详情页 el-form-item 缺 el-form 祖先报错
 苏州市房地产监测V3 中 `companyManagement/components/AgencyEntryNetworkSections.vue` 直接使用 `<el-form-item>` 但整棵组件树无 `<el-form>` 祖先，导致查看页必现 Vue warn 报错。
 

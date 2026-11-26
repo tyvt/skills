@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:43:01+08:00
+verdict_note: 小程序 wygl-wxxcx-dev-slh home.vue/externalWebview.vue 含 mergeCtUserIdentityHouseIntoPortalUser、ensureHouseSelected、clearPortalHouseFields。
+---
 # 体验版房屋首页不可见修复
 体验版（ctUserIdentity）识别到的房屋在「我的」页可见，但首页菜单仍弹「请先添加房屋」。
 ## 问题根因

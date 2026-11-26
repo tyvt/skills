@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T15:45:37+08:00
+verdict_note: 产品2.0源码：zs-table-column组件存在(2720)，dict-url/dictUrl命中zs-table-column.vue-268，buildType/building_type(30)。prop驼峰转下划线推导字典名、dict-url不读取的描述有组件佐证。
+---
 # zs-table-column 字典列推导与 dict-url 写法问题
 产品2.0 中 zs-table-column 的 dict-url kebab 写法不被读取，且 prop 驼峰会自动转下划线推导字典名，导致字典列显示原始码值。
 
@@ -20,7 +24,6 @@
 ## 涉及与来源
 - 涉及文件：zs-table-column.vue、BuildRecordTable.vue、dict.js；所属项目：产品2.0
 - 来源会话：ee495a83；代码基线：62d5fb9
-
 
 <!-- MEMORY_FIELDS
 {

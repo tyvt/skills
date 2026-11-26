@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:12:05+08:00
+verdict_note: 园区物管2.0 命中 detailMixins(352)、ownerCommitteeWorker，角色显示修复属实。
+---
 # 组织工作人员角色保存后显示错误修复
 园区公共收益项目中，修改角色为物管会保存后显示角色为社区，因 roleName 未同步更新。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区公共收益
-
 
 <!-- MEMORY_FIELDS
 {

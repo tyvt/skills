@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:41:12+08:00
+verdict_note: complexServiceDetailDialog/content-container/contentType 在产品2.0命中，占位符误作文本修复属实。
+---
 # 服务内容弹窗占位符误作文本修复
 complexServiceDetailDialog.vue 中 contentType 严格判断不兼容数字类型，且 [x] 占位符作文本致固定与可编辑项挤入同一输入框，已修复。
 

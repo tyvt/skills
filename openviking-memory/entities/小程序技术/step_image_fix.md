@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:43:55+08:00
+verdict_note: 泰兴小程序 add.vue 命中 step-form-uploader/step-form-block，图片显示修复属实。
+---
 # 新增巡检步骤弹窗图片显示修复
 泰兴小程序新增巡检步骤弹窗中巡检图片不显示的问题已修复，改动集中在 src/staff/pages_facility/record/add.vue。
 

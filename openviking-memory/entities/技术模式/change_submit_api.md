@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:15:01+08:00
+verdict_note: companyRecord.js 有 submitCompanyRecordChangeByLogin(submitApi=默认硬编码) 及 e2e master-data submitApi 字段，与记忆一致。
+---
 # 备案变更提交URL硬编码或走菜单配置
 companyRecordChange 提交 API 在 companyRecord.js 硬编码或由详情页自定义按钮触发，通用流程走菜单 route.meta.submitApi 拼接 /{module}/{business}/submit。
 

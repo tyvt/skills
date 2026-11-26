@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:43:29+08:00
+verdict_note: 实机核对 苏住房C 仓库确认关键符号(19/24)存在：??、ASCII、Header、base64、bizContent；文件与描述一致，记忆有效。
+---
 # 网关 zs-param 请求头中文变 ?? 统一改 base64 编码
 苏住房C（zhi2-mobile-shimin）经 gateway.js 发请求时业务参数放自定义头 `zs-param`，带中文后端收到全变 `??`，需在 gateway.js 收口 base64 编码。
 

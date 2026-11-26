@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:18:14+08:00
+verdict_note: 与现状不符：README 明确“标签列不再统一写死 162px，改为按列最长标签定宽”，RentalDetailDialog 用 --rental-label-width 变量，162px 固定宽度已不存在。
+---
 # 基本信息弹窗字段标签定宽162px值左对齐
 门户 publicPortal 首页基本信息弹窗（人员信息、信用记录、公司/预售许可/房屋详情等）两列布局约定：标签列固定宽度 162px，字段值统一左对齐。
 

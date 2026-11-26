@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:43:56+08:00
+verdict_note: VALID；RepairPanel/donutOption 环形图 option 在苏住房G真实代码命中，标签截断修复说法属实。
+---
 # ECharts 环形图外侧标签截断
 home/v2 首页「报事报修→当月数据」环形图外侧标签被截成「...」，同页公共收益饼图显示正常。
 

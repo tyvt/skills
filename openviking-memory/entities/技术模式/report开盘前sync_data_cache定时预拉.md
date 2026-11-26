@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:23:14+08:00
+verdict_note: fund 仓存在 sync_data_cache.py、setup_sync_task.bat 且含 09-30 与「投资信号数据预拉取」，与定时预拉约定一致。
+---
 # report开盘前sync_data_cache定时预拉
 report 耗时主要来自外部行情/指标接口；优化方向是磁盘缓存 + 开盘前批量预拉。
 

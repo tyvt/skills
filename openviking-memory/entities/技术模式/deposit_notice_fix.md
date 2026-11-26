@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T12:32:59+08:00
+verdict_note: 实机核对 zhi2-web-admin/.../deposit/notice/index.vue-189-221 确有 extractListData/extractTotal/normalizeNoticeRow，字段映射 noticeNo→payNoticeNo、projectName→regulatorProjectName、houseNo→roomNo、buildingNo→policeNo/constructionNo、noticeId→id 兜底，与记忆一致。
+---
 # 定金缴款列表空白修复
 苏州市房地产监测V3 修复定金缴款列表有数据但不显示的问题，兼容接口返回结构并映射字段。
 

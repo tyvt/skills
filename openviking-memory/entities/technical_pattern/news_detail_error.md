@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:44:59+08:00
+verdict_note: VALID；goNewsDetail(Home_Suzhufang.vue) 与 menuRouteMap 在苏住房C真实代码命中。
+---
 # news detail migrated to subpackage but homepage jumps old path
 News detail page moved to `pages_main/news/detail` subpackage, but `Home_Suzhufang.vue`'s `goNewsDetail` still navigated to undefined `/pages/news/detail` in `pages.json`, causing MiniProgramError.
 
@@ -19,7 +24,6 @@ News detail page moved to `pages_main/news/detail` subpackage, but `Home_Suzhufa
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：29317b48-dcb1-481b-a230-4459674df2a0
-
 
 <!-- MEMORY_FIELDS
 {

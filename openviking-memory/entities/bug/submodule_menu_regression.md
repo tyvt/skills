@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-26T08:33:09+08:00
+verdict_note: 榆林G git 核实：47984b5 存在且 message 为 Merge remote-tracking branch 'yulin-target/develop/v2.6.2-yulin' into develop/v2.6.2-yulin，与记忆一致；git log 另有 994c976 'update submodule zhi2-web-admin to latest commit a8203a6' 与 afb95da '修复合并冲突导致子模块回退，恢复菜单导航布局'，印证选错版本致导航回退。
 ---
 # 子模块菜单导航回退问题
 合并 zhi2-web-admin 子模块时选错旧提交，导致菜单导航功能回退。

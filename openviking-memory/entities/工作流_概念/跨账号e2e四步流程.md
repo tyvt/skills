@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:50:19+08:00
+verdict_note: 产品2.0 e2e/fixtures/auth-helpers.js 实测含 loginAsAdmin/loginAsCompany，四步串行流程属实。
+---
 # 产品2.0 跨账号 E2E 四步串行流程
 针对必须两端角色才能闭环的功能（如企业变更备案），单角色用例只能覆盖一半，须把同一 spec 写成默认串行的 4 步，用账号切换走完真实操作链。
 

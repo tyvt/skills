@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:26:57+08:00
+verdict_note: SignBoard.vue 在多个H5仓存在，惠山小程序版命中 canvasToTempFilePath(1)；api/file.ts 薄封装存在，根因分析无矛盾。
+---
 # SignBoard塞File入files致上传失败
 src/api/file.ts 薄封装逻辑正确，失败根因在 SignBoard.vue 将 File 对象塞入 uni.uploadFile 的 files 致后端收不到二进制返回 502。
 

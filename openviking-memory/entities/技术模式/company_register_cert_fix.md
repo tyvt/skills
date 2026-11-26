@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:20:52+08:00
+verdict_note: 苏州市房地产监测V3 e2e 命中 pickSelectOption(8)、registered_record_dept(5)、document_type(1156)，股东弹窗证件类型 E2E 修复有据。
+---
 # 企业注册股东弹窗证件类型修复
 产品2.0 的 zhi2-web-admin 企业注册 E2E 全流程中，修复了股东弹窗证件类型选择失败的问题。
 

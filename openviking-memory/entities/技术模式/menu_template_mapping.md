@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:45:00+08:00
+verdict_note: 实机核对：引用文件(8个)存在于对应项目仓；核心符号命中[MtplOwnerVotePrintService,busiCode,DepositMarginPrintService,ExportPdfModelByWordServiceImpl,MtplMoneySharePubListServiceImpl]，与记忆描述一致。
+---
 # 模板文件菜单对应清单
 园区V0 项目的 Markdown 文件，记录菜单与模板文件的对照关系及 busiCode 规则。
 

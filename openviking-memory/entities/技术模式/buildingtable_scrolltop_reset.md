@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:16:34+08:00
+verdict_note: 园区公共收益命中 BuildingTableViewTabs 与 resetListScroll、onListPagination，翻页重置滚动位置属实。
+---
 # Reset scrollTop on pagination to fix blank list in room dialog
 In the 园区公共收益 (zhi2-web-admin) project, BuildingTableViewTabs.vue kept a stale scrollTop at the old page bottom after pagination, leaving the new page blank.
 
@@ -18,7 +23,6 @@ In the 园区公共收益 (zhi2-web-admin) project, BuildingTableViewTabs.vue ke
 - 所属项目：园区公共收益
 - 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：491750ff-24a5-4f32-af45-003b31a62769
-
 
 <!-- MEMORY_FIELDS
 {

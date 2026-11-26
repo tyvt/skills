@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:22:59+08:00
+verdict_note: 真实代码命中 isNavigableDataId(29)、pubBankAccountInfo(27)、userStatistics(4)，2个引用文件存在，链接详情对齐属实。
+---
 # 列表 link 跳详情三处对齐
 为统计/列表列添加 zs-table-column link 跳转时，除引入 getRouterPathByFilePath 外还需核对主键回退、路由语义与权限合法性三处，否则列可点但报参数异常或 404。
 

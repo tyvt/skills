@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T13:34:52+08:00
+verdict_note: 苏住房C Project_Suzhufang.vue-39图标导航仍用scroll-view+onNavScroll+nav-dots；swiper(14)仅banner轮播；CSS-352 calc(100vw-44px)、359 calc((100vw-76px)/5)，与记忆所述swiper+calc((100%-32px)/5)不符。
+---
 # 苏找房页图标导航分页滑动修复
 苏住房C小程序苏找房页顶部图标导航分页滑动UI问题已修复。
 

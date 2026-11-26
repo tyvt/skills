@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:26:14+08:00
+verdict_note: 园区公共收益命中 handleIfSettlementChange(11)，2个引用文件存在，条件必填规则属实。
+---
 # 联动显隐字段条件必填规则
 开户等表单中「是否结息」为是时才展示并校验「结息类型」，应使用 rules.required 表达式而非自定义 validator。
 

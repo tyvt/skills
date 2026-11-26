@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:13:25+08:00
+verdict_note: 园区物管2.0 overviewContent.vue 实机含 tabs-wrap、calc(100% - 64px)、overflow-y-auto、sticky，多层 overflow 互锁修复属实。
+---
 # overviewContent多层overflow互锁致内容被遮
 园区物管2.0 overviewContent.vue 因多层 overflow 互锁，导致抽屉内容被遮住且无法滚动。
 

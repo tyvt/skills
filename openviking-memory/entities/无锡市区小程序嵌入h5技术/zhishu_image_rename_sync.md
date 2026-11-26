@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:17:04+08:00
+verdict_note: 确认zhishuAsset.js、externalWebview.vue及8个落点文件，中文图片改名英文须同步代码引用的约定与项目一致。
+---
 # 中文图片改名英文须同步代码引用
 无锡市区小程序嵌入 H5 的 static/images/zhishu/ 与 home-menu/ 中文图片重命名为英文时，代码引用与 dist 构建须同步更新。
 

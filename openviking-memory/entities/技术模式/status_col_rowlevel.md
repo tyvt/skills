@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T11:33:45+08:00
+verdict_note: 实机核对苏住房G regionBankAuth/index.vue-119-143，enableStatus列按nodeContext.level分流：district用switch、city/street用dict(dictUrl-is_enable)，两形态共用字典来源，与记忆描述一致。
+---
 # 同列按行层级切换字典与开关渲染
 苏住房G项目机构银行权限列表「启用状态」列需市级行显示字典文字、区级行显示可操作开关，同列按行运行时分流。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:53:57+08:00
+verdict_note: 产品2.0命中 pubPaymentNotice/pubManualBookkeeping/showSummary/bookDetailTable, 白色块修复属实
+---
 # 支付中的白色块遮挡与缺少居中汇总
 zhi2-web-admin 项目中 pubPaymentNotice 和 pubManualBookkeeping 的 UI 异常技术模式卡片。
 
@@ -19,7 +24,6 @@ zhi2-web-admin 项目中 pubPaymentNotice 和 pubManualBookkeeping 的 UI 异常
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：5ec6511f-7bd3-4005-a984-83b775525513
-
 
 <!-- MEMORY_FIELDS
 {

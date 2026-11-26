@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:42:23+08:00
+verdict_note: 真实代码中存在 serachPoi（苏住房C newHouse/detail.vue）、onCategoryChange、clearBefore（无锡市区 facility/index.vue），加载态约定有据。
+---
 - When switching list categories, in `onCategoryChange` first clear the list data (e.g. `facilityList`) then set `listLoading=true`; write the list back after the request finishes to avoid flashing old data.
 - When `listLoading` is true, render only the loading component (e.g. `<uni-load-more status="loading" />`) instead of the list content.
 - On first `onLoad`, call the data request (e.g. `serachPoi(..., { clearBefore: false })`) also through the loading state to avoid a blank screen.

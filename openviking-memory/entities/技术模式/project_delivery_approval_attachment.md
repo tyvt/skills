@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:40:52+08:00
+verdict_note: projectDeliveryConstants.js-188/209/244/262 确认三个审批附件helper及normalizeProjectDeliveryDetail归一化，ProjectDeliveryApprovalDialog.vue 含『审批附件』FileUpload，改造属实。
+---
 # 交付备案审批附件接口改造
 苏州市房地产监测V3 项目交付备案 detail/approval 接口变更已按计划完成对接。
 ## 变更内容
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

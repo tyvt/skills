@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:53:12+08:00
+verdict_note: 产品2.0命中 noBizState/openCompanySelect/setCompany/listNoScopeWithCode, 属实
+---
 # zs-select-dialog 默认强制 bizState 与回填机制
 注册类免过滤接口必须显式 :noBizState="true"，且弹窗必须绑 @setData 回填。
 

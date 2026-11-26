@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:16:01+08:00
+verdict_note: 命中 InstitutionUploadItem、action=#、http-request、uploadInstitutionAppendix，el-upload 告警修复属实
+---
 # el-upload必填action未传致Vue警告
 苏州市房地产监测V3 的 InstitutionUploadItem 中 el-upload 仅用 :http-request 未传必填 action，触发 Vue 警告，补充 action="#" 修复。
 

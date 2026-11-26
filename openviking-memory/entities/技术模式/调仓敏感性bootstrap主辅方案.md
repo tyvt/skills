@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T01:52:27+08:00
+verdict_note: D-/repository 无「投资推送」项目目录、output/robustness 无法核对；该方案记忆缺乏现状证据，无法证明有效。
+---
 # 调仓敏感性Bootstrap主辅方案
 投资推送项目中检验调仓时点与收益稳健性的 Bootstrap 主辅方案规则。
 

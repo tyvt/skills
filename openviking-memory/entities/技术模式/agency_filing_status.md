@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:41:26+08:00
+verdict_note: shouldShowApplyConditionMet 在 agencyApplyOverview.js 命中，AgencyBasicInfoDetail/getCompanyApplyOverview 均在苏州市房地产监测V3命中。
+---
 # 经纪机构详情页缺失备案状态与条件
 苏州市房地产监测V3 中经纪机构B端详情页未展示备案状态与条件，未对齐列表页 overview 规则，已修复。
 

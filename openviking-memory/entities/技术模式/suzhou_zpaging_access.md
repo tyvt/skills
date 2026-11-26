@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:45:26+08:00
+verdict_note: 苏住房C vite.config.ts 含 z-paging alias+resolve，components/Project_Suzhufang.vue 显式 import ZPaging，接入方式属实。
+---
 # 苏住房C的z-paging接入方式
 苏住房C项目通过 vite.config.ts 的 alias 与 Project_Suzhufang.vue 中的显式 import 接入 z-paging。
 

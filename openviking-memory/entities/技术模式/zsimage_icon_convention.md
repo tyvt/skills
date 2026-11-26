@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:43:57+08:00
+verdict_note: 苏住房C源码：ZsImage(681)、icon-checked命中addTypeChoose.vue-16、publishHouse(63)、warn.png(10)；tags即所述文件。图标须用ZsImage及路径修正描述与现状一致。
+---
 # 项目 ZsImage 图标约定
 图标必须使用 `ZsImage`，否则构建失败。
 ## 问题根因
@@ -15,7 +20,6 @@
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：4f2dff10-9967-4330-9845-304bfa354448
-
 
 <!-- MEMORY_FIELDS
 {

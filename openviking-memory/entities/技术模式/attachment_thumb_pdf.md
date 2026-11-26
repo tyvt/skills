@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:22:06+08:00
+verdict_note: V3实见detailAttachmentDisplay.js被detail-template.vue引用、ParcelDialog用92vh，附件缩略图工具链属实。
+---
 # 证书弹窗与附件缩略图显示修复
 苏州市房地产监测V3 项目修复证书查看弹窗空白过大问题，并实现附件按类型显示缩略图（PDF 用固定占位图）。
 

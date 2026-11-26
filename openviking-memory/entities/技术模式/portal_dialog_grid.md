@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:18:23+08:00
+verdict_note: 门户仓命中 RentalDetailDialog.vue、portal.scss，公示弹窗网格修复属实
+---
 # 公示详情弹窗网格标签竖排修复
 publicPortal 租赁/开业类详情弹窗在 CSS Grid 双列布局中沿用「标签固定约150px + 值区flex」行内结构，半列宽度不足导致长文本逐字竖排。
 

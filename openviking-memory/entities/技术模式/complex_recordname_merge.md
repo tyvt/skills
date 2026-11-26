@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:16:49+08:00
+verdict_note: 园区公共收益 zhi2-web-admin 多 complex/detail.vue 命中 recordName 与 complexChange，字段合并属实。
+---
 # 物业管理区域名称与备案名称合并为 recordName
 园区公共收益项目(zhi2-web-admin)中，complex 系列详情页将「备案名称」与「物业管理区域名称」合并展示为 recordName。
 

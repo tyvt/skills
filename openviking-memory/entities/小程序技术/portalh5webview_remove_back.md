@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:14:06+08:00
+verdict_note: 小程序 portalH5Webview.vue 实机仅保留 web-view，ph5-back-bar/handleBack 已移除，符合修复后状态。
+---
 # portalH5Webview 移除自定义返回改默认导航栏返回
 portalH5Webview.vue 移除自定义 cover-view 返回栏，仅保留 web-view 承载 H5，返回依赖导航栏默认返回。
 

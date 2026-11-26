@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T04:32:07+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin 的 pages_tab/components/Project_Suzhufang.vue-335-336 实机命中 bottom-0 + transform-translateY(50%)，与记忆解决方案一致。
+---
 # 搜索框半压Banner的稳定做法
 首页头部搜索框上下各露一半横跨Banner与白色区域交界，且白色区域紧贴Banner无缝隙，在苏住房C两处同源文件反复返工。
 

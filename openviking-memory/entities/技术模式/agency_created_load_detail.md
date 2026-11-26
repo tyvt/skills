@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:13:26+08:00
+verdict_note: 命中 detailMixins、AgencyBasicInfoDetail/DeveloperBasicInfoDetail、companyRecord，机构详情组件描述属实
+---
 # 经纪机构基本信息页created无条件调loadDetail
 苏州市房地产监测V3 中经纪机构 `AgencyBasicInfoDetail` 在 `created` 无条件调用 `loadDetail()`，修正开发企业页初始化未加载问题。
 

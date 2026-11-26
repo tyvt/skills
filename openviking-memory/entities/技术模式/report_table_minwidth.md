@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T11:35:29+08:00
+verdict_note: 实机核对苏住房G monthlyReportStat/detail.vue-31表格用-style={minWidth-...}，262-263行.stat-table{width-100%}，与记忆内联width改minWidth并恢复样式width-100%描述一致。
+---
 # 月报表格留白修复
 苏住房G项目月报页将表格内联 width 改为 minWidth 并恢复样式 width:100% 以解决留白问题。
 ## 改动要点

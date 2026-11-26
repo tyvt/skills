@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T14:39:38+08:00
+verdict_note: detail.vue setTab(481-487行) 现状仍调用 window.scrollTo，未改为 uni.pageScrollTo/createSelectorQuery；描述的跨平台修复未在现状代码体现。
+---
 # Miniprogram window.scrollTo anchor failure
 Root cause: `pages_transaction/newHouse/detail.vue`'s `setTab` uses H5-only API `window.scrollTo`; WeChat miniprogram has no `window` object, causing an error.
 
@@ -18,7 +23,6 @@ Root cause: `pages_transaction/newHouse/detail.vue`'s `setTab` uses H5-only API 
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：41a4e64f-0b65-4969-b0c2-d0d6514d2d0c
-
 
 <!-- MEMORY_FIELDS
 {

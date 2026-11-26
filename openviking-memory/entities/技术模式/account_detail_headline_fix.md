@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:12:16+08:00
+verdict_note: 命中 Headline、account/detail 组件与路由，三列布局栅格修复属实。
+---
 # 协议详情页三列布局与 Headline 栅格修复
 苏州市房地产监测V3 的 account/detail.vue 已修复因 Headline 样式破坏导致栅格固定两列的问题。
 

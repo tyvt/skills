@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:41:07+08:00
+verdict_note: DecisionRangeTable/amountFormatter/width-130/zs-table-column 命中，建筑面积列居中修复属实。
+---
 # Vote Area Column Center Fix
 Fix for voting tables' building area column not centered, unified width 130 and center align across Huaian and Huishan projects.
 
@@ -22,7 +27,6 @@ Fix for voting tables' building area column not centered, unified width 130 and 
 - 所属项目：淮安物管
 - 验证证据：extracted source=cursor project=淮安物管
 - 来源会话：51317350-fbe8-4ba5-8ad7-1e8ca1e088d0
-
 
 <!-- MEMORY_FIELDS
 {

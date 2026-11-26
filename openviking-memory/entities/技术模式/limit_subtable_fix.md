@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:19:12+08:00
+verdict_note: 苏州V3 limitFormMixin.js-157 命中 hydrateSelectedHousesForEdit，limitAdd/limitCancel 命中 houseLimitLineData，子表修复属实。
+---
 # Bug: 从查看切换到编辑时子表消失
 在项目 苏州市房地产监测V3 中，当在房屋限制中从查看模式切换到编辑模式时，子表因数据未填充而消失。
 

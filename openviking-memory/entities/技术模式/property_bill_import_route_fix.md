@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T08:32:47+08:00
+verdict_note: ruoyi.js 中 getCurrentRouterByFilePath 存在且用 find 不抛错，但记忆所述具体修复点——bill 组件改用该函数并 embedded 内嵌打开——在 property/bill 全目录(35文件)0 命中；getRouterPathByFilePath 仍在 159 行抛错。修复描述与现状不符。
+---
 # 账单导入路由查询修复
 T_SP_BILL 模块 property 业务 spF 修复了 getRouterPathByFilePath 找不到路由时直接抛错的问题，改为 getCurrentRouterByFilePath 并支持内嵌打开。
 
@@ -20,7 +25,6 @@ T_SP_BILL 模块 property 业务 spF 修复了 getRouterPathByFilePath 找不到
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

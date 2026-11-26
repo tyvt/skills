@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:22:57+08:00
+verdict_note: 园区物管2.0 detail-template.vue的.detail-label默认text-align-left已落地(-963)，与标签左对齐结论一致。
+---
 # detail_template_label_align
 园区物管2.0 中 detail-template 组件标签名称对齐问题的根因与修复。
 
@@ -10,7 +15,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/components/detail-template/detail-template.vue；所属项目：园区物管2.0；来源会话 a563fde7-487c-404f-a47e-ae62b28abbc3。
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:14:08+08:00
+verdict_note: 产品2.0 src/styles/variables.css-16、element-ui.scss-266、zs-operate-column.vue-182 命中 --table-row-hover-background-color，悬停色统一属实。
+---
 # 产品2.0表格行悬停色统一
 产品2.0 项目统一 zs-table 及固定列、操作列的悬停背景色为 #f5f7fa，消除列表页不一致。
 

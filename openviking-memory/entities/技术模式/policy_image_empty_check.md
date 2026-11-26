@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:44:26+08:00
+verdict_note: policy_SmPolicyCommunityRecordAdd.js/Edit.js 在园区V0命中，纯图片保存修复属实。
+---
 # 社区公告的纯图片内容保存失败
 js 文件 policy_SmPolicyCommunityRecordAdd.js 在移除 HTML 标签后判定内容为空，导致无法保存纯图片。
 
@@ -15,7 +20,6 @@ js 文件 policy_SmPolicyCommunityRecordAdd.js 在移除 HTML 标签后判定内
 ## 验证与归属
 - 所属项目：园区物管V0
 - 验证证据：extracted source=cursor project=园区物管V0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T10:37:17+08:00
+verdict_note: 门户/zhi2-web-admin package.json 无 typecheck 脚本仅有 eslint；仓库无 tsconfig（与记忆「无仓库级 TS 校验」一致）。
+---
 # 门户前端无仓库级 TypeScript 校验
 zhi2-web-admin 门户前端以 Vue 2 + JS 为主，仓库层面不提供 TypeScript 类型检查。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:42:40+08:00
+verdict_note: 产品2.0源码：记忆核心EndpointTable、endpoints、syncLog、integrationConfig均0命中；v-if formMode命中属其他模块(bankList/banner)。所述"应用管理集成回调子表"实现无法证明，判无效。
+---
 # 新增态隐藏配置型子表
 应用管理详情页中，新增态应使用 v-if="formMode !== 'add'" 隐藏集成回调配置子表，并从提交体剔除该字段。
 

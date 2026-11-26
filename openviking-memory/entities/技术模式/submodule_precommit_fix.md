@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:45:03+08:00
+verdict_note: 产品2.0源码：resolveServerAssetUrl(230,AnnexUpload/index.vue-93)、serviceHealth(utils/serviceHealth.js-8)、RegionTreeLayout(72)、operationReport(17)均存在。从来源分支补齐的5个依赖文件描述属实。
+---
 # 子模块合并缺依赖文件补齐
 产品2.0 父仓库合并子模块 zhi2-web-admin 分支时 pre-commit 因缺依赖文件失败，从来源分支补文件纳入提交而非跳过钩子。
 

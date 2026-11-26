@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:44:51+08:00
+verdict_note: skills插件源码：orchestrator-gate命中，ctx.tools.guard在dsh/agent-guard/lib/index.js-167/272命中，cordis.patch在多个package.json命中。拦截式guard机制与ACL部署坑描述有代码/配置佐证。
+---
 # orchestrator-gate
 DSH 本地 host 工具插件，拦截式强制所有对话经编排器执行（不自动转发）。
 

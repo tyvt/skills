@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:50:23+08:00
+verdict_note: 产品2.0与园区公共收益命中 showSummary/showMethod/各租赁合同Filing, subtotal属实
+---
 # zs-table subtotal pattern
 A Vue table technique for showing a summed subtotal row on contract filing list pages.
 ## Usage

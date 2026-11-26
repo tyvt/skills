@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:11:43+08:00
+verdict_note: 命中 AgencyPersonnelDetail、agencyPersonnelBasicInfoFields，人员查看/编辑字段统一修复属实。
+---
 # 人员查看/编辑字段不一致导致计数差异
 在项目苏州市房地产监测V3中，人员查看和编辑模式下的字段显示逻辑相互分离，导致经纪人/专业人员视图多显示或缺失«人员角色»字段（人员职能）。
 

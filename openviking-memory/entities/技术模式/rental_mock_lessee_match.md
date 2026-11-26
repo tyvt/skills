@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:51:35+08:00
+verdict_note: VALID；matchRentalContract/publicPortal/mock/rental.js 在门户真实代码命中。
+---
 # 仅在验证出租方时的租赁 mock 故障
 在 rental.js 中的 mock `matchRentalContract` 仅比较出租方，导致承租方的查询失败。
 
@@ -21,7 +26,6 @@
 ## 验证与归属
 - 所属项目：门户
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

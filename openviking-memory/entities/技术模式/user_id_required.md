@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:23:01+08:00
+verdict_note: 属实：system/user/detail.vue 含 patterns.IDCardNumber、'证件号码不能为空'、v-model.trim+maxlength=30 与 idType=='01' 校验，必填改造成立。
+---
 # 用户证件号码必填改造
 苏州市房地产监测V3 项目用户管理详情页已实施证件类型与证件号码必填校验。
 

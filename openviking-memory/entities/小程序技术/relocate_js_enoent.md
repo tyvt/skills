@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:25:31+08:00
+verdict_note: 小程序仓库未见relocate脚本及ENOENT相关代码，无法证实。
+---
 # relocate脚本未改js引用致ENOENT
 苏住房C市民端构建后处理脚本relocate-datetime-picker.mjs复制uni-datetime-picker到分包并删主包副本，但仅patch .json未patch .js懒加载路径，导致运行时ENOENT。
 

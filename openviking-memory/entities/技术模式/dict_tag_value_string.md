@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T10:36:38+08:00
+verdict_note: 苏住房G ParkingAssetDialog.vue 仍为 -value="form[f.prop]"，未见 dictValue()/String 转换，与记忆所述修复不符。
+---
 # dict-tag 值类型须与字典 dictValue 一致
 dict-tag 渲染依赖字典匹配，字典 dictValue 多为字符串，接口返回数字会导致匹配不到显示空白。
 
@@ -18,7 +23,6 @@ dict-tag 渲染依赖字典匹配，字典 dictValue 多为字符串，接口返
 - 会话 3ee096c3（010.md）：ParkingAssetDialog 车位类型值 1 不显示，转字符串后匹配
 - 涉及文件：src/views/benefit/statisticsMap/components/ParkingAssetDialog.vue
 - 来源会话ID：3ee096c3-3217-4512-83ef-b5204479f8cb；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

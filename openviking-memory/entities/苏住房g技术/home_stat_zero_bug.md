@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:46:42+08:00
+verdict_note: pickTaskCountField/loadTaskCounts/myProcessNum 在惠山二期G home/index-v2.vue 命中。
+---
 # 首页统计卡数字显示0
 苏住房G 门户 G 端首页 index-v2.vue 待办数字卡接口有数据却恒显示 0，根因为计数字段名候选缺项被静默兜 0。
 

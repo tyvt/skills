@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:45:37+08:00
+verdict_note: zs-table-container--with-summary/border-bottom/resourcesLeaseContractFiling 在园区物管2.0命中，小计行下边框修复属实。
+---
 # 小计行缺失下边框线修复
 园区物管2.0 带小计的列表页表格底部边框缺失，已修复并对所有带小计列表页生效。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T00:47:24+08:00
+verdict_note: 泰兴小程序 final-cost-detail.vue 实测字号为32/28/24rpx, 无记忆声称的40/52rpx, 描述与现状不符
+---
 # 费用详情页标题金额字号未对齐设计稿
 泰兴小程序费用详情页 final-cost-detail.vue 需调整字号以拉大差距对齐设计稿。
 ## 修改内容

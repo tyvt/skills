@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:28:53+08:00
+verdict_note: 真实代码命中 detail-container(7851)、YhwdTable(43)、detail-from-container(7578)，7个引用文件存在，溢出裁切属实。
+---
 # 整页滚动溢出裁掉兄弟节点修复
 苏州市房地产监测V3的 zhi2-web-admin 中 .detail-container 默认 height:100% 且 overflow:hidden，导致承办银行页兄弟节点被裁切，已收敛为三个互斥触发条件。
 

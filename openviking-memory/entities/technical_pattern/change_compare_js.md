@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T19:47:43+08:00
+verdict_note: 兴化物管 zhi1-web-admin/src/utils/changeCompare.js 存在，main.js 引入 isChangeValueEqual，属实。
+---
 # changeCompare.js 统一变更值比较
 兴化物管 zhi1-web-admin 新增 src/utils/changeCompare.js，统一数字/字符串、Date 与年份的比较逻辑。
 
@@ -16,7 +20,6 @@
 - 验证证据：cursor 会话 efb19730-94e6-49b0-b515-a5225a01129c（兴化物管）。
 - 涉及文件：src/utils/changeCompare.js、src/main.js、propertychange/detail.vue、mixins/detailMixins.js、propertyProject/detail.vue、directives/form/index.js、api/estate/propertyChange.js、buildinginfo/changeDetail.vue、project/projectinfo/changeDetail.vue。
 - 所属项目：兴化物管 zhi1-web-admin。
-
 
 <!-- MEMORY_FIELDS
 {

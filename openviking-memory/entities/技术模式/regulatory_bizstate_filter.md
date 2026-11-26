@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:38:37+08:00
+verdict_note: pubRegulatoryAccount/bizState/bizStateOptions 在宜兴公共收益命中，queryParams 加 bizState 筛选描述属实。
+---
 # 监管账户列表缺失单据状态筛选
 宜兴公共收益项目中监管账户列表补全「单据状态」筛选条件的修复套路。
 

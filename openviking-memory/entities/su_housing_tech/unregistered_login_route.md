@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:19:55+08:00
+verdict_note: 苏住房C src/pages.json 注册 pages/login/index、forget、password、success 四页，登录路由恢复属实。
+---
 # 登录路由未注册导致跳转失败
 苏住房C移动端因pages.json中登录路由被移除，代码仍navigateTo跳转致page not found。
 

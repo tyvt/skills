@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T20:15:10+08:00
+verdict_note: 惠山二期H5 会话复用关键符号 faceSession/sessionReuse/fiveMinute 均0命中；“5分钟”仅命中无关 uview timeFrom 工具函数，核心机制无法证明。
+---
 # 门户人脸验证会话5分钟内复用
 门户链路（verify→bdc→不动产）上次扫脸成功后5分钟内可不再调起人脸，由 isSfbFaceRecentlyVerified() 判断。
 
@@ -15,7 +20,6 @@
 ## 验证与归属
 - 所属项目：惠山二期H5
 - 验证证据：extracted source=cursor project=惠山二期H5
-
 
 <!-- MEMORY_FIELDS
 {

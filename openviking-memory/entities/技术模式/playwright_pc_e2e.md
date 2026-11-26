@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T08:32:36+08:00
+verdict_note: 产品2.0/zhi2-web-admin 下 glob **/playwright.config.* 零命中；全仓 grep reuseExistingServer/test-results 无源码命中（仅 package-lock 含 playwright 依赖名）。记忆所述三浏览器 E2E 配置与 36 passed 结论在现状代码中无存在证据，描述与现状不符。
+---
 # Playwright PC三浏览器全量E2E录屏规范
 产品2.0要求主流PC浏览器跑全量E2E且无论成败保留录像。
 ## 解决方案

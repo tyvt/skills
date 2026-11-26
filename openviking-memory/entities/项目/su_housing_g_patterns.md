@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T04:33:09+08:00
+verdict_note: 苏住房G/zhi2-web-admin 索引条目佐证命中：ruoyi.js 的 detailId/storedPath、home/index-v2.vue 的 regionOptionsFetchSeq 等均在，技术模式索引属实。
+---
 # 苏住房G已知技术模式
 苏住房G项目积累的技术模式索引，详细修复见各技术模式实体。
 

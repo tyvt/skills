@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:15:32+08:00
+verdict_note: 园区物管2.0 命中 getFundIncomeEx、dataHelpers，资金收支接口合并属实。
+---
 # 资金收支接口合并为getFundIncomeEx
 园区物管2.0 资金收支趋势接口由 `getFundIncomeTrend`+`getFundExpenditureTrend` 合并为 `getFundIncomeExpenditureTrend`。
 

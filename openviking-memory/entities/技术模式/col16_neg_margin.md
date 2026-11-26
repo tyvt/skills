@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:53:40+08:00
+verdict_note: 苏州市房地产监测V3 命中 detail-collapse-col-gap、jgxm、col-16，与负 margin 对齐楼幢号修复描述一致。
+---
 # col-16负margin对齐楼幢号全角括号右缘
 同行 col-16 较两个 col-8 右缘少 gap/3，采用宽列加 flex 布局并补负 margin 使楼幢号全角括号对齐。
 

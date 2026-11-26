@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:15:02+08:00
+verdict_note: 苏住房C src/api/transaction.js-242-243 有 pageByKeyWord/listRecommend，Project_Suzhufang.vue-95 三接口并列，参数结构属实。
+---
 # 推荐Tab接口参数结构
 苏住房C（苏找房）推荐Tab的listRecommend为GET接口，需使用扁平参数，而非新房/二手房的POST嵌套结构。
 

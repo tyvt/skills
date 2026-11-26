@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:15:52+08:00
+verdict_note: 命中 regionAmountRatio、toChartWanAmount，图表金额万元单位描述属实
+---
 # 饼图金额单位误加百分号
 园区物管2.0 fundPanorama 各区收入/支出分布图 tooltip 误把万元金额后加 %，与页面万元单位冲突。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

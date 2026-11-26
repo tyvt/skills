@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:47:17+08:00
+verdict_note: VALID；PageButton/page-button-area-height/safe-area-inset-bottom 在真实代码命中。
+---
 # 按钮缺盒模型与安全区致底部灰边
 `PageButton.vue` 未设 `box-sizing: border-box` 且 `min-height` 未含安全区致各记录页底部灰边。
 ## 问题根因

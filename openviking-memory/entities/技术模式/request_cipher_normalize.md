@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:48:34+08:00
+verdict_note: i淮安H5命中 normalizeCipherText+JSEncrypt, 密文格式校正属实
+---
 # 密文格式校正守卫使JSEncrypt解密不再返回null
 靖江物管G 的 request 层在密文传输或格式异常时调用 JSEncrypt.decrypt() 会返回 null，需在 normalizeCipherText() 中校正密文格式。
 

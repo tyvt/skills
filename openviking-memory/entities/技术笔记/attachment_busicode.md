@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:24:04+08:00
+verdict_note: 园区V0 src 命中 FileUploadCfg、basetheName、3003 与 attachment.js，与「busiCode 精确匹配无继承致文件夹不显示」一致。
+---
 # 附件配置业务码精确匹配
 园区V0 附件弹窗左侧文件夹不显示并非配置失效，而是页面查询用的 busiCode 与配置不一致，且后端精确匹配无继承。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区V0
-
 
 <!-- MEMORY_FIELDS
 {

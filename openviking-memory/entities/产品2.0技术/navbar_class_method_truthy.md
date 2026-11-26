@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:13:05+08:00
+verdict_note: 产品2.0命中 isActive/isHomeActive、syncActiveMenuFromRoute、immediate、TagsView，方法引用恒真修复属实
+---
 # 模板 :class 绑定方法引用恒为 truthy 致首页永远高亮
 Navbar.vue 把 methods 里的方法直接绑到 :class，函数引用恒 truthy，导致首页永远高亮、其他模块永不高亮的静默视觉错误。
 

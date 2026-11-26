@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:21:58+08:00
+verdict_note: 园区物管2.0 src 命中 fundPanorama、assetPanorama 及 flex- 0 0 auto，与账户统计块按内容高度、分布图容器布局偏好一致。
+---
 - 账户统计块改造：`flex: 0 0 auto` 按内容高度，分布图容器画布固定约 `200px`
 - ECharts `grid.bottom` 调为 `18`，左列剩余空间由两趋势图均分以消除边框重复与空白
 - 涉及文件：fundPanorama/index.vue、assetPanorama/index.vue、mock.js、_patch_template.py

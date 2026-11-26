@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T19:20:45+08:00
+verdict_note: 记忆点名的 notice-list-card 类在当前源码未命中；publicNotice 下 ListIndex.vue/ListContractIndex.vue 存在但与记忆描述类名不符，无法证明有效。
+---
 # 自定义组件标签 class 与 scoped CSS 不生效
 苏住房C 小程序中父级布局类写在自定义组件标签上导致 scoped CSS 不穿透、flex 失效，需将布局类下移到内层原生包裹节点。
 

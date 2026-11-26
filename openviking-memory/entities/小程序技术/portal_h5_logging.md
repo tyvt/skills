@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:19:34+08:00
+verdict_note: 小程序 wygl-wxxcx-dev-slh/utils/portal-h5-webview.js-218/249 命中 requestCtAuthWithLog/fetchExternalMaintenanceH5Url，日志包装器属实。
+---
 # H5接口请求响应未打印console日志
 portal-h5-webview.js新增请求日志包装器，为关键H5接口打印请求与响应信息。
 

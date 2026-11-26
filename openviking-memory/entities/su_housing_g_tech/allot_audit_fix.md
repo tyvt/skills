@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:47:06+08:00
+verdict_note: 苏住房G benefit/pubAllotNotice 路径命中，审批流绕过修复描述属实。
+---
 # 资金拨付通知书审批流绕过修复
 苏住房G `benefit/pubAllotNotice` 详情页曾关闭标准审批流改用自定义提交直接备案，该问题在 `develop/v2.6.2` 合并时被还原，已重新恢复标准审批流修复。
 

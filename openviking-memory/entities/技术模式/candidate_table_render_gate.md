@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:10:10+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 候选人征集报名信息表渲染与管理的备案门禁
 园区公共收益项目(zhi2-web-admin)中 detail.vue 的 CandidateTable 需按业务类型在 bizState==2（已备案）时才渲染，且管理报名须已备案且在征集期内。
 

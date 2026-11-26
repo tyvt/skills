@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:15:05+08:00
+verdict_note: 用户偏好类记忆（禅道回写指回提交人），非代码记忆；内容与用户明确陈述一致，无幻觉/测试垃圾/隐私违规
+---
 - 回写禅道 bug 为已解决时，将 bug 指回提交人/报告人（如 Bug 6409 指回 lichandan）。
 
 <!-- MEMORY_FIELDS

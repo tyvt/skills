@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:22:09+08:00
+verdict_note: 产品2.0 src 命中 printConfigId、$attrs.id、ParamsDialog/dialogMixins，与「id 声明为 prop 致 $attrs.id 丢失、confirm 用 this.id」一致。
+---
 # ParamsDialog 声明 prop 致 $attrs.id 丢失
 ParamsDialog.vue 混入 dialogMixins.js 将 id 声明为 prop，导致 this.$attrs.id 为 undefined，请求体缺失 printConfigId 而报错。
 
@@ -15,7 +20,6 @@ ParamsDialog.vue 混入 dialogMixins.js 将 id 声明为 prop，导致 this.$att
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

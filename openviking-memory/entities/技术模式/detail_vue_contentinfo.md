@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:42:29+08:00
+verdict_note: 产品2.0源码：ctUserIdentityApply/detail.vue中certificatePhoto(107-108)、identityPhoto(117-118)均在，contentInfo3存在；与补齐证件展示、新增contentInfo4/5描述一致。
+---
 # detail.vue补齐contentInfo数据
 `zhi2-web-admin/src/views/property/ctUserIdentityApply/detail.vue` 修正了 `contentInfo3` 错放审核信息且缺失证件展示的问题。
 

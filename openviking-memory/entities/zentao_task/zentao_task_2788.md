@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:18:49+08:00
+verdict_note: 属实：resourcesLeaseContractFiling/index.vue-84 有 benefit-otherRevenueContract-add，extraPerms 扩展点在代码中，独立权限改造成立。
+---
 # 禅道任务 2788
 禅道任务 2788 要求把苏住房G「其他租赁合同」列表页的「新增」按钮改为独立权限字符控制，原字符与经营用房租赁合同共用。
 

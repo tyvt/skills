@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T03:33:14+08:00
+verdict_note: 苏住房C 编译产物 utils/index.js 确认 resolveRelativePageUrl 相对路径解析、openPage 的 fail 回调打印 [openPage] navigate fail 并 toast 页面跳转失败，pages_vote/elect 路径吻合。
+---
 # openPage相对路径补斜杠不全致跳转无反应
 苏住房C分包改造后 pages_vote/elect/detail 点「参与选举」无反应无报错，根因是 redirectTo 传相对路径且 openPage 未加 fail 回调静默吞错。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:20:16+08:00
+verdict_note: 关键锚点不符：scripts/ 中没有 fix-detail-form-layout.mjs（仅有 migrate-dialog-form-layout 等），2317文件/350+自动修复主张无法按现状证明。
+---
 # DetailTemplate 同类布局问题全局修复
 苏州市房地产监测V3 完成 exchangeContract 同类布局问题全局排查与修复，扩展脚本自动修复 350+ 文件。
 

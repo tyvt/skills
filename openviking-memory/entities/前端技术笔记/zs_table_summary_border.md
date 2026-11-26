@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:08:02+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # zs-table 合计行下边框缺失修复
 带小计（show-summary）的 zs-table 因容器 overflow hidden 裁切 footer-wrapper，需在组件层加 with-summary 类统一补下边框。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

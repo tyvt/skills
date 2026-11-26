@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:22:09+08:00
+verdict_note: 属实：AgencyBranchList.vue 有 company-agencyBranch-edit 权限码与 multiDeleteButton，公共新增/批量删除配置改造成立。
+---
 # 新增和删除使用公共配置方式
 苏州市房地产监测V3 多个列表页已统一改为使用 mixin 公共的 addButton 与 multiDeleteButton 配置。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:40:45+08:00
+verdict_note: message-nav-tabs/tabLine/uni-nav-bar 在苏住房C命中，tab-line居中修复描述与代码一致。
+---
 # Nav-Bar Slot Tab-Line Left Align Causing Tab Not Centered
 In Su Housing C project, placing tab-line inside uni-nav-bar slot defaulted to left alignment, not occupying middle area.
 
@@ -27,7 +32,6 @@ In Su Housing C project, placing tab-line inside uni-nav-bar slot defaulted to l
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：e5260577-7b96-471b-8868-7016b41f64dd
-
 
 <!-- MEMORY_FIELDS
 {

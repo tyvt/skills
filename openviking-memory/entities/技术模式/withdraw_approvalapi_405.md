@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T14:40:20+08:00
+verdict_note: flowApi.js 全文46行仅 buildBusinessApi/getSubmitApi/getApprovalApi/ensureFlowConfigured，无 withdrawProcess、无 approvalApi 含'/'校验；描述的撤回修复不在现状代码。
+---
 # 我发起的流程撤回405与approvalApi校验收敛
 园区公共收益项目(zhi2-web-admin)中，「我发起的」点撤回报405，根因是流程配置 approvalApi 写成纯数字导致拼成 /api/v2/2。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:54:29+08:00
+verdict_note: Playwright忽略规则在苏州V3与门户 zhi2-web-admin/.gitignore 命中 /test-results/, 规则属实(项目标注产品2.0漂移)
+---
 # Playwright 测试产物忽略规则
 Playwright 测试产物不应纳入版本控制，误提交会污染仓库。
 ## 忽略范围

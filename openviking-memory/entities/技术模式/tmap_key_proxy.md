@@ -4,13 +4,16 @@
 ## 问题背景
 - 硬编码地图 Key 不利于统一配置与维护，直连的 GL JS Key 会暴露在前端页面与请求中。
 
-## 解决方案
-- 已按腾讯官方 GL 安全代理文档（https://lbs.qq.com/webApi/javascriptGL/glGuide/glKeyDelegate）完成前端改造。
+## 配置与脚本加载
+- 系统管理 → 参数设置中对应参数名称为“腾讯地图Key”、参数键名为 sys.config.map.key，参数键值填写当前环境的腾讯地图 Key。
 - 新增 src/utils/mapKey.js，通过 /system/config/getByKey/sys.config.map.key 获取 Key，提供带缓存的 getMapKey() 与 loadTencentMapScript()，不再从后端拉取 sys.config.map。
 - 移除 index.html 中的腾讯地图 script 标签；mapLoader.js 改为调用 loadTencentMapScript() 加载 SDK；ZsTencentMap/index.vue 组件创建时加载地图脚本。
 - 登录后预加载：router/index.js 中用户登录并获取信息后自动预加载地图脚本。
+
+## 安全代理改造
+- 已按腾讯官方 GL 安全代理文档（https://lbs.qq.com/webApi/javascriptGL/glGuide/glKeyDelegate）完成前端改造，使 Key 不再出现在页面与请求中。
 - 加载 gljs 之前设置 window._TMapSecurityConfig.serviceHost（默认 /_TMapService），脚本 URL 去掉 &key=xxx。
-- 新增 getTMapWsUrl() 代理 WebService 请求；commuteDialog.vue 与 markMap.vue 移除 mapKey/getMapKey()，axios 请求改为 getTMapWsUrl('geocoder/v1') 等，不再传 key。
+- 新增 getTMapWsUrl() 代理 WebService 请求，WebService 走 /_TMapService_ws/...；commuteDialog.vue 与 markMap.vue 移除 mapKey/getMapKey()，axios 请求改为 getTMapWsUrl('geocoder/v1') 等，不再传 key。
 - vite.config.js 本地开发代理用 /_TMapService、/_TMapService_ws 替代原有的 /map；本地需在 env/.env 配置 VITE_APP_TMAP（勿提交仓库）。
 
 ## 验证与归属
@@ -22,8 +25,8 @@
 {
   "category": "技术模式",
   "name": "tmap_key_proxy",
-  "source_extraction_id": "911474cd4feb42868c2d557caafc7cad",
-  "version": 2,
+  "source_extraction_id": "803a5a1c6bff45f19fe101943d693412",
+  "version": 3,
   "memory_type": "entities"
 }
 -->

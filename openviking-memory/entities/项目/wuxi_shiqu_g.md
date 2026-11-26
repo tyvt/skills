@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:15:41+08:00
+verdict_note: 无锡市区G 实机当前分支 develop/v2.6.1、tag 202611051818 均存在，仓库元信息属实。
+---
 # 无锡市区G前端仓库
 无锡市区G（关联无锡市智慧物业服务平台/三资监管）前端主仓库，使用 zhi2-web-admin 作为子模块，当前工作分支 develop/v2.6.1。
 

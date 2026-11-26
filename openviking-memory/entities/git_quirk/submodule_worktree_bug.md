@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:22:53+08:00
+verdict_note: Git worktree解析quirk属流程性描述，无对应项目代码证据可核对，无法证明有效。
+---
 # Submodule Worktree Resolution Bug
 Git submodule worktree resolution fails on Windows with nested Chinese paths, returning wrong gitdir.
 

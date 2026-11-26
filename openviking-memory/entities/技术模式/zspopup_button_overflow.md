@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:53:24+08:00
+verdict_note: 命中 ZsPopup/ZsButton组件及pages_my/setting, 按钮溢出修复属实
+---
 # ZsPopup按钮固定宽度致弹窗溢出贴边
 苏住房C移动端 ZsPopup.vue 弹窗宽280px，底部按钮固定220rpx×2加48rpx间距与22px内边距，总宽超出容器致贴边。
 

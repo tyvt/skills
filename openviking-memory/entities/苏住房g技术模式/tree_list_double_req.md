@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:15:46+08:00
+verdict_note: 命中 listMixins、getList、getTreeselect、handleNodeClick，树列表重复请求修复属实
+---
 # 左侧树+右侧列表页首屏请求翻倍
 系统管理用户管理等左树右列表页面 Network 中 page 接口调两次，根因是 init() 直接 getList() 与树加载后自动选首节点两条取数路径叠加。
 

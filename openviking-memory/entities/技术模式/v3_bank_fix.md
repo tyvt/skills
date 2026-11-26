@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:41:56+08:00
+verdict_note: 实机核对：引用文件(5个)存在于对应项目仓；核心符号命中[setData,unionBank,openUnionBankWdmcSelect,SelectDialog,unionBankWdmc]，与记忆描述一致。
+---
 # 银行选择弹窗确定锁与联行选择统一修复
 苏州市房地产监测V3 中修复 zs-select-dialog-func.vue 确定无效果问题，并统一联行选择弹窗。
 

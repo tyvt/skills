@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T09:44:58+08:00
+verdict_note: 记忆称修复为对settleWarnFlag用显式=='1'比较；但惠山二期G final/detail.vue-10/85、final/index.vue-37/40 仍为 v-if settleWarnFlag 真值判断，全仓无 == '1' 比较，描述与现状证据不符。
+---
 # 字符串 '0' 标志错误触发结算警告
 在 maintenance/final/index.vue 中，v-if="settleWarnFlag" 在 JS 中将字符串 '0' 视为真值，导致不当显示。
 

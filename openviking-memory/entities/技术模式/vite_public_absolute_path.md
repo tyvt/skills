@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:13:32+08:00
+verdict_note: 确认UnifiedLogin.vue及public资源须用/assets绝对路径的Vite约定；public/assets→/assets替换与构建成功结论合理。
+---
 # 产品2.0 Vite public 目录资源绝对路径约定
 Vite 构建中 public 目录资源必须用以 / 开头的绝对路径引用，带 public/ 前缀会导致模块解析构建失败。
 

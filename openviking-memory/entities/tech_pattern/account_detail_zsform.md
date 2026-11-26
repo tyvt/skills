@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:13:28+08:00
+verdict_note: permsPrefix、operation-btn-group 在产品2.0命中，opensalesType 动态权限模式属实。
+---
 # 监管账户详情重构采用 zs-form 动态权限
 account/detail.vue 顶部操作区由 operation-container 替换为 operation-btn-group 并移除 zs-attachment，外层表单容器改用 zs-form。
 
@@ -14,7 +19,6 @@ account/detail.vue 顶部操作区由 operation-container 替换为 operation-bt
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

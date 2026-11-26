@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:12:36+08:00
+verdict_note: 在externalWebview.vue确认queryParams优先、profileData回退及certificateNumber/realName清洗逻辑，描述属实。
+---
 # externalWebview queryParams 优先回退 profileData
 externalWebview 的 resolvePageByProfile 中 phone/certificateNumber/realName 优先取 queryParams，缺失回退 profileData 并清洗脏值。
 

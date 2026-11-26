@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:46:59+08:00
+verdict_note: 产品2.0源码：guaranteeDeposit/components/detail.vue路径0命中(guaranteeDeposit全仓无)，所述编辑态切换zs-form、可编辑字段的具体组件无法证明。depositRegister存在但非同一组件，按证据不足判无效。
+---
 # 资金缴存详情编辑无表单修复
 房屋质量保证金资金缴存详情页点击编辑无输入框、保存无反应，已通过编辑态切换 zs-form 修复。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

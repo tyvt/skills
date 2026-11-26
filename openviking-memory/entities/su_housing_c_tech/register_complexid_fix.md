@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:16:19+08:00
+verdict_note: register.vue-167-169 ctUserIdentityApply 提交参数含 complexId- useHouseStore.complexId，与记忆一致。
+---
 # 人工添加页complexId缺失报错修复
 苏住房C小程序「人工添加」页面(register.vue)提交时因未传complexId导致后端报“物业管理区域权限不能为空”，已修复。
 

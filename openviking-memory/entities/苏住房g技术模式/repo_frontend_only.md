@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:15:43+08:00
+verdict_note: 苏住房G 顶层仅前端工程(package.json/dist/src 等)无后端源码，仓库仅含前端事实属实。
+---
 # 苏住房G仓库仅含前端代码
 苏住房G(d:\repository\苏住房G) 仓库仅包含前端子模块 zhi2-web-admin，无 Java/Kotlin 后端代码，后端服务部署在远端。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

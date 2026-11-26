@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:42:29+08:00
+verdict_note: 实机核对：引用文件(3个)存在于对应项目仓；核心符号命中[handleDownloadPlan,detail,download,PermitPlanPanel,planDocSite]，与记忆描述一致。
+---
 # 预售方案增加下载功能
 苏州市房地产监测V3 中预售许可方案详情页与面板新增下载功能，遵循先维护再下载的业务流程。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:36:51+08:00
+verdict_note: 园区公共收益 record/detail.vue-175-176 实机确认 contentFile 校验规则含 required- true，与记忆所述必填星号修复一致。
+---
 # 文件内容校验未置必填致星号缺失
 园区公共收益项目(zhi2-web-admin)中 detail.vue 的 contentFile 校验规则缺少 required: true，导致 Element UI 不渲染红色 * 必填标识。
 

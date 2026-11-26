@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:11:33+08:00
+verdict_note: 命中 property/complex/pageNew、pageNum，苏住房G 查询接口分页参数描述属实
+---
 # 物业管理区域查询接口参数事实
 苏住房G 项目 zhi2-web-admin 中物业管理区域查询（publicQuery/complex）实际接口与常见假设不同，且曾出现分页异常已修复。
 ## 关键事实

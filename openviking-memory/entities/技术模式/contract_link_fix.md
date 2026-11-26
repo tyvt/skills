@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:21:29+08:00
+verdict_note: 产品2.0 propertyContract/components/detail.vue 有 initComplexFromRoute 及 mounted 调用，合同备案链接带入 complexId 属实。
+---
 # 前期合同备案链接穿透修复
 产品2.0 物业区域查询详情页「暂无数据」中「合同备案」链接穿透修复，自动带入当前物业管理区域。
 

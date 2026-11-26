@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:15:24+08:00
+verdict_note: 苏州V3 ParcelDialog.vue rules() 实存；'请绘制地图后再保存' 仅存于未修的同族仓（兴化物管/太仓G），V3 已去除，取消必填修复属实。
+---
 # 宗地信息弹窗取消必填校验修复
 苏州市房地产监测V3 的新增/编辑宗地信息弹窗 ParcelDialog.vue 取消字段必填校验与 GIS 绘制校验，已可空值保存。
 
@@ -12,7 +17,6 @@
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：projectManagement/customerProject/components/ParcelDialog.vue、ProjectCertificateTabs.vue、ParcelTable.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：260e58d6-3f0e-4efb-b6ab-5ed116832ca3
-
 
 <!-- MEMORY_FIELDS
 {

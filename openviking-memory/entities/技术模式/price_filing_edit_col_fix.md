@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T05:33:10+08:00
+verdict_note: recordPriceMngSuzhou/detail.vue-304 <el-col v-bind="FORM_COL_THREE">，306 label=单位面积成本，904 import FORM_COL_THREE。与记忆改为三列栅格一致。
+---
 # 价格备案编辑/新增表单栅格修复
 苏州市房地产监测V3 修复价格备案（苏州）编辑/新增表单中「单位面积成本」与「所属片区」栅格不对齐问题。
 
@@ -17,7 +21,6 @@
 
 ## 验证与归属
 - 所属项目：苏州市房地产监测V3；来源会话：c17eb850-8da8-45be-8e07-7991bc836b23；验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

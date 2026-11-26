@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T10:37:05+08:00
+verdict_note: 产品2.0 HeadTitle 无 formMode prop，formMode 取自 $route.query；complex/detail 仅传 -list 未传 -formMode，与记忆方案不符。
+---
 # HeadTitle 必须声明并接收 formMode prop
 产品2.0 中 HeadTitle 组件需在 props 声明 formMode 并由父级传入，否则整块不显示或条件渲染异常。
 

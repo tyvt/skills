@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:20:15+08:00
+verdict_note: 苏州市房地产监测V3 src 命中 s16-scroll、s16-party-table-wrap、sz-contract，与「多 overflow-x 叠加致表头错位、保留外层横滚」一致。
+---
 # 嵌套容器overflow-x叠加致宽表多横滚动条
 苏州市房地产监测V3 中外层 .s16-party-table-wrap、内层 el-table body-wrapper 及 .s16-scroll 隐式 overflow-x:auto 叠加多条横向滚动条致表头错位。
 

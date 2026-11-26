@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:27:08+08:00
+verdict_note: 苏州市房地产监测V3 命中 PresaleBuildingTable(12)、PresaleSelectBuildingDialog(4)、loadBuildings(15)，残留勾选属实。
+---
 # 预售楼幢选择弹窗取消后残留选中状态
 苏州市房地产监测V3 项目中修复 PresaleSelectBuildingDialog.vue 取消或关闭弹窗后残留选中状态的逻辑缺陷。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

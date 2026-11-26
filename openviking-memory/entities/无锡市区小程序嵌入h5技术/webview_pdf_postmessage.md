@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:44:57+08:00
+verdict_note: 无锡H5 webView.vue 命中 postMessage，PDF 预览 postMessage 方案属实。
+---
 # web-view内嵌H5的PDF预览postMessage方案
 H5 运行在微信小程序 web-view 内时，PDF 预览需通过 wx.miniProgram.postMessage 交给小程序侧处理。
 

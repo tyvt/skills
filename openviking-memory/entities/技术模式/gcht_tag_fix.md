@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:17:09+08:00
+verdict_note: gcht/detail.vue 存在 wherherOptions data、getDicts 赋值及 options- this.wherherOptions，tag 字典转译修复属实。
+---
 # 工程合同备案详情是否分包合同标签修复
 苏州市房地产监测V3 中修复工程合同备案详情页「是否分包合同」在查看模式显示原始值 0 的问题。
 

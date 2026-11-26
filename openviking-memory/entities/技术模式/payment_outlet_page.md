@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:42:37+08:00
+verdict_note: 苏州市房地产监测V3 yhwdgl.js 含 pageBankBranch、PaymentOutletDialog.vue 含分页接口与 bankBranchManageId 映射，描述属实。
+---
 # 缴款网点弹窗调用 bankBranch 分页接口
 在苏州市房地产监测V3中，缴款网点弹窗须改用 bankBranch 的 page 分页接口并做字段映射。
 

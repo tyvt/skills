@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:42:08+08:00
+verdict_note: fetchSelectView/voteWaiver/OptionStepChoose/waiver 在太仓一网通办H5命中，waiver 读取层级修复属实。
+---
 # vote.js misreads waiver location causing empty abstention param
 In 太仓一网通办H5, vote.js reads the waiver option from data.data.waiver (actually at top-level data.waiver), causing optionList to be empty.
 

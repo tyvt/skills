@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:23:27+08:00
+verdict_note: appid __UNI__FLOOD_C 在 苏住房防汛C端 构建产物 vendor.js 中确认；nginx 站点配置属部署事实，无矛盾证据。
+---
 # 门户H5站点
 「门户H5」前端（当前项目，分支 master）的独立 nginx 站点，与旧「门户」站点分离。
 ## Description

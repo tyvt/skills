@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:14:07+08:00
+verdict_note: 园区物管2.0 命中 zs-table-column，自适应列溢出遮挡修复属实。
+---
 # zs-table 自适应列溢出遮挡相邻列
 园区物管2.0 的 zs-table 自适应列在内容超长时会溢出遮挡右侧相邻列，仅需两处收口即可修复。
 

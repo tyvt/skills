@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T05:33:53+08:00
+verdict_note: building/building/detail.vue-546-547 getFloor 用 add(floorNumberAbove||0, floorNumberUnder||0)，与记忆 ||0 兜底一致。
+---
 # mathjs add 空值入参类型报错兜底
 building/detail.vue 中 getFloor 调 mathjs add 计算总层数时空值抛类型错误，改用 || 0 兜底。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:38:02+08:00
+verdict_note: BrokerPages.vue 实测四列网格180px|值|180px|值(1018行)、display-contents(1044)、subgrid(1049)+@supports回退(1057)、≤1200px断点(1120)均在，与描述一致。
+---
 # 经纪机构页字段对齐修复
 修复经纪机构页（BrokerPages.vue）字段宽度导致统一社会信用代码换行及标签值起点不一致问题，改为四列网格与 subgrid。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

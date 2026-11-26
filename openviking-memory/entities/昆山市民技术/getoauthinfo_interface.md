@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:43:17+08:00
+verdict_note: 昆山市民 verifyUser/index.vue 命中 refreshUserAndHouse 与 getOauthInfoByIdNumber，接口调用时机属实。
+---
 # getOauthInfoByIdNumber 接口调用说明
 昆山市民小程序中 getOauthInfoByIdNumber 仅在实名成功后后台刷新时调用，且不返回 token 的影响取决于接口成败。
 

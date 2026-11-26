@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:48:03+08:00
+verdict_note: 实机核对 苏住房C 仓库确认关键符号(12/18)存在：Cursor、ahead、bottomBtn、commonNew、cursor；文件与描述一致，记忆有效。
+---
 # dev-sfb分支标签同步修复
 苏住房C 地图找房新房详情出现穿屏，根因为本地标签与远端指向不同提交导致代码未对齐，已通过强制同步标签解决。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

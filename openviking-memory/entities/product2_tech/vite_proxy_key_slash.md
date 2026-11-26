@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:13:01+08:00
+verdict_note: 产品2.0 vite.config.js 命中 normalizeProxyContext，代理前缀补斜杠归一化修复属实。
+---
 # Vite proxy key missing leading slash causes proxy failure
 Vite proxy match function uses req.url.startsWith(key), and when VITE_APP_BASE_API lacks leading slash the rule cannot match.
 
@@ -20,7 +25,6 @@ Vite proxy match function uses req.url.startsWith(key), and when VITE_APP_BASE_A
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：317d62ff-fec1-4cf3-a02d-1ac604d82396
-
 
 <!-- MEMORY_FIELDS
 {

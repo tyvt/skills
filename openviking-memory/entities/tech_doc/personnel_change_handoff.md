@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:17:39+08:00
+verdict_note: 实机 D-/plan/苏州市房地产监测V3/ 下存在该 HANDOFF-CHAIN hop8 交接文档，路径属实。
+---
 # HANDOFF-CHAIN-zentao6891-personnel-change-ui-hop8
 Nine-section chain handoff document recording the hop8 state of the Zentao 6891 personnel-change UI task in the 苏州市房地产监测V3 project, written 2026-11-24.
 

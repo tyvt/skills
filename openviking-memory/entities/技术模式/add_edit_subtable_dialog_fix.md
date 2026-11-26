@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T08:32:58+08:00
+verdict_note: benefit/assetLeaseApply/components 下 subOtherTable/subVenueTable/subAdvertiseTable/houseTable.vue 及 resourcesLeaseContractFiling/detail.vue 均存在；sub*Dialog.vue 中有 fullRowLayout、el-button、view 模式「关闭」文案，与记忆描述的子表弹窗样式修复一致。
+---
 # 新增/编辑界面子表及弹窗样式修复
 产品2.0 项目修复新增/编辑界面中子表及弹窗相关问题，涉及多个子表组件与租赁合同备案详情页。
 

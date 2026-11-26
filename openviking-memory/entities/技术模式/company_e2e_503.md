@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:43:23+08:00
+verdict_note: 苏州市房地产监测V3：company-register.spec在package.json-28/73，editAndSubmit命中src/api/company/companyRegister.js-11等8处。该条为后端503诊断结论而非纯代码修复，相关文件齐备，描述自洽。
+---
 # 公司注册E2E提交步因后端503工作流失败
 苏州市房地产监测V3 公司注册 E2E 在 Step4 提交步因后端 503 工作流失败，与前端访问路径无关。
 

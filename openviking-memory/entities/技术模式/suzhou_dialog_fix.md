@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T11:34:42+08:00
+verdict_note: 实机核对监测V3 recordPriceMngSuzhou/detail.vue-843-850项目名称SelectDialog为普通文本列+@setData=pickProject，1235行pickProject调setProject；show-checkbox/show-confirm=false已去除，与记忆一致。
+---
 # 价格备案苏州详情页项目名称弹窗修复
 苏州市房地产监测V3 项目修复价格备案苏州详情页「项目名称」弹窗 SelectDialog 无「确定」按钮的问题。
 

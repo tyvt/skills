@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T21:12:04+08:00
+verdict_note: 记忆称 src/manifest.js 与 Vite base 回退；实机 i淮安公版 manifest.js/src/manifest 均0命中，仅 vite.config.ts 有 base，描述与现状不符
+---
 # i淮安公版 Vite base 路径回退修复
 i淮安公版项目 vite.config.ts 中因 runMode 推断错误导致 H5 打包 base 路径缺失 /h5/ 的修复记录。
 
@@ -15,7 +20,6 @@ i淮安公版项目 vite.config.ts 中因 runMode 推断错误导致 H5 打包 b
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=i淮安公版
-
 
 <!-- MEMORY_FIELDS
 {

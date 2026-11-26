@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T17:18:08+08:00
+verdict_note: D-/repository 无 vlmeter 源码目录或 config/models.yaml 配置；models.yaml/list-models 命中仅在记忆归档 JSON，非实际工具代码，无法证明工具描述。
+---
 # vlmeter
 Accuracy × cost VLM evaluation pipeline tool that runs one dataset across multiple models and auto-generates comparison reports.
 

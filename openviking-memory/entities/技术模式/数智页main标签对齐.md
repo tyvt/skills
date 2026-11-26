@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:45:52+08:00
+verdict_note: 实机核对：D-/repository 代码仓无对应文件命中，属配置/会话/工具类记忆，无法用代码证据证明有效，判无效。
+---
 # 数智页 main 标签 class 对齐
 苏住房防汛C端数智页按新参考稿还原时，通过补齐参考稿 `<main>` 开标签 class 消除大面积像素偏差的排查与修复模式。
 

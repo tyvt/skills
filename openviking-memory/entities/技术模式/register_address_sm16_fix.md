@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:46:37+08:00
+verdict_note: V3 register-form.scss 存在，CompanyRegisterSingleForm 与 -sm="12" 在注册表单/e2e 中存在，属实。
+---
 # 地址列 sm=16 未适配半列致宽度仅 1/3
 register-form.scss 仅将 el-col-sm-12 作半列，地址列 :sm="16" 落到默认 lg/xl=8 宽度变 1/3 且错位，已改为 :sm="12"。
 

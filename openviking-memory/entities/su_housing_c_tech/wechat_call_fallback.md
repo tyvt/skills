@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T07:35:19+08:00
+verdict_note: 记忆称 sfb.js 及 jmportal.communication.callPhone/lightAppJssdk/wx.miniProgram/tel- 降级，源码(非dist)均无；sfb.js 不存在，callPhone(utils/index.js-960) 仅为 uni.makePhoneCall。描述与现状不符，无法证明有效。
+---
 # 苏服办拨号兼容与降级策略
 苏住房C 在苏服办 App 与微信环境采用不同拨号方式，微信环境增加 tel: 协议降级以避免页面崩溃。
 

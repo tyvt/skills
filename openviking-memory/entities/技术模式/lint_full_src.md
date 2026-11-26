@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:16:22+08:00
+verdict_note: 涉及 BuildingChangeDialog.vue、zs-dialog.vue 等组件均存在于苏州市房地产监测V3，lint 行为经验与现状无矛盾。
+---
 # 带文件名运行 npm run lint 仍然会 lint 整个 src
 `npm run lint -- BuildingChangeDialog.vue` 实际上会对整个 `src` 目录执行 lint（约 19k 警告），对单个文件运行 `npx eslint --no-fix` 结果为 0 错误，15 个警告。
 

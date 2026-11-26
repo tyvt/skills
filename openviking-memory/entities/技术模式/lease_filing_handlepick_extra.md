@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:46:08+08:00
+verdict_note: VALID；resourcesLeaseContractFiling/handlePick/extraLinks 在园区物管2.0及benefit服务真实代码命中。
+---
 # B端租赁备案选区域 handlePick 扩展
 园区物管2.0 中资源租赁合同备案 detail 选择「物业管理区域名称」弹窗，需对齐资产租赁备案同场景增加 extra 与 extraLinks。
 

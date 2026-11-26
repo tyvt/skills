@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:15:12+08:00
+verdict_note: 无锡市区嵌入H5 useProjectState.js 有 applyHouseSelection 写 userStore，externalWebview.vue 读 userStore.houseId，数据流一致。
+---
 # 嵌入H5业务houseId以userStore为唯一来源
 小程序web-view嵌入H5时子页须以App.vue解析的userStore.houseId为唯一房屋上下文来源，禁混用本地store或路由参数。
 

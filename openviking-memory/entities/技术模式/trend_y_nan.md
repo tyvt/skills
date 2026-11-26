@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:18:20+08:00
+verdict_note: 苏住房G/zhi2-web-admin/.../RepairPanel.vue-84 有 buildTrendYScale、-363 有 Number.isFinite 过滤、-282 有 Math.max，与「先过滤非有限值再取 max」一致。
+---
 # 柱线混合趋势图自算 Y 轴刻度需先过滤非有限值
 苏住房G 首页 RepairPanel.vue 趋势图用 Math.max(0, ...数组) 驱动显式 min/max 刻度，遇 null 整轴 NaN 失效。
 

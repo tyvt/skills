@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:18:20+08:00
+verdict_note: 苏住房C 命中 ZsImage、family-empty.png、headphone.svg，分包静态图500双根因修复属实。
+---
 # 分包页面引用静态图 500 双根因
 苏住房C 小程序页面报本地图片资源 500，根因是相对路径被解析成分包路径且未在分包映射表登记，属文件缺失+路径错误双根因。
 

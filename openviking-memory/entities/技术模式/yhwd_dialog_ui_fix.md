@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T18:40:33+08:00
+verdict_note: 实机核对：引用文件(4个)存在于对应项目仓；核心符号命中[detail,line-height,el-col,el-row,el-form-item__content]，与记忆描述一致。
+---
 # 新增网点弹窗宽度与表单项间距调整
 苏州市房地产监测V3 调整了承办银行新增网点弹窗（YhwdDialog.vue）宽度与表单项布局。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:51:27+08:00
+verdict_note: 苏州V3命中 AgencyPersonnelDetail/BasicInfoFormFields/canEditInHeader, 禁编辑属实
+---
 # 禁止编辑代理机构人员详情
 Suzhou Real Estate Monitoring V3系统：AgencyPersonnelDetail.vue 移除了 G-terminal 的编辑逻辑，限制录入仅限企业终端和待处理状态。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:44:06+08:00
+verdict_note: 实机核对：引用文件存在但核心符号[AREA_BUBBLE_SIZE_PX,statisticsMap]未命中，描述与现状证据不符或无法证明，判无效。
+---
 # 区域和街道聚合气泡缩小
 园区物管2.0 统计地图中区县级、街道级聚合气泡由 96px 调整为 72px（约缩小 25%），同步缩小字号与内边距。
 

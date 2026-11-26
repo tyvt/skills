@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:14:38+08:00
+verdict_note: ZsButton、certificatesTable 命中产品2.0，布尔 permission 透传类型警告排查结论属实。
+---
 # ZsButton 布尔 permission 透传类型警告
 ZsButton 的 permission prop 声明为 Array，通过 v-bind="attrs" 透传布尔 permission:false 会触发类型警告。
 

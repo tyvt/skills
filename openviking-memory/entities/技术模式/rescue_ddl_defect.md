@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:20:08+08:00
+verdict_note: 苏住房G zhi2-web-admin/docs/flood/common-errors.md-107、delivery-2026-10-29.md-32 命中 OPERATOR_ROLE，DDL 缺陷记录属实。
+---
 # 防汛救援审批 DDL 跨环境缺陷
 防汛救援（rescue）审批接口在 dev 因 T_FLOOD_RESCUE_LOG.OPERATOR_ROLE 字段长度不足报 500，同款建表脚本在 ST/生产未同步修复会复现。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:40:07+08:00
+verdict_note: 实机核对 苏住房C 仓库确认关键符号(12/14)存在：benefit、common、encode、found、menuRouteMap；文件与描述一致，记忆有效。
+---
 # 市民端分包迁移后navigateTo页面找不到
 苏住房C(zhi2-mobile-shimin) uni-app小程序迁移common/home等目录到pages_main、repair到pages_owner后，真机报navigateTo:fail page not found。
 

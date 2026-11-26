@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:15:58+08:00
+verdict_note: 实机核对 ~/.openviking/ov.conf 含 127.0.0.1-3425/v1 与 magpie api_key，/v1/models 实测返回含图像输入模型。
+---
 # magpie
 本地模型网关（OpenAI 兼容），被 OpenViking 复用为 VLM 抽取与评测的模型代理。
 
@@ -8,7 +13,6 @@
 
 ## 暴露模型
 - 2026-11-09 经 /v1/models 查询确认暴露 13 个模型，且全部支持图像输入（即本次 MMVP 评测对象）
-
 
 <!-- MEMORY_FIELDS
 {

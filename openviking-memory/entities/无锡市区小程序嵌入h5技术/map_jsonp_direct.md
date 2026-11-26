@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:40:24+08:00
+verdict_note: 无锡H5 src/utils/index.js 命中 apis.map.qq.com 与 jsonp，JSONP 直连腾讯地图属实。
+---
 # H5地图接口JSONP直连方案
 H5端地图能力通过JSONP直连腾讯地图API，移除了原有的/map反向代理配置。
 

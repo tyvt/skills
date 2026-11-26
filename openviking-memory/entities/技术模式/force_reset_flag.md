@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:19:43+08:00
+verdict_note: 苏住房G utils/passwordReset.js 有 FORCE_RESET_PASSWORD_ENABLED=false 且 store/user.js 引用，强制改密开关属实。
+---
 # 强制改密开关禁用避免登录拦截
 苏住房G 项目通过 `FORCE_RESET_PASSWORD_ENABLED` 开关在登录链路禁用强制改密弹窗，避免 `ResetPwdDialog` 拦截登录，同时保留个人中心改密入口。
 
@@ -20,7 +25,6 @@
 ## 验证与归属
 - 所属项目：苏住房G
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

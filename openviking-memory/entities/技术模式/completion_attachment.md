@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:49:33+08:00
+verdict_note: VALID；fetchCompletionAcceptance/WXZJJGYS/completion-acceptance 在泰兴小程序真实代码命中。
+---
 # 竣工验收附件能力对接
 泰兴小程序竣工验收页已对接附件能力，对齐三方鉴定页实现方式，`busCode` 使用 `WXZJJGYS`。
 

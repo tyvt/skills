@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T23:45:09+08:00
+verdict_note: selection_lake 数据湖项目不在本机；external_lake.py/screen_sh.py/screen_sz.py/update_selection_lake.py 及配置文件全盘D盘搜索均不存在，无代码证据，无法证明有效。
+---
 # selection_lake 数据湖项目
 本地股票数据湖项目，用于抓取东财、腾讯等数据源并做筛选，依赖本地 HTTP 代理出口。
 
@@ -15,7 +20,6 @@
 ## 更新行为
 - 若历史日期（如 2026-10-29）有失败阶段，本次运行会先按 retry-previous-date 补该日计划
 - 更新阶段包括 BSE 快照、push2、baostock、instruments、compact、公告 events（cninfo）等
-
 
 <!-- MEMORY_FIELDS
 {

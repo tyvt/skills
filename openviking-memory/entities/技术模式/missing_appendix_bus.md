@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:43:41+08:00
+verdict_note: AgencyBranchDetail.vue/appendixBusCode/agencyBranch 在苏州市房地产监测V3命中。
+---
 # 计算属性 appendixBusCode 缺失导致 Vue 警告
 在项目 苏州市房地产监测V3 中，`AgencyBranchDetail.vue` 在编辑模板中绑定了未定义的属性 `appendixBusCode`，触发了 Vue 警告。
 

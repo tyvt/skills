@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T04:32:48+08:00
+verdict_note: 苏住房G/zhi2-web-admin fundPanorama 下 chartRenderers.js 命中 lastTrendUnitPos/requestAnimationFrame/replaceMerge，index.vue-120/461 调用 renderFundTrendMixed，ECharts 时序处理描述属实。
+---
 - ECharts 主渲染中不可在 finished 事件内同步调用 chart.setOption，会触发主流程告警
 - 改用 requestAnimationFrame 推迟调用，并以 lastTrendUnitPos 缓存位置防止循环
 - 为 graphic 更新设 {replaceMerge:['graphic']} 避免残留

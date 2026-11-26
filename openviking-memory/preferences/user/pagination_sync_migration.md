@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:48:04+08:00
+verdict_note: VALID；zs-pagination/v-model-page/-page.sync 迁移语法在真实代码命中。
+---
 - Root cause of pagination bounce: `zs-pagination` migrated to `v-model:current-page`, but many pages still use old `:page.sync`/`:limit.sync` syntax, causing pagination to bounce back.
 - Preferred fix: globally regex-replace `:page.sync=` with `v-model:page=`, `:limit.sync=` with `v-model:limit=`, and migrate `zs-select`'s `:value.sync` to `v-model:value` under `zhi2-web-admin/src`.
 - Verification: extracted source=cursor session=73a5ecd2-f9fb-443b-b4b0-8e8521acce74

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:45:30+08:00
+verdict_note: BankAccountTable.vue、showBalanceQueryButton、itf_bankList 等19符号命中，查询空表留白修复属实。
+---
 # 银行账户查询空表留白与按钮位置统一修复
 苏州市房地产监测V3 的 supervision 与 property 两个 BankAccountTable 已完成空表留白与按钮位置统一修复。
 

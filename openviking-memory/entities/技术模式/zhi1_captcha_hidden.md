@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:43:25+08:00
+verdict_note: 太仓G/zhi1-web-admin 目录存在；验证码默认隐藏为已批准决策记录，含 dev 环境 captchaOnOff 过程，无幻觉与隐私违规。
+---
 # zhi1 登录注册验证码默认隐藏
 太仓物管前端 zhi1-web-admin 的登录与注册页图形验证码按原型默认隐藏，只有接口明确返回开启时才显示并校验。
 

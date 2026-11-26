@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:13:49+08:00
+verdict_note: 苏住房C 命中 Project_Suzhufang、listRecommend，二手房图片字段映射与分包图修复上下文属实；mainStaticPaths 未直接命中但整体方案成立。
+---
 # 苏找房全部Tab二手房图片空白修复
 苏住房C 苏找房「全部」Tab 二手房图片空白问题已定位并修复，根因含接口缺图、分包默认图不可达、字段映射错与 H5 混内容。
 

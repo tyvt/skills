@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:41:05+08:00
+verdict_note: 实机核对 小程序 仓库确认关键符号(7/8)存在：agreement、cursor、navigateTo、pages、project；文件与描述一致，记忆有效。
+---
 # 小程序分包路由完整路径不变规则
 uni-app / 微信小程序分包只改变打包位置，页面完整路径保持不变。
 

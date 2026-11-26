@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:20:20+08:00
+verdict_note: 昆山市民 src/pages/verifyUser/index.vue-50/42、src/pages/common/useEidVerify.js-26/100 命中 HANDLED_RESULT_KEY/takePendingVerifyResult/useEidVerify，防重修复属实。
+---
 # 昆山市民E证通实名变更重复消费pending
 实名信息变更流程中 `onSuccess` 与 `onShow` 各处理一次同一 pending，叠加过早重置导致卡在修改页，需防重并修正回跳逻辑。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:14:46+08:00
+verdict_note: 抽检2026-11-26 customerProject/detail.vue 本机存在
+---
 # 楼幢区Tab内容留白修复
 苏州市房地产监测V3 中楼幢区内层 Tab 的 tabs-content 已补充左右留白，使表格与 Tab 标题对齐。
 

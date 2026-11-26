@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T21:46:18+08:00
+verdict_note: 全仓无 resolveRelativePageUrl/handleParticipate/needToKnow，选举跳转修复符号无法证实。
+---
 # 选举页参与选举跳转失败修复
 苏住房C小程序分包改造后，选举详情页点击「参与选举」跳转须知页失败，已通过路径解析与失败回调修复。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:47:20+08:00
+verdict_note: 计划文件 openviking-optimization-20261113.md 存在于 D-/plan/skills/，与记忆所述规划文档一致。
+---
 # openviking 优化计划
 OpenViking 优化计划是记录成本与可观测性优化方案、验收标准及实施安排的规划文档。
 

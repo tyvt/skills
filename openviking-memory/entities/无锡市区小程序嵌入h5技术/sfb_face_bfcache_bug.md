@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:15:22+08:00
+verdict_note: 在无锡市区小程序嵌入H5定位sfbFaceAuth.js、face.vue；bfcache僵尸桥二次人脸超时修复为该会话落地文件，一致。
+---
 # 苏服办人脸bfcache僵尸桥导致二次识别超时
 无锡市区H5在苏服办App内办完第一户人脸跳第三方页返回后，iOS WKWebView从bfcache恢复使lightAppJssdk桥变僵尸态，第二户waitForSfbFaceSdk超时失败。
 

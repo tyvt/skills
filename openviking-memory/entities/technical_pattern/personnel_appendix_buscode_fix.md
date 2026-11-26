@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T10:35:18+08:00
+verdict_note: 苏州市房地产监测V3 三文件 appendixBusCode 计算属性均 return this.auditBusCode（Agency/LeasePersonnelDetail、staffManagement/detail）。
+---
 # Personnel Change Attachment busCode Fix
 In 苏州市房地产监测V3, AgencyPersonnelDetail.vue, LeasePersonnelDetail.vue, and staffManagement/detail.vue had appendixBusCode hardcoded to return the filing code, inconsistent with the change-submit busCode.
 

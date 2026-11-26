@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:53:50+08:00
+verdict_note: 园区物管2.0 命中 zs-like-select、getBoundingClientRect、position-fixed，与下拉层改 fixed 定位描述一致。
+---
 # 祖先overflow裁剪下拉改fixed定位（zs-like-select）
 祖先容器 `overflow:auto` 场景下下拉层被裁剪，改为 `position: fixed` 定位。
 
@@ -15,7 +20,6 @@
 - 验证：长表单 dialog 内打开 like-select，滚动 dialog 后下拉仍贴齐输入框且不被裁切；也可打开弹窗，光标点到“资金专户/资金专户名称”附近靠下位置，确认下拉完整显示且弹窗滚动不受影响
 - 涉及文件：zhi2-web-admin/src/components/zs-select/zs-like-select.vue（亦称 index.vue）、AddDialog.vue
 - 所属项目：2-0；来源会话：e46496c1-c5d8-41f4-9fe7-15b3f4530f3a、7f3a94cb-8b2a-4c1e-9d3e-4f8a1b2c3d4e；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

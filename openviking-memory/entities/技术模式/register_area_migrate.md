@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:49:25+08:00
+verdict_note: Step1BasicInfo.vue 实测含 administrativeArea 与 provinceCityArea，区域字段迁移兼容属实。
+---
 # 机构注册区域字段迁移兼容旧数据
 苏州市房地产监测V3中Step1BasicInfo.vue将「行政区域」绑定由provinceCityArea改为administrativeArea，需兼容旧数据。
 

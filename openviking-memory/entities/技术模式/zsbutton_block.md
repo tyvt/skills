@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T00:17:50+08:00
+verdict_note: 苏住房C ZsButton.vue 源码仍为 width-inherit(-42)、无 block prop、.long(-78) 仍在；全仓无 zs-button--block。记忆称已加 block、移除 width-inherit 与现状不符。
+---
 # ZsButton 全宽需 block 属性
 苏住房C 的 addHouseContract 页底部「添加」按钮因未设 block 且父级 flex 居中，显示成贴中间的窄条而非整行圆角按钮。
 

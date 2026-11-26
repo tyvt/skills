@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T01:51:39+08:00
+verdict_note: 苏州市房地产监测V3 命中 institution-register-flow、institution-appendix、InstitutionRegisterSingleForm 等，与 HEAD 既有失败描述一致。
+---
 # 机构注册相关用例在 HEAD 上既有失败
 苏州市房地产监测V3 中 institution-register 系列测试在 HEAD 版本即存在失败，非本次改动引入，属既有问题。
 

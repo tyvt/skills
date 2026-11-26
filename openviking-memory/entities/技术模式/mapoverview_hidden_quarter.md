@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T16:24:39+08:00
+verdict_note: 园区物管2.0 mapOverview/index.vue 存在，但关键符号 getCurrentOverviewQuarterLabel、selectedQuarter、quarter 在真实代码全库0命中，仅存于记忆镜像，无法证明有效。
+---
 # mapOverview 隐藏季度筛选UI仍带默认季度参数
 园区物管2.0 mapOverview 页移除左上角季度下拉仅改展示时，selectedQuarter 仍默认 getCurrentOverviewQuarterLabel()，统计/大屏接口请求行为不变。
 

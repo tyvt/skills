@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:42:28+08:00
+verdict_note: form-item-error-slot/detail-block-gap/element-ui.scss/detail-form.scss 在苏州监测V3命中，全局间距统一属实。
+---
 # 表单项纵向间距与校验错误全局统一
 苏州市房地产监测V3 将表单项改为固定留白、不随报错撑高，统一全局样式。
 

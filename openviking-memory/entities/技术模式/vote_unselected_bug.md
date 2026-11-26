@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:39:25+08:00
+verdict_note: ViewOptionsList/DescribePopup/暂未选择/readOnly 在惠山二期H5命中，选项区显示与prop描述属实。
+---
 # 非必填投票中“未选择”的显示
 当投票非必填且未投票时，`ViewOptionsList.vue` 和 `DescribePopup.vue` 中的选项区域显示“暂未选择”；新增了 prop `readOnly`。
 

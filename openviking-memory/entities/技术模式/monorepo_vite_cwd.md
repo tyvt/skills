@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:16:38+08:00
+verdict_note: 门户 package.json-4-5 命中 workspaces-['zhi2-web-admin']，monorepo 需子目录起 vite 的约定属实。
+---
 # monorepo 根跑 vite 必 404
 monorepo 仓库根直接跑 vite 返回 404，必须以 workspaces 子目录为 cwd 才能起。
 
@@ -17,7 +22,6 @@ monorepo 仓库根直接跑 vite 返回 404，必须以 workspaces 子目录为 
 ## 验证与归属
 - 来源会话 feishu-8464c72c-f8a9-4d8a-ba49-fb88c20e2f6b（基线 6156653）最终结论「前端已启动」段
 - 涉及文件：zhi2-web-admin/vite.config.js、zhi2-web-admin/package.json
-
 
 <!-- MEMORY_FIELDS
 {

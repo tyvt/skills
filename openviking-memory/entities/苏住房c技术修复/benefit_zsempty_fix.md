@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:11:26+08:00
+verdict_note: 命中 benefit、ZsEmpty，苏住房C 收益空态组件描述属实
+---
 # 受益分包空状态组件属性批量修复
 苏住房C小程序 pages_benefit 分包中 11 处 ZsEmpty 的 text 属性误用，已统一改为 description。
 

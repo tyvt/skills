@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:14:25+08:00
+verdict_note: 产品2.0 src/views/maintenance/accRefund/ 下 AccountRefundTable.vue、HistoryRefundNoticeDialog.vue 实存，退款功能文件结构属实。
+---
 # 维修资金账户退款申请功能
 产品2.0 项目按现有规范新建维修资金退款（账户退款申请）功能，包含列表页、详情页与多个组件。
 

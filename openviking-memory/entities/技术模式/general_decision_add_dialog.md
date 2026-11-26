@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T14:09:08+08:00
+verdict_note: DecisionRangeTable.vue-324-336 RangeHouseDialog、-361 batchAdd 引入、-634 打开弹窗、-639 batchAdd 调用、-341 decision-policy 传递，一般表决改开选择户室弹窗的修复属实。
+---
 # 一般表决详情新增按钮打开错误弹窗
 太仓G 一般表决详情页点「新增」误打开「新增决策范围」表单弹窗并调接口导致系统异常，已改为打开「选择户室」弹窗。
 

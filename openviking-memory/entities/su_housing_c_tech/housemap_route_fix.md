@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:46:40+08:00
+verdict_note: VALID；menuRouteMap/houseMap/1_4_5 在苏住房C真实代码命中。
+---
 # 地图找房菜单路由指向旧路径修复
 苏住房C小程序「地图找房」因菜单路由仍指向旧分包路径导致页面找不到，已修复。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

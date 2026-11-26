@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T15:47:24+08:00
+verdict_note: 苏州市房地产监测V3：staffManagement(51)、contentInfo、人员编号/HeadTitle(173)均命中，staffManagement组件与人员编号页头展示存在。字段顺序调整的记忆与文件/符号一致。
+---
 # 从业人员详情页字段顺序调整
 苏州市房地产监测V3 中从业人员详情页（staffManagement/components/detail.vue）查看态「基本信息」区块已按图调整字段顺序，采用 3 列网格。
 

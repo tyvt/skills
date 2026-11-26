@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:45:11+08:00
+verdict_note: 惠山二期G decisionRangeBuildingSelectMixins.js 等6文件命中，全取消/缓存同步修复描述属实。
+---
 # 因异步缓存导致全取消失效的缺陷
 取消建筑的全选未与建筑表同步，原因是缓存缺少同步更新。
 

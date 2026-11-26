@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:24:08+08:00
+verdict_note: 苏州市房地产监测V3 src 命中 cashsalePlanId、extractPlanId、buildPlanPageResult，与「接口返回 cashsalePlanId 误用 planId 致按钮禁用」一致。
+---
 # 保存接口字段名不符致回传 planId 空禁用
 苏州市房地产监测V3 预售方案保存接口返回 `cashsalePlanId`，方案页误用 `planId` 解析致回传为空、「查看」按钮禁用。
 

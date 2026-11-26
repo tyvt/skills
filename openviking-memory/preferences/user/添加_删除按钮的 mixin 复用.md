@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T04:32:27+08:00
+verdict_note: 苏州市房地产监测V3 AgencyBranchList.vue-106/118/119 命中 extraPerms、addButton、multiDeleteButton，permsMixins.js-29 展开 extraPerms，描述属实。
+---
 - 在业务页面中，添加按钮移除自定义实现并复用 mixin 中的 `addButton`，通过 `extraPerms` 映射权限（例如：`company:agencyBranch:edit`）。
 - 批量删除复用 mixin 的 `multiDeleteButton`；选择列 `selectable='isSelectable'` 将 `recordState==='0'` 限制为可选；`deleteRequest` 并行调用单 ID 接口；行内删除和批量删除共享 `handleDelete`。
 - 重复的 `handleQuery`/`resetQuery` 被移除，使用 mixin 的默认实现；`showButton` 控制编辑按钮的可见性。
@@ -7,7 +12,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：b02c7339-410a-4155-9af2-1dd4826ef29d
-
 
 <!-- MEMORY_FIELDS
 {

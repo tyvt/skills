@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:48:48+08:00
+verdict_note: VALID；tabBar/menuStore/@/store/menu/loadMenu 在苏住房C真实代码命中。
+---
 # 微信小程序动态导入返回路径字符串致模块未定义
 苏住房C小程序分包提交将 menuStore 改为动态 import，微信小程序编译返回路径字符串而非模块对象，致 loadMenu 报错，回退静态导入。
 

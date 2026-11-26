@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T03:34:10+08:00
+verdict_note: complex/detail.vue-485 watch 监听 form.aboveFloorArea/underFloorArea(506-507) 至 handleChangeFloorArea(1347，两值相加赋值 totalFloorArea)，面积输入框仅 v-model 无 @change，吻合。
+---
 # 物业区域面积自动重算统一修复（苏住房G）
 苏住房G 在 3 个页面统一应用相同修复，使总建筑面积在粘贴、手动输入或程序化赋值后自动重算。
 

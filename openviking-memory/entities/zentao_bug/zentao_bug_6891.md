@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T17:20:00+08:00
+verdict_note: 苏州市房地产监测V3 src 命中 jgcyrybg 与 company-personnelRecordChange-query，与按 busCode 分发 AgencyPersonnelDetail 的接口400根因描述一致。
+---
 # 禅道 Bug 6891
 禅道缺陷 6891：经纪机构从业人员变更详情页字段大面积显示「-」、人员角色显示原始码，根因是详情接口 400（后端权限码未开通 + 接口路径不一致）；前端已按 busCode 分发修复并推送。
 

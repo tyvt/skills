@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:11:13+08:00
+verdict_note: 实机核对：所属项目仓库命中记忆所述关键标识，描述与代码现状一致
+---
 # 富文本解码函数正文空白
 苏住房C 账户注销页 decodeHtmlEntitiesIfNeeded 遇标签与实体混排跳过解码致正文空白。
 

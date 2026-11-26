@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:47:11+08:00
+verdict_note: httpInstance 在苏住房C szffluzm 命中，网关ID描述属实。
+---
 # 苏服办网关GET/POST靠不同interface_id分流
 苏住房C（zhi2-mobile-shimin）所有接口经苏服办网关gateway.do转发，GET/POST须用不同interface_id，且普通请求不要自带zs-method。
 

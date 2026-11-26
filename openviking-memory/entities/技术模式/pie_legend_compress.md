@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:13:15+08:00
+verdict_note: 命中 fundPanorama、icon，基金全景图相关描述属实
+---
 # 饼图例圆形图标等宽致横向压缩
 园区物管2.0 资产沙盘 fundPanorama 饼图图例因圆形图标等宽设置导致底部多列排布色块横向压缩显扁。
 

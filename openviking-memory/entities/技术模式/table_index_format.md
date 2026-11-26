@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:20:34+08:00
+verdict_note: 苏州市房地产监测V3 zs-table-column.vue 有 formatRowIndex(scope.$index) 及回调处理，序号格式修复属实。
+---
 # 表格序号格式修复
 苏州市房地产监测V3 项目优化 `zs-table-column` 的 `formatRowIndex`，使 `type="index"` 列自定义序号回调真正生效。
 

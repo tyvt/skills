@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:43:47+08:00
+verdict_note: resolveBudgetResponse/noReject/getAnnualBudgetByComplexId 在苏住房C命中，未传noReject致错位描述属实。
+---
 # 预算页未传noReject致数据层错位
 苏住房C业主端年度预算页因接口未传noReject，拦截器已解包导致response.data即为业务数组，自写解析取response.data.data得到undefined而显示空态。
 ## 问题现象

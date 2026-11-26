@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T09:14:57+08:00
+verdict_note: 抽检2026-11-26 苏住房C定位修复叙述自洽
+---
 # 首页搜索框定位修复
 苏住房C(zhi2-mobile-shimin) 首页 Project_Suzhufang.vue 调整搜索框定位，使其一半叠在 Banner 上。
 

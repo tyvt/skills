@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T00:49:50+08:00
+verdict_note: 苏州V3命中 getLastChangeByLogin/companyRecordAgency/detail, companyRecordId修复属实
+---
 # 修复变更接口中的 companyRecordId 参数
 在项目 zhi2-web-admin 中，修复了代理机构注册变更 API 中缺失 companyRecordId 的问题。
 
@@ -22,7 +27,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：7228345d-b39b-4e14-b319-e0de248ed26e
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:19:07+08:00
+verdict_note: 苏住房G CompanyProjectStats 组件含 statType/statTypeOptions，按统计类型前端筛选逻辑属实。
+---
 # 物业企业项目统计类型筛选修复
 苏住房G 公共查询-物业企业项目统计模块中，按统计类型筛选不生效的问题已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:41:27+08:00
+verdict_note: 工作流/偏好类记忆，无单一代码修复点；所述文件(exception commit/status 约定)与 AGENTS.md 及仓库现状一致，未发现幻觉或隐私违规。
+---
 # 子表组件独占Headline承载按钮
 苏州市房地产监测V3 的 specialcontract/detail.vue 移除父层 Headline 包裹，改由子表组件 contractTable.vue 独占 Headline 以挂载操作按钮，遵循 businessItemTable/assetTable 约定。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T22:14:38+08:00
+verdict_note: 产品2.0 collectionDialog.vue 实机含 createFromBill、CSCANC、queryOrderStatus，扫码收款时序属实。
+---
 # 扫码收款链路固定时序约定
 产品2.0 阳光物业账单收款扫码支付须按 createFromBill → payInfo(CSCANC) → 轮询 queryOrderStatus 固定时序串接。
 

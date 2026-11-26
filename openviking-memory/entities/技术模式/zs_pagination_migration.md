@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T18:27:14+08:00
+verdict_note: 产品2.0仓库仍有大量-page.sync(CompanyDialog-80等)且无v-model-page，与"全局替换完成"描述不符。
+---
 # zs-pagination v-model 迁移与全局替换
 产品2.0（zhi2-web-admin）将分页组件从 .sync 语法迁移到 Vue3 v-model 语法，并通过全局正则一次性批量替换。
 

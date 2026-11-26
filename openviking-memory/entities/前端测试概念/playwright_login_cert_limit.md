@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:44:26+08:00
+verdict_note: 真实代码存在 ProjectCertificateTabs.vue、form-content-col（zs-search-form），所述组件与 CSS 落点属实。
+---
 # Playwright登录证书筛选限制
 Playwright 通用登录无法自动化验证证书管理筛选 UI 的技术限制与应对。
 ## 限制说明

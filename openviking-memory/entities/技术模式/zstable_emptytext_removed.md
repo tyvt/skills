@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:41:29+08:00
+verdict_note: 兴化物管 zsTable/index.vue 已无 emptyText，与记忆「移除 emptyText 逻辑」一致，移除类修复已落地。
+---
 # zsTable 移除 emptyText 逻辑
 在兴化物管 zhi1-web-admin 的 zsTable/index.vue 中移除了所有 emptyText 相关逻辑，空状态改由 Element UI 默认文案展示。
 

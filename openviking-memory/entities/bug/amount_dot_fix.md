@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-26T20:13:51+08:00
+verdict_note: 命中 ParcelDialog、dot="6"，金额6位小数修复属实。
 ---
 # 项目信息备案金额字段6位小数修复
 苏州市房地产监测V3 中项目信息备案表单的金额字段因 `:dot="6"` 出现 6 位小数，已修复为 2 位。

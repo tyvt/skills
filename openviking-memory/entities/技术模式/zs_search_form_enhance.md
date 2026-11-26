@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T21:42:54+08:00
+verdict_note: 苏州V3 BranchOneDialog.vue 命中 zs-search-form 与 provinceName，组件迁移属实。
+---
 # zs-search-form 增强与 BranchOneDialog 迁移
 苏州市房地产监测V3 增强公共组件 zs-search-form 并将 BranchOneDialog 迁移至其下。
 

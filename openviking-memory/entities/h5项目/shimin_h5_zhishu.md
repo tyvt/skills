@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T05:33:05+08:00
+verdict_note: 本地工作区无 zhishu-c/指数C 仓库，全库与 zhi2-mobile-shimin/src 均无 stripTokenFromUrl、tracker.js、vite html-transform 对应代码（扫描受 file-limit 限制）。记忆大量为外部部署/nginx事实，核心代码点不可核验，按无法证明即无效。
+---
 # 市民H5指数C项目
 作为 web-view 嵌入微信小程序的 H5 项目（gitlab 路径含 homeland-fe-zhi2/mobile/shimin/h5/zhishu-c）。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T20:47:45+08:00
+verdict_note: 门户 portalPersonPhoto.js 实测含 resolvePersonPhotoSrc，人员照片占位图回退逻辑属实。
+---
 # 门户首页二级人员照片占位图统一
 门户项目「首页二级」缺人员照片位置统一使用 empty.svg 占位，新增 resolvePersonPhotoSrc 回退逻辑。
 

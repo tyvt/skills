@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T02:17:58+08:00
+verdict_note: 物业手持B端pages_facility/record相关文件存在；add页灰底修复与IDX29同项目同批改动，背景色约定与现状无矛盾。
+---
 # 巡检记录add页背景灰底修复
 泰兴小程序巡检记录 `add` 页背景应为灰色 `#f7f7f7`，因 scoped 样式未生效导致露白，已修复。
 ## 问题根因

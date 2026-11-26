@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T19:22:07+08:00
+verdict_note: 苏住房C security.js 有 getTokenV1、v1Instance.js 读 tokenV1，登录链路补 V1 token 属实。
+---
 # 苏服办登录后V1 token缺失修复
 苏住房C苏服办登录流程（App.vue的initSfbUser）漏掉V2换V1 token调用，已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T03:33:47+08:00
+verdict_note: 门户仓 router/index.js 的 constantRoutes(34-147) 无消息中心路由，全仓 git log 无 0fd25ef15 提交，router/views/message* 无消息中心字样；记忆声称的已注册固定隐藏路由与该提交与现状不符。
+---
 # 门户铃铛提示没有授权的根因与修复
 固定或隐藏路由（如消息中心）后端菜单不下发，前端未显式注册导致点铃铛提示「没有授权」，实际是路由缺失而非权限问题。
 

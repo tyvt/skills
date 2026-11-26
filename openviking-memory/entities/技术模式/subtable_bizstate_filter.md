@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T16:52:31+08:00
+verdict_note: 榆林G/产品2.0 含 AccountDetailTable.vue、guaranteeDepositAccount 与 bizState-2 过滤用法，子表聚合口径属实。
+---
 # 聚合类子表明细查询必须显式传 bizState=2
 房屋质量保证金账户详情页的缴存明细/支用明细子表只应展示已备案（bizState=2）数据，需显式传参过滤。
 

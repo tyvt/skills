@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-26T23:17:27+08:00
+verdict_note: 命中 companyManagement/change/detail.vue 内 components/detail，对话框刷新打开描述属实（证据偏弱但文件与符号存在）
+---
 # 企业变更详情页变更记录弹窗修复
 淮安物管企业变更详情页接入 change-record-dialog 时的具体修复实例（会话 95b62123）。
 
@@ -12,7 +16,6 @@
 - 验证证据：extracted source=cursor project=淮安物管
 - 涉及文件：companyManagement/change/detail.vue、credit/companyDeclaration/components/checkDialog.vue、companyManagement/components/detail.vue；需刷新页面重新打开变更记录。
 - 来源会话：95b62123-9914-4e98-aca3-4d7acff520aa；代码基线：22a1d9d。
-
 
 <!-- MEMORY_FIELDS
 {

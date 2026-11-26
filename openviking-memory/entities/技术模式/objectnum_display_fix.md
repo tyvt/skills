@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T01:47:44+08:00
+verdict_note: 泰兴小程序源码中 objectNum、applyCount、maintainProject 均命中，与维修对象数展示修复描述一致。
+---
 # 维修对象数展示修复
 泰兴小程序项目列表页将展示改为接口返回的 objectNum（维修对象数），并修正空值显示逻辑。
 
@@ -15,7 +19,6 @@
 - 验证：extracted source=cursor session=bc34b808-3561-437d-9b34-098a77d7e44d
 - 涉及文件：d:/repository/泰兴小程序/src/pages_maintain_project/project.vue、maintainProject.js、index.vue、api/maintenance.js、project-detail.vue
 - 所属项目：泰兴小程序；来源会话：bc34b808-3561-437d-9b34-098a77d7e44d；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

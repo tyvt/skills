@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-26T23:14:33+08:00
+verdict_note: 命中 file/appendixConfig、dialogMixins、appendixConfig，FjDialog 接口规范化属实
+---
 # FjDialog.vue 附件配置接口规范化修复
 FjDialog.vue 原使用 dialogMixins 但详情与保存仍走旧 REST 风格接口，已改为复用 mixin 标准 CRUD。
 

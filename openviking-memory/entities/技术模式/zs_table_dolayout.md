@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-26T15:44:22+08:00
+verdict_note: 园区公共收益源码：ScopeSelectDialog.vue、handleQuery、doLayout存在，但记忆核心listTableTr/updateListTableTr全仓0命中(仅memory归档有)。"listTableTr不变即return跳过doLayout"的根因机制无法证明，判无效。
+---
 # 弹窗内zs-table重置搜索后末行裁切修复（listTableTr不变跳过doLayout）
 在ScopeSelectDialog内嵌zs-table时，若计算listTableTr与上次相同则跳过doLayout，重置搜索后行数恢复但内部滚动高度未重算致末行裁切。
 
