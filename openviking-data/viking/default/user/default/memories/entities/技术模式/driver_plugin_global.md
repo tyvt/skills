@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:45:24+08:00
+verdict_note: 记忆称Vue3插件src/plugins/driver.js+app.config.globalProperties.$driver+app.use；实测main.js-82为Vue2 `Vue.prototype.$driver = new Driver(...)`，App.vue-67-68直接调用未判空，无plugins/driver.js。描述与现状不符。
+---
 # driver.js引导封装为插件挂载全局属性
 将 driver.js 引导功能封装为插件以规避未挂载时抛 Uncaught 异常。
 

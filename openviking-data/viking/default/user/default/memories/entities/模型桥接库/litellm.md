@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:44:26+08:00
+verdict_note: 工具/偏好/知识类记忆，核心符号在 skills 与 OpenViking 仓源码/配置全部命中，描述与现状一致，判有效。
+---
 # litellm
 模型调用桥接库，被 OpenViking 用于连接 Ollama 等后端。
 

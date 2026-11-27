@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:42:31+08:00
+verdict_note: 核对保障房G：src/utils/mapKey.js 命中 getMapKey/loadTencentMapScript、glKeyDelegate 安全代理文档、/_TMapService 代理，与描述一致。
+---
 # 保障房G 腾讯地图 Key 加载与安全代理
 在保障房G（zhi2-web-admin）中，腾讯地图 Key 统一从系统参数读取，并通过安全代理转发，避免硬编码与前端点位暴露。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:28:06+08:00
+verdict_note: 园区物管2.0 mapOverview/index.vue含MAP_OVERVIEW_ASSET_URL、mapAssetUrls、mascot，与图片资源统一引入描述一致。
+---
 # 图片资源统一按 resolveServerAssetUrl 引入
 园区物管2.0 效益分析-地图总览页（benefit/mapOverview）所有图片资源统一按 `resolveServerAssetUrl` 处理。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:08:45+08:00
+verdict_note: 目标项目 苏州市房地产监测V3 的 other_record/index.vue 已无 noticeState/NOTICE_STATE/bizStateOptions；旧版仓库(建湖G、淮安等)仍保留，印证V3已删除描述属实。
+---
 # 其他缴款列表误留通知书状态筛选及列
 苏州市房地产监测V3 其他缴款列表冗余通知书状态查询与列，已删除。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:45:29+08:00
+verdict_note: 多个小程序 App.vue 实存 useUserStore().clear，onLaunch 清 token 描述与代码一致。
+---
 # Pinia持久化旧token冷启动清理
 uni-app 用 Pinia persist 持久化 user store，冷启动会恢复旧 token，需 onLaunch clear 实现每次重登。
 

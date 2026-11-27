@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:50:07+08:00
+verdict_note: 产品2.0 命中 -reserve-selection=false/listCallback/zs-select-column/clearSelection()/this.ids，跨页全选修复属实。
+---
 # 物业管理区域备案跨页保留选中修复
 产品2.0 物业管理区域备案列表全选含未备案数据点击同步时，因跨页保留选中导致校验失败。
 

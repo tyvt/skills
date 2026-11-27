@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:48:44+08:00
+verdict_note: 产品2.0 命中 resolveServerAssetUrl 导入、ForgotPassword.vue、iconDataCardNew.vue，模板补全并构建属实。
+---
 # 模板resolveServerAssetUrl方法补全
 剩余在模板使用 `resolveServerAssetUrl(...)` 未接入公共方法的页面已补全，并完成 `npm run build` 退出码0。
 

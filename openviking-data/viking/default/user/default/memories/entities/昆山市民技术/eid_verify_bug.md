@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:47:38+08:00
+verdict_note: 昆山市民useEidVerify.js-58 code===200/0或msg==='操作成功'、-89延迟300ms，request/index.js-89 res.status??res.statusCode，与修复一致。
+---
 # 响应拦截器仅认200致E证通核身失败
 昆山市民 axios 响应拦截器仅认严格 HTTP 200 而提前 reject，导致 E 证通核身接口日志 code 200 仍提示失败。
 

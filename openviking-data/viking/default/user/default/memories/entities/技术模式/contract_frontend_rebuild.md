@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:26:03+08:00
+verdict_note: contract 目录命中 decorateType(chapter2.vue等)而 decorationType 已无，字段重命名属实，组件文件均在
+---
 # 合同页面改造前端
 苏州市房地产监测V3 中合同页面前端改造已完成，覆盖入口版本控制、公共组件、第一章当事人表格与章节字段补充。
 

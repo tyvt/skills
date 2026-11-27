@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:30:15+08:00
+verdict_note: 苏州市房地产监测V3 company/institutionRegister/detail.vue含loadDetail并指向/company/companyRegister/detail，与重写init修复一致。
+---
 # detailMixins 拼接错误路径导致错误请求
 在 Suzhou Real Estate Monitoring V3 项目中，`detailMixins` 在 `formMode:'view'` 下通过 `moduleName+businessName` 拼接了错误路径 `/company/institutionRegister/detail`，导致详情请求了错误的 API。
 

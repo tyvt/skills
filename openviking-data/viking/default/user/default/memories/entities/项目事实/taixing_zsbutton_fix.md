@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:50:55+08:00
+verdict_note: 实机核对：泰兴小程序 src/staff/components/ZsButton/ZsButton.vue(101) @include staff-page-theme，staff/styles/theme.js(2) STAFF_PRIMARY='#1677ff'，theme.scss $staff-primary-#1677ff；主题色统一属实。
+---
 # 泰兴小程序员工端 ZsButton 主题色统一
 泰兴小程序员工端 `ZsButton` 因读不到页面 `--primary-color` 而回退业主端深蓝，已修复为天蓝色 `#1677ff`。
 

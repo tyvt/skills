@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:15:51+08:00
+verdict_note: 苏州市房地产监测V3 命中 Headline、collapse-content、overflow-hidden 及 presale/permit 详情，溢出修复属实
+---
 # 预售许可新增页要件区溢出修复
 苏州市房地产监测V3 中预售许可新增页因 Headline 组件 overflow 致要件列表撑破容器，已限高修复。
 

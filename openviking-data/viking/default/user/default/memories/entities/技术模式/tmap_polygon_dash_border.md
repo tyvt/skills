@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T19:41:10+08:00
+verdict_note: 全库 tmap/qqmap/polygon 路径下 PolygonStyle/showBorder/borderWidth 均为 0；命中仅来自记忆归档自引用，无真实修复代码，无法证明
+---
 # 腾讯地图 TMap 多边形虚线边框
 腾讯地图 TMap.PolygonStyle 绘制虚线边框需特定属性组合，仅设 borderColor 不生效。
 

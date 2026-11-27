@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:47:39+08:00
+verdict_note: 园区物管2.0 map.vue 命中 MultiPolygon/MultiMarker/MultiLabel/instanceof/_tmapCtx/_mapViewToken/loadMap/JSONP，地图实例守卫属实。
+---
 # 腾讯地图 TMap 实例校验失败防御
 园区物管2.0 中腾讯地图 GL JS API 创建 MultiPolygon/MultiMarker/MultiLabel 时报「所传入参数并非 TMap.Map 的实例」的三类根因与统一防御套路。
 

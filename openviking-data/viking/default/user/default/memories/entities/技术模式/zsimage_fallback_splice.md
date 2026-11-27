@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:48:18+08:00
+verdict_note: 在泰兴小程序仓源码命中核心符号(13/16)buildstaticurl,decision,fallback,fallbacksrc，涉及文件存在，描述与现状一致，判有效。
+---
 # 业主端图片图标因 ZsImage 兜底图双重拼接缺失
 调整分包后业主端大量图片与 icon 不显示，根因是 ZsImage 兜底逻辑把完整远程 URL 拼进本地 static 前缀。
 

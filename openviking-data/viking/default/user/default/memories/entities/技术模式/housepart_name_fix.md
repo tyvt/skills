@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:45:22+08:00
+verdict_note: 苏住房G housePart 命中 subdistrictFormatter/communityFormatter/选择资产，街道社区名称显示修复属实
+---
 # 资产点位选择资产弹窗街道社区名称显示修复（苏住房G）
 苏住房G 项目修复资产点位页面「选择资产」弹窗街道、社区列直接显示编码而非名称的问题。
 

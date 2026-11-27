@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:27:23+08:00
+verdict_note: 园区物管2.0 user.js-8,131 有 clearProjectContext，Navbar.vue-228 有 localProjectName，FedLogOut 联动存在；退出清小区上下文属实。
+---
 # 退出登录清除小区上下文
 园区物管2.0 在退出登录时新增 clearProjectContext，统一清除 localStorage 与 Vuex 中的小区状态，避免串号显示旧小区。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

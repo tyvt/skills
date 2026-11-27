@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:53:50+08:00
+verdict_note: 命中 AgencyPersonnelDetail/LeasePersonnelDetail/personnelRecordChangeId/formMode，保存后置 view 修复属实。
+---
 # 变更单保存须改formMode为view退出编辑态
 苏州市房地产监测V3 中变更单保存成功后未将路由 `formMode` 置 `view`，导致仍处编辑态。
 

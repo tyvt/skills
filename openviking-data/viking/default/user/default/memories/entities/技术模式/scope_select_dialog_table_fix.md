@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:24:18+08:00
+verdict_note: 园区公共收益 ScopeSelectDialog.vue 命中 scope-select-footer/listTableTr，表格底部遮挡修复属实
+---
 # 新增开户明细弹框表格底部遮挡修复
 园区公共收益 zhi2-web-admin 修复「新增开户明细」弹框表格底部被遮挡问题。
 
@@ -14,7 +19,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区公共收益
 - 所属项目：园区公共收益；来源会话：a30ff912-d925-46fa-ad4b-9657898fd082；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

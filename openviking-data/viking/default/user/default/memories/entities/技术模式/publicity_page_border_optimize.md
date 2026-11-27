@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:47:14+08:00
+verdict_note: 产品2.0 autonomy下无pubPublicity/index.vue与pubownerDecision/index.vue，记忆所述去双层边框的两个落点文件不存在。
+---
 # 公共收益公示管理页面边框优化
 产品2.0 项目优化了公共收益-公示管理相关页面的表格外层边框，消除双层边框问题。
 

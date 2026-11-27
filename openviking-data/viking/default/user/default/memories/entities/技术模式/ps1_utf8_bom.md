@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:43:25+08:00
+verdict_note: D-/sdk/start-backend.ps1存在，PowerShell 5.x无BOM按GBK解析为通用技术事实，记忆有效。
+---
 # PowerShell 脚本必须 UTF-8 BOM 保存
 PowerShell 5.x 读取无 BOM 的 UTF-8 脚本会按系统 ANSI 代码页（GBK）解析，导致中文路径乱码、脚本解析失败。
 

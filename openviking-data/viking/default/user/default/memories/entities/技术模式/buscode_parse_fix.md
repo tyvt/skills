@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:19:16+08:00
+verdict_note: 苏州市房地产监测V3/personnelRecord.js 存在 AGENCY_PERSONNEL_CHANGE_BUS_CODE/jgcyrybg，与描述一致
+---
 # 修复 busCode 解析为变更代码
 `resolvePersonnelChangeBusCode` 最初将归档代码与变更代码混淆，已通过常量和按路由的逻辑进行修正。
 

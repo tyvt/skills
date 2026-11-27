@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:45:58+08:00
+verdict_note: 园区物管2.0 benefit detail 中 isBTerminal 计算属性与 pubRegulatoryAccount 接口实测存在
+---
 # B端默认物业管理区域不可修改
 园区物管2.0 在 pubRegulatoryAccount、pubRegAccountChange、pubRegulatoryStopAgreement 三页加入与 pubManagementOrg 一致的 B 端逻辑。
 

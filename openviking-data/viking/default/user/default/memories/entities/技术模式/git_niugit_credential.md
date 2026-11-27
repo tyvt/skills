@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:13:50+08:00
+verdict_note: 实机在 niubash-prepared/.../winuxcmd/usr/bin/ 找到 git-credential-manager.exe，与记忆所述复制落点一致；维护脚本按记忆自述未落盘，非矛盾。
+---
 # niugit 会话推送失败与 git-credential-manager
 当前会话的 git 是 niugit，PATH 缺少标准 Git 的 bin，导致 credential.helper=manager 找不到 git-credential-manager.exe，推送报「credential-manager is not a git command」并常表现为超时 exit 124；这是“之前一直能推送、现在不行”的根因。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:16:36+08:00
+verdict_note: 禅道6402回写事务记录，含 product/project/action id 具体证据，无幻觉
+---
 # ZenTao Bug 6402
 ZenTao defect 6402: flood cause review (reviewContent) validation fix, resolved via DBX write-back on 2026-11-10.
 

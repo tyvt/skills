@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:42:59+08:00
+verdict_note: 园区公共收益 main.js 命中 dictFormatter，operlog 状态 0 走字典翻译的根因与修复属实
+---
 # 日志管理操作状态显示修复
 园区公共收益项目修复了系统管理-日志管理列表成功记录未显示「成功」的问题。
 

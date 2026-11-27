@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:49:02+08:00
+verdict_note: TodoPanel.vue/StudyPanel.vue 含 .td__row/45px/flex-0 0，行高审查与 ESLint 单文件检查模式属实。
+---
 # TodoPanel行高与ESLint单文件检查模式
 苏住房G 项目记录 TodoPanel 样式审查结论及 ESLint 单文件检查的正确方式。
 

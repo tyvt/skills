@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:47:06+08:00
+verdict_note: 防汛C端 vitest.config.ts 命中 VITE_DATA_MODE/demo，与单测 harness 固定 demo 模式一致。
+---
 # Vite构建关闭mock开关模式
 苏住房防汛C端在 2026-11-09 关闭测试环境打包的 mock 数据时沉淀出的两条可复用根因。
 

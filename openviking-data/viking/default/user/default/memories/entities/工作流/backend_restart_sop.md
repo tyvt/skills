@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:34:14+08:00
+verdict_note: estate-manage 存在 common-flowable-server 模块与 Nacos bootstrap.yml，14 模块/pom 编译 SOP 与仓库结构一致。
+---
 # 更新后端并重启标准 SOP
 更新代码后必须先全量编译通过再停机，用原参数重启并以进程存活+端口监听+网关可连作为健康口径。
 
@@ -21,7 +26,6 @@
 - 验证：会话 session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6（基线 6156653）最终结论表与未覆盖风险段
 - 涉及文件：pom.xml、settings.xml
 - 来源会话ID：session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6；代码基线：6156653
-
 
 <!-- MEMORY_FIELDS
 {

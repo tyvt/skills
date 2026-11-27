@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:12:24+08:00
+verdict_note: dataSandbox/assetPanorama/index.vue 命中 getDonutSlicePercent 与 percent，与饼图占比自算描述一致。
+---
 # ECharts 饼图占比约定
 数据沙盘饼图 label/tooltip 的占比统一读取 p.percent，不再解析接口 ratio 字段。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

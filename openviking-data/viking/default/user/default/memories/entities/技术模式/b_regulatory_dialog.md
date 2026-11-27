@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T08:12:11+08:00
+verdict_note: 园区公共收益 ruoyi.js 含 getBTerminalRegulatoryDialogConfig 与 withAgreement，B端弹窗工具真实存在。
+---
 # B 端监管弹窗链接初始化修复
 园区公共收益项目全局修复 B 端新增页自动弹窗报错问题。
 
@@ -10,7 +14,6 @@
 ## Relations
 - 来源会话：b2ceb96d-3372-48d3-9c13-5aed7776c612（extracted source=cursor）
 - 所属项目：园区公共收益；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:44:07+08:00
+verdict_note: 核对苏州市房地产监测V3：riskmanage/riskregister/components/superviseDialog 等选择弹窗路径与空白修复描述命中。
+---
 # Zs Select 对话框导致右侧空白
 组件 `zs-select-dialog` 使用了默认的绝对定位和固定高度的 `dialog-box`，导致右侧留下空白。
 
@@ -19,7 +24,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：b5dcbf27-aa94-4d27-a97a-978ba9a2e7cd
-
 
 <!-- MEMORY_FIELDS
 {

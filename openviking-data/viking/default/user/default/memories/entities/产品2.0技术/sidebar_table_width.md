@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:14:10+08:00
+verdict_note: 产品2.0 index.vue/table.js/zs-table.vue 命中，侧栏表格宽度修复属实。
+---
 # 侧栏收起表格列宽重算均分
 左侧菜单收起后列表页表格右侧留白、列宽不均，需重新触发宽度计算并均分剩余列。
 

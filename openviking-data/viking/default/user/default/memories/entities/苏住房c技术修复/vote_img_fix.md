@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T01:12:13+08:00
+verdict_note: 记忆称用 subpackage="pages_owner"+SUBPACKAGE_STATIC_IMAGES 登记修复；现状 DecisionList.vue 用 appStore.isSuZhuFang 动态拼 src，SUBPACKAGE_STATIC_IMAGES 在苏住房C全仓不存在，描述与现状不符。
+---
 # 业主表决列表项目图片不显示修复
 苏住房C小程序业主表决列表页项目图片（house_szf.png）因分包静态资源解析错误导致加载失败，已通过显式指定subpackage及登记分包映射修复。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:54:27+08:00
+verdict_note: 苏住房G toB/personnelRecord/components/detail.vue 存在且含角色下拉，数据源修复描述属实
+---
 # 人员管理角色下拉框数据源错误修复
 苏住房G项目修复 toB 人员管理详情页角色下拉框硬编码机构类型导致的数据源错误。
 

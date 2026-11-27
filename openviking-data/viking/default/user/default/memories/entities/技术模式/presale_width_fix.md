@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:46:58+08:00
+verdict_note: PresalePlanFillForm.vue 命中 narrative-block，宽度修复落点在。
+---
 # 预售方案填报表单宽度修复
 苏州市房地产监测V3 的 PresalePlanFillForm 组件修复了叙事块内输入框与日期选择器被撑满的问题。
 

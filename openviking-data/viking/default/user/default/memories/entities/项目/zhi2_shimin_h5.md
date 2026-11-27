@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:54:56+08:00
+verdict_note: 园区V0H5中handleAvatarTap/tapCounter/vconsole及customer/index.vue均0命中，记忆所述vConsole十连击实现无法在标注落点证实。
+---
 # 园区市民h5智数c前端仓库(zhi2/yuanqu)
 苏州园区住房市民h5智数c前端仓库，GitLab路径 zhi-suzhou-yuanqu-homeland-fe-zhi2-mobile-shimin-h5-zhishu-c，使用 dev-v0 分支，为 uni-app Vue3 H5 项目。
 

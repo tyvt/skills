@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:18:33+08:00
+verdict_note: 苏州市房地产监测V3 AgencyBranchDetail.vue 中 requirement-grid、AppendixPackageSection 命中，zs-pagination 存在，详情要件网格改造属实。
+---
 # 分支机构详情要件网格与服务方案条数显示
 苏州市房地产监测V3 的 zhi2-web-admin 已完成分支机构详情与服务方案的展示改造。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:17:07+08:00
+verdict_note: skills/dsh/langgraph-orchestrator/scripts/cost_bill.py 存在，账单脚本描述属实。
+---
 # dsh_cost_bill
 DSH 编排器（LangGraph）的会话账单文件与聚合脚本，记录各会话的工具与模型 Token 消耗明细。
 

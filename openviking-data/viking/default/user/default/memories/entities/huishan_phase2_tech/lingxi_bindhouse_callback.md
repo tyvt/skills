@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T05:14:17+08:00
+verdict_note: 惠山二期H5 命中 AddHouseDialog.vue、externalWebview、authCode、backUrl、onLaunch，回跳修复属实
+---
 # 灵锡绑房回跳修复
 惠山二期H5 修复了第三方灵锡绑定房屋回跳时的地址、authCode 解析与登录态丢失问题。
 
@@ -20,7 +24,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=惠山二期H5
 - 来源会话ID：b9f46e5c-31b8-4bcb-a8ee-185ec72988e3；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:26:52+08:00
+verdict_note: 产品2.0 maintenance/{facility,accountType,depositStandard} 等页存在 sort-left-body 左树容器与 align-self-stretch 高度锁定写法，描述属实。
+---
 # 左树右内容两栏页左栏高度锁视口剩余高度
 维护类模块「左侧分类树 + 右侧列表」两栏布局，左栏默认随树节点增高撑长整页，需用 flex 拉伸 + min-height:0 + 内部分区滚动锁定高度。
 ## 问题现象

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:15:59+08:00
+verdict_note: 苏住房G 中 selectTJgBankBranchList、bankBranchManageId、sysBankBranchId、openbankName 命中，名称反查网点主键属实。
+---
 # 协议/开户表单网点主键靠名称反查
 新增共管协议等表单提交需 bankBranchManageId，但账号详情接口只回 openbankName 等名称字段、无网点 ID，须经网点列表接口按名称反查。
 

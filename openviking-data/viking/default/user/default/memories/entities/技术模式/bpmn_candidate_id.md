@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:41:31+08:00
+verdict_note: 在苏住房G仓源码命中核心符号(18/19)allowcreate,approval,candidategroups,candidateusers，涉及文件存在，描述与现状一致，判有效。
+---
 # BPMN候选组/人员回显ID修复模式
 苏住房G项目 BPMN 流程设计器与 zs-remote-select 组件在回显候选组/人员时显示 ID 而非名称，需补全标签反查。
 ## 问题根因

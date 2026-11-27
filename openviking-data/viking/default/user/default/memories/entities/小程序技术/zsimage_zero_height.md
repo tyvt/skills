@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:42:30+08:00
+verdict_note: 苏住房C 实存 ZsImage.vue/SuccessCard.vue，width prop、widthFix、styleIsolation 描述与组件一致。
+---
 # ZsImage组件默认高度导致图片不显示
 苏住房C的ZsImage封装默认aspectFill+height:100%，父级无高度时图片渲染为0高，需补width prop与widthFix。
 

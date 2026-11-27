@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:16:01+08:00
+verdict_note: 门户命中 public-portal-visual.spec 与 EBUSY 处理记录，视觉用例 EBUSY 兜底结论属实。
+---
 # 视觉用例 EBUSY 起不来时改用直接测量
 门户视觉回归用例因 Node spawnSync 返回 EBUSY 跑不起来时，改用同视口同 DPR 直接测量与独立复算，并如实标注用例未执行。
 

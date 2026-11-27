@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:42:36+08:00
+verdict_note: personnelStatus.js 实存；businessStatus/freezeStatus/bizState 与 AgencyPersonnelList/Detail 命中，多标签状态展示属实。
+---
 # 经纪机构人员状态多标签展示
 苏州市房地产监测V3 中新增 personnelStatus.js 优先取 businessStatus 并按 freezeStatus 加冻结标签，列表与详情改为多标签展示。
 

@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T20:54:46+08:00
+verdict_note: 园区物管2.0 ratingRule/table.vue 含 isSelectable 与 bizState，复选框显示条件修复属实
+---
 # 企业信用评级规则详情页修复
 园区物管2.0 的企业信用评级规则详情页修复了复选框缺失、查看样式与弹窗优化问题。
 
@@ -19,7 +23,6 @@
 - 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/evaluation/ratingRule/table.vue、detail.vue、dialog.vue、src/mixins/subTableMixins.js。
 - 所属项目：园区物管2.0；来源会话 15e3f1e2-9505-4347-bf12-82cca18b71ec；代码基线 none。
-
 
 <!-- MEMORY_FIELDS
 {

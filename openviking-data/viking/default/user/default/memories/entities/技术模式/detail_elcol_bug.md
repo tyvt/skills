@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:28:14+08:00
+verdict_note: 园区公共收益 benefit/pubAllotNotice/detail.vue、pubPaymentNotice 与 pubTradeDetailTable.vue 存在，外层 el-col 相关结构可查，描述属实。
+---
 # 详情页外层 el-col 挤压表单
 园区公共收益项目详情页为对齐子表宽度在 zs-form 外再包 el-col，会把整页挤到左侧约四成。
 

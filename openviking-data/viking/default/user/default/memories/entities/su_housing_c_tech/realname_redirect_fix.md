@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:11:42+08:00
+verdict_note: 实机核对 userInfo.vue-39 仍为 goMenu(isReal?realInfo-'','v1')，未实名依旧传空路径；源码无 handleRealNameClick/AuthorizedFail/AuthorizedWaiting 状态路由，修复描述与现状不符。dist 中的相关字样为构建产物，非源码。
+---
 # 个人信息实名信息跳转修复
 苏住房C小程序「个人信息→实名信息」点击提示「功能暂未开放」，根因是未实名时传给goMenu空路径，已按实名状态路由修复。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

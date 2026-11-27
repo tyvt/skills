@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:20:03+08:00
+verdict_note: 门户命中 UnifiedLogin 及 e2e/unified 路径，统一登录 banner 属实
+---
 # UnifiedLogin platform-banner-desc 左对齐规范
 门户 UnifiedLogin 顶部平台区文案图与设计稿一致为左对齐时，应避免固定宽度百分比拉伸。
 

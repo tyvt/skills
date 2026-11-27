@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:13:52+08:00
+verdict_note: 苏住房C addHouse(5)/不动产权证(13)命中，证号单行布局修复目标存在。
+---
 # 业主添加房源不动产权号单行布局修复
 苏住房C小程序 `pages_owner/house/owner/addHouse.vue` 不动产权证号布局错乱（纵向拆成两行），已改为单行布局。
 

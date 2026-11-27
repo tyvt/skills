@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:50:00+08:00
+verdict_note: 产品2.0 实存 guaranteeDeposit AddDialog.vue/index.vue 与 el-row/el-col 单列布局，描述一致。
+---
 # 保证金账户新增管理员不再自动带出
 产品2.0 项目修复保证金账户新增时管理员账号自动带出账户的问题。
 

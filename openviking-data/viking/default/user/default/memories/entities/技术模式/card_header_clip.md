@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T14:45:44+08:00
+verdict_note: 门户 home/index-new.vue 中无 card-header/card-header-tab/translateY；记忆所述 .card-header 溢出裁切修复在指定文件无对应代码。
+---
 # 门户首页卡片头溢出隐藏裁切
 门户首页设计图 100% 还原时，卡片标题因 .card-header 溢出隐藏被裁切，已通过样式与 Playwright 断言修复。
 
@@ -17,7 +22,6 @@
 ## 验证与归属
 - 所属项目：门户
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

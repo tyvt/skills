@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:15:27+08:00
+verdict_note: todoTask.js 含 isRejectedTodoTask、formatTodoTaskTitle、normalizeTodoTaskRows、驳回，一致。
+---
 # 园区公共收益待办驳回前缀规范
 园区公共收益项目(zhi2-web-admin)中，被驳回后回到待提交的单据需在待办主题展示层统一加「<驳回>」前缀。
 

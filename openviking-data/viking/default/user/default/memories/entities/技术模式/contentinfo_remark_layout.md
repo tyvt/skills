@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:12:54+08:00
+verdict_note: 产品2.0 zhi2-web-admin/src/views/autonomy/change/property/detail.vue 存在，命中 contentInfo、remark 字段及「变更内容」文案，详情追加 remark 属实。
+---
 # 变更详情contentInfo末增remark独占行
 自治变更房产详情弹窗 contentInfo 数组末尾追加 remark 项（显示名"变更内容"），layout 的 xs/sm/md/lg/xl 全部设为 24 实现独占一行。
 

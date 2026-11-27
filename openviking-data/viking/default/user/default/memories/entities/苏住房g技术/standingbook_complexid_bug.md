@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:10:45+08:00
+verdict_note: 苏住房G含complexId与standingBook(statisticsMap视图)，台账ID优先级问题上下文存在；commit哈希未在本仓history命中但代码实体一致。
+---
 # 台账详情页complexId优先致查询无数据
 台账详情页因 commit 5d50941f2 将 ID 优先级改为 complexId 优先，而 standingBook 路径参数历史使用 projectId || leaseProjectId，导致 200 空数据。
 

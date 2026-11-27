@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:51:13+08:00
+verdict_note: mmvp_eval.jsonl/models.yaml/vlmeter/Questions.csv 仅命中 skills/memory-migration-archive 与 openviking-data 记忆归档，D-/repository 无数据集、models.yaml 或 vlmeter 源码；关联记忆 vlmeter.md 自身亦记「无源码无法证明」。无法证明有效。
+---
 # MMVP Benchmark
 A multimodal visual perception/proficiency evaluation with 300 image-question pairs.
 ## Description

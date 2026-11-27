@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:31:53+08:00
+verdict_note: 苏州市房地产监测V3 AgencyPersonnelDetail.vue含handleSave、$router.replace、formMode、changeActive，与保存后置view修复一致。
+---
 # 变更单保存后须将 formMode 置为 view
 苏州市房地产监测V3 中变更单保存成功后需通过路由把 formMode 改为 view，否则停留编辑态。
 

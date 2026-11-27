@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:54:09+08:00
+verdict_note: 产品2.0 实存 pubHouseDialog.vue 与 regionCode 用法，经营用房行政区划编码修复属实。
+---
 # 经营用房新增行政区划编码缺失修复
 产品2.0 的 benefit/pubHouse 新增时因提交缺少 regionCode 编码导致「行政区划不能为空」问题已修复。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

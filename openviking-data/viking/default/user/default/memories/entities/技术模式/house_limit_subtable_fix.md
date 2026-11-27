@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:21:22+08:00
+verdict_note: limitFormMixin.js/limitCancel.vue/limitAdd.vue 存在且命中 houseLimit/selectedHouse
+---
 # 限制审核编辑子表消失因选中房屋未初始化
 苏州市房地产监测V3房屋限制审核从查看切编辑态时子表消失，因选中房屋未初始化，已新增 hydrate 方法修复。
 

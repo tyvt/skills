@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:45:35+08:00
+verdict_note: 苏州V3 zs-tabs.vue实有tabs-header-action渲染、zsTabsToolbar的register/unregister(75-77/101-106)与样式(160)，与记忆基础设施描述一致。
+---
 # V3 子表工具栏标题栏全局改造
 苏州市房地产监测V3 完成子表工具栏标题栏全局改造，所有 todo 标记完成。
 

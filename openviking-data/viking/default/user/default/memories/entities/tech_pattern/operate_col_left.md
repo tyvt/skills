@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:49:29+08:00
+verdict_note: 核对产品2.0：zs-operate-column.vue 存在，操作列左对齐样式改动与描述一致。
+---
 # Operate Column Left Align
 The zs-operate-column button container style was changed from center to flex-start to unify alignment.
 
@@ -16,7 +21,6 @@ The zs-operate-column button container style was changed from center to flex-sta
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：10245f13-6519-46f8-a323-cd84d8946449
-
 
 <!-- MEMORY_FIELDS
 {

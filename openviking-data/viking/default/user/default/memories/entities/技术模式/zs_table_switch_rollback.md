@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:10:41+08:00
+verdict_note: 苏住房G regionBankAuth(15)/handleSwitchChange(2)/enableStatus(12)命中，开关回滚方案与代码一致。
+---
 # zs-table-column 开关列回滚失败：回调前已写新值
 [苏房G] zs-table-column 的 handleSwitchChange 先把 row.enableStatus 写成新值再回调页面，导致页面取「旧值」实为已改新值，拦截后回滚无效。
 

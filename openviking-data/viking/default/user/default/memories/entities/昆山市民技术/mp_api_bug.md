@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:20:13+08:00
+verdict_note: 昆山市民 src/env/mp.js 中 envVersion、BASE_URL、/kwt.ksjzaq.com/app/ 命中，小程序环境配置修复属实。
+---
 # 小程序 BASE_URL 禁止沿用 H5 相对路径 /api
 昆山市民小程序因 mp.js 误用相对 /api 导致打包后接口地址错误，需按 envVersion 选择完整域名。
 
@@ -15,7 +20,6 @@
 - 验证：会话 76e058f1 用户反馈小程序打包接口不对，修复恢复 envVersion 分支表；验证证据 src=昆山市民/006.md。
 - 涉及文件：src/env/mp.js、src/request/index.js、package.json、vite.config.js、src/manifest.json、src/api/index.js。
 - 所属项目：昆山市民；代码基线：1e46691；来源会话ID：76e058f1-ba17-479b-89f8-7c7af2202d46。
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:17:01+08:00
+verdict_note: 苏州市房地产监测V3 package.json 命中 vite-ng-plugin-vue2、@unocss/core、8.3.5，Vite8 升级属实
+---
 # Vue2 项目升级 Vite 8
 Vue 2.7.16 + Element UI 2.15.13 项目从 Vite 5.4.11 升级到 8.3.5 需换 Vue2 专用插件并拆分 UnoCSS 依赖。
 

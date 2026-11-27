@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:15:56+08:00
+verdict_note: 淮安物管源码含 changeRecordMixins、complexChange、contentInfo，区域概览纳入 contentInfo 修复所涉文件与工具存在。
+---
 # 区域概览字段未纳入 contentInfo 致变更记录缺失
 淮安物管 zhi2-web-admin 中 complexChange/detail.vue 区域概览字段仅在模板渲染，未纳入 contentInfo* 计算属性，导致变更记录缺失。
 ## 问题现象

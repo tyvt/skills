@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:11:28+08:00
+verdict_note: 小程序/wygl-wxxcx-dev-slh 命中 portal-h5-webview.js 与 portalH5Webview.vue，含 miniRoute 读取和 web-view 渲染，与描述一致。
+---
 # House card uses portalH5Webview
 After login, house card display relies on a new portal-h5-webview.js wrapper and a fullscreen portalH5Webview.vue web-view.
 
@@ -19,7 +24,6 @@ After login, house card display relies on a new portal-h5-webview.js wrapper and
 - 所属项目：小程序
 - 验证证据：extracted source=cursor project=小程序
 - 来源会话：5c68c6ac-0836-4b0f-83d0-9a13e307e434
-
 
 <!-- MEMORY_FIELDS
 {

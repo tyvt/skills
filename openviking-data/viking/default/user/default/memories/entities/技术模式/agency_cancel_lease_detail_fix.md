@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:14:00+08:00
+verdict_note: AgencyBasicInfoForm.vue 含 buildLease*ContentInfo、businessScenarioOptions、isLeaseOrgan，一致。
+---
 # 机构注销详情租赁机构模板对齐修复
 苏州市房地产监测V3 中机构注销详情在非开发企业时复用了 AgencyBasicInfoForm 只读模式，但租赁机构仍走经纪机构「基本信息」模板，与 AgencyBasicInfoDetail 三段式布局不一致，已对齐修复。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

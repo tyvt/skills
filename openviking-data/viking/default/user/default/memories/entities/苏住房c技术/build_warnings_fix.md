@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:47:34+08:00
+verdict_note: vite.config.ts-83 精确命中 sourcemap 的 UNI_PLATFORM 判断；flag-szf.svg 与 update-browserslist-db 佐证，构建告警修复属实。
+---
 # 苏住房C构建警告修复
 苏住房C(zhi2-mobile-shimin)修复了构建期多处可处理警告，重新构建后相关警告已消除。
 

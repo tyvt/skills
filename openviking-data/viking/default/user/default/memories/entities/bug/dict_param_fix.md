@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-27T15:16:53+08:00
+verdict_note: 产品2.0 dict.js-11 有 GET /system/dictData/listByType/${dictType}，传参方式修复属实
 ---
 # dictData/listByType 传参方式修复
 产品2.0 中 getDicts 原先直接传 dictType 字符串作为 POST body，接口要求 JSON 对象，已修复为传 { dictType }。

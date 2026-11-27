@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:13:02+08:00
+verdict_note: 惠山二期G utils/ruoyi.js、main.js 源码命中 resolveBackNavigationTarget、directDetail，返回路由修复属实。
+---
 # 待办详情返回路由与 backUrl 修复
 惠山二期G 项目中，待办从首页进入详情未带 backUrl、返回路径截错、directDetail 未识别的修复套路。
 

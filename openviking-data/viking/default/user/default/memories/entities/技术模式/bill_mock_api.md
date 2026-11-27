@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T14:47:34+08:00
+verdict_note: iHomePC 全仓无 submitRentPayment/submitRefundApply/getRefundContractOptions，也无「补充缴费/退费申请」文案；所述 Mock 接口不存在。
+---
 # 我的账单页补充缴费退费接入Mock接口
 iHomePC 个人中心我的账单页通过 personalCenter.js 新增 Mock 接口完成补充缴费与退费申请。
 

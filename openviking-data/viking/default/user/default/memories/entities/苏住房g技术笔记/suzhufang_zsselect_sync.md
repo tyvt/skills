@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:46:00+08:00
+verdict_note: 苏住房G serviceItem/detail.vue 命中 handleContentTypeChange(2)，行内 zs-select 用 $set 回写属实
+---
 # 苏住房G 子表行内 zs-select 的 :value.sync 失效
 property/serviceItem/detail.vue 行内用 zs-select :value.sync 切选项不刷新，且表格重构误删顶部预览区。
 

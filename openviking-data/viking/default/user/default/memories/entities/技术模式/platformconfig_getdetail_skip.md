@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:54:51+08:00
+verdict_note: form.js 含 validateDetailRequiredParams 与 detailApiFull，getDetail 守卫跳过描述属实
+---
 # 平台配置页 getDetail 必需参数守卫跳过请求
 产品2.0 中平台配置页因重写了详情接口（无需 id 的 `/system/platformConfig/getInfo`），触发 `form.js` 的 `getDetail()` 必需参数守卫，导致请求被跳过并打印警告。
 

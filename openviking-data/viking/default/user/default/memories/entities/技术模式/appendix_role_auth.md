@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:50:01+08:00
+verdict_note: 苏州V3 未命中记忆关键包编码 zljghtsq(0)；LeasePersonnelDetail/AppendixPackageSection 虽有命中但无该授权包证据，无法证明有效。
+---
 # 按角色展示附件并优先采用授权包
 在 Suzhou Real Estate Monitoring V3 项目中，所需的附件根据操作员角色展示，在出现重复时优先采用授权包。
 

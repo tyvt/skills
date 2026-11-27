@@ -4,10 +4,10 @@ last_checked: 2026-11-26T20:49:57+08:00
 verdict_note: OpenViking /health 实测 healthy-true version0.5.5、端口1933，长程记忆服务记忆核心事实属实。
 ---
 # OpenViking 长程记忆服务
-OpenViking 是当前会话后台运行的长程记忆注入层，负责把历史记忆在每轮开头免检索地送进上下文。
+OpenViking 是当前会话后台的长程记忆注入层，每轮开头免检索地把历史记忆送进上下文。
 
 ## 基本信息与数据
-- 服务名 `openviking-server`（PID 9892），监听 `127.0.0.1:1933`；版本 `0.5.3`，`/health` 返回 `healthy:true`，旧记忆中的 `/debug/health`、`/observer/system` 本轮实测均 404
+- `openviking-server` 监听 `127.0.0.1:1933`，版本 `0.5.5`，`/health` 返回 `healthy:true`；旧记忆中的 `/debug/health`、`/observer/system` 实测均 404
 - 数据规模：记忆文件 6745 个、历史会话 552 个、按仓库分库的项目 peer 23 个
 - 2026-11-18 存量复查：工作区含备份/归档共 38369 个记忆文件，活跃库 `openviking-memory/entities/` 数千条，活跃入口 `viking://user/default/memories/entities/`；存量记忆均无 frontmatter
 
@@ -33,8 +33,8 @@ OpenViking 是当前会话后台运行的长程记忆注入层，负责把历史
 {
   "category": "程序",
   "name": "openviking_memory",
-  "source_extraction_id": "086c3b4abde24062b66243e5c1be81a6",
-  "version": 7,
+  "source_extraction_id": "31ac6f048fda409db5a9ad5cc28fbf33",
+  "version": 8,
   "memory_type": "entities"
 }
 -->

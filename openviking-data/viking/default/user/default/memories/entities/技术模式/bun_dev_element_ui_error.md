@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:49:09+08:00
+verdict_note: 产品2.0 ImageViewer/index.vue 存在并引用 element-ui image-viewer；记忆为 bun dev 解析错误记录
+---
 # bun dev 启动项目出现 element-ui 解析错误
 产品2.0前端使用 `bun --no-install run dev` 启动时报 element-ui 与 zrender 依赖解析错误，需修复引用路径。
 

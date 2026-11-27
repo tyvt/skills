@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-27T14:42:33+08:00
+verdict_note: 产品2.0 common.js-51 存在无参 request("/system/region/listTree") 调用，正是记忆所述缺 body 场景，归属与触发条件属实。
 ---
 # 区域接口 POST 缺少请求体修复
 产品2.0 加密改造后非白名单接口统一改为 POST，无参 GET 请求（如 region/listTree）因缺少 body 报 Required request body is missing，已修复。

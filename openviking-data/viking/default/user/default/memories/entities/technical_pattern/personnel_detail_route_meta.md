@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:29:52+08:00
+verdict_note: 苏州市房地产监测V3多个人员详情组件含resolvePersonnelAppendixBusCode，默认值jgcyryba存在，与回退方案一致。
+---
 # 人员详情硬依赖路由meta致流程未维护
 原 `AgencyPersonnelDetail.vue` 等使用 `this.$route.meta?.busCode || ''` 硬依赖路由 meta，菜单未配或错配致 `ensureFlowConfigured` 查 `/flowable/flowConfig/list` 无果报"审核流程未维护完成"。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:17:48+08:00
+verdict_note: ownerCommitteeWorker/detail.vue 命中；detailCallback（detailMixins.js）/statusOptions/jobType 均命中，字典字符串化归一属实。
+---
 # detail_callback_stringify
 组织工作人员详情页字典字段显示数字而非文案时，通过 detailCallback 字符串化归一并兜底选项的技术修复。
 ## 问题原因

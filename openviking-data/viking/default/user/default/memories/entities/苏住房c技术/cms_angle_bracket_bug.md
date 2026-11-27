@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:15:05+08:00
+verdict_note: 苏住房C 命中 escapeInvalidHtmlAngleBrackets/formatRichTextContent/ZsRichText，尖括号转义属实
+---
 # CMS富文本尖括号误判导致正文白屏
 苏住房C市民端CMS富文本页因书名号误写尖括号被rich-text当非法HTML标签解析失败，整块白屏仅控制台Parse Error。
 

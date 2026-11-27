@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:17:18+08:00
+verdict_note: 苏住房C 中 virtualHost、MenuImage 命中，scoped 样式改由子组件集中管理的方案属实。
+---
 # Mini-program parent scoped style cannot constrain child component
 In the WeChat mini-program, parent component scoped or :deep() styles cannot reliably constrain child component sizes like MenuImage, causing icons to fill.
 
@@ -26,7 +31,6 @@ In the WeChat mini-program, parent component scoped or :deep() styles cannot rel
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：fd31d266-ac37-45f4-a828-8a29b307c443
-
 
 <!-- MEMORY_FIELDS
 {

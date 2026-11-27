@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:48:42+08:00
+verdict_note: i淮安公版源码 houseList[0] 命中，但 displayHouseTitle/displayHouseSubTitle 均为 0；记忆所称的标题计算属性缺失，无法证明有效。
+---
 # Home Title From HouseList
 DisplayHouseTitle and displayHouseSubTitle in home.vue now read from userStore.houseList[0] with fallback texts.
 
@@ -17,7 +22,6 @@ DisplayHouseTitle and displayHouseSubTitle in home.vue now read from userStore.h
 - 所属项目：i淮安公版
 - 验证证据：extracted source=cursor project=i淮安公版
 - 来源会话：888c04f6-7ea6-471f-a22f-fd6d92d637f3
-
 
 <!-- MEMORY_FIELDS
 {

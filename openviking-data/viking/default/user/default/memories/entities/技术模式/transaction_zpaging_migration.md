@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:12:28+08:00
+verdict_note: 苏住房C usePaging.js 等6个文件命中，z-paging 迁移基础设施真实存在。
+---
 # pages_transaction 整包迁移 z-paging 规则集
 苏住房C 的 pages_transaction 分包统一将 useLoadMore/uni-load-more 列表页迁移到 z-paging，形成标准规则集与五类例外处理法。
 

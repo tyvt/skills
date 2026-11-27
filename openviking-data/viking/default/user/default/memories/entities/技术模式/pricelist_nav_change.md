@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:19:18+08:00
+verdict_note: 苏州市房地产监测命中 commercialHousingSales、recordPriceMngSuzhou、priceFiling、listMixins，导航变更属实
+---
 # 共用列表导航漏change致变更跳备案
 苏州市房地产监测V3 价格备案与变更列表共用记录页及 buildDetailNavigation，变更菜单 pathHint 含 change 但导航按 detail 匹配误命中首个备案 detail 路由。
 

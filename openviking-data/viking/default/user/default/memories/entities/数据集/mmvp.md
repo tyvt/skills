@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:18:10+08:00
+verdict_note: MMVP 数据集记忆，skills 中命中 mmvp 相关内容，数据集描述为公开事实。
+---
 # MMVP
 Multimodal Visual Patterns benchmark，专探模型是否真"看见"细节的 VLM 评测数据集。
 
@@ -13,7 +18,6 @@ Multimodal Visual Patterns benchmark，专探模型是否真"看见"细节的 VL
 
 ## 评测要点
 - 可计算更严格的配对准确率（pair_id = Index // 2）；若一系列模型配对准确率普遍偏低，说明视觉编码器存在系统性盲区
-
 
 <!-- MEMORY_FIELDS
 {

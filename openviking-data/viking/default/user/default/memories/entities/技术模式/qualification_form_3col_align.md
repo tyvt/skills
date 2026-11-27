@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:20:16+08:00
+verdict_note: V3 仓 personnelCertificate/detail.vue 与 sys_user_sex 字典可查，3 列资格表单描述有代码依据。
+---
 # 3列网格资格表单
 在 Suzhou Real Estate Monitoring V3 中，资格证书表单已根据设计调整为 3 列网格。
 

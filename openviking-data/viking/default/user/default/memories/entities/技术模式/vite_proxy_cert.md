@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T15:49:28+08:00
+verdict_note: 园区物管2.0 vite.config.js createProxyConfig(target) 无 secure-false 参数，git -S "secure- false" 亦无历史，记忆所述加 secure-false 修复与现状不符。
+---
 # Vite 开发代理 HTTPS 连 IP 证书校验失败
 园区物管2.0（苏房）中 VITE_APP_PROXY_ADDRESS 配成 https://IP:端口 时触发 ERR_TLS_CERT_ALTNAME_INVALID，/api 代理失败。
 

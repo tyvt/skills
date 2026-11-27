@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:48:08+08:00
+verdict_note: 实机核对：苏住房G zhi2-web-admin/src/components/zs-advanced-query/zs-advanced-query.vue 存在 isFixedOperatorField/applyDefaultOperator，仅固定操作符字段自动选默认值(345)，多操作符保留 placeholder「请选择」(67/374)；描述属实。
+---
 # zs高级查询多操作符自动选中致占位缺失
 `zs-advanced-query.vue` 多操作符字段自动填入首个操作符导致占位符不显示的 bug。
 

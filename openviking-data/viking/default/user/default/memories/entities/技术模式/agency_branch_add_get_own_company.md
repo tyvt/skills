@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:28:17+08:00
+verdict_note: 苏州市房地产监测V3 AgencyBranchDetail.vue含loadAddPage/getOwnCompany/parentCompanyName，与添加页改造一致。
+---
 # 代理分支在添加页面使用 getOwnCompany
 在添加页面，使用 getOwnCompany 替代 init 以预填机构数据。
 

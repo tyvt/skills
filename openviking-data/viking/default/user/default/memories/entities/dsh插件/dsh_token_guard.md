@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:41:00+08:00
+verdict_note: dsh/token-guard/lib/index.js 实存，p0LogReader/capPwsh/pwshReadMaxLines/provide 全部命中，记忆与现状一致
+---
 # dsh-token-guard
 DSH local plugin that enforces token-cost guardrails and hard-truncates oversized tool results; source at D:/repository/skills/dsh/token-guard/lib/index.js, symlinked from ~/.dsh/token-guard, zero-dependency (imports no @deepseek-ai/*), wired into the web profile as a pnpm file: dependency.
 

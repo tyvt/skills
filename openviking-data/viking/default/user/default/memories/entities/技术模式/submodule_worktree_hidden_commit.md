@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:14:40+08:00
+verdict_note: 苏州V3 git log 佐证 #6326/#6365 子模块提交与指针更新，隐藏提交事件属实
+---
 # wt-bug-6326 子模块隐藏未推送提交
 合并 #6326 至主工作区 zhi2-web-admin 子模块前，排查发现 wt-bug-6326 工作树的子模块藏有一条未推送的 #6365 提交，使其本地 develop/v3.0.0 基线与主工作区 origin/develop 不一致。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:41:25+08:00
+verdict_note: 工具/偏好/知识类记忆，核心符号在 skills 与 OpenViking 仓源码/配置全部命中，描述与现状一致，判有效。
+---
 # agent-cost-hygiene
 DSH 技能仓库中的成本卫生技能，定义跨会话通用的 AI 降本纪律，把规范下沉为框架强制而非靠模型自觉。
 

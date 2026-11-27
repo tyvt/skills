@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:14:20+08:00
+verdict_note: 存在 NoticeList 旧组件与 msg.js/home.js 消息接口，与描述一致
+---
 # NoticeList.vue 未连接到首页通知流
 在B-end物业管理移动App中，首页通知红点的逻辑位于 home/index.vue，且 NoticeList.vue 是一个未连接的旧组件；消息接口依赖于 home.js 和 msg.js。
 

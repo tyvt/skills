@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:50:06+08:00
+verdict_note: skills/dsh/orchestrator 目录存在，含 cordis.patch.yml、selftest.mjs、package.json，与记忆所述插件一致。
+---
 # dsh-orchestrator
 DSH 本地 host 工具插件，将 LangGraph 编排器（4 个工具 + 故障转移）暴露为单一入口工具 `orchestrate`。
 
@@ -7,7 +12,8 @@ DSH 本地 host 工具插件，将 LangGraph 编排器（4 个工具 + 故障转
 - 照 mcp-gateway 模板实现，零 `@deepseek-ai/*` 依赖
 
 ## 部署
-- 源码位于 D:epository\skills\dsh\orchestrator，~/.dsh/orchestrator 为符号链接
+- 源码位于 D:
+epository\skills\dsh\orchestrator，~/.dsh/orchestrator 为符号链接
 - 2026-11-10 构建并接入 DSH Web，4/4 自测通过
 - `--dump-config` 确认合成 profile 树含 `id: orchestrator`；2026-11-10 用户重启后新 web 进程 pid 7380（8:47 启动）已加载插件
 - 备用端口 3099 探针（pid 8364）真实启动 web profile 验证：插件加载零报错

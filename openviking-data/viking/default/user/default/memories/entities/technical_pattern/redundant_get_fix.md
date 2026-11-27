@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:25:56+08:00
+verdict_note: 产品2.0 system/user/detail.vue 命中 getInitialPassword 与 postOptions，冗余GET修复属实。
+---
 # User Add Redundant Get Fix
 Redundant GET in user add page caused V3 empty-body POST error; removed and password init adjusted.
 
@@ -25,7 +30,6 @@ Redundant GET in user add page caused V3 empty-body POST error; removed and pass
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：4f365506-e3be-4779-92c3-618489cfe3e8
-
 
 <!-- MEMORY_FIELDS
 {

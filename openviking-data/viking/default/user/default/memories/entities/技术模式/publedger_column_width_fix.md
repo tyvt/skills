@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:14:56+08:00
+verdict_note: 淮安物管 pubLedger/zs-table-column/行政区域命中，列宽按表头字数覆盖修复属实。
+---
 # 物业管理区域统计页面排版优化
 淮安物管「公共查询 > 物业管理区域统计」(pubLedger) 页面表格排版优化，解决内容被压缩省略问题。
 

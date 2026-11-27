@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:32:33+08:00
+verdict_note: 产品2.0全库无uploadAnonymous字符串，也无companyRegister.js文件，与记忆所述匿名上传端点改造不符。
+---
 # 企业注册附件的匿名上传
 企业注册附件的上传是一个匿名流程，不需要认证；前端不应发送 Authorization，并且应清除 E2E tokens。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:18:12+08:00
+verdict_note: SelectJudgesDialog.vue 现状 min-height-120px 且无 success-content，与『148px/去 padding』不符。
+---
 # 抽取成功弹窗垂直居中修复
 园区物管2.0 中 SelectJudgesDialog.vue 的抽取成功弹窗因 body 高度与内容一致导致 align-items:center 无效，内容贴顶。
 

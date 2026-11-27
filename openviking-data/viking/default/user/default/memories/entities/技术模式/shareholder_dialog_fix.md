@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:10:20+08:00
+verdict_note: 核心 dialogMode prop 仅在 docs 文档出现，register/components/ShareholderDialog.vue 源码无此 prop，描述与现状证据不符。
+---
 # 股东信息查看弹窗修复
 苏州市房地产监测V3 修复股东查看弹窗始终表现为「新增」且可编辑的问题，改用 `dialogMode` prop 区分模式。
 

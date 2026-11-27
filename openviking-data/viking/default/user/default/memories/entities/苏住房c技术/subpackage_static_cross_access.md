@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:15:44+08:00
+verdict_note: 苏住房C ZsImage.vue/custom-tab-bar 含 resolveStaticUrl，ownerCard 分包资源加载修复所涉方法存在。
+---
 # 分包静态资源跨包加载失败
 苏住房C(zhi2-mobile-shimin)小程序中电子业主卡页面因跨分包加载静态资源导致图标加载失败，需将资源复制到本分包并修复样式穿透。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:34:22+08:00
+verdict_note: 产品2.0/园区公共收益 等 zs-table.vue 存在 handleCellMouseEnter 与 cell?.parentElement 空值守卫，描述属实。
+---
 # zs-table 单元格悬停回调须空值守卫
 zs-table 包装 Element 表格原生事件回调时，合计行/固定列/重绘瞬间 cell 可能为 undefined，须在 handler 开头加空值守卫。
 

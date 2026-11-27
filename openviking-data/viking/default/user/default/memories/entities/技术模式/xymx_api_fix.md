@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:11:06+08:00
+verdict_note: zjjg/xymx.js 的 listXyEnd 存在，URL 为 /prefund/superviseAgreeDetail/listByAgreeNo，无 /add 后缀，符合去除描述。
+---
 # 监管协议终止列表接口去/add后缀
 苏州市房地产监测V3 中 zhi2-web-admin/src/api/zjjg/xymx.js 的 listXyEnd URL 去除多余 /add 后缀，与 benefit/xymx.js 保持一致。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:19:18+08:00
+verdict_note: 门户中 PortalDialogHost、PropertyDetailDialog、--dialog-form-item-gap 命中，弹窗样式统一改造属实。
+---
 # 门户公共表单弹窗体布局规范
 门户详情弹窗（公司/许可等）按项目公共表单弹窗（zs-dialog + .form-box）重排，统一标签列与边距。
 

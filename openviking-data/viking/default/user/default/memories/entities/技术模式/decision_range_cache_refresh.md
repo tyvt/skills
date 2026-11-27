@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:15:05+08:00
+verdict_note: 太仓G DecisionRangeTable.vue 含 getSearchCondition、buildingId、unitId 级联，属实。
+---
 # 决策范围楼幢缓存刷新后单元下拉空
 太仓G端 listMixins 将 buildingId 写入 Vuex 缓存，刷新恢复该值，但单元号、户室号下拉数据仅在手动切换楼幢/单元时加载，刷新后未重新请求致下拉为空。
 

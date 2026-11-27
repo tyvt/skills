@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:47:28+08:00
+verdict_note: 苏住房C redirect/index.vue 命中 _apiLoadingDepth/trackApi/_beginApiLoading，单一 loading 深度计数方案属实
+---
 # 中转页多接口共用单一 loading 深度计数
 苏住房C 扫码/分享中转页并发多接口，用 _apiLoadingDepth 与 trackApi 包装保证全页只有一个 loading。
 

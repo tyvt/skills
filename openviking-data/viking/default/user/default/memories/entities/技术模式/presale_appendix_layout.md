@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:18:14+08:00
+verdict_note: 苏州市房地产监测V3 命中 appendix-section/AnnexUpload，左右布局要件统一修复文件存在。
+---
 # 预售域左右布局要件统一
 苏州市房地产监测V3 中预售域备案详情 Tab 内要件上传区样式已修复，使查看态与编辑态左右内边距一致。
 

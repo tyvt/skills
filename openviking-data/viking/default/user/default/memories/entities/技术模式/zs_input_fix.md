@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:13:14+08:00
+verdict_note: 产品2.0 zs-input.vue 仍固定渲染 prepend/suffix/prefix 插槽(L10/13/16)，无 v-if 也无 $slots.append；记忆所述条件渲染修复未落地。
+---
 # zs-input 前后缀插槽冗余修复
 zs-input 组件无论是否传入插槽都固定渲染四个插槽模板，导致 el-input 预留前后缀区域，看起来前后缀自动带上。
 ## 问题根因

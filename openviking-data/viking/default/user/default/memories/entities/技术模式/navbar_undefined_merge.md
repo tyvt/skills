@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:13:47+08:00
+verdict_note: 园区物管2.0 Navbar.vue/bProjectDialog.vue 命中，合并写法组件真实存在。
+---
 # 切换小区后导航栏显示 undefined
 园区物管2.0 切换小区后导航栏项目名称显示字符串 "undefined"，根因是展开合并被详情接口 undefined 字段覆盖。
 

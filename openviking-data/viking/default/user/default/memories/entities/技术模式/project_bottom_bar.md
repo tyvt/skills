@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:10:08+08:00
+verdict_note: 苏住房C z-paging命中(126)，project页面底部留白与z-paging处理存在。
+---
 # 项目页底部白条修复
 苏住房C 微信小程序 `pages/index/project` 页面滚动到底部出现白条，由两层底部留白叠加及 z-paging 安全区占位导致，已修复。
 

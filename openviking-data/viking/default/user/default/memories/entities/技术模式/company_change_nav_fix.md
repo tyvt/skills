@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:25:55+08:00
+verdict_note: 苏州市房地产监测V3 命中 resolveChangeDetailTarget/companyChangeManage/AgencyPersonnelDetail，跳转修复属实。
+---
 # 机构变更详情列表跳转逻辑修复
 苏州市房地产监测V3 项目修复经纪/租赁机构变更列表跳转详情页路由错误及从业人员详情页初始化失效问题。
 

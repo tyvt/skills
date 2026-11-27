@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:13:33+08:00
+verdict_note: 苏州V3 AgencyBranchList.vue 存在且注销按钮命中；warning 样式 MISS 符合记忆所述“已移除 warning 改 plain”的修复结果
+---
 # 注销按钮误用 warning 样式致对比度低
 苏州市房地产监测V3 的 zhi2-web-admin 中 AgencyBranchList.vue 注销按钮误用 warning 样式致对比度低文字不清，改为与编辑按钮对齐的 plain 样式。
 

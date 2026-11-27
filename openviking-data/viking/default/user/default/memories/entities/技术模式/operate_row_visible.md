@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:12:04+08:00
+verdict_note: 园区物管2.0 feeCustomTypeTable.vue 源码命中 isOperateButtonVisible，操作列按钮改造属实。
+---
 # 操作列按钮 visible 与 rowVisible 拆分
 园区物管2.0 中 zs-table / zs-operate-column 把操作列按钮从 if-push 改为「数组 + filter」时需区分数组级布尔 visible 与行级 rowVisible。
 

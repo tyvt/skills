@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:11:46+08:00
+verdict_note: 苏州市房地产检测V3后端 FileController.java 含 writeTicketPreview 且引用 FilePreviewService，接口新增属实。
+---
 # 禅道 Bug 6909
 苏州市房地产监测V3 登录态上传图片后缩略图 preview 404 的缺陷，2026-11-24 完成实机验证、提交推送并回写禅道 resolved/fixed。
 

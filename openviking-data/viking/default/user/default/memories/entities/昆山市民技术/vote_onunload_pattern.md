@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:17:05+08:00
+verdict_note: 昆山市民 onUnload/navigateBack/pages_vote/vote/pages_election 命中，返回逻辑描述属实
+---
 # 业主表决/业委会选举列表勿在 onUnload 多级 navigateBack
 昆山市民业主决策相关列表页曾在 onUnload 主动多次 navigateBack，导致返回时一次退出多页，应移除该逻辑。
 

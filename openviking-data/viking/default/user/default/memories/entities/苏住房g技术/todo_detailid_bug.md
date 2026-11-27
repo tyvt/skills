@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:46:31+08:00
+verdict_note: ruoyi.js 含 detailId/dataId/missingId，待办跳转兼容 detailId 与缺参拦截属实。
+---
 # 待办跳转未兼容detailId致缺主键误跳转
 待办跳转未兼容 detailId 字段且缺参时未拦截错误跳转，导致缺主键误跳转。
 

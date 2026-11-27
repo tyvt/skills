@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:19:16+08:00
+verdict_note: PresaleBuildingTable.vue 在建湖G、淮安存量房对应presale路径精确命中，onRemoveBuilding回调描述属实
+---
 - 现售（cashsale）已保存单据（含 cashsaleRecordId）删除楼幢后须调用 POST /presale/cashsale/save 并 getDetail() 刷新，草稿仅更新本地 selectedBuildings 与 form.houses。
 - PresaleBuildingTable.vue 的 onRemoveBuilding/onBatchRemoveBuildings 回调删除成功后提示，批量删除仅触发一次 save 避免多次保存。
 

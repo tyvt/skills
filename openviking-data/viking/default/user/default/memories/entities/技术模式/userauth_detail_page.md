@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:52:42+08:00
+verdict_note: 园区物管2.0 userAuth/detail.vue 含 biz-state 与 ownerCommitteeLog，自治用户授权详情页实现属实。
+---
 # 自治用户授权详情页实现
 园区物管2.0 的 zhi2-web-admin 已按设计图与 procedure/detail.vue 模板实现 autonomy/userAuth/detail.vue 详情/新增/编辑页。
 

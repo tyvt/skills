@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:51:06+08:00
+verdict_note: V3 实存 DeveloperBasicInfoForm.vue、Step4Shareholders.vue、ShareholderDialog、developerBasicInfoContent，移除股东区块属实。
+---
 # 企业入网确认详情页移除股东信息区块
 在 `zhi2-web-admin/src/views/company/companyRegister/detail.vue` 删除「股东信息」Headline、表格、`ShareholderDialog` 及关联 data/computed/methods 与字典加载。
 

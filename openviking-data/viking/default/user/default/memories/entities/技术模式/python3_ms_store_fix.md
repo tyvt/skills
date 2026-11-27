@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:12:18+08:00
+verdict_note: 实机存在 C-/Program Files/Python310/python3.exe 且 --version 为 Python 3.10.0，~/.bashrc 存在，环境修复结果描述属实。
+---
 # Python3微软商店弹窗修复
 苏州市房地产监测V3 环境修复后Agent调用python3不再弹出微软商店。
 
@@ -19,7 +24,6 @@
 ## 验证与归属
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

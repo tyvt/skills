@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:46:23+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin 实存 stockHouse/index.vue、hooks/useLoadMore.js，async/await+catch 修复一致。
+---
 # 库存房列表加载与请求失败修复
 苏住房C(zhi2-mobile-shimin)小程序中 `stockHouse/index.vue` 与 `hooks/useLoadMore.js` 的列表加载与请求失败处理已修复。
 

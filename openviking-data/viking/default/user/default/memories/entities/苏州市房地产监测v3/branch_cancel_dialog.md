@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:42:13+08:00
+verdict_note: 苏州市房地产监测V3 实存 AppendixPictureUpload.vue、listAppendixPackage、picture-card、before-remove，描述属实。
+---
 # 分支机构注销弹窗改造
 苏州市房地产监测V3 已按设计稿完成「分支机构注销」弹窗改造，新增附件上传组件并调整弹窗。
 

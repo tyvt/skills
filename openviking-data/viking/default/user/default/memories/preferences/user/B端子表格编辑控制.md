@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:12:33+08:00
+verdict_note: 含canEditSubTable与CertificateList，B端子表编辑正向逻辑属实。
+---
 - B-end子表编辑：不使用语义混淆的 `disabled`（旧版本 `CertificateList` 只读导致按钮异常）。
 - 使用计算属性 `canEditSubTable` 来判断 `formMode`，采用正向逻辑 `operable` 而非混淆的 `disabled`。
 - 验证证据: src=苏州市房地产监测V3/051.md

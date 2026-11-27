@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:46:27+08:00
+verdict_note: 产品2.0命中 showViewer/image-viewer-host/viewer-container/ImageViewer，v-if 重建与去写死 z-index 的方案属实。
+---
 # 产品2.0 ImageViewer常驻致层级失效
 [苏房] 产品2.0 全局 ImageViewer 挂 App 常驻，el-dialog 缓存首次 zIndex，写死 z-index 也压不过后续业务弹窗。
 

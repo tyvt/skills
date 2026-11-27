@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:30:27+08:00
+verdict_note: 产品2.0 zs-table-column.vue含amountFormatter及align/headerAlign处理，与金额列仅未显式align时右对齐的规则一致。
+---
 # zs-table-column 金额列对齐规则
 `zs-table-column` 组件对金额类列的对齐行为，以及倡议管理列表的统一左对齐配置。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

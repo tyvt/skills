@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:10:19+08:00
+verdict_note: 苏州市房地产监测V3 OperationBtnGroup/index.vue命中(17)，formMode兜底逻辑存在。
+---
 # 监管标准详情页查看模式保存按钮修复
 苏州市房地产监测V3 修复监管标准详情页在查看模式下隐藏「保存」按钮的问题，通过完善 formMode 兜底逻辑实现。
 

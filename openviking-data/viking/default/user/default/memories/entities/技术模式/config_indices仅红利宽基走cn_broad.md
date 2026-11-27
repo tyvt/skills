@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:47:56+08:00
+verdict_note: 投资推送cn_broad_data.py含CN_BROAD_INDEX_BY_CODE，backtest_buy_signals.py含INDICES，宽基登记描述属实。
+---
 # config_INDICES仅红利宽基走CN_BROAD
 投资推送中 config.INDICES 仅服务红利模块，A 股宽基须在 CN_BROAD_INDEX_BY_CODE 登记。
 

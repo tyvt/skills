@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:47:07+08:00
+verdict_note: 门户命中 PortalDetailHeader/portal-detail-header/PortalDialogHost/aria-labelledby，样式耦合全局 SCSS 属实。
+---
 # 门户统一详情头 PortalDetailHeader 样式耦合全局 SCSS
 publicPortal 的详情头组件 PortalDetailHeader 自身无 `<style>`，样式全部来自全局 portal.scss。
 

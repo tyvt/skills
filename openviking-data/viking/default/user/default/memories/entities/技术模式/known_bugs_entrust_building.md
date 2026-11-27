@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:18:10+08:00
+verdict_note: 苏州市房地产监测V3 存在 handleAddBuildings/楼幢添加成功 逻辑，与描述一致
+---
 # 楼幢关联与楼幢信息已知 Bug
 苏州市房地产监测V3 中委托代售选楼与工程进度变更楼幢存在两个逻辑 Bug，属典型回归风险。
 

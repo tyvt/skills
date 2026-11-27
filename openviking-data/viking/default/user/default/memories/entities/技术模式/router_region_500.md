@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:44:49+08:00
+verdict_note: 门户源码 getRegions=0、行政区域列表=0，与记忆所述删除冗余 dispatch 及 action 一致；baseDataActionNames 保留符合描述。
+---
 # 路由守卫冗余区域列表接口调用返回500
 路由守卫登录后基础数据加载误调 `store.dispatch('common/getRegions')` 请求 `/system/region/list` 无 query 且后端持续返回 500，已在多处移除。
 

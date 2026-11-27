@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:14:38+08:00
+verdict_note: 苏住房G advancedQueryCore.js 中 sanitizeConditionGroups、operatorTypeOptions、condition 命中，筛选运算符修复属实。
+---
 # 公共查询返回筛选条件丢失修复（苏住房G）
 苏住房G 公共查询（物业服务企业查询等）从详情返回列表后筛选条件运算符被错误改为 EQ 导致无数据的修复。
 

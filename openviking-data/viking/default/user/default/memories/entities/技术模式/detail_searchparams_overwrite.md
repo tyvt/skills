@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:16:40+08:00
+verdict_note: 苏找房web verification/index.vue 含 this.searchParams = response.result 与 houseInfoDisplayDetailOld 调用，整体覆盖冗余渲染属实（函数名 loadEditData 已变更）。
+---
 # 详情响应整体覆盖 searchParams 引发冗余渲染
 苏找房web 核验页 loadEditData() 将详情接口整体响应覆盖至 searchParams，导致冗余字段参与渲染。
 

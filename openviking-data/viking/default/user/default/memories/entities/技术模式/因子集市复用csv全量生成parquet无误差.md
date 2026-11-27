@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:18:32+08:00
+verdict_note: fund/README.md 命中 factor_builder.py/factor_loader.py，因子集市 Parquet 脚本属实
+---
 # 因子集市复用CSV全量生成Parquet无误差
 因子集市基于现有CSV全量生成Parquet，统一物理Schema且误差极小，作为因子数据构建的可靠基线。
 

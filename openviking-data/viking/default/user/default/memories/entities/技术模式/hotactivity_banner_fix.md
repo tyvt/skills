@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:53:47+08:00
+verdict_note: 全项目代码无 normalizeBannerItem，苏住房C 无 Home_Suzhufang.vue，所述热门活动字段映射修复无法证实
+---
 # 小程序首页热门活动与APP一致性修复
 苏住房C小程序首页「热门活动」轮播图与APP显示不一致，已修复数据源与字段映射问题。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

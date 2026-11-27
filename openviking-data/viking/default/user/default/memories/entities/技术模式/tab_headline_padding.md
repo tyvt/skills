@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:49:54+08:00
+verdict_note: 命中 Headline/collapse/content/padding/AnnexUpload/EntrustSaleAddAppendix/PermitAppendixPanel，Tab headline 内边距调整属实。
+---
 # Tab 内全局样式误清 Headline 内边距致要件贴边
 苏州市房地产监测V3 的 zhi2-web-admin 中，备案详情置于 tabs--card 内，全局样式将 Tab 内 Headline 的 collapse-content 设 padding-top:0，导致编辑态外要件贴边。
 

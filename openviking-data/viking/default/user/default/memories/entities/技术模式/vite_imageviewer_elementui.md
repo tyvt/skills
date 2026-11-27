@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:45:14+08:00
+verdict_note: ImageViewer/index.vue 存在；记忆为条件式排障（「若报…」），element-ui 深链已不在源码，属历史排障知识且实体存在，非幻觉。
+---
 # Vite启动失败：ImageViewer深链element-ui包内.vue
 zhi2-web-admin 用 Vite 跑 dev 时，若报 `Could not resolve "element-ui/packages/image/src/image-viewer.vue"`（引用链来自 `src/components/ImageViewer/index.vue`），属于对 element-ui 源码路径的直接依赖。
 
@@ -23,7 +28,6 @@ zhi2-web-admin 用 Vite 跑 dev 时，若报 `Could not resolve "element-ui/pack
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=2-0
-
 
 <!-- MEMORY_FIELDS
 {

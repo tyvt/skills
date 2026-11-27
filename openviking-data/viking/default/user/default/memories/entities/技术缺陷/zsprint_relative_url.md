@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:47:31+08:00
+verdict_note: 苏住房G含ZsPrint组件与window.origin用法，打印模板改resolveServerAssetUrl修复属实。
+---
 # ZsPrint 用 window.origin 拼模板地址，子路径部署必丢前缀
 开户申请详情点「打印」后生成的 Word 模板打开错误地址，因 ZsPrint/index.vue 用 window.open(`${window.origin}${res.data}`) 拼绝对地址，子路径部署（如 /test/）会丢部署前缀。
 
@@ -17,7 +22,6 @@
 - 验证证据：会话 a423ec75「打印的打开路径要改为相对的」→ window.open(`${window.origin}${res.data}`) 在 /test/ 部署下丢前缀，改为 resolveServerAssetUrl(...)，printWay==2 与 HTTP 模板地址两处同改
 - 涉及文件：d:\repository\苏住房G\zhi2-web-admin\src\components\ZsPrint\index.vue；benefit\pubRegulatoryAccount\detail.vue；components\OperationBtnGroup\index.vue
 - 所属项目：苏住房G；来源会话ID：a423ec75-91b1-4249-9830-1fd5d9f6e665；代码基线：864b409
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:24:06+08:00
+verdict_note: 小程序 wygl-wxxcx-dev-slh/utils/portal-user.js 命中 extractPropertyPageRows/isPropertyApiSuccess，顶层数组解析修复属实
+---
 # 物业门户 ctUserIdentity 房屋分页顶层数组解析修复
 物业门户小程序拉身份房屋时后端可能返回顶层数组而非 rows/records 分页壳，需扩展解析分支避免 houseList 为空。
 

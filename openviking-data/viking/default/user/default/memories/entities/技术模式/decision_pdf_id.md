@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:44:18+08:00
+verdict_note: 园区表决H5 命中 alfrescoFileUuid(4)、h5decision(8)，表决单 PDF 按 UUID/ID 获取的接口契约属实
+---
 # 表决意见单PDF按ID获取
 表决意见单PDF由服务端生成，提交接口仅返回状态码而不返回文件流，需按 alfrescoFileUuid 取文件。
 

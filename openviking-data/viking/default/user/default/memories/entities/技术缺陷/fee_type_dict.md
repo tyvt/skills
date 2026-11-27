@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:18:45+08:00
+verdict_note: 苏州市房地产监测V3 中 FEE_TYPE 字典键真实存在，agencyBranch 目录已无 charge_type，与“已修复为FEE_TYPE”一致。
+---
 # 服务方案收费类型字典误用charge_type无选项
 `ServiceSchemePanel.vue` 与 `AgencyBranchDetail.vue` 使用错误字典键 `charge_type`，系统实际为 `FEE_TYPE`，致新增/详情收费类型下拉无选项。
 ## 问题根因

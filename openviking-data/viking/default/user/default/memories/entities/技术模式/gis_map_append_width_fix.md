@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:51:28+08:00
+verdict_note: 实机核对：V3 styles/index.scss(1285) map-append、(1306) min-width-96px 均在；GIS 地图按钮最小宽度修复属实。
+---
 # GIS 地图按钮 map-append 最小宽度修复
 苏州市房地产监测V3 项目修复了 `zs-form` 内 GIS 地图按钮在窄列下图标与文字挤压的问题。
 

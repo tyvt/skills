@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:18:07+08:00
+verdict_note: 惠山二期G 命中 openBuildingDialog/先选择开发项目/buildingId/houseChange，前置校验属实
+---
 # 房屋信息变更项目前置校验
 房屋信息变更（houseChange）弹窗未选项目时楼幢/单元查询返回全量数据，已加项目与楼幢前置校验。
 

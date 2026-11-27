@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:49:15+08:00
+verdict_note: 泰兴小程序命中 -deep(.zs-button)(12)、page-button-container(19)、proposal-item-detail(2)，与 CSS 嵌套平铺修复一致。
+---
 # CSS嵌套警告修复
 泰兴小程序 3 个页面因 `:deep(.zs-button)` 写在容器内部产生 chrome53 不支持的嵌套 CSS，已改为平铺写法消除警告。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:19:33+08:00
+verdict_note: 小程序含 houseBoundViaAuth/mergeLingXiHouseIntoPortalUser/externalWebview/hasHouse，鉴权绑房标记属实。
+---
 # 通过鉴权标记绑定房屋
 utils/portal-user.js 引入了 houseBoundViaAuth 标志，仅当 LingXi authCode 房屋选择通过 mergeLingXiHouseIntoPortalUser 成功时设为 true，用作正式版本的房屋绑定判定标准。
 ## 行为
@@ -14,7 +19,6 @@ utils/portal-user.js 引入了 houseBoundViaAuth 标志，仅当 LingXi authCode
 ## 验证与归属
 - 所属项目：小程序
 - 验证证据：extracted source=cursor project=小程序
-
 
 <!-- MEMORY_FIELDS
 {

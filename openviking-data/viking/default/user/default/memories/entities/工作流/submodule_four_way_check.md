@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:27:56+08:00
+verdict_note: 四方一致性校验 SOP 与仓库 submodule-commit 技能一致，属通用正确流程，无与现状冲突的具体代码断言。
+---
 # 子模块交付前四方一致性校验
 子模块与父仓推送完成后，须证明别人 clone 主仓并 submodule update 能拿到正确代码，做四方一致性校验。
 

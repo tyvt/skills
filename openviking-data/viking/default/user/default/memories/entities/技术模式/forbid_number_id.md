@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:29:03+08:00
+verdict_note: 苏住房G flood/components/CheckPage.vue无Number(/parseInt转换，与移除主键数值化、保留长ID的原则一致，无反证。
+---
 # 主键禁止 Number(id) 避免长 ID 精度丢失
 防汛模块详情页对主键做 Number(id) 转换会静默丢精度，必须原样透传长整型字符串。
 

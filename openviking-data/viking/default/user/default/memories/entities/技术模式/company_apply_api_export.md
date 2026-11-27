@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:34:29+08:00
+verdict_note: 苏州市房地产监测V3 zhi2-web-admin 有 src/api/company/companyApply.js 及 companyApply 相关视图，API 导出补全描述有代码证据。
+---
 # CompanyApply API 导出缺失导致构建错误
 在苏州市房地产监测V3项目中，companyApply.js 中缺少企业申请 API 的导出导致 `npm run build` 失败。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T19:48:42+08:00
+verdict_note: 产品2.0 home/index-new.vue/index-wrapper.vue 无 notice-body/empty-tip/暂无公告 命中，空状态居中修复无法证明
+---
 # 公示公告空状态居中修复
 产品2.0 首页公示公告空状态现已在内容区内水平、垂直居中显示。
 

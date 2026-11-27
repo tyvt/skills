@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T23:48:09+08:00
+verdict_note: 苏住房C源码无page-block/module-gap类（仅dist遗留project-page），卡片间距page-block包裹修复无法证实。
+---
 # 卡片上下间距失效修复
 苏住房C小程序卡片因样式作用域及布局问题导致上下间距失效，已通过多种方式修复。
 
@@ -18,7 +23,6 @@
 - 验证证据：extracted source=cursor project=苏住房C
 - 重新编译预览后，顶部小区信息卡片和「小区周边」之间应能看到灰色背景分隔；所有卡片间距应正常
 - 所属项目：苏住房C（zhi2-mobile-shimin）；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:47:29+08:00
+verdict_note: 泰兴小程序 staff/pages/complex-select/index.vue 实存 uni.reLaunch+returnTab+fail 兜底注释，与记忆一致。
+---
 # 物业端自定义tabBar致switchTab静默失败
 泰兴小程序物业端 tabBar 为 custom:true 时 uni.switchTab 静默失败，选中小区后停留原页，改用 uni.reLaunch 可靠跳回目标 tab。
 

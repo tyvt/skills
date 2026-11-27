@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:14:07+08:00
+verdict_note: 产品2.0/园区公共收益 workOrder 下 report/repair/index.vue 命中 ORDER_TYPE.REPORT/REPAIR 薄包装，与描述一致。
+---
 # 工单报事/报修两个菜单共享index/detail加orderType薄包装
 工单列表只有 order/index.vue 与 detail.vue 一套，需拆出「报事」(orderType=1) 与「报修」(orderType=2) 两个独立菜单，用共享组件 + 薄包装套路避免复制漂移。
 

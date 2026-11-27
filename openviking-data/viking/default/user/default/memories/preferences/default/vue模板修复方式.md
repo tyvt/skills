@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:32:45+08:00
+verdict_note: scan-vue-template.mjs 脚本仅见于记忆/归档文件，仓库内无该脚本；栈解析幂等修复的方法记忆缺实际代码产物。
+---
 - 修复 Vue 模板重复问题时，采用栈解析为主、正则为辅的幂等修复，避免正则重复执行产生振荡（问题数 61→153）。
 - 配套 scripts/scan-vue-template.mjs 扫描及 npm 脚本 scan/fix/verify:vue-template 进行校验。
 

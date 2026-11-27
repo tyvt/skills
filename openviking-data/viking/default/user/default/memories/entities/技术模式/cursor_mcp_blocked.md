@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:19:39+08:00
+verdict_note: Cursor 配置与 plans 命中 shouldBlockMcp/workbench.mcp.allowlist/tdai_recall，权限层拦截属实
+---
 # Cursor 权限层拦截 MCP 调用
 Cursor 的 InteractivePermissionsService.shouldBlockMcp 在权限层直接拦截 MCP 工具调用（如 tdai_recall），并非服务器连接失败。
 

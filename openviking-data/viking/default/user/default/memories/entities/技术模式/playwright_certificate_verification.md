@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:14:09+08:00
+verdict_note: 存在 ProjectCertificateTabs.vue 证书筛选条组件，与描述一致
+---
 # Playwright登录失败须手动验证证书筛选条
 在苏州市房地产监测V3中，Playwright无法自动化验证证书管理筛选条修复，需手动验证。
 

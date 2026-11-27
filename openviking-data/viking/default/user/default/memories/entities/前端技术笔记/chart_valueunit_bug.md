@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:12:46+08:00
+verdict_note: 园区物管2.0 dataHelpers.js 有 toChartWanAmount/regionAmountRatio，chartRenderers.js 有 valueUnit，饼图单位修复属实
+---
 # 饼图valueUnit误设致单位错
 园区物管2.0 资金全景页解析 regionAmountRatio 时误设 valueUnit 为 %，导致饼图 tooltip 错误追加 %。
 

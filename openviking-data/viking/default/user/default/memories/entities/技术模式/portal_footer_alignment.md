@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:43:17+08:00
+verdict_note: 门户 portalLayout.js 实为权限判断(shouldShowLayoutSidebar)，无 align-items-stretch；stretch 命中在 detail-template 等无关文件
+---
 # 门户首页底栏待办与公告左右底对齐
 UnifiedLogin/首页底部双栏要对齐左右卡片下沿、又不撑高整页时：外层行用 align-items: stretch，行高取左右内容较大值。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:14:22+08:00
+verdict_note: 门户 HomeAiChatDialog.vue 源码命中 data-msg-id 与贴顶滚动逻辑，禅道 6403 修复属实。
+---
 # 禅道缺陷 #6403
 门户 AI 智能问答超过一屏后点击热点问题，问题和答案贴底导致问题被滚出可视区的缺陷。
 

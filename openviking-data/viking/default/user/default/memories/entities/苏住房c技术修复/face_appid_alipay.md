@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:16:29+08:00
+verdict_note: 参考项目 zhi2-mobile-admin-h5-c-unlimited 的 sfbFaceAuth.js 命中 jisnzjk，人脸appId修复属实
+---
 # 人脸识别支付宝拉起修复
 苏住房C小程序修复支付宝无法拉起人脸识别的问题，根因为人脸 appId 误用为业务网关 ID。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

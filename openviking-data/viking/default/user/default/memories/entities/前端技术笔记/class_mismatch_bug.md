@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:41:43+08:00
+verdict_note: 园区物管2.0 serviceItem/detail.vue 存在 sort-main-box/sort-left 样式类，与记忆所述样式写在 sort-* 一致
+---
 # 复制改造页面布局错乱（类名不匹配）
 园区物管2.0 中复制或改造列表页后，因模板类名与样式类名对不上导致布局完全错乱的已知问题。
 

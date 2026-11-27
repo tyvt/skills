@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:15:28+08:00
+verdict_note: 苏州V3 index.scss 命中 detail-container/app-main，高度作用域修复属实
+---
 # Detail Container Height Scoping Fix
 `.detail-container` had hardcoded height causing bottom blank; scoping fixed.
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:14:13+08:00
+verdict_note: 苏住房G 含 areaCodeTree/resolveDistrictRegionCode/regionCode/regionBankAuth，区级请求 regionCode 兜底属实。
+---
 # 区域银行授权页区级请求漏带regionCode
 区域银行授权列表页选中区级节点时请求只带 parentDeptId 而无 regionCode，导致区级数据口径错误且静默无报错。
 

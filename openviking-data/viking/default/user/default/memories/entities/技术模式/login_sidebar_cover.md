@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:50:59+08:00
+verdict_note: 苏州市房地产监测V3 login.vue 含 login-bg、object-fit-cover，登录侧栏白条修复属实。
+---
 # 登录侧栏装饰图白条修复
 苏州市房地产监测V3 中登录侧栏装饰图缩放高度不足致底部露白底，已在 login.vue 改用 cover 铺满。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:20:49+08:00
+verdict_note: 苏州市房地产监测V3 命中 AgencyBranchDetail.vue、canEditInHeader、showSaveButton，查看态按钮属实
+---
 # 分支机构详情查看态按钮修复
 修复苏州市房地产监测V3中分支机构详情查看状态仍显示「保存」按钮的问题。
 

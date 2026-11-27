@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:11:28+08:00
+verdict_note: 园区物管2.0全仓无applyScreenQuery/buildScreenQuery/from=screen，描述的目标页重写applyScreenQuery清默认筛选修复不存在。
+---
 # 大屏穿透默认筛选未清除（Bug 6220 变体）
 园区物管2.0 大屏穿透到列表页时，目标页既有默认 queryParams 未被清除，导致列表额外叠加默认筛选、数量与大屏不一致。
 ## 问题根因

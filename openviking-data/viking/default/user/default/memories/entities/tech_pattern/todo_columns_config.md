@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:19:40+08:00
+verdict_note: 产品2.0 flowable/todo.vue-14 存在 busCodeOptions 且含 menuName columns 配置，描述与代码一致。
+---
 # Todo Table Columns Config
 The flowable todo.vue table was refactored to use a columns configuration and duplicate options were removed.
 
@@ -19,7 +24,6 @@ The flowable todo.vue table was refactored to use a columns configuration and du
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：43c31fa0-2afa-4155-861c-52d80df36f42
-
 
 <!-- MEMORY_FIELDS
 {

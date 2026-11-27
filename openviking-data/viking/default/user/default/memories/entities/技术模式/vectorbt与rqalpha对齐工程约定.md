@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:51:53+08:00
+verdict_note: fund 下 .venv-vectorbt、output/vectorbt/baselines、vectorbt 配置齐备，与 RQAlpha 隔离对齐的工程约定属实。
+---
 # VectorBT与RQAlpha对齐工程约定
 接入 VectorBT 时须与既有 RQAlpha 结果隔离并完整对齐其规则。
 

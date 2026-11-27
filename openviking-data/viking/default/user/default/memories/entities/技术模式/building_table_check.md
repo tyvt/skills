@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:18:24+08:00
+verdict_note: 产品2.0 BuildingTable.vue 仍用 @change=onUnitChange(L12) 的普通 el-checkbox，无 unitCheckState/syncUnitCheckState/isUnitChecked/v-model/watch，记忆所述修复未落地。
+---
 # 楼盘表弹窗单元表头全选不回显修复
 产品2.0 楼盘表 BuildingTable 弹窗带入已勾选数据时，单元表头 el-checkbox 因仅用 :value 绑定不刷新。
 ## 问题根因

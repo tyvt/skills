@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:15:02+08:00
+verdict_note: 苏州市房地产监测V3 E2E 存在 qualificationList/房地产开发企业资质证书断言，与描述一致
+---
 # 开发企业入网注册增加资质信息
 苏州市房地产监测V3 中开发企业入网注册流程已增加资质信息（qualificationList），并通过全流程 E2E 与字段 maxlength 测试。
 

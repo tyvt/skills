@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:46:31+08:00
+verdict_note: 苏住房G propertyContract/components/index.vue已无normalizeHasFilingForm/listCallback转换，hasFilingForm直接用1/0走dict-tag(218)，与删除转换的修复一致。
+---
 # hasFilingForm字典映射修复
 苏住房G 物业合同列表页曾将 `hasFilingForm` 由 `1`/`0` 转 `Y`/`N`，与 `sys_yes_no` 字典 `dictValue` 不一致导致 `dict-tag` 映射失败。
 

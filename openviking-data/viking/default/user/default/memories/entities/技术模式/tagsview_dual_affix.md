@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:19:40+08:00
+verdict_note: 园区公共收益中 filterAffixTags、homeRoutePath、meta.affix 命中，双固定标签修复属实。
+---
 # 首页待办改flowable/todo后TagsView双固定标签
 首页换接口下发flowable/todo且保留静态/index时，affix被叠加三次导致出现两个固定「待办任务」标签。
 

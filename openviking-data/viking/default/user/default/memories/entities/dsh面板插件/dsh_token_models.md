@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:15:21+08:00
+verdict_note: skills/dsh/token-models/lib/client.js 中 elapsedSec、fmtDur 命中，orchestrator-usage 端点存在，插件耗时功能属实。
+---
 # dsh-token-models
 DSH 面板中用于统计各模型 token 用量与耗时的插件。
 
@@ -13,7 +18,6 @@ DSH 面板中用于统计各模型 token 用量与耗时的插件。
 ## 关系
 - 数据源：.costs.jsonl 含 elapsed 字段（秒级）。
 - 运行端点：GET /api/token-models/orchestrator-usage 当前仅返回 model,prompt,completion,total,calls,roles，无 elapsedSec。
-
 
 <!-- MEMORY_FIELDS
 {

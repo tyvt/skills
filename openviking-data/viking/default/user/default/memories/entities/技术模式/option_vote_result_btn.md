@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:52:49+08:00
+verdict_note: 太仓G optionDecision/detail.vue-57表决结果按钮v-if含isSubmittedBiz&&showVoteResultBtn，状态限制描述属实。
+---
 # 表决结果按钮无状态限制致未开始显示
 太仓G端 optionDecision/detail.vue 表决结果按钮无状态限制，未开始表决也渲染。
 

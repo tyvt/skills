@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:13:55+08:00
+verdict_note: git push 校验方法论，git ls-remote 比对 ref 为通用正确做法，无事实错误
+---
 # Git 推送成功校验模式
 `git push` 返回 `Everything up-to-date` 不代表未推送，须用 `git ls-remote` 比对远程 ref 与本地 HEAD 确认。
 

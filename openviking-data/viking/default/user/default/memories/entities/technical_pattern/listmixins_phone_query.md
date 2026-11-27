@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:43:50+08:00
+verdict_note: 淮安物管 system/publicPage/index.vue 有 phone-undefined 与 model-"phone"，listMixins/table.js 有 getQueryParams，符合记忆。
+---
 # ListMixins Phone Query Pattern
 Huaian Property Management pattern where adding a phone query field to a list page is fully handled by listMixins without extra wiring.
 
@@ -13,7 +18,6 @@ Huaian Property Management pattern where adding a phone query field to a list pa
 - 所属项目：淮安物管
 - 验证证据：extracted source=cursor project=淮安物管
 - 来源会话：82c31af5-e691-4bcd-babb-0636c7bb1b31
-
 
 <!-- MEMORY_FIELDS
 {

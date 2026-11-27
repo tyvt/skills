@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:17:13+08:00
+verdict_note: 太仓一网通办H5 命中 ElectionCardList、ElectionIndex、TagTrapezoid、CardList，样式修复属实
+---
 # 业委会选举未参与列表卡片样式缺失
 太仓一网通办H5 的 C 端业委会选举「未参与」列表页因 `ElectionCardList.vue` 引用错误样式文件，导致卡片呈现无样式裸 HTML 布局，已修复。
 

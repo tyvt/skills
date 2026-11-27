@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:44:23+08:00
+verdict_note: 宜兴公共收益 building/detail.vue 与 buildingChange/detail.vue 均含 clearLandPlot 与 @clear，清除地块ID修复属实
+---
 # 清除地块名未清ID致楼幢保存仍传宗地参
 `zs-input` 清除 `landPlotName` 未触发 `@clear` 导致 `landPlotId`/`landPlotCode` 残留，`beforeSaveHook` 未判空。
 

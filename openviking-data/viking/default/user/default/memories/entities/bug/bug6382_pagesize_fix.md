@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-27T11:50:31+08:00
+verdict_note: 命中 chooseHouseDialog/queryHousesByBuildCode/paginateRows/pageSizeRows，Bug#6382 pageSize 截断修复属实；旧 suspect 标记不影响本次代码证据结论。
 ---
 # 预售选房弹窗分页截断修复
 禅道 Bug #6382（苏州市房地产监测V3，子模块 zhi2-web-admin）修复新增合同选房弹窗 chooseHouseDialog.vue 因 pageSize 写死导致第 6 间房被切页、末行裁切的问题。

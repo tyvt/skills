@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:22:37+08:00
+verdict_note: 小程序 portal-user.js 命中 mergeCtUserIdentityHouseIntoPortalUser 与 extractPropertyPageRows。
+---
 # portal-user.js 房屋合并逻辑
 `utils/portal-user.js` 扩展数组解析能力并新增房屋合并函数，将物业房屋信息并入门户用户态。
 

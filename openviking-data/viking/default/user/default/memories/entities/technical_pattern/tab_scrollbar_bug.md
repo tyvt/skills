@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:21:03+08:00
+verdict_note: 园区V0 命中 myTab/scroll-padding-inline，Tab 滚动条修复属实
+---
 # Tab Scrollbar Bug
 Global CSS scrollbar styling in main.css added left/right arrows to all scrollbars, causing tab bar anomalies and last tab hidden in EstateManagement V0 project.
 
@@ -23,7 +28,6 @@ Global CSS scrollbar styling in main.css added left/right arrows to all scrollba
 - 所属项目：园区V0
 - 验证证据：extracted source=cursor project=园区V0
 - 来源会话：a726fbc6-506c-419b-8b8c-b02f10958d6b
-
 
 <!-- MEMORY_FIELDS
 {

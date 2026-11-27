@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:46:22+08:00
+verdict_note: 苏住房C ZsPopup.vue 实存 .popup-container--after 空壳样式，与记忆核查结论一致。
+---
 # ZsPopup伪元素样式核查
 苏住房C的`ZsPopup`组件`.popup-container::after`伪元素全库唯一命中，无蓝色渐变等样式。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:01:42+08:00
+verdict_note: 苏州市房地产监测V3 building/houseLimit/detail.vue 实存 operation-btn-group、form-mode-override 及 detail-header 清理，与描述一致。
+---
 # 房源限制详情页头部改用公共组件
 苏州市房地产监测V3 将项目详情顶部自定义 `detail-header` 改为与同模块 `limitAdd.vue` 一致的公共组件 `operation-btn-group`。
 
@@ -14,7 +19,6 @@
 ## 涉及文件与归属
 - 涉及：`limitAdd.vue`、`building/houseLimit/detail.vue`、`detail-template.vue`、`building/houseLimit/index.vue`
 - 所属项目：苏州市房地产监测V3；来源会话ID：c1794d0c-f9d8-4c97-ba50-e2d018685942；验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

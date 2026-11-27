@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:22:52+08:00
+verdict_note: 产品2.0 无 src/views/supervision 目录，7 个 agreement/*/detail.vue 均不存在，supervision/agreement 无命中
+---
 # supervision 详情页面迁移至新框架
 7个 supervision/agreement 详情页面已迁移至新框架，并对3个子表组件的权限按钮进行了改造，共计10个文件。
 
@@ -13,7 +18,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：0296e49b-14ac-4732-906b-0ef4ab03bede
-
 
 <!-- MEMORY_FIELDS
 {

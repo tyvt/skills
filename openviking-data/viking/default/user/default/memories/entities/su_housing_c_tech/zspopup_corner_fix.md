@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:31:17+08:00
+verdict_note: 苏住房C源ZsPopup.vue仍保留.popup-container--after且无overflow-hidden，与记忆所述删除伪元素、加裁剪修复不符。
+---
 # ZsPopup弹窗顶部蓝色边角修复
 苏住房C小程序修复所有 `ZsPopup` 弹窗顶部蓝色方角问题，改动对所有使用 `ZsPopup` 的页面全局生效。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T18:46:27+08:00
+verdict_note: 产品2.0 Process/index.vue-119 仍为 this.modeler = new BpmnJS({...})，未用 markRaw 包裹（markRaw仅见打包vue.js）；与描述矛盾。
+---
 # BpmnJS 实例需用 markRaw 避免响应式代理
 产品2.0（zhi2-web-admin）中在 Vue 3 的 data() 里放置 new BpmnJS(...) 会触发 Proxy 只读属性报错。
 

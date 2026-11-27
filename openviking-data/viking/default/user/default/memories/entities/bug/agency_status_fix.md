@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-27T04:10:53+08:00
+verdict_note: 虽带suspect frontmatter，但agencyChangeCoreFields.js中resolveAgencyChangeToolbarBizState对bizState 1/3优先、isAgencyChangeDraftDisplayStatus兜底逻辑与描述逐字吻合，代码证据充分。
 ---
 # 机构入网信息变更双状态字段冲突修复
 苏州市房地产监测V3 项目修复机构入网信息变更详情页因 displayStatus 与 bizState 两套状态字段混淆导致工具栏状态计算错误的问题。

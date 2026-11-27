@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:15:04+08:00
+verdict_note: chooseHouseDialog.vue 命中 projectCode/sessionStorage/loadNode，与选房弹窗同步修复描述一致。
+---
 # 选房弹窗与合同编辑页报错修复
 苏州市房地产监测V3 项目修复了选房弹窗（`chooseHouseDialog.vue`）及合同编辑页（`contract/index.vue`）的 `created` 阶段报错与数据不同步问题。
 

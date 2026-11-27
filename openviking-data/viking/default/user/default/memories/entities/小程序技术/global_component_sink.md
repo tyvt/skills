@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:29:17+08:00
+verdict_note: IntentionMyList 组件全仓无命中，仅 README/figmaPrompt 有通用「分包/subPackages」字样；全局组件下沉分包无代码证据。
+---
 # 全局组件下沉分包解决主包超限
 uni-app小程序主包上传体积上限2048KB，仅被单个分包使用的全局组件必须下沉进分包目录，否则白占主包体积。
 

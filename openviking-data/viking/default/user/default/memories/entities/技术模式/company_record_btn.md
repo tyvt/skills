@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T22:17:05+08:00
+verdict_note: updateCompanyRecordChange/submitCompanyRecordChangeByLogin 未命中，实际按钮为「保存并提交」与「仅保留保存」描述不符
+---
 # 变更编辑页按钮精简修复
 产品2.0 的 toB 企业变更记录编辑页仅保留「保存」按钮，移除「提交审核」。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:46:24+08:00
+verdict_note: ZsImage 组件命中 widthFix/aspectFill/aspectFit/mode，按宽等比缩放与尺寸参照方案属实(同类组件命中于泰兴小程序，项目标注苏住房C)
+---
 # ZsImage默认width:100%/height:100%需父容器给确定尺寸否则算成0
 苏住房C小程序两处图片不显示，资源路径都存在，根因都是ZsImage默认尺寸在父容器里失去参照算成0宽或0高。
 

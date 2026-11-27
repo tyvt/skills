@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:45:44+08:00
+verdict_note: 偏好类 git 子模块指针同步约定，与现有 submodule-commit 子模块管理及 env/.env 不提交规则一致，无幻觉或违规
+---
 - 子模块 `zhi2-web-admin` 在某分支修复缺陷后，父仓库其他各分支须同步更新子模块指针到对应 commit，避免分支间代码偏差（如修复分页重叠 commit `dac8a93e7` 后，`develop/v2.6.2` 须指向 `fa00918cc`）
 - 本地代理配置文件 `env/.env` 保持未提交状态
 

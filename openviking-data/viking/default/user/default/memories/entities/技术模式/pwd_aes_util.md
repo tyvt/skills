@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:44:44+08:00
+verdict_note: 淮安存量房 zhi2-web-admin/src/utils/crypto.js 实存 encrypt；login/修改密码 AES 加密逻辑可核对。
+---
 # 修改密码AES加密统一
 登录页与各修改密码入口统一使用AES-ECB加密密码，避免明文传输。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:18:56+08:00
+verdict_note: 苏住房G 含 regionBankAuth/StreetAuthDialog/bankAuthEnabled/platformConfig，代码重生属实。
+---
 # 行政区域银行授权代码重生
 苏住房G 已重新生成「行政区域银行授权」相关代码，置于 views/system/regionBankAuth。
 

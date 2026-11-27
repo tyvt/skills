@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:54:41+08:00
+verdict_note: 苏住房G store/modules/user.js-215/236登出时dispatch(common/clearAllSearchParams)，跨账号parentDeptId残留修复属实。
+---
 # Switching account leaves parentDeptId causing wrong dept filter
 After logout without clearing Vuex cachedSearchParams, a new account inherits the previous account's department filter.
 
@@ -17,7 +22,6 @@ After logout without clearing Vuex cachedSearchParams, a new account inherits th
 - 所属项目：苏住房G
 - 验证证据：extracted source=cursor project=苏住房G
 - 来源会话：c14c5230-321b-471a-a40a-e48d33f20dbb
-
 
 <!-- MEMORY_FIELDS
 {

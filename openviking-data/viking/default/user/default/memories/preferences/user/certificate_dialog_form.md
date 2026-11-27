@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:50:54+08:00
+verdict_note: 苏州V3两处certificatesDialog.vue均有is-show-tip=false(41)与.upload-tip(43/309/298)，表单结构与上传提示描述属实。
+---
 - Certificate dialogs (certificatesDialog.vue and personnelRecord/ same-name files) follow form-box → zs-form(label-position="right") → zs-form-item structure, removing el-row/el-col and .certificate-form styles.
 - FileUpload sets :is-show-tip="false" and adds .upload-tip text; both files keep structure in sync and pass Lint.
 - Evidence: src=苏州市房地产监测V3/078.md; source session: ba8901ef-27cd-40ea-a120-41f51d8f7810
@@ -6,7 +11,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：ba8901ef-27cd-40ea-a120-41f51d8f7810
-
 
 <!-- MEMORY_FIELDS
 {

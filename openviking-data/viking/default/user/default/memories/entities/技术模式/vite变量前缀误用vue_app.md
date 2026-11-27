@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:32:05+08:00
+verdict_note: 全仓无VITE_APP_Place_URL/VUE_APP_Place_URL，placeDmsp.js已改用loadPlaceDmspBaseUrl动态加载，与记忆所述env变量重命名不符。
+---
 # Vite须用VITE_前缀替代VUE_APP_变量
 苏州市房地产监测V3 中 Vite 构建无法识别 Webpack 风格 VUE_APP_ 变量，须重命名为 VITE_ 前缀。
 

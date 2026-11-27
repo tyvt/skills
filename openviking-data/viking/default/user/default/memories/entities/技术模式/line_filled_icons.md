@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:17:32+08:00
+verdict_note: 苏住房G 存在 generate-navbar-menu-icons.mjs/menuPlatformIcons.js 线面双态图标方案，与描述一致
+---
 # 线/面双态菜单图标替换方案
 顶栏与首页热门应用菜单图标换为 line/filled 两套 SVG sprite 资源，未选中线性、选中面性。
 

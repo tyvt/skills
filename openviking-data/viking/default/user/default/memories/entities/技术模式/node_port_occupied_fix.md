@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:15:38+08:00
+verdict_note: 本地端口占用排查为系统运维常识，无可证伪代码事实，描述合理
+---
 # 本地开发端口被 Node 进程占用时终止对应 PID 释放
 Windows 本地 8081/8082 等端口被占用多为 Node.js 进程残留，结束占用 PID 的 node 进程即可释放。
 

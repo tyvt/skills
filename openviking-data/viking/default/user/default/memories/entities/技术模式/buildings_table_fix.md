@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:51:40+08:00
+verdict_note: BuildingsTable.vue 中 disabled- this.form.bizState != '0' || this.multiple、multiple-!selection.length，与记忆所述删除按钮修复完全一致。
+---
 # BuildingsTable 删除按钮修复
 `BuildingsTable.vue` 的删除按钮已修复，以验证选中的行。
 

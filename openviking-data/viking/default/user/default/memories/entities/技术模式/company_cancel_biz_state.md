@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:17:21+08:00
+verdict_note: V3 仓存在 companyCancel 组件与 biz_state 字典，机构注销列表增强描述有代码依据。
+---
 # 机构注销列表移除机构类型筛选并增业务状态列
 `companyCancel/index.vue` 移除机构类型筛选，新增业务状态列展示 bizState。
 

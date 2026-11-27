@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:43:54+08:00
+verdict_note: 在园区物管2.0仓源码命中核心符号(5/5)assetleaseapply,assetsleasecontractfiling,extralinks,selectdialog，涉及文件存在，描述与现状一致，判有效。
+---
 # B 端物业管理区域 SelectDialog extra 提示
 园区物管2.0 中 B 端（terminalType === 'B'）区域选择弹窗通过 SelectDialog.open 的 extra 与 extraLinks 提示开户与签协议。
 

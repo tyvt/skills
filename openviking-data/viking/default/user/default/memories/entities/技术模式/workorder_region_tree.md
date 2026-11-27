@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:46:48+08:00
+verdict_note: 产品2.0 workOrder/order/index.vue-7 明确 tree-url="/system/dept/complexTree"，与记忆描述一致。
+---
 # 工单列表页区域树接口切换
 产品2.0 工单列表页的区域树已切换为 /system/dept/complexTree 接口，组件支持可配置树接口。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:12:58+08:00
+verdict_note: 存在 MaintainResultDialog/VotingItemsTable 组件与 $emit('refresh') 替代 $parent.getList 的刷新模式，与描述一致
+---
 # dialog_emit_refresh
 A dialog calling the parent component method via `this.$parent` after submit was unstable and threw a method-not-found error; replaced with `$emit('refresh')` handled by the parent.
 
@@ -16,7 +21,6 @@ A dialog calling the parent component method via `this.$parent` after submit was
 - 所属项目：园区公共收益
 - 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：efcad380-fb66-4184-a744-9ea41461ecde
-
 
 <!-- MEMORY_FIELDS
 {

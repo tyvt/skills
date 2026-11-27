@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:20:28+08:00
+verdict_note: ProjectDeliveryInfoPanel.vue 含 regionLabel 计算属性并调用 formatters.provinceFormatter，属实
+---
 # 所属区域编码转名称修复
 苏州市房地产监测V3 的 projectDelivery 模块中 region 字段存储行政区划编码，详情视图已修复为展示可读名称。
 

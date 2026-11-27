@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T02:34:34+08:00
+verdict_note: 门户 index-new.vue 存在，但 --flow-step-col/116px 等 distinctive CSS 变量全仓源码不存在（仅记忆镜像）；所述等距变量未在代码中体现，无法证明有效。
+---
 # 业务中心流程条图标等距
 门户首页 index-new 业务中心两行流程步骤标签字数不一，要求图标间距等分、文字不等分，用 CSS 变量控制图标中心间距。
 

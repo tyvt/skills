@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T19:16:55+08:00
+verdict_note: 记忆正文明文记录了平台签名密钥 WEXL6R2P7S3Q9T4V8Y1U5Z0OAICBHDGE 及 RSA 私钥用法，属凭据明文入记忆的隐私违规，判无效。
+---
 # 昆山G 响应解密逻辑
 昆山G（wuguan-fe-zhi1-web-admin-h5-g）参考太仓G（zhi1-web-admin）项目，在两个请求拦截器中补充了响应解密逻辑。
 

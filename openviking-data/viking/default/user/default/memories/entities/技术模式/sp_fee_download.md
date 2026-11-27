@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:17:33+08:00
+verdict_note: 含SP_FEE_BILL_ERROR_REPORT_API/resolveErrorReportDownloadPath，错误报告下载归一化属实。
+---
 # 物业收费账单错误报告下载归一化
 产品2.0 中物业收费账单导入的错误报告下载接口，通过模块常量与解析函数统一 GET 下载通道，规避后端地址形态不统一导致的 404。
 

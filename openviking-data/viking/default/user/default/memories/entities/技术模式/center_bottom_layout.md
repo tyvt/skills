@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:26:40+08:00
+verdict_note: 园区物管2.0 benefit/mapOverview/index.vue 存在 center-bottom-row 及 grid-template-columns 列宽比修正；现值已调为 66fr 34fr（较描述的 3fr 2fr 后续再调），修复事实成立。
+---
 # 中心底栏列宽比修正
 园区物管2.0 benefit/mapOverview 中心底栏列宽比曾反置，已修正。
 

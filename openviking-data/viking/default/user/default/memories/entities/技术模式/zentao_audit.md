@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:50:12+08:00
+verdict_note: 苏住房G docs/std-evaluation/requirements.md 与 audit-frontend.md 存在，与记忆所述四步审计法文档落盘一致。
+---
 # 禅道任务完成度四步审计法
 判定禅道任务「已完成/未完成」须四步走：story 正文还原、前端代码审计、菜单表核查、权限字符核查，代码写全不等于可交付。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:52:08+08:00
+verdict_note: 门户 homeDataMixin.js 含 mapFlowsFromApi/fetchFunctions/businessCenters/DEFAULT_BUSINESS_FLOWS，homeLayout.js 含 leaseBusiness，接口驱动描述属实
+---
 # 门户首页业务中心接口全量驱动
 门户 B 端首页三块业务中心（商品房/存量房/住房租赁）在 `/portal/home/functions` 配置 `data.businessCenters` 时，以接口为唯一展示来源。
 

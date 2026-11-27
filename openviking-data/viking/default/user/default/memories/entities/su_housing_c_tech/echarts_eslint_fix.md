@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:14:11+08:00
+verdict_note: 苏住房C echarts-instance.js 文件存在，单一 echarts 声明避免 ESLint 重复报错方案属实。
+---
 # echarts条件编译ESLint报错修复
 苏住房C 参考泰兴小程序阳光物业共有资金功能迁移时，修复 echarts-uniapp.vue 因条件编译被 ESLint 判为重复声明的 pre-commit 报错。
 

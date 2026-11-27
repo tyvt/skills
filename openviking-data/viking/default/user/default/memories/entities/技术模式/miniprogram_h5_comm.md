@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:45:31+08:00
+verdict_note: 纯通信方案选型经验，i淮安公版 home.vue 无 postMessage/WebSocket/navigateBack 证据，无法证明有效
+---
 # 小程序与 H5 通信方案选型
 i淮安公版项目中小程序与 H5（web-view）通信有多种可选方案，按实时性/稳定性有不同取舍。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T15:12:23+08:00
+verdict_note: 产品2.0 home/index.vue 与 credit/home/index.vue 中 statsFetchSeq/refreshStatsData/currentTaskStats/task-stats 全 MISS，记忆核心特征符号在现状代码均不存在
+---
 # 首页keep-alive缓存致tab与统计数字错位
 [苏房]产品2.0首页「办件量分析」切到当日后进待办详情再返回，tab回默认本周但数字仍当日，出现选中与数据错乱。
 

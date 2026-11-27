@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T18:46:15+08:00
+verdict_note: 苏住房C menuRouteMap.js-60 仍为 '/pages/houseMap/houseMap?type=0'，pages.json 亦为 pages/houseMap/houseMap，无 pages_main 分包；与'已迁分包并更新路由'描述矛盾。
+---
 # 分包页面迁移后菜单路由未更新致找不到
 苏住房C 移动端 `houseMap` 迁至 `pages_main` 分包后 `menuRouteMap.js` 仍指向旧路径致页面找不到，已更新路由。
 

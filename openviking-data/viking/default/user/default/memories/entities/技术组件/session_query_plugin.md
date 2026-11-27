@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:45:51+08:00
+verdict_note: 工具/偏好/知识类记忆，核心符号在 skills 与 OpenViking 仓源码/配置全部命中，描述与现状一致，判有效。
+---
 # 会话查询插件
 DSH（DeepSeek Harness）的会话查询工具插件，插件 id 为 optional-tool-session-query。
 

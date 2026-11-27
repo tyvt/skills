@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:20:04+08:00
+verdict_note: 产品2.0 vite.config.js 命中 legacy-js-api/preprocessorOptions/api，Sass 新 API 配置属实
+---
 # Vite Sass 新 API 消除 legacy-js-api 告警
 在 zhi2-web-admin/vite.config.js 的 css.preprocessorOptions.scss 下新增 Sass 新 API 配置，消除 legacy-js-api deprecation warning。
 

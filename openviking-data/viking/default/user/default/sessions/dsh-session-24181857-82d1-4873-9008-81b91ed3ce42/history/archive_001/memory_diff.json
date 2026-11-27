@@ -1,0 +1,42 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-24181857-82d1-4873-9008-81b91ed3ce42/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-27T00:57:05.276796+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/记忆抽查候选核对流程.md",
+                "memory_type": "preferences",
+                "after": "- 记忆抽查审计开始时先建立阶段清单，并用脚本筛选候选条目。\n- 编排器快路径被拒时，直接运行筛选脚本生成候选，不反复依赖快路径。\n- 候选展开后补齐被截断条目，再按项目、文件和具体符号核对关键代码证据。\n- 对证据不足的条目继续补充具体代码证据，证据收集完成后再生成判定结果文件。"
+            }
+        ],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/记忆审计回写执行.md",
+                "memory_type": "preferences",
+                "before": "- OpenViking 记忆审计的 apply 回写阶段逐条执行 ov write + 回读，速度较慢（每条约 12 秒，个别条目 embedding 超时时单条上限可达 120 秒），应预期转入后台执行。\n- stdout 重定向后输出文件与 job_output 仅在进程结束时一次性可见；执行期间通过审计日志是否增长来判断进度，不要反复读尚未写入的输出文件。\n- 审计日志短暂停滞通常是某条 write 卡在 embedding 超时；先再等一个观察周期确认是否继续推进，不要急于中断任务。\n- 进度偏慢但稳定时用 wait 阻塞等待进程结束，避免高频轮询带来的额外开销。\n- 全部回写完成后再统一读取 apply 结果与 stats 覆盖率，核对 skipped 数、哈希回读校验与 valid/invalid 分布。\n- apply 逐条 write 带 --wait 等 embedding、串行执行；Ollama 断连会显著拖慢写回。长时间无输出疑似卡在 OpenViking API 写回时，先诊断脚本逻辑与进程状态，并抽样读首尾条目的 frontmatter 是否已写入来判断是否真在推进（如首条已写、末条未写即仍在推进），不要急于中断。\n- When the apply command produces no output for more than 12 minutes, treat it as abnormal and inspect the exact apply loop, audit log, lock, and process state instead of only re-waiting.",
+                "after": "- OpenViking 记忆审计的 apply 回写阶段逐条执行 ov write + 回读，速度较慢（每条约 12 秒，个别条目 embedding 超时时单条上限可达 120 秒），应预期转入后台执行。\n- stdout 重定向后输出文件与 job_output 仅在进程结束时一次性可见；执行期间通过审计日志是否增长来判断进度，不要反复读尚未写入的输出文件。\n- 审计日志短暂停滞通常是某条 write 卡在 embedding 超时；先再等一个观察周期确认是否继续推进，不要急于中断任务。\n- 进度偏慢但稳定时用 wait 阻塞等待进程结束，避免高频轮询带来的额外开销。\n- 全部回写完成后再统一读取 apply 结果与 stats 覆盖率，核对 skipped 数、哈希回读校验与有效/无效（VALID/INVALID）分布。\n- apply 逐条 write 带 --wait 等 embedding、串行执行；Ollama 断连会显著拖慢写回。长时间无输出疑似卡在 OpenViking API 写回时，先诊断脚本逻辑与进程状态，并抽样读首尾条目的 frontmatter 是否已写入来判断是否真在推进（如首条已写、末条未写即仍在推进），不要急于中断。\n- apply 命令超过 12 分钟没有输出时视为异常，应检查具体 apply 循环、审计日志、锁和进程状态，而不是只继续等待。\n- apply 因 embedding 服务断连报错时，先确认后台任务状态与 embedding 服务健康，再决定继续等待或处理异常。\n- 回写前对所有候选正文执行最终隐私/敏感信息扫描；完成后清理临时校验脚本，只保留缓存中间产物。\n- apply 在后台运行较慢时不要猜测或拼接 job id；用 job_list 获取真实 id 并轮询至完成再汇报。\n- 长时间无输出时不要过早判定卡住：先查脚本逻辑；每条需要多次 ov CLI 读写，45 条约 135 次调用、约 12 秒/条。\n- 进程不可见但 job 仍在运行时，不用总体 audit_status 计数判断进度（多为历史轮次）；改读当前轮首尾 URI 的 last_checked 时间戳确认落盘，并抽查中间条目估计剩余时间。\n- 用脚本从 select.json 读取 uri/sha 并合并判定到 result.json，避免手工转录全部条目。\n- 脚本用 1-based 位置索引判定 note 时，不要在字典中间补缺失键；这会让后续键错位，应调整读取下标（如 base[i+1]）并撤销插入。\n- 回写前确认 apply 脚本路径：脚本在项目 scripts/ 目录，工作目录为 D:/repository/skills，以避免路径错误。\n- result.json 是数组；每条判定记录包含 uri、verdict、note、body_sha256_16 字段；apply 按这些字段映射并逐条回写。\n- 本地重算哈希与脚本输出不一致时，使用给定的 `body_sha256_16`，不要用自算约定替换。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/记忆抽查审计输出与检索.md",
+                "memory_type": "preferences",
+                "before": "- Present the audit report as a table: include total memory count, eligible pool size, sampled/picked count and cooldown window, applied/skipped/verify-ok writeback counts, VALID/INVALID distribution, code-evidence rationale for each entry, list every invalid memory filename separately, remaining unaudited count calculated from the eligible pool minus applied writebacks, cumulative audited count, and coverage percentage.\n- When one item is skipped, report both the writeback-based verdict distribution and the full `result.json` verdict distribution; explicitly note that the skipped item remains in the candidate pool.\n- Report `post_persist_embedding_err` entries as embedding rebuild errors after writeback; if frontmatter readback passes, state that they do not change the audit verdict.\n- For invalid entries, explicitly state whether the target file exists but decisive symbols have zero real-code hits or were found only in memory mirrors.\n- When total memory count changes after reindexing on writeback, report both the select-time count and post-writeback count with the reason for the difference.\n- State the audit scope explicitly: memory body semantics were not changed, no memories were deleted, no git commit was made, and intermediate files are cache artifacts under `~/.dsh/cache/memory-audit/`.\n- Mark valid-but-skipped entries (such as space-containing URIs normalized to underscores) with an asterisk in the table and state that their original frontmatter was not updated; explain any memory-count increase as duplicate files created by that normalization.",
+                "after": "- 审计报告用表格呈现：包含总记忆条数、可抽查池（eligible）大小、抽样/选中条数与冷却窗口、applied/skipped/verify-ok 回写计数、有效/无效（VALID/INVALID）分布、每条的代码证据依据、单独列出所有无效记忆文件名、按可抽查池减去 applied 回写数计算的剩余未抽查数、累计已抽查数与覆盖率。\n- 当有一条被 skipped 时，同时报告按回写结果统计的判定分布和完整 `result.json` 的判定分布；明确说明 skipped 条目仍留在候选池中。\n- 将 `post_persist_embedding_err` 条目报告为回写后的 embedding 重建错误；若 frontmatter 回读通过，说明它不改变审计判定。\n- 对无效条目，明确说明目标文件是否存在但关键符号在真实代码中零命中，或仅在记忆镜像中出现。\n- 当回写触发重新索引后总记忆数变化时，同时报告 select 时计数与回写后计数，并说明差异原因。\n- 明确说明审计范围：未改记忆正文语义、未删除记忆、未提交 git，中间文件仅为 `~/.dsh/cache/memory-audit/` 下的缓存产物。\n- 表中用星号标注有效但被 skipped 的条目（例如含空格 URI 被规范化为下划线），并说明其原始 frontmatter 未更新；将记忆数增加解释为规范化产生的重复文件。"
+            }
+        ],
+        "deletes": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/audit_writeback_execution.md",
+                "memory_type": "preferences",
+                "deleted_content": "- Run a final privacy/secret scan across all candidate bodies before writing back verdicts.\n- Clean up temporary verification scripts after completion so only cache intermediates remain.\n- When the OpenViking writeback apply runs slowly in the background, do not guess or stitch a job id; use job_list to obtain the real id and poll until completion before reporting.\n- When a writeback apply takes a long time, do not diagnose a hang prematurely: check the script logic first (each item needs several ov CLI reads/writes, about 135 calls and roughly 12 seconds per item for 45 items); when the process is not visible but the job is still running, do not judge progress from aggregate audit_status counts (mostly historical rounds), instead read the last_checked timestamps of the first and last URI in the current round to confirm persistence and spot-check middle items to estimate remaining time.\n- Use a script to read uri/sha from select.json and merge verdicts into result.json, avoiding manual transcription of all entries.\n- When the script indexes verdict notes by 1-based position, do not insert missing keys in the middle of the dictionary (it misaligns all later keys); instead adjust the read index (for example base[i+1]) and undo the insertion.\n- Confirm the apply script path before writeback: the script is in the project scripts/ directory and the working directory is D:/repository/skills, to avoid path errors.\n- result.json is an array; each verdict record contains uri, verdict, note, and body_sha256_16 fields; apply maps and writes back each item by these fields.\n- When a candidate URI contains spaces, OpenViking writeback normalizes them to underscores and writes to a new URI, so readback verification fails and the item is skipped with its original frontmatter unchanged; this also creates duplicate files and increases the total memory count by the number of skipped items.\n- When a locally recomputed hash differs from the script output, use the supplied `body_sha256_16` verbatim rather than substituting a recomputed convention.\n- After a writeback apply completes and readback verification passes, run stats to capture the remaining unaudited count and coverage.\n- Keep audit intermediates under `~/.dsh/cache/memory-audit/`; do not alter memory bodies, delete memories, or commit git changes during a writeback audit."
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 2,
+        "total_deletes": 1,
+        "total_skipped": 0
+    }
+}

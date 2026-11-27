@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:53:27+08:00
+verdict_note: 门户仓 zhi2-web-admin 实存 toB/personnelRecord/components/detail.vue 与 company/staffManagement，发起变更按钮属实。
+---
 # 企业端从业人员详情页发起变更按钮
 企业端 `toB/personnelRecord/components/detail.vue` 详情页新增「发起变更」按钮，补齐 G 端已有能力。
 

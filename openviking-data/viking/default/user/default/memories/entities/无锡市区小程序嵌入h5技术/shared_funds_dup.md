@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:47:32+08:00
+verdict_note: 无锡市区小程序嵌入H5 实存 DetailsTab.vue、benefit_app_account_fund_type、filter 去重，描述一致。
+---
 # 共有资金明细类型"全部共有资金"重复Bug
 无锡市区小程序嵌入H5中 DetailsTab.vue 的类型选择器出现两条相同的「全部共有资金」选项。
 

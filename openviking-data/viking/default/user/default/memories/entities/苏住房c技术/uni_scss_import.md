@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:45:29+08:00
+verdict_note: 当前 src/uni.scss 无 @import 语句、无 zs-button.scss 引用，仅有 .zs-button 选择器；描述的别名 @import 修复在现有代码中不存在，无法证实。
+---
 # uni.scss相对路径@import构建失败
 苏住房C 的 uni.scss 被注入每个页面样式块，其中相对路径 @import 会按当前页面目录解析导致构建找不到文件，必须改用 @/ 别名。
 

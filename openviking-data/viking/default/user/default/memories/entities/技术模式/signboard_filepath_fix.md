@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:59:14+08:00
+verdict_note: SignBoard.vue 含 filePath、files，src/api/file.ts 含 /file/file/upload，直传 filePath 修复属实
+---
 # signboard_filepath_fix
 H5 端 SignBoard.vue 上传失败因把 File 对象塞进 uni.uploadFile 的 files 结构，改为直接传 filePath 修复。
 

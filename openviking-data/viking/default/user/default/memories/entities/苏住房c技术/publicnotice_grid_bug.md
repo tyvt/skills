@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:33:37+08:00
+verdict_note: 苏住房C publicNotice 页面与 ZsImage 组件存在，minmax(0,1fr) Grid 兜底样式在编译产物可查，描述属实。
+---
 # 双晒公示页两列卡片塌陷bug
 双晒公示页卡片塌成一列，根因为flex:0 0 48%配合nowrap标题使最小宽度超出容器，改用CSS Grid兜底。
 

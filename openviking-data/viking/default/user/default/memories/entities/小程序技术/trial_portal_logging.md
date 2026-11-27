@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:43:24+08:00
+verdict_note: 小程序 portal-user.js 实存 envVersion==='trial' 与 getPortalApiLogPrefix 返回[体验版]，[PortalAPI]日志在477/489/500行；体验版日志描述核心属实。
+---
 # 体验版门户接口与房屋拉取日志
 小程序在体验版（trial）下新增统一门户 API 与房屋拉取业务日志，正式版不打印。
 

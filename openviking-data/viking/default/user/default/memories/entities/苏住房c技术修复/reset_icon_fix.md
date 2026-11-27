@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:20:04+08:00
+verdict_note: 苏住房C 命中 conditionScreening/footer-btn-left，重置图标尺寸修复属实
+---
 # 新房筛选重置图标高度为0修复
 苏住房C小程序 conditionScreening.vue 中「重置」图标因 ZsImage 默认撑满且无固定高度导致高度为0不可见，已修复。
 

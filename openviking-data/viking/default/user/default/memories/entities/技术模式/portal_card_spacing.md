@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:48:38+08:00
+verdict_note: 门户 zhi2-web-admin 实存 InformationPages.vue 与 public-portal-visual.spec.ts，卡片间距治理属实。
+---
 # 门户二级页顶层卡片间距归一化
 门户二级页顶层卡片间距须以全量路由实测找唯一离群值再改，避免只改单页把离群值搬家。
 

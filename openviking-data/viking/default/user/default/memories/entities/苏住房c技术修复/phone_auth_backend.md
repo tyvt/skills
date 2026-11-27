@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:26:17+08:00
+verdict_note: WechatPhoneAuthPopup.vue、getPhoneNumber 全仓无命中，security.js 仅见于 dist sourcemap；记忆描述的是未部署/制定方案中的状态，无实际代码证据，无法证明有效。
+---
 # 登录手机号授权后端未部署
 苏住房C小程序登录手机号授权流程因后端接口未部署而失败，正在制定联调与提示优化方案。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

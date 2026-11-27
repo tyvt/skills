@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:27:02+08:00
+verdict_note: 无锡市区小程序嵌入H5 sfbFaceAuth.js 精确命中，苏服办JSON字符串误判修复属实
+---
 # 苏服办人脸SDK成功响应JSON字符串缺陷
 控制台打印苏服办返回成功JSON，业务仍判失败。
 

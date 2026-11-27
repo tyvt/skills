@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:09:18+08:00
+verdict_note: 产品2.0 存在 ParkingAssetDialog.vue 与 zs-dialog 组件，Headline 强制 .el-form flex 干扰栅格的覆盖样式模式属实
+---
 # headline_elrow_fix
 Headline 组件内样式强制 .el-form 为 flex 布局干扰 el-row/el-col 栅格导致弹窗错位，需覆盖样式并调整断点。
 

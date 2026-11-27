@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:14:30+08:00
+verdict_note: 无锡市区小程序H5 webViewUrl.js 有 VITE_WEBVIEW_ALLOW_HOSTS 白名单机制，.env 域名文件不在文本扫描范围，描述属实
+---
 # 灵犀投票H5WebView白名单拦截缺陷
 业主决策外链（灵犀H5Vote含Base64 query）在H5内打开报「该链接不在允许访问的域名范围内」。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T11:11:23+08:00
+verdict_note: 定点核对 InstitutionRegisterSingleForm.vue：有 agreement-wrap(5) 但无 has-agreement 类；全局真实代码 has-agreement、padding-bottom-48px 均0命中，核心实现方式与现状不符。
+---
 # 由 Padding 和 Margin 叠加导致的页脚空白
 在 Suzhou Real Estate Monitoring V3 项目中，租赁机构表单因 padding 和 margin 叠加出现了约 136px 的空白。
 

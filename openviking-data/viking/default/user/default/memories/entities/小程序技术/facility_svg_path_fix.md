@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:43:43+08:00
+verdict_note: 泰兴小程序 pages_facility 下 ZsImage/<image>/static/type_/linearGradient 命中，SVG 静态路径修复描述属实。
+---
 # 设施页SVG图标路径修复
 泰兴小程序设施设备页因 import SVG 路径无效导致图标不显示，已通过将图标放入主包并使用 ZsImage 字符串路径修复。
 

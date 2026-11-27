@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T10:17:38+08:00
+verdict_note: 产品2.0 所述 indemnity/homePage/components/cardData.vue 与 projectManagement/buildingTable/index.vue 均缺失，实际 cardData 无 el-icon-top，编译修复描述与现状不符。
+---
 # 因图片不存在且 scoped 未导入 Sass 导致的编译错误
 在产品2.0的 zhi2-web-admin 中，cardData.vue 引用了不存在的图片，且 buildingTable 的 scoped 样式未导入变量文件，导致编译或运行错误。
 

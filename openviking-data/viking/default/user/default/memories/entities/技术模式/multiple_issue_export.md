@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:49:49+08:00
+verdict_note: 惠山二期G 命中 getExportParams(4)、DecisionRangeTable(12)、decisionManageId(7)，与导出参数同源修复一致。
+---
 # 多议题表决决策范围导出为空：导出参数须与 list 同源
 惠山二期G 项目中，autonomy 模块子议题/多议题表决明细导出 Excel 为空或参数不一致的根因与修复套路。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:51:46+08:00
+verdict_note: git 子模块 cherry-pick 冲突恢复的通用操作记忆，无与现状冲突的具体代码主张
+---
 # 子模块 cherry-pick 冲突态切回分支恢复
 zhi2-web-admin 子模块卡在 cherry-pick 冲突中间态导致无法 checkout 其他分支，需先 abort 再切回。
 

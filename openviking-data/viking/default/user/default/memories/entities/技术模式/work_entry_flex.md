@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:23:05+08:00
+verdict_note: i淮安H5 全库无 work-entry/前往工作端；home.vue 仅在苏住房C，所述入口改动未落地
+---
 # 工作端入口图标与文字弹性布局对齐宽高 28rpx
 i淮安H5 首页工作端入口改为图标加文字结构，并用 flex 居中、图标宽高 28rpx 对齐。
 

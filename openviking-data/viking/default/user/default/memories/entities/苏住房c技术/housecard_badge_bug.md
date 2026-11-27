@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:17:07+08:00
+verdict_note: 苏找房web 中 houseCard.vue 存在且 publish/发布角色相关逻辑命中，徽章主题证据成立，二手房徽章机制属实。
+---
 # houseCard徽章被type当开关致二手房缺徽章
 苏找房二手房Tab房源卡片缺「个人/中介」徽章，根因是houseCard把徽章显示条件写成type为空才渲染，而二手房必须传type="stock"。
 

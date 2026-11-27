@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:15:21+08:00
+verdict_note: 门户源码 layout/index.vue/Navbar/TagsView 含 hideLayoutChrome，store 含 portalLayout，home 视图含 homeDataMixin，描述属实。
+---
 # 门户 hideLayoutChrome 布局逻辑
 门户首页 `homeDataMixin` 与 `portalLayout.js` 控制顶栏横向菜单与侧栏完整菜单的显隐。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:14:30+08:00
+verdict_note: 太仓G isMaintainFund(1)/MaintainResultDialog(5)/ownerCalculationChart(6)命中，还原客户环境修复属实。
+---
 # 维修资金结论维护页还原客户环境
 太仓G 维修资金表决在重构后改用了 decisionCommon/MaintainResultDialog.vue 并按昆山版统一，与客户环境不一致，已通过 isMaintainFund 判断还原。
 

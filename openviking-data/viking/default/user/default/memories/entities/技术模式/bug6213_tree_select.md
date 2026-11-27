@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:53:59+08:00
+verdict_note: 实机核对：榆林G RegionTreeLayout.vue(20/54) resolvedInitialRegionName/getTreeRegionNameByCode、regionTree.vue(56) initialRegionName 均在；大屏穿透左树选中修复属实。
+---
 # Bug 6213 大屏穿透左树未选中区域
 榆林G 项目（园区物管2.0）系统监控-综合大屏点选区域穿透到「物业管理区域备案」(property/complex)，左树未选中所选区域。
 

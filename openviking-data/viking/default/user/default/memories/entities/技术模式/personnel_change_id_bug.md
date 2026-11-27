@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:46:31+08:00
+verdict_note: 命中 personnelRecordChangeId/personnelRecordId/flowBusId/operation-btn-group 与两个 Detail.vue，变更态 id 传参 bug 属实。
+---
 # 从业人员变更提交误用备案主键
 苏州市房地产监测V3 中 `operation-btn-group` 未传 `:id` 时默认使用路由 `personnelRecordId` 提交变更，误用备案主键导致变更提交错误。
 

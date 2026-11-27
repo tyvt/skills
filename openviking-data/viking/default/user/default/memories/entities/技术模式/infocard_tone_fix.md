@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:18:39+08:00
+verdict_note: 全仓真实源码无 InfoCardDialog.vue 的 bizStateTone/stateTone 符号，仅记忆归档命中，无法证明该修复存在
+---
 # InfoCardDialog业务状态色调修复
 苏州市房地产监测V3 项目 zhi2-web-admin 中 InfoCardDialog.vue 的 bizStateTone 原只把「有效/正常」判为绿色，字典里「已备案」落到灰色分支，已修复。
 

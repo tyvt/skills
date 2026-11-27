@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:51:28+08:00
+verdict_note: 园区物管2.0 statisticsMap/index.vue-239 存在 normalizeProjectList，与记忆所述经纬度归一化修复一致。
+---
 # 经纬度字段未数值化致小区点不显示
 zhi2-web-admin 中经纬度字段名不一致且非数值，导致坐标被过滤或打点失败、小区点不显示。
 

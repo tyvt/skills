@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:48:32+08:00
+verdict_note: 苏住房G statisticsMap/overviewContent.vue 存在 bumpTabKey/按 menu.value 重构 Tab，operatingAssets.vue 有 resolvedProjectId，与记忆修复一致。
+---
 # 共管小区弹窗 Tab 内容空白修复
 苏住房G(zhi2-web-admin) 共管小区弹窗 Tab 内容空白，因 terminalTypeReady 拦截与 Tab 绑定共用所致，已修复并通过本地构建。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

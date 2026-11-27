@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:14:00+08:00
+verdict_note: 苏住房G 命中 creditScore/getNumberDot/zs-advanced-query，小数精度修复属实
+---
 # 物业服务企业查询信用计分小数截断修复
 苏住房G 项目公共查询-物业服务企业查询中「本年度信用计分」输入小数被四舍五入，已修复。
 

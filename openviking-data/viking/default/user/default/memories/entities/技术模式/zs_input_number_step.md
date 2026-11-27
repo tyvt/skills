@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:52:37+08:00
+verdict_note: 苏州市房地产监测V3命中 zs-input-number/step-strictly/fillAndSavePlan/PresalePlanFillForm，按 precision 推导 step 修复属实。
+---
 # zs-input-number 步进限制致小数输入失败
 苏州市房地产监测V3 的 zs-input-number 默认 step-strictly 且 step=1 仅允许整数输入，precision=2 仅控显示，修复后按 precision 推导 step。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:50:50+08:00
+verdict_note: 园区公共收益 命中 refreshColumnOrderKey(1)、columnOrderKey(1)、feeShareTable(4)，与费用分摊小计错位修复一致。
+---
 # 费用分摊表小计错位到操作列
 决算/预算 feeShareTable 动态列出现后，Element 合计行 colgroup 未随列重建，小计数值显示在固定操作列下。
 

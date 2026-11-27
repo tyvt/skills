@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:49:43+08:00
+verdict_note: 惠山二期G autonomy/general/detail.vue-43 为 -default-time="['00-00-00','23-59-59']"，无 handleDecisionTimeChange，修复落地，一致。
+---
 # 业主决策时间回显覆盖修复
 修复 `autonomy/general/detail.vue` 选时间后被强制改写导致回显成0点的问题。
 

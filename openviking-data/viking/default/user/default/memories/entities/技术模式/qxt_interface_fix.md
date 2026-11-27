@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:41:57+08:00
+verdict_note: 苏州V3 mapQxtEntInfo.js(QxtEntInfoVo)、extractQxtEntInfo.js(runQxtEntExtract)、Step1CompanyInfo、businessTermEnd 全部命中企信通对齐描述。
+---
 # 企信通接口对齐完成
 苏州市房地产监测V3 开发企业/经纪机构注册通过企信通接口提取企业信息，计划完成且 7 个 E2E 用例通过。
 

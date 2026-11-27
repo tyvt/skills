@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:51:04+08:00
+verdict_note: 实机核对：无锡锡山业主决策H5 src/pages/balancePublicity/index.vue 含 roundUp+currentAmount，src/utils/index.ts 有 roundUp 工具，描述属实
+---
 # 金额累加精度误差改用 roundUp 统一保留两位
 无锡锡山业主决策H5 中多个金额用浮点数直接 reduce 累加产生精度误差（如 8977.810000000001）。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:58:20+08:00
+verdict_note: 园区物管2.0/产品2.0 building/mapProperty/index.vue 实存 zs-dialog、area-dialog、list-card 结构，与根节点修复描述一致。
+---
 # building/mapProperty 模板根节点修复
 园区物管2.0 的 building/mapProperty/index.vue 因模板结构错误触发 ESLint `vue/no-multiple-template-root`。
 

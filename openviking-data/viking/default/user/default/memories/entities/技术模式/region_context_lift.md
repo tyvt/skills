@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:13:22+08:00
+verdict_note: 苏住房G 命中 portalParentDeptId/index-v2/parentDeptId，区域上下文上提属实
+---
 # 首页v2区域筛选上下文上提
 苏住房G首页v2将区域筛选从各卡片内部上提为全页统一上下文，用同一parentDeptId扇出到五个区块接口，避免重复渲染与不同步。
 

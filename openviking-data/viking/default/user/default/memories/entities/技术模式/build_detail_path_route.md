@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:18:58+08:00
+verdict_note: 惠山二期G ruoyi.js 命中，buildDetailPathFromRoute(1)/-tableid(28) 存在，路由拼接修复属实。
+---
 # buildDetailPathFromRoute 非 tableid 路由拼接缺陷
 惠山二期G zhi2-web-admin 待办按 busCode 解析详情路由时，非 tableid 路径误拼主键导致 push 失败或进错页的缺陷与修复。
 

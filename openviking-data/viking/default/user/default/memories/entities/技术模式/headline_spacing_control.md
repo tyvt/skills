@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:50:01+08:00
+verdict_note: Headline/index.vue 已无 padding-bottom-12px，间距改由内容区上内边距控制，与描述一致。
+---
 # Headline下间距由内容区上内边距控制
 苏州市房地产监测V3 中 Headline 标题栏原 padding-bottom:12px 与内容区上内边距叠加致约28px，撤销后由 .collapse-content 上内边距统一控制为12px。
 

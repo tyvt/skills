@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:16:36+08:00
+verdict_note: 兴化物管 zsTable/index.vue 存在且 unhandledrejection 0 命中（符合已移除修复后状态），空态改用 Element 默认属实。
+---
 # zsTable Empty State Uses Element Default
 Xinghua property management (兴化物管) zhi1-web-admin zsTable/index.vue drops custom empty state for Element UI default "no data".
 
@@ -18,7 +23,6 @@ Xinghua property management (兴化物管) zhi1-web-admin zsTable/index.vue drop
 - 所属项目：兴化物管
 - 验证证据：extracted source=cursor project=兴化物管
 - 来源会话：e27192d0-0106-412e-86ca-44489c556107
-
 
 <!-- MEMORY_FIELDS
 {

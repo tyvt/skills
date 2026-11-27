@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:47:17+08:00
+verdict_note: 无锡H5 命中 h5Context.js(9)、mergeLingXiHouse(1)，与链路日志/房屋合并修复主体一致。
+---
 # zhi2-mobile-admin-h5-c-unlimited
 无锡市民/苏服办 C 端 uni-app Vue3 H5 子模块项目，父仓 main-sfb 持有 gitlink。
 

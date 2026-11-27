@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:57:06+08:00
+verdict_note: yiwen.png、form2、160rpx 等 UI 调整在苏住房C 发布房源相关代码中可查，与三处改动描述一致。
+---
 # 发布房源角色选择页UI调整
 苏住房C小程序 `pages_transaction/publishHouse/type.vue`（选择发布角色页）完成三处 UI 调整。
 

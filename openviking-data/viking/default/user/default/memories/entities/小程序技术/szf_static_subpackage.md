@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T06:49:01+08:00
+verdict_note: 声称 utils/index.js-250-296 三个 Set+resolveSzfImageSubpackage/inferSubpackageFromRoute；现该文件仅 resolveStaticUrl(src,subpackage)，所述函数全仓不存在，描述与现状不符。
+---
 # 小程序static路径解析不能只按当前页面路由推断分包
 苏住房C小程序map找房页调 resolveStaticUrl 解析 images/szf/default.png 时报[渲染层网络层错误] Failed to load local image resource /pages_main/static/images/szf/default.png，HTTP 500，文件实际在 pages_transaction/static/images/szf/ 下。
 

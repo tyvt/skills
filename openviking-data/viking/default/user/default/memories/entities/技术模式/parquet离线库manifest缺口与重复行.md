@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:45:37+08:00
+verdict_note: 投资推送/数据湖项目不在 D-/repository；qfq_ok、prune-manifest 仅见记忆归档，fund 仓仅 README 提及脚本，无源码证据。
+---
 # Parquet 离线库：manifest 缺口、残留键与多 part 重复行
 data/parquet 的 manifest 存在记账缺口与残留键，多 part 追加可能导致重复行，需针对性处理。
 

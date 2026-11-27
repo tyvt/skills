@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:51:07+08:00
+verdict_note: 昆山市民命中 useUser(48)、useUserStore(48)，store 重命名属实
+---
 # userStore 统一重命名为 useUser
 昆山市民项目将全局用户 store 变量 userStore 统一重命名为 useUser 命名规范。
 

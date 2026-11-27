@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:49:31+08:00
+verdict_note: ZsImage.vue 无 mode/widthFix/aspectFill 命中（仅 height-inherit）；所述 mode prop 未在源码体现（编译产物含 widthFix 属历史残留）。
+---
 # ZsImage 默认高度为零不显示
 苏住房C 中 ZsImage 图片路径正确但看不见，根因为内部 height:100% 父节点无确定高度时算成 0。
 
@@ -17,7 +21,6 @@
 - 验证证据：09b69b5c（新增 mode prop 走 widthFix 修复高度塌零）、13824f1b（子包图标显式 subpackage+定尺寸容器，定尺寸容器部分验证高度修复）。
 - 涉及文件：components/ZsImage/ZsImage.vue、pages_owner/house/owner/authentication.vue、pages_transaction/publishHouse/type.vue 等。
 - 所属项目：苏住房C；来源会话ID：13824f1b-0d06-4c7a-8d3f-79edcf5ccfe4, 09b69b5c；代码基线：8fc3cc5、b7bf813。
-
 
 <!-- MEMORY_FIELDS
 {

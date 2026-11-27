@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:43:17+08:00
+verdict_note: 核对园区公共收益：operatorTable.vue 命中 operatorAuthId、/company/operatorAuthRange/bindSource/page，11/11 关键 token 全中。
+---
 # 操作人员授权弹窗查询参数修复（operatorId→operatorAuthId）
 园区公共收益项目操作人员管理详情页「授权」弹窗加载不到物业管理区域列表的问题已修复。
 

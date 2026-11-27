@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:25:17+08:00
+verdict_note: zs表格索引/组件在业务仓命中，描述属实
+---
 # zs-table-column 单元格覆盖 index
 `zs-table-column` 固定渲染 `scope.$index + 1` 且自定义单元格盖掉默认展示，致父组件 `:index` 回调失效，由 `formatRowIndex` 统一处理序号。
 

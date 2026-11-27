@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:43:55+08:00
+verdict_note: regProjectWithAgreement 接口在监管项目 6 处命中，setPaymentNotice 回填监管项目属实
+---
 # 监管项目字段随缴款通知书回填并通栏
 苏州市房地产监测V3中detail.vue监管项目字段在特定条件下插入，并随缴款通知书回填，退款说明整行通栏。
 

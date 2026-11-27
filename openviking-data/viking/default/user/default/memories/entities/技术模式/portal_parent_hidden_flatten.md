@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:32:33+08:00
+verdict_note: 门户 zhi2-web-admin menuVisibility.js-63,278 有 buildNavbarChildrenMenus，Navbar.vue 有 isRouteHidden，父 Layout hidden 阻断扁平化描述属实。
+---
 # 门户 listRouters 父 Layout 隐藏阻断扁平化
 门户后端把菜单拆成多个 path:"/" 的 Layout 节点时，父 Layout hidden 须阻断 buildNavbarChildrenMenus 对 children 的扁平化。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

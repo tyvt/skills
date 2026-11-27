@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T18:45:42+08:00
+verdict_note: 苏州V3 .vscode/settings.json 实存但无 python.defaultInterpreterPath/python3.exe/WindowsApps；删存根建硬链为环境操作，无代码证据。
+---
 # Windows python3 打开商店
 在 Windows 中，WindowsApps 里的 python.exe/python3.exe 存根会将 python3 的调用重定向到 Microsoft Store。
 ## 问题
@@ -14,7 +19,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：7907a58f-b73f-49f7-ad3d-d1a5d8cfa3eb
-
 
 <!-- MEMORY_FIELDS
 {

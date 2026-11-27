@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:19:50+08:00
+verdict_note: 园区公共收益 zs-table.vue handleCellMouseEnter 使用 cell?.parentElement(L1022) 判空，hover-row(L1042) 可查，修复属实。
+---
 # zs-table单元格事件cell未判空致报错
 园区公共收益项目中 `zs-table.vue` 的 `handleCellMouseEnter` 与 `handleCellMouseLeave` 未对 Element UI 传入的 `cell` 判空，在合计行等场景 `cell` 为 `undefined` 时访问 `cell.parentElement` 触发报错。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:49:34+08:00
+verdict_note: 苏州市房地产监测V3 存在 .appendix-section 等附录间距实现，与设计稿16px间距一致
+---
 # 附录标题与缩略图间距统一16px
 设计稿规定标题与内容间距为16px，附录区域通过 padding 与注入 CSS 变量统一间距。
 

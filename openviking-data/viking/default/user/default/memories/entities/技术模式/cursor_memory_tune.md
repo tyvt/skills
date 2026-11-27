@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:14:27+08:00
+verdict_note: maxTsServerMemory 全库仅在记忆/归档jsonl命中，无真实 settings.json 代码，无法证明
+---
 # Cursor 因宽泛索引和 TS 服务消耗大量内存
 项目 苏州市房地产监测V3 在 Cursor 编辑器中因语言和索引服务配置不当导致内存消耗过高。
 

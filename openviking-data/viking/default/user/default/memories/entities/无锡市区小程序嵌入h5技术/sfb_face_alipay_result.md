@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:15:00+08:00
+verdict_note: 无锡市区小程序嵌入H5 src/utils/sfbFaceAuth.js 源码命中，人脸 success 误判修复属实。
+---
 # 苏服办人脸支付宝 success 误判失败修复
 无锡市区小程序嵌入H5中支付宝容器内扫脸 SDK 回调 success 却被判失败的修复约定。
 

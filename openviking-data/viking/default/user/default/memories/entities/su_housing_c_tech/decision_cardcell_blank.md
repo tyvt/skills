@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:40:13+08:00
+verdict_note: 苏住房C 源码未命中关键类 sign-picture-wrap(0)，且记忆所述 pages_vote/decision 路径与实际 pages_owner/decision 结构不符，无法证明有效。
+---
 # 决策记录CardCell致空白问题修复
 苏住房C 决策记录页因 `CardCell` 导致空白问题，已在多个 cursor 会话修复。
 
@@ -26,7 +30,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor session=3769efc4-10f9-4155-b4dd-4bcdbacd77a7、e7007608-941f-47f8-a082-3768ad6aa6e3
 - 所属项目：苏住房C（zhi2-mobile-shimin）；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

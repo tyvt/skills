@@ -1,0 +1,23 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-e0dc60d1-0dfd-4030-aa08-d08bd24803e8/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-27T04:11:07.690780+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/技术模式/防汛大屏热力裁剪数据流缺陷.md",
+                "memory_type": "entities",
+                "after": "# 防汛大屏热力裁剪数据流缺陷\n苏住房G 防汛大屏热力图按预警范围裁剪在验收场景下不生效的根因、白盒验证与实机结论。\n\n## 问题根因\n- `areaOptions` 用 `value: it.whole ? '' : String(it.code)`，本级汇总项「姑苏区（全区）」`it.whole` 为真，`value=''`。\n- 父组件 `active-district=\"areaKey\"`，`areaKey=''` 传给热力组件使 `activeDistrict=''`，裁剪逻辑走清空分支，热力外溢。\n- 下拉中的街道 code（如 320508017）匹配不到 suzhou.json 的区级 feature（姑苏区 adcode 320508），选街道也不触发裁剪。\n- 未发现市级预警事项（如「2026111001预警苏州」）的范围下拉含区级 code（320508）的可裁剪场景。\n\n## 白盒验证\n- 2026-11-27 浏览器白盒探针：把 `activeDistrict` 设为 `320508` 后手动调 `applyDistrictClip`，clipPath 正确生成，证明裁剪算法本身正确。\n- 根因是数据流传值不匹配而非裁剪算法缺陷；返工应聚焦让汇总项携带区级 adcode。\n\n## 环境与验证结论\n- 2026-11-27 实机验证 localhost:8165（前端静态站，dist_root=`D:/repository/苏住房G/dist`），选「姑苏区（全区）」热力仍外溢，验收不通过、本跳不能提交/回写。\n- dist 产物 `HeatMapPanel-C_qb1xHH.js`（11:58）晚于源码改动（11:56）且含 SVG path 生成代码；强刷禁缓存后 canvas 的 clipPath 仍全空，排除构建滞后与浏览器缓存。\n- 浏览器会话名 `bug7043-e91695ee90b8` 固定，可跨会话接续操作。\n- 验证码识别：captcha-recognizer 默认模型已下线，改用 magpie-vision 视觉网关；算术验证码如 `4*4=?` 填 16。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

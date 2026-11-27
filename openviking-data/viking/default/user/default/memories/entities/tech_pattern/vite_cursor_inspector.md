@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:11:49+08:00
+verdict_note: 兴化物管 package.json 有 vite-plugin-vue-inspector，vite.config.js 有 launchEditor，描述属实
+---
 # Vite Cursor Vue Inspector
 In vite.config.js dev mode, add vite-plugin-vue-inspector with launchEditor set to cursor so Vue DevTools Open in editor locates .vue source in Cursor. Requires preinstalled Cursor CLI tool.
 

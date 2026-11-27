@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T09:44:52+08:00
+verdict_note: 视觉基线产物路径 e2e/assets/visual/price-filing/manifest 全仓未命中，仅 filePath/package 通用词，流程描述无可核实产物。
+---
 # 视觉走查基线截图对比流程
 对已部署线上环境批量截图存 prod 图、本地 dev 截 local 图，靠同名文件配对人工或自动 diff，建立 UI 改造验收客观判据。
 

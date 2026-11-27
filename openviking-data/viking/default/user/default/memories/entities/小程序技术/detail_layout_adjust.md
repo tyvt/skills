@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:53:48+08:00
+verdict_note: 泰兴小程序 src/pages_facility/detail.vue 与 PhoneCall 组件存在，布局调整描述属实
+---
 # 设施详情页按设计图调整字段与布局
 泰兴小程序 detail.vue 已按设计图调整字段展示、整体样式与底部周期区布局。
 

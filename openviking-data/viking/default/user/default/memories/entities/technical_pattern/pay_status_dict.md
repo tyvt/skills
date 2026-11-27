@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:49:22+08:00
+verdict_note: 实机核对：产品2.0 spFeeBill/components/enums.js(24) SP_PAY_STATUS_DICT+sp_pay_status、(27) PAY_STATUS_TAB PARTIAL-'1'/PAID-'2' 均在，detail/import 引用；字典对齐属实。
+---
 # Paid State Sp Pay Status Dict
 paidState enum was reversed; aligned with sp_pay_status dictionary.
 
@@ -25,7 +30,6 @@ paidState enum was reversed; aligned with sp_pay_status dictionary.
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：80a1a5aa-28bf-448e-ab1d-e5b881e76943
-
 
 <!-- MEMORY_FIELDS
 {

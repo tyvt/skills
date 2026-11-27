@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:33:13+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src/utils/appNavigation.js与tabBar.js存在，backInfo已接入，与APP内嵌H5拦截返回一致。
+---
 # APP内嵌H5的Tab页拦截返回修复
 苏住房C在APP WebView内嵌H5场景下，已实现tab页拦截，任何回到H5 tab的行为都调用原生`backInfo`返回APP。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

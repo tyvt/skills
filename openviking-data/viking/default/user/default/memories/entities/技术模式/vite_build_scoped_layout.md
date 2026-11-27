@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:45:41+08:00
+verdict_note: 产品2.0 survey/template/components/TopicDialog.vue实有.topic-group-tip(970)、flex-basis-100%(976)、-deep(.el-form-item__content)(979)，scoped布局修复属实。
+---
 # Vite build 产物 scoped 样式布局错乱
 vite build 产物与本地 dev 的 scoped 样式编译和 CSS 合并顺序不同，导致依赖父级 flex 行布局的提示语在生产环境排版错乱。
 ## 问题现象

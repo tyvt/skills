@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:47:33+08:00
+verdict_note: 惠山小程序命中 selectMyHouseByLingXi(1)、goAdd(3)、AddBtn(2)，与添加房屋主路径一致。
+---
 # 添加房屋三条并行路径
 惠山小程序「添加房屋」存在三条并行路径，当前主路径为灵犀/不动产授权第三方绑房。
 

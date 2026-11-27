@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:55:02+08:00
+verdict_note: 惠山二期G CandidateConfigTable.vue 根节点为 sub-container 且注释说明不再自包 Headline，属实
+---
 # 多议题表决决策维护收起多一层框
 线下表决决策维护的「表决项」区域因两层 Headline 嵌套且内层未传标题，渲染出多余边框，已去除内层 Headline 修复。
 

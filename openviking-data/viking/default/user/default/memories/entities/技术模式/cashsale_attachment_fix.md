@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:16:39+08:00
+verdict_note: 苏州V3 命中 applyAttachGroupId/validateRequired/PermitAppendixPanel/AnnexUpload，附件校验修复属实
+---
 # 预售现售附件校验与保存不一致修复
 苏州市房地产监测V3 项目修复前端校验与后端保存逻辑不一致导致的附件保存失败问题。
 

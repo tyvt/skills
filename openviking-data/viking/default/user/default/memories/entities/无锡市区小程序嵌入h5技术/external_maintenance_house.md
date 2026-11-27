@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:20:05+08:00
+verdict_note: 无锡市区小程序嵌入H5 maintain/index.vue 命中 maintenanceHouse/getHouseInfo，双步接口链路属实
+---
 # 业主维修资金首页走external/maintenanceHouse双步接口
 pages_owner/maintain/index.vue的维修资金链路是GET /external/maintenanceHouse/getToken再POST /external/maintenanceHouse/getHouseInfo，非AppMaintain。
 

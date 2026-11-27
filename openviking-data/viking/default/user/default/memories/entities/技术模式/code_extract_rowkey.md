@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:54:45+08:00
+verdict_note: ProjectCodeExtractDialog.vue tableRowKey() 返回 'prjNum' 并注明 exportList 行主键为立项登记编码，与 row-key 修复一致。
+---
 # 立项登记编码提取弹窗row-key修复
 苏州市房地产监测V3 修复了「立项登记编码提取」弹窗勾选无反应、「确定」不可用的 bug。
 

@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T19:47:40+08:00
+verdict_note: 产品2.0 candidateCollect/detail.vue 命中 getCustomConfig/isShowPublishButton/preparatoryGroup，新接口获取按钮方案属实
+---
 # platformConfig 发布公告按钮获取方式改造
 产品2.0 的 zhi2-web-admin 中 candidateCollect detail.vue 的 `isShowPublishButton` 获取方式从 Vuex platformConfig 改为新接口获取。
 
@@ -18,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

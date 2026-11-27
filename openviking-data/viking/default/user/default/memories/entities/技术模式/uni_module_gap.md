@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T18:46:48+08:00
+verdict_note: 苏住房C project/info/index.vue 用 flex 但无 module-gap、无 gap-20rpx，间距靠 margin-top-28rpx；父级flex gap方案描述与现状不符。
+---
 # uni-app 模块间距用父级 flex gap
 在 uni-app 小程序端，给自定义组件根节点加 margin 类不生效，模块间距需用父容器 flex + gap 控制。
 

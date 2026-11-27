@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:41:36+08:00
+verdict_note: 小程序 portal-h5-webview.js 实存 extractMaintenanceApiErrorMessage；门户auth与toast展示后端msg的核心助手已落地，与描述一致（showApiErrorToast未在源码按名命中）。
+---
 # webview首页维修资金接口带门户auth且toast展示后端msg
 pages/webview/home.vue 调维修资金、业主决策等前置接口时须带门户 Token，并用统一 toast 展示后端错误。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:49:59+08:00
+verdict_note: 产品2.0 layout/components/Navbar.vue 实存 platformConfig 与 platformName 计算属性，标题从 store 读取修复可核对。
+---
 # Navbar标题从store读取修复
 产品2.0项目zhi2-web-admin/src/layout/components/Navbar.vue标题改为从store读取，避免空标题。
 
@@ -14,7 +19,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

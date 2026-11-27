@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T17:22:53+08:00
+verdict_note: 苏州市房地产监测V3 BankAccountTable.vue含Headline、#right插槽、titleText、showBalanceQueryButton、-table-tr，与双端空态统一一致。
+---
 # Dual-End Bank Table Empty State
 BankAccountTable.vue in two modules was unified with a Headline wrapper and a right-slot button for consistent empty state and alignment.
 
@@ -19,7 +23,6 @@ BankAccountTable.vue in two modules was unified with a Headline wrapper and a ri
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：a5d89768-99be-4451-84bf-85a35b766c41
-
 
 <!-- MEMORY_FIELDS
 {

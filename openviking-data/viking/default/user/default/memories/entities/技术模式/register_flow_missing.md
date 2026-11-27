@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:49:59+08:00
+verdict_note: 公司注册 api companyRegister.js 含 040100/businessCode，后端流程未配置判断属实
+---
 # 企业注册提交审核失败因后端流程未配置
 企业注册业务编码040100后端工作流未配置，致editAndSubmit接口返回HTTP 500，非前端缺陷。
 

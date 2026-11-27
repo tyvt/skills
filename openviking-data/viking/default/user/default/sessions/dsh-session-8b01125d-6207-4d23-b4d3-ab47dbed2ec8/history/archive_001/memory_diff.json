@@ -1,0 +1,24 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-8b01125d-6207-4d23-b4d3-ab47dbed2ec8/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-27T01:21:27.144793+00:00",
+    "operations": {
+        "adds": [],
+        "updates": [
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-suzhufang-fe-zhi2-mobile-query-h5-c-unlimited/memories/entities/zentao_bug/zentao_bug_7035.md",
+                "memory_type": "entities",
+                "before": "# 禅道 Bug 7035\n苏住房防汛 C 端（zhi2-mobile-query-h5-c）求援提交后返回兜底丢失物业区域与预警事件参数，生成空白汛中巡检页压在原页之上；2026-11-27 hop1 完成根因定位、代码改动与 build，e2e 待修、提交推送与禅道回写留待新会话。\n\n## 工单与现象\n- 禅道链接 http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=7035。\n- 附图 24684.jpg＝提交后页面（物业区域空「请输入小区名称搜索」），24685.png＝再点返回后的正确页面（显示「嘉越时代花园」）；现象为提交后无区域、再点返回才回到有区域页。\n- 页面栈推断为 […, 原 inspection(有区域), 新 inspection(无区域)]。\n\n## 根因与代码\n- `workbench/index.vue:66-70` 进入汛中巡检带 `complexId/complexName/eventId/eventName`，`inspection/index.vue:157-174` 据此锁定区域（`areaLocked=true`）。\n- `inspection/index.vue:210-216` `openRescue()` 只透传 `complexId/complexName`，未传 `eventId/eventName`。\n- `rescue/index.vue:96-99` 提交成功后优先 `navigateBack`，失败兜底 `uni.redirectTo('/pages/inspection/index?kind=mid')` 只带 kind，丢掉区域/事件参数，`fromStageDialog=false` 致区域不显示。\n\n## 修复方案与进度（2026-11-27）\n- 三点修复：`openRescue()` 补传 `eventId/eventName`（含编码）→ `rescue onLoad` 接收 → 兜底 `redirectTo` 带上 `complexId/complexName/eventId/eventName`；已确认 eventId/stageSelection 为 ref。\n- 计划经 orchestrator 评审：reviewer 指出缺 e2e，补入 `page.route` mock API 免登录模式（参考 bug6769）后通过，人工确认实施。\n- 代码已改、H5 `npm run build` 通过；新增 e2e 因页面未渲染 rescue 表单、3 例失败待修。\n- 实机复现/验证被登录卡住（本地 8150 需图形验证码），按技能属非阻断失败出口，无法产出真机截图证据。\n- 成本严重超预算触发硬交接：文档 `D:/plan/苏住房防汛C端/HANDOFF-CHAIN-禅道7035求援提交返回丢区域-hop1-20261127-0854.md`，排程 08:55:27 自动开新会话（hop1/10）。",
+                "after": "# 禅道 Bug 7035\n苏住房防汛 C 端（zhi2-mobile-query-h5-c）求援提交后返回兜底丢失物业区域与预警事件参数，生成空白汛中巡检页压在原页之上；2026-11-27 hop1 完成根因定位、代码改动与 build，hop2 修复 e2e 三重根因并达 3/3 全绿、实机截图经用户确认，已硬交接 hop3；提交推送与禅道回写待接续。\n\n## 工单与现象\n- 禅道链接 http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=7035。\n- 附图 24684.jpg＝提交后页面（物业区域空「请输入小区名称搜索」），24685.png＝再点返回后的正确页面（显示「嘉越时代花园」）；现象为提交后无区域、再点返回才回到有区域页。\n- 页面栈推断为 […, 原 inspection(有区域), 新 inspection(无区域)]。\n\n## 根因与代码\n- `workbench/index.vue:66-70` 进入汛中巡检带 `complexId/complexName/eventId/eventName`，`inspection/index.vue:157-174` 据此锁定区域（`areaLocked=true`）。\n- `inspection/index.vue:210-216` `openRescue()` 只透传 `complexId/complexName`，未传 `eventId/eventName`。\n- `rescue/index.vue:96-99` 提交成功后优先 `navigateBack`，失败兜底 `uni.redirectTo('/pages/inspection/index?kind=mid')` 只带 kind，丢掉区域/事件参数，`fromStageDialog=false` 致区域不显示。\n\n## 修复方案与进度（2026-11-27）\n- 三点修复：`openRescue()` 补传 `eventId/eventName`（含编码）→ `rescue onLoad` 接收 → 兜底 `redirectTo` 带上 `complexId/complexName/eventId/eventName`；已确认 eventId/stageSelection 为 ref。\n- 计划经 orchestrator 评审：reviewer 指出缺 e2e，补入 `page.route` mock API 免登录模式（参考 bug6769）后通过，人工确认实施。\n- 代码已改、H5 `npm run build` 通过（exitCode=0）；hop2 仅改 e2e 定位器与断言、未动生产代码与 dist，build 基线沿用 hop1。\n- hop1 硬交接：文档 `D:/plan/苏住房防汛C端/HANDOFF-CHAIN-禅道7035求援提交返回丢区域-hop1-20261127-0854.md`，排程 08:55:27 自动开新会话（hop1/10）。\n\n## hop2 e2e 三重根因与修复（2026-11-27）\n- ①baseURL=8095 实为惠山C端 local（root `D:/repository/惠山二期H5/dist`、旧构建 commit 2332361、主 JS `/js/index-e7dbaceb.js`），防汛C端 local 应为 8150（root `D:/repository/苏住房防汛C端/dist`、新构建 `index-OtwsmdoP.js`）；用 `E2E_BASE_URL=8150` 覆盖，不改配置文件。\n- ②uni-app H5 编译过滤 native input 的 `aria-label`/`placeholder`（快照 textbox 无 accessible name、DOM 仅剩 class/maxlength/type）；改按稳定属性定位：物业区域 `input[maxlength=\"140\"]`、联系人 `input[maxlength=\"30\"]`、电话 `input[type=\"number\"]`、两个 textarea 用 nth。\n- ③`redirectTo` 双重编码：onLoad 拿到解码中文后代码再 `encodeURIComponent`、uni-app 路由再编码一次，URL 呈 `complexName=%25E5%2598%2589...`；功能正确（inspection 页显示「嘉越时代花园」、`fromStageDialog` 依赖的 queryComplexId/queryEventId 为 ASCII 不受影响），断言改 `decodeURIComponent(params.get(...) ?? '')` 还原后比对。\n- e2e 3/3 全绿（exitCode=0、2.8s，baseURL=8150）。\n- 实机验证改用带参 URL 直接打开 inspection 页（无需登录，推翻 hop1「8150 验证码受阻」判断）；playwright 同进程 open+eval+截图产出 `C:/Users/Administrator/AppData/Local/Temp/bug7035-verify-20261127-091755.png`，显示「物业管理区域：嘉越时代花园」+「⚠️ 紧急求救」；页面「请求失败 HTTP 502」为未 mock 模板接口、与区域回填无关。\n- 用户已确认验证通过，按禅道免二次问规则即授权提交推送+回写。\n- 清场排查：0 字节异常未跟踪文件 `({src`、`x.src.includes('code')`（08:41 shell 引号事故产物）与 `.task-state/`、`test-results/` 待清；`playwright.bug7035.config.ts` 倾向不提交、作过程产物清理；禅道 7035 已确认存在且 active。\n- hop2 硬交接（触顶 P0 1.00M）：文档 `D:/plan/苏住房防汛C端/HANDOFF-CHAIN-禅道7035求援提交返回丢区域-hop2-20261127-0919.md`（9 节，第 4 节 4 项未完成），下一跳 `schedule-e0672784-1b62-4be8-a058-669574af7a2d`，2026-11-27 09:20:20（+15 秒）new_once。\n- 待 hop3：提交推送 dev → 禅道 7035 回写带验证图 → 清场 → todo 收尾，用户已授权免二次问。"
+            }
+        ],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 0,
+        "total_updates": 1,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:17:29+08:00
+verdict_note: 泰兴G 涉及 SearchFormItem.vue、SingleSelect.vue、listMixins.js、table.js 等均存在，beforeDestroy/queryParams 命中，select 未重建修复属实。
+---
 # 缓存恢复未重建select致审核状态失效
 从详情返回列表恢复缓存时，动态组件 attrs 双向同步副作用且 key 未变，单选 select 未重建致 queryParams 缺失响应式字段。
 

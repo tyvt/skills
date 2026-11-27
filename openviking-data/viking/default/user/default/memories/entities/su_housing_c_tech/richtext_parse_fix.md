@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:48:06+08:00
+verdict_note: 苏住房C 命中 ZsRichText/escapeInvalidHtmlAngleBrackets/formatRichTextContent/rich-text，富文本尖括号转义白屏修复属实。
+---
 # 流程指南富文本 Parse Error 白屏修复
 苏住房C 小程序流程指南详情（如业主大会议事规则通知）因书名号被误解析为 HTML 标签导致正文白屏，已通过转义非法尖括号修复。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

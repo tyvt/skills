@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:53:48+08:00
+verdict_note: 苏住房C 实存 ZsEmpty.vue 且 description prop 与 194 处调用在，text→description 契约修复属实。
+---
 # ZsEmpty 文案 prop 误用 text 及分包 svg 构建 500
 苏住房C 小程序空状态组件 ZsEmpty 的 text 属性无效，且分包 static 下 svg 被构建清除报 500。
 

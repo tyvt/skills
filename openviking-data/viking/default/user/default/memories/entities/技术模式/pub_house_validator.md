@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:42:16+08:00
+verdict_note: 淮安物管zhi2-web-admin含benefit/pubHouse/components/pubHouseDialog.vue及houseCategory校验，与描述一致。
+---
 # 公共收益经营用房弹窗校验修复
 淮安物管 pubHouseDialog.vue 校验问题已修复，避免动态 required 规则下空值提交后端。
 

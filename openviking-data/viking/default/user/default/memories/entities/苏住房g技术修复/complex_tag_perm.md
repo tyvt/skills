@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:47:32+08:00
+verdict_note: 核对苏住房G：publicQuery/complex、permsPrefix、extraPerms 命中，标签管理按钮权限描述一致。
+---
 # 综合查询标签管理按钮权限
 苏住房G(zhi2-web-admin) 在 publicQuery/complex/index.vue 为「标签管理」按钮补充了权限字符控制。
 
@@ -12,7 +17,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

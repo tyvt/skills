@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T18:47:22+08:00
+verdict_note: 园区物管2.0 及各仓均无 guaranteeDepositAgreement 目录；pageOptionalComplex 见其他benefit页但非所述文件，专用可选接口修复描述无法证明。
+---
 # 业务选择弹窗专用过滤接口模式
 园区物管2.0 中带业务前置条件的选值弹窗必须走业务专用可选列表接口，不能复用通用列表接口在前端筛选。
 

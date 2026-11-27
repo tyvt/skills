@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:47:11+08:00
+verdict_note: 苏州市房地产监测V3 variables.css-59 定义 --form-item-error-slot-20px，element-ui.scss 有对应错误定位样式，一致。
+---
 # 表单项固定留白容纳校验错误防高度跳动
 原 `.el-form-item` 使用 `position: static` 且无预留，校验报错致行高撑高，需在 `variables.css` 定义错误槽位并由 `element-ui.scss` 恢复绝对定位。
 

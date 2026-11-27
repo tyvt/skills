@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:48:19+08:00
+verdict_note: 园区公共收益 pubHouse/detail.vue 命中 DetailTemplate/StatCardsRow/margin-bottom-12px 与 24px/margin-top，卡片间距调整属实。
+---
 # 详情页StatCardsRow间距
 园区公共收益详情页中 StatCardsRow 夹在 DetailTemplate 与列表间时，需清零模板上边距并单独设 12px 区块间距。
 

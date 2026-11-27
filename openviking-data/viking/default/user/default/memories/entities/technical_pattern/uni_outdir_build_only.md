@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:15:14+08:00
+verdict_note: 苏住房C package.json 的 --outDir 在 build/test 脚本、dev 脚本已移除，符合描述
+---
 # uni --outDir only valid for build
 `uni` CLI's `--outDir` only takes effect with `uni build`; passing it to `dev` errors with `Unknown option --outDir`.
 
@@ -19,7 +24,6 @@
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：3541fbbe-c057-47a6-9bce-5cea5500bd20
-
 
 <!-- MEMORY_FIELDS
 {

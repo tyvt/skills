@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:46:07+08:00
+verdict_note: 苏州市房地产监测V3 命中 AGENCY_PERSONNEL_APPENDIX_BUS_CODE(1)、jgcyryba(4)，busCode 修正属实
+---
 # 经纪机构备案附件中 busCode jgcyrybg 错误
 在苏州市房地产监测V3 (zhi2-web-admin) 项目中，`resolvePersonnelAppendixBusCode` 由于菜单配置错误，拉取了带有错误 `busCode` `jgcyrybg` 的附件，而正确的应该是 `jgcyryba`。
 

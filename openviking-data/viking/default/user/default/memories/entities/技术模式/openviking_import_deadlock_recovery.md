@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:15:02+08:00
+verdict_note: 记忆引用的 import-to-ov.mjs、ov-import-preflight.mjs、ov-cancel-stuck-commit-tasks.mjs 在 skills 仓与 ~/.dsh/scripts 均不存在，声称新增的 preflight 门禁代码锚点无法核实。
+---
 # OpenViking导入并发提交死锁与恢复
 驱动脚本超时未中止或队列堆积导致任务死锁，停服改磁盘任务JSON标cancelled（无BOM）并重启恢复，新增preflight门禁防复发。
 

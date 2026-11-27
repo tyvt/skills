@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:52:55+08:00
+verdict_note: 产品2.0 zs-table-column.vue 仅见 registeredAsFlex 的 beforeDestroy，无 _zsUnmounted 标记与 beforeUnmount，记忆所述卸载保护无法证明。
+---
 # zs-table-column 卸载保护
 在 ZsTableColumn 组件增加卸载标记与生命周期兼容，避免卸载后状态更新引发 beforeUnmount 异常。
 

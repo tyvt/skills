@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:49:46+08:00
+verdict_note: zs-table.vue 含 el.closest('.list-card') 判定，表格底部空白/list-card 排查代码属实
+---
 # 表格底部空白全局排查修复
 苏州市房地产监测V3 项目对表格底部空白做全局排查，并用 E2E 验证 list-card 间距修复。
 
@@ -17,7 +22,6 @@
 ## 验证与归属
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

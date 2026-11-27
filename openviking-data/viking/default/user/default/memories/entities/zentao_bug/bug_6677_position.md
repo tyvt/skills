@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:20:05+08:00
+verdict_note: 惠山二期G zhi2-web-admin/src/formatters/housePosition.js 命中，位置分隔符修复描述属实
+---
 # Bug 6677 House Position
 Zentao bug 6677 fixed missing separators in Huishan Phase 2G house-location display and was completed on 2026-11-25.
 
@@ -7,7 +12,6 @@ Zentao bug 6677 fixed missing separators in Huishan Phase 2G house-location disp
 
 ## Delivery
 - The missing separator issue was fixed, verified, pushed, and written back to Zentao on 2026-11-25.
-
 
 <!-- MEMORY_FIELDS
 {

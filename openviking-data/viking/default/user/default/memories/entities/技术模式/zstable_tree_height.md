@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:50:37+08:00
+verdict_note: zs-table.vue 命中 countRenderedTreeRows 与 lazyTreeNodeMap，树形高度修复在。
+---
 # zs-table树形展开高度固定不增加
 园区物管2.0 的 zs-table 在固定行高场景下，树形（懒加载）展开后高度仍按根级 data 长度计算，导致展开多少行都只显示两行。
 

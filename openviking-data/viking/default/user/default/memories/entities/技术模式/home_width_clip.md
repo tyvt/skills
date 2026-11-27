@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:46:54+08:00
+verdict_note: 门户命中 portal-home-layout、HomeLayoutSidebar、resolveHomeLayoutVariant、max-content，与首页宽度裁切修复一致。
+---
 # 首页主体宽度致右栏裁切
 门户首页因 .app-main 设 width:max-content 导致左侧业务入口撑宽整页，右侧栏常用功能 2×2 网格被裁切的 bug 与修复要点。
 

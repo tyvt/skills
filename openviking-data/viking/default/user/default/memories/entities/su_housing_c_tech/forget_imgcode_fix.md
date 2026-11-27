@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:20:14+08:00
+verdict_note: 苏住房C 命中 imageCode、VerifyCode、sendPhoneMessage、cancellationForm，忘记密码图形码修复属实
+---
 # 忘记密码页图形验证码失败处理修复
 苏住房C忘记密码页因共享组件`PhoneForm.vue`未处理发送失败回调，导致按钮卡在「发送中…」且未刷新验证码，已对齐其他表单模式修复。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:32:40+08:00
+verdict_note: 产品2.0 存在 pubQuarterlyDeclaration、amountFormatter、calculation.add，精确累加与格式化方案在源。
+---
 # 原生累加金额浮点误差
 currentAmount 使用 JS 原生 + 累加产生浮点误差，且 :formatter 写在普通 span 上不生效。
 

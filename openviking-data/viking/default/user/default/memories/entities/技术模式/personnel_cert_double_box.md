@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:15:02+08:00
+verdict_note: PersonnelCertificatePlaceholder.vue/AgencyPersonnelDetail.vue 命中；ppf-box 命中x2、1440 断点命中 e2e 测试，证件框断点方案有据可查。
+---
 # 经纪与租赁从业人员证件双框放大
 苏州市房地产监测V3中经纪机构和租赁机构的从业人员布局双框放大，并解决窄窗口挤扁字段问题，已交付。
 

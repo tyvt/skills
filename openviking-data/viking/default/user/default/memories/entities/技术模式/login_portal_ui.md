@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:48:50+08:00
+verdict_note: 产品2.0 存 accountInfo.vue；登录页 portal 逻辑（/portal/sso/login、setStoredUserId）在门户仓 login.vue/portalUserContext.js 核实。
+---
 # 登录页UI调整迁移至portal分支
 产品2.0 的 zhi2-web-admin 登录页 UI 改动已迁移到 develop/v2.6.2-portal 分支（即 262portal 分支）。
 

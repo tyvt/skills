@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:55:20+08:00
+verdict_note: 苏住房防汛C端 src/api/property.js-572 存在 "zs-method"- "delete" 方法隧道，与记忆所述网关 delete 缺陷上下文一致。
+---
 # 网关 zs-method:delete 缺陷
 防汛模块 E2E 删除接口经网关返回 400/1400，直连 DELETE 返回 200，定位为网关 method tunneling 改写缺陷。
 
@@ -21,7 +26,6 @@
 ## 验证与归属
 - 来源会话 session-42ca405e-529e-4af3-98b5-81e2b92083de（基线 6156653）最终结论交付记录带 `[PUA生效 🔥] 网关 delete 改写直连对照实验`
 - 涉及文件：zhi2-web-admin/e2e-flood-crud.cjs、docs/flood/common-errors.md、src/utils/request.js
-
 
 <!-- MEMORY_FIELDS
 {

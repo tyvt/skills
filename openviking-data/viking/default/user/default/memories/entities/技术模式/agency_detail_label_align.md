@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:12:20+08:00
+verdict_note: 苏州市房地产监测V3 labelAlign(1)/AgencyBranchDetail(6)/AgencyPersonnelDetail(7)命中，标签对齐整改目标文件存在。
+---
 # 详情标签左对齐全局修复
 苏州市房地产监测V3 中移除了写死的 labelAlign:'right'，统一走 DetailTemplate 默认左对齐。
 

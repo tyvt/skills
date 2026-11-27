@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:45:44+08:00
+verdict_note: 小程序 wygl-wxxcx-dev-slh pages/face/bdc.vue-32/45 消费 portalPostAction，与记忆一致
+---
 # 业主决策portalPostAction消费流程
 wygl小程序业主决策H5打开成功后再消费缓存，普通绑房入口需清残留避免重复触发。
 

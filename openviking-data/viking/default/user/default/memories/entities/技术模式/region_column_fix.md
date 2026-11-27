@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:42:29+08:00
+verdict_note: 在苏州市房地产监测V3仓源码命中核心符号(10/10)administrativearea,common,companycancel,companyregister，涉及文件存在，描述与现状一致，判有效。
+---
 # 机构注销列表行政区划列显示修复
 苏州市房地产监测V3 项目中修复了「入网注销 → 机构注销列表」行政区划列全部显示为 `-` 的问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:16:45+08:00
+verdict_note: 园区公共收益 projectTypeRules.js 命中 createProjectTypeRules/projectSubType，校验修复属实
+---
 # 物业管理区域项目类型校验修复
 修复园区公共收益项目物业管理区域备案与变更页「项目类型」保存时校验错误静默失败的问题，改为在可见字段显示错误。
 ## 修改说明

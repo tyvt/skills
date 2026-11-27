@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:45:40+08:00
+verdict_note: 无锡市区G含src/utils/innerLink.js与iframeToggle/InnerLinkFrame.vue，iframe视图池方案属实。
+---
 # 智能问答iframe切页签强制刷新修复
 无锡市区G项目中，智能问答（iframe容器页）在答案生成中切页签再切回，页面强制刷新、内容丢失。
 

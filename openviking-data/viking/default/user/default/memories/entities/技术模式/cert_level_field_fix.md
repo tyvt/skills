@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:52:33+08:00
+verdict_note: AgencyPersonnelCertificateTable.vue 含 company_certificate_level、level、zs-select，旧字段 certificateLevel 已清零，字段修复属实
+---
 # 证书等级回显失败因字段误用未配字典
 苏州市房地产监测V3 中 AgencyPersonnelCertificateTable.vue 误用 certificateLevel 字段且未配置字典类型，致证书等级回显失败。
 

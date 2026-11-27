@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:41:47+08:00
+verdict_note: 小程序 externalWebview.vue 实存 lingXiQueried、selectMyHouseByLingXi、authCode，环境分支选房终止逻辑与描述吻合。
+---
 - 在 pages/webview/externalWebview.vue 依据 envVersion 与 authCode === 0 判断分支：开发环境不调 selectMyHouseByLingXi 直接续流；非开发环境弹 uni.showToast 并 return 终止选房。
 - 终止时置 lingXiQueried 为 true 防止重复触发。
 - 验证证据：extracted source=cursor session=591f20d2-2801-494e-9917-cd9943d6d175；涉及文件：pages/webview/externalWebview.vue；来源会话ID：591f20d2-2801-494e-9917-cd9943d6d175；代码基线：none

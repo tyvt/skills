@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:30:21+08:00
+verdict_note: 园区公共收益 benefit/pubBankDetailDay/index.vue 存在「请将对账方式」提示语，替换后句式在源，描述属实。
+---
 # 提示语冗余场景描述且用抽象概念致歧义
 园区公共收益项目(zhi2-web-admin)中，操作提示语含冗余场景描述且用抽象概念导致理解歧义，需改为直接可执行句式。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:49:22+08:00
+verdict_note: 产品2.0 Navbar.vue 含 platformConfig.platformName，符合 computed title 以环境变量回退的描述
+---
 # 从 store 读取 Navbar 标题，环境变量作为回退
 在 zhi2-web-admin（产品 2.0）中，Navbar.vue 的标题固定为环境变量，没有从 store 读取平台名称。
 ## 问题根因

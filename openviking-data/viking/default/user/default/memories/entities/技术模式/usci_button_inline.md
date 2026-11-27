@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:16:26+08:00
+verdict_note: 苏州市房地产监测V3 命中 Step1BasicInfo.vue 的 input-with-actions/action-buttons，信用代码按钮同行属实。
+---
 # 统一社会信用代码按钮与输入框同行
 苏州市房地产监测V3 中 Step1BasicInfo.vue 将统一社会信用代码按钮与输入框设置为同行显示。
 

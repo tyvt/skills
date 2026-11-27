@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:12:44+08:00
+verdict_note: 门户 PropertyDetailDialog.vue 命中 residentialArea/nonResidentialArea/permitDisplay，描述一致
+---
 # 预售许可弹窗住宅面积绑定问题
 许可详情双栏配置里若「住宅」用途面积取 permitDisplay.area，与「预售总建筑面积」同源，在非纯住宅项目且接口/mock 仅有 nonResidentialArea、无独立 residentialArea 时，住宅行会展示错误。
 

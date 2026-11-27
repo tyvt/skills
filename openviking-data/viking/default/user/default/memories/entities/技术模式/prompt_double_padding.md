@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:14:19+08:00
+verdict_note: 园区物管2.0 pubRevenueContract/index.vue-175 有 padding-12px 12px 0，正是记忆描述的双重 padding 修复
+---
 # 提示语间距因双重padding变大修复
 园区物管2.0 中提示语因自身 padding-bottom 与表格容器 padding-top 叠加，导致下方间距比上方大一倍，已调整为统一 12px。
 

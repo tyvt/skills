@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:24:52+08:00
+verdict_note: 苏住房C 命中 home-nav-wrap、Project_Suzhufang、header-wrap，布局间隙修复文件存在。
+---
 # 苏找房首页白色背景紧贴Banner间隙修复
 苏住房C 苏找房首页调整布局，使白色背景紧贴 Banner，消除中间灰色间隙。
 

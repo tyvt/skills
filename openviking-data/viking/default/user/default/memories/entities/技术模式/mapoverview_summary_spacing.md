@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T13:52:05+08:00
+verdict_note: 园区物管2.0 mapOverview/index.vue 含 summary-list、grid-template-columns、gap-4px，间距收紧属实。
+---
 # 物业管理区域间距收紧
 园区物管2.0 mapOverview 左栏「物业管理区域」三项指标横向间距收紧，去除多余留白。
 
@@ -16,7 +20,6 @@
 - 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；来源会话：76615610-2741-4c89-accc-c5cfe6621d05；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

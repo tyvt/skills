@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:13:59+08:00
+verdict_note: 苏州V3 detail.vue/permitConstants.js/vite.config.js 命中，permitDocSite 等符号存在。
+---
 # 预售许可证查看按钮修复
 苏州市房地产监测V3 中备案后详情页缺失「查看预售许可证」按钮，已通过新增解析与按钮逻辑修复。
 

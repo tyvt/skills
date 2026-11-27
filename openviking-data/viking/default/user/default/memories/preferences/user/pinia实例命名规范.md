@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:42:58+08:00
+verdict_note: 园区表决H5等多仓普遍存在 const useUser = useUserStore() 命名，符合记忆所述统一规范，无反例。
+---
 - 统一将 Pinia 实例命名为 `const useUser = useUserStore()`，不使用 `userStore` 命名（应用于 api/index.js、App.vue 等 9 个文件）。
 - 移除回调内重复声明，复用顶层实例。
 

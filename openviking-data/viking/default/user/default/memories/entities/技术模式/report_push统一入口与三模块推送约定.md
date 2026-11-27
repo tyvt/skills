@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:44:48+08:00
+verdict_note: fund/report.py 实存且含 argparse/add_argument 与 cyb 分支，统一入口 -m 参数机制属实(dividend/a500 为模块别名未字面命中)
+---
 # report_push统一入口与三模块推送约定
 投资推送项目抽象后本地报告与微信推送统一入口，支持 -m 指定 dividend|a500|cyb 三模块，定时任务默认全推。
 

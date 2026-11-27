@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:51:17+08:00
+verdict_note: 实机核对：V3 InfoCardDialog.vue(74)、WorkCardDialog.vue(73) 引用 html2canvasObjectFit，object-fit 处理方案在；描述属实。
+---
 # 缺少 object-fit 的证件下载
 html2canvas 原生不支持 object-fit，导致证件下载时图像被拉伸。
 
@@ -18,7 +23,6 @@ html2canvas 原生不支持 object-fit，导致证件下载时图像被拉伸。
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：0b2661f5-bbe8-434f-86da-96244d6397a7
-
 
 <!-- MEMORY_FIELDS
 {

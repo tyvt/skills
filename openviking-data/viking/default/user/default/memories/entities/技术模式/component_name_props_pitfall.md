@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:48:01+08:00
+verdict_note: 产品2.0中 AnnexUpload/index.vue 内部 name-'FileUpload' 与全局撞名属实，zs-file-upload.vue 存在 isShowTip prop；源码级陷阱描述可证。
+---
 # 组件名撞名与 props 未透传陷阱
 整理公共组件用法时发现两个不会报错但行为不对的源码级坑：内部 name 撞全局名、封装组件 fieldProps 未透传开关型 prop。
 

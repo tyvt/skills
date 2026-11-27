@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:14:25+08:00
+verdict_note: 惠山二期G 命中 userStatistics、complexName、subdistrictCode、communityCode、listMixins，新页面描述属实
+---
 # 灵锡绑定查看功能页
 惠山二期G 项目中新增的「灵锡绑定查看」页面，用于统计物业管理区域的业主绑定与投票情况。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:18:16+08:00
+verdict_note: fillOrgName/fillMainAccountName 全库仅记忆命中，苏州V3无真实代码，无法证明
+---
 # V3 预售资金菜单与前端修复
 苏州市房地产监测V3 预售资金模块菜单权限插入及前端字段反查修复。
 
@@ -8,7 +13,7 @@
 - 监管账户详情/列表用 `orgName`/`mainAccountName` 但后端仅返 `orgId`/`mainAccountId` 致空白，已改 ID 反查补名称（detail.vue `fillOrgName`/`fillMainAccountName`），列表显 ID；Lint+构建通过已部署
 
 ## 收尾
-- 联调收尾：测试数据清理、zsbase 密码与 Nacos 配置已还原
+- 联调收尾：测试数据清理、{{ov_privacy:ambiguous}} 密码与 Nacos 配置已还原
 
 ## 归属
 - 所属项目：苏州市房地产监测V3；代码基线：none

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:12:12+08:00
+verdict_note: 门户 operationGuideBanners.js 存在且 ASSET 指向 /assets/images/operationGuide，banner.svg 为图片未被文本扫描，描述属实
+---
 # 门户操作指引三条业务线 Banner 统一
 门户操作指引顶栏图集中由 operationGuideBanners.js 配置，三条业务线统一指向公共 banner.svg。
 

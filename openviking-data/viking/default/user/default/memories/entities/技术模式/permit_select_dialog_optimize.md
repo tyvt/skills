@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:16:57+08:00
+verdict_note: 苏州市房地产监测V3 presale/permitSelectConstants.js 实存，含 buildPermitSelectDialogOptions/PERMIT_SELECT 共享配置，与记忆一致
+---
 # 选证弹窗表格溢出 UI 优化
 苏州市房地产监测V3 的选证弹窗已改为函数式 SelectDialog.open() 并统一共享配置。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:41:44+08:00
+verdict_note: 在园区物管2.0仓源码命中核心符号(5/6)esbuild,monorepo,node_modules,resolve，涉及文件存在，描述与现状一致，判有效。
+---
 # Vite下vue-compat绝对路径禁止
 zhi2-web-admin 的 vue-compat.js 在 Vite/esbuild 下禁止写绝对 node_modules 路径，需统一从 'vue' 导入。
 ## 问题现象

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:19:43+08:00
+verdict_note: statisticsMap 命中 showOverviewContent/zoom_changed，缩放误触概览修复属实
+---
 # Map组件缩放监听误触概览显示
 Map组件监听地图zoom_changed事件并emit clickMark/hoverMark false，导致搜索引发缩放变动时误触发概览内容显示。
 

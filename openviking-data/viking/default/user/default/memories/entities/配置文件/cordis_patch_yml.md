@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:52:16+08:00
+verdict_note: skills/dsh/profiles/web/cordis.patch.yml 命中 catalogDescriptionMaxLength，补丁配置改动在。
+---
 # cordis.patch.yml
 
 DSH web profile 的补丁配置文件，路径 C:\Users\Administrator\.dsh\profiles\web\，不在 git 仓库，改动后需重启 web 生效。

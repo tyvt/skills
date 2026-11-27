@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:13:49+08:00
+verdict_note: 含resolveChangeId/findRouterByFilePath，修改按钮路由与ID修复属实。
+---
 # 修改按钮因路由错误和ID格式问题导致的导航失败
 在苏州市房地产监测V3项目的 zhi2-web-admin 中，修改按钮因路由错误和ID格式不一致而失效。
 
@@ -15,7 +20,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：ac2a541a-e0f6-41f2-bba0-8b283388ff32
-
 
 <!-- MEMORY_FIELDS
 {

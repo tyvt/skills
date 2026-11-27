@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:48:47+08:00
+verdict_note: 园区物管2.0 Sidebar/RecursiveMenu.vue含getMenuIcon，图标占位缩进根因属实。
+---
 # RecursiveMenu 子菜单图标占位缩进
 园区物管2.0 侧边栏 RecursiveMenu 子菜单缩进不应依赖图标占位，icon 为 null 时文字会比父级更靠左。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:09:52+08:00
+verdict_note: 园区公共收益 zhi2-web-admin/src/views/benefit/pubBankDetailDay/index.vue 命中 shouldUseBankReceiptMode，回单校验拆分属实。
+---
 # 银行回单校验误拦普通已对账查询
 园区公共收益项目(zhi2-web-admin)中，getList() 的回单模式校验误拦普通已对账查询，需拆分校验条件并限定回单模式。
 

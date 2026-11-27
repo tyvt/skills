@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:48:24+08:00
+verdict_note: 惠山二期H5 newHome.vue/lingxi.js 实存 waitForLingxiHouseBind、[newHome]、syncHouseInfoAfterLogin，首页接口重复修复属实。
+---
 # 首页接口重复因onMounted与绑房回跳并发
 惠山二期H5 首页首次进入时 onShow 与 onMounted 均触发 loadPageData，且绑房回跳未等待致接口重复。
 

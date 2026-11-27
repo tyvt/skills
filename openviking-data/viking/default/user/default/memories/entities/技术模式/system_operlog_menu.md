@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:46:11+08:00
+verdict_note: 苏住房G 存在 pageRequestContext.js（screen-motion worktree）与 operlog 日志菜单相关文件，与记忆一致。
+---
 # 系统管理日志管理菜单新增
 苏住房G 项目在「系统管理」模块新增「日志管理」菜单，并同步园区操作日志全局拦截。
 

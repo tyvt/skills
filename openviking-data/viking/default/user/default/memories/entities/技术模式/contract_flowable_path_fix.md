@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:14:12+08:00
+verdict_note: 苏州V3 contractRequest.js 命中 /flowable/task//getFlowViewer/isApprovalAuth，路径改造属实
+---
 # 合同接口flowable路径由definition改为task
 苏州市房地产监测V3 的 `contractRequest.js` 中 `getFlowViewer` 和 `isApprovalAuth` 接口路径已从 `/flowable/definition/*` 改为 `/flowable/task/*`。
 

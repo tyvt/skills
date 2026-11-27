@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T06:09:29+08:00
+verdict_note: 榆林相关仓库中 /property/workOrder/app/orders、workOrder/app 工单接口零命中，记忆所述5接口迁移路径无法在代码中证实。
+---
 # 工单功能从榆林小程序迁移
 苏住房C(zhi2-mobile-shimin)已从榆林小程序完成工单（报事报修）功能迁移，升级API并新增多个页面。
 

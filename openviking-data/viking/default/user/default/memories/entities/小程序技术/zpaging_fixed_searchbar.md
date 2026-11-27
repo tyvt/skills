@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:10:10+08:00
+verdict_note: 苏住房C 搜索小区页 pages_transaction/intention/search 存在，-fixed="false"、autoFocus、暂无数据均命中，与描述一致
+---
 # z-paging默认fixed盖住同屏搜索栏
 苏住房C（uni-app小程序zhi2-mobile-shimin）「搜索小区」页顶部搜索框点不动、无法输入，因 z-paging 默认 fixed 全屏覆盖压住同屏搜索栏。
 

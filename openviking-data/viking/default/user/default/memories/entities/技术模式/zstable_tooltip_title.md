@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:46:43+08:00
+verdict_note: 园区公共收益 BuildingDialogAuth.vue 实存；tooltip/title/width/minWidth/ellipsis 命中，列宽 tooltip 修复属实。
+---
 # zs-table-column 自定义渲染绕过 tooltip 补齐
 园区公共收益弹窗内 zs-table 自定义渲染列截断且无悬浮提示，组件层需补 title 并放宽过窄 width，业务侧过窄固定 width 改 minWidth。
 

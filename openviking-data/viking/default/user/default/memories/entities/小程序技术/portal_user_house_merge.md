@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:16:14+08:00
+verdict_note: 小程序 wygl-wxxcx-dev-slh/utils/portal-user.js 命中 mergeCtUserIdentityHouseIntoPortalUser 与 extractPropertyPageRows，房屋接口串联属实。
+---
 # portal-user.js 房屋接口串联与解析
 utils/portal-user.js 新增/修改房屋接口串联逻辑，使 profile 之后也能拉到房屋数据。
 

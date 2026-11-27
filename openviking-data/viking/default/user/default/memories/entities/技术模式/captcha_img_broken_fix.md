@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T06:15:37+08:00
+verdict_note: 未找到含 codeUrl 条件渲染+'加载中...'占位的验证码组件证据，命中仅为无关项目loading文案，记忆修复无代码佐证。
+---
 # captcha_img_broken_fix
 园区物管2.0 登录页验证码初始破图问题的根因与修复。
 
@@ -13,7 +18,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/components/SvgIcon/index.vue；所属项目：园区物管2.0；来源会话 80ec8712-2d9a-40e3-9d5a-6f593b0483e2。
-
 
 <!-- MEMORY_FIELDS
 {

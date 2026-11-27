@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:26:28+08:00
+verdict_note: 苏州V3 zhi2-web-admin/src/views/presale/permitCancel/index.vue 存在，后端 presalePermitId 字段可查，列名与穿透逻辑相符。
+---
 # 预售许可注销列表列名顺序与穿透修复
 苏州市房地产监测V3 的 permitCancel/index.vue 调整了列名、列顺序并完善穿透详情链接。
 

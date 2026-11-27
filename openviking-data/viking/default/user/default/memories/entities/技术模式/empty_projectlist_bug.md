@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:34:41+08:00
+verdict_note: 园区公共收益 layout/index.vue-248,170 有 syncProjectDialogVisibility、-30 有 projectDialogVisible、-31 有 bProjectData，空列表防卡死修复属实。
+---
 # 未授权区域登录后项目选择弹窗无法关闭
 layout/index.vue 在登录后依据 operableProjectList / bProjectData 自动弹出物业管理区域选择框，列表为空时仍置 projectDialogVisible=true 导致整站卡死。
 

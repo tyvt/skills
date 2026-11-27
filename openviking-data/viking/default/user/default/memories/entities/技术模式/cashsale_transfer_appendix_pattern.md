@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:15:51+08:00
+verdict_note: cashsaleConstants.js/CashsaleTransferAppendixPanel.vue 命中；TRANSFER_APPENDIX_BUS_CODE/yszxs/mapAppendixPackageList/validateCashsaleAnnexRequired 均命中，拼接方案属实。
+---
 # 预售转现售要件拼接方案
 苏州市房地产监测V3 实现预售转现售要件拼接，复用预售要件并拼接本单 yszxs 要件。
 

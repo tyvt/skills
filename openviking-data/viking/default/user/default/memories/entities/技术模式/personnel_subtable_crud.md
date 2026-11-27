@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:51:39+08:00
+verdict_note: 实机核对：V3 AgencyPersonnelDetail.vue EducationTable(78)/CareerList(85)/certificateList(82)/careerList(209) 及 formMode==='view' 判断均在，三个子表弹窗式改造属实。
+---
 # 从业人员详情子表弹窗式增删改查改造
 苏州市房地产监测V3 中 AgencyPersonnelDetail 的三个子表已统一为 ServiceSchemePanel 风格弹窗式增删改查。
 

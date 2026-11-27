@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:31:36+08:00
+verdict_note: 门户 publicPortal/components/PortalBreadcrumb.vue 存在，面包屑样式修复文件在源。
+---
 # 门户 PortalBreadcrumb 盒高与间距修正
 PortalBreadcrumb.vue 盒高由 40px 改为 30px 并调整外边距，解决标题栏到面包屑视觉间距过大的问题。
 

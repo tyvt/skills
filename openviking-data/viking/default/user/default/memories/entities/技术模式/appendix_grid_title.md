@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:55:08+08:00
+verdict_note: V3 zhi2-web-admin 实存 AppendixRequirementCard.vue/AppendixRequirementGrid.vue，标题行固定高度修复属实。
+---
 # 要件网格标题行固定高度且操作区占位
 AppendixRequirementCard.vue 同排要件标题高度不齐，固定标题行 40px 并常驻操作区占位以修复对齐。
 

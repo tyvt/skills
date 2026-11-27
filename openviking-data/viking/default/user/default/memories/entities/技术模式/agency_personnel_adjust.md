@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:51:01+08:00
+verdict_note: 核对苏州市房地产监测V3：StatusAdjustDialog、agencyPersonnel/adjust、CancelDialog 命中，状态调整弹窗描述一致。
+---
 # 经纪机构人员状态调整弹窗
 苏州市房地产监测V3 中 AgencyPersonnelList 操作栏改为「人员状态调整」并新增 StatusAdjustDialog 按冻结态区分注销、冻结、解冻选项。
 

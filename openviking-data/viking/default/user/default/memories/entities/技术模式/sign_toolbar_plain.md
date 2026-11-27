@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:51:40+08:00
+verdict_note: 苏州市房地产监测V3 contractView/index.vue plain=0，与移除 plain 改实心配色一致，属实
+---
 # 签订撤销列表工具栏去plain改色
 苏州市房地产监测V3 中预售/现售签订列表与合同撤销列表工具栏移除 plain 并改为实心配色。
 
@@ -14,7 +19,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

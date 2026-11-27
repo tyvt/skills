@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:12:58+08:00
+verdict_note: pubRegulatoryAgreement/detail.vue 命中，前端目录存在；未发现后端源码的检索结论与全库检索一致，前端字段调整属实。
+---
 # 公共收益协议前端调整与检索结论
 苏住房G 项目公共收益协议（pubRegulatoryAgreement）前端详情页字段已调整，全库检索未发现后端源码。
 

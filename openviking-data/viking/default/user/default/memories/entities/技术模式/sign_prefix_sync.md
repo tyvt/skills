@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:50:02+08:00
+verdict_note: 核对产品2.0：sign.js 命中 SIGN_API_BASE、resolveSecretKeyUrl、/secret/key，API 前缀双写描述一致。
+---
 # sign.js 加签脚本 API 前缀双写同步约定
 园区物管2.0 的 public/sign.js 放弃运行时注入 API 前缀，改为写死常量 SIGN_API_BASE 并与 VITE_APP_BASE_API 双处同步。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:59:26+08:00
+verdict_note: 苏住房C collectBtn.vue 含 ZsImage 但无 subpackage/aixin_e（aixin_e 仅在 stockHouse/detail.vue），所述收藏图标修复无法证实
+---
 # 新房详情页收藏图标不显示修复
 苏住房C小程序新房详情页底部「收藏」图标不显示的问题已修复，根因包含组件未注册与静态资源路径错误。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

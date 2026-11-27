@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T22:50:44+08:00
+verdict_note: statisticsMap 含 selectOptionalComplexList 与 areaDrillStack，第三级下钻切换受益台账接口属实
+---
 # 大屏统计地图下钻接口切换
 园区物管2.0 的 statisticsMap 地图下钻到第三级（街道）时，列表接口由物业接口切换为受益台账接口。
 
@@ -16,7 +20,6 @@
 - 验证证据：extracted source=cursor project=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/views/benefit/statisticsMap/index.vue、components/map.vue、property/mapProperty/index.vue。
 - 所属项目：园区物管2.0；来源会话 f2d1a9a6-0158-4986-829e-bf8d662f3dff；代码基线 none。
-
 
 <!-- MEMORY_FIELDS
 {

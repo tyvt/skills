@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:27:18+08:00
+verdict_note: 泰兴小程序 src/components/PageButton/PageButton.vue 存在 getBtnStyle 与 ZsButton plain/颜色样式，按钮颜色边框修复代码在源。
+---
 # 报修详情页按钮颜色与边框修复
 泰兴小程序报修详情页按钮颜色与边框异常问题已修复，共改动 3 个文件。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:52:21+08:00
+verdict_note: PropertyDetailDialog.vue 命中 splitBuiltArea 与 propertyHouses，house 计算属性在。
+---
 # PropertyDetailDialog house 计算属性与面积拆分
 房屋详情弹窗统一在 house 计算属性合并行数据与 record，禁止模板临时拼数字。
 

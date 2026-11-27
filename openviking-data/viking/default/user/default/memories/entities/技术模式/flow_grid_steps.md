@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T22:54:15+08:00
+verdict_note: 门户 index-new.vue 无 flow-grid/176px/flow.steps 且文件仅约3KB，所述 flow-grid 布局与修复方向无当前代码支撑
+---
 # 业务中心 flow-grid 空 steps 导致标签错行
 门户首页 index-new.vue 业务流区 .flow-grid 为 grid-template-columns: 176px 1fr，空 steps 板块会让下一板块 label 挤入同行第二列造成错行。
 

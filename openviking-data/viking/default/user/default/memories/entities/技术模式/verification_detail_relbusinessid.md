@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:17:25+08:00
+verdict_note: 园区物管2.0 命中 relBusinessId、VerificationReceiptDetailDialog/Table、buildSubmitPayload，编辑保留属实
+---
 # 园区物管2.0 核销明细 relBusinessId 编辑保留
 园区物管2.0 编辑核销明细时，relBusinessId 会在整条链路上保留并随更新接口提交，避免后端 400 校验失败。
 

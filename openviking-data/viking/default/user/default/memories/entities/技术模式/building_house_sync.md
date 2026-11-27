@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:16:08+08:00
+verdict_note: 园区公共收益 houseTable.vue 含 importHouseByBuildingCode，building/detail.vue 含 xinwu，同步房屋按钮修复属实。
+---
 # 楼幢详情房屋信息区新增同步房屋按钮
 园区公共收益项目在楼幢信息详情页「房屋信息」区域右侧新增通用【同步房屋】按钮。
 

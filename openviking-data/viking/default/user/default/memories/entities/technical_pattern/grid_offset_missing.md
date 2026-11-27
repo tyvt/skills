@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:16:48+08:00
+verdict_note: 含gridOffset与buildCancelBasicInfoView，预售许可栅格错位修复属实。
+---
 # Grid Offset Missing Causes Column Misalignment
 Full-width grid row lacking gridOffset caused next row misalignment; fixed with gridOffset.
 
@@ -18,7 +23,6 @@ Full-width grid row lacking gridOffset caused next row misalignment; fixed with 
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：db3f4214-4b5b-4cbc-b081-3c46c8cde75a
-
 
 <!-- MEMORY_FIELDS
 {

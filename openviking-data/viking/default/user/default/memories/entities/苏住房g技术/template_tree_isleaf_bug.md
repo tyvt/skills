@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:29:29+08:00
+verdict_note: 苏住房G zhi2-web-admin/src/utils/monthlyReport.js 存在 clearBranchNodeFields/ensureLeafFields/isLeafNode，TemplateTreeTable 逻辑属实。
+---
 # 月报模板树表新增下级父级填报列仍显示
 苏住房G 公共查询-物业管理区域月报模板配置（TemplateTreeTable）新增下级后父级填报列仍显示且仍拦截保存的缺陷与修复。
 
@@ -18,7 +23,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
 - 来源会话：78a75b10-f6bb-48e1-ade4-51abaa4d72e3
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:53:17+08:00
+verdict_note: 物业手持B端无 --page-button-area-height，PageButton.vue 仅 env(safe-area-inset-bottom) padding，未见记忆所述 box-sizing/min-height-136rpx 修复，描述与现状不符。
+---
 # 巡检记录添加页底部灰色边距条
 物业手持B端巡检/维保/年检/报废记录页底部出现灰色边距条，已统一底部高度变量铺满安全区。
 

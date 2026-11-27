@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:45:18+08:00
+verdict_note: 门户 homeLayout.js-182 现为 SIDEBAR_QUICK_FUNCTIONS，全局无 BROKER_SECTION_CODES 常量，记忆描述的代码状态不存在
+---
 # 经纪端首页业务流程须按 permittedCodes 过滤板块
 门户首页 `mergeBusinessFlows` 在 `variant === 'broker'` 时若固定用 `BROKER_SECTION_CODES` 而不按 `permittedCodes` 过滤，仅部分权限用户仍见完整默认流程。
 

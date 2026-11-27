@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:12:28+08:00
+verdict_note: 「2-0」目录不存在；产品2.0 全仓 0 命中 fix-el-col-breakpoints 脚本，无法证明有效。
+---
 # 无断点 el-col 批量补全脚本
 zhi2-web-admin 提供脚本为缺失全部断点的 <el-col> 统一补全响应式列宽。
 ## 问题描述

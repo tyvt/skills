@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:19:53+08:00
+verdict_note: 产品2.0 zhi2-web-admin autonomy/record/components/directDetail.vue 命中，预填锁定描述与路径一致
+---
 # 物管会备案详情跳转用户授权预填锁定与重选并存
 从物管会备案详情进「用户授权」时，预填锁定须与校验失败可重选并存，避免只锁死或只清空一侧。
 

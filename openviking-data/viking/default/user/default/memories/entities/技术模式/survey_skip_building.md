@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:13:04+08:00
+verdict_note: 含presale-survey-change-helpers、hasActiveSurveyChange、surveyChange/page，选楼幢跳过在途逻辑属实。
+---
 # 测绘变更选楼幢跳过在途楼幢
 苏州市房地产监测V3 的 E2E 辅助文件 `presale-survey-change-helpers.js` 实现选楼幢弹窗中跳过在途楼幢的逻辑。
 ## 行为说明

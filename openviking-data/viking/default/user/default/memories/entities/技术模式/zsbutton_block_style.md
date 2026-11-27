@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:13:59+08:00
+verdict_note: 苏住房C源码ZsButton.vue存在但全仓无.zs-button--block类，描述的补block样式修复不在代码中。
+---
 # ZsButton的long/block类名无对应样式
 苏住房C 人工添加页底部提交按钮因父容器 align-items:center 且 long 类未定义，只按文字宽度撑开，需在组件内补 .zs-button--block{width:100%} 并改 stretch。
 

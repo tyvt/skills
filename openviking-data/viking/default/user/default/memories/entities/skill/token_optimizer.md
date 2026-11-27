@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:45:50+08:00
+verdict_note: 确认 D-/repository/skills/token-optimizer 下 SKILL.md 与 analyze.mjs 均存在，路径与实现描述一致。
+---
 # token-optimizer
 DSH 技能，用于从 dsh-context 投影缓存生成可复跑的 token 优化清单。
 
@@ -10,7 +15,6 @@ DSH 技能，用于从 dsh-context 投影缓存生成可复跑的 token 优化�
 
 ## 关系
 - 数据源与 dsh-context 插件面板一致，2026-11-09 由 deepseek-harness-default-workspace 会话创建并提交 git。
-
 
 <!-- MEMORY_FIELDS
 {

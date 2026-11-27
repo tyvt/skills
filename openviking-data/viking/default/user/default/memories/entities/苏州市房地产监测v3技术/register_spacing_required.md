@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:44:07+08:00
+verdict_note: 苏州市房地产监测V3 命中 -fit=false/show-overflow-tooltip/width=140,60,96/min-width=180 与 Step1/Step4Shareholders，必填列宽调整属实。
+---
 # 开发企业注册列间距与成立日期必填修复
 苏州市房地产监测V3 项目完成开发企业注册 Step4 股东列表列间距调整与 Step1 成立日期必填校验。
 

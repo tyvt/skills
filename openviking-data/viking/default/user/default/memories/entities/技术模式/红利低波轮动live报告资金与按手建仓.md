@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:57:58+08:00
+verdict_note: fund 仓无 dividend_lowvol_rotation 目录，无 DLV_PORTFOLIO_CAPITAL_CNY/plan_portfolio_allocation，所述建仓报告修复无法证实
+---
 # 红利低波轮动live报告资金与按手建仓
 子包 dividend_lowvol_rotation 的 live 建仓报告资金解析与按手建仓规则。
 

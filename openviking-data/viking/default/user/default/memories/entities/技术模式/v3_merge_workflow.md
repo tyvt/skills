@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:13:39+08:00
+verdict_note: develop/v3.0.0 子模块+gitlink 合并流程记忆，属本机既定工作流，无代码反证，非幻觉/测试垃圾。
+---
 # develop/v3.0.0 合并回主干流程
 将代码合并回 develop/v3.0.0 时，本机有一套既定流程，确保子模块与父仓库的 gitlink 一致。
 

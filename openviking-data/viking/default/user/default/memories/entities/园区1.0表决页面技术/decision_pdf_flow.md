@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:45:25+08:00
+verdict_note: 园区表决H5 实存 alfrescoFileUuid、h5decision/decisionRecord、estate/decisionRecord，PDF两步获取流程描述属实。
+---
 # 表决意见单 PDF 两步获取流程
 园区1.0表决页面中，表决意见单（PDF/签章文件）由后端在提交时生成，查询时通过文件 ID 取回，提交接口不直接返回文件流。
 

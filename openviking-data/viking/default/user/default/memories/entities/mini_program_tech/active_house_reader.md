@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:17:58+08:00
+verdict_note: 所述 getActiveHouseFromPortalUser、mergeCtUserIdentityHouseIntoPortalUser、portal-user.js 全仓 0 命中，iHome小程序无此代码，属幻觉
+---
 # Active House Unified Reader
 getActiveHouseFromPortalUser added in utils/portal-user.js unifies active-house reading to fix menu inconsistency caused by snapshot field conflicts after house switching.
 ## Problem
@@ -14,7 +19,6 @@ getActiveHouseFromPortalUser added in utils/portal-user.js unifies active-house 
 - 所属项目：小程序
 - 验证证据：extracted source=cursor project=小程序
 - 来源会话：4b7771ad-3727-4825-9b66-d0df7f681ca0
-
 
 <!-- MEMORY_FIELDS
 {

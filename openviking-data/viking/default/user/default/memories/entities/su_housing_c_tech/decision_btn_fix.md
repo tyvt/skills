@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:47:50+08:00
+verdict_note: 苏住房C 未找到 pages_vote/decision/index.vue，needToKnow 0 命中，按钮改 ZsButton 方案无法核实
+---
 # 决策列表参与按钮点击无响应修复
 苏住房C小程序决策模块「参与决策」按钮在安卓微信小程序中因使用普通view @tap.stop收不到点击，已改为ZsButton修复。
 

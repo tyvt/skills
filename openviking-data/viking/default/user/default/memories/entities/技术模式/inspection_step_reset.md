@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:43:30+08:00
+verdict_note: 在物业手持B端仓源码命中核心符号(11/12)completedialog,package,pages_facility,picker，涉及文件存在，描述与现状一致，判有效。
+---
 # 巡检步骤增删后新增状态未重置
 物业手持B端巡检记录添加并删除步骤后再次新增存在状态残留的已知问题及修复方案。
 

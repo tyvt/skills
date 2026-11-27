@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:27:43+08:00
+verdict_note: 园区公共收益zs-table.vue含resyncTableLayout/cancelResyncTableLayout，zs-table-column.vue主动调用resyncTableLayout，与并发重排修复一致。
+---
 # zs-table并发重排失效修复
 园区公共收益(zhi2-web-admin)表格布局同步原先丢弃并发调用，致小计行错位至操作列。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:51:05+08:00
+verdict_note: 苏住房C property/index.vue与benefit/index.vue均有menuList(10)，子菜单URL写死在入口页的描述属实。
+---
 # 阳光物业与公共收益菜单URL配置
 苏住房C 小程序「阳光物业」与「公共收益」（入口页标题「共有资金」）子菜单 URL 写死在对应 `index.vue` 的 `menuList` 中，分三层配置。
 

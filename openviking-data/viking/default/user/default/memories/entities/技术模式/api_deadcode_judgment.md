@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:49:51+08:00
+verdict_note: 园区物管2.0命中 businessName 通用请求与 pubExpenditureContract，「页面存在≠api 被引用」判定口径在代码结构可证；一次性扫描脚本已清理不影响方法论结论。
+---
 # 清理src/api死代码判定口径
 园区物管2.0 中清理 src/api 死代码的唯一口径是全量扫描 import/require 引用，页面存在不代表 api 模块被引用。
 

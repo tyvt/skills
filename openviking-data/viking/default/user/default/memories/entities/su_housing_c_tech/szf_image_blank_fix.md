@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:47:57+08:00
+verdict_note: 苏住房C src/utils/index.js 无 PAGES_OWNER_SZF_FILES / default.png / pages_transaction 命中，所述默认图分包逻辑未在源码体现。
+---
 # 苏找房列表图片空白修复
 苏住房C小程序苏找房列表图片无法访问时显示空白，因默认图分包路径错误与分包未预加载，已修复。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

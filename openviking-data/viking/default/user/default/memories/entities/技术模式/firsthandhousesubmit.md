@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:46:20+08:00
+verdict_note: zhi2-mobile-shimin中firstHandHouseSubmit及/transaction/firstHandHouse/submit全仓0命中，声称的transaction.js-361与detail.vue-216接口无法证实。
+---
 # 一手房交易提交接口 firstHandHouseSubmit
 `zhi2-mobile-shimin` 项目中交易申请页（新房认证详情页）点击「确认提交」时调用的提交接口。
 

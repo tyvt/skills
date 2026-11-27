@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:12:43+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin 命中 usePaging 与 z-paging 依赖，业主端列表分页迁移属实。
+---
 # 业主端列表页分页迁移
 苏住房C 小程序 `pages_owner` 下所有列表页已从 `useLoadMore` / `uni-load-more` 迁移到 `usePaging` + `z-paging`。
 

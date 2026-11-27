@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:23:42+08:00
+verdict_note: CandidateDialog.vue/zs-select-dialog-func.vue 存在，后者命中 pagination、前者命中楼幢
+---
 # 新增委员楼幢分页修复
 泰兴G 业主自治新增委员时楼幢数据缺失前端分页，已改回滚动自动加载并修复列表未撑满问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:19:54+08:00
+verdict_note: pages_poll 相关页面命中 bg_szf.png 别名引用，背景图路径修复属实
+---
 # pages_poll 中因使用 ../.. 导致的背景图片故障
 文件 `src/pages_poll/result.vue` 和 `form.vue` 错误地使用了 `../../static/images/bg_szf.png`，解析到了不存在的 static 目录；已使用别名路径修正。
 

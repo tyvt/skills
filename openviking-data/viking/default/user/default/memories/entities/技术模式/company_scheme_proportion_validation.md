@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:26:06+08:00
+verdict_note: 代码核对：companyScheme/components/CompanySchemeDialog.vue-141 有 isChargeTypeProportion，-153 占位符「请输入0-100之间的数字，最多2位小数」，按比例校验逻辑属实（记忆写 detail.vue，实际在该组件）。
+---
 # 经纪机构服务方案按比例收费标准校验
 苏州市房地产监测V3 的 companyScheme/detail.vue 已补全「按比例」收费标准的输入校验与动态提示。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

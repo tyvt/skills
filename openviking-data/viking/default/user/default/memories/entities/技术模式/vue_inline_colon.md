@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:44:12+08:00
+verdict_note: 产品2.0 存在 maintenance/accountOpen/owner/components/ScopeSelectDialog.vue 且使用 -inline，与记忆文件与属性一致，未见孤立冒号残留。
+---
 # 模板孤立冒号致 Vue 编译非法 JS
 在 ScopeSelectDialog.vue 的 `<zs-form>` 中 `:inline="true"` 后多余冒号使 Vue 编译出非法 JS，触发 `[vite:vue2] Unexpected token`。
 

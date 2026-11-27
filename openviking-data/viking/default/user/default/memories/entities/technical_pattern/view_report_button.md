@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:48:47+08:00
+verdict_note: 核对园区物管2.0：property/complex/index.vue 命中 showBenefitService、serviceName、visible 行级函数，显隐契约一致。
+---
 # 跨系统查看报告按钮显隐契约
 园区物管2.0 业务列表/详情增加跳转收益系统「查看报告」按钮，需控制显隐且逻辑公共化。
 

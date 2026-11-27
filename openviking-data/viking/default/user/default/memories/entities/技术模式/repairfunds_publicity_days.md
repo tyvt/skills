@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:14:51+08:00
+verdict_note: 存在 publicityDays 参数与 ConclusionDialog/PublicityTable 公示组件，与描述一致
+---
 # 维修资金公示「重新公示」新增接口必须带 publicityDays
 太仓G端维修资金公示详情点击「重新公示」若报系统异常，常见根因是新增接口请求体未传 publicityDays（公示天数）。
 

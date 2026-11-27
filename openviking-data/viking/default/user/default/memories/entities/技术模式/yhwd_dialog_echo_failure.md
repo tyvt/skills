@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:51:50+08:00
+verdict_note: 苏州市房地产监测V3命中 YhwdDialog/normalizeFormValues/YhwdTable/yhwdgl，详情加载与 $nextTick 打开修复属实。
+---
 # YhwdDialog 无详情接口和时序导致显示失败
 在项目 苏州市房地产监测V3 中，`YhwdDialog.vue` 未调用详情接口也未格式化值，且 `YhwdTable.vue` 未在 `$nextTick` 后打开对话框，导致银行网点展示失败。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:19:39+08:00
+verdict_note: git 合并策略方法论记忆，涉及子模块 zhi2-web-admin 与 develop/v3.0.0 分支，与项目实际子模块结构一致；属操作经验类，无矛盾证据。
+---
 # 父仓子模块滞后指针的合并策略
 当父仓库子模块 gitlink 因未 fetch 而滞后、真实远程子模块 develop 已含所需提交时，须先 fetch 真实远程，再在其上叠加特性分支并更新父仓 gitlink。
 

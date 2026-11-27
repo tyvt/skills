@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:18:23+08:00
+verdict_note: 家园区一网通办/src/pages-survey/index.vue 含 survey-page-body；提交 4e1e63e、39ce63a 均在该仓存在，关怀模式修复属实。
+---
 # 民意调查答题页微信关怀模式评星修复
 苏住房C（zhi2-mobile-shimin H5）民意调查答题页在微信关怀模式（大字模式）下底部评星不可见且无法滚动，已通过整页滚动改造修复。
 

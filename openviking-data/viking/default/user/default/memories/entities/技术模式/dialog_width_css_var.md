@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:11:13+08:00
+verdict_note: zs-select-dialog.vue 含 mergedDialogAttrs，width-1300px 与 building-table 全局样式命中，对话框宽度改 CSS 变量解耦属实。
+---
 # 由 CSS 变量控制的对话框宽度
 在 Suzhou Real Estate Monitoring V3 项目中，对话框宽度已从 props 解耦，并集中到 CSS variables 中。
 

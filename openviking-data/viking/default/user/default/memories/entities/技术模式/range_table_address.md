@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:52:21+08:00
+verdict_note: 产品2.0 rangeTable.vue 含 projectName/buildingNo/unitName/houseNo 字段，地址拼接逻辑所在文件与描述一致
+---
 # 房屋坐落拼接去重避免项目名重复
 在产品2.0的rangeTable.vue中“房屋坐落”拼接逻辑增加去重，防止buildingNo包含projectName时重复展示。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:44:31+08:00
+verdict_note: 苏住房C编译产物含houseLoanGuide/webViewNav/fddydetail，跳转未注册页改webViewNuvi修复属实。
+---
 # Unregistered local page jump causes navigateTo failure
 houseLoanGuide/index.vue jumped to an unregistered page pages/policy/fddydetail (not in pages.json), causing navigateTo:fail page not found.
 
@@ -18,7 +23,6 @@ houseLoanGuide/index.vue jumped to an unregistered page pages/policy/fddydetail 
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：2d03bb3e-84c4-4246-ae8a-bea874fd391d
-
 
 <!-- MEMORY_FIELDS
 {

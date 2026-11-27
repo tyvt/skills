@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T12:42:38+08:00
+verdict_note: 苏州V3 命中 showChangeEditBtn(3)、show-back、show-approval、companyRecord，与入网变更按钮补全一致。
+---
 # 企业/经纪机构入网变更详情按钮补全
 苏州市房地产监测V3 中开发企业（companyRecord）与经纪机构（agencyRecord）入网变更详情页补全了返回、编辑、流程查看按钮。
 
@@ -12,7 +16,6 @@
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`toB/companyRecord/detail.vue`、`toB/agencyRecord/detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：651e58d0-833a-407d-b950-d0210aaf6ccc
-
 
 <!-- MEMORY_FIELDS
 {

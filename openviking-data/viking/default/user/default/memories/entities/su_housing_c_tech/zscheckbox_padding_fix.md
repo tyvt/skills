@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:23:09+08:00
+verdict_note: ZsCheckbox.vue 命中 highlight/checkbox-item，高亮模式内边距修复属实
+---
 # ZsCheckbox 高亮模式内边距修复
 苏住房C小程序修复微信小程序组件样式隔离导致 ZsCheckbox 选中项蓝色背景贴边问题。
 

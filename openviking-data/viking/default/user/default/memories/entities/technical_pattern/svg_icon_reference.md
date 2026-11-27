@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:13:16+08:00
+verdict_note: Hamburger.vue 含 menu-fold.svg 且用 img 直接引用，与记忆一致。
+---
 # SVG Icon Direct Reference
 Icons not registered to the SVG sprite need a direct static file reference instead of a sprite symbol.
 
@@ -22,7 +27,6 @@ Icons not registered to the SVG sprite need a direct static file reference inste
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：b5854166-69ad-4373-b2ce-06fc224fa0a4
-
 
 <!-- MEMORY_FIELDS
 {

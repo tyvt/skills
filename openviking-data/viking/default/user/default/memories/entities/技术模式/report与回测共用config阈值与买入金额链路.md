@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:17:03+08:00
+verdict_note: report.py/config.py/buy_amount_tiers.py 实机均不存在，仅存于记忆归档，无法证实。
+---
 # report与回测共用config阈值与买入金额链路
 report.py 不维护独立阈值，而是直接读取 config 中的买入条件与金额分档配置，保证报告与回测对齐同一配置。
 

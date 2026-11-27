@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T01:17:29+08:00
+verdict_note: 记忆称 jsconfig 保留 checkJs-true 及 maxTsServerMemory 8192→2048/.cursorignore 等；实际 jsconfig.json checkJs-false，IDE 全局配置不在代码仓无法证明，描述与现状不符。
+---
 # Cursor内存占用优化
 苏州市房地产监测V3 开发环境下对 Cursor IDE 进行内存占用优化的一系列配置调整。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:44:49+08:00
+verdict_note: 苏住房C含ZsMap.vue/ZsPaging.vue，ZsPaging为inheritAttrs-false且defineOptions已移除，与降级修复一致。
+---
 # Vue 3.2.45 禁用 defineOptions 编译宏
 苏住房C（zhi2-mobile-shimin）组件写 `defineOptions({ inheritAttrs: false })` 在微信开发者工具打开页面即崩，报 `ReferenceError: defineOptions is not defined`，因项目 Vue 为 3.2.45 不支持 3.3+ 宏。
 

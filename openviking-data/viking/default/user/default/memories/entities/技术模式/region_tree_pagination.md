@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:47:13+08:00
+verdict_note: 无锡市区G zs-table.vue-134 fill-height、-289 .list-container .region-tree-layout .list-card 命中，与记忆一致
+---
 # 区域树列表页翻页栏不显示修复
 无锡市区G项目zhi2-web-admin中，带左侧区域树的列表页因固定视口高度且overflow:hidden，分页栏被挤出，已通过调整布局与表格fill-height修复。
 

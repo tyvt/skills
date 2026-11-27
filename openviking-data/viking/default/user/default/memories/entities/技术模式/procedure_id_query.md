@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:46:15+08:00
+verdict_note: 产品2.0代码中 procedureId/processSerial/isExplain/isPicture 及 /dataProperty/procedureProcess/page 均命中，recordProcessStepDialog.vue 等文件存在，描述与现状一致。
+---
 # 步骤子表按 procedureId 查询 dataProperty
 产品2.0 的 zhi2-web-admin 中按 `procedureId` 查询 `dataProperty` 以驱动步骤子表必填项。
 
@@ -20,7 +25,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
 - 所属项目：产品2.0；来源会话：4d8f8198-d7b1-458f-891e-5a0c95b1090a；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:14:29+08:00
+verdict_note: 苏住房C 命中 appSuggestListVoList/complexId，倡议页补传小区ID属实
+---
 # 业主倡议列表页请求异常修复
 苏住房C小程序「首页-小区管理-业主倡议」打开后提示"请求异常"，根因为小区ID未传，已修复。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

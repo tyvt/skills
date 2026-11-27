@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:50:10+08:00
+verdict_note: 苏住房G regionBankAuth/detail.vue 与 file-name-text 样式均在，长文件名省略号修复属实。
+---
 # 长文件名遮挡删除按钮样式修复（苏住房G）
 苏住房G 项目修复了长文件名压制「删除」按钮的样式错乱问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T15:16:25+08:00
+verdict_note: 记忆指向 d-\repository\book-summarizer\ 项目，该目录不在 D-/repository 仓库清单且全库 FILE-NOT-FOUND，book-summarizer 仅命中于记忆提取报告自身，无法证明属实
+---
 # book-summarizer
 本地书籍摘要程序，使用 llama.cpp 与 Qwen2.5-1.5B 模型对书籍进行摘要处理。
 
@@ -11,7 +16,8 @@
 - 已通过 `--single-turn --simple-io` 参数修复
 
 ## 使用方式
-- 项目路径 `d:epositoryook-summarizer\`，示例书已跑通，输出位于 `output\sample_summary.json`
+- 项目路径 `d:
+epositoryook-summarizer\`，示例书已跑通，输出位于 `output\sample_summary.json`
 - 将 `.txt` 文件放入 `books\` 后执行 `run.bat` 即可处理正式书籍
 
 <!-- MEMORY_FIELDS

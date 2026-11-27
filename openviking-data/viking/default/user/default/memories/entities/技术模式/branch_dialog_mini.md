@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:44:06+08:00
+verdict_note: YhwdDialog 组件虽存在，但 zs-size、line-height-36px 全仓 0 命中，mini 化与去行高改动无法核实
+---
 # 网点弹窗改zs-size mini并去除表项式行高
 在 zhi2-web-admin 网点弹窗中，弹窗宽度由 width="60%" 改为 zs-size="mini"（616px），移除行高覆盖使用默认间距。
 

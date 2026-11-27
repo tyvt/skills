@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:33:01+08:00
+verdict_note: 苏住房C guard-info-card.vue含header-img包裹ZsImage与default-avatar，与div包裹+主包头像修复一致；MAIN_STATIC_PATHS未定位但无反证。
+---
 # ZsImage头像不显示因样式隔离与分包路径
 苏住房C市民端guard页默认头像不显示，根因新版ZsImage内部100%宽高+组件样式隔离+分包static路径不可达两处叠加。
 

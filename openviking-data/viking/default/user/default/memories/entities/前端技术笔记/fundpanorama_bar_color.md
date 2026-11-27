@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T18:24:28+08:00
+verdict_note: 基金面板柱状图配色相关文件命中，描述可归属无违规
+---
 # 资金全景支出柱图需传 uniformBarColor
 园区物管2.0 资金全景各类支出分布柱图与收入图共用 renderCategoryBar，未传第三参 uniformBarColor 会回落 mock 配色。
 
@@ -16,7 +20,6 @@
 - 验证：会话 418857f1 用户要求各类支出分布柱体全部 #FFA94D，结论指出未传 uniformBarColor 根因及 index.vue 修改行（参考 园区物管2.0/061.md）
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/index.vue、zhi2-web-admin/src/views/benefit/dataSandbox/fundPanorama/mock.js
 - 所属项目：园区物管2.0；来源会话：418857f1-8122-4137-97aa-db7576f9cb72；代码基线：f00310232
-
 
 <!-- MEMORY_FIELDS
 {

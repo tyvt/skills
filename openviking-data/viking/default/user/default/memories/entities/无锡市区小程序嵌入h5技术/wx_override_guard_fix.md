@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:53:22+08:00
+verdict_note: 惠山二期H5 与无锡市区项目含 restoreWeixinWx.js 与 main.ts 二次恢复，属实
+---
 # 全局wx对象被覆盖的双层防护修复
 uni-app会向window.wx写入空对象覆盖苏服办JSSDK，导致wx.miniProgram不可用，已用守卫脚本与二次恢复修复。
 

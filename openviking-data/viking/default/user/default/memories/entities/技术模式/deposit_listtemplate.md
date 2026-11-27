@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:16:18+08:00
+verdict_note: 产品2.0 源码含 ListTemplate/listMixins，存款页面列表重构所用组件存在，描述无反证。
+---
 # ListTemplate + listMixins 在存款页面中
 
 存款监管模块的列表页面已重构以使用 ListTemplate + listMixins，统一了结构。
@@ -21,7 +26,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：5db9c51e-2b5e-440b-9222-d5a6f6452a33
-
 
 <!-- MEMORY_FIELDS
 {

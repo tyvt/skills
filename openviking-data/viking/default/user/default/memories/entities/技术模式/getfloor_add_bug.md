@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:11:00+08:00
+verdict_note: 园区公共收益 building/detail.vue 等含 getFloor/floorNumberAbove/floorNumberUnder，mathjs.add 操作数兜底与四份详情页同步修复属实。
+---
 # 楼幢总层数 getFloor 未对 mathjs.add 操作数兜底
 building/unit 系列详情页 getFloor 用 mathjs add 求和，floorNumberAbove/floorNumberUnder 为 undefined 或空字符串时抛 addScalar TypeError。
 

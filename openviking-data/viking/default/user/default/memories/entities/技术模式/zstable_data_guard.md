@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:17:54+08:00
+verdict_note: 靖江物管G zsTable/index.vue 命中，data 空值保护属实。
+---
 # ZsTable 对 $attrs.data 增加空值保护
 靖江物管G 的 zsTable 组件在父组件传入 undefined/null 时因 watcher 无空值保护而报 TypeError，需在 watcher 与 handleSelect 中增加数组保护。
 

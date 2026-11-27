@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:24:39+08:00
+verdict_note: 当前 detail-template.vue 仍为 res.blob()+downloadBlobFile 旧逻辑，saveBlobToFile/getAttachmentDownloadName 未合入，与记忆所述修复未合入一致
+---
 # ZenTao Bug 6369
 ZenTao defect 6369: emergency-plan attachment download produced a .txt suffix instead of the original file extension. A fix was committed to branch `fix/bug6369-download-txt-ext` (`8d5f9c0ce`) on 2026-11-11 and written back as resolved in ZenTao, but it was never merged into trunk, so the bug still reproduces online as of 2026-11-12.
 

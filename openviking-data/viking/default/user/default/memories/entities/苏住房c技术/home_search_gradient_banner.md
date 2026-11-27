@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:14:05+08:00
+verdict_note: 苏住房C 命中 Home_Suzhufang.vue、aspectFill 与 linear-gradient(180deg)，搜索框渐变与横幅边距修复属实。
+---
 # 搜索框渐变与横幅边距移除
 Su Zhu Fang C 首页的 UI 调整：搜索框采用垂直渐变，横幅图片使用 aspectFill 以移除边距，以及无数据时 news-card 不渲染。
 
@@ -16,7 +21,6 @@ Su Zhu Fang C 首页的 UI 调整：搜索框采用垂直渐变，横幅图片�
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：f12bdce7-635e-42f0-b034-e806a17e8c7e
-
 
 <!-- MEMORY_FIELDS
 {

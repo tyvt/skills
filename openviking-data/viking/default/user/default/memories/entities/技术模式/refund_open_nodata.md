@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:17:03+08:00
+verdict_note: 惠山 refundDetailTable.vue 仍保留 -key=currentMaintenanceObjectId，refundDetailDialog.vue 含 dialogForm watch immediate-true 且 --disabled 笔误已修正，修复属实。
+---
 # 返还明细弹窗首次打开无数据修复
 惠山G 项目 zhi1-web-admin 中返还明细弹窗因 `:key="currentMaintenanceObjectId"` 导致首次打开（挂载即打开）不触发 `@open`，`onOpen()` 不执行，`form` 为空；第二次打开 `visible` false→true 才正常显示。
 

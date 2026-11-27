@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:51:11+08:00
+verdict_note: 惠山二期G命中 downloadJson/downloadGet/buildingTable，src/api/index.js 补导出 downloadJson 属实。
+---
 # API 未导出 downloadJson 导致导入失败
 buildingTable/index.vue 和 project/index.vue 从 @/api 导入了 downloadJson，但 src/api/index.js 未导出它。
 

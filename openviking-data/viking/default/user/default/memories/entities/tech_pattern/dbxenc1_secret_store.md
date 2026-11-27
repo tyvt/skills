@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:45:53+08:00
+verdict_note: D-/DBX 实存；dbxenc1 存储机制技术记忆，无明文口令泄露，与现状无矛盾。
+---
 # DBX local secret store (dbxenc1)
 DBX desktop database client keeps connection passwords in an app-encrypted local store and only uses them internally, so its query tools never reveal them.
 

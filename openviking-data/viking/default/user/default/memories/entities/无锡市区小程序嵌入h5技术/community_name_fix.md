@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:14:23+08:00
+verdict_note: 无锡市区小程序嵌入H5 maintain/index.vue 含 resolveCommunityName 与 getHouseInfo，h5Context 存在，兜底修复属实。
+---
 # 维修资金页所属小区不显示修复
 维修资金页「所属小区」字段因仅从URL/store读取而小程序嵌入H5只传houseId致不显示，已增加接口与房屋列表兜底逻辑修复。
 

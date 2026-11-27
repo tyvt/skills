@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:48:54+08:00
+verdict_note: 苏州市房地产监测V3 keyExchange.js 命中 public-key(2)、publicKey(7)，security.js 命中 VITE_CRYPTO_ENABLED，公钥为空中止属实
+---
 # 后端公钥为空致前端启动中止
 后端 /security/public-key 返回空时，前端开启 VITE_CRYPTO_ENABLED 无法生成加密请求而中止启动仅留 Loading。
 

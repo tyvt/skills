@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:09:31+08:00
+verdict_note: 命中 AgencyPersonnelBasicInfoFormFields.vue 的 el-col--full-row 与 PersonnelBasicInfoLayout.vue 豁免规则，整行字段半宽修复属实。
+---
 # 共享布局兜底样式强制列宽致整行字段半宽
 苏州市房地产监测V3 中 `PersonnelBasicInfoLayout.vue` 兜底样式强制块内两列宽且未豁免整行字段，导致 `FORM_COL_FULL` 字段被压半宽。
 

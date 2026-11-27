@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:19:26+08:00
+verdict_note: 泰兴小程序 knowledge/index.vue、response.js、knowledgeCategory.js 均命中；extractArrayData/resolveCategory/viewCategory 命中，交互改 view @tap 方案属实。
+---
 # 知识库查看全部无响应因text点击未生效
 泰兴小程序知识库查看全部无响应因 viewCategory 解析失败静默 return，且交互误用 `<text @click>` 未触发。
 ## 问题根因

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:54:30+08:00
+verdict_note: 苏住房C uni.scss 已无 .page-not(.page-wrapper) 全局污染；残留 form2.scss-13 为 -deep(...-not(-last-child)) 深层选择器，非记忆所述全局伪类源头，模式成立。
+---
 # 微信小程序WXSS不支持:not()伪类
 苏住房C（uni-app Vue3）构建时微信开发者工具报wxss编译错误，根因为WXSS整类不支持:not()等伪类，需改写显式选择器或套容器承接样式。
 

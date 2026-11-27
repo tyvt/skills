@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:48:52+08:00
+verdict_note: 门户 Navbar.vue 命中 window.location.replace，与返回首页改 replace 的修复一致。
+---
 # 同站门户跳转缺陷（返回首页）
 顶栏「返回首页」跳同站点门户时，因使用 window.location.href 导致浏览器视为同页导航，表现为后退/无反应，需改用 replace 并同址时 reload。
 

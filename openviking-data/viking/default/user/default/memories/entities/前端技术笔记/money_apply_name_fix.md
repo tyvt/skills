@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:30:35+08:00
+verdict_note: 园区公共收益 formatters/index.js-205 有 subdistrictFormatter、mixins/area.js-20 有 communityFormatter，弹框中英文名称修复属实。
+---
 # 用款申请物业管理区域弹框街道社区名称修复
 修复园区公共收益项目用款申请「物业管理区域名称」弹框街道、社区列显示编码而非中文名称的问题。
 

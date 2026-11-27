@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T11:49:28+08:00
+verdict_note: 苏住房C pages_my/verification/FormManual.vue 中 verifyInfo=0、getUserInfo=0，onLoad 仅置 isLocal，未做证件信息快照；记忆所述 verifyInfo 快照修复在现状代码中不存在，描述与现状不符。
+---
 # 人工核验证件信息快照修复
 苏住房C小程序人工核验页（FormManual.vue）在提交时因 store 被清空导致证件信息丢失，已通过 onLoad 快照修复。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:52:32+08:00
+verdict_note: property/complex/index.vue 命中 export/导出，导出按钮在（JSON body 属运行时行为）。
+---
 # 复制页导出按钮须对齐正常页 JSON 请求体
 同源复制的物业管理区域导出页把入参按 query 串发送，而同一后端接口实际按 JSON body 取值，须以正常页格式为准收敛到 API 层。
 

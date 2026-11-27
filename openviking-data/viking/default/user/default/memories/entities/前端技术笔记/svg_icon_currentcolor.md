@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:44:53+08:00
+verdict_note: 在园区物管2.0仓源码命中核心符号(4/5)convertcolors,currentcolor,develop,svgicon，涉及文件存在，描述与现状一致，判有效。
+---
 # SVG 图标主题色失效根因
 svg-icon 图标颜色变成写死 #1990FF 不再跟随主题色，根因为 SVGO convertColors 插件在构建期改写源文件 fill="currentColor"。
 

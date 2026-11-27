@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:15:25+08:00
+verdict_note: 昆山市民命中 decisionRangeId、votedetail.vue、DetailTop、Screen，undefined URL 修复属实
+---
 # 列表缺字段致详情URL带undefined
 昆山市民表决列表未返回 decisionRangeId 却被拼入详情 URL 产生 undefined 致查无数据的 bug 根因与修复记录。
 

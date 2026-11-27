@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:44:05+08:00
+verdict_note: 记忆称全项目 <el-radio...label 结果为0；实机在 产品2.0 源码命中 288 处 <el-radio label=，其余仓库同样数百处，与描述矛盾。
+---
 # Element Plus radio label 迁移为 value
 zhi2-web-admin 已全量将 el-radio / el-radio-button 的选中值写法从 label 改为 value。
 

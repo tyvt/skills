@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:54:42+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src/api/autonomy.js 含 listByComplexIdAndStatus，倡议列表缺 complexId 接口属实
+---
 # 业主倡议列表缺complexId报请求异常
 苏住房C小区管理→业主提倡页面因缺失complexId调用接口失败报「请求异常」，兄弟页正常，已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:46:56+08:00
+verdict_note: CashsaleDetail/CashsaleInfoPanel/cashsaleConstants 实存；deliveryDate/deliveryDateDisplay/formatDateOnly/detailCallback 命中，日期显示修复属实。
+---
 # 预售转现售交付日期回显修复
 苏州市房地产监测V3 项目修复了预售转现售时「项目交付日期」不回显的问题，涉及 CashsaleInfoPanel.vue 等文件。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

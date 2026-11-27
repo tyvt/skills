@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:29:28+08:00
+verdict_note: 苏州市房地产监测V3 有 SubTableToolbar 组件、presale/permit/detail.vue 有 hide-headline，docs/common-errors.md 记载 CashsaleDetail 相关 UI 修复，描述与现状基本一致。
+---
 # 现售备案申请详情页 UI 修复
 苏州市房地产监测V3 现售备案申请详情页 UI 修复已完成，并顺带修复页签栏工具栏不刷新问题。
 

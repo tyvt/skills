@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:09:57+08:00
+verdict_note: 源码命中 Home_Suzhufang.vue 的 szf-scroll、page-body 包裹层及 disableScroll，描述与现状一致。
+---
 # 首页无法上下滚动修复
 苏住房C小程序首页因 `disableScroll: true` 且缺少高度限制导致无法滚动，已通过增加 `page-body` 包裹层修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:33:59+08:00
+verdict_note: 苏住房G complexManageType.js含NON_PROPERTY_SERVICE_TYPES与resolveComplexManageType系列，与动态busCode方案一致。
+---
 # 非物业服务小区变更记录审批流动态busCode
 在zhi2-web-admin中，非物业服务小区（211/212/213/214/215/22）的变更记录审批流按complexManageType动态取对应类型菜单的busCode，实现社区提交、街道审核的二级审批。
 

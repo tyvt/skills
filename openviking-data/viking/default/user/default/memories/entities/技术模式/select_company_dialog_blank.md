@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:51:10+08:00
+verdict_note: companyCancel/index.vue 命中 SelectDialog.open，弹窗改造在。
+---
 # 选择机构弹窗空白因未自适应高度
 在苏州市房地产监测V3中，原 `SelectCompanyDialog` 未随数据行数自适应高度导致机构注销选择弹窗空白，列表页「新增」改用 `SelectDialog.open` 打开弹窗并删除 `SelectCompanyDialog` 以消除空白。
 

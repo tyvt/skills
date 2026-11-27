@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:54:21+08:00
+verdict_note: 描述与现状不符：Home_Suzhufang.vue pickBannerImg(189-191) 仅识别 iconPath/bannerImg/img/image，不含 pictureUrl，且无 normalizeBannerItem 函数；所述 pictureUrl 映射与统一映射未落地。
+---
 # 首页 banner 数据映射错误
 小程序 Su Zhu Fang C 曾优先使用本地配置 homeBanner，且 pickBannerImg 未识别 pictureUrl 等字段；已在 Home_Suzhufang.vue 中统一映射。
 
@@ -18,7 +23,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：5b209d2f-cd82-4005-8b65-1e07b8e31017
-
 
 <!-- MEMORY_FIELDS
 {

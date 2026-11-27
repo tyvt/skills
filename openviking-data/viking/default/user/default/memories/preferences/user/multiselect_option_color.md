@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:15:23+08:00
+verdict_note: OPTION_NAME_COLOR/optionNameColorClass 仅命中记忆迁移归档报告，全仓源码 0 命中，无法证明有效。
+---
 - Multi-select topics (optionType '1') must not hardcode option name color as `color-333` in `ViewOptionsList.vue`; single-select colors dynamically by option name, and the hardcoded value made waiver show dark gray
 - Use a template dynamic class via `OPTION_NAME_COLOR` mapping and `optionNameColorClass` function returning the corresponding font color class (e.g. `font-color-ed9e0f`)
 

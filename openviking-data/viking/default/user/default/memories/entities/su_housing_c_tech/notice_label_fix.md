@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:42:06+08:00
+verdict_note: 苏住房C publicNotice.vue-63 title 使用 options.label||'双晒'，印证跳转带 label 后详情页直接作标题
+---
 # 公告列表跳转详情标题错误修复
 苏住房C 小程序 `publicNotice.vue` 列表传了 `noticeLabel` 但详情跳转未带 `label`，导致详情页显示默认标题，已修复。
 

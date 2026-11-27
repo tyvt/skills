@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:16:01+08:00
+verdict_note: 苏州V3 6个详情组件文件命中，边框统一属实。
+---
 # DetailTemplate无边框仅去外框留网格线
 苏州市房地产监测V3 中 detail-template 的 no-border 修饰仅去外框，弹窗恢复默认 border 保留分隔线。
 

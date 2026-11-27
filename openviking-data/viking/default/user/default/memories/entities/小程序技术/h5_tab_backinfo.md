@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:41:04+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src/utils/appNavigation.js 存在，含 backInfo/navigateBack/switchTab 拦截
+---
 # APP内嵌H5回到tab页统一转交原生backInfo
 苏住房C移动端H5内嵌原生APP时，所有回到H5同名tab页的跳转/后退须收口转交原生backInfo，避免看到「第二套tab」。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:48:18+08:00
+verdict_note: 产品2.0 spFeeBill 详情组件实存 isBaseFieldReadonly 计算属性，四类账单共用结构属实。
+---
 # 页内编辑态折叠成只红框字段可编辑
 物业服务费账单详情组件通过抽 isBaseFieldReadonly 谓词统一门控只读字段，不在模板逐字段写 disabled。
 

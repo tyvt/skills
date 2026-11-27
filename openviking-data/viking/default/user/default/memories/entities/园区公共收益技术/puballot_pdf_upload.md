@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:19:11+08:00
+verdict_note: 园区公共收益 zs-file-upload.vue 含 accept/pdf/toLowerCase/MIME 双重校验，PDF 上传修复属实（方法名 isAllowedFileType 未命中但校验逻辑在）。
+---
 # 资金拨付详情PDF上传修复
 园区公共收益项目资金拨付详情页「上传支付凭证」无法上传 PDF 的问题已修复，涉及 zs-file-upload 组件与 pubAllotNotice/detail.vue。
 

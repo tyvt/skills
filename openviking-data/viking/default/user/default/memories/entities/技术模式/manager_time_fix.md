@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T17:34:45+08:00
+verdict_note: 苏住房G propertyManager/detail.vue含tmfPropertyWorker、createTime/updateTime、setStaff、response.data，与时间字段覆盖修复一致。
+---
 # 物业管家详情页时间字段被覆盖修复（苏住房G）
 苏住房G 项目 propertyManager/detail.vue 修复物业管家详情页创建/更新时间显示错误问题。
 
@@ -18,7 +22,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
 - 所属项目：苏住房G；来源会话ID：d3762f0d-f15f-422b-9579-d05d71e9fa27；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

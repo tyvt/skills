@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T15:43:08+08:00
+verdict_note: 实机读 RegisterPageHeader/index.vue：为静态横幅图+props title/pageTitle，无 mapState/platformConfig/displayPlatformName/sysLogo/resolveServerAssetUrl；git 亦无相关历史，记忆描述与现状不符。
+---
 # 注册页顶栏从系统配置读取图标与名称
 苏州市房地产监测V3 中 `RegisterPageHeader/index.vue` 通过 Vuex `mapState` 读取 `platformConfig` 动态绑定名称与 LOGO。
 

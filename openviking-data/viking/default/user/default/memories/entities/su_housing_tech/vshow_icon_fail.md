@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:43:59+08:00
+verdict_note: 苏住房C 实存 transaction.js、facility/detail.vue 与 facilityCategory 可选链修复，描述一致。
+---
 # v-show未阻模板求值致空数组取icon报错
 苏住房C移动端详情页根节点v-show不阻止模板求值，facilityCategory初始空数组致首屏访问.icon报错。
 

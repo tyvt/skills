@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:54:20+08:00
+verdict_note: 苏住房C 实存 message.vue 与 My_Suzhufang.vue，消息列表滚动修复属实。
+---
 # 苏住房C消息列表滚动修复
 消息列表页「管理」和「筛选」原固定顶部，已改为随列表一起滚动，底部操作栏仍固定。
 

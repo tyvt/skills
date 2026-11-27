@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:26:05+08:00
+verdict_note: 所述产品2.0 communityStatistics.vue等仅echarts.init，4169个vue全库无getInstanceByDom/dispose，与记忆批量复用修复描述不符。
+---
 # Web chart repeated init: reuse via getInstanceByDom plus single resize bind plus dispose
 Warning `There is a chart instance already initialized on the dom` comes from mounted and watch(dataList/setOption) calling drawCharts() many times, each doing echarts.init(dom) and binding resize with an anonymous function (cannot remove).
 
@@ -17,7 +22,6 @@ Warning `There is a chart instance already initialized on the dom` comes from mo
 - 所属项目：2-0
 - 验证证据：extracted source=cursor project=2-0
 - 来源会话：2a9f420a-f2ff-426a-a5c2-7881713c1a52
-
 
 <!-- MEMORY_FIELDS
 {

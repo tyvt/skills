@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:47:25+08:00
+verdict_note: 标注项目bugfix、证据src=bugfix/001.md，含'自动修正75个文件'等一次性过程数据；产品2.0中richtext仍有大量命中，'错配已清空'与现状不符。
+---
 # zs-textarea 的 richtext 类型不正确
 同文件存在 zs-textarea 且展示配置中 label 为 '备注'、type 为 'richtext' 时，应将 type 改为 'textarea'；真正的富文本场景（如 zs-editor）保持不变。
 

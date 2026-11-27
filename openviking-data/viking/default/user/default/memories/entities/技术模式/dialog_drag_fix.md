@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:48:53+08:00
+verdict_note: 苏州V3 zs-dialog.vue/drag.js 命中 dialogDragEnabled/getBoundingClientRect，弹窗撑满修复与后续跟进属实
+---
 # v-dialogDrag弹窗撑满修复
 苏州市房地产监测V3 中 `v-dialogDrag` 指令导致弹窗被拉满全屏，已修复为居中且可选关闭拖拽。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:15:33+08:00
+verdict_note: 园区公共收益 layout/index.vue 含 syncProjectDialogVisibility/operableProjectList/暂无可用物业管理区域，空区域不弹窗修复属实。
+---
 # 空物业管理区域不弹窗修复
 园区公共收益项目修复 `zhi2-web-admin/src/layout/index.vue` 登录后无物业管理区域时弹出无法关闭选择弹窗的问题。
 

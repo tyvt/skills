@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:21:57+08:00
+verdict_note: ALL_ORDER_STATUS 常量在真实项目代码未命中（仅迁移归档命中），核心修复常量无法证实。
+---
 # el-tab-pane empty name breaks orderStatus param
 Setting el-tab-pane :name to empty string is illegal in Element UI and makes the bound orderStatus become index 0, breaking query params.
 
@@ -28,7 +33,6 @@ Setting el-tab-pane :name to empty string is illegal in Element UI and makes the
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：896a4167-b34c-4afa-9eed-b4e49624b8d5
-
 
 <!-- MEMORY_FIELDS
 {

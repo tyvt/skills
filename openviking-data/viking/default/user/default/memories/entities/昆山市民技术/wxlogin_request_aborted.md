@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:15:25+08:00
+verdict_note: 昆山市民 getInfoByCode/loginWithWxCode/wxLogin 命中，微信登录接口存在，描述属实
+---
 # 微信登录请求被中途取消
 昆山市民小程序微信登录调用 getInfoByCode 报错 MiniProgramError: Request aborted，属请求被取消而非业务错误。
 

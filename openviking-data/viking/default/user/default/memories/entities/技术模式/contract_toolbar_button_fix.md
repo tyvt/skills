@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:14:51+08:00
+verdict_note: 苏州市房地产监测V3 presale/contractView(16)/contractView(18)/plain(176)命中，工具栏按钮修复目标存在。
+---
 # 预售合同签订列表工具栏按钮颜色修复
 苏州市房地产监测V3 中预售/现售签订列表与合同撤销列表工具栏按钮去掉 plain 样式，统一实心配色。
 

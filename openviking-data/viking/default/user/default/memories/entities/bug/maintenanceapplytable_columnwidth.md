@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-27T05:13:45+08:00
+verdict_note: 园区物管2.0 maintenanceApplyTable.vue 命中 applyOperateColumnWidth，operationColumnWidth 已无，改名修复属实
 ---
 # maintenanceApplyTable operationColumnWidth 声明冲突修复
 园区物管2.0（zhi2-web-admin）中 `maintenanceApplyTable.vue` 因 `data` 与 `computed` 同名 `operationColumnWidth` 触发 Vue warn。

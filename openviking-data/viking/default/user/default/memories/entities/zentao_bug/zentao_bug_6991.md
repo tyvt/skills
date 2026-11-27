@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:11:56+08:00
+verdict_note: HistoryRefundNoticeDialog.vue 命中 zs-search-form 与 queryParams，与禅道6991根因及修复描述一致。
+---
 # 禅道缺陷 6991
 禅道缺陷 6991「选择历史退款通知书」弹窗位于账户退款申请详情页：2026-11-25 完成属性与布局修复验证、子模块和父仓推送、禅道带图回写及产物清零，链路终止。
 

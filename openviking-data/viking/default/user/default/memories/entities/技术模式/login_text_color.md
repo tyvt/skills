@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:51:08+08:00
+verdict_note: 园区物管2.0 命中 loginBottomTextColor(3)、el-color-picker(2)、platformConfig，与底部文字颜色动态化一致。
+---
 # 登录页底部文字颜色动态化
 园区物管2.0 登录页底部版权文字颜色支持通过平台配置动态设置，未配置时回退默认。
 

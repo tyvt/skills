@@ -1,0 +1,23 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-6c843ae9-1323-4915-81d9-79c0cf9953bb/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-27T04:02:51.249655+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_7043.md",
+                "memory_type": "entities",
+                "after": "# ZenTao Bug 7043\nZenTao bug 7043 是防汛大屏热力图在选中姑苏区时越过行政区边界、外溢到虎丘/相城/吴中的页面缺陷，2026-11-27 完成根因定位与裁剪实现后因 P0 强制交接停在实机验证门前，尚未提交、推送与回写禅道。\n\n## 工单与症状\n- 链接 http://zentao-biz.zhi.com/index.php?m=bug&f=view&bugID=7043；type=Page，严重度 4，由 lichandan 提出，指派 tiany，状态 active。\n- 症状：防汛大屏选「姑苏区(全区)」时，热力图红色热力圈越过姑苏边界，溢到虎丘/相城/吴中。\n- 用户确认采用「裁剪热力到所选区边界」方案，并要求提交推送并回写禅道。\n\n## 根因与方案\n- `HeatMapPanel.vue` 用 ECharts `type:'heatmap'`（`pointSize:46, blurSize:62`）做高斯扩散，热力按画布矩形渲染，不按行政区多边形裁剪。\n- `activeDistrict` prop 虽传入但 `render()` 完全未使用，选姑苏区后地图仍画全市，热力自然外溢。\n- 方案：对热力专用 zlevel 2 画布应用 CSS `clip-path` 多边形，由选中区 GeoJSON 经 `convertToPixel` 计算；已核实 zlevel 2 仅含热力层（geo=0、effectScatter=3、label=4）。\n- 姑苏区为单环无内孔，裁剪路径正确；实现中确认 GeoJSON 原生环绕方向可用 nonzero 填充处理内孔，并遍历 MultiPolygon 所有外环。\n- 计划审核 86/100 无 P0，sha256 `094bdaec…44bfe0d48`；3 个 P1 为实施细节（确认 zlevel 2 仅含热力、外环+内孔处理、裁剪重算放在 setOption/resize 之后），无需再问用户。\n\n## 实施与验证\n- 已完成：`HeatMapPanel.vue` 裁剪实现、错误台账更新、eslint exit 0、`npm test` exit 0、构建 exit 0（46s，job `bash-e086e3b9db844cfc`）。\n- 浏览器验证打开防汛大屏时页面跳转到登录页，需验证码 base64 OCR 登录后切换姑苏区核对热力不外溢。\n- 累计等效成本 1.08M 越过 1.00M 交接档位（mid，上限 10 跳）触发 P0 强制交接，本会话停手。\n\n## 交接与待办\n- 交接文档 `HANDOFF-CHAIN-bug7043-heatmap-clip-hop1-20261127-1201.md`（9 节完整，含 chain_id/hop/maxHops）；下一跳 `schedule-52199989-bb5e-4dd3-a0fa-d0948fca8a2c` 于 12:01:49 投递新会话 `session-e0dc60d1`，prompt 含文档路径 + 第 9 节 + chain 元信息 + 目标。\n- 待办：实机登录 → 切姑苏区验证热力不外溢 → 出截图请用户确认 → 提交推送 + 回写禅道 + 清理产物。\n- 遗留后台 job `bash-a6a99fb092174854`（browser open）由下一跳收集/停掉。"
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 1,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

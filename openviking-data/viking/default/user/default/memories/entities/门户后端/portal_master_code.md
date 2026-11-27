@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:47:41+08:00
+verdict_note: 实机核对：门户后端 AppLoginServiceImpl.java(142-144) 明确「万能验证码模式」+T_PORTAL_CONFIG 注释，PortalConfigService 存在，T_PORTAL_CONFIG 见 V2.6.2-init.sql；配置驱动机制属实。
+---
 # 门户后端万能验证码模式
 门户后端（Java）支持万能验证码（master code）联调模式，由配置驱动，无需改源码；分支 feature/feat-dzc-261111 提交 484848e「固定短信验证码（联调用）」实现。
 

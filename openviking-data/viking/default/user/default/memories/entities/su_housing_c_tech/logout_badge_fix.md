@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:18:55+08:00
+verdict_note: 苏住房C My_Suzhufang.vue 命中 messageBadge/unreadCount，注销角标清零修复属实
+---
 # 注销账号后消息角标未清除修复
 苏住房C 小程序「我的」页在注销账号后，「消息」入口未读角标未清零，已通过三处改动修复。
 

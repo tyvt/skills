@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:50:11+08:00
+verdict_note: .eslintrc.cjs 与 eslint-rules 含 zs-dialog-form-layout、prefer-zs-components 规则，属实
+---
 # 表单弹窗用 form-layout 收敛为单双列两档宽度
 苏州市房地产监测V3 的 zhi2-web-admin 将 412 个表单类弹窗收敛，389 个复用 form-layout（117 双列 + 272 单列），36 个左树豁免。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:48:34+08:00
+verdict_note: 门户含unified-login-menu-more-wrap及ExternalInfoDialog.vue，弹窗flex居中修复属实。
+---
 # 门户更多弹窗Flex居中
 对外首页商品房「更多」弹窗因 wrapper 非 flex 导致 margin:auto 把对话框顶到页顶，需用 flex 居中修复。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

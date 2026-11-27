@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:57:58+08:00
+verdict_note: 产品2.0 styles/index.scss 实存 operation-hint 全局类及 padding 设置，与描述一致。
+---
 # padding-top inline 导致的不均匀间距
 关于使用 padding-top inline 且无下边距导致未对齐的提示文本的技术规范。
 ## 问题根因
@@ -12,7 +17,6 @@
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：95de17f2-76c3-4cab-884c-27a0549a0793
-
 
 <!-- MEMORY_FIELDS
 {

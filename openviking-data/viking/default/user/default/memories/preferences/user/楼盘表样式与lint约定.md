@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:51:12+08:00
+verdict_note: 多仓 buildingTable/index.vue 使用 .building-container，均无 -has(> .building-detail) 选择器；描述的 -has 改动无对应代码。
+---
 - 楼盘表去除 `.building-container` 局部滚动并改用 `.detail-container:has(> .building-detail)` 时，全局 `> .building-detail` 须收窄为 `.building-container` 避免误伤其他详情页。
 - 图例 `.status` 绝对定位与固定 `padding-top: 40px` 换行会压住表头或阻挡点击，需警惕。
 - ESLint 须用 `npx eslint src/views/projectManagement/buildingTable/index.vue` 单文件校验。

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:46:43+08:00
+verdict_note: 苏住房C存在 pages_owner/house/verify.vue，命中「不动产权第」「placeholder-class」「22rpx」，两行布局约定属实。
+---
 # 小程序年-字-号组合输入框排版约定
 苏住房C不动产权证号输入区反复排版错乱，最终约定放弃flex-wrap改固定两行结构。
 

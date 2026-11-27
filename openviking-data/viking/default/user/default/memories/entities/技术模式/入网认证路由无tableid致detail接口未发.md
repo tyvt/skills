@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:42:15+08:00
+verdict_note: 苏州市房地产监测V3 中 getEntryNetworkDetail 与 entryNetwork/detail 在 6 个 vue 文件命中，入网认证详情补调接口属实
+---
 # 入网认证路由无tableid致detail接口未发
 入网认证路由缺少 tableid 导致详情接口未请求，页面显示异常，已通过判页调接口修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:48:11+08:00
+verdict_note: 苏州市房地产监测V3 命中 APPENDIX_EMPTY_IMAGE_SIZE(2)、APPENDIX_EMPTY_DESCRIPTION(3)，缺省图统一属实
+---
 # 要件上传缺省图统一
 苏州市房地产监测V3 已完成「要件上传」缺省图统一，查看态与编辑态均为 56px、文案「暂无附件」。
 

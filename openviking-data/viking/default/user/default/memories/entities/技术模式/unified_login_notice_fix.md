@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:13:16+08:00
+verdict_note: 门户 UnifiedLogin.vue 命中 externalInfo 公示接口，修复方向属实
+---
 # UnifiedLogin 公示区与 Tab 修复
 UnifiedLogin 公示区无数据且 Tab 缺失的修复已完成，本机验证 Tab 切换与公告列表正常。
 

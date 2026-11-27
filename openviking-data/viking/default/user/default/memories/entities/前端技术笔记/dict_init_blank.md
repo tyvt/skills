@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:55:19+08:00
+verdict_note: assetLease.vue 在产品2.0/园区物管2.0 等仓 statisticsMap 下存在，字典初始化修复对象属实。
+---
 # assetLease.vue字典初始化与切换按钮修复
 资产租赁页 assetLease.vue 存在资产类型列空白及顶部切换按钮未传资产类型重新请求接口的问题，已在会话 6baca9f8 中修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:54:51+08:00
+verdict_note: 苏住房C 实存 MenuImage.vue 与 virtualHost，scoped 约束子组件方案属实。
+---
 # Scoped style cannot constrain child component
 In the WeChat mini-program, parent scoped or :deep() styles cannot reliably constrain sizes of child components like MenuImage, causing icons to fill, so child must manage its own size.
 
@@ -26,7 +31,6 @@ In the WeChat mini-program, parent scoped or :deep() styles cannot reliably cons
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：fd31d266-ac37-45f4-a828-8a29b307c443
-
 
 <!-- MEMORY_FIELDS
 {

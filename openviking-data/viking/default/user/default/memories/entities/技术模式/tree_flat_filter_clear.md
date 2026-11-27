@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:17:18+08:00
+verdict_note: RegionTreeLayout.vue 含 clearFlatModeQueryParams、syncListParentDeptFilter、flatOnlyFields，一致。
+---
 # 树状平铺双模式切换需清理专属筛选字段
 楼盘/项目列表页树状与平铺模式共用queryParams时，切换模式须清理对方专属筛选字段以防残留。
 

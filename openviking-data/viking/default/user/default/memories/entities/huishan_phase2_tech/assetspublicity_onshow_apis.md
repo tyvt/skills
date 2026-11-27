@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:46:57+08:00
+verdict_note: 惠山二期H5 assetsPublicity/index.vue loadData 含 getProjectAssetInfo、getProjectAssetChargeStandard、benefit_pay_type 三接口，属实。
+---
 # assetsPublicity 页面 onShow 并行请求三接口
 惠山二期H5 中 assetsPublicity/index.vue 在 onShow 时通过 loadData 并行请求 3 个接口查询资产与收费信息。
 

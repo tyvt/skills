@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:27:18+08:00
+verdict_note: profile.js 引用 passwordEncrypt，后者 import crypto-js 做 AES 加密；updateProfilePwd/encryptPassword 命中
+---
 # 惠山二期G改密加密修复
 惠山二期G的system/profile/updatePwd接口密码加密问题已修复，改用npm crypto-js在API层统一加密。
 ## 问题原因
@@ -12,7 +17,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=惠山二期G
-
 
 <!-- MEMORY_FIELDS
 {

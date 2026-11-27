@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:20:25+08:00
+verdict_note: 苏住房G 命中 getRouterPathByFilePath、saveBizStateOption、indemnity/components/enums.js，筛选默认态属实
+---
 # 已备案列表默认筛选分清两套值源
 苏住房G项目把行业管理/项目管理/业主自治模块列表默认筛选设为已备案，需分清 BIZ_STATE 常量与全局 biz_state 字典。
 

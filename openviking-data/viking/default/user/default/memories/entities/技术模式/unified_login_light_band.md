@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:08:56+08:00
+verdict_note: 门户 zhi2-web-admin/src/views/home/UnifiedLogin.vue 命中 guide-ring-angle 与 mask-composite，conic-gradient 光带实现与记忆一致。
+---
 # UnifiedLogin引导卡白色环绕光带
 在门户 UnifiedLogin 引导卡上实现沿边框跑动的白色光带，采用 conic-gradient 加双层 mask 抠出 1px 环。
 

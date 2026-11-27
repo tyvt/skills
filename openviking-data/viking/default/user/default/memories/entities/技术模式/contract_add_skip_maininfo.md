@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:46:49+08:00
+verdict_note: 苏州V3 contract/index.vue getDetail 现仅 518(缺码兜底)/576(详情查看)两处 getContractMainInfo，add 冗余补拉已删，符合记忆
+---
 # 签订新增模式移除补拉合同主信息请求
 苏州市房地产监测V3 中 contract/index.vue 的 getDetail() 删除 add 模式带 contractId 时补拉 getContractMainInfo 的冗余代码块。
 

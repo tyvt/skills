@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:42:18+08:00
+verdict_note: 苏州市房地产监测V3 e2e 中 register-helpers.js 及 input[placeholder=请输入联系人] 定位实测存在
+---
 # 由于与 Step1 表单不一致导致的注册 e2e 定位失败
 在苏州 V3 房地产监测系统的注册 e2e 测试中，`register-helpers.js` 的 Step1 定位与表单不一致，导致无法找到元素。
 

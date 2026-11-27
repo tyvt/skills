@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:51:02+08:00
+verdict_note: 实机核对：V3 developerBasicInfoContent.js(94) buildOfficeContentInfo、FORM_COL_WIDE、detailLayout.js FORM_COL_TWO、detail-template.vue(680) normalizeDetailSpan 均在；办公地址列宽调整属实。
+---
 # FORM_COL_TWO 转换为 span8 占据 1/3 宽度
 在项目 苏州市房地产监测V3 中，`FORM_COL_TWO` (span=12) 在 `DetailTemplate` 内被 `normalizeDetailSpan` 转换为 span=8，仅占据 1/3 的宽度。
 

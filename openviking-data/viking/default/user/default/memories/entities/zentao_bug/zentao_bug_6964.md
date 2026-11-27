@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:44:01+08:00
+verdict_note: 新禅道DB-bug6964 zt_action id=99510由tiany于2026-11-25 resolved，resolution=fixed，与记忆一致。
+---
 # ZenTao Bug 6964: blank signatures in rectification task PDF
 ZenTao bug 6964 was closed on 2026-11-25 after confirming that the required backend signature-in-PDF fix had already been merged for duplicate bug 6911.
 
@@ -27,7 +32,6 @@ ZenTao bug 6964 was closed on 2026-11-25 after confirming that the required back
 - UPDATE zt_bug set status=resolved, resolution=fixed, resolvedBy=tiany, resolvedBuild=trunk, assignedTo=lichandan.
 - INSERT zt_action created id=99510 with 14 columns and a 717-character HTML comment covering root cause, fix, bug 6911 relation, and verification; transaction committed and verified.
 - Final state: bug 6964 status=resolved, resolution=fixed, action record 99510 exists; process artifacts were cleaned and the chain terminated at hop=1.
-
 
 <!-- MEMORY_FIELDS
 {

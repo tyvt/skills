@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T23:43:37+08:00
+verdict_note: 声称zhi2-web-admin/tests/e2e/login.spec.js-15与playwright.config.js，园区物管2.0/苏住房G/苏州V3均无该文件，无法证实。
+---
 # Playwright相对路径缺baseURL报错
 在 zhi2-web-admin 的 Playwright E2E 测试中，beforeEach 里 page.goto('/#/login') 因未配置 baseURL 报 Cannot navigate to invalid URL。
 ## 问题原因

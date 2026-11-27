@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:49:54+08:00
+verdict_note: 实机核对：产品2.0 candidateCollect/components/detail.vue(82) isShowPublishButton、PREPARATORY_GROUP 常量与 candidateCollect 组件均在；发布按钮显隐逻辑属实。
+---
 # 候选人征集详情页发布按钮显隐逻辑
 在产品2.0的candidateCollect/detail.vue中调整发布按钮显示条件，使筹备组受isShowPublishButton控制，其他类型走通用条件。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:12:33+08:00
+verdict_note: 园区公共收益 layout/index.vue 命中 syncProjectDialogVisibility/operableProjectList，空列表不弹窗属实
+---
 # 空物业管理区域列表不弹窗改提示
 operableProjectList 返回空数组时原强制弹无法关闭选择弹窗，改为置否且不打开并给 warning 提示。
 

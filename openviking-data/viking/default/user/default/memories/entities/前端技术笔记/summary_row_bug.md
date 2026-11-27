@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:53:36+08:00
+verdict_note: 园区物管2.0 evaluation/companyReport/components/detail.vue 含 table-section + zs-table，合计行宽度问题结构属实
+---
 # 合计行与表格宽度不一致（全局 padding）
 园区物管2.0 中合计行写在 table-section 下，不继承 zs-table-container 的左右 padding，导致比表格宽 24px。
 

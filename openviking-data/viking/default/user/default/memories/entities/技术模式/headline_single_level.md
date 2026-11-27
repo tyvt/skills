@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:23:30+08:00
+verdict_note: specialcontract/detail.vue 与 contractTable.vue 在苏州市房地产监测(V3)存在并命中
+---
 # 合同详情标题层级扁平化
 苏州市房地产监测V3 的 `specialcontract` 模块将父 Headline 套子 Headline 改为子表组件独占一个 Headline，按钮上移。
 

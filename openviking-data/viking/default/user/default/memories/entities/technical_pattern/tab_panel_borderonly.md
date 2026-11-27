@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:10:12+08:00
+verdict_note: 苏州市房地产监测V3/Headline/index.vue 存在 borderOnly prop，PermitInfoPanel、PresaleBuildingSection 命中，与描述一致
+---
 # Tab Embedded Panel Must Use borderOnly to Avoid Title Duplication
 In 苏州市房地产监测V3 project, Tab embedded detail panel downgraded to div loses border and duplicates title; Headline adds borderOnly prop.
 
@@ -18,7 +23,6 @@ In 苏州市房地产监测V3 project, Tab embedded detail panel downgraded to d
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：7449fdc3-42d5-42b0-88b6-d6daed5dc2cd
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:52:55+08:00
+verdict_note: 描述与现状不符：产品2.0 src 全目录无 defineAsyncComponent（34 async src- none），home/index.vue(160) 仍为 GuideSettingDialog-()=>import(...)：Vue3 异步组件迁移未落地。
+---
 # 异步组件改用 defineAsyncComponent
 产品2.0 前端全局将 `components: { Xxx: () => import('...') }` 写法迁移为 Vue 3 的 defineAsyncComponent 形式。
 

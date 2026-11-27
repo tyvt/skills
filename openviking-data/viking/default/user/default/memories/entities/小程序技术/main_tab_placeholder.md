@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:14:48+08:00
+verdict_note: 苏住房C 主包 src/static/images/szf/default.png 存在，houseCard.vue 用 thumbnail||imageUrl 映射(L222)，env/mp.js 含 https-//szfang.szfcweb.cn，核心描述属实。
+---
 # 主包Tab兜底占位图须放主包static否则空白
 苏住房C苏找房「全部」Tab二手房卡片因默认图放分包未预加载而整块空白，非默认图缺失。
 

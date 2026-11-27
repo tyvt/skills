@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:16:43+08:00
+verdict_note: 苏州V3 AgencyBranchDetail.vue 存在，自动保存流程主体文件属实（agencyBranch.js 路径已变更）。
+---
 # 分支机构详情保存流程调整
 苏州市房地产监测V3 项目按「主机构备案后后端自动备案」调整了 `AgencyBranchDetail.vue` 的保存流程，去掉提交/审批前端逻辑。
 

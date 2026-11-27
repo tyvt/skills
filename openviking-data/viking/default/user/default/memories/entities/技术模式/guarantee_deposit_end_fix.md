@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:47:46+08:00
+verdict_note: 产品2.0 无 guaranteeDepositAgreementEnd 前端文件（仅 estate-manage 有后端 Controller/Domain），所述前端终止页修复无代码证据。
+---
 # 房屋质量保证金协议终止页修复
 产品2.0 项目修复房屋质量保证金协议终止（add 模式）页面数据未加载与路由错误问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:20:43+08:00
+verdict_note: 园区物管2.0 sign.js/vite.config.js 命中；shouldApplySign/SIGN_API_BASE/nonce 均命中 sign.js，外链不加签修复属实（pr.map.qq.com 域名未硬编码属正常）。
+---
 # 全局签名脚本误加签致地图CORS报错
 园区物管2.0 中 public/assets/js/sign.js 全局改写请求并给外部链接误加签，导致腾讯地图统计请求触发 CORS 预检失败。
 

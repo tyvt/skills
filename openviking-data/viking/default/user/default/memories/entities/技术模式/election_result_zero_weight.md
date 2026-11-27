@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:47:49+08:00
+verdict_note: 太仓一网通办H5命中 weightSocreRatio/optionGroupResultList/getCalculationChart/GroupResult，得票权数修复属实。
+---
 # 业委会选举结果统计候选人得票权数显示0
 太仓一网通办H5 的业委会选举表决结果页因数据来源与字段计算错误，导致候选人得票权数统计显示为0。
 
@@ -14,7 +19,6 @@
 - 验证证据：extracted source=cursor project=太仓一网通办H5
 - 涉及文件：src/views/election/components/GroupResult.vue、src/views/election/ElectionResult.vue、src/views/decision/components/ProgressBar.vue、src/views/owner-decision/components/ResultStatisticsTab.vue
 - 所属项目：太仓一网通办H5；来源会话：fa7fcf41-4dd6-479b-95dc-fc0517ba9715；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

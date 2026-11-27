@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:49:42+08:00
+verdict_note: feeDeclare2/index.vue 未命中 minmax(160px/el-input-group，列宽比例化修复未印证。
+---
 # 弹窗表格列宽比例化
 苏住房G 申报缴费信息弹窗内表格写死像素列宽，弹窗加宽后不拉伸、右侧留白、金额输入框偏窄。
 

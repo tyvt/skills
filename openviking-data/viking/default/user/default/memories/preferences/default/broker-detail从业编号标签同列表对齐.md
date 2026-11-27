@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:17:09+08:00
+verdict_note: 门户 BrokerPages.vue 存在 { ...defaultProfile, ...record } 与 profile.code(L80)，brokers.js 含 netSignAuth，字段映射描述属实。
+---
 - broker-detail 的 profile 经 `{ ...defaultProfile, ...this.record }` 合并，record 含列表完整行，字段映射须对齐 brokers.js 与 mock 数据。
 - 「从业编号」绑定 profile.code 时标签同列表「人员编号」一致。
 - netSignAuth 为空时处理空白渲染。

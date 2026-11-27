@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:45:24+08:00
+verdict_note: 园区物管2.0 complexMeterRecordDialog.vue 存在且当前无 -border=false，与移除该属性修复一致
+---
 # 仪表记录弹窗误设 border 致详情无边框
 园区物管2.0 仪表记录明细弹窗详情表单因误设 :border="false" 而无边框。
 
@@ -14,7 +19,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:50:52+08:00
+verdict_note: 苏住房G 命中 VoteRangeDialog/CandidateConfigTable/v-if=bizState==0/decisionOptionId/getQueryParams，候选人配置投票范围修复属实。
+---
 # 选项表决线下投票录入勾选修复
 苏住房G 业主决策-选项表决模块中，线下投票录入时因勾选列被 bizState 条件限制导致无法选择，已完成修复。
 

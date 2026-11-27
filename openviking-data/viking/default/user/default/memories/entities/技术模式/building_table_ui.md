@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:15:21+08:00
+verdict_note: 含buildingTableStatus/BuildingTableGrid/predictFloorArea，楼盘表UI改造属实。
+---
 # 参考设计图修改楼盘表UI
 苏州市房地产监测V3 中楼盘表页面已按两张设计图改完，图表与列表视图均用真实组件配假数据验证通过。
 

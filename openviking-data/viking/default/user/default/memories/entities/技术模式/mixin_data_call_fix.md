@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:40:00+08:00
+verdict_note: 苏州市房地产监测V3 zhi2-web-admin/src/mixins/table.js-234 实测 this.$options.data.call(this).queryParams
+---
 # 全局Mixin重置this.$options.data调用修复
 苏州市房地产监测V3 修复了 mixin 及多处直接调用点中 `this.$options.data()` 未绑定组件实例的高风险问题。
 

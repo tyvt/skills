@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T05:50:27+08:00
+verdict_note: completion-acceptance.vue 命中验收意见与 info-card，意见并入卡片在。
+---
 # 验收意见并入信息卡片
 泰兴小程序 completion-acceptance.vue 已将「验收意见」并入上方信息卡片，不再单独分块。
 
@@ -14,7 +18,6 @@
 - 涉及文件：src/pages_maintain_project/completion-acceptance.vue、final-cost-detail.vue、apply-detail.vue、maintainProject.js、pages.json、object-detail.vue
 - 来源会话ID：1001f03a-2149-436d-91f2-135277c72900
 - 代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

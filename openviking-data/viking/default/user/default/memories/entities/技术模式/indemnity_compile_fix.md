@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:12:10+08:00
+verdict_note: 产品2.0 cardData.vue 等命中，el-icon-top/bottom、var(--primary-color) 命中，编译修复属实。
+---
 # 理赔首页编译问题修复
 产品2.0 理赔首页（indemnity/homePage）组件因缺失图片资源和未定义 Sass 变量导致构建失败，已修复至 `npm run build` 退出码 0。
 

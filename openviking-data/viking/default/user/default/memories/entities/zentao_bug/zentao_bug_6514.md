@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:52:33+08:00
+verdict_note: 实机核对：V3 utils/mapQxtEntInfo.js(70) QXT_PREFILL_ONLY_FIELDS 含 registeredAddress，common-errors.md(426-427) E-051 登记；GIS 死锁解锁修复属实。
+---
 # 禅道 Bug 6514
 经纪机构注册工商提取后 GIS 校验死锁，2026-11-13 修复并回写禅道 resolved/fixed。
 

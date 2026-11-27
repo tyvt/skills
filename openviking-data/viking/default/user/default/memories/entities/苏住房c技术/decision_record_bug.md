@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:49:10+08:00
+verdict_note: 苏住房C 实存 DecisionResult.vue、CardList.vue，决策记录缺陷修复描述一致。
+---
 # 决策记录列表只显示时间
 苏住房C投票决策记录列表因enrich覆盖与CardList槽位错位，只显示时间看不到决策者和选项。
 

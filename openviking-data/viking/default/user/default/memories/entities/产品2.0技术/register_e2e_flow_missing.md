@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:44:42+08:00
+verdict_note: 记忆涉及 e2e/register/real-api-flow.spec.js 在产品2.0 找不到，'后端未配置流程'结论无前端代码可证，无法证明有效
+---
 # 注册真实接口 E2E「该业务未配置流程」根因
 企业注册真实接口全流程 E2E 在 editAndSubmit 提交审核时返回 HTTP 500「该业务未配置流程」，根因是后端工作流未配置，非前端或脚本问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:59:22+08:00
+verdict_note: 门户 publicPortal pages/BrokerPages.vue 实存 isBrokerList、agencies、openRecord 逻辑，与描述一致。
+---
 # Portal Broker Branch
 机构档案列在 BrokerPages 的分支列表中显示为空白。
 
@@ -15,7 +20,6 @@
 - 所属项目：门户
 - 验证证据：extracted source=cursor project=门户
 - 来源会话：01c99a3c-2693-474a-bcc9-5c73f2538cbe
-
 
 <!-- MEMORY_FIELDS
 {

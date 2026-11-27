@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:14:43+08:00
+verdict_note: 产品2.0 permission.js/zs-button.vue 命中，审批 label 存在，权限+业务禁用逻辑属实。
+---
 # 停车泊位审批按钮的权限显隐链路
 产品2.0 的 zhi2-web-admin 停车泊位列表页「审批」按钮由权限字符控制是否渲染，权限显隐与业务禁用是两套独立机制。
 

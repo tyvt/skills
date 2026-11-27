@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:52:49+08:00
+verdict_note: 苏住房C命中 houseVideo/z-paging/ZsSearch/goodProject，搜索框移入 #top 插槽修复属实。
+---
 # 视频看房搜索框被覆盖修复
 苏住房C小程序「视频看房」页面搜索框被 z-paging 遮挡，已通过将搜索框移入 #top 插槽修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:46:36+08:00
+verdict_note: 苏住房C含tab-line编译样式与word-break-keep-all用例、stockHouse页面，间距折行修复描述属实。
+---
 # 二手房列表页UI间距与名称折行修复
 苏住房C 二手房列表页 `stockHouse` 与 `houseCard` 的间距及名称折行未按设计处理，已在 cursor 会话 2f565b3c 修复。
 

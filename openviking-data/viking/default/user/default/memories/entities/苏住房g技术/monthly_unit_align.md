@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:53:58+08:00
+verdict_note: 苏住房G worktree 实存 buildHierarchyCells/buildStatColumnWidths/monthlyReport，单位列对齐属实。
+---
 # 月报统计详情页单位列对齐月报口径
 苏住房G 月报统计详情页需与月报一致：单位随叶子节点名称合并显示，不单独成列。
 
@@ -19,7 +24,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
 - 来源会话：c17a549c-5505-45c7-a569-8186d32c2167
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:47:02+08:00
+verdict_note: 苏州市房地产监测V3 depositNotice/company/components/detail.vue 命中 bizStateName(2)、?.dictLabel(1)，可选链兜底属实
+---
 # 字典find无匹配dictLabel需可选链
 计算属性中对字典选项数组 find 后直接取 .dictLabel，匹配不到返回 undefined 会抛 Cannot read properties of undefined。
 ## 根因

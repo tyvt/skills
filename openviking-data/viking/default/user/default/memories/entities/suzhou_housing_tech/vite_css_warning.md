@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:48:22+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin 实存 PropertyCard.vue/data-analysis.vue 及 flag-szf、sourcemap 配置，涉及文件吻合。
+---
 # Vite config and CSS nesting build warnings
 The zhi2-mobile-shimin project had build warnings from duplicate vite sourcemap keys, CSS nesting, and local SVG paths; fixes eliminated warnings.
 ## Root cause
@@ -18,7 +23,6 @@ The zhi2-mobile-shimin project had build warnings from duplicate vite sourcemap 
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：5ca7c165-a429-40a7-a5eb-a5c94b398242
-
 
 <!-- MEMORY_FIELDS
 {

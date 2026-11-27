@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:43:28+08:00
+verdict_note: shareholder/detail.vue-215 getDetailParams 直接 return this.id(-216)，无 Number(this.id)；Number 截断修复已落地。
+---
 # 股东详情主键Number截断修复
 苏州市房地产监测V3 修复 `/company/shareholder/detail` 因 `Number()` 转换雪花ID截断导致详情异常的问题。
 
@@ -13,7 +18,6 @@
 ## 涉及文件与归属
 - 涉及：`company/shareholder/detail.vue`、`ruoyi.js`、`jsonParseSafeIds.js`
 - 所属项目：苏州市房地产监测V3；来源会话ID：a32faed2-0d46-4ca1-9093-a9c63ba5842d；验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

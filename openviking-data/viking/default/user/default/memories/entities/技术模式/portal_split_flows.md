@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:47:29+08:00
+verdict_note: homeLayout.js 命中 splitBusinessFlowsForLayout，侧栏业务流拆分函数在。
+---
 # splitBusinessFlowsForLayout 统一侧栏业务流横排
 首页侧栏业务流布局抽成 splitBusinessFlowsForLayout，由 HomeLayoutSidebar、HomeLayoutAdmin 共用，统一分行/横排规则。
 

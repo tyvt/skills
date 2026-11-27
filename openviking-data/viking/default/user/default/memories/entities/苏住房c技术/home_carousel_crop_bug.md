@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:20:37+08:00
+verdict_note: 苏住房C 命中 Home_Suzhufang、aspectFill/aspectFit、ZsImage，轮播裁切修复属实
+---
 # 首页轮播图横向被裁切
 苏住房C 业主端首页「热门活动」轮播图因 aspectFill + 固定高度容器导致横向被遮挡。
 

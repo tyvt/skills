@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:10:30+08:00
+verdict_note: 产品2.0 spFeeBill(17)/importId(5)//import/confirm(1)均命中，两段式导入流程与代码一致。
+---
 # 账单两段式导入约定
 园区物管2.0 的 spFeeBill 账单导入采用「/import 拿 importId 预览，/import/confirm 收尾」的三步流程。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-27T23:46:18+08:00
+verdict_note: 声称zhi2-web-admin/src/views/maintenance/accountCancel/detail.vue，全仓无accountCancel的.vue文件，contentInfo reason字段修复无法证实。
+---
 # 销户详情contentInfo缺失变更/销户原因字段
 维保销户模块 accountCancel/detail.vue 查看模式下 contentInfo 比同页 zs-form 少「变更/销户原因」列（reason，对应 zs-textarea）。
 
@@ -18,7 +22,6 @@
 - 涉及文件：zhi2-web-admin/src/views/maintenance/accountCancel/detail.vue
 - 所属项目：园区物管2.0（项目2-0）
 - 来源会话：491cb20a-e8f3-44cb-9648-5a18d4740d5d
-
 
 <!-- MEMORY_FIELDS
 {

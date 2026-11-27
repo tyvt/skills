@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:50:47+08:00
+verdict_note: 园区公共收益 flowable/finished.vue、process.vue 存在，LAST_HANDLE_COLUMNS 已移除，符合修复后现状
+---
 # Remove LAST_HANDLE_COLUMNS import from finished and process lists
 In the 园区公共收益 (zhi2-web-admin) project, finished.vue (done list) and process.vue (initiated-by-me list) wrongly imported LAST_HANDLE_COLUMNS (last-handle column) exclusive to todo.vue, and must remove it.
 
@@ -17,7 +22,6 @@ In the 园区公共收益 (zhi2-web-admin) project, finished.vue (done list) and
 - 所属项目：园区公共收益
 - 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：3924b519-9c9c-4c23-8add-6fd9b72aa24a
-
 
 <!-- MEMORY_FIELDS
 {

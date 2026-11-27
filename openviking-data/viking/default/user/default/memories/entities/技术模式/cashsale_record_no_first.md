@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:35:02+08:00
+verdict_note: 苏州市房地产监测V3 e2e/presale/cashsale-apply-real-api-flow.spec.js-24,124 有 assertCashsaleBasicInfoRecordNoFirst，headTitleList 存在，现售首位展示修复属实。
+---
 # 现售备案详情基本信息首位展示修复
 苏州市房地产监测V3 调整了现售备案详情基本信息与顶栏，使「现售备案编号」作为基本信息第一项展示。
 

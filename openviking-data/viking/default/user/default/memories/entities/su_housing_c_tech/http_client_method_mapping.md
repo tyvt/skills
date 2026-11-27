@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:51:25+08:00
+verdict_note: httpInstance.js-47 命中 createHttpClient；apiV1、szffluzm-yhcq 命中，传输层方法映射属实。
+---
 # 苏住房C接口传输层方法映射
 苏住房C小程序所有请求均经createHttpClient（api/apiV1）发出，其传输层在调用时即确定后端方法与网关接口方法。
 

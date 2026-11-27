@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:28:54+08:00
+verdict_note: 苏州市房地产监测V3 unitinfo.js-35 为 /building/building/listNofenye，与记忆「基础路径替换为 /building/building、listNofenye 子路径不变」一致，有代码证据。
+---
 # 楼盘表API旧路径buildinginfo致400修复
 苏州市房地产监测V3 中楼盘表API基础路径未统一致请求400错误，已批量替换路径修复。
 

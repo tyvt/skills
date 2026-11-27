@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:44:55+08:00
+verdict_note: propertyContract/components/index.vue 在多副本命中 BUSINESS_TYPE 与 bizState 分支隔离，与描述一致。
+---
 # 复用组件多业务类型默认筛选隔离
 苏住房G 物业合同与前期物业合同列表共用组件靠 BUSINESS_TYPE 分流时，默认筛选与说明条仅允许作用在备案(ADD)分支。
 

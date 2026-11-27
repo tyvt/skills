@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:47:30+08:00
+verdict_note: 命中 zs-table-container/table-section 及 credit/companyEvaluation、companyReport，padding 对齐修复属实。
+---
 # 信用报告列表合计行对齐修复
 园区物管2.0 修复信用报告列表合计行因全局 padding 导致的宽度不一致问题。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

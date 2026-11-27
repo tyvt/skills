@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:48:27+08:00
+verdict_note: 物业手持B端 src/pages_facility/record/detailScrap.vue 及 detail-page/add-record-page 类名均在，根节点修复属实。
+---
 # 报废详情页根节点误用致灰底分块缺失
 物业手持B端报废记录详情页因根节点类名误用导致灰色底与白卡分块缺失的已知问题及修复方案。
 

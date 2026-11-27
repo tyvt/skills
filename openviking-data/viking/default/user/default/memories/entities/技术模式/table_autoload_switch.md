@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:15:15+08:00
+verdict_note: 惠山二期G 的 table.js 命中 autoLoadList x3；appOwnerAudit/index.vue 命中，自动查询开关方案属实。
+---
 # created 中的自动查询因空参数导致后端弹窗
 `src/mixins/table.js` 的 `init()` 在 `created` 中无条件调用 `getList()`，发送了被后端拦截的空请求。
 

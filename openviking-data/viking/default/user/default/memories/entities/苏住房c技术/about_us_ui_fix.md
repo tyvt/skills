@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:32:17+08:00
+verdict_note: 苏住房C pages/about/AboutUs.vue含logo、ZsImage及80px尺寸，与固定尺寸容器包裹ZsImage修复一致（实际路径非pages_main）。
+---
 # 关于我们页面UI紊乱修复
 苏住房C「关于我们」页因`ZsImage`内部样式撑满导致logo巨大，已用固定尺寸容器包裹修复。
 

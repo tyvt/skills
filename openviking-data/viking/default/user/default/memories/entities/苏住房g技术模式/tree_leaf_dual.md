@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:16:04+08:00
+verdict_note: monthlyReport.js 命中；isLeafNode/clearBranchNodeFields/leafFlag/normalizeTemplateOrder 均命中，children 唯一真值方案属实。
+---
 # 树表叶子/分支状态字段与树结构双轨判定
 月报模板维护等树表行上类型字段与 children 结构不一致，导致显示分支但校验按叶子，须以 children 为唯一真值。
 

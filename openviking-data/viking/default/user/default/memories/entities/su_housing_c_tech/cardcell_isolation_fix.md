@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-27T18:47:11+08:00
+verdict_note: 苏住房C 无 pages_vote/decision/detail.vue；DetailTopCard 仅在 pages_owner 下，pages_vote分包样式隔离修复描述无实据。
+---
 # 决策详情页CardCell样式隔离致空白修复
 苏住房C 决策详情页 `pages_vote/decision/detail` 因小程序分包 + 组件样式隔离导致标签不渲染，已修复。
 
@@ -20,7 +24,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：f7c75f86-93d3-413f-b2a8-5162c9c21849；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

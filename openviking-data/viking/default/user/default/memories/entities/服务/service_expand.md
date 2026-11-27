@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:46:29+08:00
+verdict_note: 苏住房后端service-expand-server/resources/bootstrap.yml存在，9610端口与Feign联调记录一致。
+---
 # service-expand 防汛接口服务
 苏住房防汛 C 端（防汛巡检）的后端微服务，承载 Flood 全部接口，依赖 zhi2-property 的 Feign 接口。
 

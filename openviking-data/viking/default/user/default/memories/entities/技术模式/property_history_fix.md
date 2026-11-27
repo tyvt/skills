@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:16:46+08:00
+verdict_note: 产品2.0 含 ifHistory/propertyContractTemporary/getForm，历史合同维护参数传递修复属实。
+---
 # 前期物业合同历史维护误走审批修复
 产品2.0前期物业服务合同备案详情页未传递路由`ifHistory`参数，导致历史合同维护仍走审批，已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:44:19+08:00
+verdict_note: 苏住房G zhi2-web-admin/src/views/register/components/companyInfo.vue存在，机构注册必填校验描述属实。
+---
 # 机构注册第二步六字段缺必填校验
 机构注册第二步表单核心字段未配置必填校验，致空值可提交。
 

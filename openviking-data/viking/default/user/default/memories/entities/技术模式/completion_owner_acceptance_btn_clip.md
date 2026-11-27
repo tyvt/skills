@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:49:49+08:00
+verdict_note: 园区公共收益 ownerAcceptanceTable.vue 已无 operateColumnWidth 固定宽度绑定，保留 zs-operate-column，删除按钮截断修复属实。
+---
 # 竣工验收详情业主代表验收意见按钮截断修复
 园区公共收益项目竣工验收详情页业主代表验收意见操作列删除按钮被截断的根因与修复。
 

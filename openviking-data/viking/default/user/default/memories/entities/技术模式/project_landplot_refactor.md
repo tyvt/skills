@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:17:58+08:00
+verdict_note: 产品2.0 存在 landPlotCode/landPlotId/unitChange 宗地号五处改造代码，与描述一致
+---
 # 楼幢/单元/房屋链路项目改宗地号五处同步改造
 将开发项目/项目名称统一改为宗地号(地号)时，单次需求横跨 building、unit、house、houseImport 及 buildingChange/unitChange 五处需同步改造。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:14:16+08:00
+verdict_note: 苏州市房地产监测V3 中 organType、companyChangeManage、getList() 命中，薄页固定 organType 入参属实。
+---
 # 企业变更列表须内核薄页固定 organType 入参
 苏州市房地产监测V3 中多机构变更列表未隔离查询参数致数据混淆，须内核固定 `organType` 并由薄页传参复用。
 

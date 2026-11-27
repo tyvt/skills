@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:14:38+08:00
+verdict_note: 苏住房防汛C端 App.vue 源码无 isTokenAlive/getInfo/401 校验代码，核心 token 盲信修复无法证明。
+---
 # 苏住房防汛C端登录鉴权模型
 zhi2-mobile-query-h5-c（苏住房防汛C端移动查询H5）的登录与 token 鉴权技术模式，后端为 RuoYi 风格。
 

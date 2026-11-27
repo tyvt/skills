@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:11:49+08:00
+verdict_note: 苏住房C 存在 zhi2-mobile-shimin/src/pages/index/my.vue 头像页与 resolveFullMediaUrl 工具，与描述一致
+---
 # 我的页头像相对路径直绑导致加载失败
 苏住房C 小程序「我的」页 `My_Suzhufang.vue` 将头像相对路径直接绑定到 `<image>`，被微信当作本地资源引发 500 错误。
 

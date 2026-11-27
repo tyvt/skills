@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:42:48+08:00
+verdict_note: 记忆涉及 pages_examine/components/approveDialog.vue 在昆山市民项目不存在，移除 auto-height/136rpx 无固定代码证据
+---
 # 意见说明输入框溢出边框修复
 意见说明输入框内容超出时做内部滚动，原文字溢出边框问题已修复。
 

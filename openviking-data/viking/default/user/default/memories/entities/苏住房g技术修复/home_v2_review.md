@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:55:49+08:00
+verdict_note: 苏住房G home/v2/components/CheckDataNav.vue、KeyDataNav.vue、progressPct 实存，审查对象与代码一致。
+---
 # 首页 v2 Vue 代码审查结论（苏住房G）
 苏住房G 首页 v2（`index-v2.vue` 及组件/导航/API）代码审查结论与遗留风险项。
 

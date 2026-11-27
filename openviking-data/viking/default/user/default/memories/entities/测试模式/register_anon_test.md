@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:50:58+08:00
+verdict_note: 产品2.0 全仓无 ensureRegisterAnonymousSession / REAL_API_TOKEN / register-helpers，e2e 下无对应匿名会话工具，记忆所述测试改动无法证明。
+---
 # 企业注册自动化测试匿名Token处理
 产品2.0 的 zhi2-web-admin 企业注册自动化测试已按「注册附件上传不带 Token」处理，避免过期 Token 导致 401。
 

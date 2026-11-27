@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:13:16+08:00
+verdict_note: 苏住房G 中 bizState、getQueryParams 在 mixins 命中，advSpaceLeaseApply/assetLeaseApply/resourcesLeaseContractFiling/leaseContractMixins.js 均存在，只读筛选分离属实。
+---
 # 只读列表页业务状态筛选与查询分离
 苏住房G只读/已备案视图列表页隐藏「业务状态」筛选项，但查询仍固定传bizState='2'。
 ## 现象与根因

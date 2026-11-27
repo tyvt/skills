@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:13:45+08:00
+verdict_note: 苏住房防汛C端命中 captcha//code，登录绕过方案属实
+---
 # E2E 登录无人值守方案
 跑防汛自动化测试时，让本地后端 `/code` 直接返回 captcha 答案，比图片识别更稳定。
 
@@ -10,14 +15,13 @@
 - 本地起后端网关与业务服务，让 `/code` 响应体带 captcha 答案（测试环境专用分支/开关，不带生产）
 - E2E 登录流程读该答案直接填入验证码框，配合 `ctx.ui.login`
 - 代理链路：前端 dev 站点接口代理指向本地后端（`env/.env` 代理/后端地址），nginx 站点同理
-- 测试账号用联调专用账号（如 `zsbase`）而非真实业务账号，避免污染生产数据
+- 测试账号用联调专用账号（如 `{{ov_privacy:ambiguous}}`）而非真实业务账号，避免污染生产数据
 - 验收后清掉本地跑出的历史测试数据
 
 ## 验证与归属
 - 来源会话 session-42ca405e-529e-4af3-98b5-81e2b92083de（基线 6156653）用户诉求 1/4/6
-- 测试账号 zsbase / Zs@2026Aa! 走完整联调
+- 测试账号 {{ov_privacy:ambiguous}} / {{ov_privacy:ambiguous}} 走完整联调
 - 涉及文件：env/.env、env/.env.test、zhi2-web-admin/src/views/login.vue、e2e-flood-crud.cjs
-
 
 <!-- MEMORY_FIELDS
 {

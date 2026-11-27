@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:13:57+08:00
+verdict_note: 存在 syncFixedColumnOffset 与 zs-table-container--bottom-spacing 固定列边框修复，与描述一致
+---
 # zs-table 固定列边框分页条件异常
 园区物管2.0 的 zs-table 固定操作列多余边框只在有分页的页面出现，因修复样式挂在无分页才加的条件 class 上。
 

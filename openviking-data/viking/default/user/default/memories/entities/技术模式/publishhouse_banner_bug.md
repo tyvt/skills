@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:50:32+08:00
+verdict_note: 苏住房C publishHouse/index.vue 存在且命中 Banner(1)/banner(6)，页面布局调整主体属实
+---
 # 我的房源页UI回归致顶部Banner不显示
 苏住房C 移动端 `pages_transaction/publishHouse` 页面 UI 回归引发顶部 Banner 不显示等异常，需调整布局样式恢复渲染。
 

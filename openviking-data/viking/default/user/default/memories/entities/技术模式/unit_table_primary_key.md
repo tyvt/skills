@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:16:49+08:00
+verdict_note: 园区公共收益 unitTable(1)/buildingVId(20)/HouseScopeTable(3)命中，主键改unitId修复属实。
+---
 # 楼幢详情单元子表误用buildingVId作主键
 building/detail.vue内嵌unitTable做单元增删改与房屋选择时，操作列/删除接口误用楼幢主键buildingVId，与单元实体unitId不一致。
 

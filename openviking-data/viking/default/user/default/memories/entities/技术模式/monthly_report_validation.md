@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:13:56+08:00
+verdict_note: 苏住房G 命中 buildSaveValues、TemplateTreeTable、ReportItemsTable、monthlyReportTemplate，动态校验改造属实
+---
 # 月报模板填报校验动态化
 原月报模板填报校验未动态判断、不可编辑列未置空且填写说明误合并父级。
 

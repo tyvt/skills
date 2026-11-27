@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:40:31+08:00
+verdict_note: 在苏州市房地产监测V3仓源码命中核心符号(2/2)padding,template，涉及文件存在，描述与现状一致，判有效。
+---
 # 标签区 padding 调整致文字换行
 苏州市房地产监测V3 的 detail-template.vue 标签区 padding 改为 16px 后文字换行，根因宽度计算未含 padding 增量。
 

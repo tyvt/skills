@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:14:30+08:00
+verdict_note: spFeeBill/components/import.vue 命中 errorReportUrl 与 errorSummary，与Excel导入错误报告约定一致。
+---
 # Excel 导入部分失败错误报告约定
 产品2.0 物业费账单导入接口部分失败时，前端按 errorReportUrl 有值即提示 errorSummary 并自动下载错误报告。
 

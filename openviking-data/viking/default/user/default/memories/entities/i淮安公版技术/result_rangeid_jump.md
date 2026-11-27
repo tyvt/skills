@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:47:41+08:00
+verdict_note: i淮安公版 ViewOptionsList.vue 有 decisionRangeId，common/ResultStatistics.vue 有 rangeId，跳转携带改动可核对。
+---
 # i淮安公版 ResultStatistics 跳转携带 rangeId
 i淮安公版投票/决策相关页面跳转 ResultStatistics 时携带 `rangeId`（接口字段 `decisionRangeId`）的改动记录。
 
@@ -13,7 +18,6 @@ i淮安公版投票/决策相关页面跳转 ResultStatistics 时携带 `rangeId
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=i淮安公版
-
 
 <!-- MEMORY_FIELDS
 {

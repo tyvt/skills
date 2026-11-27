@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T15:11:59+08:00
+verdict_note: 核心脚本 prune-component-wxss-leak.mjs/validate-dist.mjs/LEAK_END 全库 FILE-NOT-FOUND，仅编译产物 css 有 min-height-100%，无法证明正则修复属实
+---
 # uni.scss末尾marker改动致LEAK_END正则失配
 uni.scss 末尾 marker 规则增删属性会让 prune-component-wxss-leak.mjs 的 LEAK_END 正则失配，主包上传体积暴涨超限。
 

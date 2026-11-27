@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:46:40+08:00
+verdict_note: styles/index.scss-76 命中 detail-from-container、-96 命中 overflow，滚动改由表单容器承载属实。
+---
 # detail-container禁滚改由表单容器滚动
 苏州市房地产监测V3将 detail-container 禁用滚动并改由内部表单容器承载滚动，避免双滚动条与操作栏冲突。
 

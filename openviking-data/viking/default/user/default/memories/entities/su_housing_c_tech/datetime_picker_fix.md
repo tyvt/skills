@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:49:34+08:00
+verdict_note: 记忆所述 scripts/relocate-datetime-picker.mjs 不存在（苏住房C/scripts 仅 findUnUseImages.mjs），pages_owner_extra 无命中，relocate-datetime-picker 全项目无源码；无法证明有效。
+---
 # uni-datetime-picker 主包副本删除致 ENOENT 修复
 苏住房C 构建后处理脚本遗漏 JS lazy-load 路径修正，致分包页面加载 `uni-datetime-picker` 报 ENOENT。
 

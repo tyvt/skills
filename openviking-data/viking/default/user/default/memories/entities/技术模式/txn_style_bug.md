@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:49:26+08:00
+verdict_note: 苏住房C 命中 fundPolicy、ZsPaging、border-radius-0，与交易页样式修复一致。
+---
 # 多交易页样式偏离设计稿需统一圆角与跳转
 苏住房C 移动端 `fundPolicy/index.vue` 等交易页样式偏离设计稿、详情页误用 webView。
 

@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T08:48:01+08:00
+verdict_note: 苏住房G operatingAssets.vue有__table-body(1569)且overflow-y-auto(1574)、__name-grid(1614)仍在表体内，滚动移至表体的改动属实。
+---
 # 表格滚动改为整体 table-body 而非每行独立滚动
 抽屉/Tab 固定高度布局里，把滚动放在每行上会出现多个滚动条且被裁切，应移到表体。
 ## 问题根因
@@ -13,7 +17,6 @@
 - 011.md 会话 e780a0dd/1fb2d557：operatingAssets 滚动从 name-grid 移到 table-body，flex column 分离表头
 - 涉及文件：src/views/benefit/statisticsMap/operatingAssets.vue
 - 来源会话ID：e780a0dd-fe30-4f74-9569-c9d33cce3fc1, 1fb2d557-1e32-434c-916c-0095fdd829ee；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

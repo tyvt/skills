@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:11:36+08:00
+verdict_note: 太仓G DecisionRangeTable(5)/searchDecisionRange(3)/buildingResult(2)命中，级联缓存修复属实。
+---
 # 一般表决详情决策范围楼幢号缓存导致级联下拉为空
 太仓G 一般表决详情页「决策范围」筛选选择楼幢号并搜索后刷新页面，楼幢号有值但单元号、户室号下拉为空，已修复。
 

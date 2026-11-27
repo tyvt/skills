@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:45:55+08:00
+verdict_note: 工具/偏好/知识类记忆，核心符号在 skills 与 OpenViking 仓源码/配置全部命中，描述与现状一致，判有效。
+---
 # .list-container 高度塌陷技术模式
 自定义「左树+右列表」两栏布局页面在全局 .list-container 高度规则变更时右列塌陷的可复用技术模式。
 

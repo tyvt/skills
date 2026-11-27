@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:23:17+08:00
+verdict_note: 门户 portal.scss 含 position-fixed/inset-0 与 --portal-page-bg 背景图，全屏背景属实
+---
 # 门户二级页全屏背景
 publicPortal 首页菜单链接打开的全屏对外门户页（可售楼盘、公示公告、经纪人查询等）背景由 portal.scss 的 `.public-portal` 全屏层引用静态资源。
 

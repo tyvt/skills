@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:45:29+08:00
+verdict_note: staffManagement/detail.vue 实存；isChange/detailMixins/ApprovalProcess/OperationBtnGroup/HeadTitle 命中，人员审批流描述属实。
+---
 # 企业端人员详情审批流接入
 产品2.0 企业端 `staffManagement/detail.vue` 已对齐 toB 版实现审批流。
 
@@ -23,7 +28,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

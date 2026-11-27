@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:53:34+08:00
+verdict_note: 苏住房C 下无 project.config.json、size-main-package.mjs、split-pages-vote.mjs；bigPackageSizeSupport 仅在他仓 manifest，所述文件无法证实
+---
 # 微信开发者工具source size超限但自测合规
 苏住房C市民端小程序报source size exceed max limit 2048KB但本地脚本统计合规，因口径不同且4M上限需UI勾选。
 

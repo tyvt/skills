@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:45:26+08:00
+verdict_note: 苏州市房地产监测V3 存在 AgencyPersonnelList.vue(4)，keyWord 命中，冗余 name 过滤项清理属实
+---
 # AgencyPersonnelList.vue 中的冗余名称过滤器
 在项目苏州市房地产监测V3的G模块中，组件AgencyPersonnelList.vue存在重复的名称字段，已被移除。
 

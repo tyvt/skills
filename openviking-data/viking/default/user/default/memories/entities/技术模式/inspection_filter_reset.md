@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:16:04+08:00
+verdict_note: 物业手持B端 FilterPopup.vue 源码命中 uni-icons 重置图标，筛选弹窗图标恢复属实。
+---
 # 巡检记录筛选重置图标缺失
 物业手持B端巡检/维保/年检/报废记录页筛选弹窗底部重置图标丢失，已将组件图标改为 uni-icons 恢复。
 

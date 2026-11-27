@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:12:14+08:00
+verdict_note: 小程序 wygl-wxxcx-dev-slh/pages.json 命中 subPackages，pages/face 目录存在，分包后路由不变结论属实。
+---
 # uni-app分包瘦身页面挪进subPackages后业务跳转完整路径不变
 主包超限把页面从 pages 挪到 subPackages 后，业务跳转 URL 不必批量改写。
 

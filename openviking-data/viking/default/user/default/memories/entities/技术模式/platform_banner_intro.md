@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:47:57+08:00
+verdict_note: 门户 UnifiedLogin.vue 实存 platformBanner/IntersectionObserver 动画逻辑，与记忆一致。
+---
 # 横幅入视口20%触发动画一次
 首页 `platformBanner` 通过 `IntersectionObserver` 监听，进入视口 20% 时添加 `platform-banner--intro` 类触发动画并仅播放一次。
 ## 实现要点

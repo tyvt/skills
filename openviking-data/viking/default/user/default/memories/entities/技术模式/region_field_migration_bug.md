@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:50:21+08:00
+verdict_note: 实机核对：V3 e2e/fixtures/institution-helpers.js provinceCityArea 与 e2e/company administrativeArea、ECONOMIC_INSTITUTIONS_REGION 词典均在；行政区域字段迁移兼容旧数据属实。
+---
 # 机构注册/入网行政区域字段变更前端需兼容旧数据
 苏州市房地产监测V3 因接口行政区域字段变更，前端需迁移绑定并兼容旧数据。
 

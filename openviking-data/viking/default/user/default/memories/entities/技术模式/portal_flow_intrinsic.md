@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:44:30+08:00
+verdict_note: 在门户H5仓源码命中核心符号(6/10)content,hidden,nowrap,overflow，涉及文件存在，描述与现状一致，判有效。
+---
 # 门户首页流程区 intrinsic 宽度与横向滚动依赖
 门户首页 `.home-new`/`.top-row` 使用 `width: max-content` 叠加流程区固定最小宽，会撑宽整页并依赖 layout 提供横向滚动。
 

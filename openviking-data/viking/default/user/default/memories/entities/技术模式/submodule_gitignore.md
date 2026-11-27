@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:45:53+08:00
+verdict_note: 各 zhi2-web-admin/.gitignore 均无 report.html/version.json/preview 等条目，所述 ignore 规则无法印证。
+---
 # 子模块 .gitignore 收录边界：E2E/预览产物不入库，本地 AI 记忆要入库
 子模块工作区中 report.html、preview PNG、E2E 产物等每次运行变动污染 git status，需按产物/源码脚本/记忆文档三分类书写 ignore 规则。
 ## 问题根因

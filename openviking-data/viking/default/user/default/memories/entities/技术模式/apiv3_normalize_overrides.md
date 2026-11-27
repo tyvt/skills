@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:20:50+08:00
+verdict_note: ACTION_PARAM_KEY_OVERRIDES/apiV3Normalize 在 苏州市房地产监测V3/utils/apiV3Normalize.js 命中且含优先级逻辑，核心机制真实，仅项目归属记为产品2.0有偏差。
+---
 # apiV3Normalize 参数键映射优先级
 产品2.0 前端 apiV3Normalize 对能被后缀规则（ByXxx/ById）推断覆盖的动作名，参数键映射须放 ACTION_PARAM_KEY_OVERRIDES 而非 ACTION_PATH_PARAM_KEYS。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

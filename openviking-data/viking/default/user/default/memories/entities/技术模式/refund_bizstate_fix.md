@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:16:15+08:00
+verdict_note: 苏州市房地产监测V3 tableColumnMeasure.js 源码命中 MEASURE_LABEL_EXCLUDE_RE，业务状态查询与列对齐修复属实。
+---
 # 定金退款列表查询与列对齐修复
 苏州市房地产监测V3 的「定金退款列表」完成两处修改：查询条件改业务状态、缴款通知书号正常左对齐。
 

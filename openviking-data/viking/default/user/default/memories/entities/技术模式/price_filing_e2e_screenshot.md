@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:48:47+08:00
+verdict_note: 产品2.0 manifest.prod.js 含 1060000001 与 prod 截图配置，价格备案截图对比属实。
+---
 # 价格备案自动化测试截图对比
 价格备案自动化测试已扩展为全部 10 个菜单的列表页 + 详情页截图对比，并已在线上环境跑通，共 20 张截图。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

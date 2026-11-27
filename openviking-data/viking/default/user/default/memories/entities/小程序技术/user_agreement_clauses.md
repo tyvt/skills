@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:54:54+08:00
+verdict_note: 实机核对：小程序 user-agreement.vue 全文仅21行，无「争议解决与法律适用」「八、」残留，「其他条款」仍在；与删除原第七条并改号的描述一致。
+---
 # 用户协议条款结构调整
 pages/face/user-agreement.vue 中已删除原第七条并调整后续条款编号。
 

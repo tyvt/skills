@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:41:32+08:00
+verdict_note: 苏州V3 BuildingUnitLazyTree.vue 命中 building-unit-lazy-tree/dialog-box/dialog-left，双倍间距修复场景属实
+---
 # 全局样式导致对话框左侧面板出现双倍间距
 在苏州市房地产监测V3中，全局`zs-dialog`为`.dialog-left`定义了`margin-right: 20px; padding: 20px`；组件的新样式优先级相同且未覆盖该全局样式，导致左侧面板出现双倍间距。
 

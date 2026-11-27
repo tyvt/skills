@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T09:45:22+08:00
+verdict_note: 无项目与代码产物；auto/hy3 供 VLM 抽取的断言在配置中未找到对应证据，magpie 命中均为 fast/planner 话题，无法证实。
+---
 # magpie 网关
 magpie 网关是提供 auto/hy3 模型的模型网关。
 

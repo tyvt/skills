@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:48:36+08:00
+verdict_note: 核对苏州市房地产监测V3：AgencyBranchList.vue 存在，注销按钮 attrs warning 样式修复与描述一致。
+---
 # 分支机构「注销」按钮样式修复
 苏州市房地产监测V3 修复 G 端「经纪机构管理 > 分支机构信息」页「注销」按钮样式对比度低的问题。
 

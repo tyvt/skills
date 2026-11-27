@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:26:29+08:00
+verdict_note: face.vue 的 goBdc 采用相对 hash 路由 /pages/face/bdc，无 origin+BASE_URL 拼接，与修复一致
+---
 # 苏服办人脸成功却报 DOMException
 苏服办 SDK 人脸认证已 success（retcode 000000），随后 location.replace 抛 DOMException code 12，根因是 origin 拼接 BASE_URL 生成非法 URL。
 

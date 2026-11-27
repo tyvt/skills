@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:13:07+08:00
+verdict_note: E2E spec 文件存在，但调用的是 assertEntrustSaleDetailVerticalLayout；无 assertEntrustSaleBasicAppendixRowCompact，也无 basic-appendix-row--natural-height，记忆描述的函数/类名与现状不符。
+---
 # 委托代售详情页去除中间空白
 苏州市房地产监测V3 修复委托代售详情页查看态「basic-appendix-row」底部大块留白，E2E 用例通过。
 

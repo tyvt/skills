@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:47:46+08:00
+verdict_note: todoTask.js 含 getTodoTaskRoutePath/detailId/getRouterPathByFilePath，待办跳转兼容修复属实。
+---
 # 待办任务跳转路径兼容修复
 园区公共收益项目待办/流程跳转原传路由地址改为组件路径，新增getTodoTaskRoutePath统一兼容历史数据。
 

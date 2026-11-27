@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:14:44+08:00
+verdict_note: 产品2.0 存在 tencentDistrictBoundary.js 与 districtMapSupplements 地图补丁，与描述一致
+---
 # 苏州工业园区地图补丁
 产品2.0 可视化中苏州工业园区在左侧轮播能显示，但地图 GeoJSON 无对应多边形，已从历史 GeoJSON 提取补丁并在地图加载时自动补缺。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

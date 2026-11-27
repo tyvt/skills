@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:26:30+08:00
+verdict_note: home.vue/handleUserEntry、detectMiniProgramEnv、house.js在i淮安H5命中，用户卡片登录描述属实
+---
 # 在 home.vue 中点击用户卡片触发补充登录
 在 `home.vue` 中，`user-card` 块调用 `handleUserEntry`；`goLogin()` 触发 `detectMiniProgramEnv()` 和 `initMiniProgramMessageListener()`，当桥接未就绪时，在 `WeixinJSBridgeReady` 之后重新发送 `requestLogin`。
 

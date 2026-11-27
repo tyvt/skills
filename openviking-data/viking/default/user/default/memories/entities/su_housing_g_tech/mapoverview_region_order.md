@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:48:12+08:00
+verdict_note: 苏住房G platformRegionOrder.js 命中 platformRegionOrder/mergeDistrictNameOrder，公共行政区划顺序改造属实
+---
 # mapOverview 使用公共行政区划顺序
 苏住房G(zhi2-web-admin) 已实现 mapOverview 改用公共行政区划数据顺序，新增 platformRegionOrder.js 并改造 initMap。
 

@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T21:13:26+08:00
+verdict_note: 产品2.0 home/index.vue-237 存在 todoPanelFetchSeq 竞态序号逻辑，与记忆描述一致。
+---
 # home/index.vue 待办消息竞态修复
 产品2.0 的 zhi2-web-admin 修复待办与消息共用 `todos` 因请求乱序返回导致展示与跳转不一致的问题。
 
@@ -18,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

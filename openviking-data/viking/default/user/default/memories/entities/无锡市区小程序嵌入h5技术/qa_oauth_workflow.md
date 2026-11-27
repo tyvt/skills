@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:26:16+08:00
+verdict_note: qaOAuth.js 与 security.js 存在并命中 OAuth/security，三方 OAuth 流程属实
+---
 # 智能问答改三方OAuth流程
 将 Tab 内智能问答替换为三方页面，需对齐无锡市区 G 项目调用 security/oauth2/authorize，并保留原页逻辑仅口令触发新链。
 

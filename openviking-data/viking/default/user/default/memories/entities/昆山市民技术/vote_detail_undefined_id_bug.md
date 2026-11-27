@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:14:59+08:00
+verdict_note: 昆山市民源码含 decisionRangeId、DetailTop.vue、votedetail.vue，undefined id 过滤修复所涉文件与字段均存在。
+---
 # 决策详情因 decisionRangeId=undefined 无数据 Bug
 昆山市民「已完成」列表点击「决策详情」进入后页面无数据，根因为 URL 误传 decisionRangeId=undefined 字符串。
 

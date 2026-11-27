@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:56:23+08:00
+verdict_note: 园区物管2.0 ratingRule/detail.vue 含"名称/年度"字段，detail-template 组件存在，同行布局描述与现状一致
+---
 # 信用评级规则详情页名称与年度字段同行显示
 园区物管2.0 中信用评级规则详情页名称与年度字段原未同行显示，提交 a0b68cb32 调整布局实现同行。
 

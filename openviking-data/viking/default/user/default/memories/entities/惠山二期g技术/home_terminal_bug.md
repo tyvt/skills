@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:43:03+08:00
+verdict_note: 在惠山二期G仓源码命中核心符号(5/5)getinfo,localstorage,terminaltype,usebakcomponent，涉及文件存在，描述与现状一致，判有效。
+---
 # 物业B端首页未区分终端类型误渲新版
 惠山二期G zhi2-web-admin 首页包装组件未区分 terminalType 致物业B端误入新版首页的缺陷与修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:17:59+08:00
+verdict_note: 泰兴G 命中 SearchFormItem.vue、ctUserIdentityApply、auditStatus，审核状态返回修复文件存在。
+---
 # 审核状态返回后无法选中修复
 泰兴G 项目 ctUserIdentityApply 模块在详情返回列表后，审核状态下拉无法选中的 bug 修复套路。
 

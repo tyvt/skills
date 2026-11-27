@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:14:31+08:00
+verdict_note: 记忆称删除 src/static/images/szf/default.png 主包副本并移除 MAIN_STATIC_PATHS；实则该 default.png 仍存在，且 mainStaticPaths.js/MAIN_STATIC_PATHS 均不存在，描述与现状矛盾。
+---
 # 主包体积超限修复
 苏住房C小程序主包构建失败因上传预估超 2048KB，通过调整静态资源白名单解决。
 
@@ -18,7 +23,6 @@
 ## 验证与归属
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T14:42:21+08:00
+verdict_note: i淮安公版 assetsPublicity/index.vue-10 leaseHouseNum 仍带 v-show，且 4A90E2/1989FA/FFC53D/F7F8FA/F0F7FF/租售情况 在仓内全无；所述 UI 还原未落地。
+---
 # 资产公示页 UI 还原
 i淮安H5 资产公示页已按设计稿 100% 还原视觉与结构。
 

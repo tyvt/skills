@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:52:24+08:00
+verdict_note: 园区公共收益pubBankDetailDay/index.vue有isBankReceiptReconciled(423)、bankReceiptOperateButtons(191/198/208)与防重复核销(463)，修复属实。
+---
 # 业务对账已对账数据误显核销按钮修复
 园区公共收益项目中，业务对账已对账查询数据仍显示“核销”按钮，因未根据对账状态判断。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区公共收益
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:15:49+08:00
+verdict_note: 苏住房C 命中 VITE_APP_API_PROXY、resolveMediaUrl 与 zhi2-pro，内网 IP 图片 URL 转线上代理属实。
+---
 # 内网IP图片URL未转线上致H5失败
 苏住房C「苏找房」H5接口返回带内网IP的完整图片URL，原样返回致H5无法访问，需在生产环境拼接线上代理域名。
 

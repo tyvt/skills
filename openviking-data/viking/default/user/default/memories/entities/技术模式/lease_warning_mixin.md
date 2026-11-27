@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:56:14+08:00
+verdict_note: 苏住房G leaseContractWarningMixin.js 含 isWarningContract，多合同预警 mixin 收口属实
+---
 # 多租赁合同忽略预警勾选规则收口mixin
 苏住房G四份租赁合同列表的「忽略预警」勾选规则漂移，抽成leaseContractWarningMixin统一封装。
 

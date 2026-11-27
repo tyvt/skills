@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:16:19+08:00
+verdict_note: 苏住房防汛C端存在 Ref8443Inspection 防汛检查组件，项目事实描述与现状一致
+---
 # 防汛 C 端 uni-app 项目
 uni-app Vue3 + TypeScript 开发的防汛 C 端移动应用，用于汛前/汛中/汛后检查、求援与历史记录。
 

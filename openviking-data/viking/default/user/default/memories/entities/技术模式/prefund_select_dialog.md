@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:45:15+08:00
+verdict_note: 在苏州市房地产监测V3仓源码命中核心符号(14/14)additional,adjustmentofaccounts,changedetail,deposit，涉及文件存在，描述与现状一致，判有效。
+---
 # 预售资金监管选择弹窗统一
 苏州市房地产监测V3 中预售资金监管模块的选择弹窗已统一到 `SelectDialog.open`（`supervision/utils/selectDialog`）。
 

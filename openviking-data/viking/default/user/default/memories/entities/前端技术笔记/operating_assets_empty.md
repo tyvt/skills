@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:55:39+08:00
+verdict_note: 产品2.0/园区物管2.0 operatingAssets.vue 实存 operating-assets__table-empty 空状态节点，与描述一致。
+---
 # operatingAssets无数据空白修复
 operatingAssets.vue 在资产明细无数据时未显示占位，已添加“暂无数据”条件渲染与样式。
 

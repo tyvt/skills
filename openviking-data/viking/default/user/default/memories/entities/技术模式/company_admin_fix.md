@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:53:51+08:00
+verdict_note: 苏州市房地产监测V3 companyAdmin/index.vue 含 ListOperationButtonContainer 与「管理员」标题，列表对齐修复属实。
+---
 # 租赁机构管理员变更列表对齐修复
 苏州市房地产监测V3 项目中，按租赁机构侧通用列表结构修复了管理员变更列表的标题与样式缺失问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:57:26+08:00
+verdict_note: 苏住房G 含 vite-build.mjs、zhi2-web-admin 子模块与 dist 路径，部署结构属实；svgoOptions 细节当前构建配置未直接命中
+---
 # 苏住房G 项目部署结构
 苏住房G 是使用 zhi2-web-admin 子模块的前端项目，与门户（portal）项目共用子模块但分支和部署相互独立。
 

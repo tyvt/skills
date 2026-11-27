@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:17:21+08:00
+verdict_note: 存在 operatingAssets.vue/selectParkingSpaceList/人防车位 筛选逻辑，与描述一致
+---
 # 切换车位类型数据未筛选问题
 园区物管2.0 切换车位类型时下方数据未筛选，后端文件未找到，以前端字典解析+标签匹配+切换带参重请求方案为准。
 ## 问题根因

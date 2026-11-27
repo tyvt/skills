@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:47:20+08:00
+verdict_note: 苏州市房地产监测V3 实存 Vue.prototype.dayjs=dayjs 全局挂载、index.html dayjs.min.js，修复属实。
+---
 # dayjs全局挂载修复
 苏州市房地产监测V3 项目因 dayjs 未挂载到 Vue 原型，导致多个详情页调用 `this.dayjs` 报错，已修复。
 

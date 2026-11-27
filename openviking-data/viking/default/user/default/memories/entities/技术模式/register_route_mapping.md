@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:15:03+08:00
+verdict_note: 苏州V3 router/index.js 及 views 有 companyRegister/institutionRegister/unitRegister，路由对应描述属实
+---
 # 注册流程路由对应关系澄清
 苏州市房地产监测V3 澄清「机构注册 → 开发企业注册 → 信息录入」路径对应的实际路由。
 

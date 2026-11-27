@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:22:35+08:00
+verdict_note: D-\repository\苏州市房地产检测V3后端仓库 存在，pom.xml/README.md 含 zhi3-presale 模块引用
+---
 # 苏州市房地产检测V3后端仓库
 苏州市房地产检测 V3 后端代码仓库，本地路径 D:\repository\苏州市房地产检测V3后端仓库。
 ## Description
@@ -9,7 +14,6 @@
 - 主工作区分支 feature/feat-ligy-260825，开工前后无改动
 ## Relations
 - 包含 presale-permit-template.docx 模板
-
 
 <!-- MEMORY_FIELDS
 {

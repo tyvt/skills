@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:52:16+08:00
+verdict_note: agreementContent.js 含 getAgreementContent 与 platform.usage.agreement 配置键，协议弹窗后台可配属实。
+---
 # 禅道任务 2428
 禅道任务 2428：开发企业注册流程中《平台使用协议》《企业注册协议》弹窗内容由硬编码/占位改为后台系统配置可配。
 

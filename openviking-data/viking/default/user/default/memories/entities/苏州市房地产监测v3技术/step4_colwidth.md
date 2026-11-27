@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:53:23+08:00
+verdict_note: 命中 Step4Shareholders/show-overflow-tooltip/companyRegister，Step4 股东表列宽紧凑优化属实。
+---
 # Step4股东表列宽紧凑优化
 苏州市房地产监测V3 注册流程 Step4Shareholders.vue 调整股东表列宽与溢出提示以实现紧凑布局。
 

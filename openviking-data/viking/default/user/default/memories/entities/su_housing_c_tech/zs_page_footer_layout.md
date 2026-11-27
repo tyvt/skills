@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:25:57+08:00
+verdict_note: 苏住房C 命中 ZsPageFooter/tab-bar-placeholder/56px，页脚布局修复属实。
+---
 # 苏住房C页脚ZsPageFooter布局
 苏住房C小程序的ZsPageFooter组件已改为普通文档流布局，随各Tab页内容滚动至底部、TabBar上方显示。
 

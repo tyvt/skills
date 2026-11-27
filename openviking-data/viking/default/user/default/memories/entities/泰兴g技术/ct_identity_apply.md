@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:43:35+08:00
+verdict_note: 泰兴G zhi2-web-admin 实存 ctUserIdentityApply/ 目录、applyId、icon-APP业主人工审核新，模块描述属实。
+---
 # ctUserIdentityApply 模块
 泰兴G 前端子模块 zhi2-web-admin 中对应「APP业主人工审核新」菜单的业务模块，处理用户身份申请。
 

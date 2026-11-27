@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:46:49+08:00
+verdict_note: 苏州V3 SzBlank.vue含margin-4px 0与s16-blank，填空框行高修复属实。
+---
 # 填空输入框高度超行高致合同段落文字紧贴
 苏州市房地产监测V3 中 `.s16-p` 正文行高约 27px，填空输入框固定 32px 高撑高行盒，导致上下行文字紧贴输入框边缘，已通过 margin 修复。
 

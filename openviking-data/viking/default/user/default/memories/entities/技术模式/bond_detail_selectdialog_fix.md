@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T14:45:11+08:00
+verdict_note: bond/detail.vue 仅有 ProjectDialog/showProjectDialog/handView，无 SelectDialog 与 outletsTable 组件块；记忆所述标签修复未在现状文件体现。
+---
 # bond/detail.vue SelectDialog 标签修复
 苏州市房地产监测V3 项目修复 bond/detail.vue 中拆散的 SelectDialog 标签问题。
 

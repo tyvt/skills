@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:50:10+08:00
+verdict_note: 无锡市区小程序嵌入H5 utils/portal.js 实存 getBdcJumpParams 与 ensureProfileForBdcJump，与记忆一致。
+---
 # 不动产跳转数据完整性修复
 小程序跳转不动产场景修复用户数据不全问题，统一跳转前校验与刷新用户档案。
 

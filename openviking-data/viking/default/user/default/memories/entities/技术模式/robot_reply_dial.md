@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T06:11:05+08:00
+verdict_note: 记忆核心改动文件 pages_main/automaticRobot/index.vue 无 makePhoneCall；索引中 automaticRobot/index.vue 命中零关键词。makePhoneCall 仅见于 pages_my/robot 等其他页面，核心描述不符。
+---
 # robot_reply_dial 小程序机器人回复拨号入口
 小程序机器人回复含电话号码时，因 rich-text 屏蔽事件导致 `<a href="tel:">` 不可点击，改为回复气泡下渲染可点拨号条目。
 ## 背景与原因

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:10:22+08:00
+verdict_note: 苏州V3 agencyChangeCoreFields 在 detail.vue/index.vue，jjjgbgxq、USCI 均命中，代理机构核心字段审计描述属实
+---
 # 代理机构核心字段审计与 USCI 锁定
 代理机构变更逻辑不完整，导致了授权错误；已添加核心字段校验和 USCI 代码锁定。
 
@@ -19,7 +24,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：6c91b23f-bba3-49fb-bd85-76e4879db720
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:48:12+08:00
+verdict_note: 苏州V3 registerQualification.js-102 extractQualificationListFromPayload、qualificationRecordList兼容(83/253)，resolveLicenseAppendixBusCode见api/company/companyRecord.js-84，资质双列表解析属实。
+---
 # 资质回显兼容双列表且动态解析许可编码
 苏州市房地产监测V3 中资质回显兼容双列表结构并以路由动态解析 licenseBusCode 去除硬编码。
 

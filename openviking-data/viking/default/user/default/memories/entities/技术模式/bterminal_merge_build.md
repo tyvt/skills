@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:45:58+08:00
+verdict_note: 泰兴小程序 package.json 含 build-mp-weixin，src/components/PageButton/PageButton.vue 存在，与记忆同步组件与验证流程一致。
+---
 # 物业B端改动须合并泰兴小程序验证
 物业手持B端提交 `906ac00`（含 `PageButton` 等共享组件）需合并至泰兴小程序，关键流程为执行 `npm run build:mp-weixin` 完成编译验证。
 ## 问题背景

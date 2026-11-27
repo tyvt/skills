@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:40:42+08:00
+verdict_note: 苏住房防汛C端 docs/backend-integration.md 实存 patrol/item/page、patrolItem、T_PATROL_ITEM、PLATFORM_TENANT_ID 排查记录；记忆自标'可能根因待查Nacos'，非幻觉。
+---
 # 巡检事项分页接口返回0排查
 苏住房防汛C端 property 服务 `/v2.0/property/patrol/item/page` 联调始终返回 total=0。
 
@@ -18,7 +23,6 @@
 ## 验证与归属
 - 会话时间 2026-11-03；涉及服务 zhi2-property-server(9604)、common-framework-server(9211)
 - 临时权限菜单与样本数据已清理，SERVICE_EXPAND.T_PATROL_ITEM 原有11条未受影响
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:10:45+08:00
+verdict_note: 苏州V3 RecordCertificateDialog.vue 有 record-certificate-bg、备案证书编号、recordTermEnd，证书弹窗改版属实
+---
 # 经纪机构备案证书弹窗改版
 苏州市房地产监测V3 完成经纪机构备案证书弹窗改版，重写 `RecordCertificateDialog.vue` 按设计稿实现正式证书样式。
 

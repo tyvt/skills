@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T07:10:31+08:00
+verdict_note: 泰兴小程序 decision/detail.vue 源码命中 detail_bg 静态资源引用，绝对路径问题涉及文件属实。
+---
 # 绝对路径静态资源导致H5构建失败
 泰兴小程序模板使用以 `/` 开头的绝对路径引用静态资源，导致 Vite/Rollup H5 构建失败，改为相对路径 import 与 :src 绑定修复。
 
@@ -15,7 +19,6 @@
 - 涉及文件：d:/repository/泰兴小程序/src/pages_owner/decision/detail.vue、d:/repository/泰兴小程序/src/pages_owner/house/index.vue、d:/repository/泰兴小程序/src/pages_owner/elect/detail.vue、d:/repository/泰兴小程序/package.json、d:/repository/泰兴小程序/src/pages_property/gauge/detail.vue、d:/repository/泰兴小程序/src/pages_property/payment/index.vue、d:/repository/泰兴小程序/src/pages_property/payment/components/PaymentChannelPopup.vue、d:/repository/泰兴小程序/src/pages_property/payment/bills.vue
 - 验证：extracted source=cursor session=86482c93-650d-48c7-9ed2-4c1ad439ee68
 - 所属项目：泰兴小程序；来源会话：86482c93-650d-48c7-9ed2-4c1ad439ee68；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

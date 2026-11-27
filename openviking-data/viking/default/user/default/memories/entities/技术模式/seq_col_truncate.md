@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:47:56+08:00
+verdict_note: 实机核对：苏州市房地产监测V3 zs-table-column.vue(73) FIXED_TYPE_WIDTH、(8) table-header--fixed 均存在；width 取较大值+关闭 ellipsis 方案属实。
+---
 # 序号列宽60透传绕过全局80致表头截断
 页面传 width="60" 在 zs-table-column.vue 原样透传，绕过全局 FIXED_TYPE_WIDTH=80，致扣除 padding 后表头「序号」被 ellipsis 裁切不全。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:16:29+08:00
+verdict_note: 太仓G 命中 MaintainResultDialog、MaintainResultDialogLite、ownerCalculationChart、decisionCommon，结果维护改造属实
+---
 # 一般表决结论维护弹窗对齐昆山
 太仓G 已按昆山对齐「一般表决 → 表决结论维护」弹窗，主要差异均已修复。
 

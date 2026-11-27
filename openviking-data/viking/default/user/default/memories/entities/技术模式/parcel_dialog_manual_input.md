@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:47:08+08:00
+verdict_note: 苏州市房地产监测V3 实存 ParcelDialog.vue、landPlot、zs-input 手输改造，描述一致。
+---
 # 备案新增宗地编号改手输并移除选地逻辑
 苏州市房地产监测V3 的 ParcelDialog.vue 将地块编号由只读+SelectDialog 选择改为 zs-input 手输，并移除选地逻辑。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T11:18:05+08:00
+verdict_note: 苏住房C scripts/relocate-z-paging.mjs 不存在，relocate-z-paging 全局真实代码0命中，声称的脚本改动无证据。
+---
 # 分包体积优化脚本未改 require 路径
 苏住房C 构建脚本把 z-paging 复制进分包后未重写 require 路径，致分包启动报 module not defined。
 

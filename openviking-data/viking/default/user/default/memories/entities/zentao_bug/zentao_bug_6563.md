@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:55:15+08:00
+verdict_note: AgencyBasicInfoForm.vue 含 isQxtLocked、omitCompanyType，bug6563 机构类型补充属实
+---
 # ZenTao Bug 6563
 禅道缺陷 6563：经纪机构「机构基本信息」页点「变更」后编辑表单缺少「机构类型」字段，无法修改机构类型。
 ## Description

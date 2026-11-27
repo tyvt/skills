@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:50:14+08:00
+verdict_note: 园区物管2.0 userAuth/detail.vue 含 checkUserUnique 与 applyOrganizationSelected，先校验后回填属实。
+---
 # 新增选组织先校验后回填
 园区物管2.0 中新增模式下选择组织先校验唯一性再回填，防止重复提交。
 

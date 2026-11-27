@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:13:27+08:00
+verdict_note: 门户仓 index-new.vue、layout/index.vue、portal-home-visual.spec.ts 存在，overflow/column-gap/minmax(0 相关样式命中；flow-grid 类名或已调整，但涉及文件与主题证据成立。
+---
 # 业务中心流程区溢出与列宽不约束
 门户首页 index-new 业务中心流程区因 overflow:visible 使步骤条溢入 column-gap，且 flow-grid 列宽未约束导致上下行不对齐。
 

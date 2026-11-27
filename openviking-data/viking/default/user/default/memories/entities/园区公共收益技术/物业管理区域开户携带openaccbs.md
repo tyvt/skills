@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:21:48+08:00
+verdict_note: 园区公共收益 accountOpen/complex/detail.vue 命中 openAccBS/complexId
+---
 # 物业管理区域开户携带openAccBS
 园区公共收益项目在物业管理区域开户新增/编辑时，请求体统一携带 openAccBS 字段的技术约定。
 

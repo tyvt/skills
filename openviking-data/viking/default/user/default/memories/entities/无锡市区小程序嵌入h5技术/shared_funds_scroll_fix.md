@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:16:31+08:00
+verdict_note: OverviewTab/index.vue 含 bank-section、scroll-to-bank/scrollIntoView、scroll-into-view，属实。
+---
 # 共有资金查询明细自动滚动修复
 无锡市区小程序嵌入H5修复共有资金点查询明细后页面不自动滚动到底部账户余额区域的问题。
 

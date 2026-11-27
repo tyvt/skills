@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:48:08+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin 仓库中 git 对象 d06922ab 存在（commit），与记忆所述提交一致。
+---
 # 公共收益开户主体显示修复
 苏住房C 修复公共收益开户主体显示为数字（应为类型名称）问题，已提交合并至 main-v2.1。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:24:03+08:00
+verdict_note: 产品2.0 命中 feeDeclare2 的 index/detail/feeBindScopeTable/Dialog，界面调整文件齐备。
+---
 # 物业费简易申报界面调整
 产品2.0 物业费简易申报（property/feeDeclare2）按参考样式完成列表页、详情页与选择弹窗的界面调整及 bug 修复。
 

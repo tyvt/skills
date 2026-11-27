@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:49:51+08:00
+verdict_note: 苏州V3含administrativeArea/provinceCityArea与pageInstitutionRegisters，区域字段改名兼容属实。
+---
 # 机构注册列表页区域字段改名
 苏州市房地产监测V3中institutionRegister/page的搜索及表格字段provinceCityArea须统一改为administrativeArea，并兼容旧数据。
 

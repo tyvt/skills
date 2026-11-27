@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:43:18+08:00
+verdict_note: 园区物管2.0 fundPanorama/index.vue 实存；renderDistrictPie/formatter/toFixed/tooltip/percent 命中，饼图标签改区域名属实。
+---
 # 资金全景饼图标签显示区域名称修复
 园区物管2.0 的 fundPanorama 饼图标签已改为显示区域名称而非金额。
 

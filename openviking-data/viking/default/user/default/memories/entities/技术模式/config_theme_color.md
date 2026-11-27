@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:45:42+08:00
+verdict_note: store/modules/app.js 命中 changeThemeColor 与 buttonDefaultColor，主题色接入在。
+---
 # 园区物管2.0 平台配置自动应用主题色
 园区物管2.0 在 `zhi2-web-admin/src/store/modules/app.js` 中接入平台配置返回后自动生成主题色变量。
 

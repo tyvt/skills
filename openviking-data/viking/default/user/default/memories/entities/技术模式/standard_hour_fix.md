@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:45:54+08:00
+verdict_note: 核对泰兴小程序：add.vue 命中 parseStandardHour、standardHour，facility record 路径与描述一致。
+---
 # 添加巡检记录标准工时格式校验修复
 泰兴小程序员工端「添加巡检记录」标准工时（standardHour）输入非法格式被保存为 NaN 的问题已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:47:46+08:00
+verdict_note: 门户 home/publicPortal/pages/PropertyPages.vue 中 formatUnitPrice 返回 formatPortalNumber(value,2)，与记忆一致。
+---
 # 单价列格式化缺两位小数导致显示不一致
 PropertyPages.vue 的 formatUnitPrice 原传入0位小数，导致列表单价无小数及千分位，已统一为两位小数千分位格式。
 

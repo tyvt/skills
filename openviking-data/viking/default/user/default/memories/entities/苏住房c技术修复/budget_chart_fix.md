@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:50:31+08:00
+verdict_note: 苏住房C budget/index.vue 实存 budgetAmount/chartOption，echarts-uniapp 组件在，图表修复属实。
+---
 # 年度预算收入/支出图表不显示修复
 苏住房C小程序 pages_benefit/budget/index.vue 中年度预算收入/支出图表因 canvas 在 scroll-view 内不渲染而空白，已修复。
 

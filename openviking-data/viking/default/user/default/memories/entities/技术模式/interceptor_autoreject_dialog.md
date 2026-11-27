@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:15:14+08:00
+verdict_note: 苏住房C 命中 handleHouseOwner、noReject 与 addHouseContract.vue，拦截器自动 reject 导致弹窗缺失修复属实。
+---
 # 接口拦截器自动 reject 致登记弹窗缺失
 handleHouseOwner 非 200 时 HTTP 拦截器自动 showToast 并 reject，页面无 catch 致人工登记弹窗缺失。
 

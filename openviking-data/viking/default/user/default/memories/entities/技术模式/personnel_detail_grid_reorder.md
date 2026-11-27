@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:49:53+08:00
+verdict_note: staffManagement/components/detail.vue 命中 contentInfo，查看态字段重排在。
+---
 # 从业人员查看态网格去编号重排8字段
 苏州市房地产监测V3 中 staffManagement/detail.vue 查看态 contentInfo 区块按 3 列网格重排 8 个字段并移除人员编号。
 

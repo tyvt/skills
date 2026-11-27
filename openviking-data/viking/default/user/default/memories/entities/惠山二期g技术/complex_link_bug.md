@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:46:22+08:00
+verdict_note: 惠山二期G userStatistics/index.vue 同时含 getRouterPathByFilePath、complexName、handleViewProject，列改链接修复属实。
+---
 # 用户统计中跳转到项目详情的链接问题
 列“物业管理区域”原本是文本，不会跳转到项目详情，已修正为链接。
 

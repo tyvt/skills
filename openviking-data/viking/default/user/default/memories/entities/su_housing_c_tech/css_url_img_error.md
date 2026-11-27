@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:51:30+08:00
+verdict_note: 苏住房C announcement/detail.vue 实查无 watermark-layer/backgroundImage/makeWatermark；watermark-layer 仅在监测V3布局。所述水印修复在该项目无法证实
+---
 # 公告详情页水印CSS url()被误作img src导致加载失败
 苏住房C小程序（zhi2-mobile-shimin）中detail.vue将makeWatermark()返回的CSS url()值用作<img>相对路径，导致500加载错误，已改为<view>背景图渲染。
 
@@ -21,7 +25,6 @@
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话ID：c1c2be72-6443-4d0a-8960-b97194bec465
 - 代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

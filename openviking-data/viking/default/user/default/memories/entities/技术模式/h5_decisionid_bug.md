@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:14:47+08:00
+verdict_note: 昆山市民命中 votedetail.vue/loadVoteDetail、loginWithWxCode、decisionId、DetailTop，H5直调详情属实
+---
 # H5持decisionId直调详情接口
 昆山市民 H5 环境 votedetail.vue 存在 decisionId 时直接 loadVoteDetail 且不走 loginWithWxCode，token 由首页缓存经拦截器附加。
 

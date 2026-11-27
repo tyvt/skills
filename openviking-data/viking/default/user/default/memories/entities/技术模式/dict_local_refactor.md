@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:16:42+08:00
+verdict_note: propertyContract 目录命中；listCallback/colorMap/dict-tag 命中，normalizeHasFilingForm MISS 正符合'删除 normalizeHasFilingForm'描述，四道口守护属实。
+---
 # 字典改本地选项的四道口守护
 propertyContract 列表将「是否上传备案表」从 sys_yes_no（Y/N）改为本地常量选项（'1'/'0'），并删除 normalizeHasFilingForm 与 listCallback，需同时守住归一化、colorMap 键、筛选参数、接口真值四道口。
 

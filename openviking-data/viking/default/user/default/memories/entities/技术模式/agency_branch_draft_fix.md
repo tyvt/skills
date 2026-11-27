@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:55:24+08:00
+verdict_note: 全项目代码无 agencyBranchListDraft、mergeDraftRowFromSession，所述独立草稿 key 修复在当前代码无法证实
+---
 # 分支机构备案草稿行丢失修复
 苏州市房地产监测V3 中分支机构备案返回列表后找不到草稿行的问题已修复，改用独立草稿 key。
 

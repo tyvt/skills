@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:13:47+08:00
+verdict_note: 园区V0 index.html 命中 #myTab 与 width-88.5% 及宽度逻辑，与记忆'标签宽度88.5%致末尾溢出'修复主题一致。
+---
 # 页签栏滚动与打开页数修复
 园区V0 项目将可打开页面数量从5个增加到15个，并修复了页签栏滚动条左侧奇怪图标与末位页签被遮挡的问题。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区V0
-
 
 <!-- MEMORY_FIELDS
 {

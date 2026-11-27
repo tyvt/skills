@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:43:14+08:00
+verdict_note: 苏州V3 certificate/* 实存 permission-module-name/permission-business-name，presale- 与 certificate- 前缀并存，权限字符口径冲突描述属实。
+---
 # 菜单权限字符与代码校验字符口径冲突处理规则
 苏州市房地产监测V3 四证类多证照模块权限字符冲突时，先查 SYS_MENU 实际数据再定谁改谁，OperationBtnGroup 只走 permission-module-name/permission-business-name。
 

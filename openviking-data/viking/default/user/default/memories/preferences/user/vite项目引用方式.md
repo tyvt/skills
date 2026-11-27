@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:17:33+08:00
+verdict_note: getStatIconUrl/STAT_ICON_MAP 仅命中历史会话 memory_diff.json，源码 0 命中，无法证明有效。
+---
 - 在 Vue/Vite 项目中，将 `require()` 运行时取图替换为统一方法 `getStatIconUrl(relativePath) => new URL(relativePath, import.meta.url).href`，以兼容 Vite 构建时的静态资源解析与产物映射。
 - `STAT_ICON_MAP` 等图标映射中所有 `require(...)` 改为 `getStatIconUrl(...)` 调用。
 - 本目录图片使用相对路径 `./images/...`；跨目录资源 `@/assets/images/benefit/...` 改为相对路径 `../../../assets/images/benefit/...`。

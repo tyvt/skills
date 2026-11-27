@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:46:24+08:00
+verdict_note: 园区物管2.0 assetPanorama/index.vue-268-273 parseAssetCategories 按 subCategory 解析实测存在
+---
 # 经营资源扁平列表按子类解析展示
 
 根因：`operatingResources.assetCategories` 变更为扁平列表（`subCategory` 为 null 表示大类）。关键修复：`assetPanorama/index.vue` 的 `parseAssetCategories` 自动识别 `subCategory` 展示，名称取 `subCategory` 或 `category`，配色按父级 `category` 取色。

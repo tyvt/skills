@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:54:12+08:00
+verdict_note: ~/.dsh/profiles/web/cordis.patch.yml 实存 harness-dev-context disabled-true 及技能 120→40，上下文预算记录属实
+---
 # DSH 单步上下文预算
 DSH Web 单次请求固定上下文开销的实测构成，2026-11-14 实测由 15.5k 收敛到 14.6k。
 

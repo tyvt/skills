@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:56:55+08:00
+verdict_note: 产品2.0/园区物管2.0 fundPanorama/index.vue 实存 metric-income-amount、metric-account-count 等重命名图标，与描述一致。
+---
 # 资金全景图片重命名与引入
 园区物管2.0 项目中对 mapOverview 图片资源重命名并在 fundPanorama 引入，以匹配设计稿与 mock 数据。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

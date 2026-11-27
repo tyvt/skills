@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:10:56+08:00
+verdict_note: 苏住房G zhi2-web-admin/src/components/OperationBtnGroup/index.vue 命中 cancelApprovalLoading/cancelApproval，取消审核 loading 改造属实。
+---
 # 物业费申报取消审核按钮 Loading 与去图标（苏住房G）
 苏住房G 项目通过通用组件 OperationBtnGroup 与 feeDeclare2/detail.vue 调整「取消审核」按钮的交互与 loading 状态。
 

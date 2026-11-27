@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:52:43+08:00
+verdict_note: 园区公共收益 subAdvertiseDialog.vue 与 subVenueDialog.vue 均存在，前者含 overflow-hidden，与去 Headline 防遮挡修复一致。
+---
 # benefit 明细弹窗去 Headline 嵌套防底部按钮遮挡
 资产租赁申请下的 subAdvertiseDialog / subVenueDialog 等明细弹窗，用 Headline 再包一层会多出边框并与 DetailTemplate 查看态 border 叠加，溢出时盖住 Footer。
 

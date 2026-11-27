@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:51:48+08:00
+verdict_note: 泰兴小程序src下parseRemark 0命中，记忆所述新增容错函数与现状不符。
+---
 # remark为对象或非标JSON致解析报错
 泰兴小程序 el.remark 解析新增 parseRemark 容错处理。
 ## 问题根因

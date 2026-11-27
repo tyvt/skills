@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:13:06+08:00
+verdict_note: expenditureContract/detail.vue 含 isFixedContractAmount、fixedContractAmountType、contractAmountType，一致。
+---
 # 支用合同金额类型显示修复
 苏住房G(zhi2-web-admin) 修复了 property/expenditureContract/detail.vue 新增时合同金额类型显示与切换问题。
 
@@ -21,7 +26,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

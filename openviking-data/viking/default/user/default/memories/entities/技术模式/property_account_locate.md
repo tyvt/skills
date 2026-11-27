@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:49:36+08:00
+verdict_note: 苏住房G 实存 property/propertyAccount/detail.vue、AccountDialog.vue、workBank.js，参数带出修复一致。
+---
 # 近名页面改错位置按请求名定位
 苏住房G项目同业务存在 property/account 与 property/propertyAccount 两个近名页面，参数须改真正发请求的那个页面。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:57:09+08:00
+verdict_note: 产品2.0 与园区物管2.0 ListTemplate.js 均含 column.prop、column.label，key 区分修复属实
+---
 # ListTemplate列v-for的key不能仅用prop
 ListTemplate.js 对 displayColumns 循环若 :key="column.prop"，当两列配置相同 prop 不同 label 会触发 Vue Duplicate keys 警告。
 ## 根因

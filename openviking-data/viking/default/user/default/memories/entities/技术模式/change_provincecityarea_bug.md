@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:48:51+08:00
+verdict_note: companyBasicInfoContent.js 不存在，provinceCityArea 恢复逻辑未找到，无代码证据。
+---
 # 公司变更时 provinceCityArea 未填充的问题
 在 苏州市房地产监测V3 项目中，代理机构登记变更在规范化表单时未恢复 `provinceCityArea` 的原始值。
 
@@ -27,7 +32,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：b9e75113-bcab-4880-a9ad-aff2106e5082
-
 
 <!-- MEMORY_FIELDS
 {

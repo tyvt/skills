@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:21:14+08:00
+verdict_note: 园区物管2.0 fundPanorama 的 index.vue 与 mock.js 命中，坐标轴取整约定对应文件存在。
+---
 # ECharts 轴刻度上限取整约定
 园区物管2.0 统计图坐标轴 max 须用 Math.ceil(峰值/步长)×步长，避免出现 2143 这类非整怪刻度。
 

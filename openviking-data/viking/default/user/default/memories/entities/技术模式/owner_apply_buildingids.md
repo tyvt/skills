@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:46:04+08:00
+verdict_note: 太仓G repairFunds/ownerApply/components/RangeHouseDialog.vue-283实为`buildingIds- this.checkList`传数组，与修复描述一致。
+---
 # 业委会选举申请楼幢勾选buildingIds格式修复
 太仓G 业委会选举申请「选择户室」弹窗勾选左侧楼幢时报系统异常，因 buildingIds 被拼成字符串而非数组，已修复为传数组。
 

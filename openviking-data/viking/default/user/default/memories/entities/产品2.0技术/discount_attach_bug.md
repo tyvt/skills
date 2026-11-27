@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:15:13+08:00
+verdict_note: 产品2.0 存在 discountDialog.vue/discountTable.vue 折扣附件组件，与描述一致
+---
 # 折扣弹窗附件下载失败与回显残留
 新增折扣附件编辑下载不了且再次新增带出上次附件，根因是行内附件走临时 busId 且弹窗复用未重置。
 

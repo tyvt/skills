@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:57:16+08:00
+verdict_note: 园区公共收益 pubBankDetailDay/index.vue 实存 isBankReceiptReconciled、bankReceiptOperateButtons、handleReceiptWriteOff，与描述一致。
+---
 # 已对账收据行错误地显示了核销按钮
 在 Park Public Benefit (zhi2-web-admin) 项目中，pubBankDetailDay/index.vue 中的 bankReceiptOperateButtons 函数未检查对账状态，且总是显示核销按钮。
 

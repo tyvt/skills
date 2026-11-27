@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:09:16+08:00
+verdict_note: 泰兴G bulkImportDialog.vue命中，busCode多处命中，含固定业务码3010与path匹配约定，与描述一致。
+---
 - Interface matches business config by `busCode` and `path`; misusing `this.$route.meta.busCode` (e.g., `feeDeclare2Detail`) with case-mismatched `path` causes backend match failure.
 - In `bulkImportDialog.vue`, import param `busCode` must be a fixed business code (e.g., `3010`); `path` should be standard lowercase value or remove after confirming required.
 - Verification: src=泰兴G/003.md; project: 泰兴G (zhi2-web-admin); source session 7590eb72-ea98-4d1e-bf6a-32ed8129172e; code baseline none.
@@ -7,7 +12,6 @@
 - 所属项目：泰兴G
 - 验证证据：extracted source=cursor project=泰兴G
 - 来源会话：7590eb72-ea98-4d1e-bf6a-32ed8129172e
-
 
 <!-- MEMORY_FIELDS
 {

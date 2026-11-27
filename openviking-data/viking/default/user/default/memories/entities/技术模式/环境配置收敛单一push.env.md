@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T06:08:08+08:00
+verdict_note: 投资推送项目不在本地代码库；索引中12个config.py均属OpenViking/fund，LEGACY_CONFIG_FILES、push.env、930955.env 零命中，无法证实收敛方案已落地。
+---
 # [投资推送] 环境配置收敛为单一 push.env
 遗留按指数拆分的 *.env 应删除，配置加载链统一只读 push.env，密钥与覆盖项统一维护在 push.example.env → 本地 push.env。
 

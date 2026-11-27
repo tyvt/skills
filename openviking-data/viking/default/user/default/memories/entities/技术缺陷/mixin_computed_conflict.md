@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:41:15+08:00
+verdict_note: area.js-46 与 AgencyBasicInfoDetail.vue-359 均有 regionOptions，-421 有 ECONOMIC_INSTITUTIONS_REGION，同名 computed 冲突属实。
+---
 # data与mixin计算属性同名触发Vue警告
 `AgencyBasicInfoDetail` 混入 `area` mixin 的 computed `regionOptions` 与组件 `data` 中同名 `regionOptions`（加载 `ECONOMIC_INSTITUTIONS_REGION` 字典）冲突触发 Vue 警告。
 ## 问题根因

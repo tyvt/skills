@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:25:54+08:00
+verdict_note: 产品2.0 命中 BankAccountTable/operation-btn-group/prefund，账户详情页改造属实。
+---
 # 监管协议账户详情页改造
 产品2.0 项目完成 supervision/agreement/account 下 account/detail.vue 与 BankAccountTable.vue 改造。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:20:28+08:00
+verdict_note: 苏住房C 存在 menuRouteMap.js 与 pages_benefit 分包迁移产物，分包瘦身描述属实；size-owner-package.mjs 未在源码找到（疑为临时脚本）。
+---
 # 分包超2048KB瘦身套路
 单个分包源码超 2048KB 限制时，整页迁出到空闲分包并禁跨包引用、全库核对跳转路径。
 

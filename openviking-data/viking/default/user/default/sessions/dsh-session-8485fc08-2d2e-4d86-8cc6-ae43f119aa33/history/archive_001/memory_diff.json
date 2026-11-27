@@ -1,0 +1,49 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-8485fc08-2d2e-4d86-8cc6-ae43f119aa33/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-27T01:22:01.672846+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/审计回写执行与进度监控.md",
+                "memory_type": "preferences",
+                "after": "- apply 逐条执行 ov write + 回读，速度较慢（每条约 11–12 秒，个别条目 embedding 超时时单条上限可达 120 秒），应预期转入后台执行。\n- 大批量回写耗时较长，可转后台运行并继续做核对，不要干等；后台运行较慢时不要猜测或拼接 job id，用 job_list 获取真实 id 并轮询至完成再汇报。\n- 进度偏慢但稳定时用 wait 阻塞等待进程结束，避免高频轮询带来的额外开销。\n- stdout 重定向后输出文件与 job_output 仅在进程结束时一次性可见；执行期间通过审计日志是否增长来判断进度，不要反复读尚未写入的输出文件；stdout 不打印中间进度属正常。\n- 审计日志 audit.jsonl 每条 apply 追加一行，查其行数即可判断写回进度。\n- 回写前确认 apply 脚本路径：脚本在项目 scripts/ 目录，工作目录为 D:/repository/skills，以避免路径错误。\n- 回写前对所有候选正文执行最终隐私/敏感信息扫描；完成后清理临时校验脚本，只保留缓存中间产物。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/审计回写卡顿诊断与异常处理.md",
+                "memory_type": "preferences",
+                "after": "- 后台 apply 长时间无输出时不要过早判定卡住：先查进程状态与脚本逻辑，判断是否卡在某个 OpenViking HTTP 调用，而不是反复轮询 stdout；每条需多次 ov CLI 读写，45 条约 135 次调用、约 12 秒/条。\n- 审计日志短暂停滞通常是某条 write 卡在 embedding 超时；先再等一个观察周期确认是否继续推进，不要急于中断任务。\n- apply 逐条 write 带 --wait 等 embedding、串行执行；Ollama 断连会显著拖慢写回。长时间无输出疑似卡在 OpenViking API 写回时，先诊断脚本逻辑与进程状态，并抽样读首尾条目的 frontmatter 是否已写入来判断是否真在推进（如首条已写、末条未写即仍在推进），不要急于中断。\n- apply 因 embedding 服务断连报错时，先确认后台任务状态与 embedding 服务健康，再决定继续等待或处理异常。\n- apply 命令超过 12 分钟没有输出时视为异常，应检查具体 apply 循环、审计日志、锁和进程状态，而不是只继续等待。\n- 进程不可见但 job 仍在运行时，不用总体 audit_status 计数判断进度（多为历史轮次）；改读当前轮首尾 URI 的 last_checked 时间戳确认落盘，并抽查中间条目估计剩余时间。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/审计结果生成与回写校验.md",
+                "memory_type": "preferences",
+                "after": "- 回写判定结果时用脚本从 select.json 读取原始 uri/sha、按序号映射判定并生成 result.json，避免中文 URI 编码错误和手工转录全部条目，再执行 apply 回写。\n- result.json 是数组；每条判定记录包含 uri、verdict、note、body_sha256_16 字段；apply 按这些字段映射并逐条回写。\n- 脚本用 1-based 位置索引判定 note 时，不要在字典中间补缺失键；这会让后续键错位，应调整读取下标（如 base[i+1]）并撤销插入。\n- 本地重算哈希与脚本输出不一致时，使用给定的 body_sha256_16，不要用自算约定替换。\n- apply 后必须回读校验；URI 含空格会被 OpenViking 规范化为下划线导致回读失败并被跳过，此时判定结论仍应保留。\n- 全部回写完成后再统一读取 apply 结果与 stats 覆盖率，核对 skipped 数、哈希回读校验与有效/无效分布。\n- apply 汇总 JSON 可能混入 ERROR 行而无法直接解析，可从输出尾部的 applied/skipped/invalid 汇总确认结果；JSON 为多行缩进格式时用 raw_decode 从首个 `{` 开始解析。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/审计代码证据核对.md",
+                "memory_type": "preferences",
+                "after": "- 用 grep 核对记忆描述与真实代码时，排除 skills/memory-migration-archive 等记忆归档目录，归档命中不能当作真实业务代码证据。\n- 每条候选只取最具判别力的符号核对，输出精简命中作为有效性证据，避免大量无关命中干扰。"
+            }
+        ],
+        "updates": [],
+        "deletes": [
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/审计结果回写与进度监控.md",
+                "memory_type": "preferences",
+                "deleted_content": "- 回写判定结果时用脚本从 select.json 读取原始 uri/sha、按序号映射判定并生成 result.json，避免中文 URI 编码错误，再执行 apply 回写。\n- apply 回写每条约 11 秒（read + write 带 --wait 等 embedding + 回读），大批量时耗时较长，可转后台运行并继续做核对，不要干等。\n- 后台 apply 长时间无输出时，先查进程状态与脚本逻辑，判断是否卡在某个 OpenViking HTTP 调用，而不是反复轮询 stdout。\n- 审计日志 audit.jsonl 每条 apply 追加一行，查其行数即可判断写回进度；stdout 不打印中间进度属正常。\n- apply 后必须回读校验；URI 含空格会被 OpenViking 规范化为下划线导致回读失败并被跳过，此时判定结论仍应保留。"
+            },
+            {
+                "uri": "viking://user/default/peers/github.com-tyvt-skills/memories/preferences/github.com-tyvt-skills/记忆审计回写执行.md",
+                "memory_type": "preferences",
+                "deleted_content": "- OpenViking 记忆审计的 apply 回写阶段逐条执行 ov write + 回读，速度较慢（每条约 12 秒，个别条目 embedding 超时时单条上限可达 120 秒），应预期转入后台执行。\n- stdout 重定向后输出文件与 job_output 仅在进程结束时一次性可见；执行期间通过审计日志是否增长来判断进度，不要反复读尚未写入的输出文件。\n- 审计日志短暂停滞通常是某条 write 卡在 embedding 超时；先再等一个观察周期确认是否继续推进，不要急于中断任务。\n- 进度偏慢但稳定时用 wait 阻塞等待进程结束，避免高频轮询带来的额外开销。\n- 全部回写完成后再统一读取 apply 结果与 stats 覆盖率，核对 skipped 数、哈希回读校验与有效/无效（VALID/INVALID）分布。\n- apply 逐条 write 带 --wait 等 embedding、串行执行；Ollama 断连会显著拖慢写回。长时间无输出疑似卡在 OpenViking API 写回时，先诊断脚本逻辑与进程状态，并抽样读首尾条目的 frontmatter 是否已写入来判断是否真在推进（如首条已写、末条未写即仍在推进），不要急于中断。\n- apply 命令超过 12 分钟没有输出时视为异常，应检查具体 apply 循环、审计日志、锁和进程状态，而不是只继续等待。\n- apply 因 embedding 服务断连报错时，先确认后台任务状态与 embedding 服务健康，再决定继续等待或处理异常。\n- 回写前对所有候选正文执行最终隐私/敏感信息扫描；完成后清理临时校验脚本，只保留缓存中间产物。\n- apply 在后台运行较慢时不要猜测或拼接 job id；用 job_list 获取真实 id 并轮询至完成再汇报。\n- 长时间无输出时不要过早判定卡住：先查脚本逻辑；每条需要多次 ov CLI 读写，45 条约 135 次调用、约 12 秒/条。\n- 进程不可见但 job 仍在运行时，不用总体 audit_status 计数判断进度（多为历史轮次）；改读当前轮首尾 URI 的 last_checked 时间戳确认落盘，并抽查中间条目估计剩余时间。\n- 用脚本从 select.json 读取 uri/sha 并合并判定到 result.json，避免手工转录全部条目。\n- 脚本用 1-based 位置索引判定 note 时，不要在字典中间补缺失键；这会让后续键错位，应调整读取下标（如 base[i+1]）并撤销插入。\n- 回写前确认 apply 脚本路径：脚本在项目 scripts/ 目录，工作目录为 D:/repository/skills，以避免路径错误。\n- result.json 是数组；每条判定记录包含 uri、verdict、note、body_sha256_16 字段；apply 按这些字段映射并逐条回写。\n- 本地重算哈希与脚本输出不一致时，使用给定的 `body_sha256_16`，不要用自算约定替换。"
+            }
+        ]
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 4,
+        "total_updates": 0,
+        "total_deletes": 2,
+        "total_skipped": 0
+    }
+}

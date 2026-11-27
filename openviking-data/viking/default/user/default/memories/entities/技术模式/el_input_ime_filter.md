@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:48:14+08:00
+verdict_note: 园区物管2.0 IconSelect.vue-3 @input=filterIcons(无 .native)、-25 filterIcons(value) 直接用事件参数，与记忆一致
+---
 # el-input IME 过滤失效
 在园区物管2.0 中，使用 @input.native 监听 el-input 搜索过滤会在中文输入法下失效，需改 @input 并直接使用事件参数。
 

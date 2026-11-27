@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:47:23+08:00
+verdict_note: 全仓 grep 产品2.0/src 无 contractMainInfo / listContractViewInfo，presale/contractView/index.vue 不存在，记忆所述具体配置无法以现状证据证明。
+---
 # 5 个 Vue 列表页改用 ListTemplate + listMixins
 产品2.0 中将 5 个列表页统一改造为标准 ListTemplate + listMixins 模式。
 

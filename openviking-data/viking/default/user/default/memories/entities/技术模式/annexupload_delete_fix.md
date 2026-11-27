@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:50:46+08:00
+verdict_note: AnnexUpload/index.vue-449/455 命中 handleDelete 与 this.$post('/file/appendix/delete', ids)，删除接口修复属实。
+---
 # AnnexUpload 删除接口修复
 苏州市房地产监测V3 项目 zhi2-web-admin 中公共组件 AnnexUpload 的删除逻辑写错，已修复。
 

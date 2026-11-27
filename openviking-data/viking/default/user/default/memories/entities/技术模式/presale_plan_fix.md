@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T11:17:19+08:00
+verdict_note: 苏州V3 extractPlanId(8)/buildPlanPageResult(4) 命中，预售方案修复属实。
+---
 # 预售方案保存后详情ID解析修复
 苏州市房地产监测V3 中预售方案（presale plan）保存成功后详情页无法正确解析方案 ID 的问题已修复，后端 `PresalePlanSaveVo` 与前端对齐。
 
@@ -15,7 +19,6 @@
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`presale/permit/plan/detail.vue`
 - 所属项目：苏州市房地产监测V3；来源会话：77643a80-744f-419d-abfc-21a4685e8d9f
-
 
 <!-- MEMORY_FIELDS
 {

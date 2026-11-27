@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:16:35+08:00
+verdict_note: 苏住房G serviceItem/detail.vue 中“固定内容”“文本输入”、dictLabel、serviceItem 命中，默认类型改造属实。
+---
 # 阳光物业服务事项默认固定内容类型改造
 苏住房G 项目 serviceItem/detail.vue 服务内容默认类型改为「固定内容」并规范输入规则。
 

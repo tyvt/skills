@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:18:33+08:00
+verdict_note: 无锡市区小程序嵌入H5 index.html/main.ts/utils/restoreWeixinWx.js 均含 restoreWeixinWx 守卫，wx 全局覆盖修复属实。
+---
 # wx全局覆盖修复
 uni-app 主包覆盖 window.wx 导致微信 web-view 内 H5 的 wx.miniProgram 为空，需用守卫与兜底恢复。
 

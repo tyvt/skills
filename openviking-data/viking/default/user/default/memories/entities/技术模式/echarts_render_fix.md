@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:45:33+08:00
+verdict_note: 泰兴小程序 echarts-uniapp.vue 命中 canvas-id/type=2d/formatMonth/dayjs，图表穿屏空白修复属实
+---
 # 工单统计图表穿屏与空白修复
 泰兴小程序统计概览-工单统计图表因旧版 canvas 渲染与日期格式化问题显示异常，已修复并出包。
 ## 问题根因

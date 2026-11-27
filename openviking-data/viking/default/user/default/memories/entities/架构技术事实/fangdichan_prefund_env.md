@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:46:49+08:00
+verdict_note: 苏州市房地产检测V3后端仓库 zhi3-prefund 实存 RegulatorOrgServiceImpl.generateOrgCode，环境/缺陷描述含隐私占位符无明文，属实。
+---
 # 房地产监测V3 prefund模块联调环境
 房地产监测V3（szfc-v3-wt-prefund-new worktree）的前后端联调环境、nginx配置与已知缺陷记录。
 
@@ -18,8 +23,7 @@
 
 ## 权限与数据
 - 菜单按钮权限写入 `COMMON_FRAMEWORK.SYS_MENU`（dameng），新增 23 条：监管账户、监管协议两组各9按钮+协议print
-- 测试数据已清理，zsbase 密码恢复原 hash，Nacos 配置还原
-
+- 测试数据已清理，{{ov_privacy:ambiguous}} 密码恢复原 hash，Nacos 配置还原
 
 <!-- MEMORY_FIELDS
 {

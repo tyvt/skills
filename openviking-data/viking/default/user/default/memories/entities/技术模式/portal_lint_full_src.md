@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:17:08+08:00
+verdict_note: 门户 zhi2-web-admin/package.json 的 lint 脚本为 eslint 扫 src，符合记忆描述
+---
 # 门户 npm run lint 仍扫描整个 src
 门户项目执行 `npm run lint` 会扫描整个 `src/**/*.{vue,js}`，并非仅查指定文件。
 

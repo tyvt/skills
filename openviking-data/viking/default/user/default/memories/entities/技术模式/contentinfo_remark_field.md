@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:12:44+08:00
+verdict_note: 产品2.0 弹窗含 contentInfo、remark、备注字段，查看模式补备注属实。
+---
 # contentInfo 补充备注字段
 `contentInfo` 在查看模式通过 `DetailTemplate` 渲染时此前未包含备注字段，编辑模式已有 `remark` 输入。
 ## 问题根因

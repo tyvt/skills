@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:48:57+08:00
+verdict_note: 苏住房C addHouseContract.vue-40仍为`<ZsButton class="button long">`，未移除long类也无block属性，记忆所述全宽按钮修复与现状不符。
+---
 # 苏住房C添加合同按钮UI修复
 addHouseContract 页面「添加」按钮因布局与组件属性问题显示为窄条，已修复为全宽按钮。
 

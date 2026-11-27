@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:15:46+08:00
+verdict_note: 苏州V3 version-check.js 有 forceRefresh/checkUpdate，main.js/autoRefresh.js 引用，白屏修复属实
+---
 # 预售许可申请维护白屏与页签丢失修复
 苏州市房地产监测V3 预售许可申请页点「预售方案-维护」出现紫色加载页＋约 1 秒白屏＋页签 10 个剩 1 个＋跳不到维护页（禅道 bug 6285）。
 

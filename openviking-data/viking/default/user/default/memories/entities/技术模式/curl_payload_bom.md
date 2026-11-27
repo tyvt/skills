@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:50:38+08:00
+verdict_note: 通用技术事实：PowerShell [Text.Encoding]--UTF8 带 BOM、UTF8Encoding($false) 无 BOM 属实，无隐私/测试垃圾。
+---
 # curl payload BOM 坑
 PowerShell 用 [Text.Encoding]::UTF8 写 curl payload 会带 BOM，被网关判 400，须改用无 BOM 编码。
 

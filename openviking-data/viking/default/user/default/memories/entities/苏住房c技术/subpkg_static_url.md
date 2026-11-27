@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:16:23+08:00
+verdict_note: 苏住房C 中 /static/images/szf/Bg.svg、/szf/Bg.svg、backgroundImage、ownerCard 命中，分包静态资源解析属实。
+---
 # 分包静态资源须用resolveStaticUrl解析
 苏住房C分包内WXSS引用本地图片因路径错误报无法通过WXSS获取，须用resolveStaticUrl按分包名拼路径。
 ## 问题现象

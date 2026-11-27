@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T15:11:28+08:00
+verdict_note: HousePresell-JH 项目不在 D-/repository 仓库清单，Empj_ProjectInfoEdit.js 全库 FILE-NOT-FOUND，oldProject 无命中，无法证明文件与闭合错误修复属实
+---
 # Empj_ProjectInfoEdit.js对象闭合错
 HousePresell-JH 项目 Empj_ProjectInfoEdit.js 中 Vue 实例配置对象 methods 后存在多余 `}` 及缩进错误，引发 JS 语法错误致 Vue 未挂载，页面显示 `{{oldProject.xxx}}` 原样文本。
 

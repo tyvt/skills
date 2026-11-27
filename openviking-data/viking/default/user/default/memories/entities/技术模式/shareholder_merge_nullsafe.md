@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:16:13+08:00
+verdict_note: 苏州V3 mergedRows/beforeRows/percentFormatter 命中，股东合并空值保护属实。
+---
 # 股东表合并的安全格式化
 `ShareholderPlainTable.vue` 为合并模式添加 prop `beforeRows`；一侧的 `undefined` 值应使用安全的 formatter 而不是 `percentFormatter`。
 

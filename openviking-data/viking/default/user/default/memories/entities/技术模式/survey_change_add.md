@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:16:29+08:00
+verdict_note: 苏州市房地产监测V3 surveyChange/detail.vue 与 surveyChangeConstants.js 含 buildSurveyChangeAddPayload，构建新增 payload 修复属实。
+---
 # 通过常量函数构建测绘变更的新增 payload
 `surveyChangeConstants.js` 添加 `buildSurveyChangeAddPayload` 用于映射表单字段到 v1.9 接口参数。
 
@@ -13,7 +18,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：cd5819ca-3f99-45cb-b786-bfcca981ec48
-
 
 <!-- MEMORY_FIELDS
 {

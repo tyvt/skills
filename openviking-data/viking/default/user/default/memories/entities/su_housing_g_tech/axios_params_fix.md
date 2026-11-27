@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:47:57+08:00
+verdict_note: complex/index.vue 含 propertyTypes/complexIds 且全仓无 paramsSerializer，与「移除 paramsSerializer、数组转逗号串」修复一致。
+---
 # 公共查询复杂表参数序列化修复
 苏住房G(zhi2-web-admin) 公共查询 complex 页面因 axios 0.28 与自定义 paramsSerializer 不兼容导致页面 created 阶段调用 getList 报 AxiosError，已修复。
 

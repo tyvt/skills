@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:39:47+08:00
+verdict_note: 苏住房C addHouse.vue-21-25 产权证号用 flex items-center 单行布局，未见 composition-row 断行，与'改为单行'一致
+---
 # composition-row 将证书编号断成两行
 `addHouse.vue` 对产权证书编号使用垂直布局 `composition-row` (`flex-direction: column`)，将文本分成两行。
 
@@ -16,7 +21,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：54f4fa88-f084-46ed-a03b-0f245a7026be
-
 
 <!-- MEMORY_FIELDS
 {

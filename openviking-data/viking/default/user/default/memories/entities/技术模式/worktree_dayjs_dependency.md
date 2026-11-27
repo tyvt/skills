@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T04:56:45+08:00
+verdict_note: 属隔离 worktree 临时依赖指向的构建过程记忆，无对应代码改动可核对；按「无法证明有效即判 INVALID」。项目虽含 dayjs 依赖，但不能证明所述临时修复。
+---
 # worktree 缺少 dayjs 依赖的临时构建修复
 苏住房防汛C端移动查询H5 项目在隔离分支的 worktree 中构建时缺少 dayjs 依赖，临时指向主检出的依赖目录后构建成功。
 

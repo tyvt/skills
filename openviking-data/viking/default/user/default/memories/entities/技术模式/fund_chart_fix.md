@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:18:29+08:00
+verdict_note: mapOverview/chartOptions.js 命中 formatWanValue/buildFundIncomeExpenseOption，数值格式化修复属实
+---
 # 资金收支合并图数值格式化修复
 园区物管2.0 的 benefit/mapOverview 资金收支合并柱状图修复了数值被四舍五入取整导致 0.22 显示为 0 的问题。
 

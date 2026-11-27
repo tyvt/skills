@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:54:32+08:00
+verdict_note: 产品2.0 src/mixins/listMixins.js 实存 !!(this && this.$options && this.$options.props...) 前置判空，与描述一致。
+---
 # Vue3 下 this.$options 判空
 Vue 3 组合式组件或 mixin 复用场景下 `this.$options` 可能为 `undefined`，直接访问 props 会报错，须前置判空。
 ## 问题根因

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:14:40+08:00
+verdict_note: HeadTitle/index.vue 命中 value-link；handleLinkClick/link-click/goToComplexDetail 均命中，link 类型契约属实。
+---
 # HeadTitle 支持 link 类型
 详情顶栏 HeadTitle 的 headTitleList 项可设 type:'link'，实现可点击跳转并对齐 detail-template 契约。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:46:44+08:00
+verdict_note: 苏住房C pages.json 含 decision/index 与 navigationStyle-custom，双头修复可核对。
+---
 # 我的决策页导航双头修复
 苏住房C 项目 `pages_owner/decision/index.vue` 因 pages.json 未设自定义导航导致系统栏与 ZsNav 重复渲染，已修复。
 

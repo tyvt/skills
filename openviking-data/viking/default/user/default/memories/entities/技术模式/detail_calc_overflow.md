@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:15:37+08:00
+verdict_note: 苏州市房地产监测V3 涉及文件 index.scss/AppMain.vue/OperationBtnGroup 存在，operation-btn-group 与 #f7f7f7 命中，问题值 calc(100vh-120px) 已移除符合修复落地。
+---
 # 详情容器高度溢出致底部白条与灰条
 苏州市房地产监测V3 的 zhi2-web-admin 中 detail-container 使用 calc(100vh - 120px) 多出 16px 导致底部白条，未包裹 detail-from-container 的 Headline 滚动层级错误且 el-table 固定列外溢造成灰条。
 

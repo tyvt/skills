@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:47:06+08:00
+verdict_note: stdEvaluation.js 实存 rectificationApi（145-161）且 confirm/close 用 {params-{rectificationNoticeId}} 走 query，与记忆死代码+参数位置结论一致。
+---
 # 整改API封装死代码与参数位置bug
 rectificationApi全仓库无人import是死代码；confirm/close参数放body而后端@RequestParam会报1105。
 

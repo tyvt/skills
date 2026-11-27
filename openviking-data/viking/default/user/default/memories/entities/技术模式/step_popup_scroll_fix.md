@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:13:00+08:00
+verdict_note: 泰兴小程序 add.vue 含 step-form-body/scroll-view，巡检说明弹窗滚动错位修复属实。
+---
 # 巡检步骤弹窗滚动错位修复
 泰兴小程序员工端「添加巡检记录」步骤弹窗中「巡检说明」placeholder 跟随滚动错位，已通过将弹窗内容区改为 scroll-view 修复。
 

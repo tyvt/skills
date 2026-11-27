@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:42:48+08:00
+verdict_note: 通用 git 教训：git commit -- <path> 绕过暂存区取子模块 HEAD 属实；suzhufang 分支命中，具体 hash ab8412e/d423d12 未逐一核对。
+---
 # 提交子模块 gitlink 禁用 git commit -- <path>
 用 `git commit -- <path>` 提交子模块指针会绕过暂存区、取子模块工作区当前 HEAD，把别的分支指针误写进父仓。
 

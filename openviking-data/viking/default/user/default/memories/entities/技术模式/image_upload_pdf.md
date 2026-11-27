@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:52:43+08:00
+verdict_note: ImageUpload/index.vue 命中 getFileExtension 与 isImageFile，PDF 缩略图修复在。
+---
 # ImageUpload的PDF缩略图破图
 苏住房G通用 ImageUpload 组件在 picture-card 模式把 PDF 地址当 img.src，导致上传 PDF 后缩略图破图、预览异常。
 

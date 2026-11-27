@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T22:15:26+08:00
+verdict_note: 苏州V3 命中 canEditInHeader/showSaveButton/isViewDisplay/AgencyBranchDetail，保存按钮门控属实
+---
 # Branch Detail Save Button Gating
 AgencyBranchDetail.vue defines header-button gating so the "保存" button only appears in editable states, not in view mode.
 
@@ -20,7 +24,6 @@ AgencyBranchDetail.vue defines header-button gating so the "保存" button only 
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：27689708-9f9b-4386-9993-e547142b1ab3
-
 
 <!-- MEMORY_FIELDS
 {

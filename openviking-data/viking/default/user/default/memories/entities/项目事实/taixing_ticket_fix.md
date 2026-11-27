@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:15:19+08:00
+verdict_note: 泰兴小程序 命中 staff-page-theme/$staff-primary/1677ff/issue，主题色统一属实
+---
 # 泰兴小程序员工端工单（报事/报修）主题色修复
 泰兴小程序员工端工单页因硬编码色值与未注入主题导致双主色，已统一为 `#1677ff`。
 

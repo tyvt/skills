@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:12:55+08:00
+verdict_note: 苏州V3 companyApplyAudit/detail.vue 命中 INDUSTRY_ASSOCIATION，字典转写属实
+---
 # INDUSTRY_ASSOCIATION 字典转写修复
 苏州市房地产监测V3 中机构备案详情页行业协会组织未转写字典名称，已接入 INDUSTRY_ASSOCIATION 字典并兼容数值比较。
 

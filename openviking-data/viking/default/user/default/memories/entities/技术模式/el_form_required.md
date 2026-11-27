@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:46:36+08:00
+verdict_note: 园区公共收益 operatorAddDialog/operatorDialog 命中 required/rules/message，el-form-item 必填规则场景属实
+---
 # 表单中多余的 required 属性覆盖英文提示
 在 园区公共收益 (zhi2-web-admin) 项目中，`el-form-item` 的 `required` 属性注入了不含 `message` 的规则；Element UI 使用默认的英文提示，覆盖了 `rules` 中的中文提示。
 

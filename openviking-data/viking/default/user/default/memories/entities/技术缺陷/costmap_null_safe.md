@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:14:49+08:00
+verdict_note: 园区物管2.0 owner/index.vue 命中 costMap/sumFromApi/defaultSum，空安全属实
+---
 # accountOpen业主页costMap空安全
 列表/汇总区直接取response.costMap.sum在costMap为null时会抛错，需可选链与默认合并。
 

@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:47:23+08:00
+verdict_note: _personnelStatusCode、listCallback 全仓 0 命中，复合状态列的关键字段不存在，描述无法核实
+---
 # 开发企业从业人员备案状态列复合展示
 苏州市房地产监测V3 中开发企业从业人员备案（personnelRecord）模块的状态列已改为按 bizState + cancelStatus 复合展示，复用 personnelStatus.js 与 personnel_business_status 字典。
 
@@ -18,7 +22,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 所属项目：苏州市房地产监测V3；来源会话ID：aee9a3ba-5a81-43af-bc39-5611731be2b1；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

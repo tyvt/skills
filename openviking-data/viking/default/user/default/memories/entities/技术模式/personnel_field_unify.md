@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:14:41+08:00
+verdict_note: 苏州V3 agencyPersonnelBasicInfoFields.js 有 resolveAgencyPersonnelBasicInfoFields/showPersonnelRoleField，字段统一描述属实
+---
 # 经纪人员字段查看编辑显隐不统一修复
 showPersonnelRoleField 在查看与编辑模式判断差异，致经纪与专业人员字段数不一致（17/18项），已抽象统一显隐逻辑对齐。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:23:32+08:00
+verdict_note: 苏住房C 构建产物命中 resolveRelativePageUrl/openPage，navigateTo相对路径修复属实
+---
 # 小程序navigateTo相对路径跳转失败修复
 苏住房C小程序通过openPage统一解析相对路径为绝对路径，解决navigateTo找不到页面的问题。
 ## 问题场景

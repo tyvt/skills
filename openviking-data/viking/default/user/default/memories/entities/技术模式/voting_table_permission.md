@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:48:04+08:00
+verdict_note: 核对园区物管2.0：VotingItemsTable、permissionType、viewDecisionDetailButton 命中，表决表格权限描述一致。
+---
 # 投票项表格权限字符缺失
 园区物管2.0 中 VotingItemsTable 的两个按钮未配置有效权限字符，导致 zs-operate-column 拼接权限时可能无限制。
 
@@ -14,7 +19,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:41:41+08:00
+verdict_note: 园区公共收益 platformConfig/detail.vue-55 为'是否短信通知 passwordMsg'，全局无 smsLoginStatus 字段，与记忆不符
+---
 # 平台配置短信登录开关驱动登录页
 园区公共收益项目在 platformConfig 新增布尔开关控制登录页是否展示短信登录方式。
 

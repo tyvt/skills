@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:26:07+08:00
+verdict_note: ParcelDialog.vue 在项目管理的zs-form布局命中，el-row gutter=32/span=12描述属实
+---
 # 宗地变更信息弹窗两列表单布局
 苏州市房地产监测V3 项目中 ParcelDialog.vue 改造为两列表单布局，仅改动此文件。
 

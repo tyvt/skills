@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:44:22+08:00
+verdict_note: 产品2.0 property/syncObligee/index.vue 实存 list-card 包裹，与记忆修复一致。
+---
 # 榆林分支列表list-card包裹层丢失修复
 产品2.0 的 develop/v2.6.2-yulin 分支因合并问题丢失了多个页面的 list-card 包裹层，已修复。
 

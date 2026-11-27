@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:25:56+08:00
+verdict_note: 小程序 face.vue 命中 canStartVerify/startFaceVerify/重试按钮；goBackAfterFaceFail 已移除符合记忆描述。
+---
 # 人脸识别失败当前页重试
 face.vue 人脸识别失败改为当前页展示失败态并提供重试，而非自动后退。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:48:23+08:00
+verdict_note: 苏住房C pages.json 仅有 pages/index/home 与 pages/login/index，未见 type-"home" 配置，login 下亦无 onLoad；记忆所述启动页改动无法以现状证据证明。
+---
 # home类型页成启动页致login自动登录未触发
 pages/home 配置 type: "home" 被 @uni-helper/vite-plugin-uni-pages 排至首位作为入口，冷启动不加载 login.vue 致自动登录失效。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:52:11+08:00
+verdict_note: 苏住房G feeDeclare2/detail.vue 实存 showSave 与 formMode 判定，保存按钮显隐属实。
+---
 # 一键申报详情保存按钮显隐修复
 物业费申报页点「一键申报」进详情后「保存」按钮误显示，需将显隐判定收敛为仅看 formMode。
 

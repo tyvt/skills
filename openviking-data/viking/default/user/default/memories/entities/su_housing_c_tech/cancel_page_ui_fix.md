@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:46:44+08:00
+verdict_note: 核对苏住房C：utils/index.js 命中 decodeHtmlEntitiesIfNeeded，cancellationWarning 路径与 UI 修复描述一致。
+---
 # 账户注销页面 UI 异常修复
 苏住房C 小程序账户注销页（cancellationWarning.vue）修复空白区域、图标未居中及协议渲染不全问题。
 

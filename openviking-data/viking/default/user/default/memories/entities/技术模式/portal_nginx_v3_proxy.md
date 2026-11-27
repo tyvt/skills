@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:48:21+08:00
+verdict_note: 门户 deploy/nginx.conf 与 vite.config.js 均含 /v3.0 路径段保留，与记忆反代修复一致。
+---
 # 门户 Nginx 反代 /api/v3.0 保留路径段
 Nginx 反代 /api/v3.0 时 proxy_pass 与调试头须保留 /v3.0 路径段，否则接口 404。
 ## 问题根因

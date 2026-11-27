@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T19:42:28+08:00
+verdict_note: 全库无 verifyHouseOwner/handleHouseOwner/noReject 真实代码，命中仅记忆归档自引用，无法证明该偏好落地
+---
 - 偏好在苏住房C小程序按合同/权证添加房屋时，若核验接口返回非200，不触发全局一闪而过的 toast，而由页面展示「核验失败」弹窗，提供「人工登记」与「重试」。
 - 偏好未查到房屋或未关联小区时，继续用成功类弹窗引导「人工登记」，按钮文案统一为「人工登记」而非「手动维护」。
 - 偏好新增`verifyHouseOwner`（noReject:true）由页面自行处理失败逻辑，替代原`handleHouseOwner`全局 reject 行为。

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:14:59+08:00
+verdict_note: 苏住房G含stripDuplicateHomeRoutes与index-wrapper，首页路由重复注册修复属实。
+---
 # 首页路由重复注册与旧版 UI 修复（苏住房G）
 苏住房G 点左侧菜单栏出现旧版首页的问题已修复，统一路由映射并避免动态路由重复注册。
 

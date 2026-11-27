@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:11:54+08:00
+verdict_note: authentication.vue .page-container 仍有 align-items-center(L116)，未出现 icon-slot{width-20px;height-20px} 固定尺寸；记忆称移除 align-items-center 并补固定尺寸，与现状矛盾。
+---
 # ZsImage图标塌陷为0加卡片被压窄
 苏住房C业主端认证页选项卡片不铺满、右侧单选圆圈不可见，由三处独立原因叠加。
 

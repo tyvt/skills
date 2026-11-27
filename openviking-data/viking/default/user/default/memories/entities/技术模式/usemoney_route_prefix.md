@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:18:21+08:00
+verdict_note: 苏州V3 路由信息.json 含 general/usemoney 类型前缀，ruoyi.js 存在，资金使用跳转加前缀修复无反证（pathHints 命名已变更）。
+---
 # 资金使用详情跳转缺少类型前缀
 
 在项目 苏州市房地产监测V3 中，资金使用详情导航因缺少类型前缀而跳转到未监管页面。

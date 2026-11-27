@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:47:07+08:00
+verdict_note: 核对苏住房C：resolveStaticUrl、location-red.png、houseMap 命中，prune-main-static 跨包 import 修复属实。
+---
 # 主包静态图被裁导致跨包import 500
 苏住房C 小程序为压主包体积将公共图标拆到各分包 static，构建后 prune-main-static 删主包同名文件，仍用主包路径 import 的页面运行时 500 且静默退默认 marker。
 

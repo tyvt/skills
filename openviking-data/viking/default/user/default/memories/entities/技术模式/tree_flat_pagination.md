@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:54:29+08:00
+verdict_note: 苏住房G RegionTreeLayout.vue 含 type-right-body 中间容器，平铺态分页高度链修复属实
+---
 # 部门树平铺态分页消失修复
 苏住房G 部门树 RegionTreeLayout 从树形切到「平铺展示」后列表底部翻页组件被裁掉，需三层联动修复。
 

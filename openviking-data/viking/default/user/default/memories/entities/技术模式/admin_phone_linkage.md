@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:10:44+08:00
+verdict_note: 两个 SingleForm.vue 与两份 e2e spec 均在；文件内含法人电话联动、readonly/disabled 与切换清空逻辑，与记忆一致。
+---
 # 注册页管理员身份联动联系电话
 开发企业/机构注册页管理员选法人则联系电话只读取法人电话，选受托人则可改且切换时清空。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:18:07+08:00
+verdict_note: 苏州市房地产监测V3 entrustSale/detail.vue 命中 shouldLoadSelectOptions，terminalType 读取修复属实
+---
 # 委托销售详情页terminalType读取修复
 苏州市房地产监测V3 的 entrustSale/detail.vue 修复了 terminalType 始终为 undefined 导致选项未加载的问题。
 

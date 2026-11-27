@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:45:02+08:00
+verdict_note: 苏住房G accountInfo.vue含isCaptchaError及两种验证码超时/错误文案，分支修复属实。
+---
 # 机构注册验证码分支区分
 苏住房G(zhi2-web-admin)机构注册页修复验证码失败提示，区分超时与输错两种场景文案。
 

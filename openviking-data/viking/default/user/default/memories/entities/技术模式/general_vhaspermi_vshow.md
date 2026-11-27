@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:47:45+08:00
+verdict_note: 太仓G zhi1-web-admin generalDecision/detail.vue 实存 isSubmittedBiz、checkPermission，v-hasPermi覆盖v-show修复描述属实。
+---
 # v-hasPermi 覆盖 v-show 隐藏按钮
 
 在 太仓G zhi1-web-admin 项目的 generalDecision/detail.vue 页面中，底部按钮使用了 v-show 和 v-hasPermi，导致冗余。
@@ -18,7 +23,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=太仓G
 - 来源会话：3c3a27ee-5748-4f83-bd05-d3e2e69d6434
-
 
 <!-- MEMORY_FIELDS
 {

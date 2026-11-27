@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:48:43+08:00
+verdict_note: 园区公共收益命中 preparatoryApply/preparatoryRangeTable/「筹建范围」，隐藏增删默认全量约定属实。
+---
 # 筹建申请筹建范围默认全量禁改
 园区版筹建申请详情隐藏筹建范围增删、默认加载全量房屋的后端约束与前端改造约定。
 ## 业务规则

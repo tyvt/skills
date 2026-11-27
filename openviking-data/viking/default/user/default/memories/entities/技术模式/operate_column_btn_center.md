@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:45:53+08:00
+verdict_note: 园区物管2.0 zs-operate-column.vue 实存 operate-column-button-container 且含 justify-content-center，单按钮居中修复属实。
+---
 # 操作列单按钮居中修复
 园区物管2.0 中 zs-operate-column.vue 在操作列仅有一个「查看」按钮时因列宽变大导致按钮不居中，已修复。
 

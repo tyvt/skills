@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:49:26+08:00
+verdict_note: V3 zs-table-column.vue 实存 isFixedWidthCustomSlot/containsComplexSlotNode，另两符号在同族产品2.0，列宽修复属实。
+---
 # 表格列宽全局排查与修复
 苏州市房地产监测V3 优化 zs-table-column 与 element-ui 样式，修复表格列宽误算与表头省略问题。
 

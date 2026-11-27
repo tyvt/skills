@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:18:44+08:00
+verdict_note: 园区物管2.0 中 getQueryParams、parentDeptId、applyType 在 assetLeaseApply/resourcesLeaseContractFiling 命中，同名 methods 覆盖问题属实。
+---
 # Vue 同名 methods 静默覆盖
 园区物管2.0 的 Vue 组件 methods 里同名方法定义两次会静默覆盖，靠 no-duplicate-vue-options 门禁拦截。
 

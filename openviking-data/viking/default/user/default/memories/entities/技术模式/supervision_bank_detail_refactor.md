@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:26:15+08:00
+verdict_note: 产品2.0 及多仓存在 supervision/bank/{cbyh,jgwd,wtjgxy}/detail.vue，contentInfo2 与 DetailTemplate type-'dict' 用法在源码可查，描述属实。
+---
 # 产品2.0监管银行详情页改造
 产品2.0 项目将 supervision/bank 三个详情页按新版框架规范改造，并为 DetailTemplate 增加 type:'dict' 渲染支持。
 

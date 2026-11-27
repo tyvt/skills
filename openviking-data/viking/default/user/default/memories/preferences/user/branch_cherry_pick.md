@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:34:52+08:00
+verdict_note: 工作流偏好：cherry-pick 分支提交在多事件记忆中交叉印证，env/.env 分支差异约定无相反证据，属合理偏好记忆。
+---
 - 子模块 zhi2-web-admin 与父仓库提交至 develop/v2.6.1/2/yulin 分支时，因 env/.env 未提交等分支差异，采用 cherry-pick 单条修复而非全量 merge
 - 涉及 fix(收费标准) 列表字段对齐与底部空白等改动
 - 来源会话：2c17338a-e53b-49fc-afee-3c701ab5cbc9
@@ -6,7 +11,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -16,12 +16,16 @@
 - tag `202611131548`（2026-11-13）：父仓提交 a672d2e（远程 05842ff），子模块提交 9f04cb5（远程 30887b1）
 - 父仓 tag 注释：「苏服办跳转增加链路日志（密文脱敏）+ 缺失手机号提示改为绑定指引（子模块 9f04cb5）」
 
+## 相关缺陷
+- 业主决策确认后打开失败/无反应的排查与修复详见 bug/sfb_vote_open 实体。
+
+
 <!-- MEMORY_FIELDS
 {
   "category": "项目",
   "name": "zhi2_mobile_shimin",
-  "source_extraction_id": "5db6478697d3414f94ebbea622994d60",
-  "version": 1,
+  "source_extraction_id": "7f972e1739974242b0a22cc45a3804a4",
+  "version": 5,
   "memory_type": "entities"
 }
 -->

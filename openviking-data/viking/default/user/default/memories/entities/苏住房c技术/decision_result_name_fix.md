@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:09:26+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin源码form.vue及编译产物DecisionResult均含decisionPlayerName，CardList存在；resolvePlayerName私有命名未命中但主映射成立。
+---
 # 决策记录姓名显示修复（DecisionResult.vue）
 苏住房C(zhi2-mobile-shimin)业主端决策页DecisionResult.vue因字段映射缺失导致决策人姓名不显示，已通过CardList的label/value/remark映射修复。
 

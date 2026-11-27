@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:45:15+08:00
+verdict_note: 苏州V3 permitConstants.js含buildingNo，cashsaleConstants.js含flattenCashsale，楼幢号优先映射属实。
+---
 # 楼幢号优先展示buildingNo回退buildingCode
 苏州市房地产监测V3 预售与现售模块楼幢号列及文案优先展示 `buildingNo`（无则回退 `buildingCode`）。
 
@@ -12,7 +17,6 @@
 - 验证证据：src=苏州市房地产监测V3-rest/074.md
 - 涉及文件：PresaleSelectBuildingDialog.vue、CashsaleDetail.vue、permitConstants.js、PresaleBuildingTable.vue、CashsaleSelectBuildingDialog.vue、PresaleHouseTable.vue、detail.vue、PresaleProgressDialog.vue、SelectBuildingDialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话：762f7645-68ac-43ea-9ab7-f47dca205482；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

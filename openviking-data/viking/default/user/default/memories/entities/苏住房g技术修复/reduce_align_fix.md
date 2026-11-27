@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:13:16+08:00
+verdict_note: 苏住房G zhi2-web-admin 命中 reduceRecordTable.vue 与 amountFormatter，减免记录表头对齐修复属实。
+---
 # 物业费账单减免记录表头内容对齐修复（苏住房G）
 苏住房G 项目修复物业服务费账单详情中减免/优惠记录列表表头与内容对齐不一致的问题。
 

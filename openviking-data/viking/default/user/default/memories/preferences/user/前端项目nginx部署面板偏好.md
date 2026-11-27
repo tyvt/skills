@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:28:53+08:00
+verdict_note: 前端本地部署走 nginx UI 面板、手改 conf 须 Reload 的偏好，与当前 AGENTS.md 部署面板硬拦截规则一致，属有效用户偏好。
+---
 - 前端项目本地部署统一使用 nginx UI 面板管理，站点配置写在 D:/nginx/conf/sites-enabled/*.conf（由面板维护），不使用 http-serve、live-server、python -m http.server 等其他本地静态服务器替代。
 - 面板是 nginx 配置的真实来源；手改磁盘 conf 文件后必须到面板执行 Reload/重载，避免面板状态与磁盘配置漂移，面板里的改动也要确实落到 sites-enabled 文件。
 - 出现配置冲突（例如两个 server 块抢同一 listen 端口且 server_name 相同导致 "conflicting server name ... ignored"）时，优先在面板对应站点配置中调整端口/服务名，不临时手改后不回写面板。

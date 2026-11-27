@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:42:08+08:00
+verdict_note: 门户 InformationPages.vue 与 public-portal-interactions.spec.ts 实存 portal-notice-title，notice-detail 路由存在，标题高亮链接描述属实。
+---
 # 门户公示公告标题列高亮链接
 门户 InformationPages.vue 的公示公告标题列改为高亮链接，点击与「查看」走同一条详情路由。
 

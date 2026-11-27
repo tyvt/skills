@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:16:07+08:00
+verdict_note: 苏州市房地产监测V3 存在 buildEntrustSaleBuildingSelectDialogOptions/entrustSaleConstants 公共弹窗改造，与描述一致
+---
 # 委托代售楼幢选择公共弹窗改造
 苏州市房地产监测V3 委托代售「选择楼幢」已改为公共 `SelectDialog.open`（`zs-select-dialog`），与测绘变更等预售模块一致。
 

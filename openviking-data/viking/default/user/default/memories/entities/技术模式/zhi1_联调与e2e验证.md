@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:48:55+08:00
+verdict_note: 太仓物管/zhi1-web-admin package.json 命中项目名；记忆自述凭据在 Nacos 不在工作区，与本地无 shared-druid-dev 一致。
+---
 # zhi1 注册流程联调与 E2E 验证
 zhi1-web-admin（太仓物管前端）企业注册流程改造的 dev 联调、Playwright E2E 验证环境与阻塞点。
 
@@ -21,7 +26,6 @@ zhi1-web-admin（太仓物管前端）企业注册流程改造的 dev 联调、P
 
 ## 归属
 - 所属项目：zhi1-web-admin（太仓物管前端）。
-
 
 <!-- MEMORY_FIELDS
 {

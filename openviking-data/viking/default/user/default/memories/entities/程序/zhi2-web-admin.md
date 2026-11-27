@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:43:04+08:00
+verdict_note: 门户仓含marketMonitor/dashboard.css等市场监测面板结构，项目描述与现状相符。
+---
 # zhi2-web-admin
 门户 npm workspaces 单仓子模块前端项目，承载无锡市区（benefit）前端业务，父仓 zhi2-web-admin-h5-g-unlimited（中文名"无锡市区G"）。
 

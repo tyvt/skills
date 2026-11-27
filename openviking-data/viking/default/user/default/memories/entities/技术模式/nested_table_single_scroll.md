@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:01:00+08:00
+verdict_note: 苏州市房地产监测V3 contract 下 s16-scroll、s16-party-table-wrap、sz-contract.scss 实存，与单滚动防错位描述一致。
+---
 # 嵌套宽表多重横向滚动须外层单滚动防错位
 苏州市房地产监测V3 中嵌套宽表因多重隐式 `overflow-x: auto` 叠加致横向滚动条重复与表头错位，须仅保留外层单滚动。
 

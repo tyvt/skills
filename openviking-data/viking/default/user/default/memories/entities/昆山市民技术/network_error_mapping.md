@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:15:40+08:00
+verdict_note: 昆山市民 Network Error 命中1次，网络错误映射涉及文件均在。
+---
 # Network Error 映射文案指网络层失败
 昆山市民请求拦截器将 `Network Error` 映射为「后端接口连接异常」，该报错属网络层失败而非业务 code 错误。
 

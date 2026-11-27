@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:13:03+08:00
+verdict_note: entrustSale/detail.vue 命中 isFormDisabled 与 canOperateAppendix，与表单禁用级联附件按钮描述一致。
+---
 # 委托销售表单禁用阻塞附件按钮
 在委托销售的 `detail.vue` 中，`zs-form` 的 `:disabled="isFormDisabled"` 会级联禁用附件区域的按钮；移除后，`canOperateAppendix` 仅验证 `bizState === '0'`。
 

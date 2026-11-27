@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:48:57+08:00
+verdict_note: 园区物管2.0 index.scss 含 --before/--after、dialog-right、el-table 去重样式，accountQuery/type.vue 存在，与描述一致
+---
 # 弹窗内表格底部双重边框去重
 园区物管2.0 中弹窗（非 list-card 容器）内 zs-table 底部出现加粗/重合下边框的根因与修复。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:56:10+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin elevator/addAlone.vue 实存 inputHidden、adjust-position、word-limit，与地图/输入冲突修复描述一致。
+---
 # 加梯申请页地图与输入框原生组件冲突修复
 苏住房C小程序 `pages_owner_extra/elevator/addAlone.vue`（及 add.vue）修复地图原生组件与「申请说明」输入框互相遮挡导致无法输入的问题。
 

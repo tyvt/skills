@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:12:01+08:00
+verdict_note: 无锡锡山业主决策H5 src/store/user.js 含 tokenV0（4 处）与 clear，双 token 清理修复与描述一致。
+---
 # V0V2双token清理校验不足致登录与头异常
 无锡锡山业主决策H5 中 tokenV0 与 tokenV2 双 token 清理校验不足，导致登录跳转异常与旧 token 残留。
 

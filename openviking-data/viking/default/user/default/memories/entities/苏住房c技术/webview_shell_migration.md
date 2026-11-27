@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:15:09+08:00
+verdict_note: 苏住房C 含 automaticRobot 壳页与 digital-accumulation-fund 域名，web-view 嵌入第三方 H5 迁移属实。
+---
 # 苏住房C原生页改web-view嵌入流程
 将已上线原生页改为web-view嵌入第三方H5时，必须保留原生壳页、配置域名白名单、多分支同步提交。
 

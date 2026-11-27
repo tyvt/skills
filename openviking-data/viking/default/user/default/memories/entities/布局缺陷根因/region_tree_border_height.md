@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:15:46+08:00
+verdict_note: 园区物管2.0 命中 RegionTreeLayout、regionTree，布局高度修复描述与组件现状一致
+---
 # RegionTreeLayout 左侧树边框随节点变矮
 园区物管2.0 物业 complex 页左侧树面板边框随节点数量收缩变矮，根因是 flex 对齐与 height:auto 覆盖。
 

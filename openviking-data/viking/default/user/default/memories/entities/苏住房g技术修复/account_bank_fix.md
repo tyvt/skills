@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:44:53+08:00
+verdict_note: 苏住房G propertyAccount/detail.vue 命中 bankAccount(1)、disabled(20)，编辑只读逻辑属实
+---
 # 账号管理编辑银行账号与名称显示只读修复（苏住房G）
 苏住房G 项目修复 propertyAccount/detail.vue 与 account/detail.vue 在编辑模式下银行账号和账户名称的显示与只读逻辑。
 

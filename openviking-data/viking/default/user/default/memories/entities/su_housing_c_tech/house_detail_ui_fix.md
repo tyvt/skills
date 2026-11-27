@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:14:15+08:00
+verdict_note: pages_owner/house/detail.vue 与 housekeeper/detail.vue 均命中；house-page 类命中，去掉 flex 居中改块级流式布局属实。
+---
 # 业主房屋详情页 UI 紊乱修复
 苏住房C 小程序 `pages_owner/house/detail.vue` 因 flex 布局导致卡片错位、按钮压缩，已修复。
 

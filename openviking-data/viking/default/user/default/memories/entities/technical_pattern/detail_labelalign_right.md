@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:13:36+08:00
+verdict_note: 苏州V3 含 labelAlign/AgencyBranchDetail/AgencyPersonnelDetail/agencyBasicInfoContent，去除写死右对齐属实。
+---
 # 写死labelAlign:right破坏详情左对齐
 苏州市房地产监测V3 的 AgencyBranchDetail.vue 与 AgencyPersonnelDetail.vue 写死 labelAlign:'right' 覆盖 DetailTemplate 默认左对齐。
 

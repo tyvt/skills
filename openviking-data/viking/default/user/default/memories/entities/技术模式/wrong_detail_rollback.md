@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:15:48+08:00
+verdict_note: 命中 audit-wrong-detail-apis.json 与 system/msg/publish 接口，与'/detail误改回滚'描述一致。
+---
 # 误改/detail接口批量回滚
 批量脚本误将 publish、calculationChart 等非详情接口改为 `./detail`，已按规范回滚约93个文件。
 

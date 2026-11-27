@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:12:29+08:00
+verdict_note: PresalePlanFillForm.vue 命中 parseCompletionPlanLegacy，与历史文本解析回填描述一致。
+---
 # 预售方案历史文本自动解析回填
 苏州市房地产监测V3 中 `PresalePlanFillForm.vue` 完成历史文本自动解析回填改造。
 

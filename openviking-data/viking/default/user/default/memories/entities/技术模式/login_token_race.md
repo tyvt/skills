@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T11:14:20+08:00
+verdict_note: 惠山小程序 src/pages/login/index.vue 不存在，clearAuthState 全局真实代码0命中，登录页/鉴权清理核心实现无证据。
+---
 # 登录页收敛时序避免token竞态
 登录页作为启动首屏执行登录并写token后再初始化业务，避免业务请求先于token就绪导致的竞态问题。
 

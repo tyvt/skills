@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:50:10+08:00
+verdict_note: 实机核对：产品2.0 pubBankReceiptApply/detail.vue(328) rowKey-'projectId'（非 complexId），zs-table.vue(608-620) rowClassName 对 undefined/null/'' 行 key 空值过滤；描述属实。
+---
 # zs-select-dialog rowKey 误用导致整表高亮
 zs-select-dialog 的 rowKey 误写为接口不存在的字段时，所有行 key 为 undefined，选中后整表高亮。
 

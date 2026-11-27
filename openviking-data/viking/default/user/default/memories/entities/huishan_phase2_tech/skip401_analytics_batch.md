@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:22:02+08:00
+verdict_note: 惠山二期H5 zhi2-mobile-admin-h5-c-unlimited/src/api/analytics.js 命中，skip401埋点401处理属实
+---
 # 批量埋点接口401需skip401避免误登出
 惠山二期H5 全局 401 处理未区分埋点接口，导致批量埋点返回 401 时误清 session 并跳转「我的」。
 

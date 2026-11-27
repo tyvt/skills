@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:52:04+08:00
+verdict_note: patterns/index.js 中 IDCardNumber 为校验函数（非正则），与误用 .test() 根因描述属实
+---
 # IDCardNumber误用test类型错误
 苏住房G中patterns/index.js仅IDCardNumber为校验函数，误用.test()引发TypeError，已全仓库消除该误用。
 ## 问题根因

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:10:34+08:00
+verdict_note: 无锡锡山业主决策H5 login.vue 有 lingxiLogin/queryUser/登录中/hideLoading，登录 loading 描述属实
+---
 # 登录页增加 loading 并在全部接口完成后关闭
 无锡锡山业主决策H5 的 src/pages/common/login.vue 增加登录 loading，确保全部接口调用完毕或失败后关闭。
 

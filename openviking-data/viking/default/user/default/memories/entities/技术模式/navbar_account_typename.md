@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:18:19+08:00
+verdict_note: 园区公共收益 命中 accountTypeName/sys_account_type_all/Navbar/deptName，组织类型展示属实
+---
 # 导航栏组织类型展示依赖accountTypeName
 zhi2-web-admin 顶栏 Navbar 在 nickName 后追加组织类型时判断解析后的 accountTypeName 而非 getInfo 里的 accountType 原值。
 

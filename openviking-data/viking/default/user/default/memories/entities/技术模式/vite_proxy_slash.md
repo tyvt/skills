@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T15:43:19+08:00
+verdict_note: 产品2.0 vite.config.js 有 normalizeProxyContext（s.startsWith("/")?s-"/"+s）与 baseApiContext=normalizeProxyContext(env.VITE_APP_BASE_API)，并注明 req.url 恒以 / 开头；与记忆方案语义一致（仅变量名重构）。
+---
 # Vite代理前导斜杠处理（产品2.0）
 产品2.0 的 Vite 开发代理 key 必须以 / 开头，但生产环境接口必须是相对路径 api/v2.0（无前导 /），两者对同一环境变量 VITE_APP_BASE_API 的要求冲突。
 
@@ -23,7 +27,6 @@
 - 验证代理生效看响应头 frontend-proxy
 - 与已知「env 被 .env.development.local 覆盖」是不同根因，分别排查
 - 涉及文件：vite.config.js、env/.env；所属项目：产品2.0；来源会话：317d62ff、dace033e；基线：5a86102、dfe69d6
-
 
 <!-- MEMORY_FIELDS
 {

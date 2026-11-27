@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:14:21+08:00
+verdict_note: 产品2.0全仓无operationColumnWidth，描述的table.js补默认80修复不存在。
+---
 # ListTemplate 操作列宽度 mixin 默认值
 ListTemplate.js 操作列绑定 operationColumnWidth，页面仅用 listMixins 未声明时会 Vue warn，须在 table.js 提供默认 80。
 

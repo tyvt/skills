@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:42:28+08:00
+verdict_note: presale/permit/permitConstants.js含PLAN_DICT_TYPES与resolveDictLabel，字典接入去硬编码属实。
+---
 # 预售方案三字段经zs-select接入字典去硬编码
 苏州市房地产监测V3 预售方案的土地使用权类型、土地用途、有无委托三字段改为经 zs-select 接入字典，移除硬编码选项。
 

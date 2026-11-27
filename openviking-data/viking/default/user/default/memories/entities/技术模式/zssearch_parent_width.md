@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:32:01+08:00
+verdict_note: 苏住房C 源码中 pages_transaction/houseVideo/index.vue 不存在（n=0），仅记忆/归档提及；父级无宽度百分比搜索框修复无代码证据。
+---
 # 父级无宽度时百分比宽度无法展开搜索框
 在项目 苏住房C (zhi2-mobile-shimin) 中，当父级没有显式宽度时，`ZsSearch` 不会展开。
 

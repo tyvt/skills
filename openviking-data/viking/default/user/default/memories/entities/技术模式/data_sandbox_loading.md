@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:48:54+08:00
+verdict_note: 苏住房G assetPanorama/fundPanorama 含 v-loading=pageLoading 与 loadPanoramaData，首次加载 loading 属实
+---
 # 数据沙盘资产/资金全景首次加载 loading
 苏住房G(zhi2-web-admin) 已为「资产全景监管」和「资金全景监管」两个页面加上首次加载 loading，避免约 10 秒白屏。
 ## 实现方式
@@ -11,7 +16,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

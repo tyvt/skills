@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:12:51+08:00
+verdict_note: 苏住房C 加梯 addAlone.vue 源码命中 ZsTextarea，输入框高度塌陷修复属实。
+---
 # 加梯申请页申请说明输入框高度塌陷修复
 苏住房C小程序加梯申请页「申请说明」输入框因样式问题高度塌陷、标题叠加拦截点击，已修复。
 

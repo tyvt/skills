@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:49:12+08:00
+verdict_note: house_data.js 全仓 0 命中，苏找房web 无该文件，id 重排描述无法核实
+---
 # house_data.js 删数据后 id 需重排连续
 苏找房WEB 的 public/assets/js/house_data.js 删除数据后需将 id 重排为连续数值。
 

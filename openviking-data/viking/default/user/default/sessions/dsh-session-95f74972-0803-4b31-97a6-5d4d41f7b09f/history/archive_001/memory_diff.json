@@ -1,0 +1,28 @@
+{
+    "archive_uri": "viking://user/default/sessions/dsh-session-95f74972-0803-4b31-97a6-5d4d41f7b09f/history/archive_001",
+    "trace_id": null,
+    "extracted_at": "2026-11-27T08:34:48.308116+00:00",
+    "operations": {
+        "adds": [
+            {
+                "uri": "viking://user/default/memories/entities/zentao_bug/zentao_bug_7080.md",
+                "memory_type": "entities",
+                "after": "# ZenTao Bug 7080\nZenTao bug 7080 \"其他缴款-缴款网点选中后不回显\" (payment outlet does not echo after selection in the other-payment form) is being worked under chain_id=bug7080-bankbranch-echo. On 2026-11-27 hop1 restored the UAT real-device verification path and reached the add page, but echo verification, commit/push, and ZenTao writeback remain for hop2.\n\n## Basic info and prior work\n- Ticket: ZenTao bug 7080 \"其他缴款-缴款网点选中后不回显\"; chain_id=bug7080-bankbranch-echo.\n- Goal: real-device verify echo -> screenshot evidence into session + user confirmation -> commit/push submodule (detail.vue only) -> ZenTao 7080 writeback with attached image -> cleanup.\n- Already done before hop1: root cause located, fix landed (detail.vue:610-613 two-line field mapping), eslint 0 errors, build exit 0, plan approved + human-confirmed, worktree snapshot taken.\n\n## hop1 progress (2026-11-27)\n- Fixed UAT deploy-env nginx /api/v3.0 prefix rewrite (405): the gateway requires the /api/v3.0 prefix preserved (200); nginx stripped it to /v3.0 (405); changed gen_nginx_sites.ps1:76-80 v3.0 to identity rewrite preserving the prefix (v2.0 already identity; v3.0 was a legacy strip) and converged via the sanctioned sync script.\n- Fixed sync.ps1:51/108: load_registry() returns 3 values but the script unpacked 2 (pre-existing bug); -AsHashtable requires pwsh (PS6+), so sync was run with pwsh; sync rollback only restores sites-enabled, not env-sites, so the new conf stayed live despite a transient probe failure on unrelated sites.\n- Verification evidence: curl localhost:8103/api/v3.0/code and getInfo both 200; nginx -t passed.\n- agent-browser logged into UAT successfully; captcha recognized via magpie-vision (8/1 -> 8); navigated to Presale Fund Supervision -> Fund Deposit -> Other Payment (\"其他缴款\") add page.\n- Form behavior: both 归集账户 (collection account) and 缴款网点 (payment outlet) are disabled until 归集账户 is selected.\n- Blocker: first project \"客测项目1123002\" has no 归集账户, so the flow could not advance to the payment outlet; handoff triggered while switching projects.\n- Not done: echo not verified on device, code not committed, ZenTao not written back, temp artifacts not cleaned, background jobs not stopped.\n\n## Handoff\n- Document: D:/plan/苏州市房地产监测V3/HANDOFF-CHAIN-bug7080-bankbranch-echo-hop2-20261127-1632.md (9 sections).\n- Next hop2 scheduled for 16:33; goal = choose a project with a collection account -> verify payment outlet echo -> produce evidence + user confirmation -> commit/push + ZenTao 7080 writeback.\n- maxHops=10 / \"stop at hop>=10\" conflicts with AGENTS.md P0 (2026-11-23) forbidding maxHops and hop-count termination; at hop=1 with pending todos both readings say continue; termination only when section 4 is empty."
+            },
+            {
+                "uri": "viking://user/default/peers/gitlab.zhi.com-zhi-suzhou-shiqu-fangdichan-fe-zhi3-web-admin-h5-g-unlimited/memories/entities/technical_pattern/zhi3_nginx_rewrite.md",
+                "memory_type": "entities",
+                "after": "# zhi3 UAT nginx rewrite and sync pitfalls\nReusable fix for the UAT real-device verification path where nginx stripped the /api/v3.0 prefix and the gateway returned 405.\n\n## Root cause and fix\n- Gateway requires the /api/v3.0 prefix preserved (200); nginx rewrote it to /v3.0 (405).\n- gen_nginx_sites.ps1 v2.0 handler already used identity rewrite; v3.0 used a legacy strip.\n- Fixed gen_nginx_sites.ps1:76-80 by changing v3.0 to identity rewrite preserving the prefix, then converged via the sanctioned sync script.\n- Do not run the registry prune script: fdc-v3 has a local row but UAT intentionally uses a reachable remote gateway.\n\n## sync.ps1 pitfalls\n- load_registry() returns 3 values but sync.ps1 unpacks 2 - pre-existing bug, narrow-fixed at :51/:108.\n- sync.ps1 uses -AsHashtable (PS6+); run it with pwsh, not Windows PowerShell 5.1.\n- Sync rolled back on probe failure, but rollback only restores sites-enabled, not env-sites, so the new conf stayed live; the probe failure on unrelated sites was transient.\n- Verification: curl localhost:8103/api/v3.0/code and getInfo = 200; nginx -t passed."
+            }
+        ],
+        "updates": [],
+        "deletes": []
+    },
+    "skipped_operations": [],
+    "summary": {
+        "total_adds": 2,
+        "total_updates": 0,
+        "total_deletes": 0,
+        "total_skipped": 0
+    }
+}

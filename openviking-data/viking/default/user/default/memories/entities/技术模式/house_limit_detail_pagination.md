@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:51:17+08:00
+verdict_note: LimitRecordDetailDialog.vue 含 houseQuery/houseTotal/houseIndex/loadHouseList/involveLimitCount 与 zs-pagination，分页改造落地，一致。
+---
 # 关联房屋详情分页改造
 苏州市房地产监测V3 完成记录详情弹窗「关联房屋详情」分页改造。
 
@@ -17,7 +22,6 @@
 ## 验证与归属
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

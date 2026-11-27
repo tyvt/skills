@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:15:45+08:00
+verdict_note: 苏州V3 源码中 isSuzhouzhizai/currentEnvironment 已为 0 处，RegulatoryAccountDialog 命中，「已全局移除环境分支」与现状一致。
+---
 # 全局移除苏州智在与环境分支逻辑
 苏州市房地产监测V3 中已全局移除 `isSuzhouzhizai` 和 `currentEnvironment` 相关逻辑，统一为通用逻辑。
 

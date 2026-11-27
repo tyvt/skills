@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:51:54+08:00
+verdict_note: usePortal.js 命中 ensureProfileForBdcJump，跳转前刷新校验在。
+---
 # 用户名误存昵称且跳转前未刷新信息
 嵌入H5中setUserInfo字段映射错误致username误用nickName，跳转竞态致参数为空，需修正映射并在跳转前await刷新。
 

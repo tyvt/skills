@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:16:44+08:00
+verdict_note: 淮安物管 detail-template.vue-54 存在 getAmountDisplay，amount 类型占位符方案在代码中可查，描述属实。
+---
 # 因未使用 amount 类型导致面积字段显示 undefined
 在项目 淮安物管 (zhi2-web-admin) 中，propertyContract/components/detail.vue 使用了模板字符串 `${this.form.landArea}㎡`，当为 null 时导致 "undefined㎡"。
 
@@ -17,7 +22,6 @@
 - 所属项目：淮安物管
 - 验证证据：extracted source=cursor project=淮安物管
 - 来源会话：1d686e0a-d458-44a4-bb4f-d49a87fb35e2
-
 
 <!-- MEMORY_FIELDS
 {

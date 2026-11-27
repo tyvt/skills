@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T23:49:00+08:00
+verdict_note: 苏住房C全仓无useSubmitLock标识，声称input.vue重复导入useSubmitLock致re-export错误无法证实。
+---
 # input.vue useSubmitLock Duplicate Import
 In zhi2-mobile-shimin, input.vue had a duplicate import of useSubmitLock causing re-export error.
 ## Root Cause
@@ -20,7 +25,6 @@ In zhi2-mobile-shimin, input.vue had a duplicate import of useSubmitLock causing
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：90f801fd-16cc-4974-98c1-c375232f80c4
-
 
 <!-- MEMORY_FIELDS
 {

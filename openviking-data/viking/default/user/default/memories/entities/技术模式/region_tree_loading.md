@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:49:06+08:00
+verdict_note: 园区物管2.0 命中 regionTree/RegionTreeLayout/treeLoading/getDeptList/treeData/treeRenderKey/treeBusy，区域树 loading 属实。
+---
 # region_tree_loading
 园区物管2.0 property/complex 左侧区域树请求中 el-tree 应显示「加载中」而非「暂无数据」的约定。
 

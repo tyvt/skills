@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:50:03+08:00
+verdict_note: 园区公共收益ruoyi.js含getBTerminalRegulatoryDialogConfig与getRouterPathByFilePathOptional，无授权菜单修复属实。
+---
 # B端收益类新增页初始化监管提示链接触发无授权菜单
 用款申请等 benefit 模块新增页初始化阶段构建「前往开户/签署协议」链接若调 getRouterPathByFilePath，B 端用户无菜单会抛「没有授权相关菜单」。
 

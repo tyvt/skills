@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:00:15+08:00
+verdict_note: 实机核对：产品2.0 TagsView/index.vue 仍为 class="el-icon-close"、样式 .el-icon-close；全仓无 @element-plus/icons-vue 引入、无 <Close/>。记忆所述改为 Close 组件与代码现状不符。
+---
 # Element Plus 关闭图标弃用 el-icon-close 改用 Close 组件
 zhi2-web-admin 在 Element Plus 下 class="el-icon-close" 已无对应字体图标，必须按需引入图标组件。
 

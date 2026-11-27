@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:30:04+08:00
+verdict_note: 园区公共收益pubVerificationReceipts/detail.vue含voucherFileId，BankReceiptDetailDialog.vue亦有，与凭证附件修复描述一致。
+---
 # 回单核销凭证删附件后查看态可点击0
 凭证并存 voucherFileUrl（展示/上传 v-model）与 voucherFileId（提交主键）。删附件时若 change 回调在列表为空 early return，只清 URL 而 voucherFileId 保留；保存后后端回写 voucherFileId:0，查看态用 url||id 兜底把 0 当路径渲染成可下载链接。
 

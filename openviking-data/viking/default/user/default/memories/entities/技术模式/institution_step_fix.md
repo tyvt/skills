@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:16:38+08:00
+verdict_note: 苏州市房地产监测V3 institutionRegister(48)/getInstitutionRegisterDetail(4)/ensureValidStep(1)命中，步骤回退修复属实。
+---
 # 经纪机构注册步骤回退回显修复
 苏州市房地产监测V3 修复经纪机构注册 Step3 回退时管理员信息无法回显、点下一步报「注册单 ID 缺失」的问题。
 
@@ -17,7 +22,6 @@
 ## 验证与归属
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

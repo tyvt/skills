@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:33:07+08:00
+verdict_note: 淮安物管 TagsView/index.vue-24,659 有 more-btn-wrapper、-609 有 tags-view-container，z-index 收敛描述属实。
+---
 # TagsView 更多下拉 z-index 收敛
 淮安物管 TagsView「更多」下拉 z-index 高于弹窗遮罩导致边线浮于遮罩上的修复约定。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:48:49+08:00
+verdict_note: 实机核对：V3 presale/permit/components/detail.vue(66) 存在 hide-headline，zs-tabs type=line 组件与文档规范齐备；Tab 改 zs-tabs 方案属实。
+---
 # 预售许可详情页 Tab UI 修复
 苏州市房地产监测V3 项目修复了预售许可详情页顶部与底部 Tab 的 UI 样式不一致与标题重复问题。
 

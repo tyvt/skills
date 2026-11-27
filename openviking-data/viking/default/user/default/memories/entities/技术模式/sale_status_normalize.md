@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:46:55+08:00
+verdict_note: houseLimitConstants.js 含 resolveHouseSaleStatus 且用 saleStatus ?? sale_status 统一来源，属实
+---
 # 房屋销售状态的规范化
 在苏州市房地产监测V3的house-limit模块中，房产数据存在重复的字段`saleStatus`和`sale_status`；`houseLimitConstants.js`中的`resolveHouseSaleStatus`统一了来源，以使`dict-tag`显示和`isHouseSelectable`禁用逻辑保持一致。
 

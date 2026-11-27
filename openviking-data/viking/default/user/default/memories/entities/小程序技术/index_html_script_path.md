@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:28:40+08:00
+verdict_note: 苏住房C index.html 按 location.pathname 计算资源根、SM3Digest/szffluzm 绝对路径注入在源，描述属实。
+---
 # index.html脚本绝对路径注入
 zhi2-mobile-shimin的index.html脚本须按location.pathname计算资源根再用绝对路径，避免无尾斜杠入口404。
 ## 问题现象

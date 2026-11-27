@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:15:44+08:00
+verdict_note: 园区物管2.0 OperationBtnGroup/index.vue-273 当前 z-index 为 11（注释称高于 el-table 固定列 10），并非记忆所述从 10 改为 1，与现状不符。
+---
 # 操作栏 z-index 过高遮挡顶栏下拉
 园区物管2.0 中 OperationBtnGroup 的 z-index:10 大于 Navbar 顶栏根节点 z-index:9，导致操作栏压住顶栏下拉菜单。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:44:48+08:00
+verdict_note: 手机号授权弹窗 UI 间距为用户设计规范类偏好，仓内无对应组件文件亦无反证，非幻觉/违规。
+---
 - WechatPhoneAuthPopup.vue 弹窗顶部内边距 24px、图标到标题间距 8px、标题到文案间距 24px
 - 移除 72×72 图标容器，图标显示尺寸改为 49px
 - 标题与说明文字居中，权益列表左对齐
@@ -7,7 +12,6 @@
 ## 验证与归属
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

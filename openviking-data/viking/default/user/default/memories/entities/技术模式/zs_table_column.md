@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:46:36+08:00
+verdict_note: 产品2.0 zs-table-column.vue实有hasCustomSlot(99)、slotWidth(229/409)及自动宽度判定，与插槽列测宽修复一致。
+---
 # zs-table-column 自定义插槽列宽度修复
 [苏房] 自定义插槽列被排除出自动测宽，无宽度列吸走剩余空间成大片空白，需组件层修复。
 

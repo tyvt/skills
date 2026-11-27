@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:17:44+08:00
+verdict_note: 苏州市房地产监测V3 中 fileMaxSize、institutionRegisterAppendix、RegisterUploadItem 命中，附件配置修复属实。
+---
 # 附件配置主数据错配导致提示与拦截不一致
 开发企业注册上传附件时页面提示 5MB 但实际拦截 0.48MB，根因是附件配置表 FILE_MAX_SIZE 误配而非代码 bug。
 

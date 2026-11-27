@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T19:43:32+08:00
+verdict_note: 所列 qualification_change_btn 等为记忆别名而非代码符号，全库无对应实现，清单条目无法用代码证明
+---
 # 苏州市房地产监测V3已知修复清单
 苏州市房地产监测V3项目累积的前端修复点集合，详细会话见各独立修复实体。
 

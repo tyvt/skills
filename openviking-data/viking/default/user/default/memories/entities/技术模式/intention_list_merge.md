@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:19:40+08:00
+verdict_note: 苏住房C 命中 intention/list、menuRouteMap、pages_transaction，意向列表合并属实
+---
 # 苏找房求购信息页面合并修复
 苏住房C「苏找房」安卓端求购信息空白，根因是 intention/my/list 页面路径仍存在但组件已抽走，安卓端加载报错。
 

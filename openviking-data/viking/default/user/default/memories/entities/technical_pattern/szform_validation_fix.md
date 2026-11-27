@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:48:29+08:00
+verdict_note: 实机核对：V3 contract/chapters/suzhou2016 validation.js(5) CHAPTER_REQUIRED、fieldAnchor、szForm.js checkValidate、SzContent.getFormData 均在；校验修复属实。
+---
 # SzForm Empty Validation Caused No Frontend Location
 In 苏州市房地产监测V3 project, suzhou2016/mixins/szForm.js checkValidate() empty implementation caused no frontend validation on save and SzContent scroll to .is-error not triggered.
 

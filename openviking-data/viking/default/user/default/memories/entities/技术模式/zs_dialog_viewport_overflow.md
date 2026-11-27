@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:41:47+08:00
+verdict_note: 苏州市房地产监测V3 ParcelDialog.vue 实存 92vh/parcel-land-dialog，changeDetail/ParcelTable 等文件均在，修复描述与代码一致。
+---
 # 宗地变更弹窗超视口致底部关闭按钮裁切
 `zs-dialog` 在 `overflow: hidden` 下按内容算高度，宗地变更详情弹窗内详情加地图总高超过视口使 footer 被挤出可视区域。
 

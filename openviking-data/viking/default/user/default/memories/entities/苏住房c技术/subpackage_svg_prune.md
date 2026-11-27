@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:18:43+08:00
+verdict_note: 苏住房C utils/index.js 含 svg/ 路径映射处理且 headphone.svg 被 AboutUs.vue 使用，子包 SVG 需映射主题属实。
+---
 # 子包的SVG需要映射否则构建后失败
 在 zhi2-mobile-shimin 的构建中，主包中位于 `static/svg/` 的 SVG 文件被裁剪并在运行时从 `/pages_main/static/svg/` 加载，要求进行映射注册。
 
@@ -17,7 +22,6 @@
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：e7e357b4-638f-4ace-8ca0-7fa9ff707a43
-
 
 <!-- MEMORY_FIELDS
 {

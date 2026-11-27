@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:18:50+08:00
+verdict_note: controller-bench 报告与编排器配置命中 composer-2.5/code_edit_with_signal，模型失效模式记录属实
+---
 # composer-2.5
 composer-2.5 是 cursor-model-routing 编排器中使用的模型之一，存在特定的偏题失效模式。
 

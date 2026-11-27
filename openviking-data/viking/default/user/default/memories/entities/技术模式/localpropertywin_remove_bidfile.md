@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:17:18+08:00
+verdict_note: 苏住房G localPropertyWin/detail.vue 命中 acceptable，删除投标文件字段属实
+---
 # 中标结果备案删除投标文件字段
 苏住房G 项目本地资产中标结果备案详情页（`localPropertyWin/detail.vue`）已删除「投标文件」字段。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

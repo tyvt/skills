@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:49:06+08:00
+verdict_note: loginAsCompanyOnce 在 auth-helpers.js(6处)、switchToCompany 在 e2e company spec 中命中，E2E 登录合并/切回约定属实（代码位于苏州V3，与会话归属略有出入）。
+---
 - 在从业人员 E2E 测试中，若一次登录可完成的多个步骤，合并为单个用例并仅登录一次，避免重复登录/恢复会话
 - 跨账号场景（如管理端审批）保留必要登录，审批后使用 `switchToCompany` 完整切回企业端
 - 增强 `auth-helpers.js` 中 `loginAsCompanyOnce` 恢复会话后的动态路由注入，供其他 spec 复用
@@ -6,7 +11,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

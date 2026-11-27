@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:44:03+08:00
+verdict_note: 命中 isRecordPriceMngSuzhou/recordPriceMngSuzhou 于 priceFiling 页，按路由 key 判定按钮方案属实(项目标注仍写产品2.0，代码在苏州V3)
+---
 # 申请查询页按钮显隐按 routeKey 判定
 产品2.0 的 recordPriceMngSuzhou 页面因按菜单标题文字分流导致查询页缺失按钮，需对齐参考仓库按路由 key 判定。
 

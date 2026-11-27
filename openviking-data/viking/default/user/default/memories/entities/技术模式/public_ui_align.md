@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T10:14:11+08:00
+verdict_note: 苏州市房地产监测V3 源码无 ServiceSchemePanel.vue（0 命中），所述公共 UI 改写所涉核心组件不存在，无法证实。
+---
 # 详情子表改用公共UI写法
 苏州市房地产监测V3 已按项目公共 UI 规范调整详情内嵌子表写法，对齐公共组件结构。
 

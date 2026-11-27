@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:43:39+08:00
+verdict_note: 苏州V3 e2e/README.md 含 192.168.1.129-8098，package.json/docs 记录 /sys/fdc 不需后缀，503排查的E2E基址描述有据。
+---
 # 后端工作流503致公司注册提交失败
 苏州市房地产监测V3 中后端工作流启动接口返回503，导致公司注册 Step4 股东信息提交失败。
 

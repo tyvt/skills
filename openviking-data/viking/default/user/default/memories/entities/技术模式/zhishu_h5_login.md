@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:46:48+08:00
+verdict_note: 仅命中记忆文件自身，zhi2-mobile-shimin-h5-zhishu 的 uuid/ImgCode 代码未找到，无独立证据。
+---
 # zhi2-mobile-shimin-h5-zhishu-c-unlimited 登录要点
 `zhi2-mobile-shimin-h5-zhishu-c-unlimited` 项目 H5 密码登录与图形验证码环节依赖 `uuid` 的技术要点。
 

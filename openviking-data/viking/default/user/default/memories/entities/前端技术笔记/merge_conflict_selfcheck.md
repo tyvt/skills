@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:31:41+08:00
+verdict_note: 园区物管2.0 zhi2-web-admin存在AmountInput/index.vue、money.js等所述文件，合并冲突双重自检工作流记录无矛盾证据。
+---
 # 合并冲突双重自检工作流
 园区物管2.0 子模块 zhi2-web-admin 中处理报告的大量合并冲突前，需先双重自检确认是否真有冲突。
 

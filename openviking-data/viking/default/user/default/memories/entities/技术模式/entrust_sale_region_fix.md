@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:49:00+08:00
+verdict_note: 实机核对：V3 presale/entrustSale/detail.vue normalizeDetail(209) 读 data.region、buildSavePayload(224) 发 form.region，regionLabel 展示用 form.region；areaCode→region 迁移属实。
+---
 # 委托销售接口将参数 areaCode 改为 region
 在 Suzhou Real Estate Monitoring V3 项目中，后端在委托销售接口中将输入字段和详情返回字段从 areaCode 改为 region；前端未对齐。
 
@@ -19,7 +24,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：74428e0b-126e-4f90-9fc3-2fbe6b27a399
-
 
 <!-- MEMORY_FIELDS
 {

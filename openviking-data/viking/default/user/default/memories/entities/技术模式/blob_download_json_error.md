@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:51:48+08:00
+verdict_note: src/utils/index.js 含 downloadBlobFileWithCheck 且 import.vue 调用，属实
+---
 # Blob 下载接口 JSON 错误兼容
 产品2.0 下载模板类接口设 responseType:'blob' 后，后端报错被封装成二进制，现有 JSON 解析链路失效，需 downloadBlobFileWithCheck + 错误拦截器解析 Blob。
 

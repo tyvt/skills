@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:42:09+08:00
+verdict_note: 记忆点名的 6 个门户文件（PropertyPages/InformationPages/BrokerPages/RentalPages/PropertyDetailDialog/RentalDetailDialog）均存在，标签文案规范无矛盾。
+---
 # 门户二级页与弹窗字段标签去全角冒号
 门户二级页与弹窗里字段标签后的全角冒号已统一去掉。
 

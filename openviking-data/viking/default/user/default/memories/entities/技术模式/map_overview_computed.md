@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:11:49+08:00
+verdict_note: mapOverview/index.vue 仅有 computed；districtStatsByName/threeAssetsMax 在所有实机代码均无，仅存于记忆归档，无法证实。
+---
 # 地图概览重复 computed 修复
 园区物管2.0 修复 mapOverview 因重复 computed 键覆盖导致悬停弹窗报错的问题，并规范 computed 书写。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

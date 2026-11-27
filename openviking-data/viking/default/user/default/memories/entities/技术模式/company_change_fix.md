@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:14:38+08:00
+verdict_note: CompanyBasicInfoDetail.vue 与 toB/companyRecord/detail.vue 实机均不存在，403 降级修复无法证实。
+---
 # 企业基本信息变更功能与403降级修复
 企业基本信息页面增加变更功能，测试中发现保存接口403，顺带修复多项前端阻塞。
 

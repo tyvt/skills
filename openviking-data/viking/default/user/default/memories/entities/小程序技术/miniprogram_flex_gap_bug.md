@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:46:11+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src 全局无 page-block 类，记忆所称改用 page-block 包裹的控制间距方案无代码证据
+---
 # 微信小程序flex gap不稳致卡片间距失效
 苏住房C小程序 flex gap 对组件子元素支持不稳定，base-card 的 margin-top 被清除，卡片上下间距失效，改用 page-block 包裹控制间距。
 

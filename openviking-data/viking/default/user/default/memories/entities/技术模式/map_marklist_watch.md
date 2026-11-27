@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:31:48+08:00
+verdict_note: MultiMarker 地图点位重绘与 statisticsMap lng/lat→longitude/latitude 映射在多仓源码可查，方案属实。
+---
 # 地图组件深度监听markList重绘
 自封装 Map 组件需 watch markList 深度重绘 marker，并映射后端经纬度字段。
 

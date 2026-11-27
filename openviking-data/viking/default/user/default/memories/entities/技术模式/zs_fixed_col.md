@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:55:31+08:00
+verdict_note: zs-table-column.vue 与 zs-table.vue 含 getBaseWidth、slot-width，固定列宽度分配属实
+---
 # 固定宽度的自定义列不参与 zs-table 中的宽度分配
 Suzhou Real Estate Monitoring V3 系统：zs-table 曾将固定列视为可拉伸的，导致空白；已修正为使用 slot-width。
 

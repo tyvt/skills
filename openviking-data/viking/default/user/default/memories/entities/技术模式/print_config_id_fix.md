@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:16:55+08:00
+verdict_note: 产品2.0 printConfigId = this.id 命中1次（$attrs.id 写法已消失），修复与现状一致。
+---
 # ParamsDialog 打印配置保存缺 printConfigId 修复
 系统工具-打印配置保存报错因请求体缺 printConfigId，已修复。
 

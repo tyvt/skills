@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:53:00+08:00
+verdict_note: 太仓一网通办H5命中 ParticipateIn/StepSign/FaceStep/StepChooseCommon，签字与人脸识别必经流程属实。
+---
 # 表决流程签字与人脸识别为必经步骤
 太仓一网通办H5 的参与表决页面定义了四步流程，签字与人脸识别均已接入且为提交前的强制步骤。
 
@@ -13,7 +18,6 @@
 - 验证证据：extracted source=cursor project=太仓一网通办H5
 - 涉及文件：src/views/decision/ParticipateIn.vue、src/views/decision/components/StepSign.vue、src/views/decision/components/FaceStep.vue
 - 所属项目：太仓一网通办H5；来源会话：cbc17960-f384-48d7-9b4e-db2e42efe692；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

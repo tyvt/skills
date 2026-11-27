@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:19:51+08:00
+verdict_note: 苏住房C 中 ZsDatePicker、white-space-nowrap、padding-0 8px 命中，日期换行修复属实。
+---
 # 报事报修筛选弹窗日期换行修复
 苏住房C小程序「报事报修」筛选弹窗中「上报日期」因宽度与换行问题掉字，已通过样式调整修复。
 

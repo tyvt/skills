@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:28:28+08:00
+verdict_note: 惠山二期G parkingSpace/index.vue已无「审批」按钮与isApproveDisabled，保留handleApproval，与隐藏审批按钮的改动一致。
+---
 # 禅道缺陷 6939
 惠山二期G 产品2.0（zhi2-web-admin）停车泊位列表的缺陷：要求在审批业务逻辑完善前关闭外部「审批」按钮。
 
@@ -15,7 +20,6 @@
 ## 处理状态
 - 2026-11-24 代码改动已完成，但实机 UI 未验证：改后 build 刚结束即触发 P0 成本硬交接，尚未导航到停车泊位页截图，非功能失败。
 - 剩余待办：实机截图 → 用户确认 → 提交 → 回写禅道 6939（附图）→ 清理产物，已移交接续会话（hop1/10）。
-
 
 <!-- MEMORY_FIELDS
 {

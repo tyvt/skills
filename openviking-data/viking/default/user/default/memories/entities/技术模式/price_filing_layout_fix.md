@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:50:50+08:00
+verdict_note: recordPriceMngContentInfo.js 命中 autoHeight，备案意见自适应在。
+---
 # 价格备案详情 view 模式可编辑字段布局修复
 苏州市房地产监测V3 修复价格备案（苏州）详情 view 模式下可编辑字段布局异常。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:48:24+08:00
+verdict_note: 苏住房G home/v2/components/KeyDataNav.vue为kd__row/kd__card结构，kd__sec--split与kd__divider均0命中，记忆所述间距修复与现状不符。
+---
 # 首页关键数据导航图标间距修复（苏住房G）
 苏住房G 项目修复首页「关键数据导航」第二、第三块图标贴住分隔线或压到上一块明细区的问题。
 

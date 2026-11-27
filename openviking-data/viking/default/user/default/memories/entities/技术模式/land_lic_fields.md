@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:14:01+08:00
+verdict_note: 苏州V3 含 BaseLandLicForm/不动产权证号/用地性质/changeDetail，许可证字段顺序调整属实。
+---
 # 建设用地规划许可证字段顺序调整
 苏州市房地产监测V3 的「建设用地规划许可证」基本信息字段已按设计稿调整顺序，不动产权证号移至用地性质之后。
 

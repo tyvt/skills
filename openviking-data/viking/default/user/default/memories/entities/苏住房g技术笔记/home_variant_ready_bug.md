@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:49:05+08:00
+verdict_note: 苏住房G home/index-wrapper.vue 命中 homeVariantReady(1)，首页分流门禁描述属实
+---
 # 首页分流门禁永久 loading 修复
 苏住房G 后台首页 homeVariantReady 只认 terminalType!=null，导致 G 端/超管因 GetInfo 不下发该字段而永久 loading。
 ## 问题现象

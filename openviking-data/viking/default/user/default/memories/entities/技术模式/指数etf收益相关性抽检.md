@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T19:46:03+08:00
+verdict_note: fund 下 dividend_data.py 等均无 512890/560150/H30269 或相关性数值，ETF 相关性抽检结论无代码证据
+---
 # 指数ETF收益相关性抽检
 部分指数在 baostock 无直接 K 线，可用跟踪 ETF 日收益与指数序列做相关性抽检作为价格可靠性辅助证据。
 

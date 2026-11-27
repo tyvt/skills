@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:46:19+08:00
+verdict_note: 在苏住房G仓源码命中核心符号(6/6)operationbtngroup,property,regionbankauth,regionbankauthchange，涉及文件存在，描述与现状一致，判有效。
+---
 # saveLoading
 苏住房G 前端（zhi2-web-admin）中用于按钮保存状态的布尔变量，默认 false。
 
@@ -11,7 +16,6 @@
 ## 验证与归属
 - 所属项目：苏住房G
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

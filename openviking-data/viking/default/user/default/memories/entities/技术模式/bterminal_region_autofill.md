@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:52:10+08:00
+verdict_note: 实机核对：园区物管2.0 layout/index.vue(28) isBTerminal、pubManagementOrg/detail.vue(538) applyPropertyProjectRow 等多页适配均在；B端区域禁用/自动填充属实。
+---
 # B端物业区域禁用且自动填充当前选中
 园区物管2.0 中 B 端页面通过 isBTerminal 计算属性禁用物业管理区域输入框、隐藏搜索图标，新增时自动填充当前选中区域。
 

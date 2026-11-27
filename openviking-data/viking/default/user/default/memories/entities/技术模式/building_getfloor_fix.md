@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:16:20+08:00
+verdict_note: building/detail.vue 含 getFloor、floorNumberAbove/Under、add(，||0 兜底对象真实存在。
+---
 # Building详情getFloor的mathjs add报错修复
 园区公共收益项目中BuildingDetail页面的getFloor方法因mathjs add处理undefined导致Vue warn报错，已通过||0兜底修复。
 

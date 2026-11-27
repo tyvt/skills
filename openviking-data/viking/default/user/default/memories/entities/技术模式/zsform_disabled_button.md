@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:56:56+08:00
+verdict_note: pubBankReceiptApply/detail.vue 含 Headline/hasQueryDetail/right 插槽，按钮移出 zs-form 描述属实
+---
 # zs-form禁用致回单明细按钮置灰
 详情页 view 模式禁用整个 zs-form，原在表单内的「获取回单明细」按钮随之置灰不可点。
 

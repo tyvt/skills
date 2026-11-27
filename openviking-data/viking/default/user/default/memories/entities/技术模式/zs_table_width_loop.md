@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:20:03+08:00
+verdict_note: 园区物管2.0 zs-table-column.vue 用 contentWidth 纯 computed(L157)，zs-table 已无 distributeColumnWidths，与移除分配引擎的重构描述一致。
+---
 # zs-table 列宽因自动反馈导致的死循环
 在 园区物管2.0 项目中，zs-table 自定义的列宽分配引擎在读取渲染结果并重写布局时，导致与 el-table 的同步循环。
 

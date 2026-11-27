@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:56:35+08:00
+verdict_note: map.vue/mapLoader.js 实存 MultiLabel、styleId、baseMap 要素配置，与行政区名称重影修复描述一致。
+---
 # 腾讯地图行政区名称重影修复
 苏州市等行政区名称在腾讯矢量底图上出现重影/叠字，根因为底图 POI 文字与自定义 MultiLabel 叠加且 styleId 引用未定义键。
 

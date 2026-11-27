@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:49:59+08:00
+verdict_note: 苏住房G regionBankAuth/index.vue-68与StreetAuthDialog.vue-23均为'/system/streetBankPolicy'，印证记忆所述/system路径前缀约定。
+---
 # 外部接口路径前缀核对与下线必填项全链路审查
 [苏房G] 补外部接口路径前缀前先核对项目 /system 约定；下线必填项要同时审 prop 空壳与 skip-check 连带失效。
 

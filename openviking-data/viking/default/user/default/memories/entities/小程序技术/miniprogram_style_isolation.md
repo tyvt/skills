@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:13:38+08:00
+verdict_note: 苏住房C 命中 rgba(19,84,190,0.08)、ZsCheckbox 与 highlight，选中态组件内闭环修复属实。
+---
 # 微信小程序样式隔离使:deep无法穿透自定义组件
 苏住房C（uni-app小程序zhi2-mobile-shimin）中，父页 :deep() 无法穿透 ZsCheckbox 等自定义组件内部节点，选中态背景色与内边距等样式静默失效。
 

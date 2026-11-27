@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T11:18:36+08:00
+verdict_note: 产品2.0 路径下 AveragePriceTable.vue 不存在（该组件实际在其他项目），response.rows || response.data 属通用写法，记忆项目归属与现状不符。
+---
 # 平均价格表响应修复
 平均价格表组件已调整以兼容 API 返回格式。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:34:02+08:00
+verdict_note: 门户 router/index.js 的 baseDataActionNames 已不含行政区域 getRegions，common.js 仅保留 region/listTree，移除属实。
+---
 # 路由守卫已移除getRegions调用
 门户 zhi2-web-admin 已移除登录后基础数据加载中的 `common/getRegions` 调用及对应 action，因该接口持续返回 500 且无功能依赖。
 

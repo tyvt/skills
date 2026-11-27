@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:18:21+08:00
+verdict_note: 苏州市房地产监测V3 存在 EntrustSaleAddAppendix.vue 要件上传组件，与描述一致
+---
 # 委托代售详情页要件上传布局对齐
 苏州市房地产监测V3 已完成委托代售详情页「要件上传」布局对齐到全局 `AnnexUpload`，业务逻辑未改。
 

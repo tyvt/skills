@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:54:32+08:00
+verdict_note: 描述与现状不符：记忆称删除的建湖G OperationContainer/SearchContainer 仍存在（exists=True），且 v-waiting 仍在源码多页使用；仅 package.json 无 v-waiting 条目，遗留组件删除未落地。
+---
 # 建湖G旧方案与V3现有能力重复
 建湖G 迁入的 OperationContainer、SearchContainer、v-waiting 与 V3 现有能力重复，且 v-waiting 劫持 XMLHttpRequest 与 Vite/axios 栈叠加致维护成本高。
 

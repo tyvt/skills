@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:18:36+08:00
+verdict_note: 门户命中 isAllowedPortalImageUrl、wechatQrSrc、BrokerPages，二维码白名单属实
+---
 # 门户经纪人页微信二维码白名单校验
 BrokerPages 模板中微信二维码为静态 `img`，`:src` 使用已校验的 `wechatQrSrc`（`isAllowedPortalImageUrl`），纯 CSS 改 QR 尺寸不改变该安全约束。
 

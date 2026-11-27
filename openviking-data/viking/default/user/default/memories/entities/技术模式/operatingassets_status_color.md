@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:49:11+08:00
+verdict_note: 描述与现状不符：记忆称部分缴款=#FDE3D1/.is-orange；实际 operatingAssets.vue 中 .is-orange 背景=#D0E4FF，且 #FDE3D1 被转换为 #D0E4FF(589/871)，图例部分缴款用 is-blue。关键颜色/类名映射失实。
+---
 # operatingAssets 状态颜色映射
 operatingAssets.vue 已按缴款状态调整颜色与图例文案，并兼容后端旧文案。
 

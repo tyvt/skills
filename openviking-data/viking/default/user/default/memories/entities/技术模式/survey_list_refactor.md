@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T10:13:15+08:00
+verdict_note: 产品2.0 源码未找到 survey/statistics/index.vue，statistics/index 仅见于 report.html 构建产物，所述重构文件无法证实。
+---
 # 问卷发布统计列表重构
 产品2.0 问卷发布详情的 `statistics/index.vue` 已对齐 `release/index.vue` 标准列表写法，使用 `ListTemplate.js` + `listMixins` 精简代码。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

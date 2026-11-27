@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:43:55+08:00
+verdict_note: 苏住房C ZsEmpty/NoticeList 实存；pages_owner community/project/subdistrict announcement 与 committee/application 命中，空态组件复用属实。
+---
 # Notice Empty State
 将公告页面的空状态标准化以使用 NoticeList 组件。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

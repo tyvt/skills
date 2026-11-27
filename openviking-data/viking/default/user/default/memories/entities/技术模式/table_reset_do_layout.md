@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:12:43+08:00
+verdict_note: 园区公共收益含ScopeSelectDialog与doLayout，表重置后doLayout修复属实。
+---
 # Always call doLayout after table reset to fix stale scroll area
 In the 园区公共收益 (zhi2-web-admin) project, ScopeSelectDialog.vue skipped doLayout() when listTableTr was unchanged, leaving the scroll area stale after search reset.
 
@@ -18,7 +23,6 @@ In the 园区公共收益 (zhi2-web-admin) project, ScopeSelectDialog.vue skippe
 - 所属项目：园区公共收益
 - 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：acf40130-9dda-4c08-b943-34292e01cab4
-
 
 <!-- MEMORY_FIELDS
 {

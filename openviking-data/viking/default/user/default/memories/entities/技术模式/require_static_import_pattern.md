@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T14:46:07+08:00
+verdict_note: cardData.vue-93 仍为 require("@/assets/images/down.png") 运行时取图；记忆所述「全量替换为静态引用」未落地。
+---
 # require运行时取图替换为静态引用
 将 `require()` 运行时取图逻辑全量替换为静态引用，替换后须全局排查与构建检查。
 

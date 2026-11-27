@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:43:55+08:00
+verdict_note: 苏住房G monthlyReportStat/detail.vue-2 根节点 class=list-container，与'改 list-container 修复'一致
+---
 # 月报统计详情页布局修复
 苏住房G 月报统计详情页因全局样式 `.detail-container` 设 `flex-direction: column-reverse`，标题栏被排到视觉底部，已通过将外层容器改为 `list-container` 修复。
 

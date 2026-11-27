@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:22:18+08:00
+verdict_note: RegionTreeLayout.vue 命中 parentDeptId/findParentNode，部门树返回根节点修复属实
+---
 # [苏房] 左侧部门树返回后跳回根节点
 行政区域银行授权等「左侧树+右侧列表」页面，从详情返回列表后树回到苏州市根节点，列表不再是之前筛选街道数据。
 

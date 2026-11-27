@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:54:21+08:00
+verdict_note: estate-manage/common-flowable/pom.xml 与 common-flowable-server/pom.xml 均在，-rf -common-flowable-server 续建所指模块属实
+---
 # Maven 复制构件失败因本地实例占着 jar
 全量构建中途报 Failed to copy artifact ... 另一个程序正在使用此文件，根因是本地还在跑的实例占着 target/lib 的 jar，停掉后用 -rf 续建。
 

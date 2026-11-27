@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:52:00+08:00
+verdict_note: 记忆所述 allocation/detail.vue 在产品2.0 不存在，adjustNotice/adjustNoticeId/custom-print 全项目无命中（仅 AgreementDetailsTable/index.vue moduleName-'prefund'）；新版框架改造无法证明有效。
+---
 # allocation/detail.vue 新版框架改造
 产品2.0 的 zhi2-web-admin 中 allocation/detail.vue 按新版框架完成改造。
 

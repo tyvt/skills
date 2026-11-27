@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:21:14+08:00
+verdict_note: autonomy/userAuth/detail.vue 命中 clearOrganizationFields/checkUserUnique，组织核验失败级联清空属实
+---
 # 自治用户授权组织核验失败级联清空
 园区物管2.0 中 autonomy/userAuth/detail.vue 在组织名称核验失败或切换业务类型时须级联清空组织与从属用户字段。
 

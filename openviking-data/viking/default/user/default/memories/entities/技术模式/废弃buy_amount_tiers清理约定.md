@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:49:31+08:00
+verdict_note: buy_amount_tiers 仅在记忆文件命中，投资推送项目源码未找到，清理约定无代码证据。
+---
 # 废弃buy_amount_tiers清理约定
 分档金额迁至 buy_amount_change.py / buy_amount_config.py 后，约定删除死代码与孤儿 pyc 缓存的清理规范。
 

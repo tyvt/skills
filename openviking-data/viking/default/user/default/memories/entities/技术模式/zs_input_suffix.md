@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:11:11+08:00
+verdict_note: 苏州市房地产监测V3源码含 scripts/check-dialog-picker-suffix-icon.mjs，package.json 挂载 check-dialog-picker-suffix，detail.vue 存在 suffix-icon/el-icon-search，描述属实。
+---
 # zs-input弹窗选择须带suffix-icon
 `zs-input` 带 `@focus` 弹窗选择时必须声明 `suffix-icon="el-icon-search"`，并通过新增 lint 脚本批量补齐图标。
 

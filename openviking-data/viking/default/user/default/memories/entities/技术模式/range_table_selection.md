@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:53:03+08:00
+verdict_note: preparatoryRangeTable 相关页含 isSyncingSelection，选中同步标记修复属实
+---
 # PreparatoryRangeTable 列表模式选中丢失修复
 Vue3 迁移中，preparatoryRangeTable.vue 通过新增同步标记修复了切到 list 模式时选中丢失的问题。
 ## 问题根因

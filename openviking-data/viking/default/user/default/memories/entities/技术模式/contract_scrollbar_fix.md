@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:13:11+08:00
+verdict_note: 存在 sz-contract.scss 及 .s16-scroll/.s16-party-table-wrap 宽表双滚动条修复，与描述一致
+---
 # 2016合同出卖人宽表双横向滚动条修复
 苏州市房地产监测V3 中 `sz-contract.scss` 修复第一部分「出卖人」宽表出现两条横向滚动条的问题。
 

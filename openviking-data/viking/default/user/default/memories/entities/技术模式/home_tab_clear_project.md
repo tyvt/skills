@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:50:14+08:00
+verdict_note: 核对苏住房C：useBoundProjects、loadBoundProjects、clearProjectInfo 命中，首页 tab 清除项目描述一致。
+---
 # 首页 tab 切换清空小区缓存模式
 首页多 tab 切换时按绑定小区列表刷新缓存，空列表必须清掉本地小区信息，避免幽灵小区。
 

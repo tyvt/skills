@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:51:07+08:00
+verdict_note: rangeTable.vue、housePosition.js-18「隆舜园」分隔符处理、prop-'position' 均命中源码，bug 锚点与根因属实。
+---
 # 禅道 Bug 6677
 惠山二期G（zhi2-web-admin）房屋清单弹窗「房屋坐落」缺少分隔符的前端缺陷，2026-11-25 已复现、修复计划通过评审并获确认，代码待实现。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:44:29+08:00
+verdict_note: 园区公共收益 zs-table.vue-445/454/459 resyncTableLayout 实测存在
+---
 # 综合查询小计行错位修复
 园区公共收益项目综合查询列表小计行错位到操作列，修复集中在zs-table组件层，未改业务页query/index.vue。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:28:29+08:00
+verdict_note: 记忆为 skills 仓库知识：worktree-snapshot、submodule-commit、memory_audit 均见 skills/README.md 与 dsh/AGENTS.md-100，仓库事实一致。
+---
 # dsh_skills_repo
 DSH 技能与插件仓库，本体 D:/repository/skills，运行时目录 C:\Users\Administrator\.dsh\skills 指向它。
 

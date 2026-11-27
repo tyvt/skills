@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:20:33+08:00
+verdict_note: fund仓 report.py、sync_data_cache.py 命中，Python死代码import批处理对照描述有据
+---
 # 死代码冗余排查入口import批处理对照
 投资推送类纯 Python 仓库做冗余分析时，需入口加 import 链加批处理/README 三向对照，避免误删批处理依赖模块。
 

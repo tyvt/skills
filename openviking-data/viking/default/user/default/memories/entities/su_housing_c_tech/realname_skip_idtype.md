@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:18:32+08:00
+verdict_note: 核对 苏住房C/zhi2-mobile-shimin/src/utils/index.js：shouldSkip/IdType/RealName/FormLocal 均0次命中，记忆所述函数与文件不符；仅构建产物存在 FormLocal chunk，核心断言无法在当前源码证实。
+---
 # 实名认证跳过证件选择页
 苏住房C（zhi2-mobile-shimin）的实名认证入口已改为跳过证件类型选择页，直接进入姓名+证件号码输入页（FormLocal）。
 

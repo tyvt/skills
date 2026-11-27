@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:44:31+08:00
+verdict_note: 产品2.0 zhi2-web-admin/.husky/pre-commit 实存且含 REPO_ROOT/lint-staged.js/node 直跑，绕过 npx 修复属实。
+---
 # pre-commit调用lint-staged路径解析
 在 zhi2-web-admin 所在的 monorepo（npm workspaces）中，husky pre-commit 调用 lint-staged 易因路径解析失败报 `MODULE_NOT_FOUND`。
 

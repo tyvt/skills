@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:09:47+08:00
+verdict_note: 苏住房C optional/StepChoose.vue命中(4)，内边距调整目标文件存在。
+---
 # optional/StepChoose.vue 选项内边距布局修复
 苏住房C小程序 `optional/StepChoose.vue` 按图2调整选择项内边距，修复高亮背景贴边等问题。
 
@@ -17,7 +22,6 @@
 - 刷新页面后选项呈现为图2：卡片内有留白，选中项圆角浅蓝背景不贴边
 - 涉及文件：`optional/StepChoose.vue`、`pages_vote/decision/common/StepChoose.vue`
 - 所属项目：苏住房C；来源会话ID：7596f0ef-5187-468b-8b37-d30dd7fc905d；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

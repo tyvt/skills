@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-27T06:13:36+08:00
+verdict_note: automaticRobot 相关文件 white-space-nowrap/128rpx 零命中，记忆所述ZsButton防文字裁切修复在当前代码无证据。
+---
 # 在线咨询页发送按钮文字显示不全修复
 苏住房C小程序「我的→消息→微聊→机器客服」(在线咨询页)右下角发送按钮文字显示不全，因按钮宽度不足换行且文字被裁切。
 
@@ -17,7 +21,6 @@
 - 验证证据：cursor 会话 139110b4-03df-4c4d-bf70-e95f95be8853
 - 涉及文件：pages_main/automaticRobot/index.vue、pages_my/robot/index.vue、pages_my/robot/chitchatDetail.vue、pages_my/robot/chitchat.vue、pages.json、ZsButton.vue、problemListCard.vue、automaticRobot/index.vue、chitchatDetail.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

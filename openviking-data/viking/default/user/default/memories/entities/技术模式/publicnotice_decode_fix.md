@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:43:05+08:00
+verdict_note: 苏住房C publicNotice.vue-55-63 onLoad 直接以 options.label 设标题，印证'label 未解码直设'的问题描述
+---
 # publicNotice未解码URL参数致标题乱码
 苏住房C 移动端 `publicNotice/index.vue` 跳转时 `label` 经 `encodeURIComponent` 编码，但 `publicNotice.vue` 的 `onLoad` 未解码直接设标题。
 

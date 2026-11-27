@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:13:23+08:00
+verdict_note: 太仓一网通办H5 OptionStepChoose.vue 源码命中 minOptionNum，多选配置修复属实。
+---
 # 选项表决组件单选逻辑致无法多选
 太仓一网通办H5 的 OptionStepChoose.vue 强制单选，与后台多选配置冲突导致无法多选。
 

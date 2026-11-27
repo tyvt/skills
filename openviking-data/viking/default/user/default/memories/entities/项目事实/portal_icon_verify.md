@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:49:53+08:00
+verdict_note: 门户存在 home/publicPortal/components/PortalSearch.vue 等记忆所列文件，首页二级页 icon 改动范围可核对。
+---
 # 门户首页二级页面人员名称后icon隐藏改动验证
 首页二级页面人员名称后面的 icon 先全部隐藏，该改动经验证 `npx vite build` 通过且 ESLint 报错为改动前既有问题。
 

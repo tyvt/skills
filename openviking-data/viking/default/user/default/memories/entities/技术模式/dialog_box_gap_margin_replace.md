@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:48:35+08:00
+verdict_note: 苏州市房地产监测V3 实存 .dialog-box 12px、chooseHouseDialog.vue、HouseSelectDialog.vue，间距替换属实。
+---
 # 对话框使用 gap 替代重叠边距
 调整对话框中的间距，其中左右边距造成了过多空白。
 
@@ -15,7 +20,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：aa2afcf7-1398-4cdf-93b4-30183eff923a
-
 
 <!-- MEMORY_FIELDS
 {

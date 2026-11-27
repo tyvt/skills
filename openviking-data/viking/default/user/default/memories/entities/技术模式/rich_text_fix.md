@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T15:48:42+08:00
+verdict_note: 苏住房C utils/index.js 实存 formatRichTextContent，存在 ZsRichText 组件产物，统一富文本修复可核对。
+---
 # 富文本字段接口渲染失败统一修复
 苏住房C 大量返回富文本字段的接口无法渲染，已通过 `formatRichTextContent` 增强与 `ZsRichText` 组件统一修复。
 
@@ -21,7 +25,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：0bc1d7be-3e28-4c25-90a8-6816570ec803；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

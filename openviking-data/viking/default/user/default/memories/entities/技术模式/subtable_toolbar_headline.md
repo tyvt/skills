@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:20:56+08:00
+verdict_note: zhi2-web-admin/scripts 子表toolbar迁移脚本与QualificationsForm等组件命中，Headline #right规范属实
+---
 # 子表工具栏迁入 Headline #right 规范
 苏州市房地产监测V3 子表工具栏迁入 Headline #right 的待办已全部完成，统一子表操作按钮布局。
 

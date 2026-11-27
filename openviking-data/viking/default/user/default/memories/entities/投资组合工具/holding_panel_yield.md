@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:25:32+08:00
+verdict_note: 持仓面板 final_portfolio_v3.py/_selftest.js 与 targetYld*/股息率在 fund/ 及各仓均无命中，无代码证据
+---
 # 持仓面板目标股息率策略
 持仓面板（分析产出/持仓面板/）的目标股息率选股模块，按个股近3年股息率历史动态定价。
 

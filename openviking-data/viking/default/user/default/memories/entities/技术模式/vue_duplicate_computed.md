@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:26:58+08:00
+verdict_note: 项目bugfix无对应仓库，无法定位所述index.vue多重computed与...mapState合并；...mapState仅见于iHomePC等无关仓，无法证明。
+---
 # index.vue多个computed选项覆盖
 `index.vue` 声明多个 `computed` 选项导致前者被覆盖、`projectId` 未注册；合并为单一 `computed` 对象并使用展开运算符注入 `mapState` 即可消除告警。
 

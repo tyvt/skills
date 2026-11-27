@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:22:11+08:00
+verdict_note: 苏州市房地产监测V3 QualificationFormSection.vue、DeveloperBasicInfoForm.vue 命中，资质表单修复属实
+---
 # 资质表单布局塌陷修复
 苏州市房地产监测V3 修复资质表单变成「1行1列」的布局问题，并全局排查类似问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:42:00+08:00
+verdict_note: 工作流记忆；components-guide.md 实存于 苏住房G/worktrees/screen-motion/docs/，源码核对流程描述无矛盾证据。
+---
 # 公共组件手册源码核对工作流
 编写公共组件使用手册前必须逐条按当前源码核对，文档常量可能早已不存在，目录可能空，链接需用 Test-Path 验存在性。
 

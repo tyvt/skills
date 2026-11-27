@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:41:47+08:00
+verdict_note: institutionRegister/detail.vue 含 detail-from-container(-16)、detail-container(-2)、Headline(-18)，滚动容器包裹结构属实。
+---
 # 机构注册详情页内容截断修复
 苏州市房地产监测V3 的 institutionRegister/detail.vue 因 Headline 区块直接置于 .detail-container 下导致内容裁切，需包裹滚动容器。
 

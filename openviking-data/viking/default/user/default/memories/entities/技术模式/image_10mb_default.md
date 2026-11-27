@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:22:58+08:00
+verdict_note: 园区公共收益 assetLeaseApply 弹窗命中 file-size=10，图片上传10MB默认化属实
+---
 # 全站图片上传上限 10MB 默认化
 园区公共收益项目客户要求附件统一仅图片且上限 10MB 时，改 ImageUpload 组件默认 fileSize 并对业务弹窗显式传值。
 

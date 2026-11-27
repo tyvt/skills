@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:17:39+08:00
+verdict_note: 产品2.0 financialSubjectsTable.vue 命中 countTreeNodes/treeList，总数修复属实
+---
 # standard_account_subject_total_fix
 产品2.0 修复标准账套详情页财务科目表格底部「共 XX 条记录」缺失的问题。
 

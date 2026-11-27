@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:15:39+08:00
+verdict_note: CandidateDialog.vue 含 isMassesPoliticsStatus、群众、所属党组织，一致。
+---
 # 业委会选举候选业主群众隐藏党组织
 太仓G 业委会选举 CandidateDialog 若把所属党组织写死 required，选政治面貌「群众」仍会显示红星并校验失败。
 

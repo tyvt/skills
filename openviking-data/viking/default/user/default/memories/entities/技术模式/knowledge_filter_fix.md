@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:46:32+08:00
+verdict_note: 核对泰兴小程序：knowledgeCategory、resolveCategory、isDraftPathCrumbActive 等 18/18 关键 token 全中。
+---
 # 知识库筛选不生效修复
 泰兴小程序员工端知识库筛选修复完成，改动集中在 src/staff/pages/knowledge/index.vue。
 

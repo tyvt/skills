@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:20:10+08:00
+verdict_note: 苏住房防汛C端 命中 ref-assets 与 8095 端口，H5 项目结构属实
+---
 # 苏住房防汛C端移动查询H5
 苏州住房防汛业务查询与办理的 uni-app Vue3 移动端项目（GitLab suzhufang-fe/zhi2-mobile-query-h5），活跃分支 dev。
 

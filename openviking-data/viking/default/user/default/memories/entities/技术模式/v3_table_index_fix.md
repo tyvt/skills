@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:51:32+08:00
+verdict_note: zs-table-column.vue 命中 $attrs.type 与 scope.column.type，序号列重构在。
+---
 # zs-table-column 序号列点击修复
 苏州市房地产监测V3 中 zs-table-column.vue 重构后 `:index` 弹窗无法选择，已全局排查修复并完成 90 个文件迁移。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:21:18+08:00
+verdict_note: i淮安公版 vite.config.ts 含 import dayjs from dayjs、.eslintrc no-unresolved，全局化配置描述属实
+---
 # dayjs 作为 Vite 中的外部全局变量
 
 一种配置情况，其中 dayjs 是通过 CDN 引入的外部全局变量，而不是 npm 依赖。

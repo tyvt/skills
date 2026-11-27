@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T02:27:05+08:00
+verdict_note: 防复发脚本 scripts/scan-tag-mismatch.js 全仓源码不存在；苏州V3 仍有 25 个 vue 含 </el-table-column>。distinctive token 仅见于记忆镜像，描述与现状不符。
+---
 # 全局 zs/el 模板标签不匹配修复
 苏州市房地产监测V3 中 `zs-table-column` 与 `zs-form-item` 闭合标签错配已全局修复并加防复发脚本。
 

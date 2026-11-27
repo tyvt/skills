@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:21:50+08:00
+verdict_note: 苏州市房地产监测V3 三个migrate-v3.mjs脚本精确命中，V3接口迁移三轮分治描述属实
+---
 # zhi2-web-admin V3 接口规范化批量迁移
 对 zhi2-web-admin 的 src/api 与 views 做 V2 REST → V3 全 POST 动作式的脚本化三轮迁移，并定死边缘场景验收口径。
 

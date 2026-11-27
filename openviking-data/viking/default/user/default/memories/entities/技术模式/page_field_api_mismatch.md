@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:50:35+08:00
+verdict_note: 苏住房C fddydetail.vue 含 contactInformation 字段，与接口对齐描述一致
+---
 # 页面字段名与接口不一致致数据读取失败
 页面字段名（`loadLimit`、`contact`等）与接口实际字段（`loanAmount`、`contactInformation`等）不一致，导致除 `applicationMaterials`、`unableLoan` 外区块数据读取失败。
 

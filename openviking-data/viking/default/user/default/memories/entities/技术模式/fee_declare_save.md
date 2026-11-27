@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:14:52+08:00
+verdict_note: 苏住房G feeDeclare2/detail.vue 存在，showSave 命中，保存按钮显示条件描述属实
+---
 # 物业费申报详情页移除「保存」按钮（苏住房G）
 苏住房G 项目 feeDeclare2/detail.vue 调整了「保存」按钮的显示条件，仅编辑模式可见。
 

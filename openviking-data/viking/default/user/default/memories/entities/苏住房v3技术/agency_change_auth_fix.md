@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:48:13+08:00
+verdict_note: 命中 agencyChangeCoreFields/showChangeTooltip/jjjgbgxq/统一社会信用代码，核心字段授权变更方案属实。
+---
 # 机构基本信息「变更」授权错误修复
 苏州市房地产监测V3 补齐机构变更逻辑，核心字段变更须提交审核，非核心字段保存即生效。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:11:35+08:00
+verdict_note: 门户 HomeTodoTable.vue/app.js 等5个文件均命中，fill-height 布局修复代码真实存在。
+---
 # 首页待办表fill-height致列间留白
 门户首页待办表开启 fill-height 后侧栏收起列宽不均分留白，已修复 syncFillHeight 与监听 sidebar.opened。
 
@@ -22,7 +27,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
 - 验证证据：cursor 会话提取；所属项目：门户；来源会话：b25bdc8a-c0a8-4fca-bcff-d85e7e292acd
-
 
 <!-- MEMORY_FIELDS
 {

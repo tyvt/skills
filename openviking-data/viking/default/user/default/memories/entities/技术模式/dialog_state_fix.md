@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:00:26+08:00
+verdict_note: chooseHouseDialog.vue 实存 selectedOrigin/selectedTarget，selection.origin 已移除，与状态名统一修复描述一致。
+---
 # data() 中状态名称不一致导致 undefined
 在项目 苏州市房地产监测V3 中，`chooseHouseDialog.vue` 在 `data()` 中声明了 `selection.origin/target`，但 methods 使用了 `selectedOrigin/Target`，导致在 `forEach` 中出错。
 

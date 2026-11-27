@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:46:33+08:00
+verdict_note: 苏州市房地产监测V3 login.vue 已无固定/仅保留 500/520/560 三档 min-height，无 ResizeObserver，符合记忆所述移除自激监听的修复现状。
+---
 # 登录页左侧图片展示不全修复
 苏州市房地产监测V3 管理端与门户登录页因 `ResizeObserver` 正反馈导致图片区域涨到接近全屏，已修复。
 

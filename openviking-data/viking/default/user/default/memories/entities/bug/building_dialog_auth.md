@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-27T19:20:31+08:00
+verdict_note: 产品2.0 BuildingDialogAuth.vue 中“选中移入”、96vw 命中，complexBuildingAuth 存在，虽原有 suspect 标记但代码证据充分，判有效。
 ---
 # 楼幢授权弹窗样式同步修复
 产品2.0 的楼幢授权弹窗已从 develop/v2.6.1-yuanqu 分支同步样式，对应提交 cd9696539。

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:43:06+08:00
+verdict_note: 苏州市房地产监测V3 unblock/notice/detail.vue、noticeChange/detail.vue 实存 hasVerificationOptions，与 bug6520 修复一致。
+---
 # 禅道 Bug 6520
 预售资金监管银行-资金解款-划拨（用款）通知书详情页码值显示问题，2026-11-13 修复并回写禅道 resolved/fixed。
 

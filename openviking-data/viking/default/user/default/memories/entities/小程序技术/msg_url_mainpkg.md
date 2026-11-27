@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:13:38+08:00
+verdict_note: 苏住房C 源码无 route-map.js、无 normalizeLegacyPageUrl，utils/index.js 也无归一化映射；记忆声称新增的路由归一化函数不存在。
+---
 # 主包旧路径msgUrl前端归一化映射
 苏住房C小程序消息接口返回迁移前主包路径，navigateTo报页面不存在，须在跳转层normalizeLegacyPageUrl集中映射。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:42:18+08:00
+verdict_note: 产品2.0 passwordEncrypt.js 含逐字节密钥 A-16-Byte-keyValA-16-Byte-keyVal，login.vue 含 companyLogin 分支，AES-CBC恢复约定与描述一致。
+---
 # 登录密码加密恢复约定
 登录页密码加密被整段删除后需恢复，AES-CBC 的 Key/IV/模式必须与历史 bug43754 版本逐字节一致，复用全局 CryptoJS。
 

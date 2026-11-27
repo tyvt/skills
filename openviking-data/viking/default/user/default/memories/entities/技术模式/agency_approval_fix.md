@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:47:22+08:00
+verdict_note: AgencyPersonnelDetail/LeasePersonnelDetail/personnelRecord.js 含 businessName/personnelRecordChange/jgcyrybg/zlcyrybg，审批接口修复属实。
+---
 # 经纪从业人员变更审批接口修复
 苏州市房地产监测V3 项目修复经纪机构/租赁机构从业人员变更审批接口路径错误。
 

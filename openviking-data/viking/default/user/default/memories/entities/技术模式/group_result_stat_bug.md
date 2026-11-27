@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:31:46+08:00
+verdict_note: 太仓一网通办H5 有 election/ElectionResult.vue 使用 GroupResult、components/ProgressBar.vue 与 percent 逻辑；候选人统计组件与占比逻辑存在。
+---
 # 候选人统计误取无字段接口且百分比重复乘百
 太仓一网通办H5 的 GroupResult.vue 误用无字段接口并重复乘百，导致候选人统计错误。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:51:51+08:00
+verdict_note: 苏州市房地产监测V3 InformationPush/detail.vue-215 name-'InformationPushDetail'，与记忆所述组件改名一致。
+---
 # detail.vue 中缺失字段导致 Vue 警告
 在项目 苏州市房地产监测V3 中，InformationPush 的 `detail.vue` 和 `changeDetail.vue` 缺少 `primaryKey`、`moduleName`、`businessName`，且命名不规范，导致 Vue 警告。
 
@@ -16,7 +21,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：b2283e1b-5660-4ecc-9c6b-175b05319777
-
 
 <!-- MEMORY_FIELDS
 {

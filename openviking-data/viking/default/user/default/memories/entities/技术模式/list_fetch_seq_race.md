@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:50:09+08:00
+verdict_note: home/index-v2.vue-171 命中 todoPanelFetchSeq、-266 命中 loadStudyList，异步装载防竞态序号属实。
+---
 # 多列表异步装载防竞态序号
 苏住房G index-v2.vue 同页多异步装载需逐个补齐请求序号，避免慢请求覆盖与闭包 Tab 错配。
 

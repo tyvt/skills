@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:54:15+08:00
+verdict_note: zs-select/SingleSelect.vue 与 maintenanceFeeDtlDialog.vue 存在，flex 宽度修正属实
+---
 # zs-select flex容器宽度固定与嵌套弹窗修正
 在 maintenanceFeeDtlDialog.vue 与 SingleSelect.vue 中，flex 容器内的 zs-select 因缺乏明确宽度导致面板异常，需固定宽度并修正嵌套弹窗面板。
 
@@ -19,7 +24,6 @@
 ## 验证与归属
 - 所属项目：2-0
 - 验证证据：extracted source=cursor project=2-0
-
 
 <!-- MEMORY_FIELDS
 {

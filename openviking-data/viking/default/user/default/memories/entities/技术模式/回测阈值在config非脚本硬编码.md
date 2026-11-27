@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:50:16+08:00
+verdict_note: 投资推送含push.example.env、sell_trailing.py与backtest_buy_signals.py，阈值走config/env非脚本硬编码描述属实。
+---
 # 回测阈值在config非脚本硬编码
 投资推送项目的回测买卖门控阈值不在 backtest 脚本中硬编码，统一由 config.py（经 push.env 加载）管理。
 ## 阈值来源与卖出侧

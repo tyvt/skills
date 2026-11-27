@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:43:21+08:00
+verdict_note: 苏住房G regulation/components/index.vue 引入 REGULATION_TYPE/NAME/getKeyByValue，按钮文案从枚举派生属实
+---
 # 多套同类规则共用列表组件时按钮文案须从枚举派生
 苏住房G项目中业主自治-规约管理下管理规约/议事规则/工作规则三套规则共用同一列表组件，按钮中文名写死导致串味，须从类型枚举派生。
 

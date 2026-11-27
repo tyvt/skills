@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:46:53+08:00
+verdict_note: 惠山二期H5 含 handleLingxiLaunchQuery/goAdd/lingxi，V1/V2 灵锡绑房结构属实。
+---
 # 惠山V1V2灵锡绑房结构
 惠山二期H5 存在 V1 小程序与 V2 H5 两套灵锡绑房实现，核心逻辑位置不同。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:13:12+08:00
+verdict_note: 门户 operationGuideContent.js 含 rental-opening/rental-staff/contract-query/onAction，links 复用 onAction 属实。
+---
 # 操作指引外链 links 与 onAction
 门户首页操作指引文案加跳转时，在 operationGuideContent.js 为卡片配置 links，不要另写一套路由。
 

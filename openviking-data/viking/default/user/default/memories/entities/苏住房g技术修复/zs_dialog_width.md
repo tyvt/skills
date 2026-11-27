@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T12:24:25+08:00
+verdict_note: 苏住房G zhi2-web-admin 有 dialog-right 布局类（transferDiscount/dutyPaidDialog.vue、worktrees）及 propertyOwnerDialog，zs-dialog 宽度修复描述属实。
+---
 # zs-dialog 内容区宽度修复
 苏住房G(zhi2-web-admin) 公共组件 zs-dialog 弹窗内容区因缺少约定布局类导致表格未撑满宽度，已修复。
 ## 问题原因
@@ -13,7 +17,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

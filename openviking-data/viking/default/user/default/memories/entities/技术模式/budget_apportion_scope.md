@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:11:53+08:00
+verdict_note: 泰兴小程序命中 scope=estimated/final、shareAmountG/J、budget-apportion，概算决算字段来源区分属实
+---
 # 分摊页区分概算与决算字段来源
 泰兴小程序维修项目分摊页已区分「概算/决算」字段来源，通过跳转参数 scope 控制。
 

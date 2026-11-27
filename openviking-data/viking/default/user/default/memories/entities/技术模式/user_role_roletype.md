@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:15:56+08:00
+verdict_note: 园区公共收益 user/detail.vue-209/267 仍调用 /system/role/roles 且传 roleType-'1'，无 loadRoleOptions；记忆声称的解除 roleType 修复未落地。
+---
 # 用户角色下拉误传roleType致缺失
 园区公共收益(zhi2-web-admin)用户管理角色下拉因误传 roleType 仅返回管理端角色。
 

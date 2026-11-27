@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:49:08+08:00
+verdict_note: 产品2.0 package.json 含 @wangeditor/editor-for-vue 1.0.2，zs-editor.vue 从该包 import Editor/Toolbar，与 Vue3 集成方案一致。
+---
 # Vue3富文本wangeditor集成
 产品2.0（zhi2-web-admin）迁 Vue3 时富文本保持 @wangeditor/editor@5.1.x，Vue 封装依赖改为 @wangeditor/editor-for-vue@next。
 ## 集成要点

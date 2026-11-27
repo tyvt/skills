@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:48:08+08:00
+verdict_note: 园区物管2.0 zs-table-column.vue 有 min-width 分支，pubBankAccountInfo(及New) 存在，min-width 弹性列改动可核对。
+---
 # zs-table全列设宽右侧留白
 园区物管2.0 中 zs-table 全列设 width/min-width 时右侧留白，需组件层改造让 min-width 弹性列参与剩余空间均分。
 
